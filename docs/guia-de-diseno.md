@@ -33,6 +33,8 @@ Para calcular calidad, tier y precio (P112), cada elemento del diseño tiene una
 | **Crítico frecuente / potente** | *(por definir)* | Universo de las armas Tipo 4 y 6 (P115) |
 | **Tipo y cantidad de dados** | *(por definir)* | |
 | **Defensa** | *(por definir)* | |
+| **Bono a Parry / a Bloqueo** (escudos y armas) | *(por definir)*, **más que la durabilidad** | Dueño, 2026-09-30: son las variables fuertes de un escudo |
+| **Durabilidad** (`durPorPeso`) | **Menor que Parry y Bloqueo** | Dueño, 2026-09-30: "tiene un impacto menos fuerte que las variables anteriores" |
 
 ## 1. Familias de arma y su mecánica "de casa"
 
@@ -134,8 +136,24 @@ Mismo criterio que el contraataque, pero para las armas de **Tipo 4** (punzantes
 El **Tipo 12 está dedicado exclusivamente al efecto Explosión**: un arma es T12 si y solo si tiene ese efecto. No hay mazas ni martillos T12 que "solo peguen más". Las armas de Explosión son **muy raras y circunstanciales** (pocas, tiers altos, casi todas de rango y a dos manos). La calculadora valora la Explosión en 6 PC a radio 1 (+50 % por radio extra). Definición exacta del efecto: `preguntas-abiertas.md` (P-Explosión).
 **En pausa (2026-09-26):** no se diseñan armas T12 hasta que el resto esté consolidado; el único T12 del catálogo es el Lanzallamas (Excepcional).
 
-## Durabilidad como elemento de diseño (idea del dueño, 2026-09-26, para más adelante)
-Hoy todos los ítems tienen **3 puntos de durabilidad por punto de Peso** (mínimo 3). En el rework del catálogo se puede **usar la durabilidad para diferenciar ítems**: **escudos y armas resistentes** (más puntos que lo que da su Peso), **armas y escudos pensados para el Parry** (Parry y Bloqueo mejorados con buena durabilidad, o que gastan menos al perder el Bloqueo), etc. Pendiente: definir si es un campo propio del ítem o un bono, cuánto vale en PC en la calculadora y cómo se muestra en la tienda. Ver `durabilidad.md`.
+## Durabilidad como elemento de diseño (idea del dueño, 2026-09-26; hecho el 2026-09-30)
+Por defecto un ítem tiene **3 puntos de durabilidad por punto de Peso** (mínimo 3). Desde el 2026-09-30 es un **campo propio del
+ítem**, `durPorPeso` ("puntos por cada punto de Peso"): se elige en el asistente de ítems (paso Peso y daño en las armas, paso
+Peso/Precio en escudos y armaduras) y se ve en el "Ver" de cada ítem (ficha, GM Tools, tienda, editor del catálogo). 4 o 5 =
+más resistente para su peso; 2 = frágil. Regla en `comun/combatiente.js` (`durMax`). Ver `durabilidad.md`. Pendiente: cuánto
+vale en la calculadora de calidad/precio (P112).
+
+## Escudos: un espacio de diseño propio (dueño, 2026-09-30)
+Las armas ya tienen mucho para diferenciarse (Tipo, dados, efectos al golpear, crítico); los escudos eran más limitados. Con
+Parry → Bloqueo → durabilidad hay tres ejes para jugar con la calidad de un escudo (y también de un arma):
+- **Escudo normal**: sus stats salen de sus características (Peso, Defensa, resistencias a crítico).
+- **De Parry**: +1 al Parry, nada al Bloqueo (intercepta mejor, pero aguanta lo normal).
+- **De Bloqueo**: +1 al Bloqueo, nada al Parry (le cuesta interceptar, pero cuando lo hace aguanta más).
+- **Mejor en los dos**: más Parry y más Bloqueo.
+- **Resistente**: solo más durabilidad (el eje más suave: impacta menos que Parry y Bloqueo).
+- **Combinaciones**: mucho Parry y más durabilidad, etc.
+Los bonos a Parry y a Bloqueo ya son accesos rápidos del paso "Bonos" del asistente para la categoría Defensa. Ver P129 (a qué
+Parry cuenta el bono de un escudo).
 
 ## Máximo de Resistencia a crítico acumulable con el catálogo actual (medido 2026-09-27)
 Pedido del dueño (log «A desarrollar»): cuánto se puede acumular de Resistencia a crítico por Tipo con un ítem en cada slot, eligiendo la mejor pieza de cada uno del catálogo de hoy (889 ítems; slots: cabeza, armadura blanda, armadura rígida, manos, piernas, pies, escudo y 2 anillos; el arma no aporta).

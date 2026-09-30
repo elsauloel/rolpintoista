@@ -134,7 +134,9 @@ const Plantillas = (() => {
   /* ---- Ítem ---- la forma del catálogo, sin imagen ni lo de quien lo lleva. */
   function item(it){
     const out = clon(it);
-    ['id', 'imagen', 'equipado', 'cargaActual', '_bib'].forEach(k => delete out[k]);
+    // `dur` y `armRota` son el desgaste de ESA copia (la de la mochila de alguien), no del diseño: no viajan.
+    // `durPorPeso` sí (la durabilidad es una variable de diseño del ítem).
+    ['id', 'imagen', 'equipado', 'cargaActual', '_bib', 'dur', 'armRota'].forEach(k => delete out[k]);
     return out;
   }
 

@@ -205,7 +205,8 @@ header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 <div class="toast" id="toast"></div>
 
 <script src="../comun/efectos-golpe.js"></script>
-<script src="../comun/asistente-item.js"></script>
+<script src="../comun/combatiente.js?v=20260930f"></script>
+<script src="../comun/asistente-item.js?v=20260930a"></script>
 <script src="../comun/catalogo.js?v=20260929b"></script>
 <script>
 /* =========================================================
@@ -413,6 +414,7 @@ function verItem(id){
     if(EfectosGolpe.lista(item.efectosGolpe).length) L.push(linea('Al golpear', EfectosGolpe.resumenLista(item.efectosGolpe)));
   }
   L.push(linea('Peso', num(item.peso)));
+  if(Combatiente.durTexto(item)) L.push(linea('Durabilidad', Combatiente.durTexto(item)));   // variable de diseño (comun/combatiente.js)
   L.push(linea('Precio', `${num(item.precioCompra)} DDE`));
   if(esCons) L.push(linea('Unidades', `${num(item.unidades) || 1}${item.cargaMax ? ` · ${num(item.cargaMax)} cargas c/u` : ''}`));
   const mods = (item.mods || []).filter(m => m.stat);

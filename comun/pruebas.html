@@ -215,6 +215,18 @@ prueba('Parry y Bloqueo: con arma o escudo; sin nada o con arma natural, no', ()
     Combatiente.armaParaDefensa({arma: {nombre: '', peso: 1}}),
   ], [espada, escudo, null, escudo, null, null]);
 });
+prueba('durabilidad: 3 por Peso (mínimo 3); un ítem de diseño puede traer más o menos', () => igual([
+  Combatiente.durMax({tipoItem: 'escudo_1m', peso: 3}),
+  Combatiente.durMax({tipoItem: 'escudo_1m', peso: 3, durPorPeso: 5}),
+  Combatiente.durMax({tipoItem: 'arma_1m', peso: 2, durPorPeso: 2}),
+  Combatiente.durMax({tipoItem: 'cabeza', peso: 0}),
+  Combatiente.esDurable({tipoItem: 'anillos'}), Combatiente.esDurable({tipoItem: 'armadura_rigida'}),
+  Combatiente.durTexto({tipoItem: 'escudo_1m', peso: 3, durPorPeso: 5}),
+], [9, 15, 4, 3, false, true, '15 (5 por punto de Peso, más resistente)']));
+prueba('subir un ítem lleva su durabilidad de diseño pero no el desgaste de la copia', () => {
+  const s = Plantillas.limpiar('items', {nombre: 'Escudo', tipoItem: 'escudo_1m', peso: 3, durPorPeso: 4, dur: 2, armRota: 1});
+  igual([s.durPorPeso, 'dur' in s, 'armRota' in s], [4, false, false]);
+});
 prueba('estados-aplicar usa el motor: un jefe rebota el Stun', () => igual(EstadosAplicar.aplicarACreep({jefe: true, estados: []}, {nombre: 'Stun'}).motivo, 'Protección de jefe'));
 
 /* ---------- Plantillas (comun/plantillas.js) ---------- */

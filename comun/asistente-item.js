@@ -379,6 +379,7 @@ const AsistenteItem = (() => {
       h += efecto(`<span id="aa-dano">${danoHtml()}</span>`);
       h += `<div class="aa-nota"><b>Daño fijo</b>: se suma siempre al resultado de los dados. <b>Daño amplificado</b>: dados de más que no pesan (un arma liviana que pega como una pesada).</div>`;
       if(q.ctx !== 'creep') h += efecto(`<span id="aa-carga">${cargaHtml()}</span>`);
+      h += durCampo();
     }
 
     if(paso.id === 'defensa'){
@@ -471,6 +472,7 @@ const AsistenteItem = (() => {
       if(g !== 'arma'){
         h += campo('Peso', num('peso', d.peso, 'step="any" min="0" style="max-width:120px"'));
         if(q.ctx !== 'creep') h += efecto(`<span id="aa-carga">${cargaHtml()}</span>`);
+        if(DURABLE(d)) h += durCampo();
       }
       if(cfg.conPrecio){
         h += campo('Precio de compra (DDE)', num('precioCompra', d.precioCompra, 'step="1" min="0" style="max-width:140px"'));
@@ -510,6 +512,7 @@ const AsistenteItem = (() => {
         ${fila('Bonos', e(bonos || 'ninguno'))}
         ${cfg.conEstadoEquipar ? fila('Al equipar', e(String(d.equipoEstadoNombre || '').trim() || 'ningún estado')) : ''}
         ${q.ctx !== 'creep' || g !== 'arma' ? fila('Peso', f(n(d.peso))) : ''}
+        ${DURABLE(d) ? fila('Durabilidad', `${f(durTotal(d))} (${f(durPP(d))} por punto de Peso${durPP(d) > 3 ? ', más resistente' : durPP(d) < 3 ? ', frágil' : ''})`) : ''}
         ${cfg.conPrecio ? fila('Precio', `${f(n(d.precioCompra))} DDE`) : ''}
         ${cfg.conLugar ? fila('Dónde', d.equipado ? 'equipado' : `mochila (${f(n(d.ranuras))} ranura${n(d.ranuras) === 1 ? '' : 's'})`) : cfg.conRanuras ? fila('Ranuras', f(n(d.ranuras))) : ''}
       </div>`;
@@ -571,6 +574,23 @@ const AsistenteItem = (() => {
     return t + ' En la mochila no pesa: ocupa ranuras.';
   }
 
+  /* Durabilidad: variable de diseño del ítem (2026-09-30, dueño). Puntos por cada punto de Peso: 3 lo normal, más = mejor
+     calidad, menos = frágil; mínimo 3 en total. La regla es la del motor (comun/combatiente.js). */
+  const DURABLE = d => /^(arma_|escudo_|armadura_)/.test(String(d.tipoItem || '')) || ['cabeza', 'manos', 'piernas', 'pies'].includes(d.tipoItem);
+  const durPP = d => n(d.durPorPeso) > 0 ? n(d.durPorPeso) : 3;
+  const durTotal = d => typeof Combatiente !== 'undefined' ? Combatiente.durMax(d) : Math.max(3, Math.round(durPP(d) * Math.max(0, Math.round(n(d.peso)))));
+  function durHtml(){
+    const d = st.d, pp = durPP(d), tot = durTotal(d), peso = Math.max(0, Math.round(n(d.peso)));
+    const calidad = pp > 3 ? ' — <b>más resistente</b> que lo normal para su peso' : pp < 3 ? ' — <b>frágil</b> para su peso' : ' (lo normal)';
+    return `Durabilidad <b>${f(tot)}</b>: ${f(peso)} de Peso × ${f(pp)}${tot > pp * peso ? ' (sube al mínimo de 3)' : ''}${calidad}. Cada Bloqueo perdido (o una pieza de armadura dañada) le saca 1 punto; en 0 se rompe y no da efectos hasta repararlo.`;
+  }
+  function durCampo(){
+    const d = st.d;
+    return campo('Durabilidad: puntos por cada punto de Peso', num('durPorPeso', durPP(d), 'step="1" min="1" style="max-width:120px"'),
+      '3 es lo normal. Un ítem de mejor calidad puede tener 4 o 5; uno frágil, 2.' + (quien().ctx === 'creep' ? ' (Los creeps no gastan durabilidad: vale si se publica en el catálogo o se suelta como botín.)' : ''))
+      + efecto(`<span id="aa-dur">${durHtml()}</span>`);
+  }
+
   function precioHtml(){
     const d = st.d;
     return `Se compra a <b>${f(n(d.precioCompra))}</b> DDE y se vende a la mitad: <b>${f(n(d.precioCompra) / 2)}</b>.${st.cfg.precioTxt ? ' ' + st.cfg.precioTxt(d) : ''}`;
@@ -617,7 +637,7 @@ const AsistenteItem = (() => {
     dibujar();
   }
 
-  const NUMERICOS = ['peso', 'danoFijo', 'danoAmplificado', 'precioCompra', 'ranuras', 'equipoEstadoHpTurno'];
+  const NUMERICOS = ['peso', 'danoFijo', 'danoAmplificado', 'precioCompra', 'ranuras', 'equipoEstadoHpTurno', 'durPorPeso'];
   function alEscribir(ev){
     if(!st) return;
     const t = ev.target, d = st.d;
@@ -629,6 +649,7 @@ const AsistenteItem = (() => {
       d[c] = NUMERICOS.includes(c) ? n(t.value) : t.value;
       if(['peso', 'danoFijo', 'danoAmplificado'].includes(c)) poner('aa-dano', danoHtml());
       if(c === 'peso') poner('aa-carga', cargaHtml());
+      if(c === 'peso' || c === 'durPorPeso') poner('aa-dur', durHtml());
       if(c === 'precioCompra') poner('aa-precio', precioHtml());
       if(c === 'nombre') raiz.querySelectorAll('[data-aa-paso]').forEach(x => { x.disabled = !!faltaAlgo() && n(x.dataset.aaPaso) > st.paso; });
     }
@@ -677,6 +698,9 @@ const AsistenteItem = (() => {
       // Lo que es solo de armas no viaja en el resto.
       delete d.efectosGolpe; delete d.tipoDado; delete d.danoFijo; delete d.danoAmplificado; delete d.armaDeRango;
     }
+    // Durabilidad: solo se guarda si no es la de siempre (3 por Peso) y el ítem la tiene.
+    if(!DURABLE(d) || !(n(d.durPorPeso) > 0) || n(d.durPorPeso) === 3) delete d.durPorPeso;
+    else d.durPorPeso = Math.round(n(d.durPorPeso));
     return d;
   }
 

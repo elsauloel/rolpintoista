@@ -24,6 +24,10 @@ que usan las herramientas (los que no aplican se omiten):
   "peso": 1,                      // en armas, además: cantidad de dados de daño
   "ranuras": 1,                   // ranuras que ocupa en la mochila si no está equipado
   "precioCompra": 90,
+  "durPorPeso": 4,                // opcional (armas, escudos y armaduras): puntos de durabilidad por punto de Peso; sin él, 3.
+                                  // Durabilidad total = max(3, durPorPeso × Peso) (comun/combatiente.js, durMax). Variable de diseño.
+                                  // En la mochila de un personaje, cada copia guarda además `dur` (lo que le queda) y, las
+                                  // piezas de armadura, `armRota`: eso es de esa copia y no viaja al subir al catálogo.
 
   // Solo si tipoItem empieza con "arma_":
   "tipoDado": 6,                  // 4, 6, 8, 10 o 12 (antes 2..10: ver escalaTipos)

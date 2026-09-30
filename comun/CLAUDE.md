@@ -811,6 +811,11 @@ versión parecida en más de una, es candidato a juntar.
   herramienta recuerda el Parry que espera su Bloqueo (`parryArmaPendiente` en la ficha, `parryPendienteInv`,
   `parryPendienteCreep`); el botón de Bloqueo se ve siempre, apagado, mostrando lo que tiraría, para decidir entre Parry y
   Evasión.
+- **Durabilidad, variable de diseño** (2026-09-30, dueño): `Combatiente.durMax(item)` / `durPorPeso` / `durTexto` /
+  `esDurable` — 3 puntos por punto de Peso salvo que el ítem traiga `durPorPeso` (4–5 = más resistente, 2 = frágil), mínimo
+  3. `asistente-item.js` lo pregunta (paso Peso y daño / Peso-Precio) y lo muestra en el resumen; los "Ver" de ficha, GM Tools,
+  tienda y editor del catálogo muestran «Durabilidad N (X por punto de Peso)». `Plantillas.limpiar('items')` ya no sube `dur`
+  ni `armRota` (desgaste de la copia). El motor ahora también se carga en `vendor-generator.html` y `catalogo-editor.html`.
 - **`modificadores-tirada.js`, el «?» de las defensas** (2026-09-30, pedido del dueño — "que el sistema sea un poco
   autoexplicativo"): `ModTirada.ayuda('eva'|'parry'|'bloqueo')` pone un circulito «?» en el botón; al pasar el mouse explica
   el concepto (textos en `AYUDA`, siguen las notas Parry/Bloqueo/Evasión del manual: si cambia una regla, cambiar los dos).

@@ -2,6 +2,10 @@
 
 > Mecánica nueva del dueño, 2026-09-26, nacida del duelo paso a paso (Parry → Bloqueo). **Estado: reglas definidas casi todas, sin implementar.** Lo que falta decidir está al final y en `preguntas-abiertas.md` (P-Durabilidad).
 
+> **2026-09-30 — la durabilidad es una variable de diseño del ítem** (dueño): cada arma, escudo o armadura puede traer su propio
+> `durPorPeso` (puntos por punto de Peso; sin él, 3). Se elige en el asistente de ítems y se ve en el "Ver" de cada ítem. La regla
+> vive en `comun/combatiente.js` (`durMax`, `durTexto`). Ver "Escudos: un espacio de diseño propio" en `guia-de-diseno.md`.
+
 ## Reglas decididas (dueño, 2026-09-26)
 1. **Cuánta durabilidad:** **3 puntos por cada punto de Peso** (armas, escudos y armaduras). Un escudo de peso 3 tiene 9. Sale del Peso del ítem, así que **se calcula: no hace falta cargarla a mano en el catálogo** (el inventario sí guarda la durabilidad actual de cada ítem, por defecto = el máximo). **Las armaduras de Peso 0 tienen un mínimo de 3.**
 2. **Cuándo se gasta 1 punto de un arma o escudo:** cuando el defensor **gana el Parry pero pierde el Bloqueo** (el golpe pasa a **mitad de daño**, redondeada **para arriba**) — el punto lo pierde el objeto con el que bloqueó (arma o escudo).

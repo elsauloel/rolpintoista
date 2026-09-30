@@ -97,6 +97,24 @@ const Combatiente = (() => {
      salvo que se diseñe para un contexto especial. Cada herramienta recuerda el Parry que quedó esperando su Bloqueo. */
   const BLOQUEO_SOLO_TRAS_PARRY = 'El Bloqueo se tira solo después de un Parry, con la misma arma o escudo';
 
+  /* ---------- Durabilidad de un ítem (2026-09-26, docs/durabilidad.md; variable de diseño desde 2026-09-30) ----------
+     Armas, escudos y piezas de armadura tienen durabilidad: puntos por cada punto de Peso (3 por defecto) y como mínimo 3.
+     Cada ítem puede traer su propio `durPorPeso` (dueño, 2026-09-30: "una variable de diseño, para generar objetos de
+     mejor calidad"): 4 o 5 = más resistente para su peso; 2 = frágil. Sin el campo vale 3. La durabilidad ACTUAL de una
+     copia (`dur`, lo que se gastó) y su Armadura rota (`armRota`) son de esa copia, no del diseño. */
+  const DUR_POR_PESO = 3, DUR_MIN = 3;
+  const TIPOS_DURABLES = ['cabeza', 'manos', 'piernas', 'pies'];
+  function esDurable(item){ const t = String((item && item.tipoItem) || ''); return !(item && item.consumible) && (/^(arma_|escudo_|armadura_)/.test(t) || TIPOS_DURABLES.includes(t)); }
+  function durPorPeso(item){ const v = n(item && item.durPorPeso); return v > 0 ? v : DUR_POR_PESO; }
+  function durMax(item){ return Math.max(DUR_MIN, Math.round(durPorPeso(item) * Math.max(0, Math.round(n(item && item.peso))))); }
+  // Texto para las características del ítem: «12 (4 por punto de Peso)»; null si el ítem no tiene durabilidad.
+  function durTexto(item){
+    if(!esDurable(item)) return null;
+    const pp = durPorPeso(item), max = durMax(item);
+    const nota = max === DUR_MIN && pp * Math.max(0, Math.round(n(item.peso))) < DUR_MIN ? 'el mínimo' : `${pp} por punto de Peso${pp > DUR_POR_PESO ? ', más resistente' : pp < DUR_POR_PESO ? ', frágil' : ''}`;
+    return `${max} (${nota})`;
+  }
+
   /* ---------- Escudo especial y Excedente de vida: cambiar el valor a mano (2026-09-24, dueño) ----------
      El texto puede ser un número (valor nuevo), +N / −N (sumar o restar) o «max N» (cambia el máximo). `max === null` =
      excedente de vida (valor neto, sin tope ni «max N»). Devuelve {max, actual} o null si el texto no se entiende. */
@@ -174,5 +192,6 @@ const Combatiente = (() => {
   }
 
   return {mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+    DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, ajustarPreset, inmunidad};
 })();

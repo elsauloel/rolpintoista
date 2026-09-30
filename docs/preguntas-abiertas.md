@@ -561,3 +561,9 @@ resuelven a mano, como el resto de los avisos).
   un contexto especial que se diseñe más adelante). En personaje, invocación y creep el botón de Bloqueo se ve siempre,
   apagado y con lo que tirarías (para decidir entre Parry y Evasión), y se habilita recién después de un Parry, con la
   misma arma o escudo (`Combatiente.BLOQUEO_SOLO_TRAS_PARRY`). En el duelo ya era así.
+- 🔲 **P129. ¿El bono a Parry/Bloqueo de un escudo cuenta solo cuando parás con ESE escudo? — 2026-09-30.** Surge del
+  espacio de diseño de escudos ("un escudo con +1 al Parry, otro con +1 al Bloqueo", ver `guia-de-diseno.md`). Hoy, en la
+  ficha, el bono de un **arma** solo cuenta cuando se usa esa arma (`statParaArma`), pero el de un **escudo** cuenta para
+  **cualquier** Parry o Bloqueo: con espada y escudo +1 Parry, parar con la espada también suma el +1 (y el +1 Parry de la
+  espada NO cuenta al parar con el escudo). Propuesta: que cada uno cuente solo con lo suyo (el escudo al parar con el escudo,
+  el arma con el arma), igual que el PdG y el Crítico de cada arma.

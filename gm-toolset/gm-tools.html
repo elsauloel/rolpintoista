@@ -1292,9 +1292,9 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/plantillas.js?v=20260930b"></script>
 <script src="../comun/biblioteca.js?v=20260929i"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930h"></script>
+<script src="../comun/combatiente.js?v=20260930i"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
-<script src="../comun/estados-aplicar.js?v=20260930b"></script>
+<script src="../comun/estados-aplicar.js?v=20260930c"></script>
 <script src="../comun/creeps-base.js?v=20260927a"></script>
 <script src="../comun/skills-creep-base.js?v=20260927a"></script>
 <script src="../comun/armas-naturales-base.js"></script>
@@ -3230,43 +3230,28 @@ function activarEstadoPresetCreep(preset){
     mods: structuredClone(preset.mods || []),
   };
   FLAGS_ESTADO_CREEP.forEach(f => { datos[f] = !!preset[f]; });
-  if(estaBloqueadoElDebuffCreep(sc, datos)){
-    toast(`${sc.nombre}: inmune ahora mismo — ${preset.nombre} no se pudo aplicar`);
-    return;
-  }
-  // Armadura rota se acumula: cada rotura suma un stack (-1 Defensa) en el mismo estado.
-  const yaRota = datos.armaduraRota ? sc.estados.find(e => e.armaduraRota) : null;
-  if(yaRota){
-    yaRota.stacks = Math.max(1, num(yaRota.stacks) || 1) + 1;
-    yaRota.activo = true;
-    renderAll();
-    toast(`${sc.nombre}: ${yaRota.nombre} ×${yaRota.stacks}`);
-    return;
-  }
-  const yaVeneno = acumularVenenoCreep(sc, datos);
-  if(yaVeneno){
-    if(datos.permanente){ toast(`${sc.nombre}: ${datos.nombre} ya lo tiene, no se acumula`); return; }
-    renderAll();
-    toast(`${sc.nombre}: ${yaVeneno.nombre} ×${yaVeneno.stacks}`);
-    return;
-  }
-  const yaSangrado = acumularSangradoCreep(sc, datos);
-  if(yaSangrado){
-    renderAll();
-    toast(yaSangrado.esEscarcha ? `${sc.nombre}: ${yaSangrado.nombre} ×${yaSangrado.stacks} (−${yaSangrado.stacks} No2 máx.)` : `${sc.nombre}: ${yaSangrado.nombre} +1 al daño por turno (${fmt(Math.abs(num(yaSangrado.hpTurno)) * num(yaSangrado.stacks))} ahora)`);
-    return;
-  }
-  const es = {id: uid(), ...datos};
-  sc.estados.push(es);
-  if(modsAfectanHp(datos.mods)) actualizarHpMaxPorCon(sc);
+  // Inmunidades, acumulación (Armadura rota, Veneno, Sangrado, Escarcha) y renovación de uno igual: comun/combatiente.js.
+  const r = Combatiente.agregarEstado(sc.estados, {id: uid(), ...datos}, {jefe: sc.jefe});
+  if(!r.ok){ toast(`${sc.nombre}: inmune ahora mismo (${r.motivo}) — ${preset.nombre} no se pudo aplicar`); return; }
+  if(r.que === 'yaLoTiene'){ toast(`${sc.nombre}: ${datos.nombre} ya lo tiene, no se acumula`); return; }
+  if(modsAfectanHp(r.estado.mods)) actualizarHpMaxPorCon(sc);
   renderAll();
-  toast(`${sc.nombre}: ${preset.nombre} activado`);
+  toast(`${sc.nombre}: ${textoEstadoAgregado(r, 'hpTurno')}`);
+}
+// Lo que se le avisa al que pone un estado (misma frase en la ficha, las invocaciones y los creeps).
+function textoEstadoAgregado(r, campoHp){
+  const e = r.estado;
+  if(r.que === 'acumulado'){
+    if(e.esEscarcha) return `${e.nombre} ×${e.stacks} (−${e.stacks} No2 máx.)`;
+    if(e.esSangrado) return `${e.nombre} +1 al daño por turno (${fmt(Math.abs(num(e[campoHp])) * num(e.stacks))} ahora)`;
+    return `${e.nombre} ×${e.stacks}`;
+  }
+  return r.que === 'renovado' ? `${e.nombre} renovado (ya lo tenía)` : `${e.nombre} activado`;
 }
 
-// Veneno suma sus stacks enteros; Sangrado y Escarcha, +1 stack (comun/combatiente.js, la misma regla que la ficha).
-// Devuelven el estado que ya estaba (null si no había).
+// Veneno suma sus stacks enteros (comun/combatiente.js); lo usa el estado que se pone el creep con una habilidad.
+// Devuelve el estado que ya estaba (null si no había).
 function acumularVenenoCreep(sc, nuevo){ return Combatiente.acumularVeneno(sc.estados, nuevo); }
-function acumularSangradoCreep(sc, nuevo){ return Combatiente.acumularSangrado(sc.estados, nuevo); }
 
 function aplicarPresetEstadoCreep(valor){
   if(presetsCreepDestino === 'duelo'){
@@ -4630,26 +4615,25 @@ function guardarEditorEstadoCreep(){
     mods: structuredClone(ecMods),
   };
   FLAGS_ESTADO_CREEP.forEach(f => { datos[f] = $('#ec-preset').dataset[f.toLowerCase()] === '1'; });
-  if(!editingEstadoCreep.esId && datos.activo && estaBloqueadoElDebuffCreep(sc, datos)){
-    toast(`${sc.nombre}: inmune ahora mismo — ${nombre} no se pudo aplicar`);
+  if(editingEstadoCreep.esId){
+    const es = sc.estados.find(x => x.id === editingEstadoCreep.esId);
+    if(es) Object.assign(es, datos);
+    if(modsAfectanHp(datos.mods)) actualizarHpMaxPorCon(sc);
     editingEstadoCreep = null;
     $('#scrim-estado-creep').classList.remove('open');
+    renderAll();
+    toast(`${nombre} guardado`);
     return;
   }
-  let es;
-  if(editingEstadoCreep.esId){
-    es = sc.estados.find(x => x.id === editingEstadoCreep.esId);
-    if(es) Object.assign(es, datos);
-  }else{
-    es = {id: uid(), ...datos};
-    sc.estados.push(es);
-  }
-  const teniaCon = modsAfectanHp(datos.mods);
-  if(teniaCon) actualizarHpMaxPorCon(sc);
+  // Un estado nuevo: la misma regla que el "+ Estado" (inmunidades, acumular o renovar uno igual), comun/combatiente.js.
+  const r = Combatiente.agregarEstado(sc.estados, {id: uid(), ...datos}, {jefe: sc.jefe});
   editingEstadoCreep = null;
   $('#scrim-estado-creep').classList.remove('open');
+  if(!r.ok){ toast(`${sc.nombre}: inmune ahora mismo (${r.motivo}) — ${nombre} no se pudo aplicar`); return; }
+  if(r.que === 'yaLoTiene'){ toast(`${sc.nombre}: ${nombre} ya lo tiene, no se acumula`); return; }
+  if(modsAfectanHp(r.estado.mods)) actualizarHpMaxPorCon(sc);
   renderAll();
-  toast(`${nombre} guardado`);
+  toast(`${sc.nombre}: ${textoEstadoAgregado(r, 'hpTurno')}`);
 }
 
 // Escudo especial / Excedente de vida: cambiar el valor a mano (número, +N/−N o «max N»): comun/combatiente.js.

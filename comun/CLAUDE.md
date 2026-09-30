@@ -813,6 +813,8 @@ versión parecida en más de una, es candidato a juntar.
   preset), `tirarStat(valor, estados, statId, {extra, azar})` (LA tirada de un stat: Afortunado, mitades, Evasión mínimo 1;
   devuelve lo que se publica en la Mesa, no publica), `estadosQueAfectan` (los estados que se pintan en la Mesa),
   `nitrosMax(natural, estados)` (Cansado, Hypeado, Exhausto y Stun/"forzar" como topes, P130),
+  `agregarEstado(estados, nuevo, {jefe})` (ponerle un estado a alguien: inmunidades, acumular o renovar uno igual, P132 —
+  lo usan todos los "+ Estado", los formularios completos, lo recibido y `EstadosAplicar.aplicarACreep`),
   `pasarTurnoEstados(estados, {hp, stacks})` + `reporteTurno(eventos)` (lo que hacen los estados en el Mantenimiento, paso 2 —
   lo usan `mantenimiento()` de la ficha, el de sus invocaciones y el de gm-tools; P131: sin turnos ni permanente = 1 turno), `costoAtaque(tipo,
   ataquesPrevios)` / `costoPrimerAtaque` / `ataquesPosibles` (Tipo ÷ 2 el primero, completo después),

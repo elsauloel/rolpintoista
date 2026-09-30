@@ -13,7 +13,7 @@
 > Cómo anotar: al lado de cada punto, ✔ / ✘ y la fecha. Un ✘ se arregla (o se anota en `pendientes.md`) antes de seguir.
 
 ## 0. Automáticas
-- [ ] `comun/pruebas.html` en verde (hoy: 78 pruebas).
+- [ ] `comun/pruebas.html` en verde (hoy: 83 pruebas).
 
 ## 1. Ficha (partida "Test", "Prueba de Claude")
 - [ ] Abre sin errores en la consola; el título dice personaje y partida.
@@ -70,6 +70,7 @@
 | 2026-09-30 | En mesa: GM Tools ("Claude · pruebas": Pajaritos+Lisiado+Parálisis en un goblin, tirada de PdG, Sangrado ×2, jefe contra Stun) y ficha ("Test": estados recibidos, acumulación, Invulnerable, botones de colores, escudo) | ✔ | Apareció la diferencia de estados recibidos (Veneno ×3 → ×4 en personajes): corregida. Todo quedó como estaba. |
 | 2026-09-30 | Tanda 2 (tirar un stat): automáticas + ficha, invocación y GM Tools (copias sin sesión) | ✔ 65/65 | Invocaciones con Afortunado (P100) ya tiran dos veces. |
 | 2026-09-30 | Paso 2, tanda 1 (pase de turno de los estados): personaje, invocación y creep (copias sin sesión) | ✔ 78/78 | La invocación ya respeta Invulnerable y el tope de vida. |
+| 2026-09-30 | Paso 2, tanda 2 (poner un estado): personaje (+ Estado y recibido), invocación y creep (copias sin sesión) | ✔ 83/83 | Repetidos se renuevan; la invocación con Invulnerable rebota el Stun. |
 | 2026-09-30 | 🎮 Tomar el control en mesa ("Claude · pruebas", Clementino): estado recibido, pase de turno, Botonera en el mapa, mover con No2, defensa en un duelo, devolver | ✔ | Todo restaurado al terminar. |
 | 2026-09-30 | Paso 2 en mesa ("Claude · pruebas", sitio publicado): Goblin con Veneno ×2, Regeneración +3 y Escudo gastado, 3 Mantenimientos seguidos | ✔ | Vida 20 → 21 → 23 → 26; Veneno se terminó al llegar a 0 stacks; Regeneración venció; escudo recargado. Todo restaurado. |
 | 2026-09-30 | Tanda 3: costo de atacar y No2 máximo en ficha, invocación y GM Tools (copias sin sesión) | ✔ 72/72 | "Forzar Nitros a 20" con Agilidad 9 ya no sube el máximo (P130). |

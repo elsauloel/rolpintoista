@@ -235,6 +235,30 @@ prueba('No2 máximo: Cansado 2/3, Hypeado +1/3, Exhausto 1/3, Stun 0', () => igu
   Combatiente.nitrosMax(9, [E({exhausto: true})]), Combatiente.nitrosMax(9, [E({forzarNitros: 0})]), Combatiente.nitrosMax(9, [E({cansado: true}), E({hypeado: true})]),
 ], [9, 6, 12, 3, 0, 9]));
 prueba('"Forzar Nitros máx." es un tope: nunca sube el máximo (dueño, 2026-09-30)', () => igual(Combatiente.nitrosMax(6, [E({forzarNitros: 10})]), 6));
+grupo('Poner un estado (paso 2)');
+prueba('Invulnerable rebota un debuff nuevo; un buff entra', () => {
+  const es = [E({nombre: 'Invulnerable', invulnerable: true, polaridad: 'buff'})];
+  const a = Combatiente.agregarEstado(es, {nombre: 'Stun', polaridad: 'debuff'});
+  const b = Combatiente.agregarEstado(es, {nombre: 'Hypeado', polaridad: 'buff'});
+  igual([a.ok, a.motivo, b.que, es.length], [false, 'Invulnerable', 'nuevo', 2]);
+});
+prueba('Armadura rota +1; Veneno suma; el severo repetido no hace nada', () => {
+  const es = [E({nombre: 'Armadura rota', armaduraRota: true, stacks: 1}), E({nombre: 'Veneno', esVeneno: true, stacks: 2, turnos: 2}), E({nombre: 'Veneno severo', esVeneno: true, permanente: true})];
+  const r1 = Combatiente.agregarEstado(es, {nombre: 'Armadura rota', armaduraRota: true});
+  const r2 = Combatiente.agregarEstado(es, {nombre: 'Veneno', esVeneno: true, stacks: 3});
+  const r3 = Combatiente.agregarEstado(es, {nombre: 'Veneno severo', esVeneno: true, permanente: true});
+  igual([r1.que, es[0].stacks, r2.que, es[1].stacks, r3.que, es.length], ['acumulado', 2, 'acumulado', 5, 'yaLoTiene', 3]);
+});
+prueba('uno igual que no se acumula SE RENUEVA (queda uno, con los números nuevos)', () => {
+  const es = [E({id: 'x1', nombre: 'Stun', turnos: 1, forzarNitros: 0, polaridad: 'debuff'})];
+  const r = Combatiente.agregarEstado(es, {nombre: 'Stun', turnos: 2, forzarNitros: 0, polaridad: 'debuff', activo: true});
+  igual([r.que, es.length, es[0].turnos, es[0].id], ['renovado', 1, 2, 'x1']);
+});
+prueba('el estado que da un ítem equipado no se renueva: el de a mano va aparte', () => {
+  const es = [E({nombre: 'Regeneración', origenItem: 'anillo', permanente: true})];
+  igual([Combatiente.agregarEstado(es, {nombre: 'Regeneración', turnos: 2}).que, es.length], ['nuevo', 2]);
+});
+prueba('un jefe rebota el Stun también a mano', () => igual(Combatiente.agregarEstado([], {nombre: 'Stun', polaridad: 'debuff'}, {jefe: true}).motivo, 'Protección de jefe'));
 grupo('Pase de turno (paso 2)');
 const campF = {hp: 'hpturno', stacks: 'stacksturno'};
 prueba('Veneno ×3 de 1: −3 de vida y un turno menos', () => {

@@ -249,6 +249,44 @@ const Combatiente = (() => {
     return ya;
   }
 
+  /* ---------- Ponerle un estado a alguien (paso 2, tanda 2, 2026-09-30) ----------
+     La misma regla para el "+ Estado" a mano (personaje, invocación, creep), lo que llega de una habilidad o trampa, y el
+     formulario completo:
+       1. Inmunidades (Invulnerable, Inmunidad a CC, Sangre pura, Coagulación, jefe contra Stun): rebota. (Un estado que se
+          carga pausado no se revisa.)
+       2. Armadura rota: +1 stack al que ya tenía.
+       3. Veneno: suma sus stacks (el severo, si ya lo tiene, no hace nada). Sangrado y Escarcha: +1 stack.
+       4. Si ya tiene uno con el mismo nombre: SE RENUEVA — queda uno solo, con los números nuevos (dueño, 2026-09-30:
+          antes el "+ Estado" a mano dejaba dos iguales y solo lo que llegaba a un creep desde una habilidad lo renovaba).
+          Los que vienen de un ítem equipado no se tocan.
+       5. Si no, se agrega.
+     Modifica la lista y devuelve {ok, que: 'bloqueado'|'acumulado'|'yaLoTiene'|'renovado'|'nuevo', estado, motivo?}.
+     `o.jefe`: el que lo recibe es un creep jefe. */
+  function agregarEstado(estados, nuevo, o){
+    if(!Array.isArray(estados) || !nuevo) return {ok: false, que: 'nada'};
+    if(nuevo.activo !== false){
+      const motivo = inmunidad(estados, nuevo, o);
+      if(motivo) return {ok: false, que: 'bloqueado', motivo};
+    }
+    if(nuevo.armaduraRota){
+      const ya = estados.find(e => e && e.armaduraRota);
+      if(ya){ ya.stacks = Math.max(1, n(ya.stacks) || 1) + 1; ya.activo = true; return {ok: true, que: 'acumulado', estado: ya}; }
+    }
+    const veneno = acumularVeneno(estados, nuevo);
+    if(veneno) return {ok: true, que: nuevo.permanente ? 'yaLoTiene' : 'acumulado', estado: veneno};
+    const sangrado = acumularSangrado(estados, nuevo);
+    if(sangrado) return {ok: true, que: 'acumulado', estado: sangrado};
+    const igual = estados.find(e => e && e.nombre === nuevo.nombre && !e.origenItem && !e.derivado);
+    if(igual){
+      const id = igual.id;
+      Object.keys(igual).forEach(k => { delete igual[k]; });
+      Object.assign(igual, nuevo, id !== undefined ? {id} : {});
+      return {ok: true, que: 'renovado', estado: igual};
+    }
+    estados.push(nuevo);
+    return {ok: true, que: 'nuevo', estado: nuevo};
+  }
+
   /* ---------- Un preset con los números que manda la habilidad ----------
      Cuando una habilidad, trampa o zona aplica un estado estándar (Veneno, Sangrado…) con sus propios números, esos números
      mandan sobre los del preset: turnos, bonos, daño/cura por turno, escudo, detalle y, en el Veneno (no el severo), los
@@ -282,5 +320,5 @@ const Combatiente = (() => {
 
   return {mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
-    escudoParsear, acumularVeneno, acumularSangrado, ajustarPreset, inmunidad};
+    escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, inmunidad};
 })();

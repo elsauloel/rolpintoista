@@ -64,20 +64,9 @@ const EstadosAplicar = (() => {
   // Lo pone en un creep (objeto de gm-tools o de su parte privada). Devuelve {ok, estado?, motivo?}.
   function aplicarACreep(sc, spec){
     sc.estados = Array.isArray(sc.estados) ? sc.estados : [];
-    const est = componer(spec);
-    const b = bloqueadoCreep(sc.estados, est, sc);
-    if(b) return {ok: false, motivo: b};
-    if(est.armaduraRota){
-      const ya = sc.estados.find(e => e.armaduraRota);
-      if(ya){ ya.stacks = Math.max(1, Number(ya.stacks) || 1) + 1; ya.activo = true; return {ok: true, estado: ya}; }
-    }
-    // Veneno suma sus stacks (Veneno severo no); Sangrado y Escarcha, +1 stack (comun/combatiente.js).
-    const acumulado = Combatiente.acumularVeneno(sc.estados, est) || Combatiente.acumularSangrado(sc.estados, est);
-    if(acumulado) return {ok: true, estado: acumulado};
-    const igual = sc.estados.find(e => e.nombre === est.nombre);
-    if(igual){ Object.assign(igual, {...est, id: igual.id}); return {ok: true, estado: igual}; }
-    sc.estados.push(est);
-    return {ok: true, estado: est};
+    // Inmunidades, acumulación y renovación: la regla común de comun/combatiente.js (agregarEstado).
+    const r = Combatiente.agregarEstado(sc.estados, componer(spec), sc);
+    return r.ok ? {ok: true, estado: r.estado, que: r.que} : {ok: false, motivo: r.motivo};
   }
 
   // Deja el aviso para que la ficha del dueño lo aplique (campanas/<id>/estados).

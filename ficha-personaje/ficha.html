@@ -2075,9 +2075,9 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-estado.js"></script>
 <script src="../comun/modificadores-tirada.js?v=20260930c"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930h"></script>
+<script src="../comun/combatiente.js?v=20260930i"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
-<script src="../comun/estados-aplicar.js?v=20260930b"></script>
+<script src="../comun/estados-aplicar.js?v=20260930c"></script>
 <script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-trampa.js?v=20260929i"></script>
 <script src="../comun/asistente-duelo-hab.js?v=20260930a"></script>
@@ -2867,32 +2867,16 @@ function aplicarEstadoRecibido(spec, origen){
   draft.activo = true;
   if(!draft.polaridad) draft.polaridad = 'debuff';
   const quien = origen ? `${origen}: ` : '';
-  if(estaBloqueadoElDebuff(draft)){
-    toast(`🛡 ${quien}Inmune ahora mismo — ${draft.nombre} no te afectó`);
-    return;
-  }
-  const yaRota = draft.armaduraRota ? S.efectos.find(e => e.armaduraRota) : null;
-  const yaVeneno = acumularVeneno(S.efectos, draft);
-  const yaSangrado = acumularSangrado(S.efectos, draft);
-  if(yaRota){
-    yaRota.stacks = Math.max(1, num(yaRota.stacks) || 1) + 1;
-    yaRota.activo = true;
-  }else if(yaVeneno){
-    if(draft.permanente){ toast(`${quien}${draft.nombre}: ya lo tenías, no se acumula`); return; }
-  }else if(yaSangrado){
-    // ya viene con +1 stack aplicado por acumularSangrado
-  }else{
-    S.efectos.push(draft);
-  }
+  // Inmunidades, acumulación y renovación: la regla común (comun/combatiente.js, agregarEstado).
+  const r = Combatiente.agregarEstado(S.efectos, draft);
+  if(!r.ok){ toast(`🛡 ${quien}Inmune ahora mismo (${r.motivo}) — ${draft.nombre} no te afectó`); return; }
+  if(r.que === 'yaLoTiene'){ toast(`${quien}${draft.nombre}: ya lo tenías, no se acumula`); return; }
   renderList('efectos');
   refresh();
-  toast(`🎯 ${quien}recibiste ${draft.nombre}`);
+  toast(`🎯 ${quien}recibiste ${draft.nombre}${r.que === 'renovado' ? ' (se renovó el que tenías)' : r.que === 'acumulado' ? ` (×${r.estado.stacks})` : ''}`);
 }
 
-// Veneno suma sus stacks enteros; Sangrado y Escarcha, +1 stack. Devuelven el estado que ya estaba (null = agregar el nuevo).
-// La regla vive en el motor común (comun/combatiente.js, paso 1 de docs/plan-consolidacion.md).
-function acumularVeneno(lista, nuevo){ return Combatiente.acumularVeneno(lista, nuevo); }
-function acumularSangrado(lista, nuevo){ return Combatiente.acumularSangrado(lista, nuevo); }
+// (Acumular Veneno/Sangrado/Escarcha, inmunidades y renovar: Combatiente.agregarEstado, comun/combatiente.js — ver agregarEstadoConAviso.)
 
 function attrBudget(){
   const nivel = Math.max(1, num(S.meta.nivel) || 1);
@@ -4994,31 +4978,10 @@ function activarEfectoPresetInv(preset){
   const {nombre, ...resto} = preset;
   const datos = {id: uid(), nombre, ...structuredClone(resto)};
   inv.estados = inv.estados || [];
-  const yaRotaInv = datos.armaduraRota ? inv.estados.find(e => e.armaduraRota) : null;
-  if(yaRotaInv){
-    yaRotaInv.stacks = Math.max(1, num(yaRotaInv.stacks) || 1) + 1;
-    yaRotaInv.activo = true;
-    renderInvocaciones();
-    toast(`${inv.nombre}: ${yaRotaInv.nombre} ×${yaRotaInv.stacks}`);
-    return;
-  }
-  const yaVenenoInv = acumularVeneno(inv.estados, datos);
-  if(yaVenenoInv){
-    if(datos.permanente){ toast(`${inv.nombre}: ${nombre} ya lo tiene, no se acumula`); return; }
-    renderInvocaciones();
-    toast(`${inv.nombre}: ${yaVenenoInv.nombre} ×${yaVenenoInv.stacks}`);
-    return;
-  }
-  const yaSangradoInv = acumularSangrado(inv.estados, datos);
-  if(yaSangradoInv){
-    renderInvocaciones();
-    toast(yaSangradoInv.esEscarcha ? `${inv.nombre}: ${yaSangradoInv.nombre} ×${yaSangradoInv.stacks} (−${yaSangradoInv.stacks} No2 máx.)` : `${inv.nombre}: ${yaSangradoInv.nombre} +1 al daño por turno (${fmt(Math.abs(num(yaSangradoInv.hpturno)) * num(yaSangradoInv.stacks))} ahora)`);
-    return;
-  }
-  inv.estados.push(datos);
-  if(modsAfectanHpInv(datos.mods)) actualizarHpMaxPorConInv(inv);
+  // La misma regla que el personaje y los creeps (antes la invocación no revisaba inmunidades: Invulnerable no frenaba un Stun).
+  const r = agregarEstadoConAviso(inv.estados, datos, inv.nombre);
+  if(r.ok && modsAfectanHpInv(r.estado.mods)) actualizarHpMaxPorConInv(inv);
   renderInvocaciones();
-  toast(`${inv.nombre}: ${nombre} activado`);
 }
 
 // Cableado del editor de habilidad de invocación (campos fijos, no el
@@ -7147,39 +7110,23 @@ function activarEfectoPreset(preset){
   editing.draft.nombre = nombre;
   const draft = editing.draft;
   closeModal();
-  if(draft.activo !== false && estaBloqueadoElDebuff(draft)){
-    toast(`Inmune ahora mismo — ${draft.nombre} no se pudo aplicar`);
-    return;
-  }
-  // Armadura rota se acumula: cada rotura suma un stack (-1 Defensa) en el mismo estado.
-  const yaRota = draft.armaduraRota ? S.efectos.find(e => e.armaduraRota) : null;
-  if(yaRota){
-    yaRota.stacks = Math.max(1, num(yaRota.stacks) || 1) + 1;
-    yaRota.activo = true;
-    renderList('efectos');
-    refresh();
-    toast(`${yaRota.nombre} ×${yaRota.stacks}`);
-    return;
-  }
-  const yaVeneno = acumularVeneno(S.efectos, draft);
-  if(yaVeneno){
-    if(draft.permanente){ toast(`${draft.nombre}: ya lo tenés, no se acumula`); return; }
-    renderList('efectos');
-    refresh();
-    toast(`${yaVeneno.nombre} ×${yaVeneno.stacks}`);
-    return;
-  }
-  const yaSangrado = acumularSangrado(S.efectos, draft);
-  if(yaSangrado){
-    renderList('efectos');
-    refresh();
-    toast(yaSangrado.esEscarcha ? `${yaSangrado.nombre} ×${yaSangrado.stacks} (−${yaSangrado.stacks} No2 máx.)` : `${yaSangrado.nombre}: +1 al daño por turno (${fmt(Math.abs(num(yaSangrado.hpturno)) * num(yaSangrado.stacks))} ahora)`);
-    return;
-  }
-  S.efectos.push(draft);
+  agregarEstadoConAviso(S.efectos, draft, '');
   renderList('efectos');
   refresh();
-  toast(`${draft.nombre} activado`);
+}
+// Ponerle un estado al personaje o a una invocación: inmunidades, acumulación (Armadura rota, Veneno, Sangrado, Escarcha) y
+// renovación de uno igual son la regla común (comun/combatiente.js, agregarEstado). Devuelve el resultado.
+function agregarEstadoConAviso(lista, nuevo, quien){
+  const r = Combatiente.agregarEstado(lista, nuevo);
+  const q = quien ? quien + ': ' : '';
+  if(!r.ok){ toast(`🛡 ${q}inmune ahora mismo (${r.motivo}) — ${nuevo.nombre} no se pudo aplicar`); return r; }
+  if(r.que === 'yaLoTiene'){ toast(`${q}${nuevo.nombre}: ya lo tiene, no se acumula`); return r; }
+  const e = r.estado;
+  const txt = r.que === 'acumulado'
+    ? (e.esEscarcha ? `${e.nombre} ×${e.stacks} (−${e.stacks} No2 máx.)` : e.esSangrado ? `${e.nombre}: +1 al daño por turno (${fmt(Math.abs(num(e.hpturno)) * num(e.stacks))} ahora)` : `${e.nombre} ×${e.stacks}`)
+    : r.que === 'renovado' ? `${e.nombre} renovado (ya lo tenía)` : `${e.nombre} activado`;
+  toast(q + txt);
+  return r;
 }
 
 // Menú paso a paso para crear un estado alterado de cero (comun/asistente-estado.js): reemplaza al botón "Estado personalizado"
@@ -9990,8 +9937,12 @@ function cargarItemsSubidos(){
 $('#modal-save').onclick = () => {
   const {key, id, draft} = editing;
   if(!draft.nombre.trim()) draft.nombre = 'Sin nombre';
-  if(key === 'efectos' && !id && draft.activo !== false && estaBloqueadoElDebuff(draft)){
-    toast(`Inmune ahora mismo — ${draft.nombre} no se pudo aplicar`);
+  // Un estado nuevo desde el formulario completo: la misma regla que el "+ Estado" (inmunidades, acumular o renovar).
+  if(key === 'efectos' && !id){
+    closeModal();
+    agregarEstadoConAviso(S.efectos, draft, '');
+    renderList('efectos');
+    refresh();
     return;
   }
   if(key === 'inventario' && draft.tipoItem === 'consumibles' && draft.equipado){

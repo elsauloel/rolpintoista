@@ -575,3 +575,8 @@ resuelven a mano, como el resto de los avisos).
   va en el próximo pase de turno** (dueño). Diferencia encontrada en el paso 2 de la consolidación: el personaje lo dejaba para
   siempre (como permanente) y el creep lo borraba. Ningún estado de fábrica ni de ítems equipados cae en este caso; solo uno
   armado a mano sin turnos. Regla en `Combatiente.pasarTurnoEstados`. De paso: un estado con 0 stacks se termina en los tres.
+- ✅ **P132. Un estado que ya tiene y que no se acumula — 2026-09-30, resuelta: SE RENUEVA** (dueño). Queda uno solo, con los
+  números nuevos (turnos, bonos, escudo). Veneno, Sangrado, Escarcha y Armadura rota siguen con su regla de acumular. Diferencia
+  encontrada en el paso 2 de la consolidación: lo que llegaba a un creep desde una habilidad o trampa ya renovaba, pero el
+  "+ Estado" a mano (personaje, invocación, creep), el formulario completo y lo que le llegaba al personaje dejaban dos iguales.
+  Los estados que da un ítem equipado no se renuevan (el de a mano va aparte). Regla en `Combatiente.agregarEstado`.

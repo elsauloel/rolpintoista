@@ -1,7 +1,7 @@
 # Plan de consolidación: un solo motor, varias ventanas
 
 > **Estado: en curso** (escrita y empezada el 2026-09-30 a pedido del dueño — "vamos empezando poco a poco… si hace falta
-> pausarlo para encarar otra tarea, lo pausamos"). **Hechos: pasos 0 y 1** (2026-09-30). En curso: paso 2 (estados y Mantenimiento; tanda 1 hecha). Cada paso se decide, se hace y se prueba por separado; ninguno obliga al
+> pausarlo para encarar otra tarea, lo pausamos"). **Hechos: pasos 0, 1 y 2** (2026-09-30). Siguiente: paso 3 (ejecución de habilidades). Cada paso se decide, se hace y se prueba por separado; ninguno obliga al
 > siguiente. Relacionado: "A desarrollar" n.º 51 (integrar todo en un solo sitio) y
 > [`plan-subida-unificada.md`](plan-subida-unificada.md) (el mismo espíritu, ya hecho, para subir elementos).
 
@@ -119,8 +119,14 @@ Cada paso: qué es, qué se gana, qué se arriesga, cómo se prueba. Se pueden e
   personaje lo dejaba para siempre y el creep lo borraba); **0 stacks = se terminó** en los tres; en los creeps la vida del
   turno se suma toda junta antes del tope (antes, estado por estado: una cura y un daño en el mismo turno podían dar distinto
   según el orden). Pruebas: 78.
-- **Tanda 2 (siguiente)**: probarlo en "Claude · pruebas" varios turnos seguidos; después, aplicar/quitar estados (lo que
-  todavía está repetido entre el "+ Estado" de la ficha, el de los creeps y `EstadosAplicar`).
+  Probado en "Claude · pruebas" con 3 Mantenimientos seguidos.
+- **Tanda 2 ✅** (2026-09-30): **ponerle un estado a alguien** (`Combatiente.agregarEstado`): inmunidades, Armadura rota
+  +1, Veneno/Sangrado/Escarcha que se acumulan y **renovar uno igual** (**P132**). Lo usan el "+ Estado" del personaje, el de
+  las invocaciones y el de los creeps, los dos formularios completos (ficha y GM Tools), lo que le llega al personaje desde
+  afuera y `EstadosAplicar.aplicarACreep` — antes eran seis copias. Corregido de paso: el "+ Estado" de las invocaciones no
+  revisaba inmunidades, y la ficha acumulaba Veneno y Sangrado por adelantado al recibir un estado aunque no correspondiera.
+  Pruebas: 83. **El paso 2 queda cerrado** (lo que se pone uno mismo con una habilidad o un consumible ya renovaba y pasa
+  al paso 3, junto con la ejecución de habilidades).
 - **Qué**: aplicar, acumular, vencer y recalcular estados, y el Mantenimiento (pasar el turno), en un solo lugar para los
   tres tipos de combatiente. Hoy `mantenimiento` existe en tres versiones.
 - **Se gana**: un estado nuevo o una regla de turno nueva se escribe una vez.

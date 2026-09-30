@@ -832,7 +832,12 @@ versión parecida en más de una, es candidato a juntar.
   no se toca ninguna «X»), `efectoDeEjecucion(e)`, `sustituirX`, `sobreSiSinTiradas(hab)` (el atajo de Blindaje) y
   `ejecucionNoDisponible(c, 'pj'|'inv'|'creep')` (P134: ataque con arma y Flash todavía solo en personajes, zona no en
   invocaciones → aviso y 💰), `zonaDeHab(h, c, {fichaId, tipo, X, resistValor})` (el mensaje 'zona-persistente-habilidad'
-  al mapa), `formulaDanoHab(h, c, X)` y `trampaDeHab(h)` (la trampa lista para el mapa). Lo usan `habDueloDatos`/`modoHab`/`costoNitrosHab` de la ficha, `habDueloInv`/`invEjecutarHab`
+  al mapa), `formulaDanoHab(h, c, X)` y `trampaDeHab(h)` (la trampa lista para el mapa), `ataqueConArreglos(h, c, {arma,
+  alcance, X})` (el ataque 'habilidad-arma' que va al duelo: lo usan `ataqueDeHabArma` de la ficha y `ataqueDeHabCreep` de GM
+  Tools) y `flashPara(c, campo, modo)` (¿este ⚡ Flash vale para esa tirada?). **Flash de creeps** (P135, solo cooldown):
+  `comun/duelo.js` ya les pregunta (antes los salteaba); el mapa contesta solo si el creep no tiene ninguno
+  (`cfgEscuchar.flashLocal` = `dueloFlashLocal`) y si tiene, contesta GM Tools; una opción puede traer `costoTxt` en vez de
+  `costoSp`. Lo usan `habDueloDatos`/`modoHab`/`costoNitrosHab` de la ficha, `habDueloInv`/`invEjecutarHab`
   de las invocaciones y `habEjecucionCreep`/`aplicarHabCreepSobreSi`/`modoHabCreep` de GM Tools.
 - **Durabilidad, variable de diseño** (2026-09-30, dueño): `Combatiente.durMax(item)` / `durPorPeso` / `durTexto` /
   `esDurable` — 3 puntos por punto de Peso salvo que el ítem traiga `durPorPeso` (4–5 = más resistente, 2 = frágil), mínimo

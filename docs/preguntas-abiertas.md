@@ -591,3 +591,7 @@ resuelven a mano, como el resto de los avisos).
   personajes: en un creep armaban un cuadro de habilidad que no correspondía y en una invocación (igual que la zona) se
   ejecutaban como semiautomáticas sin decir nada. Ahora se avisa ("todavía no anda para creeps/invocaciones: se ejecutó como
   semiautomática", `Combatiente.ejecucionNoDisponible`) y sumarlos queda en `pendientes.md` para una tanda propia.
+  **Creeps: hecho el mismo día** (pedido del dueño): ataque con arma con arreglos y ⚡ Flash (ver P135). Faltan las invocaciones.
+- ✅ **P135. Qué le cuesta un ⚡ Flash a un creep — 2026-09-30, resuelta: SOLO COOLDOWN** (dueño). Igual que en el personaje
+  (que paga solo SP), no gasta No2: su límite es el cooldown de la habilidad, y la vida si la habilidad la cuesta. En el duelo,
+  el botón del Flash dice "cooldown N" en vez de "N SP"; en cooldown aparece apagado.

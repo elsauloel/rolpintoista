@@ -33,9 +33,11 @@
 
 ## 4. Diseño pendiente
 - [ ] **Trampas para jugadores**: que un personaje con una habilidad de trampa también la coloque solo (hoy solo los creeps).
-- [ ] **Ataque con arma y Flash desde una habilidad, en creeps e invocaciones; zona persistente y trampas en invocaciones** (P134,
-  2026-09-30): hoy avisan y se ejecutan como semiautomáticas. Hace falta que el duelo de GM Tools y el de la invocación sepan
-  resolver un "ataque con arreglos" (mods de PdG/daño, efectos al pegar, crítico) y ofrecer los Flash del creep.
+- [ ] **Ataque con arma y Flash desde una habilidad en invocaciones; zona persistente y trampas en invocaciones** (P134,
+  2026-09-30): hoy avisan y se ejecutan como semiautomáticas. (Los creeps ya los tienen desde el 2026-09-30: `ataqueDeHabCreep`
+  y los ganchos `flashOpciones`/`flashUsar` de GM Tools, P135.)
+- [ ] **Probar en mesa el ataque con arreglos y el Flash de un creep** (2026-09-30): probado en copias sin sesión; falta un duelo
+  real en el mapa ("Claude · pruebas", GM contra Clementino con 🎮 Tomar el control).
 - [ ] **Despojos mágico/especial** de los ítems: siguen a mano.
 - [ ] **Protección de jefe, segunda versión** (P95): resistencia a otros controles (Exhausto, Inmovilizado…), contador de resistencia o fases.
 - [ ] **Estados sobre otros más finos**: los que faltan automatizar (empujar, derribar, huir, "pierde el sigilo", etc.).

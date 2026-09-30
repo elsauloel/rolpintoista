@@ -13,7 +13,7 @@
 > Cómo anotar: al lado de cada punto, ✔ / ✘ y la fecha. Un ✘ se arregla (o se anota en `pendientes.md`) antes de seguir.
 
 ## 0. Automáticas
-- [ ] `comun/pruebas.html` en verde (hoy: 94 pruebas).
+- [ ] `comun/pruebas.html` en verde (hoy: 96 pruebas).
 
 ## 1. Ficha (partida "Test", "Prueba de Claude")
 - [ ] Abre sin errores en la consola; el título dice personaje y partida.
@@ -74,6 +74,7 @@
 | 2026-09-30 | 🎮 Tomar el control en mesa ("Claude · pruebas", Clementino): estado recibido, pase de turno, Botonera en el mapa, mover con No2, defensa en un duelo, devolver | ✔ | Todo restaurado al terminar. |
 | 2026-09-30 | Paso 2 en mesa ("Claude · pruebas", sitio publicado): Goblin con Veneno ×2, Regeneración +3 y Escudo gastado, 3 Mantenimientos seguidos | ✔ | Vida 20 → 21 → 23 → 26; Veneno se terminó al llegar a 0 stacks; Regeneración venció; escudo recargado. Todo restaurado. |
 | 2026-09-30 | Tanda 3: costo de atacar y No2 máximo en ficha, invocación y GM Tools (copias sin sesión) | ✔ 72/72 | "Forzar Nitros a 20" con Agilidad 9 ya no sube el máximo (P130). |
+| 2026-09-30 | Creeps: ataque con arreglos (Embestida: cobra lo de un ataque, PdG +2, daño +3) y ⚡ Flash (Furia ciega en PdG, cooldown sin No2; Esquive felino vale con Evasión y no con Parry, cuesta 2 HP) — copia de GM Tools sin sesión | ✔ 96/96 | Ataque con arreglos del personaje comparado con el viejo: 4000 casos, igual. Falta el duelo real en el mapa (pendientes). |
 | 2026-09-30 | Paso 3 en mesa ("Claude · pruebas", sitio publicado): Piel dura (✨ sobre sí) del Escarabajo de cobre | ✔ | −1 No2, cooldown 3, Escudo especial 5, sin cuadro. Restaurado (recargado y verificado). |
 | 2026-09-30 | Paso 3, tanda 2 (zonas, trampas y el estado del sistema anterior): creep y personaje dentro de un marco que hace de mapa (mensajes de zona y trampa), Veneno 2+2, Excedente de vida 4+4, jefe contra Stun, estado repetido que se renueva, Invulnerable contra Lisiado (copias sin sesión) | ✔ 94/94 | Zona del personaje con X = 3: «1d6+3». |
 | 2026-09-30 | Paso 3, tanda 1 (usar una habilidad): creep (✨ sobre sí con costo en vida, cooldown, "Sin vida", ataque con arma y sin Ejecución → avisan, tirada personalizada en el duelo, editor), invocación (escudo que se renueva, Invulnerable frena un Stun, Veneno ×2, zona → avisa, cura, editor) y personaje (copias sin sesión) | ✔ 92/92 | Comparado contra las funciones viejas sobre las habilidades de clase + 3000 al azar: igual (creep: solo lo buscado). |

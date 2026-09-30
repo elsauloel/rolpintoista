@@ -362,3 +362,9 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   índice). Auto + solo sobre el creep y sin tiradas → `aplicarHabCreepSobreSi` (sin cuadro). Auto con trampa y embebido en
   el mapa → `pedirTrampaAlMapaCreep` (el GM elige la casilla; no se anuncia a los jugadores). El ✨ de la fila abre el
   asistente con `siempreActivo` y deja la habilidad en auto (o semi si se saca).
+- **Ataque con arreglos y ⚡ Flash de los creeps** (2026-09-30, P134/P135): una habilidad ✨ "ataque con mi arma, con arreglos"
+  va al duelo como un ataque del creep (`lanzarAtaqueDeHabCreep` → `ataqueDeHabCreep`, `Combatiente.ataqueConArreglos`):
+  el gancho `atacar` tira su PdG con lo que suma la habilidad (`tirarPdgDeArreglosCreep`, los No2 ya se cobraron) y `dano`
+  le suma los dados y el fijo. Los Flash del creep aparecen en las cajas de tirada del duelo que maneja el GM
+  (`flashOpciones`/`flashUsar`): no gastan No2, ponen el cooldown (y cobran la vida si la tienen). Ejecutar un Flash con el
+  botón avisa que se usa dentro del duelo.

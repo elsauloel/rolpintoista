@@ -1030,7 +1030,13 @@ const Duelo = (() => {
     if(flashPedidas.has(k)) return;
     flashPedidas.add(k);
     const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
-    if(lado.tipo === 'creep' || String(lado.ref || '').includes('~')){ flashOps[k] = []; return; }   // los creeps y las invocaciones no usan Flash: no hace falta preguntar
+    if(String(lado.ref || '').includes('~')){ flashOps[k] = []; return; }   // las invocaciones todavía no usan Flash (P134): no hace falta preguntar
+    // Un creep sin Flash para esta tirada: el mapa del GM ya lo sabe y contesta solo, sin cargar GM Tools (P135, 2026-09-30).
+    if(lado.tipo === 'creep' && cfgEscuchar.flashLocal){
+      let ops = null;
+      try{ ops = cfgEscuchar.flashLocal(d, campo, lado); }catch(err){ console.error('Duelo: flashLocal', err); }
+      if(ops){ flashOps[k] = ops; return; }
+    }
     enviar(lado, {tipo: 'duelo-flash', id: d.id, campo});
     setTimeout(() => { if(flashOps[k] === undefined) flashOps[k] = []; }, 6000);
   }
@@ -1044,10 +1050,10 @@ const Duelo = (() => {
     if(flashOps[k] === undefined){ pedirFlash(d, campo); return ''; }
     const ops = flashOps[k];
     if(!ops.length) return '';
-    return `<div class="duelo-flash"><div class="det">⚡ Flash (se declara antes de tirar · no cuesta No2):</div>${ops.map(o => {
+    return `<div class="duelo-flash"><div class="det">⚡ Flash (se declara antes de tirar · no cuesta No2):</div>${ops.map(o => {   // costoTxt: lo que cuesta (un creep: cooldown); si no, SP
       const on = flashSel[k] === o.habId;
       const vale = (o.en || []).map(e => ETQ_FLASH[e] || e).join(', ');
-      return `<button type="button" class="flash${on ? ' on' : ''}" data-flash="${_esc(campo)}:${_esc(o.habId)}"${o.motivoNo ? ' disabled' : ''} title="Vale para: ${_esc(vale)}">${on ? '✔ ' : ''}⚡ ${_esc(o.nombre)} +${_fmt(o.bono)}<small>${_fmt(o.costoSp)} SP${campo === 'eva' && (o.en || []).length ? ' · vale con ' + _esc((o.en || []).filter(e => e === 'eva' || e === 'parry').map(e => ETQ_FLASH[e]).join(' o ')) : ''}${o.motivoNo ? ' · ' + _esc(o.motivoNo) : ''}</small></button>`;
+      return `<button type="button" class="flash${on ? ' on' : ''}" data-flash="${_esc(campo)}:${_esc(o.habId)}"${o.motivoNo ? ' disabled' : ''} title="Vale para: ${_esc(vale)}">${on ? '✔ ' : ''}⚡ ${_esc(o.nombre)} +${_fmt(o.bono)}<small>${o.costoTxt ? _esc(o.costoTxt) : _fmt(o.costoSp) + ' SP'}${campo === 'eva' && (o.en || []).length ? ' · vale con ' + _esc((o.en || []).filter(e => e === 'eva' || e === 'parry').map(e => ETQ_FLASH[e]).join(' o ')) : ''}${o.motivoNo ? ' · ' + _esc(o.motivoNo) : ''}</small></button>`;
     }).join('')}</div>`;
   }
 

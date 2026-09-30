@@ -1296,7 +1296,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/plantillas.js?v=20260930b"></script>
 <script src="../comun/biblioteca.js?v=20260929i"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930k"></script>
+<script src="../comun/combatiente.js?v=20260930l"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930c"></script>
 <script src="../comun/creeps-base.js?v=20260927a"></script>
@@ -1321,7 +1321,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/asistente-duelo-hab.js?v=20260930a"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js?v=20260930a"></script>
-<script src="../comun/duelo.js?v=20260930c"></script>
+<script src="../comun/duelo.js?v=20260930d"></script>
 <script src="../comun/catalogo.js?v=20260929b"></script>
 <script src="../comun/items-subidos.js?v=20260930a"></script>
 <script src="../comun/asistente-item.js?v=20260930b"></script>
@@ -3327,6 +3327,33 @@ function habDueloCreep(sc, h){
   if(typeof Duelo === 'undefined' || !Duelo.disponible() || !gmVivo.activo) return null;
   return habEjecucionCreep(sc, h);
 }
+// «Ataque con mi arma, con arreglos» de un creep (Golpe brutal, Carga…; P134, 2026-09-30): el mismo armado que el personaje
+// (comun/combatiente.js, ataqueConArreglos), con el arma del creep y su alcance (o el que diga la habilidad).
+function ataqueDeHabCreep(sc, h){
+  const c = h && h.duelo;
+  return Combatiente.ataqueConArreglos(h, c, {arma: {id: '', nombre: sc.armaNombre || '', tipoDado: num(sc.armaTipo) || 8, rango: !!sc.armaDeRango},
+    alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? alcanceDeHabCreep(sc, c, 'pdg') : alcanceDeCreep(sc)});
+}
+// El PdG del ataque con arreglos, con lo que le suma la habilidad (los No2 ya los cobró la habilidad).
+function tirarPdgDeArreglosCreep(sc, atq){
+  tirarValorStat(`${sc.nombre} · PdG`, creepStatValor(sc, 'pdg') + num(atq && atq.mods && atq.mods.pdg), sc, 'pdg');
+}
+// Se anuncia y va al cuadro del duelo (elegir el objetivo en el mapa); sin duelo, se tira el PdG suelto.
+function lanzarAtaqueDeHabCreep(sc, h){
+  const atq = ataqueDeHabCreep(sc, h);
+  parryPendienteCreep.delete(sc.id);   // atacar cierra el Parry que esperaba su Bloqueo
+  mesaPublicarHabilidadCreep(sc, h);
+  if(atq && typeof Duelo !== 'undefined' && Duelo.disponible() && gmVivo.activo)
+    Duelo.elegirObjetivo({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre}, ataque: atq, suelto: () => tirarPdgDeArreglosCreep(sc, atq)});
+  else tirarPdgDeArreglosCreep(sc, atq);
+}
+// ⚡ Flash de un creep (P135, 2026-09-30): no gasta No2 (igual que en el personaje); su límite es el cooldown, y la vida si
+// la habilidad la cuesta. Texto del costo para el botón del duelo.
+function costoFlashCreepTxt(h){
+  const p = [num(h.cd) > 0 ? `cooldown ${fmt(num(h.cd))}` : 'sin cooldown'];
+  if(num(h.hpCosto) > 0) p.push(`${fmt(num(h.hpCosto))} HP`);
+  return p.join(' · ');
+}
 function lanzarDueloDeHabCreep(sc, h, hab){
   Duelo.elegirObjetivo({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre}, ataque: {tipo: 'habilidad', hab, alcance: hab.alcance}, suelto: () => tirarExtraDeHab(h, sc)});
 }
@@ -5081,12 +5108,15 @@ document.addEventListener('click', e => {
     if(directo){ renderAll(); mesaPublicarHabilidadCreep(sc, h, directo.nota); toast(`${h.nombre || 'Habilidad'} ejecutada sobre ${sc.nombre}${directo.hechos.length ? ' → ' + directo.hechos.join(' · ') : ''}${costoHp > 0 ? ` · −${fmt(costoHp)} HP` : ''}`); return; }
     // Una trampa se coloca en secreto: la habilidad no se anuncia en la Mesa (los jugadores no deben enterarse).
     const hDuelo = (!auto || h.trampaColocar || esZona) ? null : habDueloCreep(sc, h);   // habilidad dirigida: la contienda va en el cuadro del duelo
-    if(h.trampaColocar){ if(!(auto && pedirTrampaAlMapaCreep(sc, h))) colocarTrampaDeHab(sc, h); }
+    const esArma = auto && !h.trampaColocar && Combatiente.tipoEjecucion(h.duelo) === 'arma';   // ataque con arreglos: al duelo como un ataque
+    if(esArma) lanzarAtaqueDeHabCreep(sc, h);
+    else if(h.trampaColocar){ if(!(auto && pedirTrampaAlMapaCreep(sc, h))) colocarTrampaDeHab(sc, h); }
     else if(esZona){ mesaPublicarHabilidadCreep(sc, h); if(!colocarZonaDeHabCreep(sc, h)) toast(`${h.nombre}: para colocar la zona hace falta ejecutarla desde el mapa (⚔ Acciones)`); }
     // Con tirada, la descripción viaja con ella (una sola línea en la Mesa).
     else if(habCreepTira(h) && !hDuelo) mesaConTexto(habTextoMesa(h));
     else mesaPublicarHabilidadCreep(sc, h);
-    if(hDuelo) lanzarDueloDeHabCreep(sc, h, hDuelo);
+    if(esArma){ /* ya fue al duelo */ }
+    else if(hDuelo) lanzarDueloDeHabCreep(sc, h, hDuelo);
     else if(habCreepTira(h) && !h.trampaColocar && !esZona) tirarExtraDeHab(h, sc);
     if(h.estadoObjetivo) elegirObjetivoDeHab(sc, h);   // a quién le pegó: se le aplica el estado solo
     const partes = [`ejecutada`, costo ? `−${fmt(costo)} No2 (quedan ${fmt(sc.nitros)})` : 'sin costo de No2'];
@@ -7608,6 +7638,7 @@ window.DUELO_HOOKS = {
   atacar: d => {
     const sc = S.creeps.find(c => c.id === d.atacante.ref);
     if(!sc) return;
+    if(d.ataque.tipo === 'habilidad-arma'){ tirarPdgDeArreglosCreep(sc, d.ataque); return; }   // los No2 ya los cobró la habilidad
     if(d.ataque.tipo === 'normal') atacarNormalCreep(sc); else ataqueEspecialCreep(sc, d.ataque.tipo);
   },
   // Para el crítico: el Crítico frecuente y potente del creep y su Resistencia a crítico contra el Tipo del arma que lo ataca.
@@ -7629,8 +7660,35 @@ window.DUELO_HOOKS = {
   dano: d => {
     const sc = S.creeps.find(c => c.id === d.atacante.ref);
     if(!sc) return;
-    const r = tirarDados(danoTxt(sc, creepStatValor(sc, 'dmg')));
+    let formula = danoTxt(sc, creepStatValor(sc, 'dmg'));
+    const m = d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null;   // lo que le suma la habilidad: dados del Tipo del arma y daño fijo
+    if(m){
+      if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${num(sc.armaTipo) || 8}`;
+      if(num(m.fijo)) formula += ` ${num(m.fijo) > 0 ? '+' : '-'} ${fmt(Math.abs(num(m.fijo)))}`;
+    }
+    const r = tirarDados(formula);
     if(r) registrarTirada(`${sc.nombre} · Daño`, r);
+  },
+  // ⚡ Flash (P135): las reacciones del creep que sirven para esta tirada del duelo (se marcan antes de tirar) y su uso.
+  flashOpciones: (d, campo) => {
+    const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
+    const sc = S.creeps.find(c => c.id === lado.ref);
+    if(!sc) return [];
+    return (sc.habilidades || []).filter(h => Combatiente.flashPara(h.duelo, campo)).map(h => ({habId: h.id, nombre: h.nombre, bono: num(h.duelo.flash.bono), en: h.duelo.flash.en || [],
+      costoTxt: costoFlashCreepTxt(h), motivoNo: Combatiente.bloqueoHab(h, {hp: sc.hp}).toLowerCase()}));
+  },
+  flashUsar: (d, campo, modo, habId) => {
+    const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
+    const sc = S.creeps.find(c => c.id === lado.ref);
+    const h = sc && (sc.habilidades || []).find(x => x.id === habId);
+    if(!h || !Combatiente.flashPara(h.duelo, campo)) return null;
+    if(!Combatiente.flashPara(h.duelo, campo, modo)){ toast(`${h.nombre} no vale para esta tirada (${modo === 'parry' ? 'Parry' : campo})`); return null; }
+    const motivo = Combatiente.bloqueoHab(h, {hp: sc.hp});
+    if(motivo){ toast(`${sc.nombre}: ${h.nombre} — ${motivo}`); return null; }
+    h.cdActual = num(h.cd);   // sin No2: el cooldown es su límite
+    if(num(h.hpCosto) > 0) sc.hp = num(sc.hp) - num(h.hpCosto);
+    renderAll();
+    return {bono: num(h.duelo.flash.bono), etq: h.nombre, quien: sc.nombre};
   },
   // Habilidades dirigidas: la tirada del creep que la usa (quien = 'atacante') o la del creep que se resiste (quien = 'defensor').
   habTirar: (d, quien, modo) => {

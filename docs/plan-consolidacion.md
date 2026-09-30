@@ -151,6 +151,9 @@ Cada paso: qué es, qué se gana, qué se arriesga, cómo se prueba. Se pueden e
   lo demás (el personaje renovaba también el de un ítem equipado y no acumulaba Veneno; el Excedente de vida del creep se
   sigue sumando). Pruebas: 94. **El paso 3 queda cerrado**; lo que falta para creeps e invocaciones (ataque con arma, Flash,
   zona y trampas de invocación) quedó en `pendientes.md` (P134).
+- **Después del paso 3** (2026-09-30, pedido del dueño): **los creeps ya atacan con arreglos y usan ⚡ Flash**. El ataque con
+  arreglos sale de `Combatiente.ataqueConArreglos` (la ficha usa el mismo; comparado contra el viejo en 4000 casos: igual) y
+  un Flash se reconoce con `Combatiente.flashPara`. El Flash de un creep cuesta solo cooldown (**P135**). Pruebas: 96.
 - **Qué**: cobrar el costo, los tres modos (📣 manual, 💰 semi, ✨ auto), lo del sistema anterior mientras dure, trampas y
   zonas: una sola implementación que usan personaje, invocación y creep.
 - **Se gana**: se terminan las tres versiones; las invocaciones reciben lo que hoy les falta (zonas, ataque con arma desde

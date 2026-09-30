@@ -431,6 +431,39 @@ const Combatiente = (() => {
     const t = h && h.trampaColocar;
     return t ? {...t, nombre: String(t.nombre || '').trim() || h.nombre} : null;
   }
+  /* «Ataque con mi arma, con arreglos» (Golpe brutal, Carga, Takle…): el ataque que va al duelo, con lo que le suma la
+     habilidad (PdG, dados del Tipo del arma, daño fijo, crítico, ignorar resistencia a crítico, sin Parry, efectos al pegar
+     y los que solo pasan si es crítico). Igual para personaje y creep. `o.arma` = {id, nombre, tipoDado, rango} de quien
+     ataca; `o.alcance` = casilleros (lo calcula quien llama: el de su arma o el que diga la habilidad); `o.X` = el costo
+     variable (sin X, ninguna «X» de los textos se toca). */
+  function ataqueConArreglos(h, c, o){
+    if(!c || typeof c !== 'object' || c.modo !== 'arma') return null;
+    o = o || {};
+    const a = c.arma || {}, arma = o.arma || {}, conX = o.X !== undefined && o.X !== null, X = nf(o.X);
+    const sx = t => conX ? sustituirX(t, X) : t;
+    const mapEf = e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1,
+      spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: nf(e.val)}] : e.mods, polaridad: e.stat ? (nf(e.val) >= 0 ? 'buff' : 'debuff') : undefined},
+      cura: nf(e.cura), detalle: e.detalle || ''});
+    const critico = c.critico ? {
+      ...(c.critico.efectos && c.critico.efectos.length ? {efectos: c.critico.efectos.map(mapEf)} : {}),
+      ...(c.critico.efectosNota ? {efectosNota: sx(c.critico.efectosNota)} : {}),
+    } : null;
+    return {tipo: 'habilidad-arma', habNombre: h.nombre, armaId: arma.id || '', armaNombre: arma.nombre || '', tipoDado: arma.tipoDado, rango: !!arma.rango,
+      alcance: o.alcance, sinParry: !!a.sinParry,
+      mods: {pdg: nf(a.pdg) + nf(a.pdgPorX) * X, dados: nf(a.dadosPorX) * X, fijo: nf(a.fijo) + nf(a.fijoPorX) * X, ignoraResistCrit: nf(a.ignoraResistCrit), critBono: nf(a.critBono), critpotBono: nf(a.critpotBono)},
+      efectos: (c.efectos || []).map(mapEf),
+      ...(c.efectosNota ? {efectosNota: sx(c.efectosNota)} : {}),
+      ...(critico && Object.keys(critico).length ? {critico} : {})};
+  }
+  /* ⚡ Flash: ¿esta Ejecución es un Flash que vale para esa tirada del duelo? `campo`: 'pdg', 'eva' (la defensa), 'bloqueo',
+     'fuerza' o 'dano'. Sin `modo`, para 'eva' vale si sirve para Evasión o Parry (la lista de opciones); con `modo`, para la
+     defensa que se eligió ('parry' o la Evasión). */
+  function flashPara(c, campo, modo){
+    if(!c || typeof c !== 'object' || c.modo !== 'flash' || !c.flash) return false;
+    const en = c.flash.en || [];
+    if(campo !== 'eva') return en.includes(campo);
+    return modo === undefined ? en.includes('eva') || en.includes('parry') : en.includes(modo === 'parry' ? 'parry' : 'eva');
+  }
   // Solo sobre uno mismo y sin nada que tirar ni resistir (Blindaje y parecidos): se aplica directo, sin abrir el cuadro.
   const sobreSiSinTiradas = hab => !!(hab && hab.objetivo === 'uno mismo' && !hab.tira && !hab.dano && !(hab.contra || []).length);
   // Por qué una ✨ se ejecuta como 💰 en quien todavía no tiene esa parte (P134: invocaciones y creeps sin ataque con
@@ -439,8 +472,8 @@ const Combatiente = (() => {
     const t = tipoEjecucion(c);
     if(!t) return 'todavía no tiene armada la ejecución paso a paso (✨)';
     if(quien === 'pj') return '';
-    if(t === 'arma') return 'el «ataque con arma, con arreglos» todavía no anda para ' + (quien === 'inv' ? 'invocaciones' : 'creeps');
-    if(t === 'flash') return 'la «reacción Flash» todavía no anda para ' + (quien === 'inv' ? 'invocaciones' : 'creeps');
+    if(t === 'arma' && quien === 'inv') return 'el «ataque con arma, con arreglos» todavía no anda para invocaciones';
+    if(t === 'flash') return quien === 'inv' ? 'la «reacción Flash» todavía no anda para invocaciones' : 'un ⚡ Flash se usa dentro del duelo, antes de una tirada';
     if(t === 'zona' && quien === 'inv') return 'la zona persistente todavía no anda para invocaciones';
     return '';
   }
@@ -449,5 +482,5 @@ const Combatiente = (() => {
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, inmunidad,
     modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
-    formulaDanoHab, zonaDeHab, trampaDeHab};
+    formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, flashPara};
 })();

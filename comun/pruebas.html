@@ -333,10 +333,24 @@ prueba('zona persistente: el mismo mensaje al mapa para personaje y creep (daño
 prueba('trampa de una habilidad: sin nombre propio lleva el de la habilidad', () => igual(
   [Combatiente.trampaDeHab({nombre: 'Raíces', trampaColocar: {nombre: '  ', dano: '1d6', radio: 1}}), Combatiente.trampaDeHab({nombre: 'X', trampaColocar: {nombre: 'Cepo'}}).nombre, Combatiente.trampaDeHab({nombre: 'Y'})],
   [{nombre: 'Raíces', dano: '1d6', radio: 1}, 'Cepo', null]));
-prueba('lo que todavía no anda en creeps e invocaciones se avisa (P134)', () => igual(
-  [Combatiente.ejecucionNoDisponible({modo: 'arma'}, 'pj'), Combatiente.ejecucionNoDisponible({modo: 'arma'}, 'creep') !== '', Combatiente.ejecucionNoDisponible({modo: 'flash'}, 'inv') !== '',
+prueba('lo que todavía no anda en invocaciones se avisa (P134); el creep ya ataca con arreglos', () => igual(
+  [Combatiente.ejecucionNoDisponible({modo: 'arma'}, 'pj'), Combatiente.ejecucionNoDisponible({modo: 'arma'}, 'creep'), Combatiente.ejecucionNoDisponible({modo: 'arma'}, 'inv') !== '',
+   Combatiente.ejecucionNoDisponible({modo: 'flash'}, 'inv') !== '', Combatiente.ejecucionNoDisponible({modo: 'flash'}, 'creep') !== '',
    Combatiente.ejecucionNoDisponible({objetivo: 'zona'}, 'creep'), Combatiente.ejecucionNoDisponible({objetivo: 'zona'}, 'inv') !== '', Combatiente.ejecucionNoDisponible(null, 'pj') !== ''],
-  ['', true, true, '', true, true]));
+  ['', '', true, true, true, '', true, true]));
+prueba('ataque con arreglos: mods por X, sin Parry, efectos y los de crítico, igual para personaje y creep', () => {
+  const c = {modo: 'arma', arma: {pdg: 1, pdgPorX: 1, dadosPorX: 1, fijo: 2, sinParry: true, critBono: 1}, efectos: [{nombre: 'Rengo', turnos: 1}], efectosNota: 'Empuja X', critico: {efectosNota: 'Lisia X'}};
+  const pj = Combatiente.ataqueConArreglos({nombre: 'Carga'}, c, {X: 2, arma: {id: 'a1', nombre: 'Lanza', tipoDado: 8, rango: false}, alcance: 1});
+  const cr = Combatiente.ataqueConArreglos({nombre: 'Carga'}, c, {arma: {nombre: 'Garras', tipoDado: 6}, alcance: 1});
+  igual([pj.tipo, pj.mods.pdg, pj.mods.dados, pj.mods.fijo, pj.sinParry, pj.mods.critBono, pj.efectos[0].nombre, pj.efectosNota, pj.critico.efectosNota, pj.armaId,
+    cr.mods.pdg, cr.mods.dados, cr.efectosNota, cr.tipoDado, cr.armaNombre, Combatiente.ataqueConArreglos({}, {modo: 'hab'})],
+    ['habilidad-arma', 3, 2, 2, true, 1, 'Rengo', 'Empuja 2', 'Lisia 2', 'a1', 1, 0, 'Empuja X', 6, 'Garras', null]);
+});
+prueba('⚡ Flash: vale para esa tirada; en la defensa, según Evasión o Parry', () => {
+  const c = {modo: 'flash', flash: {en: ['parry', 'dano'], bono: 2}};
+  igual([Combatiente.flashPara(c, 'eva'), Combatiente.flashPara(c, 'eva', 'parry'), Combatiente.flashPara(c, 'eva', 'evasion'), Combatiente.flashPara(c, 'dano'), Combatiente.flashPara(c, 'pdg'), Combatiente.flashPara({modo: 'hab'}, 'pdg')],
+    [true, true, false, true, false, false]);
+});
 
 /* ---------- Plantillas (comun/plantillas.js) ---------- */
 grupo('Plantillas');

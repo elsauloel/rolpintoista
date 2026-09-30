@@ -22,13 +22,19 @@ Una **habilidad** es algo especial que tu personaje sabe hacer: un golpe, un hec
 - Una **tirada** (un stat y/o una fórmula) y un **estado** que se aplica sobre uno mismo.
 - **Cura HP** sobre uno mismo, si es una habilidad de curación.
 
-## Automatizada o solo anunciada
-Al crearla, el asistente te pregunta **¿la automatizamos?**
+## Cómo se ejecuta: manual, semiautomática o automática
+Al crearla (o con **Editar**), lo primero que elegís es **cómo se ejecuta**. Se puede cambiar cuando quieras.
 
 | | Qué hace al ejecutarla |
 |---|---|
-| **Sí** | Descuenta SP, Nitros y HP solos; tira lo que tenga que tirar; aplica el estado. |
-| **No** | Botón **Anunciar**: publica la descripción en la [[La Mesa\|Mesa]], sin costo, sin tirada y sin estado. La resuelve el grupo. |
+| **📣 Manual** | Botón **Anunciar**: publica la descripción en la [[La Mesa\|Mesa]]. No cobra ni tira nada: la mesa resuelve costos, tiradas y efectos a mano. |
+| **💰 Semiautomática** | Botón **Ejecutar**: **cobra sola el costo** (Nitros, SP y HP, si tiene) y **tira la tirada inicial** si la tiene (por lo general, la PdG). Publica la descripción; los efectos se resuelven a mano. |
+| **✨ Automática** | Botón **Ejecutar**: abre la **Ejecución paso a paso**, a la vista de toda la mesa — cobra el costo, elegís el objetivo en el mapa, cada involucrado tira en su momento y se aplican los efectos. Si es **solo sobre vos y no tira nada** (como Blindaje), se aplica directo y se anuncia en la Mesa. |
+
+La ejecución paso a paso se arma con el botón **✨** de la habilidad (o en el paso "Ejecución" del editor): tipo de habilidad, costo, objetivo, tirada, resistencia, daño y efectos.
+
+> [!note] Del sistema anterior
+> Hasta el 2026-09-30 había un solo "¿la automatizamos?" que descontaba costos, tiraba y aplicaba un estado **sobre vos**, cura o una trampa. Las habilidades que todavía tienen eso lo siguen aplicando (el editor lo muestra en el paso "Del sistema anterior") hasta que se adapten a la ✨ Automática.
 
 > [!tip] Lo que no automatiza, se dice
 > Muchas habilidades tienen efectos sobre *otros* (empujar, marcar, quitar Nitros): eso queda escrito en la descripción y se resuelve en la mesa ([[La esencia del Rol Pintoísta]]).

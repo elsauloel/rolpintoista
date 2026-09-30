@@ -1207,6 +1207,10 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 #ficha-lectura button{pointer-events:auto;margin-left:10px;cursor:pointer}
 #ficha-lectura.editando-gm{background:#5b4310;border-color:#E0A458
 }
+.modos-hab{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.modo-hab-btn{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;white-space:normal;padding:10px 12px;line-height:1.4}
+.modo-hab-btn span{font-size:12.5px;color:var(--muted);font-weight:400}
+.modo-hab-btn.activa span{color:inherit}
 </style>
 <style>
 /* Modo botonera (?modo=botonera): la ficha se abre adentro del mapa y
@@ -2069,7 +2073,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/estados-aplicar.js?v=20260929a"></script>
 <script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-trampa.js?v=20260929i"></script>
-<script src="../comun/asistente-duelo-hab.js?v=20260929a"></script>
+<script src="../comun/asistente-duelo-hab.js?v=20260930a"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js?v=20260930a"></script>
 <script src="../comun/duelo.js?v=20260930a"></script>
@@ -2079,7 +2083,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/editar-item.js?v=20260930a"></script>
 <script src="../comun/skills-clase.js"></script>
 <script src="../comun/pasivas.js"></script>
-<script src="../comun/plantillas.js?v=20260929i"></script>
+<script src="../comun/plantillas.js?v=20260930a"></script>
 <script src="../comun/biblioteca.js?v=20260929i"></script>
 <script src="../comun/recorte-imagen.js"></script>
 <script>
@@ -3573,6 +3577,9 @@ function dueloAplicarEfectoPropio(d, ef){
 // dirigida o ataque con arma). La tirada personalizada de una habilidad dirigida (ver habDueloDe) ya vive
 // DENTRO del duelo (hab.tira.formula), no acá — no hace falta ninguna ventanita aparte en la ficha.
 function terminarEjecucionHab(it, arma, xSp, xNitros){
+  // 💰 Semiautomática: ya cobró el costo; anuncia y tira la tirada inicial (si tiene). Los efectos, a mano.
+  if(modoHab(it) !== 'auto'){ anunciarHabilidad(it); tirarPrimeraDeHab(it); return; }
+  if(!dueloDe(it)){ toast(`${it.nombre}: todavía no tiene armada la ejecución paso a paso (✨) — se ejecutó como semiautomática`); anunciarHabilidad(it); tirarPrimeraDeHab(it); return; }
   const aArma = ataqueDeHabArma(it, arma, xSp, xNitros);
   if(aArma){
     mesaPublicarHabilidad(it.nombre, it.detalle || it.efectoDetalle || '');
@@ -3587,6 +3594,8 @@ function terminarEjecucionHab(it, arma, xSp, xNitros){
     if(!colocarZonaDeHab(it, xSp, xNitros)) toast(`${it.nombre}: para colocar la zona hace falta tener el mapa abierto`);
     return;
   }
+  // Solo sobre uno mismo y sin nada que tirar (Blindaje y parecidos): no hace falta el cuadro — se aplica directo y se anuncia.
+  if(aplicarHabSobreMiDirecto(it, habDueloDatos(it, xSp, xNitros))) return;
   const hDuelo = habDueloDe(it, xSp, xNitros);   // habilidad dirigida (duelo): se anuncia sin tirada y la contienda va en el cuadro del duelo
   if(hDuelo) mesaPublicarHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); else anunciarHabilidad(it);
   if(!(hDuelo && lanzarDueloDeHab(it, hDuelo))) tirarPrimeraDeHab(it);
@@ -3643,9 +3652,13 @@ function alcanceDeHab(c, statTira){
   return statTira === 'pdgmg' ? rc() : 0;   // auto: los hechizos usan el Rango de casteo; el resto no resalta
 }
 function habDueloDe(it, xSp, xNitros){
+  if(typeof Duelo === 'undefined' || !Duelo.disponible() || !fichaVivo || !fichaVivo.id || fichaVivo.soloLectura || fichaVivo.editaGM) return null;
+  return habDueloDatos(it, xSp, xNitros);
+}
+// Lo mismo que habDueloDe pero sin pedir que el duelo esté conectado (lo usa el atajo de «solo sobre vos, sin tiradas»).
+function habDueloDatos(it, xSp, xNitros){
   const c = dueloDe(it);
   if(!c || typeof c !== 'object' || c.modo === 'arma' || c.modo === 'flash') return null;
-  if(typeof Duelo === 'undefined' || !Duelo.disponible() || !fichaVivo || !fichaVivo.id || fichaVivo.soloLectura || fichaVivo.editaGM) return null;
   const stat = c.tira !== undefined ? c.tira : (it.tiradaStat || '');
   const tipo = c.tipoDano || 'arcano';
   const base = String(it.tiradaExtra || '').trim();
@@ -3668,6 +3681,45 @@ function habDueloDe(it, xSp, xNitros){
     ...(c.efectosNota ? {efectosNota: sustituirX(c.efectosNota, X)} : {}),
     ...(c.contraOtro ? {contraOtro: c.contraOtro} : {}),
   };
+}
+// Resumen de una ejecución paso a paso, en una línea (para el editor y la tarjeta).
+function resumenEjecucionHab(c){
+  if(!c || typeof c !== 'object') return '';
+  if(c.modo === 'arma') return 'ataque con tu arma';
+  if(c.modo === 'flash') return 'flash';
+  const OBJ = {enemigo: 'a un enemigo', aliado: 'a un aliado', 'uno mismo': 'sobre vos', area: 'en un área', onda: 'onda alrededor tuyo', zona: 'zona persistente'};
+  const tira = c.tiraFormula ? (c.tiraEtiqueta || 'tirada propia') : c.tira ? (STAT_LABEL[c.tira] || c.tira) : '';
+  const partes = [OBJ[c.objetivo] || c.objetivo || 'a un enemigo'];
+  if(tira) partes.push(`tira ${tira}${(c.contra || []).length ? ' contra ' + c.contra.map(s => STAT_LABEL[s] || s).join('/') : ''}`);
+  if(c.dano) partes.push('hace daño');
+  if((c.efectos || []).length) partes.push(c.efectos.map(e => e.nombre || (e.cura ? 'cura' : 'efecto')).join(', '));
+  return partes.join(' · ');
+}
+// Abre el cuadro que arma la ejecución paso a paso de una habilidad (comun/asistente-duelo-hab.js). Guardarla la deja
+// en ✨ Automático; sacarla la deja en 💰 Semiautomático.
+function abrirEjecucionHab(it, alTerminar){
+  AsistenteDueloHab.abrir({nombre: it.nombre || 'Habilidad', inicial: dueloDe(it) || null, siempreActivo: true, tieneFormula: !!String(it.tiradaExtra || '').trim(), costoVariable: spVariable(it) ? 'sp' : nitrosVariable(it) ? 'nitros' : '',
+    costoInicial: {sp: it.costo, nitrosCosto: it.nitrosCosto, hpCosto: it.hpCosto, turnoAjenoSp: it.turnoAjenoSp}, elegirEstado: elegirEstadoDuelo,
+    alGuardar: r => {
+      if(r){ it.duelo = r.duelo; it.costo = r.costo.sp; it.nitrosCosto = r.costo.nitrosCosto; it.hpCosto = r.costo.hpCosto; it.turnoAjenoSp = r.costo.turnoAjenoSp || ''; it.modo = 'auto'; it.automatizada = true; }
+      else{
+        if(it.habClaseId && (function(){ const base = CLASES_SKILLS.flatMap(c => c.habilidades).find(h => h.id === it.habClaseId); return base && base.duelo; })()) it.duelo = null;
+        else delete it.duelo;
+        if(modoHab(it) === 'auto' || it.modo === 'auto') it.modo = 'semi';
+      }
+      if(alTerminar) alTerminar(r);
+    }});
+}
+// ✨ Automática, solo sobre uno mismo y sin tiradas (Blindaje y parecidos): se aplica directo, sin abrir el cuadro, y se anuncia
+// en la Mesa con lo que pasó. Devuelve false si no es ese caso (entonces sigue el cuadro de siempre).
+function aplicarHabSobreMiDirecto(it, h){
+  if(!h || h.objetivo !== 'uno mismo' || h.tira || h.dano || (h.contra || []).length || !fichaVivo || !fichaVivo.id || fichaVivo.soloLectura) return false;
+  const d = {defensor: {tipo: 'pj', ref: fichaVivo && fichaVivo.id}, atacante: {nombre: (S.meta && S.meta.nombre) || 'Personaje'}};
+  const hechos = (h.efectos || []).map(ef => { const r = dueloAplicarEfectoPropio(d, ef); return r && !r.manual && r.nota ? r.nota : `${ef.nombre || 'Efecto'}: a mano`; });
+  const texto = [it.detalle || it.efectoDetalle || '', hechos.length ? '→ ' + hechos.join(' · ') : '', h.efectoLibre || '', h.efectosNota || ''].filter(Boolean).join(' ');
+  mesaPublicarHabilidad(it.nombre, texto);
+  renderList('efectos'); renderVitals();
+  return true;
 }
 function lanzarDueloDeHab(it, hab){
   if(!hab) return false;
@@ -5058,7 +5110,7 @@ const LISTS = {
       return `<div class="item">
       <div class="ihead">
         ${thumb(i)}
-        <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''}${dueloDe(i) ? ' <span class="tag cost" title="Al ejecutarla se abre el cuadro de ejecución paso a paso">✨ ejecución</span>' : ''}${i.para === 'creep' ? ' <span class="tag cost" title="Habilidad pensada para creeps: paga con cooldown, no con SP. En la ficha no hay cooldown: revisale el costo.">🐾 de creep</span>' : ''}${versionNuevaDeHab(i) ? ` <button type="button" class="mini" data-versionhab="${i.id}" title="Alguien corrigió la habilidad de la que salió esta: ver y decidir si actualizarla">🔔 versión nueva</button>` : ''}</div>
+        <div><div class="iname">${esc(i.nombre)} ${i.costo?`<span class="tag cost">${esc(i.costo)}</span>`:''}<span class="tag cost" title="${esc(MODOS_HAB[modoHab(i) || 'semi'].nombre)}: ${esc(MODOS_HAB[modoHab(i) || 'semi'].corto)}">${MODOS_HAB[modoHab(i) || 'semi'].icono} ${esc(MODOS_HAB[modoHab(i) || 'semi'].nombre.toLowerCase())}</span>${i.para === 'creep' ? ' <span class="tag cost" title="Habilidad pensada para creeps: paga con cooldown, no con SP. En la ficha no hay cooldown: revisale el costo.">🐾 de creep</span>' : ''}${versionNuevaDeHab(i) ? ` <button type="button" class="mini" data-versionhab="${i.id}" title="Alguien corrigió la habilidad de la que salió esta: ver y decidir si actualizarla">🔔 versión nueva</button>` : ''}</div>
           <div class="idesc">${esc(i.detalle)}</div>
         </div>
         <div class="rowbtns"><button class="mini" data-view="habilidades:${i.id}">Ver</button><button class="mini" data-edit="habilidades:${i.id}">Editar</button><button class="mini" data-duelohab="${i.id}" title="Ejecución: cómo se juega esta habilidad (qué se tira, con qué se resiste, daño y efectos)">✨</button><button class="mini" data-subirhab="${i.id}" title="Subir a la biblioteca con toda su configuración: queda disponible para todos al instante">⬆</button></div>
@@ -6168,14 +6220,7 @@ document.addEventListener('click', async e => {
   if(b.dataset.versionhab){ const it = S.habilidades.find(x => x.id === b.dataset.versionhab); if(it) abrirVersionNuevaHab(it); return; }
   if(b.dataset.duelohab){   // 🎯 cómo se juega la habilidad en el duelo (comun/asistente-duelo-hab.js)
     const it = S.habilidades.find(x => x.id === b.dataset.duelohab);
-    if(it) AsistenteDueloHab.abrir({nombre: it.nombre, inicial: dueloDe(it) || null, tieneFormula: !!String(it.tiradaExtra || '').trim(), costoVariable: spVariable(it) ? 'sp' : nitrosVariable(it) ? 'nitros' : '',
-      costoInicial: {sp: it.costo, nitrosCosto: it.nitrosCosto, hpCosto: it.hpCosto, turnoAjenoSp: it.turnoAjenoSp}, elegirEstado: elegirEstadoDuelo,
-      alGuardar: r => {
-        if(r){ it.duelo = r.duelo; it.costo = r.costo.sp; it.nitrosCosto = r.costo.nitrosCosto; it.hpCosto = r.costo.hpCosto; it.turnoAjenoSp = r.costo.turnoAjenoSp || ''; }
-        else if(it.habClaseId && (function(){ const base = CLASES_SKILLS.flatMap(c => c.habilidades).find(h => h.id === it.habClaseId); return base && base.duelo; })()) it.duelo = null;
-        else delete it.duelo;
-        renderList('habilidades'); refresh(); toast(r ? `${it.nombre}: ahora se juega en el duelo` : `${it.nombre}: sin duelo`);
-      }});
+    if(it) abrirEjecucionHab(it, r => { renderList('habilidades'); refresh(); toast(r ? `${it.nombre}: ✨ automática (ejecución paso a paso)` : `${it.nombre}: sin ejecución paso a paso (queda semiautomática)`); });
     return;
   }
   if(b.dataset.armrota){
@@ -9035,7 +9080,7 @@ function openEditor(key, id, equipadoPreset, opciones){
   // Una habilidad nueva arranca sin respuesta a "¿automatizarla?": es lo
   // primero que se pregunta. Las que ya existen (sin el dato) cuentan como
   // automatizadas.
-  if(key === 'habilidades' && !id && !op.draft){ editing.draft.automatizada = null; editing.draft.jobCosto = HAB_JOB_CUSTOM; }
+  if(key === 'habilidades' && !id && !op.draft){ editing.draft.automatizada = null; editing.draft.modo = null; editing.draft.jobCosto = HAB_JOB_CUSTOM; }
   $("#modal-save").style.display = "";
   $('#modal-title').textContent = (id ? 'Editar ' : 'Nueva ') + sc.titulo.toLowerCase();
   $('#modal-del').style.display = id ? 'block' : 'none';
@@ -9061,8 +9106,12 @@ function campoImagenHtml(draft){
    pregunta que guía al jugador. Al crear, "Guardar" aparece en el último
    paso; al editar, está siempre (y se puede saltar a cualquier paso). */
 const PASOS_HAB = {
-  auto: {id: 'auto', corto: 'Automatizar', titulo: '¿Querés automatizar la ejecución de esta habilidad?',
-   ayuda: 'Si la automatizás, al tocar Ejecutar la ficha descuenta sola el costo (Nitros, SP, HP), tira los dados y aplica el estado que le pongas. Si no, queda como una nota: Anunciar solo publica su descripción en la Mesa y todo lo demás lo llevás a mano.'},
+  auto: {id: 'auto', corto: 'Cómo se ejecuta', titulo: '¿Cómo se ejecuta esta habilidad?',
+   ayuda: 'Tres formas, de menos a más automática. Se puede cambiar cuando quieras.'},
+  ejecucion: {id: 'ejecucion', corto: 'Ejecución', titulo: '¿Cómo se juega paso a paso?',
+   ayuda: 'El costo, a quién apunta, qué tira cada uno, el daño y los efectos. Se arma en el cuadro de Ejecución (✨), el mismo que se abre para toda la mesa al usarla.'},
+  anterior: {id: 'anterior', corto: 'Del sistema anterior', titulo: 'Lo que tenía del sistema anterior',
+   ayuda: 'Esta habilidad todavía tiene cosas del sistema de automatización anterior. Se siguen aplicando solas al ejecutarla hasta que la adaptes: lo ideal es pasarla a ✨ Automático y armar ahí su ejecución.'},
   que: {id: 'que', corto: 'Qué es', titulo: '¿Cómo se llama y qué hace?',
    ayuda: 'Contalo como lo leería la mesa: esta descripción aparece en la Mesa cada vez que la uses.'},
   costo: {id: 'costo', corto: 'Costo', titulo: '¿Qué cuesta usarla?',
@@ -9080,11 +9129,40 @@ const PASOS_HAB = {
 };
 // Automatizada (o sin definir, como las de antes): pide costo y efecto.
 // No automatizada: solo qué es, origen y listo.
-const habAutomatizada = h => !h || h.automatizada !== false;
+/* Tres modos de ejecución (regla del dueño, 2026-09-30 — reemplaza a "¿automatizarla? sí/no" + el tilde "¿se juega en el
+   duelo?", que se superponían): 'manual' (📣 Anunciar: publica el texto y todo va a mano), 'semi' (💰 cobra solo el costo
+   —Nitros, SP, HP— y tira la tirada inicial si la tiene; los efectos van a mano) y 'auto' (✨ la Ejecución paso a paso:
+   objetivo, tiradas de cada uno, efectos). Se guarda en `h.modo`; las de antes lo deducen: automatizada === false →
+   manual, con `duelo` configurado → auto, el resto → semi. Lo del sistema anterior (estado sobre uno mismo, cura, trampa)
+   se sigue aplicando en semi y en auto hasta que se adapte cada habilidad. */
+const MODOS_HAB = {
+  manual: {icono: '📣', nombre: 'Manual', boton: 'Anunciar', corto: 'solo se anuncia'},
+  semi: {icono: '💰', nombre: 'Semiautomático', boton: 'Ejecutar', corto: 'cobra el costo y tira la tirada inicial'},
+  auto: {icono: '✨', nombre: 'Automático', boton: 'Ejecutar', corto: 'ejecución paso a paso'},
+};
+function modoHab(h){
+  if(!h) return 'semi';
+  if(h.modo === null) return null;   // habilidad nueva: todavía no eligió
+  if(MODOS_HAB[h.modo]) return h.modo;
+  if(h.automatizada === false) return 'manual';
+  return dueloDe(h) ? 'auto' : 'semi';
+}
+const habAutomatizada = h => modoHab(h) !== 'manual';
+// Lo del sistema anterior que tiene cargado la habilidad (se sigue aplicando en semi y auto hasta adaptarla).
+function habLegado(h){
+  const L = [];
+  if(String(h.efectoNombre || '').trim()) L.push(`estado «${h.efectoNombre}» sobre vos`);
+  if(num(h.curaHp) > 0) L.push(`cura ${fmt(num(h.curaHp))} HP`);
+  if(h.trampaColocar) L.push('coloca una trampa');
+  if(h.zonaMapa || h.portalMapa) L.push(h.portalMapa ? 'abre un portal' : 'marca una zona');
+  return L;
+}
 function pasosHabilidad(draft){
-  return habAutomatizada(draft)
-    ? [PASOS_HAB.auto, PASOS_HAB.que, PASOS_HAB.costo, PASOS_HAB.tiradaEj, PASOS_HAB.tiradaEf, PASOS_HAB.efecto, PASOS_HAB.origen, PASOS_HAB.listo]
-    : [PASOS_HAB.auto, PASOS_HAB.que, PASOS_HAB.origen, PASOS_HAB.listo];
+  const m = modoHab(draft);
+  const anterior = habLegado(draft).length ? [PASOS_HAB.anterior] : [];
+  if(m === 'semi') return [PASOS_HAB.auto, PASOS_HAB.que, PASOS_HAB.costo, PASOS_HAB.tiradaEj, PASOS_HAB.tiradaEf, ...anterior, PASOS_HAB.origen, PASOS_HAB.listo];
+  if(m === 'auto') return [PASOS_HAB.auto, PASOS_HAB.que, PASOS_HAB.ejecucion, ...anterior, PASOS_HAB.origen, PASOS_HAB.listo];
+  return [PASOS_HAB.auto, PASOS_HAB.que, PASOS_HAB.origen, PASOS_HAB.listo];
 }
 
 function drawEditorHabilidad(){
@@ -9100,23 +9178,36 @@ function drawEditorHabilidad(){
   let html = `<div class="pasos-hab">${pasos.map((p, i) => {
     // Al crear, no se puede saltar adelante sin haber respondido lo primero
     // (¿automatizar?) ni sin nombre.
-    const bloqueado = nuevo && i > paso && (draft.automatizada === null || !(draft.nombre || '').trim());
+    const bloqueado = nuevo && i > paso && (modoHab(draft) === null || !(draft.nombre || '').trim());
     return `<button type="button" class="paso-chip${i === paso ? ' activo' : ''}${i < paso ? ' hecho' : ''}" data-hab-paso="${i}" ${bloqueado ? 'disabled' : ''}>${i + 1}. ${p.corto}</button>`;
   }).join('')}</div>`;
   html += `<div class="paso-titulo">${info.titulo}</div><p class="paso-ayuda">${info.ayuda}</p>`;
 
   if(info.id === 'auto'){
-    const auto = habAutomatizada(draft) && draft.automatizada !== null;
-    const manual = draft.automatizada === false;
-    html += `<div class="opcion-fila" style="margin-top:8px">
-        <button type="button" class="opcion-btn ${auto ? 'activa' : ''}" data-hab-auto="1">Sí, automatizarla</button>
-        <button type="button" class="opcion-btn ${manual ? 'activa' : ''}" data-hab-auto="0">No, la llevo a mano</button>
-      </div>
-      <div class="hint" style="margin-top:8px">${draft.automatizada === null
-        ? 'Elegí una para seguir.'
-        : auto
-          ? 'Vas a poder automatizar el <b>costo</b> (Nitros, SP y vida se descuentan solos) y el <b>efecto</b> (la tirada y el estado que aplica sobre vos).'
-          : 'Solo va a quedar la descripción: el botón se llama <b>Anunciar</b>, publica el texto en la Mesa y no cobra ni tira nada.'}</div>`;
+    const m = modoHab(draft);
+    const EXPLICA = {
+      manual: 'El botón se llama <b>Anunciar</b>: publica la descripción en la Mesa y la mesa se ocupa de todo lo demás (costos, tiradas y efectos, a mano). No cobra ni tira nada.',
+      semi: 'Al tocar <b>Ejecutar</b> la ficha <b>cobra sola el costo</b> (Nitros, SP y HP, si tiene) y <b>tira la tirada inicial</b> si la tiene (por lo general, la PdG). Publica la descripción en la Mesa; los efectos se resuelven a mano.',
+      auto: 'Al tocar <b>Ejecutar</b> se abre la <b>Ejecución paso a paso</b>, a la vista de toda la mesa: cobra el costo, elegís el objetivo en el mapa, cada involucrado tira en su momento, se ven los resultados y se aplican los efectos. Si es solo sobre vos y no tira nada (como Blindaje), se aplica directo con un anuncio.',
+    };
+    html += `<div class="modos-hab">${Object.entries(MODOS_HAB).map(([k, v]) => `
+        <button type="button" class="opcion-btn modo-hab-btn ${m === k ? 'activa' : ''}" data-hab-modo="${k}">
+          <b>${v.icono} ${v.nombre}</b><span>${EXPLICA[k]}</span>
+        </button>`).join('')}</div>
+      ${m === null ? '<div class="hint" style="margin-top:8px">Elegí una para seguir.</div>' : ''}`;
+  }
+  if(info.id === 'ejecucion'){
+    const c = dueloDe(draft);
+    html += `<div class="hint" style="margin:6px 0 10px">${c ? `Configurada: <b>${esc(resumenEjecucionHab(c))}</b>.` : 'Todavía <b>no está configurada</b>: sin esto, al ejecutarla solo cobra el costo y tira la tirada inicial (como la semiautomática).'}</div>
+      <button type="button" class="btn primary" data-hab-ejecucion="1" style="width:100%">✨ ${c ? 'Cambiar' : 'Armar'} la ejecución paso a paso</button>`;
+  }
+  if(info.id === 'anterior'){
+    html += `<div class="hint" style="margin:0 0 10px">Tiene: <b>${esc(habLegado(draft).join(' · '))}</b>.</div>`;
+    html += `<div class="f"><label>Vida (HP) que cura</label>
+        <input data-c="curaHp" type="number" step="1" min="0" value="${esc(num(draft.curaHp))}" data-hab-enter="1" style="max-width:120px">
+        <div class="hint" style="margin-top:5px">Se suma sola a tu vida al ejecutarla, sin pasar del máximo. 0 = no cura.</div></div>`;
+    html += htmlEstadoAlUsar('habilidades', draft);
+    html += trampaHtml(draft);
   }
   if(info.id === 'que'){
     html += `<div class="f"><label>Nombre</label><input data-c="nombre" value="${esc(draft.nombre)}" placeholder="ej. Golpe certero" data-hab-enter="1"></div>
@@ -9140,10 +9231,6 @@ function drawEditorHabilidad(){
       <div class="f"><label>Vida (HP) que gasta</label>
         <input data-c="hpCosto" type="number" step="1" min="0" value="${esc(num(draft.hpCosto))}" data-hab-enter="1" style="max-width:120px">
         <div class="hint" style="margin-top:5px">Se descuenta sola al ejecutarla. No te deja usarla si te dejaría en 0: tenés que tener más vida que el costo. 0 = no gasta.</div>
-      </div>
-      <div class="f"><label>Vida (HP) que cura</label>
-        <input data-c="curaHp" type="number" step="1" min="0" value="${esc(num(draft.curaHp))}" data-hab-enter="1" style="max-width:120px">
-        <div class="hint" style="margin-top:5px">Se suma sola a tu vida al ejecutarla, sin pasar del máximo (sobre vos). 0 = no cura.</div>
       </div>
       `;
   }
@@ -9176,21 +9263,22 @@ function drawEditorHabilidad(){
   }
   if(info.id === 'listo'){
     const fila = (titulo, valor) => `<div class="resumen-fila"><span>${titulo}</span><b>${valor}</b></div>`;
-    const auto = habAutomatizada(draft);
+    const modo = modoHab(draft) || 'semi', auto = modo === 'semi';
     const costoSp = String(draft.costo ?? '').trim();
     const tiradaEj = draft.tiradaStat ? (STAT_LABEL[draft.tiradaStat] || draft.tiradaStat) : (String(draft.tiradaExtra || '').trim() || 'no tira'), tiradaEf = draft.tiradaStat && String(draft.tiradaExtra || '').trim() ? String(draft.tiradaExtra).trim() + ' (botón 🎲)' : 'sin tirada de efecto';
     const estado = String(draft.efectoNombre || '').trim();
     html += `<div class="resumen-hab">
       <div class="resumen-nombre">${esc(draft.nombre || '(sin nombre)')}</div>
       <div class="resumen-desc">${draft.detalle ? esc(draft.detalle) : '<span style="color:var(--muted)">(sin descripción)</span>'}</div>
-      ${fila('Ejecución', auto ? 'automatizada' : 'a mano (solo se anuncia)')}
+      ${fila('Ejecución', `${MODOS_HAB[modo].icono} ${MODOS_HAB[modo].nombre} (${MODOS_HAB[modo].corto})`)}
+      ${modo === 'auto' ? fila('Paso a paso', esc(dueloDe(draft) ? resumenEjecucionHab(dueloDe(draft)) : 'sin configurar')) : ''}
+      ${habLegado(draft).length ? fila('Del sistema anterior', esc(habLegado(draft).join(' · '))) : ''}
       ${auto ? `${fila('SP', esc(costoSp || 'no gasta'))}
       ${fila("No2", nitrosAtaque(draft) ? "como un ataque (elegís el arma al usarla)" : nitrosVariable(draft) ? "X (lo elegís al usarla)" : fmt(num(draft.nitrosCosto ?? IT2.nitrosHabilidad)))}
       ${fila('HP', num(draft.hpCosto) > 0 ? fmt(num(draft.hpCosto)) : 'no gasta')}
-      ${fila('Cura', num(draft.curaHp) > 0 ? `+${fmt(num(draft.curaHp))} HP` : 'no cura')}
       ${fila('Al ejecutar', esc(tiradaEj))}
       ${fila('Efecto', esc(tiradaEf))}
-      ${fila('Estado', esc(estado ? `${estado}${draft.efectoPermanente ? ' (no vence)' : num(draft.efectoTurnos) ? ` (${fmt(num(draft.efectoTurnos))} turnos)` : ''}` : 'ninguno'))}` : ''}
+      ` : ''}
       ${fila("Origen", esc(draft.job !== false ? `Puntos de Job (${fmt(jobCostoDe(draft))})` : (draft.origen || "otro")))}
     </div>`;
   }
@@ -9214,8 +9302,8 @@ function habilidadIrAPaso(n){
   if(!pasos) return;
   const destino = Math.max(0, Math.min(pasos.length - 1, n));
   // Lo primero: ¿automatizarla? Sin esa respuesta no se avanza.
-  if(destino > 0 && editing.draft.automatizada === null){
-    toast('Primero elegí si querés automatizarla');
+  if(destino > 0 && modoHab(editing.draft) === null){
+    toast('Primero elegí cómo se ejecuta');
     editing.paso = 0;
     drawEditor();
     return;
@@ -9246,12 +9334,14 @@ $('#modal-body').addEventListener('click', e => {
     drawEditor();
     return;
   }
-  const auto = e.target.closest('[data-hab-auto]');
-  if(auto){
-    editing.draft.automatizada = auto.dataset.habAuto === '1';
+  const modoBtn = e.target.closest('[data-hab-modo]');
+  if(modoBtn){
+    editing.draft.modo = modoBtn.dataset.habModo;
+    editing.draft.automatizada = editing.draft.modo !== 'manual';
     drawEditor();
     return;
   }
+  if(e.target.closest('[data-hab-ejecucion]')){ abrirEjecucionHab(editing.draft, () => drawEditor()); return; }
   const chip = e.target.closest('[data-hab-paso]');
   if(chip){ habilidadIrAPaso(num(chip.dataset.habPaso)); return; }
   if(e.target.closest('[data-hab-siguiente]')){ habilidadIrAPaso((editing.paso || 0) + 1); return; }
@@ -10692,8 +10782,8 @@ function costoAtaqueHabTxt(){
 async function ejecutarHabilidad(id, armaId, forzar){
   const it = S.habilidades.find(h => h.id === id);
   if(!it) return;
-  // No automatizada: "Anunciar" solo publica la descripción en la Mesa.
-  if(!habAutomatizada(it)){
+  // 📣 Manual: "Anunciar" solo publica la descripción en la Mesa.
+  if(modoHab(it) === 'manual'){
     mesaPublicarHabilidad(it.nombre, it.detalle || it.efectoDetalle || '');
     toast(`${it.nombre} anunciada`);
     return;

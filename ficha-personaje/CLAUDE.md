@@ -539,3 +539,16 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   Inteligencia = +1 nivel = +2 caras del dado; Inteligencia 6 + 3 por nivel. Mientras se define el mecanismo, **± Nivel**
   (`abrirNivelSocial`) suma **✎ A mano** (`nivelarSocialAMano`): fija `puntosInt` y `nivelExtra` para arriba o para abajo;
   si se invierte más Inteligencia de la que hay, avisa (toast) pero no bloquea.
+
+- **Tres modos de ejecución de una habilidad** (2026-09-30, pedido del dueño; reemplaza "¿automatizarla?" + el tilde "¿se
+  juega en el duelo?"): `h.modo` = `'manual'` (📣 Anunciar), `'semi'` (💰 cobra el costo y tira la tirada inicial —
+  `tirarPrimeraDeHab`—, los efectos van a mano) o `'auto'` (✨ la Ejecución paso a paso, `dueloDe(h)`). `modoHab(h)`
+  deduce el de las viejas (automatizada === false → manual; con `duelo` → auto; resto → semi); `habAutomatizada(h)` es
+  ahora `modoHab(h) !== 'manual'`. El editor arranca en "¿Cómo se ejecuta?" (`MODOS_HAB`); semi = costo + tiradas;
+  auto = paso "Ejecución" (`abrirEjecucionHab`, abre `AsistenteDueloHab` con `siempreActivo`: guardarla deja
+  `modo: 'auto'`, sacarla lo pasa a semi). Lo del sistema anterior (estado sobre uno mismo, cura, trampa, zona/portal:
+  `habLegado`) se sigue aplicando en semi y auto y se edita en el paso "Del sistema anterior" hasta adaptarla.
+  **Atajo:** auto + objetivo "uno mismo" + sin tirada, sin daño y sin resistencia (Blindaje) → `aplicarHabSobreMiDirecto`
+  aplica los efectos sin abrir el cuadro y anuncia en la Mesa (usa `habDueloDatos`, que no pide el duelo conectado).
+  `modo` viaja al subir (`Plantillas.HAB`). Pendiente: colocar trampa como opción del automático (anuncio solo al bando y
+  elegir la casilla en el mapa) y los mismos tres modos en creeps (gm-tools) e invocaciones.

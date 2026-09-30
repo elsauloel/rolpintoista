@@ -21,7 +21,7 @@ const Plantillas = (() => {
   /* ---- Habilidad de jugador (clase / pool custom) ----
      En este orden. Lo vacío se omite (salvo id/nombre/detalle/nitrosCosto: nitrosCosto ausente vale lo de siempre al
      cargarla en la ficha, no 0); los efecto* solo si hay efectoNombre; `automatizada` solo cuando es false. */
-  const HAB = ['id', 'nombre', 'detalle', 'automatizada', 'etiquetas', 'costo', 'nitrosCosto', 'hpCosto', 'turnoAjenoSp',
+  const HAB = ['id', 'nombre', 'detalle', 'automatizada', 'modo', 'etiquetas', 'costo', 'nitrosCosto', 'hpCosto', 'turnoAjenoSp',
     'tiradaStat', 'tiradaBono', 'tiradaExtra', 'curaHp',
     'efectoNombre', 'efectoTurnos', 'efectoHpTurno', 'efectoEscudo', 'efectoStacks', 'efectoPermanente', 'efectoMods', 'efectoDetalle',
     'zonaMapa', 'zonaRadio', 'portalMapa', 'trampaColocar', 'duelo',

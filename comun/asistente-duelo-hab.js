@@ -112,7 +112,7 @@ const AsistenteDueloHab = (() => {
     const ini = cfg.inicial || null;
     const st = {
       paso: 0,
-      activo: !!ini, objetivo: (ini && ini.objetivo) || 'enemigo',
+      activo: !!ini || !!cfg.siempreActivo, objetivo: (ini && ini.objetivo) || 'enemigo',
       // No lleva tirada (2026-09-28, pedido del dueño): antes «Nada» era una opción escondida adentro del
       // desplegable de stats, y no existía en modo Personalizada — un buff sobre uno mismo o un aliado con
       // tirada personalizada no tenía forma de decir «no hay nada que resistir». Ahora es un tilde propio,
@@ -197,7 +197,7 @@ const AsistenteDueloHab = (() => {
 
     // Lista de pasos: cambia según activo/modo/objetivo/tira, igual que en asistente-item.js (pasos()).
     function pasos(){
-      const L = [{id: 'activo', corto: '¿Se juega?'}];
+      const L = [{id: 'activo', corto: cfg.siempreActivo ? 'Tipo' : '¿Se juega?'}];
       if(!st.activo){ L.push({id: 'listo', corto: 'Listo'}); return L; }
       L.push({id: 'costo', corto: 'Costo'});
       if(st.modo === 'flash'){
@@ -403,6 +403,11 @@ const AsistenteDueloHab = (() => {
       return h;
     }
     function cuerpoActivo(){
+      // Abierto desde una habilidad ✨ Automática (2026-09-30): siempre se juega con el cuadro; acá solo se elige el tipo.
+      if(cfg.siempreActivo){
+        return titulo('', '¿Qué tipo de habilidad es?', 'Define qué pasos siguen. Para dejar de usar la ejecución paso a paso, cambiá el modo de la habilidad a Manual o Semiautomático.')
+          + `<select data-modo><option value="hab"${st.modo === 'hab' ? ' selected' : ''}>Habilidad dirigida (hechizo, control, apoyo, buff sobre vos…)</option><option value="arma"${st.modo === 'arma' ? ' selected' : ''}>Ataque con mi arma, con arreglos (Golpe brutal, Carga, Takle…)</option><option value="flash"${st.modo === 'flash' ? ' selected' : ''}>⚡ Reacción Flash (suma a una tirada de otro cuadro)</option></select>`;
+      }
       let h = titulo('', '¿Se juega con este cuadro?', 'Si lo tildás, ejecutar esta habilidad abre un cuadro de ejecución paso a paso, visible para toda la mesa — elegís el objetivo (si tiene), se tira, se ve en vivo, con su resumen en la Mesa. Sirve tanto para un ataque como para un buff sobre uno mismo o un aliado. Si no, se ejecuta como antes: se anuncia y tira su fórmula sola.');
       h += `<label class="op"><input type="checkbox" data-activo ${st.activo ? 'checked' : ''}> Ejecutar esta habilidad abre el cuadro de ejecución paso a paso</label>`;
       if(st.activo){

@@ -1821,6 +1821,11 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
         <div class="paso-titulo" id="hi-paso-titulo"></div>
         <p class="paso-ayuda" id="hi-paso-ayuda"></p>
       </div>
+      <div class="hi-paso" data-hi-paso="6"><div class="modos-hab" id="hi-modos"></div></div>
+      <div class="hi-paso" data-hi-paso="7">
+        <div class="hint" id="hi-ejecucion-resumen" style="margin-bottom:10px"></div>
+        <button type="button" class="btn primary" id="hi-ejecucion-abrir" style="width:100%">✨ Armar la ejecución paso a paso</button>
+      </div>
       <div class="hi-paso" data-hi-paso="0">
         <div class="f"><label>Nombre</label><input type="text" id="hi-nombre" placeholder="ej. Mordida venenosa" data-hi-enter="1"></div>
         <div class="f" style="margin-top:8px"><label>Descripción</label><textarea id="hi-detalle" rows="4" placeholder="ej. Muerde y deja veneno en la herida."></textarea></div>
@@ -4224,6 +4229,7 @@ function costoHabInvTxt(inv, h){
   return n ? `${fmt(n)} No2` : 'sin costo';
 }
 function bloqueoHabInv(inv, h){
+  if(modoHab(h) === 'manual') return '';   // manual: no cobra nada
   if(num(h.cdActual) > 0) return `Cooldown · ${fmt(num(h.cdActual))} turno(s)`;
   if(num(inv.nitros) < costoNitrosHabInv(inv, h)) return 'Sin No2';
   return '';
@@ -4440,7 +4446,7 @@ function invCardHtml(inv){
 function invHabHtml(inv, h){
   return `<div class="inv-hab">
     <div class="inv-habtop">
-      <span class="inv-hn">${esc(h.nombre || 'Sin nombre')}</span>
+      <span class="inv-hn">${esc(h.nombre || 'Sin nombre')} <span title="${esc(MODOS_HAB[modoHab(h) || 'semi'].nombre)}: ${esc(MODOS_HAB[modoHab(h) || 'semi'].corto)}">${MODOS_HAB[modoHab(h) || 'semi'].icono}</span></span>
       <button type="button" class="mini" data-edithabinv="${inv.id}:${h.id}" title="Editar">✎</button>
       <button type="button" class="inv-rm" data-rmhabinv="${inv.id}:${h.id}" title="Eliminar">×</button>
     </div>
@@ -4597,7 +4603,7 @@ function renderBotoneraInv(){
       </div>
       <div class="bot-fila-btns">
         <button type="button" class="mini" data-verhabinv="${inv.id}:${h.id}">Ver</button>
-        <button type="button" class="ejecutar-btn con-lupa${bloqueo?' sin-recursos':''}" data-ejecutarhabinv="${inv.id}:${h.id}" ${bloqueo?`aria-disabled="true" title="${esc(bloqueo)}"`:''}>Ejecutar${lupaBotonHtml(`inv:${inv.id}:hab:${h.id}`, 'en-boton')}</button>
+        <button type="button" class="ejecutar-btn con-lupa${bloqueo?' sin-recursos':''}" data-ejecutarhabinv="${inv.id}:${h.id}" ${bloqueo?`aria-disabled="true" title="${esc(bloqueo)}"`:''}>${modoHab(h) === 'manual' ? 'Anunciar' : 'Ejecutar'}${lupaBotonHtml(`inv:${inv.id}:hab:${h.id}`, 'en-boton')}</button>
         ${botonSegundaHabInv(inv, h)}
       </div>
     </div>`;
@@ -4771,10 +4777,57 @@ function tirarSegundaDeHabInv(invId, habId){
 }
 const botonSegundaHabInv = (inv, h) => (h.tiradaStat && (h.tiradaExtra||'').trim())
   ? `<button type="button" class="mini" data-danohabinv="${inv.id}:${h.id}" title="Segunda tirada de la habilidad (daño o efecto): ${esc(String(h.tiradaExtra).trim())}">🎲 ${esc(String(h.tiradaExtra).trim())}</button>` : '';
+// Tres modos (2026-09-30): 📣 manual solo anuncia; 💰 semi cobra No2 y cooldown y tira la primera; ✨ auto abre la Ejecución
+// paso a paso a nombre de la invocación (ref `fichaId~invId`, como su ataque), o aplica directo si es solo sobre ella y sin tiradas.
+function alcanceDeHabInv(inv, c, statTira){
+  const modo = c && c.alcance !== undefined ? c.alcance : 'auto';
+  const v = s => Math.max(0, Math.round(num(invStatValor(inv, s))));
+  if(modo === 'casteo') return v('rangocasteo');
+  if(modo === 'rango') return v('rng');
+  if(modo === 'adyacente') return 1;
+  if(modo === 'ilimitado') return 0;
+  if(modo === 'fijo') return Math.max(0, Math.round(num(c.alcanceN)));
+  return statTira === 'pdgmg' ? v('rangocasteo') : 0;
+}
+function habDueloInv(inv, h){
+  const c = h && h.duelo;
+  if(!c || typeof c !== 'object' || c.modo === 'arma' || c.modo === 'flash' || c.objetivo === 'zona') return null;
+  const stat = c.tira !== undefined ? c.tira : (h.tiradaStat || '');
+  const tipo = c.tipoDano || 'arcano';
+  const formula = String(h.tiradaExtra || '').trim();
+  return {
+    nombre: h.nombre, objetivo: c.objetivo || 'enemigo', alcance: c.objetivo === 'uno mismo' || c.objetivo === 'area' || c.objetivo === 'onda' ? 0 : alcanceDeHabInv(inv, c, stat),
+    tira: c.tiraFormula ? {formula: c.tiraFormula, etq: c.tiraEtiqueta || 'Tirada'} : (stat ? {stat, etq: STAT_LABEL[stat] || stat, bono: num(h.tiradaBono)} : null),
+    contra: (c.contra || []).map(s => ({modo: s, stat: s, etq: STAT_LABEL[s] || s})),
+    dano: c.dano && formula ? {formula, tipo, ignoraDef: c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico'} : null,
+    efectos: (c.efectos || []).map(e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1, spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: num(e.val)}] : e.mods, polaridad: e.stat ? (num(e.val) >= 0 ? 'buff' : 'debuff') : (e.escudo ? 'buff' : undefined), hp: e.hp, stacks: e.stacks, escudoMagico: e.escudo}, cura: num(e.cura), detalle: e.detalle || ''})),
+    ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: num(c.radio)} : {}),
+    ...(c.efectoLibre ? {efectoLibre: c.efectoLibre} : {}),
+    ...(c.efectosNota ? {efectosNota: c.efectosNota} : {}),
+    ...(c.contraOtro ? {contraOtro: c.contraOtro} : {}),
+  };
+}
+// Un efecto del cuadro de Ejecución sobre la propia invocación: el preset con ese nombre (con lo que traiga la habilidad encima) o un estado propio.
+function aplicarSpecAInv(inv, e){
+  if(e.cura){ inv.hp = Math.min(num(inv.hpMax) > 0 ? num(inv.hpMax) : Infinity, num(inv.hp) + num(e.cura)); return `+${fmt(num(e.cura))} HP`; }
+  const base = EFECTOS_PRESET.find(p => p.nombre === e.nombre);
+  const d = {...(base ? structuredClone(base) : {polaridad: e.escudo ? 'buff' : 'otro'}), id: uid(), nombre: e.nombre || 'Efecto', activo: true};
+  if(e.turnos !== undefined && e.turnos !== null && e.turnos !== ''){ d.turnos = Math.max(0, num(e.turnos)); if(d.turnos) d.permanente = false; }
+  if(e.stat) d.mods = [{stat: e.stat, val: num(e.val)}]; else if(Array.isArray(e.mods) && e.mods.length) d.mods = structuredClone(e.mods);
+  if(e.hp) d.hpturno = num(e.hp);
+  if(e.stacks) d.stacks = Math.max(1, num(e.stacks));
+  if(e.escudo){ d.escudoMagico = num(e.escudo); d.escudoMagicoActual = num(e.escudo); }
+  inv.estados = inv.estados || [];
+  inv.estados.push(d);
+  if(modsAfectanHpInv(d.mods || [])) actualizarHpMaxPorConInv(inv);
+  return `${d.nombre}${d.turnos ? ` (${fmt(d.turnos)} turno${d.turnos === 1 ? '' : 's'})` : ''}${d.escudoMagico ? `, 🛡${fmt(d.escudoMagico)}` : ''}`;
+}
 function invEjecutarHab(invId, habId){
   const inv = S.invocaciones.find(x => x.id === invId);
   const h = inv && inv.habilidades.find(x => x.id === habId);
   if(!inv || !h) return;
+  const modo = modoHab(h);
+  if(modo === 'manual'){ mesaPublicarHabilidadInv(inv, h.nombre, h.detalle || h.efectoDetalle || ''); toast(`${h.nombre || 'Habilidad'} anunciada`); return; }
   const bloqueo = bloqueoHabInv(inv, h);
   if(bloqueo){ toast(`${inv.nombre}: ${h.nombre||'Habilidad'} — ${bloqueo}`); return; }
   const costo = costoNitrosHabInv(inv, h);
@@ -4793,10 +4846,26 @@ function invEjecutarHab(invId, habId){
     if(modsAfectanHpInv(datos.mods)) actualizarHpMaxPorConInv(inv);
     efectoTxt = `${datos.nombre}${datos.permanente?' (no vence)':datos.turnos?` (${fmt(datos.turnos)} turnos)`:''}`;
   }
-  anunciarHabilidadInv(inv, h);
-  tirarExtraDeHabInv(inv, h);
+  let hDuelo = null, aplicadoDirecto = '';
+  if(modo === 'auto'){
+    const c = h.duelo;
+    const stat = c ? (c.tira !== undefined ? c.tira : (h.tiradaStat || '')) : '';
+    if(c && typeof c === 'object' && c.objetivo === 'uno mismo' && !stat && !c.tiraFormula && !c.dano && !(c.contra || []).length && c.modo !== 'arma' && c.modo !== 'flash'){
+      aplicadoDirecto = (c.efectos || []).map(e => aplicarSpecAInv(inv, e)).join(' · ');
+      mesaPublicarHabilidadInv(inv, h.nombre, `${h.detalle || ''}${aplicadoDirecto ? ' → ' + aplicadoDirecto : ''}`);
+    }else if(typeof Duelo !== 'undefined' && Duelo.disponible() && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM) hDuelo = habDueloInv(inv, h);
+    if(!c) toast(`${h.nombre}: todavía no tiene armada la ejecución paso a paso (✨) — se ejecutó como semiautomática`);
+  }
+  if(hDuelo){
+    mesaPublicarHabilidadInv(inv, h.nombre, h.detalle || h.efectoDetalle || '');
+    Duelo.elegirObjetivo({yo: {ref: fichaVivo.id + '~' + inv.id, tipo: 'pj', nombre: inv.nombre}, ataque: {tipo: 'habilidad', hab: hDuelo, alcance: hDuelo.alcance}, suelto: () => tirarExtraDeHabInv(inv, h)});
+  }else if(!aplicadoDirecto){
+    anunciarHabilidadInv(inv, h);
+    tirarExtraDeHabInv(inv, h);
+  }
   renderInvocaciones();
   const partes = ['ejecutada', costo?`-${fmt(costo)} No2`:'sin costo de Nitros'];
+  if(aplicadoDirecto) partes.push(aplicadoDirecto);
   if(efectoTxt) partes.push(efectoTxt);
   toast(`${h.nombre||'Habilidad'} ${partes.join(' · ')}`);
 }
@@ -4832,7 +4901,49 @@ const PASOS_HAB_INV = [
    ayuda: 'Se aplica sobre la propia invocación al ejecutarla. Si no aplica ninguno, dejá el nombre vacío y seguí.'},
   {corto: 'Listo', titulo: 'Revisá cómo quedó',
    ayuda: 'Si algo no está bien, tocá el paso arriba para volver. Si está todo, guardala.'},
+  {corto: 'Cómo se ejecuta', titulo: '¿Cómo se ejecuta esta habilidad?',
+   ayuda: 'Tres formas, de menos a más automática (las mismas que las habilidades del personaje). Se puede cambiar cuando quieras.'},
+  {corto: 'Ejecución', titulo: '¿Cómo se juega paso a paso?',
+   ayuda: 'A quién apunta, qué tira cada uno, el daño y los efectos: el mismo cuadro de Ejecución que se abre para toda la mesa al usarla.'},
 ];
+// Pasos visibles según el modo (índices de PASOS_HAB_INV / data-hi-paso). El estado sobre la invocación (sistema anterior)
+// aparece en semi y en auto solo si ya lo tenía.
+function hiOrden(){
+  const m = editingHabInv && editingHabInv.modo, conEstado = !!$('#hi-efecto-nombre').value.trim();
+  if(m === 'semi') return [6, 0, 1, 2, 3, ...(conEstado ? [4] : []), 5];
+  if(m === 'auto') return [6, 0, 1, 7, ...(conEstado ? [4] : []), 5];
+  return [6, 0, 5];
+}
+const EXPLICA_MODO_INV = {
+  manual: 'El botón se llama <b>Anunciar</b>: publica la descripción en la Mesa y todo lo demás (No2, cooldown, tiradas y efectos) va a mano.',
+  semi: 'Al tocar <b>Ejecutar</b> cobra solo los <b>No2</b> y pone el <b>cooldown</b>, y <b>tira la tirada inicial</b> si la tiene. Los efectos se resuelven a mano.',
+  auto: 'Al tocar <b>Ejecutar</b> se abre la <b>Ejecución paso a paso</b> a nombre de la invocación: elegís el objetivo, cada uno tira en su momento y se aplican los efectos. Si es solo sobre la invocación y no tira nada, se aplica directo.',
+};
+function hiModosRender(){
+  const m = editingHabInv.modo;
+  $('#hi-modos').innerHTML = Object.entries(MODOS_HAB).map(([k, v]) => `<button type="button" class="opcion-btn modo-hab-btn ${m === k ? 'activa' : ''}" data-hi-modo="${k}"><b>${v.icono} ${v.nombre}</b><span>${EXPLICA_MODO_INV[k]}</span></button>`).join('')
+    + (m === null ? '<div class="hint">Elegí una para seguir.</div>' : '');
+}
+function hiEjecucionRender(){
+  const c = editingHabInv.duelo;
+  $('#hi-ejecucion-resumen').innerHTML = c ? `Configurada: <b>${esc(resumenEjecucionHab(c))}</b>.` : 'Todavía <b>no está configurada</b>: sin esto, al ejecutarla solo cobra y tira la tirada inicial (como la semiautomática).';
+  $('#hi-ejecucion-abrir').textContent = `✨ ${c ? 'Cambiar' : 'Armar'} la ejecución paso a paso`;
+}
+function hiAbrirEjecucion(){
+  const e = editingHabInv;
+  AsistenteDueloHab.abrir({nombre: $('#hi-nombre').value.trim() || 'Habilidad', inicial: e.duelo || null, siempreActivo: true, tieneFormula: !!$('#hi-tirada').value.trim(),
+    costoInicial: {sp: '', nitrosCosto: $('#hi-nitros-modo').value === 'ataque' ? 'ATAQUE' : num($('#hi-acciones').value)}, elegirEstado: elegirEstadoDuelo,
+    alGuardar: r => {
+      if(editingHabInv !== e) return;
+      if(r){
+        e.duelo = r.duelo;
+        if(r.costo.nitrosCosto === 'ATAQUE') $('#hi-nitros-modo').value = 'ataque';
+        else{ $('#hi-nitros-modo').value = 'num'; $('#hi-acciones').value = Math.max(0, num(r.costo.nitrosCosto)); }
+        hiAplicarModoNitros();
+      }else{ e.duelo = null; e.modo = 'semi'; }
+      hiMostrarPaso(e.paso);
+    }});
+}
 
 let editingHabInv = null;   // {invId, habId, paso}
 let editingHabInvPdgAuto = false;
@@ -4849,31 +4960,31 @@ function hiAplicarModoNitros(){
   else if(modo !== 'ataque' && editingHabInvPdgAuto){ $('#hi-tirada-stat').value = ''; editingHabInvPdgAuto = false; }
 }
 
+// `n` es la posición dentro de los pasos visibles (hiOrden), no el índice de PASOS_HAB_INV.
 function hiMostrarPaso(n){
   if(!editingHabInv) return;
-  const total = PASOS_HAB_INV.length;
-  const destino = Math.max(0, Math.min(total - 1, n));
-  if(destino > 0 && !$('#hi-nombre').value.trim()){
-    toast('Primero ponele un nombre');
-    editingHabInv.paso = 0;
-  }else{
-    editingHabInv.paso = destino;
-  }
-  const paso = editingHabInv.paso;
+  const orden = hiOrden(), total = orden.length;
+  let destino = Math.max(0, Math.min(total - 1, n));
+  if(destino > 0 && editingHabInv.modo === null){ toast('Primero elegí cómo se ejecuta'); destino = 0; }
+  else if(destino > 1 && !$('#hi-nombre').value.trim()){ toast('Primero ponele un nombre'); destino = 1; }
+  editingHabInv.paso = destino;
+  const paso = destino, idx = orden[paso];
   const nueva = !editingHabInv.habId;
-  const conNombre = !!$('#hi-nombre').value.trim();
-  $('#hi-pasos').innerHTML = PASOS_HAB_INV.map((p, i) => {
-    const bloqueado = nueva && i > paso && !conNombre;
-    return `<button type="button" class="paso-chip${i === paso ? ' activo' : ''}${i < paso ? ' hecho' : ''}" data-hi-ir="${i}" ${bloqueado ? 'disabled' : ''}>${i + 1}. ${p.corto}</button>`;
+  const listoParaSeguir = editingHabInv.modo !== null && !!$('#hi-nombre').value.trim();
+  $('#hi-pasos').innerHTML = orden.map((ix, i) => {
+    const bloqueado = nueva && i > paso && !listoParaSeguir;
+    return `<button type="button" class="paso-chip${i === paso ? ' activo' : ''}${i < paso ? ' hecho' : ''}" data-hi-ir="${i}" ${bloqueado ? 'disabled' : ''}>${i + 1}. ${PASOS_HAB_INV[ix].corto}</button>`;
   }).join('');
-  $('#hi-paso-titulo').textContent = PASOS_HAB_INV[paso].titulo;
-  $('#hi-paso-ayuda').textContent = PASOS_HAB_INV[paso].ayuda;
-  document.querySelectorAll('#scrim-hab-inv .hi-paso').forEach(el => { el.hidden = num(el.dataset.hiPaso) !== paso; });
+  $('#hi-paso-titulo').textContent = PASOS_HAB_INV[idx].titulo;
+  $('#hi-paso-ayuda').textContent = PASOS_HAB_INV[idx].ayuda;
+  document.querySelectorAll('#scrim-hab-inv .hi-paso').forEach(el => { el.hidden = num(el.dataset.hiPaso) !== idx; });
+  if(idx === 6) hiModosRender();
+  if(idx === 7) hiEjecucionRender();
   $('#hi-atras').style.visibility = paso > 0 ? 'visible' : 'hidden';
   $('#hi-siguiente').hidden = paso === total - 1;
   $('#habinv-guardar').hidden = nueva && paso !== total - 1;
   if(paso === total - 1) $('#hi-resumen').innerHTML = hiResumenHtml();
-  const primero = document.querySelector(`#scrim-hab-inv .hi-paso[data-hi-paso="${paso}"] input:not([type=hidden]),#scrim-hab-inv .hi-paso[data-hi-paso="${paso}"] select,#scrim-hab-inv .hi-paso[data-hi-paso="${paso}"] textarea`);
+  const primero = document.querySelector(`#scrim-hab-inv .hi-paso[data-hi-paso="${idx}"] input:not([type=hidden]),#scrim-hab-inv .hi-paso[data-hi-paso="${idx}"] select,#scrim-hab-inv .hi-paso[data-hi-paso="${idx}"] textarea`);
   if(primero) setTimeout(() => primero.focus(), 30);
 }
 
@@ -4892,6 +5003,8 @@ function hiResumenHtml(){
   const cd = num($('#hi-cd').value);
   return `<div class="resumen-nombre">${esc($('#hi-nombre').value.trim() || '(sin nombre)')}</div>
     <div class="resumen-desc">${detalle ? esc(detalle) : '<span style="color:var(--muted)">(sin descripción)</span>'}</div>
+    ${fila('Ejecución', (m => `${m.icono} ${m.nombre} (${m.corto})`)(MODOS_HAB[editingHabInv.modo || 'semi']))}
+    ${editingHabInv.modo === 'auto' ? fila('Paso a paso', editingHabInv.duelo ? resumenEjecucionHab(editingHabInv.duelo) : 'sin configurar') : ''}
     ${fila('No2', $('#hi-nitros-modo').value === 'ataque' ? 'como un ataque' : fmt(Math.max(0, num($('#hi-acciones').value))))}
     ${fila('Cooldown', cd ? `${fmt(cd)} turno${cd===1?'':'s'}` : 'sin cooldown')}
     ${fila('Al ejecutar', STAT_LABEL[$('#hi-tirada-stat').value] || $('#hi-tirada').value.trim() || 'no tira')}
@@ -4904,7 +5017,7 @@ function abrirEditorHabInv(invId, habId){
   if(!inv) return;
   const h = habId ? inv.habilidades.find(x => x.id === habId) : {};
   if(!h) return;
-  editingHabInv = {invId, habId: habId || null, paso: 0};
+  editingHabInv = {invId, habId: habId || null, paso: 0, modo: habId ? modoHab(h) : null, duelo: h.duelo && typeof h.duelo === 'object' ? structuredClone(h.duelo) : null};
   $('#hi-titulo-modal').textContent = habId ? `Editar habilidad · ${inv.nombre}` : `Nueva habilidad · ${inv.nombre}`;
   $('#hi-nombre').value = h.nombre || '';
   $('#hi-nitros-modo').value = habInvAtaque(h) ? 'ataque' : 'num';
@@ -4933,7 +5046,7 @@ function guardarEditorHabInv(){
   if(!inv){ editingHabInv = null; return; }
   let h = editingHabInv.habId ? inv.habilidades.find(x => x.id === editingHabInv.habId) : null;
   if(editingHabInv.habId && !h){ editingHabInv = null; return; }
-  if(!$('#hi-nombre').value.trim()){ hiMostrarPaso(0); return; }
+  if(!$('#hi-nombre').value.trim()){ hiMostrarPaso(1); return; }
   if(!h){
     h = {id: uid(), cdActual: 0};
     inv.habilidades.push(h);
@@ -4951,6 +5064,9 @@ function guardarEditorHabInv(){
   h.efectoPermanente = $('#hi-efecto-permanente').checked;
   h.efectoPolaridad = $('#hi-efecto-polaridad').value || 'otro';
   try{ h.efectoMods = JSON.parse($('#hi-efecto-mods').value) || []; }catch(e){ h.efectoMods = []; }
+  h.modo = editingHabInv.modo || 'semi';
+  h.automatizada = h.modo !== 'manual';
+  if(editingHabInv.duelo) h.duelo = editingHabInv.duelo; else delete h.duelo;
   editingHabInv = null;
   $('#scrim-hab-inv').classList.remove('open');
   renderInvocaciones();
@@ -5002,6 +5118,13 @@ function activarEfectoPresetInv(preset){
 // Cableado del editor de habilidad de invocación (campos fijos, no el
 // editor genérico) — mismo patrón que gm-tools con sus habilidades de creep.
 $('#habinv-guardar').onclick = guardarEditorHabInv;
+$('#hi-ejecucion-abrir').onclick = hiAbrirEjecucion;
+$('#hi-modos').addEventListener('click', e => {
+  const b = e.target.closest('[data-hi-modo]');
+  if(!b || !editingHabInv) return;
+  editingHabInv.modo = b.dataset.hiModo;
+  hiMostrarPaso(0);
+});
 $('#hi-pasos').addEventListener('click', e => {
   const chip = e.target.closest('[data-hi-ir]');
   if(chip && editingHabInv) hiMostrarPaso(num(chip.dataset.hiIr));
@@ -5016,7 +5139,7 @@ $('#hi-atras').onclick = () => { if(editingHabInv) hiMostrarPaso(editingHabInv.p
 $('#scrim-hab-inv').addEventListener('keydown', e => {
   if(e.key !== 'Enter' || !editingHabInv || !e.target.matches('[data-hi-enter]')) return;
   e.preventDefault();
-  if(editingHabInv.paso < PASOS_HAB_INV.length - 1) hiMostrarPaso(editingHabInv.paso + 1);
+  if(editingHabInv.paso < hiOrden().length - 1) hiMostrarPaso(editingHabInv.paso + 1);
 });
 $('#hi-nombre').addEventListener('input', () => { if(editingHabInv && !editingHabInv.habId) hiMostrarPaso(editingHabInv.paso); });
 $('#hi-efecto-preset').addEventListener('change', e => {

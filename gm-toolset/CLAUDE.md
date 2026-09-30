@@ -353,3 +353,12 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   creep (`#verhab-subir` → `proponerHabilidadABiblioteca`, corrección / nuevo). Los creeps guardan `bibOrigen` y la
   tarjeta muestra 🔔 si el original se corrigió (`creepsSubidos`, `versionNuevaDeCreep`, `abrirVersionNuevaCreep`,
   `actualizarCreepDesdeBib`: conserva vida, estados, grupo, imagen y color).
+
+- **Tres modos de ejecución en las habilidades de creep** (2026-09-30, los mismos que en la ficha): `h.modo` = 'manual'
+  (📣 Anunciar: solo el texto, no cobra ni pone cooldown), 'semi' (💰 No2 + cooldown + tirada inicial; lo del sistema
+  anterior sigue: estado propio, cura, trampa al lado del token, estado sobre el objetivo de las de fábrica) o 'auto' (✨
+  `h.duelo`). `modoHabCreep(h)` deduce el de las viejas. El editor (`PASOS_HAB_CREEP`, ahora con los pasos 7 "Cómo se
+  ejecuta" y 8 "Ejecución") muestra los pasos según el modo (`hcOrden`; `hcMostrarPaso(n)` recibe la POSICIÓN, no el
+  índice). Auto + solo sobre el creep y sin tiradas → `aplicarHabCreepSobreSi` (sin cuadro). Auto con trampa y embebido en
+  el mapa → `pedirTrampaAlMapaCreep` (el GM elige la casilla; no se anuncia a los jugadores). El ✨ de la fila abre el
+  asistente con `siempreActivo` y deja la habilidad en auto (o semi si se saca).

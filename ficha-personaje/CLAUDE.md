@@ -552,3 +552,8 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   aplica los efectos sin abrir el cuadro y anuncia en la Mesa (usa `habDueloDatos`, que no pide el duelo conectado).
   `modo` viaja al subir (`Plantillas.HAB`). Pendiente: colocar trampa como opción del automático (anuncio solo al bando y
   elegir la casilla en el mapa) y los mismos tres modos en creeps (gm-tools) e invocaciones.
+- **Invocaciones: los mismos tres modos** (2026-09-30): el editor de habilidades de invocación (`PASOS_HAB_INV` + pasos 6
+  "Cómo se ejecuta" y 7 "Ejecución", `hiOrden`) e `invEjecutarHab`: manual solo anuncia; semi cobra No2 y cooldown y tira
+  la primera; auto abre la Ejecución a nombre de la invocación (`habDueloInv`, ref `fichaId~invId`, igual que su ataque) o,
+  si es solo sobre ella y sin tiradas, la aplica directo (`aplicarSpecAInv`). Zonas, ataques con arma y Flash todavía no
+  van para invocaciones (se ejecutan como semiautomáticas).

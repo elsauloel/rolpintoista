@@ -792,6 +792,10 @@ body.arrastrando-creep #grupos-barra .btn[data-grupo-tab]:not([data-grupo-tab=""
 .mesa-otro{color:var(--muted);font-weight:700}
 .mesa-vacia{color:var(--muted);font-size:11px}
 #mesa-entrar{margin-top:8px;align-self:flex-start}
+.modos-hab{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.modo-hab-btn{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;white-space:normal;padding:10px 12px;line-height:1.4}
+.modo-hab-btn span{font-size:12.5px;color:var(--muted);font-weight:400}
+.modo-hab-btn.activa span{color:inherit}
 </style>
 <style>
 /* Modo acciones (?modo=acciones&creep=<id>): gm-tools se abre adentro del
@@ -1025,6 +1029,11 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
       <div>
         <div class="paso-titulo" id="hc-paso-titulo"></div>
         <p class="paso-ayuda" id="hc-paso-ayuda"></p>
+      </div>
+      <div class="hc-paso" data-hc-paso="7"><div class="modos-hab" id="hc-modos"></div></div>
+      <div class="hc-paso" data-hc-paso="8">
+        <div class="hint" id="hc-ejecucion-resumen" style="margin-bottom:10px"></div>
+        <button type="button" class="btn primary" id="hc-ejecucion-abrir" style="width:100%">✨ Armar la ejecución paso a paso</button>
       </div>
       <div class="hc-paso" data-hc-paso="0">
         <div class="f"><label>Nombre</label><input type="text" id="hc-nombre" placeholder="ej. Mordida venenosa" data-hc-enter="1"></div>
@@ -2178,7 +2187,27 @@ function cdControlesHtml(sc, h){
   </span>`;
 }
 
+/* Tres modos de ejecución (2026-09-30, los mismos que en la ficha — ver MODOS_HAB en ficha-personaje/ficha.html): 'manual'
+   (📣 Anunciar: solo el texto, no cobra ni pone cooldown), 'semi' (💰 cobra No2 y cooldown, tira la tirada inicial; los efectos
+   van a mano) y 'auto' (✨ la Ejecución paso a paso, `h.duelo`). Las de antes lo deducen: automatizada === false → manual, con
+   `duelo` → auto, el resto → semi. Lo del sistema anterior (estado propio, cura, trampa al lado del token, estado sobre el
+   objetivo de las habilidades de fábrica) se sigue aplicando en semi y en auto. */
+const MODOS_HAB_CREEP = {
+  manual: {icono: '📣', nombre: 'Manual', boton: 'Anunciar', corto: 'solo se anuncia', explica: 'El botón se llama <b>Anunciar</b>: publica la descripción en la Mesa y todo lo demás (costo, cooldown, tiradas y efectos) va a mano.'},
+  semi: {icono: '💰', nombre: 'Semiautomático', boton: 'Ejecutar', corto: 'cobra No2 y cooldown, tira la tirada inicial', explica: 'Al tocar <b>Ejecutar</b> cobra solo los <b>No2</b> y pone el <b>cooldown</b>, y <b>tira la tirada inicial</b> si la tiene (por lo general, la PdG). Los efectos se resuelven a mano.'},
+  auto: {icono: '✨', nombre: 'Automático', boton: 'Ejecutar', corto: 'ejecución paso a paso', explica: 'Al tocar <b>Ejecutar</b> se abre la <b>Ejecución paso a paso</b>: cobra, elegís el objetivo en el mapa, cada uno tira en su momento y se aplican los efectos. Si es solo sobre el creep y no tira nada, se aplica directo. Si coloca una trampa, elegís la casilla en el mapa (los jugadores no se enteran).'},
+};
+function modoHabCreep(h){
+  if(!h) return 'semi';
+  if(h.modo === null) return null;
+  if(MODOS_HAB_CREEP[h.modo]) return h.modo;
+  if(h.automatizada === false) return 'manual';
+  return h.duelo && typeof h.duelo === 'object' ? 'auto' : 'semi';
+}
+const botonHabCreepTxt = h => modoHabCreep(h) === 'manual' ? 'Anunciar' : 'Ejecutar';
+function etiquetaModoCreep(h){ const m = MODOS_HAB_CREEP[modoHabCreep(h) || 'semi']; return `<span class="tag" title="${esc(m.nombre)}: ${esc(m.corto)}">${m.icono}</span>`; }
 function bloqueoHabCreep(sc, h){
+  if(modoHabCreep(h) === 'manual') return '';   // manual: no cobra nada
   if(num(h.cdActual) > 0) return `Cooldown · ${fmt(num(h.cdActual))} turno(s)`;
   if(num(sc.nitros) < costoNitrosHabCreep(sc, h)) return 'Sin No2';
   return '';
@@ -2790,7 +2819,7 @@ function renderAccionesCreep(){
     const partes = [costoHabCreepTxt(sc, h)];
     if(num(h.cd) > 0) partes.push(`CD ${fmt(num(h.cd))}`);
     const motivo = bloqueo ? `${bloqueo} · ${partes.join(' · ')}` : partes.join(' · ');
-    return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: !!bloqueo, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`, segunda: botonSegundaHabCreep(h, sc), cdHtml: cdControlesHtml(sc, h)};
+    return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: !!bloqueo, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`, boton: botonHabCreepTxt(h), segunda: botonSegundaHabCreep(h, sc), cdHtml: cdControlesHtml(sc, h)};
   });
 
   $('#acciones-creep-titulo').textContent = sc.nombre;
@@ -2802,7 +2831,7 @@ function renderAccionesCreep(){
       <span class="hab-estado ${f.disabled?'cd':'ok'}">${esc(f.motivo)}</span>
       <button class="verbtn" data-verhabaccion="${sc.id}:${f.id}">Ver</button>
       ${lupaBotonHtml(`${sc.id}|hab|${f.id}`, 'mini')}
-      <button class="hab-ejecutar" ${f.attr} ${f.disabled?'disabled':''}>Ejecutar</button>
+      <button class="hab-ejecutar" ${f.attr} ${f.disabled?'disabled':''}>${f.boton || 'Ejecutar'}</button>
       ${f.segunda || ''}
       ${f.cdHtml || ''}
     </div>`;
@@ -3103,7 +3132,7 @@ function habsMiniHtml(sc){
     return `<div class="hab-mini">
       <span class="hab-mini-nombre" title="${esc(titulo)}">${esc(h.nombre || 'Sin nombre')}</span>
       <button type="button" class="verbtn" data-verhabaccion="${sc.id}:${h.id}">Ver</button>
-      <button type="button" class="hab-ejecutar" data-ejecutar="${sc.id}:${h.id}" title="${esc(titulo)}" ${bloqueo ? 'disabled' : ''}>Ejecutar</button>
+      <button type="button" class="hab-ejecutar" data-ejecutar="${sc.id}:${h.id}" title="${esc(titulo)}" ${bloqueo ? 'disabled' : ''}>${botonHabCreepTxt(h)}</button>
       ${botonSegundaHabCreep(h, sc)}
       ${cdControlesHtml(sc, h)}
     </div>`;
@@ -3840,7 +3869,49 @@ const PASOS_HAB_CREEP = [
    ayuda: 'Al ejecutarla, la habilidad deja sola una trampa oculta a los jugadores al lado del token del creep. Acá elegís qué trampa es, cuánto daño hace y qué estado deja, o se la sacás.'},
   {corto: 'Listo', titulo: 'Revisá cómo quedó',
    ayuda: 'Si algo no está bien, tocá el paso arriba para volver. Si está todo, guardala.'},
+  {corto: 'Cómo se ejecuta', titulo: '¿Cómo se ejecuta esta habilidad?',
+   ayuda: 'Tres formas, de menos a más automática. Se puede cambiar cuando quieras.'},
+  {corto: 'Ejecución', titulo: '¿Cómo se juega paso a paso?',
+   ayuda: 'A quién apunta, qué tira cada uno, el daño y los efectos: el mismo cuadro de Ejecución que se abre para toda la mesa al usarla.'},
 ];
+// Qué pasos (índices de PASOS_HAB_CREEP / data-hc-paso) muestra el editor según el modo. Lo del sistema anterior (estado propio,
+// trampa al lado del token) aparece en semi solo si la habilidad ya lo tenía; en auto la trampa es una opción más (se elige la casilla).
+function hcOrden(){
+  const m = editingHabCreep && editingHabCreep.modo;
+  const conEstado = !!$('#hc-efecto-nombre').value.trim(), conTrampa = $('#hc-trampa-on').checked;
+  if(m === 'semi') return [7, 0, 1, 2, 3, ...(conEstado ? [4] : []), ...(conTrampa ? [5] : []), 6];
+  if(m === 'auto') return [7, 0, 1, 8, 5, ...(conEstado ? [4] : []), 6];
+  return [7, 0, 6];
+}
+function hcModosRender(){
+  const m = editingHabCreep.modo;
+  $('#hc-modos').innerHTML = Object.entries(MODOS_HAB_CREEP).map(([k, v]) => `<button type="button" class="opcion-btn modo-hab-btn ${m === k ? 'activa' : ''}" data-hc-modo="${k}"><b>${v.icono} ${v.nombre}</b><span>${v.explica}</span></button>`).join('')
+    + (m === null ? '<div class="hint">Elegí una para seguir.</div>' : '');
+}
+function hcEjecucionRender(){
+  const c = editingHabCreep.duelo;
+  const OBJ = {enemigo: 'a un enemigo', aliado: 'a un aliado', 'uno mismo': 'sobre el creep', area: 'en un área', onda: 'onda alrededor', zona: 'zona persistente'};
+  $('#hc-ejecucion-resumen').innerHTML = c
+    ? `Configurada: <b>${esc(c.modo === 'arma' ? 'ataque con su arma' : (OBJ[c.objetivo] || c.objetivo || 'a un enemigo') + (c.tira ? ' · tira ' + habEtqCreep(c.tira) : '') + (c.dano ? ' · hace daño' : '') + ((c.efectos || []).length ? ' · ' + c.efectos.map(e => e.nombre || 'efecto').join(', ') : ''))}</b>. Si además coloca una trampa, está en el paso siguiente.`
+    : 'Todavía <b>no está configurada</b>. Si la habilidad solo coloca una trampa, alcanza con el paso siguiente (🪤); si no, armala acá.';
+  $('#hc-ejecucion-abrir').textContent = `✨ ${c ? 'Cambiar' : 'Armar'} la ejecución paso a paso`;
+}
+function hcAbrirEjecucion(){
+  const e = editingHabCreep;
+  AsistenteDueloHab.abrir({nombre: $('#hc-nombre').value.trim() || 'Habilidad', inicial: e.duelo || null, siempreActivo: true, tieneFormula: !!$('#hc-tirada').value.trim(),
+    costoInicial: {sp: $('#hc-costo').value, nitrosCosto: $('#hc-nitros-modo').value === 'ataque' ? 'ATAQUE' : num($('#hc-acciones').value)}, elegirEstado: elegirEstadoDuelo,
+    alGuardar: r => {
+      if(editingHabCreep !== e) return;
+      if(r){
+        e.duelo = r.duelo;
+        $('#hc-costo').value = r.costo.sp || '';
+        if(r.costo.nitrosCosto === 'ATAQUE'){ $('#hc-nitros-modo').value = 'ataque'; }
+        else{ $('#hc-nitros-modo').value = 'num'; $('#hc-acciones').value = Math.max(0, num(r.costo.nitrosCosto)); }
+        hcAplicarModoNitros();
+      }else{ e.duelo = null; e.modo = 'semi'; }
+      hcMostrarPaso(e.paso);
+    }});
+}
 
 // Modo de costo de Nitros: número o "lo mismo que un ataque" (con su arma).
 function hcAplicarModoNitros(){
@@ -3853,31 +3924,31 @@ function hcAplicarModoNitros(){
     : "Siempre gasta esa cantidad.";
 }
 
+// `n` es la posición dentro de los pasos visibles (hcOrden), no el índice de PASOS_HAB_CREEP.
 function hcMostrarPaso(n){
   if(!editingHabCreep) return;
-  const total = PASOS_HAB_CREEP.length;
-  const destino = Math.max(0, Math.min(total - 1, n));
-  if(destino > 0 && !$('#hc-nombre').value.trim()){
-    toast('Primero ponele un nombre');
-    editingHabCreep.paso = 0;
-  }else{
-    editingHabCreep.paso = destino;
-  }
-  const paso = editingHabCreep.paso;
+  const orden = hcOrden(), total = orden.length;
+  let destino = Math.max(0, Math.min(total - 1, n));
+  if(destino > 0 && editingHabCreep.modo === null){ toast('Primero elegí cómo se ejecuta'); destino = 0; }
+  else if(destino > 1 && !$('#hc-nombre').value.trim()){ toast('Primero ponele un nombre'); destino = 1; }
+  editingHabCreep.paso = destino;
+  const paso = destino, idx = orden[paso];
   const nueva = !editingHabCreep.habId && !editingHabCreep.borrador;
-  const conNombre = !!$('#hc-nombre').value.trim();
-  $('#hc-pasos').innerHTML = PASOS_HAB_CREEP.map((p, i) => {
-    const bloqueado = nueva && i > paso && !conNombre;
-    return `<button type="button" class="paso-chip${i === paso ? ' activo' : ''}${i < paso ? ' hecho' : ''}" data-hc-ir="${i}" ${bloqueado ? 'disabled' : ''}>${i + 1}. ${p.corto}</button>`;
+  const listoParaSeguir = editingHabCreep.modo !== null && !!$('#hc-nombre').value.trim();
+  $('#hc-pasos').innerHTML = orden.map((ix, i) => {
+    const bloqueado = nueva && i > paso && !listoParaSeguir;
+    return `<button type="button" class="paso-chip${i === paso ? ' activo' : ''}${i < paso ? ' hecho' : ''}" data-hc-ir="${i}" ${bloqueado ? 'disabled' : ''}>${i + 1}. ${PASOS_HAB_CREEP[ix].corto}</button>`;
   }).join('');
-  $('#hc-paso-titulo').textContent = PASOS_HAB_CREEP[paso].titulo;
-  $('#hc-paso-ayuda').textContent = PASOS_HAB_CREEP[paso].ayuda;
-  document.querySelectorAll('#scrim-hab-creep .hc-paso').forEach(el => { el.hidden = num(el.dataset.hcPaso) !== paso; });
+  $('#hc-paso-titulo').textContent = PASOS_HAB_CREEP[idx].titulo;
+  $('#hc-paso-ayuda').textContent = PASOS_HAB_CREEP[idx].ayuda;
+  document.querySelectorAll('#scrim-hab-creep .hc-paso').forEach(el => { el.hidden = num(el.dataset.hcPaso) !== idx; });
+  if(idx === 7) hcModosRender();
+  if(idx === 8) hcEjecucionRender();
   $('#hc-atras').style.visibility = paso > 0 ? 'visible' : 'hidden';
   $('#hc-siguiente').hidden = paso === total - 1;
   $('#habcreep-guardar').hidden = nueva && paso !== total - 1;
   if(paso === total - 1) $('#hc-resumen').innerHTML = hcResumenHtml();
-  const primero = document.querySelector(`#scrim-hab-creep .hc-paso[data-hc-paso="${paso}"] input:not([type=hidden]),#scrim-hab-creep .hc-paso[data-hc-paso="${paso}"] select,#scrim-hab-creep .hc-paso[data-hc-paso="${paso}"] textarea`);
+  const primero = document.querySelector(`#scrim-hab-creep .hc-paso[data-hc-paso="${idx}"] input:not([type=hidden]),#scrim-hab-creep .hc-paso[data-hc-paso="${idx}"] select,#scrim-hab-creep .hc-paso[data-hc-paso="${idx}"] textarea`);
   if(primero) setTimeout(() => primero.focus(), 30);
 }
 
@@ -3937,6 +4008,7 @@ function hcResumenHtml(){
   const cd = num($('#hc-cd').value);
   return `<div class="resumen-nombre">${esc($('#hc-nombre').value.trim() || '(sin nombre)')}</div>
     <div class="resumen-desc">${detalle ? esc(detalle) : '<span style="color:var(--muted)">(sin descripción)</span>'}</div>
+    ${fila('Ejecución', (m => `${m.icono} ${m.nombre} (${m.corto})`)(MODOS_HAB_CREEP[editingHabCreep.modo || 'semi']))}
     ${fila("No2", $("#hc-nitros-modo").value === "ataque" ? "como un ataque" : fmt(Math.max(0, num($("#hc-acciones").value))))}
     ${fila('Cooldown', cd ? `${fmt(cd)} turno${cd === 1 ? '' : 's'}` : 'sin cooldown')}
     ${fila('Otro costo', $('#hc-costo').value.trim() || 'ninguno')}
@@ -4142,7 +4214,8 @@ function abrirEditorHabCreep(scId, habId, opc){
   // opc.borrador = una habilidad suelta (la de la biblioteca): se edita ella, no se agrega al creep; al guardar avisa con opc.alGuardar.
   const h = opc && opc.borrador ? opc.borrador : habId ? sc.habilidades.find(x => x.id === habId) : {};
   if(!h) return;
-  editingHabCreep = {scId, habId: habId || null, paso: 0, borrador: !!(opc && opc.borrador), alGuardar: opc && opc.alGuardar};
+  editingHabCreep = {scId, habId: habId || null, paso: 0, borrador: !!(opc && opc.borrador), alGuardar: opc && opc.alGuardar,
+    modo: (habId || (opc && opc.borrador)) ? modoHabCreep(h) : null, duelo: h.duelo && typeof h.duelo === 'object' ? structuredClone(h.duelo) : null};
   $('#scrim-hab-creep').classList.toggle('desde-biblioteca', !!(editingHabCreep.borrador || (opc && opc.encima)));   // por encima de las ventanas de Ver
   $('#hc-titulo-modal').textContent = editingHabCreep.borrador ? `Editar habilidad de la biblioteca · ${h.nombre || ''}` : habId ? `Editar habilidad · ${sc.nombre || 'creep'}` : `Nueva habilidad · ${sc.nombre || 'creep'}`;
   $('#hc-nombre').value = h.nombre || '';
@@ -4175,7 +4248,7 @@ function guardarEditorHabCreep(){
   if(!sc){ editingHabCreep = null; return; }
   let h = editingHabCreep.habId ? sc.habilidades.find(x => x.id === editingHabCreep.habId) : null;
   if(editingHabCreep.habId && !h){ editingHabCreep = null; return; }
-  if(!$('#hc-nombre').value.trim()){ hcMostrarPaso(0); return; }
+  if(!$('#hc-nombre').value.trim()){ hcMostrarPaso(1); return; }
   if(!h && editingHabCreep.borrador && verHab) h = verHab.hab;   // la habilidad de la biblioteca que se está viendo
   if(!h){
     h = {id: uid(), cdActual: 0};
@@ -4200,6 +4273,9 @@ function guardarEditorHabCreep(){
   h.efectoPolaridad = $('#hc-efecto-polaridad').value || 'otro';
   try{ h.efectoMods = JSON.parse($('#hc-efecto-mods').value) || []; }catch(e){ h.efectoMods = []; }
   hcGuardarTrampa(h);
+  h.modo = editingHabCreep.modo || 'semi';
+  h.automatizada = h.modo !== 'manual';
+  if(editingHabCreep.duelo) h.duelo = editingHabCreep.duelo; else delete h.duelo;
   const alGuardar = editingHabCreep.alGuardar;
   editingHabCreep = null;
   $('#scrim-hab-creep').classList.remove('open');
@@ -4700,14 +4776,14 @@ function habHtml(sc, h){
         <span class="durlabel">CD</span>
         <input type="number" data-habf="cd" data-scid="${scId}" data-habid="${h.id}" value="${h.cd||0}" min="0" title="Turnos de reutilización. 0 = sin cooldown">
       </div>
-      ${h.duelo ? '<span class="tag" title="Al ejecutarla se abre el cuadro de ejecución paso a paso">✨</span>' : ''}<button class="rm" data-duelohabcreep="${scId}:${h.id}" title="Ejecución: cómo se juega esta habilidad">✨</button>
+      ${etiquetaModoCreep(h)}<button class="rm" data-duelohabcreep="${scId}:${h.id}" title="Ejecución: cómo se juega esta habilidad">✨</button>
       <button class="rm" data-edithab="${scId}:${h.id}" title="Editar">✎</button>
       <button class="rm" data-rmhab="${scId}:${h.id}">×</button>
     </div>
     <div class="hab-detalle-text${h.detalle ? '' : ' vacio'}">${h.detalle ? esc(h.detalle) : 'Sin detalle — tocá ✎ para escribir uno.'}</div>
     <div class="hab-bottom">
       <span class="hab-estado ${bloqueado?'cd':'ok'}">${esc(estadoTxt)}</span>
-      <button class="hab-ejecutar" data-ejecutar="${scId}:${h.id}" ${bloqueado?'disabled':''}>Ejecutar</button>
+      <button class="hab-ejecutar" data-ejecutar="${scId}:${h.id}" ${bloqueado?'disabled':''}>${botonHabCreepTxt(h)}</button>
       ${botonSegundaHabCreep(h, S.creeps.find(x => x.id === scId))}
       ${cdControlesHtml(S.creeps.find(x => x.id === scId) || {id: scId}, h)}
     </div>
@@ -5098,12 +5174,12 @@ document.addEventListener('click', e => {
     const [scId, habId] = b.dataset.duelohabcreep.split(':');
     const sc = S.creeps.find(s => s.id === scId);
     const h = sc && sc.habilidades.find(x => x.id === habId);
-    if(sc && h) AsistenteDueloHab.abrir({nombre: h.nombre, inicial: h.duelo || null, tieneFormula: !!String(h.tiradaExtra || '').trim(),
+    if(sc && h) AsistenteDueloHab.abrir({nombre: h.nombre, inicial: h.duelo || null, siempreActivo: true, tieneFormula: !!String(h.tiradaExtra || '').trim(),
       costoInicial: {sp: h.costo, nitrosCosto: h.nitrosCosto}, elegirEstado: elegirEstadoDuelo,   // los creeps no tienen costo en HP todavía: ese campo del paso "Costo" no se guarda acá
       alGuardar: r => {
-        if(r){ h.duelo = r.duelo; h.costo = r.costo.sp; h.nitrosCosto = r.costo.nitrosCosto; }
-        else delete h.duelo;
-        renderAll(); toast(r ? `${h.nombre}: ahora se juega en el duelo` : `${h.nombre}: sin duelo`);
+        if(r){ h.duelo = r.duelo; h.costo = r.costo.sp; h.nitrosCosto = r.costo.nitrosCosto; h.modo = 'auto'; h.automatizada = true; }
+        else{ delete h.duelo; if(h.modo === 'auto' || !h.modo) h.modo = 'semi'; }
+        renderAll(); toast(r ? `${h.nombre}: ✨ automática (ejecución paso a paso)` : `${h.nombre}: sin ejecución paso a paso (queda semiautomática)`);
       }});
     return;
   }
@@ -5119,6 +5195,8 @@ document.addEventListener('click', e => {
     const sc = S.creeps.find(s=>s.id===scId);
     const h = sc && sc.habilidades.find(x=>x.id===habId);
     if(!sc || !h) return;
+    const modo = modoHabCreep(h);
+    if(modo === 'manual'){ mesaPublicarHabilidadCreep(sc, h); toast(`${h.nombre || 'Habilidad'} anunciada`); return; }   // 📣 solo el texto
     const bloqueo = bloqueoHabCreep(sc, h);
     if(bloqueo){
       toast(`${sc.nombre}: ${h.nombre || 'Habilidad'} no se puede usar — ${bloqueo}`);
@@ -5132,10 +5210,13 @@ document.addEventListener('click', e => {
     const efecto = aplicarEfectoDeConsumoCreep(sc, h);
     if(efecto && modsAfectanHp(efecto.mods)) actualizarHpMaxPorCon(sc);
     renderAll();
-    const esZona = h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'zona';
-    // Una trampa se coloca sola y en secreto: la habilidad no se anuncia en la Mesa (los jugadores no deben enterarse).
-    const hDuelo = (h.trampaColocar || esZona) ? null : habDueloCreep(sc, h);   // habilidad dirigida: la contienda va en el cuadro del duelo
-    if(h.trampaColocar) colocarTrampaDeHab(sc, h);
+    const auto = modo === 'auto';
+    const esZona = auto && h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'zona';
+    // ✨ Solo sobre el creep y sin nada que tirar: se aplica directo, sin abrir el cuadro.
+    if(auto && !h.trampaColocar && aplicarHabCreepSobreSi(sc, h)){ renderAll(); mesaPublicarHabilidadCreep(sc, h); toast(`${h.nombre || 'Habilidad'} ejecutada sobre ${sc.nombre}`); return; }
+    // Una trampa se coloca en secreto: la habilidad no se anuncia en la Mesa (los jugadores no deben enterarse).
+    const hDuelo = (!auto || h.trampaColocar || esZona) ? null : habDueloCreep(sc, h);   // habilidad dirigida: la contienda va en el cuadro del duelo
+    if(h.trampaColocar){ if(!(auto && pedirTrampaAlMapaCreep(sc, h))) colocarTrampaDeHab(sc, h); }
     else if(esZona){ mesaPublicarHabilidadCreep(sc, h); if(!colocarZonaDeHabCreep(sc, h)) toast(`${h.nombre}: para colocar la zona hace falta ejecutarla desde el mapa (⚔ Acciones)`); }
     // Con tirada, la descripción viaja con ella (una sola línea en la Mesa).
     else if(habCreepTira(h) && !hDuelo) mesaConTexto(habTextoMesa(h));
@@ -6760,6 +6841,28 @@ async function aplicarEstadoAObjetivo(tok, spec, origen){
 }
 
 /* Habilidad con trampa: la coloca sola, oculta a los jugadores, al lado del token del creep en el mapa que el GM está mirando. */
+// ✨ Automática embebida en el mapa (⚔ Acciones): el GM elige la casilla con un clic (mismo camino que la trampa de un jugador,
+// trampaDeHabilidad en el mapa). Devuelve false si no hay mapa (entonces se coloca sola al lado del token, como siempre).
+function pedirTrampaAlMapaCreep(sc, h){
+  if(window.parent === window) return false;
+  try{ window.parent.postMessage({tipo: 'trampa-habilidad', fichaId: sc.id, tipoToken: 'creep', nombre: h.nombre, trampa: {...h.trampaColocar, nombre: h.trampaColocar.nombre || h.nombre}}, location.origin); return true; }
+  catch(err){ console.error('No se pudo avisar la trampa al mapa:', err); return false; }
+}
+// ✨ Automática, solo sobre el propio creep y sin tiradas: aplica los efectos del cuadro de Ejecución directo (como Blindaje en la ficha).
+function aplicarHabCreepSobreSi(sc, h){
+  const c = h.duelo;
+  if(!c || typeof c !== 'object' || c.modo === 'arma' || c.modo === 'flash' || c.objetivo !== 'uno mismo') return false;
+  const stat = c.tira !== undefined ? c.tira : (h.tiradaStat || '');
+  if(stat || c.tiraFormula || c.dano || (c.contra || []).length) return false;
+  (c.efectos || []).forEach(e => {
+    if(e.cura){ sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, num(sc.hp) + num(e.cura)); return; }
+    const spec = {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: num(e.val)}] : e.mods, hp: e.hp, stacks: e.stacks, escudoMagico: e.escudo,
+      polaridad: e.stat ? (num(e.val) >= 0 ? 'buff' : 'debuff') : (e.escudo ? 'buff' : undefined)};
+    const r = EstadosAplicar.aplicarACreep(sc, spec);
+    if(r.ok && modsAfectanHp(r.estado.mods)) actualizarHpMaxPorCon(sc);
+  });
+  return true;
+}
 async function colocarTrampaDeHab(sc, h){
   const t = h.trampaColocar;
   try{
@@ -6897,6 +7000,13 @@ $('#item-aleatorio-gm-x').onclick = () => $('#scrim-item-aleatorio-gm').classLis
 $('#item-aleatorio-gm-cerrar').onclick = () => $('#scrim-item-aleatorio-gm').classList.remove('open');
 $('#scrim-item-aleatorio-gm').addEventListener('mousedown', e => { if(e.target.id==='scrim-item-aleatorio-gm') $('#scrim-item-aleatorio-gm').classList.remove('open'); });
 $('#habcreep-guardar').onclick = guardarEditorHabCreep;
+$('#hc-ejecucion-abrir').onclick = hcAbrirEjecucion;
+$('#hc-modos').addEventListener('click', e => {
+  const b = e.target.closest('[data-hc-modo]');
+  if(!b || !editingHabCreep) return;
+  editingHabCreep.modo = b.dataset.hcModo;
+  hcMostrarPaso(0);
+});
 $('#hc-pasos').addEventListener('click', e => {
   const chip = e.target.closest('[data-hc-ir]');
   if(chip && editingHabCreep) hcMostrarPaso(num(chip.dataset.hcIr));
@@ -6918,7 +7028,7 @@ $('#hc-atras').onclick = () => { if(editingHabCreep) hcMostrarPaso(editingHabCre
 $('#scrim-hab-creep').addEventListener('keydown', e => {
   if(e.key !== 'Enter' || !editingHabCreep || !e.target.matches('[data-hc-enter]')) return;
   e.preventDefault();
-  if(editingHabCreep.paso < PASOS_HAB_CREEP.length - 1) hcMostrarPaso(editingHabCreep.paso + 1);
+  if(editingHabCreep.paso < hcOrden().length - 1) hcMostrarPaso(editingHabCreep.paso + 1);
 });
 // El nombre habilita (o no) los pasos de adelante.
 $('#hc-nombre').addEventListener('input', () => { if(editingHabCreep && !editingHabCreep.habId) hcMostrarPaso(editingHabCreep.paso); });

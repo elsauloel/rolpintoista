@@ -346,6 +346,8 @@ prueba('ataque con arreglos: mods por X, sin Parry, efectos y los de crítico, i
     cr.mods.pdg, cr.mods.dados, cr.efectosNota, cr.tipoDado, cr.armaNombre, Combatiente.ataqueConArreglos({}, {modo: 'hab'})],
     ['habilidad-arma', 3, 2, 2, true, 1, 'Rengo', 'Empuja 2', 'Lisia 2', 'a1', 1, 0, 'Empuja X', 6, 'Garras', null]);
 });
+prueba('⚡ Flash de un creep: cooldown en su turno, el doble en turno ajeno (P136)', () => igual(
+  [Combatiente.cdFlash(2, true), Combatiente.cdFlash(2, false), Combatiente.cdFlash(0, false), Combatiente.cdFlash('3', false)], [2, 4, 0, 6]));
 prueba('⚡ Flash: vale para esa tirada; en la defensa, según Evasión o Parry', () => {
   const c = {modo: 'flash', flash: {en: ['parry', 'dano'], bono: 2}};
   igual([Combatiente.flashPara(c, 'eva'), Combatiente.flashPara(c, 'eva', 'parry'), Combatiente.flashPara(c, 'eva', 'evasion'), Combatiente.flashPara(c, 'dano'), Combatiente.flashPara(c, 'pdg'), Combatiente.flashPara({modo: 'hab'}, 'pdg')],

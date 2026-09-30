@@ -455,6 +455,8 @@ const Combatiente = (() => {
       ...(c.efectosNota ? {efectosNota: sx(c.efectosNota)} : {}),
       ...(critico && Object.keys(critico).length ? {critico} : {})};
   }
+  // ⚡ Flash de un creep (P136, dueño 2026-09-30): en su turno, el cooldown de la habilidad; en turno ajeno, el doble.
+  const cdFlash = (cd, turnoPropio) => Math.max(0, nf(cd)) * (turnoPropio ? 1 : 2);
   /* ⚡ Flash: ¿esta Ejecución es un Flash que vale para esa tirada del duelo? `campo`: 'pdg', 'eva' (la defensa), 'bloqueo',
      'fuerza' o 'dano'. Sin `modo`, para 'eva' vale si sirve para Evasión o Parry (la lista de opciones); con `modo`, para la
      defensa que se eligió ('parry' o la Evasión). */
@@ -482,5 +484,5 @@ const Combatiente = (() => {
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, inmunidad,
     modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
-    formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, flashPara};
+    formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, flashPara, cdFlash};
 })();

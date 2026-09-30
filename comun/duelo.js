@@ -1709,7 +1709,15 @@ const Duelo = (() => {
       if(d.hab && campo === 'pdg') re = new RegExp(escRe(etqTira(d)), 'i');
       if(d.hab && campo === 'eva'){ const c = d.hab.contra.find(x => x.modo === m.modo); re = new RegExp(escRe(c ? c.etq : m.modo), 'i'); }
       let flash = null;   // Flash marcado: la página cobra los SP y el bono se suma a la tirada cuando llegue
-      if(m.flash && h.flashUsar){ flash = h.flashUsar(d, campo, m.modo || '', m.flash) || null; if(!flash) _toast('No se pudo usar el Flash: se tira sin él'); delete flashOps[d.id + ':' + campo]; flashPedidas.delete(d.id + ':' + campo); }
+      if(m.flash && h.flashUsar){
+        // flashUsar puede preguntar algo antes de cobrar (un creep: «¿es su turno?», P136) — se espera la respuesta; dentro
+        // del mapa, el cartel hace que se muestre la ventana de esta página.
+        const pedido = h.flashUsar(d, campo, m.modo || '', m.flash);
+        setTimeout(avisarMapaUi, 120);
+        flash = (await pedido) || null;
+        if(!flash) _toast('No se usó el Flash: se tira sin él');
+        delete flashOps[d.id + ':' + campo]; flashPedidas.delete(d.id + ':' + campo);
+      }
       esperaTiro = {id: d.id, campo, re, defensa, extra, flash};
       if(d.hab && (campo === 'pdg' || campo === 'eva')){
         if(h.habTirar) h.habTirar(d, campo === 'pdg' ? 'atacante' : 'defensor', m.modo);
@@ -1750,7 +1758,7 @@ const Duelo = (() => {
   // Adentro de un iframe del mapa: le cuenta si hay algún cartelito abierto (Nitros, sobrepeso…) que el jugador tiene que ver, o si ya puede esconderse.
   function avisarMapaUi(){
     if(!enIframe()) return;
-    const abiertoUi = !!document.querySelector('.scrim.open, #ep-fondo, #ae-fondo');
+    const abiertoUi = !!document.querySelector('.scrim.open, #ep-fondo, #ae-fondo, #ct-fondo');
     window.parent.postMessage({tipo: abiertoUi ? 'duelo-ui-visible' : 'botonera-cerrada'}, location.origin);
   }
 

@@ -4,6 +4,8 @@
    tu turno" (paso Costo del 🎯/✨, `it.turnoAjenoSp`) y, al ejecutarla, un cartelito pregunta antes de cobrar
    nada — ni el jugador ni el sistema tienen que acordarse de duplicar el costo a mano.
    Uso: const costoSp = await ConfirmarTurno.pedir(nombre, costoPropio, costoAjeno); // null si se cancela
+   Con `o` (2026-09-30, Flash de los creeps, P136): `o.unidad` ('SP' por defecto; ej. 'turnos de cooldown') y `o.quien`
+   (el nombre del creep: la pregunta pasa a "¿Es el turno de X?").
    Mismo patrón que EstadoPreguntas.preguntar (comun/estado-preguntas.js): una Promise, sin Firebase. */
 const ConfirmarTurno = (() => {
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
@@ -22,18 +24,20 @@ const ConfirmarTurno = (() => {
 #ct-caja button.ct-cancelar{background:none;border:none;color:#9A867E;font-weight:400;text-align:center;margin-bottom:0;padding:6px}`;
     document.head.appendChild(s);
   }
-  // pedir(nombre, costoPropio, costoAjeno) → Promise<number|null> (el SP a cobrar; null = canceló, no cobra nada).
-  function pedir(nombre, costoPropio, costoAjeno){
+  // pedir(nombre, costoPropio, costoAjeno, o) → Promise<number|null> (lo que se cobra; null = canceló, no cobra nada).
+  function pedir(nombre, costoPropio, costoAjeno, o){
+    o = o || {};
+    const unidad = o.unidad || 'SP';
     estilos();
     return new Promise(resolver => {
       const fondo = document.createElement('div');
       fondo.id = 'ct-fondo';
       fondo.innerHTML = `<div id="ct-caja" role="dialog" aria-modal="true">
-        <div class="ct-titulo">¿Es tu turno?</div>
+        <div class="ct-titulo">${o.quien ? `¿Es el turno de ${esc(o.quien)}?` : '¿Es tu turno?'}</div>
         <div class="ct-nombre">${esc(nombre)}</div>
         <div class="ct-pregunta">Esta habilidad cuesta distinto según de quién sea el turno.</div>
-        <button type="button" class="ct-primario" id="ct-si">Sí, es mi turno — ${esc(costoPropio)} SP</button>
-        <button type="button" id="ct-no">No, es turno ajeno — ${esc(costoAjeno)} SP</button>
+        <button type="button" class="ct-primario" id="ct-si">${o.quien ? 'Sí, es su turno' : 'Sí, es mi turno'} — ${esc(costoPropio)} ${esc(unidad)}</button>
+        <button type="button" id="ct-no">No, es turno ajeno — ${esc(costoAjeno)} ${esc(unidad)}</button>
         <button type="button" class="ct-cancelar" id="ct-cancelar">Cancelar</button>
       </div>`;
       document.body.appendChild(fondo);

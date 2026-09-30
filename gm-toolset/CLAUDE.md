@@ -366,5 +366,6 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   va al duelo como un ataque del creep (`lanzarAtaqueDeHabCreep` → `ataqueDeHabCreep`, `Combatiente.ataqueConArreglos`):
   el gancho `atacar` tira su PdG con lo que suma la habilidad (`tirarPdgDeArreglosCreep`, los No2 ya se cobraron) y `dano`
   le suma los dados y el fijo. Los Flash del creep aparecen en las cajas de tirada del duelo que maneja el GM
-  (`flashOpciones`/`flashUsar`): no gastan No2, ponen el cooldown (y cobran la vida si la tienen). Ejecutar un Flash con el
-  botón avisa que se usa dentro del duelo.
+  (`flashOpciones`/`flashUsar`): no gastan No2, ponen el cooldown (y cobran la vida si la tienen). Al usarlo pregunta "¿Es el
+  turno de X?" (`cooldownFlashCreep`): en turno ajeno, el doble de cooldown (P136). Con el botón Ejecutar
+  (`usarFlashFueraDelDueloCreep`) hace lo mismo, sin No2, y lo anuncia: el bono se suma a mano a la tirada.

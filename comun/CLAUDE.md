@@ -837,7 +837,9 @@ versión parecida en más de una, es candidato a juntar.
   Tools) y `flashPara(c, campo, modo)` (¿este ⚡ Flash vale para esa tirada?). **Flash de creeps** (P135, solo cooldown):
   `comun/duelo.js` ya les pregunta (antes los salteaba); el mapa contesta solo si el creep no tiene ninguno
   (`cfgEscuchar.flashLocal` = `dueloFlashLocal`) y si tiene, contesta GM Tools; una opción puede traer `costoTxt` en vez de
-  `costoSp`. Lo usan `habDueloDatos`/`modoHab`/`costoNitrosHab` de la ficha, `habDueloInv`/`invEjecutarHab`
+  `costoSp`. **En turno ajeno, el doble de cooldown** (P136, `cdFlash`): `flashUsar` puede devolver una Promise (el cartel
+  «¿Es el turno de X?», `ConfirmarTurno.pedir(nombre, propio, ajeno, {unidad, quien})`); el duelo la espera, y dentro del
+  mapa el cartel (`#ct-fondo`) cuenta como ventana abierta para que se muestre la página que lo abrió. Lo usan `habDueloDatos`/`modoHab`/`costoNitrosHab` de la ficha, `habDueloInv`/`invEjecutarHab`
   de las invocaciones y `habEjecucionCreep`/`aplicarHabCreepSobreSi`/`modoHabCreep` de GM Tools.
 - **Durabilidad, variable de diseño** (2026-09-30, dueño): `Combatiente.durMax(item)` / `durPorPeso` / `durTexto` /
   `esDurable` — 3 puntos por punto de Peso salvo que el ítem traiga `durPorPeso` (4–5 = más resistente, 2 = frágil), mínimo

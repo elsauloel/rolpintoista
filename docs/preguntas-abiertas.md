@@ -595,3 +595,7 @@ resuelven a mano, como el resto de los avisos).
 - ✅ **P135. Qué le cuesta un ⚡ Flash a un creep — 2026-09-30, resuelta: SOLO COOLDOWN** (dueño). Igual que en el personaje
   (que paga solo SP), no gasta No2: su límite es el cooldown de la habilidad, y la vida si la habilidad la cuesta. En el duelo,
   el botón del Flash dice "cooldown N" en vez de "N SP"; en cooldown aparece apagado.
+- ✅ **P136. Flash de un creep en turno ajeno — 2026-09-30, decidida por el dueño: EL DOBLE DE COOLDOWN.** Al usar un ⚡ Flash
+  de un creep (en el duelo o con el botón Ejecutar) un cartel pregunta "¿Es el turno de X?": en su turno pone el cooldown de
+  la habilidad; en turno ajeno, el doble. Sin cooldown no pregunta. Mismo cartel que el "costo distinto en turno ajeno" de
+  los personajes (`comun/confirmar-turno.js`, ahora con `unidad` y `quien`). Regla en `Combatiente.cdFlash`.

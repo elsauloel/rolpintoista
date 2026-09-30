@@ -5,7 +5,7 @@ Reglas (docs/rework-defensa.md, aprobadas por el dueño el 2026-09-25):
   Tipo 4  -> cabeza, torso, manos, piernas, pies, escudo
   Tipo 6  -> torso (solo rígido), manos, piernas
   Tipo 8  -> torso rígido, escudo
-  Tipo 10 -> cabeza
+  Tipo 10 -> cabeza, escudo (escudo sumado el 2026-09-30)
   Tipo 12 -> solo cinturón y anillos (Legendarios, +1)
 Tope por pieza según tier (ver TOPE). Las armaduras blandas solo dan Tipo 4.
 
@@ -92,7 +92,7 @@ def permitido(tipo, item):
     if tipo == 8:
         return (ti == 'armadura_rigida' or slot == 'escudo'), 'el Tipo 8 solo va en torso rígido y escudo'
     if tipo == 10:
-        return slot == 'cabeza', 'el Tipo 10 solo va en la cabeza'
+        return slot in ('cabeza', 'escudo'), 'el Tipo 10 solo va en la cabeza y los escudos'
     if tipo == 12:
         return slot in ('cinturón', 'anillo'), 'el Tipo 12 solo va en cinturón y anillos'
     return True, ''

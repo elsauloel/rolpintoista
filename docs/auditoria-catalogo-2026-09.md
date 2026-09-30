@@ -28,11 +28,12 @@ armas y defensa no tienen decisiones guardadas).
 - **2026-09-30 · Anillos caros:** sí, **son caros a propósito** (de $1200 a $9000 aunque su tier diga otra cosa). No se
   tocan sus precios ni se marcan como hallazgo.
 - **2026-09-30 · Resistencia al crítico Tipo 10** (dicho en "A desarrollar"): tiene que ser **algo no tan infrecuente**;
-  afloja la regla aprobada (hoy solo en la cabeza). Falta decidir en qué piezas.
+  afloja la regla aprobada (hoy solo en la cabeza). **Decidido el mismo día: se suma a los escudos** (1 y 2 manos) → Tipo
+  10 en **cabeza y escudo**, con los mismos topes por tier. Aplicado en `herramientas/reajuste_defensa.py` y
+  `rework-defensa.md`.
 
 ## Preguntas abiertas
 1. Tope de crítico por tier: ¿cuenta el potente igual que el frecuente, o es solo para el frecuente?
 2. Rango de arcos y pistolas (+4 a +8): ¿es su alcance base, fuera del máximo de +3 por stat?
 3. Crítico en anillos y guantes: ¿sí o no?
-4. Resistencia Tipo 10: ¿en qué piezas además de la cabeza (torso rígido, escudo…)?
-5. Aurelius Risus: ¿se corrige el martillo de su mochila o se resuelve en la mesa?
+4. Aurelius Risus: ¿se corrige el martillo de su mochila o se resuelve en la mesa?

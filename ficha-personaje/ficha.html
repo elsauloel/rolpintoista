@@ -2074,7 +2074,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-estado.js"></script>
 <script src="../comun/modificadores-tirada.js?v=20260930c"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930f"></script>
+<script src="../comun/combatiente.js?v=20260930g"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930b"></script>
 <script src="../comun/trampas-base.js"></script>
@@ -2083,7 +2083,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js?v=20260930a"></script>
 <script src="../comun/duelo.js?v=20260930b"></script>
-<script src="../comun/asistente-item.js?v=20260930a"></script>
+<script src="../comun/asistente-item.js?v=20260930b"></script>
 <script src="../comun/catalogo.js?v=20260929b"></script>
 <script src="../comun/items-subidos.js?v=20260930a"></script>
 <script src="../comun/editar-item.js?v=20260930a"></script>
@@ -2180,9 +2180,7 @@ const IT2 = {
   spPorBono: 1,
   // PLACEHOLDER: Tipo con el que se cobra un ataque sin arma equipada.
   tipoSinArma: 4,
-  // PLACEHOLDER: el primer ataque del turno cuesta Tipo ÷ 2; así se
-  // redondea si el Tipo es impar.
-  redondeoPrimerAtaque: Math.ceil,
+  // (El costo de atacar —Tipo ÷ 2 para arriba el primero— pasó al motor común: Combatiente.costoAtaque, comun/combatiente.js.)
   // PLACEHOLDER: Rengo cobra esto por casillero; Inmovilizado no deja moverse.
   nitrosMoverRengo: 2,
   inmovilizadoBloqueaMover: true,
@@ -2650,16 +2648,8 @@ function compute(){
 
   // Efectos activos que fuerzan/alteran un stat más allá de un modificador sumable.
   const efectosActivos = (S.efectos || []).filter(e => e.activo !== false);
-  // Cansado y Exhausto son proporcionales al máximo NATURAL (antes de que se apliquen entre sí): Cansado lo deja en 2/3, Exhausto en un tercio.
-  const nitrosNatural = final.nitros;
-  if(efectosActivos.some(e => e.cansado) && !Number.isNaN(nitrosNatural)) final.nitros = Math.floor(nitrosNatural * 2 / 3);
-  // Hypeado suma un tercio del natural, redondeado hacia arriba (buff). Con Cansado se compensan; Stun y Exhausto lo topean igual.
-  if(efectosActivos.some(e => e.hypeado) && !Number.isNaN(nitrosNatural)) final.nitros += Math.ceil(nitrosNatural / 3);
-  const forzados = efectosActivos
-    .filter(e => e.forzarNitros !== '' && e.forzarNitros !== null && e.forzarNitros !== undefined)
-    .map(e => num(e.forzarNitros));
-  if(efectosActivos.some(e => e.exhausto) && !Number.isNaN(nitrosNatural)) forzados.push(Math.floor(nitrosNatural / 3));
-  if(forzados.length) final.nitros = Math.min(...forzados);  // Stun (tope fijo), Exhausto (un tercio del natural)
+  // No2 máximo con Cansado, Hypeado, Exhausto y Stun/forzados (topes): regla común de personajes, invocaciones y creeps.
+  final.nitros = Combatiente.nitrosMax(final.nitros, efectosActivos);
   // Pajaritos y Lisiado ya no achican el stat: parten el RESULTADO de la tirada (ver mitadesDeTirada / tirarValorStat).
   // Inmovilizado y Rengo ya no tocan un stat: Movimiento se fundió en
   // Nitros, así que actúan al moverse (ver costoMoverCasillero).
@@ -4037,8 +4027,7 @@ function nuevaInvocacion(){
    formato de efecto/estado — ver gm-toolset/CLAUDE.md.
    ========================================================= */
 const IT2_INV = {
-  nitrosHabilidad: 1,             // costo por defecto de una habilidad
-  redondeoPrimerAtaque: Math.ceil,
+  nitrosHabilidad: 1,             // costo por defecto de una habilidad (el de atacar es Combatiente.costoAtaque)
 };
 const ATTR_IDS_INV = ['con','fue','agl','des','esp'];
 // Stats secundarios de una invocación: los mismos que un PJ (GRUPOS),
@@ -4115,17 +4104,8 @@ function invStatValor(inv, statId){
   return v;
 }
 function invNitrosMax(inv){
-  let v = num(inv.agl) + invModTotal(inv, 'agl') + invModTotal(inv, 'nitros');
-  const nitrosNaturalInv = v;
-  if(invEstadoActivo(inv, 'cansado')) v = Math.floor(v * 2 / 3);
-  if(invEstadoActivo(inv, 'hypeado')) v += Math.ceil(nitrosNaturalInv / 3);
-  // Stun (tope fijo), Exhausto (un tercio del natural): el más bajo activo gana.
-  const forzados = (inv.estados || [])
-    .filter(e => e.activo !== false && e.forzarNitros !== '' && e.forzarNitros !== null && e.forzarNitros !== undefined)
-    .map(e => num(e.forzarNitros));
-  if(invEstadoActivo(inv, 'exhausto')) forzados.push(Math.floor(nitrosNaturalInv / 3));
-  if(forzados.length) v = Math.min(v, ...forzados);
-  return Math.max(0, v);
+  // Natural = Agilidad efectiva + bonos a Nitros; los estados los aplica el motor común (comun/combatiente.js).
+  return Combatiente.nitrosMax(num(inv.agl) + invModTotal(inv, 'agl') + invModTotal(inv, 'nitros'), inv.estados);
 }
 // Nitros de una habilidad: un número, o "ATAQUE" = lo que le cuesta un
 // ataque con su arma (Tipo ÷ 2 el primero del turno) y cuenta como ese ataque.
@@ -4140,10 +4120,7 @@ function defensaInv(inv){
     escudos: (inv.equipo || []).filter(it => slotDe(it.tipoItem) === 'escudo').map(it => ({nombre: it.nombre, peso: num(it.peso)}))});
 }
 function bloqueoValorInv(inv){ const d = defensaInv(inv); return invStatValor(inv, 'bloqueo') + (d ? num(d.peso) : 0); }
-function costoAtaqueInv(inv){
-  const tipo = num(inv.armaTipo) || 8;
-  return num(inv.ataquesTurno) === 0 ? IT2_INV.redondeoPrimerAtaque(tipo / 2) : tipo;
-}
+function costoAtaqueInv(inv){ return Combatiente.costoAtaque(num(inv.armaTipo) || 8, inv.ataquesTurno); }   // regla común (comun/combatiente.js)
 function costoNitrosHabInv(inv, h){
   if(habInvAtaque(h)) return costoAtaqueInv(inv);
   return num(h.nitrosCosto ?? IT2_INV.nitrosHabilidad);
@@ -10113,10 +10090,8 @@ const claveAtaque = arma => arma ? arma.id : 'sin-arma';
 const tipoAtaque = arma => arma ? (num(arma.tipoDado) || 8) : IT2.tipoSinArma;
 const ataquesConArma = arma => num((S.ataquesArma || {})[claveAtaque(arma)]);
 
-function costoAtaqueNitros(arma){
-  const tipo = tipoAtaque(arma);
-  return ataquesConArma(arma) === 0 ? IT2.redondeoPrimerAtaque(tipo / 2) : tipo;
-}
+// La regla (Tipo ÷ 2 el primero, Tipo completo después) es la del motor común (comun/combatiente.js); acá se cuenta por arma.
+function costoAtaqueNitros(arma){ return Combatiente.costoAtaque(tipoAtaque(arma), ataquesConArma(arma)); }
 
 function costoAtaqueTxt(){
   const armas = armasEquipadasConDano();
@@ -10210,7 +10185,7 @@ function bloqueoConArma(arma){
 // Menú de Atacar (2026-09-26, pedido del dueño): el botón Atacar pregunta QUÉ ataque es, para automatizar el costo en Nitros de cada uno.
 //  · Ataque normal: el primero del turno con esa arma cuesta Tipo ÷ 2; los siguientes, el Tipo completo (cuenta como ataque).
 //  · Ataque de oportunidad y Contraataque (regla a prueba: tras un Parry con arma o escudo): SIEMPRE cuestan Tipo ÷ 2 (lo de un primer ataque) y NO suman al conteo de ataques del turno.
-const costoAtaqueEspecial = arma => IT2.redondeoPrimerAtaque(tipoAtaque(arma) / 2);
+const costoAtaqueEspecial = arma => Combatiente.costoPrimerAtaque(tipoAtaque(arma));
 const NOMBRE_ATAQUE_ESPECIAL = {oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
 function ataqueEspecialConArma(arma, tipo, forzar){
   const costo = costoAtaqueEspecial(arma), nombre = NOMBRE_ATAQUE_ESPECIAL[tipo] || 'Ataque';

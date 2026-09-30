@@ -227,6 +227,14 @@ prueba('subir un ítem lleva su durabilidad de diseño pero no el desgaste de la
   const s = Plantillas.limpiar('items', {nombre: 'Escudo', tipoItem: 'escudo_1m', peso: 3, durPorPeso: 4, dur: 2, armRota: 1});
   igual([s.durPorPeso, 'dur' in s, 'armRota' in s], [4, false, false]);
 });
+prueba('atacar: el primero Tipo ÷ 2 para arriba, después el Tipo completo', () => igual(
+  [Combatiente.costoAtaque(8, 0), Combatiente.costoAtaque(8, 1), Combatiente.costoAtaque(5, 0), Combatiente.costoPrimerAtaque(12)], [4, 8, 3, 6]));
+prueba('cuántos ataques alcanzan: Tipo 6 con 10 No2 = 2 (3 + 6)', () => igual([Combatiente.ataquesPosibles(6, 10), Combatiente.ataquesPosibles(6, 2), Combatiente.ataquesPosibles(4, 10)], [2, 0, 3]));
+prueba('No2 máximo: Cansado 2/3, Hypeado +1/3, Exhausto 1/3, Stun 0', () => igual([
+  Combatiente.nitrosMax(9, []), Combatiente.nitrosMax(9, [E({cansado: true})]), Combatiente.nitrosMax(9, [E({hypeado: true})]),
+  Combatiente.nitrosMax(9, [E({exhausto: true})]), Combatiente.nitrosMax(9, [E({forzarNitros: 0})]), Combatiente.nitrosMax(9, [E({cansado: true}), E({hypeado: true})]),
+], [9, 6, 12, 3, 0, 9]));
+prueba('"Forzar Nitros máx." es un tope: nunca sube el máximo (dueño, 2026-09-30)', () => igual(Combatiente.nitrosMax(6, [E({forzarNitros: 10})]), 6));
 prueba('estados-aplicar usa el motor: un jefe rebota el Stun', () => igual(EstadosAplicar.aplicarACreep({jefe: true, estados: []}, {nombre: 'Stun'}).motivo, 'Protección de jefe'));
 
 /* ---------- Plantillas (comun/plantillas.js) ---------- */

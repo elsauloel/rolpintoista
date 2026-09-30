@@ -1,7 +1,7 @@
 # Plan de consolidación: un solo motor, varias ventanas
 
 > **Estado: en curso** (escrita y empezada el 2026-09-30 a pedido del dueño — "vamos empezando poco a poco… si hace falta
-> pausarlo para encarar otra tarea, lo pausamos"). **Hecho: paso 0.** En curso: paso 1 (tanda 1 hecha). Cada paso se decide, se hace y se prueba por separado; ninguno obliga al
+> pausarlo para encarar otra tarea, lo pausamos"). **Hechos: pasos 0 y 1** (2026-09-30). Siguiente: paso 2 (estados y Mantenimiento). Cada paso se decide, se hace y se prueba por separado; ninguno obliga al
 > siguiente. Relacionado: "A desarrollar" n.º 51 (integrar todo en un solo sitio) y
 > [`plan-subida-unificada.md`](plan-subida-unificada.md) (el mismo espíritu, ya hecho, para subir elementos).
 
@@ -97,9 +97,16 @@ Cada paso: qué es, qué se gana, qué se arriesga, cómo se prueba. Se pueden e
     creeps). Pruebas: 66.
   - **No hay Bloqueo sin Parry** (concepto del dueño, 2026-09-30, P128): los botones de Bloqueo sueltos de personaje,
     invocación y creep pasan a verse apagados con lo que tirarían, y se habilitan solo después de un Parry.
-  - **Tanda 3 (siguiente)**: los adaptadores de "combatiente" (leer stat, estados, No2, HP y escudo de un personaje, una
-    invocación o un creep con la misma forma) y los costos de atacar (Tipo ÷ 2 el primero, completo después), hoy en
-    tres versiones. `mantenimiento` (3 versiones) queda para el paso 2.
+  - **Tanda 3 ✅** (2026-09-30): **costo de atacar** (`costoAtaque`, `costoPrimerAtaque`, `ataquesPosibles`: Tipo ÷ 2 para
+    arriba el primero, Tipo completo después; oportunidad y contraataque siempre lo de un primer ataque) — estaba en la ficha,
+    las invocaciones, los creeps y el asistente de ítems. **Máximo de No2 con los estados** (`nitrosMax`: Cansado, Hypeado,
+    Exhausto y Stun/forzados) — tres copias. Diferencia encontrada y decidida (**P130**): "Forzar Nitros máx." es un tope,
+    nunca sube el máximo (el personaje lo tomaba como "fijar"). Comparado contra la versión vieja en 5000 casos: igual.
+    Pruebas: 72.
+  - **Sobre los "adaptadores"** (leer stat, estados, No2, HP y escudo con la misma forma): al hacer las tandas quedó claro
+    que no hace falta una capa aparte — el motor recibe los datos crudos (la lista de estados, el valor natural) y cada
+    herramienta se los pasa. Lo que sigue repetido de verdad son el **Mantenimiento** (paso 2) y la **ejecución de
+    habilidades** con su costo en No2/SP (paso 3). **El paso 1 queda cerrado.**
 
 ### Paso 2 — Estados y Mantenimiento únicos
 - **Qué**: aplicar, acumular, vencer y recalcular estados, y el Mantenimiento (pasar el turno), en un solo lugar para los

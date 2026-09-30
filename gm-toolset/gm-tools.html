@@ -1291,7 +1291,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/plantillas.js?v=20260930b"></script>
 <script src="../comun/biblioteca.js?v=20260929i"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930f"></script>
+<script src="../comun/combatiente.js?v=20260930g"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930b"></script>
 <script src="../comun/creeps-base.js?v=20260927a"></script>
@@ -1319,7 +1319,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/duelo.js?v=20260930b"></script>
 <script src="../comun/catalogo.js?v=20260929b"></script>
 <script src="../comun/items-subidos.js?v=20260930a"></script>
-<script src="../comun/asistente-item.js?v=20260930a"></script>
+<script src="../comun/asistente-item.js?v=20260930b"></script>
 <script src="../comun/editar-item.js?v=20260930a"></script>
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') document.documentElement.classList.add('modo-mantenimiento');
@@ -2020,27 +2020,15 @@ function actualizarBadgePresupuesto(sc, card){
    hechos desde el último Mantenimiento.
    ========================================================= */
 const IT2_CREEP = {
-  nitrosHabilidad: 1,            // costo por defecto de una habilidad
-  redondeoPrimerAtaque: Math.ceil,
+  nitrosHabilidad: 1,            // costo por defecto de una habilidad (el de atacar es Combatiente.costoAtaque)
 };
 // Moverse no está acá: lo cobra el mapa al arrastrar el token del creep
 // (1 No2 por casillero, 2 con Rengo, nada con Inmovilizado).
 
 function creepNitrosMax(sc){
-  let v = num(sc.agl) + creepModTotal(sc, 'agl')
-    + creepModTotal(sc, 'nitros') + creepModTotal(sc, 'mov') + creepModTotal(sc, 'accionesmax');
-  const nitrosNatural = v;
-  // Cansado y Exhausto son proporcionales al máximo NATURAL: Cansado lo deja en 2/3, Exhausto en un tercio.
-  if((sc.estados || []).some(e => e.activo !== false && e.cansado)) v = Math.floor(v * 2 / 3);
-  // Hypeado suma un tercio del natural, redondeado hacia arriba (buff).
-  if((sc.estados || []).some(e => e.activo !== false && e.hypeado)) v += Math.ceil(nitrosNatural / 3);
-  // Stun (tope fijo), Exhausto (un tercio del natural): el más bajo activo gana.
-  const forzados = (sc.estados || [])
-    .filter(e => e.activo !== false && e.forzarNitros !== '' && e.forzarNitros !== null && e.forzarNitros !== undefined)
-    .map(e => num(e.forzarNitros));
-  if((sc.estados || []).some(e => e.activo !== false && e.exhausto)) forzados.push(Math.floor(nitrosNatural / 3));
-  if(forzados.length) v = Math.min(v, ...forzados);
-  return Math.max(0, v);
+  // Natural = Agilidad efectiva + bonos a Nitros (los viejos de Movimiento y Acciones máx. cuentan como No2); los estados
+  // (Cansado, Hypeado, Exhausto, Stun) los aplica el motor común (comun/combatiente.js), igual que a personajes e invocaciones.
+  return Combatiente.nitrosMax(num(sc.agl) + creepModTotal(sc, 'agl') + creepModTotal(sc, 'nitros') + creepModTotal(sc, 'mov') + creepModTotal(sc, 'accionesmax'), sc.estados);
 }
 
 // Nitros de una habilidad: un número, o "ATAQUE" = lo que le cuesta un
@@ -2092,7 +2080,7 @@ const parryPendienteCreep = new Set();
 // Fuerza del golpe (reglas del escudo, 2026-09-26): la tirada del atacante contra el Bloqueo del defensor = su Fuerza (con los estados activos) + el peso de su arma; la SUMA es el dado.
 function fuerzaGolpeValorCreep(sc){ return num(sc.fue) + (sc.estados || []).filter(e => e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'fue').reduce((x, m) => x + num(m.val) * Math.max(1, num(e.stacks) || 1), 0), 0) + pesoArmaCreep(sc); }
 // Contraataque (regla a prueba, 2026-09-26): tras un Parry, siempre cuesta lo de un primer ataque y no suma al conteo de ataques del turno.
-function costoContraataqueCreep(sc){ return IT2_CREEP.redondeoPrimerAtaque((num(sc.armaTipo) || 8) / 2); }
+function costoContraataqueCreep(sc){ return Combatiente.costoPrimerAtaque(num(sc.armaTipo) || 8); }   // regla común (comun/combatiente.js)
 // Menú de Atacar del creep (2026-09-26, pedido del dueño): Ataque normal / Ataque de oportunidad / Contraataque. Normal: el primero del turno cuesta Tipo ÷ 2 y los siguientes el Tipo completo;
 // oportunidad y contraataque siempre cuestan Tipo ÷ 2 y no suman al conteo de ataques del turno.
 function atacarNormalCreep(sc){
@@ -2131,10 +2119,7 @@ function preguntarTipoAtaqueCreep(sc){
     <button class="btn" data-tipoataquecreep="contra:${sc.id}" style="width:100%">↩ Contraataque — ${fmt(especial)} No2<br><span class="hint">tras un Parry; siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>`;
   $('#scrim-tipo-ataque-creep').classList.add('open');
 }
-function costoAtaqueCreep(sc){
-  const tipo = num(sc.armaTipo) || 8;
-  return num(sc.ataquesTurno) === 0 ? IT2_CREEP.redondeoPrimerAtaque(tipo / 2) : tipo;
-}
+function costoAtaqueCreep(sc){ return Combatiente.costoAtaque(num(sc.armaTipo) || 8, sc.ataquesTurno); }   // regla común (comun/combatiente.js)
 
 // Por qué no se puede ejecutar una habilidad ahora ('' = se puede).
 // Cooldown de una habilidad de creep, a mano (2026-09-24, pedido del dueño): el GM puede subirlo, bajarlo o resetearlo en cualquier

@@ -79,6 +79,33 @@ const Combatiente = (() => {
     if(conVentaja){ const af = activos(estados).find(e => e.afortunado); if(af) out.push({n: af.nombre, p: 'buff'}); }
     return out;
   }
+  /* ---------- Máximo de No2 con los estados (tanda 3, 2026-09-30) ----------
+     `natural` = Agilidad efectiva + bonos a Nitros (cada herramienta lo arma con lo suyo). Cansado lo deja en 2/3 del natural
+     (para abajo); Hypeado suma un tercio del natural (para arriba); "Forzar Nitros máx." (Stun = 0, estados propios) y
+     Exhausto (un tercio del natural, para abajo) son TOPES: gana el más bajo y nunca suben el máximo (dueño, 2026-09-30: hasta
+     entonces el personaje lo tomaba como "fijar", y un forzado más alto que su máximo se lo subía). Mínimo 0. Antes había
+     tres copias (ficha, invocaciones, creeps). */
+  function nitrosMax(natural, estados){
+    if(!Number.isFinite(Number(natural))) return natural;   // la ficha usa NaN para "no se puede calcular"
+    const act = activos(estados), nat = n(natural);
+    let v = nat;
+    if(act.some(e => e.cansado)) v = Math.floor(nat * 2 / 3);
+    if(act.some(e => e.hypeado)) v += Math.ceil(nat / 3);
+    const topes = act.filter(e => e.forzarNitros !== '' && e.forzarNitros !== null && e.forzarNitros !== undefined).map(e => n(e.forzarNitros));
+    if(act.some(e => e.exhausto)) topes.push(Math.floor(nat / 3));
+    if(topes.length) v = Math.min(v, ...topes);
+    return Math.max(0, v);
+  }
+
+  /* ---------- Costo de atacar (tanda 3, 2026-09-30) ----------
+     El primer ataque del turno con un arma cuesta Tipo ÷ 2 (para arriba) en No2; los siguientes, el Tipo completo. El ataque
+     de oportunidad y el contraataque cuestan siempre lo de un primer ataque y no suman al conteo. Antes estaba en la ficha, las
+     invocaciones, los creeps y el asistente de ítems, cada uno con su copia. */
+  function costoPrimerAtaque(tipo){ return Math.ceil(n(tipo) / 2); }
+  function costoAtaque(tipo, ataquesPrevios){ return n(ataquesPrevios) === 0 ? costoPrimerAtaque(tipo) : n(tipo); }
+  // Cuántos ataques alcanzan con esos No2 (el primero a mitad de precio, los demás completos).
+  function ataquesPosibles(tipo, nitros){ const t = n(tipo), p = costoPrimerAtaque(t); return n(nitros) < p ? 0 : 1 + (t > 0 ? Math.floor((n(nitros) - p) / t) : 0); }
+
   // El Parry cuesta siempre 1 No2, con cualquier arma o escudo (2026-09-26, dueño). Sin arma ni escudo no se puede (P121).
   function costoParry(){ return 1; }
   /* Parry y Bloqueo: SOLO con un arma o un escudo de verdad (regla del dueño, 2026-09-30, "hasta que diga lo contrario").
@@ -191,7 +218,7 @@ const Combatiente = (() => {
     return false;
   }
 
-  return {mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+  return {mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, nitrosMax, costoPrimerAtaque, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, ajustarPreset, inmunidad};
 })();

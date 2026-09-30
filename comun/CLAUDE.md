@@ -804,6 +804,8 @@ versión parecida en más de una, es candidato a juntar.
   (devuelve el motivo o false), `ajustarPreset(base, spec, campoHp)` (los números que manda una habilidad pisan los del
   preset), `tirarStat(valor, estados, statId, {extra, azar})` (LA tirada de un stat: Afortunado, mitades, Evasión mínimo 1;
   devuelve lo que se publica en la Mesa, no publica), `estadosQueAfectan` (los estados que se pintan en la Mesa),
+  `nitrosMax(natural, estados)` (Cansado, Hypeado, Exhausto y Stun/"forzar" como topes, P130), `costoAtaque(tipo,
+  ataquesPrevios)` / `costoPrimerAtaque` / `ataquesPosibles` (Tipo ÷ 2 el primero, completo después),
   `costoParry()` y `armaParaDefensa({arma, natural, escudos})` (**Parry y Bloqueo solo con un arma o un escudo; un arma
   natural no alcanza, por ahora** — regla del dueño 2026-09-30; lo usan `armasYEscudosParaParry` de la ficha,
   `defensaInv`, `defensaCreep` de GM Tools y `defensaCreepMapa` del mapa). **No hay Bloqueo sin Parry**

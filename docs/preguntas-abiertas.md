@@ -567,3 +567,7 @@ resuelven a mano, como el resto de los avisos).
   **cualquier** Parry o Bloqueo: con espada y escudo +1 Parry, parar con la espada también suma el +1 (y el +1 Parry de la
   espada NO cuenta al parar con el escudo). Propuesta: que cada uno cuente solo con lo suyo (el escudo al parar con el escudo,
   el arma con el arma), igual que el PdG y el Crítico de cada arma.
+- ✅ **P130. "Forzar Nitros máx. a N": ¿tope o fija el máximo? — 2026-09-30, resuelta el mismo día: es un TOPE** (dueño). Solo
+  puede bajar el máximo de No2, nunca subirlo (para subir están Hypeado o un bono a Nitros). Diferencia encontrada al unificar
+  (paso 1 de la consolidación): creeps e invocaciones ya lo tomaban como tope; el personaje lo tomaba como "fijar" y un estado
+  armado a mano con N más alto le subía el máximo. Ahora los tres usan `Combatiente.nitrosMax`.

@@ -85,8 +85,10 @@ const AsistenteItem = (() => {
   const n = v => { const x = parseFloat(v); return Number.isFinite(x) ? x : 0; };
   const f = x => Number.isInteger(x) ? x : Math.round(x * 100) / 100;
   const e = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
-  const primer = t => Math.ceil(t / 2);
-  const ataques = (t, nitros) => nitros < primer(t) ? 0 : 1 + Math.floor((nitros - primer(t)) / t);
+  // Costo de atacar: la regla del motor (comun/combatiente.js); la copia de abajo es solo por si una página no lo carga.
+  const MOTOR = () => (typeof Combatiente !== 'undefined' ? Combatiente : null);
+  const primer = t => MOTOR() ? MOTOR().costoPrimerAtaque(t) : Math.ceil(t / 2);
+  const ataques = (t, nitros) => MOTOR() ? MOTOR().ataquesPosibles(t, nitros) : (nitros < primer(t) ? 0 : 1 + Math.floor((nitros - primer(t)) / t));
   const grupoDe = id => (CATEGORIAS.find(c => c.id === id) || {}).grupo || '';
   const labelDe = id => (CATEGORIAS.find(c => c.id === id) || {}).label || id;
   const danoTxt = d => {

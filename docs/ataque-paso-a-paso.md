@@ -92,7 +92,7 @@ Cada tirada usa la misma regla de empate (gana la que no lleva «+»; si no, par
 
 **Preguntas abiertas (propuesta entre paréntesis):**
 1. ✅ (dueño, 2026-09-26) El defensor elige la defensa **antes** de ver el PdG (a ciegas).
-2. ✅ (dueño, 2026-09-26) Gana el Parry pero **pierde el Bloqueo**: **pasa la mitad del daño y se consume 1 punto de durabilidad** del arma o escudo con el que bloqueó. Nace la mecánica de **durabilidad** (armas y escudos = 2 por punto de Peso; las armaduras también se rompen): ver [`durabilidad.md`](durabilidad.md).
+2. ✅ (dueño, 2026-09-26) Gana el Parry pero **pierde el Bloqueo**: **pasa la mitad del daño y se consume 1 punto de durabilidad** del arma o escudo con el que bloqueó. Nace la mecánica de **durabilidad** (armas, escudos y armaduras = **3** por punto de Peso, mínimo 3 — primero se habló de 2, quedó en 3): ver [`durabilidad.md`](durabilidad.md).
 3. ✅ (dueño, 2026-09-26) **Crítico contra Parry: se calcula igual, solo que con el Parry en lugar de la Evasión** (PdG − Parry).
 4. ✅ (dueño, 2026-09-26) **El contraataque solo se ofrece si se gana el Bloqueo** (no basta con ganar el Parry).
 5. ✅ (dueño, 2026-09-26) **No hay tiempo límite** para elegir la defensa (el GM igual puede tirar por el defensor si no está).

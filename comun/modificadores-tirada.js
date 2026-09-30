@@ -45,13 +45,14 @@ const ModTirada = (() => {
       'Nunca baja de 1. Pajaritos y Sentado la parten a la mitad.']},
     parry: {t: '🗡 Parry', p: [
       'Interceptar el arma del enemigo con tu propia arma o tu escudo: tirás tu Parry (sale de la Destreza) contra el PdG del que te ataca.',
-      'Cuesta 1 No2 y necesitás un arma o un escudo (un arma natural no alcanza, por ahora).',
+      'Cuesta 1 No2 y necesitás un arma o un escudo sano (uno roto no sirve; un arma natural tampoco, por ahora).',
       'Si lo ganás, todavía falta aguantar el golpe: sigue el Bloqueo. Si lo perdés, te pega.',
       'Para elegir entre Parry y Esquivar, mirá también cuánto tirarías de Bloqueo.']},
     bloqueo: {t: '🛡 Bloqueo', p: [
       'Aguantar la fuerza del golpe con tu propia fuerza, después de ganar el Parry.',
       'Tirás tu Bloqueo (Fuerza) + el peso de tu arma o escudo, contra la Fuerza del atacante + el peso de su arma.',
-      'Si ganás, el golpe queda anulado. Si perdés, pasa la mitad del daño.',
+      'Si ganás, el golpe queda anulado. Si perdés, pasa la mitad del daño y tu arma o escudo pierde 1 punto de durabilidad.',
+      'Durabilidad: 3 puntos por cada punto de Peso (mínimo 3). En 0 se rompe: no da bonos y no sirve para parar hasta repararlo.',
       'No hay Bloqueo sin Parry: el botón muestra lo que tirarías, para decidir antes de defenderte.']},
   };
   function ayuda(clave){

@@ -188,6 +188,8 @@ El **Bloqueo** (de [[Fuerza]]) es la **segunda tirada** de una defensa con [[Par
 > [!info] El concepto (regla del dueño, 2026-09-30)
 > Cuando te vienen a atacar, el **Parry** (Destreza) es **interceptar el arma del enemigo** con tu propia arma o tu escudo. Si lo lográs, el **Bloqueo** es **aguantar la fuerza del golpe con tu propia fuerza**: tu Fuerza + el peso de tu arma o escudo, contra la Fuerza del atacante + el peso de su arma. Por eso **no hay Bloqueo sin Parry** (salvo que algún día se diseñe para un contexto especial).
 >
+> Si **ganás el Bloqueo**, el golpe queda anulado. Si **lo perdés**, pasa **la mitad del daño** (para arriba) y tu arma o escudo **pierde 1 punto de [[Durabilidad]]** (3 puntos por cada punto de Peso, mínimo 3; en 0 se rompe y no sirve para parar).
+>
 > En la Botonera el botón de Bloqueo **se ve siempre, apagado, con lo que tirarías** con cada arma o escudo: sirve para decidir antes de defenderte si te conviene el Parry o la [[Evasión]] (con un Bloqueo muy bajo quizás convenga esquivar). Recién se puede tirar después de un Parry, y con la misma arma o escudo.
 
 - Se calcula sumando tu stat Bloqueo (de [[Fuerza]]) **más el peso del arma o escudo** con la que hiciste el Parry, y **esa suma es el dado que tirás** (Bloqueo 6 + Peso 4 = 10 → 1d10).

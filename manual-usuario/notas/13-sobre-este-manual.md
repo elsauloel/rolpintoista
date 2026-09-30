@@ -64,7 +64,7 @@ Cambios importantes del sistema, para entender material viejo:
 |---|---|---|
 | **Iteración 2** (2026-09-04) | **Bonos** y **Acciones** por turno | [[SP]] (Special Power) y [[Nitros (No2)]] |
 | **Movimiento** | Un stat aparte | Se paga con [[Nitros (No2)\|Nitros]] |
-| **Inteligencia → Especial** (2026-09-18) | El atributo se llamaba "Inteligencia" | Se llama [[Especial]]; "Inteligencia" ahora es el presupuesto para [[Inteligencia y habilidades sociales\|habilidades sociales]] |
+| **Inteligencia → Especial** (2026-09-18) | El atributo se llamaba "Inteligencia" | Se llama [[Especial]]; "Inteligencia" ahora es el presupuesto para [[Inteligencia y talentos\|habilidades sociales]] |
 | **Escala de Tipos** | Tipos 2, 4, 6, 8, 10 | Tipos **4, 6, 8, 10, 12** ([[Daño y Tipo de arma]]) |
 | **Piezas de defensa** | Cascos/guantes/piernas/botas blandos y rígidos | Una sola categoría plana por ranura; solo el torso distingue blanda/rígida |
 | **Skill de clase** | 1 de tu clase, 2 de otra, 3 custom | **1** de clase (cualquiera), **2** custom ([[Puntos de Job]]) |

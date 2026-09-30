@@ -540,4 +540,13 @@ resuelven a mano, como el resto de los avisos).
   (rama `main`, Excel, `importar_json.py`, catálogo copiado adentro de los HTML). **Propuesta**: los ítems subidos
   viven en Firebase igual que el resto (disponibles al instante, sin token), con id `usr-<slug>`; el catálogo de
   GitHub queda como "de fábrica" y cada tanto una conversación pasa a él lo aprobado. Se decide en el paso 5.
-
+- 🔶 **P126. Talentos (antes "habilidades sociales") e Inteligencia — 2026-09-30, regla fijada, mecanismo abierto.** Dueño:
+  "La inteligencia arranca con 6 puntos. Se puede invertir un punto de inteligencia en cargar un talento. Por cada un punto
+  de inteligencia se suman dos puntos de los talentos [= 2 caras del dado]. Eso por default. Pero hasta que terminemos de
+  definirlo, dejemos que cada jugador pueda gestionar sus propios puntos… Establezcamos la regla, pero dejemos libre el
+  mecanismo por ahora." → **Regla:** Inteligencia 6 + 3 por nivel del personaje (confirmado); 1 punto invertido = +1 nivel
+  del talento = +2 caras del dado (d2, d4, d6…); tirada 1d(nivel × 2) + Inteligencia sin invertir; +1 nivel gratis por
+  tirada máxima. **Mecanismo libre:** el total de Inteligencia se edita a mano (ya existía) y cada talento se ajusta a mano
+  con **± Nivel → ✎ A mano** (Inteligencia invertida y niveles extra, para arriba o para abajo; avisa si se invierte de
+  más, no bloquea). En pantalla se llaman **Talentos** (los datos siguen en `S.sociales`). **Queda por definir:** el
+  catálogo de talentos, Carisma/Persuasión/Intuición y cómo cerrar el mecanismo (ver "A desarrollar").

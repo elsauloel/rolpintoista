@@ -88,18 +88,18 @@ Podés **comprar la misma pasiva varias veces** y los bonos se suman. El **tope 
 > - Los +1 de No2, Rango y Crítico están marcados ⚠ en el catálogo: son los que más hay que revisar.
 
 +++
-titulo: Inteligencia y habilidades sociales
-alias: [Inteligencia, Habilidades sociales, Sociales, Habilidad social, Presupuesto social]
+titulo: Inteligencia y talentos
+alias: [Inteligencia, Talentos, Talento, Habilidades sociales, Sociales, Habilidad social, Presupuesto social]
 tags: [habilidades, personaje]
 estado: borrador
 +++
-Además de los cinco [[Atributos]] hay un número aparte, la **Inteligencia**, para las **habilidades sociales** (persuadir, mentir, intimidar, regatear…).
+Además de los cinco [[Atributos]] hay un número aparte, la **Inteligencia**, para los **talentos** (persuadir, mentir, intimidar, regatear…; antes se llamaban *habilidades sociales*).
 
 ## El presupuesto
-No se reparte como los atributos: **se calcula sola**. **6 al crear el personaje, +3 por nivel.** Funciona como el presupuesto de Job: el total no baja, y lo que invertís en habilidades sociales se resta del disponible. El contador muestra cuánto te queda; al pasar el mouse ves en qué se fue cada punto.
+No se reparte como los atributos: **se calcula sola**. **6 al crear el personaje, +3 por nivel.** Funciona como el presupuesto de Job: el total no baja, y lo que invertís en talentos se resta del disponible. El contador muestra cuánto te queda; al pasar el mouse ves en qué se fue cada punto.
 
-## Cómo funciona una habilidad social
-Cada habilidad social tiene un **nivel** (puntos de Inteligencia invertidos + subidas gratis).
+## Cómo funciona un talento
+**Cada punto de Inteligencia que invertís en un talento le suma 2 caras al dado.** Dicho de otra forma, cada talento tiene un **nivel** (puntos de Inteligencia invertidos + subidas gratis).
 
 - **Dado = nivel × 2 caras.** Nivel 2 → d4; nivel 3 → d6; nivel 0 → sin dado.
 - **La tirada** es siempre `1d(nivel × 2) + tu Inteligencia sin invertir`.
@@ -107,10 +107,14 @@ Cada habilidad social tiene un **nivel** (puntos de Inteligencia invertidos + su
 > [!example] Persuadir nivel 3
 > Tenés Inteligencia total 9 y 3 puntos invertidos en Persuadir → te quedan 6 sin invertir. Tirás **1d6 + 6**.
 
-## Subir de nivel
-El botón **+ Nivel** de cada habilidad social ofrece dos caminos:
+## Subir (o bajar) de nivel
+El botón **± Nivel** de cada talento ofrece tres caminos:
 1. **Por Inteligencia:** elegís cuántos puntos invertís (se restan del presupuesto).
 2. **Por tirada máxima:** si sacás el máximo en la tirada, **subís +1 nivel gratis**.
+3. **A mano:** fijás vos la Inteligencia invertida y los niveles extra, para arriba o para abajo (bajar la Inteligencia invertida la devuelve al disponible).
+
+> [!note] Mecanismo libre por ahora (2026-09-30)
+> La regla es la de arriba, pero mientras se termina de definir, **cada jugador gestiona sus propios puntos**: el total de Inteligencia se toca en el contador de Atributos (un número, +N / −N o `auto`) y cada talento se ajusta a mano con **± Nivel**. La ficha avisa si invertiste más de lo que tenés, pero no lo impide.
 
 ## En la Botonera
 Con nivel, aparecen en la Botonera: **arriba de todo en [[Modo narrativo y modo combate|modo narrativo]]**, y al final en combate.

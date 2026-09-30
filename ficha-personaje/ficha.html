@@ -1425,8 +1425,8 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 
       <section class="card card--sociales">
         <header>
-          <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="sociales" title="Contraer/expandir">👁</button><h2>Habilidades sociales</h2></div>
-          <button class="iconbtn iconbtn-add" data-add="sociales">+ Social</button>
+          <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="sociales" title="Contraer/expandir">👁</button><h2>Talentos</h2></div>
+          <button class="iconbtn iconbtn-add" data-add="sociales">+ Talento</button>
         </header>
         <div class="body" id="list-sociales"></div>
       </section>
@@ -1533,7 +1533,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 
 <div class="scrim" id="scrim-nivel-social">
   <div class="modal" style="max-width:360px">
-    <header><h3 id="nivelsocial-titulo">Subir de nivel</h3><button class="iconbtn" id="nivelsocial-x">Cerrar</button></header>
+    <header><h3 id="nivelsocial-titulo">Nivel del talento</h3><button class="iconbtn" id="nivelsocial-x">Cerrar</button></header>
     <div class="body" style="display:flex;flex-direction:column;gap:12px">
       <div class="hint" id="nivelsocial-info"></div>
       <button type="button" class="btn" id="nivelsocial-tiradamax">🎲 Por tirada máxima · +1 nivel, sin gastar Inteligencia</button>
@@ -1544,6 +1544,15 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
           <button type="button" class="btn primary" id="nivelsocial-confirmar" style="flex:1">Invertir y subir nivel</button>
         </div>
         <div class="hint" id="nivelsocial-disponible" style="margin-top:6px"></div>
+      </div>
+      <div class="f" style="border-top:1px dashed var(--line);padding-top:10px">
+        <label>✎ A mano (mientras se termina de definir el mecanismo)</label>
+        <div style="display:flex;gap:8px;align-items:flex-end">
+          <div style="flex:1"><div class="hint">Inteligencia invertida</div><input type="number" id="f-nivelsocial-manual-int" min="0" step="1"></div>
+          <div style="flex:1"><div class="hint">Niveles extra (sin Inteligencia)</div><input type="number" id="f-nivelsocial-manual-extra" min="0" step="1"></div>
+        </div>
+        <button type="button" class="btn" id="nivelsocial-manual" style="margin-top:8px;width:100%">Guardar a mano</button>
+        <div class="hint" style="margin-top:6px">Subí o bajá cualquiera de los dos. Bajar la Inteligencia invertida la devuelve al total disponible.</div>
       </div>
     </div>
   </div>
@@ -5070,13 +5079,13 @@ const LISTS = {
       </div></div>`
   },
   sociales:{
-    empty:'Sin habilidades sociales.',
+    empty:'Sin talentos.',
     row:i => `<div class="item">
       <div class="ihead">
         ${thumb(i)}
         <div><div class="iname">${esc(i.nombre)} <span class="tag cost" title="${esc(tiradaSocialTxt(i))}">${esc(nivelSocialTxt(i))}</span></div>
           <div class="idesc">${esc(i.detalle)}</div></div>
-        <div class="rowbtns"><button class="mini" data-view="sociales:${i.id}">Ver</button><button class="mini" data-edit="sociales:${i.id}">Editar</button><button class="mini" data-nivelsocial="${i.id}">+ Nivel</button><button class="mini" data-tirarsocial="${i.id}">Dado</button></div>
+        <div class="rowbtns"><button class="mini" data-view="sociales:${i.id}">Ver</button><button class="mini" data-edit="sociales:${i.id}">Editar</button><button class="mini" data-nivelsocial="${i.id}" title="Subir o bajar el nivel del talento (por Inteligencia, por tirada máxima o a mano)">± Nivel</button><button class="mini" data-tirarsocial="${i.id}">Dado</button></div>
       </div></div>`
   },
   efectos:{
@@ -5336,9 +5345,9 @@ function renderBotonera(){
   // el resto de las habilidades) en modo combate — según lo que publique
   // el mapa (modoMapa; 'combate' si todavía no se sabe).
   const socialesHtml = `<div class="botonera-caja">
-    <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-sociales" title="Contraer/expandir">👁</button><span>Habilidades sociales</span></div>
+    <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-sociales" title="Contraer/expandir">👁</button><span>Talentos</span></div>
     <div class="botonera-list-grid">
-      ${S.sociales.length ? S.sociales.map(filaSocialBotonera).join('') : `<div class="hint">Sin habilidades sociales cargadas.</div>`}
+      ${S.sociales.length ? S.sociales.map(filaSocialBotonera).join('') : `<div class="hint">Sin talentos cargados.</div>`}
     </div>
   </div>`;
   if(modoMapa === 'narrativo') html += socialesHtml;
@@ -5617,7 +5626,9 @@ function abrirNivelSocial(id){
   if(!i) return;
   nivelSocialId = id;
   const b = inteligenciaBudget();
-  $('#nivelsocial-titulo').textContent = `Subir de nivel · ${i.nombre}`;
+  $('#nivelsocial-titulo').textContent = `Nivel del talento · ${i.nombre}`;
+  $('#f-nivelsocial-manual-int').value = Math.max(0, num(i.puntosInt));
+  $('#f-nivelsocial-manual-extra').value = Math.max(0, num(i.nivelExtra));
   $('#nivelsocial-info').textContent = `${nivelSocialTxt(i)} — ${i.puntosInt ? `${fmt(num(i.puntosInt))} de Inteligencia` : 'sin Inteligencia invertida'}${i.nivelExtra ? ` + ${fmt(num(i.nivelExtra))} por tirada máxima` : ''}.`;
   $('#f-nivelsocial-puntos').value = Math.min(Math.max(1, b.resto), 1) || 1;
   $('#f-nivelsocial-puntos').max = Math.max(1, b.resto);
@@ -5632,6 +5643,19 @@ function nivelarSocialPorTiradaMaxima(){
   $('#scrim-nivel-social').classList.remove('open');
   renderList('sociales'); renderInteligencia();
   toast(`${i.nombre}: ${nivelSocialTxt(i)} (tirada máxima)`);
+}
+// Ajuste a mano (regla del dueño, 2026-09-30: la regla está, el mecanismo queda libre): cada jugador fija la Inteligencia
+// invertida y los niveles extra de su talento, para arriba o para abajo. Si invierte más de lo que tiene, avisa pero lo deja.
+function nivelarSocialAMano(){
+  const i = S.sociales.find(x => x.id === nivelSocialId);
+  if(!i) return;
+  const antesInt = Math.max(0, num(i.puntosInt));
+  i.puntosInt = Math.max(0, Math.round(num($('#f-nivelsocial-manual-int').value)));
+  i.nivelExtra = Math.max(0, Math.round(num($('#f-nivelsocial-manual-extra').value)));
+  $('#scrim-nivel-social').classList.remove('open');
+  renderList('sociales'); renderInteligencia();
+  const b = inteligenciaBudget();
+  toast(`${i.nombre}: ${nivelSocialTxt(i)}${b.resto < 0 ? ` · ojo: invertiste ${fmt(-b.resto)} de Inteligencia de más` : i.puntosInt !== antesInt ? ` · te quedan ${fmt(b.resto)} de Inteligencia` : ''}`);
 }
 function nivelarSocialPorInteligencia(){
   const i = S.sociales.find(x => x.id === nivelSocialId);
@@ -6835,7 +6859,7 @@ const SCHEMA = {
   habilidades:{titulo:'Habilidad', campos:['nombre','imagen','costo','nitrosCosto','job','origen','efectoNombre','efectoTurnos','efectoHpTurno','efectoDetalle','tiradaExtra','detalle'], mods:false},
   pasivas:  {titulo:'Pasiva', campos:['nombre','imagen','job','jobCosto','compras','regenHp','origen','detalle'], mods:true},
   // El dado ya no se escribe a mano: sale del nivel (botón "+ Nivel" en la lista).
-  sociales: {titulo:'Social', campos:['nombre','imagen','detalle'], mods:false},
+  sociales: {titulo:'Talento', campos:['nombre','imagen','detalle'], mods:false},
   efectos:  {titulo:'Estado alterado', campos:['nombre','imagen','turnos','stacks','hpturno','stacksturno','forzarNitros','escudoMagico','mitadPdgEva','armaduraRota','permanente','activo','popup','detalle'], mods:true},
 };
 const CAMPO_LABEL = {nombre:'Nombre', peso:'Peso', ranuras:'Ranuras (si no está equipado)', costo:'Costo en SP (ej. 2 SP, o X si es variable)', nitrosCosto:'Costo en Nitros', dado:'Dado', stacks:'Stacks', detalle:'Detalle',
@@ -10516,7 +10540,7 @@ function lupaHtml(clave){
   }
   if(tipo === 'social'){
     const it = S.sociales.find(x => x.id === ref);
-    if(!it) return {titulo: 'Habilidad social', html: ''};
+    if(!it) return {titulo: 'Talento', html: ''};
     const caras = dadoCarasSocial(it);
     let h = lupaFila('Nivel', fmt(nivelSocial(it)));
     if(num(it.puntosInt)) h += lupaFila('· de Inteligencia invertida', fmt(num(it.puntosInt)));
@@ -11110,6 +11134,7 @@ $('#job-x').onclick = () => $('#scrim-job').classList.remove('open');
 $('#scrim-job').addEventListener('mousedown', e => { if(e.target.id==='scrim-job') $('#scrim-job').classList.remove('open'); });
 $('#nivelsocial-tiradamax').onclick = nivelarSocialPorTiradaMaxima;
 $('#nivelsocial-confirmar').onclick = nivelarSocialPorInteligencia;
+$('#nivelsocial-manual').onclick = nivelarSocialAMano;
 $('#nivelsocial-x').onclick = () => { nivelSocialId = null; $('#scrim-nivel-social').classList.remove('open'); };
 $('#scrim-nivel-social').addEventListener('mousedown', e => { if(e.target.id==='scrim-nivel-social'){ nivelSocialId = null; $('#scrim-nivel-social').classList.remove('open'); } });
 $('#scrim-chooser').addEventListener('mousedown', e => { if(e.target.id==='scrim-chooser') $('#scrim-chooser').classList.remove('open'); });

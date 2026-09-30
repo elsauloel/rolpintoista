@@ -19,7 +19,7 @@ Crear un personaje es, en el fondo, **subir de nivel 0 a 1**: repartís unos poo
 1. **Identidad.** Nombre, raza, [[Clases|clase]], subclase y nivel (arrancás en 1). Podés subir una foto: la ficha te deja elegir qué recorte va en tu token del [[El mapa|mapa]].
 2. **Atributos.** Repartí **33 puntos** entre los cinco [[Atributos]] (mínimo 3 cada uno). → [[Niveles y puntos]]
 3. **Job.** Tenés **3 puntos de [[Puntos de Job|Job]]** para comprar habilidades y pasivas. → [[Habilidades]], [[Pasivas]]
-4. **Inteligencia.** Se calcula sola (6 al crear): es tu presupuesto para [[Inteligencia y habilidades sociales|habilidades sociales]].
+4. **Inteligencia.** Se calcula sola (6 al crear): es tu presupuesto para [[Inteligencia y talentos|habilidades sociales]].
 5. **Equipo.** Comprá o pedí ítems del [[Catálogo de ítems]] y [[Equipo y ranuras|equipalos]]. El GM te da tu [[DDE]] inicial.
 6. **Historia.** Un nombre, un motivo, una manía. Es puramente narrativo… y es lo más divertido.
 
@@ -54,7 +54,7 @@ Todo personaje tiene **cinco atributos**. Son el "esqueleto" del personaje: de c
 Cada atributo, además, cambia el **dado** que tirás: ver [[Cómo se tira un stat]].
 
 > [!info] Un sexto número: Inteligencia
-> No se reparte como los cinco: es un presupuesto aparte para lo social. → [[Inteligencia y habilidades sociales]]
+> No se reparte como los cinco: es un presupuesto aparte para lo social. → [[Inteligencia y talentos]]
 
 > [!warning] Ojo: "Especial" antes se llamaba "Inteligencia"
 > Cambió de nombre para liberar "Inteligencia" para otra cosa. Si ves "Int" en material viejo, es **Especial**.
@@ -180,7 +180,7 @@ Se juega con **niveles**. Cada nivel te da tres pools de puntos, que se reciben 
 |---|---|---|
 | Puntos de [[Atributos\|atributo]] | **33** (mínimo 3 por atributo) | **+3** |
 | Puntos de [[Puntos de Job\|Job]] | **3** | **+3** |
-| [[Inteligencia y habilidades sociales\|Inteligencia]] | **6** | **+3** |
+| [[Inteligencia y talentos\|Inteligencia]] | **6** | **+3** |
 
 > [!example] Un personaje de nivel 4
 > Repartió 33 + 3 × 3 = **42 puntos de atributo**, tiene 3 + 9 = **12 de Job** y 6 + 9 = **15 de Inteligencia**.

@@ -533,3 +533,9 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   las pasivas guardan `bibOrigen` y muestran 🔔 versión nueva si el original se corrige (`origenDePasiva`,
   `versionNuevaDePasiva`, `abrirVersionNuevaPasiva`). El 🔔 de habilidades usa ahora el cartel compartido
   (`Biblioteca.avisoVersion`).
+
+- **Talentos (antes "habilidades sociales") — regla fijada, mecanismo libre** (2026-09-30, P126): en pantalla se llaman
+  **Talentos** (tarjeta, botón "+ Talento", Botonera, lupa); los datos siguen en `S.sociales`. Regla: 1 punto de
+  Inteligencia = +1 nivel = +2 caras del dado; Inteligencia 6 + 3 por nivel. Mientras se define el mecanismo, **± Nivel**
+  (`abrirNivelSocial`) suma **✎ A mano** (`nivelarSocialAMano`): fija `puntosInt` y `nivelExtra` para arriba o para abajo;
+  si se invierte más Inteligencia de la que hay, avisa (toast) pero no bloquea.

@@ -48,7 +48,7 @@ Todas las palabras y siglas del juego, con un enlace a la nota que las explica.
 
 | **AGL / Agi** | Agilidad | [[Agilidad]] |
 
-| **Int** | Inteligencia: presupuesto para lo social | [[Inteligencia y habilidades sociales]] |
+| **Int** | Inteligencia: presupuesto para lo social | [[Inteligencia y talentos]] |
 
 | **PdG** | Probabilidad de Golpe: lo que tirás para conectar | [[Atacar]] |
 
@@ -315,7 +315,7 @@ Lo esencial en una pantalla. Para el detalle, seguí los enlaces.
 
 | [[Puntos de Job\|Job]] | 3 | +3 |
 
-| [[Inteligencia y habilidades sociales\|Inteligencia]] | 6 | +3 |
+| [[Inteligencia y talentos\|Inteligencia]] | 6 | +3 |
 
 
 

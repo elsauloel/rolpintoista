@@ -4,8 +4,10 @@
    tu turno" (paso Costo del 🎯/✨, `it.turnoAjenoSp`) y, al ejecutarla, un cartelito pregunta antes de cobrar
    nada — ni el jugador ni el sistema tienen que acordarse de duplicar el costo a mano.
    Uso: const costoSp = await ConfirmarTurno.pedir(nombre, costoPropio, costoAjeno); // null si se cancela
-   Con `o` (2026-09-30, Flash de los creeps, P136): `o.unidad` ('SP' por defecto; ej. 'turnos de cooldown') y `o.quien`
-   (el nombre del creep: la pregunta pasa a "¿Es el turno de X?").
+   Con `o` (2026-09-30, Flash, P136): `o.unidad` ('SP' por defecto), `o.quien` (el nombre de un creep: la pregunta pasa a
+   "¿Es el turno de X?"), `o.textos` = [texto propio, texto ajeno] (entonces los costos pueden ser objetos) y `o.pregunta`.
+   ⚡ Flash: `ConfirmarTurno.flash(nombre, {sp, cd, hp}, {quien, spAjeno})` → Promise<{sp, cd, hp}|null>: en turno ajeno cuesta
+   el doble (Combatiente.costoFlash); sin nada que cobrar no pregunta. `textoFlash(costo, o)`: el texto de los dos costos.
    Mismo patrón que EstadoPreguntas.preguntar (comun/estado-preguntas.js): una Promise, sin Firebase. */
 const ConfirmarTurno = (() => {
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
@@ -35,9 +37,9 @@ const ConfirmarTurno = (() => {
       fondo.innerHTML = `<div id="ct-caja" role="dialog" aria-modal="true">
         <div class="ct-titulo">${o.quien ? `¿Es el turno de ${esc(o.quien)}?` : '¿Es tu turno?'}</div>
         <div class="ct-nombre">${esc(nombre)}</div>
-        <div class="ct-pregunta">Esta habilidad cuesta distinto según de quién sea el turno.</div>
-        <button type="button" class="ct-primario" id="ct-si">${o.quien ? 'Sí, es su turno' : 'Sí, es mi turno'} — ${esc(costoPropio)} ${esc(unidad)}</button>
-        <button type="button" id="ct-no">No, es turno ajeno — ${esc(costoAjeno)} ${esc(unidad)}</button>
+        <div class="ct-pregunta">${esc(o.pregunta || 'Esta habilidad cuesta distinto según de quién sea el turno.')}</div>
+        <button type="button" class="ct-primario" id="ct-si">${o.quien ? 'Sí, es su turno' : 'Sí, es mi turno'} — ${o.textos ? esc(o.textos[0]) : `${esc(costoPropio)} ${esc(unidad)}`}</button>
+        <button type="button" id="ct-no">No, es turno ajeno — ${o.textos ? esc(o.textos[1]) : `${esc(costoAjeno)} ${esc(unidad)}`}</button>
         <button type="button" class="ct-cancelar" id="ct-cancelar">Cancelar</button>
       </div>`;
       document.body.appendChild(fondo);
@@ -50,5 +52,23 @@ const ConfirmarTurno = (() => {
       fondo.querySelector('#ct-cancelar').onclick = () => cerrar(null);
     });
   }
-  return {pedir};
+  const fmtN = n => Number.isInteger(n) ? n : Math.round(n * 100) / 100;
+  function textoCosto(c){
+    const p = [];
+    if(c.sp > 0) p.push(`${fmtN(c.sp)} SP`);
+    if(c.cd > 0) p.push(`${fmtN(c.cd)} turno${c.cd === 1 ? '' : 's'} de cooldown`);
+    if(c.hp > 0) p.push(`${fmtN(c.hp)} HP`);
+    return p.join(' + ') || 'sin costo';
+  }
+  function textoFlash(costo, o){
+    const a = Combatiente.costoFlash(costo, true, o), b = Combatiente.costoFlash(costo, false, o);
+    return `${textoCosto(a)} · turno ajeno: ${textoCosto(b)}`;
+  }
+  function flash(nombre, costo, o){
+    o = o || {};
+    const a = Combatiente.costoFlash(costo, true, o), b = Combatiente.costoFlash(costo, false, o);
+    if(textoCosto(a) === 'sin costo' && textoCosto(b) === 'sin costo') return Promise.resolve(a);   // nada que cobrar: no pregunta
+    return pedir(nombre, a, b, {quien: o.quien, textos: [textoCosto(a), textoCosto(b)], pregunta: 'Un ⚡ Flash cuesta el doble fuera del propio turno.'});
+  }
+  return {pedir, flash, textoFlash, textoCosto};
 })();

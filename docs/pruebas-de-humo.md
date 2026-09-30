@@ -13,7 +13,7 @@
 > Cómo anotar: al lado de cada punto, ✔ / ✘ y la fecha. Un ✘ se arregla (o se anota en `pendientes.md`) antes de seguir.
 
 ## 0. Automáticas
-- [ ] `comun/pruebas.html` en verde (hoy: 97 pruebas).
+- [ ] `comun/pruebas.html` en verde (hoy: 98 pruebas).
 
 ## 1. Ficha (partida "Test", "Prueba de Claude")
 - [ ] Abre sin errores en la consola; el título dice personaje y partida.
@@ -74,6 +74,7 @@
 | 2026-09-30 | 🎮 Tomar el control en mesa ("Claude · pruebas", Clementino): estado recibido, pase de turno, Botonera en el mapa, mover con No2, defensa en un duelo, devolver | ✔ | Todo restaurado al terminar. |
 | 2026-09-30 | Paso 2 en mesa ("Claude · pruebas", sitio publicado): Goblin con Veneno ×2, Regeneración +3 y Escudo gastado, 3 Mantenimientos seguidos | ✔ | Vida 20 → 21 → 23 → 26; Veneno se terminó al llegar a 0 stacks; Regeneración venció; escudo recargado. Todo restaurado. |
 | 2026-09-30 | Tanda 3: costo de atacar y No2 máximo en ficha, invocación y GM Tools (copias sin sesión) | ✔ 72/72 | "Forzar Nitros a 20" con Agilidad 9 ya no sube el máximo (P130). |
+| 2026-09-30 | Regla del Flash (P136, el doble en turno ajeno) en personaje y creep: personaje "Reflejo" (2 SP + 1 HP; ajeno 4 SP + 2 HP → no le alcanzan los SP y no se usa; con Ejecutar en su turno cobra 2 SP + 1 HP, sin No2); creep "Furia ciega" (ajeno: cooldown 4 y −2 HP; con Ejecutar en su turno: cooldown 2 y −1 HP; sin No2) — copias sin sesión | ✔ 98/98 | |
 | 2026-09-30 | Flash de creep en turno ajeno (P136): en el duelo "No, es turno ajeno" → cooldown 4 (el doble de 2); con el botón Ejecutar "Sí, es su turno" → cooldown 2, sin No2; sin cooldown no pregunta; Cancelar no cobra — copia de GM Tools sin sesión | ✔ 97/97 | |
 | 2026-09-30 | Creeps: ataque con arreglos (Embestida: cobra lo de un ataque, PdG +2, daño +3) y ⚡ Flash (Furia ciega en PdG, cooldown sin No2; Esquive felino vale con Evasión y no con Parry, cuesta 2 HP) — copia de GM Tools sin sesión | ✔ 96/96 | Ataque con arreglos del personaje comparado con el viejo: 4000 casos, igual. Falta el duelo real en el mapa (pendientes). |
 | 2026-09-30 | Paso 3 en mesa ("Claude · pruebas", sitio publicado): Piel dura (✨ sobre sí) del Escarabajo de cobre | ✔ | −1 No2, cooldown 3, Escudo especial 5, sin cuadro. Restaurado (recargado y verificado). |

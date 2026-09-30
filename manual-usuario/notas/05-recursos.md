@@ -102,7 +102,7 @@ Todo lo que se paga con [[Nitros (No2)|Nitros]] en combate:
 ## Detalles útiles
 - El "primer ataque barato" **se recalcula cada turno nuevo**.
 - En [[Modo narrativo y modo combate|modo narrativo]] moverte, equiparte y girar **no cuestan nada**.
-- Flash ([[Habilidades]]) es la excepción: no cuesta Nitros y se puede usar en el turno de otro.
+- Flash ([[Habilidades]]) es la excepción: no cuesta Nitros y se puede usar en el turno de otro (ahí cuesta el doble).
 - Si una habilidad no dice cuánto cuesta, cuesta **1** (o lo de un ataque, si está atada a uno).
 
 > [!question] Costo variable (X)

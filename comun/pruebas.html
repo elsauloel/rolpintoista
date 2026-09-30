@@ -348,6 +348,9 @@ prueba('ataque con arreglos: mods por X, sin Parry, efectos y los de crítico, i
 });
 prueba('⚡ Flash de un creep: cooldown en su turno, el doble en turno ajeno (P136)', () => igual(
   [Combatiente.cdFlash(2, true), Combatiente.cdFlash(2, false), Combatiente.cdFlash(0, false), Combatiente.cdFlash('3', false)], [2, 4, 0, 6]));
+prueba('⚡ Flash: en turno ajeno TODO el costo es el doble (SP, cooldown y vida); un SP ajeno cargado a mano manda (P136)', () => igual(
+  [Combatiente.costoFlash({sp: 2, hp: 1}, true), Combatiente.costoFlash({sp: 2, hp: 1}, false), Combatiente.costoFlash({cd: 3}, false), Combatiente.costoFlash({sp: 2}, false, {spAjeno: '3'}), Combatiente.costoFlash({sp: 2}, false, {spAjeno: ''})],
+  [{sp: 2, cd: 0, hp: 1}, {sp: 4, cd: 0, hp: 2}, {sp: 0, cd: 6, hp: 0}, {sp: 3, cd: 0, hp: 0}, {sp: 4, cd: 0, hp: 0}]));
 prueba('⚡ Flash: vale para esa tirada; en la defensa, según Evasión o Parry', () => {
   const c = {modo: 'flash', flash: {en: ['parry', 'dano'], bono: 2}};
   igual([Combatiente.flashPara(c, 'eva'), Combatiente.flashPara(c, 'eva', 'parry'), Combatiente.flashPara(c, 'eva', 'evasion'), Combatiente.flashPara(c, 'dano'), Combatiente.flashPara(c, 'pdg'), Combatiente.flashPara({modo: 'hab'}, 'pdg')],

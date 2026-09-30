@@ -42,7 +42,7 @@ La ejecución paso a paso se arma con el botón **✨** de la habilidad (o en el
 ## Palabras que vas a ver en las descripciones
 | Palabra | Significa |
 |---|---|
-| **Flash** | No cuesta Nitros y se puede usar **durante el turno de otro**. Se declara **antes de que tire los dados**, nunca después de ver el resultado. |
+| **Flash** | No cuesta Nitros y se puede usar **durante el turno de otro**. Se declara **antes de que tire los dados**, nunca después de ver el resultado. **En tu turno cuesta lo que dice la habilidad; en turno ajeno, el doble** (el SP, o el cooldown si es de un creep, y la vida si la cuesta), se use dentro del duelo o con el botón: al usarla, un cartel pregunta de quién es el turno. |
 | **Espameable** | Se puede repetir en el turno; el límite lo ponen los Nitros. |
 | **Cooldown** | Turnos de espera antes de volver a usarla. |
 | **Amplificar** | Dados de daño de más, del [[Daño y Tipo de arma\|Tipo]] del arma. |

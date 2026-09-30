@@ -1296,7 +1296,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/plantillas.js?v=20260930b"></script>
 <script src="../comun/biblioteca.js?v=20260929i"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930m"></script>
+<script src="../comun/combatiente.js?v=20260930n"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930c"></script>
 <script src="../comun/creeps-base.js?v=20260927a"></script>
@@ -1316,7 +1316,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/estado-preguntas.js?v=20260929a"></script>
 <script src="../comun/asistente-estado.js"></script>
 <script src="../comun/modificadores-tirada.js?v=20260930c"></script>
-<script src="../comun/confirmar-turno.js?v=20260930a"></script>
+<script src="../comun/confirmar-turno.js?v=20260930b"></script>
 <script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-trampa.js?v=20260929i"></script>
 <script src="../comun/asistente-duelo-hab.js?v=20260930a"></script>
@@ -3350,32 +3350,28 @@ function lanzarAtaqueDeHabCreep(sc, h){
 }
 // ⚡ Flash de un creep (P135, 2026-09-30): no gasta No2 (igual que en el personaje); su límite es el cooldown, y la vida si
 // la habilidad la cuesta. Texto del costo para el botón del duelo.
-function costoFlashCreepTxt(h){
-  const cd = num(h.cd);
-  const p = [cd > 0 ? `cooldown ${fmt(Combatiente.cdFlash(cd, true))} (turno ajeno ${fmt(Combatiente.cdFlash(cd, false))})` : 'sin cooldown'];
-  if(num(h.hpCosto) > 0) p.push(`${fmt(num(h.hpCosto))} HP`);
-  return p.join(' · ');
-}
-// «¿Es el turno del creep?» (P136, dueño 2026-09-30): en su turno el Flash pone el cooldown de la habilidad; en turno ajeno,
-// el doble. Devuelve el cooldown a poner (null = el GM canceló). Sin cooldown no hay nada que preguntar.
-async function cooldownFlashCreep(sc, h){
-  const cd = num(h.cd);
-  if(cd <= 0) return 0;
-  return ConfirmarTurno.pedir(`⚡ ${h.nombre || 'Flash'}`, Combatiente.cdFlash(cd, true), Combatiente.cdFlash(cd, false), {unidad: 'turno(s) de cooldown', quien: sc.nombre});
-}
-// Ejecutar un ⚡ Flash con el botón, fuera del cuadro del duelo: pregunta el turno, pone el cooldown (y cobra la vida, si la
-// tiene), sin No2 (P135), y lo anuncia; el bono se suma a mano a la tirada que corresponda.
-async function usarFlashFueraDelDueloCreep(sc, h){
+const costoFlashCreep = h => ({cd: num(h.cd), hp: num(h.hpCosto)});
+function costoFlashCreepTxt(h){ return ConfirmarTurno.textoFlash(costoFlashCreep(h)); }
+// «¿Es el turno del creep?» (P136, regla del dueño): en su turno el Flash cuesta lo que dice la habilidad (cooldown y vida);
+// en turno ajeno, el doble. Nunca No2. Pregunta, revisa la vida y cobra; null = no se usó.
+async function pagarFlashCreep(sc, h){
   const motivo = Combatiente.bloqueoHab(h, {hp: sc.hp});
-  if(motivo){ toast(`${sc.nombre}: ${h.nombre || 'Habilidad'} no se puede usar — ${motivo}`); return; }
-  const cd = await cooldownFlashCreep(sc, h);
-  if(cd === null) return;
-  h.cdActual = cd;
-  if(num(h.hpCosto) > 0) sc.hp = num(sc.hp) - num(h.hpCosto);
+  if(motivo){ toast(`${sc.nombre}: ${h.nombre || 'Habilidad'} no se puede usar — ${motivo}`); return null; }
+  const p = await ConfirmarTurno.flash(`⚡ ${h.nombre || 'Flash'}`, costoFlashCreep(h), {quien: sc.nombre});
+  if(!p) return null;
+  if(p.hp > 0 && num(sc.hp) <= p.hp){ toast(`${sc.nombre}: no le alcanza la vida para ${h.nombre} (${fmt(p.hp)} HP)`); return null; }
+  h.cdActual = p.cd;
+  if(p.hp > 0) sc.hp = num(sc.hp) - p.hp;
   renderAll();
+  return p;
+}
+// Ejecutar un ⚡ Flash con el botón, fuera del cuadro del duelo: la misma regla de costo; se anuncia y el bono se suma a mano.
+async function usarFlashFueraDelDueloCreep(sc, h){
+  const p = await pagarFlashCreep(sc, h);
+  if(!p) return;
   const f = h.duelo.flash || {};
   mesaPublicarHabilidadCreep(sc, h, `⚡ Flash: +${fmt(num(f.bono))} a la tirada.`);
-  toast(`${h.nombre}: ⚡ +${fmt(num(f.bono))} (sumalo a mano a la tirada; dentro del duelo se suma solo) · cooldown ${fmt(cd)}${num(h.hpCosto) > 0 ? ` · −${fmt(num(h.hpCosto))} HP` : ''}`);
+  toast(`${h.nombre}: ⚡ +${fmt(num(f.bono))} (sumalo a mano a la tirada; dentro del duelo se suma solo) · ${ConfirmarTurno.textoCosto(p)}`);
 }
 function lanzarDueloDeHabCreep(sc, h, hab){
   Duelo.elegirObjetivo({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre}, ataque: {tipo: 'habilidad', hab, alcance: hab.alcance}, suelto: () => tirarExtraDeHab(h, sc)});
@@ -7707,15 +7703,8 @@ window.DUELO_HOOKS = {
     const h = sc && (sc.habilidades || []).find(x => x.id === habId);
     if(!h || !Combatiente.flashPara(h.duelo, campo)) return null;
     if(!Combatiente.flashPara(h.duelo, campo, modo)){ toast(`${h.nombre} no vale para esta tirada (${modo === 'parry' ? 'Parry' : campo})`); return null; }
-    const motivo = Combatiente.bloqueoHab(h, {hp: sc.hp});
-    if(motivo){ toast(`${sc.nombre}: ${h.nombre} — ${motivo}`); return null; }
-    return cooldownFlashCreep(sc, h).then(cd => {   // «¿es su turno?»: cooldown normal o el doble (P136)
-      if(cd === null) return null;
-      h.cdActual = cd;   // sin No2: el cooldown es su límite
-      if(num(h.hpCosto) > 0) sc.hp = num(sc.hp) - num(h.hpCosto);
-      renderAll();
-      return {bono: num(h.duelo.flash.bono), etq: h.nombre, quien: sc.nombre};
-    });
+    // «¿es su turno?»: lo de la habilidad o el doble (P136); sin No2
+    return pagarFlashCreep(sc, h).then(p => p ? {bono: num(h.duelo.flash.bono), etq: h.nombre, quien: sc.nombre} : null);
   },
   // Habilidades dirigidas: la tirada del creep que la usa (quien = 'atacante') o la del creep que se resiste (quien = 'defensor').
   habTirar: (d, quien, modo) => {

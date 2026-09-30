@@ -2071,11 +2071,11 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/mesa.js"></script>
 <script src="../comun/lupa.js"></script>
 <script src="../comun/estado-preguntas.js?v=20260929a"></script>
-<script src="../comun/confirmar-turno.js?v=20260930a"></script>
+<script src="../comun/confirmar-turno.js?v=20260930b"></script>
 <script src="../comun/asistente-estado.js"></script>
 <script src="../comun/modificadores-tirada.js?v=20260930c"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930m"></script>
+<script src="../comun/combatiente.js?v=20260930n"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930c"></script>
 <script src="../comun/trampas-base.js"></script>
@@ -10195,17 +10195,15 @@ window.DUELO_HOOKS = {
     if(dueloInvDe(lado)) return [];   // las invocaciones no usan Flash
     const sp = spMaximo() - num(S.spGastado);
     return S.habilidades.filter(h => Combatiente.flashPara(dueloDe(h), campo))   // regla común (comun/combatiente.js)
-      .map(h => { const c = dueloDe(h).flash, costo = parseCostoSp(h.costo); return {habId: h.id, nombre: h.nombre, bono: num(c.bono), en: c.en || [], costoSp: costo, motivoNo: costo > sp ? 'no te alcanzan los SP' : ''}; });
+      .map(h => { const c = dueloDe(h).flash, costo = parseCostoSp(h.costo); return {habId: h.id, nombre: h.nombre, bono: num(c.bono), en: c.en || [], costoSp: costo,
+        costoTxt: ConfirmarTurno.textoFlash(costoFlashDe(h), {spAjeno: h.turnoAjenoSp}), motivoNo: costo > sp ? 'no te alcanzan los SP' : ''}; });
   },
+  // Usarlo: «¿es tu turno?» — en turno ajeno cuesta el doble (P136); se cobra al contestar y el duelo suma el bono.
   flashUsar: (d, campo, modo, habId) => {
     const h = S.habilidades.find(x => x.id === habId), c = h && dueloDe(h);
     if(!c || c.modo !== 'flash' || !c.flash) return null;
     if(!Combatiente.flashPara(c, campo, modo)){ toast(`${h.nombre} no vale para esta tirada (${modo === 'parry' ? 'Parry' : campo})`); return null; }
-    const costo = parseCostoSp(h.costo);
-    if(costo > spMaximo() - num(S.spGastado)){ toast(`No te alcanzan los SP para ${h.nombre}`); return null; }
-    S.spGastado = num(S.spGastado) + costo;   // Flash: no cuesta No2, solo SP
-    renderVitals(); refresh();
-    return {bono: num(c.flash.bono), etq: h.nombre, quien: (S.meta && S.meta.nombre) || 'Personaje'};
+    return pagarFlash(h).then(p => p ? {bono: num(c.flash.bono), etq: h.nombre, quien: (S.meta && S.meta.nombre) || 'Personaje'} : null);
   },
   // Habilidades dirigidas: la tirada de quien la usa (quien = 'atacante') o la de quien se resiste (quien = 'defensor', modo = el stat que eligió).
   habTirar: (d, quien, modo) => {
@@ -10705,6 +10703,28 @@ function costoAtaqueHabTxt(){
   return `ataque: ${opciones.map(o => `${o.arma.nombre} ${fmt(costoAtaqueNitros(o.arma))}`).join(' / ')} No2`;
 }
 
+// ⚡ Flash (P136, regla del dueño): en tu turno cuesta lo que dice la habilidad (SP y vida); en turno ajeno, el doble — igual
+// dentro del duelo que con el botón. Nunca cuesta No2. Pregunta el turno, revisa que alcance y cobra; null = no se usó.
+const costoFlashDe = h => ({sp: parseCostoSp(h.costo), hp: num(h.hpCosto)});
+async function pagarFlash(h){
+  const p = await ConfirmarTurno.flash(`⚡ ${h.nombre || 'Flash'}`, costoFlashDe(h), {spAjeno: h.turnoAjenoSp});
+  if(!p) return null;
+  if(p.sp > spMaximo() - num(S.spGastado)){ toast(`No te alcanzan los SP para ${h.nombre} (${fmt(p.sp)} SP)`); return null; }
+  if(p.hp > 0 && num(S.hp) <= p.hp){ toast(`No te alcanza la vida para ${h.nombre} (${fmt(p.hp)} HP)`); return null; }
+  S.spGastado = num(S.spGastado) + p.sp;
+  if(p.hp > 0) fijarHp(num(S.hp) - p.hp);
+  renderVitals(); refresh();
+  return p;
+}
+// Un Flash con el botón Ejecutar, fuera del cuadro del duelo: la misma regla de costo, se anuncia y el bono se suma a mano.
+async function usarFlashFueraDelDuelo(it){
+  const p = await pagarFlash(it);
+  if(!p) return;
+  const f = dueloDe(it).flash || {};
+  mesaPublicarHabilidad(it.nombre, `${it.detalle || ''}${it.detalle ? ' — ' : ''}⚡ Flash: +${fmt(num(f.bono))} a la tirada.`);
+  renderList('habilidades');
+  toast(`${it.nombre}: ⚡ +${fmt(num(f.bono))} (sumalo a mano a la tirada; dentro del duelo se suma solo) · ${ConfirmarTurno.textoCosto(p)}`);
+}
 async function ejecutarHabilidad(id, armaId, forzar){
   const it = S.habilidades.find(h => h.id === id);
   if(!it) return;
@@ -10714,6 +10734,7 @@ async function ejecutarHabilidad(id, armaId, forzar){
     toast(`${it.nombre} anunciada`);
     return;
   }
+  if(Combatiente.tipoEjecucion(dueloDe(it)) === 'flash'){ usarFlashFueraDelDuelo(it); return; }   // ⚡ su propia regla de costo (P136)
   // Costo en vida: hace falta que sobre vida después de pagarlo.
   if(num(it.hpCosto) > 0 && num(S.hp) <= num(it.hpCosto)){
     toast(`No te alcanza la vida — ${it.nombre} cuesta ${fmt(num(it.hpCosto))} HP y tenés ${fmt(num(S.hp))}`);

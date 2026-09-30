@@ -455,8 +455,17 @@ const Combatiente = (() => {
       ...(c.efectosNota ? {efectosNota: sx(c.efectosNota)} : {}),
       ...(critico && Object.keys(critico).length ? {critico} : {})};
   }
-  // ⚡ Flash de un creep (P136, dueño 2026-09-30): en su turno, el cooldown de la habilidad; en turno ajeno, el doble.
-  const cdFlash = (cd, turnoPropio) => Math.max(0, nf(cd)) * (turnoPropio ? 1 : 2);
+  /* ⚡ Flash (P136, regla del dueño 2026-09-30): en el propio turno cuesta lo que dice la habilidad; en turno ajeno, EL DOBLE —
+     SP (personaje), cooldown (creep) y vida por igual, se use dentro del duelo o con el botón. `costo` = {sp, cd, hp};
+     `o.spAjeno`: si la habilidad tiene cargado a mano otro SP para turno ajeno, manda ese. */
+  function costoFlash(costo, turnoPropio, o){
+    const c = costo || {}, k = turnoPropio ? 1 : 2;
+    const out = {sp: Math.max(0, nf(c.sp)) * k, cd: Math.max(0, nf(c.cd)) * k, hp: Math.max(0, nf(c.hp)) * k};
+    const aj = o && o.spAjeno;
+    if(!turnoPropio && aj !== undefined && aj !== null && String(aj).trim() !== '') out.sp = Math.max(0, nf(aj));
+    return out;
+  }
+  const cdFlash = (cd, turnoPropio) => costoFlash({cd}, turnoPropio).cd;
   /* ⚡ Flash: ¿esta Ejecución es un Flash que vale para esa tirada del duelo? `campo`: 'pdg', 'eva' (la defensa), 'bloqueo',
      'fuerza' o 'dano'. Sin `modo`, para 'eva' vale si sirve para Evasión o Parry (la lista de opciones); con `modo`, para la
      defensa que se eligió ('parry' o la Evasión). */
@@ -484,5 +493,5 @@ const Combatiente = (() => {
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, inmunidad,
     modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
-    formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, flashPara, cdFlash};
+    formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, flashPara, cdFlash, costoFlash};
 })();

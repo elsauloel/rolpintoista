@@ -113,7 +113,7 @@ Todas las palabras y siglas del juego, con un enlace a la nota que las explica.
 
 | **Stack** | Acumulación de un estado | [[Estados alterados]] |
 
-| **Flash** | Habilidad sin Nitros, en turno ajeno | [[Habilidades]] |
+| **Flash** | Habilidad sin Nitros, también en turno ajeno (ahí cuesta el doble) | [[Habilidades]] |
 
 | **Espameable** | Repetible en el turno | [[Habilidades]] |
 

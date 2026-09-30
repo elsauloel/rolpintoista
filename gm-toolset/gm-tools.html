@@ -1291,7 +1291,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/plantillas.js?v=20260930a"></script>
 <script src="../comun/biblioteca.js?v=20260929i"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930d"></script>
+<script src="../comun/combatiente.js?v=20260930e"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930b"></script>
 <script src="../comun/creeps-base.js?v=20260927a"></script>
@@ -2085,6 +2085,9 @@ function defensaCreep(sc){
     escudos: (sc.equipo || []).filter(it => slotDeGM(it.tipoItem) === 'escudo').map(it => ({nombre: it.nombre, peso: num(it.peso)}))});
 }
 function bloqueoValorCreep(sc){ const d = defensaCreep(sc); return creepStatValor(sc, 'bloqueo') + (d ? num(d.peso) : 0); }
+// Creeps con un Parry esperando su Bloqueo: el Bloqueo solo existe después de un Parry (regla del dueño, 2026-09-30).
+// Se limpia al bloquear, atacar, en el Mantenimiento y al reiniciar el combate. El duelo no lo necesita (ya sabe si ganó el Parry).
+const parryPendienteCreep = new Set();
 // Fuerza del golpe (reglas del escudo, 2026-09-26): la tirada del atacante contra el Bloqueo del defensor = su Fuerza (con los estados activos) + el peso de su arma; la SUMA es el dado.
 function fuerzaGolpeValorCreep(sc){ return num(sc.fue) + (sc.estados || []).filter(e => e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'fue').reduce((x, m) => x + num(m.val) * Math.max(1, num(e.stacks) || 1), 0), 0) + pesoArmaCreep(sc); }
 // Contraataque (regla a prueba, 2026-09-26): tras un Parry, siempre cuesta lo de un primer ataque y no suma al conteo de ataques del turno.
@@ -2101,6 +2104,7 @@ function atacarNormalCreep(sc){
   const primero = num(sc.ataquesTurno) === 0;
   sc.nitros = num(sc.nitros) - costo;
   sc.ataquesTurno = num(sc.ataquesTurno) + 1;
+  parryPendienteCreep.delete(sc.id);   // atacar cierra el Parry que esperaba su Bloqueo
   renderAll();
   const pdg = creepStatValor(sc, 'pdg');
   tirarValorStat(`${sc.nombre} · PdG`, pdg, sc, 'pdg');
@@ -2753,7 +2757,10 @@ function renderAccionesCreep(){
     // Parry y Bloqueo solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30): sin eso, o con un arma
     // natural, no aparecen (defensaCreep).
     ...(defCreep ? [{stat:'parry', nombre:`Parry · ${fmt(costoParryCreep(sc))} No2`, dado: fc.parry, sinNitros: num(sc.nitros) < costoParryCreep(sc), lupa:'stat|parry', motivo:`${num(sc.nitros) < costoParryCreep(sc) ? 'Sin No2 · ' : ''}Cuesta ${fmt(costoParryCreep(sc))} No2 · con ${defCreep.nombre}`, attr:`data-parrycreep="${sc.id}"`},
-      {stat:'bloqueo', nombre:'Bloqueo', dado: fc.bloqueo, lupa:'stat|bloqueo', motivo:`Sin costo · su Bloqueo + el Peso de ${defCreep.nombre} (${fmt(num(defCreep.peso))}) es el dado`, attr:`data-bloqueocreep="${sc.id}"`}] : []),
+      // El Bloqueo solo se tira después de un Parry; antes queda apagado pero muestra lo que tiraría (para decidir).
+      parryPendienteCreep.has(sc.id)
+        ? {stat:'bloqueo', nombre:`Bloqueo · ${defCreep.nombre}`, dado: fc.bloqueo, lupa:'stat|bloqueo', motivo:`Tras el Parry · sin costo · su Bloqueo + el Peso de ${defCreep.nombre} (${fmt(num(defCreep.peso))}) es el dado`, attr:`data-bloqueocreep="${sc.id}"`}
+        : {stat:'bloqueo', nombre:'Bloqueo · tras el Parry', dado: fc.bloqueo, sinNitros: true, lupa:'stat|bloqueo', motivo:`${Combatiente.BLOQUEO_SOLO_TRAS_PARRY} · con ${defCreep.nombre} tiraría esto`, attr:`data-bloqueocreep="${sc.id}"`}] : []),
     {nombre:'Fuerza del golpe', dado: fc.fuerza, motivo:`Sin costo · su Fuerza + el Peso de su arma (${fmt(pesoArmaCreep(sc))}) es el dado: su tirada contra el Bloqueo del defensor`, attr:`data-fuerzacreep="${sc.id}"`},
   ];
   // Sentado: levantarse cuesta 1 No2 y saca el estado (ver data-levantarcreep).
@@ -4938,10 +4945,11 @@ document.addEventListener('click', e => {
       return;
     }
     sc.nitros = num(sc.nitros) - costo;
+    parryPendienteCreep.add(sc.id);   // si gana el Parry, sigue el Bloqueo
     renderAll();
     const parry = creepStatValor(sc, 'parry');
     tirarValorStat(`${sc.nombre} · Parry`, parry, sc, 'parry');
-    toast(`${sc.nombre}: Parry −${fmt(costo)} No2 · quedan ${fmt(sc.nitros)}`);
+    toast(`${sc.nombre}: Parry −${fmt(costo)} No2 · quedan ${fmt(sc.nitros)} · si lo gana, tirá el Bloqueo`);
     return;
   }
   if(b.dataset.contraatacarcreep){   // (ya no hay botón suelto: el contraataque es una opción del menú de Atacar)
@@ -4982,6 +4990,9 @@ document.addEventListener('click', e => {
     if(!sc) return;
     const def = defensaCreep(sc);
     if(!def){ toast(`${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`); return; }
+    if(!parryPendienteCreep.has(sc.id)){ toast(`${sc.nombre}: ${Combatiente.BLOQUEO_SOLO_TRAS_PARRY}`); return; }
+    parryPendienteCreep.delete(sc.id);
+    renderAll();
     tirarValorStat(`${sc.nombre} · Bloqueo · ${def.nombre}`, bloqueoValorCreep(sc), sc, 'bloqueo');
     return;
   }
@@ -5664,6 +5675,7 @@ async function generarCreepIA(promptUsuario){
 
 function mantenimiento(){
   S.turno += 1;
+  parryPendienteCreep.clear();
   let enCooldown = 0;
   let hpAplicado = 0;
   let vencidos = 0;
@@ -5758,6 +5770,7 @@ async function nieblaReiniciarDesdeGM(){
 function reiniciarCombate(){
   if(!confirm('¿Reiniciar el combate? El contador vuelve a cero.')) return;
   S.turno = 0;
+  parryPendienteCreep.clear();
   S.creeps.forEach(sc => {
     (sc.habilidades || []).forEach(h => { h.cdActual = h.cdArranca ? num(h.cd) : 0; });
     sc.nitros = creepNitrosMax(sc);

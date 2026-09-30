@@ -95,6 +95,8 @@ Cada paso: qué es, qué se gana, qué se arriesga, cómo se prueba. Se pueden e
     siempre y parriaban con garras; y el mapa tenía **su propia copia** de las defensas de un creep que ofrecía Parry aunque
     no tuviera arma. Ahora las cuatro vías usan la misma regla. Las invocaciones suman el tilde "arma natural" (como los
     creeps). Pruebas: 66.
+  - **No hay Bloqueo sin Parry** (concepto del dueño, 2026-09-30, P128): los botones de Bloqueo sueltos de personaje,
+    invocación y creep pasan a verse apagados con lo que tirarían, y se habilitan solo después de un Parry.
   - **Tanda 3 (siguiente)**: los adaptadores de "combatiente" (leer stat, estados, No2, HP y escudo de un personaje, una
     invocación o un creep con la misma forma) y los costos de atacar (Tipo ÷ 2 el primero, completo después), hoy en
     tres versiones. `mantenimiento` (3 versiones) queda para el paso 2.

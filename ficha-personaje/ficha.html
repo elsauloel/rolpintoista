@@ -2074,7 +2074,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-estado.js"></script>
 <script src="../comun/modificadores-tirada.js?v=20260930a"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930d"></script>
+<script src="../comun/combatiente.js?v=20260930e"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930b"></script>
 <script src="../comun/trampas-base.js"></script>
@@ -4509,7 +4509,10 @@ function renderBotoneraInv(){
     // Parry y Bloqueo solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30): sin eso, o con un arma
     // natural, no aparecen (defensaInv).
     ...(defInv ? [{stat:'parry', nombre:`Parry · ${fmt(Combatiente.costoParry())} No2`, dado: f(invStatValor(inv,'parry')), sinNitros: num(inv.nitros) < Combatiente.costoParry(), clave:`inv:${inv.id}:stat:parry`, motivo:`${num(inv.nitros) < Combatiente.costoParry() ? 'Sin No2 · ' : ''}Cuesta ${fmt(Combatiente.costoParry())} No2 · con ${defInv.nombre}`, attr:`data-invtirarstat="${inv.id}:parry"`},
-      {stat:'bloqueo', nombre:'Bloqueo', dado: f(bloqueoValorInv(inv)), clave:`inv:${inv.id}:stat:bloqueo`, motivo:`Sin costo · su Bloqueo + el Peso de ${defInv.nombre} (${fmt(num(defInv.peso))}) es el dado`, attr:`data-invtirarstat="${inv.id}:bloqueo"`}] : []),
+      parryPendienteInv.has(inv.id)
+        ? {stat:'bloqueo', nombre:`Bloqueo · ${defInv.nombre}`, dado: f(bloqueoValorInv(inv)), clave:`inv:${inv.id}:stat:bloqueo`, motivo:`Tras el Parry · sin costo · su Bloqueo + el Peso de ${defInv.nombre} (${fmt(num(defInv.peso))}) es el dado`, attr:`data-invtirarstat="${inv.id}:bloqueo"`}
+        // Apagado hasta el Parry, pero muestra lo que tiraría (para decidir entre Parry y Evasión).
+        : {stat:'bloqueo', nombre:'Bloqueo · tras el Parry', dado: f(bloqueoValorInv(inv)), sinNitros: true, clave:`inv:${inv.id}:stat:bloqueo`, motivo: `${Combatiente.BLOQUEO_SOLO_TRAS_PARRY} · con ${defInv.nombre} tiraría esto`, attr:`data-invtirarstat="${inv.id}:bloqueo"`}] : []),
   ];
   const tilesCombate = combate.map(c => {
     const mt = c.stat ? ModTirada.tile(inv.estados, c.stat) : {clase: '', html: '', titulo: ''};
@@ -4606,6 +4609,7 @@ function invAtacarSuelto(invId){
   const primero = num(inv.ataquesTurno) === 0;
   inv.nitros = num(inv.nitros) - costo;
   inv.ataquesTurno = num(inv.ataquesTurno) + 1;
+  parryPendienteInv.delete(inv.id);   // atacar cierra el Parry que esperaba su Bloqueo
   renderInvocaciones();
   tirarValorStatInv(inv, 'Atacar (PdG)', invStatValor(inv, 'pdg'), 'pdg');
   toast(`${inv.nombre}: -${fmt(costo)} No2 · ${primero ? 'primer ataque del turno' : 'ataque extra'}`);
@@ -4631,10 +4635,18 @@ function invDanio(invId, sinEfectos){   // sinEfectos: el duelo resuelve los efe
     },
   });
 }
-function invTirarStat(invId, statId){
+// Invocaciones con un Parry esperando su Bloqueo (el Bloqueo solo existe después de un Parry, regla del dueño 2026-09-30).
+// Se limpia al bloquear, atacar o pasar el turno. `o.trasParry`: el duelo ya sabe que el Parry se ganó.
+const parryPendienteInv = new Set();
+function invTirarStat(invId, statId, o){
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
   if((statId === 'parry' || statId === 'bloqueo') && !defensaInv(inv)){ toast(`${inv.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`); return; }
+  if(statId === 'bloqueo'){
+    if(!(o && o.trasParry) && !parryPendienteInv.has(inv.id)){ toast(`${inv.nombre}: ${Combatiente.BLOQUEO_SOLO_TRAS_PARRY}`); return; }
+    parryPendienteInv.delete(inv.id);
+    renderInvocaciones();
+  }
   if(statId === 'parry'){
     const costo = Combatiente.costoParry();   // el Parry siempre cuesta 1 No2
     if(costo > num(inv.nitros)){
@@ -4642,6 +4654,7 @@ function invTirarStat(invId, statId){
       return;
     }
     inv.nitros = num(inv.nitros) - costo;
+    parryPendienteInv.add(inv.id);   // si gana el Parry, sigue el Bloqueo
     renderInvocaciones();
     toast(`${inv.nombre}: Parry −${fmt(costo)} No2 · quedan ${fmt(inv.nitros)}`);
   }
@@ -5435,6 +5448,13 @@ function renderBotonera(){
   const fCombate = formulasCombate();
   // Parry y Bloqueo solo con un arma o un escudo equipado (regla del dueño, 2026-09-30): sin eso quedan apagados.
   const sinDefArma = !armasYEscudosParaParry().length;
+  // El Bloqueo solo existe después de un Parry, con esa misma arma o escudo (regla del dueño, 2026-09-30).
+  const armaBloqueo = parryArmaPendiente ? S.inventario.find(x => x.id === parryArmaPendiente && x.equipado) || null : null;
+  // Aunque todavía no se pueda tirar, se ve QUÉ tirarías con cada arma o escudo, para decidir entre Parry y Evasión
+  // (pedido del dueño, 2026-09-30): con uno, su fórmula; con varios, «Espada 1d8 · Escudo 1d10».
+  const fBloq = it => (formulaParaValor(bloqueoValorConArma(it)) || {}).formula || '';
+  const bloqueoPrevio = armaBloqueo ? fBloq(armaBloqueo)
+    : (() => { const l = armasYEscudosParaParry(); return l.length === 1 ? fBloq(l[0].item) : l.map(a => `${a.item.nombre} ${fBloq(a.item)}`).join(' · '); })();
   // Con dos armas, Atacar y Daño se desdoblan: uno por arma.
   const armasBotonera = armasEquipadasConDano();
   // Estados alterados que modifican cada tirada (2026-09-25): el botón se pinta de verde/rojo y dice cuáles (comun/modificadores-tirada.js).
@@ -5489,9 +5509,9 @@ function renderBotonera(){
             ${lupaBotonHtml('stat:parry')}
             <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">${sinDefArma ? 'sin arma ni escudo' : `🎲 ${esc(fCombate.parry)}`}</span>${sinDefArma ? '' : mtParry.html}
           </button>
-          <button type="button" class="botonera-tile${mtBloqueo.clase}${sinDefArma ? ' bt-sin-nitros' : ''}" data-botoneraaccion="bloqueo" title="${esc(sinDefArma ? Combatiente.SIN_ARMA_DEFENSA : 'Bloqueo con arma o escudo: tu Bloqueo (de Fuerza) MÁS su peso; esa suma es el dado que tirás. Después de un Parry, es el arma o escudo del Parry' + mtBloqueo.titulo)}">
+          <button type="button" class="botonera-tile${mtBloqueo.clase}${!armaBloqueo ? ' bt-sin-nitros' : ''}" data-botoneraaccion="bloqueo" title="${esc(sinDefArma ? Combatiente.SIN_ARMA_DEFENSA : !armaBloqueo ? Combatiente.BLOQUEO_SOLO_TRAS_PARRY + ': si ganaste el Parry, aguantás la fuerza del golpe con tu Fuerza + el peso de tu arma o escudo' : `Bloqueo con ${armaBloqueo.nombre} (tras el Parry): tu Bloqueo (de Fuerza) MÁS su peso; esa suma es el dado que tirás` + mtBloqueo.titulo)}">
             ${lupaBotonHtml('stat:bloqueo')}
-            <span class="bt-label">Bloqueo</span><span class="bt-value bt-value-formula">${sinDefArma ? 'sin arma ni escudo' : `🎲 ${esc(fCombate.bloqueo)}`}</span>${sinDefArma ? '' : mtBloqueo.html}
+            <span class="bt-label">Bloqueo${armaBloqueo ? ` · ${esc(armaBloqueo.nombre)}` : sinDefArma ? '' : ' · tras el Parry'}</span><span class="bt-value bt-value-formula">${sinDefArma ? 'sin arma ni escudo' : `🎲 ${esc(bloqueoPrevio)}`}</span>${sinDefArma ? '' : mtBloqueo.html}
           </button>
           <button type="button" class="botonera-tile" data-botoneraaccion="fuerzagolpe" style="grid-column:1/-1" title="Fuerza del golpe: tu Fuerza + el peso de tu arma; esa suma es el dado. Es tu tirada contra el Bloqueo del defensor cuando gana el Parry.">
             <span class="bt-label">Fuerza del golpe (contra su Bloqueo)</span><span class="bt-value bt-value-formula">🎲 Fue + peso</span>
@@ -10114,12 +10134,12 @@ function pdgParaArma(arma, c){
    Parry: siempre cuesta 1 No2 (2026-09-26, dueño; antes el Peso del arma o escudo), sin importar el arma o escudo ni cuántos ataques hiciste en
    el turno. Se puede parriar con cualquier arma o escudo equipado, no
    solo con las que hacen daño (`armasYEscudosParaParry`).
-   Bloqueo: tira el substat Bloqueo (sale de Fuerza) MÁS el peso del arma, y la SUMA es el dado (`bloqueoValorConArma`, 2026-09-24).
-   Con más de un arma/escudo equipado, se elige con cuál. Sin nada
-   equipado: el Parry igual cuesta 1 No2 y el Bloqueo no suma peso. */
-// Arma con la que se hizo el último Parry (id, o '' si fue sin arma). El Bloqueo que
-// sigue (defensa: Parry y después Bloqueo) usa esa misma arma sin volver a preguntar.
-// null = no hay un Parry esperando su Bloqueo. Se limpia al bloquear, atacar o pasar el turno.
+   Bloqueo: tira el substat Bloqueo (sale de Fuerza) MÁS el peso del arma o escudo, y la SUMA es el dado (`bloqueoValorConArma`, 2026-09-24).
+   Con más de un arma/escudo equipado, el Parry pregunta con cuál. Sin arma ni escudo no hay Parry ni Bloqueo, y el
+   Bloqueo SOLO existe después de un Parry, con la misma arma o escudo (reglas del dueño, 2026-09-30 — ver
+   comun/combatiente.js, BLOQUEO_SOLO_TRAS_PARRY). */
+// Arma o escudo con el que se hizo el último Parry (id). El Bloqueo que sigue usa ese mismo sin volver a preguntar.
+// null = no hay un Parry esperando su Bloqueo (entonces no hay Bloqueo). Se limpia al bloquear, atacar o pasar el turno.
 let parryArmaPendiente = null;
 // El Parry siempre cuesta 1 No2 (2026-09-26, dueño). Antes: el Peso del arma o escudo (2026-09-24) y antes la mitad.
 const costoParryNitros = () => Combatiente.costoParry();   // SIEMPRE 1 No2, sin importar el arma o escudo (comun/combatiente.js)
@@ -10159,10 +10179,11 @@ function parryConArma(arma, forzar){
   }
   S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(costo, `hizo Parry${con}`) : costo);
   renderNitros();
-  parryArmaPendiente = arma ? arma.id : '';
+  parryArmaPendiente = arma ? arma.id : null;   // queda esperando su Bloqueo (si ganás el Parry)
   tirarValorStat(arma ? `Parry · ${arma.nombre}` : 'Parry', statParaArma('parry', arma), 'parry');
-  toast(`Parry${con}: −${fmt(costo)} No2 · te quedan ${fmt(num(S.nitros))}`);
+  toast(`Parry${con}: −${fmt(costo)} No2 · te quedan ${fmt(num(S.nitros))}${arma ? ' · si lo ganás, tirá el Bloqueo' : ''}`);
   refresh();
+  if($('#scrim-botonera').classList.contains('open')) renderBotonera();
 }
 
 // El Bloqueo se calcula así (2026-09-24, pedido del dueño): tu Bloqueo (que sale de la Fuerza, con lo que le suma tu equipo) MÁS el
@@ -10403,7 +10424,7 @@ window.DUELO_HOOKS = {
   // El Bloqueo del defensor con el mismo arma o escudo con el que hizo Parry.
   bloquear: d => {
     const inv = dueloInvDe(d.defensor);
-    if(inv){ invTirarStat(inv.id, 'bloqueo'); return; }
+    if(inv){ invTirarStat(inv.id, 'bloqueo', {trasParry: true}); return; }   // el duelo ya sabe que ganó el Parry
     const it = d.defensa && d.defensa.itemId ? S.inventario.find(x => x.id === d.defensa.itemId) || null : null;
     parryArmaPendiente = null;
     // Con el arma o escudo del Parry; si ya no está, con el primero que haya en mano; sin nada, no hay Bloqueo.
@@ -10434,13 +10455,16 @@ function fuerzaGolpeConArma(arma){
 // Botones 🎲 Parry y 🎲 Bloqueo: con dos o más armas equipadas se elige con cuál.
 function elegirArmaDefensa(tipo){
   // Bloqueo justo después de un Parry: es con la misma arma, no se elige otra vez.
-  if(tipo === 'bloqueo' && parryArmaPendiente !== null){
+  // El Bloqueo solo existe después de un Parry, y es con la misma arma o escudo (regla del dueño, 2026-09-30).
+  if(tipo === 'bloqueo'){
     const armaDelParry = parryArmaPendiente ? S.inventario.find(x => x.id === parryArmaPendiente && x.equipado) : null;
     parryArmaPendiente = null;
-    if(armaDelParry){ bloqueoConArma(armaDelParry); return; }
-    // el arma o escudo del Parry ya no está equipado: se elige de nuevo
+    if(armaDelParry) bloqueoConArma(armaDelParry);
+    else toast(Combatiente.BLOQUEO_SOLO_TRAS_PARRY);
+    if($('#scrim-botonera').classList.contains('open')) renderBotonera();
+    return;
   }
-  // Parry y Bloqueo: con un arma o un escudo (regla del dueño, 2026-09-30); la Fuerza del golpe, con un arma que pega.
+  // Parry: con un arma o un escudo (regla del dueño, 2026-09-30); la Fuerza del golpe, con un arma que pega.
   const armas = tipo === 'fuerza' ? armasEquipadasConDano() : armasYEscudosParaParry();
   if(tipo !== 'fuerza' && !armas.length){ toast(Combatiente.SIN_ARMA_DEFENSA); return; }
   const ir = arma => (tipo === 'parry' ? parryConArma(arma) : tipo === 'fuerza' ? fuerzaGolpeConArma(arma) : bloqueoConArma(arma));
@@ -11066,6 +11090,7 @@ function mantenimiento(){
 
   S.turno = (S.turno || 1) + 1;
   parryArmaPendiente = null;
+  parryPendienteInv.clear();
   // Nitros se recargan al máximo y el primer ataque vuelve a costar la
   // mitad (el SP ya se regeneró al principio del Mantenimiento, ver arriba).
   S.nitros = nitrosMaximo();

@@ -69,4 +69,5 @@
 | 2026-09-30 | Automáticas + funciones del motor dentro de ficha y GM Tools (copias sin sesión) | ✔ 56/56 | Paso 1, tanda 1 (`comun/combatiente.js`). |
 | 2026-09-30 | En mesa: GM Tools ("Claude · pruebas": Pajaritos+Lisiado+Parálisis en un goblin, tirada de PdG, Sangrado ×2, jefe contra Stun) y ficha ("Test": estados recibidos, acumulación, Invulnerable, botones de colores, escudo) | ✔ | Apareció la diferencia de estados recibidos (Veneno ×3 → ×4 en personajes): corregida. Todo quedó como estaba. |
 | 2026-09-30 | Tanda 2 (tirar un stat): automáticas + ficha, invocación y GM Tools (copias sin sesión) | ✔ 65/65 | Invocaciones con Afortunado (P100) ya tiran dos veces. |
+| 2026-09-30 | Bloqueo solo tras un Parry: personaje (arma + escudo), invocación y creep (copias sin sesión) | ✔ 66/66 | Antes del Parry: apagado con «Espada 1d4 · Escudo 1d6»; tras el Parry: se tira con ese; un segundo Bloqueo no. |
 | 2026-09-30 | Parry y Bloqueo solo con arma o escudo: personaje (sin nada / con escudo), invocación (natural / con arma), creeps (sin arma, espada, garras, garras + escudo) | ✔ 66/66 | Sin opción → aviso y no cobra ni tira. |

@@ -806,7 +806,11 @@ versión parecida en más de una, es candidato a juntar.
   devuelve lo que se publica en la Mesa, no publica), `estadosQueAfectan` (los estados que se pintan en la Mesa),
   `costoParry()` y `armaParaDefensa({arma, natural, escudos})` (**Parry y Bloqueo solo con un arma o un escudo; un arma
   natural no alcanza, por ahora** — regla del dueño 2026-09-30; lo usan `armasYEscudosParaParry` de la ficha,
-  `defensaInv`, `defensaCreep` de GM Tools y `defensaCreepMapa` del mapa). **Una regla de combate nueva o corregida va acá, no en una herramienta.** La ficha, GM Tools
+  `defensaInv`, `defensaCreep` de GM Tools y `defensaCreepMapa` del mapa). **No hay Bloqueo sin Parry**
+  (`BLOQUEO_SOLO_TRAS_PARRY`, concepto del dueño 2026-09-30: el Parry intercepta el arma, el Bloqueo aguanta el golpe): cada
+  herramienta recuerda el Parry que espera su Bloqueo (`parryArmaPendiente` en la ficha, `parryPendienteInv`,
+  `parryPendienteCreep`); el botón de Bloqueo se ve siempre, apagado, mostrando lo que tiraría, para decidir entre Parry y
+  Evasión. **Una regla de combate nueva o corregida va acá, no en una herramienta.** La ficha, GM Tools
   y el mapa conservan los nombres de siempre como atajos de una línea (`estaBloqueadoElDebuffCreep` → `inmunidad`, etc.);
   `estados-aplicar.js` y `modificadores-tirada.js` también lo usan. Se carga **antes** de `estados-presets.js` en ficha,
   gm-tools, mapa y `datos/auditoria-skills.html`.

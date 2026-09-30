@@ -556,3 +556,8 @@ resuelven a mano, como el resto de los avisos).
   mínimo 1** (`pesoArmaCreep`/`pesoArmaInv`: `Math.max(1, armaPeso)`), aunque no tenga arma. Lo mismo pasa en la
   Fuerza del golpe de un creep. ¿Cuál vale para todos: 0 sin arma (como el personaje) o mínimo 1? Hasta decidirlo quedan
   como están.
+- ✅ **P128. Bloqueo sin Parry — 2026-09-30, regla y concepto del dueño.** El Parry (Destreza) es interceptar el arma del
+  rival con tu arma o escudo; si sale, el Bloqueo (Fuerza + pesos) es aguantar el golpe. **No hay Bloqueo sin Parry** (salvo
+  un contexto especial que se diseñe más adelante). En personaje, invocación y creep el botón de Bloqueo se ve siempre,
+  apagado y con lo que tirarías (para decidir entre Parry y Evasión), y se habilita recién después de un Parry, con la
+  misma arma o escudo (`Combatiente.BLOQUEO_SOLO_TRAS_PARRY`). En el duelo ya era así.

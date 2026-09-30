@@ -91,6 +91,11 @@ const Combatiente = (() => {
     return (o.escudos || []).find(e => e && e.nombre) || null;
   }
   const SIN_ARMA_DEFENSA = 'Sin un arma o un escudo no hay Parry ni Bloqueo (un arma natural tampoco, por ahora)';
+  /* El Bloqueo SIEMPRE viene después de un Parry (regla y concepto del dueño, 2026-09-30): cuando te atacan, el Parry
+     (Destreza) es interceptar el arma del rival con tu arma o tu escudo; si lo lográs, el Bloqueo (Fuerza + el peso de tu
+     arma o escudo) es aguantar la fuerza del golpe (Fuerza del atacante + el peso de su arma). Bloqueo sin Parry no existe,
+     salvo que se diseñe para un contexto especial. Cada herramienta recuerda el Parry que quedó esperando su Bloqueo. */
+  const BLOQUEO_SOLO_TRAS_PARRY = 'El Bloqueo se tira solo después de un Parry, con la misma arma o escudo';
 
   /* ---------- Escudo especial y Excedente de vida: cambiar el valor a mano (2026-09-24, dueño) ----------
      El texto puede ser un número (valor nuevo), +N / −N (sumar o restar) o «max N» (cambia el máximo). `max === null` =
@@ -168,6 +173,6 @@ const Combatiente = (() => {
     return false;
   }
 
-  return {mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA,
+  return {mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     escudoParsear, acumularVeneno, acumularSangrado, ajustarPreset, inmunidad};
 })();

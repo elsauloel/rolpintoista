@@ -48,4 +48,5 @@ Con las piezas de la etapa 2, el mapa arma la Botonera del personaje y las Accio
   piezas comunes; cualquier cartel se ve; avisa `embebido-abierto`/`embebido-cerrado`), cargado en la ficha y en GM Tools en
   lugar de sus listas fijas; el mapa escucha los avisos. Probado en un marco de prueba (cartel nuevo de GM Tools visible y
   avisado, Botonera abre/cierra, la Mesa no se ve, la Polilla se ve sin dejar la capa abierta, el cartel de solo lectura no
-  se ve).
+  se ve) y **en mesa** en "Claude · pruebas" (Acciones de un creep, un cartel suelto con la capa cerrada, la Botonera de un
+  personaje). Siguen los puntos 3 (mensajes en un archivo común) y 4 (abrir más rápido).

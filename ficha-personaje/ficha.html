@@ -2074,7 +2074,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-estado.js"></script>
 <script src="../comun/modificadores-tirada.js?v=20260930a"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930c"></script>
+<script src="../comun/combatiente.js?v=20260930d"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930b"></script>
 <script src="../comun/trampas-base.js"></script>
@@ -4017,7 +4017,7 @@ function nuevaInvocacion(){
     hp:5, hpMax:5, spd:5,  // Hp.Max = Con*5
     con:1, fue:1, agl:1, des:1, esp:1,
     ataquesTurno:0,  // inv.nitros lo pone migrarInvocacion: arranca en el máximo
-    armaTipo:8, armaPeso:1, armaFijo:0, armaAmplificado:0, armaDeRango:false, armaNombre:'', armaDetalle:'',
+    armaTipo:8, armaPeso:1, armaFijo:0, armaAmplificado:0, armaDeRango:false, armaNatural:false, armaNombre:'', armaDetalle:'',
     armaMods:[], armaEfectos:[], armaManos:'arma_1m',
     defensa:0, equipo:[],
     crit:[0,0,0,0,0],
@@ -4131,6 +4131,14 @@ function invNitrosMax(inv){
 function habInvAtaque(h){ return String((h && h.nitrosCosto) ?? '').trim().toUpperCase() === 'ATAQUE'; }
 // Parry y Bloqueo de una invocación (2026-09-24), igual que un creep: el Parry cuesta 1 No2 (2026-09-26); el Bloqueo = su Bloqueo + el Peso de su arma.
 function pesoArmaInv(inv){ return Math.max(1, num(inv.armaPeso) || 1); }
+// Con qué para la invocación (Parry y Bloqueo): su arma si no es natural, si no un escudo de su equipo; null = no puede
+// (regla del dueño 2026-09-30, comun/combatiente.js — la misma que personajes y creeps). El Bloqueo suma el peso de eso.
+function defensaInv(inv){
+  if(!inv) return null;
+  return Combatiente.armaParaDefensa({arma: inv.armaNombre ? {nombre: inv.armaNombre, peso: pesoArmaInv(inv)} : null, natural: inv.armaNatural === true,
+    escudos: (inv.equipo || []).filter(it => slotDe(it.tipoItem) === 'escudo').map(it => ({nombre: it.nombre, peso: num(it.peso)}))});
+}
+function bloqueoValorInv(inv){ const d = defensaInv(inv); return invStatValor(inv, 'bloqueo') + (d ? num(d.peso) : 0); }
 function costoAtaqueInv(inv){
   const tipo = num(inv.armaTipo) || 8;
   return num(inv.ataquesTurno) === 0 ? IT2_INV.redondeoPrimerAtaque(tipo / 2) : tipo;
@@ -4247,7 +4255,7 @@ function ponerEquipoEnInv(inv, d){
   const mods = (d.mods || []).filter(m => m.stat !== 'def');
   inv.defensa = num(inv.defensa) + def;
   inv.equipo = inv.equipo || [];
-  inv.equipo.push({id: uid(), nombre: d.nombre, tipoItem: d.tipoItem, def, mods, detalle: d.detalle || ''});
+  inv.equipo.push({id: uid(), nombre: d.nombre, tipoItem: d.tipoItem, def, mods, detalle: d.detalle || '', peso: num(d.peso)});   // peso: el de un escudo suma al Bloqueo
   if(modsAfectanHpInv(mods)) actualizarHpMaxPorConInv(inv);
 }
 function abrirEditorArmaInv(invId){
@@ -4429,6 +4437,7 @@ function renderEditarInv(){
       </div>
       ${inv.armaDetalle ? `<div class="hint">${esc(inv.armaDetalle)}</div>` : ''}
       ${(inv.armaEfectos||[]).length ? `<div class="hint"><b>Al golpear:</b> ${esc(EfectosGolpe.resumenLista(inv.armaEfectos))}</div>` : ''}
+      <label class="hint" style="display:flex;gap:6px;align-items:center;margin-top:4px" title="Un arma natural (garras, colmillos, puños…) no permite Parry ni Bloqueo, por ahora (regla del dueño, 2026-09-30)."><input type="checkbox" data-invf="armaNatural" data-invid="${inv.id}" style="width:auto"${inv.armaNatural ? ' checked' : ''}> Es un arma natural (garras, colmillos…): sin Parry ni Bloqueo</label>
     </div>
     <div class="inv-editar-separador"><span>Defensa y armadura</span></div>
     <div class="inv-row3">
@@ -4492,13 +4501,15 @@ function renderBotoneraInv(){
     </button>`).join('');
 
   const f = v => { const x = formulaParaValor(v); return x ? x.formula : ''; };
+  const defInv = defensaInv(inv);
   const combate = [
     {stat:'pdg', nombre:`Atacar (PdG) · ${fmt(costoAtaque)} No2`, dado: f(invStatValor(inv,'pdg')), sinNitros: sinNitrosAtaque, clave:`inv:${inv.id}:atacar`, motivo:`${sinNitrosAtaque?'Sin No2 · ':''}Cuesta ${fmt(costoAtaque)} No2 · ${cualAtaque}`, attr:`data-invatacar="${inv.id}"`},
     {nombre:'Daño Arma', dado: invDanoTxt(inv, invStatValor(inv,'dmg')), clave:`inv:${inv.id}:danio`, motivo:'Sin costo', attr:`data-invdanio="${inv.id}"`},
     {stat:'eva', nombre:'Esquivar (Eva)', dado: f(invStatValor(inv,'eva')), clave:`inv:${inv.id}:stat:eva`, motivo:'Sin costo', attr:`data-invtirarstat="${inv.id}:eva"`},
-    // Sin arma no se puede parriar (2026-09-28, regla del dueño — misma que la ficha).
-    ...(inv.armaNombre ? [{stat:'parry', nombre:`Parry · 1 No2`, dado: f(invStatValor(inv,'parry')), sinNitros: num(inv.nitros) < 1, clave:`inv:${inv.id}:stat:parry`, motivo:`${num(inv.nitros) < 1 ? 'Sin No2 · ' : ''}Cuesta 1 No2`, attr:`data-invtirarstat="${inv.id}:parry"`}] : []),
-    {stat:'bloqueo', nombre:'Bloqueo', dado: f(invStatValor(inv,'bloqueo') + pesoArmaInv(inv)), clave:`inv:${inv.id}:stat:bloqueo`, motivo:`Sin costo · su Bloqueo + el Peso de su arma (${fmt(pesoArmaInv(inv))}) es el dado`, attr:`data-invtirarstat="${inv.id}:bloqueo"`},
+    // Parry y Bloqueo solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30): sin eso, o con un arma
+    // natural, no aparecen (defensaInv).
+    ...(defInv ? [{stat:'parry', nombre:`Parry · ${fmt(Combatiente.costoParry())} No2`, dado: f(invStatValor(inv,'parry')), sinNitros: num(inv.nitros) < Combatiente.costoParry(), clave:`inv:${inv.id}:stat:parry`, motivo:`${num(inv.nitros) < Combatiente.costoParry() ? 'Sin No2 · ' : ''}Cuesta ${fmt(Combatiente.costoParry())} No2 · con ${defInv.nombre}`, attr:`data-invtirarstat="${inv.id}:parry"`},
+      {stat:'bloqueo', nombre:'Bloqueo', dado: f(bloqueoValorInv(inv)), clave:`inv:${inv.id}:stat:bloqueo`, motivo:`Sin costo · su Bloqueo + el Peso de ${defInv.nombre} (${fmt(num(defInv.peso))}) es el dado`, attr:`data-invtirarstat="${inv.id}:bloqueo"`}] : []),
   ];
   const tilesCombate = combate.map(c => {
     const mt = c.stat ? ModTirada.tile(inv.estados, c.stat) : {clase: '', html: '', titulo: ''};
@@ -4623,6 +4634,7 @@ function invDanio(invId, sinEfectos){   // sinEfectos: el duelo resuelve los efe
 function invTirarStat(invId, statId){
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
+  if((statId === 'parry' || statId === 'bloqueo') && !defensaInv(inv)){ toast(`${inv.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`); return; }
   if(statId === 'parry'){
     const costo = Combatiente.costoParry();   // el Parry siempre cuesta 1 No2
     if(costo > num(inv.nitros)){
@@ -4633,7 +4645,7 @@ function invTirarStat(invId, statId){
     renderInvocaciones();
     toast(`${inv.nombre}: Parry −${fmt(costo)} No2 · quedan ${fmt(inv.nitros)}`);
   }
-  const valor = statId === 'bloqueo' ? invStatValor(inv, 'bloqueo') + pesoArmaInv(inv) : invStatValor(inv, statId);
+  const valor = statId === 'bloqueo' ? bloqueoValorInv(inv) : invStatValor(inv, statId);
   tirarValorStatInv(inv, STAT_LABEL[statId] || statId, valor, statId);
 }
 function habilidadInvTira(h){ return !!(h.tiradaStat || (h.tiradaExtra||'').trim()); }
@@ -5421,6 +5433,8 @@ function renderBotonera(){
     ...STAT_LIST.filter(s => !STATS_SIN_TIRADA.includes(s.id) && !STATS_REDUNDANTES_COMBATE.includes(s.id)),
   ];
   const fCombate = formulasCombate();
+  // Parry y Bloqueo solo con un arma o un escudo equipado (regla del dueño, 2026-09-30): sin eso quedan apagados.
+  const sinDefArma = !armasYEscudosParaParry().length;
   // Con dos armas, Atacar y Daño se desdoblan: uno por arma.
   const armasBotonera = armasEquipadasConDano();
   // Estados alterados que modifican cada tirada (2026-09-25): el botón se pinta de verde/rojo y dice cuáles (comun/modificadores-tirada.js).
@@ -5471,13 +5485,13 @@ function renderBotonera(){
             ${lupaBotonHtml('stat:eva')}
             <span class="bt-label">Esquivar (Eva)</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.eva)}</span>${mtEva.html}
           </button>
-          <button type="button" class="botonera-tile${mtParry.clase}" data-botoneraaccion="parry" title="${esc('Parry con arma o escudo: siempre cuesta 1 No2 (' + costoParryTxt() + ')' + mtParry.titulo)}">
+          <button type="button" class="botonera-tile${mtParry.clase}${sinDefArma ? ' bt-sin-nitros' : ''}" data-botoneraaccion="parry" title="${esc(sinDefArma ? Combatiente.SIN_ARMA_DEFENSA : 'Parry con arma o escudo: siempre cuesta 1 No2 (' + costoParryTxt() + ')' + mtParry.titulo)}">
             ${lupaBotonHtml('stat:parry')}
-            <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.parry)}</span>${mtParry.html}
+            <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">${sinDefArma ? 'sin arma ni escudo' : `🎲 ${esc(fCombate.parry)}`}</span>${sinDefArma ? '' : mtParry.html}
           </button>
-          <button type="button" class="botonera-tile${mtBloqueo.clase}" data-botoneraaccion="bloqueo" title="${esc('Bloqueo: tu Bloqueo (de Fuerza) MÁS el peso del arma; esa suma es el dado que tirás. Después de un Parry, es el arma del Parry' + mtBloqueo.titulo)}">
+          <button type="button" class="botonera-tile${mtBloqueo.clase}${sinDefArma ? ' bt-sin-nitros' : ''}" data-botoneraaccion="bloqueo" title="${esc(sinDefArma ? Combatiente.SIN_ARMA_DEFENSA : 'Bloqueo con arma o escudo: tu Bloqueo (de Fuerza) MÁS su peso; esa suma es el dado que tirás. Después de un Parry, es el arma o escudo del Parry' + mtBloqueo.titulo)}">
             ${lupaBotonHtml('stat:bloqueo')}
-            <span class="bt-label">Bloqueo</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.bloqueo)}</span>${mtBloqueo.html}
+            <span class="bt-label">Bloqueo</span><span class="bt-value bt-value-formula">${sinDefArma ? 'sin arma ni escudo' : `🎲 ${esc(fCombate.bloqueo)}`}</span>${sinDefArma ? '' : mtBloqueo.html}
           </button>
           <button type="button" class="botonera-tile" data-botoneraaccion="fuerzagolpe" style="grid-column:1/-1" title="Fuerza del golpe: tu Fuerza + el peso de tu arma; esa suma es el dado. Es tu tirada contra el Bloqueo del defensor cuando gana el Parry.">
             <span class="bt-label">Fuerza del golpe (contra su Bloqueo)</span><span class="bt-value bt-value-formula">🎲 Fue + peso</span>
@@ -5933,6 +5947,7 @@ document.addEventListener('input', e => {
     if(!inv) return;
     const campo = t.dataset.invf;
     const noNumericos = ['nombre','notas'];
+    if(t.type === 'checkbox'){ inv[campo] = t.checked; renderInvocaciones(); return; }
     inv[campo] = noNumericos.includes(campo) ? t.value : num(t.value);
     if(campo === 'cooldown') inv.cooldownActual = Math.min(num(inv.cooldownActual), num(inv.cooldown));
     return;
@@ -10330,7 +10345,7 @@ window.DUELO_HOOKS = {
   // del 🎯/✨ — misma regla que un ataque normal, P121: sin arma ni escudo equipado, no hay Parry.)
   puedeParry: d => {
     const inv = dueloInvDe(d.defensor);
-    return inv ? !!inv.armaNombre : armasYEscudosParaParry().length > 0;
+    return inv ? !!defensaInv(inv) : armasYEscudosParaParry().length > 0;   // arma de verdad o escudo (2026-09-30)
   },
   // Cómo puede defenderse (elige a ciegas): Evasión, o Parry con cada arma o escudo equipado (siempre 1 No2).
   opcionesDefensa: d => {
@@ -10340,9 +10355,10 @@ window.DUELO_HOOKS = {
     if(inv){
       const c = Combatiente.costoParry();
       const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${fx(invStatValor(inv, 'eva'), 'eva', inv.estados)}`]}];
-      // Sin arma no se puede parriar (2026-09-28, regla del dueño — misma que la ficha).
-      if(inv.armaNombre) ops.push({modo: 'parry', itemId: '', itemNombre: inv.armaNombre, etiqueta: `🗡 Parry · ${inv.armaNombre}`, costo: c, motivoNo: c > num(inv.nitros) ? 'no le alcanzan los No2' : '',
-        info: [`Parry 🎲 ${fx(invStatValor(inv, 'parry'), 'parry', inv.estados)}`, `si ganás, Bloqueo 🎲 ${fx(invStatValor(inv, 'bloqueo') + pesoArmaInv(inv))}`]});
+      // Parry solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30; un arma natural no alcanza, por ahora).
+      const def = defensaInv(inv);
+      if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === inv.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}`, costo: c, motivoNo: c > num(inv.nitros) ? 'no le alcanzan los No2' : '',
+        info: [`Parry 🎲 ${fx(invStatValor(inv, 'parry'), 'parry', inv.estados)}`, `si ganás, Bloqueo 🎲 ${fx(bloqueoValorInv(inv))}`]});
       return ops;
     }
     const sobre = compute().sobrecarga;
@@ -10390,7 +10406,10 @@ window.DUELO_HOOKS = {
     if(inv){ invTirarStat(inv.id, 'bloqueo'); return; }
     const it = d.defensa && d.defensa.itemId ? S.inventario.find(x => x.id === d.defensa.itemId) || null : null;
     parryArmaPendiente = null;
-    bloqueoConArma(it);
+    // Con el arma o escudo del Parry; si ya no está, con el primero que haya en mano; sin nada, no hay Bloqueo.
+    const conQue = it || ((armasYEscudosParaParry()[0] || {}).item) || null;
+    if(!conQue){ toast(Combatiente.SIN_ARMA_DEFENSA); return; }
+    bloqueoConArma(conQue);
   },
   // Con qué arma contraataca (la del Parry si es un arma con daño; si no, la primera arma equipada con daño).
   armaContra: d => {
@@ -10417,19 +10436,17 @@ function elegirArmaDefensa(tipo){
   // Bloqueo justo después de un Parry: es con la misma arma, no se elige otra vez.
   if(tipo === 'bloqueo' && parryArmaPendiente !== null){
     const armaDelParry = parryArmaPendiente ? S.inventario.find(x => x.id === parryArmaPendiente && x.equipado) : null;
-    if(!parryArmaPendiente || armaDelParry){
-      parryArmaPendiente = null;
-      bloqueoConArma(armaDelParry || null);
-      return;
-    }
-    parryArmaPendiente = null;   // el arma ya no está equipada: se elige de nuevo
+    parryArmaPendiente = null;
+    if(armaDelParry){ bloqueoConArma(armaDelParry); return; }
+    // el arma o escudo del Parry ya no está equipado: se elige de nuevo
   }
-  const armas = tipo === 'parry' ? armasYEscudosParaParry() : armasEquipadasConDano();
-  if(tipo === 'parry' && !armas.length){ toast('No podés parriar sin un arma o escudo equipado'); return; }
+  // Parry y Bloqueo: con un arma o un escudo (regla del dueño, 2026-09-30); la Fuerza del golpe, con un arma que pega.
+  const armas = tipo === 'fuerza' ? armasEquipadasConDano() : armasYEscudosParaParry();
+  if(tipo !== 'fuerza' && !armas.length){ toast(Combatiente.SIN_ARMA_DEFENSA); return; }
   const ir = arma => (tipo === 'parry' ? parryConArma(arma) : tipo === 'fuerza' ? fuerzaGolpeConArma(arma) : bloqueoConArma(arma));
   if(armas.length <= 1){ ir(armas.length ? armas[0].item : null); return; }
   $('#elegir-arma-lista').innerHTML =
-    `<div class="hint">${tipo === 'parry' ? 'Parry: siempre cuesta 1 No2, sea cual sea el arma o escudo que elijas.' : tipo === 'fuerza' ? 'Fuerza del golpe: tu Fuerza + el peso del arma que elijas; esa suma es el dado (contra el Bloqueo del defensor).' : 'Bloqueo: tu Bloqueo + el peso del arma que elijas; esa suma es el dado que tirás. (Después de un Parry se usa el arma del Parry solo.)'}</div>` +
+    `<div class="hint">${tipo === 'parry' ? 'Parry: siempre cuesta 1 No2, sea cual sea el arma o escudo que elijas.' : tipo === 'fuerza' ? 'Fuerza del golpe: tu Fuerza + el peso del arma que elijas; esa suma es el dado (contra el Bloqueo del defensor).' : 'Bloqueo: tu Bloqueo + el peso del arma o escudo que elijas; esa suma es el dado que tirás. (Después de un Parry se usa el mismo, solo.)'}</div>` +
     armas.map(a => `
     <button class="btn" data-defarma="${tipo}:${a.item.id}" style="width:100%">
       ${a.mano ? `Mano ${a.mano}: ` : ''}${esc(a.item.nombre)} — ${tipo === 'parry' ? `${fmt(costoParryNitros(a.item))} No2` : `+${fmt(num(a.item.peso))} de peso`}

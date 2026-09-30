@@ -1291,7 +1291,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/plantillas.js?v=20260930a"></script>
 <script src="../comun/biblioteca.js?v=20260929i"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930c"></script>
+<script src="../comun/combatiente.js?v=20260930d"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930b"></script>
 <script src="../comun/creeps-base.js?v=20260927a"></script>
@@ -2077,7 +2077,14 @@ function costoHabCreepTxt(sc, h){
 // el Bloqueo suma su Bloqueo + el Peso del arma y ESA SUMA es el dado.
 function pesoArmaCreep(sc){ return Math.max(1, num(sc.armaPeso) || 1); }
 function costoParryCreep(sc){ return Combatiente.costoParry(); }   // siempre 1 No2, sin importar el arma (comun/combatiente.js)
-function bloqueoValorCreep(sc){ return creepStatValor(sc, 'bloqueo') + pesoArmaCreep(sc); }
+// Con qué para el creep (Parry y Bloqueo): su arma si no es natural, si no un escudo de su equipo; null = no puede
+// (regla del dueño 2026-09-30, comun/combatiente.js). El Bloqueo suma el peso de eso.
+function defensaCreep(sc){
+  if(!sc) return null;
+  return Combatiente.armaParaDefensa({arma: sc.armaNombre ? {nombre: sc.armaNombre, peso: pesoArmaCreep(sc)} : null, natural: sc.armaNatural,
+    escudos: (sc.equipo || []).filter(it => slotDeGM(it.tipoItem) === 'escudo').map(it => ({nombre: it.nombre, peso: num(it.peso)}))});
+}
+function bloqueoValorCreep(sc){ const d = defensaCreep(sc); return creepStatValor(sc, 'bloqueo') + (d ? num(d.peso) : 0); }
 // Fuerza del golpe (reglas del escudo, 2026-09-26): la tirada del atacante contra el Bloqueo del defensor = su Fuerza (con los estados activos) + el peso de su arma; la SUMA es el dado.
 function fuerzaGolpeValorCreep(sc){ return num(sc.fue) + (sc.estados || []).filter(e => e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'fue').reduce((x, m) => x + num(m.val) * Math.max(1, num(e.stacks) || 1), 0), 0) + pesoArmaCreep(sc); }
 // Contraataque (regla a prueba, 2026-09-26): tras un Parry, siempre cuesta lo de un primer ataque y no suma al conteo de ataques del turno.
@@ -2737,15 +2744,16 @@ function renderAccionesCreep(){
     </button>`).join('');
 
   const fc = formulasCombateCreep(sc);
+  const defCreep = defensaCreep(sc);
   const combate = [
     // Atacar sin No2 no se deshabilita (un botón deshabilitado no deja abrir la 🔍): al tocarlo avisa.
     {stat:'pdg', nombre:`Atacar (PdG) · ${fmt(costoAtaque)} No2`, dado: fc.pdg, sinNitros: sinNitrosAtaque, lupa:'atacar', motivo: `${sinNitrosAtaque ? 'Sin No2 · ' : ''}Cuesta ${fmt(costoAtaque)} No2 · ${cualAtaque}`, attr:`data-atacarcreep="${sc.id}"`},
     {nombre:'Daño Arma', dado: danoTxt(sc, creepStatValor(sc, 'dmg')), lupa:'danio', motivo:'Sin costo', attr:`data-daniocreep="${sc.id}"`},
     {stat:'eva', nombre:'Esquivar (Eva)', dado: fc.eva, lupa:'stat|eva', motivo:'Sin costo', attr:`data-esquivarcreep="${sc.id}"`},
-    // Sin arma no se puede parriar (2026-09-28, regla del dueño — misma que la ficha; un arma natural puesta en
-    // sc.armaNombre cuenta como arma).
-    ...(sc.armaNombre ? [{stat:'parry', nombre:`Parry · ${fmt(costoParryCreep(sc))} No2`, dado: fc.parry, sinNitros: num(sc.nitros) < costoParryCreep(sc), lupa:'stat|parry', motivo:`${num(sc.nitros) < costoParryCreep(sc) ? 'Sin No2 · ' : ''}Cuesta ${fmt(costoParryCreep(sc))} No2`, attr:`data-parrycreep="${sc.id}"`}] : []),
-    {stat:'bloqueo', nombre:'Bloqueo', dado: fc.bloqueo, lupa:'stat|bloqueo', motivo:`Sin costo · su Bloqueo + el Peso de su arma (${fmt(pesoArmaCreep(sc))}) es el dado`, attr:`data-bloqueocreep="${sc.id}"`},
+    // Parry y Bloqueo solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30): sin eso, o con un arma
+    // natural, no aparecen (defensaCreep).
+    ...(defCreep ? [{stat:'parry', nombre:`Parry · ${fmt(costoParryCreep(sc))} No2`, dado: fc.parry, sinNitros: num(sc.nitros) < costoParryCreep(sc), lupa:'stat|parry', motivo:`${num(sc.nitros) < costoParryCreep(sc) ? 'Sin No2 · ' : ''}Cuesta ${fmt(costoParryCreep(sc))} No2 · con ${defCreep.nombre}`, attr:`data-parrycreep="${sc.id}"`},
+      {stat:'bloqueo', nombre:'Bloqueo', dado: fc.bloqueo, lupa:'stat|bloqueo', motivo:`Sin costo · su Bloqueo + el Peso de ${defCreep.nombre} (${fmt(num(defCreep.peso))}) es el dado`, attr:`data-bloqueocreep="${sc.id}"`}] : []),
     {nombre:'Fuerza del golpe', dado: fc.fuerza, motivo:`Sin costo · su Fuerza + el Peso de su arma (${fmt(pesoArmaCreep(sc))}) es el dado: su tirada contra el Bloqueo del defensor`, attr:`data-fuerzacreep="${sc.id}"`},
   ];
   // Sentado: levantarse cuesta 1 No2 y saca el estado (ver data-levantarcreep).
@@ -4923,6 +4931,7 @@ document.addEventListener('click', e => {
   if(b.dataset.parrycreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.parrycreep);
     if(!sc) return;
+    if(!defensaCreep(sc)){ toast(`${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`); return; }
     const costo = costoParryCreep(sc);
     if(costo > num(sc.nitros)){
       toast(`${sc.nombre}: no le alcanzan los No2 — el Parry cuesta ${fmt(costo)} No2 y tiene ${fmt(num(sc.nitros))}`);
@@ -4971,7 +4980,9 @@ document.addEventListener('click', e => {
   if(b.dataset.bloqueocreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.bloqueocreep);
     if(!sc) return;
-    tirarValorStat(`${sc.nombre} · Bloqueo`, bloqueoValorCreep(sc));
+    const def = defensaCreep(sc);
+    if(!def){ toast(`${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`); return; }
+    tirarValorStat(`${sc.nombre} · Bloqueo · ${def.nombre}`, bloqueoValorCreep(sc), sc, 'bloqueo');
     return;
   }
   if(b.dataset.armanat){
@@ -7714,7 +7725,7 @@ window.DUELO_HOOKS = {
   // normal, P121: sin arma no hay Parry.)
   puedeParry: d => {
     const sc = S.creeps.find(c => c.id === d.defensor.ref);
-    return !!(sc && sc.armaNombre);
+    return !!defensaCreep(sc);   // arma de verdad o escudo (un arma natural no alcanza, por ahora)
   },
   // Cómo puede defenderse el creep (elige el GM, a ciegas): Evasión o Parry con su arma (siempre 1 No2).
   opcionesDefensa: d => {
@@ -7725,8 +7736,9 @@ window.DUELO_HOOKS = {
     const fx = (v, statId) => { const f = formulaParaValor(v); if(!f) return fmt(num(v)); const mit = statId ? mitadesDeTirada(sc.estados, statId) : 0; return f.formula + ' ÷2'.repeat(mit); };
     const c = costoParryCreep(sc);
     const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${fx(creepStatValor(sc, 'eva'), 'eva')}`]}];
-    // Sin arma no se puede parriar (2026-09-28, regla del dueño — misma que la ficha).
-    if(sc.armaNombre) ops.push({modo: 'parry', itemId: '', itemNombre: sc.armaNombre, etiqueta: `🗡 Parry · ${sc.armaNombre}`, costo: c, motivoNo: c > num(sc.nitros) ? 'no le alcanzan los No2' : '',
+    // Parry solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30; un arma natural no alcanza, por ahora).
+    const def = defensaCreep(sc);
+    if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === sc.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}`, costo: c, motivoNo: c > num(sc.nitros) ? 'no le alcanzan los No2' : '',
       info: [`Parry 🎲 ${fx(creepStatValor(sc, 'parry'), 'parry')}`, `si gana, Bloqueo 🎲 ${fx(bloqueoValorCreep(sc))}`]});
     return ops;
   },
@@ -7734,6 +7746,7 @@ window.DUELO_HOOKS = {
     const sc = S.creeps.find(c => c.id === d.defensor.ref);
     if(!sc) return;
     if(modo === 'parry'){
+      if(!defensaCreep(sc)){ toast(`${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`); return; }
       const costo = costoParryCreep(sc);
       if(costo > num(sc.nitros)){ toast(`${sc.nombre}: no le alcanzan los No2 — el Parry cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`); return; }
       sc.nitros = num(sc.nitros) - costo;
@@ -7748,7 +7761,7 @@ window.DUELO_HOOKS = {
   },
   bloquear: d => {
     const sc = S.creeps.find(c => c.id === d.defensor.ref);
-    if(sc) tirarValorStat(`${sc.nombre} · Bloqueo`, bloqueoValorCreep(sc));
+    if(sc) tirarValorStat(`${sc.nombre} · Bloqueo`, bloqueoValorCreep(sc), sc, 'bloqueo');
   },
   armaContra: d => {
     const sc = S.creeps.find(c => c.id === d.defensor.ref);

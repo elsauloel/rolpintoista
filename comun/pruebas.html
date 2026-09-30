@@ -204,6 +204,17 @@ prueba('la Mesa pinta los mismos estados que parten la tirada', () => {
   igual([Combatiente.estadosQueAfectan(es, 'pdg').map(e => e.n), Combatiente.estadosQueAfectan(es, 'eva').map(e => e.n)], [['Lisiado'], ['Parálisis']]);
 });
 prueba('el Parry cuesta 1 No2', () => igual(Combatiente.costoParry(), 1));
+prueba('Parry y Bloqueo: con arma o escudo; sin nada o con arma natural, no', () => {
+  const espada = {nombre: 'Espada', peso: 3}, escudo = {nombre: 'Escudo', peso: 2};
+  igual([
+    Combatiente.armaParaDefensa({arma: espada}),
+    Combatiente.armaParaDefensa({arma: null, escudos: [escudo]}),
+    Combatiente.armaParaDefensa({arma: {nombre: 'Garras', peso: 1}, natural: true}),
+    Combatiente.armaParaDefensa({arma: {nombre: 'Garras', peso: 1}, natural: true, escudos: [escudo]}),
+    Combatiente.armaParaDefensa({arma: null}),
+    Combatiente.armaParaDefensa({arma: {nombre: '', peso: 1}}),
+  ], [espada, escudo, null, escudo, null, null]);
+});
 prueba('estados-aplicar usa el motor: un jefe rebota el Stun', () => igual(EstadosAplicar.aplicarACreep({jefe: true, estados: []}, {nombre: 'Stun'}).motivo, 'Protección de jefe'));
 
 /* ---------- Plantillas (comun/plantillas.js) ---------- */

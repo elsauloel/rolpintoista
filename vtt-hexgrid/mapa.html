@@ -932,7 +932,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/plantillas.js?v=20260930a"></script>
 <script src="../comun/biblioteca.js?v=20260929i"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930c"></script>
+<script src="../comun/combatiente.js?v=20260930d"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930b"></script>
 <script src="../comun/trampas-base.js"></script>
@@ -9831,11 +9831,16 @@ function dueloOpcionesLocal(d){
   const sc = creepPrivadoDe(ref);
   if(!sc) return motivo('no encuentro los datos de ese creep');
   window.DUELO_MOTIVO = '';
-  if(d.hab) return Duelo.opcionesHab(d);   // habilidad dirigida: lo que puede tirar el creep contra ella
-  const arma = sc.armaNombre || 'su arma';
-  const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión'},
-    {modo: 'parry', itemId: '', itemNombre: arma, etiqueta: `🗡 Parry · ${arma}`, costo: 1, motivoNo: num(sc.nitros) < 1 ? 'no le alcanzan los No2' : ''}];
+  if(d.hab) return Duelo.opcionesHab(d, {puedeParry: () => !!defensaCreepMapa(sc)});   // habilidad dirigida: lo que puede tirar el creep contra ella
+  // Parry solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30, comun/combatiente.js; la misma que GM Tools).
+  const def = defensaCreepMapa(sc), c = Combatiente.costoParry();
+  const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión'}];
+  if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === sc.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}`, costo: c, motivoNo: num(sc.nitros) < c ? 'no le alcanzan los No2' : ''});
   return d.ataque && d.ataque.sinParry ? ops.filter(o => o.modo !== 'parry') : ops;   // Takle y otros ataques que no se pueden parrear
+}
+function defensaCreepMapa(sc){
+  return Combatiente.armaParaDefensa({arma: sc.armaNombre ? {nombre: sc.armaNombre, peso: Math.max(1, num(sc.armaPeso) || 1)} : null, natural: sc.armaNatural === true,
+    escudos: (sc.equipo || []).filter(it => String(it.tipoItem || '').startsWith('escudo')).map(it => ({nombre: it.nombre, peso: num(it.peso)}))});
 }
 
 // Pone el estado de un efecto del golpe sobre el defensor (solo corre en el mapa del GM). Creep: se escribe su estado; personaje: le llega a su ficha (mismo

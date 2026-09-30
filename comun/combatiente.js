@@ -81,6 +81,16 @@ const Combatiente = (() => {
   }
   // El Parry cuesta siempre 1 No2, con cualquier arma o escudo (2026-09-26, dueño). Sin arma ni escudo no se puede (P121).
   function costoParry(){ return 1; }
+  /* Parry y Bloqueo: SOLO con un arma o un escudo de verdad (regla del dueño, 2026-09-30, "hasta que diga lo contrario").
+     Sin nada no hay opción, y un arma natural (garras, colmillos, puños…) tampoco la da por ahora: sería circunstancial y
+     narrativo, se evalúa más adelante. Recibe {arma: {nombre, peso}|null, natural, escudos: [{nombre, peso}]} y devuelve
+     con qué se para (el arma si es de verdad, si no el primer escudo) o null. El Bloqueo suma el peso de eso. */
+  function armaParaDefensa(o){
+    o = o || {};
+    if(o.arma && o.arma.nombre && !o.natural) return o.arma;
+    return (o.escudos || []).find(e => e && e.nombre) || null;
+  }
+  const SIN_ARMA_DEFENSA = 'Sin un arma o un escudo no hay Parry ni Bloqueo (un arma natural tampoco, por ahora)';
 
   /* ---------- Escudo especial y Excedente de vida: cambiar el valor a mano (2026-09-24, dueño) ----------
      El texto puede ser un número (valor nuevo), +N / −N (sumar o restar) o «max N» (cambia el máximo). `max === null` =
@@ -158,6 +168,6 @@ const Combatiente = (() => {
     return false;
   }
 
-  return {mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, costoParry,
+  return {mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA,
     escudoParsear, acumularVeneno, acumularSangrado, ajustarPreset, inmunidad};
 })();

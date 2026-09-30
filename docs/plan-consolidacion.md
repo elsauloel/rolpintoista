@@ -88,8 +88,13 @@ Cada paso: qué es, qué se gana, qué se arriesga, cómo se prueba. Se pueden e
     entrar en una zona, en el mapa). Comparada contra la versión vieja en 4790 casos con los mismos dados: mismos
     totales. Diferencias corregidas: las invocaciones no tiraban dos veces con Afortunado (**P100**, ya anotada como bug)
     y el cartel de la Mesa mostraba "Parálisis" aunque no partiera la tirada. **Costo del Parry** (`costoParry`, 1 No2)
-    en un solo lugar. **Pendiente de decidir (P127):** el peso mínimo del arma en el Bloqueo de creeps e invocaciones.
-    Pruebas: 65.
+    en un solo lugar. Pruebas: 65.
+  - **Regla nueva del dueño, aplicada en el motor** (2026-09-30, resuelve P127): **Parry y Bloqueo solo con un arma o un
+    escudo**; sin nada no hay opción, y un arma natural tampoco, por ahora (`Combatiente.armaParaDefensa`). Antes: el
+    personaje podía tirar Bloqueo sin nada y no podía elegir un escudo para bloquear; creeps e invocaciones bloqueaban
+    siempre y parriaban con garras; y el mapa tenía **su propia copia** de las defensas de un creep que ofrecía Parry aunque
+    no tuviera arma. Ahora las cuatro vías usan la misma regla. Las invocaciones suman el tilde "arma natural" (como los
+    creeps). Pruebas: 66.
   - **Tanda 3 (siguiente)**: los adaptadores de "combatiente" (leer stat, estados, No2, HP y escudo de un personaje, una
     invocación o un creep con la misma forma) y los costos de atacar (Tipo ÷ 2 el primero, completo después), hoy en
     tres versiones. `mantenimiento` (3 versiones) queda para el paso 2.

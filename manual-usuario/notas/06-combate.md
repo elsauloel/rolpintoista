@@ -187,7 +187,8 @@ El **Bloqueo** (de [[Fuerza]]) es la **segunda tirada** de una defensa con [[Par
 
 - Se calcula sumando tu stat Bloqueo (de [[Fuerza]]) **más el peso del arma o escudo** con la que hiciste el Parry, y **esa suma es el dado que tirás** (Bloqueo 6 + Peso 4 = 10 → 1d10).
 - Si tenés más de un arma o escudo, se usa **el mismo con el que hiciste el Parry** (no vuelve a preguntarte).
-- Sin nada equipado, el Bloqueo no suma peso.
+- **Parry y Bloqueo solo se pueden hacer con un arma o un escudo** (regla del dueño, 2026-09-30): sin nada equipado no hay opción. Vale igual para personajes, invocaciones y creeps.
+- **Un arma natural** (garras, colmillos, puños…) **no da Parry ni Bloqueo**, por ahora: sería algo circunstancial y narrativo, se va a evaluar más adelante. Un creep o una invocación con arma natural y un escudo sí puede parar con el escudo.
 
 > [!success] ¿Contra qué se tira? (cerrada 2026-09-26)
 > Es un **enfrentamiento de sumas**: tu Bloqueo (Fuerza) + Peso del arma o escudo del Parry **contra** la Fuerza del atacante + Peso de su arma. El atacante tira con el botón 🎲 **Fuerza del golpe**.

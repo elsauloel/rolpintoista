@@ -508,7 +508,7 @@ resuelven a mano, como el resto de los avisos).
   mismas reglas". Se sacó Parry del combate de una invocación (`ficha.html`, cuando `!inv.armaNombre`) y de un
   creep (`gm-tools.html`, cuando `!sc.armaNombre`), tanto de su fila de combate propia como del menú "Elegí
   cómo te defendés" del duelo — un arma natural (garras, colmillos…) puesta en `armaNombre` sigue contando
-  como arma, así que esos creeps no pierden Parry.
+  como arma, así que esos creeps no pierden Parry. **Cambiado el 2026-09-30 (dueño):** un arma natural ya NO da Parry ni Bloqueo, por ahora; un escudo sí (ver P127).
 
 - ⏸ **P120. Reglas de arma de rango, pendientes — 2026-09-27 (auditando la clase Shooter).** Al llegar a la clase **Shooter** en `docs/clases-borrador.md`, la mayoría de sus 10 skills piden mecánicas que todavía no existen en el juego: **cooldown de arma para personajes** (Acelerado — hoy el cooldown solo existe en las habilidades de creep), **reaccionar a un ataque entrante con un disparo propio** (Parry a distancia), **un ataque normal (no hechizo de área) que pegue a más de un objetivo** (Proyectil perforante, Disparo múltiple — el sistema de área en cascada de `comun/duelo.js` hoy es solo para habilidades tipo hechizo), **una marca sobre el objetivo que da bono mientras lo ataques** (Marcar — `efectoMods` de hoy siempre es sobre quien lo tiene, no "bono contra X"), y **línea de tiro esquivando obstáculos** (Tiro con comba). El dueño decidió **dejar Shooter en pausa entera hasta definir las reglas generales de arma de rango** (el módulo "Reglas del tiro" al pie de `clases-borrador.md`, hoy solo la fórmula vieja del PDF con 1d20 y distancia máxima = DES, sin uso real en el juego) — de ahí probablemente salgan resueltas varias de estas mecánicas de una. **Solo 2 de las 10 cerraban limpio con lo que ya existe** (Enfocado con `duelo:{modo:'arma', arma:{fijo:2}}`; Headshot igual salvo la salvedad "falla si no es crítico", que no se puede automatizar) y una a medias con precedente (Apuntar, como Cañón Vasco: cobra No2/SP variable pero el bono en sí queda a mano) — no se cargó ninguna todavía, para no auditarlas a medias antes de la base. Se sigue con **Support** mientras tanto.
 
@@ -550,7 +550,7 @@ resuelven a mano, como el resto de los avisos).
   con **± Nivel → ✎ A mano** (Inteligencia invertida y niveles extra, para arriba o para abajo; avisa si se invierte de
   más, no bloquea). En pantalla se llaman **Talentos** (los datos siguen en `S.sociales`). **Queda por definir:** el
   catálogo de talentos, Carisma/Persuasión/Intuición y cómo cerrar el mecanismo (ver "A desarrollar").
-- 🔲 **P127. El peso del arma en el Bloqueo: ¿mínimo 1 para creeps e invocaciones? — 2026-09-30 (paso 1 de la consolidación).**
+- ✅ **P127. El peso del arma en el Bloqueo: ¿mínimo 1 para creeps e invocaciones? — 2026-09-30, resuelta el mismo día.** Regla del dueño: **Parry y Bloqueo solo con un arma o un escudo**; sin nada no hay opción, y **un arma natural tampoco** (garras, colmillos: circunstancial y narrativo, se evalúa más adelante). El caso "sin arma" desaparece: el Bloqueo suma el peso del arma o escudo con el que se para (`Combatiente.armaParaDefensa`). Pregunta original:
   El Bloqueo es tu Bloqueo + el Peso del arma, y esa suma es el dado (igual en los tres). Diferencia encontrada: al
   **personaje** sin arma se le suma 0 y con un arma de Peso 0, 0; a un **creep** o una **invocación** se le suma **como
   mínimo 1** (`pesoArmaCreep`/`pesoArmaInv`: `Math.max(1, armaPeso)`), aunque no tenga arma. Lo mismo pasa en la

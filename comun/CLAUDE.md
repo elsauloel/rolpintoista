@@ -803,8 +803,10 @@ versión parecida en más de una, es candidato a juntar.
   Sentado), `escudoParsear`, `acumularVeneno`/`acumularSangrado` (+ Escarcha), `inmunidad(estados, est, {jefe})`
   (devuelve el motivo o false), `ajustarPreset(base, spec, campoHp)` (los números que manda una habilidad pisan los del
   preset), `tirarStat(valor, estados, statId, {extra, azar})` (LA tirada de un stat: Afortunado, mitades, Evasión mínimo 1;
-  devuelve lo que se publica en la Mesa, no publica), `estadosQueAfectan` (los estados que se pintan en la Mesa) y
-  `costoParry()`. **Una regla de combate nueva o corregida va acá, no en una herramienta.** La ficha, GM Tools
+  devuelve lo que se publica en la Mesa, no publica), `estadosQueAfectan` (los estados que se pintan en la Mesa),
+  `costoParry()` y `armaParaDefensa({arma, natural, escudos})` (**Parry y Bloqueo solo con un arma o un escudo; un arma
+  natural no alcanza, por ahora** — regla del dueño 2026-09-30; lo usan `armasYEscudosParaParry` de la ficha,
+  `defensaInv`, `defensaCreep` de GM Tools y `defensaCreepMapa` del mapa). **Una regla de combate nueva o corregida va acá, no en una herramienta.** La ficha, GM Tools
   y el mapa conservan los nombres de siempre como atajos de una línea (`estaBloqueadoElDebuffCreep` → `inmunidad`, etc.);
   `estados-aplicar.js` y `modificadores-tirada.js` también lo usan. Se carga **antes** de `estados-presets.js` en ficha,
   gm-tools, mapa y `datos/auditoria-skills.html`.

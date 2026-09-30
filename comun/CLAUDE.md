@@ -779,3 +779,11 @@ versión parecida en más de una, es candidato a juntar.
   `descartar(tipo, id, col?)`, `corregirComoDueno(tipo, id, datos, col?)` (versión + 1, queda auditada),
   `propuestasViejas(tipo)`, `aprobarPropuesta(tipo, ent)`, `rechazarPropuesta(tipo, id)`, y `fecha` en cada entrada. Las usa
   `datos/auditoria.html`. El menú ☰ (`menu-sitio.js`) suma el link "🔍 Auditoría de lo subido".
+- **`editar-item.js`** (`EditarItem`, 2026-09-30, pedido del dueño): desde **cualquier "Ver" de un ítem** —tienda, catálogo,
+  mochila de otro jugador, botín, arma o pieza de un creep— el botón **✎ Editar y subir** arma una COPIA, la edita con el
+  asistente de siempre (consumibles: formulario corto propio) y la sube con `Biblioteca.guardar({tipo:'items'})`
+  (corrección del ítem del catálogo o algo nuevo). No toca lo que se estaba mirando. Si la copia tiene otros bonos que el
+  ítem del catálogo actual (una copia vieja, como el Martillo de sargento con Crítico +10), pregunta cuál editar. Lo que la
+  copia no trae (rareza, precio, narrativa) se completa del ítem del catálogo. `EditarItem.subir(item, {catalogo})` sube
+  directo (lo usa el ⬆ del editor del arma de un creep). En la ficha, los ítems propios editables siguen con su "Editar"
+  de siempre; el de "Editar y subir" aparece para el catálogo/tienda/botín y en fichas de solo lectura.

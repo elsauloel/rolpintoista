@@ -991,6 +991,9 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
   <div class="modal">
     <header><h3 id="veritem-titulo">Ítem</h3><button class="iconbtn" id="veritem-x">Cerrar</button></header>
     <div class="body" id="veritem-body"></div>
+    <footer style="display:flex;justify-content:flex-end;gap:8px;padding:12px 15px;border-top:1px solid var(--line)">
+      <button class="btn primary" id="veritem-editar" title="Editá una copia y subila al catálogo compartido (no cambia este ítem)">✎ Editar y subir</button>
+    </footer>
   </div>
 </div>
 
@@ -1307,6 +1310,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/catalogo.js?v=20260929b"></script>
 <script src="../comun/items-subidos.js?v=20260929a"></script>
 <script src="../comun/asistente-item.js"></script>
+<script src="../comun/editar-item.js?v=20260929a"></script>
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') document.documentElement.classList.add('modo-mantenimiento');
 </script>
@@ -2517,6 +2521,7 @@ function renderAsistenteCreep(){
     h = `<p class="hint" style="margin:0 0 10px">Rareza sugerida para el nivel ${n}: <b>${RAREZA_ARMADURA[Math.min(n, 5) - 1]}</b>. Defensa total: <b>${fmt(num(sc.defensa))}</b>.</p>
       <div class="equipo-list">${sc.equipo.length ? sc.equipo.map(it => `<div class="equipo-item"><div class="equipo-item-info"><div class="equipo-item-top">
         <span class="equipado-nombre">${esc(it.nombre)}</span><span class="valor-caja"><small>DEF</small>+${fmt(num(it.def))}</span>
+        <button class="rm" data-verequipocreep="${sc.id}:${it.id}" title="Ver la pieza (y editarla y subirla al catálogo)">👁</button>
         <button class="rm" data-quitarequipo="${sc.id}:${it.id}" title="Quitar">×</button></div>
         <div class="equipo-item-meta">${esc(TIPOITEM_LABEL_GM[it.tipoItem] || it.tipoItem)}</div></div></div>`).join('') : '<div class="hint">Sin armadura.</div>'}</div>
       <button type="button" class="addhab" data-equipardelfabricante="${sc.id}" style="margin-top:8px">⚔ Equipar del fabricante</button>`;
@@ -2952,6 +2957,7 @@ function cardHtml(sc){
             <span class="equipado-nombre">${sc.armaNombre ? esc(sc.armaNombre) : '<span class="hint">Sin nombre</span>'}</span>
             <span class="valor-caja" title="Daño">${danoTxt(sc)}</span>
             <button class="rm" data-armanat="${sc.id}" title="Arma natural del catálogo (garras, colmillos, aguijón…)">🐾</button>
+            ${sc.armaNombre ? `<button class="rm" data-verarmacreep="${sc.id}" title="Ver el arma (y editarla y subirla al catálogo)">👁</button>` : ''}
             <button class="rm" data-editararma="${sc.id}" title="Editar arma">✎</button>
           </div>
           <div class="arma-detalle">${sc.armaDetalle ? esc(sc.armaDetalle) : 'Sin efecto.'}</div>
@@ -2968,6 +2974,7 @@ function cardHtml(sc){
                 <div class="equipo-item-top">
                   <span class="equipado-nombre">${esc(it.nombre)}</span>
                   <span class="valor-caja" title="Defensa que otorga"><small>DEF</small>+${fmt(num(it.def))}</span>
+                  <button class="rm" data-verequipocreep="${sc.id}:${it.id}" title="Ver la pieza (y editarla y subirla al catálogo)">👁</button>
                   <button class="rm" data-quitarequipo="${sc.id}:${it.id}" title="Quitar">×</button>
                 </div>
                 <div class="equipo-item-meta">${esc(TIPOITEM_LABEL_GM[it.tipoItem] || it.tipoItem)}</div>
@@ -3555,9 +3562,21 @@ function equipoItemHtml(item, idx){
 // vendor-generator.html/ficha.html, con imagen y descripción narrativa
 // si el ítem las trae.
 function verItemGM(idx){ verItemDatos(CATALOGO_EQUIPO[idx]); }
-// Ventana de detalles de un ítem (del catálogo, o una plantilla del botín).
+// Ventana de detalles de un ítem (del catálogo, una plantilla del botín, o el arma o una pieza de un creep). Su botón
+// "✎ Editar y subir" arma una copia y la sube al catálogo compartido (comun/editar-item.js); no toca lo que se está viendo.
+let verItemActual = null;
+function catalogoGMCompleto(){ return ItemsSubidos.mezclar(structuredClone(CATALOGO_BASE), itemsSubidosGM); }
+function editarYSubirItemGM(item){
+  if(!item) return;
+  EditarItem.abrir({item, catalogo: catalogoGMCompleto(), contexto: 'creep', stats: cfgItemGM().stats,
+    alSubir: () => cargarItemsSubidosGM()});
+}
+// El arma de un creep y sus piezas de armadura, como ítems (para verlos y subirlos).
+function armaDeCreepComoItem(sc){ return armaDeCreepComoDraft(sc); }
+function piezaDeCreepComoItem(it){ return {nombre: it.nombre, tipoItem: it.tipoItem, def: num(it.def), mods: structuredClone(it.mods || []), detalle: it.detalle || ''}; }
 function verItemDatos(item){
   if(!item) return;
+  verItemActual = item;
   item = {tipoItem: 'otros', ...item};
   const linea = (label, val) => (val === '' || val === null || val === undefined)
     ? '' : `<div class="view-line"><span class="view-label">${esc(label)}</span><span class="view-value">${esc(val)}</span></div>`;
@@ -3569,7 +3588,7 @@ function verItemDatos(item){
   if(esArma) L.push(linea('Daño', `${Math.max(1,num(item.peso))}d${num(item.tipoDado)||8}${num(item.danoFijo)?` +${fmt(num(item.danoFijo))}`:''}`));
   if(item.def) L.push(linea('Defensa', `${num(item.def)>0?'+':''}${fmt(num(item.def))}`));
   L.push(linea('Peso', fmt(num(item.peso))));
-  L.push(linea('Precio', `${fmt(num(item.precioCompra))} DDE${item.estimado ? ' (estimado por comparación con el catálogo)' : ''}`));
+  if(item.precioCompra !== undefined) L.push(linea('Precio', `${fmt(num(item.precioCompra))} DDE${item.estimado ? ' (estimado por comparación con el catálogo)' : ''}`));
   if(item.trofeo) L.push(linea('Trofeo', 'No se equipa: se vende en una tienda o se convierte en despojos'));
   if(esArma && (item.efectosGolpe || []).length) L.push(linea('Al golpear', EfectosGolpe.resumenLista(item.efectosGolpe)));
   if(esCons) L.push(linea('Consumible', item.curahp ? `${num(item.curahp)>0?'+':''}${fmt(num(item.curahp))} HP al consumir` : 'Sin efecto numérico'));
@@ -4263,6 +4282,7 @@ function abrirEditorArmaCreep(scId){
     fijarCategoria: true,
     draft: armaDeCreepComoDraft(sc),
     portador: () => portadorCreep(scId),
+    botones: [{texto: '⬆ Subir al catálogo', accion: d => EditarItem.subir(d, {catalogo: catalogoGMCompleto(), alSubir: () => cargarItemsSubidosGM()})}],
     onGuardar: d => {
       const actual = S.creeps.find(s => s.id === scId);
       if(!actual){ toast('Ese creep ya no está'); return true; }
@@ -4847,6 +4867,18 @@ document.addEventListener('click', e => {
   }
   if(b.dataset.editararma){
     abrirEditorArmaCreep(b.dataset.editararma);
+    return;
+  }
+  if(b.dataset.verarmacreep){
+    const sc = S.creeps.find(s => s.id === b.dataset.verarmacreep);
+    if(sc) verItemDatos(armaDeCreepComoItem(sc));
+    return;
+  }
+  if(b.dataset.verequipocreep){
+    const [scId, itId] = b.dataset.verequipocreep.split(':');
+    const sc = S.creeps.find(s => s.id === scId);
+    const it = sc && (sc.equipo || []).find(x => x.id === itId);
+    if(it) verItemDatos(piezaDeCreepComoItem(it));
     return;
   }
   if(b.dataset.modorigen){
@@ -6838,6 +6870,7 @@ document.addEventListener('keydown', e => {
 });
 $('#scrim-editar-creep').addEventListener('mousedown', e => { if(e.target.id === 'scrim-editar-creep') cerrarEditarCreep(); });
 $('#veritem-x').onclick = () => $('#scrim-ver-item').classList.remove('open');
+$('#veritem-editar').onclick = () => { $('#scrim-ver-item').classList.remove('open'); editarYSubirItemGM(verItemActual); };
 $('#scrim-ver-item').addEventListener('mousedown', e => { if(e.target.id==='scrim-ver-item') $('#scrim-ver-item').classList.remove('open'); });
 $('#equipar-creep-x').onclick = () => { equipandoCreepId = null; $('#scrim-equipar-creep').classList.remove('open'); };
 $('#scrim-equipar-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-equipar-creep'){ equipandoCreepId = null; $('#scrim-equipar-creep').classList.remove('open'); } });

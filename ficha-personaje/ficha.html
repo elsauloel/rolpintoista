@@ -8202,6 +8202,8 @@ function catalogoVisibles(){
     // De los consumibles, el catálogo abierto solo ofrece los esenciales.
     // El resto existe igual, pero se consigue en un vendedor.
     base = base.filter(item => !item.consumible || item.legacy);
+    // El equipo con nombre propio de los creeps (soloBotin) se consigue derrotándolos, no comprándolo de la lista general.
+    base = base.filter(item => !item.soloBotin);
   }
   let visibles = filtro ? base.filter(item => grupoCompraDe(item.tipoItem) === filtro) : base;
   if(filtroSlot) visibles = visibles.filter(item => slotDe(item.tipoItem) === filtroSlot);

@@ -716,7 +716,7 @@ function elegirItem(rubro, tier, usados, porRubroTier, soloLegacy, tierMax){
   // "Lo que haya" también respeta el tope de rareza: sin esto, una tienda
   // con tope (inicio de partida) podía terminar ofreciendo un Legendario
   // apenas el catálogo se quedaba sin nada del rubro y el tier pedidos.
-  const cualquiera = libres(CATALOGO.filter(it => dentroDeTope(it, tierMax)));
+  const cualquiera = libres(CATALOGO.filter(it => dentroDeTope(it, tierMax) && !it.soloBotin));
   return cualquiera.length ? cualquiera[entero(0, cualquiera.length - 1)] : null;
 }
 
@@ -734,6 +734,9 @@ function indexarCatalogo(tierMax){
   const porRubroTier = {};
   CATALOGO.forEach(it => {
     if(!dentroDeTope(it, tierMax)) return;
+    // Solo botín (el equipo con nombre propio de los creeps, 2026-09-30): se consigue derrotándolos y se vende en la
+    // tienda, pero no sale a la venta al generar ni en "🎲 Otro". El GM lo puede agregar a mano igual.
+    if(it.soloBotin) return;
     const r = rubroDe(it);
     (porRubroTier[r] = porRubroTier[r] || {});
     (porRubroTier[r][it.tier] = porRubroTier[r][it.tier] || []).push(it);
@@ -1294,7 +1297,7 @@ function renderAgregarLista(){
     const statTxt = dano ? `Daño ${dano}` : (defVal ? `Def ${defVal>0?'+':''}${fmt(defVal)}` : '');
     return `<div class="agregar-fila">
       <div class="agregar-fila-top">
-        <div class="cat-nombre">${esc(it.nombre)}</div>
+        <div class="cat-nombre">${esc(it.nombre)}${it.soloBotin ? ' <span title="Equipo con nombre propio de un creep: se consigue derrotándolo; no sale solo en las tiendas generadas" style="font-size:11px;opacity:.75">· 🎒 solo botín</span>' : ''}</div>
         <div class="cat-tier-badge" style="color:${color};border-color:${color};background:${color}22">${esc(it.tier)}</div>
         <span class="cat-meta">${fmt(precioAjustado(it))} DDE · Peso ${fmt(num(it.peso))}${statTxt ? ` · ${esc(statTxt)}` : ''}</span>
         <button type="button" class="iconbtn" data-ver="${esc(it.id)}">Ver</button>

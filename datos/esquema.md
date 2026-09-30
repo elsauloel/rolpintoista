@@ -54,6 +54,8 @@ que usan las herramientas (los que no aplican se omiten):
                                    // Vacío = el estado es solo un cartel (recordatorio manual).
 
   "legacy": false,                // cuenta para el piso de ítems clásicos del Alquimista
+  "soloBotin": true,              // opcional (2026-09-30): equipo con nombre propio de un creep; se consigue derrotándolo,
+                                  // se usa y se vende, pero no sale en las tiendas generadas ni en el catálogo abierto de la ficha
   "mods": [{"stat": "pdg", "val": 1}],  // se suman al stat mientras esté equipado
   "detalle": "Texto que lee el jugador"
 }

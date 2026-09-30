@@ -47,6 +47,14 @@ armas y defensa no tienen decisiones guardadas).
   (88). Se saca al corregir cada uno. Las búsquedas por nombre (ficha, GM Tools, `comun/items-subidos.js`,
   `comun/editar-item.js`, scripts de variaciones) ignoran el ⚠️ (`sinAviso`).
 
+- **2026-09-30 · ⚠️ también en lo de la resistencia por lugar:** dueño: marcar igual las ~120 que había dejado sin
+  marca. Hecho: 98 más (las demás ya la tenían) → **200 ítems con ⚠️**, más las 14 piezas tocadas hoy a mano.
+- **2026-09-30 · Equipo de los creeps = solo botín:** dueño: el equipo con nombre propio de los creeps humanos (54 ítems
+  agregados el 2026-09-20, `new-…`) no tenía que aparecer en las tiendas: se consigue derrotando al creep, se usa y se
+  vende, pero no se compra. Campo nuevo `soloBotin: true` en esos 54: el generador de tiendas no los sortea (ni en
+  "🎲 Otro") y el catálogo abierto de la ficha no los ofrece; en "+ Agregar ítems" del generador aparecen con
+  «🎒 solo botín» (el GM los puede poner a mano igual). Una tienda ya publicada que tenga alguno lo conserva.
+
 ## Preguntas abiertas
 1. Tope de crítico por tier: ¿cuenta el potente igual que el frecuente, o es solo para el frecuente?
 2. Rango de arcos y pistolas (+4 a +8): ¿es su alcance base, fuera del máximo de +3 por stat?

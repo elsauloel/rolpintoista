@@ -810,7 +810,12 @@ versión parecida en más de una, es candidato a juntar.
   (`BLOQUEO_SOLO_TRAS_PARRY`, concepto del dueño 2026-09-30: el Parry intercepta el arma, el Bloqueo aguanta el golpe): cada
   herramienta recuerda el Parry que espera su Bloqueo (`parryArmaPendiente` en la ficha, `parryPendienteInv`,
   `parryPendienteCreep`); el botón de Bloqueo se ve siempre, apagado, mostrando lo que tiraría, para decidir entre Parry y
-  Evasión. **Una regla de combate nueva o corregida va acá, no en una herramienta.** La ficha, GM Tools
+  Evasión.
+- **`modificadores-tirada.js`, el «?» de las defensas** (2026-09-30, pedido del dueño — "que el sistema sea un poco
+  autoexplicativo"): `ModTirada.ayuda('eva'|'parry'|'bloqueo')` pone un circulito «?» en el botón; al pasar el mouse explica
+  el concepto (textos en `AYUDA`, siguen las notas Parry/Bloqueo/Evasión del manual: si cambia una regla, cambiar los dos).
+  Tocarlo no dispara el botón. Está en la Botonera del personaje, la de las invocaciones, las Acciones de los creeps y en
+  "Elegí cómo te defendés" / "Tirar Bloqueo" del duelo (el mapa ahora también carga este archivo). **Una regla de combate nueva o corregida va acá, no en una herramienta.** La ficha, GM Tools
   y el mapa conservan los nombres de siempre como atajos de una línea (`estaBloqueadoElDebuffCreep` → `inmunidad`, etc.);
   `estados-aplicar.js` y `modificadores-tirada.js` también lo usan. Se carga **antes** de `estados-presets.js` en ficha,
   gm-tools, mapa y `datos/auditoria-skills.html`.

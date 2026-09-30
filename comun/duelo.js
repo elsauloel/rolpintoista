@@ -1130,6 +1130,9 @@ const Duelo = (() => {
     return `<div class="duelo-tiro${esNuevo ? ' nuevo' : ''}"><div class="que">${_esc(que)} · ${_esc(quien)}</div><div class="num">${_fmt(tiro.total)}</div><div class="det">${_esc(tiro.formula || '')}${tiro.rolls && tiro.rolls.length ? ' → ' + tiro.rolls.join(' + ') : ''}${_num(tiro.mod) ? ' ' + (_num(tiro.mod) > 0 ? '+' : '−') + ' ' + Math.abs(_num(tiro.mod)) : ''}</div></div>`;
   }
 
+  // El «?» que explica Esquivar, Parry y Bloqueo (comun/modificadores-tirada.js; si la página no lo carga, no aparece).
+  const ayudaDefensa = clave => typeof ModTirada !== 'undefined' && ModTirada.ayuda ? ModTirada.ayuda(clave).replace('class="bt-ayuda"', 'class="bt-ayuda en-linea"') : '';
+
   // Una caja de tirada. campo: 'pdg'|'eva'|'fuerza'|'bloqueo'.
   function cajaHtml(d, campo, otro, esNuevo){
     const esAtq = campo === 'pdg' || campo === 'fuerza';
@@ -1158,10 +1161,10 @@ const Duelo = (() => {
             <div class="duelo-man"><input type="number" min="1" data-manual="eva" placeholder="valor" value="${_esc(manual.eva || '')}"><select data-manual-modo>${selModoHtml(d)}</select><button type="button" class="sec" data-tirarpor="eva">🎲 Tirar a mano</button></div>`;
         }
         else if(!ops){ pedirOpciones(d); cuerpo = '<div class="espera">cargando tus opciones de defensa… <span class="det">(la primera vez puede tardar unos segundos)</span></div>'; }
-        else cuerpo = `<div class="det">Elegí cómo te defendés (antes de ver el PdG):</div><div class="duelo-opc">${ops.map((o, i) => `<button type="button" data-def="${i}"${o.motivoNo ? ' disabled' : ''}>${_esc(o.etiqueta)}${o.costo ? `<small>${_fmt(o.costo)} No2</small>` : ''}${(o.info || []).map(t => `<small class="duelo-info">${_esc(t)}</small>`).join('')}${o.motivoNo ? `<small>${_esc(o.motivoNo)}</small>` : ''}</button>`).join('')}</div>`;
+        else cuerpo = `<div class="det">Elegí cómo te defendés (antes de ver el PdG):</div><div class="duelo-opc">${ops.map((o, i) => `<button type="button" data-def="${i}"${o.motivoNo ? ' disabled' : ''}>${_esc(o.etiqueta)}${ayudaDefensa(o.modo === 'evasion' ? 'eva' : o.modo)}${o.costo ? `<small>${_fmt(o.costo)} No2</small>` : ''}${(o.info || []).map(t => `<small class="duelo-info">${_esc(t)}</small>`).join('')}${o.motivoNo ? `<small>${_esc(o.motivoNo)}</small>` : ''}</button>`).join('')}</div>`;
       }else{
         const txt = campo === 'pdg' ? (d.hab ? `🎲 Tirar ${_esc(etqTira(d))}` : '🎲 Pagar y tirar PdG') : campo === 'fuerza' ? '🎲 Tirar Fuerza del golpe' : `🎲 Tirar Bloqueo${d.defensa && d.defensa.itemNombre ? ' · ' + _esc(d.defensa.itemNombre) : ''}`;
-        cuerpo = `<button type="button" data-tirar="${campo}">${txt}</button>${campo === 'pdg' && !d.hab ? '<div class="det">descuenta los No2 del ataque</div>' : ''}`;
+        cuerpo = `<button type="button" data-tirar="${campo}">${txt}${campo === 'bloqueo' ? ayudaDefensa('bloqueo') : ''}</button>${campo === 'pdg' && !d.hab ? '<div class="det">descuenta los No2 del ataque</div>' : ''}`;
       }
       cuerpo += flashHtml(d, campo);
     }else if(puedoAMano(lado)){

@@ -2072,7 +2072,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/estado-preguntas.js?v=20260929a"></script>
 <script src="../comun/confirmar-turno.js"></script>
 <script src="../comun/asistente-estado.js"></script>
-<script src="../comun/modificadores-tirada.js?v=20260930a"></script>
+<script src="../comun/modificadores-tirada.js?v=20260930b"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
 <script src="../comun/combatiente.js?v=20260930e"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
@@ -2082,7 +2082,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-duelo-hab.js?v=20260930a"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js?v=20260930a"></script>
-<script src="../comun/duelo.js?v=20260930a"></script>
+<script src="../comun/duelo.js?v=20260930b"></script>
 <script src="../comun/asistente-item.js"></script>
 <script src="../comun/catalogo.js?v=20260929b"></script>
 <script src="../comun/items-subidos.js?v=20260930a"></script>
@@ -4518,7 +4518,7 @@ function renderBotoneraInv(){
     const mt = c.stat ? ModTirada.tile(inv.estados, c.stat) : {clase: '', html: '', titulo: ''};
     return `
     <button type="button" class="botonera-tile${c.sinNitros?' bt-sin-nitros':''}${mt.clase}" ${c.attr} title="${esc(c.motivo + mt.titulo)}">
-      ${lupaBotonHtml(c.clave)}
+      ${lupaBotonHtml(c.clave)}${ModTirada.ayuda(c.stat)}
       <span class="bt-label">${esc(c.nombre)}</span><span class="bt-value bt-value-formula">🎲${c.dado?` ${esc(c.dado)}`:''}</span>${mt.html}
     </button>`;
   }).join('');
@@ -5502,15 +5502,15 @@ function renderBotonera(){
         </div>
         <div class="botonera-combate-grid botonera-combate-bottom">
           <button type="button" class="botonera-tile${mtEva.clase}" data-botoneraaccion="esquivar" title="Esquivar${esc(mtEva.titulo)}">
-            ${lupaBotonHtml('stat:eva')}
+            ${lupaBotonHtml('stat:eva')}${ModTirada.ayuda('eva')}
             <span class="bt-label">Esquivar (Eva)</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.eva)}</span>${mtEva.html}
           </button>
           <button type="button" class="botonera-tile${mtParry.clase}${sinDefArma ? ' bt-sin-nitros' : ''}" data-botoneraaccion="parry" title="${esc(sinDefArma ? Combatiente.SIN_ARMA_DEFENSA : 'Parry con arma o escudo: siempre cuesta 1 No2 (' + costoParryTxt() + ')' + mtParry.titulo)}">
-            ${lupaBotonHtml('stat:parry')}
+            ${lupaBotonHtml('stat:parry')}${ModTirada.ayuda('parry')}
             <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">${sinDefArma ? 'sin arma ni escudo' : `🎲 ${esc(fCombate.parry)}`}</span>${sinDefArma ? '' : mtParry.html}
           </button>
           <button type="button" class="botonera-tile${mtBloqueo.clase}${!armaBloqueo ? ' bt-sin-nitros' : ''}" data-botoneraaccion="bloqueo" title="${esc(sinDefArma ? Combatiente.SIN_ARMA_DEFENSA : !armaBloqueo ? Combatiente.BLOQUEO_SOLO_TRAS_PARRY + ': si ganaste el Parry, aguantás la fuerza del golpe con tu Fuerza + el peso de tu arma o escudo' : `Bloqueo con ${armaBloqueo.nombre} (tras el Parry): tu Bloqueo (de Fuerza) MÁS su peso; esa suma es el dado que tirás` + mtBloqueo.titulo)}">
-            ${lupaBotonHtml('stat:bloqueo')}
+            ${lupaBotonHtml('stat:bloqueo')}${ModTirada.ayuda('bloqueo')}
             <span class="bt-label">Bloqueo${armaBloqueo ? ` · ${esc(armaBloqueo.nombre)}` : sinDefArma ? '' : ' · tras el Parry'}</span><span class="bt-value bt-value-formula">${sinDefArma ? 'sin arma ni escudo' : `🎲 ${esc(bloqueoPrevio)}`}</span>${sinDefArma ? '' : mtBloqueo.html}
           </button>
           <button type="button" class="botonera-tile" data-botoneraaccion="fuerzagolpe" style="grid-column:1/-1" title="Fuerza del golpe: tu Fuerza + el peso de tu arma; esa suma es el dado. Es tu tirada contra el Bloqueo del defensor cuando gana el Parry.">

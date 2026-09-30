@@ -2068,7 +2068,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/confirmar-turno.js"></script>
 <script src="../comun/asistente-estado.js"></script>
 <script src="../comun/modificadores-tirada.js"></script>
-<script src="../comun/tokens-auto.js?v=20260929i"></script>
+<script src="../comun/tokens-auto.js?v=20260930a"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260929a"></script>
 <script src="../comun/trampas-base.js"></script>
@@ -3579,7 +3579,10 @@ function dueloAplicarEfectoPropio(d, ef){
 function terminarEjecucionHab(it, arma, xSp, xNitros){
   // 💰 Semiautomática: ya cobró el costo; anuncia y tira la tirada inicial (si tiene). Los efectos, a mano.
   if(modoHab(it) !== 'auto'){ anunciarHabilidad(it); tirarPrimeraDeHab(it); return; }
-  if(!dueloDe(it)){ toast(`${it.nombre}: todavía no tiene armada la ejecución paso a paso (✨) — se ejecutó como semiautomática`); anunciarHabilidad(it); tirarPrimeraDeHab(it); return; }
+  if(!dueloDe(it)){
+    if(it.trampaColocar) return;   // una trampa sola: el anuncio y la casilla ya los maneja colocarTrampaDeHab
+    toast(`${it.nombre}: todavía no tiene armada la ejecución paso a paso (✨) — se ejecutó como semiautomática`); anunciarHabilidad(it); tirarPrimeraDeHab(it); return;
+  }
   const aArma = ataqueDeHabArma(it, arma, xSp, xNitros);
   if(aArma){
     mesaPublicarHabilidad(it.nombre, it.detalle || it.efectoDetalle || '');
@@ -9153,7 +9156,7 @@ function habLegado(h){
   const L = [];
   if(String(h.efectoNombre || '').trim()) L.push(`estado «${h.efectoNombre}» sobre vos`);
   if(num(h.curaHp) > 0) L.push(`cura ${fmt(num(h.curaHp))} HP`);
-  if(h.trampaColocar) L.push('coloca una trampa');
+  if(h.trampaColocar && modoHab(h) !== 'auto') L.push('coloca una trampa');
   if(h.zonaMapa || h.portalMapa) L.push(h.portalMapa ? 'abre un portal' : 'marca una zona');
   return L;
 }
@@ -9199,7 +9202,9 @@ function drawEditorHabilidad(){
   if(info.id === 'ejecucion'){
     const c = dueloDe(draft);
     html += `<div class="hint" style="margin:6px 0 10px">${c ? `Configurada: <b>${esc(resumenEjecucionHab(c))}</b>.` : 'Todavía <b>no está configurada</b>: sin esto, al ejecutarla solo cobra el costo y tira la tirada inicial (como la semiautomática).'}</div>
-      <button type="button" class="btn primary" data-hab-ejecucion="1" style="width:100%">✨ ${c ? 'Cambiar' : 'Armar'} la ejecución paso a paso</button>`;
+      <button type="button" class="btn primary" data-hab-ejecucion="1" style="width:100%">✨ ${c ? 'Cambiar' : 'Armar'} la ejecución paso a paso</button>
+      <div class="hint" style="margin:14px 0 0">¿La habilidad coloca una trampa? Tildalo acá: al ejecutarla se cobra el costo, se anuncia en la Mesa (sin decir dónde) y elegís la casilla en el mapa.</div>`;
+    html += trampaHtml(draft);
   }
   if(info.id === 'anterior'){
     html += `<div class="hint" style="margin:0 0 10px">Tiene: <b>${esc(habLegado(draft).join(' · '))}</b>.</div>`;
@@ -9395,7 +9400,7 @@ function trampaHtml(draft){
   const t = draft.trampaColocar || null;
   const campo = (k, etiqueta, tipo, extra) => `<div class="f"><label>${etiqueta}</label><input data-tr="${k}" type="${tipo}" value="${esc(t && t[k] !== undefined ? t[k] : '')}" ${extra || ''}></div>`;
   return `<div class="f" style="margin-top:10px"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 10px;border:1px solid var(--copper);border-radius:var(--r);background:rgba(201,133,69,.10)">
-      <input type="checkbox" data-tr="on" ${t ? 'checked' : ''} style="width:auto"> <span><b>🪤 Esta habilidad coloca una trampa</b><br><span style="font-size:12px;color:var(--muted);text-transform:none;letter-spacing:0">Al ejecutarla deja sola una trampa oculta al lado de tu token, en el mapa que se está jugando.</span></span></label></div>
+      <input type="checkbox" data-tr="on" ${t ? 'checked' : ''} style="width:auto"> <span><b>🪤 Esta habilidad coloca una trampa</b><br><span style="font-size:12px;color:var(--muted);text-transform:none;letter-spacing:0">${modoHab(draft) === 'auto' ? 'Al ejecutarla elegís en el mapa dónde colocarla. La ven solo los de tu bando: el GM se entera de que la colocaste, pero no de dónde.' : 'Al ejecutarla deja sola una trampa oculta al lado de tu token, en el mapa que se está jugando.'}</span></span></label></div>
     ${t ? `<button type="button" class="btn" id="hab-trampa-pre" style="width:100%;margin-bottom:8px">📚 Trampas preconstruidas</button>
       <div class="hint" style="margin:4px 0 8px"><b>${esc(t.nombre || 'Sin nombre')}</b><br>${esc(trampaResumenTexto(t))}</div>
       <button type="button" class="btn primary" id="hab-trampa-asistente" style="width:100%">🪄 ${t.nombre ? 'Cambiar' : 'Armar'} la trampa paso a paso</button>` : ''}`;
@@ -9442,6 +9447,14 @@ async function colocarTrampaDeItem(it){
 async function colocarTrampaDeHab(h){
   const t = h.trampaColocar;
   if(!t || typeof TokensAuto === 'undefined' || !fichaVivo || !fichaVivo.id) return;
+  // ✨ Automática (2026-09-30): se anuncia (sin la ubicación) y se elige la casilla en el mapa. Sin el mapa abierto (ficha suelta),
+  // queda al lado del token como siempre.
+  if(modoHab(h) === 'auto' && window.parent !== window){
+    mesaPublicarHabilidad(h.nombre, `${h.detalle || ''}${h.detalle ? ' — ' : ''}🪤 colocó una trampa${t.nombre ? ` («${String(t.nombre).trim()}»)` : ''}.`);
+    try{ window.parent.postMessage({tipo: 'trampa-habilidad', fichaId: fichaVivo.id, tipoToken: 'pj', nombre: h.nombre, trampa: {...t, nombre: String(t.nombre || '').trim() || h.nombre}}, location.origin); }
+    catch(err){ console.error('No se pudo avisar la trampa al mapa:', err); }
+    return;
+  }
   try{
     const dano = TRAMPA_DANO_RE.test(String(t.dano || '').trim()) ? String(t.dano).trim() : '';
     const r = await TokensAuto.colocarTrampas({fichaId: fichaVivo.id, tipoToken: 'pj', trampa: {...t, nombre: String(t.nombre || '').trim() || h.nombre, dano}});

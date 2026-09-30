@@ -931,7 +931,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/recorte-imagen.js"></script>
 <script src="../comun/plantillas.js?v=20260930a"></script>
 <script src="../comun/biblioteca.js?v=20260929i"></script>
-<script src="../comun/tokens-auto.js?v=20260929i"></script>
+<script src="../comun/tokens-auto.js?v=20260930a"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260929a"></script>
 <script src="../comun/trampas-base.js"></script>
@@ -2655,6 +2655,7 @@ function revelarActualizar(){
   tokens.forEach(t => {
     const R = veOcultoDe(t);
     if(!R || t.oculto) return;
+    if(soyGM ? t.tipo !== 'creep' : t.tipo === 'creep') return;   // cada bando descubre con la visión de sus propios tokens
     celdasVisionDe(t).forEach(k => { if(distanciaHex({col: t.col, fila: t.fila}, nbUnpack(k)) <= R) reveladas.add(k); });
   });
   if(!reveladas.size) return;
@@ -5465,9 +5466,17 @@ function descubrirTrampa(id){
   try{ localStorage.setItem('trampas-vistas-' + FB_CAMPANA, JSON.stringify([...trampasVistas].slice(-300))); }catch(e){}
   pedirDibujo();
 }
+// ¿La trampa es de mi bando? (2026-09-30, regla del dueño: el GM se entera de que un jugador colocó una trampa —por el anuncio
+// en la Mesa— pero NO de dónde.) Las del GM son del bando de los creeps; las de cualquier jugador, del bando de los jugadores.
+function trampaDeMiBando(el){
+  const dueno = miembros.get(el.duenoUid);
+  const deGM = !!(dueno && dueno.gm);
+  return soyGM ? deGM : !deGM;
+}
 function puedeVerElemento(el){
-  // Una trampa sin disparar solo la ven su dueño y el GM (y quien la descubrió); disparada, todos.
-  if(el.trampa && !el.disparada && !puedeManipularElemento(el) && !(el.id && trampasVistas.has(el.id))) return false;
+  // Una trampa sin disparar solo la ve su bando (los jugadores las de los jugadores; el GM las suyas) y quien la descubrió;
+  // disparada, todos. El GM no ve dónde están las de los jugadores (antes sí).
+  if(el.trampa && !el.disparada && !trampaDeMiBando(el) && !(el.id && trampasVistas.has(el.id))) return false;
   return !el.invisible || puedeManipularElemento(el);
 }
 // Las casillas que ocupa de verdad ahora mismo (origen + cada offset, ya
@@ -9393,6 +9402,16 @@ function zonaPersistenteDeHabilidad(msg){
     casteadorRef: msg.fichaId, casteadorTipo: msg.casteadorTipo,
   }), `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': marcá el centro' : 'Elegí el centro de la zona'}</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true);
 }
+// 🪤 Trampa de una habilidad ✨ automática (2026-09-30, pedido del dueño): quien la usa elige la casilla con un clic (antes quedaba
+// sola al lado del token). El anuncio (sin la ubicación) ya lo publicó la ficha; la trampa la ve solo su bando (trampaDeMiBando).
+function trampaDeHabilidad(msg){
+  elegirDestino(async h => {
+    try{
+      const r = await TokensAuto.colocarTrampas({fichaId: msg.fichaId, tipoToken: msg.tipoToken || 'pj', trampa: msg.trampa, mapaId: mapaMostrado, celda: {col: h.col, fila: h.fila}});
+      toast(r.colocadas ? `🪤 ${msg.nombre}: ${r.colocadas > 1 ? r.colocadas + ' trampas colocadas' : 'trampa colocada'}` : `🪤 ${msg.nombre}: no se pudo colocar`);
+    }catch(err){ console.error('No se pudo colocar la trampa:', err); toast('No se pudo colocar la trampa — revisá la consola'); }
+  }, `<b>🪤 ${msg.nombre ? esc(msg.nombre) + ': elegí dónde colocar la trampa' : 'Elegí dónde colocar la trampa'}</b> <span>clic en el mapa · Esc o clic derecho cancelan</span>`, true);
+}
 // 🌫 Zonas con efectos persistentes: el asistente paso a paso (comun/asistente-zona.js, 2026-09-28, pedido del
 // dueño). Cualquier miembro lo puede usar (mismo criterio que Formas libres y Trampas); el casteador queda como
 // "el bando de quien la coloca" (el GM = rival de los PJ; un jugador = rival de los creeps), no un token puntual.
@@ -9433,6 +9452,7 @@ window.addEventListener('message', e => {
   if(e.data.tipo === 'zona-habilidad') zonaDeHabilidad(e.data);
   if(e.data.tipo === 'portal-habilidad') portalDeHabilidad(e.data);
   if(e.data.tipo === 'zona-persistente-habilidad') zonaPersistenteDeHabilidad(e.data);
+  if(e.data.tipo === 'trampa-habilidad') trampaDeHabilidad(e.data);
   if(e.data.tipo === 'duelo-elegir-objetivo') dueloElegirObjetivoMapa(e.data);
   if(e.data.tipo === 'duelo-reroll-info-res') Duelo.recibirRerollInfo(e.data.id, e.data.lado, e.data.info);   // ¿tiene una moneda de re-roll quien tira?
   if(e.data.tipo === 'duelo-flash-res') Duelo.recibirFlash(e.data.id, e.data.campo, e.data.opciones);   // los Flash que tiene quien va a tirar

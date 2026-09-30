@@ -1094,3 +1094,9 @@ hexágono con otro sin importar bando. Todavía no está construido.
   perdían). Cada trampa guardada tiene **⬆** (subir al catálogo compartido: al instante para todos, corrección / nueva
   si salió del catálogo) y **🔔** si la del catálogo de la que salió se corrigió (`elemTrampaBibOrigen`,
   `trampasSubidas`, `versionNuevaDeTrampa`, cartel `Biblioteca.avisoVersion`).
+
+- **Trampas: cada bando ve las suyas; y trampas de habilidades con clic** (2026-09-30, regla del dueño): una trampa sin disparar
+  la ve solo **su bando** (`trampaDeMiBando`: las de un jugador, todos los jugadores; las del GM, el GM) — **el GM ya no ve
+  dónde están las de los jugadores** (se entera por el anuncio en la Mesa). La detección por "Ve lo oculto" usa solo los tokens
+  del propio bando. Una habilidad ✨ automática con trampa le manda al mapa `trampa-habilidad` y el mapa pide la casilla con un
+  clic (`trampaDeHabilidad` → `TokensAuto.colocarTrampas({…, celda})`).

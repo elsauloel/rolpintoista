@@ -91,7 +91,9 @@ const TokensAuto = (() => {
     }
     return out;
   }
-  /* o: {fichaId, tipoToken?, trampa, mapaId?, item?} — `trampa` en la forma única de comun/plantillas.js (P123: la misma de las
+  /* o: {fichaId, tipoToken?, trampa, mapaId?, item?, celda?} — `celda` = {col, fila}: la casilla que eligió quien la coloca con un
+     clic en el mapa (2026-09-30, trampas de habilidades ✨ automáticas); sin `celda`, la casilla libre al frente del token, como
+     siempre. `trampa` en la forma única de comun/plantillas.js (P123: la misma de las
      trampas del mapa y del catálogo: tipo/tamano, color, alfa, daño, estado, zona que deja al dispararse, turnos que dura, cant).
      Se sigue aceptando la forma vieja suelta {nombre, detalle, dano, radio, cant, fuegoAmigo, color, forma, largo, estado}.
      El teleport no se coloca solo (su destino se marca en el mapa, a mano). Devuelve {colocadas, mapaId, motivo?}
@@ -108,17 +110,20 @@ const TokensAuto = (() => {
     const mapaId = o.mapaId || await mapaQueMiraElGM();
     const tokens = await fbDb.collection(fbRutaCampana(rutaTokens(mapaId))).get();
     const mio = tokens.docs.find(d => d.data().fichaId === o.fichaId && d.data().tipo === (o.tipoToken || 'creep'));
-    if(!mio) return {colocadas: 0, mapaId, motivo: 'sin-token'};
+    if(!mio && !o.celda) return {colocadas: 0, mapaId, motivo: 'sin-token'};
     const elCol = fbDb.collection(fbRutaCampana(mapaId === MAPA_PRINCIPAL_ID ? 'elementos' : `mapas/${mapaId}/elementos`));
     const els = await elCol.get();
     const ocupadas = new Set(tokens.docs.map(d => `${d.data().col},${d.data().fila}`));
     els.docs.forEach(d => { const e = d.data(); if(e.solido) celdasAbsolutas(e).forEach(k => ocupadas.add(k)); });
-    const t = mio.data(), base = aCubo({col: t.col, fila: t.fila});
+    const t = mio ? mio.data() : {col: o.celda.col, fila: o.celda.fila, rotacion: 0}, base = aCubo({col: t.col, fila: t.fila});
     const frente = ((Math.round((t.rotacion || 0) / 60) % 6) + 6) % 6;   // 0 = mira hacia abajo
     const elegidas = [];
+    // Casilla elegida en el mapa: esa (y, si deja varias, las libres de alrededor).
+    if(o.celda){ const c = {col: o.celda.col, fila: o.celda.fila, dir: frente}; elegidas.push(c); ocupadas.add(`${c.col},${c.fila}`); }
+    const centro = o.celda ? aCubo(o.celda) : base;
     [0, 1, 5, 2, 4, 3].forEach(k => {
       const d = rotarCubo(0, 1, frente + k);
-      const c = deCubo(base.q + d.dq, base.r + d.dr);
+      const c = deCubo(centro.q + d.dq, centro.r + d.dr);
       if(elegidas.length < (o.cant || 1) && !ocupadas.has(`${c.col},${c.fila}`)){ c.dir = (frente + k) % 6; elegidas.push(c); }   // dir: hacia dónde apunta (la línea se extiende hacia afuera del token)
     });
     if(!elegidas.length) return {colocadas: 0, mapaId, motivo: 'sin-lugar'};

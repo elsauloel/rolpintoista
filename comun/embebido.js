@@ -34,16 +34,15 @@ const Embebido = (() => {
     (document.head || document.documentElement).appendChild(s);
   }
 
-  // ¿Hay algo a la vista? Un hijo de <body> que no sea la página, una pieza común ni un aviso, y que se vea de verdad.
+  // ¿Hay algo a la vista? Un hijo de <body> que no sea la página, una pieza común ni un aviso, y que no esté oculto. Sin medir
+  // tamaños: con la capa del mapa cerrada el marco no se dibuja y todo mide cero (así no avisaba nunca, 2026-09-30).
   const oculto = el => [...cfg.pagina, ...COMUNES, ...NO_CUENTA, ...cfg.noCuenta].some(sel => { try{ return el.matches(sel); }catch(e){ return false; } });
   function hayAlgoAbierto(){
     if(!document.body) return false;
     return [...document.body.children].some(el => {
       if(/^(SCRIPT|STYLE|LINK|TEMPLATE)$/.test(el.tagName) || oculto(el)) return false;
       const s = getComputedStyle(el);
-      if(s.display === 'none' || s.visibility === 'hidden' || el.hidden) return false;
-      const r = el.getBoundingClientRect();
-      return r.width > 0 && r.height > 0;
+      return !(s.display === 'none' || s.visibility === 'hidden' || el.hidden);
     });
   }
   function revisar(){

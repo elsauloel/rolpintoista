@@ -5456,6 +5456,9 @@ function renderBotonera(){
   const fBloq = it => (formulaParaValor(bloqueoValorConArma(it)) || {}).formula || '';
   const bloqueoPrevio = armaBloqueo ? fBloq(armaBloqueo)
     : (() => { const l = armasYEscudosParaParry(); return l.length === 1 ? fBloq(l[0].item) : l.map(a => `${a.item.nombre} ${fBloq(a.item)}`).join(' · '); })();
+  // El Parry también se muestra por arma o escudo: cada uno suma solo sus propios bonos a Parry (P129).
+  const fParryIt = it => { const f = formulaParaValor(statParaArma('parry', it)); return f ? f.formula + ' ÷2'.repeat(mitadesDeTirada(S.efectos, 'parry')) : ''; };
+  const parryPrevio = (() => { const l = armasYEscudosParaParry(); return l.length === 1 ? fParryIt(l[0].item) : l.map(a => `${a.item.nombre} ${fParryIt(a.item)}`).join(' · '); })();
   // Con dos armas, Atacar y Daño se desdoblan: uno por arma.
   const armasBotonera = armasEquipadasConDano();
   // Estados alterados que modifican cada tirada (2026-09-25): el botón se pinta de verde/rojo y dice cuáles (comun/modificadores-tirada.js).
@@ -5508,7 +5511,7 @@ function renderBotonera(){
           </button>
           <button type="button" class="botonera-tile${mtParry.clase}${sinDefArma ? ' bt-sin-nitros' : ''}" data-botoneraaccion="parry" title="${esc(sinDefArma ? Combatiente.SIN_ARMA_DEFENSA : 'Parry con arma o escudo: siempre cuesta 1 No2 (' + costoParryTxt() + ')' + mtParry.titulo)}">
             ${lupaBotonHtml('stat:parry')}${ModTirada.ayuda('parry')}
-            <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">${sinDefArma ? 'sin arma ni escudo' : `🎲 ${esc(fCombate.parry)}`}</span>${sinDefArma ? '' : mtParry.html}
+            <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">${sinDefArma ? 'sin arma ni escudo' : `🎲 ${esc(parryPrevio)}`}</span>${sinDefArma ? '' : mtParry.html}
           </button>
           <button type="button" class="botonera-tile${mtBloqueo.clase}${!armaBloqueo ? ' bt-sin-nitros' : ''}" data-botoneraaccion="bloqueo" title="${esc(sinDefArma ? Combatiente.SIN_ARMA_DEFENSA : !armaBloqueo ? Combatiente.BLOQUEO_SOLO_TRAS_PARRY + ': si ganaste el Parry, aguantás la fuerza del golpe con tu Fuerza + el peso de tu arma o escudo' : `Bloqueo con ${armaBloqueo.nombre} (tras el Parry): tu Bloqueo (de Fuerza) MÁS su peso; esa suma es el dado que tirás` + mtBloqueo.titulo)}">
             ${lupaBotonHtml('stat:bloqueo')}${ModTirada.ayuda('bloqueo')}
@@ -10166,9 +10169,14 @@ function costoParryTxt(){
 }
 
 // Valor del stat cuando se usa ESA arma: no cuentan los modificadores que vienen de otra arma equipada.
+// Parry y Bloqueo (P129, dueño 2026-09-30, "cada uno con lo suyo"): tampoco cuentan los de un ESCUDO que no es con el que se
+// para — el +1 al Parry de un escudo vale al parar con ese escudo, y el de la espada, con la espada.
+const STATS_DEFENSA_POR_ITEM = ['parry', 'bloqueo'];
+const esEnMano = id => S.inventario.some(i => i.id === id && i.equipado && ES_MANO(i.tipoItem));
 function statParaArma(statId, arma){
   const c = compute();
-  const excluidos = (c.mods[statId] || []).filter(m => m.itemId && m.itemId !== (arma && arma.id) && esArmaEnMano(m.itemId));
+  const deOtro = STATS_DEFENSA_POR_ITEM.includes(statId) ? esEnMano : esArmaEnMano;
+  const excluidos = (c.mods[statId] || []).filter(m => m.itemId && m.itemId !== (arma && arma.id) && deOtro(m.itemId));
   if(!excluidos.length || Number.isNaN(c.final[statId])) return c.final[statId];
   let v = c.base[statId] + c.modTotal[statId] - excluidos.reduce((a, m) => a + m.val, 0);
   return v;

@@ -152,8 +152,8 @@ Parry → Bloqueo → durabilidad hay tres ejes para jugar con la calidad de un 
 - **Mejor en los dos**: más Parry y más Bloqueo.
 - **Resistente**: solo más durabilidad (el eje más suave: impacta menos que Parry y Bloqueo).
 - **Combinaciones**: mucho Parry y más durabilidad, etc.
-Los bonos a Parry y a Bloqueo ya son accesos rápidos del paso "Bonos" del asistente para la categoría Defensa. Ver P129 (a qué
-Parry cuenta el bono de un escudo).
+Los bonos a Parry y a Bloqueo ya son accesos rápidos del paso "Bonos" del asistente para la categoría Defensa. **Cada uno con lo
+suyo** (P129, dueño 2026-09-30): el bono de un escudo cuenta al parar o bloquear con ese escudo, y el de un arma, con esa arma.
 
 ## Máximo de Resistencia a crítico acumulable con el catálogo actual (medido 2026-09-27)
 Pedido del dueño (log «A desarrollar»): cuánto se puede acumular de Resistencia a crítico por Tipo con un ítem en cada slot, eligiendo la mejor pieza de cada uno del catálogo de hoy (889 ítems; slots: cabeza, armadura blanda, armadura rígida, manos, piernas, pies, escudo y 2 anillos; el arma no aporta).

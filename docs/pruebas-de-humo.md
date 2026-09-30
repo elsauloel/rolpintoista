@@ -1,0 +1,68 @@
+# Pruebas de humo
+
+> Paso 0 de [`plan-consolidacion.md`](plan-consolidacion.md) (2026-09-30). **Qué tocar y qué tiene que pasar** en cada
+> herramienta, para repasar **antes y después** de cada paso de la consolidación (y de cualquier cambio grande). Lo automático
+> vive en [`../comun/pruebas.html`](../comun/pruebas.html) (reglas puras, sin sesión: todo en verde = se puede seguir); esto es
+> lo que hay que mirar con las herramientas de verdad.
+>
+> **Dónde probar** (ver la memoria del asistente, `partidas-de-prueba`): **"Claude · pruebas"** para todo lo del GM (creeps del
+> grupo "Arena de pruebas", tokens en el mapa principal y en "Mazmorra de pruebas"); **"Test"** (GM: Seba) solo para lo que
+> necesita una ficha de jugador (personaje "Prueba de Claude"). Nunca en las partidas reales. Al terminar, dejar todo como estaba
+> (estados, cooldowns, No2, HP; borrar lo colocado en el mapa de Seba).
+>
+> Cómo anotar: al lado de cada punto, ✔ / ✘ y la fecha. Un ✘ se arregla (o se anota en `pendientes.md`) antes de seguir.
+
+## 0. Automáticas
+- [ ] `comun/pruebas.html` en verde (hoy: 38 pruebas).
+
+## 1. Ficha (partida "Test", "Prueba de Claude")
+- [ ] Abre sin errores en la consola; el título dice personaje y partida.
+- [ ] Cambiar un atributo (Con) recalcula el HP máximo; el HP actual no se cura de más.
+- [ ] **Habilidad 📣 manual**: "Anunciar" publica el texto en la Mesa; no cobra nada.
+- [ ] **Habilidad 💰 semiautomática**: cobra SP y No2 y tira la tirada inicial (aparece en la Mesa).
+- [ ] **Habilidad ✨ automática sobre uno mismo sin tiradas** (Blindaje): aplica el estado (escudo) sin abrir el cuadro y lo anuncia.
+- [ ] **Habilidad ✨ automática contra un enemigo**: abre el cuadro de Ejecución; elegir objetivo; tiradas de los dos lados; efectos.
+- [ ] Editor de habilidad: arranca en "¿Cómo se ejecuta?"; los pasos cambian según el modo.
+- [ ] "+ Estado" con un preset: pregunta las cantidades y lo aplica; el Mantenimiento lo descuenta.
+- [ ] Equipar / desequipar un ítem: cambian los stats; en modo combate cuesta 1 No2.
+- [ ] Talentos: "± Nivel" → por Inteligencia, por tirada máxima y ✎ a mano; la tirada es 1d(nivel×2) + Inteligencia libre.
+- [ ] Invocación: crearla, "▶ Usar", ejecutar una habilidad de cada modo.
+- [ ] Ver un ítem del catálogo → "✎ Editar y subir" abre el asistente (no subir, cancelar).
+
+## 2. Mapa (como jugador en "Test" y como GM en "Claude · pruebas")
+- [ ] Carga el mapa con los tokens; el GM ve los creeps ocultos, el jugador no.
+- [ ] Mover el propio token cobra No2 por casillero.
+- [ ] La Botonera (dentro del mapa) abre, tira y publica en la Mesa; sus ventanitas se ven (ej. "¿Es tu turno?").
+- [ ] Atacar a un token → cuadro del duelo: PdG, defensa, crítico (cuadraditos), daño aplicado al HP.
+- [ ] Trampa de una habilidad ✨: se anuncia en la Mesa sin ubicación; el mapa pide la casilla; la ve solo el bando que la puso.
+- [ ] Pisar una trampa enemiga la dispara (daño y estado).
+- [ ] Zona persistente: se coloca, afecta al entrar y en el Mantenimiento.
+- [ ] Niebla de guerra y "Ve lo oculto" funcionan; el GM no descubre trampas de los jugadores.
+- [ ] ⟳ Mantenimiento (GM): pasa el turno de fichas y creeps; el reporte aparece en la Mesa.
+
+## 3. GM Tools (partida "Claude · pruebas")
+- [ ] Carga los 6 creeps del grupo "Arena de pruebas".
+- [ ] **Grito burlón** (📣): Anunciar, sin cobrar ni cooldown.
+- [ ] **Piel dura** (✨ sobre sí): cobra No2, cooldown, escudo de 5, sin cuadro.
+- [ ] **Rayo de pantano** (✨ contra un enemigo): abre el cuadro del duelo (necesita un objetivo en el mapa).
+- [ ] **Pisotón** (✨ onda): desde el mapa, afecta a los adyacentes.
+- [ ] **Trampa de raíces** (✨ trampa): desde las Acciones del mapa, pide la casilla; los jugadores no la ven.
+- [ ] Una habilidad 💰 de fábrica: cobra y tira la primera tirada.
+- [ ] Editor de habilidad de creep: arranca en "¿Cómo se ejecuta?"; los pasos cambian según el modo.
+- [ ] Mantenimiento: baja cooldowns, recarga No2, aplica estados.
+- [ ] 🏁 Finalizar combate → reporte de XP/oro/despojos (no publicar).
+
+## 4. Generador de tiendas (partida "Claude · pruebas")
+- [ ] Generar una tienda: no aparecen ítems 🎒 solo botín.
+- [ ] Ver un ítem → "✎ Editar y subir" abre el asistente (cancelar).
+- [ ] Publicar y verla desde una ficha (partida "Test" no: usar solo el generador).
+
+## 5. Biblioteca, subida y auditoría
+- [ ] "+ Habilidad" de la ficha lista las clases y el pool custom.
+- [ ] `datos/auditoria.html`: 👁 Ver y ⚖ Comparar se leen claros (sin llaves ni JSON crudo).
+- [ ] Menú ☰ abre todas las herramientas de la partida.
+
+## Registro
+| Fecha | Qué se probó | Resultado | Notas |
+|---|---|---|---|
+| 2026-09-30 | Automáticas (`comun/pruebas.html`) | ✔ 38/38 | Primera versión del paso 0. |

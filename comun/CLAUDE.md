@@ -792,3 +792,8 @@ versión parecida en más de una, es candidato a juntar.
   sin importar umbrales ni Crítico potente; si no, el mejor d20 como siempre. `Critico.nombreMult(mult)`. Lo usan la
   calculadora de crítico y el duelo (`tirarCritico` guarda `crit.supercritico` = cuántos 20; el cuadro muestra
   «¡SUPERCRÍTICO!», resalta todos los 20 y explica la suma). No hace falta regla nueva de Firestore (va dentro de `crit`).
+- **`pruebas.html`** (2026-09-30, paso 0 de `../docs/plan-consolidacion.md`) — **pruebas automáticas del motor**: carga los scripts
+  de `comun/` (sin sesión ni Firebase) y verifica resultados conocidos (dados, crítico y supercrítico, estados y su
+  acumulación, inmunidades, plantillas, catálogo, ítems subidos). Todo en verde = se puede seguir. **Cada función que se mueva
+  al motor común suma acá sus pruebas.** `window.PRUEBAS = {total, fallas}` para leerlo desde el navegador. La lista manual
+  complementaria es `../docs/pruebas-de-humo.md`.

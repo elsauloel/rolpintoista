@@ -1,7 +1,7 @@
 # Plan de consolidación: un solo motor, varias ventanas
 
-> **Estado: propuesta, sin empezar** (escrita el 2026-09-30 a pedido del dueño). Se lleva adelante cuando el dueño tenga el
-> tiempo y lo considere criterioso — no antes. Cada paso se decide, se hace y se prueba por separado; ninguno obliga al
+> **Estado: en curso** (escrita y empezada el 2026-09-30 a pedido del dueño — "vamos empezando poco a poco… si hace falta
+> pausarlo para encarar otra tarea, lo pausamos"). **Hecho: paso 0.** Siguiente: paso 1. Cada paso se decide, se hace y se prueba por separado; ninguno obliga al
 > siguiente. Relacionado: "A desarrollar" n.º 51 (integrar todo en un solo sitio) y
 > [`plan-subida-unificada.md`](plan-subida-unificada.md) (el mismo espíritu, ya hecho, para subir elementos).
 
@@ -46,13 +46,17 @@ hecho, sería un cambio chico. Sin él, sería una casa más grande con los mism
 
 Cada paso: qué es, qué se gana, qué se arriesga, cómo se prueba. Se pueden espaciar semanas entre uno y otro.
 
-### Paso 0 — Red de seguridad (antes de tocar nada)
+### Paso 0 — Red de seguridad (antes de tocar nada) — ✅ 2026-09-30
 - **Qué**: una lista de pruebas de humo por herramienta (qué tocar y qué tiene que pasar: atacar, defenderse, ejecutar una
   habilidad de cada modo, pasar el turno, comprar, colocar una trampa…) y, si conviene, una página de pruebas
   (`comun/pruebas.html`) que carga el motor y verifica resultados solos (ej.: "Sangrado 2 stacks + otro → 3").
   Usar la partida **"Claude · pruebas"** (creeps y mapas ya armados) y **"Test"** para fichas de jugador.
 - **Se gana**: poder mover código con la tranquilidad de detectar enseguida si algo se rompió.
 - **Riesgo**: ninguno (no toca el juego).
+- **Cómo quedó**: [`../comun/pruebas.html`](../comun/pruebas.html) — 38 pruebas automáticas de lo que ya vive en `comun/`
+  (dados, crítico y supercrítico, estados y su acumulación, inmunidades, plantillas, catálogo, ítems subidos, la marca ⚠️),
+  sin sesión ni Firebase; cada función que se mueva al motor suma las suyas. [`pruebas-de-humo.md`](pruebas-de-humo.md) — la
+  lista de qué tocar y qué tiene que pasar en cada herramienta (ficha, mapa, GM Tools, tienda, biblioteca), con un registro.
 
 ### Paso 1 — El combatiente único (`comun/combatiente.js`)
 - **Qué**: una sola forma de leer y escribir a "alguien que pelea", con tres adaptadores (personaje, invocación, creep):

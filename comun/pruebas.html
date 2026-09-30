@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pruebas del motor — Rol Pintoísta</title>
+<link rel="icon" type="image/svg+xml" href="icono.svg">
+<style>
+:root{--ink:#0F0C0E;--panel:#1A1418;--line:#3B2E34;--paper:#EDE3D2;--muted:#9A867E;--ok:#A8C256;--mal:#D4574E;--brass:#E0A458}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--paper);font:15px/1.45 system-ui,sans-serif;padding:20px 16px 40px}
+main{max-width:900px;margin:0 auto}
+h1{font-size:20px;margin:0 0 4px}
+.hint{color:var(--muted);font-size:13px}
+#resumen{margin:14px 0;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:var(--panel);font-weight:700}
+#resumen.ok{border-color:var(--ok);color:var(--ok)}
+#resumen.mal{border-color:var(--mal);color:var(--mal)}
+h2{font-size:14px;color:var(--brass);text-transform:uppercase;letter-spacing:.06em;margin:18px 0 6px}
+.p{font-size:13.5px;padding:3px 0;border-bottom:1px solid #221A1E}
+.p b{display:inline-block;width:22px}
+.p.ok b{color:var(--ok)} .p.mal b{color:var(--mal)}
+.p .det{color:var(--mal);font-family:monospace;font-size:12px;margin-left:22px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<main>
+<h1>🧪 Pruebas del motor</h1>
+<div class="hint">Paso 0 de <code>docs/plan-consolidacion.md</code>: verifica solas las reglas que viven en <code>comun/</code>, sin Firebase ni
+  sesión. Cada función que se mueva al motor común (paso 1 en adelante) suma acá sus pruebas. Se abre directo (doble clic) o en el sitio
+  publicado: <code>comun/pruebas.html</code>. Todo en verde = se puede seguir.</div>
+<div id="resumen">Corriendo…</div>
+<div id="lista"></div>
+</main>
+
+<!-- Lo que las herramientas definen para los scripts de comun/ (acá, lo mínimo). -->
+<script>
+function num(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
+function toast(){}
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c])); }
+</script>
+<script src="tiradas.js"></script>
+<script src="critico.js"></script>
+<script src="estados-presets.js"></script>
+<script src="estados-aplicar.js"></script>
+<script src="plantillas.js"></script>
+<script src="catalogo.js"></script>
+<script src="items-subidos.js"></script>
+<script>
+/* ---------- Mini corredor de pruebas ---------- */
+const resultados = [];
+let seccion = '';
+function grupo(nombre){ seccion = nombre; }
+function prueba(nombre, fn){
+  try{ fn(); resultados.push({seccion, nombre, ok: true}); }
+  catch(e){ resultados.push({seccion, nombre, ok: false, det: e.message}); }
+}
+const js = v => JSON.stringify(v);
+function igual(real, esperado, que){
+  if(js(real) !== js(esperado)) throw new Error(`${que ? que + ': ' : ''}dio ${js(real)} y se esperaba ${js(esperado)}`);
+}
+function cierto(v, que){ if(!v) throw new Error(que || 'se esperaba verdadero'); }
+
+/* ---------- Dados (comun/tiradas.js) ---------- */
+grupo('Dados');
+prueba('parseDados entiende "2d6+3"', () => igual(parseDados('2d6+3'), {dados: [{n: 2, caras: 6}], mod: 3}));
+prueba('parseDados rechaza una fórmula con letras sueltas', () => igual(parseDados('2d6+x'), null));
+prueba('tirarDados da un total entre el mínimo y el máximo', () => {
+  for(let i = 0; i < 200; i++){ const r = tirarDados('3d4+1'); cierto(r.total >= 4 && r.total <= 13, `total ${r.total} fuera de 4–13`); }
+});
+prueba('formulaParaValor: 10 → 1d10', () => igual(formulaParaValor(10).formula, '1d10'));
+prueba('formulaParaValor: impar 5 → 1d4+1', () => igual(formulaParaValor(5).formula, '1d4+1'));
+prueba('formulaParaValor: 3 (sin dado real) → 1d3', () => igual(formulaParaValor(3).formula, '1d3'));
+prueba('formulaParaValor: 0 → nada', () => igual(formulaParaValor(0), null));
+
+/* ---------- Crítico (comun/critico.js) ---------- */
+grupo('Crítico');
+prueba('rango: Tipo 4 con frecuente +1 → 3', () => igual(Critico.rango(4, 1), 3));
+prueba('rango: nunca baja de 2', () => igual(Critico.rango(4, 5), 2));
+prueba('umbrales sin potente: 7 / 17 / 20', () => igual(Critico.umbrales(0), {doble: 7, triple: 17, cuadruple: 20}));
+prueba('umbrales con potente 6: 1 / 14 / 18', () => igual(Critico.umbrales(6), {doble: 1, triple: 14, cuadruple: 18}));
+prueba('multiplicador: 17 sin potente → triple', () => igual(Critico.multiplicador(17, 0), 3));
+prueba('evaluar: PdG 12 vs Eva 4, Tipo 4 → nivel 2, 2d20', () => { const e = Critico.evaluar({pdg: 12, eva: 4, tipo: 4}); igual([e.nivel, e.dados], [2, 2]); });
+prueba('evaluar: la Resistencia a crítico resta d20', () => igual(Critico.evaluar({pdg: 12, eva: 4, tipo: 4, resistencia: 1}).dados, 1));
+prueba('supercrítico: dos 20 naturales → ×8', () => igual(Critico.resultadoD20([20, 20], 0).mult, 8));
+prueba('supercrítico: tres 20 naturales → ×12', () => igual(Critico.resultadoD20([20, 20, 20], 0).mult, 12));
+prueba('supercrítico: un solo 20 sigue en ×4', () => igual(Critico.resultadoD20([20, 3], 0).mult, 4));
+prueba('supercrítico: dos 19 con potente no cuentan', () => { const r = Critico.resultadoD20([19, 19], 6); igual([r.mult, r.supercritico], [4, false]); });
+prueba('daño con crítico ignora la Defensa', () => igual(Critico.resolverDano({dano: 7, defensa: 5, critico: true, mult: 2}).final, 14));
+prueba('daño sin crítico resta la Defensa (mínimo 0)', () => igual(Critico.resolverDano({dano: 3, defensa: 5, critico: false}).final, 0));
+
+/* ---------- Estados (comun/estados-presets.js, comun/estados-aplicar.js) ---------- */
+grupo('Estados');
+prueba('la lista única tiene al menos 31 presets', () => cierto(ESTADOS_PRESET.length >= 31, `hay ${ESTADOS_PRESET.length}`));
+prueba('Sangrado: 2 stacks de −1 HP por turno', () => { const s = ESTADOS_PRESET.find(p => p.nombre === 'Sangrado'); igual([s.stacks, s.hpTurno], [2, -1]); });
+prueba('Armadura rota en la ficha lleva −1 Defensa; en el creep no (se resta aparte)', () => {
+  const f = estadosPresetFicha().find(p => p.nombre === 'Armadura rota'), c = estadosPresetCreep().find(p => p.nombre === 'Armadura rota');
+  igual((f.mods || []).find(m => m.stat === 'def').val, -1); igual((c.mods || []).length, 0);
+});
+prueba('Sangrado reaplicado suma de a 1 stack', () => {
+  const sc = {estados: []}; EstadosAplicar.aplicarACreep(sc, {nombre: 'Sangrado'}); EstadosAplicar.aplicarACreep(sc, {nombre: 'Sangrado'});
+  igual(sc.estados.find(e => e.nombre === 'Sangrado').stacks, 3);
+});
+prueba('Veneno suma sus stacks y dura tantos turnos como stacks', () => {
+  const sc = {estados: []}; EstadosAplicar.aplicarACreep(sc, {nombre: 'Veneno', stacks: 3}); EstadosAplicar.aplicarACreep(sc, {nombre: 'Veneno', stacks: 2});
+  const v = sc.estados.find(e => e.nombre === 'Veneno'); igual([v.stacks, v.turnos], [5, 5]);
+});
+prueba('Invulnerable bloquea un debuff', () => {
+  const sc = {estados: []}; EstadosAplicar.aplicarACreep(sc, {nombre: 'Invulnerable'});
+  igual(EstadosAplicar.aplicarACreep(sc, {nombre: 'Pajaritos'}).motivo, 'Invulnerable');
+});
+prueba('un jefe es inmune a Stun', () => igual(EstadosAplicar.aplicarACreep({estados: [], jefe: true}, {nombre: 'Stun'}).motivo, 'Protección de jefe'));
+prueba('estado propio con escudo queda como buff', () => igual(EstadosAplicar.componer({nombre: 'Blindaje improvisado', escudoMagico: 6}).polaridad, 'buff'));
+prueba('texto de un estado con turnos y escudo', () => igual(EstadosAplicar.texto({nombre: 'Escudo especial', turnos: 1, escudoMagico: 8}), 'Escudo especial (1 turno, 🛡8)'));
+
+/* ---------- Plantillas (comun/plantillas.js) ---------- */
+grupo('Plantillas');
+prueba('un ítem sube sin id, imagen ni "equipado"', () => igual(Plantillas.limpiar('items', {id: 'x', imagen: 'a', equipado: true, nombre: 'N'}), {nombre: 'N'}));
+prueba('una trampa vieja {radio: 2} pasa a la forma única con tamaño 2', () => {
+  const t = Plantillas.trampaDesde({nombre: 'Aceite', radio: 2, cant: 1}); igual([t.tamano, Plantillas.radioDeTrampa(t)], [2, 2]);
+});
+prueba('una habilidad lleva su modo de ejecución al subirla', () => igual(Plantillas.limpiar('skills', {id: 'h', nombre: 'H', detalle: '', nitrosCosto: 1, modo: 'auto'}).modo, 'auto'));
+
+/* ---------- Catálogo e ítems subidos (comun/catalogo.js, comun/items-subidos.js) ---------- */
+grupo('Catálogo');
+const TIERS = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
+prueba('no hay ids repetidos', () => { const ids = CATALOGO_BASE.map(i => i.id); igual(ids.length - new Set(ids).size, 0, 'repetidos'); });
+prueba('toda rareza es una de las cinco', () => igual(CATALOGO_BASE.filter(i => !TIERS.includes(i.tier)).map(i => i.nombre), []));
+prueba('ningún ítem tiene imagen cargada (catálogo sin imágenes)', () => igual(CATALOGO_BASE.filter(i => i.imagen).length, 0));
+prueba('una corrección subida reemplaza al de fábrica y lo nuevo entra como usr-', () => {
+  const base = [{id: 'a', nombre: 'A'}];
+  const l = ItemsSubidos.mezclar(base, [{id: 'e1', reemplaza: 'base-a', datos: {nombre: 'A corregido'}}, {id: 'e2', datos: {nombre: 'B'}}], base);
+  igual(l.map(i => i.id + ':' + i.nombre), ['a:A corregido', 'usr-e2:B']);
+});
+prueba('sacar lo subido vuelve al de fábrica', () => {
+  const base = [{id: 'a', nombre: 'A'}];
+  const con = ItemsSubidos.mezclar(base, [{id: 'e1', reemplaza: 'base-a', datos: {nombre: 'A corregido'}}], base);
+  igual(ItemsSubidos.mezclar(con, [], base).map(i => i.nombre), ['A']);
+});
+prueba('la marca ⚠️ no impide encontrar un ítem por nombre', () => {
+  const marcado = CATALOGO_BASE.find(i => i.nombre.startsWith('⚠️'));
+  if(!marcado) return;   // sin ítems marcados no hay nada que probar
+  const sinMarca = sinAviso(marcado.nombre);
+  igual(ItemsSubidos.basadoEn({nombre: sinMarca, id: 'otro'}, CATALOGO_BASE), {id: 'base-' + marcado.id, nombre: marcado.nombre});
+});
+
+/* ---------- Resultado ---------- */
+const malas = resultados.filter(r => !r.ok);
+const res = document.getElementById('resumen');
+res.textContent = malas.length ? `✘ ${malas.length} de ${resultados.length} pruebas fallaron` : `✔ Las ${resultados.length} pruebas pasaron`;
+res.className = malas.length ? 'mal' : 'ok';
+let html = '', actual = null;
+resultados.forEach(r => {
+  if(r.seccion !== actual){ actual = r.seccion; html += `<h2>${esc(actual)}</h2>`; }
+  html += `<div class="p ${r.ok ? 'ok' : 'mal'}"><b>${r.ok ? '✔' : '✘'}</b>${esc(r.nombre)}${r.ok ? '' : `<div class="det">${esc(r.det)}</div>`}</div>`;
+});
+document.getElementById('lista').innerHTML = html;
+window.PRUEBAS = {total: resultados.length, fallas: malas.map(r => `${r.seccion} · ${r.nombre}: ${r.det}`)};
+</script>
+</body>
+</html>

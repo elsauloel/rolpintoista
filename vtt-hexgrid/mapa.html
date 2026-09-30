@@ -702,6 +702,9 @@ aside{
 /* Con el cartel de movimiento a la vista, los avisos suben para no taparlo. */
 body.con-ruta .toast{bottom:auto;top:74px}
 #botonera-capa{position:fixed;inset:0;z-index:90}
+/* Un cartel de la ficha o de GM Tools durante un duelo (¿es tu turno?, No2, sobrepeso…) tiene que verse ENCIMA del cuadro del
+   duelo (#duelo-fondo, z-index 99000): antes quedaba tapado y la tirada se quedaba en «Tirando…» (encontrado 2026-09-30). */
+#botonera-capa.sobre-duelo{z-index:99500}
 #botonera-marco{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;color-scheme:normal}
 #botonera-cargando{
   position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--panel);border:1px solid var(--line);
@@ -9299,6 +9302,7 @@ function escapeABotonera(cerrarTodo){
 
 function cerrarBotonera(){
   $('#botonera-capa').hidden = true;
+  $('#botonera-capa').classList.remove('sobre-duelo');
   $('#botonera-cargando').hidden = true;
 }
 
@@ -9457,6 +9461,7 @@ window.addEventListener('message', e => {
   if(e.data.tipo === 'duelo-opciones-res') Duelo.recibirOpciones(e.data.id, e.data.opciones);   // las opciones de defensa que calculó la ficha del defensor
   if(e.data.tipo === 'duelo-ui-visible'){   // la ficha tirando para un duelo necesita mostrar un cartelito (Nitros, sobrepeso…)
     $('#botonera-capa').hidden = false;
+    $('#botonera-capa').classList.add('sobre-duelo');   // encima del cuadro del duelo mientras dure el cartel
     ubicarBotoneraCapa();
     enfocarBotonera();
   }

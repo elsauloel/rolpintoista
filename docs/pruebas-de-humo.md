@@ -13,7 +13,7 @@
 > Cómo anotar: al lado de cada punto, ✔ / ✘ y la fecha. Un ✘ se arregla (o se anota en `pendientes.md`) antes de seguir.
 
 ## 0. Automáticas
-- [ ] `comun/pruebas.html` en verde (hoy: 38 pruebas).
+- [ ] `comun/pruebas.html` en verde (hoy: 56 pruebas).
 
 ## 1. Ficha (partida "Test", "Prueba de Claude")
 - [ ] Abre sin errores en la consola; el título dice personaje y partida.
@@ -66,3 +66,4 @@
 | Fecha | Qué se probó | Resultado | Notas |
 |---|---|---|---|
 | 2026-09-30 | Automáticas (`comun/pruebas.html`) | ✔ 38/38 | Primera versión del paso 0. |
+| 2026-09-30 | Automáticas + funciones del motor dentro de ficha y GM Tools (copias sin sesión) | ✔ 56/56 | Paso 1, tanda 1 (`comun/combatiente.js`). Falta repasar la lista manual en mesa. |

@@ -932,8 +932,9 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/plantillas.js?v=20260930a"></script>
 <script src="../comun/biblioteca.js?v=20260929i"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
+<script src="../comun/combatiente.js?v=20260930a"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
-<script src="../comun/estados-aplicar.js?v=20260929a"></script>
+<script src="../comun/estados-aplicar.js?v=20260930a"></script>
 <script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-trampa.js?v=20260929i"></script>
 <script src="../comun/asistente-zona.js"></script>
@@ -8921,22 +8922,8 @@ function abrirEditarEstado(t, nombre){
 }
 
 // Estados alterados desde el HUD: sacar uno o cambiarle los turnos.
-// Escudo especial: el texto puede ser un número, +N / -N o «max N» (cambia el máximo; en un excedente de vida no hay máximo). Igual que en ficha y gm-tools.
-function escudoParsear(txt, actual, max){
-  // max === null: excedente de vida (valor neto, sin tope ni «max N»); si no, un escudo con máximo.
-  const t = String(txt || '').trim().replace(',', '.').replace('\u2212', '-');
-  if(!t) return null;
-  const neto = max === null;
-  if(!neto){
-    const m = /^max\s*(\d+(?:\.\d+)?)$/i.exec(t);
-    if(m){ const nm = Math.max(1, parseFloat(m[1])); return {max: nm, actual: Math.min(actual, nm)}; }
-  }
-  let v;
-  if(/^[+-]\d+(?:\.\d+)?$/.test(t)) v = actual + parseFloat(t);
-  else if(/^\d+(?:\.\d+)?$/.test(t)) v = parseFloat(t);
-  else return null;
-  return {max: neto ? null : max, actual: Math.max(0, neto ? v : Math.min(max, v))};
-}
+// Escudo especial / Excedente de vida: el texto puede ser un número, +N / -N o «max N» (comun/combatiente.js, igual que ficha y gm-tools).
+function escudoParsear(txt, actual, max){ return Combatiente.escudoParsear(txt, actual, max); }
 async function hudEstadoCambiar(t, indice, accion, delta){
   const v = vinculo(t);
   const lista = (v && v.resumen && v.resumen.estados) || [];

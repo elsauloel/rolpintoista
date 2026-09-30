@@ -40,8 +40,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
+<script src="combatiente.js"></script>
 <script src="estados-presets.js"></script>
 <script src="estados-aplicar.js"></script>
+<script src="modificadores-tirada.js"></script>
 <script src="plantillas.js"></script>
 <script src="catalogo.js"></script>
 <script src="items-subidos.js"></script>
@@ -111,6 +113,67 @@ prueba('Invulnerable bloquea un debuff', () => {
 prueba('un jefe es inmune a Stun', () => igual(EstadosAplicar.aplicarACreep({estados: [], jefe: true}, {nombre: 'Stun'}).motivo, 'Protección de jefe'));
 prueba('estado propio con escudo queda como buff', () => igual(EstadosAplicar.componer({nombre: 'Blindaje improvisado', escudoMagico: 6}).polaridad, 'buff'));
 prueba('texto de un estado con turnos y escudo', () => igual(EstadosAplicar.texto({nombre: 'Escudo especial', turnos: 1, escudoMagico: 8}), 'Escudo especial (1 turno, 🛡8)'));
+
+/* ---------- Combatiente (comun/combatiente.js, paso 1 de la consolidación) ---------- */
+grupo('Combatiente');
+const E = o => ({activo: true, ...o});
+prueba('Pajaritos parte PdG y Evasión, no Parry', () => {
+  const es = [E({mitadPdgEva: true})];
+  igual(['pdg', 'eva', 'parry'].map(s => Combatiente.mitadesDeTirada(es, s)), [1, 1, 0]);
+});
+prueba('Pajaritos + Lisiado parten la PdG dos veces', () => igual(Combatiente.mitadesDeTirada([E({mitadPdgEva: true}), E({lisiado: true})], 'pdg'), 2));
+prueba('Parálisis no se suma a Lisiado (una sola mitad)', () => igual(Combatiente.mitadesDeTirada([E({lisiado: true}), E({paralisis: true})], 'pdg'), 1));
+prueba('Parálisis sola parte PdG, Parry y Evasión', () => igual(['pdg', 'parry', 'eva'].map(s => Combatiente.mitadesDeTirada([E({paralisis: true})], s)), [1, 1, 1]));
+prueba('Sentado parte la Evasión', () => igual(Combatiente.mitadesDeTirada([E({sentado: true})], 'eva'), 1));
+prueba('un estado pausado no parte nada', () => igual(Combatiente.mitadesDeTirada([{mitadPdgEva: true, activo: false}], 'pdg'), 0));
+prueba('aplicarMitades: 9 partido dos veces → 2; nunca baja de 1', () => igual([Combatiente.aplicarMitades(9, 2), Combatiente.aplicarMitades(1, 3)], [2, 1]));
+prueba('el cartel de mitades coincide con la cuenta (Parálisis no aparece si ya hay Lisiado)', () => {
+  const es = [E({nombre: 'Lisiado', lisiado: true}), E({nombre: 'Parálisis', paralisis: true})];
+  igual(Combatiente.estadosQueParten(es, 'pdg').map(e => e.nombre), ['Lisiado']);
+});
+prueba('escudo: número, +N, −N y «max N»', () => igual([
+  Combatiente.escudoParsear('5', 8, 10), Combatiente.escudoParsear('+4', 8, 10), Combatiente.escudoParsear('−3', 8, 10), Combatiente.escudoParsear('max 6', 8, 10)],
+  [{max: 10, actual: 5}, {max: 10, actual: 10}, {max: 10, actual: 5}, {max: 6, actual: 6}]));
+prueba('excedente de vida: sin tope ni «max»', () => igual([Combatiente.escudoParsear('+30', 5, null), Combatiente.escudoParsear('max 3', 5, null)], [{max: null, actual: 35}, null]));
+prueba('Veneno se acumula sumando stacks; Veneno severo no', () => {
+  const l = [E({nombre: 'Veneno', esVeneno: true, stacks: 2, turnos: 2})];
+  Combatiente.acumularVeneno(l, {nombre: 'Veneno', esVeneno: true, stacks: 3});
+  const sev = [E({nombre: 'Veneno severo', esVeneno: true, permanente: true, stacks: 1})];
+  Combatiente.acumularVeneno(sev, {nombre: 'Veneno severo', esVeneno: true, permanente: true, stacks: 1});
+  igual([l[0].stacks, l[0].turnos, sev[0].stacks], [5, 5, 1]);
+});
+prueba('Sangrado suma de a 1; Escarcha suma 1 y renueva la duración', () => {
+  const l = [E({nombre: 'Sangrado', esSangrado: true, stacks: 2}), E({nombre: 'Escarcha', esEscarcha: true, stacks: 1, turnos: 1})];
+  Combatiente.acumularSangrado(l, {nombre: 'Sangrado', esSangrado: true, stacks: 2});
+  Combatiente.acumularSangrado(l, {nombre: 'Escarcha', esEscarcha: true, turnos: 3});
+  igual([l[0].stacks, l[1].stacks, l[1].turnos], [3, 2, 3]);
+});
+prueba('sin uno igual, no acumula (devuelve null)', () => igual(Combatiente.acumularVeneno([], {nombre: 'Veneno', esVeneno: true}), null));
+prueba('inmunidades: Invulnerable, CC, Sangre pura, Coagulación, jefe', () => {
+  const deb = o => ({polaridad: 'debuff', ...o});
+  igual([
+    Combatiente.inmunidad([E({invulnerable: true})], deb({nombre: 'X'})),
+    Combatiente.inmunidad([E({inmunidadCC: true})], deb({nombre: 'Stun', esCC: true})),
+    Combatiente.inmunidad([E({sangrePura: true})], deb({nombre: 'Veneno', esVeneno: true})),
+    Combatiente.inmunidad([E({coagulacionExtrema: true})], deb({nombre: 'Sangrado', esSangrado: true})),
+    Combatiente.inmunidad([], deb({nombre: 'Stun'}), {jefe: true}),
+    Combatiente.inmunidad([E({invulnerable: true})], {nombre: 'Hypeado', polaridad: 'buff'}),
+  ], ['Invulnerable', 'Inmunidad a CC', 'Sangre pura', 'Coagulación extrema', 'Protección de jefe', false]);
+});
+prueba('dos Pajaritos parten una sola vez y el cartel muestra uno', () => {
+  const es = [E({nombre: 'Pajaritos', mitadPdgEva: true}), E({nombre: 'Pajaritos 2', mitadPdgEva: true})];
+  igual([Combatiente.mitadesDeTirada(es, 'pdg'), Combatiente.estadosQueParten(es, 'pdg').length], [1, 1]);
+});
+prueba('botón de colores: con Lisiado, Parálisis no dice ÷2 (como la tirada)', () => {
+  const es = [E({nombre: 'Lisiado', lisiado: true, polaridad: 'debuff'}), E({nombre: 'Parálisis', paralisis: true, polaridad: 'debuff'})];
+  igual(ModTirada.lista(es, 'pdg').map(x => x.txt), ['Lisiado ÷2']);
+});
+prueba('estados-aplicar usa el motor: Sangrado en un creep suma de a 1', () => {
+  const sc = {estados: [E({nombre: 'Sangrado', esSangrado: true, polaridad: 'debuff', stacks: 2, hpTurno: -1})]};
+  const r = EstadosAplicar.aplicarACreep(sc, {nombre: 'Sangrado'});
+  igual([r.ok, sc.estados.length, sc.estados[0].stacks], [true, 1, 3]);
+});
+prueba('estados-aplicar usa el motor: un jefe rebota el Stun', () => igual(EstadosAplicar.aplicarACreep({jefe: true, estados: []}, {nombre: 'Stun'}).motivo, 'Protección de jefe'));
 
 /* ---------- Plantillas (comun/plantillas.js) ---------- */
 grupo('Plantillas');

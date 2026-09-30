@@ -1,7 +1,7 @@
 # Plan de consolidación: un solo motor, varias ventanas
 
 > **Estado: en curso** (escrita y empezada el 2026-09-30 a pedido del dueño — "vamos empezando poco a poco… si hace falta
-> pausarlo para encarar otra tarea, lo pausamos"). **Hecho: paso 0.** Siguiente: paso 1. Cada paso se decide, se hace y se prueba por separado; ninguno obliga al
+> pausarlo para encarar otra tarea, lo pausamos"). **Hecho: paso 0.** En curso: paso 1 (tanda 1 hecha). Cada paso se decide, se hace y se prueba por separado; ninguno obliga al
 > siguiente. Relacionado: "A desarrollar" n.º 51 (integrar todo en un solo sitio) y
 > [`plan-subida-unificada.md`](plan-subida-unificada.md) (el mismo espíritu, ya hecho, para subir elementos).
 
@@ -65,6 +65,22 @@ Cada paso: qué es, qué se gana, qué se arriesga, cómo se prueba. Se pueden e
   `estaBloqueadoElDebuff`…), una por una, comparando que den lo mismo que antes.
 - **Se gana**: el cimiento de todo lo demás; cada función movida deja de poder divergir.
 - **Riesgo**: bajo, si se mueve de a una y con el paso 0.
+- **Cómo va** (empezado el 2026-09-30):
+  - **Inventario**: 59 funciones con el mismo nombre en 2+ herramientas (28 idénticas, 31 distintas). Las de combate
+    que importan están listadas abajo.
+  - **Tanda 1 ✅** — [`../comun/combatiente.js`](../comun/combatiente.js) (`Combatiente`) con `mitadesDeTirada`,
+    `aplicarMitades`, `estadosQueParten`, `escudoParsear`, `acumularVeneno`, `acumularSangrado` (incluye Escarcha) e
+    `inmunidad` (Invulnerable, Inmunidad a CC, Sangre pura, Coagulación extrema, protección de jefe). Antes vivían en
+    hasta **cuatro** copias (ficha, GM Tools, mapa y `estados-aplicar.js`). Las herramientas conservan los nombres de
+    siempre (`estaBloqueadoElDebuffCreep`, `acumularVenenoCreep`…) como atajos de una línea al motor, así nada más
+    cambió. Antes de reemplazar se compararon las copias viejas contra el motor en 3000 casos al azar: idénticas.
+  - **Diferencia encontrada y corregida**: los botones de colores de la Botonera (`modificadores-tirada.js`) decían
+    "Parálisis ÷2" aunque ya partiera Lisiado o Pajaritos (la tirada partía una sola vez, el cartel decía dos). Ahora el
+    cartel sale del motor y muestra exactamente lo que se aplica.
+  - **Pruebas**: `comun/pruebas.html` 38 → 56.
+  - **Tanda 2 (siguiente)**: `tirarValorStat` (ficha vs GM Tools, hoy distintas), `bloqueoValor`/`costoParry` (personaje,
+    invocación y creep), y los adaptadores de "combatiente" (leer stat, estados, No2, HP y escudo de un personaje, una
+    invocación o un creep con la misma forma). `mantenimiento` (3 versiones) queda para el paso 2.
 
 ### Paso 2 — Estados y Mantenimiento únicos
 - **Qué**: aplicar, acumular, vencer y recalcular estados, y el Mantenimiento (pasar el turno), en un solo lugar para los

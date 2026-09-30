@@ -1291,8 +1291,9 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/plantillas.js?v=20260930a"></script>
 <script src="../comun/biblioteca.js?v=20260929i"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
+<script src="../comun/combatiente.js?v=20260930a"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
-<script src="../comun/estados-aplicar.js?v=20260929a"></script>
+<script src="../comun/estados-aplicar.js?v=20260930a"></script>
 <script src="../comun/creeps-base.js?v=20260927a"></script>
 <script src="../comun/skills-creep-base.js?v=20260927a"></script>
 <script src="../comun/armas-naturales-base.js"></script>
@@ -1309,7 +1310,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/lupa.js"></script>
 <script src="../comun/estado-preguntas.js?v=20260929a"></script>
 <script src="../comun/asistente-estado.js"></script>
-<script src="../comun/modificadores-tirada.js"></script>
+<script src="../comun/modificadores-tirada.js?v=20260930a"></script>
 <script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-trampa.js?v=20260929i"></script>
 <script src="../comun/asistente-duelo-hab.js?v=20260930a"></script>
@@ -1386,18 +1387,9 @@ function estadosQueAfectanStatCreep(sc, statId, conVentaja){
   }
   return out;
 }
-// Estados que parten la TIRADA a la mitad (2026-09-24): se tira el dado completo y al resultado se lo divide por 2, para abajo, mínimo 1.
-// Igual que en ficha.html (código duplicado a propósito, ver comun/CLAUDE.md).
-function mitadesDeTirada(estados, statId){
-  const act = (estados || []).filter(e => e && e.activo !== false);
-  let n = 0;
-  if(['pdg', 'eva'].includes(statId) && act.some(e => e.mitadPdgEva)) n++;
-  if(['pdg', 'parry'].includes(statId) && act.some(e => e.lisiado)) n++;
-  if(['pdg', 'parry', 'eva'].includes(statId) && n === 0 && act.some(e => e.paralisis)) n++;   // Parálisis: una sola mitad por stat
-  if(statId === 'eva' && act.some(e => e.sentado)) n++;
-  return n;
-}
-function aplicarMitades(total, n){ for(let i = 0; i < n; i++) total = Math.max(1, Math.floor(total / 2)); return total; }
+// Estados que parten la TIRADA a la mitad (Pajaritos, Lisiado, Parálisis, Sentado): comun/combatiente.js, la misma regla que la ficha.
+function mitadesDeTirada(estados, statId){ return Combatiente.mitadesDeTirada(estados, statId); }
+function aplicarMitades(total, n){ return Combatiente.aplicarMitades(total, n); }
 function tirarValorStat(nombre, valor, sc, statId){
   const f = formulaParaValor(valor);
   if(!f){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
@@ -3309,33 +3301,10 @@ function activarEstadoPresetCreep(preset){
   toast(`${sc.nombre}: ${preset.nombre} activado`);
 }
 
-// Veneno se acumula: una aplicación nueva suma sus stacks al Veneno que ya tiene el creep, en un solo
-// estado, y los turnos quedan igualados a los stacks. Veneno severo (permanente) no se acumula.
-// Devuelve el estado que ya estaba (null si no había). Igual que en ficha.html y comun/estados-aplicar.js.
-function acumularVenenoCreep(sc, nuevo){
-  if(!nuevo.esVeneno) return null;
-  const ya = (sc.estados || []).find(e => e.esVeneno && e.nombre === nuevo.nombre);
-  if(!ya) return null;
-  if(!nuevo.permanente){
-    ya.stacks = Math.max(1, num(ya.stacks) || 1) + Math.max(1, num(nuevo.stacks) || 1);
-    ya.turnos = ya.stacks;
-    ya.activo = true;
-  }
-  return ya;
-}
-// Sangrado se acumula distinto: una reaplicación suma solo +1 stack (el daño por turno sube de a 1), no una tirada
-// nueva de stacks — mismo criterio que Armadura rota.
-function acumularSangradoCreep(sc, nuevo){
-  // También acumula Escarcha (2026-09-25): cada reaplicación suma un stack y renueva la duración.
-  const clave = nuevo.esSangrado ? 'esSangrado' : nuevo.esEscarcha ? 'esEscarcha' : '';
-  if(!clave) return null;
-  const ya = (sc.estados || []).find(e => e[clave] && e.nombre === nuevo.nombre);
-  if(!ya) return null;
-  ya.stacks = Math.max(1, num(ya.stacks) || 1) + 1;
-  ya.activo = true;
-  if(clave === 'esEscarcha') ya.turnos = Math.max(num(ya.turnos), num(nuevo.turnos));
-  return ya;
-}
+// Veneno suma sus stacks enteros; Sangrado y Escarcha, +1 stack (comun/combatiente.js, la misma regla que la ficha).
+// Devuelven el estado que ya estaba (null si no había).
+function acumularVenenoCreep(sc, nuevo){ return Combatiente.acumularVeneno(sc.estados, nuevo); }
+function acumularSangradoCreep(sc, nuevo){ return Combatiente.acumularSangrado(sc.estados, nuevo); }
 
 function aplicarPresetEstadoCreep(valor){
   if(presetsCreepDestino === 'duelo'){
@@ -3362,19 +3331,8 @@ const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp'};
 // Crea o refresca un estado del creep a partir de una habilidad con un
 // efecto configurado (preset o a mano) — igual variedad que en ficha.html:
 // nombre, turnos, stacks, HP por turno, detalle y modificadores de atributo.
-// Invulnerable bloquea cualquier debuff nuevo; Inmunidad a CC / Sangre
-// pura / Coagulación extrema bloquean solo su categoría (esCC/esVeneno/
-// esSangrado, la misma marca que llevan los presets).
-function estaBloqueadoElDebuffCreep(sc, objEfecto){
-  if(!objEfecto || objEfecto.polaridad !== 'debuff') return false;
-  if(sc.jefe && objEfecto.nombre === 'Stun') return true;   // protección de jefe: inmune a Stun
-  const activos = (sc.estados || []).filter(e => e.activo !== false);
-  if(activos.some(e => e.invulnerable)) return true;
-  if(objEfecto.esCC && activos.some(e => e.inmunidadCC)) return true;
-  if(objEfecto.esVeneno && activos.some(e => e.sangrePura)) return true;
-  if(objEfecto.esSangrado && activos.some(e => e.coagulacionExtrema)) return true;
-  return false;
-}
+// Invulnerable, Inmunidad a CC, Sangre pura, Coagulación extrema y la protección de jefe contra Stun (comun/combatiente.js).
+function estaBloqueadoElDebuffCreep(sc, objEfecto){ return !!Combatiente.inmunidad(sc.estados, objEfecto, {jefe: sc.jefe}); }
 
 function aplicarEfectoDeConsumoCreep(sc, h){
   const nombre = (h.efectoNombre || '').trim();
@@ -4728,23 +4686,8 @@ function guardarEditorEstadoCreep(){
   toast(`${nombre} guardado`);
 }
 
-// Escudo especial: cambiar su valor sin abrir el editor de estados (2026-09-24, pedido del dueño). El texto puede ser un número
-// (valor actual nuevo), +N / -N (sumar o restar) o «max N» (cambia el máximo; en un excedente de vida no hay máximo). Duplicado en ficha y gm-tools a propósito.
-function escudoParsear(txt, actual, max){
-  // max === null: excedente de vida (valor neto, sin tope ni «max N»); si no, un escudo con máximo.
-  const t = String(txt || '').trim().replace(',', '.').replace('\u2212', '-');
-  if(!t) return null;
-  const neto = max === null;
-  if(!neto){
-    const m = /^max\s*(\d+(?:\.\d+)?)$/i.exec(t);
-    if(m){ const nm = Math.max(1, parseFloat(m[1])); return {max: nm, actual: Math.min(actual, nm)}; }
-  }
-  let v;
-  if(/^[+-]\d+(?:\.\d+)?$/.test(t)) v = actual + parseFloat(t);
-  else if(/^\d+(?:\.\d+)?$/.test(t)) v = parseFloat(t);
-  else return null;
-  return {max: neto ? null : max, actual: Math.max(0, neto ? v : Math.min(max, v))};
-}
+// Escudo especial / Excedente de vida: cambiar el valor a mano (número, +N/−N o «max N»): comun/combatiente.js.
+function escudoParsear(txt, actual, max){ return Combatiente.escudoParsear(txt, actual, max); }
 
 function estadoHtml(scId, es){
   const stacks = Math.max(1, num(es.stacks) || 1);

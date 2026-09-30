@@ -17,16 +17,17 @@ const ModTirada = (() => {
 
   function lista(estados, statId){
     const out = [];
+    // Las mitades salen del motor común (comun/combatiente.js): se muestran exactamente las que se aplican al tirar
+    // (Parálisis no aparece si ya parte Lisiado o Pajaritos; dos estados con la misma marca parten una sola vez).
+    const parten = new Map();
+    Combatiente.estadosQueParten(estados, statId).forEach(e => parten.set(e, (parten.get(e) || 0) + 1));
     (estados || []).filter(e => e && e.activo !== false).forEach(e => {
       const pol = e.polaridad === 'buff' ? 'buff' : e.polaridad === 'debuff' ? 'debuff' : 'otro';
       (e.mods || []).filter(m => m && m.stat === statId && num(m.val)).forEach(m => {
         const v = num(m.val);
         out.push({txt: `${e.nombre} ${v > 0 ? '+' : '−'}${Math.abs(v)}`, p: pol === 'otro' ? (v > 0 ? 'buff' : 'debuff') : pol});
       });
-      if(e.mitadPdgEva && ['pdg', 'eva'].includes(statId)) out.push({txt: `${e.nombre} ÷2`, p: 'debuff'});
-      if(e.lisiado && ['pdg', 'parry'].includes(statId)) out.push({txt: `${e.nombre} ÷2`, p: 'debuff'});
-      if(e.paralisis && ['pdg', 'parry', 'eva'].includes(statId)) out.push({txt: `${e.nombre} ÷2`, p: 'debuff'});
-      if(e.sentado && statId === 'eva') out.push({txt: `${e.nombre} ÷2`, p: 'debuff'});
+      if(parten.has(e)) out.push({txt: `${e.nombre} ÷${2 ** parten.get(e)}`, p: 'debuff'});
       if(e.afortunado && ['pdg', 'parry', 'eva'].includes(statId)) out.push({txt: `${e.nombre} ×2`, p: 'buff'});
     });
     return out;

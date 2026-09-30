@@ -797,3 +797,11 @@ versión parecida en más de una, es candidato a juntar.
   acumulación, inmunidades, plantillas, catálogo, ítems subidos). Todo en verde = se puede seguir. **Cada función que se mueva
   al motor común suma acá sus pruebas.** `window.PRUEBAS = {total, fallas}` para leerlo desde el navegador. La lista manual
   complementaria es `../docs/pruebas-de-humo.md`.
+- **`combatiente.js`** (`Combatiente`, 2026-09-30, paso 1 de `../docs/plan-consolidacion.md`) — **el motor de reglas común**
+  de personajes, invocaciones y creeps. Funciones puras (reciben la lista de estados o el valor y devuelven el resultado, sin
+  tocar pantalla ni Firebase): `mitadesDeTirada`/`aplicarMitades`/`estadosQueParten` (Pajaritos, Lisiado, Parálisis,
+  Sentado), `escudoParsear`, `acumularVeneno`/`acumularSangrado` (+ Escarcha) e `inmunidad(estados, est, {jefe})`
+  (devuelve el motivo o false). **Una regla de combate nueva o corregida va acá, no en una herramienta.** La ficha, GM Tools
+  y el mapa conservan los nombres de siempre como atajos de una línea (`estaBloqueadoElDebuffCreep` → `inmunidad`, etc.);
+  `estados-aplicar.js` y `modificadores-tirada.js` también lo usan. Se carga **antes** de `estados-presets.js` en ficha,
+  gm-tools, mapa y `datos/auditoria-skills.html`.

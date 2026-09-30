@@ -62,17 +62,8 @@ const EstadosAplicar = (() => {
     return {id: id(), activo: true, stacks: 1, hpTurno: 0, stacksTurno: 0, permanente: false, escudoMagico: 0, forzarNitros: '', mods: [], ...base};
   }
 
-  // Inmunidades del que recibe el estado (las mismas reglas que gm-tools y la ficha).
-  function bloqueadoCreep(estados, est, sc){
-    if(!est || est.polaridad !== 'debuff') return false;
-    if(sc && sc.jefe && est.nombre === 'Stun') return 'Protección de jefe';
-    const activos = (estados || []).filter(e => e.activo !== false);
-    if(activos.some(e => e.invulnerable)) return 'Invulnerable';
-    if(est.esCC && activos.some(e => e.inmunidadCC)) return 'Inmunidad a CC';
-    if(est.esVeneno && activos.some(e => e.sangrePura)) return 'Sangre pura';
-    if(est.esSangrado && activos.some(e => e.coagulacionExtrema)) return 'Coagulación extrema';
-    return false;
-  }
+  // Inmunidades del que recibe el estado: la regla vive en comun/combatiente.js (la misma para ficha, gm-tools y mapa).
+  function bloqueadoCreep(estados, est, sc){ return Combatiente.inmunidad(estados, est, sc); }
 
   // Lo pone en un creep (objeto de gm-tools o de su parte privada). Devuelve {ok, estado?, motivo?}.
   function aplicarACreep(sc, spec){
@@ -84,28 +75,9 @@ const EstadosAplicar = (() => {
       const ya = sc.estados.find(e => e.armaduraRota);
       if(ya){ ya.stacks = Math.max(1, Number(ya.stacks) || 1) + 1; ya.activo = true; return {ok: true, estado: ya}; }
     }
-    // Veneno se acumula (suma sus stacks, turnos = stacks); Veneno severo no.
-    if(est.esVeneno){
-      const ya = sc.estados.find(e => e.esVeneno && e.nombre === est.nombre);
-      if(ya){
-        if(!est.permanente){
-          ya.stacks = Math.max(1, Number(ya.stacks) || 1) + Math.max(1, Number(est.stacks) || 1);
-          ya.turnos = ya.stacks;
-          ya.activo = true;
-        }
-        return {ok: true, estado: ya};
-      }
-    }
-    // Sangrado se acumula distinto: solo +1 stack por reaplicación (el daño por turno sube de a 1), no una tirada nueva.
-    if(est.esSangrado){
-      const ya = sc.estados.find(e => e.esSangrado && e.nombre === est.nombre);
-      if(ya){ ya.stacks = Math.max(1, Number(ya.stacks) || 1) + 1; ya.activo = true; return {ok: true, estado: ya}; }
-    }
-    // Escarcha se acumula (2026-09-25): cada reaplicación suma un stack (−1 No2 máx. por stack) y renueva la duración.
-    if(est.esEscarcha){
-      const ya = sc.estados.find(e => e.esEscarcha && e.nombre === est.nombre);
-      if(ya){ ya.stacks = Math.max(1, Number(ya.stacks) || 1) + 1; ya.activo = true; ya.turnos = Math.max(Number(ya.turnos) || 0, Number(est.turnos) || 0); return {ok: true, estado: ya}; }
-    }
+    // Veneno suma sus stacks (Veneno severo no); Sangrado y Escarcha, +1 stack (comun/combatiente.js).
+    const acumulado = Combatiente.acumularVeneno(sc.estados, est) || Combatiente.acumularSangrado(sc.estados, est);
+    if(acumulado) return {ok: true, estado: acumulado};
     const igual = sc.estados.find(e => e.nombre === est.nombre);
     if(igual){ Object.assign(igual, {...est, id: igual.id}); return {ok: true, estado: igual}; }
     sc.estados.push(est);

@@ -2072,10 +2072,11 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/estado-preguntas.js?v=20260929a"></script>
 <script src="../comun/confirmar-turno.js"></script>
 <script src="../comun/asistente-estado.js"></script>
-<script src="../comun/modificadores-tirada.js"></script>
+<script src="../comun/modificadores-tirada.js?v=20260930a"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
+<script src="../comun/combatiente.js?v=20260930a"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
-<script src="../comun/estados-aplicar.js?v=20260929a"></script>
+<script src="../comun/estados-aplicar.js?v=20260930a"></script>
 <script src="../comun/trampas-base.js"></script>
 <script src="../comun/asistente-trampa.js?v=20260929i"></script>
 <script src="../comun/asistente-duelo-hab.js?v=20260930a"></script>
@@ -2892,33 +2893,10 @@ function aplicarEstadoRecibido(spec, origen){
   toast(`🎯 ${quien}recibiste ${draft.nombre}`);
 }
 
-// Veneno se acumula: una aplicación nueva suma sus stacks al Veneno que ya tenés, en un solo estado,
-// y los turnos quedan igualados a los stacks para que se agoten juntos. Veneno severo (permanente)
-// no se acumula. Devuelve el estado que ya estaba (null si no había, y hay que agregar el nuevo).
-function acumularVeneno(lista, nuevo){
-  if(!nuevo.esVeneno) return null;
-  const ya = (lista || []).find(e => e.esVeneno && e.nombre === nuevo.nombre);
-  if(!ya) return null;
-  if(!nuevo.permanente){
-    ya.stacks = Math.max(1, num(ya.stacks) || 1) + Math.max(1, num(nuevo.stacks) || 1);
-    ya.turnos = ya.stacks;
-    ya.activo = true;
-  }
-  return ya;
-}
-// Sangrado se acumula distinto: una reaplicación no suma sus stacks enteros, solo +1 (el daño por turno sube de a 1:
-// 2, 3, 4…). Mismo mecanismo que Armadura rota (un stack más en el mismo estado), no una tirada nueva de stacks.
-function acumularSangrado(lista, nuevo){
-  // También acumula Escarcha (2026-09-25): cada reaplicación suma un stack y renueva la duración.
-  const clave = nuevo.esSangrado ? 'esSangrado' : nuevo.esEscarcha ? 'esEscarcha' : '';
-  if(!clave) return null;
-  const ya = (lista || []).find(e => e[clave] && e.nombre === nuevo.nombre);
-  if(!ya) return null;
-  ya.stacks = Math.max(1, num(ya.stacks) || 1) + 1;
-  ya.activo = true;
-  if(clave === 'esEscarcha') ya.turnos = Math.max(num(ya.turnos), num(nuevo.turnos));
-  return ya;
-}
+// Veneno suma sus stacks enteros; Sangrado y Escarcha, +1 stack. Devuelven el estado que ya estaba (null = agregar el nuevo).
+// La regla vive en el motor común (comun/combatiente.js, paso 1 de docs/plan-consolidacion.md).
+function acumularVeneno(lista, nuevo){ return Combatiente.acumularVeneno(lista, nuevo); }
+function acumularSangrado(lista, nuevo){ return Combatiente.acumularSangrado(lista, nuevo); }
 
 function attrBudget(){
   const nivel = Math.max(1, num(S.meta.nivel) || 1);
@@ -3369,20 +3347,8 @@ function configEfectoDe(it){
   return it;
 }
 
-// Invulnerable bloquea cualquier debuff nuevo; Inmunidad a CC / Sangre
-// pura / Coagulación extrema bloquean solo su categoría (marcada en el
-// preset con esCC/esVeneno/esSangrado). objEfecto puede ser un preset o
-// un draft del editor — a los dos les alcanza con tener polaridad/las
-// banderas de categoría.
-function estaBloqueadoElDebuff(objEfecto){
-  if(!objEfecto || objEfecto.polaridad !== 'debuff') return false;
-  const activos = (S.efectos || []).filter(e => e.activo !== false);
-  if(activos.some(e => e.invulnerable)) return true;
-  if(objEfecto.esCC && activos.some(e => e.inmunidadCC)) return true;
-  if(objEfecto.esVeneno && activos.some(e => e.sangrePura)) return true;
-  if(objEfecto.esSangrado && activos.some(e => e.coagulacionExtrema)) return true;
-  return false;
-}
+// Invulnerable, Inmunidad a CC, Sangre pura y Coagulación extrema (comun/combatiente.js). objEfecto: un preset o un draft del editor.
+function estaBloqueadoElDebuff(objEfecto){ return !!Combatiente.inmunidad(S.efectos, objEfecto); }
 
 // Oleo reparador: quita Armadura rota si está activa (es permanente, no vence sola). Devuelve cuántas se quitaron.
 function repararArmadura(){
@@ -4035,18 +4001,9 @@ $('#scrim-sobrepeso').addEventListener('mousedown', e => { if(e.target.id === 's
 $('#sobrepeso-pagar').onclick = () => sobrepesoElegir(true);
 $('#sobrepeso-penal').onclick = () => sobrepesoElegir(false);
 
-// Estados que parten la TIRADA a la mitad (2026-09-24, pedido del dueño): Pajaritos (PdG y Evasión) y Lisiado (PdG y Parry). No se achican
-// los dados: se tira el dado completo y al resultado se lo divide por 2, para abajo, con mínimo 1. Un estado por cada uno.
-function mitadesDeTirada(estados, statId){
-  const act = (estados || []).filter(e => e && e.activo !== false);
-  let n = 0;
-  if(['pdg', 'eva'].includes(statId) && act.some(e => e.mitadPdgEva)) n++;
-  if(['pdg', 'parry'].includes(statId) && act.some(e => e.lisiado)) n++;
-  if(['pdg', 'parry', 'eva'].includes(statId) && n === 0 && act.some(e => e.paralisis)) n++;   // Parálisis: una sola mitad por stat, no se suma a Lisiado ni Pajaritos
-  if(statId === 'eva' && act.some(e => e.sentado)) n++;
-  return n;
-}
-function aplicarMitades(total, n){ for(let i = 0; i < n; i++) total = Math.max(1, Math.floor(total / 2)); return total; }
+// Estados que parten la TIRADA a la mitad (Pajaritos, Lisiado, Parálisis, Sentado): comun/combatiente.js.
+function mitadesDeTirada(estados, statId){ return Combatiente.mitadesDeTirada(estados, statId); }
+function aplicarMitades(total, n){ return Combatiente.aplicarMitades(total, n); }
 
 function tirarValorStat(nombre, valor, statId, extra, sobrepeso, sobre){
   const f = formulaParaValor(valor);
@@ -5305,23 +5262,8 @@ const LISTS = {
   }
 };
 
-// Escudo especial: cambiar su valor sin abrir el editor de estados (2026-09-24, pedido del dueño). El texto puede ser un número
-// (valor actual nuevo), +N / -N (sumar o restar) o «max N» (cambia el máximo; en un excedente de vida no hay máximo). Duplicado en ficha y gm-tools a propósito.
-function escudoParsear(txt, actual, max){
-  // max === null: excedente de vida (valor neto, sin tope ni «max N»); si no, un escudo con máximo.
-  const t = String(txt || '').trim().replace(',', '.').replace('\u2212', '-');
-  if(!t) return null;
-  const neto = max === null;
-  if(!neto){
-    const m = /^max\s*(\d+(?:\.\d+)?)$/i.exec(t);
-    if(m){ const nm = Math.max(1, parseFloat(m[1])); return {max: nm, actual: Math.min(actual, nm)}; }
-  }
-  let v;
-  if(/^[+-]\d+(?:\.\d+)?$/.test(t)) v = actual + parseFloat(t);
-  else if(/^\d+(?:\.\d+)?$/.test(t)) v = parseFloat(t);
-  else return null;
-  return {max: neto ? null : max, actual: Math.max(0, neto ? v : Math.min(max, v))};
-}
+// Escudo especial / Excedente de vida: cambiar el valor a mano (número, +N/−N o «max N»): comun/combatiente.js.
+function escudoParsear(txt, actual, max){ return Combatiente.escudoParsear(txt, actual, max); }
 
 // Estados que vienen de una pasiva (2026-09-24, pedido del dueño): hoy solo la regeneración (`regenHp`). No se guardan: se arman
 // cada vez a partir de las pasivas, aparecen entre los estados alterados activos y en el resumen que ve el mapa, pero son de

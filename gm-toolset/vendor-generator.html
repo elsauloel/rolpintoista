@@ -381,6 +381,7 @@ input[type=checkbox]{width:auto}
     </header>
     <div class="body" id="ver-body"></div>
     <footer style="display:flex;justify-content:flex-end;gap:9px;padding:12px 15px;border-top:1px solid var(--line)">
+      <button class="btn del" id="ver-baja" title="Pedile al dueño que lo saque del catálogo, con una justificación">🗑 Solicitar eliminar</button>
       <button class="btn ghost" id="ver-editar" title="Editá una copia y subila al catálogo compartido (no cambia la tienda)">✎ Editar y subir</button>
       <button class="btn primary" id="ver-toggle">Agregar a la tienda</button>
     </footer>
@@ -1894,6 +1895,12 @@ $('#ver-editar').addEventListener('click', () => {
   $('#scrim-ver').classList.remove('open');
   EditarItem.abrir({item, catalogo: CATALOGO, contexto: 'tienda', stats: MOD_TARGETS.map(s => ({id: s.id, label: s.label})),
     tiers: TIERS, alSubir: () => cargarItemsSubidosTienda()});
+});
+$('#ver-baja').addEventListener('click', async () => {
+  const item = CATALOGO.find(it => it.id === $('#ver-toggle').dataset.item);
+  if(!item) return;
+  const ok = await ItemsSubidos.solicitarBaja(item);
+  if(ok){ $('#scrim-ver').classList.remove('open'); cargarItemsSubidosTienda(); }
 });
 $('#scrim-ver').addEventListener('mousedown', e => { if(e.target.id === 'scrim-ver') $('#scrim-ver').classList.remove('open'); });
 $('#ver-toggle').addEventListener('click', e => {

@@ -996,6 +996,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
     <header><h3 id="veritem-titulo">Ítem</h3><button class="iconbtn" id="veritem-x">Cerrar</button></header>
     <div class="body" id="veritem-body"></div>
     <footer style="display:flex;justify-content:flex-end;gap:8px;padding:12px 15px;border-top:1px solid var(--line)">
+      <button class="btn del" id="veritem-baja" style="display:none" title="Pedile al dueño que lo saque del catálogo, con una justificación">🗑 Solicitar eliminar</button>
       <button class="btn primary" id="veritem-editar" title="Editá una copia y subila al catálogo compartido (no cambia este ítem)">✎ Editar y subir</button>
     </footer>
   </div>
@@ -3555,6 +3556,9 @@ function verItemDatos(item){
     ${item.detalle ? `<div class="view-detalle"><span class="view-label">Detalle</span>${esc(item.detalle)}</div>` : ''}
     ${(item.descripcionNarrativa||'').trim() ? `<div class="view-detalle view-narrativa">${esc(item.descripcionNarrativa)}</div>` : ''}
   `;
+  // Solicitar eliminar solo tiene sentido si esto es de verdad un ítem del catálogo (no el arma de un creep, una pieza,
+  // o una plantilla de botín, que no tienen id ahí).
+  $('#veritem-baja').style.display = (item.id && catalogoGMCompleto().some(c => c.id === item.id)) ? '' : 'none';
   $('#scrim-ver-item').classList.add('open');
 }
 
@@ -4277,6 +4281,7 @@ function abrirEditorArmaCreep(scId){
     fijarCategoria: true,
     draft: armaDeCreepComoDraft(sc),
     portador: () => portadorCreep(scId),
+    tiers: Object.keys(TIER_COLOR),
     botones: [{texto: '⬆ Subir al catálogo', accion: d => EditarItem.subir(d, {catalogo: catalogoGMCompleto(), alSubir: () => cargarItemsSubidosGM()})}],
     onGuardar: d => {
       const actual = S.creeps.find(s => s.id === scId);
@@ -6851,6 +6856,11 @@ document.addEventListener('keydown', e => {
 $('#scrim-editar-creep').addEventListener('mousedown', e => { if(e.target.id === 'scrim-editar-creep') cerrarEditarCreep(); });
 $('#veritem-x').onclick = () => $('#scrim-ver-item').classList.remove('open');
 $('#veritem-editar').onclick = () => { $('#scrim-ver-item').classList.remove('open'); editarYSubirItemGM(verItemActual); };
+$('#veritem-baja').onclick = async () => {
+  if(!verItemActual) return;
+  const ok = await ItemsSubidos.solicitarBaja(verItemActual);
+  if(ok){ $('#scrim-ver-item').classList.remove('open'); cargarItemsSubidosGM(); }
+};
 $('#scrim-ver-item').addEventListener('mousedown', e => { if(e.target.id==='scrim-ver-item') $('#scrim-ver-item').classList.remove('open'); });
 $('#equipar-creep-x').onclick = () => { equipandoCreepId = null; $('#scrim-equipar-creep').classList.remove('open'); };
 $('#scrim-equipar-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-equipar-creep'){ equipandoCreepId = null; $('#scrim-equipar-creep').classList.remove('open'); } });

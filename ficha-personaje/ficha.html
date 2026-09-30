@@ -1904,6 +1904,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
     <div class="body" id="view-body"></div>
     <footer style="justify-content:flex-end;gap:8px">
       <button class="btn del" id="view-del-btn">Eliminar</button>
+      <button class="btn del" id="view-baja-btn" style="display:none" title="Pedile al dueño que lo saque del catálogo, con una justificación">🗑 Solicitar eliminar</button>
       <button class="btn primary" id="view-edit-btn">Editar</button>
     </footer>
   </div>
@@ -7367,6 +7368,7 @@ function openViewer(key, id){
   $('#view-edit-btn').title = ajeno ? 'Editá una copia y subila al catálogo compartido (no cambia este ítem)' : '';
   $('#view-edit-btn').style.display = '';
   $('#view-del-btn').style.display = ajeno ? 'none' : '';
+  $('#view-baja-btn').style.display = (key === 'catalogo' && ajeno) ? '' : 'none';
   $('#scrim-view').classList.add('open');
 }
 const ES_KEY_ITEM = k => k === 'inventario' || k === 'cinturon' || k === 'catalogo';
@@ -9586,6 +9588,7 @@ function abrirAsistenteItem(key, id, op){
     stats: MOD_TARGETS.map(x => ({id: x.id, label: x.label})),
     portador: () => portadorFicha(base.id),
     ejemplos: (tipoItem, t) => (S.catalogo || []).filter(it => ES_ARMA(it.tipoItem) && num(it.tipoDado) === t).map(it => it.nombre),
+    tiers: Object.keys(TIER_COLOR),
     conImagen: true,
     imagenADatos: file => fileToDataURL(file, 480, 0.85),
     conEstadoEquipar: true,
@@ -11255,6 +11258,13 @@ $('#view-edit-btn').onclick = () => {
     return;
   }
   openEditor(viewing.key, viewing.id);
+};
+$('#view-baja-btn').onclick = async () => {
+  if(!viewing) return;
+  const it = viewing.key === 'catalogo' ? itemCatalogo(viewing.id) : (S[viewing.key] || []).find(x => x.id === viewing.id);
+  if(!it) return;
+  const ok = await ItemsSubidos.solicitarBaja(it);
+  if(ok){ $('#scrim-view').classList.remove('open'); cargarItemsSubidos(); }
 };
 
 $('#btn-limpiar-estados').onclick = () => {

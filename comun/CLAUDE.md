@@ -775,6 +775,14 @@ versión parecida en más de una, es candidato a juntar.
   entra como `usr-<id>`; cada uno lleva `_bib` con de dónde salió), `cargar()`, `basadoEn(item, catalogo)` (para
   "¿corrección o algo nuevo?" al subir) y `etiqueta(item)` ("🔶 sin auditar · subido por X"). Lo usan ficha, gm-tools y el
   generador de tiendas; el botón de todos es **⬆ Subir al catálogo** (`Biblioteca.guardar({tipo: 'items'})`).
+  **Solicitar eliminar un ítem** (2026-09-30, pedido del dueño): `solicitarBaja(item)` — pide confirmación y una
+  justificación escrita obligatoria, y sube una entrada más a `biblioteca_items` marcada `datos.baja = true` (mismo
+  esquema de siempre, sin reglas de Firestore nuevas); si la pide el dueño entra auditada (se saca al instante), si no
+  queda 🔶 sin auditar hasta que el dueño la revise en `datos/auditoria.html` (✅ Auditado confirma la baja, 🗑 Descartar
+  la rechaza y el ítem vuelve). `mezclar` la lee aparte de los ítems de verdad y filtra del catálogo a cualquier ítem (de
+  fábrica o subido) que tenga una baja auditada apuntándole — no borra nada, así que revertir es gratis. Botón
+  **🗑 Solicitar eliminar** en el "Ver" de un ítem del catálogo (ficha, gm-tools, generador de tiendas); no aparece para
+  ítems que no son del catálogo (mochila propia, arma/pieza de un creep, plantilla de botín).
 - **`biblioteca.js`, operaciones para la auditoría** (2026-09-29, paso 6): `auditar(tipo, id, col?)`,
   `descartar(tipo, id, col?)`, `corregirComoDueno(tipo, id, datos, col?)` (versión + 1, queda auditada),
   `propuestasViejas(tipo)`, `aprobarPropuesta(tipo, ent)`, `rechazarPropuesta(tipo, id)`, y `fecha` en cada entrada. Las usa

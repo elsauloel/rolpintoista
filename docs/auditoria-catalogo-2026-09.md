@@ -31,6 +31,14 @@ armas y defensa no tienen decisiones guardadas).
   afloja la regla aprobada (hoy solo en la cabeza). **Decidido el mismo día: se suma a los escudos** (1 y 2 manos) → Tipo
   10 en **cabeza y escudo**, con los mismos topes por tier. Aplicado en `herramientas/reajuste_defensa.py` y
   `rework-defensa.md`.
+- **2026-09-30 · Tipo 8 y 10 también en piezas baratas, pocas y elegidas:** dueño: en cascos y escudos, uno de los comunes
+  más flojos y dos de Buena Calidad con Res. crítico Tipo 10 +1; algo parecido con el Tipo 8. **Aplicado:**
+  - Tipo 10 +1: **Casco de obra abollado** (Común), **Yelmo de guardia** y **Casco de bandas remachadas** (Buena Calidad);
+    **Rodela de cuero** (Común), **Escudo triangular** (Buena Calidad) y **Escudo grande** (Buena Calidad).
+  - Tipo 8 +1: **Armadura de hojalata** (torso rígido, Común) y **Broquel de bronce** (escudo, Común). En Buena Calidad ya
+    había de sobra (5 torsos rígidos y 2 escudos con Tipo 8), así que no se sumó ninguno.
+  - El tope por tier (`herramientas/reajuste_defensa.py`) pasa a permitir +1 de Tipo 8 y 10 en Común y Buena Calidad,
+    con la aclaración de que son **pocas piezas elegidas a mano**. Precios sin tocar (a revisar con el motor de valor).
 
 ## Preguntas abiertas
 1. Tope de crítico por tier: ¿cuenta el potente igual que el frecuente, o es solo para el frecuente?

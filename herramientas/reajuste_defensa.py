@@ -21,8 +21,10 @@ T_CRIT = {'tipo1': 4, 'tipo2': 6, 'tipo3': 8, 'tipo4': 10, 'tipo5': 12}
 STAT_DE_TIPO = {v: k for k, v in T_CRIT.items()}
 TIERS = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario']
 TOPE = {  # tier -> {Tipo: tope por pieza}
-    'Común': {4: 1, 6: 1, 8: 0, 10: 0, 12: 0},
-    'Buena Calidad': {4: 1, 6: 1, 8: 0, 10: 0, 12: 0},
+    # Tipo 8 y 10 en Común y Buena Calidad: +1, pero solo en unas pocas piezas elegidas a mano (dueño, 2026-09-30:
+    # 1 común y 2 de Buena Calidad por lugar; ver docs/auditoria-catalogo-2026-09.md). No repartirlo en masa.
+    'Común': {4: 1, 6: 1, 8: 1, 10: 1, 12: 0},
+    'Buena Calidad': {4: 1, 6: 1, 8: 1, 10: 1, 12: 0},
     'Raro': {4: 2, 6: 1, 8: 1, 10: 1, 12: 0},
     'Excepcional': {4: 2, 6: 2, 8: 1, 10: 1, 12: 0},
     'Legendario': {4: 3, 6: 2, 8: 2, 10: 2, 12: 1},

@@ -78,9 +78,21 @@ Cada paso: qué es, qué se gana, qué se arriesga, cómo se prueba. Se pueden e
     "Parálisis ÷2" aunque ya partiera Lisiado o Pajaritos (la tirada partía una sola vez, el cartel decía dos). Ahora el
     cartel sale del motor y muestra exactamente lo que se aplica.
   - **Pruebas**: `comun/pruebas.html` 38 → 56.
-  - **Tanda 2 (siguiente)**: `tirarValorStat` (ficha vs GM Tools, hoy distintas), `bloqueoValor`/`costoParry` (personaje,
-    invocación y creep), y los adaptadores de "combatiente" (leer stat, estados, No2, HP y escudo de un personaje, una
-    invocación o un creep con la misma forma). `mantenimiento` (3 versiones) queda para el paso 2.
+  - **Repaso en mesa** (2026-09-30, "Claude · pruebas" y "Test"): todo bien, y apareció otra diferencia entre copias — un
+    estado estándar que llega de una habilidad, trampa o zona respetaba sus números (stacks del Veneno, bonos, daño por
+    turno) en un creep pero no en un personaje (Nube tóxica: Veneno ×3 al creep, ×4 al personaje). Ahora es una sola
+    regla: `Combatiente.ajustarPreset`.
+  - **Tanda 2 ✅** — **tirar un stat** (`Combatiente.tirarStat`): Afortunado (dos veces, queda la mejor), mitades,
+    Evasión mínimo 1 y los estados que se pintan en la Mesa (`estadosQueAfectan`). Antes había tres copias (personaje,
+    invocación, creep) y otras tres tiradas sueltas (quien coloca una zona, en ficha y GM Tools, y la resistencia al
+    entrar en una zona, en el mapa). Comparada contra la versión vieja en 4790 casos con los mismos dados: mismos
+    totales. Diferencias corregidas: las invocaciones no tiraban dos veces con Afortunado (**P100**, ya anotada como bug)
+    y el cartel de la Mesa mostraba "Parálisis" aunque no partiera la tirada. **Costo del Parry** (`costoParry`, 1 No2)
+    en un solo lugar. **Pendiente de decidir (P127):** el peso mínimo del arma en el Bloqueo de creeps e invocaciones.
+    Pruebas: 65.
+  - **Tanda 3 (siguiente)**: los adaptadores de "combatiente" (leer stat, estados, No2, HP y escudo de un personaje, una
+    invocación o un creep con la misma forma) y los costos de atacar (Tipo ÷ 2 el primero, completo después), hoy en
+    tres versiones. `mantenimiento` (3 versiones) queda para el paso 2.
 
 ### Paso 2 — Estados y Mantenimiento únicos
 - **Qué**: aplicar, acumular, vencer y recalcular estados, y el Mantenimiento (pasar el turno), en un solo lugar para los

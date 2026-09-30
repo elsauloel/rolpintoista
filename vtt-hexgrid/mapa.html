@@ -932,7 +932,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/plantillas.js?v=20260930a"></script>
 <script src="../comun/biblioteca.js?v=20260929i"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930b"></script>
+<script src="../comun/combatiente.js?v=20260930c"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930b"></script>
 <script src="../comun/trampas-base.js"></script>
@@ -6692,12 +6692,13 @@ async function zonaResolverBanner(){
   if(el.zonaResistStat){
     const valor = t.tipo === 'creep' ? (() => { const sc = creepPrivadoDe(t.fichaId); return sc ? zonaStatCreep(sc, el.zonaResistStat) : 0; })()
       : (() => { const f = fichasPub.get(t.fichaId); return f && f.resumen ? num(f.resumen[el.zonaResistStat]) : 0; })();
-    const fd = formulaParaValor(valor);
-    if(fd){
-      const rolls = fd.combo.map(d => 1 + Math.floor(Math.random() * d));
-      const total = rolls.reduce((a, b) => a + b, 0) + fd.mod;
+    // La misma tirada de stat que en la ficha y GM Tools (comun/combatiente.js), con los estados de quien resiste.
+    const estadosDe = t.tipo === 'creep' ? ((creepPrivadoDe(t.fichaId) || {}).estados || []) : (((fichasPub.get(t.fichaId) || {}).resumen || {}).estados || []);
+    const rd = Combatiente.tirarStat(valor, estadosDe, el.zonaResistStat);
+    if(rd){
+      const total = rd.total;
       resistio = total > num(el.zonaResistValor);   // empate: gana quien creó la zona
-      try{ mesaPublicar(`${t.oculto ? 'Alguien' : nombreDe(t)} · ${ZONA_STAT_LABEL[el.zonaResistStat] || el.zonaResistStat}`, {formula: fd.formula, rolls, mod: fd.mod, total}); }catch(err){}
+      try{ mesaPublicar(`${t.oculto ? 'Alguien' : nombreDe(t)} · ${ZONA_STAT_LABEL[el.zonaResistStat] || el.zonaResistStat}`, {formula: rd.formula, rolls: rd.rolls, mod: rd.mod, total}); }catch(err){}
       partes.push(resistio ? `resistió (${total} contra ${num(el.zonaResistValor)})` : `no resistió (${total} contra ${num(el.zonaResistValor)})`);
     }
   }

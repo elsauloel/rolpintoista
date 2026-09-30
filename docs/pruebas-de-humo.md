@@ -13,7 +13,7 @@
 > Cómo anotar: al lado de cada punto, ✔ / ✘ y la fecha. Un ✘ se arregla (o se anota en `pendientes.md`) antes de seguir.
 
 ## 0. Automáticas
-- [ ] `comun/pruebas.html` en verde (hoy: 56 pruebas).
+- [ ] `comun/pruebas.html` en verde (hoy: 65 pruebas).
 
 ## 1. Ficha (partida "Test", "Prueba de Claude")
 - [ ] Abre sin errores en la consola; el título dice personaje y partida.
@@ -66,4 +66,6 @@
 | Fecha | Qué se probó | Resultado | Notas |
 |---|---|---|---|
 | 2026-09-30 | Automáticas (`comun/pruebas.html`) | ✔ 38/38 | Primera versión del paso 0. |
-| 2026-09-30 | Automáticas + funciones del motor dentro de ficha y GM Tools (copias sin sesión) | ✔ 56/56 | Paso 1, tanda 1 (`comun/combatiente.js`). Falta repasar la lista manual en mesa. |
+| 2026-09-30 | Automáticas + funciones del motor dentro de ficha y GM Tools (copias sin sesión) | ✔ 56/56 | Paso 1, tanda 1 (`comun/combatiente.js`). |
+| 2026-09-30 | En mesa: GM Tools ("Claude · pruebas": Pajaritos+Lisiado+Parálisis en un goblin, tirada de PdG, Sangrado ×2, jefe contra Stun) y ficha ("Test": estados recibidos, acumulación, Invulnerable, botones de colores, escudo) | ✔ | Apareció la diferencia de estados recibidos (Veneno ×3 → ×4 en personajes): corregida. Todo quedó como estaba. |
+| 2026-09-30 | Tanda 2 (tirar un stat): automáticas + ficha, invocación y GM Tools (copias sin sesión) | ✔ 65/65 | Invocaciones con Afortunado (P100) ya tiran dos veces. |

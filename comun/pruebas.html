@@ -184,6 +184,26 @@ prueba('creep y personaje reciben el mismo Veneno ×3', () => {
   const pj = Combatiente.ajustarPreset(structuredClone(ESTADOS_PRESET.find(p => p.nombre === 'Veneno')), {stacks: 3}, 'hpturno');
   igual([creep.stacks, creep.turnos, pj.stacks, pj.turnos], [3, 3, 3, 3]);
 });
+const dadosFijos = (...v) => { let i = 0; return () => v[i++ % v.length]; };   // azar trucado: 0 = sale 1, 0.999 = sale el máximo
+prueba('tirar un stat sin estados: los dados de siempre', () => {
+  const r = Combatiente.tirarStat(8, [], 'pdg', {azar: dadosFijos(0.999)});
+  igual([r.total, r.formula, r.estados.length, !!r.ventaja], [formulaParaValor(8).combo.reduce((a, b) => a + b, 0) + formulaParaValor(8).mod, formulaParaValor(8).formula, 0, false]);
+});
+prueba('Afortunado: tira dos veces, queda la mejor y la otra viaja a la Mesa', () => {
+  const r = Combatiente.tirarStat(6, [E({nombre: 'Afortunado', afortunado: true, polaridad: 'buff'})], 'eva', {azar: dadosFijos(0, 0.999)});
+  igual([r.total, r.ventaja.total, r.ventaja.elegido, r.estados.map(e => e.n)], [6, 1, 6, ['Afortunado']]);
+});
+prueba('Afortunado no cuenta para otros stats (Fuerza)', () => igual(!!Combatiente.tirarStat(6, [E({afortunado: true})], 'fue', {azar: dadosFijos(0)}).ventaja, false));
+prueba('Evasión partida nunca baja de 1; la fórmula muestra ÷2 ÷2', () => {
+  const r = Combatiente.tirarStat(4, [E({nombre: 'Pajaritos', mitadPdgEva: true}), E({nombre: 'Sentado', sentado: true})], 'eva', {azar: dadosFijos(0)});
+  igual([r.total, r.formula.endsWith(' ÷2 ÷2')], [1, true]);
+});
+prueba('un número fijo negativo se escribe «−» (sobrepeso)', () => igual(Combatiente.tirarStat(6, [], 'eva', {extra: -2, azar: dadosFijos(0.999)}).formula, formulaParaValor(6).formula + '-2'));
+prueba('la Mesa pinta los mismos estados que parten la tirada', () => {
+  const es = [E({nombre: 'Lisiado', lisiado: true}), E({nombre: 'Parálisis', paralisis: true})];
+  igual([Combatiente.estadosQueAfectan(es, 'pdg').map(e => e.n), Combatiente.estadosQueAfectan(es, 'eva').map(e => e.n)], [['Lisiado'], ['Parálisis']]);
+});
+prueba('el Parry cuesta 1 No2', () => igual(Combatiente.costoParry(), 1));
 prueba('estados-aplicar usa el motor: un jefe rebota el Stun', () => igual(EstadosAplicar.aplicarACreep({jefe: true, estados: []}, {nombre: 'Stun'}).motivo, 'Protección de jefe'));
 
 /* ---------- Plantillas (comun/plantillas.js) ---------- */

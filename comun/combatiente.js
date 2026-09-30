@@ -5,7 +5,7 @@
    Son funciones puras: reciben los datos (la lista de estados, el valor actual…) y devuelven el resultado, sin tocar la
    pantalla ni Firebase. Cada herramienta las llama con lo suyo (S.efectos en la ficha, sc.estados en un creep,
    inv.estados en una invocación). Cada regla que se sume acá suma sus pruebas en comun/pruebas.html.
-   No depende de nada: se carga antes que estados-presets.js / estados-aplicar.js en cada herramienta.
+   Solo usa formulaParaValor (comun/tiradas.js) al tirar; se carga antes que estados-presets.js / estados-aplicar.js.
    ========================================================= */
 const Combatiente = (() => {
   const n = v => { const x = Number(v); return Number.isFinite(x) ? x : 0; };
@@ -36,6 +36,51 @@ const Combatiente = (() => {
     if(statId === 'eva' && primero('sentado')) out.push(primero('sentado'));
     return out;
   }
+
+  /* ---------- Tirar un stat (2026-09-30, tanda 2) ----------
+     La misma tirada para personaje, invocación y creep: el valor se reparte en dados reales (formulaParaValor, de
+     comun/tiradas.js); con Afortunado, PdG/Parry/Evasión se tiran DOS veces y queda la mejor (la otra viaja en `ventaja`
+     para que la Mesa la muestre); después se parte a la mitad lo que corresponda y la Evasión nunca baja de 1.
+     `o.extra`: un número fijo que se suma antes de partir (ej. la penalidad por sobrepeso de la ficha). `o.azar`: para las
+     pruebas (por defecto Math.random). Devuelve lo que se publica en la Mesa ({formula, rolls, mod, total, estados,
+     ventaja?}) o null si el valor no se puede tirar con dados reales. No publica nada: eso lo hace cada herramienta. */
+  const STATS_AFORTUNADO = ['pdg', 'parry', 'eva'];
+  function afortunado(estados, statId){ return STATS_AFORTUNADO.includes(statId) && activos(estados).some(e => e.afortunado); }
+  function tirarStat(valor, estados, statId, o){
+    o = o || {};
+    const f = formulaParaValor(valor);
+    if(!f) return null;
+    const azar = o.azar || Math.random;
+    const tirar = () => { const rolls = f.combo.map(d => 1 + Math.floor(azar() * d)); return {rolls, total: rolls.reduce((a, b) => a + b, 0) + f.mod}; };
+    const conVentaja = afortunado(estados, statId);
+    let intento = tirar(), ventaja = null;
+    if(conVentaja){
+      const segundo = tirar();
+      const gana = segundo.total > intento.total ? segundo : intento, pierde = gana === intento ? segundo : intento;
+      ventaja = {rolls: pierde.rolls, total: pierde.total, elegido: gana.total};
+      intento = gana;
+    }
+    const ex = n(o.extra);
+    const mit = statId ? mitadesDeTirada(estados, statId) : 0;
+    let total = aplicarMitades(intento.total + ex, mit);
+    if(statId === 'eva') total = Math.max(1, total);   // una tirada de Evasión nunca baja de 1 (regla del dueño, 2026-09-28)
+    return {formula: f.formula + (ex ? (ex > 0 ? `+${ex}` : `${ex}`) : '') + ' ÷2'.repeat(mit), rolls: intento.rolls, mod: f.mod + ex, total,
+      estados: statId ? estadosQueAfectan(estados, statId, conVentaja) : [], ...(ventaja ? {ventaja} : {})};
+  }
+  // Los estados que cambiaron esa tirada, para pintarlos en la Mesa (verde a favor, rojo en contra): los que le suman o
+  // restan al stat, los que la parten a la mitad (los mismos que cuenta la tirada) y Afortunado si se tiró dos veces.
+  function estadosQueAfectan(estados, statId, conVentaja){
+    const parten = new Set(estadosQueParten(estados, statId)), out = [];
+    activos(estados).forEach(e => {
+      const p = e.polaridad === 'buff' ? 'buff' : e.polaridad === 'debuff' ? 'debuff' : 'otro';
+      if((e.mods || []).some(m => m.stat === statId && n(m.val))) out.push({n: e.nombre, p});
+      else if(parten.has(e)) out.push({n: e.nombre, p: 'debuff'});
+    });
+    if(conVentaja){ const af = activos(estados).find(e => e.afortunado); if(af) out.push({n: af.nombre, p: 'buff'}); }
+    return out;
+  }
+  // El Parry cuesta siempre 1 No2, con cualquier arma o escudo (2026-09-26, dueño). Sin arma ni escudo no se puede (P121).
+  function costoParry(){ return 1; }
 
   /* ---------- Escudo especial y Excedente de vida: cambiar el valor a mano (2026-09-24, dueño) ----------
      El texto puede ser un número (valor nuevo), +N / −N (sumar o restar) o «max N» (cambia el máximo). `max === null` =
@@ -113,5 +158,6 @@ const Combatiente = (() => {
     return false;
   }
 
-  return {mitadesDeTirada, aplicarMitades, estadosQueParten, escudoParsear, acumularVeneno, acumularSangrado, ajustarPreset, inmunidad};
+  return {mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, costoParry,
+    escudoParsear, acumularVeneno, acumularSangrado, ajustarPreset, inmunidad};
 })();

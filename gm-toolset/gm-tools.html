@@ -1291,7 +1291,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/plantillas.js?v=20260930a"></script>
 <script src="../comun/biblioteca.js?v=20260929i"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930b"></script>
+<script src="../comun/combatiente.js?v=20260930c"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930b"></script>
 <script src="../comun/creeps-base.js?v=20260927a"></script>
@@ -1362,56 +1362,16 @@ function renderHistorialSesion(){
     : '<div style="opacity:.6">Sin eventos todavía.</div>';
 }
 
-/* ---------- Descomponer un valor de stat en dados reales (portado de ficha.html) ---------- */
-
-
-// Afortunado da ventaja en PdG/Parry/Evasión: tira dos veces y se queda
-// con el total más alto. sc+statId son opcionales — solo importan para
-// esos tres stats de un creep con ese estado activo.
-// Mismo criterio que ficha.html (estadosQueAfectanStat), sobre los estados del creep (sc.estados) — código duplicado a
-// propósito, no importado (ver comun/CLAUDE.md). Se publica en la Mesa en color: verde buff, rojo debuff.
-function estadosQueAfectanStatCreep(sc, statId, conVentaja){
-  const activos = sc ? (sc.estados || []).filter(e => e.activo !== false) : [];
-  const out = [];
-  activos.forEach(e => {
-    const p = e.polaridad === 'buff' ? 'buff' : e.polaridad === 'debuff' ? 'debuff' : 'otro';
-    if((e.mods || []).some(m => m.stat === statId && num(m.val))) out.push({n: e.nombre, p});
-    else if(e.mitadPdgEva && ['pdg', 'eva'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
-    else if(e.lisiado && ['pdg', 'parry'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
-    else if(e.paralisis && ['pdg', 'parry', 'eva'].includes(statId)) out.push({n: e.nombre, p: 'debuff'});
-    else if(e.sentado && statId === 'eva') out.push({n: e.nombre, p: 'debuff'});
-  });
-  if(conVentaja){
-    const af = activos.find(e => e.afortunado);
-    if(af) out.push({n: af.nombre, p: 'buff'});
-  }
-  return out;
-}
+/* ---------- Tirar un stat del creep: el motor común (comun/combatiente.js) ---------- */
 // Estados que parten la TIRADA a la mitad (Pajaritos, Lisiado, Parálisis, Sentado): comun/combatiente.js, la misma regla que la ficha.
 function mitadesDeTirada(estados, statId){ return Combatiente.mitadesDeTirada(estados, statId); }
 function aplicarMitades(total, n){ return Combatiente.aplicarMitades(total, n); }
+// La tirada de un stat del creep es la misma que la de un personaje o una invocación (comun/combatiente.js): Afortunado
+// (dos veces, queda la mejor), mitades y Evasión mínimo 1.
 function tirarValorStat(nombre, valor, sc, statId){
-  const f = formulaParaValor(valor);
-  if(!f){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
-  const conVentaja = sc && ['pdg','parry','eva'].includes(statId) &&
-    (sc.estados||[]).some(e => e.activo !== false && e.afortunado);
-  const tirar = () => {
-    const rolls = f.combo.map(d => 1 + Math.floor(Math.random() * d));
-    return {rolls, total: rolls.reduce((a,b)=>a+b,0) + f.mod};
-  };
-  let intento = tirar();
-  let ventaja = null;   // Afortunado: se tiran DOS veces y se queda la mejor; la otra viaja a la Mesa para que se vea (r.ventaja)
-  if(conVentaja){
-    const segundo = tirar();
-    const gana = segundo.total > intento.total ? segundo : intento, pierde = gana === intento ? segundo : intento;
-    ventaja = {rolls: pierde.rolls, total: pierde.total, elegido: gana.total};
-    intento = gana;
-  }
-  const estados = statId ? estadosQueAfectanStatCreep(sc, statId, conVentaja) : [];
-  const mit = sc && statId ? mitadesDeTirada(sc.estados, statId) : 0;
-  let totalFinal = aplicarMitades(intento.total, mit);
-  if(statId === 'eva') totalFinal = Math.max(1, totalFinal);   // la Evasión nunca baja de 1
-  registrarTirada(nombre, {formula: f.formula + ' ÷2'.repeat(mit), rolls: intento.rolls, mod: f.mod, total: totalFinal, estados, ...(ventaja ? {ventaja} : {})});
+  const r = Combatiente.tirarStat(valor, sc ? sc.estados : [], statId);
+  if(!r){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
+  registrarTirada(nombre, r);
 }
 
 const COLORES = ['#C4485A','#D07B3A','#8FB84F','#4FA88C','#9B7BD4','#6FA8D8'];
@@ -2116,7 +2076,7 @@ function costoHabCreepTxt(sc, h){
 // Parry y Bloqueo de un creep (2026-09-24, pedido del dueño; igual que en la ficha): el Parry cuesta 1 No2 (2026-09-26; antes el Peso de su arma);
 // el Bloqueo suma su Bloqueo + el Peso del arma y ESA SUMA es el dado.
 function pesoArmaCreep(sc){ return Math.max(1, num(sc.armaPeso) || 1); }
-function costoParryCreep(sc){ return 1; }   // 2026-09-26 (dueño): el Parry siempre cuesta 1 No2, sin importar el peso del arma
+function costoParryCreep(sc){ return Combatiente.costoParry(); }   // siempre 1 No2, sin importar el arma (comun/combatiente.js)
 function bloqueoValorCreep(sc){ return creepStatValor(sc, 'bloqueo') + pesoArmaCreep(sc); }
 // Fuerza del golpe (reglas del escudo, 2026-09-26): la tirada del atacante contra el Bloqueo del defensor = su Fuerza (con los estados activos) + el peso de su arma; la SUMA es el dado.
 function fuerzaGolpeValorCreep(sc){ return num(sc.fue) + (sc.estados || []).filter(e => e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'fue').reduce((x, m) => x + num(m.val) * Math.max(1, num(e.stacks) || 1), 0), 0) + pesoArmaCreep(sc); }
@@ -3434,12 +3394,10 @@ function colocarZonaDeHabCreep(sc, h){
   const stat = c.tira || '';
   let resistValor = null;
   if(stat){
-    const valor = habStatCreep(sc, stat);
-    const f = formulaParaValor(valor);
-    if(f){
-      const rolls = f.combo.map(d => 1 + Math.floor(Math.random() * d));
-      resistValor = rolls.reduce((a, b) => a + b, 0) + f.mod;
-      registrarTirada(`${sc.nombre} · ${h.nombre} · ${habEtqCreep(stat)}`, {formula: f.formula, rolls, mod: f.mod, total: resistValor});
+    const r = Combatiente.tirarStat(habStatCreep(sc, stat), sc.estados, stat);
+    if(r){
+      resistValor = r.total;
+      registrarTirada(`${sc.nombre} · ${h.nombre} · ${habEtqCreep(stat)}`, r);
     }
   }
   const formula = String(h.tiradaExtra || '').trim();

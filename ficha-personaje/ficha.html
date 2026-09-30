@@ -2075,7 +2075,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-estado.js"></script>
 <script src="../comun/modificadores-tirada.js?v=20260930c"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20260930n"></script>
+<script src="../comun/combatiente.js?v=20260930o"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930c"></script>
 <script src="../comun/trampas-base.js"></script>
@@ -2083,7 +2083,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/asistente-duelo-hab.js?v=20260930a"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js?v=20260930a"></script>
-<script src="../comun/duelo.js?v=20260930e"></script>
+<script src="../comun/duelo.js?v=20260930f"></script>
 <script src="../comun/asistente-item.js?v=20260930b"></script>
 <script src="../comun/catalogo.js?v=20260929b"></script>
 <script src="../comun/items-subidos.js?v=20260930a"></script>
@@ -4523,10 +4523,15 @@ function invAtacarSuelto(invId){
   tirarValorStatInv(inv, 'Atacar (PdG)', invStatValor(inv, 'pdg'), 'pdg');
   toast(`${inv.nombre}: -${fmt(costo)} No2 · ${primero ? 'primer ataque del turno' : 'ataque extra'}`);
 }
-function invDanio(invId, sinEfectos){   // sinEfectos: el duelo resuelve los efectos del golpe por su cuenta
+function invDanio(invId, sinEfectos, mods){   // sinEfectos: el duelo resuelve los efectos del golpe por su cuenta; mods: lo que suma un ataque con arreglos
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
-  const r = tirarDados(invDanoTxt(inv, invStatValor(inv, 'dmg')));
+  let formula = invDanoTxt(inv, invStatValor(inv, 'dmg'));
+  if(mods){
+    if(num(mods.dados) > 0) formula += ` + ${Math.round(num(mods.dados))}d${num(inv.armaTipo) || 8}`;
+    if(num(mods.fijo)) formula += ` ${num(mods.fijo) > 0 ? '+' : '-'} ${fmt(Math.abs(num(mods.fijo)))}`;
+  }
+  const r = tirarDados(formula);
   if(!r) return;
   registrarTirada(`${inv.nombre} · Daño Arma`, r);
   if(!sinEfectos && (inv.armaEfectos||[]).length) EfectosGolpe.alPegar({
@@ -4616,6 +4621,46 @@ function alcanceDeHabInv(inv, c, statTira){ return Combatiente.alcanceHab(c, sta
 function habDueloInv(inv, h){
   return Combatiente.habEjecucion(h, h && h.duelo, {stat: s => invStatValor(inv, s), etq: s => STAT_LABEL[s] || s});
 }
+// «Ataque con mi arma, con arreglos» de una invocación (2026-09-30, P134): el mismo armado que el personaje y el creep
+// (comun/combatiente.js, ataqueConArreglos), con el arma de la invocación y su alcance (o el que diga la habilidad).
+function ataqueDeHabInv(inv, h){
+  const c = h && h.duelo;
+  return Combatiente.ataqueConArreglos(h, c, {arma: {id: '', nombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8, rango: !!inv.armaDeRango},
+    alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? alcanceDeHabInv(inv, c, 'pdg') : (inv.armaDeRango ? Math.max(1, Math.round(num(invStatValor(inv, 'rng')))) : 1)});
+}
+// El PdG del ataque con arreglos, con lo que le suma la habilidad (los No2 ya los cobró la habilidad).
+function tirarPdgDeArreglosInv(inv, atq){
+  tirarValorStatInv(inv, 'Atacar (PdG)', invStatValor(inv, 'pdg') + num(atq && atq.mods && atq.mods.pdg), 'pdg');
+}
+// Se anuncia y va al cuadro del duelo como un ataque de la invocación; sin duelo, se tira el PdG suelto.
+function lanzarAtaqueDeHabInv(inv, h){
+  const atq = ataqueDeHabInv(inv, h);
+  parryPendienteInv.delete(inv.id);   // atacar cierra el Parry que esperaba su Bloqueo
+  mesaPublicarHabilidadInv(inv, h.nombre, h.detalle || h.efectoDetalle || '');
+  if(atq && typeof Duelo !== 'undefined' && Duelo.disponible() && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM)
+    Duelo.elegirObjetivo({yo: {ref: fichaVivo.id + '~' + inv.id, tipo: 'pj', nombre: inv.nombre}, ataque: atq, suelto: () => tirarPdgDeArreglosInv(inv, atq)});
+  else tirarPdgDeArreglosInv(inv, atq);
+}
+// ⚡ Flash de una invocación (igual que un creep, P135/P136): cooldown y vida — el doble en turno ajeno —, nunca No2.
+const costoFlashInv = h => ({cd: num(h.cd), hp: num(h.hpCosto)});
+async function pagarFlashInv(inv, h){
+  const motivo = Combatiente.bloqueoHab(h, {hp: inv.hp});
+  if(motivo){ toast(`${inv.nombre}: ${h.nombre || 'Habilidad'} no se puede usar — ${motivo}`); return null; }
+  const p = await ConfirmarTurno.flash(`⚡ ${h.nombre || 'Flash'}`, costoFlashInv(h), {quien: inv.nombre});
+  if(!p) return null;
+  if(p.hp > 0 && num(inv.hp) <= p.hp){ toast(`${inv.nombre}: no le alcanza la vida para ${h.nombre} (${fmt(p.hp)} HP)`); return null; }
+  h.cdActual = p.cd;
+  if(p.hp > 0) inv.hp = num(inv.hp) - p.hp;
+  renderInvocaciones();
+  return p;
+}
+async function usarFlashFueraDelDueloInv(inv, h){
+  const p = await pagarFlashInv(inv, h);
+  if(!p) return;
+  const f = h.duelo.flash || {};
+  mesaPublicarHabilidadInv(inv, h.nombre, `${h.detalle || ''}${h.detalle ? ' — ' : ''}⚡ Flash: +${fmt(num(f.bono))} a la tirada.`);
+  toast(`${h.nombre}: ⚡ +${fmt(num(f.bono))} (sumalo a mano a la tirada; dentro del duelo se suma solo) · ${ConfirmarTurno.textoCosto(p)}`);
+}
 // Pone un estado en la invocación con la regla común (inmunidades, acumulación y renovación: comun/combatiente.js,
 // agregarEstado — antes se sumaba directo y duplicaba). Devuelve el texto para la Mesa.
 function ponerEstadoEnInv(inv, d){
@@ -4640,6 +4685,7 @@ function invEjecutarHab(invId, habId){
   if(!inv || !h) return;
   const modo = modoHab(h);
   if(modo === 'manual'){ mesaPublicarHabilidadInv(inv, h.nombre, h.detalle || h.efectoDetalle || ''); toast(`${h.nombre || 'Habilidad'} anunciada`); return; }
+  if(modo === 'auto' && Combatiente.tipoEjecucion(h.duelo) === 'flash'){ usarFlashFueraDelDueloInv(inv, h); return; }   // ⚡ su propia regla de costo (P136)
   const bloqueo = bloqueoHabInv(inv, h);
   if(bloqueo){ toast(`${inv.nombre}: ${h.nombre||'Habilidad'} — ${bloqueo}`); return; }
   // Se cobra lo que la habilidad tenga cargado (P133): No2, cooldown y vida; y si trae una cura del sistema anterior, cura.
@@ -4657,18 +4703,20 @@ function invEjecutarHab(invId, habId){
       hpturno: num(h.efectoHpTurno)||0, permanente: !!h.efectoPermanente, activo: true, stacks:1, stacksturno:0,
       polaridad: h.efectoPolaridad||'otro', mods: structuredClone(h.efectoMods||[])});
   }
-  let hDuelo = null, aplicadoDirecto = '', falta = '';
+  let hDuelo = null, aplicadoDirecto = '', falta = '', esArma = false;
   if(modo === 'auto'){
-    // Lo que todavía no anda para invocaciones (ataque con arma, Flash, zona — P134) se avisa y va como 💰.
+    // Lo que todavía no anda para invocaciones (la zona persistente — P134) se avisa y va como 💰.
     falta = Combatiente.ejecucionNoDisponible(h.duelo, 'inv');
-    const hab = falta ? null : habDueloInv(inv, h);
-    if(falta){ /* se avisa al final, junto con lo que se cobró */ }
+    esArma = !falta && Combatiente.tipoEjecucion(h.duelo) === 'arma';   // ataque con arreglos: al duelo como un ataque
+    const hab = falta || esArma ? null : habDueloInv(inv, h);
+    if(falta || esArma){ /* el aviso va al final, junto con lo que se cobró; el ataque, más abajo */ }
     else if(Combatiente.sobreSiSinTiradas(hab)){
       aplicadoDirecto = hab.efectos.map(ef => aplicarSpecAInv(inv, ef)).join(' · ');
       mesaPublicarHabilidadInv(inv, h.nombre, [h.detalle || '', aplicadoDirecto ? '→ ' + aplicadoDirecto : '', hab.efectoLibre || '', hab.efectosNota || ''].filter(Boolean).join(' '));
     }else if(typeof Duelo !== 'undefined' && Duelo.disponible() && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM) hDuelo = hab;
   }
-  if(hDuelo){
+  if(esArma) lanzarAtaqueDeHabInv(inv, h);
+  else if(hDuelo){
     mesaPublicarHabilidadInv(inv, h.nombre, h.detalle || h.efectoDetalle || '');
     Duelo.elegirObjetivo({yo: {ref: fichaVivo.id + '~' + inv.id, tipo: 'pj', nombre: inv.nombre}, ataque: {tipo: 'habilidad', hab: hDuelo, alcance: hDuelo.alcance}, suelto: () => tirarExtraDeHabInv(inv, h)});
   }else if(!aplicadoDirecto){
@@ -10126,7 +10174,7 @@ window.DUELO_HOOKS = {
   // El ataque de siempre (paga los No2 y tira el PdG).
   atacar: d => {
     const inv = dueloInvDe(d.atacante);
-    if(inv){ invAtacarSuelto(inv.id); return; }
+    if(inv){ if(d.ataque.tipo === 'habilidad-arma') tirarPdgDeArreglosInv(inv, d.ataque); else invAtacarSuelto(inv.id); return; }   // con arreglos: los No2 ya los cobró la habilidad
     const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null;
     if(d.ataque.tipo === 'habilidad-arma'){   // los No2 del ataque ya los cobró la habilidad: solo se tira el PdG (con lo que le suma)
       tirarValorStat(arma ? `PdG · ${arma.nombre}` : 'PdG', pdgParaArma(arma).valor + num(d.ataque.mods && d.ataque.mods.pdg), 'pdg');
@@ -10163,7 +10211,7 @@ window.DUELO_HOOKS = {
   // El daño del arma del ataque (sin los efectos del golpe: los resuelve el duelo en su paso de efectos).
   dano: d => {
     const inv = dueloInvDe(d.atacante);
-    if(inv){ invDanio(inv.id, true); return; }
+    if(inv){ invDanio(inv.id, true, d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null); return; }
     const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : (armasEquipadasConDano()[0] || {}).item || null;
     if(!arma){ toast('No hay un arma equipada con daño para tirar'); return; }
     let formula = armaDanoTxt(arma, compute().final.dmg);
@@ -10192,7 +10240,9 @@ window.DUELO_HOOKS = {
   // Flash (2026-09-27): las habilidades Flash que me sirven para esta tirada del duelo (se marcan ANTES de tirar) y su uso (cobra los SP; el duelo suma el bono).
   flashOpciones: (d, campo) => {
     const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
-    if(dueloInvDe(lado)) return [];   // las invocaciones no usan Flash
+    const inv = dueloInvDe(lado);
+    if(inv) return (inv.habilidades || []).filter(h => Combatiente.flashPara(h.duelo, campo)).map(h => ({habId: h.id, nombre: h.nombre, bono: num(h.duelo.flash.bono), en: h.duelo.flash.en || [],
+      costoTxt: ConfirmarTurno.textoFlash(costoFlashInv(h)), motivoNo: Combatiente.bloqueoHab(h, {hp: inv.hp}).toLowerCase()}));   // invocación: como un creep (cooldown)
     const sp = spMaximo() - num(S.spGastado);
     return S.habilidades.filter(h => Combatiente.flashPara(dueloDe(h), campo))   // regla común (comun/combatiente.js)
       .map(h => { const c = dueloDe(h).flash, costo = parseCostoSp(h.costo); return {habId: h.id, nombre: h.nombre, bono: num(c.bono), en: c.en || [], costoSp: costo,
@@ -10200,6 +10250,13 @@ window.DUELO_HOOKS = {
   },
   // Usarlo: «¿es tu turno?» — en turno ajeno cuesta el doble (P136); se cobra al contestar y el duelo suma el bono.
   flashUsar: (d, campo, modo, habId) => {
+    const inv = dueloInvDe((campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor);
+    if(inv){
+      const hi = (inv.habilidades || []).find(x => x.id === habId);
+      if(!hi || !Combatiente.flashPara(hi.duelo, campo)) return null;
+      if(!Combatiente.flashPara(hi.duelo, campo, modo)){ toast(`${hi.nombre} no vale para esta tirada (${modo === 'parry' ? 'Parry' : campo})`); return null; }
+      return pagarFlashInv(inv, hi).then(p => p ? {bono: num(hi.duelo.flash.bono), etq: hi.nombre, quien: inv.nombre} : null);
+    }
     const h = S.habilidades.find(x => x.id === habId), c = h && dueloDe(h);
     if(!c || c.modo !== 'flash' || !c.flash) return null;
     if(!Combatiente.flashPara(c, campo, modo)){ toast(`${h.nombre} no vale para esta tirada (${modo === 'parry' ? 'Parry' : campo})`); return null; }

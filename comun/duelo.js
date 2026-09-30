@@ -1030,7 +1030,6 @@ const Duelo = (() => {
     if(flashPedidas.has(k)) return;
     flashPedidas.add(k);
     const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
-    if(String(lado.ref || '').includes('~')){ flashOps[k] = []; return; }   // las invocaciones todavía no usan Flash (P134): no hace falta preguntar
     // Un creep sin Flash para esta tirada: el mapa del GM ya lo sabe y contesta solo, sin cargar GM Tools (P135, 2026-09-30).
     if(lado.tipo === 'creep' && cfgEscuchar.flashLocal){
       let ops = null;

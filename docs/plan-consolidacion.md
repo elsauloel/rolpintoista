@@ -154,7 +154,8 @@ Cada paso: qué es, qué se gana, qué se arriesga, cómo se prueba. Se pueden e
 - **Después del paso 3** (2026-09-30, pedido del dueño): **los creeps ya atacan con arreglos y usan ⚡ Flash**. El ataque con
   arreglos sale de `Combatiente.ataqueConArreglos` (la ficha usa el mismo; comparado contra el viejo en 4000 casos: igual) y
   un Flash se reconoce con `Combatiente.flashPara`. El Flash de un creep cuesta solo cooldown (**P135**); todo Flash, de
-  personaje o de creep, cuesta el doble en turno ajeno (**P136**, `costoFlash`: pregunta al usarlo). Pruebas: 98.
+  personaje o de creep, cuesta el doble en turno ajeno (**P136**, `costoFlash`: pregunta al usarlo). **Las invocaciones
+  también** (mismo día): ataque con arreglos (`ataqueDeHabInv`) y Flash (`pagarFlashInv`, como un creep). Pruebas: 98.
 - **Qué**: cobrar el costo, los tres modos (📣 manual, 💰 semi, ✨ auto), lo del sistema anterior mientras dure, trampas y
   zonas: una sola implementación que usan personaje, invocación y creep.
 - **Se gana**: se terminan las tres versiones; las invocaciones reciben lo que hoy les falta (zonas, ataque con arma desde

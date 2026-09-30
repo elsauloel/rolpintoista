@@ -477,14 +477,13 @@ const Combatiente = (() => {
   }
   // Solo sobre uno mismo y sin nada que tirar ni resistir (Blindaje y parecidos): se aplica directo, sin abrir el cuadro.
   const sobreSiSinTiradas = hab => !!(hab && hab.objetivo === 'uno mismo' && !hab.tira && !hab.dano && !(hab.contra || []).length);
-  // Por qué una ✨ se ejecuta como 💰 en quien todavía no tiene esa parte (P134: invocaciones y creeps sin ataque con
-  // arma ni Flash; invocaciones sin zona). '' = se puede.
+  // Por qué una ✨ se ejecuta como 💰 en quien todavía no tiene esa parte (P134: a las invocaciones les falta la zona
+  // persistente; un ⚡ Flash se usa dentro del duelo, antes de una tirada). '' = se puede.
   function ejecucionNoDisponible(c, quien){
     const t = tipoEjecucion(c);
     if(!t) return 'todavía no tiene armada la ejecución paso a paso (✨)';
     if(quien === 'pj') return '';
-    if(t === 'arma' && quien === 'inv') return 'el «ataque con arma, con arreglos» todavía no anda para invocaciones';
-    if(t === 'flash') return quien === 'inv' ? 'la «reacción Flash» todavía no anda para invocaciones' : 'un ⚡ Flash se usa dentro del duelo, antes de una tirada';
+    if(t === 'flash') return 'un ⚡ Flash se usa dentro del duelo, antes de una tirada';
     if(t === 'zona' && quien === 'inv') return 'la zona persistente todavía no anda para invocaciones';
     return '';
   }

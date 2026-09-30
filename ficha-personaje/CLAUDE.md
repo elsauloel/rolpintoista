@@ -567,5 +567,8 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
 - **Invocaciones: los mismos tres modos** (2026-09-30): el editor de habilidades de invocación (`PASOS_HAB_INV` + pasos 6
   "Cómo se ejecuta" y 7 "Ejecución", `hiOrden`) e `invEjecutarHab`: manual solo anuncia; semi cobra No2 y cooldown y tira
   la primera; auto abre la Ejecución a nombre de la invocación (`habDueloInv`, ref `fichaId~invId`, igual que su ataque) o,
-  si es solo sobre ella y sin tiradas, la aplica directo (`aplicarSpecAInv`). Zonas, ataques con arma y Flash todavía no
-  van para invocaciones (se ejecutan como semiautomáticas).
+  si es solo sobre ella y sin tiradas, la aplica directo (`aplicarSpecAInv`). **Ataque con arma con arreglos y ⚡ Flash**
+  (2026-09-30): `lanzarAtaqueDeHabInv` → `ataqueDeHabInv` (el gancho `atacar` tira su PdG con lo que suma y `dano` —
+  `invDanio(id, true, mods)` — le suma dados y fijo); el Flash de una invocación cuesta como el de un creep (cooldown y vida,
+  el doble en turno ajeno: `pagarFlashInv`, `usarFlashFueraDelDueloInv`) y aparece en las tiradas del duelo. La zona
+  persistente todavía no va para invocaciones (se ejecuta como semiautomática).

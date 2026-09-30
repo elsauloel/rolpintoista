@@ -33,9 +33,9 @@
 
 ## 4. Diseño pendiente
 - [ ] **Trampas para jugadores**: que un personaje con una habilidad de trampa también la coloque solo (hoy solo los creeps).
-- [ ] **Ataque con arma y Flash desde una habilidad en invocaciones; zona persistente y trampas en invocaciones** (P134,
-  2026-09-30): hoy avisan y se ejecutan como semiautomáticas. (Los creeps ya los tienen desde el 2026-09-30: `ataqueDeHabCreep`
-  y los ganchos `flashOpciones`/`flashUsar` de GM Tools, P135.)
+- [ ] **Zona persistente y trampas en invocaciones** (P134, 2026-09-30): la zona avisa y se ejecuta como semiautomática; el
+  editor de habilidades de invocación no tiene paso de trampa. (Ataque con arma con arreglos y ⚡ Flash ya andan en creeps e
+  invocaciones desde el 2026-09-30.)
 - [x] **Probar en mesa el ataque con arreglos y el Flash de un creep** (2026-09-30): ✔ en "Claude · pruebas" (ver
   `pruebas-de-humo.md`); encontró y se corrigieron dos fallas de carteles tapados en el mapa.
 - [ ] **Despojos mágico/especial** de los ítems: siguen a mano.

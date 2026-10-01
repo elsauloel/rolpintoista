@@ -603,5 +603,6 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   `ataqueDeHabArma`, `habDueloDatos`, `xDeHab`, `aplicarHabSobreMiDirecto`, `dueloAplicarEfectoPropio`, `aplicarEstadoRecibido`,
   `estadoDeSpec`, `durAviso`, `desgastarItem` y `rompeArmaduraAlAzar` son atajos a `comun/ficha-acciones.js` (habUi suma `yo`,
   `dueloDisponible`, `puedeEscribir`, `elegirObjetivo` → `Duelo.elegirObjetivo`, `colocarZona` → `colocarZonaDeHab`, `presets`
-  y `recordatorios`).
+  y `recordatorios`). Desde el 5c, también `avisarZonaAlMapa` (`js/10`), `colocarTrampaDeHab` (`js/10`) y `colocarZonaDeHab`
+  (`js/02`): habUi suma `enMapa` (¿estoy dentro del mapa?) y `alMapa` (→ `MensajesMapa.alMapa`).
 - **La sesión en vivo, compartida (paso 4, etapa 3a, 2026-10-01)**: escuchar el personaje, aplicar cambios de otra ventana y el guardado (`fichaEscuchar`, `fichaGuardarTick`, `fichaHayPendiente`, `fichaNuevoEstado`) pasan por `comun/ficha-sesion.js`; acá queda lo que la ficha hace en cada momento (armarse y dibujarse, avisos, solo lectura, control del GM, `fichaOpcionesGuardado`). El objeto `fichaVivo` tiene los mismos campos de siempre.

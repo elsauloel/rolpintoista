@@ -1109,4 +1109,11 @@ nueva, si quien mira puede guardarlo y, si es GM, con ⚗ prendido; sus invocaci
 habilidades** (paso 5a, `bnHabAca`/`bnHabUi`/`bnMesaHabilidad`): las 📣 manuales, las 💰 semiautomáticas sin trampa/zona/portal,
 el ⚡ Flash fuera del duelo, el costo X (cartel `#bn-costox` en el recuadro), el arma de un costo "como un ataque" y la 🎲
 segunda tirada las hace el mapa, y desde el 5b también las ✨ automáticas (`bnElegirObjetivo` → `dueloElegirObjetivoMapa`;
-`bnRecordatorios`); las que colocan trampa, zona o portal, y la 🔍, siguen delegadas.
+`bnRecordatorios`); desde el 5c, también las que colocan trampa, zona o portal (`bnAlMapa` llama directo a `portalDeHabilidad`,
+`zonaDeHabilidad`, `zonaPersistenteDeHabilidad` o `trampaDeHabilidad`; `bnHabAca` ya acepta todas). La 🔍 y "Ver" siguen
+delegados (paso 6).
+
+- **Arreglo: las zonas persistentes no se podían crear** (2026-10-01): `crearElementoZona` mandaba `celdas` como objetos
+  `{dq, dr}` en vez de la lista plana `[dq, dr, …]` que guardan todas las formas (`guardarElemento`) y que exigen las reglas, así
+  que Firestore rechazaba toda zona —por habilidad o por el asistente de zonas— desde que existe (2026-09-28), con un cartel que
+  culpaba a "las reglas sin publicar". Ahora va plana.

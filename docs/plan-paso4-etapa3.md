@@ -2,7 +2,7 @@
 
 > Parte de [`plan-paso4.md`](plan-paso4.md) y de [`plan-consolidacion.md`](plan-consolidacion.md). Escrito el 2026-10-01,
 > después de terminar el nivel B del paso 5 (áreas 1 a 4, ver [`plan-paso5.md`](plan-paso5.md)). **Estado: en curso** —
-> 3a y 3b hechas; 3c hasta el paso 5b hecha (ver "Para retomar" justo abajo y "Cómo va" al final). Preguntas del dueño:
+> 3a y 3b hechas; 3c hasta el paso 5 hecha (ver "Para retomar" justo abajo y "Cómo va" al final). Preguntas del dueño:
 > contestadas.
 
 ## ▶ Para retomar (al cierre de la conversación del 2026-10-01, tarde)
@@ -14,18 +14,14 @@ interruptor ⚗, solo GM), y de la 3c: paso 1 (tiradas de stats y Percepción), 
 paso 2 (Sigilo, Levantarse: el mapa ya guarda al personaje), paso 3 (Consumir), paso 4a (Esquivar, Parry, Bloqueo, Fuerza
 del golpe, Daño), 4b (Atacar), **4c (los ganchos del duelo: `comun/ficha-duelo.js`)** — probado en vivo con un objetivo de
 verdad, atacando y defendiendo —, **5a (habilidades manuales, semiautomáticas, el costo X, el Flash fuera del duelo y la 🎲
-segunda tirada)** y **5b (las ✨ automáticas: ataque con arreglos, habilidad dirigida con su duelo y el atajo «solo sobre vos»)**. Todo lo que hace la Botonera nueva vive en `comun/ficha-acciones.js` y `comun/ficha-duelo.js` (la ficha usa
-lo mismo con sus nombres de siempre).
+segunda tirada)**, **5b (las ✨ automáticas: ataque con arreglos, habilidad dirigida con su duelo y el atajo «solo sobre vos»)**
+y **5c (las que colocan trampa, zona o portal)**: **la Botonera nueva ya hace todas las habilidades** sin pedirle nada al marco.
+Todo lo que hace vive en `comun/ficha-acciones.js` y `comun/ficha-duelo.js` (la ficha usa lo mismo con sus nombres de siempre).
 
-**Lo próximo — 3c, paso 5c: las habilidades que colocan algo en el mapa.** Hoy `bnHabAca` (mapa) se las deja a la ficha
-escondida: las que tienen `trampaColocar` (`colocarTrampaDeHab`, js/10: con ✨ manda `trampa-habilidad` y el mapa pide la
-casilla; si no, `TokensAuto.colocarTrampas` al lado del token), `zonaMapa` o `portalMapa` (`avisarZonaAlMapa`, js/10:
-`zona-habilidad` / `portal-habilidad`) y las ✨ con `objetivo: 'zona'` (`colocarZonaDeHab`, js/02: tira la resistencia una vez y
-manda la zona con `Combatiente.zonaDeHab`). En el mapa esos mensajes se vuelven llamadas directas a lo que ya hace con ellos
-(`trampaDeHabilidad`, `portalDeHabilidad`, el manejador de `zona-habilidad` y el de la zona persistente) — buscar en
-`mapa.html` dónde se reciben. En `comun/ficha-acciones.js` ya están los ganchos `ui.colocarTrampa`, `ui.avisarZona` y
-`ui.colocarZona`: falta que el mapa los implemente y sacar esos casos de `bnHabAca`. **Después**: paso 6 (🔍 lupa y Ver), los
-talentos, las trampas consumibles y el Ankh manual; recién ahí 3d (retirar el marco para los jugadores).
+**Lo próximo — 3c, paso 6: 🔍 lupa y "Ver"** (hoy la Botonera nueva no tiene 🔍, y "Ver" de una habilidad, consumible o
+talento se le pide a la ficha). La lupa es `lupaHtml` (`js/11`, "cómo se calcula cada cosa"): mudarla a `comun/` con `S` como
+parámetro, igual que el resto. **Después**: los talentos (tirar uno), las trampas consumibles y el Ankh manual (lo único de
+Consumir que sigue delegado); recién ahí 3d (retirar el marco para los jugadores).
 
 **Dónde probar** (2026-10-01): con Chrome logueado como `elsaulo@gmail.com`, la partida **"Test con claude elsaulo"** (ahí esa
 cuenta es el GM, "S.Claude"); el jugador es "Sujeto de pruebas" con **Silvia Suller** (Cimitarra + Broquel de bronce, 20 HP,
@@ -84,7 +80,7 @@ botón, que hoy viven en la ficha:
 | Traer el personaje y guardarlo | partes de Firebase, migraciones | ✅ ya en `comun/` (`FichaGuardado.cargar`) — falta el guardado **en vivo** (ver 3a) |
 | Tirar un stat, Percepción, Fuerza del golpe | tirada + Mesa | ✅ en el mapa (3c-1 y 4a), con el cartel de sobrepeso |
 | Atacar, Daño, Esquivar, Parry, Bloqueo | el **duelo** y sus ganchos de la ficha (`DUELO_HOOKS`, ~200 renglones), carteles de No2 | ✅ los botones en el mapa (4a, 4b) y los ganchos del duelo (4c, `comun/ficha-duelo.js`) |
-| Habilidades (Ejecutar / Anunciar / 🎲 segunda) | `ejecutarHabilidad`: elegir arma, costo X, ¿es tu turno?, Flash, Ejecución paso a paso, zona, trampa, Mesa | ✅ manual, semi, costo X, Flash y segunda tirada (5a) y las ✨ automáticas (5b) en el mapa; **las que colocan algo (5c), todavía en la ficha** |
+| Habilidades (Ejecutar / Anunciar / 🎲 segunda) | `ejecutarHabilidad`: elegir arma, costo X, ¿es tu turno?, Flash, Ejecución paso a paso, zona, trampa, Mesa | ✅ todas en el mapa: manual, semi, costo X, Flash y segunda tirada (5a), las ✨ automáticas (5b) y las que colocan trampa, zona o portal (5c) |
 | Consumibles (cinturón y mochila) | consumir: No2 por lugar, unidades, cura, estado, trampa consumible | ✅ en el mapa (3c-3), salvo trampas consumibles y el Ankh manual |
 | Sigilo, Levantarse | estado + No2 | ✅ en el mapa (3c-2) |
 | 🔍 Lupa de cada botón | `lupaHtml` (cómo se calcula cada cosa) | en la ficha |
@@ -125,7 +121,7 @@ Orden propuesto, de lo más simple a lo más complejo (ver pregunta 3):
 4. Atacar, Daño, Esquivar, Parry y Bloqueo — con los ganchos del duelo del personaje (`DUELO_HOOKS`). Partido en 4a (sueltos ✅
    2026-10-01), 4b (Atacar ✅ 2026-10-01) y 4c (los ganchos del duelo ✅ 2026-10-01; 4b y 4c probados juntos contra un creep).
 5. Habilidades (lo más grande): partido en 5a (manual, semi, costo X, arma, turno ajeno, Flash, segunda tirada ✅ 2026-10-01),
-   5b (✨ automáticas con la Ejecución paso a paso ✅ 2026-10-01) y 5c (zonas, trampas y portal).
+   5b (✨ automáticas con la Ejecución paso a paso ✅ 2026-10-01) y 5c (zonas, trampas y portal ✅ 2026-10-01).
 6. 🔍 Lupa y "Ver".
 
 ### 3d — Retirar el marco para los jugadores
@@ -326,3 +322,19 @@ siga necesitándolo (ver pregunta 4). La ficha suelta (`ficha.html`) no cambia: 
   Cimitarra), tiró el PdG con su +1 y el daño 1d6+6 (el +2 de la habilidad). Desde la ficha nueva, «Escudo propio» igual. Todo
   quedó como estaba (Silvia con Especial 3, sin Blindado, todo lleno y sin el control; creep con 5 HP); las 8 habilidades de prueba
   quedaron en su ficha.
+- 2026-10-01: **3c, paso 5c hecho — las habilidades que colocan algo en el mapa**. A `comun/ficha-acciones.js`, copiados de la ficha
+  (`js/10` y `js/02`): `avisarZonaAlMapa(S, h, ui)` (portal y zona de habilidad), `colocarTrampaDeHab(S, h, ui)` (con ✨ se anuncia
+  y le pide la casilla al mapa; si no, `TokensAuto.colocarTrampas` al lado del token) y `colocarZonaDeHab(S, it, xSp, xNitros, ui)`
+  (zona persistente: tira la resistencia una vez y manda la zona con `Combatiente.zonaDeHab`). El `ui` suma `enMapa()` y
+  `alMapa(tipo, msg)`: la ficha le sigue mandando el aviso al mapa por `MensajesMapa`; el mapa (`bnAlMapa`) llama directo a
+  `portalDeHabilidad`, `zonaDeHabilidad`, `zonaPersistenteDeHabilidad` o `trampaDeHabilidad`, y `bnHabAca` ya acepta toda
+  habilidad: **la Botonera nueva no le pide ninguna habilidad a la ficha escondida**. Comparado contra el código viejo en 200
+  personajes al azar (dentro del mapa y suelta, con y sin personaje, colocando o no): 2400 iguales, 0 distintas; 3 mutaciones
+  plantadas, las 3 detectadas. `pruebas.html`: 164 en verde (3 nuevas). **En vivo** (🎮 Silvia, Botonera nueva): el cono 📣 se
+  dibujó, Invocar portal pidió los dos puntos y creó los portales, la ✨ con trampa se anunció y la colocó en la casilla elegida.
+  **La zona persistente falló** — y no por este cambio: `crearElementoZona` (mapa) mandaba las casillas como objetos `{dq, dr}`
+  en vez de la lista plana `[dq, dr, …]` que exigen las reglas, así que Firestore rechazaba **toda** zona persistente desde que
+  existe (2026-09-28), por habilidad o por el asistente de zonas (el cartel culpaba a "las reglas sin publicar", que sí estaban
+  publicadas). Arreglado (d63189a) y vuelto a probar: la zona de «Niebla (prueba)» se creó con sus 7 casillas, el estado y la
+  resistencia (Esp de Silvia: 3). Todo borrado al terminar (portales, trampa y zona); Silvia con todo lleno, sin estados y sin el
+  control; ⚗ apagado.

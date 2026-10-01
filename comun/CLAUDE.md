@@ -903,7 +903,10 @@ versión parecida en más de una, es candidato a juntar.
   automáticas): `terminarEjecucionHab(S, it, arma, xSp, xNitros, ui)`, `ataqueDeHabArma`, `habDueloDatos`, `xDeHab`,
   `aplicarHabSobreMiDirecto`, `dueloAplicarEfectoPropio(S, fichaId, d, ef, ui)`, `aplicarEstadoRecibido`, `estadoDeSpec(spec,
   presets)`, `durAviso`, `desgastarItem` y `rompeArmaduraAlAzar` (ui suma `yo()`, `dueloDisponible()`, `puedeEscribir()`,
-  `elegirObjetivo(cfg)`, `colocarZona`, `presets`, `recordatorios`; `cambio` además 'equipo' y 'mochila').
+  `elegirObjetivo(cfg)`, `colocarZona`, `presets`, `recordatorios`; `cambio` además 'equipo' y 'mochila'). Desde el 5c (las que
+  colocan algo en el mapa): `avisarZonaAlMapa(S, h, ui)` (portal y zona de habilidad), `colocarTrampaDeHab(S, h, ui)` y
+  `colocarZonaDeHab(S, it, xSp, xNitros, ui)` (zona persistente); ui suma `enMapa()` y `alMapa(tipo, msg)` (la ficha manda el aviso
+  por `MensajesMapa`; el mapa lo resuelve directo, `bnAlMapa`).
 - **`ficha-duelo.js`** (`FichaDuelo`, 2026-10-01, paso 4 etapa 3c-4c) — **lo que el duelo (`duelo.js`) le pide a un personaje**:
   `hooks(() => S, ui)` devuelve los ganchos (`soy`, `controlDe`, `registrarTirada`, `atacar`, `statsCritico`,
   `resistenciaCritico`, `efectosArma`, `dano`, `rerollInfo`, `rerollUsar`, `flashOpciones`, `flashUsar`, `habTirar`, `habValor`,

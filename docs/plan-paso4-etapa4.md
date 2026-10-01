@@ -15,7 +15,7 @@ creeps primero, el mismo interruptor ⚗, P137 espera.
 2. Esquivar, Parry, Bloqueo, Fuerza del golpe, Daño ✅ (2026-10-01; el Parry pendiente del mapa vive en `acParry`).
 3. Atacar (menú "¿Qué ataque es?", el objetivo con `dueloElegirObjetivoMapa`) ✅ (2026-10-01).
 4. Lo que el duelo le pide a un creep (`window.DUELO_HOOKS` de `js/12`) → `comun/creep-duelo.js`, y `hooksLocal` del mapa ✅ (2026-10-01).
-5. Habilidades (`js/04`: manual, semi, ✨, Flash, cooldowns `data-cdmod`, segunda tirada, trampa y zona).
+5. Habilidades (`js/04`: manual, semi, ✨, Flash, cooldowns `data-cdmod`, segunda tirada, trampa y zona) ✅ (2026-10-01).
 6. 🔍 (`lupaHtmlCreep`, `js/03`) y Ver.
 El mapa guarda con `modificarCreep` (transacción + resumen + firma); GM Tools, abierto en otra pestaña, se entera por la firma.
 
@@ -149,3 +149,20 @@ pruebas en `comun/pruebas.html`, `?v=` al día, probada en vivo y documentada.
   atacó al creep y el creep se defendió con Evasión (ganó el desempate). **Ningún pedido fue al marco** (ni a GM Tools ni a la
   ficha). Todo restaurado (creep: 6 No2, 2 HP; Silvia: como estaba antes de la prueba, 10 HP y 3 No2 — alguien la había usado —, sin
   el control; ⚗ apagado). Lo que sigue: tanda 5, las habilidades de los creeps.
+- 2026-10-01: **4c, tanda 5 hecha** (fb92f01) — las habilidades. `CreepAcciones` suma `ejecutarHab(sc, h, presets)` (lo que cambia al
+  creep: bloqueo por cooldown/No2, cobrar, cura y estado del sistema anterior, el atajo «solo sobre sí»; devuelve `{error}` o lo que
+  hay que hacer después) y `terminarHab(sc, h, p, ui)` (Mesa, duelo, trampa, zona, "¿A quién le pegó?", el aviso), más `habEjecucion`,
+  `ataqueDeHab`, `habTira`, `efectoDeHab`, `sobreSi`, `tiradaPrimeraHab`, `tiradaSegundaHab`, `zonaDeHab` y `cdMod`, copiados de
+  `js/03`, `js/04`, `js/06` y `js/10`, que quedan con atajos. `ui` = {`mesaHabilidad`, `mesaConTexto`, `publicar`, `toast`, `habDuelo`,
+  `lanzarAtaque`, `lanzarDuelo`, `colocarTrampa(sc, h, auto)`, `colocarZona`, `elegirObjetivo`}: GM Tools lo arma en `gmHabUi`
+  (`js/04`); el mapa en `acHabUi()` (trampa con `trampaDeHabilidad` o junto al token, zona con `zonaPersistenteDeHabilidad`, el
+  objetivo de un estado con un cartel propio `#ac-objetivo` en el recuadro, el duelo con `acElegirObjetivo`). En el mapa
+  (`acEjecutarHab`): 📣 manual anuncia, ⚡ Flash fuera del duelo (`acFlashFuera`, con `CreepDuelo.pagarFlash`), el resto cobra con
+  `acCambiar` → `modificarCreep` y sigue con `terminarHab`; `danohabcreep` (🎲 segunda tirada) y `cdmod` (− / + / ↺ del cooldown)
+  también los hace el mapa. Comparado contra el código viejo de GM Tools en 500 creeps con 4 clics al azar (habilidades con duelo
+  al azar, cura, costo en HP, estados, con y sin duelo/mapa): 500 iguales sin contar los redibujos; 5 mutaciones detectadas.
+  `pruebas.html`: 180 en verde (1 nueva). **En vivo** (GM con ⚗, "Creep nuevo" con 8 No2 y tres habilidades de prueba): la 📣
+  manual se anunció en la Mesa sin cobrar; la 💰 semi cobró 2 No2, puso cooldown 1 y tiró la Fuerza, y su 🎲 tiró el 1d6 «Efecto»;
+  la ✨ «sobre sí mismo» cobró 1 No2, puso cooldown 3, aplicó Blindado (2 turnos) y se anunció; el + del cooldown subió a 1 la manual.
+  **Ningún pedido fue a GM Tools.** Creep restaurado tal cual (6 No2, 2 HP, sin habilidades); ⚗ apagado. Lo que sigue: tanda 6,
+  la 🔍 y el Ver de los creeps.

@@ -934,7 +934,11 @@ versión parecida en más de una, es candidato a juntar.
   tiradas (`tirada`, `tiradaStat`, `esquivar`, `parry`, `fuerzaGolpe`, `bloqueo`, `dano` → `{origen, r}` o `{error}`) y lo que
   cambia al creep (`levantarse`, `pagarParry` → `{error}` o `{aviso}`). Cada pantalla publica y guarda a su manera (GM Tools en
   memoria; el mapa con `modificarCreep`). **`mesa.js`**: una tirada con `r.desde = 'gm'` se guarda como de GM Tools (nombre del
-  creep en rojo), aunque la publique el mapa.
+  creep en rojo), aunque la publique el mapa. Desde la tanda 5, **las habilidades**: `ejecutarHab(sc, h, presets)` (bloqueo, cobrar,
+  cura y estado del sistema anterior, atajo «solo sobre sí» → `{error}` o qué sigue) y `terminarHab(sc, h, p, ui)` (lo que pasa
+  después; `ui = {mesaHabilidad, mesaConTexto, publicar, toast, habDuelo, lanzarAtaque, lanzarDuelo, colocarTrampa(sc, h, auto),
+  colocarZona, elegirObjetivo}`), más `habEjecucion`, `ataqueDeHab`, `habTira`, `efectoDeHab`, `sobreSi`, `tiradaPrimeraHab`,
+  `tiradaSegundaHab`, `zonaDeHab` y `cdMod`. Necesita `estados-aplicar.js` y `combatiente.js`.
 - **`creep-duelo.js`** (`CreepDuelo`, 2026-10-01, paso 4 etapa 4c) — **lo que el duelo le pide a un creep**: `hooks(ui)` devuelve los
   ganchos (`soy`, `atacar`, `defender`, `dano`, `fuerza`, `bloquear`, crítico, Flash, habilidad dirigida…) con `ui = {creep(ref),
   cambiar(ref, fn), publicar(sc, t), toast, confirmar, soy, borrarParry}`. GM Tools arma `window.DUELO_HOOKS` con esto; el mapa,

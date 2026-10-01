@@ -24,7 +24,7 @@
 > motor de reglas para personajes, invocaciones y creeps, con la ficha, GM Tools y el mapa como ventanas. Se lleva adelante
 > de a un paso, pausable. Antes y después de cada paso: [`comun/pruebas.html`](comun/pruebas.html) en verde y las
 > [`docs/pruebas-de-humo.md`](docs/pruebas-de-humo.md). **Dónde quedó (2026-10-01)**: paso 4, etapa 3 (la Botonera la dibuja
-> el mapa): 3a–3c terminadas; 3d en curso (⚗ ya disponible para todos, falta probarla en una sesión real) — leer la sección **"▶ Para retomar"** de [`docs/plan-paso4-etapa3.md`](docs/plan-paso4-etapa3.md). **En paralelo, etapa 4** (Acciones de los creeps y Botonera de las invocaciones en el mapa): 4a hecha, ver [`docs/plan-paso4-etapa4.md`](docs/plan-paso4-etapa4.md).
+> el mapa): 3a–3c terminadas; 3d en curso (⚗ ya disponible para todos, falta probarla en una sesión real) — leer la sección **"▶ Para retomar"** de [`docs/plan-paso4-etapa3.md`](docs/plan-paso4-etapa3.md). **En paralelo, etapa 4** (Acciones de los creeps y Botonera de las invocaciones en el mapa): 4a, 4b y 4c tandas 1–5 hechas (las Acciones nuevas de un creep ya no le piden nada a GM Tools salvo la 🔍 y el Ver: tanda 6) — ver **"▶ Para retomar"** de [`docs/plan-paso4-etapa4.md`](docs/plan-paso4-etapa4.md).
 >
 > **Tareas pendientes → [`docs/pendientes.md`](docs/pendientes.md)** (lista viva para ir tachando; las decisiones de diseño
 > siguen en `preguntas-abiertas.md`). Al terminar o descubrir una tarea, actualizarla ahí.

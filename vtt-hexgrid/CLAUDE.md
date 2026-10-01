@@ -1128,7 +1128,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   golpear), Levantarse, Parry y Bloqueo — publica con `acPublicar` (`desde: 'gm'`) y guarda con `acCambiar` → `modificarCreep`; y
   Atacar (`acAtacar`: el menú en el recuadro, el objetivo con `dueloElegirObjetivoMapa`, o suelto). Y lo que el duelo le pide a
   **cualquier** creep con token (`acHooksDuelo`, con `comun/creep-duelo.js`, en `hooksLocal`) si el GM tiene ⚗ prendido: el mapa
-  carga las piezas al prender ⚗ o al entrar con él prendido (`cargarPiezas`, que no repite scripts).
+  carga las piezas al prender ⚗ o al entrar con él prendido (`cargarPiezas`, que no repite scripts). Desde la tanda 5, **las
+  habilidades** también (`acEjecutarHab`, con `CreepAcciones.ejecutarHab`/`terminarHab` y `acHabUi()`): 📣 anunciar, 💰 y ✨
+  (cobrar con `modificarCreep`, la Mesa, el duelo, la trampa, la zona), ⚡ Flash fuera del duelo (`acFlashFuera`), la 🎲 segunda
+  tirada y el − / + / ↺ del cooldown; "¿A quién le pegó?" es un cartel del recuadro (`#ac-objetivo`, `acElegirObjetivoEstado`).
+  Lo único que todavía va a GM Tools es la 🔍 y el Ver (tanda 6).
 - **Las reglas de los creeps, comunes** (2026-10-01, paso 4 etapa 4a): el mapa carga `comun/creep-calculo.js` siempre;
   `creepModTotalMapa`, `creepIniMapa`, `creepDefensaMapa`, `creepArmadmgMapa`, `defensaCreepMapa` y `zonaStatCreep` son atajos a
   `CreepCalculo` (antes eran copias propias). `zonaStatCreep` (la resistencia de un creep a una zona) ahora da lo mismo que GM

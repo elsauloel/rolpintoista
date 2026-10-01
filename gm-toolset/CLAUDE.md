@@ -212,6 +212,12 @@ hay trabajo reciente o en curso de otra conversación (ver
   (`js/12`); `pagarFlashCreep`, `costoFlashCreep(Txt)` y `tirarPdgDeArreglosCreep` (`js/04`) son atajos. Los clics de las Acciones
   (`js/06`) y el ataque (`atacarNormalCreep`, `ataqueEspecialCreep`) usan `comun/creep-acciones.js`.
 
+- **Las habilidades de un creep, en `comun/creep-acciones.js`** (2026-10-01, paso 4 etapa 4c, tanda 5): el clic de Ejecutar (`js/06`)
+  es `CreepAcciones.ejecutarHab` + `terminarHab(sc, h, p, gmHabUi)` (`gmHabUi` en `js/04`: Mesa, duelo, trampa, zona, "¿A quién le
+  pegó?"); el cooldown a mano, `CreepAcciones.cdMod`. `aplicarEfectoDeConsumoCreep`, `habCreepTira`, `habEjecucionCreep`,
+  `ataqueDeHabCreep`, `tirarExtraDeHab`, `tirarSegundaDeHab`, `aplicarHabCreepSobreSi` y la tirada de `colocarZonaDeHabCreep` son
+  atajos. Lo que se ve (Mesa, carteles, el mapa) sigue acá.
+
 ## Formato de datos
 
 - **Consumen** (desde 2026-09-29) el catálogo de fábrica `comun/catalogo.js`

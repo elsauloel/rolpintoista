@@ -951,6 +951,30 @@ prueba('la 🔍 y el Ver de un creep: costo de atacar, cooldown que falta y habi
     ['Orco · Atacar', true, true, true, true, 'Golpe', true, '']);
 });
 
+prueba('P137: «no vence» lo decide la habilidad si lo marca, si no el estado (personaje, invocación y creep)', () => {
+  const sev = {nombre: 'Veneno severo', permanente: true};
+  igual([Combatiente.efectoPermanente({}, sev), Combatiente.efectoPermanente({efectoPermanente: false}, sev),
+    Combatiente.efectoPermanente({efectoPermanente: true}, null), Combatiente.efectoPermanente({}, null)], [true, false, true, false]);
+  const sc = creepPrueba({habilidades: [{id: 'a', nombre: 'Sombra', efectoNombre: 'Sigilo'}, {id: 'b', nombre: 'Sombra corta', efectoNombre: 'Sigilo', efectoPermanente: false, efectoTurnos: 2}]});
+  const r1 = CreepAcciones.efectoDeHab(sc, sc.habilidades[0], estadosPresetCreep());
+  const sc2 = creepPrueba({});
+  const r2 = CreepAcciones.efectoDeHab(sc2, sc.habilidades[1], estadosPresetCreep());
+  const S = {catalogo: [], efectos: []};
+  const r3 = FichaHabilidades.aplicarEfectoDeConsumo(S, {nombre: 'Capa', efectoNombre: 'Sigilo'}, estadosPresetFicha());
+  igual([r1.estado.permanente, r2.estado.permanente, r3.estado.permanente], [true, false, true]);
+});
+prueba('P137: el Excedente de vida que da una habilidad reemplaza al que había, también en los creeps', () => {
+  const h = {id: 'd', nombre: 'Drenar', efectoNombre: 'Excedente de vida', efectoEscudo: 3};
+  const sc = creepPrueba({habilidades: [h]});
+  CreepAcciones.efectoDeHab(sc, Object.assign({}, h, {efectoEscudo: 5}), estadosPresetCreep());
+  const r = CreepAcciones.efectoDeHab(sc, h, estadosPresetCreep());
+  const S = {catalogo: [], efectos: []};
+  FichaHabilidades.aplicarEfectoDeConsumo(S, Object.assign({}, h, {efectoEscudo: 5}), estadosPresetFicha());
+  const rf = FichaHabilidades.aplicarEfectoDeConsumo(S, h, estadosPresetFicha());
+  const exc = l => l.filter(e => e.nombre === 'Excedente de vida').map(e => [e.escudoMagico, e.escudoMagicoActual]);
+  igual([exc(sc.estados), exc(S.efectos), !!r.estado, !!rf.ok], [[[3, 3]], [[3, 3]], true, true]);
+});
+
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */
 grupo('Mis últimas tiradas (P138)');
 prueba('se juntan las de la Mesa con las de esta ventana, sin repetir, las últimas primero', () => {

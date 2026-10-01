@@ -751,7 +751,7 @@ function invEjecutarHab(invId, habId){
     const nombre = h.efectoNombre.trim();
     // Estado al ejecutar (sistema anterior): con las marcas de su preset, si tiene uno, para que valgan las inmunidades.
     efectoTxt = ponerEstadoEnInv(inv, {...flagsDePreset(nombre), id: uid(), nombre, detalle: h.efectoDetalle||'', turnos: Math.max(0,num(h.efectoTurnos)||0),
-      hpturno: num(h.efectoHpTurno)||0, permanente: !!h.efectoPermanente, activo: true, stacks:1, stacksturno:0,
+      hpturno: num(h.efectoHpTurno)||0, permanente: Combatiente.efectoPermanente(h, presetPorNombre(EFECTOS_PRESET, nombre)), activo: true, stacks:1, stacksturno:0,
       polaridad: h.efectoPolaridad||'otro', mods: structuredClone(h.efectoMods||[])});
   }
   let hDuelo = null, aplicadoDirecto = '', falta = '', esArma = false;
@@ -949,7 +949,7 @@ function abrirEditorHabInv(invId, habId){
   $('#hi-efecto-turnos').value = h.efectoTurnos || 0;
   $('#hi-efecto-hpturno').value = h.efectoHpTurno || 0;
   $('#hi-efecto-detalle').value = h.efectoDetalle || '';
-  $('#hi-efecto-permanente').checked = !!h.efectoPermanente;
+  $('#hi-efecto-permanente').checked = Combatiente.efectoPermanente(h, presetPorNombre(EFECTOS_PRESET, (h.efectoNombre || '').trim()));   // P137
   $('#hi-efecto-polaridad').value = h.efectoPolaridad || 'otro';
   $('#hi-efecto-mods').value = JSON.stringify(h.efectoMods || []);
   hiAplicarModoNitros();

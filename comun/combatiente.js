@@ -304,6 +304,14 @@ const Combatiente = (() => {
     return base;
   }
 
+  /* ¿El estado que pone una habilidad o un ítem al usarse (efectoNombre…) no vence? (P137, 2026-10-01, igual para personajes,
+     invocaciones y creeps): si la habilidad/ítem lo dice (efectoPermanente, la casilla "No vence" / "Sin límite"), manda eso;
+     si nunca se tocó, lo que diga el estado (`preset`). */
+  function efectoPermanente(src, preset){
+    const v = src && src.efectoPermanente;
+    return v !== undefined && v !== null ? !!v : !!(preset && preset.permanente);
+  }
+
   /* ---------- Inmunidades ----------
      ¿Este debuff rebota en quien lo recibe? Devuelve el motivo ('Invulnerable', 'Inmunidad a CC', 'Sangre pura',
      'Coagulación extrema', 'Protección de jefe') o false. `o.jefe`: un creep jefe es inmune a Stun (P95). */
@@ -490,7 +498,7 @@ const Combatiente = (() => {
 
   return {mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
-    escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, inmunidad,
+    escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
     formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, flashPara, cdFlash, costoFlash};
 })();

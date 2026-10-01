@@ -104,7 +104,7 @@ function renderVerHab(){
       ${linea('Otro costo', h.costo)}
       ${linea('Tirada', tirada || 'no tira')}
       ${linea('Cura', h.curaHp ? `${fmt(num(h.curaHp))} HP` : '')}
-      ${linea('Estado sobre sí mismo', h.efectoNombre ? `${h.efectoNombre}${num(h.efectoTurnos) ? ` (${fmt(num(h.efectoTurnos))} turnos)` : ''}${mods ? ` · ${mods}` : ''}` : '')}
+      ${linea('Estado sobre sí mismo', h.efectoNombre ? `${h.efectoNombre}${h.efectoPermanente ? ' (no vence)' : num(h.efectoTurnos) ? ` (${fmt(num(h.efectoTurnos))} turnos)` : ''}${mods ? ` · ${mods}` : ''}` : '')}
       ${linea('Estado sobre el objetivo', aplica)}
       ${linea('Trampa', h.trampaColocar ? 'Se coloca sola en el mapa al ejecutarla' : '')}
     </div>
@@ -265,6 +265,7 @@ function abrirEditorHabCreep(scId, habId, opc){
   $('#hc-efecto-turnos').value = h.efectoTurnos || 0;
   $('#hc-efecto-stacks').value = h.efectoStacks || 1;
   $('#hc-efecto-hpturno').value = h.efectoHpTurno || 0;
+  $('#hc-efecto-permanente').checked = Combatiente.efectoPermanente(h, ESTADOS_PRESET_GM.find(p => p.nombre === (h.efectoNombre || '').trim() || (p.alias || []).includes((h.efectoNombre || '').trim())));   // P137
   $('#hc-efecto-detalle').value = h.efectoDetalle || '';
   $('#hc-efecto-polaridad').value = h.efectoPolaridad || 'otro';
   $('#hc-efecto-mods').value = JSON.stringify(h.efectoMods || []);
@@ -303,6 +304,7 @@ function guardarEditorHabCreep(){
   h.efectoTurnos = Math.max(0, num($('#hc-efecto-turnos').value) || 0);
   h.efectoStacks = Math.max(1, num($('#hc-efecto-stacks').value) || 1);
   h.efectoHpTurno = num($('#hc-efecto-hpturno').value) || 0;
+  h.efectoPermanente = $('#hc-efecto-permanente').checked;
   h.efectoDetalle = $('#hc-efecto-detalle').value;
   h.efectoPolaridad = $('#hc-efecto-polaridad').value || 'otro';
   try{ h.efectoMods = JSON.parse($('#hc-efecto-mods').value) || []; }catch(e){ h.efectoMods = []; }

@@ -958,3 +958,8 @@ versión parecida en más de una, es candidato a juntar.
   cuadro abre también desde la Botonera nueva del mapa (shadow DOM, donde `e.target` es el recuadro). Sus estilos llevan
   `id="lupa-css"` (el mapa los copia adentro del recuadro).
 - **`pruebas.html` acepta pruebas async** (2026-10-01): una prueba que devuelve una promesa se anota cuando termina y el resumen la espera. `IT2` (los costos en No2/SP) vive ahora en `ficha-calculo.js` (`FichaCalculo.IT2`). **Al cambiar un archivo de `comun/` que la ficha carga con `?v=`, subir su versión** (si no, el navegador usa la copia vieja: pasó con `ficha-calculo.js`).
+
+- **`Combatiente.efectoPermanente(src, preset)`** (2026-10-01, P137): ¿el estado que pone una habilidad o un ítem al usarse
+  (`efectoNombre`…) no vence? Si la habilidad/ítem tiene `efectoPermanente` (la casilla "No vence" / "Sin límite"), manda eso; si
+  no, el `permanente` del estado. La usan la ficha (`ficha-habilidades.js`), las invocaciones y los creeps (`creep-acciones.js`).
+  El Excedente de vida que da una habilidad **reemplaza** al que había en los tres (antes, en los creeps, se sumaba).

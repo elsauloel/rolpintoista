@@ -74,7 +74,7 @@ const FichaHabilidades = (() => {
     if(estaBloqueadoElDebuff(S, preset)) return {ok: false, motivo: 'inmune', nombre};
     const turnos = n(src.efectoTurnos);
     const hpturno = n(src.efectoHpTurno);
-    const permanente = !!src.efectoPermanente;
+    const permanente = Combatiente.efectoPermanente(src, preset);   // P137: la casilla de la habilidad/ítem, o lo del estado
     const mods = (src.efectoMods || []).filter(m => m && m.stat).map(m => ({stat: m.stat, val: n(m.val)}));
     // El estado se queda solo en la lista: sin una descripción propia hay que acordarse de qué ítem salió. Si el
     // ítem no trae un texto pensado para el estado, se usa el suyo, que es mejor que nada.

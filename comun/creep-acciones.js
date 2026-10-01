@@ -128,12 +128,11 @@ const CreepAcciones = (() => {
     const categorias = preset ? {esCC:preset.esCC, esVeneno:preset.esVeneno, esSangrado:preset.esSangrado,
       stacksTurno: preset.stacksTurno ?? 0, permanente: !!preset.permanente, escudoMagico: preset.escudoMagico ?? 0, forzarNitros: preset.forzarNitros ?? ''} : {};
     if(preset) FLAGS_ESTADO.forEach(f => { categorias[f] = !!preset[f]; });
-    const previo = sc.estados.find(x => x.nombre === nombre);
-    const excPrevio = previo ? num(previo.escudoMagicoActual ?? previo.escudoMagico) : 0;   // Excedente de vida: lo que ya tenía
-    const nuevo = {id: uid(), nombre, hpTurno, stacks, turnos, polaridad, detalle, mods, ...categorias};
+    // P137 (2026-10-01): "no vence" lo decide la habilidad si lo marca (como en personajes e invocaciones); si no, el estado.
+    const nuevo = {id: uid(), nombre, hpTurno, stacks, turnos, polaridad, detalle, mods, ...categorias, permanente: Combatiente.efectoPermanente(h, preset)};
     if(num(h.efectoEscudo) > 0){   // la habilidad da HP de escudo o de Excedente de vida (Absorber vida, Coraza de huesos…)
-      const suma = num(h.efectoEscudo), total = (preset && preset.excedenteVida) ? excPrevio + suma : suma;
-      nuevo.escudoMagico = total; nuevo.escudoMagicoActual = total;
+      // P137: el Excedente de vida nuevo reemplaza al que tenía (antes se sumaba), igual que en personajes e invocaciones.
+      nuevo.escudoMagico = num(h.efectoEscudo); nuevo.escudoMagicoActual = num(h.efectoEscudo);
     }
     // Ponerlo: la regla común (comun/combatiente.js, agregarEstado) — inmunidades (con la de jefe), Veneno que se acumula y,
     // si ya tiene uno igual, se renueva (P132).

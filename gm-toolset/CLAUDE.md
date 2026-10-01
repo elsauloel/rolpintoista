@@ -404,3 +404,7 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   (`flashOpciones`/`flashUsar`): no gastan No2, ponen el cooldown (y cobran la vida si la tienen). Al usarlo pregunta "¿Es el
   turno de X?" (`pagarFlashCreep`): en turno ajeno, todo el costo es el doble (P136, regla del juego). Con el botón Ejecutar
   (`usarFlashFueraDelDueloCreep`) hace lo mismo, sin No2, y lo anuncia: el bono se suma a mano a la tirada.
+
+- **"No vence" en las habilidades de creep** (2026-10-01, P137): el paso del estado del editor de habilidades suma la casilla
+  `#hc-efecto-permanente` (`h.efectoPermanente`; se marca sola al elegir un preset que no vence, y una habilidad vieja sin el dato
+  la muestra según su estado). El Excedente de vida que da una habilidad reemplaza al que tenía el creep (antes se sumaba).

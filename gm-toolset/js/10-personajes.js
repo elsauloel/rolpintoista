@@ -285,6 +285,7 @@ $('#hc-efecto-preset').addEventListener('change', e => {
   $('#hc-efecto-turnos').value = preset.turnos ?? 0;
   $('#hc-efecto-stacks').value = preset.stacks ?? 1;
   $('#hc-efecto-hpturno').value = preset.hpTurno ?? 0;
+  $('#hc-efecto-permanente').checked = !!preset.permanente;
   $('#hc-efecto-detalle').value = preset.detalle || '';
   $('#hc-efecto-polaridad').value = preset.polaridad || 'otro';
   $('#hc-efecto-mods').value = JSON.stringify(preset.mods || []);

@@ -81,6 +81,11 @@ pruebas en `comun/pruebas.html`, `?v=` al día, probada en vivo y documentada.
 2. **El mismo interruptor ⚗** "Botonera nueva" para las Acciones nuevas de los creeps.
 3. **P137, esperar**: se decide antes de las invocaciones.
 
+## P137, decidida (2026-10-01)
+"No vence": la habilidad lo marca o lo desmarca; si nunca se tocó, manda el estado — igual en personajes, invocaciones y creeps
+(los creeps ganaron la casilla). El Excedente de vida que da una habilidad reemplaza al que había, en los tres. Con eso, la 4e
+puede empezar.
+
 ## Cómo va
 - 2026-10-01: plan escrito. Empieza la 4a (no depende de las respuestas: el cálculo de los creeps hace falta en cualquier
   orden).
@@ -185,3 +190,8 @@ pruebas en `comun/pruebas.html`, `?v=` al día, probada en vivo y documentada.
   (costo, «faltan 1» de cooldown, tirada del stat) se abrieron sobre el recuadro; el Ver mostró «🐾 Creep · cooldown», el costo y
   el detalle; ✎ Editar abrió el editor paso a paso de GM Tools sobre el mapa. Se cerró sin guardar; creep restaurado tal cual
   (6 No2, 2 HP, sin habilidades) y ⚗ apagado.
+- 2026-10-01: **P137 decidida y aplicada** — `Combatiente.efectoPermanente(src, preset)` (la casilla de la habilidad/ítem si se
+  tocó; si no, el estado), usada por `FichaHabilidades.aplicarEfectoDeConsumo`, `CreepAcciones.efectoDeHab` e `invEjecutarHab`;
+  el editor de habilidades de creep suma la casilla "No vence" (`#hc-efecto-permanente`, se llena con el preset al elegirlo). El
+  Excedente de vida de un creep ya no se suma al que tenía (`efectoDeHab`). Ningún ítem del catálogo cambia. `pruebas.html`: 183
+  en verde (2 nuevas). El dueño va a probar la 4d en una sesión real; mientras tanto, empieza la 4e (invocaciones).

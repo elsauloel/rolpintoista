@@ -1119,6 +1119,10 @@ manual (`bnAccionAca`): **la Botonera nueva ya no delega ningún botón**; solo 
 **Ojo con el recuadro aislado**: en un listener del recuadro (`bn.host`), `e.target` es siempre el recuadro aunque el clic sea
 adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo cierra", que antes cerraba con cualquier clic).
 
+- **Las reglas de los creeps, comunes** (2026-10-01, paso 4 etapa 4a): el mapa carga `comun/creep-calculo.js` siempre;
+  `creepModTotalMapa`, `creepIniMapa`, `creepDefensaMapa`, `creepArmadmgMapa`, `defensaCreepMapa` y `zonaStatCreep` son atajos a
+  `CreepCalculo` (antes eran copias propias). `zonaStatCreep` (la resistencia de un creep a una zona) ahora da lo mismo que GM
+  Tools: suma lo que sube el atributo y el +1 de Res.Esp de los jefes.
 - **Arreglo: las zonas persistentes no se podían crear** (2026-10-01): `crearElementoZona` mandaba `celdas` como objetos
   `{dq, dr}` en vez de la lista plana `[dq, dr, …]` que guardan todas las formas (`guardarElemento`) y que exigen las reglas, así
   que Firestore rechazaba toda zona —por habilidad o por el asistente de zonas— desde que existe (2026-09-28), con un cartel que

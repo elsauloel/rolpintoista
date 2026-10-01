@@ -6,7 +6,9 @@
 
 ## ▶ Para retomar
 
-**Lo próximo**: 4a (el cálculo de un creep en `comun/`). Ver "Cómo va".
+**Hecho**: 4a (las reglas de un creep en `comun/creep-calculo.js`, usadas por GM Tools y el mapa). **Lo próximo**: 4b (las
+Acciones nuevas en el mapa, solo dibujar: `comun/creep-botonera.js` con `renderAccionesCreep`, `js/03`). Las preguntas de abajo
+siguen abiertas (P141); se avanza con lo recomendado.
 
 ## Cómo es hoy
 
@@ -63,3 +65,18 @@ pruebas en `comun/pruebas.html`, `?v=` al día, probada en vivo y documentada.
 ## Cómo va
 - 2026-10-01: plan escrito. Empieza la 4a (no depende de las respuestas: el cálculo de los creeps hace falta en cualquier
   orden).
+- 2026-10-01: **4a hecha** (72af09a) — `comun/creep-calculo.js` (`CreepCalculo`), copiado tal cual de GM Tools (`js/01`, `js/02`,
+  `js/04`): `statValor`, `modTotal`, `defensaEfectiva`, `armadmgEfectiva`, `critEfectivo`, `nitrosMax`, `costoAtaque`,
+  `costoContraataque`, `costoParry`, `costoNitrosHab`, `costoHabTxt`, `defensa` (con qué para), `bloqueoValor`,
+  `fuerzaGolpeValor`, `danoTxt`/`ataqueTxt`, `modoHab`/`bloqueoHab`, `habPartes`/`habTextoMesa`, los textos de "de dónde sale"
+  (`statOrigenTxt`, `defensaOrigenTxt`, `critOrigenTxt`…), `actualizarHpMaxPorCon`, `actualizarNo2PorAgl`, `normalizar` y sus
+  migraciones, y las tablas (`DERIVED_STATS`, `STATS_TIRADA_IDS`, `DERIVADOS_POR_ATTR`, `SLOT_MAP`, `IT2_CREEP`). GM Tools queda
+  con atajos de una línea con sus nombres de siempre (`creepStatValor`, `creepModTotal`, `normalizarCreep`…). El mapa carga la
+  pieza siempre y reemplaza sus copias parciales: `creepModTotalMapa`, `creepIniMapa`, `creepDefensaMapa`, `creepArmadmgMapa`,
+  `defensaCreepMapa` daban lo mismo; **`zonaStatCreep` cambia** (la resistencia de un creep a una zona): ahora suma lo que sube
+  el atributo (Res.Esp con los bonos de Constitución, Evasión con los de Agilidad) y el +1 de Res.Esp de los jefes, como GM
+  Tools. Comparado contra el código viejo en 600 creeps de la biblioteca base con estados, equipo, escudos y datos viejos al
+  azar (todos los stats, costos, textos y `normalizar`): 600 iguales, 0 distintas; 4 mutaciones plantadas, las 4 detectadas.
+  `pruebas.html`: 175 en verde (4 nuevas). **En vivo** ("Test con claude elsaulo", como GM): GM Tools carga y guarda; las
+  Acciones del "Creep nuevo" se dibujan igual (PdG 1d1, Daño 1d8 + 1, Esquivar 1d6, sin Parry porque no tiene arma) y sus 🔍
+  abren; en el mapa, la Iniciativa (6) y la Res.Esp (1) del creep dan lo mismo que en GM Tools.

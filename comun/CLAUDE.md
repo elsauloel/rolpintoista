@@ -920,6 +920,12 @@ versión parecida en más de una, es candidato a juntar.
   `confirmar-turno.js` (Flash). **`duelo.js` acepta `cfg.hooksLocal(lado)`** (en `escuchar`): si devuelve ganchos, el pedido
   (`duelo-opciones`, `duelo-tirar`, `duelo-flash`, `duelo-reroll`, `duelo-contra`…) se resuelve ahí mismo con `ejecutar(m, hk)` en
   vez de mandarlo al marco; la tirada se recoge igual, por el evento `tirada-registrada` (que dispara quien publica).
+- **`creep-calculo.js`** (`CreepCalculo`, 2026-10-01, paso 4 etapa 4a, `../docs/plan-paso4-etapa4.md`) — **las reglas de un creep,
+  fuera de GM Tools**: stats con equipo y estados (`statValor`, `modTotal`), Defensa, Armadura mágica, críticos, No2 máximo, costos
+  (atacar, contraataque, Parry, habilidades), con qué para (`defensa`), Bloqueo, Fuerza del golpe, daño del arma, modo y bloqueo de
+  una habilidad, los textos de "de dónde sale", `normalizar` (y sus migraciones) y las tablas de stats. Todo recibe el creep
+  (`sc`). GM Tools lo usa con sus nombres de siempre (`creepStatValor`…); el mapa lo carga siempre (antes tenía copias
+  parciales). **Una regla de creep nueva o corregida va acá.** Necesita `combatiente.js`.
 - **`ficha-lupa.js`** (`FichaLupa`, 2026-10-01, paso 4 etapa 3c-6) — **la 🔍 y el "Ver" de un personaje**, para la ficha y el
   mapa: `contenido(S, clave)` → `{titulo, html}` (el desglose de cada 🔍 de la Botonera: `stat:`, `defensa:`, `atacar:`, `danio:`,
   `social:`, `habx:`, `hab:`, `cons:`; las de las invocaciones siguen en la ficha) y `ver(S, key, it)` → `{titulo, html}` (la tarjeta

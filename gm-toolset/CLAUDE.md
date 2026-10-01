@@ -198,6 +198,11 @@ hay trabajo reciente o en curso de otra conversación (ver
   sortear el stock de la abierta conservando nombre, ajuste de precios y
   lugar en la lista.
 
+- **Las reglas de un creep, en `comun/creep-calculo.js`** (2026-10-01, paso 4 etapa 4a, `../docs/plan-paso4-etapa4.md`): lo
+  que vivía en `js/01`, `js/02` y `js/04` (`creepStatValor`, `creepModTotal`, `creepDefensaEfectiva`, `creepNitrosMax`, los costos,
+  `defensaCreep`, `normalizarCreep` y sus migraciones, los textos de origen, `CREEP_DERIVED_STATS`, `SLOT_MAP_GM`…) son ahora atajos
+  de una línea a `CreepCalculo`. Para cambiar una regla de creep, ir a ese archivo (y subir su `?v=` en `gm-tools.html` y en el mapa).
+
 ## Formato de datos
 
 - **Consumen** (desde 2026-09-29) el catálogo de fábrica `comun/catalogo.js`

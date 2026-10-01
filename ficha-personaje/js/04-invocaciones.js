@@ -325,90 +325,13 @@ function abrirBotoneraInv(invId){
   renderBotoneraInv();
   $('#scrim-botonera-inv').classList.add('open');
 }
-function renderBotoneraInv(){
+function renderBotoneraInv(){   // el dibujo vive en comun/inv-botonera.js (paso 4, etapa 4e, tanda 2): lo usa también el mapa
   const inv = S.invocaciones.find(x => x.id === botoneraInvId);
   if(!inv) return;
-  const costoAtaque = costoAtaqueInv(inv);
-  const sinNitrosAtaque = num(inv.nitros) < costoAtaque;
-  const cualAtaque = num(inv.ataquesTurno) === 0 ? 'primer ataque del turno (Tipo ÷ 2)' : 'ataque extra (Tipo completo)';
-  $('#botonerainv-titulo').textContent = inv.nombre;
-  $('#botonerainv-badge').textContent = `No2 ${fmt(num(inv.nitros))}/${fmt(invNitrosMax(inv))}`;
-
-  const tilesStats = INV_STATS_TIRADA_IDS.map(id => `
-    <button type="button" class="botonera-tile" data-invtirarstat="${inv.id}:${id}" title="${esc(STAT_LABEL[id]||id)}">
-      ${lupaBotonHtml(`inv:${inv.id}:stat:${id}`)}
-      <span class="bt-label">${esc(STAT_LABEL[id]||id)}</span>
-      <span class="bt-value">${fmt(invStatValor(inv, id))}</span>
-    </button>`).join('');
-
-  const f = v => { const x = formulaParaValor(v); return x ? x.formula : ''; };
-  const defInv = defensaInv(inv);
-  const combate = [
-    {stat:'pdg', nombre:`Atacar (PdG) · ${fmt(costoAtaque)} No2`, dado: f(invStatValor(inv,'pdg')), sinNitros: sinNitrosAtaque, clave:`inv:${inv.id}:atacar`, motivo:`${sinNitrosAtaque?'Sin No2 · ':''}Cuesta ${fmt(costoAtaque)} No2 · ${cualAtaque}`, attr:`data-invatacar="${inv.id}"`},
-    {nombre:'Daño Arma', dado: invDanoTxt(inv, invStatValor(inv,'dmg')), clave:`inv:${inv.id}:danio`, motivo:'Sin costo', attr:`data-invdanio="${inv.id}"`},
-    {stat:'eva', nombre:'Esquivar (Eva)', dado: f(invStatValor(inv,'eva')), clave:`inv:${inv.id}:stat:eva`, motivo:'Sin costo', attr:`data-invtirarstat="${inv.id}:eva"`},
-    // Parry y Bloqueo solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30): sin eso, o con un arma
-    // natural, no aparecen (defensaInv).
-    ...(defInv ? [{stat:'parry', nombre:`Parry · ${fmt(Combatiente.costoParry())} No2`, dado: f(invStatValor(inv,'parry')), sinNitros: num(inv.nitros) < Combatiente.costoParry(), clave:`inv:${inv.id}:stat:parry`, motivo:`${num(inv.nitros) < Combatiente.costoParry() ? 'Sin No2 · ' : ''}Cuesta ${fmt(Combatiente.costoParry())} No2 · con ${defInv.nombre}`, attr:`data-invtirarstat="${inv.id}:parry"`},
-      parryPendienteInv.has(inv.id)
-        ? {stat:'bloqueo', nombre:`Bloqueo · ${defInv.nombre}`, dado: f(bloqueoValorInv(inv)), clave:`inv:${inv.id}:stat:bloqueo`, motivo:`Tras el Parry · sin costo · su Bloqueo + el Peso de ${defInv.nombre} (${fmt(num(defInv.peso))}) es el dado`, attr:`data-invtirarstat="${inv.id}:bloqueo"`}
-        // Apagado hasta el Parry, pero muestra lo que tiraría (para decidir entre Parry y Evasión).
-        : {stat:'bloqueo', nombre:'Bloqueo · tras el Parry', dado: f(bloqueoValorInv(inv)), sinNitros: true, clave:`inv:${inv.id}:stat:bloqueo`, motivo: `${Combatiente.BLOQUEO_SOLO_TRAS_PARRY} · con ${defInv.nombre} tiraría esto`, attr:`data-invtirarstat="${inv.id}:bloqueo"`}] : []),
-  ];
-  const tilesCombate = combate.map(c => {
-    const mt = c.stat ? ModTirada.tile(inv.estados, c.stat) : {clase: '', html: '', titulo: ''};
-    return `
-    <button type="button" class="botonera-tile${c.sinNitros?' bt-sin-nitros':''}${mt.clase}" ${c.attr} title="${esc(c.motivo + mt.titulo)}">
-      ${lupaBotonHtml(c.clave)}${ModTirada.ayuda(c.stat)}
-      <span class="bt-label">${esc(c.nombre)}</span><span class="bt-value bt-value-formula">🎲${c.dado?` ${esc(c.dado)}`:''}</span>${mt.html}
-    </button>`;
-  }).join('');
-
-  const filasHab = inv.habilidades.map(h => {
-    const bloqueo = bloqueoHabInv(inv, h);
-    const motivo = [costoHabInvTxt(inv,h), num(h.cd)>0?`CD ${fmt(num(h.cd))}`:''].filter(Boolean).join(' · ');
-    return `<div class="cat-row bot-fila">
-      <div class="bot-fila-info">
-        <div class="cat-nombre">${esc(h.nombre||'Sin nombre')}</div>
-        <div class="bot-fila-costo">${esc(bloqueo || motivo)}</div>
-      </div>
-      <div class="bot-fila-btns">
-        <button type="button" class="mini" data-verhabinv="${inv.id}:${h.id}">Ver</button>
-        <button type="button" class="ejecutar-btn con-lupa${bloqueo?' sin-recursos':''}" data-ejecutarhabinv="${inv.id}:${h.id}" ${bloqueo?`aria-disabled="true" title="${esc(bloqueo)}"`:''}>${modoHab(h) === 'manual' ? 'Anunciar' : 'Ejecutar'}${lupaBotonHtml(`inv:${inv.id}:hab:${h.id}`, 'en-boton')}</button>
-        ${botonSegundaHabInv(inv, h)}
-      </div>
-    </div>`;
-  }).join('');
-
-  $('#botonerainv-body').innerHTML = `
-    <div class="botonera-grid botonera-grid-even">
-      <div class="botonera-caja">
-        <div class="cat-grouphead" style="margin-top:0"><span>Combate</span></div>
-        <div class="botonera-combate-grid">${tilesCombate}</div>
-        <div class="botonera-defensa botonera-combate-bottom" style="margin-top:6px">
-          <div class="botonera-tile bt-info" title="Defensa (no se tira)">
-            <span class="bt-label">Defensa</span><span class="bt-value">${fmt(invDefensaEfectiva(inv))}</span>
-          </div>
-          <div class="botonera-crit">
-            <div class="botonera-crit-t">Resistencia a críticos</div>
-            <div class="botonera-crit-grid">
-              ${[0, 1, 2, 3, 4].map(i => `
-              <div class="botonera-tile bt-info" title="Resistencia a crítico Tipo ${4 + 2 * i} (no se tira)">
-                <span class="bt-label">Tipo ${4 + 2 * i}</span><span class="bt-value">${fmt(invCritEfectivo(inv, i))}</span>
-              </div>`).join('')}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="botonera-caja">
-        <div class="cat-grouphead" style="margin-top:0"><span>Tiradas de stats</span></div>
-        <div class="botonera-stats-grid">${tilesStats}</div>
-      </div>
-    </div>
-    <div class="botonera-caja">
-      <div class="cat-grouphead" style="margin-top:0"><span>Habilidades</span></div>
-      <div class="botonera-list-grid">${inv.habilidades.length ? filasHab : '<div class="hint">Sin habilidades cargadas.</div>'}</div>
-    </div>`;
+  const r = InvBotonera.html(inv, {parryPendiente: parryPendienteInv.has(inv.id)});
+  $('#botonerainv-titulo').textContent = r.titulo;
+  $('#botonerainv-badge').textContent = r.badge;
+  $('#botonerainv-body').innerHTML = r.html;
 }
 
 function verHabInv(invId, habId){
@@ -543,8 +466,7 @@ function tirarSegundaDeHabInv(invId, habId){
   const r = tirarDados((h.tiradaExtra||'').trim());
   if(r) registrarTirada(`${inv.nombre} · ${h.nombre} · Efecto`, r); else toast('La fórmula de la habilidad no es válida');
 }
-const botonSegundaHabInv = (inv, h) => (h.tiradaStat && (h.tiradaExtra||'').trim())
-  ? `<button type="button" class="mini" data-danohabinv="${inv.id}:${h.id}" title="Segunda tirada de la habilidad (daño o efecto): ${esc(String(h.tiradaExtra).trim())}">🎲 ${esc(String(h.tiradaExtra).trim())}</button>` : '';
+const botonSegundaHabInv = (inv, h) => InvBotonera.botonSegundaHab(inv, h);   // comun/inv-botonera.js
 // Tres modos (2026-09-30): 📣 manual solo anuncia; 💰 semi cobra No2 y cooldown y tira la primera; ✨ auto abre la Ejecución
 // paso a paso a nombre de la invocación (ref `fichaId~invId`, como su ataque), o aplica directo si es solo sobre ella y sin tiradas.
 function alcanceDeHabInv(inv, c, statTira){ return Combatiente.alcanceHab(c, statTira, s => invStatValor(inv, s)); }   // comun/combatiente.js

@@ -9027,7 +9027,7 @@ function centrarTokenDeBotonera(herramienta, id){
 // invId: si viene, abre la Botonera de esa invocación del personaje en vez
 // de la propia (mismo iframe: la ficha ya sabe mostrar una u otra).
 function abrirBotonera(fichaId, mensaje, invId, sinNueva){
-  if(!mensaje && !invId && !sinNueva && bnActiva()){ abrirBotoneraNueva(fichaId); return; }   // ⚗ prueba (paso 4, etapa 3b)
+  if(!mensaje && !sinNueva && bnActiva()){ abrirBotoneraNueva(fichaId, invId || ''); return; }   // ⚗ prueba (paso 4, etapa 3b; con invocación, 4e)
   const capa = $('#botonera-capa');
   const marco = $('#botonera-marco');
   const completa = !!(mensaje && (mensaje.tipo === 'abrir-botin' || mensaje.tipo === 'abrir-equipo'));   // la ventana de la batalla y la de Equipo y mochila ocupan todo el centro
@@ -9097,7 +9097,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001c',
-  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001h',
+  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/inv-calculo.js?v=20261001b', '../comun/inv-botonera.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001h',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
@@ -9169,6 +9169,7 @@ function bnDibujar(){
   if(!bn) return;
   const cuerpo = bn.raiz.querySelector('#bn-contenido');
   if(!bn.S){ cuerpo.innerHTML = '<div class="modal catalogo-modal botonera-modal"><div class="body"><div class="hint">Cargando el personaje…</div></div></div>'; return; }
+  if(bn.invId){ bnDibujarInv(cuerpo); return; }
   const r = FichaBotonera.html(bn.S, {modoMapa, parryArmaPendiente: bn.parryPendiente || null});
   const scroll = bn.host.scrollTop;
   cuerpo.innerHTML = `<div class="modal catalogo-modal botonera-modal">
@@ -9187,8 +9188,31 @@ function bnDibujar(){
   bnPintarColapsados();
   bn.host.scrollTop = scroll;
 }
+/* Paso 4, etapa 4e (tanda 2): la Botonera de una invocación del personaje, dibujada con comun/inv-botonera.js (la misma de la
+   ficha) a partir de la invocación que trae el personaje (S.invocaciones, al día con FichaSesion). Por ahora cada botón se lo
+   pide a la ficha del marco ('botonera-delegar' con `inv`). Una invocación vieja se dibuja sobre una copia migrada (la ficha
+   la migra al dibujarla). */
+function bnDibujarInv(cuerpo){
+  const cruda = (bn.S.invocaciones || []).find(x => x && x.id === bn.invId);
+  const marco = adentro => `<div class="modal catalogo-modal botonera-modal" style="max-width:640px">${adentro}</div>`;
+  if(!cruda){ cuerpo.innerHTML = marco('<div class="body"><div class="hint">Esa invocación ya no está.</div></div>'); return; }
+  const inv = InvCalculo.migrar(structuredClone(cruda));
+  const cab = (titulo, badge) => `<header>
+      <div style="display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap">
+        <h3>${esc(titulo)} <span title="Botonera nueva (prueba): la dibuja el mapa">⚗</span></h3>
+        ${badge ? `<span class="botonera-badge">${esc(badge)}</span>` : ''}
+        <span class="hint" style="font-size:11px">${esc((bn.S.meta && bn.S.meta.nombre) || '')}</span>
+      </div>
+      <div style="display:flex;gap:6px;flex:none"><button class="iconbtn" data-bn-cerrar title="Cerrar (B o Esc)">Cerrar</button></div>
+    </header>`;
+  if(inv.activa === false){ cuerpo.innerHTML = marco(cab(inv.nombre) + `<div class="body"><div class="hint">${esc(inv.nombre)} está dormida — tocá «Invocar» en la ficha para reactivarla.</div></div>`); return; }
+  const r = InvBotonera.html(inv, {lupa: false});
+  const scroll = bn.host.scrollTop;
+  cuerpo.innerHTML = marco(cab(r.titulo, r.badge) + `<div class="body" id="botonerainv-body">${r.html}</div>`);
+  bn.host.scrollTop = scroll;
+}
 // Un botón de la Botonera nueva: se lo pide a la ficha escondida en el marco (la carga si hace falta).
-function bnDelegar(datos){ bnAlMarco({tipo: 'botonera-delegar', datos}); }
+function bnDelegar(datos){ bnAlMarco({tipo: 'botonera-delegar', datos, ...(bn.invId ? {inv: bn.invId} : {})}); }
 function bnAlMarco(msg){
   const marco = $('#botonera-marco');
   if(botonera.herramienta === 'ficha' && botonera.fichaId === bn.fichaId && !botonera.invId){
@@ -9651,9 +9675,10 @@ function bnCrear(){
   host.addEventListener('mousedown', e => { const t = e.composedPath()[0]; if(t === host || (t && t.id === 'bn-contenido')) cerrarBotoneraNueva(); });
   return {host, raiz};
 }
-async function abrirBotoneraNueva(fichaId){
-  if(bn && bn.fichaId === fichaId && !bn.host.hidden){ cerrarBotoneraNueva(); return; }   // B (o el token) otra vez: se cierra
-  try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo cargar la Botonera nueva — se abre la de siempre'); abrirBotonera(fichaId, null, '', true); return; }
+async function abrirBotoneraNueva(fichaId, invId){
+  invId = invId || '';
+  if(bn && bn.fichaId === fichaId && (bn.invId || '') === invId && !bn.host.hidden){ cerrarBotoneraNueva(); return; }   // B (o el token) otra vez: se cierra
+  try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo cargar la Botonera nueva — se abre la de siempre'); abrirBotonera(fichaId, null, invId, true); return; }
   if(!bn){ bn = Object.assign({fichaId: '', sesion: null, S: null}, bnCrear()); }
   const lupaCss = (document.getElementById('lupa-css') || {}).textContent || '';   // los 🔍 (comun/lupa.js)
   bn.raiz.querySelector('#bn-css').textContent = bnCss + lupaCss + ' #bn-contenido{font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--paper)}';
@@ -9685,6 +9710,7 @@ async function abrirBotoneraNueva(fichaId){
     // La ficha escondida ya no se carga para la Botonera nueva (P140, 2026-10-01): se carga sola recién si se toca Editar en un
     // Ver (bnAlMarco). La que precarga el mapa al entrar (precargarMarco) sigue, para lo demás que usa el marco.
   }
+  bn.invId = invId;   // la Botonera de una de sus invocaciones (4e), o '' para la del personaje
   if(ac && !ac.host.hidden) cerrarAccionesNuevas();
   bn.host.hidden = false;
   bnUbicar();

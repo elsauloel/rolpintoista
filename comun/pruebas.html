@@ -60,6 +60,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-botonera.js"></script>
 <script src="ficha-resumen.js"></script>
 <script src="inv-calculo.js"></script>
+<script src="inv-botonera.js"></script>
 <script src="ficha-acciones.js"></script>
 <script src="tiradas-propias.js"></script>
 <script src="efectos-golpe.js"></script>
@@ -981,6 +982,14 @@ prueba('invocación: la Defensa suma los estados que la cambian (como un creep) 
   const inv = {defensa: 5, crit: [0, 0, 0, 0, 0], equipo: [], estados: [{nombre: 'Débil', mods: [{stat: 'def', val: -2}]}, Object.assign(structuredClone(rota), {stacks: 2})]};
   const apagado = {defensa: 5, crit: [0, 0, 0, 0, 0], equipo: [], estados: [{nombre: 'Piel', activo: false, mods: [{stat: 'def', val: 3}]}, {nombre: 'Escoria', stacks: 2, mods: [{stat: 'def', val: 1}]}]};
   igual([InvCalculo.defensaEfectiva(inv), InvCalculo.defensaEfectiva(apagado), InvCalculo.statValor({fue: 3, estados: [{mods: [{stat: 'fue', val: 1}]}]}, 'bloqueo')], [1, 7, 4]);
+});
+
+prueba('la Botonera de una invocación: No2, Bloqueo solo tras el Parry y Anunciar para las manuales', () => {
+  const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, armaNombre: 'Colmillo', armaTipo: 8, armaPeso: 2, nitros: 3,
+    habilidades: [{id: 'a', nombre: 'Aullido', modo: 'manual'}, {id: 'b', nombre: 'Mordida', modo: 'semi', tiradaStat: 'pdg', tiradaExtra: '1d6'}]});
+  const sin = InvBotonera.html(inv, {lupa: false}), con = InvBotonera.html(inv, {parryPendiente: true, lupa: false});
+  igual([sin.titulo, sin.badge, /Bloqueo · tras el Parry/.test(sin.html), /Bloqueo · Colmillo/.test(con.html), /data-ejecutarhabinv="i:a"[^>]*>Anunciar/.test(sin.html),
+    /data-danohabinv="i:b"/.test(sin.html), /data-lupa/.test(sin.html)], ['Lobo', 'No2 3/4', true, true, true, true, false]);
 });
 
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */

@@ -64,10 +64,12 @@ if(MODO_BOTONERA){
     // mismo botón en la Botonera de acá (dibujada al día, aunque no esté abierta) y se toca, como si se hubiera tocado acá. Lo
     // que cambie se sube enseguida, así el mapa lo muestra sin esperar.
     if(e.data.tipo === 'botonera-delegar' && fichaVivo && fichaVivo.cargada){
-      renderBotonera();
+      // Con `inv` (paso 4, etapa 4e, tanda 2): el botón es de la Botonera de esa invocación, que dibuja el mapa.
+      const invId = e.data.inv || '';
+      if(invId){ botoneraInvId = invId; renderBotoneraInv(); } else renderBotonera();
       const d = e.data.datos || {};
       const sel = Object.keys(d).map(k => `[data-${k.replace(/[A-Z]/g, m => '-' + m.toLowerCase())}="${CSS.escape(String(d[k]))}"]`).join('');
-      const b = sel ? document.querySelector('#botonera-body ' + sel) : null;
+      const b = sel ? document.querySelector((invId ? '#botonerainv-body ' : '#botonera-body ') + sel) : null;
       if(b) b.click(); else toast('No se encontró ese botón en la Botonera de la ficha');
       setTimeout(() => fichaGuardarTick(true), 300);
     }

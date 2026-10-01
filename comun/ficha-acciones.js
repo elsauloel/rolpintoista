@@ -703,7 +703,39 @@ const FichaAcciones = (() => {
     }catch(err){ console.error('No se pudo avisar la zona al mapa:', err); return false; }
   }
 
+  /* ---------- Talentos, trampas consumibles y el Ankh a mano (paso 4, etapa 3c-7, 2026-10-01; antes en js/05, js/10 y js/06) ---------- */
+  // Tirar un talento: 1d(nivel × 2) + la Inteligencia sin invertir. La publica cada pantalla (ui.registrarTirada).
+  function tirarSocial(S, i, ui){
+    const r = tirarDados(FichaLupa.formulaSocial(S, i));
+    if(!r){ ui.toast(`${i.nombre}: sin nivel ni Inteligencia sin invertir — no hay nada que tirar`); return; }
+    ui.registrarTirada(i.nombre, r);
+  }
+  // Trampa consumible: coloca en el mapa la trampa del ítem (`trampaDatos`) en la casilla libre al frente de tu token; después la arrastrás a donde quieras
+  // (solo la ven vos y el GM, y la disparan los rivales). Devuelve true si se colocó (entonces se gasta la unidad). fichaId: el del personaje.
+  async function colocarTrampaDeItem(fichaId, it, ui){
+    const d = it.trampaDatos;
+    if(!d || typeof TokensAuto === 'undefined' || !fichaId){ ui.toast('Para colocar la trampa tenés que estar en la mesa, con tu personaje en el mapa'); return false; }
+    try{
+      const dano = TRAMPA_DANO_RE.test(String(d.dano || '').trim()) ? String(d.dano).trim() : '';
+      // Forma única de trampa (P123): el `tamano` de la flor es su radio (tamano 2 = flor de 19 casillas, como dice el ítem).
+      const r = await TokensAuto.colocarTrampas({fichaId, tipoToken: 'pj',
+        trampa: {...d, nombre: String(d.nombre || it.nombre).slice(0, 40), dano, cant: 1},
+        item: (() => { const c = structuredClone(it); delete c.imagen; delete c.equipado; delete c.enMesa; delete c.id; c.unidades = 1; c.cargaActual = 1; return JSON.stringify(c); })()});
+      if(r.colocadas){ ui.toast(`🪤 ${it.nombre} colocada junto a tu token: arrastrala en el mapa a donde la quieras`); return true; }
+      ui.toast(r.motivo === 'sin-token' ? `🪤 ${it.nombre}: tu personaje no tiene token en el mapa en juego — no se usó` : `🪤 ${it.nombre}: no hay lugar libre al lado de tu token — no se usó`);
+      return false;
+    }catch(err){ console.error('No se pudo colocar la trampa:', err); ui.toast('No se pudo colocar la trampa — revisá la consola'); return false; }
+  }
+  // El Ankh usado a mano (el botón Consumir de uno de la mochila): revive con el 25 % del HP máximo. Devuelve el nombre del
+  // ítem, o null si no está o no le quedan unidades.
+  function ankhAMano(S, key, id){
+    const it = S[key] && S[key].find(x => x.id === id);
+    if(!it || num(it.unidades) <= 0) return null;
+    return aplicarRevivirConAnkh(S, key, id);
+  }
+
   return {gastoNitrosForzado, alternarSigilo, levantarse,
+    tirarSocial, colocarTrampaDeItem, ankhAMano,
     TRAMPA_DANO_RE, avisarZonaAlMapa, colocarTrampaDeHab, colocarZonaDeHab,
     durAviso, desgastarItem, rompeArmaduraAlAzar, estadoDeSpec, aplicarEstadoRecibido, dueloAplicarEfectoPropio, xDeHab, habDueloDatos,
     ataqueDeHabArma, aplicarHabSobreMiDirecto, terminarEjecucionHab,

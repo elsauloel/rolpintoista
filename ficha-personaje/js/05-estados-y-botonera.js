@@ -211,11 +211,7 @@ function dadoCarasSocial(i){ return FichaBotonera.dadoCarasSocial(i); }
 function nivelSocialTxt(i){ return FichaBotonera.nivelSocialTxt(i); }
 function formulaSocial(i){ return FichaLupa.formulaSocial(S, i); }   // comun/ficha-lupa.js
 function tiradaSocialTxt(i){ return FichaBotonera.tiradaSocialTxt(S, i); }
-function tirarSocial(i){
-  const r = tirarDados(formulaSocial(i));
-  if(!r){ toast(`${i.nombre}: sin nivel ni Inteligencia sin invertir — no hay nada que tirar`); return; }
-  registrarTirada(i.nombre, r);
-}
+function tirarSocial(i){ FichaAcciones.tirarSocial(S, i, combateUi); }   // comun/ficha-acciones.js (paso 3c-7)
 
 let nivelSocialId = null;
 function abrirNivelSocial(id){

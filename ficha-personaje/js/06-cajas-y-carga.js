@@ -594,9 +594,9 @@ document.addEventListener('click', async e => {
   }
   if(b.dataset.consumirankh){
     const [key, id] = b.dataset.consumirankh.split(':');
-    const it = S[key] && S[key].find(x => x.id === id);
-    if(!it || num(it.unidades) <= 0) return;
-    const nombre = aplicarRevivirConAnkh(key, id);
+    const nombre = FichaAcciones.ankhAMano(S, key, id);   // comun/ficha-acciones.js (paso 3c-7)
+    if(!nombre) return;
+    $('#f-hp').value = S.hp;
     renderInventario(); renderList('cinturon');
     refresh();
     toast(`${nombre} activado a mano. Revivís con ${fmt(S.hp)} HP.`);

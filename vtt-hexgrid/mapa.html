@@ -9123,7 +9123,7 @@ function abrirBotoneraPrincipal(){
    no están (la lupa vive en la ficha: etapa 3c). Las piezas se cargan recién al usarla: para los jugadores no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001b',
-  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001g',
+  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001h',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
@@ -9296,12 +9296,12 @@ function bnHooksDuelo(lado){
 const BN_ACCIONES = {
   sigilo: (S, ui) => FichaAcciones.alternarSigilo(S, false, ui),
   levantarse: (S, ui) => FichaAcciones.levantarse(S, false, ui),
-  // Consumir: la vida, el estado que deja y sus tiradas los resuelve el mapa con las piezas comunes.
+  // Consumir: la vida, el estado que deja, sus tiradas y la trampa consumible los resuelve el mapa con las piezas comunes.
   consumir: (S, ui, id) => FichaAcciones.consumir(S, id, false, {...ui,
     fijarHp: v => FichaAcciones.fijarHp(S, v),
     efecto: it => FichaAcciones.efectoDeConsumo(S, it, ui.presets, t => toast(t)),
     tirarExtra: it => FichaAcciones.tiradasDeItem(S, it).forEach(t => { if(t.error) toast(t.error); else bnPublicar(t.origen, t.r); }),
-    colocarTrampa: async () => false,   // no llega: las trampas consumibles las sigue haciendo la ficha (bnAccionAca)
+    colocarTrampa: it => FichaAcciones.colocarTrampaDeItem(bn.fichaId, it, ui),   // la trampa consumible, junto al token
   }),
 };
 /* Etapa 3c, paso 4a: las tiradas de combate sueltas (Esquivar, Parry, Bloqueo, Fuerza del golpe, Daño) — comun/ficha-acciones.js.
@@ -9476,12 +9476,24 @@ function bnAccionAca(b){
     FichaAcciones.ejecutarHabilidad(bn.S, it.id, undefined, false, bnHabUi());
     return true;
   }
-  let accion = b.dataset.sigilo ? 'sigilo' : b.dataset.levantarse ? 'levantarse' : b.dataset.consume ? 'consumir' : '';
-  if(accion === 'consumir'){
-    // Una trampa consumible se coloca junto al token con el código de la ficha: por ahora se le sigue pidiendo a ella.
-    const it = [...(bn.S.inventario || []), ...(bn.S.cinturon || [])].find(x => x.id === b.dataset.consume);
-    if(!it || it.trampaDatos) accion = '';
+  // Paso 3c-7: tirar un talento (no cambia al personaje: como las tiradas de stats, a su nombre en la Mesa).
+  if(b.dataset.tirarsocial){
+    const i = (bn.S.sociales || []).find(x => x.id === b.dataset.tirarsocial);
+    if(i) FichaAcciones.tirarSocial(bn.S, i, {toast: t => toast(t), registrarTirada: (origen, r) => bnPublicar(origen, r)});
+    return true;
   }
+  // Paso 3c-7: el Ankh usado a mano (uno de la mochila): revive con el 25 % del HP máximo.
+  if(b.dataset.consumirankh){
+    if(!bnPuedeGuardar()) return false;
+    const [key, id] = b.dataset.consumirankh.split(':');
+    const ui = bnUi(FichaGuardado.partes(bn.S));
+    const nombre = FichaAcciones.ankhAMano(bn.S, key, id);
+    if(!nombre) return true;
+    ui.cambio();
+    toast(`${nombre} activado a mano. Revivís con ${fmt(bn.S.hp)} HP.`);
+    return true;
+  }
+  const accion = b.dataset.sigilo ? 'sigilo' : b.dataset.levantarse ? 'levantarse' : b.dataset.consume ? 'consumir' : '';
   if(!accion || !bnPuedeGuardar()) return false;
   BN_ACCIONES[accion](bn.S, bnUi(FichaGuardado.partes(bn.S)), b.dataset.consume);
   return true;

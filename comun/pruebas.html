@@ -848,6 +848,30 @@ prueba('el 🔍 se abre también adentro de un recuadro aislado (la Botonera nue
   }finally{ cerrarLupa(); host.remove(); delete window.lupaContenido; }
 });
 
+/* ---------- Talentos, trampas consumibles y Ankh a mano (comun/ficha-acciones.js, paso 4 etapa 3c-7) ---------- */
+grupo('Talentos, trampas consumibles y Ankh (paso 4)');
+prueba('tirar un talento: 1d(nivel × 2) + la Inteligencia sin invertir', () => {
+  const S = fichaBotonera(), reg = [];
+  FichaAcciones.tirarSocial(S, S.sociales[0], {toast: t => reg.push(t), registrarTirada: (o, r) => reg.push(`${o} ${r.formula}`)});
+  igual(reg, [`Trato 1d4+${FichaBotonera.inteligenciaBudget(S).resto}`]);
+});
+prueba('una trampa consumible se coloca junto al token; sin personaje en la mesa no se gasta', async () => {
+  const it = {nombre: 'Cepo', unidades: 2, imagen: 'x', trampaDatos: {dano: '2d6', tipo: 'flor', tamano: 0}};
+  const reg = [], viejo = window.TokensAuto;
+  window.TokensAuto = {colocarTrampas: async a => { reg.push(`${a.fichaId} ${a.trampa.nombre} ${a.trampa.cant} ${JSON.parse(a.item).unidades}`); return {colocadas: 1}; }};
+  // Las dos se arrancan antes del primer await: otra prueba async también cambia window.TokensAuto.
+  const ui = {toast: () => {}};
+  const sin = FichaAcciones.colocarTrampaDeItem('', it, ui), con = FichaAcciones.colocarTrampaDeItem('F1', it, ui);
+  window.TokensAuto = viejo;
+  igual([await sin, await con, reg], [false, true, ['F1 Cepo 1 1']]);
+});
+prueba('el Ankh a mano revive con el 25 % del HP máximo y gasta una unidad', () => {
+  const S = fichaBotonera({inventario: [{id: 'a', nombre: 'Ankh de Reencarnación', consumible: true, unidades: 1}]});
+  S.hp = 0;
+  const nombre = FichaAcciones.ankhAMano(S, 'inventario', 'a'), max = FichaCalculo.calcular(S).final.hpmax;
+  igual([nombre, S.hp > 0, S.hp <= Math.ceil(max / 4) + 1, FichaAcciones.ankhAMano(S, 'inventario', 'a')], ['Ankh de Reencarnación', true, true, null]);
+});
+
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */
 grupo('Mis últimas tiradas (P138)');
 prueba('se juntan las de la Mesa con las de esta ventana, sin repetir, las últimas primero', () => {

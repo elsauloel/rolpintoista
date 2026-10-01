@@ -632,23 +632,8 @@ function trampaGuardarCampo(el){
 // Se ejecuta con la habilidad: coloca la trampa en el mapa (si hay token del personaje en el mapa en juego).
 // Habilidad con zona en el mapa (zonaMapa: 'cono'): le avisa al mapa (la ficha corre en su iframe) para que dibuje el área 3 segundos.
 function avisarZonaAlMapa(h){ FichaAcciones.avisarZonaAlMapa(S, h, habUi); }   // comun/ficha-acciones.js (paso 3c-5c)
-const consumiendoTrampa = new Set();
-// Trampa consumible: coloca en el mapa la trampa del ítem (`trampaDatos`) en la casilla libre al frente de tu token; después la arrastrás a donde quieras
-// (solo la ven vos y el GM, y la disparan los rivales). Devuelve true si se colocó (entonces se gasta la unidad).
-async function colocarTrampaDeItem(it){
-  const d = it.trampaDatos;
-  if(!d || typeof TokensAuto === 'undefined' || !fichaVivo || !fichaVivo.id){ toast('Para colocar la trampa tenés que estar en la mesa, con tu personaje en el mapa'); return false; }
-  try{
-    const dano = TRAMPA_DANO_RE.test(String(d.dano || '').trim()) ? String(d.dano).trim() : '';
-    // Forma única de trampa (P123): el `tamano` de la flor es su radio (tamano 2 = flor de 19 casillas, como dice el ítem).
-    const r = await TokensAuto.colocarTrampas({fichaId: fichaVivo.id, tipoToken: 'pj',
-      trampa: {...d, nombre: String(d.nombre || it.nombre).slice(0, 40), dano, cant: 1},
-      item: (() => { const c = structuredClone(it); delete c.imagen; delete c.equipado; delete c.enMesa; delete c.id; c.unidades = 1; c.cargaActual = 1; return JSON.stringify(c); })()});
-    if(r.colocadas){ toast(`🪤 ${it.nombre} colocada junto a tu token: arrastrala en el mapa a donde la quieras`); return true; }
-    toast(r.motivo === 'sin-token' ? `🪤 ${it.nombre}: tu personaje no tiene token en el mapa en juego — no se usó` : `🪤 ${it.nombre}: no hay lugar libre al lado de tu token — no se usó`);
-    return false;
-  }catch(err){ console.error('No se pudo colocar la trampa:', err); toast('No se pudo colocar la trampa — revisá la consola'); return false; }
-}
+// Trampa consumible: la coloca junto a tu token (comun/ficha-acciones.js, paso 3c-7). Devuelve true si se colocó.
+function colocarTrampaDeItem(it){ return FichaAcciones.colocarTrampaDeItem(fichaVivo ? fichaVivo.id : '', it, consumoUi); }
 function colocarTrampaDeHab(h){ return FichaAcciones.colocarTrampaDeHab(S, h, habUi); }   // comun/ficha-acciones.js (paso 3c-5c)
 function trampaPreconstruidas(){
   const ed = editing;

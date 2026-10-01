@@ -365,8 +365,8 @@ const MODOS_HAB = {
   semi: {icono: '💰', nombre: 'Semiautomático', boton: 'Ejecutar', corto: 'cobra el costo y tira la tirada inicial'},
   auto: {icono: '✨', nombre: 'Automático', boton: 'Ejecutar', corto: 'ejecución paso a paso'},
 };
-function modoHab(h){ return Combatiente.modoHab(h, h && dueloDe(h)); }   // la regla común (comun/combatiente.js); null = nueva, sin elegir
-const habAutomatizada = h => modoHab(h) !== 'manual';
+function modoHab(h){ return FichaBotonera.modoHab(h); }   // la regla común (comun/combatiente.js), vía comun/ficha-botonera.js
+const habAutomatizada = h => FichaBotonera.habAutomatizada(h);
 // Lo del sistema anterior que tiene cargado la habilidad (se sigue aplicando en semi y auto hasta adaptarla).
 function habLegado(h){
   const L = [];

@@ -245,7 +245,7 @@ function breakdown(id, c){
   </div>`;
 }
 
-const TIPOS_IDS = ['tipo1','tipo2','tipo3','tipo4','tipo5'];
+const TIPOS_IDS = FichaBotonera.TIPOS_IDS;   // comun/ficha-botonera.js
 
 function renderArmadura(){
   const c = compute();
@@ -486,16 +486,9 @@ function renderVitals(){
 
 // SP máximo = el calculado (Especial × 3 + bonos) + un ajuste a mano (`S.meta.spMaxExtra`, puede ser negativo) que se fija desde el
 // token del mapa (2026-09-24, pedido de los jugadores): así se puede subir o bajar el máximo sin tocar la fórmula.
-function spMaximo(c){
-  c = c || compute();
-  if(Number.isNaN(c.final.sp)) return 0;
-  return Math.max(0, c.final.sp + num(S.meta.spMaxExtra));
-}
+function spMaximo(c){ return FichaBotonera.spMaximo(S, c); }   // comun/ficha-botonera.js
 
-function nitrosMaximo(c){
-  c = c || compute();
-  return Number.isNaN(c.final.nitros) ? 0 : c.final.nitros;
-}
+function nitrosMaximo(c){ return FichaBotonera.nitrosMaximo(S, c); }
 
 function setCap(key, used, total){
   $('#cap-'+key+'-n').textContent = fmt(used);
@@ -577,8 +570,8 @@ function repararArmadura(){
    pasar por "+ Estado". Entrar cuesta IT2.nitrosSigilo (1 No2, a revisar) y
    aplica el estado alterado "Sigilo" sobre uno mismo (el mapa lo lee de ahí);
    salir es gratis. No se avisa en la Mesa: el sigilo no se anuncia. */
-const tieneSigilo = () => S.habilidades.some(h => String(h.nombre || '').trim().toLowerCase() === 'sigilo');
-const efectoSigilo = () => S.efectos.find(e => e.activo !== false && String(e.nombre || '').trim().toLowerCase() === 'sigilo');
+const tieneSigilo = () => FichaBotonera.tieneSigilo(S);   // comun/ficha-botonera.js
+const efectoSigilo = () => FichaBotonera.efectoSigilo(S);
 
 function alternarSigilo(forzar){
   const actual = efectoSigilo();
@@ -603,7 +596,7 @@ function alternarSigilo(forzar){
 
 /* ---------- Sentado: levantarse cuesta 1 No2 ----------
    El estado Sentado no vence solo; el botón "Levantarse" de la Botonera lo saca y cobra IT2.nitrosLevantarse. */
-const efectoSentado = () => S.efectos.find(e => e.activo !== false && e.sentado);
+const efectoSentado = () => FichaBotonera.efectoSentado(S);   // comun/ficha-botonera.js
 function levantarse(forzar){
   const actual = efectoSentado();
   if(!actual) return;
@@ -633,9 +626,7 @@ function aplicarEfectoDeConsumo(it){
 // la publica en la Mesa, igual que un ataque o un chequeo manual.
 
 // Stats secundarios que se pueden tirar (los que tienen 🎲 en Atributos).
-function STATS_CON_TIRADA(){
-  return STAT_LIST.filter(s => !STATS_SIN_TIRADA.includes(s.id));
-}
+function STATS_CON_TIRADA(){ return FichaBotonera.statsConTirada(); }   // comun/ficha-botonera.js
 
 // Al ejecutar: tira el stat vinculado (con su valor del momento, mods
 // incluidos) y/o la fórmula manual. Se puede tener las dos.
@@ -657,11 +648,8 @@ function tirarExtraDeItem(it){
 /* Ejecutar una habilidad tira SOLO la primera tirada que le corresponde: el stat vinculado (PdG, PdG.Esp u otro) o,
    si no tiene, la fórmula. La segunda (la fórmula: el daño o el efecto) va aparte con el botón 🎲, igual que en las
    armas (Atacar → Daño) — decidido 2026-09-24. */
-function habStatTirable(it){
-  const s = it.tiradaStat;
-  return !!(s && (ATTR_LIST.some(a => a.id === s) || STATS_CON_TIRADA().some(x => x.id === s)));
-}
-function habTieneSegundaTirada(it){ return habStatTirable(it) && !!(it.tiradaExtra || '').trim(); }
+function habStatTirable(it){ return FichaBotonera.habStatTirable(it); }   // comun/ficha-botonera.js
+function habTieneSegundaTirada(it){ return FichaBotonera.habTieneSegundaTirada(it); }
 /* ---------- Habilidades dirigidas en el duelo (2026-09-27, docs/duelo-de-habilidades.md) ----------
    Una habilidad con `duelo` = {objetivo: 'enemigo'|'aliado'|'uno mismo', tira: stat (por defecto su tiradaStat), contra: [stats con los que se resiste el objetivo],
    dano: true si la fórmula de la habilidad (tiradaExtra) es daño, tipoDano: 'arcano'|'fuego'|'hielo'|'rayo'|'fisico', efectos: [{nombre, turnos, mods, hp, cura}]}
@@ -670,12 +658,7 @@ function habTieneSegundaTirada(it){ return habStatTirable(it) && !!(it.tiradaExt
    su costo). Al ejecutarla se abre el duelo de ATAQUE de siempre (PdG, Evasión o Parry, crítico, daño con los efectos del arma) con lo que la habilidad le suma. Los No2 del ataque ya
    los cobró la habilidad: el duelo no los vuelve a cobrar. */
 // El duelo de una habilidad: el que se le configuró con 🎯 (null = se lo sacaron) o, si nunca se tocó, el de la skill de clase de la que salió (así las que ya estaban en la mochila también lo traen).
-function dueloDe(it){
-  if(!it) return null;
-  if(it.duelo !== undefined) return it.duelo;
-  const base = it.habClaseId && typeof CLASES_SKILLS !== 'undefined' ? CLASES_SKILLS.flatMap(c => c.habilidades).find(h => h.id === it.habClaseId) : null;
-  return base && base.duelo ? base.duelo : null;
-}
+function dueloDe(it){ return FichaBotonera.dueloDe(it); }   // comun/ficha-botonera.js
 function ataqueDeHabArma(it, arma, xSp, xNitros){
   const c = dueloDe(it);
   if(!c || c.modo !== 'arma' || typeof Duelo === 'undefined' || !Duelo.disponible() || !fichaVivo || !fichaVivo.id || fichaVivo.soloLectura || fichaVivo.editaGM) return null;
@@ -845,8 +828,7 @@ function tirarSegundaDeHab(id){
   if(r) registrarTirada(`${it.nombre} · Efecto`, r);
   else toast('La fórmula de la habilidad no es válida');
 }
-const botonSegundaHab = it => habTieneSegundaTirada(it)
-  ? `<button type="button" class="mini" data-danohab="${esc(it.id)}" title="Segunda tirada de la habilidad (daño o efecto): ${esc(String(it.tiradaExtra).trim())}">🎲 ${esc(String(it.tiradaExtra).trim())}</button>` : '';
+const botonSegundaHab = it => FichaBotonera.botonSegundaHab(it);   // comun/ficha-botonera.js
 
 function restaurarSpDeConsumo(it){
   const pct = num(it.curaspPct);
@@ -929,35 +911,10 @@ $('#reroll-lista').addEventListener('click', e => {
 // Botón 🪙 (Botonera y mapa): abre la ventana de re-roll.
 function rerollFuera(){ abrirReroll(); }
 
-function costoConsumirNitros(key){
-  return key === 'cinturon' ? IT2.nitrosConsumirCinturon : IT2.nitrosConsumirMochila;
-}
+function costoConsumirNitros(key){ return FichaBotonera.costoConsumirNitros(key); }   // comun/ficha-botonera.js
 
 // conLupa: en la Botonera la 🔍 va dentro del botón (sin "disabled", que no deja abrirla).
-function consumeButton(i, key, conLupa){
-  if(!i.consumible) return '';
-  if(i.nombre === 'Ankh de Reencarnación'){
-    if(key === 'cinturon') return `<span class="hint">Se activa solo al llegar tu HP a 0</span>`;
-    return `<button class="consume-btn" data-consumirankh="${key}:${i.id}" ${num(i.unidades)<=0?'disabled':''}>
-      Consumir <span class="consume-fx">(revive con 25% del HP máx.)</span>
-    </button>
-    <span class="hint">En la mochila no se activa solo — usalo a mano para el caso de un aliado a distancia cero.</span>`;
-  }
-  const partes = [];
-  if(i.trampaDatos) partes.push('🪤 se coloca en el mapa');
-  if(i.curahp) partes.push(`${num(i.curahp)>0?'+':''}${fmt(num(i.curahp))} HP`);
-  if(num(i.curaspPct) > 0) partes.push(`${fmt(num(i.curaspPct))}% SP`);
-  partes.push(`-${costoConsumirNitros(key)} No2`);
-  const agotado = num(i.unidades) <= 0;
-  if(conLupa){
-    return `<button class="consume-btn con-lupa${agotado ? " sin-recursos" : ""}" data-consume="${i.id}"${agotado ? ' aria-disabled="true"' : ""}>
-      Consumir <span class="consume-fx">(${partes.join(" · ")})</span>${lupaBotonHtml(`cons:${key}:${i.id}`, "en-boton")}
-    </button>`;
-  }
-  return `<button class="consume-btn" data-consume="${i.id}" ${agotado?"disabled":""}>
-    Consumir <span class="consume-fx">(${partes.join(" · ")})</span>
-  </button>`;
-}
+function consumeButton(i, key, conLupa){ return FichaBotonera.consumeButton(i, key, conLupa, lupaBotonHtml); }
 
 function priceTags(i){
   const c = num(i.precioCompra), v = precioVentaDe(i);

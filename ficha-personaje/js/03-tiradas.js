@@ -77,7 +77,7 @@ function renderHistorialSesion(){
 
 /* ---------- Tirar dados a partir del valor de un stat (formulaParaValor: comun/tiradas.js) ---------- */
 
-const STATS_SIN_TIRADA = ['vision', 'hpmax', 'crgmax', 'sp', 'spregen','tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5', 'dmg', 'nitros', 'rng', 'crit', 'critpot', 'rangocasteo', 'def', 'capcinturon', 'capmochila', 'luz', 'veoculto', 'pdgcontra', 'pdgopor'];
+const STATS_SIN_TIRADA = FichaBotonera.STATS_SIN_TIRADA;   // comun/ficha-botonera.js
 
 
 // Afortunado da ventaja en PdG/Parry/Evasión: tira dos veces y se queda
@@ -88,11 +88,7 @@ const STATS_SIN_TIRADA = ['vision', 'hpmax', 'crgmax', 'sp', 'spregen','tipo1', 
    "Percepción aumentada" sube un escalón cada dado (d6 → d8, d8 → d10…) y
    además hace que el mapa le avise de las trampas ocultas cercanas. */
 const PERCEPCION_DADO_SUBE = {2: 4, 3: 4, 4: 6, 6: 8, 8: 10, 10: 12, 12: 20, 20: 20};
-function tienePercepcionAumentada(){
-  return (S.pasivas || []).some(p => p.poolId === 'percepcion-aumentada' || p.percepcionAumentada)
-    || (S.efectos || []).some(e => /percepci[oó]n aumentada/i.test(e.nombre || ''))   // el colirio del vidente: estado con turnos
-    || (S.inventario || []).some(i => i.equipado && (i.percepcionAumentada || /percepci[oó]n aumentada/i.test(i.equipoEstadoNombre || '')));   // el anillo de percepción aumentada, equipado, da el mismo efecto que la pasiva
-}
+function tienePercepcionAumentada(){ return FichaBotonera.tienePercepcionAumentada(S); }   // comun/ficha-botonera.js
 function tirarPercepcion(){
   const valor = compute().final.percepcion;
   const f = formulaParaValor(valor);

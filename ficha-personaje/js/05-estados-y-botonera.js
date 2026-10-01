@@ -128,210 +128,15 @@ function renderTodasHabilidades(){
 
 // Fila de una habilidad social en la Botonera: nivel/dado a la izquierda,
 // Ejecutar (con su 🔍) a la derecha — mismo patrón que las de combate.
-function filaSocialBotonera(i){
-  return `<div class="cat-row bot-fila">
-    <div class="bot-fila-info">
-      <div class="cat-nombre">${esc(i.nombre)}</div>
-      <div class="bot-fila-costo" title="${esc(tiradaSocialTxt(i))}">${esc(nivelSocialTxt(i))}</div>
-    </div>
-    <div class="bot-fila-btns">
-      <button class="mini" data-view="sociales:${i.id}">Ver</button>
-      <button class="ejecutar-btn con-lupa" data-tirarsocial="${i.id}">Ejecutar${lupaBotonHtml(`social:${i.id}`, "en-boton")}</button>
-    </div>
-  </div>`;
-}
+function filaSocialBotonera(i){ return FichaBotonera.filaSocialBotonera(S, i, lupaBotonHtml); }   // comun/ficha-botonera.js
 
 function renderBotonera(){
-  const c = compute();
-  let html = '';
-
-  $('#botonera-badge-nitros').textContent = `No2 ${fmt(num(S.nitros))}/${fmt(nitrosMaximo(c))}`;
-  const spMax = spMaximo(c);
-  $('#botonera-badge-sp').textContent = `SP ${fmt(spMax - num(S.spGastado))}/${fmt(spMax)}`;
-  $('#botonera-badge-def').textContent = `Def ${Number.isNaN(c.final.def) ? '?' : fmt(c.final.def)}`;
-
-  // Habilidades sociales: arriba de todo en modo narrativo, al final (con
-  // el resto de las habilidades) en modo combate — según lo que publique
-  // el mapa (modoMapa; 'combate' si todavía no se sabe).
-  const socialesHtml = `<div class="botonera-caja">
-    <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-sociales" title="Contraer/expandir">👁</button><span>Talentos</span></div>
-    <div class="botonera-list-grid">
-      ${S.sociales.length ? S.sociales.map(filaSocialBotonera).join('') : `<div class="hint">Sin talentos cargados.</div>`}
-    </div>
-  </div>`;
-  if(modoMapa === 'narrativo') html += socialesHtml;
-
-  // Los que ya tienen su propio botón en la caja de Combate (PdG, Dmg, Eva,
-  // Parry, Bloqueo) no hace falta repetirlos acá. Los 5 principales (Con,
-  // Fue, Agi, Des, Int) van siempre, igual que en el contenedor de Atributos.
-  const STATS_REDUNDANTES_COMBATE = ['pdg', 'eva', 'parry', 'bloqueo'];
-  const statsRollables = [
-    ...ATTR_LIST,
-    ...STAT_LIST.filter(s => !STATS_SIN_TIRADA.includes(s.id) && !STATS_REDUNDANTES_COMBATE.includes(s.id)),
-  ];
-  const fCombate = formulasCombate();
-  // Parry y Bloqueo solo con un arma o un escudo equipado (regla del dueño, 2026-09-30): sin eso quedan apagados.
-  const sinDefArma = !armasYEscudosParaParry().length;
-  // El Bloqueo solo existe después de un Parry, con esa misma arma o escudo (regla del dueño, 2026-09-30).
-  const armaBloqueo = parryArmaPendiente ? S.inventario.find(x => x.id === parryArmaPendiente && x.equipado) || null : null;
-  // Aunque todavía no se pueda tirar, se ve QUÉ tirarías con cada arma o escudo, para decidir entre Parry y Evasión
-  // (pedido del dueño, 2026-09-30): con uno, su fórmula; con varios, «Espada 1d8 · Escudo 1d10».
-  const fBloq = it => (formulaParaValor(bloqueoValorConArma(it)) || {}).formula || '';
-  const bloqueoPrevio = armaBloqueo ? fBloq(armaBloqueo)
-    : (() => { const l = armasYEscudosParaParry(); return l.length === 1 ? fBloq(l[0].item) : l.map(a => `${a.item.nombre} ${fBloq(a.item)}`).join(' · '); })();
-  // El Parry también se muestra por arma o escudo: cada uno suma solo sus propios bonos a Parry (P129).
-  const fParryIt = it => { const f = formulaParaValor(statParaArma('parry', it)); return f ? f.formula + ' ÷2'.repeat(mitadesDeTirada(S.efectos, 'parry')) : ''; };
-  const parryPrevio = (() => { const l = armasYEscudosParaParry(); return l.length === 1 ? fParryIt(l[0].item) : l.map(a => `${a.item.nombre} ${fParryIt(a.item)}`).join(' · '); })();
-  // Con dos armas, Atacar y Daño se desdoblan: uno por arma.
-  const armasBotonera = armasEquipadasConDano();
-  // Estados alterados que modifican cada tirada (2026-09-25): el botón se pinta de verde/rojo y dice cuáles (comun/modificadores-tirada.js).
-  const mtEva = ModTirada.tile(S.efectos, 'eva'), mtParry = ModTirada.tile(S.efectos, 'parry'), mtBloqueo = ModTirada.tile(S.efectos, 'bloqueo');
-
-  // Percepción: tirada de Destreza (con dado más alto si tiene la pasiva Percepción aumentada).
-  html += `<div class="botonera-caja" style="margin-bottom:8px"><button type="button" class="ejecutar-btn" data-botoneraaccion="percepcion" style="width:100%" title="Tirada de percepción: tu Destreza${tienePercepcionAumentada() ? ', con un dado más alto (Percepción aumentada)' : ''}">🔎 Tirar percepción${tienePercepcionAumentada() ? ' · dado más alto' : ''}</button></div>`;
-
-  // Sentado: levantarse cuesta 1 No2 (ver levantarse).
-  if(efectoSentado()){
-    const falta = num(S.nitros) < num(IT2.nitrosLevantarse);
-    html += `<div class="botonera-caja" style="margin-bottom:8px"><button class="ejecutar-btn${falta ? ' sin-recursos' : ''}" data-levantarse="1" style="width:100%" ${falta ? 'aria-disabled="true" title="No te alcanzan los Nitros"' : ''}>🧍 Levantarse · ${fmt(num(IT2.nitrosLevantarse))} No2</button></div>`;
-  }
-
-  // Sigilo: botón directo para quien tiene la habilidad (ver alternarSigilo).
-  if(tieneSigilo()){
-    const dentro = !!efectoSigilo();
-    const falta = !dentro && num(S.nitros) < num(IT2.nitrosSigilo);
-    html += `<div class="botonera-caja" style="margin-bottom:8px"><button class="ejecutar-btn${dentro ? ' usada' : ''}${falta ? ' sin-recursos' : ''}" data-sigilo="1" style="width:100%" ${falta ? 'aria-disabled="true" title="No te alcanzan los Nitros"' : ''}>🕶 ${dentro ? 'Salir del sigilo' : `Entrar en sigilo · ${fmt(num(IT2.nitrosSigilo))} No2`}</button></div>`;
-  }
-
-  html += `<div class="botonera-grid botonera-grid-even">
-    <div class="botonera-caja">
-      <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-combate" title="Contraer/expandir">👁</button><span>Combate</span></div>
-      <div class="botonera-combate-wrap">
-        <div class="botonera-combate-grid">
-          ${(armasBotonera.length ? armasBotonera : [null]).map(a => {
-            const arma = a && a.item;
-            const nombre = armasBotonera.length > 1 ? ` · ${esc(arma.nombre)}` : '';
-            const fPdg = formulaParaValor(pdgParaArma(arma, c).valor);
-            const costo = costoAtaqueNitros(arma);
-            const sinNitros = costo > num(S.nitros);
-            const mtP = ModTirada.tile(S.efectos, 'pdg');
-            return `
-          <button type="button" class="botonera-tile${sinNitros ? ' bt-sin-nitros' : ''}${mtP.clase}" data-botoneraaccion="atacar" data-arma="${arma ? arma.id : ''}" title="Atacar${arma ? ` con ${esc(arma.nombre)}` : ''} · ${fmt(costo)} No2${esc(mtP.titulo)}">
-            ${lupaBotonHtml(`atacar:${arma ? arma.id : ''}`)}
-            <span class="bt-label">Atacar (PdG)${nombre}</span><span class="bt-value bt-value-formula">🎲 ${esc(fPdg ? fPdg.formula : '')}</span>
-            <span class="bt-mod">${fmt(costo)} No2${ataquesConArma(arma) ? '' : ' · 1.º ataque'}</span>${mtP.html}
-          </button>
-          <button type="button" class="botonera-tile" data-botoneraaccion="danio" data-arma="${arma ? arma.id : ''}" title="Daño${arma ? ` · ${esc(arma.nombre)}` : ''}" ${arma ? '' : 'disabled'}>
-            ${arma ? lupaBotonHtml(`danio:${arma.id}`) : ''}
-            <span class="bt-label">Daño${nombre || ' Arma'}</span><span class="bt-value bt-value-formula">🎲 ${esc(arma ? armaDanoTxt(arma, c.final.dmg) : 'sin arma equipada')}</span>
-          </button>`;
-          }).join('')}
-        </div>
-        <div class="botonera-combate-grid botonera-combate-bottom">
-          <button type="button" class="botonera-tile${mtEva.clase}" data-botoneraaccion="esquivar" title="Esquivar${esc(mtEva.titulo)}">
-            ${lupaBotonHtml('stat:eva')}${ModTirada.ayuda('eva')}
-            <span class="bt-label">Esquivar (Eva)</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.eva)}</span>${mtEva.html}
-          </button>
-          <button type="button" class="botonera-tile${mtParry.clase}${sinDefArma ? ' bt-sin-nitros' : ''}" data-botoneraaccion="parry" title="${esc(sinDefArma ? Combatiente.SIN_ARMA_DEFENSA : 'Parry con arma o escudo: siempre cuesta 1 No2 (' + costoParryTxt() + ')' + mtParry.titulo)}">
-            ${lupaBotonHtml('stat:parry')}${ModTirada.ayuda('parry')}
-            <span class="bt-label">Parry</span><span class="bt-value bt-value-formula">${sinDefArma ? 'sin arma ni escudo' : `🎲 ${esc(parryPrevio)}`}</span>${sinDefArma ? '' : mtParry.html}
-          </button>
-          <button type="button" class="botonera-tile${mtBloqueo.clase}${!armaBloqueo ? ' bt-sin-nitros' : ''}" data-botoneraaccion="bloqueo" title="${esc(sinDefArma ? Combatiente.SIN_ARMA_DEFENSA : !armaBloqueo ? Combatiente.BLOQUEO_SOLO_TRAS_PARRY + ': si ganaste el Parry, aguantás la fuerza del golpe con tu Fuerza + el peso de tu arma o escudo' : `Bloqueo con ${armaBloqueo.nombre} (tras el Parry): tu Bloqueo (de Fuerza) MÁS su peso; esa suma es el dado que tirás` + mtBloqueo.titulo)}">
-            ${lupaBotonHtml('stat:bloqueo')}${ModTirada.ayuda('bloqueo')}
-            <span class="bt-label">Bloqueo${armaBloqueo ? ` · ${esc(armaBloqueo.nombre)}` : sinDefArma ? '' : ' · tras el Parry'}</span><span class="bt-value bt-value-formula">${sinDefArma ? 'sin arma ni escudo' : `🎲 ${esc(bloqueoPrevio)}`}</span>${sinDefArma ? '' : mtBloqueo.html}
-          </button>
-          <button type="button" class="botonera-tile" data-botoneraaccion="fuerzagolpe" style="grid-column:1/-1" title="Fuerza del golpe: tu Fuerza + el peso de tu arma; esa suma es el dado. Es tu tirada contra el Bloqueo del defensor cuando gana el Parry.">
-            <span class="bt-label">Fuerza del golpe (contra su Bloqueo)</span><span class="bt-value bt-value-formula">🎲 Fue + peso</span>
-          </button>
-        </div>
-        <div class="botonera-defensa botonera-combate-bottom">
-          <div class="botonera-tile bt-info" title="Defensa (no se tira)">
-            ${lupaBotonHtml('defensa:def')}
-            <span class="bt-label">Defensa</span><span class="bt-value">${Number.isNaN(c.final.def) ? '?' : fmt(c.final.def)}</span>
-          </div>
-          <div class="botonera-crit">
-            <div class="botonera-crit-t">Resistencia a críticos</div>
-            <div class="botonera-crit-grid">
-              ${TIPOS_IDS.map(id => `
-              <div class="botonera-tile bt-info" title="${esc(STAT_FULL[id])} (no se tira)">
-                ${lupaBotonHtml(`defensa:${id}`)}
-                <span class="bt-label">${esc(STAT_LABEL[id])}</span><span class="bt-value">${Number.isNaN(c.final[id]) ? '?' : fmt(c.final[id])}</span>
-              </div>`).join('')}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="botonera-caja">
-      <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-stats" title="Contraer/expandir">👁</button><span>Tiradas de stats</span></div>
-      <div class="botonera-stats-grid">
-        ${statsRollables.map(s => {
-          const m = c.modTotal[s.id];
-          const valCls = m>0 ? 'mod-plus' : m<0 ? 'mod-minus' : '';
-          const origins = c.mods[s.id] || [];
-          const origenTxt = origins.length===1 ? origins[0].origen : origins.length>1 ? `${origins.length} orígenes` : '';
-          const tituloMod = m ? ` — ${m>0?'+':''}${fmt(m)}${origenTxt?` (${esc(origenTxt)})`:''}` : '';
-          return `
-          <button type="button" class="botonera-tile" data-tirarstat="${s.id}" title="${esc(s.full || s.label)}${tituloMod}">
-            ${lupaBotonHtml(`stat:${s.id}`)}
-            <span class="bt-label">${esc(s.label)}</span>
-            <span class="bt-value ${valCls}">${fmt(c.final[s.id])}</span>
-            ${m ? `<span class="bt-mod">${m>0?'+':''}${fmt(m)}</span>` : ''}
-          </button>`;
-        }).join('')}
-      </div>
-    </div>
-  </div>`;
-
-  const consumiblesCinturon = S.cinturon.filter(i => i.consumible);
-  const consumiblesMochila = S.inventario.filter(i => i.consumible);
-  const filaConsumible = (i, key) => `<div class="cat-row bot-fila">
-    <div class="bot-fila-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
-    <div class="bot-fila-btns">
-      <button class="mini" data-view="${key}:${i.id}">Ver</button>
-      ${consumeButton(i, key, true)}
-    </div>
-  </div>`;
-
-  html += `<div class="botonera-grid botonera-grid-even">
-    <div class="botonera-caja">
-      <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-habilidades" title="Contraer/expandir">👁</button><span>Habilidades</span></div>
-      <div class="botonera-list-grid">
-        ${S.habilidades.length ? S.habilidades.map(i => {
-          const sinNitros = sinNitrosPara(i);
-          // Nombre y costo a la izquierda; Ver y Ejecutar siempre juntos a la derecha.
-          return `<div class="cat-row bot-fila">
-            <div class="bot-fila-info">
-              <div class="cat-nombre">${esc(i.nombre)}</div>
-              ${costoHabilidadTxt(i) ? `<div class="bot-fila-costo" title="Lo que cuesta ejecutarla">${esc(costoHabilidadTxt(i))}</div>` : ''}
-            </div>
-            <div class="bot-fila-btns">
-              <button class="mini" data-view="habilidades:${i.id}">Ver</button>
-              <button class="ejecutar-btn${habAutomatizada(i) ? ' con-lupa' : ''}${sinNitros?" sin-recursos":""}" data-ejecutar="${i.id}" ${sinNitros?'aria-disabled="true" title="No te alcanzan los recursos"':""}>${habAutomatizada(i) ? 'Ejecutar' + lupaBotonHtml(`habx:${i.id}`, "en-boton") : 'Anunciar'}</button>
-              ${botonSegundaHab(i)}
-            </div>
-          </div>`;
-        }).join('') : `<div class="hint">Sin habilidades cargadas.</div>`}
-      </div>
-    </div>
-    <div class="botonera-caja">
-      <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-consumibles" title="Contraer/expandir">👁</button><span>Consumibles</span></div>
-      <div class="botonera-list-grid">
-        ${consumiblesCinturon.length ? consumiblesCinturon.map(i => filaConsumible(i, 'cinturon')).join('') : `<div class="hint">Sin consumibles en el cinturón.</div>`}
-      </div>
-    </div>
-  </div>`;
-
-  html += `<div class="botonera-caja">
-    <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-consumibles-mochila" title="Contraer/expandir">👁</button><span>Consumibles en mochila</span></div>
-    <div class="botonera-list-grid">
-      ${consumiblesMochila.length ? consumiblesMochila.map(i => filaConsumible(i, 'inventario')).join('') : `<div class="hint">Sin consumibles en la mochila.</div>`}
-    </div>
-  </div>`;
-
-  if(modoMapa !== 'narrativo') html += socialesHtml;
-
-  $('#botonera-body').innerHTML = html;
+  // El dibujo de la Botonera: comun/ficha-botonera.js (paso 4, etapa 3b), el mismo que usa el mapa.
+  const r = FichaBotonera.html(S, {modoMapa, parryArmaPendiente});
+  $('#botonera-badge-nitros').textContent = r.nitros;
+  $('#botonera-badge-sp').textContent = r.sp;
+  $('#botonera-badge-def').textContent = r.def;
+  $('#botonera-body').innerHTML = r.html;
   aplicarColapsados();
 }
 
@@ -364,19 +169,10 @@ function jobCostoDe(x){
 // Se "invierte" en habilidades sociales (ver más abajo): el total no baja,
 // es un presupuesto igual que el de Job (jobBudget) — lo gastado queda
 // funcionando, "resto" es lo que falta repartir.
-function inteligenciaAuto(){
-  const nivel = Math.max(1, num(S.meta.nivel) || 1);
-  return 6 + 3 * (nivel - 1);
-}
+function inteligenciaAuto(){ return FichaBotonera.inteligenciaAuto(S); }   // comun/ficha-botonera.js
 // Total de Inteligencia: el automático (6 + 3 por nivel) o, si se fijó a mano (2026-09-24, pedido del dueño), ese valor libre.
-function inteligenciaManual(){
-  const m = S.meta.inteligenciaManual;
-  return (m !== null && m !== undefined && m !== '' && Number.isFinite(Number(m))) ? Number(m) : null;
-}
-function inteligenciaValor(){
-  const m = inteligenciaManual();
-  return m !== null ? m : inteligenciaAuto();
-}
+function inteligenciaManual(){ return FichaBotonera.inteligenciaManual(S); }
+function inteligenciaValor(){ return FichaBotonera.inteligenciaValor(S); }
 // Editar a mano el total: número (el total nuevo), +N / -N (sumar o restar) o "auto" (vuelve al cálculo automático).
 function editarInteligencia(){
   if(fichaVivo && fichaVivo.soloLectura){ toast('Este personaje no es tuyo: no podés cambiarle la Inteligencia'); return; }
@@ -396,11 +192,7 @@ Escribí el total nuevo, +N o -N, o "auto" para volver al cálculo automático.`
   refresh();
   toast(nuevo === null ? `Inteligencia automática: ${fmt(inteligenciaAuto())}` : `Inteligencia fijada a mano: ${fmt(S.meta.inteligenciaManual)}`);
 }
-function inteligenciaBudget(){
-  const total = inteligenciaValor();
-  const gastado = S.sociales.reduce((a, x) => a + Math.max(0, num(x.puntosInt)), 0);
-  return {total, gastado, resto: total - gastado};
-}
+function inteligenciaBudget(){ return FichaBotonera.inteligenciaBudget(S); }
 function renderInteligencia(){
   const b = inteligenciaBudget();
   $('#v-inteligencia').textContent = fmt(b.resto);
@@ -419,22 +211,15 @@ Tocá para cambiar el total a mano.`;
 /* ---------- Habilidades sociales: nivel por Inteligencia invertida o por
    tirada máxima, dado = nivel × 2 caras, tirada = 1dNivel×2 + Inteligencia
    (el total, no lo que queda por invertir). Sin nivel, tira solo Inteligencia. ---------- */
-function nivelSocial(i){ return Math.max(0, num(i.puntosInt)) + Math.max(0, num(i.nivelExtra)); }
-function dadoCarasSocial(i){ return nivelSocial(i) * 2; }
-function nivelSocialTxt(i){
-  const n = nivelSocial(i);
-  const caras = dadoCarasSocial(i);
-  return `Nivel ${fmt(n)}${caras ? ` · d${fmt(caras)}` : ''}`;
-}
+function nivelSocial(i){ return FichaBotonera.nivelSocial(i); }   // comun/ficha-botonera.js
+function dadoCarasSocial(i){ return FichaBotonera.dadoCarasSocial(i); }
+function nivelSocialTxt(i){ return FichaBotonera.nivelSocialTxt(i); }
 function formulaSocial(i){
   const caras = dadoCarasSocial(i);
   const inte = inteligenciaBudget().resto;
   return caras > 0 ? `1d${caras}+${inte}` : `+${inte}`;
 }
-function tiradaSocialTxt(i){
-  const caras = dadoCarasSocial(i);
-  return `Tira ${caras ? `1d${caras} + ` : ''}Inteligencia sin invertir (${fmt(inteligenciaBudget().resto)})`;
-}
+function tiradaSocialTxt(i){ return FichaBotonera.tiradaSocialTxt(S, i); }
 function tirarSocial(i){
   const r = tirarDados(formulaSocial(i));
   if(!r){ toast(`${i.nombre}: sin nivel ni Inteligencia sin invertir — no hay nada que tirar`); return; }

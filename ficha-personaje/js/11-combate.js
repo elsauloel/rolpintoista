@@ -29,9 +29,7 @@ const nitrosAtaque = FichaHabilidades.nitrosAtaque;
 const habCostoVariable = FichaHabilidades.habCostoVariable;
 
 // Nitros fijos de una habilidad (0 si son X: se eligen al usarla).
-function costoNitrosHab(h, arma){
-  return Combatiente.costoNitrosHab(h, () => arma === undefined ? costoAtaqueMinimo() : costoAtaqueNitros(arma), IT2.nitrosHabilidad);
-}
+function costoNitrosHab(h, arma){ return FichaBotonera.costoNitrosHab(S, h, arma); }   // comun/ficha-botonera.js
 
 /* ---------- Moverse: los Nitros se gastan desde el mapa (arrastrando el token);
    la ficha solo publica cuánto cuesta cada casillero (ver fichaResumen) ---------- */
@@ -44,12 +42,7 @@ function costoMoverCasillero(){
   return estadoActivo('rengo') ? IT2.nitrosMoverRengo : IT2.nitrosMover;
 }
 
-function sinNitrosPara(h){
-  if(!habAutomatizada(h)) return false;
-  if(num(h.hpCosto) > 0 && num(S.hp) <= num(h.hpCosto)) return true;
-  if(nitrosVariable(h)) return false;
-  return num(S.nitros) < costoNitrosHab(h);
-}
+function sinNitrosPara(h){ return FichaBotonera.sinNitrosPara(S, h); }   // comun/ficha-botonera.js
 
 /* ---------- Atacar: cada arma paga Tipo ÷ 2 su primer ataque del turno y Tipo completo los demás ---------- */
 
@@ -90,11 +83,7 @@ const costoParryNitros = () => Combatiente.costoParry();   // SIEMPRE 1 No2, sin
 // parriar alcanza con la mano, el escudo no ataca pero sí para.
 function armasYEscudosParaParry(){ return FichaCombate.armasYEscudosParaParry(S); }   // comun/ficha-combate.js
 
-function costoParryTxt(){
-  const armas = armasYEscudosParaParry();
-  if(!armas.length) return 'no podés parriar sin un arma o escudo equipado';
-  return armas.map(a => `${a.item.nombre}: ${fmt(costoParryNitros(a.item))} No2`).join(' · ');
-}
+function costoParryTxt(){ return FichaBotonera.costoParryTxt(S); }   // comun/ficha-botonera.js
 
 // Valor del stat cuando se usa ESA arma: no cuentan los modificadores que vienen de otra arma equipada.
 // Parry y Bloqueo (P129, dueño 2026-09-30, "cada uno con lo suyo"): tampoco cuentan los de un ESCUDO que no es con el que se
@@ -730,19 +719,7 @@ let pendingEjecucion = null;
 /* Lo que cuesta ejecutar una habilidad, para verlo sin abrir la tarjeta.
    El costo en SP es texto libre ("2 SP", "X SP"), así que se muestra tal
    cual lo escribió el jugador. */
-function costoHabilidadTxt(h){
-  if(!habAutomatizada(h)) return '';
-  const partes = [];
-  const nitros = costoNitrosHab(h);
-  if(nitrosAtaque(h)) partes.push(costoAtaqueHabTxt());
-  else if(nitrosVariable(h)) partes.push("X No2");
-  else if(nitros) partes.push(`${fmt(nitros)} No2`);
-  const costo = String(h.costo || '').trim();
-  if(costo) partes.push(/sp|bono/i.test(costo) ? costo : `${costo} SP`);
-  if(num(h.hpCosto) > 0) partes.push(`${fmt(num(h.hpCosto))} HP`);
-  if(num(h.curaHp) > 0) partes.push(`cura ${fmt(num(h.curaHp))} HP`);
-  return partes.join(' · ');
-}
+function costoHabilidadTxt(h){ return FichaBotonera.costoHabilidadTxt(S, h); }   // comun/ficha-botonera.js
 
 function esCostoVariable(costo){
   return /x/i.test(String(costo||''));
@@ -758,20 +735,11 @@ function limiteCostoX(cual){
 // con el arma que se elige al ejecutarlas y cuentan como ese ataque.
 let pendingArmaHab = undefined;   // arma elegida para la habilidad en curso (null = sin arma)
 
-function armasParaHabilidad(){
-  const armas = armasEquipadasConDano();
-  return armas.length ? armas.map(a => ({arma: a.item, mano: a.mano})) : [{arma: null, mano: null}];
-}
+function armasParaHabilidad(){ return FichaBotonera.armasParaHabilidad(S); }   // comun/ficha-botonera.js
 
 // Lo mínimo que puede costar (para saber si alcanza) y el texto para mostrar.
-function costoAtaqueMinimo(){
-  return Math.min(...armasParaHabilidad().map(o => costoAtaqueNitros(o.arma)));
-}
-function costoAtaqueHabTxt(){
-  const opciones = armasParaHabilidad();
-  if(opciones.length === 1) return `${fmt(costoAtaqueNitros(opciones[0].arma))} No2 (ataque${opciones[0].arma ? ` con ${opciones[0].arma.nombre}` : ' sin arma'})`;
-  return `ataque: ${opciones.map(o => `${o.arma.nombre} ${fmt(costoAtaqueNitros(o.arma))}`).join(' / ')} No2`;
-}
+function costoAtaqueMinimo(){ return FichaBotonera.costoAtaqueMinimo(S); }
+function costoAtaqueHabTxt(){ return FichaBotonera.costoAtaqueHabTxt(S); }
 
 // ⚡ Flash (P136, regla del dueño): en tu turno cuesta lo que dice la habilidad (SP y vida); en turno ajeno, el doble — igual
 // dentro del duelo que con el botón. Nunca cuesta No2. Pregunta el turno, revisa que alcance y cobra; null = no se usó.

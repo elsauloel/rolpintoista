@@ -22,32 +22,8 @@ const DADOS_ARMA = [4, 6, 8, 10, 12];
    Todo lo marcado PLACEHOLDER está sin confirmar: se ajusta acá y en la
    pantalla aparece con ⚠.
    ========================================================= */
-const IT2 = {
-  // Costos confirmados.
-  nitrosMover: 1,               // por casillero
-  nitrosConsumirCinturon: 1,
-  nitrosConsumirMochila: 2,
-  nitrosHabilidad: 1,           // costo por defecto de una habilidad nueva
-  nitrosSigilo: 1,              // entrar en sigilo (a revisar, P1)
-  nitrosLevantarse: 1,          // pararse estando Sentado (decidido 2026-09-24)
-  nitrosEquipar: 1,             // equipar o desequipar un ítem, solo en modo combate del mapa
-  // PLACEHOLDER: equipo, estados y catálogo viejos que daban "+N Bonos"
-  // pasan a dar "+N × esto" de SP.
-  spPorBono: 1,
-  // PLACEHOLDER: Tipo con el que se cobra un ataque sin arma equipada.
-  tipoSinArma: 4,
-  // (El costo de atacar —Tipo ÷ 2 para arriba el primero— pasó al motor común: Combatiente.costoAtaque, comun/combatiente.js.)
-  // PLACEHOLDER: Rengo cobra esto por casillero; Inmovilizado no deja moverse.
-  nitrosMoverRengo: 2,
-  inmovilizadoBloqueaMover: true,
-  // PLACEHOLDER: tope de X en costos variables. null = solo frena lo
-  // disponible. Si se confirma, poner una función: c => c.final.esp
-  limiteXNitros: null,
-  limiteXSp: null,
-  // PLACEHOLDER: penalidad por peso de más. Hoy no resta nada (antes
-  // restaba de Bonos); se puede sumar en la fórmula de SP (clic en el stat → fx), ej. esp*3 - sobrecarga.
-  penalidadSobrecargaDefinida: false,
-};
+// Los costos de la Iteración 2 (No2 y SP) viven en comun/ficha-calculo.js (paso 4, etapa 3b): el mapa también los usa.
+const IT2 = FichaCalculo.IT2;
 const IT2_PENDIENTE = txt => `<span class="it2-pendiente" title="Sin confirmar (Iteración 2): ${esc(txt)}">⚠</span>`;
 // Las migraciones que ponen al día una ficha vieja (Iteración 2: Bonos → SP y Acciones/Movimiento → No2; Inteligencia →
 // Especial; escala de Tipos +2) viven en comun/ficha-guardado.js (paso 5, nivel B, área 4). Acá, los mismos nombres de siempre.

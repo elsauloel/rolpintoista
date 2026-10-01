@@ -51,6 +51,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="items-subidos.js"></script>
 <script src="ficha-habilidades.js"></script>
 <script src="ficha-guardado.js"></script>
+<script src="ficha-botonera.js"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -503,6 +504,24 @@ prueba('una parte que cambió desde otra ventana: el retrato y las invocaciones 
   FichaGuardado.aplicarParte(S, 'retrato', FichaGuardado.leerParte('retrato', JSON.stringify({imagen: 'data:nuevo', miniatura: 'data:mini'})));
   igual([S.meta.nombre, S.hp, S.invocaciones[0].imagen, S.meta.imagen, S.meta.miniatura], ['B', 3, 'data:lobo', 'data:nuevo', 'data:mini']);
 });
+
+/* ---------- El dibujo de la Botonera (comun/ficha-botonera.js, paso 4 etapa 3b) ---------- */
+grupo('Botonera del personaje (paso 4)');
+const fichaBotonera = extra => FichaGuardado.completar(FichaGuardado.normalizar(Object.assign({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4},
+  habilidades: [{id: 'h1', nombre: 'Golpe', costo: '1', nitrosCosto: 2}, {id: 'h2', nombre: 'Rayo', costo: 'X SP', nitrosCosto: 'ATAQUE', modo: 'semi'}],
+  sociales: [{id: 's1', nombre: 'Trato', puntosInt: 2}]}, extra || {})).S);
+prueba('las insignias y lo que cuesta cada habilidad', () => {
+  const S = fichaBotonera(), r = FichaBotonera.html(S);
+  igual([r.nitros, r.sp, FichaBotonera.costoHabilidadTxt(S, S.habilidades[0]), FichaBotonera.costoHabilidadTxt(S, S.habilidades[1])],
+    ['No2 6/6', 'SP 12/12', '2 No2 · 1 SP', '2 No2 (ataque sin arma) · X SP']);
+});
+prueba('Levantarse y Sigilo aparecen solo cuando corresponden; los talentos van arriba en narrativo y abajo en combate', () => {
+  const S = fichaBotonera({efectos: [{id: 'e', nombre: 'Sentado', sentado: true, activo: true}]});
+  const comb = FichaBotonera.html(S, {modoMapa: 'combate'}).html, narr = FichaBotonera.html(S, {modoMapa: 'narrativo'}).html, sinNada = FichaBotonera.html(fichaBotonera()).html;
+  igual([comb.includes('data-levantarse'), sinNada.includes('data-levantarse'), sinNada.includes('data-sigilo'), narr.indexOf('Talentos') < narr.indexOf('Combate'), comb.indexOf('Talentos') > comb.indexOf('Combate')],
+    [true, false, false, true, true]);
+});
+prueba('los costos de la Iteración 2 son los de siempre', () => igual([FichaCalculo.IT2.nitrosHabilidad, FichaCalculo.IT2.nitrosConsumirMochila, FichaCalculo.IT2.nitrosSigilo], [1, 2, 1]));
 
 /* ---------- Plantillas (comun/plantillas.js) ---------- */
 grupo('Plantillas');

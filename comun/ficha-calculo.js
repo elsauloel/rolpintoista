@@ -183,7 +183,36 @@ const FichaCalculo = (() => {
     return {base, mods, modTotal, final, pesoEquipado, sobrecarga:ctx.sobrecarga};
   }
 
-  return {GRUPOS, EXTRA, STAT_LIST, ATTR_LIST, MOD_TARGETS, STAT_LABEL, STAT_FULL, ES_ATTR,
+  /* ---------- Iteración 2 — Nitros (No2) y SP: los costos (movido tal cual de ficha-personaje/js/01, 2026-10-01) ----------
+     Lo marcado PLACEHOLDER está sin confirmar: se ajusta acá y en la pantalla de la ficha aparece con ⚠. */
+  const IT2 = {
+    // Costos confirmados.
+    nitrosMover: 1,               // por casillero
+    nitrosConsumirCinturon: 1,
+    nitrosConsumirMochila: 2,
+    nitrosHabilidad: 1,           // costo por defecto de una habilidad nueva
+    nitrosSigilo: 1,              // entrar en sigilo (a revisar, P1)
+    nitrosLevantarse: 1,          // pararse estando Sentado (decidido 2026-09-24)
+    nitrosEquipar: 1,             // equipar o desequipar un ítem, solo en modo combate del mapa
+    // PLACEHOLDER: equipo, estados y catálogo viejos que daban "+N Bonos"
+    // pasan a dar "+N × esto" de SP.
+    spPorBono: 1,
+    // PLACEHOLDER: Tipo con el que se cobra un ataque sin arma equipada.
+    tipoSinArma: 4,
+    // (El costo de atacar —Tipo ÷ 2 para arriba el primero— pasó al motor común: Combatiente.costoAtaque, comun/combatiente.js.)
+    // PLACEHOLDER: Rengo cobra esto por casillero; Inmovilizado no deja moverse.
+    nitrosMoverRengo: 2,
+    inmovilizadoBloqueaMover: true,
+    // PLACEHOLDER: tope de X en costos variables. null = solo frena lo
+    // disponible. Si se confirma, poner una función: c => c.final.esp
+    limiteXNitros: null,
+    limiteXSp: null,
+    // PLACEHOLDER: penalidad por peso de más. Hoy no resta nada (antes
+    // restaba de Bonos); se puede sumar en la fórmula de SP (clic en el stat → fx), ej. esp*3 - sobrecarga.
+    penalidadSobrecargaDefinida: false,
+  };
+
+  return {IT2, GRUPOS, EXTRA, STAT_LIST, ATTR_LIST, MOD_TARGETS, STAT_LABEL, STAT_FULL, ES_ATTR,
     SLOT_MAP, slotDe, SLOTS_DURABLES, SLOTS_ARMADURA, durableItem, esArmaduraItem, durMax, durActual, itemRoto, armRotaDe,
     pasivaCompras, jobTotal, modsDe, evalFormula, calcular};
 })();

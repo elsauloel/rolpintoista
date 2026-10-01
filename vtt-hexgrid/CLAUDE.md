@@ -1143,3 +1143,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `{dq, dr}` en vez de la lista plana `[dq, dr, …]` que guardan todas las formas (`guardarElemento`) y que exigen las reglas, así
   que Firestore rechazaba toda zona —por habilidad o por el asistente de zonas— desde que existe (2026-09-28), con un cartel que
   culpaba a "las reglas sin publicar". Ahora va plana.
+
+- **⚗ La Botonera nueva de una invocación** (2026-10-01, paso 4 etapa 4e, tanda 2): con ⚗, el ⚡ o la B de una invocación propia
+  (`abrirBotonera(fichaId, undefined, invId)`) abren la Botonera nueva del dueño en modo invocación (`abrirBotoneraNueva(fichaId,
+  invId)`, `bn.invId`): la dibuja `bnDibujarInv` con `comun/inv-botonera.js` a partir de `bn.S.invocaciones` (una copia migrada con
+  `InvCalculo.migrar`). Por ahora cada botón se lo pide a la ficha del marco (`bnDelegar` manda `inv`). Sin 🔍 todavía.

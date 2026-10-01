@@ -618,3 +618,7 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
 - **Las reglas de una invocación, compartidas (paso 4, etapa 4e, tanda 1, 2026-10-01)**: el motor de stats de `js/04` (`invStatValor`,
   `invDefensaEfectiva`, `defensaInv`, `costoAtaqueInv`, `migrarInvocacion`…) son atajos a `comun/inv-calculo.js`. **La Defensa de
   una invocación ahora suma los estados que la cambian** (antes los ignoraba), igual que un creep o un personaje.
+- **La Botonera de una invocación, compartida (paso 4, etapa 4e, tanda 2, 2026-10-01)**: `renderBotoneraInv` y `botonSegundaHabInv`
+  (`js/04`) usan `comun/inv-botonera.js`. En modo Botonera, `js/14` atiende `botonera-delegar` con `inv`: abre la Botonera de esa
+  invocación y toca el mismo botón (la dibuja el mapa con ⚗). **`comun/ficha-sesion.js`**: la primera carga del personaje ahora
+  espera al servidor (antes podía armarse con partes sueltas de la memoria local y correr +2 los Tipos).

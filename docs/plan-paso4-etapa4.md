@@ -23,7 +23,7 @@ El mapa guarda con `modificarCreep` (transacción + resumen + firma); GM Tools, 
 1. El cálculo de una invocación → `comun/inv-calculo.js` ✅ (2026-10-01). Arreglo de paso: la Defensa de una invocación ahora
    suma los estados que la cambian, como la de un creep o un personaje.
 2. Dibujar su Botonera → `comun/inv-botonera.js` (`renderBotoneraInv` con la invocación como parámetro); con ⚗, el mapa la dibuja
-   en la Botonera nueva del dueño (lee `S.invocaciones` con `FichaSesion`) y cada botón se lo pide a la ficha del marco.
+   en la Botonera nueva del dueño (lee `S.invocaciones` con `FichaSesion`) y cada botón se lo pide a la ficha del marco ✅ (2026-10-01).
 3. Los botones (tiradas de stats, Esquivar, Parry, Bloqueo, Daño, Atacar) → `comun/inv-acciones.js`; el mapa guarda la parte
    `invocaciones` del personaje con `FichaSesion`.
 4. Lo que el duelo le pide a una invocación (`dueloInvDe`, `js/11`) → `comun/inv-duelo.js`, en `hooksLocal` del mapa. Con los
@@ -217,3 +217,19 @@ puede empezar.
   («−2 Defensa», Piel de escoria). **Arreglado** (`InvCalculo.defensaEfectiva`, misma regla que los creeps — «invocaciones =
   creeps», P121 —, salteando Armadura rota, que en la forma de la ficha trae su −1 como bono y ya se cuenta por acumulación).
   `pruebas.html`: 184 en verde (1 nueva).
+- 2026-10-01: **4e, tanda 2 hecha** (d57a9b2) — `comun/inv-botonera.js` (`InvBotonera.html(inv, {parryPendiente, lupa})` →
+  `{titulo, badge, html}`, y `botonSegundaHab`), copiado de `renderBotoneraInv`/`botonSegundaHabInv` (`js/04`, que quedan con
+  atajos). En el mapa, con ⚗, `abrirBotonera(fichaId, undefined, invId)` abre la Botonera nueva del dueño en modo invocación
+  (`bn.invId`; `bnDibujarInv`, sobre una copia migrada; dormida o borrada, avisa). Cada botón va a la ficha del marco
+  (`botonera-delegar` con `inv`; `js/14` abre la Botonera de esa invocación y toca el mismo botón). Sin 🔍 todavía. Comparado
+  contra el código viejo en 600 invocaciones al azar: 600 iguales; 5 mutaciones detectadas. `pruebas.html`: 185 (1 nueva). **En
+  vivo** (GM con ⚗, un "Lobo de prueba" escrito un rato en la parte `invocaciones` de Silvia): la Botonera mostró sus No2, Combate,
+  Defensa 0 (1 − «Débil»), stats y habilidades (Anunciar / Ejecutar / 🎲 1d6); «Fue» se tiró a nombre del Lobo y «Ver» abrió la
+  ventana de la ficha encima del mapa. Restaurado (`{"invocaciones":[]}`) y ⚗ apagado.
+- 2026-10-01: **Arreglo en `comun/ficha-sesion.js`, encontrado en esa prueba**: la primera carga de un personaje armaba todo con el
+  primer aviso de Firestore, aunque viniera de la memoria local con solo algunas partes (las que esa misma página había escrito o
+  leído). Sin la parte "otros" (la marca de la escala de Tipos), la migración corría +2 los Tipos de lo que sí había llegado —
+  el Lobo apareció con d10 en vez de d8 — y, si la Botonera nueva guardaba esa parte, quedaba escrito. Desde que existe la ficha en
+  vivo (Paso 3a); en la ficha podía pasar al cambiar de personaje en la misma pestaña. Ahora la primera carga espera la respuesta
+  del servidor (`snap.metadata.fromCache`, con `includeMetadataChanges`). Probado en vivo con la misma secuencia (d8) y la ficha
+  abre igual. `pruebas.html`: 186 (1 nueva, con un Firestore simulado).

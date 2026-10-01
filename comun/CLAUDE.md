@@ -970,3 +970,10 @@ versión parecida en más de una, es candidato a juntar.
   `costoHabTxt`, `bloqueoHab`, `danoTxt`, `ataqueTxt`, `actualizarHpMaxPorCon`, `migrar` y las listas de stats (`INV_STATS_TIRADA_IDS`…).
   Todo recibe la invocación (`inv`). La ficha lo usa con sus nombres de siempre (`invStatValor`…). Necesita `combatiente.js`,
   `ficha-calculo.js`, `ficha-resumen.js` y `ficha-botonera.js` (al llamar).
+- **`inv-botonera.js`** (`InvBotonera`, 2026-10-01, paso 4 etapa 4e, tanda 2) — **el dibujo de la Botonera de una invocación**:
+  `html(inv, {parryPendiente, lupa})` → `{titulo, badge, html}` y `botonSegundaHab(inv, h)`. Lo usan la ficha (`renderBotoneraInv`)
+  y el mapa (Botonera nueva, `bnDibujarInv`). Necesita `inv-calculo.js`, `combatiente.js`, `ficha-calculo.js`, `ficha-botonera.js`,
+  `modificadores-tirada.js` y `tiradas.js`.
+- **`ficha-sesion.js`: la primera carga espera al servidor** (2026-10-01): `escuchar` ya no arma el personaje con un aviso que venga
+  de la memoria local de Firestore (`snap.metadata.fromCache`; el listener va con `includeMetadataChanges`), porque podía traer solo
+  algunas partes y, sin "otros", la migración de la escala de Tipos corría +2 las armas que sí llegaban.

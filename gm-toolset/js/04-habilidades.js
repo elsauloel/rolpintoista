@@ -130,14 +130,8 @@ const STAT_FULL_GM = {
   resm:'Resistencia mental', resmg:'Resistencia especial', rescc:'Resistencia a CC',
   con:'Constitución', fue:'Fuerza', agl:'Agilidad', des:'Destreza', esp:'Especial',
 };
-const SLOT_MAP_GM = {
-  arma_1m:'mano', arma_2m:'mano',
-  escudo_1m:'escudo', escudo_2m:'escudo',
-  armadura_blanda:'armadura', armadura_rigida:'armadura',
-  cabeza:'cabeza', manos:'manos', piernas:'piernas', pies:'pies',
-  cinturon:'cinturon', mochila:'mochila',
-};
-function slotDeGM(tipoItem){ return SLOT_MAP_GM[tipoItem] || 'otro'; }
+const SLOT_MAP_GM = CreepCalculo.SLOT_MAP;   // comun/creep-calculo.js
+function slotDeGM(tipoItem){ return CreepCalculo.slotDe(tipoItem); }
 
 function modsResumenHtmlGM(mods){
   const list = (mods || []).filter(m => m.stat && m.stat !== 'def');

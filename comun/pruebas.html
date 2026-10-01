@@ -43,6 +43,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
 <script src="combatiente.js"></script>
+<script src="creep-calculo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
 <script src="estados-presets.js"></script>
@@ -870,6 +871,27 @@ prueba('el Ankh a mano revive con el 25 % del HP máximo y gasta una unidad', ()
   S.hp = 0;
   const nombre = FichaAcciones.ankhAMano(S, 'inventario', 'a'), max = FichaCalculo.calcular(S).final.hpmax;
   igual([nombre, S.hp > 0, S.hp <= Math.ceil(max / 4) + 1, FichaAcciones.ankhAMano(S, 'inventario', 'a')], ['Ankh de Reencarnación', true, true, null]);
+});
+
+/* ---------- Las reglas de un creep (comun/creep-calculo.js, paso 4 etapa 4a) ---------- */
+grupo('Reglas de un creep (paso 4, etapa 4)');
+const creepPrueba = extra => CreepCalculo.normalizar(Object.assign({nombre: 'Orco', con: 4, fue: 5, agl: 3, des: 4, esp: 2, hp: 20, hpMax: 20,
+  armaNombre: 'Hacha', armaTipo: 8, armaPeso: 2, armaFijo: 1, defensa: 3, equipo: [], estados: [], habilidades: [], escalaTipos: 2}, extra || {}));
+prueba('los stats suman lo que sube el atributo y lo que apunta al stat; el jefe tiene +1 Res.Esp', () => {
+  const sc = creepPrueba({equipo: [{nombre: 'Yelmo', tipoItem: 'cabeza', mods: [{stat: 'con', val: 1}, {stat: 'resmg', val: 2}]}]});
+  igual([CreepCalculo.statValor(sc, 'resmg'), CreepCalculo.statValor(creepPrueba({jefe: true}), 'resmg'), CreepCalculo.statValor(sc, 'pdg')], [7, 5, 4]);
+});
+prueba('Defensa con bonos de estados y Armadura rota; daño del arma con Fuerza (no si es de rango)', () => {
+  const sc = creepPrueba({estados: [{nombre: 'Piel', activo: true, mods: [{stat: 'def', val: 2}]}, {nombre: 'Armadura rota', activo: true, armaduraRota: true, stacks: 2}]});
+  igual([CreepCalculo.defensaEfectiva(sc), CreepCalculo.ataqueTxt(sc), CreepCalculo.ataqueTxt(creepPrueba({armaDeRango: true}))], [3, '2d8 + 6', '2d8 + 1']);
+});
+prueba('Parry y Bloqueo: con su arma o un escudo; un arma natural sola no alcanza', () => {
+  const nat = creepPrueba({armaNatural: true}), conEscudo = creepPrueba({armaNatural: true, equipo: [{nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 3}]});
+  igual([!!CreepCalculo.defensa(creepPrueba()), CreepCalculo.defensa(nat), CreepCalculo.defensa(conEscudo).nombre, CreepCalculo.bloqueoValor(conEscudo)], [true, null, 'Rodela', 8]);
+});
+prueba('normalizar pasa Inteligencia a Especial, corre la escala de Tipos y saca la habilidad Movimiento', () => {
+  const sc = CreepCalculo.normalizar({nombre: 'Viejo', int: 3, armaTipo: 6, habilidades: [{nombre: 'Movimiento'}, {nombre: 'Golpe', detalle: 'Crítico 4 y 6', tiradaStat: 'int'}]});
+  igual([sc.esp, sc.int, sc.armaTipo, sc.habilidades.length, sc.habilidades[0].tiradaStat, sc.habilidades[0].detalle, sc.crit], [3, undefined, 8, 1, 'esp', 'Crítico 6 y 8', [0, 0, 0, 0, 0]]);
 });
 
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */

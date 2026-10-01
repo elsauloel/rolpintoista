@@ -938,6 +938,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/biblioteca.js?v=20260929i"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
 <script src="../comun/combatiente.js?v=20260930o"></script>
+<script src="../comun/creep-calculo.js?v=20261001a"></script>
 <script src="../comun/modificadores-tirada.js?v=20260930c"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930c"></script>
@@ -3153,22 +3154,9 @@ function iniciativaMover(id, delta){
 }
 
 // Suma de los modificadores de un stat de un creep (equipo puesto, arma y estados activos): mismo criterio que gm-tools.
-function creepModTotalMapa(sc, statId){
-  let total = 0;
-  const fuentes = [...(sc.equipo || []), ...((sc.armaMods || []).length ? [{mods: sc.armaMods}] : [])];
-  fuentes.forEach(it => (it.mods || []).forEach(m => { if(m.stat === statId) total += num(m.val); }));
-  (sc.estados || []).forEach(es => {
-    if(es.activo === false) return;
-    const stacks = Math.max(1, num(es.stacks) || 1);
-    (es.mods || []).forEach(m => { if(m.stat === statId) total += num(m.val) * stacks; });
-  });
-  return total;
-}
+function creepModTotalMapa(sc, statId){ return CreepCalculo.modTotal(sc, statId); }   // comun/creep-calculo.js (paso 4 etapa 4a)
 // Iniciativa de un creep: Agilidad + lo que la sube (Agilidad o Iniciativa directa). null si todavía no se leyó el creep.
-function creepIniMapa(sc){
-  if(!sc) return null;
-  return num(sc.agl) + creepModTotalMapa(sc, 'agl') + creepModTotalMapa(sc, 'ini');
-}
+function creepIniMapa(sc){ return sc ? CreepCalculo.statValor(sc, 'ini') : null; }
 
 // 🎲 Tirar iniciativa (2026-09-24, pedido del dueño): un jugador tira la de sus personajes; el GM, la de todos los creeps de la
 // lista. El resultado se carga solo junto al nombre (no agrega ni saca filas: los tokens los trae el GM con "Traer tokens").
@@ -6602,13 +6590,10 @@ async function fuegoMantenimiento(numero){
    momento de esto está pasando" — nunca se resuelve en silencio, siempre aparece #zona-banner con lo que
    corresponde (tirar para resistir, o un simple "Aplicar" si no hay nada que tirar) antes de tocar nada. */
 const ZONA_STAT_LABEL = {resmg: 'Res.Esp', resm: 'Res.Mt', con: 'Constitución', fue: 'Fuerza', agl: 'Agilidad', des: 'Destreza', esp: 'Especial', eva: 'Evasión', pdg: 'PdG', pdgmg: 'PdG.Esp'};
-// Res.Esp/Res.Mt de un creep salen de su Constitución (misma tabla que CREEP_DERIVADOS_POR_ATTR de gm-tools,
-// acá solo lo que hace falta para resolver una resistencia): base + lo que sume el equipo/estados.
-function zonaStatCreep(sc, statId){
-  if(['con', 'fue', 'agl', 'des', 'esp'].includes(statId)) return num(sc[statId]) + creepModTotalMapa(sc, statId);
-  const base = statId === 'pdg' ? 'des' : statId === 'pdgmg' ? 'esp' : statId === 'eva' ? 'agl' : 'con';
-  return num(sc[base]) + creepModTotalMapa(sc, statId);
-}
+// El stat de un creep para resistir una zona: el mismo cálculo que GM Tools (comun/creep-calculo.js, paso 4 etapa 4a). Antes era
+// una cuenta propia que no sumaba lo que sube el atributo (Res.Esp sin los bonos de Constitución, Evasión sin los de Agilidad)
+// ni el +1 de Res.Esp de los jefes.
+function zonaStatCreep(sc, statId){ return CreepCalculo.statValor(sc, statId); }
 function zonaEsMia(t){
   if(t.tipo === 'creep') return soyGM;
   return t.tipo === 'pj' && !!t.fichaId && !String(t.fichaId).includes(SEP_INVOCACION) && puedoMover(t);
@@ -8059,13 +8044,7 @@ let hpRayo = false;   // ⚡ Rayo en cadena en "Recibe daño" (P118): daño dire
 let hpCritMult = 1;   // multiplicador de crítico de "Recibe daño" (1 = sin crítico; 2 doble daño, 3 triple, 4 cuádruple). Un crítico multiplica TODO el daño y NO resta la Defensa (Comun/critico.js).
 let hpModo = 'danio';   // 'danio' | 'directo' (vuelve a 'danio' cada vez que se abre)
 
-function creepDefensaMapa(sc){
-  const activos = (sc.estados || []).filter(e => e && e.activo !== false);
-  let v = num(sc.defensa);
-  activos.forEach(es => { const st = Math.max(1, num(es.stacks) || 1); (es.mods || []).forEach(m => { if(m.stat === 'def') v += num(m.val) * st; }); });   // bonos de Defensa de estados
-  v -= activos.filter(e => e.armaduraRota).reduce((a, e) => a + Math.max(1, num(e.stacks) || 1), 0);
-  return Math.max(0, v);
-}
+function creepDefensaMapa(sc){ return CreepCalculo.defensaEfectiva(sc); }   // comun/creep-calculo.js
 
 // Armadura mágica (Paso 3 de las reglas de casteo, docs/reglas-casteo.md):
 // stat general y fijo, sin atributo (base a mano, sc.armadmg, 0 por
@@ -8073,13 +8052,7 @@ function creepDefensaMapa(sc){
 // la base al equipar (gm-tools los deja en it.mods): se suman acá en vivo,
 // igual que gm-tools.html (creepModTotal). Se resta al daño de casteo que
 // ignora la Defensa (mismo lugar donde antes se usaba 0 a secas).
-function creepArmadmgMapa(sc){
-  let v = num(sc.armadmg);
-  (sc.estados || []).filter(e => e && e.activo !== false).forEach(es => { const st = Math.max(1, num(es.stacks) || 1); (es.mods || []).forEach(m => { if(m.stat === 'armadmg') v += num(m.val) * st; }); });
-  (sc.equipo || []).forEach(it => (it.mods || []).forEach(m => { if(m.stat === 'armadmg') v += num(m.val); }));
-  (sc.armaMods || []).forEach(m => { if(m.stat === 'armadmg') v += num(m.val); });
-  return Math.max(0, v);
-}
+function creepArmadmgMapa(sc){ return CreepCalculo.armadmgEfectiva(sc); }
 
 // Golpe − Defensa, con Invulnerable y Escudo mágico (mismas reglas que gm-tools
 // con los creeps). Modifica el escudo de `efectos`: pasar una copia para solo mirar.
@@ -10481,10 +10454,7 @@ function dueloFlashLocal(d, campo, lado){
   if(!sc) return null;
   return (sc.habilidades || []).some(h => Combatiente.flashPara(h.duelo, campo)) ? null : [];
 }
-function defensaCreepMapa(sc){
-  return Combatiente.armaParaDefensa({arma: sc.armaNombre ? {nombre: sc.armaNombre, peso: Math.max(1, num(sc.armaPeso) || 1)} : null, natural: sc.armaNatural === true,
-    escudos: (sc.equipo || []).filter(it => String(it.tipoItem || '').startsWith('escudo')).map(it => ({nombre: it.nombre, peso: num(it.peso)}))});
-}
+function defensaCreepMapa(sc){ return CreepCalculo.defensa(sc); }   // con qué para (comun/creep-calculo.js)
 
 // Pone el estado de un efecto del golpe sobre el defensor (solo corre en el mapa del GM). Creep: se escribe su estado; personaje: le llega a su ficha (mismo
 // mecanismo que las trampas y las habilidades de creep); invocación o sin estado automático: a mano.

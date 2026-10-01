@@ -351,39 +351,13 @@ let accionesCreepId = null;
 // del creep — se tiran desde acá, en Acciones. El set completo se usa
 // también para cálculos internos (formulasCombateCreep, danoTxt, etc.);
 // CREEP_STATS_TIRADA_IDS más abajo recorta cuáles se muestran como botón.
-const CREEP_DERIVED_STATS = [
-  {id:'con', label:'Con', attr:'con'}, {id:'fue', label:'Fue', attr:'fue'},
-  {id:'agl', label:'Agi', attr:'agl'}, {id:'des', label:'Des', attr:'des'}, {id:'esp', label:'Esp', attr:'esp'},
-  {id:'resmg', label:'Res.Esp', attr:'con'}, {id:'rescc', label:'Res.CC', attr:'con'},
-  {id:'dmg', label:'Dmg', attr:'fue'}, {id:'bloqueo', label:'Bloqueo', attr:'fue'},
-  {id:'eva', label:'Eva', attr:'agl'}, {id:'ini', label:'Iniciativa', attr:'agl'}, {id:'mov', label:'Mov', attr:'agl'},
-  {id:'rng', label:'Rango', attr:'des'}, {id:'pdg', label:'PdG', attr:'des'}, {id:'crit', label:'Crítico frecuente', attr:'des'}, {id:'critpot', label:'Crítico potente', attr:'des'}, {id:'parry', label:'Parry', attr:'des'}, {id:'percepcion', label:'Percepción', attr:'des'},
-  {id:'pdgmg', label:'PdG.Esp', attr:'esp'}, {id:'resm', label:'Res.Mt', attr:'esp'}, {id:'rangocasteo', label:'Rango de casteo', attr:'esp'},
-];
+const CREEP_DERIVED_STATS = CreepCalculo.DERIVED_STATS;   // comun/creep-calculo.js (paso 4 etapa 4a)
 
 // Mismo criterio que STATS_SIN_TIRADA/STATS_REDUNDANTES_COMBATE en la
 // Botonera de la ficha: los 5 atributos base + los secundarios que no
 // tienen ya su propio botón en la caja de Combate.
-const CREEP_STATS_TIRADA_IDS = ['con', 'fue', 'agl', 'des', 'esp', 'resmg', 'rescc', 'ini', 'pdgmg', 'resm', 'percepcion'];
+const CREEP_STATS_TIRADA_IDS = CreepCalculo.STATS_TIRADA_IDS;
 
-const CREEP_STAT_LOOKUP = Object.fromEntries(CREEP_DERIVED_STATS.map(d => [d.id, d]));
-function creepStatValor(sc, statId){
-  const d = CREEP_STAT_LOOKUP[statId];
-  if(!d) return 0;
-  // Suma tanto lo que sube el atributo que lo gobierna (fue, des, etc.,
-  // que arrastra a todos sus derivados) como lo que apunta directo al
-  // derivado (p.ej. un ítem con "bloqueo +N" que no toca Fuerza). Para un
-  // atributo base tirado directo (statId === d.attr) no hay que sumar el
-  // mod dos veces.
-  let v = num(sc[d.attr]) + creepModTotal(sc, d.attr);
-  if(statId !== d.attr) v += creepModTotal(sc, statId);
-  // Pajaritos (PdG/Eva) y Lisiado (PdG/Parry) ya no achican el stat: parten el resultado de la tirada (mitadesDeTirada, en tirarValorStat).
-  if(statId === 'resmg' && sc.jefe) v += 1;   // protección de jefe: +1 Res.Esp (la tirada contra los debuffs)
-  if(statId === 'mov'){
-    const activos = (sc.estados||[]).filter(e => e.activo !== false);
-    if(activos.some(e => e.inmovilizado)) v = 0;
-    else if(activos.some(e => e.rengo)) v = Math.floor(v / 2);
-  }
-  return v;
-}
+const CREEP_STAT_LOOKUP = CreepCalculo.STAT_LOOKUP;
+function creepStatValor(sc, statId){ return CreepCalculo.statValor(sc, statId); }
 

@@ -1119,6 +1119,11 @@ manual (`bnAccionAca`): **la Botonera nueva ya no delega ningún botón**; solo 
 **Ojo con el recuadro aislado**: en un listener del recuadro (`bn.host`), `e.target` es siempre el recuadro aunque el clic sea
 adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo cierra", que antes cerraba con cualquier clic).
 
+- **⚗ Acciones nuevas de un creep** (2026-10-01, paso 4 etapa 4b, `docs/plan-paso4-etapa4.md`): con el mismo interruptor ⚗, el
+  ⚡ o la B de un creep (GM) abren `abrirAccionesNuevas`: un recuadro aislado (`#acciones-nuevas`, shadow DOM con `gm-tools.css`)
+  dibujado con `comun/creep-botonera.js` a partir de `creepsPriv` y redibujado con cada cambio (`acDibujar`). Cada botón se le
+  pide a GM Tools en el marco (`acDelegar` → `acciones-delegar`; si el marco no tiene GM Tools, lo carga con `precarga=1`).
+  `abrirAcciones(id, mensaje, sinNueva)`: con un mensaje (Ver, estados) sigue yendo al marco. Sin 🔍 todavía.
 - **Las reglas de los creeps, comunes** (2026-10-01, paso 4 etapa 4a): el mapa carga `comun/creep-calculo.js` siempre;
   `creepModTotalMapa`, `creepIniMapa`, `creepDefensaMapa`, `creepArmadmgMapa`, `defensaCreepMapa` y `zonaStatCreep` son atajos a
   `CreepCalculo` (antes eran copias propias). `zonaStatCreep` (la resistencia de un creep a una zona) ahora da lo mismo que GM

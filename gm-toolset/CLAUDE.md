@@ -203,6 +203,11 @@ hay trabajo reciente o en curso de otra conversación (ver
   `defensaCreep`, `normalizarCreep` y sus migraciones, los textos de origen, `CREEP_DERIVED_STATS`, `SLOT_MAP_GM`…) son ahora atajos
   de una línea a `CreepCalculo`. Para cambiar una regla de creep, ir a ese archivo (y subir su `?v=` en `gm-tools.html` y en el mapa).
 
+- **El dibujo de las Acciones, en `comun/creep-botonera.js`** (2026-10-01, paso 4 etapa 4b): `renderAccionesCreep` arma la
+  ventana con `CreepBotonera.html`; `formulasCombateCreep`, `botonSegundaHabCreep`, `cdControlesHtml` y `botonHabCreepTxt` son
+  atajos. En modo Acciones (dentro del mapa), `js/12` atiende `acciones-delegar`: las Acciones nuevas del mapa (⚗) le piden un
+  botón y GM Tools dibuja las Acciones de ese creep y toca el mismo botón.
+
 ## Formato de datos
 
 - **Consumen** (desde 2026-09-29) el catálogo de fábrica `comun/catalogo.js`

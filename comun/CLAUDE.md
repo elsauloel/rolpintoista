@@ -926,6 +926,10 @@ versión parecida en más de una, es candidato a juntar.
   una habilidad, los textos de "de dónde sale", `normalizar` (y sus migraciones) y las tablas de stats. Todo recibe el creep
   (`sc`). GM Tools lo usa con sus nombres de siempre (`creepStatValor`…); el mapa lo carga siempre (antes tenía copias
   parciales). **Una regla de creep nueva o corregida va acá.** Necesita `combatiente.js`.
+- **`creep-botonera.js`** (`CreepBotonera`, 2026-10-01, paso 4 etapa 4b) — **el dibujo de las Acciones de un creep**:
+  `html(sc, {parryPendiente, lupa})` → `{titulo, badge, html}` y sus ayudantes (`formulasCombate`, `botonSegundaHab`, `botonHabTxt`,
+  `cdControlesHtml`). Lo usan GM Tools (`renderAccionesCreep`) y el mapa (⚗ Acciones nuevas). Necesita `creep-calculo.js`,
+  `modificadores-tirada.js` y `tiradas.js`.
 - **`ficha-lupa.js`** (`FichaLupa`, 2026-10-01, paso 4 etapa 3c-6) — **la 🔍 y el "Ver" de un personaje**, para la ficha y el
   mapa: `contenido(S, clave)` → `{titulo, html}` (el desglose de cada 🔍 de la Botonera: `stat:`, `defensa:`, `atacar:`, `danio:`,
   `social:`, `habx:`, `hab:`, `cons:`; las de las invocaciones siguen en la ficha) y `ver(S, key, it)` → `{titulo, html}` (la tarjeta

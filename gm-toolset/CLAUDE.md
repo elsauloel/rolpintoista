@@ -23,6 +23,16 @@ hay trabajo reciente o en curso de otra conversación (ver
 ## Lógica principal
 
 ### gm-tools.html
+- **Partido en archivos desde el 2026-09-30** (paso 5 nivel A, `../docs/plan-paso5.md`): `gm-tools.html` es solo la pantalla
+  (~560 líneas) y carga, en este orden, `gm-tools.css` y los 12 tramos de su código en `js/`: `01-dados-reglas-y-nitros`
+  (tiradas, escala de Tipos, reglas tomadas de la ficha, No2) · `02-editar-creep-y-recompensas` (ventana de edición,
+  recompensas, asistente de creep) · `03-acciones-y-lupa` (lupa, Acciones, tarjetas) · `04-habilidades` (Ejecución, ataque
+  con arreglos, Flash, zonas) · `05-trampas-e-items` (trampa de habilidad, biblioteca de habilidades, editor, asistente de
+  ítems) · `06-eventos` (los clics de toda la página) · `07-tablero-e-ia` · `08-fin-del-combate` · `09-grupos-botin-y-bitacora`
+  · `10-personajes` (lista de fichas, estados sobre otros, trampas al mapa, revivir y el creep vacío del arranque) ·
+  `11-en-vivo` (Mesa, Firebase, guardado, Mantenimiento) · `12-modo-acciones` (dentro del mapa y el arranque). Mismo programa
+  de antes, en el mismo orden, con las mismas variables globales; una línea que se ejecuta al cargar solo puede usar funciones
+  de su archivo o de los anteriores. Cada archivo lleva su `?v=` en `gm-tools.html`.
 - Estado en memoria: `S.creeps[]`, cada uno con la forma de `nuevoCreep()`
   (ver [`datos/esquema.md`](../datos/esquema.md), sección "Creep").
 - `creepStatValor()`/`mantenimiento()` son el equivalente de `compute()`

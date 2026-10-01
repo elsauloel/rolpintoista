@@ -59,4 +59,10 @@ etapa 3 del paso 4 (el mapa dibuja la Botonera) es armar la pantalla con esas pi
   final de `11-combate.js` al final de `14-modo-botonera.js` (renderAll usa funciones de archivos posteriores: entre
   archivos no se "elevan"; lo encontró la prueba al cargar). Comparado contra la ficha original sin sesión: la pantalla
   dibujada es idéntica letra por letra, los estilos de 400 elementos iguales, los modos `botonera` y `mantenimiento`
-  cargan sin errores, y los flujos de invocación dan los mismos números. Sigue GM Tools.
+  cargan sin errores, y los flujos de invocación dan los mismos números. Probada en mesa (la ficha de Clementino y su
+  Botonera dentro del mapa, sin errores).
+- 2026-09-30: **GM Tools partido** (nivel A): `gm-tools.css` + 12 tramos en `gm-toolset/js/`, idénticos al original; no
+  hizo falta ningún ajuste (su primer `renderAll()` no usa nada de los archivos posteriores). Comparado sin sesión: misma
+  pantalla (salvo el color al azar del creep vacío del arranque), mismos estilos, modos `acciones` y `finalizar` sin errores,
+  ataque con arreglos y Flash con los mismos números. **Nivel A terminado**; sigue el nivel B (separar la lógica de juego de
+  la pantalla, por áreas), con su propio plan por área.

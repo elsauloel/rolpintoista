@@ -1,0 +1,496 @@
+// js/06-eventos.js — tramo 6 de 12 del script de gm-tools.html (paso 5, nivel A: mismo código, en el mismo orden).
+/* ---------- Eventos ---------- */
+
+document.addEventListener('input', e => {
+  const t = e.target;
+  if(t.dataset.attr !== undefined && t.dataset.id){
+    const sc = S.creeps.find(s=>s.id===t.dataset.id);
+    if(!sc) return;
+    const mod = num(t.dataset.attrmod);
+    // No2 depende de Agilidad: el "antes" hay que tomarlo previo a cambiar
+    // el atributo (no hay un sc.nitrosMax guardado, a diferencia del HP).
+    const agl = t.dataset.attr === 'agl' && sc.nitros !== null && sc.nitros !== undefined
+      ? {full: num(sc.nitros) >= creepNitrosMax(sc)} : null;
+    sc[t.dataset.attr] = num(t.value) - mod;
+    const card = t.closest('.card');
+    if(t.dataset.attr === 'con'){
+      actualizarHpMaxPorCon(sc);
+      actualizarVitalesEnDOM(sc, card);
+    }
+    if(agl){
+      actualizarNo2PorAgl(sc, agl);
+      actualizarNo2EnDOM(sc, card);
+    }
+    actualizarBadgePresupuesto(sc, card);
+    actualizarDerivadosEnDOM(sc, card);
+    return;
+  }
+  if(t.dataset.f !== undefined && t.dataset.id){
+    const sc = S.creeps.find(s=>s.id===t.dataset.id);
+    if(!sc) return;
+    const campo = t.dataset.f;
+    // El HP se resuelve al salir del campo o con Enter: si se guardara
+    // mientras se escribe, "+10" quedaría en 10 apenas se teclea el 1.
+    if(campo === 'hp') return;
+    const numericos = ['nivel','hp','hpMax','nitros','spd','defensa','armadmg'];
+    sc[campo] = numericos.includes(campo) ? num(t.value) : t.value;
+    if(campo === 'nivel'){
+      actualizarBadgePresupuesto(sc, t.closest('.card'));
+    }
+    return;
+  }
+  if(t.dataset.crit !== undefined && t.dataset.id){
+    const sc = S.creeps.find(s=>s.id===t.dataset.id);
+    if(sc) sc.crit[+t.dataset.crit] = num(t.value);
+    return;
+  }
+  if(t.dataset.habf !== undefined){
+    const sc = S.creeps.find(s=>s.id===t.dataset.scid);
+    if(!sc) return;
+    const h = sc.habilidades.find(x=>x.id===t.dataset.habid);
+    if(!h) return;
+    h[t.dataset.habf] = t.dataset.habf === 'cd' ? num(t.value) : t.value;
+    return;
+  }
+});
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('button');
+  // Tocar en cualquier otro lado esconde los botones del estado abierto.
+  if(estadoChipAbierto && !(b && (b.dataset.toggleestado || b.dataset.turnoestado || b.dataset.stackestado))) cerrarChipEstado(b);
+  if(!b) return;
+
+  if(b.dataset.toggleestado){
+    estadoChipAbierto = estadoChipAbierto === b.dataset.toggleestado ? null : b.dataset.toggleestado;
+    renderAll();
+    return;
+  }
+  if(b.dataset.stackestado){
+    // Armadura rota: suma o resta un stack (-1 Defensa cada uno); en 0 se repara.
+    const [scId, esId, d] = b.dataset.stackestado.split(':');
+    const sc = S.creeps.find(s => s.id === scId);
+    const es = sc && sc.estados.find(x => x.id === esId);
+    if(es){
+      const n = Math.max(1, num(es.stacks) || 1) + num(d);
+      if(n <= 0){ sc.estados = sc.estados.filter(x => x.id !== esId); estadoChipAbierto = null; toast('Armadura reparada'); }
+      else { es.stacks = n; estadoChipAbierto = `${scId}:${esId}`; }
+      renderAll();
+    }
+    return;
+  }
+  if(b.dataset.turnoestado){
+    // Suma o resta un turno y deja los botones a la vista para seguir ajustando.
+    const [scId, esId, d] = b.dataset.turnoestado.split(':');
+    const sc = S.creeps.find(s => s.id === scId);
+    const es = sc && sc.estados.find(x => x.id === esId);
+    if(es){
+      es.turnos = Math.max(0, num(es.turnos) + num(d));
+      estadoChipAbierto = `${scId}:${esId}`;
+      renderAll();
+    }
+    return;
+  }
+
+  if(b.id === 'btn-add'){
+    cargarCreepsSubidos();   // de paso, los avisos 🔔 de las tarjetas quedan al día
+    Biblioteca.abrir({
+      tipo: 'creeps', titulo: 'Creep nuevo',
+      textoCrearDeCero: '+ Crear de cero',
+      textoAsistente: '🧭 Crear paso a paso',
+      alAsistente: () => abrirAsistenteCreep(null),
+      base: typeof CREEPS_BASE !== 'undefined' ? CREEPS_BASE : [],
+      alCrearDeCero: () => { const nuevo = nuevoCreep(); nuevo.grupo = grupoParaNuevo(); S.creeps.push(nuevo); renderAll(); },
+      alElegir: agregarCreepDeBiblioteca,
+      alVer: verCreepDeBiblioteca,
+      grupos: CREEPS_GRUPOS,
+    });
+    return;
+  }
+  if(b.dataset.bib){
+    const sc = S.creeps.find(s => s.id === b.dataset.bib);
+    if(sc) guardarCreepEnBiblioteca(sc);
+    return;
+  }
+  if(b.dataset.versioncreep){ const sc = S.creeps.find(s => s.id === b.dataset.versioncreep); if(sc) abrirVersionNuevaCreep(sc); return; }
+  if(b.dataset.ver){ verCreep(b.dataset.ver); return; }
+  if(b.dataset.editarcreep){ abrirEditarCreep(b.dataset.editarcreep); return; }
+  if(b.dataset.cerrareditar){ cerrarEditarCreep(); return; }
+  if(b.dataset.img){
+    document.querySelector(`[data-imginput="${b.dataset.img}"]`)?.click();
+    return;
+  }
+  if(b.dataset.imgrm){
+    const sc = S.creeps.find(x=>x.id===b.dataset.imgrm);
+    if(sc){ sc.imagen = ''; renderAll(); }
+    return;
+  }
+  if(b.dataset.del){
+    if(!confirm('¿Borrar este creep? No se puede deshacer.')) return;
+    const idBorrado = b.dataset.del;
+    S.creeps = S.creeps.filter(s=>s.id!==idBorrado);
+    renderAll();
+    preguntarBorrarTokensDeCreep(idBorrado);
+    return;
+  }
+  if(b.dataset.dup){
+    const idx = S.creeps.findIndex(s=>s.id===b.dataset.dup);
+    if(idx < 0) return;
+    const copia = structuredClone(S.creeps[idx]);
+    copia.id = uid();
+    copia.nombre = (copia.nombre || 'Creep') + ' (copia)';
+    copia.habilidades = (copia.habilidades || []).map(h => ({...h, id: uid()}));
+    copia.estados = (copia.estados || []).map(es => ({...es, id: uid()}));
+    S.creeps.splice(idx + 1, 0, copia);
+    renderAll();
+    toast(`${copia.nombre} creado`);
+    return;
+  }
+  if(b.dataset.edithab){
+    const [scId, habId] = b.dataset.edithab.split(':');
+    abrirEditorHabCreep(scId, habId);
+    return;
+  }
+  if(b.dataset.editararma){
+    abrirEditorArmaCreep(b.dataset.editararma);
+    return;
+  }
+  if(b.dataset.verarmacreep){
+    const sc = S.creeps.find(s => s.id === b.dataset.verarmacreep);
+    if(sc) verItemDatos(armaDeCreepComoItem(sc));
+    return;
+  }
+  if(b.dataset.verequipocreep){
+    const [scId, itId] = b.dataset.verequipocreep.split(':');
+    const sc = S.creeps.find(s => s.id === scId);
+    const it = sc && (sc.equipo || []).find(x => x.id === itId);
+    if(it) verItemDatos(piezaDeCreepComoItem(it));
+    return;
+  }
+  if(b.dataset.modorigen){
+    toast(b.dataset.modorigen);
+    return;
+  }
+  if(b.dataset.abriracciones){
+    abrirAccionesCreep(b.dataset.abriracciones);
+    return;
+  }
+  if(b.dataset.revivircreep){
+    revivirCreepId = b.dataset.revivircreep;
+    revivirCreepModo = 'pct';
+    $('#f-revivircreep-pct').value = 50;
+    actualizarRevivirCreepUI();
+    $('#scrim-revivir-creep').classList.add('open');
+    return;
+  }
+  if(b.dataset.verhabaccion){
+    const [scId, habId] = b.dataset.verhabaccion.split(':');
+    abrirVerHabAccion(scId, habId);
+    return;
+  }
+  if(b.dataset.tirarstatcreep){
+    const [scId, statId] = b.dataset.tirarstatcreep.split(':');
+    const sc = S.creeps.find(s=>s.id===scId);
+    const d = CREEP_STAT_LOOKUP[statId];
+    if(!sc || !d) return;
+    tirarValorStat(`${sc.nombre} · ${d.label}`, creepStatValor(sc, statId), sc, statId);
+    return;
+  }
+  if(b.dataset.atacarcreep){
+    const sc = S.creeps.find(s=>s.id===b.dataset.atacarcreep);
+    if(!sc) return;
+    preguntarTipoAtaqueCreep(sc);
+    return;
+  }
+  if(b.dataset.levantarcreep){
+    const sc = S.creeps.find(s=>s.id===b.dataset.levantarcreep);
+    if(!sc) return;
+    if(num(sc.nitros) < 1){ toast(`${sc.nombre}: no le alcanzan los No2 — levantarse cuesta 1`); return; }
+    sc.nitros = num(sc.nitros) - 1;
+    sc.estados = (sc.estados || []).filter(e => !(e.activo !== false && e.sentado));
+    renderAll();
+    toast(`${sc.nombre} se levantó · −1 No2 · quedan ${fmt(sc.nitros)}`);
+    return;
+  }
+  if(b.dataset.daniocreep){
+    const sc = S.creeps.find(s=>s.id===b.dataset.daniocreep);
+    if(!sc) return;
+    const r = tirarDados(danoTxt(sc, creepStatValor(sc, 'dmg')));
+    if(r){
+      registrarTirada(`${sc.nombre} · Daño`, r);
+      efectosAlPegarCreep(sc);
+    }
+    return;
+  }
+  if(b.dataset.esquivarcreep){
+    const sc = S.creeps.find(s=>s.id===b.dataset.esquivarcreep);
+    if(!sc) return;
+    const eva = creepStatValor(sc, 'eva');
+    tirarValorStat(`${sc.nombre} · Esquivar`, eva, sc, 'eva');
+    return;
+  }
+  if(b.dataset.parrycreep){
+    const sc = S.creeps.find(s=>s.id===b.dataset.parrycreep);
+    if(!sc) return;
+    if(!defensaCreep(sc)){ toast(`${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`); return; }
+    const costo = costoParryCreep(sc);
+    if(costo > num(sc.nitros)){
+      toast(`${sc.nombre}: no le alcanzan los No2 — el Parry cuesta ${fmt(costo)} No2 y tiene ${fmt(num(sc.nitros))}`);
+      return;
+    }
+    sc.nitros = num(sc.nitros) - costo;
+    parryPendienteCreep.add(sc.id);   // si gana el Parry, sigue el Bloqueo
+    renderAll();
+    const parry = creepStatValor(sc, 'parry');
+    tirarValorStat(`${sc.nombre} · Parry`, parry, sc, 'parry');
+    toast(`${sc.nombre}: Parry −${fmt(costo)} No2 · quedan ${fmt(sc.nitros)} · si lo gana, tirá el Bloqueo`);
+    return;
+  }
+  if(b.dataset.contraatacarcreep){   // (ya no hay botón suelto: el contraataque es una opción del menú de Atacar)
+    const sc = S.creeps.find(s=>s.id===b.dataset.contraatacarcreep);
+    if(!sc) return;
+    const costo = costoContraataqueCreep(sc);
+    if(costo > num(sc.nitros)){
+      toast(`${sc.nombre}: no le alcanzan los No2 — el contraataque cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`);
+      return;
+    }
+    sc.nitros = num(sc.nitros) - costo;
+    renderAll();
+    tirarValorStat(`${sc.nombre} · Contraataque (PdG)`, creepStatValor(sc, 'pdg'), sc, 'pdg');
+    toast(`${sc.nombre}: contraataque −${fmt(costo)} No2 (lo de un primer ataque) · quedan ${fmt(sc.nitros)}`);
+    return;
+  }
+  if(b.dataset.tipoataquecreep){
+    const [tipo, scId] = b.dataset.tipoataquecreep.split(':');
+    $('#scrim-tipo-ataque-creep').classList.remove('open');
+    const sc = S.creeps.find(s=>s.id===scId);
+    if(!sc) return;
+    const hacer = () => { if(tipo === 'normal') atacarNormalCreep(sc); else ataqueEspecialCreep(sc, tipo); };
+    // Duelo paso a paso (comun/duelo.js): se elige el token al que ataca; su PdG (y los No2) se tiran adentro del duelo.
+    if(typeof Duelo !== 'undefined' && Duelo.disponible()){
+      Duelo.elegirObjetivo({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre},
+        ataque: {tipo, armaId: '', armaNombre: sc.armaNombre || '', tipoDado: num(sc.armaTipo) || 8, rango: !!sc.armaDeRango, alcance: alcanceDeCreep(sc)}, suelto: hacer});
+    }else hacer();
+    return;
+  }
+  if(b.dataset.fuerzacreep){
+    const sc = S.creeps.find(s=>s.id===b.dataset.fuerzacreep);
+    if(!sc) return;
+    tirarValorStat(`${sc.nombre} · Fuerza del golpe`, fuerzaGolpeValorCreep(sc));
+    return;
+  }
+  if(b.dataset.bloqueocreep){
+    const sc = S.creeps.find(s=>s.id===b.dataset.bloqueocreep);
+    if(!sc) return;
+    const def = defensaCreep(sc);
+    if(!def){ toast(`${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`); return; }
+    if(!parryPendienteCreep.has(sc.id)){ toast(`${sc.nombre}: ${Combatiente.BLOQUEO_SOLO_TRAS_PARRY}`); return; }
+    parryPendienteCreep.delete(sc.id);
+    renderAll();
+    tirarValorStat(`${sc.nombre} · Bloqueo · ${def.nombre}`, bloqueoValorCreep(sc), sc, 'bloqueo');
+    return;
+  }
+  if(b.dataset.armanat){
+    abrirCatalogoArmasNaturales(b.dataset.armanat);
+    return;
+  }
+  if(b.dataset.equipardelfabricante){
+    abrirEquiparCreep(b.dataset.equipardelfabricante);
+    return;
+  }
+  if(b.id === 'btn-catalogo'){
+    abrirEquiparCreep(null);
+    return;
+  }
+  if(b.id === 'btn-tablero'){
+    abrirTablero();
+    return;
+  }
+  if(b.id === 'btn-historial'){
+    renderHistorialSesion();
+    $('#scrim-historial').classList.add('open');
+    return;
+  }
+  if(b.dataset.equiparitem !== undefined){
+    equiparItemEnCreep(num(b.dataset.equiparitem));
+    return;
+  }
+  if(b.dataset.veritem !== undefined){
+    verItemGM(num(b.dataset.veritem));
+    return;
+  }
+  if(b.dataset.quitarequipo){
+    const [scId, equipoId] = b.dataset.quitarequipo.split(':');
+    quitarEquipoDeCreep(scId, equipoId);
+    return;
+  }
+  if(b.dataset.addhab){
+    const sc = S.creeps.find(s=>s.id===b.dataset.addhab);
+    if(sc) abrirCatalogoHabilidades(sc.id);
+    return;
+  }
+  if(b.dataset.addestado){
+    abrirPresetsEstadoCreep(b.dataset.addestado);
+    return;
+  }
+  if(b.dataset.presetcreep){
+    aplicarPresetEstadoCreep(b.dataset.presetcreep);
+    return;
+  }
+  if(b.dataset.escudo){
+    const [scId, esId, acc] = b.dataset.escudo.split(':');
+    const sc = S.creeps.find(x => x.id === scId);
+    const es = sc && sc.estados.find(x => x.id === esId);
+    if(es){
+      const neto = !!es.excedenteVida, max = neto ? null : num(es.escudoMagico), actual = num(es.escudoMagicoActual ?? es.escudoMagico);
+      const txt = acc === 'set' ? prompt(neto ? `${es.nombre}: ${fmt(actual)}\nEscribí el valor nuevo, +N o -N (sin tope)` : `${es.nombre}: ${fmt(actual)}/${fmt(max)}\nEscribí el valor nuevo, +N o -N (para cambiar el máximo: max 12)`, fmt(actual)) : (num(acc) > 0 ? '+' : '') + acc;
+      const nuevo = txt === null ? null : escudoParsear(txt, actual, max);
+      if(nuevo){ es.escudoMagico = neto ? nuevo.actual : nuevo.max; es.escudoMagicoActual = nuevo.actual; renderAll(); }
+      else if(txt !== null) toast(neto ? 'Escribí un número, +N o -N' : 'Escribí un número, +N, -N o "max N"');
+    }
+    return;
+  }
+  if(b.dataset.editarestado){
+    const [scId, esId] = b.dataset.editarestado.split(':');
+    abrirEditorEstadoCreep(scId, esId);
+    return;
+  }
+  if(b.dataset.verestadocreep){
+    const [scId, esId] = b.dataset.verestadocreep.split(':');
+    abrirVerEstadoCreep(scId, esId);
+    return;
+  }
+  if(b.dataset.rmestado){
+    const [scId, estId] = b.dataset.rmestado.split(':');
+    const sc = S.creeps.find(s=>s.id===scId);
+    if(sc){
+      const es = sc.estados.find(x=>x.id===estId);
+      const teniaCon = es && modsAfectanHp(es.mods);
+      sc.estados = sc.estados.filter(es=>es.id!==estId);
+      if(teniaCon) actualizarHpMaxPorCon(sc);
+      renderAll();
+    }
+    return;
+  }
+  if(b.dataset.rmhab){
+    const [scId, habId] = b.dataset.rmhab.split(':');
+    const sc = S.creeps.find(s=>s.id===scId);
+    if(sc){ sc.habilidades = sc.habilidades.filter(h=>h.id!==habId); renderAll(); }
+    return;
+  }
+  if(b.dataset.cdmod){
+    const [scId, habId, accion] = b.dataset.cdmod.split(':');
+    const sc = S.creeps.find(s => s.id === scId);
+    const h = sc && sc.habilidades.find(x => x.id === habId);
+    if(!sc || !h) return;
+    h.cdActual = accion === 'reset' ? 0 : Math.max(0, Math.min(99, num(h.cdActual) + num(accion)));
+    renderAll();
+    return;
+  }
+  if(b.dataset.duelohabcreep){   // 🎯 cómo se juega la habilidad en el duelo (comun/asistente-duelo-hab.js)
+    const [scId, habId] = b.dataset.duelohabcreep.split(':');
+    const sc = S.creeps.find(s => s.id === scId);
+    const h = sc && sc.habilidades.find(x => x.id === habId);
+    if(sc && h) AsistenteDueloHab.abrir({nombre: h.nombre, inicial: h.duelo || null, siempreActivo: true, tieneFormula: !!String(h.tiradaExtra || '').trim(),
+      costoInicial: {sp: h.costo, nitrosCosto: h.nitrosCosto, hpCosto: h.hpCosto}, elegirEstado: elegirEstadoDuelo,   // costo en vida: se cobra igual que en un personaje (P133)
+      alGuardar: r => {
+        if(r){ h.duelo = r.duelo; h.costo = r.costo.sp; h.nitrosCosto = r.costo.nitrosCosto; if(num(r.costo.hpCosto) > 0) h.hpCosto = num(r.costo.hpCosto); else delete h.hpCosto; h.modo = 'auto'; h.automatizada = true; }
+        else{ delete h.duelo; if(h.modo === 'auto' || !h.modo) h.modo = 'semi'; }
+        renderAll(); toast(r ? `${h.nombre}: ✨ automática (ejecución paso a paso)` : `${h.nombre}: sin ejecución paso a paso (queda semiautomática)`);
+      }});
+    return;
+  }
+  if(b.dataset.danohabcreep){
+    const [scId, habId] = b.dataset.danohabcreep.split(':');
+    const sc = S.creeps.find(s=>s.id===scId);
+    const h = sc && sc.habilidades.find(x=>x.id===habId);
+    if(sc && h) tirarSegundaDeHab(h, sc);
+    return;
+  }
+  if(b.dataset.ejecutar){
+    const [scId, habId] = b.dataset.ejecutar.split(':');
+    const sc = S.creeps.find(s=>s.id===scId);
+    const h = sc && sc.habilidades.find(x=>x.id===habId);
+    if(!sc || !h) return;
+    const modo = modoHabCreep(h);
+    if(modo === 'manual'){ mesaPublicarHabilidadCreep(sc, h); toast(`${h.nombre || 'Habilidad'} anunciada`); return; }   // 📣 solo el texto
+    if(modo === 'auto' && Combatiente.tipoEjecucion(h.duelo) === 'flash'){ usarFlashFueraDelDueloCreep(sc, h); return; }   // ⚡ sin No2, cooldown según el turno
+    const bloqueo = bloqueoHabCreep(sc, h);
+    if(bloqueo){
+      toast(`${sc.nombre}: ${h.nombre || 'Habilidad'} no se puede usar — ${bloqueo}`);
+      return;
+    }
+    // Se cobra lo que la habilidad tenga cargado (P133): No2, cooldown y vida; y la cura del sistema anterior, si la trae.
+    const costo = costoNitrosHabCreep(sc, h), costoHp = num(h.hpCosto);
+    sc.nitros = num(sc.nitros) - costo;
+    h.cdActual = num(h.cd);
+    if(habCreepAtaque(h)) sc.ataquesTurno = num(sc.ataquesTurno) + 1;  // cuenta como su ataque
+    if(costoHp > 0) sc.hp = num(sc.hp) - costoHp;
+    if(num(h.curaHp) > 0) sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, num(sc.hp) + num(h.curaHp));   // cura sobre sí mismo
+    const efecto = aplicarEfectoDeConsumoCreep(sc, h);
+    if(efecto && modsAfectanHp(efecto.mods)) actualizarHpMaxPorCon(sc);
+    renderAll();
+    // Lo que todavía no anda para creeps (ataque con arma, Flash — P134) o una ✨ sin la Ejecución armada: avisa y va como 💰.
+    const falta = modo === 'auto' && !h.trampaColocar ? Combatiente.ejecucionNoDisponible(h.duelo, 'creep') : '';
+    const auto = modo === 'auto' && !falta;
+    const esZona = auto && h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'zona';
+    // ✨ Solo sobre el creep y sin nada que tirar: se aplica directo, sin abrir el cuadro.
+    const directo = auto && !h.trampaColocar ? aplicarHabCreepSobreSi(sc, h) : null;
+    if(directo){ renderAll(); mesaPublicarHabilidadCreep(sc, h, directo.nota); toast(`${h.nombre || 'Habilidad'} ejecutada sobre ${sc.nombre}${directo.hechos.length ? ' → ' + directo.hechos.join(' · ') : ''}${costoHp > 0 ? ` · −${fmt(costoHp)} HP` : ''}`); return; }
+    // Una trampa se coloca en secreto: la habilidad no se anuncia en la Mesa (los jugadores no deben enterarse).
+    const hDuelo = (!auto || h.trampaColocar || esZona) ? null : habDueloCreep(sc, h);   // habilidad dirigida: la contienda va en el cuadro del duelo
+    const esArma = auto && !h.trampaColocar && Combatiente.tipoEjecucion(h.duelo) === 'arma';   // ataque con arreglos: al duelo como un ataque
+    if(esArma) lanzarAtaqueDeHabCreep(sc, h);
+    else if(h.trampaColocar){ if(!(auto && pedirTrampaAlMapaCreep(sc, h))) colocarTrampaDeHab(sc, h); }
+    else if(esZona){ mesaPublicarHabilidadCreep(sc, h); if(!colocarZonaDeHabCreep(sc, h)) toast(`${h.nombre}: para colocar la zona hace falta ejecutarla desde el mapa (⚔ Acciones)`); }
+    // Con tirada, la descripción viaja con ella (una sola línea en la Mesa).
+    else if(habCreepTira(h) && !hDuelo) mesaConTexto(habTextoMesa(h));
+    else mesaPublicarHabilidadCreep(sc, h);
+    if(esArma){ /* ya fue al duelo */ }
+    else if(hDuelo) lanzarDueloDeHabCreep(sc, h, hDuelo);
+    else if(habCreepTira(h) && !h.trampaColocar && !esZona) tirarExtraDeHab(h, sc);
+    if(h.estadoObjetivo) elegirObjetivoDeHab(sc, h);   // a quién le pegó: se le aplica el estado solo
+    const partes = [`ejecutada`, costo ? `−${fmt(costo)} No2 (quedan ${fmt(sc.nitros)})` : 'sin costo de No2'];
+    if(costoHp > 0) partes.push(`−${fmt(costoHp)} HP`);
+    if(num(h.curaHp) > 0) partes.push(`+${fmt(num(h.curaHp))} HP`);
+    if(falta) partes.push(`⚠ ${falta}: se ejecutó como semiautomática`);
+    if(h.cd > 0) partes.push(`cooldown ${fmt(num(h.cd))} turno(s)`);
+    if(efecto) partes.push(`${efecto.nombre} (${fmt(efecto.turnos)}t)`);
+    toast(`${h.nombre||'Habilidad'} ${partes.join(' · ')}`);
+    return;
+  }
+  if(b.id === 'btn-mant'){
+    // Conectado como GM: pasa el turno para toda la mesa (fichas y creeps).
+    // Sin conexión: solo los creeps de esta pestaña, como antes.
+    if(gmVivo.activo && gmVivo.listo) mantenimientoGlobal();
+    else mantenimiento();
+    return;
+  }
+  if(b.id === 'btn-reset'){
+    reiniciarCombate();
+    return;
+  }
+  if(b.id === 'btn-finalizar-combate'){
+    abrirReporteFinalizar();
+    return;
+  }
+  if(b.id === 'btn-respaldo-partida'){
+    if(!fbDb || !fbMiembro){ toast('Sin conexión con la partida: no se puede armar el respaldo'); return; }
+    b.disabled = true;
+    toast('Armando el respaldo de la partida…');
+    fbBajarRespaldo().then(toast).catch(err => {
+      console.error('No se pudo armar el respaldo:', err);
+      toast('No se pudo armar el respaldo — mirá la consola');
+    }).finally(() => { b.disabled = false; });
+    return;
+  }
+  if(b.id === 'btn-load'){
+    if(gmVivo.listo && !confirm('Cargar un respaldo reemplaza TODOS los creeps de la mesa por los del archivo (los que no estén en el archivo se borran).\n\n¿Seguís?')) return;
+    $('#file-input').click();
+    return;
+  }
+  if(b.id === 'btn-ia'){ $('#ia-prompt').value = ''; poblarSelectorModelos(); $('#scrim-ia').classList.add('open'); $('#ia-prompt').focus(); return; }
+  if(b.id === 'ia-x'){ $('#scrim-ia').classList.remove('open'); return; }
+  if(b.id === 'ia-token'){ if(orKey(true)) toast('Clave de OpenRouter actualizada'); return; }
+  if(b.id === 'ia-generar'){ generarCreepIA($('#ia-prompt').value.trim()); return; }
+});
+

@@ -946,7 +946,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/asistente-zona.js"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js?v=20260930a"></script>
-<script src="../comun/duelo.js?v=20260930f"></script>
+<script src="../comun/duelo.js?v=20261001a"></script>
 <script src="../comun/mensajes-mapa.js?v=20261001a"></script>
 <script>
 /* =========================================================
@@ -9328,7 +9328,7 @@ function bnPreguntarTipoAtaque(arma){
   bn.raiz.querySelector('#bn-tipo-lista').innerHTML = `<div class="hint">${arma ? esc(arma.nombre) : 'Sin arma'}</div>
     <button class="btn" data-bn-tipo="normal:${id}" style="width:100%">⚔ Ataque normal — ${fmt(costoNormal)} No2<br><span class="hint">${primero ? 'primer ataque con esta arma (Tipo ÷ 2)' : 'Tipo completo (ya atacaste con esta arma este turno)'}</span></button>
     <button class="btn" data-bn-tipo="oportunidad:${id}" style="width:100%">🏃 Ataque de oportunidad — ${fmt(especial)} No2<br><span class="hint">siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>
-    <button class="btn" data-bn-tipo="contra:${id}" style="width:100%">↩ Contraataque — ${fmt(especial)} No2<br><span class="hint">tras un Parry; siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>`;
+    <button class="btn" data-bn-tipo="contra:${id}" style="width:100%">↩ Contraataque — ${fmt(especial)} No2<br><span class="hint">solo tras ganar un Parry y un Bloqueo; siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>`;
   bn.raiz.querySelector('#bn-tipo-ataque').classList.add('open');
 }
 function bnAtacar(tipo, armaId){

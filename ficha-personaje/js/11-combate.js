@@ -147,7 +147,7 @@ function preguntarTipoAtaque(arma){
   $('#tipo-ataque-lista').innerHTML = `<div class="hint">${arma ? esc(arma.nombre) : 'Sin arma'}</div>
     <button class="btn" data-tipoataque="normal:${id}" style="width:100%">⚔ Ataque normal — ${fmt(costoNormal)} No2<br><span class="hint">${primero ? 'primer ataque con esta arma (Tipo ÷ 2)' : 'Tipo completo (ya atacaste con esta arma este turno)'}</span></button>
     <button class="btn" data-tipoataque="oportunidad:${id}" style="width:100%">🏃 Ataque de oportunidad — ${fmt(especial)} No2<br><span class="hint">siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>
-    <button class="btn" data-tipoataque="contra:${id}" style="width:100%">↩ Contraataque — ${fmt(especial)} No2<br><span class="hint">tras un Parry; siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>`;
+    <button class="btn" data-tipoataque="contra:${id}" style="width:100%">↩ Contraataque — ${fmt(especial)} No2<br><span class="hint">solo tras ganar un Parry y un Bloqueo; siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>`;
   $('#scrim-tipo-ataque').classList.add('open');
 }
 $('#tipo-ataque-x').onclick = () => $('#scrim-tipo-ataque').classList.remove('open');

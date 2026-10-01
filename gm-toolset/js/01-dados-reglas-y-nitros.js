@@ -787,7 +787,7 @@ function preguntarTipoAtaqueCreep(sc){
   $('#tipo-ataque-creep-lista').innerHTML = `<div class="hint">${esc(sc.nombre)}</div>
     <button class="btn" data-tipoataquecreep="normal:${sc.id}" style="width:100%">⚔ Ataque normal — ${fmt(normal)} No2<br><span class="hint">${primero ? 'primer ataque del turno (Tipo ÷ 2)' : 'Tipo completo (ya atacó este turno)'}</span></button>
     <button class="btn" data-tipoataquecreep="oportunidad:${sc.id}" style="width:100%">🏃 Ataque de oportunidad — ${fmt(especial)} No2<br><span class="hint">siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>
-    <button class="btn" data-tipoataquecreep="contra:${sc.id}" style="width:100%">↩ Contraataque — ${fmt(especial)} No2<br><span class="hint">tras un Parry; siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>`;
+    <button class="btn" data-tipoataquecreep="contra:${sc.id}" style="width:100%">↩ Contraataque — ${fmt(especial)} No2<br><span class="hint">solo tras ganar un Parry y un Bloqueo; siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>`;
   $('#scrim-tipo-ataque-creep').classList.add('open');
 }
 function costoAtaqueCreep(sc){ return Combatiente.costoAtaque(num(sc.armaTipo) || 8, sc.ataquesTurno); }   // regla común (comun/combatiente.js)

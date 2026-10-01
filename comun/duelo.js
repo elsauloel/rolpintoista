@@ -1240,9 +1240,17 @@ const Duelo = (() => {
       caja = `<div class="duelo-veredicto mitad${nuevo}"><div class="grande">⚠ PASA LA MITAD</div><div class="chico">Paró el golpe pero no lo frenó del todo: pasa la mitad del daño (redondeada para arriba)</div>
         <div class="duelo-motivo">🔧 ${_esc(item)} pierde 1 punto de durabilidad${d.dano && d.dano.desgaste ? ' <span style="font-weight:400">(ya se le descontó en su ficha)</span>' : ''}</div>${mot}</div>`;
     }else return '';
+    // Contraataque (regla del dueño, 2026-10-01, P139): solo después de un Parry Y un Bloqueo exitosos — eso es «bloqueado». El paso
+    // siguiente es una pregunta, Sí o No: con Sí se abre un duelo nuevo con los papeles al revés (quien defendía ataca). `contra`:
+    // el id de ese duelo, 'no' si decidió no contraatacar, vacío mientras decide.
     let contra = '';
-    if(d.resultado === 'bloqueado' && !d.contra && esMio(d.defensor)) contra = `<div class="duelo-contra"><button type="button" data-contra>⚔ Contraatacar</button></div>`;
-    else if(d.resultado === 'bloqueado' && !d.contra && soyGM()) contra = `<div class="duelo-contra"><button type="button" data-contra>⚔ Contraatacar (por ${_esc(d.defensor.nombre)})</button></div>`;
+    if(d.resultado === 'bloqueado' && !d.contra){
+      const propio = esMio(d.defensor);
+      if(propio || soyGM()) contra = `<div class="duelo-contra"><div class="duelo-nota" style="margin-bottom:8px">⚔ ${propio ? 'Ganaste' : _esc(d.defensor.nombre) + ' ganó'} el Parry y el Bloqueo: <b>¿${propio ? 'contraatacás' : 'contraataca'} a ${_esc(d.atacante.nombre)}?</b><br><span style="opacity:.8">Cuesta lo de un primer ataque con su arma y se abre un duelo nuevo con los papeles al revés.</span></div>`
+        + `<button type="button" data-contra>Sí, contraatacar${propio ? '' : ' (por ' + _esc(d.defensor.nombre) + ')'}</button> <button type="button" class="sec" data-contra-no>No</button></div>`;
+      else contra = `<div class="duelo-mini">⚔ ${_esc(d.defensor.nombre)} puede contraatacar: está decidiendo…</div>`;
+    }
+    else if(d.contra === 'no') contra = `<div class="duelo-mini">${_esc(d.defensor.nombre)} decidió no contraatacar</div>`;
     else if(d.contra) contra = `<div class="duelo-mini">⚔ ${_esc(d.defensor.nombre)} contraatacó: hay otro duelo abierto</div>`;
     return caja + contra;
   }
@@ -1637,6 +1645,11 @@ const Duelo = (() => {
     if(bfin){ bfin.onclick = cerrar; if(nuevoFin){ try{ bfin.scrollIntoView({behavior: 'smooth', block: 'nearest'}); }catch(err){} } }
     const bcon = f.querySelector('[data-contra]');
     if(bcon) bcon.onclick = () => { bcon.disabled = true; enviar(d.defensor, {tipo: 'duelo-contra', id: d.id}); };
+    const bconNo = f.querySelector('[data-contra-no]');
+    if(bconNo) bconNo.onclick = () => {
+      bconNo.disabled = true;
+      col().doc(d.id).update({contra: 'no'}).catch(err => { console.error('Duelo: no se pudo anotar «no contraatacar»', err); bconNo.disabled = false; _toast('No se pudo anotar la respuesta: probá de nuevo'); });
+    };
   }
 
   /* ---------- las tiradas: lo que corre en la página del dueño (iframe del mapa o página suelta) ---------- */

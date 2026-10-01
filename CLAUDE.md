@@ -24,7 +24,7 @@
 > motor de reglas para personajes, invocaciones y creeps, con la ficha, GM Tools y el mapa como ventanas. Se lleva adelante
 > de a un paso, pausable. Antes y después de cada paso: [`comun/pruebas.html`](comun/pruebas.html) en verde y las
 > [`docs/pruebas-de-humo.md`](docs/pruebas-de-humo.md). **Dónde quedó (2026-10-01)**: paso 4, etapa 3 (la Botonera la dibuja
-> el mapa): 3a–3c terminadas, la 3d espera decisiones del dueño — leer la sección **"▶ Para retomar"** de [`docs/plan-paso4-etapa3.md`](docs/plan-paso4-etapa3.md) antes de seguir.
+> el mapa): 3a–3c terminadas; 3d en curso (⚗ ya disponible para todos, falta probarla en una sesión real) — leer la sección **"▶ Para retomar"** de [`docs/plan-paso4-etapa3.md`](docs/plan-paso4-etapa3.md) antes de seguir.
 >
 > **Tareas pendientes → [`docs/pendientes.md`](docs/pendientes.md)** (lista viva para ir tachando; las decisiones de diseño
 > siguen en `preguntas-abiertas.md`). Al terminar o descubrir una tarea, actualizarla ahí.

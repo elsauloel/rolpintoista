@@ -2,7 +2,7 @@
 
 > Parte de [`plan-paso4.md`](plan-paso4.md) y de [`plan-consolidacion.md`](plan-consolidacion.md). Escrito el 2026-10-01,
 > después de terminar el nivel B del paso 5 (áreas 1 a 4, ver [`plan-paso5.md`](plan-paso5.md)). **Estado: en curso** —
-> 3a, 3b y 3c hechas; la 3d espera decisiones del dueño (ver "Para retomar" justo abajo y "Cómo va" al final). Preguntas del dueño:
+> 3a, 3b y 3c hechas; la 3d en curso (falta probarla en una sesión real) (ver "Para retomar" justo abajo y "Cómo va" al final). Preguntas del dueño:
 > contestadas.
 
 ## ▶ Para retomar (al cierre de la conversación del 2026-10-01, tarde)
@@ -22,14 +22,19 @@ Todo lo que hace vive en `comun/ficha-acciones.js` y `comun/ficha-duelo.js` (la 
 consumibles y Ankh a mano), **la Botonera nueva no le pide ningún botón a la ficha escondida**. Lo único que sigue yendo al
 marco, a propósito, es el **editor** (Editar del Ver, mensaje `editar-en-ficha`).
 
-**Lo próximo — 3d, y antes, decisiones del dueño** (no es código para hacer a ciegas: toca a los jugadores de verdad):
-1. **Probarla en una partida de verdad**: hoy solo la ve el GM con ⚗. Opciones: que el GM la use un rato con 🎮 el control de
-   un personaje en una sesión real, o abrir el interruptor ⚗ a los jugadores (opt-in, cada uno en su navegador).
-2. **Qué hace "Editar"** cuando el marco ya no se cargue para la Botonera: abrir la ficha en otra pestaña (simple) o mudar los
-   editores al mapa (grande).
-3. Recién con eso, 3d: la Botonera nueva pasa a ser la de todos. **El marco no desaparece**: lo siguen usando Equipo y mochila
-   (🛡), los Despojos, la Tienda, la Moneda Re-Roll fija, Revivir, la ficha liviana (F), la Botonera de las **invocaciones**, el
-   Mantenimiento en segundo plano y los ganchos del duelo de las invocaciones. Solo deja de cargarse para abrir la Botonera.
+**3d en curso — decidido por el dueño (P140, 2026-10-01): las dos propuestas.** Hecho ya en el código (07b021f): el
+interruptor **⚗ Botonera nueva lo ve cualquiera de la partida** (opt-in, cada uno en su navegador) y **Editar carga la ficha
+escondida recién al tocarlo** (abrir la Botonera nueva ya no la precarga). Lo que sigue:
+1. **El dueño la prueba como GM en una sesión real** (⚗ prendido, 🎮 el control de un personaje) — es de él, no hay código.
+   Qué mirar: que abra rápido con B o el ⚡ del token; atacar y defenderse en un duelo de verdad (las tiradas que pide el duelo
+   las contesta el mapa); una habilidad ✨ con objetivo; consumir algo; la 🔍 y el Ver; que la ficha del jugador (en su pantalla)
+   se actualice sola; y que **si algo falla, apagar ⚗ vuelve todo a la de siempre**.
+2. Si anda, que la prenda el jugador que quiera. Avisar que el ⚗ existe y que se apaga si algo no anda.
+3. Con eso probado en varias sesiones, **la Botonera nueva pasa a ser la de todos** (prendida por defecto, y después sacar el
+   interruptor). **El marco no desaparece**: lo siguen usando Equipo y mochila (🛡), los Despojos, la Tienda, la Moneda Re-Roll
+   fija, Revivir, la ficha liviana (F), la Botonera de las **invocaciones**, el Mantenimiento en segundo plano, los ganchos del
+   duelo de las invocaciones y el Editar del Ver. Solo deja de cargarse para abrir la Botonera del personaje.
+4. Después (fuera de esta etapa): las Acciones de los creeps del GM y la Botonera de las invocaciones, con el mismo método.
 
 **Dónde probar** (2026-10-01): con Chrome logueado como `elsaulo@gmail.com`, la partida **"Test con claude elsaulo"** (ahí esa
 cuenta es el GM, "S.Claude"); el jugador es "Sujeto de pruebas" con **Silvia Suller** (Cimitarra + Broquel de bronce, 20 HP,
@@ -377,3 +382,11 @@ siga necesitándolo (ver pregunta 4). La ficha suelta (`ficha.html`) no cambia: 
   gastó el ítem y 2 No2 (de la mochila); el Ankh la revivió con 5 HP (25 % de 20) — todo sin mensajes al marco y con la ficha de
   la otra pestaña al día. Todo restaurado (trampa borrada del mapa, Silvia con 20 HP y 6 No2, sin los ítems de prueba ni el
   control); ⚗ apagado. **La 3c quedó terminada**; la 3d espera las decisiones del dueño (ver "Para retomar").
+- 2026-10-01: **P140 decidida (las dos propuestas) — empieza la 3d**. En el mapa: `bnActiva()` ya no exige ser GM y el botón ⚗
+  aparece para cualquiera de la partida (opt-in por navegador; con él apagado no cambia nada); los ganchos del duelo del mapa
+  (`bnHooksDuelo`) siguen el mismo interruptor. `abrirBotoneraNueva` ya no precarga la ficha en el marco: el Editar del Ver la
+  carga sola con el pedido pendiente (`bnAlMarco`) y avisa "Abriendo el editor de la ficha…". La precarga general del mapa
+  (`precargarMarco`) sigue igual, para todo lo demás que usa el marco. **En vivo** (como GM, 🎮 Silvia): el marco tenía GM Tools
+  precargado; abrir la Botonera nueva no lo cambió; Editar en el Ver de una habilidad cargó la ficha de Silvia y abrió "Editar
+  habilidad". Todo como estaba (⚗ apagado, Silvia sin el control). Falta: que el dueño la pruebe en una sesión real (ver "Para
+  retomar"). No se probó con una cuenta de jugador (no hay una a mano): el camino es el mismo, con `bnPuedeGuardar` por ser el dueño.

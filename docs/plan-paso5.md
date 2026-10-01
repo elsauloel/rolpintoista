@@ -93,3 +93,19 @@ etapa 3 del paso 4 (el mapa dibuja la Botonera) es armar la pantalla con esas pi
   invocaciones no hacen ninguna de las dos cosas. No se tocó ninguna de las tres implementaciones — es la pregunta
   para el dueño antes de seguir unificándolas. Sigue el resto de la habilidad que ejecuta (`ejecutarHabilidad`,
   `confirmarCostoVariable`, el cuadro de Ejecución) y, después, el área 4 (guardar/leer la ficha de Firebase).
+- 2026-10-01: **nivel B, área 4 hecha — guardar y leer la ficha** (`comun/ficha-guardado.js`, `FichaGuardado`). Sin
+  preguntas de diseño (ninguna regla cambia). Se mudaron, copiados tal cual: **el personaje en blanco** (`DEFAULT`) y
+  **las migraciones** que ponen al día una ficha vieja (Iteración 2: Bonos → SP y Acciones/Movimiento → No2;
+  Inteligencia → Especial; escala de Tipos +2), **la mezcla con el personaje en blanco** que hacía `aplicarFicha` antes de
+  dibujar (`normalizar`) y lo que `renderAll` completaba (`completar`: migraciones repetibles y No2 llenos), y **las
+  partes de Firebase** (`PARTES`, `partes`, `leerParte`, `armarDatos`, `aplicarParte`). Nuevo: **`FichaGuardado.leer` /
+  `cargar(db, ruta)`** traen un personaje de Firebase UNA vez, listo para usar, sin la ficha abierta — la pieza que le
+  faltaba al mapa para la etapa 3 del paso 4. La ficha conserva sus nombres como alias y sigue haciendo el guardado en
+  vivo (temporizador, partes sucias, reintento) y la escucha. Comparado contra el código viejo en 400 fichas al azar llenas
+  de formatos viejos (normalizar, completar, partes, armarDatos, aplicarParte: igual); la comparación se probó con
+  errores plantados a propósito (detectó 3 de 4; el cuarto, que los ítems de la biblioteca no viajan en la parte
+  "catálogo", quedó cubierto con una prueba puntual). Pruebas: 113 → 120. De paso: se subieron los `?v=` de los tramos
+  cambiados en las áreas 3 y 4 (en el área 3 había quedado sin hacer). gm-tools tiene su propia copia de las migraciones
+  de Tipos y de Especial para los creeps (con `armaDetalle` de más): no se tocó. **Con las áreas 1–4, el nivel B tiene
+  las piezas que pide la etapa 3 del paso 4** (el mapa dibuja la Botonera); del área 3 queda la parte de pantalla de
+  ejecutar una habilidad (Duelo, Mesa), que se mueve cuando el mapa la necesite.

@@ -759,25 +759,8 @@ function lanzarDueloDeHab(it, hab){
   return true;
 }
 
-function tirarPrimeraDeHab(it){
-  if(habStatTirable(it)){
-    tirarValorStat(`${it.nombre} · ${STAT_LABEL[it.tiradaStat]}`, compute().final[it.tiradaStat] + num(it.tiradaBono), it.tiradaStat);   // tiradaBono: bono fijo de la habilidad al stat (ej. Takle: +1 PdG)
-    return true;
-  }
-  const formula = (it.tiradaExtra || '').trim();
-  if(formula){
-    const r = tirarDados(formula);
-    if(r){ registrarTirada(it.nombre, r); return true; }
-  }
-  return false;
-}
-function tirarSegundaDeHab(id){
-  const it = S.habilidades.find(h => h.id === id);
-  if(!it) return;
-  const r = tirarDados((it.tiradaExtra || '').trim());
-  if(r) registrarTirada(`${it.nombre} · Efecto`, r);
-  else toast('La fórmula de la habilidad no es válida');
-}
+function tirarPrimeraDeHab(it){ return FichaAcciones.tirarPrimeraDeHab(S, it, habUi); }   // comun/ficha-acciones.js
+function tirarSegundaDeHab(id){ FichaAcciones.tirarSegundaDeHab(S, id, habUi); }
 const botonSegundaHab = it => FichaBotonera.botonSegundaHab(it);   // comun/ficha-botonera.js
 
 function restaurarSpDeConsumo(it){ return FichaAcciones.restaurarSpDeConsumo(S, it); }   // comun/ficha-acciones.js

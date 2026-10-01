@@ -54,6 +54,17 @@ const FichaDuelo = (() => {
     return p;
   }
 
+  // Un Flash con el botón Ejecutar, fuera del cuadro del duelo (js/11): la misma regla de costo, se anuncia y el bono se suma a
+  // mano. ui suma mesaHabilidad(nombre, detalle) y cambio(['habilidades']).
+  async function usarFlashFueraDelDuelo(S, it, ui){
+    const p = await pagarFlash(S, it, ui);
+    if(!p) return;
+    const f = FichaBotonera.dueloDe(it).flash || {};
+    ui.mesaHabilidad(it.nombre, `${it.detalle || ''}${it.detalle ? ' — ' : ''}⚡ Flash: +${fmt(num(f.bono))} a la tirada.`);
+    ui.cambio(['habilidades']);
+    ui.toast(`${it.nombre}: ⚡ +${fmt(num(f.bono))} (sumalo a mano a la tirada; dentro del duelo se suma solo) · ${ConfirmarTurno.textoCosto(p)}`);
+  }
+
   /* ---------- Los ganchos del duelo para un personaje (js/11, DUELO_HOOKS: lo que no es de invocaciones) ---------- */
   function hooks(getS, ui){
     const tirarValorStat = (nombre, valor, statId, extra, sobrepeso, sobre) => FichaAcciones.tirarValorStat(getS(), nombre, valor, statId, extra, sobrepeso, sobre, ui);
@@ -211,5 +222,5 @@ const FichaDuelo = (() => {
     };
   }
 
-  return {esMonedaReroll, monedaReroll, tirarMonedaReroll, costoFlashDe, pagarFlash, hooks};
+  return {esMonedaReroll, monedaReroll, tirarMonedaReroll, costoFlashDe, pagarFlash, usarFlashFueraDelDuelo, hooks};
 })();

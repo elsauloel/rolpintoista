@@ -726,6 +726,40 @@ prueba('un Flash del duelo cobra sus SP al usarlo y devuelve su bono', async () 
   }finally{ ConfirmarTurno.flash = viejo; }
 });
 
+grupo('Habilidades (comun/ficha-acciones.js, paso 5a)');
+const uiHab = (reg, extra) => ({...uiCombate(reg, {}), mesaHabilidad: (n, d) => reg.push(`mesa ${n}`), fijarHp: () => {}, efecto: () => null,
+  colocarTrampa: () => {}, avisarZona: () => {}, terminar: it => reg.push(`terminar ${it.nombre}`), flashFuera: it => reg.push(`flash ${it.nombre}`),
+  elegirArmaHab: (it, ops) => reg.push(`elegir arma: ${ops.length}`), pedirCostoX: (it, arma) => reg.push(`costo X ${it.nombre}`), cerrarCostoX: () => reg.push('cerrar X'), ...(extra || {})});
+prueba('una habilidad manual solo se anuncia: no cobra nada', async () => {
+  const S = fichaBotonera({nitros: 5, spGastado: 0, habilidades: [{id: 'm', nombre: 'Grito', modo: 'manual', costo: '3', nitrosCosto: 2, detalle: 'asusta'}]}), reg = [];
+  await FichaAcciones.ejecutarHabilidad(S, 'm', undefined, false, uiHab(reg));
+  igual([reg, S.nitros, S.spGastado], [['mesa Grito', 'Grito anunciada'], 5, 0]);
+});
+prueba('una semiautomática cobra SP y No2 y sigue (anunciar y tirar)', async () => {
+  const S = fichaBotonera({nitros: 5, spGastado: 0, habilidades: [{id: 's', nombre: 'Golpe', modo: 'semi', costo: '2', nitrosCosto: 1}]}), reg = [];
+  await FichaAcciones.ejecutarHabilidad(S, 's', undefined, false, uiHab(reg));
+  igual([S.nitros, S.spGastado, reg.includes('terminar Golpe')], [4, 2, true]);
+});
+prueba('costo X: abre el cartel sin cobrar; al confirmar cobra lo elegido', async () => {
+  const S = fichaBotonera({nitros: 5, spGastado: 0, habilidades: [{id: 'x', nombre: 'Rayo', modo: 'semi', costo: 'X', nitrosCosto: 1}]}), reg = [];
+  await FichaAcciones.ejecutarHabilidad(S, 'x', undefined, false, uiHab(reg));
+  const antes = [S.nitros, S.spGastado];
+  const neg = FichaAcciones.confirmarCostoVariable(S, S.habilidades[0], -1, 1, null, uiHab(reg));
+  const ok = FichaAcciones.confirmarCostoVariable(S, S.habilidades[0], 3, 1, null, uiHab(reg));
+  igual([reg[0], antes, neg, ok, S.nitros, S.spGastado], ['costo X Rayo', [5, 0], false, true, 4, 3]);
+});
+prueba('cuesta como un ataque: con dos armas pregunta con cuál', async () => {
+  const S = fichaBotonera({nitros: 9, inventario: [espada, {...espada, id: 'esp2', nombre: 'Daga'}], habilidades: [{id: 'a', nombre: 'Tajo', modo: 'semi', costo: '0', nitrosCosto: 'ATAQUE'}]}), reg = [];
+  await FichaAcciones.ejecutarHabilidad(S, 'a', undefined, false, uiHab(reg));
+  igual([reg, S.nitros], [['elegir arma: 2'], 9]);
+});
+prueba('sin No2 avisa antes de cobrar; la segunda tirada tira la fórmula', async () => {
+  const S = fichaBotonera({nitros: 0, habilidades: [{id: 's', nombre: 'Golpe', modo: 'semi', costo: '0', nitrosCosto: 2, tiradaExtra: '2d6'}]}), reg = [];
+  await FichaAcciones.ejecutarHabilidad(S, 's', undefined, false, uiHab(reg));
+  FichaAcciones.tirarSegundaDeHab(S, 's', uiHab(reg));
+  igual([reg[0], reg[1], S.nitros], ['sin No2: usar Golpe', '🎲 Golpe · Efecto', 0]);
+});
+
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */
 grupo('Mis últimas tiradas (P138)');
 prueba('se juntan las de la Mesa con las de esta ventana, sin repetir, las últimas primero', () => {

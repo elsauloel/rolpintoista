@@ -9123,8 +9123,8 @@ function abrirBotoneraPrincipal(){
    no están (la lupa vive en la ficha: etapa 3c). Las piezas se cargan recién al usarla: para los jugadores no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001b',
-  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001d',
-  '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001a'];
+  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001e',
+  '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
 var bnCss = '';
@@ -9377,8 +9377,73 @@ function bnCombateAca(b){
   else FichaAcciones.elegirArmaDefensa(S, a === 'fuerzagolpe' ? 'fuerza' : a, ui);
   return true;
 }
+/* Paso 3c-5a: las habilidades. El mapa hace él mismo las 📣 manuales (Anunciar), las 💰 semiautomáticas (cobra y tira la primera
+   tirada), el ⚡ Flash fuera del duelo, el costo X y la 🎲 segunda tirada, con el mismo código que la ficha
+   (comun/ficha-acciones.js). Las ✨ automáticas (abren la Ejecución paso a paso: paso 5b) y las que colocan una trampa, una zona o
+   un portal (paso 5c) se le siguen pidiendo a la ficha escondida. */
+function bnHabAca(it){
+  if(!it) return false;
+  const modo = FichaBotonera.modoHab(it);
+  if(modo === 'manual') return true;
+  if(Combatiente.tipoEjecucion(FichaBotonera.dueloDe(it)) === 'flash') return true;
+  if(modo === 'auto') return false;
+  return !(it.trampaColocar || it.zonaMapa || it.portalMapa);
+}
+// La línea de una habilidad en la Mesa, a nombre del personaje (como mesaPublicarHabilidad de la ficha).
+function bnMesaHabilidad(nombre, detalle){
+  if(!fbDb || !fbUsuario || !fbMiembro) return;
+  fbDb.collection(fbRutaCampana('tiradas')).add({
+    uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: ((bn.S.meta && bn.S.meta.nombre) || '').trim(),
+    origen: String(nombre || 'Habilidad').slice(0, 80),
+    formula: String(detalle || '').slice(0, 300),
+    rolls: [], mod: 0, total: 0, desde: 'habilidad',
+    cuando: firebase.firestore.FieldValue.serverTimestamp(),
+  }).catch(err => console.error('No se pudo publicar la habilidad en la Mesa:', err));
+}
+var bnCostoX = null;   // {id, arma} de la habilidad cuyo costo X se está eligiendo
+function bnHabUi(){
+  const base = bnCombateUi();
+  const ui = {...base,
+    mesaHabilidad: (nombre, detalle) => bnMesaHabilidad(nombre, detalle),
+    fijarHp: v => FichaAcciones.fijarHp(bn.S, v),   // el Ankh y la muerte los revisa ui.cambio (bnRevisarVida)
+    efecto: it => FichaAcciones.efectoDeConsumo(bn.S, it, base.presets, t => toast(t)),
+    colocarTrampa: () => {}, avisarZona: () => {},   // no llegan: bnHabAca deja esas habilidades a la ficha
+    terminar: it => { FichaAcciones.anunciarHabilidad(bn.S, it, ui); FichaAcciones.tirarPrimeraDeHab(bn.S, it, ui); },   // 💰 semi
+    flashFuera: it => FichaDuelo.usarFlashFueraDelDuelo(bn.S, it, ui),
+    elegirArmaHab: (it, opciones) => {
+      bn.raiz.querySelector('#bn-arma-lista').innerHTML = `<div class="hint">${esc(it.nombre)}: cuesta lo mismo que un ataque con el arma que elijas, y cuenta como ese ataque.</div>` +
+        opciones.map(o => `<button class="btn" data-bn-habarma="${esc(it.id)}:${esc(o.arma.id)}" style="width:100%">${o.mano ? `Mano ${o.mano}: ` : ''}${esc(o.arma.nombre)} — ${fmt(FichaCombate.costoAtaque(bn.S, o.arma))} No2${FichaCombate.ataquesConArma(bn.S, o.arma) ? '' : ' (primer ataque)'}${FichaCombate.costoAtaque(bn.S, o.arma) > num(bn.S.nitros) ? ' · no te alcanza' : ''}</button>`).join('');
+      bn.raiz.querySelector('#bn-elegir-arma').classList.add('open');
+    },
+    pedirCostoX: (it, armaPend) => {
+      const S = bn.S, arma = armaPend === undefined ? null : armaPend, r = bn.raiz;
+      bnCostoX = {id: it.id, arma};
+      r.querySelector('#bn-cx-nombre').textContent = it.nombre + (FichaHabilidades.nitrosAtaque(it) ? ` · con ${arma ? arma.nombre : 'sin arma'}` : '');
+      // Lo que es X se elige; lo fijo se muestra y no se puede cambiar.
+      const campoSp = r.querySelector('#bn-cx-sp'), campoNitros = r.querySelector('#bn-cx-nitros');
+      campoSp.value = FichaHabilidades.spVariable(it) ? 0 : FichaHabilidades.parseCostoSp(it.costo);
+      campoSp.disabled = !FichaHabilidades.spVariable(it);
+      campoNitros.value = FichaHabilidades.nitrosVariable(it) ? Math.min(num(S.nitros), 1) : FichaBotonera.costoNitrosHab(S, it, arma);
+      campoNitros.disabled = !FichaHabilidades.nitrosVariable(it);
+      r.querySelector('#bn-cx-disp').textContent = `${fmt(num(S.nitros))} No2 y ${fmt(FichaBotonera.spMaximo(S) - num(S.spGastado))} SP`;
+      const limN = FichaAcciones.limiteCostoX(S, 'nitros'), limS = FichaAcciones.limiteCostoX(S, 'sp');
+      r.querySelector('#bn-cx-limite').textContent = (limN === null || limS === null) ? '⚠ Tope de X sin definir: por ahora solo te frena lo que tengas.' : '';
+      r.querySelector('#bn-costox').classList.add('open');
+      if(FichaHabilidades.nitrosVariable(it) && !FichaHabilidades.spVariable(it)) setTimeout(() => campoNitros.select(), 50);
+    },
+    cerrarCostoX: () => { bnCostoX = null; bn.raiz.querySelector('#bn-costox').classList.remove('open'); },
+  };
+  return ui;
+}
 function bnAccionAca(b){
   if(bnCombateAca(b)) return true;
+  if(b.dataset.danohab){ FichaAcciones.tirarSegundaDeHab(bn.S, b.dataset.danohab, bnHabUi()); return true; }
+  if(b.dataset.ejecutar){
+    const it = (bn.S.habilidades || []).find(h => h.id === b.dataset.ejecutar);
+    if(!bnHabAca(it) || !bnPuedeGuardar()) return false;
+    FichaAcciones.ejecutarHabilidad(bn.S, it.id, undefined, false, bnHabUi());
+    return true;
+  }
   let accion = b.dataset.sigilo ? 'sigilo' : b.dataset.levantarse ? 'levantarse' : b.dataset.consume ? 'consumir' : '';
   if(accion === 'consumir'){
     // Una trampa consumible se coloca junto al token con el código de la ficha: por ahora se le sigue pidiendo a ella.
@@ -9420,11 +9485,25 @@ function bnCrear(){
       <header><h3>¿Qué ataque es?</h3><button class="iconbtn" data-bn-tipo="no">Cerrar</button></header>
       <div class="body" id="bn-tipo-lista" style="display:flex;flex-direction:column;gap:9px"></div>
     </div></div>
+    <div class="scrim" id="bn-costox"><div class="modal" style="max-width:380px">
+      <header><h3>Costo variable</h3><button class="iconbtn" data-bn-cx="no">Cerrar</button></header>
+      <div class="body" style="display:flex;flex-direction:column;gap:12px">
+        <div class="hint" id="bn-cx-nombre" style="font-size:14px;color:var(--paper);font-family:'Fraunces',serif;font-weight:700"></div>
+        <div class="f2">
+          <div class="f"><label>SP a gastar</label><input type="number" id="bn-cx-sp" value="0" min="0"></div>
+          <div class="f"><label>Nitros a gastar</label><input type="number" id="bn-cx-nitros" value="1" min="0"></div>
+        </div>
+        <div class="hint">Tenés <span id="bn-cx-disp"></span> disponibles ahora mismo.</div>
+        <div class="hint" id="bn-cx-limite"></div>
+      </div>
+      <footer><button class="btn ghost" data-bn-cx="no">Cancelar</button><button class="btn primary" data-bn-cx="si">Ejecutar</button></footer>
+    </div></div>
     <div class="scrim" id="bn-elegir-arma"><div class="modal" style="max-width:320px">
       <header><h3>¿Con qué arma?</h3><button class="iconbtn" data-bn-arma="no">Cerrar</button></header>
       <div class="body" id="bn-arma-lista" style="display:flex;flex-direction:column;gap:9px"></div>
     </div></div>`;
   raiz.querySelector('#bn-sin-nitros').addEventListener('mousedown', e => { if(e.target.id === 'bn-sin-nitros') bnCerrarSinNitros(); });
+  raiz.querySelector('#bn-costox').addEventListener('mousedown', e => { if(e.target.id === 'bn-costox'){ bnCostoX = null; e.target.classList.remove('open'); } });
   ['bn-sobrepeso', 'bn-elegir-arma', 'bn-tipo-ataque'].forEach(id => raiz.querySelector('#' + id).addEventListener('mousedown', e => { if(e.target.id === id){ e.target.classList.remove('open'); if(id === 'bn-sobrepeso') bnSobrepeso = null; } }));
   raiz.addEventListener('click', e => {
     const b = e.target.closest('button');
@@ -9444,6 +9523,20 @@ function bnCrear(){
       if(b.dataset.bnTipo === 'no') return;
       const [tipo, armaId] = b.dataset.bnTipo.split(':');
       bnAtacar(tipo, armaId);
+      return;
+    }
+    if(b.dataset.bnCx){
+      const c = bnCostoX;
+      if(b.dataset.bnCx === 'no' || !c){ bnCostoX = null; raiz.querySelector('#bn-costox').classList.remove('open'); return; }
+      const it = (bn.S.habilidades || []).find(h => h.id === c.id);
+      if(!it){ bnCostoX = null; raiz.querySelector('#bn-costox').classList.remove('open'); return; }
+      FichaAcciones.confirmarCostoVariable(bn.S, it, num(raiz.querySelector('#bn-cx-sp').value), num(raiz.querySelector('#bn-cx-nitros').value), c.arma, bnHabUi());
+      return;
+    }
+    if(b.dataset.bnHabarma){
+      raiz.querySelector('#bn-elegir-arma').classList.remove('open');
+      const [habId, armaId] = b.dataset.bnHabarma.split(':');
+      FichaAcciones.ejecutarHabilidad(bn.S, habId, armaId, false, bnHabUi());
       return;
     }
     if(b.dataset.bnArma){

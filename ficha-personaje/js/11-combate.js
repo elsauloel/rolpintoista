@@ -184,6 +184,50 @@ const dueloUi = {...combateUi,
   fijarHp: v => fijarHp(v),
 };
 const dueloPj = FichaDuelo.hooks(() => S, dueloUi);
+// Ejecutar una habilidad (paso 3c-5a): la regla en comun/ficha-acciones.js; acá lo que se ve y lo que todavía hace solo la ficha
+// (trampa, zona, la Ejecución paso a paso).
+const habUi = {...combateUi,
+  cambio: lista => lista.forEach(k => {
+    if(k === 'habilidades' || k === 'efectos') renderList(k);
+    else combateUi.cambio([k]);
+  }),
+  mesaHabilidad: (nombre, detalle) => mesaPublicarHabilidad(nombre, detalle),
+  fijarHp: v => fijarHp(v),
+  efecto: it => aplicarEfectoDeConsumo(it),
+  colocarTrampa: it => colocarTrampaDeHab(it),
+  avisarZona: it => avisarZonaAlMapa(it),
+  terminar: (it, arma, xSp, xNitros) => terminarEjecucionHab(it, arma, xSp, xNitros),
+  flashFuera: it => usarFlashFueraDelDuelo(it),
+  elegirArmaHab: (it, opciones) => {
+    $('#elegir-arma-lista').innerHTML =
+      `<div class="hint">${esc(it.nombre)}: cuesta lo mismo que un ataque con el arma que elijas, y cuenta como ese ataque.</div>` +
+      opciones.map(o => `
+      <button class="btn" data-habarma="${esc(it.id)}:${esc(o.arma.id)}" style="width:100%">
+        ${o.mano ? `Mano ${o.mano}: ` : ''}${esc(o.arma.nombre)} — ${fmt(costoAtaqueNitros(o.arma))} No2${ataquesConArma(o.arma) ? '' : ' (primer ataque)'}${costoAtaqueNitros(o.arma) > num(S.nitros) ? ' · no te alcanza' : ''}
+      </button>`).join('');
+    $('#scrim-elegir-arma').classList.add('open');
+  },
+  pedirCostoX: (it, armaPend) => {
+    pendingArmaHab = armaPend;
+    const arma = armaPend === undefined ? null : armaPend;
+    pendingEjecucion = it.id;
+    $("#costox-nombre").textContent = it.nombre + (nitrosAtaque(it) ? ` · con ${arma ? arma.nombre : 'sin arma'}` : '');
+    // Lo que es X se elige; lo fijo se muestra y no se puede cambiar.
+    const campoSp = $("#f-costox-sp"), campoNitros = $("#f-costox-nitros");
+    campoSp.value = spVariable(it) ? 0 : parseCostoSp(it.costo);
+    campoSp.disabled = !spVariable(it);
+    campoNitros.value = nitrosVariable(it) ? Math.min(num(S.nitros), 1) : costoNitrosHab(it, arma);
+    campoNitros.disabled = !nitrosVariable(it);
+    if(nitrosVariable(it) && !spVariable(it)) setTimeout(() => campoNitros.select(), 50);
+    $('#costox-disponibles').textContent = `${fmt(num(S.nitros))} No2 y ${fmt(spMaximo() - num(S.spGastado))} SP`;
+    const limN = limiteCostoX('nitros'), limS = limiteCostoX('sp');
+    $('#costox-limite').innerHTML = (limN === null || limS === null)
+      ? `${IT2_PENDIENTE('el tope de X todavía no está confirmado')} Tope de X sin definir: por ahora solo te frena lo que tengas.`
+      : '';
+    $('#scrim-costox').classList.add('open');
+  },
+  cerrarCostoX: () => { $("#scrim-costox").classList.remove("open"); pendingEjecucion = null; },
+};
 window.DUELO_HOOKS = {
   soy: lado => {
     if(!(lado && lado.tipo === 'pj' && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM)) return false;
@@ -635,10 +679,7 @@ function esCostoVariable(costo){
 }
 
 // Tope de X en costos variables. PLACEHOLDER: ver IT2.limiteXNitros/limiteXSp.
-function limiteCostoX(cual){
-  const f = cual === 'sp' ? IT2.limiteXSp : IT2.limiteXNitros;
-  return typeof f === 'function' ? f(compute()) : null;
-}
+function limiteCostoX(cual){ return FichaAcciones.limiteCostoX(S, cual); }   // comun/ficha-acciones.js
 
 // Habilidades con costo de Nitros "ATAQUE": cuestan lo mismo que un ataque
 // con el arma que se elige al ejecutarlas y cuentan como ese ataque.
@@ -655,148 +696,22 @@ function costoAtaqueHabTxt(){ return FichaBotonera.costoAtaqueHabTxt(S); }
 const costoFlashDe = FichaDuelo.costoFlashDe;   // comun/ficha-duelo.js
 function pagarFlash(h){ return FichaDuelo.pagarFlash(S, h, dueloUi); }
 // Un Flash con el botón Ejecutar, fuera del cuadro del duelo: la misma regla de costo, se anuncia y el bono se suma a mano.
-async function usarFlashFueraDelDuelo(it){
-  const p = await pagarFlash(it);
-  if(!p) return;
-  const f = dueloDe(it).flash || {};
-  mesaPublicarHabilidad(it.nombre, `${it.detalle || ''}${it.detalle ? ' — ' : ''}⚡ Flash: +${fmt(num(f.bono))} a la tirada.`);
-  renderList('habilidades');
-  toast(`${it.nombre}: ⚡ +${fmt(num(f.bono))} (sumalo a mano a la tirada; dentro del duelo se suma solo) · ${ConfirmarTurno.textoCosto(p)}`);
-}
-async function ejecutarHabilidad(id, armaId, forzar){
-  const it = S.habilidades.find(h => h.id === id);
-  if(!it) return;
-  // 📣 Manual: "Anunciar" solo publica la descripción en la Mesa.
-  if(modoHab(it) === 'manual'){
-    mesaPublicarHabilidad(it.nombre, it.detalle || it.efectoDetalle || '');
-    toast(`${it.nombre} anunciada`);
-    return;
-  }
-  if(Combatiente.tipoEjecucion(dueloDe(it)) === 'flash'){ usarFlashFueraDelDuelo(it); return; }   // ⚡ su propia regla de costo (P136)
-  // Costo en vida: hace falta que sobre vida después de pagarlo.
-  if(num(it.hpCosto) > 0 && num(S.hp) <= num(it.hpCosto)){
-    toast(`No te alcanza la vida — ${it.nombre} cuesta ${fmt(num(it.hpCosto))} HP y tenés ${fmt(num(S.hp))}`);
-    return;
-  }
-  // Con costo de ataque: primero se elige el arma (si hay más de una).
-  let arma = null;
-  if(nitrosAtaque(it)){
-    const opciones = armasParaHabilidad();
-    if(armaId === undefined && opciones.length > 1){
-      $('#elegir-arma-lista').innerHTML =
-        `<div class="hint">${esc(it.nombre)}: cuesta lo mismo que un ataque con el arma que elijas, y cuenta como ese ataque.</div>` +
-        opciones.map(o => `
-        <button class="btn" data-habarma="${esc(it.id)}:${esc(o.arma.id)}" style="width:100%">
-          ${o.mano ? `Mano ${o.mano}: ` : ''}${esc(o.arma.nombre)} — ${fmt(costoAtaqueNitros(o.arma))} No2${ataquesConArma(o.arma) ? '' : ' (primer ataque)'}${costoAtaqueNitros(o.arma) > num(S.nitros) ? ' · no te alcanza' : ''}
-        </button>`).join('');
-      $('#scrim-elegir-arma').classList.add('open');
-      return;
-    }
-    arma = armaId ? (S.inventario.find(x => x.id === armaId) || null) : opciones[0].arma;
-  }
-  pendingArmaHab = nitrosAtaque(it) ? arma : undefined;
-  if(habCostoVariable(it)){
-    pendingEjecucion = id;
-    $("#costox-nombre").textContent = it.nombre + (nitrosAtaque(it) ? ` · con ${arma ? arma.nombre : 'sin arma'}` : '');
-    // Lo que es X se elige; lo fijo se muestra y no se puede cambiar.
-    const campoSp = $("#f-costox-sp"), campoNitros = $("#f-costox-nitros");
-    campoSp.value = spVariable(it) ? 0 : parseCostoSp(it.costo);
-    campoSp.disabled = !spVariable(it);
-    campoNitros.value = nitrosVariable(it) ? Math.min(num(S.nitros), 1) : costoNitrosHab(it, arma);
-    campoNitros.disabled = !nitrosVariable(it);
-    if(nitrosVariable(it) && !spVariable(it)) setTimeout(() => campoNitros.select(), 50);
-    $('#costox-disponibles').textContent = `${fmt(num(S.nitros))} No2 y ${fmt(spMaximo() - num(S.spGastado))} SP`;
-    const limN = limiteCostoX('nitros'), limS = limiteCostoX('sp');
-    $('#costox-limite').innerHTML = (limN === null || limS === null)
-      ? `${IT2_PENDIENTE('el tope de X todavía no está confirmado')} Tope de X sin definir: por ahora solo te frena lo que tengas.`
-      : '';
-    $('#scrim-costox').classList.add('open');
-    return;
-  }
-  const costoNitros = costoNitrosHab(it, arma);
-  if(costoNitros > num(S.nitros) && !forzar){
-    avisarSinNitros(costoNitros, `usar ${it.nombre}${nitrosAtaque(it) ? ` (ataque con ${arma ? arma.nombre : 'sin arma'})` : ''}`, () => ejecutarHabilidad(id, armaId, true));
-    return;
-  }
-  let costoSp = parseCostoSp(it.costo);
-  // Costo distinto en turno ajeno (2026-09-28, pedido del dueño): antes de cobrar nada, un cartelito pregunta.
-  if(String(it.turnoAjenoSp || '').trim() && !spVariable(it)){
-    const elegido = await ConfirmarTurno.pedir(it.nombre, costoSp, num(it.turnoAjenoSp));
-    if(elegido === null) return;   // canceló: no se cobra ni se ejecuta nada
-    costoSp = elegido;
-  }
-  S.nitros = num(S.nitros) - (forzar && costoNitros > num(S.nitros) ? gastoNitrosForzado(costoNitros, `usó ${it.nombre}`) : costoNitros);
-  S.spGastado = num(S.spGastado) + costoSp;
-  const costoHp = num(it.hpCosto);
-  if(costoHp > 0) fijarHp(num(S.hp) - costoHp);
-  const curaHp = num(it.curaHp);
-  if(curaHp > 0) fijarHp(num(S.hp) + curaHp);   // cura sobre uno mismo, sin pasar del máximo
-  const ataque = registrarAtaqueDeHabilidad(it, arma);
-  const efecto = aplicarEfectoDeConsumo(it);
-  colocarTrampaDeHab(it);
-  avisarZonaAlMapa(it);
-  terminarEjecucionHab(it, arma, 0, 0);
-  renderList("habilidades");
-  if(efecto) renderList('efectos');
-  renderNitros();
-  renderVitals();
-  const partes = [`ejecutada`];
-  if(costoSp) partes.push(`-${fmt(costoSp)} SP`);
-  partes.push(costoNitros ? `-${fmt(costoNitros)} No2` : 'sin costo de Nitros');
-  if(costoHp > 0) partes.push(`-${fmt(costoHp)} HP`);
-  if(curaHp > 0) partes.push(`+${fmt(curaHp)} HP`);
-  if(ataque) partes.push(ataque);
-  if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
-  toast(`${it.nombre} ${partes.join(' · ')}`);
-}
+function usarFlashFueraDelDuelo(it){ return FichaDuelo.usarFlashFueraDelDuelo(S, it, habUi); }   // comun/ficha-duelo.js
+// Ejecutar / Anunciar una habilidad (paso 4 etapa 3c-5a, 2026-10-01): la regla vive en comun/ficha-acciones.js (la usa también la
+// Botonera nueva del mapa); acá queda lo que se ve — los carteles de "¿con qué arma?" y del costo X — en habUi.
+function ejecutarHabilidad(id, armaId, forzar){ return FichaAcciones.ejecutarHabilidad(S, id, armaId, forzar, habUi); }
 
 // Si la habilidad cuesta como un ataque, cuenta como ese ataque del arma
 // (el próximo ataque con esa arma ya paga Tipo completo). Devuelve el texto.
-function registrarAtaqueDeHabilidad(it, arma){
-  if(!nitrosAtaque(it)) return '';
-  const primero = FichaCombate.registrarAtaque(S, arma);   // cuenta como ese ataque (comun/ficha-combate.js)
-  return `ataque con ${arma ? arma.nombre : 'sin arma'}${primero ? ' (primero del turno)' : ''}`;
-}
+function registrarAtaqueDeHabilidad(it, arma){ return FichaAcciones.registrarAtaqueDeHabilidad(S, it, arma); }
 
 function confirmarCostoVariable(){
   const it = S.habilidades.find(h => h.id === pendingEjecucion);
   if(!it) return;
   const sp = num($('#f-costox-sp').value);
   const nitros = num($('#f-costox-nitros').value);
-  if(sp < 0 || nitros < 0){
-    toast('Los valores no pueden ser negativos');
-    return;
-  }
-  if(nitros > num(S.nitros)){
-    toast(`No te alcanzan los Nitros — tenés ${fmt(num(S.nitros))}`);
-    return;
-  }
-  const limN = limiteCostoX('nitros'), limS = limiteCostoX('sp');
-  if(limN !== null && nitros > limN){ toast(`Como mucho ${fmt(limN)} Nitros en X`); return; }
-  if(limS !== null && sp > limS){ toast(`Como mucho ${fmt(limS)} SP en X`); return; }
-  S.nitros = Math.max(0, num(S.nitros) - nitros);
-  S.spGastado = num(S.spGastado) + sp;
-  const costoHp = num(it.hpCosto);
-  if(costoHp > 0) fijarHp(num(S.hp) - costoHp);
-  if(num(it.curaHp) > 0) fijarHp(num(S.hp) + num(it.curaHp));
   const armaDeLaHab = pendingArmaHab === undefined ? null : pendingArmaHab;
-  const ataque = registrarAtaqueDeHabilidad(it, armaDeLaHab);
-  pendingArmaHab = undefined;
-  const efecto = aplicarEfectoDeConsumo(it);
-  colocarTrampaDeHab(it);
-  avisarZonaAlMapa(it);
-  terminarEjecucionHab(it, armaDeLaHab, sp, nitros);
-  $("#scrim-costox").classList.remove("open");
-  pendingEjecucion = null;
-  renderList('habilidades');
-  if(efecto) renderList('efectos');
-  renderNitros();
-  renderVitals();
-  const partes = [`ejecutada`, `-${fmt(sp)} SP`, `-${fmt(nitros)} No2`];
-  if(costoHp > 0) partes.push(`-${fmt(costoHp)} HP`);
-  if(ataque) partes.push(ataque);
-  if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
-  toast(`${it.nombre} ${partes.join(' · ')}`);
+  if(FichaAcciones.confirmarCostoVariable(S, it, sp, nitros, armaDeLaHab, habUi)) pendingArmaHab = undefined;
 }
 
 function mantenimiento(){
@@ -919,15 +834,9 @@ function mantenimiento(){
 // Al ejecutar una habilidad, su descripción va a la Mesa aunque no tire
 // dados, así todos leen qué hace. Si tira, viaja con la tirada (una sola
 // línea); si no, va en su propia línea.
-function habilidadTira(h){
-  return !!(h && (String(h.tiradaExtra || "").trim() || h.tiradaStat));
-}
+function habilidadTira(h){ return FichaAcciones.habilidadTira(h); }   // comun/ficha-acciones.js
 
-function anunciarHabilidad(h){
-  const detalle = (h && (h.detalle || h.efectoDetalle)) || "";
-  if(habilidadTira(h)) mesaConTexto(detalle);
-  else mesaPublicarHabilidad(h.nombre, detalle);
-}
+function anunciarHabilidad(h){ FichaAcciones.anunciarHabilidad(S, h, habUi); }
 
 function mesaPublicarHabilidad(nombre, detalle){
   if(!fbDb || !fbUsuario || !fbMiembro) return;

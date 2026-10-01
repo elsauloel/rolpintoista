@@ -362,7 +362,150 @@ const FichaAcciones = (() => {
     ui.cambio(['refresh']);
   }
 
+  /* ---------- Habilidades (paso 3c-5a): Ejecutar / Anunciar, el costo X y la 🎲 segunda tirada (js/11 y js/02) ----------
+     Lo que pasa después de cobrar (anunciar y tirar, o abrir la Ejecución paso a paso, colocar una trampa, avisar una zona) lo
+     decide cada pantalla con `ui`:
+       ui = el de combate (toast, registrarTirada, avisarSinNitros, cambio, preguntarSobrepeso…) +
+            mesaHabilidad(nombre, detalle) (la línea de la habilidad en la Mesa, a nombre del personaje), fijarHp(valor),
+            efecto(it) (el estado del sistema anterior: FichaAcciones.efectoDeConsumo), colocarTrampa(it), avisarZona(it),
+            terminar(it, arma, xSp, xNitros) (anunciar y tirar, o la Ejecución), flashFuera(it), elegirArmaHab(it, opciones)
+            (el cartel "¿con qué arma?"), pedirCostoX(it, arma) (el cartel del costo X) y cerrarCostoX().
+       cambio(lista) además recibe 'habilidades' y 'efectos'. */
+  // Al ejecutar una habilidad, su descripción va a la Mesa aunque no tire dados: si tira, viaja con la tirada (una sola línea);
+  // si no, va en su propia línea.
+  function habilidadTira(h){
+    return !!(h && (String(h.tiradaExtra || "").trim() || h.tiradaStat));
+  }
+  function anunciarHabilidad(S, h, ui){
+    const detalle = (h && (h.detalle || h.efectoDetalle)) || "";
+    if(habilidadTira(h)) mesaConTexto(detalle);
+    else ui.mesaHabilidad(h.nombre, detalle);
+  }
+  // Ejecutar tira SOLO la primera tirada: el stat vinculado o, si no tiene, la fórmula. La segunda va con el botón 🎲.
+  function tirarPrimeraDeHab(S, it, ui){
+    if(FichaBotonera.habStatTirable(it)){
+      tirarValorStat(S, `${it.nombre} · ${FichaCalculo.STAT_LABEL[it.tiradaStat]}`, FichaCalculo.calcular(S).final[it.tiradaStat] + num(it.tiradaBono), it.tiradaStat, undefined, undefined, undefined, ui);   // tiradaBono: bono fijo de la habilidad al stat (ej. Takle: +1 PdG)
+      return true;
+    }
+    const formula = (it.tiradaExtra || '').trim();
+    if(formula){
+      const r = tirarDados(formula);
+      if(r){ ui.registrarTirada(it.nombre, r); return true; }
+    }
+    return false;
+  }
+  function tirarSegundaDeHab(S, id, ui){
+    const it = S.habilidades.find(h => h.id === id);
+    if(!it) return;
+    const r = tirarDados((it.tiradaExtra || '').trim());
+    if(r) ui.registrarTirada(`${it.nombre} · Efecto`, r);
+    else ui.toast('La fórmula de la habilidad no es válida');
+  }
+  // Si la habilidad cuesta como un ataque, cuenta como ese ataque del arma (el próximo ataque con esa arma ya paga Tipo
+  // completo). Devuelve el texto.
+  function registrarAtaqueDeHabilidad(S, it, arma){
+    if(!FichaHabilidades.nitrosAtaque(it)) return '';
+    const primero = FichaCombate.registrarAtaque(S, arma);   // cuenta como ese ataque (comun/ficha-combate.js)
+    return `ataque con ${arma ? arma.nombre : 'sin arma'}${primero ? ' (primero del turno)' : ''}`;
+  }
+  // Tope de X en costos variables. PLACEHOLDER: ver IT2.limiteXNitros/limiteXSp.
+  function limiteCostoX(S, cual){
+    const f = cual === 'sp' ? IT2().limiteXSp : IT2().limiteXNitros;
+    return typeof f === 'function' ? f(FichaCalculo.calcular(S)) : null;
+  }
+  async function ejecutarHabilidad(S, id, armaId, forzar, ui){
+    const it = S.habilidades.find(h => h.id === id);
+    if(!it) return;
+    // 📣 Manual: "Anunciar" solo publica la descripción en la Mesa.
+    if(FichaBotonera.modoHab(it) === 'manual'){
+      ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || '');
+      ui.toast(`${it.nombre} anunciada`);
+      return;
+    }
+    if(Combatiente.tipoEjecucion(FichaBotonera.dueloDe(it)) === 'flash'){ ui.flashFuera(it); return; }   // ⚡ su propia regla de costo (P136)
+    // Costo en vida: hace falta que sobre vida después de pagarlo.
+    if(num(it.hpCosto) > 0 && num(S.hp) <= num(it.hpCosto)){
+      ui.toast(`No te alcanza la vida — ${it.nombre} cuesta ${fmt(num(it.hpCosto))} HP y tenés ${fmt(num(S.hp))}`);
+      return;
+    }
+    // Con costo de ataque: primero se elige el arma (si hay más de una).
+    let arma = null;
+    if(FichaHabilidades.nitrosAtaque(it)){
+      const opciones = FichaBotonera.armasParaHabilidad(S);
+      if(armaId === undefined && opciones.length > 1){ ui.elegirArmaHab(it, opciones); return; }
+      arma = armaId ? (S.inventario.find(x => x.id === armaId) || null) : opciones[0].arma;
+    }
+    const armaPendiente = FichaHabilidades.nitrosAtaque(it) ? arma : undefined;
+    if(FichaHabilidades.habCostoVariable(it)){ ui.pedirCostoX(it, armaPendiente); return; }
+    const costoNitros = FichaBotonera.costoNitrosHab(S, it, arma);
+    if(costoNitros > num(S.nitros) && !forzar){
+      ui.avisarSinNitros(costoNitros, `usar ${it.nombre}${FichaHabilidades.nitrosAtaque(it) ? ` (ataque con ${arma ? arma.nombre : 'sin arma'})` : ''}`, () => ejecutarHabilidad(S, id, armaId, true, ui));
+      return;
+    }
+    let costoSp = FichaHabilidades.parseCostoSp(it.costo);
+    // Costo distinto en turno ajeno (2026-09-28, pedido del dueño): antes de cobrar nada, un cartelito pregunta.
+    if(String(it.turnoAjenoSp || '').trim() && !FichaHabilidades.spVariable(it)){
+      const elegido = await ConfirmarTurno.pedir(it.nombre, costoSp, num(it.turnoAjenoSp));
+      if(elegido === null) return;   // canceló: no se cobra ni se ejecuta nada
+      costoSp = elegido;
+    }
+    S.nitros = num(S.nitros) - (forzar && costoNitros > num(S.nitros) ? gastoNitrosForzado(S, costoNitros, `usó ${it.nombre}`) : costoNitros);
+    S.spGastado = num(S.spGastado) + costoSp;
+    const costoHp = num(it.hpCosto);
+    if(costoHp > 0) ui.fijarHp(num(S.hp) - costoHp);
+    const curaHp = num(it.curaHp);
+    if(curaHp > 0) ui.fijarHp(num(S.hp) + curaHp);   // cura sobre uno mismo, sin pasar del máximo
+    const ataque = registrarAtaqueDeHabilidad(S, it, arma);
+    const efecto = ui.efecto(it);
+    ui.colocarTrampa(it);
+    ui.avisarZona(it);
+    ui.terminar(it, arma, 0, 0);
+    ui.cambio(['habilidades', ...(efecto ? ['efectos'] : []), 'nitros', 'vitals']);
+    const partes = [`ejecutada`];
+    if(costoSp) partes.push(`-${fmt(costoSp)} SP`);
+    partes.push(costoNitros ? `-${fmt(costoNitros)} No2` : 'sin costo de Nitros');
+    if(costoHp > 0) partes.push(`-${fmt(costoHp)} HP`);
+    if(curaHp > 0) partes.push(`+${fmt(curaHp)} HP`);
+    if(ataque) partes.push(ataque);
+    if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
+    ui.toast(`${it.nombre} ${partes.join(' · ')}`);
+  }
+  // El costo X ya elegido en el cartel (sp y nitros): valida, cobra y sigue como Ejecutar. Devuelve true si se ejecutó.
+  function confirmarCostoVariable(S, it, sp, nitros, arma, ui){
+    if(sp < 0 || nitros < 0){
+      ui.toast('Los valores no pueden ser negativos');
+      return false;
+    }
+    if(nitros > num(S.nitros)){
+      ui.toast(`No te alcanzan los Nitros — tenés ${fmt(num(S.nitros))}`);
+      return false;
+    }
+    const limN = limiteCostoX(S, 'nitros'), limS = limiteCostoX(S, 'sp');
+    if(limN !== null && nitros > limN){ ui.toast(`Como mucho ${fmt(limN)} Nitros en X`); return false; }
+    if(limS !== null && sp > limS){ ui.toast(`Como mucho ${fmt(limS)} SP en X`); return false; }
+    S.nitros = Math.max(0, num(S.nitros) - nitros);
+    S.spGastado = num(S.spGastado) + sp;
+    const costoHp = num(it.hpCosto);
+    if(costoHp > 0) ui.fijarHp(num(S.hp) - costoHp);
+    if(num(it.curaHp) > 0) ui.fijarHp(num(S.hp) + num(it.curaHp));
+    const ataque = registrarAtaqueDeHabilidad(S, it, arma);
+    const efecto = ui.efecto(it);
+    ui.colocarTrampa(it);
+    ui.avisarZona(it);
+    ui.terminar(it, arma, sp, nitros);
+    ui.cerrarCostoX();
+    ui.cambio(['habilidades', ...(efecto ? ['efectos'] : []), 'nitros', 'vitals']);
+    const partes = [`ejecutada`, `-${fmt(sp)} SP`, `-${fmt(nitros)} No2`];
+    if(costoHp > 0) partes.push(`-${fmt(costoHp)} HP`);
+    if(ataque) partes.push(ataque);
+    if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
+    ui.toast(`${it.nombre} ${partes.join(' · ')}`);
+    return true;
+  }
+
   return {gastoNitrosForzado, alternarSigilo, levantarse,
+    habilidadTira, anunciarHabilidad, tirarPrimeraDeHab, tirarSegundaDeHab, registrarAtaqueDeHabilidad, limiteCostoX,
+    ejecutarHabilidad, confirmarCostoVariable,
     atacarConArma, ataqueEspecialConArma, NOMBRE_ATAQUE_ESPECIAL,
     tirarValorStat, sobrepesoPagar, parryConArma, bloqueoConArma, fuerzaGolpeValorConArma, fuerzaGolpeConArma, elegirArmaDefensa, armaElegida, tirarDanoDeArma, pedirArmaYTirar,
     aplicarRevivirConAnkh, fijarHp, revisarAnkh, revisarMuerte,

@@ -88,28 +88,52 @@ const STATS_DEFENSA_POR_ITEM = FichaCombate.STATS_DEFENSA_POR_ITEM;
 const esEnMano = id => FichaCombate.esEnMano(S, id);
 function statParaArma(statId, arma){ return FichaCombate.statParaArma(S, statId, arma); }   // comun/ficha-combate.js
 
-function parryConArma(arma, forzar){
-  const costo = costoParryNitros(arma);
-  const con = arma ? ' con ' + arma.nombre : '';
-  if(costo > num(S.nitros) && !forzar){
-    avisarSinNitros(costo, `hacer Parry${con}`, () => parryConArma(arma, true));
-    return;
-  }
-  S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(costo, `hizo Parry${con}`) : costo);
-  renderNitros();
-  parryArmaPendiente = arma ? arma.id : null;   // queda esperando su Bloqueo (si ganás el Parry)
-  tirarValorStat(arma ? `Parry · ${arma.nombre}` : 'Parry', statParaArma('parry', arma), 'parry');
-  toast(`Parry${con}: −${fmt(costo)} No2 · te quedan ${fmt(num(S.nitros))}${arma ? ' · si lo ganás, tirá el Bloqueo' : ''}`);
-  refresh();
-  if($('#scrim-botonera').classList.contains('open')) renderBotonera();
-}
+function parryConArma(arma, forzar){ FichaAcciones.parryConArma(S, arma, forzar, combateUi); }   // comun/ficha-acciones.js
 
 // El Bloqueo se calcula así (2026-09-24, pedido del dueño): tu Bloqueo (que sale de la Fuerza, con lo que le suma tu equipo) MÁS el
 // peso del arma elegida; ESA SUMA es el valor que se convierte en dado (antes el peso se sumaba aparte, como número fijo).
 function bloqueoValorConArma(arma){ return FichaCombate.bloqueoValor(S, arma); }   // Bloqueo + peso: esa suma es el dado
-function bloqueoConArma(arma){
-  tirarValorStat(arma ? `Bloqueo · ${arma.nombre}` : 'Bloqueo', bloqueoValorConArma(arma), 'bloqueo');
-}
+function bloqueoConArma(arma){ FichaAcciones.bloqueoConArma(S, arma, combateUi); }
+// Lo que hacen las tiradas de combate sueltas está en comun/ficha-acciones.js (lo usa también la Botonera nueva del mapa); acá,
+// lo que se ve: los carteles de sobrepeso y de "¿Con qué arma?", el Parry que espera su Bloqueo, los efectos al golpear.
+const combateUi = {
+  toast: t => toast(t),
+  registrarTirada: (origen, r) => registrarTirada(origen, r),
+  avisarSinNitros: (costo, accion, continuar) => avisarSinNitros(costo, accion, continuar),
+  preguntarSobrepeso: ({nombre, valor, extra, sobre: s}) => {
+    sobrepesoPendiente = {nombre, valor, extra, sobre: s};
+    $('#sobrepeso-texto').innerHTML = `Tu equipo pesa <b>${fmt(s)}</b> de más. ¿Pagás <b>1 No2</b> para tirar la evasión sin penalidad, o tirás con <b>−${fmt(s)}</b>? (tenés ${fmt(Math.max(0, num(S.nitros)))} No2)`;
+    $('#sobrepeso-penal').textContent = `Tirar con −${fmt(s)}`;
+    $('#sobrepeso-pagar').disabled = num(S.nitros) < 1;
+    $('#scrim-sobrepeso').classList.add('open');
+  },
+  cambio: lista => lista.forEach(k => {
+    if(k === 'nitros') renderNitros();
+    else if(k === 'refresh') refresh();
+    else if(k === 'botonera'){ if($('#scrim-botonera').classList.contains('open')) renderBotonera(); }
+  }),
+  getParry: () => parryArmaPendiente,
+  setParry: id => { parryArmaPendiente = id; },
+  elegirArma: (tipo, armas) => {
+    if(tipo === 'dano'){
+      const dmg = compute().final.dmg;
+      $('#elegir-arma-lista').innerHTML = armas.map(a => `
+    <button class="btn" data-elegirarma="${a.item.id}" style="width:100%">
+      ${a.mano ? `Mano ${a.mano}: ` : ''}${esc(a.item.nombre)} — ${esc(armaDanoTxt(a.item, dmg))}
+    </button>`).join('');
+      $('#scrim-elegir-arma').classList.add('open');
+      return;
+    }
+    $('#elegir-arma-lista').innerHTML =
+      `<div class="hint">${tipo === 'parry' ? 'Parry: siempre cuesta 1 No2, sea cual sea el arma o escudo que elijas.' : tipo === 'fuerza' ? 'Fuerza del golpe: tu Fuerza + el peso del arma que elijas; esa suma es el dado (contra el Bloqueo del defensor).' : 'Bloqueo: tu Bloqueo + el peso del arma o escudo que elijas; esa suma es el dado que tirás. (Después de un Parry se usa el mismo, solo.)'}</div>` +
+      armas.map(a => `
+    <button class="btn" data-defarma="${tipo}:${a.item.id}" style="width:100%">
+      ${a.mano ? `Mano ${a.mano}: ` : ''}${esc(a.item.nombre)} — ${tipo === 'parry' ? `${fmt(costoParryNitros(a.item))} No2` : `+${fmt(num(a.item.peso))} de peso`}
+    </button>`).join('');
+    $('#scrim-elegir-arma').classList.add('open');
+  },
+  efectosAlPegar: it => efectosAlPegar(it),
+};
 
 // Menú de Atacar (2026-09-26, pedido del dueño): el botón Atacar pregunta QUÉ ataque es, para automatizar el costo en Nitros de cada uno.
 //  · Ataque normal: el primero del turno con esa arma cuesta Tipo ÷ 2; los siguientes, el Tipo completo (cuenta como ataque).
@@ -367,38 +391,11 @@ window.DUELO_HOOKS = {
 
 // Fuerza del golpe (2026-09-26, reglas del escudo): la tirada del ATACANTE contra el Bloqueo del defensor. Si el defensor gana el Parry (con arma o escudo),
 // su Bloqueo (Fuerza + peso de lo que usó) se enfrenta a tu Fuerza + el peso de tu arma; esa suma es el dado. Sin costo.
-function fuerzaGolpeValorConArma(arma){
-  return statParaArma('fue', arma) + (arma ? num(arma.peso) : 0);
-}
-function fuerzaGolpeConArma(arma){
-  tirarValorStat(arma ? `Fuerza del golpe · ${arma.nombre}` : 'Fuerza del golpe', fuerzaGolpeValorConArma(arma), 'fue');
-}
+function fuerzaGolpeValorConArma(arma){ return FichaAcciones.fuerzaGolpeValorConArma(S, arma); }   // comun/ficha-acciones.js
+function fuerzaGolpeConArma(arma){ FichaAcciones.fuerzaGolpeConArma(S, arma, combateUi); }
 
 // Botones 🎲 Parry y 🎲 Bloqueo: con dos o más armas equipadas se elige con cuál.
-function elegirArmaDefensa(tipo){
-  // Bloqueo justo después de un Parry: es con la misma arma, no se elige otra vez.
-  // El Bloqueo solo existe después de un Parry, y es con la misma arma o escudo (regla del dueño, 2026-09-30).
-  if(tipo === 'bloqueo'){
-    const armaDelParry = parryArmaPendiente ? S.inventario.find(x => x.id === parryArmaPendiente && x.equipado) : null;
-    parryArmaPendiente = null;
-    if(armaDelParry) bloqueoConArma(armaDelParry);
-    else toast(Combatiente.BLOQUEO_SOLO_TRAS_PARRY);
-    if($('#scrim-botonera').classList.contains('open')) renderBotonera();
-    return;
-  }
-  // Parry: con un arma o un escudo (regla del dueño, 2026-09-30); la Fuerza del golpe, con un arma que pega.
-  const armas = tipo === 'fuerza' ? armasEquipadasConDano() : armasYEscudosParaParry();
-  if(tipo !== 'fuerza' && !armas.length){ toast(Combatiente.SIN_ARMA_DEFENSA); return; }
-  const ir = arma => (tipo === 'parry' ? parryConArma(arma) : tipo === 'fuerza' ? fuerzaGolpeConArma(arma) : bloqueoConArma(arma));
-  if(armas.length <= 1){ ir(armas.length ? armas[0].item : null); return; }
-  $('#elegir-arma-lista').innerHTML =
-    `<div class="hint">${tipo === 'parry' ? 'Parry: siempre cuesta 1 No2, sea cual sea el arma o escudo que elijas.' : tipo === 'fuerza' ? 'Fuerza del golpe: tu Fuerza + el peso del arma que elijas; esa suma es el dado (contra el Bloqueo del defensor).' : 'Bloqueo: tu Bloqueo + el peso del arma o escudo que elijas; esa suma es el dado que tirás. (Después de un Parry se usa el mismo, solo.)'}</div>` +
-    armas.map(a => `
-    <button class="btn" data-defarma="${tipo}:${a.item.id}" style="width:100%">
-      ${a.mano ? `Mano ${a.mano}: ` : ''}${esc(a.item.nombre)} — ${tipo === 'parry' ? `${fmt(costoParryNitros(a.item))} No2` : `+${fmt(num(a.item.peso))} de peso`}
-    </button>`).join('');
-  $('#scrim-elegir-arma').classList.add('open');
-}
+function elegirArmaDefensa(tipo){ FichaAcciones.elegirArmaDefensa(S, tipo, combateUi); }   // comun/ficha-acciones.js
 
 function atacarConArma(arma, forzar){
   parryArmaPendiente = null;

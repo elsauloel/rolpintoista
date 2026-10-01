@@ -419,7 +419,7 @@ document.addEventListener('click', async e => {
   if(b.dataset.elegirarma){
     const it = S.inventario.find(x=>x.id===b.dataset.elegirarma);
     $('#scrim-elegir-arma').classList.remove('open');
-    if(it) tirarDanoDeArma(it);
+    FichaAcciones.armaElegida(S, 'dano', it || null, combateUi);
     return;
   }
   if(b.dataset.habarma){
@@ -432,7 +432,7 @@ document.addEventListener('click', async e => {
     const [tipoDef, armaDefId] = b.dataset.defarma.split(':');
     $('#scrim-elegir-arma').classList.remove('open');
     const armaDef = S.inventario.find(x => x.id === armaDefId) || null;
-    if(tipoDef === 'parry') parryConArma(armaDef); else if(tipoDef === 'fuerza') fuerzaGolpeConArma(armaDef); else bloqueoConArma(armaDef);
+    FichaAcciones.armaElegida(S, tipoDef, armaDef, combateUi);
     return;
   }
   if(b.dataset.atacararma){

@@ -115,11 +115,7 @@ let sobrepesoPendiente = null;
 function cerrarSobrepeso(){ sobrepesoPendiente = null; $('#scrim-sobrepeso').classList.remove('open'); }
 function sobrepesoElegir(pagar){
   const p = sobrepesoPendiente; if(!p) return;
-  if(pagar){
-    if(num(S.nitros) < 1){ toast('No tenés Nitros para pagar: tirá con la penalidad o cancelá'); return; }
-    S.nitros = num(S.nitros) - 1;
-    renderNitros(); refresh();
-  }
+  if(pagar && !FichaAcciones.sobrepesoPagar(S, combateUi)) return;   // comun/ficha-acciones.js
   cerrarSobrepeso();
   tirarValorStat(p.nombre, p.valor, 'eva', p.extra, pagar ? 'pagado' : 'penal', p.sobre);
 }
@@ -132,25 +128,6 @@ $('#sobrepeso-penal').onclick = () => sobrepesoElegir(false);
 function mitadesDeTirada(estados, statId){ return Combatiente.mitadesDeTirada(estados, statId); }
 function aplicarMitades(total, n){ return Combatiente.aplicarMitades(total, n); }
 
-function tirarValorStat(nombre, valor, statId, extra, sobrepeso, sobre){
-  const f = formulaParaValor(valor);
-  if(!f){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
-  if(statId === 'eva' && !sobrepeso){
-    const s = compute().sobrecarga;
-    if(s > 0){
-      sobrepesoPendiente = {nombre, valor, extra, sobre: s};
-      $('#sobrepeso-texto').innerHTML = `Tu equipo pesa <b>${fmt(s)}</b> de más. ¿Pagás <b>1 No2</b> para tirar la evasión sin penalidad, o tirás con <b>−${fmt(s)}</b>? (tenés ${fmt(Math.max(0, num(S.nitros)))} No2)`;
-      $('#sobrepeso-penal').textContent = `Tirar con −${fmt(s)}`;
-      $('#sobrepeso-pagar').disabled = num(S.nitros) < 1;
-      $('#scrim-sobrepeso').classList.add('open');
-      return;
-    }
-  }
-  if(sobrepeso === 'penal') extra = num(extra) - num(sobre);
-  // La tirada en sí (Afortunado, mitades, Evasión mínimo 1) es la del motor común: comun/combatiente.js.
-  const r = Combatiente.tirarStat(valor, S.efectos, statId, {extra});
-  if(sobrepeso === 'penal') r.estados.push({n: 'Sobrepeso', p: 'debuff'});
-  else if(sobrepeso === 'pagado') r.estados.push({n: 'Sobrepeso (pagó 1 No2)', p: 'otro'});
-  registrarTirada(nombre, r);
-}
+// La tirada (y si la Evasión pregunta por el sobrepeso) es la de comun/ficha-acciones.js, la misma que usa la Botonera nueva del mapa.
+function tirarValorStat(nombre, valor, statId, extra, sobrepeso, sobre){ FichaAcciones.tirarValorStat(S, nombre, valor, statId, extra, sobrepeso, sobre, combateUi); }
 

@@ -230,7 +230,103 @@ const FichaAcciones = (() => {
     }
   }
 
+  /* ---------- Combate suelto: tiradas de la Botonera fuera del duelo (paso 3c-4a; js/03, js/11 y js/02) ----------
+     ui, además de toast / avisarSinNitros: registrarTirada(origen, r) (publicarla), preguntarSobrepeso({nombre, valor, extra,
+     sobre}) (el cartel; la pantalla después llama a sobrepesoPagar y tirarValorStat), cambio(lista) ('nitros', 'refresh',
+     'botonera', en ese orden), getParry() / setParry(id) (el arma o escudo del último Parry, que espera su Bloqueo: lo guarda
+     cada pantalla), elegirArma(tipo, armas) (el cartel "¿Con qué arma?": 'parry' | 'bloqueo' | 'fuerza' | 'dano'; la pantalla
+     llama a armaElegida) y efectosAlPegar(arma) (los efectos al golpear, comun/efectos-golpe.js). */
+  // Tirar un stat: Afortunado, mitades y Evasión mínimo 1 (Combatiente.tirarStat); la Evasión con sobrepeso pregunta antes.
+  function tirarValorStat(S, nombre, valor, statId, extra, sobrepeso, sobre, ui){
+    const f = formulaParaValor(valor);
+    if(!f){ ui.toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
+    if(statId === 'eva' && !sobrepeso){
+      const s = FichaCalculo.calcular(S).sobrecarga;
+      if(s > 0){
+        ui.preguntarSobrepeso({nombre, valor, extra, sobre: s});
+        return;
+      }
+    }
+    if(sobrepeso === 'penal') extra = num(extra) - num(sobre);
+    // La tirada en sí (Afortunado, mitades, Evasión mínimo 1) es la del motor común: comun/combatiente.js.
+    const r = Combatiente.tirarStat(valor, S.efectos, statId, {extra});
+    if(sobrepeso === 'penal') r.estados.push({n: 'Sobrepeso', p: 'debuff'});
+    else if(sobrepeso === 'pagado') r.estados.push({n: 'Sobrepeso (pagó 1 No2)', p: 'otro'});
+    ui.registrarTirada(nombre, r);
+  }
+  // El cartel de sobrepeso, "Pagar 1 No2": devuelve false si no alcanzan (y no cierra el cartel).
+  function sobrepesoPagar(S, ui){
+    if(num(S.nitros) < 1){ ui.toast('No tenés Nitros para pagar: tirá con la penalidad o cancelá'); return false; }
+    S.nitros = num(S.nitros) - 1;
+    ui.cambio(['nitros', 'refresh']);
+    return true;
+  }
+  // Parry: siempre 1 No2 (Combatiente.costoParry); queda esperando su Bloqueo con esa misma arma o escudo.
+  function parryConArma(S, arma, forzar, ui){
+    const costo = Combatiente.costoParry();
+    const con = arma ? ' con ' + arma.nombre : '';
+    if(costo > num(S.nitros) && !forzar){
+      ui.avisarSinNitros(costo, `hacer Parry${con}`, () => parryConArma(S, arma, true, ui));
+      return;
+    }
+    S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, `hizo Parry${con}`) : costo);
+    ui.cambio(['nitros']);
+    ui.setParry(arma ? arma.id : null);   // queda esperando su Bloqueo (si ganás el Parry)
+    tirarValorStat(S, arma ? `Parry · ${arma.nombre}` : 'Parry', FichaCombate.statParaArma(S, 'parry', arma), 'parry', undefined, undefined, undefined, ui);
+    ui.toast(`Parry${con}: −${fmt(costo)} No2 · te quedan ${fmt(num(S.nitros))}${arma ? ' · si lo ganás, tirá el Bloqueo' : ''}`);
+    ui.cambio(['refresh', 'botonera']);
+  }
+  // Bloqueo: tu Bloqueo (de Fuerza) MÁS el peso del arma o escudo; esa suma es el dado.
+  function bloqueoConArma(S, arma, ui){
+    tirarValorStat(S, arma ? `Bloqueo · ${arma.nombre}` : 'Bloqueo', FichaCombate.bloqueoValor(S, arma), 'bloqueo', undefined, undefined, undefined, ui);
+  }
+  // Fuerza del golpe: tu Fuerza + el peso de tu arma; esa suma es el dado (contra el Bloqueo del defensor). Sin costo.
+  function fuerzaGolpeValorConArma(S, arma){
+    return FichaCombate.statParaArma(S, 'fue', arma) + (arma ? num(arma.peso) : 0);
+  }
+  function fuerzaGolpeConArma(S, arma, ui){
+    tirarValorStat(S, arma ? `Fuerza del golpe · ${arma.nombre}` : 'Fuerza del golpe', fuerzaGolpeValorConArma(S, arma), 'fue', undefined, undefined, undefined, ui);
+  }
+  // Botones Parry, Bloqueo y Fuerza del golpe: con dos o más armas equipadas se elige con cuál.
+  function elegirArmaDefensa(S, tipo, ui){
+    // El Bloqueo solo existe después de un Parry, y es con la misma arma o escudo (regla del dueño, 2026-09-30).
+    if(tipo === 'bloqueo'){
+      const pendiente = ui.getParry();
+      const armaDelParry = pendiente ? S.inventario.find(x => x.id === pendiente && x.equipado) : null;
+      ui.setParry(null);
+      if(armaDelParry) bloqueoConArma(S, armaDelParry, ui);
+      else ui.toast(Combatiente.BLOQUEO_SOLO_TRAS_PARRY);
+      ui.cambio(['botonera']);
+      return;
+    }
+    // Parry: con un arma o un escudo (regla del dueño, 2026-09-30); la Fuerza del golpe, con un arma que pega.
+    const armas = tipo === 'fuerza' ? FichaCombate.armasEquipadasConDano(S) : FichaCombate.armasYEscudosParaParry(S);
+    if(tipo !== 'fuerza' && !armas.length){ ui.toast(Combatiente.SIN_ARMA_DEFENSA); return; }
+    if(armas.length <= 1){ armaElegida(S, tipo, armas.length ? armas[0].item : null, ui); return; }
+    ui.elegirArma(tipo, armas);
+  }
+  // Lo elegido en "¿Con qué arma?".
+  function armaElegida(S, tipo, arma, ui){
+    if(tipo === 'dano'){ if(arma) tirarDanoDeArma(S, arma, ui); return; }
+    if(tipo === 'parry') parryConArma(S, arma, false, ui); else if(tipo === 'fuerza') fuerzaGolpeConArma(S, arma, ui); else bloqueoConArma(S, arma, ui);
+  }
+  // Daño del arma (con lo que suma el stat Daño) y sus efectos al golpear.
+  function tirarDanoDeArma(S, it, ui){
+    const dmg = FichaCalculo.calcular(S).final.dmg;
+    const r = tirarDados(FichaCombate.armaDanoTxt(it, dmg));
+    if(!r) return;
+    ui.registrarTirada(it.nombre, r);
+    ui.efectosAlPegar(it);
+  }
+  function pedirArmaYTirar(S, ui){
+    const armas = FichaCombate.armasEquipadasConDano(S);
+    if(!armas.length){ ui.toast('No tenés ningún arma equipada con daño para tirar'); return; }
+    if(armas.length === 1){ tirarDanoDeArma(S, armas[0].item, ui); return; }
+    ui.elegirArma('dano', armas);
+  }
+
   return {gastoNitrosForzado, alternarSigilo, levantarse,
+    tirarValorStat, sobrepesoPagar, parryConArma, bloqueoConArma, fuerzaGolpeValorConArma, fuerzaGolpeConArma, elegirArmaDefensa, armaElegida, tirarDanoDeArma, pedirArmaYTirar,
     aplicarRevivirConAnkh, fijarHp, revisarAnkh, revisarMuerte,
     purgarSiAgotado, restaurarSpDeConsumo, repararArmadura, efectoDeConsumo, tiradasDeItem, consumir};
 })();

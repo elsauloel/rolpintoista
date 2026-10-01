@@ -638,6 +638,42 @@ prueba('curar a quien estaba inconsciente lo despierta; quedar en 0 lo desmaya (
   igual([despierto, cae, S.muerto.turnos, ankh, T.hp > 0, T.cinturon.length], [{vivo: true, revivio: true}, {vivo: false, cayo: true}, 5, 'Ankh de Reencarnación', true, 0]);
 });
 
+grupo('Combate suelto (Parry, Bloqueo, Fuerza del golpe, Evasión, Daño)');
+const uiCombate = (reg, estado) => ({...uiPrueba(reg), registrarTirada: (o, r) => reg.push('🎲 ' + o), preguntarSobrepeso: p => reg.push('sobrepeso ' + p.sobre),
+  getParry: () => estado.parry, setParry: id => { estado.parry = id; }, elegirArma: (t, armas) => reg.push(`elegir ${t}: ${armas.length}`), efectosAlPegar: it => reg.push('efectos ' + it.nombre)});
+// Un arma y un escudo de verdad del catálogo (con otro nombre, para leer las pruebas).
+const espada = {...structuredClone(CATALOGO_BASE.find(i => i.tipoItem === 'arma_1m' && num(i.tipoDado))), id: 'esp', nombre: 'Espada', equipado: true, efectosGolpe: []};
+const escudo = {...structuredClone(CATALOGO_BASE.find(i => i.tipoItem === 'escudo_1m')), id: 'esc', nombre: 'Escudo', equipado: true};
+prueba('Parry cobra 1 No2, tira y deja el Bloqueo esperando con esa misma arma', () => {
+  const S = fichaBotonera({nitros: 3, inventario: [espada]}), reg = [], est = {parry: null};
+  FichaAcciones.elegirArmaDefensa(S, 'parry', uiCombate(reg, est));
+  igual([S.nitros, est.parry, reg.filter(x => x.startsWith('🎲'))], [2, 'esp', ['🎲 Parry · Espada']]);
+});
+prueba('sin Parry antes no hay Bloqueo; después sí, con la misma arma', () => {
+  const S = fichaBotonera({nitros: 3, inventario: [espada, escudo]}), reg = [], est = {parry: null};
+  FichaAcciones.elegirArmaDefensa(S, 'bloqueo', uiCombate(reg, est));
+  const sin = reg.includes(Combatiente.BLOQUEO_SOLO_TRAS_PARRY);
+  est.parry = 'esc'; FichaAcciones.elegirArmaDefensa(S, 'bloqueo', uiCombate(reg, est));
+  igual([sin, reg.includes('🎲 Bloqueo · Escudo'), est.parry], [true, true, null]);
+});
+prueba('con arma y escudo el Parry pregunta con cuál; sin nada, no hay Parry', () => {
+  const reg = [];
+  FichaAcciones.elegirArmaDefensa(fichaBotonera({inventario: [espada, escudo]}), 'parry', uiCombate(reg, {}));
+  FichaAcciones.elegirArmaDefensa(fichaBotonera({inventario: []}), 'parry', uiCombate(reg, {}));
+  igual([reg[0], reg[1]], ['elegir parry: 2', Combatiente.SIN_ARMA_DEFENSA]);
+});
+prueba('Fuerza del golpe = Fuerza + peso del arma; la Evasión con sobrepeso pregunta antes de tirar', () => {
+  const S = fichaBotonera({inventario: [espada]}), reg = [];
+  const pesado = fichaBotonera({attrs: {con: 1, fue: 0, agl: 6, des: 5, esp: 4}, inventario: [{id: 'y', nombre: 'Yunque', tipoItem: 'armadura_rigida', equipado: true, peso: 40}]});
+  FichaAcciones.tirarValorStat(pesado, 'Evasión', FichaCalculo.calcular(pesado).final.eva, 'eva', undefined, undefined, undefined, uiCombate(reg, {}));
+  igual([FichaAcciones.fuerzaGolpeValorConArma(S, espada), FichaCombate.statParaArma(S, 'fue', espada) + 2, reg[0].startsWith('sobrepeso ')], [FichaCombate.statParaArma(S, 'fue', espada) + num(espada.peso), FichaCombate.statParaArma(S, 'fue', espada) + num(espada.peso), true]);
+});
+prueba('el Daño tira la del arma y recuerda sus efectos al golpear', () => {
+  const S = fichaBotonera({inventario: [espada]}), reg = [];
+  FichaAcciones.pedirArmaYTirar(S, uiCombate(reg, {}));
+  igual(reg, ['🎲 Espada', 'efectos Espada']);
+});
+
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */
 grupo('Mis últimas tiradas (P138)');
 prueba('se juntan las de la Mesa con las de esta ventana, sin repetir, las últimas primero', () => {

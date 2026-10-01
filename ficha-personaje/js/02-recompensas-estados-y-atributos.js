@@ -325,25 +325,9 @@ function actualizarTextosCombate(){
 
 function armasEquipadasConDano(){ return FichaCombate.armasEquipadasConDano(S); }   // comun/ficha-combate.js
 
-function tirarDanoDeArma(it){
-  const dmg = compute().final.dmg;
-  const r = tirarDados(armaDanoTxt(it, dmg));
-  if(!r) return;
-  registrarTirada(it.nombre, r);
-  efectosAlPegar(it);
-}
+function tirarDanoDeArma(it){ FichaAcciones.tirarDanoDeArma(S, it, combateUi); }   // comun/ficha-acciones.js
 
-function pedirArmaYTirar(){
-  const armas = armasEquipadasConDano();
-  if(!armas.length){ toast('No tenés ningún arma equipada con daño para tirar'); return; }
-  if(armas.length === 1){ tirarDanoDeArma(armas[0].item); return; }
-  const dmg = compute().final.dmg;
-  $('#elegir-arma-lista').innerHTML = armas.map(a => `
-    <button class="btn" data-elegirarma="${a.item.id}" style="width:100%">
-      ${a.mano ? `Mano ${a.mano}: ` : ''}${esc(a.item.nombre)} — ${esc(armaDanoTxt(a.item, dmg))}
-    </button>`).join('');
-  $('#scrim-elegir-arma').classList.add('open');
-}
+function pedirArmaYTirar(){ FichaAcciones.pedirArmaYTirar(S, combateUi); }
 
 function renderEfectosOtros(){
   const equipados = S.inventario.filter(i => i.equipado);

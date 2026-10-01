@@ -918,4 +918,13 @@ versión parecida en más de una, es candidato a juntar.
   `confirmar-turno.js` (Flash). **`duelo.js` acepta `cfg.hooksLocal(lado)`** (en `escuchar`): si devuelve ganchos, el pedido
   (`duelo-opciones`, `duelo-tirar`, `duelo-flash`, `duelo-reroll`, `duelo-contra`…) se resuelve ahí mismo con `ejecutar(m, hk)` en
   vez de mandarlo al marco; la tirada se recoge igual, por el evento `tirada-registrada` (que dispara quien publica).
+- **`ficha-lupa.js`** (`FichaLupa`, 2026-10-01, paso 4 etapa 3c-6) — **la 🔍 y el "Ver" de un personaje**, para la ficha y el
+  mapa: `contenido(S, clave)` → `{titulo, html}` (el desglose de cada 🔍 de la Botonera: `stat:`, `defensa:`, `atacar:`, `danio:`,
+  `social:`, `habx:`, `hab:`, `cons:`; las de las invocaciones siguen en la ficha) y `ver(S, key, it)` → `{titulo, html}` (la tarjeta
+  de "Ver" de un ítem, habilidad, pasiva, talento o estado). También `jobCostoDe`, `formulaSocial(S, i)` y `narrativaDe(S, it)`.
+  Solo arma el HTML: el cuadro lo abre `lupa.js` (cada pantalla define `lupaContenido`) y la ventana de Ver, cada pantalla.
+  Necesita `lupa.js` (sus ladrillos) y las piezas `ficha-*.js`.
+- **`lupa.js`, 🔍 adentro de un recuadro aislado** (2026-10-01): `lupaDelEvento(e)` busca el 🔍 en `e.composedPath()`, así el
+  cuadro abre también desde la Botonera nueva del mapa (shadow DOM, donde `e.target` es el recuadro). Sus estilos llevan
+  `id="lupa-css"` (el mapa los copia adentro del recuadro).
 - **`pruebas.html` acepta pruebas async** (2026-10-01): una prueba que devuelve una promesa se anota cuando termina y el resumen la espera. `IT2` (los costos en No2/SP) vive ahora en `ficha-calculo.js` (`FichaCalculo.IT2`). **Al cambiar un archivo de `comun/` que la ficha carga con `?v=`, subir su versión** (si no, el navegador usa la copia vieja: pasó con `ficha-calculo.js`).

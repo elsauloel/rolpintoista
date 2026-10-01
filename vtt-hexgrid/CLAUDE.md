@@ -1110,8 +1110,13 @@ habilidades** (paso 5a, `bnHabAca`/`bnHabUi`/`bnMesaHabilidad`): las 📣 manual
 el ⚡ Flash fuera del duelo, el costo X (cartel `#bn-costox` en el recuadro), el arma de un costo "como un ataque" y la 🎲
 segunda tirada las hace el mapa, y desde el 5b también las ✨ automáticas (`bnElegirObjetivo` → `dueloElegirObjetivoMapa`;
 `bnRecordatorios`); desde el 5c, también las que colocan trampa, zona o portal (`bnAlMapa` llama directo a `portalDeHabilidad`,
-`zonaDeHabilidad`, `zonaPersistenteDeHabilidad` o `trampaDeHabilidad`; `bnHabAca` ya acepta todas). La 🔍 y "Ver" siguen
-delegados (paso 6).
+`zonaDeHabilidad`, `zonaPersistenteDeHabilidad` o `trampaDeHabilidad`; `bnHabAca` ya acepta todas). Desde el paso 6, **la 🔍 y el
+"Ver"** (`comun/ficha-lupa.js`): `lupaContenido` (global del mapa, para el personaje de la Botonera nueva; `lupa.js` y
+`ficha-lupa.js` van en `BN_PIEZAS`, y los estilos del 🔍 se copian al recuadro), el Ver adentro del recuadro (`#bn-ver`,
+`bnVer`/`bnVerAccion`: Eliminar lo hace el mapa; Editar manda `editar-en-ficha` a la ficha escondida con `bnAlMarco`), y Esc
+cierra primero el cartel abierto del recuadro. Siguen delegados: tirar un talento, las trampas consumibles y el Ankh manual.
+**Ojo con el recuadro aislado**: en un listener del recuadro (`bn.host`), `e.target` es siempre el recuadro aunque el clic sea
+adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo cierra", que antes cerraba con cualquier clic).
 
 - **Arreglo: las zonas persistentes no se podían crear** (2026-10-01): `crearElementoZona` mandaba `celdas` como objetos
   `{dq, dr}` en vez de la lista plana `[dq, dr, …]` que guardan todas las formas (`guardarElemento`) y que exigen las reglas, así

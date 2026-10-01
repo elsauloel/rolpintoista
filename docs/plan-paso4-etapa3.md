@@ -2,7 +2,7 @@
 
 > Parte de [`plan-paso4.md`](plan-paso4.md) y de [`plan-consolidacion.md`](plan-consolidacion.md). Escrito el 2026-10-01,
 > después de terminar el nivel B del paso 5 (áreas 1 a 4, ver [`plan-paso5.md`](plan-paso5.md)). **Estado: en curso** —
-> 3a y 3b hechas; 3c hasta el paso 5 hecha (ver "Para retomar" justo abajo y "Cómo va" al final). Preguntas del dueño:
+> 3a y 3b hechas; 3c hasta el paso 6 hecha (ver "Para retomar" justo abajo y "Cómo va" al final). Preguntas del dueño:
 > contestadas.
 
 ## ▶ Para retomar (al cierre de la conversación del 2026-10-01, tarde)
@@ -18,10 +18,11 @@ segunda tirada)**, **5b (las ✨ automáticas: ataque con arreglos, habilidad di
 y **5c (las que colocan trampa, zona o portal)**: **la Botonera nueva ya hace todas las habilidades** sin pedirle nada al marco.
 Todo lo que hace vive en `comun/ficha-acciones.js` y `comun/ficha-duelo.js` (la ficha usa lo mismo con sus nombres de siempre).
 
-**Lo próximo — 3c, paso 6: 🔍 lupa y "Ver"** (hoy la Botonera nueva no tiene 🔍, y "Ver" de una habilidad, consumible o
-talento se le pide a la ficha). La lupa es `lupaHtml` (`js/11`, "cómo se calcula cada cosa"): mudarla a `comun/` con `S` como
-parámetro, igual que el resto. **Después**: los talentos (tirar uno), las trampas consumibles y el Ankh manual (lo único de
-Consumir que sigue delegado); recién ahí 3d (retirar el marco para los jugadores).
+**Paso 6 hecho (2026-10-01)**: la 🔍 y el "Ver" (`comun/ficha-lupa.js`). Lo único que la Botonera nueva todavía le pide a
+la ficha escondida: **tirar un talento** (`data-tirarsocial`, `tirarSocial` en `js/05`), **las trampas consumibles**
+(`trampaDatos`, en `bnAccionAca`) y **el Ankh manual** (`data-consumirankh`) — y, a propósito, el **editor** (Editar del Ver,
+mensaje `editar-en-ficha`). **Lo próximo**: esos tres botones (paso 7, chico); recién ahí 3d (retirar el marco para los
+jugadores; decidir qué pasa con Editar: abrir la ficha en otra pestaña o mudar los editores).
 
 **Dónde probar** (2026-10-01): con Chrome logueado como `elsaulo@gmail.com`, la partida **"Test con claude elsaulo"** (ahí esa
 cuenta es el GM, "S.Claude"); el jugador es "Sujeto de pruebas" con **Silvia Suller** (Cimitarra + Broquel de bronce, 20 HP,
@@ -83,8 +84,9 @@ botón, que hoy viven en la ficha:
 | Habilidades (Ejecutar / Anunciar / 🎲 segunda) | `ejecutarHabilidad`: elegir arma, costo X, ¿es tu turno?, Flash, Ejecución paso a paso, zona, trampa, Mesa | ✅ todas en el mapa: manual, semi, costo X, Flash y segunda tirada (5a), las ✨ automáticas (5b) y las que colocan trampa, zona o portal (5c) |
 | Consumibles (cinturón y mochila) | consumir: No2 por lugar, unidades, cura, estado, trampa consumible | ✅ en el mapa (3c-3), salvo trampas consumibles y el Ankh manual |
 | Sigilo, Levantarse | estado + No2 | ✅ en el mapa (3c-2) |
-| 🔍 Lupa de cada botón | `lupaHtml` (cómo se calcula cada cosa) | en la ficha |
-| Ver (habilidad, consumible, talento) | ventana de detalle de la ficha | en la ficha |
+| 🔍 Lupa de cada botón | `lupaHtml` (cómo se calcula cada cosa) | ✅ en el mapa (paso 6, `comun/ficha-lupa.js`) |
+| Ver (habilidad, consumible, talento) | ventana de detalle de la ficha | ✅ en el mapa (paso 6); su "Editar" abre el editor de la ficha escondida |
+| Talentos, trampas consumibles, Ankh manual | `tirarSocial`, `consumir` con trampa, `consumirAnkh` | en la ficha (paso 7) |
 
 Y algo que no es un botón pero pesa: **cuando a un personaje lo atacan, el duelo le pide la tirada a su ficha** (el mapa la
 reenvía al marco). Mientras eso viva en la ficha, el marco tiene que seguir existiendo aunque la Botonera la dibuje el mapa.
@@ -122,7 +124,8 @@ Orden propuesto, de lo más simple a lo más complejo (ver pregunta 3):
    2026-10-01), 4b (Atacar ✅ 2026-10-01) y 4c (los ganchos del duelo ✅ 2026-10-01; 4b y 4c probados juntos contra un creep).
 5. Habilidades (lo más grande): partido en 5a (manual, semi, costo X, arma, turno ajeno, Flash, segunda tirada ✅ 2026-10-01),
    5b (✨ automáticas con la Ejecución paso a paso ✅ 2026-10-01) y 5c (zonas, trampas y portal ✅ 2026-10-01).
-6. 🔍 Lupa y "Ver".
+6. 🔍 Lupa y "Ver" ✅ (2026-10-01).
+7. Talentos, trampas consumibles y Ankh manual (lo último delegado).
 
 ### 3d — Retirar el marco para los jugadores
 Con todo mudado y probado en una partida de verdad, la Botonera nueva pasa a ser la única; el marco queda solo para lo que
@@ -338,3 +341,20 @@ siga necesitándolo (ver pregunta 4). La ficha suelta (`ficha.html`) no cambia: 
   publicadas). Arreglado (d63189a) y vuelto a probar: la zona de «Niebla (prueba)» se creó con sus 7 casillas, el estado y la
   resistencia (Esp de Silvia: 3). Todo borrado al terminar (portales, trampa y zona); Silvia con todo lleno, sin estados y sin el
   control; ⚗ apagado.
+- 2026-10-01: **3c, paso 6 hecho — la 🔍 y el "Ver"**. Nuevo `comun/ficha-lupa.js` (`FichaLupa`), copiado de la ficha: `contenido(S,
+  clave)` (el viejo `lupaHtml` de `js/11` con `lupaBase`, `lupaDesgloseVars`, `lupaStat`, `lupaCostoAtaque`; las 🔍 de las invocaciones
+  siguen en la ficha) y `ver(S, key, it)` (la tarjeta de `openViewer`, `js/07`, con `narrativaDe`), más `jobCostoDe` y `formulaSocial`
+  (`js/05`, ahora atajos). `comun/lupa.js` reconoce el 🔍 adentro de un recuadro aislado (`lupaDelEvento`, con `composedPath`) y
+  le pone `id="lupa-css"` a sus estilos. En el mapa: la Botonera nueva dibuja los 🔍 (`lupaContenido` → `FichaLupa`; los estilos
+  copiados al recuadro), el "Ver" se muestra adentro (`#bn-ver`, `bnVer`/`bnVerAccion`): Eliminar lo hace el mapa (si puede
+  guardar al personaje) y Editar le pide el editor a la ficha escondida (mensaje nuevo `editar-en-ficha`, `js/14`, que toca el
+  Editar de su Ver: con "Editar y subir" si es de otro). Esc cierra primero el cartel abierto del recuadro. **Arreglado de paso
+  (de la 3b)**: un clic real del mouse adentro de la Botonera nueva la cerraba — el "clic en el fondo" (`mousedown` del recuadro)
+  veía siempre al recuadro como destino (el navegador lo retarguetea); ahora mira `composedPath()[0]`. No se había visto porque
+  las pruebas en vivo tocaban los botones por código. Comparado contra el código viejo en 300 personajes al azar (todas las 🔍 de
+  cada uno y el Ver de cada ítem, habilidad, talento, pasiva, estado y 3 del catálogo): 24 467 iguales, 0 distintas; 4 mutaciones
+  plantadas, las 4 detectadas. `pruebas.html`: 168 en verde (4 nuevas, una del 🔍 adentro de un recuadro aislado). **En vivo**
+  (🎮 Silvia, Botonera nueva): se ven 34 🔍; los de Atacar, Evasión y una habilidad abren su desglose sin disparar el botón; un clic
+  real del mouse adentro ya no la cierra; el Ver de una habilidad de prueba la mostró y Eliminar la borró (la ficha de la otra
+  pestaña se enteró sola); Editar abrió "Editar habilidad" en la ficha escondida; Esc cerró primero el Ver y después la Botonera.
+  Silvia quedó como estaba (sin la habilidad de prueba, todo lleno, sin el control); ⚗ apagado.

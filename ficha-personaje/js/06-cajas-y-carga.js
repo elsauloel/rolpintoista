@@ -723,19 +723,7 @@ document.addEventListener('change', async e => {
   }
 });
 
-function mergeDeep(base, incoming){
-  if(!incoming || typeof incoming !== 'object' || Array.isArray(incoming)) return structuredClone(base);
-  const out = structuredClone(base);
-  Object.keys(incoming).forEach(k => {
-    const bv = out[k], iv = incoming[k];
-    if(iv && typeof iv === 'object' && !Array.isArray(iv) && bv && typeof bv === 'object' && !Array.isArray(bv)){
-      out[k] = mergeDeep(bv, iv);
-    } else if(iv !== undefined){
-      out[k] = iv;
-    }
-  });
-  return out;
-}
+const mergeDeep = FichaGuardado.mergeDeep;   // comun/ficha-guardado.js
 
 $('#file-input').onchange = ev => {
   const f = ev.target.files[0]; if(!f) return;
@@ -759,43 +747,9 @@ $('#file-input').onchange = ev => {
 // migraciones y merges tanto si viene de un archivo local como de GitHub.
 function aplicarFicha(data){
     try{
-      if(migrarEstadoTipos(data)) tiposGuardarJunto = true;
-      const fresh = structuredClone(DEFAULT);
-      const next = {...fresh, ...data};
-      // Potencia pasó a llamarse Bloqueo: las fichas guardadas antes traen
-      // la fórmula con el nombre viejo. Se renombra para no perderla si
-      // estaba personalizada (si ya tiene Bloqueo, gana el nuevo).
-      if(data.formulas && data.formulas.potencia !== undefined){
-        if(data.formulas.bloqueo === undefined) data.formulas.bloqueo = data.formulas.potencia;
-        delete data.formulas.potencia;
-      }
-      ['meta','loot','armadura','caps','formulas'].forEach(k => { next[k] = mergeDeep(fresh[k], data[k]); });
-      ['inventario','cinturon','habilidades','pasivas','sociales','efectos','bitacora','invocaciones'].forEach(k => {
-        next[k] = Array.isArray(data[k]) && data[k].length ? data[k] : fresh[k];
-      });
-      // El catálogo NO es un dato del personaje: es la referencia compartida
-      // del juego, así que siempre gana la versión fresca de esta ficha —
-      // si cambiaste un precio en el catálogo del fabricante, cargar un
-      // personaje viejo no debe volver a mostrar el precio congelado de
-      // cuando se guardó. Lo único que se conserva de `data.catalogo` son
-      // los ids que esta versión de la ficha ni conoce: ítems que en algún
-      // momento se agregaron directo al catálogo de esa ficha puntual y
-      // nunca se publicaron al catálogo compartido (antes de que existiera
-      // el botón "Agregar al catálogo").
-      {
-        const propio = Array.isArray(data.catalogo) ? data.catalogo : [];
-        const frescoIds = new Set(fresh.catalogo.map(i => i.id));
-        const soloLocal = propio.filter(item => !frescoIds.has(item.id));
-        next.catalogo = ItemsSubidos.mezclar([...structuredClone(fresh.catalogo), ...soloLocal.filter(i => !i._bib)], itemsSubidos, DEFAULT.catalogo);
-      }
-      // Migración: fichas viejas guardaban equipo y mochila como listas separadas.
-      if(!(Array.isArray(data.inventario) && data.inventario.length) && (Array.isArray(data.equipo) || Array.isArray(data.mochila))){
-        next.inventario = [
-          ...(data.equipo || []).map(i => ({...i, equipado:true})),
-          ...(data.mochila || []).map(i => ({...i, equipado:false, ranuras: i.ranuras ?? 1})),
-        ];
-      }
-      if(!next.bitacora.some(p => p.id === next.bitacoraActiva)) next.bitacoraActiva = next.bitacora[0].id;
+      // La mezcla con el personaje en blanco y las migraciones: comun/ficha-guardado.js (paso 5, nivel B, área 4).
+      const {S: next, tiposMigrados} = FichaGuardado.normalizar(data, {mezclarCatalogo: lista => ItemsSubidos.mezclar(lista, itemsSubidos, DEFAULT.catalogo)});
+      if(tiposMigrados) tiposGuardarJunto = true;
       // Iteración 2 (Bonos → SP, Acciones/Mov → Nitros): ver migrarEstadoIt2,
       // que corre en renderAll.
       S = next;

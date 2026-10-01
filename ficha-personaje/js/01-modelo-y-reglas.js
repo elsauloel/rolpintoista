@@ -49,153 +49,18 @@ const IT2 = {
   penalidadSobrecargaDefinida: false,
 };
 const IT2_PENDIENTE = txt => `<span class="it2-pendiente" title="Sin confirmar (Iteración 2): ${esc(txt)}">⚠</span>`;
-const STATS_VIEJOS_IT2 = {bonos:'sp', mov:'nitros', accionesmax:'nitros'};
-
-function migrarModsIt2(mods){
-  (Array.isArray(mods) ? mods : []).forEach(m => {
-    if(!m || !STATS_VIEJOS_IT2[m.stat]) return;
-    if(m.stat === 'bonos') m.val = num(m.val) * IT2.spPorBono;
-    m.stat = STATS_VIEJOS_IT2[m.stat];
-  });
-}
-
-// Ítems, habilidades y estados guardados con los campos viejos. Se puede
-// correr varias veces sobre lo mismo sin cambiar nada.
-function migrarObjIt2(o){
-  if(!o || typeof o !== 'object') return;
-  migrarModsIt2(o.mods);
-  migrarModsIt2(o.efectoMods);
-  [['curabonosPct', 'curaspPct'], ['accionesCosto', 'nitrosCosto'], ['forzarAccionesMax', 'forzarNitros']].forEach(([viejo, nuevo]) => {
-    if(o[viejo] === undefined) return;
-    if(o[nuevo] === undefined) o[nuevo] = o[viejo];
-    delete o[viejo];
-  });
-}
-
-function migrarEstadoIt2(st){
-  const f = st.formulas || (st.formulas = {});
-  ['bonos', 'mov', 'accionesmax'].forEach(k => delete f[k]);
-  // Armadura rota ahora resta 1 de Defensa por cada acumulación (antes: la mitad).
-  (st.efectos || []).forEach(e => {
-    if(e.armaduraRota && !(e.mods || []).some(m => m.stat === 'def')){
-      e.mods = [...(e.mods || []), {stat: 'def', val: -1}];
-      e.stacks = Math.max(1, num(e.stacks) || 1);
-    }
-  });
-  ['sp', 'nitros'].forEach(k => { if(f[k] === undefined) f[k] = k === 'sp' ? 'esp*3' : 'agl'; });
-  // SP Regen (2026-09-24, regla por defecto del dueño): TODOS los personajes regeneran, en el Mantenimiento, la mitad de su
-  // Especial redondeada hacia abajo (base floor(esp/2)) + lo que sumen habilidades, equipo o estados. Las fichas que tenían la base
-  // vieja (0, o floor(int/2)) pasan a la nueva UNA sola vez (marca spRegenAuto); si después alguien la deja a mano en 0, se respeta.
-  if(f.spregen === undefined || f.spregen === 'floor(int/2)') f.spregen = 'floor(esp/2)';
-  if(!st.spRegenAuto){
-    if(f.spregen === '0') f.spregen = 'floor(esp/2)';
-    st.spRegenAuto = true;
-  }
-  // Crítico frecuente (2026-09-25): el stat Crit dejó de salir de la Destreza (regla nueva del crítico, P113/P115). Las fichas viejas pasan a base 0 UNA sola vez.
-  if(!st.critFrecuenteAuto){
-    if(f.crit === 'des') f.crit = '0';
-    st.critFrecuenteAuto = true;
-  }
-  if(f.critpot === undefined) f.critpot = '0';   // Crítico potente (2026-09-25)
-  if(f.vision === undefined) f.vision = '6';
-  Object.keys(f).forEach(k => {
-    if(typeof f[k] === 'string') f[k] = f[k].replace(/\b(bonos|bon)\b/g, 'sp').replace(/\b(mov|accionesmax)\b/g, 'nitros');
-  });
-  // bonosGastados solo existe en fichas viejas, así que manda aunque el
-  // merge con DEFAULT ya haya puesto spGastado en 0.
-  if(st.bonosGastados !== undefined){
-    st.spGastado = num(st.bonosGastados);
-    delete st.bonosGastados;
-  }
-  if(st.spGastado === undefined) st.spGastado = 0;
-  delete st.acciones;  // los Nitros arrancan llenos (ver renderAll)
-  if(st.ataquesTurno === undefined) st.ataquesTurno = 0;
-  if(!st.ataquesArma || typeof st.ataquesArma !== 'object') st.ataquesArma = {};
-  // La habilidad base "Movimiento" se quitó: moverse se cobra desde el mapa.
-  if(Array.isArray(st.habilidades)) st.habilidades = st.habilidades.filter(h => !h || h.id !== 'movimiento');
-  ['inventario', 'cinturon', 'habilidades', 'pasivas', 'sociales', 'efectos', 'efectosPersonalizados', 'catalogo']
-    .forEach(k => (Array.isArray(st[k]) ? st[k] : []).forEach(migrarObjIt2));
-}
-
-// El atributo Inteligencia se renombró a Especial (id 'int' -> 'esp', 2026-09-18)
-// para poder reusar el nombre "Inteligencia" después con un significado
-// distinto. Corre sobre S ya armado (ver renderAll); se puede correr varias
-// veces sin cambiar nada, porque una vez migrado no queda ningún 'int'.
-function migrarObjEspecial(o){
-  if(!o || typeof o !== 'object') return;
-  (Array.isArray(o.mods) ? o.mods : []).forEach(m => { if(m && m.stat === 'int') m.stat = 'esp'; });
-  (Array.isArray(o.efectoMods) ? o.efectoMods : []).forEach(m => { if(m && m.stat === 'int') m.stat = 'esp'; });
-  if(o.tiradaStat === 'int') o.tiradaStat = 'esp';
-  ['detalle', 'descripcionNarrativa', 'efectoDetalle', 'equipoEstadoDetalle', 'notas'].forEach(k => {
-    if(typeof o[k] === 'string') o[k] = o[k].replace(/Inteligencia/g, 'Especial').replace(/inteligencia/g, 'especial');
-  });
-}
-
-function migrarEstadoEspecial(st){
-  if(!st || typeof st !== 'object') return;
-  if(st.attrs && typeof st.attrs === 'object' && st.attrs.int !== undefined){
-    if(st.attrs.esp === undefined) st.attrs.esp = st.attrs.int;
-    delete st.attrs.int;
-  }
-  // WildCards se sacó: ese lugar en la ficha ahora lo ocupa la Inteligencia
-  // nueva (se calcula sola, no se guarda ningún valor).
-  if(st.meta && typeof st.meta === 'object') delete st.meta.wld;
-  if(st.formulas && typeof st.formulas === 'object'){
-    Object.keys(st.formulas).forEach(k => {
-      if(typeof st.formulas[k] === 'string') st.formulas[k] = st.formulas[k].replace(/\bint\b/g, 'esp');
-    });
-  }
-  ['inventario', 'cinturon', 'habilidades', 'pasivas', 'sociales', 'efectos', 'efectosPersonalizados', 'catalogo']
-    .forEach(k => (Array.isArray(st[k]) ? st[k] : []).forEach(migrarObjEspecial));
-  (Array.isArray(st.invocaciones) ? st.invocaciones : []).forEach(inv => {
-    if(!inv || typeof inv !== 'object') return;
-    if(inv.int !== undefined){
-      if(inv.esp === undefined) inv.esp = inv.int;
-      delete inv.int;
-    }
-    (Array.isArray(inv.armaMods) ? inv.armaMods : []).forEach(m => { if(m && m.stat === 'int') m.stat = 'esp'; });
-    (Array.isArray(inv.equipo) ? inv.equipo : []).forEach(migrarObjEspecial);
-    (Array.isArray(inv.habilidades) ? inv.habilidades : []).forEach(migrarObjEspecial);
-  });
-}
-
-/* ---------- Escala de Tipos de arma +2 ----------
-   Los Tipos pasaron de 2/4/6/8/10 a 4/6/8/10/12. Las fichas guardadas antes
-   traen tipoDado/armaTipo y los textos ("Resistencia a críticos tipo 2",
-   "T2 P1") con la escala vieja: se corren +2 una sola vez y la ficha queda
-   marcada con escalaTipos. No se puede correr dos veces sobre lo mismo. */
-const ESCALA_TIPOS = 2;
-// Lista de tipos después de "tipo(s)" o "crítico(s)/crit" ("área tipo 3" no es de arma).
-const RE_TIPOS_LISTA = /(?<![Áá]rea )(\b(?:[Tt]ipos?|[Cc]r[ií]tic[oa]s?|[Cc]rit)\s+(?:de\s+)?)((?:10|[2468])\b(?:\s*(?:,|y)\s*(?:10|[2468])\b)*)(?!\s*%)/g;
-// Notación corta de arma: "T2 P1", "T6, P1", "3d T4".
-const RE_TIPOS_T = /\bT(10|[2468])(?=\s*,?\s*P\d)|(?<=\dd ?)T(10|[2468])\b/g;
-let tiposGuardarJunto = false;  // recién migrada: todas las partes se guardan en el mismo lote
-
-function correrTiposTexto(txt){
-  if(typeof txt !== 'string' || !txt) return txt;
-  return txt
-    .replace(RE_TIPOS_LISTA, (m, pre, lista) => pre + lista.replace(/\d+/g, n => +n + 2))
-    .replace(RE_TIPOS_T, (m, a, b) => 'T' + (+(a || b) + 2));
-}
-
-function migrarObjTipos(o){
-  if(!o || typeof o !== 'object') return;
-  if(num(o.tipoDado) > 0) o.tipoDado = num(o.tipoDado) + 2;
-  if(num(o.armaTipo) > 0) o.armaTipo = num(o.armaTipo) + 2;
-  ['detalle', 'descripcionNarrativa', 'efectoDetalle', 'equipoEstadoDetalle', 'notas']
-    .forEach(k => { if(typeof o[k] === 'string') o[k] = correrTiposTexto(o[k]); });
-  if(Array.isArray(o.habilidades)) o.habilidades.forEach(migrarObjTipos);  // de las invocaciones
-}
-
-// Sobre los datos crudos que llegan (antes del merge con DEFAULT, que ya
-// trae la marca). Devuelve true si hubo que correrlos.
-function migrarEstadoTipos(st){
-  if(!st || typeof st !== 'object' || num(st.escalaTipos) >= ESCALA_TIPOS) return false;
-  ['inventario', 'cinturon', 'habilidades', 'pasivas', 'sociales', 'efectos', 'efectosPersonalizados', 'catalogo', 'invocaciones', 'equipo', 'mochila']
-    .forEach(k => (Array.isArray(st[k]) ? st[k] : []).forEach(migrarObjTipos));
-  st.escalaTipos = ESCALA_TIPOS;
-  return true;
-}
+// Las migraciones que ponen al día una ficha vieja (Iteración 2: Bonos → SP y Acciones/Movimiento → No2; Inteligencia →
+// Especial; escala de Tipos +2) viven en comun/ficha-guardado.js (paso 5, nivel B, área 4). Acá, los mismos nombres de siempre.
+const migrarModsIt2 = mods => FichaGuardado.migrarModsIt2(mods, IT2.spPorBono);
+const migrarObjIt2 = o => FichaGuardado.migrarObjIt2(o, IT2.spPorBono);
+const migrarEstadoIt2 = st => FichaGuardado.migrarEstadoIt2(st, IT2.spPorBono);
+const migrarObjEspecial = FichaGuardado.migrarObjEspecial;
+const migrarEstadoEspecial = FichaGuardado.migrarEstadoEspecial;
+const ESCALA_TIPOS = FichaGuardado.ESCALA_TIPOS;
+const correrTiposTexto = FichaGuardado.correrTiposTexto;
+const migrarObjTipos = FichaGuardado.migrarObjTipos;
+const migrarEstadoTipos = FichaGuardado.migrarEstadoTipos;
+let tiposGuardarJunto = false;  // recién migrada a la escala de Tipos: todas las partes se guardan en el mismo lote
 
 const CATEGORIAS = [
   {id:'', label:'— elegir categoría —'},
@@ -269,44 +134,8 @@ const STAT_LABEL = FichaCalculo.STAT_LABEL;
 const STAT_FULL = FichaCalculo.STAT_FULL;
 const ES_ATTR = FichaCalculo.ES_ATTR;
 
-const DEFAULT = {
-  meta:{nombre:'', raza:'', clase:'', subclase:'',
-        nivel:1, exp:0, dde:0, wildcards:0, wildcardsMax:0, inteligenciaManual:null, spMaxExtra:0, imagen:'', miniatura:''},
-  bitacora:[{id:'j1', nombre:'Página 1', texto:''}],
-  bitacoraActiva:'j1',
-  loot:{normal:0, magico:0, especial:[]},
-  attrs:{con:1, fue:1, agl:1, des:1, esp:1},
-  // spGastado: SP usado desde la última recarga. nitros: los que quedan en
-  // el turno (null = arrancan llenos). ataquesTurno: para cobrar el primer
-  // ataque del turno a mitad de precio.
-  // ataquesArma: ataques de cada arma en el turno ({idArma|'sin-arma': n});
-  // el primero con cada arma cuesta la mitad.
-  hp:5, turno:1, log:[], spGastado:0, nitros:null, ataquesTurno:0, ataquesArma:{},
-  escalaTipos: ESCALA_TIPOS,  // ver migrarEstadoTipos
-  muerto:{activo:false, turnos:5, definitivo:false},
-  caps:{mochila:20, cinturon:5},
-  armadura:{nota:''},
-  spRegenAuto:false,   // ya se pasó la base de SP Regen a la regla por defecto (mitad del Especial); ver migrarEstadoIt2
-  formulas:{
-    resmg:'con', rescc:'con', hpmax:'con*5',
-    dmg:'fue', bloqueo:'fue', crgmax:'fue',
-    eva:'agl', ini:'agl', nitros:'agl',
-    rng:'des', pdg:'des', crit:'0', critpot:'0', pdgcontra:'0', pdgopor:'0', parry:'des', percepcion:'des',   // crit = Crítico frecuente (2026-09-25): ya no sale de la Destreza, solo lo suman equipo, skills y estados
-    pdgmg:'esp', resm:'esp', sp:'esp*3', spregen:'floor(esp/2)', rangocasteo:'esp',
-    def:'0', armadmg:'0', tipo1:'0', tipo2:'0', tipo3:'0', tipo4:'0', tipo5:'0', capcinturon:'0', capmochila:'0', luz:'0', veoculto:'0', vision:'6'
-  },
-  inventario:[],
-  cinturon:[],
-  habilidades:[],
-  pasivas:[],
-  sociales:[],
-  efectos:[],
-  efectosPersonalizados:[],
-  invocaciones:[],
-  // El catálogo de fábrica vive en comun/catalogo.js (una sola copia para todas las herramientas, paso 5 de
-  // docs/plan-subida-unificada.md); lo subido por el grupo se suma desde la biblioteca.
-  catalogo: structuredClone(CATALOGO_BASE)
-};
+// El personaje en blanco: comun/ficha-guardado.js (paso 5, nivel B, área 4), ya pasado a SP/No2.
+const DEFAULT = FichaGuardado.DEFAULT;
 
 let S = structuredClone(DEFAULT);
 let openStat = null;
@@ -314,10 +143,7 @@ let openStat = null;
 const $ = s => document.querySelector(s);
 const uid = () => Math.random().toString(36).slice(2,9);
 const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
-// El catálogo embebido todavía viene con Bonos/Mov/Acciones (se regenera
-// desde datos/catalogo.json): se pasa a SP/Nitros al abrir la ficha.
-migrarEstadoIt2(DEFAULT);
-migrarEstadoIt2(S);
+migrarEstadoIt2(S);   // no cambia nada (DEFAULT ya viene al día); queda por las dudas
 
 function fileToDataURL(file, maxDim=480, quality=0.85){
   return new Promise((resolve, reject) => {

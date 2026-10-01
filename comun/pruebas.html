@@ -50,6 +50,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="catalogo.js"></script>
 <script src="items-subidos.js"></script>
 <script src="ficha-habilidades.js"></script>
+<script src="ficha-guardado.js"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -448,6 +449,56 @@ prueba('el catálogo completado después manda sobre la copia que ya tenía el �
   igual([r.ok, r.estado.hpturno], [true, 3]);
 });
 prueba('sin efectoNombre no hace nada', () => igual(FichaHabilidades.aplicarEfectoDeConsumo({catalogo: [], efectos: []}, {nombre: 'Piedra'}, presetsDePrueba), null));
+
+/* ---------- Guardar y leer la ficha (comun/ficha-guardado.js, paso 5 nivel B área 4) ---------- */
+grupo('Guardar y leer la ficha (paso 5)');
+prueba('el personaje en blanco ya viene con SP y No2 (Iteración 2) y la escala de Tipos nueva', () => {
+  const D = FichaGuardado.DEFAULT;
+  igual([D.formulas.sp, D.formulas.nitros, D.formulas.spregen, D.formulas.vision, D.escalaTipos, D.catalogo.length > 0], ['esp*3', 'agl', 'floor(esp/2)', '6', 2, true]);
+});
+prueba('una ficha vieja se pone al día: Potencia → Bloqueo, equipo y mochila → inventario, Tipos +2, página de bitácora', () => {
+  const r = FichaGuardado.normalizar({formulas: {potencia: 'fue*2'}, equipo: [{id: 'e', nombre: 'Hacha', tipoDado: 6, detalle: 'Resistencia a críticos tipo 2'}],
+    mochila: [{id: 'm', nombre: 'Soga'}], bitacora: [{id: 'b1', nombre: 'Una', texto: ''}], bitacoraActiva: 'zz'});
+  const hacha = r.S.inventario[0], soga = r.S.inventario[1];
+  igual([r.tiposMigrados, r.S.formulas.bloqueo, r.S.formulas.potencia, hacha.equipado, hacha.tipoDado, hacha.detalle, soga.equipado, soga.ranuras, r.S.bitacoraActiva],
+    [true, 'fue*2', undefined, true, 8, 'Resistencia a críticos tipo 4', false, 1, 'b1']);
+});
+prueba('la escala de Tipos no se corre dos veces', () => {
+  const r = FichaGuardado.normalizar({escalaTipos: 2, inventario: [{id: 'a', tipoDado: 8}]});
+  igual([r.tiposMigrados, r.S.inventario[0].tipoDado], [false, 8]);
+});
+prueba('completar: Inteligencia → Especial, Bonos → SP, Movimiento fuera y No2 llenos', () => {
+  const {S} = FichaGuardado.normalizar({attrs: {con: 2, fue: 2, agl: 5, des: 2, int: 4}, bonosGastados: 2,
+    inventario: [{id: 'a', nombre: 'Amuleto', equipado: true, mods: [{stat: 'bonos', val: 2}, {stat: 'int', val: 1}]}],
+    habilidades: [{id: 'movimiento', nombre: 'Movimiento'}, {id: 'h', nombre: 'Golpe', accionesCosto: 2}]});
+  FichaGuardado.completar(S);
+  igual([S.attrs.esp, S.attrs.int, S.inventario[0].mods, S.spGastado, S.habilidades.map(h => h.id), S.habilidades[0].nitrosCosto, S.nitros],
+    [4, undefined, [{stat: 'sp', val: 2}, {stat: 'esp', val: 1}], 2, ['h'], 2, 5]);
+});
+prueba('ida y vuelta por las partes: se guarda y se lee igual; el retrato va aparte y las imágenes de ítems no viajan', () => {
+  const {S} = FichaGuardado.normalizar({meta: {nombre: 'Clementino', imagen: 'data:image/jpeg;base64,AA'}, hp: 17,
+    inventario: [{id: 'a', nombre: 'Daga', imagen: 'data:image/png;base64,BB'}], invocaciones: [{id: 'i1', nombre: 'Lobo', imagen: 'data:image/png;base64,CC'}]});
+  FichaGuardado.completar(S);
+  const p = FichaGuardado.partes(S);
+  const docs = Object.entries(p).map(([id, json]) => ({id, json})).concat([{id: 'control', json: JSON.stringify({uid: 'gm1', nombre: 'GM'})}]);
+  const a = FichaGuardado.armarDatos(docs);
+  const S2 = FichaGuardado.completar(FichaGuardado.normalizar(a.datos).S);
+  FichaGuardado.ponerImagenesInvocaciones(S2, a.imgInvocaciones);
+  igual([JSON.parse(p.general).meta.imagen, S2.meta.nombre, S2.meta.imagen, S2.hp, S2.inventario[0].imagen, S2.invocaciones[0].imagen, a.control.uid, 'control' in a.ultimo],
+    ['', 'Clementino', 'data:image/jpeg;base64,AA', 17, '', 'data:image/png;base64,CC', 'gm1', false]);
+});
+prueba('en la parte "catálogo" solo viaja lo agregado a mano (ni lo de fábrica ni lo de la biblioteca)', () => {
+  const fab = FichaGuardado.DEFAULT.catalogo[0];
+  const S = {meta: {}, catalogo: [fab, {id: 'mio', nombre: 'Mío'}, {id: 'usr-x', nombre: 'Subido', _bib: {id: 'x'}}]};
+  igual(JSON.parse(FichaGuardado.partes(S).catalogo).catalogo.map(i => i.id), ['mio']);
+});
+prueba('una parte que cambió desde otra ventana: el retrato y las invocaciones conservan sus imágenes', () => {
+  const S = {meta: {nombre: 'A', imagen: 'data:viejo'}, invocaciones: []};
+  FichaGuardado.aplicarParte(S, 'general', {meta: {nombre: 'B', imagen: ''}, hp: 3});
+  FichaGuardado.aplicarParte(S, 'invocaciones', {invocaciones: [{id: 'i1', nombre: 'Lobo'}]}, {imgInvocaciones: JSON.stringify({i1: 'data:lobo'})});
+  FichaGuardado.aplicarParte(S, 'retrato', FichaGuardado.leerParte('retrato', JSON.stringify({imagen: 'data:nuevo', miniatura: 'data:mini'})));
+  igual([S.meta.nombre, S.hp, S.invocaciones[0].imagen, S.meta.imagen, S.meta.miniatura], ['B', 3, 'data:lobo', 'data:nuevo', 'data:mini']);
+});
 
 /* ---------- Plantillas (comun/plantillas.js) ---------- */
 grupo('Plantillas');

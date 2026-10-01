@@ -35,87 +35,27 @@ function mesaQuien(origen){
    modifica (lo imponen las reglas). Ver docs/workflow-firebase.md.
    ========================================================= */
 
-const PARTES_FICHA = {
-  general: ['meta', 'attrs', 'hp', 'turno', 'spGastado', 'nitros', 'ataquesTurno', 'ataquesArma', 'muerto', 'caps', 'armadura', 'formulas', 'loot'],
-  notas: ['bitacora', 'bitacoraActiva', 'log'],
-  inventario: ['inventario'],
-  cinturon: ['cinturon'],
-  habilidades: ['habilidades', 'pasivas', 'sociales'],
-  efectos: ['efectos', 'efectosPersonalizados'],
-  invocaciones: ['invocaciones'],
-};
-const CLAVES_CON_PARTE = new Set([...Object.values(PARTES_FICHA).flat(), 'catalogo']);
-const CATALOGO_IDS = new Set(DEFAULT.catalogo.map(c => c.id));
+// Qué va en cada parte y cómo se arman, leen y aplican: comun/ficha-guardado.js (paso 5, nivel B, área 4).
+const PARTES_FICHA = FichaGuardado.PARTES;
+const CLAVES_CON_PARTE = FichaGuardado.CLAVES_CON_PARTE;
+const CATALOGO_IDS = FichaGuardado.CATALOGO_IDS;
 const GUARDAR_QUIETO_MS = 1200;  // se escribe cuando una parte deja de cambiar este rato…
 const GUARDAR_MAX_MS = 5000;     // …o, si no para de cambiar (tipeando), como mucho cada tanto
 const MINIATURA_PX = 96;
 const MINIATURA_MAX = 60000;   // tope que aceptan las reglas
 const GM_SIN_PERSONAJES = 'Como GM, tus personajes y creeps se manejan desde gm-tools. Acá solo podés mirar las fichas de los jugadores.';
 
-// Las imágenes embebidas (data:...) no se guardan, salvo el retrato, que
-// va en su propia parte.
-function fichaSerializar(valor){
-  return JSON.stringify(valor, (k, v) => (typeof v === 'string' && v.startsWith('data:')) ? '' : v);
-}
-
-function fichaPartesActuales(){
-  const res = {};
-  Object.entries(PARTES_FICHA).forEach(([parte, claves]) => {
-    const o = {};
-    claves.forEach(k => { o[k] = k === 'meta' ? {...S.meta, imagen: '', miniatura: ''} : S[k]; });
-    res[parte] = fichaSerializar(o);
-  });
-  const otros = {};
-  Object.keys(S).forEach(k => { if(!CLAVES_CON_PARTE.has(k)) otros[k] = S[k]; });
-  res.otros = fichaSerializar(otros);
-  // Del catálogo solo viaja lo que no está en el catálogo compartido
-  // (ítems agregados a mano en esta ficha), igual que en aplicarFicha().
-  res.catalogo = fichaSerializar({catalogo: (S.catalogo || []).filter(i => !CATALOGO_IDS.has(i.id) && !i._bib)});
-  res.retrato = JSON.stringify({imagen: S.meta.imagen || '', miniatura: S.meta.miniatura || ''});
-  res.imgInvocaciones = JSON.stringify(fichaImagenesInvocaciones());
-  return res;
-}
-
-// {idInvocación: imagen} de las invocaciones que tienen imagen propia.
-function fichaImagenesInvocaciones(){
-  const res = {};
-  (S.invocaciones || []).forEach(inv => {
-    if(inv && typeof inv.imagen === 'string' && inv.imagen.startsWith('data:')) res[inv.id] = inv.imagen;
-  });
-  return res;
-}
-
-function fichaPonerImagenesInvocaciones(mapa){
-  (S.invocaciones || []).forEach(inv => { if(inv) inv.imagen = (mapa && mapa[inv.id]) || ''; });
-}
-
-// Pasa una parte guardada a claves de S (sin tocarlo todavía).
-function fichaLeerParte(parte, json){
-  let datos;
-  try{ datos = JSON.parse(json); }catch(e){ return {}; }
-  if(parte === 'retrato'){
-    if(typeof datos === 'string') return {retrato: datos, retratoMiniatura: ''};
-    return {retrato: (datos && datos.imagen) || '', retratoMiniatura: (datos && datos.miniatura) || ''};
-  }
-  if(parte === 'imgInvocaciones') return {imgInvocaciones: datos && typeof datos === 'object' ? datos : {}};
-  return datos && typeof datos === 'object' ? datos : {};
-}
-
+const fichaSerializar = FichaGuardado.serializar;
+function fichaPartesActuales(){ return FichaGuardado.partes(S); }
+function fichaImagenesInvocaciones(){ return FichaGuardado.imagenesInvocaciones(S); }
+function fichaPonerImagenesInvocaciones(mapa){ FichaGuardado.ponerImagenesInvocaciones(S, mapa); }
+const fichaLeerParte = FichaGuardado.leerParte;
+// Las imágenes de las invocaciones no viajan con su parte: se vuelven a poner desde la última parte imgInvocaciones leída.
 function fichaAplicarParte(parte, datos){
-  if(parte === 'retrato'){ S.meta.imagen = datos.retrato || ''; S.meta.miniatura = datos.retratoMiniatura || ''; return; }
-  if(parte === 'imgInvocaciones'){ fichaPonerImagenesInvocaciones(datos.imgInvocaciones); return; }
-  if(parte === 'catalogo'){
-    const propios = Array.isArray(datos.catalogo) ? datos.catalogo : [];
-    S.catalogo = ItemsSubidos.mezclar((S.catalogo || []).filter(i => CATALOGO_IDS.has(i.id)).concat(propios.filter(i => !i._bib)), itemsSubidos, DEFAULT.catalogo);
-    return;
-  }
-  if(datos.meta){ datos.meta.imagen = S.meta.imagen; datos.meta.miniatura = S.meta.miniatura; }
-  Object.keys(datos).forEach(k => { S[k] = datos[k]; });
-  if(parte === 'invocaciones' && fichaVivo){
-    let mapa = {};
-    try{ mapa = JSON.parse(fichaVivo.ultimo.imgInvocaciones || '{}'); }catch(e){}
-    fichaPonerImagenesInvocaciones(mapa);
-  }
+  FichaGuardado.aplicarParte(S, parte, datos, {
+    mezclarCatalogo: lista => ItemsSubidos.mezclar(lista, itemsSubidos, DEFAULT.catalogo),
+    imgInvocaciones: fichaVivo ? (fichaVivo.ultimo.imgInvocaciones || '') : null,
+  });
 }
 
 function fichaResumen(){
@@ -587,25 +527,14 @@ function fichaEscuchar(f){
     f.cola = f.cola.then(() => {
       if(fichaVivo !== f) return;
       if(!f.cargada){
-        const datos = {};
-        let retrato = '', retratoMiniatura = '';
-        let imgInvocaciones = {};
-        snap.docs.forEach(d => {
-          const json = String(d.data().json || '');
-          // La marca de control del GM no es un dato del personaje: va aparte (fichaControlCambio).
-          if(d.id === 'control'){ let c = null; try{ c = JSON.parse(json); }catch(e){} f.control = c && c.uid ? c : null; return; }
-          f.ultimo[d.id] = json;
-          const leido = fichaLeerParte(d.id, json);
-          if(d.id === 'retrato'){ retrato = leido.retrato; retratoMiniatura = leido.retratoMiniatura; }
-          else if(d.id === 'imgInvocaciones') imgInvocaciones = leido.imgInvocaciones;
-          else Object.assign(datos, leido);
-        });
-        if(!datos.meta) datos.meta = {};
-        datos.meta.imagen = retrato;
-        datos.meta.miniatura = retratoMiniatura;
+        // Las partes juntas: comun/ficha-guardado.js (armarDatos). La marca de control del GM no es un dato del
+        // personaje: va aparte (fichaControlCambio).
+        const armado = FichaGuardado.armarDatos(snap.docs.map(d => ({id: d.id, json: d.data().json})));
+        if(armado.control) f.control = armado.control;
+        Object.assign(f.ultimo, armado.ultimo);
         f.soloLectura = fichaSoloLecturaPara(f.duenoUid, f);   // con la marca de control ya leída
-        aplicarFicha(datos);
-        fichaPonerImagenesInvocaciones(imgInvocaciones);
+        aplicarFicha(armado.datos);
+        fichaPonerImagenesInvocaciones(armado.imgInvocaciones);
         renderInvocaciones();
         f.cargada = true;
         // Si la ficha tiene retrato pero el token del mapa se quedó sin miniatura, la vuelve a publicar.

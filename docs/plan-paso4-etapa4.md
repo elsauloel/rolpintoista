@@ -16,8 +16,13 @@ creeps primero, el mismo interruptor ⚗, P137 espera.
 3. Atacar (menú "¿Qué ataque es?", el objetivo con `dueloElegirObjetivoMapa`) ✅ (2026-10-01).
 4. Lo que el duelo le pide a un creep (`window.DUELO_HOOKS` de `js/12`) → `comun/creep-duelo.js`, y `hooksLocal` del mapa ✅ (2026-10-01).
 5. Habilidades (`js/04`: manual, semi, ✨, Flash, cooldowns `data-cdmod`, segunda tirada, trampa y zona) ✅ (2026-10-01).
-6. 🔍 (`lupaHtmlCreep`, `js/03`) y Ver.
+6. 🔍 (`lupaHtmlCreep`, `js/03`) y Ver ✅ (2026-10-01). **La 4c está terminada.**
 El mapa guarda con `modificarCreep` (transacción + resumen + firma); GM Tools, abierto en otra pestaña, se entera por la firma.
+
+**Lo próximo — 4d**: probar las Acciones nuevas en una sesión real (el GM con ⚗ prendido, jugando un combate de verdad) y,
+si andan bien, dejarlas como las de siempre (como la 3d de la Botonera del personaje). Las Acciones nuevas ya no le piden nada
+a GM Tools salvo Editar / Subir / Reemplazar del Ver de una habilidad (y lo que abre "+ Estado" o el editor del creep). Después,
+**4e** (invocaciones), que espera P137.
 
 ## Cómo es hoy
 
@@ -166,3 +171,17 @@ pruebas en `comun/pruebas.html`, `?v=` al día, probada en vivo y documentada.
   la ✨ «sobre sí mismo» cobró 1 No2, puso cooldown 3, aplicó Blindado (2 turnos) y se anunció; el + del cooldown subió a 1 la manual.
   **Ningún pedido fue a GM Tools.** Creep restaurado tal cual (6 No2, 2 HP, sin habilidades); ⚗ apagado. Lo que sigue: tanda 6,
   la 🔍 y el Ver de los creeps.
+- 2026-10-01: **4c, tanda 6 hecha** (84ad4a7) — la 🔍 y el Ver. `comun/creep-lupa.js` (`CreepLupa`): `contenido(sc, clave)` (la 🔍
+  de cada botón: stat, defensa, atacar, daño, habilidad), `verHab(sc, h)` (la tarjeta de Ver de una habilidad), `paraHtml(h)` y
+  `stat(sc, statId, o)`, copiados de `lupaStatCreep`, `lupaHtmlCreep` y `abrirVerHabAccion` (`js/03`) y `paraHabHtml` (`js/05`),
+  que quedan con atajos. En el mapa: las Acciones nuevas dibujan las 🔍 (`lupa.js` y `creep-lupa.js` en `AC_PIEZAS`, los estilos
+  del 🔍 copiados al recuadro) y `lupaContenido` reconoce la clave de un creep (`"creepId|tipo|ref"`); el Ver se muestra en el
+  recuadro (`#ac-ver`, `acVerHab`); Editar, Subir y Reemplazar los hace GM Tools en el marco (`acDelegar(datos, boton)` →
+  `acciones-delegar` con `boton`: GM Tools abre el Ver de esa habilidad y toca el mismo botón). Comparado contra el código viejo
+  en 400 creeps al azar (12 070 🔍 y el Ver de cada habilidad): 400 iguales; 6 mutaciones detectadas. `pruebas.html`: 181 en
+  verde (1 nueva). **Arreglo de paso**: "Fuerza del golpe" dibujaba una 🔍 vacía (no tiene desglose; su texto ya explica de dónde
+  sale) — ya no se dibuja (`creep-botonera.js`, en GM Tools y en el mapa). **En vivo** (GM con ⚗, "Creep nuevo" con una
+  habilidad de prueba): las 🔍 de Atacar (con el costo: «Ya atacó: Tipo completo, 8 No2»), Defensa, Fuerza y la habilidad
+  (costo, «faltan 1» de cooldown, tirada del stat) se abrieron sobre el recuadro; el Ver mostró «🐾 Creep · cooldown», el costo y
+  el detalle; ✎ Editar abrió el editor paso a paso de GM Tools sobre el mapa. Se cerró sin guardar; creep restaurado tal cual
+  (6 No2, 2 HP, sin habilidades) y ⚗ apagado.

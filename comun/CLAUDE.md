@@ -939,6 +939,11 @@ versión parecida en más de una, es candidato a juntar.
   después; `ui = {mesaHabilidad, mesaConTexto, publicar, toast, habDuelo, lanzarAtaque, lanzarDuelo, colocarTrampa(sc, h, auto),
   colocarZona, elegirObjetivo}`), más `habEjecucion`, `ataqueDeHab`, `habTira`, `efectoDeHab`, `sobreSi`, `tiradaPrimeraHab`,
   `tiradaSegundaHab`, `zonaDeHab` y `cdMod`. Necesita `estados-aplicar.js` y `combatiente.js`.
+- **`creep-lupa.js`** (`CreepLupa`, 2026-10-01, paso 4 etapa 4c, tanda 6) — **la 🔍 y el "Ver" de un creep**, para GM Tools y el
+  mapa: `contenido(sc, clave)` → `{titulo, html}` (clave `"creepId|tipo|ref"`, la de los `data-lupa` de `creep-botonera.js`:
+  stat, defensa, atacar, daño, habilidad), `verHab(sc, h)` → `{titulo, html}` (la tarjeta de Ver de una habilidad), `paraHtml(h)`
+  (🐾 creep / 🧙 jugador) y `stat(sc, statId, o)`. Solo arma el HTML (como `ficha-lupa.js`). Necesita `creep-calculo.js` y
+  `lupa.js`.
 - **`creep-duelo.js`** (`CreepDuelo`, 2026-10-01, paso 4 etapa 4c) — **lo que el duelo le pide a un creep**: `hooks(ui)` devuelve los
   ganchos (`soy`, `atacar`, `defender`, `dano`, `fuerza`, `bloquear`, crítico, Flash, habilidad dirigida…) con `ui = {creep(ref),
   cambiar(ref, fn), publicar(sc, t), toast, confirmar, soy, borrarParry}`. GM Tools arma `window.DUELO_HOOKS` con esto; el mapa,

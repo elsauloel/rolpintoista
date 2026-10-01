@@ -218,6 +218,11 @@ hay trabajo reciente o en curso de otra conversación (ver
   `ataqueDeHabCreep`, `tirarExtraDeHab`, `tirarSegundaDeHab`, `aplicarHabCreepSobreSi` y la tirada de `colocarZonaDeHabCreep` son
   atajos. Lo que se ve (Mesa, carteles, el mapa) sigue acá.
 
+- **La 🔍 y el Ver de un creep, en `comun/creep-lupa.js`** (2026-10-01, paso 4 etapa 4c, tanda 6): `lupaHtmlCreep`,
+  `lupaStatCreep` (`js/03`) y `paraHabHtml` (`js/05`) son atajos; `abrirVerHabAccion` arma la tarjeta con `CreepLupa.verHab` y
+  abre la ventana de siempre. `acciones-delegar` (`js/12`) acepta `boton` (`verhab-editar`, `verhab-subir`, `verhab-reemplazar`):
+  el Ver lo muestra el mapa y, para Editar/Subir/Reemplazar, GM Tools abre ese Ver y toca el botón.
+
 ## Formato de datos
 
 - **Consumen** (desde 2026-09-29) el catálogo de fábrica `comun/catalogo.js`

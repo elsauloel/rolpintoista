@@ -94,7 +94,7 @@ const CreepBotonera = (() => {
       <span class="bt-label">${esc(f.nombre)}</span>
     </button>` : `
     <button type="button" class="botonera-tile${f.sinNitros ? ' bt-sin-nitros' : ''}${f.mt.clase}" ${f.attr} title="${esc(f.motivo + f.mt.titulo)}">
-      ${lupaBotonHtml(`${sc.id}|${f.lupa}`)}${ModTirada.ayuda(f.stat)}
+      ${f.lupa ? lupaBotonHtml(`${sc.id}|${f.lupa}`) : ''}${ModTirada.ayuda(f.stat)}
       <span class="bt-label">${esc(f.nombre)}</span><span class="bt-value bt-value-formula">🎲${f.dado ? ` ${esc(f.dado)}` : ''}</span>${f.mt.html}
     </button>`).join('');
 

@@ -1132,7 +1132,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   habilidades** también (`acEjecutarHab`, con `CreepAcciones.ejecutarHab`/`terminarHab` y `acHabUi()`): 📣 anunciar, 💰 y ✨
   (cobrar con `modificarCreep`, la Mesa, el duelo, la trampa, la zona), ⚡ Flash fuera del duelo (`acFlashFuera`), la 🎲 segunda
   tirada y el − / + / ↺ del cooldown; "¿A quién le pegó?" es un cartel del recuadro (`#ac-objetivo`, `acElegirObjetivoEstado`).
-  Lo único que todavía va a GM Tools es la 🔍 y el Ver (tanda 6).
+  Desde la tanda 6, **la 🔍 y el Ver** (`comun/creep-lupa.js`): `lupaContenido` reconoce la clave de un creep
+  (`"creepId|tipo|ref"`) y el Ver de una habilidad se muestra en el recuadro (`#ac-ver`, `acVerHab`); solo Editar, Subir y
+  Reemplazar van a GM Tools (`acDelegar(datos, boton)`). La 4c quedó terminada: falta la 4d (probarlas en una sesión real).
 - **Las reglas de los creeps, comunes** (2026-10-01, paso 4 etapa 4a): el mapa carga `comun/creep-calculo.js` siempre;
   `creepModTotalMapa`, `creepIniMapa`, `creepDefensaMapa`, `creepArmadmgMapa`, `defensaCreepMapa` y `zonaStatCreep` son atajos a
   `CreepCalculo` (antes eran copias propias). `zonaStatCreep` (la resistencia de un creep a una zona) ahora da lo mismo que GM

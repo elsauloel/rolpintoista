@@ -37,6 +37,7 @@ h2{font-size:14px;color:var(--brass);text-transform:uppercase;letter-spacing:.06
 function num(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
 function toast(){}
 function mesaConTexto(){}
+function fmt(n){ return Number.isInteger(n) ? n : Math.round(n*100)/100; }
 function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c])); }
 </script>
 <script src="tiradas.js"></script>
@@ -60,6 +61,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
 <script src="duelo.js"></script>
+<script src="lupa.js"></script>
+<script src="ficha-lupa.js"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -814,6 +817,35 @@ prueba('una zona persistente tira su resistencia una vez y la manda al mapa', ()
   const reg = [];
   const ok = FichaAcciones.colocarZonaDeHab(fichaBotonera({}), h, 0, 0, uiMapa(reg, true));
   igual([ok, reg.length, reg[0].startsWith('🎲 Niebla'), reg[1]], [true, 2, true, 'alMapa zona-persistente-habilidad']);
+});
+
+/* ---------- La 🔍 y el "Ver" de un personaje (comun/ficha-lupa.js, paso 4 etapa 3c-6) ---------- */
+grupo('Lupa y Ver del personaje (paso 4)');
+prueba('la 🔍 de un stat dice de dónde sale y cómo se tira', () => {
+  const S = fichaBotonera(), r = FichaLupa.contenido(S, 'stat:pdg');
+  igual([r.titulo, r.html.includes('De dónde sale'), r.html.includes('Tirada'), r.html.includes('sin costo')], [FichaCalculo.STAT_FULL.pdg || 'PdG', true, true, true]);
+});
+prueba('la 🔍 de Ejecutar dice cuánto cuesta y cuánto tenés', () => {
+  const S = fichaBotonera(), h = FichaLupa.contenido(S, 'habx:h1').html;
+  igual([h.includes('Cuesta'), h.includes('Tenés'), h.includes('<b>2</b>'), FichaLupa.contenido(S, 'habx:nada').html], [true, true, true, '']);
+});
+prueba('el Ver de un talento y de un ítem (precio de venta: la mitad)', () => {
+  const S = fichaBotonera({inventario: [{id: 'i1', nombre: 'Daga', tipoItem: 'arma_1m', precioCompra: 9, peso: 1, tipoDado: 4}]});
+  const t = FichaLupa.ver(S, 'sociales', S.sociales[0]), i = FichaLupa.ver(S, 'inventario', S.inventario[0]);
+  igual([t.titulo, t.html.includes('Nivel 2'), i.html.includes('Precio de venta'), i.html.includes('4.5'), i.html.includes('Arma de una mano')], ['Trato', true, true, true, true]);
+});
+prueba('el 🔍 se abre también adentro de un recuadro aislado (la Botonera nueva del mapa)', () => {
+  const host = document.createElement('div'); document.body.appendChild(host);
+  const raiz = host.attachShadow({mode: 'open'});
+  raiz.innerHTML = `<button>Atacar ${lupaBotonHtml('stat:pdg')}</button>`;
+  let tocado = false;
+  raiz.querySelector('button').addEventListener('click', () => { tocado = true; });
+  window.lupaContenido = clave => ({titulo: 'T ' + clave, html: ''});
+  try{
+    raiz.querySelector('[data-lupa]').dispatchEvent(new MouseEvent('click', {bubbles: true, composed: true}));
+    const p = document.getElementById('lupa-pop');
+    igual([!!p, p && p.dataset.clave, tocado], [true, 'stat:pdg', false]);
+  }finally{ cerrarLupa(); host.remove(); delete window.lupaContenido; }
 });
 
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */

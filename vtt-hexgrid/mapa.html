@@ -947,7 +947,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js?v=20260930a"></script>
 <script src="../comun/duelo.js?v=20261001b"></script>
-<script src="../comun/mensajes-mapa.js?v=20261001a"></script>
+<script src="../comun/mensajes-mapa.js?v=20261001b"></script>
 <script>
 /* =========================================================
    MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
@@ -9124,7 +9124,7 @@ function abrirBotoneraPrincipal(){
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001b',
   '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001g',
-  '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b'];
+  '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
 var bnCss = '';
@@ -9184,7 +9184,7 @@ function bnDibujar(){
   if(!bn) return;
   const cuerpo = bn.raiz.querySelector('#bn-contenido');
   if(!bn.S){ cuerpo.innerHTML = '<div class="modal catalogo-modal botonera-modal"><div class="body"><div class="hint">Cargando el personaje…</div></div></div>'; return; }
-  const r = FichaBotonera.html(bn.S, {modoMapa, lupa: false, parryArmaPendiente: bn.parryPendiente || null});
+  const r = FichaBotonera.html(bn.S, {modoMapa, parryArmaPendiente: bn.parryPendiente || null});
   const scroll = bn.host.scrollTop;
   cuerpo.innerHTML = `<div class="modal catalogo-modal botonera-modal">
     <header>
@@ -9203,8 +9203,9 @@ function bnDibujar(){
   bn.host.scrollTop = scroll;
 }
 // Un botón de la Botonera nueva: se lo pide a la ficha escondida en el marco (la carga si hace falta).
-function bnDelegar(datos){
-  const marco = $('#botonera-marco'), msg = {tipo: 'botonera-delegar', datos};
+function bnDelegar(datos){ bnAlMarco({tipo: 'botonera-delegar', datos}); }
+function bnAlMarco(msg){
+  const marco = $('#botonera-marco');
   if(botonera.herramienta === 'ficha' && botonera.fichaId === bn.fichaId && !botonera.invId){
     if(botonera.lista) MensajesMapa.alMarco(marco, msg); else botonera.pendiente = msg;
     return;
@@ -9485,6 +9486,41 @@ function bnAccionAca(b){
   BN_ACCIONES[accion](bn.S, bnUi(FichaGuardado.partes(bn.S)), b.dataset.consume);
   return true;
 }
+/* Paso 3c-6: la 🔍 y el "Ver". La 🔍 la arma comun/ficha-lupa.js (la misma de la ficha) y la abre comun/lupa.js, que pide el
+   contenido con lupaContenido (acá, solo para el personaje de la Botonera nueva). El "Ver" se muestra adentro del recuadro;
+   Eliminar lo hace el mapa (si puede guardar al personaje) y Editar abre el editor de la ficha escondida ('editar-en-ficha'). */
+function lupaContenido(clave){ return bn && bn.S ? FichaLupa.contenido(bn.S, clave) : {titulo: '', html: ''}; }
+var bnViendo = null;   // {key, id} de lo que muestra el Ver
+function bnVer(key, id){
+  const it = ((bn.S && bn.S[key]) || []).find(x => x.id === id);
+  if(!it) return;
+  bnViendo = {key, id};
+  const v = FichaLupa.ver(bn.S, key, it), r = bn.raiz, puede = bnPuedeGuardar();
+  r.querySelector('#bn-ver-titulo').textContent = v.titulo;
+  r.querySelector('#bn-ver-cuerpo').innerHTML = v.html;
+  // Como la ficha: un ítem de un personaje que no podés guardar se edita como copia para subir ("Editar y subir"), sin Eliminar.
+  const ajeno = !puede && (key === 'inventario' || key === 'cinturon');
+  const editar = r.querySelector('[data-bn-ver="editar"]');
+  editar.textContent = ajeno ? '✎ Editar y subir' : 'Editar';
+  editar.title = ajeno ? 'Editá una copia y subila al catálogo compartido (no cambia este ítem)' : '';
+  r.querySelector('[data-bn-ver="borrar"]').style.display = puede ? '' : 'none';
+  r.querySelector('#bn-ver').classList.add('open');
+}
+function bnVerAccion(accion){
+  const r = bn.raiz, v = bnViendo;
+  r.querySelector('#bn-ver').classList.remove('open');
+  bnViendo = null;
+  if(!v || accion === 'no') return;
+  if(accion === 'editar'){ bnAlMarco({tipo: 'editar-en-ficha', key: v.key, id: v.id}); return; }
+  if(accion === 'borrar' && bnPuedeGuardar()){
+    const it = (bn.S[v.key] || []).find(x => x.id === v.id);
+    if(!it || !confirm(`¿Borrar "${it.nombre || 'esto'}"?`)) return;
+    const ui = bnUi(FichaGuardado.partes(bn.S));
+    bn.S[v.key] = bn.S[v.key].filter(x => x.id !== v.id);
+    ui.cambio();
+    toast(`${it.nombre || 'Ítem'} eliminado`);
+  }
+}
 // El cartel de "No te alcanzan los Nitros" (el mismo de la ficha), adentro del recuadro.
 let bnSinNitrosSeguir = null;
 function bnSinNitros(costo, accion, continuar){
@@ -9532,10 +9568,18 @@ function bnCrear(){
     <div class="scrim" id="bn-elegir-arma"><div class="modal" style="max-width:320px">
       <header><h3>¿Con qué arma?</h3><button class="iconbtn" data-bn-arma="no">Cerrar</button></header>
       <div class="body" id="bn-arma-lista" style="display:flex;flex-direction:column;gap:9px"></div>
+    </div></div>
+    <div class="scrim" id="bn-ver"><div class="modal view-modal">
+      <header><h3 id="bn-ver-titulo">Ítem</h3><button class="iconbtn" data-bn-ver="no">Cerrar</button></header>
+      <div class="body" id="bn-ver-cuerpo"></div>
+      <footer style="justify-content:flex-end;gap:8px">
+        <button class="btn del" data-bn-ver="borrar">Eliminar</button>
+        <button class="btn primary" data-bn-ver="editar">Editar</button>
+      </footer>
     </div></div>`;
   raiz.querySelector('#bn-sin-nitros').addEventListener('mousedown', e => { if(e.target.id === 'bn-sin-nitros') bnCerrarSinNitros(); });
   raiz.querySelector('#bn-costox').addEventListener('mousedown', e => { if(e.target.id === 'bn-costox'){ bnCostoX = null; e.target.classList.remove('open'); } });
-  ['bn-sobrepeso', 'bn-elegir-arma', 'bn-tipo-ataque'].forEach(id => raiz.querySelector('#' + id).addEventListener('mousedown', e => { if(e.target.id === id){ e.target.classList.remove('open'); if(id === 'bn-sobrepeso') bnSobrepeso = null; } }));
+  ['bn-sobrepeso', 'bn-elegir-arma', 'bn-tipo-ataque', 'bn-ver'].forEach(id => raiz.querySelector('#' + id).addEventListener('mousedown', e => { if(e.target.id === id){ e.target.classList.remove('open'); if(id === 'bn-sobrepeso') bnSobrepeso = null; } }));
   raiz.addEventListener('click', e => {
     const b = e.target.closest('button');
     if(!b || !bn) return;
@@ -9577,6 +9621,8 @@ function bnCrear(){
       FichaAcciones.armaElegida(bn.S, tipo, bn.S.inventario.find(x => x.id === id) || null, bnCombateUi());
       return;
     }
+    if(b.dataset.bnVer){ bnVerAccion(b.dataset.bnVer); return; }
+    if(b.dataset.view){ const [key, id] = b.dataset.view.split(':'); bnVer(key, id); return; }
     if(b.dataset.bnCerrar !== undefined){ cerrarBotoneraNueva(); return; }
     if(b.dataset.colapsar){
       const estado = bnColapsados();
@@ -9591,14 +9637,17 @@ function bnCrear(){
     if(!Object.keys(datos).length) return;
     bnDelegar(datos);
   });
-  host.addEventListener('mousedown', e => { if(e.target === host) cerrarBotoneraNueva(); });   // clic en el fondo: se cierra
+  // Clic en el fondo: se cierra. Ojo: para un clic adentro del recuadro, e.target acá es SIEMPRE el recuadro (el navegador lo
+  // "retarguetea"): se mira el primer elemento real del recorrido (antes, cualquier clic con el mouse la cerraba).
+  host.addEventListener('mousedown', e => { const t = e.composedPath()[0]; if(t === host || (t && t.id === 'bn-contenido')) cerrarBotoneraNueva(); });
   return {host, raiz};
 }
 async function abrirBotoneraNueva(fichaId){
   if(bn && bn.fichaId === fichaId && !bn.host.hidden){ cerrarBotoneraNueva(); return; }   // B (o el token) otra vez: se cierra
   try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo cargar la Botonera nueva — se abre la de siempre'); abrirBotonera(fichaId, null, '', true); return; }
   if(!bn){ bn = Object.assign({fichaId: '', sesion: null, S: null}, bnCrear()); }
-  bn.raiz.querySelector('#bn-css').textContent = bnCss + ' #bn-contenido{font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--paper)}';
+  const lupaCss = (document.getElementById('lupa-css') || {}).textContent || '';   // los 🔍 (comun/lupa.js)
+  bn.raiz.querySelector('#bn-css').textContent = bnCss + lupaCss + ' #bn-contenido{font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--paper)}';
   if(bn.fichaId !== fichaId || !bn.sesion){
     if(bn.sesion) FichaSesion.cortar(bn.sesion);
     bn.fichaId = fichaId; bn.S = null; bn.parryPendiente = null;
@@ -9643,7 +9692,11 @@ function cerrarBotoneraNueva(){
 function bnModoCambio(){ if(bn && !bn.host.hidden) bnDibujar(); }
 document.addEventListener('keydown', e => {
   if(!bn || bn.host.hidden || !$('#botonera-capa').hidden || elegirDestinoCb) return;
-  if(e.key === 'Escape'){ e.preventDefault(); cerrarBotoneraNueva(); }
+  if(e.key !== 'Escape') return;
+  e.preventDefault();
+  const cartel = bn.raiz.querySelector('.scrim.open');
+  if(cartel){ cartel.classList.remove('open'); bnViendo = null; bnCostoX = null; bnSobrepeso = null; bnSinNitrosSeguir = null; return; }
+  cerrarBotoneraNueva();
 });
 
 /* Batalla terminada: cuando el GM confirma el fin del combate, a cada jugador se le abre solo la ventana (la de la ficha, en el iframe de la

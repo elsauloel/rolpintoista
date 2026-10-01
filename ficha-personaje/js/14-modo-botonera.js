@@ -71,6 +71,12 @@ if(MODO_BOTONERA){
       if(b) b.click(); else toast('No se encontró ese botón en la Botonera de la ficha');
       setTimeout(() => fichaGuardarTick(true), 300);
     }
+    // El "Editar" del Ver de la Botonera nueva (paso 4, etapa 3c-6): el Ver lo muestra el mapa, el editor sigue siendo el de la
+    // ficha — el mismo botón Editar de su Ver (con "Editar y subir" si es de otro).
+    if(e.data.tipo === 'editar-en-ficha' && fichaVivo && fichaVivo.cargada){
+      if((S[e.data.key] || []).some(x => x.id === e.data.id)){ viewing = {key: e.data.key, id: e.data.id}; $('#view-edit-btn').click(); }
+      else toast('No se encontró eso en la ficha');
+    }
     if(e.data.tipo === 'abrir-reroll' && fichaVivo && fichaVivo.cargada) abrirReroll();   // el 🪙 fijo del mapa
     if(e.data.tipo === 'abrir-ficha-mapa' && fichaVivo && fichaVivo.cargada) fichaMapaAbrir();   // el 📜 del token propio (o la tecla F)
     if(e.data.tipo === 'abrir-revivir' && fichaVivo && fichaVivo.cargada){   // el botón ✚ Revivir del mapa

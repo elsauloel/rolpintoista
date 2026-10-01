@@ -156,12 +156,7 @@ function lootEspTotal(){
 }
 
 // Puntos de Job que costó (1 si no dice otra cosa).
-function jobCostoDe(x){
-  if(!x || x.job === false) return 0;
-  const n = num(x.jobCosto);
-  const uno = x.jobCosto === undefined || x.jobCosto === null || x.jobCosto === "" ? 1 : Math.max(0, n);
-  return uno * pasivaCompras(x);
-}
+function jobCostoDe(x){ return FichaLupa.jobCostoDe(x); }   // comun/ficha-lupa.js
 
 // Inteligencia (el nuevo significado, reintroducido 2026-09-18 tras liberar
 // el nombre al renombrar el atributo viejo a Especial): no es un atributo
@@ -214,11 +209,7 @@ Tocá para cambiar el total a mano.`;
 function nivelSocial(i){ return FichaBotonera.nivelSocial(i); }   // comun/ficha-botonera.js
 function dadoCarasSocial(i){ return FichaBotonera.dadoCarasSocial(i); }
 function nivelSocialTxt(i){ return FichaBotonera.nivelSocialTxt(i); }
-function formulaSocial(i){
-  const caras = dadoCarasSocial(i);
-  const inte = inteligenciaBudget().resto;
-  return caras > 0 ? `1d${caras}+${inte}` : `+${inte}`;
-}
+function formulaSocial(i){ return FichaLupa.formulaSocial(S, i); }   // comun/ficha-lupa.js
 function tiradaSocialTxt(i){ return FichaBotonera.tiradaSocialTxt(S, i); }
 function tirarSocial(i){
   const r = tirarDados(formulaSocial(i));

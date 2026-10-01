@@ -55,12 +55,19 @@ function abrirLupa(el){
   p.style.left = Math.max(m, Math.min(r.right - w, innerWidth - w - m)) + 'px';
 }
 
+// El 🔍 que tocó el evento, también si está adentro de un recuadro aislado (shadow DOM: la Botonera nueva del mapa),
+// donde e.target es el recuadro y no el 🔍 (2026-10-01).
+function lupaDelEvento(e){
+  const ruta = e.composedPath ? e.composedPath() : [];
+  return ruta.find(n => n && n.dataset && n.dataset.lupa !== undefined) || null;
+}
+
 // El 🔍 va dentro de otro botón: se atiende antes que nada (fase de
 // captura) y el clic no llega al botón. Algunos navegadores reportan el
 // clic sobre el botón y no sobre el 🔍: se mira también el punto tocado.
 document.addEventListener('click', e => {
   const enPunto = e.clientX || e.clientY ? document.elementFromPoint(e.clientX, e.clientY) : null;
-  const lupa = e.target.closest('[data-lupa]') || (enPunto && enPunto.closest('[data-lupa]'));
+  const lupa = lupaDelEvento(e) || e.target.closest('[data-lupa]') || (enPunto && enPunto.closest('[data-lupa]'));
   if(!lupa) return;
   e.preventDefault();
   e.stopPropagation();
@@ -68,15 +75,16 @@ document.addEventListener('click', e => {
 }, true);
 document.addEventListener('pointerdown', e => {
   const p = document.getElementById('lupa-pop');
-  if(p && !p.contains(e.target) && !e.target.closest('[data-lupa]')) cerrarLupa();
+  if(p && !p.contains(e.target) && !lupaDelEvento(e) && !e.target.closest('[data-lupa]')) cerrarLupa();
 }, true);
 document.addEventListener('keydown', e => {
   if(e.key === 'Escape' && document.getElementById('lupa-pop')){ cerrarLupa(); e.stopImmediatePropagation(); e.preventDefault(); }
-  else if((e.key === 'Enter' || e.key === ' ') && e.target.closest && e.target.closest('[data-lupa]')){ e.preventDefault(); abrirLupa(e.target.closest('[data-lupa]')); }
+  else if((e.key === 'Enter' || e.key === ' ') && (lupaDelEvento(e) || (e.target.closest && e.target.closest('[data-lupa]')))){ e.preventDefault(); abrirLupa(lupaDelEvento(e) || e.target.closest('[data-lupa]')); }
 }, true);
 
 (() => {
   const s = document.createElement('style');
+  s.id = 'lupa-css';   // el mapa copia estos estilos adentro de la Botonera nueva (shadow DOM)
   s.textContent = `
 .bt-lupa{position:absolute;top:2px;right:2px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;
   font-size:10px;line-height:1;border-radius:var(--r);opacity:.55;cursor:help;filter:grayscale(.3)}

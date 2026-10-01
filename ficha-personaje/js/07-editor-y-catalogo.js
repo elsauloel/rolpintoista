@@ -561,91 +561,14 @@ let editing = null;
 
 let viewing = null;
 
-/* Texto de color del ítem, solo para la tarjeta de "Ver" — no toca ninguna
-   mecánica (todo lo que el ítem hace vive en `detalle`). Igual que con el
-   efecto al consumir, el catálogo manda: los ítems que el jugador ya tenía
-   en la mochila se copiaron antes de que existiera este campo. */
-function narrativaDe(it){
-  const propia = (it.descripcionNarrativa || '').trim();
-  if(propia) return propia;
-  const base = (S.catalogo || []).find(c => sinAviso(c.nombre) === sinAviso(it.nombre));
-  return base ? (base.descripcionNarrativa || '').trim() : '';
-}
-
 function openViewer(key, id){
   const it = key === 'catalogo' ? itemCatalogo(id) : S[key].find(x => x.id === id);
   if(!it) return;
   viewing = {key, id};
-
-  const linea = (label, val) => (val === '' || val === null || val === undefined) ? '' : `<div class="view-line"><span class="view-label">${esc(label)}</span><span class="view-value">${esc(val)}</span></div>`;
-  const L = [];
-
-  if(key === 'inventario' || key === 'cinturon' || key === 'catalogo'){
-    if(it.tipoItem) L.push(linea('Categoría', CATEGORIA_LABEL[it.tipoItem] || it.tipoItem));
-    if(ES_ARMA(it.tipoItem)) L.push(linea('Tipo', fmt(num(it.tipoDado) || 8)));
-    if(ES_ARMA(it.tipoItem) && EfectosGolpe.lista(it.efectosGolpe).length) L.push(linea('Al golpear', EfectosGolpe.resumenLista(it.efectosGolpe)));
-    L.push(linea('Peso', fmt(num(it.peso))));
-    // Durabilidad (variable de diseño del ítem): la de fábrica; en una copia propia, además cuánto le queda.
-    if(durableItem(it)) L.push(linea('Durabilidad', key === 'catalogo' || it.dur === undefined || it.dur === null
-      ? Combatiente.durTexto(it) : `${fmt(durActual(it))} de ${Combatiente.durTexto(it)}${itemRoto(it) ? ' · ROTO' : ''}`));
-    if(ES_ARMA(it.tipoItem)) L.push(linea('Daño', armaDanoTxt(it)));
-    const defVal = defValorDe(it);
-    if(defVal) L.push(linea('Defensa', `${defVal>0?'+':''}${fmt(defVal)}`));
-    TIPOS_IDS.forEach(tid => {
-      const v = getModVal(it, tid);
-      if(v) L.push(linea(`Res. crítico ${STAT_LABEL[tid]}`, `${v>0?'+':''}${fmt(v)}`));
-    });
-    if(key === 'inventario') L.push(linea('Estado', it.equipado ? 'Equipado' : 'En mochila'));
-    if(key === 'inventario' && !it.equipado) L.push(linea('Ranuras', fmt(ranurasDe(it))));
-    if(num(it.precioCompra)) L.push(linea('Precio de compra', fmt(num(it.precioCompra))));
-    if(precioVentaDe(it)) L.push(linea('Precio de venta', fmt(precioVentaDe(it))));
-    if(it.consumible) L.push(linea('Consumible', `${fmt(num(it.unidades))} unidades · ${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp))} HP al consumir`));
-    const otrosMods = (it.mods||[]).filter(m => m.stat && m.stat !== 'def' && !TIPOS_IDS.includes(m.stat));
-    if(otrosMods.length) L.push(linea('Otros modificadores', otrosMods.map(m => `${STAT_LABEL[m.stat]||m.stat} ${num(m.val)>0?'+':''}${fmt(num(m.val))}`).join(', ')));
-  }
-
-  if(key === 'habilidades'){
-    if(it.costo) L.push(linea('Costo', it.costo));
-    L.push(linea("Adquirida con Job", it.job !== false ? `Sí · ${fmt(jobCostoDe(it))} punto${jobCostoDe(it) === 1 ? "" : "s"}` : "No"));
-    if(it.job === false && it.origen) L.push(linea("Origen", it.origen));
-  }
-
-  if(key === 'pasivas'){
-    L.push(linea('Adquirida con Job', it.job !== false ? 'Sí' : 'No'));
-    if(it.job === false && it.origen) L.push(linea('Origen', it.origen));
-    const pMods = (it.mods||[]);
-    if(pMods.length) L.push(linea('Modificadores', pMods.map(m => `${STAT_LABEL[m.stat]||m.stat} ${num(m.val)>0?'+':''}${fmt(num(m.val))}`).join(', ')));
-  }
-
-  if(key === 'sociales'){
-    L.push(linea('Nivel', nivelSocialTxt(it)));
-    L.push(linea('Tirada', tiradaSocialTxt(it)));
-    if(num(it.puntosInt)) L.push(linea('De Inteligencia', fmt(num(it.puntosInt))));
-    if(num(it.nivelExtra)) L.push(linea('De tirada máxima', fmt(num(it.nivelExtra))));
-  }
-
-  if(key === 'efectos'){
-    L.push(linea('Duración', it.permanente ? 'Permanente' : (num(it.turnos)>0 ? `${fmt(num(it.turnos))} turno(s) restante(s)` : 'Sin duración fija')));
-    if(num(it.stacks) > 1) L.push(linea('Stacks', fmt(num(it.stacks))));
-    if(num(it.hpturno)) L.push(linea('HP por turno (por stack)', `${num(it.hpturno)>0?'+':''}${fmt(num(it.hpturno))}`));
-    L.push(linea('Estado', it.activo !== false ? 'Activo' : 'Pausado'));
-    if(it.popup) L.push(linea('Aviso', 'Avisa en el mantenimiento'));
-    const eMods = (it.mods||[]);
-    if(eMods.length) L.push(linea('Modificadores', eMods.map(m => `${STAT_LABEL[m.stat]||m.stat} ${num(m.val)>0?'+':''}${fmt(num(m.val))}`).join(', ')));
-  }
-
-  $('#view-title-header').textContent = it.nombre || 'Ítem';
-  $('#view-body').innerHTML = `
-    <div class="view-wrap">
-      <div class="view-image-wrap">${it.imagen ? `<img src="${esc(it.imagen)}" class="view-image" alt="">` : `<span class="view-image-empty">Sin imagen</span>`}</div>
-      <div class="view-info">
-        <div class="view-title">${esc(it.nombre)}</div>
-        <div class="view-lines">${L.filter(Boolean).join('') || '<div class="view-line"><span class="view-value">Sin datos adicionales.</span></div>'}</div>
-      </div>
-    </div>
-    ${it.detalle ? `<div class="view-detalle"><span class="view-label">Detalle</span>${esc(it.detalle)}</div>` : ''}
-    ${narrativaDe(it) ? `<div class="view-detalle view-narrativa">${esc(narrativaDe(it))}</div>` : ''}
-  `;
+  // La tarjeta la arma comun/ficha-lupa.js (paso 4 etapa 3c-6): la misma que muestra el "Ver" de la Botonera del mapa.
+  const v = FichaLupa.ver(S, key, it);
+  $('#view-title-header').textContent = v.titulo;
+  $('#view-body').innerHTML = v.html;
   // Un ítem que no es de esta ficha editable (de la tienda, del catálogo, de la mochila de otro) no se edita en el lugar:
   // Editar arma una copia y la sube al catálogo compartido (comun/editar-item.js). Borrar no tiene sentido ahí.
   const ajeno = verItemAjeno(key);

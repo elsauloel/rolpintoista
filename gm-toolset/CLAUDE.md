@@ -208,6 +208,10 @@ hay trabajo reciente o en curso de otra conversación (ver
   atajos. En modo Acciones (dentro del mapa), `js/12` atiende `acciones-delegar`: las Acciones nuevas del mapa (⚗) le piden un
   botón y GM Tools dibuja las Acciones de ese creep y toca el mismo botón.
 
+- **Los ganchos del duelo, en `comun/creep-duelo.js`** (2026-10-01, paso 4 etapa 4c): `window.DUELO_HOOKS = CreepDuelo.hooks(gmDueloUi)`
+  (`js/12`); `pagarFlashCreep`, `costoFlashCreep(Txt)` y `tirarPdgDeArreglosCreep` (`js/04`) son atajos. Los clics de las Acciones
+  (`js/06`) y el ataque (`atacarNormalCreep`, `ataqueEspecialCreep`) usan `comun/creep-acciones.js`.
+
 ## Formato de datos
 
 - **Consumen** (desde 2026-09-29) el catálogo de fábrica `comun/catalogo.js`

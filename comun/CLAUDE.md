@@ -935,6 +935,10 @@ versión parecida en más de una, es candidato a juntar.
   cambia al creep (`levantarse`, `pagarParry` → `{error}` o `{aviso}`). Cada pantalla publica y guarda a su manera (GM Tools en
   memoria; el mapa con `modificarCreep`). **`mesa.js`**: una tirada con `r.desde = 'gm'` se guarda como de GM Tools (nombre del
   creep en rojo), aunque la publique el mapa.
+- **`creep-duelo.js`** (`CreepDuelo`, 2026-10-01, paso 4 etapa 4c) — **lo que el duelo le pide a un creep**: `hooks(ui)` devuelve los
+  ganchos (`soy`, `atacar`, `defender`, `dano`, `fuerza`, `bloquear`, crítico, Flash, habilidad dirigida…) con `ui = {creep(ref),
+  cambiar(ref, fn), publicar(sc, t), toast, confirmar, soy, borrarParry}`. GM Tools arma `window.DUELO_HOOKS` con esto; el mapa,
+  `acHooksDuelo` (en `hooksLocal`). Necesita `creep-acciones.js`, `efectos-golpe.js` y `confirmar-turno.js`.
 - **`ficha-lupa.js`** (`FichaLupa`, 2026-10-01, paso 4 etapa 3c-6) — **la 🔍 y el "Ver" de un personaje**, para la ficha y el
   mapa: `contenido(S, clave)` → `{titulo, html}` (el desglose de cada 🔍 de la Botonera: `stat:`, `defensa:`, `atacar:`, `danio:`,
   `social:`, `habx:`, `hab:`, `cons:`; las de las invocaciones siguen en la ficha) y `ver(S, key, it)` → `{titulo, html}` (la tarjeta

@@ -14,7 +14,7 @@ creeps primero, el mismo interruptor ⚗, P137 espera.
 1. Tiradas de stats y Levantarse ✅ (2026-10-01).
 2. Esquivar, Parry, Bloqueo, Fuerza del golpe, Daño ✅ (2026-10-01; el Parry pendiente del mapa vive en `acParry`).
 3. Atacar (menú "¿Qué ataque es?", el objetivo con `dueloElegirObjetivoMapa`) ✅ (2026-10-01).
-4. Lo que el duelo le pide a un creep (`window.DUELO_HOOKS` de `js/12`) → `comun/creep-duelo.js`, y `hooksLocal` del mapa.
+4. Lo que el duelo le pide a un creep (`window.DUELO_HOOKS` de `js/12`) → `comun/creep-duelo.js`, y `hooksLocal` del mapa ✅ (2026-10-01).
 5. Habilidades (`js/04`: manual, semi, ✨, Flash, cooldowns `data-cdmod`, segunda tirada, trampa y zona).
 6. 🔍 (`lupaHtmlCreep`, `js/03`) y Ver.
 El mapa guarda con `modificarCreep` (transacción + resumen + firma); GM Tools, abierto en otra pestaña, se entera por la firma.
@@ -134,3 +134,18 @@ pruebas en `comun/pruebas.html`, `?v=` al día, probada en vivo y documentada.
   ataque hecho): el menú mostró 8 No2 (Tipo completo) y 4 (oportunidad/contraataque); el ataque de oportunidad pasó al modo de
   elegir objetivo, "Sin objetivo" cobró 4 No2 sin sumar al conteo y tiró el PdG en la Mesa, y las Acciones volvieron. Sin
   pedidos a GM Tools. Creep restaurado.
+- 2026-10-01: **4c, tanda 4 hecha** (77585b8) — `comun/creep-duelo.js` (`CreepDuelo.hooks(ui)`), copiado de `window.DUELO_HOOKS` (`js/12`)
+  y de `pagarFlashCreep`/`tirarPdgDeArreglosCreep` (`js/04`): `soy`, `atacar`, `statsCritico`, `resistenciaCritico`, `efectosArma`,
+  `dano`, `flashOpciones`, `flashUsar`, `habTirar`, `habValor`, `puedeParry`, `opcionesDefensa`, `defender`, `fuerza`, `bloquear`,
+  `armaContra`; más `pagarFlash`, `costoFlash`, `costoFlashTxt`, `pdgDeArreglos`. `ui` = {`creep(ref)`, `cambiar(ref, fn)` (Promise;
+  `{error}` no guarda), `publicar(sc, t)`, `toast`, `confirmar`, `soy`, `borrarParry`}. GM Tools: `gmDueloUi` (`js/12`, en memoria +
+  `renderAll`) y `window.DUELO_HOOKS = CreepDuelo.hooks(gmDueloUi)`. Mapa: `acDueloUi`/`acHooksDuelo` (cualquier creep con token,
+  GM con ⚗; guarda con `acCambiarCreep` → `modificarCreep`), en `hooksLocal: lado => bnHooksDuelo(lado) || acHooksDuelo(lado)`.
+  Un cargador nuevo, `cargarPiezas(lista)`, no repite scripts entre la Botonera nueva y las Acciones nuevas (un `const` arriba no se
+  puede cargar dos veces); las piezas de los creeps se cargan al prender ⚗ (GM) o al entrar con él prendido. Comparado contra los
+  ganchos viejos en 400 duelos al azar (los 17 ganchos, con Flash y confirmaciones simuladas): 400 iguales, 0 distintas; 5
+  mutaciones detectadas. `pruebas.html`: 179 en verde (1 nueva). **En vivo** (GM con ⚗, 🎮 Silvia con su Botonera nueva cargada): el
+  creep atacó a Silvia (oportunidad) — cobró 4 No2 y tiró su PdG, Silvia eligió y tiró su Evasión, el creep falló —; después Silvia
+  atacó al creep y el creep se defendió con Evasión (ganó el desempate). **Ningún pedido fue al marco** (ni a GM Tools ni a la
+  ficha). Todo restaurado (creep: 6 No2, 2 HP; Silvia: como estaba antes de la prueba, 10 HP y 3 No2 — alguien la había usado —, sin
+  el control; ⚗ apagado). Lo que sigue: tanda 5, las habilidades de los creeps.

@@ -1126,7 +1126,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `abrirAcciones(id, mensaje, sinNueva)`: con un mensaje (Ver, estados) sigue yendo al marco. Sin 🔍 todavía. Desde la 4c, el mapa
   hace solo (`acAccionAca`, con `comun/creep-acciones.js`): tiradas de stats, Esquivar, Fuerza del golpe, Daño (con los efectos al
   golpear), Levantarse, Parry y Bloqueo — publica con `acPublicar` (`desde: 'gm'`) y guarda con `acCambiar` → `modificarCreep`; y
-  Atacar (`acAtacar`: el menú en el recuadro, el objetivo con `dueloElegirObjetivoMapa`, o suelto).
+  Atacar (`acAtacar`: el menú en el recuadro, el objetivo con `dueloElegirObjetivoMapa`, o suelto). Y lo que el duelo le pide a
+  **cualquier** creep con token (`acHooksDuelo`, con `comun/creep-duelo.js`, en `hooksLocal`) si el GM tiene ⚗ prendido: el mapa
+  carga las piezas al prender ⚗ o al entrar con él prendido (`cargarPiezas`, que no repite scripts).
 - **Las reglas de los creeps, comunes** (2026-10-01, paso 4 etapa 4a): el mapa carga `comun/creep-calculo.js` siempre;
   `creepModTotalMapa`, `creepIniMapa`, `creepDefensaMapa`, `creepArmadmgMapa`, `defensaCreepMapa` y `zonaStatCreep` son atajos a
   `CreepCalculo` (antes eran copias propias). `zonaStatCreep` (la resistencia de un creep a una zona) ahora da lo mismo que GM

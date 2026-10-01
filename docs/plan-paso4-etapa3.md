@@ -64,7 +64,7 @@ Orden propuesto, de lo más simple a lo más complejo (ver pregunta 3):
 2. Sigilo y Levantarse ✅ (2026-10-01; el mapa ya guarda al personaje).
 3. Consumibles (cinturón y mochila) ✅ (2026-10-01; quedan delegadas las trampas consumibles y el Ankh manual).
 4. Atacar, Daño, Esquivar, Parry y Bloqueo — con los ganchos del duelo del personaje (`DUELO_HOOKS`). Partido en 4a (sueltos ✅
-   2026-10-01), 4b (Atacar) y 4c (los ganchos del duelo).
+   2026-10-01), 4b (Atacar ✅ 2026-10-01; falta probarlo con un objetivo de verdad, como GM) y 4c (los ganchos del duelo).
 5. Habilidades (lo más grande: elegir arma, costo X, turno ajeno, Flash, Ejecución, zonas y trampas).
 6. 🔍 Lupa y "Ver".
 
@@ -191,3 +191,21 @@ siga necesitándolo (ver pregunta 4). La ficha suelta (`ficha.html`) no cambia: 
   marca "Sobrepeso (pagó 1 No2)". Todo a nombre de Clementino y con su `ficha`; la ficha de la otra pestaña recibió los No2
   sin nada pendiente. Pendiente menor: el Parry que espera su Bloqueo en el mapa no se borra al pasar el turno ni al atacar
   (Atacar sigue en la ficha); se borra al bloquear o al cambiar de personaje.
+- 2026-10-01: **3c, paso 4b hecho — Atacar desde el mapa**. A `comun/ficha-acciones.js`: `atacarConArma` (normal: Tipo ÷ 2 el
+  primero con esa arma, Tipo completo después, cuenta el ataque, borra el Parry pendiente) y `ataqueEspecialConArma`
+  (oportunidad y contraataque: siempre lo de un primer ataque, no suman al conteo, suman `pdgopor`/`pdgcontra`); la ficha los
+  usa con sus nombres de siempre (también desde sus `DUELO_HOOKS`). En el mapa (`bnPreguntarTipoAtaque`, `bnAtacar`): el
+  cartel "¿Qué ataque es?" dentro del recuadro (mismos textos y costos que la ficha); al elegir, la Botonera nueva se esconde
+  y se elige el objetivo con un clic en el token con el mismo `dueloElegirObjetivoMapa` de siempre, que ahora acepta
+  `alSuelto`/`alCancelar` (sin ellos sigue avisándole al marco como antes); "Sin objetivo · tirada suelta" vuelve a mostrar la
+  Botonera y ataca acá; Esc cancela sin cobrar (la Botonera queda cerrada, igual que con la de siempre). **Las tiradas que
+  pide el duelo una vez creado las sigue haciendo la ficha escondida** (paso 4c). Comparado contra el código viejo en 500
+  casos con los mismos dados (sin No2, línea roja, primero/completo, PdG en contraataque/oportunidad): igual; 3 mutaciones
+  detectadas. **En vivo como jugador** (Clementino con un arma T4): el cartel mostró 2 No2 para los tres; ataque normal →
+  Botonera escondida y el aviso "elegí a quién atacás … Sin objetivo" → tirada suelta: PdG en la Mesa, 12 → 10 No2, el
+  ataque contado; el segundo normal ya mostraba 4 No2 (Tipo completo); contraataque → Esc: no cobró nada. **Falta probar
+  con un objetivo de verdad** (los creeps de "Claude · pruebas" están ocultos: solo el GM puede apuntarles) — con la sesión
+  del GM y 🎮 el control de Clementino.
+- 2026-10-01: **P139 anotada**: las preguntas abiertas del contraataque fuera del duelo (¿exige ganar el Parry/Bloqueo?
+  ¿cuántos por turno?) estaban solo en el manual y en pendientes; dentro del duelo ya estaba decidido (solo si se gana el
+  Bloqueo). Al mudar Atacar se conservó tal cual.

@@ -9122,7 +9122,7 @@ function abrirBotoneraPrincipal(){
    toca como siempre; lo que abra (elegir arma, costo X, Ver, un cartel) sale encima, en la capa de siempre. Las 🔍 todavía
    no están (la lupa vive en la ficha: etapa 3c). Las piezas se cargan recién al usarla: para los jugadores no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001b', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b'];
+const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001b', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
 var bnCss = '';
@@ -9217,16 +9217,80 @@ function bnTirarAca(b){
   mesaPublicar(t.origen, {...t.r, quien: ((bn.S.meta && bn.S.meta.nombre) || '').trim(), ficha: bn.fichaId});
   return true;
 }
+/* Etapa 3c, paso 2: botones que CAMBIAN al personaje (Sigilo, Levantarse) — los hace el mapa y guarda él (FichaSesion), con el
+   mismo código que la ficha (comun/ficha-acciones.js). Solo si este usuario puede guardar ese personaje (su dueño, o el GM con
+   🎮 el control); si no, se le siguen pidiendo a la ficha escondida. Se escriben solo las partes que cambió la acción (lo que
+   difiera por haberlo armado distinto, no) y el resumen público (comun/ficha-resumen.js), así el token se actualiza. */
+function bnPuedeGuardar(){
+  const f = bn && bn.sesion;
+  return !!(f && f.cargada && fbUsuario && (f.duenoUid === fbUsuario.uid || (f.control && f.control.uid === fbUsuario.uid)));
+}
+function bnOpcionesGuardado(f){
+  // Las miniaturas de las invocaciones las calcula la ficha (tardan): se reusan las que ya están publicadas.
+  const miniaturaInv = img => {
+    const inv = (bn.S.invocaciones || []).find(i => i.imagen === img);
+    const r = inv && (((bn.doc && bn.doc.resumen) || {}).invocaciones || []).find(x => x.id === String(inv.id));
+    return (r && r.miniatura) || '';
+  };
+  return {
+    db: fbDb, ruta: fbRutaCampana(`fichas/${f.id}`), marcaDeTiempo: () => firebase.firestore.FieldValue.serverTimestamp(),
+    partes: () => FichaGuardado.partes(bn.S),
+    resumen: () => FichaResumen.resumen(bn.S, {control: f.control, miniaturaInv}),
+    nombre: () => String((bn.S.meta && bn.S.meta.nombre) || '').trim().slice(0, 60) || 'Sin nombre',
+    miniatura: async () => (bn.doc && bn.doc.miniatura) || '',
+    vigente: () => !!bn && bn.sesion === f,
+    alError: (err, primeraVez) => { if(primeraVez) toast('No se pudo guardar el personaje: se reintenta solo'); },
+  };
+}
+// La interfaz que le da el mapa a FichaAcciones. `antes`: las partes antes de la acción, para escribir solo lo que tocó.
+function bnUi(antes){
+  const f = bn.sesion;
+  return {
+    presets: estadosPresetFicha(),
+    toast: t => toast(t),
+    avisarSinNitros: (costo, accion, continuar) => bnSinNitros(costo, accion, continuar),
+    cambio: () => {
+      const despues = FichaGuardado.partes(bn.S);
+      Object.keys(despues).forEach(p => { if(despues[p] === antes[p] && despues[p] !== f.ultimo[p]) f.ultimo[p] = despues[p]; });
+      f.soloLectura = !bnPuedeGuardar();
+      FichaSesion.guardar(f, true, bnOpcionesGuardado(f));
+      bnDibujar();
+    },
+  };
+}
+const BN_ACCIONES = {sigilo: (S, ui) => FichaAcciones.alternarSigilo(S, false, ui), levantarse: (S, ui) => FichaAcciones.levantarse(S, false, ui)};
+function bnAccionAca(b){
+  const accion = b.dataset.sigilo ? 'sigilo' : b.dataset.levantarse ? 'levantarse' : '';
+  if(!accion || !bnPuedeGuardar()) return false;
+  BN_ACCIONES[accion](bn.S, bnUi(FichaGuardado.partes(bn.S)));
+  return true;
+}
+// El cartel de "No te alcanzan los Nitros" (el mismo de la ficha), adentro del recuadro.
+let bnSinNitrosSeguir = null;
+function bnSinNitros(costo, accion, continuar){
+  bnSinNitrosSeguir = continuar;
+  bn.raiz.querySelector('#bn-sn-texto').innerHTML = `No podés <b>${esc(accion)}</b>: cuesta <b>${fmt(costo)} No2</b> y tenés <b>${fmt(Math.max(0, num(bn.S.nitros)))}</b>.`;
+  bn.raiz.querySelector('#bn-sin-nitros').classList.add('open');
+}
+function bnCerrarSinNitros(){ bnSinNitrosSeguir = null; if(bn) bn.raiz.querySelector('#bn-sin-nitros').classList.remove('open'); }
 function bnCrear(){
   const host = document.createElement('div');
   host.id = 'botonera-nueva';
   host.hidden = true;
   document.body.appendChild(host);
   const raiz = host.attachShadow({mode: 'open'});
-  raiz.innerHTML = '<style id="bn-css"></style><div id="bn-contenido"></div>';
+  raiz.innerHTML = `<style id="bn-css"></style><div id="bn-contenido"></div>
+    <div class="scrim" id="bn-sin-nitros"><div class="modal" style="max-width:440px">
+      <header><h3>No te alcanzan los Nitros</h3><button class="iconbtn" data-bn-sn="no">Cancelar</button></header>
+      <div class="body"><p id="bn-sn-texto" style="margin:0 0 8px"></p>
+        <p class="hint" style="margin:0">Si la hacés igual, se anota en rojo en la Mesa que se realizó sin Nitros suficientes, y los Nitros que tengas se gastan hasta llegar a 0.</p></div>
+      <footer><button class="btn" data-bn-sn="no">Cancelar</button><button class="btn primary" data-bn-sn="si">Realizar de cualquier modo</button></footer>
+    </div></div>`;
+  raiz.querySelector('#bn-sin-nitros').addEventListener('mousedown', e => { if(e.target.id === 'bn-sin-nitros') bnCerrarSinNitros(); });
   raiz.addEventListener('click', e => {
     const b = e.target.closest('button');
     if(!b || !bn) return;
+    if(b.dataset.bnSn){ const seguir = bnSinNitrosSeguir; bnCerrarSinNitros(); if(b.dataset.bnSn === 'si' && seguir) seguir(); return; }
     if(b.dataset.bnCerrar !== undefined){ cerrarBotoneraNueva(); return; }
     if(b.dataset.colapsar){
       const estado = bnColapsados();
@@ -9236,7 +9300,7 @@ function bnCrear(){
       return;
     }
     if(!bn.S) return;
-    if(bnTirarAca(b)) return;
+    if(bnTirarAca(b) || bnAccionAca(b)) return;
     const datos = {...b.dataset};
     if(!Object.keys(datos).length) return;
     bnDelegar(datos);
@@ -9252,11 +9316,15 @@ async function abrirBotoneraNueva(fichaId){
   if(bn.fichaId !== fichaId || !bn.sesion){
     if(bn.sesion) FichaSesion.cortar(bn.sesion);
     bn.fichaId = fichaId; bn.S = null;
-    const f = FichaSesion.nueva(fichaId, '', false, true);   // solo mirar: la que guarda es la ficha
-    bn.sesion = f;
+    const f = FichaSesion.nueva(fichaId, '', false, true);   // guarda solo después de un botón que lo cambia (bnUi), si puede
+    bn.sesion = f; bn.doc = null;
     FichaSesion.escuchar(f, {
       db: fbDb, ruta: fbRutaCampana(`fichas/${fichaId}`), vigente: () => !!bn && bn.sesion === f,
-      alDoc: doc => { if(!doc.exists){ toast('Ese personaje ya no está en la mesa'); cerrarBotoneraNueva(); } },
+      alDoc: doc => {
+        if(!doc.exists){ toast('Ese personaje ya no está en la mesa'); cerrarBotoneraNueva(); return; }
+        bn.doc = doc.data();
+        f.duenoUid = bn.doc.duenoUid;
+      },
       alCargar: armado => {
         const S = FichaGuardado.normalizar(armado.datos).S;
         FichaGuardado.ponerImagenesInvocaciones(S, armado.imgInvocaciones);
@@ -9265,7 +9333,7 @@ async function abrirBotoneraNueva(fichaId){
         f.cargada = true;
         bnDibujar();
       },
-      alControl: () => {},
+      alControl: c => { f.control = c; },
       aplicarParte: (parte, datos) => FichaGuardado.aplicarParte(bn.S, parte, datos, {imgInvocaciones: f.ultimo.imgInvocaciones || ''}),
       alCambiar: () => { FichaGuardado.completar(bn.S); bnDibujar(); },
       alErrorPartes: () => toast('No se pudo leer el personaje para la Botonera nueva'),

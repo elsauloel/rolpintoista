@@ -12,19 +12,7 @@ function avisarSinNitros(costo, accion, continuar){
   $('#scrim-sin-nitros').classList.add('open');
 }
 // Publica la línea roja y devuelve cuántos Nitros descontar (los que haya, nunca de más).
-function gastoNitrosForzado(costo, hizo){
-  const disp = Math.max(0, num(S.nitros));
-  if(fbDb && fbUsuario && fbMiembro){
-    const nombre = ((S.meta && S.meta.nombre) || '').trim() || fbMiembro.nombre;
-    fbDb.collection(fbRutaCampana('tiradas')).add({
-      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
-      origen: `⚠ ${nombre} ${hizo} sin Nitros suficientes`, formula: `Costaba ${fmt(costo)} No2 y tenía ${fmt(disp)}`,
-      rolls: [], mod: 0, total: 0, desde: 'alerta-roja',
-      cuando: firebase.firestore.FieldValue.serverTimestamp(),
-    }).catch(err => console.error('No se pudo publicar la alerta de Nitros:', err));
-  }
-  return Math.min(costo, disp);
-}
+function gastoNitrosForzado(costo, hizo){ return FichaAcciones.gastoNitrosForzado(S, costo, hizo); }   // comun/ficha-acciones.js
 function cerrarSinNitros(){ sinNitrosPendiente = null; $('#scrim-sin-nitros').classList.remove('open'); }
 $('#sin-nitros-x').onclick = $('#sin-nitros-cancel').onclick = cerrarSinNitros;
 $('#scrim-sin-nitros').addEventListener('mousedown', e => { if(e.target.id === 'scrim-sin-nitros') cerrarSinNitros(); });

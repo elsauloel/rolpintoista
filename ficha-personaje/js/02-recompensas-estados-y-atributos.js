@@ -573,43 +573,19 @@ function repararArmadura(){
 const tieneSigilo = () => FichaBotonera.tieneSigilo(S);   // comun/ficha-botonera.js
 const efectoSigilo = () => FichaBotonera.efectoSigilo(S);
 
-function alternarSigilo(forzar){
-  const actual = efectoSigilo();
-  if(actual){
-    S.efectos = S.efectos.filter(e => e !== actual);
-    renderList('efectos'); refresh();
-    toast('Saliste del sigilo');
-    return;
-  }
-  const costo = num(IT2.nitrosSigilo);
-  if(num(S.nitros) < costo && !forzar){
-    avisarSinNitros(costo, 'entrar en sigilo', () => alternarSigilo(true));
-    return;
-  }
-  const preset = EFECTOS_PRESET.find(p => p.nombre === 'Sigilo');
-  S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(costo, 'entró en sigilo') : costo);
-  S.efectos.push({id: uid(), nombre: 'Sigilo', imagen: '', turnos: 0, stacks: 1, hpturno: 0, stacksturno: 0,
-    permanente: true, activo: true, popup: false, detalle: (preset && preset.detalle) || '', mods: [], ...flagsDePreset('Sigilo')});
-  renderList('efectos'); renderNitros(); refresh();
-  toast(`Entraste en sigilo${costo ? ` · -${fmt(costo)} No2` : ''}`);
-}
+// Lo que hacen Sigilo y Levantarse: comun/ficha-acciones.js (el mismo que usa la Botonera nueva del mapa); acá, lo que se ve.
+const accionesUi = {
+  get presets(){ return EFECTOS_PRESET; },
+  toast: t => toast(t),
+  avisarSinNitros: (costo, accion, continuar) => avisarSinNitros(costo, accion, continuar),
+  cambio: lista => { renderList('efectos'); if(lista.includes('nitros')) renderNitros(); refresh(); },
+};
+function alternarSigilo(forzar){ FichaAcciones.alternarSigilo(S, forzar, accionesUi); }
 
 /* ---------- Sentado: levantarse cuesta 1 No2 ----------
    El estado Sentado no vence solo; el botón "Levantarse" de la Botonera lo saca y cobra IT2.nitrosLevantarse. */
 const efectoSentado = () => FichaBotonera.efectoSentado(S);   // comun/ficha-botonera.js
-function levantarse(forzar){
-  const actual = efectoSentado();
-  if(!actual) return;
-  const costo = num(IT2.nitrosLevantarse);
-  if(num(S.nitros) < costo && !forzar){
-    avisarSinNitros(costo, 'levantarte', () => levantarse(true));
-    return;
-  }
-  S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(costo, 'se levantó') : costo);
-  S.efectos = S.efectos.filter(e => e !== actual);
-  renderList('efectos'); renderNitros(); refresh();
-  toast(`Te levantaste${costo ? ` · -${fmt(costo)} No2` : ''}`);
-}
+function levantarse(forzar){ FichaAcciones.levantarse(S, forzar, accionesUi); }
 
 // El "estado del sistema anterior" que una habilidad o un ítem pone al ejecutarse/consumirse (nombre, turnos, HP por
 // turno, escudo, stacks, mods): la regla vive en comun/ficha-habilidades.js (paso 5, nivel B, área 3), con el

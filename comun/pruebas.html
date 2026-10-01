@@ -53,6 +53,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
 <script src="ficha-resumen.js"></script>
+<script src="ficha-acciones.js"></script>
 <script src="tiradas-propias.js"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
@@ -582,6 +583,24 @@ prueba('una invocación publica su No2 máximo con lo que le suma el equipo y su
   const S = fichaBotonera({invocaciones: [{id: 'v', nombre: 'Lobo', agl: 4, imagen: 'data:x', equipo: [{nombre: 'Collar', mods: [{stat: 'nitros', val: 2}]}]}]});
   const i = FichaResumen.resumen(S, {miniaturaInv: img => img ? 'mini' : ''}).invocaciones[0];
   igual([i.nombre, i.nitrosMax, i.miniatura, i.activa], ['Lobo', 6, 'mini', true]);
+});
+
+/* ---------- Botones que cambian al personaje (comun/ficha-acciones.js, paso 4 etapa 3c) ---------- */
+grupo('Sigilo y Levantarse');
+const uiPrueba = reg => ({presets: estadosPresetFicha(), toast: t => reg.push(t), avisarSinNitros: (c, a, seguir) => { reg.push(`sin No2: ${a}`); reg.seguir = seguir; }, cambio: l => reg.push('cambio ' + l)});
+prueba('entrar en sigilo cobra 1 No2 y pone el estado; salir es gratis', () => {
+  const S = fichaBotonera({nitros: 3}), reg = [];
+  FichaAcciones.alternarSigilo(S, false, uiPrueba(reg));
+  const dentro = [S.nitros, S.efectos.map(e => e.nombre)];
+  FichaAcciones.alternarSigilo(S, false, uiPrueba(reg));
+  igual([dentro, S.nitros, S.efectos.length, reg.filter(x => !x.startsWith('cambio'))], [[2, ['Sigilo']], 2, 0, ['Entraste en sigilo · -1 No2', 'Saliste del sigilo']]);
+});
+prueba('sin No2 avisa y no hace nada; "Realizar de cualquier modo" lo hace igual sin bajar de 0', () => {
+  const S = fichaBotonera({nitros: 0, efectos: [{id: 's', nombre: 'Sentado', sentado: true, activo: true}]}), reg = [];
+  FichaAcciones.levantarse(S, false, uiPrueba(reg));
+  const antes = [S.efectos.length, reg[0]];
+  reg.seguir();
+  igual([antes, S.nitros, S.efectos.length], [[1, 'sin No2: levantarte'], 0, 0]);
 });
 
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */

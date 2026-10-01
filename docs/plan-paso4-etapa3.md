@@ -61,7 +61,7 @@ Botonera a medio andar: lo que no está listo, sigue funcionando por el camino d
 Cada uno: su pieza a `comun/` (como en el paso 5), sus pruebas, el botón pasa a hacerse en el mapa, probado con Clementino.
 Orden propuesto, de lo más simple a lo más complejo (ver pregunta 3):
 1. Tirar un stat, Percepción ✅ (2026-10-01). Fuerza del golpe pasa al paso 4 (elige arma como el Parry).
-2. Sigilo y Levantarse.
+2. Sigilo y Levantarse ✅ (2026-10-01; el mapa ya guarda al personaje).
 3. Consumibles (cinturón y mochila).
 4. Atacar, Daño, Esquivar, Parry y Bloqueo — con los ganchos del duelo del personaje (`DUELO_HOOKS`).
 5. Habilidades (lo más grande: elegir arma, costo X, turno ajeno, Flash, Ejecución, zonas y trampas).
@@ -139,3 +139,20 @@ siga necesitándolo (ver pregunta 4). La ficha suelta (`ficha.html`) no cambia: 
   **En vivo** (Clementino): el resumen que arma la ficha nueva es idéntico al que estaba guardado; entrar en sigilo lo
   publica (Sigilo, No2 12 → 11) y salir lo saca. Ojo, de paso: el resumen tiene la clave `muerto` dos veces (un objeto y
   después un sí/no); vale la segunda, como siempre — no se tocó.
+- 2026-10-01: **P138 probada en vivo** con las reglas pegadas por el dueño: la Percepción de Clementino quedó en la Mesa con
+  su `ficha`, aparece una sola vez en "mis últimas tiradas" y sigue ahí después de recargar la ficha.
+- 2026-10-01: **3c, paso 2 hecho — Sigilo y Levantarse los hace el mapa, y el mapa guarda al personaje** (primera vez).
+  `comun/ficha-acciones.js` (`FichaAcciones.alternarSigilo/levantarse(S, forzar, ui)` y `gastoNitrosForzado(S, costo, hizo)`,
+  copiados de la ficha; cada pantalla pone el cartel, el aviso y el redibujo con `ui`). La ficha los usa con sus nombres de
+  siempre. En el mapa (`bnAccionAca`, `bnUi`, `bnOpcionesGuardado`): solo si quien mira puede guardar ese personaje (su dueño
+  o el GM con 🎮 el control; si no, se sigue delegando); escribe **solo las partes que cambió la acción** (lo que difiera
+  por haberlo armado distinto se marca como ya guardado) y el resumen público con `FichaResumen` (las miniaturas de las
+  invocaciones se reusan de las publicadas). El cartel "No te alcanzan los Nitros" es el mismo de la ficha, dentro del
+  recuadro. Comparado contra el código viejo en 80 casos (con y sin el estado, No2 de sobra/justos/ninguno, forzando o no,
+  aceptando o no el cartel; registrando carteles, avisos, redibujos y la línea roja): igual; 2 mutaciones detectadas.
+  **En vivo, con Clementino abierto a la vez en la ficha y en el mapa (Saulo-Prueba)**: sin tocar nada, el mapa no
+  escribiría ninguna parte y su resumen es idéntico al guardado; entrar en sigilo desde el mapa → mapa, Firebase y la ficha
+  de la otra pestaña en Sigilo y No2 11 → 10, la ficha sin nada pendiente; sentado y con 0 No2 (puesto desde la ficha), el
+  botón 🧍 apareció solo en el mapa, salió el cartel ("No podés levantarte: cuesta 1 No2 y tenés 0."), "Realizar de
+  cualquier modo" lo levantó sin bajar de 0 y publicó la línea roja en la Mesa; salir del sigilo desde el mapa llegó a la
+  ficha, y los No2 llenados desde la ficha llegaron al mapa (12/12).

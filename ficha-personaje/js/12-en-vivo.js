@@ -16,6 +16,8 @@ function mesaQuien(origen){
   if(inv) return inv.nombre;
   return ((S.meta && S.meta.nombre) || '').trim();
 }
+// De qué personaje es la tirada (comun/mesa.js la publica con su `ficha`): el abierto, también lo de sus invocaciones (P138).
+function mesaFicha(){ return fichaVivo && fichaVivo.id ? fichaVivo.id : ''; }
 
 
 /* =========================================================
@@ -463,6 +465,14 @@ function fichaEscuchar(f){
       fichaPonerImagenesInvocaciones(armado.imgInvocaciones);
       renderInvocaciones();
       f.cargada = true;
+      // "Mis últimas tiradas" desde la Mesa (P138): para la Moneda Re-Roll y la Polilla. Se corta con el personaje.
+      tiradasMesa = [];
+      f.cortes.push(TiradasPropias.escuchar(fbDb, fbRutaCampana('tiradas'), f.id, (S.meta && S.meta.nombre) || '', lista => {
+        if(fichaVivo !== f) return;
+        tiradasMesa = lista;
+        if($('#scrim-reroll').classList.contains('open')) renderReroll();
+        renderPolillaBoton();
+      }));
       // Si la ficha tiene retrato pero el token del mapa se quedó sin miniatura, la vuelve a publicar.
       if(!f.soloLectura && !f.miniaturaDoc && (S.meta.imagen || S.meta.miniatura)){ f.reponerMiniatura = true; }
       f.revisarResumen = true;

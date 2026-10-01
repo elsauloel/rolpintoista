@@ -52,6 +52,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
+<script src="tiradas-propias.js"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -522,6 +523,19 @@ prueba('Levantarse y Sigilo aparecen solo cuando corresponden; los talentos van 
     [true, false, false, true, true]);
 });
 prueba('los costos de la Iteración 2 son los de siempre', () => igual([FichaCalculo.IT2.nitrosHabilidad, FichaCalculo.IT2.nitrosConsumirMochila, FichaCalculo.IT2.nitrosSigilo], [1, 2, 1]));
+
+/* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */
+grupo('Mis últimas tiradas (P138)');
+prueba('se juntan las de la Mesa con las de esta ventana, sin repetir, las últimas primero', () => {
+  const locales = [{origen: 'Fue', rerollId: 3, docId: 'm2', hora: new Date(3000)}, {origen: 'Eva', rerollId: 2, hora: new Date(2500)}];
+  const mesa = [{clave: 'm2', docId: 'm2', origen: 'Fue', t: 3000}, {clave: 'm1', docId: 'm1', origen: 'PdG', t: 1000}];
+  igual(TiradasPropias.juntar(locales, mesa).map(e => e.clave), ['m2', 'L2', 'm1']);
+});
+prueba('ya usó su moneda: por su clave, o por su id de la Mesa si se marcó antes de que llegara', () => {
+  const e = {clave: 'm5', docId: 'm5'}, local = {clave: 'L7', rerollId: 7, docId: 'm9'};
+  igual([TiradasPropias.usada(e, ['m5']), TiradasPropias.usada(e, ['L1']), TiradasPropias.usada(local, ['m9']), TiradasPropias.usada({clave: 'm9', docId: 'm9'}, ['L7', 'm9']), TiradasPropias.usada(e, undefined)],
+    [true, false, true, true, false]);
+});
 
 /* ---------- Plantillas (comun/plantillas.js) ---------- */
 grupo('Plantillas');

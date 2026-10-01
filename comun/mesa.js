@@ -39,6 +39,9 @@ function mesaEstado(texto){
 let mesaTextoPendiente = '';
 function mesaConTexto(detalle){ mesaTextoPendiente = String(detalle || '').slice(0, 300); }
 
+// Devuelve el id de la tirada en la Mesa (o undefined si no se publicó). r.quien: quién tira, si la herramienta no lo sabe por el
+// origen (el mapa, cuando tira por un personaje). La `ficha` del personaje (r.ficha, o mesaFicha(origen) si la herramienta la
+// define) viaja con la tirada: de ahí salen "mis últimas tiradas" de la Moneda Re-Roll y la Polilla (comun/tiradas-propias.js, P138).
 async function mesaPublicar(origen, r){
   // Duelo (comun/duelo.js): el PdG, la Evasión, el Parry, la Fuerza del golpe y el Bloqueo de un duelo se publican juntos cuando tiran los dos (elegir la defensa es a ciegas).
   if(window.DUELO_RETENER) return;
@@ -48,7 +51,8 @@ async function mesaPublicar(origen, r){
   }
   const texto = mesaTextoPendiente;
   mesaTextoPendiente = '';
-  const quien = String(mesaQuien(origen) || '');
+  const quien = String(r.quien || mesaQuien(origen) || '');
+  const ficha = String(r.ficha || (typeof mesaFicha === 'function' ? mesaFicha(origen) : '') || '').slice(0, 80);
   let origenTxt = String(origen || '');
   if(quien && origenTxt.startsWith(quien + ' · ')) origenTxt = origenTxt.slice(quien.length + 3);
   const doc = {
@@ -78,14 +82,14 @@ async function mesaPublicar(origen, r){
   const ventaja = r.ventaja && Array.isArray(r.ventaja.rolls)
     ? {rolls: r.ventaja.rolls.slice(0, 100).map(num), total: num(r.ventaja.total), elegido: num(r.ventaja.elegido)} : null;
   // Reglas viejas (no conocen "ventaja", "estados", "estilo" o "texto"): se reintenta quitando campos de a uno, la tirada sale igual.
-  const extras = [['texto', texto], ['estilo', estilo], ['estados', estados.length ? estados : null], ['ventaja', ventaja], ['destacar', r.destacar === 'max' ? 'max' : '']].filter(x => x[1]);   // destacar: 'max' = los dados 3D hacen brillar el más alto (crítico)
+  const extras = [['texto', texto], ['estilo', estilo], ['estados', estados.length ? estados : null], ['ventaja', ventaja], ['destacar', r.destacar === 'max' ? 'max' : ''], ['ficha', ficha]].filter(x => x[1]);   // destacar: 'max' = los dados 3D hacen brillar el más alto (crítico)
   const intentos = [];
   for(let n = extras.length; n >= 0; n--) intentos.push({...doc, ...Object.fromEntries(extras.slice(0, n))});
   let err = null;
   for(const d of intentos){
     try{
-      await fbDb.collection(fbRutaCampana('tiradas')).add({...d, cuando: firebase.firestore.FieldValue.serverTimestamp()});
-      return;
+      const ref = await fbDb.collection(fbRutaCampana('tiradas')).add({...d, cuando: firebase.firestore.FieldValue.serverTimestamp()});
+      return ref.id;
     }catch(e){
       err = e;
       if(e.code !== 'permission-denied') break;

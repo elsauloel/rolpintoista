@@ -8,9 +8,21 @@ let dadosHistorial = [];
 
 
 let dadosHistorialSeq = 0;   // id creciente por tirada (para que la Moneda Re-Roll sepa cuál ya usó su re-roll)
+// "Mis últimas tiradas" (P138, 2026-10-01): las de este personaje en la Mesa (las escucha la ficha abierta, fichaEscuchar) más
+// las de esta ventana que todavía no llegaron; comun/tiradas-propias.js. Las usan la Moneda Re-Roll y la Polilla.
+let tiradasMesa = [];
+const tiradasPropias = () => TiradasPropias.juntar(dadosHistorial, tiradasMesa);
 function registrarTirada(origen, r){
-  dadosHistorial.unshift({origen, ...r, hora: new Date(), rerollId: ++dadosHistorialSeq});
-  mesaPublicar(origen, r);
+  const entrada = {origen, ...r, hora: new Date(), rerollId: ++dadosHistorialSeq};
+  dadosHistorial.unshift(entrada);
+  const pub = mesaPublicar(origen, r);
+  // El id que le dio la Mesa: así no aparece dos veces en la lista y, si ya usó su moneda, la marca vale para las dos formas.
+  if(pub && typeof pub.then === 'function') pub.then(id => {
+    if(!id) return;
+    entrada.docId = id;
+    const u = S.rerollUsados || [];
+    if(u.includes('L' + entrada.rerollId) && !u.includes(id)) S.rerollUsados = [...u, id].slice(-50);
+  }).catch(() => {});
   window.dispatchEvent(new CustomEvent('tirada-registrada', {detail: {origen, r}}));   // el duelo (comun/duelo.js) recoge su PdG / Evasión de acá
   dadosHistorial = dadosHistorial.slice(0, 20);
   registrarEvento(`🎲 ${origen}: ${r.formula} = ${fmt(r.total)}`);
@@ -44,13 +56,13 @@ function renderPolillaBoton(){
       document.head.appendChild(s);
     }
   }
-  const ultima = dadosHistorial[0];
+  const ultima = tiradasPropias()[0];
   $('#polilla-flotante-sub').textContent = ultima ? `+2 a tu última tirada: ${ultima.origen} (${fmt(num(ultima.total))})` : 'todavía no hiciste ninguna tirada';
 }
 function usarPolilla(){
   const est = esPolillaActiva();
   if(!est) return;
-  const ultima = dadosHistorial[0];
+  const ultima = tiradasPropias()[0];
   if(!ultima){ toast('Todavía no hiciste ninguna tirada para sumarle el +2'); return; }
   S.efectos = S.efectos.filter(e => e.id !== est.id);   // la polilla se gasta
   ultima.total = num(ultima.total) + 2;   // se ve reflejado en el historial de esta pantalla (la Mesa ya publicada no se reescribe)

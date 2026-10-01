@@ -877,17 +877,17 @@ function repetirTirada(u){
   registrarTirada(`${String(u.origen).replace(/ \(re-roll\)$/, '')} (re-roll)`, {formula: u.formula, rolls, mod: u.mod, total, estados: u.estados});
   return true;
 }
-let rerollUsados = new Set();   // ids de dadosHistorial que ya usaron su moneda (una por tirada; no se guarda, es de esta sesión)
+// Qué tiradas ya usaron su moneda (una por tirada): S.rerollUsados, las claves de comun/tiradas-propias.js — se guarda en la ficha (P138).
 function renderReroll(){
   const m = monedaReroll();
-  const lista = dadosHistorial.filter(h => !/^🪙 Moneda Re-Roll/.test(String(h.origen)));
+  const lista = tiradasPropias().filter(h => !/^🪙 Moneda Re-Roll/.test(String(h.origen)));
   $('#reroll-aviso').innerHTML = m
     ? `Tenés una Moneda Re-Roll en <b>${m.key === 'cinturon' ? 'el cinturón' : 'la mochila'}</b>. Elegí qué tirada repetir: no cuesta No2, pero después se tira la moneda (par se conserva, impar se rompe).`
     : `No tenés una Moneda Re-Roll equipada (cinturón o mochila). Podés ver tus últimas tiradas igual.`;
   $('#reroll-lista').innerHTML = lista.length ? lista.map(h => {
-    const usada = rerollUsados.has(h.rerollId);
+    const usada = TiradasPropias.usada(h, S.rerollUsados);
     return `<div class="item"><div class="ihead"><div><div class="iname">${esc(h.origen)}</div><div class="idesc">${esc(h.formula || '')}${h.rolls && h.rolls.length ? ' → ' + h.rolls.join(' + ') : ''}${num(h.mod) ? ' ' + (num(h.mod) > 0 ? '+' : '−') + ' ' + Math.abs(num(h.mod)) : ''} = <b>${fmt(num(h.total))}</b></div></div>
-      ${usada ? '<span class="tag">ya usó su re-roll</span>' : `<button type="button" class="mini" data-rerollpick="${h.rerollId}"${m ? '' : ' disabled'}>🪙 Re-roll</button>`}</div></div>`;
+      ${usada ? '<span class="tag">ya usó su re-roll</span>' : `<button type="button" class="mini" data-rerollpick="${esc(h.clave)}"${m ? '' : ' disabled'}>🪙 Re-roll</button>`}</div></div>`;
   }).join('') : '<div class="hint">Todavía no hiciste ninguna tirada.</div>';
 }
 function abrirReroll(){
@@ -899,11 +899,11 @@ $('#scrim-reroll').addEventListener('mousedown', e => { if(e.target.id === 'scri
 $('#reroll-lista').addEventListener('click', e => {
   const b = e.target.closest('[data-rerollpick]');
   if(!b) return;
-  const id = Number(b.dataset.rerollpick);
-  const h = dadosHistorial.find(x => x.rerollId === id);
+  const clave = b.dataset.rerollpick;
+  const h = tiradasPropias().find(x => x.clave === clave);
   const m = monedaReroll();
-  if(!h || !m || rerollUsados.has(id)) return;
-  rerollUsados.add(id);
+  if(!h || !m || TiradasPropias.usada(h, S.rerollUsados)) return;
+  S.rerollUsados = [...(S.rerollUsados || []), clave, ...(h.docId && h.docId !== clave ? [h.docId] : [])].slice(-50);
   if(!repetirTirada(h)) return;
   setTimeout(() => tirarMonedaReroll(m), 900);
   renderReroll();

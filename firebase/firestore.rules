@@ -208,7 +208,9 @@ service cloud.firestore {
       match /tiradas/{id} {
         allow read: if esMiembro(c);
         allow create: if esMiembro(c)
-          && request.resource.data.keys().hasOnly(['uid', 'jugador', 'quien', 'origen', 'formula', 'rolls', 'mod', 'total', 'desde', 'cuando', 'texto', 'estilo', 'estados', 'ventaja', 'destacar'])
+          && request.resource.data.keys().hasOnly(['uid', 'jugador', 'quien', 'origen', 'formula', 'rolls', 'mod', 'total', 'desde', 'cuando', 'texto', 'estilo', 'estados', 'ventaja', 'destacar', 'ficha'])
+          // De qué personaje es la tirada (P138, 2026-10-01): de ahí salen sus últimas tiradas para la Moneda Re-Roll y la Polilla.
+          && (!('ficha' in request.resource.data) || (request.resource.data.ficha is string && request.resource.data.ficha.size() <= 80))
           // Afortunado: la tirada descartada {rolls, total, elegido} (comun/mesa.js, para mostrar las dos en la Mesa y en los dados 3D).
           && (!('ventaja' in request.resource.data) || (request.resource.data.ventaja is map && request.resource.data.ventaja.rolls is list && request.resource.data.ventaja.rolls.size() <= 100))
           && (!('estilo' in request.resource.data) || (request.resource.data.estilo is string && request.resource.data.estilo.size() <= 300))

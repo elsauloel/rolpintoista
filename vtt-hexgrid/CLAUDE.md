@@ -1100,3 +1100,6 @@ hexágono con otro sin importar bando. Todavía no está construido.
   dónde están las de los jugadores** (se entera por el anuncio en la Mesa). La detección por "Ve lo oculto" usa solo los tokens
   del propio bando. Una habilidad ✨ automática con trampa le manda al mapa `trampa-habilidad` y el mapa pide la casilla con un
   clic (`trampaDeHabilidad` → `TokensAuto.colocarTrampas({…, celda})`).
+
+
+- **⚗ Botonera nueva (prueba, paso 4 etapa 3b, 2026-10-01, `docs/plan-paso4-etapa3.md`)**: interruptor `#btn-botonera-nueva` (solo GM, `localStorage` `botonera-nueva-prueba`). Prendido, `abrirBotonera` de un personaje (sin mensaje ni invocación) abre `abrirBotoneraNueva(fichaId)`: carga recién ahí `comun/ficha-calculo/combate/habilidades/guardado/sesion/botonera.js` y `skills-clase.js` (`BN_PIEZAS`, mismas versiones que la ficha) y el `ficha.css` (con `:root` → `:host`), lee al personaje con `FichaSesion` (solo mirar) y lo dibuja con `FichaBotonera.html` en `#botonera-nueva` (shadow DOM, z-index 89, debajo de `#botonera-capa`). Cada botón se lo pide a la ficha escondida del marco (`bnDelegar` → `botonera-delegar`; la ficha busca el mismo `data-*` en su Botonera y lo toca). Escape, B o clic en el fondo la cierran. Sin 🔍 todavía.

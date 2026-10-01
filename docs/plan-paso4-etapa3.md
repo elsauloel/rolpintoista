@@ -108,3 +108,14 @@ siga necesitándolo (ver pregunta 4). La ficha suelta (`ficha.html`) no cambia: 
   la pestaña B no llegó a la A mientras la A seguía "Guardando…" su propio cambio (pestaña de fondo): no se repitió en
   dos intentos más y la lógica es la misma de antes (lo que tiene una escritura propia pendiente se saltea) — a mirar si
   aparece en una partida. Sigue la **3b** (la Botonera nueva en el mapa, solo mirar, detrás del interruptor).
+- 2026-10-01: **3b hecha** — `comun/ficha-botonera.js` (`FichaBotonera`: el dibujo de la Botonera y ~30 ayudantes; la ficha
+  lo usa; comparado contra el `renderBotonera` viejo en 400 personajes al azar y cada ayudante en 9150 casos: igual) e `IT2`
+  pasó a `comun/ficha-calculo.js`. En el mapa, **⚗ Botonera nueva** (interruptor de la barra de arriba, solo GM, recordado en
+  el navegador): `abrirBotoneraNueva(fichaId)` lee al personaje con `FichaSesion` (solo mirar), lo dibuja con
+  `FichaBotonera` en un recuadro aislado (shadow DOM) con el `ficha.css` de siempre y le pide cada botón a la ficha escondida
+  del marco (mensaje `botonera-delegar`). Las piezas se cargan al usarla (no el catálogo: `FichaGuardado` ya funciona sin él).
+  **Probada en "Claude · pruebas" como Saulo-Prueba (el jugador dueño de Clementino, abierta desde la consola porque el
+  interruptor es del GM)**: muestra lo mismo que la ficha; Fue y Percepción tiran desde la ficha escondida y salen en la Mesa;
+  Atacar abre "¿Qué ataque es?" encima (como siempre) y, con tirada suelta, tira PdG y cobra 2 No2 — la Botonera nueva se
+  actualiza sola (No2 10/12, el próximo ataque a 4 No2). Pendiente de la 3b: las 🔍 (la lupa vive en la ficha; va en la 3c).
+  Sigue la **3c**: mudar los botones de a uno (tiradas de stats y Percepción primero).

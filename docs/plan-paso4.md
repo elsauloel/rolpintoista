@@ -55,3 +55,6 @@ Con las piezas de la etapa 2, el mapa arma la Botonera del personaje y las Accio
   habrían aparecido encima del duelo), GM Tools cargado sirve para cualquier creep, y dentro del mapa la ficha no muestra su
   propio cartel de subida de nivel (ya lo muestra el mapa). **Efecto buscado de la etapa 1**: los carteles que la ficha abre
   sola dentro del mapa (quedaste inconsciente, recordatorios de estados) ahora se ven; antes quedaban escondidos.
+  Probado en mesa como GM (precarga, Acciones al instante, duelo con el creep sin cargar). **Etapa 1 cerrada**, salvo probar
+  como jugador la precarga de la ficha propia (en la próxima partida o con 🎮 Tomar el control). Sigue la **etapa 2** (= paso
+  5, partir los archivos): necesita su propio plan antes de empezar.

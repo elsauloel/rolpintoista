@@ -42,10 +42,12 @@ function mitadesDeTirada(estados, statId){ return Combatiente.mitadesDeTirada(es
 function aplicarMitades(total, n){ return Combatiente.aplicarMitades(total, n); }
 // La tirada de un stat del creep es la misma que la de un personaje o una invocación (comun/combatiente.js): Afortunado
 // (dos veces, queda la mejor), mitades y Evasión mínimo 1.
-function tirarValorStat(nombre, valor, sc, statId){
-  const r = Combatiente.tirarStat(valor, sc ? sc.estados : [], statId);
-  if(!r){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
-  registrarTirada(nombre, r);
+function tirarValorStat(nombre, valor, sc, statId){ publicarTiradaCreep(CreepAcciones.tirada(nombre, valor, sc, statId)); }   // comun/creep-acciones.js
+// Una tirada armada por comun/creep-acciones.js ({origen, r} o {error}), a la Mesa.
+function publicarTiradaCreep(t){
+  if(!t) return;
+  if(t.error){ toast(t.error); return; }
+  registrarTirada(t.origen, t.r);
 }
 
 const COLORES = ['#C4485A','#D07B3A','#8FB84F','#4FA88C','#9B7BD4','#6FA8D8'];

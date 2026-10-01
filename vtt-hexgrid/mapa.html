@@ -932,7 +932,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/grilla-dados.js"></script>
 <script src="../comun/efectos-golpe.js"></script>
 <script src="../comun/tiradas.js"></script>
-<script src="../comun/mesa.js?v=20261001a"></script>
+<script src="../comun/mesa.js?v=20261001b"></script>
 <script src="../comun/recorte-imagen.js"></script>
 <script src="../comun/plantillas.js?v=20260930b"></script>
 <script src="../comun/biblioteca.js?v=20260929i"></script>
@@ -9693,7 +9693,7 @@ document.addEventListener('keydown', e => {
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/creep-botonera.js?v=20261001a'];
+const AC_PIEZAS = ['../comun/creep-botonera.js?v=20261001a', '../comun/creep-acciones.js?v=20261001a'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -9727,7 +9727,7 @@ function acDibujar(){
   if(!crudo){ cuerpo.innerHTML = '<div class="modal acciones-modal"><div class="body"><div class="hint">Cargando el creep…</div></div></div>'; return; }
   const sc = CreepCalculo.normalizar(structuredClone(crudo));
   sc.id = ac.creepId;
-  const r = CreepBotonera.html(sc, {lupa: false, parryPendiente: false});
+  const r = CreepBotonera.html(sc, {lupa: false, parryPendiente: acParry.has(ac.creepId)});
   const scroll = ac.host.scrollTop;
   cuerpo.innerHTML = `<div class="modal acciones-modal">
     <header>
@@ -9741,6 +9741,85 @@ function acDibujar(){
     <div class="body">${r.html}</div>
   </div>`;
   ac.host.scrollTop = scroll;
+}
+/* Paso 4c (tandas 1 y 2): lo que el mapa ya hace él mismo, con comun/creep-acciones.js — las tiradas de stats, Esquivar, Fuerza
+   del golpe, Daño (con los efectos al golpear de su arma), Levantarse, Parry y Bloqueo. Lo que cambia al creep (No2, Sentado) se
+   escribe con modificarCreep (transacción sobre su parte privada + resumen + firma: GM Tools, abierto en otra pestaña, se entera
+   por la firma). El Parry que espera su Bloqueo vive acá (acParry), como en GM Tools. */
+var acParry = new Set();
+function acCreep(){
+  const crudo = creepPrivadoDe(ac.creepId);
+  if(!crudo) return null;
+  const sc = CreepCalculo.normalizar(structuredClone(crudo));
+  sc.id = ac.creepId;
+  return sc;
+}
+// Una tirada del creep a la Mesa, a su nombre y pintada como las de GM Tools; avisa 'tirada-registrada' (lo recoge el duelo).
+function acPublicar(sc, t){
+  if(!t) return;
+  if(t.error){ toast(t.error); return; }
+  mesaPublicar(t.origen, {...t.r, quien: sc.nombre, desde: 'gm'});
+  window.dispatchEvent(new CustomEvent('tirada-registrada', {detail: {origen: t.origen, r: t.r}}));
+}
+// Cambia el creep en una transacción: `cambiar(sc)` recibe el creep al día (normalizado) y devuelve {error} o {aviso}. Si es un
+// error de la regla, no se escribe nada y se avisa. Devuelve lo que devolvió `cambiar`, o null.
+async function acCambiar(cambiar){
+  try{
+    return await modificarCreep(ac.creepId, crudo => {
+      const x = cambiar(CreepCalculo.normalizar(crudo));
+      if(x && x.error) throw Object.assign(new Error(x.error), {regla: true});
+      return x;
+    });
+  }catch(err){
+    if(err.regla) toast(err.message);
+    else { console.error('No se pudo cambiar el creep:', err); toast('No se pudo guardar el creep — revisá la consola'); }
+    return null;
+  }
+}
+// Los efectos al golpear de su arma (comun/efectos-golpe.js): recordar y tirar, no aplicar — igual que GM Tools.
+function acEfectosAlPegar(sc){
+  EfectosGolpe.alPegar({arma: `${sc.nombre} · ${sc.armaNombre || 'arma'}`, efectos: sc.armaEfectos, publicar: linea => {
+    if(!fbDb || !fbUsuario || !fbMiembro) return;
+    fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: String(sc.nombre || '').slice(0, 60),
+      origen: linea.origen.slice(0, 120), formula: linea.formula.slice(0, 900),
+      rolls: linea.rolls.slice(0, 100), mod: 0, total: 0, desde: 'efecto-gm',
+      cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    }).catch(err => console.error('No se pudieron publicar los efectos en la Mesa:', err));
+  }});
+}
+function acAccionAca(b){
+  const d = b.dataset, sc = acCreep();
+  if(!sc) return false;
+  if(d.tirarstatcreep){ acPublicar(sc, CreepAcciones.tiradaStat(sc, d.tirarstatcreep.split(':')[1])); return true; }
+  if(d.esquivarcreep){ acPublicar(sc, CreepAcciones.esquivar(sc)); return true; }
+  if(d.fuerzacreep){ acPublicar(sc, CreepAcciones.fuerzaGolpe(sc)); return true; }
+  if(d.daniocreep){
+    const t = CreepAcciones.dano(sc);
+    if(t){ acPublicar(sc, t); acEfectosAlPegar(sc); }
+    return true;
+  }
+  if(d.levantarcreep){ acCambiar(c => CreepAcciones.levantarse(c)).then(x => { if(x) toast(x.aviso); }); return true; }
+  if(d.parrycreep){
+    const id = ac.creepId;
+    acCambiar(c => CreepAcciones.pagarParry(c)).then(x => {
+      if(!x) return;
+      acParry.add(id);   // si gana el Parry, sigue el Bloqueo
+      acPublicar(sc, CreepAcciones.parry(sc));
+      toast(x.aviso);
+      acDibujar();
+    });
+    return true;
+  }
+  if(d.bloqueocreep){
+    const t = CreepAcciones.bloqueo(sc, acParry.has(ac.creepId));
+    if(t.error){ toast(t.error); return true; }
+    acParry.delete(ac.creepId);
+    acDibujar();
+    acPublicar(sc, t);
+    return true;
+  }
+  return false;
 }
 // Un botón de las Acciones nuevas: se lo pide a GM Tools en el marco (lo carga si hace falta, sin abrir nada).
 function acDelegar(datos){
@@ -9763,6 +9842,7 @@ function acCrear(){
     const b = e.target.closest('button');
     if(!b || !ac) return;
     if(b.dataset.acCerrar !== undefined){ cerrarAccionesNuevas(); return; }
+    if(acAccionAca(b)) return;
     const datos = {...b.dataset};
     if(!Object.keys(datos).length) return;
     acDelegar(datos);

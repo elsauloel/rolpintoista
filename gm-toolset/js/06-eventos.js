@@ -189,10 +189,7 @@ document.addEventListener('click', e => {
   }
   if(b.dataset.tirarstatcreep){
     const [scId, statId] = b.dataset.tirarstatcreep.split(':');
-    const sc = S.creeps.find(s=>s.id===scId);
-    const d = CREEP_STAT_LOOKUP[statId];
-    if(!sc || !d) return;
-    tirarValorStat(`${sc.nombre} · ${d.label}`, creepStatValor(sc, statId), sc, statId);
+    publicarTiradaCreep(CreepAcciones.tiradaStat(S.creeps.find(s=>s.id===scId), statId));   // comun/creep-acciones.js (paso 4 etapa 4c)
     return;
   }
   if(b.dataset.atacarcreep){
@@ -204,19 +201,18 @@ document.addEventListener('click', e => {
   if(b.dataset.levantarcreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.levantarcreep);
     if(!sc) return;
-    if(num(sc.nitros) < 1){ toast(`${sc.nombre}: no le alcanzan los No2 — levantarse cuesta 1`); return; }
-    sc.nitros = num(sc.nitros) - 1;
-    sc.estados = (sc.estados || []).filter(e => !(e.activo !== false && e.sentado));
+    const x = CreepAcciones.levantarse(sc);   // comun/creep-acciones.js
+    if(x.error){ toast(x.error); return; }
     renderAll();
-    toast(`${sc.nombre} se levantó · −1 No2 · quedan ${fmt(sc.nitros)}`);
+    toast(x.aviso);
     return;
   }
   if(b.dataset.daniocreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.daniocreep);
     if(!sc) return;
-    const r = tirarDados(danoTxt(sc, creepStatValor(sc, 'dmg')));
-    if(r){
-      registrarTirada(`${sc.nombre} · Daño`, r);
+    const t = CreepAcciones.dano(sc);   // comun/creep-acciones.js
+    if(t){
+      registrarTirada(t.origen, t.r);
       efectosAlPegarCreep(sc);
     }
     return;
@@ -224,25 +220,18 @@ document.addEventListener('click', e => {
   if(b.dataset.esquivarcreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.esquivarcreep);
     if(!sc) return;
-    const eva = creepStatValor(sc, 'eva');
-    tirarValorStat(`${sc.nombre} · Esquivar`, eva, sc, 'eva');
+    publicarTiradaCreep(CreepAcciones.esquivar(sc));   // comun/creep-acciones.js
     return;
   }
   if(b.dataset.parrycreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.parrycreep);
     if(!sc) return;
-    if(!defensaCreep(sc)){ toast(`${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`); return; }
-    const costo = costoParryCreep(sc);
-    if(costo > num(sc.nitros)){
-      toast(`${sc.nombre}: no le alcanzan los No2 — el Parry cuesta ${fmt(costo)} No2 y tiene ${fmt(num(sc.nitros))}`);
-      return;
-    }
-    sc.nitros = num(sc.nitros) - costo;
+    const x = CreepAcciones.pagarParry(sc);   // comun/creep-acciones.js
+    if(x.error){ toast(x.error); return; }
     parryPendienteCreep.add(sc.id);   // si gana el Parry, sigue el Bloqueo
     renderAll();
-    const parry = creepStatValor(sc, 'parry');
-    tirarValorStat(`${sc.nombre} · Parry`, parry, sc, 'parry');
-    toast(`${sc.nombre}: Parry −${fmt(costo)} No2 · quedan ${fmt(sc.nitros)} · si lo gana, tirá el Bloqueo`);
+    publicarTiradaCreep(CreepAcciones.parry(sc));
+    toast(x.aviso);
     return;
   }
   if(b.dataset.contraatacarcreep){   // (ya no hay botón suelto: el contraataque es una opción del menú de Atacar)
@@ -275,18 +264,17 @@ document.addEventListener('click', e => {
   if(b.dataset.fuerzacreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.fuerzacreep);
     if(!sc) return;
-    tirarValorStat(`${sc.nombre} · Fuerza del golpe`, fuerzaGolpeValorCreep(sc));
+    publicarTiradaCreep(CreepAcciones.fuerzaGolpe(sc));   // comun/creep-acciones.js
     return;
   }
   if(b.dataset.bloqueocreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.bloqueocreep);
     if(!sc) return;
-    const def = defensaCreep(sc);
-    if(!def){ toast(`${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`); return; }
-    if(!parryPendienteCreep.has(sc.id)){ toast(`${sc.nombre}: ${Combatiente.BLOQUEO_SOLO_TRAS_PARRY}`); return; }
+    const t = CreepAcciones.bloqueo(sc, parryPendienteCreep.has(sc.id));   // comun/creep-acciones.js
+    if(t.error){ toast(t.error); return; }
     parryPendienteCreep.delete(sc.id);
     renderAll();
-    tirarValorStat(`${sc.nombre} · Bloqueo · ${def.nombre}`, bloqueoValorCreep(sc), sc, 'bloqueo');
+    publicarTiradaCreep(t);
     return;
   }
   if(b.dataset.armanat){

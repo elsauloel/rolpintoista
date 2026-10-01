@@ -45,6 +45,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="combatiente.js"></script>
 <script src="creep-calculo.js"></script>
 <script src="creep-botonera.js"></script>
+<script src="creep-acciones.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
 <script src="estados-presets.js"></script>
@@ -901,6 +902,13 @@ prueba('las Acciones de un creep: sin arma no hay Parry; el Bloqueo se habilita 
   const con = CreepBotonera.html(sc, {lupa: false, parryPendiente: true}), sin = CreepBotonera.html(sc, {lupa: false});
   igual([sinArma.includes('data-parrycreep'), con.html.includes('Bloqueo · Hacha'), sin.html.includes('Bloqueo · tras el Parry'), con.html.includes('>Anunciar<'), con.html.includes('data-cdmod="k:h2:reset"'), con.badge, con.titulo],
     [false, true, true, true, true, 'No2 6/3', 'Orco']);
+});
+
+prueba('acciones de un creep: levantarse y el Parry cobran No2; el Bloqueo solo tras un Parry; sin No2 no se cobra', () => {
+  const sc = creepPrueba({nitros: 2, estados: [{nombre: 'Sentado', activo: true, sentado: true}]});
+  const lev = CreepAcciones.levantarse(sc), par = CreepAcciones.pagarParry(sc), sinNo2 = CreepAcciones.pagarParry(sc);
+  igual([!!lev.aviso, sc.estados.length, !!par.aviso, sc.nitros, !!sinNo2.error, !!CreepAcciones.bloqueo(sc, false).error, CreepAcciones.bloqueo(sc, true).origen, CreepAcciones.tiradaStat(sc, 'nada')],
+    [true, 0, true, 0, true, true, 'Orco · Bloqueo · Hacha', null]);
 });
 
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */

@@ -64,7 +64,8 @@ async function mesaPublicar(origen, r){
     rolls: (r.rolls || []).slice(0, 100),
     mod: num(r.mod),
     total: num(r.total),
-    desde: MESA_DESDE,
+    // r.desde = 'gm': la tirada de un creep que publica el mapa (Acciones nuevas, paso 4 etapa 4c): se pinta como las de GM Tools.
+    desde: r.desde === 'gm' ? 'gm' : MESA_DESDE,
     cuando: firebase.firestore.FieldValue.serverTimestamp(),
   };
   // Estilo de dados de quien tira (comun/dados3d.js): los demás lo ven con su color.

@@ -60,7 +60,7 @@ Botonera a medio andar: lo que no está listo, sigue funcionando por el camino d
 ### 3c — Mudar los botones, de a uno
 Cada uno: su pieza a `comun/` (como en el paso 5), sus pruebas, el botón pasa a hacerse en el mapa, probado con Clementino.
 Orden propuesto, de lo más simple a lo más complejo (ver pregunta 3):
-1. Tirar un stat, Percepción, Fuerza del golpe (con el cartel de sobrepeso).
+1. Tirar un stat, Percepción ✅ (2026-10-01). Fuerza del golpe pasa al paso 4 (elige arma como el Parry).
 2. Sigilo y Levantarse.
 3. Consumibles (cinturón y mochila).
 4. Atacar, Daño, Esquivar, Parry y Bloqueo — con los ganchos del duelo del personaje (`DUELO_HOOKS`).
@@ -119,3 +119,13 @@ siga necesitándolo (ver pregunta 4). La ficha suelta (`ficha.html`) no cambia: 
   Atacar abre "¿Qué ataque es?" encima (como siempre) y, con tirada suelta, tira PdG y cobra 2 No2 — la Botonera nueva se
   actualiza sola (No2 10/12, el próximo ataque a 4 No2). Pendiente de la 3b: las 🔍 (la lupa vive en la ficha; va en la 3c).
   Sigue la **3c**: mudar los botones de a uno (tiradas de stats y Percepción primero).
+- 2026-10-01: **3c, paso 1 (parte 1) hecho** — las tiradas de stats y la Percepción las hace el mapa: `FichaBotonera.tiradaStat(S,
+  statId)` y `tiradaPercepcion(S, azar)` arman la tirada (`{origen, r}` o `{error}`) y cada pantalla la publica a su manera; la
+  ficha usa la misma Percepción (`tirarPercepcion` quedó de 3 líneas) y el mapa publica con `quien` y `ficha` del personaje
+  (`bnTirarAca`), así la Moneda Re-Roll y la Polilla las ven (P138). Las tiradas de stats de la ficha siguen por
+  `tirarValorStat` (tiene el cartel de sobrepeso de la Evasión; la Botonera no ofrece Evasión como stat suelto). Pruebas: la
+  Percepción nueva contra una copia textual de la vieja en 300 personajes al azar (con y sin Percepción aumentada, mismo azar):
+  igual; una mutación en la tabla de escalones la detecta (26 de 300 distintas). **En "Claude · pruebas" como Saulo-Prueba**:
+  Constitución (1d4+1) y Percepción (1d6) salieron en la Mesa a nombre de Clementino, `desde: 'mapa'`, sin pasar por la ficha
+  escondida. Salen sin `ficha` hasta que se peguen las reglas de P138 (la Mesa reintenta sin ese campo). **Fuerza del golpe
+  sigue delegada**: abre el cartel de elegir arma de la ficha; va junto con Parry y Bloqueo (paso 4 de la 3c).

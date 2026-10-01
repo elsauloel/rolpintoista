@@ -426,6 +426,10 @@ prueba('costo en SP y X: fijo, "X" y "ATAQUE" no son X', () => {
     FichaHabilidades.nitrosAtaque({nitrosCosto: 'ataque'}), FichaHabilidades.nitrosVariable({nitrosCosto: 'ATAQUE'}), FichaHabilidades.habCostoVariable({costo: '1'})],
     [2, true, true, true, false, false]);
 });
+prueba('"X SP" también es un costo variable (como siempre en la ficha); "2 SP" no', () => {
+  igual([FichaHabilidades.spVariable({costo: 'X SP'}), FichaHabilidades.spVariable({costo: '2 SP'}), FichaHabilidades.nitrosVariable({nitrosCosto: 'X No2'}), FichaHabilidades.spVariable({costo: 0})],
+    [true, false, true, false]);
+});
 const presetsDePrueba = estadosPresetFicha();
 prueba('aplicarEfectoDeConsumo arma el estado con las marcas del preset (Veneno, con sus inmunidades)', () => {
   const S = {catalogo: [], efectos: []};

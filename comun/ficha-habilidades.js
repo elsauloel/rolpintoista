@@ -18,7 +18,8 @@ const FichaHabilidades = (() => {
   const n = v => { const x = parseFloat(v); return Number.isFinite(x) ? x : 0; };
 
   /* ---------- Costo en SP/Nitros: fijo o "X" (se elige al ejecutar) ---------- */
-  const esCostoVariable = v => String(v ?? '').trim().toUpperCase() === 'X';
+  // Igual que la ficha de siempre: cualquier costo que tenga una "x" ("X", "X SP", "x") se elige al ejecutar.
+  const esCostoVariable = v => /x/i.test(String(v || ''));
   // Número del costo en SP de una habilidad ("2 SP"; las viejas dicen "1 bono").
   function parseCostoSp(costo){
     if(!costo) return 0;

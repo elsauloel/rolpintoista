@@ -10,6 +10,7 @@ const MensajesMapa = (() => {
   const TIPOS = {
     // ---- El mapa le pide algo a la herramienta del marco ----
     'abrir-botonera':   {de: 'mapa', a: 'ficha', que: 'abrir la Botonera (del personaje, o de una invocación con `inv`)'},
+    'botonera-delegar': {de: 'mapa', a: 'ficha', que: 'tocar un botón de la Botonera (`datos`: sus data-*): lo pide la Botonera nueva del mapa (paso 4, etapa 3b)'},
     'abrir-ficha-mapa': {de: 'mapa', a: 'ficha', que: 'abrir la ficha liviana del personaje (📜 del token propio, tecla F)'},
     'abrir-equipo':     {de: 'mapa', a: 'ficha', que: 'abrir Equipo y mochila (🛡 del token)'},
     'abrir-botin':      {de: 'mapa', a: 'ficha', que: 'abrir la ventana de la batalla terminada / despojos'},

@@ -193,7 +193,7 @@ const FichaGuardado = (() => {
     efectosPersonalizados: [],
     invocaciones: [],
     // El catálogo de fábrica vive en comun/catalogo.js; lo subido por el grupo se suma desde la biblioteca.
-    catalogo: structuredClone(CATALOGO_BASE)
+    catalogo: typeof CATALOGO_BASE !== 'undefined' ? structuredClone(CATALOGO_BASE) : []   // el mapa no carga el catálogo
   };
   // El catálogo embebido puede traer Bonos/Mov/Acciones: se pasa a SP/Nitros una vez.
   migrarEstadoIt2(DEFAULT);

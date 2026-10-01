@@ -60,6 +60,17 @@ if(MODO_BOTONERA){
     if(e.origin !== location.origin || !e.data) return;
     if(e.data.tipo === 'abrir-botonera' && fichaVivo && fichaVivo.cargada) botoneraModoAbrir(e.data.inv || '');
     if(e.data.tipo === 'abrir-equipo' && fichaVivo && fichaVivo.cargada) equipoModoAbrir();
+    // ⚗ La Botonera nueva del mapa (paso 4, etapa 3b) la dibuja el mapa; sus botones, por ahora, los hace la ficha: se busca el
+    // mismo botón en la Botonera de acá (dibujada al día, aunque no esté abierta) y se toca, como si se hubiera tocado acá. Lo
+    // que cambie se sube enseguida, así el mapa lo muestra sin esperar.
+    if(e.data.tipo === 'botonera-delegar' && fichaVivo && fichaVivo.cargada){
+      renderBotonera();
+      const d = e.data.datos || {};
+      const sel = Object.keys(d).map(k => `[data-${k.replace(/[A-Z]/g, m => '-' + m.toLowerCase())}="${CSS.escape(String(d[k]))}"]`).join('');
+      const b = sel ? document.querySelector('#botonera-body ' + sel) : null;
+      if(b) b.click(); else toast('No se encontró ese botón en la Botonera de la ficha');
+      setTimeout(() => fichaGuardarTick(true), 300);
+    }
     if(e.data.tipo === 'abrir-reroll' && fichaVivo && fichaVivo.cargada) abrirReroll();   // el 🪙 fijo del mapa
     if(e.data.tipo === 'abrir-ficha-mapa' && fichaVivo && fichaVivo.cargada) fichaMapaAbrir();   // el 📜 del token propio (o la tecla F)
     if(e.data.tipo === 'abrir-revivir' && fichaVivo && fichaVivo.cargada){   // el botón ✚ Revivir del mapa

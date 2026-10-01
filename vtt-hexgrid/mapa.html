@@ -702,6 +702,7 @@ aside{
 /* Con el cartel de movimiento a la vista, los avisos suben para no taparlo. */
 body.con-ruta .toast{bottom:auto;top:74px}
 #botonera-capa{position:fixed;inset:0;z-index:90}
+#botonera-nueva{position:fixed;inset:0;z-index:89;background:rgba(8,5,7,.78);backdrop-filter:blur(3px);overflow:auto;padding:24px}
 /* Un cartel de la ficha o de GM Tools durante un duelo (¿es tu turno?, No2, sobrepeso…) tiene que verse ENCIMA del cuadro del
    duelo (#duelo-fondo, z-index 99000): antes quedaba tapado y la tirada se quedaba en «Tirando…» (encontrado 2026-09-30). */
 #botonera-capa.sobre-duelo{z-index:99500}
@@ -726,6 +727,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
   <span class="ayuda-icono" id="ayuda-token" tabindex="-1" aria-label="Ayuda de los tokens y guía de colores">?<span class="ayuda-globo" id="ayuda-token-globo" role="tooltip"></span></span>
   <a class="btn" id="link-herramienta" href="#" target="_blank" rel="noopener" style="text-decoration:none" hidden></a>
   <button type="button" class="btn" id="btn-tablero" title="Tablero: el estado de todos los que tienen token en el mapa publicado">📋 Tablero</button>
+  <button type="button" class="btn" id="btn-botonera-nueva" hidden title="Prueba (solo el GM, solo en este navegador): la Botonera de un personaje la dibuja el mapa, sin la ficha adentro (paso 4, etapa 3b). Los botones todavía los hace la ficha.">⚗ Botonera nueva: no</button>
   <div class="desplegable" id="personajes-caja" hidden>
     <button type="button" class="btn btn-personajes" id="btn-personajes" aria-expanded="false" title="Fichas de los personajes de la partida">👥 Personajes</button>
     <div class="desplegable-lista" id="personajes-lista" hidden></div>
@@ -945,7 +947,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js?v=20260930a"></script>
 <script src="../comun/duelo.js?v=20260930f"></script>
-<script src="../comun/mensajes-mapa.js?v=20260930a"></script>
+<script src="../comun/mensajes-mapa.js?v=20261001a"></script>
 <script>
 /* =========================================================
    MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
@@ -1583,6 +1585,7 @@ function imagenLista(url){
 let modoMapa = 'narrativo';
 
 function renderModo(){
+  bnModoCambio();   // ⚗ Botonera nueva: los Talentos cambian de lugar
   const b = $('#modo-switch');
   const combate = modoMapa === 'combate';
   b.dataset.modo = modoMapa;
@@ -7360,6 +7363,7 @@ function escucharMiembros(){
     snap.docs.forEach(d => miembros.set(d.id, {nombre: String(d.data().nombre || '?'), gm: d.data().gm === true}));
     const yo = miembros.get(fbUsuario.uid);
     if(yo){ fbMiembro = {...fbMiembro, ...yo}; soyGM = yo.gm; }
+    bnPintarInterruptor();
     renderModo();
     estado(barraTexto());
     renderPanel();
@@ -9048,7 +9052,8 @@ function centrarTokenDeBotonera(herramienta, id){
 
 // invId: si viene, abre la Botonera de esa invocación del personaje en vez
 // de la propia (mismo iframe: la ficha ya sabe mostrar una u otra).
-function abrirBotonera(fichaId, mensaje, invId){
+function abrirBotonera(fichaId, mensaje, invId, sinNueva){
+  if(!mensaje && !invId && !sinNueva && bnActiva()){ abrirBotoneraNueva(fichaId); return; }   // ⚗ prueba (paso 4, etapa 3b)
   const capa = $('#botonera-capa');
   const marco = $('#botonera-marco');
   const completa = !!(mensaje && (mensaje.tipo === 'abrir-botin' || mensaje.tipo === 'abrir-equipo'));   // la ventana de la batalla y la de Equipo y mochila ocupan todo el centro
@@ -9108,6 +9113,172 @@ function abrirBotoneraPrincipal(){
   if(!fichaId){ toast('No tenés un personaje con Botonera'); return; }
   abrirBotonera(fichaId);
 }
+
+/* ---------- ⚗ Botonera nueva (prueba) — paso 4, etapa 3b (docs/plan-paso4-etapa3.md, 2026-10-01) ----------
+   Detrás de un interruptor que solo ve el GM ("⚗ Botonera nueva", recordado en este navegador): la Botonera de un personaje la
+   dibuja el mapa con las piezas de comun/ — FichaSesion para leerlo de Firebase (solo mirar: el que guarda sigue siendo la
+   ficha) y FichaBotonera para dibujarlo —, en un recuadro aislado (shadow DOM) con el ficha.css de siempre, así se ve igual.
+   Por ahora solo dibuja: cada botón se lo pide a la ficha cargada escondida en el marco (mensaje 'botonera-delegar'), que lo
+   toca como siempre; lo que abra (elegir arma, costo X, Ver, un cartel) sale encima, en la capa de siempre. Las 🔍 todavía
+   no están (la lupa vive en la ficha: etapa 3c). Las piezas se cargan recién al usarla: para los jugadores no cambia nada. */
+const BN_CLAVE = 'botonera-nueva-prueba';
+const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001b', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001a'];
+const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
+var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
+var bnCss = '';
+var bnCargando = null;
+const bnActiva = () => { try{ return soyGM && localStorage.getItem(BN_CLAVE) === '1'; }catch(e){ return false; } };
+function bnPintarInterruptor(){
+  const b = $('#btn-botonera-nueva');
+  if(!b) return;
+  b.hidden = !soyGM;
+  b.textContent = `⚗ Botonera nueva: ${bnActiva() ? 'sí' : 'no'}`;
+  b.classList.toggle('primary', bnActiva());
+}
+function bnAlternar(){
+  try{ localStorage.setItem(BN_CLAVE, bnActiva() ? '0' : '1'); }catch(e){}
+  bnPintarInterruptor();
+  if(!bnActiva()) cerrarBotoneraNueva();
+  toast(bnActiva() ? '⚗ Botonera nueva prendida (solo en este navegador): abrí la Botonera de un personaje con B o con su token' : 'Botonera nueva apagada: vuelve la de siempre');
+}
+// Las piezas de comun/ que el mapa no carga siempre, y el ficha.css (con :root → :host para que valga adentro del recuadro).
+function bnCargarPiezas(){
+  if(!bnCargando){
+    if(!document.querySelector('link[data-bn-fuentes]')){
+      const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = BN_FUENTES; l.dataset.bnFuentes = '1'; document.head.appendChild(l);
+    }
+    bnCargando = BN_PIEZAS.reduce((p, src) => p.then(() => new Promise((ok, mal) => {
+      const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => mal(new Error('No se pudo cargar ' + src));
+      document.head.appendChild(s);
+    })), Promise.resolve())
+      .then(() => fetch('../ficha-personaje/ficha.css?v=20260930a').then(r => r.text()))
+      .then(css => { bnCss = css.replace(/:root\b/g, ':host'); })
+      .catch(err => { bnCargando = null; throw err; });
+  }
+  return bnCargando;
+}
+function bnUbicar(){
+  if(!bn || bn.host.hidden) return;
+  const h = bn.host;
+  if(!botoneraEnMitad()){ h.removeAttribute('style'); return; }
+  const r = $('#lienzo-caja').getBoundingClientRect();
+  Object.assign(h.style, {left: r.left + 'px', top: r.top + 'px', right: 'auto', bottom: 'auto', width: Math.round(r.width / 2) + 'px', height: r.height + 'px'});
+}
+window.addEventListener('resize', bnUbicar);
+function bnColapsados(){ try{ return JSON.parse(localStorage.getItem('ficha-colapsados') || '{}'); }catch(e){ return {}; } }   // el mismo de la ficha
+function bnPintarColapsados(){
+  const estado = bnColapsados();
+  bn.raiz.querySelectorAll('[data-colapsar]').forEach(btn => {
+    const cont = btn.closest('.botonera-caja');
+    if(cont) cont.classList.toggle('colapsada', !!estado[btn.dataset.colapsar]);
+    btn.textContent = estado[btn.dataset.colapsar] ? '🙈' : '👁';
+  });
+}
+function bnDibujar(){
+  if(!bn) return;
+  const cuerpo = bn.raiz.querySelector('#bn-contenido');
+  if(!bn.S){ cuerpo.innerHTML = '<div class="modal catalogo-modal botonera-modal"><div class="body"><div class="hint">Cargando el personaje…</div></div></div>'; return; }
+  const r = FichaBotonera.html(bn.S, {modoMapa, lupa: false});
+  const scroll = bn.host.scrollTop;
+  cuerpo.innerHTML = `<div class="modal catalogo-modal botonera-modal">
+    <header>
+      <div style="display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap">
+        <h3>Botonera <span title="Botonera nueva (prueba): la dibuja el mapa">⚗</span></h3>
+        <span class="botonera-badge">${esc(r.nitros)}</span>
+        <span class="botonera-badge">${esc(r.sp)}</span>
+        <span class="botonera-badge" title="Defensa">${esc(r.def)}</span>
+        <span class="hint" style="font-size:11px">${esc((bn.S.meta && bn.S.meta.nombre) || '')}</span>
+      </div>
+      <div style="display:flex;gap:6px;flex:none"><button class="iconbtn" data-bn-cerrar title="Cerrar (B o Esc)">Cerrar</button></div>
+    </header>
+    <div class="body" id="botonera-body">${r.html}</div>
+  </div>`;
+  bnPintarColapsados();
+  bn.host.scrollTop = scroll;
+}
+// Un botón de la Botonera nueva: se lo pide a la ficha escondida en el marco (la carga si hace falta).
+function bnDelegar(datos){
+  const marco = $('#botonera-marco'), msg = {tipo: 'botonera-delegar', datos};
+  if(botonera.herramienta === 'ficha' && botonera.fichaId === bn.fichaId && !botonera.invId){
+    if(botonera.lista) MensajesMapa.alMarco(marco, msg); else botonera.pendiente = msg;
+    return;
+  }
+  botonera = {herramienta: 'ficha', fichaId: bn.fichaId, invId: '', lista: false, pendiente: msg, completa: false, precarga: true};
+  marco.src = sinCache(`../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=botonera&precarga=1#${encodeURIComponent(bn.fichaId)}`);
+}
+function bnCrear(){
+  const host = document.createElement('div');
+  host.id = 'botonera-nueva';
+  host.hidden = true;
+  document.body.appendChild(host);
+  const raiz = host.attachShadow({mode: 'open'});
+  raiz.innerHTML = '<style id="bn-css"></style><div id="bn-contenido"></div>';
+  raiz.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if(!b || !bn) return;
+    if(b.dataset.bnCerrar !== undefined){ cerrarBotoneraNueva(); return; }
+    if(b.dataset.colapsar){
+      const estado = bnColapsados();
+      estado[b.dataset.colapsar] = !estado[b.dataset.colapsar];
+      try{ localStorage.setItem('ficha-colapsados', JSON.stringify(estado)); }catch(err){}
+      bnPintarColapsados();
+      return;
+    }
+    if(!bn.S) return;
+    const datos = {...b.dataset};
+    if(!Object.keys(datos).length) return;
+    bnDelegar(datos);
+  });
+  host.addEventListener('mousedown', e => { if(e.target === host) cerrarBotoneraNueva(); });   // clic en el fondo: se cierra
+  return {host, raiz};
+}
+async function abrirBotoneraNueva(fichaId){
+  if(bn && bn.fichaId === fichaId && !bn.host.hidden){ cerrarBotoneraNueva(); return; }   // B (o el token) otra vez: se cierra
+  try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo cargar la Botonera nueva — se abre la de siempre'); abrirBotonera(fichaId, null, '', true); return; }
+  if(!bn){ bn = Object.assign({fichaId: '', sesion: null, S: null}, bnCrear()); }
+  bn.raiz.querySelector('#bn-css').textContent = bnCss + ' #bn-contenido{font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--paper)}';
+  if(bn.fichaId !== fichaId || !bn.sesion){
+    if(bn.sesion) FichaSesion.cortar(bn.sesion);
+    bn.fichaId = fichaId; bn.S = null;
+    const f = FichaSesion.nueva(fichaId, '', false, true);   // solo mirar: la que guarda es la ficha
+    bn.sesion = f;
+    FichaSesion.escuchar(f, {
+      db: fbDb, ruta: fbRutaCampana(`fichas/${fichaId}`), vigente: () => !!bn && bn.sesion === f,
+      alDoc: doc => { if(!doc.exists){ toast('Ese personaje ya no está en la mesa'); cerrarBotoneraNueva(); } },
+      alCargar: armado => {
+        const S = FichaGuardado.normalizar(armado.datos).S;
+        FichaGuardado.ponerImagenesInvocaciones(S, armado.imgInvocaciones);
+        FichaGuardado.completar(S);
+        bn.S = S;
+        f.cargada = true;
+        bnDibujar();
+      },
+      alControl: () => {},
+      aplicarParte: (parte, datos) => FichaGuardado.aplicarParte(bn.S, parte, datos, {imgInvocaciones: f.ultimo.imgInvocaciones || ''}),
+      alCambiar: () => { FichaGuardado.completar(bn.S); bnDibujar(); },
+      alErrorPartes: () => toast('No se pudo leer el personaje para la Botonera nueva'),
+    });
+    // La ficha escondida que hace los botones: se carga ya, así el primer toque no espera.
+    if(!(botonera.herramienta === 'ficha' && botonera.fichaId === fichaId && !botonera.invId) && $('#botonera-capa').hidden){
+      botonera = {herramienta: 'ficha', fichaId, invId: '', lista: false, pendiente: null, completa: false, precarga: true};
+      $('#botonera-marco').src = sinCache(`../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=botonera&precarga=1#${encodeURIComponent(fichaId)}`);
+    }
+  }
+  bn.host.hidden = false;
+  bnUbicar();
+  centrarTokenDeBotonera('ficha', fichaId);
+  bnDibujar();
+}
+function cerrarBotoneraNueva(){
+  if(!bn) return;
+  bn.host.hidden = true;
+}
+// El modo del mapa (narrativo/combate) cambia el orden de los Talentos: se redibuja.
+function bnModoCambio(){ if(bn && !bn.host.hidden) bnDibujar(); }
+document.addEventListener('keydown', e => {
+  if(!bn || bn.host.hidden || !$('#botonera-capa').hidden || elegirDestinoCb) return;
+  if(e.key === 'Escape'){ e.preventDefault(); cerrarBotoneraNueva(); }
+});
 
 /* Batalla terminada: cuando el GM confirma el fin del combate, a cada jugador se le abre solo la ventana (la de la ficha, en el iframe de la
    Botonera, a pantalla casi completa) con lo que recibe cada uno y los despojos para elegir. El botón 🎁 del borde izquierdo (para todos, junto
@@ -10750,6 +10921,8 @@ function arrancarEnVivo(){
   estado(barraTexto());
   soyGM = fbMiembro.gm === true;
   if($('#btn-reroll')) $('#btn-reroll').hidden = soyGM;   // la Moneda Re-Roll es de los jugadores
+  bnPintarInterruptor();   // ⚗ Botonera nueva (prueba, solo GM)
+  $('#btn-botonera-nueva').onclick = bnAlternar;
   escucharMiembros();
   escucharVinculables();
   escucharMantenimiento();

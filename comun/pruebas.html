@@ -49,6 +49,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="plantillas.js"></script>
 <script src="catalogo.js"></script>
 <script src="items-subidos.js"></script>
+<script src="ficha-habilidades.js"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -416,6 +417,37 @@ prueba('alcance y daño de un arma', () => {
   igual([FichaCombate.alcanceDeArma(S, S.inventario[0]), FichaCombate.armaDanoTxt(S.inventario[0], 3), FichaCombate.armaDanoTxt({tipoItem: 'arma_2m', peso: 3, tipoDado: 10, armaDeRango: true}, 3), FichaCombate.armaDanoTxt(S.inventario[1])],
     [1, '2d8 + 3', '3d10', '']);
 });
+
+/* ---------- Habilidades y consumibles (comun/ficha-habilidades.js, paso 5 nivel B área 3) ---------- */
+grupo('Habilidades y consumibles (paso 5)');
+prueba('costo en SP y X: fijo, "X" y "ATAQUE" no son X', () => {
+  igual([FichaHabilidades.parseCostoSp('2 SP'), FichaHabilidades.spVariable({costo: 'X'}), FichaHabilidades.nitrosVariable({nitrosCosto: 'x'}),
+    FichaHabilidades.nitrosAtaque({nitrosCosto: 'ataque'}), FichaHabilidades.nitrosVariable({nitrosCosto: 'ATAQUE'}), FichaHabilidades.habCostoVariable({costo: '1'})],
+    [2, true, true, true, false, false]);
+});
+const presetsDePrueba = estadosPresetFicha();
+prueba('aplicarEfectoDeConsumo arma el estado con las marcas del preset (Veneno, con sus inmunidades)', () => {
+  const S = {catalogo: [], efectos: []};
+  const r = FichaHabilidades.aplicarEfectoDeConsumo(S, {nombre: 'Daga', efectoNombre: 'Veneno', efectoHpTurno: -2, efectoStacks: 3, efectoTurnos: 0}, presetsDePrueba);
+  igual([r.ok, r.estado.nombre, r.estado.hpturno, r.estado.stacks, r.estado.esVeneno], [true, 'Veneno', -2, 3, true]);
+});
+prueba('Invulnerable activo bloquea un debuff del consumo (y lo dice)', () => {
+  const S = {catalogo: [], efectos: [{nombre: 'Invulnerable', activo: true, invulnerable: true}]};
+  const r = FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Veneno', efectoHpTurno: -2}, presetsDePrueba);
+  igual([r.ok, r.motivo], [false, 'inmune']);
+});
+prueba('el escudo y los stacks propios del ítem pisan a los del preset; reaplicar renueva (P132)', () => {
+  const S = {catalogo: [], efectos: []};
+  FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Escudo especial', efectoEscudo: 6, efectoTurnos: 2}, presetsDePrueba);
+  const r2 = FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Escudo especial', efectoEscudo: 9, efectoTurnos: 2}, presetsDePrueba);
+  igual([S.efectos.length, r2.estado.escudoMagico, r2.estado.escudoMagicoActual], [1, 9, 9]);
+});
+prueba('el catálogo completado después manda sobre la copia que ya tenía el ítem (configEfectoDe)', () => {
+  const S = {catalogo: [{nombre: 'Poción vieja', efectoNombre: 'Regeneración', efectoHpTurno: 3}], efectos: []};
+  const r = FichaHabilidades.aplicarEfectoDeConsumo(S, {nombre: 'Poción vieja'}, presetsDePrueba);
+  igual([r.ok, r.estado.hpturno], [true, 3]);
+});
+prueba('sin efectoNombre no hace nada', () => igual(FichaHabilidades.aplicarEfectoDeConsumo({catalogo: [], efectos: []}, {nombre: 'Piedra'}, presetsDePrueba), null));
 
 /* ---------- Plantillas (comun/plantillas.js) ---------- */
 grupo('Plantillas');

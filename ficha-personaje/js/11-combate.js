@@ -20,18 +20,13 @@ function renderNitros(){
   if($('#scrim-botonera').classList.contains('open')) renderBotonera();
 }
 
-// Número del costo en SP de una habilidad ("2 SP"; las viejas dicen "1 bono").
-function parseCostoSp(costo){
-  if(!costo) return 0;
-  const m = String(costo).match(/(\d+(\.\d+)?)/);
-  return m ? num(m[1]) : 0;
-}
-
-// Costo variable (X) en SP o en Nitros: se elige al ejecutar.
-function spVariable(h){ return esCostoVariable(h && h.costo); }
-function nitrosVariable(h){ return esCostoVariable(h && h.nitrosCosto) && !nitrosAtaque(h); }
-function nitrosAtaque(h){ return String((h && h.nitrosCosto) ?? "").trim().toUpperCase() === "ATAQUE"; }
-function habCostoVariable(h){ return spVariable(h) || nitrosVariable(h); }
+// Número del costo en SP de una habilidad, y el costo variable (X) en SP o en Nitros (se elige al ejecutar):
+// comun/ficha-habilidades.js (paso 5, nivel B, área 3) — mismas funciones, puras.
+const parseCostoSp = FichaHabilidades.parseCostoSp;
+const spVariable = FichaHabilidades.spVariable;
+const nitrosVariable = FichaHabilidades.nitrosVariable;
+const nitrosAtaque = FichaHabilidades.nitrosAtaque;
+const habCostoVariable = FichaHabilidades.habCostoVariable;
 
 // Nitros fijos de una habilidad (0 si son X: se eligen al usarla).
 function costoNitrosHab(h, arma){

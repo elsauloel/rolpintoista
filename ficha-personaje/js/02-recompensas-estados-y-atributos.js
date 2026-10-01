@@ -112,7 +112,8 @@ async function estadosRevisar(){
   }
 }
 // Un preset se encuentra por su nombre o por un nombre viejo (alias): "Escudo especial" pasó a llamarse "Escudo especial" (2026-09-24).
-const presetPorNombre = (lista, nombre) => lista.find(p => p.nombre === nombre || (p.alias || []).includes(nombre));
+// comun/ficha-habilidades.js (paso 5, nivel B, área 3).
+const presetPorNombre = FichaHabilidades.presetPorNombre;
 // Un estado armado a partir de lo que manda una habilidad o una trampa ({nombre, turnos, mods, hp, stacks, escudoMagico…}):
 // el preset con ese nombre con los números de la habilidad encima (comun/combatiente.js, ajustarPreset), o uno propio.
 // Lo usan lo que le llega al personaje y lo que una invocación se pone a sí misma.
@@ -557,21 +558,12 @@ function cargaIndicator(i){
 // momento de comprarlo. Si el efecto se configuró después, esa copia no lo
 // tiene y el consumible no hace nada. Se busca el original por nombre, que
 // es la única referencia al catálogo que sobrevive a la copia.
-function configEfectoDe(it){
-  // El catálogo es la referencia compartida y siempre gana sobre lo que
-  // haya quedado copiado en el ítem al comprarlo/agregarlo — si se le
-  // completó el efecto en el catálogo después (como pasó con las pociones
-  // y pergaminos que ya tenían nombre de estado pero sin modificadores),
-  // los ítems que la gente ya tenía en la mochila tienen que verlo también.
-  // Solo se usa lo propio del ítem si no hay match en el catálogo (algo
-  // 100% custom, nunca publicado).
-  const base = (S.catalogo || []).find(c => sinAviso(c.nombre) === sinAviso(it.nombre));
-  if(base && (base.efectoNombre || '').trim()) return base;
-  return it;
-}
+// El catálogo es la referencia compartida y siempre gana sobre lo que haya quedado copiado en el ítem al
+// comprarlo/agregarlo — comun/ficha-habilidades.js (paso 5, nivel B, área 3) tiene el comentario largo original.
+function configEfectoDe(it){ return FichaHabilidades.configEfectoDe(S, it); }
 
 // Invulnerable, Inmunidad a CC, Sangre pura y Coagulación extrema (comun/combatiente.js). objEfecto: un preset o un draft del editor.
-function estaBloqueadoElDebuff(objEfecto){ return !!Combatiente.inmunidad(S.efectos, objEfecto); }
+function estaBloqueadoElDebuff(objEfecto){ return FichaHabilidades.estaBloqueadoElDebuff(S, objEfecto); }
 
 // Oleo reparador: quita Armadura rota si está activa (es permanente, no vence sola). Devuelve cuántas se quitaron.
 function repararArmadura(){
@@ -626,40 +618,14 @@ function levantarse(forzar){
   toast(`Te levantaste${costo ? ` · -${fmt(costo)} No2` : ''}`);
 }
 
+// El "estado del sistema anterior" que una habilidad o un ítem pone al ejecutarse/consumirse (nombre, turnos, HP por
+// turno, escudo, stacks, mods): la regla vive en comun/ficha-habilidades.js (paso 5, nivel B, área 3), con el
+// comentario largo original sobre el catálogo que manda y por qué. Acá solo el toast si quedó bloqueado por una
+// inmunidad (Invulnerable, Sangre pura…) y devolver lo mismo que antes: el estado armado, o null.
 function aplicarEfectoDeConsumo(it){
-  const src = configEfectoDe(it);
-  const nombre = (src.efectoNombre || '').trim();
-  if(!nombre) return null;
-  // El ítem no sabe de categorías/inmunidades — se infiere buscando un
-  // preset con el mismo nombre (así "Veneno", "Sangrado", etc. quedan
-  // bloqueados por sus inmunidades aunque lleguen desde un consumible), o
-  // el que declare en efectoPreset — para poder mostrar un nombre propio
-  // ("Coagulación extrema (pergamino)") sin perder la mecánica real del
-  // preset "Coagulación extrema" (mismo mecanismo que equipoEstadoPreset).
-  const nombrePresetEfectivo = presetPorNombre(EFECTOS_PRESET, nombre) ? nombre : (src.efectoPreset || '').trim();
-  const preset = presetPorNombre(EFECTOS_PRESET, nombrePresetEfectivo);
-  if(estaBloqueadoElDebuff(preset)){
-    toast(`Inmune ahora mismo — ${nombre} no hizo efecto`);
-    return null;
-  }
-  const turnos = num(src.efectoTurnos);
-  const hpturno = num(src.efectoHpTurno);
-  const permanente = !!src.efectoPermanente;
-  const mods = structuredClone((src.efectoMods || []).filter(m => m.stat));
-  // El estado se queda solo en la lista: sin una descripción propia hay que
-  // acordarse de qué ítem salió. Si el ítem no trae un texto pensado para el
-  // estado, se usa el suyo, que es mejor que nada.
-  const detalle = (src.efectoDetalle || '').trim() || (src.detalle || '').trim();
-  const categorias = flagsDePreset(nombrePresetEfectivo);
-  // Cantidades propias de la habilidad/ítem (las que se eligieron en el asistente de estados): mandan sobre las del preset.
-  const escudo = num(src.efectoEscudo), stacks = Math.max(1, num(src.efectoStacks) || 1);
-  if(escudo > 0) categorias.escudoMagico = escudo;
-  // Ponerlo: la regla común (comun/combatiente.js, agregarEstado) — inmunidades, Veneno y Sangrado que se acumulan y, si ya
-  // tiene uno igual (no el de un ítem equipado), se renueva (P132). Reaplicar recarga el escudo entero.
-  const nuevo = {id:uid(), nombre, imagen:'', turnos, stacks, hpturno, stacksturno:0, permanente, activo:true, popup:false, detalle, mods, ...categorias};
-  if(num(nuevo.escudoMagico) > 0) nuevo.escudoMagicoActual = num(nuevo.escudoMagico);
-  const r = Combatiente.agregarEstado(S.efectos, nuevo);
-  if(!r.ok){ toast(`Inmune ahora mismo (${r.motivo}) — ${nombre} no hizo efecto`); return null; }
+  const r = FichaHabilidades.aplicarEfectoDeConsumo(S, it, EFECTOS_PRESET);
+  if(!r) return null;
+  if(!r.ok){ toast(`Inmune ahora mismo${r.motivo === 'inmune' ? '' : ` (${r.motivo})`} — ${r.nombre} no hizo efecto`); return null; }
   return r.estado;
 }
 

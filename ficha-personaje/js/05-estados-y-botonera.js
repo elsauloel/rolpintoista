@@ -575,17 +575,8 @@ function configEquipoEstadoDe(it){
 // (afortunado, inmunidades, etc.) — un ítem puede pedir "activate igual
 // que este preset" sin copiarle el nombre, vía equipoEstadoPreset, para
 // poder mostrar un nombre propio ("Afortunado (anillo)") sin perder la
-// mecánica real del preset "Afortunado".
-const EFECTO_FLAGS_ESPECIALES = ['esCC', 'esVeneno', 'esSangrado', 'afortunado', 'invulnerable',
-  'inmunidadCC', 'sangrePura', 'coagulacionExtrema', 'blindado', 'espinas', 'mitadPdgEva',
-  'lisiado', 'paralisis', 'esEscarcha', 'inmovilizado', 'rengo', 'cansado', 'exhausto', 'hypeado', 'sentado', 'armaduraRota', 'escudoMagico', 'excedenteVida', 'forzarNitros'];
-function flagsDePreset(nombrePreset){
-  const p = presetPorNombre(EFECTOS_PRESET, (nombrePreset || '').trim());
-  if(!p) return {};
-  const out = {polaridad: p.polaridad};
-  EFECTO_FLAGS_ESPECIALES.forEach(f => { if(p[f] !== undefined) out[f] = p[f]; });
-  return out;
-}
+// mecánica real del preset "Afortunado". comun/ficha-habilidades.js (paso 5, nivel B, área 3).
+function flagsDePreset(nombrePreset){ return FichaHabilidades.flagsDePreset(EFECTOS_PRESET, nombrePreset); }
 
 /* Ítems que aplican un estado mientras están puestos (los Guantes de piel
    de troll y su regeneración, por ejemplo). El estado aparece solo al

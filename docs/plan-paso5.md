@@ -81,3 +81,15 @@ etapa 3 del paso 4 (el mapa dibuja la Botonera) es armar la pantalla con esas pi
   usan esas piezas. Comparado contra lo viejo en 1 200 fichas al azar (armas de una y dos manos, escudos, bonos de PdG,
   Parry, Bloqueo, crítico y rango, ítems rotos, mano preferida, armas de rango, ataques ya hechos, Lisiado): igual. Pruebas:
   107. Sigue el área 3 (habilidades y consumibles).
+- 2026-10-01: **nivel B, área 3 empezada — habilidades y consumibles** (`comun/ficha-habilidades.js`, `FichaHabilidades`).
+  Primer tramo, sin preguntas de diseño (ninguna regla cambia): el costo en SP/No2 de una habilidad (fijo o "X", y
+  "ATAQUE") y **el "estado del sistema anterior"** que una habilidad o un ítem aplica al ejecutarse/consumirse
+  (`aplicarEfectoDeConsumo`, con `configEfectoDe` —el catálogo manda sobre la copia del ítem— y `flagsDePreset`).
+  Comparado contra la versión vieja en 4 000 casos al azar (con y sin catálogo completado después, con y sin
+  inmunidades activas, escudo/stacks propios de la habilidad pisando al preset): igual; sumado a `comun/pruebas.html`
+  (108 → 113). **Encontrada una diferencia real entre ficha, gm-tools e invocaciones, no corregida — P137**: gm-tools
+  (`aplicarEfectoDeConsumoCreep`) deja que el preset gane siempre el `permanente` (las habilidades de creep no tienen
+  ese campo propio) y suma el escudo nuevo al que ya tenía si el preset es Excedente de vida; la ficha y las
+  invocaciones no hacen ninguna de las dos cosas. No se tocó ninguna de las tres implementaciones — es la pregunta
+  para el dueño antes de seguir unificándolas. Sigue el resto de la habilidad que ejecuta (`ejecutarHabilidad`,
+  `confirmarCostoVariable`, el cuadro de Ejecución) y, después, el área 4 (guardar/leer la ficha de Firebase).

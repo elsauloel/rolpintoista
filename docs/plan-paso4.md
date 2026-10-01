@@ -58,3 +58,6 @@ Con las piezas de la etapa 2, el mapa arma la Botonera del personaje y las Accio
   Probado en mesa como GM (precarga, Acciones al instante, duelo con el creep sin cargar). **Etapa 1 cerrada**, salvo probar
   como jugador la precarga de la ficha propia (en la próxima partida o con 🎮 Tomar el control). Sigue la **etapa 2** (= paso
   5, partir los archivos): necesita su propio plan antes de empezar.
+
+- 2026-10-01: **etapa 2 (= paso 5, nivel B) terminada** (áreas 1–4: cálculo, combate, habilidades y consumibles, guardar y
+  leer la ficha). **Etapa 3: plan detallado en [`plan-paso4-etapa3.md`](plan-paso4-etapa3.md)**, con 4 preguntas para el dueño.

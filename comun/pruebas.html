@@ -52,6 +52,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
+<script src="ficha-resumen.js"></script>
 <script src="tiradas-propias.js"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
@@ -559,6 +560,29 @@ prueba('un stat que no se puede tirar con dados reales avisa en vez de tirar', (
   igual(FichaBotonera.tiradaStat(S, 'fue').error, 'Fue: 0 no se puede tirar con dados reales');
 });
 prueba('los costos de la Iteración 2 son los de siempre', () => igual([FichaCalculo.IT2.nitrosHabilidad, FichaCalculo.IT2.nitrosConsumirMochila, FichaCalculo.IT2.nitrosSigilo], [1, 2, 1]));
+
+/* ---------- El resumen público de un personaje (comun/ficha-resumen.js, paso 4 etapa 3c) ---------- */
+grupo('Resumen público del personaje');
+prueba('vida, No2, costo de moverse con Rengo y la marca de control del GM', () => {
+  const S = fichaBotonera({hp: 7, nitros: 3, efectos: [{id: 'r', nombre: 'Rengo', rengo: true, activo: true}]});
+  const r = FichaResumen.resumen(S, {control: {uid: 'gm1'}});
+  igual([r.hp, r.nitros, r.costoMover, r.control, r.estados.map(e => e.nombre)], [7, 3, FichaCalculo.IT2.nitrosMoverRengo, 'gm1', ['Rengo']]);
+});
+prueba('la regeneración de una pasiva aparece como estado derivado; inactivos no', () => {
+  const S = fichaBotonera({pasivas: [{id: 'p', nombre: 'Sangre de troll', regenHp: 2, compras: 2}], efectos: [{id: 'x', nombre: 'Viejo', activo: false}]});
+  const r = FichaResumen.resumen(S);
+  igual(r.estados.map(e => [e.nombre, !!e.derivado]), [['Sangre de troll', true]]);
+});
+prueba('escudo con máximo, excedente de vida con tope y Armadura rota con sus stacks', () => {
+  const S = fichaBotonera({efectos: [{id: 'a', nombre: 'Escudo especial', escudoMagico: 8, escudoMagicoActual: 5}, {id: 'b', nombre: 'Excedente de vida', excedenteVida: true, escudoMagicoActual: 3, excedenteTope: 9}, {id: 'c', nombre: 'Armadura rota', armaduraRota: true, stacks: 2}]});
+  const e = FichaResumen.resumen(S).estados;
+  igual([e[0].escudo, e[0].escudoMax, e[1].excedente, e[1].tope, e[1].escudoMax, e[2].stacks], [5, 8, true, 9, undefined, 2]);
+});
+prueba('una invocación publica su No2 máximo con lo que le suma el equipo y su miniatura', () => {
+  const S = fichaBotonera({invocaciones: [{id: 'v', nombre: 'Lobo', agl: 4, imagen: 'data:x', equipo: [{nombre: 'Collar', mods: [{stat: 'nitros', val: 2}]}]}]});
+  const i = FichaResumen.resumen(S, {miniaturaInv: img => img ? 'mini' : ''}).invocaciones[0];
+  igual([i.nombre, i.nitrosMax, i.miniatura, i.activa], ['Lobo', 6, 'mini', true]);
+});
 
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */
 grupo('Mis últimas tiradas (P138)');

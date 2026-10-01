@@ -34,13 +34,9 @@ function costoNitrosHab(h, arma){ return FichaBotonera.costoNitrosHab(S, h, arma
 /* ---------- Moverse: los Nitros se gastan desde el mapa (arrastrando el token);
    la ficha solo publica cuánto cuesta cada casillero (ver fichaResumen) ---------- */
 
-function estadoActivo(flag){
-  return (S.efectos || []).some(e => e.activo !== false && e[flag]);
-}
+function estadoActivo(flag){ return FichaResumen.estadoActivo(S, flag); }   // comun/ficha-resumen.js
 
-function costoMoverCasillero(){
-  return estadoActivo('rengo') ? IT2.nitrosMoverRengo : IT2.nitrosMover;
-}
+function costoMoverCasillero(){ return FichaResumen.costoMoverCasillero(S); }
 
 function sinNitrosPara(h){ return FichaBotonera.sinNitrosPara(S, h); }   // comun/ficha-botonera.js
 

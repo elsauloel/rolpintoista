@@ -47,20 +47,8 @@ const INV_STATS_TIRADA_IDS = ['con','fue','agl','des','esp','resmg','rescc','ini
 // en INV_STATS_TIRADA_IDS) — mismos que ofrece gm-tools para un creep.
 const INV_STATS_HAB = ['resmg','rescc','bloqueo','eva','ini','pdg','parry','pdgmg','resm'];
 
-function invFuentesEquipo(inv){
-  const arma = (inv.armaMods || []).length ? [{nombre: inv.armaNombre || 'Arma', mods: inv.armaMods}] : [];
-  return [...(inv.equipo || []), ...arma];
-}
-function invModTotal(inv, statId){
-  let total = 0;
-  invFuentesEquipo(inv).forEach(it => (it.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val); }));
-  (inv.estados||[]).forEach(es => {
-    if(es.activo === false) return;
-    const stacks = Math.max(1, num(es.stacks)||1);
-    (es.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val) * stacks; });
-  });
-  return total;
-}
+function invFuentesEquipo(inv){ return FichaResumen.invFuentesEquipo(inv); }   // comun/ficha-resumen.js
+function invModTotal(inv, statId){ return FichaResumen.invModTotal(inv, statId); }
 // Cada fuente (equipo o estado activo) que le suma a un stat, con su valor
 // — para la 🔍 (de dónde sale cada tirada).
 function aportesModInv(inv, statId){
@@ -107,10 +95,7 @@ function invStatValor(inv, statId){
   if(statId !== attr) v += invModTotal(inv, statId);
   return v;
 }
-function invNitrosMax(inv){
-  // Natural = Agilidad efectiva + bonos a Nitros; los estados los aplica el motor común (comun/combatiente.js).
-  return Combatiente.nitrosMax(num(inv.agl) + invModTotal(inv, 'agl') + invModTotal(inv, 'nitros'), inv.estados);
-}
+function invNitrosMax(inv){ return FichaResumen.invNitrosMax(inv); }
 // Nitros de una habilidad: un número, o "ATAQUE" = lo que le cuesta un
 // ataque con su arma (Tipo ÷ 2 el primero del turno) y cuenta como ese ataque.
 function habInvAtaque(h){ return String((h && h.nitrosCosto) ?? '').trim().toUpperCase() === 'ATAQUE'; }
@@ -1225,21 +1210,10 @@ function escudoParsear(txt, actual, max){ return Combatiente.escudoParsear(txt, 
 // cada vez a partir de las pasivas, aparecen entre los estados alterados activos y en el resumen que ve el mapa, pero son de
 // solo lectura (se sacan quitando la pasiva) y el Mantenimiento ya los aplica por su lado, así no se cuentan dos veces.
 // Qué efectos de ítems y pasivas deben mostrarse como estado y cuáles no es una pregunta abierta (docs/preguntas-abiertas.md).
-function estadosDePasivas(){
-  return (S.pasivas || []).filter(p => num(p.regenHp) > 0).map(p => {
-    const hp = num(p.regenHp) * pasivaCompras(p);
-    return {id: 'pasiva:' + p.id, nombre: p.nombre, polaridad: 'buff', permanente: true, stacks: 1, turnos: 0, hpturno: hp, activo: true, derivado: true,
-      detalle: `Viene de tu pasiva "${p.nombre}": recupera ${fmt(hp)} HP en cada Mantenimiento.`};
-  });
-}
+function estadosDePasivas(){ return FichaResumen.estadosDePasivas(S); }   // comun/ficha-resumen.js
 // Sobrepeso: estado derivado (no se guarda): aparece solo mientras el equipo pasa la Crg.Max. La penalidad se decide al tirar Evasión.
-function estadoSobrepeso(){
-  const s = compute().sobrecarga;
-  if(!(s > 0)) return [];
-  return [{id: 'sobrepeso', nombre: 'Sobrepeso', polaridad: 'debuff', permanente: true, stacks: 1, turnos: 0, hpturno: 0, activo: true, derivado: true, sobrepeso: s,
-    detalle: `Tu equipo pesa ${fmt(s)} de más: al tirar Evasión restás ${fmt(s)}, salvo que pagues 1 No2 para evitarlo.`}];
-}
-const estadosTodos = () => [...(S.efectos || []), ...estadosDePasivas(), ...estadoSobrepeso()];
+function estadoSobrepeso(){ return FichaResumen.estadoSobrepeso(S); }
+const estadosTodos = () => FichaResumen.estadosTodos(S);
 
 function renderList(key){
   const el = $('#list-'+key);

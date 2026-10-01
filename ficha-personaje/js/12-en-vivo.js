@@ -61,83 +61,9 @@ function fichaAplicarParte(parte, datos){
   });
 }
 
-function fichaResumen(){
-  const c = compute();
-  const n = v => (typeof v === 'number' && !Number.isNaN(v)) ? v : num(v);
-  const spMax = n(spMaximo(c));
-  return {
-    nivel: num(S.meta.nivel),
-    hp: num(S.hp),
-    hpMax: n(c.final.hpmax),
-    ini: n(c.final.ini),   // Iniciativa: el mapa la usa para el botón "Tirar iniciativa" de la lista de turnos
-    def: n(c.final.def),   // Defensa total: el mapa la resta al daño que se le asigna al token
-    armadmg: n(c.final.armadmg),   // Armadura mágica (Paso 3 del casteo): el mapa la resta al daño de casteo que ignora la Defensa
-    muerto: {activo: !!(S.muerto && S.muerto.activo), turnos: num(S.muerto && S.muerto.turnos), definitivo: !!(S.muerto && S.muerto.definitivo)},   // el mapa tiñe de rojo la pantalla de su jugador y le da el botón Revivir
-    esp: n(c.final.esp),   // Especial
-    resmg: n(c.final.resmg),   // Res.Esp (2026-09-28): el mapa la usa para tirar sola la resistencia de una zona persistente, sin que la ficha esté abierta
-    percepcion: n(c.final.percepcion),   // Percepción (de Destreza, 2026-09-22): por si el mapa la necesita más adelante
-    rng: n(c.final.rng),               // Rango (de Destreza): el mapa lo usa para el visualizador de rango (📏)
-    rangocasteo: n(c.final.rangocasteo),   // Rango de casteo (de Especial): visualizador de rango mágico (🔮)
-    luz: n(c.final.luz), veoculto: n(c.final.veoculto),   // luz que lleva encima y radio en el que ve lo oculto: el mapa los lee (farol, bengala, yelmo del ojo que todo lo ve)
-    vision: n(c.final.vision),   // Campo de visión (base 6 + ítems, pasivas y estados): el mapa lo suma a la luz de la escena para el radio de cada token
-    // Crítico (2026-09-25): el mapa arma con esto la Calculadora de crítico sin que haya que escribirlo (equipo, habilidades y estados ya sumados).
-    // Crítico frecuente y potente DE ESA ARMA (la misma de armaTipo): lo de la otra arma equipada no cuenta.
-    ...(() => { const a = (S.inventario || []).find(i => i.equipado && /^arma/.test(i.tipoItem || '') && [4, 6, 8, 10, 12].includes(num(i.tipoDado))); return {crit: n(statParaArma('crit', a || null)), critpot: n(statParaArma('critpot', a || null))}; })(),
-    armaTipo: (() => { const a = (S.inventario || []).find(i => i.equipado && /^arma/.test(i.tipoItem || '') && [4, 6, 8, 10, 12].includes(num(i.tipoDado))); return a ? num(a.tipoDado) : 0; })(),   // Tipo de su arma equipada
-    rescrit: ['tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5'].map(k => n(c.final[k])),   // Resistencia a crítico contra armas de Tipo 4, 6, 8, 10 y 12
-    percepcionAumentada: tienePercepcionAumentada(),   // el mapa le avisa de las trampas ocultas cercanas
-    sp: spMax - num(S.spGastado),
-    spMax,
-    // Para mover el token desde el mapa: Nitros que quedan y cuánto cuesta
-    // cada casillero (0 = no se puede mover, ej. Inmovilizado).
-    nitros: S.nitros === null || S.nitros === undefined ? n(c.final.nitros) : num(S.nitros),
-    nitrosMax: n(c.final.nitros),
-    costoMover: IT2.inmovilizadoBloqueaMover && estadoActivo('inmovilizado') ? 0 : costoMoverCasillero(),
-    muerto: !!(S.muerto && S.muerto.activo),
-    muertoDef: !!(S.muerto && S.muerto.definitivo),   // muerto de verdad (el GM lo usa al repartir la experiencia)
-    // 🎮 Si el GM tiene el control, su uid: el mapa le deja usar este token como si fuera suyo (Botonera, moverlo pagando No2).
-    ...(fichaVivo && fichaVivo.control && fichaVivo.control.uid ? {control: fichaVivo.control.uid} : {}),
-    estados: estadosTodos()
-      .filter(e => e && e.activo !== false && e.nombre)
-      .slice(0, 30)
-      .map(e => ({
-        nombre: String(e.nombre).slice(0, 60),
-        turnos: num(e.turnos),
-        permanente: !!e.permanente,
-        ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
-        ...(e.derivado ? {derivado: true} : {}),
-        polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
-        // Para el globito del mapa al pasar el mouse por el estado.
-        detalle: String(e.detalle || '').slice(0, 300),
-      })),
-    invocaciones: (S.invocaciones || [])
-      .filter(inv => inv && inv.id)
-      .slice(0, 20)
-      .map(inv => ({
-        id: String(inv.id),
-        nombre: String(inv.nombre || 'Invocación').slice(0, 60),
-        hp: num(inv.hp),
-        hpMax: num(inv.hpMax),
-        // Nitros y estados, para que el token en el mapa muestre lo mismo
-        // que un PJ o un creep (barra de No2, estados con su detalle).
-        nitros: num(inv.nitros),
-        nitrosMax: invNitrosMax(inv),
-        activa: inv.activa !== false,
-        miniatura: fichaMiniaturaInvocacion(inv.imagen),
-        estados: (inv.estados || [])
-          .filter(e => e && e.activo !== false && e.nombre)
-          .slice(0, 30)
-          .map(e => ({
-            nombre: String(e.nombre).slice(0, 60),
-            turnos: num(e.turnos),
-            permanente: !!e.permanente,
-            ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
-            polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
-            detalle: String(e.detalle || '').slice(0, 300),
-          })),
-      })),
-  };
-}
+// El resumen público (lo que leen los tokens del mapa, el Tablero, la Calculadora de crítico): comun/ficha-resumen.js, el mismo
+// que arma el mapa cuando guarda un personaje desde la Botonera nueva (paso 4, etapa 3c).
+function fichaResumen(){ return FichaResumen.resumen(S, {control: fichaVivo && fichaVivo.control, miniaturaInv: fichaMiniaturaInvocacion}); }
 
 // Miniaturas de las invocaciones para el resumen: se calculan aparte (tardan
 // un instante) y, cuando están, se vuelve a revisar el resumen.

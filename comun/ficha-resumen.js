@@ -1,0 +1,147 @@
+/* =========================================================
+   FICHA-RESUMEN — lo que se publica de un personaje para los demás (paso 4, etapa 3c de docs/plan-paso4-etapa3.md,
+   2026-10-01)
+   El documento de cada personaje (campanas/<id>/fichas/<id>) lleva un `resumen` público: vida, SP, No2, Defensa, estados,
+   invocaciones… — lo que leen los tokens del mapa, el Tablero, la Calculadora de crítico, el historial. Hasta ahora lo armaba
+   solo la ficha (fichaResumen, js/12); para que el mapa pueda guardar un personaje (cobrar No2, poner un estado) tiene que
+   poder armarlo él también, igual. Copiado tal cual de la ficha, con `S` como parámetro.
+   También los estados "derivados" (no se guardan: la regeneración de las pasivas y el Sobrepeso), el costo de moverse y el
+   No2 máximo de una invocación, que el resumen usa.
+   Necesita ficha-calculo.js, ficha-combate.js, ficha-botonera.js y combatiente.js antes.
+   ========================================================= */
+const FichaResumen = (() => {
+  const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
+  function fmt(n){ return Number.isInteger(n) ? n : Math.round(n*100)/100; }
+  const IT2 = () => FichaCalculo.IT2;
+
+  /* ---------- Estados derivados (js/04) ---------- */
+  function estadosDePasivas(S){
+    return (S.pasivas || []).filter(p => num(p.regenHp) > 0).map(p => {
+      const hp = num(p.regenHp) * FichaCalculo.pasivaCompras(p);
+      return {id: 'pasiva:' + p.id, nombre: p.nombre, polaridad: 'buff', permanente: true, stacks: 1, turnos: 0, hpturno: hp, activo: true, derivado: true,
+        detalle: `Viene de tu pasiva "${p.nombre}": recupera ${fmt(hp)} HP en cada Mantenimiento.`};
+    });
+  }
+  // Sobrepeso: estado derivado (no se guarda): aparece solo mientras el equipo pasa la Crg.Max. La penalidad se decide al tirar Evasión.
+  function estadoSobrepeso(S){
+    const s = FichaCalculo.calcular(S).sobrecarga;
+    if(!(s > 0)) return [];
+    return [{id: 'sobrepeso', nombre: 'Sobrepeso', polaridad: 'debuff', permanente: true, stacks: 1, turnos: 0, hpturno: 0, activo: true, derivado: true, sobrepeso: s,
+      detalle: `Tu equipo pesa ${fmt(s)} de más: al tirar Evasión restás ${fmt(s)}, salvo que pagues 1 No2 para evitarlo.`}];
+  }
+  const estadosTodos = S => [...(S.efectos || []), ...estadosDePasivas(S), ...estadoSobrepeso(S)];
+
+  /* ---------- Moverse (js/11) ---------- */
+  function estadoActivo(S, flag){
+    return (S.efectos || []).some(e => e.activo !== false && e[flag]);
+  }
+  function costoMoverCasillero(S){
+    return estadoActivo(S, 'rengo') ? IT2().nitrosMoverRengo : IT2().nitrosMover;
+  }
+
+  /* ---------- No2 máximo de una invocación (js/04) ---------- */
+  function invFuentesEquipo(inv){
+    const arma = (inv.armaMods || []).length ? [{nombre: inv.armaNombre || 'Arma', mods: inv.armaMods}] : [];
+    return [...(inv.equipo || []), ...arma];
+  }
+  function invModTotal(inv, statId){
+    let total = 0;
+    invFuentesEquipo(inv).forEach(it => (it.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val); }));
+    (inv.estados||[]).forEach(es => {
+      if(es.activo === false) return;
+      const stacks = Math.max(1, num(es.stacks)||1);
+      (es.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val) * stacks; });
+    });
+    return total;
+  }
+  function invNitrosMax(inv){
+    // Natural = Agilidad efectiva + bonos a Nitros; los estados los aplica el motor común (comun/combatiente.js).
+    return Combatiente.nitrosMax(num(inv.agl) + invModTotal(inv, 'agl') + invModTotal(inv, 'nitros'), inv.estados);
+  }
+
+  /* ---------- El resumen (js/12, fichaResumen) ----------
+     o: {control: {uid} | null (🎮 si el GM tiene el control), miniaturaInv(imagen) (la miniatura de una invocación; la
+     ficha la calcula aparte y devuelve '' mientras tanto)}. */
+  function resumen(S, o){
+    o = o || {};
+    const c = FichaCalculo.calcular(S);
+    const n = v => (typeof v === 'number' && !Number.isNaN(v)) ? v : num(v);
+    const spMax = n(FichaBotonera.spMaximo(S, c));
+    const statParaArma = (statId, arma) => FichaCombate.statParaArma(S, statId, arma);
+    const miniaturaInv = o.miniaturaInv || (() => '');
+    return {
+      nivel: num(S.meta.nivel),
+      hp: num(S.hp),
+      hpMax: n(c.final.hpmax),
+      ini: n(c.final.ini),   // Iniciativa: el mapa la usa para el botón "Tirar iniciativa" de la lista de turnos
+      def: n(c.final.def),   // Defensa total: el mapa la resta al daño que se le asigna al token
+      armadmg: n(c.final.armadmg),   // Armadura mágica (Paso 3 del casteo): el mapa la resta al daño de casteo que ignora la Defensa
+      muerto: {activo: !!(S.muerto && S.muerto.activo), turnos: num(S.muerto && S.muerto.turnos), definitivo: !!(S.muerto && S.muerto.definitivo)},   // el mapa tiñe de rojo la pantalla de su jugador y le da el botón Revivir
+      esp: n(c.final.esp),   // Especial
+      resmg: n(c.final.resmg),   // Res.Esp (2026-09-28): el mapa la usa para tirar sola la resistencia de una zona persistente, sin que la ficha esté abierta
+      percepcion: n(c.final.percepcion),   // Percepción (de Destreza, 2026-09-22): por si el mapa la necesita más adelante
+      rng: n(c.final.rng),               // Rango (de Destreza): el mapa lo usa para el visualizador de rango (📏)
+      rangocasteo: n(c.final.rangocasteo),   // Rango de casteo (de Especial): visualizador de rango mágico (🔮)
+      luz: n(c.final.luz), veoculto: n(c.final.veoculto),   // luz que lleva encima y radio en el que ve lo oculto: el mapa los lee (farol, bengala, yelmo del ojo que todo lo ve)
+      vision: n(c.final.vision),   // Campo de visión (base 6 + ítems, pasivas y estados): el mapa lo suma a la luz de la escena para el radio de cada token
+      // Crítico (2026-09-25): el mapa arma con esto la Calculadora de crítico sin que haya que escribirlo (equipo, habilidades y estados ya sumados).
+      // Crítico frecuente y potente DE ESA ARMA (la misma de armaTipo): lo de la otra arma equipada no cuenta.
+      ...(() => { const a = (S.inventario || []).find(i => i.equipado && /^arma/.test(i.tipoItem || '') && [4, 6, 8, 10, 12].includes(num(i.tipoDado))); return {crit: n(statParaArma('crit', a || null)), critpot: n(statParaArma('critpot', a || null))}; })(),
+      armaTipo: (() => { const a = (S.inventario || []).find(i => i.equipado && /^arma/.test(i.tipoItem || '') && [4, 6, 8, 10, 12].includes(num(i.tipoDado))); return a ? num(a.tipoDado) : 0; })(),   // Tipo de su arma equipada
+      rescrit: ['tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5'].map(k => n(c.final[k])),   // Resistencia a crítico contra armas de Tipo 4, 6, 8, 10 y 12
+      percepcionAumentada: FichaBotonera.tienePercepcionAumentada(S),   // el mapa le avisa de las trampas ocultas cercanas
+      sp: spMax - num(S.spGastado),
+      spMax,
+      // Para mover el token desde el mapa: Nitros que quedan y cuánto cuesta
+      // cada casillero (0 = no se puede mover, ej. Inmovilizado).
+      nitros: S.nitros === null || S.nitros === undefined ? n(c.final.nitros) : num(S.nitros),
+      nitrosMax: n(c.final.nitros),
+      costoMover: IT2().inmovilizadoBloqueaMover && estadoActivo(S, 'inmovilizado') ? 0 : costoMoverCasillero(S),
+      muerto: !!(S.muerto && S.muerto.activo),
+      muertoDef: !!(S.muerto && S.muerto.definitivo),   // muerto de verdad (el GM lo usa al repartir la experiencia)
+      // 🎮 Si el GM tiene el control, su uid: el mapa le deja usar este token como si fuera suyo (Botonera, moverlo pagando No2).
+      ...(o.control && o.control.uid ? {control: o.control.uid} : {}),
+      estados: estadosTodos(S)
+        .filter(e => e && e.activo !== false && e.nombre)
+        .slice(0, 30)
+        .map(e => ({
+          nombre: String(e.nombre).slice(0, 60),
+          turnos: num(e.turnos),
+          permanente: !!e.permanente,
+          ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
+          ...(e.derivado ? {derivado: true} : {}),
+          polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
+          // Para el globito del mapa al pasar el mouse por el estado.
+          detalle: String(e.detalle || '').slice(0, 300),
+        })),
+      invocaciones: (S.invocaciones || [])
+        .filter(inv => inv && inv.id)
+        .slice(0, 20)
+        .map(inv => ({
+          id: String(inv.id),
+          nombre: String(inv.nombre || 'Invocación').slice(0, 60),
+          hp: num(inv.hp),
+          hpMax: num(inv.hpMax),
+          // Nitros y estados, para que el token en el mapa muestre lo mismo
+          // que un PJ o un creep (barra de No2, estados con su detalle).
+          nitros: num(inv.nitros),
+          nitrosMax: invNitrosMax(inv),
+          activa: inv.activa !== false,
+          miniatura: miniaturaInv(inv.imagen),
+          estados: (inv.estados || [])
+            .filter(e => e && e.activo !== false && e.nombre)
+            .slice(0, 30)
+            .map(e => ({
+              nombre: String(e.nombre).slice(0, 60),
+              turnos: num(e.turnos),
+              permanente: !!e.permanente,
+              ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
+              polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
+              detalle: String(e.detalle || '').slice(0, 300),
+            })),
+        })),
+    };
+  }
+
+  return {estadosDePasivas, estadoSobrepeso, estadosTodos, estadoActivo, costoMoverCasillero, invFuentesEquipo, invModTotal, invNitrosMax, resumen};
+})();

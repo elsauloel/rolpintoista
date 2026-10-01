@@ -39,8 +39,9 @@ function mesaQuien(origen){
 const PARTES_FICHA = FichaGuardado.PARTES;
 const CLAVES_CON_PARTE = FichaGuardado.CLAVES_CON_PARTE;
 const CATALOGO_IDS = FichaGuardado.CATALOGO_IDS;
-const GUARDAR_QUIETO_MS = 1200;  // se escribe cuando una parte deja de cambiar este rato…
-const GUARDAR_MAX_MS = 5000;     // …o, si no para de cambiar (tipeando), como mucho cada tanto
+// Cuándo se escribe (1,2 s quieto, o cada 5 s si no para de cambiar): comun/ficha-sesion.js (paso 4, etapa 3a).
+const GUARDAR_QUIETO_MS = FichaSesion.QUIETO_MS;
+const GUARDAR_MAX_MS = FichaSesion.MAX_MS;
 const MINIATURA_PX = 96;
 const MINIATURA_MAX = 60000;   // tope que aceptan las reglas
 const GM_SIN_PERSONAJES = 'Como GM, tus personajes y creeps se manejan desde gm-tools. Acá solo podés mirar las fichas de los jugadores.';
@@ -386,85 +387,30 @@ async function fichaMostrarLectura(){
 
 /* ---------- Guardado ---------- */
 
+// El guardado en sí (qué partes cambiaron, cuándo escribir, reintentar) vive en comun/ficha-sesion.js (paso 4, etapa 3a), el
+// mismo que usa el mapa. Acá, lo propio de la ficha: qué se guarda (partes, resumen, nombre, miniatura) y qué se muestra.
+function fichaOpcionesGuardado(f){
+  return {
+    db: fbDb, ruta: fbRutaCampana(`fichas/${f.id}`), marcaDeTiempo: () => firebase.firestore.FieldValue.serverTimestamp(),
+    partes: fichaPartesActuales, resumen: fichaResumen, nombre: fichaNombre, miniatura: fichaMiniaturaActual,
+    juntos: () => tiposGuardarJunto, juntosListo: () => { tiposGuardarJunto = false; },
+    alEstado: fichaEstadoAlDia, vigente: () => fichaVivo === f,
+    alError: (err, primeraVez) => {
+      if(primeraVez) toast(err.code === 'permission-denied'
+        ? 'No se pudo guardar: la mesa no te deja modificar este personaje'
+        : 'No se pudo guardar la ficha en la mesa — se reintenta sola');
+    },
+  };
+}
 async function fichaGuardarTick(forzar){
   const f = fichaVivo;
   if(!f || f.soloLectura || !f.cargada || f.escribiendo) return;
-  const ahora = Date.now();
-  if(f.reintentarDesde && ahora < f.reintentarDesde && !forzar) return;
-  // Recién pasada a la escala nueva de Tipos: la marca (en "otros") y los
-  // ítems corridos tienen que llegar juntos, o la próxima carga los correría otra vez.
-  const juntos = tiposGuardarJunto;
-  forzar = forzar || juntos;
-  const actuales = fichaPartesActuales();
-  const listas = [];
-  Object.entries(actuales).forEach(([parte, json]) => {
-    if(json === f.ultimo[parte]){ delete f.sucias[parte]; return; }
-    const s = f.sucias[parte];
-    if(!s) f.sucias[parte] = {json, desde: ahora, cambio: ahora};
-    else if(s.json !== json){ s.json = json; s.cambio = ahora; }
-    const t = f.sucias[parte];
-    if(forzar || ahora - t.cambio >= GUARDAR_QUIETO_MS || ahora - t.desde >= GUARDAR_MAX_MS) listas.push([parte, json]);
-  });
-  if(juntos && !listas.length) tiposGuardarJunto = false;
-  if(!listas.length && !f.revisarResumen && !f.reponerMiniatura){ fichaEstadoAlDia(); return; }
-
-  f.escribiendo = true;
-  f.revisarResumen = false;
-  fichaEstadoAlDia();
-  const ts = firebase.firestore.FieldValue.serverTimestamp();
-  const base = fbDb.doc(fbRutaCampana(`fichas/${f.id}`));
-  const batch = fbDb.batch();
-  listas.forEach(([parte, json]) => {
-    batch.set(base.collection('partes').doc(parte), {json, actualizado: ts});
-    f.enviando[parte] = json;
-  });
-  const cambios = {};
-  const nombre = fichaNombre();
-  const resumen = fichaResumen();
-  const resumenJson = JSON.stringify([nombre, resumen]);
-  if(resumenJson !== f.ultimoResumen){ cambios.nombre = nombre; cambios.resumen = resumen; }
-  const retrato = listas.find(([parte]) => parte === 'retrato');
-  if(retrato) cambios.miniatura = await fichaMiniaturaActual();
-  else if(f.reponerMiniatura){
-    const mini = await fichaMiniaturaActual();
-    if(mini) cambios.miniatura = mini;
-    f.reponerMiniatura = false;
-  }
-  if(Object.keys(cambios).length){ cambios.actualizado = ts; batch.update(base, cambios); }
-
-  try{
-    await batch.commit();
-    listas.forEach(([parte, json]) => {
-      f.ultimo[parte] = json;
-      if(f.sucias[parte] && f.sucias[parte].json === json) delete f.sucias[parte];
-    });
-    f.ultimoResumen = resumenJson;
-    f.reintentarDesde = 0;
-    if(juntos) tiposGuardarJunto = false;
-  }catch(err){
-    console.error('No se pudo guardar la ficha en la mesa:', err);
-    if(!f.reintentarDesde){
-      toast(err.code === 'permission-denied'
-        ? 'No se pudo guardar: la mesa no te deja modificar este personaje'
-        : 'No se pudo guardar la ficha en la mesa — se reintenta sola');
-    }
-    f.reintentarDesde = Date.now() + 8000;
-  }finally{
-    listas.forEach(([parte]) => { delete f.enviando[parte]; });
-    f.escribiendo = false;
-    if(fichaVivo === f) fichaEstadoAlDia();
-  }
+  return FichaSesion.guardar(f, forzar, fichaOpcionesGuardado(f));
 }
 
 setInterval(() => fichaGuardarTick(false), 1000);
 
-function fichaHayPendiente(){
-  const f = fichaVivo;
-  if(!f || f.soloLectura || !f.cargada) return false;
-  if(f.escribiendo) return true;
-  const actuales = fichaPartesActuales();
-  return Object.keys(actuales).some(p => actuales[p] !== f.ultimo[p]);
-}
+function fichaHayPendiente(){ return FichaSesion.pendiente(fichaVivo, fichaPartesActuales); }
 
 window.addEventListener('beforeunload', e => {
   if(!fichaHayPendiente()) return;
@@ -483,106 +429,66 @@ function fichaRecordar(id, soloEnPestana){
   try{ history.replaceState(null, '', id ? '#' + id : location.pathname + location.search); }catch(e){}
 }
 
-function fichaNuevoEstado(id, duenoUid, cargada){
-  return {
-    id, duenoUid,
-    editaGM: false,   // el GM puede pasar a editar (fichaAlternarEdicionGM)
-    control: null,    // {uid, nombre, desde}: quien tiene el control del personaje (el GM, con "🎮 Tomar el control"); null = su dueño
-    soloLectura: fichaSoloLecturaPara(duenoUid, null),
-    cargada,
-    ultimo: {}, sucias: {}, enviando: {},
-    ultimoResumen: '', revisarResumen: false,
-    escribiendo: false, reintentarDesde: 0,
-    cortes: [], cola: Promise.resolve(),
-  };
-}
+// El estado de un personaje abierto (fichaVivo): comun/ficha-sesion.js.
+function fichaNuevoEstado(id, duenoUid, cargada){ return FichaSesion.nueva(id, duenoUid, cargada, fichaSoloLecturaPara(duenoUid, null)); }
 
+// Escuchar el personaje: comun/ficha-sesion.js (paso 4, etapa 3a), el mismo que usa el mapa. Acá, lo que la ficha hace en
+// cada momento (armarse y dibujarse, avisos, solo lectura, control del GM).
 function fichaEscuchar(f){
-  const base = fbDb.doc(fbRutaCampana(`fichas/${f.id}`));
-
-  // Documento principal: si cambia el dueño (el GM lo reasignó) o se borra.
-  f.cortes.push(base.onSnapshot(doc => {
-    if(fichaVivo !== f) return;
-    if(!doc.exists){
-      if(doc.metadata.hasPendingWrites) return;
-      toast('Este personaje se borró de la mesa');
-      fichaDesenganchar();
-      return;
-    }
-    const d = doc.data();
-    const lectura = fichaSoloLecturaPara(d.duenoUid, f);
-    f.duenoUid = d.duenoUid;
-    f.miniaturaDoc = typeof d.miniatura === 'string' ? d.miniatura : '';   // la que ven los tokens del mapa
-    if(lectura !== f.soloLectura){
-      f.soloLectura = lectura;
-      toast(lectura ? 'Este personaje pasó a otro dueño: queda en solo lectura' : 'Ahora este personaje es tuyo');
-      fichaMostrarLectura();
-      fichaEstadoAlDia();
-    }
-  }, err => console.error('Error escuchando el personaje:', err)));
-
-  // Partes: la primera vez arman la ficha entera; después, cada parte que
-  // cambia desde otra ventana (o el dueño, si es solo lectura) se aplica sola.
-  f.cortes.push(base.collection('partes').onSnapshot(snap => {
-    f.cola = f.cola.then(() => {
-      if(fichaVivo !== f) return;
-      if(!f.cargada){
-        // Las partes juntas: comun/ficha-guardado.js (armarDatos). La marca de control del GM no es un dato del
-        // personaje: va aparte (fichaControlCambio).
-        const armado = FichaGuardado.armarDatos(snap.docs.map(d => ({id: d.id, json: d.data().json})));
-        if(armado.control) f.control = armado.control;
-        Object.assign(f.ultimo, armado.ultimo);
-        f.soloLectura = fichaSoloLecturaPara(f.duenoUid, f);   // con la marca de control ya leída
-        aplicarFicha(armado.datos);
-        fichaPonerImagenesInvocaciones(armado.imgInvocaciones);
-        renderInvocaciones();
-        f.cargada = true;
-        // Si la ficha tiene retrato pero el token del mapa se quedó sin miniatura, la vuelve a publicar.
-        if(!f.soloLectura && !f.miniaturaDoc && (S.meta.imagen || S.meta.miniatura)){ f.reponerMiniatura = true; }
-        f.revisarResumen = true;
-        fichaMostrarLectura();
-        fichaEstadoAlDia();
-        // ?precarga=1 (paso 4): el mapa la carga de antemano, o para un duelo, sin abrir nada; avisa que está lista y espera.
-        if(MODO_BOTONERA){ if(new URLSearchParams(location.search).get('precarga') === '1') botoneraAvisarMapa('botonera-lista'); else botoneraModoAbrir(); }
-        mantenimientoRevisar();
-        recompensasRevisar();
+  FichaSesion.escuchar(f, {
+    db: fbDb, ruta: fbRutaCampana(`fichas/${f.id}`), vigente: () => fichaVivo === f,
+    // Documento principal: si cambia el dueño (el GM lo reasignó) o se borra.
+    alDoc: doc => {
+      if(!doc.exists){
+        if(doc.metadata.hasPendingWrites) return;
+        toast('Este personaje se borró de la mesa');
+        fichaDesenganchar();
         return;
       }
-      let cambio = false;
-      snap.docChanges().forEach(ch => {
-        if(ch.doc.id === 'control'){
-          if(ch.doc.metadata.hasPendingWrites) return;   // lo escribió esta misma pantalla: ya se aplicó
-          let c = null;
-          if(ch.type !== 'removed'){ try{ c = JSON.parse(String(ch.doc.data().json || 'null')); }catch(e){} }
-          const nuevo = c && c.uid ? c : null;
-          if((nuevo && nuevo.uid) !== (f.control && f.control.uid)) fichaControlCambio(f, nuevo, true);
-          return;
-        }
-        if(ch.type === 'removed' || ch.doc.metadata.hasPendingWrites) return;
-        const json = String(ch.doc.data().json || '');
-        if(json === f.ultimo[ch.doc.id] || json === f.enviando[ch.doc.id]) return;
-        fichaAplicarParte(ch.doc.id, fichaLeerParte(ch.doc.id, json));
-        f.ultimo[ch.doc.id] = json;
-        delete f.sucias[ch.doc.id];
-        cambio = true;
-      });
-      if(cambio){
-        renderAll();
-        if(!f.soloLectura) toast('La ficha se actualizó desde otra ventana');
+      const d = doc.data();
+      const lectura = fichaSoloLecturaPara(d.duenoUid, f);
+      f.duenoUid = d.duenoUid;
+      f.miniaturaDoc = typeof d.miniatura === 'string' ? d.miniatura : '';   // la que ven los tokens del mapa
+      if(lectura !== f.soloLectura){
+        f.soloLectura = lectura;
+        toast(lectura ? 'Este personaje pasó a otro dueño: queda en solo lectura' : 'Ahora este personaje es tuyo');
+        fichaMostrarLectura();
         fichaEstadoAlDia();
       }
-    }).catch(err => console.error('Error aplicando cambios de la ficha:', err));
-  }, err => {
-    console.error('Error escuchando las partes del personaje:', err);
-    fichaEstado('⚠ No se pudo leer el personaje — mirá la consola', 'error');
-  }));
+    },
+    // La primera vez: la ficha entera (la marca de control y lo leído ya están en f).
+    alCargar: armado => {
+      f.soloLectura = fichaSoloLecturaPara(f.duenoUid, f);   // con la marca de control ya leída
+      aplicarFicha(armado.datos);
+      fichaPonerImagenesInvocaciones(armado.imgInvocaciones);
+      renderInvocaciones();
+      f.cargada = true;
+      // Si la ficha tiene retrato pero el token del mapa se quedó sin miniatura, la vuelve a publicar.
+      if(!f.soloLectura && !f.miniaturaDoc && (S.meta.imagen || S.meta.miniatura)){ f.reponerMiniatura = true; }
+      f.revisarResumen = true;
+      fichaMostrarLectura();
+      fichaEstadoAlDia();
+      // ?precarga=1 (paso 4): el mapa la carga de antemano, o para un duelo, sin abrir nada; avisa que está lista y espera.
+      if(MODO_BOTONERA){ if(new URLSearchParams(location.search).get('precarga') === '1') botoneraAvisarMapa('botonera-lista'); else botoneraModoAbrir(); }
+      mantenimientoRevisar();
+      recompensasRevisar();
+    },
+    alControl: nuevo => fichaControlCambio(f, nuevo, true),
+    aplicarParte: (parte, datos) => fichaAplicarParte(parte, datos),
+    alCambiar: () => {
+      renderAll();
+      if(!f.soloLectura) toast('La ficha se actualizó desde otra ventana');
+      fichaEstadoAlDia();
+    },
+    alErrorPartes: () => fichaEstado('⚠ No se pudo leer el personaje — mirá la consola', 'error'),
+  });
 }
 
 // Corta la conexión con el personaje abierto sin guardar nada más.
 function fichaDesenganchar(){
   const f = fichaVivo;
   if(!f) return;
-  f.cortes.forEach(cortar => cortar());
+  FichaSesion.cortar(f);
   fichaVivo = null;
   fichaRecordar('');
   fichaMostrarLectura();

@@ -90,5 +90,12 @@ siga necesitándolo (ver pregunta 4). La ficha suelta (`ficha.html`) no cambia: 
 4. **¿Y las Acciones de los creeps (GM) y la Botonera de las invocaciones?** Después de la del personaje, con el mismo
    método, o en paralelo. *Recomendado: después*.
 
+## Decisiones del dueño (2026-10-01)
+1. **En `nueva-version`, detrás de un interruptor escondido** (botón "⚗ Botonera nueva (prueba)" que solo ve el GM), no en
+   una rama: los jugadores siguen con la de siempre y se puede probar en la mesa real.
+2. **Igual que la de hoy**: se mueve sin cambiar lo que se ve.
+3. **De lo simple a lo complejo** (el orden de 3c).
+4. **Creeps e invocaciones, después** de la Botonera del personaje.
+
 ## Cómo va
-- 2026-10-01: plan escrito; esperando las respuestas.
+- 2026-10-01: plan escrito y preguntas contestadas (todas como lo recomendado). Empieza la 3a.

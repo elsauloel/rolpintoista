@@ -62,7 +62,7 @@ Cada uno: su pieza a `comun/` (como en el paso 5), sus pruebas, el botón pasa a
 Orden propuesto, de lo más simple a lo más complejo (ver pregunta 3):
 1. Tirar un stat, Percepción ✅ (2026-10-01). Fuerza del golpe pasa al paso 4 (elige arma como el Parry).
 2. Sigilo y Levantarse ✅ (2026-10-01; el mapa ya guarda al personaje).
-3. Consumibles (cinturón y mochila).
+3. Consumibles (cinturón y mochila) ✅ (2026-10-01; quedan delegadas las trampas consumibles y el Ankh manual).
 4. Atacar, Daño, Esquivar, Parry y Bloqueo — con los ganchos del duelo del personaje (`DUELO_HOOKS`).
 5. Habilidades (lo más grande: elegir arma, costo X, turno ajeno, Flash, Ejecución, zonas y trampas).
 6. 🔍 Lupa y "Ver".
@@ -156,3 +156,18 @@ siga necesitándolo (ver pregunta 4). La ficha suelta (`ficha.html`) no cambia: 
   botón 🧍 apareció solo en el mapa, salió el cartel ("No podés levantarte: cuesta 1 No2 y tenés 0."), "Realizar de
   cualquier modo" lo levantó sin bajar de 0 y publicó la línea roja en la Mesa; salir del sigilo desde el mapa llegó a la
   ficha, y los No2 llenados desde la ficha llegaron al mapa (12/12).
+- 2026-10-01: **3c, paso 3 hecho — Consumir lo hace el mapa** (cinturón y mochila). A `comun/ficha-acciones.js`:
+  `consumir(S, id, forzar, ui)` (el botón Consumir entero: mesa común, cartel sin No2, trampa consumible, cargas y unidades,
+  vida, estado, tiradas, SP, Oleo reparador) y la **vida** (`fijarHp`, `revisarAnkh`, `revisarMuerte`, `aplicarRevivirConAnkh`:
+  lo que cambia en el personaje; el cartel de "Inconsciente" y el campo de HP siguen en la ficha), más `purgarSiAgotado`,
+  `restaurarSpDeConsumo`, `repararArmadura`, `efectoDeConsumo` y `tiradasDeItem` (las tiradas del ítem sin publicar). La ficha
+  los usa con sus nombres de siempre (`consumoUi` para el botón). **El mapa ahora carga el catálogo** (`catalogo.js` y lo
+  subido por el grupo, `items-subidos.js`, como la ficha): un consumible viejo busca ahí el estado que deja; sin él dejaría
+  otro. Revisa el Ankh y la muerte cada vez que guarda (como la ficha al redibujar la vida). **Siguen delegadas** a la ficha
+  escondida: las trampas consumibles (se colocan con su código) y el "Consumir" manual del Ankh. Comparado contra el código
+  viejo de la ficha en 850 casos al azar (registrando estado final, avisos, carteles, redibujos, campo de HP, línea roja,
+  trampas colocadas o no, desmayo y Ankh automático): igual; 4 mutaciones plantadas, las 4 detectadas. `pruebas.html` ahora
+  acepta pruebas que terminan más tarde (async). **En vivo** (Clementino en la ficha y en el mapa a la vez): con el catálogo
+  cargado el mapa no escribiría ninguna parte sin tocar nada; Elixir de Fénix (HP 10 → 25, el máximo), Poción de Bonos
+  (+23 SP) y Antorcha de brea (estado 3 turnos), 2 No2 cada uno y una unidad menos — igual en el mapa, en Firebase y en la
+  ficha de la otra pestaña, sin nada pendiente. Clementino quedó como estaba.

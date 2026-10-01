@@ -2,8 +2,8 @@
 
 > Parte de [`plan-paso4.md`](plan-paso4.md) y de [`plan-consolidacion.md`](plan-consolidacion.md). Escrito el 2026-10-01,
 > después de terminar el nivel B del paso 5 (áreas 1 a 4, ver [`plan-paso5.md`](plan-paso5.md)). **Estado: en curso** —
-> 3a y 3b hechas; 3c hasta el paso 4 (4a, 4b y 4c) hecha (ver "Para retomar" justo abajo y "Cómo va" al final). Preguntas del
-> dueño: contestadas.
+> 3a y 3b hechas; 3c hasta el paso 5a hecha (ver "Para retomar" justo abajo y "Cómo va" al final). Preguntas del dueño:
+> contestadas.
 
 ## ▶ Para retomar (al cierre de la conversación del 2026-10-01, tarde)
 
@@ -12,16 +12,20 @@
 **Hecho en esta etapa**: 3a (sesión en vivo compartida, `comun/ficha-sesion.js`), 3b (Botonera nueva detrás del
 interruptor ⚗, solo GM), y de la 3c: paso 1 (tiradas de stats y Percepción), el resumen público (`comun/ficha-resumen.js`),
 paso 2 (Sigilo, Levantarse: el mapa ya guarda al personaje), paso 3 (Consumir), paso 4a (Esquivar, Parry, Bloqueo, Fuerza
-del golpe, Daño), 4b (Atacar) y **4c (los ganchos del duelo: `comun/ficha-duelo.js`)** — probado en vivo con un objetivo de
-verdad, atacando y defendiendo. Todo lo que hace la Botonera nueva vive en `comun/ficha-acciones.js` y `comun/ficha-duelo.js`
-(la ficha usa lo mismo con sus nombres de siempre).
+del golpe, Daño), 4b (Atacar), **4c (los ganchos del duelo: `comun/ficha-duelo.js`)** — probado en vivo con un objetivo de
+verdad, atacando y defendiendo — y **5a (habilidades manuales, semiautomáticas, el costo X, el Flash fuera del duelo y la 🎲
+segunda tirada)**. Todo lo que hace la Botonera nueva vive en `comun/ficha-acciones.js` y `comun/ficha-duelo.js` (la ficha usa
+lo mismo con sus nombres de siempre).
 
-**Lo próximo — 3c, paso 5: las habilidades** (Ejecutar / Anunciar / 🎲 segunda tirada, `data-ejecutar`, `data-danohab`):
-`ejecutarHabilidad` de la ficha (`js/11`) — elegir arma, costo X (`#scrim-costox`), «¿es tu turno?», Flash fuera del duelo
-(`usarFlashFueraDelDuelo`, ya usa `FichaDuelo.pagarFlash`), la Ejecución paso a paso (`habDueloDe` → `Duelo.elegirObjetivo`),
-zonas, trampas, Mesa. Es lo más grande que queda: conviene partirlo (por ejemplo: 5a manual y semi; 5b automática con duelo;
-5c zonas, trampas y portal). Después: paso 6 (🔍 lupa y Ver), los talentos, las trampas consumibles y el Ankh manual; recién
-ahí 3d (retirar el marco para los jugadores).
+**Lo próximo — 3c, paso 5b: las habilidades ✨ automáticas** (las que abren la Ejecución paso a paso). Hoy `bnHabAca` (mapa)
+se las deja a la ficha escondida. Lo que falta mudar es `terminarEjecucionHab` (`js/02`) para el caso `modo === 'auto'`: ataque
+con arma con arreglos (`ataqueDeHabArma` → `Duelo.elegirObjetivo`), habilidad dirigida (`habDueloDe` + `lanzarDueloDeHab`), el
+atajo «solo sobre vos, sin tiradas» (`aplicarHabSobreMiDirecto` + `dueloAplicarEfectoPropio`) y la que todavía no tiene armada
+la Ejecución (se ejecuta como semi). En el mapa, `Duelo.elegirObjetivo` se reemplaza por `dueloElegirObjetivoMapa` con
+`alSuelto`/`alCancelar` (como Atacar en el 4b; el área ya lo maneja `dueloElegirAreaMapa`). Ojo: hoy se cobra ANTES de
+elegir el objetivo (igual que en la ficha) — mudarlo tal cual. **Después**: 5c (zonas persistentes `colocarZonaDeHab`, trampas
+`colocarTrampaDeHab`, `zonaMapa`/`portalMapa` con `avisarZonaAlMapa`: en el mapa son llamadas directas, sin mensajes), paso 6
+(🔍 lupa y Ver), los talentos, las trampas consumibles y el Ankh manual; recién ahí 3d (retirar el marco para los jugadores).
 
 **Dónde probar** (2026-10-01): con Chrome logueado como `elsaulo@gmail.com`, la partida **"Test con claude elsaulo"** (ahí esa
 cuenta es el GM, "S.Claude"); el jugador es "Sujeto de pruebas" con **Silvia Suller** (Cimitarra + Broquel de bronce, 20 HP,
@@ -80,7 +84,7 @@ botón, que hoy viven en la ficha:
 | Traer el personaje y guardarlo | partes de Firebase, migraciones | ✅ ya en `comun/` (`FichaGuardado.cargar`) — falta el guardado **en vivo** (ver 3a) |
 | Tirar un stat, Percepción, Fuerza del golpe | tirada + Mesa | ✅ en el mapa (3c-1 y 4a), con el cartel de sobrepeso |
 | Atacar, Daño, Esquivar, Parry, Bloqueo | el **duelo** y sus ganchos de la ficha (`DUELO_HOOKS`, ~200 renglones), carteles de No2 | ✅ los botones en el mapa (4a, 4b) y los ganchos del duelo (4c, `comun/ficha-duelo.js`) |
-| Habilidades (Ejecutar / Anunciar / 🎲 segunda) | `ejecutarHabilidad`: elegir arma, costo X, ¿es tu turno?, Flash, Ejecución paso a paso, zona, trampa, Mesa | la regla en `comun/`; la pantalla en la ficha |
+| Habilidades (Ejecutar / Anunciar / 🎲 segunda) | `ejecutarHabilidad`: elegir arma, costo X, ¿es tu turno?, Flash, Ejecución paso a paso, zona, trampa, Mesa | ✅ manual, semi, costo X, Flash y segunda tirada en el mapa (5a); **las ✨ automáticas (5b) y las que colocan algo (5c), todavía en la ficha** |
 | Consumibles (cinturón y mochila) | consumir: No2 por lugar, unidades, cura, estado, trampa consumible | ✅ en el mapa (3c-3), salvo trampas consumibles y el Ankh manual |
 | Sigilo, Levantarse | estado + No2 | ✅ en el mapa (3c-2) |
 | 🔍 Lupa de cada botón | `lupaHtml` (cómo se calcula cada cosa) | en la ficha |
@@ -120,7 +124,8 @@ Orden propuesto, de lo más simple a lo más complejo (ver pregunta 3):
 3. Consumibles (cinturón y mochila) ✅ (2026-10-01; quedan delegadas las trampas consumibles y el Ankh manual).
 4. Atacar, Daño, Esquivar, Parry y Bloqueo — con los ganchos del duelo del personaje (`DUELO_HOOKS`). Partido en 4a (sueltos ✅
    2026-10-01), 4b (Atacar ✅ 2026-10-01) y 4c (los ganchos del duelo ✅ 2026-10-01; 4b y 4c probados juntos contra un creep).
-5. Habilidades (lo más grande: elegir arma, costo X, turno ajeno, Flash, Ejecución, zonas y trampas).
+5. Habilidades (lo más grande): partido en 5a (manual, semi, costo X, arma, turno ajeno, Flash, segunda tirada ✅ 2026-10-01),
+   5b (✨ automáticas con la Ejecución paso a paso) y 5c (zonas, trampas y portal).
 6. 🔍 Lupa y "Ver".
 
 ### 3d — Retirar el marco para los jugadores
@@ -282,3 +287,21 @@ siga necesitándolo (ver pregunta 4). La ficha suelta (`ficha.html`) no cambia: 
   con el Bloqueo de cada uno), el Parry (3 → 2 No2, Bloqueo pendiente) y el Bloqueo (borró el pendiente) los hizo el mapa; lo
   del creep fue a GM Tools como siempre. Pasó la mitad del daño (20 → 17 HP) y el Broquel perdió 1 de durabilidad en la ficha,
   que estaba abierta en la otra pestaña y quedó igual. Silvia quedó con 20 HP y 6 No2, sin el control del GM.
+- 2026-10-01: **3c, paso 5a hecho — las habilidades manuales y semiautomáticas**. A `comun/ficha-acciones.js`, copiados de la
+  ficha: `ejecutarHabilidad(S, id, armaId, forzar, ui)`, `confirmarCostoVariable(S, it, sp, nitros, arma, ui)` (devuelve true si
+  se ejecutó), `anunciarHabilidad`, `habilidadTira`, `tirarPrimeraDeHab`, `tirarSegundaDeHab`, `registrarAtaqueDeHabilidad` y
+  `limiteCostoX`; a `comun/ficha-duelo.js`, `usarFlashFueraDelDuelo`. El `ui` de habilidades suma `mesaHabilidad`, `fijarHp`,
+  `efecto`, `colocarTrampa`, `avisarZona`, `terminar` (lo que pasa después de cobrar), `flashFuera`, `elegirArmaHab`, `pedirCostoX` y
+  `cerrarCostoX`. La ficha los usa con sus nombres de siempre (`habUi` en `js/11`, con los carteles de siempre). El "arma
+  pendiente" del costo X (`pendingArmaHab`) ahora se anota solo al abrir ese cartel (antes quedaba anotada siempre, sin que nadie
+  la leyera). En el mapa (`bnHabAca`, `bnHabUi`, `bnMesaHabilidad`): 📣 manuales, 💰 semiautomáticas sin trampa/zona/portal, ⚡
+  Flash fuera del duelo, el costo X (cartel `#bn-costox` en el recuadro), el arma de un costo "como un ataque" y la 🎲 segunda
+  tirada; las ✨ automáticas y las que colocan algo se le siguen pidiendo a la ficha escondida. Comparado contra el código viejo
+  (la ficha entera de habilidades, con sus carteles) en 200 personajes con 4 habilidades al azar y los mismos dados: 599 iguales
+  y 1 distinta solo por la sangría del HTML del cartel de armas; 4 mutaciones plantadas, las 4 detectadas. `pruebas.html`: 157
+  en verde (5 nuevas). **En vivo** ("Test con claude elsaulo", 🎮 Silvia Suller con 5 habilidades de prueba): desde la Botonera
+  nueva, Anunciar no cobró nada; la semiautomática cobró 2 SP y 1 No2 y tiró el PdG; la segunda tirada sacó 2d6; la "como un
+  ataque" cobró 3 No2 y contó el ataque; el costo X abrió el cartel y cobró los 3 SP elegidos; el Flash preguntó el turno y cobró
+  1 SP — todo sin mandarle nada al marco, a nombre de Silvia en la Mesa y con la ficha de la otra pestaña al día. Desde la ficha
+  (versión nueva) también: semi y costo X con su cartel. Silvia quedó con todo lleno y sin el control del GM; las 5 habilidades
+  de prueba quedaron en su ficha (sirven para el 5b).

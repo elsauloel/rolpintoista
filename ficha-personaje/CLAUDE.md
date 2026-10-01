@@ -596,4 +596,8 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   `js/11` arma `window.DUELO_HOOKS` con `FichaDuelo.hooks(() => S, dueloUi)` y deja adentro solo lo de las **invocaciones**
   (`dueloInvDe`). `monedaReroll`/`tirarMonedaReroll` (`js/02`) y `pagarFlash`/`costoFlashDe` (`js/11`) son atajos a la misma
   pieza. `combateUi.cambio` suma `'vitals'`, `'inventario'` y `'cinturon'`.
+- **Ejecutar una habilidad, compartido (paso 4, etapa 3c-5a, 2026-10-01)**: `ejecutarHabilidad`, `confirmarCostoVariable`,
+  `anunciarHabilidad`, `tirarPrimeraDeHab`/`tirarSegundaDeHab`, `registrarAtaqueDeHabilidad` y `limiteCostoX` son atajos a
+  `comun/ficha-acciones.js` (y `usarFlashFueraDelDuelo` a `comun/ficha-duelo.js`); los carteles de "¿con qué arma?" y del costo X
+  y lo que todavía hace solo la ficha (trampa, zona, la Ejecución paso a paso: `terminarEjecucionHab`) van en `habUi` (`js/11`).
 - **La sesión en vivo, compartida (paso 4, etapa 3a, 2026-10-01)**: escuchar el personaje, aplicar cambios de otra ventana y el guardado (`fichaEscuchar`, `fichaGuardarTick`, `fichaHayPendiente`, `fichaNuevoEstado`) pasan por `comun/ficha-sesion.js`; acá queda lo que la ficha hace en cada momento (armarse y dibujarse, avisos, solo lectura, control del GM, `fichaOpcionesGuardado`). El objeto `fichaVivo` tiene los mismos campos de siempre.

@@ -945,6 +945,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js?v=20260930a"></script>
 <script src="../comun/duelo.js?v=20260930f"></script>
+<script src="../comun/mensajes-mapa.js?v=20260930a"></script>
 <script>
 /* =========================================================
    MAPA DE HEXÁGONOS — Paso 2 del sistema nuevo
@@ -9057,13 +9058,17 @@ function abrirBotonera(fichaId, mensaje, invId){
   if(!completa) centrarTokenDeBotonera('ficha', fichaId);
   if(botonera.herramienta === 'ficha' && botonera.fichaId === fichaId && botonera.lista){
     botonera.invId = invId || '';
-    marco.contentWindow.postMessage(mensaje || {tipo: 'abrir-botonera', inv: invId || ''}, location.origin);
+    MensajesMapa.alMarco(marco, mensaje || {tipo: 'abrir-botonera', inv: invId || ''});
     enfocarBotonera();
     return;
   }
-  botonera = {herramienta: 'ficha', fichaId, invId: invId || '', lista: false, pendiente: mensaje || null, completa};
   $('#botonera-cargando-texto').textContent = 'Abriendo la Botonera…';
   $('#botonera-cargando').hidden = false;
+  if(botonera.herramienta === 'ficha' && botonera.fichaId === fichaId && !botonera.lista){   // se está precargando: al estar lista, se abre
+    Object.assign(botonera, {invId: invId || '', pendiente: mensaje || {tipo: 'abrir-botonera', inv: invId || ''}, completa});
+    return;
+  }
+  botonera = {herramienta: 'ficha', fichaId, invId: invId || '', lista: false, pendiente: mensaje || null, completa};
   const inv = invId ? `&inv=${encodeURIComponent(invId)}` : '';
   marco.src = sinCache(`../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=botonera${inv}#${encodeURIComponent(fichaId)}`);
 }
@@ -9276,13 +9281,17 @@ function abrirAcciones(creepId, mensaje){
   // gm-tools ya cargado: solo cambia de creep (instantáneo).
   if(botonera.herramienta === 'gm' && botonera.lista){
     botonera.fichaId = creepId;
-    marco.contentWindow.postMessage(mensaje || {tipo: 'abrir-acciones', creep: creepId}, location.origin);
+    MensajesMapa.alMarco(marco, mensaje || {tipo: 'abrir-acciones', creep: creepId});
     enfocarBotonera();
     return;
   }
-  botonera = {herramienta: 'gm', fichaId: creepId, lista: false, pendiente: mensaje || null};
   $('#botonera-cargando-texto').textContent = 'Abriendo las Acciones…';
   $('#botonera-cargando').hidden = false;
+  if(botonera.herramienta === 'gm' && !botonera.lista && botonera.precarga){   // se está precargando: al estar lista, se abre
+    Object.assign(botonera, {fichaId: creepId, pendiente: mensaje || {tipo: 'abrir-acciones', creep: creepId}});
+    return;
+  }
+  botonera = {herramienta: 'gm', fichaId: creepId, lista: false, pendiente: mensaje || null};
   marco.src = sinCache(`../gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=acciones&creep=${encodeURIComponent(creepId)}${mensaje && mensaje.tipo === 'abrir-ver-creep' ? '&ver=1' : ''}`);
 }
 
@@ -9297,7 +9306,7 @@ function escapeABotonera(cerrarTodo){
     $('#botonera-cargando-x').click();
     return;
   }
-  $('#botonera-marco').contentWindow.postMessage({tipo: cerrarTodo ? 'tecla-f' : 'tecla-escape'}, location.origin);
+  MensajesMapa.alMarco($('#botonera-marco'), cerrarTodo ? 'tecla-f' : 'tecla-escape');
 }
 
 function cerrarBotonera(){
@@ -9435,6 +9444,7 @@ function abrirAsistenteZonaNueva(){
 
 window.addEventListener('message', e => {
   if(e.origin !== location.origin || !e.data || e.source !== $('#botonera-marco').contentWindow) return;
+  if(!MensajesMapa.conocido(e.data.tipo)) console.warn(`Llegó del marco un mensaje sin registrar: «${e.data.tipo}» (comun/mensajes-mapa.js)`);
   if(e.data.tipo === 'muerte-estado'){   // la ficha (iframe) avisa que su personaje está inconsciente: el filtro rojo cubre todo el mapa
     muerteIframe = e.data.activo ? {activo: true, turnos: e.data.turnos, definitivo: !!e.data.definitivo} : null;
     actualizarMuerteMapa();
@@ -9443,10 +9453,10 @@ window.addEventListener('message', e => {
   if(e.data.tipo === 'botonera-lista' || e.data.tipo === 'acciones-lista'){
     botonera.lista = true;
     $('#botonera-cargando').hidden = true;
-    enfocarBotonera();
+    if(!$('#botonera-capa').hidden) enfocarBotonera();   // precargada por detrás: no le saca el teclado al mapa
     // Lo que se pidió mientras cargaba (por ejemplo, agregar un estado).
     if(botonera.pendiente){
-      $('#botonera-marco').contentWindow.postMessage(botonera.pendiente, location.origin);
+      MensajesMapa.alMarco($('#botonera-marco'), botonera.pendiente);
       botonera.pendiente = null;
     }
   }
@@ -9537,11 +9547,11 @@ function dueloElegirObjetivoMapa(msg){
   const objetivoTipo = (ataque && ataque.hab && ataque.hab.objetivo) || 'enemigo';
   const esValido = objetivoTipo === 'aliado' ? t => !dueloEsRival(yo, t) : objetivoTipo === 'enemigo' ? t => dueloEsRival(yo, t) : null;
   const nEnAlcance = dueloResaltarObjetivos(propio, ataque && ataque.alcance, esValido);
-  const cancelado = () => { dueloAvisoObjetivoOcultar(); try{ $('#botonera-marco').contentWindow.postMessage({tipo: 'duelo-cancelado'}, location.origin); }catch(e){} };
+  const cancelado = () => { dueloAvisoObjetivoOcultar(); try{ MensajesMapa.alMarco($('#botonera-marco'), 'duelo-cancelado'); }catch(e){} };
   const alSuelto = () => {
     elegirDestinoTerminar(); dueloAvisoObjetivoOcultar();
     $('#botonera-capa').hidden = false; ubicarBotoneraCapa();
-    try{ $('#botonera-marco').contentWindow.postMessage({tipo: 'duelo-suelto'}, location.origin); }catch(e){}
+    try{ MensajesMapa.alMarco($('#botonera-marco'), 'duelo-suelto'); }catch(e){}
   };
   const pedir = () => {
     elegirDestino(async h => {
@@ -9722,7 +9732,7 @@ function dueloElegirAreaMapa(msg){
   seleccion = null; hudCerrar(); pedirDibujo();
   const propio = t => t.fichaId === yo.ref && t.tipo === yo.tipo;
   const radio = Math.max(0, Math.round(num(hab.radio)) || 0);
-  const cancelado = () => { try{ $('#botonera-marco').contentWindow.postMessage({tipo: 'duelo-cancelado'}, location.origin); }catch(e){} };
+  const cancelado = () => { try{ MensajesMapa.alMarco($('#botonera-marco'), 'duelo-cancelado'); }catch(e){} };
   const lanzar = async h => {
     const todos = [...tokens.entries()].map(([id, t]) => ({...t, id}));
     const mio = todos.find(propio);
@@ -9920,14 +9930,31 @@ function dueloRelayMapa(l, msg){
   const creep = l.tipo === 'creep';
   const id = creep ? l.ref : String(l.ref).split(SEP_INVOCACION)[0];
   const marco = $('#botonera-marco');
-  if(botonera.herramienta === (creep ? 'gm' : 'ficha') && botonera.fichaId === id && botonera.lista){
-    marco.contentWindow.postMessage(msg, location.origin);
+  // GM Tools tiene todos los creeps: sirve el que esté cargado, sea cual sea el creep.
+  if(botonera.herramienta === (creep ? 'gm' : 'ficha') && (creep || botonera.fichaId === id)){
+    if(botonera.lista) MensajesMapa.alMarco(marco, msg); else botonera.pendiente = msg;   // cargando: se manda al estar lista
     return;
   }
-  botonera = {herramienta: creep ? 'gm' : 'ficha', fichaId: id, invId: '', lista: false, pendiente: msg, completa: false};
+  // Se carga SIN abrir nada (?precarga=1, paso 4): si no, la Botonera o las Acciones aparecerían encima del duelo.
+  botonera = {herramienta: creep ? 'gm' : 'ficha', fichaId: id, invId: '', lista: false, pendiente: msg, completa: false, precarga: true};
   marco.src = sinCache(creep
-    ? `../gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=acciones&creep=${encodeURIComponent(id)}`
-    : `../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=botonera#${encodeURIComponent(id)}`);
+    ? `../gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=acciones&precarga=1`
+    : `../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=botonera&precarga=1#${encodeURIComponent(id)}`);
+}
+// Abrir más rápido (paso 4, etapa 1): un rato después de entrar, el mapa carga de antemano la ficha propia (jugador) o GM
+// Tools (GM), sin abrir nada; la primera Botonera o Acciones ya no espera la carga.
+function precargarMarco(){
+  if(botonera.herramienta || !$('#botonera-capa').hidden) return;   // ya hay algo cargado o abierto
+  const marco = $('#botonera-marco');
+  if(soyGM){
+    botonera = {herramienta: 'gm', fichaId: '', invId: '', lista: false, pendiente: null, completa: false, precarga: true};
+    marco.src = sinCache(`../gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=acciones&precarga=1`);
+    return;
+  }
+  const id = fichaPrincipalId();
+  if(!id) return;
+  botonera = {herramienta: 'ficha', fichaId: id, invId: '', lista: false, pendiente: null, completa: false, precarga: true};
+  marco.src = sinCache(`../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=botonera&precarga=1#${encodeURIComponent(id)}`);
 }
 
 $('#botonera-cargando-x').onclick = () => { cerrarBotonera(); botonera = {herramienta: '', fichaId: '', lista: false}; $('#botonera-marco').src = 'about:blank'; };
@@ -10735,6 +10762,7 @@ function arrancarEnVivo(){
   mesaEscuchar();
   mesaHistorialAlEntrar();
   // Duelo paso a paso (comun/duelo.js): el cuadro se abre solo para todos; las tiradas de cada uno se piden al iframe de su ficha (o de las Acciones del creep).
+  setTimeout(precargarMarco, 6000);   // abrir más rápido la primera Botonera o Acciones (paso 4)
   Duelo.escuchar({relay: dueloRelayMapa, controlDe: lado => {   // 🎮 personaje controlado por el GM: su lado lo maneja el GM
     if(!lado || lado.tipo !== 'pj') return '';
     const f = fichasPub.get(String(lado.ref || '').split(SEP_INVOCACION)[0]);

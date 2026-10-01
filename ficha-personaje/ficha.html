@@ -1216,6 +1216,7 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .dock-btn:disabled{opacity:.4;cursor:not-allowed}
 </style>
 <script src="../comun/embebido.js?v=20260930b"></script>
+<script src="../comun/mensajes-mapa.js?v=20260930a"></script>
 <script>
 /* Modo botonera (?modo=botonera): la ficha se abre adentro del mapa y muestra solo la Botonera y sus ventanitas, con fondo
    transparente. Desde el paso 4 (2026-09-30) lo resuelve comun/embebido.js: se esconde solo la página (lo de abajo) y las
@@ -2715,6 +2716,7 @@ function applyExp(rawValue){
 /* Pop-up de subida de nivel (también le aparece en el mapa: mira el nivel de su ficha en el resumen). */
 function mostrarSubidaNivel(nivel){
   toast(`¡Subiste a nivel ${nivel}!`);
+  if(document.documentElement.classList.contains('modo-botonera')) return;   // dentro del mapa, el cartel lo muestra el mapa (mostrarSubidaNivelMapa)
   let cap = document.getElementById('scrim-nivel-nuevo');
   if(!cap){
     cap = document.createElement('div');
@@ -3563,7 +3565,8 @@ function colocarZonaDeHab(it, xSp, xNitros){
   }
   try{
     // El mensaje lo arma la regla común (comun/combatiente.js, zonaDeHab), el mismo que manda un creep.
-    window.parent.postMessage(Combatiente.zonaDeHab(it, c, {fichaId: fichaVivo.id, tipo: 'pj', X: xDeHab(it, xSp, xNitros), resistValor}), location.origin);
+    const zona = Combatiente.zonaDeHab(it, c, {fichaId: fichaVivo.id, tipo: 'pj', X: xDeHab(it, xSp, xNitros), resistValor});
+    MensajesMapa.alMapa(zona.tipo, zona);
     return true;
   }catch(err){ console.error('No se pudo avisar la zona al mapa:', err); return false; }
 }
@@ -9374,12 +9377,12 @@ function avisarZonaAlMapa(h){
   if(!h || window.parent === window || !fichaVivo || !fichaVivo.id) return;
   // Invocar portal: le pide al mapa que deje elegir los dos puntos (dentro del rango de casteo) y cree los portales.
   if(h.portalMapa){
-    try{ window.parent.postMessage({tipo: 'portal-habilidad', fichaId: fichaVivo.id, turnos: Math.max(1, num(h.portalMapa.turnos) || 3), nombre: h.nombre}, location.origin); }
+    try{ MensajesMapa.alMapa('portal-habilidad', {fichaId: fichaVivo.id, turnos: Math.max(1, num(h.portalMapa.turnos) || 3), nombre: h.nombre}); }
     catch(err){ console.error('No se pudo avisar el portal al mapa:', err); }
     return;
   }
   if(!h.zonaMapa) return;
-  try{ window.parent.postMessage({tipo: 'zona-habilidad', fichaId: fichaVivo.id, forma: h.zonaMapa, radio: num(h.zonaRadio) || 1, nombre: h.nombre}, location.origin); }
+  try{ MensajesMapa.alMapa('zona-habilidad', {fichaId: fichaVivo.id, forma: h.zonaMapa, radio: num(h.zonaRadio) || 1, nombre: h.nombre}); }
   catch(err){ console.error('No se pudo avisar la zona al mapa:', err); }
 }
 const consumiendoTrampa = new Set();
@@ -9406,7 +9409,7 @@ async function colocarTrampaDeHab(h){
   // queda al lado del token como siempre.
   if(modoHab(h) === 'auto' && window.parent !== window){
     mesaPublicarHabilidad(h.nombre, `${h.detalle || ''}${h.detalle ? ' — ' : ''}🪤 colocó una trampa${t.nombre ? ` («${String(t.nombre).trim()}»)` : ''}.`);
-    try{ window.parent.postMessage({tipo: 'trampa-habilidad', fichaId: fichaVivo.id, tipoToken: 'pj', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h)}, location.origin); }
+    try{ MensajesMapa.alMapa('trampa-habilidad', {fichaId: fichaVivo.id, tipoToken: 'pj', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h)}); }
     catch(err){ console.error('No se pudo avisar la trampa al mapa:', err); }
     return;
   }
@@ -11890,7 +11893,8 @@ function fichaEscuchar(f){
         f.revisarResumen = true;
         fichaMostrarLectura();
         fichaEstadoAlDia();
-        if(MODO_BOTONERA) botoneraModoAbrir();
+        // ?precarga=1 (paso 4): el mapa la carga de antemano, o para un duelo, sin abrir nada; avisa que está lista y espera.
+        if(MODO_BOTONERA){ if(new URLSearchParams(location.search).get('precarga') === '1') botoneraAvisarMapa('botonera-lista'); else botoneraModoAbrir(); }
         mantenimientoRevisar();
         recompensasRevisar();
         return;
@@ -12404,9 +12408,7 @@ const MODO_BOTONERA = document.documentElement.classList.contains('modo-botonera
 // Acciones de un creep, pero acá vive adentro de la ficha de su dueño.
 let modoBotoneraInv = new URLSearchParams(location.search).get('inv') || '';
 
-function botoneraAvisarMapa(tipo, extra){
-  if(window.parent !== window) window.parent.postMessage(Object.assign({tipo}, extra || {}), location.origin);
-}
+function botoneraAvisarMapa(tipo, extra){ MensajesMapa.alMapa(tipo, extra); }   // la lista de mensajes: comun/mensajes-mapa.js
 
 function botoneraModoAbrir(invId){
   const destino = invId !== undefined ? invId : modoBotoneraInv;

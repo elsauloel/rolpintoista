@@ -49,4 +49,9 @@ Con las piezas de la etapa 2, el mapa arma la Botonera del personaje y las Accio
   lugar de sus listas fijas; el mapa escucha los avisos. Probado en un marco de prueba (cartel nuevo de GM Tools visible y
   avisado, Botonera abre/cierra, la Mesa no se ve, la Polilla se ve sin dejar la capa abierta, el cartel de solo lectura no
   se ve) y **en mesa** en "Claude · pruebas" (Acciones de un creep, un cartel suelto con la capa cerrada, la Botonera de un
-  personaje). Siguen los puntos 3 (mensajes en un archivo común) y 4 (abrir más rápido).
+  personaje). **Punto 3 hecho**: `comun/mensajes-mapa.js` (la lista de los ~38 mensajes y los ayudantes `alMapa`/`alMarco`;
+  avisa en la consola si aparece uno sin registrar). **Punto 4 hecho**: `?precarga=1` (cargar sin abrir nada) y
+  `precargarMarco()`. De paso: el reenvío del duelo ahora carga sin abrir nada (con la etapa 1, la Botonera o las Acciones
+  habrían aparecido encima del duelo), GM Tools cargado sirve para cualquier creep, y dentro del mapa la ficha no muestra su
+  propio cartel de subida de nivel (ya lo muestra el mapa). **Efecto buscado de la etapa 1**: los carteles que la ficha abre
+  sola dentro del mapa (quedaste inconsciente, recordatorios de estados) ahora se ven; antes quedaban escondidos.

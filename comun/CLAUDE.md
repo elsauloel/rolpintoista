@@ -852,6 +852,14 @@ versión parecida en más de una, es candidato a juntar.
   (la saca, para que el marco transparente no tape el mapa). `noCuenta`: lo que se ve pero no es una ventana (la Polilla
   mística). **Un cartel nuevo no necesita registrarse en ningún lado**; una parte nueva de la PÁGINA que se agregue al
   `<body>` sí va en `pagina` (si no, se vería dentro del mapa y dejaría la capa abierta).
+- **`mensajes-mapa.js`** (`MensajesMapa`, 2026-09-30, paso 4 etapa 1) — **la lista de TODOS los mensajes** entre el mapa y la
+  ficha / GM Tools de su marco (`TIPOS`: quién lo manda, quién lo recibe y para qué), con `alMapa(tipo, datos)` (desde el
+  marco) y `alMarco(marco, tipo|mensaje, datos)` (desde el mapa). Un mensaje sin registrar se manda igual pero avisa en la
+  consola, y el mapa avisa si le llega uno que no conoce. **Un mensaje nuevo se agrega acá.** `duelo.js` y `embebido.js`
+  siguen con su `postMessage` propio (sus tipos están en la lista).
+  **`?precarga=1`** (ficha `modo=botonera`, GM Tools `modo=acciones`): la herramienta carga **sin abrir nada** y avisa que
+  está lista; la usan el reenvío del duelo (si no, la Botonera o las Acciones aparecían encima del duelo) y
+  `precargarMarco()` del mapa (6 s después de entrar carga la ficha propia o GM Tools para que la primera apertura no espere).
 - **Durabilidad, variable de diseño** (2026-09-30, dueño): `Combatiente.durMax(item)` / `durPorPeso` / `durTexto` /
   `esDurable` — 3 puntos por punto de Peso salvo que el ítem traiga `durPorPeso` (4–5 = más resistente, 2 = frágil), mínimo
   3. `asistente-item.js` lo pregunta (paso Peso y daño / Peso-Precio) y lo muestra en el resumen; los "Ver" de ficha, GM Tools,

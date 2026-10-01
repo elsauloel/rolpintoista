@@ -798,6 +798,7 @@ body.arrastrando-creep #grupos-barra .btn[data-grupo-tab]:not([data-grupo-tab=""
 .modo-hab-btn.activa span{color:inherit}
 </style>
 <script src="../comun/embebido.js?v=20260930b"></script>
+<script src="../comun/mensajes-mapa.js?v=20260930a"></script>
 <script>
 /* Modo acciones (?modo=acciones&creep=<id>; finalizar y botín se abren igual): gm-tools se abre adentro del mapa y muestra solo
    la ventana de Acciones del creep y las que se abren desde ahí, con fondo transparente. Desde el paso 4 (2026-09-30) lo
@@ -3395,7 +3396,8 @@ function colocarZonaDeHabCreep(sc, h){
   }
   try{
     // El mensaje lo arma la regla común (comun/combatiente.js, zonaDeHab), el mismo que manda un personaje.
-    window.parent.postMessage(Combatiente.zonaDeHab(h, c, {fichaId: sc.id, tipo: 'creep', resistValor}), location.origin);
+    const zona = Combatiente.zonaDeHab(h, c, {fichaId: sc.id, tipo: 'creep', resistValor});
+    MensajesMapa.alMapa(zona.tipo, zona);
     return true;
   }catch(err){ console.error('No se pudo avisar la zona al mapa:', err); return false; }
 }
@@ -6728,7 +6730,7 @@ async function aplicarEstadoAObjetivo(tok, spec, origen){
 // trampaDeHabilidad en el mapa). Devuelve false si no hay mapa (entonces se coloca sola al lado del token, como siempre).
 function pedirTrampaAlMapaCreep(sc, h){
   if(window.parent === window) return false;
-  try{ window.parent.postMessage({tipo: 'trampa-habilidad', fichaId: sc.id, tipoToken: 'creep', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h)}, location.origin); return true; }
+  try{ MensajesMapa.alMapa('trampa-habilidad', {fichaId: sc.id, tipoToken: 'creep', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h)}); return true; }
   catch(err){ console.error('No se pudo avisar la trampa al mapa:', err); return false; }
 }
 // ✨ Automática, solo sobre el propio creep y sin tiradas: aplica los efectos del cuadro de Ejecución directo (como Blindaje en la ficha).
@@ -7523,7 +7525,11 @@ async function gmProcesarSnapshot(snap){
     const modoGM = new URLSearchParams(location.search).get('modo');
     if(modoGM === 'finalizar'){ abrirReporteFinalizar(); gmAvisarMapa('acciones-lista'); }
     else if(modoGM === 'botin'){ abrirBotinGM(); gmAvisarMapa('acciones-lista'); }
-    else if(MODO_ACCIONES){ const cid = new URLSearchParams(location.search).get('creep'); if(new URLSearchParams(location.search).get('ver')) accionesModoVer(cid); else accionesModoAbrir(cid); }
+    else if(MODO_ACCIONES){
+      const q = new URLSearchParams(location.search), cid = q.get('creep');
+      if(q.get('precarga') === '1') gmAvisarMapa('acciones-lista');   // el mapa la cargó de antemano o para un duelo: no abre nada (paso 4)
+      else if(q.get('ver')) accionesModoVer(cid); else accionesModoAbrir(cid);
+    }
     // ?editar=<creep>: el mapa abre la ficha completa de ese creep (botón 📜 del token).
     const paraEditar = new URLSearchParams(location.search).get('editar');
     if(!MODO_ACCIONES && paraEditar && S.creeps.some(s => s.id === paraEditar)) abrirEditarCreep(paraEditar);
@@ -7630,9 +7636,7 @@ async function mantenimientoGlobal(){
   }
 }
 
-function gmAvisarMapa(tipo){
-  if(window.parent !== window) window.parent.postMessage({tipo}, location.origin);
-}
+function gmAvisarMapa(tipo){ MensajesMapa.alMapa(tipo); }   // la lista de mensajes: comun/mensajes-mapa.js
 
 /* ---------- Modo acciones (dentro del mapa) ----------
    El mapa del GM abre gm-tools en un iframe con ?modo=acciones&creep=<id>:

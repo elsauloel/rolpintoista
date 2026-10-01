@@ -163,36 +163,12 @@ function fileToDataURL(file, maxDim=480, quality=0.85){
 // Qué ítems tienen durabilidad, cuánta les queda y si están rotos: comun/ficha-calculo.js.
 const {SLOTS_DURABLES, SLOTS_ARMADURA, durableItem, esArmaduraItem, durMax, durActual, itemRoto, armRotaDe} = FichaCalculo;
 
-// Aviso al quedar en 1 punto y al romperse: cartel y una línea en la Mesa para todos.
-function durAviso(i){
-  const a = durActual(i), quien = ((S.meta && S.meta.nombre) || '').trim();
-  const txt = a <= 0 ? `💥 ${i.nombre} se rompió: sigue ocupando el lugar pero no da ningún efecto hasta que se repare` : a === 1 ? `⚠ ${i.nombre} está a punto de romperse (queda 1 punto de durabilidad)` : '';
-  if(!txt) return;
-  toast(txt);
-  try{ publicarRecordatorios([{nombre: `🔧 ${quien ? quien + ': ' : ''}${txt}`, detalle: ''}]); }catch(e){}
-}
-function desgastarItem(i, n){
-  const antes = durActual(i);
-  i.dur = Math.max(0, antes - Math.max(1, n || 1));
-  if(durActual(i) !== antes) durAviso(i);
-}
+// Aviso al quedar en 1 punto y al romperse, desgaste y Rompe armadura al azar: comun/ficha-acciones.js (paso 3c-5b). Se llaman en
+// tiempo de uso, así que pueden usar habUi (js/11).
+function durAviso(i){ FichaAcciones.durAviso(S, i, habUi); }
+function desgastarItem(i, n){ FichaAcciones.desgastarItem(S, i, n, habUi); }
 // Rompe armadura: una pieza de armadura equipada (que todavía no esté rota) elegida AL AZAR, sin distinguir por ninguna característica.
-function rompeArmaduraAlAzar(veces){
-  const tocadas = [];
-  for(let k = 0; k < Math.max(1, veces || 1); k++){
-    const pool = S.inventario.filter(i => i.equipado && esArmaduraItem(i) && durActual(i) > 0);
-    if(!pool.length) break;
-    const it = pool[Math.floor(Math.random() * pool.length)];
-    it.armRota = Math.min(durMax(it), armRotaDe(it) + 1);
-    desgastarItem(it, 1);
-    tocadas.push(it.nombre);
-  }
-  if(!tocadas.length){ toast('Rompe armadura: no tenés piezas de armadura equipadas que se puedan romper'); return 0; }
-  toast(`💥 Rompe armadura: se dañó ${[...new Set(tocadas)].join(', ')}`);
-  renderList('equipo'); renderList('mochila');
-  refresh();
-  return tocadas.length;
-}
+function rompeArmaduraAlAzar(veces){ return FichaAcciones.rompeArmaduraAlAzar(S, veces, habUi); }
 function durLineaHtml(i){
   if(!durableItem(i)) return '';
   const max = durMax(i), act = durActual(i), ar = armRotaDe(i);

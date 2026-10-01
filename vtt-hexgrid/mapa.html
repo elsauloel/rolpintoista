@@ -9123,7 +9123,7 @@ function abrirBotoneraPrincipal(){
    no están (la lupa vive en la ficha: etapa 3c). Las piezas se cargan recién al usarla: para los jugadores no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001b',
-  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001e',
+  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001f',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
@@ -9377,17 +9377,38 @@ function bnCombateAca(b){
   else FichaAcciones.elegirArmaDefensa(S, a === 'fuerzagolpe' ? 'fuerza' : a, ui);
   return true;
 }
-/* Paso 3c-5a: las habilidades. El mapa hace él mismo las 📣 manuales (Anunciar), las 💰 semiautomáticas (cobra y tira la primera
-   tirada), el ⚡ Flash fuera del duelo, el costo X y la 🎲 segunda tirada, con el mismo código que la ficha
-   (comun/ficha-acciones.js). Las ✨ automáticas (abren la Ejecución paso a paso: paso 5b) y las que colocan una trampa, una zona o
-   un portal (paso 5c) se le siguen pidiendo a la ficha escondida. */
+/* Pasos 3c-5a y 5b: las habilidades. El mapa hace él mismo las 📣 manuales (Anunciar), las 💰 semiautomáticas (cobra y tira la
+   primera tirada), las ✨ automáticas (ataque con arreglos, habilidad dirigida con su duelo, el atajo «solo sobre vos, sin
+   tiradas»), el ⚡ Flash fuera del duelo, el costo X y la 🎲 segunda tirada, con el mismo código que la ficha
+   (comun/ficha-acciones.js). Las que colocan algo en el mapa —trampa, zona persistente, zona de habilidad o portal— todavía se le
+   piden a la ficha escondida (paso 5c). */
 function bnHabAca(it){
   if(!it) return false;
-  const modo = FichaBotonera.modoHab(it);
+  const modo = FichaBotonera.modoHab(it), c = FichaBotonera.dueloDe(it);
   if(modo === 'manual') return true;
-  if(Combatiente.tipoEjecucion(FichaBotonera.dueloDe(it)) === 'flash') return true;
-  if(modo === 'auto') return false;
-  return !(it.trampaColocar || it.zonaMapa || it.portalMapa);
+  if(Combatiente.tipoEjecucion(c) === 'flash') return true;
+  if(it.trampaColocar || it.zonaMapa || it.portalMapa) return false;
+  if(modo === 'auto' && c && typeof c === 'object' && c.objetivo === 'zona') return false;
+  return true;
+}
+// Líneas de recordatorio en la Mesa a nombre del personaje (como publicarRecordatorios de la ficha): durabilidad, etc.
+function bnRecordatorios(avisos){
+  if(!fbDb || !fbUsuario || !fbMiembro) return;
+  avisos.slice(0, 5).forEach(e => {
+    fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: ((bn.S.meta && bn.S.meta.nombre) || '').trim(),
+      origen: String(e.nombre || 'Estado').slice(0, 80), formula: String(e.detalle || '').slice(0, 240),
+      rolls: [], mod: 0, total: 0, desde: 'recordatorio',
+      cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    }).catch(err => console.error('No se pudo publicar el recordatorio:', err));
+  });
+}
+// Elegir el objetivo de una habilidad (o de un ataque con arreglos) desde la Botonera nueva: como Atacar (paso 4b), con
+// dueloElegirObjetivoMapa; "Sin objetivo" vuelve a mostrar la Botonera y tira suelto acá.
+function bnElegirObjetivo(cfg){
+  const reabrir = () => { if(bn){ bn.host.hidden = false; bnUbicar(); bnDibujar(); } };
+  bn.host.hidden = true;
+  dueloElegirObjetivoMapa({yo: cfg.yo, ataque: cfg.ataque, conSuelto: !!cfg.suelto, alSuelto: () => { reabrir(); if(cfg.suelto) cfg.suelto(); }, alCancelar: () => {}});
 }
 // La línea de una habilidad en la Mesa, a nombre del personaje (como mesaPublicarHabilidad de la ficha).
 function bnMesaHabilidad(nombre, detalle){
@@ -9407,8 +9428,13 @@ function bnHabUi(){
     mesaHabilidad: (nombre, detalle) => bnMesaHabilidad(nombre, detalle),
     fijarHp: v => FichaAcciones.fijarHp(bn.S, v),   // el Ankh y la muerte los revisa ui.cambio (bnRevisarVida)
     efecto: it => FichaAcciones.efectoDeConsumo(bn.S, it, base.presets, t => toast(t)),
-    colocarTrampa: () => {}, avisarZona: () => {},   // no llegan: bnHabAca deja esas habilidades a la ficha
-    terminar: it => { FichaAcciones.anunciarHabilidad(bn.S, it, ui); FichaAcciones.tirarPrimeraDeHab(bn.S, it, ui); },   // 💰 semi
+    colocarTrampa: () => {}, avisarZona: () => {}, colocarZona: () => false,   // no llegan: bnHabAca deja esas habilidades a la ficha
+    terminar: (it, arma, xSp, xNitros) => FichaAcciones.terminarEjecucionHab(bn.S, it, arma, xSp, xNitros, ui),
+    recordatorios: avisos => bnRecordatorios(avisos),
+    yo: () => ({ref: bn.fichaId, tipo: 'pj', nombre: (bn.S.meta && bn.S.meta.nombre) || 'Personaje'}),
+    dueloDisponible: () => !!(typeof Duelo !== 'undefined' && Duelo.disponible() && bnPuedeGuardar()),
+    puedeEscribir: () => bnPuedeGuardar(),
+    elegirObjetivo: cfg => bnElegirObjetivo(cfg),
     flashFuera: it => FichaDuelo.usarFlashFueraDelDuelo(bn.S, it, ui),
     elegirArmaHab: (it, opciones) => {
       bn.raiz.querySelector('#bn-arma-lista').innerHTML = `<div class="hint">${esc(it.nombre)}: cuesta lo mismo que un ataque con el arma que elijas, y cuenta como ese ataque.</div>` +

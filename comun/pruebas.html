@@ -36,6 +36,7 @@ h2{font-size:14px;color:var(--brass);text-transform:uppercase;letter-spacing:.06
 <script>
 function num(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
 function toast(){}
+function mesaConTexto(){}
 function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c])); }
 </script>
 <script src="tiradas.js"></script>
@@ -58,6 +59,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
+<script src="duelo.js"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -758,6 +760,37 @@ prueba('sin No2 avisa antes de cobrar; la segunda tirada tira la fórmula', asyn
   await FichaAcciones.ejecutarHabilidad(S, 's', undefined, false, uiHab(reg));
   FichaAcciones.tirarSegundaDeHab(S, 's', uiHab(reg));
   igual([reg[0], reg[1], S.nitros], ['sin No2: usar Golpe', '🎲 Golpe · Efecto', 0]);
+});
+
+grupo('Habilidades automáticas (comun/ficha-acciones.js, paso 5b)');
+const uiAuto = (reg, conDuelo) => ({...uiHab(reg), presets: estadosPresetFicha(), recordatorios: () => {}, yo: () => ({ref: 'F', tipo: 'pj', nombre: 'Pj'}),
+  dueloDisponible: () => conDuelo, puedeEscribir: () => true, colocarZona: () => false,
+  elegirObjetivo: cfg => reg.push(`objetivo ${cfg.ataque.tipo}${cfg.ataque.hab ? ':' + cfg.ataque.hab.objetivo : ''}`)});
+prueba('«solo sobre vos, sin tiradas» se aplica directo y se anuncia (sin cuadro)', () => {
+  const blindaje = {id: 'b', nombre: 'Blindaje', modo: 'auto', costo: '1', duelo: {objetivo: 'uno mismo', tira: '', contra: [], efectos: [{nombre: 'Blindado', spec: {nombre: 'Blindado', turnos: 2}}]}};
+  const S = fichaBotonera({habilidades: [blindaje]}), reg = [];
+  FichaAcciones.terminarEjecucionHab(S, blindaje, null, 0, 0, uiAuto(reg, true));
+  igual([S.efectos.some(e => e.nombre === 'Blindado'), reg.some(x => x.startsWith('mesa Blindaje')), reg.some(x => x.startsWith('objetivo'))], [true, true, false]);
+});
+prueba('una dirigida abre el duelo si está conectado; si no, se anuncia y tira suelta', () => {
+  const rayo = {id: 'r', nombre: 'Rayo', modo: 'auto', costo: '2', tiradaStat: 'pdgmg', duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['resmg'], dano: false, efectos: []}};
+  const S = fichaBotonera({habilidades: [rayo]}), con = [], sin = [];
+  FichaAcciones.terminarEjecucionHab(S, rayo, null, 0, 0, uiAuto(con, true));
+  FichaAcciones.terminarEjecucionHab(S, rayo, null, 0, 0, uiAuto(sin, false));
+  igual([con.filter(x => x.startsWith('objetivo')), sin.some(x => x.startsWith('🎲 Rayo'))], [['objetivo habilidad:enemigo'], true]);
+});
+prueba('un ataque con arreglos abre el duelo de ataque', () => {
+  const tajo = {id: 't', nombre: 'Tajo', modo: 'auto', costo: '0', nitrosCosto: 'ATAQUE', duelo: {modo: 'arma', arma: {pdg: 1}}};
+  const S = fichaBotonera({inventario: [espada], habilidades: [tajo]}), reg = [];
+  FichaAcciones.terminarEjecucionHab(S, tajo, espada, 0, 0, uiAuto(reg, true));
+  cierto(reg.some(x => x.startsWith('objetivo ') && !x.includes(':')), 'esperaba elegir objetivo para el ataque: ' + reg.join(' | '));
+});
+prueba('un estado recibido respeta Invulnerable; el Desgaste baja la durabilidad del ítem', () => {
+  const S = fichaBotonera({inventario: [escudo], efectos: [{nombre: 'Invulnerable', activo: true, invulnerable: true, turnos: 1, polaridad: 'buff'}]}), reg = [];
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Stun', turnos: 1}, 'Un creep', uiAuto(reg, true));
+  const durAntes = FichaCalculo.durActual(S.inventario[0]);
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Desgaste', item: 'esc'}, '', uiAuto(reg, true));
+  igual([S.efectos.some(e => e.nombre === 'Stun'), FichaCalculo.durActual(S.inventario[0])], [false, durAntes - 1]);
 });
 
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */

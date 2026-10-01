@@ -188,9 +188,16 @@ const dueloPj = FichaDuelo.hooks(() => S, dueloUi);
 // (trampa, zona, la Ejecución paso a paso).
 const habUi = {...combateUi,
   cambio: lista => lista.forEach(k => {
-    if(k === 'habilidades' || k === 'efectos') renderList(k);
+    if(k === 'habilidades' || k === 'efectos' || k === 'equipo' || k === 'mochila') renderList(k);
     else combateUi.cambio([k]);
   }),
+  presets: EFECTOS_PRESET,
+  recordatorios: avisos => publicarRecordatorios(avisos),
+  yo: () => ({ref: fichaVivo.id, tipo: 'pj', nombre: (S.meta && S.meta.nombre) || 'Personaje'}),
+  dueloDisponible: () => !!(typeof Duelo !== 'undefined' && Duelo.disponible() && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM),
+  puedeEscribir: () => !!(fichaVivo && fichaVivo.id && !fichaVivo.soloLectura),
+  elegirObjetivo: cfg => Duelo.elegirObjetivo(cfg),
+  colocarZona: (it, xSp, xNitros) => colocarZonaDeHab(it, xSp, xNitros),
   mesaHabilidad: (nombre, detalle) => mesaPublicarHabilidad(nombre, detalle),
   fijarHp: v => fijarHp(v),
   efecto: it => aplicarEfectoDeConsumo(it),

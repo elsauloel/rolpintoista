@@ -117,46 +117,8 @@ const presetPorNombre = FichaHabilidades.presetPorNombre;
 // Un estado armado a partir de lo que manda una habilidad o una trampa ({nombre, turnos, mods, hp, stacks, escudoMagico…}):
 // el preset con ese nombre con los números de la habilidad encima (comun/combatiente.js, ajustarPreset), o uno propio.
 // Lo usan lo que le llega al personaje y lo que una invocación se pone a sí misma.
-function estadoDeSpec(spec){
-  const preset = presetPorNombre(EFECTOS_PRESET, spec.nombre);
-  let draft;
-  if(preset){
-    const {nombre, ...resto} = preset;
-    draft = {id: uid(), nombre, ...structuredClone(resto)};
-    // Los números que manda la habilidad (turnos, bonos, daño por turno, escudo, stacks del Veneno) pisan los del preset:
-    // la misma regla que los creeps (comun/combatiente.js). Ej.: Blindaje con otro escudo, Nube tóxica con Veneno ×3.
-    Combatiente.ajustarPreset(draft, spec, 'hpturno');
-  }else{
-    const mods = (spec.mods || []).map(m => ({stat: m.stat, val: num(m.val)}));
-    const txt = mods.map(m => `${num(m.val) > 0 ? '+' : ''}${fmt(num(m.val))} ${STAT_LABEL[m.stat] || m.stat}`);
-    if(spec.hp) txt.push(`${spec.hp > 0 ? '+' : ''}${spec.hp} HP por turno`);
-    if(spec.escudoMagico) txt.push(`escudo de ${num(spec.escudoMagico)}`);
-    draft = {id: uid(), nombre: spec.nombre || 'Efecto', polaridad: spec.polaridad || (spec.escudoMagico ? 'buff' : 'debuff'), turnos: num(spec.turnos), stacks: 1, hpturno: num(spec.hp), stacksturno: 0,
-      permanente: false, detalle: spec.detalle || txt.join(', '), mods, ...(num(spec.escudoMagico) ? {escudoMagico: num(spec.escudoMagico)} : {})};
-  }
-  draft.activo = true;
-  if(!draft.polaridad) draft.polaridad = 'debuff';
-  return draft;
-}
-function aplicarEstadoRecibido(spec, origen){
-  // Durabilidad (2026-09-26): la Armadura rota y el desgaste son de los ÍTEMS, no un estado del personaje.
-  if(spec.nombre === 'Desgaste'){
-    const it = S.inventario.find(x => x.id === spec.item);
-    if(it && durableItem(it)){ desgastarItem(it, 1); renderList('equipo'); renderList('mochila'); refresh(); }
-    else toast(`Desgaste: no encuentro ese ítem en tu inventario`);
-    return;
-  }
-  if(spec.nombre === 'Armadura rota'){ rompeArmaduraAlAzar(Math.max(1, num(spec.stacks) || 1)); return; }
-  const draft = estadoDeSpec(spec);
-  const quien = origen ? `${origen}: ` : '';
-  // Inmunidades, acumulación y renovación: la regla común (comun/combatiente.js, agregarEstado).
-  const r = Combatiente.agregarEstado(S.efectos, draft);
-  if(!r.ok){ toast(`🛡 ${quien}Inmune ahora mismo (${r.motivo}) — ${draft.nombre} no te afectó`); return; }
-  if(r.que === 'yaLoTiene'){ toast(`${quien}${draft.nombre}: ya lo tenías, no se acumula`); return; }
-  renderList('efectos');
-  refresh();
-  toast(`🎯 ${quien}recibiste ${draft.nombre}${r.que === 'renovado' ? ' (se renovó el que tenías)' : r.que === 'acumulado' ? ` (×${r.estado.stacks})` : ''}`);
-}
+function estadoDeSpec(spec){ return FichaAcciones.estadoDeSpec(spec, EFECTOS_PRESET); }   // comun/ficha-acciones.js
+function aplicarEstadoRecibido(spec, origen){ FichaAcciones.aplicarEstadoRecibido(S, spec, origen, habUi); }
 
 // (Acumular Veneno/Sangrado/Escarcha, inmunidades y renovar: Combatiente.agregarEstado, comun/combatiente.js — ver agregarEstadoConAviso.)
 
@@ -609,16 +571,11 @@ function habTieneSegundaTirada(it){ return FichaBotonera.habTieneSegundaTirada(i
    los cobró la habilidad: el duelo no los vuelve a cobrar. */
 // El duelo de una habilidad: el que se le configuró con 🎯 (null = se lo sacaron) o, si nunca se tocó, el de la skill de clase de la que salió (así las que ya estaban en la mochila también lo traen).
 function dueloDe(it){ return FichaBotonera.dueloDe(it); }   // comun/ficha-botonera.js
-function ataqueDeHabArma(it, arma, xSp, xNitros){
-  const c = dueloDe(it);
-  if(!c || c.modo !== 'arma' || typeof Duelo === 'undefined' || !Duelo.disponible() || !fichaVivo || !fichaVivo.id || fichaVivo.soloLectura || fichaVivo.editaGM) return null;
-  // El ataque con arreglos lo arma la regla común (comun/combatiente.js, ataqueConArreglos), la misma que usa un creep.
-  // ⚡ Critical Matters: los efectos/nota de `c.critico` solo se suman si el golpe termina siendo crítico (comun/duelo.js).
-  return Combatiente.ataqueConArreglos(it, c, {X: c.x === 'sp' ? num(xSp) : num(xNitros),
-    arma: {id: arma ? arma.id : '', nombre: arma ? arma.nombre : '', tipoDado: tipoAtaque(arma), rango: !!(arma && arma.armaDeRango)},
-    alcance: c.alcance !== undefined && c.alcance !== 'auto' ? alcanceDeHab(c, 'pdg') : alcanceDeArma(arma)});
-}
-function xDeHab(it, xSp, xNitros){ return spVariable(it) ? num(xSp) : nitrosVariable(it) ? num(xNitros) : 0; }
+// El ataque con arreglos lo arma la regla común (comun/combatiente.js, ataqueConArreglos), la misma que usa un creep; esto vive
+// en comun/ficha-acciones.js (paso 3c-5b). ⚡ Critical Matters: los efectos/nota de `c.critico` solo se suman si el golpe
+// termina siendo crítico (comun/duelo.js).
+function ataqueDeHabArma(it, arma, xSp, xNitros){ return FichaAcciones.ataqueDeHabArma(S, it, arma, xSp, xNitros, habUi); }
+function xDeHab(it, xSp, xNitros){ return FichaAcciones.xDeHab(it, xSp, xNitros); }
 // Reemplaza el token «X» (sin importar mayúsculas) de una fórmula de dados o de un texto libre por un número —
 // mismo criterio que ya usa danoFijoPorX, generalizado para tirada personalizada y efecto a mano/personalizado.
 // \bx\b sola no alcanza: en «1dX» la X queda pegada a la «d» (las dos son \w, sin borde de palabra ahí) y no
@@ -632,48 +589,11 @@ function sustituirX(formula, X){ return Combatiente.sustituirX(formula, X); }   
 // cfgEscuchar.aplicarEfecto, gateado a soyGM()). Escribir la propia ficha nunca necesita el permiso de nadie
 // más, así que este hook (pasado a Duelo.escuchar) se habilita también para `esMio(d.defensor)` — ver el
 // cambio de esa fecha en comun/duelo.js. Cualquier otro caso (un aliado, un rival) sigue dependiendo del mapa.
-function dueloAplicarEfectoPropio(d, ef){
-  if(!fichaVivo || d.defensor.tipo !== 'pj' || d.defensor.ref !== fichaVivo.id) return {manual: true, nota: 'a mano'};
-  const spec = Duelo.specDeEfecto(ef);
-  if(!spec) return {manual: true, nota: 'a mano'};
-  if(spec.cura){
-    const antes = num(S.hp);
-    fijarHp(antes + num(spec.cura));
-    return {nota: `+${fmt(num(spec.cura))} HP (${fmt(antes)} → ${fmt(num(S.hp))})`};
-  }
-  aplicarEstadoRecibido(spec, `${d.atacante.nombre} · ${ef.nombre}`);
-  return {nota: typeof EstadosAplicar !== 'undefined' ? EstadosAplicar.texto(spec) : spec.nombre};
-}
+function dueloAplicarEfectoPropio(d, ef){ return FichaAcciones.dueloAplicarEfectoPropio(S, fichaVivo && fichaVivo.id, d, ef, habUi); }
 // Lo último que hace ejecutar una habilidad: anunciarla y tirar su primera tirada, o abrir el duelo (habilidad
-// dirigida o ataque con arma). La tirada personalizada de una habilidad dirigida (ver habDueloDe) ya vive
+// dirigida o ataque con arma). La tirada personalizada de una habilidad dirigida (ver habDueloDatos) ya vive
 // DENTRO del duelo (hab.tira.formula), no acá — no hace falta ninguna ventanita aparte en la ficha.
-function terminarEjecucionHab(it, arma, xSp, xNitros){
-  // 💰 Semiautomática: ya cobró el costo; anuncia y tira la tirada inicial (si tiene). Los efectos, a mano.
-  if(modoHab(it) !== 'auto'){ anunciarHabilidad(it); tirarPrimeraDeHab(it); return; }
-  if(!dueloDe(it)){
-    if(it.trampaColocar) return;   // una trampa sola: el anuncio y la casilla ya los maneja colocarTrampaDeHab
-    toast(`${it.nombre}: todavía no tiene armada la ejecución paso a paso (✨) — se ejecutó como semiautomática`); anunciarHabilidad(it); tirarPrimeraDeHab(it); return;
-  }
-  const aArma = ataqueDeHabArma(it, arma, xSp, xNitros);
-  if(aArma){
-    mesaPublicarHabilidad(it.nombre, it.detalle || it.efectoDetalle || '');
-    Duelo.elegirObjetivo({yo: {ref: fichaVivo.id, tipo: 'pj', nombre: (S.meta && S.meta.nombre) || 'Personaje'}, ataque: aArma, suelto: () => tirarPrimeraDeHab(it)});
-    return;
-  }
-  // Zona persistente (2026-09-28): no abre el cuadro del duelo — queda puesta en el mapa y se resuelve sola,
-  // de a uno, mientras dura (ver comun/asistente-duelo-hab.js y comun/CLAUDE.md "Zona persistente").
-  const cZona = dueloDe(it);
-  if(cZona && typeof cZona === 'object' && cZona.objetivo === 'zona'){
-    mesaPublicarHabilidad(it.nombre, it.detalle || it.efectoDetalle || '');
-    if(!colocarZonaDeHab(it, xSp, xNitros)) toast(`${it.nombre}: para colocar la zona hace falta tener el mapa abierto`);
-    return;
-  }
-  // Solo sobre uno mismo y sin nada que tirar (Blindaje y parecidos): no hace falta el cuadro — se aplica directo y se anuncia.
-  if(aplicarHabSobreMiDirecto(it, habDueloDatos(it, xSp, xNitros))) return;
-  const hDuelo = habDueloDe(it, xSp, xNitros);   // habilidad dirigida (duelo): se anuncia sin tirada y la contienda va en el cuadro del duelo
-  if(hDuelo) mesaPublicarHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); else anunciarHabilidad(it);
-  if(!(hDuelo && lanzarDueloDeHab(it, hDuelo))) tirarPrimeraDeHab(it);
-}
+function terminarEjecucionHab(it, arma, xSp, xNitros){ FichaAcciones.terminarEjecucionHab(S, it, arma, xSp, xNitros, habUi); }   // comun/ficha-acciones.js (paso 3c-5b)
 // Manda al mapa (la ficha corre en su iframe) todo lo que hace falta para crear la zona: radio, duración, estado
 // y/o daño, y con qué resistencia. Si hay tirada («tira» del 🎯), la tira UNA vez acá y manda el total — esa
 // misma tirada es la que se reusa contra cada uno que entra o sigue adentro en el Mantenimiento (mismo criterio
@@ -700,20 +620,10 @@ function colocarZonaDeHab(it, xSp, xNitros){
 }
 // Alcance en casilleros de un ataque: cuerpo a cuerpo = 1 + el Alcance del arma (su bono `rng`); arma de rango = su Rango.
 function alcanceDeArma(arma){ return FichaCombate.alcanceDeArma(S, arma); }   // comun/ficha-combate.js
-// Alcance de una habilidad según lo que configuró el 🎯: 'casteo' (Rango de casteo), 'rango' (Rango), 'adyacente' (1), un número, o sin límite (0 = no resalta).
-// Hasta dónde llega: la regla común (comun/combatiente.js), con el Rango y el Rango de casteo del personaje.
-function alcanceDeHab(c, statTira){ return Combatiente.alcanceHab(c, statTira, s => compute().final[s]); }
-function habDueloDe(it, xSp, xNitros){
-  if(typeof Duelo === 'undefined' || !Duelo.disponible() || !fichaVivo || !fichaVivo.id || fichaVivo.soloLectura || fichaVivo.editaGM) return null;
-  return habDueloDatos(it, xSp, xNitros);
-}
-// Lo mismo que habDueloDe pero sin pedir que el duelo esté conectado (lo usa el atajo de «solo sobre vos, sin tiradas»).
 // La Ejecución para el cuadro del duelo: la regla común (comun/combatiente.js, habEjecucion), la misma de invocaciones y
-// creeps. La X ya se eligió al pagar el costo variable (confirmarCostoVariable): daño por X, tirada personalizada y
+// creeps, en comun/ficha-acciones.js. La X ya se eligió al pagar el costo variable: daño por X, tirada personalizada y
 // textos a mano llegan con la X ya sustituida.
-function habDueloDatos(it, xSp, xNitros){
-  return Combatiente.habEjecucion(it, dueloDe(it), {stat: s => compute().final[s], etq: s => STAT_LABEL[s] || s, X: xDeHab(it, xSp, xNitros)});
-}
+function habDueloDatos(it, xSp, xNitros){ return FichaAcciones.habDueloDatos(S, it, xSp, xNitros); }
 // Resumen de una ejecución paso a paso, en una línea (para el editor y la tarjeta).
 function resumenEjecucionHab(c){
   if(!c || typeof c !== 'object') return '';
@@ -744,20 +654,7 @@ function abrirEjecucionHab(it, alTerminar){
 }
 // ✨ Automática, solo sobre uno mismo y sin tiradas (Blindaje y parecidos): se aplica directo, sin abrir el cuadro, y se anuncia
 // en la Mesa con lo que pasó. Devuelve false si no es ese caso (entonces sigue el cuadro de siempre).
-function aplicarHabSobreMiDirecto(it, h){
-  if(!Combatiente.sobreSiSinTiradas(h) || !fichaVivo || !fichaVivo.id || fichaVivo.soloLectura) return false;
-  const d = {defensor: {tipo: 'pj', ref: fichaVivo && fichaVivo.id}, atacante: {nombre: (S.meta && S.meta.nombre) || 'Personaje'}};
-  const hechos = (h.efectos || []).map(ef => { const r = dueloAplicarEfectoPropio(d, ef); return r && !r.manual && r.nota ? r.nota : `${ef.nombre || 'Efecto'}: a mano`; });
-  const texto = [it.detalle || it.efectoDetalle || '', hechos.length ? '→ ' + hechos.join(' · ') : '', h.efectoLibre || '', h.efectosNota || ''].filter(Boolean).join(' ');
-  mesaPublicarHabilidad(it.nombre, texto);
-  renderList('efectos'); renderVitals();
-  return true;
-}
-function lanzarDueloDeHab(it, hab){
-  if(!hab) return false;
-  Duelo.elegirObjetivo({yo: {ref: fichaVivo.id, tipo: 'pj', nombre: (S.meta && S.meta.nombre) || 'Personaje'}, ataque: {tipo: 'habilidad', hab, alcance: hab.alcance}, suelto: () => tirarPrimeraDeHab(it)});
-  return true;
-}
+function aplicarHabSobreMiDirecto(it, h){ return FichaAcciones.aplicarHabSobreMiDirecto(S, it, h, habUi); }
 
 function tirarPrimeraDeHab(it){ return FichaAcciones.tirarPrimeraDeHab(S, it, habUi); }   // comun/ficha-acciones.js
 function tirarSegundaDeHab(id){ FichaAcciones.tirarSegundaDeHab(S, id, habUi); }

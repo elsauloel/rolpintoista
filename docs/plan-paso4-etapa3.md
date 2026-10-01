@@ -63,7 +63,8 @@ Orden propuesto, de lo más simple a lo más complejo (ver pregunta 3):
 1. Tirar un stat, Percepción ✅ (2026-10-01). Fuerza del golpe pasa al paso 4 (elige arma como el Parry).
 2. Sigilo y Levantarse ✅ (2026-10-01; el mapa ya guarda al personaje).
 3. Consumibles (cinturón y mochila) ✅ (2026-10-01; quedan delegadas las trampas consumibles y el Ankh manual).
-4. Atacar, Daño, Esquivar, Parry y Bloqueo — con los ganchos del duelo del personaje (`DUELO_HOOKS`).
+4. Atacar, Daño, Esquivar, Parry y Bloqueo — con los ganchos del duelo del personaje (`DUELO_HOOKS`). Partido en 4a (sueltos ✅
+   2026-10-01), 4b (Atacar) y 4c (los ganchos del duelo).
 5. Habilidades (lo más grande: elegir arma, costo X, turno ajeno, Flash, Ejecución, zonas y trampas).
 6. 🔍 Lupa y "Ver".
 
@@ -171,3 +172,22 @@ siga necesitándolo (ver pregunta 4). La ficha suelta (`ficha.html`) no cambia: 
   cargado el mapa no escribiría ninguna parte sin tocar nada; Elixir de Fénix (HP 10 → 25, el máximo), Poción de Bonos
   (+23 SP) y Antorcha de brea (estado 3 turnos), 2 No2 cada uno y una unidad menos — igual en el mapa, en Firebase y en la
   ficha de la otra pestaña, sin nada pendiente. Clementino quedó como estaba.
+- 2026-10-01: **el paso 4 de la 3c se parte en tres** (es lo más atado al duelo): **4a** las tiradas de combate sueltas
+  (Esquivar, Parry, Bloqueo, Fuerza del golpe, Daño); **4b** Atacar (el cartel "¿Qué ataque es?", elegir el objetivo en el
+  mapa y abrir el duelo, o el ataque suelto); **4c** las tiradas que el duelo le pide al personaje (`DUELO_HOOKS`: hoy el
+  mapa se las pide a la ficha escondida con `duelo-tirar`). Recién con 4c el marco deja de hacer falta para el combate.
+- 2026-10-01: **3c, paso 4a hecho**. A `comun/ficha-acciones.js`: `tirarValorStat` (la tirada de un stat, con el cartel de
+  sobrepeso de la Evasión) y `sobrepesoPagar`, `parryConArma`, `bloqueoConArma`, `fuerzaGolpeValorConArma`/`fuerzaGolpeConArma`,
+  `elegirArmaDefensa` + `armaElegida` (el cartel "¿Con qué arma?"), `tirarDanoDeArma` y `pedirArmaYTirar`. La ficha los usa
+  con sus nombres de siempre (`combateUi` en `js/11`, que dibuja sus carteles como antes; el Parry que espera su Bloqueo sigue
+  en la ficha, `parryArmaPendiente`). En el mapa (`bnCombateAca`, `bnCombateUi`): los dos carteles (sobrepeso y elegir arma)
+  dentro del recuadro, el Parry pendiente en `bn.parryPendiente` (la Botonera muestra el Bloqueo listo) y los efectos al
+  golpear con `EfectosGolpe.alPegar`, como la ficha. Comparado contra el código viejo de la ficha en 700 casos al azar **con
+  los mismos dados** (misma semilla en las dos): igual, incluidos los números; 4 mutaciones plantadas, las 4 detectadas.
+  **En vivo** (Clementino con un arma y un escudo del catálogo): en la ficha, el Parry preguntó con cuál y dejó el Bloqueo
+  esperando (la ficha sigue andando igual); en el mapa, Parry → "¿Con qué arma?" con las dos → escudo (No2 11 → 10), Bloqueo
+  con el mismo escudo, Fuerza del golpe con el arma (la única que pega: no preguntó), Daño del arma con su Envenenar anotado
+  en la Mesa, y Esquivar → el cartel de sobrepeso (el escudo lo dejó 1 de más) → "Pagar 1 No2" (10 → 9) y la Evasión con la
+  marca "Sobrepeso (pagó 1 No2)". Todo a nombre de Clementino y con su `ficha`; la ficha de la otra pestaña recibió los No2
+  sin nada pendiente. Pendiente menor: el Parry que espera su Bloqueo en el mapa no se borra al pasar el turno ni al atacar
+  (Atacar sigue en la ficha); se borra al bloquear o al cambiar de personaje.

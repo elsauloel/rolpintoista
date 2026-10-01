@@ -9123,7 +9123,7 @@ function abrirBotoneraPrincipal(){
    no están (la lupa vive en la ficha: etapa 3c). Las piezas se cargan recién al usarla: para los jugadores no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001b',
-  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001c'];
+  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001d'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
 var bnCss = '';
@@ -9318,11 +9318,39 @@ function bnCombateUi(){
   };
 }
 var bnSobrepeso = null;
+/* Paso 3c-4b: Atacar. El cartel "¿Qué ataque es?" (normal / oportunidad / contraataque, con lo que cuesta cada uno, igual que la
+   ficha), después el objetivo con un clic en el token (dueloElegirObjetivoMapa, el mismo de siempre) y el duelo; "Sin objetivo"
+   hace el ataque suelto acá (FichaAcciones.atacarConArma / ataqueEspecialConArma). Las tiradas que pide el duelo las sigue
+   haciendo la ficha escondida (paso 4c). */
+function bnPreguntarTipoAtaque(arma){
+  const S = bn.S, costoNormal = FichaCombate.costoAtaque(S, arma), primero = FichaCombate.ataquesConArma(S, arma) === 0, especial = FichaCombate.costoAtaqueEspecial(arma);
+  const id = arma ? arma.id : '';
+  bn.raiz.querySelector('#bn-tipo-lista').innerHTML = `<div class="hint">${arma ? esc(arma.nombre) : 'Sin arma'}</div>
+    <button class="btn" data-bn-tipo="normal:${id}" style="width:100%">⚔ Ataque normal — ${fmt(costoNormal)} No2<br><span class="hint">${primero ? 'primer ataque con esta arma (Tipo ÷ 2)' : 'Tipo completo (ya atacaste con esta arma este turno)'}</span></button>
+    <button class="btn" data-bn-tipo="oportunidad:${id}" style="width:100%">🏃 Ataque de oportunidad — ${fmt(especial)} No2<br><span class="hint">siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>
+    <button class="btn" data-bn-tipo="contra:${id}" style="width:100%">↩ Contraataque — ${fmt(especial)} No2<br><span class="hint">tras un Parry; siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>`;
+  bn.raiz.querySelector('#bn-tipo-ataque').classList.add('open');
+}
+function bnAtacar(tipo, armaId){
+  const S = bn.S, arma = S.inventario.find(x => x.id === armaId) || null;
+  const hacer = () => { const ui = bnCombateUi(); if(tipo === 'normal') FichaAcciones.atacarConArma(S, arma, false, ui); else FichaAcciones.ataqueEspecialConArma(S, arma, tipo, false, ui); };
+  if(typeof Duelo === 'undefined' || !Duelo.disponible()){ hacer(); return; }
+  // Mientras se elige el objetivo la Botonera nueva se esconde (tapa el mapa); "Sin objetivo" la vuelve a mostrar.
+  const reabrir = () => { if(bn){ bn.host.hidden = false; bnUbicar(); bnDibujar(); } };
+  bn.host.hidden = true;
+  dueloElegirObjetivoMapa({yo: {ref: bn.fichaId, tipo: 'pj', nombre: (S.meta && S.meta.nombre) || 'Personaje'},
+    ataque: {tipo, armaId: arma ? arma.id : '', armaNombre: arma ? arma.nombre : '', tipoDado: FichaCombate.tipoAtaque(arma), rango: !!(arma && arma.armaDeRango), alcance: FichaCombate.alcanceDeArma(S, arma)},
+    conSuelto: true, alSuelto: () => { reabrir(); hacer(); }, alCancelar: () => {}});
+}
 function bnCombateAca(b){
   const a = b.dataset.botoneraaccion;
-  if(!['esquivar', 'parry', 'bloqueo', 'fuerzagolpe', 'danio'].includes(a) || !bnPuedeGuardar()) return false;
+  if(!['esquivar', 'parry', 'bloqueo', 'fuerzagolpe', 'danio', 'atacar'].includes(a) || !bnPuedeGuardar()) return false;
   const S = bn.S, ui = bnCombateUi();
-  if(a === 'esquivar') FichaAcciones.tirarValorStat(S, 'Evasión', FichaCalculo.calcular(S).final.eva, 'eva', undefined, undefined, undefined, ui);
+  if(a === 'atacar'){
+    if(b.dataset.arma === undefined) return false;   // (la Botonera siempre lo trae con su arma; si no, que lo haga la ficha)
+    bnPreguntarTipoAtaque(S.inventario.find(x => x.id === b.dataset.arma) || null);
+  }
+  else if(a === 'esquivar') FichaAcciones.tirarValorStat(S, 'Evasión', FichaCalculo.calcular(S).final.eva, 'eva', undefined, undefined, undefined, ui);
   else if(a === 'danio'){
     if(b.dataset.arma === undefined) FichaAcciones.pedirArmaYTirar(S, ui);
     else { const arma = S.inventario.find(x => x.id === b.dataset.arma); if(arma) FichaAcciones.tirarDanoDeArma(S, arma, ui); }
@@ -9369,12 +9397,16 @@ function bnCrear(){
         <p class="hint" style="margin:0">Regla en prueba: por cada punto de sobrepeso restás 1 a la Evasión, salvo que pagues 1 No2 para evitar la penalidad en esta tirada.</p></div>
       <footer style="flex-wrap:wrap;gap:8px"><button class="btn" data-bn-sobre="penal"></button><button class="btn primary" data-bn-sobre="pagar">Pagar 1 No2 y tirar sin penalidad</button></footer>
     </div></div>
+    <div class="scrim" id="bn-tipo-ataque"><div class="modal" style="max-width:360px">
+      <header><h3>¿Qué ataque es?</h3><button class="iconbtn" data-bn-tipo="no">Cerrar</button></header>
+      <div class="body" id="bn-tipo-lista" style="display:flex;flex-direction:column;gap:9px"></div>
+    </div></div>
     <div class="scrim" id="bn-elegir-arma"><div class="modal" style="max-width:320px">
       <header><h3>¿Con qué arma?</h3><button class="iconbtn" data-bn-arma="no">Cerrar</button></header>
       <div class="body" id="bn-arma-lista" style="display:flex;flex-direction:column;gap:9px"></div>
     </div></div>`;
   raiz.querySelector('#bn-sin-nitros').addEventListener('mousedown', e => { if(e.target.id === 'bn-sin-nitros') bnCerrarSinNitros(); });
-  ['bn-sobrepeso', 'bn-elegir-arma'].forEach(id => raiz.querySelector('#' + id).addEventListener('mousedown', e => { if(e.target.id === id){ e.target.classList.remove('open'); if(id === 'bn-sobrepeso') bnSobrepeso = null; } }));
+  ['bn-sobrepeso', 'bn-elegir-arma', 'bn-tipo-ataque'].forEach(id => raiz.querySelector('#' + id).addEventListener('mousedown', e => { if(e.target.id === id){ e.target.classList.remove('open'); if(id === 'bn-sobrepeso') bnSobrepeso = null; } }));
   raiz.addEventListener('click', e => {
     const b = e.target.closest('button');
     if(!b || !bn) return;
@@ -9386,6 +9418,13 @@ function bnCrear(){
       if(pagar && !FichaAcciones.sobrepesoPagar(bn.S, ui)) return;
       bnSobrepeso = null; raiz.querySelector('#bn-sobrepeso').classList.remove('open');
       FichaAcciones.tirarValorStat(bn.S, p.nombre, p.valor, 'eva', p.extra, pagar ? 'pagado' : 'penal', p.sobre, ui);
+      return;
+    }
+    if(b.dataset.bnTipo){
+      raiz.querySelector('#bn-tipo-ataque').classList.remove('open');
+      if(b.dataset.bnTipo === 'no') return;
+      const [tipo, armaId] = b.dataset.bnTipo.split(':');
+      bnAtacar(tipo, armaId);
       return;
     }
     if(b.dataset.bnArma){
@@ -9902,9 +9941,11 @@ function dueloElegirObjetivoMapa(msg){
   const objetivoTipo = (ataque && ataque.hab && ataque.hab.objetivo) || 'enemigo';
   const esValido = objetivoTipo === 'aliado' ? t => !dueloEsRival(yo, t) : objetivoTipo === 'enemigo' ? t => dueloEsRival(yo, t) : null;
   const nEnAlcance = dueloResaltarObjetivos(propio, ataque && ataque.alcance, esValido);
-  const cancelado = () => { dueloAvisoObjetivoOcultar(); try{ MensajesMapa.alMarco($('#botonera-marco'), 'duelo-cancelado'); }catch(e){} };
+  // msg.alSuelto / msg.alCancelar: cuando el ataque sale de la Botonera nueva (el mapa mismo, paso 3c-4b) y no del marco.
+  const cancelado = () => { dueloAvisoObjetivoOcultar(); if(msg.alCancelar){ msg.alCancelar(); return; } try{ MensajesMapa.alMarco($('#botonera-marco'), 'duelo-cancelado'); }catch(e){} };
   const alSuelto = () => {
     elegirDestinoTerminar(); dueloAvisoObjetivoOcultar();
+    if(msg.alSuelto){ msg.alSuelto(); return; }
     $('#botonera-capa').hidden = false; ubicarBotoneraCapa();
     try{ MensajesMapa.alMarco($('#botonera-marco'), 'duelo-suelto'); }catch(e){}
   };

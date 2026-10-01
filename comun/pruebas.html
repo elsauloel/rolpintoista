@@ -674,6 +674,21 @@ prueba('el Daño tira la del arma y recuerda sus efectos al golpear', () => {
   igual(reg, ['🎲 Espada', 'efectos Espada']);
 });
 
+grupo('Atacar (suelto)');
+prueba('el primer ataque con un arma cuesta Tipo ÷ 2 y el siguiente el Tipo completo; atacar borra el Parry pendiente', () => {
+  const S = fichaBotonera({nitros: 50, inventario: [espada]}), reg = [], est = {parry: 'esc'};
+  const tipo = FichaCombate.tipoAtaque(espada);
+  FichaAcciones.atacarConArma(S, espada, false, uiCombate(reg, est));
+  const tras1 = S.nitros;
+  FichaAcciones.atacarConArma(S, espada, false, uiCombate(reg, est));
+  igual([50 - tras1, tras1 - S.nitros, est.parry, reg.filter(x => x.startsWith('🎲')).length], [Combatiente.costoPrimerAtaque(tipo), tipo, null, 2]);
+});
+prueba('oportunidad y contraataque cuestan siempre lo de un primer ataque y no suman al conteo', () => {
+  const S = fichaBotonera({nitros: 20, inventario: [espada], ataquesArma: {[FichaCombate.claveAtaque(espada)]: 3}}), reg = [];
+  FichaAcciones.ataqueEspecialConArma(S, espada, 'contra', false, uiCombate(reg, {}));
+  igual([20 - S.nitros, FichaCombate.ataquesConArma(S, espada), reg.some(x => x.startsWith('🎲 Contraataque · PdG'))], [FichaCombate.costoAtaqueEspecial(espada), 3, true]);
+});
+
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */
 grupo('Mis últimas tiradas (P138)');
 prueba('se juntan las de la Mesa con las de esta ventana, sin repetir, las últimas primero', () => {

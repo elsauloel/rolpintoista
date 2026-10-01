@@ -325,7 +325,45 @@ const FichaAcciones = (() => {
     ui.elegirArma('dano', armas);
   }
 
+  /* ---------- Atacar (paso 3c-4b; js/11) ----------
+     Lo que hace el ataque suelto (sin objetivo) o el que el duelo le pide al atacante: cobrar los No2 y tirar el PdG.
+     Ataque normal: el primero del turno con esa arma cuesta Tipo ÷ 2, los siguientes el Tipo completo (cuenta como ataque).
+     Ataque de oportunidad y Contraataque (regla a prueba, P139): SIEMPRE Tipo ÷ 2 y NO suman al conteo de ataques. */
+  function atacarConArma(S, arma, forzar, ui){
+    ui.setParry(null);
+    const costo = FichaCombate.costoAtaque(S, arma);
+    if(costo > num(S.nitros) && !forzar){
+      ui.avisarSinNitros(costo, `atacar${arma ? ' con ' + arma.nombre : ''}`, () => atacarConArma(S, arma, true, ui));
+      return;
+    }
+    S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, `atacó${arma ? ' con ' + arma.nombre : ''}`) : costo);
+    const primero = FichaCombate.registrarAtaque(S, arma);   // cuenta el ataque con esa arma (comun/ficha-combate.js)
+    ui.cambio(['nitros']);
+    tirarValorStat(S, arma ? `PdG · ${arma.nombre}` : 'PdG', FichaCombate.pdgParaArma(S, arma).valor, 'pdg', undefined, undefined, undefined, ui);
+    const tipo = FichaCombate.tipoAtaque(arma);
+    const impar = primero && tipo % 2 !== 0;
+    ui.toast(`${arma ? arma.nombre : 'Sin arma ⚠ (Tipo provisorio)'}: -${fmt(costo)} No2 · ${primero ? 'primer ataque con esta arma' : `ataque ${FichaCombate.ataquesConArma(S, arma)} con esta arma`}${impar ? ' · ⚠ Tipo impar, redondeo provisorio' : ''}`);
+  }
+  const NOMBRE_ATAQUE_ESPECIAL = {oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
+  function ataqueEspecialConArma(S, arma, tipo, forzar, ui){
+    const costo = FichaCombate.costoAtaqueEspecial(arma), nombre = NOMBRE_ATAQUE_ESPECIAL[tipo] || 'Ataque';
+    const con = arma ? ' con ' + arma.nombre : '';
+    if(costo > num(S.nitros) && !forzar){
+      ui.avisarSinNitros(costo, `hacer un ${nombre.toLowerCase()}${con}`, () => ataqueEspecialConArma(S, arma, tipo, true, ui));
+      return;
+    }
+    S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, `hizo un ${nombre.toLowerCase()}${con}`) : costo);
+    ui.cambio(['nitros']);
+    // Solo el contraataque suma el «PdG en contraataque» de la propia arma (los tipos 6 lo traen: +1 a +3, mucho menos valioso que un PdG normal porque es circunstancial);
+    // y solo el ataque de oportunidad suma el «PdG en oportunidad» (los tipos 4, mismo criterio).
+    const bonoContra = tipo === 'contra' ? FichaCombate.statParaArma(S, 'pdgcontra', arma) : tipo === 'oportunidad' ? FichaCombate.statParaArma(S, 'pdgopor', arma) : 0;
+    tirarValorStat(S, `${nombre} · PdG${arma ? ' · ' + arma.nombre : ''}`, FichaCombate.pdgParaArma(S, arma).valor + (Number.isNaN(bonoContra) ? 0 : bonoContra), 'pdg', undefined, undefined, undefined, ui);
+    ui.toast(`${nombre}${con}: −${fmt(costo)} No2 (lo de un primer ataque)${bonoContra > 0 ? ` · PdG +${fmt(bonoContra)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''} · te quedan ${fmt(num(S.nitros))}`);
+    ui.cambio(['refresh']);
+  }
+
   return {gastoNitrosForzado, alternarSigilo, levantarse,
+    atacarConArma, ataqueEspecialConArma, NOMBRE_ATAQUE_ESPECIAL,
     tirarValorStat, sobrepesoPagar, parryConArma, bloqueoConArma, fuerzaGolpeValorConArma, fuerzaGolpeConArma, elegirArmaDefensa, armaElegida, tirarDanoDeArma, pedirArmaYTirar,
     aplicarRevivirConAnkh, fijarHp, revisarAnkh, revisarMuerte,
     purgarSiAgotado, restaurarSpDeConsumo, repararArmadura, efectoDeConsumo, tiradasDeItem, consumir};

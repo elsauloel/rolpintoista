@@ -48,10 +48,15 @@ const FichaSesion = (() => {
     }, err => console.error('Error escuchando el personaje:', err)));
     // Partes: la primera vez arman el personaje entero; después, cada parte que cambia desde otra ventana (o el dueño, si
     // es solo lectura) se aplica sola. En cola, para que una carga lenta no se cruce con la siguiente.
-    f.cortes.push(base.collection('partes').onSnapshot(snap => {
+    // includeMetadataChanges: para enterarse cuando el servidor confirma lo que ya estaba en la memoria local (ver abajo).
+    f.cortes.push(base.collection('partes').onSnapshot({includeMetadataChanges: true}, snap => {
       f.cola = f.cola.then(() => {
         if(!o.vigente()) return;
         if(!f.cargada){
+          // La primera carga espera al servidor (2026-10-01): lo que Firestore tenga en memoria puede ser solo algunas partes
+          // (las que esta misma página escribió o leyó antes), y armar el personaje con eso lo deja a medias — sin "otros",
+          // hasta corre +2 los Tipos de las armas que sí llegaron (la migración de la escala de Tipos).
+          if(snap.metadata.fromCache) return;
           const armado = FichaGuardado.armarDatos(snap.docs.map(d => ({id: d.id, json: d.data().json})));
           // La marca de control del GM no es un dato del personaje: va aparte.
           if(armado.control) f.control = armado.control;

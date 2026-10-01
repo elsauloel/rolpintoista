@@ -59,6 +59,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
 <script src="ficha-resumen.js"></script>
+<script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js"></script>
 <script src="inv-botonera.js"></script>
 <script src="ficha-acciones.js"></script>
@@ -990,6 +991,19 @@ prueba('la Botonera de una invocación: No2, Bloqueo solo tras el Parry y Anunci
   const sin = InvBotonera.html(inv, {lupa: false}), con = InvBotonera.html(inv, {parryPendiente: true, lupa: false});
   igual([sin.titulo, sin.badge, /Bloqueo · tras el Parry/.test(sin.html), /Bloqueo · Colmillo/.test(con.html), /data-ejecutarhabinv="i:a"[^>]*>Anunciar/.test(sin.html),
     /data-danohabinv="i:b"/.test(sin.html), /data-lupa/.test(sin.html)], ['Lobo', 'No2 3/4', true, true, true, true, false]);
+});
+
+prueba('FichaSesion: la primera carga espera al servidor (no arma el personaje con lo que haya en la memoria local)', () => {
+  let alPartes = null;
+  const db = {doc: () => ({onSnapshot: () => () => {}, collection: () => ({onSnapshot: (opc, cb) => { alPartes = {opc, cb}; return () => {}; }})})};
+  const f = FichaSesion.nueva('x', '', false, true);
+  const cargas = [];
+  FichaSesion.escuchar(f, {db, ruta: 'r', vigente: () => true, alDoc: () => {}, alCargar: a => { cargas.push(Object.keys(a.ultimo).sort().join(',')); f.cargada = true; },
+    alControl: () => {}, aplicarParte: () => {}, alCambiar: () => {}});
+  const snap = (desdeCache, ids) => ({metadata: {fromCache: desdeCache}, docs: ids.map(id => ({id, data: () => ({json: '{}'})})), docChanges: () => []});
+  alPartes.cb(snap(true, ['invocaciones']));
+  alPartes.cb(snap(false, ['general', 'invocaciones', 'otros']));
+  return f.cola.then(() => igual([alPartes.opc && alPartes.opc.includeMetadataChanges, cargas], [true, ['general,invocaciones,otros']]));
 });
 
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */

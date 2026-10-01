@@ -3,60 +3,10 @@
    MODELO
    ========================================================= */
 
-const GRUPOS = [
-  {id:'con', label:'Con', full:'Constitución', color:'#C4485A', derived:[
-    {id:'resmg', label:'Res.Esp', full:'Resistencia especial'},
-    {id:'rescc', label:'Res.CC', full:'Resistencia al crowd control'},
-    {id:'hpmax', label:'Hp.Max', full:'Health points máximos'}]},
-  {id:'fue', label:'Fue', full:'Fuerza', color:'#D07B3A', derived:[
-    {id:'dmg', label:'Dmg', full:'Damage'},
-    {id:'bloqueo', label:'Bloqueo', full:'Bloqueo'},
-    {id:'crgmax', label:'Crg.Max', full:'Carga máxima'}]},
-  {id:'agl', label:'Agi', full:'Agilidad', color:'#8FB84F', derived:[
-    {id:'eva', label:'Eva', full:'Evasión'},
-    {id:'ini', label:'Iniciativa', full:'Iniciativa'},
-    {id:'nitros', label:'No2', full:'Nitros'}]},
-  {id:'des', label:'Des', full:'Destreza', color:'#4FA88C', derived:[
-    {id:'rng', label:'Rng', full:'Rango'},
-    {id:'pdg', label:'PdG', full:'Probabilidad de golpe'},
-    {id:'pdgopor', label:'PdG Oport.', full:'PdG en ataque de oportunidad: solo suma cuando hacés un ataque de oportunidad; vale mucho menos que un PdG normal'},
-    {id:'pdgcontra', label:'PdG Contra', full:'PdG en contraataque: solo suma cuando contraatacás (tras un Parry); vale mucho menos que un PdG normal'},
-    {id:'critpot', label:'Crít.Pot.', full:'Crítico potente (baja los umbrales del d20: doble, triple y cuádruple daño)'},
-    {id:'crit', label:'Crít.Frec.', full:'Crítico frecuente (baja el rango del crítico; ver Calculadora de crítico)'},
-    {id:'parry', label:'Parry', full:'Parry'},
-    {id:'percepcion', label:'Percep.', full:'Percepción'}]},
-  {id:'esp', label:'Esp', full:'Especial', color:'#9B7BD4', derived:[
-    {id:'pdgmg', label:'PdG.Esp', full:'Probabilidad de golpe especial'},
-    {id:'resm', label:'Res.Mt', full:'Resistencia mental'},
-    {id:'sp', label:'SP', full:'Special Power'},
-    {id:'spregen', label:'SP Regen', full:'Regeneración de SP por turno'},
-    {id:'rangocasteo', label:'Rango Cast.', full:'Rango de casteo'}]},
-];
-const EXTRA = [
-  {id:'def', label:'Defensa', full:'Defensa'},
-  // Armadura mágica (Paso 3 de las reglas de casteo, docs/reglas-casteo.md):
-  // stat general, fijo, que NO sale de ningún atributo (arranca en 0) — solo
-  // lo dan ítems Raros o mejores. Protege el daño de casteo que "ignora la
-  // Defensa" (Paso 1); no tiene nada que ver con el Escudo especial (HP
-  // temporal) ni con la skill del Mago "Armadura arcana".
-  {id:'armadmg', label:'Armadura mágica', full:'Armadura mágica: se resta al daño de casteo que ignora la Defensa. No sale de ningún atributo — solo la dan ítems raros o mejores.'},
-  // Los ids tipo1..tipo5 quedaron de antes de correr la escala +2 (eran
-  // Tipo 2..10): no se renombran para no tocar los mods ya guardados.
-  {id:'tipo1', label:'Tipo 4', full:'Resistencia a crítico — armas Tipo 4 (d4)'},
-  {id:'tipo2', label:'Tipo 6', full:'Resistencia a crítico — armas Tipo 6 (d6)'},
-  {id:'tipo3', label:'Tipo 8', full:'Resistencia a crítico — armas Tipo 8 (d8)'},
-  {id:'tipo4', label:'Tipo 10', full:'Resistencia a crítico — armas Tipo 10 (d10)'},
-  {id:'tipo5', label:'Tipo 12', full:'Resistencia a crítico — armas Tipo 12 (d12, explosivos/modernas)'},
-  {id:'capcinturon', label:'Ranuras cinturón', full:'Ranuras extra para consumibles que da el cinturón equipado'},
-  {id:'capmochila', label:'Ranuras mochila', full:'Ranuras extra de la mochila que da la mochila equipada'},
-  {id:'luz', label:'Luz portada', full:'Radio de luz que llevás encima (farol, bengala): iluminás y ves ese radio a tu alrededor, sin punto ciego'},
-  {id:'veoculto', label:'Ve lo oculto', full:'Radio (dentro de tu campo de visión) en el que ves lo oculto: creeps en sigilo y trampas escondidas'},
-  // Radio del campo de visión en hexágonos (base 6, decidido con la niebla de
-  // guerra: P47). Se ve en un cuadro junto a Defensa; lo modifican pasivas,
-  // ítems y estados. La niebla del mapa todavía no lo lee.
-  {id:'vision', label:'Campo de visión', full:'Campo de visión (radio en hexágonos)'},
-];
-const STAT_LIST = [...GRUPOS.flatMap(g=>g.derived), ...EXTRA];
+// Atributos y stats: viven en comun/ficha-calculo.js (paso 5, nivel B); acá, los mismos nombres de siempre.
+const GRUPOS = FichaCalculo.GRUPOS;
+const EXTRA = FichaCalculo.EXTRA;
+const STAT_LIST = FichaCalculo.STAT_LIST;
 
 const DADOS_ARMA = [4, 6, 8, 10, 12];
 
@@ -270,15 +220,9 @@ const CATEGORIA_LABEL = Object.fromEntries(CATEGORIAS.map(c=>[c.id, c.label]));
 // Slot de equipamiento, para el filtro por slot del catálogo del
 // fabricante. Desde la fusión blando/rígido el tipoItem de cabeza,
 // manos, piernas y pies ES directamente el slot.
-const SLOT_MAP = {
-  arma_1m:'mano', arma_2m:'mano',
-  escudo_1m:'escudo', escudo_2m:'escudo',
-  armadura_blanda:'armadura', armadura_rigida:'armadura',
-  cabeza:'cabeza', manos:'manos', piernas:'piernas', pies:'pies',
-  cinturon:'cinturon', mochila:'mochila',
-};
-const SLOT_LABEL = {mano:'Mano (una mano)', escudo:'Escudo', armadura:'Armadura', cabeza:'Cabeza', manos:'Manos', piernas:'Piernas', pies:'Pies', cinturon:'Cinturón', mochila:'Mochila', otro:'Otro'};
-function slotDe(tipoItem){ return SLOT_MAP[tipoItem] || 'otro'; }
+// Ranuras del equipo: comun/ficha-calculo.js.
+const SLOT_MAP = FichaCalculo.SLOT_MAP;
+const slotDe = FichaCalculo.slotDe;
 
 const GRUPO_COMPRA_MAP = {
   arma_1m:'armas', arma_2m:'armas',
@@ -319,11 +263,11 @@ const SLOT_DEFS = [
   {id:'cinturon', label:'Cinturón', cats:['cinturon'], max:1},
   {id:'mochila', label:'Mochila', cats:['mochila'], max:1},   // un solo cinturón y una sola mochila puestos (2026-09-25)
 ];
-const ATTR_LIST = GRUPOS.map(g => ({id:g.id, label:g.label, full:g.full}));
-const MOD_TARGETS = [...ATTR_LIST, ...STAT_LIST];
-const STAT_LABEL = Object.fromEntries(MOD_TARGETS.map(s=>[s.id,s.label]));
-const STAT_FULL = Object.fromEntries(MOD_TARGETS.map(s=>[s.id,s.full]));
-const ES_ATTR = id => ATTR_LIST.some(a => a.id === id);
+const ATTR_LIST = FichaCalculo.ATTR_LIST;
+const MOD_TARGETS = FichaCalculo.MOD_TARGETS;
+const STAT_LABEL = FichaCalculo.STAT_LABEL;
+const STAT_FULL = FichaCalculo.STAT_FULL;
+const ES_ATTR = FichaCalculo.ES_ATTR;
 
 const DEFAULT = {
   meta:{nombre:'', raza:'', clase:'', subclase:'',
@@ -414,14 +358,8 @@ function fileToDataURL(file, maxDim=480, quality=0.85){
    con el que se bloqueó. Los creeps y las invocaciones no llevan. */
 // Cuánta durabilidad tiene cada ítem es regla común (comun/combatiente.js): 3 por punto de Peso salvo que el ítem traiga su
 // propio `durPorPeso` (variable de diseño, 2026-09-30), mínimo 3.
-const SLOTS_DURABLES = ['mano', 'escudo', 'armadura', 'cabeza', 'manos', 'piernas', 'pies'];
-const SLOTS_ARMADURA = ['armadura', 'cabeza', 'manos', 'piernas', 'pies'];
-const durableItem = i => !!i && !i.consumible && SLOTS_DURABLES.includes(slotDe(i.tipoItem));
-const esArmaduraItem = i => durableItem(i) && SLOTS_ARMADURA.includes(slotDe(i.tipoItem));
-const durMax = i => Combatiente.durMax(i);
-const durActual = i => (i.dur === undefined || i.dur === null) ? durMax(i) : Math.max(0, Math.min(durMax(i), Math.round(num(i.dur))));
-const itemRoto = i => durableItem(i) && durActual(i) <= 0;
-const armRotaDe = i => Math.max(0, Math.min(durMax(i), Math.round(num(i.armRota))));
+// Qué ítems tienen durabilidad, cuánta les queda y si están rotos: comun/ficha-calculo.js.
+const {SLOTS_DURABLES, SLOTS_ARMADURA, durableItem, esArmaduraItem, durMax, durActual, itemRoto, armRotaDe} = FichaCalculo;
 
 // Aviso al quedar en 1 punto y al romperse: cartel y una línea en la Mesa para todos.
 function durAviso(i){
@@ -462,34 +400,8 @@ function durLineaHtml(i){
     <button class="mini" data-durmod="${i.id}:-1" title="Un punto menos (a mano)">−</button><button class="mini" data-durmod="${i.id}:1" title="Reparar 1 punto (solo fuera de combate)">+</button></div>`;
 }
 
-function collectMods(){
-  const out = {};
-  // tipo: de dónde viene (lo muestra la 🔍); itemId: para el PdG propio de cada arma.
-  const push = (m, origen, tipo, itemId) => {
-    if(!m || !m.stat) return;
-    (out[m.stat] = out[m.stat] || []).push({val:num(m.val), origen, tipo, itemId});
-  };
-  S.inventario.filter(i=>i.equipado).forEach(i => {
-    if(itemRoto(i)) return;   // roto: ocupa el lugar pero no da ningún efecto
-    (i.mods||[]).forEach(m => push(m, i.nombre, 'equipado', i.id));
-    // Armadura rota de la pieza: cada punto baja 1 su Defensa (sin pasar de lo que la pieza da).
-    const ar = esArmaduraItem(i) ? armRotaDe(i) : 0;
-    if(ar > 0){
-      const defPieza = (i.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + num(m.val), 0);
-      const r = Math.min(ar, Math.max(0, defPieza));
-      if(r > 0) push({stat: 'def', val: -r}, `${i.nombre} · Armadura rota ×${ar}`, 'equipado', i.id);
-    }
-  });
-  S.pasivas.forEach(p => {
-    const compras = pasivaCompras(p);
-    (p.mods||[]).forEach(m => push({stat:m.stat, val:num(m.val)*compras}, p.nombre + (compras>1 ? ' ×'+compras : ''), 'pasiva'));
-  });
-  S.efectos.filter(e=>e.activo !== false).forEach(e => (e.mods||[]).forEach(m => {
-    const stacks = Math.max(1, num(e.stacks) || 1);
-    push({stat:m.stat, val:num(m.val)*stacks}, e.nombre + (stacks>1 ? ' ×'+stacks : ''), 'estado alterado');
-  }));
-  return out;
-}
+// Los bonos de equipo, pasivas y estados, con su origen: comun/ficha-calculo.js (modsDe).
+function collectMods(){ return FichaCalculo.modsDe(S); }
 
 // Cuánto aporta a un stat el equipo puesto en un slot puntual (p.ej.
 // 'armadura', para que "Arruina armadura" no toque guantes ni casco).
@@ -498,14 +410,7 @@ function aporteSlot(slot, statId){
     .reduce((a,i) => a + (i.mods||[]).filter(m=>m.stat===statId).reduce((s,m)=>s+num(m.val),0), 0);
 }
 
-function evalFormula(expr, ctx){
-  try{
-    const keys = Object.keys(ctx);
-    const fn = new Function(...keys, 'return ('+(expr||'0')+');');
-    const v = fn(...keys.map(k=>ctx[k]));
-    return Number.isFinite(v) ? v : NaN;
-  }catch(e){ return NaN; }
-}
+function evalFormula(expr, ctx){ return FichaCalculo.evalFormula(expr, ctx); }
 
 // Datos de partida de la Calculadora de crítico (comun/critico.js): el Crítico frecuente y potente de este personaje y el Tipo de su arma equipada.
 function criticoDatosIniciales(){
@@ -519,50 +424,9 @@ function criticoDatosIniciales(){
   if(arma) d.tipo = num(arma.tipoDado);
   return d;
 }
-function compute(){
-  const mods = collectMods();
-  const modTotal = {};
-  MOD_TARGETS.forEach(s => modTotal[s.id] = (mods[s.id]||[]).reduce((a,b)=>a+b.val,0));
-
-  const attrFinal = {};
-  ATTR_LIST.forEach(a => attrFinal[a.id] = num(S.attrs[a.id]) + modTotal[a.id]);
-
-  const ctx = {
-    ...attrFinal,
-    nivel:num(S.meta.nivel), job:jobBudget().total,
-    sobrecarga:0,
-    floor:Math.floor, ceil:Math.ceil, round:Math.round,
-    min:Math.min, max:Math.max, abs:Math.abs
-  };
-  STAT_LIST.forEach(s => ctx[s.id] = 0);
-
-  const pesoEquipado = S.inventario.filter(i=>i.equipado).reduce((a,i)=>a+num(i.peso),0);
-
-  const base = {};
-  for(let pass=0; pass<4; pass++){
-    ctx.sobrecarga = Math.max(0, pesoEquipado - (ctx.crgmax||0));
-    STAT_LIST.forEach(s => {
-      const v = evalFormula(S.formulas[s.id], ctx);
-      base[s.id] = Number.isNaN(v) ? NaN : v;
-      ctx[s.id] = (Number.isNaN(v) ? 0 : v) + modTotal[s.id];
-    });
-  }
-
-  const final = {};
-  STAT_LIST.forEach(s => final[s.id] = Number.isNaN(base[s.id]) ? NaN : base[s.id] + modTotal[s.id]);
-  ATTR_LIST.forEach(a => { base[a.id] = num(S.attrs[a.id]); final[a.id] = attrFinal[a.id]; });
-
-  // Efectos activos que fuerzan/alteran un stat más allá de un modificador sumable.
-  const efectosActivos = (S.efectos || []).filter(e => e.activo !== false);
-  // No2 máximo con Cansado, Hypeado, Exhausto y Stun/forzados (topes): regla común de personajes, invocaciones y creeps.
-  final.nitros = Combatiente.nitrosMax(final.nitros, efectosActivos);
-  // Pajaritos y Lisiado ya no achican el stat: parten el RESULTADO de la tirada (ver mitadesDeTirada / tirarValorStat).
-  // Inmovilizado y Rengo ya no tocan un stat: Movimiento se fundió en
-  // Nitros, así que actúan al moverse (ver costoMoverCasillero).
-  // Armadura arruinada se sacó (2026-09-21, repaso de debuffs): lo que la aplicaba pasó a sumar stacks de Armadura rota.
-
-  return {base, mods, modTotal, final, pesoEquipado, sobrecarga:ctx.sobrecarga};
-}
+// Los stats finales del personaje (base + equipo + pasivas + estados, fórmulas, No2 máximo): el cálculo vive en
+// comun/ficha-calculo.js (paso 5, nivel B, área 1) y recibe la ficha; acá se le pasa la abierta.
+function compute(){ return FichaCalculo.calcular(S); }
 
 // Ranuras para consumibles del cinturón: la base la pone el jugador a mano
 // (S.caps.cinturon, como siempre), y el cinturón equipado la puede ampliar

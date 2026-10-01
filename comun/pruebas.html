@@ -41,6 +41,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
 <script src="combatiente.js"></script>
+<script src="ficha-calculo.js"></script>
 <script src="estados-presets.js"></script>
 <script src="estados-aplicar.js"></script>
 <script src="modificadores-tirada.js"></script>
@@ -355,6 +356,37 @@ prueba('⚡ Flash: vale para esa tirada; en la defensa, según Evasión o Parry'
   const c = {modo: 'flash', flash: {en: ['parry', 'dano'], bono: 2}};
   igual([Combatiente.flashPara(c, 'eva'), Combatiente.flashPara(c, 'eva', 'parry'), Combatiente.flashPara(c, 'eva', 'evasion'), Combatiente.flashPara(c, 'dano'), Combatiente.flashPara(c, 'pdg'), Combatiente.flashPara({modo: 'hab'}, 'pdg')],
     [true, true, false, true, false, false]);
+});
+
+/* ---------- El cálculo de la ficha (comun/ficha-calculo.js, paso 5 nivel B) ---------- */
+grupo('Cálculo de la ficha (paso 5)');
+const fichaDePrueba = extra => Object.assign({meta: {nivel: 2}, attrs: {con: 4, fue: 3, agl: 5, des: 6, esp: 2},
+  formulas: {pdg: 'des', eva: 'agl', hpmax: 'con*5', crgmax: 'fue*2', nitros: 'agl', def: '0', sp: 'esp*3', bloqueo: 'fue'},
+  inventario: [], pasivas: [], efectos: []}, extra || {});
+prueba('stats con fórmulas y atributos', () => {
+  const c = FichaCalculo.calcular(fichaDePrueba());
+  igual([c.final.pdg, c.final.eva, c.final.hpmax, c.final.nitros, c.final.sp, c.final.con], [6, 5, 20, 5, 6, 4]);
+});
+prueba('bonos: equipo puesto, pasiva × compras, estado × stacks; lo inactivo y lo guardado no cuentan', () => {
+  const c = FichaCalculo.calcular(fichaDePrueba({
+    inventario: [{id: 'a', nombre: 'Espada', tipoItem: 'arma_1m', equipado: true, peso: 2, mods: [{stat: 'pdg', val: 1}]}, {id: 'b', nombre: 'Guardada', tipoItem: 'arma_1m', equipado: false, mods: [{stat: 'pdg', val: 5}]}],
+    pasivas: [{nombre: 'Ojo', compras: 2, mods: [{stat: 'pdg', val: 1}]}],
+    efectos: [{nombre: 'Furia', activo: true, stacks: 3, mods: [{stat: 'pdg', val: 1}]}, {nombre: 'Pausado', activo: false, mods: [{stat: 'pdg', val: 9}]}]}));
+  igual([c.final.pdg, c.modTotal.pdg, c.mods.pdg.map(m => m.origen)], [12, 6, ['Espada', 'Ojo ×2', 'Furia ×3']]);
+});
+prueba('un ítem roto no da bonos; la armadura rota baja la Defensa de su pieza (sin pasar de lo que da)', () => {
+  const c = FichaCalculo.calcular(fichaDePrueba({inventario: [
+    {id: 'r', nombre: 'Rota', tipoItem: 'arma_1m', equipado: true, peso: 1, dur: 0, mods: [{stat: 'pdg', val: 3}]},
+    {id: 'p', nombre: 'Peto', tipoItem: 'armadura_rigida', equipado: true, peso: 3, armRota: 5, mods: [{stat: 'def', val: 2}]}]}));
+  igual([c.final.pdg, c.final.def], [6, 0]);
+});
+prueba('sobrecarga: peso equipado por encima de la Carga máxima', () => {
+  const c = FichaCalculo.calcular(fichaDePrueba({formulas: {crgmax: 'fue*2', eva: 'agl-sobrecarga'}, inventario: [{id: 'x', nombre: 'Yunque', tipoItem: 'otros', equipado: true, peso: 9, mods: []}]}));
+  igual([c.pesoEquipado, c.sobrecarga, c.final.eva], [9, 3, 2]);
+});
+prueba('No2 máximo con un tope forzado (regla común) y Job por nivel', () => {
+  const c = FichaCalculo.calcular(fichaDePrueba({efectos: [{nombre: 'Stun', activo: true, forzarNitros: 2}]}));
+  igual([c.final.nitros, FichaCalculo.jobTotal(1), FichaCalculo.jobTotal('4'), FichaCalculo.pasivaCompras({compras: '3'}), FichaCalculo.slotDe('escudo_1m')], [2, 3, 12, 3, 'escudo']);
 });
 
 /* ---------- Plantillas (comun/plantillas.js) ---------- */

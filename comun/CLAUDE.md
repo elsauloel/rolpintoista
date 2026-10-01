@@ -843,6 +843,14 @@ versión parecida en más de una, es candidato a juntar.
   dentro del mapa el cartel (`#ct-fondo`) cuenta como ventana abierta para que se muestre la página que lo abrió. En la ficha,
   `pagarFlash`/`usarFlashFueraDelDuelo`; en GM Tools, `pagarFlashCreep`/`usarFlashFueraDelDueloCreep`. Lo usan `habDueloDatos`/`modoHab`/`costoNitrosHab` de la ficha, `habDueloInv`/`invEjecutarHab`
   de las invocaciones y `habEjecucionCreep`/`aplicarHabCreepSobreSi`/`modoHabCreep` de GM Tools.
+- **`ficha-calculo.js`** (`FichaCalculo`, 2026-09-30, paso 5 nivel B área 1, `../docs/plan-paso5.md`) — **el cálculo de un
+  personaje, fuera de la ficha**: la lista de atributos y stats (`GRUPOS`, `EXTRA`, `STAT_LIST`, `ATTR_LIST`, `MOD_TARGETS`,
+  `STAT_LABEL`, `STAT_FULL`), las ranuras (`slotDe`), la durabilidad de los ítems (`durableItem`, `itemRoto`, `armRotaDe`…),
+  `pasivaCompras`, `jobTotal(nivel)`, los bonos con su origen (`modsDe(S)`) y los stats finales (`calcular(S)`, el viejo
+  `compute()`: base + equipo + pasivas + estados, fórmulas de la ficha, No2 máximo). Recibe la ficha (`S`) en vez de leerla
+  de una variable global, así que lo puede usar cualquier pantalla que tenga los datos de un personaje. La ficha usa los mismos
+  nombres de siempre como alias (`compute()` = `FichaCalculo.calcular(S)`). Comparado contra el cálculo viejo en 1 500 fichas
+  al azar: igual. Ojo: las fórmulas de stats de cada ficha se evalúan como código (`evalFormula`), igual que siempre.
 - **`embebido.js`** (`Embebido`, 2026-09-30, paso 4 etapa 1, `../docs/plan-paso4.md`) — **una herramienta dentro del mapa**
   (la ficha con `?modo=botonera`, GM Tools con `?modo=acciones|finalizar|botin`). `Embebido.iniciar({clase, pagina,
   noCuenta})`: esconde SOLO la página de la herramienta (`pagina`) y las piezas comunes que el mapa ya muestra (`COMUNES`:

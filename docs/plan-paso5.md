@@ -66,3 +66,11 @@ etapa 3 del paso 4 (el mapa dibuja la Botonera) es armar la pantalla con esas pi
   pantalla (salvo el color al azar del creep vacío del arranque), mismos estilos, modos `acciones` y `finalizar` sin errores,
   ataque con arreglos y Flash con los mismos números. **Nivel A terminado**; sigue el nivel B (separar la lógica de juego de
   la pantalla, por áreas), con su propio plan por área.
+- 2026-09-30: **nivel B, área 1 hecha — el cálculo de la ficha** (`comun/ficha-calculo.js`, `FichaCalculo`). Sin preguntas
+  de diseño (no cambia ninguna regla, solo de lugar). Se mudaron, copiados tal cual: la lista de atributos y stats, las
+  ranuras, la durabilidad, las compras de pasivas, el total de Job, `collectMods` (→ `modsDe(S)`), `evalFormula` y `compute`
+  (→ `calcular(S)`). La ficha conserva los mismos nombres como alias. Comparado contra el cálculo viejo en 1 500 fichas al
+  azar (equipo del catálogo, ítems rotos y con armadura rota, pasivas compradas varias veces, estados con stacks, niveles y
+  fórmulas cambiadas a mano): igual. Pruebas: 103. **Para tener en cuenta en la etapa 3**: las fórmulas de stats de cada
+  ficha se evalúan como código; hoy ya pasa al abrir una ficha ajena, y va a pasar en el mapa — anotar en "Antes de abrirlo
+  al público". Sigue el área 2 (combate).

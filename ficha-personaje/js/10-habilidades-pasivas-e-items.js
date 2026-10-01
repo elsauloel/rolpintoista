@@ -201,7 +201,7 @@ $('#hab-clase-body').addEventListener('click', e => {
    multiplican. Tope por pasiva: mitad del nivel, redondeada hacia abajo (mínimo 1).
    Efectos automatizados: mods (bonos a stats) y regenHp (Mantenimiento).
    Las creadas de cero se pueden mandar como propuesta con "📚 Proponer". */
-const pasivaCompras = x => Math.max(1, Math.floor(num(x && x.compras)) || 1);
+const pasivaCompras = FichaCalculo.pasivaCompras;   // comun/ficha-calculo.js
 const PASIVA_TOPE = () => Math.max(1, Math.floor(Math.max(1, num(S.meta.nivel) || 1) / 2));
 const claveDePasiva = d => d.poolId || ('p-' + normClase(d.nombre));
 

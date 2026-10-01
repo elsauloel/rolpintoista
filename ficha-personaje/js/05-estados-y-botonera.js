@@ -494,8 +494,7 @@ function renderBotoneraSiAbierta(){
 }
 
 function jobBudget(){
-  const nivel = Math.max(1, num(S.meta.nivel) || 1);
-  const total = 3 + 3 * (nivel - 1);
+  const total = FichaCalculo.jobTotal(S.meta.nivel);   // 3 al nivel 1 y 3 más por nivel (comun/ficha-calculo.js)
   const gastado = [...S.habilidades, ...S.pasivas].reduce((a, x) => a + jobCostoDe(x), 0);
   return {total, gastado, resto: total - gastado};
 }

@@ -60,9 +60,17 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 const resultados = [];
 let seccion = '';
 function grupo(nombre){ seccion = nombre; }
+// Una prueba puede devolver una promesa (async): el resultado se anota cuando termina y el resumen la espera.
+const pendientes = [];
 function prueba(nombre, fn){
-  try{ fn(); resultados.push({seccion, nombre, ok: true}); }
-  catch(e){ resultados.push({seccion, nombre, ok: false, det: e.message}); }
+  const sec = seccion, fila = {seccion: sec, nombre, ok: false, det: 'no terminó'};
+  resultados.push(fila);
+  const bien = () => { fila.ok = true; delete fila.det; }, mal = e => { fila.ok = false; fila.det = e && e.message || String(e); };
+  try{
+    const r = fn();
+    if(r && typeof r.then === 'function') pendientes.push(r.then(bien, mal));
+    else bien();
+  }catch(e){ mal(e); }
 }
 const js = v => JSON.stringify(v);
 function igual(real, esperado, que){
@@ -603,6 +611,33 @@ prueba('sin No2 avisa y no hace nada; "Realizar de cualquier modo" lo hace igual
   igual([antes, S.nitros, S.efectos.length], [[1, 'sin No2: levantarte'], 0, 0]);
 });
 
+grupo('Consumir');
+const uiConsumo = (S, reg, trampaOk) => ({...uiPrueba(reg), fijarHp: v => FichaAcciones.fijarHp(S, v), efecto: it => FichaAcciones.efectoDeConsumo(S, it, estadosPresetFicha(), t => reg.push(t)),
+  tirarExtra: it => reg.push('tira ' + it.nombre), colocarTrampa: async () => trampaOk});
+prueba('una poción de la mochila cura sin pasar del máximo, cobra 2 No2 y se gasta la unidad', async () => {
+  const S = fichaBotonera({hp: 1, nitros: 3, inventario: [{id: 'p', nombre: 'Poción', consumible: true, unidades: 1, curahp: 99}]}), reg = [];
+  await FichaAcciones.consumir(S, 'p', false, uiConsumo(S, reg));
+  igual([S.hp, S.nitros, S.inventario.length], [FichaCalculo.calcular(S).final.hpmax, 3 - FichaBotonera.costoConsumirNitros('inventario'), 0]);
+});
+prueba('con cargas, gasta una carga antes que la unidad', async () => {
+  const S = fichaBotonera({nitros: 5, cinturon: [{id: 'c', nombre: 'Frasco', consumible: true, unidades: 2, cargaMax: 3, cargaActual: 3}]}), reg = [];
+  await FichaAcciones.consumir(S, 'c', false, uiConsumo(S, reg));
+  igual([S.cinturon[0].unidades, S.cinturon[0].cargaActual], [2, 2]);
+});
+prueba('una trampa consumible que no se pudo colocar no se gasta ni cobra', async () => {
+  const S = fichaBotonera({nitros: 5, inventario: [{id: 't', nombre: 'Trampa', consumible: true, unidades: 1, trampaDatos: {nombre: 'Púas'}}]}), reg = [];
+  await FichaAcciones.consumir(S, 't', false, uiConsumo(S, reg, false));
+  igual([S.nitros, S.inventario.length], [5, 1]);
+});
+prueba('curar a quien estaba inconsciente lo despierta; quedar en 0 lo desmaya (y el Ankh del cinturón lo revive)', () => {
+  const S = fichaBotonera({hp: 0, muerto: {activo: true, turnos: 2, definitivo: false}});
+  FichaAcciones.fijarHp(S, 5); const despierto = FichaAcciones.revisarMuerte(S);
+  FichaAcciones.fijarHp(S, 0); const cae = FichaAcciones.revisarMuerte(S);
+  const T = fichaBotonera({hp: 0, cinturon: [{id: 'a', nombre: 'Ankh de Reencarnación', consumible: true, unidades: 1}]});
+  const ankh = FichaAcciones.revisarAnkh(T);
+  igual([despierto, cae, S.muerto.turnos, ankh, T.hp > 0, T.cinturon.length], [{vivo: true, revivio: true}, {vivo: false, cayo: true}, 5, 'Ankh de Reencarnación', true, 0]);
+});
+
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */
 grupo('Mis últimas tiradas (P138)');
 prueba('se juntan las de la Mesa con las de esta ventana, sin repetir, las últimas primero', () => {
@@ -648,6 +683,7 @@ prueba('la marca ⚠️ no impide encontrar un ítem por nombre', () => {
 });
 
 /* ---------- Resultado ---------- */
+Promise.all(pendientes).then(() => {
 const malas = resultados.filter(r => !r.ok);
 const res = document.getElementById('resumen');
 res.textContent = malas.length ? `✘ ${malas.length} de ${resultados.length} pruebas fallaron` : `✔ Las ${resultados.length} pruebas pasaron`;
@@ -659,6 +695,7 @@ resultados.forEach(r => {
 });
 document.getElementById('lista').innerHTML = html;
 window.PRUEBAS = {total: resultados.length, fallas: malas.map(r => `${r.seccion} · ${r.nombre}: ${r.det}`)};
+});
 </script>
 </body>
 </html>

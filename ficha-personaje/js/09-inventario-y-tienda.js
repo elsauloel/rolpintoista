@@ -655,14 +655,7 @@ const STACK_MAX = 5;
 // Las trampas consumibles (`pilaInfinita`) se apilan sin límite: una sola ranura de la mochila para todas las iguales (pedido del dueño, 2026-09-25).
 const stackMaxDe = it => (it && it.pilaInfinita) ? Infinity : STACK_MAX;
 
-function purgarSiAgotado(key, id){
-  const it = S[key].find(x=>x.id===id);
-  if(it && it.consumible && num(it.unidades) <= 0){
-    S[key] = S[key].filter(x=>x.id!==id);
-    return true;
-  }
-  return false;
-}
+function purgarSiAgotado(key, id){ return FichaAcciones.purgarSiAgotado(S, key, id); }   // comun/ficha-acciones.js
 
 function agregarConsumibleAInventario(itemBase, cantidad){
   let restante = num(cantidad);

@@ -9122,11 +9122,14 @@ function abrirBotoneraPrincipal(){
    toca como siempre; lo que abra (elegir arma, costo X, Ver, un cartel) sale encima, en la capa de siempre. Las 🔍 todavía
    no están (la lupa vive en la ficha: etapa 3c). Las piezas se cargan recién al usarla: para los jugadores no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001b', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001a'];
+const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001b',
+  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001b'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
 var bnCss = '';
 var bnCargando = null;
+var bnItemsSubidos = [];
+const bnMezclarCatalogo = lista => ItemsSubidos.mezclar(lista, bnItemsSubidos, FichaGuardado.DEFAULT.catalogo);
 const bnActiva = () => { try{ return soyGM && localStorage.getItem(BN_CLAVE) === '1'; }catch(e){ return false; } };
 function bnPintarInterruptor(){
   const b = $('#btn-botonera-nueva');
@@ -9151,6 +9154,8 @@ function bnCargarPiezas(){
       const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => mal(new Error('No se pudo cargar ' + src));
       document.head.appendChild(s);
     })), Promise.resolve())
+      // Lo que subió el grupo al catálogo (como la ficha): un consumible viejo busca ahí el estado que deja.
+      .then(() => ItemsSubidos.cargar().then(l => { bnItemsSubidos = l || []; }))
       .then(() => fetch('../ficha-personaje/ficha.css?v=20260930a').then(r => r.text()))
       .then(css => { bnCss = css.replace(/:root\b/g, ':host'); })
       .catch(err => { bnCargando = null; throw err; });
@@ -9250,6 +9255,7 @@ function bnUi(antes){
     toast: t => toast(t),
     avisarSinNitros: (costo, accion, continuar) => bnSinNitros(costo, accion, continuar),
     cambio: () => {
+      bnRevisarVida();
       const despues = FichaGuardado.partes(bn.S);
       Object.keys(despues).forEach(p => { if(despues[p] === antes[p] && despues[p] !== f.ultimo[p]) f.ultimo[p] = despues[p]; });
       f.soloLectura = !bnPuedeGuardar();
@@ -9258,11 +9264,35 @@ function bnUi(antes){
     },
   };
 }
-const BN_ACCIONES = {sigilo: (S, ui) => FichaAcciones.alternarSigilo(S, false, ui), levantarse: (S, ui) => FichaAcciones.levantarse(S, false, ui)};
+// Lo que la ficha revisa cada vez que redibuja la vida (renderVitals): el Ankh del cinturón con HP 0 y el estado de muerte. El
+// mapa lo muestra solo, leyendo el resumen (actualizarMuerteMapa).
+function bnRevisarVida(){
+  const ankh = FichaAcciones.revisarAnkh(bn.S);
+  if(ankh) toast(`¡${ankh} se activó solo! Revivís con ${fmt(bn.S.hp)} HP.`);
+  FichaAcciones.revisarMuerte(bn.S);
+}
+// Una tirada del personaje armada acá, a la Mesa a su nombre y con su `ficha` (P138).
+function bnPublicar(origen, r){ mesaPublicar(origen, {...r, quien: ((bn.S.meta && bn.S.meta.nombre) || '').trim(), ficha: bn.fichaId}); }
+const BN_ACCIONES = {
+  sigilo: (S, ui) => FichaAcciones.alternarSigilo(S, false, ui),
+  levantarse: (S, ui) => FichaAcciones.levantarse(S, false, ui),
+  // Consumir: la vida, el estado que deja y sus tiradas los resuelve el mapa con las piezas comunes.
+  consumir: (S, ui, id) => FichaAcciones.consumir(S, id, false, {...ui,
+    fijarHp: v => FichaAcciones.fijarHp(S, v),
+    efecto: it => FichaAcciones.efectoDeConsumo(S, it, ui.presets, t => toast(t)),
+    tirarExtra: it => FichaAcciones.tiradasDeItem(S, it).forEach(t => { if(t.error) toast(t.error); else bnPublicar(t.origen, t.r); }),
+    colocarTrampa: async () => false,   // no llega: las trampas consumibles las sigue haciendo la ficha (bnAccionAca)
+  }),
+};
 function bnAccionAca(b){
-  const accion = b.dataset.sigilo ? 'sigilo' : b.dataset.levantarse ? 'levantarse' : '';
+  let accion = b.dataset.sigilo ? 'sigilo' : b.dataset.levantarse ? 'levantarse' : b.dataset.consume ? 'consumir' : '';
+  if(accion === 'consumir'){
+    // Una trampa consumible se coloca junto al token con el código de la ficha: por ahora se le sigue pidiendo a ella.
+    const it = [...(bn.S.inventario || []), ...(bn.S.cinturon || [])].find(x => x.id === b.dataset.consume);
+    if(!it || it.trampaDatos) accion = '';
+  }
   if(!accion || !bnPuedeGuardar()) return false;
-  BN_ACCIONES[accion](bn.S, bnUi(FichaGuardado.partes(bn.S)));
+  BN_ACCIONES[accion](bn.S, bnUi(FichaGuardado.partes(bn.S)), b.dataset.consume);
   return true;
 }
 // El cartel de "No te alcanzan los Nitros" (el mismo de la ficha), adentro del recuadro.
@@ -9326,7 +9356,7 @@ async function abrirBotoneraNueva(fichaId){
         f.duenoUid = bn.doc.duenoUid;
       },
       alCargar: armado => {
-        const S = FichaGuardado.normalizar(armado.datos).S;
+        const S = FichaGuardado.normalizar(armado.datos, {mezclarCatalogo: bnMezclarCatalogo}).S;
         FichaGuardado.ponerImagenesInvocaciones(S, armado.imgInvocaciones);
         FichaGuardado.completar(S);
         bn.S = S;
@@ -9334,7 +9364,7 @@ async function abrirBotoneraNueva(fichaId){
         bnDibujar();
       },
       alControl: c => { f.control = c; },
-      aplicarParte: (parte, datos) => FichaGuardado.aplicarParte(bn.S, parte, datos, {imgInvocaciones: f.ultimo.imgInvocaciones || ''}),
+      aplicarParte: (parte, datos) => FichaGuardado.aplicarParte(bn.S, parte, datos, {mezclarCatalogo: bnMezclarCatalogo, imgInvocaciones: f.ultimo.imgInvocaciones || ''}),
       alCambiar: () => { FichaGuardado.completar(bn.S); bnDibujar(); },
       alErrorPartes: () => toast('No se pudo leer el personaje para la Botonera nueva'),
     });

@@ -602,72 +602,7 @@ document.addEventListener('click', async e => {
     toast(`${nombre} activado a mano. Revivís con ${fmt(S.hp)} HP.`);
     return;
   }
-  if(b.dataset.consume){
-    const id = b.dataset.consume;
-    { const enM = S.inventario.find(x => x.id === id); if(enM && enM.enMesa){ toast('Está ofrecido en la mesa común: retiralo primero'); return; } }
-    let it = S.inventario.find(x=>x.id===id);
-    let key = 'inventario';
-    if(!it){ it = S.cinturon.find(x=>x.id===id); key = 'cinturon'; }
-    if(it && num(it.unidades) > 0){
-      const costoNitros = costoConsumirNitros(key);
-      let gastoNitros = costoNitros;
-      if(costoNitros > num(S.nitros)){
-        if(!b.dataset.sinnitros){
-          avisarSinNitros(costoNitros, `consumir ${it.nombre} ${key === 'cinturon' ? 'del cinturón' : 'de la mochila'}`, () => { b.dataset.sinnitros = '1'; b.click(); delete b.dataset.sinnitros; });
-          return;
-        }
-        gastoNitros = gastoNitrosForzado(costoNitros, `consumió ${it.nombre}`);
-      }
-      // Trampa consumible (2026-09-25): al usarla se coloca sola junto a tu token; si no se puede, no se gasta.
-      if(it.trampaDatos){
-        if(consumiendoTrampa.has(id)) return;
-        consumiendoTrampa.add(id);
-        let ok = false;
-        try{ ok = await colocarTrampaDeItem(it); }finally{ consumiendoTrampa.delete(id); }
-        if(!ok) return;
-      }
-      S.nitros = num(S.nitros) - gastoNitros;
-
-      const cargaMax = Math.max(1, num(it.cargaMax) || 1);
-      let carga = num(it.cargaActual ?? cargaMax);
-      if(carga <= 0) carga = cargaMax;
-      carga -= 1;
-      let gastoUnidad = false;
-      if(carga <= 0){
-        it.unidades = num(it.unidades) - 1;
-        carga = cargaMax;
-        gastoUnidad = true;
-      }
-      it.cargaActual = carga;
-      purgarSiAgotado(key, id);
-
-      // Solo se toca el HP si el ítem efectivamente cura o daña: si no,
-      // el clamp contra hpmax lo bajaría igual (con la ficha recién
-      // abierta hpmax es 0 y eso mataba al personaje de una).
-      if(num(it.curahp)){
-        const c = compute();
-        const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
-        fijarHp(num(S.hp) + num(it.curahp));
-      }
-      const efecto = aplicarEfectoDeConsumo(it);
-  tirarExtraDeItem(it);
-      const spRestaurado = restaurarSpDeConsumo(it);
-      const reparados = it.nombre === 'Oleo reparador' ? repararArmadura() : 0;
-      if(key === 'inventario') renderInventario(); else renderList('cinturon');
-      if(efecto || reparados) renderList('efectos');
-      renderVitals();
-      renderNitros();
-      const partes = [];
-      if(it.curahp) partes.push(`${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp))} HP`);
-      if(spRestaurado) partes.push(`+${fmt(spRestaurado)} SP`);
-      partes.push(`-${costoNitros} No2`);
-      if(cargaMax > 1) partes.push(gastoUnidad ? 'última carga usada' : `carga ${carga}/${cargaMax}`);
-      if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
-      if(reparados) partes.push(reparados > 1 ? 'armadura reparada por completo' : 'armadura reparada');
-      toast(`${it.nombre}: ${partes.join(' · ')}`);
-    }
-    return;
-  }
+  if(b.dataset.consume){ FichaAcciones.consumir(S, b.dataset.consume, false, consumoUi); return; }   // comun/ficha-acciones.js
 });
 
 function cargarArchivoLocal(){

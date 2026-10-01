@@ -377,16 +377,12 @@ function computeSlots(){
 // máximo (mínimo 1, para no reventar todos los Ankh de un saque si el HP
 // máximo es muy bajo). No toca S.muerto — eso lo resuelve revisarMuerte()
 // en el siguiente renderVitals().
+// La vida (Ankh, HP, estado de muerte): lo que cambia en el personaje está en comun/ficha-acciones.js; acá, lo que se ve.
 function aplicarRevivirConAnkh(key, id){
-  const it = S[key].find(x => x.id === id);
-  if(!it) return null;
-  it.unidades = num(it.unidades) - 1;
-  purgarSiAgotado(key, it.id);
-  const cc = compute();
-  const hpmaxAnkh = Number.isNaN(cc.final.hpmax) ? 0 : cc.final.hpmax;
-  S.hp = Math.max(1, Math.floor(hpmaxAnkh * 0.25));
+  const nombre = FichaAcciones.aplicarRevivirConAnkh(S, key, id);
+  if(nombre === null) return null;
   $('#f-hp').value = S.hp;
-  return it.nombre;
+  return nombre;
 }
 
 /* Toda baja de HP pasa por acá. Antes cada camino asignaba S.hp por su
@@ -394,10 +390,7 @@ function aplicarRevivirConAnkh(key, id){
    por dentro había un pozo (-40, por ejemplo), así que curar +5 dejaba -35
    y el jugador seguía muerto sin entender por qué. El HP nunca baja de 0. */
 function fijarHp(valor){
-  const c = compute();
-  const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
-  const tope = hpmax > 0 ? hpmax : Math.max(0, num(valor));
-  S.hp = Math.max(0, Math.min(tope, num(valor)));
+  FichaAcciones.fijarHp(S, valor);
   const campo = $('#f-hp');
   if(campo) campo.value = fmt(S.hp);
   renderVitals();   // acá adentro se revisa el Ankh y el estado de muerte
@@ -409,29 +402,20 @@ function fijarHp(valor){
 // NO se activa solo — hay un botón de Consumir aparte para activarlo a
 // mano (pensado para el caso de un aliado a distancia cero).
 function revisarAnkh(){
-  if(num(S.hp) > 0) return;
-  if(S.muerto && S.muerto.definitivo) return; // muerte definitiva: ya no hay vuelta atrás
-  const idx = S.cinturon.findIndex(i => i.nombre === 'Ankh de Reencarnación' && num(i.unidades) > 0);
-  if(idx < 0) return;
-  const nombre = aplicarRevivirConAnkh('cinturon', S.cinturon[idx].id);
+  const nombre = FichaAcciones.revisarAnkh(S);
+  if(!nombre) return;
+  $('#f-hp').value = S.hp;
   renderList('cinturon');
   toast(`¡${nombre} se activó solo! Revivís con ${fmt(S.hp)} HP.`);
 }
 
 function revisarMuerte(){
-  if(!S.muerto) S.muerto = {activo:false, turnos:5, definitivo:false};
-  if(num(S.hp) > 0){
-    if(S.muerto.activo){
-      S.muerto = {activo:false, turnos:5, definitivo:false};
-      $('#overlay-muerte').classList.remove('open');
-    }
+  const r = FichaAcciones.revisarMuerte(S);
+  if(r.vivo){
+    if(r.revivio) $('#overlay-muerte').classList.remove('open');
     return;
   }
-  if(!S.muerto.activo && !S.muerto.definitivo){
-    S.muerto.activo = true;
-    S.muerto.turnos = 5;
-    $('#scrim-muerte').classList.add('open');
-  }
+  if(r.cayo) $('#scrim-muerte').classList.add('open');
   renderOverlayMuerte();
 }
 
@@ -559,11 +543,7 @@ function configEfectoDe(it){ return FichaHabilidades.configEfectoDe(S, it); }
 function estaBloqueadoElDebuff(objEfecto){ return FichaHabilidades.estaBloqueadoElDebuff(S, objEfecto); }
 
 // Oleo reparador: quita Armadura rota si está activa (es permanente, no vence sola). Devuelve cuántas se quitaron.
-function repararArmadura(){
-  const antes = S.efectos.length;
-  S.efectos = S.efectos.filter(e => e.nombre !== 'Armadura rota');
-  return antes - S.efectos.length;
-}
+function repararArmadura(){ return FichaAcciones.repararArmadura(S); }   // comun/ficha-acciones.js
 
 /* ---------- Sigilo: entrar y salir con un botón (Botonera) ----------
    Quien tiene la habilidad "Sigilo" ve en la Botonera un botón directo, sin
@@ -586,17 +566,27 @@ function alternarSigilo(forzar){ FichaAcciones.alternarSigilo(S, forzar, accione
    El estado Sentado no vence solo; el botón "Levantarse" de la Botonera lo saca y cobra IT2.nitrosLevantarse. */
 const efectoSentado = () => FichaBotonera.efectoSentado(S);   // comun/ficha-botonera.js
 function levantarse(forzar){ FichaAcciones.levantarse(S, forzar, accionesUi); }
+// Consumir (comun/ficha-acciones.js): la vida, el estado, las tiradas y la trampa los pone la ficha; redibuja lo que cambió.
+const consumoUi = {
+  toast: t => toast(t),
+  avisarSinNitros: (costo, accion, continuar) => avisarSinNitros(costo, accion, continuar),
+  fijarHp: v => fijarHp(v),
+  efecto: it => aplicarEfectoDeConsumo(it),
+  tirarExtra: it => tirarExtraDeItem(it),
+  colocarTrampa: it => colocarTrampaDeItem(it),
+  cambio: lista => {
+    if(lista.includes('inventario')) renderInventario(); else renderList('cinturon');
+    if(lista.includes('efectos')) renderList('efectos');
+    renderVitals();
+    renderNitros();
+  },
+};
 
 // El "estado del sistema anterior" que una habilidad o un ítem pone al ejecutarse/consumirse (nombre, turnos, HP por
 // turno, escudo, stacks, mods): la regla vive en comun/ficha-habilidades.js (paso 5, nivel B, área 3), con el
 // comentario largo original sobre el catálogo que manda y por qué. Acá solo el toast si quedó bloqueado por una
 // inmunidad (Invulnerable, Sangre pura…) y devolver lo mismo que antes: el estado armado, o null.
-function aplicarEfectoDeConsumo(it){
-  const r = FichaHabilidades.aplicarEfectoDeConsumo(S, it, EFECTOS_PRESET);
-  if(!r) return null;
-  if(!r.ok){ toast(`Inmune ahora mismo${r.motivo === 'inmune' ? '' : ` (${r.motivo})`} — ${r.nombre} no hizo efecto`); return null; }
-  return r.estado;
-}
+function aplicarEfectoDeConsumo(it){ return FichaAcciones.efectoDeConsumo(S, it, EFECTOS_PRESET, toast); }   // comun/ficha-acciones.js
 
 // Tira la fórmula custom configurada en el ítem/habilidad (si tiene) y
 // la publica en la Mesa, igual que un ataque o un chequeo manual.
@@ -806,13 +796,7 @@ function tirarSegundaDeHab(id){
 }
 const botonSegundaHab = it => FichaBotonera.botonSegundaHab(it);   // comun/ficha-botonera.js
 
-function restaurarSpDeConsumo(it){
-  const pct = num(it.curaspPct);
-  if(pct <= 0) return 0;
-  const restaurar = Math.ceil(spMaximo() * Math.min(pct, 100) / 100);
-  S.spGastado = Math.max(0, num(S.spGastado) - restaurar);
-  return restaurar;
-}
+function restaurarSpDeConsumo(it){ return FichaAcciones.restaurarSpDeConsumo(S, it); }   // comun/ficha-acciones.js
 
 // Nitros que cuesta consumir un ítem según de dónde sale.
 /* ---------- Moneda Re-Roll (2026-09-27, regla del dueño; docs/reroll.md) ----------

@@ -1114,7 +1114,8 @@ segunda tirada las hace el mapa, y desde el 5b también las ✨ automáticas (`b
 "Ver"** (`comun/ficha-lupa.js`): `lupaContenido` (global del mapa, para el personaje de la Botonera nueva; `lupa.js` y
 `ficha-lupa.js` van en `BN_PIEZAS`, y los estilos del 🔍 se copian al recuadro), el Ver adentro del recuadro (`#bn-ver`,
 `bnVer`/`bnVerAccion`: Eliminar lo hace el mapa; Editar manda `editar-en-ficha` a la ficha escondida con `bnAlMarco`), y Esc
-cierra primero el cartel abierto del recuadro. Siguen delegados: tirar un talento, las trampas consumibles y el Ankh manual.
+cierra primero el cartel abierto del recuadro. Desde el paso 7, también tirar un talento, las trampas consumibles y el Ankh
+manual (`bnAccionAca`): **la Botonera nueva ya no delega ningún botón**; solo el Editar del Ver va a la ficha escondida.
 **Ojo con el recuadro aislado**: en un listener del recuadro (`bn.host`), `e.target` es siempre el recuadro aunque el clic sea
 adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo cierra", que antes cerraba con cualquier clic).
 

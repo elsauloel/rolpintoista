@@ -2,7 +2,7 @@
 
 > Parte de [`plan-paso4.md`](plan-paso4.md) y de [`plan-consolidacion.md`](plan-consolidacion.md). Escrito el 2026-10-01,
 > después de terminar el nivel B del paso 5 (áreas 1 a 4, ver [`plan-paso5.md`](plan-paso5.md)). **Estado: en curso** —
-> 3a y 3b hechas; 3c hasta el paso 6 hecha (ver "Para retomar" justo abajo y "Cómo va" al final). Preguntas del dueño:
+> 3a, 3b y 3c hechas; la 3d espera decisiones del dueño (ver "Para retomar" justo abajo y "Cómo va" al final). Preguntas del dueño:
 > contestadas.
 
 ## ▶ Para retomar (al cierre de la conversación del 2026-10-01, tarde)
@@ -18,11 +18,18 @@ segunda tirada)**, **5b (las ✨ automáticas: ataque con arreglos, habilidad di
 y **5c (las que colocan trampa, zona o portal)**: **la Botonera nueva ya hace todas las habilidades** sin pedirle nada al marco.
 Todo lo que hace vive en `comun/ficha-acciones.js` y `comun/ficha-duelo.js` (la ficha usa lo mismo con sus nombres de siempre).
 
-**Paso 6 hecho (2026-10-01)**: la 🔍 y el "Ver" (`comun/ficha-lupa.js`). Lo único que la Botonera nueva todavía le pide a
-la ficha escondida: **tirar un talento** (`data-tirarsocial`, `tirarSocial` en `js/05`), **las trampas consumibles**
-(`trampaDatos`, en `bnAccionAca`) y **el Ankh manual** (`data-consumirankh`) — y, a propósito, el **editor** (Editar del Ver,
-mensaje `editar-en-ficha`). **Lo próximo**: esos tres botones (paso 7, chico); recién ahí 3d (retirar el marco para los
-jugadores; decidir qué pasa con Editar: abrir la ficha en otra pestaña o mudar los editores).
+**La 3c está terminada (2026-10-01)**: con el paso 6 (la 🔍 y el "Ver", `comun/ficha-lupa.js`) y el 7 (talentos, trampas
+consumibles y Ankh a mano), **la Botonera nueva no le pide ningún botón a la ficha escondida**. Lo único que sigue yendo al
+marco, a propósito, es el **editor** (Editar del Ver, mensaje `editar-en-ficha`).
+
+**Lo próximo — 3d, y antes, decisiones del dueño** (no es código para hacer a ciegas: toca a los jugadores de verdad):
+1. **Probarla en una partida de verdad**: hoy solo la ve el GM con ⚗. Opciones: que el GM la use un rato con 🎮 el control de
+   un personaje en una sesión real, o abrir el interruptor ⚗ a los jugadores (opt-in, cada uno en su navegador).
+2. **Qué hace "Editar"** cuando el marco ya no se cargue para la Botonera: abrir la ficha en otra pestaña (simple) o mudar los
+   editores al mapa (grande).
+3. Recién con eso, 3d: la Botonera nueva pasa a ser la de todos. **El marco no desaparece**: lo siguen usando Equipo y mochila
+   (🛡), los Despojos, la Tienda, la Moneda Re-Roll fija, Revivir, la ficha liviana (F), la Botonera de las **invocaciones**, el
+   Mantenimiento en segundo plano y los ganchos del duelo de las invocaciones. Solo deja de cargarse para abrir la Botonera.
 
 **Dónde probar** (2026-10-01): con Chrome logueado como `elsaulo@gmail.com`, la partida **"Test con claude elsaulo"** (ahí esa
 cuenta es el GM, "S.Claude"); el jugador es "Sujeto de pruebas" con **Silvia Suller** (Cimitarra + Broquel de bronce, 20 HP,
@@ -86,7 +93,7 @@ botón, que hoy viven en la ficha:
 | Sigilo, Levantarse | estado + No2 | ✅ en el mapa (3c-2) |
 | 🔍 Lupa de cada botón | `lupaHtml` (cómo se calcula cada cosa) | ✅ en el mapa (paso 6, `comun/ficha-lupa.js`) |
 | Ver (habilidad, consumible, talento) | ventana de detalle de la ficha | ✅ en el mapa (paso 6); su "Editar" abre el editor de la ficha escondida |
-| Talentos, trampas consumibles, Ankh manual | `tirarSocial`, `consumir` con trampa, `consumirAnkh` | en la ficha (paso 7) |
+| Talentos, trampas consumibles, Ankh manual | `tirarSocial`, `consumir` con trampa, `consumirAnkh` | ✅ en el mapa (paso 7) |
 
 Y algo que no es un botón pero pesa: **cuando a un personaje lo atacan, el duelo le pide la tirada a su ficha** (el mapa la
 reenvía al marco). Mientras eso viva en la ficha, el marco tiene que seguir existiendo aunque la Botonera la dibuje el mapa.
@@ -125,7 +132,7 @@ Orden propuesto, de lo más simple a lo más complejo (ver pregunta 3):
 5. Habilidades (lo más grande): partido en 5a (manual, semi, costo X, arma, turno ajeno, Flash, segunda tirada ✅ 2026-10-01),
    5b (✨ automáticas con la Ejecución paso a paso ✅ 2026-10-01) y 5c (zonas, trampas y portal ✅ 2026-10-01).
 6. 🔍 Lupa y "Ver" ✅ (2026-10-01).
-7. Talentos, trampas consumibles y Ankh manual (lo último delegado).
+7. Talentos, trampas consumibles y Ankh manual (lo último delegado) ✅ (2026-10-01).
 
 ### 3d — Retirar el marco para los jugadores
 Con todo mudado y probado en una partida de verdad, la Botonera nueva pasa a ser la única; el marco queda solo para lo que
@@ -358,3 +365,15 @@ siga necesitándolo (ver pregunta 4). La ficha suelta (`ficha.html`) no cambia: 
   real del mouse adentro ya no la cierra; el Ver de una habilidad de prueba la mostró y Eliminar la borró (la ficha de la otra
   pestaña se enteró sola); Editar abrió "Editar habilidad" en la ficha escondida; Esc cerró primero el Ver y después la Botonera.
   Silvia quedó como estaba (sin la habilidad de prueba, todo lleno, sin el control); ⚗ apagado.
+- 2026-10-01: **3c, paso 7 hecho — lo último que se delegaba**. A `comun/ficha-acciones.js`, copiados de la ficha: `tirarSocial(S, i,
+  ui)` (`js/05`), `colocarTrampaDeItem(fichaId, it, ui)` (`js/10`: la trampa consumible, junto al token) y `ankhAMano(S, key, id)` (el
+  Ankh usado desde la mochila, `js/06`); la ficha queda con atajos. En el mapa (`bnAccionAca`): el talento se tira a nombre del
+  personaje (sin guardar nada, como las tiradas de stats), el Ankh revive y guarda, y Consumir coloca la trampa consumible con su
+  `colocarTrampa`. **Con esto la Botonera nueva no le pide ningún botón a la ficha escondida** (solo el Editar del Ver, a
+  propósito). Comparado contra el código viejo en 400 personajes al azar (talentos con los mismos dados; trampas con un mapa
+  simulado que la coloca, no tiene token, no tiene lugar o falla; el Ankh en mochila, cinturón o inexistente): 400 iguales, 0
+  distintas; 3 mutaciones plantadas, las 3 detectadas. `pruebas.html`: 171 en verde (3 nuevas). **En vivo** (🎮 Silvia con un
+  talento, una trampa consumible y un Ankh de prueba, HP 0): el talento tiró 1d4+4; Consumir la trampa la colocó junto al token,
+  gastó el ítem y 2 No2 (de la mochila); el Ankh la revivió con 5 HP (25 % de 20) — todo sin mensajes al marco y con la ficha de
+  la otra pestaña al día. Todo restaurado (trampa borrada del mapa, Silvia con 20 HP y 6 No2, sin los ítems de prueba ni el
+  control); ⚗ apagado. **La 3c quedó terminada**; la 3d espera las decisiones del dueño (ver "Para retomar").

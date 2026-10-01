@@ -610,4 +610,7 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   siguen acá); `jobCostoDe` y `formulaSocial` (`js/05`) también son atajos (`comun/ficha-lupa.js`). Las 🔍 de las invocaciones
   (`lupaHtmlInv`) siguen acá. En modo Botonera, `js/14` atiende `editar-en-ficha` (el "Editar" del Ver de la Botonera nueva del
   mapa): toca el Editar de su propio Ver.
+- **Talentos, trampas consumibles y Ankh a mano, compartidos (paso 4, etapa 3c-7, 2026-10-01)**: `tirarSocial` (`js/05`) y
+  `colocarTrampaDeItem` (`js/10`) son atajos a `comun/ficha-acciones.js`, y el botón del Ankh a mano (`js/06`, `data-consumirankh`)
+  usa `FichaAcciones.ankhAMano`.
 - **La sesión en vivo, compartida (paso 4, etapa 3a, 2026-10-01)**: escuchar el personaje, aplicar cambios de otra ventana y el guardado (`fichaEscuchar`, `fichaGuardarTick`, `fichaHayPendiente`, `fichaNuevoEstado`) pasan por `comun/ficha-sesion.js`; acá queda lo que la ficha hace en cada momento (armarse y dibujarse, avisos, solo lectura, control del GM, `fichaOpcionesGuardado`). El objeto `fichaVivo` tiene los mismos campos de siempre.

@@ -906,7 +906,9 @@ versión parecida en más de una, es candidato a juntar.
   `elegirObjetivo(cfg)`, `colocarZona`, `presets`, `recordatorios`; `cambio` además 'equipo' y 'mochila'). Desde el 5c (las que
   colocan algo en el mapa): `avisarZonaAlMapa(S, h, ui)` (portal y zona de habilidad), `colocarTrampaDeHab(S, h, ui)` y
   `colocarZonaDeHab(S, it, xSp, xNitros, ui)` (zona persistente); ui suma `enMapa()` y `alMapa(tipo, msg)` (la ficha manda el aviso
-  por `MensajesMapa`; el mapa lo resuelve directo, `bnAlMapa`).
+  por `MensajesMapa`; el mapa lo resuelve directo, `bnAlMapa`). Desde el 7: `tirarSocial(S, i, ui)` (un talento; ui: `toast`,
+  `registrarTirada`), `colocarTrampaDeItem(fichaId, it, ui)` (la trampa consumible junto al token; es el `colocarTrampa` de
+  `consumir`) y `ankhAMano(S, key, id)` (el Ankh usado desde la mochila; devuelve el nombre o null).
 - **`ficha-duelo.js`** (`FichaDuelo`, 2026-10-01, paso 4 etapa 3c-4c) — **lo que el duelo (`duelo.js`) le pide a un personaje**:
   `hooks(() => S, ui)` devuelve los ganchos (`soy`, `controlDe`, `registrarTirada`, `atacar`, `statsCritico`,
   `resistenciaCritico`, `efectosArma`, `dano`, `rerollInfo`, `rerollUsar`, `flashOpciones`, `flashUsar`, `habTirar`, `habValor`,

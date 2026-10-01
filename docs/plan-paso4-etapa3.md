@@ -2,48 +2,41 @@
 
 > Parte de [`plan-paso4.md`](plan-paso4.md) y de [`plan-consolidacion.md`](plan-consolidacion.md). Escrito el 2026-10-01,
 > después de terminar el nivel B del paso 5 (áreas 1 a 4, ver [`plan-paso5.md`](plan-paso5.md)). **Estado: en curso** —
-> 3a y 3b hechas; 3c por la mitad (ver "Para retomar" justo abajo y "Cómo va" al final). Preguntas del dueño: contestadas.
+> 3a y 3b hechas; 3c hasta el paso 4 (4a, 4b y 4c) hecha (ver "Para retomar" justo abajo y "Cómo va" al final). Preguntas del
+> dueño: contestadas.
 
-## ▶ Para retomar (al cierre de la conversación del 2026-10-01)
+## ▶ Para retomar (al cierre de la conversación del 2026-10-01, tarde)
 
-**El repo está limpio**: todo subido a `nueva-version` (último commit `870aa73`), nada a medio escribir en el código. Lo
-que sigue es un paso nuevo, no algo cortado.
+**El repo está limpio**: todo subido a `nueva-version`, nada a medio escribir en el código. Lo que sigue es un paso nuevo.
 
 **Hecho en esta etapa**: 3a (sesión en vivo compartida, `comun/ficha-sesion.js`), 3b (Botonera nueva detrás del
-interruptor ⚗, solo GM), y de la 3c: paso 1 (tiradas de stats y Percepción), el resumen público (`comun/ficha-resumen.js`,
-para que el mapa pueda guardar), paso 2 (Sigilo, Levantarse: **el mapa ya guarda al personaje**), paso 3 (Consumir, con el
-catálogo cargado en el mapa), paso 4a (Esquivar, Parry, Bloqueo, Fuerza del golpe, Daño) y 4b (Atacar: "¿Qué ataque es?",
-objetivo y duelo, o tirada suelta). Todo lo que hace la Botonera nueva vive en `comun/ficha-acciones.js` (la ficha usa lo
-mismo con sus nombres de siempre). También: P138 (tiradas con `ficha`, reglas ya pegadas) y P139 (contraataque, resuelta).
+interruptor ⚗, solo GM), y de la 3c: paso 1 (tiradas de stats y Percepción), el resumen público (`comun/ficha-resumen.js`),
+paso 2 (Sigilo, Levantarse: el mapa ya guarda al personaje), paso 3 (Consumir), paso 4a (Esquivar, Parry, Bloqueo, Fuerza
+del golpe, Daño), 4b (Atacar) y **4c (los ganchos del duelo: `comun/ficha-duelo.js`)** — probado en vivo con un objetivo de
+verdad, atacando y defendiendo. Todo lo que hace la Botonera nueva vive en `comun/ficha-acciones.js` y `comun/ficha-duelo.js`
+(la ficha usa lo mismo con sus nombres de siempre).
 
-**Lo próximo — 3c, paso 4c: los ganchos del duelo del personaje.** Cuando un duelo necesita una tirada de un personaje
-(su PdG, su defensa, su daño, la Fuerza del golpe, el Bloqueo, el crítico, el Flash, la Moneda Re-Roll, una habilidad
-dirigida, contraatacar), el mapa se la reenvía a la ficha escondida (`dueloRelayMapa` → mensajes `duelo-opciones`,
-`duelo-tirar`, `duelo-contra`, `duelo-flash`, `duelo-reroll-info`, `duelo-reroll`) y la ficha contesta con
-`window.DUELO_HOOKS` (`ficha-personaje/js/11-combate.js`: `soy`, `controlDe`, `atacar`, `statsCritico`, `resistenciaCritico`,
-`efectosArma`, `dano`, `rerollInfo`, `rerollUsar`, `flashOpciones`, `flashUsar`, `habTirar`, `habValor`, `puedeParry`,
-`opcionesDefensa`, `defender`, `fuerza`, `bloquear`, `armaContra`). La idea: pasar la lógica de cada gancho a `comun/`
-(con `S`), que la ficha los siga usando, y que el mapa los conteste él mismo para el personaje de la Botonera nueva (`bn`),
-cobrando y guardando con `bnUi`. Ojo: (1) el duelo recoge las tiradas por el evento `tirada-registrada` que dispara
-`registrarTirada` de la ficha — el mapa tiene que dispararlo igual al publicar una tirada pedida por el duelo; (2) los
-lados que son **invocaciones** (`fichaId~invId`, `dueloInvDe`) quedan delegados a la ficha (las invocaciones van después
-de esta etapa); (3) un personaje que **no** es el de la Botonera nueva (o sin el interruptor prendido) sigue por el marco.
-Leer antes `comun/duelo.js` (cómo pide cada tirada: `ejecutar`, `cfgEscuchar`) y `dueloRelayMapa` en el mapa.
+**Lo próximo — 3c, paso 5: las habilidades** (Ejecutar / Anunciar / 🎲 segunda tirada, `data-ejecutar`, `data-danohab`):
+`ejecutarHabilidad` de la ficha (`js/11`) — elegir arma, costo X (`#scrim-costox`), «¿es tu turno?», Flash fuera del duelo
+(`usarFlashFueraDelDuelo`, ya usa `FichaDuelo.pagarFlash`), la Ejecución paso a paso (`habDueloDe` → `Duelo.elegirObjetivo`),
+zonas, trampas, Mesa. Es lo más grande que queda: conviene partirlo (por ejemplo: 5a manual y semi; 5b automática con duelo;
+5c zonas, trampas y portal). Después: paso 6 (🔍 lupa y Ver), los talentos, las trampas consumibles y el Ankh manual; recién
+ahí 3d (retirar el marco para los jugadores).
 
-**Después**: paso 5 (habilidades: Ejecutar/Anunciar/🎲, `data-ejecutar`, `data-danohab`), paso 6 (🔍 lupa y Ver,
-`data-view`), los talentos (`data-tirarsocial`), las trampas consumibles y el Ankh manual (`data-consumirankh`); recién
-ahí 3d (retirar el marco para los jugadores) y, fuera de la etapa, las Acciones de los creeps y la Botonera de las
-invocaciones.
+**Dónde probar** (2026-10-01): con Chrome logueado como `elsaulo@gmail.com`, la partida **"Test con claude elsaulo"** (ahí esa
+cuenta es el GM, "S.Claude"); el jugador es "Sujeto de pruebas" con **Silvia Suller** (Cimitarra + Broquel de bronce, 20 HP,
+6 No2), y hay un creep "Creep nuevo" con token al lado. Para usar a Silvia desde el GM: 🎮 Tomar el control en su ficha (y
+devolverlo al terminar). Con `rolpintoista@gmail.com`, "Claude · pruebas" como antes. Ver la memoria `partidas-de-prueba`.
 
 **Pendientes chicos de lo ya hecho**:
-- **4b sin probar contra un objetivo de verdad**: en "Claude · pruebas" los creeps están ocultos y solo el GM puede
-  apuntarles. **La sesión de Claude in Chrome es la del jugador Saulo-Prueba** (`elsaulo@gmail.com`, no GM en esa
-  partida). Para probarlo: pedirle al dueño que pase Chrome a su cuenta de GM, tomar 🎮 el control de Clementino, mostrar
-  un creep y atacarlo desde la Botonera nueva. Con eso también se prueba en vivo la pregunta del contraataque (P139).
 - El Parry que espera su Bloqueo en el mapa (`bn.parryPendiente`) no se borra al pasar el turno (sí al bloquear, al atacar
   y al cambiar de personaje).
 - P137 (diferencias de "permanente" y Excedente de vida entre ficha, GM Tools e invocaciones): espera decisión del dueño.
-- 3a: una vez, un cambio de otra pestaña no llegó mientras esta decía "Guardando…" (no se repitió).
+- 3a: en una pestaña de fondo el guardado tarda (Chrome frena sus temporizadores): la ficha sigue "Guardando…" un rato
+  aunque los datos ya llegaron a Firebase. Visto otra vez el 2026-10-01 (durabilidad del Broquel tras un Bloqueo perdido).
+- **Visto probando el 4c (no es de este cambio)**: si un creep no tiene No2 para atacar, GM Tools lo rechaza y el aviso queda
+  adentro del marco escondido — en el cuadro del duelo el botón «Pagar y tirar PdG» no hace nada visible. Anotado en
+  `docs/pendientes.md`.
 
 **Cómo se viene trabajando cada paso (método que funcionó)**:
 1. Copiar el código **tal cual** a `comun/` (casi siempre `comun/ficha-acciones.js`) con `S` como parámetro y un objeto
@@ -86,7 +79,7 @@ botón, que hoy viven en la ficha:
 | Números de la Botonera (No2, SP, Def, fórmulas, costos) | cálculo, combate, costos de habilidad | ✅ ya en `comun/` (`FichaCalculo`, `FichaCombate`, `FichaHabilidades`) |
 | Traer el personaje y guardarlo | partes de Firebase, migraciones | ✅ ya en `comun/` (`FichaGuardado.cargar`) — falta el guardado **en vivo** (ver 3a) |
 | Tirar un stat, Percepción, Fuerza del golpe | tirada + Mesa | ✅ en el mapa (3c-1 y 4a), con el cartel de sobrepeso |
-| Atacar, Daño, Esquivar, Parry, Bloqueo | el **duelo** y sus ganchos de la ficha (`DUELO_HOOKS`, ~200 renglones), carteles de No2 | ✅ los botones en el mapa (4a, 4b); **los ganchos del duelo siguen en la ficha (4c, lo próximo)** |
+| Atacar, Daño, Esquivar, Parry, Bloqueo | el **duelo** y sus ganchos de la ficha (`DUELO_HOOKS`, ~200 renglones), carteles de No2 | ✅ los botones en el mapa (4a, 4b) y los ganchos del duelo (4c, `comun/ficha-duelo.js`) |
 | Habilidades (Ejecutar / Anunciar / 🎲 segunda) | `ejecutarHabilidad`: elegir arma, costo X, ¿es tu turno?, Flash, Ejecución paso a paso, zona, trampa, Mesa | la regla en `comun/`; la pantalla en la ficha |
 | Consumibles (cinturón y mochila) | consumir: No2 por lugar, unidades, cura, estado, trampa consumible | ✅ en el mapa (3c-3), salvo trampas consumibles y el Ankh manual |
 | Sigilo, Levantarse | estado + No2 | ✅ en el mapa (3c-2) |
@@ -126,7 +119,7 @@ Orden propuesto, de lo más simple a lo más complejo (ver pregunta 3):
 2. Sigilo y Levantarse ✅ (2026-10-01; el mapa ya guarda al personaje).
 3. Consumibles (cinturón y mochila) ✅ (2026-10-01; quedan delegadas las trampas consumibles y el Ankh manual).
 4. Atacar, Daño, Esquivar, Parry y Bloqueo — con los ganchos del duelo del personaje (`DUELO_HOOKS`). Partido en 4a (sueltos ✅
-   2026-10-01), 4b (Atacar ✅ 2026-10-01; falta probarlo con un objetivo de verdad, como GM) y 4c (los ganchos del duelo).
+   2026-10-01), 4b (Atacar ✅ 2026-10-01) y 4c (los ganchos del duelo ✅ 2026-10-01; 4b y 4c probados juntos contra un creep).
 5. Habilidades (lo más grande: elegir arma, costo X, turno ajeno, Flash, Ejecución, zonas y trampas).
 6. 🔍 Lupa y "Ver".
 
@@ -271,3 +264,21 @@ siga necesitándolo (ver pregunta 4). La ficha suelta (`ficha.html`) no cambia: 
 - 2026-10-01: **P139 anotada**: las preguntas abiertas del contraataque fuera del duelo (¿exige ganar el Parry/Bloqueo?
   ¿cuántos por turno?) estaban solo en el manual y en pendientes; dentro del duelo ya estaba decidido (solo si se gana el
   Bloqueo). Al mudar Atacar se conservó tal cual.
+- 2026-10-01: **3c, paso 4c hecho — los ganchos del duelo del personaje**. Lo que el duelo le pide a un personaje (atacar,
+  crítico, resistencia a crítico, efectos del arma, daño, Moneda Re-Roll, Flash, habilidad dirigida, opciones de defensa,
+  defender, Fuerza del golpe, Bloqueo, arma del contraataque) pasó de `window.DUELO_HOOKS` de la ficha (`js/11`) a
+  `comun/ficha-duelo.js` (`FichaDuelo.hooks(() => S, ui)`, más `monedaReroll`/`tirarMonedaReroll` y `pagarFlash`, copiados de
+  `js/02` y `js/11`). La ficha arma con eso sus `DUELO_HOOKS` (las **invocaciones** siguen con su código de siempre, adentro del
+  mismo objeto). `comun/duelo.js`: `enviar` pregunta antes `cfg.hooksLocal(lado)` y, si hay ganchos, los corre ahí mismo
+  (`ejecutar(m, hk)`; sin cerrar los `.scrim` de la página; el daño de una habilidad usa `h.registrarTirada`). El mapa le pasa
+  `bnHooksDuelo`: para el personaje de la Botonera nueva (si este usuario puede guardarlo y, si es GM, con ⚗ prendido) contesta
+  él mismo; `bnPublicar` avisa `tirada-registrada`, como `registrarTirada` de la ficha, para que el duelo recoja la tirada.
+  El mapa además carga `confirmar-turno.js` (el «¿es tu turno?» del Flash). Comparado contra el código viejo (sacado del último
+  commit, con los mismos atajos que la ficha) en 150 personajes y duelos al azar **con los mismos dados**: 2455 llamadas
+  iguales, 0 distintas; 4 mutaciones plantadas, las 4 detectadas. `pruebas.html`: 152 en verde (5 nuevas). **En vivo** ("Test con
+  claude elsaulo", GM con 🎮 el control de Silvia Suller y un creep al lado): **atacando** desde la Botonera nueva, el PdG
+  (6 → 3 No2, ataque contado), el crítico y el daño (1d6+4 = 9, creep 5 → 0 HP) los hizo el mapa sin mandarle nada al marco;
+  **defendiendo** del creep, las opciones de defensa aparecieron al instante (Evasión, Parry con la Cimitarra y con el Broquel,
+  con el Bloqueo de cada uno), el Parry (3 → 2 No2, Bloqueo pendiente) y el Bloqueo (borró el pendiente) los hizo el mapa; lo
+  del creep fue a GM Tools como siempre. Pasó la mitad del daño (20 → 17 HP) y el Broquel perdió 1 de durabilidad en la ficha,
+  que estaba abierta en la otra pestaña y quedó igual. Silvia quedó con 20 HP y 6 No2, sin el control del GM.

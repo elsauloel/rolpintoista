@@ -99,3 +99,12 @@ siga necesitándolo (ver pregunta 4). La ficha suelta (`ficha.html`) no cambia: 
 
 ## Cómo va
 - 2026-10-01: plan escrito y preguntas contestadas (todas como lo recomendado). Empieza la 3a.
+- 2026-10-01: **3a hecha** — `comun/ficha-sesion.js` (`FichaSesion`): tener abierto un personaje en vivo (escuchar,
+  aplicar cambios de otra ventana, guardar lo que cambió, reintentar), y la ficha lo usa. Comparado contra el tramo viejo
+  con una base de datos falsa y un guion de 33 pasos: mismos 73 eventos y estados intermedios; la comparación detecta los 5
+  errores plantados. En la mesa ("Claude · pruebas", Clementino con 🎮 control, dos pestañas a la vez): un cambio en una
+  llega solo a la otra (con el aviso "La ficha se actualizó desde otra ventana") en ~13 ms, en los dos sentidos; dos
+  cambios casi simultáneos terminan iguales en las dos y en Firebase (gana el último que guarda). **Una vez** un cambio de
+  la pestaña B no llegó a la A mientras la A seguía "Guardando…" su propio cambio (pestaña de fondo): no se repitió en
+  dos intentos más y la lógica es la misma de antes (lo que tiene una escritura propia pendiente se saltea) — a mirar si
+  aparece en una partida. Sigue la **3b** (la Botonera nueva en el mapa, solo mirar, detrás del interruptor).

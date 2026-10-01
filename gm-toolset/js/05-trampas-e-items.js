@@ -61,10 +61,7 @@ let verHab = null;   // {scId, ent, hab, editada}
 const LEGADO_HABS = {tipo: 'habs_creep', convertir: d => d && d.habilidad ? {...d.habilidad, para: 'creep'} : d};
 const paraDeDatos = d => d && d.sp ? 'creep' : (d && d.para) || 'creep';   // las recetas de fábrica (sp) son de creep
 const PARA_TXT = {creep: '🐾 Creep · cooldown', jugador: '🧙 Jugador · SP'};
-function paraHabHtml(h){
-  if(h.para !== 'jugador') return `<div class="hint" style="margin-bottom:6px"><b>${PARA_TXT.creep}</b></div>`;
-  return `<div class="hint" style="margin-bottom:6px;color:#e0a040"><b>${PARA_TXT.jugador}</b> — es una habilidad de jugador: paga con SP, que un creep no tiene. Revisale el costo y, si hace falta, ponele cooldown.</div>`;
-}
+function paraHabHtml(h){ return CreepLupa.paraHtml(h); }   // comun/creep-lupa.js
 // Una habilidad de la biblioteca lista para un creep: las recetas de fábrica se calculan con su nivel; lo subido va tal
 // cual. `meta` = de dónde salió ({tipo, id, version}), para el aviso de versión nueva. Una de jugador conserva la marca.
 function habDeBiblioteca(sc, datos, meta){

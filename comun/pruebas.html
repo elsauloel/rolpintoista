@@ -67,6 +67,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="duelo.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
+<script src="creep-lupa.js"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -940,6 +941,14 @@ prueba('habilidades de un creep: cobra No2 y cooldown, la ✨ «solo sobre sí»
   const otraVez = CreepAcciones.ejecutarHab(sc, sc.habilidades[0], estadosPresetCreep());
   igual([sc.nitros, sc.habilidades[0].cdActual, reg, !!p2.directo, sc.estados.some(e => e.nombre === 'Blindado'), !!otraVez.error, CreepAcciones.tiradaSegundaHab(sc, sc.habilidades[0]).origen],
     [2, 2, ['texto', 'Orco · Golpe · PdG', 'aviso'], true, true, true, 'Orco · Golpe · Efecto']);
+});
+
+prueba('la 🔍 y el Ver de un creep: costo de atacar, cooldown que falta y habilidad de jugador', () => {
+  const sc = creepPrueba({nitros: 1, ataquesTurno: 0, armaTipo: 8, habilidades: [{id: 'g', nombre: 'Golpe', nitrosCosto: 3, cd: 2, cdActual: 1, para: 'jugador'}]});
+  const atq = CreepLupa.contenido(sc, sc.id + '|atacar|'), hab = CreepLupa.contenido(sc, sc.id + '|hab|g'), ver = CreepLupa.verHab(sc, sc.habilidades[0]);
+  igual([atq.titulo, /Primer ataque: Tipo ÷ 2/.test(atq.html), /4 No2/.test(atq.html), /faltan 1/.test(hab.html), /lupa-falta/.test(hab.html),
+    ver.titulo, /Jugador · SP/.test(ver.html), CreepLupa.contenido(null, 'x|stat|pdg').html],
+    ['Orco · Atacar', true, true, true, true, 'Golpe', true, '']);
 });
 
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */

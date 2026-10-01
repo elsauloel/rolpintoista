@@ -88,6 +88,8 @@ if(MODO_ACCIONES){
         const sel = Object.keys(d).map(k => `[data-${k.replace(/[A-Z]/g, m => '-' + m.toLowerCase())}="${CSS.escape(String(d[k]))}"]`).join('');
         const b = sel ? document.querySelector('#acciones-creep-lista ' + sel) : null;
         if(b) b.click(); else toast('No se encontró ese botón en las Acciones de GM Tools');
+        // El Ver de una habilidad lo muestra el mapa; Editar, Subir y Reemplazar los hace GM Tools (paso 4c, tanda 6).
+        if(b && ['verhab-editar', 'verhab-subir', 'verhab-reemplazar'].includes(e.data.boton)) $('#' + e.data.boton).click();
         setTimeout(() => gmGuardarTick(true), 300);
       }else toast('Ese creep ya no está en gm-tools');
     }

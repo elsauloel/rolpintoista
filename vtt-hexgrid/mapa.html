@@ -9486,7 +9486,15 @@ function bnAccionAca(b){
 /* Paso 3c-6: la 🔍 y el "Ver". La 🔍 la arma comun/ficha-lupa.js (la misma de la ficha) y la abre comun/lupa.js, que pide el
    contenido con lupaContenido (acá, solo para el personaje de la Botonera nueva). El "Ver" se muestra adentro del recuadro;
    Eliminar lo hace el mapa (si puede guardar al personaje) y Editar abre el editor de la ficha escondida ('editar-en-ficha'). */
-function lupaContenido(clave){ return bn && bn.S ? FichaLupa.contenido(bn.S, clave) : {titulo: '', html: ''}; }
+function lupaContenido(clave){
+  // La de un creep (Acciones nuevas, "creepId|tipo|ref"): comun/creep-lupa.js, con su parte privada (paso 4c, tanda 6).
+  if(String(clave).includes('|') && typeof CreepLupa !== 'undefined'){
+    const id = String(clave).split('|')[0], crudo = creepPrivadoDe(id);
+    if(!crudo) return {titulo: '', html: ''};
+    return CreepLupa.contenido(Object.assign(CreepCalculo.normalizar(structuredClone(crudo)), {id}), clave);
+  }
+  return bn && bn.S ? FichaLupa.contenido(bn.S, clave) : {titulo: '', html: ''};
+}
 var bnViendo = null;   // {key, id} de lo que muestra el Ver
 function bnVer(key, id){
   const it = ((bn.S && bn.S[key]) || []).find(x => x.id === id);
@@ -9704,7 +9712,7 @@ document.addEventListener('keydown', e => {
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/creep-botonera.js?v=20261001a', '../comun/creep-acciones.js?v=20261001c', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261001a'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/creep-lupa.js?v=20261001a', '../comun/creep-botonera.js?v=20261001a', '../comun/creep-acciones.js?v=20261001c', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261001a'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -9735,7 +9743,7 @@ function acDibujar(){
   if(!crudo){ cuerpo.innerHTML = '<div class="modal acciones-modal"><div class="body"><div class="hint">Cargando el creep…</div></div></div>'; return; }
   const sc = CreepCalculo.normalizar(structuredClone(crudo));
   sc.id = ac.creepId;
-  const r = CreepBotonera.html(sc, {lupa: false, parryPendiente: acParry.has(ac.creepId)});
+  const r = CreepBotonera.html(sc, {parryPendiente: acParry.has(ac.creepId)});
   const scroll = ac.host.scrollTop;
   cuerpo.innerHTML = `<div class="modal acciones-modal">
     <header>
@@ -9800,6 +9808,7 @@ function acEfectosAlPegar(sc){
 function acAccionAca(b){
   const d = b.dataset, sc = acCreep();
   if(!sc) return false;
+  if(d.verhabaccion){ acVerHab(sc, d.verhabaccion); return true; }
   if(d.tirarstatcreep){ acPublicar(sc, CreepAcciones.tiradaStat(sc, d.tirarstatcreep.split(':')[1])); return true; }
   if(d.esquivarcreep){ acPublicar(sc, CreepAcciones.esquivar(sc)); return true; }
   if(d.fuerzacreep){ acPublicar(sc, CreepAcciones.fuerzaGolpe(sc)); return true; }
@@ -10020,8 +10029,19 @@ function acEjecutarHab(sc, habId){
   });
 }
 // Un botón de las Acciones nuevas: se lo pide a GM Tools en el marco (lo carga si hace falta, sin abrir nada).
-function acDelegar(datos){
-  const marco = $('#botonera-marco'), msg = {tipo: 'acciones-delegar', creep: ac.creepId, datos};
+/* Paso 4c, tanda 6: el Ver de una habilidad del creep, adentro del recuadro (comun/creep-lupa.js, el mismo de GM Tools). */
+var acViendo = null;   // "creepId:habId" de lo que muestra el Ver
+function acVerHab(sc, ref){
+  const h = (sc.habilidades || []).find(x => x.id === ref.split(':')[1]);
+  if(!h) return;
+  acViendo = ref;
+  const v = CreepLupa.verHab(sc, h);
+  ac.raiz.querySelector('#ac-ver-titulo').textContent = v.titulo;
+  ac.raiz.querySelector('#ac-ver-cuerpo').innerHTML = v.html;
+  ac.raiz.querySelector('#ac-ver').classList.add('open');
+}
+function acDelegar(datos, boton){
+  const marco = $('#botonera-marco'), msg = {tipo: 'acciones-delegar', creep: ac.creepId, datos, ...(boton ? {boton} : {})};
   if(botonera.herramienta === 'gm'){
     if(botonera.lista) MensajesMapa.alMarco(marco, msg); else botonera.pendiente = msg;
     return;
@@ -10041,11 +10061,21 @@ function acCrear(){
       <div class="body" id="ac-obj-cuerpo"></div>
       <footer><button class="btn ghost" data-ac-obj="nadie">Nadie (falló)</button></footer>
     </div></div>
+    <div class="scrim" id="ac-ver"><div class="modal" style="max-width:420px">
+      <header><h3 id="ac-ver-titulo">Habilidad</h3><button class="iconbtn" data-ac-ver="no">Cerrar</button></header>
+      <div class="body" id="ac-ver-cuerpo"></div>
+      <footer>
+        <button class="btn ghost" data-ac-ver="verhab-subir" title="Subir esta habilidad a la biblioteca compartida, con toda su configuración: queda disponible para todos al instante">⬆ Subir</button>
+        <button class="btn ghost" data-ac-ver="verhab-reemplazar" title="Cambiar esta habilidad por otra de la biblioteca">↻ Reemplazar</button>
+        <button class="btn primary" data-ac-ver="verhab-editar" title="Abrir el editor paso a paso de esta habilidad">✎ Editar</button>
+      </footer>
+    </div></div>
     <div class="scrim" id="ac-tipo-ataque"><div class="modal" style="max-width:360px">
       <header><h3>¿Qué ataque es?</h3><button class="iconbtn" data-ac-tipo="no">Cerrar</button></header>
       <div class="body" id="ac-tipo-lista" style="display:flex;flex-direction:column;gap:9px"></div>
     </div></div>`;
   raiz.querySelector('#ac-tipo-ataque').addEventListener('mousedown', e => { if(e.target.id === 'ac-tipo-ataque') e.target.classList.remove('open'); });
+  raiz.querySelector('#ac-ver').addEventListener('mousedown', e => { if(e.target.id === 'ac-ver'){ e.target.classList.remove('open'); acViendo = null; } });
   raiz.querySelector('#ac-objetivo').addEventListener('mousedown', e => { if(e.target.id === 'ac-objetivo'){ e.target.classList.remove('open'); acObjetivoPendiente = null; } });
   raiz.addEventListener('click', e => {
     const b = e.target.closest('button');
@@ -10056,6 +10086,14 @@ function acCrear(){
       const pend = acObjetivoPendiente;
       acObjetivoPendiente = null;
       if(pend && b.dataset.acObj !== 'nadie') acAplicarEstadoAObjetivo(pend, b.dataset.acObj);
+      return;
+    }
+    if(b.dataset.acVer){
+      raiz.querySelector('#ac-ver').classList.remove('open');
+      const v = acViendo;
+      acViendo = null;
+      // Editar, Subir y Reemplazar: los hace GM Tools en el marco (abre el Ver de esa habilidad y toca el mismo botón).
+      if(v && b.dataset.acVer !== 'no') acDelegar({verhabaccion: v}, b.dataset.acVer);
       return;
     }
     if(b.dataset.acTipo){
@@ -10076,7 +10114,8 @@ async function abrirAccionesNuevas(creepId){
   if(ac && ac.creepId === creepId && !ac.host.hidden){ cerrarAccionesNuevas(); return; }   // B (o el token) otra vez: se cierra
   try{ await acCargarPiezas(); }catch(err){ console.error(err); toast('No se pudieron cargar las Acciones nuevas — se abren las de siempre'); abrirAcciones(creepId, null, true); return; }
   if(!ac) ac = Object.assign({creepId: ''}, acCrear());
-  ac.raiz.querySelector('#ac-css').textContent = acCss + ' #ac-contenido{font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--paper)}';
+  const lupaCss = (document.getElementById('lupa-css') || {}).textContent || '';   // los 🔍 (comun/lupa.js)
+  ac.raiz.querySelector('#ac-css').textContent = acCss + lupaCss + ' #ac-contenido{font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--paper)}';
   ac.creepId = creepId;
   if(bn && !bn.host.hidden) cerrarBotoneraNueva();
   ac.host.hidden = false;

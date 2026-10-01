@@ -61,6 +61,9 @@ const InvCalculo = (() => {
     const {arruinada, rota} = estadosArmadura(inv);
     let v = num(inv.defensa);
     if(arruinada) v -= aporteArmadura(inv, 'def');
+    // Bonos de Defensa de los estados (ej. «−2 Defensa», Piel de escoria): se suman por stack, igual que en los creeps y los
+    // personajes (2026-10-01; antes una invocación los ignoraba). Armadura rota no: su −1 ya se cuenta abajo, por acumulación.
+    (inv.estados || []).forEach(es => { if(es.activo === false || es.armaduraRota) return; const st = Math.max(1, num(es.stacks) || 1); (es.mods || []).forEach(m => { if(m.stat === 'def') v += num(m.val) * st; }); });
     v -= rota;  // Armadura rota: -1 por cada acumulación
     return Math.max(0, v);
   }

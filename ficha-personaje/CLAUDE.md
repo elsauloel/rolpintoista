@@ -614,3 +614,7 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   `colocarTrampaDeItem` (`js/10`) son atajos a `comun/ficha-acciones.js`, y el botón del Ankh a mano (`js/06`, `data-consumirankh`)
   usa `FichaAcciones.ankhAMano`.
 - **La sesión en vivo, compartida (paso 4, etapa 3a, 2026-10-01)**: escuchar el personaje, aplicar cambios de otra ventana y el guardado (`fichaEscuchar`, `fichaGuardarTick`, `fichaHayPendiente`, `fichaNuevoEstado`) pasan por `comun/ficha-sesion.js`; acá queda lo que la ficha hace en cada momento (armarse y dibujarse, avisos, solo lectura, control del GM, `fichaOpcionesGuardado`). El objeto `fichaVivo` tiene los mismos campos de siempre.
+
+- **Las reglas de una invocación, compartidas (paso 4, etapa 4e, tanda 1, 2026-10-01)**: el motor de stats de `js/04` (`invStatValor`,
+  `invDefensaEfectiva`, `defensaInv`, `costoAtaqueInv`, `migrarInvocacion`…) son atajos a `comun/inv-calculo.js`. **La Defensa de
+  una invocación ahora suma los estados que la cambian** (antes los ignoraba), igual que un creep o un personaje.

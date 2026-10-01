@@ -976,6 +976,13 @@ prueba('P137: el Excedente de vida que da una habilidad reemplaza al que había,
   igual([exc(sc.estados), exc(S.efectos), !!r.estado, !!rf.ok], [[[3, 3]], [[3, 3]], true, true]);
 });
 
+prueba('invocación: la Defensa suma los estados que la cambian (como un creep) y Armadura rota resta una sola vez', () => {
+  const rota = estadosPresetFicha().find(p => p.nombre === 'Armadura rota');
+  const inv = {defensa: 5, crit: [0, 0, 0, 0, 0], equipo: [], estados: [{nombre: 'Débil', mods: [{stat: 'def', val: -2}]}, Object.assign(structuredClone(rota), {stacks: 2})]};
+  const apagado = {defensa: 5, crit: [0, 0, 0, 0, 0], equipo: [], estados: [{nombre: 'Piel', activo: false, mods: [{stat: 'def', val: 3}]}, {nombre: 'Escoria', stacks: 2, mods: [{stat: 'def', val: 1}]}]};
+  igual([InvCalculo.defensaEfectiva(inv), InvCalculo.defensaEfectiva(apagado), InvCalculo.statValor({fue: 3, estados: [{mods: [{stat: 'fue', val: 1}]}]}, 'bloqueo')], [1, 7, 4]);
+});
+
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */
 grupo('Mis últimas tiradas (P138)');
 prueba('se juntan las de la Mesa con las de esta ventana, sin repetir, las últimas primero', () => {

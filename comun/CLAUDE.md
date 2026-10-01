@@ -963,3 +963,10 @@ versión parecida en más de una, es candidato a juntar.
   (`efectoNombre`…) no vence? Si la habilidad/ítem tiene `efectoPermanente` (la casilla "No vence" / "Sin límite"), manda eso; si
   no, el `permanente` del estado. La usan la ficha (`ficha-habilidades.js`), las invocaciones y los creeps (`creep-acciones.js`).
   El Excedente de vida que da una habilidad **reemplaza** al que había en los tres (antes, en los creeps, se sumaba).
+
+- **`inv-calculo.js`** (`InvCalculo`, 2026-10-01, paso 4 etapa 4e, tanda 1) — **las reglas de una invocación, fuera de la ficha**:
+  `statValor`, `aportesMod`, `defensaEfectiva` (suma los estados que cambian la Defensa, salvo Armadura rota, que cuenta por
+  acumulación), `critEfectivo`, `nitrosMax`, `defensa` (con qué para), `bloqueoValor`, `costoAtaque`, `costoNitrosHab`,
+  `costoHabTxt`, `bloqueoHab`, `danoTxt`, `ataqueTxt`, `actualizarHpMaxPorCon`, `migrar` y las listas de stats (`INV_STATS_TIRADA_IDS`…).
+  Todo recibe la invocación (`inv`). La ficha lo usa con sus nombres de siempre (`invStatValor`…). Necesita `combatiente.js`,
+  `ficha-calculo.js`, `ficha-resumen.js` y `ficha-botonera.js` (al llamar).

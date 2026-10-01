@@ -19,7 +19,20 @@ creeps primero, el mismo interruptor ⚗, P137 espera.
 6. 🔍 (`lupaHtmlCreep`, `js/03`) y Ver ✅ (2026-10-01). **La 4c está terminada.**
 El mapa guarda con `modificarCreep` (transacción + resumen + firma); GM Tools, abierto en otra pestaña, se entera por la firma.
 
-**Lo próximo — 4d**: probar las Acciones nuevas en una sesión real (el GM con ⚗ prendido, jugando un combate de verdad) y,
+**4e — invocaciones (en curso desde 2026-10-01; el dueño pidió avanzar mientras prueba la 4d)**, por tandas como la 4c:
+1. El cálculo de una invocación → `comun/inv-calculo.js` ✅ (2026-10-01). Arreglo de paso: la Defensa de una invocación ahora
+   suma los estados que la cambian, como la de un creep o un personaje.
+2. Dibujar su Botonera → `comun/inv-botonera.js` (`renderBotoneraInv` con la invocación como parámetro); con ⚗, el mapa la dibuja
+   en la Botonera nueva del dueño (lee `S.invocaciones` con `FichaSesion`) y cada botón se lo pide a la ficha del marco.
+3. Los botones (tiradas de stats, Esquivar, Parry, Bloqueo, Daño, Atacar) → `comun/inv-acciones.js`; el mapa guarda la parte
+   `invocaciones` del personaje con `FichaSesion`.
+4. Lo que el duelo le pide a una invocación (`dueloInvDe`, `js/11`) → `comun/inv-duelo.js`, en `hooksLocal` del mapa. Con los
+   datos de la invocación a mano, el daño que recibe en el duelo puede dejar de ser a mano (hoy `dueloAplicarDano` lo marca
+   "es una invocación").
+5. Las habilidades (`invEjecutarHab` y compañía).
+6. La 🔍 (`lupaHtmlInv`) y el Ver (`verHabInv`).
+
+**4d (pendiente del dueño)**: probar las Acciones nuevas en una sesión real (el GM con ⚗ prendido, jugando un combate de verdad) y,
 si andan bien, dejarlas como las de siempre (como la 3d de la Botonera del personaje). Las Acciones nuevas ya no le piden nada
 a GM Tools salvo Editar / Subir / Reemplazar del Ver de una habilidad (y lo que abre "+ Estado" o el editor del creep). Después,
 **4e** (invocaciones), que espera P137.
@@ -195,3 +208,12 @@ puede empezar.
   el editor de habilidades de creep suma la casilla "No vence" (`#hc-efecto-permanente`, se llena con el preset al elegirlo). El
   Excedente de vida de un creep ya no se suma al que tenía (`efectoDeHab`). Ningún ítem del catálogo cambia. `pruebas.html`: 183
   en verde (2 nuevas). El dueño va a probar la 4d en una sesión real; mientras tanto, empieza la 4e (invocaciones).
+- 2026-10-01: **4e, tanda 1 hecha** (fbff51c + el arreglo de la Defensa) — `comun/inv-calculo.js` (`InvCalculo`): stats con equipo y
+  estados, Defensa, críticos, No2 máximo, con qué para, Bloqueo, costos de atacar y de las habilidades, daño del arma, HP máximo
+  por Constitución y `migrar`, copiados de `ficha-personaje/js/04` (que queda con atajos de una línea). Comparado contra el código
+  viejo en 800 invocaciones al azar: 800 iguales; 7 mutaciones detectadas. **Comparado también contra las reglas de los creeps**:
+  coinciden en No2 máximo, con qué para, Bloqueo, costo de atacar, daño y críticos; los stats, en todos los que tienen los dos (los
+  que difieren son de personaje: SP, Crg.Max, etc.); la **Defensa no**: una invocación ignoraba los estados que la suben o la bajan
+  («−2 Defensa», Piel de escoria). **Arreglado** (`InvCalculo.defensaEfectiva`, misma regla que los creeps — «invocaciones =
+  creeps», P121 —, salteando Armadura rota, que en la forma de la ficha trae su −1 como bono y ya se cuenta por acumulación).
+  `pruebas.html`: 184 en verde (1 nueva).

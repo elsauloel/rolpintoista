@@ -727,7 +727,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
   <span class="ayuda-icono" id="ayuda-token" tabindex="-1" aria-label="Ayuda de los tokens y guía de colores">?<span class="ayuda-globo" id="ayuda-token-globo" role="tooltip"></span></span>
   <a class="btn" id="link-herramienta" href="#" target="_blank" rel="noopener" style="text-decoration:none" hidden></a>
   <button type="button" class="btn" id="btn-tablero" title="Tablero: el estado de todos los que tienen token en el mapa publicado">📋 Tablero</button>
-  <button type="button" class="btn" id="btn-botonera-nueva" hidden title="Prueba (solo el GM, solo en este navegador): la Botonera de un personaje la dibuja el mapa, sin la ficha adentro (paso 4, etapa 3b). Los botones todavía los hace la ficha.">⚗ Botonera nueva: no</button>
+  <button type="button" class="btn" id="btn-botonera-nueva" hidden title="Prueba (solo en este navegador): la Botonera de tu personaje la dibuja el mapa, sin cargar la ficha adentro — abre más rápido. Si algo no anda, apagala y vuelve la de siempre.">⚗ Botonera nueva: no</button>
   <div class="desplegable" id="personajes-caja" hidden>
     <button type="button" class="btn btn-personajes" id="btn-personajes" aria-expanded="false" title="Fichas de los personajes de la partida">👥 Personajes</button>
     <div class="desplegable-lista" id="personajes-lista" hidden></div>
@@ -9114,13 +9114,13 @@ function abrirBotoneraPrincipal(){
   abrirBotonera(fichaId);
 }
 
-/* ---------- ⚗ Botonera nueva (prueba) — paso 4, etapa 3b (docs/plan-paso4-etapa3.md, 2026-10-01) ----------
-   Detrás de un interruptor que solo ve el GM ("⚗ Botonera nueva", recordado en este navegador): la Botonera de un personaje la
-   dibuja el mapa con las piezas de comun/ — FichaSesion para leerlo de Firebase (solo mirar: el que guarda sigue siendo la
-   ficha) y FichaBotonera para dibujarlo —, en un recuadro aislado (shadow DOM) con el ficha.css de siempre, así se ve igual.
-   Por ahora solo dibuja: cada botón se lo pide a la ficha cargada escondida en el marco (mensaje 'botonera-delegar'), que lo
-   toca como siempre; lo que abra (elegir arma, costo X, Ver, un cartel) sale encima, en la capa de siempre. Las 🔍 todavía
-   no están (la lupa vive en la ficha: etapa 3c). Las piezas se cargan recién al usarla: para los jugadores no cambia nada. */
+/* ---------- ⚗ Botonera nueva (prueba) — paso 4, etapas 3b–3d (docs/plan-paso4-etapa3.md, 2026-10-01) ----------
+   Detrás de un interruptor ("⚗ Botonera nueva", recordado en este navegador; desde el 2026-10-01 lo ve cualquiera, P140: el GM
+   la prueba primero en una sesión real y después la prende el jugador que quiera): la Botonera de un personaje la dibuja el
+   mapa con las piezas de comun/ — FichaSesion para leerlo y guardarlo, FichaBotonera para dibujarlo —, en un recuadro aislado
+   (shadow DOM) con el ficha.css de siempre, así se ve igual. Desde la 3c todos sus botones los hace el mapa (FichaAcciones,
+   FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
+   Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001b',
   '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001h',
@@ -9131,11 +9131,11 @@ var bnCss = '';
 var bnCargando = null;
 var bnItemsSubidos = [];
 const bnMezclarCatalogo = lista => ItemsSubidos.mezclar(lista, bnItemsSubidos, FichaGuardado.DEFAULT.catalogo);
-const bnActiva = () => { try{ return soyGM && localStorage.getItem(BN_CLAVE) === '1'; }catch(e){ return false; } };
+const bnActiva = () => { try{ return localStorage.getItem(BN_CLAVE) === '1'; }catch(e){ return false; } };
 function bnPintarInterruptor(){
   const b = $('#btn-botonera-nueva');
   if(!b) return;
-  b.hidden = !soyGM;
+  b.hidden = !fbMiembro;   // cualquiera de la partida (P140)
   b.textContent = `⚗ Botonera nueva: ${bnActiva() ? 'sí' : 'no'}`;
   b.classList.toggle('primary', bnActiva());
 }
@@ -9143,7 +9143,7 @@ function bnAlternar(){
   try{ localStorage.setItem(BN_CLAVE, bnActiva() ? '0' : '1'); }catch(e){}
   bnPintarInterruptor();
   if(!bnActiva()) cerrarBotoneraNueva();
-  toast(bnActiva() ? '⚗ Botonera nueva prendida (solo en este navegador): abrí la Botonera de un personaje con B o con su token' : 'Botonera nueva apagada: vuelve la de siempre');
+  toast(bnActiva() ? '⚗ Botonera nueva prendida (solo en este navegador): abrí la Botonera de tu personaje con B o con su token. Si algo no anda, apagala.' : 'Botonera nueva apagada: vuelve la de siempre');
 }
 // Las piezas de comun/ que el mapa no carga siempre, y el ficha.css (con :root → :host para que valga adentro del recuadro).
 function bnCargarPiezas(){
@@ -9285,7 +9285,7 @@ function bnPublicar(origen, r){
    personaje. Sus invocaciones, otro personaje, o el GM con el interruptor ⚗ apagado: por el marco, como siempre. */
 function bnHooksDuelo(lado){
   if(!bn || !bn.S || !lado || lado.tipo !== 'pj' || lado.ref !== bn.fichaId || typeof FichaDuelo === 'undefined') return null;
-  if((soyGM && !bnActiva()) || !bnPuedeGuardar()) return null;
+  if(!bnActiva() || !bnPuedeGuardar()) return null;
   const ui = {...bnCombateUi(),
     soy: l => !!(l && l.tipo === 'pj' && l.ref === bn.fichaId),
     reabrir: (id, campo) => Duelo.reabrir(id, campo),
@@ -9523,7 +9523,11 @@ function bnVerAccion(accion){
   r.querySelector('#bn-ver').classList.remove('open');
   bnViendo = null;
   if(!v || accion === 'no') return;
-  if(accion === 'editar'){ bnAlMarco({tipo: 'editar-en-ficha', key: v.key, id: v.id}); return; }
+  if(accion === 'editar'){
+    if(!(botonera.herramienta === 'ficha' && botonera.fichaId === bn.fichaId && !botonera.invId && botonera.lista)) toast('Abriendo el editor de la ficha…');
+    bnAlMarco({tipo: 'editar-en-ficha', key: v.key, id: v.id});
+    return;
+  }
   if(accion === 'borrar' && bnPuedeGuardar()){
     const it = (bn.S[v.key] || []).find(x => x.id === v.id);
     if(!it || !confirm(`¿Borrar "${it.nombre || 'esto'}"?`)) return;
@@ -9685,11 +9689,8 @@ async function abrirBotoneraNueva(fichaId){
       alCambiar: () => { FichaGuardado.completar(bn.S); bnDibujar(); },
       alErrorPartes: () => toast('No se pudo leer el personaje para la Botonera nueva'),
     });
-    // La ficha escondida que hace los botones: se carga ya, así el primer toque no espera.
-    if(!(botonera.herramienta === 'ficha' && botonera.fichaId === fichaId && !botonera.invId) && $('#botonera-capa').hidden){
-      botonera = {herramienta: 'ficha', fichaId, invId: '', lista: false, pendiente: null, completa: false, precarga: true};
-      $('#botonera-marco').src = sinCache(`../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=botonera&precarga=1#${encodeURIComponent(fichaId)}`);
-    }
+    // La ficha escondida ya no se carga para la Botonera nueva (P140, 2026-10-01): se carga sola recién si se toca Editar en un
+    // Ver (bnAlMarco). La que precarga el mapa al entrar (precargarMarco) sigue, para lo demás que usa el marco.
   }
   bn.host.hidden = false;
   bnUbicar();
@@ -11355,7 +11356,7 @@ function arrancarEnVivo(){
   estado(barraTexto());
   soyGM = fbMiembro.gm === true;
   if($('#btn-reroll')) $('#btn-reroll').hidden = soyGM;   // la Moneda Re-Roll es de los jugadores
-  bnPintarInterruptor();   // ⚗ Botonera nueva (prueba, solo GM)
+  bnPintarInterruptor();   // ⚗ Botonera nueva (prueba, para quien la quiera prender)
   $('#btn-botonera-nueva').onclick = bnAlternar;
   escucharMiembros();
   escucharVinculables();

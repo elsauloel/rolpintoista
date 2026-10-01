@@ -23,158 +23,39 @@ function nuevaInvocacion(){
 }
 
 /* =========================================================
-   INVOCACIONES — motor de stats, igual que los creeps de gm-tools:
-   mismos Nitros (No2), la misma arma con mods de equipo y efectos al
-   golpear, los mismos estados alterados y habilidades con asistente paso
-   a paso — la maneja el jugador que invoca, no el GM. Duplicado a
-   propósito (no importado), como ya pasa entre la ficha y gm-tools con el
-   formato de efecto/estado — ver gm-toolset/CLAUDE.md.
+   INVOCACIONES — motor de stats, igual que los creeps de gm-tools: vive en comun/inv-calculo.js (paso 4, etapa 4e, tanda 1,
+   2026-10-01), con la invocación como parámetro, así lo usa también el mapa. Acá quedan los nombres de siempre.
    ========================================================= */
-const IT2_INV = {
-  nitrosHabilidad: 1,             // costo por defecto de una habilidad (el de atacar es Combatiente.costoAtaque)
-};
-const ATTR_IDS_INV = ['con','fue','agl','des','esp'];
-// Stats secundarios de una invocación: los mismos que un PJ (GRUPOS),
-// salvo Hp.Max/No2 (ya se ven en las barras) y Crg.Max/SP/SP Regen (no aplican).
-const INV_STAT_EXCLUIR = ['hpmax','nitros','crgmax','sp','spregen'];
-const INV_DERIVADOS_POR_ATTR = Object.fromEntries(GRUPOS.map(g => [g.id, g.derived.filter(d => !INV_STAT_EXCLUIR.includes(d.id))]));
-const INV_STAT_ATTR = Object.fromEntries(GRUPOS.flatMap(g => g.derived.map(d => [d.id, g.id])));
-// Mismo criterio que STATS_CON_TIRADA en la Botonera de la ficha: los 5
-// atributos base + los secundarios que no tienen ya su propio botón en Combate.
-const INV_STATS_TIRADA_IDS = ['con','fue','agl','des','esp','resmg','rescc','ini','pdgmg','resm'];
-// Stats que puede tirar una habilidad (incluye PdG, Bloqueo y Parry, que
-// en la Botonera ya tienen su propio botón de Combate y por eso no están
-// en INV_STATS_TIRADA_IDS) — mismos que ofrece gm-tools para un creep.
-const INV_STATS_HAB = ['resmg','rescc','bloqueo','eva','ini','pdg','parry','pdgmg','resm'];
-
-function invFuentesEquipo(inv){ return FichaResumen.invFuentesEquipo(inv); }   // comun/ficha-resumen.js
-function invModTotal(inv, statId){ return FichaResumen.invModTotal(inv, statId); }
-// Cada fuente (equipo o estado activo) que le suma a un stat, con su valor
-// — para la 🔍 (de dónde sale cada tirada).
-function aportesModInv(inv, statId){
-  const out = [];
-  invFuentesEquipo(inv).forEach(it => {
-    const v = (it.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val), 0);
-    if(v) out.push({nombre: it.nombre || '(sin nombre)', val: v});
-  });
-  (inv.estados||[]).forEach(es => {
-    if(es.activo === false) return;
-    const stacks = Math.max(1, num(es.stacks)||1);
-    const v = (es.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val) * stacks, 0);
-    if(v) out.push({nombre: es.nombre || '(sin nombre)', val: v});
-  });
-  return out;
-}
-function invEstadosArmadura(inv){
-  const activos = (inv.estados||[]).filter(e => e.activo !== false);
-  return {rota: activos.filter(e => e.armaduraRota).reduce((a, e) => a + Math.max(1, num(e.stacks) || 1), 0)};
-}
-function invAporteArmadura(inv, statId){
-  return (inv.equipo||[]).filter(it => slotDe(it.tipoItem) === 'armadura')
-    .reduce((a,it) => a + (statId === 'def' ? num(it.def) : (it.mods||[]).filter(m=>m.stat===statId).reduce((s,m)=>s+num(m.val),0)), 0);
-}
-function invDefensaEfectiva(inv){
-  const {arruinada, rota} = invEstadosArmadura(inv);
-  let v = num(inv.defensa);
-  if(arruinada) v -= invAporteArmadura(inv, 'def');
-  v -= rota;  // Armadura rota: -1 por cada acumulación
-  return Math.max(0, v);
-}
-function invCritEfectivo(inv, i){
-  const {arruinada} = invEstadosArmadura(inv);
-  let v = num(inv.crit[i]);
-  if(arruinada) v -= invAporteArmadura(inv, 'tipo'+(i+1));
-  return v;
-}
-function invEstadoActivo(inv, flag){
-  return (inv.estados || []).some(e => e.activo !== false && e[flag]);
-}
-function invStatValor(inv, statId){
-  const attr = INV_STAT_ATTR[statId] || statId;
-  let v = num(inv[attr]) + invModTotal(inv, attr);
-  if(statId !== attr) v += invModTotal(inv, statId);
-  return v;
-}
-function invNitrosMax(inv){ return FichaResumen.invNitrosMax(inv); }
-// Nitros de una habilidad: un número, o "ATAQUE" = lo que le cuesta un
-// ataque con su arma (Tipo ÷ 2 el primero del turno) y cuenta como ese ataque.
-function habInvAtaque(h){ return String((h && h.nitrosCosto) ?? '').trim().toUpperCase() === 'ATAQUE'; }
-// Parry y Bloqueo de una invocación (2026-09-24), igual que un creep: el Parry cuesta 1 No2 (2026-09-26); el Bloqueo = su Bloqueo + el Peso de su arma.
-function pesoArmaInv(inv){ return Math.max(1, num(inv.armaPeso) || 1); }
-// Con qué para la invocación (Parry y Bloqueo): su arma si no es natural, si no un escudo de su equipo; null = no puede
-// (regla del dueño 2026-09-30, comun/combatiente.js — la misma que personajes y creeps). El Bloqueo suma el peso de eso.
-function defensaInv(inv){
-  if(!inv) return null;
-  return Combatiente.armaParaDefensa({arma: inv.armaNombre ? {nombre: inv.armaNombre, peso: pesoArmaInv(inv)} : null, natural: inv.armaNatural === true,
-    escudos: (inv.equipo || []).filter(it => slotDe(it.tipoItem) === 'escudo').map(it => ({nombre: it.nombre, peso: num(it.peso)}))});
-}
-function bloqueoValorInv(inv){ const d = defensaInv(inv); return invStatValor(inv, 'bloqueo') + (d ? num(d.peso) : 0); }
-function costoAtaqueInv(inv){ return Combatiente.costoAtaque(num(inv.armaTipo) || 8, inv.ataquesTurno); }   // regla común (comun/combatiente.js)
-function costoNitrosHabInv(inv, h){ return Combatiente.costoNitrosHab(h, () => costoAtaqueInv(inv), IT2_INV.nitrosHabilidad); }
-function costoHabInvTxt(inv, h){
-  const n = costoNitrosHabInv(inv, h);
-  if(habInvAtaque(h)) return `${fmt(n)} No2 (como un ataque)`;
-  return n ? `${fmt(n)} No2` : 'sin costo';
-}
-// ¿Se puede usar ahora? La regla común (P133): cooldown, No2 y vida (una 📣 manual no cobra nada).
-function bloqueoHabInv(inv, h){ return Combatiente.bloqueoHab(h, {modo: modoHab(h), nitros: inv.nitros, costo: costoNitrosHabInv(inv, h), hp: inv.hp}); }
-function invDanoTxt(inv, extra){
-  const dados = Math.max(1, num(inv.armaPeso)||1) + Math.max(0, num(inv.armaAmplificado));
-  const tipo = num(inv.armaTipo)||8;
-  const fijo = num(inv.armaFijo) + (inv.armaDeRango ? 0 : num(extra));
-  return `${dados}d${tipo}${fijo?` + ${fmt(fijo)}`:''}`;
-}
-function invAtaqueTxt(inv){
-  return invDanoTxt(inv, invStatValor(inv, 'dmg'));
-}
-function modsAfectanHpInv(mods){
-  return (mods || []).some(m => m.stat === 'con' || m.stat === 'hpmax');
-}
-// Recalcula hpMax = con*5 + mods de Hp.Max (con efectivo, equipo y estados
-// incluidos, igual que la ficha y los creeps). Si estaba lleno, sigue
-// lleno con el nuevo máximo; si no, solo se recorta si se pasa.
-function actualizarHpMaxPorConInv(inv){
-  const conEfectivo = num(inv.con) + invModTotal(inv, 'con');
-  const nuevoHpMax = Math.max(0, conEfectivo * 5 + invModTotal(inv, 'hpmax'));
-  const estabaFull = num(inv.hp) >= num(inv.hpMax);
-  inv.hpMax = nuevoHpMax;
-  inv.hp = estabaFull ? nuevoHpMax : Math.min(num(inv.hp), nuevoHpMax);
-}
-
-// Rellena campos que invocaciones viejas (guardadas antes de esta
-// actualización) no tienen, para que el resto del código no se tope con
-// undefined. Convierte Acciones/Movimiento (viejo) a No2, igual que ya
-// se hizo en la ficha y en los creeps con la Iteración 2.
-function migrarInvocacion(inv){
-  const crit = Array.isArray(inv.crit) ? inv.crit.map(v=>num(v)) : [];
-  while(crit.length < 5) crit.push(0);
-  inv.crit = crit.slice(0, 5);
-  inv.equipo = Array.isArray(inv.equipo) ? inv.equipo : [];
-  inv.estados = Array.isArray(inv.estados) ? inv.estados : [];
-  inv.habilidades = Array.isArray(inv.habilidades) ? inv.habilidades : [];
-  inv.armaMods = Array.isArray(inv.armaMods) ? inv.armaMods : [];
-  inv.armaEfectos = Array.isArray(inv.armaEfectos) ? inv.armaEfectos : [];
-  if(inv.armaManos === undefined) inv.armaManos = 'arma_1m';
-  if(inv.armaAmplificado === undefined) inv.armaAmplificado = 0;
-  if(inv.armaDeRango === undefined) inv.armaDeRango = false;
-  if(inv.armaNombre === undefined) inv.armaNombre = '';
-  if(inv.armaDetalle === undefined) inv.armaDetalle = '';
-  if(inv.defensa === undefined) inv.defensa = 0;
-  if(inv.notas === undefined) inv.notas = '';
-  if(inv.acc !== undefined || inv.accMax !== undefined){
-    delete inv.acc; delete inv.accMax; delete inv.nitros;  // arranca lleno, abajo
-  }
-  inv.habilidades.forEach(h => {
-    if(h.nitrosCosto === undefined) h.nitrosCosto = IT2_INV.nitrosHabilidad;
-    if(h.tiradaStat === undefined) h.tiradaStat = '';
-    if(h.tiradaExtra === undefined) h.tiradaExtra = '';
-    if(h.cdActual === undefined) h.cdActual = 0;
-    if(h.efectoNombre === undefined) h.efectoNombre = '';
-  });
-  if(inv.nitros === undefined || inv.nitros === null) inv.nitros = invNitrosMax(inv);
-  if(inv.ataquesTurno === undefined) inv.ataquesTurno = 0;
-  return inv;
-}
+const IT2_INV = InvCalculo.IT2_INV;
+const ATTR_IDS_INV = InvCalculo.ATTR_IDS_INV;
+const INV_STAT_EXCLUIR = InvCalculo.INV_STAT_EXCLUIR;
+const INV_DERIVADOS_POR_ATTR = InvCalculo.INV_DERIVADOS_POR_ATTR;
+const INV_STAT_ATTR = InvCalculo.INV_STAT_ATTR;
+const INV_STATS_TIRADA_IDS = InvCalculo.INV_STATS_TIRADA_IDS;
+const INV_STATS_HAB = InvCalculo.INV_STATS_HAB;
+function invFuentesEquipo(inv){ return InvCalculo.fuentesEquipo(inv); }
+function invModTotal(inv, statId){ return InvCalculo.modTotal(inv, statId); }
+function aportesModInv(inv, statId){ return InvCalculo.aportesMod(inv, statId); }
+function invEstadosArmadura(inv){ return InvCalculo.estadosArmadura(inv); }
+function invAporteArmadura(inv, statId){ return InvCalculo.aporteArmadura(inv, statId); }
+function invDefensaEfectiva(inv){ return InvCalculo.defensaEfectiva(inv); }
+function invCritEfectivo(inv, i){ return InvCalculo.critEfectivo(inv, i); }
+function invEstadoActivo(inv, flag){ return InvCalculo.estadoActivo(inv, flag); }
+function invStatValor(inv, statId){ return InvCalculo.statValor(inv, statId); }
+function invNitrosMax(inv){ return InvCalculo.nitrosMax(inv); }
+function habInvAtaque(h){ return InvCalculo.habAtaque(h); }
+function pesoArmaInv(inv){ return InvCalculo.pesoArma(inv); }
+function defensaInv(inv){ return InvCalculo.defensa(inv); }
+function bloqueoValorInv(inv){ return InvCalculo.bloqueoValor(inv); }
+function costoAtaqueInv(inv){ return InvCalculo.costoAtaque(inv); }
+function costoNitrosHabInv(inv, h){ return InvCalculo.costoNitrosHab(inv, h); }
+function costoHabInvTxt(inv, h){ return InvCalculo.costoHabTxt(inv, h); }
+function bloqueoHabInv(inv, h){ return InvCalculo.bloqueoHab(inv, h); }
+function invDanoTxt(inv, extra){ return InvCalculo.danoTxt(inv, extra); }
+function invAtaqueTxt(inv){ return InvCalculo.ataqueTxt(inv); }
+function modsAfectanHpInv(mods){ return InvCalculo.modsAfectanHp(mods); }
+function actualizarHpMaxPorConInv(inv){ return InvCalculo.actualizarHpMaxPorCon(inv); }
+function migrarInvocacion(inv){ return InvCalculo.migrar(inv); }
 
 /* ---------- Ítems de una invocación (arma y armadura): asistente paso a
    paso compartido, igual que en la ficha y en gm-tools ---------- */

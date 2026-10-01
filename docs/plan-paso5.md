@@ -74,3 +74,10 @@ etapa 3 del paso 4 (el mapa dibuja la Botonera) es armar la pantalla con esas pi
   fórmulas cambiadas a mano): igual. Pruebas: 103. **Para tener en cuenta en la etapa 3**: las fórmulas de stats de cada
   ficha se evalúan como código; hoy ya pasa al abrir una ficha ajena, y va a pasar en el mapa — anotar en "Antes de abrirlo
   al público". Sigue el área 2 (combate).
+- 2026-10-01: **nivel B, área 2 hecha — el combate** (`comun/ficha-combate.js`, `FichaCombate`). Sin preguntas de diseño
+  (ninguna regla cambia). Se mudaron: manos, con qué atacar y con qué parriar, PdG y stats por arma (sin los bonos de la otra;
+  Parry y Bloqueo sin los del escudo ajeno), valor del Bloqueo, alcance, daño, fórmulas de los botones, costo de atacar y el
+  conteo de ataques. Quedan en la ficha las acciones con pantalla (`atacarConArma`, `parryConArma`, los avisos), que ahora
+  usan esas piezas. Comparado contra lo viejo en 1 200 fichas al azar (armas de una y dos manos, escudos, bonos de PdG,
+  Parry, Bloqueo, crítico y rango, ítems rotos, mano preferida, armas de rango, ataques ya hechos, Lisiado): igual. Pruebas:
+  107. Sigue el área 3 (habilidades y consumibles).

@@ -42,6 +42,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="critico.js"></script>
 <script src="combatiente.js"></script>
 <script src="ficha-calculo.js"></script>
+<script src="ficha-combate.js"></script>
 <script src="estados-presets.js"></script>
 <script src="estados-aplicar.js"></script>
 <script src="modificadores-tirada.js"></script>
@@ -387,6 +388,33 @@ prueba('sobrecarga: peso equipado por encima de la Carga máxima', () => {
 prueba('No2 máximo con un tope forzado (regla común) y Job por nivel', () => {
   const c = FichaCalculo.calcular(fichaDePrueba({efectos: [{nombre: 'Stun', activo: true, forzarNitros: 2}]}));
   igual([c.final.nitros, FichaCalculo.jobTotal(1), FichaCalculo.jobTotal('4'), FichaCalculo.pasivaCompras({compras: '3'}), FichaCalculo.slotDe('escudo_1m')], [2, 3, 12, 3, 'escudo']);
+});
+
+/* ---------- El combate de la ficha (comun/ficha-combate.js, paso 5 nivel B área 2) ---------- */
+grupo('Combate de la ficha (paso 5)');
+const fichaArmada = () => fichaDePrueba({inventario: [
+  {id: 'esp', nombre: 'Espada', tipoItem: 'arma_1m', tipoDado: 8, peso: 2, equipado: true, mods: [{stat: 'pdg', val: 2}, {stat: 'parry', val: 1}]},
+  {id: 'esc', nombre: 'Escudo', tipoItem: 'escudo_1m', peso: 3, equipado: true, mods: [{stat: 'parry', val: 2}, {stat: 'bloqueo', val: 1}]},
+  {id: 'dag', nombre: 'Daga', tipoItem: 'arma_1m', tipoDado: 4, peso: 1, equipado: false, mods: [{stat: 'pdg', val: 5}]}]});
+prueba('manos: con qué ataca (armas con daño) y con qué parría (también el escudo)', () => {
+  const S = fichaArmada();
+  igual([FichaCombate.armasEquipadasConDano(S).map(a => [a.item.id, a.mano]), FichaCombate.armasYEscudosParaParry(S).map(a => [a.item.id, a.mano])],
+    [[['esp', 1]], [['esp', 1], ['esc', 2]]]);
+});
+prueba('cada uno con lo suyo: el Parry con la espada no suma el del escudo, y al revés (P129)', () => {
+  const S = fichaArmada(), esp = S.inventario[0], esc = S.inventario[1];
+  igual([FichaCombate.statParaArma(S, 'parry', esp), FichaCombate.statParaArma(S, 'parry', esc), FichaCombate.pdgParaArma(S, esp).valor, FichaCombate.bloqueoValor(S, esc)],
+    [1, 2, 8, 3 + 1 + 3]);
+});
+prueba('atacar: Tipo ÷ 2 el primero con cada arma, Tipo completo después; se cuenta por arma', () => {
+  const S = fichaArmada(), esp = S.inventario[0];
+  const antes = FichaCombate.costoAtaque(S, esp), primero = FichaCombate.registrarAtaque(S, esp), despues = FichaCombate.costoAtaque(S, esp);
+  igual([antes, primero, despues, S.ataquesTurno, S.ataquesArma.esp, FichaCombate.costoAtaque(S, null), FichaCombate.costoAtaqueEspecial(esp)], [4, true, 8, 1, 1, 2, 4]);
+});
+prueba('alcance y daño de un arma', () => {
+  const S = fichaArmada();
+  igual([FichaCombate.alcanceDeArma(S, S.inventario[0]), FichaCombate.armaDanoTxt(S.inventario[0], 3), FichaCombate.armaDanoTxt({tipoItem: 'arma_2m', peso: 3, tipoDado: 10, armaDeRango: true}, 3), FichaCombate.armaDanoTxt(S.inventario[1])],
+    [1, '2d8 + 3', '3d10', '']);
 });
 
 /* ---------- Plantillas (comun/plantillas.js) ---------- */

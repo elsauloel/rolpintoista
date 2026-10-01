@@ -58,12 +58,11 @@ function sinNitrosPara(h){
 
 /* ---------- Atacar: cada arma paga Tipo ÷ 2 su primer ataque del turno y Tipo completo los demás ---------- */
 
-const claveAtaque = arma => arma ? arma.id : 'sin-arma';
-const tipoAtaque = arma => arma ? (num(arma.tipoDado) || 8) : IT2.tipoSinArma;
-const ataquesConArma = arma => num((S.ataquesArma || {})[claveAtaque(arma)]);
-
-// La regla (Tipo ÷ 2 el primero, Tipo completo después) es la del motor común (comun/combatiente.js); acá se cuenta por arma.
-function costoAtaqueNitros(arma){ return Combatiente.costoAtaque(tipoAtaque(arma), ataquesConArma(arma)); }
+// Qué arma, su Tipo, cuántos ataques lleva y cuánto cuesta el próximo: comun/ficha-combate.js (paso 5, nivel B, área 2).
+const claveAtaque = FichaCombate.claveAtaque;
+const tipoAtaque = FichaCombate.tipoAtaque;
+const ataquesConArma = arma => FichaCombate.ataquesConArma(S, arma);
+function costoAtaqueNitros(arma){ return FichaCombate.costoAtaque(S, arma); }
 
 function costoAtaqueTxt(){
   const armas = armasEquipadasConDano();
@@ -71,18 +70,11 @@ function costoAtaqueTxt(){
   return armas.map(a => `${a.item.nombre}: ${costoAtaqueNitros(a.item)} No2 (${ataquesConArma(a.item) ? 'Tipo completo' : 'primer ataque, Tipo ÷ 2'})`).join(' · ');
 }
 
-const esArmaEnMano = id => S.inventario.some(i => i.id === id && i.equipado && ES_MANO(i.tipoItem) && ES_ARMA(i.tipoItem));
+const esArmaEnMano = id => FichaCombate.esArmaEnMano(S, id);
 
 // PdG al atacar con un arma: no cuentan los modificadores de PdG que vienen
 // de otra arma equipada (cada arma aporta el suyo solo cuando ataca).
-function pdgParaArma(arma, c){
-  c = c || compute();
-  const excluidos = (c.mods.pdg || []).filter(m => m.itemId && m.itemId !== (arma && arma.id) && esArmaEnMano(m.itemId));
-  if(!excluidos.length || Number.isNaN(c.final.pdg)) return {valor: c.final.pdg, excluidos: []};
-  let v = c.base.pdg + c.modTotal.pdg - excluidos.reduce((a, m) => a + m.val, 0);
-  const activos = (S.efectos || []).filter(e => e.activo !== false);
-  return {valor: v, excluidos};
-}
+function pdgParaArma(arma, c){ return FichaCombate.pdgParaArma(S, arma, c); }   // sin los bonos de PdG de la otra arma
 
 /* ---------- Parry y Bloqueo con arma o escudo ----------
    Parry: siempre cuesta 1 No2 (2026-09-26, dueño; antes el Peso del arma o escudo), sin importar el arma o escudo ni cuántos ataques hiciste en
@@ -101,13 +93,7 @@ const costoParryNitros = () => Combatiente.costoParry();   // SIEMPRE 1 No2, sin
 // A diferencia de armasEquipadasConDano() (para Atacar/Daño Arma/Bloqueo),
 // acá entra cualquier arma O ESCUDO equipado, tenga o no daño: para
 // parriar alcanza con la mano, el escudo no ataca pero sí para.
-function armasYEscudosParaParry(){
-  const manos = asignarManos();
-  return S.inventario
-    .filter(i => i.equipado && !itemRoto(i) && ES_MANO(i.tipoItem))
-    .map(i => ({item: i, mano: manos.get(i.id) || null}))
-    .sort((a, b) => (a.mano || 99) - (b.mano || 99));
-}
+function armasYEscudosParaParry(){ return FichaCombate.armasYEscudosParaParry(S); }   // comun/ficha-combate.js
 
 function costoParryTxt(){
   const armas = armasYEscudosParaParry();
@@ -118,16 +104,9 @@ function costoParryTxt(){
 // Valor del stat cuando se usa ESA arma: no cuentan los modificadores que vienen de otra arma equipada.
 // Parry y Bloqueo (P129, dueño 2026-09-30, "cada uno con lo suyo"): tampoco cuentan los de un ESCUDO que no es con el que se
 // para — el +1 al Parry de un escudo vale al parar con ese escudo, y el de la espada, con la espada.
-const STATS_DEFENSA_POR_ITEM = ['parry', 'bloqueo'];
-const esEnMano = id => S.inventario.some(i => i.id === id && i.equipado && ES_MANO(i.tipoItem));
-function statParaArma(statId, arma){
-  const c = compute();
-  const deOtro = STATS_DEFENSA_POR_ITEM.includes(statId) ? esEnMano : esArmaEnMano;
-  const excluidos = (c.mods[statId] || []).filter(m => m.itemId && m.itemId !== (arma && arma.id) && deOtro(m.itemId));
-  if(!excluidos.length || Number.isNaN(c.final[statId])) return c.final[statId];
-  let v = c.base[statId] + c.modTotal[statId] - excluidos.reduce((a, m) => a + m.val, 0);
-  return v;
-}
+const STATS_DEFENSA_POR_ITEM = FichaCombate.STATS_DEFENSA_POR_ITEM;
+const esEnMano = id => FichaCombate.esEnMano(S, id);
+function statParaArma(statId, arma){ return FichaCombate.statParaArma(S, statId, arma); }   // comun/ficha-combate.js
 
 function parryConArma(arma, forzar){
   const costo = costoParryNitros(arma);
@@ -147,9 +126,7 @@ function parryConArma(arma, forzar){
 
 // El Bloqueo se calcula así (2026-09-24, pedido del dueño): tu Bloqueo (que sale de la Fuerza, con lo que le suma tu equipo) MÁS el
 // peso del arma elegida; ESA SUMA es el valor que se convierte en dado (antes el peso se sumaba aparte, como número fijo).
-function bloqueoValorConArma(arma){
-  return statParaArma('bloqueo', arma) + (arma ? num(arma.peso) : 0);
-}
+function bloqueoValorConArma(arma){ return FichaCombate.bloqueoValor(S, arma); }   // Bloqueo + peso: esa suma es el dado
 function bloqueoConArma(arma){
   tirarValorStat(arma ? `Bloqueo · ${arma.nombre}` : 'Bloqueo', bloqueoValorConArma(arma), 'bloqueo');
 }
@@ -157,7 +134,7 @@ function bloqueoConArma(arma){
 // Menú de Atacar (2026-09-26, pedido del dueño): el botón Atacar pregunta QUÉ ataque es, para automatizar el costo en Nitros de cada uno.
 //  · Ataque normal: el primero del turno con esa arma cuesta Tipo ÷ 2; los siguientes, el Tipo completo (cuenta como ataque).
 //  · Ataque de oportunidad y Contraataque (regla a prueba: tras un Parry con arma o escudo): SIEMPRE cuestan Tipo ÷ 2 (lo de un primer ataque) y NO suman al conteo de ataques del turno.
-const costoAtaqueEspecial = arma => Combatiente.costoPrimerAtaque(tipoAtaque(arma));
+const costoAtaqueEspecial = FichaCombate.costoAtaqueEspecial;
 const NOMBRE_ATAQUE_ESPECIAL = {oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
 function ataqueEspecialConArma(arma, tipo, forzar){
   const costo = costoAtaqueEspecial(arma), nombre = NOMBRE_ATAQUE_ESPECIAL[tipo] || 'Ataque';
@@ -450,10 +427,8 @@ function atacarConArma(arma, forzar){
     avisarSinNitros(costo, `atacar${arma ? ' con ' + arma.nombre : ''}`, () => atacarConArma(arma, true));
     return;
   }
-  const primero = ataquesConArma(arma) === 0;
   S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(costo, `atacó${arma ? ' con ' + arma.nombre : ''}`) : costo);
-  S.ataquesTurno = num(S.ataquesTurno) + 1;
-  S.ataquesArma = {...(S.ataquesArma || {}), [claveAtaque(arma)]: ataquesConArma(arma) + 1};
+  const primero = FichaCombate.registrarAtaque(S, arma);   // cuenta el ataque con esa arma (comun/ficha-combate.js)
   renderNitros();
   tirarValorStat(arma ? `PdG · ${arma.nombre}` : 'PdG', pdgParaArma(arma).valor, 'pdg');
   const tipo = tipoAtaque(arma);
@@ -916,9 +891,7 @@ async function ejecutarHabilidad(id, armaId, forzar){
 // (el próximo ataque con esa arma ya paga Tipo completo). Devuelve el texto.
 function registrarAtaqueDeHabilidad(it, arma){
   if(!nitrosAtaque(it)) return '';
-  const primero = ataquesConArma(arma) === 0;
-  S.ataquesTurno = num(S.ataquesTurno) + 1;
-  S.ataquesArma = {...(S.ataquesArma || {}), [claveAtaque(arma)]: ataquesConArma(arma) + 1};
+  const primero = FichaCombate.registrarAtaque(S, arma);   // cuenta como ese ataque (comun/ficha-combate.js)
   return `ataque con ${arma ? arma.nombre : 'sin arma'}${primero ? ' (primero del turno)' : ''}`;
 }
 

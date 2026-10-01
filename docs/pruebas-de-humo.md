@@ -13,7 +13,7 @@
 > Cómo anotar: al lado de cada punto, ✔ / ✘ y la fecha. Un ✘ se arregla (o se anota en `pendientes.md`) antes de seguir.
 
 ## 0. Automáticas
-- [ ] `comun/pruebas.html` en verde (hoy: 103 pruebas).
+- [ ] `comun/pruebas.html` en verde (hoy: 107 pruebas).
 
 ## 1. Ficha (partida "Test", "Prueba de Claude")
 - [ ] Abre sin errores en la consola; el título dice personaje y partida.
@@ -74,6 +74,7 @@
 | 2026-09-30 | 🎮 Tomar el control en mesa ("Claude · pruebas", Clementino): estado recibido, pase de turno, Botonera en el mapa, mover con No2, defensa en un duelo, devolver | ✔ | Todo restaurado al terminar. |
 | 2026-09-30 | Paso 2 en mesa ("Claude · pruebas", sitio publicado): Goblin con Veneno ×2, Regeneración +3 y Escudo gastado, 3 Mantenimientos seguidos | ✔ | Vida 20 → 21 → 23 → 26; Veneno se terminó al llegar a 0 stacks; Regeneración venció; escudo recargado. Todo restaurado. |
 | 2026-09-30 | Tanda 3: costo de atacar y No2 máximo en ficha, invocación y GM Tools (copias sin sesión) | ✔ 72/72 | "Forzar Nitros a 20" con Agilidad 9 ya no sube el máximo (P130). |
+| 2026-10-01 | Paso 5, nivel B, área 2 (`comun/ficha-combate.js`): combate nuevo contra el viejo en 1 200 fichas al azar (igual); atacar con la espada en una copia sin sesión (−4 No2 el primero; el segundo, sin No2 suficientes, avisa y no cobra) | ✔ 107/107 | |
 | 2026-09-30 | Paso 5, nivel B, área 1 (`comun/ficha-calculo.js`): cálculo nuevo contra el viejo en 1 500 fichas al azar (igual) y en mesa: la ficha de Clementino calcula lo mismo que tenía publicado (vida máx. 25, Defensa 0, No2 12, Rango 6, Rango de casteo 15, SP 45) | ✔ 103/103 | Sin errores. |
 | 2026-09-30 | Paso 5, nivel A (ficha y GM Tools partidas en archivos): copias sin sesión comparadas con las originales (pantalla idéntica, estilos iguales, modos botonera/mantenimiento/acciones/finalizar sin errores, invocación y creep con los mismos números) y en mesa ("Claude · pruebas"): ficha de Clementino, su Botonera dentro del mapa, GM Tools suelto (6 creeps, guardado) y las Acciones del Goblin dentro del mapa | ✔ | Un ajuste en la ficha: el primer `renderAll()` pasó al final (usaba funciones de archivos posteriores). Sin errores. |
 | 2026-09-30 | Paso 4, etapa 1, puntos 3 y 4 en mesa ("Claude · pruebas", como GM): precarga (GM Tools cargado por detrás sin abrir nada, capa cerrada); Acciones del Goblin en 0,3 s, sin «Abriendo…»; duelo con el creep sin cargar (GM Tools carga sin abrir sus Acciones encima del duelo, el PdG se tira igual); mensajes sin avisos de «sin registrar» | ✔ | Goblin restaurado (10 No2, 0 ataques); duelo cancelado antes de la defensa. Falta probar como jugador (precarga de la ficha propia). |

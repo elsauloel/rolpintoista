@@ -851,6 +851,13 @@ versión parecida en más de una, es candidato a juntar.
   de una variable global, así que lo puede usar cualquier pantalla que tenga los datos de un personaje. La ficha usa los mismos
   nombres de siempre como alias (`compute()` = `FichaCalculo.calcular(S)`). Comparado contra el cálculo viejo en 1 500 fichas
   al azar: igual. Ojo: las fórmulas de stats de cada ficha se evalúan como código (`evalFormula`), igual que siempre.
+- **`ficha-combate.js`** (`FichaCombate`, 2026-10-01, paso 5 nivel B área 2) — **el combate de un personaje, fuera de la
+  ficha**: qué tiene en cada mano (`asignarManos`), con qué ataca (`armasEquipadasConDano`) y con qué parría
+  (`armasYEscudosParaParry`), el PdG y los stats de cada arma sin los bonos de la otra (`pdgParaArma`, `statParaArma`, P129),
+  el Bloqueo (`bloqueoValor`: Bloqueo + peso), el alcance, el daño (`armaDanoTxt`), las fórmulas de los botones
+  (`formulasCombate`), el costo de atacar (`costoAtaque`, `costoAtaqueEspecial`) y el conteo de ataques del turno
+  (`registrarAtaque`). Reciben la ficha (`S`); la ficha conserva sus nombres de siempre como alias y sigue haciendo lo que se
+  ve (carteles, Mesa, Botonera). Comparado contra lo viejo en 1 200 fichas al azar: igual.
 - **`embebido.js`** (`Embebido`, 2026-09-30, paso 4 etapa 1, `../docs/plan-paso4.md`) — **una herramienta dentro del mapa**
   (la ficha con `?modo=botonera`, GM Tools con `?modo=acciones|finalizar|botin`). `Embebido.iniciar({clase, pagina,
   noCuenta})`: esconde SOLO la página de la herramienta (`pagina`) y las piezas comunes que el mapa ya muestra (`COMUNES`:

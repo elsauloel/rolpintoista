@@ -270,26 +270,7 @@ function renderArmadura(){
   renderEfectosOtros();
 }
 
-function asignarManos(){
-  const enManos = S.inventario.filter(i => i.equipado && ES_MANO(i.tipoItem));
-  const dosManos = enManos.find(a => a.tipoItem === 'arma_2m' || a.tipoItem === 'escudo_2m');
-  const unaMano = enManos.filter(a => a.tipoItem === 'arma_1m' || a.tipoItem === 'escudo_1m');
-  const mapa = new Map();
-  if(dosManos){
-    mapa.set(dosManos.id, 1);
-    const otro = unaMano[0];
-    if(otro) mapa.set(otro.id, 2);
-  }else{
-    const pref1 = unaMano.find(a => String(a.manoPreferida) === '1');
-    const pref2 = unaMano.find(a => String(a.manoPreferida) === '2' && a !== pref1);
-    const resto = unaMano.filter(a => a !== pref1 && a !== pref2);
-    const m1 = pref1 || resto.shift() || null;
-    const m2 = pref2 || resto.shift() || null;
-    if(m1) mapa.set(m1.id, 1);
-    if(m2) mapa.set(m2.id, 2);
-  }
-  return mapa;
-}
+function asignarManos(){ return FichaCombate.asignarManos(S); }   // comun/ficha-combate.js
 
 function renderEfectosArmas(){
   const enManos = S.inventario.filter(i => i.equipado && ES_MANO(i.tipoItem));
@@ -328,20 +309,7 @@ function renderEfectosArmas(){
 // Fórmulas de las 4 tiradas de Combate — se usa tanto para los botones
 // de la caja Combate como para las tiles de la Botonera, así siempre
 // muestran lo mismo.
-function formulasCombate(){
-  const c = compute();
-  const fPdg = formulaParaValor(c.final.pdg);
-  const fEva = formulaParaValor(c.final.eva);
-  const fParry = formulaParaValor(c.final.parry);
-  const fBloqueo = formulaParaValor(c.final.bloqueo);
-  const armas = S.inventario.filter(i => i.equipado && ES_MANO(i.tipoItem) && ES_ARMA(i.tipoItem));
-  let danio;
-  if(armas.length === 1) danio = armaDanoTxt(armas[0], c.final.dmg);
-  else if(armas.length > 1) danio = 'elegís arma';
-  else danio = 'sin arma equipada';
-  const conMit = (f, id) => f ? f.formula + ' ÷2'.repeat(mitadesDeTirada(S.efectos, id)) : '';
-  return {pdg: conMit(fPdg, 'pdg'), eva: conMit(fEva, 'eva'), parry: conMit(fParry, 'parry'), bloqueo: fBloqueo ? fBloqueo.formula : '', danio};
-}
+function formulasCombate(){ return FichaCombate.formulasCombate(S); }   // comun/ficha-combate.js
 
 // Los botones de Combate muestran qué van a tirar, para no tener que
 // adivinar antes de apretar.
@@ -354,13 +322,7 @@ function actualizarTextosCombate(){
   $('#btn-danio-arma').textContent = `🎲 Daño Arma · ${f.danio}`;
 }
 
-function armasEquipadasConDano(){
-  const manos = asignarManos();
-  return S.inventario
-    .filter(i => i.equipado && !itemRoto(i) && ES_MANO(i.tipoItem) && armaDanoTxt(i))
-    .map(i => ({item: i, mano: manos.get(i.id) || null}))
-    .sort((a, b) => (a.mano || 99) - (b.mano || 99));
-}
+function armasEquipadasConDano(){ return FichaCombate.armasEquipadasConDano(S); }   // comun/ficha-combate.js
 
 function tirarDanoDeArma(it){
   const dmg = compute().final.dmg;
@@ -838,11 +800,7 @@ function colocarZonaDeHab(it, xSp, xNitros){
   }catch(err){ console.error('No se pudo avisar la zona al mapa:', err); return false; }
 }
 // Alcance en casilleros de un ataque: cuerpo a cuerpo = 1 + el Alcance del arma (su bono `rng`); arma de rango = su Rango.
-function alcanceDeArma(arma){
-  if(arma && arma.armaDeRango){ const v = statParaArma('rng', arma); return Number.isNaN(v) ? 0 : Math.max(1, Math.round(v)); }
-  const bono = arma ? (arma.mods || []).filter(m => m.stat === 'rng').reduce((a, m) => a + num(m.val), 0) : 0;
-  return 1 + Math.max(0, Math.round(bono));
-}
+function alcanceDeArma(arma){ return FichaCombate.alcanceDeArma(S, arma); }   // comun/ficha-combate.js
 // Alcance de una habilidad según lo que configuró el 🎯: 'casteo' (Rango de casteo), 'rango' (Rango), 'adyacente' (1), un número, o sin límite (0 = no resalta).
 // Hasta dónde llega: la regla común (comun/combatiente.js), con el Rango y el Rango de casteo del personaje.
 function alcanceDeHab(c, statTira){ return Combatiente.alcanceHab(c, statTira, s => compute().final[s]); }
@@ -1047,11 +1005,5 @@ function precioVentaDe(i){
   return Math.round((num(i.precioCompra) / 2) * 100) / 100;
 }
 
-function armaDanoTxt(i, extra){
-  if(!ES_ARMA(i.tipoItem)) return '';
-  const dados = Math.max(1, num(i.peso) || 1) + Math.max(0, num(i.danoAmplificado));
-  const tipo = num(i.tipoDado) || 8;
-  const fijo = num(i.danoFijo) + (i.armaDeRango ? 0 : num(extra));
-  return `${dados}d${tipo}${fijo ? ` + ${fmt(fijo)}` : ''}`;
-}
+function armaDanoTxt(i, extra){ return FichaCombate.armaDanoTxt(i, extra); }   // comun/ficha-combate.js
 

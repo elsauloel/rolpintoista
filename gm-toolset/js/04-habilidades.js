@@ -3,11 +3,7 @@
 const habStatCreep = (sc, stat) => ATTR_IDS.includes(stat) ? num(sc[stat]) + creepModTotal(sc, stat) : creepStatValor(sc, stat);
 const habEtqCreep = stat => (CREEP_STAT_LOOKUP[stat] && CREEP_STAT_LOOKUP[stat].label) || (ATTR_LABELS && ATTR_LABELS[stat]) || stat;
 // Alcance en casilleros de un creep: cuerpo a cuerpo = 1 + el Alcance de su arma (mod `rng`); arma de rango = su Rango.
-function alcanceDeCreep(sc){
-  if(sc.armaDeRango){ const v = creepStatValor(sc, 'rng'); return Number.isNaN(v) ? 0 : Math.max(1, Math.round(v)); }
-  const bono = (sc.armaMods || []).filter(m => m.stat === 'rng').reduce((a, m) => a + num(m.val), 0);
-  return 1 + Math.max(0, Math.round(bono));
-}
+function alcanceDeCreep(sc){ return CreepCalculo.alcance(sc); }   // comun/creep-calculo.js
 function alcanceDeHabCreep(sc, c, statTira){ return Combatiente.alcanceHab(c, statTira, s => creepStatValor(sc, s)); }   // comun/combatiente.js
 // La Ejecución de un creep: la misma regla que personajes e invocaciones (comun/combatiente.js, habEjecucion) — ahora
 // también con la tirada personalizada y los textos «a mano», que antes se perdían. Sin costo variable: ninguna «X» se toca.

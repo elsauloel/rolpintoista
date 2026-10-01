@@ -938,7 +938,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/biblioteca.js?v=20260929i"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
 <script src="../comun/combatiente.js?v=20260930o"></script>
-<script src="../comun/creep-calculo.js?v=20261001a"></script>
+<script src="../comun/creep-calculo.js?v=20261001b"></script>
 <script src="../comun/modificadores-tirada.js?v=20260930c"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
 <script src="../comun/estados-aplicar.js?v=20260930c"></script>
@@ -9693,7 +9693,7 @@ document.addEventListener('keydown', e => {
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/creep-botonera.js?v=20261001a', '../comun/creep-acciones.js?v=20261001a'];
+const AC_PIEZAS = ['../comun/creep-botonera.js?v=20261001a', '../comun/creep-acciones.js?v=20261001b'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -9811,6 +9811,7 @@ function acAccionAca(b){
     });
     return true;
   }
+  if(d.atacarcreep){ acPreguntarTipoAtaque(sc); return true; }
   if(d.bloqueocreep){
     const t = CreepAcciones.bloqueo(sc, acParry.has(ac.creepId));
     if(t.error){ toast(t.error); return true; }
@@ -9820,6 +9821,40 @@ function acAccionAca(b){
     return true;
   }
   return false;
+}
+/* Paso 4c (tanda 3): Atacar. El menú "¿Qué ataque es?" (normal / oportunidad / contraataque, con lo que cuesta cada uno, igual que
+   GM Tools), después el objetivo con un clic en el token (dueloElegirObjetivoMapa, el mismo de siempre) y el duelo; "Sin objetivo"
+   hace el ataque suelto acá (cobra con modificarCreep y tira el PdG). Las tiradas que pide el duelo las sigue haciendo GM Tools
+   en el marco (tanda 4). */
+function acPreguntarTipoAtaque(sc){
+  const normal = CreepCalculo.costoAtaque(sc), primero = num(sc.ataquesTurno) === 0, especial = CreepCalculo.costoContraataque(sc);
+  ac.raiz.querySelector('#ac-tipo-lista').innerHTML = `<div class="hint">${esc(sc.nombre)}</div>
+    <button class="btn" data-ac-tipo="normal" style="width:100%">⚔ Ataque normal — ${fmt(normal)} No2<br><span class="hint">${primero ? 'primer ataque del turno (Tipo ÷ 2)' : 'Tipo completo (ya atacó este turno)'}</span></button>
+    <button class="btn" data-ac-tipo="oportunidad" style="width:100%">🏃 Ataque de oportunidad — ${fmt(especial)} No2<br><span class="hint">siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>
+    <button class="btn" data-ac-tipo="contra" style="width:100%">↩ Contraataque — ${fmt(especial)} No2<br><span class="hint">solo tras ganar un Parry y un Bloqueo; siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>`;
+  ac.raiz.querySelector('#ac-tipo-ataque').classList.add('open');
+}
+function acAtacar(tipo){
+  const sc = acCreep();
+  if(!sc) return;
+  const id = ac.creepId;
+  const hacer = () => {
+    if(tipo === 'normal' && (sc.estados || []).some(e => e.activo !== false && e.sentado) && !confirm(`${sc.nombre} está Sentado y no puede atacar. ¿Atacar igual?`)) return;
+    acCambiar(c => CreepAcciones.pagarAtaque(c, tipo)).then(x => {
+      if(!x) return;
+      if(tipo === 'normal') acParry.delete(id);   // atacar cierra el Parry que esperaba su Bloqueo
+      acPublicar(sc, CreepAcciones.tiradaAtaque(sc, tipo));
+      toast(x.aviso);
+      acDibujar();
+    });
+  };
+  if(typeof Duelo === 'undefined' || !Duelo.disponible()){ hacer(); return; }
+  // Mientras se elige el objetivo las Acciones nuevas se esconden (tapan el mapa); "Sin objetivo" o cancelar las vuelven a mostrar.
+  const reabrir = () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } };
+  ac.host.hidden = true;
+  dueloElegirObjetivoMapa({yo: {ref: id, tipo: 'creep', nombre: sc.nombre},
+    ataque: {tipo, armaId: '', armaNombre: sc.armaNombre || '', tipoDado: num(sc.armaTipo) || 8, rango: !!sc.armaDeRango, alcance: CreepCalculo.alcance(sc)},
+    conSuelto: true, alSuelto: () => { reabrir(); hacer(); }, alCancelar: () => reabrir()});
 }
 // Un botón de las Acciones nuevas: se lo pide a GM Tools en el marco (lo carga si hace falta, sin abrir nada).
 function acDelegar(datos){
@@ -9837,11 +9872,21 @@ function acCrear(){
   host.hidden = true;
   document.body.appendChild(host);
   const raiz = host.attachShadow({mode: 'open'});
-  raiz.innerHTML = `<style id="ac-css"></style><div id="ac-contenido"></div>`;
+  raiz.innerHTML = `<style id="ac-css"></style><div id="ac-contenido"></div>
+    <div class="scrim" id="ac-tipo-ataque"><div class="modal" style="max-width:360px">
+      <header><h3>¿Qué ataque es?</h3><button class="iconbtn" data-ac-tipo="no">Cerrar</button></header>
+      <div class="body" id="ac-tipo-lista" style="display:flex;flex-direction:column;gap:9px"></div>
+    </div></div>`;
+  raiz.querySelector('#ac-tipo-ataque').addEventListener('mousedown', e => { if(e.target.id === 'ac-tipo-ataque') e.target.classList.remove('open'); });
   raiz.addEventListener('click', e => {
     const b = e.target.closest('button');
     if(!b || !ac) return;
     if(b.dataset.acCerrar !== undefined){ cerrarAccionesNuevas(); return; }
+    if(b.dataset.acTipo){
+      raiz.querySelector('#ac-tipo-ataque').classList.remove('open');
+      if(b.dataset.acTipo !== 'no') acAtacar(b.dataset.acTipo);
+      return;
+    }
     if(acAccionAca(b)) return;
     const datos = {...b.dataset};
     if(!Object.keys(datos).length) return;
@@ -9871,6 +9916,8 @@ document.addEventListener('keydown', e => {
   if(!ac || ac.host.hidden || !$('#botonera-capa').hidden || elegirDestinoCb) return;
   if(e.key !== 'Escape') return;
   e.preventDefault();
+  const cartel = ac.raiz.querySelector('.scrim.open');
+  if(cartel){ cartel.classList.remove('open'); return; }
   cerrarAccionesNuevas();
 });
 

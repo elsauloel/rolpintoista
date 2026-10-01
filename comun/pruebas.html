@@ -911,6 +911,13 @@ prueba('acciones de un creep: levantarse y el Parry cobran No2; el Bloqueo solo 
     [true, 0, true, 0, true, true, 'Orco · Bloqueo · Hacha', null]);
 });
 
+prueba('atacar con un creep: el normal suma al conteo y el contraataque no; alcance cuerpo a cuerpo y de rango', () => {
+  const sc = creepPrueba({nitros: 10, armaMods: [{stat: 'pdgcontra', val: 2}]});
+  const n = CreepAcciones.pagarAtaque(sc, 'normal'), c = CreepAcciones.pagarAtaque(sc, 'contra');
+  igual([sc.ataquesTurno, sc.nitros, c.aviso.includes('PdG +2 por contraataque'), CreepAcciones.tiradaAtaque(sc, 'contra').origen, CreepCalculo.alcance(sc), CreepCalculo.alcance(creepPrueba({armaDeRango: true, des: 5}))],
+    [1, 2, true, 'Orco · Contraataque (PdG)', 1, 5]);
+});
+
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */
 grupo('Mis últimas tiradas (P138)');
 prueba('se juntan las de la Mesa con las de esta ventana, sin repetir, las últimas primero', () => {

@@ -392,6 +392,12 @@ const CreepCalculo = (() => {
   function fuerzaGolpeValor(sc){ return num(sc.fue) + (sc.estados || []).filter(e => e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'fue').reduce((x, m) => x + num(m.val) * Math.max(1, num(e.stacks) || 1), 0), 0) + pesoArma(sc); }
   // Contraataque (regla a prueba, 2026-09-26): tras un Parry, siempre cuesta lo de un primer ataque y no suma al conteo de ataques del turno.
   function costoContraataque(sc){ return Combatiente.costoPrimerAtaque(num(sc.armaTipo) || 8); }   // regla común (comun/combatiente.js)
+  // Alcance de su arma, en casilleros: un arma de rango usa su Rango; una de cuerpo a cuerpo, 1 + lo que le sume a Rango.
+  function alcance(sc){
+    if(sc.armaDeRango){ const v = statValor(sc, 'rng'); return Number.isNaN(v) ? 0 : Math.max(1, Math.round(v)); }
+    const bono = (sc.armaMods || []).filter(m => m.stat === 'rng').reduce((a, m) => a + num(m.val), 0);
+    return 1 + Math.max(0, Math.round(bono));
+  }
 
   /* ---------- Habilidades: modo y si se pueden usar ---------- */
   function modoHab(h){ return Combatiente.modoHab(h, h && h.duelo && typeof h.duelo === 'object' ? h.duelo : null); }   // la regla común
@@ -464,5 +470,5 @@ const CreepCalculo = (() => {
     statValor, estadoActivo, aportesMod, origenesMod, conSigno, statOrigenTxt, armadmgOrigenTxt, ataqueTxt, ataqueOrigenTxt,
     defensaOrigenTxt, critOrigenTxt, armaduraOrigenTxt, modsAfectanHp, actualizarHpMaxPorCon, nitrosMax, actualizarNo2PorAgl,
     costoAtaque, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor,
-    fuerzaGolpeValor, costoContraataque, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
+    fuerzaGolpeValor, costoContraataque, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
 })();

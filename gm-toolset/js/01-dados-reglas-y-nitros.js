@@ -534,31 +534,19 @@ function costoContraataqueCreep(sc){ return CreepCalculo.costoContraataque(sc); 
 // oportunidad y contraataque siempre cuestan Tipo ÷ 2 y no suman al conteo de ataques del turno.
 function atacarNormalCreep(sc){
   if((sc.estados || []).some(e => e.activo !== false && e.sentado) && !confirm(`${sc.nombre} está Sentado y no puede atacar. ¿Atacar igual?`)) return;
-  const costo = costoAtaqueCreep(sc);
-  if(costo > num(sc.nitros)){
-    toast(`${sc.nombre}: no le alcanzan los No2 — este ataque cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`);
-    return;
-  }
-  const primero = num(sc.ataquesTurno) === 0;
-  sc.nitros = num(sc.nitros) - costo;
-  sc.ataquesTurno = num(sc.ataquesTurno) + 1;
+  const x = CreepAcciones.pagarAtaque(sc, 'normal');   // comun/creep-acciones.js
+  if(x.error){ toast(x.error); return; }
   parryPendienteCreep.delete(sc.id);   // atacar cierra el Parry que esperaba su Bloqueo
   renderAll();
-  const pdg = creepStatValor(sc, 'pdg');
-  tirarValorStat(`${sc.nombre} · PdG`, pdg, sc, 'pdg');
-  toast(`${sc.nombre}: −${fmt(costo)} No2 · ${primero ? 'primer ataque del turno' : `ataque ${fmt(sc.ataquesTurno)} del turno`} · quedan ${fmt(sc.nitros)}`);
+  publicarTiradaCreep(CreepAcciones.tiradaAtaque(sc, 'normal'));
+  toast(x.aviso);
 }
 function ataqueEspecialCreep(sc, tipo){
-  const nombre = tipo === 'oportunidad' ? 'Ataque de oportunidad' : 'Contraataque', costo = costoContraataqueCreep(sc);
-  if(costo > num(sc.nitros)){
-    toast(`${sc.nombre}: no le alcanzan los No2 — el ${nombre.toLowerCase()} cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`);
-    return;
-  }
-  sc.nitros = num(sc.nitros) - costo;
+  const x = CreepAcciones.pagarAtaque(sc, tipo);   // comun/creep-acciones.js
+  if(x.error){ toast(x.error); return; }
   renderAll();
-  const bonoContra = (sc.armaMods || []).filter(m => m.stat === (tipo === 'contra' ? 'pdgcontra' : tipo === 'oportunidad' ? 'pdgopor' : '')).reduce((a, m) => a + num(m.val), 0);   // PdG en contraataque de su arma
-  tirarValorStat(`${sc.nombre} · ${nombre} (PdG)`, creepStatValor(sc, 'pdg') + bonoContra, sc, 'pdg');
-  toast(`${sc.nombre}: ${nombre.toLowerCase()} −${fmt(costo)} No2 (lo de un primer ataque)${bonoContra ? ` · PdG +${fmt(bonoContra)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''} · quedan ${fmt(sc.nitros)}`);
+  publicarTiradaCreep(CreepAcciones.tiradaAtaque(sc, tipo));
+  toast(x.aviso);
 }
 function preguntarTipoAtaqueCreep(sc){
   const normal = costoAtaqueCreep(sc), primero = num(sc.ataquesTurno) === 0, especial = costoContraataqueCreep(sc);

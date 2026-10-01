@@ -60,5 +60,33 @@ const CreepAcciones = (() => {
     return {aviso: `${sc.nombre}: Parry −${fmt(costo)} No2 · quedan ${fmt(sc.nitros)} · si lo gana, tirá el Bloqueo`};
   }
 
-  return {tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, pagarParry};
+  /* ---------- Atacar (menú de Atacar del creep, 2026-09-26) ----------
+     'normal': el primero del turno cuesta Tipo ÷ 2 y los siguientes el Tipo completo, y suma al conteo de ataques;
+     'oportunidad' y 'contra' (contraataque): siempre Tipo ÷ 2 y no suman al conteo. Cobrar (pagarAtaque → {error} o {aviso}) y
+     después la tirada de PdG (tiradaAtaque). Un ataque normal cierra el Parry que esperaba su Bloqueo: lo borra cada pantalla. */
+  const NOMBRE_ESPECIAL = {oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
+  // PdG en contraataque (o en oportunidad) que le suma su arma.
+  const bonoEspecial = (sc, tipo) => (sc.armaMods || []).filter(m => m.stat === (tipo === 'contra' ? 'pdgcontra' : tipo === 'oportunidad' ? 'pdgopor' : '')).reduce((a, m) => a + num(m.val), 0);
+  function pagarAtaque(sc, tipo){
+    if(tipo === 'normal'){
+      const costo = C().costoAtaque(sc);
+      if(costo > num(sc.nitros)) return {error: `${sc.nombre}: no le alcanzan los No2 — este ataque cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`};
+      const primero = num(sc.ataquesTurno) === 0;
+      sc.nitros = num(sc.nitros) - costo;
+      sc.ataquesTurno = num(sc.ataquesTurno) + 1;
+      return {aviso: `${sc.nombre}: −${fmt(costo)} No2 · ${primero ? 'primer ataque del turno' : `ataque ${fmt(sc.ataquesTurno)} del turno`} · quedan ${fmt(sc.nitros)}`};
+    }
+    const nombre = NOMBRE_ESPECIAL[tipo] || 'Contraataque', costo = C().costoContraataque(sc);
+    if(costo > num(sc.nitros)) return {error: `${sc.nombre}: no le alcanzan los No2 — el ${nombre.toLowerCase()} cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`};
+    sc.nitros = num(sc.nitros) - costo;
+    const bono = bonoEspecial(sc, tipo);
+    return {aviso: `${sc.nombre}: ${nombre.toLowerCase()} −${fmt(costo)} No2 (lo de un primer ataque)${bono ? ` · PdG +${fmt(bono)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''} · quedan ${fmt(sc.nitros)}`};
+  }
+  function tiradaAtaque(sc, tipo){
+    if(tipo === 'normal') return tirada(`${sc.nombre} · PdG`, C().statValor(sc, 'pdg'), sc, 'pdg');
+    const nombre = NOMBRE_ESPECIAL[tipo] || 'Contraataque';
+    return tirada(`${sc.nombre} · ${nombre} (PdG)`, C().statValor(sc, 'pdg') + bonoEspecial(sc, tipo), sc, 'pdg');
+  }
+
+  return {tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL};
 })();

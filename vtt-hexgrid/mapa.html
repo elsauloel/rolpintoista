@@ -9117,18 +9117,29 @@ function bnAlternar(){
   try{ localStorage.setItem(BN_CLAVE, bnActiva() ? '0' : '1'); }catch(e){}
   bnPintarInterruptor();
   if(!bnActiva()) cerrarBotoneraNueva();
+  else if(soyGM) acCargarPiezas().catch(err => console.error(err));   // los ganchos del duelo de los creeps (tanda 4)
   toast(bnActiva() ? '⚗ Botonera nueva prendida (solo en este navegador): abrí la Botonera de tu personaje con B o con su token. Si algo no anda, apagala.' : 'Botonera nueva apagada: vuelve la de siempre');
 }
 // Las piezas de comun/ que el mapa no carga siempre, y el ficha.css (con :root → :host para que valga adentro del recuadro).
+// Carga scripts de comun/ en orden, una sola vez cada uno (se reconocen sin el ?v=): la Botonera nueva y las Acciones nuevas
+// comparten algunos, y un script con `const` arriba no se puede cargar dos veces.
+const piezasCargadas = new Map();
+function cargarPiezas(lista){
+  return lista.reduce((p, src) => p.then(() => {
+    const clave = src.split('?')[0];
+    if(!piezasCargadas.has(clave)) piezasCargadas.set(clave, new Promise((ok, mal) => {
+      const el = document.createElement('script'); el.src = src; el.onload = ok; el.onerror = () => { piezasCargadas.delete(clave); mal(new Error('No se pudo cargar ' + src)); };
+      document.head.appendChild(el);
+    }));
+    return piezasCargadas.get(clave);
+  }), Promise.resolve());
+}
 function bnCargarPiezas(){
   if(!bnCargando){
     if(!document.querySelector('link[data-bn-fuentes]')){
       const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = BN_FUENTES; l.dataset.bnFuentes = '1'; document.head.appendChild(l);
     }
-    bnCargando = BN_PIEZAS.reduce((p, src) => p.then(() => new Promise((ok, mal) => {
-      const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => mal(new Error('No se pudo cargar ' + src));
-      document.head.appendChild(s);
-    })), Promise.resolve())
+    bnCargando = cargarPiezas(BN_PIEZAS)
       // Lo que subió el grupo al catálogo (como la ficha): un consumible viejo busca ahí el estado que deja.
       .then(() => ItemsSubidos.cargar().then(l => { bnItemsSubidos = l || []; }))
       .then(() => fetch('../ficha-personaje/ficha.css?v=20260930a').then(r => r.text()))
@@ -9693,7 +9704,7 @@ document.addEventListener('keydown', e => {
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/creep-botonera.js?v=20261001a', '../comun/creep-acciones.js?v=20261001b'];
+const AC_PIEZAS = ['../comun/creep-botonera.js?v=20261001a', '../comun/creep-acciones.js?v=20261001b', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261001a'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -9702,10 +9713,7 @@ function acCargarPiezas(){
     if(!document.querySelector('link[data-bn-fuentes]')){
       const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = BN_FUENTES; l.dataset.bnFuentes = '1'; document.head.appendChild(l);
     }
-    acCargando = AC_PIEZAS.reduce((p, src) => p.then(() => new Promise((ok, mal) => {
-      const el = document.createElement('script'); el.src = src; el.onload = ok; el.onerror = () => mal(new Error('No se pudo cargar ' + src));
-      document.head.appendChild(el);
-    })), Promise.resolve())
+    acCargando = cargarPiezas(AC_PIEZAS)
       .then(() => fetch('../gm-toolset/gm-tools.css?v=20260930a').then(r => r.text()))
       .then(css => { acCss = css.replace(/:root\b/g, ':host'); })
       .catch(err => { acCargando = null; throw err; });
@@ -9763,9 +9771,10 @@ function acPublicar(sc, t){
 }
 // Cambia el creep en una transacción: `cambiar(sc)` recibe el creep al día (normalizado) y devuelve {error} o {aviso}. Si es un
 // error de la regla, no se escribe nada y se avisa. Devuelve lo que devolvió `cambiar`, o null.
-async function acCambiar(cambiar){
+function acCambiar(cambiar){ return acCambiarCreep(ac.creepId, cambiar); }
+async function acCambiarCreep(creepId, cambiar){
   try{
-    return await modificarCreep(ac.creepId, crudo => {
+    return await modificarCreep(creepId, crudo => {
       const x = cambiar(CreepCalculo.normalizar(crudo));
       if(x && x.error) throw Object.assign(new Error(x.error), {regla: true});
       return x;
@@ -9822,6 +9831,26 @@ function acAccionAca(b){
   }
   return false;
 }
+/* Paso 4c (tanda 4): lo que el duelo le pide a un creep (su PdG, la defensa, el daño, la Fuerza del golpe, el Bloqueo, el crítico,
+   el Flash, las tiradas de una habilidad dirigida) lo contesta el mapa con los mismos ganchos de GM Tools (comun/creep-duelo.js),
+   sin pasar por el marco — para cualquier creep con token, si quien mira es el GM con ⚗ prendido (las piezas se cargan al
+   prenderlo o al entrar con él prendido). Si no, por el marco, como siempre. */
+function acDueloUi(){
+  return {
+    creep: ref => { const c = creepPrivadoDe(ref); if(!c) return null; const sc = CreepCalculo.normalizar(structuredClone(c)); sc.id = ref; return sc; },
+    cambiar: (ref, fn) => acCambiarCreep(ref, fn),
+    publicar: (sc, t) => acPublicar(sc, t),
+    toast: t => toast(t),
+    confirmar: t => confirm(t),
+    soy: lado => !!(lado && lado.tipo === 'creep' && soyGM && creepPrivadoDe(lado.ref)),
+    borrarParry: ref => acParry.delete(ref),
+  };
+}
+function acHooksDuelo(lado){
+  if(!lado || lado.tipo !== 'creep' || !soyGM || !bnActiva() || typeof CreepDuelo === 'undefined' || !creepPrivadoDe(lado.ref)) return null;
+  return CreepDuelo.hooks(acDueloUi());
+}
+
 /* Paso 4c (tanda 3): Atacar. El menú "¿Qué ataque es?" (normal / oportunidad / contraataque, con lo que cuesta cada uno, igual que
    GM Tools), después el objetivo con un clic en el token (dueloElegirObjetivoMapa, el mismo de siempre) y el duelo; "Sin objetivo"
    hace el ataque suelto acá (cobra con modificarCreep y tira el PdG). Las tiradas que pide el duelo las sigue haciendo GM Tools
@@ -11564,6 +11593,7 @@ function arrancarEnVivo(){
   soyGM = fbMiembro.gm === true;
   if($('#btn-reroll')) $('#btn-reroll').hidden = soyGM;   // la Moneda Re-Roll es de los jugadores
   bnPintarInterruptor();   // ⚗ Botonera nueva (prueba, para quien la quiera prender)
+  if(soyGM && bnActiva()) acCargarPiezas().catch(err => console.error(err));   // los ganchos del duelo de los creeps (paso 4c, tanda 4)
   $('#btn-botonera-nueva').onclick = bnAlternar;
   escucharMiembros();
   escucharVinculables();
@@ -11578,7 +11608,7 @@ function arrancarEnVivo(){
   mesaHistorialAlEntrar();
   // Duelo paso a paso (comun/duelo.js): el cuadro se abre solo para todos; las tiradas de cada uno se piden al iframe de su ficha (o de las Acciones del creep).
   setTimeout(precargarMarco, 6000);   // abrir más rápido la primera Botonera o Acciones (paso 4)
-  Duelo.escuchar({relay: dueloRelayMapa, hooksLocal: bnHooksDuelo, controlDe: lado => {   // 🎮 personaje controlado por el GM: su lado lo maneja el GM
+  Duelo.escuchar({relay: dueloRelayMapa, hooksLocal: lado => bnHooksDuelo(lado) || acHooksDuelo(lado), controlDe: lado => {   // 🎮 personaje controlado por el GM: su lado lo maneja el GM
     if(!lado || lado.tipo !== 'pj') return '';
     const f = fichasPub.get(String(lado.ref || '').split(SEP_INVOCACION)[0]);
     return (f && f.resumen && f.resumen.control) || '';

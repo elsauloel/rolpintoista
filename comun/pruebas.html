@@ -46,6 +46,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-calculo.js"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js"></script>
+<script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
 <script src="estados-presets.js"></script>
@@ -916,6 +917,16 @@ prueba('atacar con un creep: el normal suma al conteo y el contraataque no; alca
   const n = CreepAcciones.pagarAtaque(sc, 'normal'), c = CreepAcciones.pagarAtaque(sc, 'contra');
   igual([sc.ataquesTurno, sc.nitros, c.aviso.includes('PdG +2 por contraataque'), CreepAcciones.tiradaAtaque(sc, 'contra').origen, CreepCalculo.alcance(sc), CreepCalculo.alcance(creepPrueba({armaDeRango: true, des: 5}))],
     [1, 2, true, 'Orco · Contraataque (PdG)', 1, 5]);
+});
+
+prueba('los ganchos del duelo de un creep: el Parry cobra y tira; Sentado sin confirmar no ataca', async () => {
+  const creeps = {k: creepPrueba({id: 'k', nitros: 3, estados: [{nombre: 'Sentado', activo: true, sentado: true}]})}, reg = [];
+  const ui = {creep: ref => creeps[ref] || null, cambiar: (ref, fn) => { const x = fn(creeps[ref]); if(x && x.error){ reg.push('error'); return Promise.resolve(null); } return Promise.resolve(x); },
+    publicar: (sc, t) => reg.push(t && t.origen), toast: () => {}, confirmar: () => false, soy: l => l.tipo === 'creep', borrarParry: () => reg.push('borrar')};
+  const H = CreepDuelo.hooks(ui), d = {atacante: {ref: 'k', tipo: 'creep'}, defensor: {ref: 'k', tipo: 'creep'}, ataque: {tipo: 'normal', tipoDado: 8}};
+  await H.atacar(d);
+  await H.defender(d, 'parry');
+  igual([reg, creeps.k.nitros, creeps.k.ataquesTurno, H.soy({tipo: 'pj'}), H.opcionesDefensa(d).map(o => o.modo)], [['Orco · Parry'], 2, 0, false, ['evasion', 'parry']]);
 });
 
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */

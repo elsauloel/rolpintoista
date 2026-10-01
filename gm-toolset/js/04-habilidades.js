@@ -22,9 +22,7 @@ function ataqueDeHabCreep(sc, h){
     alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? alcanceDeHabCreep(sc, c, 'pdg') : alcanceDeCreep(sc)});
 }
 // El PdG del ataque con arreglos, con lo que le suma la habilidad (los No2 ya los cobró la habilidad).
-function tirarPdgDeArreglosCreep(sc, atq){
-  tirarValorStat(`${sc.nombre} · PdG`, creepStatValor(sc, 'pdg') + num(atq && atq.mods && atq.mods.pdg), sc, 'pdg');
-}
+function tirarPdgDeArreglosCreep(sc, atq){ publicarTiradaCreep(CreepDuelo.pdgDeArreglos(sc, atq)); }   // comun/creep-duelo.js
 // Se anuncia y va al cuadro del duelo (elegir el objetivo en el mapa); sin duelo, se tira el PdG suelto.
 function lanzarAtaqueDeHabCreep(sc, h){
   const atq = ataqueDeHabCreep(sc, h);
@@ -36,21 +34,11 @@ function lanzarAtaqueDeHabCreep(sc, h){
 }
 // ⚡ Flash de un creep (P135, 2026-09-30): no gasta No2 (igual que en el personaje); su límite es el cooldown, y la vida si
 // la habilidad la cuesta. Texto del costo para el botón del duelo.
-const costoFlashCreep = h => ({cd: num(h.cd), hp: num(h.hpCosto)});
-function costoFlashCreepTxt(h){ return ConfirmarTurno.textoFlash(costoFlashCreep(h)); }
+const costoFlashCreep = h => CreepDuelo.costoFlash(h);   // comun/creep-duelo.js
+function costoFlashCreepTxt(h){ return CreepDuelo.costoFlashTxt(h); }
 // «¿Es el turno del creep?» (P136, regla del dueño): en su turno el Flash cuesta lo que dice la habilidad (cooldown y vida);
 // en turno ajeno, el doble. Nunca No2. Pregunta, revisa la vida y cobra; null = no se usó.
-async function pagarFlashCreep(sc, h){
-  const motivo = Combatiente.bloqueoHab(h, {hp: sc.hp});
-  if(motivo){ toast(`${sc.nombre}: ${h.nombre || 'Habilidad'} no se puede usar — ${motivo}`); return null; }
-  const p = await ConfirmarTurno.flash(`⚡ ${h.nombre || 'Flash'}`, costoFlashCreep(h), {quien: sc.nombre});
-  if(!p) return null;
-  if(p.hp > 0 && num(sc.hp) <= p.hp){ toast(`${sc.nombre}: no le alcanza la vida para ${h.nombre} (${fmt(p.hp)} HP)`); return null; }
-  h.cdActual = p.cd;
-  if(p.hp > 0) sc.hp = num(sc.hp) - p.hp;
-  renderAll();
-  return p;
-}
+function pagarFlashCreep(sc, h){ return CreepDuelo.pagarFlash(gmDueloUi, sc.id, h.id); }   // comun/creep-duelo.js (gmDueloUi: js/12)
 // Ejecutar un ⚡ Flash con el botón, fuera del cuadro del duelo: la misma regla de costo; se anuncia y el bono se suma a mano.
 async function usarFlashFueraDelDueloCreep(sc, h){
   const p = await pagarFlashCreep(sc, h);

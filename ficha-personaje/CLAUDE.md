@@ -2,9 +2,23 @@
 
 ## Qué es
 
-`ficha.html` — la ficha de personaje interactiva. Un único archivo HTML
-standalone (~650 KB, ~8500 líneas) con todo: atributos, combate,
-inventario, catálogo de compra, habilidades, bitácora.
+La ficha de personaje interactiva: atributos, combate, inventario, catálogo de compra, habilidades, bitácora.
+
+**Desde el 2026-09-30 está partida en archivos** (paso 5 nivel A, `../docs/plan-paso5.md`): `ficha.html` es solo la
+pantalla (~900 líneas) y carga, en este orden, `ficha.css` (los estilos) y los 14 tramos de su código en `js/`:
+`01-modelo-y-reglas` (DEFAULT, No2/SP, escala de Tipos, cálculo, durabilidad) · `02-recompensas-estados-y-atributos`
+(recompensas, estados recibidos, atributos, sigilo, sentado, habilidades en el duelo, Re-Roll) · `03-tiradas` (tiradas,
+polilla, percepción) · `04-invocaciones` · `05-estados-y-botonera` (estados alterados, inventario, `renderBotonera`,
+`renderAll`) · `06-cajas-y-carga` (cajas de vida/SP/DDE/XP, colapsables, `aplicarFicha`) · `07-editor-y-catalogo` (editor
+genérico, presets, `toast`) · `08-equipo-botin-y-mesa-comun` · `09-inventario-y-tienda` (sin No2, slot lleno, tienda,
+vender, reparar) · `10-habilidades-pasivas-e-items` (+ Habilidad, + Pasiva, editores, trampa, asistente de ítems) ·
+`11-combate` (Mantenimiento, atacar, Parry/Bloqueo, lupa, ejecutar habilidades, revivir) · `12-en-vivo` (Firebase:
+guardado, control, abrir, personajes) · `13-bitacora` · `14-modo-botonera` (dentro del mapa, Mantenimiento del GM y el
+arranque). **Son el mismo programa de antes, en el mismo orden**: comparten las variables globales (`S`, `fichaVivo`…).
+Cuidados: una línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar funciones de su archivo o de
+los anteriores — por eso el primer `renderAll()` está al final de `14-modo-botonera.js`; cada archivo lleva su `?v=` en
+`ficha.html` y se sube solo el del que cambia. Para una copia de prueba sin sesión: copiar `js/14-modo-botonera.js` sin la
+línea `mesaIniciar(fbAlEntrar);` y apuntar a esa copia desde una copia de `ficha.html`.
 
 ## Estado actual
 

@@ -166,7 +166,9 @@ Cada paso: qué es, qué se gana, qué se arriesga, cómo se prueba. Se pueden e
 - **Cómo va**: el dueño eligió hacerlo **por etapas** (plan detallado en [`plan-paso4.md`](plan-paso4.md)): 1) arreglar de raíz
   cómo viven la ficha y GM Tools dentro del mapa (`comun/embebido.js`: se esconde la página, cualquier cartel se ve y avisa
   solo); 2) el paso 5 (partir los archivos); 3) que el mapa dibuje la Botonera y las Acciones; al final, zonas y trampas de
-  las invocaciones.
+  las invocaciones. **Etapa 3 en curso** (2026-10-01): plan, estado y **"Para retomar"** en
+  [`plan-paso4-etapa3.md`](plan-paso4-etapa3.md) — se hace en `nueva-version` detrás de un interruptor que solo ve el GM
+  (decisión del dueño, en vez de la rama aparte de abajo); lo próximo es el paso 3c-4c (los ganchos del duelo).
 - **Qué**: que el mapa **dibuje él mismo** la Botonera del personaje y las Acciones del creep (usando el motor), en vez de
   meter la ficha o GM Tools enteras adentro. Menos puertas y menos mensajes.
 - **Se gana**: se van los bugs de "invisible dentro del mapa", el mapa carga más rápido, un clic hace lo que dice.

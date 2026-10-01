@@ -1,8 +1,70 @@
 # Paso 4, etapa 3 — El mapa dibuja la Botonera él mismo (plan detallado)
 
 > Parte de [`plan-paso4.md`](plan-paso4.md) y de [`plan-consolidacion.md`](plan-consolidacion.md). Escrito el 2026-10-01,
-> después de terminar el nivel B del paso 5 (áreas 1 a 4, ver [`plan-paso5.md`](plan-paso5.md)). **Estado: plan, sin
-> código.** Las preguntas de diseño están al final; nada se empieza hasta que el dueño las conteste.
+> después de terminar el nivel B del paso 5 (áreas 1 a 4, ver [`plan-paso5.md`](plan-paso5.md)). **Estado: en curso** —
+> 3a y 3b hechas; 3c por la mitad (ver "Para retomar" justo abajo y "Cómo va" al final). Preguntas del dueño: contestadas.
+
+## ▶ Para retomar (al cierre de la conversación del 2026-10-01)
+
+**El repo está limpio**: todo subido a `nueva-version` (último commit `870aa73`), nada a medio escribir en el código. Lo
+que sigue es un paso nuevo, no algo cortado.
+
+**Hecho en esta etapa**: 3a (sesión en vivo compartida, `comun/ficha-sesion.js`), 3b (Botonera nueva detrás del
+interruptor ⚗, solo GM), y de la 3c: paso 1 (tiradas de stats y Percepción), el resumen público (`comun/ficha-resumen.js`,
+para que el mapa pueda guardar), paso 2 (Sigilo, Levantarse: **el mapa ya guarda al personaje**), paso 3 (Consumir, con el
+catálogo cargado en el mapa), paso 4a (Esquivar, Parry, Bloqueo, Fuerza del golpe, Daño) y 4b (Atacar: "¿Qué ataque es?",
+objetivo y duelo, o tirada suelta). Todo lo que hace la Botonera nueva vive en `comun/ficha-acciones.js` (la ficha usa lo
+mismo con sus nombres de siempre). También: P138 (tiradas con `ficha`, reglas ya pegadas) y P139 (contraataque, resuelta).
+
+**Lo próximo — 3c, paso 4c: los ganchos del duelo del personaje.** Cuando un duelo necesita una tirada de un personaje
+(su PdG, su defensa, su daño, la Fuerza del golpe, el Bloqueo, el crítico, el Flash, la Moneda Re-Roll, una habilidad
+dirigida, contraatacar), el mapa se la reenvía a la ficha escondida (`dueloRelayMapa` → mensajes `duelo-opciones`,
+`duelo-tirar`, `duelo-contra`, `duelo-flash`, `duelo-reroll-info`, `duelo-reroll`) y la ficha contesta con
+`window.DUELO_HOOKS` (`ficha-personaje/js/11-combate.js`: `soy`, `controlDe`, `atacar`, `statsCritico`, `resistenciaCritico`,
+`efectosArma`, `dano`, `rerollInfo`, `rerollUsar`, `flashOpciones`, `flashUsar`, `habTirar`, `habValor`, `puedeParry`,
+`opcionesDefensa`, `defender`, `fuerza`, `bloquear`, `armaContra`). La idea: pasar la lógica de cada gancho a `comun/`
+(con `S`), que la ficha los siga usando, y que el mapa los conteste él mismo para el personaje de la Botonera nueva (`bn`),
+cobrando y guardando con `bnUi`. Ojo: (1) el duelo recoge las tiradas por el evento `tirada-registrada` que dispara
+`registrarTirada` de la ficha — el mapa tiene que dispararlo igual al publicar una tirada pedida por el duelo; (2) los
+lados que son **invocaciones** (`fichaId~invId`, `dueloInvDe`) quedan delegados a la ficha (las invocaciones van después
+de esta etapa); (3) un personaje que **no** es el de la Botonera nueva (o sin el interruptor prendido) sigue por el marco.
+Leer antes `comun/duelo.js` (cómo pide cada tirada: `ejecutar`, `cfgEscuchar`) y `dueloRelayMapa` en el mapa.
+
+**Después**: paso 5 (habilidades: Ejecutar/Anunciar/🎲, `data-ejecutar`, `data-danohab`), paso 6 (🔍 lupa y Ver,
+`data-view`), los talentos (`data-tirarsocial`), las trampas consumibles y el Ankh manual (`data-consumirankh`); recién
+ahí 3d (retirar el marco para los jugadores) y, fuera de la etapa, las Acciones de los creeps y la Botonera de las
+invocaciones.
+
+**Pendientes chicos de lo ya hecho**:
+- **4b sin probar contra un objetivo de verdad**: en "Claude · pruebas" los creeps están ocultos y solo el GM puede
+  apuntarles. **La sesión de Claude in Chrome es la del jugador Saulo-Prueba** (`elsaulo@gmail.com`, no GM en esa
+  partida). Para probarlo: pedirle al dueño que pase Chrome a su cuenta de GM, tomar 🎮 el control de Clementino, mostrar
+  un creep y atacarlo desde la Botonera nueva. Con eso también se prueba en vivo la pregunta del contraataque (P139).
+- El Parry que espera su Bloqueo en el mapa (`bn.parryPendiente`) no se borra al pasar el turno (sí al bloquear, al atacar
+  y al cambiar de personaje).
+- P137 (diferencias de "permanente" y Excedente de vida entre ficha, GM Tools e invocaciones): espera decisión del dueño.
+- 3a: una vez, un cambio de otra pestaña no llegó mientras esta decía "Guardando…" (no se repitió).
+
+**Cómo se viene trabajando cada paso (método que funcionó)**:
+1. Copiar el código **tal cual** a `comun/` (casi siempre `comun/ficha-acciones.js`) con `S` como parámetro y un objeto
+   `ui` para todo lo que se ve (carteles, avisos, redibujar); la ficha queda con atajos de una línea y su propio `ui`
+   (`accionesUi`, `consumoUi`, `combateUi`).
+2. **Comparar viejo contra nuevo** antes de subir: copias temporales del código viejo (`git show HEAD:… > comun/_viejo-….tmp.js`,
+   borrarlas al terminar), sacar las funciones contando llaves, correrlas en el preview local `archivos` (puerto 8765,
+   `comun/pruebas.html`) con los **mismos dados** (Math.random con semilla) en 300–800 casos al azar, y **plantar 3–4
+   errores** para ver que la comparación los detecta.
+3. Pruebas permanentes en `comun/pruebas.html` (acepta pruebas async); todas en verde (hoy 147).
+4. Subir el `?v=` de cada archivo tocado: `ficha-personaje/ficha.html`, `BN_PIEZAS` en `vtt-hexgrid/mapa.html`,
+   `gm-toolset/gm-tools.html`. Si no, el navegador usa la copia vieja.
+5. Push y prueba en vivo en "Claude · pruebas" con Claude in Chrome: abrir con `&_=<algo>` en la dirección (GitHub Pages
+   cachea 10 min); la Botonera nueva se abre desde la consola del mapa con `abrirBotoneraNueva(fichaPrincipalId())` (el
+   interruptor ⚗ es del GM); tener la ficha abierta en otra pestaña para ver que se sincroniza; dejar a Clementino como
+   estaba (12 No2, 25 HP, sin equipo ni estados).
+6. Documentar en "Cómo va" (al final de este archivo) y en los `CLAUDE.md` de `comun/` y `vtt-hexgrid/`; commit y push.
+
+Trucos de la herramienta: con la ventana de Chrome oculta los temporizadores van lentos (cada llamada tiene 45 s: partir
+las esperas largas); si una pestaña no responde, recargarla; el número de pestaña cambia cuando la extensión se reconecta
+(`tabs_context_mcp`); la extensión bloquea un resultado con la clave `tokens`.
 
 ## Cómo es hoy
 
@@ -23,11 +85,11 @@ botón, que hoy viven en la ficha:
 |---|---|---|
 | Números de la Botonera (No2, SP, Def, fórmulas, costos) | cálculo, combate, costos de habilidad | ✅ ya en `comun/` (`FichaCalculo`, `FichaCombate`, `FichaHabilidades`) |
 | Traer el personaje y guardarlo | partes de Firebase, migraciones | ✅ ya en `comun/` (`FichaGuardado.cargar`) — falta el guardado **en vivo** (ver 3a) |
-| Tirar un stat, Percepción, Fuerza del golpe | tirada + Mesa | casi todo en `comun/` (`Combatiente.tirarStat`, `mesa.js`); falta el sobrepeso (cartel) |
-| Atacar, Daño, Esquivar, Parry, Bloqueo | el **duelo** y sus ganchos de la ficha (`DUELO_HOOKS`, ~200 renglones), carteles de No2 | en la ficha |
+| Tirar un stat, Percepción, Fuerza del golpe | tirada + Mesa | ✅ en el mapa (3c-1 y 4a), con el cartel de sobrepeso |
+| Atacar, Daño, Esquivar, Parry, Bloqueo | el **duelo** y sus ganchos de la ficha (`DUELO_HOOKS`, ~200 renglones), carteles de No2 | ✅ los botones en el mapa (4a, 4b); **los ganchos del duelo siguen en la ficha (4c, lo próximo)** |
 | Habilidades (Ejecutar / Anunciar / 🎲 segunda) | `ejecutarHabilidad`: elegir arma, costo X, ¿es tu turno?, Flash, Ejecución paso a paso, zona, trampa, Mesa | la regla en `comun/`; la pantalla en la ficha |
-| Consumibles (cinturón y mochila) | consumir: No2 por lugar, unidades, cura, estado, trampa consumible | en la ficha |
-| Sigilo, Levantarse | estado + No2 | en la ficha |
+| Consumibles (cinturón y mochila) | consumir: No2 por lugar, unidades, cura, estado, trampa consumible | ✅ en el mapa (3c-3), salvo trampas consumibles y el Ankh manual |
+| Sigilo, Levantarse | estado + No2 | ✅ en el mapa (3c-2) |
 | 🔍 Lupa de cada botón | `lupaHtml` (cómo se calcula cada cosa) | en la ficha |
 | Ver (habilidad, consumible, talento) | ventana de detalle de la ficha | en la ficha |
 

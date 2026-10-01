@@ -44,6 +44,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="critico.js"></script>
 <script src="combatiente.js"></script>
 <script src="creep-calculo.js"></script>
+<script src="creep-botonera.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
 <script src="estados-presets.js"></script>
@@ -892,6 +893,14 @@ prueba('Parry y Bloqueo: con su arma o un escudo; un arma natural sola no alcanz
 prueba('normalizar pasa Inteligencia a Especial, corre la escala de Tipos y saca la habilidad Movimiento', () => {
   const sc = CreepCalculo.normalizar({nombre: 'Viejo', int: 3, armaTipo: 6, habilidades: [{nombre: 'Movimiento'}, {nombre: 'Golpe', detalle: 'Crítico 4 y 6', tiradaStat: 'int'}]});
   igual([sc.esp, sc.int, sc.armaTipo, sc.habilidades.length, sc.habilidades[0].tiradaStat, sc.habilidades[0].detalle, sc.crit], [3, undefined, 8, 1, 'esp', 'Crítico 6 y 8', [0, 0, 0, 0, 0]]);
+});
+
+prueba('las Acciones de un creep: sin arma no hay Parry; el Bloqueo se habilita tras un Parry; Anunciar en una manual', () => {
+  const sc = creepPrueba({id: 'k', nitros: 6, habilidades: [{id: 'h1', nombre: 'Rugido', automatizada: false}, {id: 'h2', nombre: 'Mordisco', nitrosCosto: 2, cd: 2, cdActual: 1}]});
+  const sinArma = CreepBotonera.html(creepPrueba({id: 'k2', armaNombre: ''}), {lupa: false}).html;
+  const con = CreepBotonera.html(sc, {lupa: false, parryPendiente: true}), sin = CreepBotonera.html(sc, {lupa: false});
+  igual([sinArma.includes('data-parrycreep'), con.html.includes('Bloqueo · Hacha'), sin.html.includes('Bloqueo · tras el Parry'), con.html.includes('>Anunciar<'), con.html.includes('data-cdmod="k:h2:reset"'), con.badge, con.titulo],
+    [false, true, true, true, true, 'No2 6/3', 'Orco']);
 });
 
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */

@@ -19,6 +19,7 @@ const MensajesMapa = (() => {
     'abrir-revivir':    {de: 'mapa', a: 'ficha', que: 'revivir al personaje (✚ del filtro de muerte)'},
     'abrir-tienda':     {de: 'mapa', a: 'ficha', que: 'abrir el Vendedor (🏪)'},
     'abrir-acciones':   {de: 'mapa', a: 'gm',    que: 'abrir las Acciones de un creep (`creep`)'},
+    'acciones-delegar': {de: 'mapa', a: 'gm',    que: 'tocar un botón de las Acciones de un creep (`creep`, `datos`: sus data-*): lo piden las Acciones nuevas del mapa (paso 4, etapa 4b)'},
     'abrir-ver-creep':  {de: 'mapa', a: 'gm',    que: 'abrir la ventana «Ver» de un creep (📜 del token)'},
     'abrir-estados':    {de: 'mapa', a: 'marco', que: 'abrir los estados alterados (del personaje, o del creep con `creep`)'},
     'editar-estado':    {de: 'mapa', a: 'marco', que: 'editar un estado puntual (`nombre`, y `creep` si es de un creep)'},

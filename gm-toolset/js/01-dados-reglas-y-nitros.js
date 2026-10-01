@@ -572,16 +572,7 @@ function costoAtaqueCreep(sc){ return CreepCalculo.costoAtaque(sc); }   // regla
 // Cooldown de una habilidad de creep, a mano (2026-09-24, pedido del dueño): el GM puede subirlo, bajarlo o resetearlo en cualquier
 // momento, por ejemplo después de ejecutar una habilidad para probar algo. − y + cambian los turnos que le quedan; ↺ (solo con
 // cooldown activo) lo deja en 0.
-function cdControlesHtml(sc, h){
-  const v = Math.max(0, num(h.cdActual));
-  const ref = `${sc.id}:${h.id}`;
-  return `<span class="cd-ctl" title="Cooldown: turnos que le quedan a esta habilidad">
-    <button type="button" data-cdmod="${ref}:-1" title="Un turno menos de cooldown">−</button>
-    <span class="cd-val${v > 0 ? ' activo' : ''}">CD ${fmt(v)}</span>
-    <button type="button" data-cdmod="${ref}:1" title="Un turno más de cooldown">+</button>
-    ${v > 0 ? `<button type="button" data-cdmod="${ref}:reset" title="Resetear el cooldown (queda listo para usarse)">↺</button>` : ''}
-  </span>`;
-}
+function cdControlesHtml(sc, h){ return CreepBotonera.cdControlesHtml(sc, h); }   // comun/creep-botonera.js
 
 /* Tres modos de ejecución (2026-09-30, los mismos que en la ficha — ver MODOS_HAB en ficha-personaje/ficha.html): 'manual'
    (📣 Anunciar: solo el texto, no cobra ni pone cooldown), 'semi' (💰 cobra No2 y cooldown, tira la tirada inicial; los efectos
@@ -594,7 +585,7 @@ const MODOS_HAB_CREEP = {
   auto: {icono: '✨', nombre: 'Automático', boton: 'Ejecutar', corto: 'ejecución paso a paso', explica: 'Al tocar <b>Ejecutar</b> se abre la <b>Ejecución paso a paso</b>: cobra, elegís el objetivo en el mapa, cada uno tira en su momento y se aplican los efectos. Si es solo sobre el creep y no tira nada, se aplica directo. Si coloca una trampa, elegís la casilla en el mapa (los jugadores no se enteran).'},
 };
 function modoHabCreep(h){ return CreepCalculo.modoHab(h); }   // la regla común
-const botonHabCreepTxt = h => modoHabCreep(h) === 'manual' ? 'Anunciar' : 'Ejecutar';
+const botonHabCreepTxt = h => CreepBotonera.botonHabTxt(h);
 function etiquetaModoCreep(h){ const m = MODOS_HAB_CREEP[modoHabCreep(h) || 'semi']; return `<span class="tag" title="${esc(m.nombre)}: ${esc(m.corto)}">${m.icono}</span>`; }
 // ¿Se puede usar ahora? La regla común (P133): cooldown, No2 y vida (una 📣 manual no cobra nada).
 function bloqueoHabCreep(sc, h){ return CreepCalculo.bloqueoHab(sc, h); }

@@ -107,8 +107,7 @@ function tirarSegundaDeHab(h, sc){
   if(r) registrarTirada(`${sc ? sc.nombre + " · " : ""}${h.nombre || "Habilidad"} · Efecto`, r);
   else toast('La fórmula de la habilidad no es válida');
 }
-const botonSegundaHabCreep = (h, sc) => habCreepTieneSegunda(h, sc)
-  ? `<button type="button" class="verbtn" data-danohabcreep="${sc.id}:${h.id}" title="Segunda tirada (daño o efecto): ${esc(String(h.tiradaExtra).trim())}">🎲 ${esc(String(h.tiradaExtra).trim())}</button>` : '';
+const botonSegundaHabCreep = (h, sc) => CreepBotonera.botonSegundaHab(h, sc);   // comun/creep-botonera.js
 
 let equipandoCreepId = null;
 

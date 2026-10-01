@@ -87,111 +87,14 @@ function lupaHtmlCreep(clave){
 }
 
 
+// El dibujo de las Acciones vive en comun/creep-botonera.js (paso 4 etapa 4b, 2026-10-01): lo usa también el mapa.
 function renderAccionesCreep(){
   const sc = S.creeps.find(s => s.id === accionesCreepId);
   if(!sc) return;
-  const costoAtaque = costoAtaqueCreep(sc);
-  const sinNitrosAtaque = num(sc.nitros) < costoAtaque;
-  const cualAtaque = num(sc.ataquesTurno) === 0 ? 'primer ataque del turno (Tipo ÷ 2)' : 'ataque extra (Tipo completo)';
-
-  const tilesStats = CREEP_STATS_TIRADA_IDS.map(id => CREEP_STAT_LOOKUP[id]).map(d => `
-    <button type="button" class="botonera-tile" data-tirarstatcreep="${sc.id}:${d.id}" title="${esc(d.label)}">
-      ${lupaBotonHtml(`${sc.id}|stat|${d.id}`)}
-      <span class="bt-label">${esc(d.label)}</span>
-      <span class="bt-value">${fmt(creepStatValor(sc, d.id))}</span>
-    </button>`).join('');
-
-  const fc = formulasCombateCreep(sc);
-  const defCreep = defensaCreep(sc);
-  const combate = [
-    // Atacar sin No2 no se deshabilita (un botón deshabilitado no deja abrir la 🔍): al tocarlo avisa.
-    {stat:'pdg', nombre:`Atacar (PdG) · ${fmt(costoAtaque)} No2`, dado: fc.pdg, sinNitros: sinNitrosAtaque, lupa:'atacar', motivo: `${sinNitrosAtaque ? 'Sin No2 · ' : ''}Cuesta ${fmt(costoAtaque)} No2 · ${cualAtaque}`, attr:`data-atacarcreep="${sc.id}"`},
-    {nombre:'Daño Arma', dado: danoTxt(sc, creepStatValor(sc, 'dmg')), lupa:'danio', motivo:'Sin costo', attr:`data-daniocreep="${sc.id}"`},
-    {stat:'eva', nombre:'Esquivar (Eva)', dado: fc.eva, lupa:'stat|eva', motivo:'Sin costo', attr:`data-esquivarcreep="${sc.id}"`},
-    // Parry y Bloqueo solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30): sin eso, o con un arma
-    // natural, no aparecen (defensaCreep).
-    ...(defCreep ? [{stat:'parry', nombre:`Parry · ${fmt(costoParryCreep(sc))} No2`, dado: fc.parry, sinNitros: num(sc.nitros) < costoParryCreep(sc), lupa:'stat|parry', motivo:`${num(sc.nitros) < costoParryCreep(sc) ? 'Sin No2 · ' : ''}Cuesta ${fmt(costoParryCreep(sc))} No2 · con ${defCreep.nombre}`, attr:`data-parrycreep="${sc.id}"`},
-      // El Bloqueo solo se tira después de un Parry; antes queda apagado pero muestra lo que tiraría (para decidir).
-      parryPendienteCreep.has(sc.id)
-        ? {stat:'bloqueo', nombre:`Bloqueo · ${defCreep.nombre}`, dado: fc.bloqueo, lupa:'stat|bloqueo', motivo:`Tras el Parry · sin costo · su Bloqueo + el Peso de ${defCreep.nombre} (${fmt(num(defCreep.peso))}) es el dado`, attr:`data-bloqueocreep="${sc.id}"`}
-        : {stat:'bloqueo', nombre:'Bloqueo · tras el Parry', dado: fc.bloqueo, sinNitros: true, lupa:'stat|bloqueo', motivo:`${Combatiente.BLOQUEO_SOLO_TRAS_PARRY} · con ${defCreep.nombre} tiraría esto`, attr:`data-bloqueocreep="${sc.id}"`}] : []),
-    {nombre:'Fuerza del golpe', dado: fc.fuerza, motivo:`Sin costo · su Fuerza + el Peso de su arma (${fmt(pesoArmaCreep(sc))}) es el dado: su tirada contra el Bloqueo del defensor`, attr:`data-fuerzacreep="${sc.id}"`},
-  ];
-  // Sentado: levantarse cuesta 1 No2 y saca el estado (ver data-levantarcreep).
-  const sentadoCreep = (sc.estados || []).some(e => e.activo !== false && e.sentado);
-  if(sentadoCreep){
-    const sinNitrosLev = num(sc.nitros) < 1;
-    combate.push({nombre:'🧍 Levantarse · 1 No2', dado:'', soloTexto:true, sinNitros: sinNitrosLev, motivo: `${sinNitrosLev ? 'Sin No2 · ' : ''}Cuesta 1 No2 y saca el estado Sentado`, attr:`data-levantarcreep="${sc.id}"`});
-  }
-  // Estados alterados que modifican cada tirada (2026-09-25): el botón se pinta de verde/rojo y dice cuáles (comun/modificadores-tirada.js).
-  combate.forEach(f => { f.mt = f.stat ? ModTirada.tile(sc.estados, f.stat) : {clase: '', html: '', titulo: ''}; });
-  const tilesCombate = combate.map(f => f.soloTexto ? `
-    <button type="button" class="botonera-tile${f.sinNitros ? ' bt-sin-nitros' : ''}" ${f.attr} title="${esc(f.motivo)}">
-      <span class="bt-label">${esc(f.nombre)}</span>
-    </button>` : `
-    <button type="button" class="botonera-tile${f.sinNitros ? ' bt-sin-nitros' : ''}${f.mt.clase}" ${f.attr} title="${esc(f.motivo + f.mt.titulo)}">
-      ${lupaBotonHtml(`${sc.id}|${f.lupa}`)}${ModTirada.ayuda(f.stat)}
-      <span class="bt-label">${esc(f.nombre)}</span><span class="bt-value bt-value-formula">🎲${f.dado ? ` ${esc(f.dado)}` : ''}</span>${f.mt.html}
-    </button>`).join('');
-
-  const filasHab = sc.habilidades.map(h => {
-    const bloqueo = bloqueoHabCreep(sc, h);
-    const costo = costoNitrosHabCreep(sc, h);
-    const partes = [costoHabCreepTxt(sc, h)];
-    if(num(h.cd) > 0) partes.push(`CD ${fmt(num(h.cd))}`);
-    const motivo = bloqueo ? `${bloqueo} · ${partes.join(' · ')}` : partes.join(' · ');
-    return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: !!bloqueo, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`, boton: botonHabCreepTxt(h), segunda: botonSegundaHabCreep(h, sc), cdHtml: cdControlesHtml(sc, h)};
-  });
-
-  $('#acciones-creep-titulo').textContent = sc.nombre;
-  $('#acciones-creep-badge').textContent = `No2 ${fmt(num(sc.nitros))}/${fmt(creepNitrosMax(sc))}`;
-
-  const filaHab = f => `
-    <div class="accion-row">
-      <div class="accion-nombre">${esc(f.nombre)}</div>
-      <span class="hab-estado ${f.disabled?'cd':'ok'}">${esc(f.motivo)}</span>
-      <button class="verbtn" data-verhabaccion="${sc.id}:${f.id}">Ver</button>
-      ${lupaBotonHtml(`${sc.id}|hab|${f.id}`, 'mini')}
-      <button class="hab-ejecutar" ${f.attr} ${f.disabled?'disabled':''}>${f.boton || 'Ejecutar'}</button>
-      ${f.segunda || ''}
-      ${f.cdHtml || ''}
-    </div>`;
-
-  $('#acciones-creep-lista').innerHTML = `
-    <div class="botonera-grid botonera-grid-even">
-      <div class="botonera-caja">
-        <div class="acciones-grupo-label" style="margin-top:0">Combate</div>
-        <div class="botonera-combate-grid">${tilesCombate}</div>
-        <div class="botonera-defensa">
-          <div class="botonera-tile bt-info" title="Defensa (no se tira)">
-            ${lupaBotonHtml(`${sc.id}|defensa|def`)}
-            <span class="bt-label">Defensa</span><span class="bt-value">${fmt(creepDefensaEfectiva(sc))}</span>
-          </div>
-          <div class="botonera-tile bt-info" title="Armadura mágica: se resta al daño de casteo que ignora la Defensa (no se tira)">
-            ${lupaBotonHtml(`${sc.id}|defensa|armadmg`)}
-            <span class="bt-label">Armad. mágica</span><span class="bt-value">${fmt(creepArmadmgEfectiva(sc))}</span>
-          </div>
-          <div class="botonera-crit">
-            <div class="botonera-crit-t">Resistencia a críticos</div>
-            <div class="botonera-crit-grid">
-              ${[0, 1, 2, 3, 4].map(i => `
-              <div class="botonera-tile bt-info" title="Resistencia a crítico Tipo ${4 + 2 * i} (no se tira)">
-                ${lupaBotonHtml(`${sc.id}|defensa|tipo${i + 1}`)}
-                <span class="bt-label">Tipo ${4 + 2 * i}</span><span class="bt-value">${fmt(creepCritEfectivo(sc, i))}</span>
-              </div>`).join('')}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="botonera-caja">
-        <div class="acciones-grupo-label" style="margin-top:0">Tiradas de stats</div>
-        <div class="botonera-stats-grid">${tilesStats}</div>
-      </div>
-    </div>
-    <div class="botonera-caja">
-      <div class="acciones-grupo-label" style="margin-top:0">Habilidades</div>
-      <div class="botonera-list-grid">${filasHab.map(filaHab).join('')}</div>
-    </div>`;
+  const r = CreepBotonera.html(sc, {parryPendiente: parryPendienteCreep.has(sc.id)});
+  $('#acciones-creep-titulo').textContent = r.titulo;
+  $('#acciones-creep-badge').textContent = r.badge;
+  $('#acciones-creep-lista').innerHTML = r.html;
 }
 
 function abrirAccionesCreep(scId){
@@ -228,16 +131,7 @@ function muertoBadgeHtml(sc){
 
 // Qué dado va a tirar cada botón de Combate, para no tener que
 // adivinarlo antes de apretar (igual que en la ficha).
-function formulasCombateCreep(sc){
-  const f = (v, id) => { const x = formulaParaValor(v); return x ? x.formula + ' ÷2'.repeat(mitadesDeTirada(sc.estados, id)) : ''; };
-  return {
-    pdg: f(creepStatValor(sc, 'pdg'), 'pdg'),
-    eva: f(creepStatValor(sc, 'eva'), 'eva'),
-    parry: f(creepStatValor(sc, 'parry'), 'parry'),
-    bloqueo: f(bloqueoValorCreep(sc)),
-    fuerza: f(fuerzaGolpeValorCreep(sc)),
-  };
-}
+function formulasCombateCreep(sc){ return CreepBotonera.formulasCombate(sc); }   // comun/creep-botonera.js
 
 function cardHtml(sc){
   return `
@@ -682,5 +576,5 @@ function habCreepTira(h){
 }
 // Ejecutar tira SOLO la primera tirada que le corresponde (PdG, PdG.Esp u otro stat vinculado; si no hay stat, la fórmula).
 // La fórmula (el daño o el efecto), si hay stat, va aparte con el botón 🎲 — igual que Atacar → Daño (2026-09-24).
-function habCreepStatTirable(h, sc){ return !!(sc && h.tiradaStat && CREEP_STAT_LOOKUP[h.tiradaStat]); }
-function habCreepTieneSegunda(h, sc){ return habCreepStatTirable(h, sc) && !!String(h.tiradaExtra || "").trim(); }
+function habCreepStatTirable(h, sc){ return CreepBotonera.habStatTirable(h, sc); }
+function habCreepTieneSegunda(h, sc){ return CreepBotonera.habTieneSegunda(h, sc); }

@@ -176,6 +176,20 @@ if(MODO_ACCIONES){
     if(e.origin !== location.origin || !e.data) return;
     if(e.data.tipo === 'abrir-acciones' && gmVivo.listo) accionesModoAbrir(e.data.creep);
     if(e.data.tipo === 'abrir-ver-creep' && gmVivo.listo) accionesModoVer(e.data.creep);   // el 📜 del token de un creep
+    // ⚗ Las Acciones nuevas del mapa (paso 4, etapa 4b) las dibuja el mapa; sus botones, por ahora, los hace GM Tools: se dibujan
+    // las Acciones de ese creep (aunque no estén abiertas) y se toca el mismo botón, como si se hubiera tocado acá. Lo que cambie
+    // se sube enseguida, así el mapa lo muestra sin esperar.
+    if(e.data.tipo === 'acciones-delegar' && gmVivo.listo){
+      if(S.creeps.some(sc => sc.id === e.data.creep)){
+        accionesCreepId = e.data.creep;
+        renderAccionesCreep();
+        const d = e.data.datos || {};
+        const sel = Object.keys(d).map(k => `[data-${k.replace(/[A-Z]/g, m => '-' + m.toLowerCase())}="${CSS.escape(String(d[k]))}"]`).join('');
+        const b = sel ? document.querySelector('#acciones-creep-lista ' + sel) : null;
+        if(b) b.click(); else toast('No se encontró ese botón en las Acciones de GM Tools');
+        setTimeout(() => gmGuardarTick(true), 300);
+      }else toast('Ese creep ya no está en gm-tools');
+    }
     // Escape apretado en el mapa: se hace como si se apretara acá.
     if(e.data.tipo === 'tecla-f') document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
     if(e.data.tipo === 'tecla-escape') document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));

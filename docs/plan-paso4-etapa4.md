@@ -13,7 +13,7 @@ creeps primero, el mismo interruptor ⚗, P137 espera.
 **Lo próximo — 4c, mudar los botones de a uno** (como la 3c de la Botonera del personaje), del más simple al más complejo:
 1. Tiradas de stats y Levantarse ✅ (2026-10-01).
 2. Esquivar, Parry, Bloqueo, Fuerza del golpe, Daño ✅ (2026-10-01; el Parry pendiente del mapa vive en `acParry`).
-3. Atacar (menú "¿Qué ataque es?", el objetivo con `dueloElegirObjetivoMapa`).
+3. Atacar (menú "¿Qué ataque es?", el objetivo con `dueloElegirObjetivoMapa`) ✅ (2026-10-01).
 4. Lo que el duelo le pide a un creep (`window.DUELO_HOOKS` de `js/12`) → `comun/creep-duelo.js`, y `hooksLocal` del mapa.
 5. Habilidades (`js/04`: manual, semi, ✨, Flash, cooldowns `data-cdmod`, segunda tirada, trampa y zona).
 6. 🔍 (`lupaHtmlCreep`, `js/03`) y Ver.
@@ -122,3 +122,15 @@ pruebas en `comun/pruebas.html`, `?v=` al día, probada en vivo y documentada.
   Esquivar, Parry (−1 No2, y el Bloqueo pasó a "Bloqueo · Garrote"), Bloqueo, Fuerza del golpe y Daño salieron en la Mesa en rojo
   a nombre del creep, sin ningún pedido a GM Tools. Creep restaurado (sin arma, 6 No2, sin estados). **Pendiente chico**: el
   `acParry` del mapa no se borra al atacar (Atacar todavía va al marco) ni en el Mantenimiento.
+- 2026-10-01: **4c, tanda 3 hecha** (95a458e) — Atacar. `CreepAcciones.pagarAtaque(sc, tipo)` / `tiradaAtaque(sc, tipo)` (normal: Tipo ÷ 2
+  el primero y suma al conteo; oportunidad y contraataque: siempre Tipo ÷ 2, no suman, con el PdG en contraataque/oportunidad del
+  arma) y `CreepCalculo.alcance(sc)`, copiados de `atacarNormalCreep`, `ataqueEspecialCreep` (`js/01`) y `alcanceDeCreep` (`js/04`),
+  que quedan con atajos (el confirm de "Sentado" y borrar el Parry pendiente siguen en cada pantalla). En el mapa
+  (`acPreguntarTipoAtaque`, `acAtacar`, cartel `#ac-tipo-ataque` en el recuadro): el objetivo con `dueloElegirObjetivoMapa` (las
+  Acciones se esconden mientras; cancelar o "Sin objetivo" las vuelven a mostrar); "Sin objetivo" cobra con `modificarCreep` y
+  tira el PdG; Esc cierra primero el menú. Las tiradas que pide el duelo siguen en GM Tools (tanda 4). Comparado contra el
+  código viejo en 600 creeps con 4 ataques al azar (con y sin Sentado, confirmando o no) y los mismos dados: 600 iguales, 0
+  distintas; 4 mutaciones detectadas. `pruebas.html`: 178 en verde (1 nueva). **En vivo** (GM, "Creep nuevo" con 6 No2 y un
+  ataque hecho): el menú mostró 8 No2 (Tipo completo) y 4 (oportunidad/contraataque); el ataque de oportunidad pasó al modo de
+  elegir objetivo, "Sin objetivo" cobró 4 No2 sin sumar al conteo y tiró el PdG en la Mesa, y las Acciones volvieron. Sin
+  pedidos a GM Tools. Creep restaurado.

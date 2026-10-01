@@ -370,7 +370,7 @@ document.addEventListener('click', e => {
     const sc = S.creeps.find(s => s.id === scId);
     const h = sc && sc.habilidades.find(x => x.id === habId);
     if(!sc || !h) return;
-    h.cdActual = accion === 'reset' ? 0 : Math.max(0, Math.min(99, num(h.cdActual) + num(accion)));
+    CreepAcciones.cdMod(sc, habId, accion);   // comun/creep-acciones.js
     renderAll();
     return;
   }
@@ -402,48 +402,13 @@ document.addEventListener('click', e => {
     const modo = modoHabCreep(h);
     if(modo === 'manual'){ mesaPublicarHabilidadCreep(sc, h); toast(`${h.nombre || 'Habilidad'} anunciada`); return; }   // 📣 solo el texto
     if(modo === 'auto' && Combatiente.tipoEjecucion(h.duelo) === 'flash'){ usarFlashFueraDelDueloCreep(sc, h); return; }   // ⚡ sin No2, cooldown según el turno
-    const bloqueo = bloqueoHabCreep(sc, h);
-    if(bloqueo){
-      toast(`${sc.nombre}: ${h.nombre || 'Habilidad'} no se puede usar — ${bloqueo}`);
-      return;
-    }
-    // Se cobra lo que la habilidad tenga cargado (P133): No2, cooldown y vida; y la cura del sistema anterior, si la trae.
-    const costo = costoNitrosHabCreep(sc, h), costoHp = num(h.hpCosto);
-    sc.nitros = num(sc.nitros) - costo;
-    h.cdActual = num(h.cd);
-    if(habCreepAtaque(h)) sc.ataquesTurno = num(sc.ataquesTurno) + 1;  // cuenta como su ataque
-    if(costoHp > 0) sc.hp = num(sc.hp) - costoHp;
-    if(num(h.curaHp) > 0) sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, num(sc.hp) + num(h.curaHp));   // cura sobre sí mismo
-    const efecto = aplicarEfectoDeConsumoCreep(sc, h);
-    if(efecto && modsAfectanHp(efecto.mods)) actualizarHpMaxPorCon(sc);
+    // Lo que cambia al creep (cobrar, cura y estado del sistema anterior, el atajo «solo sobre sí») y lo que pasa después (Mesa,
+    // duelo, trampa, zona, a quién le pegó, el aviso): comun/creep-acciones.js (paso 4 etapa 4c, tanda 5), con gmHabUi (js/04).
+    const p = CreepAcciones.ejecutarHab(sc, h, ESTADOS_PRESET_GM);
+    if(p.error){ toast(p.error); return; }
+    if(p.aviso) toast(p.aviso);
     renderAll();
-    // Lo que todavía no anda para creeps (ataque con arma, Flash — P134) o una ✨ sin la Ejecución armada: avisa y va como 💰.
-    const falta = modo === 'auto' && !h.trampaColocar ? Combatiente.ejecucionNoDisponible(h.duelo, 'creep') : '';
-    const auto = modo === 'auto' && !falta;
-    const esZona = auto && h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'zona';
-    // ✨ Solo sobre el creep y sin nada que tirar: se aplica directo, sin abrir el cuadro.
-    const directo = auto && !h.trampaColocar ? aplicarHabCreepSobreSi(sc, h) : null;
-    if(directo){ renderAll(); mesaPublicarHabilidadCreep(sc, h, directo.nota); toast(`${h.nombre || 'Habilidad'} ejecutada sobre ${sc.nombre}${directo.hechos.length ? ' → ' + directo.hechos.join(' · ') : ''}${costoHp > 0 ? ` · −${fmt(costoHp)} HP` : ''}`); return; }
-    // Una trampa se coloca en secreto: la habilidad no se anuncia en la Mesa (los jugadores no deben enterarse).
-    const hDuelo = (!auto || h.trampaColocar || esZona) ? null : habDueloCreep(sc, h);   // habilidad dirigida: la contienda va en el cuadro del duelo
-    const esArma = auto && !h.trampaColocar && Combatiente.tipoEjecucion(h.duelo) === 'arma';   // ataque con arreglos: al duelo como un ataque
-    if(esArma) lanzarAtaqueDeHabCreep(sc, h);
-    else if(h.trampaColocar){ if(!(auto && pedirTrampaAlMapaCreep(sc, h))) colocarTrampaDeHab(sc, h); }
-    else if(esZona){ mesaPublicarHabilidadCreep(sc, h); if(!colocarZonaDeHabCreep(sc, h)) toast(`${h.nombre}: para colocar la zona hace falta ejecutarla desde el mapa (⚔ Acciones)`); }
-    // Con tirada, la descripción viaja con ella (una sola línea en la Mesa).
-    else if(habCreepTira(h) && !hDuelo) mesaConTexto(habTextoMesa(h));
-    else mesaPublicarHabilidadCreep(sc, h);
-    if(esArma){ /* ya fue al duelo */ }
-    else if(hDuelo) lanzarDueloDeHabCreep(sc, h, hDuelo);
-    else if(habCreepTira(h) && !h.trampaColocar && !esZona) tirarExtraDeHab(h, sc);
-    if(h.estadoObjetivo) elegirObjetivoDeHab(sc, h);   // a quién le pegó: se le aplica el estado solo
-    const partes = [`ejecutada`, costo ? `−${fmt(costo)} No2 (quedan ${fmt(sc.nitros)})` : 'sin costo de No2'];
-    if(costoHp > 0) partes.push(`−${fmt(costoHp)} HP`);
-    if(num(h.curaHp) > 0) partes.push(`+${fmt(num(h.curaHp))} HP`);
-    if(falta) partes.push(`⚠ ${falta}: se ejecutó como semiautomática`);
-    if(h.cd > 0) partes.push(`cooldown ${fmt(num(h.cd))} turno(s)`);
-    if(efecto) partes.push(`${efecto.nombre} (${fmt(efecto.turnos)}t)`);
-    toast(`${h.nombre||'Habilidad'} ${partes.join(' · ')}`);
+    CreepAcciones.terminarHab(sc, h, p, gmHabUi);
     return;
   }
   if(b.id === 'btn-mant'){

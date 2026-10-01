@@ -929,6 +929,19 @@ prueba('los ganchos del duelo de un creep: el Parry cobra y tira; Sentado sin co
   igual([reg, creeps.k.nitros, creeps.k.ataquesTurno, H.soy({tipo: 'pj'}), H.opcionesDefensa(d).map(o => o.modo)], [['Orco · Parry'], 2, 0, false, ['evasion', 'parry']]);
 });
 
+prueba('habilidades de un creep: cobra No2 y cooldown, la ✨ «solo sobre sí» se aplica directo, y en cooldown no se puede', () => {
+  const sc = creepPrueba({nitros: 5, habilidades: [{id: 'g', nombre: 'Golpe', nitrosCosto: 2, cd: 2, tiradaStat: 'pdg', tiradaExtra: '2d6'},
+    {id: 'b', nombre: 'Piel', modo: 'auto', cd: 1, nitrosCosto: 1, duelo: {objetivo: 'uno mismo', efectos: [{nombre: 'Blindado', turnos: 2}]}}]});
+  const reg = [], ui = {mesaHabilidad: (s, h) => reg.push('mesa ' + h.nombre), mesaConTexto: () => reg.push('texto'), publicar: (s, t) => reg.push(t && t.origen), toast: t => reg.push('aviso'),
+    habDuelo: () => null, lanzarAtaque: () => {}, lanzarDuelo: () => {}, colocarTrampa: () => {}, colocarZona: () => false, elegirObjetivo: () => {}};
+  const p1 = CreepAcciones.ejecutarHab(sc, sc.habilidades[0], estadosPresetCreep());
+  CreepAcciones.terminarHab(sc, sc.habilidades[0], p1, ui);
+  const p2 = CreepAcciones.ejecutarHab(sc, sc.habilidades[1], estadosPresetCreep());
+  const otraVez = CreepAcciones.ejecutarHab(sc, sc.habilidades[0], estadosPresetCreep());
+  igual([sc.nitros, sc.habilidades[0].cdActual, reg, !!p2.directo, sc.estados.some(e => e.nombre === 'Blindado'), !!otraVez.error, CreepAcciones.tiradaSegundaHab(sc, sc.habilidades[0]).origen],
+    [2, 2, ['texto', 'Orco · Golpe · PdG', 'aviso'], true, true, true, 'Orco · Golpe · Efecto']);
+});
+
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */
 grupo('Mis últimas tiradas (P138)');
 prueba('se juntan las de la Mesa con las de esta ventana, sin repetir, las últimas primero', () => {

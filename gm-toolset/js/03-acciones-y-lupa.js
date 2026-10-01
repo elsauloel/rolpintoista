@@ -539,41 +539,15 @@ const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp'};
 // (Inmunidades — Invulnerable, Inmunidad a CC, Sangre pura, Coagulación extrema, jefe contra Stun — y acumular Veneno:
 // Combatiente.agregarEstado, comun/combatiente.js.)
 
-function aplicarEfectoDeConsumoCreep(sc, h){
-  const nombre = (h.efectoNombre || '').trim();
-  if(!nombre) return null;
-  // La habilidad no sabe de categorías/inmunidades — se infiere buscando
-  // un preset con el mismo nombre, igual que en ficha.html.
-  const preset = ESTADOS_PRESET_GM.find(p => p.nombre === nombre || (p.alias || []).includes(nombre));   // "Escudo especial" pasó a "Escudo especial" (2026-09-24)
-  const turnos = num(h.efectoTurnos);
-  const stacks = Math.max(1, num(h.efectoStacks) || 1);
-  const hpTurno = num(h.efectoHpTurno);
-  const polaridad = h.efectoPolaridad || (preset ? preset.polaridad : 'otro');
-  const detalle = h.efectoDetalle || '';
-  const mods = structuredClone(h.efectoMods || []);
-  // Con un preset conocido (Invulnerable, Espinas, Escudo especial, Sigilo…) el estado lleva todas sus marcas, no solo las categorías.
-  const categorias = preset ? {esCC:preset.esCC, esVeneno:preset.esVeneno, esSangrado:preset.esSangrado,
-    stacksTurno: preset.stacksTurno ?? 0, permanente: !!preset.permanente, escudoMagico: preset.escudoMagico ?? 0, forzarNitros: preset.forzarNitros ?? ''} : {};
-  if(preset) FLAGS_ESTADO_CREEP.forEach(f => { categorias[f] = !!preset[f]; });
-  const previo = sc.estados.find(x => x.nombre === nombre);
-  const excPrevio = previo ? num(previo.escudoMagicoActual ?? previo.escudoMagico) : 0;   // Excedente de vida: lo que ya tenía
-  const nuevo = {id: uid(), nombre, hpTurno, stacks, turnos, polaridad, detalle, mods, ...categorias};
-  if(num(h.efectoEscudo) > 0){   // la habilidad da HP de escudo o de Excedente de vida (Absorber vida, Coraza de huesos…)
-    const suma = num(h.efectoEscudo), total = (preset && preset.excedenteVida) ? excPrevio + suma : suma;
-    nuevo.escudoMagico = total; nuevo.escudoMagicoActual = total;
-  }
-  // Ponerlo: la regla común (comun/combatiente.js, agregarEstado) — inmunidades (con la de jefe), Veneno que se acumula (el
-  // severo no) y, si ya tiene uno igual, se renueva (P132).
-  const r = Combatiente.agregarEstado(sc.estados, nuevo, sc);
-  if(!r.ok){ toast(`${sc.nombre}: inmune ahora mismo (${r.motivo}) — ${nombre} no hizo efecto`); return null; }
+function aplicarEfectoDeConsumoCreep(sc, h){   // comun/creep-acciones.js (paso 4 etapa 4c, tanda 5)
+  const r = CreepAcciones.efectoDeHab(sc, h, ESTADOS_PRESET_GM);
+  if(r.aviso) toast(r.aviso);
   return r.estado;
 }
 
 // Tirada de una habilidad del creep: el stat vinculado (con su valor del
 // momento) y/o la fórmula. Se pueden tener las dos.
-function habCreepTira(h){
-  return !!(h && (String(h.tiradaExtra || "").trim() || (h.tiradaStat && CREEP_STAT_LOOKUP[h.tiradaStat])));
-}
+function habCreepTira(h){ return CreepAcciones.habTira(h); }   // comun/creep-acciones.js
 // Ejecutar tira SOLO la primera tirada que le corresponde (PdG, PdG.Esp u otro stat vinculado; si no hay stat, la fórmula).
 // La fórmula (el daño o el efecto), si hay stat, va aparte con el botón 🎲 — igual que Atacar → Daño (2026-09-24).
 function habCreepStatTirable(h, sc){ return CreepBotonera.habStatTirable(h, sc); }

@@ -88,5 +88,160 @@ const CreepAcciones = (() => {
     return tirada(`${sc.nombre} · ${nombre} (PdG)`, C().statValor(sc, 'pdg') + bonoEspecial(sc, tipo), sc, 'pdg');
   }
 
-  return {tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL};
+  /* ---------- Habilidades (paso 4c, tanda 5; antes el clic de data-ejecutar en js/06, y js/03, js/04 y js/10) ----------
+     Ejecutar se parte en dos: ejecutarHab (lo que CAMBIA al creep: cobrar No2, cooldown y vida, la cura y el estado del sistema
+     anterior, y el atajo ✨ «solo sobre sí, sin tiradas») y terminarHab (lo que pasa DESPUÉS: la Mesa, el duelo, la trampa, la
+     zona, a quién le pegó, el aviso), que cada pantalla hace a su manera con su `ui`. Las 📣 manuales y los ⚡ Flash no pasan por
+     acá (los resuelve cada pantalla antes). */
+  const uid = () => Math.random().toString(36).slice(2,9);
+  const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp'};
+  const FLAGS_ESTADO = ['armaduraRota','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
+  const habEtq = stat => (C().STAT_LOOKUP[stat] && C().STAT_LOOKUP[stat].label) || ATTR_LABELS[stat] || stat;
+  // La Ejecución de un creep: la misma regla que personajes e invocaciones (comun/combatiente.js, habEjecucion). Sin costo variable.
+  function habEjecucion(sc, h){
+    return Combatiente.habEjecucion(h, h && h.duelo, {stat: s => C().statValor(sc, s), etq: habEtq});
+  }
+  // «Ataque con mi arma, con arreglos» de un creep (Golpe brutal, Carga…; P134): el mismo armado que el personaje, con su arma.
+  function ataqueDeHab(sc, h){
+    const c = h && h.duelo;
+    return Combatiente.ataqueConArreglos(h, c, {arma: {id: '', nombre: sc.armaNombre || '', tipoDado: num(sc.armaTipo) || 8, rango: !!sc.armaDeRango},
+      alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? Combatiente.alcanceHab(c, 'pdg', s => C().statValor(sc, s)) : C().alcance(sc)});
+  }
+  // ¿Tira algo? El stat vinculado (con su valor del momento) y/o la fórmula.
+  function habTira(h){
+    return !!(h && (String(h.tiradaExtra || "").trim() || (h.tiradaStat && C().STAT_LOOKUP[h.tiradaStat])));
+  }
+  // El estado «del sistema anterior» que la habilidad le pone al propio creep (h.efectoNombre…). Devuelve {estado} (null si no
+  // tiene) y, si no le hizo efecto, {aviso}.
+  function efectoDeHab(sc, h, presets){
+    const nombre = (h.efectoNombre || '').trim();
+    if(!nombre) return {estado: null};
+    // La habilidad no sabe de categorías/inmunidades — se infiere buscando un preset con el mismo nombre, igual que en ficha.html.
+    const preset = (presets || []).find(p => p.nombre === nombre || (p.alias || []).includes(nombre));
+    const turnos = num(h.efectoTurnos);
+    const stacks = Math.max(1, num(h.efectoStacks) || 1);
+    const hpTurno = num(h.efectoHpTurno);
+    const polaridad = h.efectoPolaridad || (preset ? preset.polaridad : 'otro');
+    const detalle = h.efectoDetalle || '';
+    const mods = structuredClone(h.efectoMods || []);
+    // Con un preset conocido (Invulnerable, Espinas, Escudo especial, Sigilo…) el estado lleva todas sus marcas, no solo las categorías.
+    const categorias = preset ? {esCC:preset.esCC, esVeneno:preset.esVeneno, esSangrado:preset.esSangrado,
+      stacksTurno: preset.stacksTurno ?? 0, permanente: !!preset.permanente, escudoMagico: preset.escudoMagico ?? 0, forzarNitros: preset.forzarNitros ?? ''} : {};
+    if(preset) FLAGS_ESTADO.forEach(f => { categorias[f] = !!preset[f]; });
+    const previo = sc.estados.find(x => x.nombre === nombre);
+    const excPrevio = previo ? num(previo.escudoMagicoActual ?? previo.escudoMagico) : 0;   // Excedente de vida: lo que ya tenía
+    const nuevo = {id: uid(), nombre, hpTurno, stacks, turnos, polaridad, detalle, mods, ...categorias};
+    if(num(h.efectoEscudo) > 0){   // la habilidad da HP de escudo o de Excedente de vida (Absorber vida, Coraza de huesos…)
+      const suma = num(h.efectoEscudo), total = (preset && preset.excedenteVida) ? excPrevio + suma : suma;
+      nuevo.escudoMagico = total; nuevo.escudoMagicoActual = total;
+    }
+    // Ponerlo: la regla común (comun/combatiente.js, agregarEstado) — inmunidades (con la de jefe), Veneno que se acumula y,
+    // si ya tiene uno igual, se renueva (P132).
+    const r = Combatiente.agregarEstado(sc.estados, nuevo, sc);
+    if(!r.ok) return {estado: null, aviso: `${sc.nombre}: inmune ahora mismo (${r.motivo}) — ${nombre} no hizo efecto`};
+    return {estado: r.estado};
+  }
+  // ✨ Automática, solo sobre el propio creep y sin tiradas: aplica los efectos del cuadro de Ejecución directo. Devuelve null si
+  // no es ese caso; si no, {hechos} (para el aviso del GM) y {nota} (los textos «a mano», para la Mesa).
+  function sobreSi(sc, h){
+    const hab = habEjecucion(sc, h);
+    if(!Combatiente.sobreSiSinTiradas(hab)) return null;
+    const hechos = hab.efectos.map(ef => {
+      if(!ef.spec){ sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, num(sc.hp) + num(ef.cura)); return `+${fmt(num(ef.cura))} HP`; }
+      const r = EstadosAplicar.aplicarACreep(sc, ef.spec);
+      if(!r.ok) return `${ef.nombre}: no le hizo efecto (${r.motivo})`;
+      if(C().modsAfectanHp(r.estado.mods)) C().actualizarHpMaxPorCon(sc);
+      return r.que === 'renovado' ? `${r.estado.nombre} renovado` : EstadosAplicar.texto(ef.spec);
+    });
+    return {hechos, nota: [hab.efectoLibre || '', hab.efectosNota || ''].filter(Boolean).join(' ')};
+  }
+  // Lo que cambia al ejecutar una 💰 o ✨ (no manual ni Flash): {error} o el plan para terminarHab.
+  function ejecutarHab(sc, h, presets){
+    const modo = C().modoHab(h);
+    const bloqueo = C().bloqueoHab(sc, h);
+    if(bloqueo) return {error: `${sc.nombre}: ${h.nombre || 'Habilidad'} no se puede usar — ${bloqueo}`};
+    // Se cobra lo que la habilidad tenga cargado (P133): No2, cooldown y vida; y la cura del sistema anterior, si la trae.
+    const costo = C().costoNitrosHab(sc, h), costoHp = num(h.hpCosto);
+    sc.nitros = num(sc.nitros) - costo;
+    h.cdActual = num(h.cd);
+    if(C().habAtaque(h)) sc.ataquesTurno = num(sc.ataquesTurno) + 1;  // cuenta como su ataque
+    if(costoHp > 0) sc.hp = num(sc.hp) - costoHp;
+    if(num(h.curaHp) > 0) sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, num(sc.hp) + num(h.curaHp));   // cura sobre sí mismo
+    const ef = efectoDeHab(sc, h, presets);
+    const efecto = ef.estado;
+    if(efecto && C().modsAfectanHp(efecto.mods)) C().actualizarHpMaxPorCon(sc);
+    // Lo que todavía no anda para creeps o una ✨ sin la Ejecución armada: avisa y va como 💰.
+    const falta = modo === 'auto' && !h.trampaColocar ? Combatiente.ejecucionNoDisponible(h.duelo, 'creep') : '';
+    const auto = modo === 'auto' && !falta;
+    const esZona = auto && h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'zona';
+    // ✨ Solo sobre el creep y sin nada que tirar: se aplica directo, sin abrir el cuadro.
+    const directo = auto && !h.trampaColocar ? sobreSi(sc, h) : null;
+    return {costo, costoHp, efecto, aviso: ef.aviso || '', falta, auto, esZona, directo, nitros: sc.nitros};
+  }
+  /* Lo que pasa después de cobrar. ui = {mesaHabilidad(sc, h, extra), mesaConTexto(texto), publicar(sc, t), toast(t),
+       habDuelo(sc, h) (la Ejecución para el duelo, o null si no hay duelo), lanzarAtaque(sc, h), lanzarDuelo(sc, h, hab),
+       colocarTrampa(sc, h, auto), colocarZona(sc, h) → bool, elegirObjetivo(sc, h) (el estado sobre el objetivo)} */
+  function terminarHab(sc, h, p, ui){
+    const {costo, costoHp, efecto, falta, auto, esZona, directo} = p;
+    if(directo){ ui.mesaHabilidad(sc, h, directo.nota); ui.toast(`${h.nombre || 'Habilidad'} ejecutada sobre ${sc.nombre}${directo.hechos.length ? ' → ' + directo.hechos.join(' · ') : ''}${costoHp > 0 ? ` · −${fmt(costoHp)} HP` : ''}`); return; }
+    // Una trampa se coloca en secreto: la habilidad no se anuncia en la Mesa (los jugadores no deben enterarse).
+    const hDuelo = (!auto || h.trampaColocar || esZona) ? null : ui.habDuelo(sc, h);   // habilidad dirigida: la contienda va en el cuadro del duelo
+    const esArma = auto && !h.trampaColocar && Combatiente.tipoEjecucion(h.duelo) === 'arma';   // ataque con arreglos: al duelo como un ataque
+    if(esArma) ui.lanzarAtaque(sc, h);
+    else if(h.trampaColocar) ui.colocarTrampa(sc, h, auto);
+    else if(esZona){ ui.mesaHabilidad(sc, h); if(!ui.colocarZona(sc, h)) ui.toast(`${h.nombre}: para colocar la zona hace falta ejecutarla desde el mapa (⚔ Acciones)`); }
+    // Con tirada, la descripción viaja con ella (una sola línea en la Mesa).
+    else if(habTira(h) && !hDuelo) ui.mesaConTexto(C().habTextoMesa(h));
+    else ui.mesaHabilidad(sc, h);
+    if(esArma){ /* ya fue al duelo */ }
+    else if(hDuelo) ui.lanzarDuelo(sc, h, hDuelo);
+    else if(habTira(h) && !h.trampaColocar && !esZona) ui.publicar(sc, tiradaPrimeraHab(sc, h));
+    if(h.estadoObjetivo) ui.elegirObjetivo(sc, h);   // a quién le pegó: se le aplica el estado solo
+    const partes = [`ejecutada`, costo ? `−${fmt(costo)} No2 (quedan ${fmt(p.nitros)})` : 'sin costo de No2'];
+    if(costoHp > 0) partes.push(`−${fmt(costoHp)} HP`);
+    if(num(h.curaHp) > 0) partes.push(`+${fmt(num(h.curaHp))} HP`);
+    if(falta) partes.push(`⚠ ${falta}: se ejecutó como semiautomática`);
+    if(h.cd > 0) partes.push(`cooldown ${fmt(num(h.cd))} turno(s)`);
+    if(efecto) partes.push(`${efecto.nombre} (${fmt(efecto.turnos)}t)`);
+    ui.toast(`${h.nombre||'Habilidad'} ${partes.join(' · ')}`);
+  }
+  // La primera tirada (Ejecutar): el stat vinculado o, si no tiene, la fórmula. null si no tira nada.
+  function tiradaPrimeraHab(sc, h){
+    const prefijo = `${sc ? sc.nombre + " · " : ""}${h.nombre || "Habilidad"}`;
+    if(sc && h.tiradaStat && C().STAT_LOOKUP[h.tiradaStat]) return tirada(`${prefijo} · ${C().STAT_LOOKUP[h.tiradaStat].label}`, C().statValor(sc, h.tiradaStat), sc, h.tiradaStat);
+    if(String(h.tiradaExtra || "").trim()){
+      const r = tirarDados(h.tiradaExtra);
+      if(r) return {origen: prefijo, r};
+    }
+    return null;
+  }
+  // La segunda tirada (🎲 <fórmula>, el daño o el efecto).
+  function tiradaSegundaHab(sc, h){
+    const r = tirarDados(String(h.tiradaExtra || "").trim());
+    return r ? {origen: `${sc ? sc.nombre + " · " : ""}${h.nombre || "Habilidad"} · Efecto`, r} : {error: 'La fórmula de la habilidad no es válida'};
+  }
+  // Zona persistente: si hay tirada («tira» del ✨), se tira UNA vez (con los stats del creep) y viaja el total. {tirada, zona} o null.
+  function zonaDeHab(sc, h){
+    const c = h && h.duelo;
+    if(!c || typeof c !== 'object' || c.objetivo !== 'zona') return null;
+    const stat = c.tira || '';
+    let resistValor = null, t = null;
+    if(stat){
+      const r = Combatiente.tirarStat(CreepDuelo.habStat(sc, stat), sc.estados, stat);
+      if(r){ resistValor = r.total; t = {origen: `${sc.nombre} · ${h.nombre} · ${habEtq(stat)}`, r}; }
+    }
+    // El mensaje lo arma la regla común (comun/combatiente.js, zonaDeHab), el mismo que manda un personaje.
+    return {tirada: t, zona: Combatiente.zonaDeHab(h, c, {fichaId: sc.id, tipo: 'creep', resistValor})};
+  }
+  // Cooldown a mano (− / + / ↺).
+  function cdMod(sc, habId, accion){
+    const h = (sc.habilidades || []).find(x => x.id === habId);
+    if(!h) return {error: 'No encontré esa habilidad'};
+    h.cdActual = accion === 'reset' ? 0 : Math.max(0, Math.min(99, num(h.cdActual) + num(accion)));
+    return {aviso: ''};
+  }
+
+  return {tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
+    FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,
+    zonaDeHab, cdMod};
 })();

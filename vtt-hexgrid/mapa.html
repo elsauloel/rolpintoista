@@ -9704,7 +9704,7 @@ document.addEventListener('keydown', e => {
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/creep-botonera.js?v=20261001a', '../comun/creep-acciones.js?v=20261001b', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261001a'];
+const AC_PIEZAS = ['../comun/creep-botonera.js?v=20261001a', '../comun/creep-acciones.js?v=20261001c', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261001a'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -9821,6 +9821,17 @@ function acAccionAca(b){
     return true;
   }
   if(d.atacarcreep){ acPreguntarTipoAtaque(sc); return true; }
+  if(d.ejecutar){ acEjecutarHab(sc, d.ejecutar.split(':')[1]); return true; }
+  if(d.danohabcreep){
+    const h = (sc.habilidades || []).find(x => x.id === d.danohabcreep.split(':')[1]);
+    if(h) acPublicar(sc, CreepAcciones.tiradaSegundaHab(sc, h));
+    return true;
+  }
+  if(d.cdmod){
+    const [, habId, accion] = d.cdmod.split(':');
+    acCambiar(c => CreepAcciones.cdMod(c, habId, accion));
+    return true;
+  }
   if(d.bloqueocreep){
     const t = CreepAcciones.bloqueo(sc, acParry.has(ac.creepId));
     if(t.error){ toast(t.error); return true; }
@@ -9878,12 +9889,135 @@ function acAtacar(tipo){
     });
   };
   if(typeof Duelo === 'undefined' || !Duelo.disponible()){ hacer(); return; }
-  // Mientras se elige el objetivo las Acciones nuevas se esconden (tapan el mapa); "Sin objetivo" o cancelar las vuelven a mostrar.
+  acElegirObjetivo(sc, {tipo, armaId: '', armaNombre: sc.armaNombre || '', tipoDado: num(sc.armaTipo) || 8, rango: !!sc.armaDeRango, alcance: CreepCalculo.alcance(sc)}, hacer);
+}
+// Elegir el objetivo (de un ataque o de una habilidad) con un clic en el token: mientras tanto las Acciones nuevas se esconden
+// (tapan el mapa); "Sin objetivo" o cancelar las vuelven a mostrar. `suelto`: lo que se hace sin objetivo.
+function acElegirObjetivo(sc, ataque, suelto){
+  const id = ac.creepId;
   const reabrir = () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } };
   ac.host.hidden = true;
-  dueloElegirObjetivoMapa({yo: {ref: id, tipo: 'creep', nombre: sc.nombre},
-    ataque: {tipo, armaId: '', armaNombre: sc.armaNombre || '', tipoDado: num(sc.armaTipo) || 8, rango: !!sc.armaDeRango, alcance: CreepCalculo.alcance(sc)},
-    conSuelto: true, alSuelto: () => { reabrir(); hacer(); }, alCancelar: () => reabrir()});
+  dueloElegirObjetivoMapa({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre}, ataque, conSuelto: true, alSuelto: () => { reabrir(); suelto(); }, alCancelar: () => reabrir()});
+}
+
+/* Paso 4c (tanda 5): las habilidades. Lo que cambia al creep (cobrar, cura y estado propio, el atajo ✨ «solo sobre sí») va en una
+   transacción (CreepAcciones.ejecutarHab); lo que pasa después (la Mesa, el duelo, la trampa, la zona, «¿a quién le pegó?», el
+   aviso) lo hace CreepAcciones.terminarHab con acHabUi — igual que GM Tools, pero con el mapa a mano: la trampa ✨ y la zona se
+   colocan con un clic, como las de un personaje. */
+function acMesaHabilidad(sc, h, extra){
+  if(!fbDb || !fbUsuario || !fbMiembro) return;
+  fbDb.collection(fbRutaCampana('tiradas')).add({
+    uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: String((sc && sc.nombre) || '').slice(0, 60),
+    origen: String((h && h.nombre) || 'Habilidad').slice(0, 80),
+    formula: [CreepCalculo.habTextoMesa(h), extra || ''].filter(Boolean).join(' ').slice(0, 300),   // sin el aviso ⚙/✋ para el GM
+    rolls: [], mod: 0, total: 0, desde: 'habilidad',
+    cuando: firebase.firestore.FieldValue.serverTimestamp(),
+  }).catch(err => console.error('No se pudo publicar la habilidad en la Mesa:', err));
+}
+// «Ataque con mi arma, con arreglos»: se anuncia y va al cuadro del duelo; sin duelo, se tira el PdG suelto.
+function acLanzarAtaqueDeHab(sc, h){
+  const atq = CreepAcciones.ataqueDeHab(sc, h);
+  acParry.delete(sc.id);   // atacar cierra el Parry que esperaba su Bloqueo
+  acMesaHabilidad(sc, h);
+  if(atq && typeof Duelo !== 'undefined' && Duelo.disponible()) acElegirObjetivo(sc, atq, () => acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq)));
+  else acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq));
+}
+// 🪤 Una 💰 con trampa: la coloca sola, oculta, al lado del token del creep (como GM Tools).
+async function acColocarTrampaJunto(sc, h){
+  try{
+    const r = await TokensAuto.colocarTrampas({fichaId: sc.id, tipoToken: 'creep', trampa: Combatiente.trampaDeHab(h)});   // forma única (P123)
+    if(r.colocadas) toast(`🪤 ${r.colocadas === 1 ? 'Trampa colocada' : r.colocadas + ' trampas colocadas'} al lado de ${sc.nombre}, oculta${r.colocadas === 1 ? '' : 's'} a los jugadores`);
+    else if(r.motivo === 'sin-token') toast(`${sc.nombre} no tiene token en ese mapa: la trampa no se colocó (ponela a mano con Terreno y Formas → Trampa)`);
+    else toast('No hay casilla libre al lado del token para la trampa');
+  }catch(err){
+    console.error('No se pudo colocar la trampa:', err);
+    toast('No se pudo colocar la trampa' + (err.code === 'permission-denied' ? ' (sin permiso)' : ' — ponela a mano'));
+  }
+}
+// 🎯 «¿A quién le pegó?» (h.estadoObjetivo): los tokens del mapa que se está viendo; un creep lo recibe directo, un personaje por
+// un aviso que su ficha aplica sola (comun/estados-aplicar.js) — como GM Tools.
+var acObjetivoPendiente = null;
+function acElegirObjetivoEstado(sc, h){
+  const spec = h.estadoObjetivo;
+  const toks = [...tokens.entries()].map(([id, t]) => ({id, ...t, nombre: nombreDe(t)}))
+    .filter(t => t.fichaId && !String(t.fichaId).includes('~') && !(t.tipo === 'creep' && t.fichaId === sc.id))
+    .sort((a, b) => (a.tipo === b.tipo ? 0 : a.tipo === 'pj' ? -1 : 1) || String(a.nombre).localeCompare(String(b.nombre), 'es'));
+  acObjetivoPendiente = {sc, h, spec, toks};
+  ac.raiz.querySelector('#ac-obj-titulo').textContent = `🎯 ¿A quién le pegó ${h.nombre || 'la habilidad'}?`;
+  ac.raiz.querySelector('#ac-obj-cuerpo').innerHTML = `<p class="hint" style="margin:0 0 10px">Se le aplica solo: <b>${esc(EstadosAplicar.texto(spec))}</b>. Elegí a quien la recibió; si falló, tocá "Nadie".</p>
+    ${toks.length ? toks.map(t => `<button type="button" class="addhab" data-ac-obj="${esc(t.id)}" style="display:block;width:100%;margin:0 0 6px;text-align:left">${t.tipo === 'pj' ? '🧑' : '👹'} ${esc(t.nombre)}${t.oculto ? ' 🙈' : ''}</button>`).join('') : '<div class="hint">No hay otros tokens en el mapa que estás viendo.</div>'}`;
+  ac.raiz.querySelector('#ac-objetivo').classList.add('open');
+}
+async function acAplicarEstadoAObjetivo(pend, tokenId){
+  const tok = pend.toks.find(t => t.id === tokenId), spec = pend.spec;
+  if(!tok) return;
+  try{
+    if(tok.tipo === 'creep'){
+      const r = await acCambiarCreep(tok.fichaId, c => {
+        const x = EstadosAplicar.aplicarACreep(c, spec);
+        if(!x.ok) return {error: `${c.nombre}: inmune ahora mismo (${x.motivo}) — no recibió ${spec.nombre}`};
+        if(CreepCalculo.modsAfectanHp(x.estado.mods)) CreepCalculo.actualizarHpMaxPorCon(c);
+        return {aviso: `🎯 ${c.nombre} recibe ${EstadosAplicar.texto(spec)}`};
+      });
+      if(r) toast(r.aviso);
+      return;
+    }
+    await EstadosAplicar.encolarPj({fichaId: tok.fichaId, duenoUid: tok.duenoUid, spec, origen: `${pend.sc.nombre}: ${pend.h.nombre || ''}`});
+    toast(`🎯 ${tok.nombre} recibe ${EstadosAplicar.texto(spec)} (su ficha lo aplica sola)`);
+  }catch(err){
+    console.error('No se pudo aplicar el estado:', err);
+    toast('No se pudo aplicar el estado' + (err.code === 'permission-denied' ? ' (faltan pegar las reglas nuevas)' : ''));
+  }
+}
+function acHabUi(){
+  return {
+    mesaHabilidad: (sc, h, extra) => acMesaHabilidad(sc, h, extra),
+    mesaConTexto: t => mesaConTexto(t),
+    publicar: (sc, t) => acPublicar(sc, t),
+    toast: t => toast(t),
+    habDuelo: (sc, h) => (typeof Duelo !== 'undefined' && Duelo.disponible()) ? CreepAcciones.habEjecucion(sc, h) : null,
+    lanzarAtaque: (sc, h) => acLanzarAtaqueDeHab(sc, h),
+    lanzarDuelo: (sc, h, hab) => acElegirObjetivo(sc, {tipo: 'habilidad', hab, alcance: hab.alcance}, () => acPublicar(sc, CreepAcciones.tiradaPrimeraHab(sc, h))),
+    // ✨ el GM elige la casilla (los jugadores no se enteran); 💰 al lado del token, como siempre.
+    colocarTrampa: (sc, h, auto) => { if(auto){ ac.host.hidden = true; trampaDeHabilidad({fichaId: sc.id, tipoToken: 'creep', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h)}); } else acColocarTrampaJunto(sc, h); },
+    colocarZona: (sc, h) => {
+      const z = CreepAcciones.zonaDeHab(sc, h);
+      if(!z) return false;
+      if(z.tirada) acPublicar(sc, z.tirada);
+      ac.host.hidden = true;
+      zonaPersistenteDeHabilidad(z.zona);
+      return true;
+    },
+    elegirObjetivo: (sc, h) => acElegirObjetivoEstado(sc, h),
+  };
+}
+// ⚡ Un Flash con el botón, fuera del cuadro del duelo: la misma regla de costo (cooldown y vida, el doble en turno ajeno); se
+// anuncia y el bono se suma a mano.
+async function acFlashFuera(sc, h){
+  const p = await CreepDuelo.pagarFlash(acDueloUi(), sc.id, h.id);
+  if(!p) return;
+  const f = h.duelo.flash || {};
+  acMesaHabilidad(sc, h, `⚡ Flash: +${fmt(num(f.bono))} a la tirada.`);
+  toast(`${h.nombre}: ⚡ +${fmt(num(f.bono))} (sumalo a mano a la tirada; dentro del duelo se suma solo) · ${ConfirmarTurno.textoCosto(p)}`);
+}
+function acEjecutarHab(sc, habId){
+  const h = (sc.habilidades || []).find(x => x.id === habId);
+  if(!h) return;
+  const modo = CreepCalculo.modoHab(h);
+  if(modo === 'manual'){ acMesaHabilidad(sc, h); toast(`${h.nombre || 'Habilidad'} anunciada`); return; }   // 📣 solo el texto
+  if(modo === 'auto' && Combatiente.tipoEjecucion(h.duelo) === 'flash'){ acFlashFuera(sc, h); return; }   // ⚡ sin No2, cooldown según el turno
+  const id = sc.id;
+  acCambiar(c => {
+    const p = CreepAcciones.ejecutarHab(c, (c.habilidades || []).find(x => x.id === habId), estadosPresetCreep());
+    if(!p.error) p.creep = c;   // el creep ya cambiado (con el estado propio, si lo hubo), para lo que sigue
+    return p;
+  }).then(p => {
+    if(!p) return;
+    if(p.aviso) toast(p.aviso);
+    const sc2 = Object.assign(p.creep, {id}), h2 = (sc2.habilidades || []).find(x => x.id === habId);
+    CreepAcciones.terminarHab(sc2, h2, p, acHabUi());
+    acDibujar();
+  });
 }
 // Un botón de las Acciones nuevas: se lo pide a GM Tools en el marco (lo carga si hace falta, sin abrir nada).
 function acDelegar(datos){
@@ -9902,15 +10036,28 @@ function acCrear(){
   document.body.appendChild(host);
   const raiz = host.attachShadow({mode: 'open'});
   raiz.innerHTML = `<style id="ac-css"></style><div id="ac-contenido"></div>
+    <div class="scrim" id="ac-objetivo"><div class="modal" style="max-width:440px">
+      <header><h3 id="ac-obj-titulo">🎯 ¿A quién le pegó?</h3></header>
+      <div class="body" id="ac-obj-cuerpo"></div>
+      <footer><button class="btn ghost" data-ac-obj="nadie">Nadie (falló)</button></footer>
+    </div></div>
     <div class="scrim" id="ac-tipo-ataque"><div class="modal" style="max-width:360px">
       <header><h3>¿Qué ataque es?</h3><button class="iconbtn" data-ac-tipo="no">Cerrar</button></header>
       <div class="body" id="ac-tipo-lista" style="display:flex;flex-direction:column;gap:9px"></div>
     </div></div>`;
   raiz.querySelector('#ac-tipo-ataque').addEventListener('mousedown', e => { if(e.target.id === 'ac-tipo-ataque') e.target.classList.remove('open'); });
+  raiz.querySelector('#ac-objetivo').addEventListener('mousedown', e => { if(e.target.id === 'ac-objetivo'){ e.target.classList.remove('open'); acObjetivoPendiente = null; } });
   raiz.addEventListener('click', e => {
     const b = e.target.closest('button');
     if(!b || !ac) return;
     if(b.dataset.acCerrar !== undefined){ cerrarAccionesNuevas(); return; }
+    if(b.dataset.acObj){
+      raiz.querySelector('#ac-objetivo').classList.remove('open');
+      const pend = acObjetivoPendiente;
+      acObjetivoPendiente = null;
+      if(pend && b.dataset.acObj !== 'nadie') acAplicarEstadoAObjetivo(pend, b.dataset.acObj);
+      return;
+    }
     if(b.dataset.acTipo){
       raiz.querySelector('#ac-tipo-ataque').classList.remove('open');
       if(b.dataset.acTipo !== 'no') acAtacar(b.dataset.acTipo);
@@ -9946,7 +10093,7 @@ document.addEventListener('keydown', e => {
   if(e.key !== 'Escape') return;
   e.preventDefault();
   const cartel = ac.raiz.querySelector('.scrim.open');
-  if(cartel){ cartel.classList.remove('open'); return; }
+  if(cartel){ cartel.classList.remove('open'); acObjetivoPendiente = null; return; }
   cerrarAccionesNuevas();
 });
 

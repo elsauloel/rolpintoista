@@ -102,18 +102,7 @@ function pedirTrampaAlMapaCreep(sc, h){
 // ✨ Automática, solo sobre el propio creep y sin tiradas: aplica los efectos del cuadro de Ejecución directo (como Blindaje en la ficha).
 // Devuelve null si no es ese caso; si no, {hechos} (para el aviso del GM) y {nota} (los textos «a mano», para la Mesa:
 // lo que le pasó al creep no se publica, su vida es secreta). La regla de «solo sobre sí y sin tiradas» es la común.
-function aplicarHabCreepSobreSi(sc, h){
-  const hab = habEjecucionCreep(sc, h);
-  if(!Combatiente.sobreSiSinTiradas(hab)) return null;
-  const hechos = hab.efectos.map(ef => {
-    if(!ef.spec){ sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, num(sc.hp) + num(ef.cura)); return `+${fmt(num(ef.cura))} HP`; }
-    const r = EstadosAplicar.aplicarACreep(sc, ef.spec);
-    if(!r.ok) return `${ef.nombre}: no le hizo efecto (${r.motivo})`;
-    if(modsAfectanHp(r.estado.mods)) actualizarHpMaxPorCon(sc);
-    return r.que === 'renovado' ? `${r.estado.nombre} renovado` : EstadosAplicar.texto(ef.spec);
-  });
-  return {hechos, nota: [hab.efectoLibre || '', hab.efectosNota || ''].filter(Boolean).join(' ')};
-}
+function aplicarHabCreepSobreSi(sc, h){ return CreepAcciones.sobreSi(sc, h); }   // comun/creep-acciones.js
 async function colocarTrampaDeHab(sc, h){
   try{
     const r = await TokensAuto.colocarTrampas({fichaId: sc.id, tipoToken: 'creep', trampa: Combatiente.trampaDeHab(h)});   // forma única (P123)

@@ -7,20 +7,14 @@ function alcanceDeCreep(sc){ return CreepCalculo.alcance(sc); }   // comun/creep
 function alcanceDeHabCreep(sc, c, statTira){ return Combatiente.alcanceHab(c, statTira, s => creepStatValor(sc, s)); }   // comun/combatiente.js
 // La Ejecución de un creep: la misma regla que personajes e invocaciones (comun/combatiente.js, habEjecucion) — ahora
 // también con la tirada personalizada y los textos «a mano», que antes se perdían. Sin costo variable: ninguna «X» se toca.
-function habEjecucionCreep(sc, h){
-  return Combatiente.habEjecucion(h, h && h.duelo, {stat: s => creepStatValor(sc, s), etq: habEtqCreep});
-}
+function habEjecucionCreep(sc, h){ return CreepAcciones.habEjecucion(sc, h); }   // comun/creep-acciones.js
 function habDueloCreep(sc, h){
   if(typeof Duelo === 'undefined' || !Duelo.disponible() || !gmVivo.activo) return null;
   return habEjecucionCreep(sc, h);
 }
 // «Ataque con mi arma, con arreglos» de un creep (Golpe brutal, Carga…; P134, 2026-09-30): el mismo armado que el personaje
 // (comun/combatiente.js, ataqueConArreglos), con el arma del creep y su alcance (o el que diga la habilidad).
-function ataqueDeHabCreep(sc, h){
-  const c = h && h.duelo;
-  return Combatiente.ataqueConArreglos(h, c, {arma: {id: '', nombre: sc.armaNombre || '', tipoDado: num(sc.armaTipo) || 8, rango: !!sc.armaDeRango},
-    alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? alcanceDeHabCreep(sc, c, 'pdg') : alcanceDeCreep(sc)});
-}
+function ataqueDeHabCreep(sc, h){ return CreepAcciones.ataqueDeHab(sc, h); }   // comun/creep-acciones.js
 // El PdG del ataque con arreglos, con lo que le suma la habilidad (los No2 ya los cobró la habilidad).
 function tirarPdgDeArreglosCreep(sc, atq){ publicarTiradaCreep(CreepDuelo.pdgDeArreglos(sc, atq)); }   // comun/creep-duelo.js
 // Se anuncia y va al cuadro del duelo (elegir el objetivo en el mapa); sin duelo, se tira el PdG suelto.
@@ -55,43 +49,33 @@ function lanzarDueloDeHabCreep(sc, h, hab){
 // centro. Si hay tirada («tira» del 🎯), la tira UNA vez acá (con los stats del creep) y manda el total. Sin el
 // mapa embebido no hay dónde marcar el centro — mismo límite que ya tienen los hechizos de área.
 function colocarZonaDeHabCreep(sc, h){
-  const c = h && h.duelo;
-  if(!c || typeof c !== 'object' || c.objetivo !== 'zona') return false;
+  if(!(h && h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'zona')) return false;
   if(window.parent === window) return false;
-  const stat = c.tira || '';
-  let resistValor = null;
-  if(stat){
-    const r = Combatiente.tirarStat(habStatCreep(sc, stat), sc.estados, stat);
-    if(r){
-      resistValor = r.total;
-      registrarTirada(`${sc.nombre} · ${h.nombre} · ${habEtqCreep(stat)}`, r);
-    }
-  }
+  const z = CreepAcciones.zonaDeHab(sc, h);   // comun/creep-acciones.js: la tirada (una vez) y el mensaje
+  if(!z) return false;
+  if(z.tirada) registrarTirada(z.tirada.origen, z.tirada.r);
   try{
-    // El mensaje lo arma la regla común (comun/combatiente.js, zonaDeHab), el mismo que manda un personaje.
-    const zona = Combatiente.zonaDeHab(h, c, {fichaId: sc.id, tipo: 'creep', resistValor});
-    MensajesMapa.alMapa(zona.tipo, zona);
+    MensajesMapa.alMapa(z.zona.tipo, z.zona);
     return true;
   }catch(err){ console.error('No se pudo avisar la zona al mapa:', err); return false; }
 }
 
-function tirarExtraDeHab(h, sc){
-  const prefijo = `${sc ? sc.nombre + " · " : ""}${h.nombre || "Habilidad"}`;
-  if(habCreepStatTirable(h, sc)){
-    tirarValorStat(`${prefijo} · ${CREEP_STAT_LOOKUP[h.tiradaStat].label}`, creepStatValor(sc, h.tiradaStat), sc, h.tiradaStat);
-    return;
-  }
-  if(String(h.tiradaExtra || "").trim()){
-    const r = tirarDados(h.tiradaExtra);
-    if(r) registrarTirada(prefijo, r);
-  }
-}
-function tirarSegundaDeHab(h, sc){
-  const r = tirarDados(String(h.tiradaExtra || "").trim());
-  if(r) registrarTirada(`${sc ? sc.nombre + " · " : ""}${h.nombre || "Habilidad"} · Efecto`, r);
-  else toast('La fórmula de la habilidad no es válida');
-}
+function tirarExtraDeHab(h, sc){ publicarTiradaCreep(CreepAcciones.tiradaPrimeraHab(sc, h)); }   // comun/creep-acciones.js
+function tirarSegundaDeHab(h, sc){ publicarTiradaCreep(CreepAcciones.tiradaSegundaHab(sc, h)); }
 const botonSegundaHabCreep = (h, sc) => CreepBotonera.botonSegundaHab(h, sc);   // comun/creep-botonera.js
+// Lo que pasa después de cobrar una habilidad (comun/creep-acciones.js, terminarHab): cómo lo hace GM Tools.
+const gmHabUi = {
+  mesaHabilidad: (sc, h, extra) => mesaPublicarHabilidadCreep(sc, h, extra),
+  mesaConTexto: t => mesaConTexto(t),
+  publicar: (sc, t) => publicarTiradaCreep(t),
+  toast: t => toast(t),
+  habDuelo: (sc, h) => habDueloCreep(sc, h),
+  lanzarAtaque: (sc, h) => lanzarAtaqueDeHabCreep(sc, h),
+  lanzarDuelo: (sc, h, hab) => lanzarDueloDeHabCreep(sc, h, hab),
+  colocarTrampa: (sc, h, auto) => { if(!(auto && pedirTrampaAlMapaCreep(sc, h))) colocarTrampaDeHab(sc, h); },
+  colocarZona: (sc, h) => colocarZonaDeHabCreep(sc, h),
+  elegirObjetivo: (sc, h) => elegirObjetivoDeHab(sc, h),
+};
 
 let equipandoCreepId = null;
 

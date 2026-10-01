@@ -129,3 +129,13 @@ siga necesitándolo (ver pregunta 4). La ficha suelta (`ficha.html`) no cambia: 
   Constitución (1d4+1) y Percepción (1d6) salieron en la Mesa a nombre de Clementino, `desde: 'mapa'`, sin pasar por la ficha
   escondida. Salen sin `ficha` hasta que se peguen las reglas de P138 (la Mesa reintenta sin ese campo). **Fuerza del golpe
   sigue delegada**: abre el cartel de elegir arma de la ficha; va junto con Parry y Bloqueo (paso 4 de la 3c).
+- 2026-10-01: **antes del paso 2 de la 3c (Sigilo y Levantarse), el resumen público** — desde el paso 2 el mapa tiene que
+  *guardar* al personaje (cobrar No2, poner o sacar un estado), y al guardar se publica también el `resumen` (vida, No2,
+  estados… lo que leen los tokens). Lo armaba solo la ficha (`fichaResumen`); pasó a `comun/ficha-resumen.js`
+  (`FichaResumen.resumen(S, {control, miniaturaInv})`, con los estados derivados —regeneración de pasivas, Sobrepeso—, el
+  costo de moverse y el No2 máximo de las invocaciones). La ficha conserva los nombres de siempre como atajos. Comparado
+  contra el código viejo sacado tal cual de los archivos de la ficha en 700 personajes al azar (sobrepeso, invocaciones,
+  pasivas, Rengo/Inmovilizado, control del GM, escudos y excedente): igual; 4 mutaciones plantadas, las 4 detectadas.
+  **En vivo** (Clementino): el resumen que arma la ficha nueva es idéntico al que estaba guardado; entrar en sigilo lo
+  publica (Sigilo, No2 12 → 11) y salir lo saca. Ojo, de paso: el resumen tiene la clave `muerto` dos veces (un objeto y
+  después un sí/no); vale la segunda, como siempre — no se tocó.

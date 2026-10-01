@@ -9123,7 +9123,7 @@ function abrirBotoneraPrincipal(){
    no están (la lupa vive en la ficha: etapa 3c). Las piezas se cargan recién al usarla: para los jugadores no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001b',
-  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001f',
+  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001g',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
@@ -9377,19 +9377,20 @@ function bnCombateAca(b){
   else FichaAcciones.elegirArmaDefensa(S, a === 'fuerzagolpe' ? 'fuerza' : a, ui);
   return true;
 }
-/* Pasos 3c-5a y 5b: las habilidades. El mapa hace él mismo las 📣 manuales (Anunciar), las 💰 semiautomáticas (cobra y tira la
-   primera tirada), las ✨ automáticas (ataque con arreglos, habilidad dirigida con su duelo, el atajo «solo sobre vos, sin
-   tiradas»), el ⚡ Flash fuera del duelo, el costo X y la 🎲 segunda tirada, con el mismo código que la ficha
-   (comun/ficha-acciones.js). Las que colocan algo en el mapa —trampa, zona persistente, zona de habilidad o portal— todavía se le
-   piden a la ficha escondida (paso 5c). */
-function bnHabAca(it){
-  if(!it) return false;
-  const modo = FichaBotonera.modoHab(it), c = FichaBotonera.dueloDe(it);
-  if(modo === 'manual') return true;
-  if(Combatiente.tipoEjecucion(c) === 'flash') return true;
-  if(it.trampaColocar || it.zonaMapa || it.portalMapa) return false;
-  if(modo === 'auto' && c && typeof c === 'object' && c.objetivo === 'zona') return false;
-  return true;
+/* Pasos 3c-5a, 5b y 5c: las habilidades. El mapa hace él mismo todas — 📣 manuales (Anunciar), 💰 semiautomáticas, ✨
+   automáticas (ataque con arreglos, habilidad dirigida con su duelo, «solo sobre vos»), ⚡ Flash fuera del duelo, costo X, 🎲
+   segunda tirada y las que colocan algo en el mapa (trampa, zona persistente, zona de habilidad, portal: bnAlMapa) — con el mismo
+   código que la ficha (comun/ficha-acciones.js). */
+function bnHabAca(it){ return !!it; }
+// Lo que la ficha le manda al mapa al ejecutar una habilidad, acá se llama directo. Los que piden un clic en el mapa esconden la
+// Botonera nueva (como al elegir el objetivo de un ataque).
+function bnAlMapa(tipo, msg){
+  if(tipo !== 'zona-habilidad' && bn) bn.host.hidden = true;
+  if(tipo === 'zona-habilidad') zonaDeHabilidad(msg);
+  else if(tipo === 'portal-habilidad') portalDeHabilidad(msg);
+  else if(tipo === 'zona-persistente-habilidad') zonaPersistenteDeHabilidad(msg);
+  else if(tipo === 'trampa-habilidad') trampaDeHabilidad(msg);
+  else console.warn('bnAlMapa: aviso desconocido', tipo);
 }
 // Líneas de recordatorio en la Mesa a nombre del personaje (como publicarRecordatorios de la ficha): durabilidad, etc.
 function bnRecordatorios(avisos){
@@ -9428,7 +9429,11 @@ function bnHabUi(){
     mesaHabilidad: (nombre, detalle) => bnMesaHabilidad(nombre, detalle),
     fijarHp: v => FichaAcciones.fijarHp(bn.S, v),   // el Ankh y la muerte los revisa ui.cambio (bnRevisarVida)
     efecto: it => FichaAcciones.efectoDeConsumo(bn.S, it, base.presets, t => toast(t)),
-    colocarTrampa: () => {}, avisarZona: () => {}, colocarZona: () => false,   // no llegan: bnHabAca deja esas habilidades a la ficha
+    enMapa: () => true,
+    alMapa: (tipo, m) => bnAlMapa(tipo, m),
+    colocarTrampa: it => FichaAcciones.colocarTrampaDeHab(bn.S, it, ui),
+    avisarZona: it => FichaAcciones.avisarZonaAlMapa(bn.S, it, ui),
+    colocarZona: (it, xSp, xNitros) => FichaAcciones.colocarZonaDeHab(bn.S, it, xSp, xNitros, ui),
     terminar: (it, arma, xSp, xNitros) => FichaAcciones.terminarEjecucionHab(bn.S, it, arma, xSp, xNitros, ui),
     recordatorios: avisos => bnRecordatorios(avisos),
     yo: () => ({ref: bn.fichaId, tipo: 'pj', nombre: (bn.S.meta && bn.S.meta.nombre) || 'Personaje'}),

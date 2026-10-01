@@ -598,26 +598,7 @@ function terminarEjecucionHab(it, arma, xSp, xNitros){ FichaAcciones.terminarEje
 // y/o daño, y con qué resistencia. Si hay tirada («tira» del 🎯), la tira UNA vez acá y manda el total — esa
 // misma tirada es la que se reusa contra cada uno que entra o sigue adentro en el Mantenimiento (mismo criterio
 // que la PdG.Esp compartida de los hechizos de área). Devuelve false si no se pudo avisar (sin mapa abierto).
-function colocarZonaDeHab(it, xSp, xNitros){
-  const c = dueloDe(it);
-  if(!c || typeof c !== 'object' || c.objetivo !== 'zona') return false;
-  if(window.parent === window || !fichaVivo || !fichaVivo.id) return false;
-  const stat = c.tira || '';
-  let resistValor = null;
-  if(stat){
-    const r = Combatiente.tirarStat(compute().final[stat], S.efectos, stat);
-    if(r){
-      resistValor = r.total;
-      registrarTirada(`${it.nombre} · ${STAT_LABEL[stat] || stat}`, r);
-    }
-  }
-  try{
-    // El mensaje lo arma la regla común (comun/combatiente.js, zonaDeHab), el mismo que manda un creep.
-    const zona = Combatiente.zonaDeHab(it, c, {fichaId: fichaVivo.id, tipo: 'pj', X: xDeHab(it, xSp, xNitros), resistValor});
-    MensajesMapa.alMapa(zona.tipo, zona);
-    return true;
-  }catch(err){ console.error('No se pudo avisar la zona al mapa:', err); return false; }
-}
+function colocarZonaDeHab(it, xSp, xNitros){ return FichaAcciones.colocarZonaDeHab(S, it, xSp, xNitros, habUi); }   // comun/ficha-acciones.js (paso 3c-5c)
 // Alcance en casilleros de un ataque: cuerpo a cuerpo = 1 + el Alcance del arma (su bono `rng`); arma de rango = su Rango.
 function alcanceDeArma(arma){ return FichaCombate.alcanceDeArma(S, arma); }   // comun/ficha-combate.js
 // La Ejecución para el cuadro del duelo: la regla común (comun/combatiente.js, habEjecucion), la misma de invocaciones y

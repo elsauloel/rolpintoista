@@ -793,6 +793,29 @@ prueba('un estado recibido respeta Invulnerable; el Desgaste baja la durabilidad
   igual([S.efectos.some(e => e.nombre === 'Stun'), FichaCalculo.durActual(S.inventario[0])], [false, durAntes - 1]);
 });
 
+grupo('Habilidades que colocan algo (comun/ficha-acciones.js, paso 5c)');
+const uiMapa = (reg, enMapa) => ({...uiAuto(reg, true), enMapa: () => enMapa, alMapa: (tipo, m) => reg.push(`alMapa ${tipo}`)});
+prueba('Invocar portal y una zona de habilidad se le avisan al mapa; sin mapa no pasa nada', () => {
+  const portal = {id: 'p', nombre: 'Portal', portalMapa: {turnos: 3}}, cono = {id: 'c', nombre: 'Cono', zonaMapa: 'cono', zonaRadio: 1};
+  const S = fichaBotonera({}), con = [], sin = [];
+  FichaAcciones.avisarZonaAlMapa(S, portal, uiMapa(con, true)); FichaAcciones.avisarZonaAlMapa(S, cono, uiMapa(con, true));
+  FichaAcciones.avisarZonaAlMapa(S, portal, uiMapa(sin, false));
+  igual([con, sin], [['alMapa portal-habilidad', 'alMapa zona-habilidad'], []]);
+});
+prueba('una ✨ con trampa se anuncia y le pide la casilla al mapa', async () => {
+  const h = {id: 't', nombre: 'Lazo', modo: 'auto', detalle: 'atrapa', trampaColocar: {nombre: 'Lazo', dano: '2d6', tipo: 'flor', tamano: 0, cant: 1}};
+  const reg = [], viejo = window.TokensAuto;
+  window.TokensAuto = {colocarTrampas: async () => ({colocadas: 1})};
+  try{ await FichaAcciones.colocarTrampaDeHab(fichaBotonera({}), h, uiMapa(reg, true)); }finally{ window.TokensAuto = viejo; }
+  igual(reg, ['mesa Lazo', 'alMapa trampa-habilidad']);
+});
+prueba('una zona persistente tira su resistencia una vez y la manda al mapa', () => {
+  const h = {id: 'z', nombre: 'Niebla', modo: 'auto', duelo: {objetivo: 'zona', tira: 'esp', radio: 2, zonaTurnos: 3, efectos: [{nombre: 'Lisiado'}]}};
+  const reg = [];
+  const ok = FichaAcciones.colocarZonaDeHab(fichaBotonera({}), h, 0, 0, uiMapa(reg, true));
+  igual([ok, reg.length, reg[0].startsWith('🎲 Niebla'), reg[1]], [true, 2, true, 'alMapa zona-persistente-habilidad']);
+});
+
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */
 grupo('Mis últimas tiradas (P138)');
 prueba('se juntan las de la Mesa con las de esta ventana, sin repetir, las últimas primero', () => {

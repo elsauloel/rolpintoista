@@ -631,18 +631,7 @@ function trampaGuardarCampo(el){
 }
 // Se ejecuta con la habilidad: coloca la trampa en el mapa (si hay token del personaje en el mapa en juego).
 // Habilidad con zona en el mapa (zonaMapa: 'cono'): le avisa al mapa (la ficha corre en su iframe) para que dibuje el área 3 segundos.
-function avisarZonaAlMapa(h){
-  if(!h || window.parent === window || !fichaVivo || !fichaVivo.id) return;
-  // Invocar portal: le pide al mapa que deje elegir los dos puntos (dentro del rango de casteo) y cree los portales.
-  if(h.portalMapa){
-    try{ MensajesMapa.alMapa('portal-habilidad', {fichaId: fichaVivo.id, turnos: Math.max(1, num(h.portalMapa.turnos) || 3), nombre: h.nombre}); }
-    catch(err){ console.error('No se pudo avisar el portal al mapa:', err); }
-    return;
-  }
-  if(!h.zonaMapa) return;
-  try{ MensajesMapa.alMapa('zona-habilidad', {fichaId: fichaVivo.id, forma: h.zonaMapa, radio: num(h.zonaRadio) || 1, nombre: h.nombre}); }
-  catch(err){ console.error('No se pudo avisar la zona al mapa:', err); }
-}
+function avisarZonaAlMapa(h){ FichaAcciones.avisarZonaAlMapa(S, h, habUi); }   // comun/ficha-acciones.js (paso 3c-5c)
 const consumiendoTrampa = new Set();
 // Trampa consumible: coloca en el mapa la trampa del ítem (`trampaDatos`) en la casilla libre al frente de tu token; después la arrastrás a donde quieras
 // (solo la ven vos y el GM, y la disparan los rivales). Devuelve true si se colocó (entonces se gasta la unidad).
@@ -660,24 +649,7 @@ async function colocarTrampaDeItem(it){
     return false;
   }catch(err){ console.error('No se pudo colocar la trampa:', err); toast('No se pudo colocar la trampa — revisá la consola'); return false; }
 }
-async function colocarTrampaDeHab(h){
-  const t = h.trampaColocar;
-  if(!t || typeof TokensAuto === 'undefined' || !fichaVivo || !fichaVivo.id) return;
-  // ✨ Automática (2026-09-30): se anuncia (sin la ubicación) y se elige la casilla en el mapa. Sin el mapa abierto (ficha suelta),
-  // queda al lado del token como siempre.
-  if(modoHab(h) === 'auto' && window.parent !== window){
-    mesaPublicarHabilidad(h.nombre, `${h.detalle || ''}${h.detalle ? ' — ' : ''}🪤 colocó una trampa${t.nombre ? ` («${String(t.nombre).trim()}»)` : ''}.`);
-    try{ MensajesMapa.alMapa('trampa-habilidad', {fichaId: fichaVivo.id, tipoToken: 'pj', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h)}); }
-    catch(err){ console.error('No se pudo avisar la trampa al mapa:', err); }
-    return;
-  }
-  try{
-    const dano = TRAMPA_DANO_RE.test(String(t.dano || '').trim()) ? String(t.dano).trim() : '';
-    const r = await TokensAuto.colocarTrampas({fichaId: fichaVivo.id, tipoToken: 'pj', trampa: {...Combatiente.trampaDeHab(h), dano}});
-    if(r.colocadas) toast(`🪤 ${h.nombre}: ${r.colocadas > 1 ? r.colocadas + ' trampas colocadas' : 'trampa colocada'} en el mapa`);
-    else toast(r.motivo === 'sin-token' ? `🪤 ${h.nombre}: tu personaje no tiene token en el mapa en juego — no se colocó la trampa` : `🪤 ${h.nombre}: no hay lugar libre al lado de tu token`);
-  }catch(err){ console.error('No se pudo colocar la trampa:', err); toast('No se pudo colocar la trampa — revisá la consola'); }
-}
+function colocarTrampaDeHab(h){ return FichaAcciones.colocarTrampaDeHab(S, h, habUi); }   // comun/ficha-acciones.js (paso 3c-5c)
 function trampaPreconstruidas(){
   const ed = editing;
   Biblioteca.abrir({

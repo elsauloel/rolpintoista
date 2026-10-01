@@ -643,7 +643,68 @@ const FichaAcciones = (() => {
     else tirarPrimeraDeHab(S, it, ui);
   }
 
+  /* ---------- Paso 3c-5c: habilidades que colocan algo en el mapa (js/10 y js/02) ----------
+     ui además: enMapa() (la página corre dentro del mapa —la ficha en su marco— o ES el mapa) y alMapa(tipo, msg) (la ficha le
+     manda el mensaje al mapa; el mapa llama directo a lo que hace con él: zona-habilidad, portal-habilidad,
+     zona-persistente-habilidad, trampa-habilidad). */
+  const TRAMPA_DANO_RE = /^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i;
+  // Habilidad con zona en el mapa (zonaMapa: 'cono'/'flor') o Invocar portal (portalMapa): se le avisa al mapa.
+  function avisarZonaAlMapa(S, h, ui){
+    if(!h || !ui.enMapa() || !ui.yo().ref) return;
+    // Invocar portal: le pide al mapa que deje elegir los dos puntos (dentro del rango de casteo) y cree los portales.
+    if(h.portalMapa){
+      try{ ui.alMapa('portal-habilidad', {fichaId: ui.yo().ref, turnos: Math.max(1, num(h.portalMapa.turnos) || 3), nombre: h.nombre}); }
+      catch(err){ console.error('No se pudo avisar el portal al mapa:', err); }
+      return;
+    }
+    if(!h.zonaMapa) return;
+    try{ ui.alMapa('zona-habilidad', {fichaId: ui.yo().ref, forma: h.zonaMapa, radio: num(h.zonaRadio) || 1, nombre: h.nombre}); }
+    catch(err){ console.error('No se pudo avisar la zona al mapa:', err); }
+  }
+  // Se ejecuta con la habilidad: coloca la trampa en el mapa (si hay token del personaje en el mapa en juego).
+  async function colocarTrampaDeHab(S, h, ui){
+    const t = h.trampaColocar;
+    if(!t || typeof TokensAuto === 'undefined' || !ui.yo().ref) return;
+    // ✨ Automática (2026-09-30): se anuncia (sin la ubicación) y se elige la casilla en el mapa. Sin el mapa abierto (ficha suelta),
+    // queda al lado del token como siempre.
+    if(FichaBotonera.modoHab(h) === 'auto' && ui.enMapa()){
+      ui.mesaHabilidad(h.nombre, `${h.detalle || ''}${h.detalle ? ' — ' : ''}🪤 colocó una trampa${t.nombre ? ` («${String(t.nombre).trim()}»)` : ''}.`);
+      try{ ui.alMapa('trampa-habilidad', {fichaId: ui.yo().ref, tipoToken: 'pj', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h)}); }
+      catch(err){ console.error('No se pudo avisar la trampa al mapa:', err); }
+      return;
+    }
+    try{
+      const dano = TRAMPA_DANO_RE.test(String(t.dano || '').trim()) ? String(t.dano).trim() : '';
+      const r = await TokensAuto.colocarTrampas({fichaId: ui.yo().ref, tipoToken: 'pj', trampa: {...Combatiente.trampaDeHab(h), dano}});
+      if(r.colocadas) ui.toast(`🪤 ${h.nombre}: ${r.colocadas > 1 ? r.colocadas + ' trampas colocadas' : 'trampa colocada'} en el mapa`);
+      else ui.toast(r.motivo === 'sin-token' ? `🪤 ${h.nombre}: tu personaje no tiene token en el mapa en juego — no se colocó la trampa` : `🪤 ${h.nombre}: no hay lugar libre al lado de tu token`);
+    }catch(err){ console.error('No se pudo colocar la trampa:', err); ui.toast('No se pudo colocar la trampa — revisá la consola'); }
+  }
+  // Manda al mapa todo lo que hace falta para crear la zona persistente: radio, duración, estado y/o daño, y con qué resistencia.
+  // Si hay tirada («tira» del 🎯), la tira UNA vez acá y manda el total. Devuelve false si no se pudo avisar (sin mapa abierto).
+  function colocarZonaDeHab(S, it, xSp, xNitros, ui){
+    const c = FichaBotonera.dueloDe(it);
+    if(!c || typeof c !== 'object' || c.objetivo !== 'zona') return false;
+    if(!ui.enMapa() || !ui.yo().ref) return false;
+    const stat = c.tira || '';
+    let resistValor = null;
+    if(stat){
+      const r = Combatiente.tirarStat(FichaCalculo.calcular(S).final[stat], S.efectos, stat);
+      if(r){
+        resistValor = r.total;
+        ui.registrarTirada(`${it.nombre} · ${FichaCalculo.STAT_LABEL[stat] || stat}`, r);
+      }
+    }
+    try{
+      // El mensaje lo arma la regla común (comun/combatiente.js, zonaDeHab), el mismo que manda un creep.
+      const zona = Combatiente.zonaDeHab(it, c, {fichaId: ui.yo().ref, tipo: 'pj', X: xDeHab(it, xSp, xNitros), resistValor});
+      ui.alMapa(zona.tipo, zona);
+      return true;
+    }catch(err){ console.error('No se pudo avisar la zona al mapa:', err); return false; }
+  }
+
   return {gastoNitrosForzado, alternarSigilo, levantarse,
+    TRAMPA_DANO_RE, avisarZonaAlMapa, colocarTrampaDeHab, colocarZonaDeHab,
     durAviso, desgastarItem, rompeArmaduraAlAzar, estadoDeSpec, aplicarEstadoRecibido, dueloAplicarEfectoPropio, xDeHab, habDueloDatos,
     ataqueDeHabArma, aplicarHabSobreMiDirecto, terminarEjecucionHab,
     habilidadTira, anunciarHabilidad, tirarPrimeraDeHab, tirarSegundaDeHab, registrarAtaqueDeHabilidad, limiteCostoX,

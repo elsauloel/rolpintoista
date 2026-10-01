@@ -55,6 +55,9 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-resumen.js"></script>
 <script src="ficha-acciones.js"></script>
 <script src="tiradas-propias.js"></script>
+<script src="efectos-golpe.js"></script>
+<script src="confirmar-turno.js"></script>
+<script src="ficha-duelo.js"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -687,6 +690,40 @@ prueba('oportunidad y contraataque cuestan siempre lo de un primer ataque y no s
   const S = fichaBotonera({nitros: 20, inventario: [espada], ataquesArma: {[FichaCombate.claveAtaque(espada)]: 3}}), reg = [];
   FichaAcciones.ataqueEspecialConArma(S, espada, 'contra', false, uiCombate(reg, {}));
   igual([20 - S.nitros, FichaCombate.ataquesConArma(S, espada), reg.some(x => x.startsWith('🎲 Contraataque · PdG'))], [FichaCombate.costoAtaqueEspecial(espada), 3, true]);
+});
+
+grupo('Duelo del personaje (comun/ficha-duelo.js, paso 4c)');
+const uiDuelo = (reg, est) => ({...uiCombate(reg, est), soy: () => true, reabrir: async () => true, fijarHp: () => {}});
+const dueloPrueba = (S, extra) => Object.assign({id: 'D', atacante: {ref: 'F', tipo: 'pj'}, defensor: {ref: 'F', tipo: 'pj'}, ataque: {tipo: 'normal', armaId: '', tipoDado: 6}}, extra || {});
+prueba('sin arma ni escudo solo se defiende con Evasión; con arma y escudo, un Parry con cada uno', () => {
+  const sin = FichaDuelo.hooks(() => fichaBotonera({inventario: []}), uiDuelo([], {}));
+  const con = FichaDuelo.hooks(() => fichaBotonera({nitros: 5, inventario: [espada, escudo]}), uiDuelo([], {}));
+  igual([sin.opcionesDefensa(dueloPrueba()).map(o => o.modo), con.opcionesDefensa(dueloPrueba()).map(o => o.modo + ':' + (o.itemId || '')), sin.puedeParry(dueloPrueba())],
+    [['evasion'], ['evasion:', 'parry:esp', 'parry:esc'], false]);
+});
+prueba('con sobrepeso la Evasión se ofrece pagando 1 No2 o con la penalidad', () => {
+  const pesado = fichaBotonera({nitros: 3, attrs: {con: 1, fue: 0, agl: 6, des: 5, esp: 4}, inventario: [{id: 'y', nombre: 'Yunque', tipoItem: 'armadura_rigida', equipado: true, peso: 40}]});
+  const h = FichaDuelo.hooks(() => pesado, uiDuelo([], {}));
+  igual(h.opcionesDefensa(dueloPrueba()).map(o => o.itemId), ['pagado', 'penal']);
+});
+prueba('el Bloqueo del duelo usa el arma del Parry y borra el Parry pendiente', () => {
+  const S = fichaBotonera({inventario: [espada, escudo]}), reg = [], est = {parry: 'esc'};
+  FichaDuelo.hooks(() => S, uiDuelo(reg, est)).bloquear(dueloPrueba(S, {defensa: {itemId: 'esc'}}));
+  igual([est.parry, reg.filter(x => x.startsWith('🎲'))], [null, ['🎲 Bloqueo · Escudo']]);
+});
+prueba('la Moneda Re-Roll se busca primero en el cinturón; sin moneda no hay re-roll', () => {
+  const S = fichaBotonera({cinturon: [{id: 'm1', nombre: 'Moneda Re-Roll', unidades: 1}], inventario: [{id: 'm2', nombre: 'Moneda Re-Roll', unidades: 2}]});
+  igual([FichaDuelo.monedaReroll(S).it.id, FichaDuelo.hooks(() => fichaBotonera({}), uiDuelo([], {})).rerollInfo(dueloPrueba()).disponible], ['m1', false]);
+});
+prueba('un Flash del duelo cobra sus SP al usarlo y devuelve su bono', async () => {
+  const flash = {id: 'f', nombre: 'Reflejos', costo: '2', modo: 'auto', duelo: {modo: 'flash', flash: {en: ['eva'], bono: 3}}};
+  const S = fichaBotonera({spGastado: 0, habilidades: [flash]}), viejo = ConfirmarTurno.flash;
+  ConfirmarTurno.flash = async (n, costo) => ({...costo});
+  try{
+    const h = FichaDuelo.hooks(() => S, uiDuelo([], {}));
+    const ops = h.flashOpciones(dueloPrueba(), 'eva'), p = await h.flashUsar(dueloPrueba(), 'eva', 'evasion', 'f');
+    igual([ops.map(o => o.habId), p.bono, S.spGastado], [['f'], 3, 2]);
+  }finally{ ConfirmarTurno.flash = viejo; }
 });
 
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */

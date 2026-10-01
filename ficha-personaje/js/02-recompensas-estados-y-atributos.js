@@ -788,27 +788,10 @@ function restaurarSpDeConsumo(it){ return FichaAcciones.restaurarSpDeConsumo(S, 
    cuál repetir («una moneda por tirada»: cada tirada solo se puede re-rolear una vez — la que sale de repetirla es una tirada nueva, que se puede re-rolear de nuevo con otra
    moneda). Después de usarla se tira una moneda: par (2) se conserva, impar (1) se rompe (gasta una unidad, como cualquier consumible). Botón 🪙 fijo en el mapa (jugadores) y
    en la cabecera de la Botonera; en el duelo, el botón flotante 🪙 reabre la última tirada tuya del duelo (docs/duelo-de-habilidades.md). */
-const esMonedaReroll = i => !!i && !!(i.rerollMoneda || /moneda re-?roll/i.test(String(i.nombre || '')));
-function monedaReroll(){
-  const enC = S.cinturon.find(i => esMonedaReroll(i) && num(i.unidades) > 0);
-  if(enC) return {key: 'cinturon', it: enC};
-  const enM = S.inventario.find(i => esMonedaReroll(i) && num(i.unidades) > 0 && !i.enMesa);
-  return enM ? {key: 'inventario', it: enM} : null;
-}
+const esMonedaReroll = FichaDuelo.esMonedaReroll;   // comun/ficha-duelo.js
+function monedaReroll(){ return FichaDuelo.monedaReroll(S); }
 // Tira la moneda: par se conserva, impar se rompe.
-function tirarMonedaReroll(m){
-  const r = tirarDados('1d2');   // 2 = par (se conserva) · 1 = impar (se rompe)
-  const par = r.total % 2 === 0;
-  registrarTirada(`🪙 Moneda Re-Roll · ${par ? 'par: se conserva' : 'impar: se rompe'}`, r);
-  if(!par){
-    m.it.unidades = num(m.it.unidades) - 1;
-    purgarSiAgotado(m.key, m.it.id);
-    if(m.key === 'inventario') renderInventario(); else renderList('cinturon');
-    toast(`🪙 La moneda se rompió (impar)${num(m.it.unidades) > 0 ? '' : ': era la última'}`);
-  }else toast('🪙 La moneda se conserva (par)');
-  refresh();
-  return !par;
-}
+function tirarMonedaReroll(m){ return FichaDuelo.tirarMonedaReroll(S, m, combateUi); }
 // Vuelve a tirar los mismos dados de una tirada anterior (con sus mismos bonos y mitades). `u` es una entrada de dadosHistorial.
 function repetirTirada(u){
   const mit = (String(u.formula || '').match(/÷2/g) || []).length;

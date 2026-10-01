@@ -993,7 +993,11 @@ const Duelo = (() => {
   const puedoAMano = lado => soyGM() || esMio(lado);
 
   // Envía un pedido al dueño del lado: en el mapa, al iframe; en una página suelta, se ejecuta acá.
+  // Paso 4, etapa 3c-4c (2026-10-01): el mapa puede contestar él mismo por un lado (el personaje de su Botonera nueva) con
+  // cfg.hooksLocal(lado) → los mismos ganchos de la ficha (comun/ficha-duelo.js), sin pasar por el marco.
   function enviar(lado, msg){
+    const hl = cfgEscuchar.hooksLocal ? cfgEscuchar.hooksLocal(lado) : null;
+    if(hl){ ejecutar(msg, hl); return; }
     if(cfgEscuchar.relay) cfgEscuchar.relay(lado, msg);
     else ejecutar(msg);
   }
@@ -1655,8 +1659,8 @@ const Duelo = (() => {
   /* ---------- las tiradas: lo que corre en la página del dueño (iframe del mapa o página suelta) ---------- */
   const RE_CAMPO = {pdg: /pdg/i, eva: /evasi|parry/i, fuerza: /fuerza/i, bloqueo: /bloqueo/i, dano: /da[ñn]o/i};
 
-  async function ejecutar(m){
-    const h = hooks();
+  async function ejecutar(m, hk){
+    const h = hk || hooks();
     if(!h || !disponible()) return;
     try{
       const doc = await col().doc(m.id).get();
@@ -1701,7 +1705,7 @@ const Duelo = (() => {
       const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
       const fase = (campo === 'pdg' || campo === 'eva') ? 'contacto' : campo === 'dano' ? 'dano' : 'bloqueo';
       if(!h.soy || !h.soy(lado) || d[campo] || d.estado !== 'esperando' || d.fase !== fase) return;
-      document.querySelectorAll('.scrim.open').forEach(s => s.classList.remove('open'));   // sin la Botonera abierta debajo
+      if(!hk) document.querySelectorAll('.scrim.open').forEach(s => s.classList.remove('open'));   // sin la Botonera abierta debajo
       let defensa = null;
       if(campo === 'eva'){
         const op = (d.hab ? opcionesHab(d, h) : (h.opcionesDefensa ? h.opcionesDefensa(d) : [])).find(o => o.modo === m.modo && (o.itemId || '') === (m.itemId || ''));
@@ -1735,7 +1739,7 @@ const Duelo = (() => {
         if(h.habTirar) h.habTirar(d, campo === 'pdg' ? 'atacante' : 'defensor', m.modo);
         else{ esperaTiro = null; retener(false); _toast('Esta página no sabe tirar habilidades'); }
       }
-      else if(d.hab && campo === 'dano') tirarDanoHab(d);
+      else if(d.hab && campo === 'dano') tirarDanoHab(d, h);
       else if(campo === 'pdg') h.atacar(d);
       else if(campo === 'eva') h.defender(d, m.modo, m.itemId || '');
       else if(campo === 'fuerza') h.fuerza(d);
@@ -1806,11 +1810,12 @@ const Duelo = (() => {
   }
 
   // El daño de una habilidad: la fórmula que dejó la habilidad (ya con lo que suma el que la usa), tirada por quien la usa.
-  function tirarDanoHab(d){
+  function tirarDanoHab(d, h){
     const f = d.hab && d.hab.dano ? d.hab.dano.formula : '';
     const r = f && typeof tirarDados === 'function' ? tirarDados(f) : null;
     if(!r){ esperaTiro = null; retener(false); _toast('La fórmula de daño de la habilidad no es válida: ' + f); return; }
-    if(typeof registrarTirada === 'function') registrarTirada(`Daño · ${d.hab.nombre}`, r);
+    const reg = (h && h.registrarTirada) || (typeof registrarTirada === 'function' ? registrarTirada : null);
+    if(reg) reg(`Daño · ${d.hab.nombre}`, r);
   }
 
   /* ---------- botones «Ver duelo» y apertura automática ---------- */

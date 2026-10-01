@@ -111,6 +111,9 @@ const combateUi = {
     if(k === 'nitros') renderNitros();
     else if(k === 'refresh') refresh();
     else if(k === 'botonera'){ if($('#scrim-botonera').classList.contains('open')) renderBotonera(); }
+    else if(k === 'vitals') renderVitals();
+    else if(k === 'inventario') renderInventario();
+    else if(k === 'cinturon') renderList('cinturon');
   }),
   getParry: () => parryArmaPendiente,
   setParry: id => { parryArmaPendiente = id; },
@@ -173,6 +176,14 @@ const dueloInvDe = lado => {
   const [f, invId] = String(lado.ref || '').split('~');
   return invId && f === (fichaVivo && fichaVivo.id) ? S.invocaciones.find(x => x.id === invId) || null : null;
 };
+// Lo que el duelo le pide a un PERSONAJE vive en comun/ficha-duelo.js (paso 4, etapa 3c-4c, 2026-10-01): la misma pieza la usa
+// la Botonera nueva del mapa. Acá quedan las invocaciones (un lado «fichaId~invId»), que siguen con su código de siempre.
+const dueloUi = {...combateUi,
+  soy: lado => !!(lado && lado.tipo === 'pj' && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM && lado.ref === fichaVivo.id),
+  reabrir: (id, campo) => Duelo.reabrir(id, campo),
+  fijarHp: v => fijarHp(v),
+};
+const dueloPj = FichaDuelo.hooks(() => S, dueloUi);
 window.DUELO_HOOKS = {
   soy: lado => {
     if(!(lado && lado.tipo === 'pj' && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM)) return false;
@@ -184,12 +195,7 @@ window.DUELO_HOOKS = {
   atacar: d => {
     const inv = dueloInvDe(d.atacante);
     if(inv){ if(d.ataque.tipo === 'habilidad-arma') tirarPdgDeArreglosInv(inv, d.ataque); else invAtacarSuelto(inv.id); return; }   // con arreglos: los No2 ya los cobró la habilidad
-    const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null;
-    if(d.ataque.tipo === 'habilidad-arma'){   // los No2 del ataque ya los cobró la habilidad: solo se tira el PdG (con lo que le suma)
-      tirarValorStat(arma ? `PdG · ${arma.nombre}` : 'PdG', pdgParaArma(arma).valor + num(d.ataque.mods && d.ataque.mods.pdg), 'pdg');
-      return;
-    }
-    if(d.ataque.tipo === 'normal') atacarConArma(arma); else ataqueEspecialConArma(arma, d.ataque.tipo);
+    dueloPj.atacar(d);
   },
   // Para el crítico: el Crítico frecuente y potente del atacante (con el arma que usa) y la Resistencia a crítico del defensor contra el Tipo del arma.
   statsCritico: d => {
@@ -198,64 +204,40 @@ window.DUELO_HOOKS = {
       const f = invStatValor(inv, 'crit'), p = invStatValor(inv, 'critpot');
       return {frecuente: Number.isNaN(f) ? 0 : Math.max(0, Math.round(f)), potente: Number.isNaN(p) ? 0 : Math.max(0, Math.round(p))};
     }
-    const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null;
-    const f = statParaArma('crit', arma), p = statParaArma('critpot', arma);
-    return {frecuente: Number.isNaN(f) ? 0 : Math.max(0, Math.round(f)), potente: Number.isNaN(p) ? 0 : Math.max(0, Math.round(p))};
+    return dueloPj.statsCritico(d);
   },
   resistenciaCritico: d => {
     const i = [4, 6, 8, 10, 12].indexOf(num(d.ataque.tipoDado));
     if(i < 0) return 0;
     const inv = dueloInvDe(d.defensor);
     if(inv) return num((inv.crit || [])[i]);
-    const v = compute().final['tipo' + (i + 1)];
-    return Number.isNaN(v) ? 0 : Math.max(0, Math.round(v));
+    return dueloPj.resistenciaCritico(d);
   },
   // Los efectos al golpear del arma (o de la invocación) que el duelo resuelve uno por uno.
   efectosArma: d => {
     const inv = dueloInvDe(d.atacante);
     if(inv) return (inv.armaEfectos || []).map(e => ({...EfectosGolpe.normalizar(e), stacks: num(e.stacks)}));
-    const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : (armasEquipadasConDano()[0] || {}).item || null;
-    return arma ? (arma.efectosGolpe || []).map(e => ({...EfectosGolpe.normalizar(e), stacks: num(e.stacks)})) : [];
+    return dueloPj.efectosArma(d);
   },
   // El daño del arma del ataque (sin los efectos del golpe: los resuelve el duelo en su paso de efectos).
   dano: d => {
     const inv = dueloInvDe(d.atacante);
     if(inv){ invDanio(inv.id, true, d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null); return; }
-    const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : (armasEquipadasConDano()[0] || {}).item || null;
-    if(!arma){ toast('No hay un arma equipada con daño para tirar'); return; }
-    let formula = armaDanoTxt(arma, compute().final.dmg);
-    const m = d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null;   // lo que le suma la habilidad: dados del Tipo del arma y daño fijo
-    if(m){
-      if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${num(arma.tipoDado) || 8}`;
-      if(num(m.fijo)) formula += ` ${num(m.fijo) > 0 ? '+' : '−'} ${fmt(Math.abs(num(m.fijo)))}`.replace('−', '-');
-    }
-    const r = tirarDados(formula);
-    if(r) registrarTirada(`Daño · ${arma.nombre}`, r);
+    dueloPj.dano(d);
   },
   // Moneda Re-Roll (2026-09-27): ¿tengo una y cuánto cuesta? / usarla para reabrir una tirada del duelo.
   rerollInfo: d => {
     if(dueloInvDe(d.atacante) || dueloInvDe(d.defensor)) return {disponible: false};
-    const m = monedaReroll();
-    return m ? {disponible: true, donde: m.key === 'cinturon' ? 'el cinturón' : 'la mochila'} : {disponible: false};
+    return dueloPj.rerollInfo(d);
   },
-  rerollUsar: async (d, campo) => {
-    const m = monedaReroll();
-    if(!m){ toast('No tenés una Moneda Re-Roll'); return false; }
-    const ok = await Duelo.reabrir(d.id, campo);
-    if(!ok){ toast('La tirada ya no se puede repetir (no se gastó la moneda)'); return false; }
-    setTimeout(() => tirarMonedaReroll(m), 800);
-    return true;
-  },
+  rerollUsar: (d, campo) => dueloPj.rerollUsar(d, campo),
   // Flash (2026-09-27): las habilidades Flash que me sirven para esta tirada del duelo (se marcan ANTES de tirar) y su uso (cobra los SP; el duelo suma el bono).
   flashOpciones: (d, campo) => {
     const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
     const inv = dueloInvDe(lado);
     if(inv) return (inv.habilidades || []).filter(h => Combatiente.flashPara(h.duelo, campo)).map(h => ({habId: h.id, nombre: h.nombre, bono: num(h.duelo.flash.bono), en: h.duelo.flash.en || [],
       costoTxt: ConfirmarTurno.textoFlash(costoFlashInv(h)), motivoNo: Combatiente.bloqueoHab(h, {hp: inv.hp}).toLowerCase()}));   // invocación: como un creep (cooldown)
-    const sp = spMaximo() - num(S.spGastado);
-    return S.habilidades.filter(h => Combatiente.flashPara(dueloDe(h), campo))   // regla común (comun/combatiente.js)
-      .map(h => { const c = dueloDe(h).flash, costo = parseCostoSp(h.costo); return {habId: h.id, nombre: h.nombre, bono: num(c.bono), en: c.en || [], costoSp: costo,
-        costoTxt: ConfirmarTurno.textoFlash(costoFlashDe(h), {spAjeno: h.turnoAjenoSp}), motivoNo: costo > sp ? 'no te alcanzan los SP' : ''}; });
+    return dueloPj.flashOpciones(d, campo);
   },
   // Usarlo: «¿es tu turno?» — en turno ajeno cuesta el doble (P136); se cobra al contestar y el duelo suma el bono.
   flashUsar: (d, campo, modo, habId) => {
@@ -266,14 +248,13 @@ window.DUELO_HOOKS = {
       if(!Combatiente.flashPara(hi.duelo, campo, modo)){ toast(`${hi.nombre} no vale para esta tirada (${modo === 'parry' ? 'Parry' : campo})`); return null; }
       return pagarFlashInv(inv, hi).then(p => p ? {bono: num(hi.duelo.flash.bono), etq: hi.nombre, quien: inv.nombre} : null);
     }
-    const h = S.habilidades.find(x => x.id === habId), c = h && dueloDe(h);
-    if(!c || c.modo !== 'flash' || !c.flash) return null;
-    if(!Combatiente.flashPara(c, campo, modo)){ toast(`${h.nombre} no vale para esta tirada (${modo === 'parry' ? 'Parry' : campo})`); return null; }
-    return pagarFlash(h).then(p => p ? {bono: num(c.flash.bono), etq: h.nombre, quien: (S.meta && S.meta.nombre) || 'Personaje'} : null);
+    return dueloPj.flashUsar(d, campo, modo, habId);
   },
   // Habilidades dirigidas: la tirada de quien la usa (quien = 'atacante') o la de quien se resiste (quien = 'defensor', modo = el stat que eligió).
   habTirar: (d, quien, modo) => {
     const lado = quien === 'atacante' ? d.atacante : d.defensor;
+    const inv = dueloInvDe(lado);
+    if(!inv){ dueloPj.habTirar(d, quien, modo); return; }
     const c = quien === 'atacante' ? d.hab.tira : (d.hab.contra || []).find(x => x.modo === modo);
     if(!c) return;
     const nombre = quien === 'atacante' ? `${d.hab.nombre} · ${c.etq}` : c.etq;
@@ -281,15 +262,13 @@ window.DUELO_HOOKS = {
     // solo se tira y se anuncia, igual que cualquier otra tirada del duelo.
     if(c.formula){ const r = tirarDados(c.formula); if(r) registrarTirada(nombre, r); else toast(`No se pudo tirar «${c.etq}»: la fórmula «${c.formula}» no es válida (revisá la habilidad)`); return; }
     if(!c.stat) return;
-    const inv = dueloInvDe(lado);
-    const v = inv ? invStatValor(inv, c.stat) : compute().final[c.stat];
-    if(inv) tirarValorStatInv(inv, nombre, num(v) + num(c.bono), c.stat);
-    else tirarValorStat(nombre, num(v) + num(c.bono), c.stat);
+    tirarValorStatInv(inv, nombre, num(invStatValor(inv, c.stat)) + num(c.bono), c.stat);
   },
   // «Cuánto tirarías»: la fórmula de dados de ese stat (para el botón de defensa).
   habValor: (d, quien, stat) => {
     const inv = dueloInvDe(quien === 'atacante' ? d.atacante : d.defensor);
-    const v = inv ? invStatValor(inv, stat) : compute().final[stat];
+    if(!inv) return dueloPj.habValor(d, quien, stat);
+    const v = invStatValor(inv, stat);
     const f = formulaParaValor(num(v));
     return f ? f.formula : fmt(num(v));
   },
@@ -297,36 +276,19 @@ window.DUELO_HOOKS = {
   // del 🎯/✨ — misma regla que un ataque normal, P121: sin arma ni escudo equipado, no hay Parry.)
   puedeParry: d => {
     const inv = dueloInvDe(d.defensor);
-    return inv ? !!defensaInv(inv) : armasYEscudosParaParry().length > 0;   // arma de verdad o escudo (2026-09-30)
+    return inv ? !!defensaInv(inv) : dueloPj.puedeParry(d);   // arma de verdad o escudo (2026-09-30)
   },
   // Cómo puede defenderse (elige a ciegas): Evasión, o Parry con cada arma o escudo equipado (siempre 1 No2).
   opcionesDefensa: d => {
-    // «cuánto tirarías»: la fórmula de dados de cada defensa (con las mitades de Lisiado/Pajaritos/Sentado…) y, para cada Parry, el Bloqueo que tirarías si ganás.
-    const fx = (v, statId, estados) => { const f = formulaParaValor(v); if(!f) return fmt(num(v)); const mit = statId ? mitadesDeTirada(estados, statId) : 0; return f.formula + ' ÷2'.repeat(mit); };
     const inv = dueloInvDe(d.defensor);
-    if(inv){
-      const c = Combatiente.costoParry();
-      const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${fx(invStatValor(inv, 'eva'), 'eva', inv.estados)}`]}];
-      // Parry solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30; un arma natural no alcanza, por ahora).
-      const def = defensaInv(inv);
-      if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === inv.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}`, costo: c, motivoNo: c > num(inv.nitros) ? 'no le alcanzan los No2' : '',
-        info: [`Parry 🎲 ${fx(invStatValor(inv, 'parry'), 'parry', inv.estados)}`, `si ganás, Bloqueo 🎲 ${fx(bloqueoValorInv(inv))}`]});
-      return ops;
-    }
-    const sobre = compute().sobrecarga;
-    // Con sobrepeso (el equipo pasa el Crg.Max) la Evasión pide elegir: pagar 1 No2 para tirar sin penalidad o tirar con −N. Se elige acá, en el cuadro del duelo.
-    const ops = sobre > 0
-      ? [{modo: 'evasion', itemId: 'pagado', etiqueta: '🏃 Evasión · pagando 1 No2', costo: 1, motivoNo: num(S.nitros) < 1 ? 'no te alcanzan los No2' : '', info: [`Evasión 🎲 ${fx(compute().final.eva, 'eva', S.efectos)}`, `sin la penalidad de sobrepeso (−${fmt(sobre)})`]},
-         {modo: 'evasion', itemId: 'penal', etiqueta: `🏃 Evasión · con penalidad −${fmt(sobre)}`, motivoNo: '', info: [`Evasión 🎲 ${fx(compute().final.eva, 'eva', S.efectos)} −${fmt(sobre)}`, 'no gastás No2']}]
-      : [{modo: 'evasion', itemId: '', etiqueta: '🏃 Evasión', motivoNo: '', info: [`Evasión 🎲 ${fx(compute().final.eva, 'eva', S.efectos)}`]}];
-    // Sin arma ni escudo equipado no se puede parriar (regla del dueño, 2026-09-28) — antes había una opción
-    // "Parry (sin arma ni escudo)" gratis; se sacó, no se ofrece nada si `armas` viene vacío.
-    const armas = armasYEscudosParaParry();
-    armas.forEach(a => {
-      const c = costoParryNitros(a.item);
-      ops.push({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, etiqueta: `${String(a.item.tipoItem).startsWith('escudo') ? '🛡' : '🗡'} Parry · ${a.item.nombre}`, costo: c, motivoNo: c > num(S.nitros) ? 'no te alcanzan los No2' : '',
-        info: [`Parry 🎲 ${fx(statParaArma('parry', a.item), 'parry', S.efectos)}`, `si ganás, Bloqueo 🎲 ${fx(bloqueoValorConArma(a.item))}`]});
-    });
+    if(!inv) return dueloPj.opcionesDefensa(d);
+    const fx = (v, statId, estados) => { const f = formulaParaValor(v); if(!f) return fmt(num(v)); const mit = statId ? mitadesDeTirada(estados, statId) : 0; return f.formula + ' ÷2'.repeat(mit); };
+    const c = Combatiente.costoParry();
+    const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${fx(invStatValor(inv, 'eva'), 'eva', inv.estados)}`]}];
+    // Parry solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30; un arma natural no alcanza, por ahora).
+    const def = defensaInv(inv);
+    if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === inv.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}`, costo: c, motivoNo: c > num(inv.nitros) ? 'no le alcanzan los No2' : '',
+      info: [`Parry 🎲 ${fx(invStatValor(inv, 'parry'), 'parry', inv.estados)}`, `si ganás, Bloqueo 🎲 ${fx(bloqueoValorInv(inv))}`]});
     return ops;
   },
   defender: (d, modo, itemId) => {
@@ -335,42 +297,25 @@ window.DUELO_HOOKS = {
       if(modo === 'parry') invTirarStat(inv.id, 'parry'); else tirarValorStatInv(inv, 'Evasión', invStatValor(inv, 'eva'), 'eva');
       return;
     }
-    if(modo === 'parry') parryConArma(itemId ? S.inventario.find(x => x.id === itemId) || null : null);
-    else if(itemId === 'pagado' || itemId === 'penal'){   // Evasión con sobrepeso: la elección ya se hizo en el cuadro del duelo
-      const sobre = compute().sobrecarga;
-      if(itemId === 'pagado'){
-        if(num(S.nitros) < 1){ toast('No tenés No2 para pagar: elegí tirar con la penalidad'); return; }
-        S.nitros = num(S.nitros) - 1; renderNitros(); refresh();
-      }
-      tirarValorStat('Evasión', compute().final.eva, 'eva', undefined, itemId === 'pagado' ? 'pagado' : 'penal', sobre);
-    }
-    else tirarValorStat('Evasión', compute().final.eva, 'eva');
+    dueloPj.defender(d, modo, itemId);
   },
   // La Fuerza del golpe del atacante contra el Bloqueo del defensor (Fue + peso de su arma).
   fuerza: d => {
     const inv = dueloInvDe(d.atacante);
     if(inv){ tirarValorStatInv(inv, 'Fuerza del golpe', invStatValor(inv, 'fue') + pesoArmaInv(inv), 'fue'); return; }
-    fuerzaGolpeConArma(d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null);
+    dueloPj.fuerza(d);
   },
   // El Bloqueo del defensor con el mismo arma o escudo con el que hizo Parry.
   bloquear: d => {
     const inv = dueloInvDe(d.defensor);
     if(inv){ invTirarStat(inv.id, 'bloqueo', {trasParry: true}); return; }   // el duelo ya sabe que ganó el Parry
-    const it = d.defensa && d.defensa.itemId ? S.inventario.find(x => x.id === d.defensa.itemId) || null : null;
-    parryArmaPendiente = null;
-    // Con el arma o escudo del Parry; si ya no está, con el primero que haya en mano; sin nada, no hay Bloqueo.
-    const conQue = it || ((armasYEscudosParaParry()[0] || {}).item) || null;
-    if(!conQue){ toast(Combatiente.SIN_ARMA_DEFENSA); return; }
-    bloqueoConArma(conQue);
+    dueloPj.bloquear(d);
   },
   // Con qué arma contraataca (la del Parry si es un arma con daño; si no, la primera arma equipada con daño).
   armaContra: d => {
     const inv = dueloInvDe(d.defensor);
     if(inv) return {armaId: '', armaNombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8};
-    const usada = d.defensa && d.defensa.itemId ? S.inventario.find(x => x.id === d.defensa.itemId) : null;
-    const conDano = armasEquipadasConDano();
-    const it = (usada && conDano.some(a => a.item.id === usada.id)) ? usada : (conDano.length ? conDano[0].item : null);
-    return {armaId: it ? it.id : '', armaNombre: it ? it.nombre : '', tipoDado: tipoAtaque(it)};
+    return dueloPj.armaContra(d);
   },
 };
 
@@ -707,17 +652,8 @@ function costoAtaqueHabTxt(){ return FichaBotonera.costoAtaqueHabTxt(S); }
 
 // ⚡ Flash (P136, regla del dueño): en tu turno cuesta lo que dice la habilidad (SP y vida); en turno ajeno, el doble — igual
 // dentro del duelo que con el botón. Nunca cuesta No2. Pregunta el turno, revisa que alcance y cobra; null = no se usó.
-const costoFlashDe = h => ({sp: parseCostoSp(h.costo), hp: num(h.hpCosto)});
-async function pagarFlash(h){
-  const p = await ConfirmarTurno.flash(`⚡ ${h.nombre || 'Flash'}`, costoFlashDe(h), {spAjeno: h.turnoAjenoSp});
-  if(!p) return null;
-  if(p.sp > spMaximo() - num(S.spGastado)){ toast(`No te alcanzan los SP para ${h.nombre} (${fmt(p.sp)} SP)`); return null; }
-  if(p.hp > 0 && num(S.hp) <= p.hp){ toast(`No te alcanza la vida para ${h.nombre} (${fmt(p.hp)} HP)`); return null; }
-  S.spGastado = num(S.spGastado) + p.sp;
-  if(p.hp > 0) fijarHp(num(S.hp) - p.hp);
-  renderVitals(); refresh();
-  return p;
-}
+const costoFlashDe = FichaDuelo.costoFlashDe;   // comun/ficha-duelo.js
+function pagarFlash(h){ return FichaDuelo.pagarFlash(S, h, dueloUi); }
 // Un Flash con el botón Ejecutar, fuera del cuadro del duelo: la misma regla de costo, se anuncia y el bono se suma a mano.
 async function usarFlashFueraDelDuelo(it){
   const p = await pagarFlash(it);

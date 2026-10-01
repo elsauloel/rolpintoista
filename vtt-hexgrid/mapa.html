@@ -946,7 +946,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/asistente-zona.js"></script>
 <script src="../comun/guia-diseno.js"></script>
 <script src="../comun/critico.js?v=20260930a"></script>
-<script src="../comun/duelo.js?v=20261001a"></script>
+<script src="../comun/duelo.js?v=20261001b"></script>
 <script src="../comun/mensajes-mapa.js?v=20261001a"></script>
 <script>
 /* =========================================================
@@ -9123,7 +9123,8 @@ function abrirBotoneraPrincipal(){
    no están (la lupa vive en la ficha: etapa 3c). Las piezas se cargan recién al usarla: para los jugadores no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001b',
-  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001d'];
+  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001d',
+  '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
 var bnCss = '';
@@ -9271,8 +9272,26 @@ function bnRevisarVida(){
   if(ankh) toast(`¡${ankh} se activó solo! Revivís con ${fmt(bn.S.hp)} HP.`);
   FichaAcciones.revisarMuerte(bn.S);
 }
-// Una tirada del personaje armada acá, a la Mesa a su nombre y con su `ficha` (P138).
-function bnPublicar(origen, r){ mesaPublicar(origen, {...r, quien: ((bn.S.meta && bn.S.meta.nombre) || '').trim(), ficha: bn.fichaId}); }
+// Una tirada del personaje armada acá, a la Mesa a su nombre y con su `ficha` (P138). Como registrarTirada de la ficha, avisa
+// 'tirada-registrada': de ahí el duelo (comun/duelo.js) recoge la tirada que le pidió a este personaje (paso 4c).
+function bnPublicar(origen, r){
+  mesaPublicar(origen, {...r, quien: ((bn.S.meta && bn.S.meta.nombre) || '').trim(), ficha: bn.fichaId});
+  window.dispatchEvent(new CustomEvent('tirada-registrada', {detail: {origen, r}}));
+}
+/* Paso 3c-4c: lo que el duelo le pide al personaje de la Botonera nueva (su PdG, su defensa, su daño, la Fuerza del golpe, el
+   Bloqueo, el crítico, el Flash, la Moneda Re-Roll, una habilidad dirigida, con qué arma contraataca) lo contesta el mapa con
+   los mismos ganchos de la ficha (comun/ficha-duelo.js), sin pasar por el marco — solo si este usuario puede guardar ese
+   personaje. Sus invocaciones, otro personaje, o el GM con el interruptor ⚗ apagado: por el marco, como siempre. */
+function bnHooksDuelo(lado){
+  if(!bn || !bn.S || !lado || lado.tipo !== 'pj' || lado.ref !== bn.fichaId || typeof FichaDuelo === 'undefined') return null;
+  if((soyGM && !bnActiva()) || !bnPuedeGuardar()) return null;
+  const ui = {...bnCombateUi(),
+    soy: l => !!(l && l.tipo === 'pj' && l.ref === bn.fichaId),
+    reabrir: (id, campo) => Duelo.reabrir(id, campo),
+    fijarHp: v => { FichaAcciones.fijarHp(bn.S, v); bnRevisarVida(); },
+  };
+  return FichaDuelo.hooks(() => bn.S, ui);
+}
 const BN_ACCIONES = {
   sigilo: (S, ui) => FichaAcciones.alternarSigilo(S, false, ui),
   levantarse: (S, ui) => FichaAcciones.levantarse(S, false, ui),
@@ -11161,7 +11180,7 @@ function arrancarEnVivo(){
   mesaHistorialAlEntrar();
   // Duelo paso a paso (comun/duelo.js): el cuadro se abre solo para todos; las tiradas de cada uno se piden al iframe de su ficha (o de las Acciones del creep).
   setTimeout(precargarMarco, 6000);   // abrir más rápido la primera Botonera o Acciones (paso 4)
-  Duelo.escuchar({relay: dueloRelayMapa, controlDe: lado => {   // 🎮 personaje controlado por el GM: su lado lo maneja el GM
+  Duelo.escuchar({relay: dueloRelayMapa, hooksLocal: bnHooksDuelo, controlDe: lado => {   // 🎮 personaje controlado por el GM: su lado lo maneja el GM
     if(!lado || lado.tipo !== 'pj') return '';
     const f = fichasPub.get(String(lado.ref || '').split(SEP_INVOCACION)[0]);
     return (f && f.resumen && f.resumen.control) || '';

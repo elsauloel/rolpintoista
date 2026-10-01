@@ -899,7 +899,11 @@ versión parecida en más de una, es candidato a juntar.
   `anunciarHabilidad`, `habilidadTira`, `tirarPrimeraDeHab`, `tirarSegundaDeHab`, `registrarAtaqueDeHabilidad` y `limiteCostoX`
   (ui suma `mesaHabilidad`, `fijarHp`, `efecto`, `colocarTrampa`, `avisarZona`, `terminar(it, arma, xSp, xNitros)` —lo que pasa
   después de cobrar: anunciar y tirar, o la Ejecución—, `flashFuera`, `elegirArmaHab`, `pedirCostoX(it, arma)` y `cerrarCostoX`;
-  `cambio` además recibe 'habilidades' y 'efectos'). `anunciarHabilidad` usa `mesaConTexto` de `mesa.js`.
+  `cambio` además recibe 'habilidades' y 'efectos'). `anunciarHabilidad` usa `mesaConTexto` de `mesa.js`. Desde el 5b (✨
+  automáticas): `terminarEjecucionHab(S, it, arma, xSp, xNitros, ui)`, `ataqueDeHabArma`, `habDueloDatos`, `xDeHab`,
+  `aplicarHabSobreMiDirecto`, `dueloAplicarEfectoPropio(S, fichaId, d, ef, ui)`, `aplicarEstadoRecibido`, `estadoDeSpec(spec,
+  presets)`, `durAviso`, `desgastarItem` y `rompeArmaduraAlAzar` (ui suma `yo()`, `dueloDisponible()`, `puedeEscribir()`,
+  `elegirObjetivo(cfg)`, `colocarZona`, `presets`, `recordatorios`; `cambio` además 'equipo' y 'mochila').
 - **`ficha-duelo.js`** (`FichaDuelo`, 2026-10-01, paso 4 etapa 3c-4c) — **lo que el duelo (`duelo.js`) le pide a un personaje**:
   `hooks(() => S, ui)` devuelve los ganchos (`soy`, `controlDe`, `registrarTirada`, `atacar`, `statsCritico`,
   `resistenciaCritico`, `efectosArma`, `dano`, `rerollInfo`, `rerollUsar`, `flashOpciones`, `flashUsar`, `habTirar`, `habValor`,

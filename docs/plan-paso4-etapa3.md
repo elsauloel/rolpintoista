@@ -2,7 +2,7 @@
 
 > Parte de [`plan-paso4.md`](plan-paso4.md) y de [`plan-consolidacion.md`](plan-consolidacion.md). Escrito el 2026-10-01,
 > después de terminar el nivel B del paso 5 (áreas 1 a 4, ver [`plan-paso5.md`](plan-paso5.md)). **Estado: en curso** —
-> 3a y 3b hechas; 3c hasta el paso 5a hecha (ver "Para retomar" justo abajo y "Cómo va" al final). Preguntas del dueño:
+> 3a y 3b hechas; 3c hasta el paso 5b hecha (ver "Para retomar" justo abajo y "Cómo va" al final). Preguntas del dueño:
 > contestadas.
 
 ## ▶ Para retomar (al cierre de la conversación del 2026-10-01, tarde)
@@ -13,19 +13,19 @@
 interruptor ⚗, solo GM), y de la 3c: paso 1 (tiradas de stats y Percepción), el resumen público (`comun/ficha-resumen.js`),
 paso 2 (Sigilo, Levantarse: el mapa ya guarda al personaje), paso 3 (Consumir), paso 4a (Esquivar, Parry, Bloqueo, Fuerza
 del golpe, Daño), 4b (Atacar), **4c (los ganchos del duelo: `comun/ficha-duelo.js`)** — probado en vivo con un objetivo de
-verdad, atacando y defendiendo — y **5a (habilidades manuales, semiautomáticas, el costo X, el Flash fuera del duelo y la 🎲
-segunda tirada)**. Todo lo que hace la Botonera nueva vive en `comun/ficha-acciones.js` y `comun/ficha-duelo.js` (la ficha usa
+verdad, atacando y defendiendo —, **5a (habilidades manuales, semiautomáticas, el costo X, el Flash fuera del duelo y la 🎲
+segunda tirada)** y **5b (las ✨ automáticas: ataque con arreglos, habilidad dirigida con su duelo y el atajo «solo sobre vos»)**. Todo lo que hace la Botonera nueva vive en `comun/ficha-acciones.js` y `comun/ficha-duelo.js` (la ficha usa
 lo mismo con sus nombres de siempre).
 
-**Lo próximo — 3c, paso 5b: las habilidades ✨ automáticas** (las que abren la Ejecución paso a paso). Hoy `bnHabAca` (mapa)
-se las deja a la ficha escondida. Lo que falta mudar es `terminarEjecucionHab` (`js/02`) para el caso `modo === 'auto'`: ataque
-con arma con arreglos (`ataqueDeHabArma` → `Duelo.elegirObjetivo`), habilidad dirigida (`habDueloDe` + `lanzarDueloDeHab`), el
-atajo «solo sobre vos, sin tiradas» (`aplicarHabSobreMiDirecto` + `dueloAplicarEfectoPropio`) y la que todavía no tiene armada
-la Ejecución (se ejecuta como semi). En el mapa, `Duelo.elegirObjetivo` se reemplaza por `dueloElegirObjetivoMapa` con
-`alSuelto`/`alCancelar` (como Atacar en el 4b; el área ya lo maneja `dueloElegirAreaMapa`). Ojo: hoy se cobra ANTES de
-elegir el objetivo (igual que en la ficha) — mudarlo tal cual. **Después**: 5c (zonas persistentes `colocarZonaDeHab`, trampas
-`colocarTrampaDeHab`, `zonaMapa`/`portalMapa` con `avisarZonaAlMapa`: en el mapa son llamadas directas, sin mensajes), paso 6
-(🔍 lupa y Ver), los talentos, las trampas consumibles y el Ankh manual; recién ahí 3d (retirar el marco para los jugadores).
+**Lo próximo — 3c, paso 5c: las habilidades que colocan algo en el mapa.** Hoy `bnHabAca` (mapa) se las deja a la ficha
+escondida: las que tienen `trampaColocar` (`colocarTrampaDeHab`, js/10: con ✨ manda `trampa-habilidad` y el mapa pide la
+casilla; si no, `TokensAuto.colocarTrampas` al lado del token), `zonaMapa` o `portalMapa` (`avisarZonaAlMapa`, js/10:
+`zona-habilidad` / `portal-habilidad`) y las ✨ con `objetivo: 'zona'` (`colocarZonaDeHab`, js/02: tira la resistencia una vez y
+manda la zona con `Combatiente.zonaDeHab`). En el mapa esos mensajes se vuelven llamadas directas a lo que ya hace con ellos
+(`trampaDeHabilidad`, `portalDeHabilidad`, el manejador de `zona-habilidad` y el de la zona persistente) — buscar en
+`mapa.html` dónde se reciben. En `comun/ficha-acciones.js` ya están los ganchos `ui.colocarTrampa`, `ui.avisarZona` y
+`ui.colocarZona`: falta que el mapa los implemente y sacar esos casos de `bnHabAca`. **Después**: paso 6 (🔍 lupa y Ver), los
+talentos, las trampas consumibles y el Ankh manual; recién ahí 3d (retirar el marco para los jugadores).
 
 **Dónde probar** (2026-10-01): con Chrome logueado como `elsaulo@gmail.com`, la partida **"Test con claude elsaulo"** (ahí esa
 cuenta es el GM, "S.Claude"); el jugador es "Sujeto de pruebas" con **Silvia Suller** (Cimitarra + Broquel de bronce, 20 HP,
@@ -84,7 +84,7 @@ botón, que hoy viven en la ficha:
 | Traer el personaje y guardarlo | partes de Firebase, migraciones | ✅ ya en `comun/` (`FichaGuardado.cargar`) — falta el guardado **en vivo** (ver 3a) |
 | Tirar un stat, Percepción, Fuerza del golpe | tirada + Mesa | ✅ en el mapa (3c-1 y 4a), con el cartel de sobrepeso |
 | Atacar, Daño, Esquivar, Parry, Bloqueo | el **duelo** y sus ganchos de la ficha (`DUELO_HOOKS`, ~200 renglones), carteles de No2 | ✅ los botones en el mapa (4a, 4b) y los ganchos del duelo (4c, `comun/ficha-duelo.js`) |
-| Habilidades (Ejecutar / Anunciar / 🎲 segunda) | `ejecutarHabilidad`: elegir arma, costo X, ¿es tu turno?, Flash, Ejecución paso a paso, zona, trampa, Mesa | ✅ manual, semi, costo X, Flash y segunda tirada en el mapa (5a); **las ✨ automáticas (5b) y las que colocan algo (5c), todavía en la ficha** |
+| Habilidades (Ejecutar / Anunciar / 🎲 segunda) | `ejecutarHabilidad`: elegir arma, costo X, ¿es tu turno?, Flash, Ejecución paso a paso, zona, trampa, Mesa | ✅ manual, semi, costo X, Flash y segunda tirada (5a) y las ✨ automáticas (5b) en el mapa; **las que colocan algo (5c), todavía en la ficha** |
 | Consumibles (cinturón y mochila) | consumir: No2 por lugar, unidades, cura, estado, trampa consumible | ✅ en el mapa (3c-3), salvo trampas consumibles y el Ankh manual |
 | Sigilo, Levantarse | estado + No2 | ✅ en el mapa (3c-2) |
 | 🔍 Lupa de cada botón | `lupaHtml` (cómo se calcula cada cosa) | en la ficha |
@@ -125,7 +125,7 @@ Orden propuesto, de lo más simple a lo más complejo (ver pregunta 3):
 4. Atacar, Daño, Esquivar, Parry y Bloqueo — con los ganchos del duelo del personaje (`DUELO_HOOKS`). Partido en 4a (sueltos ✅
    2026-10-01), 4b (Atacar ✅ 2026-10-01) y 4c (los ganchos del duelo ✅ 2026-10-01; 4b y 4c probados juntos contra un creep).
 5. Habilidades (lo más grande): partido en 5a (manual, semi, costo X, arma, turno ajeno, Flash, segunda tirada ✅ 2026-10-01),
-   5b (✨ automáticas con la Ejecución paso a paso) y 5c (zonas, trampas y portal).
+   5b (✨ automáticas con la Ejecución paso a paso ✅ 2026-10-01) y 5c (zonas, trampas y portal).
 6. 🔍 Lupa y "Ver".
 
 ### 3d — Retirar el marco para los jugadores
@@ -305,3 +305,24 @@ siga necesitándolo (ver pregunta 4). La ficha suelta (`ficha.html`) no cambia: 
   1 SP — todo sin mandarle nada al marco, a nombre de Silvia en la Mesa y con la ficha de la otra pestaña al día. Desde la ficha
   (versión nueva) también: semi y costo X con su cartel. Silvia quedó con todo lleno y sin el control del GM; las 5 habilidades
   de prueba quedaron en su ficha (sirven para el 5b).
+- 2026-10-01: **3c, paso 5b hecho — las habilidades ✨ automáticas**. A `comun/ficha-acciones.js`, copiados de la ficha (`js/02` y
+  `js/01`): `terminarEjecucionHab(S, it, arma, xSp, xNitros, ui)` (semi: anunciar y tirar; auto: ataque con arreglos, zona,
+  «solo sobre vos», dirigida o, sin Ejecución armada, como semi), `ataqueDeHabArma`, `habDueloDatos`, `xDeHab`,
+  `aplicarHabSobreMiDirecto`, `dueloAplicarEfectoPropio(S, fichaId, d, ef, ui)`, `aplicarEstadoRecibido`, `estadoDeSpec(spec,
+  presets)`, `durAviso`, `desgastarItem` y `rompeArmaduraAlAzar`. El `ui` suma `yo()`, `dueloDisponible()`, `puedeEscribir()`,
+  `elegirObjetivo(cfg)`, `colocarZona`, `presets` y `recordatorios`; `cambio` además recibe 'equipo' y 'mochila'. La ficha los usa
+  con sus nombres de siempre (`habUi`); se sacaron `habDueloDe`, `lanzarDueloDeHab` y `alcanceDeHab`, que ya no los llamaba nadie.
+  En el mapa (`bnHabAca`, `bnElegirObjetivo`, `bnRecordatorios`): las automáticas también las hace el mapa — el objetivo se elige
+  con `dueloElegirObjetivoMapa` (como Atacar), y el duelo después pide las tiradas al mapa mismo (4c); solo siguen en la ficha
+  escondida las que colocan trampa, zona o portal (5c). Comparado contra el código viejo en 250 personajes con 4 habilidades
+  automáticas al azar y los mismos dados (terminar la ejecución, estados recibidos con Desgaste y Armadura rota, efecto propio,
+  Rompe armadura, desgaste): 1250 iguales, 0 distintas; 4 mutaciones plantadas, las 4 detectadas (una primera mutación sobre la
+  X no se notaba porque ninguna Ejecución al azar usaba X: se cambió por una que sí importa). `pruebas.html`: 161 en verde (4
+  nuevas; carga `duelo.js` y un `mesaConTexto` vacío). **En vivo** ("Test con claude elsaulo", 🎮 Silvia y el creep): desde la
+  Botonera nueva, «Escudo propio» (sobre sí, sin tiradas) se aplicó directo con su anuncio (−1 SP, −1 No2, Blindado); «Rayo»
+  (PdG.Esp contra Res.Esp, con daño) cobró, eligió el objetivo y abrió la Ejecución: la tirada de Silvia y el daño (1d6, directo a
+  la vida) los hizo el mapa, la resistencia del creep GM Tools — una vez ganó el creep por par o impar, otra ganó Silvia (con el
+  Especial subido un rato para probarlo) y el creep pasó de 5 a 4; «Tajo con arreglos» cobró una vez 3 No2 (primer ataque con la
+  Cimitarra), tiró el PdG con su +1 y el daño 1d6+6 (el +2 de la habilidad). Desde la ficha nueva, «Escudo propio» igual. Todo
+  quedó como estaba (Silvia con Especial 3, sin Blindado, todo lleno y sin el control; creep con 5 HP); las 8 habilidades de prueba
+  quedaron en su ficha.

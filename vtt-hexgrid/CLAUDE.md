@@ -1108,4 +1108,5 @@ el contraataque; `bnPublicar` avisa `tirada-registrada` para que el duelo la rec
 nueva, si quien mira puede guardarlo y, si es GM, con ⚗ prendido; sus invocaciones y los creeps siguen por el marco. **Las
 habilidades** (paso 5a, `bnHabAca`/`bnHabUi`/`bnMesaHabilidad`): las 📣 manuales, las 💰 semiautomáticas sin trampa/zona/portal,
 el ⚡ Flash fuera del duelo, el costo X (cartel `#bn-costox` en el recuadro), el arma de un costo "como un ataque" y la 🎲
-segunda tirada las hace el mapa; las ✨ automáticas y las que colocan algo, y la 🔍, siguen delegadas.
+segunda tirada las hace el mapa, y desde el 5b también las ✨ automáticas (`bnElegirObjetivo` → `dueloElegirObjetivoMapa`;
+`bnRecordatorios`); las que colocan trampa, zona o portal, y la 🔍, siguen delegadas.

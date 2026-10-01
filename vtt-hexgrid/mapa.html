@@ -9122,7 +9122,7 @@ function abrirBotoneraPrincipal(){
    toca como siempre; lo que abra (elegir arma, costo X, Ver, un cartel) sale encima, en la capa de siempre. Las 🔍 todavía
    no están (la lupa vive en la ficha: etapa 3c). Las piezas se cargan recién al usarla: para los jugadores no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001b', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001a'];
+const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001b', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001a', '../comun/ficha-botonera.js?v=20261001b'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
 var bnCss = '';
@@ -9206,6 +9206,17 @@ function bnDelegar(datos){
   botonera = {herramienta: 'ficha', fichaId: bn.fichaId, invId: '', lista: false, pendiente: msg, completa: false, precarga: true};
   marco.src = sinCache(`../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=botonera&precarga=1#${encodeURIComponent(bn.fichaId)}`);
 }
+// Etapa 3c: lo que el mapa ya hace él mismo, sin pedírselo a la ficha — las tiradas de stats y la Percepción (las arma
+// comun/ficha-botonera.js, la misma cuenta que la ficha). Se publican a nombre del personaje y con su `ficha`, así la Moneda
+// Re-Roll y la Polilla las ven (P138). Devuelve true si la hizo.
+function bnTirarAca(b){
+  const t = b.dataset.tirarstat ? FichaBotonera.tiradaStat(bn.S, b.dataset.tirarstat)
+    : b.dataset.botoneraaccion === 'percepcion' ? FichaBotonera.tiradaPercepcion(bn.S) : null;
+  if(!t) return false;
+  if(t.error){ toast(t.error); return true; }
+  mesaPublicar(t.origen, {...t.r, quien: ((bn.S.meta && bn.S.meta.nombre) || '').trim(), ficha: bn.fichaId});
+  return true;
+}
 function bnCrear(){
   const host = document.createElement('div');
   host.id = 'botonera-nueva';
@@ -9225,6 +9236,7 @@ function bnCrear(){
       return;
     }
     if(!bn.S) return;
+    if(bnTirarAca(b)) return;
     const datos = {...b.dataset};
     if(!Object.keys(datos).length) return;
     bnDelegar(datos);

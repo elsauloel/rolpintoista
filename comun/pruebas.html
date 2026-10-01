@@ -522,6 +522,42 @@ prueba('Levantarse y Sigilo aparecen solo cuando corresponden; los talentos van 
   igual([comb.includes('data-levantarse'), sinNada.includes('data-levantarse'), sinNada.includes('data-sigilo'), narr.indexOf('Talentos') < narr.indexOf('Combate'), comb.indexOf('Talentos') > comb.indexOf('Combate')],
     [true, false, false, true, true]);
 });
+// La Percepción como la tiraba la ficha antes de mudarse (js/03, copia textual con el azar inyectado), para comparar.
+function percepcionVieja(S, azar){
+  const valor = FichaCalculo.calcular(S).final.percepcion;
+  const f = formulaParaValor(valor);
+  if(!f) return {error: `Percepción: ${fmt(num(valor))} no se puede tirar con dados reales`};
+  const mejor = FichaBotonera.tienePercepcionAumentada(S);
+  const combo = f.combo.map(d => mejor ? ({2: 4, 3: 4, 4: 6, 6: 8, 8: 10, 10: 12, 12: 20, 20: 20}[d] || d) : d);
+  const rolls = combo.map(d => 1 + Math.floor(azar() * d));
+  const cuenta = {};
+  combo.forEach(d => { cuenta[d] = (cuenta[d] || 0) + 1; });
+  const formula = Object.keys(cuenta).map(Number).sort((a, b) => a - b).map(d => `${cuenta[d]}d${d}`).join('+') + (f.mod ? `+${f.mod}` : '');
+  return {origen: mejor ? 'Percepción (aumentada)' : 'Percepción', r: {formula, rolls, mod: f.mod, total: rolls.reduce((a, b) => a + b, 0) + f.mod}};
+}
+prueba('la Percepción del motor común da lo mismo que la de la ficha (300 fichas al azar, con y sin Percepción aumentada)', () => {
+  const sembrar = s => () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+  const distintas = [];
+  for(let i = 0; i < 300; i++){
+    const S = fichaBotonera({attrs: {con: 3, fue: 4, agl: 6, des: 1 + (i % 23), esp: 4}, pasivas: i % 2 ? [{id: 'p', nombre: 'Percepción aumentada', poolId: 'percepcion-aumentada'}] : []});
+    const a = JSON.stringify(FichaBotonera.tiradaPercepcion(S, sembrar(i + 7))), b = JSON.stringify(percepcionVieja(S, sembrar(i + 7)));
+    if(a !== b) distintas.push(`${i}: ${a} ≠ ${b}`);
+  }
+  igual(distintas.slice(0, 3), []);
+});
+prueba('con Percepción aumentada cada dado sube un escalón', () => {
+  const S = fichaBotonera({attrs: {con: 3, fue: 4, agl: 6, des: 6, esp: 4}, pasivas: [{id: 'p', nombre: 'Percepción aumentada', poolId: 'percepcion-aumentada'}]});
+  const t = FichaBotonera.tiradaPercepcion(S, () => 0);
+  igual([t.origen, t.r.formula], ['Percepción (aumentada)', '1d8']);
+});
+prueba('la tirada de un stat de la Botonera es la del motor común, con su nombre', () => {
+  const S = fichaBotonera(), t = FichaBotonera.tiradaStat(S, 'fue');
+  igual([t.origen, t.r.formula], ['Fue', Combatiente.tirarStat(FichaCalculo.calcular(S).final.fue, S.efectos, 'fue', {}).formula]);
+});
+prueba('un stat que no se puede tirar con dados reales avisa en vez de tirar', () => {
+  const S = fichaBotonera({attrs: {con: 3, fue: 0, agl: 6, des: 5, esp: 4}});
+  igual(FichaBotonera.tiradaStat(S, 'fue').error, 'Fue: 0 no se puede tirar con dados reales');
+});
 prueba('los costos de la Iteración 2 son los de siempre', () => igual([FichaCalculo.IT2.nitrosHabilidad, FichaCalculo.IT2.nitrosConsumirMochila, FichaCalculo.IT2.nitrosSigilo], [1, 2, 1]));
 
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */

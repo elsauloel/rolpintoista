@@ -99,19 +99,13 @@ const STATS_SIN_TIRADA = FichaBotonera.STATS_SIN_TIRADA;   // comun/ficha-botone
    GRUPOS/formulas.percepcion, junto a rng/pdg/crit/parry). La pasiva
    "Percepción aumentada" sube un escalón cada dado (d6 → d8, d8 → d10…) y
    además hace que el mapa le avise de las trampas ocultas cercanas. */
-const PERCEPCION_DADO_SUBE = {2: 4, 3: 4, 4: 6, 6: 8, 8: 10, 10: 12, 12: 20, 20: 20};
+const PERCEPCION_DADO_SUBE = FichaBotonera.PERCEPCION_DADO_SUBE;
 function tienePercepcionAumentada(){ return FichaBotonera.tienePercepcionAumentada(S); }   // comun/ficha-botonera.js
+// La tirada la arma comun/ficha-botonera.js (la misma que usa la Botonera nueva del mapa); acá se publica.
 function tirarPercepcion(){
-  const valor = compute().final.percepcion;
-  const f = formulaParaValor(valor);
-  if(!f){ toast(`Percepción: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
-  const mejor = tienePercepcionAumentada();
-  const combo = f.combo.map(d => mejor ? (PERCEPCION_DADO_SUBE[d] || d) : d);
-  const rolls = combo.map(d => 1 + Math.floor(Math.random() * d));
-  const cuenta = {};
-  combo.forEach(d => { cuenta[d] = (cuenta[d] || 0) + 1; });
-  const formula = Object.keys(cuenta).map(Number).sort((a, b) => a - b).map(d => `${cuenta[d]}d${d}`).join('+') + (f.mod ? `+${f.mod}` : '');
-  registrarTirada(mejor ? 'Percepción (aumentada)' : 'Percepción', {formula, rolls, mod: f.mod, total: rolls.reduce((a, b) => a + b, 0) + f.mod});
+  const t = FichaBotonera.tiradaPercepcion(S);
+  if(t.error){ toast(t.error); return; }
+  registrarTirada(t.origen, t.r);
 }
 
 

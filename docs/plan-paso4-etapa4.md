@@ -11,8 +11,8 @@
 creeps primero, el mismo interruptor ⚗, P137 espera.
 
 **Lo próximo — 4c, mudar los botones de a uno** (como la 3c de la Botonera del personaje), del más simple al más complejo:
-1. Tiradas de stats (`data-tirarstatcreep`: `tirarValorStat` de `js/01`, con Afortunado y las mitades) y Levantarse.
-2. Esquivar, Parry (con el Parry que espera su Bloqueo, hoy un `Set` de GM Tools), Bloqueo, Fuerza del golpe, Daño.
+1. Tiradas de stats y Levantarse ✅ (2026-10-01).
+2. Esquivar, Parry, Bloqueo, Fuerza del golpe, Daño ✅ (2026-10-01; el Parry pendiente del mapa vive en `acParry`).
 3. Atacar (menú "¿Qué ataque es?", el objetivo con `dueloElegirObjetivoMapa`).
 4. Lo que el duelo le pide a un creep (`window.DUELO_HOOKS` de `js/12`) → `comun/creep-duelo.js`, y `hooksLocal` del mapa.
 5. Habilidades (`js/04`: manual, semi, ✨, Flash, cooldowns `data-cdmod`, segunda tirada, trampa y zona).
@@ -109,3 +109,16 @@ pruebas en `comun/pruebas.html`, `?v=` al día, probada en vivo y documentada.
   nuevas se dibujaron en la mitad izquierda con el estilo de GM Tools; Esquivar y la tirada de Agilidad salieron en la Mesa a
   nombre del creep (las hizo GM Tools en el marco); cambiar sus No2 por la base (4 y de vuelta a 6) se vio al instante; Atacar
   abrió "¿Qué ataque es?" encima. Todo como estaba (⚗ apagado, creep con 6 No2).
+- 2026-10-01: **4c, tandas 1 y 2 hechas** (d514304) — `comun/creep-acciones.js` (`CreepAcciones`), copiado de los clics de GM Tools
+  (`js/06`) y de `tirarValorStat` (`js/01`), partido en tiradas (`tirada`, `tiradaStat`, `esquivar`, `parry`, `fuerzaGolpe`,
+  `bloqueo(sc, parryPendiente)`, `dano` → `{origen, r}` o `{error}`) y cambios (`levantarse`, `pagarParry` → `{error}` o `{aviso}`).
+  GM Tools lo usa con su creep en memoria (`publicarTiradaCreep`, `js/01`). En el mapa (`acAccionAca`, `acCambiar`, `acPublicar`,
+  `acEfectosAlPegar`, `acParry`): las tiradas a la Mesa a nombre del creep con `desde: 'gm'` (`comun/mesa.js` ahora lo acepta, así
+  se pintan en rojo como las de GM Tools) y avisando `tirada-registrada`; Levantarse y el Parry se escriben con `modificarCreep`
+  (si la regla dice que no, se lanza el error adentro de la transacción y no se escribe nada). Comparado contra los clics viejos
+  de GM Tools en 600 creeps al azar con 6 clics cada uno y los mismos dados: 600 iguales, 0 distintas; 4 mutaciones detectadas
+  (una que no cambiaba nada —pasarle los estados a la Fuerza del golpe— se reemplazó). `pruebas.html`: 177 en verde (1 nueva).
+  **En vivo** (GM, "Creep nuevo" con un arma y Sentado puestos para la prueba): Levantarse cobró 1 No2 y sacó Sentado; Agilidad,
+  Esquivar, Parry (−1 No2, y el Bloqueo pasó a "Bloqueo · Garrote"), Bloqueo, Fuerza del golpe y Daño salieron en la Mesa en rojo
+  a nombre del creep, sin ningún pedido a GM Tools. Creep restaurado (sin arma, 6 No2, sin estados). **Pendiente chico**: el
+  `acParry` del mapa no se borra al atacar (Atacar todavía va al marco) ni en el Mantenimiento.

@@ -930,6 +930,11 @@ versión parecida en más de una, es candidato a juntar.
   `html(sc, {parryPendiente, lupa})` → `{titulo, badge, html}` y sus ayudantes (`formulasCombate`, `botonSegundaHab`, `botonHabTxt`,
   `cdControlesHtml`). Lo usan GM Tools (`renderAccionesCreep`) y el mapa (⚗ Acciones nuevas). Necesita `creep-calculo.js`,
   `modificadores-tirada.js` y `tiradas.js`.
+- **`creep-acciones.js`** (`CreepAcciones`, 2026-10-01, paso 4 etapa 4c) — **los botones de las Acciones de un creep**: las
+  tiradas (`tirada`, `tiradaStat`, `esquivar`, `parry`, `fuerzaGolpe`, `bloqueo`, `dano` → `{origen, r}` o `{error}`) y lo que
+  cambia al creep (`levantarse`, `pagarParry` → `{error}` o `{aviso}`). Cada pantalla publica y guarda a su manera (GM Tools en
+  memoria; el mapa con `modificarCreep`). **`mesa.js`**: una tirada con `r.desde = 'gm'` se guarda como de GM Tools (nombre del
+  creep en rojo), aunque la publique el mapa.
 - **`ficha-lupa.js`** (`FichaLupa`, 2026-10-01, paso 4 etapa 3c-6) — **la 🔍 y el "Ver" de un personaje**, para la ficha y el
   mapa: `contenido(S, clave)` → `{titulo, html}` (el desglose de cada 🔍 de la Botonera: `stat:`, `defensa:`, `atacar:`, `danio:`,
   `social:`, `habx:`, `hab:`, `cons:`; las de las invocaciones siguen en la ficha) y `ver(S, key, it)` → `{titulo, html}` (la tarjeta

@@ -173,6 +173,15 @@ function fichaSoloLecturaPara(duenoUid, f){
    (juego entre amigos: anotado en "Antes de abrirlo al público"). La marca vive en la parte `control` de la ficha
    ({uid, nombre, desde}; "null" = la tiene su dueño) y, para el mapa, en `resumen.control` (el uid del GM). */
 const fichaControloYo = f => !!(f && f.control && fbUsuario && f.control.uid === fbUsuario.uid);
+// El momento del cambio de control (2026-10-02, P146): el mapa del jugador dueño lo muestra al centro; el de los demás, en la esquina.
+function fichaMomentoControl(tomo){
+  if(!fbDb || !fbUsuario || !fbMiembro || !fichaVivo) return;
+  fbDb.collection(fbRutaCampana('momentos')).add({tipo: 'control', icono: tomo ? '🎮' : '↩',
+    titulo: (tomo ? `El GM tomó el control de ${fichaNombre()}` : `El GM devolvió el control de ${fichaNombre()}`).slice(0, 200),
+    resultado: tomo ? 'Su jugador queda en solo lectura hasta que se lo devuelva.' : 'Lo vuelve a manejar su jugador.', estado: 'listo', resuelve: '',
+    datos: {centro: true, paraUid: fichaVivo.duenoUid || ''}, creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+  }).catch(err => console.error('No se pudo publicar el momento del control:', err));
+}
 function fichaAvisarMesaControl(texto){
   if(!fbDb || !fbUsuario || !fbMiembro) return;
   fbDb.collection(fbRutaCampana('tiradas')).add({
@@ -194,6 +203,7 @@ async function fichaTomarControl(){
   f.editaGM = false;
   fichaControlCambio(f, control, true);
   fichaAvisarMesaControl(`🎮 El GM (${control.nombre}) tomó el control de ${fichaNombre()}`);
+  fichaMomentoControl(true);
 }
 async function fichaDevolverControl(){
   const f = fichaVivo;
@@ -205,6 +215,7 @@ async function fichaDevolverControl(){
     await base.update({'resumen.control': firebase.firestore.FieldValue.delete()});
   }catch(err){ console.error('No se pudo devolver el control:', err); toast('No se pudo devolver el control — revisá la consola'); return; }
   fichaAvisarMesaControl(`↩ El GM devolvió el control de ${fichaNombre()} a su jugador`);
+  fichaMomentoControl(false);
   fichaControlCambio(f, null, true);
 }
 // Llega (o cambia) la marca de control: recalcula quién puede editar y avisa. `avisar` = false en la carga inicial.

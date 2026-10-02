@@ -333,6 +333,11 @@ Lo vas a usar como si fueras su jugador (Botonera, duelos, habilidades, token, M
       origen: (tomar ? `🎮 El GM (${control.nombre}) tomó el control de ${nombre}` : `↩ El GM devolvió el control de ${nombre} a su jugador`).slice(0, 80),
       formula: '', rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
   }catch(err){ console.error('No se pudo avisar en la Mesa:', err); }
+  // Su momento (P146): el jugador dueño lo ve al centro; el resto, en la esquina (js/16).
+  const f = fichasPub.get(fichaId);
+  momentoAbrir({tipo: 'control', icono: tomar ? '🎮' : '↩', titulo: tomar ? `El GM tomó el control de ${nombre}` : `El GM devolvió el control de ${nombre}`,
+    resultado: tomar ? 'Su jugador queda en solo lectura hasta que se lo devuelva.' : 'Lo vuelve a manejar su jugador.', estado: 'listo',
+    datos: {centro: true, paraUid: (f && f.duenoUid) || ''}});
   toast(tomar ? `🎮 Tenés el control de ${nombre}: lo usás como si fueras su jugador` : `↩ Le devolviste el control de ${nombre} a su jugador`);
   setTimeout(renderLentesControl, 800);   // cuando llega el resumen nuevo
 }

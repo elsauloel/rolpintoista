@@ -70,6 +70,8 @@ function momentoRecibido(id, d){
   if(percepcionBanner && percepcionBanner.momentoId === id && d.estado === 'listo' && !percepcionBanner.resultado) percepcionRespuesta(d);
   // Si otra pantalla del GM ya lo resolvió, esta cierra su cartelito.
   if(deteccionBanner && deteccionBanner.id === id && d.estado === 'listo' && deteccionBanner.resultado === null){ deteccionBanner = null; renderDeteccionBanner(); }
+  // Lo que me toca a mí (el jugador dueño, cuando el GM toma o devuelve el control de su personaje): al centro, no en la esquina.
+  if(d.datos && d.datos.paraUid && d.datos.paraUid === fbUsuario.uid && d.creadoPor !== fbUsuario.uid){ momentoAvisoCentro(id, d); return; }
   // La esquina: todo, salvo lo que esta pantalla ya sigue al centro.
   const mio = d.creadoPor === fbUsuario.uid && d.datos && d.datos.centro;
   const delGM = d.tipo === 'sigilo-pedido' && soyGM && (d.estado === 'esperandoGM' || (deteccionBanner && deteccionBanner.id === id));
@@ -250,4 +252,23 @@ async function deteccionGMResolver(){
   renderDeteccionBanner();
   await momentoActualizar(db.id, {estado: 'listo', resultado: detectado ? `…¡y descubre a ${nomOculto}!` : 'Mmm... puede que esté flasheando.',
     datos: {...dt, detectado, ...(detectado ? {ocultoNombre: nomOculto} : {})}});
+}
+
+/* ---------- Un aviso al centro para quien le toca (P146) ----------
+   Sin nada que tirar: solo el momento y «Entendido». Lo usa el cambio de control (el GM toma o devuelve el personaje de un jugador). */
+let avisoCentro = null;   // {id, d}
+function momentoAvisoCentro(id, d){
+  avisoCentro = {id, d};
+  let el2 = document.getElementById('momento-aviso-centro');
+  if(!el2){
+    el2 = document.createElement('div');
+    el2.id = 'momento-aviso-centro';
+    momentoEstiloCentro(el2);
+    el2.style.top = '35%';
+    el2.style.zIndex = '77';
+    document.body.appendChild(el2);
+  }
+  el2.hidden = false;
+  el2.innerHTML = `<div style="flex:1 1 100%"><div style="font-size:30px;line-height:1">${esc(d.icono || '•')}</div><div style="font-size:18px;font-weight:700;margin-top:6px">${esc(d.titulo || '')}</div>${d.resultado ? `<div style="margin-top:4px;color:#cfd6e6">${esc(d.resultado)}</div>` : ''}</div><button type="button" class="btn" id="momento-aviso-ok">Entendido</button>`;
+  document.getElementById('momento-aviso-ok').onclick = () => { el2.hidden = true; avisoCentro = null; };
 }

@@ -753,11 +753,7 @@ function bnVerAccion(accion){
   r.querySelector('#bn-ver').classList.remove('open');
   bnViendo = null;
   if(!v || accion === 'no') return;
-  if(accion === 'editar'){
-    if(!(botonera.herramienta === 'ficha' && botonera.fichaId === bn.fichaId && !botonera.invId && botonera.lista)) toast('Abriendo el editor de la ficha…');
-    bnAlMarco({tipo: 'editar-en-ficha', key: v.key, id: v.id});
-    return;
-  }
+  if(accion === 'editar'){ bnEditar(v.key, v.id); return; }   // el editor común (A6b)
   if(accion === 'borrar' && bnPuedeGuardar()){
     const it = (bn.S[v.key] || []).find(x => x.id === v.id);
     if(!it || !confirm(`¿Borrar "${it.nombre || 'esto'}"?`)) return;
@@ -916,6 +912,24 @@ function bnCrear(){
         <button class="btn del" data-bn-ver="borrar">Eliminar</button>
         <button class="btn primary" data-bn-ver="editar">Editar</button>
       </footer>
+    </div></div>
+    <div class="scrim" id="bn-editor"><div class="modal">
+      <header><h3 data-bned="titulo">Editar</h3><button class="iconbtn" data-bned="activar" style="display:none">Activar</button><button class="iconbtn" data-bned="x">Cerrar</button></header>
+      <div class="body" data-bned="cuerpo"></div>
+      <footer>
+        <div style="display:flex;gap:9px">
+          <button class="btn del" data-bned="eliminar">Eliminar</button>
+          <button class="btn ghost" data-bned="catalogo" style="display:none" title="Sube este ítem al catálogo compartido: queda disponible al instante para que cualquiera lo compre (si salió de un ítem del catálogo, podés elegir que sea una corrección)">⬆ Subir al catálogo</button>
+        </div>
+        <div style="display:flex;gap:9px">
+          <button class="btn ghost" data-bned="cancelar">Cancelar</button>
+          <button class="btn primary" data-bned="guardar">Guardar</button>
+        </div>
+      </footer>
+    </div></div>
+    <div class="scrim" id="bn-tipoitem"><div class="modal" style="max-width:620px">
+      <header><h3>Categoría del ítem</h3><button class="iconbtn" data-bn-tipoitem="">Cerrar</button></header>
+      <div class="body" id="bn-tipoitem-cuerpo"></div>
     </div></div>`;
   raiz.querySelector('#bn-sin-nitros').addEventListener('mousedown', e => { if(e.target.id === 'bn-sin-nitros') bnCerrarSinNitros(); });
   raiz.querySelector('#bn-costox').addEventListener('mousedown', e => { if(e.target.id === 'bn-costox'){ bnCostoX = null; e.target.classList.remove('open'); } });
@@ -926,6 +940,16 @@ function bnCrear(){
   raiz.querySelector('#bn-stats').addEventListener('mousedown', e => { if(e.target.id === 'bn-stats') bnStatsCerrar(); });
   raiz.querySelector('#bn-reroll').addEventListener('mousedown', e => { if(e.target.id === 'bn-reroll') bnRerollCerrar(); });
   raiz.querySelector('#bn-revivir').addEventListener('mousedown', e => { if(e.target.id === 'bn-revivir') bnRevivirCerrar(); });
+  // El editor común (A6b): sus botones son solo suyos (el componente los atiende antes, en su cuerpo y su pie).
+  ['click', 'change', 'input'].forEach(ev => raiz.querySelector('#bn-editor').addEventListener(ev, e => e.stopPropagation()));
+  raiz.querySelector('#bn-tipoitem').addEventListener('mousedown', e => { if(e.target.id === 'bn-tipoitem') bnTipoItemCerrar(null); });
+  raiz.querySelector('#bn-tipoitem').addEventListener('click', e => {
+    e.stopPropagation();
+    const b = e.composedPath()[0].closest && e.composedPath()[0].closest('button');
+    if(!b) return;
+    if(b.dataset.tipoitem) bnTipoItemCerrar(b.dataset.tipoitem);
+    else if(b.dataset.bnTipoitem !== undefined) bnTipoItemCerrar(null);
+  });
   raiz.querySelector('#bn-revivir').addEventListener('input', () => bnRevivirDibujar());
   raiz.querySelector('#bn-revivir').addEventListener('click', e => {
     e.stopPropagation();   // sus botones son solo de esta ventana
@@ -1318,8 +1342,7 @@ function bnEquipoClic(b){
   if(b.dataset.compararElegir){ if(bnComparando){ bnComparando.equipadoId = b.dataset.compararElegir; bnCompararDibujar(); } return true; }
   if(b.dataset.edit){
     const [key, id] = b.dataset.edit.split(':');
-    if(!(botonera.herramienta === 'ficha' && botonera.fichaId === bn.fichaId && !botonera.invId && botonera.lista)) toast('Abriendo el editor de la ficha…');
-    bnAlMarco({tipo: 'editar-en-ficha', key, id});
+    bnEditar(key, id);   // el editor común (A6b)
     return true;
   }
   return false;   // data-view (Ver) lo atiende el resto del recuadro
@@ -1395,6 +1418,78 @@ function bnRerollDibujar(){
   const r = FichaDuelo.rerollHtml(bn.S, bnRerollLista);
   bn.raiz.querySelector('#bn-reroll-aviso').innerHTML = r.aviso;
   bn.raiz.querySelector('#bn-reroll-lista').innerHTML = r.filas;
+}
+/* ---------- ✎ El editor de la ficha, hecho por el mapa (2026-10-02, hoja de ruta A6b, docs/plan-a6b-editor.md) ----------
+   El Editar del Ver y del Equipo abrían el editor de la ficha escondida ('editar-en-ficha'). Ahora es el editor común
+   (comun/ficha-editor.js: el mismo formulario, el paso a paso de las habilidades, el asistente de ítems, la trampa y la Ejecución ✨),
+   adentro del recuadro de la Botonera nueva (#bn-editor). Guardar pasa por bnUi (las partes que cambiaron y el resumen). Los estados de
+   la lista (para "estado al usar" y para la Ejecución) se eligen con el selector común (comun/selector-estados.js). */
+const ED_PIEZAS = ['../comun/ficha-editor.js?v=20261002b', '../comun/asistente-item.js?v=20260930b', '../comun/asistente-duelo-hab.js?v=20261002i'];
+let bnTipoItemResolver = null;
+async function bnEditar(key, id){
+  if(!bn || !bn.S) return;
+  if(!bnPuedeGuardar()){ toast('Ese personaje no lo manejás vos: solo se puede mirar'); return; }
+  try{ await bnCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ED_PIEZAS); }
+  catch(err){ console.error(err); toast('No se pudo abrir el editor'); return; }
+  if(!bn.editor) bn.editor = bnCrearEditor();
+  bn.editorAntes = FichaGuardado.partes(bn.S);
+  bn.editor.abrir(key, id);
+}
+// Elegir un estado de la lista (el selector común, con los "Mis presets" del personaje). → {preset, guardar} o null.
+async function bnElegirEstadoLista(){
+  const r = await SelectorEstados.abrir({
+    titulo: 'Estado alterado', para: (bn.S.meta && bn.S.meta.nombre) || '',
+    presets: estadosPresetFicha(), propios: bn.S.efectosPersonalizados || [],
+    cfgPreguntas: {hp: 'hpturno', statLabel: id => FichaCalculo.STAT_LABEL[id] || id},
+    stats: seStatsFicha(),
+    armarDeAsistente: res => ({nombre: res.nombre, polaridad: res.polaridad, turnos: res.turnos, permanente: res.permanente, stacks: 1, hpturno: res.hp, stacksturno: 0,
+      escudoMagico: res.escudo, mods: res.mods, detalle: res.detalle, popup: false, ...res.flags, ...(res.forzarNitros !== undefined ? {forzarNitros: res.forzarNitros} : {})}),
+  });
+  if(r && r.guardar){
+    bn.S.efectosPersonalizados = bn.S.efectosPersonalizados || [];
+    const i = bn.S.efectosPersonalizados.findIndex(p => p.nombre === r.preset.nombre);
+    if(i >= 0) bn.S.efectosPersonalizados[i] = r.preset; else bn.S.efectosPersonalizados.push(r.preset);
+  }
+  return r;
+}
+function bnCrearEditor(){
+  const r = bn.raiz, el = n => r.querySelector(`#bn-editor [data-bned="${n}"]`);
+  return FichaEditor.crear({scrim: r.querySelector('#bn-editor'), titulo: el('titulo'), cuerpo: el('cuerpo'), guardar: el('guardar'), eliminar: el('eliminar'),
+    catalogo: el('catalogo'), activar: el('activar'), cancelar: el('cancelar'), x: el('x')}, {
+    S: () => bn.S,
+    toast: m => toast(m),
+    confirmar: t => confirm(t),
+    // Se guardó o se borró algo: se guarda (solo lo que cambió) y se redibuja lo que esté abierto.
+    alCambiar: () => {
+      bnUi(bn.editorAntes || FichaGuardado.partes(bn.S)).cambio();
+      bn.editorAntes = FichaGuardado.partes(bn.S);
+      if(bn.raiz.querySelector('#bn-equipo').classList.contains('open')) bnEquipoDibujar();
+    },
+    elegirTipoItem: actual => new Promise(resolve => {
+      bnTipoItemResolver = resolve;
+      bn.raiz.querySelector('#bn-tipoitem-cuerpo').innerHTML = FichaEditor.tipoItemHtml(actual);
+      bn.raiz.querySelector('#bn-tipoitem').classList.add('open');
+    }),
+    elegirEstadoItem: async () => {
+      const r = await bnElegirEstadoLista();
+      if(!r) return null;
+      return {nombre: r.preset.nombre, armado: r.preset, estandar: estadosPresetFicha().some(p => p.nombre === r.preset.nombre), detalle: r.preset.detalle};
+    },
+    // Para la Ejecución ✨ (comun/asistente-duelo-hab.js): lo mismo que el elegirEstadoDuelo de la ficha.
+    elegirEstadoDuelo: async () => {
+      const r = await bnElegirEstadoLista();
+      if(!r) return null;
+      const p = r.preset;
+      return {modo: 'preset', nombre: p.nombre, turnos: p.turnos, permanente: !!p.permanente, hp: num(p.hpturno), mods: p.mods, stacks: p.stacks, escudoMagico: num(p.escudoMagico), polaridad: p.polaridad, detalle: p.detalle};
+    },
+    alSubirCatalogo: () => ItemsSubidos.cargar().then(l => { bnItemsSubidos = l || []; }),
+  });
+}
+function bnTipoItemCerrar(valor){
+  if(bn) bn.raiz.querySelector('#bn-tipoitem').classList.remove('open');
+  const res = bnTipoItemResolver;
+  bnTipoItemResolver = null;
+  if(res) res(valor);
 }
 /* ---------- ✚ Revivir, hecho por el mapa (2026-10-02, hoja de ruta A6b) ----------
    El ✚ Revivir de la pantalla de muerte del mapa abría el diálogo de la ficha escondida ('abrir-revivir'). Ahora lo muestra el mapa adentro
@@ -1621,6 +1716,8 @@ document.addEventListener('keydown', e => {
   if(cartel && cartel.id === 'bn-tienda'){ bnTiendaCerrar(); return; }
   if(cartel && cartel.id === 'bn-stats'){ bnStatsCerrar(); return; }
   if(cartel && cartel.id === 'bn-reroll'){ bnRerollCerrar(); return; }
+  if(cartel && cartel.id === 'bn-editor'){ bn.editor.cerrar(); return; }
+  if(cartel && cartel.id === 'bn-tipoitem'){ bnTipoItemCerrar(null); return; }
   if(cartel && cartel.id === 'bn-revivir'){ bnRevivirCerrar(); return; }
   if(cartel){ cartel.classList.remove('open'); if(cartel.id === 'bn-comparar') bnComparando = null; bnViendo = null; bnCostoX = null; bnSobrepeso = null; bnSinNitrosSeguir = null; return; }
   cerrarBotoneraNueva();

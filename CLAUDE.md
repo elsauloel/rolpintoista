@@ -31,8 +31,9 @@
 >
 > **Hoja de ruta A (estructural, 2026-10-02) → [`docs/pendientes.md`](docs/pendientes.md) §0**: A1–A6 hechas (el mapa ya no carga la
 > ficha ni GM Tools escondidas para nada; los editores son comunes: `comun/ficha-editor.js`, `comun/creep-editor.js`). Falta la limpieza
-> A′ (después de tres sesiones reales) y sigue la B (lo puntual). Reportes: [`docs/reporte-estructural-2026-10-02.md`](docs/reporte-estructural-2026-10-02.md),
-> [`docs/reporte-a6-2026-10-02.md`](docs/reporte-a6-2026-10-02.md).
+> A′ (después de tres sesiones reales). De la B (lo puntual), 7, 7b y 8 hechas (lo que le llega a un personaje lo aplica también el
+> mapa: `comun/recibidos.js`); lo que queda (9–12) espera decisiones del dueño o del grupo. Reportes: [`docs/reporte-estructural-2026-10-02.md`](docs/reporte-estructural-2026-10-02.md),
+> [`docs/reporte-a6-2026-10-02.md`](docs/reporte-a6-2026-10-02.md), [`docs/reporte-b7-b8-2026-10-02.md`](docs/reporte-b7-b8-2026-10-02.md).
 >
 > **Tareas pendientes → [`docs/pendientes.md`](docs/pendientes.md)** (lista viva para ir tachando; las decisiones de diseño
 > siguen en `preguntas-abiertas.md`). Al terminar o descubrir una tarea, actualizarla ahí.

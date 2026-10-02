@@ -117,7 +117,8 @@
    para los personajes que maneja ese usuario (`comun/recibidos.js`, `recibidosEscuchar` en el mapa; la ficha usa la misma pieza). Lo
    mismo pasaba con las **recompensas del combate** (XP, DDE, despojos, trampas que vuelven): también las aplica el mapa ahora; **(b)** a una **invocación** no le llegaba nada («aplicalo a mano»): ahora el estado va con el mismo aviso
    (`fichaId~invId`) y la cura directo (`dueloCurarInv`). Probado en vivo (GM con 🎮 Silvia, solo el mapa abierto): Escarcha a Silvia
-   y Pajaritos a su invocación de prueba se aplicaron solos y los avisos se borraron; la invocación 5 → 2 (daño) → 4 (cura). Las skills
+   y Pajaritos a su invocación de prueba se aplicaron solos y los avisos se borraron; la invocación 5 → 2 (daño) → 4 (cura); una
+   recompensa de prueba (+7 XP, +2 DDE, +1 despojo) la aplicó el mapa (XP 59 → 66, DDE 482 → 484, despojos 14 → 15). Las skills
    de clase que lo necesitan (Lisiar, Confusión, Marcar, Maldiciones) se arman con la Ejecución al auditarlas (B-9).
 9. [ ] **Auditoría de skills de clase** (§7): Tanque 9/10 (falta Miti-Miti), después una skill por clase alternando.
 10. [ ] **Paso 8 del casteo** (§1): quedan 10 skills de clase que tocan casteo.

@@ -27,8 +27,11 @@
    el mapa, en cada ⟳, lee a los personajes que maneja ese usuario, toma sus turnos con la misma transacción, los aplica, publica el
    reporte y guarda — sin cargar la ficha en un marco invisible. Probado en vivo (GM con 🎮 Silvia): dos ⟳ seguidos, una quemadura de
    prueba hizo 10 → 9 → 8 y terminó, No2 a full, SP Regen, reporte en la Mesa, una sola vez por turno, sin ficha escondida.
-   - [ ] **A2b. El Mantenimiento de los creeps**: el mapa del GM todavía carga GM Tools en un marco invisible para pasarles el turno.
-     Que lo haga el mapa con la regla de GM Tools llevada a `comun/` (como los personajes).
+   - [x] **A2b. El Mantenimiento de los creeps** (2026-10-02): la regla de cada creep salió a `CreepAcciones.mantenimiento` (GM Tools la
+     usa igual) y el mapa del GM, en cada ⟳, toma los turnos con la misma transacción (`gm/mantenimiento`), pasa el turno de cada creep
+     con `modificarCreep`, sube el contador de GM Tools (`gm/estado`) y anota en el 📜 Historial. Probado en vivo: el creep con una
+     quemadura de prueba hizo 5 → 4 y pasó a 1 turno, No2 a full, ataques a 0, el contador 3 → 4, la línea en el Historial, y no se
+     cargó GM Tools en ningún marco invisible.
 3. [ ] **"+ Estado"** (el selector de estados de un personaje, una invocación o un creep, con sus preguntas).
 4. [ ] **Equipo y mochila** (equipar, desequipar, mirar la mochila).
 5. [ ] **Tienda y Botín**.
@@ -41,8 +44,9 @@
   false`) ni apareció un problema que solo se arregle con lo viejo. Mientras tanto queda "dormido", sin tocarlo ni probarlo.
 - **Cómo** — de a un paso y probando: sacar `BN_SIEMPRE`, el interruptor ⚗ y `bnAlternar`; los pedidos de botón al marco
   (`bnDelegar`/`botonera-delegar`, `acDelegar`/`acciones-delegar`) y lo que los atiende en la ficha y en GM Tools (`modo=botonera` sin
-  mensaje, `modo=acciones`); la ficha liviana vieja (`fichaMapaAbrir`, `abrir-ficha-mapa`); los mensajes que queden sin uso en
-  `comun/mensajes-mapa.js`. **No** se borra la Botonera de la ficha suelta (`ficha.html` sin el mapa): usa las mismas piezas de
+  mensaje, `modo=acciones`); la ficha liviana vieja (`fichaMapaAbrir`, `abrir-ficha-mapa`); el Mantenimiento en un marco invisible (en el
+  mapa `mantenimientoEncolar`/`mantenimientoSiguiente`/`mantenimientoCerrarMarco` y el aviso `mantenimiento-listo`; en la ficha y en GM
+  Tools el `?modo=mantenimiento`), sin uso desde A2/A2b; los mensajes que queden sin uso en `comun/mensajes-mapa.js`. **No** se borra la Botonera de la ficha suelta (`ficha.html` sin el mapa): usa las mismas piezas de
   `comun/` y es la de la página de la ficha.
 - [ ] Limpieza hecha (fecha y commit).
 

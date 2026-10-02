@@ -1271,4 +1271,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   que el GM controla con 🎮) y, de a uno (`mantPersonajesCola`), los lee (la sesión de la Botonera nueva si está abierta; si no,
   `mantSesionTemporal`), toma sus turnos con `FichaMantenimiento.reclamar` (la misma transacción de la ficha), aplica
   `FichaMantenimiento.aplicar`, publica el reporte y los recordatorios en la Mesa y guarda (`opcionesGuardadoMapa`, compartida con
-  `bnOpcionesGuardado`). Ya no se carga la ficha en el marco invisible para eso; GM Tools sí, para los creeps (A2b).
+  `bnOpcionesGuardado`). Ya no se carga la ficha en el marco invisible para eso. **Los creeps tampoco** (A2b, 2026-10-02):
+  `mantenimientoCreeps(numero)` (js/12, solo el GM) toma los turnos con `CreepAcciones.reclamarMantenimiento` (`gm/mantenimiento`),
+  pasa el turno de cada creep de la partida con `modificarCreep` + `CreepAcciones.mantenimiento`, sube `gm/estado.turno` y anota en el
+  📜 Historial. El marco invisible del Mantenimiento (`mantenimientoEncolar`…) quedó sin uso: va a la limpieza (A′).

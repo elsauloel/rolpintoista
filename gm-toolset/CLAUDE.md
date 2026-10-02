@@ -408,3 +408,8 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
 - **"No vence" en las habilidades de creep** (2026-10-01, P137): el paso del estado del editor de habilidades suma la casilla
   `#hc-efecto-permanente` (`h.efectoPermanente`; se marca sola al elegir un preset que no vence, y una habilidad vieja sin el dato
   la muestra según su estado). El Excedente de vida que da una habilidad reemplaza al que tenía el creep (antes se sumaba).
+
+- **El Mantenimiento de un creep, en `comun/creep-acciones.js`** (2026-10-02, hoja de ruta A2b): `mantenimiento()` (`js/07`) usa
+  `CreepAcciones.mantenimiento(sc)` por cada creep y `gmMantenimientoRevisar` (`js/12`) `CreepAcciones.reclamarMantenimiento`. El mapa
+  ya no carga GM Tools en `?modo=mantenimiento`: pasa el turno de los creeps él mismo con la misma pieza (el modo queda sin uso, para la
+  limpieza).

@@ -944,6 +944,9 @@ versión parecida en más de una, es candidato a juntar.
   turnos de muerte, No2, invocaciones; deja `S.turno` y `S.log`; devuelve `{rep, avisos}`), `reclamar(db, rutaFicha, objetivo, marca)`
   (la transacción de `partes/mantenimiento`: cuántos turnos aplicar), `publicarReporte` y `publicarRecordatorios`. Lo usan la ficha
   (`js/11`, `js/14`) y el mapa (`mantenimientoPersonajes`). Necesita combatiente, ficha-calculo, ficha-botonera e inv-calculo.
+- **`CreepAcciones.mantenimiento(sc)` y `reclamarMantenimiento(db, ref, objetivo, marca)`** (2026-10-02, hoja de ruta A2b): el pase de
+  turno de un creep (copia textual de `mantenimiento()` de GM Tools, por creep) y la transacción de `gm/mantenimiento`. Lo usan GM Tools
+  (`js/07`, `js/12`) y el mapa del GM (`mantenimientoCreeps`).
 - **`duelo.js`: `hooksLocal` puede devolver una promesa** (2026-10-02): `enviar` la espera; si termina en null va por `relay` como
   siempre. Lo usa el mapa para leer al personaje la primera vez que el duelo le pide algo.
 - **Creep sin No2 para atacar** (2026-10-02, como con los personajes: avisar y dejar seguir): `CreepAcciones.faltanNitros(sc, tipo)`,

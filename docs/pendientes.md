@@ -78,7 +78,8 @@
    - [x] **6b. El editor de la ficha** (2026-10-02): `comun/ficha-editor.js`, un componente que usan la ficha (en su ventana de siempre) y el
      mapa (adentro de la Botonera nueva, sin la ficha escondida); también el ✚ Revivir y el ⚙ de un estado. Detalle y pruebas en
      [`plan-a6b-editor.md`](plan-a6b-editor.md).
-   - [ ] **6c. El editor de creeps** (GM Tools) en piezas comunes.
+   - [ ] **6c. El editor de creeps** (GM Tools) en piezas comunes: el editor de habilidades, Subir/Reemplazar y el editor de estados de un
+     creep. Por tandas, en [`plan-a6c-editor-creeps.md`](plan-a6c-editor-creeps.md) (ver su «▶ Para retomar»).
    - [ ] Después, la **limpieza** (A′): borrar el marco y lo que quedó sin uso.
 
 **A′. Limpieza: borrar el camino viejo (cuándo y cómo, criterio propuesto por el asistente, 2026-10-02; el dueño lo dejó a su criterio):**

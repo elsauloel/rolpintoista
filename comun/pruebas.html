@@ -75,6 +75,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
 <script src="creep-lupa.js"></script>
+<script src="ficha-lite.js"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -1110,6 +1111,52 @@ prueba('la marca ⚠️ no impide encontrar un ítem por nombre', () => {
   if(!marcado) return;   // sin ítems marcados no hay nada que probar
   const sinMarca = sinAviso(marcado.nombre);
   igual(ItemsSubidos.basadoEn({nombre: sinMarca, id: 'otro'}, CATALOGO_BASE), {id: 'base-' + marcado.id, nombre: marcado.nombre});
+});
+
+/* ---------- Ficha lite (comun/ficha-lite.js, 2026-10-02) ---------- */
+grupo('Ficha lite');
+prueba('personaje: manos, Defensa y resistencias con su origen (una pieza rota va tachada)', () => {
+  const S = fichaBotonera({inventario: [
+    {id: 'e', nombre: 'Espada', tipoItem: 'arma_1m', equipado: true, tipoDado: 8, peso: 2, mods: [{stat: 'pdg', val: 1}], efectosGolpe: [{nombre: 'Sangrado', caras: 3, exitos: 1}]},
+    {id: 'b', nombre: 'Broquel', tipoItem: 'escudo_1m', equipado: true, peso: 1, mods: [{stat: 'def', val: 2}]},
+    {id: 'c', nombre: 'Casco', tipoItem: 'cabeza', equipado: true, peso: 1, mods: [{stat: 'def', val: 1}, {stat: 'tipo3', val: 1}]},
+    {id: 'r', nombre: 'Peto roto', tipoItem: 'armadura_rigida', equipado: true, peso: 3, dur: 0, mods: [{stat: 'def', val: 3}]}],
+    efectos: [{id: 'x', nombre: 'Piel dura', polaridad: 'buff', turnos: 2, mods: [{stat: 'def', val: 1}]}]});
+  const m = FichaLite.personaje(S), c = FichaCalculo.calcular(S);
+  const roto = FichaCalculo.itemRoto(S.inventario[3]);
+  igual([m.manos[0].nombre, m.manos[1].nombre, m.defensa.valor, m.crit[2].valor, m.equipo.map(e => e.nombre), m.estados.map(e => e.nombre)],
+    ['Espada', 'Broquel', c.final.def, c.final.tipo3, ['Casco', 'Peto roto'], ['Piel dura']]);
+  const lin = m.defensa.lineas.map(l => l.txt + (l.tachado ? '~' : ''));
+  cierto(lin.includes('Broquel') && lin.includes('Casco') && lin.includes('Piel dura'), 'Defensa sin sus orígenes: ' + lin.join(', '));
+  if(roto) cierto(lin.includes('Peto roto (rota: no cuenta)~'), 'la pieza rota tendría que ir tachada');
+  cierto(m.manos[0].lineas.some(l => l.txt === 'Al golpear: Sangrado (33 %)'), 'falta el efecto al golpear');
+  cierto(m.crit[2].lineas.some(l => l.txt === 'Casco' && l.val === 1), 'la resistencia T8 tendría que venir del Casco');
+});
+prueba('personaje: un arma a dos manos ocupa la segunda; la suma de las líneas da el total', () => {
+  const S = fichaBotonera({inventario: [{id: 'g', nombre: 'Mandoble', tipoItem: 'arma_2m', equipado: true, tipoDado: 10, peso: 4, mods: []}]});
+  const m = FichaLite.personaje(S);
+  igual([m.manos[0].nombre, m.manos[1].detalle], ['Mandoble', 'ocupada (arma a dos manos)']);
+  const suma = x => x.lineas.filter(l => !l.tachado && l.val != null).reduce((a, l) => a + l.val, 0);
+  [m.defensa, ...m.crit].forEach(x => igual(suma(x), x.valor, 'la cuenta no cierra'));
+});
+prueba('creep: Defensa con base a mano, equipo, estados y Armadura rota; resistencias del equipo', () => {
+  const sc = creepPrueba({defensa: 5, crit: [0, 0, 2, 0, 0], armaEfectos: [{nombre: 'Envenenar', caras: 1, exitos: 1}],
+    equipo: [{nombre: 'Peto', tipoItem: 'armadura_rigida', def: 3, mods: [{stat: 'tipo3', val: 1}]}, {nombre: 'Rodela', tipoItem: 'escudo_1m', def: 1}],
+    estados: [{nombre: 'Armadura rota', armaduraRota: true, stacks: 2}, {nombre: 'Piel de escoria', mods: [{stat: 'def', val: 1}]}]});
+  const m = FichaLite.creep(sc);
+  igual([m.manos[0].nombre, m.manos[1].nombre, m.defensa.valor, m.crit[2].valor, m.equipo.map(e => e.nombre)],
+    ['Hacha', 'Rodela', CreepCalculo.defensaEfectiva(sc), CreepCalculo.critEfectivo(sc, 2), ['Peto']]);
+  igual(m.defensa.lineas.map(l => [l.txt, l.val]), [['Base (cargada a mano)', 1], ['Peto', 3], ['Rodela', 1], ['Armadura rota', -2], ['Piel de escoria', 1]]);
+  igual(m.crit[2].lineas.map(l => [l.txt, l.val]), [['Base (cargada a mano)', 1], ['Peto', 1]]);
+  cierto(m.manos[0].lineas.some(l => l.txt === 'Al golpear: Envenenar'), 'falta el efecto al golpear del arma');
+});
+prueba('invocación: arma, Defensa y estados; el HTML trae los tres orígenes y los botones', () => {
+  const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, armaNombre: 'Colmillo', armaTipo: 8, armaPeso: 2,
+    defensa: 2, crit: [1, 0, 0, 0, 0], estados: [{nombre: 'Veneno', polaridad: 'debuff', turnos: 3, stacks: 2, hpTurno: -1}]});
+  const m = FichaLite.invocacion(inv, 'Silvia');
+  igual([m.titulo, m.subtitulo, m.manos[0].nombre, m.defensa.valor, m.crit[0].valor, m.estados[0].datos], ['Lobo', 'Invocación · de Silvia', 'Colmillo', InvCalculo.defensaEfectiva(inv), 1, '×2 3t']);
+  const h = FichaLite.html(m, [{id: 'botonera', txt: '⚡ Botonera'}]);
+  cierto(/Resistencia a crítico de armas Tipo 4/.test(h) && /data-fl="botonera"/.test(h) && /Daña 2 HP en cada Mantenimiento/.test(h), 'falta algo en el HTML');
 });
 
 /* ---------- Resultado ---------- */

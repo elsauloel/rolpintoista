@@ -669,13 +669,15 @@ document.addEventListener('keydown', e => {
   // F (2026-09-26, pedido del dueño): abre el menú de la FICHA del token seleccionado (jugador: su personaje, o el principal si no hay selección; GM: la ficha del creep). Se cierra con F o con Esc.
   if((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey && fbMiembro){
     e.preventDefault();
+    if(flAbierta()){ cerrarFichaLite(); return; }   // F otra vez: se cierra la ficha lite (js/15)
     const tf = seleccion ? tokens.get(seleccion) : null;
-    if(soyGM){   // GM: la ficha editable del creep seleccionado
+    if(soyGM){   // GM: la ficha lite del creep seleccionado, o la de un personaje del que tiene 🎮 el control
       if(tf && tf.tipo === 'creep'){ if(tf.fichaId && creepsPub.has(tf.fichaId)) abrirFichaDeToken(tf); else toast('Ese token no está vinculado a un creep de GM Tools'); }
-      else toast('Seleccioná un creep para ver su ficha');
-    }else{   // jugador: SIEMPRE su ficha liviana (aunque tenga seleccionado el token de otro)
-      const propio = tf && tf.tipo === 'pj' && tf.fichaId && tf.duenoUid === fbUsuario.uid ? String(tf.fichaId).split(SEP_INVOCACION)[0] : fichaPrincipalId();
-      if(propio) abrirBotonera(propio, {tipo: 'abrir-ficha-mapa'}); else toast('No tenés un personaje para abrir');
+      else if(tf && tf.tipo === 'pj' && tf.fichaId && controloFicha(tf.fichaId)) abrirFichaDeToken(tf);
+      else toast('Seleccioná un creep (o un personaje del que tengas el control) para ver su ficha');
+    }else{   // jugador: su token seleccionado (personaje o invocación) o, si no, su personaje principal (aunque tenga seleccionado el de otro)
+      if(tf && tf.tipo === 'pj' && tf.fichaId && tf.duenoUid === fbUsuario.uid) abrirFichaDeToken(tf);
+      else{ const propio = fichaPrincipalId(); if(propio) abrirFichaLite({tipo: 'pj', fichaId: propio}); else toast('No tenés un personaje para abrir'); }
     }
     return;
   }

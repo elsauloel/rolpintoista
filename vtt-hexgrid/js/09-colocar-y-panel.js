@@ -689,6 +689,7 @@ function actualizarEscuchasCreeps(){
       e.sc = sc;
       renderPanel();
       if(ac && ac.creepId === id && !ac.host.hidden) acDibujar();   // ⚗ las Acciones nuevas de ese creep, al día
+      flCreepCambio(id);   // y su ficha lite, si está abierta (js/15)
     }, err => console.error('Error leyendo el creep:', err));
   });
 }

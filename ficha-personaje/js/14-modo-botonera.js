@@ -81,6 +81,13 @@ if(MODO_BOTONERA){
     }
     if(e.data.tipo === 'abrir-reroll' && fichaVivo && fichaVivo.cargada) abrirReroll();   // el 🪙 fijo del mapa
     if(e.data.tipo === 'abrir-ficha-mapa' && fichaVivo && fichaVivo.cargada) fichaMapaAbrir();   // el 📜 del token propio (o la tecla F)
+    if(e.data.tipo === 'abrir-stats' && fichaVivo && fichaVivo.cargada){   // 📊 de la ficha lite del mapa (2026-10-02)
+      document.querySelectorAll('.scrim.open').forEach(x => x.classList.remove('open'));
+      modoBotoneraInv = '';
+      renderAttrs();
+      $('#scrim-stats-mapa').classList.add('open');
+      botoneraAvisarMapa('botonera-lista');
+    }
     if(e.data.tipo === 'abrir-revivir' && fichaVivo && fichaVivo.cargada){   // el botón ✚ Revivir del mapa
       document.querySelectorAll('.scrim.open').forEach(x => x.classList.remove('open'));
       $('#btn-revivir').click();

@@ -470,6 +470,12 @@ const invHabUi = {
   parry: parryPendienteInv,
   dueloDisponible: () => invDueloDisponible(),
   elegirObjetivo: (inv, cfg) => Duelo.elegirObjetivo({yo: {ref: fichaVivo.id + '~' + inv.id, tipo: 'pj', nombre: inv.nombre}, ...cfg}),
+  // 4f (P134): zona persistente y trampa — el mismo camino que el personaje, a nombre de «fichaId~invId».
+  enMapa: () => window.parent !== window,
+  ref: inv => fichaVivo && fichaVivo.id ? fichaVivo.id + '~' + inv.id : '',
+  colocarZona: msg => { try{ MensajesMapa.alMapa(msg.tipo, msg); return true; }catch(err){ console.error('No se pudo avisar la zona al mapa:', err); return false; } },
+  colocarTrampa: (inv, h) => FichaAcciones.colocarTrampaDeHab(S, h, {yo: () => ({ref: invHabUi.ref(inv)}), enMapa: invHabUi.enMapa,
+    alMapa: (tipo, msg) => MensajesMapa.alMapa(tipo, msg), mesaHabilidad: (nombre, detalle) => mesaPublicarHabilidadInv(inv, nombre, detalle), toast: t => toast(t)}),
 };
 function invEjecutarHab(invId, habId){
   const inv = S.invocaciones.find(x => x.id === invId);

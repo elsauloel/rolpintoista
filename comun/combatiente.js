@@ -492,7 +492,6 @@ const Combatiente = (() => {
     if(!t) return 'todavía no tiene armada la ejecución paso a paso (✨)';
     if(quien === 'pj') return '';
     if(t === 'flash') return 'un ⚡ Flash se usa dentro del duelo, antes de una tirada';
-    if(t === 'zona' && quien === 'inv') return 'la zona persistente todavía no anda para invocaciones';
     return '';
   }
 

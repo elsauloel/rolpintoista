@@ -9,7 +9,10 @@
    `ui`. Las tiradas devuelven {origen, r} o {error}.
    ui = {mesaHabilidad(inv, nombre, detalle), mesaConTexto(texto), publicar(t), toast(t), cambio() (después de ejecutar: guardar y
      dibujar), cambiar(fn) (el Flash), parry (el Set del Parry pendiente), dueloDisponible(), elegirObjetivo(inv, cfg) (cfg =
-     {ataque, suelto}: el duelo a nombre de la invocación)}.
+     {ataque, suelto}: el duelo a nombre de la invocación), enMapa(), ref(inv) («fichaId~invId»), colocarZona(msg) → bool (la zona
+     persistente: el mensaje 'zona-persistente-habilidad' al mapa), colocarTrampa(inv, h) (la trampa de la habilidad)}.
+   Zona persistente y trampa (paso 4, etapa 4f, 2026-10-02, P134): como en el personaje — la trampa se coloca y la habilidad se
+   anuncia igual (la maneja un jugador); la zona tira una vez su stat y le pide al mapa el centro.
    Necesita comun/combatiente.js, inv-calculo.js, inv-acciones.js, inv-duelo.js, ficha-calculo.js (STAT_LABEL), ficha-botonera.js
    (modoHab), ficha-habilidades.js (presets), ficha-acciones.js (estadoDeSpec), confirmar-turno.js y tiradas.js.
    ========================================================= */
@@ -81,6 +84,19 @@ const InvHabilidades = (() => {
     if(r.que === 'acumulado') return `${e.nombre} ×${fmt(num(e.stacks))}`;
     return `${e.nombre}${r.que === 'renovado' ? ' renovado' : ''}${e.permanente ? ' (no vence)' : e.turnos ? ` (${fmt(e.turnos)} turno${e.turnos === 1 ? '' : 's'})` : ''}${e.escudoMagico ? `, 🛡${fmt(e.escudoMagico)}` : ''}`;
   }
+  // La zona persistente (4f): tira una vez su stat (si la Ejecución dice qué tira) y le manda al mapa el mensaje de siempre
+  // (comun/combatiente.js, zonaDeHab, a nombre de «fichaId~invId»). false = no se pudo (sin el mapa abierto).
+  function zona(inv, h, ui){
+    const c = h && h.duelo;
+    if(!c || typeof c !== 'object' || c.objetivo !== 'zona' || !ui.enMapa()) return false;
+    let resistValor = null;
+    if(c.tira){
+      const t = A().tirada(inv, `${h.nombre} · ${etq(c.tira)}`, I().statValor(inv, c.tira), c.tira);
+      if(!t.error){ resistValor = t.r.total; ui.publicar(t); }
+    }
+    try{ return ui.colocarZona(Combatiente.zonaDeHab(h, c, {fichaId: ui.ref(inv), tipo: 'pj', resistValor})) !== false; }
+    catch(err){ console.error('No se pudo avisar la zona al mapa:', err); return false; }
+  }
   // Un efecto del cuadro de Ejecución sobre la propia invocación: cura, o el estado armado igual que uno recibido.
   function aplicarSpec(inv, ef, presets){
     if(ef.cura){ inv.hp = Math.min(num(inv.hpMax) > 0 ? num(inv.hpMax) : Infinity, num(inv.hp) + num(ef.cura)); return `+${fmt(num(ef.cura))} HP`; }
@@ -112,23 +128,32 @@ const InvHabilidades = (() => {
         hpturno: num(h.efectoHpTurno)||0, permanente: Combatiente.efectoPermanente(h, FichaHabilidades.presetPorNombre(presets, nombre)), activo: true, stacks:1, stacksturno:0,
         polaridad: h.efectoPolaridad||'otro', mods: structuredClone(h.efectoMods||[])});
     }
-    let hDuelo = null, aplicadoDirecto = '', falta = '', esArma = false, sobreSi = false, hab = null;
+    let hDuelo = null, aplicadoDirecto = '', falta = '', esArma = false, sobreSi = false, hab = null, esZona = false, soloTrampa = false;
     if(modo === 'auto'){
-      // Lo que todavía no anda para invocaciones (la zona persistente — P134) se avisa y va como 💰.
-      falta = Combatiente.ejecucionNoDisponible(h.duelo, 'inv');
-      esArma = !falta && Combatiente.tipoEjecucion(h.duelo) === 'arma';   // ataque con arreglos: al duelo como un ataque
-      hab = falta || esArma ? null : habEjecucion(inv, h);
-      if(falta || esArma){ /* el aviso va al final, junto con lo que se cobró; el ataque, en terminar */ }
+      // ✨ que solo coloca una trampa (sin la Ejecución armada): la trampa y su anuncio los hace colocarTrampa, como el personaje.
+      soloTrampa = !!h.trampaColocar && !Combatiente.tipoEjecucion(h.duelo);
+      // Lo que todavía no anda para invocaciones se avisa y va como 💰.
+      falta = soloTrampa ? '' : Combatiente.ejecucionNoDisponible(h.duelo, 'inv');
+      esArma = !falta && !soloTrampa && Combatiente.tipoEjecucion(h.duelo) === 'arma';   // ataque con arreglos: al duelo como un ataque
+      esZona = !falta && !soloTrampa && Combatiente.tipoEjecucion(h.duelo) === 'zona';   // zona persistente (4f): queda puesta en el mapa
+      hab = falta || esArma || esZona || soloTrampa ? null : habEjecucion(inv, h);
+      if(falta || esArma || esZona || soloTrampa){ /* el aviso va al final, junto con lo que se cobró; el resto, en terminar */ }
       else if(Combatiente.sobreSiSinTiradas(hab)){
         sobreSi = true;
         aplicadoDirecto = hab.efectos.map(ef => aplicarSpec(inv, ef, presets)).join(' · ');
       }else if(dueloDisponible) hDuelo = hab;
     }
-    return {costo, costoHp, curaHp, efectoTxt, falta, esArma, sobreSi, hab, aplicadoDirecto, hDuelo};
+    return {costo, costoHp, curaHp, efectoTxt, falta, esArma, esZona, soloTrampa, sobreSi, hab, aplicadoDirecto, hDuelo};
   }
   function terminar(inv, h, p, ui){
+    if(h.trampaColocar && ui.colocarTrampa) ui.colocarTrampa(inv, h);   // 4f: como el personaje, se coloca y la habilidad sigue
     if(p.sobreSi) ui.mesaHabilidad(inv, h.nombre, [h.detalle || '', p.aplicadoDirecto ? '→ ' + p.aplicadoDirecto : '', p.hab.efectoLibre || '', p.hab.efectosNota || ''].filter(Boolean).join(' '));
     if(p.esArma) lanzarAtaque(inv, h, ui);
+    else if(p.soloTrampa){ /* el anuncio y la casilla ya los maneja colocarTrampa */ }
+    else if(p.esZona){
+      ui.mesaHabilidad(inv, h.nombre, h.detalle || h.efectoDetalle || '');
+      if(!zona(inv, h, ui)) ui.toast(`${h.nombre}: para colocar la zona hace falta tener el mapa abierto`);
+    }
     else if(p.hDuelo){
       ui.mesaHabilidad(inv, h.nombre, h.detalle || h.efectoDetalle || '');
       ui.elegirObjetivo(inv, {ataque: {tipo: 'habilidad', hab: p.hDuelo, alcance: p.hDuelo.alcance}, suelto: () => { const t = tiradaPrimera(inv, h); if(t) ui.publicar(t); }});
@@ -148,5 +173,5 @@ const InvHabilidades = (() => {
   }
 
   return {tira, anunciar, tiradaPrimera, tiradaSegunda, alcanceHab, habEjecucion, ataqueDeHab, tiradaPdgArreglos, lanzarAtaque,
-    usarFlashFuera, ponerEstado, aplicarSpec, ejecutar, terminar};
+    usarFlashFuera, ponerEstado, aplicarSpec, zona, ejecutar, terminar};
 })();

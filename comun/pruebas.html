@@ -372,7 +372,7 @@ prueba('trampa de una habilidad: sin nombre propio lleva el de la habilidad', ()
 prueba('creeps e invocaciones ya atacan con arreglos; a la invocación solo le falta la zona (P134)', () => igual(
   [Combatiente.ejecucionNoDisponible({modo: 'arma'}, 'pj'), Combatiente.ejecucionNoDisponible({modo: 'arma'}, 'creep'), Combatiente.ejecucionNoDisponible({modo: 'arma'}, 'inv'),
    Combatiente.ejecucionNoDisponible({modo: 'flash'}, 'inv') !== '', Combatiente.ejecucionNoDisponible({modo: 'flash'}, 'creep') !== '',
-   Combatiente.ejecucionNoDisponible({objetivo: 'zona'}, 'creep'), Combatiente.ejecucionNoDisponible({objetivo: 'zona'}, 'inv') !== '', Combatiente.ejecucionNoDisponible(null, 'pj') !== ''],
+   Combatiente.ejecucionNoDisponible({objetivo: 'zona'}, 'creep'), Combatiente.ejecucionNoDisponible({objetivo: 'zona'}, 'inv') === '', Combatiente.ejecucionNoDisponible(null, 'pj') !== ''],
   ['', '', '', true, true, '', true, true]));
 prueba('ataque con arreglos: mods por X, sin Parry, efectos y los de crítico, igual para personaje y creep', () => {
   const c = {modo: 'arma', arma: {pdg: 1, pdgPorX: 1, dadosPorX: 1, fijo: 2, sinParry: true, critBono: 1}, efectos: [{nombre: 'Rengo', turnos: 1}], efectosNota: 'Empuja X', critico: {efectosNota: 'Lisia X'}};
@@ -1052,6 +1052,20 @@ prueba('la 🔍 y el Ver de una invocación: costo de atacar, cooldown que falta
   const atq = InvLupa.contenido(inv, 'inv:i:atacar'), hab = InvLupa.contenido(inv, 'inv:i:hab:m'), ver = InvLupa.verHab(inv, inv.habilidades[1]);
   igual([atq.titulo, /4 No2/.test(atq.html), /lupa-falta/.test(atq.html), /faltan 1/.test(hab.html), ver.titulo, /sin cooldown/.test(ver.html), /Aúlla/.test(ver.html), InvLupa.contenido(null, 'inv:x:stat:con').html],
     ['Lobo · Atacar', true, true, true, 'Aullido', true, true, '']);
+});
+
+prueba('invocaciones (4f, P134): la ✨ de zona le pide el centro al mapa con su tirada; la trampa se coloca y la 💰 se anuncia igual', () => {
+  const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 3, nitros: 6, habilidades: [
+    {id: 'z', nombre: 'Niebla', modo: 'auto', nitrosCosto: 1, duelo: {objetivo: 'zona', tira: 'esp', radio: 2, zonaTurnos: 3, contra: ['resmg'], zonaEstado: {nombre: 'Veneno'}}},
+    {id: 't', nombre: 'Cepo', modo: 'semi', nitrosCosto: 1, tiradaExtra: '1d4', trampaColocar: {nombre: 'Cepo', dano: '1d6'}},
+    {id: 's', nombre: 'Pozo', modo: 'auto', nitrosCosto: 1, trampaColocar: {nombre: 'Pozo'}}]});
+  const reg = [], zonas = [];
+  const ui = {mesaHabilidad: (i, n) => reg.push('mesa ' + n), mesaConTexto: () => reg.push('texto'), publicar: t => reg.push(t.origen), toast: () => {}, cambio: () => {}, cambiar: fn => fn(),
+    parry: new Set(), dueloDisponible: () => true, elegirObjetivo: () => reg.push('duelo'), enMapa: () => true, ref: i => 'F~' + i.id,
+    colocarZona: msg => { zonas.push(msg); return true; }, colocarTrampa: (i, h) => reg.push('trampa ' + h.nombre)};
+  ['z', 't', 's'].forEach(id => { const h = inv.habilidades.find(x => x.id === id); InvHabilidades.terminar(inv, h, InvHabilidades.ejecutar(inv, h, estadosPresetFicha(), true), ui); });
+  igual([reg.filter(x => x !== 'texto'), zonas.map(z => [z.tipo, z.fichaId, z.casteadorTipo, z.radio, z.resistStat, typeof z.resistValor]), inv.nitros],
+    [['mesa Niebla', 'Lobo · Niebla · Esp', 'trampa Cepo', 'Lobo · Cepo', 'trampa Pozo'], [['zona-persistente-habilidad', 'F~i', 'pj', 2, 'resmg', 'number']], 3]);
 });
 
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */

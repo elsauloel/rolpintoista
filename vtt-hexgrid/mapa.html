@@ -937,7 +937,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
 <script src="../comun/plantillas.js?v=20260930b"></script>
 <script src="../comun/biblioteca.js?v=20260929i"></script>
 <script src="../comun/tokens-auto.js?v=20260930a"></script>
-<script src="../comun/combatiente.js?v=20261001a"></script>
+<script src="../comun/combatiente.js?v=20261002a"></script>
 <script src="../comun/creep-calculo.js?v=20261001b"></script>
 <script src="../comun/modificadores-tirada.js?v=20260930c"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
@@ -9133,7 +9133,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001c',
-  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/inv-calculo.js?v=20261001b', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/inv-duelo.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001h', '../comun/inv-habilidades.js?v=20261001a', '../comun/inv-lupa.js?v=20261001a',
+  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/inv-calculo.js?v=20261001b', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/inv-duelo.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001h', '../comun/inv-habilidades.js?v=20261002a', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
@@ -9323,7 +9323,7 @@ function bnInvAca(b){
 // nombre, guarda la parte `invocaciones` y el duelo va a nombre de `fichaId~invId`.
 function bnInvHabUi(){
   const u = bnUi(FichaGuardado.partes(bn.S));
-  return {
+  const ui = {
     mesaHabilidad: (inv, nombre, detalle) => {
       if(!fbDb || !fbUsuario || !fbMiembro) return;
       fbDb.collection(fbRutaCampana('tiradas')).add({
@@ -9345,7 +9345,14 @@ function bnInvHabUi(){
       dueloElegirObjetivoMapa({yo: {ref: bn.fichaId + SEP_INVOCACION + inv.id, tipo: 'pj', nombre: inv.nombre}, ataque: cfg.ataque,
         conSuelto: true, alSuelto: () => { reabrir(); cfg.suelto(); }, alCancelar: () => {}});
     },
+    // 4f (P134): zona persistente y trampa, directo (como el personaje de la Botonera nueva, bnAlMapa).
+    enMapa: () => true,
+    ref: inv => bn.fichaId + SEP_INVOCACION + inv.id,
+    colocarZona: msg => { bnAlMapa(msg.tipo, msg); return true; },
+    colocarTrampa: (inv, h) => FichaAcciones.colocarTrampaDeHab(bn.S, h, {yo: () => ({ref: bn.fichaId + SEP_INVOCACION + inv.id}), enMapa: () => true,
+      alMapa: (tipo, msg) => bnAlMapa(tipo, msg), mesaHabilidad: (nombre, detalle) => ui.mesaHabilidad(inv, nombre, detalle), toast: t => toast(t)}),
   };
+  return ui;
 }
 // Atacar con la invocación: el objetivo con un clic en el token (dueloElegirObjetivoMapa, a su nombre: `fichaId~invId`) y el
 // duelo; "Sin objetivo" (o sin duelo) cobra y tira el PdG acá.

@@ -84,33 +84,7 @@ const uid = () => Math.random().toString(36).slice(2,9);
 const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
 migrarEstadoIt2(S);   // no cambia nada (DEFAULT ya viene al día); queda por las dudas
 
-function fileToDataURL(file, maxDim=480, quality=0.85){
-  return new Promise((resolve, reject) => {
-    if(!file.type || !file.type.startsWith('image/')){ reject(new Error('no-image')); return; }
-    const reader = new FileReader();
-    reader.onerror = () => reject(reader.error);
-    reader.onload = () => {
-      const img = new Image();
-      img.onerror = () => reject(new Error('bad-image'));
-      img.onload = () => {
-        let w = img.naturalWidth, h = img.naturalHeight;
-        if(w > maxDim || h > maxDim){
-          if(w >= h){ h = Math.round(h * maxDim / w); w = maxDim; }
-          else { w = Math.round(w * maxDim / h); h = maxDim; }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#1A1418';
-        ctx.fillRect(0, 0, w, h);
-        ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', quality));
-      };
-      img.src = reader.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
+function fileToDataURL(file, maxDim=480, quality=0.85){ return FichaEditor.imagenADatos(file, maxDim, quality); }   // comun/ficha-editor.js (A6b)
 
 /* =========================================================
    CÁLCULO

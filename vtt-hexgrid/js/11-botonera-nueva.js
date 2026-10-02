@@ -173,7 +173,7 @@ function bnCargarPiezas(){
     bnCargando = cargarPiezas(BN_PIEZAS)
       // Lo que subió el grupo al catálogo (como la ficha): un consumible viejo busca ahí el estado que deja.
       .then(() => ItemsSubidos.cargar().then(l => { bnItemsSubidos = l || []; }))
-      .then(() => fetch('../ficha-personaje/ficha.css?v=20260930a').then(r => r.text()))
+      .then(() => fetch('../ficha-personaje/ficha.css?v=20261002a').then(r => r.text()))
       .then(css => { bnCss = css.replace(/:root\b/g, ':host'); })
       .catch(err => { bnCargando = null; throw err; });
   }

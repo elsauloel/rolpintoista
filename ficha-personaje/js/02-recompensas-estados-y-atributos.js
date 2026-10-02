@@ -350,12 +350,7 @@ function pct(v, max){ return max>0 ? Math.min(100, Math.max(0, v/max*100))+'%' :
 function fmt(n){ return Number.isInteger(n) ? n : Math.round(n*100)/100; }
 function esc(s){ return String(s??'').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])); }
 
-function statOptions(sel){
-  const opt = s => `<option value="${s.id}" ${sel===s.id?'selected':''}>${s.label} — ${s.full}</option>`;
-  return `<optgroup label="Atributos">${ATTR_LIST.map(opt).join('')}</optgroup>`
-       + GRUPOS.map(g => `<optgroup label="${g.label} · ${g.full}">${g.derived.map(opt).join('')}</optgroup>`).join('')
-       + `<optgroup label="Otros">${EXTRA.map(opt).join('')}</optgroup>`;
-}
+function statOptions(sel){ return FichaEditor.statOptions(sel); }   // comun/ficha-editor.js (A6b)
 
 function jobTag(i){
   if(i.job === false){
@@ -519,33 +514,9 @@ function alcanceDeArma(arma){ return FichaCombate.alcanceDeArma(S, arma); }   //
 // textos a mano llegan con la X ya sustituida.
 function habDueloDatos(it, xSp, xNitros){ return FichaAcciones.habDueloDatos(S, it, xSp, xNitros); }
 // Resumen de una ejecución paso a paso, en una línea (para el editor y la tarjeta).
-function resumenEjecucionHab(c){
-  if(!c || typeof c !== 'object') return '';
-  if(c.modo === 'arma') return 'ataque con tu arma';
-  if(c.modo === 'flash') return 'flash';
-  const OBJ = {enemigo: 'a un enemigo', aliado: 'a un aliado', 'uno mismo': 'sobre vos', area: 'en un área', onda: 'onda alrededor tuyo', zona: 'zona persistente'};
-  const tira = c.tiraFormula ? (c.tiraEtiqueta || 'tirada propia') : c.tira ? (STAT_LABEL[c.tira] || c.tira) : '';
-  const partes = [OBJ[c.objetivo] || c.objetivo || 'a un enemigo'];
-  if(tira) partes.push(`tira ${tira}${(c.contra || []).length ? ' contra ' + c.contra.map(s => STAT_LABEL[s] || s).join('/') : ''}`);
-  if(c.dano) partes.push('hace daño');
-  if((c.efectos || []).length) partes.push(c.efectos.map(e => e.nombre || (e.cura ? 'cura' : 'efecto')).join(', '));
-  return partes.join(' · ');
-}
-// Abre el cuadro que arma la ejecución paso a paso de una habilidad (comun/asistente-duelo-hab.js). Guardarla la deja
-// en ✨ Automático; sacarla la deja en 💰 Semiautomático.
-function abrirEjecucionHab(it, alTerminar){
-  AsistenteDueloHab.abrir({nombre: it.nombre || 'Habilidad', inicial: dueloDe(it) || null, siempreActivo: true, tieneFormula: !!String(it.tiradaExtra || '').trim(), costoVariable: spVariable(it) ? 'sp' : nitrosVariable(it) ? 'nitros' : '',
-    costoInicial: {sp: it.costo, nitrosCosto: it.nitrosCosto, hpCosto: it.hpCosto, turnoAjenoSp: it.turnoAjenoSp}, elegirEstado: elegirEstadoDuelo,
-    alGuardar: r => {
-      if(r){ it.duelo = r.duelo; it.costo = r.costo.sp; it.nitrosCosto = r.costo.nitrosCosto; it.hpCosto = r.costo.hpCosto; it.turnoAjenoSp = r.costo.turnoAjenoSp || ''; it.modo = 'auto'; it.automatizada = true; }
-      else{
-        if(it.habClaseId && (function(){ const base = CLASES_SKILLS.flatMap(c => c.habilidades).find(h => h.id === it.habClaseId); return base && base.duelo; })()) it.duelo = null;
-        else delete it.duelo;
-        if(modoHab(it) === 'auto' || it.modo === 'auto') it.modo = 'semi';
-      }
-      if(alTerminar) alTerminar(r);
-    }});
-}
+function resumenEjecucionHab(c){ return FichaEditor.resumenEjecucionHab(c); }   // comun/ficha-editor.js (A6b)
+// Abre el cuadro que arma la ejecución paso a paso de una habilidad (comun/asistente-duelo-hab.js), desde el editor común.
+function abrirEjecucionHab(it, alTerminar){ FichaEditor.abrirEjecucionHab(it, elegirEstadoDuelo, alTerminar); }
 // ✨ Automática, solo sobre uno mismo y sin tiradas (Blindaje y parecidos): se aplica directo, sin abrir el cuadro, y se anuncia
 // en la Mesa con lo que pasó. Devuelve false si no es ese caso (entonces sigue el cuadro de siempre).
 function aplicarHabSobreMiDirecto(it, h){ return FichaAcciones.aplicarHabSobreMiDirecto(S, it, h, habUi); }

@@ -188,11 +188,9 @@ $('#btn-vendedor').onclick = () => abrirVendedor();
 $('#presets-x').onclick = () => { if(presetDestino === 'duelo') cerrarPresetsDuelo(null); else $('#scrim-presets').classList.remove('open'); };
 $('#presets-personalizado').onclick = () => { const destino = presetDestino; $('#scrim-presets').classList.remove('open'); abrirAsistenteEstadoFicha(destino); };
 $('#scrim-presets').addEventListener('mousedown', e => { if(e.target.id === 'scrim-presets'){ if(presetDestino === 'duelo') cerrarPresetsDuelo(null); else $('#scrim-presets').classList.remove('open'); } });
-$('#tipoitem-x').onclick = () => $('#scrim-tipoitem').classList.remove('open');
-$('#scrim-tipoitem').addEventListener('mousedown', e => { if(e.target.id === 'scrim-tipoitem') $('#scrim-tipoitem').classList.remove('open'); });
+$('#tipoitem-x').onclick = () => cerrarTipoItem(null);
+$('#scrim-tipoitem').addEventListener('mousedown', e => { if(e.target.id === 'scrim-tipoitem') cerrarTipoItem(null); });
 document.addEventListener('click', e => {
-  if(e.target.closest('#item-efecto-preset-abrir')){ abrirPresetsEfecto('item'); return; }
-  if(e.target.closest('#tipoitem-abrir')){ abrirTipoItem(); return; }
   const presetVer = e.target.closest('[data-presetver]');
   if(presetVer){ verPresetEfecto(presetVer.dataset.presetver); return; }
   const presetEdit = e.target.closest('[data-presetedit]');
@@ -200,7 +198,7 @@ document.addEventListener('click', e => {
   const preset = e.target.closest('[data-preset]');
   if(preset && preset.closest('#presets-body')){ aplicarPresetEfecto(preset.dataset.preset); return; }
   const tipo = e.target.closest('[data-tipoitem]');
-  if(tipo){ aplicarTipoItem(tipo.dataset.tipoitem); return; }
+  if(tipo && tipo.closest('#tipoitem-body')){ cerrarTipoItem(tipo.dataset.tipoitem); return; }
 });
 $('#tienda-salir').onclick = () => salirDeLaTienda();
 $('#catalogo-orden').addEventListener('change', e => { catalogoOrden = e.target.value; renderCatalogoModal(); });
@@ -360,34 +358,34 @@ function cerrarPresetsDuelo(valor){
   if(resolver) resolver(valor);
 }
 
-function abrirTipoItem(){
-  const grupos = {armas:'Armas', escudos:'Escudos', defensa:'Defensa', consumibles:'Consumibles', otros:'Otros'};
-  const draft = editing && editing.draft;
-  let html = '';
-  Object.keys(grupos).forEach(g => {
-    const del = CATEGORIAS.filter(c => c.id && grupoCompraDe(c.id) === g);
-    if(!del.length) return;
-    html += `<div class="preset-grupo">${grupos[g]} · ${fmt(del.length)}</div>`;
-    html += `<div class="preset-grid">${del.map(c =>
-      `<button type="button" class="tipoitem-btn ${g} ${draft && draft.tipoItem === c.id ? 'activa' : ''}" data-tipoitem="${esc(c.id)}">${esc(c.label)}</button>`
-    ).join('')}</div>`;
+// La categoría de un ítem, para el editor común (comun/ficha-editor.js, A6b): la grilla en #scrim-tipoitem; resuelve el id elegido
+// (o null si se cerró sin elegir).
+let tipoItemResolver = null;
+function elegirTipoItemFicha(actual){
+  return new Promise(resolve => {
+    tipoItemResolver = resolve;
+    $('#tipoitem-body').innerHTML = FichaEditor.tipoItemHtml(actual);
+    $('#scrim-tipoitem').classList.add('open');
   });
-  $('#tipoitem-body').innerHTML = html;
-  $('#scrim-tipoitem').classList.add('open');
 }
-
-function aplicarTipoItem(id){
+function cerrarTipoItem(valor){
   $('#scrim-tipoitem').classList.remove('open');
-  if(!editing) return;
-  editing.draft.tipoItem = id;
-  // Un ítem nuevo que deja de ser consumible sigue en el asistente de ítems.
-  if(!editing.id && id !== 'consumibles' && (editing.key === 'inventario' || editing.key === 'catalogo')){
-    const {key, draft} = editing;
-    closeModal();
-    abrirAsistenteItem(key, null, {draft});
-    return;
-  }
-  drawEditor();
+  const r = tipoItemResolver;
+  tipoItemResolver = null;
+  if(r) r(valor);
+}
+// El estado de la lista para "estado al usar/consumir" de una habilidad o un ítem (editor común): la grilla de siempre, destino 'item'.
+let presetItemResolver = null;
+function elegirEstadoItemFicha(){
+  return new Promise(resolve => {
+    presetItemResolver = resolve;
+    abrirPresetsEfecto('item');
+  });
+}
+function resolverPresetItem(valor){
+  const r = presetItemResolver;
+  presetItemResolver = null;
+  if(r) r(valor);
 }
 
 function abrirPresetsEfecto(destino){
@@ -418,30 +416,16 @@ function abrirPresetsEfecto(destino){
 // mostrar nada de eso: abre y cierra el editor en el mismo tick, así el
 // navegador nunca llega a pintar el paso intermedio.
 function activarEfectoPreset(preset){
-  openEditor('efectos', null);
   const {nombre, ...resto} = preset;
-  Object.assign(editing.draft, structuredClone(resto));
-  editing.draft.nombre = nombre;
-  const draft = editing.draft;
-  closeModal();
+  const draft = Object.assign(FichaEditor.borrador(null), structuredClone(resto));
+  draft.nombre = nombre;
   agregarEstadoConAviso(S.efectos, draft, '');
   renderList('efectos');
   refresh();
 }
 // Ponerle un estado al personaje o a una invocación: inmunidades, acumulación (Armadura rota, Veneno, Sangrado, Escarcha) y
 // renovación de uno igual son la regla común (comun/combatiente.js, agregarEstado). Devuelve el resultado.
-function agregarEstadoConAviso(lista, nuevo, quien){
-  const r = Combatiente.agregarEstado(lista, nuevo);
-  const q = quien ? quien + ': ' : '';
-  if(!r.ok){ toast(`🛡 ${q}inmune ahora mismo (${r.motivo}) — ${nuevo.nombre} no se pudo aplicar`); return r; }
-  if(r.que === 'yaLoTiene'){ toast(`${q}${nuevo.nombre}: ya lo tiene, no se acumula`); return r; }
-  const e = r.estado;
-  const txt = r.que === 'acumulado'
-    ? (e.esEscarcha ? `${e.nombre} ×${e.stacks} (−${e.stacks} No2 máx.)` : e.esSangrado ? `${e.nombre}: +1 al daño por turno (${fmt(Math.abs(num(e.hpturno)) * num(e.stacks))} ahora)` : `${e.nombre} ×${e.stacks}`)
-    : r.que === 'renovado' ? `${e.nombre} renovado (ya lo tenía)` : `${e.nombre} activado`;
-  toast(q + txt);
-  return r;
-}
+function agregarEstadoConAviso(lista, nuevo, quien){ return FichaEditor.agregarEstadoConAviso(lista, nuevo, quien, toast); }   // comun/ficha-editor.js (A6b)
 
 // Menú paso a paso para crear un estado alterado de cero (comun/asistente-estado.js): reemplaza al botón "Estado personalizado"
 // que abría el formulario completo (el formulario sigue disponible desde el último paso). destino: 'directo' (el personaje) o 'inv'.
@@ -487,7 +471,7 @@ function aplicarPresetEfecto(valor){
     return;
   }
   $('#scrim-presets').classList.remove('open');
-  if(!valor) return;
+  if(!valor){ if(presetDestino === 'item') resolverPresetItem(null); return; }
   const [tipo, idx] = valor.split(':');
   const preset = (tipo === 'std' ? EFECTOS_PRESET : (S.efectosPersonalizados || []))[+idx];
   if(!preset) return;
@@ -500,22 +484,10 @@ function aplicarPresetEfecto(valor){
   }
   if(!editing) return;
   if(presetDestino === 'item'){
-    // Un preset estándar pregunta sus cantidades (HP, escudo, stacks, bonos, turnos / sin límite) y las guarda en la habilidad/ítem.
-    const cargar = p => {
-      const d = editing.draft;
-      d.efectoNombre = preset.nombre;
-      d.efectoTurnos = p.turnos ?? 0;
-      d.efectoHpTurno = p.hpturno ?? 0;
-      d.efectoPermanente = !!p.permanente;
-      d.efectoEscudo = num(p.escudoMagico);
-      d.efectoStacks = num(p.stacks) > 1 ? num(p.stacks) : 1;
-      if(tipo === 'std' && (p.mods || []).some(m => m && m.stat)) d.efectoMods = structuredClone(p.mods.filter(m => m && m.stat));
-      if(preset.detalle && !(d.efectoDetalle || '').trim()) d.efectoDetalle = preset.detalle;
-      drawEditor();
-    };
-    const ed = editing;
-    if(tipo === 'std') EstadoPreguntas.pedir(preset, CFG_PREGUNTAS_FICHA).then(armado => { if(armado && editing === ed) cargar(armado); });
-    else cargar(preset);
+    // Un preset estándar pregunta sus cantidades (HP, escudo, stacks, bonos, turnos / sin límite); el editor común las carga.
+    const armar = p => ({nombre: preset.nombre, armado: p, estandar: tipo === 'std', detalle: preset.detalle});
+    if(tipo === 'std') EstadoPreguntas.pedir(preset, CFG_PREGUNTAS_FICHA).then(armado => resolverPresetItem(armado ? armar(armado) : null));
+    else resolverPresetItem(armar(preset));
     return;
   }else{
     const {nombre, ...resto} = preset;
@@ -533,7 +505,7 @@ function optgroupsEfectosPresetHtml(){
   }).join('');
 }
 
-let editing = null;
+// `editing` (el borrador abierto del editor) lo define js/10 sobre el editor común (comun/ficha-editor.js, A6b).
 
 let viewing = null;
 

@@ -632,3 +632,12 @@ resuelven a mano, como el resto de los avisos).
   como los mágicos, arranca con «Ignora la Defensa» tildado (un gas pasa la armadura; se puede destildar). Abierto: en un duelo, el daño
   de habilidad que ignora la Defensa se reduce con la **Armadura mágica** del objetivo — ¿también el tóxico, o lo frena otra cosa
   (Inmunidad a veneno, Constitución…)? En las zonas persistentes hoy no resta Armadura mágica (ningún tipo).~~
+
+- **P143. Zonas persistentes de habilidad (Pedos Tóxicos): ¿la fuerza de la nube se decide al lanzarla o en cada exposición? Y las
+  peculiaridades del daño tóxico (2026-10-02, abierta a pedido del dueño para que la discutan Enro y Seba — también va en la pestaña
+  💬 Preguntas de las Herramientas de diseño).** (1) a) **Al lanzarla**: una tirada al crear la zona, el mismo número para todos los que
+  entren durante sus turnos; b) **en cada exposición**: la habilidad no falla (la nube aparece siempre) y cada vez que afecta a alguien (al
+  entrar o en cada Mantenimiento) se tira de nuevo el stat de quien la lanzó (con el valor que tenía al lanzarla) contra la resistencia de
+  ese alguien. **Mientras se decide, quedó armado como (b)** (2026-10-02). ¿Vale igual para todas las zonas de habilidad o depende de cada
+  una? (2) Daño tóxico: hoy va directo a la vida por defecto (se puede destildar) y lo reduce la Armadura mágica (P142). ¿La Inmunidad a
+  veneno lo anula? ¿Algo más lo frena (Constitución, una máscara…)? ¿Otra peculiaridad frente al arcano (acumular, dejar Veneno…)?

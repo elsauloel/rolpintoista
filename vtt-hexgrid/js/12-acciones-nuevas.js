@@ -481,7 +481,7 @@ function cerrarAccionesNuevas(){
    El ✎ Editar del Ver de una habilidad se lo pedía a GM Tools escondido. Ahora es el editor común (comun/creep-editor.js: el mismo paso
    a paso, con la trampa y la Ejecución ✨), adentro del recuadro de las Acciones nuevas; guarda con modificarCreep (acCambiarCreep). Los
    estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
-const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261002e', '../comun/asistente-duelo-hab.js?v=20261002j'];
+const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261002f', '../comun/asistente-duelo-hab.js?v=20261002j'];
 // Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
 const ACE_BASE = ['../comun/creeps-base.js?v=20260927a', '../comun/skills-creep-base.js?v=20260927a'];
 async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }
@@ -522,8 +522,7 @@ async function abrirEditarEstadoCreepMapa(creepId, nombre){
       alCerrar: () => cerrarSiSoloEstado(),
       personalizados: () => PresetsGM.lista(),   // los "Mis presets" del GM (comun/presets-gm.js, B-7b)
       guardarPresets: lista => PresetsGM.guardar(lista),
-    }, {id: 'scrim-estado-creep'});
-    ['click', 'change', 'input'].forEach(ev => ac.editorEstado.scrim.addEventListener(ev, e => e.stopPropagation()));
+    });
   }
   const sc = acCreepDe(creepId), es = sc && (sc.estados || []).find(x => x && x.nombre === nombre);
   if(!es){ toast('No encontré ese estado en el creep'); cerrarSiSolo(); return; }
@@ -600,8 +599,6 @@ document.addEventListener('keydown', e => {
   if(e.key !== 'Escape') return;
   e.preventDefault();
   const abiertos = [...ac.raiz.querySelectorAll('.scrim.open')], cartel = abiertos[abiertos.length - 1];   // el de más arriba
-  if(cartel && ac.editor && cartel === ac.editor.scrim){ ac.editor.cerrar(); return; }
-  if(cartel && ac.editorEstado && cartel === ac.editorEstado.scrim){ ac.editorEstado.cerrar(); return; }
   if(cartel && cartel.id === 'ac-vercreep'){ acVerCreepCerrar(); return; }
   if(cartel){ cartel.classList.remove('open'); acObjetivoPendiente = null; return; }
   cerrarAccionesNuevas();

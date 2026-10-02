@@ -1185,24 +1185,25 @@ prueba('editor de un estado de creep (comun/creep-editor.js): un preset nuevo se
   const sc = creepPrueba({id: 'k', estados: [{id: 'e1', nombre: 'Furia', turnos: 2, stacks: 1, hpTurno: 0, activo: true, mods: []}]}), avisos = [];
   const caja = document.createElement('div'); caja.style.cssText = 'position:absolute;left:-9999px'; document.body.appendChild(caja);
   const ed = CreepEditor.crearEstado(caja, {creep: () => sc, guardar: (id, aplicar) => aplicar(sc), toast: m => avisos.push(m)});
-  const q = s => ed.scrim.querySelector(s);
-  // uno nuevo desde un preset de la lista (Veneno)
+  const q = s => ed.raiz.querySelector(s), ir = id => ed.raiz.querySelector(`[data-pap-paso="${['que', 'dura', 'vida', 'numeros', 'resumen'].indexOf(id)}"]`).click();
+  // uno nuevo desde un preset de la lista (Veneno), en la ventana común paso a paso
   ed.abrir('k', null);
+  const pestanas = [...ed.raiz.querySelectorAll('[data-pap-paso]')].map(b => b.textContent.replace(/^\d+\. /, ''));
   const sel = q('[data-ec="preset"]'), opt = [...sel.options].find(o => o.textContent === 'Veneno');
   sel.value = opt.value; sel.dispatchEvent(new Event('change', {bubbles: true}));
-  const presetsVisibles = q('[data-ec="presets-caja"]').style.display;
-  q('[data-ec="guardar"]').dispatchEvent(new MouseEvent('click', {bubbles: true})); await new Promise(r => setTimeout(r, 0));
-  // editar Furia: 5 turnos y un +1 Fuerza
+  ir('resumen'); const presetsVisibles = q('[data-ec="presets-caja"]').style.display;
+  q('[data-pap="crear"]').click(); await new Promise(r => setTimeout(r, 0));
+  // editar Furia: 5 turnos y un +1 Fuerza (Guardar está siempre)
   ed.abrir('k', 'e1');
-  const t = q('[data-ec="turnos"]'); t.value = '5';
-  q('[data-ec="addmod"]').dispatchEvent(new MouseEvent('click', {bubbles: true}));
+  ir('dura'); const t = q('[data-ec="turnos"]'); t.value = '5';
+  ir('numeros'); q('[data-ec="addmod"]').dispatchEvent(new MouseEvent('click', {bubbles: true}));
   const st = q('[data-ecmodstat="0"]'); st.value = 'fue'; st.dispatchEvent(new Event('change', {bubbles: true}));
   const vl = q('[data-ecmodval="0"]'); vl.value = '1'; vl.dispatchEvent(new Event('input', {bubbles: true}));
-  q('[data-ec="guardar"]').dispatchEvent(new MouseEvent('click', {bubbles: true})); await new Promise(r => setTimeout(r, 0));
+  q('[data-pap="guardar"]').click(); await new Promise(r => setTimeout(r, 0));
   caja.remove();
   const veneno = sc.estados.find(e => e.nombre === 'Veneno'), furia = sc.estados.find(e => e.id === 'e1');
-  igual([presetsVisibles, !!veneno, veneno && veneno.esVeneno, furia.turnos, furia.mods, avisos, ed.scrim.classList.contains('open')],
-    ['none', true, true, 5, [{stat: 'fue', val: 1}], ['Orco: Veneno activado', 'Furia guardado'], false]);
+  igual([pestanas, presetsVisibles, !!veneno, veneno && veneno.esVeneno, furia.turnos, furia.mods, avisos, ed.raiz],
+    [['Qué es', 'Duración', 'Vida', 'Números', 'Resumen'], 'none', true, true, 5, [{stat: 'fue', val: 1}], ['Orco: Veneno activado', 'Furia guardado'], null]);
 });
 prueba('habilidades de la biblioteca para un creep: lo subido va tal cual (con id nuevo y su origen); reemplazar pisa en el mismo lugar', () => {
   const sc = creepPrueba({nivel: 2, habilidades: [{id: 'a', nombre: 'Uno'}, {id: 'b', nombre: 'Dos'}]});

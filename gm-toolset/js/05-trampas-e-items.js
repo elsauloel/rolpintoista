@@ -426,15 +426,14 @@ function abrirVerEstadoCreep(scId, esId){
   $('#scrim-ver-estado').classList.add('open');
 }
 
-// El editor de un estado de creep es común (comun/creep-editor.js, A6c, 2026-10-02): GM Tools lo arma en su ventana de siempre
-// (#scrim-estado-creep, la crea el componente), con sus "Mis presets".
+// El editor de un estado de creep es común (comun/creep-editor.js, A6c, 2026-10-02), en la ventana común paso a paso, con sus "Mis presets".
 const editorEstadoCreep = CreepEditor.crearEstado(document.body, {
   creep: scId => S.creeps.find(s => s.id === scId),
   guardar: (scId, aplicar) => { const sc = S.creeps.find(s => s.id === scId); if(sc){ aplicar(sc); renderAll(); } },
   personalizados: () => (S.estadosPersonalizados = S.estadosPersonalizados || []),
   guardarPresets: lista => { S.estadosPersonalizados = lista; PresetsGM.guardar(lista); },   // en la partida (comun/presets-gm.js)
   toast: m => toast(m),
-}, {id: 'scrim-estado-creep'});
+});
 // esId vacío = un estado nuevo; inicial = lo del asistente de estados ("formulario completo").
 function abrirEditorEstadoCreep(scId, esId, inicial){ editorEstadoCreep.abrir(scId, esId, inicial); }
 

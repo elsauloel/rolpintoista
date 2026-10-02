@@ -555,7 +555,9 @@ const CreepEditor = (() => {
   /* ---------- El editor de un estado de un creep (tanda c3, 2026-10-02) ----------
      Copiado de gm-toolset (js/05: abrirEditorEstadoCreep, actualizarBotonesPresetEc, renderEcMods, forzarNitrosDelEditor,
      guardarEditorEstadoCreep; js/03: textoEstadoAgregado; js/10: sus manejadores) y la ventana #scrim-estado-creep (ids → data-ec).
-     crearEstado(contenedor, ctx, {id}) → {abrir(scId, esId, inicial), cerrar, scrim}. `ctx`: creep(scId), guardar(scId, aplicar) (aplicar(sc)
+     Desde 2026-10-02 (tanda 6 de docs/plan-paso-a-paso.md) en la ventana común paso a paso: Qué es · Duración · Vida · Números · Resumen.
+     crearEstado(contenedor, ctx) → {abrir(scId, esId, inicial), cerrar, raiz, estado}. `contenedor`: donde va la ventana (document.body, o el
+     recuadro aislado del mapa). `ctx`: creep(scId), guardar(scId, aplicar) (aplicar(sc)
      cambia el creep; puede devolver una promesa), toast, confirmar?, alCerrar?, y — solo si la pantalla guarda "Mis presets" — personalizados() y
      guardarPresets(lista) (sin eso, los botones de preset personalizado no aparecen). `inicial` = lo que trae el asistente de estados
      ("formulario completo"): {nombre, detalle, turnos, permanente, hp, escudo, mods, polaridad, flags, forzarNitros}. */
@@ -571,53 +573,62 @@ const CreepEditor = (() => {
     }
     return r.que === 'renovado' ? `${x.nombre} renovado (ya lo tenía)` : `${x.nombre} activado`;
   }
-  const PANTALLA_ESTADO = `
-  <div class="modal" style="max-width:420px">
-    <header><h3>Estado alterado</h3><button class="iconbtn" data-ec="x">Cerrar</button></header>
-    <div class="body" style="display:flex;flex-direction:column;gap:10px">
-      <div class="f"><label>Preset</label><select data-ec="preset"></select></div>
+  // Los bloques de cada paso del editor de un estado (2026-10-02, tanda 6 de docs/plan-paso-a-paso.md): la ventana, las pestañas y los botones
+  // son de la ventana común (comun/paso-a-paso.js); cada paso muestra su bloque tal cual, así lo escrito se conserva al ir y volver.
+  const BLOQUES_ESTADO = `
+    <div class="ec-paso" data-ec-paso="que" style="display:flex;flex-direction:column;gap:10px">
+      <div class="f"><label>Preset (opcional: carga sus números)</label><select data-ec="preset"></select></div>
       <div class="f"><label>Nombre</label><input type="text" data-ec="nombre" placeholder="ej. Veneno"></div>
-      <div class="f"><label>Detalle (opcional)</label><input type="text" data-ec="detalle"></div>
+      <div class="f"><label>Qué hace (en palabras, opcional)</label><input type="text" data-ec="detalle"></div>
+    </div>
+    <div class="ec-paso" data-ec-paso="dura" style="display:flex;flex-direction:column;gap:10px">
+      <div class="mini-f" style="max-width:220px"><label>Turnos restantes</label><input type="number" data-ec="turnos" min="0" value="1"></div>
+      <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" data-ec="permanente" style="width:auto">
+        <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Permanente (no vence)</span>
+      </label>
+      <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" data-ec="activo" checked style="width:auto">
+        <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Activo (si no, queda en la lista sin hacer efecto)</span>
+      </label>
+    </div>
+    <div class="ec-paso" data-ec-paso="vida">
       <div class="row3" style="grid-template-columns:1fr 1fr">
-        <div class="mini-f"><label>Turnos restantes</label><input type="number" data-ec="turnos" min="0" value="1"></div>
         <div class="mini-f"><label>HP por turno (por stack)</label><input type="number" data-ec="hpturno" value="0"></div>
         <div class="mini-f"><label>Stacks</label><input type="number" data-ec="stacks" min="1" value="1"></div>
         <div class="mini-f"><label>Stacks por turno</label><input type="number" data-ec="stacksturno" value="0"></div>
         <div class="mini-f"><label>Escudo especial (HP secundario, se recarga cada Mantenimiento)</label><input type="number" data-ec="escudomagico" min="0" value="0"></div>
       </div>
-      <div style="display:flex;gap:16px">
-        <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:none">
-          <input type="checkbox" data-ec="activo" checked style="width:auto">
-          <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Activo</span>
-        </label>
-        <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:none">
-          <input type="checkbox" data-ec="permanente" style="width:auto">
-          <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Permanente (no vence)</span>
-        </label>
-      </div>
+    </div>
+    <div class="ec-paso" data-ec-paso="numeros">
       <div class="est-mods">
         <div class="est-mods-label">Modificadores de atributo</div>
         <div data-ec="mods-lista"></div>
         <button type="button" class="addmod-mini" data-ec="addmod">+ Modificador de atributo</button>
-        <div class="hint" style="margin-top:5px">Cada modificador suma o resta a un atributo mientras el estado esté activo: uno principal (Fuerza, Destreza, Agilidad…) o uno secundario (PdG, Evasión, Defensa, No2…). Ej.: +2 Fuerza durante los turnos que dure, o −1 PdG.</div>
       </div>
+    </div>
+    <div class="ec-paso" data-ec-paso="resumen" style="display:flex;flex-direction:column;gap:10px">
+      <div class="resumen-hab" data-ec="resumen"></div>
       <div data-ec="presets-caja" style="border-top:1px dashed var(--line-soft);padding-top:8px">
         <button type="button" class="addmod-mini" data-ec="guardarpreset">☆ Guardar como preset personalizado</button>
         <button type="button" class="addmod-mini" data-ec="borrarpreset" style="margin-top:5px;color:var(--danger);display:none">Borrar preset personalizado</button>
       </div>
-    </div>
-    <footer>
-      <button class="btn ghost" data-ec="cancelar">Cancelar</button>
-      <button class="btn primary" data-ec="guardar">Guardar</button>
-    </footer>
-  </div>`;
-  function crearEstado(contenedor, ctx, {id} = {}){
-    const scrim = document.createElement('div');
-    scrim.className = 'scrim';
-    if(id) scrim.id = id;
-    scrim.innerHTML = PANTALLA_ESTADO;
-    contenedor.appendChild(scrim);
-    const $e = n => scrim.querySelector(`[data-ec="${n}"]`);
+    </div>`;
+  const PASOS_ESTADO = [
+    {id: 'que', corto: 'Qué es', ayuda: '<b>¿Qué estado es?</b> Elegí uno de la lista (carga sus números) o completalo a mano.'},
+    {id: 'dura', corto: 'Duración', ayuda: '<b>¿Cuánto dura?</b> Cada ⟳ Mantenimiento descuenta un turno. Permanente: no vence solo.'},
+    {id: 'vida', corto: 'Vida', ayuda: '<b>¿Toca la vida?</b> HP por turno: negativo daña, positivo cura; se multiplica por los stacks. El escudo absorbe el daño antes que la vida.'},
+    {id: 'numeros', corto: 'Números', ayuda: '<b>¿Cambia algún número?</b> Suma o resta a un atributo (o al No2 máximo) mientras esté activo: +2 Fuerza, −1 Agilidad…'},
+    {id: 'resumen', corto: 'Resumen', ayuda: '<b>Así queda.</b>'},
+  ];
+  function crearEstado(contenedor, ctx){
+    const cajaBloques = document.createElement('div');
+    cajaBloques.innerHTML = BLOQUES_ESTADO;
+    const bloques = {};
+    cajaBloques.querySelectorAll('.ec-paso').forEach(b => { bloques[b.dataset.ecPaso] = b; });
+    const todos = Object.values(bloques);
+    const $e = n => { for(const b of todos){ const x = b.querySelector(`[data-ec="${n}"]`); if(x) return x; } return null; };
+    let pap = null;   // la ventana abierta (comun/paso-a-paso.js)
     const toast = m => ctx.toast(m);
     const confirmar = t => (ctx.confirmar || (x => confirm(x)))(t);
     const FLAGS = CreepAcciones.FLAGS_ESTADO;
@@ -687,9 +698,41 @@ const CreepEditor = (() => {
       }
       renderMods();
       botonesPreset();
-      scrim.classList.add('open');
+      const inicialPantalla = JSON.stringify(datosDePantalla()), nuevo = !esId;
+      if(pap){ const v = pap; pap = null; v.cerrar(); }
+      pap = PasoAPaso.abrir({
+        titulo: () => nuevo ? `Nuevo estado · ${sc.nombre || 'creep'}` : `Editar estado · ${$e('nombre').value.trim() || 'estado'}`, crear: nuevo, contenedor, z: 85,
+        textoCrear: '✔ Aplicar el estado',
+        pasos: PASOS_ESTADO.map(x => ({id: x.id, nombre: x.corto, ayuda: x.ayuda, html: () => {
+          if(x.id === 'resumen') $e('resumen').innerHTML = resumenHtml();
+          bloques[x.id].hidden = false;
+          return bloques[x.id];
+        }, alMontar: () => { if(x.id === 'que') setTimeout(() => $e('nombre').focus(), 30); }})),
+        alClic: clic, alCambio: alCambio, alInput: alInput,
+        alTecla: ev => {
+          const t = ev.composedPath ? ev.composedPath()[0] : ev.target;
+          if(ev.key !== 'Enter' || !t || t.tagName !== 'INPUT') return;
+          ev.preventDefault();
+          if(pap.paso() < PASOS_ESTADO.length - 1) pap.irA(pap.paso() + 1);
+        },
+        confirmarCancelar: () => JSON.stringify(datosDePantalla()) === inicialPantalla ? '' : (nuevo ? '¿Cancelar? El estado que estás armando se descarta.' : '¿Descartar los cambios de este estado?'),
+        alGuardar: () => guardar(), alCrear: () => guardar(),
+        alCancelar: () => cerrar(),
+      });
     }
-    function cerrar(){ ed = null; scrim.classList.remove('open'); if(ctx.alCerrar) ctx.alCerrar(); }
+    function cerrar(){
+      ed = null;
+      if(pap){ const v = pap; pap = null; v.cerrar(); }
+      if(ctx.alCerrar) ctx.alCerrar();
+    }
+    function resumenHtml(){
+      const d = datosDePantalla(), fila = (t, v) => `<div class="resumen-fila"><span>${t}</span><b>${v}</b></div>`;
+      const mods = d.mods.filter(m => m && num(m.val)).map(m => `${num(m.val) > 0 ? '+' : ''}${fmt(num(m.val))} ${esc(m.stat === 'nitros' ? 'No2 máx.' : ATTR_LABELS[m.stat] || m.stat)}`).join(' · ');
+      return fila('Nombre', esc(d.nombre)) + fila('Dura', d.permanente ? 'no vence' : `${fmt(d.turnos)} turno(s)`)
+        + (d.hpTurno ? fila('HP por turno', fmt(d.hpTurno) + (d.stacks > 1 ? ` × ${fmt(d.stacks)} stacks` : '')) : '')
+        + (d.escudoMagico ? fila('Escudo', fmt(d.escudoMagico) + ' HP') : '') + (mods ? fila('Números', mods) : '') + (d.activo ? '' : fila('Activo', 'no'))
+        + (d.detalle ? `<p class="hint" style="margin-top:8px">${esc(d.detalle)}</p>` : '');
+    }
     function datosDePantalla(){
       const datos = {
         nombre: $e('nombre').value.trim() || 'Sin nombre',
@@ -711,7 +754,7 @@ const CreepEditor = (() => {
     async function guardar(){
       if(!ed) return;
       const datos = datosDePantalla(), {scId, esId} = ed, nombre = datos.nombre;
-      cerrar();
+      cerrar();   // (la ventana se cierra sola: alGuardar/alCrear no devuelven false)
       let aviso = '';
       await ctx.guardar(scId, sc => {
         if(esId){
@@ -731,15 +774,13 @@ const CreepEditor = (() => {
       if(aviso) toast(aviso);
     }
 
-    scrim.addEventListener('click', ev => {
+    function clic(ev){
       const t = ev.composedPath ? ev.composedPath()[0] : ev.target;
       if(!t || !t.closest || !ed) return;
       const rm = t.closest('[data-ecmodrm]');
       if(rm){ mods.splice(+rm.dataset.ecmodrm, 1); renderMods(); return; }
       const b = t.closest('[data-ec]'), a = b && b.dataset.ec;
-      if(a === 'guardar') guardar();
-      else if(a === 'cancelar' || a === 'x') cerrar();
-      else if(a === 'addmod'){ mods.push({stat:'con', val:0}); renderMods(); }
+      if(a === 'addmod'){ mods.push({stat:'con', val:0}); renderMods(); }
       else if(a === 'guardarpreset' && conPresets){
         const nombre = $e('nombre').value.trim();
         if(!nombre){ toast('Poné un nombre antes de guardar el preset'); return; }
@@ -761,19 +802,18 @@ const CreepEditor = (() => {
         toast('Preset borrado');
         botonesPreset();
       }
-    });
-    scrim.addEventListener('mousedown', ev => { if((ev.composedPath ? ev.composedPath()[0] : ev.target) === scrim) cerrar(); });
-    scrim.addEventListener('change', ev => {
+    }
+    function alCambio(ev){
       const t = ev.composedPath ? ev.composedPath()[0] : ev.target;
       if(t && t.dataset && t.dataset.ecmodstat !== undefined) mods[+t.dataset.ecmodstat].stat = t.value;
-    });
-    scrim.addEventListener('input', ev => {
+      if(t && t.dataset && t.dataset.ec === 'preset') elegirPreset(t);
+    }
+    function alInput(ev){
       const t = ev.composedPath ? ev.composedPath()[0] : ev.target;
       if(t && t.dataset && t.dataset.ecmodval !== undefined) mods[+t.dataset.ecmodval].val = num(t.value);
-    });
-    $e('nombre').addEventListener('input', botonesPreset);
-    $e('preset').addEventListener('change', ev => {
-      const t = ev.composedPath ? ev.composedPath()[0] : ev.target;
+      if(t && t.dataset && t.dataset.ec === 'nombre') botonesPreset();
+    }
+    function elegirPreset(t){
       if(!t.value) return;
       const [tipo, idx] = t.value.split(':');
       const preset = (tipo === 'std' ? estadosPresetCreep() : personalizados())[+idx];
@@ -793,9 +833,9 @@ const CreepEditor = (() => {
       mods = structuredClone(preset.mods || []);
       renderMods();
       botonesPreset();
-    });
+    }
 
-    return {abrir, cerrar, scrim, get estado(){ return ed; }};
+    return {abrir, cerrar, get raiz(){ return pap ? pap.raiz : null; }, get estado(){ return ed; }};
   }
 
   return {MODOS_HAB_CREEP, PASOS_HAB_CREEP, HC_STATS_SECUNDARIOS, statLabel, opcionesStat, opcionesEstadosHtml, crear,

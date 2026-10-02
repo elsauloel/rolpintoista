@@ -663,3 +663,11 @@ resuelven a mano, como el resto de los avisos).
   trampa** (campo nuevo del asistente con un valor por defecto, algo de quien la puso, o un número fijo)? (b) en sigilo, ¿Percepción
   **contra qué** (una tirada de Destreza del que se esconde —cerca de P3— o un número fijo)? (c) al descubrir una trampa, ¿la ve solo
   quien la descubrió o todo su bando? (d) la tirada sale en la Mesa como una Percepción cualquiera, sin decir para qué (propuesta).
+
+- **P146. Que los eventos tengan "su momento" para toda la mesa (2026-10-02, pedido del dueño: "no quiero que las cosas queden
+  simplemente comunicadas en el log… pasa como silbando bajito").** Hoy solo el duelo se abre en todas las pantallas; la percepción
+  («algo está fuera de lugar»), las zonas (resistir, daño, el d20 de Pedos Tóxicos), las trampas disparadas y el sigilo roto quedan en
+  un cartelito de una sola pantalla + una línea en la Mesa. Propuesta: una **escena común** — una tarjeta grande en todas las pantallas
+  que encadena el momento (texto → dados 3D → resultado) y se va sola; los botones de tirar, solo en la pantalla de quien tira. Abierto:
+  (1) qué eventos la tienen (propuesta: percepción, zonas, trampas, sigilo roto); (2) cuánto se cuenta (sin la vida de los creeps; un
+  oculto sin descubrir es "alguien"; ¿el nombre de la trampa?); (3) ¿tapa el centro del mapa unos segundos o va arriba sin tapar?

@@ -913,6 +913,7 @@ function bnCrear(){
   raiz.querySelector('#bn-stats').addEventListener('mousedown', e => { if(e.target.id === 'bn-stats') bnStatsCerrar(); });
   raiz.querySelector('#bn-reroll').addEventListener('mousedown', e => { if(e.target.id === 'bn-reroll') bnRerollCerrar(); });
   raiz.querySelector('#bn-reroll').addEventListener('click', e => {
+    e.stopPropagation();   // sus botones son solo de esta ventana: que no los atienda también el manejador general del recuadro
     const b = e.composedPath()[0].closest && e.composedPath()[0].closest('button');
     if(!b) return;
     if(b.dataset.bnRr === 'cerrar'){ bnRerollCerrar(); return; }
@@ -924,6 +925,7 @@ function bnCrear(){
   });
   // 📊 Stats (A6a): tocar un stat abre su desglose; el número grande de un atributo y las fórmulas se guardan al confirmar.
   raiz.querySelector('#bn-stats').addEventListener('click', e => {
+    e.stopPropagation();   // ídem: si no, el 🎲 tiraba dos veces y tocar un stat se le pedía a la ficha escondida
     const t = e.composedPath()[0];
     const b = t.closest && t.closest('button');
     if(b && b.dataset.tirarstat){ if(bn.S) bnTirarAca(b); return; }

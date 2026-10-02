@@ -426,104 +426,17 @@ function abrirVerEstadoCreep(scId, esId){
   $('#scrim-ver-estado').classList.add('open');
 }
 
-let editingEstadoCreep = null; // {scId, esId} — esId es null para un estado nuevo
-let ecMods = [];
-
-function abrirEditorEstadoCreep(scId, esId){
-  const sc = S.creeps.find(s => s.id === scId);
-  if(!sc) return;
-  let es = null;
-  if(esId){
-    es = sc.estados.find(x => x.id === esId);
-    if(!es) return;
-  }
-  editingEstadoCreep = {scId, esId};
-  ecMods = structuredClone((es && es.mods) || []);
-  $('#ec-preset').innerHTML = '<option value="">— elegir preset o completar a mano —</option>' + optgroupsEstadosPresetHtml() + optgroupsEstadosPersonalizadosHtml();
-  $('#ec-preset').value = '';
-  $('#ec-nombre').value = es ? es.nombre : '';
-  $('#ec-detalle').value = es ? (es.detalle||'') : '';
-  $('#ec-turnos').value = es ? es.turnos : 1;
-  $('#ec-stacks').value = es ? es.stacks : 1;
-  $('#ec-hpturno').value = es ? es.hpTurno : 0;
-  $('#ec-stacksturno').value = es ? (es.stacksTurno ?? 0) : 0;
-  $('#ec-activo').checked = es ? es.activo !== false : true;
-  $('#ec-permanente').checked = es ? !!es.permanente : false;
-  $('#ec-preset').dataset.polaridad = es ? (es.polaridad||'otro') : 'otro';
-  FLAGS_ESTADO_CREEP.forEach(f => { $('#ec-preset').dataset[f.toLowerCase()] = es && es[f] ? '1' : ''; });
-  $('#ec-preset').dataset.forzarnitros = es && es.forzarNitros !== undefined && es.forzarNitros !== null ? String(es.forzarNitros) : '';
-  $('#ec-escudomagico').value = es ? (es.escudoMagico ?? 0) : 0;
-  renderEcMods();
-  actualizarBotonesPresetEc();
-  $('#scrim-estado-creep').classList.add('open');
-}
-
-function actualizarBotonesPresetEc(){
-  const nombre = $('#ec-nombre').value.trim();
-  const personalizados = S.estadosPersonalizados || [];
-  const yaGuardado = nombre && personalizados.some(p => p.nombre === nombre);
-  $('#ec-guardarpreset').textContent = yaGuardado ? 'Actualizar preset personalizado' : '☆ Guardar como preset personalizado';
-  $('#ec-borrarpreset').style.display = yaGuardado ? '' : 'none';
-}
-
-function renderEcMods(){
-  $('#ec-mods-lista').innerHTML = ecMods.map((m,i) => `
-    <div class="est-modrow">
-      <select data-ecmodstat="${i}">
-        ${[...ATTR_IDS, 'nitros'].map(a => `<option value="${a}" ${m.stat===a?'selected':''}>${a === 'nitros' ? 'No2 máx.' : ATTR_LABELS[a]}</option>`).join('')}
-      </select>
-      <input type="number" data-ecmodval="${i}" value="${m.val}">
-      <button class="rm" data-ecmodrm="${i}">×</button>
-    </div>`).join('');
-}
-
-// El tope de No2 (Stun, Exhausto) no tiene campo propio en el editor: viaja
-// con el preset elegido o con el estado que se está editando.
-function forzarNitrosDelEditor(){
-  const v = $('#ec-preset').dataset.forzarnitros;
-  return v === undefined || v === '' ? '' : num(v);
-}
-
-function guardarEditorEstadoCreep(){
-  if(!editingEstadoCreep) return;
-  const sc = S.creeps.find(s => s.id === editingEstadoCreep.scId);
-  if(!sc) return;
-  const nombre = $('#ec-nombre').value.trim() || 'Sin nombre';
-  const datos = {
-    nombre,
-    detalle: $('#ec-detalle').value,
-    turnos: Math.max(0, num($('#ec-turnos').value) || 0),
-    stacks: Math.max(1, num($('#ec-stacks').value) || 1),
-    hpTurno: num($('#ec-hpturno').value) || 0,
-    stacksTurno: num($('#ec-stacksturno').value) || 0,
-    activo: $('#ec-activo').checked,
-    permanente: $('#ec-permanente').checked,
-    polaridad: $('#ec-preset').dataset.polaridad || 'otro',
-    escudoMagico: num($('#ec-escudomagico').value) || 0,
-    forzarNitros: forzarNitrosDelEditor(),
-    mods: structuredClone(ecMods),
-  };
-  FLAGS_ESTADO_CREEP.forEach(f => { datos[f] = $('#ec-preset').dataset[f.toLowerCase()] === '1'; });
-  if(editingEstadoCreep.esId){
-    const es = sc.estados.find(x => x.id === editingEstadoCreep.esId);
-    if(es) Object.assign(es, datos);
-    if(modsAfectanHp(datos.mods)) actualizarHpMaxPorCon(sc);
-    editingEstadoCreep = null;
-    $('#scrim-estado-creep').classList.remove('open');
-    renderAll();
-    toast(`${nombre} guardado`);
-    return;
-  }
-  // Un estado nuevo: la misma regla que el "+ Estado" (inmunidades, acumular o renovar uno igual), comun/combatiente.js.
-  const r = Combatiente.agregarEstado(sc.estados, {id: uid(), ...datos}, {jefe: sc.jefe});
-  editingEstadoCreep = null;
-  $('#scrim-estado-creep').classList.remove('open');
-  if(!r.ok){ toast(`${sc.nombre}: inmune ahora mismo (${r.motivo}) — ${nombre} no se pudo aplicar`); return; }
-  if(r.que === 'yaLoTiene'){ toast(`${sc.nombre}: ${nombre} ya lo tiene, no se acumula`); return; }
-  if(modsAfectanHp(r.estado.mods)) actualizarHpMaxPorCon(sc);
-  renderAll();
-  toast(`${sc.nombre}: ${textoEstadoAgregado(r, 'hpTurno')}`);
-}
+// El editor de un estado de creep es común (comun/creep-editor.js, A6c, 2026-10-02): GM Tools lo arma en su ventana de siempre
+// (#scrim-estado-creep, la crea el componente), con sus "Mis presets".
+const editorEstadoCreep = CreepEditor.crearEstado(document.body, {
+  creep: scId => S.creeps.find(s => s.id === scId),
+  guardar: (scId, aplicar) => { const sc = S.creeps.find(s => s.id === scId); if(sc){ aplicar(sc); renderAll(); } },
+  personalizados: () => (S.estadosPersonalizados = S.estadosPersonalizados || []),
+  guardarPresets: lista => { S.estadosPersonalizados = lista; },
+  toast: m => toast(m),
+}, {id: 'scrim-estado-creep'});
+// esId vacío = un estado nuevo; inicial = lo del asistente de estados ("formulario completo").
+function abrirEditorEstadoCreep(scId, esId, inicial){ editorEstadoCreep.abrir(scId, esId, inicial); }
 
 // Escudo especial / Excedente de vida: cambiar el valor a mano (número, +N/−N o «max N»): comun/combatiente.js.
 function escudoParsear(txt, actual, max){ return Combatiente.escudoParsear(txt, actual, max); }

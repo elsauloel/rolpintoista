@@ -287,10 +287,6 @@ $('#verestado-editar').onclick = () => {
   abrirEditorEstadoCreep(scId, esId);
 };
 $('#scrim-ver-estado').addEventListener('mousedown', e => { if(e.target.id==='scrim-ver-estado'){ viendoEstadoCreep = null; $('#scrim-ver-estado').classList.remove('open'); } });
-$('#estadocreep-guardar').onclick = guardarEditorEstadoCreep;
-$('#estadocreep-cancel').onclick = () => { editingEstadoCreep = null; $('#scrim-estado-creep').classList.remove('open'); };
-$('#estadocreep-x').onclick = () => { editingEstadoCreep = null; $('#scrim-estado-creep').classList.remove('open'); };
-$('#scrim-estado-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-estado-creep'){ editingEstadoCreep = null; $('#scrim-estado-creep').classList.remove('open'); } });
 $('#presets-creep-x').onclick = () => { if(presetsCreepDestino === 'duelo') cerrarPresetsDuelo(null); else $('#scrim-presets-creep').classList.remove('open'); };
 // Menú paso a paso para crear un estado de cero (comun/asistente-estado.js); el formulario completo sigue en el último paso.
 function armarPresetDeAsistenteGM(res){
@@ -316,86 +312,11 @@ $('#presets-creep-personalizado').onclick = () => {
       presetsCreepScId = scId;
       activarEstadoPresetCreep(preset);
     },
-    alFormulario: res => {
-      abrirEditorEstadoCreep(scId, null);
-      $('#ec-nombre').value = res.nombre;
-      $('#ec-detalle').value = res.detalle;
-      $('#ec-turnos').value = res.turnos;
-      $('#ec-permanente').checked = !!res.permanente;
-      $('#ec-hpturno').value = res.hp;
-      $('#ec-escudomagico').value = res.escudo;
-      ecMods = structuredClone(res.mods.filter(m => [...ATTR_IDS, 'nitros'].includes(m.stat)));
-      renderEcMods();
-      $('#ec-preset').dataset.polaridad = res.polaridad;
-      FLAGS_ESTADO_CREEP.forEach(f => { $('#ec-preset').dataset[f.toLowerCase()] = res.flags[f] ? '1' : ''; });
-      $('#ec-preset').dataset.forzarnitros = res.forzarNitros !== undefined ? String(res.forzarNitros) : '';
-      actualizarBotonesPresetEc();
-    },
+    alFormulario: res => abrirEditorEstadoCreep(scId, null, res),   // el editor común con lo del asistente
   });
 };
 $('#scrim-presets-creep').addEventListener('mousedown', e => { if(e.target.id === 'scrim-presets-creep'){ if(presetsCreepDestino === 'duelo') cerrarPresetsDuelo(null); else $('#scrim-presets-creep').classList.remove('open'); } });
-$('#ec-nombre').addEventListener('input', actualizarBotonesPresetEc);
-$('#ec-preset').addEventListener('change', e => {
-  if(!e.target.value) return;
-  const [tipo, idx] = e.target.value.split(':');
-  const preset = (tipo === 'std' ? ESTADOS_PRESET_GM : (S.estadosPersonalizados || []))[+idx];
-  if(!preset) return;
-  $('#ec-nombre').value = preset.nombre;
-  $('#ec-detalle').value = preset.detalle || '';
-  $('#ec-turnos').value = preset.turnos ?? 0;
-  $('#ec-stacks').value = preset.stacks ?? 1;
-  $('#ec-hpturno').value = preset.hpTurno ?? 0;
-  $('#ec-stacksturno').value = preset.stacksTurno ?? 0;
-  $('#ec-activo').checked = true;
-  $('#ec-permanente').checked = !!preset.permanente;
-  $('#ec-escudomagico').value = preset.escudoMagico ?? 0;
-  e.target.dataset.polaridad = preset.polaridad || 'otro';
-  FLAGS_ESTADO_CREEP.forEach(f => { e.target.dataset[f.toLowerCase()] = preset[f] ? '1' : ''; });
-  e.target.dataset.forzarnitros = preset.forzarNitros !== undefined && preset.forzarNitros !== null ? String(preset.forzarNitros) : '';
-  ecMods = structuredClone(preset.mods || []);
-  renderEcMods();
-  actualizarBotonesPresetEc();
-});
-$('#ec-addmod').onclick = () => { ecMods.push({stat:'con', val:0}); renderEcMods(); };
-$('#ec-mods-lista').addEventListener('change', e => {
-  if(e.target.dataset.ecmodstat !== undefined) ecMods[+e.target.dataset.ecmodstat].stat = e.target.value;
-});
-$('#ec-mods-lista').addEventListener('input', e => {
-  if(e.target.dataset.ecmodval !== undefined) ecMods[+e.target.dataset.ecmodval].val = num(e.target.value);
-});
-$('#ec-mods-lista').addEventListener('click', e => {
-  const b = e.target.closest('[data-ecmodrm]');
-  if(!b) return;
-  ecMods.splice(+b.dataset.ecmodrm, 1);
-  renderEcMods();
-});
 $('#btn-item-custom-gm').addEventListener('click', abrirItemCustomGM);
-$('#ec-guardarpreset').onclick = () => {
-  const nombre = $('#ec-nombre').value.trim();
-  if(!nombre){ toast('Poné un nombre antes de guardar el preset'); return; }
-  const preset = {
-    nombre, polaridad: $('#ec-preset').dataset.polaridad || 'otro',
-    turnos: Math.max(0, num($('#ec-turnos').value) || 0), stacks: Math.max(1, num($('#ec-stacks').value) || 1),
-    hpTurno: num($('#ec-hpturno').value) || 0, stacksTurno: num($('#ec-stacksturno').value) || 0,
-    detalle: $('#ec-detalle').value,
-    escudoMagico: num($('#ec-escudomagico').value) || 0,
-    forzarNitros: forzarNitrosDelEditor(),
-    mods: structuredClone(ecMods),
-  };
-  FLAGS_ESTADO_CREEP.forEach(f => { preset[f] = $('#ec-preset').dataset[f.toLowerCase()] === '1'; });
-  S.estadosPersonalizados = S.estadosPersonalizados || [];
-  const idx = S.estadosPersonalizados.findIndex(p => p.nombre === preset.nombre);
-  if(idx >= 0) S.estadosPersonalizados[idx] = preset; else S.estadosPersonalizados.push(preset);
-  toast(`Preset "${preset.nombre}" guardado`);
-  actualizarBotonesPresetEc();
-};
-$('#ec-borrarpreset').onclick = () => {
-  const nombre = $('#ec-nombre').value.trim();
-  if(!confirm(`¿Borrar el preset "${nombre}"?\n\nEsto no borra el estado activo, solo el preset guardado para reutilizar.`)) return;
-  S.estadosPersonalizados = (S.estadosPersonalizados || []).filter(p => p.nombre !== nombre);
-  toast('Preset borrado');
-  actualizarBotonesPresetEc();
-};
 let revivirCreepId = null;
 let revivirCreepModo = 'pct';
 function calcularHpRevivirCreep(){

@@ -6,8 +6,8 @@
 
 ## ▶ Para retomar
 
-- **Hecho**: nada todavía (plan escrito).
-- **Sigue**: c1.
+- **Hecho**: c1 y c2 (2026-10-02).
+- **Sigue**: c3 (el editor de un estado de creep).
 - Antes de cada tanda: `git status`, `git log --oneline -5`. Probar primero en local (`.claude/launch.json` → "archivos", puerto 8765:
   `comun/pruebas.html`), después en "Test con claude elsaulo" (GM; creep de prueba `nvjcz6l`, token `QQUKbhYKfI1JcXBzj0rp`).
 
@@ -30,10 +30,12 @@ bloquea la limpieza A′. Si más adelante se quiere editar el creep entero aden
 
 ## Tandas
 
-- [ ] **c1. El editor de habilidades de creep** a `comun/creep-editor.js` (`CreepEditor`): un componente como `FichaEditor.crear` que arma
+- [x] **c1. El editor de habilidades de creep** (2026-10-02; probado: GM Tools crea una habilidad nueva con el componente —modo, costo de
+  ataque → PdG, estado de la lista—; el mapa la edita desde el Ver —cooldown 3— y queda en Firebase sin pasar por GM Tools) a `comun/creep-editor.js` (`CreepEditor`): un componente como `FichaEditor.crear` que arma
   su propia pantalla (la de `#scrim-hab-creep`, con `data-hc` en vez de ids) adentro de lo que le dé cada pantalla, con `ctx` = {creep(),
   cambiar(fn), toast, …}. GM Tools lo usa en vez de su ventana fija (atajos); el mapa, adentro del recuadro de las Acciones nuevas, y guarda
   con `modificarCreep`.
-- [ ] **c2. ⬆ Subir y ↻ Reemplazar** de una habilidad de creep: comunes (`Biblioteca` ya lo es); el mapa los hace sin GM Tools.
+- [x] **c2. ⬆ Subir y ↻ Reemplazar** (2026-10-02; probado en el mapa: Reemplazar abrió la biblioteca con su título, «Golpe fuerte» quedó
+  en el lugar de la vieja con su origen; Subir abre el cartel de la biblioteca —cancelado, para no subir una de prueba—) de una habilidad de creep: comunes (`Biblioteca` ya lo es); el mapa los hace sin GM Tools.
 - [ ] **c3. El editor de un estado de creep** (`#scrim-estado-creep`) común; el ⚙ del HUD de un creep lo abre en el mapa.
 - [ ] Documentar y sumar a la limpieza A′: `acDelegar`/`acciones-delegar` (y el `boton` de `verhab-*`), el `editar-estado` de un creep.

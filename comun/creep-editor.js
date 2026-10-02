@@ -15,6 +15,7 @@
      personalizados()               los "Mis presets" de estados (GM Tools: S.estadosPersonalizados; el mapa: []).
      elegirEstadoDuelo()            el `elegirEstado` de la Ejecución ✨ (comun/asistente-duelo-hab.js).
      toast(msg)
+     alCerrar()                     (opcional) la ventana se cerró (guardada o cancelada).
    editor = {abrir(scId, habId, opc), cerrar(), estado}. opc = {borrador (una habilidad suelta: se edita ella, no se agrega al creep),
    alGuardar(h), encima (por encima de las ventanas de Ver)}.
    Necesita creep-calculo.js, combatiente.js, estados-presets.js, estados-aplicar.js y, al usarlos, asistente-duelo-hab.js,
@@ -370,7 +371,7 @@ const CreepEditor = (() => {
       scrim.classList.add('open');
       mostrarPaso(0);
     }
-    function cerrar(){ e = null; scrim.classList.remove('open'); }
+    function cerrar(){ e = null; scrim.classList.remove('open'); if(ctx.alCerrar) ctx.alCerrar(); }
 
     async function guardar(){
       if(!e) return;
@@ -561,6 +562,253 @@ const CreepEditor = (() => {
     });
   }
 
+  /* ---------- El editor de un estado de un creep (tanda c3, 2026-10-02) ----------
+     Copiado de gm-toolset (js/05: abrirEditorEstadoCreep, actualizarBotonesPresetEc, renderEcMods, forzarNitrosDelEditor,
+     guardarEditorEstadoCreep; js/03: textoEstadoAgregado; js/10: sus manejadores) y la ventana #scrim-estado-creep (ids → data-ec).
+     crearEstado(contenedor, ctx, {id}) → {abrir(scId, esId, inicial), cerrar, scrim}. `ctx`: creep(scId), guardar(scId, aplicar) (aplicar(sc)
+     cambia el creep; puede devolver una promesa), toast, confirmar?, alCerrar?, y — solo si la pantalla guarda "Mis presets" — personalizados() y
+     guardarPresets(lista) (sin eso, los botones de preset personalizado no aparecen). `inicial` = lo que trae el asistente de estados
+     ("formulario completo"): {nombre, detalle, turnos, permanente, hp, escudo, mods, polaridad, flags, forzarNitros}. */
+  const ATTR_IDS = ['con','fue','agl','des','esp'];
+  const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp'};
+  // Lo que se le avisa al que pone un estado (misma frase en la ficha, las invocaciones y los creeps).
+  function textoEstadoAgregado(r, campoHp){
+    const x = r.estado;
+    if(r.que === 'acumulado'){
+      if(x.esEscarcha) return `${x.nombre} ×${x.stacks} (−${x.stacks} No2 máx.)`;
+      if(x.esSangrado) return `${x.nombre} +1 al daño por turno (${fmt(Math.abs(num(x[campoHp])) * num(x.stacks))} ahora)`;
+      return `${x.nombre} ×${x.stacks}`;
+    }
+    return r.que === 'renovado' ? `${x.nombre} renovado (ya lo tenía)` : `${x.nombre} activado`;
+  }
+  const PANTALLA_ESTADO = `
+  <div class="modal" style="max-width:420px">
+    <header><h3>Estado alterado</h3><button class="iconbtn" data-ec="x">Cerrar</button></header>
+    <div class="body" style="display:flex;flex-direction:column;gap:10px">
+      <div class="f"><label>Preset</label><select data-ec="preset"></select></div>
+      <div class="f"><label>Nombre</label><input type="text" data-ec="nombre" placeholder="ej. Veneno"></div>
+      <div class="f"><label>Detalle (opcional)</label><input type="text" data-ec="detalle"></div>
+      <div class="row3" style="grid-template-columns:1fr 1fr">
+        <div class="mini-f"><label>Turnos restantes</label><input type="number" data-ec="turnos" min="0" value="1"></div>
+        <div class="mini-f"><label>HP por turno (por stack)</label><input type="number" data-ec="hpturno" value="0"></div>
+        <div class="mini-f"><label>Stacks</label><input type="number" data-ec="stacks" min="1" value="1"></div>
+        <div class="mini-f"><label>Stacks por turno</label><input type="number" data-ec="stacksturno" value="0"></div>
+        <div class="mini-f"><label>Escudo especial (HP secundario, se recarga cada Mantenimiento)</label><input type="number" data-ec="escudomagico" min="0" value="0"></div>
+      </div>
+      <div style="display:flex;gap:16px">
+        <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:none">
+          <input type="checkbox" data-ec="activo" checked style="width:auto">
+          <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Activo</span>
+        </label>
+        <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:none">
+          <input type="checkbox" data-ec="permanente" style="width:auto">
+          <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Permanente (no vence)</span>
+        </label>
+      </div>
+      <div class="est-mods">
+        <div class="est-mods-label">Modificadores de atributo</div>
+        <div data-ec="mods-lista"></div>
+        <button type="button" class="addmod-mini" data-ec="addmod">+ Modificador de atributo</button>
+        <div class="hint" style="margin-top:5px">Cada modificador suma o resta a un atributo mientras el estado esté activo: uno principal (Fuerza, Destreza, Agilidad…) o uno secundario (PdG, Evasión, Defensa, No2…). Ej.: +2 Fuerza durante los turnos que dure, o −1 PdG.</div>
+      </div>
+      <div data-ec="presets-caja" style="border-top:1px dashed var(--line-soft);padding-top:8px">
+        <button type="button" class="addmod-mini" data-ec="guardarpreset">☆ Guardar como preset personalizado</button>
+        <button type="button" class="addmod-mini" data-ec="borrarpreset" style="margin-top:5px;color:var(--danger);display:none">Borrar preset personalizado</button>
+      </div>
+    </div>
+    <footer>
+      <button class="btn ghost" data-ec="cancelar">Cancelar</button>
+      <button class="btn primary" data-ec="guardar">Guardar</button>
+    </footer>
+  </div>`;
+  function crearEstado(contenedor, ctx, {id} = {}){
+    const scrim = document.createElement('div');
+    scrim.className = 'scrim';
+    if(id) scrim.id = id;
+    scrim.innerHTML = PANTALLA_ESTADO;
+    contenedor.appendChild(scrim);
+    const $e = n => scrim.querySelector(`[data-ec="${n}"]`);
+    const toast = m => ctx.toast(m);
+    const confirmar = t => (ctx.confirmar || (x => confirm(x)))(t);
+    const FLAGS = CreepAcciones.FLAGS_ESTADO;
+    const conPresets = typeof ctx.personalizados === 'function' && typeof ctx.guardarPresets === 'function';
+    const personalizados = () => conPresets ? (ctx.personalizados() || []) : [];
+    let ed = null;     // {scId, esId} — esId es null para un estado nuevo
+    let mods = [];
+
+    function botonesPreset(){
+      $e('presets-caja').style.display = conPresets ? '' : 'none';
+      if(!conPresets) return;
+      const nombre = $e('nombre').value.trim();
+      const yaGuardado = nombre && personalizados().some(p => p.nombre === nombre);
+      $e('guardarpreset').textContent = yaGuardado ? 'Actualizar preset personalizado' : '☆ Guardar como preset personalizado';
+      $e('borrarpreset').style.display = yaGuardado ? '' : 'none';
+    }
+    function renderMods(){
+      $e('mods-lista').innerHTML = mods.map((m,i) => `
+    <div class="est-modrow">
+      <select data-ecmodstat="${i}">
+        ${[...ATTR_IDS, 'nitros'].map(a => `<option value="${a}" ${m.stat===a?'selected':''}>${a === 'nitros' ? 'No2 máx.' : ATTR_LABELS[a]}</option>`).join('')}
+      </select>
+      <input type="number" data-ecmodval="${i}" value="${m.val}">
+      <button class="rm" data-ecmodrm="${i}">×</button>
+    </div>`).join('');
+    }
+    // El tope de No2 (Stun, Exhausto) no tiene campo propio en el editor: viaja con el preset elegido o con el estado que se está editando.
+    function forzarNitros(){
+      const v = $e('preset').dataset.forzarnitros;
+      return v === undefined || v === '' ? '' : num(v);
+    }
+    function abrir(scId, esId, inicial){
+      const sc = ctx.creep(scId);
+      if(!sc) return;
+      let es = null;
+      if(esId){
+        es = (sc.estados || []).find(x => x.id === esId);
+        if(!es) return;
+      }
+      ed = {scId, esId};
+      mods = structuredClone((es && es.mods) || []);
+      $e('preset').innerHTML = '<option value="">— elegir preset o completar a mano —</option>' + opcionesEstadosHtml(personalizados());
+      $e('preset').value = '';
+      $e('nombre').value = es ? es.nombre : '';
+      $e('detalle').value = es ? (es.detalle||'') : '';
+      $e('turnos').value = es ? es.turnos : 1;
+      $e('stacks').value = es ? es.stacks : 1;
+      $e('hpturno').value = es ? es.hpTurno : 0;
+      $e('stacksturno').value = es ? (es.stacksTurno ?? 0) : 0;
+      $e('activo').checked = es ? es.activo !== false : true;
+      $e('permanente').checked = es ? !!es.permanente : false;
+      $e('preset').dataset.polaridad = es ? (es.polaridad||'otro') : 'otro';
+      FLAGS.forEach(f => { $e('preset').dataset[f.toLowerCase()] = es && es[f] ? '1' : ''; });
+      $e('preset').dataset.forzarnitros = es && es.forzarNitros !== undefined && es.forzarNitros !== null ? String(es.forzarNitros) : '';
+      $e('escudomagico').value = es ? (es.escudoMagico ?? 0) : 0;
+      if(inicial){   // lo que trae el asistente de estados (comun/asistente-estado.js, "formulario completo")
+        $e('nombre').value = inicial.nombre;
+        $e('detalle').value = inicial.detalle;
+        $e('turnos').value = inicial.turnos;
+        $e('permanente').checked = !!inicial.permanente;
+        $e('hpturno').value = inicial.hp;
+        $e('escudomagico').value = inicial.escudo;
+        mods = structuredClone((inicial.mods || []).filter(m => [...ATTR_IDS, 'nitros'].includes(m.stat)));
+        $e('preset').dataset.polaridad = inicial.polaridad;
+        FLAGS.forEach(f => { $e('preset').dataset[f.toLowerCase()] = inicial.flags && inicial.flags[f] ? '1' : ''; });
+        $e('preset').dataset.forzarnitros = inicial.forzarNitros !== undefined ? String(inicial.forzarNitros) : '';
+      }
+      renderMods();
+      botonesPreset();
+      scrim.classList.add('open');
+    }
+    function cerrar(){ ed = null; scrim.classList.remove('open'); if(ctx.alCerrar) ctx.alCerrar(); }
+    function datosDePantalla(){
+      const datos = {
+        nombre: $e('nombre').value.trim() || 'Sin nombre',
+        detalle: $e('detalle').value,
+        turnos: Math.max(0, num($e('turnos').value) || 0),
+        stacks: Math.max(1, num($e('stacks').value) || 1),
+        hpTurno: num($e('hpturno').value) || 0,
+        stacksTurno: num($e('stacksturno').value) || 0,
+        activo: $e('activo').checked,
+        permanente: $e('permanente').checked,
+        polaridad: $e('preset').dataset.polaridad || 'otro',
+        escudoMagico: num($e('escudomagico').value) || 0,
+        forzarNitros: forzarNitros(),
+        mods: structuredClone(mods),
+      };
+      FLAGS.forEach(f => { datos[f] = $e('preset').dataset[f.toLowerCase()] === '1'; });
+      return datos;
+    }
+    async function guardar(){
+      if(!ed) return;
+      const datos = datosDePantalla(), {scId, esId} = ed, nombre = datos.nombre;
+      cerrar();
+      let aviso = '';
+      await ctx.guardar(scId, sc => {
+        if(esId){
+          const es = sc.estados.find(x => x.id === esId);
+          if(es) Object.assign(es, datos);
+          if(K.modsAfectanHp(datos.mods)) K.actualizarHpMaxPorCon(sc);
+          aviso = `${nombre} guardado`;
+          return;
+        }
+        // Un estado nuevo: la misma regla que el "+ Estado" (inmunidades, acumular o renovar uno igual), comun/combatiente.js.
+        const r = Combatiente.agregarEstado(sc.estados, {id: uid(), ...datos}, {jefe: sc.jefe});
+        if(!r.ok){ aviso = `${sc.nombre}: inmune ahora mismo (${r.motivo}) — ${nombre} no se pudo aplicar`; return; }
+        if(r.que === 'yaLoTiene'){ aviso = `${sc.nombre}: ${nombre} ya lo tiene, no se acumula`; return; }
+        if(K.modsAfectanHp(r.estado.mods)) K.actualizarHpMaxPorCon(sc);
+        aviso = `${sc.nombre}: ${textoEstadoAgregado(r, 'hpTurno')}`;
+      });
+      if(aviso) toast(aviso);
+    }
+
+    scrim.addEventListener('click', ev => {
+      const t = ev.composedPath ? ev.composedPath()[0] : ev.target;
+      if(!t || !t.closest || !ed) return;
+      const rm = t.closest('[data-ecmodrm]');
+      if(rm){ mods.splice(+rm.dataset.ecmodrm, 1); renderMods(); return; }
+      const b = t.closest('[data-ec]'), a = b && b.dataset.ec;
+      if(a === 'guardar') guardar();
+      else if(a === 'cancelar' || a === 'x') cerrar();
+      else if(a === 'addmod'){ mods.push({stat:'con', val:0}); renderMods(); }
+      else if(a === 'guardarpreset' && conPresets){
+        const nombre = $e('nombre').value.trim();
+        if(!nombre){ toast('Poné un nombre antes de guardar el preset'); return; }
+        const d = datosDePantalla();
+        const preset = {nombre, polaridad: d.polaridad, turnos: d.turnos, stacks: d.stacks, hpTurno: d.hpTurno, stacksTurno: d.stacksTurno, detalle: d.detalle,
+          escudoMagico: d.escudoMagico, forzarNitros: d.forzarNitros, mods: d.mods};
+        FLAGS.forEach(f => { preset[f] = d[f]; });
+        const lista = personalizados();
+        const idx = lista.findIndex(p => p.nombre === preset.nombre);
+        if(idx >= 0) lista[idx] = preset; else lista.push(preset);
+        ctx.guardarPresets(lista);
+        toast(`Preset "${preset.nombre}" guardado`);
+        botonesPreset();
+      }
+      else if(a === 'borrarpreset' && conPresets){
+        const nombre = $e('nombre').value.trim();
+        if(!confirmar(`¿Borrar el preset "${nombre}"?\n\nEsto no borra el estado activo, solo el preset guardado para reutilizar.`)) return;
+        ctx.guardarPresets(personalizados().filter(p => p.nombre !== nombre));
+        toast('Preset borrado');
+        botonesPreset();
+      }
+    });
+    scrim.addEventListener('mousedown', ev => { if((ev.composedPath ? ev.composedPath()[0] : ev.target) === scrim) cerrar(); });
+    scrim.addEventListener('change', ev => {
+      const t = ev.composedPath ? ev.composedPath()[0] : ev.target;
+      if(t && t.dataset && t.dataset.ecmodstat !== undefined) mods[+t.dataset.ecmodstat].stat = t.value;
+    });
+    scrim.addEventListener('input', ev => {
+      const t = ev.composedPath ? ev.composedPath()[0] : ev.target;
+      if(t && t.dataset && t.dataset.ecmodval !== undefined) mods[+t.dataset.ecmodval].val = num(t.value);
+    });
+    $e('nombre').addEventListener('input', botonesPreset);
+    $e('preset').addEventListener('change', ev => {
+      const t = ev.composedPath ? ev.composedPath()[0] : ev.target;
+      if(!t.value) return;
+      const [tipo, idx] = t.value.split(':');
+      const preset = (tipo === 'std' ? estadosPresetCreep() : personalizados())[+idx];
+      if(!preset) return;
+      $e('nombre').value = preset.nombre;
+      $e('detalle').value = preset.detalle || '';
+      $e('turnos').value = preset.turnos ?? 0;
+      $e('stacks').value = preset.stacks ?? 1;
+      $e('hpturno').value = preset.hpTurno ?? 0;
+      $e('stacksturno').value = preset.stacksTurno ?? 0;
+      $e('activo').checked = true;
+      $e('permanente').checked = !!preset.permanente;
+      $e('escudomagico').value = preset.escudoMagico ?? 0;
+      t.dataset.polaridad = preset.polaridad || 'otro';
+      FLAGS.forEach(f => { t.dataset[f.toLowerCase()] = preset[f] ? '1' : ''; });
+      t.dataset.forzarnitros = preset.forzarNitros !== undefined && preset.forzarNitros !== null ? String(preset.forzarNitros) : '';
+      mods = structuredClone(preset.mods || []);
+      renderMods();
+      botonesPreset();
+    });
+
+    return {abrir, cerrar, scrim, get estado(){ return ed; }};
+  }
+
   return {MODOS_HAB_CREEP, PASOS_HAB_CREEP, HC_STATS_SECUNDARIOS, statLabel, opcionesStat, opcionesEstadosHtml, crear,
+    textoEstadoAgregado, crearEstado,
     LEGADO_HABS, paraDeDatos, PARA_TXT, habDeBiblioteca, avisoJugador, metaHab, HABS_CREEP_GRUPOS, subirHab, ponerHab, elegirDeBiblioteca};
 })();

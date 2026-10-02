@@ -423,15 +423,7 @@ function activarEstadoPresetCreep(preset){
   toast(`${sc.nombre}: ${textoEstadoAgregado(r, 'hpTurno')}`);
 }
 // Lo que se le avisa al que pone un estado (misma frase en la ficha, las invocaciones y los creeps).
-function textoEstadoAgregado(r, campoHp){
-  const e = r.estado;
-  if(r.que === 'acumulado'){
-    if(e.esEscarcha) return `${e.nombre} ×${e.stacks} (−${e.stacks} No2 máx.)`;
-    if(e.esSangrado) return `${e.nombre} +1 al daño por turno (${fmt(Math.abs(num(e[campoHp])) * num(e.stacks))} ahora)`;
-    return `${e.nombre} ×${e.stacks}`;
-  }
-  return r.que === 'renovado' ? `${e.nombre} renovado (ya lo tenía)` : `${e.nombre} activado`;
-}
+function textoEstadoAgregado(r, campoHp){ return CreepEditor.textoEstadoAgregado(r, campoHp); }   // comun/creep-editor.js (A6c)
 
 
 function aplicarPresetEstadoCreep(valor){

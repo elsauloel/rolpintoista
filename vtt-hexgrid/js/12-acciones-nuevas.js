@@ -481,7 +481,7 @@ function cerrarAccionesNuevas(){
    El ✎ Editar del Ver de una habilidad se lo pedía a GM Tools escondido. Ahora es el editor común (comun/creep-editor.js: el mismo paso
    a paso, con la trampa y la Ejecución ✨), adentro del recuadro de las Acciones nuevas; guarda con modificarCreep (acCambiarCreep). Los
    estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
-const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261002b', '../comun/asistente-duelo-hab.js?v=20261002i'];
+const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261002d', '../comun/asistente-duelo-hab.js?v=20261002i'];
 // Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
 const ACE_BASE = ['../comun/creeps-base.js?v=20260927a', '../comun/skills-creep-base.js?v=20260927a'];
 async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }
@@ -505,6 +505,29 @@ async function acReemplazarHab(creepId, habId){
       if(r) toast(msg);
     }});
 }
+/* El ⚙ de un estado de un creep (el HUD, A6c-c3): el editor común de estados (comun/creep-editor.js), adentro del recuadro de las Acciones
+   nuevas; si no estaban a la vista, se abren solo para esto (ac.soloEstado). Sin "Mis presets" (no están en la partida: pendientes 7b). */
+async function abrirEditarEstadoCreepMapa(creepId, nombre){
+  const yaVisible = ac && ac.host && !ac.host.hidden && ac.creepId === creepId;
+  if(!yaVisible) await abrirAccionesNuevas(creepId);
+  if(!ac || ac.host.hidden || ac.creepId !== creepId) return;
+  ac.soloEstado = !yaVisible;
+  const cerrarSiSolo = () => { if(ac.soloEstado){ ac.soloEstado = false; setTimeout(() => cerrarAccionesNuevas(), 0); } };
+  try{ await acCargarEditor(); }catch(err){ console.error(err); toast('No se pudo abrir el editor'); cerrarSiSolo(); return; }
+  if(!ac.editorEstado){
+    ac.editorEstado = CreepEditor.crearEstado(ac.raiz, {
+      creep: id => acCreepDe(id),
+      guardar: (id, aplicar) => acCambiarCreep(id, sc => { aplicar(sc); return {}; }),
+      toast: m => toast(m),
+      alCerrar: () => cerrarSiSoloEstado(),
+    }, {id: 'scrim-estado-creep'});
+    ['click', 'change', 'input'].forEach(ev => ac.editorEstado.scrim.addEventListener(ev, e => e.stopPropagation()));
+  }
+  const sc = acCreepDe(creepId), es = sc && (sc.estados || []).find(x => x && x.nombre === nombre);
+  if(!es){ toast('No encontré ese estado en el creep'); cerrarSiSolo(); return; }
+  ac.editorEstado.abrir(creepId, es.id);
+}
+function cerrarSiSoloEstado(){ if(ac && ac.soloEstado){ ac.soloEstado = false; setTimeout(() => cerrarAccionesNuevas(), 0); } }
 // Una copia del creep, normalizada (la parte privada que escucha el mapa).
 function acCreepDe(id){ const crudo = creepPrivadoDe(id); if(!crudo) return null; const sc = CreepCalculo.normalizar(structuredClone(crudo)); sc.id = id; return sc; }
 async function acEditarHab(creepId, habId){
@@ -568,6 +591,7 @@ document.addEventListener('keydown', e => {
   e.preventDefault();
   const abiertos = [...ac.raiz.querySelectorAll('.scrim.open')], cartel = abiertos[abiertos.length - 1];   // el de más arriba
   if(cartel && ac.editor && cartel === ac.editor.scrim){ ac.editor.cerrar(); return; }
+  if(cartel && ac.editorEstado && cartel === ac.editorEstado.scrim){ ac.editorEstado.cerrar(); return; }
   if(cartel && cartel.id === 'ac-vercreep'){ acVerCreepCerrar(); return; }
   if(cartel){ cartel.classList.remove('open'); acObjetivoPendiente = null; return; }
   cerrarAccionesNuevas();

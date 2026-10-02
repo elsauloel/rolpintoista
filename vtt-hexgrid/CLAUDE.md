@@ -1330,3 +1330,6 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   Reserva, los demás). Crear o vincular un token de un creep de otro mapa lo **muda a este** (`creepLlegoAlMapa`: `sc.mapa` con
   `modificarCreep`, que ahora también escribe `mapa` en lo público, y su token se va del otro mapa). El auto-vínculo por nombre del duelo
   prefiere los creeps de este mapa. Se sacaron `enlacesGM`, `escucharEnlaces` y los grupos del panel de Mapas.
+- **Cabecera por rol** (2026-10-02, pedido del dueño): `#estado` dice «Partida · GM · Usuario» para el GM y «Partida · Personaje · Usuario» para un
+  jugador (`actualizarCabecera`, js/01, con `barraTextoRol` de `comun/barra.js`; el personaje es `fichaPrincipalId`: el de su token en el
+  mapa que se ve o su primera ficha). Se rearma al llegar miembros, fichas y tokens.

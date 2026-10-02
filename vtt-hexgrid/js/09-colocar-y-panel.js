@@ -746,7 +746,7 @@ function renderPanel(forzar){
     // Si sigue abierto el mismo panel, no pisar lo que alguien está
     // escribiendo o eligiendo.
     const mismoPanel = firmaPanel.startsWith(clave + '|');
-    if(mismoPanel && (creando || panel.contains(document.activeElement) || $('#editar-token-ventana').contains(document.activeElement))) return;
+    if(mismoPanel && (creando || panel.contains(document.activeElement))) return;
   }
   firmaPanel = firma;
   $('#btn-nuevo').disabled = !fbMiembro;
@@ -761,62 +761,60 @@ function renderPanel(forzar){
 
   // Los datos del token se ven en los controles flotantes (HUD): el panel
   // del costado queda solo con Token (?) y la configuración de los dados.
-  const ed = $('#editar-token-ventana');
-  $('#editar-token-capa').hidden = !(t && editandoToken);
-  if(!t || !editandoToken){
-    ed.innerHTML = '';
-    // (La ayuda de los tokens vive en el (?) de la barra de arriba: actualizarAyudaToken.)
-    panel.innerHTML = '';
-    return;
+  panel.innerHTML = '';   // (la ayuda de los tokens vive en el (?) de la barra de arriba: actualizarAyudaToken)
+}
+
+/* ---------- Editar token, paso a paso en la ventana común (comun/paso-a-paso.js, 2026-10-02, tanda 6 de docs/plan-paso-a-paso.md) ----------
+   Vinculado a → Cómo se ve (nombre y color) → Dueño (GM, solo un personaje). Guardar siempre; «Sacar del mapa» en el pie. */
+let editarTokenPap = null;
+function abrirEditarToken(id){
+  const t = tokens.get(id);
+  if(!t) return;
+  if(editarTokenPap) editarTokenPap.cerrar();
+  editandoToken = true;
+  const v = vinculo(t), editable = puedoMover(t);
+  const tipoTxt = t.tipo === 'creep' ? (t.fichaId ? 'creep' : 'NPC') : (v && v.invocacion ? 'invocación' : 'personaje');
+  const st = {vinculo: t.fichaId || '', nombre: t.nombre || '', color: t.color, dueno: t.duenoUid || ''};
+  const conDueno = soyGM && t.tipo === 'pj';
+  const pasos = [
+    ...(editable ? [
+      {id: 'cual', nombre: 'Vinculado a', ayuda: `<b>¿De qué ficha saca sus datos?</b> Vinculado, toma el nombre, la imagen, las barras y los estados${t.tipo === 'creep' ? ' del creep (si es de otro mapa, se muda a este)' : ' de la ficha'}. Sin vincular es un ${t.tipo === 'creep' ? 'NPC u objeto' : 'token suelto'}.`,
+        html: () => `<div class="pap-campo"><label>Vinculado a</label><select id="te-vinculo" size="12" style="width:100%">${opcionesVinculo(t.tipo, st.vinculo)}</select></div>`},
+      {id: 've', nombre: 'Cómo se ve', ayuda: '<b>Nombre y color.</b> El nombre solo cuenta si no está vinculado; el color se ve si no tiene imagen.',
+        html: () => `<div class="pap-campo"><label>Nombre</label><input id="te-nombre" maxlength="40" value="${esc(st.nombre)}"></div><div class="pap-campo"><label>Color</label>${htmlColores(st.color, true)}</div>`,
+        alMontar: (c, a) => conectarColores(a.raiz, col => { st.color = col; })},
+    ] : [{id: 'info', nombre: 'Token', ayuda: '<b>Este token no lo movés vos.</b>', html: () => `<p style="font-size:15px;margin:0"><b>${esc(nombreDe(t))}</b></p><p class="pap-nota">Casilla ${t.col}, ${t.fila}</p>`}]),
+    ...(conDueno ? [{id: 'dueno', nombre: 'Dueño', ayuda: '<b>¿Quién lo mueve?</b> Para cuando alguien cambió de cuenta.',
+      html: () => `<div class="pap-campo"><label>Dueño</label><select id="te-dueno">${opcionesDueno(st.dueno)}</select></div>`}] : []),
+  ];
+  const cerrado = () => { editarTokenPap = null; editandoToken = false; renderPanel(true); pedirDibujo(); };
+  async function guardar(){
+    const cambios = {};
+    if(editable){
+      const vv = st.vinculo ? vinculo({tipo: t.tipo, fichaId: st.vinculo}) : null;
+      const nombre = (st.nombre.trim() || (vv ? vv.nombre : '')).slice(0, 40);
+      if(!nombre){ api.irA('ve'); api.aviso('El token necesita un nombre'); return false; }
+      Object.assign(cambios, {nombre, color: st.color, fichaId: st.vinculo ? st.vinculo : firebase.firestore.FieldValue.delete()});
+    }
+    if(conDueno && st.dueno && st.dueno !== t.duenoUid) cambios.duenoUid = st.dueno;
+    if(Object.keys(cambios).length) await editarToken(id, cambios);
+    if(editable && t.tipo === 'creep' && st.vinculo && st.vinculo !== t.fichaId) creepLlegoAlMapa(st.vinculo);   // vinculado a un creep de otro mapa: se muda acá
+    cerrado();
   }
-
-  const editable = puedoMover(t);
-  const titulo = t.tipo === 'creep' ? (t.fichaId ? 'Creep' : 'NPC') : (v && v.invocacion ? 'Invocación' : 'Personaje');
-
-  // Edición: vínculo, nombre, color, dueño (GM), sacar del mapa.
-  let color = t.color;
-  ed.innerHTML =
-    `<h2>Editar token · ${titulo.toLowerCase()}</h2>` +
-    (editable
-      ? `<label class="etiqueta">Vinculado a</label><select id="token-vinculo">${opcionesVinculo(t.tipo, t.fichaId)}</select>` +
-        `<label class="etiqueta">Nombre (si no está vinculado)</label><input id="token-nombre" maxlength="40" value="${esc(t.nombre)}">` +
-        '<label class="etiqueta">Color</label>' + htmlColores(t.color, true)
-      : `<div class="dato"><b>${esc(nombreDe(t))}</b></div>`) +
-    `<div class="dato" style="color:var(--muted)">Casilla ${t.col}, ${t.fila}</div>` +
-    (soyGM && t.tipo === 'pj'
-      ? '<label class="etiqueta">Cambiar dueño (si alguien cambió de cuenta)</label>' +
-        `<div class="fila" style="margin-top:0"><select id="token-dueno">${opcionesDueno(t.duenoUid)}</select>` +
-        '<button type="button" class="btn" id="token-dueno-ok">Cambiar</button></div>'
-      : '') +
-    '<div class="fila">' +
-      (editable ? '<button type="button" class="btn primary" id="token-guardar">Guardar</button>' : '') +
-      '<button type="button" class="btn" id="token-volver">Volver</button>' +
-    '</div>' +
-    (puedoBorrar(t) ? '<div class="fila"><button type="button" class="btn peligro" id="token-borrar">Sacar del mapa</button></div>' : '');
-
-  $('#token-volver').onclick = () => { editandoToken = false; renderPanel(true); };
-  if(editable){
-    conectarColores(ed, c => color = c);
-    const guardar = async () => {
-      const fichaId = $('#token-vinculo').value;
-      const vv = fichaId ? vinculo({tipo: t.tipo, fichaId}) : null;
-      const nombre = ($('#token-nombre').value.trim() || (vv ? vv.nombre : '')).slice(0, 40);
-      if(!nombre){ toast('El token necesita un nombre'); return; }
-      const cambios = {nombre, color};
-      cambios.fichaId = fichaId ? fichaId : firebase.firestore.FieldValue.delete();
-      await editarToken(seleccion, cambios);
-      if(t.tipo === 'creep' && fichaId && fichaId !== t.fichaId) creepLlegoAlMapa(fichaId);   // vinculado a un creep de otro mapa: se muda acá
-      editandoToken = false;
-      renderPanel(true);
-    };
-    $('#token-guardar').onclick = guardar;
-    $('#token-nombre').onkeydown = e => { if(e.key === 'Enter') guardar(); };
-  }
-  if($('#token-borrar')) $('#token-borrar').onclick = () => borrarToken(seleccion);
-  if($('#token-dueno-ok')) $('#token-dueno-ok').onclick = () => {
-    const nuevo = $('#token-dueno').value;
-    if(nuevo && nuevo !== t.duenoUid) editarToken(seleccion, {duenoUid: nuevo});
-  };
+  const api = editarTokenPap = PasoAPaso.abrir({
+    titulo: `Editar token · ${tipoTxt} · ${nombreDe(t)}`, crear: false, z: 95,
+    pasos,
+    alInput: e => { if(e.target.id === 'te-nombre') st.nombre = e.target.value; },
+    alCambio: e => {
+      if(e.target.id === 'te-vinculo'){ st.vinculo = e.target.value; const vv = st.vinculo ? vinculo({tipo: t.tipo, fichaId: st.vinculo}) : null; if(vv) st.nombre = String(vv.nombre || '').slice(0, 40); }
+      else if(e.target.id === 'te-dueno') st.dueno = e.target.value;
+    },
+    alTecla: e => { if(e.key === 'Enter' && e.target.id === 'te-nombre'){ e.preventDefault(); guardar().then(r => { if(r !== false && api.abierto()) api.cerrar(); }); } },
+    confirmarCancelar: '',
+    alGuardar: () => guardar(),
+    alCancelar: () => cerrado(),
+    extras: puedoBorrar(t) ? [{id: 'borrar', texto: 'Sacar del mapa', alClic: () => { api.cerrar(); cerrado(); borrarToken(id); }}] : [],
+  });
 }
 
 /* ---------- 🗺 Mapas: botón del borde izquierdo (solo GM) ----------
@@ -1029,14 +1027,6 @@ function abrirTokenNuevo(){
   }
 }
 
-// Editar token: ventana emergente. Se cierra con clic en el fondo, clic derecho (fuera de un campo) o Esc.
-function cerrarEditarToken(){ if(!editandoToken) return; editandoToken = false; renderPanel(true); pedirDibujo(); }
-$('#editar-token-capa').addEventListener('mousedown', e => { if(e.target === $('#editar-token-capa')) cerrarEditarToken(); });
-$('#editar-token-capa').addEventListener('contextmenu', e => {
-  if(e.target.closest('input,textarea,select')) return;
-  e.preventDefault(); cerrarEditarToken();
-});
-document.addEventListener('keydown', e => { if(e.key === 'Escape' && editandoToken && !document.querySelector('.recorte-scrim')){ e.stopImmediatePropagation(); cerrarEditarToken(); } }, true);
 
 $('#btn-nuevo').onclick = e => {
   if(e && e.target.closest('.ayuda-icono')) return;   // tocar el (?) no crea un token

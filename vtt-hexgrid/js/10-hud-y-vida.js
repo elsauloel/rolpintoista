@@ -834,7 +834,7 @@ Escribí cuántos puntos de armadura rota, +N o -N (0 la repara)`, fmt(stacks)) 
     editarToken(id, {rotacion: fin});
   };
   const botonEditar = hud.querySelector("[data-hud-editar]");
-  if(botonEditar) botonEditar.onclick = () => { editandoToken = true; hudCerrar(); renderPanel(true); pedirDibujo(); };
+  if(botonEditar) botonEditar.onclick = () => { const id = seleccion; hudCerrar(); abrirEditarToken(id); };
   const botonImagen = hud.querySelector("[data-hud-imagen]");
   if(botonImagen) botonImagen.onclick = () => elegirImagenToken(seleccion);
   const quitarImagen = hud.querySelector('[data-hud-imagen-no]');

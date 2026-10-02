@@ -8,7 +8,21 @@ nuevo de Rol Pintoísta. Paso 2 de
 
 ## Estado actual
 
-`mapa.html`: un solo archivo, se abre con doble clic.
+**Desde el 2026-10-02 está partido en archivos** (paso 5 nivel A, como la ficha y GM Tools): `mapa.html` es solo la pantalla
+(~260 líneas) y carga `mapa.css` (los estilos) y los 14 tramos de su código en `js/`, en este orden:
+`01-base-y-mapas` (cabecera, Firebase, geometría de hexágonos, estado, lápiz, terreno y formas, varios mapas guardados) ·
+`02-modo-niebla-sigilo` (modo narrativo/combate, niebla, sigilo, rango, polilla, detección, oportunidad, menú de trampas) ·
+`03-asistente-trampa` · `04-mantenimiento-e-iniciativa` (Mantenimiento del GM, lista de personajes, iniciativa) ·
+`05-vista-y-dibujo` · `06-mouse` · `07-tokens-y-elementos` (tokens y elementos en Firestore, formas con turnos, colisión,
+copiar/pegar, editar un elemento) · `08-mover-trampas-y-zonas` (mover con No2, deshacer, trampas ocultas, terreno incendiado,
+motor de zonas) · `09-colocar-y-panel` (colocar un token, panel del costado, botón de mapas) · `10-hud-y-vida` (HUD, vida y daño,
+rayo en cadena, creeps privados) · `11-botonera-nueva` (la Botonera de la ficha en el marco y la Botonera nueva ⚗) ·
+`12-acciones-nuevas` (Acciones nuevas de un creep ⚗) · `13-tokens-portal-duelo` (botón 🎭, portal, zonas de habilidad, duelo,
+hechizos de área, dodge, muerte) · `14-herramientas-y-arranque` (caja de herramientas, bitácora, Mesa y el arranque).
+**Es el mismo programa de antes, en el mismo orden**: comparten las variables globales. Cuidados (los mismos que la ficha): una
+línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar lo de su archivo o de los anteriores — el arranque
+(`iniciar()`) está al final de `14-…`; cada archivo lleva su `?v=` en `mapa.html` y se sube solo el del que cambia. Para buscar algo,
+`grep` en `vtt-hexgrid/js/` (los números de línea viejos de `mapa.html` ya no valen).
 
 - Grilla de hexágonos "de lado arriba" (un lado horizontal, no una punta;
   `ESQUINAS`, `hexCentro`, `mundoAHex`, `hexACubo` — girada 30° contra la

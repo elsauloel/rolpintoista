@@ -109,3 +109,10 @@ etapa 3 del paso 4 (el mapa dibuja la Botonera) es armar la pantalla con esas pi
   de Tipos y de Especial para los creeps (con `armaDetalle` de más): no se tocó. **Con las áreas 1–4, el nivel B tiene
   las piezas que pide la etapa 3 del paso 4** (el mapa dibuja la Botonera); del área 3 queda la parte de pantalla de
   ejecutar una habilidad (Duelo, Mesa), que se mueve cuando el mapa la necesite.
+- 2026-10-02: **el mapa partido** (nivel A, elegido por el dueño mientras prueba el ⚗): `vtt-hexgrid/mapa.css` + 14 tramos en
+  `vtt-hexgrid/js/` (`mapa.html` pasó de 12 074 a 258 líneas); el programa que corta comprobó que juntarlos da el original exacto.
+  **Nuevo para detectar la trampa de "usar al cargar algo de un archivo posterior"**: un análisis con un parser de JavaScript
+  (acorn) recorrió las 363 sentencias que se ejecutan al cargar, siguiendo las funciones que llaman: un solo aviso, falso (una
+  `soltar` local que tapa a la global); no hizo falta mover nada. Comparado contra el original sin sesión: mismas 659 funciones
+  globales, la misma pantalla (salvo los renglones vacíos donde estaban los `<script>`), los mismos estilos en 52 elementos y ningún
+  error. **En vivo** con la sesión del GM: carga, Mesa, HUD de un token, Botonera nueva y Acciones nuevas, sin errores.

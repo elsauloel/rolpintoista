@@ -176,6 +176,8 @@ Cada paso: qué es, qué se gana, qué se arriesga, cómo se prueba. Se pueden e
   que se publica sola) y juntarlo cuando esté probado en "Claude · pruebas" y "Test".
 
 ### Paso 5 — Partir los archivos gigantes
+- **Cómo va**: nivel A hecho en las tres herramientas grandes — la ficha y GM Tools (2026-09-30) y **el mapa (2026-10-02)**; nivel B
+  (la lógica de juego a `comun/`) hecho para el personaje, los creeps y las invocaciones. Detalle en [`plan-paso5.md`](plan-paso5.md).
 - **Qué**: separar cada herramienta en piezas con nombre (`comun/…`: inventario, habilidades, invocaciones, niebla, tokens,
   tienda…), cada una más chica y con una sola responsabilidad.
 - **Se gana**: cambios más seguros, menos choques entre conversaciones, más fácil de entender.

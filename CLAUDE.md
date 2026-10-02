@@ -86,7 +86,8 @@ lo que el grupo usa.
 - **La ficha y GM Tools están partidas en archivos** (2026-09-30, paso 5): `ficha-personaje/ficha.html` (pantalla) +
   `ficha.css` + `ficha-personaje/js/01…14-*.js`, y `gm-toolset/gm-tools.html` + `gm-tools.css` + `gm-toolset/js/01…12-*.js`
   (su código, en orden). Ver [`ficha-personaje/CLAUDE.md`](ficha-personaje/CLAUDE.md) y
-  [`gm-toolset/CLAUDE.md`](gm-toolset/CLAUDE.md) para saber qué hay en cada uno antes de buscar.
+  [`gm-toolset/CLAUDE.md`](gm-toolset/CLAUDE.md) para saber qué hay en cada uno antes de buscar. **El mapa también** (2026-10-02):
+  `vtt-hexgrid/mapa.html` (pantalla) + `mapa.css` + `vtt-hexgrid/js/01…14-*.js` — ver [`vtt-hexgrid/CLAUDE.md`](vtt-hexgrid/CLAUDE.md).
 - **HTML/CSS/JS puro, sin build step.** Cada herramienta (`ficha.html`,
   `gm-tools.html`, `vendor-generator.html`, `mapa.html`, `index.html`) es
   una página completa y se abre con doble clic o por el sitio publicado;

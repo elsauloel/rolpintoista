@@ -1160,3 +1160,5 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   invocación de la parte `invocaciones` de su dueño (`invDeToken`), su Defensa y Armadura mágica con `comun/inv-calculo.js`
   (`defensasDeInv`) y escribe con `danioInv` (transacción: HP, escudos y `resumen.invocaciones`). Las Espinas de una invocación
   todavía no se devuelven solas.
+  Desde la tanda 5, **las habilidades de la invocación** también (Ejecutar/Anunciar y la 🎲 segunda tirada: `bnInvAca` con
+  `comun/inv-habilidades.js` y `bnInvHabUi`). Solo el Ver sigue yendo a la ficha (tanda 6).

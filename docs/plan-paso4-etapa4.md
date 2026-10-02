@@ -29,7 +29,7 @@ El mapa guarda con `modificarCreep` (transacción + resumen + firma); GM Tools, 
 4. Lo que el duelo le pide a una invocación (`dueloInvDe`, `js/11`) → `comun/inv-duelo.js`, en `hooksLocal` del mapa. Con los
    datos de la invocación a mano, el daño que recibe en el duelo puede dejar de ser a mano (hoy `dueloAplicarDano` lo marca
    "es una invocación"). ✅ los ganchos y el daño automático (2026-10-01).
-5. Las habilidades (`invEjecutarHab` y compañía).
+5. Las habilidades (`invEjecutarHab` y compañía) ✅ (2026-10-01).
 6. La 🔍 (`lupaHtmlInv`) y el Ver (`verHabInv`).
 
 **4d (pendiente del dueño)**: probar las Acciones nuevas en una sesión real (el GM con ⚗ prendido, jugando un combate de verdad) y,
@@ -269,3 +269,15 @@ puede empezar.
   escudo de 2): normal de 7 → Defensa 2, el escudo absorbió 2, entraron 3 (10 → 7); crítico ×2 de 3 → 6 directo (7 → 1); mitad de
   5 → ⌈(5 − 2) ÷ 2⌉ = 2 (1 → 0); en los tres, la vida y el resumen guardados. Restaurado y verificado (resumen idéntico).
   Pendiente: las Espinas de una invocación que recibe el golpe (`dueloEspinas` las sigue salteando).
+- 2026-10-01: **4e, tanda 5 hecha** (62b7c4a) — `comun/inv-habilidades.js` (`InvHabilidades`): `ejecutar(inv, h, presets,
+  dueloDisponible)` (lo que cambia a la invocación: cobrar No2, cooldown y vida, la cura y el estado del sistema anterior, el atajo
+  ✨ «solo sobre ella»; devuelve `{modo: 'manual'|'flash'}`, `{error}` o el plan) y `terminar(inv, h, p, ui)` (la Mesa, el duelo, el
+  ataque con arreglos, la tirada, el aviso), más `tiradaPrimera`, `tiradaSegunda`, `habEjecucion`, `ataqueDeHab`, `lanzarAtaque`,
+  `usarFlashFuera`, `ponerEstado`, `aplicarSpec` y `anunciar`, copiados de `invEjecutarHab` y sus ayudantes (`js/04`, que quedan con
+  atajos; `invHabUi` es lo que hace la ficha). En el mapa, `bnInvAca` hace Ejecutar/Anunciar y la 🎲 segunda tirada con
+  `bnInvHabUi()` (publica a nombre de la invocación, guarda la parte `invocaciones`, el duelo a nombre de `fichaId~invId`).
+  Comparado contra el código viejo en 500 invocaciones con 4 clics al azar (con las Ejecuciones de las clases, Flash, «sobre sí»,
+  zona, estados): 500 iguales; 10 de 10 mutaciones detectadas. `pruebas.html`: 189 (1 nueva). **En vivo** (GM con 🎮 el control de
+  Silvia, ⚗, un Lobo con tres habilidades): 📣 Aullido se anunció sin cobrar; 💰 Mordida cobró 1 No2, puso cooldown 2 y tiró Fue, y
+  su 🎲 el 1d6; ✨ Piel dura cobró 1 No2, cooldown 3 y le puso Blindado (2 turnos); Mordida otra vez se negó por el cooldown. Todo
+  guardado, **ningún pedido a la ficha**. Restaurado y verificado. Lo que sigue: tanda 6, la 🔍 y el Ver.

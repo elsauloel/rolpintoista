@@ -986,3 +986,9 @@ versión parecida en más de una, es candidato a juntar.
   `rerollInfo`, `flashOpciones`, `flashUsar`, `habTirar`, `habValor`, `puedeParry`, `opcionesDefensa`, `defender`, `fuerza`,
   `bloquear`, `armaContra`) con `ui = {inv(lado), registrar(origen, r), toast, cambiar(fn), parry, soy}`; también `pagarFlash(inv, h,
   ui)` y `costoFlash(h)`. Lo usan la ficha (`dueloInv`, `js/11`) y el mapa (`bnHooksDueloInv`, en `hooksLocal`).
+- **`inv-habilidades.js`** (`InvHabilidades`, 2026-10-01, paso 4 etapa 4e, tanda 5) — **las habilidades de una invocación**:
+  `ejecutar(inv, h, presets, dueloDisponible)` (cobrar, cooldown, vida, cura, estado del sistema anterior, atajo ✨ «solo sobre ella»)
+  y `terminar(inv, h, p, ui)` (Mesa, duelo, ataque con arreglos, tirada, aviso), más `tiradaPrimera`, `tiradaSegunda`, `habEjecucion`,
+  `ataqueDeHab`, `lanzarAtaque`, `usarFlashFuera`, `ponerEstado`, `aplicarSpec`, `anunciar`. `ui = {mesaHabilidad, mesaConTexto, publicar,
+  toast, cambio, cambiar, parry, dueloDisponible, elegirObjetivo(inv, cfg)}`. Lo usan la ficha (`invHabUi`, `js/04`) y el mapa
+  (`bnInvHabUi`).

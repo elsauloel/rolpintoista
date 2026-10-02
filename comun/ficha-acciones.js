@@ -665,17 +665,19 @@ const FichaAcciones = (() => {
   async function colocarTrampaDeHab(S, h, ui){
     const t = h.trampaColocar;
     if(!t || typeof TokensAuto === 'undefined' || !ui.yo().ref) return;
+    // La dificultad para detectarla sale de quien la coloca (P145): el personaje, o la invocación si `ui.valorStat` lo dice.
+    const valorDe = ui.valorStat || (st => FichaCalculo.calcular(S).final[st]);
     // ✨ Automática (2026-09-30): se anuncia (sin la ubicación) y se elige la casilla en el mapa. Sin el mapa abierto (ficha suelta),
     // queda al lado del token como siempre.
     if(FichaBotonera.modoHab(h) === 'auto' && ui.enMapa()){
       ui.mesaHabilidad(h.nombre, `${h.detalle || ''}${h.detalle ? ' — ' : ''}🪤 colocó una trampa${t.nombre ? ` («${String(t.nombre).trim()}»)` : ''}.`);
-      try{ ui.alMapa('trampa-habilidad', {fichaId: ui.yo().ref, tipoToken: 'pj', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h)}); }
+      try{ ui.alMapa('trampa-habilidad', {fichaId: ui.yo().ref, tipoToken: 'pj', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h, valorDe)}); }
       catch(err){ console.error('No se pudo avisar la trampa al mapa:', err); }
       return;
     }
     try{
       const dano = TRAMPA_DANO_RE.test(String(t.dano || '').trim()) ? String(t.dano).trim() : '';
-      const r = await TokensAuto.colocarTrampas({fichaId: ui.yo().ref, tipoToken: 'pj', trampa: {...Combatiente.trampaDeHab(h), dano}});
+      const r = await TokensAuto.colocarTrampas({fichaId: ui.yo().ref, tipoToken: 'pj', trampa: {...Combatiente.trampaDeHab(h, valorDe), dano}});
       if(r.colocadas) ui.toast(`🪤 ${h.nombre}: ${r.colocadas > 1 ? r.colocadas + ' trampas colocadas' : 'trampa colocada'} en el mapa`);
       else ui.toast(r.motivo === 'sin-token' ? `🪤 ${h.nombre}: tu personaje no tiene token en el mapa en juego — no se colocó la trampa` : `🪤 ${h.nombre}: no hay lugar libre al lado de tu token`);
     }catch(err){ console.error('No se pudo colocar la trampa:', err); ui.toast('No se pudo colocar la trampa — revisá la consola'); }

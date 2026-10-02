@@ -558,7 +558,7 @@ service cloud.firestore {
       // solo lo puede prender o apagar el GM (al crear o después, desde ⚙️);
       // sirve con o sin Sólido. alfa 0 se permite (solo se ve el contorno).
       function elementoValido(d) {
-        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'usoEn', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant', 'trampaItem', 'trampaFicha', 'zona', 'zonaNombre', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaAmiga', 'zonaResistStat', 'zonaResistValor', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaDanoDif', 'zonaDanoTipo', 'zonaTiraExtra', 'zonaNota', 'zonaTiraStat', 'zonaTiraValor', 'trampaDejaZona', 'zonaTurnos'])
+        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'usoEn', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant', 'trampaItem', 'trampaFicha', 'zona', 'zonaNombre', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaAmiga', 'zonaResistStat', 'zonaResistValor', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaDanoDif', 'zonaDanoTipo', 'zonaTiraExtra', 'zonaNota', 'zonaTiraStat', 'zonaTiraValor', 'trampaDetectar', 'descubierta', 'trampaDejaZona', 'zonaTurnos'])
           && d.tipo in ['flor', 'linea', 'libre']
           && d.origen is map && d.origen.col is int && d.origen.fila is int
           && d.celdas is list && d.celdas.size() >= 2 && d.celdas.size() <= 6000 && d.celdas.size() % 2 == 0
@@ -579,6 +579,9 @@ service cloud.firestore {
           && (!('trampaDano' in d) || (d.trampaDano is string && d.trampaDano.size() <= 12))
           && (!('trampaEstado' in d) || (d.trampaEstado is string && d.trampaEstado.size() <= 300))
           && (!('disparada' in d) || d.disparada is bool)
+          // Percepción aumentada (2026-10-02, P145): dificultad para detectarla y si ya la descubrió alguien (la ve todo su equipo).
+          && (!('trampaDetectar' in d) || (d.trampaDetectar is int && d.trampaDetectar >= 1 && d.trampaDetectar <= 99))
+          && (!('descubierta' in d) || d.descubierta is bool)
           && (!('fuegoAmigo' in d) || d.fuegoAmigo is bool)
           // La tirada de daño de la trampa ignora la Defensa de quien la pisa (daño directo).
           && (!('trampaIgnoraDef' in d) || d.trampaIgnoraDef is bool)
@@ -633,12 +636,16 @@ service cloud.firestore {
         allow update: if esMiembro(c) && (
           ((resource.data.duenoUid == request.auth.uid || esGM(c))
             && elementoValido(request.resource.data)
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'trampaIgnoraDef', 'trampaDestino', 'fuegoDano', 'disparada', 'fuegoAmigo', 'turnos', 'venceMant', 'zonaResueltos', 'trampaDejaZona', 'zonaTurnos'])
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'trampaIgnoraDef', 'trampaDestino', 'fuegoDano', 'disparada', 'fuegoAmigo', 'turnos', 'venceMant', 'zonaResueltos', 'trampaDejaZona', 'zonaTurnos', 'trampaDetectar'])
             && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c)))
           // Un rival que pisa una trampa la marca como disparada (solo ese campo).
           || (resource.data.get('trampa', false) == true
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['disparada'])
             && request.resource.data.disparada == true)
+          // Quien la descubre con Percepción aumentada la marca como descubierta (solo ese campo): la ve todo su equipo (P145).
+          || (resource.data.get('trampa', false) == true
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['descubierta'])
+            && request.resource.data.descubierta == true)
           // Un aliado que usa un portal deja la hora del uso (solo ese campo): dispara los pulsos en todas las pantallas.
           || (resource.data.get('portal', false) == true
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usoEn'])
@@ -736,11 +743,15 @@ service cloud.firestore {
           allow update: if esMiembro(c) && (
             ((resource.data.duenoUid == request.auth.uid || esGM(c))
               && elementoValido(request.resource.data)
-              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'trampaIgnoraDef', 'trampaDestino', 'fuegoDano', 'disparada', 'fuegoAmigo', 'turnos', 'venceMant', 'zonaResueltos', 'trampaDejaZona', 'zonaTurnos'])
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'trampaIgnoraDef', 'trampaDestino', 'fuegoDano', 'disparada', 'fuegoAmigo', 'turnos', 'venceMant', 'zonaResueltos', 'trampaDejaZona', 'zonaTurnos', 'trampaDetectar'])
               && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c)))
             || (resource.data.get('trampa', false) == true
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['disparada'])
               && request.resource.data.disparada == true)
+            // Quien la descubre con Percepción aumentada la marca como descubierta (solo ese campo): la ve todo su equipo (P145).
+            || (resource.data.get('trampa', false) == true
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['descubierta'])
+              && request.resource.data.descubierta == true)
             // Un aliado que usa un portal deja la hora del uso (solo ese campo): dispara los pulsos en todas las pantallas.
             || (resource.data.get('portal', false) == true
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usoEn'])

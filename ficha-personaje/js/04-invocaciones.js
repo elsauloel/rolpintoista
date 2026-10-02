@@ -474,7 +474,7 @@ const invHabUi = {
   enMapa: () => window.parent !== window,
   ref: inv => fichaVivo && fichaVivo.id ? fichaVivo.id + '~' + inv.id : '',
   colocarZona: msg => { try{ MensajesMapa.alMapa(msg.tipo, msg); return true; }catch(err){ console.error('No se pudo avisar la zona al mapa:', err); return false; } },
-  colocarTrampa: (inv, h) => FichaAcciones.colocarTrampaDeHab(S, h, {yo: () => ({ref: invHabUi.ref(inv)}), enMapa: invHabUi.enMapa,
+  colocarTrampa: (inv, h) => FichaAcciones.colocarTrampaDeHab(S, h, {yo: () => ({ref: invHabUi.ref(inv)}), enMapa: invHabUi.enMapa, valorStat: st => InvCalculo.statValor(inv, st),
     alMapa: (tipo, msg) => MensajesMapa.alMapa(tipo, msg), mesaHabilidad: (nombre, detalle) => mesaPublicarHabilidadInv(inv, nombre, detalle), toast: t => toast(t)}),
 };
 function invEjecutarHab(invId, habId){

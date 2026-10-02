@@ -382,7 +382,7 @@ const Combatiente = (() => {
     if(modo === 'adyacente') return 1;
     if(modo === 'ilimitado') return 0;
     if(modo === 'fijo') return Math.max(0, Math.round(nf(c.alcanceN)));
-    return statTira === 'pdgmg' || statTira === 'dmgesp' ? v('rangocasteo') : 0;   // Dmg.Esp (2026-10-02): también del Especial
+    return statTira === 'pdgmg' || statTira === 'dmgesp' ? v('rangocasteo') : 0;   // Ef.Esp (2026-10-02): también del Especial
   }
   // Un efecto de la Ejecución, en la forma que usa el cuadro del duelo (y el estado que pone, `spec`).
   function efectoDeEjecucion(e){
@@ -444,9 +444,17 @@ const Combatiente = (() => {
       tiraStat: c.tira || '', tiraValor: Number.isFinite(o.tiraValor) ? Math.round(o.tiraValor) : null};
   }
   // La trampa que coloca una habilidad, lista para el mapa: si no trae nombre propio, lleva el de la habilidad.
-  function trampaDeHab(h){
+  // `valorDe(statId)` (2026-10-02, P145): el valor de un stat de quien la coloca — la dificultad para detectarla sale de su Destreza (trampas
+  // físicas) o de su Efecto especial (mágicas, `detectarStat: 'dmgesp'`), en el momento de colocarla. Sin `valorDe`, queda la de siempre (8).
+  function trampaDeHab(h, valorDe){
     const t = h && h.trampaColocar;
-    return t ? {...t, nombre: String(t.nombre || '').trim() || h.nombre} : null;
+    if(!t) return null;
+    const out = {...t, nombre: String(t.nombre || '').trim() || h.nombre};
+    if(typeof valorDe === 'function'){
+      const v = Number(valorDe(t.detectarStat === 'dmgesp' ? 'dmgesp' : 'des'));
+      if(Number.isFinite(v)) out.detectar = Math.max(1, Math.round(v));
+    }
+    return out;
   }
   /* «Ataque con mi arma, con arreglos» (Golpe brutal, Carga, Takle…): el ataque que va al duelo, con lo que le suma la
      habilidad (PdG, dados del Tipo del arma, daño fijo, crítico, ignorar resistencia a crítico, sin Parry, efectos al pegar

@@ -194,18 +194,24 @@ const FichaBotonera = (() => {
   }
   // Percepción (de Destreza): con Percepción aumentada, cada dado sube un escalón (d6 → d8, d8 → d10…). azar: para las pruebas.
   const PERCEPCION_DADO_SUBE = {2: 4, 3: 4, 4: 6, 6: 8, 8: 10, 10: 12, 12: 20, 20: 20};
-  function tiradaPercepcion(S, azar){
+  // La tirada a partir del valor (2026-10-02: la usa también el mapa, con el valor que publica la ficha, para «algo está fuera de lugar», P145).
+  function tiradaPercepcionValor(valor, mejor, azar){
     azar = azar || Math.random;
-    const valor = FichaCalculo.calcular(S).final.percepcion;
     const f = formulaParaValor(valor);
-    if(!f) return {error: `Percepción: ${fmt(num(valor))} no se puede tirar con dados reales`};
-    const mejor = tienePercepcionAumentada(S);
+    if(!f) return null;
     const combo = f.combo.map(d => mejor ? (PERCEPCION_DADO_SUBE[d] || d) : d);
     const rolls = combo.map(d => 1 + Math.floor(azar() * d));
     const cuenta = {};
     combo.forEach(d => { cuenta[d] = (cuenta[d] || 0) + 1; });
     const formula = Object.keys(cuenta).map(Number).sort((a, b) => a - b).map(d => `${cuenta[d]}d${d}`).join('+') + (f.mod ? `+${f.mod}` : '');
-    return {origen: mejor ? 'Percepción (aumentada)' : 'Percepción', r: {formula, rolls, mod: f.mod, total: rolls.reduce((a, b) => a + b, 0) + f.mod}};
+    return {formula, rolls, mod: f.mod, total: rolls.reduce((a, b) => a + b, 0) + f.mod};
+  }
+  function tiradaPercepcion(S, azar){
+    const valor = FichaCalculo.calcular(S).final.percepcion;
+    const mejor = tienePercepcionAumentada(S);
+    const r = tiradaPercepcionValor(valor, mejor, azar);
+    if(!r) return {error: `Percepción: ${fmt(num(valor))} no se puede tirar con dados reales`};
+    return {origen: mejor ? 'Percepción (aumentada)' : 'Percepción', r};
   }
 
   /* ---------- La Botonera ---------- */
@@ -404,7 +410,7 @@ const FichaBotonera = (() => {
     return {html, nitros: badgeNitros, sp: badgeSp, def: badgeDef};
   }
 
-  return {STATS_SIN_TIRADA, TIPOS_IDS, PERCEPCION_DADO_SUBE, html, tiradaStat, tiradaPercepcion,
+  return {STATS_SIN_TIRADA, TIPOS_IDS, PERCEPCION_DADO_SUBE, html, tiradaStat, tiradaPercepcion, tiradaPercepcionValor,
     spMaximo, nitrosMaximo, tienePercepcionAumentada, tieneSigilo, efectoSigilo, efectoSentado,
     statsConTirada, habStatTirable, habTieneSegundaTirada, botonSegundaHab, dueloDe, modoHab, habAutomatizada,
     armasParaHabilidad, costoAtaqueMinimo, costoAtaqueHabTxt, costoNitrosHab, sinNitrosPara, costoHabilidadTxt,

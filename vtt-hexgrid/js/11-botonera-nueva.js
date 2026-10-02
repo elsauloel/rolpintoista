@@ -111,8 +111,8 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261002d', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js?v=20261002h', '../comun/ficha-habilidades.js?v=20261001c',
-  '../comun/catalogo.js?v=20261002d', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261002d', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/inv-calculo.js?v=20261002d', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/inv-duelo.js?v=20261001a', '../comun/ficha-acciones.js?v=20261002g', '../comun/inv-habilidades.js?v=20261002g', '../comun/inv-lupa.js?v=20261001a',
+const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261002i', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js?v=20261002i', '../comun/ficha-habilidades.js?v=20261001c',
+  '../comun/catalogo.js?v=20261002i', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261002d', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261002i', '../comun/ficha-resumen.js?v=20261001a', '../comun/inv-calculo.js?v=20261002d', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/inv-duelo.js?v=20261001a', '../comun/ficha-acciones.js?v=20261002i', '../comun/inv-habilidades.js?v=20261002g', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
@@ -328,7 +328,7 @@ function bnInvHabUi(){
     enMapa: () => true,
     ref: inv => bn.fichaId + SEP_INVOCACION + inv.id,
     colocarZona: msg => { bnAlMapa(msg.tipo, msg); return true; },
-    colocarTrampa: (inv, h) => FichaAcciones.colocarTrampaDeHab(bn.S, h, {yo: () => ({ref: bn.fichaId + SEP_INVOCACION + inv.id}), enMapa: () => true,
+    colocarTrampa: (inv, h) => FichaAcciones.colocarTrampaDeHab(bn.S, h, {yo: () => ({ref: bn.fichaId + SEP_INVOCACION + inv.id}), enMapa: () => true, valorStat: st => InvCalculo.statValor(inv, st),
       alMapa: (tipo, msg) => bnAlMapa(tipo, msg), mesaHabilidad: (nombre, detalle) => ui.mesaHabilidad(inv, nombre, detalle), toast: t => toast(t)}),
   };
   return ui;

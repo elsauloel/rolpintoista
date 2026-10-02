@@ -1021,3 +1021,9 @@ versión parecida en más de una, es candidato a juntar.
   ejecutar ya no se tira nada — la zona aparece siempre. `Combatiente.zonaDeHab` manda `tiraStat` + `tiraValor` (el valor del stat de quien
   la crea en ese momento; lo calculan `FichaAcciones.colocarZonaDeHab`, `CreepAcciones.zonaDeHab` e `InvHabilidades.zona`) y el mapa lo tira
   **cada vez que la zona afecta a alguien**. En el ✨, con objetivo zona, el paso se llama «Tirada de la zona» (solo un stat, o «No»).
+- **Efecto especial (Ef.Esp)** (2026-10-02): el stat `dmgesp` se renombró de "Daño especial" a **"Efecto especial"** (la potencia de
+  los efectos del Especial, daño u otros); el id no cambió. También es la dificultad de las trampas mágicas que coloca una habilidad.
+- **Dificultad para detectar una trampa** (2026-10-02, P145): `AsistenteTrampa` suma el paso «detecta» — en el mapa un número
+  (`detectar`, trampa común 8), en una habilidad de qué stat sale (`detectarStat: 'des' | 'dmgesp'`). `Combatiente.trampaDeHab(h, valorDe)`
+  calcula `detectar` con el stat de quien la coloca; `TokensAuto.colocarTrampas` lo escribe como `trampaDetectar`. `Plantillas.TRAMPA` suma
+  `detectar` y `detectarStat`. `FichaBotonera.tiradaPercepcionValor(valor, aumentada, azar)`: la tirada de Percepción a partir del valor.

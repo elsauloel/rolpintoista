@@ -96,7 +96,7 @@ async function aplicarEstadoAObjetivo(tok, spec, origen){
 // trampaDeHabilidad en el mapa). Devuelve false si no hay mapa (entonces se coloca sola al lado del token, como siempre).
 function pedirTrampaAlMapaCreep(sc, h){
   if(window.parent === window) return false;
-  try{ MensajesMapa.alMapa('trampa-habilidad', {fichaId: sc.id, tipoToken: 'creep', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h)}); return true; }
+  try{ MensajesMapa.alMapa('trampa-habilidad', {fichaId: sc.id, tipoToken: 'creep', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h, st => CreepCalculo.statValor(sc, st))}); return true; }
   catch(err){ console.error('No se pudo avisar la trampa al mapa:', err); return false; }
 }
 // ✨ Automática, solo sobre el propio creep y sin tiradas: aplica los efectos del cuadro de Ejecución directo (como Blindaje en la ficha).
@@ -105,7 +105,7 @@ function pedirTrampaAlMapaCreep(sc, h){
 function aplicarHabCreepSobreSi(sc, h){ return CreepAcciones.sobreSi(sc, h); }   // comun/creep-acciones.js
 async function colocarTrampaDeHab(sc, h){
   try{
-    const r = await TokensAuto.colocarTrampas({fichaId: sc.id, tipoToken: 'creep', trampa: Combatiente.trampaDeHab(h)});   // forma única (P123)
+    const r = await TokensAuto.colocarTrampas({fichaId: sc.id, tipoToken: 'creep', trampa: Combatiente.trampaDeHab(h, st => CreepCalculo.statValor(sc, st))});   // forma única (P123)
     if(r.colocadas) toast(`🪤 ${r.colocadas === 1 ? 'Trampa colocada' : r.colocadas + ' trampas colocadas'} al lado de ${sc.nombre}, oculta${r.colocadas === 1 ? '' : 's'} a los jugadores`);
     else if(r.motivo === 'sin-token') toast(`${sc.nombre} no tiene token en ese mapa: la trampa no se colocó (ponela a mano con Terreno y Formas → Trampa)`);
     else toast('No hay casilla libre al lado del token para la trampa');

@@ -168,10 +168,13 @@ function nieblaDeshacer(seq0, pend0){
    La dispara un rival del dueño (los creeps si la puso un jugador; los personajes si la puso el
    GM) que pise cualquiera de sus casillas en la ruta: el movimiento se corta ahí, la trampa
    queda marcada como disparada (visible para todos) y se avisa en rojo en la Mesa. Quien tiene
-   la pasiva Percepción aumentada, además, se detiene al quedar justo al lado de una: le
-   corresponde una tirada de percepción (una vez por trampa). */
-let trampaPendiente = null;   // {tokenId, tipo: 'pisa' | 'cerca', id, el}
-const trampasAvisadas = new Set();   // 'token:trampa' ya avisadas por cercanía
+   la pasiva Percepción aumentada, además, se detiene al quedar justo al lado de una que todavía no ve
+   (2026-10-02, P145): «Algo está fuera de lugar… tirá Percepción» — sin decir qué es. Si gana contra la
+   dificultad de la trampa (`trampaDetectar`, 8 si no tiene), la descubre y la ve todo su equipo
+   (`descubierta`); si pierde, sigue libre: pisarla la detona y pasar por OTRO casillero al lado
+   vuelve a pedir la tirada (una vez por casillero). */
+let trampaPendiente = null;   // {tokenId, tipo: 'pisa' | 'cerca', id, el, celda}
+const trampasAvisadas = new Set();   // 'token:trampa:casillero' que ya pidieron la tirada
 
 // Criterio del dueño (2026-09-25): los aliados NUNCA disparan una trampa (solo la activan los rivales de quien la puso). "Fuego amigo"
 // es del EFECTO: si es de área y tiene fuego amigo (lo físico y explosivo), alcanza a todos los de adentro, aliados incluidos; si no
@@ -202,7 +205,9 @@ function trampasEvaluarRuta(tokId, t, ruta){
     if(pisa) return {indice: i, tipo: pisa.portal ? 'portal' : 'pisa', id: pisa.id, el: pisa.el};
     if(atento){
       const vec = vecinosDeCasilla(ruta[i]).map(v => nbPack(v.col, v.fila));
-      const cerca = trampas.find(x => !x.portal && !trampasAvisadas.has(tokId + ':' + x.id) && vec.some(k => x.set.has(k)));
+      const aca = nbPack(ruta[i].col, ruta[i].fila);
+      // Solo las que todavía no ve (ni descubierta por su equipo, ni vista por este navegador), y una vez por casillero.
+      const cerca = trampas.find(x => !x.portal && !x.el.descubierta && !trampasVistas.has(x.id) && !trampasAvisadas.has(tokId + ':' + x.id + ':' + aca) && vec.some(k => x.set.has(k)));
       if(cerca) return {indice: i, tipo: 'cerca', id: cerca.id, el: cerca.el};
     }
   }
@@ -277,7 +282,7 @@ async function fuegoMantenimiento(numero){
    sus creeps) al entrar y en cada Mantenimiento. Pedido explícito del dueño: "que la automatización no quite el
    momento de esto está pasando" — nunca se resuelve en silencio, siempre aparece #zona-banner con lo que
    corresponde (tirar para resistir, o un simple "Aplicar" si no hay nada que tirar) antes de tocar nada. */
-const ZONA_STAT_LABEL = {resmg: 'Res.Esp', dmgesp: 'Dmg.Esp', resm: 'Res.Mt', con: 'Constitución', fue: 'Fuerza', agl: 'Agilidad', des: 'Destreza', esp: 'Especial', eva: 'Evasión', pdg: 'PdG', pdgmg: 'PdG.Esp'};
+const ZONA_STAT_LABEL = {resmg: 'Res.Esp', dmgesp: 'Ef.Esp', resm: 'Res.Mt', con: 'Constitución', fue: 'Fuerza', agl: 'Agilidad', des: 'Destreza', esp: 'Especial', eva: 'Evasión', pdg: 'PdG', pdgmg: 'PdG.Esp'};
 // El stat de un creep para resistir una zona: el mismo cálculo que GM Tools (comun/creep-calculo.js, paso 4 etapa 4a). Antes era
 // una cuenta propia que no sumaba lo que sube el atributo (Res.Esp sin los bonos de Constitución, Evasión sin los de Agilidad)
 // ni el +1 de Res.Esp de los jefes.
@@ -553,11 +558,60 @@ async function trampaResolver(){
     }
     return;
   }
-  trampasAvisadas.add(p.tokenId + ':' + p.id);
-  // Descubrir una trampa NO rompe el sigilo, pero la trampa se vuelve visible para quien la descubrió (2026-09-24, regla dicha por el dueño).
-  descubrirTrampa(p.id);
-  toast('🔎 Descubriste una trampa: ahora la ves (corresponde una tirada de percepción)');
-  alertaRojaAnonima('⚠ Hace falta una tirada de percepción');
+  // 'cerca' (Percepción aumentada, P145): no se revela nada todavía — el cartelito pide la tirada sin decir qué es.
+  const c = p.celda || {col: t.col, fila: t.fila};
+  trampasAvisadas.add(p.tokenId + ':' + p.id + ':' + nbPack(c.col, c.fila));
+  percepcionBanner = {tokenId: p.tokenId, trampaId: p.id, resultado: null};
+  renderPercepcionBanner();
+}
+
+/* ---------- «Algo está fuera de lugar» (Percepción aumentada, 2026-10-02, P145) ----------
+   Un cartelito (como el de las zonas) en la pantalla de quien movió: «🔎 Algo está fuera de lugar… [🎲 Tirar Percepción]». La tirada
+   (la misma de la ficha, con el dado que sube un escalón, del valor `resumen.percepcion`) sale en la Mesa como una Percepción cualquiera,
+   sin decir para qué. Gana si llega a la dificultad de la trampa (`trampaDetectar`, 8 si no tiene): la trampa queda `descubierta` (la ve
+   todo su equipo). Si no, «No notás nada raro» y sigue. Descubrirla no rompe el sigilo. */
+let percepcionBanner = null;   // {tokenId, trampaId, resultado}
+function renderPercepcionBanner(){
+  let el2 = document.getElementById('percepcion-banner');
+  if(!percepcionBanner){ if(el2) el2.hidden = true; return; }
+  if(!el2){
+    el2 = document.createElement('div');
+    el2.id = 'percepcion-banner';
+    el2.style.cssText = 'position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:76;background:#151a26;border:1px solid #39435c;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;flex-wrap:wrap;justify-content:center;color:#e9ecf4;font-size:14px';
+    document.body.appendChild(el2);
+  }
+  el2.hidden = false;
+  const t = tokens.get(percepcionBanner.tokenId);
+  const quien = t ? nombreDe(t) : '';
+  el2.innerHTML = percepcionBanner.resultado
+    ? `<span>🔎 ${esc(quien)}: ${esc(percepcionBanner.resultado)}</span><button type="button" class="btn" id="percepcion-banner-ok">Listo</button>`
+    : `<span>🔎 <b>Algo está fuera de lugar…</b> ${esc(quien)}, tirá Percepción</span><button type="button" class="btn" id="percepcion-banner-ir">🎲 Tirar Percepción</button>`;
+  const bt = document.getElementById('percepcion-banner-ir'); if(bt) bt.onclick = percepcionResolverBanner;
+  const bo = document.getElementById('percepcion-banner-ok'); if(bo) bo.onclick = () => { percepcionBanner = null; renderPercepcionBanner(); };
+}
+async function percepcionResolverBanner(){
+  const pb = percepcionBanner;
+  if(!pb || pb.resultado) return;
+  const bt = document.getElementById('percepcion-banner-ir'); if(bt) bt.disabled = true;
+  const t = tokens.get(pb.tokenId), el = elementos.get(pb.trampaId);
+  if(!t){ percepcionBanner = null; renderPercepcionBanner(); return; }
+  try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo tirar Percepción'); if(bt) bt.disabled = false; return; }
+  const f = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]);
+  const valor = f && f.resumen ? num(f.resumen.percepcion) : 0;
+  const r = FichaBotonera.tiradaPercepcionValor(valor, true);
+  if(!r){ toast('Percepción: sin valor para tirar (abrí la ficha una vez para que lo publique)'); percepcionBanner = null; renderPercepcionBanner(); return; }
+  const nombre = nombreDe(t);
+  try{ mesaPublicar(`${nombre} · Percepción (aumentada)`, {...r, quien: nombre, ficha: String(t.fichaId).split(SEP_INVOCACION)[0]}); }catch(err){}
+  const dif = el ? Math.max(1, Math.round(num(el.trampaDetectar)) || 8) : Infinity;
+  if(el && !el.disparada && r.total >= dif){
+    descubrirTrampa(pb.trampaId);   // ya, en esta pantalla
+    try{ await coleccionElementos().doc(pb.trampaId).update({descubierta: true}); }   // y para todo su equipo
+    catch(err){ console.error('No se pudo marcar la trampa como descubierta (¿faltan publicar las reglas?):', err); }
+    percepcionBanner = {...pb, resultado: `encontraste algo: ${el.trampaNombre ? `«${el.trampaNombre}», ` : ''}una trampa (${r.total} contra ${dif}).`};
+  }else{
+    percepcionBanner = {...pb, resultado: `no notás nada raro (${r.total}).`};
+  }
+  renderPercepcionBanner();
 }
 
 // Quien camina (sin estar en sigilo) puede entrar en el CONO de un rival en sigilo (detección

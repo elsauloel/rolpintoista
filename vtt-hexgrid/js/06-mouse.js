@@ -483,8 +483,8 @@ function soltar(){
         a.x = pc.x; a.y = pc.y;
         if(corteSigilo) toast(`🕶 Viste a ${corteSigilo.ocultos.map(o => o.nombre).join(', ')}: el movimiento se corta acá y pierde el sigilo`);
         else{
-          trampaPendiente = {tokenId: a.id, tipo: corteTrampa.tipo, id: corteTrampa.id, el: corteTrampa.el};
-          toast(corteTrampa.tipo === 'pisa' ? '⚠ Pisaste algo: el movimiento se corta acá' : '🔎 Algo llama tu atención: el movimiento se corta acá');
+          trampaPendiente = {tokenId: a.id, tipo: corteTrampa.tipo, id: corteTrampa.id, el: corteTrampa.el, celda: a.ruta[a.ruta.length - 1]};
+          if(corteTrampa.tipo === 'pisa') toast('⚠ Pisaste algo: el movimiento se corta acá');   // 'cerca': lo dice el cartelito, sin nombrar la trampa (P145)
         }
       }
     }

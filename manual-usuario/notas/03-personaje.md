@@ -47,7 +47,7 @@ Todo personaje tiene **cinco atributos**. Son el "esqueleto" del personaje: de c
 |---|---|---|
 | [[Fuerza]] | FUE | [[Daño y Tipo de arma\|Daño]], [[Bloqueo]], [[Carga máxima]] |
 | [[Constitución]] | CON | [[HP]] máximo, [[Resistencias\|Res. Mágica y Res. CC]] |
-| [[Especial]] | ESP | [[SP]], PdG.Esp, Dmg.Esp, Res. Mental, Rango de casteo |
+| [[Especial]] | ESP | [[SP]], PdG.Esp, Ef.Esp, Res. Mental, Rango de casteo |
 | [[Destreza]] | DES | [[Atacar\|PdG]], [[Golpe crítico\|Crítico frecuente y potente]], [[Parry]], [[Ataques a distancia\|Rango]] |
 | [[Agilidad]] | AGL | [[Evasión]], [[Iniciativa]], [[Nitros (No2)]] |
 
@@ -97,7 +97,7 @@ El atributo de lo **mágico y lo extraño** (antes "Inteligencia"). De él salen
 
 - **[[SP]] = Especial × 3**: el "mana" para tus habilidades.
 - **PdG.Esp:** la "probabilidad de golpe" de los hechizos, en paralelo al PdG físico.
-- **Dmg.Esp (Daño especial):** una tirada de "cuánto daño" del Especial, en paralelo al Dmg de la Fuerza. Se usa en habilidades puntuales (por ejemplo, una que tira Dmg.Esp contra la Res.Esp de cada uno). Lo suben los Anillos, Pociones y Pergaminos de Furia Arcana y la pasiva Potencia especial.
+- **Ef.Esp (Efecto especial):** la potencia de los efectos del Especial —daño u otros—, en paralelo al Dmg de la Fuerza. Se usa en habilidades puntuales (por ejemplo, una que tira Ef.Esp contra la Res.Esp de cada uno) y en las trampas mágicas que coloca una habilidad (su dificultad para detectarlas). Lo suben los Anillos, Pociones y Pergaminos de Furia Arcana y la pasiva Potencia especial.
 - **Res. Mental** ([[Resistencias]]).
 - **Rango de casteo:** hasta dónde llegan tus hechizos.
 
@@ -156,7 +156,7 @@ De cada [[Atributos|atributo]] se desprenden varios **stats derivados**. Todos s
 | Parry | Destreza | [[Parry]] |
 | Rng | Destreza | [[Ataques a distancia]] |
 | SP | [[Especial]] × 3 | [[SP]] |
-| PdG.Esp · Dmg.Esp · Res.Mt · Rango de casteo | Especial | Hechizos |
+| PdG.Esp · Ef.Esp · Res.Mt · Rango de casteo | Especial | Hechizos |
 
 ## Stats sin atributo "padre"
 - **[[Defensa]] (Def):** viene del equipo, de habilidades o de efectos. Resta al daño físico.

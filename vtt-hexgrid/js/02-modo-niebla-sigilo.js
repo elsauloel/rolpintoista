@@ -526,7 +526,7 @@ function abrirAsistenteTrampaPanel(){
     contexto: 'mapa', editando: false, colores: COLORES, estados: trampaEstadosParaAsistente(),
     inicial: {nombre: elemTrampaNombre, descripcion: elemTrampaDetalle, forma: elemTipo, color: elemColor, alfa: elemAlfa, amiga: elemTrampaAmiga,
       dano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', contemplaArmadura: !elemTrampaIgnoraDef, estado: elemTrampaEstado, estadoTurnos: elemTrampaEstadoTurnos, turnos: elemTurnos, teleport: elemTrampaTeleport,
-      dejaZona: elemTrampaDejaZona, zonaTurnos: elemTrampaZonaTurnos, zonaEnMant: elemTrampaZonaEnMant, zonaCadaPaso: elemTrampaZonaCadaPaso, zonaResistStat: elemTrampaZonaResistStat, zonaResistValor: elemTrampaZonaResistValor},
+      dejaZona: elemTrampaDejaZona, zonaTurnos: elemTrampaZonaTurnos, zonaEnMant: elemTrampaZonaEnMant, zonaCadaPaso: elemTrampaZonaCadaPaso, zonaResistStat: elemTrampaZonaResistStat, zonaResistValor: elemTrampaZonaResistValor, detectar: elemTrampaDetectar},
     alTerminar: res => {
       elemTrampa = true; elemTrampaNombre = res.nombre.trim().slice(0, 40); elemTrampaDetalle = AsistenteTrampa.detalleFinal(res); elemTrampaAmiga = !!res.amiga;
       elemTrampaDano = res.dano || ''; elemTrampaIgnoraDef = !res.contemplaArmadura; elemTrampaEstado = res.estado || ''; elemTrampaEstadoTurnos = num(res.estadoTurnos);
@@ -539,8 +539,9 @@ function abrirAsistenteTrampaPanel(){
       elemTrampaDejaZona = !!res.dejaZona; elemTrampaZonaTurnos = Math.max(1, Math.round(num(res.zonaTurnos)) || 3);
       elemTrampaZonaEnMant = res.zonaEnMant !== false; elemTrampaZonaCadaPaso = !!res.zonaCadaPaso;
       elemTrampaZonaResistStat = res.zonaResistStat || ''; elemTrampaZonaResistValor = Math.round(num(res.zonaResistValor)) || 12;
+      elemTrampaDetectar = Math.max(1, Math.round(num(res.detectar)) || 8);
       if(res.guardar) guardarTrampaRecurrente({nombre: elemTrampaNombre, detalle: elemTrampaDetalle, amiga: elemTrampaAmiga, tipo: elemTipo, tamano: elemTamano, color: elemColor, alfa: elemAlfa,
-        dano: elemTrampaDano, ignoraDef: elemTrampaIgnoraDef, estado: elemTrampaEstado, estadoTurnos: elemTrampaEstadoTurnos});
+        dano: elemTrampaDano, ignoraDef: elemTrampaIgnoraDef, estado: elemTrampaEstado, estadoTurnos: elemTrampaEstadoTurnos, detectar: elemTrampaDetectar});
       renderHerramientaFlotante(); pedirDibujo();
       if(elemTrampaTeleport && !elemTrampaDestino) elegirDestino(h => { elemTrampaDestino = h.col + ',' + h.fila; renderHerramientaFlotante(); toast(`Destino marcado: ahora elegí dónde poner la trampa`); });
       else toast(`Trampa "${elemTrampaNombre}" lista: elegí dónde ponerla`);
@@ -560,14 +561,14 @@ function abrirAsistenteTrampaEditar(id, alCancelar){
     inicial: {nombre: el.trampaNombre || '', descripcion: el.trampaDetalle || '', forma: el.tipo, color: el.color, alfa: el.alfa, amiga: !!el.fuegoAmigo,
       dano: trampaDanoValido(el.trampaDano) ? String(el.trampaDano).trim() : '', contemplaArmadura: !el.trampaIgnoraDef,
       estado: est && est.nombre || '', estadoTurnos: est ? num(est.turnos) : 0, turnos: restan, teleport: !!el.trampaDestino,
-      dejaZona: !!el.trampaDejaZona, zonaTurnos: el.zonaTurnos, zonaEnMant: el.zonaEnMantenimiento, zonaCadaPaso: el.zonaCadaPaso, zonaResistStat: el.zonaResistStat, zonaResistValor: el.zonaResistValor},
+      dejaZona: !!el.trampaDejaZona, zonaTurnos: el.zonaTurnos, zonaEnMant: el.zonaEnMantenimiento, zonaCadaPaso: el.zonaCadaPaso, zonaResistStat: el.zonaResistStat, zonaResistValor: el.zonaResistValor, detectar: el.trampaDetectar || 8},
     alTerminar: res => {
       const cambios = {trampa: true, trampaNombre: res.nombre.trim().slice(0, 40), trampaDetalle: AsistenteTrampa.detalleFinal(res), fuegoAmigo: !!res.amiga,
         trampaDano: res.dano || '', trampaIgnoraDef: !res.contemplaArmadura,
         trampaEstado: res.estado ? JSON.stringify({nombre: res.estado, turnos: res.estadoTurnos > 0 ? res.estadoTurnos : trampaEstadoTurnosPreset(res.estado)}) : '',
         trampaDestino: res.teleport ? String(el.trampaDestino || '') : '', color: res.color, alfa: res.alfa,
         trampaDejaZona: !!res.dejaZona, zonaTurnos: Math.max(1, num(res.zonaTurnos) || 3), zonaEnMantenimiento: res.zonaEnMant !== false, zonaCadaPaso: !!res.zonaCadaPaso,
-        zonaResistStat: res.zonaResistStat || '', zonaResistValor: num(res.zonaResistValor) || 12};
+        zonaResistStat: res.zonaResistStat || '', zonaResistValor: num(res.zonaResistValor) || 12, trampaDetectar: Math.max(1, Math.round(num(res.detectar)) || 8)};
       const n = Math.max(0, Math.min(99, num(res.turnos)));
       Object.assign(cambios, n > 0 ? {turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n} : {turnos: 0, venceMant: null});
       Object.assign(el, cambios);
@@ -590,6 +591,7 @@ function cargarTrampaEnPanel(g, meta){
     elemTrampaZonaCadaPaso = !!g.zonaCadaPaso; elemTrampaZonaResistStat = g.zonaResistStat || ''; elemTrampaZonaResistValor = Math.round(num(g.zonaResistValor)) || 12;
   }
   elemTrampaTeleport = !!g.teleport; if(!g.teleport) elemTrampaDestino = '';
+  elemTrampaDetectar = Math.max(1, Math.round(num(g.detectar)) || 8);
   elemTrampa = true; elemTrampaNombre = g.nombre || ''; elemTrampaDetalle = g.detalle || ''; elemTrampaAmiga = !!g.amiga; elemTrampaDano = g.dano || ''; elemTrampaIgnoraDef = !!g.ignoraDef; elemTrampaEstado = g.estado || ''; elemTrampaEstadoTurnos = Math.max(0, Math.round(num(g.estadoTurnos)) || 0);
   if(['flor', 'linea', 'libre'].includes(g.tipo)) elemTipo = g.tipo;
   elemTamano = Math.max(1, Math.min(TAMANO_ELEMENTO_MAX, Math.round(num(g.tamano)) || 1));

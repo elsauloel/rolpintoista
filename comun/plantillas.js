@@ -82,7 +82,8 @@ const Plantillas = (() => {
      `trampaDesde(t)` traduce cualquier trampa, también las viejas de las habilidades ({radio, cant, estado: {nombre,
      turnos}}), a esta forma. */
   const TRAMPA = ['nombre', 'detalle', 'amiga', 'tipo', 'tamano', 'color', 'alfa', 'dano', 'ignoraDef', 'estado', 'estadoTurnos', 'estadoMods', 'teleport',
-    'dejaZona', 'zonaTurnos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaResistStat', 'zonaResistValor', 'turnos', 'cant'];
+    'dejaZona', 'zonaTurnos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaResistStat', 'zonaResistValor', 'turnos', 'cant',
+    'detectar', 'detectarStat'];   // dificultad para detectarla (P145): un número (mapa) o de qué stat de quien la coloca sale (habilidad)
   function trampaDesde(t){
     if(!t || typeof t !== 'object') return null;
     const n = v => Number(v) || 0;

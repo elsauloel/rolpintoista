@@ -159,7 +159,7 @@ const CreepCalculo = (() => {
     fue: [['dmg', 'Dmg'], ['bloqueo', 'Bloqueo']],
     agl: [['eva', 'Eva'], ['ini', 'Iniciativa']],
     des: [['rng', 'Rng'], ['pdg', 'PdG'], ['crit', 'Crít.Frec.'], ['critpot', 'Crít.Pot.'], ['parry', 'Parry'], ['percepcion', 'Percep.']],
-    esp: [['pdgmg', 'PdG.Esp'], ['dmgesp', 'Dmg.Esp'], ['resm', 'Res.Mt'], ['rangocasteo', 'Rango Cast.']],
+    esp: [['pdgmg', 'PdG.Esp'], ['dmgesp', 'Ef.Esp'], ['resm', 'Res.Mt'], ['rangocasteo', 'Rango Cast.']],
   };
   const ATTR_NOMBRE = {con:'Constitución', fue:'Fuerza', agl:'Agilidad', des:'Destreza', esp:'Especial'};
 
@@ -175,7 +175,7 @@ const CreepCalculo = (() => {
     {id:'dmg', label:'Dmg', attr:'fue'}, {id:'bloqueo', label:'Bloqueo', attr:'fue'},
     {id:'eva', label:'Eva', attr:'agl'}, {id:'ini', label:'Iniciativa', attr:'agl'}, {id:'mov', label:'Mov', attr:'agl'},
     {id:'rng', label:'Rango', attr:'des'}, {id:'pdg', label:'PdG', attr:'des'}, {id:'crit', label:'Crítico frecuente', attr:'des'}, {id:'critpot', label:'Crítico potente', attr:'des'}, {id:'parry', label:'Parry', attr:'des'}, {id:'percepcion', label:'Percepción', attr:'des'},
-    {id:'pdgmg', label:'PdG.Esp', attr:'esp'}, {id:'dmgesp', label:'Dmg.Esp', attr:'esp'}, {id:'resm', label:'Res.Mt', attr:'esp'}, {id:'rangocasteo', label:'Rango de casteo', attr:'esp'},
+    {id:'pdgmg', label:'PdG.Esp', attr:'esp'}, {id:'dmgesp', label:'Ef.Esp', attr:'esp'}, {id:'resm', label:'Res.Mt', attr:'esp'}, {id:'rangocasteo', label:'Rango de casteo', attr:'esp'},
   ];
   // Mismo criterio que STATS_SIN_TIRADA/STATS_REDUNDANTES_COMBATE en la
   // Botonera de la ficha: los 5 atributos base + los secundarios que no

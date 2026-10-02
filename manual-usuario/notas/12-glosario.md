@@ -53,7 +53,7 @@ Todas las palabras y siglas del juego, con un enlace a la nota que las explica.
 | **PdG** | Probabilidad de Golpe: lo que tirás para conectar | [[Atacar]] |
 
 | **PdG.Esp** | PdG de los hechizos | [[Especial]] |
-| **Dmg.Esp** | Daño especial: tirada de daño del Especial, para habilidades puntuales | [[Especial]] |
+| **Ef.Esp** | Efecto especial: la potencia de los efectos del Especial (daño u otros), para habilidades y trampas mágicas | [[Especial]] |
 
 | **Dmg** | Daño que se suma al del arma | [[Daño y Tipo de arma]] |
 

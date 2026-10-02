@@ -654,7 +654,7 @@ resuelven a mano, como el resto de los avisos).
   otorguen algunos equipos, efectos, habilidades o consumibles, y cuyo único trabajo sea reducir el daño mágico? ¿Qué topes o valores
   típicos? ¿Debería reducir todo daño mágico o solo algunos tipos?
 
-- **P145. Percepción aumentada: "algo está fuera de lugar" (2026-10-02, pedido del dueño; reemplaza el aviso actual).** Lo decidido:
+- **P145. Percepción aumentada: "algo está fuera de lugar" (2026-10-02, pedido del dueño; reemplaza el aviso actual).** **Respondido el mismo día:** (a) la trampa tiene su dificultad para detectarla — de fábrica o armada a mano, un número (común 8: espacio de diseño, trampas de buena o mala calidad); colocada por una habilidad, la Destreza (física) o el Efecto especial (mágica) de quien la coloca; (b) en sigilo, Percepción contra Destreza; (c) descubierta, la ve todo el equipo; (d) la tirada nunca dice para qué es. **Trampas: hecho (2026-10-02). Sigilo: pendiente.** Lo decidido:
   con la pasiva, (1) **trampas**: al quedar al lado de una trampa oculta de un rival, el movimiento se corta **sin revelar nada ni decir
   "trampa"** — solo «Algo está fuera de lugar… tirá Percepción»; si gana contra la dificultad de la trampa, recién ahí la ve; si pierde,
   sigue moviéndose libre: pisarla la detona, y pasar por **otro** casillero al lado vuelve a cortar y pedir tirada. (2) **Sigilo**: la zona

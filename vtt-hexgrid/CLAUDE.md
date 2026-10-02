@@ -1208,3 +1208,12 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   de quien la creó y su valor al crearla) y `zonaResolverBanner` lo tira cada vez (publica «Pedos Tóxicos (de Silvia) · Dmg.Esp» en la Mesa)
   contra la resistencia de quien entra. Las zonas viejas, las del GM y las de trampas siguen con su número fijo (`zonaResistValor`).
   Reglas nuevas de Firestore (esos dos campos).
+- **Percepción aumentada: «Algo está fuera de lugar» con las trampas** (2026-10-02, P145; reemplaza el aviso que mostraba la trampa):
+  al quedar al lado de una trampa oculta de un rival que todavía no ve, el movimiento se corta sin nombrar nada y aparece un cartelito
+  (`#percepcion-banner`, `renderPercepcionBanner`/`percepcionResolverBanner`) «🔎 Algo está fuera de lugar… tirá Percepción». La tirada
+  (`FichaBotonera.tiradaPercepcionValor` con `resumen.percepcion`, dado un escalón más alto) sale en la Mesa como una Percepción
+  cualquiera. Si llega a `trampaDetectar` (8 si no tiene), la trampa queda `descubierta: true` y la ve **todo su equipo**
+  (`puedeVerElemento`); si no, «no notás nada raro» y sigue: pisarla la detona, y otro casillero al lado vuelve a pedir la tirada
+  (`trampasAvisadas` por casillero). Ya no sale la línea roja «Hace falta una tirada de percepción». La dificultad se arma en el
+  paso nuevo «¿Qué tan difícil es detectarla?» del asistente (`elemTrampaDetectar`); las de habilidad la toman de la Destreza o del
+  Efecto especial de quien las coloca. Reglas nuevas (`trampaDetectar`, `descubierta`). **Falta** la parte del sigilo de P145.

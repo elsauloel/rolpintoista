@@ -227,7 +227,7 @@ function acLanzarAtaqueDeHab(sc, h){
 // 🪤 Una 💰 con trampa: la coloca sola, oculta, al lado del token del creep (como GM Tools).
 async function acColocarTrampaJunto(sc, h){
   try{
-    const r = await TokensAuto.colocarTrampas({fichaId: sc.id, tipoToken: 'creep', trampa: Combatiente.trampaDeHab(h)});   // forma única (P123)
+    const r = await TokensAuto.colocarTrampas({fichaId: sc.id, tipoToken: 'creep', trampa: Combatiente.trampaDeHab(h, st => CreepCalculo.statValor(sc, st))});   // forma única (P123)
     if(r.colocadas) toast(`🪤 ${r.colocadas === 1 ? 'Trampa colocada' : r.colocadas + ' trampas colocadas'} al lado de ${sc.nombre}, oculta${r.colocadas === 1 ? '' : 's'} a los jugadores`);
     else if(r.motivo === 'sin-token') toast(`${sc.nombre} no tiene token en ese mapa: la trampa no se colocó (ponela a mano con Terreno y Formas → Trampa)`);
     else toast('No hay casilla libre al lado del token para la trampa');
@@ -281,7 +281,7 @@ function acHabUi(){
     lanzarAtaque: (sc, h) => acLanzarAtaqueDeHab(sc, h),
     lanzarDuelo: (sc, h, hab) => acElegirObjetivo(sc, {tipo: 'habilidad', hab, alcance: hab.alcance}, () => acPublicar(sc, CreepAcciones.tiradaPrimeraHab(sc, h))),
     // ✨ el GM elige la casilla (los jugadores no se enteran); 💰 al lado del token, como siempre.
-    colocarTrampa: (sc, h, auto) => { if(auto){ ac.host.hidden = true; trampaDeHabilidad({fichaId: sc.id, tipoToken: 'creep', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h)}); } else acColocarTrampaJunto(sc, h); },
+    colocarTrampa: (sc, h, auto) => { if(auto){ ac.host.hidden = true; trampaDeHabilidad({fichaId: sc.id, tipoToken: 'creep', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h, st => CreepCalculo.statValor(sc, st))}); } else acColocarTrampaJunto(sc, h); },
     colocarZona: (sc, h) => {
       const z = CreepAcciones.zonaDeHab(sc, h);
       if(!z) return false;

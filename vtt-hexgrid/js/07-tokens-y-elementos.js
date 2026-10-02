@@ -213,7 +213,7 @@ function trampaDeMiBando(el){
 function puedeVerElemento(el){
   // Una trampa sin disparar solo la ve su bando (los jugadores las de los jugadores; el GM las suyas) y quien la descubrió;
   // disparada, todos. El GM no ve dónde están las de los jugadores (antes sí).
-  if(el.trampa && !el.disparada && !trampaDeMiBando(el) && !(el.id && trampasVistas.has(el.id))) return false;
+  if(el.trampa && !el.disparada && !el.descubierta && !trampaDeMiBando(el) && !(el.id && trampasVistas.has(el.id))) return false;   // descubierta (P145): la ve todo el equipo
   return !el.invisible || puedeManipularElemento(el);
 }
 // Las casillas que ocupa de verdad ahora mismo (origen + cada offset, ya
@@ -310,6 +310,8 @@ function escucharElementos(){
         trampaIgnoraDef: d.trampaIgnoraDef === true,
         trampaEstado: typeof d.trampaEstado === 'string' ? d.trampaEstado : '',
         trampaDestino: typeof d.trampaDestino === 'string' ? d.trampaDestino : '',   // trampa de teleport ("col,fila")
+        trampaDetectar: Number.isFinite(d.trampaDetectar) ? d.trampaDetectar : 8,   // dificultad para detectarla (P145; sin el dato, 8)
+        descubierta: d.descubierta === true,   // la descubrió alguien con Percepción aumentada: la ve todo su equipo (P145)
         portal: d.portal === true,   // Invocar portal (Mago)
         portalDestino: typeof d.portalDestino === 'string' ? d.portalDestino : '',
         usoEn: Number.isFinite(d.usoEn) ? d.usoEn : 0,   // último uso de un portal (hora local de quien lo usó): dispara los pulsos en todas las pantallas
@@ -495,6 +497,7 @@ async function pegarElemento(){
     imgZoom: c.imgZoom || 1, imgDX: c.imgDX || 0, imgDY: c.imgDY || 0, fijado: false,
     ...(c.trampa ? {trampa: true, trampaNombre: c.trampaNombre || '', trampaDetalle: c.trampaDetalle || '', disparada: false, fuegoAmigo: !!c.fuegoAmigo,
       trampaDano: c.trampaDano || '', ...(c.trampaIgnoraDef ? {trampaIgnoraDef: true} : {}), ...(c.trampaEstado ? {trampaEstado: c.trampaEstado} : {}), ...(c.trampaDestino ? {trampaDestino: c.trampaDestino} : {}),
+      trampaDetectar: Math.max(1, Math.round(num(c.trampaDetectar)) || 8),
       trampaDejaZona: !!c.trampaDejaZona,
       ...(c.trampaDejaZona ? {zonaTurnos: Math.max(1, Math.round(num(c.zonaTurnos)) || 3), zonaEnMantenimiento: c.zonaEnMantenimiento !== false, zonaCadaPaso: !!c.zonaCadaPaso,
         ...(c.zonaResistStat ? {zonaResistStat: String(c.zonaResistStat).slice(0, 12), zonaResistValor: Math.round(num(c.zonaResistValor)) || 1} : {})} : {})} : {}),
@@ -524,7 +527,7 @@ async function guardarElemento(tipo, origen, celdasSet){
       color: elemColor, alfa: elemAlfa,
       solido: elemSolido, invisible, imagen: elemImagen || '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
       ...(elemTurnos > 0 ? {turnos: elemTurnos, venceMant: Math.round(num(mantenimientoNumero)) + elemTurnos} : {}),
-      ...(elemTrampa ? {trampa: true, trampaNombre: elemTrampaNombre.trim().slice(0, 40), trampaDetalle: elemTrampaDetalle.trim().slice(0, 200), disparada: false, fuegoAmigo: elemTrampaAmiga, trampaDano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim().slice(0, 12) : '', ...(elemTrampaIgnoraDef ? {trampaIgnoraDef: true} : {}), ...(trampaEstadoSpec() ? {trampaEstado: trampaEstadoSpec()} : {})} : {}),
+      ...(elemTrampa ? {trampa: true, trampaNombre: elemTrampaNombre.trim().slice(0, 40), trampaDetalle: elemTrampaDetalle.trim().slice(0, 200), disparada: false, fuegoAmigo: elemTrampaAmiga, trampaDano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim().slice(0, 12) : '', ...(elemTrampaIgnoraDef ? {trampaIgnoraDef: true} : {}), ...(trampaEstadoSpec() ? {trampaEstado: trampaEstadoSpec()} : {}), trampaDetectar: Math.max(1, Math.round(num(elemTrampaDetectar)) || 8)} : {}),
       ...(elemTrampa && elemTrampaTeleport && destinoParsear(elemTrampaDestino) ? {trampaDestino: elemTrampaDestino} : {}),
       // Trampa persistente (2026-09-28): al dispararse se convierte en zona (ver trampaResolver) — acá solo se
       // guarda su configuración, todavía dormida.
@@ -670,6 +673,7 @@ function renderEditorElemento(){
       color: el.color, alfa: el.alfa, invisible: !!el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY,
       trampa: !!el.trampa, trampaNombre: String(el.trampaNombre || '').slice(0, 40), trampaDetalle: String(el.trampaDetalle || '').slice(0, 200), disparada: !!el.disparada, fuegoAmigo: !!el.fuegoAmigo,
       ...(el.trampa ? {trampaDano: trampaDanoValido(el.trampaDano) ? String(el.trampaDano).trim().slice(0, 12) : '', trampaIgnoraDef: !!el.trampaIgnoraDef, trampaDestino: String(el.trampaDestino || '').slice(0, 16), trampaEstado: String(el.trampaEstado || '').slice(0, 300),
+        trampaDetectar: Math.max(1, Math.round(num(el.trampaDetectar)) || 8),
         trampaDejaZona: !!el.trampaDejaZona,
         ...(el.trampaDejaZona ? {zonaTurnos: Math.max(1, Math.round(num(el.zonaTurnos)) || 3), zonaEnMantenimiento: el.zonaEnMantenimiento !== false, zonaCadaPaso: !!el.zonaCadaPaso,
           ...(el.zonaResistStat ? {zonaResistStat: String(el.zonaResistStat).slice(0, 12), zonaResistValor: Math.round(num(el.zonaResistValor)) || 1} : {})} : {})} : {})};

@@ -105,7 +105,7 @@ const TokensAuto = (() => {
       o = {...o, nombre: t.nombre, detalle: t.detalle, dano: t.dano, ignoraDef: !!t.ignoraDef, fuegoAmigo: !!t.amiga, color: t.color, alfa: t.alfa,
         forma: linea ? 'linea' : 'flor', radio: linea ? 0 : Plantillas.radioDeTrampa(t), largo: linea ? t.tamano : 0, cant: t.cant,
         estado: t.estado ? {nombre: t.estado, ...(t.estadoTurnos ? {turnos: t.estadoTurnos} : {}), ...(t.estadoMods ? {mods: t.estadoMods} : {})} : null,
-        dejaZona: t.dejaZona ? t : null, turnos: Math.max(0, Math.round(Number(t.turnos) || 0))};
+        dejaZona: t.dejaZona ? t : null, turnos: Math.max(0, Math.round(Number(t.turnos) || 0)), detectar: t.detectar};
     }
     const mapaId = o.mapaId || await mapaQueMiraElGM();
     const tokens = await fbDb.collection(fbRutaCampana(rutaTokens(mapaId))).get();
@@ -145,6 +145,7 @@ const TokensAuto = (() => {
         trampa: true, trampaNombre: String(o.nombre || 'Trampa').slice(0, 40), trampaDetalle: String(o.detalle || '').slice(0, 200),
         disparada: false, fuegoAmigo: !!o.fuegoAmigo, trampaDano: String(o.dano || '').slice(0, 12),
         ...(o.ignoraDef ? {trampaIgnoraDef: true} : {}),
+        ...(Number.isFinite(Number(o.detectar)) && Number(o.detectar) >= 1 ? {trampaDetectar: Math.round(Number(o.detectar))} : {}),   // dificultad para detectarla (P145; sin el dato, 8)
         ...(o.item ? {trampaItem: String(o.item).slice(0, 4000), trampaFicha: String(o.fichaId || '').slice(0, 80)} : {}),   // trampa que salió de un consumible: al cerrar el botín, si no se disparó, se desarma y vuelve a su dueño
         ...(o.estado && JSON.stringify(o.estado).length <= 300 ? {trampaEstado: JSON.stringify(o.estado)} : {}),
         ...(venceMant !== null ? {turnos: o.turnos, venceMant} : {}),

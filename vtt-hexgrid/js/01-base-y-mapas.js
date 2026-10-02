@@ -258,6 +258,7 @@ let elemTrampaTeleport = false, elemTrampaDestino = '';   // trampa de teleport:
 // siendo a mano); acá sí es automática, con una dificultad fija (no hay quien tire, como en el asistente de zonas).
 let elemTrampaDejaZona = false, elemTrampaZonaTurnos = 3, elemTrampaZonaEnMant = true, elemTrampaZonaCadaPaso = false;
 let elemTrampaZonaResistStat = '', elemTrampaZonaResistValor = 12;
+let elemTrampaDetectar = 8;   // dificultad para detectarla con Percepción aumentada (P145; trampa común: 8)
 let elemTrampaBibOrigen = null;   // de qué trampa de la biblioteca salió la que se está armando (para ⬆ Subir y el aviso 🔔)
 let elegirDestinoCb = null;   // esperando un clic en el mapa para elegir el destino de un teleport
 let elemTurnos = 0;   // Turnos que dura la forma que se crea (0 = sin límite). Al pasar el N-ésimo Mantenimiento la borra el GM. No se recuerda entre sesiones a propósito.

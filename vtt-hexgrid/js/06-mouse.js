@@ -457,66 +457,7 @@ function soltar(){
     const a = arrastre;
     arrastre = null;
     const t = tokens.get(a.id);
-    // Sigilo: si la ruta pisa un cono rival, se corta ahí (aparece donde lo
-    // detectaron) y se anotan los pasos en las zonas de alerta.
-    if(!a.libre && a.movio && t && a.ruta.length > 1 && enSigilo(t)){
-      const largo = a.ruta.length;
-      sigiloEvaluarRuta(t, a);
-      if(a.ruta.length < largo){
-        const fc = a.ruta[a.ruta.length - 1], pc = hexCentro(fc.col, fc.fila);
-        a.x = pc.x; a.y = pc.y;
-        toast('🕶 Te detectaron: el movimiento se corta donde entraste en su cono');
-      }
-    }
-    // Se corta la ruta donde ocurra primero: un rival en sigilo dentro del cono (detección
-    // inmediata) o una trampa (pisarla, o quedar al lado si tiene Percepción aumentada).
-    trampaPendiente = null;
-    percepcionSigiloPendiente = null;
-    if(!a.libre && a.movio && t && a.ruta.length > 1){
-      const corte = !enSigilo(t) ? percepcionEvaluarRuta(t, a.id, a.ruta, null) : null;
-      const trampa = trampasEvaluarRuta(a.id, t, a.ruta);
-      const corteTrampa = trampa && (!corte || trampa.indice < corte.indice) ? trampa : null;
-      const corteSigilo = corte && (!corteTrampa) ? corte : null;
-      const indice = corteTrampa ? corteTrampa.indice : (corteSigilo ? corteSigilo.indice : -1);
-      if(indice >= 0){
-        a.ruta = a.ruta.slice(0, indice + 1);
-        const fc = a.ruta[a.ruta.length - 1], pc = hexCentro(fc.col, fc.fila);
-        a.x = pc.x; a.y = pc.y;
-        if(corteSigilo && corteSigilo.tipo === 'percibe') percepcionSigiloPendiente = {tokenId: a.id, ocultoId: corteSigilo.ocultoId, celda: fc};   // P145: se resuelve al llegar (js/16)
-        else if(corteSigilo) toast(`🕶 Viste a ${corteSigilo.ocultos.map(o => o.nombre).join(', ')}: el movimiento se corta acá y pierde el sigilo`);
-        else{
-          trampaPendiente = {tokenId: a.id, tipo: corteTrampa.tipo, id: corteTrampa.id, el: corteTrampa.el, celda: a.ruta[a.ruta.length - 1]};
-          if(corteTrampa.tipo === 'pisa') toast('⚠ Pisaste algo: el movimiento se corta acá');   // 'cerca': lo dice el cartelito, sin nombrar la trampa (P145)
-        }
-      }
-    }
-    const pasos = a.ruta.length - 1;
-    if(a.libre){
-      const fin = mundoAHex(a.x, a.y);
-      if(a.movio && t && !mismoHex(fin, t)){
-        visibles.set(a.id, {x: a.x, y: a.y});
-        moverTokenLibre(a.id, fin.col, fin.fila);
-      }
-    }else if(a.movio && t && pasos > 0 && a.ruta.slice(1).some(c => elementoSolidoEn(c.col, c.fila))){
-      toast('Ese camino pasa por un obstáculo — no se puede confirmar así');
-      visibles.delete(a.id);
-    }else if(a.movio && t && pasos > 0){
-      if(a.chocado) toast('🚧 Te chocaste con un obstáculo');
-      visibles.set(a.id, {x: a.x, y: a.y});
-      const oportunidad = oportunidadEvaluarRuta(t, a.ruta);
-      if(a.costo){
-        rutaPendiente = {id: a.id, celdas: a.ruta, pasos, porCasillero: a.costo.porCasillero, disponibles: a.costo.disponibles, oportunidad};
-        // Solo se pregunta si el movimiento se pasa de los No2 que quedan.
-        if(pasos * a.costo.porCasillero > Math.max(0, a.costo.disponibles)) mostrarConfirmacionRuta();
-        else confirmarRuta();
-      }else{
-        const fin = a.ruta[pasos];
-        moverToken(a.id, fin.col, fin.fila, a.ruta);
-        if(trampaPendiente) trampaResolver();
-        if(percepcionSigiloPendiente) percepcionSigiloResolver();
-        oportunidadPublicarAvisos(t, oportunidad);
-      }
-    }
+    rutaSoltada(a, t);   // (2026-10-02: separado para que el ataque de oportunidad pueda retomar el resto del camino, js/17)
     pedirDibujo();
   }
   // Elegir un destino (centro de área, teleport…) ya no se resuelve en el pointerdown (bloqueaba poder
@@ -537,6 +478,83 @@ function soltar(){
     if(movido) guardarFondo({x: fondo.x, y: fondo.y});
   }
   lienzo.style.cursor = moverLibre ? 'crosshair' : 'default';
+}
+// Lo que pasa al soltar un token que se arrastró (o al retomar el resto de un camino frenado por un ataque de oportunidad, js/17): sigilo,
+// trampas, percepción y oportunidad cortan la ruta donde corresponda; después se mueve (cobrando No2) o se pregunta si se pasa de los que tiene.
+function rutaSoltada(a, t){
+  // Sigilo: si la ruta pisa un cono rival, se corta ahí (aparece donde lo
+  // detectaron) y se anotan los pasos en las zonas de alerta.
+  if(!a.libre && a.movio && t && a.ruta.length > 1 && enSigilo(t)){
+    const largo = a.ruta.length;
+    sigiloEvaluarRuta(t, a);
+    if(a.ruta.length < largo){
+      const fc = a.ruta[a.ruta.length - 1], pc = hexCentro(fc.col, fc.fila);
+      a.x = pc.x; a.y = pc.y;
+      toast('🕶 Te detectaron: el movimiento se corta donde entraste en su cono');
+    }
+  }
+  // Se corta la ruta donde ocurra primero: un rival en sigilo dentro del cono (detección
+  // inmediata) o una trampa (pisarla, o quedar al lado si tiene Percepción aumentada).
+  trampaPendiente = null;
+  percepcionSigiloPendiente = null;
+  oportunidadPendiente = null;
+  if(!a.libre && a.movio && t && a.ruta.length > 1){
+    const corte = !enSigilo(t) ? percepcionEvaluarRuta(t, a.id, a.ruta, null) : null;
+    const trampa = trampasEvaluarRuta(a.id, t, a.ruta);
+    const corteTrampa = trampa && (!corte || trampa.indice < corte.indice) ? trampa : null;
+    const corteSigilo = corte && (!corteTrampa) ? corte : null;
+    let indice = corteTrampa ? corteTrampa.indice : (corteSigilo ? corteSigilo.indice : -1);
+    // Ataque de oportunidad (2026-10-02, js/17): si antes de eso se aleja de un rival que puede aprovecharlo, se frena en el último
+    // casillero al lado de ese rival y espera la decisión; el resto del camino queda guardado.
+    const opor = oportunidadCorte(t, a.id, a.ruta);
+    if(opor && (indice < 0 || opor.indice < indice)){
+      oportunidadPendiente = {tokenId: a.id, rivalId: opor.rivalId, resto: a.ruta.slice(opor.indice)};
+      a.ruta = a.ruta.slice(0, opor.indice + 1);
+      const fc = a.ruta[a.ruta.length - 1], pc = hexCentro(fc.col, fc.fila);
+      a.x = pc.x; a.y = pc.y;
+      indice = -1;
+      if(a.ruta.length === 1){ visibles.delete(a.id); oportunidadResolver(); }   // se aleja en el primer paso: no hay nada que mover todavía
+    }
+    if(indice >= 0){
+      a.ruta = a.ruta.slice(0, indice + 1);
+      const fc = a.ruta[a.ruta.length - 1], pc = hexCentro(fc.col, fc.fila);
+      a.x = pc.x; a.y = pc.y;
+      if(corteSigilo && corteSigilo.tipo === 'percibe') percepcionSigiloPendiente = {tokenId: a.id, ocultoId: corteSigilo.ocultoId, celda: fc};   // P145: se resuelve al llegar (js/16)
+      else if(corteSigilo) toast(`🕶 Viste a ${corteSigilo.ocultos.map(o => o.nombre).join(', ')}: el movimiento se corta acá y pierde el sigilo`);
+      else{
+        trampaPendiente = {tokenId: a.id, tipo: corteTrampa.tipo, id: corteTrampa.id, el: corteTrampa.el, celda: a.ruta[a.ruta.length - 1]};
+        if(corteTrampa.tipo === 'pisa') toast('⚠ Pisaste algo: el movimiento se corta acá');   // 'cerca': lo dice el cartelito, sin nombrar la trampa (P145)
+      }
+    }
+  }
+  const pasos = a.ruta.length - 1;
+  if(a.libre){
+    const fin = mundoAHex(a.x, a.y);
+    if(a.movio && t && !mismoHex(fin, t)){
+      visibles.set(a.id, {x: a.x, y: a.y});
+      moverTokenLibre(a.id, fin.col, fin.fila);
+    }
+  }else if(a.movio && t && pasos > 0 && a.ruta.slice(1).some(c => elementoSolidoEn(c.col, c.fila))){
+    toast('Ese camino pasa por un obstáculo — no se puede confirmar así');
+    visibles.delete(a.id);
+  }else if(a.movio && t && pasos > 0){
+    if(a.chocado) toast('🚧 Te chocaste con un obstáculo');
+    visibles.set(a.id, {x: a.x, y: a.y});
+    const oportunidad = oportunidadEvaluarRuta(t, a.ruta);
+    if(a.costo){
+      rutaPendiente = {id: a.id, celdas: a.ruta, pasos, porCasillero: a.costo.porCasillero, disponibles: a.costo.disponibles, oportunidad};
+      // Solo se pregunta si el movimiento se pasa de los No2 que quedan.
+      if(pasos * a.costo.porCasillero > Math.max(0, a.costo.disponibles)) mostrarConfirmacionRuta();
+      else confirmarRuta();
+    }else{
+      const fin = a.ruta[pasos];
+      moverToken(a.id, fin.col, fin.fila, a.ruta);
+      if(trampaPendiente) trampaResolver();
+      if(percepcionSigiloPendiente) percepcionSigiloResolver();
+      if(oportunidadPendiente && oportunidadPendiente.tokenId === a.id) oportunidadResolver();
+      oportunidadPublicarAvisos(t, oportunidad);
+    }
+  }
 }
 lienzo.addEventListener('pointerup', soltar);
 lienzo.addEventListener('pointercancel', soltar);

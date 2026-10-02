@@ -392,6 +392,12 @@ const CreepCalculo = (() => {
   function fuerzaGolpeValor(sc){ return num(sc.fue) + (sc.estados || []).filter(e => e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'fue').reduce((x, m) => x + num(m.val) * Math.max(1, num(e.stacks) || 1), 0), 0) + pesoArma(sc); }
   // Contraataque (regla a prueba, 2026-09-26): tras un Parry, siempre cuesta lo de un primer ataque y no suma al conteo de ataques del turno.
   function costoContraataque(sc){ return Combatiente.costoPrimerAtaque(num(sc.armaTipo) || 8); }   // regla común (comun/combatiente.js)
+  // ¿Le alcanzan los No2 para un ataque de oportunidad (lo de un primer ataque con su arma)? (2026-10-02, pedido del dueño: el mapa solo
+  // frena a quien se aleja si el que se queda puede aprovecharlo.) Se publica en su resumen (`opor`): los jugadores no ven sus No2.
+  function oportunidadPosible(sc){
+    const n = sc.nitros === null || sc.nitros === undefined ? nitrosMax(sc) : num(sc.nitros);
+    return !(num(sc.hp) <= 0) && n >= costoContraataque(sc);
+  }
   // Alcance de su arma, en casilleros: un arma de rango usa su Rango; una de cuerpo a cuerpo, 1 + lo que le sume a Rango.
   function alcance(sc){
     if(sc.armaDeRango){ const v = statValor(sc, 'rng'); return Number.isNaN(v) ? 0 : Math.max(1, Math.round(v)); }
@@ -470,5 +476,5 @@ const CreepCalculo = (() => {
     statValor, estadoActivo, aportesMod, origenesMod, conSigno, statOrigenTxt, armadmgOrigenTxt, ataqueTxt, ataqueOrigenTxt,
     defensaOrigenTxt, critOrigenTxt, armaduraOrigenTxt, modsAfectanHp, actualizarHpMaxPorCon, nitrosMax, actualizarNo2PorAgl,
     costoAtaque, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor,
-    fuerzaGolpeValor, costoContraataque, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
+    fuerzaGolpeValor, costoContraataque, oportunidadPosible, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
 })();

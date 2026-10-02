@@ -591,6 +591,7 @@ async function modificarCreep(creepId, cambiar){
     tx.update(base, {
       'resumen.hpPct': hpMax > 0 ? Math.round(Math.max(0, Math.min(1, sc.hp / hpMax)) * 100) : 0,
       'resumen.muerto': sc.hp <= 0,
+      'resumen.opor': CreepCalculo.oportunidadPosible(sc),   // ataque de oportunidad (2026-10-02)
       'resumen.estados': (Array.isArray(sc.estados) ? sc.estados : [])
         .filter(e => e && e.activo !== false && e.nombre).slice(0, 30)
         .map(e => ({

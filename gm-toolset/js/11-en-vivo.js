@@ -89,6 +89,7 @@ function creepPublico(sc, orden){
     resumen: {
       hpPct: hpMax > 0 ? Math.round(Math.max(0, Math.min(1, hp / hpMax)) * 100) : 0,
       muerto: hp <= 0,
+      opor: CreepCalculo.oportunidadPosible(sc),   // ¿puede aprovechar un ataque de oportunidad? (2026-10-02; sin mostrar sus No2)
       estados: (sc.estados || [])
         .filter(es => es && es.activo !== false && es.nombre)
         .slice(0, 30)

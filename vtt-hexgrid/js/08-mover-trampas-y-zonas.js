@@ -31,6 +31,7 @@ function mostrarConfirmacionRuta(){
 function cancelarRuta(){
   rutaPendiente = null;
   trampaPendiente = null;
+  oportunidadPendiente = null;   // js/17
   $('#ruta-confirmar').hidden = true;
   document.body.classList.remove('con-ruta');
   pedirDibujo();
@@ -646,6 +647,7 @@ async function confirmarRuta(){
     await moverToken(p.id, fin.col, fin.fila, p.celdas);
     if(trampaPendiente && trampaPendiente.tokenId === p.id) trampaResolver();
     if(percepcionSigiloPendiente && percepcionSigiloPendiente.tokenId === p.id) percepcionSigiloResolver();   // P145 (js/16)
+    if(oportunidadPendiente && oportunidadPendiente.tokenId === p.id) oportunidadResolver();   // ataque de oportunidad (js/17)
     oportunidadPublicarAvisos(t, p.oportunidad);
     if(origen && (origen.col !== fin.col || origen.fila !== fin.fila)) deshacerRegistrar({tipo: 'mover', id: p.id, fichaId: t.fichaId, esCreep, costo, col: origen.col, fila: origen.fila, rotacion: rotAntes, seq0, pend0});
     toast(esCreep

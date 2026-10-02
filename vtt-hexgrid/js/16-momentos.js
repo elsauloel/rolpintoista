@@ -64,6 +64,7 @@ async function momentosBarrerViejos(){
 const momentosArranque = setInterval(() => { if(typeof fbMiembro !== 'undefined' && fbMiembro && fbUsuario && fbDb){ clearInterval(momentosArranque); momentosEscuchar(); } }, 1000);
 
 function momentoRecibido(id, d){
+  oporMomento(id, d);   // el ataque de oportunidad: la pregunta a quien decide y la respuesta a quien se aleja (js/17)
   // El pedido de detección al GM (P145): la pantalla del GM tira la Destreza del oculto.
   if(d.tipo === 'sigilo-pedido' && d.estado === 'esperandoGM' && soyGM) deteccionGMAbrir(id, d);
   // Quien está esperando la respuesta en su cartelito.
@@ -74,6 +75,7 @@ function momentoRecibido(id, d){
   if(d.datos && d.datos.paraUid && d.datos.paraUid === fbUsuario.uid && d.creadoPor !== fbUsuario.uid){ momentoAvisoCentro(id, d); return; }
   // La esquina: todo, salvo lo que esta pantalla ya sigue al centro.
   const mio = d.creadoPor === fbUsuario.uid && d.datos && d.datos.centro;
+  if(d.tipo === 'oportunidad' && oporSoyDecisor(d)){ momentosFeed.delete(id); renderMomentosFeed(); return; }   // lo decide esta pantalla, al centro
   const delGM = d.tipo === 'sigilo-pedido' && soyGM && (d.estado === 'esperandoGM' || (deteccionBanner && deteccionBanner.id === id));
   if(delGM) momentosFeed.delete(id);
   if(mio || delGM){ renderMomentosFeed(); return; }

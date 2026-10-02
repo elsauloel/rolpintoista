@@ -28,7 +28,7 @@ El mapa guarda con `modificarCreep` (transacción + resumen + firma); GM Tools, 
    `invocaciones` del personaje con `FichaSesion` ✅ (2026-10-01).
 4. Lo que el duelo le pide a una invocación (`dueloInvDe`, `js/11`) → `comun/inv-duelo.js`, en `hooksLocal` del mapa. Con los
    datos de la invocación a mano, el daño que recibe en el duelo puede dejar de ser a mano (hoy `dueloAplicarDano` lo marca
-   "es una invocación"). ✅ los ganchos (2026-10-01); el daño automático queda como paso aparte.
+   "es una invocación"). ✅ los ganchos y el daño automático (2026-10-01).
 5. Las habilidades (`invEjecutarHab` y compañía).
 6. La 🔍 (`lupaHtmlInv`) y el Ver (`verHabInv`).
 
@@ -261,3 +261,11 @@ puede empezar.
   sus datos (venía así de antes); quedó el que calcula la ficha con sus datos (3 No2).
   **Lo que sigue**: el daño que recibe una invocación en el duelo, automático (hoy `dueloAplicarDano` lo deja a mano), y la tanda 5
   (habilidades).
+- 2026-10-01: **el daño que recibe una invocación en el duelo se aplica solo** (cb53ed0; antes `dueloAplicarDano` lo dejaba a mano,
+  "es una invocación"). El GM (que es quien aplica el daño) lee la invocación de la parte `invocaciones` del dueño (`invDeToken`),
+  calcula su Defensa y su Armadura mágica con `comun/inv-calculo.js` (`defensasDeInv`; carga las piezas si hace falta) y la escribe
+  con una transacción (`danioInv`, como `danioPj`/`cambiarVidaPj`): HP, escudos que absorbieron y `resumen.invocaciones`. Si algo
+  falla, sigue a mano como antes. **En vivo** (golpes armados a mano sobre un Lobo de prueba con Defensa 3, «−1 Defensa» y un
+  escudo de 2): normal de 7 → Defensa 2, el escudo absorbió 2, entraron 3 (10 → 7); crítico ×2 de 3 → 6 directo (7 → 1); mitad de
+  5 → ⌈(5 − 2) ÷ 2⌉ = 2 (1 → 0); en los tres, la vida y el resumen guardados. Restaurado y verificado (resumen idéntico).
+  Pendiente: las Espinas de una invocación que recibe el golpe (`dueloEspinas` las sigue salteando).

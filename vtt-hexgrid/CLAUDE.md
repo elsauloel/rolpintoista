@@ -1155,3 +1155,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   Desde la tanda 4, **lo que el duelo le pide a esa invocación** también lo contesta el mapa (`bnHooksDueloInv`, con
   `comun/inv-duelo.js`, en `hooksLocal` después de `bnHooksDuelo`): si puede guardar al personaje y con ⚗. Publica con
   `bnRegistrarInv` y guarda la parte `invocaciones`.
+
+- **Daño a una invocación en el duelo, automático** (2026-10-01, paso 4 etapa 4e): `dueloAplicarDano` ya no lo deja a mano: lee la
+  invocación de la parte `invocaciones` de su dueño (`invDeToken`), su Defensa y Armadura mágica con `comun/inv-calculo.js`
+  (`defensasDeInv`) y escribe con `danioInv` (transacción: HP, escudos y `resumen.invocaciones`). Las Espinas de una invocación
+  todavía no se devuelven solas.

@@ -359,43 +359,44 @@ const percepcionAvisosPendientes = new Map();   // tokenId (quien camina) -> Map
 const sigiloRompiendo = new Set();
 let sigiloFirmaRev = '';
 
-/* ---------- Ataque de oportunidad (regla establecida, 2026-09-22; no se automatiza la tirada) ----------
-   Cuando dos fichas de bandos distintos están adyacentes y una se aleja, la otra tiene un ataque de
-   oportunidad: se puede hacer si tiene No2 disponibles y cuesta lo mismo que un primer ataque. El mapa NO
-   frena el movimiento ni obliga a nada (no cortar la fluidez) — solo avisa en rojo en la Mesa con los dos
-   nombres, para que no se olvide de resolverse a mano. Punto de apoyo para diseño futuro: habilidades con
-   más PdG/Evasión en ataques de oportunidad, o que dejan bloquearlos. */
+/* ---------- Ataque de oportunidad: el rival no tiene No2 (2026-10-02, pedido del dueño) ----------
+   Cuando un token se aleja de un rival que PUEDE aprovecharlo, el movimiento se frena y se le pregunta (js/17). Si el rival NO tiene
+   No2 suficientes (`oporPuede`), no se frena, pero queda dicho: una línea en la Mesa y un momento en la esquina (js/16), «no hay ataque
+   de oportunidad: Fulano no tiene No2 suficientes». Solo en modo combate, no con un token oculto o en sigilo, y una vez por par y turno
+   (como el que sí frena). Se cuenta sobre el camino que de verdad se hizo (después de los cortes). */
 function oportunidadEvaluarRuta(t, ruta){
+  if(modoMapa !== 'combate') return [];
   if(!ruta || ruta.length < 2) return [];
-  if(t.oculto) return [];  // un token oculto no delata su movimiento en la Mesa
-  const rivales = rivalesDe(t);
-  if(!rivales.length) return [];
-  const avisados = new Set(), salidos = [];
-  for(let i = 1; i < ruta.length && avisados.size < rivales.length; i++){
+  if(t.oculto || enSigilo(t)) return [];  // un token oculto no delata su movimiento
+  const id = rutaTokenId(t);
+  const rivales = new Set(rivalesDe(t));
+  const ids = [...tokens.entries()].filter(([rid, r]) => rivales.has(r) && !oporPuede(r) && !oporUsada(id, rid));
+  const salidos = [];
+  for(let i = 1; i < ruta.length; i++){
     const antes = ruta[i - 1], despues = ruta[i];
-    rivales.forEach(r => {
-      if(avisados.has(r)) return;
-      // Desde 2026-10-02 el ataque de oportunidad frena y pregunta (js/17): la línea de la Mesa ya no va para quien no puede aprovecharlo o ya decidió.
-      if(!oporPuede(r) || oporUsada(rutaTokenId(t), [...tokens.entries()].find(([, x]) => x === r)[0])) return;
-      if(distanciaHex(antes, {col: r.col, fila: r.fila}) === 1 && distanciaHex(despues, {col: r.col, fila: r.fila}) > 1){
-        avisados.add(r);
-        salidos.push(r);
-      }
+    ids.forEach(([rid, r]) => {
+      if(salidos.some(x => x.rid === rid)) return;
+      if(distanciaHex(antes, {col: r.col, fila: r.fila}) === 1 && distanciaHex(despues, {col: r.col, fila: r.fila}) > 1) salidos.push({rid, r});
     });
   }
   return salidos;
 }
 async function oportunidadPublicarAvisos(t, salidos){
   if(!salidos || !salidos.length || !fbDb || !fbUsuario || !fbMiembro) return;
-  for(const r of salidos){
+  const id = rutaTokenId(t);
+  for(const {rid, r} of salidos){
+    oporMarcar(id, rid);
+    const texto = `${nombreDe(t)} se alejó de ${nombreDe(r)}: no hay ataque de oportunidad (${nombreDe(r)} no tiene No2 suficientes)`;
     try{
       await fbDb.collection(fbRutaCampana('tiradas')).add({
         uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
-        origen: `⚔ ${nombreDe(t)} se alejó de ${nombreDe(r)}: posible ataque de oportunidad`,
-        formula: '', rolls: [], mod: 0, total: 0, desde: 'alerta-roja',
+        origen: '⚔ ' + texto,
+        formula: '', rolls: [], mod: 0, total: 0, desde: 'recordatorio',
         cuando: firebase.firestore.FieldValue.serverTimestamp(),
       });
     }catch(err){ console.error('No se pudo avisar el ataque de oportunidad:', err); }
+    momentoAbrir({tipo: 'oportunidad-sin', icono: '⚔', titulo: `${nombreDe(t)} se aleja de ${nombreDe(r)}`,
+      resultado: `No hay ataque de oportunidad: ${nombreDe(r)} no tiene No2 suficientes.`, estado: 'listo'});
   }
 }
 

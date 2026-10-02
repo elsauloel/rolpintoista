@@ -18,9 +18,11 @@
 - [x] **Solo la Botonera nueva** (decidido por el dueño): siempre prendida, sin interruptor ⚗ (`BN_SIEMPRE`).
 
 **A. Estructural — mudar al mapa lo que todavía va por el marco (en este orden):**
-1. [ ] **El duelo de un jugador que no abrió su Botonera**: lo que el duelo le pide a su personaje lo sigue contestando la ficha
-   escondida en el marco hasta que abre la Botonera nueva en esa pantalla (`bnHooksDuelo` necesita la sesión `bn`). Que el mapa tenga
-   la sesión del personaje siempre lista (sin mostrar nada) para contestar siempre él.
+1. [x] **El duelo de un jugador que no abrió su Botonera** (2026-10-02): si el duelo le pide algo a un personaje (o invocación) que
+   maneja este usuario y su Botonera todavía no se abrió en esta pantalla, el mapa abre su sesión sin mostrar nada
+   (`bnPrepararParaDuelo`, `bnAbrirSesion`) y contesta él; `comun/duelo.js` acepta que `hooksLocal` devuelva una promesa. Probado en
+   vivo (GM con 🎮 Silvia, mapa recién cargado): las opciones de defensa y la Evasión las contestó el mapa, el duelo se resolvió y
+   la ficha escondida nunca se cargó (en el marco siguió GM Tools).
 2. [ ] **El Mantenimiento en segundo plano**: hoy carga la ficha escondida de cada jugador en cada turno; que lo haga el mapa con el
    motor común (`Combatiente.pasarTurnoEstados` y compañía).
 3. [ ] **"+ Estado"** (el selector de estados de un personaje, una invocación o un creep, con sus preguntas).
@@ -28,6 +30,17 @@
 5. [ ] **Tienda y Botín**.
 6. [ ] **El editor** (editar una habilidad, un ítem, un creep): lo más grande y lo que menos se usa en partida; puede seguir abriéndose
    en la ficha o en GM Tools si conviene.
+
+**A′. Limpieza: borrar el camino viejo (cuándo y cómo, criterio propuesto por el asistente, 2026-10-02; el dueño lo dejó a su criterio):**
+- **Cuándo** — las tres cosas juntas: (1) **A terminado** (nada de la Botonera ni de las Acciones depende ya del marco); (2) **tres
+  sesiones de juego reales** con el grupo usando solo lo nuevo; (3) en esas sesiones **nadie necesitó volver atrás** (`BN_SIEMPRE =
+  false`) ni apareció un problema que solo se arregle con lo viejo. Mientras tanto queda "dormido", sin tocarlo ni probarlo.
+- **Cómo** — de a un paso y probando: sacar `BN_SIEMPRE`, el interruptor ⚗ y `bnAlternar`; los pedidos de botón al marco
+  (`bnDelegar`/`botonera-delegar`, `acDelegar`/`acciones-delegar`) y lo que los atiende en la ficha y en GM Tools (`modo=botonera` sin
+  mensaje, `modo=acciones`); la ficha liviana vieja (`fichaMapaAbrir`, `abrir-ficha-mapa`); los mensajes que queden sin uso en
+  `comun/mensajes-mapa.js`. **No** se borra la Botonera de la ficha suelta (`ficha.html` sin el mapa): usa las mismas piezas de
+  `comun/` y es la de la página de la ficha.
+- [ ] Limpieza hecha (fecha y commit).
 
 **B. Puntual (después de A):**
 7. [ ] **Una invocación sin No2 para atacar, adentro del duelo** (ver §2): igual que los creeps.

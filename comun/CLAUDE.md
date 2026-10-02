@@ -939,6 +939,8 @@ versión parecida en más de una, es candidato a juntar.
   después; `ui = {mesaHabilidad, mesaConTexto, publicar, toast, habDuelo, lanzarAtaque, lanzarDuelo, colocarTrampa(sc, h, auto),
   colocarZona, elegirObjetivo}`), más `habEjecucion`, `ataqueDeHab`, `habTira`, `efectoDeHab`, `sobreSi`, `tiradaPrimeraHab`,
   `tiradaSegundaHab`, `zonaDeHab` y `cdMod`. Necesita `estados-aplicar.js` y `combatiente.js`.
+- **`duelo.js`: `hooksLocal` puede devolver una promesa** (2026-10-02): `enviar` la espera; si termina en null va por `relay` como
+  siempre. Lo usa el mapa para leer al personaje la primera vez que el duelo le pide algo.
 - **Creep sin No2 para atacar** (2026-10-02, como con los personajes: avisar y dejar seguir): `CreepAcciones.faltanNitros(sc, tipo)`,
   `preguntaSinNitros(sc, tipo)` (el texto de «¿Atacar igual?»), `pagarAtaque(sc, tipo, forzar)` (forzado: gasta los que tenga hasta 0 y
   devuelve `forzado: {costo, tenia}`) y `alertaSinNitros(sc, tipo, forzado)` (la línea roja de la Mesa). Lo usan `CreepDuelo` (el

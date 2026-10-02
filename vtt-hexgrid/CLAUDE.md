@@ -1262,6 +1262,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `BN_SIEMPRE = true` en `js/11` hace que `bnActiva()` dé siempre sí y esconde el botón ⚗. Vale para la Botonera de un personaje, la de
   sus invocaciones y las Acciones de los creeps (GM). Lo que sigue usando el marco, a propósito: el Editar del Ver (la ficha / GM Tools
   escondida), Equipo y mochila, Tienda, Botín, Mantenimiento en segundo plano, el Ver de un creep y los estados. **Para volver atrás**:
-  `BN_SIEMPRE = false` (vuelve el interruptor y cada navegador elige). Pendiente: si el jugador todavía no abrió su Botonera en esa
-  pantalla, lo que el duelo le pide a su personaje lo sigue contestando la ficha escondida en el marco (`bnHooksDuelo` necesita `bn`
-  abierto); ver `docs/pendientes.md`.
+  `BN_SIEMPRE = false` (vuelve el interruptor y cada navegador elige). **El duelo ya no depende de haber abierto la
+  Botonera** (2026-10-02, A1): `bnHooksDuelo`/`bnHooksDueloInv` abren la sesión del personaje sin mostrarla (`bnAbrirSesion`,
+  `bnSesionLista`, `bnPrepararParaDuelo`; `bnManejo(fichaId)`: su dueño sin el GM con el control, o quien tiene 🎮 el control) y
+  devuelven una promesa con los ganchos; no cambian de personaje si la Botonera está a la vista con otro. Los títulos ya no llevan ⚗.

@@ -60,8 +60,13 @@
      Probado en vivo (tienda de prueba de 5 ítems con herrero, GM con 🎮 Silvia): en el mapa, buscar, carrito y comprar (500 → 480),
      vender (+10), reparar bloqueado en combate y permitido en narrativo (durabilidad 1 → 3, −2 DDE), el cierre del GM, y el DDE guardado
      en la ficha; en la ficha suelta, buscar (ya no da error), carrito y comprar (488 → 468). La tienda de prueba quedó cerrada.
-6. [ ] **El editor** (editar una habilidad, un ítem, un creep): lo más grande y lo que menos se usa en partida; puede seguir abriéndose
-   en la ficha o en GM Tools si conviene.
+6. [ ] **Todo al mapa, editor incluido** (decidido por el dueño, 2026-10-02: "lo más prolijo al final, aunque sea largo"): que no quede
+   nada escondido y se pueda borrar todo el mecanismo del marco. Por tandas, cada una probada:
+   - [ ] **6a. Las ventanas sueltas**: 📊 Stats de la ficha lite, la Moneda Re-Roll 🪙, el 🔍 Ver todo de un creep, las ventanas del GM de
+     fin de combate (Finalizar / Despojar).
+   - [ ] **6b. El editor de la ficha** (ítems —el asistente ya es común—, habilidades, estados, pasivas, talentos) en piezas comunes.
+   - [ ] **6c. El editor de creeps** (GM Tools) en piezas comunes.
+   - [ ] Después, la **limpieza** (A′): borrar el marco y lo que quedó sin uso.
 
 **A′. Limpieza: borrar el camino viejo (cuándo y cómo, criterio propuesto por el asistente, 2026-10-02; el dueño lo dejó a su criterio):**
 - **Cuándo** — las tres cosas juntas: (1) **A terminado** (nada de la Botonera ni de las Acciones depende ya del marco); (2) **tres

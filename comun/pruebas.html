@@ -51,6 +51,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-combate.js"></script>
 <script src="estados-presets.js"></script>
 <script src="estados-aplicar.js"></script>
+<script src="estados-recibidos.js"></script>
 <script src="modificadores-tirada.js"></script>
 <script src="plantillas.js"></script>
 <script src="catalogo.js"></script>
@@ -1348,6 +1349,18 @@ prueba('una invocación sin No2 para atacar: sin forzar no cobra; forzado gasta 
   respuesta = true; h.atacar(d);
   igual([falta, !!no.error, antes, inv.nitros, si.forzado, si.aviso.includes('(costaba 4)'), preguntas.length, preguntas[0].includes('¿Atacar igual?'), trasNo, inv2.nitros, reg],
     [true, true, 2, 0, {costo: 4, tenia: 2}, true, 2, true, [1, 0], 0, ['Oso · Atacar (PdG)']]);
+});
+prueba('estados recibidos (B-8): los del personaje y los de sus invocaciones; cada uno a quien corresponde', () => {
+  const doc = (fichaId, spec, origen) => ({data: () => ({fichaId, spec: JSON.stringify(spec), origen}), ref: null});
+  const docs = [doc('F', {nombre: 'Veneno', stacks: 2}, 'Goblin · Dardo'), doc('F~i', {nombre: 'Stun', turnos: 1}, 'Mago · Rayo'), doc('G', {nombre: 'Sangrado'}), doc('Fx', {nombre: 'Stun'})];
+  const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, estados: []});
+  const S = {efectos: [], invocaciones: [inv]}, avisos = [];
+  const ui = {presets: estadosPresetFicha(), toast: t => avisos.push(t), cambio: () => {}};
+  const mios = EstadosRecibidos.deFicha(docs, 'F');
+  const r = mios.map(d => !!EstadosRecibidos.aplicar(S, d, ui).inv);
+  const sinInv = EstadosRecibidos.aplicar({efectos: [], invocaciones: []}, docs[1], ui);
+  igual([mios.length, r, S.efectos.map(e => e.nombre), inv.estados.map(e => e.nombre), avisos[1].includes('Lobo'), !!sinInv.inv, avisos[2].includes('ya no está')],
+    [2, [false, true], ['Veneno'], ['Stun'], true, false, true]);
 });
 prueba('el duelo de una invocación: defensa con Parry (cobra y deja el Bloqueo), crítico y contraataque', () => {
   const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, armaNombre: 'Colmillo', armaTipo: 8, armaPeso: 2, nitros: 3, crit: [0, 1, 2, 3, 4]});

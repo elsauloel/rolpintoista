@@ -1183,6 +1183,38 @@ async function mantenimientoPersonaje(fichaId, numero){
     return true;
   });
 }
+/* ---------- Los estados que otros le dejan a un personaje, aplicados por el mapa (2026-10-02, hoja de ruta B-8) ----------
+   Una habilidad de creep, una trampa, una zona o la Ejecución ✨ de otro dejan un aviso en campanas/<id>/estados. Antes solo lo
+   aplicaba la ficha abierta (con el mapa solo, quedaba esperando); ahora también el mapa, para los personajes que maneja este
+   usuario (bnManejo: los suyos, o los que el GM controla con 🎮), y sus invocaciones. La transacción de comun/estados-recibidos.js
+   hace que lo aplique una sola pantalla aunque la ficha también esté abierta. */
+let estRecPendientes = [], estRecCola = Promise.resolve();
+const estRecEnCurso = new Set();
+function estadosRecibidosEscuchar(){ EstadosRecibidos.escuchar(docs => { estRecPendientes = docs; estadosRecibidosRevisar(); }); }
+function estadosRecibidosRevisar(){
+  new Set(estRecPendientes.map(d => String(d.data().fichaId || '').split(SEP_INVOCACION)[0])).forEach(id => {
+    if(!id || !bnManejo(id) || estRecEnCurso.has(id)) return;
+    estRecEnCurso.add(id);
+    estRecCola = estRecCola.then(() => estadosRecibidosAplicar(id))
+      .catch(err => console.error('No se pudieron aplicar los estados recibidos:', err))
+      .then(() => estRecEnCurso.delete(id));
+  });
+}
+async function estadosRecibidosAplicar(fichaId){
+  if(!EstadosRecibidos.deFicha(estRecPendientes, fichaId).length) return;
+  await editarPersonajeMapa(fichaId, async S => {
+    const nombre = ((S.meta && S.meta.nombre) || '').trim();
+    const ui = {presets: estadosPresetFicha(), cambio: () => {},
+      toast: t => toast(nombre && !String(t).includes(nombre) ? `${nombre} · ${t}` : t)};
+    let hubo = false;
+    for(const d of EstadosRecibidos.deFicha(estRecPendientes, fichaId)){
+      if(!await EstadosRecibidos.tomar(d, controloFicha(fichaId))) continue;   // 🎮 el GM lo borra en vez de marcarlo
+      EstadosRecibidos.aplicar(S, d, ui);
+      hubo = true;
+    }
+    return hubo;
+  });
+}
 /* Cambiar a un personaje desde el mapa y guardarlo (2026-10-02, A2/A3): con la sesión de la Botonera nueva si ya está abierta en ese
    personaje; si no, con una sesión de un rato (mantSesionTemporal) que se cierra al terminar. cambiar(S, {enBn}) puede ser async y
    devuelve true si cambió algo (se guarda) o false (no se toca nada). Se escriben solo las partes que cambió (lo que difiera por

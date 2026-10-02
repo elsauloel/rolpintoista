@@ -73,37 +73,26 @@ async function recompensasRevisar(){
   }
 }
 
-/* ---------- Estados que te dejan otros (una habilidad de un creep, una trampa) ----------
+/* ---------- Estados que te dejan otros (una habilidad de un creep, una trampa, la Ejecución de otro) ----------
    El GM o el mapa dejan un aviso en campanas/<id>/estados; la ficha lo aplica UNA sola vez (transacción sobre el documento) apenas
-   está abierta y editable, respetando Invulnerable, Inmunidad a CC, Sangre pura y Coagulación extrema (comun/estados-aplicar.js). */
+   está abierta y editable, respetando Invulnerable, Inmunidad a CC, Sangre pura y Coagulación extrema. Al personaje o a una de sus
+   invocaciones (`fichaId~invId`). Escuchar, tomar y aplicar: comun/estados-recibidos.js (B-8, 2026-10-02: el mapa hace lo mismo). */
 let estadosPendientes = [], estadosAplicando = false;
 function estadosEscuchar(){
-  if(!fbUsuario) return;
   // El GM escucha todos los pendientes: si toma el control de un personaje, le toca aplicarle los suyos (🎮, 2026-09-30).
-  const col = fbDb.collection(fbRutaCampana('estados'));
-  (fbMiembro && fbMiembro.gm ? col.where('aplicada', '==', false) : col.where('duenoUid', '==', fbUsuario.uid).where('aplicada', '==', false)).onSnapshot(snap => {
-    estadosPendientes = snap.docs;
-    estadosRevisar();
-  }, err => console.error('Error escuchando los estados recibidos:', err));
+  EstadosRecibidos.escuchar(docs => { estadosPendientes = docs; estadosRevisar(); });
 }
 async function estadosRevisar(){
   const f = fichaVivo;
   if(!f || !f.cargada || f.soloLectura || f.editaGM || estadosAplicando) return;
-  const mios = estadosPendientes.filter(d => d.data().fichaId === f.id);
+  const mios = EstadosRecibidos.deFicha(estadosPendientes, f.id);
   if(!mios.length) return;
   estadosAplicando = true;
   try{
     for(const d of mios){
-      const tomada = await fbDb.runTransaction(async tx => {
-        const x = await tx.get(d.ref);
-        if(!x.exists || x.data().aplicada) return false;
-        if(fichaControloYo(f)) tx.delete(d.ref); else tx.update(d.ref, {aplicada: true});   // 🎮 el GM lo borra en vez de marcarlo
-        return true;
-      });
+      const tomada = await EstadosRecibidos.tomar(d, fichaControloYo(f));   // 🎮 el GM lo borra en vez de marcarlo
       if(!tomada || fichaVivo !== f) continue;
-      let spec = null;
-      try{ spec = JSON.parse(d.data().spec || 'null'); }catch(e){}
-      if(spec && spec.nombre) aplicarEstadoRecibido(spec, d.data().origen);
+      if(EstadosRecibidos.aplicar(S, d, habUi).inv) renderInvocaciones();
     }
   }catch(err){
     console.error('No se pudieron aplicar los estados recibidos:', err);

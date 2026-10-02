@@ -732,6 +732,7 @@ function defensaCreepMapa(sc){ return CreepCalculo.defensa(sc); }   // con qué 
 // Cura de una habilidad sobre el token del objetivo (creep: su HP; personaje: su ficha, como el daño), sin pasar del máximo.
 async function dueloCurar(t, n){
   n = Math.max(0, Math.round(num(n)));
+  if(t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION)) return dueloCurarInv(t, n);
   if(t.tipo === 'creep'){
     const res = await modificarCreep(t.fichaId, sc => { const previo = num(sc.hp); const tope = num(sc.hpMax) > 0 ? num(sc.hpMax) : previo + n; sc.hp = Math.min(tope, previo + n); return {previo, nuevo: sc.hp}; });
     return {previo: res.previo, nuevo: res.nuevo};
@@ -752,12 +753,31 @@ async function dueloCurar(t, n){
   });
 }
 
+// La cura a una invocación (B-8, 2026-10-02): como danioInv, sobre la parte `invocaciones` de su dueño y su resumen.
+async function dueloCurarInv(t, n){
+  const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
+  const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
+  const parteRef = base.collection('partes').doc('invocaciones');
+  const ts = firebase.firestore.FieldValue.serverTimestamp();
+  return fbDb.runTransaction(async tx => {
+    const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
+    if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
+    const datos = JSON.parse(parte.data().json || '{}');
+    const inv = (datos.invocaciones || []).find(i => i && i.id === invId);
+    if(!inv) throw new Error('La invocación ya no existe');
+    const previo = num(inv.hp), tope = num(inv.hpMax) > 0 ? num(inv.hpMax) : previo + n;
+    inv.hp = Math.min(tope, previo + n);
+    const rs = ficha.data().resumen || {};
+    tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
+    tx.update(base, {actualizado: ts, 'resumen.invocaciones': (rs.invocaciones || []).map(i => i.id === invId ? {...i, hp: inv.hp} : i)});
+    return {previo, nuevo: inv.hp};
+  });
+}
 async function dueloAplicarEfecto(d, ef){
   const spec = Duelo.specDeEfecto(ef);
   if(!spec) return {manual: true, nota: 'a mano'};
   const t = tokens.get(d.defensor.tokenId);
   if(!t) return {manual: true, nota: 'el token ya no está: aplicalo a mano'};
-  if(t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION)) return {manual: true, nota: 'es una invocación: aplicalo a mano'};
   if(spec.cura){
     try{ const r = await dueloCurar(t, spec.cura); return {nota: `+${spec.cura} HP (${fmt(r.previo)} → ${fmt(r.nuevo)})`}; }
     catch(err){ console.error('No se pudo aplicar la cura del duelo:', err); return {manual: true, nota: 'no se pudo curar solo: aplicalo a mano'}; }

@@ -1239,13 +1239,14 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   al lado y guarda el resto del camino. Quien decide por el rival (el GM si es un creep o tiene 🎮 el control; si no, el jugador dueño) ve al
   centro «¿Ataque de oportunidad?» → No: el otro sigue su camino tal cual (`oporContinuar`, por las mismas reglas); Sí: «¿con qué arma?» si
   tiene más de una con No2, y se abre el duelo (tipo 'oportunidad'). Quien se aleja espera al centro (con «Seguir sin esperar»); el resto
-  lo ve en la esquina. Un par (quien se aleja, rival) se ofrece una vez por turno (hasta el ⟳ Mantenimiento). La línea vieja de la Mesa
-  ya no sale para quien no puede aprovecharlo o ya decidió. **Probado en vivo** (combate, Silvia con el control del GM): No → el creep
+  lo ve en la esquina. Un par (quien se aleja, rival) se ofrece una vez por turno (hasta el ⟳ Mantenimiento). En la Mesa queda el
+  registro (pedido del dueño): la línea roja «posible ataque de oportunidad» al frenarse (`oporMesa`) y cómo terminó («dejó pasar», «ataca
+  de oportunidad con…», «siguió sin esperar»). **Probado en vivo** (combate, Silvia con el control del GM): No → el creep
   siguió y se volvió a frenar al alejarse de Xeena; «Seguir sin esperar» → siguió; Sí → duelo de oportunidad con la Cimitarra (pagó 3 No2,
   pegó 7), «Terminar duelo»; todo restaurado.
 - **Ataque de oportunidad sin No2: no frena, pero avisa** (2026-10-02, pedido del dueño): si el rival del que se aleja NO tiene los No2
   (`!oporPuede`), `oportunidadEvaluarRuta` (js/02; solo en combate, no oculto ni en sigilo, par no usado) lo cuenta sobre el camino hecho y
-  `oportunidadPublicarAvisos` publica en la Mesa (`desde: 'recordatorio'`) «⚔ Fulano se alejó de Mengano: no hay ataque de oportunidad
+  `oportunidadPublicarAvisos` publica en la Mesa (`desde: 'alerta-roja'`) «⚔ Fulano se alejó de Mengano: no hay ataque de oportunidad
   (Mengano no tiene No2 suficientes)» y un momento `oportunidad-sin` para la esquina; marca el par (una vez por turno, con el id `mid` que
-  viene de cuando se soltó). Reemplaza a la vieja línea roja «posible ataque de oportunidad». Probado en vivo (creep con 0 No2: avisó una
+  viene de cuando se soltó). Probado en vivo (creep con 0 No2: avisó una
   vez; al volver a acercarse y alejarse en el mismo turno, nada).

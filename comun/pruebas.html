@@ -822,13 +822,15 @@ prueba('editor común: una pasiva nueva se escribe y se guarda; editarla y elimi
 });
 prueba('editor común: una habilidad nueva pide primero cómo se ejecuta; semi = 7 pasos; el estado al usar se carga de la lista', async () => {
   const S = fichaBotonera(), t = editorDePrueba(S);
-  t.ed.abrir('habilidades', null);
-  t.tocar('[data-hab-siguiente]');
-  const sinModo = [t.ed.estado.paso, t.avisos.slice(-1)[0]];
-  t.tocar('[data-hab-modo="semi"]');
-  const chips = t.el('cuerpo').querySelectorAll('[data-hab-paso]').length;
-  t.ed.irAPaso(1); t.escribir('[data-c="nombre"]', 'Furia'); t.ed.irAPaso(5);
-  const conModo = t.ed.estado.paso;
+  t.ed.abrir('habilidades', null);   // en la ventana común paso a paso (comun/paso-a-paso.js)
+  const pap = t.ed.estado.pap, en = sel => pap.raiz.querySelector(sel);
+  en('[data-pap="sig"]').click();
+  const sinModo = [pap.paso(), en('.pap-aviso').textContent];
+  en('[data-hab-modo="semi"]').click();
+  const chips = pap.raiz.querySelectorAll('[data-pap-paso]').length;
+  t.ed.irAPaso(1); const nom = en('[data-c="nombre"]'); nom.value = 'Furia'; nom.dispatchEvent(new Event('input', {bubbles: true})); t.ed.irAPaso(5);
+  const conModo = pap.paso();
+  t.ed.cerrar();
   t.ed.abrir('cinturon', null); t.escribir('[data-c="nombre"]', 'Poción');
   const cons = t.el('cuerpo').querySelector('[data-c="consumible"]'); cons.checked = true; cons.dispatchEvent(new Event('change', {bubbles: true}));
   t.tocar('[data-ed="estado-preset"]'); await new Promise(r => setTimeout(r, 0));

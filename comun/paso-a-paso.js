@@ -12,12 +12,13 @@
        de lo elegido),
      inicio?: índice o id del paso inicial,
      puedeIr?(i, api) → '' o el motivo por el que todavía no se puede ir a ese paso (se muestra; no se cambia de paso),
-     alClic?(e, api), alInput?(e, api), alCambio?(e, api): los eventos del contenido (el elemento real es e.composedPath()[0]),
+     alClic?(e, api), alInput?(e, api), alCambio?(e, api), alTecla?(e, api): los eventos del contenido (el elemento real es e.composedPath()[0]),
      alGuardar?(api) / alCrear?(api) → false para no cerrar (puede ser una promesa),
      alCancelar?(api), confirmarCancelar?: texto (o función → texto, '' = no preguntar) antes de descartar (por defecto, solo al crear),
      extras?: [{id, texto, alClic(api)}] botones más en el pie (a la izquierda de Siguiente),
-     textoCrear?, textoGuardar?, ancho? (px, 720), z? (z-index, 90), contenedor? (un elemento o un ShadowRoot: adentro de los recuadros
-       del mapa; por defecto, document.body).
+     textoCrear?, textoGuardar?, ancho? (px, 1100; o 'completo' = toda la pantalla), z? (z-index, 90), contenedor? (un elemento o un ShadowRoot: adentro de los recuadros
+       del mapa; por defecto, document.body), aislado? (los clics y teclas no salen de la ventana; por defecto, sí adentro de un ShadowRoot,
+       para que el recuadro del mapa no los atienda también).
    api: {raiz, cuerpo, paso() (índice), pasoId(), irA(i|id), redibujar(), aviso(texto), cerrar(), abierto()}.
    Sin dependencias. El contenido usa sus propias clases; acá vienen solo algunas de base: .pap-campo (con su label), .pap-fila,
    .pap-nota, .pap-boton.
@@ -91,7 +92,10 @@ const PasoAPaso = (() => {
     const fondo = document.createElement('div');
     fondo.className = 'pap-fondo';
     fondo.style.zIndex = String(o.z || 90);
-    fondo.innerHTML = `<div class="pap" style="max-width:${Math.round(o.ancho || 720)}px"></div>`;
+    // Ancha por defecto (dueño, 2026-10-02: "si hace falta, valete de una ventana que ocupe todo el espacio de la pantalla para ordenar bien
+    // la información"): hasta 1100 px; 'completo' = toda la pantalla; o un número de px.
+    const ancho = o.ancho === 'completo' ? 'calc(100vw - 48px)' : Math.round(o.ancho || 1100) + 'px';
+    fondo.innerHTML = `<div class="pap" style="max-width:${ancho}${o.ancho === 'completo' ? ';margin:0 auto;min-height:calc(100vh - 48px)' : ''}"></div>`;
     contenedor.appendChild(fondo);
     const caja = fondo.firstElementChild;
     const lista = () => (typeof o.pasos === 'function' ? o.pasos() : o.pasos) || [];
@@ -175,6 +179,9 @@ const PasoAPaso = (() => {
     });
     if(o.alInput) caja.addEventListener('input', e => o.alInput(e, api));
     if(o.alCambio) caja.addEventListener('change', e => o.alCambio(e, api));
+    if(o.alTecla) caja.addEventListener('keydown', e => o.alTecla(e, api));
+    if(o.aislado !== undefined ? o.aislado : contenedor instanceof ShadowRoot)
+      ['click', 'input', 'change', 'mousedown'].forEach(t => fondo.addEventListener(t, e => e.stopPropagation()));
     actual = o.inicio !== undefined ? indice(o.inicio) : 0;
     redibujar();
     return api;

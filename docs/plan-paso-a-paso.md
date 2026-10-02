@@ -13,6 +13,8 @@ unificado. Pasos chicos, claros y explicativos."* Referencia: el asistente de cr
 - **Pie:** «← Atrás» a la izquierda; a la derecha «Siguiente →» y:
   - **al editar**: **Guardar** siempre visible (en cualquier paso). Se trabaja sobre una copia: Cancelar descarta (decisión del dueño, 2026-10-02).
   - **al crear**: el último paso es **Resumen**, con «✔ Crear». Cancelar descarta lo armado.
+- **Espacio:** la ventana puede ocupar todo lo que haga falta de la pantalla para ordenar bien la información (dueño, 2026-10-02: mientras se
+  crea o edita algo no hace falta espacio en otros lados). Por defecto es ancha (hasta 1100 px) y puede pedir la pantalla completa.
 - **Paleta única** (la de la referencia: cobre/latón sobre el panel oscuro). Se terminan el azul de la Ejecución ✨ y el verde de las Zonas.
 - Funciona igual en la ficha, GM Tools, el generador de tiendas, el editor del catálogo y adentro de los recuadros del mapa.
 - **Avisar, no bloquear** (ADN del proyecto): los presupuestos (atributos, Job, Inteligencia) avisan; no impiden guardar.

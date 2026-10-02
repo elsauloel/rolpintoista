@@ -321,7 +321,8 @@ const FichaEditor = (() => {
     const toast = m => ctx.toast(m);
     const confirmar = t => (ctx.confirmar || (x => confirm(x)))(t);
     let editing = null;
-    const q = sel => els.cuerpo.querySelector(sel);
+    // Una habilidad se edita en la ventana común paso a paso (editing.pap, comun/paso-a-paso.js); el resto, en la ventana del editor.
+    const q = sel => (editing && editing.pap ? editing.pap.raiz : els.cuerpo).querySelector(sel);
 
     function campoImagenHtml(draft){
       return `<div class="f">
@@ -434,22 +435,10 @@ const FichaEditor = (() => {
     </div>`;
     }
 
-    function dibujarHabilidad(){
+    function htmlPasoHabilidad(info){
       const {draft} = editing;
-      const pasos = pasosHabilidad(draft);
-      const total = pasos.length;
-      const paso = Math.max(0, Math.min(total - 1, editing.paso || 0));
-      editing.paso = paso;
-      const info = pasos[paso];
-      const nuevo = !editing.id;
       const etiqueta = (texto, extra) => `<span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">${texto}</span>${extra || ''}`;
-
-      let html = `<div class="pasos-hab">${pasos.map((p, i) => {
-        // Al crear, no se puede saltar adelante sin haber respondido lo primero (¿automatizar?) ni sin nombre.
-        const bloqueado = nuevo && i > paso && (modoHab(draft) === null || !(draft.nombre || '').trim());
-        return `<button type="button" class="paso-chip${i === paso ? ' activo' : ''}${i < paso ? ' hecho' : ''}" data-hab-paso="${i}" ${bloqueado ? 'disabled' : ''}>${i + 1}. ${p.corto}</button>`;
-      }).join('')}</div>`;
-      html += `<div class="paso-titulo">${info.titulo}</div><p class="paso-ayuda">${info.ayuda}</p>`;
+      let html = '';
 
       if(info.id === 'auto'){
         const m = modoHab(draft);
@@ -551,19 +540,32 @@ const FichaEditor = (() => {
     </div>`;
       }
 
-      html += `<div class="paso-nav">
-    ${paso > 0 ? '<button type="button" class="btn ghost" data-hab-atras="1">← Atrás</button>' : '<span></span>'}
-    ${paso < total - 1 ? '<button type="button" class="btn primary" data-hab-siguiente="1">Siguiente →</button>' : ''}
-  </div>`;
-      els.cuerpo.innerHTML = html;
-      // Al crear, "Guardar" recién en el último paso; al editar, siempre.
-      els.guardar.style.display = (!nuevo || paso === total - 1) ? '' : 'none';
+      return html;
+    }
+    // La ventana paso a paso de una habilidad (la común: pestañas que saltan, Guardar al editar, «✔ Crear» al final).
+    function abrirHabilidadPaso(){
+      const ed = editing, raiz = els.scrim.getRootNode();
+      ed.inicial = JSON.stringify(ed.draft);
+      ed.pap = PasoAPaso.abrir({
+        titulo: ed.id ? 'Editar habilidad' : 'Nueva habilidad', crear: !ed.id,
+        contenedor: raiz instanceof ShadowRoot ? raiz : document.body,
+        z: Math.max(60, num(getComputedStyle(els.scrim).zIndex) || 0),
+        pasos: () => pasosHabilidad(ed.draft).map(p => ({id: p.id, nombre: p.corto, ayuda: `<b>${p.titulo}</b> ${p.ayuda}`, html: () => htmlPasoHabilidad(p)})),
+        // Lo primero: cómo se ejecuta; y con nombre ya se puede saltar a cualquier paso.
+        puedeIr: i => i > 0 && modoHab(ed.draft) === null ? 'Primero elegí cómo se ejecuta' : i > 1 && !(ed.draft.nombre || '').trim() ? 'Primero ponele un nombre' : '',
+        alClic: e => clic(e), alInput: e => cambio(e), alTecla: e => teclas(e),
+        alCambio: e => { cambio(e); redibujarTrasCambio(e); cambioImagen(e); },
+        confirmarCancelar: () => JSON.stringify(ed.draft) === ed.inicial ? '' : (ed.id ? '¿Descartar los cambios de esta habilidad?' : '¿Cancelar? La habilidad que estás armando se descarta.'),
+        alGuardar: () => { guardar(); }, alCrear: () => { guardar(); },
+        alCancelar: () => cerrar(),
+        extras: ed.id ? [{id: 'eliminar', texto: 'Eliminar', alClic: () => eliminar()}] : [],
+      });
     }
 
     function dibujar(){
       if(!editing) return;
       const {key, draft} = editing;
-      if(key === "habilidades"){ dibujarHabilidad(); return; }
+      if(key === "habilidades"){ if(editing.pap) editing.pap.redibujar(); return; }
       els.guardar.style.display = '';
       const sc = SCHEMA[key];
       const FLAGS = ['equipado','activo','permanente','popup','job','consumible','mitadPdgEva','armaduraRota','armaDeRango'];
@@ -742,6 +744,7 @@ const FichaEditor = (() => {
       // Una habilidad nueva arranca sin respuesta a "¿automatizarla?": es lo primero que se pregunta. Las que ya existen (sin el
       // dato) cuentan como automatizadas.
       if(key === 'habilidades' && !id && !op.draft){ editing.draft.automatizada = null; editing.draft.modo = null; editing.draft.jobCosto = HAB_JOB_CUSTOM; }
+      if(key === 'habilidades'){ abrirHabilidadPaso(); return; }
       els.guardar.style.display = "";
       els.titulo.textContent = (id ? 'Editar ' : 'Nueva ') + sc.titulo.toLowerCase();
       els.eliminar.style.display = id ? 'block' : 'none';
@@ -751,31 +754,15 @@ const FichaEditor = (() => {
       els.scrim.classList.add('open');
       setTimeout(()=>q('input')?.focus(), 40);
     }
-    function cerrar(){ els.scrim.classList.remove('open'); editing = null; if(ctx.alCerrar) ctx.alCerrar(); }
+    function cerrar(){
+      if(editing && editing.pap){ const pap = editing.pap; editing.pap = null; pap.cerrar(); }
+      els.scrim.classList.remove('open'); editing = null; if(ctx.alCerrar) ctx.alCerrar();
+    }
 
     // Pasos del asistente abierto (habilidades), o null si es el formulario común.
     function pasosDelEditor(){ return editing && editing.key === 'habilidades' ? pasosHabilidad(editing.draft) : null; }
     function irAPaso(n){
-      const pasos = pasosDelEditor();
-      if(!pasos) return;
-      const destino = Math.max(0, Math.min(pasos.length - 1, n));
-      // Lo primero: ¿automatizarla? Sin esa respuesta no se avanza.
-      if(destino > 0 && modoHab(editing.draft) === null){
-        toast('Primero elegí cómo se ejecuta');
-        editing.paso = 0;
-        dibujar();
-        return;
-      }
-      if(destino > 1 && !(editing.draft.nombre || '').trim()){
-        toast('Primero ponele un nombre');
-        editing.paso = 1;
-        dibujar();
-        q('[data-c="nombre"]')?.focus();
-        return;
-      }
-      editing.paso = destino;
-      dibujar();
-      q('input:not([type=checkbox]),textarea,select')?.focus();
+      if(editing && editing.pap) editing.pap.irA(n);   // lo que no se puede todavía lo avisa la ventana (puedeIr)
     }
 
     // La categoría elegida: un ítem nuevo que deja de ser consumible sigue en el asistente de ítems.
@@ -814,8 +801,6 @@ const FichaEditor = (() => {
         // Nitros de una habilidad: un número o X (lo elegís al usarla).
         if(c === "nitrosCosto") editing.draft[c] = esCostoVariable(t.value) ? "X" : (t.value.trim() === "" ? "" : num(t.value));
         if(c === "tiradaStat") editing.pdgAuto = false;  // lo eligió a mano
-        // Con nombre ya se puede saltar a cualquier paso del asistente.
-        if(c === 'nombre' && pasosDelEditor()) els.cuerpo.querySelectorAll('[data-hab-paso]').forEach(b => { b.disabled = !t.value.trim() && num(b.dataset.habPaso) > (editing.paso || 0); });
         if(['tipoItem','equipado','consumible','efectoPermanente'].includes(c)){ dibujar(); return; }
         if(['peso','tipoDado','danoFijo','danoAmplificado'].includes(c)){
           const hint = q('[data-ed="dano-hint"]');
@@ -874,10 +859,6 @@ const FichaEditor = (() => {
           return;
         }
         if(el.closest('[data-hab-ejecucion]')){ abrirEjecucionHab(editing.draft, ctx.elegirEstadoDuelo, () => dibujar()); return; }
-        const chip = el.closest('[data-hab-paso]');
-        if(chip){ irAPaso(num(chip.dataset.habPaso)); return; }
-        if(el.closest('[data-hab-siguiente]')){ irAPaso((editing.paso || 0) + 1); return; }
-        if(el.closest('[data-hab-atras]')){ irAPaso((editing.paso || 0) - 1); return; }
       }
       const b = el.closest('button'); if(!b) return;
       const a = b.dataset.ed;
@@ -937,7 +918,8 @@ const FichaEditor = (() => {
       if(e.key === 'Enter' && t && t.matches && t.matches('[data-hab-enter]')){
         e.preventDefault();
         t.dispatchEvent(new Event('change', {bubbles: true}));
-        if((editing.paso || 0) < pasos.length - 1) irAPaso((editing.paso || 0) + 1);
+        const ahora = editing.pap ? editing.pap.paso() : 0;
+        if(ahora < pasos.length - 1) irAPaso(ahora + 1);
       }
     }
     function redibujarTrasCambio(e){

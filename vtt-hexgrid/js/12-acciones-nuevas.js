@@ -408,7 +408,7 @@ async function abrirAccionesNuevas(creepId){
   try{ await acCargarPiezas(); }catch(err){ console.error(err); toast('No se pudieron cargar las Acciones nuevas — se abren las de siempre'); abrirAcciones(creepId, null, true); return; }
   if(!ac) ac = Object.assign({creepId: ''}, acCrear());
   const lupaCss = (document.getElementById('lupa-css') || {}).textContent || '';   // los 🔍 (comun/lupa.js)
-  ac.raiz.querySelector('#ac-css').textContent = acCss + lupaCss + ' #ac-contenido{font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--paper)}';
+  ac.raiz.querySelector('#ac-css').textContent = acCss + lupaCss + PANEL_CSS + ' #ac-contenido{font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--paper)}';
   ac.creepId = creepId;
   if(bn && !bn.host.hidden) cerrarBotoneraNueva();
   ac.host.hidden = false;

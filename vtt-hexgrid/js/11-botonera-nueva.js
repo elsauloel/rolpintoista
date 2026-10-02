@@ -115,6 +115,18 @@ const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261002i', '../comun/ficha-comb
   '../comun/catalogo.js?v=20261002i', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261002d', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261002i', '../comun/ficha-resumen.js?v=20261001a', '../comun/inv-calculo.js?v=20261002d', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/inv-duelo.js?v=20261001a', '../comun/ficha-acciones.js?v=20261002i', '../comun/inv-habilidades.js?v=20261002g', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
+/* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
+   anterior"): en la ficha las columnas se juntan recién con la PANTALLA angosta (@media), pero en el mapa la pantalla es ancha y el panel
+   no. Estas reglas valen solo adentro de los recuadros del mapa (Botonera nueva y Acciones nuevas de los creeps). */
+const PANEL_CSS = `
+.botonera-grid,.botonera-grid-even{grid-template-columns:1fr !important}
+.botonera-list-grid{grid-template-columns:1fr !important}
+.botonera-list-grid .cat-row.bot-fila{flex-wrap:wrap}
+.bot-fila-info{flex:1 1 160px}
+.bot-fila-info .cat-nombre{overflow-wrap:normal;word-break:normal}
+.botonera-stats-grid{grid-template-columns:repeat(auto-fill,minmax(82px,1fr)) !important}
+.botonera-tile{min-width:0}
+`;
 var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
 var bnCss = '';
 var bnCargando = null;
@@ -865,7 +877,7 @@ async function abrirBotoneraNueva(fichaId, invId){
   try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo cargar la Botonera nueva — se abre la de siempre'); abrirBotonera(fichaId, null, invId, true); return; }
   if(!bn){ bn = Object.assign({fichaId: '', sesion: null, S: null}, bnCrear()); }
   const lupaCss = (document.getElementById('lupa-css') || {}).textContent || '';   // los 🔍 (comun/lupa.js)
-  bn.raiz.querySelector('#bn-css').textContent = bnCss + lupaCss + ' #bn-contenido{font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--paper)}';
+  bn.raiz.querySelector('#bn-css').textContent = bnCss + lupaCss + PANEL_CSS + ' #bn-contenido{font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--paper)}';
   if(bn.fichaId !== fichaId || !bn.sesion){
     if(bn.sesion) FichaSesion.cortar(bn.sesion);
     bn.fichaId = fichaId; bn.S = null; bn.parryPendiente = null;

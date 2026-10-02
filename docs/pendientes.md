@@ -102,7 +102,9 @@
 
 **B. Puntual (después de A):**
 7. [ ] **Una invocación sin No2 para atacar, adentro del duelo** (ver §2): igual que los creeps.
-7b. [ ] **Los "Mis presets" de estados del GM se pierden al recargar** (visto 2026-10-02 al mudar el "+ Estado"): GM Tools los guarda en
+7b. [x] **Los "Mis presets" de estados del GM se pierden al recargar** — hecho 2026-10-02: `comun/presets-gm.js` los guarda en
+   `gm/presetsEstados` (sin reglas nuevas); GM Tools los lee al entrar y el mapa los ofrece ("+ Estado" de un creep, el editor de estados
+   y la Ejecución de una habilidad de creep). Probado: guardado desde GM Tools, sigue tras recargar, aparece en el mapa. Antes: (visto 2026-10-02 al mudar el "+ Estado"): GM Tools los guarda en
    `S.estadosPersonalizados`, que no se sube a Firebase (los creeps sí; esto no). Por eso el "+ Estado" de un creep en el mapa no los
    ofrece. Guardarlos en la partida (p. ej. `gm/presets`) y ofrecerlos en los dos lados.
 8. [ ] **Aplicar estados a otros desde las habilidades de personaje** (hoy solo creeps y trampas): destraba Lisiar, Confusión, Marcar,

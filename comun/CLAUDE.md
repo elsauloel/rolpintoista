@@ -1107,3 +1107,6 @@ versión parecida en más de una, es candidato a juntar.
   `HABS_CREEP_GRUPOS`), `MODOS_HAB_CREEP`, `PASOS_HAB_CREEP`, `statLabel`, `opcionesStat`, `opcionesEstadosHtml`, `textoEstadoAgregado`. Lo
   usan GM Tools (en `#scrim-hab-creep` / `#scrim-estado-creep`, que crea el componente) y el mapa (adentro de las Acciones nuevas). Para
   Reemplazar con recetas de fábrica necesita `creeps-base.js` + `skills-creep-base.js` (el mapa los carga recién ahí).
+- **`presets-gm.js`** (`PresetsGM`, 2026-10-02, hoja de ruta B-7b) — **los "Mis presets" de estados del GM, en la partida**
+  (`campanas/<id>/gm/presetsEstados = {json, actualizado}`, solo el GM): `escuchar(cb)`, `listo()`, `lista()`, `guardar(lista)`. Antes vivían
+  solo en la memoria de GM Tools y se perdían al recargar. Lo usan GM Tools (`S.estadosPersonalizados` se llena al entrar) y el mapa.

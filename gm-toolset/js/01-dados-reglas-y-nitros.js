@@ -556,11 +556,7 @@ function cdControlesHtml(sc, h){ return CreepBotonera.cdControlesHtml(sc, h); } 
    van a mano) y 'auto' (✨ la Ejecución paso a paso, `h.duelo`). Las de antes lo deducen: automatizada === false → manual, con
    `duelo` → auto, el resto → semi. Lo del sistema anterior (estado propio, cura, trampa al lado del token, estado sobre el
    objetivo de las habilidades de fábrica) se sigue aplicando en semi y en auto. */
-const MODOS_HAB_CREEP = {
-  manual: {icono: '📣', nombre: 'Manual', boton: 'Anunciar', corto: 'solo se anuncia', explica: 'El botón se llama <b>Anunciar</b>: publica la descripción en la Mesa y todo lo demás (costo, cooldown, tiradas y efectos) va a mano.'},
-  semi: {icono: '💰', nombre: 'Semiautomático', boton: 'Ejecutar', corto: 'cobra No2 y cooldown, tira la tirada inicial', explica: 'Al tocar <b>Ejecutar</b> cobra solo los <b>No2</b> y pone el <b>cooldown</b>, y <b>tira la tirada inicial</b> si la tiene (por lo general, la PdG). Los efectos se resuelven a mano.'},
-  auto: {icono: '✨', nombre: 'Automático', boton: 'Ejecutar', corto: 'ejecución paso a paso', explica: 'Al tocar <b>Ejecutar</b> se abre la <b>Ejecución paso a paso</b>: cobra, elegís el objetivo en el mapa, cada uno tira en su momento y se aplican los efectos. Si es solo sobre el creep y no tira nada, se aplica directo. Si coloca una trampa, elegís la casilla en el mapa (los jugadores no se enteran).'},
-};
+const MODOS_HAB_CREEP = CreepEditor.MODOS_HAB_CREEP;   // comun/creep-editor.js (A6c)
 function modoHabCreep(h){ return CreepCalculo.modoHab(h); }   // la regla común
 const botonHabCreepTxt = h => CreepBotonera.botonHabTxt(h);
 function etiquetaModoCreep(h){ const m = MODOS_HAB_CREEP[modoHabCreep(h) || 'semi']; return `<span class="tag" title="${esc(m.nombre)}: ${esc(m.corto)}">${m.icono}</span>`; }

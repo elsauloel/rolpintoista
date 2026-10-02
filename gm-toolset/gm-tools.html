@@ -234,107 +234,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
   </div>
 </div>
 
-<div class="scrim" id="scrim-hab-creep">
-  <div class="modal" style="max-width:460px">
-    <header><h3 id="hc-titulo-modal">Habilidad</h3><button class="iconbtn" id="habcreep-x">Cerrar</button></header>
-    <div class="body" style="display:flex;flex-direction:column;gap:10px">
-      <!-- Paso a paso: cada bloque .hc-paso es un paso (ver PASOS_HAB_CREEP). -->
-      <div class="pasos-hab" id="hc-pasos"></div>
-      <div>
-        <div class="paso-titulo" id="hc-paso-titulo"></div>
-        <p class="paso-ayuda" id="hc-paso-ayuda"></p>
-      </div>
-      <div class="hc-paso" data-hc-paso="7"><div class="modos-hab" id="hc-modos"></div></div>
-      <div class="hc-paso" data-hc-paso="8">
-        <div class="hint" id="hc-ejecucion-resumen" style="margin-bottom:10px"></div>
-        <button type="button" class="btn primary" id="hc-ejecucion-abrir" style="width:100%">✨ Armar la ejecución paso a paso</button>
-      </div>
-      <div class="hc-paso" data-hc-paso="0">
-        <div class="f"><label>Nombre</label><input type="text" id="hc-nombre" placeholder="ej. Mordida venenosa" data-hc-enter="1"></div>
-        <div class="f" style="margin-top:8px"><label>Descripción</label><textarea id="hc-detalle" rows="4" placeholder="ej. Muerde y deja veneno en la herida."></textarea></div>
-      </div>
-      <div class="hc-paso" data-hc-paso="1">
-        <div class="f" style="margin-bottom:8px"><label>No2 que gasta</label>
-          <div class="opcion-fila">
-            <button type="button" class="opcion-btn" data-hc-nitros-modo="num">Un número</button>
-            <button type="button" class="opcion-btn" data-hc-nitros-modo="ataque">Lo mismo que un ataque</button>
-          </div>
-          <div class="hint" id="hc-ataque-ayuda" style="margin-top:5px"></div>
-        </div>
-        <input type="hidden" id="hc-nitros-modo" value="num">
-        <div class="row3">
-          <div class="mini-f" id="hc-acciones-caja"><label>No2 que gasta</label><input type="number" id="hc-acciones" min="0" value="1" data-hc-enter="1"></div>
-          <div class="mini-f"><label>Cooldown (turnos)</label><input type="number" id="hc-cd" min="0" value="0" data-hc-enter="1"></div>
-          <div class="mini-f"><label>Otro costo</label><input type="text" id="hc-costo" placeholder="opcional" data-hc-enter="1"></div>
-        </div>
-        <div class="row3" style="margin-top:8px">
-          <div class="mini-f"><label>Vida (HP) que cuesta</label><input type="number" id="hc-hpcosto" min="0" value="0" data-hc-enter="1"></div>
-          <div></div><div></div>
-        </div>
-        <label class="chk-lenta" style="display:flex;align-items:center;gap:8px;margin-top:10px;cursor:pointer"><input type="checkbox" id="hc-cd-arranca" style="width:auto"> <span><b>Habilidad lenta</b>: arranca el combate con el cooldown ya activo (como si la hubiera usado el turno anterior)</span></label>
-        <div class="hint" style="margin-top:6px">Cooldown: cuántos turnos tiene que esperar para volver a usarla (0 = cuando quiera). La vida se descuenta sola al usarla (tiene que sobrarle). "Otro costo" es un recordatorio libre: un objeto, etc.</div>
-      </div>
-      <div class="hc-paso" data-hc-paso="2">
-        <div class="f"><label>Tirada al ejecutar: stat del creep</label><select id="hc-tirada-stat"></select></div>
-      </div>
-      <div class="hc-paso" data-hc-paso="3">
-        <div class="f"><label>Tirada de efecto: fórmula de dados (opcional)</label><input type="text" id="hc-tirada" placeholder="ej. 2d6+3" data-hc-enter="1"></div>
-        <div class="hint" style="margin-top:6px">Si hay un stat en el paso anterior, esta fórmula queda en el botón 🎲 de la tarjeta; sin stat, Ejecutar la tira directamente.</div>
-      </div>
-      <div class="hc-paso" data-hc-paso="4">
-        <div class="f"><label>Elegir de la lista</label><select id="hc-efecto-preset"></select></div>
-        <div class="f" style="margin-top:8px"><label>Nombre del estado</label><input type="text" id="hc-efecto-nombre" placeholder="vacío = no aplica ninguno"></div>
-        <div class="row3" style="margin-top:8px">
-          <div class="mini-f"><label>Turnos</label><input type="number" id="hc-efecto-turnos" min="0" value="0"></div>
-          <div class="mini-f"><label>Stacks</label><input type="number" id="hc-efecto-stacks" min="1" value="1"></div>
-          <div class="mini-f"><label>HP por turno</label><input type="number" id="hc-efecto-hpturno" value="0"></div>
-        </div>
-        <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:8px" title="Marcado, el estado queda puesto hasta que se lo saque a mano (los Turnos no cuentan)">
-          <input type="checkbox" id="hc-efecto-permanente" style="width:auto">
-          <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">No vence</span>
-        </label>
-        <div class="f" style="margin-top:8px"><label>Descripción del estado (opcional)</label><input type="text" id="hc-efecto-detalle"></div>
-        <input type="hidden" id="hc-efecto-polaridad" value="otro">
-        <input type="hidden" id="hc-efecto-mods" value="[]">
-      </div>
-      <div class="hc-paso" data-hc-paso="5">
-        <button type="button" class="btn" id="hc-trampa-preconstruidas" style="width:100%;margin-bottom:10px" title="Elegir una trampa ya armada del catálogo (oso, foso, mina, red…) y decir su tamaño, daño y cantidad">📚 Trampas preconstruidas</button>
-        <label class="hc-trampa-on" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--copper);border-radius:var(--r);background:rgba(201,133,69,.10);cursor:pointer">
-          <input type="checkbox" id="hc-trampa-on" style="width:auto"> <span><b>🪤 Esta habilidad coloca una trampa</b><br><span style="color:var(--muted);font-size:12px">Destildá esto para sacarle la trampa a la habilidad.</span></span>
-        </label>
-        <div id="hc-trampa-resumen" style="margin-top:10px"></div>
-        <input type="checkbox" id="hc-trampa-amiga" style="display:none">
-        <div id="hc-trampa-campos" style="display:none">
-          <div class="f"><label>Nombre de la trampa</label><input type="text" id="hc-trampa-nombre" maxlength="40" placeholder="vacío = el nombre de la habilidad"></div>
-          <div class="f" style="margin-top:8px"><label>Qué hace (lo que se lee cuando alguien la pisa)</label><input type="text" id="hc-trampa-detalle" maxlength="200" placeholder="ej. foso de púas: 2d6 de daño"></div>
-          <div class="row3" style="margin-top:8px">
-            <div class="mini-f"><label>Daño automático</label><input type="text" id="hc-trampa-dano" maxlength="12" placeholder="ej. 2d6+3" title="Al dispararse, el mapa tira este daño solo (restando la Defensa). Vacío = solo avisa."></div>
-            <div class="mini-f"><label>Radio</label><input type="number" id="hc-trampa-radio" min="0" max="6" value="0" title="0 = una casilla; 1 = una flor de 1 (7 casillas)…"></div>
-            <div class="mini-f"><label>Cantidad</label><input type="number" id="hc-trampa-cant" min="1" max="6" value="1" title="Cuántas trampas deja de una vez"></div>
-          </div>
-          <label style="display:flex;align-items:center;gap:8px;margin-top:8px;cursor:pointer" title="Sí: el daño no se reduce por la Defensa de quien la pisa (daño directo). No: se le resta su Defensa, como un golpe."><input type="checkbox" id="hc-trampa-ignora-def" style="width:auto"> <span>El daño <b>ignora la Defensa</b> de quien la pisa (daño directo)</span></label>
-          <div class="hint" style="margin-top:4px">Daño: dados y modificador, ej. <b>2d6</b> o <b>1d8+3</b>. Sin tildar, se le resta la Defensa. Radio 0 = una casilla. Cantidad: cuántas trampas coloca por ejecución.</div>
-          <div class="row3" style="margin-top:8px;grid-template-columns:2fr 1fr">
-            <div class="mini-f"><label>Estado que deja a quien la pisa</label><select id="hc-trampa-estado"></select></div>
-            <div class="mini-f"><label>Turnos</label><input type="number" id="hc-trampa-estado-turnos" min="0" value="0" title="0 = los turnos que trae el estado"></div>
-          </div>
-          <div class="hint" id="hc-trampa-ayuda" style="margin-top:6px"></div>
-        </div>
-      </div>
-      <div class="hc-paso" data-hc-paso="6">
-        <div class="resumen-hab" id="hc-resumen"></div>
-      </div>
-      <div class="paso-nav">
-        <button type="button" class="btn ghost" id="hc-atras">← Atrás</button>
-        <button type="button" class="btn primary" id="hc-siguiente">Siguiente →</button>
-      </div>
-    </div>
-    <footer>
-      <button class="btn ghost" id="habcreep-cancel">Cancelar</button>
-      <button class="btn primary" id="habcreep-guardar">Guardar</button>
-    </footer>
-  </div>
-</div>
+<!-- La ventana del editor de habilidades de creep (#scrim-hab-creep) la arma comun/creep-editor.js (A6c, 2026-10-02). -->
 
 <div class="scrim" id="scrim-ver-estado">
   <div class="modal" style="max-width:380px;position:relative">
@@ -518,6 +418,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script src="../comun/creep-botonera.js?v=20261001b"></script>
 <script src="../comun/creep-lupa.js?v=20261002b"></script>
 <script src="../comun/combate-fin.js?v=20261002a"></script>
+<script src="../comun/creep-editor.js?v=20261002a"></script>
 <script src="../comun/creep-acciones.js?v=20261002i"></script>
 <script src="../comun/creep-duelo.js?v=20261002a"></script>
 <script src="../comun/estados-presets.js?v=20260929a"></script>
@@ -553,16 +454,16 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
 <script>
 if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') document.documentElement.classList.add('modo-mantenimiento');
 </script>
-<script src="js/01-dados-reglas-y-nitros.js?v=20261002c"></script>
+<script src="js/01-dados-reglas-y-nitros.js?v=20261002d"></script>
 <script src="js/02-editar-creep-y-recompensas.js?v=20261002a"></script>
 <script src="js/03-acciones-y-lupa.js?v=20261001g"></script>
-<script src="js/04-habilidades.js?v=20261002i"></script>
-<script src="js/05-trampas-e-items.js?v=20261002a"></script>
+<script src="js/04-habilidades.js?v=20261002j"></script>
+<script src="js/05-trampas-e-items.js?v=20261002b"></script>
 <script src="js/06-eventos.js?v=20261001b"></script>
 <script src="js/07-tablero-e-ia.js?v=20261002a"></script>
 <script src="js/08-fin-del-combate.js?v=20261002a"></script>
 <script src="js/09-grupos-botin-y-bitacora.js?v=20261002a"></script>
-<script src="js/10-personajes.js?v=20261002i"></script>
+<script src="js/10-personajes.js?v=20261002j"></script>
 <script src="js/11-en-vivo.js?v=20261002o"></script>
 <script src="js/12-modo-acciones.js?v=20261002a"></script>
 </body>

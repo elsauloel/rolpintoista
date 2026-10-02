@@ -371,121 +371,17 @@ function publicarEnCatalogoGM(nuevo){
     alSubir: () => cargarItemsSubidosGM()});
 }
 
-let editingHabCreep = null;   // {scId, habId (null = nueva), paso}
 
-/* Habilidades de creeps: editor paso a paso, como el de la ficha pero con
-   lo que tiene un creep (sin SP ni Job; con cooldown y "otro costo"). Al
-   crear, Guardar aparece en el último paso; al editar, siempre. */
-const PASOS_HAB_CREEP = [
-  {corto: 'Qué es', titulo: '¿Cómo se llama y qué hace?',
-   ayuda: 'Esta descripción se lee en la Mesa cada vez que el creep la usa.'},
-  {corto: 'Costo', titulo: '¿Cuánto le cuesta y cada cuánto la puede usar?',
-   ayuda: 'Los No2 se recargan en cada Mantenimiento.'},
-  {corto: 'Tirada al ejecutar', titulo: '¿Qué se tira al tocar Ejecutar?',
-   ayuda: "Lo que se tira apenas tocás Ejecutar: elegí el stat del golpe o de la prueba (por ejemplo PdG para un ataque). Es la PRIMERA tirada, de golpe. Si no elegís ninguno, Ejecutar no tira un stat (y si en el paso siguiente hay una fórmula, Ejecutar tira esa fórmula directamente). Si la habilidad incluye un ataque (o cuesta lo mismo que uno), conviene elegir PdG."},
-  {corto: 'Tirada de efecto', titulo: '¿Tiene una tirada de efecto (daño, curación…)?',
-   ayuda: "La tirada interna de la habilidad: daño, curación, duración… (por ejemplo 2d6+3). Aparece como un botoncito 🎲 en la misma tarjeta, al lado de Ejecutar, y solo si esta tirada existe y hay un stat en el paso anterior. Sin stat, Ejecutar tira esta fórmula directamente y no hay botón aparte. Se puede dejar vacía."},
-  {corto: 'Estado', titulo: '¿Le aplica un estado alterado?',
-   ayuda: 'Se aplica sobre el propio creep al ejecutarla. Si no aplica ninguno, dejá el nombre vacío y seguí.'},
-  {corto: '🪤 Trampa', titulo: '¿Coloca una trampa en el mapa?',
-   ayuda: 'Al ejecutarla, la habilidad deja sola una trampa oculta a los jugadores al lado del token del creep. Acá elegís qué trampa es, cuánto daño hace y qué estado deja, o se la sacás.'},
-  {corto: 'Listo', titulo: 'Revisá cómo quedó',
-   ayuda: 'Si algo no está bien, tocá el paso arriba para volver. Si está todo, guardala.'},
-  {corto: 'Cómo se ejecuta', titulo: '¿Cómo se ejecuta esta habilidad?',
-   ayuda: 'Tres formas, de menos a más automática. Se puede cambiar cuando quieras.'},
-  {corto: 'Ejecución', titulo: '¿Cómo se juega paso a paso?',
-   ayuda: 'A quién apunta, qué tira cada uno, el daño y los efectos: el mismo cuadro de Ejecución que se abre para toda la mesa al usarla.'},
-];
-// Qué pasos (índices de PASOS_HAB_CREEP / data-hc-paso) muestra el editor según el modo. Lo del sistema anterior (estado propio,
-// trampa al lado del token) aparece en semi solo si la habilidad ya lo tenía; en auto la trampa es una opción más (se elige la casilla).
-function hcOrden(){
-  const m = editingHabCreep && editingHabCreep.modo;
-  const conEstado = !!$('#hc-efecto-nombre').value.trim(), conTrampa = $('#hc-trampa-on').checked;
-  if(m === 'semi') return [7, 0, 1, 2, 3, ...(conEstado ? [4] : []), ...(conTrampa ? [5] : []), 6];
-  if(m === 'auto') return [7, 0, 1, 8, 5, ...(conEstado ? [4] : []), 6];
-  return [7, 0, 6];
-}
-function hcModosRender(){
-  const m = editingHabCreep.modo;
-  $('#hc-modos').innerHTML = Object.entries(MODOS_HAB_CREEP).map(([k, v]) => `<button type="button" class="opcion-btn modo-hab-btn ${m === k ? 'activa' : ''}" data-hc-modo="${k}"><b>${v.icono} ${v.nombre}</b><span>${v.explica}</span></button>`).join('')
-    + (m === null ? '<div class="hint">Elegí una para seguir.</div>' : '');
-}
-function hcEjecucionRender(){
-  const c = editingHabCreep.duelo;
-  const OBJ = {enemigo: 'a un enemigo', aliado: 'a un aliado', 'uno mismo': 'sobre el creep', area: 'en un área', onda: 'onda alrededor', zona: 'zona persistente'};
-  $('#hc-ejecucion-resumen').innerHTML = c
-    ? `Configurada: <b>${esc(c.modo === 'arma' ? 'ataque con su arma' : (OBJ[c.objetivo] || c.objetivo || 'a un enemigo') + (c.tira ? ' · tira ' + habEtqCreep(c.tira) : '') + (c.dano ? ' · hace daño' : '') + ((c.efectos || []).length ? ' · ' + c.efectos.map(e => e.nombre || 'efecto').join(', ') : ''))}</b>. Si además coloca una trampa, está en el paso siguiente.`
-    : 'Todavía <b>no está configurada</b>. Si la habilidad solo coloca una trampa, alcanza con el paso siguiente (🪤); si no, armala acá.';
-  $('#hc-ejecucion-abrir').textContent = `✨ ${c ? 'Cambiar' : 'Armar'} la ejecución paso a paso`;
-}
-function hcAbrirEjecucion(){
-  const e = editingHabCreep;
-  AsistenteDueloHab.abrir({nombre: $('#hc-nombre').value.trim() || 'Habilidad', inicial: e.duelo || null, siempreActivo: true, tieneFormula: !!$('#hc-tirada').value.trim(),
-    costoInicial: {sp: $('#hc-costo').value, nitrosCosto: $('#hc-nitros-modo').value === 'ataque' ? 'ATAQUE' : num($('#hc-acciones').value), hpCosto: num($('#hc-hpcosto').value)}, elegirEstado: elegirEstadoDuelo,
-    alGuardar: r => {
-      if(editingHabCreep !== e) return;
-      if(r){
-        e.duelo = r.duelo;
-        $('#hc-costo').value = r.costo.sp || '';
-        if(r.costo.nitrosCosto === 'ATAQUE'){ $('#hc-nitros-modo').value = 'ataque'; }
-        else{ $('#hc-nitros-modo').value = 'num'; $('#hc-acciones').value = Math.max(0, num(r.costo.nitrosCosto)); }
-        $('#hc-hpcosto').value = Math.max(0, num(r.costo.hpCosto));
-        hcAplicarModoNitros();
-      }else{ e.duelo = null; e.modo = 'semi'; }
-      hcMostrarPaso(e.paso);
-    }});
-}
-
-// Modo de costo de Nitros: número o "lo mismo que un ataque" (con su arma).
-function hcAplicarModoNitros(){
-  const modo = $("#hc-nitros-modo").value;
-  document.querySelectorAll("[data-hc-nitros-modo]").forEach(b => b.classList.toggle("activa", b.dataset.hcNitrosModo === modo));
-  $("#hc-acciones-caja").style.visibility = modo === "ataque" ? "hidden" : "visible";
-  const sc = editingHabCreep && S.creeps.find(s => s.id === editingHabCreep.scId);
-  $("#hc-ataque-ayuda").textContent = modo === "ataque"
-    ? `Cuesta lo mismo que un ataque con su arma (Tipo ÷ 2 el primero del turno, Tipo completo después) y cuenta como ese ataque.${sc ? ` Hoy: ${fmt(costoAtaqueCreep(sc))} No2.` : ""}`
-    : "Siempre gasta esa cantidad.";
-}
-
-// `n` es la posición dentro de los pasos visibles (hcOrden), no el índice de PASOS_HAB_CREEP.
-function hcMostrarPaso(n){
-  if(!editingHabCreep) return;
-  const orden = hcOrden(), total = orden.length;
-  let destino = Math.max(0, Math.min(total - 1, n));
-  if(destino > 0 && editingHabCreep.modo === null){ toast('Primero elegí cómo se ejecuta'); destino = 0; }
-  else if(destino > 1 && !$('#hc-nombre').value.trim()){ toast('Primero ponele un nombre'); destino = 1; }
-  editingHabCreep.paso = destino;
-  const paso = destino, idx = orden[paso];
-  const nueva = !editingHabCreep.habId && !editingHabCreep.borrador;
-  const listoParaSeguir = editingHabCreep.modo !== null && !!$('#hc-nombre').value.trim();
-  $('#hc-pasos').innerHTML = orden.map((ix, i) => {
-    const bloqueado = nueva && i > paso && !listoParaSeguir;
-    return `<button type="button" class="paso-chip${i === paso ? ' activo' : ''}${i < paso ? ' hecho' : ''}" data-hc-ir="${i}" ${bloqueado ? 'disabled' : ''}>${i + 1}. ${PASOS_HAB_CREEP[ix].corto}</button>`;
-  }).join('');
-  $('#hc-paso-titulo').textContent = PASOS_HAB_CREEP[idx].titulo;
-  $('#hc-paso-ayuda').textContent = PASOS_HAB_CREEP[idx].ayuda;
-  document.querySelectorAll('#scrim-hab-creep .hc-paso').forEach(el => { el.hidden = num(el.dataset.hcPaso) !== idx; });
-  if(idx === 7) hcModosRender();
-  if(idx === 8) hcEjecucionRender();
-  $('#hc-atras').style.visibility = paso > 0 ? 'visible' : 'hidden';
-  $('#hc-siguiente').hidden = paso === total - 1;
-  $('#habcreep-guardar').hidden = nueva && paso !== total - 1;
-  if(paso === total - 1) $('#hc-resumen').innerHTML = hcResumenHtml();
-  const primero = document.querySelector(`#scrim-hab-creep .hc-paso[data-hc-paso="${idx}"] input:not([type=hidden]),#scrim-hab-creep .hc-paso[data-hc-paso="${idx}"] select,#scrim-hab-creep .hc-paso[data-hc-paso="${idx}"] textarea`);
-  if(primero) setTimeout(() => primero.focus(), 30);
-}
-
-// Stats que un creep puede tirar en una habilidad: los 5 atributos y los
-// secundarios con tirada (los mismos que ofrece la ficha).
-const HC_STATS_SECUNDARIOS = ["resmg", "rescc", "bloqueo", "eva", "ini", "pdg", "parry", "pdgmg", "dmgesp", "resm", "percepcion"];
-function hcStatLabel(id){
-  const d = id ? CREEP_STAT_LOOKUP[id] : null;
-  return d ? (ATTR_NOMBRE[id] || d.label) : "";
-}
-function hcOpcionesStat(elegido){
-  const op = id => `<option value="${id}" ${elegido === id ? "selected" : ""}>${esc(hcStatLabel(id))}</option>`;
-  return '<option value="">— no tira un stat —</option>' +
-    `<optgroup label="Principales">${["con", "fue", "agl", "des", "esp"].map(op).join("")}</optgroup>` +
-    `<optgroup label="Secundarios">${HC_STATS_SECUNDARIOS.filter(id => CREEP_STAT_LOOKUP[id]).map(op).join("")}</optgroup>`;
-}
+/* Habilidades de creeps: el editor paso a paso es común (comun/creep-editor.js, A6c, 2026-10-02): GM Tools lo arma en su ventana de
+   siempre (#scrim-hab-creep, la crea el componente). Acá, lo que GM Tools hace a su manera. */
+const editorHabCreep = CreepEditor.crear(document.body, {
+  creep: scId => S.creeps.find(s => s.id === scId),
+  guardarHab: (scId, aplicar) => { const sc = S.creeps.find(s => s.id === scId); if(sc){ aplicar(sc); renderAll(); } },
+  personalizados: () => S.estadosPersonalizados || [],
+  elegirEstadoDuelo: () => elegirEstadoDuelo(),
+  toast: m => toast(m),
+}, {id: 'scrim-hab-creep'});
+function hcStatLabel(id){ return CreepEditor.statLabel(id); }
+// habId vacío = habilidad nueva; opc = {borrador, alGuardar, encima} (ver comun/creep-editor.js).
+function abrirEditorHabCreep(scId, habId, opc){ editorHabCreep.abrir(scId, habId, opc); }
 

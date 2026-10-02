@@ -431,8 +431,9 @@ function acCrear(){
       raiz.querySelector('#ac-ver').classList.remove('open');
       const v = acViendo;
       acViendo = null;
-      // Editar, Subir y Reemplazar: los hace GM Tools en el marco (abre el Ver de esa habilidad y toca el mismo botón).
-      if(v && b.dataset.acVer !== 'no') acDelegar({verhabaccion: v}, b.dataset.acVer);
+      // ✎ Editar: el editor común, acá (A6c). Subir y Reemplazar todavía los hace GM Tools en el marco (abre el Ver y toca el botón).
+      if(v && b.dataset.acVer === 'verhab-editar'){ const [cid, hid] = v.split(':'); acEditarHab(cid, hid); }
+      else if(v && b.dataset.acVer !== 'no') acDelegar({verhabaccion: v}, b.dataset.acVer);
       return;
     }
     if(b.dataset.acVc){
@@ -474,6 +475,39 @@ function cerrarAccionesNuevas(){
   ac.raiz.querySelector('#ac-vercreep').classList.remove('open');
   ac.soloVer = false;
 }
+/* ---------- ✎ El editor de una habilidad de creep, hecho por el mapa (2026-10-02, hoja de ruta A6c, docs/plan-a6c-editor-creeps.md) ----------
+   El ✎ Editar del Ver de una habilidad se lo pedía a GM Tools escondido. Ahora es el editor común (comun/creep-editor.js: el mismo paso
+   a paso, con la trampa y la Ejecución ✨), adentro del recuadro de las Acciones nuevas; guarda con modificarCreep (acCambiarCreep). Los
+   estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
+const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261002a', '../comun/asistente-duelo-hab.js?v=20261002i'];
+async function acEditarHab(creepId, habId){
+  try{ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }
+  catch(err){ console.error(err); toast('No se pudo abrir el editor'); return; }
+  if(!ac.editor){
+    ac.editor = CreepEditor.crear(ac.raiz, {
+      creep: id => { const crudo = creepPrivadoDe(id); if(!crudo) return null; const sc = CreepCalculo.normalizar(structuredClone(crudo)); sc.id = id; return sc; },
+      guardarHab: (id, aplicar) => acCambiarCreep(id, sc => { aplicar(sc); return {}; }),
+      personalizados: () => [],
+      elegirEstadoDuelo: async () => {
+        const sc0 = creepPrivadoDe(ac.creepId);
+        const r = await SelectorEstados.abrir({
+          titulo: 'Estado alterado', para: (sc0 && sc0.nombre) || '', presets: estadosPresetCreep(), propios: [],
+          cfgPreguntas: {hp: 'hpTurno', statLabel: id => (SE_STATS_CREEP[id] && SE_STATS_CREEP[id][0]) || id},
+          stats: Object.entries(SE_STATS_CREEP).map(([id, [label, full]]) => ({id, label, full})),
+          armarDeAsistente: res => ({nombre: res.nombre, polaridad: res.polaridad, turnos: res.turnos, permanente: res.permanente, stacks: 1, hpTurno: res.hp, stacksTurno: 0,
+            escudoMagico: res.escudo, mods: res.mods, detalle: res.detalle, ...res.flags, ...(res.forzarNitros !== undefined ? {forzarNitros: res.forzarNitros} : {})}),
+        });
+        if(!r) return null;
+        const pr = r.preset;
+        return {modo: 'preset', nombre: pr.nombre, turnos: pr.turnos, permanente: !!pr.permanente, hp: num(pr.hpTurno), mods: pr.mods, stacks: pr.stacks, escudoMagico: num(pr.escudoMagico), polaridad: pr.polaridad, detalle: pr.detalle};
+      },
+      toast: m => toast(m),
+    }, {id: 'scrim-hab-creep'});
+    // Sus botones son solo suyos: que no los atienda también el manejador general del recuadro.
+    ['click', 'change', 'input'].forEach(ev => ac.editor.scrim.addEventListener(ev, e => e.stopPropagation()));
+  }
+  ac.editor.abrir(creepId, habId);
+}
 /* ---------- 🔍 Ver todo de un creep, hecho por el mapa (2026-10-02, hoja de ruta A6a) ----------
    El 🔍 Ver todo de la ficha lite abría la ventana «Ver» de GM Tools escondido en el marco. Ahora la muestra el mapa adentro del
    recuadro de las Acciones nuevas, con comun/creep-lupa.js (verCreep: el mismo dibujo que GM Tools), y se redibuja con cada cambio
@@ -505,7 +539,8 @@ document.addEventListener('keydown', e => {
   if(!ac || ac.host.hidden || !$('#botonera-capa').hidden || elegirDestinoCb) return;
   if(e.key !== 'Escape') return;
   e.preventDefault();
-  const cartel = ac.raiz.querySelector('.scrim.open');
+  const abiertos = [...ac.raiz.querySelectorAll('.scrim.open')], cartel = abiertos[abiertos.length - 1];   // el de más arriba
+  if(cartel && ac.editor && cartel === ac.editor.scrim){ ac.editor.cerrar(); return; }
   if(cartel && cartel.id === 'ac-vercreep'){ acVerCreepCerrar(); return; }
   if(cartel){ cartel.classList.remove('open'); acObjetivoPendiente = null; return; }
   cerrarAccionesNuevas();

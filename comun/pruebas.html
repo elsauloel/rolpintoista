@@ -83,6 +83,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-editor.js"></script>
 <script src="creep-lupa.js"></script>
 <script src="combate-fin.js"></script>
+<script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
 <script>
@@ -1129,6 +1130,36 @@ prueba('botín del GM (comun/combate-fin.js): lo sin tomar, los despojos a repar
   igual([v.html.includes('Sin tomar (1)'), v.html.includes('Despojar: 5 despojos → 3 c/u'), v.html.includes('Yelmo → Ana'), v.boton.startsWith('🏁 Despojar'), CombateFin.botinVista(st).html.includes('→ 5 c/u'),
     CombateFin.botinItem(st, 'x').tipoItem, CreepLupa.verItem(CombateFin.botinItem(st, 'x')).titulo],
     [true, true, true, true, true, 'arma_1m', 'Hacha']);
+});
+prueba('editor de habilidades de creep (comun/creep-editor.js): una nueva pide el modo, con costo de ataque tira PdG, se guarda en el creep', async () => {
+  const sc = creepPrueba({id: 'k', habilidades: []}), avisos = [];
+  const caja = document.createElement('div'); caja.style.cssText = 'position:absolute;left:-9999px'; document.body.appendChild(caja);
+  const ed = CreepEditor.crear(caja, {creep: () => sc, guardarHab: (id, aplicar) => aplicar(sc), personalizados: () => [], elegirEstadoDuelo: () => Promise.resolve(null), toast: m => avisos.push(m)});
+  const q = s => ed.scrim.querySelector(s), clic = s => q(s).dispatchEvent(new MouseEvent('click', {bubbles: true}));
+  ed.abrir('k', null);
+  clic('[data-hc="siguiente"]');
+  const sinModo = [ed.estado.paso, avisos.slice(-1)[0]];
+  clic('[data-hc-modo="semi"]');
+  const chips = ed.scrim.querySelectorAll('[data-hc-ir]').length;
+  const nom = q('[data-hc="nombre"]'); nom.value = 'Mordisco'; nom.dispatchEvent(new Event('input', {bubbles: true}));
+  clic('[data-hc-nitros-modo="ataque"]');
+  const pdg = q('[data-hc="tirada-stat"]').value;
+  const cd = q('[data-hc="cd"]'); cd.value = '2';
+  q('[data-hc="cd-arranca"]').checked = true;
+  await (async () => { clic('[data-hc="guardar"]'); await new Promise(r => setTimeout(r, 0)); })();
+  const h = sc.habilidades[0];
+  // editar la existente: el nombre y el modo vienen cargados
+  ed.abrir('k', h.id);
+  const cargado = [q('[data-hc="nombre"]').value, ed.estado.modo, q('[data-hc="nitros-modo"]').value];
+  ed.cerrar();
+  // una de la biblioteca (borrador): se edita ella y avisa, sin tocar al creep
+  const borr = {nombre: 'Rugido', modo: 'manual', detalle: 'Grita'}; let avisado = null;
+  ed.abrir('k', null, {borrador: borr, alGuardar: x => { avisado = x.nombre; }});
+  const n2 = q('[data-hc="nombre"]'); n2.value = 'Rugido fuerte'; n2.dispatchEvent(new Event('input', {bubbles: true}));
+  clic('[data-hc="guardar"]'); await new Promise(r => setTimeout(r, 0));
+  caja.remove();
+  igual([sinModo, chips, pdg, h.nombre, h.nitrosCosto, h.tiradaStat, h.cd, h.cdArranca, h.cdActual, h.modo, avisos.slice(-1)[0], cargado, sc.habilidades.length, avisado, borr.nombre, borr.modo],
+    [[0, 'Primero elegí cómo se ejecuta'], 6, 'pdg', 'Mordisco', 'ATAQUE', 'pdg', 2, true, 2, 'semi', 'Mordisco guardada', ['Mordisco', 'semi', 'ataque'], 1, 'Rugido fuerte', 'Rugido fuerte', 'manual']);
 });
 prueba('el «Ver» de un creep (comun/creep-lupa.js): título, nivel, habilidades en chips o la lista que se le pase, recompensas', () => {
   const sc = creepPrueba({nivel: 2, habilidades: [{id: 'h', nombre: 'Rugido', cd: 2}], notas: 'Huele mal'});

@@ -653,3 +653,13 @@ resuelven a mano, como el resto de los avisos).
   aparece en la ficha, sube con pasivas, etc.) o un **bono particular y excepcional**, que se mantenga en valores bajos y solo lo
   otorguen algunos equipos, efectos, habilidades o consumibles, y cuyo único trabajo sea reducir el daño mágico? ¿Qué topes o valores
   típicos? ¿Debería reducir todo daño mágico o solo algunos tipos?
+
+- **P145. Percepción aumentada: "algo está fuera de lugar" (2026-10-02, pedido del dueño; reemplaza el aviso actual).** Lo decidido:
+  con la pasiva, (1) **trampas**: al quedar al lado de una trampa oculta de un rival, el movimiento se corta **sin revelar nada ni decir
+  "trampa"** — solo «Algo está fuera de lugar… tirá Percepción»; si gana contra la dificultad de la trampa, recién ahí la ve; si pierde,
+  sigue moviéndose libre: pisarla la detona, y pasar por **otro** casillero al lado vuelve a cortar y pedir tirada. (2) **Sigilo**: la zona
+  de alerta de quien camina cuenta **en cada paso** (sin la pasiva sigue como P105: solo donde termina); si alguien en sigilo queda en ella,
+  mismo corte y misma tirada; si gana, lo descubre (pierde el sigilo). Abierto: (a) ¿de dónde sale la **dificultad para detectar una
+  trampa** (campo nuevo del asistente con un valor por defecto, algo de quien la puso, o un número fijo)? (b) en sigilo, ¿Percepción
+  **contra qué** (una tirada de Destreza del que se esconde —cerca de P3— o un número fijo)? (c) al descubrir una trampa, ¿la ve solo
+  quien la descubrió o todo su bando? (d) la tirada sale en la Mesa como una Percepción cualquiera, sin decir para qué (propuesta).

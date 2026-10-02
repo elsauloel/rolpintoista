@@ -491,7 +491,8 @@ Cuando **dos fichas de bandos distintos están adyacentes** (un casillero) y una
 - **Se puede hacer si tenés [[Nitros (No2)|No2]] disponibles**, y **cuesta lo mismo que un primer ataque**.
 - **En el mapa, en modo combate**: si el rival **tiene los No2**, el movimiento **se frena** en el último casillero al lado y a quien maneja al rival le aparece al centro «¿Ataque de oportunidad?». Si dice que no, el otro sigue su camino; si dice que sí (y elige el arma, si tiene más de una con No2), se abre el duelo. En la [[Mesa]] queda el registro: "*Fulano* se alejó de *Mengano*: posible ataque de oportunidad" (en rojo) y cómo terminó.
 - Si el rival **no tiene los No2**, no se frena nada, pero queda dicho en la [[Mesa]] y en la esquina del mapa: "*Fulano* se alejó de *Mengano*: no hay ataque de oportunidad (*Mengano* no tiene No2 suficientes)".
-- Cada par (quien se aleja, el rival) se ofrece **una vez por turno**: si en el mismo turno te volvés a acercar y a alejar del mismo rival, ya no se pregunta ni se avisa de nuevo.
+- **La oportunidad dura lo que dura el contacto.** Una vez que se ofreció (pegue, falle, te dejen pasar o al rival no le alcancen los No2), queda usada **mientras sigan pegados**: después del ataque seguís tu turno como quieras y, si te terminás de alejar, no hay otro. Pero apenas dejan de estar al lado (se mueva quien se mueva), se renueva: si volvés a quedar pegado a ese rival (o a otro) y te alejás, **es otro ataque de oportunidad**, aunque sea en el mismo turno.
+- **No hay tope**: se pueden hacer tantos ataques de oportunidad como alcancen los No2.
 
 > [!info] Diseño futuro
 > Es la base para habilidades que jueguen con esto más adelante: más PdG o Evasión en ataques de oportunidad, habilidades que dejan bloquearlos, etc.

@@ -19,7 +19,8 @@ motor de zonas) · `09-colocar-y-panel` (colocar un token, panel del costado, bo
 rayo en cadena, creeps privados) · `11-botonera-nueva` (la Botonera de la ficha en el marco y la Botonera nueva ⚗) ·
 `12-acciones-nuevas` (Acciones nuevas de un creep ⚗) · `13-tokens-portal-duelo` (botón 🎭, portal, zonas de habilidad, duelo,
 hechizos de área, dodge, muerte) · `14-herramientas-y-arranque` (caja de herramientas, bitácora, Mesa y el arranque) ·
-`15-ficha-lite` (la ficha lite, 2026-10-02: va después del arranque porque solo define funciones y escuchas).
+`15-ficha-lite` (la ficha lite, 2026-10-02: va después del arranque porque solo define funciones y escuchas) · `16-momentos` · `17-oportunidad` ·
+`18-ventanas-gm` (las ventanas del GM de fin de combate, 2026-10-02, A6a).
 **Es el mismo programa de antes, en el mismo orden**: comparten las variables globales. Cuidados (los mismos que la ficha): una
 línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar lo de su archivo o de los anteriores — el arranque
 (`iniciar()`) está al final de `14-…`; cada archivo lleva su `?v=` en `mapa.html` y se sube solo el del que cambia. Para buscar algo,
@@ -1295,3 +1296,14 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (`bnComparando = {item, equipadoId}`) sirve para la mochila, el botín y la tienda. Siguen yendo a la ficha / GM Tools escondidas: el
   Editar del Ver y el ⚙ de un estado (el editor, A6), 📊 Stats de la ficha lite, la Moneda Re-Roll fija, el 🔍 Ver de un creep y las
   ventanas del GM de fin de combate (Finalizar / Despojar).
+- **Hoja de ruta A6a: las ventanas sueltas, hechas por el mapa** (2026-10-02):
+  - **📊 Stats** (`abrirStatsMapa`, js/11; el 📊 de la ficha lite) y **🪙 Moneda Re-Roll** (`abrirRerollMapa`, js/11; el 🪙 fijo y la
+    Botonera): adentro del recuadro de la Botonera nueva (`#bn-stats`, `#bn-reroll`), con `comun/ficha-stats.js` y `comun/ficha-duelo.js`.
+    Sus listeners frenan la propagación: si no, el manejador general del recuadro también atendía el clic (el 🎲 tiraba dos veces).
+  - **🔍 Ver todo de un creep** (`abrirVerCreepMapa`, js/12; el de la ficha lite): `#ac-vercreep` adentro del recuadro de las Acciones
+    nuevas, con `CreepLupa.verCreep`; se redibuja con cada cambio del creep (`acDibujar`) y, si las Acciones no estaban a la vista, se
+    abren solo para esto (`ac.soloVer`). ✎ Editar abre GM Tools en otra pestaña.
+  - **🏁 Finalizar combate y 🎁 Despojos del GM** (`js/18-ventanas-gm.js`: `abrirFinalizarMapa`, `abrirBotinGMMapa`): un recuadro aislado
+    propio (`#ventanas-gm`, z-index 90, con el `gm-tools.css`) con `comun/combate-fin.js`. Los creeps del reporte se leen de su parte
+    privada (`vgLeerCreeps`); al publicar se marcan recompensados con `modificarCreep`; el catálogo es el de fábrica + lo subido, en la forma
+    de `CreepCalculo.itemParaCreep` (`vgCatalogo`). El Ver de un ítem, con `CreepLupa.verItem`. `abrirModoGM` quedó sin uso (limpieza A′).

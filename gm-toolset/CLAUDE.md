@@ -413,3 +413,12 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   `CreepAcciones.mantenimiento(sc)` por cada creep y `gmMantenimientoRevisar` (`js/12`) `CreepAcciones.reclamarMantenimiento`. El mapa
   ya no carga GM Tools en `?modo=mantenimiento`: pasa el turno de los creeps él mismo con la misma pieza (el modo queda sin uso, para la
   limpieza).
+
+- **El fin del combate, en `comun/combate-fin.js`** (2026-10-02, hoja de ruta A6a): el reporte «Batalla terminada» (`js/08`) y el botín
+  para despojar (`js/09`) son ventanas sobre `CombateFin` (`renderReporteCombate` → `CombateFin.vista`; los controles `data-rep-*` los
+  atiende un solo listener; `publicarRecompensas` → `CombateFin.publicar`; `renderBotinGM`/`despojarBotin` → `botinVista`/`despojar`).
+  `combateRep` sigue siendo la variable de GM Tools (ahora con `contarEscapados` adentro). Las reglas de recompensas (`tipoDeCreep`,
+  `trofeoDeCreep`, `dropsResumenCreep`…), `itemParaCreep`, `TIPOITEM_LABEL_GM` y `STAT_LABEL_GM` son atajos a `comun/creep-calculo.js`;
+  `verCreepDatos` y `verItemDatos` arman su HTML con `comun/creep-lupa.js` (`verCreep`, `verItem`). El mapa del GM muestra las mismas
+  ventanas él mismo (`vtt-hexgrid/js/18-ventanas-gm.js`): el `?modo=finalizar|botin` y el `&ver=1` de `modo=acciones` quedaron sin uso
+  (limpieza A′).

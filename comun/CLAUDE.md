@@ -1064,3 +1064,24 @@ versión parecida en más de una, es candidato a juntar.
   (`detectar`, trampa común 8), en una habilidad de qué stat sale (`detectarStat: 'des' | 'dmgesp'`). `Combatiente.trampaDeHab(h, valorDe)`
   calcula `detectar` con el stat de quien la coloca; `TokensAuto.colocarTrampas` lo escribe como `trampaDetectar`. `Plantillas.TRAMPA` suma
   `detectar` y `detectarStat`. `FichaBotonera.tiradaPercepcionValor(valor, aumentada, azar)`: la tirada de Percepción a partir del valor.
+- **Hoja de ruta A6a: las ventanas sueltas, comunes** (2026-10-02):
+  - **`ficha-stats.js`** (`FichaStats`) — **📊 Stats de un personaje**: `presupuesto(S)`, `puntosHtml(S)`, `statTile`, `desglose`,
+    `atributosHtml(S, abierto)` (los atributos con sus derivados; `abierto` = el stat con el desglose a la vista), `cambiarAtributo(S, attr,
+    valor, mod)` y `cambiarFormula(S, id, txt)`. Lo usan la ficha (`renderAttrs`, `statTile`, `breakdown` son atajos) y el mapa
+    (`abrirStatsMapa`, adentro de la Botonera nueva).
+  - **`ficha-duelo.js`, la Moneda Re-Roll**: `rerollHtml(S, lista)` → `{aviso, filas}` (la ventana con "mis últimas tiradas",
+    `comun/tiradas-propias.js`), `repetirTirada(u, registrar, toast)` y `usarReroll(S, h, ui)` (marca `rerollUsados`, repite y tira la
+    moneda). La ficha (`renderReroll`) y el mapa (`abrirRerollMapa`).
+  - **`creep-lupa.js`**: `verCreep(sc, {habilidades})` → `{titulo, html}` (el «Ver» de un creep entero: GM Tools `verCreepDatos` y el 🔍 Ver
+    todo del mapa), `derivadosHtml`, `recompensasVerHtml` y `verItem(item)` (el «Ver» de un ítem visto por el GM: arma o pieza de un creep,
+    catálogo, plantilla del botín). Solo HTML con las clases de `gm-tools.css`.
+  - **`creep-calculo.js`**: las reglas de **recompensas** (`TIPOS_CRIATURA`, `TIPOS_CON_ARMA_NATURAL`, `TROFEO_PRECIO_NIVEL`, `nombreLimpio`,
+    `tipoDe`, `oroSugerido`, `trofeoPrecioAuto`, `trofeo`, `despojosDePrecio`, `dropsResumen`), las etiquetas `TIPOITEM_LABEL` y `STAT_LABEL`
+    (antes `TIPOITEM_LABEL_GM` / `STAT_LABEL_GM`) e `itemParaCreep(it)` (un ítem del catálogo en la forma del equipo de un creep). GM Tools
+    conserva sus nombres de siempre como atajos.
+  - **`combate-fin.js`** (`CombateFin`) — **el fin del combate del GM**: el reporte «Batalla terminada» (`nuevo`, `creepsEnMapa`,
+    `jugadores`, `generar`, `calcularReparto`, `itemsPublicables`, `vista` → `{html, publicar, faltanJugadores}`, `cambio`/`clic` para sus
+    controles `data-rep-*`, `publicar`) y el botín para despojar (`nuevoBotin`, `jugadoresBotin`, `botinVista`, `botinCambio`, `botinItem`,
+    `despojar`), más `lineaVerde`. El estado (antes `combateRep`, `xpContarEscapados`, `botinGM` de GM Tools) se pasa como parámetro.
+    `confirmar(texto)` y `alEmpezar()` los pone cada pantalla. Lo usan GM Tools (`js/08`, `js/09`) y el mapa del GM (`js/18`). Necesita
+    `creep-calculo.js` e `items-subidos.js` (`sinAviso`).

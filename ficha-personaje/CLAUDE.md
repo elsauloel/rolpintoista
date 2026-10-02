@@ -652,3 +652,8 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   de compra) usa `comun/ficha-tienda.js` con `tiendaSt` (`js/09`: conecta la pieza con `tiendaCargada`, `carritoCatalogo`, `venderSel`,
   `catalogoOrden`… y los filtros de la ventana) y `tiendaUi`. `CATEGORIAS` y `capMochilaEfectivo` vienen de `comun/ficha-equipo.js`. El mapa
   ya no le pide `abrir-botin` ni `abrir-tienda` (los muestra él): esos mensajes y `botinModoAbrir` quedan para la limpieza (A′).
+
+- **📊 Stats y 🪙 Moneda Re-Roll, comunes** (2026-10-02, hoja de ruta A6a): los atributos (`renderAttrs`, `statTile`, `breakdown`, el cambio
+  de un atributo o una fórmula en `js/06`) usan `comun/ficha-stats.js`; la ventana de la Moneda (`renderReroll`, `repetirTirada`, el clic de
+  una tirada) usa `comun/ficha-duelo.js` (`rerollHtml`, `usarReroll`). El mapa abre las mismas ventanas él mismo, sin la ficha escondida:
+  los mensajes `abrir-stats` y `abrir-reroll` quedaron sin uso (limpieza A′).

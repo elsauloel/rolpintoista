@@ -50,8 +50,7 @@
      cuando el GM cierra el botín. Las categorías de ítem y la mochila pasaron a `comun/ficha-equipo.js`. Probado en vivo (GM con 🎮
      Silvia): lo de cada jugador, Ver (sin Editar), Comparar, «Sumar a la mochila» (transacción, mochila guardada, línea en la Mesa) y
      el cierre del GM. (Ojo al armar un botín de prueba a mano: el documento tiene que llevar `tomadoPor: ''`, si no las reglas no dejan
-     tomarlo — GM Tools ya lo hace así.) La ventana del GM (Finalizar combate / Despojar, `abrirModoGM`) sigue en GM Tools: es otra
-     pantalla, se anota aparte.
+     tomarlo — GM Tools ya lo hace así.) La ventana del GM (Finalizar combate / Despojar) se mudó en la 6a (2026-10-02). Era otra pantalla y se anotó aparte.
    - [x] **Tienda** (2026-10-02): la regla y el dibujo salieron a `comun/ficha-tienda.js` (precio con el ajuste del vendedor, filtros y
      orden, carrito y compra, agregar gratis, vender, reparar con el herrero, ítem al azar, la tienda publicada) y la usan la ficha (con
      `tiendaSt`, que conecta la pieza con sus variables de siempre) y el mapa (`abrirTiendaMapa`: el 🏪 del borde y la ficha lite, adentro
@@ -62,8 +61,20 @@
      en la ficha; en la ficha suelta, buscar (ya no da error), carrito y comprar (488 → 468). La tienda de prueba quedó cerrada.
 6. [ ] **Todo al mapa, editor incluido** (decidido por el dueño, 2026-10-02: "lo más prolijo al final, aunque sea largo"): que no quede
    nada escondido y se pueda borrar todo el mecanismo del marco. Por tandas, cada una probada:
-   - [ ] **6a. Las ventanas sueltas**: 📊 Stats de la ficha lite, la Moneda Re-Roll 🪙, el 🔍 Ver todo de un creep, las ventanas del GM de
-     fin de combate (Finalizar / Despojar).
+   - [x] **6a. Las ventanas sueltas** (2026-10-02), cada una en una pieza común que usan las dos pantallas:
+     - 📊 **Stats** (`comun/ficha-stats.js`, adentro de la Botonera nueva): atributos, desglose, fórmulas, tirar, cambiar un atributo.
+       Probado en vivo: el desglose, la tirada a nombre del personaje, Con 4 → 5 sube el HP máx. 20 → 25 y se guarda. **Arreglo**: el 🎲
+       tiraba dos veces (lo atendía también el manejador general del recuadro).
+     - 🪙 **Moneda Re-Roll** (`comun/ficha-duelo.js`): probado con una moneda de prueba en el cinturón de Silvia: repitió la Destreza
+       (5), la moneda salió impar y se rompió, la tirada quedó «ya usó su re-roll» y se guardó; la ficha suelta ve lo mismo.
+     - 🔍 **Ver todo de un creep** (`CreepLupa.verCreep`; las reglas de recompensas —tipo, oro sugerido, trofeo, lo que suelta— pasaron a
+       `comun/creep-calculo.js`): adentro de las Acciones nuevas, se actualiza solo con los cambios del creep; ✎ Editar abre GM Tools en
+       otra pestaña (el editor es la 6c).
+     - 🏁 **Finalizar combate / 🎁 Despojar del GM** (`comun/combate-fin.js`, ventanas en `vtt-hexgrid/js/18-ventanas-gm.js`; el Ver de un
+       ítem del GM en `CreepLupa.verItem`; `itemParaCreep` en `comun/creep-calculo.js`). Probado en vivo de punta a punta en el mapa: el
+       reporte (90 XP del creep nivel 2, oro con su ±20 %, dos ítems), un extra de XP, quitar un ítem, Ver, Publicar (combate publicado,
+       el creep marcado como repartido —GM Tools lo vio—, línea verde), cerrar y reabrir con 🎁, Despojar con un jugador destildado
+       (pagos, botín borrado, combate cerrado, 🎁 apagado). GM Tools sigue igual con la misma pieza. 215 pruebas en verde.
    - [ ] **6b. El editor de la ficha** (ítems —el asistente ya es común—, habilidades, estados, pasivas, talentos) en piezas comunes.
    - [ ] **6c. El editor de creeps** (GM Tools) en piezas comunes.
    - [ ] Después, la **limpieza** (A′): borrar el marco y lo que quedó sin uso.
@@ -74,7 +85,8 @@
   false`) ni apareció un problema que solo se arregle con lo viejo. Mientras tanto queda "dormido", sin tocarlo ni probarlo.
 - **Cómo** — de a un paso y probando: sacar `BN_SIEMPRE`, el interruptor ⚗ y `bnAlternar`; los pedidos de botón al marco
   (`bnDelegar`/`botonera-delegar`, `acDelegar`/`acciones-delegar`) y lo que los atiende en la ficha y en GM Tools (`modo=botonera` sin
-  mensaje, `modo=acciones`); la ficha liviana vieja (`fichaMapaAbrir`, `abrir-ficha-mapa`); `abrir-equipo`/`equipoModoAbrir` (A4); `abrir-botin`/`botinModoAbrir` y `abrir-tienda` (A5); el Mantenimiento en un marco invisible (en el
+  mensaje, `modo=acciones`); la ficha liviana vieja (`fichaMapaAbrir`, `abrir-ficha-mapa`); `abrir-equipo`/`equipoModoAbrir` (A4); `abrir-botin`/`botinModoAbrir` y `abrir-tienda` (A5); `abrir-stats`, `abrir-reroll`, `abrir-ver-creep` (y el `&ver=1` de
+  GM Tools), `abrirModoGM` y el `?modo=finalizar|botin` de GM Tools (A6a); el Mantenimiento en un marco invisible (en el
   mapa `mantenimientoEncolar`/`mantenimientoSiguiente`/`mantenimientoCerrarMarco` y el aviso `mantenimiento-listo`; en la ficha y en GM
   Tools el `?modo=mantenimiento`), sin uso desde A2/A2b; los mensajes que queden sin uso en `comun/mensajes-mapa.js`. **No** se borra la Botonera de la ficha suelta (`ficha.html` sin el mapa): usa las mismas piezas de
   `comun/` y es la de la página de la ficha.

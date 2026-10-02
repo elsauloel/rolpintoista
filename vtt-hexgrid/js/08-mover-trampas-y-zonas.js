@@ -296,15 +296,18 @@ function zonaAplicaA(el, t){
 // estado, solo si ese token no está ya en zonaResueltos (una vez que lo tiene, no se le vuelve a tirar la resistencia).
 function zonaLeFalta(el, t){
   if(el.zonaDano || el.zonaDanoDif) return true;
-  if(el.zonaEstado && !(el.zonaResueltos || []).includes(t.id)) return true;
+  if(el.zonaEstado && !(el.zonaResueltos || []).includes(zonaIdDe(t))) return true;
   return false;
 }
+// El id de un token (la clave en `tokens`): los objetos del token no lo llevan adentro (antes se leía t.id, que no existe, y el cartelito
+// de las zonas nunca aparecía — encontrado probando Pedos Tóxicos, 2026-10-02).
+function zonaIdDe(t){ for(const [id, x] of tokens) if(x === t) return id; return ""; }
 let zonaCola = [];      // [{elId, tokenId}] a la espera de mostrarse en esta pantalla
 let zonaBanner = null;  // {elId, tokenId, el, t, resultado} el que se está mostrando ahora
 function zonaEncolar(el, t){
-  if(zonaCola.some(x => x.elId === el.id && x.tokenId === t.id)) return;
-  if(zonaBanner && zonaBanner.elId === el.id && zonaBanner.tokenId === t.id) return;
-  zonaCola.push({elId: el.id, tokenId: t.id});
+  if(zonaCola.some(x => x.elId === el.id && x.tokenId === zonaIdDe(t))) return;
+  if(zonaBanner && zonaBanner.elId === el.id && zonaBanner.tokenId === zonaIdDe(t)) return;
+  zonaCola.push({elId: el.id, tokenId: zonaIdDe(t)});
   zonaMostrarSiguiente();
 }
 function zonaMostrarSiguiente(){
@@ -437,7 +440,7 @@ async function zonaResolverBanner(){
     }
   }
   if(el.zonaEstado && !resistio){
-    try{ await coleccionElementos().doc(elId).update({zonaResueltos: firebase.firestore.FieldValue.arrayUnion(t.id)}); }
+    try{ await coleccionElementos().doc(elId).update({zonaResueltos: firebase.firestore.FieldValue.arrayUnion(tokenId)}); }
     catch(err){ console.error('No se pudo anotar zonaResueltos:', err); }
   }
   zonaBanner = {...zonaBanner, el, t, resultado: partes.join(' · ') || 'sin efecto'};

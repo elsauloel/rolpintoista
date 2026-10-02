@@ -76,6 +76,7 @@
        el creep marcado como repartido —GM Tools lo vio—, línea verde), cerrar y reabrir con 🎁, Despojar con un jugador destildado
        (pagos, botín borrado, combate cerrado, 🎁 apagado). GM Tools sigue igual con la misma pieza. 215 pruebas en verde.
    - [ ] **6b. El editor de la ficha** (ítems —el asistente ya es común—, habilidades, estados, pasivas, talentos) en piezas comunes.
+     Por tandas, en [`plan-a6b-editor.md`](plan-a6b-editor.md) (ver su «▶ Para retomar»). Hecho: b0, el ✚ Revivir (2026-10-02).
    - [ ] **6c. El editor de creeps** (GM Tools) en piezas comunes.
    - [ ] Después, la **limpieza** (A′): borrar el marco y lo que quedó sin uso.
 
@@ -85,7 +86,7 @@
   false`) ni apareció un problema que solo se arregle con lo viejo. Mientras tanto queda "dormido", sin tocarlo ni probarlo.
 - **Cómo** — de a un paso y probando: sacar `BN_SIEMPRE`, el interruptor ⚗ y `bnAlternar`; los pedidos de botón al marco
   (`bnDelegar`/`botonera-delegar`, `acDelegar`/`acciones-delegar`) y lo que los atiende en la ficha y en GM Tools (`modo=botonera` sin
-  mensaje, `modo=acciones`); la ficha liviana vieja (`fichaMapaAbrir`, `abrir-ficha-mapa`); `abrir-equipo`/`equipoModoAbrir` (A4); `abrir-botin`/`botinModoAbrir` y `abrir-tienda` (A5); `abrir-stats`, `abrir-reroll`, `abrir-ver-creep` (y el `&ver=1` de
+  mensaje, `modo=acciones`); la ficha liviana vieja (`fichaMapaAbrir`, `abrir-ficha-mapa`); `abrir-equipo`/`equipoModoAbrir` (A4); `abrir-botin`/`botinModoAbrir` y `abrir-tienda` (A5); `abrir-stats`, `abrir-reroll`, `abrir-revivir`, `abrir-ver-creep` (y el `&ver=1` de
   GM Tools), `abrirModoGM` y el `?modo=finalizar|botin` de GM Tools (A6a); el Mantenimiento en un marco invisible (en el
   mapa `mantenimientoEncolar`/`mantenimientoSiguiente`/`mantenimientoCerrarMarco` y el aviso `mantenimiento-listo`; en la ficha y en GM
   Tools el `?modo=mantenimiento`), sin uso desde A2/A2b; los mensajes que queden sin uso en `comun/mensajes-mapa.js`. **No** se borra la Botonera de la ficha suelta (`ficha.html` sin el mapa): usa las mismas piezas de

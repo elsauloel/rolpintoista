@@ -388,6 +388,8 @@ function gmAlEntrar(){
   gmEstadoAlDia();
   if(gmVivo.activo) cargarCreepsSubidos();   // avisos 🔔 de versión nueva en las tarjetas
   cargarItemsSubidosGM();   // ítems que subió el grupo (catálogo compartido, paso 5)
+  // Los "Mis presets" de estados, guardados en la partida (comun/presets-gm.js, B-7b): antes se perdían al recargar.
+  if(gmVivo.activo) PresetsGM.escuchar(l => { S.estadosPersonalizados = l; });
   if(gmVivo.activo){ gmEscuchar(); gmMantenimientoEscuchar(); try{ gruposMapasEscuchar(); }catch(err){ console.error('No se pudieron escuchar los grupos vinculados:', err); } combateEscuchar(); gbitEscuchar(); }
 }
 

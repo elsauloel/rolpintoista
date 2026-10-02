@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/creep-lupa.js?v=20261002b', '../comun/creep-botonera.js?v=20261001b', '../comun/creep-acciones.js?v=20261002i', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261002a'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002b', '../comun/creep-botonera.js?v=20261001b', '../comun/creep-acciones.js?v=20261002i', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261002a'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -513,13 +513,15 @@ async function abrirEditarEstadoCreepMapa(creepId, nombre){
   if(!ac || ac.host.hidden || ac.creepId !== creepId) return;
   ac.soloEstado = !yaVisible;
   const cerrarSiSolo = () => { if(ac.soloEstado){ ac.soloEstado = false; setTimeout(() => cerrarAccionesNuevas(), 0); } };
-  try{ await acCargarEditor(); }catch(err){ console.error(err); toast('No se pudo abrir el editor'); cerrarSiSolo(); return; }
+  try{ await acCargarEditor(); await PresetsGM.listo(); }catch(err){ console.error(err); toast('No se pudo abrir el editor'); cerrarSiSolo(); return; }
   if(!ac.editorEstado){
     ac.editorEstado = CreepEditor.crearEstado(ac.raiz, {
       creep: id => acCreepDe(id),
       guardar: (id, aplicar) => acCambiarCreep(id, sc => { aplicar(sc); return {}; }),
       toast: m => toast(m),
       alCerrar: () => cerrarSiSoloEstado(),
+      personalizados: () => PresetsGM.lista(),   // los "Mis presets" del GM (comun/presets-gm.js, B-7b)
+      guardarPresets: lista => PresetsGM.guardar(lista),
     }, {id: 'scrim-estado-creep'});
     ['click', 'change', 'input'].forEach(ev => ac.editorEstado.scrim.addEventListener(ev, e => e.stopPropagation()));
   }
@@ -527,27 +529,35 @@ async function abrirEditarEstadoCreepMapa(creepId, nombre){
   if(!es){ toast('No encontré ese estado en el creep'); cerrarSiSolo(); return; }
   ac.editorEstado.abrir(creepId, es.id);
 }
+// Un preset nuevo que se pidió guardar desde el asistente de estados: a los "Mis presets" del GM, en la partida.
+function acGuardarPresetGM(preset){
+  const l = [...PresetsGM.lista()], i = l.findIndex(p => p.nombre === preset.nombre);
+  if(i >= 0) l[i] = preset; else l.push(preset);
+  PresetsGM.guardar(l);
+}
 function cerrarSiSoloEstado(){ if(ac && ac.soloEstado){ ac.soloEstado = false; setTimeout(() => cerrarAccionesNuevas(), 0); } }
 // Una copia del creep, normalizada (la parte privada que escucha el mapa).
 function acCreepDe(id){ const crudo = creepPrivadoDe(id); if(!crudo) return null; const sc = CreepCalculo.normalizar(structuredClone(crudo)); sc.id = id; return sc; }
 async function acEditarHab(creepId, habId){
-  try{ await acCargarEditor(); }
+  try{ await acCargarEditor(); await PresetsGM.listo(); }
   catch(err){ console.error(err); toast('No se pudo abrir el editor'); return; }
   if(!ac.editor){
     ac.editor = CreepEditor.crear(ac.raiz, {
       creep: id => acCreepDe(id),
       guardarHab: (id, aplicar) => acCambiarCreep(id, sc => { aplicar(sc); return {}; }),
-      personalizados: () => [],
+      personalizados: () => PresetsGM.lista(),   // los "Mis presets" del GM (comun/presets-gm.js, B-7b)
       elegirEstadoDuelo: async () => {
         const sc0 = creepPrivadoDe(ac.creepId);
+        await PresetsGM.listo();
         const r = await SelectorEstados.abrir({
-          titulo: 'Estado alterado', para: (sc0 && sc0.nombre) || '', presets: estadosPresetCreep(), propios: [],
+          titulo: 'Estado alterado', para: (sc0 && sc0.nombre) || '', presets: estadosPresetCreep(), propios: PresetsGM.lista(),
           cfgPreguntas: {hp: 'hpTurno', statLabel: id => (SE_STATS_CREEP[id] && SE_STATS_CREEP[id][0]) || id},
           stats: Object.entries(SE_STATS_CREEP).map(([id, [label, full]]) => ({id, label, full})),
           armarDeAsistente: res => ({nombre: res.nombre, polaridad: res.polaridad, turnos: res.turnos, permanente: res.permanente, stacks: 1, hpTurno: res.hp, stacksTurno: 0,
             escudoMagico: res.escudo, mods: res.mods, detalle: res.detalle, ...res.flags, ...(res.forzarNitros !== undefined ? {forzarNitros: res.forzarNitros} : {})}),
         });
         if(!r) return null;
+        if(r.guardar) acGuardarPresetGM(r.preset);
         const pr = r.preset;
         return {modo: 'preset', nombre: pr.nombre, turnos: pr.turnos, permanente: !!pr.permanente, hp: num(pr.hpTurno), mods: pr.mods, stacks: pr.stacks, escudoMagico: num(pr.escudoMagico), polaridad: pr.polaridad, detalle: pr.detalle};
       },

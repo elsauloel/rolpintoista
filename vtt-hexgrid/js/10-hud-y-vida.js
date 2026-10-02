@@ -1030,15 +1030,17 @@ async function abrirEstadoNuevo(t){
 }
 async function abrirEstadoNuevoCreep(t){
   const sc0 = creepPrivadoDe(t.fichaId);
+  await PresetsGM.listo();
   const elegido = await SelectorEstados.abrir({
     titulo: 'Estado alterado', para: (sc0 && sc0.nombre) || nombreDe(t),
-    presets: estadosPresetCreep(), propios: [],   // los "Mis presets" del GM viven solo en la memoria de GM Tools (ver docs/pendientes.md)
+    presets: estadosPresetCreep(), propios: PresetsGM.lista(),   // los "Mis presets" del GM, en la partida (comun/presets-gm.js, B-7b)
     cfgPreguntas: {hp: 'hpTurno', statLabel: id => (SE_STATS_CREEP[id] && SE_STATS_CREEP[id][0]) || id},
     stats: Object.entries(SE_STATS_CREEP).map(([id, [label, full]]) => ({id, label, full})),
     armarDeAsistente: res => ({nombre: res.nombre, polaridad: res.polaridad, turnos: res.turnos, permanente: res.permanente, stacks: 1, hpTurno: res.hp, stacksTurno: 0,
       escudoMagico: res.escudo, mods: res.mods, detalle: res.detalle, ...res.flags, ...(res.forzarNitros !== undefined ? {forzarNitros: res.forzarNitros} : {})}),
   });
   if(!elegido) return;
+  if(elegido.guardar) acGuardarPresetGM(elegido.preset);
   let r = null, nombre = '';
   try{
     await modificarCreep(t.fichaId, crudo => {

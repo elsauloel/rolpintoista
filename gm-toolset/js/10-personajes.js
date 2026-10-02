@@ -308,6 +308,7 @@ $('#presets-creep-personalizado').onclick = () => {
         S.estadosPersonalizados = S.estadosPersonalizados || [];
         const i = S.estadosPersonalizados.findIndex(p => p.nombre === preset.nombre);
         if(i >= 0) S.estadosPersonalizados[i] = preset; else S.estadosPersonalizados.push(preset);
+        PresetsGM.guardar(S.estadosPersonalizados);   // en la partida (comun/presets-gm.js)
       }
       presetsCreepScId = scId;
       activarEstadoPresetCreep(preset);

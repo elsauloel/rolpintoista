@@ -160,7 +160,7 @@ function renderInvocaciones(){
   S.invocaciones.forEach(migrarInvocacion);
   $('#inv-empty').style.display = S.invocaciones.length ? 'none' : 'block';
   grid.innerHTML = S.invocaciones.map(inv => invCardHtml(inv)).join('');
-  if(editandoInvId && $('#scrim-editar-inv').classList.contains('open')) renderEditarInv();
+  if(invPap && invPap.abierto()) invPap.redibujar();
   if(botoneraInvId && $('#scrim-botonera-inv').classList.contains('open')) renderBotoneraInv();
 }
 
@@ -235,41 +235,37 @@ function invEstadoChipHtml(inv, es){
 /* ---------- Editor completo de una invocación (atributos, arma, armadura,
    res. a críticos, habilidades, estados, notas) ---------- */
 let editandoInvId = null;
-function abrirEditarInv(invId){
-  if(!S.invocaciones.some(x => x.id === invId)) return;
-  editandoInvId = invId;
-  renderEditarInv();
-  $('#scrim-editar-inv').classList.add('open');
-}
-function cerrarEditarInv(){
-  editandoInvId = null;
-  $('#scrim-editar-inv').classList.remove('open');
-}
-// Al tipear un atributo no se redibuja todo el editor (se perdería el
-// foco): solo se refrescan los secundarios de esa columna.
-function actualizarDerivInvEnDOM(inv){
-  const body = $('#editarinv-body');
-  if(!body) return;
-  body.querySelectorAll('.inv-derivcol').forEach((col, idx) => {
-    const a = ATTR_IDS_INV[idx];
-    if(!a) return;
-    const bs = col.querySelectorAll('.inv-deriv b');
-    INV_DERIVADOS_POR_ATTR[a].forEach((d, i) => { if(bs[i]) bs[i].textContent = fmt(invStatValor(inv, d.id)); });
-  });
-}
-function renderEditarInv(){
-  const inv = S.invocaciones.find(x => x.id === editandoInvId);
-  if(!inv){ cerrarEditarInv(); return; }
-  $('#editarinv-titulo').textContent = `Editar · ${inv.nombre}`;
-  $('#editarinv-body').innerHTML = `
-    <div class="inv-sectlabel" style="margin-top:0">Atributos</div>
+/* El editor de una invocación, paso a paso en la ventana común (comun/paso-a-paso.js, 2026-10-02, tanda 6 de docs/plan-paso-a-paso.md):
+   Qué es → Atributos → Arma → Defensa → Habilidades → Estados → Notas (→ Resumen al crear). Los campos se guardan al escribir (los mismos
+   manejadores de siempre, js/06); al editar, Cancelar vuelve a como estaba al abrir y Guardar deja lo hecho; al crear, Cancelar la saca. */
+let invPap = null;
+function invEditando(){ return S.invocaciones.find(x => x.id === editandoInvId) || null; }
+const INV_PASOS = [
+  {id: 'que', nombre: 'Qué es', ayuda: '<b>¿Qué es?</b> El nombre, la imagen y cuántos turnos dura cada vez que se invoca (después se duerme y queda guardada para volver a invocarla).'},
+  {id: 'atributos', nombre: 'Atributos', ayuda: '<b>Atributos.</b> Igual que un creep: Constitución da la vida (×5), Agilidad los No2; abajo se ven los secundarios que salen de cada uno.'},
+  {id: 'arma', nombre: 'Arma', ayuda: '<b>¿Con qué pega?</b> El arma (o el arma natural) y lo que hace al golpear.'},
+  {id: 'defensa', nombre: 'Defensa', ayuda: '<b>¿Cómo aguanta?</b> Su Defensa, la armadura que lleva y la resistencia a críticos de cada Tipo de arma.'},
+  {id: 'habilidades', nombre: 'Habilidades', ayuda: '<b>Habilidades.</b> Cada una se arma en su propio paso a paso.'},
+  {id: 'estados', nombre: 'Estados', ayuda: '<b>Estados alterados</b> que tiene ahora.'},
+  {id: 'notas', nombre: 'Notas', ayuda: '<b>Notas.</b> Lo que haga falta recordar de esta invocación.'},
+];
+function invPasoHtml(id, inv){
+  if(id === 'que') return `
+    <div class="pap-campo"><label>Nombre</label><input data-invf="nombre" data-invid="${inv.id}" maxlength="60" value="${esc(inv.nombre)}"></div>
+    <div class="pap-campo"><label>Imagen (opcional)</label><div class="pap-fila" style="align-items:center">
+      ${inv.imagen ? `<img src="${inv.imagen}" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:6px;border:2px solid ${esc(inv.color)}">` : ''}
+      <button type="button" class="pap-boton" data-invimg="${inv.id}">${inv.imagen ? 'Cambiar imagen' : 'Elegir imagen'}</button>
+      ${inv.imagen ? `<button type="button" class="pap-boton" data-invimgrm="${inv.id}">Quitar</button>` : ''}
+      <input type="file" data-invimginput="${inv.id}" accept="image/*" hidden></div></div>
+    <div class="pap-campo"><label>Cuántos turnos dura</label><input type="number" min="0" data-invf="cooldown" data-invid="${inv.id}" value="${inv.cooldown}" style="max-width:120px"></div>`;
+  if(id === 'atributos') return `
     <div class="inv-row5">
       ${ATTR_IDS_INV.map(a => `<div class="inv-minif"><label>${esc(STAT_LABEL[a])}</label><input type="number" data-invattr="${a}" data-invid="${inv.id}" value="${num(inv[a])}"></div>`).join('')}
     </div>
-    <div class="inv-derivgrid">
+    <div class="inv-derivgrid" style="margin-top:12px">
       ${ATTR_IDS_INV.map(a => `<div class="inv-derivcol"><span class="inv-derivattr">${esc(STAT_LABEL[a])}</span>${INV_DERIVADOS_POR_ATTR[a].map(d => `<div class="inv-deriv"><span>${esc(d.label)}</span><b>${fmt(invStatValor(inv, d.id))}</b></div>`).join('')}</div>`).join('')}
-    </div>
-    <div class="inv-editar-separador"><span>Arma</span></div>
+    </div>`;
+  if(id === 'arma') return `
     <div class="inv-arma-compacta">
       <div class="inv-arma-top">
         <span class="inv-arma-nombre">${inv.armaNombre ? esc(inv.armaNombre) : '<span class="hint">Sin nombre</span>'}</span>
@@ -279,12 +275,13 @@ function renderEditarInv(){
       ${inv.armaDetalle ? `<div class="hint">${esc(inv.armaDetalle)}</div>` : ''}
       ${(inv.armaEfectos||[]).length ? `<div class="hint"><b>Al golpear:</b> ${esc(EfectosGolpe.resumenLista(inv.armaEfectos))}</div>` : ''}
       <label class="hint" style="display:flex;gap:6px;align-items:center;margin-top:4px" title="Un arma natural (garras, colmillos, puños…) no permite Parry ni Bloqueo, por ahora (regla del dueño, 2026-09-30)."><input type="checkbox" data-invf="armaNatural" data-invid="${inv.id}" style="width:auto"${inv.armaNatural ? ' checked' : ''}> Es un arma natural (garras, colmillos…): sin Parry ni Bloqueo</label>
-    </div>
-    <div class="inv-editar-separador"><span>Defensa y armadura</span></div>
+    </div>`;
+  if(id === 'defensa') return `
     <div class="inv-row3">
       <div class="inv-minif"><label>Defensa</label><input type="number" data-invf="defensa" data-invid="${inv.id}" value="${inv.defensa}"></div>
       <div></div><div></div>
     </div>
+    <div class="inv-editar-separador" style="margin-top:12px"><span>Armadura</span></div>
     <div class="inv-equipo-list">
       ${inv.equipo.length ? inv.equipo.map(it => `
       <div class="inv-equipo-item">
@@ -294,23 +291,73 @@ function renderEditarInv(){
       </div>`).join('') : `<div class="hint">Sin armadura.</div>`}
     </div>
     <button type="button" class="inv-addhab" data-additeminv="${inv.id}" style="margin-top:6px">+ Ítem</button>
-    <div class="inv-editar-separador"><span>Resistencia a críticos</span></div>
+    <div class="inv-editar-separador" style="margin-top:12px"><span>Resistencia a críticos</span></div>
     <div class="inv-critgrid">
       ${['Tipo 4','Tipo 6','Tipo 8','Tipo 10','Tipo 12'].map((lbl,i) => `<div class="inv-critcell"><label>${lbl}</label><input type="number" data-invcrit="${i}" data-invid="${inv.id}" value="${inv.crit[i]}"></div>`).join('')}
-    </div>
-    <div class="inv-editar-separador"><span>Habilidades</span></div>
+    </div>`;
+  if(id === 'habilidades') return `
     <div class="inv-hablist">
       ${inv.habilidades.length ? inv.habilidades.map(h => invHabHtml(inv, h)).join('') : '<div class="hint">Sin habilidades.</div>'}
     </div>
-    <button type="button" class="inv-addhab" data-addhabinv="${inv.id}" style="margin-top:6px">+ Habilidad</button>
-    <div class="inv-editar-separador"><span>Estados alterados</span></div>
+    <button type="button" class="inv-addhab" data-addhabinv="${inv.id}" style="margin-top:6px">+ Habilidad</button>`;
+  if(id === 'estados') return `
     <div class="inv-hablist">
       ${(inv.estados||[]).length ? inv.estados.map(es => invEstadoChipHtml(inv, es)).join('') : '<div class="hint">Sin estados activos.</div>'}
     </div>
-    <button type="button" class="inv-addhab" data-addestadoinv="${inv.id}" style="margin-top:6px">+ Estado</button>
-    <div class="inv-editar-separador"><span>Notas</span></div>
-    <textarea class="inv-notas" data-invf="notas" data-invid="${inv.id}" placeholder="Lo que haga falta recordar de esta invocación.">${esc(inv.notas)}</textarea>
-  `;
+    <button type="button" class="inv-addhab" data-addestadoinv="${inv.id}" style="margin-top:6px">+ Estado</button>`;
+  if(id === 'notas') return `<textarea class="inv-notas" data-invf="notas" data-invid="${inv.id}" placeholder="Lo que haga falta recordar de esta invocación." style="min-height:120px">${esc(inv.notas)}</textarea>`;
+  // Resumen (al crear)
+  const fila = (t, v) => `<div class="resumen-fila"><span>${t}</span><b>${v}</b></div>`;
+  return `<div class="resumen-hab">${fila('Nombre', esc(inv.nombre || '—'))}${fila('Dura', `${fmt(num(inv.cooldown))} turno(s)`)}${fila('Vida', fmt(num(inv.hpMax)))}${fila('No2', fmt(invNitrosMax(inv)))}
+    ${fila('Ataque', esc(invDanoTxt(inv, invStatValor(inv, 'dmg'))))}${fila('Defensa', fmt(invDefensaEfectiva(inv)))}${fila('Habilidades', inv.habilidades.length ? esc(inv.habilidades.map(h => h.nombre).join(', ')) : '—')}</div>`;
+}
+function abrirEditarInv(invId, o){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  if(!inv) return;
+  if(invPap) cerrarEditarInv();
+  const nueva = !!(o && o.nueva);
+  editandoInvId = invId;
+  const antes = structuredClone(inv), inicial = JSON.stringify(inv);
+  const descartar = () => {
+    const i = S.invocaciones.findIndex(x => x.id === invId);
+    if(nueva){ if(i >= 0) S.invocaciones.splice(i, 1); }
+    else if(i >= 0) S.invocaciones[i] = antes;
+    editandoInvId = null; invPap = null;
+    renderInvocaciones();
+  };
+  invPap = PasoAPaso.abrir({
+    titulo: () => nueva ? 'Invocación nueva' : `Editar invocación · ${(invEditando() || inv).nombre}`, crear: nueva, z: 52,
+    textoCrear: '✔ Crear la invocación',
+    pasos: () => (nueva ? INV_PASOS.concat([{id: 'resumen', nombre: 'Resumen', ayuda: '<b>Así queda.</b> Después se usa con ▶ Usar, desde su tarjeta o desde el mapa.'}]) : INV_PASOS)
+      .map(p => ({...p, html: () => { const x = invEditando(); return x ? invPasoHtml(p.id, x) : ''; },
+        alMontar: (c, a) => { if(p.id === 'que'){ const n = a.raiz.querySelector('[data-invf="nombre"]'); if(n) setTimeout(() => { n.focus(); if(nueva) n.select(); }, 30); } }})),
+    alTecla: e => {
+      if(e.key !== 'Enter' || e.target.tagName !== 'INPUT') return;
+      e.preventDefault();
+      e.target.dispatchEvent(new Event('change', {bubbles: true}));
+      const n = invPap.paso();
+      if(n < (nueva ? INV_PASOS.length : INV_PASOS.length - 1)) invPap.irA(n + 1);
+    },
+    confirmarCancelar: () => { const x = invEditando(); return x && JSON.stringify(x) !== inicial ? (nueva ? '¿Cancelar? La invocación que estás armando se descarta.' : '¿Descartar los cambios de esta invocación?') : ''; },
+    alCancelar: () => descartar(),
+    alGuardar: () => { editandoInvId = null; invPap = null; renderInvocaciones(); },
+    alCrear: () => { const x = invEditando(); editandoInvId = null; invPap = null; renderInvocaciones(); if(x) toast(`${x.nombre} lista: se usa con ▶ Usar`); },
+  });
+}
+function cerrarEditarInv(){
+  editandoInvId = null;
+  if(invPap){ const v = invPap; invPap = null; v.cerrar(); }
+}
+// Al tipear un atributo no se redibuja todo el editor (se perdería el foco): solo se refrescan los secundarios.
+function actualizarDerivInvEnDOM(inv){
+  const body = invPap && invPap.abierto() ? invPap.raiz : null;
+  if(!body) return;
+  body.querySelectorAll('.inv-derivcol').forEach((col, idx) => {
+    const a = ATTR_IDS_INV[idx];
+    if(!a) return;
+    const bs = col.querySelectorAll('.inv-deriv b');
+    INV_DERIVADOS_POR_ATTR[a].forEach((d, i) => { if(bs[i]) bs[i].textContent = fmt(invStatValor(inv, d.id)); });
+  });
 }
 
 /* ---------- Acciones de una invocación (Botonera): Combate, tiradas de
@@ -792,8 +839,6 @@ $('#hi-efecto-preset').addEventListener('change', e => {
   if(editingHabInv && editingHabInv.pap) editingHabInv.pap.redibujar();   // con estado, el paso Estado ya cuenta en las pestañas
 });
 $('#hi-efecto-nombre').addEventListener('change', () => { if(editingHabInv && editingHabInv.pap) editingHabInv.pap.redibujar(); });
-$('#editarinv-x').onclick = cerrarEditarInv;
-$('#scrim-editar-inv').addEventListener('mousedown', e => { if(e.target.id==='scrim-editar-inv') cerrarEditarInv(); });
 $('#botonerainv-x').onclick = () => { botoneraInvId = null; $('#scrim-botonera-inv').classList.remove('open'); };
 $('#scrim-botonera-inv').addEventListener('mousedown', e => { if(e.target.id==='scrim-botonera-inv'){ botoneraInvId = null; $('#scrim-botonera-inv').classList.remove('open'); } });
 $('#verhabinv-x').onclick = () => $('#scrim-verhabinv').classList.remove('open');

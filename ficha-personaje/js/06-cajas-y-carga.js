@@ -463,8 +463,10 @@ document.addEventListener('click', async e => {
   if(b.dataset.danohab){ tirarSegundaDeHab(b.dataset.danohab); return; }
   if(b.dataset.ejecutar){ ejecutarHabilidad(b.dataset.ejecutar); return; }
   if(b.id === 'btn-invocar'){
-    S.invocaciones.push(nuevaInvocacion());
+    const inv = nuevaInvocacion();
+    S.invocaciones.push(inv);
     renderInvocaciones();
+    abrirEditarInv(inv.id, {nueva: true});   // paso a paso (Cancelar la saca)
     return;
   }
   if(b.dataset.rminv){

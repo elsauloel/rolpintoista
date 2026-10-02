@@ -349,6 +349,26 @@ service cloud.firestore {
         allow delete: if esMiembro(c) && (resource.data.creadoPor == request.auth.uid || esGM(c));
       }
 
+      // Momentos (2026-10-02, P146): lo que pasa en el mapa (percepción, zonas, trampas, sigilo roto) con su momento en
+      // todas las pantallas — tarjeta al centro para quien resuelve, en la esquina para el resto. También lleva el pedido de
+      // una detección al GM (la Destreza de un creep en sigilo es privada). Cualquier miembro lo crea y lo completa; lo
+      // borra su autor o el GM (los viejos los barre el GM al entrar).
+      match /momentos/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['tipo', 'icono', 'titulo', 'resultado', 'estado', 'resuelve', 'datos', 'creadoPor', 'creado'])
+          && request.resource.data.titulo is string && request.resource.data.titulo.size() <= 200
+          && (!('resultado' in request.resource.data) || (request.resource.data.resultado is string && request.resource.data.resultado.size() <= 400))
+          && request.resource.data.creadoPor == request.auth.uid
+          && request.resource.data.creado == request.time;
+        allow update: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['tipo', 'icono', 'titulo', 'resultado', 'estado', 'resuelve', 'datos', 'creadoPor', 'creado'])
+          && (!('resultado' in request.resource.data) || (request.resource.data.resultado is string && request.resource.data.resultado.size() <= 400))
+          && request.resource.data.creadoPor == resource.data.creadoPor
+          && request.resource.data.creado == resource.data.creado;
+        allow delete: if esMiembro(c) && (resource.data.creadoPor == request.auth.uid || esGM(c));
+      }
+
       // Hechizos de área (Paso 4/7 del casteo, comun/duelo.js + vtt-hexgrid/mapa.html): un documento por casteo que ata la
       // cascada de sub-duelos (uno por objetivo dentro del área, cada uno un documento normal de `duelos`). Dibuja el
       // círculo compartido en el mapa y dice a quién le toca. Mismo criterio relajado que `duelos`: cualquier miembro

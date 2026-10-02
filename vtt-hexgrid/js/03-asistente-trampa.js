@@ -216,7 +216,7 @@ function sigiloPublicarAvisos(id){
     ? '⚠ Hace falta una tirada de percepción'
     : `⚠ Hacen falta ${av.pasos} tiradas de percepción`));
 }
-async function romperSigilo(id, detector, motivo){   // motivo (opcional): otra causa que no sea que lo detecten (una trampa)
+async function romperSigilo(id, detector, motivo, sinMomento){   // motivo (opcional): otra causa que no sea que lo detecten (una trampa); sinMomento: ya lo cuenta otro momento (P146)
   const t = tokens.get(id);
   const e = t && estadoDe(t);
   const idx = e ? e.estados.findIndex(s => String((s && s.nombre) || '').trim().toLowerCase() === 'sigilo') : -1;
@@ -225,6 +225,7 @@ async function romperSigilo(id, detector, motivo){   // motivo (opcional): otra 
   try{
     await hudEstadoCambiar(t, idx, 'quitar');
     sigiloAviso(`🕶 ${nombreDe(t)} perdió el sigilo`, motivo || `Lo detectó ${detector}: entró en su cono de detección`);
+    if(!sinMomento) momentoAbrir({tipo: 'sigilo', icono: '🕶', titulo: `¡${nombreDe(t)} quedó al descubierto!`, resultado: motivo || `Lo detectó ${detector}`, estado: 'listo'});   // P146 (js/16)
   }finally{ setTimeout(() => sigiloRompiendo.delete(id), 3000); }
 }
 // Cada vez que algo se movió o cambió de sigilo: si un token en sigilo que puedo

@@ -654,7 +654,7 @@ resuelven a mano, como el resto de los avisos).
   otorguen algunos equipos, efectos, habilidades o consumibles, y cuyo único trabajo sea reducir el daño mágico? ¿Qué topes o valores
   típicos? ¿Debería reducir todo daño mágico o solo algunos tipos?
 
-- **P145. Percepción aumentada: "algo está fuera de lugar" (2026-10-02, pedido del dueño; reemplaza el aviso actual).** **Respondido el mismo día:** (a) la trampa tiene su dificultad para detectarla — de fábrica o armada a mano, un número (común 8: espacio de diseño, trampas de buena o mala calidad); colocada por una habilidad, la Destreza (física) o el Efecto especial (mágica) de quien la coloca; (b) en sigilo, Percepción contra Destreza; (c) descubierta, la ve todo el equipo; (d) la tirada nunca dice para qué es. **Trampas: hecho (2026-10-02). Sigilo: pendiente.** Lo decidido:
+- **P145. Percepción aumentada: "algo está fuera de lugar" (2026-10-02, pedido del dueño; reemplaza el aviso actual).** **Respondido el mismo día:** (a) la trampa tiene su dificultad para detectarla — de fábrica o armada a mano, un número (común 8: espacio de diseño, trampas de buena o mala calidad); colocada por una habilidad, la Destreza (física) o el Efecto especial (mágica) de quien la coloca; (b) en sigilo, Percepción contra Destreza; (c) descubierta, la ve todo el equipo; (d) la tirada nunca dice para qué es. **Trampas y sigilo: hechos (2026-10-02; el sigilo lo resuelve la pantalla del GM — empate: sigue escondido).** Lo decidido:
   con la pasiva, (1) **trampas**: al quedar al lado de una trampa oculta de un rival, el movimiento se corta **sin revelar nada ni decir
   "trampa"** — solo «Algo está fuera de lugar… tirá Percepción»; si gana contra la dificultad de la trampa, recién ahí la ve; si pierde,
   sigue moviéndose libre: pisarla la detona, y pasar por **otro** casillero al lado vuelve a cortar y pedir tirada. (2) **Sigilo**: la zona
@@ -664,10 +664,11 @@ resuelven a mano, como el resto de los avisos).
   **contra qué** (una tirada de Destreza del que se esconde —cerca de P3— o un número fijo)? (c) al descubrir una trampa, ¿la ve solo
   quien la descubrió o todo su bando? (d) la tirada sale en la Mesa como una Percepción cualquiera, sin decir para qué (propuesta).
 
-- **P146. Que los eventos tengan "su momento" para toda la mesa (2026-10-02, pedido del dueño: "no quiero que las cosas queden
+- ✅ **P146 — resuelta 2026-10-02 (dueño): cartelito al centro para quien resuelve; para los demás, flotando en la esquina de arriba a la derecha del mapa, contando lo que pasa sin interrumpir; eventos: percepción, zonas, trampas disparadas y sigilo roto; se cuenta solo lo que ya es público (el daño, no la vida que le queda a un creep; el nombre de una trampa descubierta). Hecho: `vtt-hexgrid/js/16-momentos.js`.** Planteo original:
+- ~~**P146. Que los eventos tengan "su momento" para toda la mesa (2026-10-02, pedido del dueño: "no quiero que las cosas queden
   simplemente comunicadas en el log… pasa como silbando bajito").** Hoy solo el duelo se abre en todas las pantallas; la percepción
   («algo está fuera de lugar»), las zonas (resistir, daño, el d20 de Pedos Tóxicos), las trampas disparadas y el sigilo roto quedan en
   un cartelito de una sola pantalla + una línea en la Mesa. Propuesta: una **escena común** — una tarjeta grande en todas las pantallas
   que encadena el momento (texto → dados 3D → resultado) y se va sola; los botones de tirar, solo en la pantalla de quien tira. Abierto:
   (1) qué eventos la tienen (propuesta: percepción, zonas, trampas, sigilo roto); (2) cuánto se cuenta (sin la vida de los creeps; un
-  oculto sin descubrir es "alguien"; ¿el nombre de la trampa?); (3) ¿tapa el centro del mapa unos segundos o va arriba sin tapar?
+  oculto sin descubrir es "alguien"; ¿el nombre de la trampa?); (3) ¿tapa el centro del mapa unos segundos o va arriba sin tapar?~~

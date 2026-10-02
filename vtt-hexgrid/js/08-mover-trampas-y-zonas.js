@@ -361,11 +361,13 @@ function renderZonaBanner(){
   if(!el2){
     el2 = document.createElement('div');
     el2.id = 'zona-banner';
-    el2.style.cssText = 'position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:75;background:#151a26;border:1px solid #39435c;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;flex-wrap:wrap;justify-content:center;color:#e9ecf4;font-size:14px';
+    momentoEstiloCentro(el2);   // al centro: es quien resuelve el momento (P146, js/16)
     document.body.appendChild(el2);
   }
   el2.hidden = false;
   const icono = el.zonaDanoTipo === 'de fuego' || (!el.zonaEstado && !el.zonaDanoTipo) ? '🔥' : '🌫';   // 🔥 solo para el fuego (o una zona vieja de puro daño)
+  // Su momento (P146): los demás lo ven en la esquina mientras se resuelve, y el resultado al final.
+  if(!zonaBanner.resultado && !zonaBanner.momentoP) zonaBanner.momentoP = momentoAbrir({tipo: 'zona', icono, titulo: `${t.oculto ? 'Alguien' : nombreDe(t)} está en ${el.zonaNombre || 'la zona'}…`, estado: 'tirando', resuelve: fbUsuario.uid, datos: {centro: true}});
   const nombreT = t.oculto ? 'Alguien' : nombreDe(t);
   let cuerpo;
   if(zonaBanner.resultado){
@@ -464,6 +466,7 @@ async function zonaResolverBanner(){
     catch(err){ console.error('No se pudo anotar zonaResueltos:', err); }
   }
   zonaBanner = {...zonaBanner, el, t, resultado: partes.join(' · ') || 'sin efecto'};
+  { const resTxt = zonaBanner.resultado; if(zonaBanner.momentoP) zonaBanner.momentoP.then(mid => momentoActualizar(mid, {estado: 'listo', resultado: resTxt})); }
   renderZonaBanner();
 }
 
@@ -533,6 +536,7 @@ async function trampaResolver(){
     catch(err){ console.error('No se pudo marcar la trampa como disparada:', err); }
     const nombre = p.el.trampaNombre ? ': ' + p.el.trampaNombre : '';
     alertaRojaAnonima(`⚠ Trampa de ${nombreMiembro(p.el.duenoUid)}${nombre}`, `${nombreDe(t)} la activó${p.el.trampaDetalle ? ' — ' + p.el.trampaDetalle : ''}`);
+    momentoAbrir({tipo: 'trampa', icono: '⚠', titulo: `¡${nombreDe(t)} pisó una trampa${p.el.trampaNombre ? ': «' + p.el.trampaNombre + '»' : ''}!`, resultado: p.el.trampaDetalle || '', estado: 'listo'});   // P146 (js/16)
     // Activar una trampa rompe el sigilo (2026-09-24, regla dicha por el dueño).
     if(enSigilo(t)) await romperSigilo(p.tokenId, '', `${nombreDe(t)} activó una trampa`);
     await trampaAplicarDano(t, p.el);
@@ -561,57 +565,7 @@ async function trampaResolver(){
   // 'cerca' (Percepción aumentada, P145): no se revela nada todavía — el cartelito pide la tirada sin decir qué es.
   const c = p.celda || {col: t.col, fila: t.fila};
   trampasAvisadas.add(p.tokenId + ':' + p.id + ':' + nbPack(c.col, c.fila));
-  percepcionBanner = {tokenId: p.tokenId, trampaId: p.id, resultado: null};
-  renderPercepcionBanner();
-}
-
-/* ---------- «Algo está fuera de lugar» (Percepción aumentada, 2026-10-02, P145) ----------
-   Un cartelito (como el de las zonas) en la pantalla de quien movió: «🔎 Algo está fuera de lugar… [🎲 Tirar Percepción]». La tirada
-   (la misma de la ficha, con el dado que sube un escalón, del valor `resumen.percepcion`) sale en la Mesa como una Percepción cualquiera,
-   sin decir para qué. Gana si llega a la dificultad de la trampa (`trampaDetectar`, 8 si no tiene): la trampa queda `descubierta` (la ve
-   todo su equipo). Si no, «Mmm... Puede que estés flasheando.» y sigue. Descubrirla no rompe el sigilo. */
-let percepcionBanner = null;   // {tokenId, trampaId, resultado}
-function renderPercepcionBanner(){
-  let el2 = document.getElementById('percepcion-banner');
-  if(!percepcionBanner){ if(el2) el2.hidden = true; return; }
-  if(!el2){
-    el2 = document.createElement('div');
-    el2.id = 'percepcion-banner';
-    el2.style.cssText = 'position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:76;background:#151a26;border:1px solid #39435c;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;flex-wrap:wrap;justify-content:center;color:#e9ecf4;font-size:14px';
-    document.body.appendChild(el2);
-  }
-  el2.hidden = false;
-  const t = tokens.get(percepcionBanner.tokenId);
-  const quien = t ? nombreDe(t) : '';
-  el2.innerHTML = percepcionBanner.resultado
-    ? `<span>🔎 ${esc(quien)}: ${esc(percepcionBanner.resultado)}</span><button type="button" class="btn" id="percepcion-banner-ok">Listo</button>`
-    : `<span>🔎 <b>Algo está fuera de lugar…</b> ${esc(quien)}, tirá Percepción</span><button type="button" class="btn" id="percepcion-banner-ir">🎲 Tirar Percepción</button>`;
-  const bt = document.getElementById('percepcion-banner-ir'); if(bt) bt.onclick = percepcionResolverBanner;
-  const bo = document.getElementById('percepcion-banner-ok'); if(bo) bo.onclick = () => { percepcionBanner = null; renderPercepcionBanner(); };
-}
-async function percepcionResolverBanner(){
-  const pb = percepcionBanner;
-  if(!pb || pb.resultado) return;
-  const bt = document.getElementById('percepcion-banner-ir'); if(bt) bt.disabled = true;
-  const t = tokens.get(pb.tokenId), el = elementos.get(pb.trampaId);
-  if(!t){ percepcionBanner = null; renderPercepcionBanner(); return; }
-  try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo tirar Percepción'); if(bt) bt.disabled = false; return; }
-  const f = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]);
-  const valor = f && f.resumen ? num(f.resumen.percepcion) : 0;
-  const r = FichaBotonera.tiradaPercepcionValor(valor, true);
-  if(!r){ toast('Percepción: sin valor para tirar (abrí la ficha una vez para que lo publique)'); percepcionBanner = null; renderPercepcionBanner(); return; }
-  const nombre = nombreDe(t);
-  try{ mesaPublicar(`${nombre} · Percepción (aumentada)`, {...r, quien: nombre, ficha: String(t.fichaId).split(SEP_INVOCACION)[0]}); }catch(err){}
-  const dif = el ? Math.max(1, Math.round(num(el.trampaDetectar)) || 8) : Infinity;
-  if(el && !el.disparada && r.total >= dif){
-    descubrirTrampa(pb.trampaId);   // ya, en esta pantalla
-    try{ await coleccionElementos().doc(pb.trampaId).update({descubierta: true}); }   // y para todo su equipo
-    catch(err){ console.error('No se pudo marcar la trampa como descubierta (¿faltan publicar las reglas?):', err); }
-    percepcionBanner = {...pb, resultado: `encontraste algo: ${el.trampaNombre ? `«${el.trampaNombre}», ` : ''}una trampa (${r.total} contra ${dif}).`};
-  }else{
-    percepcionBanner = {...pb, resultado: `Mmm... Puede que estés flasheando.`};   // texto del dueño (2026-10-02); la tirada ya está en la Mesa
-  }
-  renderPercepcionBanner();
+  percepcionAbrir({tokenId: p.tokenId, trampaId: p.id});   // js/16 (el cartelito y su momento)
 }
 
 // Quien camina (sin estar en sigilo) puede entrar en el CONO de un rival en sigilo (detección
@@ -636,11 +590,19 @@ function percepcionEvaluarRuta(t, id, ruta, ignorar){
   });
   percepcionAvisosPendientes.delete(id);
   if(!ocultos.length) return null;
+  // Percepción aumentada (2026-10-02, P145): la zona de alerta cuenta en CADA paso (sin la pasiva, solo donde termina, P105). Si un oculto
+  // queda en ella, se corta ahí con «Algo está fuera de lugar» (js/16): una vez por oculto y por casillero.
+  const atento = tokenPercepcionAumentada(t);
   for(let i = 1; i < ruta.length; i++){
     const pa = hexCentro(ruta[i - 1].col, ruta[i - 1].fila), pb = hexCentro(ruta[i].col, ruta[i].fila);
     const z = zonasClaves({col: ruta[i].col, fila: ruta[i].fila, rotacion: rotacionDePaso(pa, pb)});
     const vistos = ocultos.filter(o => z.cono.has(nbPack(o.tok.col, o.tok.fila)));
     if(vistos.length) return {indice: i, ocultos: vistos.map(o => ({id: o.id, nombre: nombreDe(o.tok)}))};
+    if(atento){
+      const aca = nbPack(ruta[i].col, ruta[i].fila);
+      const sospecha = ocultos.find(o => z.alerta.has(nbPack(o.tok.col, o.tok.fila)) && !percepcionChequeados.has(id + ':' + o.id + ':' + aca));
+      if(sospecha) return {indice: i, tipo: 'percibe', ocultoId: sospecha.id, ocultos: []};
+    }
   }
   const fin = ruta.length - 1;
   const pa = hexCentro(ruta[fin - 1].col, ruta[fin - 1].fila), pb = hexCentro(ruta[fin].col, ruta[fin].fila);
@@ -683,6 +645,7 @@ async function confirmarRuta(){
     const fin = p.celdas[p.celdas.length - 1];
     await moverToken(p.id, fin.col, fin.fila, p.celdas);
     if(trampaPendiente && trampaPendiente.tokenId === p.id) trampaResolver();
+    if(percepcionSigiloPendiente && percepcionSigiloPendiente.tokenId === p.id) percepcionSigiloResolver();   // P145 (js/16)
     oportunidadPublicarAvisos(t, p.oportunidad);
     if(origen && (origen.col !== fin.col || origen.fila !== fin.fila)) deshacerRegistrar({tipo: 'mover', id: p.id, fichaId: t.fichaId, esCreep, costo, col: origen.col, fila: origen.fila, rotacion: rotAntes, seq0, pend0});
     toast(esCreep

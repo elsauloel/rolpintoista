@@ -1217,3 +1217,13 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (`trampasAvisadas` por casillero). Ya no sale la línea roja «Hace falta una tirada de percepción». La dificultad se arma en el
   paso nuevo «¿Qué tan difícil es detectarla?» del asistente (`elemTrampaDetectar`); las de habilidad la toman de la Destreza o del
   Efecto especial de quien las coloca. Reglas nuevas (`trampaDetectar`, `descubierta`). **Falta** la parte del sigilo de P145.
+- **Momentos (2026-10-02, P146)**: `js/16-momentos.js`. La percepción, las zonas, las trampas que se disparan y el sigilo roto son un
+  documento de `campanas/<id>/momentos` (`momentoAbrir`/`momentoActualizar`) que ven todas las pantallas: quien tiene que tirar algo lo
+  resuelve en un cartelito al **centro** (`momentoEstiloCentro`: el de las zonas, el de Percepción y el del GM); los demás lo ven en la
+  **esquina de arriba a la derecha** del mapa (`#momentos-feed`), el título apenas empieza y el resultado al resolverse; se van solos a
+  los ~14 s. Se cuenta solo lo público. El GM barre los de más de 2 h al entrar. Reglas nuevas (`momentos`).
+- **Percepción aumentada y sigilo (2026-10-02, P145)**: con la pasiva, la zona de alerta de quien camina cuenta en cada paso
+  (`percepcionEvaluarRuta` → corte `percibe`, una vez por oculto y casillero, `percepcionChequeados`); al llegar, «Algo está fuera de
+  lugar… tirá Percepción» (`percepcionAbrir`). Como la Destreza de un creep es privada, el momento pasa a `esperandoGM` y **la pantalla del
+  GM** muestra al centro «… tira Destreza» (`deteccionGMAbrir`/`deteccionGMResolver`): si la Percepción es mayor (empate: sigue
+  escondido), `romperSigilo` le saca el Sigilo. Hace falta el mapa del GM abierto.

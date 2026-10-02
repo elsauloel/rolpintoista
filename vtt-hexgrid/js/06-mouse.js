@@ -471,6 +471,7 @@ function soltar(){
     // Se corta la ruta donde ocurra primero: un rival en sigilo dentro del cono (detección
     // inmediata) o una trampa (pisarla, o quedar al lado si tiene Percepción aumentada).
     trampaPendiente = null;
+    percepcionSigiloPendiente = null;
     if(!a.libre && a.movio && t && a.ruta.length > 1){
       const corte = !enSigilo(t) ? percepcionEvaluarRuta(t, a.id, a.ruta, null) : null;
       const trampa = trampasEvaluarRuta(a.id, t, a.ruta);
@@ -481,7 +482,8 @@ function soltar(){
         a.ruta = a.ruta.slice(0, indice + 1);
         const fc = a.ruta[a.ruta.length - 1], pc = hexCentro(fc.col, fc.fila);
         a.x = pc.x; a.y = pc.y;
-        if(corteSigilo) toast(`🕶 Viste a ${corteSigilo.ocultos.map(o => o.nombre).join(', ')}: el movimiento se corta acá y pierde el sigilo`);
+        if(corteSigilo && corteSigilo.tipo === 'percibe') percepcionSigiloPendiente = {tokenId: a.id, ocultoId: corteSigilo.ocultoId, celda: fc};   // P145: se resuelve al llegar (js/16)
+        else if(corteSigilo) toast(`🕶 Viste a ${corteSigilo.ocultos.map(o => o.nombre).join(', ')}: el movimiento se corta acá y pierde el sigilo`);
         else{
           trampaPendiente = {tokenId: a.id, tipo: corteTrampa.tipo, id: corteTrampa.id, el: corteTrampa.el, celda: a.ruta[a.ruta.length - 1]};
           if(corteTrampa.tipo === 'pisa') toast('⚠ Pisaste algo: el movimiento se corta acá');   // 'cerca': lo dice el cartelito, sin nombrar la trampa (P145)
@@ -511,6 +513,7 @@ function soltar(){
         const fin = a.ruta[pasos];
         moverToken(a.id, fin.col, fin.fila, a.ruta);
         if(trampaPendiente) trampaResolver();
+        if(percepcionSigiloPendiente) percepcionSigiloResolver();
         oportunidadPublicarAvisos(t, oportunidad);
       }
     }

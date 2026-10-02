@@ -1258,3 +1258,10 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   **Lado del jugador** (2026-10-02, "Claude · pruebas" con la cuenta de Saulo-Prueba): un creep que se aleja de Clementino → la pregunta le
   sale al jugador al centro (no en la esquina); «Sí» con dos armas equipadas → «¿Con qué arma?» con el costo de cada una; el duelo de
   oportunidad se abre con el arma elegida.
+- **La Botonera nueva es la de todos (2026-10-02, decisión del dueño: "vamos a dejar solo la botonera nueva y trabajar sobre eso")**:
+  `BN_SIEMPRE = true` en `js/11` hace que `bnActiva()` dé siempre sí y esconde el botón ⚗. Vale para la Botonera de un personaje, la de
+  sus invocaciones y las Acciones de los creeps (GM). Lo que sigue usando el marco, a propósito: el Editar del Ver (la ficha / GM Tools
+  escondida), Equipo y mochila, Tienda, Botín, Mantenimiento en segundo plano, el Ver de un creep y los estados. **Para volver atrás**:
+  `BN_SIEMPRE = false` (vuelve el interruptor y cada navegador elige). Pendiente: si el jugador todavía no abrió su Botonera en esa
+  pantalla, lo que el duelo le pide a su personaje lo sigue contestando la ficha escondida en el marco (`bnHooksDuelo` necesita `bn`
+  abierto); ver `docs/pendientes.md`.

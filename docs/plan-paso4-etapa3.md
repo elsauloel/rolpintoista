@@ -5,6 +5,10 @@
 > 3a, 3b y 3c hechas; la 3d en curso (falta probarla en una sesión real) (ver "Para retomar" justo abajo y "Cómo va" al final). Preguntas del dueño:
 > contestadas.
 
+> **2026-10-02 — decidido por el dueño: la Botonera nueva pasa a ser la de todos** (punto 3 de abajo, sin esperar más sesiones):
+> siempre prendida, sin el interruptor ⚗ (`BN_SIEMPRE = true` en `vtt-hexgrid/js/11-botonera-nueva.js`; en `false` vuelve el
+> interruptor). Lo mismo para las Acciones nuevas de los creeps y la Botonera de las invocaciones.
+
 ## ▶ Para retomar (al cierre de la conversación del 2026-10-01, tarde)
 
 **El repo está limpio**: todo subido a `nueva-version`, nada a medio escribir en el código. Lo que sigue es un paso nuevo.

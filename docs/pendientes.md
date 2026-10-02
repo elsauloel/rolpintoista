@@ -16,6 +16,10 @@
 4. [ ] **Auditoría de skills de clase** (§7): Tanque 9/10 (falta Miti-Miti), después una skill por clase alternando.
 5. [ ] **Paso 8 del casteo** (§1): quedan 10 skills de clase que tocan casteo.
 6. [ ] **Rework de armas no mágicas** elemento por elemento y el crítico nuevo en ficha y mapa (§8).
+- [x] (2026-10-02, decidido por el dueño en el camino) **Solo la Botonera nueva**: siempre prendida, sin interruptor ⚗.
+- [ ] **El duelo de un jugador que no abrió su Botonera**: lo que el duelo le pide a su personaje lo sigue contestando la ficha
+  escondida en el marco hasta que abre la Botonera nueva en esa pantalla (`bnHooksDuelo` necesita la sesión `bn`). Que el mapa abra
+  la sesión del personaje solo (sin mostrar nada) para contestar siempre él.
 7. [ ] **Preguntas para la mesa**: P143 (la tirada de la zona) y P144 (la armadura mágica), esperan la opinión del grupo.
 
 ## 1. Casteo con SP — **proceso paso a paso en [`proceso-casteo.md`](proceso-casteo.md)** (reglas en [`reglas-casteo.md`](reglas-casteo.md), decisiones en P97)

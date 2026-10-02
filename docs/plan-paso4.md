@@ -41,7 +41,7 @@ combate, habilidades, consumibles) en piezas de `comun/`, con su propio plan det
 Con las piezas de la etapa 2, el mapa arma la Botonera del personaje y las Acciones del creep sin marco. Se hace en una
 **rama aparte** y se junta cuando esté probada en "Claude · pruebas" y "Test".
 
-### Al final — Zonas y trampas de las invocaciones (P134)
+### Al final — Zonas y trampas de las invocaciones (P134) — ✅ 2026-10-02 (etapa 4f, ver [`plan-paso4-etapa4.md`](plan-paso4-etapa4.md))
 
 ## Cómo va
 - 2026-09-30: plan escrito; etapa 1 en curso. **Puntos 1 y 2 hechos**: `comun/embebido.js` (se esconde la página y las
@@ -61,3 +61,7 @@ Con las piezas de la etapa 2, el mapa arma la Botonera del personaje y las Accio
 
 - 2026-10-01: **etapa 2 (= paso 5, nivel B) terminada** (áreas 1–4: cálculo, combate, habilidades y consumibles, guardar y
   leer la ficha). **Etapa 3: plan detallado en [`plan-paso4-etapa3.md`](plan-paso4-etapa3.md)**, con 4 preguntas para el dueño.
+
+- 2026-10-02: **etapa 3 y 4 hechas detrás del interruptor ⚗** (la Botonera del personaje, las Acciones de los creeps y la Botonera de
+  las invocaciones las dibuja y las resuelve el mapa) y **"Al final" también** (zonas y trampas de las invocaciones, 4f). Falta que el
+  dueño las pruebe en una sesión real (3d/4d) y, después, dejarlas como las de siempre.

@@ -630,3 +630,7 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   (`js/04`) usan `comun/inv-habilidades.js`; `invHabUi` es lo que hace la ficha (publicar, redibujar, el duelo).
 - **La 🔍 y el Ver de una invocación, compartidos (paso 4, etapa 4e, tanda 6, 2026-10-01)**: `lupaStatInv`/`lupaHtmlInv` (`js/11`) y
   `verHabInv` (`js/04`) usan `comun/inv-lupa.js`.
+- **Zonas y trampas de las invocaciones (paso 4, etapa 4f, 2026-10-02, P134)**: la ✨ de zona persistente de una invocación ya anda
+  (`invHabUi.colocarZona` → 'zona-persistente-habilidad' al mapa), y el editor de sus habilidades suma el paso 8 "🪤 Trampa" (`hiTrampa`,
+  `hiTrampaRender`, `hiAbrirAsistenteTrampa`: el mismo asistente y la misma forma de trampa que el personaje). Al ejecutar, la trampa se
+  coloca como la del personaje (`invHabUi.colocarTrampa` → `FichaAcciones.colocarTrampaDeHab`).

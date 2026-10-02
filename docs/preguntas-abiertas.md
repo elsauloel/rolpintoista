@@ -586,7 +586,7 @@ resuelven a mano, como el resto de los avisos).
   cuesta" en su editor y en el paso Costo de la ✨ Ejecución, que antes se mostraba y no se guardaba) y curar; hace falta que
   sobre vida después de pagar ("Sin vida"). El SP sigue siendo solo del personaje; el cooldown, de creeps e invocaciones.
   Regla en `Combatiente.bloqueoHab` / `costoNitrosHab` (paso 3 de la consolidación).
-- ✅ **P134. Ataque con arma, Flash y zona en creeps e invocaciones — 2026-09-30, resuelta: SE AVISA AHORA, SE SUMA DESPUÉS**
+- ✅ **P134. Ataque con arma, Flash y zona en creeps e invocaciones — 2026-09-30, resuelta: SE AVISA AHORA, SE SUMA DESPUÉS** **(2026-10-02: ya se sumó la zona persistente de las invocaciones, y sus trampas — etapa 4f.)**
   (dueño). La ✨ Ejecución deja elegir "Ataque con mi arma, con arreglos" y "⚡ Reacción Flash", pero solo andaban en
   personajes: en un creep armaban un cuadro de habilidad que no correspondía y en una invocación (igual que la zona) se
   ejecutaban como semiautomáticas sin decir nada. Ahora se avisa ("todavía no anda para creeps/invocaciones: se ejecutó como

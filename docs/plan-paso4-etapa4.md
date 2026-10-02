@@ -33,6 +33,9 @@ El mapa guarda con `modificarCreep` (transacción + resumen + firma); GM Tools, 
 6. La 🔍 (`lupaHtmlInv`) y el Ver (`verHabInv`) ✅ (2026-10-01). **La 4e está terminada**: con ⚗, la Botonera nueva de una
    invocación ya no le pide nada a la ficha. Las Espinas con invocaciones, también (2026-10-02).
 
+**4f — Zonas y trampas de las invocaciones (P134) ✅ (2026-10-02)**: la ✨ de zona persistente de una invocación ya anda (antes
+iba como 💰 con aviso) y su editor de habilidades suma el paso "🪤 Trampa"; al ejecutar, como el personaje.
+
 **4d (pendiente del dueño)**: probar las Acciones nuevas de los creeps y la Botonera nueva de las invocaciones en una sesión real (el GM con ⚗ prendido, jugando un combate de verdad) y,
 si andan bien, dejarlas como las de siempre (como la 3d de la Botonera del personaje). Las Acciones nuevas ya no le piden nada
 a GM Tools salvo Editar / Subir / Reemplazar del Ver de una habilidad (y lo que abre "+ Estado" o el editor del creep). Después,
@@ -294,3 +297,16 @@ puede empezar.
   estados, de la parte `invocaciones` de su dueño) y le devuelve el daño a una invocación que atacó (`danioInv`, directo a la vida).
   **En vivo** (golpes armados a mano): el Lobo con Espinas recibió 8 y le devolvió 2 al creep (20 → 18); el creep con Espinas
   recibió 6 del Lobo y le devolvió 2 (10 → 8, guardado con su resumen); a distancia, nada. Restaurado y verificado.
+- 2026-10-02: **4f hecha — zonas y trampas de las invocaciones** (3fef952, b64148f; P134, «se suma después»). `Combatiente.
+  ejecucionNoDisponible` ya no frena la zona de una invocación. `InvHabilidades`: `zona(inv, h, ui)` (tira una vez el stat de la
+  Ejecución y manda `Combatiente.zonaDeHab` a nombre de `fichaId~invId`) y, al ejecutar, la trampa (`ui.colocarTrampa`, que en la
+  ficha y en el mapa es `FichaAcciones.colocarTrampaDeHab` con la referencia de la invocación): como el **personaje** (la maneja un
+  jugador), la trampa se coloca y la habilidad se anuncia igual; una ✨ que solo coloca una trampa la anuncia sin decir dónde y pide la
+  casilla. El editor de habilidades de invocación (`js/04`, `#scrim-hab-inv`) suma el paso 8 "🪤 Trampa" (`hiTrampa`,
+  `hiTrampaRender`, `hiAbrirAsistenteTrampa`: el asistente compartido y la forma única de trampa, P123), en semi y en auto. Para lo
+  que ya existía, sin cambios: comparado contra la versión anterior en 500 invocaciones al azar (sin zona ni trampa): 500 iguales.
+  `pruebas.html`: 191 (1 nueva; se corrigió la que esperaba el aviso de la zona). **En vivo** (GM con 🎮 el control de Silvia, ⚗, un
+  Lobo con token): en la ficha, el editor mostró el paso "🪤 Trampa" con la trampa cargada y la conservó al guardar; en el mapa,
+  «Niebla» (✨ zona) se anunció, tiró Esp (3) y dejó la zona en el centro marcado, a nombre del Lobo, con Res.Esp contra 3 y Veneno,
+  por 2 turnos; «Cepo» (💰 con trampa) se anunció y dejó la trampa al lado del Lobo; «Pozo» (✨ solo trampa) se anunció sin decir
+  dónde y la dejó en la casilla elegida. Ningún pedido a la ficha. Todo borrado y Silvia restaurada (verificado).

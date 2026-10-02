@@ -995,3 +995,6 @@ versión parecida en más de una, es candidato a juntar.
 - **`inv-lupa.js`** (`InvLupa`, 2026-10-01, paso 4 etapa 4e, tanda 6) — **la 🔍 y el Ver de una invocación**: `contenido(inv, clave)`
   (clave `"inv:invId:tipo:ref"`, la de `inv-botonera.js`), `verHab(inv, h)` y `stat(inv, statId, o)`. Solo arma el HTML. Lo usan la
   ficha (`lupaHtmlInv`, `verHabInv`) y el mapa (`lupaContenido`, `#bn-verinv`).
+- **Zonas y trampas de las invocaciones** (2026-10-02, paso 4 etapa 4f, P134): `InvHabilidades.zona(inv, h, ui)` y la trampa al
+  ejecutar (`ui.colocarTrampa`, que usa `FichaAcciones.colocarTrampaDeHab` con la referencia `fichaId~invId`); `ui` suma `enMapa()`,
+  `ref(inv)`, `colocarZona(msg)` y `colocarTrampa(inv, h)`. `Combatiente.ejecucionNoDisponible` ya no frena la zona de una invocación.

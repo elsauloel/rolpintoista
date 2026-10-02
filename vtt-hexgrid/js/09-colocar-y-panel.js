@@ -153,6 +153,7 @@ function escucharTokens(){
       });
     });
     renderIniciativa();
+    actualizarCabecera();   // el personaje principal es el de su token en este mapa
     const primeraVez = !escucharTokens.listo;
     escucharTokens.listo = true;
     if(primeraVez && !ajustarTamano.habiaVista) centrarEnMios();
@@ -269,6 +270,7 @@ function escucharVinculables(){
       mapa.set(ch.doc.id, o);
     });
     renderIniciativa();   // el sigilo de un creep/personaje cambia si aparece en la lista
+    if(coleccion === 'fichas') actualizarCabecera();   // el nombre del personaje principal
     try{ actualizarMuerteMapa(); }catch(err){ console.error('muerte en el mapa:', err); }
     renderPanel();
     sigiloRevisar();   // por si el estado Sigilo se aplicó/quitó a mano estando ya en un cono rival
@@ -436,7 +438,7 @@ function escucharMiembros(){
     if(yo){ fbMiembro = {...fbMiembro, ...yo}; soyGM = yo.gm; }
     bnPintarInterruptor();
     renderModo();
-    estado(barraTexto());
+    actualizarCabecera();
     renderPanel();
     pedirDibujo();
   }, err => console.error('Error escuchando miembros:', err));

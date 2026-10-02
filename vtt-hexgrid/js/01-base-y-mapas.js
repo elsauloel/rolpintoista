@@ -35,6 +35,16 @@ function sinCache(url){
 
 
 function estado(texto){ $('#estado').textContent = texto; }
+// La cabecera: "Partida · GM · Usuario" o, para un jugador, "Partida · Personaje · Usuario" (comun/barra.js, barraTextoRol). El
+// personaje es el principal (fichaPrincipalId: su token en el mapa que se ve o su primera ficha), así que se rearma al llegar
+// fichas, tokens o miembros.
+function actualizarCabecera(){
+  if(typeof fbMiembro === 'undefined' || !fbMiembro || !fbUsuario) return;
+  const id = soyGM ? '' : fichaPrincipalId();
+  const f = id ? fichasPub.get(id) : null;
+  const texto = barraTextoRol(f ? f.nombre : '');
+  if(texto && $('#estado').textContent !== texto) estado(texto);
+}
 
 /* ---------- Geometría de hexágonos ----------
    Hexágonos "de punta arriba" en filas; las filas impares corridas medio

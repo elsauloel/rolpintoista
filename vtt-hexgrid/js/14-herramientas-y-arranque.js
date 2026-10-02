@@ -787,8 +787,8 @@ function mostrarAviso(html, boton){
 
 function arrancarEnVivo(){
   $('#aviso-mapa').hidden = true;
-  estado(barraTexto());
   soyGM = fbMiembro.gm === true;
+  actualizarCabecera();
   if($('#btn-reroll')) $('#btn-reroll').hidden = soyGM;   // la Moneda Re-Roll es de los jugadores
   bnPintarInterruptor();   // ⚗ Botonera nueva (prueba, para quien la quiera prender)
   if(soyGM && bnActiva()) acCargarPiezas().catch(err => console.error(err));   // los ganchos del duelo de los creeps (paso 4c, tanda 4)

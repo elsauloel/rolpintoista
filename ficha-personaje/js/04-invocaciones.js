@@ -523,13 +523,15 @@ const PASOS_HAB_INV = [
    ayuda: 'Tres formas, de menos a más automática (las mismas que las habilidades del personaje). Se puede cambiar cuando quieras.'},
   {corto: 'Ejecución', titulo: '¿Cómo se juega paso a paso?',
    ayuda: 'A quién apunta, qué tira cada uno, el daño y los efectos: el mismo cuadro de Ejecución que se abre para toda la mesa al usarla.'},
+  {corto: '🪤 Trampa', titulo: '¿Coloca una trampa en el mapa?',
+   ayuda: 'Opcional. Al ejecutarla, la trampa queda en el mapa: en ✨ automática se elige la casilla con un clic; si no, queda al lado de la invocación. La ven solo los de su bando hasta que alguien la pisa.'},
 ];
 // Pasos visibles según el modo (índices de PASOS_HAB_INV / data-hi-paso). El estado sobre la invocación (sistema anterior)
 // aparece en semi y en auto solo si ya lo tenía.
 function hiOrden(){
   const m = editingHabInv && editingHabInv.modo, conEstado = !!$('#hi-efecto-nombre').value.trim();
-  if(m === 'semi') return [6, 0, 1, 2, 3, ...(conEstado ? [4] : []), 5];
-  if(m === 'auto') return [6, 0, 1, 7, ...(conEstado ? [4] : []), 5];
+  if(m === 'semi') return [6, 0, 1, 2, 3, 8, ...(conEstado ? [4] : []), 5];   // 8: 🪤 Trampa (paso 4, etapa 4f)
+  if(m === 'auto') return [6, 0, 1, 7, 8, ...(conEstado ? [4] : []), 5];
   return [6, 0, 5];
 }
 const EXPLICA_MODO_INV = {
@@ -599,6 +601,7 @@ function hiMostrarPaso(n){
   document.querySelectorAll('#scrim-hab-inv .hi-paso').forEach(el => { el.hidden = num(el.dataset.hiPaso) !== idx; });
   if(idx === 6) hiModosRender();
   if(idx === 7) hiEjecucionRender();
+  if(idx === 8) hiTrampaRender();
   $('#hi-atras').style.visibility = paso > 0 ? 'visible' : 'hidden';
   $('#hi-siguiente').hidden = paso === total - 1;
   $('#habinv-guardar').hidden = nueva && paso !== total - 1;
@@ -629,8 +632,37 @@ function hiResumenHtml(){
     ${num($('#hi-hpcosto').value) > 0 ? fila('Vida', `${fmt(num($('#hi-hpcosto').value))} HP`) : ''}
     ${fila('Al ejecutar', STAT_LABEL[$('#hi-tirada-stat').value] || $('#hi-tirada').value.trim() || 'no tira')}
     ${fila('Efecto', $('#hi-tirada-stat').value && $('#hi-tirada').value.trim() ? $('#hi-tirada').value.trim() + ' (botón 🎲)' : 'sin tirada de efecto')}
-    ${fila('Estado', estado ? `${estado}${turnos ? ` (${fmt(turnos)} turnos)` : ''}` : 'ninguno')}`;
+    ${fila('Estado', estado ? `${estado}${turnos ? ` (${fmt(turnos)} turnos)` : ''}` : 'ninguno')}
+    ${fila('🪤 Trampa', hiTrampaResumen())}`;
 }
+/* ---------- 🪤 La trampa que coloca una habilidad de invocación (paso 4, etapa 4f, 2026-10-02, P134): el mismo asistente y la misma
+   forma de trampa que las habilidades del personaje y de los creeps (comun/asistente-trampa.js, P123). ---------- */
+let hiTrampa = null;
+const hiTrampaArmada = () => !!(hiTrampa && (String(hiTrampa.nombre || '').trim() || hiTrampa.dano));
+function hiTrampaResumen(){
+  if(!$('#hi-trampa-on').checked || !hiTrampa) return 'no coloca';
+  return AsistenteTrampa.resumenTexto(hiTrampa);
+}
+function hiTrampaRender(){
+  const on = $('#hi-trampa-on').checked;
+  const nom = hiTrampa ? String(hiTrampa.nombre || '').trim() : '';
+  $('#hi-trampa-resumen').innerHTML = on
+    ? `<div class="hint" style="margin-bottom:8px"><b>${esc(nom || $('#hi-nombre').value.trim() || 'Sin nombre')}</b><br>${esc(hiTrampaResumen())}</div>
+      <button type="button" class="btn primary" id="hi-trampa-asistente" style="width:100%">🪄 ${nom ? 'Cambiar' : 'Armar'} la trampa paso a paso</button>`
+    : '';
+  $('#hi-trampa-ayuda').textContent = on
+    ? 'Al ejecutarla se coloca la trampa (y la habilidad se anuncia como siempre, sin decir dónde quedó).'
+    : 'Sin trampa: la habilidad no coloca nada en el mapa.';
+}
+function hiAbrirAsistenteTrampa(){
+  AsistenteTrampa.abrir({
+    contexto: 'habilidad', editando: false, estados: trampaEstadosLista(), inicial: AsistenteTrampa.inicialDe(hiTrampa || {}),
+    alTerminar: res => { hiTrampa = AsistenteTrampa.aTrampa(res); $('#hi-trampa-on').checked = true; hiTrampaRender(); },
+    alCancelar: () => { if(!hiTrampaArmada()){ $('#hi-trampa-on').checked = false; hiTrampaRender(); } },
+  });
+}
+document.addEventListener('change', e => { if(e.target && e.target.id === 'hi-trampa-on'){ hiTrampaRender(); if(e.target.checked && !hiTrampaArmada()) hiAbrirAsistenteTrampa(); } });
+document.addEventListener('click', e => { if(e.target && e.target.closest && e.target.closest('#hi-trampa-asistente')) hiAbrirAsistenteTrampa(); });
 
 function abrirEditorHabInv(invId, habId){
   const inv = S.invocaciones.find(x => x.id === invId);
@@ -656,6 +688,8 @@ function abrirEditorHabInv(invId, habId){
   $('#hi-efecto-permanente').checked = Combatiente.efectoPermanente(h, presetPorNombre(EFECTOS_PRESET, (h.efectoNombre || '').trim()));   // P137
   $('#hi-efecto-polaridad').value = h.efectoPolaridad || 'otro';
   $('#hi-efecto-mods').value = JSON.stringify(h.efectoMods || []);
+  hiTrampa = h.trampaColocar ? Plantillas.trampaDesde(h.trampaColocar) : null;   // 4f: la trampa que coloca (las viejas se traducen solas)
+  $('#hi-trampa-on').checked = !!hiTrampa;
   hiAplicarModoNitros();
   $('#scrim-hab-inv').classList.add('open');
   hiMostrarPaso(0);
@@ -690,6 +724,8 @@ function guardarEditorHabInv(){
   h.modo = editingHabInv.modo || 'semi';
   h.automatizada = h.modo !== 'manual';
   if(editingHabInv.duelo) h.duelo = editingHabInv.duelo; else delete h.duelo;
+  if($('#hi-trampa-on').checked && hiTrampa) h.trampaColocar = {...structuredClone(hiTrampa), nombre: String(hiTrampa.nombre || '').trim().slice(0, 40) || h.nombre};
+  else delete h.trampaColocar;
   editingHabInv = null;
   $('#scrim-hab-inv').classList.remove('open');
   renderInvocaciones();

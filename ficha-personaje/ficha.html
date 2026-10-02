@@ -672,6 +672,13 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
         <input type="hidden" id="hi-efecto-polaridad" value="otro">
         <input type="hidden" id="hi-efecto-mods" value="[]">
       </div>
+      <div class="hi-paso" data-hi-paso="8">
+        <label style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--copper);border-radius:var(--r);background:rgba(201,133,69,.10);cursor:pointer">
+          <input type="checkbox" id="hi-trampa-on" style="width:auto"> <span><b>🪤 Esta habilidad coloca una trampa</b><br><span style="color:var(--muted);font-size:12px">Destildá esto para sacarle la trampa a la habilidad.</span></span>
+        </label>
+        <div id="hi-trampa-resumen" style="margin-top:10px"></div>
+        <div class="hint" id="hi-trampa-ayuda" style="margin-top:8px"></div>
+      </div>
       <div class="hi-paso" data-hi-paso="5">
         <div class="resumen-hab" id="hi-resumen"></div>
       </div>
@@ -916,7 +923,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="js/01-modelo-y-reglas.js?v=20261001d"></script>
 <script src="js/02-recompensas-estados-y-atributos.js?v=20261001l"></script>
 <script src="js/03-tiradas.js?v=20261001g"></script>
-<script src="js/04-invocaciones.js?v=20261002a"></script>
+<script src="js/04-invocaciones.js?v=20261002b"></script>
 <script src="js/05-estados-y-botonera.js?v=20261001f"></script>
 <script src="js/06-cajas-y-carga.js?v=20261001e"></script>
 <script src="js/07-editor-y-catalogo.js?v=20261001a"></script>

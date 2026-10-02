@@ -4,23 +4,39 @@
 > acá van las **tareas**. Al terminar una, marcarla `[x]` con la fecha; al aparecer una nueva, sumarla. Última revisión: 2026-09-21.
 
 ## 0. Hoja de ruta acordada (2026-10-02, a seguir en este orden)
-1. [x] **Ataque de oportunidad desde el lado del jugador** (2026-10-02, probado en "Claude · pruebas" como Saulo-Prueba con Clementino):
-   la pregunta le aparece al centro al jugador dueño, «Sí» con dos armas abre «¿Con qué arma?» (Aguja 2 No2 / Bastón de monje 5 No2) y
-   el duelo de oportunidad sale con el arma elegida (Tipo 10) y su línea en la Mesa. Lo del GM (frenar y mandar la pregunta) ya estaba
-   probado; acá el aviso se mandó a mano (la cuenta del GM no estaba conectada). Clementino quedó con esas dos armas equipadas.
-2. [x] **Un creep sin No2 para atacar, adentro del duelo** (2026-10-02): ahora pregunta «¿Atacar igual?» (en el duelo, en GM Tools y en
-   las Acciones nuevas), gasta los No2 que tenga y deja la línea roja en la Mesa, como un personaje. Probado en vivo por los dos caminos
-   (⚗ prendido y GM Tools). Las **invocaciones** sin No2 en el duelo siguen rechazando el ataque (anotado en §2).
-3. [ ] **Aplicar estados a otros desde las habilidades de personaje** (hoy solo creeps y trampas): destraba Lisiar, Confusión, Marcar,
+
+> **Criterio del dueño (2026-10-02): primero prolijar lo estructural, después lo puntual** ("tomándonos el tiempo que haga falta").
+> Lo estructural = que el mapa haga todo solo, sin la ficha ni GM Tools escondidas en el marco: un solo camino para probar y mantener.
+
+**Hecho en el camino (2026-10-02):**
+- [x] **Ataque de oportunidad desde el lado del jugador** (probado en "Claude · pruebas" como Saulo-Prueba con Clementino): la pregunta
+  le aparece al centro al jugador dueño, «Sí» con dos armas abre «¿Con qué arma?» (Aguja 2 No2 / Bastón de monje 5 No2) y el duelo de
+  oportunidad sale con el arma elegida (Tipo 10) y su línea en la Mesa. El aviso del GM se mandó a mano (la cuenta del GM no estaba
+  conectada). Clementino quedó con esas dos armas equipadas.
+- [x] **Un creep sin No2 para atacar, adentro del duelo**: pregunta «¿Atacar igual?» (duelo, GM Tools y Acciones nuevas), gasta los No2
+  que tenga y deja la línea roja en la Mesa. Probado en vivo por los dos caminos.
+- [x] **Solo la Botonera nueva** (decidido por el dueño): siempre prendida, sin interruptor ⚗ (`BN_SIEMPRE`).
+
+**A. Estructural — mudar al mapa lo que todavía va por el marco (en este orden):**
+1. [ ] **El duelo de un jugador que no abrió su Botonera**: lo que el duelo le pide a su personaje lo sigue contestando la ficha
+   escondida en el marco hasta que abre la Botonera nueva en esa pantalla (`bnHooksDuelo` necesita la sesión `bn`). Que el mapa tenga
+   la sesión del personaje siempre lista (sin mostrar nada) para contestar siempre él.
+2. [ ] **El Mantenimiento en segundo plano**: hoy carga la ficha escondida de cada jugador en cada turno; que lo haga el mapa con el
+   motor común (`Combatiente.pasarTurnoEstados` y compañía).
+3. [ ] **"+ Estado"** (el selector de estados de un personaje, una invocación o un creep, con sus preguntas).
+4. [ ] **Equipo y mochila** (equipar, desequipar, mirar la mochila).
+5. [ ] **Tienda y Botín**.
+6. [ ] **El editor** (editar una habilidad, un ítem, un creep): lo más grande y lo que menos se usa en partida; puede seguir abriéndose
+   en la ficha o en GM Tools si conviene.
+
+**B. Puntual (después de A):**
+7. [ ] **Una invocación sin No2 para atacar, adentro del duelo** (ver §2): igual que los creeps.
+8. [ ] **Aplicar estados a otros desde las habilidades de personaje** (hoy solo creeps y trampas): destraba Lisiar, Confusión, Marcar,
    Maldiciones y otras skills de clase (§7).
-4. [ ] **Auditoría de skills de clase** (§7): Tanque 9/10 (falta Miti-Miti), después una skill por clase alternando.
-5. [ ] **Paso 8 del casteo** (§1): quedan 10 skills de clase que tocan casteo.
-6. [ ] **Rework de armas no mágicas** elemento por elemento y el crítico nuevo en ficha y mapa (§8).
-- [x] (2026-10-02, decidido por el dueño en el camino) **Solo la Botonera nueva**: siempre prendida, sin interruptor ⚗.
-- [ ] **El duelo de un jugador que no abrió su Botonera**: lo que el duelo le pide a su personaje lo sigue contestando la ficha
-  escondida en el marco hasta que abre la Botonera nueva en esa pantalla (`bnHooksDuelo` necesita la sesión `bn`). Que el mapa abra
-  la sesión del personaje solo (sin mostrar nada) para contestar siempre él.
-7. [ ] **Preguntas para la mesa**: P143 (la tirada de la zona) y P144 (la armadura mágica), esperan la opinión del grupo.
+9. [ ] **Auditoría de skills de clase** (§7): Tanque 9/10 (falta Miti-Miti), después una skill por clase alternando.
+10. [ ] **Paso 8 del casteo** (§1): quedan 10 skills de clase que tocan casteo.
+11. [ ] **Rework de armas no mágicas** elemento por elemento y el crítico nuevo en ficha y mapa (§8).
+12. [ ] **Preguntas para la mesa**: P143 (la tirada de la zona) y P144 (la armadura mágica), esperan la opinión del grupo.
 
 ## 1. Casteo con SP — **proceso paso a paso en [`proceso-casteo.md`](proceso-casteo.md)** (reglas en [`reglas-casteo.md`](reglas-casteo.md), decisiones en P97)
 > **Los 5 pasos de decisión, el Paso 6 y el Paso 7 (en su mayoría) están cerrados (2026-09-27).** Retomar por el

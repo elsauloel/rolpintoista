@@ -199,5 +199,41 @@ const CreepLupa = (() => {
   `};
   }
 
-  return {contenido, verHab, paraHtml, stat, derivadosHtml, recompensasVerHtml, verCreep};
+  /* El «Ver» de un ítem visto por el GM (el arma o una pieza de un creep, un ítem del catálogo, una plantilla del botín). Copiado tal
+     cual de gm-toolset/js/04 (verItemDatos, 2026-10-02, A6a). verItem(item) → {titulo, html}. */
+  function verItem(item){
+    item = {tipoItem: 'otros', ...item};
+    const linea = (label, val) => (val === '' || val === null || val === undefined)
+      ? '' : `<div class="view-line"><span class="view-label">${esc(label)}</span><span class="view-value">${esc(val)}</span></div>`;
+    const esArma = item.tipoItem.startsWith('arma_');
+    const esCons = item.tipoItem === 'consumibles';
+    const L = [];
+    L.push(linea('Categoría', K.TIPOITEM_LABEL[item.tipoItem] || item.tipoItem));
+    if(item.tier) L.push(linea('Rareza', item.tier));
+    if(esArma) L.push(linea('Daño', `${Math.max(1,num(item.peso))}d${num(item.tipoDado)||8}${num(item.danoFijo)?` +${fmt(num(item.danoFijo))}`:''}`));
+    if(item.def) L.push(linea('Defensa', `${num(item.def)>0?'+':''}${fmt(num(item.def))}`));
+    L.push(linea('Peso', fmt(num(item.peso))));
+    // Durabilidad (variable de diseño del ítem, comun/combatiente.js). Los creeps no la gastan: importa si lo sueltan o se publica.
+    if(Combatiente.durTexto(item)) L.push(linea('Durabilidad', Combatiente.durTexto(item)));
+    if(item.precioCompra !== undefined) L.push(linea('Precio', `${fmt(num(item.precioCompra))} DDE${item.estimado ? ' (estimado por comparación con el catálogo)' : ''}`));
+    if(item.trofeo) L.push(linea('Trofeo', 'No se equipa: se vende en una tienda o se convierte en despojos'));
+    if(esArma && (item.efectosGolpe || []).length && typeof EfectosGolpe !== 'undefined') L.push(linea('Al golpear', EfectosGolpe.resumenLista(item.efectosGolpe)));
+    if(esCons) L.push(linea('Consumible', item.curahp ? `${num(item.curahp)>0?'+':''}${fmt(num(item.curahp))} HP al consumir` : 'Sin efecto numérico'));
+    const otros = (item.mods || []).filter(m => m.stat && m.stat !== 'def');
+    if(otros.length) L.push(linea('Otros modificadores', otros.map(m => `${K.STAT_LABEL[m.stat]||m.stat} ${num(m.val)>0?'+':''}${fmt(num(m.val))}`).join(', ')));
+
+    return {titulo: item.nombre || 'Ítem', html: `
+    <div class="view-wrap">
+      <div class="view-image-wrap">${item.imagen ? `<img src="${esc(item.imagen)}" class="view-image" alt="">` : `<span class="view-image-empty">Sin imagen</span>`}</div>
+      <div class="view-info">
+        <div class="view-title">${esc(item.nombre)}</div>
+        <div class="view-lines">${L.filter(Boolean).join('')}</div>
+      </div>
+    </div>
+    ${item.detalle ? `<div class="view-detalle"><span class="view-label">Detalle</span>${esc(item.detalle)}</div>` : ''}
+    ${(item.descripcionNarrativa||'').trim() ? `<div class="view-detalle view-narrativa">${esc(item.descripcionNarrativa)}</div>` : ''}
+  `};
+  }
+
+  return {contenido, verHab, paraHtml, stat, derivadosHtml, recompensasVerHtml, verCreep, verItem};
 })();

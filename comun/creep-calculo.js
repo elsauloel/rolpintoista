@@ -481,6 +481,31 @@ const CreepCalculo = (() => {
     armadura_blanda:'Armadura blanda', armadura_rigida:'Armadura rígida',
     manos:'Manos', cabeza:'Cabeza', pies:'Pies', piernas:'Piernas',
   };
+  // Etiquetas cortas de los stats de un ítem de creep (antes STAT_LABEL_GM de GM Tools).
+  const STAT_LABEL = {
+    tipo1:'Tipo 4', tipo2:'Tipo 6', tipo3:'Tipo 8', tipo4:'Tipo 10', tipo5:'Tipo 12',
+    pdg:'PdG', eva:'Eva', ini:'Iniciativa', mov:'Mov', parry:'Parry', crit:'Crítico frecuente', critpot:'Crítico potente',
+    bonos:'Bonos', rangocasteo:'Rango Cast.', accionesmax:'Acciones máx.', nitros:'No2',
+    resm:'Res.Mt', resmg:'Res.Esp', rescc:'Res.CC',
+    con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp',
+  };
+  // Un ítem del catálogo en la forma del equipo de un creep (antes itemParaCreep de GM Tools, js/01): sin id, la Defensa separada de los
+  // otros bonos (`def`), sin los campos que un creep no usa. Es la forma de CATALOGO_EQUIPO (GM Tools) y del catálogo del fin del combate.
+  function itemParaCreep(it){
+    const arma = it.tipoItem.startsWith('arma_');
+    const o = {nombre: it.nombre, tipoItem: it.tipoItem, tier: it.tier, tipoDado: arma ? (it.tipoDado || 0) : 0, danoFijo: arma ? (it.danoFijo || 0) : 0,
+      peso: it.peso || 0, precioCompra: it.precioCompra || 0, def: (it.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + (Number(m.val) || 0), 0)};
+    if(arma && it.danoAmplificado) o.danoAmplificado = it.danoAmplificado;
+    if(it.durPorPeso) o.durPorPeso = it.durPorPeso;   // durabilidad de diseño (si no es la de siempre)
+    if(arma && it.armaDeRango) o.armaDeRango = true;
+    if(arma && (it.efectosGolpe || []).length) o.efectosGolpe = structuredClone(it.efectosGolpe);
+    if(it.tipoItem === 'consumibles'){ o.consumible = true; if(it.curahp) o.curahp = it.curahp; if(it.legacy) o.legacy = true; }
+    const otros = (it.mods || []).filter(m => m.stat !== 'def');
+    if(otros.length) o.mods = structuredClone(otros);
+    o.detalle = it.detalle || '';
+    if(it.descripcionNarrativa) o.descripcionNarrativa = it.descripcionNarrativa;
+    return o;
+  }
   function nombreLimpio(sc){ return String(sc.nombre || 'Creep').replace(/\s*\(auditar\)\s*$/i, '').trim(); }
   function tipoDe(sc){
     return sc.tipoCriatura === 'otros' ? String(sc.tipoCriaturaOtro || '').trim().toLowerCase() : String(sc.tipoCriatura || '');
@@ -520,7 +545,7 @@ const CreepCalculo = (() => {
   }
 
   return {IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
-    TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto,
+    TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto,
     trofeo, despojosDePrecio, dropsResumen,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,
     danoTxt, fuentesEquipo, modTotal, estadosArmadura, aporteArmadura, defensaEfectiva, armadmgEfectiva, critEfectivo,

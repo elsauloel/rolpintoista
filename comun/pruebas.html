@@ -81,6 +81,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
 <script src="creep-lupa.js"></script>
+<script src="combate-fin.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
 <script>
@@ -1007,6 +1008,40 @@ prueba('recompensas de un creep: oro sugerido por tipo y nivel (jefe ×2), trofe
   igual([CreepCalculo.oroSugerido(humano), CreepCalculo.oroSugerido(jefe), CreepCalculo.oroSugerido(bestia), tr.nombre, tr.precioCompra, CreepCalculo.despojosDePrecio(tr.precioCompra),
     CreepCalculo.trofeo(humano), CreepCalculo.dropsResumen(creepPrueba({oroBase: 10, equipo: [{nombre: 'Yelmo'}]})), CreepCalculo.tipoDe(creepPrueba({tipoCriatura: 'otros', tipoCriaturaOtro: ' Gólem '}))],
     [40, 40, 0, 'Colmillos de Lobo', 50, 13, null, 'Hacha (arma equipable) · Yelmo (equipo) · 10 DDE de oro (±20% al final del combate)', 'gólem']);
+});
+prueba('fin del combate (comun/combate-fin.js): XP por creep (escapado 20%), quién cobra, inconsciente 25%, extras y despojos', () => {
+  const rep = CombateFin.nuevo();
+  rep.enMapa = new Set(['a', 'b', 'c']);
+  const creeps = [creepPrueba({id: 'a', nivel: 2, hp: 0, armaNatural: true, armaNombre: 'Garras', tipoCriatura: 'bestia'}), creepPrueba({id: 'b', nivel: 1, hp: 5}),
+    creepPrueba({id: 'c', nivel: 1, hp: 0, recompensado: true}), creepPrueba({id: 'd', nivel: 3, hp: 0})];
+  rep.jugadores = [{id: 'p1', nombre: 'Ana', estado: 'en pie', incluido: true}, {id: 'p2', nombre: 'Beto', estado: 'inconsciente', incluido: true}, {id: 'p3', nombre: 'Ceci', estado: 'en pie', incluido: false}];
+  const r = CombateFin.generar(rep, creeps, []), rp = CombateFin.calcularReparto(rep, r);
+  const items = CombateFin.itemsPublicables(rep, r);
+  CombateFin.cambio(rep, {dataset: {repXp: 'p1'}, value: '5'});
+  CombateFin.cambio(rep, {dataset: {repItem: 'a:trofeo'}, checked: false});
+  CombateFin.cambio(rep, {dataset: {repEscapados: ''}, checked: false});
+  const r2 = CombateFin.generar(rep, creeps, []), rp2 = CombateFin.calcularReparto(rep, r2);
+  const arma = CombateFin.plantillaArmaCreep([], creepPrueba());
+  const v = CombateFin.vista(rep, creeps, []);
+  igual([CombateFin.xpBasePorNivel(3), r.filas.length, r.xpTotal, rp.porJugador.map(p => p.xp), items.map(i => i.nombre + ' ' + i.precioCompra), r2.xpTotal, rp2.porJugador.map(p => p.xp),
+    CombateFin.itemsPublicables(rep, r2).length, [arma.precioCompra, arma.tier, arma.estimado], v.publicar, v.html.includes('Garras de Orco'), CombateFin.vista(CombateFin.nuevo(), creeps, []).publicar],
+    [150, 2, 98, [49, 12], ['Garras de Orco 30'], 90, [50, 11], 0, [60, 'Común', true], 'activo', true, 'oculto']);
+});
+prueba('itemParaCreep: un ítem del catálogo en la forma del equipo de un creep (la Defensa aparte, sin id)', () => {
+  const o = CreepCalculo.itemParaCreep({id: 'x', nombre: 'Escudo', tipoItem: 'escudo_1m', tier: 'Común', peso: 2, precioCompra: 40, mods: [{stat: 'def', val: 2}, {stat: 'eva', val: -1}]});
+  const a = CreepCalculo.itemParaCreep({nombre: 'Daga', tipoItem: 'arma_1m', tipoDado: 4, danoFijo: 1, efectosGolpe: [{nombre: 'Sangrado'}], mods: []});
+  igual([o.id, o.def, o.mods, o.tipoDado, a.tipoDado, a.danoFijo, a.efectosGolpe.length, a.mods], [undefined, 2, [{stat: 'eva', val: -1}], 0, 4, 1, 1, undefined]);
+});
+prueba('botín del GM (comun/combate-fin.js): lo sin tomar, los despojos a repartir y el Ver de un ítem', () => {
+  const st = CombateFin.nuevoBotin();
+  st.docs = [{id: 'x', nombre: 'Hacha', despojos: 5, json: JSON.stringify({nombre: 'Hacha', tipoItem: 'arma_1m'}), tomadoPor: ''}, {id: 'y', nombre: 'Yelmo', despojos: 3, tomadoPor: 'u1', tomadoNombre: 'Ana'}];
+  st.jugadores = [{id: 'p1', nombre: 'Ana'}, {id: 'p2', nombre: 'Beto'}];
+  st.incluidos = new Set(['p1', 'p2']);
+  const v = CombateFin.botinVista(st);
+  CombateFin.botinCambio(st, {dataset: {botinJug: 'p2'}, checked: false});
+  igual([v.html.includes('Sin tomar (1)'), v.html.includes('Despojar: 5 despojos → 3 c/u'), v.html.includes('Yelmo → Ana'), v.boton.startsWith('🏁 Despojar'), CombateFin.botinVista(st).html.includes('→ 5 c/u'),
+    CombateFin.botinItem(st, 'x').tipoItem, CreepLupa.verItem(CombateFin.botinItem(st, 'x')).titulo],
+    [true, true, true, true, true, 'arma_1m', 'Hacha']);
 });
 prueba('el «Ver» de un creep (comun/creep-lupa.js): título, nivel, habilidades en chips o la lista que se le pase, recompensas', () => {
   const sc = creepPrueba({nivel: 2, habilidades: [{id: 'h', nombre: 'Rugido', cd: 2}], notas: 'Huele mal'});

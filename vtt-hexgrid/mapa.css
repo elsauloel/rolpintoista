@@ -691,6 +691,8 @@ aside{
 /* Con el cartel de movimiento a la vista, los avisos suben para no taparlo. */
 body.con-ruta .toast{bottom:auto;top:74px}
 #botonera-capa{position:fixed;inset:0;z-index:90}
+/* Las ventanas del GM de fin de combate (js/18): un recuadro aislado; cada ventana trae su propio fondo oscuro. */
+#ventanas-gm{position:fixed;inset:0;z-index:90}
 #botonera-nueva, #acciones-nuevas{position:fixed;inset:0;z-index:89;background:rgba(8,5,7,.78);backdrop-filter:blur(3px);overflow:auto;padding:24px}
 /* Un cartel de la ficha o de GM Tools durante un duelo (¿es tu turno?, No2, sobrepeso…) tiene que verse ENCIMA del cuadro del
    duelo (#duelo-fondo, z-index 99000): antes quedaba tapado y la tirada se quedaba en «Tirando…» (encontrado 2026-09-30). */

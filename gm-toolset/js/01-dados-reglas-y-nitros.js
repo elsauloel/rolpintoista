@@ -58,21 +58,7 @@ const COLORES = ['#C4485A','#D07B3A','#8FB84F','#4FA88C','#9B7BD4','#6FA8D8'];
 // El catálogo de fábrica vive en comun/catalogo.js (una sola copia para todas las herramientas); acá se arma la forma que
 // usa GM Tools para el equipo de los creeps: sin id, la Defensa separada de los otros bonos (`def`), sin los campos que un
 // creep no usa. Misma forma que escribía antes herramientas/catalogo_comun.py (item_gm).
-function itemParaCreep(it){
-  const arma = it.tipoItem.startsWith('arma_');
-  const o = {nombre: it.nombre, tipoItem: it.tipoItem, tier: it.tier, tipoDado: arma ? (it.tipoDado || 0) : 0, danoFijo: arma ? (it.danoFijo || 0) : 0,
-    peso: it.peso || 0, precioCompra: it.precioCompra || 0, def: (it.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + (Number(m.val) || 0), 0)};
-  if(arma && it.danoAmplificado) o.danoAmplificado = it.danoAmplificado;
-  if(it.durPorPeso) o.durPorPeso = it.durPorPeso;   // durabilidad de diseño (si no es la de siempre)
-  if(arma && it.armaDeRango) o.armaDeRango = true;
-  if(arma && (it.efectosGolpe || []).length) o.efectosGolpe = structuredClone(it.efectosGolpe);
-  if(it.tipoItem === 'consumibles'){ o.consumible = true; if(it.curahp) o.curahp = it.curahp; if(it.legacy) o.legacy = true; }
-  const otros = (it.mods || []).filter(m => m.stat !== 'def');
-  if(otros.length) o.mods = structuredClone(otros);
-  o.detalle = it.detalle || '';
-  if(it.descripcionNarrativa) o.descripcionNarrativa = it.descripcionNarrativa;
-  return o;
-}
+function itemParaCreep(it){ return CreepCalculo.itemParaCreep(it); }   // comun/creep-calculo.js
 const CATALOGO_EQUIPO = CATALOGO_BASE.filter(it => it.tipoItem).map(itemParaCreep);
 // Lo subido por el grupo (comun/items-subidos.js), sumado a CATALOGO_EQUIPO en su lugar (se rearma entero desde la fábrica).
 let itemsSubidosGM = [];

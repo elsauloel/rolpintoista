@@ -82,13 +82,7 @@ let equipandoCreepId = null;
 const normalizarBusqueda = s => (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
 
 const TIER_COLOR = {'Común':'#9A867E', 'Buena Calidad':'#A8C256', 'Raro':'#5B8DBE', 'Excepcional':'#E0A458', 'Legendario':'#9B7BD4', 'A definir':'#D4574E'};
-const STAT_LABEL_GM = {
-  tipo1:'Tipo 4', tipo2:'Tipo 6', tipo3:'Tipo 8', tipo4:'Tipo 10', tipo5:'Tipo 12',
-  pdg:'PdG', eva:'Eva', ini:'Iniciativa', mov:'Mov', parry:'Parry', crit:'Crítico frecuente', critpot:'Crítico potente',
-  bonos:'Bonos', rangocasteo:'Rango Cast.', accionesmax:'Acciones máx.', nitros:'No2',
-  resm:'Res.Mt', resmg:'Res.Esp', rescc:'Res.CC',
-  con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp',
-};
+const STAT_LABEL_GM = CreepCalculo.STAT_LABEL;   // comun/creep-calculo.js
 const STAT_FULL_GM = {
   tipo1:'Resistencia a crítico Tipo 4', tipo2:'Resistencia a crítico Tipo 6', tipo3:'Resistencia a crítico Tipo 8',
   tipo4:'Resistencia a crítico Tipo 10', tipo5:'Resistencia a crítico Tipo 12',
@@ -162,38 +156,9 @@ function piezaDeCreepComoItem(it){ return {nombre: it.nombre, tipoItem: it.tipoI
 function verItemDatos(item){
   if(!item) return;
   verItemActual = item;
-  item = {tipoItem: 'otros', ...item};
-  const linea = (label, val) => (val === '' || val === null || val === undefined)
-    ? '' : `<div class="view-line"><span class="view-label">${esc(label)}</span><span class="view-value">${esc(val)}</span></div>`;
-  const esArma = item.tipoItem.startsWith('arma_');
-  const esCons = item.tipoItem === 'consumibles';
-  const L = [];
-  L.push(linea('Categoría', TIPOITEM_LABEL_GM[item.tipoItem] || item.tipoItem));
-  if(item.tier) L.push(linea('Rareza', item.tier));
-  if(esArma) L.push(linea('Daño', `${Math.max(1,num(item.peso))}d${num(item.tipoDado)||8}${num(item.danoFijo)?` +${fmt(num(item.danoFijo))}`:''}`));
-  if(item.def) L.push(linea('Defensa', `${num(item.def)>0?'+':''}${fmt(num(item.def))}`));
-  L.push(linea('Peso', fmt(num(item.peso))));
-  // Durabilidad (variable de diseño del ítem, comun/combatiente.js). Los creeps no la gastan: importa si lo sueltan o se publica.
-  if(Combatiente.durTexto(item)) L.push(linea('Durabilidad', Combatiente.durTexto(item)));
-  if(item.precioCompra !== undefined) L.push(linea('Precio', `${fmt(num(item.precioCompra))} DDE${item.estimado ? ' (estimado por comparación con el catálogo)' : ''}`));
-  if(item.trofeo) L.push(linea('Trofeo', 'No se equipa: se vende en una tienda o se convierte en despojos'));
-  if(esArma && (item.efectosGolpe || []).length) L.push(linea('Al golpear', EfectosGolpe.resumenLista(item.efectosGolpe)));
-  if(esCons) L.push(linea('Consumible', item.curahp ? `${num(item.curahp)>0?'+':''}${fmt(num(item.curahp))} HP al consumir` : 'Sin efecto numérico'));
-  const otros = (item.mods || []).filter(m => m.stat && m.stat !== 'def');
-  if(otros.length) L.push(linea('Otros modificadores', otros.map(m => `${STAT_LABEL_GM[m.stat]||m.stat} ${num(m.val)>0?'+':''}${fmt(num(m.val))}`).join(', ')));
-
-  $('#veritem-titulo').textContent = item.nombre || 'Ítem';
-  $('#veritem-body').innerHTML = `
-    <div class="view-wrap">
-      <div class="view-image-wrap">${item.imagen ? `<img src="${esc(item.imagen)}" class="view-image" alt="">` : `<span class="view-image-empty">Sin imagen</span>`}</div>
-      <div class="view-info">
-        <div class="view-title">${esc(item.nombre)}</div>
-        <div class="view-lines">${L.filter(Boolean).join('')}</div>
-      </div>
-    </div>
-    ${item.detalle ? `<div class="view-detalle"><span class="view-label">Detalle</span>${esc(item.detalle)}</div>` : ''}
-    ${(item.descripcionNarrativa||'').trim() ? `<div class="view-detalle view-narrativa">${esc(item.descripcionNarrativa)}</div>` : ''}
-  `;
+  const v = CreepLupa.verItem(item);   // comun/creep-lupa.js (A6a: el mapa del GM muestra el mismo)
+  $('#veritem-titulo').textContent = v.titulo;
+  $('#veritem-body').innerHTML = v.html;
   // Solicitar eliminar solo tiene sentido si esto es de verdad un ítem del catálogo (no el arma de un creep, una pieza,
   // o una plantilla de botín, que no tienen id ahí).
   $('#veritem-baja').style.display = (item.id && catalogoGMCompleto().some(c => c.id === item.id)) ? '' : 'none';

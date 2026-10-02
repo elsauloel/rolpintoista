@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/creep-lupa.js?v=20261002a', '../comun/creep-botonera.js?v=20261001b', '../comun/creep-acciones.js?v=20261002i', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261002a'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/creep-lupa.js?v=20261002b', '../comun/creep-botonera.js?v=20261001b', '../comun/creep-acciones.js?v=20261002i', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261002a'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -546,6 +546,7 @@ function escucharBotinParaJugador(){
     if(cerrada && bnBotinCombateCerrado()) toast('El GM cerró el botín: lo que nadie tomó se convirtió en despojos');
     else if(cerrada && botonera.completa && !$('#botonera-capa').hidden){ cerrarBotonera(); toast('El GM cerró el botín: lo que nadie tomó se convirtió en despojos'); }
     if(typeof bnBotinDibujar === 'function') bnBotinDibujar();
+    if(soyGM) vgCombateCambio();   // la ventana del botín del GM (js/18)
   }, err => console.error('Error escuchando el fin del combate:', err));
 }
 // 🏪 Tienda (2026-09-24, pedido del dueño): abre la tienda que publicó el GM, sin salir del mapa, en la ventana de la ficha del
@@ -558,7 +559,7 @@ $('#toolkit-tienda').onclick = async () => {
 };
 $('#toolkit-botin').onclick = () => {
   if(!combatePublicado()) return;
-  if(soyGM) abrirModoGM('botin'); else abrirBatallaDeJugador();
+  if(soyGM) abrirBotinGMMapa(); else abrirBatallaDeJugador();   // el GM: el mapa (js/18, A6a)
 };
 
 /* GM Tools adentro del mapa: el reporte de fin de combate (modo=finalizar) y el botín para despojar (modo=botin). */
@@ -572,7 +573,7 @@ function abrirModoGM(modo){
   $('#botonera-cargando').hidden = false;
   marco.src = sinCache(`../gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=${modo}`);
 }
-$('#btn-finalizar-mapa').onclick = () => abrirModoGM('finalizar');
+$('#btn-finalizar-mapa').onclick = () => abrirFinalizarMapa();   // el mapa (js/18, A6a); abrirModoGM quedó sin uso (limpieza A′)
 
 /* Tokens automáticos (comun/tokens-auto.js): uno por creep de un grupo, o uno por personaje de jugador. */
 function centroDeLaVista(){

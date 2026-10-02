@@ -11058,15 +11058,19 @@ async function dueloEspinas(d, golpe){
     const td = tokens.get(d.defensor.tokenId);
     if(!td) return null;
     let tiene = false;
-    if(td.tipo === 'creep'){ const sc = creepPrivadoDe(td.fichaId); tiene = !!(sc && (sc.estados || []).some(e => e && e.activo !== false && (e.espinas || e.nombre === 'Espinas'))); }
-    else{ const f = fichasPub.get(String(td.fichaId).split(SEP_INVOCACION)[0]); tiene = !!(f && f.resumen && (f.resumen.estados || []).some(e => e && e.nombre === 'Espinas')) && !String(td.fichaId).includes(SEP_INVOCACION); }
+    const conEspinas = l => (l || []).some(e => e && e.activo !== false && (e.espinas || e.nombre === 'Espinas'));
+    if(td.tipo === 'creep'){ const sc = creepPrivadoDe(td.fichaId); tiene = !!(sc && conEspinas(sc.estados)); }
+    // Una invocación (2026-10-02, paso 4 etapa 4e): sus estados, de la parte `invocaciones` de su dueño.
+    else if(String(td.fichaId).includes(SEP_INVOCACION)){ const inv = await invDeToken(td); tiene = !!(inv && conEspinas(inv.estados)); }
+    else{ const f = fichasPub.get(td.fichaId); tiene = !!(f && f.resumen && (f.resumen.estados || []).some(e => e && e.nombre === 'Espinas')); }
     if(!tiene) return null;
     const monto = Math.ceil(num(golpe) / 4);
     const ta = tokens.get(d.atacante.tokenId);
     const quien = d.atacante.nombre;
     if(!ta) return {quien, monto, manual: true, motivo: 'el token del atacante ya no está en el mapa'};
-    if(ta.tipo === 'pj' && String(ta.fichaId).includes(SEP_INVOCACION)) return {quien, monto, manual: true, motivo: 'es una invocación'};
-    const res = ta.tipo === 'creep' ? await danioCreep(ta, String(monto), true) : await danioPj(ta, String(monto), true);
+    // Directo a la vida (no se resta la Defensa); a una invocación, en la parte `invocaciones` de su dueño (danioInv, 2026-10-02).
+    const res = ta.tipo === 'pj' && String(ta.fichaId).includes(SEP_INVOCACION) ? await danioInv(ta, String(monto), true)
+      : ta.tipo === 'creep' ? await danioCreep(ta, String(monto), true) : await danioPj(ta, String(monto), true);
     return {quien, monto, recibido: num(res.r.recibido), hpAntes: num(res.previo), hpDespues: num(res.nuevo)};
   }catch(err){
     console.error('No se pudo aplicar las Espinas:', err);

@@ -977,28 +977,37 @@ function mantFijarHp(S, v){
   FichaAcciones.revisarMuerte(S);
 }
 async function mantenimientoPersonaje(fichaId, numero){
-  await bnCargarPiezas();
-  const ruta = fbRutaCampana(`fichas/${fichaId}`);
-  const enBn = () => !!(bn && bn.fichaId === fichaId && bn.S && bn.sesion && bn.sesion.cargada);
-  const tmp = enBn() ? null : await mantSesionTemporal(fichaId);
-  if(!enBn() && !tmp) return;
-  try{
-    const veces = await FichaMantenimiento.reclamar(fbDb, ruta, numero, () => firebase.firestore.FieldValue.serverTimestamp());
-    if(!veces) return;
-    const usarBn = !tmp && enBn();
-    const S = usarBn ? bn.S : tmp.S;
-    const antes = FichaGuardado.partes(S);
+  await editarPersonajeMapa(fichaId, async (S, o) => {
+    const veces = await FichaMantenimiento.reclamar(fbDb, fbRutaCampana(`fichas/${fichaId}`), numero, () => firebase.firestore.FieldValue.serverTimestamp());
+    if(!veces) return false;
     const nombre = ((S.meta && S.meta.nombre) || '').trim();
     for(let i = 0; i < veces; i++){
       const r = FichaMantenimiento.aplicar(S, {
         fijarHp: v => mantFijarHp(S, v),
-        limpiarParry: () => { if(usarBn){ bn.parryPendiente = null; if(bn.invParry) bn.invParry.clear(); } },
+        limpiarParry: () => { if(o.enBn){ bn.parryPendiente = null; if(bn.invParry) bn.invParry.clear(); } },
       });
       FichaMantenimiento.publicarReporte(`Turno ${S.turno}`, r.rep, nombre);
       FichaMantenimiento.publicarRecordatorios(r.avisos, nombre);
     }
-    if(usarBn){ bnUi(antes).cambio(); return; }
-    // Sesión de un rato: se escriben solo las partes que cambió el pase de turno (lo que difiera por haberlo armado distinto, no).
+    return true;
+  });
+}
+/* Cambiar a un personaje desde el mapa y guardarlo (2026-10-02, A2/A3): con la sesión de la Botonera nueva si ya está abierta en ese
+   personaje; si no, con una sesión de un rato (mantSesionTemporal) que se cierra al terminar. cambiar(S, {enBn}) puede ser async y
+   devuelve true si cambió algo (se guarda) o false (no se toca nada). Se escriben solo las partes que cambió (lo que difiera por
+   haberlo armado distinto, no) y el resumen público. → lo que devolvió cambiar, o null si no se pudo leer al personaje. */
+async function editarPersonajeMapa(fichaId, cambiar){
+  await bnCargarPiezas();
+  const enBn = () => !!(bn && bn.fichaId === fichaId && bn.S && bn.sesion && bn.sesion.cargada);
+  const tmp = enBn() ? null : await mantSesionTemporal(fichaId);
+  if(!enBn() && !tmp) return null;
+  try{
+    const usarBn = !tmp && enBn();
+    const S = usarBn ? bn.S : tmp.S;
+    const antes = FichaGuardado.partes(S);
+    const hubo = await cambiar(S, {enBn: usarBn});
+    if(!hubo) return hubo;
+    if(usarBn){ bnUi(antes).cambio(); return hubo; }
     const f = tmp.f;
     const despues = FichaGuardado.partes(S);
     Object.keys(despues).forEach(p => { if(despues[p] === antes[p] && despues[p] !== f.ultimo[p]) f.ultimo[p] = despues[p]; });
@@ -1008,6 +1017,7 @@ async function mantenimientoPersonaje(fichaId, numero){
       await FichaSesion.guardar(f, true, opts);
       if(FichaSesion.pendiente(f, () => FichaGuardado.partes(tmp.S))) await new Promise(r => setTimeout(r, 1500));
     }
+    return hubo;
   }finally{
     if(tmp){ tmp.vivo = false; FichaSesion.cortar(tmp.f); }
   }
@@ -1029,7 +1039,7 @@ async function mantSesionTemporal(fichaId){
     alControl: c => { f.control = c; },
     aplicarParte: (parte, datos) => FichaGuardado.aplicarParte(st.S, parte, datos, {mezclarCatalogo: bnMezclarCatalogo, imgInvocaciones: f.ultimo.imgInvocaciones || ''}),
     alCambiar: () => FichaGuardado.completar(st.S),
-    alErrorPartes: err => console.error('Mantenimiento: no se pudo leer el personaje', err),
+    alErrorPartes: err => console.error('El mapa no pudo leer el personaje', err),
   });
   for(let i = 0; i < 150 && !st.S; i++) await new Promise(r => setTimeout(r, 100));
   if(!st.S){ st.vivo = false; FichaSesion.cortar(f); return null; }

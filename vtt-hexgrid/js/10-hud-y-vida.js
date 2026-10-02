@@ -978,13 +978,80 @@ function abrirFichaDeToken(t){
   window.open(url, '_blank', 'noopener');
 }
 
-function abrirEstadoNuevo(t){
-  if(!puedeAgregarEstado(t)) return;
-  if(t.tipo === 'creep') abrirAcciones(t.fichaId, {tipo: 'abrir-estados', creep: t.fichaId});
-  else{
-    const invId = t.fichaId.includes(SEP_INVOCACION) ? t.fichaId.split(SEP_INVOCACION)[1] : '';
-    abrirBotonera(t.fichaId.split(SEP_INVOCACION)[0], {tipo: 'abrir-estados', inv: invId}, invId);
-  }
+/* "+ Estado" de un token (2026-10-02, hoja de ruta A3): lo hace el mapa con el selector común (comun/selector-estados.js) — los presets
+   con sus preguntas, los "Mis presets" del personaje y "Crear estado nuevo (paso a paso)" — y lo aplica con la regla común
+   (Combatiente.agregarEstado: inmunidades, acumular, renovar). Un personaje o una invocación se guardan con editarPersonajeMapa (js/11);
+   un creep, con modificarCreep. Antes abría la ficha o GM Tools escondidas en el marco. */
+const SE_PIEZAS = ['../comun/estado-preguntas.js?v=20260929a', '../comun/asistente-estado.js?v=20261002a', '../comun/selector-estados.js?v=20261002a'];
+const idEstadoNuevo = () => Math.random().toString(36).slice(2, 9);
+// Los stats que ofrece el asistente de estados y sus nombres, como en GM Tools (un creep) y en la ficha (un personaje o invocación).
+const SE_STATS_CREEP = {def: ['Def', 'Defensa'], dmg: ['Dmg', 'Daño'], pdg: ['PdG', 'Probabilidad de golpe'], eva: ['Eva', 'Evasión'], parry: ['Parry', 'Parry'],
+  nitros: ['No2', 'Nitros'], con: ['Con', 'Constitución'], fue: ['Fue', 'Fuerza'], agl: ['Agi', 'Agilidad'], des: ['Des', 'Destreza'], esp: ['Esp', 'Especial'],
+  resm: ['Res.Mt', 'Resistencia mental'], resmg: ['Res.Esp', 'Resistencia especial'], rescc: ['Res.CC', 'Resistencia a CC'], ini: ['Iniciativa', 'Iniciativa'],
+  crit: ['Crítico frecuente', 'Crítico frecuente (baja el rango del crítico)'], critpot: ['Crítico potente', 'Crítico potente (baja los umbrales del d20)']};
+const seStatsFicha = () => FichaCalculo.MOD_TARGETS.filter(s => !['sp', 'spregen', 'crgmax', 'capcinturon', 'capmochila', 'luz', 'veoculto'].includes(s.id))
+  .map(s => ({id: s.id, label: FichaCalculo.STAT_LABEL[s.id] || s.id, full: FichaCalculo.STAT_FULL[s.id] || ''}));
+async function abrirEstadoNuevo(t){
+  if(!puedeAgregarEstado(t) || !puedoCambiarEstados(t)) return;
+  try{ await bnCargarPiezas(); await cargarPiezas(SE_PIEZAS); if(t.tipo === 'creep') await acCargarPiezas(); }
+  catch(err){ console.error(err); toast('No se pudo abrir el selector de estados'); return; }
+  if(t.tipo === 'creep') return abrirEstadoNuevoCreep(t);
+  const [fichaId, invId] = t.fichaId.split(SEP_INVOCACION);
+  let elegido = null;
+  // Los "Mis presets" del personaje están en su ficha: se leen al abrir (y se guardan ahí si el asistente pide guardar uno nuevo).
+  await editarPersonajeMapa(fichaId, async S => {
+    const inv = invId ? (S.invocaciones || []).find(x => x && x.id === invId) : null;
+    if(invId && !inv){ toast('Esa invocación ya no está'); return false; }
+    elegido = await SelectorEstados.abrir({
+      titulo: 'Estado alterado', para: inv ? inv.nombre : ((S.meta && S.meta.nombre) || nombreDe(t)),
+      presets: estadosPresetFicha(), propios: S.efectosPersonalizados || [],
+      cfgPreguntas: {hp: 'hpturno', statLabel: id => FichaCalculo.STAT_LABEL[id] || id},
+      stats: seStatsFicha(),
+      armarDeAsistente: res => ({nombre: res.nombre, polaridad: res.polaridad, turnos: res.turnos, permanente: res.permanente, stacks: 1, hpturno: res.hp, stacksturno: 0,
+        escudoMagico: res.escudo, mods: res.mods, detalle: res.detalle, popup: false, ...res.flags, ...(res.forzarNitros !== undefined ? {forzarNitros: res.forzarNitros} : {})}),
+    });
+    if(!elegido) return false;
+    const {preset, guardar} = elegido;
+    if(guardar){
+      S.efectosPersonalizados = S.efectosPersonalizados || [];
+      const i = S.efectosPersonalizados.findIndex(p => p.nombre === preset.nombre);
+      if(i >= 0) S.efectosPersonalizados[i] = preset; else S.efectosPersonalizados.push(preset);
+    }
+    const lista = inv ? (inv.estados = inv.estados || []) : (S.efectos = S.efectos || []);
+    const nuevo = inv ? SelectorEstados.estadoInvocacion(preset, idEstadoNuevo()) : SelectorEstados.estadoPersonaje(preset, idEstadoNuevo());
+    const r = Combatiente.agregarEstado(lista, nuevo);
+    const quien = inv ? inv.nombre : ((S.meta && S.meta.nombre) || '');
+    if(!r.ok){ toast(`🛡 ${quien}: inmune ahora mismo (${r.motivo}) — ${nuevo.nombre} no se pudo aplicar`); return guardar; }
+    if(r.que === 'yaLoTiene'){ toast(`${quien}: ${nuevo.nombre} ya lo tiene, no se acumula`); return guardar; }
+    if(inv && InvCalculo.modsAfectanHp(r.estado.mods)) InvCalculo.actualizarHpMaxPorCon(inv);
+    toast(`${quien}: ${SelectorEstados.textoAgregado(r, 'hpturno')}`);
+    return true;
+  });
+}
+async function abrirEstadoNuevoCreep(t){
+  const sc0 = creepPrivadoDe(t.fichaId);
+  const elegido = await SelectorEstados.abrir({
+    titulo: 'Estado alterado', para: (sc0 && sc0.nombre) || nombreDe(t),
+    presets: estadosPresetCreep(), propios: [],   // los "Mis presets" del GM viven solo en la memoria de GM Tools (ver docs/pendientes.md)
+    cfgPreguntas: {hp: 'hpTurno', statLabel: id => (SE_STATS_CREEP[id] && SE_STATS_CREEP[id][0]) || id},
+    stats: Object.entries(SE_STATS_CREEP).map(([id, [label, full]]) => ({id, label, full})),
+    armarDeAsistente: res => ({nombre: res.nombre, polaridad: res.polaridad, turnos: res.turnos, permanente: res.permanente, stacks: 1, hpTurno: res.hp, stacksTurno: 0,
+      escudoMagico: res.escudo, mods: res.mods, detalle: res.detalle, ...res.flags, ...(res.forzarNitros !== undefined ? {forzarNitros: res.forzarNitros} : {})}),
+  });
+  if(!elegido) return;
+  let r = null, nombre = '';
+  try{
+    await modificarCreep(t.fichaId, crudo => {
+      const sc = CreepCalculo.normalizar(crudo);
+      nombre = sc.nombre;
+      r = Combatiente.agregarEstado(sc.estados, SelectorEstados.estadoCreep(elegido.preset, idEstadoNuevo(), CreepAcciones.FLAGS_ESTADO), {jefe: sc.jefe});
+      if(r.ok && CreepCalculo.modsAfectanHp(r.estado.mods)) CreepCalculo.actualizarHpMaxPorCon(sc);
+    });
+  }catch(err){ console.error('No se pudo poner el estado al creep:', err); toast('No se pudo poner el estado — mirá la consola'); return; }
+  if(!r) return;
+  if(!r.ok){ toast(`${nombre}: inmune ahora mismo (${r.motivo}) — ${elegido.preset.nombre} no se pudo aplicar`); return; }
+  if(r.que === 'yaLoTiene'){ toast(`${nombre}: ${elegido.preset.nombre} ya lo tiene, no se acumula`); return; }
+  toast(`${nombre}: ${SelectorEstados.textoAgregado(r, 'hpTurno')}`);
 }
 
 // ⚙ de un estado: abre su editor en la ficha o en gm-tools (se busca por

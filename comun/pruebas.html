@@ -68,6 +68,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-lupa.js"></script>
 <script src="ficha-acciones.js"></script>
 <script src="ficha-mantenimiento.js"></script>
+<script src="selector-estados.js"></script>
 <script src="tiradas-propias.js"></script>
 <script src="efectos-golpe.js"></script>
 <script src="confirmar-turno.js"></script>
@@ -548,6 +549,19 @@ prueba('un pase de turno: SP Regen al principio, el estado daña y baja un turno
   const r = FichaMantenimiento.aplicar(S, {fijarHp: v => FichaAcciones.fijarHp(S, v)});
   igual([S.hp, S.spGastado, S.nitros, S.ataquesTurno, S.turno, S.efectos.map(e => e.nombre + ':' + e.turnos), S.invocaciones[0].activa, r.rep],
     [8, 3, 6, 0, 2, ['Quemadura:1'], false, ['SP: +2 (SP Regen)', 'Quemadura: −2 HP', 'Quemadura: 2 → 1 turno', 'HP total: 10 → 8']]);
+});
+
+/* ---------- "+ Estado" (comun/selector-estados.js, hoja de ruta A3, 2026-10-02) ---------- */
+grupo('"+ Estado" desde cualquier pantalla (A3)');
+prueba('el estado se arma como en cada herramienta y la regla común lo acumula o lo frena', () => {
+  const venenoF = estadosPresetFicha().find(p => p.nombre === 'Veneno'), stunC = estadosPresetCreep().find(p => p.nombre === 'Stun');
+  const pj = SelectorEstados.estadoPersonaje(Object.assign({}, venenoF, {stacks: 2, turnos: 2}), 'e1');
+  const creep = SelectorEstados.estadoCreep(stunC, 'e2', CreepAcciones.FLAGS_ESTADO);
+  const lista = [pj];
+  const r = Combatiente.agregarEstado(lista, SelectorEstados.estadoPersonaje(Object.assign({}, venenoF, {stacks: 3, turnos: 3}), 'e3'));
+  const jefe = Combatiente.agregarEstado([], creep, {jefe: true});
+  igual([pj.id, pj.activo, pj.nombre, creep.hpTurno, creep.activo, creep.esCC, r.que, lista.length, jefe.ok, SelectorEstados.textoAgregado({que: 'nuevo', estado: {nombre: 'Stun'}}, 'hpTurno')],
+    ['e1', true, 'Veneno', 0, true, true, 'acumulado', 1, false, 'Stun activado']);
 });
 
 /* ---------- El dibujo de la Botonera (comun/ficha-botonera.js, paso 4 etapa 3b) ---------- */

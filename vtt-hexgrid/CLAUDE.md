@@ -18,7 +18,8 @@ copiar/pegar, editar un elemento) · `08-mover-trampas-y-zonas` (mover con No2, 
 motor de zonas) · `09-colocar-y-panel` (colocar un token, panel del costado, botón de mapas) · `10-hud-y-vida` (HUD, vida y daño,
 rayo en cadena, creeps privados) · `11-botonera-nueva` (la Botonera de la ficha en el marco y la Botonera nueva ⚗) ·
 `12-acciones-nuevas` (Acciones nuevas de un creep ⚗) · `13-tokens-portal-duelo` (botón 🎭, portal, zonas de habilidad, duelo,
-hechizos de área, dodge, muerte) · `14-herramientas-y-arranque` (caja de herramientas, bitácora, Mesa y el arranque).
+hechizos de área, dodge, muerte) · `14-herramientas-y-arranque` (caja de herramientas, bitácora, Mesa y el arranque) ·
+`15-ficha-lite` (la ficha lite, 2026-10-02: va después del arranque porque solo define funciones y escuchas).
 **Es el mismo programa de antes, en el mismo orden**: comparten las variables globales. Cuidados (los mismos que la ficha): una
 línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar lo de su archivo o de los anteriores — el arranque
 (`iniciar()`) está al final de `14-…`; cada archivo lleva su `?v=` en `mapa.html` y se sube solo el del que cambia. Para buscar algo,
@@ -1178,3 +1179,18 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `comun/inv-habilidades.js` y `bnInvHabUi`). Solo el Ver sigue yendo a la ficha (tanda 6).
   Desde la tanda 6, **la 🔍 y el Ver** de la invocación también (`comun/inv-lupa.js`: `lupaContenido` reconoce `inv:…`; el Ver en
   `#bn-verinv`). Con ⚗, la Botonera nueva de una invocación ya no le pide nada a la ficha.
+
+- **📜 Ficha lite** (2026-10-02, pedido del dueño; reemplaza a la "ficha liviana" que abría la ficha en el panel izquierdo, encima
+  de la Botonera): el 📜 de un token o la **F** abren una ventanita **centrada, sin oscurecer el mapa**, con lo que hace falta a mano
+  en un combate: arriba, en una franja, **qué hay en cada mano**, la **Defensa** y las **cinco resistencias a crítico** (T4…T12) —
+  al pasar el mouse por cada número, **de dónde sale** (qué ítem, estado o pasiva; una pieza rota va tachada) —; abajo, el resto del
+  equipo puesto, los estados alterados (con su detalle al pasar el mouse) y, en un personaje, DDE y Despojos. Se cierra con F, Esc,
+  ✕ o un clic afuera. Quién la ve: **un personaje o una invocación**, su dueño, o el GM con 🎮 el control (el GM sin el control sigue
+  abriendo la ficha completa en otra pestaña); **un creep**, el GM. Botones: personaje → 📊 Stats (mensaje nuevo `abrir-stats` a la
+  ficha del marco), 🎒 Abrir la mochila (`abrir-equipo`), 🏪 Tienda (solo con la tienda abierta), 🎁 Botín (solo con el botín
+  publicado) y 📜 Ver mi ficha completa (otra pestaña); invocación → ⚡ Botonera y la ficha completa del dueño; creep → ⚡ Acciones,
+  🔍 Ver todo (la ventana «Ver» de GM Tools) y ⚔ Editar en GM Tools (otra pestaña). El dibujo es común (`comun/ficha-lite.js`); acá
+  (`js/15-ficha-lite.js`: `abrirFichaLite`, `cerrarFichaLite`, `flDibujar`, `flBoton`) el personaje se lee en vivo con
+  `FichaSesion` (solo mirar, nunca guarda) y el creep de `creepsPriv` (se redibuja con cada cambio, `flCreepCambio`). Recuadro
+  aislado (shadow DOM), z-index 88 (debajo de la Botonera nueva y del marco). `abrirFichaDeToken` (js/10) y la F (js/06) la usan;
+  el mensaje `abrir-ficha-mapa` y la ficha liviana vieja de la ficha (`fichaMapaAbrir`, `#scrim-ficha-mapa`) quedaron sin uso.

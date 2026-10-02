@@ -998,3 +998,9 @@ versión parecida en más de una, es candidato a juntar.
 - **Zonas y trampas de las invocaciones** (2026-10-02, paso 4 etapa 4f, P134): `InvHabilidades.zona(inv, h, ui)` y la trampa al
   ejecutar (`ui.colocarTrampa`, que usa `FichaAcciones.colocarTrampaDeHab` con la referencia `fichaId~invId`); `ui` suma `enMapa()`,
   `ref(inv)`, `colocarZona(msg)` y `colocarTrampa(inv, h)`. `Combatiente.ejecucionNoDisponible` ya no frena la zona de una invocación.
+- **`ficha-lite.js`** (`FichaLite`, 2026-10-02, pedido del dueño) — **la ficha lite**: lo esencial de un combate en una ventanita.
+  `personaje(S)`, `creep(sc)` e `invocacion(inv, duenoNombre)` arman el mismo modelo `{titulo, subtitulo, manos[2], defensa, crit[5],
+  equipo[], estados[], extras[]}`; cada número trae sus `lineas` de origen (`{txt, val, nota?, tachado?}`) y la cuenta siempre cierra
+  (si no, una línea "Otros ajustes"). `html(modelo, botones)` lo dibuja con `CSS` (va en un recuadro aislado; los globos de origen son
+  CSS puro al pasar el mouse). Solo arma HTML. Lo usa el mapa (`vtt-hexgrid/js/15-ficha-lite.js`). Necesita las piezas `ficha-*.js`
+  (personaje), `creep-calculo.js` o `inv-calculo.js`.

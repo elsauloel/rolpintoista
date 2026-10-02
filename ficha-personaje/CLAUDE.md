@@ -634,3 +634,6 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   (`invHabUi.colocarZona` → 'zona-persistente-habilidad' al mapa), y el editor de sus habilidades suma el paso 8 "🪤 Trampa" (`hiTrampa`,
   `hiTrampaRender`, `hiAbrirAsistenteTrampa`: el mismo asistente y la misma forma de trampa que el personaje). Al ejecutar, la trampa se
   coloca como la del personaje (`invHabUi.colocarTrampa` → `FichaAcciones.colocarTrampaDeHab`).
+- **Ficha lite (2026-10-02)**: el 📜 del token y la F ya no abren la ficha liviana de acá (`fichaMapaAbrir`, `#scrim-ficha-mapa`,
+  mensaje `abrir-ficha-mapa`, sin uso: candidatos a sacar); la dibuja el mapa (`comun/ficha-lite.js`). Su botón 📊 Stats manda el
+  mensaje nuevo `abrir-stats` (`js/14`: abre `#scrim-stats-mapa`).

@@ -184,6 +184,9 @@ Cada paso: qué es, qué se gana, qué se arriesga, cómo se prueba. Se pueden e
 - **Riesgo**: bajo por pieza, pero es mucho trabajo; se puede hacer de a una cuando se toque cada parte.
 
 ### Paso 6 (opcional) — Una sola pantalla
+- **Descartado por el dueño (2026-10-02)**: "mejor es no hacerlo". En su lugar, un punto intermedio: la **ficha lite** (hecha el
+  mismo día) — el 📜 de un token o la F abren encima del mapa lo esencial del combate (manos, Defensa y resistencias a crítico con
+  su origen, equipo, estados), para personajes, invocaciones y creeps. Ver `vtt-hexgrid/CLAUDE.md` y `comun/ficha-lite.js`.
 - **Qué**: la ficha y GM Tools como paneles que se abren al lado del mapa (con la opción de abrirlas aparte), como pide "A
   desarrollar" n.º 51.
 - **Se gana**: la experiencia de "todo en un lugar".

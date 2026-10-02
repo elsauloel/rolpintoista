@@ -337,8 +337,12 @@ function huboAlguienEnSigilo(){
 // dibujaban TODAS las zonas de los rivales de una, apenas alguien entraba en sigilo — ahora
 // hace falta tocar un token (o el 👁 de "ver todas") para verlas, como con 👓 Ver conos normal.
 let sigiloPropioPrevio = false;
+// Los primeros segundos después de cargar no cuentan como "alguien entró en sigilo" (2026-10-02: con F5, el GM con un creep en sigilo veía
+// los lentes prenderse solos): ahí solo se toma nota de cómo está.
+const autoLentesDesde = Date.now() + 8000;
 function revisarAutoLentes(){
   const ahora = huboAlguienEnSigilo();
+  if(Date.now() < autoLentesDesde){ sigiloPropioPrevio = ahora; return; }
   if(ahora && !sigiloPropioPrevio && !verZonas){
     verZonas = true;
     try{ localStorage.setItem('mapa-ver-zonas', '1'); }catch(e){}

@@ -271,10 +271,8 @@ $('#btn-reroll').onclick = () => {
 
 let verZonas = false;          // modo lentes prendido
 let lentesTodos = false;       // 👁 Ver todas las zonas (si no, hace falta seleccionar un token)
-try{
-  verZonas = localStorage.getItem('mapa-ver-zonas') === '1';
-  lentesTodos = localStorage.getItem('mapa-lentes-todos') === '1';
-}catch(e){}
+// El modo lentes arranca apagado al cargar (2026-10-02, pedido del dueño: con F5 aparecía prendido); se sigue recordando "Ver todas".
+try{ lentesTodos = localStorage.getItem('mapa-lentes-todos') === '1'; }catch(e){}
 // Con un token seleccionado se ven solo sus zonas (cualquiera, para poder revisar la de un
 // aliado o un NPC si hace falta). Sin selección, nada, salvo que se pida expresamente "Ver
 // todas las zonas" (2026-09-22) — y ahí sí, solo las de riesgo, nunca las de tus propios
@@ -299,6 +297,44 @@ function renderBotonZonas(){
   const bt = $('#btn-zonas-todas');
   bt.hidden = !(verZonas && $('#lentes-menu').hidden);
   bt.classList.toggle('activo', lentesTodos);
+  renderLentesControl();
+}
+// 🎮 Tomar / devolver el control desde el mapa (2026-10-02, pedido del dueño; antes solo desde la ficha): en el menú de los lentes, para
+// el GM con el token de un personaje seleccionado. Hace lo mismo que la ficha (fichaTomarControl / fichaDevolverControl): la parte
+// `control` de la ficha y `resumen.control`, y el aviso en la Mesa. La ficha de ese personaje (y su dueño) se entera sola.
+function renderLentesControl(){
+  const caja = $('#lentes-control');
+  if(!caja) return;
+  const t = seleccion ? tokens.get(seleccion) : null;
+  const fichaId = t && t.tipo === 'pj' && t.fichaId ? String(t.fichaId).split(SEP_INVOCACION)[0] : '';
+  const f = fichaId ? fichasPub.get(fichaId) : null;
+  if(!soyGM || !f){ caja.hidden = true; caja.innerHTML = ''; return; }
+  const nombre = f.nombre || (f.resumen && f.resumen.nombre) || 'el personaje';
+  const lo = controloFicha(fichaId);
+  caja.hidden = false;
+  caja.innerHTML = lo
+    ? `<button type="button" class="btn chico" id="lentes-control-btn" style="width:100%">↩ Devolver el control de ${esc(nombre)}</button>`
+    : `<button type="button" class="btn chico" id="lentes-control-btn" style="width:100%" title="Lo usás como si fueras su jugador (Botonera, duelos, habilidades, token, Mantenimiento). Su jugador queda en solo lectura hasta que se lo devuelvas.">🎮 Tomar el control de ${esc(nombre)}</button>`;
+  $('#lentes-control-btn').onclick = () => mapaCambiarControl(fichaId, nombre, !lo);
+}
+async function mapaCambiarControl(fichaId, nombre, tomar){
+  if(!soyGM || !fbDb) return;
+  if(tomar && !confirm(`¿Tomar el control de ${nombre}?
+
+Lo vas a usar como si fueras su jugador (Botonera, duelos, habilidades, token, Mantenimiento). Su jugador queda en solo lectura hasta que se lo devuelvas, y la Mesa avisa.`)) return;
+  const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
+  const control = {uid: fbUsuario.uid, nombre: fbMiembro.nombre || 'GM', desde: Date.now()};
+  try{
+    await base.collection('partes').doc('control').set({json: tomar ? JSON.stringify(control) : 'null', actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+    await base.update({'resumen.control': tomar ? fbUsuario.uid : firebase.firestore.FieldValue.delete()});
+  }catch(err){ console.error('No se pudo cambiar el control:', err); toast('No se pudo cambiar el control — revisá la consola'); return; }
+  try{
+    await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: nombre,
+      origen: (tomar ? `🎮 El GM (${control.nombre}) tomó el control de ${nombre}` : `↩ El GM devolvió el control de ${nombre} a su jugador`).slice(0, 80),
+      formula: '', rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
+  }catch(err){ console.error('No se pudo avisar en la Mesa:', err); }
+  toast(tomar ? `🎮 Tenés el control de ${nombre}: lo usás como si fueras su jugador` : `↩ Le devolviste el control de ${nombre} a su jugador`);
+  setTimeout(renderLentesControl, 800);   // cuando llega el resumen nuevo
 }
 // Cartel fijo: con el modo prendido, nada seleccionado y "Ver todas" apagado, recuerda cómo ver algo.
 function actualizarAvisoLentes(){

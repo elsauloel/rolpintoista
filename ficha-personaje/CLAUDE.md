@@ -622,3 +622,5 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   (`js/04`) usan `comun/inv-botonera.js`. En modo Botonera, `js/14` atiende `botonera-delegar` con `inv`: abre la Botonera de esa
   invocación y toca el mismo botón (la dibuja el mapa con ⚗). **`comun/ficha-sesion.js`**: la primera carga del personaje ahora
   espera al servidor (antes podía armarse con partes sueltas de la memoria local y correr +2 los Tipos).
+- **Los botones de una invocación, compartidos (paso 4, etapa 4e, tanda 3, 2026-10-01)**: `tirarValorStatInv`, `invTirarStat`,
+  `invAtacar(Suelto)` e `invDanio` (`js/04`) usan `comun/inv-acciones.js` (`publicarTiradaInv` publica lo que devuelve).

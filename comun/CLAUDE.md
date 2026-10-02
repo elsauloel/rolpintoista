@@ -977,3 +977,7 @@ versión parecida en más de una, es candidato a juntar.
 - **`ficha-sesion.js`: la primera carga espera al servidor** (2026-10-01): `escuchar` ya no arma el personaje con un aviso que venga
   de la memoria local de Firestore (`snap.metadata.fromCache`; el listener va con `includeMetadataChanges`), porque podía traer solo
   algunas partes y, sin "otros", la migración de la escala de Tipos corría +2 las armas que sí llegaban.
+- **`inv-acciones.js`** (`InvAcciones`, 2026-10-01, paso 4 etapa 4e, tanda 3) — **los botones de la Botonera de una invocación**:
+  `tirada(inv, nombre, valor, statId)`, `tirarStat(inv, statId, {parryPendiente, trasParry})` (el Parry cobra 1 No2 y deja el
+  Bloqueo pendiente; el Bloqueo lo cierra), `dano(inv, mods)`, `ataqueDuelo(inv)`, `pagarAtaque(inv)` y `tiradaAtaque(inv)`. Devuelven
+  `{origen, r}` / `{error}` / `{aviso}`: cada pantalla publica y guarda a su manera. Lo usan la ficha (`js/04`) y el mapa (`bnInvAca`).

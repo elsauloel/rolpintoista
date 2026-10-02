@@ -25,7 +25,7 @@ El mapa guarda con `modificarCreep` (transacción + resumen + firma); GM Tools, 
 2. Dibujar su Botonera → `comun/inv-botonera.js` (`renderBotoneraInv` con la invocación como parámetro); con ⚗, el mapa la dibuja
    en la Botonera nueva del dueño (lee `S.invocaciones` con `FichaSesion`) y cada botón se lo pide a la ficha del marco ✅ (2026-10-01).
 3. Los botones (tiradas de stats, Esquivar, Parry, Bloqueo, Daño, Atacar) → `comun/inv-acciones.js`; el mapa guarda la parte
-   `invocaciones` del personaje con `FichaSesion`.
+   `invocaciones` del personaje con `FichaSesion` ✅ (2026-10-01).
 4. Lo que el duelo le pide a una invocación (`dueloInvDe`, `js/11`) → `comun/inv-duelo.js`, en `hooksLocal` del mapa. Con los
    datos de la invocación a mano, el daño que recibe en el duelo puede dejar de ser a mano (hoy `dueloAplicarDano` lo marca
    "es una invocación").
@@ -233,3 +233,15 @@ puede empezar.
   vivo (Paso 3a); en la ficha podía pasar al cambiar de personaje en la misma pestaña. Ahora la primera carga espera la respuesta
   del servidor (`snap.metadata.fromCache`, con `includeMetadataChanges`). Probado en vivo con la misma secuencia (d8) y la ficha
   abre igual. `pruebas.html`: 186 (1 nueva, con un Firestore simulado).
+- 2026-10-01: **4e, tanda 3 hecha** (8de3bfa) — `comun/inv-acciones.js` (`InvAcciones`): `tirada`, `tirarStat(inv, statId,
+  {parryPendiente, trasParry})` → `{error}` o `{tirada, parry: 'poner'|'sacar'|'', aviso, cambio}`, `dano(inv, mods)`,
+  `ataqueDuelo`, `pagarAtaque` y `tiradaAtaque`, copiados de `tirarValorStatInv`, `invTirarStat`, `invAtacar(Suelto)` e `invDanio`
+  (`js/04`, que quedan como atajos que publican y dibujan). En el mapa (`bnInvAca`, `bnInvAtacar`, `bnPublicarInv`): con ⚗ y si
+  puede guardar al personaje (dueño o GM con 🎮), las tiradas de stats, Esquivar, Parry, Bloqueo, Daño (con los efectos al golpear)
+  y Atacar (objetivo con `dueloElegirObjetivoMapa` a nombre de `fichaId~invId`, o suelto) los hace el mapa; lo que cambia se guarda
+  en la parte `invocaciones` (`bnUi`); el Parry pendiente vive en `bn.invParry`. Comparado contra el código viejo en 600
+  invocaciones con 6 clics al azar (con y sin duelo, solo lectura): 600 iguales; 7 mutaciones detectadas. `pruebas.html`: 187 (1
+  nueva). **En vivo** (GM con 🎮 el control de Silvia, ⚗, un Lobo de prueba): Fue, Bloqueo sin Parry (se negó), Parry (−1 No2,
+  guardado), Bloqueo (habilitado con los Colmillos), Daño, y Atacar sin objetivo — con 3 No2 avisó que no alcanzaba; con 6, cobró 4,
+  sumó el ataque y tiró el PdG. **Ningún pedido a la ficha.** Restaurado: invocaciones vacías, control devuelto y el resumen de
+  Silvia idéntico al de antes. Lo que sigue: tanda 4, lo que el duelo le pide a una invocación.

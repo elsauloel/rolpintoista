@@ -1148,3 +1148,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (`abrirBotonera(fichaId, undefined, invId)`) abren la Botonera nueva del dueño en modo invocación (`abrirBotoneraNueva(fichaId,
   invId)`, `bn.invId`): la dibuja `bnDibujarInv` con `comun/inv-botonera.js` a partir de `bn.S.invocaciones` (una copia migrada con
   `InvCalculo.migrar`). Por ahora cada botón se lo pide a la ficha del marco (`bnDelegar` manda `inv`). Sin 🔍 todavía.
+  Desde la tanda 3, **los botones de la invocación los hace el mapa** si puede guardar al personaje (`bnInvAca`, con
+  `comun/inv-acciones.js`): tiradas de stats, Esquivar, Parry, Bloqueo, Daño y Atacar (`bnInvAtacar`); publica a nombre de la
+  invocación (`bnPublicarInv`) y guarda la parte `invocaciones` (`bnUi`). El Parry pendiente, en `bn.invParry`. Ver, Ejecutar y la
+  🎲 segunda tirada siguen yendo a la ficha.

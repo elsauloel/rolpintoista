@@ -431,9 +431,11 @@ function acCrear(){
       raiz.querySelector('#ac-ver').classList.remove('open');
       const v = acViendo;
       acViendo = null;
-      // ✎ Editar: el editor común, acá (A6c). Subir y Reemplazar todavía los hace GM Tools en el marco (abre el Ver y toca el botón).
-      if(v && b.dataset.acVer === 'verhab-editar'){ const [cid, hid] = v.split(':'); acEditarHab(cid, hid); }
-      else if(v && b.dataset.acVer !== 'no') acDelegar({verhabaccion: v}, b.dataset.acVer);
+      // ✎ Editar, ⬆ Subir y ↻ Reemplazar: con comun/creep-editor.js, acá (A6c; antes se los pedía a GM Tools escondido).
+      const [cid, hid] = (v || '').split(':');
+      if(v && b.dataset.acVer === 'verhab-editar') acEditarHab(cid, hid);
+      else if(v && b.dataset.acVer === 'verhab-subir') acSubirHab(cid, hid);
+      else if(v && b.dataset.acVer === 'verhab-reemplazar') acReemplazarHab(cid, hid);
       return;
     }
     if(b.dataset.acVc){
@@ -479,13 +481,38 @@ function cerrarAccionesNuevas(){
    El ✎ Editar del Ver de una habilidad se lo pedía a GM Tools escondido. Ahora es el editor común (comun/creep-editor.js: el mismo paso
    a paso, con la trampa y la Ejecución ✨), adentro del recuadro de las Acciones nuevas; guarda con modificarCreep (acCambiarCreep). Los
    estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
-const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261002a', '../comun/asistente-duelo-hab.js?v=20261002i'];
+const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261002b', '../comun/asistente-duelo-hab.js?v=20261002i'];
+// Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
+const ACE_BASE = ['../comun/creeps-base.js?v=20260927a', '../comun/skills-creep-base.js?v=20260927a'];
+async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }
+// ⬆ Subir una habilidad del creep a la biblioteca compartida (corrección o algo nuevo); su `bibOrigen` nuevo se guarda en el creep.
+async function acSubirHab(creepId, habId){
+  try{ await acCargarEditor(); await cargarPiezas(ACE_BASE); }catch(err){ console.error(err); toast('No se pudo abrir la biblioteca'); return; }
+  const sc = acCreepDe(creepId), hab = sc && sc.habilidades.find(x => x.id === habId);
+  if(!hab) return;
+  CreepEditor.subirHab(sc, hab, {alSubir: (r, origen) => acCambiarCreep(creepId, s2 => { const h2 = s2.habilidades.find(x => x.id === habId); if(h2) h2.bibOrigen = origen; return {}; })});
+}
+// ↻ Reemplazar una habilidad del creep por otra de la biblioteca (en el mismo lugar de la lista).
+async function acReemplazarHab(creepId, habId){
+  try{ await acCargarEditor(); await cargarPiezas(ACE_BASE); }catch(err){ console.error(err); toast('No se pudo abrir la biblioteca'); return; }
+  const sc = acCreepDe(creepId);
+  if(!sc) return;
+  CreepEditor.elegirDeBiblioteca(sc, {reemplazarId: habId,
+    alCrearDeCero: viejaId => acEditarHab(creepId, viejaId),
+    alElegir: async (h, viejaId) => {
+      let msg = '';
+      const r = await acCambiarCreep(creepId, s2 => { msg = CreepEditor.ponerHab(s2, h, viejaId); return {}; });
+      if(r) toast(msg);
+    }});
+}
+// Una copia del creep, normalizada (la parte privada que escucha el mapa).
+function acCreepDe(id){ const crudo = creepPrivadoDe(id); if(!crudo) return null; const sc = CreepCalculo.normalizar(structuredClone(crudo)); sc.id = id; return sc; }
 async function acEditarHab(creepId, habId){
-  try{ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }
+  try{ await acCargarEditor(); }
   catch(err){ console.error(err); toast('No se pudo abrir el editor'); return; }
   if(!ac.editor){
     ac.editor = CreepEditor.crear(ac.raiz, {
-      creep: id => { const crudo = creepPrivadoDe(id); if(!crudo) return null; const sc = CreepCalculo.normalizar(structuredClone(crudo)); sc.id = id; return sc; },
+      creep: id => acCreepDe(id),
       guardarHab: (id, aplicar) => acCambiarCreep(id, sc => { aplicar(sc); return {}; }),
       personalizados: () => [],
       elegirEstadoDuelo: async () => {

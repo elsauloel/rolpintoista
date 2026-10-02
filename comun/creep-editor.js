@@ -488,5 +488,79 @@ const CreepEditor = (() => {
     return {abrir, cerrar, scrim, get estado(){ return e; }};
   }
 
-  return {MODOS_HAB_CREEP, PASOS_HAB_CREEP, HC_STATS_SECUNDARIOS, statLabel, opcionesStat, opcionesEstadosHtml, crear};
+  /* ---------- ⬆ Subir y ↻ Reemplazar una habilidad de creep (tanda c2, 2026-10-02) ----------
+     Copiado de gm-toolset/js/05 (LEGADO_HABS, paraDeDatos, PARA_TXT, habDeBiblioteca, avisoJugador, metaHab, HABS_CREEP_GRUPOS,
+     proponerHabilidadABiblioteca, abrirCatalogoHabilidades). Habilidades de jugador y de creep son un solo tipo en la biblioteca
+     (`biblioteca_skills`, P122), con la marca `para` bien a la vista porque pagan distinto: 🐾 creep = cooldown, 🧙 jugador = SP (P125).
+     Lo que se subió antes como habilidad de creep (`biblioteca_habs_creep`, `{habilidad}`) se sigue mostrando: LEGADO_HABS lo lee de ahí.
+     Necesitan biblioteca.js y, para las recetas de fábrica, creeps-base.js + skills-creep-base.js (armarHabilidadDeCreep). */
+  const LEGADO_HABS = {tipo: 'habs_creep', convertir: d => d && d.habilidad ? {...d.habilidad, para: 'creep'} : d};
+  const paraDeDatos = d => d && d.sp ? 'creep' : (d && d.para) || 'creep';   // las recetas de fábrica (sp) son de creep
+  const PARA_TXT = {creep: '🐾 Creep · cooldown', jugador: '🧙 Jugador · SP'};
+  // Una habilidad de la biblioteca lista para un creep: las recetas de fábrica se calculan con su nivel; lo subido va tal cual. `meta` =
+  // de dónde salió ({tipo, id, version}), para el aviso de versión nueva. Una de jugador conserva la marca.
+  function habDeBiblioteca(sc, datos, meta){
+    const para = paraDeDatos(datos);
+    const h = datos.sp ? armarHabilidadDeCreep(datos, sc.nivel) : structuredClone(datos.habilidad || datos);
+    delete h.para; delete h.clase;
+    return {...h, id: uid(), cdActual: h.cdArranca ? num(h.cd) : 0, ...(para === 'jugador' ? {para: 'jugador'} : {}), ...(meta ? {bibOrigen: meta} : {})};
+  }
+  const avisoJugador = h => h.para === 'jugador' ? ' — 🧙 es de jugador (paga con SP): revisale el costo' : '';
+  const metaHab = ent => ent ? {tipo: 'skills', id: ent.id, version: ent.version || 1} : null;
+  // Etiquetas de las habilidades de creeps, agrupadas por criterio: sirven de filtro en la biblioteca y de opciones al guardar.
+  const HABS_CREEP_GRUPOS = [
+    {nombre: 'Función', tags: ['daño', 'defensa', 'buff', 'debuff', 'curación', 'control', 'movilidad', 'invocación', 'área']},
+    {nombre: 'Mecánica del juego', tags: ['sigilo', 'trampas', 'terreno y formas', 'niebla y visión', 'iniciativa', 'aura', 'estados alterados', 'orientación', 'percepción', 'movimiento', 'botín', 'jefe']},
+    {nombre: 'A quién apunta', tags: ['a sí mismo', 'un enemigo', 'zona o área', 'aliados', 'terreno']},
+    {nombre: 'Velocidad', tags: ['rápida', 'lenta']},
+    {nombre: 'Rol', tags: ['melee', 'tanque', 'asalto', 'rango', 'mágico', 'apoyo', 'debuffer']},
+    {nombre: 'Raza', tags: ['cualquiera', 'humano', 'humanoide', 'bestia', 'planta', 'elemental', 'no-muerto', 'constructo', 'alienígena']},
+    {nombre: 'Automatización', tags: ['toda automatizada', 'con parte a mano']},
+  ];
+  // ⬆ Sube a la biblioteca una habilidad ya calculada (queda con valores fijos), marcada 🐾 de creep (o 🧙 si ya era de jugador). Si salió
+  // de otra (`bibOrigen`), pregunta si es una corrección o algo nuevo (comun/biblioteca.js). alSubir(r, origen): lo que guarda cada
+  // pantalla (la habilidad ya quedó con su `bibOrigen` nuevo en `hab`; el mapa lo escribe en el creep con `origen`).
+  function subirHab(sc, hab, {alSubir} = {}){
+    const h = structuredClone(hab);
+    delete h.id;
+    h.cdActual = h.cdArranca ? num(h.cd) : 0;
+    const o = hab.bibOrigen;
+    Biblioteca.guardar({tipo: 'skills', datos: {...h, para: h.para === 'jugador' ? 'jugador' : 'creep'}, nombre: h.nombre, nivel: sc.nivel,
+      grupos: HABS_CREEP_GRUPOS, base: typeof HABILIDADES_CREEP_BASE !== 'undefined' ? HABILIDADES_CREEP_BASE : [], legado: LEGADO_HABS,
+      basadoEn: o && o.id ? {id: o.id, nombre: h.nombre} : null,
+      alSubir: r => { const origen = {tipo: 'skills', id: r.id, version: r.version}; hab.bibOrigen = origen; if(alSubir) alSubir(r, origen); }});
+  }
+  // Pone una habilidad (de la biblioteca) en el creep: en el lugar de `viejaId` si viene (↻ Reemplazar), si no al final. → el aviso.
+  function ponerHab(sc, h, viejaId){
+    const vieja = viejaId ? sc.habilidades.find(x => x.id === viejaId) : null;
+    const i = vieja ? sc.habilidades.indexOf(vieja) : -1;
+    if(i >= 0){
+      sc.habilidades[i] = h;   // en el mismo lugar de la lista
+      return `${vieja.nombre || 'La habilidad'} reemplazada por ${h.nombre}${avisoJugador(h)}`;
+    }
+    sc.habilidades.push(h);
+    return `${h.nombre} agregada a ${sc.nombre || 'el creep'} (nivel ${sc.nivel || 1})${avisoJugador(h)}`;
+  }
+  /* El catálogo de habilidades para un creep (comun/skills-creep-base.js + lo subido): se elige una, se calcula con su nivel y se agrega
+     o, con reemplazarId (↻ Reemplazar del Ver), pisa esa habilidad. op = {reemplazarId, alElegir(h, viejaId), alCrearDeCero(viejaId),
+     alVer(datos, ent)?}. */
+  function elegirDeBiblioteca(sc, op = {}){
+    const vieja = op.reemplazarId ? sc.habilidades.find(x => x.id === op.reemplazarId) : null;
+    Biblioteca.abrir({
+      tipo: 'skills', legado: LEGADO_HABS,
+      titulo: vieja ? `Reemplazar «${vieja.nombre || 'habilidad'}» de ${sc.nombre || 'el creep'}` : `Habilidad para ${sc.nombre || 'el creep'}`,
+      textoCrearDeCero: vieja ? '✎ Mejor editar la actual (paso a paso)' : '+ Crear de cero (paso a paso)',
+      alCrearDeCero: () => op.alCrearDeCero && op.alCrearDeCero(vieja ? vieja.id : null),
+      base: typeof HABILIDADES_CREEP_BASE !== 'undefined' ? HABILIDADES_CREEP_BASE : [],
+      // Siempre a la vista para quién es (P122): 🐾 de creep (cooldown) o 🧙 de jugador (SP).
+      subtitulo: x => paraDeDatos(x.datos) === 'jugador' ? ` · ${PARA_TXT.jugador}`
+        : ` · ${PARA_TXT.creep} · ` + (x.datos.sp ? `${x.etiquetas.includes('lenta') ? 'lenta' : 'rápida'} · escala con el nivel del creep` : `${x.datos.cdArranca ? 'lenta' : 'rápida'} · valores fijos`),
+      ...(op.alVer ? {alVer: op.alVer} : {}),
+      alElegir: (datos, meta) => op.alElegir && op.alElegir(habDeBiblioteca(sc, datos, meta), vieja ? vieja.id : null),
+      grupos: HABS_CREEP_GRUPOS,
+    });
+  }
+
+  return {MODOS_HAB_CREEP, PASOS_HAB_CREEP, HC_STATS_SECUNDARIOS, statLabel, opcionesStat, opcionesEstadosHtml, crear,
+    LEGADO_HABS, paraDeDatos, PARA_TXT, habDeBiblioteca, avisoJugador, metaHab, HABS_CREEP_GRUPOS, subirHab, ponerHab, elegirDeBiblioteca};
 })();

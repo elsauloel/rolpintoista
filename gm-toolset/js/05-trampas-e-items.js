@@ -7,20 +7,15 @@ let verHab = null;   // {scId, ent, hab, editada}
 /* Habilidades de jugador y de creep son un solo tipo en la biblioteca (`biblioteca_skills`, P122), con la marca `para`
    bien a la vista porque pagan distinto: 🐾 creep = cooldown, 🧙 jugador = SP (ver P125). Lo que se subió antes como
    habilidad de creep (`biblioteca_habs_creep`, `{habilidad}`) se sigue mostrando: LEGADO_HABS lo lee de ahí. */
-const LEGADO_HABS = {tipo: 'habs_creep', convertir: d => d && d.habilidad ? {...d.habilidad, para: 'creep'} : d};
-const paraDeDatos = d => d && d.sp ? 'creep' : (d && d.para) || 'creep';   // las recetas de fábrica (sp) son de creep
-const PARA_TXT = {creep: '🐾 Creep · cooldown', jugador: '🧙 Jugador · SP'};
+// Las habilidades de la biblioteca para un creep (marca 🐾/🧙, recetas de fábrica que escalan con el nivel, Subir y Reemplazar) viven en
+// comun/creep-editor.js (A6c, 2026-10-02): acá quedan los nombres de siempre.
+const LEGADO_HABS = CreepEditor.LEGADO_HABS;
+const paraDeDatos = d => CreepEditor.paraDeDatos(d);
+const PARA_TXT = CreepEditor.PARA_TXT;
 function paraHabHtml(h){ return CreepLupa.paraHtml(h); }   // comun/creep-lupa.js
-// Una habilidad de la biblioteca lista para un creep: las recetas de fábrica se calculan con su nivel; lo subido va tal
-// cual. `meta` = de dónde salió ({tipo, id, version}), para el aviso de versión nueva. Una de jugador conserva la marca.
-function habDeBiblioteca(sc, datos, meta){
-  const para = paraDeDatos(datos);
-  const h = datos.sp ? armarHabilidadDeCreep(datos, sc.nivel) : structuredClone(datos.habilidad || datos);
-  delete h.para; delete h.clase;
-  return {...h, id: uid(), cdActual: h.cdArranca ? num(h.cd) : 0, ...(para === 'jugador' ? {para: 'jugador'} : {}), ...(meta ? {bibOrigen: meta} : {})};
-}
-const avisoJugador = h => h.para === 'jugador' ? ' — 🧙 es de jugador (paga con SP): revisale el costo' : '';
-const metaHab = ent => ent ? {tipo: 'skills', id: ent.id, version: ent.version || 1} : null;
+function habDeBiblioteca(sc, datos, meta){ return CreepEditor.habDeBiblioteca(sc, datos, meta); }
+const avisoJugador = h => CreepEditor.avisoJugador(h);
+const metaHab = ent => CreepEditor.metaHab(ent);
 function verHabBiblioteca(scId, datos, ent){
   const sc = S.creeps.find(s => s.id === scId);
   if(!sc) return;
@@ -88,16 +83,7 @@ $('#verhabbib-biblioteca').onclick = () => {
 };
 // ⬆ Sube a la biblioteca una habilidad ya calculada (queda con valores fijos), marcada 🐾 de creep (o 🧙 si ya era de
 // jugador). Si salió de otra (`bibOrigen`), pregunta si es una corrección o algo nuevo (comun/biblioteca.js).
-function proponerHabilidadABiblioteca(sc, hab){
-  const h = structuredClone(hab);
-  delete h.id;
-  h.cdActual = h.cdArranca ? num(h.cd) : 0;
-  const o = hab.bibOrigen;
-  Biblioteca.guardar({tipo: 'skills', datos: {...h, para: h.para === 'jugador' ? 'jugador' : 'creep'}, nombre: h.nombre, nivel: sc.nivel,
-    grupos: HABS_CREEP_GRUPOS, base: typeof HABILIDADES_CREEP_BASE !== 'undefined' ? HABILIDADES_CREEP_BASE : [], legado: LEGADO_HABS,
-    basadoEn: o && o.id ? {id: o.id, nombre: h.nombre} : null,
-    alSubir: r => { hab.bibOrigen = {tipo: 'skills', id: r.id, version: r.version}; renderAll(); }});
-}
+function proponerHabilidadABiblioteca(sc, hab){ CreepEditor.subirHab(sc, hab, {alSubir: () => renderAll()}); }   // comun/creep-editor.js
 // Ver una habilidad que ya está en un creep (las filas de la copia de un creep de la biblioteca): sin Agregar, porque ya es suya.
 function verHabDeCreep(scId, habId){
   const sc = S.creeps.find(s => s.id === scId);
@@ -114,43 +100,13 @@ function verHabDeCreep(scId, habId){
 function abrirCatalogoHabilidades(scId, reemplazarId){
   const sc = S.creeps.find(s => s.id === scId);
   if(!sc) return;
-  const vieja = reemplazarId ? sc.habilidades.find(x => x.id === reemplazarId) : null;
-  Biblioteca.abrir({
-    tipo: 'skills', legado: LEGADO_HABS,
-    titulo: vieja ? `Reemplazar «${vieja.nombre || 'habilidad'}» de ${sc.nombre || 'el creep'}` : `Habilidad para ${sc.nombre || 'el creep'}`,
-    textoCrearDeCero: vieja ? '✎ Mejor editar la actual (paso a paso)' : '+ Crear de cero (paso a paso)',
-    alCrearDeCero: () => abrirEditorHabCreep(sc.id, vieja ? vieja.id : null),
-    base: typeof HABILIDADES_CREEP_BASE !== 'undefined' ? HABILIDADES_CREEP_BASE : [],
-    // Siempre a la vista para quién es (P122): 🐾 de creep (cooldown) o 🧙 de jugador (SP).
-    subtitulo: e => paraDeDatos(e.datos) === 'jugador' ? ` · ${PARA_TXT.jugador}`
-      : ` · ${PARA_TXT.creep} · ` + (e.datos.sp ? `${e.etiquetas.includes('lenta') ? 'lenta' : 'rápida'} · escala con el nivel del creep` : `${e.datos.cdArranca ? 'lenta' : 'rápida'} · valores fijos`),
+  CreepEditor.elegirDeBiblioteca(sc, {reemplazarId,   // comun/creep-editor.js (A6c)
+    alCrearDeCero: viejaId => abrirEditorHabCreep(sc.id, viejaId),
     alVer: (datos, ent) => verHabBiblioteca(sc.id, datos, ent),
-    alElegir: (datos, meta) => {
-      const h = habDeBiblioteca(sc, datos, meta);
-      const i = vieja ? sc.habilidades.indexOf(vieja) : -1;
-      if(i >= 0){
-        sc.habilidades[i] = h;   // en el mismo lugar de la lista
-        renderAll();
-        toast(`${vieja.nombre || 'La habilidad'} reemplazada por ${h.nombre}${avisoJugador(h)}`);
-        return;
-      }
-      sc.habilidades.push(h);
-      renderAll();
-      toast(`${h.nombre} agregada a ${sc.nombre || 'el creep'} (nivel ${sc.nivel || 1})${avisoJugador(h)}`);
-    },
-    grupos: HABS_CREEP_GRUPOS,
-  });
+    alElegir: (h, viejaId) => { const msg = CreepEditor.ponerHab(sc, h, viejaId); renderAll(); toast(msg); }});
 }
 // Etiquetas de las habilidades de creeps, agrupadas por criterio: sirven de filtro en la biblioteca y de opciones al guardar.
-const HABS_CREEP_GRUPOS = [
-  {nombre: 'Función', tags: ['daño', 'defensa', 'buff', 'debuff', 'curación', 'control', 'movilidad', 'invocación', 'área']},
-  {nombre: 'Mecánica del juego', tags: ['sigilo', 'trampas', 'terreno y formas', 'niebla y visión', 'iniciativa', 'aura', 'estados alterados', 'orientación', 'percepción', 'movimiento', 'botín', 'jefe']},
-  {nombre: 'A quién apunta', tags: ['a sí mismo', 'un enemigo', 'zona o área', 'aliados', 'terreno']},
-  {nombre: 'Velocidad', tags: ['rápida', 'lenta']},
-  {nombre: 'Rol', tags: ['melee', 'tanque', 'asalto', 'rango', 'mágico', 'apoyo', 'debuffer']},
-  {nombre: 'Raza', tags: ['cualquiera', 'humano', 'humanoide', 'bestia', 'planta', 'elemental', 'no-muerto', 'constructo', 'alienígena']},
-  {nombre: 'Automatización', tags: ['toda automatizada', 'con parte a mano']},
-];
+const HABS_CREEP_GRUPOS = CreepEditor.HABS_CREEP_GRUPOS;
 // Ídem para los creeps.
 const CREEPS_GRUPOS = [
   {nombre: 'Escenario', tags: ['minas', 'bosque', 'montañas', 'templo alienígena']},

@@ -1161,6 +1161,15 @@ prueba('editor de habilidades de creep (comun/creep-editor.js): una nueva pide e
   igual([sinModo, chips, pdg, h.nombre, h.nitrosCosto, h.tiradaStat, h.cd, h.cdArranca, h.cdActual, h.modo, avisos.slice(-1)[0], cargado, sc.habilidades.length, avisado, borr.nombre, borr.modo],
     [[0, 'Primero elegí cómo se ejecuta'], 6, 'pdg', 'Mordisco', 'ATAQUE', 'pdg', 2, true, 2, 'semi', 'Mordisco guardada', ['Mordisco', 'semi', 'ataque'], 1, 'Rugido fuerte', 'Rugido fuerte', 'manual']);
 });
+prueba('habilidades de la biblioteca para un creep: lo subido va tal cual (con id nuevo y su origen); reemplazar pisa en el mismo lugar', () => {
+  const sc = creepPrueba({nivel: 2, habilidades: [{id: 'a', nombre: 'Uno'}, {id: 'b', nombre: 'Dos'}]});
+  const h = CreepEditor.habDeBiblioteca(sc, {nombre: 'Rayo', cd: 3, cdArranca: true, para: 'jugador'}, {tipo: 'skills', id: 'x', version: 2});
+  const msgR = CreepEditor.ponerHab(sc, h, 'a');
+  const h2 = CreepEditor.habDeBiblioteca(sc, {habilidad: {nombre: 'Viejo'}}, null);
+  const msgA = CreepEditor.ponerHab(sc, h2, null);
+  igual([h.nombre, h.cdActual, h.para, h.bibOrigen, typeof h.id, sc.habilidades.map(x => x.nombre), msgR, msgA, CreepEditor.paraDeDatos({sp: {}}), CreepEditor.avisoJugador({})],
+    ['Rayo', 3, 'jugador', {tipo: 'skills', id: 'x', version: 2}, 'string', ['Rayo', 'Dos', 'Viejo'], 'Uno reemplazada por Rayo — 🧙 es de jugador (paga con SP): revisale el costo', 'Viejo agregada a Orco (nivel 2)', 'creep', '']);
+});
 prueba('el «Ver» de un creep (comun/creep-lupa.js): título, nivel, habilidades en chips o la lista que se le pase, recompensas', () => {
   const sc = creepPrueba({nivel: 2, habilidades: [{id: 'h', nombre: 'Rugido', cd: 2}], notas: 'Huele mal'});
   const v = CreepLupa.verCreep(sc), otra = CreepLupa.verCreep(sc, {habilidades: '<i>lista propia</i>'});

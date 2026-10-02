@@ -534,16 +534,22 @@ function costoContraataqueCreep(sc){ return CreepCalculo.costoContraataque(sc); 
 // oportunidad y contraataque siempre cuestan Tipo ÷ 2 y no suman al conteo de ataques del turno.
 function atacarNormalCreep(sc){
   if((sc.estados || []).some(e => e.activo !== false && e.sentado) && !confirm(`${sc.nombre} está Sentado y no puede atacar. ¿Atacar igual?`)) return;
-  const x = CreepAcciones.pagarAtaque(sc, 'normal');   // comun/creep-acciones.js
+  const forzar = CreepAcciones.faltanNitros(sc, 'normal');   // sin No2: avisar y dejar seguir (2026-10-02)
+  if(forzar && !confirm(CreepAcciones.preguntaSinNitros(sc, 'normal'))) return;
+  const x = CreepAcciones.pagarAtaque(sc, 'normal', forzar);   // comun/creep-acciones.js
   if(x.error){ toast(x.error); return; }
+  CreepAcciones.alertaSinNitros(sc, 'normal', x.forzado);
   parryPendienteCreep.delete(sc.id);   // atacar cierra el Parry que esperaba su Bloqueo
   renderAll();
   publicarTiradaCreep(CreepAcciones.tiradaAtaque(sc, 'normal'));
   toast(x.aviso);
 }
 function ataqueEspecialCreep(sc, tipo){
-  const x = CreepAcciones.pagarAtaque(sc, tipo);   // comun/creep-acciones.js
+  const forzar = CreepAcciones.faltanNitros(sc, tipo);
+  if(forzar && !confirm(CreepAcciones.preguntaSinNitros(sc, tipo))) return;
+  const x = CreepAcciones.pagarAtaque(sc, tipo, forzar);   // comun/creep-acciones.js
   if(x.error){ toast(x.error); return; }
+  CreepAcciones.alertaSinNitros(sc, tipo, x.forzado);
   renderAll();
   publicarTiradaCreep(CreepAcciones.tiradaAtaque(sc, tipo));
   toast(x.aviso);

@@ -63,24 +63,46 @@ const CreepAcciones = (() => {
   /* ---------- Atacar (menú de Atacar del creep, 2026-09-26) ----------
      'normal': el primero del turno cuesta Tipo ÷ 2 y los siguientes el Tipo completo, y suma al conteo de ataques;
      'oportunidad' y 'contra' (contraataque): siempre Tipo ÷ 2 y no suman al conteo. Cobrar (pagarAtaque → {error} o {aviso}) y
-     después la tirada de PdG (tiradaAtaque). Un ataque normal cierra el Parry que esperaba su Bloqueo: lo borra cada pantalla. */
+     después la tirada de PdG (tiradaAtaque). Un ataque normal cierra el Parry que esperaba su Bloqueo: lo borra cada pantalla.
+     Sin No2 suficientes (2026-10-02, como con los personajes: avisar y dejar seguir): costoAtaqueDe dice cuánto cuesta; con
+     `forzar`, pagarAtaque gasta los que tenga (hasta 0) y devuelve `forzado: {costo, tenia}`, y alertaSinNitros deja la línea roja
+     en la Mesa. Cada pantalla pregunta antes («¿Atacar igual?», preguntaSinNitros). */
   const NOMBRE_ESPECIAL = {oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
   // PdG en contraataque (o en oportunidad) que le suma su arma.
   const bonoEspecial = (sc, tipo) => (sc.armaMods || []).filter(m => m.stat === (tipo === 'contra' ? 'pdgcontra' : tipo === 'oportunidad' ? 'pdgopor' : '')).reduce((a, m) => a + num(m.val), 0);
-  function pagarAtaque(sc, tipo){
+  const costoAtaqueDe = (sc, tipo) => tipo === 'normal' ? C().costoAtaque(sc) : C().costoContraataque(sc);
+  const faltanNitros = (sc, tipo) => costoAtaqueDe(sc, tipo) > num(sc.nitros);
+  // El texto de «¿Atacar igual?» (cada pantalla lo muestra a su manera).
+  function preguntaSinNitros(sc, tipo){
+    const nombre = tipo === 'normal' ? 'este ataque' : `el ${(NOMBRE_ESPECIAL[tipo] || 'Contraataque').toLowerCase()}`;
+    return `${sc.nombre} no tiene No2 suficientes: ${nombre} cuesta ${fmt(costoAtaqueDe(sc, tipo))} y tiene ${fmt(Math.max(0, num(sc.nitros)))}.\n\n¿Atacar igual? Gasta los No2 que tenga y queda anotado en rojo en la Mesa.`;
+  }
+  function pagarAtaque(sc, tipo, forzar){
+    const costo = costoAtaqueDe(sc, tipo), tenia = Math.max(0, num(sc.nitros));
+    const forzado = costo > tenia ? {costo, tenia} : null;
     if(tipo === 'normal'){
-      const costo = C().costoAtaque(sc);
-      if(costo > num(sc.nitros)) return {error: `${sc.nombre}: no le alcanzan los No2 — este ataque cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`};
+      if(forzado && !forzar) return {error: `${sc.nombre}: no le alcanzan los No2 — este ataque cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`};
       const primero = num(sc.ataquesTurno) === 0;
-      sc.nitros = num(sc.nitros) - costo;
+      sc.nitros = forzado ? 0 : num(sc.nitros) - costo;
       sc.ataquesTurno = num(sc.ataquesTurno) + 1;
-      return {aviso: `${sc.nombre}: −${fmt(costo)} No2 · ${primero ? 'primer ataque del turno' : `ataque ${fmt(sc.ataquesTurno)} del turno`} · quedan ${fmt(sc.nitros)}`};
+      return {forzado, aviso: `${sc.nombre}: −${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · ${primero ? 'primer ataque del turno' : `ataque ${fmt(sc.ataquesTurno)} del turno`} · quedan ${fmt(sc.nitros)}`};
     }
-    const nombre = NOMBRE_ESPECIAL[tipo] || 'Contraataque', costo = C().costoContraataque(sc);
-    if(costo > num(sc.nitros)) return {error: `${sc.nombre}: no le alcanzan los No2 — el ${nombre.toLowerCase()} cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`};
-    sc.nitros = num(sc.nitros) - costo;
+    const nombre = NOMBRE_ESPECIAL[tipo] || 'Contraataque';
+    if(forzado && !forzar) return {error: `${sc.nombre}: no le alcanzan los No2 — el ${nombre.toLowerCase()} cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`};
+    sc.nitros = forzado ? 0 : num(sc.nitros) - costo;
     const bono = bonoEspecial(sc, tipo);
-    return {aviso: `${sc.nombre}: ${nombre.toLowerCase()} −${fmt(costo)} No2 (lo de un primer ataque)${bono ? ` · PdG +${fmt(bono)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''} · quedan ${fmt(sc.nitros)}`};
+    return {forzado, aviso: `${sc.nombre}: ${nombre.toLowerCase()} −${fmt(forzado ? tenia : costo)} No2 ${forzado ? `(costaba ${fmt(costo)})` : '(lo de un primer ataque)'}${bono ? ` · PdG +${fmt(bono)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''} · quedan ${fmt(sc.nitros)}`};
+  }
+  // La línea roja de la Mesa (la misma que la de un personaje: FichaAcciones.gastoNitrosForzado).
+  function alertaSinNitros(sc, tipo, forzado){
+    if(!forzado || typeof fbDb === 'undefined' || !fbDb || typeof fbUsuario === 'undefined' || !fbUsuario || !fbMiembro) return;
+    const hizo = tipo === 'normal' ? 'atacó' : `hizo un ${(NOMBRE_ESPECIAL[tipo] || 'Contraataque').toLowerCase()}`;
+    fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
+      origen: `⚠ ${sc.nombre} ${hizo} sin No2 suficientes`, formula: `Costaba ${fmt(forzado.costo)} No2 y tenía ${fmt(forzado.tenia)}`,
+      rolls: [], mod: 0, total: 0, desde: 'alerta-roja',
+      cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    }).catch(err => console.error('No se pudo publicar la alerta de No2:', err));
   }
   function tiradaAtaque(sc, tipo){
     if(tipo === 'normal') return tirada(`${sc.nombre} · PdG`, C().statValor(sc, 'pdg'), sc, 'pdg');
@@ -238,6 +260,7 @@ const CreepAcciones = (() => {
   }
 
   return {tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
+    costoAtaqueDe, faltanNitros, preguntaSinNitros, alertaSinNitros,
     FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,
     zonaDeHab, cdMod};
 })();

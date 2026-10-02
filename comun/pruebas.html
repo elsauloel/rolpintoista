@@ -929,6 +929,14 @@ prueba('atacar con un creep: el normal suma al conteo y el contraataque no; alca
     [1, 2, true, 'Orco · Contraataque (PdG)', 1, 5]);
 });
 
+prueba('atacar con un creep sin No2: sin forzar no cobra; forzado gasta los que tiene y avisa cuánto costaba', () => {
+  const sc = creepPrueba({nitros: 2});
+  const falta = CreepAcciones.faltanNitros(sc, 'normal'), no = CreepAcciones.pagarAtaque(sc, 'normal'), antes = sc.nitros;
+  const si = CreepAcciones.pagarAtaque(sc, 'normal', true);
+  igual([falta, !!no.error, antes, sc.nitros, si.forzado, sc.ataquesTurno, CreepAcciones.preguntaSinNitros(creepPrueba({nitros: 1}), 'oportunidad').includes('cuesta 4 y tiene 1')],
+    [true, true, 2, 0, {costo: 4, tenia: 2}, 1, true]);
+});
+
 prueba('los ganchos del duelo de un creep: el Parry cobra y tira; Sentado sin confirmar no ataca', async () => {
   const creeps = {k: creepPrueba({id: 'k', nitros: 3, estados: [{nombre: 'Sentado', activo: true, sentado: true}]})}, reg = [];
   const ui = {creep: ref => creeps[ref] || null, cambiar: (ref, fn) => { const x = fn(creeps[ref]); if(x && x.error){ reg.push('error'); return Promise.resolve(null); } return Promise.resolve(x); },

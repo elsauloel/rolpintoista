@@ -40,13 +40,17 @@ const CreepDuelo = (() => {
     });
   }
 
-  // Atacar en el duelo: normal, de oportunidad o contraataque (cobra y tira el PdG). El normal pregunta si está Sentado.
+  // Atacar en el duelo: normal, de oportunidad o contraataque (cobra y tira el PdG). El normal pregunta si está Sentado. Sin No2
+  // suficientes pregunta «¿Atacar igual?» (2026-10-02: antes se rechazaba y el aviso quedaba en GM Tools, escondido en el mapa).
   function atacarCon(ui, ref, tipo){
     const sc = ui.creep(ref);
     if(!sc) return;
     if(tipo === 'normal' && (sc.estados || []).some(e => e.activo !== false && e.sentado) && !ui.confirmar(`${sc.nombre} está Sentado y no puede atacar. ¿Atacar igual?`)) return;
-    return ui.cambiar(ref, c => A().pagarAtaque(c, tipo)).then(x => {
+    const forzar = A().faltanNitros(sc, tipo);
+    if(forzar && !ui.confirmar(A().preguntaSinNitros(sc, tipo))) return;
+    return ui.cambiar(ref, c => A().pagarAtaque(c, tipo, forzar)).then(x => {
       if(!x) return;
+      A().alertaSinNitros(sc, tipo, x.forzado);
       if(tipo === 'normal') ui.borrarParry(ref);   // atacar cierra el Parry que esperaba su Bloqueo
       ui.publicar(sc, A().tiradaAtaque(ui.creep(ref) || sc, tipo));
       ui.toast(x.aviso);

@@ -426,12 +426,18 @@ const Combatiente = (() => {
   /* Lo que el mapa necesita para dejar puesta la zona persistente de una habilidad (el mensaje 'zona-persistente-habilidad',
      igual para personaje y creep). `o.fichaId` y `o.tipo` ('pj'|'creep'): quién la usa; `o.X`: el costo variable;
      `o.resistValor`: la tirada de «tira», hecha UNA vez y reusada contra cada uno que entra o sigue adentro. */
+  // Daño «la diferencia» (2026-10-02, Pedos Tóxicos): `zonaDanoDif` = cada uno que no resiste recibe la tirada de quien la creó
+  // menos la suya; `zonaTiraExtra` (ej. '1d20') + `zonaNota`: si el daño entra, se tira y se publica con ese texto (a mano).
+  const TIPO_DANO_NOMBRE = {arcano: 'arcano', fuego: 'de fuego', hielo: 'de hielo', rayo: 'de rayo', toxico: 'tóxico', fisico: 'físico'};
   function zonaDeHab(h, c, o){
     o = o || {};
+    const dif = !!(c.dano && c.danoDiferencia);
     return {tipo: 'zona-persistente-habilidad', fichaId: o.fichaId, casteadorTipo: o.tipo, nombre: h.nombre,
       radio: Math.max(1, nf(c.radio) || 1), zonaTurnos: Math.max(1, nf(c.zonaTurnos) || 3), zonaAmiga: !!c.zonaAmiga,
-      zonaEstado: c.zonaEstado || null, zonaDano: c.dano ? formulaDanoHab(h, c, o.X) : '',
+      zonaEstado: c.zonaEstado || null, zonaDano: c.dano && !dif ? formulaDanoHab(h, c, o.X) : '',
       zonaIgnoraDef: c.dano ? (c.ignoraDano !== undefined ? !!c.ignoraDano : (c.tipoDano || 'arcano') !== 'fisico') : false,
+      zonaDanoDif: dif, zonaDanoTipo: c.dano ? (TIPO_DANO_NOMBRE[c.tipoDano || 'arcano'] || '') : '',
+      zonaTiraExtra: c.dano && c.danoExtra ? String(c.danoExtra) : '', zonaNota: c.efectoLibre ? (o.X === undefined || o.X === null ? String(c.efectoLibre) : sustituirX(String(c.efectoLibre), o.X)) : '',
       resistStat: (c.contra && c.contra[0]) || '', resistValor: o.resistValor === undefined ? null : o.resistValor};
   }
   // La trampa que coloca una habilidad, lista para el mapa: si no trae nombre propio, lleva el de la habilidad.

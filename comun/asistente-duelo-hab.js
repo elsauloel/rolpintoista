@@ -31,6 +31,9 @@
    (se tira una sola vez al crearla, se reusa contra cada uno que entra o sigue adentro en el Mantenimiento) y
    `dano`/`tipoDano`/`ignoraDano` el mismo daño de siempre — la parte nueva es solo que queda puesta y se
    chequea de a uno, en vez de resolverse toda junta al ejecutar.
+   Zona, daño «la diferencia» (2026-10-02, pedido del dueño, Pedos Tóxicos): `danoDiferencia: true` = cada uno que no resiste
+   recibe tu tirada menos la suya (empate: nada); `danoExtra` ('1d20') = si el daño entra, se tira además esa fórmula y se
+   publica con el texto de `efectoLibre` (qué significa cada resultado; aplicarlo sigue a mano).
    Los ids de stat son los de la ficha y los de gm-tools (pdg, pdgmg, fue, con, agl, des, esp / eva, resmg, resm). Sin Firebase.
    `costoVariable` (P119, 2026-09-27): si la habilidad ya tiene costo "X" en SP o Nitros (spVariable/nitrosVariable en
    ficha.html), el paso de Daño ofrece "+N de daño fijo por cada punto de X" (`danoFijoPorX`) — quien ejecuta la habilidad
@@ -68,7 +71,7 @@ const AsistenteDueloHab = (() => {
   const ALCANCES = [['auto', 'Automático (los hechizos usan su Rango de casteo)'], ['casteo', 'Rango de casteo'], ['rango', 'Rango (el de las armas a distancia)'], ['adyacente', 'Cuerpo a cuerpo (casilleros de al lado)'], ['fijo', 'Un número de casilleros'], ['ilimitado', 'Sin límite (no resalta nada)']];
   const BONOS = [['pdg', 'PdG'], ['dmg', 'Daño'], ['eva', 'Evasión'], ['def', 'Defensa'], ['nitros', 'No2'], ['resmg', 'Res.Esp'], ['resm', 'Res.Mt'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo']];
   const BONOS_LABEL = Object.fromEntries(BONOS);
-  const TIPOS = [['arcano', 'Arcano (mágico)'], ['fuego', 'Fuego (mágico)'], ['hielo', 'Hielo (mágico)'], ['rayo', 'Rayo (mágico)'], ['fisico', 'Físico (respeta la Defensa)']];
+  const TIPOS = [['arcano', 'Arcano (mágico)'], ['fuego', 'Fuego (mágico)'], ['hielo', 'Hielo (mágico)'], ['rayo', 'Rayo (mágico)'], ['toxico', 'Tóxico (veneno, gas)'], ['fisico', 'Físico (respeta la Defensa)']];
   const STAT_TXT = Object.fromEntries([...TIRA, ...CONTRA]);
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 
@@ -131,6 +134,7 @@ const AsistenteDueloHab = (() => {
       contraModo: (ini && ini.contraOtro) ? 'otro' : (ini && Array.isArray(ini.contra) && ini.contra.length) ? 'stats' : (ini && ini.tira !== undefined) ? 'ninguna' : 'stats',
       contraOtro: (ini && ini.contraOtro) || '',
       dano: !!(ini && ini.dano), tipoDano: (ini && ini.tipoDano) || 'arcano',
+      danoDif: !!(ini && ini.danoDiferencia), danoExtra: (ini && ini.danoExtra) || '',   // solo zona (2026-10-02)
       // Efecto que no se puede automatizar del todo (2026-09-27, pedido del dueño): texto libre que se muestra
       // en el cuadro del duelo junto al resultado, para lo que hay que resolver a mano (ej. "drenás la diferencia").
       efectoLibreOn: !!(ini && ini.efectoLibre), efectoLibre: (ini && ini.efectoLibre) || '',
@@ -328,10 +332,14 @@ const AsistenteDueloHab = (() => {
     }
     function cuerpoDano(){
       let h = titulo('', 'Daño y lo que no se pueda automatizar', 'Si la habilidad hace daño, usa la fórmula que ya tiene cargada (su «segunda tirada», por ejemplo 2d6+3) — se escribe en el editor de siempre de la habilidad, no acá. Si además (o en vez de eso) tiene un efecto que el sistema no calcula solo, escribilo como texto.');
+      const esZona = st.objetivo === 'zona';
+      const dif = esZona && st.dano && st.danoDif;
       h += `<div class="adh-modo">
         <label class="op"><input type="radio" name="hacedano" value="no" ${!st.dano ? 'checked' : ''}> No hace daño</label>
-        <label class="op"><input type="radio" name="hacedano" value="si" ${st.dano ? 'checked' : ''}> Sí, con su fórmula${cfg.tieneFormula === false ? ' <span class="nota">(esta habilidad todavía no tiene fórmula: escribila en su editor)</span>' : ''}</label>
+        <label class="op"><input type="radio" name="hacedano" value="si" ${st.dano && !dif ? 'checked' : ''}> Sí, con su fórmula${cfg.tieneFormula === false ? ' <span class="nota">(esta habilidad todavía no tiene fórmula: escribila en su editor)</span>' : ''}</label>
+        ${esZona ? `<label class="op"><input type="radio" name="hacedano" value="dif" ${dif ? 'checked' : ''}> Sí: la diferencia entre las tiradas</label>` : ''}
       </div>`;
+      if(dif) h += `<p class="nota">Cada uno que no resiste recibe tu tirada menos la suya (si empatan, nada). Si resiste, no le pasa nada. Necesita una tirada (paso «Tirada») y una resistencia (paso «Resistencia»).</p>`;
       if(st.dano){
         h += `<div class="fila"><span>Tipo:</span><select data-tipodano>${TIPOS.map(([v, t]) => `<option value="${v}"${st.tipoDano === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
           <label class="op"><input type="checkbox" data-ignoradano ${st.ignoraDano ? 'checked' : ''}> Ignora la Defensa (va derecho a la vida y no critica)</label>
@@ -340,11 +348,17 @@ const AsistenteDueloHab = (() => {
           h += `<div class="fila" style="margin-top:8px"><span>Además, por cada punto de X (tu costo en ${cfg.costoVariable === 'sp' ? 'SP' : 'Nitros'}):</span><span>+</span><input type="number" style="width:70px" data-danoporx value="${esc(st.danoFijoPorX)}"><span>de daño fijo</span></div>
             <p class="nota">Ej. "amplifica el daño en el doble de X" → poné 2: con X = 3 suma +6 al tirar. Vacío o 0 = la fórmula no cambia con X.</p>`;
         }
+        if(esZona){
+          h += `<div class="fila" style="margin-top:10px"><span>Si el daño entra, tirar además:</span><input type="text" style="width:90px" data-danoextra placeholder="ej. 1d20" value="${esc(st.danoExtra)}"></div>
+            <p class="nota">Opcional. Se tira solo, a quien recibió daño, y sale en la Mesa con el texto de abajo («Tiene un efecto que no se puede automatizar»): ahí escribí qué significa cada resultado (ej. «7+ Pajaritos · 17+ Stun · 20 desmayo»).</p>`;
+        }
       }
       h += `<div class="fila" style="margin-top:14px"><label class="op" style="padding:0"><input type="checkbox" data-efectolibre-on ${st.efectoLibreOn ? 'checked' : ''}> Tiene un efecto que no se puede automatizar del todo</label></div>`;
       if(st.efectoLibreOn){
         h += `<textarea data-efectolibre rows="3" style="width:100%;box-sizing:border-box;background:#0e1220;color:#fff;border:1px solid #39435c;border-radius:8px;padding:8px;font-size:14px" placeholder="ej. Drenás una cantidad de HP igual a la diferencia entre tu tirada y su resistencia; sumátela a tu vida (Excedente de vida si pasa tu máximo).">${esc(st.efectoLibre)}</textarea>
-          <p class="nota" style="margin-top:6px">Este texto se muestra en el cuadro junto al resultado (con la diferencia entre las dos tiradas, si la hubo), para que quien juega lo resuelva a mano.</p>`;
+          <p class="nota" style="margin-top:6px">${st.objetivo === 'zona'
+            ? 'En una zona, este texto sale en la Mesa y en el cartelito cuando el daño entra (junto a la tirada de arriba, si hay), para que se resuelva a mano.'
+            : 'Este texto se muestra en el cuadro junto al resultado (con la diferencia entre las dos tiradas, si la hubo), para que quien juega lo resuelva a mano.'}</p>`;
       }
       return h;
     }
@@ -451,7 +465,7 @@ const AsistenteDueloHab = (() => {
         filas.push(sinOp() ? '<b>Sin tirada</b>: se aplica directo'
           : st.tiraModo === 'custom' ? `<b>Tirada personalizada</b>: ${esc(st.tiraFormula) || '(sin fórmula)'}${st.tiraEtiqueta ? ' · ' + esc(st.tiraEtiqueta) : ''} contra ${contraTxt}`
           : `<b>Tirada</b>: ${STAT_TXT[st.tira] || st.tira} contra ${contraTxt}`);
-        if(st.dano) filas.push(`<b>Daño</b>: tipo ${st.tipoDano}${st.ignoraDano ? ', ignora la Defensa' : ''}${cfg.costoVariable && st.danoFijoPorX ? `, +${st.danoFijoPorX} por X` : ''}`);
+        if(st.dano) filas.push(`<b>Daño</b>: ${st.objetivo === 'zona' && st.danoDif ? 'la diferencia entre las tiradas, ' : ''}tipo ${st.tipoDano}${st.ignoraDano ? ', ignora la Defensa' : ''}${cfg.costoVariable && st.danoFijoPorX ? `, +${st.danoFijoPorX} por X` : ''}${st.objetivo === 'zona' && st.danoExtra ? `; si entra, tira ${esc(st.danoExtra)}` : ''}`);
         if(st.efectoLibreOn && st.efectoLibre.trim()){ const t = st.efectoLibre.trim(); filas.push(`<b>Efecto a mano</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
       }
       if(st.modo !== 'flash' && st.objetivo !== 'zona'){
@@ -525,7 +539,8 @@ const AsistenteDueloHab = (() => {
       });
       f.querySelectorAll('[name=contramodo]').forEach(r => r.onchange = () => { st.contraModo = r.value; dibujar(); });
       q('[data-contraotro]', e => { st.contraOtro = e.target.value; });
-      f.querySelectorAll('[name=hacedano]').forEach(r => r.onchange = () => { st.dano = r.value === 'si'; dibujar(); });
+      f.querySelectorAll('[name=hacedano]').forEach(r => r.onchange = () => { st.dano = r.value !== 'no'; st.danoDif = r.value === 'dif'; dibujar(); });
+      q('[data-danoextra]', e => { st.danoExtra = e.target.value.trim(); });
       q('[data-tipodano]', e => { st.tipoDano = e.target.value; st.ignoraDano = st.tipoDano !== 'fisico'; dibujar(); });
       q('[data-ignoradano]', e => { st.ignoraDano = e.target.checked; });
       q('[data-danoporx]', e => { st.danoFijoPorX = Number(e.target.value) || 0; });
@@ -621,6 +636,16 @@ const AsistenteDueloHab = (() => {
           out.contraOtro = st.contraOtro.trim();
         }
         if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; out.ignoraDano = st.ignoraDano; if(cfg.costoVariable && st.danoFijoPorX) out.danoFijoPorX = st.danoFijoPorX; }
+        if(st.objetivo === 'zona' && st.dano){
+          if(st.danoDif){
+            if(!hayTira || st.tiraModo === 'custom' || !out.contra.length){ alert('El daño «la diferencia» necesita que quien la usa tire un stat (paso Tirada) y algo con qué resistirla (paso Resistencia).'); return; }
+            out.danoDiferencia = true;
+          }
+          if(st.danoExtra){
+            if(!/^\d*d\d+\s*([+-]\s*\d+)?$/i.test(st.danoExtra)){ alert('La tirada de «si el daño entra» tiene que ser una fórmula de dados, por ejemplo 1d20.'); return; }
+            out.danoExtra = st.danoExtra.replace(/\s+/g, '');
+          }
+        }
         if(st.efectoLibreOn && st.efectoLibre.trim()) out.efectoLibre = st.efectoLibre.trim();
         if(st.efectosNotaOn && st.efectosNota.trim()) out.efectosNota = st.efectosNota.trim();
         if(st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'zona') out.radio = Math.max(st.objetivo === 'area' ? 0 : 1, st.radio);

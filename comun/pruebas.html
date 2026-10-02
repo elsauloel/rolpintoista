@@ -1113,6 +1113,21 @@ prueba('la marca ⚠️ no impide encontrar un ítem por nombre', () => {
   igual(ItemsSubidos.basadoEn({nombre: sinMarca, id: 'otro'}, CATALOGO_BASE), {id: 'base-' + marcado.id, nombre: marcado.nombre});
 });
 
+/* ---------- Zona con daño «la diferencia» (Combatiente.zonaDeHab, 2026-10-02) ---------- */
+grupo('Zona: daño «la diferencia»');
+prueba('la zona manda la diferencia, el tipo tóxico, la tirada extra y su texto (sin fórmula de daño)', () => {
+  const h = {nombre: 'Pedos Tóxicos', tiradaExtra: ''};
+  const c = {objetivo: 'zona', radio: 2, zonaTurnos: 2, tira: 'pdgmg', contra: ['resmg'], dano: true, danoDiferencia: true, tipoDano: 'toxico',
+    ignoraDano: true, danoExtra: '1d20', efectoLibre: '7+ Pajaritos · 17+ Stun · 20 desmayo'};
+  const z = Combatiente.zonaDeHab(h, c, {fichaId: 'f1', tipo: 'pj', resistValor: 9});
+  igual([z.zonaDano, z.zonaDanoDif, z.zonaDanoTipo, z.zonaIgnoraDef, z.zonaTiraExtra, z.zonaNota, z.resistStat, z.resistValor, z.radio, z.zonaTurnos],
+    ['', true, 'tóxico', true, '1d20', '7+ Pajaritos · 17+ Stun · 20 desmayo', 'resmg', 9, 2, 2]);
+});
+prueba('con su fórmula, la zona sigue mandando la fórmula y no la diferencia', () => {
+  const z = Combatiente.zonaDeHab({nombre: 'Nube', tiradaExtra: '2d6'}, {objetivo: 'zona', dano: true, tipoDano: 'fuego', contra: ['resmg']}, {resistValor: 5});
+  igual([z.zonaDano, z.zonaDanoDif, z.zonaDanoTipo, z.zonaTiraExtra, z.zonaNota], ['2d6', false, 'de fuego', '', '']);
+});
+
 /* ---------- Ficha lite (comun/ficha-lite.js, 2026-10-02) ---------- */
 grupo('Ficha lite');
 prueba('personaje: manos, Defensa y resistencias con su origen (una pieza rota va tachada)', () => {

@@ -331,6 +331,10 @@ function escucharElementos(){
         zonaResueltos: Array.isArray(d.zonaResueltos) ? d.zonaResueltos.filter(x => typeof x === 'string') : [],
         zonaEnMantenimiento: d.zonaEnMantenimiento !== false,
         zonaCadaPaso: d.zonaCadaPaso === true,
+        zonaDanoDif: d.zonaDanoDif === true,   // el daño es la diferencia entre las tiradas (2026-10-02)
+        zonaDanoTipo: typeof d.zonaDanoTipo === 'string' ? d.zonaDanoTipo : '',
+        zonaTiraExtra: typeof d.zonaTiraExtra === 'string' ? d.zonaTiraExtra : '',
+        zonaNota: typeof d.zonaNota === 'string' ? d.zonaNota : '',
         // Trampa persistente (2026-09-28): configuración todavía dormida (antes de dispararse) de la zona que va
         // a dejar al activarse — ver trampaResolver. `zonaTurnos` es la duración de ESA zona, aparte de `turnos`
         // (que mientras la trampa está dormida puede significar otra cosa: cuándo se borra sola si no la pisan).

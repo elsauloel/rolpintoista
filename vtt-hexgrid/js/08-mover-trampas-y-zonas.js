@@ -295,7 +295,7 @@ function zonaAplicaA(el, t){
 // ¿Todavía le falta algo a este par (zona, token)? El daño se vuelve a chequear siempre (como el fuego); el
 // estado, solo si ese token no está ya en zonaResueltos (una vez que lo tiene, no se le vuelve a tirar la resistencia).
 function zonaLeFalta(el, t){
-  if(el.zonaDano) return true;
+  if(el.zonaDano || el.zonaDanoDif) return true;
   if(el.zonaEstado && !(el.zonaResueltos || []).includes(t.id)) return true;
   return false;
 }
@@ -377,8 +377,9 @@ async function zonaResolverBanner(){
   const el = elementos.get(elId), t = tokens.get(tokenId);
   const bt = document.getElementById('zona-banner-ir'); if(bt) bt.disabled = true;
   if(!el || !t){ zonaBanner = null; zonaMostrarSiguiente(); return; }
-  let resistio = false;
+  let resistio = false, diferencia = null;
   const partes = [];
+  const quienTxt = t.oculto ? 'Alguien' : nombreDe(t);
   if(el.zonaResistStat){
     const valor = t.tipo === 'creep' ? (() => { const sc = creepPrivadoDe(t.fichaId); return sc ? zonaStatCreep(sc, el.zonaResistStat) : 0; })()
       : (() => { const f = fichasPub.get(t.fichaId); return f && f.resumen ? num(f.resumen[el.zonaResistStat]) : 0; })();
@@ -388,19 +389,36 @@ async function zonaResolverBanner(){
     if(rd){
       const total = rd.total;
       resistio = total > num(el.zonaResistValor);   // empate: gana quien creó la zona
-      try{ mesaPublicar(`${t.oculto ? 'Alguien' : nombreDe(t)} · ${ZONA_STAT_LABEL[el.zonaResistStat] || el.zonaResistStat}`, {formula: rd.formula, rolls: rd.rolls, mod: rd.mod, total}); }catch(err){}
+      diferencia = Math.max(0, num(el.zonaResistValor) - total);
+      try{ mesaPublicar(`${quienTxt} · ${ZONA_STAT_LABEL[el.zonaResistStat] || el.zonaResistStat}`, {formula: rd.formula, rolls: rd.rolls, mod: rd.mod, total}); }catch(err){}
       partes.push(resistio ? `resistió (${total} contra ${num(el.zonaResistValor)})` : `no resistió (${total} contra ${num(el.zonaResistValor)})`);
     }
   }
-  if(el.zonaDano){
-    const r = tirarDados(el.zonaDano);
-    if(r){
+  // El daño (2026-10-02, regla del dueño): quien resiste no recibe nada — ni el daño ni el estado. Con «la diferencia», el daño es
+  // la tirada de quien la creó menos la de quien resiste (en un empate, 0: ni daño ni tirada extra).
+  let danoHecho = 0;
+  if(!resistio && (el.zonaDano || el.zonaDanoDif)){
+    let monto = null;
+    if(el.zonaDanoDif) monto = diferencia;
+    else{ const r = tirarDados(el.zonaDano); if(r) monto = r.total; }
+    const tipoTxt = el.zonaDanoTipo ? ` ${el.zonaDanoTipo}` : '';
+    if(monto > 0){
       try{
-        if(t.tipo === 'creep') await danioCreep(t, String(r.total), !!el.zonaIgnoraDef);
-        else if(puedoMover(t)) await danioPj(t, String(r.total), !!el.zonaIgnoraDef);
-        partes.push(`${r.total} de daño`);
-      }catch(err){ console.error('No se pudo aplicar el daño de la zona:', err); partes.push(`${r.total} de daño (aplicalo a mano)`); }
-    }
+        if(t.tipo === 'creep') await danioCreep(t, String(monto), !!el.zonaIgnoraDef);
+        else if(puedoMover(t)) await danioPj(t, String(monto), !!el.zonaIgnoraDef);
+        partes.push(`${monto} de daño${tipoTxt}`);
+        danoHecho = monto;
+      }catch(err){ console.error('No se pudo aplicar el daño de la zona:', err); partes.push(`${monto} de daño${tipoTxt} (aplicalo a mano)`); danoHecho = monto; }
+    }else if(monto === 0) partes.push('sin daño');
+  }
+  // Si el daño entró: la tirada extra (ej. 1d20) con el texto de qué significa cada resultado, en la Mesa y en el cartelito. Aplicar lo que
+  // salga queda a mano.
+  if(danoHecho > 0 && (el.zonaTiraExtra || el.zonaNota)){
+    const r = el.zonaTiraExtra ? tirarDados(el.zonaTiraExtra) : null;
+    if(r){
+      try{ if(el.zonaNota) mesaConTexto(el.zonaNota); mesaPublicar(`${quienTxt} · ${el.zonaNombre || 'Zona'}`, {formula: r.formula || el.zonaTiraExtra, rolls: r.rolls, mod: r.mod, total: r.total}); }catch(err){}
+      partes.push(`🎲 ${el.zonaTiraExtra}: ${r.total}${el.zonaNota ? ` — ${el.zonaNota}` : ''}`);
+    }else if(el.zonaNota) partes.push(el.zonaNota);
   }
   if(el.zonaEstado && !resistio){
     let spec = null; try{ spec = JSON.parse(el.zonaEstado); }catch(err){}

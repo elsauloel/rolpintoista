@@ -217,6 +217,11 @@ async function crearElementoZona(centro, cfg){
   if(cfg.dano){ datos.zonaDano = String(cfg.dano).slice(0, 12); if(cfg.ignoraDef) datos.zonaIgnoraDef = true; }
   if(cfg.estado && cfg.estado.nombre) datos.zonaEstado = JSON.stringify(cfg.estado).slice(0, 300);
   if(cfg.resistStat && Number.isFinite(cfg.resistValor)){ datos.zonaResistStat = String(cfg.resistStat).slice(0, 12); datos.zonaResistValor = Math.round(num(cfg.resistValor)); }
+  // Daño «la diferencia» y la tirada extra con su texto (2026-10-02): ver zonaResolverBanner.
+  if(cfg.danoDif && datos.zonaResistStat){ datos.zonaDanoDif = true; if(cfg.ignoraDef) datos.zonaIgnoraDef = true; }
+  if(cfg.danoTipo) datos.zonaDanoTipo = String(cfg.danoTipo).slice(0, 20);
+  if(cfg.tiraExtra && (datos.zonaDano || datos.zonaDanoDif)) datos.zonaTiraExtra = String(cfg.tiraExtra).slice(0, 12);
+  if(cfg.nota) datos.zonaNota = String(cfg.nota).slice(0, 200);
   try{
     await coleccionElementos().add(datos);
     toast(`🌫 ${cfg.nombre || 'Zona'} colocada: dura ${n} turno${n === 1 ? '' : 's'}`);
@@ -233,6 +238,7 @@ function zonaPersistenteDeHabilidad(msg){
     radio, turnos: msg.zonaTurnos, nombre: msg.nombre, amiga: msg.zonaAmiga, dano: msg.zonaDano, ignoraDef: msg.zonaIgnoraDef,
     estado: msg.zonaEstado, resistStat: msg.resistStat, resistValor: msg.resistValor, enMantenimiento: true, cadaPaso: false,
     casteadorRef: msg.fichaId, casteadorTipo: msg.casteadorTipo,
+    danoDif: msg.zonaDanoDif, danoTipo: msg.zonaDanoTipo, tiraExtra: msg.zonaTiraExtra, nota: msg.zonaNota,
   }), `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': marcá el centro' : 'Elegí el centro de la zona'}</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true);
 }
 // 🪤 Trampa de una habilidad ✨ automática (2026-09-30, pedido del dueño): quien la usa elige la casilla con un clic (antes quedaba

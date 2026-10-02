@@ -67,6 +67,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js"></script>
 <script src="ficha-acciones.js"></script>
+<script src="ficha-mantenimiento.js"></script>
 <script src="tiradas-propias.js"></script>
 <script src="efectos-golpe.js"></script>
 <script src="confirmar-turno.js"></script>
@@ -536,6 +537,17 @@ prueba('una parte que cambió desde otra ventana: el retrato y las invocaciones 
   FichaGuardado.aplicarParte(S, 'invocaciones', {invocaciones: [{id: 'i1', nombre: 'Lobo'}]}, {imgInvocaciones: JSON.stringify({i1: 'data:lobo'})});
   FichaGuardado.aplicarParte(S, 'retrato', FichaGuardado.leerParte('retrato', JSON.stringify({imagen: 'data:nuevo', miniatura: 'data:mini'})));
   igual([S.meta.nombre, S.hp, S.invocaciones[0].imagen, S.meta.imagen, S.meta.miniatura], ['B', 3, 'data:lobo', 'data:nuevo', 'data:mini']);
+});
+
+/* ---------- El Mantenimiento de un personaje (comun/ficha-mantenimiento.js, hoja de ruta A2, 2026-10-02) ---------- */
+grupo('Mantenimiento de un personaje (A2)');
+prueba('un pase de turno: SP Regen al principio, el estado daña y baja un turno, No2 a full, la invocación se duerme', () => {
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, hp: 10, spGastado: 5, nitros: 1, ataquesTurno: 2,
+    efectos: [{id: 'q', nombre: 'Quemadura', hpturno: -2, turnos: 2, activo: true}],
+    invocaciones: [{id: 'i1', nombre: 'Lobo', activa: true, hp: 5, hpMax: 10, nitros: 0, cooldown: 1, cooldownActual: 1, estados: [], habilidades: []}]}).S);
+  const r = FichaMantenimiento.aplicar(S, {fijarHp: v => FichaAcciones.fijarHp(S, v)});
+  igual([S.hp, S.spGastado, S.nitros, S.ataquesTurno, S.turno, S.efectos.map(e => e.nombre + ':' + e.turnos), S.invocaciones[0].activa, r.rep],
+    [8, 3, 6, 0, 2, ['Quemadura:1'], false, ['SP: +2 (SP Regen)', 'Quemadura: −2 HP', 'Quemadura: 2 → 1 turno', 'HP total: 10 → 8']]);
 });
 
 /* ---------- El dibujo de la Botonera (comun/ficha-botonera.js, paso 4 etapa 3b) ---------- */

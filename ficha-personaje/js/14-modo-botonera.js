@@ -170,16 +170,8 @@ async function mantenimientoRevisar(){
   if(mantenimientoRevisando){ mantenimientoOtraVez = true; return; }
   mantenimientoRevisando = true;
   try{
-    const objetivo = mantenimientoSenal;
-    const ref = fbDb.doc(fbRutaCampana(`fichas/${f.id}/partes/mantenimiento`));
-    const veces = await fbDb.runTransaction(async tx => {
-      const doc = await tx.get(ref);
-      let hecho = null;
-      if(doc.exists){ try{ hecho = Math.round(num(JSON.parse(doc.data().json))); }catch(e){} }
-      if(hecho !== null && hecho >= objetivo) return 0;
-      tx.set(ref, {json: JSON.stringify(objetivo), actualizado: firebase.firestore.FieldValue.serverTimestamp()});
-      return hecho === null ? 0 : Math.min(MANTENIMIENTO_MAX_SEGUIDOS, objetivo - hecho);
-    });
+    const veces = await FichaMantenimiento.reclamar(fbDb, fbRutaCampana(`fichas/${f.id}`), mantenimientoSenal,
+      () => firebase.firestore.FieldValue.serverTimestamp());   // comun/ficha-mantenimiento.js
     if(fichaVivo !== f) return;
     for(let i = 0; i < veces; i++) mantenimiento();
     if(veces) toast(veces > 1 ? `Mantenimiento del GM: pasaron ${veces} turnos` : 'Mantenimiento del GM: pasó el turno');

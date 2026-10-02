@@ -443,106 +443,14 @@ function confirmarCostoVariable(){
   if(FichaAcciones.confirmarCostoVariable(S, it, sp, nitros, armaDeLaHab, habUi)) pendingArmaHab = undefined;
 }
 
+// El pase de turno (2026-10-02, hoja de ruta A2): la regla vive en comun/ficha-mantenimiento.js (la usa también el mapa, que
+// hace el Mantenimiento de sus personajes sin cargar la ficha); acá queda lo que se ve.
 function mantenimiento(){
-  const c = compute();
-  const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
-  const log = [];
-  let hpDelta = 0;
-  // Reporte para la Mesa (2026-09-24): lo que le pasó a este personaje en el pase de turno, en texto llano y con el antes y el
-  // después, para que todos vean si el veneno bajó, si la regeneración curó, etc. Se publica al final (mesaPublicarReporte).
-  const rep = [];
-  const hpAntes = num(S.hp);
-
-  // SP Regen: AL PRINCIPIO del Mantenimiento (2026-09-24), con los números de antes de que venza o cambie ningún estado.
-  // Por defecto es la mitad del Especial, redondeada hacia abajo (fórmula base del stat), más lo que sumen habilidades, equipo o estados.
-  // Recupera SP sin pasar del máximo (si ya estaba por encima, no se toca).
-  const spRegen = Math.max(0, Number.isNaN(c.final.spregen) ? 0 : Math.floor(c.final.spregen));
-  const spRecuperado = Math.min(spRegen, Math.max(0, num(S.spGastado)));
-  if(spRecuperado){
-    S.spGastado = num(S.spGastado) - spRecuperado;
-    rep.push(`SP: +${fmt(spRecuperado)} (SP Regen)`);
-  }
-
-  // Lo que hacen los estados en el pase de turno (escudo, daño/cura con inmunidades, stacks, turnos): regla común de
-  // personajes, invocaciones y creeps (comun/combatiente.js). La vida se aplica más abajo, con fijarHp (tope, Ankh, muerte).
-  const turnoEst = Combatiente.pasarTurnoEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno'});
-  hpDelta += turnoEst.hp;
-  Combatiente.reporteTurno(turnoEst.eventos).forEach(l => { rep.push(l); log.push(esc(l)); });
-
-  // Pasivas de regeneración: recuperan HP en cada Mantenimiento (por compra).
-  S.pasivas.forEach(p => {
-    const hp = num(p.regenHp) * pasivaCompras(p);
-    if(hp > 0 && num(S.hp) > 0){
-      hpDelta += hp;
-      log.push(`<b>${esc(p.nombre)}</b> <span class="heal">+${fmt(hp)} HP</span>`);
-      rep.push(`${p.nombre} (pasiva): +${fmt(hp)} HP`);
-    }
+  const {rep, avisos} = FichaMantenimiento.aplicar(S, {
+    fijarHp: v => fijarHp(v),
+    muerte: () => renderOverlayMuerte(),
+    limpiarParry: () => { parryArmaPendiente = null; parryPendienteInv.clear(); },
   });
-
-  if(hpDelta){
-    // Pasa por fijarHp para que el veneno que te deja en 0 active el Ankh
-    // antes de que se descuenten los turnos de muerte, más abajo.
-    fijarHp(num(S.hp) + hpDelta);
-    if(num(S.hp) !== hpAntes) rep.push(`HP total: ${fmt(hpAntes)} → ${fmt(num(S.hp))}`);
-    else rep.push(`HP total: sigue en ${fmt(hpAntes)}`);
-  }
-
-  if(S.muerto && S.muerto.activo && !S.muerto.definitivo && num(S.hp) <= 0){
-    S.muerto.turnos = Math.max(0, num(S.muerto.turnos) - 1);
-    if(S.muerto.turnos === 0){
-      S.muerto.definitivo = true;
-      log.push(`<span class="gone">TE HAS MORIDO BIEN MUERTO Y YA NO HAY VUELTA ATR&Aacute;S</span>`);
-      rep.push('Murió: ya no hay vuelta atrás');
-    }else{
-      log.push(`Inconsciente: morís en <b>${fmt(S.muerto.turnos)}</b> turno(s)`);
-      rep.push(`Inconsciente: muere en ${fmt(S.muerto.turnos)} turno${S.muerto.turnos === 1 ? '' : 's'}`);
-    }
-    renderOverlayMuerte();
-  }
-
-  // Los estados que se terminaron se sacan por identidad (fijarHp pudo tocar la lista, por ejemplo el Ankh).
-  if(turnoEst.terminados.length){
-    const fin = new Set(turnoEst.terminados);
-    S.efectos = S.efectos.filter(e => !fin.has(e));
-  }
-
-  S.turno = (S.turno || 1) + 1;
-  parryArmaPendiente = null;
-  parryPendienteInv.clear();
-  // Nitros se recargan al máximo y el primer ataque vuelve a costar la
-  // mitad (el SP ya se regeneró al principio del Mantenimiento, ver arriba).
-  S.nitros = nitrosMaximo();
-  S.ataquesTurno = 0;
-  S.ataquesArma = {};
-
-  let invocacionesVencidas = 0;
-  S.invocaciones.forEach(inv => {
-    migrarInvocacion(inv);
-    if(inv.activa === false) return; // ya dormida, no se sigue procesando
-    // Nitros se recargan al máximo, igual que el propio personaje.
-    inv.nitros = invNitrosMax(inv);
-    inv.ataquesTurno = 0;
-    inv.habilidades.forEach(h => { if(num(h.cdActual) > 0) h.cdActual = Math.max(0, num(h.cdActual) - 1); });
-    // Estados alterados de la invocación: la MISMA regla que el personaje y los creeps (comun/combatiente.js). Hasta el
-    // 2026-09-30 era una copia recortada: no respetaba inmunidades, no recargaba el escudo y la vida no tenía tope.
-    const turnoInv = Combatiente.pasarTurnoEstados(inv.estados, {hp: 'hpturno', stacks: 'stacksturno'});
-    if(turnoInv.hp) inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, num(inv.hp) + turnoInv.hp));
-    inv.estados = turnoInv.quedan;
-    if(num(inv.cooldown) > 0){
-      inv.cooldownActual = Math.max(0, num(inv.cooldownActual) - 1);
-      if(inv.cooldownActual === 0){
-        inv.activa = false;
-        invocacionesVencidas++;
-      }
-    }
-  });
-  if(invocacionesVencidas){
-    log.push(`${invocacionesVencidas} invocación(es) quedaron dormidas al llegar el cooldown a 0.`);
-  }
-
-  log.unshift(`<b style="color:var(--brass)">Turno ${S.turno}</b>`);
-  log.push(`Nitros recargados a ${fmt(num(S.nitros))}.` + (spRegen ? ` SP ${spRecuperado ? `<span class="heal">+${fmt(spRecuperado)}</span>` : '+0'} (SP Regen ${fmt(spRegen)}${spRegen && !spRecuperado ? ', ya estaba lleno' : ''}).` : ''));
-  S.log = log;
   mesaPublicarReporte(`Turno ${S.turno}`, rep);
 
   renderTurno();
@@ -553,7 +461,6 @@ function mantenimiento(){
   refresh();
   if(S.hp === 0) toast('Te quedaste en 0 de HP');
 
-  const avisos = S.efectos.filter(e => e.popup && e.activo !== false);
   if(avisos.length) showReminder(avisos);
   // En segundo plano (desde el mapa) el cartel no se ve: los recordatorios
   // van a la Mesa, a nombre del personaje.

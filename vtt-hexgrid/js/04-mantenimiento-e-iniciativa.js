@@ -23,15 +23,10 @@ function escucharMantenimiento(){
     fuegoMantenimiento(numero);   // terreno incendiado: daño a los que siguen adentro
     zonaRevisarMantenimiento();   // zonas persistentes: a quien le falte algo, le aparece el cartelito
     const base = '../';
-    if(soyGM){
-      mantenimientoEncolar(`${base}gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=mantenimiento`);
-      // 🎮 Los personajes que el GM controla: les pasa el turno él (su dueño los tiene en solo lectura).
-      fichasPub.forEach((f, id) => { if(controloFicha(id)) mantenimientoEncolar(`${base}ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=mantenimiento#${encodeURIComponent(id)}`); });
-    }else{
-      fichasPub.forEach((f, id) => {
-        if(f.duenoUid === fbUsuario.uid) mantenimientoEncolar(`${base}ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=mantenimiento#${encodeURIComponent(id)}`);
-      });
-    }
+    if(soyGM) mantenimientoEncolar(`${base}gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=mantenimiento`);
+    // Los personajes que maneja este usuario (los suyos, o los que el GM controla con 🎮): desde el 2026-10-02 (hoja de ruta A2) el
+    // pase de turno lo hace el mapa él mismo (js/11, mantenimientoPersonajes), sin cargar la ficha en un marco invisible.
+    mantenimientoPersonajes(numero);
   }, err => console.error('Error escuchando el mantenimiento:', err));
 }
 

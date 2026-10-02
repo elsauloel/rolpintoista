@@ -111,7 +111,7 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261002i', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js?v=20261002i', '../comun/ficha-habilidades.js?v=20261001c',
+const BN_PIEZAS = ['../comun/ficha-mantenimiento.js?v=20261002a', '../comun/ficha-calculo.js?v=20261002i', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js?v=20261002i', '../comun/ficha-habilidades.js?v=20261001c',
   '../comun/catalogo.js?v=20261002i', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261002d', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261002i', '../comun/ficha-resumen.js?v=20261002o', '../comun/inv-calculo.js?v=20261002d', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/inv-duelo.js?v=20261001a', '../comun/ficha-acciones.js?v=20261002i', '../comun/inv-habilidades.js?v=20261002g', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
@@ -402,20 +402,24 @@ function bnPuedeGuardar(){
   const f = bn && bn.sesion;
   return !!(f && f.cargada && fbUsuario && (f.duenoUid === fbUsuario.uid || (f.control && f.control.uid === fbUsuario.uid)));
 }
-function bnOpcionesGuardado(f){
+function bnOpcionesGuardado(f){ return opcionesGuardadoMapa(f, () => bn.S, () => bn.doc, () => !!bn && bn.sesion === f); }
+// Cómo guarda el mapa a un personaje (FichaSesion.guardar): la Botonera nueva y el Mantenimiento (A2). getS/getDoc: el personaje armado
+// y su documento público; vigente: ¿sigue abierta esa sesión?
+function opcionesGuardadoMapa(f, getS, getDoc, vigente){
   // Las miniaturas de las invocaciones las calcula la ficha (tardan): se reusan las que ya están publicadas.
   const miniaturaInv = img => {
-    const inv = (bn.S.invocaciones || []).find(i => i.imagen === img);
-    const r = inv && (((bn.doc && bn.doc.resumen) || {}).invocaciones || []).find(x => x.id === String(inv.id));
+    const inv = (getS().invocaciones || []).find(i => i.imagen === img);
+    const doc = getDoc();
+    const r = inv && (((doc && doc.resumen) || {}).invocaciones || []).find(x => x.id === String(inv.id));
     return (r && r.miniatura) || '';
   };
   return {
     db: fbDb, ruta: fbRutaCampana(`fichas/${f.id}`), marcaDeTiempo: () => firebase.firestore.FieldValue.serverTimestamp(),
-    partes: () => FichaGuardado.partes(bn.S),
-    resumen: () => FichaResumen.resumen(bn.S, {control: f.control, miniaturaInv}),
-    nombre: () => String((bn.S.meta && bn.S.meta.nombre) || '').trim().slice(0, 60) || 'Sin nombre',
-    miniatura: async () => (bn.doc && bn.doc.miniatura) || '',
-    vigente: () => !!bn && bn.sesion === f,
+    partes: () => FichaGuardado.partes(getS()),
+    resumen: () => FichaResumen.resumen(getS(), {control: f.control, miniaturaInv}),
+    nombre: () => String((getS().meta && getS().meta.nombre) || '').trim().slice(0, 60) || 'Sin nombre',
+    miniatura: async () => (getDoc() && getDoc().miniatura) || '',
+    vigente,
     alError: (err, primeraVez) => { if(primeraVez) toast('No se pudo guardar el personaje: se reintenta solo'); },
   };
 }
@@ -951,6 +955,85 @@ function bnManejo(fichaId){
   if(!f || !yo) return false;
   const control = f.resumen && f.resumen.control;
   return control ? control === yo : f.duenoUid === yo;
+}
+/* ---------- El Mantenimiento de los personajes, hecho por el mapa (2026-10-02, hoja de ruta A2) ----------
+   Antes, en cada ⟳ Mantenimiento el mapa cargaba en un marco invisible la ficha de cada personaje que maneja este usuario (su dueño,
+   o el GM con 🎮 el control) para que corriera su mantenimiento(). Ahora lo hace el mapa con la misma regla (comun/ficha-mantenimiento.js):
+   lee al personaje (la sesión de la Botonera nueva si ya está abierta; si no, una sesión de un rato), toma los turnos que le tocan con
+   la misma transacción de siempre (si otra pantalla ya los aplicó, no hace nada), los aplica, publica el reporte en la Mesa y guarda. */
+let mantPersonajesCola = Promise.resolve();
+function mantenimientoPersonajes(numero){
+  fichasPub.forEach((f, id) => {
+    if(!bnManejo(id)) return;
+    mantPersonajesCola = mantPersonajesCola.then(() => mantenimientoPersonaje(id, numero))
+      .catch(err => console.error('No se pudo aplicar el Mantenimiento de un personaje:', err));
+  });
+}
+// La vida en el pase de turno, como fijarHp de la ficha: tope, y el Ankh del cinturón y el estado de muerte.
+function mantFijarHp(S, v){
+  FichaAcciones.fijarHp(S, v);
+  const ankh = FichaAcciones.revisarAnkh(S);
+  if(ankh) toast(`¡${ankh} se activó solo! ${(S.meta && S.meta.nombre) || 'Tu personaje'} revive con ${fmt(S.hp)} HP.`);
+  FichaAcciones.revisarMuerte(S);
+}
+async function mantenimientoPersonaje(fichaId, numero){
+  await bnCargarPiezas();
+  const ruta = fbRutaCampana(`fichas/${fichaId}`);
+  const enBn = () => !!(bn && bn.fichaId === fichaId && bn.S && bn.sesion && bn.sesion.cargada);
+  const tmp = enBn() ? null : await mantSesionTemporal(fichaId);
+  if(!enBn() && !tmp) return;
+  try{
+    const veces = await FichaMantenimiento.reclamar(fbDb, ruta, numero, () => firebase.firestore.FieldValue.serverTimestamp());
+    if(!veces) return;
+    const usarBn = !tmp && enBn();
+    const S = usarBn ? bn.S : tmp.S;
+    const antes = FichaGuardado.partes(S);
+    const nombre = ((S.meta && S.meta.nombre) || '').trim();
+    for(let i = 0; i < veces; i++){
+      const r = FichaMantenimiento.aplicar(S, {
+        fijarHp: v => mantFijarHp(S, v),
+        limpiarParry: () => { if(usarBn){ bn.parryPendiente = null; if(bn.invParry) bn.invParry.clear(); } },
+      });
+      FichaMantenimiento.publicarReporte(`Turno ${S.turno}`, r.rep, nombre);
+      FichaMantenimiento.publicarRecordatorios(r.avisos, nombre);
+    }
+    if(usarBn){ bnUi(antes).cambio(); return; }
+    // Sesión de un rato: se escriben solo las partes que cambió el pase de turno (lo que difiera por haberlo armado distinto, no).
+    const f = tmp.f;
+    const despues = FichaGuardado.partes(S);
+    Object.keys(despues).forEach(p => { if(despues[p] === antes[p] && despues[p] !== f.ultimo[p]) f.ultimo[p] = despues[p]; });
+    f.soloLectura = false;
+    const opts = opcionesGuardadoMapa(f, () => tmp.S, () => tmp.doc, () => tmp.vivo);
+    for(let i = 0; i < 6 && FichaSesion.pendiente(f, () => FichaGuardado.partes(tmp.S)); i++){
+      await FichaSesion.guardar(f, true, opts);
+      if(FichaSesion.pendiente(f, () => FichaGuardado.partes(tmp.S))) await new Promise(r => setTimeout(r, 1500));
+    }
+  }finally{
+    if(tmp){ tmp.vivo = false; FichaSesion.cortar(tmp.f); }
+  }
+}
+// Lee al personaje en vivo un rato (sin mostrarlo), como la Botonera nueva. → {f, S, doc, vivo} o null si no se pudo leer en 15 s.
+async function mantSesionTemporal(fichaId){
+  const f = FichaSesion.nueva(fichaId, '', false, true);
+  const st = {f, S: null, doc: null, vivo: true};
+  FichaSesion.escuchar(f, {
+    db: fbDb, ruta: fbRutaCampana(`fichas/${fichaId}`), vigente: () => st.vivo,
+    alDoc: doc => { st.doc = doc.exists ? doc.data() : null; if(st.doc) f.duenoUid = st.doc.duenoUid; },
+    alCargar: armado => {
+      const S = FichaGuardado.normalizar(armado.datos, {mezclarCatalogo: bnMezclarCatalogo}).S;
+      FichaGuardado.ponerImagenesInvocaciones(S, armado.imgInvocaciones);
+      FichaGuardado.completar(S);
+      st.S = S;
+      f.cargada = true;
+    },
+    alControl: c => { f.control = c; },
+    aplicarParte: (parte, datos) => FichaGuardado.aplicarParte(st.S, parte, datos, {mezclarCatalogo: bnMezclarCatalogo, imgInvocaciones: f.ultimo.imgInvocaciones || ''}),
+    alCambiar: () => FichaGuardado.completar(st.S),
+    alErrorPartes: err => console.error('Mantenimiento: no se pudo leer el personaje', err),
+  });
+  for(let i = 0; i < 150 && !st.S; i++) await new Promise(r => setTimeout(r, 100));
+  if(!st.S){ st.vivo = false; FichaSesion.cortar(f); return null; }
+  return st;
 }
 // Para el duelo: abre la sesión de ese personaje si hace falta y devuelve los ganchos (o null: va por el marco). No cambia de personaje
 // si la Botonera nueva está a la vista con otro (no se le cambia lo que está mirando).

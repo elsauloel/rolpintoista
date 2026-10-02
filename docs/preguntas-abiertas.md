@@ -625,3 +625,9 @@ resuelven a mano, como el resto de los avisos).
 
 - ✅ **P141 — resuelta 2026-10-01 (dueño): (1) creeps primero; (2) el mismo interruptor ⚗; (3) P137, esperar.** Lo que sigue es el planteo original:
 - ~~**P141. Etapa 4 del paso 4 (Acciones de los creeps y Botonera de las invocaciones en el mapa): orden e interruptor (2026-10-01, `docs/plan-paso4-etapa4.md`).** (1) ¿Creeps primero o invocaciones primero? *Recomendado: creeps* (es lo que el GM usa en cada combate; después las invocaciones reusan sus reglas). (2) ¿El mismo interruptor ⚗ "Botonera nueva" para las Acciones nuevas de los creeps? *Recomendado: sí, uno solo*. (3) P137 (diferencias entre ficha, GM Tools e invocaciones) hace falta decidirla antes de las invocaciones, no antes de los creeps. Mientras no se conteste, se avanza con lo recomendado (la 4a, las reglas de los creeps en `comun/creep-calculo.js`, ya está hecha y sirve para cualquier orden).~~
+
+- **P142. El daño «Tóxico»: ¿qué lo frena? (2026-10-02, al sumar el tipo Tóxico para Pedos Tóxicos).** El dueño dijo que el daño tóxico
+  «a fines prácticos no es igual al arcano». Por ahora Tóxico es un tipo más del paso «Daño» (etiqueta propia: "4 de daño tóxico") y,
+  como los mágicos, arranca con «Ignora la Defensa» tildado (un gas pasa la armadura; se puede destildar). Abierto: en un duelo, el daño
+  de habilidad que ignora la Defensa se reduce con la **Armadura mágica** del objetivo — ¿también el tóxico, o lo frena otra cosa
+  (Inmunidad a veneno, Constitución…)? En las zonas persistentes hoy no resta Armadura mágica (ningún tipo).

@@ -1004,3 +1004,10 @@ versión parecida en más de una, es candidato a juntar.
   (si no, una línea "Otros ajustes"). `html(modelo, botones)` lo dibuja con `CSS` (va en un recuadro aislado; los globos de origen son
   CSS puro al pasar el mouse). Solo arma HTML. Lo usa el mapa (`vtt-hexgrid/js/15-ficha-lite.js`). Necesita las piezas `ficha-*.js`
   (personaje), `creep-calculo.js` o `inv-calculo.js`.
+- **Zona persistente: daño «la diferencia» y tirada extra** (2026-10-02, pedido del dueño para Pedos Tóxicos): en el paso «Daño» del ✨
+  (`asistente-duelo-hab.js`), con objetivo zona hay una tercera opción, **«Sí: la diferencia entre las tiradas»** (`danoDiferencia`): cada
+  uno que no resiste recibe la tirada de quien la creó menos la suya (empate: nada). Y **«Si el daño entra, tirar además»** (`danoExtra`,
+  ej. `1d20`): se tira solo y sale en la Mesa con el texto de «Tiene un efecto que no se puede automatizar» (`efectoLibre`: qué significa
+  cada resultado; aplicarlo sigue a mano). Tipo de daño nuevo **Tóxico** (P142). `Combatiente.zonaDeHab` manda `zonaDanoDif`,
+  `zonaDanoTipo`, `zonaTiraExtra`, `zonaNota`. **Regla del dueño: resistir una zona evita todo** (antes el daño de fórmula entraba igual).
+  Reglas de Firestore nuevas (esos cuatro campos del elemento).

@@ -1194,3 +1194,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `FichaSesion` (solo mirar, nunca guarda) y el creep de `creepsPriv` (se redibuja con cada cambio, `flCreepCambio`). Recuadro
   aislado (shadow DOM), z-index 88 (debajo de la Botonera nueva y del marco). `abrirFichaDeToken` (js/10) y la F (js/06) la usan;
   el mensaje `abrir-ficha-mapa` y la ficha liviana vieja de la ficha (`fichaMapaAbrir`, `#scrim-ficha-mapa`) quedaron sin uso.
+
+- **Zonas: daño «la diferencia», tirada extra y resistir evita todo** (2026-10-02): el elemento de una zona suma `zonaDanoDif`,
+  `zonaDanoTipo` (la etiqueta: "tóxico"), `zonaTiraExtra` y `zonaNota` (`crearElementoZona`, `escucharElementos`). En `zonaResolverBanner`:
+  si quien entra resiste, no recibe nada (antes el daño de fórmula entraba igual); si no, el daño es la fórmula o, con `zonaDanoDif`, la
+  tirada guardada menos la suya (empate = 0, sin daño ni tirada extra); si el daño entró, se tira `zonaTiraExtra` y se publica en la Mesa
+  con `zonaNota` (`mesaConTexto`). Reglas nuevas de Firestore.

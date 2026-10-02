@@ -184,20 +184,6 @@ select option{background:var(--panel)}
     <p class="sub">Entrá a una partida o creá una nueva. Quien crea la partida es su GM; los que se unen son jugadores.</p>
     <div class="grid" id="lista-partidas"></div>
 
-    <div class="caja" id="crear-partida" hidden style="margin-top:18px;max-width:460px">
-      <b>Nueva partida</b>
-      <form id="form-crear">
-        <label for="in-partida-nombre">Nombre de la partida</label>
-        <input id="in-partida-nombre" maxlength="60" required placeholder="Ej: Piratas en el espacio">
-        <label for="in-partida-apodo">Tu nombre en esta partida</label>
-        <input id="in-partida-apodo" maxlength="40" required placeholder="Así te ven los demás">
-        <div class="fila">
-          <button type="submit" class="btn primary">Crear y entrar como GM</button>
-          <button type="button" class="btn" id="btn-crear-cancelar">Cancelar</button>
-        </div>
-        <div class="error" id="crear-error"></div>
-      </form>
-    </div>
   </section>
 
   <!-- Una partida -->
@@ -324,6 +310,7 @@ select option{background:var(--panel)}
 <script src="comun/sesion.js"></script>
 <script src="comun/respaldo.js"></script>
 <script src="comun/menu-sitio.js"></script>
+<script src="comun/paso-a-paso.js?v=20261002g"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
@@ -547,10 +534,7 @@ function renderPartidas(){
       <span class="desc">Vas a ser su GM.</span>
     </button>`;
   cont.querySelectorAll('[data-partida]').forEach(b => b.onclick = () => irAPartida(b.dataset.partida));
-  $('#btn-nueva-partida').onclick = () => {
-    $('#crear-partida').hidden = false;
-    $('#in-partida-nombre').focus();
-  };
+  $('#btn-nueva-partida').onclick = abrirCrearPartida;
 }
 
 async function verPartidas(){
@@ -567,29 +551,53 @@ async function verPartidas(){
   }
 }
 
-$('#btn-crear-cancelar').onclick = () => { $('#crear-partida').hidden = true; };
-
-$('#form-crear').onsubmit = async e => {
-  e.preventDefault();
-  const nombre = $('#in-partida-nombre').value.trim();
-  const apodo = $('#in-partida-apodo').value.trim();
-  if(!nombre || !apodo) return;
-  $('#crear-error').textContent = '';
-  try{
-    const ts = firebase.firestore.FieldValue.serverTimestamp();
-    const ref = fbDb.collection('campanas').doc();
-    const batch = fbDb.batch();
-    batch.set(ref, {nombre, gmUid: fbUsuario.uid, gmNombre: apodo, creado: ts});
-    batch.set(ref.collection('miembros').doc(fbUsuario.uid), {nombre: apodo, gm: true, creado: ts});
-    await batch.commit();
-    $('#form-crear').reset();
-    $('#crear-partida').hidden = true;
-    irAPartida(ref.id);
-  }catch(err){
-    console.error('No se pudo crear la partida:', err);
-    $('#crear-error').textContent = textoError(err);
+// «+ Crear partida», paso a paso en la ventana común (comun/paso-a-paso.js, 2026-10-02, tanda 6 de docs/plan-paso-a-paso.md):
+// La partida (nombre) → Vos (tu nombre en ella) → Listo («✔ Crear y entrar como GM»).
+function abrirCrearPartida(){
+  const st = {nombre: '', apodo: (fbUsuario && fbUsuario.displayName ? fbUsuario.displayName.split(' ')[0] : '').slice(0, 40)};
+  const campo = (id, etq, max, ph, val) => `<div class="pap-campo"><label for="${id}">${etq}</label><input id="${id}" maxlength="${max}" placeholder="${ph}" value="${esc(val)}"></div>`;
+  const enfocar = id => (c, a) => { const el = a.raiz.querySelector('#' + id); if(el) setTimeout(() => el.focus(), 30); };
+  const falta = i => i > 0 && !st.nombre.trim() ? 'Ponele un nombre a la partida.' : i > 1 && !st.apodo.trim() ? 'Escribí cómo te van a ver los demás.' : '';
+  async function crear(){
+    const f = falta(2);
+    if(f){ api.aviso(f); return false; }
+    try{
+      const ts = firebase.firestore.FieldValue.serverTimestamp();
+      const ref = fbDb.collection('campanas').doc();
+      const batch = fbDb.batch();
+      batch.set(ref, {nombre: st.nombre.trim().slice(0, 60), gmUid: fbUsuario.uid, gmNombre: st.apodo.trim().slice(0, 40), creado: ts});
+      batch.set(ref.collection('miembros').doc(fbUsuario.uid), {nombre: st.apodo.trim().slice(0, 40), gm: true, creado: ts});
+      await batch.commit();
+      setTimeout(() => irAPartida(ref.id), 0);
+    }catch(err){
+      console.error('No se pudo crear la partida:', err);
+      api.aviso('No se pudo crear la partida: ' + textoError(err));
+      return false;
+    }
   }
-};
+  const pasos = [
+    {id: 'partida', nombre: 'La partida', ayuda: '<b>¿Cómo se llama?</b> Una partida es una campaña: sus personajes, mapas, creeps y tienda. Quien la crea es su GM.',
+      html: () => campo('pn-nombre', 'Nombre de la partida', 60, 'Ej.: Piratas en el espacio', st.nombre), alMontar: enfocar('pn-nombre')},
+    {id: 'vos', nombre: 'Vos', ayuda: '<b>¿Cómo te ven los demás?</b> Tu nombre en esta partida (en la Mesa, en el mapa, en la lista de jugadores).',
+      html: () => campo('pn-apodo', 'Tu nombre en esta partida', 40, 'Así te ven los demás', st.apodo), alMontar: enfocar('pn-apodo')},
+    {id: 'listo', nombre: 'Listo', ayuda: '<b>Así queda.</b> Los jugadores la ven en la lista de partidas y entran con «Unirse».',
+      html: () => `<p style="font-size:15px;line-height:1.6;margin:0">🎲 <b>${esc(st.nombre.trim() || '—')}</b><br>GM: ${esc(st.apodo.trim() || '—')} (vos)</p>
+        <p class="pap-nota">Después: armá el primer mapa desde 🗺 Mapas, tus creeps en GM Tools y la tienda en el generador de tiendas.</p>`},
+  ];
+  const api = PasoAPaso.abrir({
+    titulo: '+ Crear partida', crear: true, ancho: 760, textoCrear: '✔ Crear y entrar como GM',
+    pasos, puedeIr: falta,
+    alInput: e => { if(e.target.id === 'pn-nombre') st.nombre = e.target.value; else if(e.target.id === 'pn-apodo') st.apodo = e.target.value; },
+    alTecla: e => {
+      if(e.key !== 'Enter' || e.target.tagName !== 'INPUT') return;
+      e.preventDefault();
+      if(api.paso() < pasos.length - 1) api.irA(api.paso() + 1);
+      else crear().then(r => { if(r !== false && api.abierto()) api.cerrar(); });
+    },
+    confirmarCancelar: '',
+    alCrear: () => crear(),
+  });
+}
 
 /* ---------- Una partida ---------- */
 

@@ -61,11 +61,20 @@ async function crearTokensDelMapa(){
     toast('No se pudieron crear los tokens — mirá la consola');
   }
 }
-async function pedirMapaNuevo(){
-  const n = (prompt('Nombre del mapa nuevo (por ejemplo, el escenario de combate):') || '').trim().slice(0, 40);
-  if(!n) return null;
-  try{ return await CreepsMapas.crearMapa(n); }
-  catch(err){ console.error('No se pudo crear el mapa:', err); toast('No se pudo crear el mapa'); return null; }
+// ＋ Mapa nuevo: el asistente paso a paso común (comun/asistente-mapa.js). `marcado`: el creep que pidió el mapa nuevo («Mover a… ＋ mapa
+// nuevo»), que arranca marcado. Devuelve el id del mapa (o null si se canceló); los creeps marcados se mudan acá.
+function pedirMapaNuevo(marcado){
+  return new Promise(resolver => {
+    const creeps = creepsReales().map(sc => ({id: sc.id, nombre: nombreLimpioCreep(sc), donde: nombreDeMapaGM(mapaDeCreepGM(sc))}));
+    AsistenteMapa.abrir({nombre: `Mapa ${mapasGM.size + 1}`, creeps, marcados: marcado ? [marcado] : [], alCrear: async r => {
+      let id;
+      try{ id = await CreepsMapas.crearMapa(r.nombre); }
+      catch(err){ console.error('No se pudo crear el mapa:', err); toast('No se pudo crear el mapa'); return false; }
+      if(!mapasGM.has(id)) mapasGM.set(id, {nombre: r.nombre, creadoMs: Date.now()});   // hasta que llegue de Firebase
+      for(const cid of r.creeps){ const sc = S.creeps.find(s => s.id === cid); if(sc) await moverCreepAMapa(sc, id); }
+      resolver(id);
+    }, alCancelar: () => resolver(null)});
+  });
 }
 // Mudar un creep a otro mapa (o a la Reserva), con su token: si tenía uno, aparece oculto en el mapa nuevo y se va del viejo.
 async function moverCreepAMapa(sc, destino){
@@ -95,9 +104,8 @@ document.addEventListener('change', async e => {
   if(!sc) return;
   let destino = t.value;
   if(destino === '__nuevo'){
-    destino = await pedirMapaNuevo();
-    if(destino === null){ renderAll(); return; }
-    if(!mapasGM.has(destino)) mapasGM.set(destino, {nombre: 'Mapa nuevo', creadoMs: Date.now()});   // hasta que llegue de Firebase
+    await pedirMapaNuevo(sc.id);   // si lo deja marcado, el asistente ya lo muda
+    renderAll(); return;
   }
   moverCreepAMapa(sc, destino);
 });

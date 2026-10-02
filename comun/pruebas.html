@@ -78,6 +78,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="asistente-estado.js"></script>
 <script src="asistente-trampa.js"></script>
 <script src="asistente-zona.js"></script>
+<script src="asistente-mapa.js"></script>
 <script src="selector-estados.js"></script>
 <script src="ficha-equipo.js"></script>
 <script src="ficha-botin.js"></script>
@@ -1509,6 +1510,23 @@ prueba('cantidades de un estado en la ventana común: una pregunta por paso, val
   const nada = await p2;
   igual([tabs, aviso, bloqueado, armado.escudoMagico, armado.permanente, armado.turnos, nada, v.mia.isConnected],
     [['HP del escudo', 'Turnos'], 'HP del escudo: Escribí un número.', true, 7, true, 0, null, false]);
+});
+prueba('mapa nuevo en la ventana común: sin nombre no avanza; los creeps se agrupan por dónde están y ✔ Crear devuelve los marcados', async () => {
+  let res = null;
+  AsistenteMapa.abrir({nombre: '', creeps: [{id: 'a', nombre: 'Goblin', donde: 'Reserva'}, {id: 'b', nombre: 'Orco', donde: 'Mina'}, {id: 'c', nombre: 'Rata', donde: 'Reserva'}], marcados: ['b'],
+    alCrear: r => { res = r; }});
+  const v = papUltima();
+  const tabs = v.tabs();
+  v.clic('[data-pap="sig"]');
+  const aviso = v.q('.pap-aviso').textContent;
+  v.escribir('#am-nombre', 'Cueva');
+  v.clic('[data-pap="sig"]');
+  const grupos = [...v.mia.querySelectorAll('.am-grupo h4')].map(h => h.textContent);
+  v.clic('[data-am-todos="Reserva"]');
+  v.ir('Listo');
+  v.clic('[data-pap="crear"]'); await new Promise(r => setTimeout(r, 0));
+  igual([tabs, aviso, grupos, res && res.nombre, res && res.creeps.sort(), v.mia.isConnected],
+    [['Nombre', 'Creeps', 'Listo'], 'Ponele un nombre al mapa.', ['🎒 Reserva (en ningún mapa)', '🗺 En «Mina»'], 'Cueva', ['a', 'b', 'c'], false]);
 });
 /* ---------- Creeps por mapa (comun/creeps-mapas.js, 2026-10-02: los grupos pasaron a ser mapas) ---------- */
 // Una base de datos de mentira, lo justo para CreepsMapas: colecciones y documentos en memoria.

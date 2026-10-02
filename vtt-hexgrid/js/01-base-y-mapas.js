@@ -397,15 +397,27 @@ function actualizarBotonMapas(){
     : `Mapas: estás armando "${nombreMapa(mapaMostrado)}"; los jugadores ven "${nombreMapa(mapaActivo)}"`;
 }
 
-async function crearMapa(){
-  const nombre = (prompt('Nombre del mapa nuevo:', `Mapa ${mapasLista.size + 1}`) || '').trim().slice(0, 40);
-  if(!nombre) return;
-  try{
-    const ref = await fbDb.collection(fbRutaCampana('mapas')).add({nombre, creado: firebase.firestore.FieldValue.serverTimestamp()});
-    mapaEligiendoGM = ref.id;
-    try{ localStorage.setItem('mapa-viendo', ref.id); }catch(e){}
-    recalcularMapaMostrado();
-  }catch(err){ console.error('No se pudo crear el mapa:', err); toast('No se pudo crear el mapa'); }
+// ＋ Mapa nuevo: el asistente paso a paso común (comun/asistente-mapa.js): nombre y qué creeps se mudan a él.
+function crearMapa(){
+  const ids = new Set([...mapasLista.keys(), MAPA_PRINCIPAL]);
+  const creeps = [...creepsPub.entries()].sort((a, b) => num(a[1].orden) - num(b[1].orden)).map(([id, c]) => {
+    const m = CreepsMapas.mapaDe(c, ids);
+    return {id, nombre: c.nombre || 'Creep', donde: m === CreepsMapas.RESERVA ? 'Reserva' : nombreMapa(m)};
+  });
+  AsistenteMapa.abrir({nombre: `Mapa ${mapasLista.size + 1}`, creeps, alCrear: async r => {
+    try{
+      const id = await CreepsMapas.crearMapa(r.nombre);
+      for(const cid of r.creeps){
+        const c = creepsPub.get(cid);
+        await modificarCreep(cid, sc => { sc.mapa = id; });
+        await CreepsMapas.mudarTokens({id: cid, nombre: c ? c.nombre : '', color: c ? c.color : ''}, id);
+      }
+      mapaEligiendoGM = id;
+      try{ localStorage.setItem('mapa-viendo', id); }catch(e){}
+      recalcularMapaMostrado();
+      toast(`🗺 «${r.nombre}» creado${r.creeps.length ? ` con ${r.creeps.length} creep${r.creeps.length === 1 ? '' : 's'}` : ''}: lo ves solo vos hasta que lo publiques`);
+    }catch(err){ console.error('No se pudo crear el mapa:', err); toast('No se pudo crear el mapa'); return false; }
+  }});
 }
 
 async function renombrarMapa(id){

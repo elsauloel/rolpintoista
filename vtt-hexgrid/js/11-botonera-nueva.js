@@ -112,7 +112,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261002a', '../comun/ficha-equipo.js?v=20261002b', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261002a', '../comun/ficha-mantenimiento.js?v=20261002a', '../comun/ficha-calculo.js?v=20261002j', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js?v=20261002i', '../comun/ficha-habilidades.js?v=20261001c',
-  '../comun/catalogo.js?v=20261002i', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261002d', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261002i', '../comun/ficha-resumen.js?v=20261002o', '../comun/inv-calculo.js?v=20261002d', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/inv-duelo.js?v=20261001a', '../comun/ficha-acciones.js?v=20261002j', '../comun/inv-habilidades.js?v=20261002g', '../comun/inv-lupa.js?v=20261001a',
+  '../comun/catalogo.js?v=20261002i', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261002d', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261002i', '../comun/ficha-resumen.js?v=20261002o', '../comun/inv-calculo.js?v=20261002d', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261002b', '../comun/inv-duelo.js?v=20261002b', '../comun/ficha-acciones.js?v=20261002j', '../comun/inv-habilidades.js?v=20261002g', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261002a', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -356,9 +356,13 @@ function bnInvAtacar(invId){
   const hacer = () => {
     const inv = buscar();
     if(!inv) return;
+    // Sin No2 suficientes: «¿Atacar igual?» (B-7, como los creeps): gasta los que tenga y deja la línea roja.
+    const forzar = InvAcciones.faltanNitros(inv);
+    if(forzar && !confirm(InvAcciones.preguntaSinNitros(inv))) return;
     const ui = bnUi(FichaGuardado.partes(bn.S));
-    const p = InvAcciones.pagarAtaque(inv);
+    const p = InvAcciones.pagarAtaque(inv, forzar);
     if(p.error){ toast(p.error); return; }
+    InvAcciones.alertaSinNitros(inv, p.forzado);
     if(bn.invParry) bn.invParry.delete(inv.id);   // atacar cierra el Parry que esperaba su Bloqueo
     ui.cambio();
     bnPublicarInv(inv, InvAcciones.tiradaAtaque(inv));

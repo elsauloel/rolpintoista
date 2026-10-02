@@ -7,7 +7,7 @@
    hooks(ui) → los ganchos (cada uno busca su invocación con ui.inv(lado)). ui = {
      inv(lado) → la invocación (el objeto vivo, se cambia en el lugar) o null,
      registrar(origen, r) → publica una tirada (la ficha: registrarTirada; el mapa: a la Mesa y 'tirada-registrada'),
-     toast(t), cambiar(fn) → hace fn (que cambia la invocación; si devuelve false no cambió nada) y lo guarda/dibuja,
+     toast(t), confirmar?(texto) → bool (por defecto, confirm), cambiar(fn) → hace fn (que cambia la invocación; si devuelve false no cambió nada) y lo guarda/dibuja,
      parry → el Set de invocaciones con un Parry esperando su Bloqueo, soy(lado), controlDe(lado) }.
    pagarFlash(inv, h, ui) (async) y costoFlash(h): el ⚡ Flash de una invocación (como un creep: cooldown y vida).
    Necesita comun/inv-calculo.js, inv-acciones.js, combatiente.js, efectos-golpe.js, confirmar-turno.js y tiradas.js.
@@ -49,14 +49,18 @@ const InvDuelo = (() => {
       publicar(p.tirada);
     }
     // El ataque suelto (sin arreglos): cobra, cierra el Parry pendiente y tira el PdG: invAtacarSuelto.
+    // Sin No2 suficientes pregunta «¿Atacar igual?» (B-7, 2026-10-02: antes se rechazaba): gasta los que tenga y deja la línea roja.
     function atacarSuelto(inv){
+      const forzar = A().faltanNitros(inv);
+      if(forzar && !(ui.confirmar || (t => confirm(t)))(A().preguntaSinNitros(inv))) return;
       let p;
       ui.cambiar(() => {
-        p = A().pagarAtaque(inv);
+        p = A().pagarAtaque(inv, forzar);
         if(p.error) return false;
         ui.parry.delete(inv.id);   // atacar cierra el Parry que esperaba su Bloqueo
       });
       if(p.error){ ui.toast(p.error); return; }
+      A().alertaSinNitros(inv, p.forzado);
       publicar(A().tiradaAtaque(inv));
       ui.toast(p.aviso);
     }

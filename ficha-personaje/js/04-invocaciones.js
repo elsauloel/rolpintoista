@@ -366,8 +366,12 @@ function invAtacar(invId){
 function invAtacarSuelto(invId){
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
-  const p = InvAcciones.pagarAtaque(inv);   // comun/inv-acciones.js
+  // Sin No2 suficientes: «¿Atacar igual?» (B-7, como los creeps): gasta los que tenga y deja la línea roja.
+  const forzar = InvAcciones.faltanNitros(inv);
+  if(forzar && !confirm(InvAcciones.preguntaSinNitros(inv))) return;
+  const p = InvAcciones.pagarAtaque(inv, forzar);   // comun/inv-acciones.js
   if(p.error){ toast(p.error); return; }
+  InvAcciones.alertaSinNitros(inv, p.forzado);
   parryPendienteInv.delete(inv.id);   // atacar cierra el Parry que esperaba su Bloqueo
   renderInvocaciones();
   publicarTiradaInv(InvAcciones.tiradaAtaque(inv));

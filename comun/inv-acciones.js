@@ -62,15 +62,31 @@ const InvAcciones = (() => {
     return {tipo: 'normal', armaId: '', armaNombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8, rango: !!inv.armaDeRango,
       alcance: inv.armaDeRango ? Math.max(1, Math.round(num(I().statValor(inv, 'rng')))) : 1};
   }
-  function pagarAtaque(inv){
-    const costo = I().costoAtaque(inv);
-    if(costo > num(inv.nitros)) return {error: `${inv.nombre}: no le alcanzan los Nitros — este ataque cuesta ${fmt(costo)} y tiene ${fmt(num(inv.nitros))}`};
+  /* Sin No2 suficientes (2026-10-02, hoja de ruta B-7, igual que los creeps y los personajes: avisar y dejar seguir): faltanNitros, la
+     pregunta «¿Atacar igual?», pagar forzando (gasta los que tenga, hasta 0) y la línea roja de la Mesa (alertaSinNitros). */
+  const faltanNitros = inv => I().costoAtaque(inv) > num(inv.nitros);
+  function preguntaSinNitros(inv){
+    return `${inv.nombre} no tiene No2 suficientes: este ataque cuesta ${fmt(I().costoAtaque(inv))} y tiene ${fmt(Math.max(0, num(inv.nitros)))}.\n\n¿Atacar igual? Gasta los No2 que tenga y queda anotado en rojo en la Mesa.`;
+  }
+  function pagarAtaque(inv, forzar){
+    const costo = I().costoAtaque(inv), tenia = Math.max(0, num(inv.nitros));
+    const forzado = costo > num(inv.nitros) ? {costo, tenia} : null;
+    if(forzado && !forzar) return {error: `${inv.nombre}: no le alcanzan los Nitros — este ataque cuesta ${fmt(costo)} y tiene ${fmt(num(inv.nitros))}`};
     const primero = num(inv.ataquesTurno) === 0;
-    inv.nitros = num(inv.nitros) - costo;
+    inv.nitros = forzado ? 0 : num(inv.nitros) - costo;
     inv.ataquesTurno = num(inv.ataquesTurno) + 1;
-    return {aviso: `${inv.nombre}: -${fmt(costo)} No2 · ${primero ? 'primer ataque del turno' : 'ataque extra'}`};
+    return {forzado, aviso: `${inv.nombre}: -${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · ${primero ? 'primer ataque del turno' : 'ataque extra'}`};
+  }
+  function alertaSinNitros(inv, forzado){
+    if(!forzado || typeof fbDb === 'undefined' || !fbDb || typeof fbUsuario === 'undefined' || !fbUsuario || !fbMiembro) return;
+    fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
+      origen: `⚠ ${inv.nombre} atacó sin No2 suficientes`, formula: `Costaba ${fmt(forzado.costo)} No2 y tenía ${fmt(forzado.tenia)}`,
+      rolls: [], mod: 0, total: 0, desde: 'alerta-roja',
+      cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    }).catch(err => console.error('No se pudo publicar la alerta de No2:', err));
   }
   const tiradaAtaque = inv => tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg'), 'pdg');
 
-  return {tirada, tirarStat, dano, ataqueDuelo, pagarAtaque, tiradaAtaque};
+  return {tirada, tirarStat, dano, ataqueDuelo, pagarAtaque, tiradaAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros};
 })();

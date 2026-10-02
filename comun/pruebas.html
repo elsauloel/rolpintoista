@@ -1333,6 +1333,22 @@ prueba('botones de una invocación: el Parry cobra y deja el Bloqueo pendiente; 
     [true, 'poner', true, 'sacar', 'Lobo · Bloqueo', 0, 1, true, 8]);
 });
 
+prueba('una invocación sin No2 para atacar: sin forzar no cobra; forzado gasta los que tiene y avisa cuánto costaba; el duelo pregunta', () => {
+  const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, armaNombre: 'Colmillo', armaTipo: 8, armaPeso: 2, nitros: 2});
+  const falta = InvAcciones.faltanNitros(inv), no = InvAcciones.pagarAtaque(inv), antes = inv.nitros;
+  const si = InvAcciones.pagarAtaque(inv, true);
+  // en el duelo: con «no» no ataca; con «sí» ataca (gasta y tira el PdG)
+  const inv2 = InvCalculo.migrar({id: 'j', nombre: 'Oso', con: 2, fue: 3, agl: 4, des: 2, esp: 1, armaNombre: 'Garra', armaTipo: 8, armaPeso: 2, nitros: 1});
+  const reg = [], preguntas = [];
+  let respuesta = false;
+  const h = InvDuelo.hooks({inv: () => inv2, registrar: o => reg.push(o), toast: () => {}, cambiar: fn => fn(), parry: new Set(), soy: () => true,
+    confirmar: t => { preguntas.push(t); return respuesta; }});
+  const d = {atacante: {tipo: 'pj', ref: 'F~j'}, defensor: {tipo: 'creep', ref: 'c'}, ataque: {tipo: 'normal', tipoDado: 8}};
+  h.atacar(d); const trasNo = [inv2.nitros, reg.length];
+  respuesta = true; h.atacar(d);
+  igual([falta, !!no.error, antes, inv.nitros, si.forzado, si.aviso.includes('(costaba 4)'), preguntas.length, preguntas[0].includes('¿Atacar igual?'), trasNo, inv2.nitros, reg],
+    [true, true, 2, 0, {costo: 4, tenia: 2}, true, 2, true, [1, 0], 0, ['Oso · Atacar (PdG)']]);
+});
 prueba('el duelo de una invocación: defensa con Parry (cobra y deja el Bloqueo), crítico y contraataque', () => {
   const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, armaNombre: 'Colmillo', armaTipo: 8, armaPeso: 2, nitros: 3, crit: [0, 1, 2, 3, 4]});
   const reg = [], parry = new Set();

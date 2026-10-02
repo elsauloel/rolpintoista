@@ -376,16 +376,15 @@ function oportunidadEvaluarRuta(t, ruta){
     const antes = ruta[i - 1], despues = ruta[i];
     ids.forEach(([rid, r]) => {
       if(salidos.some(x => x.rid === rid)) return;
-      if(distanciaHex(antes, {col: r.col, fila: r.fila}) === 1 && distanciaHex(despues, {col: r.col, fila: r.fila}) > 1) salidos.push({rid, r});
+      if(distanciaHex(antes, {col: r.col, fila: r.fila}) === 1 && distanciaHex(despues, {col: r.col, fila: r.fila}) > 1) salidos.push({rid, r, mid: id});
     });
   }
   return salidos;
 }
 async function oportunidadPublicarAvisos(t, salidos){
   if(!salidos || !salidos.length || !fbDb || !fbUsuario || !fbMiembro) return;
-  const id = rutaTokenId(t);
-  for(const {rid, r} of salidos){
-    oporMarcar(id, rid);
+  for(const {rid, r, mid} of salidos){
+    oporMarcar(mid, rid);   // `mid` viene de cuando se soltó: al guardarse el movimiento, el token ya es otro objeto (no se lo encuentra en `tokens`)
     const texto = `${nombreDe(t)} se alejó de ${nombreDe(r)}: no hay ataque de oportunidad (${nombreDe(r)} no tiene No2 suficientes)`;
     try{
       await fbDb.collection(fbRutaCampana('tiradas')).add({

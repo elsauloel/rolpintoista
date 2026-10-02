@@ -474,18 +474,8 @@ function lanzarAtaqueDeHabInv(inv, h){
   else tirarPdgDeArreglosInv(inv, atq);
 }
 // ⚡ Flash de una invocación (igual que un creep, P135/P136): cooldown y vida — el doble en turno ajeno —, nunca No2.
-const costoFlashInv = h => ({cd: num(h.cd), hp: num(h.hpCosto)});
-async function pagarFlashInv(inv, h){
-  const motivo = Combatiente.bloqueoHab(h, {hp: inv.hp});
-  if(motivo){ toast(`${inv.nombre}: ${h.nombre || 'Habilidad'} no se puede usar — ${motivo}`); return null; }
-  const p = await ConfirmarTurno.flash(`⚡ ${h.nombre || 'Flash'}`, costoFlashInv(h), {quien: inv.nombre});
-  if(!p) return null;
-  if(p.hp > 0 && num(inv.hp) <= p.hp){ toast(`${inv.nombre}: no le alcanza la vida para ${h.nombre} (${fmt(p.hp)} HP)`); return null; }
-  h.cdActual = p.cd;
-  if(p.hp > 0) inv.hp = num(inv.hp) - p.hp;
-  renderInvocaciones();
-  return p;
-}
+const costoFlashInv = h => InvDuelo.costoFlash(h);   // comun/inv-duelo.js (4e, tanda 4)
+function pagarFlashInv(inv, h){ return InvDuelo.pagarFlash(inv, h, dueloInvUi); }   // comun/inv-duelo.js; dueloInvUi en js/11
 async function usarFlashFueraDelDueloInv(inv, h){
   const p = await pagarFlashInv(inv, h);
   if(!p) return;

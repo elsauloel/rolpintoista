@@ -63,6 +63,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-calculo.js"></script>
 <script src="inv-botonera.js"></script>
 <script src="inv-acciones.js"></script>
+<script src="inv-duelo.js"></script>
 <script src="ficha-acciones.js"></script>
 <script src="tiradas-propias.js"></script>
 <script src="efectos-golpe.js"></script>
@@ -1016,6 +1017,19 @@ prueba('botones de una invocación: el Parry cobra y deja el Bloqueo pendiente; 
   const caro = InvAcciones.pagarAtaque(Object.assign({}, inv, {nitros: 1}));
   igual([!!sinParry.error, p.parry, p.cambio, b.parry, b.tirada.origen, inv.nitros, inv.ataquesTurno, !!caro.error, InvAcciones.ataqueDuelo(inv).tipoDado],
     [true, 'poner', true, 'sacar', 'Lobo · Bloqueo', 0, 1, true, 8]);
+});
+
+prueba('el duelo de una invocación: defensa con Parry (cobra y deja el Bloqueo), crítico y contraataque', () => {
+  const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, armaNombre: 'Colmillo', armaTipo: 8, armaPeso: 2, nitros: 3, crit: [0, 1, 2, 3, 4]});
+  const reg = [], parry = new Set();
+  const h = InvDuelo.hooks({inv: l => l && l.ref === 'F~i' ? inv : null, registrar: o => reg.push(o), toast: () => {}, cambiar: fn => fn(), parry, soy: l => !!(l && l.ref === 'F~i')});
+  const d = {atacante: {tipo: 'creep', ref: 'c'}, defensor: {tipo: 'pj', ref: 'F~i'}, ataque: {tipo: 'normal', tipoDado: 8}};
+  const ops = h.opcionesDefensa(d).map(o => o.modo);
+  h.defender(d, 'parry');
+  const tras = [inv.nitros, parry.has('i')];
+  h.bloquear(d);
+  igual([ops, tras, parry.has('i'), reg, h.resistenciaCritico(d), h.resistenciaCritico({...d, ataque: {tipoDado: 3}}), h.armaContra(d).tipoDado, h.soy(d.defensor), h.rerollInfo(d).disponible],
+    [['evasion', 'parry'], [2, true], false, ['Lobo · Parry', 'Lobo · Bloqueo'], 2, 0, 8, true, false]);
 });
 
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */

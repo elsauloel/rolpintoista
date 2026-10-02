@@ -9097,7 +9097,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001c',
-  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/inv-calculo.js?v=20261001b', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001h',
+  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/inv-calculo.js?v=20261001b', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/inv-duelo.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001h',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
@@ -9372,6 +9372,35 @@ function bnHooksDuelo(lado){
     fijarHp: v => { FichaAcciones.fijarHp(bn.S, v); bnRevisarVida(); },
   };
   return FichaDuelo.hooks(() => bn.S, ui);
+}
+/* Paso 4, etapa 4e (tanda 4): lo que el duelo le pide a una INVOCACIÓN del personaje de la Botonera nueva (lado «fichaId~invId»):
+   lo contesta el mapa con comun/inv-duelo.js (los mismos ganchos de la ficha), si puede guardar al personaje y con ⚗ prendido.
+   Publica como la ficha (a nombre de la invocación si la tirada empieza con su nombre) y guarda la parte `invocaciones`. */
+function bnRegistrarInv(origen, r){
+  const inv = (bn.S.invocaciones || []).find(i => i && i.nombre && String(origen || '').startsWith(i.nombre + ' · '));
+  mesaPublicar(origen, {...r, quien: inv ? inv.nombre : ((bn.S.meta && bn.S.meta.nombre) || '').trim(), ficha: bn.fichaId});
+  window.dispatchEvent(new CustomEvent('tirada-registrada', {detail: {origen, r}}));
+}
+function bnInvDeLado(lado){
+  if(!bn || !bn.S || !lado || lado.tipo !== 'pj') return null;
+  const [f, invId] = String(lado.ref || '').split(SEP_INVOCACION);
+  if(!invId || f !== bn.fichaId) return null;
+  const inv = (bn.S.invocaciones || []).find(x => x && x.id === invId) || null;
+  if(inv) InvCalculo.migrar(inv);   // como la ficha (una vieja puede no tener todos los campos)
+  return inv;
+}
+function bnHooksDueloInv(lado){
+  if(typeof InvDuelo === 'undefined' || !bnInvDeLado(lado)) return null;
+  if(!bnActiva() || !bnPuedeGuardar()) return null;
+  if(!bn.invParry) bn.invParry = new Set();
+  return InvDuelo.hooks({
+    inv: l => bnInvDeLado(l),
+    registrar: (origen, r) => bnRegistrarInv(origen, r),
+    toast: t => toast(t),
+    cambiar: fn => { const u = bnUi(FichaGuardado.partes(bn.S)); if(fn() !== false) u.cambio(); },
+    parry: bn.invParry,
+    soy: l => !!bnInvDeLado(l),
+  });
 }
 const BN_ACCIONES = {
   sigilo: (S, ui) => FichaAcciones.alternarSigilo(S, false, ui),
@@ -11891,7 +11920,7 @@ function arrancarEnVivo(){
   mesaHistorialAlEntrar();
   // Duelo paso a paso (comun/duelo.js): el cuadro se abre solo para todos; las tiradas de cada uno se piden al iframe de su ficha (o de las Acciones del creep).
   setTimeout(precargarMarco, 6000);   // abrir más rápido la primera Botonera o Acciones (paso 4)
-  Duelo.escuchar({relay: dueloRelayMapa, hooksLocal: lado => bnHooksDuelo(lado) || acHooksDuelo(lado), controlDe: lado => {   // 🎮 personaje controlado por el GM: su lado lo maneja el GM
+  Duelo.escuchar({relay: dueloRelayMapa, hooksLocal: lado => bnHooksDuelo(lado) || bnHooksDueloInv(lado) || acHooksDuelo(lado), controlDe: lado => {   // 🎮 personaje controlado por el GM: su lado lo maneja el GM
     if(!lado || lado.tipo !== 'pj') return '';
     const f = fichasPub.get(String(lado.ref || '').split(SEP_INVOCACION)[0]);
     return (f && f.resumen && f.resumen.control) || '';

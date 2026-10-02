@@ -8,7 +8,7 @@
    PasoAPaso.abrir(o) → api. o:
      titulo: 'Crear un creep' | 'Editar creep' (o una función que lo devuelve),
      crear: true (crear) | false (editar),
-     pasos: [{id, nombre, ayuda?, html(api) → string o un elemento ya armado (se muestra tal cual: sus campos conservan lo escrito),
+     pasos: [{id, nombre, ayuda? (puede ser un getter: se lee al dibujar), html(api) → string o un elemento ya armado (se muestra tal cual: sus campos conservan lo escrito),
        alMontar?(cuerpo, api)}] o una función que devuelve esa lista (pasos que dependen de lo elegido),
      inicio?: índice o id del paso inicial,
      puedeIr?(i, api) → '' o el motivo por el que todavía no se puede ir a ese paso (se muestra; no se cambia de paso),

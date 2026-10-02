@@ -16,7 +16,8 @@
 
    AsistenteItem.abrir(cfg) — cfg:
      contexto    'ficha' | 'creep' | 'tienda' | 'catalogo' (cambia los textos)
-     nuevo       true al crear (Guardar recién en el último paso)
+     nuevo       true al crear («✔ Crear» en el último paso; al editar, Guardar siempre). La ventana es la común paso a paso
+                 (comun/paso-a-paso.js, 2026-10-02): título con el paso, pestañas que saltan, Atrás/Siguiente.
      draft       el ítem (campos del catálogo: nombre, tipoItem, detalle, mods,
                  tipoDado, peso, danoFijo, danoAmplificado, armaDeRango,
                  efectosGolpe, tier, descripcionNarrativa, precioCompra,
@@ -102,8 +103,9 @@ const AsistenteItem = (() => {
   }
   const EG = () => (typeof EfectosGolpe !== 'undefined' ? EfectosGolpe : null);
 
-  let st = null;  // {cfg, d, paso, destino, estadoAbierto}
-  let raiz = null;
+  let st = null;  // {cfg, d, destino, estadoAbierto, api (la ventana común), inicial}
+  let cssPuesto = false;
+  const enVentana = sel => st && st.api ? st.api.raiz.querySelector(sel) : null;
 
   function pasos(){
     const {cfg, d} = st;
@@ -120,25 +122,11 @@ const AsistenteItem = (() => {
   }
 
   function montar(){
-    if(raiz) return;
+    if(cssPuesto) return;
+    cssPuesto = true;
     const css = document.createElement('style');
     css.textContent = `
-.aa-scrim{position:fixed;inset:0;background:rgba(8,5,7,.78);display:none;align-items:flex-start;justify-content:center;padding:24px;overflow:auto;z-index:95}
-.aa-scrim.open{display:flex}
-.aa-modal{width:100%;max-width:540px;background:var(--panel,#1A1418);border:1px solid var(--line,#3B2E34);border-top:3px solid var(--copper,#C98545);border-radius:var(--r,3px);color:var(--paper,#EDE3D2)}
-.aa-modal header{position:static;background:none;flex-wrap:nowrap;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 15px;border-bottom:1px solid var(--line,#3B2E34)}
-.aa-modal header h3{margin:0;font-family:"Fraunces",serif;font-size:18px}
-.aa-body{padding:14px 15px}
-.aa-modal footer{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;padding:12px 15px;border-top:1px solid var(--line,#3B2E34)}
-.aa-modal footer .aa-izq{margin-right:auto}
-.aa-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
-.aa-chip{font-family:"Space Mono",monospace;font-size:10px;padding:3px 8px;border:1px solid var(--line,#3B2E34);border-radius:99px;color:var(--muted,#9A867E);background:none;cursor:pointer}
-.aa-chip.hecho{color:var(--paper,#EDE3D2)}
-.aa-chip.activo{color:#180F08;background:var(--copper,#C98545);border-color:var(--copper,#C98545);font-weight:700}
-.aa-chip:disabled{opacity:.4;cursor:not-allowed}
-.aa-titulo{font-family:"Fraunces",serif;font-size:19px;font-weight:700;margin:2px 0 4px}
-.aa-ayuda{color:var(--muted,#9A867E);font-size:12.5px;margin:0 0 12px;line-height:1.45}
-.aa-ayuda b,.aa-efecto b{color:var(--brass,#E0A458)}
+.aa-efecto b{color:var(--brass,#E0A458)}
 .aa-campo{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
 .aa-campo>label{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted,#9A867E)}
 .aa-campo input,.aa-campo select,.aa-campo textarea,.aa-mod select,.aa-mod input,.aa-golpe input,.aa-golpe select{background:var(--panel2,#221A1E);border:1px solid var(--line,#3B2E34);color:var(--paper,#EDE3D2);border-radius:var(--r,3px);padding:6px 8px;font:inherit;font-size:13px;width:100%;box-sizing:border-box}
@@ -171,31 +159,9 @@ const AsistenteItem = (() => {
 .aa-resumen-fila{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:3px 0;border-top:1px solid var(--line-soft,#2A2126)}
 .aa-resumen-fila span{color:var(--muted,#9A867E);flex:none}
 .aa-resumen-fila b{text-align:right}
-.aa-nav{display:flex;justify-content:space-between;gap:8px;margin-top:14px;padding-top:10px;border-top:1px solid var(--line-soft,#2A2126)}
 .aa-img{width:72px;height:72px;object-fit:cover;border:1px solid var(--line,#3B2E34);border-radius:var(--r,3px)}
 `;
     document.head.appendChild(css);
-    raiz = document.createElement('div');
-    // .scrim: los modos botonera/acciones (dentro del mapa) solo muestran y vigilan esas.
-    raiz.className = 'scrim aa-scrim';
-    raiz.innerHTML = `<div class="aa-modal" role="dialog">
-      <header><h3 id="aa-titulo"></h3><button type="button" class="iconbtn" data-aa="cerrar">Cerrar</button></header>
-      <div class="aa-body" id="aa-body"></div>
-      <footer id="aa-pie"></footer>
-    </div>`;
-    document.body.appendChild(raiz);
-    raiz.addEventListener('mousedown', ev => { if(ev.target === raiz) cerrar(); });
-    raiz.addEventListener('click', alClic);
-    raiz.addEventListener('input', alEscribir);
-    raiz.addEventListener('change', alCambiar);
-    raiz.addEventListener('keydown', ev => {
-      if(ev.key === 'Escape'){ ev.stopPropagation(); cerrar(); return; }
-      if(ev.key === 'Enter' && ev.target.matches('input:not([type=file])')){
-        ev.preventDefault();
-        alEscribir(ev);
-        ir(st.paso + 1);
-      }
-    });
   }
 
   function abrir(cfg){
@@ -209,18 +175,43 @@ const AsistenteItem = (() => {
     if(!DADOS.includes(n(d.tipoDado))) d.tipoDado = 8;
     d.mods = Array.isArray(d.mods) ? d.mods : [];
     d.efectosGolpe = Array.isArray(d.efectosGolpe) ? d.efectosGolpe : [];
-    st = {cfg, d, paso: cfg.paso || 0, destino: cfg.destinos ? cfg.destinos.valor : null,
+    if(st && st.api) st.api.cerrar();
+    st = {cfg, d, destino: cfg.destinos ? cfg.destinos.valor : null,
       estadoAbierto: !!String(d.equipoEstadoNombre || '').trim()};
-    document.getElementById('aa-titulo').textContent = cfg.titulo || (cfg.nuevo ? 'Ítem nuevo' : `Editar ${d.nombre || 'ítem'}`);
-    dibujar();
-    raiz.classList.add('open');
-    setTimeout(() => raiz.querySelector('#aa-body input')?.focus(), 40);
+    const yo = st;
+    yo.inicial = JSON.stringify(d);
+    yo.api = PasoAPaso.abrir({
+      titulo: cfg.titulo || (cfg.nuevo ? 'Ítem nuevo' : `Editar ${d.nombre || 'ítem'}`),
+      crear: !!cfg.nuevo, z: 95, inicio: cfg.paso || 0,
+      textoCrear: cfg.textoGuardar || '✔ Crear', textoGuardar: cfg.textoGuardar || 'Guardar',
+      // Cada paso: su contenido y su ayuda se arman juntos, una vez por dibujo.
+      pasos: () => pasos().map(x => {
+        let c = null;
+        const cont = () => c || (c = contenidoPaso(x.id));
+        return {id: x.id, nombre: x.corto, get ayuda(){ return cont().ayuda; }, html: () => cont().h};
+      }),
+      puedeIr: i => i > 0 ? faltaAlgo() : '',
+      alClic: alClic, alInput: alEscribir, alCambio: alCambiar,
+      alTecla: ev => {
+        if(ev.key === 'Enter' && ev.target.matches('input:not([type=file])')){
+          ev.preventDefault();
+          alEscribir(ev);
+          ir(yo.api.paso() + 1);
+        }
+      },
+      extras: (cfg.botones || []).map((x, i) => ({id: 'extra' + i, texto: x.texto, alClic: () => { if(st === yo) x.accion(limpio(), enVentana(`[data-pap-extra="extra${i}"]`)); }})),
+      confirmarCancelar: () => JSON.stringify(yo.d) === yo.inicial ? '' : (cfg.nuevo ? '¿Cancelar? El ítem que estás armando se descarta.' : '¿Descartar los cambios de este ítem?'),
+      alGuardar: () => guardar(), alCrear: () => guardar(),
+      alCancelar: () => { if(st === yo) st = null; },
+    });
+    setTimeout(() => { const i = enVentana('.pap-paso input:not([type=file])'); if(i) i.focus(); }, 40);
   }
 
   function cerrar(){
-    if(!raiz) return;
-    raiz.classList.remove('open');
+    if(!st) return;
+    const api = st.api;
     st = null;
+    if(api) api.cerrar();
   }
 
   function faltaAlgo(){
@@ -229,22 +220,8 @@ const AsistenteItem = (() => {
     return '';
   }
 
-  function ir(i){
-    if(!st) return;
-    const total = pasos().length;
-    const destino = Math.max(0, Math.min(total - 1, i));
-    const falta = faltaAlgo();
-    if(destino > 0 && falta){
-      st.paso = 0;
-      dibujar();
-      avisar(falta);
-      if(st.d.tipoItem) raiz.querySelector('[data-aa-c="nombre"]')?.focus();
-      return;
-    }
-    st.paso = destino;
-    dibujar();
-    raiz.querySelector('#aa-body input:not([type=file]),#aa-body textarea')?.focus();
-  }
+  function ir(i){ if(st && st.api) st.api.irA(i); }   // lo que falta lo avisa la ventana (puedeIr)
+  function dibujar(){ if(st && st.api) st.api.redibujar(); }
 
   function avisar(msg){
     if(typeof toast === 'function') toast(msg); else alert(msg);
@@ -271,20 +248,15 @@ const AsistenteItem = (() => {
   const input = (c, val, extra = '') => `<input data-aa-c="${c}" value="${e(val)}" ${extra}>`;
   const num = (c, val, extra = '') => `<input data-aa-c="${c}" type="number" value="${e(val)}" ${extra}>`;
 
-  function dibujar(){
+  function contenidoPaso(id){
     const {cfg, d} = st;
-    const L = pasos();
-    st.paso = Math.max(0, Math.min(L.length - 1, st.paso));
-    const paso = L[st.paso];
+    const paso = {id};
     const q = quien();
     const p = q.p;
     const g = grupoDe(d.tipoItem);
     const tipo = n(d.tipoDado) || 8;
-    let h = `<div class="aa-chips">${L.map((x, i) => {
-      const bloqueado = cfg.nuevo && i > st.paso && !!faltaAlgo();
-      return `<button type="button" class="aa-chip${i === st.paso ? ' activo' : ''}${i < st.paso ? ' hecho' : ''}" data-aa-paso="${i}" ${bloqueado ? 'disabled' : ''}>${i + 1}. ${x.corto}</button>`;
-    }).join('')}</div>`;
-    const titulo = (t, ayuda) => { h += `<div class="aa-titulo">${t}</div><p class="aa-ayuda">${ayuda}</p>`; };
+    let h = '', ayuda = '';
+    const titulo = (t, a) => { ayuda = `<b>${t}</b> ${a}`; };
 
     if(paso.id === 'que'){
       titulo('¿Qué es?', 'Elegí el tipo de ítem, ponele nombre y contá con palabras todo lo que hace. Los pasos siguientes cargan solo la parte práctica (lo que la herramienta calcula o recuerda sola).');
@@ -520,19 +492,7 @@ const AsistenteItem = (() => {
       </div>`;
       if(cfg.onFormulario) h += `<button type="button" class="aa-op" data-aa-formulario="1" style="margin-top:10px">Ver en el formulario completo</button>`;
     }
-
-    h += `<div class="aa-nav">
-      ${st.paso > 0 ? '<button type="button" class="btn ghost" data-aa-atras="1">← Atrás</button>' : '<span></span>'}
-      ${st.paso < L.length - 1 ? '<button type="button" class="btn primary" data-aa-siguiente="1">Siguiente →</button>' : ''}
-    </div>`;
-    document.getElementById('aa-body').innerHTML = h;
-
-    // Pie: Guardar (y los extras) recién en el último paso al crear; al editar, siempre.
-    const listo = !cfg.nuevo || st.paso === L.length - 1;
-    const pie = document.getElementById('aa-pie');
-    pie.innerHTML = (cfg.botones || []).map((b, i) => `<button type="button" class="btn ghost aa-izq" data-aa-extra="${i}" ${listo ? '' : 'style="display:none"'}>${e(b.texto)}</button>`).join('')
-      + `<button type="button" class="btn ghost" data-aa="cerrar">Cancelar</button>`
-      + `<button type="button" class="btn primary" data-aa="guardar" ${listo ? '' : 'style="display:none"'}>${e(cfg.textoGuardar || 'Guardar')}</button>`;
+    return {h, ayuda};
   }
 
   function campoMano(d){
@@ -603,12 +563,6 @@ const AsistenteItem = (() => {
     const b = ev.target.closest('button');
     if(!b) return;
     const d = st.d, ds = b.dataset;
-    if(ds.aa === 'cerrar'){ cerrar(); return; }
-    if(ds.aa === 'guardar'){ guardar(); return; }
-    if(ds.aaPaso !== undefined){ ir(n(ds.aaPaso)); return; }
-    if(ds.aaSiguiente){ ir(st.paso + 1); return; }
-    if(ds.aaAtras){ ir(st.paso - 1); return; }
-    if(ds.aaExtra !== undefined){ const x = st.cfg.botones[n(ds.aaExtra)]; if(x) x.accion(limpio(), b); return; }
     if(ds.aaFormulario){ const cb = st.cfg.onFormulario, copia = limpio(); cerrar(); cb(copia); return; }
     if(ds.aaCat){
       if(ds.aaCat === 'consumibles'){
@@ -645,7 +599,7 @@ const AsistenteItem = (() => {
     const t = ev.target, d = st.d;
     // Los textos con cuentas se actualizan en su lugar (redibujar al
     // confirmar un número se comería el clic en "Siguiente").
-    const poner = (id, html) => { const el = document.getElementById(id); if(el) el.innerHTML = html; };
+    const poner = (id, html) => { const el = enVentana('#' + id); if(el) el.innerHTML = html; };
     if(t.dataset.aaC){
       const c = t.dataset.aaC;
       d[c] = NUMERICOS.includes(c) ? n(t.value) : t.value;
@@ -653,7 +607,6 @@ const AsistenteItem = (() => {
       if(c === 'peso') poner('aa-carga', cargaHtml());
       if(c === 'peso' || c === 'durPorPeso') poner('aa-dur', durHtml());
       if(c === 'precioCompra') poner('aa-precio', precioHtml());
-      if(c === 'nombre') raiz.querySelectorAll('[data-aa-paso]').forEach(x => { x.disabled = !!faltaAlgo() && n(x.dataset.aaPaso) > st.paso; });
     }
     if(t.dataset.aaMod1) setMod(d, t.dataset.aaMod1, n(t.value));
     if(t.dataset.aaModstat !== undefined) d.mods[n(t.dataset.aaModstat)].stat = t.value;
@@ -708,8 +661,10 @@ const AsistenteItem = (() => {
 
   function guardar(){
     const falta = faltaAlgo();
-    if(falta){ avisar(falta); ir(0); return; }
-    if(st.cfg.onGuardar(limpio(), st.destino) !== false) cerrar();
+    if(falta){ ir(0); if(st.api) st.api.aviso(falta); return false; }
+    const yo = st;
+    if(yo.cfg.onGuardar(limpio(), yo.destino) === false) return false;
+    if(st === yo) st = null;   // la ventana se cierra sola (paso-a-paso)
   }
 
   if(document.body) montar(); else document.addEventListener('DOMContentLoaded', montar);

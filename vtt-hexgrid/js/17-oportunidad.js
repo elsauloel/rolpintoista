@@ -50,6 +50,18 @@ function oporDecide(r){
   const f = fichasPub.get(String(r.fichaId || '').split(SEP_INVOCACION)[0]);
   return (f && f.resumen && f.resumen.control) || (f && f.duenoUid) || r.duenoUid || 'gm';
 }
+// El registro en la Mesa (el dueño quiere que el evento quede en el log, no solo en el momento): la línea roja de siempre al frenarse,
+// y una línea con cómo terminó.
+async function oporMesa(texto, desde){
+  if(!fbDb || !fbUsuario || !fbMiembro) return;
+  try{
+    await fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '', origen: '⚔ ' + texto,
+      formula: '', rolls: [], mod: 0, total: 0, desde: desde || 'recordatorio',
+      cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }catch(err){ console.error('No se pudo anotar el ataque de oportunidad en la Mesa:', err); }
+}
 const oporSoyDecisor = d => !!(d && d.datos) && (d.datos.decide === 'gm' ? soyGM : d.datos.decide === fbUsuario.uid);
 
 // En la pantalla de quien se aleja, al llegar al casillero donde se frenó.
@@ -63,6 +75,7 @@ async function oportunidadResolver(){
   const decide = oporDecide(r);
   oporEspera = {...p, momentoId: null, resultado: null};
   const e = oporEspera;
+  oporMesa(`${nombreDe(t)} se alejó de ${nombreDe(r)}: posible ataque de oportunidad`, 'alerta-roja');
   renderOporEspera();
   e.momentoId = await momentoAbrir({tipo: 'oportunidad', icono: '⚔', titulo: `${nombreDe(t)} se aleja de ${nombreDe(r)}…`, estado: 'esperando', resuelve: decide,
     datos: {centro: true, moverId: p.tokenId, rivalId: p.rivalId, decide}});
@@ -83,6 +96,8 @@ function renderOporEspera(){
   if(seg) seg.onclick = () => {
     const e = oporEspera; oporEspera = null; renderOporEspera();
     if(e.momentoId) momentoActualizar(e.momentoId, {estado: 'no', resultado: '…nadie contestó: sigue su camino.'});
+    const t = tokens.get(e.tokenId), r = tokens.get(e.rivalId);
+    oporMesa(`${t ? nombreDe(t) : 'Quien se alejaba'} siguió sin esperar: ${r ? nombreDe(r) : 'el rival'} no contestó a tiempo`);
     oporContinuar(e);
   };
 }
@@ -138,6 +153,8 @@ async function oporResponder(si){
   if(!si){
     oporDecision = null; renderOporDecision();
     momentoActualizar(od.id, {estado: 'no', resultado: '…y lo deja pasar.'});
+    const dt = od.d.datos || {}, m = tokens.get(dt.moverId), r = tokens.get(dt.rivalId);
+    oporMesa(`${r ? nombreDe(r) : 'El rival'} dejó pasar a ${m ? nombreDe(m) : 'quien se alejaba'}: no hubo ataque de oportunidad`);
     return;
   }
   // Con qué puede atacar: las armas (o la mano limpia) a las que les alcanzan los No2.
@@ -189,7 +206,9 @@ async function oporAtacar(a){
   oporDecision = null; renderOporDecision();
   const dt = od.d.datos || {}, m = tokens.get(dt.moverId), r = tokens.get(dt.rivalId);
   if(!m){ toast('Quien se alejaba ya no está en el mapa'); return; }
-  await momentoActualizar(od.id, {estado: 'si', resultado: `…y ${r ? nombreDe(r) : 'su rival'} lo ataca de oportunidad${a.nombre && a.nombre !== 'sin arma' && a.nombre !== 'su arma' ? ` con ${a.nombre}` : ''}.`});
+  const conArma = a.nombre && a.nombre !== 'sin arma' && a.nombre !== 'su arma' ? ` con ${a.nombre}` : '';
+  await momentoActualizar(od.id, {estado: 'si', resultado: `…y ${r ? nombreDe(r) : 'su rival'} lo ataca de oportunidad${conArma}.`});
+  oporMesa(`${r ? nombreDe(r) : 'El rival'} ataca de oportunidad a ${nombreDe(m)}${conArma}`);
   try{
     await Duelo.crear({yo: a.yo, ataque: a.ataque}, {id: dt.moverId, nombre: nombreDe(m), tipo: m.tipo, fichaId: m.fichaId, duenoUid: m.duenoUid}, dt.rivalId);
   }catch(err){

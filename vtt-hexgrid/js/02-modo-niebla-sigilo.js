@@ -390,7 +390,7 @@ async function oportunidadPublicarAvisos(t, salidos){
       await fbDb.collection(fbRutaCampana('tiradas')).add({
         uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
         origen: '⚔ ' + texto,
-        formula: '', rolls: [], mod: 0, total: 0, desde: 'recordatorio',
+        formula: '', rolls: [], mod: 0, total: 0, desde: 'alerta-roja',
         cuando: firebase.firestore.FieldValue.serverTimestamp(),
       });
     }catch(err){ console.error('No se pudo avisar el ataque de oportunidad:', err); }

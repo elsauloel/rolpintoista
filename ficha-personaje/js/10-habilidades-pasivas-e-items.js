@@ -13,7 +13,7 @@ function esMiClase(clase){
 // Mismo vocabulario de "función" y "tipo de daño" que datos/auditoria-skills.html (ver su comentario): ahí es
 // donde se cargan las etiquetas (`h.etiquetas`), acá solo se leen para armar los filtros del pool.
 const FUNCION_TAGS = ['daño', 'defensa', 'buff', 'debuff', 'curación', 'control', 'movilidad', 'invocación', 'área'];
-const TIPODANO_TAGS = ['arcano', 'fuego', 'hielo', 'rayo', 'físico'];
+const TIPODANO_TAGS = ['arcano', 'fuego', 'hielo', 'rayo', 'tóxico', 'físico'];
 let poolFiltroFuncion = '', poolFiltroTipoDano = '';
 /* Habilidades subidas por el grupo (subida unificada, paso 2 de docs/plan-subida-unificada.md, 2026-09-29).
    "+ Habilidad" muestra lo de fábrica (CLASES_SKILLS / SKILLS_CUSTOM de comun/skills-clase.js) MÁS lo que subió

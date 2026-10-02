@@ -976,6 +976,10 @@ versión parecida en más de una, es candidato a juntar.
   devuelve `forzado: {costo, tenia}`) y `alertaSinNitros(sc, tipo, forzado)` (la línea roja de la Mesa). Lo usan `CreepDuelo` (el
   «🎲 Pagar y tirar PdG» del duelo, por GM Tools o por el mapa con ⚗), `atacarNormalCreep`/`ataqueEspecialCreep` de GM Tools y `acAtacar`
   del mapa. Antes el ataque se rechazaba y, dentro del mapa, el aviso quedaba en GM Tools escondido.
+- **Invocación sin No2 para atacar** (2026-10-02, hoja de ruta B-7, igual que los creeps): `InvAcciones.faltanNitros(inv)`,
+  `preguntaSinNitros(inv)`, `pagarAtaque(inv, forzar)` (forzado: gasta los que tenga hasta 0 y devuelve `forzado: {costo, tenia}`) y
+  `alertaSinNitros(inv, forzado)` (la línea roja). Lo usan `InvDuelo` (el ataque del duelo; `ui.confirmar` opcional, si no `confirm`),
+  `invAtacarSuelto` de la ficha y `bnInvAtacar` del mapa.
 - **`creep-lupa.js`** (`CreepLupa`, 2026-10-01, paso 4 etapa 4c, tanda 6) — **la 🔍 y el "Ver" de un creep**, para GM Tools y el
   mapa: `contenido(sc, clave)` → `{titulo, html}` (clave `"creepId|tipo|ref"`, la de los `data-lupa` de `creep-botonera.js`:
   stat, defensa, atacar, daño, habilidad), `verHab(sc, h)` → `{titulo, html}` (la tarjeta de Ver de una habilidad), `paraHtml(h)`

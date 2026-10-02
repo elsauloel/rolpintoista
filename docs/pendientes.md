@@ -101,7 +101,11 @@
 - [ ] Limpieza hecha (fecha y commit).
 
 **B. Puntual (después de A):**
-7. [ ] **Una invocación sin No2 para atacar, adentro del duelo** (ver §2): igual que los creeps.
+7. [x] **Una invocación sin No2 para atacar, adentro del duelo** — hecho 2026-10-02: pregunta «¿Atacar igual?» (duelo, Botonera de la
+   ficha y del mapa), gasta los No2 que tenga y deja la línea roja (`InvAcciones.faltanNitros`/`preguntaSinNitros`/`alertaSinNitros`,
+   `pagarAtaque(inv, forzar)`). Probado en vivo en el mapa con una invocación de prueba de Silvia («Lobo de prueba (B-7)», 1 No2, ataque
+   de 4): «Sí» → quedó en 0, ataque contado, línea roja «atacó sin No2 suficientes · Costaba 4 No2 y tenía 1»; «Cancelar» → nada. El
+   duelo, con una prueba nueva de `comun/pruebas.html` (227 en verde).
 7b. [x] **Los "Mis presets" de estados del GM se pierden al recargar** — hecho 2026-10-02: `comun/presets-gm.js` los guarda en
    `gm/presetsEstados` (sin reglas nuevas); GM Tools los lee al entrar y el mapa los ofrece ("+ Estado" de un creep, el editor de estados
    y la Ejecución de una habilidad de creep). Probado: guardado desde GM Tools, sigue tras recargar, aparece en el mapa. Antes: (visto 2026-10-02 al mudar el "+ Estado"): GM Tools los guarda en
@@ -141,7 +145,7 @@
   el aviso queda en el marco escondido — en el cuadro del duelo «🎲 Pagar y tirar PdG» del creep no hace nada visible. Debería
   verse el cartel de "sin No2" (o un aviso en el mapa), como pasa con un personaje. Es del camino de siempre de los creeps, no
   de la Botonera nueva.
-- [ ] **Una invocación sin No2 para atacar, adentro del duelo** (visto 2026-10-02 al arreglar el de los creeps): `InvDuelo` rechaza el
+- [x] ~~**Una invocación sin No2 para atacar, adentro del duelo**~~ (hecho 2026-10-02, ver §0 B-7) (visto 2026-10-02 al arreglar el de los creeps): `InvDuelo` rechazaba el
   ataque con un aviso (`comun/inv-duelo.js`, `InvAcciones.pagarAtaque`); alinearlo igual que los creeps (preguntar, gastar lo que tenga,
   línea roja).
 - [ ] **Hechizo de área en cascada** (Paso 7b del casteo): armar una habilidad de prueba con objetivo "A un área", castearla contra 2-3 objetivos y ver que la cascada, el círculo compartido y la fase `dodge` anden con varias pantallas abiertas a la vez.

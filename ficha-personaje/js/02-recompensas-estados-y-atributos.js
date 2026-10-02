@@ -122,90 +122,19 @@ function aplicarEstadoRecibido(spec, origen){ FichaAcciones.aplicarEstadoRecibid
 
 // (Acumular Veneno/Sangrado/Escarcha, inmunidades y renovar: Combatiente.agregarEstado, comun/combatiente.js — ver agregarEstadoConAviso.)
 
-function attrBudget(){
-  const nivel = Math.max(1, num(S.meta.nivel) || 1);
-  const total = 33 + 3 * (nivel - 1);
-  const usado = ATTR_LIST.reduce((a,at) => a + num(S.attrs[at.id]), 0);
-  return {total, usado, pend: total - usado};
-}
-
+// Los atributos y stats (📊): comun/ficha-stats.js (A6a, 2026-10-02; el mapa usa lo mismo). Acá, dónde se dibujan.
+function attrBudget(){ return FichaStats.presupuesto(S); }
 function renderAttrs(){
-  const c = compute();
-  const pb = attrBudget();
-  $('#attr-points').innerHTML = `
-    <span class="pt-label">Puntos de atributo</span>
-    <span class="pt-nums">${pb.usado} / ${pb.total}</span>
-    ${pb.pend !== 0 ? `<span class="pt-pend ${pb.pend<0?'over':''}">${pb.pend>0?`+${pb.pend} por asignar`:`${Math.abs(pb.pend)} de más`}</span>` : `<span class="pt-ok">al día</span>`}
-  `;
-  const htmlAttrs = GRUPOS.map(g => {
-    const m = c.modTotal[g.id];
-    const valCls = m>0 ? 'mod-plus' : m<0 ? 'mod-minus' : '';
-    let descHtml = '';
-    if(m){
-      const origins = c.mods[g.id] || [];
-      const origenTxt = origins.length===1 ? origins[0].origen : origins.length>1 ? `${origins.length} orígenes` : '';
-      descHtml = `<button type="button" class="glyph-desc" data-stat="${g.id}" title="Ver detalle">${m>0?'+':''}${fmt(m)} → ${fmt(c.final[g.id])}${origenTxt?` · ${esc(origenTxt)}`:''}</button>`;
-    }
-    return `
-    <div class="attr" style="--accent:${g.color}">
-      <div class="head">
-        <div class="glyph">
-          <div class="ab">${g.label}</div>
-          <input type="number" class="glyph-val ${valCls}" data-attr="${g.id}" data-mod="${m}" value="${fmt(c.final[g.id])}" title="${esc(g.full)}">
-          <button type="button" class="dado-btn" data-tirarstat="${g.id}" title="Tirar dados para ${esc(g.full)}">🎲</button>
-        </div>
-        <div class="full">
-          <span class="full-name">${g.full}</span>
-          ${descHtml}
-        </div>
-      </div>
-      <div class="derived" style="--dcols:${g.derived.length}">
-        ${g.derived.map(d => statTile(d, c)).join('')}
-        ${(openStat === g.id || g.derived.some(d=>d.id===openStat)) ? breakdown(openStat, c) : ''}
-      </div>
-    </div>`;
-  }).join('');
+  $('#attr-points').innerHTML = FichaStats.puntosHtml(S);
+  const htmlAttrs = FichaStats.atributosHtml(S, openStat);
   $('#attrs').innerHTML = htmlAttrs;
   if($('#stats-mapa-attrs')){   // la copia del menú de Stats de la ficha liviana del mapa
     $('#stats-mapa-attrs').innerHTML = htmlAttrs;
     $('#stats-mapa-puntos').innerHTML = $('#attr-points').innerHTML;
   }
 }
-
-function statTile(d, c, showMod=true){
-  const m = c.modTotal[d.id];
-  const val = Number.isNaN(c.final[d.id]) ? '?' : fmt(c.final[d.id]);
-  const cls = m>0 ? 'boosted' : m<0 ? 'nerfed' : '';
-  const valCls = showMod ? (m>0?'mod-plus':m<0?'mod-minus':'') : '';
-  let descHtml = '';
-  if(showMod && m){
-    const origins = c.mods[d.id] || [];
-    const origenTxt = origins.length===1 ? origins[0].origen : origins.length>1 ? `${origins.length} orígenes` : '';
-    descHtml = `<span class="dv-desc">${m>0?'+':''}${fmt(m)}${origenTxt?` · ${esc(origenTxt)}`:''}</span>`;
-  }
-  const puedeTirar = !STATS_SIN_TIRADA.includes(d.id);
-  return `<div class="d ${cls}" data-stat="${d.id}" title="${esc(d.full)}">
-    <span class="dl">${d.label}</span>
-    <span class="dv ${valCls}">${val}</span>
-    ${puedeTirar ? `<button type="button" class="dado-btn" data-tirarstat="${d.id}" title="Tirar dados para ${esc(d.full)}">🎲</button>` : ''}
-    ${descHtml}
-  </div>`;
-}
-
-function breakdown(id, c){
-  const rows = (c.mods[id]||[]).map(m =>
-    `<div class="row"><span>${esc(m.origen)}</span><b>${m.val>0?'+':''}${fmt(m.val)}</b></div>`).join('');
-  const attr = ES_ATTR(id);
-  const baseTxt = Number.isNaN(c.base[id]) ? 'fórmula inválida' : fmt(c.base[id]);
-  return `<div class="breakdown">
-    <div class="row"><span>${attr ? 'Valor propio' : 'Base'}</span><b>${baseTxt}</b></div>
-    ${rows || '<div class="row" style="opacity:.6"><span>Sin modificadores activos</span><b>–</b></div>'}
-    <div class="row tot"><span>${STAT_LABEL[id]} · ${STAT_FULL[id]}</span><b>${Number.isNaN(c.final[id])?'?':fmt(c.final[id])}</b></div>
-    ${attr
-      ? `<div class="hint" style="margin-top:7px">Los derivados de ${STAT_FULL[id]} usan ${fmt(c.final[id])}, no ${fmt(c.base[id])}. Editá el valor propio desde el número grande de arriba.</div>`
-      : `<div class="fx"><span style="color:var(--copper)">fx</span><input data-formula="${id}" value="${esc(S.formulas[id]||'')}"></div>`}
-  </div>`;
-}
+function statTile(d, c, showMod=true){ return FichaStats.statTile(d, c, showMod); }
+function breakdown(id, c){ return FichaStats.desglose(S, id, c); }
 
 const TIPOS_IDS = FichaBotonera.TIPOS_IDS;   // comun/ficha-botonera.js
 

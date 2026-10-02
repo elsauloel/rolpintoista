@@ -72,6 +72,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-equipo.js"></script>
 <script src="ficha-botin.js"></script>
 <script src="ficha-tienda.js"></script>
+<script src="ficha-stats.js"></script>
 <script src="tiradas-propias.js"></script>
 <script src="efectos-golpe.js"></script>
 <script src="confirmar-turno.js"></script>
@@ -619,6 +620,16 @@ prueba('la tienda: precio con ajuste, solo lo del vendedor, comprar del carrito,
   igual([precio, vis, tras, compro, st.carrito.length, num(S.loot.normal), antesRep, num(S.meta.dde), FichaCalculo.durActual(casco), faltan > 0, FichaTienda.reparar(S, st, [{it: casco, pts: 1}], true, ui), avisos.includes('No se puede reparar durante el combate')],
     [Math.max(1, Math.round(num(arma.precioCompra) * 1.5)), [arma.id], 500 - Math.max(1, Math.round(num(arma.precioCompra) * 1.5)), true, 0, 0,
      500 - Math.max(1, Math.round(num(arma.precioCompra) * 1.5)) + 1, 500 - Math.max(1, Math.round(num(arma.precioCompra) * 1.5)) + 1 - 2, 4, true, undefined, true]);   // 2 despojos a la mitad = +1; reparar 1 punto a 2 DDE
+});
+
+grupo('📊 Stats (A6a)');
+prueba('los atributos: el presupuesto, el desglose abierto y cambiar uno (la vida llena sigue llena)', () => {
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({meta: {nivel: 2}, attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}}).S);
+  S.hp = FichaCalculo.calcular(S).final.hpmax;
+  const pb = FichaStats.presupuesto(S), html = FichaStats.atributosHtml(S, 'pdg');
+  FichaStats.cambiarAtributo(S, 'con', 5, 0);
+  igual([pb.total, pb.usado, html.includes('data-attr="con"'), html.includes('class="breakdown"'), S.attrs.con, S.hp === FichaCalculo.calcular(S).final.hpmax],
+    [36, 22, true, true, 5, true]);
 });
 
 /* ---------- El dibujo de la Botonera (comun/ficha-botonera.js, paso 4 etapa 3b) ---------- */

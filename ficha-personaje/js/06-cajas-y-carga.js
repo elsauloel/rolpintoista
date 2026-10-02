@@ -84,26 +84,8 @@ document.addEventListener('input', e => {
   if(t.id === 'f-capcinturon'){ S.caps.cinturon = num(t.value); renderVitals(); return; }
   if(t.id === 'f-armanota'){ S.armadura.nota = t.value; return; }
   if(t.dataset.attr){
-    const mod = num(t.dataset.mod);
-    // HP y Nitros dependen de atributos (Con, Agi por default, pero la
-    // fórmula es configurable): si estaban llenos, que sigan llenos con
-    // el nuevo máximo; si no, que solo se recorten si se pasan del nuevo
-    // (nunca "curan" de arriba). Mismo criterio que ya usan los creeps
-    // (actualizarHpMaxPorCon) y las invocaciones con su Constitución.
-    const antes = compute();
-    const hpMaxAntes = Number.isNaN(antes.final.hpmax) ? 0 : antes.final.hpmax;
-    const hpFull = num(S.hp) >= hpMaxAntes;
-    const nitrosSolidificado = S.nitros !== null && S.nitros !== undefined;
-    const nitrosMaxAntes = Number.isNaN(antes.final.nitros) ? 0 : antes.final.nitros;
-    const nitrosFull = nitrosSolidificado && num(S.nitros) >= nitrosMaxAntes;
-    S.attrs[t.dataset.attr] = num(t.value) - mod;
-    const despues = compute();
-    const hpMaxDespues = Number.isNaN(despues.final.hpmax) ? 0 : despues.final.hpmax;
-    S.hp = hpFull ? hpMaxDespues : Math.min(num(S.hp), hpMaxDespues);
-    if(nitrosSolidificado){
-      const nitrosMaxDespues = Number.isNaN(despues.final.nitros) ? 0 : despues.final.nitros;
-      S.nitros = nitrosFull ? nitrosMaxDespues : Math.min(num(S.nitros), nitrosMaxDespues);
-    }
+    // HP y Nitros siguen a su atributo (comun/ficha-stats.js, A6a; mismo criterio que los creeps y las invocaciones).
+    FichaStats.cambiarAtributo(S, t.dataset.attr, t.value, t.dataset.mod);
     // Si S.nitros seguía null (todavía no se solidificó), se deja así:
     // renderAll() lo llena con el máximo nuevo, como al crear el personaje.
     const keep = t.dataset.attr, pos = t.selectionStart;
@@ -113,7 +95,7 @@ document.addEventListener('input', e => {
     return;
   }
   if(t.dataset.formula){
-    S.formulas[t.dataset.formula] = t.value;
+    FichaStats.cambiarFormula(S, t.dataset.formula, t.value);
     const id = t.dataset.formula, pos = t.selectionStart;
     refresh();
     const again = document.querySelector(`[data-formula="${id}"]`);

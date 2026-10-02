@@ -111,7 +111,7 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/ficha-equipo.js?v=20261002b', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261002a', '../comun/ficha-mantenimiento.js?v=20261002a', '../comun/ficha-calculo.js?v=20261002j', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js?v=20261002i', '../comun/ficha-habilidades.js?v=20261001c',
+const BN_PIEZAS = ['../comun/ficha-stats.js?v=20261002a', '../comun/ficha-equipo.js?v=20261002b', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261002a', '../comun/ficha-mantenimiento.js?v=20261002a', '../comun/ficha-calculo.js?v=20261002j', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js?v=20261002i', '../comun/ficha-habilidades.js?v=20261001c',
   '../comun/catalogo.js?v=20261002i', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261002d', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261002i', '../comun/ficha-resumen.js?v=20261002o', '../comun/inv-calculo.js?v=20261002d', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/inv-duelo.js?v=20261001a', '../comun/ficha-acciones.js?v=20261002i', '../comun/inv-habilidades.js?v=20261002g', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
@@ -786,6 +786,14 @@ function bnCrear(){
       <header><h3>🛡 Equipo y mochila</h3><button class="iconbtn" data-bn-eq="cerrar">Cerrar</button></header>
       <div class="body" id="bn-equipo-cuerpo"></div>
     </div></div>
+    <div class="scrim" id="bn-stats"><div class="modal" style="max-width:820px">
+      <header><h3>📊 Stats</h3><button class="iconbtn" data-bn-st="cerrar">Cerrar</button></header>
+      <div class="body">
+        <div class="hint" style="margin:0 0 8px">Tocá el número grande de un atributo para cambiarlo; los stats de abajo se recalculan solos. Tocá un stat para ver de dónde sale.</div>
+        <div id="bn-stats-puntos" class="attr-points" style="margin-bottom:10px"></div>
+        <div id="bn-stats-attrs"></div>
+      </div>
+    </div></div>
     <div class="scrim" id="bn-tienda"><div class="modal catalogo-modal botonera-modal">
       <header>
         <h3 id="bn-tienda-titulo">Tienda</h3>
@@ -898,6 +906,26 @@ function bnCrear(){
   raiz.querySelector('#bn-equipo').addEventListener('mousedown', e => { if(e.target.id === 'bn-equipo') bnEquipoCerrar(); });
   raiz.querySelector('#bn-botin').addEventListener('mousedown', e => { if(e.target.id === 'bn-botin') bnBotinCerrar(); });
   raiz.querySelector('#bn-tienda').addEventListener('mousedown', e => { if(e.target.id === 'bn-tienda') bnTiendaCerrar(); });
+  raiz.querySelector('#bn-stats').addEventListener('mousedown', e => { if(e.target.id === 'bn-stats') bnStatsCerrar(); });
+  // 📊 Stats (A6a): tocar un stat abre su desglose; el número grande de un atributo y las fórmulas se guardan al confirmar.
+  raiz.querySelector('#bn-stats').addEventListener('click', e => {
+    const t = e.composedPath()[0];
+    const b = t.closest && t.closest('button');
+    if(b && b.dataset.tirarstat){ if(bn.S) bnTirarAca(b); return; }
+    if(b && b.dataset.bnSt === 'cerrar'){ bnStatsCerrar(); return; }
+    const tile = (b && b.dataset.stat) ? b : (!b && t.closest ? t.closest('.d') : null);
+    if(tile && tile.dataset.stat){ bnStatsAbierto = bnStatsAbierto === tile.dataset.stat ? null : tile.dataset.stat; bnStatsDibujar(); }
+  });
+  raiz.querySelector('#bn-stats').addEventListener('change', e => {
+    const t = e.composedPath()[0];
+    if(!bn.S || !t || !t.dataset || (!t.dataset.attr && !t.dataset.formula)) return;
+    if(!bnPuedeGuardar()){ toast('Ese personaje no lo manejás vos: solo se puede mirar'); bnStatsDibujar(); return; }
+    const antes = FichaGuardado.partes(bn.S);
+    if(t.dataset.attr) FichaStats.cambiarAtributo(bn.S, t.dataset.attr, t.value, t.dataset.mod);
+    else FichaStats.cambiarFormula(bn.S, t.dataset.formula, t.value);
+    bnUi(antes).cambio();
+    bnStatsDibujar();
+  });
   ['bn-vender', 'bn-reparar', 'bn-aleatorio'].forEach(id => raiz.querySelector('#' + id).addEventListener('mousedown', e => { if(e.target.id === id) e.target.classList.remove('open'); }));
   // Los filtros de la tienda y las cantidades de vender (A5).
   raiz.addEventListener('input', e => { const t = e.composedPath()[0]; if(t && t.dataset && t.dataset.bnTf === 'buscar') bnTiendaDibujar(); });
@@ -1295,6 +1323,32 @@ function bnVerItemSuelto(it){
   r.querySelector('[data-bn-ver="borrar"]').style.display = 'none';
   r.querySelector('#bn-ver').classList.add('open');
 }
+/* ---------- 📊 Stats, hecho por el mapa (2026-10-02, hoja de ruta A6a) ----------
+   El 📊 de la ficha lite abría la ventana de Stats de la ficha escondida. Ahora la muestra el mapa adentro del recuadro de la Botonera
+   nueva, con comun/ficha-stats.js (lo mismo que la ficha): los cinco atributos con sus derivados, el desglose de cada stat, las
+   fórmulas, el 🎲 de cada uno y cambiar el valor de un atributo (la vida y los No2 siguen a su máximo). */
+let bnStatsAbierto = null;
+async function abrirStatsMapa(fichaId){
+  try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo abrir Stats'); return; }
+  const yaVisible = bn && bn.host && !bn.host.hidden && bn.fichaId === fichaId && !bn.invId;
+  if(!yaVisible) await abrirBotoneraNueva(fichaId, '');
+  if(!bn) return;
+  bn.soloStats = !yaVisible;
+  if(!(await bnSesionLista(fichaId))){ toast('No se pudo leer el personaje'); return; }
+  bnStatsAbierto = null;
+  bn.raiz.querySelector('#bn-stats').classList.add('open');
+  bnStatsDibujar();
+}
+function bnStatsDibujar(){
+  if(!bn || !bn.S || !bn.raiz.querySelector('#bn-stats').classList.contains('open')) return;
+  bn.raiz.querySelector('#bn-stats-puntos').innerHTML = FichaStats.puntosHtml(bn.S);
+  bn.raiz.querySelector('#bn-stats-attrs').innerHTML = FichaStats.atributosHtml(bn.S, bnStatsAbierto);
+}
+function bnStatsCerrar(){
+  if(!bn) return;
+  bn.raiz.querySelector('#bn-stats').classList.remove('open');
+  if(bn.soloStats){ bn.soloStats = false; cerrarBotoneraNueva(); }
+}
 /* ---------- 🏪 La tienda, hecha por el mapa (2026-10-02, hoja de ruta A5) ----------
    El 🏪 del borde y la ficha lite abrían la tienda de la ficha escondida en el marco. Ahora la muestra el mapa adentro del recuadro de
    la Botonera nueva, con comun/ficha-tienda.js (la misma regla y la misma ventana que la ficha): el catálogo del vendedor con sus
@@ -1454,6 +1508,7 @@ document.addEventListener('keydown', e => {
   if(cartel && cartel.id === 'bn-equipo'){ bnEquipoCerrar(); return; }
   if(cartel && cartel.id === 'bn-botin'){ bnBotinCerrar(); return; }
   if(cartel && cartel.id === 'bn-tienda'){ bnTiendaCerrar(); return; }
+  if(cartel && cartel.id === 'bn-stats'){ bnStatsCerrar(); return; }
   if(cartel){ cartel.classList.remove('open'); if(cartel.id === 'bn-comparar') bnComparando = null; bnViendo = null; bnCostoX = null; bnSobrepeso = null; bnSinNitrosSeguir = null; return; }
   cerrarBotoneraNueva();
 });

@@ -1,0 +1,1034 @@
+// js/09-colocar-y-panel.js — tramo 9 de 14 del script de mapa.html (paso 5, nivel A: mismo código, en el mismo orden): colocar un token nuevo, panel del costado, botón de mapas.
+/* ---------- Colocar un token nuevo: lugar y orientación ----------
+   "Poner en el mapa" ya no lo tira en el centro de la vista: primero se elige la
+   casilla (clic) y después hacia dónde mira (se mueve el mouse y clic). Recién ahí
+   se crea. Esc o clic derecho cancelan. Entretanto se ve una vista previa. */
+let colocando = null;   // {datos, paso: 'lugar' | 'orientacion', celda, hover, rotacion}
+
+function iniciarColocacion(datos){
+  colocando = {datos, paso: 'lugar', celda: null, hover: null, rotacion: 0};
+  creando = false;
+  renderPanel(true);
+  lienzo.style.cursor = 'crosshair';
+  pedirDibujo();
+}
+function cancelarColocacion(avisar){
+  if(!colocando) return;
+  colocando = null;
+  lienzo.style.cursor = 'default';
+  if(avisar !== false) toast('Token cancelado: no se creó');
+  pedirDibujo();
+}
+function colocacionMover(px, py){
+  const m = pantallaAMundo(px, py);
+  if(colocando.paso === 'lugar'){
+    colocando.hover = mundoAHex(m.x, m.y);
+  }else{
+    const c = hexCentro(colocando.celda.col, colocando.celda.fila);
+    const dx = m.x - c.x, dy = m.y - c.y;
+    if(Math.hypot(dx, dy) > HEX * 0.3){
+      // 0° = frente abajo, sentido horario (igual que el ↻ del HUD), a los 6 lados.
+      const ang = Math.atan2(-dx, dy) * 180 / Math.PI;
+      colocando.rotacion = (((Math.round(ang / 60) * 60) % 360) + 360) % 360;
+    }
+  }
+  pedirDibujo();
+}
+function colocacionClic(px, py){
+  const m = pantallaAMundo(px, py);
+  if(colocando.paso === 'lugar'){
+    colocando.celda = mundoAHex(m.x, m.y);
+    colocando.paso = 'orientacion';
+  }else{
+    const d = colocando;
+    colocando = null;
+    lienzo.style.cursor = 'default';
+    crearToken({...d.datos, col: d.celda.col, fila: d.celda.fila, rotacion: d.rotacion});
+  }
+  pedirDibujo();
+}
+// Cartel fijo que dice qué paso toca.
+function actualizarAvisoColocacion(){
+  const el = $('#colocando-aviso');
+  if(!colocando){ if(!el.hidden) el.hidden = true; return; }
+  const txt = colocando.paso === 'lugar'
+    ? `Poné a <b>${esc(colocando.datos.nombre)}</b>: elegí la casilla con un clic`
+    : `Ahora elegí hacia dónde mira <b>${esc(colocando.datos.nombre)}</b>: movés el mouse y clic para confirmar`;
+  const html = txt + ' <span>· Esc o clic derecho cancelan</span>';
+  if(el.dataset.html !== html){ el.dataset.html = html; el.innerHTML = html; }
+  el.hidden = false;
+}
+
+async function crearToken(datos){
+  const vistaCentro = pantallaAMundo(anchoPx / 2, altoPx / 2);
+  // Con lugar elegido (colocando) usa esa casilla y orientación; si no, el centro de la vista.
+  const casilla = Number.isFinite(datos.col) ? {col: datos.col, fila: datos.fila} : mundoAHex(vistaCentro.x, vistaCentro.y);
+  try{
+    const doc = {
+      nombre: datos.nombre,
+      color: datos.color,
+      tipo: datos.tipo,
+      duenoUid: datos.duenoUid || fbUsuario.uid,
+      col: casilla.col,
+      fila: casilla.fila,
+      creado: firebase.firestore.FieldValue.serverTimestamp(),
+    };
+    if(datos.fichaId) doc.fichaId = datos.fichaId;
+    if(datos.imagen) doc.imagen = datos.imagen;
+    if(Number.isFinite(datos.rotacion) && datos.rotacion !== 0) doc.rotacion = datos.rotacion;
+    const ref = await coleccionTokens().add(doc);
+    creando = false;
+    seleccionar(ref.id);
+  }catch(err){
+    console.error('No se pudo crear el token:', err);
+    toast('No se pudo crear el token' + (err.code === 'permission-denied' ? ' (sin permiso)' : ''));
+  }
+}
+
+async function editarToken(id, cambios){
+  try{
+    await coleccionTokens().doc(id).update(cambios);
+    toast('Token guardado');
+  }catch(err){
+    console.error('No se pudo guardar el token:', err);
+    // Barras y aura son campos nuevos del token: si las reglas publicadas en
+    // Firebase son viejas, Firestore rechaza la escritura entera.
+    const nuevos = Object.keys(cambios || {}).some(k => k === 'barras' || k === 'aura' || k === 'rotacion' || k === 'oculto');
+    toast(err.code !== 'permission-denied' ? 'No se pudo guardar'
+      : nuevos ? 'No se pudo guardar: faltan publicar las reglas nuevas de Firestore (consola → Firestore → Reglas)'
+      : 'No se pudo guardar (sin permiso)');
+  }
+}
+
+async function borrarToken(id){
+  const t = tokens.get(id);
+  if(!puedoBorrar(t)) return;
+  if(!confirm(`¿Sacar el token "${t.nombre}" del mapa?`)) return;
+  try{
+    await coleccionTokens().doc(id).delete();
+  }catch(err){
+    console.error('No se pudo borrar el token:', err);
+    toast('No se pudo borrar el token');
+  }
+}
+
+function escucharTokens(){
+  escucharTokens.listo = false;
+  cortarTokensListener = coleccionTokens().onSnapshot(snap => {
+    snap.docChanges().forEach(ch => {
+      if(ch.type === 'removed'){
+        tokens.delete(ch.doc.id); visibles.delete(ch.doc.id);
+        if(seleccion === ch.doc.id) seleccion = null;
+        return;
+      }
+      const d = ch.doc.data({serverTimestamps: 'estimate'});
+      // Ruta nueva de otro (la propia ya se mostró al mover): estela unos segundos.
+      const previo = tokens.get(ch.doc.id);
+      if(ch.type === 'modified' && previo && (previo.col !== Math.round(num(d.col)) || previo.fila !== Math.round(num(d.fila)))) cerrarGirosLibres(ch.doc.id);   // otro token se movió: acción ajena
+      const ruta = Array.isArray(d.ruta) ? d.ruta.map(v => Math.round(num(v))) : [];
+      const rutaJson = JSON.stringify(ruta);
+      if(ch.type === 'modified' && ruta.length > 2 && previo && previo.rutaJson !== rutaJson){
+        const celdas = [];
+        for(let i = 0; i + 1 < ruta.length; i += 2) celdas.push({col: ruta[i], fila: ruta[i + 1]});
+        estelas.set(ch.doc.id, {celdas, hasta: Date.now() + ESTELA_MS});
+      }
+      tokens.set(ch.doc.id, {
+        rutaJson,
+        nombre: String(d.nombre || '?'),
+        color: d.color,
+        tipo: d.tipo === 'creep' ? 'creep' : 'pj',
+        duenoUid: d.duenoUid,
+        fichaId: typeof d.fichaId === 'string' ? d.fichaId : '',
+        col: Math.round(num(d.col)),
+        fila: Math.round(num(d.fila)),
+        creadoMs: d.creado && d.creado.toMillis ? d.creado.toMillis() : 0,
+        // Ojo: lo que no se copie acá se pierde al volver de Firebase.
+        aura: d.aura && typeof d.aura === 'object' ? d.aura : null,
+        barras: d.barras && typeof d.barras === 'object' ? d.barras : null,
+        imagen: typeof d.imagen === 'string' ? d.imagen : '',
+        rotacion: (((Math.round(num(d.rotacion) / 60) * 60) % 360) + 360) % 360,
+        oculto: d.oculto === true,
+      });
+    });
+    renderIniciativa();
+    const primeraVez = !escucharTokens.listo;
+    escucharTokens.listo = true;
+    if(primeraVez && !ajustarTamano.habiaVista) centrarEnMios();
+    renderPanel();
+    // Ojo (2026-09-22): la ruptura de sigilo vivía solo adentro de dibujar(), que se
+    // dispara con requestAnimationFrame — en una pestaña de fondo (minimizada, otra
+    // pestaña al frente) el navegador frena esos frames y la detección podía tardar
+    // mucho en notarse aunque la posición ya hubiera llegado por Firebase. Se llama acá
+    // también, directo desde la llegada del dato, así no depende de que se esté dibujando.
+    sigiloRevisar();
+    pedirDibujo();
+  }, err => {
+    console.error('Error escuchando los tokens:', err);
+    mostrarAviso('No se pudieron leer los tokens. ¿Están publicadas las reglas nuevas de Firestore? (mirá la consola)');
+  });
+}
+
+// Si una ficha no tiene miniatura publicada (el token quedaría con la inicial), se arma
+// una desde su retrato (`fichas/{id}/partes/retrato`), una sola vez por sesión. Solo
+// se guarda en memoria: no escribe nada.
+const miniaturasLocales = new Map();   // fichaId -> data URL de 96 px
+const miniaturasPedidas = new Set();
+const miniaturasInvalidas = new Set(); // fichas cuya miniatura publicada no sirve (se usa la local)
+// Busca la foto de la ficha: en su parte "retrato" y, si no está, en "general" (fichas viejas).
+async function fotoDeFicha(fichaId){
+  const leer = async parte => {
+    const doc = await fbDb.doc(fbRutaCampana(`fichas/${fichaId}/partes/${parte}`)).get();
+    return doc.exists ? String(doc.data().json || '') : '';
+  };
+  const crudo = await leer('retrato');
+  if(crudo){
+    let src = crudo;
+    try{ const d = JSON.parse(crudo); src = typeof d === 'string' ? d : String((d && (d.miniatura || d.imagen)) || ''); }catch(e){}
+    if(src.startsWith('data:')) return src;
+  }
+  const general = await leer('general');
+  if(general){
+    try{ const d = JSON.parse(general); const src = String((d && d.meta && (d.meta.miniatura || d.meta.imagen)) || ''); if(src.startsWith('data:')) return src; }catch(e){}
+  }
+  return '';
+}
+async function miniaturaDesdeRetrato(fichaId, forzar){
+  if(miniaturasPedidas.has(fichaId) && !forzar) return;
+  miniaturasPedidas.add(fichaId);
+  try{
+    const src = await fotoDeFicha(fichaId);
+    if(!src){ console.warn('La ficha ' + fichaId + ' no tiene foto para armar la miniatura del token'); return; }
+    const img = new Image();
+    await new Promise((ok, ko) => { img.onload = ok; img.onerror = ko; img.src = src; });
+    const lado = Math.min(img.naturalWidth, img.naturalHeight);
+    if(!lado) return;
+    const c = document.createElement('canvas');
+    c.width = c.height = 96;
+    c.getContext('2d').drawImage(img, (img.naturalWidth - lado) / 2, (img.naturalHeight - lado) / 2, lado, lado, 0, 0, 96, 96);
+    const mini = c.toDataURL('image/jpeg', 0.8);
+    miniaturasLocales.set(fichaId, mini);
+    const f = fichasPub.get(fichaId);
+    if(f && (!f.miniatura || miniaturasInvalidas.has(fichaId))) f.miniatura = mini;
+    pedirDibujo();
+  }catch(err){ console.warn('No se pudo armar la miniatura de la ficha ' + fichaId, err); miniaturasPedidas.delete(fichaId); }
+}
+// Una miniatura publicada que no carga (vacía, cortada o rota) se reemplaza por la del retrato.
+function verificarMiniatura(fichaId, src){
+  const rota = () => { miniaturasInvalidas.add(fichaId); miniaturaDesdeRetrato(fichaId, true); };
+  if(typeof src !== 'string' || src.length < 200 || !src.startsWith('data:image')){ rota(); return; }
+  const img = new Image();
+  img.onerror = rota;
+  img.src = src;
+}
+
+// Fichas de PJ y creeps: solo lo público (nombre, resumen, miniatura), para
+// las barras, estados e imagen de los tokens vinculados.
+function mostrarSubidaNivelMapa(nivel, nombre){
+  let cap = document.getElementById('scrim-nivel-nuevo');
+  if(!cap){
+    cap = document.createElement('div');
+    cap.id = 'scrim-nivel-nuevo';
+    cap.style.cssText = 'position:fixed;inset:0;z-index:120;background:rgba(8,5,7,.78);display:flex;align-items:center;justify-content:center';
+    cap.innerHTML = '<div style="background:var(--panel);border:1px solid var(--brass);border-radius:6px;padding:30px 34px;text-align:center;max-width:380px"><div style="font-size:54px">🎉</div><div style="font-family:Fraunces,serif;font-weight:900;font-size:28px;color:var(--brass);margin:8px 0" id="nivel-nuevo-titulo"></div><div style="color:var(--paper);margin-bottom:16px">¡Felicitaciones! Abrí tu ficha para repartir tus puntos nuevos.</div><button class="btn primary" id="nivel-nuevo-ok">¡Genial!</button></div>';
+    document.body.appendChild(cap);
+    cap.querySelector('#nivel-nuevo-ok').onclick = () => { cap.style.display = 'none'; };
+  }
+  cap.querySelector('#nivel-nuevo-titulo').textContent = `${nombre}: ¡subiste al nivel ${nivel}!`;
+  cap.style.display = 'flex';
+}
+
+function escucharVinculables(){
+  const escuchar = (coleccion, mapa, campos) => fbDb.collection(fbRutaCampana(coleccion)).onSnapshot(snap => {
+    snap.docChanges().forEach(ch => {
+      if(ch.type === 'removed'){ mapa.delete(ch.doc.id); return; }
+      const d = ch.doc.data();
+      const o = {};
+      campos.forEach(k => { o[k] = d[k]; });
+      o.nombre = String(d.nombre || '?');
+      if(coleccion === 'fichas'){
+        // Si sube de nivel un personaje mío (por ejemplo al cobrar la experiencia de un combate), pop-up de felicitación.
+        const previo = mapa.get(ch.doc.id);
+        if(previo && fbUsuario && d.duenoUid === fbUsuario.uid && previo.resumen && d.resumen && num(d.resumen.nivel) > num(previo.resumen.nivel) && num(previo.resumen.nivel) > 0){
+          mostrarSubidaNivelMapa(num(d.resumen.nivel), o.nombre);
+        }
+        if((!o.miniatura || miniaturasInvalidas.has(ch.doc.id)) && miniaturasLocales.has(ch.doc.id)) o.miniatura = miniaturasLocales.get(ch.doc.id);
+        if(!o.miniatura) miniaturaDesdeRetrato(ch.doc.id);
+        else if(!miniaturasLocales.has(ch.doc.id) && !miniaturasInvalidas.has(ch.doc.id)) verificarMiniatura(ch.doc.id, o.miniatura);
+      }
+      // Tarjeta del creep (🪪, ver hudTarjetaHtml): solo el nombre de cada
+      // ítem de equipo (sin def/mods/detalle) y la nota narrativa — ya son
+      // datos públicos (la ficha del creep se lee entera con `esMiembro`),
+      // acá solo se decide qué mostrar en el mapa.
+      if(coleccion === 'creeps'){
+        o.notas = String(d.notas || '').trim();
+        o.equipoNombres = Array.isArray(d.equipo) ? d.equipo.map(it => String((it && it.nombre) || '').trim()).filter(Boolean) : [];
+      }
+      mapa.set(ch.doc.id, o);
+    });
+    renderIniciativa();   // el sigilo de un creep/personaje cambia si aparece en la lista
+    try{ actualizarMuerteMapa(); }catch(err){ console.error('muerte en el mapa:', err); }
+    renderPanel();
+    sigiloRevisar();   // por si el estado Sigilo se aplicó/quitó a mano estando ya en un cono rival
+    revisarAutoLentes();   // entrar en sigilo prende el modo lentes solo (no muestra todo de una)
+    if(tableroAbierto) renderTablero();   // el HP/estados de las fichas o creeps del tablero cambió
+    renderPolillaBoton();   // el estado «Polilla revoloteando» se aplicó/gastó (propio o desde otra pantalla)
+    pedirDibujo();
+  }, err => console.error(`Error escuchando ${coleccion}:`, err));
+  escuchar('fichas', fichasPub, ['duenoUid', 'resumen', 'miniatura']);
+  escuchar('creeps', creepsPub, ['orden', 'resumen', 'miniatura', 'tarjeta', 'grupo', 'color']);
+}
+
+function componerFondo(){
+  const dato = fondoImagen || (fondoPos && fondoPos.dato) || '';
+  if(!dato){ fondo = null; return; }
+  const p = fondoPos || {};
+  fondo = {
+    dato,
+    x: p.x !== undefined ? num(p.x) : -ANCHO_CASILLA / 2,
+    y: p.y !== undefined ? num(p.y) : -HEX,
+    ancho: num(p.ancho) || ANCHO_CASILLA * 20,
+  };
+}
+
+function escucharFondo(){
+  cortarFondo1 = fbDb.doc(fbRutaCampana(rutaMapaEstado('fondo'))).onSnapshot(doc => {
+    if(arrastreFondo) return;
+    fondoPos = doc.exists ? doc.data() : null;
+    componerFondo();
+    renderPanel();
+    pedirDibujo();
+  }, err => console.error('Error escuchando el fondo del mapa:', err));
+  cortarFondo2 = fbDb.doc(fbRutaCampana(rutaMapaEstado('fondoImagen'))).onSnapshot(doc => {
+    fondoImagen = doc.exists ? String(doc.data().dato || '') : '';
+    componerFondo();
+    renderPanel();
+    pedirDibujo();
+  }, err => console.error('Error escuchando la imagen de fondo:', err));
+}
+
+async function guardarFondo(cambios){
+  try{
+    await fbDb.doc(fbRutaCampana(rutaMapaEstado('fondo'))).set({...cambios, actualizado: firebase.firestore.FieldValue.serverTimestamp()}, {merge: true});
+  }catch(err){
+    console.error('No se pudo guardar el fondo:', err);
+    toast(err.code === 'permission-denied' ? 'Solo el GM puede cambiar el fondo' : 'No se pudo guardar el fondo');
+  }
+}
+
+// Imagen propia de un token que no está vinculado a una ficha ni a un creep
+// (NPC, objetos, etc.): un cuadrado chico para que entre en el documento
+// del token, con el recorte (elegir zoom y qué parte se ve) armado por
+// comun/recorte-imagen.js — ver también token-etiqueta y HUD.
+const TOKEN_IMG_PX = 96;
+const TOKEN_IMG_MAX = 60000;   // tope que aceptan las reglas
+async function elegirImagenToken(id){
+  const entrada = $('#token-imagen-archivo');
+  entrada.onchange = async ev => {
+    const file = ev.target.files[0];
+    ev.target.value = '';
+    if(!file) return;
+    try{
+      const dato = await recortarImagen(file, {lado: TOKEN_IMG_PX, tope: TOKEN_IMG_MAX});
+      await editarToken(id, {imagen: dato});
+    }catch(err){
+      if(err.message === 'cancelado') return;
+      console.error('No se pudo preparar la imagen del token:', err);
+      toast(err.message === 'no-image' ? 'Eso no es una imagen' : 'No se pudo usar esa imagen');
+    }
+  };
+  entrada.click();
+}
+
+function prepararImagenFondo(file){
+  return new Promise((res, rej) => {
+    if(!file.type || !file.type.startsWith('image/')){ rej(new Error('no-image')); return; }
+    const lector = new FileReader();
+    lector.onerror = () => rej(lector.error);
+    lector.onload = () => {
+      const img = new Image();
+      img.onerror = () => rej(new Error('bad-image'));
+      img.onload = () => {
+        let lado = 2000, calidad = 0.82, dato = '';
+        for(let i = 0; i < 8; i++){
+          const escala = Math.min(1, lado / Math.max(img.naturalWidth, img.naturalHeight));
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.round(img.naturalWidth * escala);
+          canvas.height = Math.round(img.naturalHeight * escala);
+          const c = canvas.getContext('2d');
+          c.fillStyle = '#17121A'; c.fillRect(0, 0, canvas.width, canvas.height);
+          c.drawImage(img, 0, 0, canvas.width, canvas.height);
+          dato = canvas.toDataURL('image/jpeg', calidad);
+          if(dato.length < 900000) break;
+          lado = Math.round(lado * 0.8); calidad = Math.max(0.6, calidad - 0.05);
+        }
+        dato.length < 900000 ? res(dato) : rej(new Error('muy-grande'));
+      };
+      img.src = lector.result;
+    };
+    lector.readAsDataURL(file);
+  });
+}
+
+// Textura de fondo de un elemento de Terreno/Formas: se achica pero no
+// se recorta (no es cuadrada, cubre la caja del elemento como "cover"
+// al dibujarla — ver cajaCeldas).
+const ELEMENTO_IMG_LADO = 1200, ELEMENTO_IMG_MAX = 120000;
+function prepararImagenElemento(file){
+  return new Promise((res, rej) => {
+    if(!file.type || !file.type.startsWith('image/')){ rej(new Error('no-image')); return; }
+    const lector = new FileReader();
+    lector.onerror = () => rej(lector.error);
+    lector.onload = () => {
+      const img = new Image();
+      img.onerror = () => rej(new Error('bad-image'));
+      img.onload = () => {
+        let lado = ELEMENTO_IMG_LADO, calidad = 0.8, dato = '';
+        for(let i = 0; i < 8; i++){
+          const escala = Math.min(1, lado / Math.max(img.naturalWidth, img.naturalHeight));
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.round(img.naturalWidth * escala);
+          canvas.height = Math.round(img.naturalHeight * escala);
+          const c = canvas.getContext('2d');
+          c.drawImage(img, 0, 0, canvas.width, canvas.height);
+          dato = canvas.toDataURL('image/jpeg', calidad);
+          if(dato.length < ELEMENTO_IMG_MAX) break;
+          lado = Math.round(lado * 0.8); calidad = Math.max(0.55, calidad - 0.06);
+        }
+        dato.length < ELEMENTO_IMG_MAX ? res(dato) : rej(new Error('muy-grande'));
+      };
+      img.src = lector.result;
+    };
+    lector.readAsDataURL(file);
+  });
+}
+
+$('#fondo-archivo').onchange = async ev => {
+  const file = ev.target.files[0];
+  ev.target.value = '';
+  if(!file) return;
+  toast('Preparando la imagen…');
+  try{
+    const dato = await prepararImagenFondo(file);
+    // Si no había fondo, arranca con la esquina en la casilla 0,0 y 20 casillas de ancho.
+    const base = fondo ? {x: fondo.x, y: fondo.y, ancho: fondo.ancho} : {x: -ANCHO_CASILLA / 2, y: -HEX, ancho: ANCHO_CASILLA * 20};
+    const ts = firebase.firestore.FieldValue.serverTimestamp();
+    const lote = fbDb.batch();
+    lote.set(fbDb.doc(fbRutaCampana(rutaMapaEstado('fondoImagen'))), {dato, actualizado: ts});
+    // La posición en su propio documento (y sin la imagen, si era un fondo de antes).
+    lote.set(fbDb.doc(fbRutaCampana(rutaMapaEstado('fondo'))), {...base, dato: firebase.firestore.FieldValue.delete(), actualizado: ts}, {merge: true});
+    await lote.commit();
+    toast('Fondo cargado');
+  }catch(err){
+    console.error('No se pudo cargar el fondo:', err);
+    toast(err.message === 'muy-grande' ? 'La imagen es demasiado pesada' : 'No se pudo usar esa imagen');
+  }
+};
+
+function escucharMiembros(){
+  fbDb.collection(fbRutaCampana('miembros')).onSnapshot(snap => {
+    miembros.clear();
+    snap.docs.forEach(d => miembros.set(d.id, {nombre: String(d.data().nombre || '?'), gm: d.data().gm === true}));
+    const yo = miembros.get(fbUsuario.uid);
+    if(yo){ fbMiembro = {...fbMiembro, ...yo}; soyGM = yo.gm; }
+    bnPintarInterruptor();
+    renderModo();
+    estado(barraTexto());
+    renderPanel();
+    pedirDibujo();
+  }, err => console.error('Error escuchando miembros:', err));
+}
+
+/* ---------- Panel del costado ---------- */
+
+let firmaPanel = '';
+
+function seleccionar(id){
+  if(seleccion === id && !creando) return;
+  const habiaBotonera = !$('#botonera-capa').hidden && botonera.lista && !botonera.completa;
+  if(seleccion !== id){ editandoToken = false; moverLibre = null; hudCerrar(); }
+  seleccion = id;
+  if(id){ creando = false; trazoSeleccionado = null; elementoSeleccionado = null; }
+  renderPanel();
+  pedirDibujo();
+  // Botonera o Acciones abiertas y se elige otro token que también tiene la suya: la ventana cambia sola a ese token.
+  if(habiaBotonera && id && botoneraDeToken(tokens.get(id))) abrirBotoneraDeSeleccion();
+}
+
+function trazoSeleccionar(id){
+  if(trazoSeleccionado === id) return;
+  trazoSeleccionado = id;
+  if(id){ if(seleccion) seleccionar(null); elementoSeleccionado = null; }
+  pedirDibujo();
+}
+
+function elementoSeleccionar(id){
+  if(elementoSeleccionado === id) return;
+  if(editandoElemento && editandoElemento.id !== id) cerrarEditorElemento(true);
+  elementoSeleccionado = id;
+  if(id){ if(seleccion) seleccionar(null); trazoSeleccionado = null; }
+  pedirDibujo();
+}
+
+function htmlColores(elegido, habilitado){
+  return '<div class="colores">' + COLORES.map(c =>
+    `<button type="button" class="color${c.toLowerCase() === String(elegido).toLowerCase() ? ' elegido' : ''}" data-color="${c}" style="background:${c}" ${habilitado ? '' : 'disabled'} title="${c}"></button>`
+  ).join('') + '</div>';
+}
+
+function conectarColores(caja, alElegir){
+  caja.querySelectorAll('[data-color]').forEach(b => b.onclick = () => {
+    caja.querySelectorAll('[data-color]').forEach(x => x.classList.toggle('elegido', x === b));
+    alElegir(b.dataset.color);
+  });
+}
+
+// Opciones para vincular un token: los personajes propios (jugador) o los
+// creeps (GM), según el tipo de token.
+// todasLasFichas: el GM armando el token de otro jugador ve las fichas de
+// todos (con el nombre de su dueño al lado), no solo las suyas propias.
+function opcionesVinculo(tipo, elegido, todasLasFichas){
+  let lista;
+  if(tipo === 'creep'){
+    lista = [...creepsPub.entries()].sort((a, b) => num(a[1].orden) - num(b[1].orden));
+  }else{
+    // Cada personaje (propio, o todos si todasLasFichas) y, debajo, sus invocaciones.
+    lista = [];
+    [...fichasPub.entries()]
+      .filter(([, f]) => todasLasFichas || f.duenoUid === fbUsuario.uid)
+      .sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, 'es'))
+      .forEach(([id, f]) => {
+        const dueno = todasLasFichas ? nombreMiembro(f.duenoUid) : '';
+        lista.push([id, {...f, nombre: dueno ? `${f.nombre} — ${dueno}` : f.nombre}]);
+        ((f.resumen && f.resumen.invocaciones) || []).forEach(inv => {
+          lista.push([id + SEP_INVOCACION + inv.id, {nombre: `   ↳ ${inv.nombre || 'Invocación'} (invocación de ${f.nombre})`}]);
+        });
+      });
+  }
+  const enMapa = new Set([...tokens.values()].map(t => t.fichaId).filter(Boolean));
+  const opcion = ([id, v], grupo) => `<option value="${esc(id)}"${id === elegido ? ' selected' : ''}>${esc(v.nombre)}${grupo ? ' · ' + esc(grupo) : ''}${enMapa.has(id) && id !== elegido ? ' (ya en el mapa)' : ''}</option>`;
+  if(tipo === 'creep'){
+    // Los creeps pueden repetir nombre en grupos distintos: se listan agrupados y cada uno lleva el nombre de su grupo.
+    const porGrupo = new Map();
+    lista.forEach(e => { const g = String(e[1].grupo || '').trim(); if(!porGrupo.has(g)) porGrupo.set(g, []); porGrupo.get(g).push(e); });
+    const grupos = [...porGrupo.keys()].sort((x, y) => (x === '' ? 1 : y === '' ? -1 : x.localeCompare(y, 'es')));
+    return '<option value="">Sin vincular</option>' + grupos.map(g =>
+      `<optgroup label="${esc(g || 'Sin grupo')}">${porGrupo.get(g).map(e => opcion(e, g)).join('')}</optgroup>`).join('');
+  }
+  return '<option value="">Sin vincular</option>' + lista.map(e => opcion(e, '')).join('');
+}
+
+// Lista de miembros para elegir dueño de un token de tipo "pj" (igual
+// formato que el selector de "Cambiar dueño" del panel de edición).
+function opcionesDueno(elegido){
+  return [...miembros.entries()].map(([uid, m]) =>
+    `<option value="${esc(uid)}"${uid === elegido ? ' selected' : ''}>${esc(m.nombre)}${m.gm ? ' (GM)' : ''}</option>`
+  ).join('');
+}
+
+// Barras y estados en el panel. De los PJ se ven los números (su ficha es
+// visible para todos); de los creeps, solo cuán llena está la barra.
+// Vida y SP desde el mapa, guardados en la ficha o en el creep, así los ve
+// cambiados la ficha, gm-tools, el tablero y los demás. Los PJ los cambia
+// su dueño; los creeps, el GM (lo imponen las reglas).
+function puedoCambiarVida(t){
+  if(!t || !t.fichaId || !fbUsuario) return false;
+  if(t.tipo === 'creep') return soyGM && creepsPub.has(t.fichaId);
+  const v = vinculo(t);
+  return !!v && ((!soyGM && v.duenoUid === fbUsuario.uid) || controloFicha(t.fichaId));
+}
+// Estados alterados (agregar, sacar, cambiar turnos, editar): el dueño en su personaje y el GM en TODOS (2026-09-24, pedido
+// del dueño); los creeps, el GM. La vida de un personaje sigue siendo solo de su dueño.
+function puedoCambiarEstados(t){
+  if(!t || !t.fichaId || !fbUsuario) return false;
+  if(t.tipo === 'creep') return soyGM && creepsPub.has(t.fichaId);
+  const v = vinculo(t);
+  return !!v && (soyGM || v.duenoUid === fbUsuario.uid);
+}
+
+// "12" fija el valor; "+5" / "-3" suma o resta. null si no se entiende.
+// Firebase (plan gratis) corta todo cuando se pasa de la cuota del día (20.000 escrituras / 50.000 lecturas): el error crudo dice "quota exceeded".
+const CUOTA_AGOTADA_TXT = 'Se acabó la cuota gratis de Firebase por hoy (se renueva sola de madrugada, ~4 a.m. de Argentina). Hasta entonces no se puede guardar nada.';
+function esCuotaAgotada(err){ return !!err && (err.code === 'resource-exhausted' || /quota/i.test(String(err.message || ''))); }
+function leerValorVital(texto, actual){
+  const crudo = String(texto || '').trim().replace(',', '.').replace('−', '-');
+  const m = crudo.match(/^([+-])\s*(\d+(?:\.\d+)?)$/);
+  if(m) return actual + parseFloat(m[2]) * (m[1] === '-' ? -1 : 1);
+  if(/^\d+(?:\.\d+)?$/.test(crudo)) return parseFloat(crudo);
+  return null;
+}
+const ERROR_TIPEO = 'tipeo';
+
+// Mismo hash que gm-tools usa para la firma del creep (gmHash): al cambiar
+// la firma, gm-tools se da cuenta y trae el creep actualizado.
+function hashGm(s){
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for(let i = 0; i < s.length; i++){
+    const ch = s.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+}
+
+// Cambia el creep completo (parte privada) en una transacción y pone al día
+// su resumen público y la firma. Devuelve lo que devuelva cambiar(sc).
+async function modificarCreep(creepId, cambiar){
+  const base = fbDb.doc(fbRutaCampana(`creeps/${creepId}`));
+  const privRef = base.collection('privado').doc('ficha');
+  return fbDb.runTransaction(async tx => {
+    const [priv, pub] = await Promise.all([tx.get(privRef), tx.get(base)]);
+    if(!priv.exists || !pub.exists) throw new Error('El creep ya no existe');
+    const sc = JSON.parse(priv.data().json || '{}');
+    const resultado = cambiar(sc);
+    const hpMax = num(sc.hpMax);
+    const json = JSON.stringify(sc);
+    // La firma es hash(creep)-hash(imagen); la imagen no cambia.
+    const firmaVieja = String(pub.data().firma || '');
+    const parteImagen = firmaVieja.includes('-') ? firmaVieja.slice(firmaVieja.indexOf('-') + 1) : hashGm('');
+    tx.set(privRef, {json});
+    tx.update(base, {
+      'resumen.hpPct': hpMax > 0 ? Math.round(Math.max(0, Math.min(1, sc.hp / hpMax)) * 100) : 0,
+      'resumen.muerto': sc.hp <= 0,
+      'resumen.estados': (Array.isArray(sc.estados) ? sc.estados : [])
+        .filter(e => e && e.activo !== false && e.nombre).slice(0, 30)
+        .map(e => ({
+          nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
+          polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
+        })),
+      firma: hashGm(json) + '-' + parteImagen,
+      actualizado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    return resultado;
+  });
+}
+
+async function cambiarVidaCreep(creepId, texto){
+  await modificarCreep(creepId, sc => {
+    const hpMax = num(sc.hpMax);
+    const nuevo = leerValorVital(texto, num(sc.hp));
+    if(nuevo === null) throw new Error(ERROR_TIPEO);
+    sc.hp = Math.max(0, hpMax > 0 ? Math.min(hpMax, nuevo) : nuevo);
+  });
+}
+
+async function cambiarVidaPj(t, clave, texto){
+  const [fichaId, invId] = t.fichaId.split(SEP_INVOCACION);
+  const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
+  const parteRef = base.collection('partes').doc(invId ? 'invocaciones' : 'general');
+  const ts = firebase.firestore.FieldValue.serverTimestamp();
+  await fbDb.runTransaction(async tx => {
+    const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
+    if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
+    const datos = JSON.parse(parte.data().json || '{}');
+    const r = ficha.data().resumen || {};
+    const cambios = {actualizado: ts};
+    if(invId){
+      const inv = (datos.invocaciones || []).find(i => i && i.id === invId);
+      if(!inv) throw new Error('La invocación ya no existe');
+      const nuevo = leerValorVital(texto, num(inv.hp));
+      if(nuevo === null) throw new Error(ERROR_TIPEO);
+      inv.hp = Math.max(0, num(inv.hpMax) > 0 ? Math.min(num(inv.hpMax), nuevo) : nuevo);
+      cambios['resumen.invocaciones'] = (r.invocaciones || []).map(i => i.id === invId ? {...i, hp: inv.hp} : i);
+    }else if(clave === 'hp'){
+      const hpMax = num(r.hpMax);
+      const nuevo = leerValorVital(texto, num(datos.hp));
+      if(nuevo === null) throw new Error(ERROR_TIPEO);
+      datos.hp = Math.max(0, hpMax > 0 ? Math.min(hpMax, nuevo) : nuevo);
+      cambios['resumen.hp'] = datos.hp;
+    }else{
+      // SP disponible = máximo - gastado (igual que en la ficha).
+      const {spMax, campoGastado, campoResumen} = spDeResumen(r);
+      const nuevo = leerValorVital(texto, spMax - num(datos[campoGastado]));
+      if(nuevo === null) throw new Error(ERROR_TIPEO);
+      const sp = Math.min(spMax, nuevo);
+      datos[campoGastado] = spMax - sp;
+      cambios[campoResumen] = sp;
+    }
+    tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
+    tx.update(base, cambios);
+  });
+}
+
+// 📜 Historial (comun/historial.js): cada segundo se le pasan los creeps con token para que anote cambios de HP y de estados.
+// Si gm-tools está abierto en otra pestaña, solo una de las dos registra (turno en localStorage).
+setInterval(() => {
+  if(!soyGM || typeof historialObservarCreeps !== 'function' || window.parent !== window) return;
+  historialObservarCreeps([...creepsPriv.entries()].filter(([, e]) => e && e.sc).map(([id, e]) => ({
+    id, nombre: e.sc.nombre, hp: e.sc.hp,
+    publico: [...tokens.values()].some(t => t.tipo === 'creep' && t.fichaId === id && !t.oculto && !enSigilo(t)),   // lo ven los jugadores
+    estados: (Array.isArray(e.sc.estados) ? e.sc.estados : []).filter(x => x && x.activo !== false && x.nombre).map(x => ({nombre: x.nombre, turnos: num(x.turnos)})),
+  })));
+}, 1000);
+
+function creepPrivadoDe(creepId){
+  const e = creepsPriv.get(creepId);
+  return e ? e.sc : null;
+}
+
+// GM: escucha la parte privada de cada creep que tiene token en el mapa
+// (vida con números y No2 para cobrar al moverlo). Deja de escuchar los
+// que ya no están.
+function actualizarEscuchasCreeps(){
+  const queridos = new Set(soyGM && fbDb
+    ? [...tokens.values()].filter(t => t.tipo === 'creep' && t.fichaId).map(t => t.fichaId)
+    : []);
+  creepsPriv.forEach((e, id) => {
+    if(queridos.has(id)) return;
+    e.cortar();
+    creepsPriv.delete(id);
+  });
+  queridos.forEach(id => {
+    if(creepsPriv.has(id)) return;
+    const e = {sc: null, cortar: null};
+    creepsPriv.set(id, e);
+    e.cortar = fbDb.doc(fbRutaCampana(`creeps/${id}/privado/ficha`)).onSnapshot(doc => {
+      let sc = null;
+      try{ sc = doc.exists ? JSON.parse(doc.data().json || '{}') : null; }catch(err){}
+      e.sc = sc;
+      renderPanel();
+      if(ac && ac.creepId === id && !ac.host.hidden) acDibujar();   // ⚗ las Acciones nuevas de ese creep, al día
+    }, err => console.error('Error leyendo el creep:', err));
+  });
+}
+
+// Ayuda del (?) de la barra del costado: cómo se mueven los tokens y la guía de colores de los bordes.
+function actualizarAyudaToken(){
+  const item = (color, texto) => `<span><i style="border-color:${color}"></i>${texto}</span>`;
+  // El GM no suele tener tokens de personaje propios: el dorado solo
+  // aparece en su leyenda si tiene alguno.
+  const gmConPropios = soyGM && [...tokens.values()].some(x => claseToken(x) === 'propio');
+  const ayuda = soyGM
+    ? 'Tocá un token para ver de quién es. Vos movés los creeps y los NPC arrastrándolos; los personajes los mueve cada jugador. ' +
+      'En modo combate los creeps gastan sus No2 al moverse (si se pasan, te pide confirmar); los NPC se mueven sin costo. Con el switch de arriba pasás de modo narrativo a combate para toda la mesa. '
+    : 'Tocá un token para ver de quién es. Arrastrá los tuyos para moverlos: la estela marca la ruta casillero por casillero. En modo combate tus personajes gastan No2 al moverse (si te pasás, te pide confirmar); en modo narrativo, no. ';
+  const leyenda = soyGM
+    ? (gmConPropios ? item(BORDE.propio, 'Tuyos') : '') + item(BORDE.creep, 'Creeps') + item(BORDE.npc, 'NPC') + item(BORDE.jugador, 'Jugadores')
+    : item(BORDE.propio, 'Tuyos') + item(BORDE.jugador, 'Otros jugadores') + item(BORDE.creep, 'Creeps') + item(BORDE.npc, 'NPC');
+  $('#ayuda-token-globo').innerHTML =
+    ayuda +
+    'Arrastrá el fondo para desplazarte y usá la rueda o −/+ para el zoom.' +
+    '<span class="leyenda">' + leyenda + '</span>';
+}
+
+function renderPanel(forzar){
+  renderMapasMenu(forzar);
+  const panel = $('#panel-token');
+  const t = seleccion ? tokens.get(seleccion) : null;
+  actualizarEscuchasCreeps();
+  const clave = JSON.stringify([creando, seleccion, editandoToken]);
+  const v = t ? vinculo(t) : null;
+  const opciones = (creando || t) ? [
+    [...fichasPub.entries()].filter(([, f]) => f.duenoUid === (fbUsuario && fbUsuario.uid)).map(([id, f]) => id + f.nombre + JSON.stringify(((f.resumen && f.resumen.invocaciones) || []).map(i => [i.id, i.nombre]))),
+    [...creepsPub.entries()].map(([id, c]) => id + c.nombre),
+  ] : null;
+  const firma = clave + '|' + JSON.stringify([
+    t && [t.nombre, t.color, t.tipo, t.duenoUid, t.col, t.fichaId, t.fila],
+    v && [v.nombre, v.resumen],
+    opciones, soyGM, [...miembros.entries()], !!fbMiembro,
+    t && t.tipo === 'creep' && (s => s && [s.hp, s.hpMax, s.nitros])(creepPrivadoDe(t.fichaId)),
+  ]);
+  if(!forzar){
+    if(firma === firmaPanel) return;
+    // Si sigue abierto el mismo panel, no pisar lo que alguien está
+    // escribiendo o eligiendo.
+    const mismoPanel = firmaPanel.startsWith(clave + '|');
+    if(mismoPanel && (creando || panel.contains(document.activeElement) || $('#editar-token-ventana').contains(document.activeElement))) return;
+  }
+  firmaPanel = firma;
+  $('#btn-nuevo').disabled = !fbMiembro;
+  actualizarAyudaToken();
+  renderNiebla();
+  renderOjo();
+  $('#caja-mantenimiento').hidden = !soyGM;
+  $('#personajes-caja').hidden = !fbMiembro;
+  $('#toolkit-tienda').hidden = !fbMiembro;   // jugadores: comprar y vender; GM: abre el generador de tiendas
+  $('#toolkit-tienda').title = soyGM ? 'Tienda: abrir el generador de tiendas (en otra pestaña) para armar, publicar y abrir o cerrar la tienda' : 'Tienda: abrir la tienda que publicó el GM y comprar o vender (solo se puede con la tienda abierta)';
+  actualizarBotonMapas();
+  $('#nuevo-token-capa').hidden = !creando;
+  if(!creando) $('#nuevo-token-ventana').innerHTML = '';
+
+
+  if(creando){
+    let color = COLORES[Math.floor(Math.random() * COLORES.length)];
+    let imagenNueva = '';   // solo para tokens sin vincular (NPC, objetos)
+    const tipoInicial = soyGM ? 'creep' : 'pj';
+    // Ventana propia, centrada sobre el mapa (no en la barra lateral).
+    const ventana = $('#nuevo-token-ventana');
+    ventana.innerHTML =
+      '<div class="nt-cab"><span>➕ Nuevo token</span><button type="button" id="nuevo-x" title="Cancelar (Esc o clic derecho)">✕</button></div>' +
+      (!soyGM ? '<div class="nt-campo"><button type="button" class="btn primary" id="nuevo-traer" style="width:100%" title="Pone en el mapa el token de tu personaje, ya vinculado a su ficha">⬇ Traer mi token al mapa</button></div>' : '') +
+      (soyGM ? '<div class="nt-campo"><label class="etiqueta">Tipo</label><select id="nuevo-tipo"><option value="creep">Creep o NPC (lo mueve el GM)</option><option value="pj">Personaje (lo mueve su dueño)</option></select></div>' : '') +
+      `<div class="nt-campo"><label class="etiqueta">Vincular a ${soyGM ? 'un creep o ficha' : 'uno de tus personajes'}</label><select id="nuevo-vinculo">${opcionesVinculo(tipoInicial, '', soyGM)}</select>` +
+        '<p class="nt-pista">Vinculado, toma el nombre, la imagen, las barras y los estados de su ficha' + (soyGM ? ' (creep: borde rojo). Sin vincular: NPC, borde gris.' : '.') + '</p></div>' +
+      '<div class="nt-campo" id="nuevo-dueno-caja"></div>' +
+      '<div class="nt-campo"><label class="etiqueta">Nombre</label><input id="nuevo-nombre" maxlength="40" placeholder="Ej: Aurelio"></div>' +
+      '<div class="nt-campo" id="nuevo-imagen"></div>' +
+      '<div class="nt-campo"><label class="etiqueta">Color (se ve si no tiene imagen)</label>' + htmlColores(color, true) + '</div>' +
+      '<div class="nt-pie"><span class="nt-pista" style="margin:0 auto 0 0">Aparece en el centro de lo que estás viendo.</span><button type="button" class="btn" id="nuevo-cancelar">Cancelar</button><button type="button" class="btn primary" id="nuevo-crear">Poner en el mapa</button></div>';
+    // Imagen propia: solo tiene sentido sin vincular (vinculado, la toma de
+    // la ficha o el creep). Se guarda ya achicada, lista para crear el token.
+    const imagenNuevaHtml = () => {
+      if($('#nuevo-vinculo').value) return '';
+      return '<label class="etiqueta">Imagen (opcional)</label>' +
+        '<div class="fila" style="margin-top:0;align-items:center">' +
+          (imagenNueva ? `<img src="${esc(imagenNueva)}" alt="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid ${esc(color)}">` : '') +
+          `<button type="button" class="btn" id="nuevo-imagen-elegir">${imagenNueva ? 'Cambiar imagen' : 'Elegir imagen'}</button>` +
+          (imagenNueva ? '<button type="button" class="btn peligro" id="nuevo-imagen-quitar">Quitar</button>' : '') +
+        '</div>';
+    };
+    const actualizarImagenNueva = () => {
+      $('#nuevo-imagen').innerHTML = imagenNuevaHtml();
+      const elegir = $('#nuevo-imagen-elegir');
+      if(elegir) elegir.onclick = () => {
+        const entrada = $('#token-imagen-archivo');
+        entrada.onchange = async ev => {
+          const file = ev.target.files[0];
+          ev.target.value = '';
+          if(!file) return;
+          try{ imagenNueva = await recortarImagen(file, {lado: TOKEN_IMG_PX, tope: TOKEN_IMG_MAX}); actualizarImagenNueva(); }
+          catch(err){
+            if(err.message === 'cancelado') return;
+            console.error('No se pudo preparar la imagen del token:', err);
+            toast(err.message === 'no-image' ? 'Eso no es una imagen' : 'No se pudo usar esa imagen');
+          }
+        };
+        entrada.click();
+      };
+      const quitar = $('#nuevo-imagen-quitar');
+      if(quitar) quitar.onclick = () => { imagenNueva = ''; actualizarImagenNueva(); };
+    };
+    actualizarImagenNueva();
+    conectarColores(ventana, c => { color = c; actualizarImagenNueva(); });
+    const tipoActual = () => soyGM ? $('#nuevo-tipo').value : 'pj';
+    // Dueño: solo el GM lo elige, y solo para un token de tipo "pj" — el
+    // token queda de quien se elija acá, no de quien lo crea (para poder
+    // armar el token de cada jugador de antemano en un mapa que todavía no
+    // se publicó). Arranca en el dueño de la ficha vinculada, si hay.
+    const actualizarDueno = duenoSugerido => {
+      const caja = $('#nuevo-dueno-caja');
+      if(!soyGM || tipoActual() !== 'pj'){ caja.innerHTML = ''; return; }
+      const previo = $('#nuevo-dueno') ? $('#nuevo-dueno').value : '';
+      caja.innerHTML = '<label class="etiqueta">Dueño (quién lo mueve)</label>' +
+        `<select id="nuevo-dueno">${opcionesDueno(duenoSugerido || previo)}</select>`;
+    };
+    actualizarDueno();
+    const alVincular = () => {
+      const id = $('#nuevo-vinculo').value;
+      const vv = id ? vinculo({tipo: tipoActual(), fichaId: id}) : null;
+      if(vv) $('#nuevo-nombre').value = vv.nombre.slice(0, 40);
+      actualizarDueno(vv && vv.duenoUid);
+      actualizarImagenNueva();
+    };
+    $('#nuevo-vinculo').onchange = alVincular;
+    if(soyGM) $('#nuevo-tipo').onchange = () => {
+      $('#nuevo-vinculo').innerHTML = opcionesVinculo(tipoActual(), '', true);
+      actualizarDueno();
+      actualizarImagenNueva();
+    };
+    const crear = () => {
+      const nombre = $('#nuevo-nombre').value.trim();
+      if(!nombre){ $('#nuevo-nombre').focus(); return; }
+      const fichaId = $('#nuevo-vinculo').value;
+      const duenoUid = soyGM && tipoActual() === 'pj' && $('#nuevo-dueno') ? $('#nuevo-dueno').value : undefined;
+      iniciarColocacion({nombre, color, tipo: tipoActual(), fichaId, imagen: fichaId ? '' : imagenNueva, duenoUid});
+    };
+    $('#nuevo-crear').onclick = crear;
+    $('#nuevo-nombre').onkeydown = e => { if(e.key === 'Enter') crear(); };
+    // Jugador: un solo botón para poner en el mapa a su personaje (el primero que todavía no tenga token), ya vinculado a su ficha.
+    if($('#nuevo-traer')) $('#nuevo-traer').onclick = () => {
+      const propias = [...fichasPub.entries()].filter(([, f]) => f.duenoUid === fbUsuario.uid).sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, 'es'));
+      if(!propias.length){ toast('Todavía no tenés personajes: creá uno en tu ficha'); return; }
+      const enMapa = new Set([...tokens.values()].map(t => t.fichaId).filter(Boolean));
+      const libre = propias.find(([id]) => !enMapa.has(id));
+      if(!libre){ cancelarNuevoToken(); centrarEnMios(); toast('Tu token ya está en el mapa'); return; }
+      iniciarColocacion({nombre: String(libre[1].nombre || 'Personaje').slice(0, 40), color, tipo: 'pj', fichaId: libre[0], imagen: ''});
+    };
+    $('#nuevo-cancelar').onclick = cancelarNuevoToken;
+    $('#nuevo-x').onclick = cancelarNuevoToken;
+    $('#nuevo-vinculo').focus();
+    // Sin return: el costado queda con su panel de siempre.
+  }
+
+  // Los datos del token se ven en los controles flotantes (HUD): el panel
+  // del costado queda solo con Token (?) y la configuración de los dados.
+  const ed = $('#editar-token-ventana');
+  $('#editar-token-capa').hidden = !(t && editandoToken);
+  if(!t || !editandoToken){
+    ed.innerHTML = '';
+    // (La ayuda de los tokens vive en el (?) de la barra de arriba: actualizarAyudaToken.)
+    panel.innerHTML = '';
+    return;
+  }
+
+  const editable = puedoMover(t);
+  const titulo = t.tipo === 'creep' ? (t.fichaId ? 'Creep' : 'NPC') : (v && v.invocacion ? 'Invocación' : 'Personaje');
+
+  // Edición: vínculo, nombre, color, dueño (GM), sacar del mapa.
+  let color = t.color;
+  ed.innerHTML =
+    `<h2>Editar token · ${titulo.toLowerCase()}</h2>` +
+    (editable
+      ? `<label class="etiqueta">Vinculado a</label><select id="token-vinculo">${opcionesVinculo(t.tipo, t.fichaId)}</select>` +
+        `<label class="etiqueta">Nombre (si no está vinculado)</label><input id="token-nombre" maxlength="40" value="${esc(t.nombre)}">` +
+        '<label class="etiqueta">Color</label>' + htmlColores(t.color, true)
+      : `<div class="dato"><b>${esc(nombreDe(t))}</b></div>`) +
+    `<div class="dato" style="color:var(--muted)">Casilla ${t.col}, ${t.fila}</div>` +
+    (soyGM && t.tipo === 'pj'
+      ? '<label class="etiqueta">Cambiar dueño (si alguien cambió de cuenta)</label>' +
+        `<div class="fila" style="margin-top:0"><select id="token-dueno">${opcionesDueno(t.duenoUid)}</select>` +
+        '<button type="button" class="btn" id="token-dueno-ok">Cambiar</button></div>'
+      : '') +
+    '<div class="fila">' +
+      (editable ? '<button type="button" class="btn primary" id="token-guardar">Guardar</button>' : '') +
+      '<button type="button" class="btn" id="token-volver">Volver</button>' +
+    '</div>' +
+    (puedoBorrar(t) ? '<div class="fila"><button type="button" class="btn peligro" id="token-borrar">Sacar del mapa</button></div>' : '');
+
+  $('#token-volver').onclick = () => { editandoToken = false; renderPanel(true); };
+  if(editable){
+    conectarColores(ed, c => color = c);
+    const guardar = async () => {
+      const fichaId = $('#token-vinculo').value;
+      const vv = fichaId ? vinculo({tipo: t.tipo, fichaId}) : null;
+      const nombre = ($('#token-nombre').value.trim() || (vv ? vv.nombre : '')).slice(0, 40);
+      if(!nombre){ toast('El token necesita un nombre'); return; }
+      const cambios = {nombre, color};
+      cambios.fichaId = fichaId ? fichaId : firebase.firestore.FieldValue.delete();
+      await editarToken(seleccion, cambios);
+      editandoToken = false;
+      renderPanel(true);
+    };
+    $('#token-guardar').onclick = guardar;
+    $('#token-nombre').onkeydown = e => { if(e.key === 'Enter') guardar(); };
+  }
+  if($('#token-borrar')) $('#token-borrar').onclick = () => borrarToken(seleccion);
+  if($('#token-dueno-ok')) $('#token-dueno-ok').onclick = () => {
+    const nuevo = $('#token-dueno').value;
+    if(nuevo && nuevo !== t.duenoUid) editarToken(seleccion, {duenoUid: nuevo});
+  };
+}
+
+/* ---------- 🗺 Mapas: botón del borde izquierdo (solo GM) ----------
+   Mapas guardados (ver, publicar, renombrar, borrar, grupos de creeps vinculados, + Nuevo mapa) y el fondo del mapa que se está mirando.
+   Vive en un menú al costado del botón, como el de 🎭 Tokens: la barra lateral (donde se ve la Mesa) no se usa para menús. */
+let mapasMenuFirma = '';
+function renderMapasMenu(forzar){
+  const menu = $('#mapas-menu'), boton = $('#toolkit-mapas');
+  if(!menu || !boton) return;
+  if(!soyGM || !fbMiembro) mapasMenuAbierto = false;
+  menu.hidden = !mapasMenuAbierto;
+  boton.classList.toggle('activo', mapasMenuAbierto);
+  if(!mapasMenuAbierto) return;
+  if(!forzar && menu.contains(document.activeElement) && menu.innerHTML) return;   // no pisar lo que se está escribiendo
+  const filas = [MAPA_PRINCIPAL, ...[...mapasLista.keys()].filter(id => id !== MAPA_PRINCIPAL)
+    .sort((a, b) => mapasLista.get(a).creadoMs - mapasLista.get(b).creadoMs)]
+    .map(id => {
+      const viendo = id === mapaMostrado, activo = id === mapaActivo;
+      return `<div class="mapa-fila${viendo ? ' viendo' : ''}">
+        <span class="mapa-nombre">${esc(nombreMapa(id))}${activo ? ' <b>· en juego</b>' : ''}</span>
+        <div class="fila" style="margin-top:4px">
+          ${viendo ? '' : `<button type="button" class="btn" data-mapa-ver="${esc(id)}">Ver</button>`}
+          ${activo ? '' : `<button type="button" class="btn primary" data-mapa-publicar="${esc(id)}">Publicar</button>`}
+          <button type="button" class="btn" data-mapa-renombrar="${esc(id)}" title="Renombrar">✎</button>
+          ${id === MAPA_PRINCIPAL ? '' : `<button type="button" class="btn peligro" data-mapa-borrar="${esc(id)}" title="Borrar">✕</button>`}
+        </div>
+        ${gruposDeMapaHtml(id)}
+      </div>`;
+    }).join('');
+  const casillas = fondo ? Math.round(fondo.ancho / ANCHO_CASILLA * 10) / 10 : 20;
+  const html =
+    '<div class="fila" style="margin:0 0 8px;justify-content:space-between"><h2>🗺 Mapas</h2><button type="button" class="btn primary" id="mapa-nuevo">+ Nuevo mapa</button></div>' +
+    '<p class="ayuda" style="margin-top:0">"Ver" cambia lo que estás mirando vos, para ir armándolo. "Publicar" cambia lo que ven los jugadores.</p>' +
+    filas +
+    '<div class="mm-sec"><h2>🖼 Fondo de este mapa</h2>' +
+    '<div class="fila" style="margin-top:8px">' +
+      `<button type="button" class="btn primary" id="fondo-cargar">${fondo ? 'Cambiar imagen' : 'Cargar imagen'}</button>` +
+      (fondo ? '<button type="button" class="btn peligro" id="fondo-quitar">Quitar</button>' : '') +
+    '</div>' +
+    (fondo
+      ? `<label class="etiqueta">Ancho, en casillas</label><div class="fila" style="margin-top:0"><input id="fondo-ancho" type="number" min="1" max="400" step="0.5" value="${casillas}"><button type="button" class="btn" id="fondo-ancho-ok">Aplicar</button></div>` +
+        `<label class="fila" style="cursor:pointer"><input type="checkbox" id="fondo-mover" style="width:auto"${moverFondo ? ' checked' : ''}> Arrastrar el fondo con el mouse</label>` +
+        '<p class="ayuda" style="margin-top:6px">Con esa casilla tildada, arrastrar un lugar vacío mueve la imagen para acomodarla a la grilla. Destildala para volver a desplazar la vista.</p>'
+      : '<p class="ayuda" style="margin-top:8px">La imagen se achica sola para que entre en la mesa. Todos la ven debajo de la grilla.</p>') +
+    '</div>';
+  if(!forzar && html === mapasMenuFirma) return;
+  mapasMenuFirma = html;
+  menu.innerHTML = html;
+  menu.querySelectorAll('[data-mapa-ver]').forEach(b => b.onclick = () => verMapa(b.dataset.mapaVer));
+  menu.querySelectorAll('[data-mapa-publicar]').forEach(b => b.onclick = () => publicarMapa(b.dataset.mapaPublicar));
+  menu.querySelectorAll('[data-mapa-renombrar]').forEach(b => b.onclick = () => renombrarMapa(b.dataset.mapaRenombrar));
+  menu.querySelectorAll('[data-mapa-borrar]').forEach(b => b.onclick = () => borrarMapa(b.dataset.mapaBorrar));
+  menu.querySelectorAll('[data-mapa-grupo-add]').forEach(sel => sel.onchange = async () => {
+    if(!sel.value) return;
+    const g = sel.value, mapaId = sel.dataset.mapaGrupoAdd;
+    await vincularGrupoAMapa(g, mapaId);
+    if(confirm(`Grupo «${g}» vinculado a «${nombreMapa(mapaId)}».\n\n¿Traer ahora los tokens de ese grupo a ese mapa? (Salen ocultos; los que ya tienen token se saltean.)`)) traerTokensDeGrupos([g], mapaId);
+  });
+  menu.querySelectorAll('[data-mapa-traer]').forEach(b => b.onclick = () => traerTokensDeGrupos(TokensAuto.gruposDeMapa(enlacesGM, b.dataset.mapaTraer), b.dataset.mapaTraer));
+  menu.querySelectorAll('[data-mapa-grupo-quitar]').forEach(b => b.onclick = () => vincularGrupoAMapa(b.dataset.mapaGrupoQuitar, ''));
+  $('#mapa-nuevo').onclick = crearMapa;
+  $('#fondo-cargar').onclick = () => $('#fondo-archivo').click();
+  if($('#fondo-quitar')) $('#fondo-quitar').onclick = async () => {
+    if(!confirm('¿Quitar la imagen de fondo del mapa?')) return;
+    try{
+      const lote = fbDb.batch();
+      lote.delete(fbDb.doc(fbRutaCampana(rutaMapaEstado('fondo'))));
+      lote.delete(fbDb.doc(fbRutaCampana(rutaMapaEstado('fondoImagen'))));
+      await lote.commit();
+      moverFondo = false;
+    }
+    catch(err){ console.error(err); toast('No se pudo quitar el fondo'); }
+  };
+  if($('#fondo-ancho-ok')) $('#fondo-ancho-ok').onclick = () => {
+    const n = num($('#fondo-ancho').value);
+    if(n < 1 || n > 400){ toast('Poné un ancho entre 1 y 400 casillas'); return; }
+    fondo.ancho = n * ANCHO_CASILLA;
+    pedirDibujo();
+    guardarFondo({ancho: fondo.ancho});
+  };
+  if($('#fondo-mover')) $('#fondo-mover').onchange = e => { moverFondo = e.target.checked; };
+}
+function abrirMapasMenu(abrir){
+  if(abrir && !(soyGM && fbMiembro)) return;
+  mapasMenuAbierto = abrir;
+  if(abrir){ abrirTokensMenu(false); creando = false; seleccion = null; }
+  else moverFondo = false;
+  renderMapasMenu(true);
+  renderPanel(true);
+  pedirDibujo();
+}
+$('#toolkit-mapas').onclick = e => { e.stopPropagation(); abrirMapasMenu(!mapasMenuAbierto); };
+$('#mapas-menu').addEventListener('click', e => e.stopPropagation());
+// Solo se cierra con el mismo botón o con Esc: mientras se acomoda el fondo hay que poder tocar el mapa con el menú abierto.
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && mapasMenuAbierto && !editandoElemento && !moverLibre && !herramientaActiva && !colocando && !creando) abrirMapasMenu(false); });
+
+function cancelarNuevoToken(){
+  if(!creando) return;
+  creando = false;
+  renderPanel(true); pedirDibujo();
+}
+// Clic derecho fuera de un campo de texto, sobre la ventana o su fondo: cancela.
+$('#nuevo-token-capa').addEventListener('contextmenu', e => {
+  if(e.target.closest('input,textarea,select')) return;
+  e.preventDefault();
+  cancelarNuevoToken();
+});
+
+// Editar token: ventana emergente. Se cierra con clic en el fondo, clic derecho (fuera de un campo) o Esc.
+function cerrarEditarToken(){ if(!editandoToken) return; editandoToken = false; renderPanel(true); pedirDibujo(); }
+$('#editar-token-capa').addEventListener('mousedown', e => { if(e.target === $('#editar-token-capa')) cerrarEditarToken(); });
+$('#editar-token-capa').addEventListener('contextmenu', e => {
+  if(e.target.closest('input,textarea,select')) return;
+  e.preventDefault(); cerrarEditarToken();
+});
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && editandoToken && !document.querySelector('.recorte-scrim')){ e.stopImmediatePropagation(); cerrarEditarToken(); } }, true);
+
+$('#btn-nuevo').onclick = e => {
+  if(e && e.target.closest('.ayuda-icono')) return;   // tocar el (?) no crea un token
+  if(!fbMiembro) return;
+  creando = true; seleccion = null; moverFondo = false;
+  renderPanel(true); pedirDibujo();
+};
+

@@ -1,0 +1,708 @@
+:root{
+  --ink:#0F0C0E; --panel:#1A1418; --panel2:#221A1E; --line:#3B2E34; --line-soft:#2A2126;
+  --copper:#C98545; --brass:#E0A458; --wine:#8C2F3E; --bottle:#2E6B57; --absenta:#A8C256;
+  --paper:#EDE3D2; --muted:#9A867E; --danger:#D4574E; --r:3px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{
+  background:var(--ink);color:var(--paper);font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.4;
+  display:flex;flex-direction:column;overflow:hidden
+}
+input,select,button{font-family:inherit;color:inherit}
+input,select{
+  min-width:0;background:rgba(0,0,0,.28);border:1px solid var(--line-soft);border-radius:var(--r);
+  color:var(--paper);padding:6px 8px;width:100%
+}
+select option{background:var(--panel)}
+input:focus,select:focus{outline:2px solid var(--copper);outline-offset:1px;border-color:var(--copper)}
+button{cursor:pointer;background:none;border:none;padding:0}
+button:disabled{opacity:.5;cursor:not-allowed}
+[hidden]{display:none!important}
+
+.btn{
+  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  padding:7px 12px;border:1px solid var(--line);border-radius:var(--r);color:var(--paper);white-space:nowrap
+}
+.btn:hover{border-color:var(--copper)}
+.btn.primary{background:var(--copper);border-color:var(--copper);color:#180F08;font-weight:700}
+.btn.primary:hover{background:var(--brass)}
+.btn.peligro{border-color:var(--wine);color:var(--danger)}
+.btn.peligro:hover{border-color:var(--danger)}
+#toolkit-dados.activo{color:var(--paper);border-color:var(--copper)}
+
+/* Recorte de imagen (comun/recorte-imagen.js): elegir qué parte de la
+   foto se ve antes de guardarla como imagen de un token. */
+.recorte-scrim{position:fixed;inset:0;background:rgba(15,12,14,.75);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
+.recorte-caja{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px;align-items:center;box-shadow:0 12px 28px rgba(0,0,0,.6);max-width:calc(100vw - 32px);max-height:calc(100vh - 32px);overflow-y:auto}
+.recorte-titulo{margin:0;font-weight:700;color:var(--paper)}
+.recorte-visor{position:relative;overflow:hidden;border-radius:var(--r);border:2px solid var(--copper);background:#000;cursor:grab;touch-action:none;max-width:100%}
+.recorte-visor:active{cursor:grabbing}
+.recorte-visor img{position:absolute;left:0;top:0;max-width:none;pointer-events:none;user-select:none}
+.recorte-ayuda{margin:0;font-size:12px;color:var(--muted);text-align:center;max-width:300px}
+.recorte-botones{display:flex;gap:8px;width:100%;justify-content:flex-end}
+
+/* Ventana de "Nuevo token": centrada sobre el mapa, con el fondo oscurecido
+   (Esc o clic derecho la cierran sin crear nada). */
+#nuevo-token-capa,#editar-token-capa{position:fixed;inset:0;z-index:95;background:rgba(15,12,14,.6);display:flex;align-items:center;justify-content:center;padding:16px}
+#nuevo-token-capa[hidden],#editar-token-capa[hidden]{display:none}
+#nuevo-token-ventana,#editar-token-ventana{width:420px;max-width:100%;max-height:calc(100vh - 32px);overflow-y:auto;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6);padding:16px 18px}
+
+/* 📋 Tablero de combate: solo lo que tiene token en el mapa PUBLICADO, filtrado por lo que
+   cada uno puede ver (oculto/sigilo) — ver comentario de tableroTokensEscuchar() en el JS. */
+#tablero-capa{position:fixed;inset:0;z-index:95;background:rgba(15,12,14,.6);display:flex;align-items:center;justify-content:center;padding:16px}
+#tablero-capa[hidden]{display:none}
+#tablero-ventana{width:760px;max-width:100%;max-height:calc(100vh - 32px);overflow-y:auto;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6)}
+#tablero-cab{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--panel2);border-bottom:1px solid var(--line-soft);z-index:1}
+#tablero-cab h3{margin:0;font-size:16px;flex:1;color:var(--brass)}
+#tablero-sello{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);white-space:nowrap}
+#tablero-body{padding:14px 16px 18px}
+.tablero-grupo{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--copper);margin:14px 0 8px}
+.tablero-grupo:first-child{margin-top:0}
+.tablero-vacio{color:var(--muted);font-size:13px;padding:10px 2px}
+.tablero-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.tablero-card{background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:8px;padding:9px 10px}
+.tablero-card.caido{opacity:.55}
+.ini-fila.fuera{opacity:.45}.ini-fila.fuera .ini-nombre{text-decoration:line-through}
+.tablero-card-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.tablero-foto{width:30px;height:30px;border-radius:50%;object-fit:cover;flex:none;background:#17121A;border:1px solid var(--line)}
+.tablero-nombre{font-weight:700;font-size:13px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tablero-nivel{font-weight:400;color:var(--muted);font-size:11px}
+.tablero-hp-fila{display:flex;align-items:center;gap:6px;margin-top:3px}
+.tablero-hp-barra{flex:1;height:7px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.tablero-hp-fill{height:100%;background:#B23B3B}
+.tablero-hp-fill.sp{background:#3F86E0}
+.tablero-hp-txt{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted);white-space:nowrap}
+.tablero-caido{font-size:11px;color:var(--danger);font-weight:700;margin-top:4px}
+.tablero-estados{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tablero-estado{font-size:10px;padding:2px 6px;border-radius:99px;border:1px solid var(--line);position:relative}
+.tablero-estado.con-tip:hover .tablero-estado-tip{display:block}
+.tablero-estado-tip{display:none;position:absolute;bottom:calc(100% + 4px);left:0;z-index:2;width:180px;background:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:11px;color:var(--paper);white-space:normal;box-shadow:0 6px 16px rgba(0,0,0,.5)}
+.nt-cab{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--paper);font-size:15px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.nt-cab button{font-size:16px;color:var(--muted);line-height:1}
+.nt-cab button:hover{color:var(--paper)}
+.nt-campo{margin-top:12px}
+.nt-campo:empty{display:none}
+.nt-campo .etiqueta{margin:0 0 4px}
+.nt-pista{font-size:11.5px;color:var(--muted);margin:5px 0 0;line-height:1.4}
+.nt-pie{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
+
+/* Editor de un elemento de Terreno/Formas ya creado (⚙️ al seleccionarlo):
+   flotante, no tapa el mapa — los cambios se ven ahí atrás en vivo antes
+   de Guardar. */
+#elem-edit{
+  position:fixed;top:130px;right:346px;z-index:90;width:260px;max-width:calc(100vw - 362px);
+  max-height:calc(100vh - 90px);overflow-y:auto;background:rgba(26,20,24,.96);border:1px solid var(--line);
+  border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6);padding:12px;display:flex;flex-direction:column;gap:8px
+}
+#elem-edit-cab{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--paper)}
+#elem-edit-cab button{font-size:16px;color:var(--muted);line-height:1}
+#elem-edit-cab button:hover{color:var(--paper)}
+.elem-edit-visor{position:relative;overflow:hidden;border-radius:var(--r);border:2px solid var(--copper);background:#000;cursor:grab;touch-action:none;margin:0 auto}
+.elem-edit-visor:active{cursor:grabbing}
+.elem-edit-visor img{position:absolute;left:0;top:0;max-width:none;pointer-events:none;user-select:none}
+
+/* Ventanita propia de la herramienta activa (Lápiz/Terreno/Formas): antes
+   las opciones se desplegaban adentro de la barra lateral, una debajo de
+   la otra sin límite. Del lado derecho, como #elem-edit (nunca del lado
+   izquierdo: ahí vive el tablero de iniciativa, #iniciativa, en esa
+   misma franja — un panel izquierdo, con esta lista de trampas que puede
+   crecer sin tope, se lo tapaba entero). Ancla desde abajo (#elem-edit
+   ancla desde arriba) para que, si están los dos abiertos a la vez, se
+   estorben lo menos posible. */
+#herramienta-flotante{
+  position:fixed;bottom:16px;right:346px;z-index:90;width:250px;max-width:calc(100vw - 362px);
+  max-height:calc(100vh - 32px);overflow-y:auto;background:rgba(26,20,24,.96);border:1px solid var(--line);
+  border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6);padding:12px;display:flex;flex-direction:column;gap:2px
+}
+.herr-cab{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--paper);margin-bottom:6px}
+.herr-cab button{font-size:16px;color:var(--muted);line-height:1}
+.herr-cab button:hover{color:var(--paper)}
+
+header{
+  display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--panel);border-bottom:1px solid var(--line);flex:none;flex-wrap:wrap
+}
+header{padding-left:60px!important} /* lugar para el menú del sitio (comun/menu-sitio.js) */
+header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
+#estado{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);flex:1;min-width:120px}
+.zoom{display:flex;gap:4px}
+/* Switch Narrativo / Combate (lo cambia el GM; todos ven en qué modo está) */
+#modo-switch{
+  display:flex;align-items:center;gap:8px;padding:4px 10px 4px 5px;border-radius:999px;border:1px solid;
+  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:none;color:var(--paper)
+}
+#modo-switch .perilla{width:34px;height:18px;border-radius:999px;position:relative;transition:background .2s}
+#modo-switch .perilla::after{
+  content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s
+}
+#modo-switch[data-modo="narrativo"]{border-color:#3E9B5B;color:#8FD6A5}
+#modo-switch[data-modo="narrativo"] .perilla{background:#3E9B5B}
+#modo-switch[data-modo="combate"]{border-color:#D64545;color:#F0A39C}
+#modo-switch[data-modo="combate"] .perilla{background:#D64545}
+#modo-switch[data-modo="combate"] .perilla::after{left:18px}
+#modo-switch:disabled{opacity:1;cursor:default}
+.zoom .btn{padding:7px 10px}
+/* Switch de modo y zoom: flotan sobre el mapa, arriba a la derecha. */
+#flotantes-mapa{position:absolute;top:12px;right:12px;z-index:24;display:flex;align-items:center;gap:8px;
+  background:rgba(26,20,24,.82);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:0 8px 22px rgba(0,0,0,.5);padding:5px 7px}
+/* + Token con su (?) adentro: el globo de ayuda se abre hacia abajo desde el botón. */
+#btn-nuevo{position:relative;display:inline-flex;align-items:center;gap:8px}
+#ayuda-token{position:relative}
+#ayuda-token .ayuda-globo{left:-70px;text-align:left}
+#btn-nuevo .ayuda-icono{width:17px;height:17px;border-color:rgba(24,15,8,.6);color:#180F08;font-weight:700;cursor:help}
+#btn-nuevo .ayuda-icono:hover,#btn-nuevo .ayuda-icono:focus{background:#180F08;color:var(--brass);border-color:#180F08}
+#btn-nuevo .ayuda-globo{left:-70px;text-align:left}
+#panel-token:empty{display:none}
+/* Con muchos mapas (u otros paneles largos) el panel del costado se desplaza en vez de cortarse. */
+#panel-token{max-height:62vh;overflow-y:auto}
+/* Aviso fijo mientras se coloca un token nuevo (lugar y orientación). */
+#colocando-aviso,#lentes-aviso{
+  position:absolute;top:64px;left:50%;transform:translateX(-50%);z-index:26;max-width:80%;text-align:center;pointer-events:none;
+  background:rgba(26,20,24,.94);border:1px solid var(--copper);border-radius:var(--r);box-shadow:0 8px 22px rgba(0,0,0,.55);
+  padding:8px 16px;font-size:13px;color:var(--paper)
+}
+#colocando-aviso button{pointer-events:auto;margin-left:8px}
+#colocando-aviso b{color:var(--brass)}
+#colocando-aviso span{color:var(--muted)}
+/* (⌨) de los atajos de teclado: a la derecha de todo de la cabecera; el globo se abre hacia la izquierda. */
+.ayuda-atajos{width:30px;height:30px;font-size:15px;flex:none}
+.ayuda-atajos .ayuda-globo{left:auto;right:0;width:340px;font-size:12px}
+.atajos-titulo{display:block;margin:0 0 6px;font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400}
+.atajos-titulo + .atajos + .atajos-titulo{margin-top:10px}
+.atajos{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;align-items:baseline}
+.atajos kbd{font-family:"Space Mono",monospace;font-size:11px;padding:1px 6px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;background:var(--panel);color:var(--brass);white-space:nowrap;justify-self:start}
+.atajos span kbd{display:inline}
+.atajos .combo{white-space:nowrap}
+#token-etiqueta,#elemento-etiqueta{top:64px!important}
+/* Mantenimiento (GM), arriba de todo en la barra lateral: verde para que se note. */
+.btn-mant{width:100%;background:rgba(46,107,87,.25);border-color:#3E9B5B;color:#CFE6D8;font-weight:700;padding:9px 12px}
+.btn-mant:hover{background:#2E6B57;border-color:#3E9B5B;color:#EAF3E6}
+/* Personajes: lista desplegable de las fichas de la partida. */
+.btn-personajes{background:rgba(63,111,176,.2);border-color:#3F6FB0;color:#B9D2EA}
+.btn-personajes:hover,.btn-personajes[aria-expanded="true"]{background:#3F6FB0;border-color:#5B8DBE;color:#F2F6FB}
+.scrim{position:fixed;inset:0;background:rgba(8,5,7,.78);display:none;z-index:90;padding:24px;overflow:auto}
+.scrim.open{display:flex;align-items:flex-start;justify-content:center}
+.modal{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);width:100%;margin:6vh auto;box-shadow:0 14px 34px rgba(0,0,0,.65)}
+.modal > header{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.modal > header h3{margin:0;font-size:15px}
+.modal .body{padding:14px 16px}
+.modal > footer{display:flex;justify-content:flex-end;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
+.modal .f label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.modal input,.modal textarea{width:100%;box-sizing:border-box;background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:var(--r);color:var(--paper);padding:8px 10px;font:inherit}
+.modal .hint,.modal .vacio{color:var(--muted);font-size:12.5px}
+.iconbtn{background:none;border:1px solid var(--line);border-radius:var(--r);color:var(--paper);padding:4px 10px;font-size:12px;cursor:pointer}
+.btn.ghost{color:var(--muted)}
+.trampas-guardadas{display:flex;flex-direction:column;gap:4px}
+.tg-fila{display:flex;gap:4px}
+.tg-fila .tg-usar{flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lentes-nota{font-size:11.5px;color:var(--muted);margin:10px 4px 2px;line-height:1.35}
+.lentes-fila{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:var(--r);cursor:pointer;font-size:13px}
+.lentes-fila:hover{background:rgba(63,111,176,.25)}
+.lentes-fila input{width:auto;margin:0}
+.lentes-fila small{margin-left:auto;font-family:"Space Mono",monospace;font-size:9.5px;color:var(--muted)}
+#lentes-opciones.apagado{opacity:.4;pointer-events:none}
+.enlace-mini{background:none;border:none;color:var(--brass);text-decoration:underline;padding:0;font-size:10px;cursor:pointer;margin-left:6px}
+.desplegable{position:relative}
+.desplegable-lista{
+  position:absolute;top:calc(100% + 6px);left:0;z-index:40;min-width:240px;max-width:min(320px,calc(100vw - 24px));max-height:60vh;overflow-y:auto;
+  background:var(--panel);border:1px solid #3F6FB0;border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6);padding:5px
+}
+.ojo-luz{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 8px;font-size:13px;color:var(--paper)}
+.ojo-luz select,.ojo-luz input{background:var(--panel2, #221A1E);color:var(--paper);border:1px solid var(--line);border-radius:4px;padding:3px 6px;font:inherit}
+.ojo-luz input{width:56px}
+.desplegable-lista a{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:var(--r);color:var(--paper);text-decoration:none}
+.desplegable-lista a:hover{background:rgba(63,111,176,.25)}
+.desplegable-lista .pj-mini{width:26px;height:26px;border-radius:50%;object-fit:cover;flex:none;background:#17121A;border:1px solid var(--line)}
+.desplegable-lista .pj-nombre{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.desplegable-lista .pj-dueno{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);white-space:nowrap}
+.desplegable-lista .pj-fila{display:flex;align-items:center;gap:2px}
+.desplegable-lista .pj-fila a{flex:1;min-width:0}
+.desplegable-lista .pj-borrar{
+  flex:none;width:22px;height:22px;border-radius:50%;border:1px solid var(--line);
+  background:none;color:var(--muted);font-size:13px;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;margin-right:2px
+}
+.desplegable-lista .pj-borrar:hover{background:var(--danger);border-color:var(--danger);color:#fff}
+.desplegable-vacio{padding:8px 10px;color:var(--muted);font-size:12px}
+/* Menú del ojo (GM): niebla, "como jugador", revelar lo oculto y restablecer, en un desplegable. */
+.btn-cuadrado{width:36px;height:36px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:17px;line-height:1}
+.btn-cuadrado.activo{border-color:var(--copper);box-shadow:inset 0 0 0 1px var(--copper)}
+#btn-zonas-todas{position:absolute;top:calc(100% + 6px);left:0;z-index:39}
+.btn-cuadrado.revelando{background:#8E2323;border-color:#D8524B;color:#fff}
+#ojo-menu{left:auto;right:0;min-width:220px;display:flex;flex-direction:column;gap:5px}
+#ojo-menu[hidden]{display:none}
+#ojo-menu .btn{width:100%;text-align:left;justify-content:flex-start}
+
+main{flex:1;display:flex;min-height:0}
+#lienzo-caja{flex:1;position:relative;min-width:0;min-height:0}
+#lienzo{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block;cursor:default}
+#aviso-mapa{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:340px;text-align:center;
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;color:var(--muted)
+}
+#aviso-mapa .btn{margin-top:10px}
+/* Confirmar un movimiento que gasta Nitros. */
+#ruta-confirmar{
+  position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;
+  max-width:calc(100% - 24px);background:var(--panel);border:1px solid var(--brass);border-radius:var(--r);padding:8px 12px;
+  font-family:"Space Mono",monospace;font-size:12px;box-shadow:0 10px 24px -8px rgba(0,0,0,.7)
+}
+#ruta-confirmar.excede{border-color:var(--danger)}
+/* Si tocás otra cosa con un movimiento sin confirmar, el cartel parpadea
+   en vez de tapar los botones con un aviso. */
+#ruta-confirmar.atencion{animation:ruta-atencion .45s ease-in-out 2}
+@keyframes ruta-atencion{
+  0%,100%{transform:translateX(-50%) scale(1)}
+  50%{transform:translateX(-50%) scale(1.06);box-shadow:0 0 0 3px rgba(224,164,88,.35),0 10px 24px -8px rgba(0,0,0,.7)}
+}
+#ruta-confirmar.excede #ruta-texto{color:#F0A39C}
+
+aside{
+  width:330px;flex:none;display:flex;flex-direction:column;background:var(--panel);border-left:1px solid var(--line);min-height:0
+}
+.seccion{padding:12px 14px;border-bottom:1px solid var(--line)}
+.seccion h2{
+  margin:0 0 8px;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400
+}
+.ayuda{color:var(--muted);font-size:12.5px;margin:0}
+.con-ayuda{display:flex;align-items:center;gap:8px;margin-bottom:0!important}
+.barra-token{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:10px}
+.barra-token .chico-barra{justify-self:end;padding:5px 10px;font-size:10.5px}
+.ayuda-icono{
+  position:relative;display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;
+  border:1px solid var(--line);color:var(--muted);font-size:10.5px;cursor:help;letter-spacing:0;outline:none
+}
+.ayuda-icono:hover,.ayuda-icono:focus{border-color:var(--copper);color:var(--brass)}
+.ayuda-globo{
+  display:none;position:absolute;top:calc(100% + 8px);left:-58px;z-index:30;width:280px;max-width:calc(100vw - 40px);
+  background:var(--panel2,#221A1E);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;
+  box-shadow:0 10px 24px rgba(0,0,0,.55);font-family:"Space Grotesk",system-ui,sans-serif;font-size:12.5px;line-height:1.45;
+  letter-spacing:0;text-transform:none;color:var(--paper);font-weight:400;cursor:default
+}
+.ayuda-icono:hover .ayuda-globo,.ayuda-icono:focus .ayuda-globo{display:block}
+.ayuda-globo .leyenda{margin-top:8px}
+/* Descripción del estado al pasar el mouse. Va con position:fixed y la
+   ubica hudTipUbicar, porque el globo de estados tiene scroll propio y si
+   no la recortaría. */
+#hud .hud-estado .nom.con-tip{cursor:help;text-decoration:underline dotted var(--muted)}
+#hud .hud-estado .estado-tip{
+  display:none;position:fixed;left:0;top:0;z-index:40;width:250px;max-width:70vw;
+  background:var(--panel);border:1px solid var(--copper);border-radius:var(--r);padding:8px 10px;
+  font-size:11.5px;line-height:1.45;color:var(--paper);box-shadow:0 8px 22px rgba(0,0,0,.65);pointer-events:none;white-space:normal
+}
+#hud .hud-estado .estado-tip b{display:block;color:var(--brass);margin-bottom:3px}
+#hud .hud-estado .estado-tip.visible{display:block}
+/* Caja de herramientas: barra vertical escondida a la izquierda del mapa.
+   La pestaña asoma por el borde; al tocarla, la barra se desliza. */
+#toolkit{
+  position:absolute;left:0;top:0;bottom:0;z-index:24;width:220px;
+  transform:translateX(-100%);transition:transform .22s ease
+}
+#toolkit.abierto{transform:translateX(0)}
+#toolkit-panel{
+  height:100%;display:flex;flex-direction:column;background:rgba(26,20,24,.92);backdrop-filter:blur(6px);
+  border-right:1px solid var(--line);box-shadow:6px 0 22px rgba(0,0,0,.5)
+}
+#toolkit:not(.abierto) #toolkit-panel{visibility:hidden;transition:visibility 0s .22s}
+/* Ancladas al borde de ABAJO (no al centro vertical de la pantalla): con
+   el centro, cada botón nuevo que se agrega necesita más alto disponible
+   arriba del centro, y en una ventana de altura normal (~720px) el de más
+   arriba terminaba tapado por la cabecera (2026-09-22). Desde abajo hay
+   mucho más margen, así que entran más botones sin volver a chocar. */
+/* Los botones cuadrados del borde izquierdo (2026-09-24): quedan juntos y CENTRADOS en vertical (antes iban apilados desde abajo),
+   en la columna #toolkit-dock; el orden de abajo hacia arriba es ☭ 🎲 🎭 🏪 🎁 🗺. */
+#toolkit-dock{position:absolute;left:100%;top:50%;transform:translateY(-50%);display:flex;flex-direction:column-reverse;gap:16px;z-index:1}
+#toolkit-pestana,#toolkit-dados,#toolkit-tokens,#toolkit-tienda,#toolkit-botin,#toolkit-mapas{
+  position:static;flex:none;
+  width:46px;height:46px;padding:0;border:1px solid var(--line);border-radius:10px;
+  background:rgba(15,12,14,.92);color:var(--brass);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:21px;line-height:1;
+  box-shadow:4px 4px 14px rgba(0,0,0,.45)
+}
+#toolkit-pestana:hover,#toolkit-dados:hover,#toolkit-tokens:hover,#toolkit-tienda:hover,#toolkit-mapas:hover,#toolkit-botin:not(:disabled):hover{background:var(--panel2);color:var(--paper)}
+/* El botón de tokens va arriba de los dados, del mismo tamaño y forma; su menú se despliega al costado. */
+#toolkit-tokens.activo{color:var(--paper);border-color:var(--copper)}
+/* 🎁 Despojos: arriba de 🎭, del mismo tamaño y forma; apagado hasta que haya botín publicado. */
+#toolkit-botin:disabled{opacity:.35;cursor:not-allowed}
+#toolkit-botin.pendiente{color:var(--paper);border-color:var(--copper);animation:latidoBotin 1.6s ease-in-out infinite}
+@keyframes latidoBotin{50%{box-shadow:0 0 0 4px rgba(184,115,51,.35)}}
+/* 🗺 Mapas: arriba de 🎁, del mismo tamaño y forma; su menú se despliega al costado (mapas guardados + fondo). */
+#toolkit-mapas[hidden],#toolkit-tienda[hidden]{display:none}
+#toolkit-mapas.activo{color:var(--paper);border-color:var(--copper)}
+#toolkit-mapas.distinto{color:var(--paper);border-color:var(--copper);animation:latidoBotin 1.6s ease-in-out infinite}
+/* mapas-menu y tokens-menu: ancladas de arriba Y de abajo del panel
+   #toolkit (que ya arranca justo debajo de la cabecera), no del botón que
+   las abre ni de un alto calculado a mano — con top+bottom puestos y sin
+   height, el navegador les da el alto que entra entre los dos bordes
+   solo. Con contenido largo (muchos mapas guardados, "Fondo de este
+   mapa", etc.) y el botón que las abre cerca del piso, anclarlas al
+   botón las hacía crecer para arriba y se cortaban con el borde de la
+   ventana (2026-09-22). */
+#mapas-menu{
+  position:absolute;left:calc(100% + 56px);top:16px;bottom:16px;z-index:30;width:300px;overflow:auto;
+  padding:10px;background:rgba(26,20,24,.96);border:1px solid var(--line);border-radius:10px;
+  box-shadow:6px 6px 22px rgba(0,0,0,.55)
+}
+#mapas-menu[hidden]{display:none}
+#mapas-menu h2{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass);margin:0}
+#mapas-menu .mm-sec{margin-top:12px;padding-top:10px;border-top:1px solid var(--line-soft)}
+#tokens-menu{
+  position:absolute;left:calc(100% + 56px);top:16px;bottom:16px;z-index:30;min-width:250px;max-width:320px;overflow:auto;
+  display:flex;flex-direction:column;gap:6px;padding:10px;background:rgba(26,20,24,.96);border:1px solid var(--line);border-radius:10px;
+  box-shadow:6px 6px 22px rgba(0,0,0,.55)
+}
+#tokens-menu[hidden]{display:none}
+#tokens-menu .tm-tit{display:flex;justify-content:space-between;align-items:center;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass)}
+#tokens-menu .tm-sub{display:flex;flex-direction:column;gap:4px;margin:0 0 2px 10px;padding-left:8px;border-left:2px solid var(--line-soft)}
+#tokens-menu .hint{font-size:11.5px;opacity:.8}
+/* El botón de dados va justo arriba de la pestaña, del mismo tamaño y forma. */
+#toolkit.abierto #toolkit-pestana{color:var(--paper);border-color:var(--copper)}
+#toolkit-cab{
+  padding:12px 14px 10px;border-bottom:1px solid var(--line-soft);
+  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass)
+}
+#toolkit-lista{list-style:none;margin:0;padding:8px;overflow-y:auto;display:flex;flex-direction:column;gap:6px}
+#toolkit .tk-herramienta{
+  width:100%;display:grid;grid-template-columns:34px 1fr;grid-template-rows:auto auto;column-gap:10px;align-items:center;
+  padding:8px;border:1px solid var(--line);border-radius:var(--r);background:rgba(15,12,14,.5);color:var(--paper);
+  text-align:left;cursor:pointer;font:inherit
+}
+#toolkit .tk-herramienta:hover{border-color:var(--copper)}
+#toolkit .tk-herramienta.activa{border-color:var(--brass);background:rgba(224,164,88,.12)}
+#toolkit .tk-icono{
+  grid-row:span 2;width:34px;height:34px;border-radius:var(--r);border:1px solid var(--line-soft);
+  display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--panel)
+}
+#toolkit .tk-nombre{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+#toolkit .tk-detalle{font-size:11px;color:var(--muted);line-height:1.3}
+#toolkit .tk-pronto{
+  font-family:"Space Mono",monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);border:1px solid var(--line);border-radius:var(--r);padding:0 4px
+}
+#toolkit .tk-flecha{margin-left:auto;color:var(--muted);font-size:11px}
+#toolkit .tk-herramienta.tk-sub{margin-left:16px;width:calc(100% - 16px);padding:6px 8px}
+#toolkit .tk-herramienta.tk-sub .tk-icono{width:26px;height:26px;font-size:14px}
+.tk-lapiz-colores{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.tk-color{width:20px;height:20px;border-radius:50%;border:2px solid transparent;box-shadow:inset 0 0 0 1px rgba(0,0,0,.4);cursor:pointer}
+.tk-color.elegido{border-color:var(--paper)}
+.tk-lapiz-check{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--paper);cursor:pointer}
+.tk-lapiz-ayuda{margin:5px 0 0;font-size:10.5px;color:var(--muted);line-height:1.35}
+#toolkit-pie{margin-top:auto;padding:10px 14px;border-top:1px solid var(--line-soft);font-size:11px;color:var(--muted);line-height:1.4}
+/* Bitácora flotante (mismo patrón que la Mesa arrastrable de la ficha):
+   se arrastra desde la cabecera, un clic la achica o la agranda, y ✕ la
+   cierra del todo (vuelve a abrirse con 📖 en la caja de herramientas). */
+#bitacora-flotante{
+  position:fixed;right:16px;bottom:16px;z-index:46;width:340px;max-width:calc(100vw - 32px);
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);backdrop-filter:blur(6px);
+  box-shadow:0 10px 26px rgba(0,0,0,.55);font-size:12.5px;color:var(--paper)
+}
+#bitacora-cabecera{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:grab;user-select:none;touch-action:none;border-bottom:1px solid var(--line-soft)}
+#bitacora-flotante.arrastrando{opacity:.85}
+#bitacora-flotante.arrastrando #bitacora-cabecera{cursor:grabbing}
+#bitacora-flotante.colapsada #bitacora-cabecera{border-bottom:none}
+#bitacora-titulo{font-family:"Space Grotesk",sans-serif;font-weight:700;color:var(--brass)}
+#bitacora-estado{flex:1;text-align:right;font-size:10.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#bitacora-opacidad-btn{background:none;border:0;padding:0 2px;cursor:pointer;font-size:13px;color:var(--muted);line-height:1}
+#bitacora-opacidad-btn:hover,#bitacora-opacidad-btn[aria-expanded="true"]{color:var(--brass)}
+#bitacora-opacidad-lista{
+  position:absolute;top:calc(100% + 6px);right:0;z-index:47;width:170px;
+  background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 10px 24px rgba(0,0,0,.55);
+  padding:8px 10px;cursor:default
+}
+#bitacora-opacidad-lista label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px}
+#bitacora-opacidad-lista input[type=range]{width:100%}
+#bitacora-flecha{color:var(--muted);width:10px}
+#bitacora-cerrar{background:none;border:0;padding:0 2px;cursor:pointer;font-size:13px;color:var(--muted)}
+#bitacora-cerrar:hover{color:var(--danger)}
+#bitacora-cuerpo{padding:10px;max-height:min(60vh,460px);overflow-y:auto}
+#bitacora-flotante.colapsada #bitacora-cuerpo{display:none}
+#bitacora-cab-fila{margin-top:0;flex-wrap:wrap}
+.mini{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);border:1px solid var(--line);padding:2px 6px;border-radius:var(--r);cursor:pointer;background:none}
+.mini:hover{border-color:var(--copper);color:var(--paper)}
+.mini.peligro:hover{border-color:var(--danger);color:var(--danger)}
+.bitacora-tabs{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
+.bit-nav-flecha{
+  background:none;border:1px solid var(--line-soft);border-radius:var(--r);color:var(--paper);
+  width:22px;height:22px;flex:none;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px
+}
+.bit-nav-flecha:hover{border-color:var(--copper)}
+.bit-nav-flecha:disabled{opacity:.35;cursor:default}
+.bit-contador{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);flex:none;white-space:nowrap}
+.bit-entradas{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto;margin:9px 0}
+.bit-entrada{display:flex;gap:6px;align-items:flex-start;padding:5px 7px;border-left:3px solid;border-radius:var(--r);background:rgba(0,0,0,.18)}
+.bit-entrada .bit-texto{flex:1;min-width:0;white-space:pre-wrap;word-wrap:break-word;font-size:13px;line-height:1.45}
+.bit-entrada .bit-firma{color:var(--muted);font-size:11px;white-space:nowrap}
+.bit-entrada .bit-botones{display:flex;gap:3px;flex:none;opacity:.55}
+.bit-entrada:hover .bit-botones{opacity:1}
+.bit-entrada textarea{width:100%;min-height:60px}
+.bit-sumar{display:flex;gap:7px;align-items:stretch}
+.bit-sumar textarea{flex:1;min-height:44px;resize:vertical}
+.bit-vacia{color:var(--muted);font-size:12px}
+.bit-tab{
+  display:flex;align-items:center;gap:4px;border:1px solid var(--line-soft);background:var(--panel2);
+  border-radius:99px;padding:3px 4px 3px 10px;cursor:pointer;flex:1;min-width:0
+}
+.bit-tab.active{border-color:var(--copper);background:rgba(201,133,69,.12)}
+.bit-tab-name{
+  background:none;border:none;padding:2px 2px;font-family:"Space Grotesk",sans-serif;font-size:11.5px;
+  color:var(--paper);width:100%;min-width:0
+}
+.bit-tab.active .bit-tab-name{color:var(--brass);font-weight:700}
+.bit-tab-x{
+  width:16px;height:16px;border-radius:50%;color:var(--muted);font-size:11px;line-height:1;
+  display:flex;align-items:center;justify-content:center;flex:none;border:none;background:none;cursor:pointer
+}
+.bit-tab-x:hover{background:var(--danger);color:#fff}
+/* Con la caja abierta, el orden de turnos se corre para no quedar tapado. */
+#iniciativa:not(.movida){transition:left .22s ease}
+#lienzo-caja.toolkit-abierto #iniciativa:not(.movida){left:284px}
+/* Tablero de iniciativa (estilo Roll20): flotante, semitransparente y
+   plegable. Herramienta de siempre (decidido 2026-09-22): aparece sola
+   al entrar al mapa, en narrativo también — antes solo se veía en modo
+   combate. */
+#iniciativa{
+  position:absolute;left:64px;top:12px;z-index:22;width:340px;max-width:calc(100% - 76px);
+  background:rgba(26,20,24,.82);backdrop-filter:blur(6px);border:1px solid var(--line);
+  border-radius:var(--r);box-shadow:0 10px 26px rgba(0,0,0,.55);font-size:12.5px;overflow:hidden
+}
+#iniciativa:hover{background:rgba(26,20,24,.95)}
+/* Achicado: medio transparente (se opaca al pasar el mouse); se arrastra desde la cabecera. */
+#iniciativa{transition:opacity .18s ease}
+#iniciativa.plegado{opacity:.55}
+#iniciativa.plegado:hover,#iniciativa.arrastrando{opacity:1}
+#iniciativa-cab{
+  display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:grab;user-select:none;touch-action:none;
+  font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--brass);border-bottom:1px solid var(--line-soft)
+}
+#iniciativa.plegado #iniciativa-cab{border-bottom:none}
+#iniciativa-ronda{margin-left:auto;color:var(--muted);font-size:10.5px}
+#iniciativa .ini-plegar{color:var(--muted);font-size:13px;line-height:1;padding:0 2px;cursor:pointer}
+#iniciativa.plegado #iniciativa-cuerpo{display:none}
+#iniciativa-lista{max-height:46vh;overflow-y:auto}
+.ini-fila{display:flex;align-items:center;gap:7px;padding:4px 10px;border-top:1px solid var(--line-soft)}
+.ini-fila:first-child{border-top:none}
+.ini-fila.activo{background:rgba(46,107,87,.55)}
+.ini-ficha{width:26px;height:26px;border-radius:50%;flex:none;border:2px solid;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;overflow:hidden;background:var(--panel)}
+.ini-ficha img{width:100%;height:100%;object-fit:cover}
+.ini-nombre{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ini-valor{font-family:"Space Mono",monospace;font-weight:700;font-size:14px;min-width:26px;text-align:right}
+.ini-fila input.ini-valor{width:46px;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:var(--r);padding:2px 4px;color:var(--paper)}
+.ini-quitar{color:var(--muted);font-size:12px;line-height:1;padding:0 2px;cursor:pointer}
+.ini-quitar:hover{color:var(--danger)}
+.ini-quitar[data-ini-ocultar]:hover{color:var(--brass)}
+.ini-quitar[data-ini-subir]:hover,.ini-quitar[data-ini-bajar]:hover{color:var(--brass)}
+.ini-quitar:disabled{opacity:.25;cursor:default;color:var(--muted)}
+#iniciativa-pie{display:flex;flex-wrap:wrap;gap:5px;padding:7px 10px;border-top:1px solid var(--line-soft)}
+#iniciativa-pie .btn{font-size:10px;padding:5px 8px}
+#iniciativa-vacio{padding:8px 10px;color:var(--muted)}
+/* Controles flotantes sobre el token seleccionado (estilo Roll20) */
+#hud{position:absolute;left:0;top:0;pointer-events:none;z-index:20}
+/* Cartel fijo arriba a la derecha con el nombre del token seleccionado y
+   su dueño: no depende del zoom, así se lee igual con la grilla chiquita. */
+#token-etiqueta{
+  position:absolute;top:12px;right:12px;z-index:23;max-width:60%;pointer-events:none;
+  background:rgba(26,20,24,.88);backdrop-filter:blur(6px);border:1px solid var(--line);
+  border-radius:var(--r);box-shadow:0 8px 22px rgba(0,0,0,.5);
+  padding:6px 12px;font-size:13px;color:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+#token-etiqueta b{color:var(--brass);font-weight:600}
+#token-etiqueta span{color:var(--muted);font-weight:400}
+/* Cartel del elemento (Terreno/Formas) seleccionado: deja claro si bloquea el
+   paso (sólido) o se puede pisar. */
+#elemento-etiqueta{
+  position:absolute;top:12px;right:12px;z-index:23;max-width:70%;pointer-events:none;
+  background:rgba(26,20,24,.9);backdrop-filter:blur(6px);border:1px solid var(--line);
+  border-radius:var(--r);box-shadow:0 8px 22px rgba(0,0,0,.5);
+  padding:6px 12px;font-size:13px;color:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+#elemento-etiqueta b{color:var(--brass);font-weight:600}
+#elemento-etiqueta span{color:var(--muted);font-weight:400}
+#elemento-etiqueta .es-solido{color:#F08A84;font-weight:700}
+#elemento-etiqueta .es-libre{color:#8EE6A8;font-weight:700}
+#elemento-etiqueta.solido{border-color:rgba(216,82,75,.85)}
+#elemento-etiqueta.libre{border-color:rgba(142,230,168,.55)}
+/* Anillo: cada botón se ubica en ronda alrededor del token (hudUbicar). */
+#hud .hud-anillo{position:absolute;left:0;top:0}
+#hud .hud-anillo > *{position:absolute;transform:translate(-50%,-50%);pointer-events:auto}
+#hud .hud-rotar{
+  position:absolute;transform:translate(-50%,-50%);pointer-events:auto;touch-action:none;
+  width:22px;height:22px;border-radius:50%;background:var(--frente,#00D0FF);color:#fff;
+  border:2px solid rgba(15,12,14,.65);box-shadow:0 2px 8px rgba(0,0,0,.5);
+  display:flex;align-items:center;justify-content:center;font-size:12px;cursor:grab
+}
+#hud .hud-rotar:active{cursor:grabbing}
+#hud .hud-globos{position:absolute;left:0;top:0;display:flex;flex-direction:column;align-items:center;overflow-y:auto}
+#hud .hud-circulo{
+  width:36px;height:36px;border-radius:50%;border:2.5px solid;background:rgba(15,12,14,.5);color:var(--paper);
+  font-family:"Space Mono",monospace;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;padding:0;box-shadow:0 2px 6px rgba(0,0,0,.3);text-shadow:0 1px 2px rgba(0,0,0,.9);
+  transition:background .12s
+}
+/* Translúcidos para ver el mapa debajo; al pasar el mouse, más firmes. */
+#hud .hud-circulo:hover{background:rgba(15,12,14,.9);filter:brightness(1.15)}
+#hud .hud-circulo.icono{font-size:15px;border-color:rgba(237,227,210,.4);color:var(--paper)}
+#hud .hud-circulo.icono.abierto{border-color:var(--brass);color:var(--brass)}
+#hud .hud-circulo.icono.libre-activo{background:#B3261E;border-color:#FF6A5F;color:#fff;box-shadow:0 0 0 3px rgba(255,90,70,.4),0 0 14px rgba(255,60,40,.6);animation:libre-pulso 1.4s ease-in-out infinite}
+@keyframes libre-pulso{50%{box-shadow:0 0 0 6px rgba(255,90,70,.15),0 0 18px rgba(255,60,40,.8)}}
+#hud .hud-circulo:disabled{cursor:default;opacity:.85}
+#hud input.hud-in{
+  width:56px;height:36px;border-radius:18px;border:2.5px solid;background:rgba(15,12,14,.96);color:var(--paper);
+  font-family:"Space Mono",monospace;font-size:13px;text-align:center;padding:0 6px
+}
+#hud .hud-globo{
+  pointer-events:auto;width:260px;max-width:70vw;background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--r);padding:10px 12px;box-shadow:0 10px 26px rgba(0,0,0,.6);text-align:left;font-size:12.5px
+}
+#hud .hud-globo{user-select:none}
+#hud .hud-globo input{user-select:text}
+#hud .hud-globo h3{cursor:move}
+#hud .hud-hp-modos{display:flex;gap:6px;margin-bottom:8px}
+#hud .hud-hp-modos .hud-mini{flex:1;padding:4px 6px}
+#hud .hud-crit-fila{display:flex;gap:5px;margin-bottom:8px}
+#hud .hud-crit-fila .hud-mini{flex:1 1 0;min-width:0;padding:4px 2px;white-space:nowrap;text-align:center}
+#hud .hud-crit-fila .hud-mini:first-child{flex:1.7 1 0}
+#hud .hud-crit-fila .hud-mini.calc{flex:0 0 30px}
+#hud .hud-mini.activo{background:var(--copper);border-color:var(--copper);color:#180F08;font-weight:700}
+#hud .hud-hp-expl{color:var(--muted);line-height:1.4;margin-bottom:8px}
+#hud .hud-hp-expl b{color:var(--paper)}
+#hud input.hud-hp-in{width:100%;box-sizing:border-box;height:32px;border-radius:var(--r);border:1px solid var(--line);background:rgba(15,12,14,.96);color:var(--paper);font-family:"Space Mono",monospace;font-size:13px;padding:0 8px}
+#hud .hud-hp-prev{min-height:18px;margin-top:6px;font-family:"Space Mono",monospace;font-size:11.5px;color:var(--brass)}
+#hud .hud-hp-pie{margin-top:6px;font-size:10.5px;color:var(--muted)}
+#hud .hud-globo-acciones{margin-top:8px;display:flex;justify-content:flex-end}
+#hud .hud-globo h3{margin:0 0 8px;font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400}
+#hud .hud-estado{display:flex;align-items:center;gap:6px;padding:4px 0;border-top:1px solid var(--line-soft)}
+#hud .hud-estado:first-of-type{border-top:none}
+#hud .hud-estado .nom{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#hud .hud-estado .turnos{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);min-width:26px;text-align:right}
+#hud .hud-mini{background:none;border:1px solid var(--line);border-radius:var(--r);color:var(--paper);font-size:11px;padding:1px 6px;cursor:pointer}
+/* Tarjeta del creep (🪪): equipo en chips de solo lectura y nota con saltos de línea. */
+#hud .hud-tarjeta-equipo{display:flex;flex-wrap:wrap;gap:5px}
+#hud .hud-tarjeta-equipo span{border:1px solid var(--line);border-radius:var(--r);padding:2px 7px;font-size:11.5px;color:var(--paper);background:rgba(255,255,255,.03)}
+#hud .hud-tarjeta-nota{margin:0;white-space:pre-wrap;color:var(--paper);line-height:1.4}
+#hud .hud-mini:hover{border-color:var(--copper)}
+#hud .hud-mini.peligro:hover{border-color:var(--danger);color:var(--danger)}
+#hud .hud-campo{display:flex;align-items:center;gap:6px;margin-top:6px}
+#hud .hud-campo label{flex:1;color:var(--muted)}
+#hud .hud-campo input[type=number]{width:62px;padding:4px 6px}
+#hud .hud-campo input[type=color]{width:34px;height:26px;padding:0;border:1px solid var(--line);background:none;border-radius:var(--r)}
+/* Panel del engranaje: secciones separadas y "Editar token" al pie. */
+#hud .hud-seccion{padding:10px 0;border-top:1px solid var(--line-soft)}
+#hud .hud-seccion:first-child{padding-top:0;border-top:none}
+#hud .hud-barras{display:flex;gap:6px}
+#hud .hud-chip{flex:1;position:relative;display:flex;align-items:center;justify-content:center;gap:5px;border:1px solid var(--line);border-radius:var(--r);padding:5px 4px;cursor:pointer;font-size:11.5px;color:var(--muted);user-select:none}
+#hud .hud-chip:has(input:checked){color:var(--paper);border-color:var(--chip)}
+#hud .hud-chip input{position:absolute;opacity:0;pointer-events:none}
+#hud .hud-chip .muestra{width:10px;height:10px;border-radius:50%;border:2px solid var(--chip);flex:none}
+#hud .hud-chip:has(input:checked) .muestra{background:var(--chip)}
+#hud .hud-chip:has(input:focus-visible){outline:2px solid var(--brass)}
+/* Caja "actual / máximo" debajo de cada barra. */
+#hud .hud-recursos{display:flex;gap:6px;margin-top:6px}
+#hud .hud-recurso{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:3px;min-width:0;
+  border:1px solid var(--line);border-radius:var(--r);padding:4px 2px;
+  font-family:"Space Mono",monospace;font-size:11.5px;color:var(--muted)
+}
+#hud .hud-recurso.vacio{border-style:dashed;justify-content:center}
+#hud .hud-recurso-actual{
+  width:34px;min-width:0;background:none;border:none;color:var(--paper);font:inherit;text-align:right;padding:0
+}
+#hud .hud-recurso-actual:focus{outline:none;color:var(--brass)}
+#hud .hud-recurso-max{color:var(--muted);flex:none}
+#hud .hud-rejilla{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:8px;align-items:center}
+#hud .hud-rejilla label{color:var(--muted)}
+#hud .hud-rejilla input[type=number],#hud .hud-rejilla select{width:100%;min-width:0;padding:4px 6px;font-size:12px;height:28px}
+#hud .hud-rejilla input[type=color]{width:100%;height:28px;padding:0;border:1px solid var(--line);background:none;border-radius:var(--r)}
+#hud .hud-acciones{display:flex;gap:6px;justify-content:flex-end;margin-top:10px}
+#hud .hud-acciones .hud-mini{padding:3px 10px}
+#hud .hud-ayuda{margin:8px 0 0;font-size:11px;line-height:1.4;color:var(--muted)}
+#hud .hud-pie{padding-top:10px;border-top:1px solid var(--line)}
+#hud .hud-pie .hud-mini{width:100%;padding:6px;font-size:12px}
+.fila{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+/* Los botones del panel del token entran aunque sean tres: más compactos
+   y, si no entran, pasan al renglón de abajo. */
+#panel-token .fila .btn{padding:6px 9px;font-size:10.5px;letter-spacing:.06em}
+.etiqueta{font-size:11.5px;color:var(--muted);margin:8px 0 3px;display:block}
+.colores{display:flex;flex-wrap:wrap;gap:5px}
+.color{width:24px;height:24px;border-radius:50%;border:2px solid transparent;box-shadow:inset 0 0 0 1px rgba(0,0,0,.4)}
+.color.elegido{border-color:var(--paper)}
+.dato{font-size:12.5px;margin-top:4px}
+.dato b{color:var(--brass);font-weight:500}
+.mapa-fila{border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;margin-top:8px}
+.mapa-fila.viendo{border-color:var(--brass)}
+.mapa-nombre{font-size:13px}
+.mapa-nombre b{color:var(--brass);font-weight:500;font-size:11px}
+.mapa-fila .fila .btn{padding:4px 8px;font-size:10.5px}
+.estado-token{margin:8px 0 4px}
+.vital{margin-top:8px}
+.vital-cab{display:flex;align-items:baseline;gap:6px;font-size:12.5px}
+.vital-titulo{color:var(--muted);min-width:34px}
+.vital-num,.vital-max{font-family:"Space Mono",monospace;font-size:12px}
+.vital-in{width:64px;padding:3px 6px;font-family:"Space Mono",monospace;font-size:13px;text-align:right}
+.vital .barra{margin-top:4px}
+.barra{height:9px;background:rgba(0,0,0,.45);border:1px solid var(--line);border-radius:2px;overflow:hidden;margin-top:6px}
+.barra i{display:block;height:100%;transition:width .3s}
+.barra-txt{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted);margin-top:2px}
+.chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.leyenda{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:10px;font-size:12px;color:var(--muted)}
+.leyenda span{display:flex;align-items:center;gap:5px}
+.leyenda i{width:13px;height:13px;border-radius:50%;border:3px solid;background:#17121A}
+.chip{font-size:11px;padding:1px 7px;border:1px solid;border-left-width:4px;border-radius:var(--r);background:rgba(0,0,0,.25)}
+
+#mesa{flex:1;display:flex;flex-direction:column;min-height:0;font-family:"Space Mono",monospace;font-size:12px}
+#mesa h2{padding:12px 14px 0;margin:0;display:flex;align-items:center;gap:8px}
+.dados3d-boton{background:none;border:none;padding:0 2px;font-size:14px;cursor:pointer;line-height:1}
+.dados3d-config{color:var(--muted);text-decoration:none;font-size:12px}
+.dados3d-config:hover{color:var(--brass)}
+.mesa-borrar{background:none;border:0;padding:0 2px;cursor:pointer;font-size:12px;opacity:.6}
+.mesa-borrar:hover{opacity:1}
+.mesa-borrar:disabled{cursor:wait;opacity:.3}
+
+#mesa-cuerpo{flex:1;overflow-y:auto;padding:8px 14px;display:flex;flex-direction:column;gap:5px}
+.mesa-tirada{padding:5px 7px;border-radius:var(--r);background:var(--line-soft);transition:background 1.2s}
+.mesa-tirada.mesa-sistema{border-left:3px solid var(--copper)}
+.mesa-tirada.ultima{background:#2E6B57}
+.mesa-tirada.nueva{background:var(--wine);transition:none}
+.mesa-quien{color:var(--brass);font-weight:700}
+/* Color del nombre según quién tira (ver mesaClaseQuien). */
+.mesa-quien.mesa-q-propia{color:var(--brass)}
+.mesa-quien.mesa-q-aliado{color:#8EE6A8}
+.mesa-quien.mesa-q-creep{color:#FF7E7E}
+.mesa-quien.mesa-q-neutra{color:#F4EFE8}
+.mesa-quien.mesa-q-turno{color:#C9A8F5}
+.mesa-tirada.mesa-sistema.mesa-turno{border-left-color:#C9A8F5}
+.mesa-usuario{color:var(--muted)}
+.mesa-total{float:right;margin-left:8px;font-weight:700;font-size:15px}
+.mesa-detalle{color:var(--muted);font-size:10.5px}
+.mesa-texto{color:var(--paper);font-size:11.5px;margin-top:2px}
+.mesa-estados{font-size:10.5px;color:var(--muted);margin-top:1px}
+.mesa-buff{color:#8EE6A8;font-weight:700}
+.mesa-debuff{color:#FF7E7E;font-weight:700}
+.mesa-otro{color:var(--muted);font-weight:700}
+.mesa-vacia{color:var(--muted);font-size:11px}
+#mesa-tirar{display:flex;gap:6px;padding:10px 14px;border-top:1px solid var(--line)}
+
+.toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(12px);
+  transition:.25s, bottom 0s;
+  background:var(--bottle);color:#EAF3E6;padding:9px 16px;border-radius:var(--r);
+  font-family:"Space Mono",monospace;font-size:11.5px;opacity:0;pointer-events:none;transition:.25s;z-index:95
+}
+/* Con el cartel de movimiento a la vista, los avisos suben para no taparlo. */
+body.con-ruta .toast{bottom:auto;top:74px}
+#botonera-capa{position:fixed;inset:0;z-index:90}
+#botonera-nueva, #acciones-nuevas{position:fixed;inset:0;z-index:89;background:rgba(8,5,7,.78);backdrop-filter:blur(3px);overflow:auto;padding:24px}
+/* Un cartel de la ficha o de GM Tools durante un duelo (¿es tu turno?, No2, sobrepeso…) tiene que verse ENCIMA del cuadro del
+   duelo (#duelo-fondo, z-index 99000): antes quedaba tapado y la tirada se quedaba en «Tirando…» (encontrado 2026-09-30). */
+#botonera-capa.sobre-duelo{z-index:99500}
+#botonera-marco{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;color-scheme:normal}
+#botonera-cargando{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--r);padding:14px 18px;display:flex;gap:12px;align-items:center;box-shadow:0 10px 30px rgba(0,0,0,.6)
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:760px){
+  main{flex-direction:column}
+  aside{width:auto;height:45vh;border-left:none;border-top:1px solid var(--line)}
+}

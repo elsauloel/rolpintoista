@@ -1281,3 +1281,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `editarPersonajeMapa(fichaId, cambiar)` (js/11, también la usa el Mantenimiento: sesión de la Botonera nueva si está abierta, si no
   una de un rato); creeps: `abrirEstadoNuevoCreep` con `modificarCreep`. El ⚙ de un estado (`abrirEditarEstado`) sigue yendo al
   editor de la ficha / GM Tools (A6).
+- **Equipo y mochila lo muestra el mapa** (2026-10-02, hoja de ruta A4): `abrirEquipoMapa(fichaId)` (js/11; lo llaman el 🛡 del HUD y
+  el 🎒 de la ficha lite) abre la Botonera nueva de ese personaje (si no estaba a la vista, `bn.soloEquipo`: al cerrar el Equipo se
+  cierra todo) y muestra encima `#bn-equipo` con `FichaEquipo.html`. Los clics (`bnEquipoClic`): equipar/sacar y reemplazar con
+  `FichaEquipo.equipar/reemplazar` (`bnEquipoUi`: el cartel de sin No2 del recuadro, `modoMapa`, guarda con `bnUi`), «slot lleno»
+  (`#bn-slot-lleno`) y Comparar (`#bn-comparar`, `bnComparando`); Ver con `bnVer`; Editar → `bnAlMarco('editar-en-ficha')` (A6). Escape
+  cierra primero el cartel de más arriba.

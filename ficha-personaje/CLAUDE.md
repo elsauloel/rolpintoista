@@ -641,3 +641,8 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   `mantenimientoRevisar` (`js/14`) a `FichaMantenimiento.reclamar` (`comun/ficha-mantenimiento.js`); acá queda lo que se ve (redibujar,
   cartel de recordatorios, reporte con `mesaPublicarReporte`). El mapa ya no carga la ficha en `?modo=mantenimiento` para pasar el turno
   (lo hace él con la misma pieza); el modo sigue existiendo, sin uso desde el mapa: candidato a la limpieza (A′).
+- **Equipo y mochila, compartido (2026-10-02, hoja de ruta A4)**: `SLOT_DEFS`, `computeSlots`, `slotOcupadoInfo`, `defValorDe`,
+  `statsComparablesDe`, `TIER_COLOR`, `modTags`, `thumb`, `renderEquipo`, `conCostoEquipar`, `abrirSlotLleno`, `reemplazarEquipado`,
+  `renderComparar` y el botón de equipar (`data-toggle` de un ítem de la mochila, `js/06`) usan `comun/ficha-equipo.js` (`equipoUi` en
+  `js/09` es lo que hace la ficha: redibujar y los carteles). El mapa ya no le pide `abrir-equipo` (lo muestra él): ese mensaje y
+  `equipoModoAbrir` quedan sin uso desde el mapa, para la limpieza (A′).

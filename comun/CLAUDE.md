@@ -944,6 +944,12 @@ versión parecida en más de una, es candidato a juntar.
   turnos de muerte, No2, invocaciones; deja `S.turno` y `S.log`; devuelve `{rep, avisos}`), `reclamar(db, rutaFicha, objetivo, marca)`
   (la transacción de `partes/mantenimiento`: cuántos turnos aplicar), `publicarReporte` y `publicarRecordatorios`. Lo usan la ficha
   (`js/11`, `js/14`) y el mapa (`mantenimientoPersonajes`). Necesita combatiente, ficha-calculo, ficha-botonera e inv-calculo.
+- **`ficha-equipo.js`** (`FichaEquipo`, 2026-10-02, hoja de ruta A4) — **Equipo y mochila de un personaje**: `SLOT_DEFS`, `slots(S)`,
+  `slotOcupado(S, item)`, `defValor`, `statsComparables`, `TIER_COLOR`; `equipar(S, id, ui)` (el botón Equipar/Sacar: mesa común,
+  trofeo, consumible al cinturón, slot lleno → `ui.slotLleno(it)`, costo en combate), `reemplazar(S, eqId, nuevoId, ui)`, `conCosto(…)`
+  (el cobro de equipar en combate); y el dibujo: `html(S, {lupa})`, `slotLlenoHtml(S, it)`, `compararHtml(S, item, equipadoId,
+  {precioHtml})`. `ui = {toast, avisarSinNitros, modoCombate(), alPagar?(), slotLleno(it), cambio(partes, o)}`. Lo usan la ficha (sus
+  nombres de siempre son atajos) y el mapa (`abrirEquipoMapa`). Necesita ficha-calculo, ficha-combate y ficha-acciones.
 - **`selector-estados.js`** (`SelectorEstados`, 2026-10-02, hoja de ruta A3) — **el "+ Estado" para cualquier pantalla**: `abrir({titulo,
   para, presets, propios, cfgPreguntas, stats, armarDeAsistente})` → Promise de `{preset, guardar}` o null (la grilla por Buffs/Debuffs/
   Otros, "Mis presets", "＋ Crear estado nuevo (paso a paso)"; un preset estándar pregunta sus cantidades con `EstadoPreguntas`), más

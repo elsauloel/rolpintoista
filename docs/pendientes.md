@@ -38,7 +38,12 @@
    `modificarCreep`. Probado en vivo: Veneno ×3 / 2 turnos a Silvia (ficha y token), Pajaritos 2 turnos al creep (con su marca de
    mitad de PdG/Eva), y el asistente de "Crear estado nuevo" abre y, al cancelarlo, vuelve a la grilla. El **⚙ de un estado** (su
    editor completo) sigue yendo a la ficha / GM Tools: es parte del punto 6 (el editor).
-4. [ ] **Equipo y mochila** (equipar, desequipar, mirar la mochila).
+4. [x] **Equipo y mochila** (2026-10-02): la regla y la ventana salieron a `comun/ficha-equipo.js` (slots, equipar/sacar con su costo
+   en combate, slot lleno → Reemplazar o Comparar, la tabla de Comparar, el dibujo) y la usan la ficha y el mapa. El 🛡 del token y
+   el 🎒 de la ficha lite la abren en el mapa, adentro del recuadro de la Botonera nueva (`abrirEquipoMapa`); Editar sigue yendo al
+   editor de la ficha (punto 6). Probado en vivo (combate, Silvia con el control del GM): sacar/equipar el Broquel 6 → 5 → 4 No2 y
+   guardado; una daga de prueba con el slot lleno → «Reemplazar o Comparar», la tabla de Comparar, Reemplazar (−2 No2); Escape cierra
+   todo; y en la ficha suelta, sacar/equipar igual (2 → 1 → 0). Silvia quedó con la «Daga de prueba» equipada en lugar de la Cimitarra.
 5. [ ] **Tienda y Botín**.
 6. [ ] **El editor** (editar una habilidad, un ítem, un creep): lo más grande y lo que menos se usa en partida; puede seguir abriéndose
    en la ficha o en GM Tools si conviene.
@@ -49,7 +54,7 @@
   false`) ni apareció un problema que solo se arregle con lo viejo. Mientras tanto queda "dormido", sin tocarlo ni probarlo.
 - **Cómo** — de a un paso y probando: sacar `BN_SIEMPRE`, el interruptor ⚗ y `bnAlternar`; los pedidos de botón al marco
   (`bnDelegar`/`botonera-delegar`, `acDelegar`/`acciones-delegar`) y lo que los atiende en la ficha y en GM Tools (`modo=botonera` sin
-  mensaje, `modo=acciones`); la ficha liviana vieja (`fichaMapaAbrir`, `abrir-ficha-mapa`); el Mantenimiento en un marco invisible (en el
+  mensaje, `modo=acciones`); la ficha liviana vieja (`fichaMapaAbrir`, `abrir-ficha-mapa`); `abrir-equipo`/`equipoModoAbrir` (A4); el Mantenimiento en un marco invisible (en el
   mapa `mantenimientoEncolar`/`mantenimientoSiguiente`/`mantenimientoCerrarMarco` y el aviso `mantenimiento-listo`; en la ficha y en GM
   Tools el `?modo=mantenimiento`), sin uso desde A2/A2b; los mensajes que queden sin uso en `comun/mensajes-mapa.js`. **No** se borra la Botonera de la ficha suelta (`ficha.html` sin el mapa): usa las mismas piezas de
   `comun/` y es la de la página de la ficha.

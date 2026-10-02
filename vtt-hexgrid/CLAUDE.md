@@ -1200,3 +1200,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   si quien entra resiste, no recibe nada (antes el daño de fórmula entraba igual); si no, el daño es la fórmula o, con `zonaDanoDif`, la
   tirada guardada menos la suya (empate = 0, sin daño ni tirada extra); si el daño entró, se tira `zonaTiraExtra` y se publica en la Mesa
   con `zonaNota` (`mesaConTexto`). Reglas nuevas de Firestore.
+- **Arreglo: el cartelito de las zonas nunca aparecía** (2026-10-02, encontrado probando Pedos Tóxicos): el motor de zonas leía `t.id`, pero
+  los tokens no llevan su id adentro (es la clave del Map `tokens`); ahora usa `zonaIdDe(t)`. Además, en una zona **de habilidad** cuyo daño
+  ignora la Defensa se resta la **Armadura mágica** de quien lo recibe, como en el duelo (P142 ✅: el tóxico también); la tirada extra sale
+  solo si algo llegó a la vida. El cartelito usa 🔥 solo para el daño de fuego (si no, 🌫).

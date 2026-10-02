@@ -360,7 +360,7 @@ function renderZonaBanner(){
     document.body.appendChild(el2);
   }
   el2.hidden = false;
-  const icono = el.zonaEstado ? '🌫' : '🔥';
+  const icono = el.zonaDanoTipo === 'de fuego' || (!el.zonaEstado && !el.zonaDanoTipo) ? '🔥' : '🌫';   // 🔥 solo para el fuego (o una zona vieja de puro daño)
   const nombreT = t.oculto ? 'Alguien' : nombreDe(t);
   let cuerpo;
   if(zonaBanner.resultado){

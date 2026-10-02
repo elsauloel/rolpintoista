@@ -677,3 +677,6 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   talentos, estados y consumibles (se sacó la ventana `#scrim` y su `#modal-activar`); **＋ Invocación** abre el editor de la invocación paso a paso
   (`abrirEditarInv(id, {nueva})`, js/04: `INV_PASOS`, `invPasoHtml`; los campos se guardan al escribir con los manejadores de siempre de js/06; al
   editar, Cancelar repone la copia; al crear, Cancelar la saca). Se sacó `#scrim-editar-inv`.
+- **＋ Personaje nuevo, paso a paso** (2026-10-02, tanda 7): `abrirPersonajeNuevo` (js/12) abre `comun/asistente-personaje.js` y crea el personaje con
+  `crearPersonajeNuevo(datos, {asistente: true})`. Se separaron `habDeClase(claseId, habId)`, `pasivaDeCatalogo(datos, meta)` y `pasivasDelCatalogo()`
+  (js/10) para que los use el asistente.

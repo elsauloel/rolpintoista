@@ -672,3 +672,6 @@ resuelven a mano, como el resto de los avisos).
   que encadena el momento (texto → dados 3D → resultado) y se va sola; los botones de tirar, solo en la pantalla de quien tira. Abierto:
   (1) qué eventos la tienen (propuesta: percepción, zonas, trampas, sigilo roto); (2) cuánto se cuenta (sin la vida de los creeps; un
   oculto sin descubrir es "alguien"; ¿el nombre de la trampa?); (3) ¿tapa el centro del mapa unos segundos o va arriba sin tapar?~~
+- ✅ **P147 — resuelta 2026-10-02 (dueño): el DDE inicial de un personaje nuevo es 300 doblones del espacio, salvo que el GM fije otro para su
+  partida** («⚙ Partida» en la página de inicio; `campanas/<id>/ajustes/partida`). El acompañante del asistente de personaje nuevo sugiere los
+  atributos con los repartos de los roles de creeps (siempre como orientación). Hecho: `comun/asistente-personaje.js`.

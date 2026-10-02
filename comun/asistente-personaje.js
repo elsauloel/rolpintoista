@@ -142,7 +142,7 @@ const AsistentePersonaje = (() => {
       return (sug ? guia(`Un <b>${esc(nomClase)}</b> suele repartir así: ${ATTRS.map((a, i) => `${esc(labelAttr(a))} ${sug[i]}`).join(' · ')}. Es una orientación, no una regla: cambialo como quieras.
           <div style="margin-top:6px"><button type="button" class="pap-boton" data-ap-sugerencia="1">Usar la sugerencia</button></div>`)
           : guia('Elegí una clase en «Idea» y te sugiero un reparto. Si no, repartí a gusto: cada atributo arranca en 3.'))
-        + contador(`Puntos: ${b.usado} de ${b.total}${b.pend > 0 ? ` · te quedan ${b.pend}` : b.pend < 0 ? ` · ${-b.pend} de más` : ' · justo'}`, b.pend < 0)
+        + contador(`Puntos: ${b.usado} de ${b.total}${b.pend > 0 ? ` · te ${b.pend === 1 ? 'queda' : 'quedan'} ${b.pend}` : b.pend < 0 ? ` · ${-b.pend} de más` : ' · justo'}`, b.pend < 0)
         + `<div class="ap-attrs">${ATTRS.map((a, i) => `<div class="ap-attr"><label>${esc(labelAttr(a))}</label><div class="ap-num">${num(S.attrs[a])}</div>
             <div class="ap-mm"><button type="button" data-ap-attr="${a}" data-ap-delta="-1" title="Restar">−</button><button type="button" data-ap-attr="${a}" data-ap-delta="1" title="Sumar">+</button></div>
             ${sug ? `<div class="ap-sug">sugerido ${sug[i]}</div>` : ''}</div>`).join('')}</div>
@@ -186,7 +186,7 @@ const AsistentePersonaje = (() => {
       const it = intTotal(), iu = intUsado();
       const ya = new Set(st.talentos.map(t => t.nombre.toLowerCase()));
       return guia('Los talentos son lo social y lo que sabés: persuadir, mentir, regatear, saber de historia… Cada punto de Inteligencia en un talento le suma 2 caras al dado.')
-        + contador(`Inteligencia: ${iu} de ${it}${iu > it ? ` · ${iu - it} de más` : iu < it ? ` · te quedan ${it - iu}` : ''}`, iu > it)
+        + contador(`Inteligencia: ${iu} de ${it}${iu > it ? ` · ${iu - it} de más` : iu < it ? ` · te ${it - iu === 1 ? 'queda' : 'quedan'} ${it - iu}` : ''}`, iu > it)
         + `<div class="ap-chips">${TALENTOS_SUGERIDOS.filter(n => !ya.has(n.toLowerCase())).map(n => `<button type="button" class="ap-chip" data-ap-talento="${esc(n)}">+ ${esc(n)}</button>`).join('')}</div>
         <div class="pap-fila" style="margin:10px 0"><input id="ap-talento-propio" maxlength="40" placeholder="Otro talento (el que quieras)"><button type="button" class="pap-boton" data-ap-talento-propio="1">Agregar</button></div>
         ${st.talentos.length ? st.talentos.map((t, i) => `<div class="ap-fila"><span class="ap-n"><b>${esc(t.nombre)}</b> · ${t.puntos ? `d${t.puntos * 2}` : 'sin dado (tira solo Inteligencia)'}</span>
@@ -213,18 +213,19 @@ const AsistentePersonaje = (() => {
     }
     function avisos(){
       const a = [], b = presupuestoAttr(), jt = jobTotal(), ju = jobUsado(), it = intTotal(), iu = intUsado();
-      if(b.pend > 0) a.push(`Te quedan ${b.pend} puntos de atributo sin gastar.`);
-      if(b.pend < 0) a.push(`Usaste ${-b.pend} puntos de atributo de más.`);
-      if(ju < jt) a.push(`Te quedan ${jt - ju} de Job sin usar.`);
+      const queda = n => n === 1 ? 'Te queda 1' : `Te quedan ${n}`;
+      if(b.pend > 0) a.push(`${queda(b.pend)} punto${b.pend === 1 ? '' : 's'} de atributo sin gastar.`);
+      if(b.pend < 0) a.push(`Usaste ${-b.pend} punto${b.pend === -1 ? '' : 's'} de atributo de más.`);
+      if(ju < jt) a.push(`${queda(jt - ju)} de Job sin usar.`);
       if(ju > jt) a.push(`Usaste ${ju - jt} de Job de más.`);
-      if(iu < it) a.push(`Te quedan ${it - iu} de Inteligencia sin invertir.`);
+      if(iu < it) a.push(`${queda(it - iu)} de Inteligencia sin invertir.`);
       if(iu > it) a.push(`Invertiste ${iu - it} de Inteligencia de más.`);
       if(totalCompra() > st.dde) a.push('La compra se pasa de tus DDE.');
       return a;
     }
     function pasoResumen(){
       const fila = (t, v) => `<div class="ap-rf"><span>${t}</span><b>${v}</b></div>`;
-      const c = FichaCalculo.calcular(S).final;
+      const c = FichaCalculo.calcular(datosFinales()).final;   // con las pasivas y el equipo elegidos
       const habs = [...st.habs.values()].map(x => (ctx.pool(x.claseId).find(h => h.id === x.habId) || {}).nombre).filter(Boolean);
       const pas = [...st.pasivas].map(i => pasivasLista[i] && pasivasLista[i].datos.nombre).filter(Boolean);
       const compra = [...st.carrito.entries()].filter(([, n]) => n > 0).map(([id, n]) => { const it = itemTienda(id); return it ? `${it.nombre}${n > 1 ? ' ×' + n : ''}` : ''; }).filter(Boolean);

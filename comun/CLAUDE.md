@@ -1151,6 +1151,12 @@ versión parecida en más de una, es candidato a juntar.
   ventana común: `document.body` en la ficha, el recuadro aislado en el mapa) y **todo** lo edita por pasos — el formulario genérico se arma con
   `pasosFormulario(key, draft)` (pasivas, talentos, estados, consumibles y el «formulario completo» de un ítem) + `htmlFormulario(key, draft,
   bloques)` + Resumen; `CreepEditor.crearEstado(contenedor, ctx)` → `{abrir, cerrar, raiz, estado}` (Qué es · Duración · Vida · Números · Resumen).
+- **`asistente-personaje.js`** (`AsistentePersonaje`, 2026-10-02, tanda 7) — «＋ Personaje nuevo» paso a paso: Idea · Imagen · Atributos (33 puntos,
+  mínimo 3, con «Usar la sugerencia» de la clase) · Habilidades (las de su clase primero, ★) · Pasivas · Talentos (6 de Inteligencia) · Equipo (la
+  tienda publicada y abierta, con el DDE inicial: 300 o el de `ajustes/partida`) · Historia · Resumen (con los avisos de lo que sobra o falta). No
+  escribe nada: `ctx = {base, clases, pool, habilidad, pasivas, pasiva, tienda, ddeInicial, imagen, alCrear, toast}` (la ficha: `abrirPersonajeNuevo`,
+  js/12). `Combatiente.ROLES`/`PESOS_ROL`/`ROL_DE_CLASE`/`repartirAtributos(total, pesos, minimo)`: los repartos sugeridos (los usa también el asistente
+  de creeps de GM Tools).
 - **`asistente-mapa.js`** (`AsistenteMapa`, 2026-10-02, tanda 6) — «＋ Mapa nuevo» paso a paso: Nombre → Creeps (cuáles se mudan a este mapa, agrupados
   por dónde están) → Listo. `abrir({nombre, creeps: [{id, nombre, donde}], marcados, alCrear({nombre, creeps}), alCancelar})`; no escribe nada: el
   mapa (`crearMapa`, js/01) y GM Tools (`pedirMapaNuevo`, js/09) crean el mapa y mudan los creeps a su manera.

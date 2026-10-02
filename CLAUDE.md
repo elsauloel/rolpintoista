@@ -35,7 +35,8 @@
 > mapa: `comun/recibidos.js`); lo que queda (9–12) espera decisiones del dueño o del grupo.
 >
 > **Paso a paso unificado → [`docs/plan-paso-a-paso.md`](docs/plan-paso-a-paso.md)**: crear y editar casi todo en la ventana común
-> (`comun/paso-a-paso.js`). Tandas 1–6 hechas (2026-10-02); sigue la 7: el asistente de **personaje nuevo**. Reportes: [`docs/reporte-estructural-2026-10-02.md`](docs/reporte-estructural-2026-10-02.md),
+> (`comun/paso-a-paso.js`). Tandas 1–7 hechas (2026-10-02, la 7 = **personaje nuevo**, `comun/asistente-personaje.js`). Sigue: cómo se ven los ítems
+> en el catálogo y las tiendas (solo lo que hacen en la grilla; «Detalles técnicos» en Ver). Reportes: [`docs/reporte-estructural-2026-10-02.md`](docs/reporte-estructural-2026-10-02.md),
 > [`docs/reporte-a6-2026-10-02.md`](docs/reporte-a6-2026-10-02.md), [`docs/reporte-b7-b8-2026-10-02.md`](docs/reporte-b7-b8-2026-10-02.md).
 >
 > **Tareas pendientes → [`docs/pendientes.md`](docs/pendientes.md)** (lista viva para ir tachando; las decisiones de diseño

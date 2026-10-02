@@ -32,7 +32,7 @@ probada y publicada antes de la siguiente:
 | 4 ✅ | **Ejecución ✨** (`asistente-duelo-hab.js`) en la ventana común, con la paleta de todos | hecho 2026-10-02 |
 | 5 ✅ | **Estado** (`asistente-estado.js`), **Trampa** (`asistente-trampa.js`; al editar una ya colocada, Guardar siempre), **Zona** (`asistente-zona.js`, pasó de verde a la paleta de todos) y las cantidades de un preset (`estado-preguntas.js`: una pregunta por pestaña, «✔ Listo») en la ventana común. De paso: un Escape cierra una sola ventana (antes, con el asistente de estados abierto desde "+ Estado", cerraba también la grilla) y el mapa carga la ventana común de entrada | hecho 2026-10-02 |
 | 6 ✅ | **Token nuevo** y **Editar token** (mapa, js/09); **Mapa nuevo** (`comun/asistente-mapa.js`, el mismo en el mapa y en GM Tools, con los creeps que se mudan); **Crear partida** (inicio); el **formulario del editor común** (`ficha-editor.js`) por pasos: **pasivas**, **talentos**, **estados** (el formulario completo) y **consumibles**; el **editor de invocaciones** (Qué es · Atributos · Arma · Defensa · Habilidades · Estados · Notas); el editor de **estados de creep** (`creep-editor.js`, GM Tools y las Acciones del mapa). Se sacaron las ventanas viejas (`#scrim` de la ficha, `#bn-editor`, `#scrim-editar-inv`, `#nuevo-token-capa`, `#editar-token-capa`). No se convirtieron, a propósito: la **ficha completa de un creep** (es su hoja en juego, como la ficha de un personaje; editar su definición ya es «✎ Editar paso a paso») y el nombre con que se guarda una **tienda** (un solo dato al guardar, no algo que se crea) | hecho 2026-10-02 |
-| 7 | **Personaje nuevo** (abajo) | un `confirm` y una ficha en blanco |
+| 7 ✅ | **Personaje nuevo** (abajo): `comun/asistente-personaje.js`, desde «＋ Personaje nuevo» de la ficha | hecho 2026-10-02 |
 
 Al terminar: sacar el código muerto del asistente viejo de trampas del mapa (`vtt-hexgrid/js/03-asistente-trampa.js`) y el CSS duplicado de
 `.pasos-hab`/`.paso-chip` (ficha.css y gm-tools.css).
@@ -56,8 +56,12 @@ Pasos propuestos (desde «＋ Personaje nuevo»):
 8. **Historia** (opcional) — motivo, manía, de dónde viene.
 9. **Resumen** — todo junto, con los avisos de puntos sin gastar, y «✔ Crear».
 
-Pendiente de definir al llegar a la tanda 7: el DDE inicial (¿lo pone el GM por partida?) y los pesos sugeridos de cada clase (se arrancan de los
-roles de creeps: Warrior→brutal, Asalto→rápido, Tanque→tanque, Mago→mago, Shooter→a distancia, Support→apoyo, Debuffer→debuffer).
+**Decidido al llegar a la tanda 7 (dueño, 2026-10-02):** el **DDE inicial es 300 doblones del espacio** salvo que el GM fije otro para su partida
+(«⚙ Partida» de la página de inicio → `campanas/<id>/ajustes/partida.ddeInicial`, reglas nuevas); los **pesos de cada clase son los de los roles de
+creeps** (Warrior→brutal, Asalto→rápido, Tanque→tanque, Mago→mago, Shooter→a distancia, Support→apoyo, Debuffer→debuffer; viven en
+`Combatiente.PESOS_ROL`/`ROL_DE_CLASE`). Hecho así: el equipo se compra de la tienda **publicada y abierta** (si no, el paso explica que se compra
+después desde 🏪); lo comprado queda en la mochila; la idea y la historia van a una página «Historia» de la bitácora; el personaje arranca con la
+vida y los No2 llenos. Una habilidad custom (2 de Job) se arma después desde la ficha.
 
 ## Después de los paso a paso: cómo se ve un ítem en el catálogo y en las tiendas (pedido del dueño, 2026-10-02)
 

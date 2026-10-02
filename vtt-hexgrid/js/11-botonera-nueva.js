@@ -132,11 +132,15 @@ var bnCss = '';
 var bnCargando = null;
 var bnItemsSubidos = [];
 const bnMezclarCatalogo = lista => ItemsSubidos.mezclar(lista, bnItemsSubidos, FichaGuardado.DEFAULT.catalogo);
-const bnActiva = () => { try{ return localStorage.getItem(BN_CLAVE) === '1'; }catch(e){ return false; } };
+/* Desde el 2026-10-02 (decisión del dueño: "vamos a dejar solo la botonera nueva") la Botonera nueva y las Acciones nuevas son las de
+   todos: siempre prendidas y sin el interruptor ⚗. Para volver a la de antes (la ficha / GM Tools en el marco), poner BN_SIEMPRE en
+   false: vuelve el interruptor y cada navegador elige como antes. */
+const BN_SIEMPRE = true;
+const bnActiva = () => { if(BN_SIEMPRE) return true; try{ return localStorage.getItem(BN_CLAVE) === '1'; }catch(e){ return false; } };
 function bnPintarInterruptor(){
   const b = $('#btn-botonera-nueva');
   if(!b) return;
-  b.hidden = !fbMiembro;   // cualquiera de la partida (P140)
+  b.hidden = BN_SIEMPRE || !fbMiembro;   // cualquiera de la partida (P140); sin interruptor desde que es la de todos
   b.textContent = `⚗ Botonera nueva: ${bnActiva() ? 'sí' : 'no'}`;
   b.classList.toggle('primary', bnActiva());
 }

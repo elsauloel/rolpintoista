@@ -83,7 +83,8 @@ const PasoAPaso = (() => {
     if(e.key !== 'Escape' || !abiertos.length) return;
     const arriba = [...abiertos].reverse().find(c => estaArriba(c.fondo));
     if(!arriba) return;
-    e.stopPropagation();
+    // Del todo: ni otros oyentes del documento (la grilla de "+ Estado" que la abrió, por ejemplo) lo ven, así un Escape cierra una sola ventana.
+    e.preventDefault(); e.stopImmediatePropagation();
     arriba.cancelar();
   }, true);
 

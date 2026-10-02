@@ -285,17 +285,8 @@ function proponerPasiva(id){
 
 function openEditor(key, id, equipadoPreset, opciones){
   const sc = SCHEMA[key];
-  const defaults = {id:uid(), nombre:'', peso:0, ranuras:1, detalle:'', mods:[],
-    equipado: equipadoPreset !== undefined ? equipadoPreset : true,
-    activo:true, stacks:1, costo:'', nitrosCosto:IT2.nitrosHabilidad, dado:'', turnos:'', hpturno:0, stacksturno:0, permanente:false, popup:false,
-    compras:1, regenHp:0,
-    job:true, origen:'', imagen:'', categoria:'', tipoItem:'', tipoDado:8, danoFijo:0, danoAmplificado:0, armaDeRango:false, manoPreferida:'',
-    unidades:1, consumible:false, curahp:0, precioCompra:0,
-    efectoNombre:'', efectoTurnos:0, efectoHpTurno:0, efectoEscudo:0, efectoStacks:1, efectoPermanente:false, efectoDetalle:'', efectoMods:[], curaspPct:0, cargaMax:1, cargaActual:1,
-    forzarNitros:'', mitadPdgEva:false, armaduraRota:false, escudoMagico:0, tiradaExtra:'', tiradaStat:'',
-    equipoEstadoNombre:'', equipoEstadoHpTurno:0, equipoEstadoDetalle:''};
   const op = opciones || {};
-  const item = op.draft ? Object.assign({}, defaults, op.draft) : id ? Object.assign({}, defaults, S[key].find(x=>x.id===id)) : defaults;
+  const item = FichaEditor.borrador(op.draft || (id ? S[key].find(x=>x.id===id) : null), equipadoPreset);   // comun/ficha-editor.js (A6b)
   // Ítems de inventario y catálogo (menos consumibles): asistente paso a paso.
   if(!op.formulario && (key === 'inventario' || key === 'catalogo') && item.tipoItem !== 'consumibles'){
     abrirAsistenteItem(key, id, {equipadoPreset, draft: op.draft});
@@ -330,59 +321,13 @@ function campoImagenHtml(draft){
    Crear o editar una habilidad va en pasos cortos, cada uno con una
    pregunta que guía al jugador. Al crear, "Guardar" aparece en el último
    paso; al editar, está siempre (y se puede saltar a cualquier paso). */
-const PASOS_HAB = {
-  auto: {id: 'auto', corto: 'Cómo se ejecuta', titulo: '¿Cómo se ejecuta esta habilidad?',
-   ayuda: 'Tres formas, de menos a más automática. Se puede cambiar cuando quieras.'},
-  ejecucion: {id: 'ejecucion', corto: 'Ejecución', titulo: '¿Cómo se juega paso a paso?',
-   ayuda: 'El costo, a quién apunta, qué tira cada uno, el daño y los efectos. Se arma en el cuadro de Ejecución (✨), el mismo que se abre para toda la mesa al usarla.'},
-  anterior: {id: 'anterior', corto: 'Del sistema anterior', titulo: 'Lo que tenía del sistema anterior',
-   ayuda: 'Esta habilidad todavía tiene cosas del sistema de automatización anterior. Se siguen aplicando solas al ejecutarla hasta que la adaptes: lo ideal es pasarla a ✨ Automático y armar ahí su ejecución.'},
-  que: {id: 'que', corto: 'Qué es', titulo: '¿Cómo se llama y qué hace?',
-   ayuda: 'Contalo como lo leería la mesa: esta descripción aparece en la Mesa cada vez que la uses.'},
-  costo: {id: 'costo', corto: 'Costo', titulo: '¿Qué cuesta usarla?',
-   ayuda: 'Se descuenta solo al ejecutarla. El SP se gasta y no vuelve al pasar turno; los Nitros (No2) se recargan en cada Mantenimiento. SP vacío = no gasta. En SP y en No2, X = lo elegís al usarla.'},
-  tiradaEj: {id: 'tiradaEj', corto: 'Tirada al ejecutar', titulo: '¿Qué se tira al tocar Ejecutar?',
-   ayuda: 'Lo que se tira apenas tocás Ejecutar: elegí el stat del golpe o de la prueba (por ejemplo PdG para un ataque). Es la PRIMERA tirada, de golpe. Si no elegís ninguno, Ejecutar no tira un stat (y si en el paso siguiente hay una fórmula, Ejecutar tira esa fórmula directamente).'},
-  tiradaEf: {id: 'tiradaEf', corto: 'Tirada de efecto', titulo: '¿Tiene una tirada de efecto (daño, curación…)?',
-   ayuda: 'La tirada interna de la habilidad: daño, curación, duración… (por ejemplo 2d6+3). Aparece como un botoncito 🎲 en la misma tarjeta, al lado de Ejecutar, y solo si esta tirada existe y hay un stat en el paso anterior. Sin stat, Ejecutar tira esta fórmula directamente y no hay botón aparte. Se puede dejar vacía.'},
-  efecto: {id: 'efecto', corto: 'Efecto', titulo: '¿Qué pasa cuando la usás?',
-   ayuda: 'La tirada: podés vincularla a un stat (se tira con su valor del momento, con los modificadores activos), escribir una fórmula, las dos cosas o ninguna (por ejemplo, si incluye un ataque, elegí PdG para que tire el golpe). Y lo que habilita: un estado alterado sobre vos (un buff, un recordatorio). Si no aplica ninguno, dejá el nombre vacío.'},
-  origen: {id: 'origen', corto: 'Origen', titulo: '¿Cómo la conseguiste?',
-   ayuda: 'Las que se compran con puntos de Job descuentan de tu Job disponible.'},
-  listo: {id: 'listo', corto: 'Listo', titulo: 'Revisá cómo quedó',
-   ayuda: 'Si algo no está bien, tocá el paso arriba para volver. Si está todo, guardala.'},
-};
-// Automatizada (o sin definir, como las de antes): pide costo y efecto.
-// No automatizada: solo qué es, origen y listo.
-/* Tres modos de ejecución (regla del dueño, 2026-09-30 — reemplaza a "¿automatizarla? sí/no" + el tilde "¿se juega en el
-   duelo?", que se superponían): 'manual' (📣 Anunciar: publica el texto y todo va a mano), 'semi' (💰 cobra solo el costo
-   —Nitros, SP, HP— y tira la tirada inicial si la tiene; los efectos van a mano) y 'auto' (✨ la Ejecución paso a paso:
-   objetivo, tiradas de cada uno, efectos). Se guarda en `h.modo`; las de antes lo deducen: automatizada === false →
-   manual, con `duelo` configurado → auto, el resto → semi. Lo del sistema anterior (estado sobre uno mismo, cura, trampa)
-   se sigue aplicando en semi y en auto hasta que se adapte cada habilidad. */
-const MODOS_HAB = {
-  manual: {icono: '📣', nombre: 'Manual', boton: 'Anunciar', corto: 'solo se anuncia'},
-  semi: {icono: '💰', nombre: 'Semiautomático', boton: 'Ejecutar', corto: 'cobra el costo y tira la tirada inicial'},
-  auto: {icono: '✨', nombre: 'Automático', boton: 'Ejecutar', corto: 'ejecución paso a paso'},
-};
+// Los pasos y los modos del editor de habilidades viven en comun/ficha-editor.js (A6b): acá, los nombres de siempre.
+const PASOS_HAB = FichaEditor.PASOS_HAB;
+const MODOS_HAB = FichaEditor.MODOS_HAB;
 function modoHab(h){ return FichaBotonera.modoHab(h); }   // la regla común (comun/combatiente.js), vía comun/ficha-botonera.js
 const habAutomatizada = h => FichaBotonera.habAutomatizada(h);
-// Lo del sistema anterior que tiene cargado la habilidad (se sigue aplicando en semi y auto hasta adaptarla).
-function habLegado(h){
-  const L = [];
-  if(String(h.efectoNombre || '').trim()) L.push(`estado «${h.efectoNombre}» sobre vos`);
-  if(num(h.curaHp) > 0) L.push(`cura ${fmt(num(h.curaHp))} HP`);
-  if(h.trampaColocar && modoHab(h) !== 'auto') L.push('coloca una trampa');
-  if(h.zonaMapa || h.portalMapa) L.push(h.portalMapa ? 'abre un portal' : 'marca una zona');
-  return L;
-}
-function pasosHabilidad(draft){
-  const m = modoHab(draft);
-  const anterior = habLegado(draft).length ? [PASOS_HAB.anterior] : [];
-  if(m === 'semi') return [PASOS_HAB.auto, PASOS_HAB.que, PASOS_HAB.costo, PASOS_HAB.tiradaEj, PASOS_HAB.tiradaEf, ...anterior, PASOS_HAB.origen, PASOS_HAB.listo];
-  if(m === 'auto') return [PASOS_HAB.auto, PASOS_HAB.que, PASOS_HAB.ejecucion, ...anterior, PASOS_HAB.origen, PASOS_HAB.listo];
-  return [PASOS_HAB.auto, PASOS_HAB.que, PASOS_HAB.origen, PASOS_HAB.listo];
-}
+function habLegado(h){ return FichaEditor.habLegado(h); }
+function pasosHabilidad(draft){ return FichaEditor.pasosHabilidad(draft); }
 
 function drawEditorHabilidad(){
   const {draft} = editing;
@@ -969,21 +914,8 @@ function drawEditor(){
   $('#modal-body').innerHTML = html;
 }
 
-function getModVal(draft, statId){
-  const m = (draft.mods||[]).find(mm => mm.stat === statId);
-  return m ? m.val : 0;
-}
-function setModVal(draft, statId, val){
-  draft.mods = draft.mods || [];
-  const idx = draft.mods.findIndex(mm => mm.stat === statId);
-  if(val === 0){
-    if(idx >= 0) draft.mods.splice(idx, 1);
-  }else if(idx >= 0){
-    draft.mods[idx].val = val;
-  }else{
-    draft.mods.push({stat: statId, val});
-  }
-}
+function getModVal(draft, statId){ return FichaEditor.getModVal(draft, statId); }   // comun/ficha-editor.js (A6b)
+function setModVal(draft, statId, val){ FichaEditor.setModVal(draft, statId, val); }
 
 function handleModalFieldChange(e){
   const t = e.target;
@@ -1068,37 +1000,8 @@ $('#modal-body').addEventListener('change', async e => {
     }
   }
 });
-function slugItemCatalogo(s){
-  return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'item';
-}
-
-// Convierte un ítem de inventario/cinturón (instancia de un personaje) en
-// una entrada de catálogo del fabricante: descarta lo que solo tiene
-// sentido para una instancia (equipado, cargaActual, manoPreferida) y le
-// pone un id y un tier nuevos, porque el catálogo no los hereda de nada.
-function itemComoEntradaDeCatalogo(draft){
-  return {
-    id: 'new-' + slugItemCatalogo(draft.nombre),
-    nombre: draft.nombre, tier: 'A definir', imagen: draft.imagen || '',
-    tipoItem: draft.tipoItem, peso: num(draft.peso), ranuras: num(draft.ranuras) || 1,
-    ...(ES_ARMA(draft.tipoItem) ? {
-      tipoDado: num(draft.tipoDado) || 8, danoFijo: num(draft.danoFijo),
-      danoAmplificado: num(draft.danoAmplificado), armaDeRango: !!draft.armaDeRango,
-      efectosGolpe: structuredClone(draft.efectosGolpe || []),
-    } : {}),
-    precioCompra: num(draft.precioCompra),
-    unidades: num(draft.unidades) || 1, cargaMax: num(draft.cargaMax),
-    consumible: !!draft.consumible, curahp: num(draft.curahp), curaspPct: num(draft.curaspPct),
-    efectoNombre: draft.efectoNombre || '', efectoTurnos: num(draft.efectoTurnos),
-    efectoHpTurno: num(draft.efectoHpTurno), efectoEscudo: num(draft.efectoEscudo), efectoStacks: Math.max(1, num(draft.efectoStacks) || 1), efectoPermanente: !!draft.efectoPermanente,
-    efectoDetalle: draft.efectoDetalle || '', efectoMods: structuredClone(draft.efectoMods || []),
-    equipoEstadoNombre: draft.equipoEstadoNombre || '', equipoEstadoHpTurno: num(draft.equipoEstadoHpTurno),
-    equipoEstadoDetalle: draft.equipoEstadoDetalle || '',
-    mods: structuredClone((draft.mods || []).filter(m => m.stat)),
-    detalle: draft.detalle || '',
-  };
-}
+function slugItemCatalogo(s){ return FichaEditor.slugItemCatalogo(s); }   // comun/ficha-editor.js (A6b)
+function itemComoEntradaDeCatalogo(draft){ return FichaEditor.itemComoEntradaDeCatalogo(draft); }
 
 /* ⬆ Subir al catálogo (paso 5 de docs/plan-subida-unificada.md, P124): el ítem va a la biblioteca compartida de Firebase
    (tipo `items`), disponible al instante para todos, 🔶 sin auditar hasta que lo revise el dueño. Antes escribía

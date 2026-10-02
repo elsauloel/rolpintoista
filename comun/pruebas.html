@@ -80,6 +80,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="duelo.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
+<script src="ficha-editor.js"></script>
 <script src="creep-lupa.js"></script>
 <script src="combate-fin.js"></script>
 <script src="ficha-lite.js"></script>
@@ -760,6 +761,28 @@ prueba('✚ Revivir: con un % del HP máximo (para abajo, mínimo 1) o un valor 
   const pct = FichaAcciones.hpRevivir(S, 'pct', 50, 0), cero = FichaAcciones.hpRevivir(S, 'pct', 0, 0), neto = FichaAcciones.hpRevivir(S, 'valor', 50, 7);
   const r = FichaAcciones.revivir(S, neto.val);
   igual([pct, cero.val, neto.val, r, S.hp, S.muerto.activo], [{hpmax: max, val: Math.max(1, Math.floor(max / 2))}, 1, 7, {vivo: true, revivio: true}, 7, false]);
+});
+
+grupo('El editor de la ficha (comun/ficha-editor.js, hoja de ruta A6b)');
+prueba('el borrador trae todos los campos por defecto y lo que ya tenía la entrada; equipado según el preset', () => {
+  const b = FichaEditor.borrador({nombre: 'Daga', peso: 1}, false), v = FichaEditor.borrador(null);
+  igual([b.nombre, b.peso, b.equipado, b.tipoDado, b.nitrosCosto, typeof b.id, v.equipado, v.nombre, v.efectoStacks, FichaEditor.SCHEMA.efectos.mods, FichaEditor.CAMPO_NUM.includes('escudoMagico')],
+    ['Daga', 1, false, 8, FichaCalculo.IT2.nitrosHabilidad, 'string', true, '', 1, true, true]);
+});
+prueba('setModVal agrega, cambia y saca (con 0) un modificador; getModVal lo lee', () => {
+  const d = {mods: [{stat: 'eva', val: 1}]};
+  FichaEditor.setModVal(d, 'def', 2); FichaEditor.setModVal(d, 'eva', 3); const conDef = FichaEditor.getModVal(d, 'def');
+  FichaEditor.setModVal(d, 'def', 0);
+  igual([conDef, d.mods, FichaEditor.getModVal(d, 'pdg')], [2, [{stat: 'eva', val: 3}], 0]);
+});
+prueba('los pasos de una habilidad dependen de cómo se ejecuta; lo del sistema anterior suma su paso', () => {
+  const ids = d => FichaEditor.pasosHabilidad(d).map(p => p.id).join(',');
+  igual([ids({modo: 'manual'}), ids({modo: 'semi'}), ids({modo: 'auto', curaHp: 3}), FichaEditor.habLegado({efectoNombre: 'Furia', curaHp: 2})],
+    ['auto,que,origen,listo', 'auto,que,costo,tiradaEj,tiradaEf,origen,listo', 'auto,que,ejecucion,anterior,origen,listo', ['estado «Furia» sobre vos', 'cura 2 HP']]);
+});
+prueba('un ítem de la mochila convertido en entrada de catálogo: id del nombre, sin lo de la instancia', () => {
+  const e = FichaEditor.itemComoEntradaDeCatalogo({nombre: 'Hacha Ñandú', tipoItem: 'arma_1m', peso: 2, tipoDado: 10, equipado: true, cargaActual: 1, mods: [{stat: '', val: 1}, {stat: 'pdg', val: 1}]});
+  igual([e.id, e.tier, e.tipoDado, e.equipado, e.cargaActual, e.mods], ['new-hacha-nandu', 'A definir', 10, undefined, undefined, [{stat: 'pdg', val: 1}]]);
 });
 
 grupo('Combate suelto (Parry, Bloqueo, Fuerza del golpe, Evasión, Daño)');

@@ -1122,3 +1122,10 @@ versión parecida en más de una, es candidato a juntar.
 - **`presets-gm.js`** (`PresetsGM`, 2026-10-02, hoja de ruta B-7b) — **los "Mis presets" de estados del GM, en la partida**
   (`campanas/<id>/gm/presetsEstados = {json, actualizado}`, solo el GM): `escuchar(cb)`, `listo()`, `lista()`, `guardar(lista)`. Antes vivían
   solo en la memoria de GM Tools y se perdían al recargar. Lo usan GM Tools (`S.estadosPersonalizados` se llena al entrar) y el mapa.
+- **`creeps-mapas.js`** (`CreepsMapas`, 2026-10-02, pedido del dueño: "los grupos en realidad son mapas") — **en qué mapa está cada creep**:
+  `sc.mapa` (id del mapa, '' = la Reserva; reemplaza a `sc.grupo` y al vínculo grupo↔mapa `gm/gruposMapas`, que se sacaron de
+  `tokens-auto.js`). `ordenar(mapas)` (el orden del panel de Mapas), `mapaDe(sc, ids)` (si su mapa ya no existe, la Reserva),
+  `tokensDeCreep(id)` (en todos los mapas), `mudarTokens(c, destino)` (sus tokens se van de los otros mapas y, si tenía, aparece uno oculto
+  en el destino; a la Reserva solo se van), `crearMapa(nombre)` y `migrar(creeps, {vacios})` (los grupos viejos → mapas, una vez: con token →
+  el mapa del token; vinculado → su mapa; si no, el mapa con su nombre o uno nuevo). Lo usan GM Tools (pestañas, «🗺 Mover a…», la
+  conversión al entrar, borrar un creep) y el mapa (🎭 "Traer los creeps de este mapa", el panel de Mapas, `creepLlegoAlMapa`).

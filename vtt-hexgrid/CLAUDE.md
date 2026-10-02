@@ -1324,3 +1324,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   despojos y trampas que vuelven). Antes quedaban esperando a que se abriera la ficha. En el duelo, `dueloAplicarEfecto` ya no deja «a
   mano» a una invocación: el estado va con el mismo aviso (`fichaId~invId`) y la cura con `dueloCurarInv` (js/13, transacción sobre la
   parte `invocaciones`, como `danioInv`).
+- **Creeps por mapa, no por grupo** (2026-10-02, pedido del dueño; `comun/creeps-mapas.js`): el 🎭 del GM tiene **«👹 Traer los creeps de este
+  mapa»** (`traerCreepsDelMapa`, `creepsDelMapa`: los que GM Tools tiene en ese mapa) en lugar del submenú de grupos; el panel 🗺 Mapas muestra
+  cuántos creeps tiene cada mapa con **«Traer sus tokens»** (`creepsDeMapaHtml`). «Vincular a un creep» lista por mapa (este primero, la
+  Reserva, los demás). Crear o vincular un token de un creep de otro mapa lo **muda a este** (`creepLlegoAlMapa`: `sc.mapa` con
+  `modificarCreep`, que ahora también escribe `mapa` en lo público, y su token se va del otro mapa). El auto-vínculo por nombre del duelo
+  prefiere los creeps de este mapa. Se sacaron `enlacesGM`, `escucharEnlaces` y los grupos del panel de Mapas.

@@ -429,3 +429,11 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   js/05; `abrirEditorEstadoCreep(scId, esId, inicial)`; tampoco está ya `#scrim-estado-creep` en el HTML). `MODOS_HAB_CREEP`,
   `HABS_CREEP_GRUPOS`, `textoEstadoAgregado` y `hcStatLabel` son atajos. El mapa usa las mismas piezas y ya no le pide nada a GM Tools
   escondido: `acciones-delegar` y el `editar-estado` de un creep quedaron sin uso (limpieza A′).
+
+- **Los grupos pasaron a ser mapas** (2026-10-02, pedido del dueño; `comun/creeps-mapas.js`): las pestañas (`#mapas-barra`,
+  `renderMapasBarra`, `pestanaMapa`, `pasaPestana`) son **Todos**, los mapas de la partida (`mapasGM`, `mapasGMEscuchar`) y **🎒 Reserva**;
+  **＋ Mapa** crea uno (`pedirMapaNuevo`). Cada creep tiene **«🗺 Mover a…»** (`mapaSelectHtml`: en su propia fila de la tarjeta y en la ficha
+  completa) que lo muda con su token (`moverCreepAMapa`). En la pestaña de un mapa, **🎯 Poner sus tokens** (`crearTokensDelMapa`). Los creeps
+  nuevos van al mapa de la pestaña abierta (`mapaParaNuevo`). Al entrar, `gmMigrarGrupos` convierte los grupos viejos (una vez). Se sacaron el
+  arrastre (⠿), los grupos con nombre libre, el selector 🗺 de vínculo y `gruposMapas`. Lo de "Grupos de creeps", "Grupo ↔ mapa" y "Mover
+  creeps entre grupos arrastrando" de más arriba quedó viejo.

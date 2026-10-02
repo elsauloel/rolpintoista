@@ -100,6 +100,8 @@
   `comun/` y es la de la página de la ficha.
 - [ ] Limpieza hecha (fecha y commit).
 
+**Hecho en el camino (2026-10-02, a pedido):** ✅ **Grupos de creeps → mapas** (2026-10-02, pedido del dueño: «los grupos en realidad son mapas… un creep en un grupo es como una piedrita»): cada creep está en UN mapa (`sc.mapa`, `comun/creeps-mapas.js`) o en la Reserva; las pestañas de GM Tools son los mapas; «🗺 Mover a…» lo muda con su token; vincular en el mapa un token a un creep de otro mapa lo muda a ese mapa; los grupos viejos se convirtieron solos (con token → el mapa del token; vinculado → su mapa; si no, un mapa nuevo con su nombre). Se sacaron los grupos, el vínculo grupo↔mapa (`gm/gruposMapas`) y el arrastre. Probado en vivo en «Test con claude elsaulo»: conversión (el creep con token quedó en Mapa 1, el otro pasó a un mapa nuevo «Pantano prueba»), «Mover a…» con el token (de Mapa 1 a Pantano, oculto), a la Reserva (sin token), 🎭 «Traer los creeps de este mapa», el panel 🗺 Mapas con la cuenta, y vincular un token en Mapa 1 a un creep de Pantano (se mudó).
+
 **B. Puntual (después de A):**
 7. [x] **Una invocación sin No2 para atacar, adentro del duelo** — hecho 2026-10-02: pregunta «¿Atacar igual?» (duelo, Botonera de la
    ficha y del mapa), gasta los No2 que tenga y deja la línea roja (`InvAcciones.faltanNitros`/`preguntaSinNitros`/`alertaSinNitros`,
@@ -170,7 +172,7 @@
 - [ ] **Despojos mágico/especial** de los ítems: siguen a mano.
 - [ ] **Protección de jefe, segunda versión** (P95): resistencia a otros controles (Exhausto, Inmovilizado…), contador de resistencia o fases.
 - [ ] **Estados sobre otros más finos**: los que faltan automatizar (empujar, derribar, huir, "pierde el sigilo", etc.).
-- [ ] **Grupos vacíos en el menú 🎭** del mapa: hoy solo lista los grupos que tienen creeps.
+- [x] ~~**Grupos vacíos en el menú 🎭**~~ — ya no hay grupos: el 🎭 trae los creeps del mapa (2026-10-02, grupos → mapas).
 
 ## 5. Contenido a revisar (números de primer borrador)
 - [ ] Las **321 habilidades de creeps**: daño, cooldowns, bonos, cuáles son rápidas y cuáles lentas.

@@ -402,14 +402,6 @@ a{color:var(--brass)}
 .cat-meta .precio-lista{text-decoration:line-through;color:var(--muted);margin-right:5px}
 .preset-abrir{width:100%;text-align:left}
 /* Editor de habilidades paso a paso */
-.pasos-hab{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}
-.paso-chip{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.04em;padding:3px 8px;border:1px solid var(--line);border-radius:99px;color:var(--muted);background:none;cursor:pointer}
-.paso-chip.hecho{color:var(--paper);border-color:var(--line)}
-.paso-chip.activo{color:#180F08;background:var(--copper);border-color:var(--copper);font-weight:700}
-.paso-chip:disabled{opacity:.4;cursor:not-allowed}
-.paso-titulo{font-family:"Fraunces",serif;font-size:19px;font-weight:700;color:var(--paper);margin:2px 0 4px}
-.paso-ayuda{color:var(--muted);font-size:12.5px;margin:0 0 12px;line-height:1.45}
-.paso-nav{display:flex;justify-content:space-between;gap:8px;margin-top:14px;padding-top:10px;border-top:1px solid var(--line-soft)}
 .resumen-hab{border:1px solid var(--line);background:var(--panel2);padding:10px 12px;border-radius:var(--r)}
 .resumen-nombre{font-family:"Fraunces",serif;font-size:17px;font-weight:700;color:var(--brass)}
 .resumen-desc{font-size:13px;margin:4px 0 8px;white-space:pre-wrap}

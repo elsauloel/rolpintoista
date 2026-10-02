@@ -441,4 +441,6 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
 - **El asistente de creeps, sobre la ventana común** (2026-10-02, tanda 1 de `../docs/plan-paso-a-paso.md`): `abrirAsistenteCreep` usa
   `comun/paso-a-paso.js` (ya no está `#scrim-asistente-creep`). Crear: el creep vive marcado `_creando` (fuera de `creepsReales`: no se ve ni
   se guarda) hasta «✔ Crear»; Cancelar lo descarta. Editar: Guardar siempre visible; Cancelar repone la copia del creep (pregunta si cambió algo).
+- **El editor de habilidades de creep, en la ventana común** (2026-10-02, tanda 2): `comun/creep-editor.js` abre `comun/paso-a-paso.js` con los
+  bloques de cada paso; ya no existe `#scrim-hab-creep` (ni su CSS). Mismo en las Acciones del mapa.
 

@@ -26,8 +26,8 @@ probada y publicada antes de la siguiente:
 
 | Tanda | Qué | Hoy |
 |---|---|---|
-| 1 | **La pieza común** + el asistente de **creeps** pasado a ella (con Guardar/Cancelar) | referencia, edita en vivo |
-| 2 | **Habilidades**: de personaje (`ficha-editor.js`), de creep (`creep-editor.js`) y de invocación (js/04 de la ficha) — hoy tres editores con «pastillitas» | pasos sin pestañas |
+| 1 ✅ | **La pieza común** + el asistente de **creeps** pasado a ella (con Guardar/Cancelar) | hecho 2026-10-02 |
+| 2 ✅ | **Habilidades**: de personaje (`ficha-editor.js`), de creep (`creep-editor.js`) y de invocación (js/04 de la ficha) | hecho 2026-10-02 (se sacó el CSS de las pastillitas) |
 | 3 | **Ítems** (`asistente-item.js`), también los **consumibles** (hoy formulario aparte) | pastillitas |
 | 4 | **Ejecución ✨** (`asistente-duelo-hab.js`) | azul, pastillitas |
 | 5 | **Estado** (crear y el ⚙ de editar, hoy formulario), **Trampa**, **Zona** y las preguntas de un preset (`estado-preguntas.js`) | barra de progreso, sin saltar |

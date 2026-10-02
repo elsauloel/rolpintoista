@@ -669,3 +669,8 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   `recompensasRevisar`, `estadosEscuchar`, `estadosRevisar` en `js/02`; `applyExp`/`expThreshold` en `js/01`) usan `comun/recibidos.js`, y
   ahora también se aplican los estados de sus **invocaciones** (`fichaId~invId`). El mapa hace lo mismo con la misma pieza, así que ya
   no hace falta tener la ficha abierta para recibirlos. `devolverTrampasAlJugador` pasó a `Recibidos.devolverTrampas`.
+- **Las habilidades se editan en la ventana común paso a paso** (2026-10-02, tanda 2 de `../docs/plan-paso-a-paso.md`): la del personaje (el
+  componente `comun/ficha-editor.js` abre `comun/paso-a-paso.js` en vez de su ventana) y la de una invocación (`abrirEditorHabInv`, js/04: los
+  bloques de cada paso viven en `#hi-bloques` de ficha.html y la ventana común los muestra; ya no existe `#scrim-hab-inv`). Pestañas que saltan,
+  Guardar siempre al editar, «✔ Crear» al final, Eliminar en el pie. Se sacó el CSS de `.pasos-hab`/`.paso-chip`.
+

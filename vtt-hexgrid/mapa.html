@@ -8129,6 +8129,42 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando){
   return res;
 }
 
+/* Paso 4, etapa 4e (2026-10-01): el daño que recibe una INVOCACIÓN (token «fichaId~invId») — antes el duelo lo dejaba a mano.
+   Su Defensa sale de sus datos con la misma regla que la ficha (comun/inv-calculo.js) y se escribe en la parte `invocaciones` del
+   personaje con una transacción, como la vida desde el token (cambiarVidaPj): HP, escudos que absorbieron y el resumen público. */
+async function invDeToken(t){
+  const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
+  const parte = await fbDb.doc(fbRutaCampana(`fichas/${fichaId}/partes/invocaciones`)).get();
+  if(!parte.exists) return null;
+  return (JSON.parse(parte.data().json || '{}').invocaciones || []).find(i => i && i.id === invId) || null;
+}
+const defensasDeInv = inv => { const x = InvCalculo.migrar(structuredClone(inv)); return {def: InvCalculo.defensaEfectiva(x), armadmg: Math.max(0, num(InvCalculo.statValor(x, 'armadmg')))}; };
+async function danioInv(t, texto, ignoraDef, restaIgnorando){
+  const golpe = leerGolpe(texto);
+  if(golpe === null) throw new Error(ERROR_TIPEO);
+  const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
+  const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
+  const parteRef = base.collection('partes').doc('invocaciones');
+  const ts = firebase.firestore.FieldValue.serverTimestamp();
+  const res = await fbDb.runTransaction(async tx => {
+    const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
+    if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
+    const datos = JSON.parse(parte.data().json || '{}');
+    const inv = (datos.invocaciones || []).find(i => i && i.id === invId);
+    if(!inv) throw new Error('La invocación ya no existe');
+    if(!Array.isArray(inv.estados)) inv.estados = [];
+    const r = resolverGolpe(golpe, ignoraDef ? num(restaIgnorando || 0) : defensasDeInv(inv).def, inv.estados);
+    const previo = num(inv.hp);
+    inv.hp = Math.max(0, previo - r.recibido);
+    const rs = ficha.data().resumen || {};
+    tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
+    tx.update(base, {actualizado: ts, 'resumen.invocaciones': (rs.invocaciones || []).map(i => i.id === invId ? {...i, hp: inv.hp} : i)});
+    return {r, previo, nuevo: inv.hp};
+  });
+  toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
+  return res;
+}
+
 function hudHpHtml(t, d){
   const danio = hpModo === 'danio';
   const def = d.def === null || d.def === undefined ? null : d.def;
@@ -10984,9 +11020,17 @@ async function dueloAplicarDano(d){
   const mult = critReal ? d.crit.mult : 1, crudo = Math.max(0, num(dn.crudo)), golpe = crudo * mult;
   const base = {crudo, mult, golpe, ignoraDef: crit, mitad: d.resultado === 'mitad'};
   if(!t) return {...base, manual: true, motivoManual: 'el token ya no está en el mapa'};
-  if(t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION)) return {...base, manual: true, motivoManual: 'es una invocación'};
+  const esInv = t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION);
   let def = 0, armadmg = 0;
-  if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); def = sc ? creepDefensaMapa(sc) : 0; armadmg = sc ? creepArmadmgMapa(sc) : 0; }
+  if(esInv){   // 4e: su Defensa y su Armadura mágica, de sus datos (comun/inv-calculo.js, que se carga si hace falta)
+    try{
+      await bnCargarPiezas();
+      const inv = await invDeToken(t);
+      if(!inv) return {...base, manual: true, motivoManual: 'la invocación ya no está'};
+      ({def, armadmg} = defensasDeInv(inv));
+    }catch(err){ console.error('No se pudieron leer los datos de la invocación:', err); return {...base, manual: true, motivoManual: 'es una invocación (no se pudieron leer sus datos)'}; }
+  }
+  else if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); def = sc ? creepDefensaMapa(sc) : 0; armadmg = sc ? creepArmadmgMapa(sc) : 0; }
   else{ const f = fichasPub.get(t.fichaId); def = f && f.resumen && f.resumen.def !== undefined ? num(f.resumen.def) : 0; armadmg = f && f.resumen ? num(f.resumen.armadmg || 0) : 0; }
   // Un crítico real ignora la Defensa entera (0); el daño de casteo que la ignora (Paso 1) resta la Armadura mágica (Paso 3) en vez de nada.
   const restaIgnorando = magico ? armadmg : 0;
@@ -10999,7 +11043,8 @@ async function dueloAplicarDano(d){
     catch(err){ console.error('No se pudo pedir el desgaste del ítem:', err); }
   }
   try{
-    const res = t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando);
+    const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando)
+      : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando);
     const espinas = res.r.invulnerable ? null : await dueloEspinas(d, golpe);   // el daño inflictido (con el multiplicador del crítico), antes de la Defensa
     return {...base, desgaste, defensa: crit ? restaIgnorando : def, recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {})};
   }catch(err){

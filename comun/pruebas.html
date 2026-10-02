@@ -74,6 +74,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-lupa.js"></script>
 <script src="ficha-acciones.js"></script>
 <script src="ficha-mantenimiento.js"></script>
+<script src="estado-preguntas.js"></script>
+<script src="asistente-estado.js"></script>
+<script src="asistente-trampa.js"></script>
+<script src="asistente-zona.js"></script>
 <script src="selector-estados.js"></script>
 <script src="ficha-equipo.js"></script>
 <script src="ficha-botin.js"></script>
@@ -1428,6 +1432,83 @@ prueba('paso a paso: al crear, «✔ Crear» solo en el último paso; Cancelar p
   window.confirm = orig;
   r.push(hechos, api.abierto());
   igual(r, [false, 2, 3, true, true, ['crear', 'cancelar'], false]);
+});
+/* Tanda 5: los asistentes de estados, trampas y zonas, y las cantidades de un estado, en la ventana común. */
+// La última ventana abierta (otras pruebas pueden tener la suya) y atajos para tocarla.
+function papUltima(){
+  const mia = [...document.querySelectorAll('.pap')].pop();
+  const q = s => mia.querySelector(s);
+  return {mia, q, clic: s => q(s).click(), tabs: () => [...mia.querySelectorAll('[data-pap-paso]')].map(b => b.textContent.replace(/^\d+\. /, '')),
+    escribir: (s, v) => { const el = q(s); el.value = v; el.dispatchEvent(new Event('input', {bubbles: true})); },
+    marcar: (s, v) => { const el = q(s); el.checked = v; el.dispatchEvent(new Event('change', {bubbles: true})); },
+    ir: nombre => q(`[data-pap-paso="${[...mia.querySelectorAll('[data-pap-paso]')].map(b => b.textContent.replace(/^\d+\. /, '')).indexOf(nombre)}"]`).click()};
+}
+prueba('asistente de estados en la ventana común: no salta sin nombre; los pasos salen de "Qué hace"; ✓ Crear devuelve el estado', async () => {
+  let res = null;
+  AsistenteEstado.abrir({stats: [{id: 'pdg', label: 'PdG'}], alTerminar: r => { res = r; }});
+  const v = papUltima();
+  const antes = v.tabs();
+  v.ir('Resumen');
+  const aviso = v.q('.pap-aviso').textContent;
+  v.escribir('#ae-nombre', 'Maldición'); v.clic('[data-pol="debuff"]');
+  v.clic('[data-pap="sig"]'); v.clic('[data-hace="hp"]');
+  const despues = v.tabs();
+  v.ir('Vida'); v.clic('[data-hptipo="dano"]'); v.escribir('#ae-hp', '2');
+  v.ir('Resumen');
+  const titulo = v.q('.pap-cab h3').textContent;
+  v.clic('[data-pap="crear"]'); await new Promise(r => setTimeout(r, 0));
+  igual([antes, aviso, despues, titulo, res && res.nombre, res && res.hp, res && res.polaridad, v.mia.isConnected],
+    [['Qué es', 'Qué hace', 'Duración', 'Resumen'], 'Ponele un nombre al estado.', ['Qué es', 'Qué hace', 'Vida', 'Duración', 'Resumen'],
+     'Crear un estado alterado · paso 5 de 5: Resumen', 'Maldición', -2, 'debuff', false]);
+});
+prueba('asistente de trampas en la ventana común: pestañas con nombre, sin nombre no salta, el daño se arma y Cancelar avisa', async () => {
+  let res = null, cancelada = 0;
+  AsistenteTrampa.abrir({contexto: 'mapa', estados: [], alTerminar: r => { res = r; }});
+  const v = papUltima();
+  const tabs = v.tabs();
+  v.ir('Resumen');
+  const aviso = v.q('.pap-aviso').textContent;
+  v.escribir('#at-nombre', 'Foso');
+  v.ir('Daño'); v.marcar('#at-haceDano', true); v.escribir('#at-dados', '3');
+  const vistaDano = v.q('#at-dvista').textContent;
+  v.ir('Resumen');
+  v.clic('[data-pap="crear"]'); await new Promise(r => setTimeout(r, 0));
+  // Editando una ya colocada: Guardar siempre visible; Cancelar sin cambios no pregunta y avisa a quien la abrió.
+  AsistenteTrampa.abrir({contexto: 'mapa', editando: true, inicial: {nombre: 'Red'}, estados: [], alTerminar: () => {}, alCancelar: () => { cancelada++; }});
+  const e = papUltima();
+  const guardarVisible = !!e.q('[data-pap="guardar"]');
+  e.clic('[data-pap="cancelar"]');
+  igual([tabs.length, tabs[0], tabs[3], aviso, vistaDano, res && res.nombre, res && res.dano, v.mia.isConnected, guardarVisible, cancelada, e.mia.isConnected],
+    [11, 'Nombre', 'Daño', 'Ponele un nombre a la trampa.', '3d6', 'Foso', '3d6', false, true, 1, false]);
+});
+prueba('asistente de zonas en la ventana común: sin nombre no llega al resumen; ✓ Crear devuelve la zona', async () => {
+  let res = null;
+  AsistenteZona.abrir({alTerminar: r => { res = r; }});
+  const v = papUltima();
+  const tabs = v.tabs();
+  v.ir('Resumen');
+  const aviso = v.q('.pap-aviso').textContent;
+  v.ir('Nombre'); v.escribir('#az-nombre', 'Nube');
+  v.ir('Resumen'); v.clic('[data-pap="crear"]'); await new Promise(r => setTimeout(r, 0));
+  igual([tabs, aviso, res && res.nombre, res && res.radio, v.mia.isConnected],
+    [['Tamaño', 'Daño', 'Estado', 'Resistencia', 'Cuándo afecta', 'Nombre', 'Resumen'], 'Ponele un nombre a la zona.', 'Nube', 1, false]);
+});
+prueba('cantidades de un estado en la ventana común: una pregunta por paso, valida el número, «Sin límite» y Cancelar = null', async () => {
+  const p1 = EstadoPreguntas.pedir({nombre: 'Escudo', escudoMagico: 5, turnos: 2}, {});
+  const v = papUltima();
+  const tabs = v.tabs();
+  v.clic('[data-pap="sig"]');
+  const aviso = v.q('.pap-aviso').textContent;
+  v.escribir('#ep-valor', '7'); v.clic('[data-pap="sig"]');
+  v.marcar('#ep-sin', true);
+  const bloqueado = v.q('#ep-valor').disabled;
+  v.clic('[data-pap="crear"]');
+  const armado = await p1;
+  const p2 = EstadoPreguntas.pedir({nombre: 'Escudo', escudoMagico: 5, turnos: 2}, {});
+  papUltima().clic('[data-pap="cancelar"]');
+  const nada = await p2;
+  igual([tabs, aviso, bloqueado, armado.escudoMagico, armado.permanente, armado.turnos, nada, v.mia.isConnected],
+    [['HP del escudo', 'Turnos'], 'HP del escudo: Escribí un número.', true, 7, true, 0, null, false]);
 });
 /* ---------- Creeps por mapa (comun/creeps-mapas.js, 2026-10-02: los grupos pasaron a ser mapas) ---------- */
 // Una base de datos de mentira, lo justo para CreepsMapas: colecciones y documentos en memoria.

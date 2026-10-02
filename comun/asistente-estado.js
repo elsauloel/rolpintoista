@@ -57,48 +57,31 @@ const AsistenteEstado = (() => {
     const s = document.createElement('style');
     s.id = 'ae-css';
     s.textContent = `
-#ae-fondo{position:fixed;inset:0;z-index:99980;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;padding:14px}
-#ae-caja{width:min(560px,100%);max-height:calc(100vh - 28px);display:flex;flex-direction:column;background:#1A1418;border:1px solid #C98545;border-radius:6px;
-  box-shadow:0 16px 40px rgba(0,0,0,.7);font-family:"Space Grotesk",system-ui,sans-serif;color:#EDE3D2;text-align:left}
-#ae-caja header{padding:14px 18px 8px}
-#ae-caja .ae-sup{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9A867E}
-#ae-caja .ae-tit{font-size:18px;font-weight:700;color:#E0A458;margin-top:2px}
-#ae-caja .ae-pasos{display:flex;gap:4px;margin-top:8px}
-#ae-caja .ae-pasos i{flex:1;height:4px;border-radius:2px;background:#3B2E34}
-#ae-caja .ae-pasos i.hecho{background:#8A6236}
-#ae-caja .ae-pasos i.ahora{background:#E0A458}
-#ae-caja .ae-cuerpo{padding:6px 18px 10px;overflow:auto}
-#ae-caja .ae-preg{font-size:16px;font-weight:600;margin:10px 0 4px}
-#ae-caja .ae-ayuda{font-size:13px;color:#B7A79E;margin:0 0 10px;line-height:1.4}
-#ae-caja input[type=text],#ae-caja input[type=number],#ae-caja select,#ae-caja textarea{width:100%;box-sizing:border-box;background:rgba(0,0,0,.35);border:1px solid #3B2E34;
+.ae-c .ae-preg{font-size:16px;font-weight:600;margin:10px 0 4px}
+.ae-c .ae-ayuda{font-size:13px;color:#B7A79E;margin:0 0 10px;line-height:1.4}
+.ae-c input[type=text],.ae-c input[type=number],.ae-c select,.ae-c textarea{width:100%;box-sizing:border-box;background:rgba(0,0,0,.35);border:1px solid #3B2E34;
   border-radius:4px;color:#EDE3D2;padding:9px 10px;font:inherit;font-size:15px}
-#ae-caja textarea{min-height:64px;resize:vertical}
-#ae-caja input:focus,#ae-caja select:focus,#ae-caja textarea:focus{outline:2px solid #C98545}
-#ae-caja .ae-op{display:flex;gap:10px;align-items:flex-start;width:100%;box-sizing:border-box;text-align:left;background:rgba(255,255,255,.03);border:1px solid #3B2E34;
+.ae-c textarea{min-height:64px;resize:vertical}
+.ae-c input:focus,.ae-c select:focus,.ae-c textarea:focus{outline:2px solid #C98545}
+.ae-c .ae-op{display:flex;gap:10px;align-items:flex-start;width:100%;box-sizing:border-box;text-align:left;background:rgba(255,255,255,.03);border:1px solid #3B2E34;
   border-radius:6px;padding:10px 12px;margin-bottom:8px;color:#EDE3D2;cursor:pointer;font:inherit}
-#ae-caja .ae-op:hover{border-color:#8A6236}
-#ae-caja .ae-op.on{border-color:#E0A458;background:rgba(224,164,88,.12)}
-#ae-caja .ae-op .ico{font-size:22px;line-height:1.1;flex:none}
-#ae-caja .ae-op b{display:block;font-size:15px}
-#ae-caja .ae-op small{display:block;color:#B7A79E;font-size:12.5px;margin-top:2px;line-height:1.35}
-#ae-caja .ae-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-#ae-caja .ae-grid3 .ae-op{flex-direction:column;align-items:center;text-align:center;margin:0}
-#ae-caja .ae-fila{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-#ae-caja .ae-fila select{flex:1.2}#ae-caja .ae-fila input[type=number]{flex:1;min-width:0}
-#ae-caja .ae-mini{background:#2A2126;border:1px solid #3B2E34;border-radius:4px;color:#EDE3D2;padding:7px 11px;cursor:pointer;font:inherit;font-size:14px}
-#ae-caja .ae-mini:hover{border-color:#C98545}
-#ae-caja .ae-sin{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:14px;cursor:pointer}
-#ae-caja .ae-sin input{width:auto!important;flex:none;margin:0;padding:0}
-#ae-caja .ae-resumen{background:rgba(0,0,0,.3);border:1px solid #3B2E34;border-radius:6px;padding:12px 14px;margin:8px 0;font-size:15px;line-height:1.5}
-#ae-caja .ae-resumen b{color:#E0A458}
-#ae-caja .ae-resumen ul{margin:6px 0 0;padding-left:20px}
-#ae-caja .ae-error{min-height:1.3em;color:#E27B72;font-size:13px;margin:4px 0 0}
-#ae-caja footer{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:10px 18px 14px;border-top:1px solid #2A2126}
-#ae-caja footer .der{display:flex;gap:8px}
-#ae-caja .ae-btn{background:#2A2126;border:1px solid #3B2E34;border-radius:5px;color:#EDE3D2;padding:9px 16px;cursor:pointer;font:inherit;font-size:14px}
-#ae-caja .ae-btn:hover{border-color:#C98545}
-#ae-caja .ae-btn.prim{background:#C98545;border-color:#C98545;color:#1A1418;font-weight:700}
-#ae-caja .ae-link{background:none;border:none;color:#9A867E;text-decoration:underline;cursor:pointer;font:inherit;font-size:13px;padding:4px 0}
+.ae-c .ae-op:hover{border-color:#8A6236}
+.ae-c .ae-op.on{border-color:#E0A458;background:rgba(224,164,88,.12)}
+.ae-c .ae-op .ico{font-size:22px;line-height:1.1;flex:none}
+.ae-c .ae-op b{display:block;font-size:15px}
+.ae-c .ae-op small{display:block;color:#B7A79E;font-size:12.5px;margin-top:2px;line-height:1.35}
+.ae-c .ae-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ae-c .ae-grid3 .ae-op{flex-direction:column;align-items:center;text-align:center;margin:0}
+.ae-c .ae-fila{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.ae-c .ae-fila select{flex:1.2}.ae-c .ae-fila input[type=number]{flex:1;min-width:0}
+.ae-c .ae-mini{background:#2A2126;border:1px solid #3B2E34;border-radius:4px;color:#EDE3D2;padding:7px 11px;cursor:pointer;font:inherit;font-size:14px}
+.ae-c .ae-mini:hover{border-color:#C98545}
+.ae-c .ae-sin{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:14px;cursor:pointer}
+.ae-c .ae-sin input{width:auto!important;flex:none;margin:0;padding:0}
+.ae-c .ae-resumen{background:rgba(0,0,0,.3);border:1px solid #3B2E34;border-radius:6px;padding:12px 14px;margin:8px 0;font-size:15px;line-height:1.5}
+.ae-c .ae-resumen b{color:#E0A458}
+.ae-c .ae-resumen ul{margin:6px 0 0;padding-left:20px}
+.ae-c .ae-link{background:none;border:none;color:#9A867E;text-decoration:underline;cursor:pointer;font:inherit;font-size:13px;padding:4px 0}
 `;
     document.head.appendChild(s);
   }
@@ -181,12 +164,12 @@ const AsistenteEstado = (() => {
       return '';
     }
 
-    const fondo = document.createElement('div');
-    fondo.id = 'ae-fondo';
-    document.body.appendChild(fondo);
-    const cerrar = () => { fondo.remove(); document.removeEventListener('keydown', teclas, true); };
-    const teclas = e => { if(e.key === 'Escape'){ e.stopPropagation(); cerrar(); } };
-    document.addEventListener('keydown', teclas, true);
+    // La ventana es la común (comun/paso-a-paso.js, 2026-10-02): pestañas que saltan hasta donde lo anterior está completo.
+    let api = null;
+    const cerrar = () => { if(api) api.cerrar(); };
+    const NOMBRES = {que: 'Qué es', hace: 'Qué hace', hp: 'Vida', mods: 'Números', escudo: 'Escudo', especial: 'Reglas', dura: 'Duración', resumen: 'Resumen'};
+    // ¿Se puede ir al paso i? Todo lo anterior tiene que estar completo (el problema se muestra arriba del paso).
+    const faltaAntes = i => { const ps = pasos(); for(let k = 0; k < Math.min(i, ps.length); k++){ const p = validar(ps[k]); if(p) return p; } return ''; };
 
     function cuerpoPaso(id){
       if(id === 'que'){
@@ -250,52 +233,19 @@ const AsistenteEstado = (() => {
         ${cfg.alFormulario ? '<div style="margin-top:10px"><button type="button" class="ae-link" data-formulario="1">Prefiero abrir el formulario completo para ajustar más cosas</button></div>' : ''}`;
     }
 
-    function dibujar(){
-      const ps = pasos();
-      const id = ps[est.paso];
-      const ultimo = est.paso === ps.length - 1;
-      fondo.innerHTML = `<div id="ae-caja" role="dialog" aria-modal="true">
-        <header>
-          <div class="ae-sup">Paso ${est.paso + 1} de ${ps.length}${cfg.para ? ' · para ' + esc(cfg.para) : ''}</div>
-          <div class="ae-tit">${esc(cfg.titulo || 'Crear un estado alterado')}</div>
-          <div class="ae-pasos">${ps.map((_, i) => `<i class="${i < est.paso ? 'hecho' : i === est.paso ? 'ahora' : ''}"></i>`).join('')}</div>
-        </header>
-        <div class="ae-cuerpo">${cuerpoPaso(id)}<div class="ae-error">${esc(est.error)}</div></div>
-        <footer>
-          <button type="button" class="ae-btn" data-cancelar="1">Cancelar</button>
-          <div class="der">
-            ${est.paso > 0 ? '<button type="button" class="ae-btn" data-atras="1">◀ Volver</button>' : ''}
-            <button type="button" class="ae-btn prim" data-sigue="1">${ultimo ? '✓ Crear el estado' : 'Siguiente ▶'}</button>
-          </div>
-        </footer>
-      </div>`;
-      const foco = fondo.querySelector('#ae-nombre, #ae-hp, #ae-escudo, #ae-turnos');
-      if(foco) setTimeout(() => { foco.focus(); if(foco.select) foco.select(); }, 30);
+    const dibujar = () => { if(api) api.redibujar(); };
+    function terminar(){
+      const problema = faltaAntes(pasos().length);
+      if(problema){ api.aviso(problema); return false; }
+      const res = resultado();
+      if(cfg.alTerminar) cfg.alTerminar(res);
     }
+    const siguiente = () => api.irA(api.paso() + 1);
 
-    const siguiente = () => {
-      const ps = pasos(), id = ps[est.paso];
-      const problema = validar(id);
-      if(problema){ est.error = problema; dibujar(); return; }
-      est.error = '';
-      if(est.paso === ps.length - 1){
-        const res = resultado();
-        cerrar();
-        if(cfg.alTerminar) cfg.alTerminar(res);
-        return;
-      }
-      est.paso++;
-      dibujar();
-    };
-
-    fondo.addEventListener('mousedown', e => { if(e.target === fondo) cerrar(); });
-    fondo.addEventListener('click', e => {
+    const alClic = e => {
       const b = e.target.closest('button');
       if(!b) return;
       const d = b.dataset;
-      if(d.cancelar){ cerrar(); return; }
-      if(d.atras){ est.error = ''; est.paso = Math.max(0, est.paso - 1); dibujar(); return; }
-      if(d.sigue){ siguiente(); return; }
       if(d.pol){ est.polaridad = d.pol; if(!est.modsTocados) est.mods[0].val = d.pol === 'debuff' ? -1 : 1; est.error = ''; dibujar(); return; }
       if(d.hace){
         // "Solo un recordatorio" no se combina con lo demás.
@@ -308,9 +258,9 @@ const AsistenteEstado = (() => {
       if(d.modmas){ est.mods.push({stat: stats[0].id, val: est.polaridad === 'debuff' ? -1 : 1}); dibujar(); return; }
       if(d.modrm !== undefined){ est.mods.splice(num(d.modrm), 1); dibujar(); return; }
       if(d.formulario && cfg.alFormulario){ const res = resultado(); cerrar(); cfg.alFormulario(res); return; }
-    });
+    };
     // Los campos se guardan al escribir (sin volver a dibujar, para no perder el foco).
-    fondo.addEventListener('input', e => {
+    const alInput = e => {
       const t = e.target;
       if(t.id === 'ae-nombre') est.nombre = t.value;
       else if(t.id === 'ae-detalle') est.detalle = t.value;
@@ -318,17 +268,25 @@ const AsistenteEstado = (() => {
       else if(t.id === 'ae-escudo') est.escudo = t.value === '' ? '' : Math.max(0, Math.round(num(t.value)));
       else if(t.id === 'ae-turnos') est.turnos = t.value === '' ? '' : Math.max(0, Math.round(num(t.value)));
       else if(t.dataset.modval !== undefined){ est.modsTocados = true; est.mods[num(t.dataset.modval)].val = t.value === '' ? 0 : Math.round(num(t.value)); }
-    });
-    fondo.addEventListener('change', e => {
+    };
+    const alCambio = e => {
       const t = e.target;
       if(t.id === 'ae-sin'){ est.sinLimite = t.checked; est.error = ''; dibujar(); }
       else if(t.id === 'ae-guardar') est.guardar = t.checked;
       else if(t.dataset.modstat !== undefined) est.mods[num(t.dataset.modstat)].stat = t.value;
+    };
+    api = PasoAPaso.abrir({
+      titulo: (cfg.titulo || 'Crear un estado alterado') + (cfg.para ? ' · para ' + cfg.para : ''), crear: true, z: 99980,
+      textoCrear: '✓ Crear el estado',
+      pasos: () => pasos().map(id => ({id, nombre: NOMBRES[id] || id, html: () => `<div class="ae-c">${cuerpoPaso(id)}</div>`,
+        alMontar: (c, a) => { const foco = a.raiz.querySelector('#ae-nombre, #ae-hp, #ae-escudo, #ae-turnos'); if(foco) setTimeout(() => { foco.focus(); if(foco.select) foco.select(); }, 30); }})),
+      puedeIr: i => faltaAntes(i),
+      alClic, alInput, alCambio,
+      alTecla: e => { if(e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON'){ e.preventDefault(); if(api.paso() < pasos().length - 1) siguiente(); else if(terminar() !== false) cerrar(); } },
+      confirmarCancelar: () => est.nombre.trim() || est.hace.size ? '¿Cancelar? El estado que estás armando se descarta.' : '',
+      alCrear: () => terminar(),
+      alCancelar: () => { if(cfg.alCancelar) cfg.alCancelar(); },   // se cerró sin crear (lo usa el selector de estados para volver a su grilla)
     });
-    fondo.addEventListener('keydown', e => {
-      if(e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON'){ e.preventDefault(); siguiente(); }
-    });
-    dibujar();
   }
 
   return {abrir, ESPECIALES};

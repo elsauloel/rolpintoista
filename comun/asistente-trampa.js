@@ -22,6 +22,8 @@
    color, daño, estado, zona que deja al dispararse, cuánto dura…) salvo el teleport (su destino se marca con un clic en el mapa)
    y la forma libre (se pinta a mano). `aTrampa(res)` lo pasa a la forma única de comun/plantillas.js (lo que se guarda en
    `trampaColocar` y en el catálogo) e `inicialDe(trampa)` hace el camino inverso; `resumenTexto(trampa)` la describe corta.
+   Desde 2026-10-02 (tanda 5 de docs/plan-paso-a-paso.md) se abre en la ventana común paso a paso (comun/paso-a-paso.js): título
+   con el paso, pestañas con el nombre de cada paso que saltan (hasta donde lo anterior está completo), Atrás/Siguiente.
    ========================================================= */
 const AsistenteTrampa = (() => {
   const num = v => { const n = Number(String(v ?? '').replace(',', '.')); return Number.isFinite(n) ? n : 0; };
@@ -42,46 +44,31 @@ const AsistenteTrampa = (() => {
     const s = document.createElement('style');
     s.id = 'at-css';
     s.textContent = `
-#at-fondo{position:fixed;inset:0;z-index:99985;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;padding:14px}
-#at-caja{width:min(640px,100%);max-height:calc(100vh - 28px);display:flex;flex-direction:column;background:#1A1418;border:1px solid #C98545;border-radius:6px;
-  box-shadow:0 16px 40px rgba(0,0,0,.7);font-family:"Space Grotesk",system-ui,sans-serif;color:#EDE3D2;text-align:left}
-#at-caja header{padding:14px 18px 8px}
-#at-caja .at-sup{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9A867E}
-#at-caja .at-tit{font-size:18px;font-weight:700;color:#E0A458;margin-top:2px}
-#at-caja .at-pasos{display:flex;gap:4px;margin-top:8px}
-#at-caja .at-pasos i{flex:1;height:4px;border-radius:2px;background:#3B2E34}
-#at-caja .at-pasos i.hecho{background:#8A6236}#at-caja .at-pasos i.ahora{background:#E0A458}
-#at-caja .at-cuerpo{padding:6px 18px 10px;overflow:auto}
-#at-caja .at-preg{font-size:16px;font-weight:600;margin:10px 0 4px}
-#at-caja .at-ayuda{font-size:13px;color:#B7A79E;margin:0 0 10px;line-height:1.45}
-#at-caja input[type=text],#at-caja input[type=number],#at-caja select,#at-caja textarea{width:100%;box-sizing:border-box;background:rgba(0,0,0,.35);border:1px solid #3B2E34;
+.at-c .at-preg{font-size:16px;font-weight:600;margin:10px 0 4px}
+.at-c .at-ayuda{font-size:13px;color:#B7A79E;margin:0 0 10px;line-height:1.45}
+.at-c input[type=text],.at-c input[type=number],.at-c select,.at-c textarea{width:100%;box-sizing:border-box;background:rgba(0,0,0,.35);border:1px solid #3B2E34;
   border-radius:4px;color:#EDE3D2;padding:9px 10px;font:inherit;font-size:15px}
-#at-caja textarea{min-height:70px;resize:vertical}
-#at-caja input:focus,#at-caja select:focus,#at-caja textarea:focus{outline:2px solid #C98545}
-#at-caja .at-op{display:flex;gap:10px;align-items:flex-start;width:100%;box-sizing:border-box;text-align:left;background:rgba(255,255,255,.03);border:1px solid #3B2E34;
+.at-c textarea{min-height:70px;resize:vertical}
+.at-c input:focus,.at-c select:focus,.at-c textarea:focus{outline:2px solid #C98545}
+.at-c .at-op{display:flex;gap:10px;align-items:flex-start;width:100%;box-sizing:border-box;text-align:left;background:rgba(255,255,255,.03);border:1px solid #3B2E34;
   border-radius:6px;padding:10px 12px;margin-bottom:8px;color:#EDE3D2;cursor:pointer;font:inherit}
-#at-caja .at-op:hover{border-color:#8A6236}#at-caja .at-op.on{border-color:#E0A458;background:rgba(224,164,88,.12)}
-#at-caja .at-op .ico{font-size:22px;line-height:1.1;flex:none}
-#at-caja .at-op b{display:block;font-size:15px}#at-caja .at-op small{display:block;color:#B7A79E;font-size:12.5px;margin-top:2px;line-height:1.35}
-#at-caja .at-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-#at-caja .at-grid .at-op{margin:0;flex-direction:column;gap:4px}
-#at-caja .at-grid .at-op .cab{display:flex;justify-content:space-between;gap:6px;width:100%;align-items:baseline}
-#at-caja .at-grid .at-op .cab em{font-style:normal;font-size:11px;color:#9A867E;font-family:"Space Mono",monospace;flex:none}
-#at-caja .at-fila{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-#at-caja .at-fila > *{min-width:0}
-#at-caja .at-fila label{font-size:13px;color:#B7A79E;flex:none}
-#at-caja .at-colores{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
-#at-caja .at-color{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0}
-#at-caja .at-color.on{border-color:#EDE3D2}
-#at-caja .at-sin{display:flex;gap:8px;align-items:flex-start;margin:10px 0;font-size:14px;cursor:pointer;line-height:1.35}
-#at-caja .at-sin input{width:auto!important;flex:none;margin:3px 0 0;padding:0}
-#at-caja .at-resumen{background:rgba(0,0,0,.3);border:1px solid #3B2E34;border-radius:6px;padding:12px 14px;margin:8px 0;font-size:15px;line-height:1.5}
-#at-caja .at-resumen b{color:#E0A458}#at-caja .at-resumen ul{margin:6px 0 0;padding-left:20px}
-#at-caja .at-error{min-height:1.3em;color:#E27B72;font-size:13px;margin:4px 0 0}
-#at-caja footer{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:10px 18px 14px;border-top:1px solid #2A2126}
-#at-caja footer .der{display:flex;gap:8px}
-#at-caja .at-btn{background:#2A2126;border:1px solid #3B2E34;border-radius:5px;color:#EDE3D2;padding:9px 16px;cursor:pointer;font:inherit;font-size:14px}
-#at-caja .at-btn:hover{border-color:#C98545}#at-caja .at-btn.prim{background:#C98545;border-color:#C98545;color:#1A1418;font-weight:700}
+.at-c .at-op:hover{border-color:#8A6236}.at-c .at-op.on{border-color:#E0A458;background:rgba(224,164,88,.12)}
+.at-c .at-op .ico{font-size:22px;line-height:1.1;flex:none}
+.at-c .at-op b{display:block;font-size:15px}.at-c .at-op small{display:block;color:#B7A79E;font-size:12.5px;margin-top:2px;line-height:1.35}
+.at-c .at-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+.at-c .at-grid .at-op{margin:0;flex-direction:column;gap:4px}
+.at-c .at-grid .at-op .cab{display:flex;justify-content:space-between;gap:6px;width:100%;align-items:baseline}
+.at-c .at-grid .at-op .cab em{font-style:normal;font-size:11px;color:#9A867E;font-family:"Space Mono",monospace;flex:none}
+.at-c .at-fila{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.at-c .at-fila > *{min-width:0}
+.at-c .at-fila label{font-size:13px;color:#B7A79E;flex:none}
+.at-c .at-colores{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.at-c .at-color{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0}
+.at-c .at-color.on{border-color:#EDE3D2}
+.at-c .at-sin{display:flex;gap:8px;align-items:flex-start;margin:10px 0;font-size:14px;cursor:pointer;line-height:1.35}
+.at-c .at-sin input{width:auto!important;flex:none;margin:3px 0 0;padding:0}
+.at-c .at-resumen{background:rgba(0,0,0,.3);border:1px solid #3B2E34;border-radius:6px;padding:12px 14px;margin:8px 0;font-size:15px;line-height:1.5}
+.at-c .at-resumen b{color:#E0A458}.at-c .at-resumen ul{margin:6px 0 0;padding-left:20px}
 `;
     document.head.appendChild(s);
   }
@@ -97,7 +84,7 @@ const AsistenteTrampa = (() => {
     // "2d6+1" → {dados, caras, fijo}
     const m = /^(\d+)d(\d+)([+-]\d+)?$/.exec(String(ini.dano || '').trim());
     const est = {
-      paso: 0, error: '',
+      error: '',
       nombre: ini.nombre || '', descripcion: ini.descripcion || '',
       radio: Math.max(0, Math.min(6, num(ini.radio))), cant: Math.max(1, Math.min(6, num(ini.cant) || 1)), largo: Math.max(1, Math.min(20, num(ini.largo) || 3)),
       forma: ini.forma || 'flor', color: ini.color || colores[0], alfa: Number.isFinite(ini.alfa) ? ini.alfa : 45,
@@ -158,12 +145,13 @@ const AsistenteTrampa = (() => {
       return '';
     }
 
-    const fondo = document.createElement('div');
-    fondo.id = 'at-fondo';
-    document.body.appendChild(fondo);
-    const teclas = e => { if(e.key === 'Escape'){ e.stopPropagation(); cerrar(); } };
-    const cerrar = fin => { fondo.remove(); document.removeEventListener("keydown", teclas, true); if(fin !== true && cfg.alCancelar) cfg.alCancelar(); };
-    document.addEventListener('keydown', teclas, true);
+    // La ventana es la común (comun/paso-a-paso.js, 2026-10-02): pestañas que saltan hasta donde lo anterior está completo.
+    let api = null;
+    const NOMBRES = {nombre: 'Nombre', superficie: deHab ? 'Forma' : 'Superficie', quien: 'A quién', dano: 'Daño', estado: 'Estado', persistente: 'Zona',
+      teleport: 'Teleport', evita: 'Se evita', detecta: 'Detectarla', dura: 'Duración', resumen: 'Resumen'};
+    // ¿Se puede ir al paso i? Todo lo anterior tiene que estar completo (el problema se muestra arriba del paso).
+    const faltaAntes = i => { for(let k = 0; k < Math.min(i, PASOS.length); k++){ const p = validar(PASOS[k]); if(p) return p; } return ''; };
+    const vista = () => api && api.raiz.querySelector('#at-dvista');
 
     function cuerpo(id){
       if(id === 'nombre'){
@@ -279,18 +267,7 @@ const AsistenteTrampa = (() => {
         ${editando || deHab ? '' : '<label class="at-sin"><input type="checkbox" id="at-guardar"' + (est.guardar ? ' checked' : '') + '> ⭐ Guardarla también como recurrente para usarla de nuevo</label>'}`;
     }
 
-    function dibujar(){
-      const id = PASOS[est.paso], ultimo = est.paso === PASOS.length - 1;
-      fondo.innerHTML = `<div id="at-caja" role="dialog" aria-modal="true">
-        <header><div class="at-sup">Paso ${est.paso + 1} de ${PASOS.length}</div><div class="at-tit">${editando ? 'Editar la trampa' : 'Crear una trampa'}</div>
-          <div class="at-pasos">${PASOS.map((_, i) => `<i class="${i < est.paso ? 'hecho' : i === est.paso ? 'ahora' : ''}"></i>`).join('')}</div></header>
-        <div class="at-cuerpo">${cuerpo(id)}<div class="at-error">${esc(est.error)}</div></div>
-        <footer><button type="button" class="at-btn" data-cancelar="1">Cancelar</button>
-          <div class="der">${est.paso > 0 ? '<button type="button" class="at-btn" data-atras="1">◀ Volver</button>' : ''}
-            <button type="button" class="at-btn prim" data-sigue="1">${ultimo ? (editando ? '✓ Guardar cambios' : '✓ Crear la trampa') : 'Siguiente ▶'}</button></div></footer></div>`;
-      const foco = fondo.querySelector('#at-nombre, #at-dados, #at-turnos');
-      if(foco) setTimeout(() => { foco.focus(); if(foco.select) foco.select(); }, 30);
-    }
+    const dibujar = () => { if(api) api.redibujar(); };
 
     const resultado = () => ({
       nombre: est.nombre.trim(), descripcion: est.descripcion.trim(), forma: est.forma, color: est.color, alfa: est.alfa, amiga: est.amiga,
@@ -306,21 +283,18 @@ const AsistenteTrampa = (() => {
       ...(deHab ? {detectarStat: est.detectarStat} : {detectar: est.detectar}),
     });
 
-    const siguiente = () => {
-      const p = validar(PASOS[est.paso]);
-      if(p){ est.error = p; dibujar(); return; }
-      est.error = '';
-      if(est.paso === PASOS.length - 1){ const r = resultado(); cerrar(true); if(cfg.alTerminar) cfg.alTerminar(r); return; }
-      est.paso++; dibujar();
-    };
+    // Terminar (el «✓» del último paso): todo completo → el resultado (la ventana se cierra sola); si falta algo, avisa y sigue abierta.
+    function terminar(){
+      const problema = faltaAntes(PASOS.length);
+      if(problema){ api.aviso(problema); return false; }
+      const r = resultado();
+      if(cfg.alTerminar) cfg.alTerminar(r);
+    }
+    const siguiente = () => api.irA(api.paso() + 1);
 
-    fondo.addEventListener('mousedown', e => { if(e.target === fondo) cerrar(); });
-    fondo.addEventListener('click', e => {
+    const alClic = e => {
       const b = e.target.closest('button'); if(!b) return;
       const d = b.dataset;
-      if(d.cancelar){ cerrar(); return; }
-      if(d.atras){ est.error = ''; est.paso = Math.max(0, est.paso - 1); dibujar(); return; }
-      if(d.sigue){ siguiente(); return; }
       if(d.forma){ est.forma = d.forma; dibujar(); return; }
       if(d.color){ est.color = d.color; dibujar(); return; }
       if(d.amiga !== undefined){ est.amiga = d.amiga === '1'; dibujar(); return; }
@@ -328,8 +302,9 @@ const AsistenteTrampa = (() => {
       if(d.estado){ est.estado = d.estado; est.estadoTurnos = 0; est.error = ''; dibujar(); return; }
       if(d.zonaEnMant !== undefined){ est.zonaEnMant = d.zonaEnMant === '1'; dibujar(); return; }
       if(d.zonaCadaPaso !== undefined){ est.zonaCadaPaso = d.zonaCadaPaso === '1'; dibujar(); return; }
-    });
-    fondo.addEventListener('input', e => {
+    };
+    // Los campos se guardan al escribir (sin volver a dibujar, para no perder el foco).
+    const alInput = e => {
       const t = e.target;
       if(t.id === 'at-nombre') est.nombre = t.value;
       else if(t.id === 'at-desc') est.descripcion = t.value;
@@ -337,19 +312,19 @@ const AsistenteTrampa = (() => {
       else if(t.id === 'at-radio') est.radio = Math.max(0, Math.min(6, Math.round(num(t.value))));
       else if(t.id === 'at-cant') est.cant = Math.max(1, Math.min(6, Math.round(num(t.value)) || 1));
       else if(t.id === 'at-largo') est.largo = Math.max(1, Math.min(20, Math.round(num(t.value)) || 1));
-      else if(t.id === 'at-dados'){ est.dados = Math.max(0, Math.round(num(t.value))); const v = fondo.querySelector('#at-dvista'); if(v) v.textContent = danoTxt(); }
-      else if(t.id === 'at-fijo'){ est.fijo = Math.round(num(t.value)); const v = fondo.querySelector('#at-dvista'); if(v) v.textContent = danoTxt(); }
+      else if(t.id === 'at-dados'){ est.dados = Math.max(0, Math.round(num(t.value))); const v = vista(); if(v) v.textContent = danoTxt(); }
+      else if(t.id === 'at-fijo'){ est.fijo = Math.round(num(t.value)); const v = vista(); if(v) v.textContent = danoTxt(); }
       else if(t.id === 'at-estadoTurnos') est.estadoTurnos = Math.max(0, Math.round(num(t.value)));
       else if(t.id === 'at-salDif') est.salDif = Math.round(num(t.value));
       else if(t.id === 'at-turnos') est.turnos = Math.max(0, Math.round(num(t.value)));
       else if(t.id === 'at-zonaTurnos') est.zonaTurnos = Math.max(0, Math.round(num(t.value)));
       else if(t.id === 'at-zonaResistValor') est.zonaResistValor = Math.round(num(t.value));
       else if(t.id === 'at-detectar') est.detectar = Math.max(0, Math.round(num(t.value)));
-    });
-    fondo.addEventListener('change', e => {
+    };
+    const alCambio = e => {
       const t = e.target;
       if(t.id === 'at-haceDano'){ est.haceDano = t.checked; est.error = ''; dibujar(); }
-      else if(t.id === 'at-caras'){ est.caras = num(t.value); const v = fondo.querySelector('#at-dvista'); if(v) v.textContent = danoTxt(); }
+      else if(t.id === 'at-caras'){ est.caras = num(t.value); const v = vista(); if(v) v.textContent = danoTxt(); }
       else if(t.id === 'at-armadura') est.contemplaArmadura = t.checked;
       else if(t.id === 'at-teleport'){ est.teleport = t.checked; }
       else if(t.id === 'at-seEvita'){ est.seEvita = t.checked; est.error = ''; dibujar(); }
@@ -360,11 +335,20 @@ const AsistenteTrampa = (() => {
       else if(t.id === 'at-zonaSeResiste'){ est.zonaSeResiste = t.checked; dibujar(); }
       else if(t.id === 'at-zonaResistStat') est.zonaResistStat = t.value;
       else if(t.name === 'at-detectarStat') est.detectarStat = t.value === 'dmgesp' ? 'dmgesp' : 'des';
+    };
+    const inicial = JSON.stringify(est);
+    api = PasoAPaso.abrir({
+      titulo: editando ? 'Editar la trampa' : deHab ? 'Trampa de la habilidad' : 'Crear una trampa', crear: !editando, z: 99985,
+      textoCrear: '✓ Crear la trampa', textoGuardar: '✓ Guardar cambios',
+      pasos: () => PASOS.map(id => ({id, nombre: NOMBRES[id] || id, html: () => `<div class="at-c">${cuerpo(id)}</div>`,
+        alMontar: (c, a) => { const foco = a.raiz.querySelector('#at-nombre, #at-dados, #at-turnos'); if(foco) setTimeout(() => { foco.focus(); if(foco.select) foco.select(); }, 30); }})),
+      puedeIr: i => faltaAntes(i),
+      alClic, alInput, alCambio,
+      alTecla: e => { if(e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON'){ e.preventDefault(); if(api.paso() < PASOS.length - 1) siguiente(); else if(terminar() !== false) api.cerrar(); } },
+      confirmarCancelar: () => JSON.stringify(est) === inicial ? '' : editando ? '¿Descartar los cambios de esta trampa?' : '¿Cancelar? La trampa que estás armando se descarta.',
+      alCrear: () => terminar(), alGuardar: () => terminar(),
+      alCancelar: () => { if(cfg.alCancelar) cfg.alCancelar(); },
     });
-    fondo.addEventListener('keydown', e => {
-      if(e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON'){ e.preventDefault(); siguiente(); }
-    });
-    dibujar();
   }
 
   // Texto que se guarda en la trampa (≤ 200 caracteres, el tope del mapa): la descripción que escribió quien la armó o, si la dejó vacía,

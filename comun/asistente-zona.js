@@ -13,6 +13,8 @@
      });
    res = {nombre, color, alfa, radio, turnos, dano ('' o '2d6+1'), tipoDano, ignoraDef, estado: {nombre, turnos, stacks?} | null,
           resistStat ('' o el id de un stat), resistValor, enMantenimiento, cadaPaso, amiga}
+   Desde 2026-10-02 (tanda 5 de docs/plan-paso-a-paso.md) se abre en la ventana común paso a paso (comun/paso-a-paso.js), con la
+   paleta de todos (antes era verde): título con el paso, pestañas que saltan, Atrás/Siguiente.
    ========================================================= */
 const AsistenteZona = (() => {
   const num = v => { const n = Number(String(v ?? '').replace(',', '.')); return Number.isFinite(n) ? n : 0; };
@@ -26,45 +28,30 @@ const AsistenteZona = (() => {
     const s = document.createElement('style');
     s.id = 'az-css';
     s.textContent = `
-#az-fondo{position:fixed;inset:0;z-index:99985;background:rgba(0,0,0,.62);display:flex;align-items:center;justify-content:center;padding:14px}
-#az-caja{width:min(640px,100%);max-height:calc(100vh - 28px);display:flex;flex-direction:column;background:#1A1418;border:1px solid #4C9A2A;border-radius:6px;
-  box-shadow:0 16px 40px rgba(0,0,0,.7);font-family:"Space Grotesk",system-ui,sans-serif;color:#EDE3D2;text-align:left}
-#az-caja header{padding:14px 18px 8px}
-#az-caja .az-sup{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#9A867E}
-#az-caja .az-tit{font-size:18px;font-weight:700;color:#7BC24A;margin-top:2px}
-#az-caja .az-pasos{display:flex;gap:4px;margin-top:8px}
-#az-caja .az-pasos i{flex:1;height:4px;border-radius:2px;background:#3B2E34}
-#az-caja .az-pasos i.hecho{background:#3E6B2A}#az-caja .az-pasos i.ahora{background:#7BC24A}
-#az-caja .az-cuerpo{padding:6px 18px 10px;overflow:auto}
-#az-caja .az-preg{font-size:16px;font-weight:600;margin:10px 0 4px}
-#az-caja .az-ayuda{font-size:13px;color:#B7A79E;margin:0 0 10px;line-height:1.45}
-#az-caja input[type=text],#az-caja input[type=number],#az-caja select{width:100%;box-sizing:border-box;background:rgba(0,0,0,.35);border:1px solid #3B2E34;
+.az-c .az-preg{font-size:16px;font-weight:600;margin:10px 0 4px}
+.az-c .az-ayuda{font-size:13px;color:#B7A79E;margin:0 0 10px;line-height:1.45}
+.az-c input[type=text],.az-c input[type=number],.az-c select{width:100%;box-sizing:border-box;background:rgba(0,0,0,.35);border:1px solid #3B2E34;
   border-radius:4px;color:#EDE3D2;padding:9px 10px;font:inherit;font-size:15px}
-#az-caja input:focus,#az-caja select:focus{outline:2px solid #4C9A2A}
-#az-caja .az-op{display:flex;gap:10px;align-items:flex-start;width:100%;box-sizing:border-box;text-align:left;background:rgba(255,255,255,.03);border:1px solid #3B2E34;
+.az-c input:focus,.az-c select:focus{outline:2px solid #C98545}
+.az-c .az-op{display:flex;gap:10px;align-items:flex-start;width:100%;box-sizing:border-box;text-align:left;background:rgba(255,255,255,.03);border:1px solid #3B2E34;
   border-radius:6px;padding:10px 12px;margin-bottom:8px;color:#EDE3D2;cursor:pointer;font:inherit}
-#az-caja .az-op:hover{border-color:#3E6B2A}#az-caja .az-op.on{border-color:#7BC24A;background:rgba(123,194,74,.12)}
-#az-caja .az-op .ico{font-size:22px;line-height:1.1;flex:none}
-#az-caja .az-op b{display:block;font-size:15px}#az-caja .az-op small{display:block;color:#B7A79E;font-size:12.5px;margin-top:2px;line-height:1.35}
-#az-caja .az-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-#az-caja .az-grid .az-op{margin:0;flex-direction:column;gap:4px}
-#az-caja .az-grid .az-op .cab{display:flex;justify-content:space-between;gap:6px;width:100%;align-items:baseline}
-#az-caja .az-grid .az-op .cab em{font-style:normal;font-size:11px;color:#9A867E;font-family:"Space Mono",monospace;flex:none}
-#az-caja .az-fila{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-#az-caja .az-fila > *{min-width:0}
-#az-caja .az-fila label{font-size:13px;color:#B7A79E;flex:none}
-#az-caja .az-colores{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
-#az-caja .az-color{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0}
-#az-caja .az-color.on{border-color:#EDE3D2}
-#az-caja .az-sin{display:flex;gap:8px;align-items:flex-start;margin:10px 0;font-size:14px;cursor:pointer;line-height:1.35}
-#az-caja .az-sin input{width:auto!important;flex:none;margin:3px 0 0;padding:0}
-#az-caja .az-resumen{background:rgba(0,0,0,.3);border:1px solid #3B2E34;border-radius:6px;padding:12px 14px;margin:8px 0;font-size:15px;line-height:1.5}
-#az-caja .az-resumen b{color:#7BC24A}#az-caja .az-resumen ul{margin:6px 0 0;padding-left:20px}
-#az-caja .az-error{min-height:1.3em;color:#E27B72;font-size:13px;margin:4px 0 0}
-#az-caja footer{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:10px 18px 14px;border-top:1px solid #2A2126}
-#az-caja footer .der{display:flex;gap:8px}
-#az-caja .az-btn{background:#2A2126;border:1px solid #3B2E34;border-radius:5px;color:#EDE3D2;padding:9px 16px;cursor:pointer;font:inherit;font-size:14px}
-#az-caja .az-btn:hover{border-color:#4C9A2A}#az-caja .az-btn.prim{background:#4C9A2A;border-color:#4C9A2A;color:#0F1A0A;font-weight:700}
+.az-c .az-op:hover{border-color:#8A6236}.az-c .az-op.on{border-color:#E0A458;background:rgba(224,164,88,.12)}
+.az-c .az-op .ico{font-size:22px;line-height:1.1;flex:none}
+.az-c .az-op b{display:block;font-size:15px}.az-c .az-op small{display:block;color:#B7A79E;font-size:12.5px;margin-top:2px;line-height:1.35}
+.az-c .az-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.az-c .az-grid .az-op{margin:0;flex-direction:column;gap:4px}
+.az-c .az-grid .az-op .cab{display:flex;justify-content:space-between;gap:6px;width:100%;align-items:baseline}
+.az-c .az-grid .az-op .cab em{font-style:normal;font-size:11px;color:#9A867E;font-family:"Space Mono",monospace;flex:none}
+.az-c .az-fila{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.az-c .az-fila > *{min-width:0}
+.az-c .az-fila label{font-size:13px;color:#B7A79E;flex:none}
+.az-c .az-colores{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.az-c .az-color{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0}
+.az-c .az-color.on{border-color:#EDE3D2}
+.az-c .az-sin{display:flex;gap:8px;align-items:flex-start;margin:10px 0;font-size:14px;cursor:pointer;line-height:1.35}
+.az-c .az-sin input{width:auto!important;flex:none;margin:3px 0 0;padding:0}
+.az-c .az-resumen{background:rgba(0,0,0,.3);border:1px solid #3B2E34;border-radius:6px;padding:12px 14px;margin:8px 0;font-size:15px;line-height:1.5}
+.az-c .az-resumen b{color:#E0A458}.az-c .az-resumen ul{margin:6px 0 0;padding-left:20px}
 `;
     document.head.appendChild(s);
   }
@@ -74,7 +61,7 @@ const AsistenteZona = (() => {
     estilos();
     const colores = cfg.colores && cfg.colores.length ? cfg.colores : ['#4C9A2A', '#D9531E', '#3F6FB0', '#D07B3A', '#C4485A', '#9B7BD4'];
     const est = {
-      paso: 0, error: '',
+      error: '',
       radio: 1, turnos: 3,
       haceDano: false, dados: 2, caras: 6, fijo: 0, tipoDano: 'arcano', ignoraDef: true,
       aplicaEstado: false, estado: '', estadoTurnos: 0, estadoStacks: 0,
@@ -113,12 +100,12 @@ const AsistenteZona = (() => {
       return '';
     }
 
-    const fondo = document.createElement('div');
-    fondo.id = 'az-fondo';
-    document.body.appendChild(fondo);
-    const teclas = e => { if(e.key === 'Escape'){ e.stopPropagation(); cerrar(); } };
-    const cerrar = fin => { fondo.remove(); document.removeEventListener('keydown', teclas, true); if(fin !== true && cfg.alCancelar) cfg.alCancelar(); };
-    document.addEventListener('keydown', teclas, true);
+    // La ventana es la común (comun/paso-a-paso.js, 2026-10-02): pestañas que saltan hasta donde lo anterior está completo.
+    let api = null;
+    const NOMBRES = {tamano: 'Tamaño', dano: 'Daño', estado: 'Estado', resistencia: 'Resistencia', disparo: 'Cuándo afecta', nombre: 'Nombre', resumen: 'Resumen'};
+    // ¿Se puede ir al paso i? Todo lo anterior tiene que estar completo (el problema se muestra arriba del paso).
+    const faltaAntes = i => { for(let k = 0; k < Math.min(i, PASOS.length); k++){ const p = validar(PASOS[k]); if(p) return p; } return ''; };
+    const vista = () => api && api.raiz.querySelector('#az-dvista');
 
     function cuerpo(id){
       if(id === 'tamano'){
@@ -135,7 +122,7 @@ const AsistenteZona = (() => {
           ${est.haceDano ? `<div class="az-preg">¿Cuánto?</div>
             <div class="az-fila"><input type="number" id="az-dados" min="1" max="20" value="${esc(est.dados)}" style="width:70px"><label>d</label>
               <select id="az-caras" style="width:90px">${[4, 6, 8, 10, 12, 20].map(c => `<option value="${c}"${est.caras === c ? ' selected' : ''}>${c}</option>`).join('')}</select>
-              <label>+</label><input type="number" id="az-fijo" value="${esc(est.fijo)}" style="width:80px"><label>= <b id="az-dvista" style="color:#7BC24A">${esc(danoTxt())}</b></label></div>
+              <label>+</label><input type="number" id="az-fijo" value="${esc(est.fijo)}" style="width:80px"><label>= <b id="az-dvista" style="color:#E0A458">${esc(danoTxt())}</b></label></div>
             <div class="az-preg">Tipo</div>
             <select id="az-tipodano">${TIPOS.map(([v, t]) => `<option value="${v}"${est.tipoDano === v ? ' selected' : ''}>${t}</option>`).join('')}</select>
             <label class="az-sin" style="margin-top:8px"><input type="checkbox" id="az-ignoradef"${est.ignoraDef ? ' checked' : ''}> <span><b>Ignora la Defensa</b><br><small style="color:#B7A79E">Arranca marcado o no según el tipo (mágico = sí, físico = no), pero se puede cambiar: lo que decide no es el elemento, es cómo se narra.</small></span></label>` : ''}`;
@@ -183,18 +170,7 @@ const AsistenteZona = (() => {
         <p class="az-ayuda">Al confirmar te queda lista: <b>hacé clic en el mapa</b> para marcar el centro.</p>`;
     }
 
-    function dibujar(){
-      const id = PASOS[est.paso], ultimo = est.paso === PASOS.length - 1;
-      fondo.innerHTML = `<div id="az-caja" role="dialog" aria-modal="true">
-        <header><div class="az-sup">Paso ${est.paso + 1} de ${PASOS.length}</div><div class="az-tit">🌫 Crear una zona con efecto persistente</div>
-          <div class="az-pasos">${PASOS.map((_, i) => `<i class="${i < est.paso ? 'hecho' : i === est.paso ? 'ahora' : ''}"></i>`).join('')}</div></header>
-        <div class="az-cuerpo">${cuerpo(id)}<div class="az-error">${esc(est.error)}</div></div>
-        <footer><button type="button" class="az-btn" data-cancelar="1">Cancelar</button>
-          <div class="der">${est.paso > 0 ? '<button type="button" class="az-btn" data-atras="1">◀ Volver</button>' : ''}
-            <button type="button" class="az-btn prim" data-sigue="1">${ultimo ? '✓ Crear la zona' : 'Siguiente ▶'}</button></div></footer></div>`;
-      const foco = fondo.querySelector('#az-radio, #az-nombre');
-      if(foco) setTimeout(() => { foco.focus(); if(foco.select) foco.select(); }, 30);
-    }
+    const dibujar = () => { if(api) api.redibujar(); };
 
     // Estado: si es Veneno/Veneno severo y no se puso una cantidad de stacks a mano, no se manda `turnos` —
     // que lo complete el preset solo (Veneno sin stacks propios: 4 stacks, 4 turnos). Si se manda `turnos` fijo
@@ -215,53 +191,60 @@ const AsistenteZona = (() => {
       enMantenimiento: est.enMantenimiento, cadaPaso: est.cadaPaso, amiga: est.amiga,
     });
 
-    const siguiente = () => {
-      const p = validar(PASOS[est.paso]);
-      if(p){ est.error = p; dibujar(); return; }
-      est.error = '';
-      if(est.paso === PASOS.length - 1){ const r = resultado(); cerrar(true); if(cfg.alTerminar) cfg.alTerminar(r); return; }
-      est.paso++; dibujar();
-    };
+    // Terminar (el «✓» del último paso): todo completo → el resultado (la ventana se cierra sola); si falta algo, avisa y sigue abierta.
+    function terminar(){
+      const problema = faltaAntes(PASOS.length);
+      if(problema){ api.aviso(problema); return false; }
+      const r = resultado();
+      if(cfg.alTerminar) cfg.alTerminar(r);
+    }
+    const siguiente = () => api.irA(api.paso() + 1);
 
-    fondo.addEventListener('mousedown', e => { if(e.target === fondo) cerrar(); });
-    fondo.addEventListener('click', e => {
+    const alClic = e => {
       const b = e.target.closest('button'); if(!b) return;
       const d = b.dataset;
-      if(d.cancelar){ cerrar(); return; }
-      if(d.atras){ est.error = ''; est.paso = Math.max(0, est.paso - 1); dibujar(); return; }
-      if(d.sigue){ siguiente(); return; }
       if(d.color){ est.color = d.color; dibujar(); return; }
       if(d.aplica !== undefined){ est.aplicaEstado = d.aplica === '1'; if(!est.aplicaEstado) est.estado = ''; est.error = ''; dibujar(); return; }
       if(d.estado){ est.estado = d.estado; est.estadoTurnos = 0; est.estadoStacks = 0; est.error = ''; dibujar(); return; }
       if(d.mant !== undefined){ est.enMantenimiento = d.mant === '1'; dibujar(); return; }
       if(d.paso !== undefined){ est.cadaPaso = d.paso === '1'; dibujar(); return; }
-    });
-    fondo.addEventListener('input', e => {
+    };
+    // Los campos se guardan al escribir (sin volver a dibujar, para no perder el foco).
+    const alInput = e => {
       const t = e.target;
       if(t.id === 'az-radio') est.radio = Math.max(1, Math.min(6, Math.round(num(t.value)) || 1));
       else if(t.id === 'az-turnos') est.turnos = Math.max(1, Math.min(99, Math.round(num(t.value)) || 1));
-      else if(t.id === 'az-dados'){ est.dados = Math.max(0, Math.round(num(t.value))); const v = fondo.querySelector('#az-dvista'); if(v) v.textContent = danoTxt(); }
-      else if(t.id === 'az-fijo'){ est.fijo = Math.round(num(t.value)); const v = fondo.querySelector('#az-dvista'); if(v) v.textContent = danoTxt(); }
+      else if(t.id === 'az-dados'){ est.dados = Math.max(0, Math.round(num(t.value))); const v = vista(); if(v) v.textContent = danoTxt(); }
+      else if(t.id === 'az-fijo'){ est.fijo = Math.round(num(t.value)); const v = vista(); if(v) v.textContent = danoTxt(); }
       else if(t.id === 'az-estadoturnos') est.estadoTurnos = Math.max(0, Math.round(num(t.value)));
       else if(t.id === 'az-estadostacks') est.estadoStacks = Math.max(0, Math.round(num(t.value)));
       else if(t.id === 'az-resistvalor') est.resistValor = Math.round(num(t.value));
       else if(t.id === 'az-alfa') est.alfa = Math.round(num(t.value));
       else if(t.id === 'az-nombre') est.nombre = t.value;
-    });
-    fondo.addEventListener('change', e => {
+    };
+    const alCambio = e => {
       const t = e.target;
       if(t.id === 'az-haceDano'){ est.haceDano = t.checked; est.error = ''; dibujar(); }
-      else if(t.id === 'az-caras'){ est.caras = num(t.value); const v = fondo.querySelector('#az-dvista'); if(v) v.textContent = danoTxt(); }
+      else if(t.id === 'az-caras'){ est.caras = num(t.value); const v = vista(); if(v) v.textContent = danoTxt(); }
       else if(t.id === 'az-tipodano'){ est.tipoDano = t.value; est.ignoraDef = est.tipoDano !== 'fisico'; dibujar(); }
       else if(t.id === 'az-ignoradef') est.ignoraDef = t.checked;
       else if(t.id === 'az-seresiste'){ est.seResiste = t.checked; est.error = ''; dibujar(); }
       else if(t.id === 'az-resiststat') est.resistStat = t.value;
       else if(t.id === 'az-amiga') est.amiga = t.checked;
+    };
+    const inicial = JSON.stringify(est);
+    api = PasoAPaso.abrir({
+      titulo: '🌫 Crear una zona con efecto persistente', crear: true, z: 99985,
+      textoCrear: '✓ Crear la zona',
+      pasos: () => PASOS.map(id => ({id, nombre: NOMBRES[id] || id, html: () => `<div class="az-c">${cuerpo(id)}</div>`,
+        alMontar: (c, a) => { const foco = a.raiz.querySelector('#az-radio, #az-nombre'); if(foco) setTimeout(() => { foco.focus(); if(foco.select) foco.select(); }, 30); }})),
+      puedeIr: i => faltaAntes(i),
+      alClic, alInput, alCambio,
+      alTecla: e => { if(e.key === 'Enter' && e.target.tagName !== 'BUTTON'){ e.preventDefault(); if(api.paso() < PASOS.length - 1) siguiente(); else if(terminar() !== false) api.cerrar(); } },
+      confirmarCancelar: () => JSON.stringify(est) === inicial ? '' : '¿Cancelar? La zona que estás armando se descarta.',
+      alCrear: () => terminar(),
+      alCancelar: () => { if(cfg.alCancelar) cfg.alCancelar(); },
     });
-    fondo.addEventListener('keydown', e => {
-      if(e.key === 'Enter' && e.target.tagName !== 'BUTTON'){ e.preventDefault(); siguiente(); }
-    });
-    dibujar();
   }
 
   return {abrir};

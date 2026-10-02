@@ -1777,7 +1777,7 @@ const Duelo = (() => {
   // Adentro de un iframe del mapa: le cuenta si hay algún cartelito abierto (Nitros, sobrepeso…) que el jugador tiene que ver, o si ya puede esconderse.
   function avisarMapaUi(){
     if(!enIframe()) return;
-    const abiertoUi = !!document.querySelector('.scrim.open, #ep-fondo, #ae-fondo, #ct-fondo');
+    const abiertoUi = !!document.querySelector('.scrim.open, .pap-fondo, #ct-fondo');
     window.parent.postMessage({tipo: abiertoUi ? 'duelo-ui-visible' : 'botonera-cerrada'}, location.origin);
   }
 

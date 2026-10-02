@@ -9,6 +9,8 @@
    `cfg.hp` es el nombre del campo de HP por turno del preset (la ficha usa `hpturno`, gm-tools `hpTurno`) y `cfg.statLabel`
    traduce el id de un stat a su nombre. Devuelve una copia del preset con las respuestas puestas; si no hay nada que preguntar,
    devuelve el preset tal cual. `EstadoPreguntas.chips(preset, cfg)` da lo que se va a preguntar, para mostrar en la tarjeta.
+   Desde 2026-10-02 (tanda 5 de docs/plan-paso-a-paso.md) las preguntas se hacen en la ventana común paso a paso
+   (comun/paso-a-paso.js): una pregunta por paso, con su pestaña («HP del escudo», «Turnos»…) y «✔ Listo» en el último.
    ========================================================= */
 const EstadoPreguntas = (() => {
   const num = v => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
@@ -71,24 +73,11 @@ const EstadoPreguntas = (() => {
     const s = document.createElement('style');
     s.id = 'estado-preguntas-css';
     s.textContent = `
-#ep-fondo{position:fixed;inset:0;z-index:99990;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px}
-#ep-caja{width:min(360px,100%);background:#1A1418;border:1px solid #C98545;border-radius:6px;box-shadow:0 16px 40px rgba(0,0,0,.7);
-  padding:16px 18px;font-family:"Space Grotesk",system-ui,sans-serif;color:#EDE3D2;text-align:left}
-#ep-caja .ep-titulo{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#9A867E;margin-bottom:2px}
-#ep-caja .ep-estado{font-size:17px;font-weight:700;color:#E0A458;margin-bottom:12px}
-#ep-caja .ep-pregunta{font-size:15px;margin-bottom:8px}
-#ep-caja input[type=number]{width:100%;box-sizing:border-box;background:rgba(0,0,0,.35);border:1px solid #3B2E34;border-radius:4px;color:#EDE3D2;
-  padding:9px 10px;font:inherit;font-size:18px}
-#ep-caja input[type=number]:focus{outline:2px solid #C98545}
-#ep-caja input[type=number]:disabled{opacity:.4}
-#ep-caja .ep-sin{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:14px;color:#EDE3D2;cursor:pointer}
-#ep-caja .ep-error{min-height:1.2em;color:#E27B72;font-size:13px;margin-top:8px}
-#ep-caja .ep-fila{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:10px}
-#ep-caja .ep-pasos{font:11px "Space Mono",monospace;color:#9A867E}
-#ep-caja .ep-botones{display:flex;gap:8px}
-#ep-caja button{background:#221A1E;border:1px solid #3B2E34;border-radius:4px;color:#EDE3D2;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer}
-#ep-caja button:hover{border-color:#C98545}
-#ep-caja button.ep-primario{background:#C98545;border-color:#C98545;color:#180F08}`;
+.ep-c .ep-pregunta{font-size:16px;font-weight:600;margin:4px 0 10px}
+.ep-c input[type=number],.ep-c input[type=text]{width:100%;box-sizing:border-box;font-size:18px}
+.ep-c input:disabled{opacity:.4}
+.ep-c .ep-sin{display:flex;gap:8px;align-items:center;margin-top:12px;font-size:14px;cursor:pointer}
+.ep-c .ep-sin input{width:auto;flex:none;margin:0}`;
     document.head.appendChild(s);
   }
 
@@ -105,67 +94,66 @@ const EstadoPreguntas = (() => {
   function preguntar(cab, qs, alTerminar){
     estilos();
     return new Promise(resolver => {
-      const resp = {};
-      let i = 0;
-      const fondo = document.createElement('div');
-      fondo.id = 'ep-fondo';
-      fondo.innerHTML = '<div id="ep-caja" role="dialog" aria-modal="true"></div>';
-      document.body.appendChild(fondo);
-      const caja = fondo.firstChild;
-      const cerrar = valor => { document.removeEventListener('keydown', teclas, true); fondo.remove(); resolver(valor); window.dispatchEvent(new Event('ep-cerrado')); };
-      const teclas = e => { if(e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); cerrar(null); } };
-      document.addEventListener('keydown', teclas, true);
-      fondo.addEventListener('mousedown', e => { if(e.target === fondo) cerrar(null); });
-
-      const dibujar = () => {
-        const q = qs[i], ultimo = i === qs.length - 1;
-        const previo = q.clave in resp ? resp[q.clave] : undefined;
-        const conCheckSin = q.turnos || q.sinLimite;
-        const sinLimite = conCheckSin && (previo === null || (previo === undefined && q.sinLimiteInicial));
-        caja.innerHTML = `
-          <div class="ep-titulo">${esc(cab.titulo)}</div>
-          <div class="ep-estado">${esc(cab.nombre)}</div>
-          <div class="ep-pregunta">${esc(q.texto)}</div>
-          ${q.tipo === 'texto'
-            ? `<input type="text" id="ep-valor" placeholder="${esc(q.placeholder || 'Escribí acá')}" value="${previo !== undefined && previo !== null ? esc(previo) : ''}" style="width:100%;box-sizing:border-box;background:rgba(0,0,0,.35);border:1px solid #3B2E34;border-radius:4px;color:#EDE3D2;padding:9px 10px;font:inherit;font-size:18px">`
-            : `<input type="number" id="ep-valor" min="${q.min}" step="1" inputmode="numeric" placeholder="Escribí un número"
-            value="${previo !== undefined && previo !== null ? previo : ''}"${sinLimite ? ' disabled' : ''}>`}
-          ${conCheckSin ? `<label class="ep-sin"><input type="checkbox" id="ep-sin"${sinLimite ? ' checked' : ''}> ${esc(q.sinLimiteTexto || 'Sin límite (no vence: dura hasta que se lo saquen)')}</label>` : ''}
-          <div class="ep-error" id="ep-error"></div>
-          <div class="ep-fila">
-            <span class="ep-pasos">${i + 1} de ${qs.length}</span>
-            <span class="ep-botones">
-              <button type="button" id="ep-cancelar">Cancelar</button>
-              ${i > 0 ? '<button type="button" id="ep-atras">← Atrás</button>' : ''}
-              <button type="button" class="ep-primario" id="ep-siguiente">${ultimo ? 'Listo' : 'Siguiente'}</button>
-            </span>
-          </div>`;
-        const campo = caja.querySelector('#ep-valor'), sin = caja.querySelector('#ep-sin');
-        if(sin) sin.onchange = () => { campo.disabled = sin.checked; if(!sin.checked) campo.focus(); };
-        const avanzar = () => {
-          const error = msg => { caja.querySelector('#ep-error').textContent = msg; if(!campo.disabled) campo.focus(); };
-          if(sin && sin.checked) resp[q.clave] = null;
-          else if(q.tipo === 'texto'){
-            const t = campo.value.trim();
-            if(!t && !q.opcional) return error('Escribí algo.');
-            if(t && q.patron && !q.patron.test(t)) return error(q.error || 'No es válido.');
-            resp[q.clave] = t;
-          }else{
-            const v = Math.round(num(campo.value));
-            if(campo.value.trim() === '' || !Number.isFinite(Number(campo.value))) return error('Escribí un número.');
-            if(v < q.min) return error(`Tiene que ser ${q.min} o más.`);
-            resp[q.clave] = v;
-          }
-          if(ultimo) cerrar(alTerminar(resp)); else{ i++; dibujar(); }
-        };
-        caja.querySelector('#ep-siguiente').onclick = avanzar;
-        caja.querySelector('#ep-cancelar').onclick = () => cerrar(null);
-        const atras = caja.querySelector('#ep-atras');
-        if(atras) atras.onclick = () => { i--; dibujar(); };
-        campo.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); avanzar(); } };
-        if(!sinLimite) setTimeout(() => campo.focus(), 20);
+      // Lo escrito en cada pregunta (texto crudo) y si está marcado "sin límite"; se valida al pasar de paso y al terminar.
+      const crudo = {}, sin = {};
+      qs.forEach(q => { sin[q.clave] = !!((q.turnos || q.sinLimite) && q.sinLimiteInicial); crudo[q.clave] = ''; });
+      // Se resuelve una sola vez: con lo armado (Listo) o null (Cancelar, Escape). El aviso 'ep-cerrado' sale después de que la ventana
+      // se cerró (la Botonera/Acciones del mapa se fijan si quedó algo abierto).
+      let resuelta = false;
+      const listo = valor => { if(resuelta) return; resuelta = true; resolver(valor); setTimeout(() => window.dispatchEvent(new Event('ep-cerrado')), 0); };
+      // La respuesta de la pregunta k: {v} o {error}.
+      const leer = k => {
+        const q = qs[k];
+        if((q.turnos || q.sinLimite) && sin[q.clave]) return {v: null};
+        const t = String(crudo[q.clave] ?? '').trim();
+        if(q.tipo === 'texto'){
+          if(!t && !q.opcional) return {error: 'Escribí algo.'};
+          if(t && q.patron && !q.patron.test(t)) return {error: q.error || 'No es válido.'};
+          return {v: t};
+        }
+        if(t === '' || !Number.isFinite(Number(t))) return {error: 'Escribí un número.'};
+        const v = Math.round(num(t));
+        if(v < q.min) return {error: `Tiene que ser ${q.min} o más.`};
+        return {v};
       };
-      dibujar();
+      const faltaAntes = i => { for(let k = 0; k < Math.min(i, qs.length); k++){ const x = leer(k); if(x.error) return `${qs[k].etiqueta || qs[k].texto}: ${x.error}`; } return ''; };
+      function terminar(){
+        const problema = faltaAntes(qs.length);
+        if(problema){ api.aviso(problema); return false; }
+        const resp = {};
+        qs.forEach((q, k) => { resp[q.clave] = leer(k).v; });
+        listo(alTerminar(resp));
+      }
+      const campoDe = () => api.raiz.querySelector('#ep-valor');
+      const api = PasoAPaso.abrir({
+        titulo: `${cab.titulo} · ${cab.nombre}`, crear: true, z: 99990, ancho: 640, textoCrear: '✔ Listo',
+        pasos: qs.map((q, k) => ({id: q.clave, nombre: q.etiqueta || 'Pregunta ' + (k + 1), html: () => {
+          const conCheckSin = q.turnos || q.sinLimite, marcado = conCheckSin && sin[q.clave];
+          return `<div class="ep-c"><div class="ep-pregunta">${esc(q.texto)}</div>
+            ${q.tipo === 'texto'
+              ? `<input type="text" id="ep-valor" placeholder="${esc(q.placeholder || 'Escribí acá')}" value="${esc(crudo[q.clave])}">`
+              : `<input type="number" id="ep-valor" min="${q.min}" step="1" inputmode="numeric" placeholder="Escribí un número" value="${esc(crudo[q.clave])}"${marcado ? ' disabled' : ''}>`}
+            ${conCheckSin ? `<label class="ep-sin"><input type="checkbox" id="ep-sin"${marcado ? ' checked' : ''}> ${esc(q.sinLimiteTexto || 'Sin límite (no vence: dura hasta que se lo saquen)')}</label>` : ''}</div>`;
+        }, alMontar: (cuerpo, a) => { const c = a.raiz.querySelector('#ep-valor'); if(c && !c.disabled) setTimeout(() => c.focus(), 20); }})),
+        puedeIr: i => faltaAntes(i),
+        alInput: e => { const t = e.target; if(t.id === 'ep-valor') crudo[qs[api.paso()].clave] = t.value; },
+        alCambio: e => {
+          const t = e.target;
+          if(t.id !== 'ep-sin') return;
+          sin[qs[api.paso()].clave] = t.checked;
+          const c = campoDe();
+          if(c){ c.disabled = t.checked; if(!t.checked) c.focus(); }
+        },
+        alTecla: e => {
+          if(e.key !== 'Enter' || e.target.id !== 'ep-valor') return;
+          e.preventDefault();
+          if(api.paso() < qs.length - 1) api.irA(api.paso() + 1);
+          else if(terminar() !== false) api.cerrar();
+        },
+        confirmarCancelar: '',
+        alCrear: () => terminar(),
+        alCancelar: () => listo(null),
+      });
     });
   }
 

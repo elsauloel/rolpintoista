@@ -114,12 +114,8 @@ const SelectorEstados = (() => {
           AsistenteEstado.abrir({
             titulo: 'Crear un estado alterado', para: o.para || '', stats: o.stats || [],
             alTerminar: res => { elegido = true; terminar({preset: o.armarDeAsistente(res), guardar: !!res.guardar}); },
+            alCancelar: () => { if(!hecho && !elegido) fondo.hidden = false; },   // se cerró sin crear: se vuelve a la grilla
           });
-          // Si el asistente se cierra sin terminar, se vuelve a la grilla.
-          const vigilar = setInterval(() => {
-            if(hecho){ clearInterval(vigilar); return; }
-            if(!document.getElementById('ae-fondo') && !elegido){ clearInterval(vigilar); fondo.hidden = false; }
-          }, 300);
           return;
         }
         const valor = b.dataset.se;

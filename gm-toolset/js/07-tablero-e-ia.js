@@ -488,27 +488,14 @@ function mantenimiento(){
   let enCooldown = 0;
   let hpAplicado = 0;
   let vencidos = 0;
+  // El pase de turno de cada creep: la regla vive en comun/creep-acciones.js (2026-10-02, A2b: la usa también el mapa).
   creepsReales().forEach(sc => {
-    sc.ataquesTurno = 0;
+    const r = CreepAcciones.mantenimiento(sc);
+    enCooldown += r.enCooldown;
+    hpAplicado += r.hpAplicado;
+    vencidos += r.vencidos;
     // Reporte para el 📜 Historial del GM (2026-09-24): qué le pasó a este creep en el pase de turno, con el antes y el después.
-    const rep = [];
-    sc.habilidades.forEach(h => {
-      if(num(h.cdActual) > 0){
-        h.cdActual = Math.max(0, num(h.cdActual) - 1);
-        enCooldown++;
-      }
-    });
-    // Lo que hacen los estados en el pase de turno: la regla común de personajes, invocaciones y creeps (comun/combatiente.js).
-    const turnoEst = Combatiente.pasarTurnoEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno'});
-    if(turnoEst.hp){ sc.hp = Math.max(0, Math.min(num(sc.hpMax), num(sc.hp) + turnoEst.hp)); }
-    hpAplicado += turnoEst.eventos.filter(ev => ev.tipo === 'hp').length;
-    rep.push(...Combatiente.reporteTurno(turnoEst.eventos));
-    sc.estados = turnoEst.quedan;
-    if(turnoEst.terminados.some(es => modsAfectanHp(es.mods))) actualizarHpMaxPorCon(sc);
-    vencidos += turnoEst.terminados.length;
-    // Se recargan después de los estados: un Stun que venció ya no los topea.
-    sc.nitros = creepNitrosMax(sc);
-    if(rep.length && typeof historialReporteMantenimiento === 'function') historialReporteMantenimiento(sc.nombre, rep);
+    if(r.rep.length && typeof historialReporteMantenimiento === 'function') historialReporteMantenimiento(sc.nombre, r.rep);
   });
   renderAll();
   const detalle = [

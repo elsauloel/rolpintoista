@@ -22,8 +22,9 @@ function escucharMantenimiento(){
     toast(`⟳ Mantenimiento: pasó el turno`);
     fuegoMantenimiento(numero);   // terreno incendiado: daño a los que siguen adentro
     zonaRevisarMantenimiento();   // zonas persistentes: a quien le falte algo, le aparece el cartelito
-    const base = '../';
-    if(soyGM) mantenimientoEncolar(`${base}gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=mantenimiento`);
+    // Los creeps (solo el GM): desde el 2026-10-02 (A2b) el pase de turno lo hace el mapa (js/12, mantenimientoCreeps), sin cargar GM
+    // Tools en un marco invisible.
+    if(soyGM) mantenimientoCreeps(numero);
     // Los personajes que maneja este usuario (los suyos, o los que el GM controla con 🎮): desde el 2026-10-02 (hoja de ruta A2) el
     // pase de turno lo hace el mapa él mismo (js/11, mantenimientoPersonajes), sin cargar la ficha en un marco invisible.
     mantenimientoPersonajes(numero);

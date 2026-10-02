@@ -116,14 +116,8 @@ async function gmMantenimientoRevisar(){
   gmMantenimientoRevisando = true;
   try{
     const objetivo = gmMantenimientoSenal;
-    const ref = fbDb.doc(fbRutaCampana('gm/mantenimiento'));
-    const veces = await fbDb.runTransaction(async tx => {
-      const doc = await tx.get(ref);
-      const hecho = doc.exists ? Math.round(num(doc.data().aplicado)) : null;
-      if(hecho !== null && hecho >= objetivo) return 0;
-      tx.set(ref, {aplicado: objetivo, actualizado: firebase.firestore.FieldValue.serverTimestamp()});
-      return hecho === null ? 0 : Math.min(MANTENIMIENTO_MAX_SEGUIDOS, objetivo - hecho);
-    });
+    const veces = await CreepAcciones.reclamarMantenimiento(fbDb, fbDb.doc(fbRutaCampana('gm/mantenimiento')), objetivo,
+      () => firebase.firestore.FieldValue.serverTimestamp());   // comun/creep-acciones.js
     for(let i = 0; i < veces; i++) mantenimiento();
     if(MODO_MANTENIMIENTO){
       // En segundo plano (iframe del mapa): avisar cuando los creeps ya se guardaron.

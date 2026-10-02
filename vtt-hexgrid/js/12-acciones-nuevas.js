@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/creep-lupa.js?v=20261001a', '../comun/creep-botonera.js?v=20261001b', '../comun/creep-acciones.js?v=20261002h', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261002a'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/creep-lupa.js?v=20261001a', '../comun/creep-botonera.js?v=20261001b', '../comun/creep-acciones.js?v=20261002i', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261002a'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -72,6 +72,42 @@ function acPublicar(sc, t){
 }
 // Cambia el creep en una transacción: `cambiar(sc)` recibe el creep al día (normalizado) y devuelve {error} o {aviso}. Si es un
 // error de la regla, no se escribe nada y se avisa. Devuelve lo que devolvió `cambiar`, o null.
+/* ---------- El Mantenimiento de los creeps, hecho por el mapa del GM (2026-10-02, hoja de ruta A2b) ----------
+   Antes, en cada ⟳ el mapa del GM cargaba GM Tools en un marco invisible para que les pasara el turno. Ahora lo hace el mapa con la
+   misma regla (CreepAcciones.mantenimiento): toma los turnos con la misma transacción de GM Tools (gm/mantenimiento; si otra
+   pantalla ya los aplicó, nada), le pasa el turno a cada creep de la partida (modificarCreep: transacción + resumen + firma, así GM
+   Tools abierto en otra pestaña se entera), sube el contador de turno de GM Tools (gm/estado) y anota en el 📜 Historial. */
+async function mantenimientoCreeps(numero){
+  if(!soyGM) return;
+  try{
+    await acCargarPiezas();
+    const veces = await CreepAcciones.reclamarMantenimiento(fbDb, fbDb.doc(fbRutaCampana('gm/mantenimiento')), numero,
+      () => firebase.firestore.FieldValue.serverTimestamp());
+    if(!veces) return;
+    acParry.clear();
+    const snap = await fbDb.collection(fbRutaCampana('creeps')).get();
+    let enCooldown = 0, hpAplicado = 0, vencidos = 0;
+    for(const doc of snap.docs){
+      for(let i = 0; i < veces; i++){
+        let r = null, nombre = '';
+        try{ await modificarCreep(doc.id, crudo => { const sc = CreepCalculo.normalizar(crudo); r = CreepAcciones.mantenimiento(sc); nombre = sc.nombre; return r; }); }
+        catch(err){ r = null; console.error(`Mantenimiento: no se pudo pasar el turno del creep ${doc.id}`, err); }   // un creep a medio borrar, etc.
+        if(!r) continue;
+        enCooldown += r.enCooldown; hpAplicado += r.hpAplicado; vencidos += r.vencidos;
+        if(r.rep.length && typeof historialReporteMantenimiento === 'function') historialReporteMantenimiento(nombre, r.rep);
+      }
+    }
+    await fbDb.doc(fbRutaCampana('gm/estado')).set({turno: firebase.firestore.FieldValue.increment(veces),
+      actualizado: firebase.firestore.FieldValue.serverTimestamp()}, {merge: true});
+    const detalle = [enCooldown ? `${enCooldown} CD en cuenta regresiva` : '', hpAplicado ? `${hpAplicado} estado(s) aplicados` : '',
+      vencidos ? `${vencidos} estado(s) vencidos` : ''].filter(Boolean).join(' · ');
+    toast(`Creeps: No2 recargados${detalle ? ` · ${detalle}` : ''}`);
+    if(ac && !ac.host.hidden) acDibujar();
+  }catch(err){
+    console.error('No se pudo aplicar el Mantenimiento a los creeps:', err);
+    toast('No se pudo pasar el turno de los creeps — mirá la consola');
+  }
+}
 function acCambiar(cambiar){ return acCambiarCreep(ac.creepId, cambiar); }
 async function acCambiarCreep(creepId, cambiar){
   try{

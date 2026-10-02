@@ -259,7 +259,48 @@ const CreepAcciones = (() => {
     return {aviso: ''};
   }
 
-  return {tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
+  /* ---------- ⟳ Mantenimiento (2026-10-02, hoja de ruta A2b: lo hace también el mapa, sin cargar GM Tools) ----------
+     mantenimiento(sc): el pase de turno de UN creep — copia textual de lo que hacía mantenimiento() de GM Tools (js/07) por cada
+     creep: ataques del turno a 0, cooldowns −1, los estados (Combatiente.pasarTurnoEstados), la vida con tope, el HP máximo si
+     venció algo que lo tocaba, y No2 a full DESPUÉS de los estados (un Stun que venció ya no los topea). → {rep (para el 📜
+     Historial del GM; no va a la Mesa: el HP de un creep es secreto), enCooldown, hpAplicado, vencidos}.
+     reclamarMantenimiento(db, ref, objetivo, marca): la transacción sobre gm/mantenimiento = {aplicado}: cuántos turnos aplicarles a
+     los creeps (0 si ya los aplicó otra pantalla; si nunca se registró, arranca desde el actual), máximo 10. */
+  const MANT_MAX_SEGUIDOS = 10;
+  function mantenimiento(sc){
+    sc.ataquesTurno = 0;
+    const rep = [];
+    let enCooldown = 0;
+    (sc.habilidades || []).forEach(h => {
+      if(num(h.cdActual) > 0){
+        h.cdActual = Math.max(0, num(h.cdActual) - 1);
+        enCooldown++;
+      }
+    });
+    // Lo que hacen los estados en el pase de turno: la regla común de personajes, invocaciones y creeps (comun/combatiente.js).
+    const turnoEst = Combatiente.pasarTurnoEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno'});
+    if(turnoEst.hp){ sc.hp = Math.max(0, Math.min(num(sc.hpMax), num(sc.hp) + turnoEst.hp)); }
+    const hpAplicado = turnoEst.eventos.filter(ev => ev.tipo === 'hp').length;
+    rep.push(...Combatiente.reporteTurno(turnoEst.eventos));
+    sc.estados = turnoEst.quedan;
+    if(turnoEst.terminados.some(es => C().modsAfectanHp(es.mods))) C().actualizarHpMaxPorCon(sc);
+    const vencidos = turnoEst.terminados.length;
+    // Se recargan después de los estados: un Stun que venció ya no los topea.
+    sc.nitros = C().nitrosMax(sc);
+    return {rep, enCooldown, hpAplicado, vencidos};
+  }
+  async function reclamarMantenimiento(db, ref, objetivo, marca){
+    return db.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      const hecho = doc.exists ? Math.round(num(doc.data().aplicado)) : null;
+      if(hecho !== null && hecho >= objetivo) return 0;
+      tx.set(ref, {aplicado: objetivo, actualizado: marca()});
+      return hecho === null ? 0 : Math.min(MANT_MAX_SEGUIDOS, objetivo - hecho);
+    });
+  }
+
+  return {mantenimiento, reclamarMantenimiento,
+    tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
     costoAtaqueDe, faltanNitros, preguntaSinNitros, alertaSinNitros,
     FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,
     zonaDeHab, cdMod};

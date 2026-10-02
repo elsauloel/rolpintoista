@@ -949,6 +949,14 @@ prueba('atacar con un creep sin No2: sin forzar no cobra; forzado gasta los que 
     [true, true, 2, 0, {costo: 4, tenia: 2}, 1, true]);
 });
 
+prueba('un pase de turno de un creep: el estado daña y baja un turno, cooldown −1, No2 a full, ataques a 0', () => {
+  const sc = creepPrueba({hp: 10, hpMax: 20, nitros: 0, ataquesTurno: 2, habilidades: [{id: 'h', nombre: 'Golpe', cd: 3, cdActual: 2}],
+    estados: [{id: 'e', nombre: 'Quemadura', hpTurno: -2, turnos: 2, activo: true}]});
+  const r = CreepAcciones.mantenimiento(sc);
+  igual([sc.hp, sc.nitros === CreepCalculo.nitrosMax(sc), sc.ataquesTurno, sc.habilidades[0].cdActual, sc.estados.map(e => e.nombre + ':' + e.turnos), r],
+    [8, true, 0, 1, ['Quemadura:1'], {rep: ['Quemadura: −2 HP', 'Quemadura: 2 → 1 turno'], enCooldown: 1, hpAplicado: 1, vencidos: 0}]);
+});
+
 prueba('los ganchos del duelo de un creep: el Parry cobra y tira; Sentado sin confirmar no ataca', async () => {
   const creeps = {k: creepPrueba({id: 'k', nitros: 3, estados: [{nombre: 'Sentado', activo: true, sentado: true}]})}, reg = [];
   const ui = {creep: ref => creeps[ref] || null, cambiar: (ref, fn) => { const x = fn(creeps[ref]); if(x && x.error){ reg.push('error'); return Promise.resolve(null); } return Promise.resolve(x); },

@@ -1382,15 +1382,15 @@ prueba('creeps por mapa: el orden de las pestañas y el mapa de un creep (si su 
   igual([CreepsMapas.ordenar(mapas).map(m => m.nombre), CreepsMapas.mapaDe({mapa: 'b'}, ids), CreepsMapas.mapaDe({mapa: 'zz'}, ids), CreepsMapas.mapaDe({}, ids)],
     [['Cueva', 'Aldea', 'Bosque'], 'b', '', '']);
 });
-prueba('creeps por mapa: los grupos viejos pasan a ser mapas (vinculado → su mapa; con el nombre de un mapa → ese; si no, uno nuevo; los vacíos también)', () => conFbFalso({
-    'mapas/_principal': {nombre: 'Mapa 1'}, 'mapas/m2': {nombre: 'Mina'}, 'gm/gruposMapas': {enlaces: [{grupo: 'Goblins', mapaId: 'm2'}]},
+prueba('creeps por mapa: los grupos viejos pasan a ser mapas (con token → el mapa del token; vinculado → su mapa; con el nombre de un mapa → ese; si no, uno nuevo; los vacíos también)', () => conFbFalso({
+    'mapas/_principal': {nombre: 'Mapa 1'}, 'mapas/m2': {nombre: 'Mina'}, 'gm/gruposMapas': {enlaces: [{grupo: 'Goblins', mapaId: 'm2'}]}, 'tokens/t9': {tipo: 'creep', fichaId: 'd'},
   }, async () => {
     const creeps = [{id: 'a', grupo: 'Goblins'}, {id: 'b', grupo: 'mina'}, {id: 'c', grupo: 'Pantano'}, {id: 'd', grupo: 'Pantano'}, {id: 'e'}, {id: 'f', grupo: 'X', mapa: 'm2'}];
     const r = await CreepsMapas.migrar(creeps, {vacios: ['Torre']});
     const mapas = (await fbDb.collection('mapas').get()).docs.map(d => d.data().nombre).sort();
     const otra = await CreepsMapas.migrar(creeps, {});
     igual([r, creeps.map(c => c.mapa || ''), creeps.some(c => 'grupo' in c), mapas, (await fbDb.doc('gm/gruposMapas').get()).exists, otra],
-      [{cambiados: 4, creados: 2}, ['m2', 'm2', creeps[2].mapa, creeps[2].mapa, '', 'm2'], false, ['Mapa 1', 'Mina', 'Pantano', 'Torre'], false, {cambiados: 0, creados: 0}]);
+      [{cambiados: 4, creados: 2}, ['m2', 'm2', creeps[2].mapa, '_principal', '', 'm2'], false, ['Mapa 1', 'Mina', 'Pantano', 'Torre'], false, {cambiados: 0, creados: 0}]);
   }));
 prueba('creeps por mapa: mudar un creep se lleva su token (sale del mapa viejo y aparece oculto en el nuevo); a la Reserva solo lo saca', () => conFbFalso({
     'mapas/_principal': {nombre: 'Mapa 1'}, 'mapas/m2': {nombre: 'Mina'},

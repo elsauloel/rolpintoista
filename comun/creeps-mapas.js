@@ -12,8 +12,9 @@
      hay, crea uno oculto en el destino (en `centro`, o el centro que guardó la vista del mapa). A Reserva: solo los borra.
      → {borrados, creado}.
    - `crearMapa(nombre)` → id.
-   - `migrar(creeps, {vacios})`: los grupos viejos → mapas. Un grupo vinculado va a su mapa; uno sin vincular, a un mapa con su
-     nombre (el que ya exista con ese nombre, o uno nuevo y vacío: decisión del dueño, 2026-10-02). Pone `sc.mapa`, saca `sc.grupo` y
+   - `migrar(creeps, {vacios})`: los grupos viejos → mapas. Un creep que ya tiene token en un mapa se queda en ese mapa; si no, un
+     grupo vinculado va a su mapa y uno sin vincular, a un mapa con su nombre (el que ya exista con ese nombre, o uno nuevo y vacío:
+     decisión del dueño, 2026-10-02). Pone `sc.mapa`, saca `sc.grupo` y
      borra gm/gruposMapas. `vacios`: los grupos sin creeps que el GM había creado (también pasan a ser mapas). → {cambiados, creados}.
    Necesita sesion.js y tokens-auto.js.
    ========================================================= */
@@ -74,9 +75,14 @@ const CreepsMapas = (() => {
     const porNombre = new Map();
     mapasSnap.docs.forEach(d => { const n = String(d.data().nombre || '').trim().toLowerCase(); if(n && !porNombre.has(n)) porNombre.set(n, d.id); });
     if(!porNombre.has('mapa 1')) porNombre.set('mapa 1', PRINCIPAL);
+    // Un creep que ya tiene su token puesto se queda en ese mapa (lo que está en el tablero manda: no se lo saca de una partida en curso).
+    const tokenEn = new Map();   // creepId → mapa donde tiene token
+    const ids = [PRINCIPAL, ...mapasSnap.docs.map(d => d.id).filter(id => id !== PRINCIPAL)];
+    const snaps = await Promise.all(ids.map(id => fbDb.collection(fbRutaCampana(rutaTokens(id))).get()));
+    snaps.forEach((sn, i) => sn.docs.forEach(d => { const t = d.data(); if(t.tipo === 'creep' && t.fichaId && !tokenEn.has(t.fichaId)) tokenEn.set(t.fichaId, ids[i]); }));
     const destino = new Map();   // grupo → id del mapa
     let creados = 0;
-    const grupos = [...new Set([...conGrupo.map(sc => sc.grupo), ...vacios])];
+    const grupos = [...new Set([...conGrupo.filter(sc => !tokenEn.has(sc.id)).map(sc => sc.grupo), ...vacios])];
     for(const g of grupos){
       const vinculado = (enlaces.find(e => e && e.grupo === g) || {}).mapaId;
       if(vinculado && existentes.has(vinculado)){ destino.set(g, vinculado); continue; }
@@ -87,7 +93,7 @@ const CreepsMapas = (() => {
       destino.set(g, id);
       creados++;
     }
-    conGrupo.forEach(sc => { sc.mapa = destino.get(sc.grupo) || RESERVA; });
+    conGrupo.forEach(sc => { sc.mapa = tokenEn.get(sc.id) || destino.get(sc.grupo) || RESERVA; });
     creeps.forEach(sc => { if(sc && 'grupo' in sc) delete sc.grupo; });
     if(enl.exists) await refEnlaces.delete();
     return {cambiados: conGrupo.length, creados};

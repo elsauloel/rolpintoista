@@ -8,7 +8,9 @@
    la pregunta le aparece al centro al jugador dueño, «Sí» con dos armas abre «¿Con qué arma?» (Aguja 2 No2 / Bastón de monje 5 No2) y
    el duelo de oportunidad sale con el arma elegida (Tipo 10) y su línea en la Mesa. Lo del GM (frenar y mandar la pregunta) ya estaba
    probado; acá el aviso se mandó a mano (la cuenta del GM no estaba conectada). Clementino quedó con esas dos armas equipadas.
-2. [ ] **Un creep sin No2 para atacar, adentro del duelo** (ver §2): alinearlo con "avisar y dejar seguir".
+2. [x] **Un creep sin No2 para atacar, adentro del duelo** (2026-10-02): ahora pregunta «¿Atacar igual?» (en el duelo, en GM Tools y en
+   las Acciones nuevas), gasta los No2 que tenga y deja la línea roja en la Mesa, como un personaje. Probado en vivo por los dos caminos
+   (⚗ prendido y GM Tools). Las **invocaciones** sin No2 en el duelo siguen rechazando el ataque (anotado en §2).
 3. [ ] **Aplicar estados a otros desde las habilidades de personaje** (hoy solo creeps y trampas): destraba Lisiar, Confusión, Marcar,
    Maldiciones y otras skills de clase (§7).
 4. [ ] **Auditoría de skills de clase** (§7): Tanque 9/10 (falta Miti-Miti), después una skill por clase alternando.
@@ -39,10 +41,13 @@
 - [ ] Botón **🗺 Mapas** del GM (se arregló una posible falla de caché: confirmar que abre; si no, mandar el error de la consola).
 - [ ] Al borrar un creep, la pregunta de borrar sus tokens en todos los mapas.
 - [x] **🎮 Tomar el control** (2026-09-30): probado en "Claude · pruebas" con Clementino (personaje del dueño con otra cuenta) desde la cuenta del GM: tomar el control (marca, cartel, Mesa), estado recibido (Veneno ×2, el aviso se borra), pase de turno (25 → 23, reporte en la Mesa), Botonera desde el mapa, mover pagando No2 (12 → 11), ser atacado por un creep (el GM elige la defensa y tira la Evasión) y devolver el control. Todo restaurado. Falta mirarlo desde la cuenta del jugador (el cartel de solo lectura en su pantalla).
-- [ ] **Un creep sin No2 para atacar, adentro del duelo** (visto el 2026-10-01 probando el paso 4c): GM Tools rechaza el ataque y
+- [x] ~~**Un creep sin No2 para atacar, adentro del duelo**~~ (hecho 2026-10-02, ver §0.2) (visto el 2026-10-01 probando el paso 4c): GM Tools rechaza el ataque y
   el aviso queda en el marco escondido — en el cuadro del duelo «🎲 Pagar y tirar PdG» del creep no hace nada visible. Debería
   verse el cartel de "sin No2" (o un aviso en el mapa), como pasa con un personaje. Es del camino de siempre de los creeps, no
   de la Botonera nueva.
+- [ ] **Una invocación sin No2 para atacar, adentro del duelo** (visto 2026-10-02 al arreglar el de los creeps): `InvDuelo` rechaza el
+  ataque con un aviso (`comun/inv-duelo.js`, `InvAcciones.pagarAtaque`); alinearlo igual que los creeps (preguntar, gastar lo que tenga,
+  línea roja).
 - [ ] **Hechizo de área en cascada** (Paso 7b del casteo): armar una habilidad de prueba con objetivo "A un área", castearla contra 2-3 objetivos y ver que la cascada, el círculo compartido y la fase `dodge` anden con varias pantallas abiertas a la vez.
 
 ## 3. Documentación

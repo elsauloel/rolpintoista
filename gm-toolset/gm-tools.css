@@ -244,7 +244,6 @@ input[type=file]{display:none}
 .paso-chip:disabled{opacity:.4;cursor:not-allowed}
 .paso-titulo{font-family:"Fraunces",serif;font-size:19px;font-weight:700;color:var(--paper);margin:2px 0 4px}
 .paso-ayuda{color:var(--muted);font-size:12.5px;margin:0;line-height:1.45}
-#scrim-hab-creep [hidden]{display:none!important}
 .paso-nav{display:flex;justify-content:space-between;gap:8px;padding-top:10px;border-top:1px solid var(--line-soft)}
 .resumen-hab{border:1px solid var(--line);background:var(--panel2);padding:10px 12px;border-radius:var(--r)}
 .resumen-nombre{font-family:"Fraunces",serif;font-size:17px;font-weight:700;color:var(--brass)}
@@ -597,7 +596,6 @@ input[type=file]{display:none}
 #scrim-view .modal{max-width:680px}
 #scrim-view.desde-biblioteca{z-index:93}
 #scrim-ver-habbib{z-index:94}
-#scrim-hab-creep.desde-biblioteca{z-index:96}
 .toast{z-index:120}
 .vc-hab-acc{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
 .vc-hab-acc .btn{padding:2px 8px;font-size:11.5px}

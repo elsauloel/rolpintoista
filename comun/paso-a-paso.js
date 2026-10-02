@@ -8,8 +8,8 @@
    PasoAPaso.abrir(o) → api. o:
      titulo: 'Crear un creep' | 'Editar creep' (o una función que lo devuelve),
      crear: true (crear) | false (editar),
-     pasos: [{id, nombre, ayuda?, html(api) → string, alMontar?(cuerpo, api)}] o una función que devuelve esa lista (pasos que dependen
-       de lo elegido),
+     pasos: [{id, nombre, ayuda?, html(api) → string o un elemento ya armado (se muestra tal cual: sus campos conservan lo escrito),
+       alMontar?(cuerpo, api)}] o una función que devuelve esa lista (pasos que dependen de lo elegido),
      inicio?: índice o id del paso inicial,
      puedeIr?(i, api) → '' o el motivo por el que todavía no se puede ir a ese paso (se muestra; no se cambia de paso),
      alClic?(e, api), alInput?(e, api), alCambio?(e, api), alTecla?(e, api): los eventos del contenido (el elemento real es e.composedPath()[0]),
@@ -62,8 +62,9 @@ const PasoAPaso = (() => {
 .pap-boton:hover{background:rgba(201,133,69,.2)}
 `;
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+  const sombraDe = n => { const r = n && n.getRootNode ? n.getRootNode() : null; return r instanceof ShadowRoot ? r : null; };
   function ponerCss(dondeVive){
-    const raiz = dondeVive instanceof ShadowRoot ? dondeVive : document.head;
+    const raiz = sombraDe(dondeVive) || document.head;
     if(raiz.querySelector && raiz.querySelector('style[data-pap]')) return;
     const st = document.createElement('style');
     st.dataset.pap = '1';
@@ -128,13 +129,16 @@ const PasoAPaso = (() => {
           <button type="button" class="pap-btn chico" data-pap="cancelar">Cancelar</button></div>
         <div class="pap-cuerpo"><div class="pap-pestanas">${pasos.map((x, i) => `<button type="button" class="pap-btn${i === actual ? ' primario' : ''}" data-pap-paso="${i}">${i + 1}. ${esc(x.nombre)}</button>`).join('')}</div>
           ${avisoTxt ? `<div class="pap-aviso">${esc(avisoTxt)}</div>` : ''}${p.ayuda ? `<p class="pap-ayuda">${p.ayuda}</p>` : ''}
-          <div class="pap-paso">${p.html ? p.html(api) : ''}</div></div>
+          <div class="pap-paso"></div></div>
         <div class="pap-pie"><button type="button" class="pap-btn tenue" data-pap="atras"${actual === 0 ? ' disabled' : ''}>← Atrás</button>
           <span class="der">${(o.extras || []).map(x => `<button type="button" class="pap-btn" data-pap-extra="${esc(x.id)}">${esc(x.texto)}</button>`).join('')}
             ${ultimo ? '' : `<button type="button" class="pap-btn${o.crear ? ' primario' : ''}" data-pap="sig">Siguiente →</button>`}
             ${o.crear ? (ultimo ? `<button type="button" class="pap-btn primario" data-pap="crear">${esc(o.textoCrear || '✔ Crear')}</button>` : '')
               : `<button type="button" class="pap-btn primario" data-pap="guardar">${esc(o.textoGuardar || 'Guardar')}</button>`}</span></div>`;
       api.cuerpo = caja.querySelector('.pap-paso');
+      // El contenido: HTML nuevo, o un bloque ya armado (un elemento) que se muestra tal cual y conserva lo escrito al ir y volver.
+      const contenido = p.html ? p.html(api) : '';
+      if(contenido instanceof Node) api.cuerpo.appendChild(contenido); else api.cuerpo.innerHTML = contenido || '';
       fondo.scrollTop = scroll;
       if(p.alMontar) p.alMontar(api.cuerpo, api);
     }
@@ -180,7 +184,7 @@ const PasoAPaso = (() => {
     if(o.alInput) caja.addEventListener('input', e => o.alInput(e, api));
     if(o.alCambio) caja.addEventListener('change', e => o.alCambio(e, api));
     if(o.alTecla) caja.addEventListener('keydown', e => o.alTecla(e, api));
-    if(o.aislado !== undefined ? o.aislado : contenedor instanceof ShadowRoot)
+    if(o.aislado !== undefined ? o.aislado : !!sombraDe(contenedor))
       ['click', 'input', 'change', 'mousedown'].forEach(t => fondo.addEventListener(t, e => e.stopPropagation()));
     actual = o.inicio !== undefined ? indice(o.inicio) : 0;
     redibujar();

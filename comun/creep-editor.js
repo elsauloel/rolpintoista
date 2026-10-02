@@ -83,16 +83,9 @@ const CreepEditor = (() => {
   const habEtq = stat => (K.STAT_LOOKUP[stat] && K.STAT_LOOKUP[stat].label) || stat;
   const HC_TRAMPA_DANO_RE = /^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i;
 
-  const PANTALLA = `
-  <div class="modal" style="max-width:460px">
-    <header><h3 data-hc="titulo">Habilidad</h3><button class="iconbtn" data-hc="x">Cerrar</button></header>
-    <div class="body" style="display:flex;flex-direction:column;gap:10px">
-      <!-- Paso a paso: cada bloque .hc-paso es un paso (ver PASOS_HAB_CREEP). -->
-      <div class="pasos-hab" data-hc="pasos"></div>
-      <div>
-        <div class="paso-titulo" data-hc="paso-titulo"></div>
-        <p class="paso-ayuda" data-hc="paso-ayuda"></p>
-      </div>
+  // Los bloques de cada paso (data-hc-paso = índice de PASOS_HAB_CREEP). La ventana, las pestañas, el título y Atrás/Siguiente/Guardar
+  // son de la ventana común (comun/paso-a-paso.js, 2026-10-02): cada paso muestra su bloque tal cual, así lo escrito se conserva.
+  const BLOQUES = `
       <div class="hc-paso" data-hc-paso="7"><div class="modos-hab" data-hc="modos"></div></div>
       <div class="hc-paso" data-hc-paso="8">
         <div class="hint" data-hc="ejecucion-resumen" style="margin-bottom:10px"></div>
@@ -155,25 +148,18 @@ const CreepEditor = (() => {
       </div>
       <div class="hc-paso" data-hc-paso="6">
         <div class="resumen-hab" data-hc="resumen"></div>
-      </div>
-      <div class="paso-nav">
-        <button type="button" class="btn ghost" data-hc="atras">← Atrás</button>
-        <button type="button" class="btn primary" data-hc="siguiente">Siguiente →</button>
-      </div>
-    </div>
-    <footer>
-      <button class="btn ghost" data-hc="cancelar">Cancelar</button>
-      <button class="btn primary" data-hc="guardar">Guardar</button>
-    </footer>
-  </div>`;
+      </div>`;
 
   function crear(contenedor, ctx, {id} = {}){
-    const scrim = document.createElement('div');
-    scrim.className = 'scrim';
-    if(id) scrim.id = id;
-    scrim.innerHTML = PANTALLA;
-    contenedor.appendChild(scrim);
-    const $h = n => scrim.querySelector(`[data-hc="${n}"]`);
+    // Los bloques viven sueltos (fuera de la página) y la ventana común muestra el del paso actual.
+    const cajaBloques = document.createElement('div');
+    cajaBloques.innerHTML = BLOQUES;
+    const bloques = {};
+    cajaBloques.querySelectorAll('.hc-paso').forEach(b => { bloques[b.dataset.hcPaso] = b; });
+    const todos = Object.values(bloques);
+    const $h = n => { for(const b of todos){ const x = b.querySelector(`[data-hc="${n}"]`); if(x) return x; } return null; };
+    const $$h = sel => todos.flatMap(b => [...b.querySelectorAll(sel)]);
+    let pap = null;          // la ventana abierta (comun/paso-a-paso.js)
     const toast = m => ctx.toast(m);
     let e = null;            // la habilidad que se edita: {scId, habId (null = nueva), paso, borrador, alGuardar, modo, duelo}
     let pdgAuto = false;     // el PdG lo puso solo el costo de ataque (se saca si cambia de opción)
@@ -215,45 +201,35 @@ const CreepEditor = (() => {
             $h('hpcosto').value = Math.max(0, num(r.costo.hpCosto));
             aplicarModoNitros();
           }else{ ed.duelo = null; ed.modo = 'semi'; }
-          mostrarPaso(ed.paso);
+          if(pap) pap.redibujar();
         }});
     }
     // Modo de costo de Nitros: número o "lo mismo que un ataque" (con su arma).
     function aplicarModoNitros(){
       const modo = $h('nitros-modo').value;
-      scrim.querySelectorAll("[data-hc-nitros-modo]").forEach(b => b.classList.toggle("activa", b.dataset.hcNitrosModo === modo));
+      $$h("[data-hc-nitros-modo]").forEach(b => b.classList.toggle("activa", b.dataset.hcNitrosModo === modo));
       $h('acciones-caja').style.visibility = modo === "ataque" ? "hidden" : "visible";
       const sc = e && ctx.creep(e.scId);
       $h('ataque-ayuda').textContent = modo === "ataque"
         ? `Cuesta lo mismo que un ataque con su arma (Tipo ÷ 2 el primero del turno, Tipo completo después) y cuenta como ese ataque.${sc ? ` Hoy: ${fmt(K.costoAtaque(sc))} No2.` : ""}`
         : "Siempre gasta esa cantidad.";
     }
-    // `n` es la posición dentro de los pasos visibles (orden), no el índice de PASOS_HAB_CREEP.
-    function mostrarPaso(n){
-      if(!e) return;
-      const ord = orden(), total = ord.length;
-      let destino = Math.max(0, Math.min(total - 1, n));
-      if(destino > 0 && e.modo === null){ toast('Primero elegí cómo se ejecuta'); destino = 0; }
-      else if(destino > 1 && !$h('nombre').value.trim()){ toast('Primero ponele un nombre'); destino = 1; }
-      e.paso = destino;
-      const paso = destino, idx = ord[paso];
-      const nueva = !e.habId && !e.borrador;
-      const listoParaSeguir = e.modo !== null && !!$h('nombre').value.trim();
-      $h('pasos').innerHTML = ord.map((ix, i) => {
-        const bloqueado = nueva && i > paso && !listoParaSeguir;
-        return `<button type="button" class="paso-chip${i === paso ? ' activo' : ''}${i < paso ? ' hecho' : ''}" data-hc-ir="${i}" ${bloqueado ? 'disabled' : ''}>${i + 1}. ${PASOS_HAB_CREEP[ix].corto}</button>`;
-      }).join('');
-      $h('paso-titulo').textContent = PASOS_HAB_CREEP[idx].titulo;
-      $h('paso-ayuda').textContent = PASOS_HAB_CREEP[idx].ayuda;
-      scrim.querySelectorAll('.hc-paso').forEach(el => { el.hidden = num(el.dataset.hcPaso) !== idx; });
-      if(idx === 7) modosRender();
-      if(idx === 8) ejecucionRender();
-      $h('atras').style.visibility = paso > 0 ? 'visible' : 'hidden';
-      $h('siguiente').hidden = paso === total - 1;
-      $h('guardar').hidden = nueva && paso !== total - 1;
-      if(paso === total - 1) $h('resumen').innerHTML = resumenHtml();
-      const primero = scrim.querySelector(`.hc-paso[data-hc-paso="${idx}"] input:not([type=hidden]),.hc-paso[data-hc-paso="${idx}"] select,.hc-paso[data-hc-paso="${idx}"] textarea`);
-      if(primero) setTimeout(() => primero.focus(), 30);
+    // `n` es la posición dentro de los pasos visibles (orden), no el índice de PASOS_HAB_CREEP. Lo que todavía no se puede lo avisa la
+    // ventana (puedeIr).
+    function mostrarPaso(n){ if(pap) pap.irA(n); }
+    // El paso `idx` (índice de PASOS_HAB_CREEP) para la ventana común: su bloque, con lo que se calcula al mostrarlo.
+    function pasoVentana(idx){
+      const P = PASOS_HAB_CREEP[idx];
+      return {id: String(idx), nombre: P.corto, ayuda: `<b>${P.titulo}</b> ${P.ayuda}`, html: () => {
+        if(idx === 7) modosRender();
+        if(idx === 8) ejecucionRender();
+        if(idx === 6) $h('resumen').innerHTML = resumenHtml();
+        bloques[idx].hidden = false;
+        return bloques[idx];
+      }, alMontar: () => {
+        const primero = bloques[idx].querySelector('input:not([type=hidden]):not([type=checkbox]),select,textarea');
+        if(primero) setTimeout(() => primero.focus(), 30);
+      }};
     }
 
     /* ---------- 🪤 Trampa de una habilidad de creep (2026-09-24) ----------
@@ -342,10 +318,10 @@ const CreepEditor = (() => {
       // opc.borrador = una habilidad suelta (la de la biblioteca): se edita ella, no se agrega al creep; al guardar avisa con opc.alGuardar.
       const h = opc && opc.borrador ? opc.borrador : habId ? sc.habilidades.find(x => x.id === habId) : {};
       if(!h) return;
-      e = {scId, habId: habId || null, paso: 0, borrador: !!(opc && opc.borrador), borradorObj: opc && opc.borrador, alGuardar: opc && opc.alGuardar,
+      e = {scId, habId: habId || null, borrador: !!(opc && opc.borrador), borradorObj: opc && opc.borrador, alGuardar: opc && opc.alGuardar,
         modo: (habId || (opc && opc.borrador)) ? K.modoHab(h) : null, duelo: h.duelo && typeof h.duelo === 'object' ? structuredClone(h.duelo) : null};
-      scrim.classList.toggle('desde-biblioteca', !!(e.borrador || (opc && opc.encima)));   // por encima de las ventanas de Ver
-      $h('titulo').textContent = e.borrador ? `Editar habilidad de la biblioteca · ${h.nombre || ''}` : habId ? `Editar habilidad · ${sc.nombre || 'creep'}` : `Nueva habilidad · ${sc.nombre || 'creep'}`;
+      const titulo = e.borrador ? `Editar habilidad de la biblioteca · ${h.nombre || ''}` : habId ? `Editar habilidad · ${sc.nombre || 'creep'}` : `Nueva habilidad · ${sc.nombre || 'creep'}`;
+      const encima = !!(e.borrador || (opc && opc.encima));   // por encima de las ventanas de Ver
       $h('nombre').value = h.nombre || '';
       $h('costo').value = h.costo || '';
       $h('nitros-modo').value = K.habAtaque(h) ? "ataque" : "num";
@@ -368,14 +344,33 @@ const CreepEditor = (() => {
       $h('efecto-mods').value = JSON.stringify(h.efectoMods || []);
       cargarTrampa(h);
       aplicarModoNitros();
-      scrim.classList.add('open');
-      mostrarPaso(0);
+      const ed = e, inicial = JSON.stringify(datosDePantalla());
+      if(pap){ const viejo = pap; pap = null; viejo.cerrar(); }
+      pap = PasoAPaso.abrir({
+        titulo, crear: !habId && !ed.borrador, contenedor, z: encima ? 96 : 85,
+        pasos: () => orden().map(pasoVentana),
+        puedeIr: i => i > 0 && ed.modo === null ? 'Primero elegí cómo se ejecuta' : i > 1 && !$h('nombre').value.trim() ? 'Primero ponele un nombre' : '',
+        alClic: clic, alTecla: teclas,
+        confirmarCancelar: () => JSON.stringify(datosDePantalla()) === inicial && ed.modo === (habId || ed.borrador ? K.modoHab(h) : null) ? ''
+          : (habId || ed.borrador ? '¿Descartar los cambios de esta habilidad?' : '¿Cancelar? La habilidad que estás armando se descarta.'),
+        alGuardar: () => guardar(), alCrear: () => guardar(),
+        alCancelar: () => cerrar(),
+      });
     }
-    function cerrar(){ e = null; scrim.classList.remove('open'); if(ctx.alCerrar) ctx.alCerrar(); }
+    function cerrar(){
+      e = null;
+      if(pap){ const viejo = pap; pap = null; viejo.cerrar(); }
+      if(ctx.alCerrar) ctx.alCerrar();
+    }
+    // Lo que hay en la pantalla (para saber si cambió algo antes de descartar).
+    function datosDePantalla(){
+      return ['nombre', 'detalle', 'costo', 'nitros-modo', 'acciones', 'cd', 'hpcosto', 'tirada', 'tirada-stat', 'efecto-nombre', 'efecto-turnos', 'efecto-stacks', 'efecto-hpturno', 'efecto-detalle']
+        .map(n => $h(n) ? $h(n).value : '').concat([$h('cd-arranca').checked, $h('efecto-permanente').checked, $h('trampa-on').checked, JSON.stringify(e && e.duelo || null)]);
+    }
 
     async function guardar(){
       if(!e) return;
-      if(!$h('nombre').value.trim()){ mostrarPaso(1); return; }
+      if(!$h('nombre').value.trim()){ mostrarPaso(1); if(pap) pap.aviso('Ponele un nombre antes de guardarla'); return false; }
       // Lo que quedó en la pantalla, antes de cerrarla.
       let mods;
       try{ mods = JSON.parse($h('efecto-mods').value) || []; }catch(err){ mods = []; }
@@ -429,14 +424,12 @@ const CreepEditor = (() => {
       if(ok) toast(`${nombre} guardada`);
     }
 
-    // Los manejadores (antes en gm-toolset/js/10).
-    scrim.addEventListener('click', ev => {
+    // Los manejadores (antes en gm-toolset/js/10): clics y teclas de la ventana común; los campos tienen los suyos en sus bloques.
+    function clic(ev){
       const t = ev.composedPath ? ev.composedPath()[0] : ev.target;
       if(!t || !t.closest || !e) return;
       const modo = t.closest('[data-hc-modo]');
-      if(modo){ e.modo = modo.dataset.hcModo; mostrarPaso(0); return; }
-      const chip = t.closest('[data-hc-ir]');
-      if(chip){ mostrarPaso(num(chip.dataset.hcIr)); return; }
+      if(modo){ e.modo = modo.dataset.hcModo; if(pap) pap.redibujar(); return; }
       const nm = t.closest('[data-hc-nitros-modo]');
       if(nm){
         const m = nm.dataset.hcNitrosModo;
@@ -450,24 +443,17 @@ const CreepEditor = (() => {
       }
       const b = t.closest('[data-hc]');
       const a = b && b.dataset.hc;
-      if(a === 'siguiente') mostrarPaso(e.paso + 1);
-      else if(a === 'atras') mostrarPaso(e.paso - 1);
-      else if(a === 'ejecucion-abrir') abrirEjecucion();
+      if(a === 'ejecucion-abrir') abrirEjecucion();
       else if(a === 'trampa-asistente') abrirAsistenteTrampa();
       else if(a === 'trampa-preconstruidas') trampasPreconstruidas();
-      else if(a === 'guardar') guardar();
-      else if(a === 'cancelar' || a === 'x') cerrar();
-    });
-    scrim.addEventListener('mousedown', ev => { if((ev.composedPath ? ev.composedPath()[0] : ev.target) === scrim) cerrar(); });
+    }
     // Enter en un campo de una línea: al paso siguiente.
-    scrim.addEventListener('keydown', ev => {
+    function teclas(ev){
       const t = ev.composedPath ? ev.composedPath()[0] : ev.target;
-      if(ev.key !== 'Enter' || !e || !t.matches || !t.matches('[data-hc-enter]')) return;
+      if(ev.key !== 'Enter' || !e || !pap || !t.matches || !t.matches('[data-hc-enter]')) return;
       ev.preventDefault();
-      if(e.paso < orden().length - 1) mostrarPaso(e.paso + 1);
-    });
-    // El nombre habilita (o no) los pasos de adelante.
-    $h('nombre').addEventListener('input', () => { if(e && !e.habId) mostrarPaso(e.paso); });
+      if(pap.paso() < orden().length - 1) mostrarPaso(pap.paso() + 1);
+    }
     $h('tirada-stat').addEventListener('change', () => { pdgAuto = false; });
     $h('efecto-preset').addEventListener('change', ev => {
       const t = ev.composedPath ? ev.composedPath()[0] : ev.target;
@@ -483,10 +469,14 @@ const CreepEditor = (() => {
       $h('efecto-detalle').value = preset.detalle || '';
       $h('efecto-polaridad').value = preset.polaridad || 'otro';
       $h('efecto-mods').value = JSON.stringify(preset.mods || []);
+      if(pap) pap.redibujar();   // con estado, el paso Estado ya cuenta en las pestañas
     });
     $h('trampa-on').addEventListener('change', () => { trampaRender(); if($h('trampa-on').checked && !(trampa && (String(trampa.nombre || '').trim() || trampa.dano))) abrirAsistenteTrampa(); });
+    // Los pasos que se ven dependen de si hay estado y de si coloca trampa (orden): al cambiarlos, se rearman las pestañas.
+    $h('trampa-on').addEventListener('change', () => { if(pap) pap.redibujar(); });
+    $h('efecto-nombre').addEventListener('change', () => { if(pap) pap.redibujar(); });
 
-    return {abrir, cerrar, scrim, get estado(){ return e; }};
+    return {abrir, cerrar, get raiz(){ return pap ? pap.raiz : null; }, get estado(){ return e && pap ? {...e, paso: pap.paso()} : e; }};
   }
 
   /* ---------- ⬆ Subir y ↻ Reemplazar una habilidad de creep (tanda c2, 2026-10-02) ----------

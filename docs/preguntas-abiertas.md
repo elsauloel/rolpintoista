@@ -645,3 +645,11 @@ resuelven a mano, como el resto de los avisos).
   daño —, y el daño arcano esa resistencia no la tiene. Entonces no es daño físico (que frena la Defensa) ni arcano (que va directo,
   solo con la Armadura mágica): es un **lugar intermedio**. ¿Lo consolidamos como **regla del tipo tóxico** (todo daño tóxico se resiste
   con Res.Esp) o es una **peculiaridad de esta skill puntual** (Pedos Tóxicos)?
+
+- **P144. La Armadura mágica: ¿un stat más o un bono excepcional? (2026-10-02, abierta a pedido del dueño para que la discutan Enro y
+  Seba — también va en la pestaña 💬 Preguntas de las Herramientas de diseño).** Hoy existe como stat (`armadmg`, paso 7 de las reglas de
+  casteo, 2026-09-27): arranca en 0, no sale de ningún atributo, la dan ítems (por criterio, Raros o mejores) y se resta al daño mágico
+  que ignora la Defensa (en el duelo, en las zonas de habilidad y al tóxico, P142). Planteo: ¿debería ser un **stat** como los demás (que
+  aparece en la ficha, sube con pasivas, etc.) o un **bono particular y excepcional**, que se mantenga en valores bajos y solo lo
+  otorguen algunos equipos, efectos, habilidades o consumibles, y cuyo único trabajo sea reducir el daño mágico? ¿Qué topes o valores
+  típicos? ¿Debería reducir todo daño mágico o solo algunos tipos?

@@ -995,11 +995,14 @@ const Duelo = (() => {
   // Envía un pedido al dueño del lado: en el mapa, al iframe; en una página suelta, se ejecuta acá.
   // Paso 4, etapa 3c-4c (2026-10-01): el mapa puede contestar él mismo por un lado (el personaje de su Botonera nueva) con
   // cfg.hooksLocal(lado) → los mismos ganchos de la ficha (comun/ficha-duelo.js), sin pasar por el marco.
+  // hooksLocal puede devolver una promesa (2026-10-02: el mapa tiene que cargar al personaje la primera vez): se espera; si termina
+  // en null, va por el camino de siempre.
   function enviar(lado, msg){
     const hl = cfgEscuchar.hooksLocal ? cfgEscuchar.hooksLocal(lado) : null;
+    const otro = () => { if(cfgEscuchar.relay) cfgEscuchar.relay(lado, msg); else ejecutar(msg); };
+    if(hl && typeof hl.then === 'function'){ hl.then(h => h ? ejecutar(msg, h) : otro(), err => { console.error('Duelo: hooksLocal', err); otro(); }); return; }
     if(hl){ ejecutar(msg, hl); return; }
-    if(cfgEscuchar.relay) cfgEscuchar.relay(lado, msg);
-    else ejecutar(msg);
+    otro();
   }
 
   let opcionesFalla = {};   // id → true: las opciones no llegaron (tardaron demasiado o la ficha/Acciones no respondió)

@@ -41,7 +41,7 @@ function acDibujar(){
   cuerpo.innerHTML = `<div class="modal acciones-modal">
     <header>
       <div style="display:flex;align-items:center;gap:10px;min-width:0">
-        <h3>Acciones <span title="Acciones nuevas (prueba): las dibuja el mapa">⚗</span></h3>
+        <h3>Acciones</h3>
         <span class="acciones-badge">${esc(r.badge)}</span>
         <span style="font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.titulo)}</span>
       </div>

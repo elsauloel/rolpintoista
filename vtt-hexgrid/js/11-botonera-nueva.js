@@ -206,7 +206,7 @@ function bnDibujar(){
   cuerpo.innerHTML = `<div class="modal catalogo-modal botonera-modal">
     <header>
       <div style="display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap">
-        <h3>Botonera <span title="Botonera nueva (prueba): la dibuja el mapa">⚗</span></h3>
+        <h3>Botonera</h3>
         <span class="botonera-badge">${esc(r.nitros)}</span>
         <span class="botonera-badge">${esc(r.sp)}</span>
         <span class="botonera-badge" title="Defensa">${esc(r.def)}</span>
@@ -230,7 +230,7 @@ function bnDibujarInv(cuerpo){
   const inv = InvCalculo.migrar(structuredClone(cruda));
   const cab = (titulo, badge) => `<header>
       <div style="display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap">
-        <h3>${esc(titulo)} <span title="Botonera nueva (prueba): la dibuja el mapa">⚗</span></h3>
+        <h3>${esc(titulo)}</h3>
         ${badge ? `<span class="botonera-badge">${esc(badge)}</span>` : ''}
         <span class="hint" style="font-size:11px">${esc((bn.S.meta && bn.S.meta.nombre) || '')}</span>
       </div>
@@ -454,7 +454,13 @@ function bnPublicar(origen, r){
    los mismos ganchos de la ficha (comun/ficha-duelo.js), sin pasar por el marco — solo si este usuario puede guardar ese
    personaje. Sus invocaciones, otro personaje, o el GM con el interruptor ⚗ apagado: por el marco, como siempre. */
 function bnHooksDuelo(lado){
-  if(!bn || !bn.S || !lado || lado.tipo !== 'pj' || lado.ref !== bn.fichaId || typeof FichaDuelo === 'undefined') return null;
+  if(!lado || lado.tipo !== 'pj' || String(lado.ref || '').includes(SEP_INVOCACION)) return null;
+  if(!bn || !bn.S || lado.ref !== bn.fichaId || typeof FichaDuelo === 'undefined')   // todavía no está leído: se lee (A1, 2026-10-02)
+    return bnManejo(lado.ref) ? bnPrepararParaDuelo(lado.ref, () => bnHooksDueloYa(lado)) : null;
+  return bnHooksDueloYa(lado);
+}
+function bnHooksDueloYa(lado){
+  if(!bn || !bn.S || lado.ref !== bn.fichaId || typeof FichaDuelo === 'undefined') return null;
   if(!bnActiva() || !bnPuedeGuardar()) return null;
   const ui = {...bnCombateUi(),
     soy: l => !!(l && l.tipo === 'pj' && l.ref === bn.fichaId),
@@ -480,6 +486,13 @@ function bnInvDeLado(lado){
   return inv;
 }
 function bnHooksDueloInv(lado){
+  if(!lado || lado.tipo !== 'pj' || !String(lado.ref || '').includes(SEP_INVOCACION)) return null;
+  const fichaId = String(lado.ref).split(SEP_INVOCACION)[0];
+  if(typeof InvDuelo === 'undefined' || !bn || bn.fichaId !== fichaId || !bn.S)   // todavía no está leído: se lee (A1, 2026-10-02)
+    return bnManejo(fichaId) ? bnPrepararParaDuelo(fichaId, () => bnHooksDueloInvYa(lado)) : null;
+  return bnHooksDueloInvYa(lado);
+}
+function bnHooksDueloInvYa(lado){
   if(typeof InvDuelo === 'undefined' || !bnInvDeLado(lado)) return null;
   if(!bnActiva() || !bnPuedeGuardar()) return null;
   if(!bn.invParry) bn.invParry = new Set();
@@ -879,9 +892,21 @@ async function abrirBotoneraNueva(fichaId, invId){
   invId = invId || '';
   if(bn && bn.fichaId === fichaId && (bn.invId || '') === invId && !bn.host.hidden){ cerrarBotoneraNueva(); return; }   // B (o el token) otra vez: se cierra
   try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo cargar la Botonera nueva — se abre la de siempre'); abrirBotonera(fichaId, null, invId, true); return; }
-  if(!bn){ bn = Object.assign({fichaId: '', sesion: null, S: null}, bnCrear()); }
+  bnAbrirSesion(fichaId);
   const lupaCss = (document.getElementById('lupa-css') || {}).textContent || '';   // los 🔍 (comun/lupa.js)
   bn.raiz.querySelector('#bn-css').textContent = bnCss + lupaCss + PANEL_CSS + ' #bn-contenido{font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--paper)}';
+  bn.invId = invId;   // la Botonera de una de sus invocaciones (4e), o '' para la del personaje
+  if(ac && !ac.host.hidden) cerrarAccionesNuevas();
+  bn.host.hidden = false;
+  bnUbicar();
+  centrarTokenDeBotonera('ficha', fichaId);
+  bnDibujar();
+}
+/* La sesión en vivo del personaje (FichaSesion), sin mostrar nada: la abre la Botonera nueva y, desde el 2026-10-02 (hoja de ruta A1),
+   también el duelo cuando le pide algo a un personaje de este usuario que todavía no abrió su Botonera en esta pantalla (bnHooksDuelo):
+   así lo contesta siempre el mapa, nunca la ficha escondida. Una sola a la vez (la de `bn`); cambiar de personaje corta la anterior. */
+function bnAbrirSesion(fichaId){
+  if(!bn){ bn = Object.assign({fichaId: '', sesion: null, S: null}, bnCrear()); }
   if(bn.fichaId !== fichaId || !bn.sesion){
     if(bn.sesion) FichaSesion.cortar(bn.sesion);
     bn.fichaId = fichaId; bn.S = null; bn.parryPendiente = null;
@@ -910,12 +935,32 @@ async function abrirBotoneraNueva(fichaId, invId){
     // La ficha escondida ya no se carga para la Botonera nueva (P140, 2026-10-01): se carga sola recién si se toca Editar en un
     // Ver (bnAlMarco). La que precarga el mapa al entrar (precargarMarco) sigue, para lo demás que usa el marco.
   }
-  bn.invId = invId;   // la Botonera de una de sus invocaciones (4e), o '' para la del personaje
-  if(ac && !ac.host.hidden) cerrarAccionesNuevas();
-  bn.host.hidden = false;
-  bnUbicar();
-  centrarTokenDeBotonera('ficha', fichaId);
-  bnDibujar();
+}
+// Espera a que el personaje esté leído (hasta 15 s). true si quedó listo.
+async function bnSesionLista(fichaId){
+  for(let i = 0; i < 150; i++){
+    if(!bn || bn.fichaId !== fichaId) return false;
+    if(bn.S && bn.sesion && bn.sesion.cargada) return true;
+    await new Promise(r => setTimeout(r, 100));
+  }
+  return false;
+}
+// ¿Este usuario maneja a ese personaje (su dueño sin el GM con el control, o quien tiene 🎮 el control)? Con lo público, antes de leerlo.
+function bnManejo(fichaId){
+  const f = fichasPub.get(fichaId), yo = fbUsuario && fbUsuario.uid;
+  if(!f || !yo) return false;
+  const control = f.resumen && f.resumen.control;
+  return control ? control === yo : f.duenoUid === yo;
+}
+// Para el duelo: abre la sesión de ese personaje si hace falta y devuelve los ganchos (o null: va por el marco). No cambia de personaje
+// si la Botonera nueva está a la vista con otro (no se le cambia lo que está mirando).
+async function bnPrepararParaDuelo(fichaId, armar){
+  if(!bnActiva() || !bnManejo(fichaId)) return null;
+  if(bn && bn.host && !bn.host.hidden && bn.fichaId !== fichaId) return null;
+  await bnCargarPiezas();
+  bnAbrirSesion(fichaId);
+  if(!(await bnSesionLista(fichaId))) return null;
+  return armar();
 }
 function cerrarBotoneraNueva(){
   if(!bn) return;

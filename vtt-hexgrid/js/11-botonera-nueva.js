@@ -111,7 +111,7 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/ficha-equipo.js?v=20261002b', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-mantenimiento.js?v=20261002a', '../comun/ficha-calculo.js?v=20261002j', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js?v=20261002i', '../comun/ficha-habilidades.js?v=20261001c',
+const BN_PIEZAS = ['../comun/ficha-equipo.js?v=20261002b', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261002a', '../comun/ficha-mantenimiento.js?v=20261002a', '../comun/ficha-calculo.js?v=20261002j', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js?v=20261002i', '../comun/ficha-habilidades.js?v=20261001c',
   '../comun/catalogo.js?v=20261002i', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261002d', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261002i', '../comun/ficha-resumen.js?v=20261002o', '../comun/inv-calculo.js?v=20261002d', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/inv-duelo.js?v=20261001a', '../comun/ficha-acciones.js?v=20261002i', '../comun/inv-habilidades.js?v=20261002g', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
@@ -786,6 +786,55 @@ function bnCrear(){
       <header><h3>🛡 Equipo y mochila</h3><button class="iconbtn" data-bn-eq="cerrar">Cerrar</button></header>
       <div class="body" id="bn-equipo-cuerpo"></div>
     </div></div>
+    <div class="scrim" id="bn-tienda"><div class="modal catalogo-modal botonera-modal">
+      <header>
+        <h3 id="bn-tienda-titulo">Tienda</h3>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="tienda-badge" id="bn-tienda-badge"></span>
+          <button class="iconbtn" data-bn-ti="vender" title="Vender ítems de tu mochila y despojos a esta tienda">💰 Vender</button>
+          <button class="iconbtn" data-bn-ti="reparar" id="bn-tienda-reparar" title="Reparar tu equipo con el herrero (se paga por punto de durabilidad)">🔧 Reparación</button>
+          <span class="catalogo-dde-badge">DDE disponibles: <b id="bn-tienda-dde">0</b></span>
+          <button class="iconbtn" data-bn-ti="cerrar">Cerrar</button>
+        </div>
+      </header>
+      <div class="carrito-bar">
+        <div class="catalogo-filtro-fila">
+          <div class="catalogo-filtro-grupo"><label class="catalogo-filtro-label">Categoría</label>
+            <select data-bn-tf="cat"><option value="">Todas</option><option value="armas">Armas</option><option value="escudos">Escudos</option><option value="defensa">Defensa</option><option value="consumibles">Consumibles</option><option value="otros">Otros</option></select></div>
+          <div class="catalogo-filtro-grupo"><label class="catalogo-filtro-label">Slot</label>
+            <select data-bn-tf="slot"><option value="">Todos</option><option value="mano">Mano (una mano)</option><option value="escudo">Escudo</option><option value="armadura">Armadura</option><option value="cabeza">Cabeza</option><option value="manos">Manos</option><option value="piernas">Piernas</option><option value="pies">Pies</option><option value="otro">Otro</option></select></div>
+          <div class="catalogo-filtro-grupo"><label class="catalogo-filtro-label">Tier</label>
+            <select data-bn-tf="tier"><option value="">Todos</option><option value="Común">Común</option><option value="Buena Calidad">Buena calidad</option><option value="Raro">Raro</option><option value="Excepcional">Excepcional</option><option value="Legendario">Legendario</option><option value="A definir">A definir</option></select></div>
+          <div class="catalogo-filtro-grupo"><label class="catalogo-filtro-label">Ordenar</label><select data-bn-tf="orden"></select></div>
+          <button type="button" class="btn ghost" data-bn-ti="orden-dir" id="bn-tienda-orden-dir" title="Invertir el orden">↑ Menor a mayor</button>
+          <button type="button" class="btn ghost" data-bn-ti="limpiar">Limpiar filtros</button>
+          <input type="text" data-bn-tf="buscar" placeholder="Buscar por nombre, efecto, modificador…">
+        </div>
+        <div class="carrito-lista" id="bn-carrito-lista"></div>
+        <div class="carrito-footer">
+          <span>Total: <b id="bn-carrito-total">0</b> DDE</span>
+          <button type="button" class="btn aleatorio" data-bn-ti="aleatorio" title="Elige un ítem al azar entre los que cumplen los filtros activos">🎲 Ítem aleatorio</button>
+          <button class="btn ghost" data-bn-ti="vaciar">Vaciar</button>
+          <button class="btn primary" data-bn-ti="comprar" id="bn-carrito-comprar" disabled>Comprar</button>
+        </div>
+      </div>
+      <div class="body" id="bn-tienda-cuerpo"></div>
+    </div></div>
+    <div class="scrim" id="bn-vender"><div class="modal" style="max-width:640px">
+      <header><h3>💰 Vender a la tienda</h3><button class="iconbtn" data-bn-ti="vender-no">Cerrar</button></header>
+      <div class="body" id="bn-vender-cuerpo"></div>
+      <footer style="justify-content:space-between"><span class="hint" id="bn-vender-total" style="font-size:14px;color:var(--paper)"></span><button class="btn primary" data-bn-ti="vender-si">Vender lo elegido</button></footer>
+    </div></div>
+    <div class="scrim" id="bn-reparar"><div class="modal" style="max-width:680px">
+      <header><h3>🔧 Reparación · herrero</h3><button class="iconbtn" data-bn-ti="reparar-no">Cerrar</button></header>
+      <div class="body" id="bn-reparar-cuerpo"></div>
+      <footer style="justify-content:space-between"><span class="hint" id="bn-reparar-total" style="font-size:14px;color:var(--paper)"></span><button class="btn primary" data-bn-ti="reparar-todo" id="bn-reparar-todo">Reparar todo</button></footer>
+    </div></div>
+    <div class="scrim" id="bn-aleatorio"><div class="modal" style="max-width:420px">
+      <header><h3>🎲 Ítem aleatorio</h3><button class="iconbtn" data-bn-ti="aleatorio-no">Cerrar</button></header>
+      <div class="body" id="bn-aleatorio-cuerpo"></div>
+      <footer><button class="btn ghost" data-bn-ti="aleatorio">🎲 Tirar de nuevo</button><button class="btn primary" data-bn-ti="aleatorio-no">Cerrar</button></footer>
+    </div></div>
     <div class="scrim" id="bn-botin"><div class="modal" style="max-width:920px;width:94vw">
       <header><h3>⚔ Batalla terminada</h3><button class="iconbtn" data-bn-eq="botin-no">Cerrar</button></header>
       <div class="body" id="bn-botin-cuerpo"></div>
@@ -848,6 +897,20 @@ function bnCrear(){
   ['bn-slot-lleno', 'bn-comparar'].forEach(id => raiz.querySelector('#' + id).addEventListener('mousedown', e => { if(e.target.id === id) e.target.classList.remove('open'); }));
   raiz.querySelector('#bn-equipo').addEventListener('mousedown', e => { if(e.target.id === 'bn-equipo') bnEquipoCerrar(); });
   raiz.querySelector('#bn-botin').addEventListener('mousedown', e => { if(e.target.id === 'bn-botin') bnBotinCerrar(); });
+  raiz.querySelector('#bn-tienda').addEventListener('mousedown', e => { if(e.target.id === 'bn-tienda') bnTiendaCerrar(); });
+  ['bn-vender', 'bn-reparar', 'bn-aleatorio'].forEach(id => raiz.querySelector('#' + id).addEventListener('mousedown', e => { if(e.target.id === id) e.target.classList.remove('open'); }));
+  // Los filtros de la tienda y las cantidades de vender (A5).
+  raiz.addEventListener('input', e => { const t = e.composedPath()[0]; if(t && t.dataset && t.dataset.bnTf === 'buscar') bnTiendaDibujar(); });
+  raiz.addEventListener('change', e => {
+    const t = e.composedPath()[0];
+    if(!t || !t.dataset) return;
+    if(t.dataset.bnTf === 'orden'){ bnTiendaSt.orden = t.value; bnTiendaDibujar(); return; }
+    if(t.dataset.bnTf){ bnTiendaDibujar(); return; }
+    if(t.dataset.venderChk !== undefined || t.dataset.venderCant !== undefined){
+      FichaTienda.venderCambio(bnTiendaSt, t);
+      raiz.querySelector('#bn-vender-total').innerHTML = `Vas a cobrar: <b>${fmt(FichaTienda.totalVenta(bn.S, bnTiendaSt))} DDE</b>`;
+    }
+  });
   ['bn-sobrepeso', 'bn-elegir-arma', 'bn-tipo-ataque', 'bn-ver', 'bn-verinv'].forEach(id => raiz.querySelector('#' + id).addEventListener('mousedown', e => { if(e.target.id === id){ e.target.classList.remove('open'); if(id === 'bn-sobrepeso') bnSobrepeso = null; } }));
   raiz.addEventListener('click', e => {
     const b = e.target.closest('button');
@@ -891,7 +954,8 @@ function bnCrear(){
       return;
     }
     if(b.dataset.bnVer){ bnVerAccion(b.dataset.bnVer); return; }
-    if(bnEquipoClic(b)) return;   // Equipo y mochila (A4)
+    if(bnEquipoClic(b)) return;   // Equipo y mochila (A4) y el botín (A5)
+    if(bnTiendaClic(b)) return;   // la tienda (A5)
     if(b.dataset.bnVerinv){ raiz.querySelector('#bn-verinv').classList.remove('open'); return; }
     if(b.dataset.view){ const [key, id] = b.dataset.view.split(':'); bnVer(key, id); return; }
     if(b.dataset.bnCerrar !== undefined){ cerrarBotoneraNueva(); return; }
@@ -1133,7 +1197,7 @@ function bnCompararDibujar(){
 // Los clics de la ventana de Equipo (y de sus carteles). true si era de acá.
 function bnEquipoClic(b){
   const r = bn.raiz;
-  const enEquipo = !!b.closest('#bn-equipo, #bn-slot-lleno, #bn-comparar, #bn-botin');
+  const enEquipo = !!b.closest('#bn-equipo, #bn-slot-lleno, #bn-comparar, #bn-botin');   // (la tienda: bnTiendaClic)
   if(b.dataset.bnEq){
     if(b.dataset.bnEq === 'cerrar') bnEquipoCerrar();
     else if(b.dataset.bnEq === 'botin-no') bnBotinCerrar();
@@ -1231,6 +1295,151 @@ function bnVerItemSuelto(it){
   r.querySelector('[data-bn-ver="borrar"]').style.display = 'none';
   r.querySelector('#bn-ver').classList.add('open');
 }
+/* ---------- 🏪 La tienda, hecha por el mapa (2026-10-02, hoja de ruta A5) ----------
+   El 🏪 del borde y la ficha lite abrían la tienda de la ficha escondida en el marco. Ahora la muestra el mapa adentro del recuadro de
+   la Botonera nueva, con comun/ficha-tienda.js (la misma regla y la misma ventana que la ficha): el catálogo del vendedor con sus
+   filtros y orden, el carrito y Comprar, Vender, Reparación (si es herrero), el ítem al azar, Ver y Comparar. Mientras está abierta,
+   los cambios del GM (otra tienda, cerrarla) llegan solos. */
+const bnTiendaSt = {tienda: null, carrito: [], venderSel: {}, orden: 'categoria', ordenDesc: false, verCompleto: false};   // como FichaTienda.nueva()
+Object.defineProperty(bnTiendaSt, 'filtros', {get(){   // los filtros se leen en vivo de los campos de la ventana
+  const v = k => { const el = bn && bn.raiz.querySelector(`[data-bn-tf="${k}"]`); return el ? el.value : ''; };
+  return {cat: v('cat'), slot: v('slot'), tier: v('tier'), buscar: v('buscar')};
+}});
+let bnTiendaEscucha = null;
+async function abrirTiendaMapa(fichaId){
+  try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo abrir la tienda'); return; }
+  let tienda = null;
+  try{ tienda = FichaTienda.desdeDoc(await fbDb.doc(fbRutaCampana('tienda/publicada')).get()); }
+  catch(err){ console.error('No se pudo mirar la tienda:', err); toast('No se pudo abrir la tienda'); return; }
+  if(!tienda || !tienda.abierta){ toast('Tienda cerrada'); return; }
+  const yaVisible = bn && bn.host && !bn.host.hidden && bn.fichaId === fichaId && !bn.invId;
+  if(!yaVisible) await abrirBotoneraNueva(fichaId, '');
+  if(!bn) return;
+  bn.soloTienda = !yaVisible;
+  if(!(await bnSesionLista(fichaId))){ toast('No se pudo leer el personaje'); return; }
+  Object.assign(bnTiendaSt, {tienda, carrito: [], venderSel: {}, verCompleto: false});
+  bn.raiz.querySelectorAll('[data-bn-tf]').forEach(el => { if(el.dataset.bnTf !== 'orden') el.value = ''; });
+  const sel = bn.raiz.querySelector('[data-bn-tf="orden"]');
+  if(!sel.dataset.listo){ sel.innerHTML = FichaTienda.opcionesOrden(bnTiendaSt); sel.dataset.listo = '1'; }
+  bn.raiz.querySelector('#bn-tienda').classList.add('open');
+  bnTiendaDibujar();
+  toast(`${tienda.nombre || 'Tienda'} · ${fmt(FichaTienda.visibles(bn.S, bnTiendaSt).length)} ítems`);
+  bnTiendaEscuchar();
+}
+function bnTiendaEscuchar(){
+  if(bnTiendaEscucha) return;
+  let primera = true;
+  bnTiendaEscucha = fbDb.doc(fbRutaCampana('tienda/publicada')).onSnapshot(snap => {
+    if(primera){ primera = false; return; }   // es la misma que se acaba de abrir
+    if(!bnTiendaSt.tienda){ bnTiendaDejar(); return; }
+    const nueva = FichaTienda.desdeDoc(snap);
+    if(!nueva || !nueva.abierta){ bnTiendaCerrar(); toast('El GM cerró la tienda'); return; }
+    bnTiendaSt.tienda = nueva;
+    const antes = bnTiendaSt.carrito.length;
+    bnTiendaSt.carrito = bnTiendaSt.carrito.filter(e => nueva.items.includes(e.catId));   // lo que ya no se vende sale del carrito
+    bnTiendaDibujar();
+    const quitados = antes - bnTiendaSt.carrito.length;
+    toast('El GM cambió la tienda' + (quitados ? ` · ${fmt(quitados)} ítem(s) salieron del carrito` : ''));
+  }, err => console.error('No se pudo escuchar la tienda:', err));
+}
+function bnTiendaDejar(){ if(bnTiendaEscucha){ bnTiendaEscucha(); bnTiendaEscucha = null; } }
+function bnTiendaDibujar(){
+  if(!bn || !bn.S || !bn.raiz.querySelector('#bn-tienda').classList.contains('open')) return;
+  const r = bn.raiz, st = bnTiendaSt, t = st.tienda;
+  r.querySelector('#bn-tienda-titulo').textContent = (t && t.nombre) || 'Tienda';
+  r.querySelector('#bn-tienda-badge').textContent = FichaTienda.badge(st);
+  r.querySelector('#bn-tienda-reparar').style.display = t && t.herrero ? '' : 'none';   // solo las tiendas con herrero reparan
+  // Lo Excepcional y lo Legendario solo se filtran con una tienda que lo ofrezca (la tienda siempre está, acá).
+  r.querySelector('[data-bn-tf="orden"]').value = st.orden;
+  r.querySelector('#bn-tienda-orden-dir').textContent = FichaTienda.etiquetaOrden(st);
+  r.querySelector('#bn-tienda-cuerpo').innerHTML = FichaTienda.catalogoHtml(bn.S, st, {gestion: false});
+  r.querySelector('#bn-tienda-dde').textContent = fmt(num(bn.S.meta.dde));
+  const c = FichaTienda.carrito(bn.S, st);
+  r.querySelector('#bn-carrito-lista').innerHTML = c.html;
+  r.querySelector('#bn-carrito-total').textContent = fmt(c.total);
+  const comprar = r.querySelector('#bn-carrito-comprar');
+  comprar.disabled = !st.carrito.length || !c.puede;
+  comprar.title = c.falta > 0 ? `Te faltan ${fmt(c.falta)} DDE` : '';
+}
+function bnTiendaCerrar(){
+  if(!bn) return;
+  ['#bn-tienda', '#bn-vender', '#bn-reparar', '#bn-aleatorio'].forEach(s => bn.raiz.querySelector(s).classList.remove('open'));
+  bnTiendaSt.tienda = null; bnTiendaSt.carrito = []; bnTiendaSt.venderSel = {};
+  bnTiendaDejar();
+  if(bn.soloTienda){ bn.soloTienda = false; cerrarBotoneraNueva(); }
+}
+const bnEnCombate = () => modoMapa === 'combate';
+function bnRepararDibujar(){
+  const r = bn.raiz, res = FichaTienda.repararHtml(bn.S, bnTiendaSt, bnEnCombate());
+  r.querySelector('#bn-reparar-cuerpo').innerHTML = res.html;
+  r.querySelector('#bn-reparar-total').innerHTML = res.total;
+  r.querySelector('#bn-reparar-todo').disabled = bnEnCombate() || !res.totalPts;
+}
+// Los clics de la tienda (y de sus carteles). true si eran de acá.
+function bnTiendaClic(b){
+  const r = bn.raiz, st = bnTiendaSt;
+  if(!b.closest('#bn-tienda, #bn-vender, #bn-reparar, #bn-aleatorio')) return false;
+  if(!bn.S) return true;
+  const puede = () => { if(bnPuedeGuardar()) return true; toast('Ese personaje no lo manejás vos: solo se puede mirar'); return false; };
+  // El ui de comun/ficha-tienda.js: guarda lo que cambió (bnUi) y redibuja.
+  const ui = antes => ({toast: t => toast(t), cambio: () => { bnUi(antes).cambio(); bnTiendaDibujar(); }});
+  const qty = id => { const el = r.querySelector(`#bn-tienda [data-catqty="${id}"]`); return Math.max(1, num(el ? el.value : 1)); };
+  const a = b.dataset.bnTi;
+  if(a === 'cerrar'){ bnTiendaCerrar(); return true; }
+  if(a === 'orden-dir'){ st.ordenDesc = !st.ordenDesc; bnTiendaDibujar(); return true; }
+  if(a === 'limpiar'){ r.querySelectorAll('[data-bn-tf]').forEach(el => { if(el.dataset.bnTf !== 'orden') el.value = ''; }); bnTiendaDibujar(); return true; }
+  if(a === 'vaciar'){ st.carrito = []; bnTiendaDibujar(); return true; }
+  if(a === 'comprar'){ if(puede()) FichaTienda.comprar(bn.S, st, ui(FichaGuardado.partes(bn.S))); bnTiendaDibujar(); return true; }
+  if(a === 'aleatorio'){
+    const it = FichaTienda.aleatorio(bn.S, st);
+    if(!it){ toast('No hay ítems que coincidan con los filtros activos'); return true; }
+    r.querySelector('#bn-aleatorio-cuerpo').innerHTML = `<div class="cat-grid">${FichaTienda.rowHtml(bn.S, st, it, {gestion: false})}</div>`;
+    r.querySelector('#bn-aleatorio').classList.add('open');
+    return true;
+  }
+  if(a === 'aleatorio-no'){ r.querySelector('#bn-aleatorio').classList.remove('open'); return true; }
+  if(a === 'vender'){
+    st.venderSel = {};
+    r.querySelector('#bn-vender-cuerpo').innerHTML = FichaTienda.venderHtml(bn.S, st);
+    r.querySelector('#bn-vender-total').innerHTML = `Vas a cobrar: <b>${fmt(FichaTienda.totalVenta(bn.S, st))} DDE</b>`;
+    r.querySelector('#bn-vender').classList.add('open');
+    return true;
+  }
+  if(a === 'vender-no'){ r.querySelector('#bn-vender').classList.remove('open'); return true; }
+  if(a === 'vender-si'){ if(puede() && FichaTienda.vender(bn.S, st, ui(FichaGuardado.partes(bn.S)))) r.querySelector('#bn-vender').classList.remove('open'); return true; }
+  if(a === 'reparar'){
+    if(!st.tienda || !st.tienda.herrero){ toast('Esta tienda no tiene herrero'); return true; }
+    bnRepararDibujar();
+    r.querySelector('#bn-reparar').classList.add('open');
+    return true;
+  }
+  if(a === 'reparar-no'){ r.querySelector('#bn-reparar').classList.remove('open'); return true; }
+  const reparar = pares => { if(!puede()) return; const antes = FichaGuardado.partes(bn.S); FichaTienda.reparar(bn.S, st, pares, bnEnCombate(), {toast: t => toast(t), cambio: () => { bnUi(antes).cambio(); bnTiendaDibujar(); bnRepararDibujar(); }}); };
+  if(a === 'reparar-todo'){ reparar(FichaTienda.aReparar(bn.S).map(x => ({it: x.it, pts: x.faltan}))); return true; }
+  if(b.dataset.rep){
+    const [id, n] = b.dataset.rep.split(':');
+    const it = (bn.S.inventario || []).find(x => x.id === id);
+    if(it) reparar([{it, pts: Math.max(1, Math.round(num(n)))}]);
+    return true;
+  }
+  if(b.dataset.catalogocarrito){ FichaTienda.agregarAlCarrito(bn.S, st, b.dataset.catalogocarrito, qty(b.dataset.catalogocarrito), {toast: t => toast(t), cambio: () => {}}); bnTiendaDibujar(); return true; }
+  if(b.dataset.catalogoadd){ if(puede()) FichaTienda.agregarGratis(bn.S, st, b.dataset.catalogoadd, qty(b.dataset.catalogoadd), ui(FichaGuardado.partes(bn.S))); return true; }
+  if(b.dataset.carritorm){ FichaTienda.quitarDelCarrito(st, b.dataset.carritorm); bnTiendaDibujar(); return true; }
+  if(b.dataset.comparar){
+    const it = FichaTienda.itemCatalogo(bn.S, st, b.dataset.comparar);
+    if(!it) return true;
+    bnComparando = {item: it, equipadoId: ''};
+    bnCompararDibujar();
+    if(bnComparando) r.querySelector('#bn-comparar').classList.add('open');
+    return true;
+  }
+  if(b.dataset.view){
+    const it = FichaTienda.itemCatalogo(bn.S, st, b.dataset.view.split(':')[1]);
+    if(it) bnVerItemSuelto(it);
+    return true;
+  }
+  return true;
+}
 function cerrarBotoneraNueva(){
   if(!bn) return;
   bn.host.hidden = true;
@@ -1244,6 +1453,7 @@ document.addEventListener('keydown', e => {
   const abiertos = [...bn.raiz.querySelectorAll('.scrim.open')], cartel = abiertos[abiertos.length - 1];   // el de más arriba
   if(cartel && cartel.id === 'bn-equipo'){ bnEquipoCerrar(); return; }
   if(cartel && cartel.id === 'bn-botin'){ bnBotinCerrar(); return; }
+  if(cartel && cartel.id === 'bn-tienda'){ bnTiendaCerrar(); return; }
   if(cartel){ cartel.classList.remove('open'); if(cartel.id === 'bn-comparar') bnComparando = null; bnViendo = null; bnCostoX = null; bnSobrepeso = null; bnSinNitrosSeguir = null; return; }
   cerrarBotoneraNueva();
 });

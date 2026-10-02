@@ -511,11 +511,7 @@ $('#toolkit-tienda').onclick = async () => {
   if(soyGM){ window.open('../gm-toolset/vendor-generator.html?partida=' + encodeURIComponent(FB_CAMPANA), '_blank', 'noopener'); return; }   // el GM arma y abre la tienda en el generador
   const fichaId = fichaPrincipalId();
   if(!fichaId){ toast('Para usar la tienda necesitás un personaje'); return; }
-  try{
-    const doc = await fbDb.doc(fbRutaCampana('tienda/publicada')).get();
-    if(!doc.exists || doc.data().abierta !== true){ toast('Tienda cerrada'); return; }
-  }catch(err){ console.error('No se pudo mirar la tienda:', err); toast('No se pudo abrir la tienda'); return; }
-  abrirBotonera(fichaId, {tipo: 'abrir-tienda'});
+  abrirTiendaMapa(fichaId);   // el mapa (js/11, A5): mira si está abierta y la muestra
 };
 $('#toolkit-botin').onclick = () => {
   if(!combatePublicado()) return;

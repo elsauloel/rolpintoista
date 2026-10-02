@@ -130,7 +130,7 @@ function flBoton(id){
   cerrarFichaLite();   // lo demás abre otra ventana encima del mapa
   if(id === 'stats') abrirBotonera(fichaId, {tipo: 'abrir-stats'});
   else if(id === 'mochila') abrirEquipoMapa(fichaId);   // el mapa (js/11, A4)
-  else if(id === 'tienda') abrirBotonera(fichaId, {tipo: 'abrir-tienda'});
+  else if(id === 'tienda') abrirTiendaMapa(fichaId);   // el mapa (js/11, A5)
   else if(id === 'botin') abrirBotinMapa(fichaId);   // el mapa (js/11, A5)
   else if(id === 'botonera') abrirBotonera(fichaId, undefined, invId);
   else if(id === 'acciones') abrirAcciones(creepId);

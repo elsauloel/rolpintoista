@@ -34,7 +34,7 @@ function botoneraModoAbrir(invId){
 if(MODO_BOTONERA){
   const revisarCerrada = () => {
     // El cartelito de cantidades de un estado (comun/estado-preguntas.js, #ep-fondo) cuenta como ventana abierta: si no, al elegir un preset se cerraba la Botonera.
-    if(fichaVivo && fichaVivo.cargada && !document.querySelector('.scrim.open, #ep-fondo, #ae-fondo, #adh-fondo, #duelo-fondo')){
+    if(fichaVivo && fichaVivo.cargada && !document.querySelector('.scrim.open, #ep-fondo, #ae-fondo, #adh-fondo, .pap-fondo, #duelo-fondo')){
       if(fichaVivo.editaGM) fichaGuardarTick(true);   // el GM editó estados de otro personaje: se sube antes de cerrar
       botoneraAvisarMapa('botonera-cerrada');
     }

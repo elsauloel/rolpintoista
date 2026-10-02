@@ -70,7 +70,7 @@ if(MODO_ACCIONES){
     document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', bubbles: true}));
   });
   const observador = new MutationObserver(() => {
-    if(gmVivo.listo && !document.querySelector('.scrim.open, #ep-fondo, #ae-fondo, #at-fondo, #adh-fondo, #duelo-fondo')) gmAvisarMapa('acciones-cerrada');   // #ep-fondo: cartelito de cantidades de un estado
+    if(gmVivo.listo && !document.querySelector('.scrim.open, #ep-fondo, #ae-fondo, #at-fondo, #adh-fondo, .pap-fondo, #duelo-fondo')) gmAvisarMapa('acciones-cerrada');   // #ep-fondo: cartelito de cantidades de un estado
   });
   document.querySelectorAll('.scrim').forEach(el => observador.observe(el, {attributes: true, attributeFilter: ['class']}));
   window.addEventListener('message', e => {

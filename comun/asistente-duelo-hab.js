@@ -1,4 +1,6 @@
 /* comun/asistente-duelo-hab.js — «⚔ Duelo» de una habilidad (2026-09-27, docs/duelo-de-habilidades.md).
+   Desde 2026-10-02 (tanda 4 de docs/plan-paso-a-paso.md) se abre en la ventana común paso a paso (comun/paso-a-paso.js): título con
+   el paso, pestañas que saltan, Guardar siempre visible y la paleta de todos (antes era azul, con pastillitas).
    Ventana PASO A PASO (2026-09-27, pedido del dueño — mismo criterio que el resto de los asistentes del
    juego: comun/asistente-item.js, comun/asistente-trampa.js, comun/asistente-estado.js) para decidir cómo
    se juega una habilidad dirigida en el duelo: a quién apunta, qué tira quien la usa, con qué se resiste
@@ -79,34 +81,27 @@ const AsistenteDueloHab = (() => {
     if(document.getElementById('adh-css')) return;
     const s = document.createElement('style');
     s.id = 'adh-css';
-    s.textContent = `#adh-fondo{position:fixed;inset:0;z-index:99500;background:rgba(6,8,14,.78);display:flex;align-items:center;justify-content:center;padding:12px;font-family:inherit}
-#adh-fondo .adh{background:#151a26;color:#e9ecf4;border:1px solid #39435c;border-radius:14px;width:min(640px,100%);max-height:94vh;overflow:auto;box-shadow:0 18px 60px rgba(0,0,0,.6)}
-#adh-fondo header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #2b3347;font-weight:800;font-size:17px}
-#adh-fondo .cuerpo{padding:14px 16px;display:flex;flex-direction:column;gap:14px}
-#adh-fondo h4{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#9aa4bd}
-#adh-fondo .nota{font-size:12.5px;color:#aab3ca;margin:0 0 6px}
-#adh-fondo select,#adh-fondo input[type=number],#adh-fondo input[type=text]{background:#0e1220;color:#fff;border:1px solid #39435c;border-radius:8px;padding:8px;font-size:14px;max-width:100%}
-#adh-fondo label.op{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:14px;cursor:pointer;width:100%;box-sizing:border-box}
-#adh-fondo label.op input[type=checkbox],#adh-fondo label.op input[type=radio]{flex-shrink:0;flex-grow:0;width:16px;min-width:16px;max-width:16px;height:16px;margin:3px 0 0}
-#adh-fondo .adh-check-list{display:flex;flex-direction:column;gap:0;margin-top:8px}
-#adh-fondo .adh-modo{display:flex;flex-direction:column;gap:2px;margin:8px 0 4px;padding:8px 10px;background:#0e1220;border:1px solid #2b3347;border-radius:8px}
-#adh-fondo .adh-ef-card{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:8px 10px;margin:4px 0;background:#0e1220;border:1px solid #2b3347;border-radius:8px}
-#adh-fondo .fila{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0}
-#adh-fondo button{background:#2d6cdf;color:#fff;border:0;border-radius:10px;padding:9px 14px;font-size:14px;font-weight:700;cursor:pointer}
-#adh-fondo button.sec{background:#2b3347;color:#d5dbec}
-#adh-fondo button.rojo{background:#5a2530;color:#fbd0d7}
-#adh-fondo .pie{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid #2b3347;flex-wrap:wrap}
-#adh-fondo .aviso{background:rgba(255,210,90,.12);border:1px solid #d9b45a;border-radius:8px;padding:8px 10px;font-size:12.5px;color:#f8ecc6}
-#adh-fondo .adh-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:2px}
-#adh-fondo .adh-chip{font-size:10.5px;padding:4px 9px;border:1px solid #39435c;border-radius:99px;color:#9aa4bd;background:none;cursor:pointer;font-weight:700}
-#adh-fondo .adh-chip.hecho{color:#e9ecf4}
-#adh-fondo .adh-chip.activo{color:#fff;background:#2d6cdf;border-color:#2d6cdf}
-#adh-fondo .adh-titulo{font-size:16px;font-weight:800;margin:2px 0 4px}
-#adh-fondo .adh-ayuda{color:#aab3ca;font-size:12.5px;margin:0 0 10px;line-height:1.45}
-#adh-fondo .adh-ayuda b{color:#8db3ff}
-#adh-fondo .adh-nav{display:flex;justify-content:space-between;gap:8px;margin-top:6px;padding-top:10px;border-top:1px solid #2b3347}
-#adh-fondo .adh-resumen{border:1px solid #2b3347;background:#12172a;padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.6}
-#adh-fondo .adh-resumen b{color:#8db3ff}`;
+    s.textContent = `.adh-paso{display:flex;flex-direction:column;gap:14px}
+.adh-paso h4{margin:0 0 6px;font-family:"Space Mono",ui-monospace,monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--pap-tenue,#9A867E)}
+.adh-paso .nota{font-size:12.5px;color:var(--pap-tenue,#9A867E);margin:0 0 6px;line-height:1.45}
+.adh-paso .nota b{color:var(--pap-laton,#E0A458)}
+.adh-paso select,.adh-paso input[type=number],.adh-paso input[type=text]{max-width:100%;width:auto}
+.adh-paso label.op{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:14px;cursor:pointer;width:100%;box-sizing:border-box}
+.adh-paso label.op input[type=checkbox],.adh-paso label.op input[type=radio]{flex-shrink:0;flex-grow:0;width:16px;min-width:16px;max-width:16px;height:16px;margin:3px 0 0}
+.adh-paso .adh-check-list{display:flex;flex-direction:column;gap:0;margin-top:8px}
+.adh-paso .adh-modo,.adh-paso .adh-ef-card{display:flex;gap:10px;padding:8px 10px;margin:4px 0;background:#120D10;border:1px solid var(--pap-linea,#3B2E34);border-radius:3px}
+.adh-paso .adh-modo{flex-direction:column;gap:2px;margin:8px 0 4px}
+.adh-paso .adh-ef-card{justify-content:space-between;align-items:flex-start}
+.adh-paso .fila{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0}
+.adh-paso button{font-family:"Space Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:7px 12px;cursor:pointer;
+  border:1px dashed var(--pap-cobre,#C98545);border-radius:3px;background:rgba(201,133,69,.08);color:var(--pap-laton,#E0A458)}
+.adh-paso button:hover{background:rgba(201,133,69,.2)}
+.adh-paso button.sec{border-style:solid;border-color:var(--pap-linea,#3B2E34);background:none;color:var(--pap-tenue,#9A867E)}
+.adh-paso button.rojo{border-style:solid;border-color:rgba(212,87,78,.5);background:none;color:var(--pap-peligro,#D4574E)}
+.adh-paso .aviso{background:rgba(201,133,69,.12);border:1px solid var(--pap-cobre,#C98545);border-radius:3px;padding:8px 10px;font-size:12.5px;color:var(--pap-laton,#E0A458)}
+.adh-paso .adh-resumen{border:1px solid var(--pap-linea,#3B2E34);background:#120D10;padding:10px 12px;border-radius:3px;font-size:13px;line-height:1.6}
+.adh-paso .adh-resumen b{color:var(--pap-laton,#E0A458)}
+.adh-paso textarea{width:100%;box-sizing:border-box}`;
     document.head.appendChild(s);
   }
 
@@ -191,13 +186,11 @@ const AsistenteDueloHab = (() => {
       zonaEstadoTurnos: (ini && ini.zonaEstado && ini.zonaEstado.turnos) ?? 2,
       zonaEstadoStacks: (ini && ini.zonaEstado && ini.zonaEstado.stacks) || '',
     };
-    const prev = document.getElementById('adh-fondo');
-    if(prev) prev.remove();
-    const f = document.createElement('div');
-    f.id = 'adh-fondo';
-    document.body.appendChild(f);
-    const cerrar = () => f.remove();
+    let api = null, f = null;   // la ventana común abierta y su caja (f: donde se buscan los controles de cada paso)
+    const cerrar = () => { if(api) api.cerrar(); };
+    const ir = i => { if(api) api.irA(i); };
     const sinOp = () => st.tiraNinguna;
+    let ayudaPaso = '';   // la ayuda del paso que se está armando (la pone titulo())
 
     // Lista de pasos: cambia según activo/modo/objetivo/tira, igual que en asistente-item.js (pasos()).
     function pasos(){
@@ -220,7 +213,7 @@ const AsistenteDueloHab = (() => {
       return L;
     }
 
-    const titulo = (h, t, ayuda) => h + `<div class="adh-titulo">${t}</div><p class="adh-ayuda">${ayuda}</p>`;
+    const titulo = (h, t, ayuda) => { ayudaPaso = `<b>${t}</b> ${ayuda}`; return h; };
 
     function cuerpoCosto(){
       let h = titulo('', '¿Cuánto cuesta ejecutarla?', 'Se cobra apenas tocás Ejecutar, antes de que se abra el cuadro. Es el mismo costo de siempre de la habilidad (podés cambiarlo desde acá o desde su editor, es un solo dato). «X» en SP o Nitros significa que elegís cuánto pagar cada vez que la uses — esa misma X es la que podés usar en la Tirada o el Daño escribiendo «X» en la fórmula.');
@@ -366,7 +359,7 @@ const AsistenteDueloHab = (() => {
       }
       h += `<div class="fila" style="margin-top:14px"><label class="op" style="padding:0"><input type="checkbox" data-efectolibre-on ${st.efectoLibreOn ? 'checked' : ''}> Tiene un efecto que no se puede automatizar del todo</label></div>`;
       if(st.efectoLibreOn){
-        h += `<textarea data-efectolibre rows="3" style="width:100%;box-sizing:border-box;background:#0e1220;color:#fff;border:1px solid #39435c;border-radius:8px;padding:8px;font-size:14px" placeholder="ej. Drenás una cantidad de HP igual a la diferencia entre tu tirada y su resistencia; sumátela a tu vida (Excedente de vida si pasa tu máximo).">${esc(st.efectoLibre)}</textarea>
+        h += `<textarea data-efectolibre rows="3" style="width:100%;box-sizing:border-box;padding:8px;font-size:14px" placeholder="ej. Drenás una cantidad de HP igual a la diferencia entre tu tirada y su resistencia; sumátela a tu vida (Excedente de vida si pasa tu máximo).">${esc(st.efectoLibre)}</textarea>
           <p class="nota" style="margin-top:6px">${st.objetivo === 'zona'
             ? 'En una zona, este texto sale en la Mesa y en el cartelito cuando el daño entra (junto a la tirada de arriba, si hay), para que se resuelva a mano.'
             : 'Este texto se muestra en el cuadro junto al resultado (con la diferencia entre las dos tiradas, si la hubo), para que quien juega lo resuelva a mano.'}</p>`;
@@ -406,21 +399,21 @@ const AsistenteDueloHab = (() => {
         <div class="fila"><button type="button" class="sec" data-ef-mas="estado">＋ Estado</button><button type="button" class="sec" data-ef-mas="cura">＋ Cura</button></div>`;
       h += `<div class="fila" style="margin-top:14px"><label class="op" style="padding:0"><input type="checkbox" data-efectosnota-on ${st.efectosNotaOn ? 'checked' : ''}> Personalizar: tiene otro efecto que no está en la lista</label></div>`;
       if(st.efectosNotaOn){
-        h += `<textarea data-efectosnota rows="3" style="width:100%;box-sizing:border-box;background:#0e1220;color:#fff;border:1px solid #39435c;border-radius:8px;padding:8px;font-size:14px" placeholder="ej. Invertí el orden de turno de todos los presentes hasta tu próximo turno.">${esc(st.efectosNota)}</textarea>
+        h += `<textarea data-efectosnota rows="3" style="width:100%;box-sizing:border-box;padding:8px;font-size:14px" placeholder="ej. Invertí el orden de turno de todos los presentes hasta tu próximo turno.">${esc(st.efectosNota)}</textarea>
           <p class="nota" style="margin-top:6px">Este texto se muestra junto a los demás efectos, sin botón «Aplicar» — para resolverlo a mano.</p>`;
       }
       // ⚡ Critical Matters (2026-09-29, pedido del dueño — Lisiar: bono al crítico + un efecto que es más
       // intenso si el golpe termina siendo crítico). Solo tiene sentido en modo 'arma' (el único que puede
       // critear); mismo andamiaje de arriba, en una lista aparte que se SUMA a la de siempre solo si pega crítico.
       if(st.modo === 'arma'){
-        h += `<div class="fila" style="margin-top:18px;padding-top:14px;border-top:1px solid #2b3347"><label class="op" style="padding:0"><input type="checkbox" data-critmatters ${st.critMatters ? 'checked' : ''}> ⚡ Critical Matters: si el golpe es crítico, pasa algo más (además de lo de arriba)</label></div>`;
+        h += `<div class="fila" style="margin-top:18px;padding-top:14px;border-top:1px solid var(--pap-linea,#3B2E34)"><label class="op" style="padding:0"><input type="checkbox" data-critmatters ${st.critMatters ? 'checked' : ''}> ⚡ Critical Matters: si el golpe es crítico, pasa algo más (además de lo de arriba)</label></div>`;
         if(st.critMatters){
           h += `<p class="nota" style="margin:4px 0 8px">Esto se suma a los efectos de arriba SOLO si el golpe resulta crítico — no reemplaza nada, se agrega. Si no es crítico, esta parte no pasa nada.</p>`;
           h += filaEfectosLista(st.efectosCritico, i => 'c' + i);
           h += `<div class="fila"><button type="button" class="sec" data-ef-mas="c:estado">＋ Estado (si es crítico)</button><button type="button" class="sec" data-ef-mas="c:cura">＋ Cura (si es crítico)</button></div>`;
           h += `<div class="fila" style="margin-top:14px"><label class="op" style="padding:0"><input type="checkbox" data-efectosnotacritico-on ${st.efectosNotaCriticoOn ? 'checked' : ''}> Personalizar: un efecto libre que solo pasa si es crítico</label></div>`;
           if(st.efectosNotaCriticoOn){
-            h += `<textarea data-efectosnotacritico rows="3" style="width:100%;box-sizing:border-box;background:#0e1220;color:#fff;border:1px solid #39435c;border-radius:8px;padding:8px;font-size:14px" placeholder="ej. La lesión pasa a -2 fijo a la PdG por 2 turnos.">${esc(st.efectosNotaCritico)}</textarea>
+            h += `<textarea data-efectosnotacritico rows="3" style="width:100%;box-sizing:border-box;padding:8px;font-size:14px" placeholder="ej. La lesión pasa a -2 fijo a la PdG por 2 turnos.">${esc(st.efectosNotaCritico)}</textarea>
               <p class="nota" style="margin-top:6px">Se muestra en el cuadro del duelo, junto a los demás efectos, SOLO cuando el golpe sale crítico — sin botón «Aplicar», para resolverlo a mano.</p>`;
           }
         }
@@ -495,24 +488,19 @@ const AsistenteDueloHab = (() => {
       return h;
     }
 
-    function dibujar(){
-      const L = pasos();
-      st.paso = Math.max(0, Math.min(L.length - 1, st.paso));
-      const id = L[st.paso].id;
+    // El contenido de un paso y su ayuda (titulo() la deja en ayudaPaso).
+    function contenidoPaso(id){
+      ayudaPaso = '';
       const cuerpo = id === 'activo' ? cuerpoActivo() : id === 'costo' ? cuerpoCosto() : id === 'objetivo' ? cuerpoObjetivo() : id === 'alcance' ? cuerpoAlcance(st.modo === 'arma')
         : id === 'tira' ? cuerpoTira() : id === 'contra' ? cuerpoContra() : id === 'dano' ? cuerpoDano() : id === 'efectos' ? cuerpoEfectos()
         : id === 'arma' ? cuerpoArma() : id === 'flash' ? cuerpoFlash() : cuerpoListo();
-      const chips = `<div class="adh-chips">${L.map((x, i) => `<button type="button" class="adh-chip${i === st.paso ? ' activo' : ''}${i < st.paso ? ' hecho' : ''}" data-paso="${i}">${i + 1}. ${x.corto}</button>`).join('')}</div>`;
-      const nav = `<div class="adh-nav">${st.paso > 0 ? '<button type="button" class="sec" data-atras>← Atrás</button>' : '<span></span>'}${st.paso < L.length - 1 ? '<button type="button" data-siguiente>Siguiente →</button>' : '<span></span>'}</div>`;
-      f.innerHTML = `<div class="adh"><header><span>✨ Ejecución · ${esc(cfg.nombre || 'Habilidad')}</span><button type="button" class="sec" data-x>✕</button></header>
-        <div class="cuerpo">${chips}${cuerpo}${nav}</div>
-        <div class="pie">${ini ? '<button type="button" class="rojo" data-quitar title="Vuelve al modo simple de siempre (sin este cuadro)">Sacar esta configuración</button>' : ''}<button type="button" class="sec" data-x>Cancelar</button><button type="button" data-ok>Guardar</button></div></div>`;
-      f.querySelectorAll('[data-x]').forEach(b => b.onclick = cerrar);
-      f.querySelectorAll('[data-paso]').forEach(b => b.onclick = () => { st.paso = +b.dataset.paso; dibujar(); });
-      const atras = f.querySelector('[data-atras]'); if(atras) atras.onclick = () => { st.paso--; dibujar(); };
-      const sig = f.querySelector('[data-siguiente]'); if(sig) sig.onclick = () => { st.paso++; dibujar(); };
+      return {h: `<div class="adh-paso">${cuerpo}</div>`, ayuda: ayudaPaso};
+    }
+    function dibujar(){ if(api) api.redibujar(); }
+    // Los controles del paso que se acaba de dibujar (la ventana común lo llama en cada dibujo).
+    function conectar(){
       const q = (sel, fn) => { const el = f.querySelector(sel); if(el) el.onchange = fn; };
-      q('[data-activo]', e => { st.activo = e.target.checked; st.paso = 0; dibujar(); });
+      q('[data-activo]', e => { st.activo = e.target.checked; dibujar(); ir(0); });
       q('[data-costo-sp]', e => { st.costoSp = e.target.value; });
       q('[data-costo-nitros-modo]', e => { st.costoNitrosModo = e.target.value; dibujar(); });
       q('[data-costo-nitros-num]', e => { st.costoNitrosNum = Math.max(0, Math.round(Number(e.target.value) || 0)); });
@@ -606,16 +594,16 @@ const AsistenteDueloHab = (() => {
         arr[i] = r.modo === 'preset' ? efectoDePreset(r) : {nombre: '', turnos: 2, origen: 'manual'};
         dibujar();
       });
-      const bq = f.querySelector('[data-quitar]');
-      if(bq) bq.onclick = () => { cerrar(); cfg.alGuardar(null); };
       // Costo (2026-09-27, pedido del dueño): se guarda junto con el duelo, en el mismo Guardar — es el mismo
       // dato de siempre (it.costo/nitrosCosto/hpCosto), no uno nuevo. cfg.alGuardar recibe {duelo, costo}
       // cuando se guarda algo (null sigue siendo "sin duelo", sin tocar el costo).
-      const costoResultado = () => ({sp: st.costoSp.trim(), nitrosCosto: st.costoNitrosModo === 'ataque' ? 'ATAQUE' : st.costoNitrosModo === 'x' ? 'X' : st.costoNitrosNum, hpCosto: st.costoHp, turnoAjenoSp: st.costoTurnoOn ? st.costoTurnoSp.trim() : ''});
-      f.querySelector('[data-ok]').onclick = () => {
+    }
+    // Guardar (antes el botón «Guardar» del pie): false = falta algo (avisa y la ventana sigue abierta).
+    function okGuardar(){
+        const costoResultado = () => ({sp: st.costoSp.trim(), nitrosCosto: st.costoNitrosModo === 'ataque' ? 'ATAQUE' : st.costoNitrosModo === 'x' ? 'X' : st.costoNitrosNum, hpCosto: st.costoHp, turnoAjenoSp: st.costoTurnoOn ? st.costoTurnoSp.trim() : ''});
         if(!st.activo){ cerrar(); cfg.alGuardar(null); return; }
         if(st.modo === 'flash'){
-          if(!st.flashEn.size){ alert('Marcá al menos una tirada donde vale el Flash.'); return; }
+          if(!st.flashEn.size){ alert('Marcá al menos una tirada donde vale el Flash.'); return false; }
           cerrar(); cfg.alGuardar({duelo: {modo: 'flash', flash: {en: [...st.flashEn], bono: st.flashBono}}, costo: costoResultado()}); return;
         }
         const efs = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(mapEfectoOut);
@@ -635,25 +623,25 @@ const AsistenteDueloHab = (() => {
           cerrar(); cfg.alGuardar({duelo: o2, costo: costoResultado()}); return;
         }
         const hayTira = !st.tiraNinguna && (st.tiraModo === 'custom' ? !!st.tiraFormula.trim() : !!st.tira);
-        if(!st.tiraNinguna && st.tiraModo === 'custom' && !st.tiraFormula.trim()){ alert('Escribí la fórmula de la tirada personalizada (podés usar «X»), o tildá «No lleva tirada».'); return; }
+        if(!st.tiraNinguna && st.tiraModo === 'custom' && !st.tiraFormula.trim()){ alert('Escribí la fórmula de la tirada personalizada (podés usar «X»), o tildá «No lleva tirada».'); return false; }
         const esArea = st.objetivo === 'area' || st.objetivo === 'onda';
         const out = {objetivo: st.objetivo, tira: (!st.tiraNinguna && st.tiraModo === 'stat') ? (st.tira || '') : '', contra: (hayTira && (esArea || st.contraModo === 'stats')) ? [...st.contra] : []};
         if(!st.tiraNinguna && st.tiraModo === 'custom'){ out.tiraFormula = st.tiraFormula.trim(); out.tiraEtiqueta = st.tiraEtiqueta.trim() || 'Tirada'; }
-        if(esArea && !hayTira){ alert('Una habilidad de área u onda necesita una tirada (ej. PdG.Esp o Fuerza contra lo que resiste cada uno) — elegí qué tira quien la usa.'); return; }
-        if(st.objetivo === 'zona' && !st.dano && !st.zonaEstadoNombre){ alert('Una zona persistente necesita hacer algo: marcá «Esta habilidad hace daño» en el paso Daño y/o elegí un estado en el paso Objetivo.'); return; }
-        if(hayTira && (esArea || st.contraModo === 'stats') && !out.contra.length){ alert('Marcá con qué se resiste el objetivo (o elegí «Nadie» / «Otro»).'); return; }
+        if(esArea && !hayTira){ alert('Una habilidad de área u onda necesita una tirada (ej. PdG.Esp o Fuerza contra lo que resiste cada uno) — elegí qué tira quien la usa.'); return false; }
+        if(st.objetivo === 'zona' && !st.dano && !st.zonaEstadoNombre){ alert('Una zona persistente necesita hacer algo: marcá «Esta habilidad hace daño» en el paso Daño y/o elegí un estado en el paso Objetivo.'); return false; }
+        if(hayTira && (esArea || st.contraModo === 'stats') && !out.contra.length){ alert('Marcá con qué se resiste el objetivo (o elegí «Nadie» / «Otro»).'); return false; }
         if(hayTira && !esArea && st.contraModo === 'otro'){
-          if(!st.contraOtro.trim()){ alert('Escribí con qué se resiste (o elegí «Nadie» si no hay nada que resista).'); return; }
+          if(!st.contraOtro.trim()){ alert('Escribí con qué se resiste (o elegí «Nadie» si no hay nada que resista).'); return false; }
           out.contraOtro = st.contraOtro.trim();
         }
         if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; out.ignoraDano = st.ignoraDano; if(cfg.costoVariable && st.danoFijoPorX) out.danoFijoPorX = st.danoFijoPorX; }
         if(st.objetivo === 'zona' && st.dano){
           if(st.danoDif){
-            if(!hayTira || st.tiraModo === 'custom' || !out.contra.length){ alert('El daño «la diferencia» necesita que quien la usa tire un stat (paso Tirada) y algo con qué resistirla (paso Resistencia).'); return; }
+            if(!hayTira || st.tiraModo === 'custom' || !out.contra.length){ alert('El daño «la diferencia» necesita que quien la usa tire un stat (paso Tirada) y algo con qué resistirla (paso Resistencia).'); return false; }
             out.danoDiferencia = true;
           }
           if(st.danoExtra){
-            if(!/^\d*d\d+\s*([+-]\s*\d+)?$/i.test(st.danoExtra)){ alert('La tirada de «si el daño entra» tiene que ser una fórmula de dados, por ejemplo 1d20.'); return; }
+            if(!/^\d*d\d+\s*([+-]\s*\d+)?$/i.test(st.danoExtra)){ alert('La tirada de «si el daño entra» tiene que ser una fórmula de dados, por ejemplo 1d20.'); return false; }
             out.danoExtra = st.danoExtra.replace(/\s+/g, '');
           }
         }
@@ -675,7 +663,6 @@ const AsistenteDueloHab = (() => {
         out.efectos = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(mapEfectoOut);
         cerrar();
         cfg.alGuardar({duelo: out, costo: costoResultado()});
-      };
     }
     // Nombres de estados que conoce el juego (debuffs y buffs de `comun/estados-presets.js`, vía EstadosAplicar);
     // se puede escribir otro a mano si no hay lista.
@@ -700,7 +687,17 @@ const AsistenteDueloHab = (() => {
         ...(e.polaridad ? {polaridad: e.polaridad} : {}),
       };
     }
-    dibujar();
+    api = PasoAPaso.abrir({
+      titulo: `Ejecución ✨ · ${cfg.nombre || 'Habilidad'}`, crear: false, z: 99500,
+      pasos: () => pasos().map(x => {
+        let c = null;
+        const cont = () => c || (c = contenidoPaso(x.id));
+        return {id: x.id, nombre: x.corto, get ayuda(){ return cont().ayuda; }, html: () => cont().h, alMontar: (cuerpo, a) => { f = a.raiz; conectar(); }};
+      }),
+      alGuardar: () => okGuardar(),
+      extras: ini ? [{id: 'quitar', texto: 'Sacar esta configuración', alClic: () => { cerrar(); cfg.alGuardar(null); }}] : [],
+    });
+    f = api.raiz;
   }
   return {abrir};
 })();

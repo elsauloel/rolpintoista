@@ -56,6 +56,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creeps-mapas.js"></script>
 <script src="paso-a-paso.js"></script>
 <script src="asistente-item.js"></script>
+<script src="asistente-duelo-hab.js"></script>
 <script src="modificadores-tirada.js"></script>
 <script src="plantillas.js"></script>
 <script src="catalogo.js"></script>
@@ -1394,6 +1395,19 @@ prueba('asistente de ítems en la ventana común: sin categoría ni nombre no av
   clic('[data-pap="crear"]'); await new Promise(r => setTimeout(r, 0));
   igual([aviso, pestanas[1], titulo, guardado && guardado.nombre, guardado && guardado.tipoDado, AsistenteItem.abierto(), mia.isConnected],
     ['Primero elegí qué tipo de ítem es', '2. Tipo', `Ítem nuevo · paso ${pestanas.length} de ${pestanas.length}: Listo`, 'Hacha de prueba', 6, false, false]);
+});
+prueba('Ejecución ✨ en la ventana común: los pasos dependen del objetivo y Guardar devuelve la configuración', async () => {
+  let r = 'nada';
+  AsistenteDueloHab.abrir({nombre: 'Rayo', siempreActivo: true, costoInicial: {sp: '2', nitrosCosto: 1}, alGuardar: x => { r = x; }});
+  const mia = [...document.querySelectorAll('.pap')].pop(), q = s => mia.querySelector(s);
+  const tabs = () => [...mia.querySelectorAll('[data-pap-paso]')].map(b => b.textContent.replace(/^\d+\. /, ''));
+  const antes = tabs();
+  q(`[data-pap-paso="${antes.indexOf('Objetivo')}"]`).click();
+  const sel = q('[data-objetivo]'); sel.value = 'uno mismo'; sel.dispatchEvent(new Event('change', {bubbles: true}));
+  const despues = tabs(), titulo = q('.pap-cab h3').textContent;
+  q('[data-pap="guardar"]').click(); await new Promise(res => setTimeout(res, 0));
+  igual([antes.includes('Alcance'), despues.includes('Alcance'), titulo, r && r.duelo && r.duelo.objetivo, r && r.costo && r.costo.sp, mia.isConnected],
+    [true, false, `Ejecución ✨ · Rayo · paso ${antes.indexOf('Objetivo') + 1} de ${despues.length}: Objetivo`, 'uno mismo', '2', false]);
 });
 prueba('paso a paso: al crear, «✔ Crear» solo en el último paso; Cancelar pregunta y descarta; los pasos pueden depender de lo elegido', async () => {
   const hechos = [];

@@ -569,7 +569,7 @@ async function trampaResolver(){
    Un cartelito (como el de las zonas) en la pantalla de quien movió: «🔎 Algo está fuera de lugar… [🎲 Tirar Percepción]». La tirada
    (la misma de la ficha, con el dado que sube un escalón, del valor `resumen.percepcion`) sale en la Mesa como una Percepción cualquiera,
    sin decir para qué. Gana si llega a la dificultad de la trampa (`trampaDetectar`, 8 si no tiene): la trampa queda `descubierta` (la ve
-   todo su equipo). Si no, «No notás nada raro» y sigue. Descubrirla no rompe el sigilo. */
+   todo su equipo). Si no, «Mmm... Puede que estés flasheando.» y sigue. Descubrirla no rompe el sigilo. */
 let percepcionBanner = null;   // {tokenId, trampaId, resultado}
 function renderPercepcionBanner(){
   let el2 = document.getElementById('percepcion-banner');
@@ -609,7 +609,7 @@ async function percepcionResolverBanner(){
     catch(err){ console.error('No se pudo marcar la trampa como descubierta (¿faltan publicar las reglas?):', err); }
     percepcionBanner = {...pb, resultado: `encontraste algo: ${el.trampaNombre ? `«${el.trampaNombre}», ` : ''}una trampa (${r.total} contra ${dif}).`};
   }else{
-    percepcionBanner = {...pb, resultado: `no notás nada raro (${r.total}).`};
+    percepcionBanner = {...pb, resultado: `Mmm... Puede que estés flasheando.`};   // texto del dueño (2026-10-02); la tirada ya está en la Mesa
   }
   renderPercepcionBanner();
 }

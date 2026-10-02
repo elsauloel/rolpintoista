@@ -438,7 +438,10 @@ const Combatiente = (() => {
       zonaIgnoraDef: c.dano ? (c.ignoraDano !== undefined ? !!c.ignoraDano : (c.tipoDano || 'arcano') !== 'fisico') : false,
       zonaDanoDif: dif, zonaDanoTipo: c.dano ? (TIPO_DANO_NOMBRE[c.tipoDano || 'arcano'] || '') : '',
       zonaTiraExtra: c.dano && c.danoExtra ? String(c.danoExtra) : '', zonaNota: c.efectoLibre ? (o.X === undefined || o.X === null ? String(c.efectoLibre) : sustituirX(String(c.efectoLibre), o.X)) : '',
-      resistStat: (c.contra && c.contra[0]) || '', resistValor: o.resistValor === undefined ? null : o.resistValor};
+      resistStat: (c.contra && c.contra[0]) || '', resistValor: o.resistValor === undefined ? null : o.resistValor,
+      // La tirada de la zona (2026-10-02, P143): el stat de quien la crea y su VALOR en ese momento; el mapa lo tira cada vez que la zona
+      // afecta a alguien (antes se tiraba una sola vez al ejecutar: `resistValor`, que sigue valiendo para las zonas viejas).
+      tiraStat: c.tira || '', tiraValor: Number.isFinite(o.tiraValor) ? Math.round(o.tiraValor) : null};
   }
   // La trampa que coloca una habilidad, lista para el mapa: si no trae nombre propio, lleva el de la habilidad.
   function trampaDeHab(h){

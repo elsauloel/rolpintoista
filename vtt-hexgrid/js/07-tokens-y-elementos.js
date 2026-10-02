@@ -335,6 +335,8 @@ function escucharElementos(){
         zonaDanoTipo: typeof d.zonaDanoTipo === 'string' ? d.zonaDanoTipo : '',
         zonaTiraExtra: typeof d.zonaTiraExtra === 'string' ? d.zonaTiraExtra : '',
         zonaNota: typeof d.zonaNota === 'string' ? d.zonaNota : '',
+        zonaTiraStat: typeof d.zonaTiraStat === 'string' ? d.zonaTiraStat : '',   // la tirada de la zona en cada exposición (P143)
+        zonaTiraValor: Number.isFinite(d.zonaTiraValor) ? d.zonaTiraValor : null,
         // Trampa persistente (2026-09-28): configuración todavía dormida (antes de dispararse) de la zona que va
         // a dejar al activarse — ver trampaResolver. `zonaTurnos` es la duración de ESA zona, aparte de `turnos`
         // (que mientras la trampa está dormida puede significar otra cosa: cuándo se borra sola si no la pisan).

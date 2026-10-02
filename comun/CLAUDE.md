@@ -1017,3 +1017,7 @@ versión parecida en más de una, es candidato a juntar.
   tirada), `InvCalculo` (botón y editor), el ✨ (`TIRA` de `asistente-duelo-hab.js`; su alcance automático es el Rango de casteo, como
   PdG.Esp) y el editor de habilidades de creep. Lo suben los **Anillos / Pociones / Pergaminos de Furia Arcana** (`comun/catalogo.js`, +1/+2/+3,
   pares de los de Furia de Combate) y la pasiva **Potencia especial** (`comun/pasivas.js`, +1).
+- **La tirada de una zona persistente es de la zona, no de la habilidad** (2026-10-02, dueño; P143 sigue abierta para el grupo): al
+  ejecutar ya no se tira nada — la zona aparece siempre. `Combatiente.zonaDeHab` manda `tiraStat` + `tiraValor` (el valor del stat de quien
+  la crea en ese momento; lo calculan `FichaAcciones.colocarZonaDeHab`, `CreepAcciones.zonaDeHab` e `InvHabilidades.zona`) y el mapa lo tira
+  **cada vez que la zona afecta a alguien**. En el ✨, con objetivo zona, el paso se llama «Tirada de la zona» (solo un stat, o «No»).

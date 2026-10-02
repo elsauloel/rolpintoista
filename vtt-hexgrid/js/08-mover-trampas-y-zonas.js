@@ -388,13 +388,28 @@ async function zonaResolverBanner(){
       : (() => { const f = fichasPub.get(t.fichaId); return f && f.resumen ? num(f.resumen[el.zonaResistStat]) : 0; })();
     // La misma tirada de stat que en la ficha y GM Tools (comun/combatiente.js), con los estados de quien resiste.
     const estadosDe = t.tipo === 'creep' ? ((creepPrivadoDe(t.fichaId) || {}).estados || []) : (((fichasPub.get(t.fichaId) || {}).resumen || {}).estados || []);
+    // La tirada de la zona (2026-10-02, P143): si la zona guarda el stat de quien la creó, se tira AHORA (cada exposición, una tirada
+    // nueva); si no (zonas viejas, del GM o de trampas), vale el número fijo guardado.
+    let contra = num(el.zonaResistValor), contraTxt = String(contra);
+    if(el.zonaTiraStat && Number.isFinite(el.zonaTiraValor)){
+      const rz = Combatiente.tirarStat(el.zonaTiraValor, [], el.zonaTiraStat);
+      if(rz){
+        contra = rz.total;
+        const etqZ = ZONA_STAT_LABEL[el.zonaTiraStat] || el.zonaTiraStat;
+        contraTxt = `${etqZ} ${rz.total}`;
+        const ct = [...tokens.values()].find(x => x.fichaId === el.zonaCasteadorRef && x.tipo === el.zonaCasteadorTipo);
+        const de = ct && !ct.oculto ? ` (de ${nombreDe(ct)})` : '';
+        try{ mesaPublicar(`${el.zonaNombre || 'Zona'}${de} · ${etqZ}`, {formula: rz.formula, rolls: rz.rolls, mod: rz.mod, total: rz.total, quien: `${el.zonaNombre || 'Zona'}${de}`}); }catch(err){}
+      }
+    }
     const rd = Combatiente.tirarStat(valor, estadosDe, el.zonaResistStat);
     if(rd){
       const total = rd.total;
-      resistio = total > num(el.zonaResistValor);   // empate: gana quien creó la zona
-      diferencia = Math.max(0, num(el.zonaResistValor) - total);
+      resistio = total > contra;   // empate: gana la zona (quien la creó)
+      diferencia = Math.max(0, contra - total);
       try{ mesaPublicar(`${quienTxt} · ${ZONA_STAT_LABEL[el.zonaResistStat] || el.zonaResistStat}`, {formula: rd.formula, rolls: rd.rolls, mod: rd.mod, total}); }catch(err){}
-      partes.push(resistio ? `resistió (${total} contra ${num(el.zonaResistValor)})` : `no resistió (${total} contra ${num(el.zonaResistValor)})`);
+      const tuyo = `${ZONA_STAT_LABEL[el.zonaResistStat] || el.zonaResistStat} ${total}`;
+      partes.push(resistio ? `resistió (${tuyo} contra ${contraTxt})` : `no resistió (${tuyo} contra ${contraTxt})`);
     }
   }
   // El daño (2026-10-02, regla del dueño): quien resiste no recibe nada — ni el daño ni el estado. Con «la diferencia», el daño es

@@ -1204,3 +1204,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   los tokens no llevan su id adentro (es la clave del Map `tokens`); ahora usa `zonaIdDe(t)`. Además, en una zona **de habilidad** cuyo daño
   ignora la Defensa se resta la **Armadura mágica** de quien lo recibe, como en el duelo (P142 ✅: el tóxico también); la tirada extra sale
   solo si algo llegó a la vida. El cartelito usa 🔥 solo para el daño de fuego (si no, 🌫).
+- **Zonas de habilidad: la zona tira en cada exposición** (2026-10-02, P143): el elemento guarda `zonaTiraStat` + `zonaTiraValor` (el stat
+  de quien la creó y su valor al crearla) y `zonaResolverBanner` lo tira cada vez (publica «Pedos Tóxicos (de Silvia) · Dmg.Esp» en la Mesa)
+  contra la resistencia de quien entra. Las zonas viejas, las del GM y las de trampas siguen con su número fijo (`zonaResistValor`).
+  Reglas nuevas de Firestore (esos dos campos).

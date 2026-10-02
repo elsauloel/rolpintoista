@@ -223,14 +223,11 @@ const CreepAcciones = (() => {
   function zonaDeHab(sc, h){
     const c = h && h.duelo;
     if(!c || typeof c !== 'object' || c.objetivo !== 'zona') return null;
+    // La tirada es de la zona, no de la habilidad (2026-10-02, P143): se manda el valor del stat y el mapa lo tira en cada exposición.
     const stat = c.tira || '';
-    let resistValor = null, t = null;
-    if(stat){
-      const r = Combatiente.tirarStat(CreepDuelo.habStat(sc, stat), sc.estados, stat);
-      if(r){ resistValor = r.total; t = {origen: `${sc.nombre} · ${h.nombre} · ${habEtq(stat)}`, r}; }
-    }
+    const v = stat ? CreepDuelo.habStat(sc, stat) : NaN;
     // El mensaje lo arma la regla común (comun/combatiente.js, zonaDeHab), el mismo que manda un personaje.
-    return {tirada: t, zona: Combatiente.zonaDeHab(h, c, {fichaId: sc.id, tipo: 'creep', resistValor})};
+    return {tirada: null, zona: Combatiente.zonaDeHab(h, c, {fichaId: sc.id, tipo: 'creep', tiraValor: Number.isFinite(v) ? v : undefined})};
   }
   // Cooldown a mano (− / + / ↺).
   function cdMod(sc, habId, accion){

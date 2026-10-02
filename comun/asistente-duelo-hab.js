@@ -211,7 +211,7 @@ const AsistenteDueloHab = (() => {
       }else{
         L.push({id: 'objetivo', corto: 'Objetivo'});
         if(st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda' && st.objetivo !== 'zona') L.push({id: 'alcance', corto: 'Alcance'});
-        L.push({id: 'tira', corto: 'Tirada'});
+        L.push({id: 'tira', corto: st.objetivo === 'zona' ? 'Tirada de la zona' : 'Tirada'});
         if(!sinOp()) L.push({id: 'contra', corto: 'Resistencia'});
         L.push({id: 'dano', corto: 'Daño'});
         if(st.objetivo !== 'zona') L.push({id: 'efectos', corto: 'Efectos'});
@@ -291,6 +291,15 @@ const AsistenteDueloHab = (() => {
       return h;
     }
     function cuerpoTira(){
+      // Zona persistente (2026-10-02, dueño): la habilidad no falla — la zona aparece siempre; la tirada es del EFECTO de la zona,
+      // y se hace cada vez que afecta a alguien (P143, abierta: por ahora así).
+      if(st.objetivo === 'zona'){
+        st.tiraModo = 'stat';   // una zona tira un stat de quien la creó (la fórmula propia no va acá)
+        let h = titulo('', '¿La zona pide una tirada a quien afecta?', 'La habilidad no falla: al ejecutarla, la zona aparece. La tirada es del efecto de la zona: cada vez que afecta a alguien (al entrar, o en cada Mantenimiento si sigue adentro) se tira este stat de quien la creó —con el valor que tenía al crearla— contra la resistencia de esa persona (paso siguiente).');
+        h += `<label class="op"><input type="checkbox" data-tira-ninguna ${st.tiraNinguna ? 'checked' : ''}> No: el daño y el estado le entran directo a quien esté adentro</label>`;
+        if(!st.tiraNinguna) h += `<select data-tira style="margin-top:10px">${TIRA.map(([v, t]) => `<option value="${v}"${st.tira === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
+        return h;
+      }
       let h = titulo('', '¿Qué tira quien la usa?', 'El stat que tira quien ejecuta la habilidad, o —si no encaja en ninguno— tu propia fórmula (ej. Drenar vida: «X + 1dX»).');
       h += `<label class="op"><input type="checkbox" data-tira-ninguna ${st.tiraNinguna ? 'checked' : ''}> No lleva tirada: se aplica directo (buffs, curas sobre uno mismo o un aliado)</label>`;
       if(st.tiraNinguna){
@@ -309,7 +318,9 @@ const AsistenteDueloHab = (() => {
     }
     function cuerpoContra(){
       const esArea = st.objetivo === 'area' || st.objetivo === 'onda';
-      let h = titulo('', '¿Con qué se resiste el objetivo?', esArea
+      let h = titulo('', st.objetivo === 'zona' ? '¿Con qué se resiste quien la zona afecta?' : '¿Con qué se resiste el objetivo?', st.objetivo === 'zona'
+        ? 'Cada vez que la zona afecta a alguien, esa persona tira esto contra la tirada de la zona. Si gana, no le pasa nada (ni daño ni estado).'
+        : esArea
         ? 'Un hechizo de área u onda necesita un stat real: cada objetivo lo tira contra vos por separado, en la cascada.'
         : 'Para un ataque o control sobre un rival, elegí uno o más stats (si marcás más de uno, el objetivo elige uno a ciegas, antes de ver tu tirada). Un proyectil suele esquivarse (Evasión); un efecto sobre el cuerpo se resiste con Res.Esp; un control mental con Res.Mt. Para un buff sobre uno mismo o un aliado, casi siempre no hay nada que resistir.');
       if(!esArea){

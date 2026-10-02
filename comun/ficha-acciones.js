@@ -681,23 +681,17 @@ const FichaAcciones = (() => {
     }catch(err){ console.error('No se pudo colocar la trampa:', err); ui.toast('No se pudo colocar la trampa — revisá la consola'); }
   }
   // Manda al mapa todo lo que hace falta para crear la zona persistente: radio, duración, estado y/o daño, y con qué resistencia.
-  // Si hay tirada («tira» del 🎯), la tira UNA vez acá y manda el total. Devuelve false si no se pudo avisar (sin mapa abierto).
+  // Si hay tirada («tira» del ✨), NO se tira acá (2026-10-02, P143: la habilidad no falla, la zona aparece siempre): se manda el valor
+  // del stat en este momento y el mapa lo tira cada vez que la zona afecta a alguien. Devuelve false si no se pudo avisar (sin mapa abierto).
   function colocarZonaDeHab(S, it, xSp, xNitros, ui){
     const c = FichaBotonera.dueloDe(it);
     if(!c || typeof c !== 'object' || c.objetivo !== 'zona') return false;
     if(!ui.enMapa() || !ui.yo().ref) return false;
     const stat = c.tira || '';
-    let resistValor = null;
-    if(stat){
-      const r = Combatiente.tirarStat(FichaCalculo.calcular(S).final[stat], S.efectos, stat);
-      if(r){
-        resistValor = r.total;
-        ui.registrarTirada(`${it.nombre} · ${FichaCalculo.STAT_LABEL[stat] || stat}`, r);
-      }
-    }
+    const v = stat ? FichaCalculo.calcular(S).final[stat] : NaN;
     try{
       // El mensaje lo arma la regla común (comun/combatiente.js, zonaDeHab), el mismo que manda un creep.
-      const zona = Combatiente.zonaDeHab(it, c, {fichaId: ui.yo().ref, tipo: 'pj', X: xDeHab(it, xSp, xNitros), resistValor});
+      const zona = Combatiente.zonaDeHab(it, c, {fichaId: ui.yo().ref, tipo: 'pj', X: xDeHab(it, xSp, xNitros), tiraValor: Number.isFinite(v) ? v : undefined});
       ui.alMapa(zona.tipo, zona);
       return true;
     }catch(err){ console.error('No se pudo avisar la zona al mapa:', err); return false; }

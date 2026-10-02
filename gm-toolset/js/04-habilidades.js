@@ -51,7 +51,7 @@ function lanzarDueloDeHabCreep(sc, h, hab){
 function colocarZonaDeHabCreep(sc, h){
   if(!(h && h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'zona')) return false;
   if(window.parent === window) return false;
-  const z = CreepAcciones.zonaDeHab(sc, h);   // comun/creep-acciones.js: la tirada (una vez) y el mensaje
+  const z = CreepAcciones.zonaDeHab(sc, h);   // comun/creep-acciones.js: el mensaje (la tirada la hace la zona en cada exposición, P143)
   if(!z) return false;
   if(z.tirada) registrarTirada(z.tirada.origen, z.tirada.r);
   try{

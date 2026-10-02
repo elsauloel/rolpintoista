@@ -89,12 +89,9 @@ const InvHabilidades = (() => {
   function zona(inv, h, ui){
     const c = h && h.duelo;
     if(!c || typeof c !== 'object' || c.objetivo !== 'zona' || !ui.enMapa()) return false;
-    let resistValor = null;
-    if(c.tira){
-      const t = A().tirada(inv, `${h.nombre} · ${etq(c.tira)}`, I().statValor(inv, c.tira), c.tira);
-      if(!t.error){ resistValor = t.r.total; ui.publicar(t); }
-    }
-    try{ return ui.colocarZona(Combatiente.zonaDeHab(h, c, {fichaId: ui.ref(inv), tipo: 'pj', resistValor})) !== false; }
+    // La tirada es de la zona, no de la habilidad (2026-10-02, P143): se manda el valor del stat y el mapa lo tira en cada exposición.
+    const v = c.tira ? I().statValor(inv, c.tira) : NaN;
+    try{ return ui.colocarZona(Combatiente.zonaDeHab(h, c, {fichaId: ui.ref(inv), tipo: 'pj', tiraValor: Number.isFinite(v) ? v : undefined})) !== false; }
     catch(err){ console.error('No se pudo avisar la zona al mapa:', err); return false; }
   }
   // Un efecto del cuadro de Ejecución sobre la propia invocación: cura, o el estado armado igual que uno recibido.

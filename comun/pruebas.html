@@ -1141,6 +1141,10 @@ prueba('la zona manda la diferencia, el tipo tóxico, la tirada extra y su texto
   igual([z.zonaDano, z.zonaDanoDif, z.zonaDanoTipo, z.zonaIgnoraDef, z.zonaTiraExtra, z.zonaNota, z.resistStat, z.resistValor, z.radio, z.zonaTurnos],
     ['', true, 'tóxico', true, '1d20', '7+ Pajaritos · 17+ Stun · 20 desmayo', 'resmg', 9, 2, 2]);
 });
+prueba('la zona manda el stat y su valor (no una tirada): el mapa tira en cada exposición (P143)', () => {
+  const z = Combatiente.zonaDeHab({nombre: 'Pedos Tóxicos'}, {objetivo: 'zona', tira: 'dmgesp', contra: ['resmg'], dano: true, danoDiferencia: true}, {fichaId: 'f1', tipo: 'pj', tiraValor: 6.4});
+  igual([z.tiraStat, z.tiraValor, z.resistValor, z.resistStat], ['dmgesp', 6, null, 'resmg']);
+});
 prueba('con su fórmula, la zona sigue mandando la fórmula y no la diferencia', () => {
   const z = Combatiente.zonaDeHab({nombre: 'Nube', tiradaExtra: '2d6'}, {objetivo: 'zona', dano: true, tipoDano: 'fuego', contra: ['resmg']}, {resistValor: 5});
   igual([z.zonaDano, z.zonaDanoDif, z.zonaDanoTipo, z.zonaTiraExtra, z.zonaNota], ['2d6', false, 'de fuego', '', '']);

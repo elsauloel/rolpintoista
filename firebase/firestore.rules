@@ -558,7 +558,7 @@ service cloud.firestore {
       // solo lo puede prender o apagar el GM (al crear o después, desde ⚙️);
       // sirve con o sin Sólido. alfa 0 se permite (solo se ve el contorno).
       function elementoValido(d) {
-        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'usoEn', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant', 'trampaItem', 'trampaFicha', 'zona', 'zonaNombre', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaAmiga', 'zonaResistStat', 'zonaResistValor', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaDanoDif', 'zonaDanoTipo', 'zonaTiraExtra', 'zonaNota', 'trampaDejaZona', 'zonaTurnos'])
+        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'usoEn', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant', 'trampaItem', 'trampaFicha', 'zona', 'zonaNombre', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaAmiga', 'zonaResistStat', 'zonaResistValor', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaDanoDif', 'zonaDanoTipo', 'zonaTiraExtra', 'zonaNota', 'zonaTiraStat', 'zonaTiraValor', 'trampaDejaZona', 'zonaTurnos'])
           && d.tipo in ['flor', 'linea', 'libre']
           && d.origen is map && d.origen.col is int && d.origen.fila is int
           && d.celdas is list && d.celdas.size() >= 2 && d.celdas.size() <= 6000 && d.celdas.size() % 2 == 0
@@ -614,6 +614,9 @@ service cloud.firestore {
           && (!('zonaDanoTipo' in d) || (d.zonaDanoTipo is string && d.zonaDanoTipo.size() <= 20))
           && (!('zonaTiraExtra' in d) || (d.zonaTiraExtra is string && d.zonaTiraExtra.size() <= 12))
           && (!('zonaNota' in d) || (d.zonaNota is string && d.zonaNota.size() <= 200))
+          // La tirada de la zona en cada exposición: el stat de quien la creó y su valor al crearla (2026-10-02, P143).
+          && (!('zonaTiraStat' in d) || (d.zonaTiraStat is string && d.zonaTiraStat.size() <= 12))
+          && (!('zonaTiraValor' in d) || d.zonaTiraValor is int)
           // Trampa persistente (2026-09-28): al dispararse se convierte en zona (mismas celdas), ver trampaResolver.
           && (!('trampaDejaZona' in d) || d.trampaDejaZona is bool)
           && (!('zonaTurnos' in d) || (d.zonaTurnos is int && d.zonaTurnos >= 1 && d.zonaTurnos <= 99))

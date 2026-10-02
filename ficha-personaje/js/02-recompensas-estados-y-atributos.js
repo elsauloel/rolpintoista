@@ -567,29 +567,12 @@ function monedaReroll(){ return FichaDuelo.monedaReroll(S); }
 // Tira la moneda: par se conserva, impar se rompe.
 function tirarMonedaReroll(m){ return FichaDuelo.tirarMonedaReroll(S, m, combateUi); }
 // Vuelve a tirar los mismos dados de una tirada anterior (con sus mismos bonos y mitades). `u` es una entrada de dadosHistorial.
-function repetirTirada(u){
-  const mit = (String(u.formula || '').match(/÷2/g) || []).length;
-  const base = String(u.formula || '').replace(/÷2/g, '').replace(/\+\s*\d+\s*⚡/g, '');
-  const p = typeof parseDados === 'function' ? parseDados(base) : null;
-  if(!p || !p.dados.length){ toast('No se puede repetir esa tirada'); return false; }
-  const rolls = [];
-  p.dados.forEach(g => { for(let k = 0; k < g.n; k++) rolls.push(1 + Math.floor(Math.random() * g.caras)); });
-  const total = aplicarMitades(rolls.reduce((a, b) => a + b, 0) + num(u.mod), mit);
-  registrarTirada(`${String(u.origen).replace(/ \(re-roll\)$/, '')} (re-roll)`, {formula: u.formula, rolls, mod: u.mod, total, estados: u.estados});
-  return true;
-}
+function repetirTirada(u){ return FichaDuelo.repetirTirada(u, registrarTirada, toast); }   // comun/ficha-duelo.js (A6a)
 // Qué tiradas ya usaron su moneda (una por tirada): S.rerollUsados, las claves de comun/tiradas-propias.js — se guarda en la ficha (P138).
 function renderReroll(){
-  const m = monedaReroll();
-  const lista = tiradasPropias().filter(h => !/^🪙 Moneda Re-Roll/.test(String(h.origen)));
-  $('#reroll-aviso').innerHTML = m
-    ? `Tenés una Moneda Re-Roll en <b>${m.key === 'cinturon' ? 'el cinturón' : 'la mochila'}</b>. Elegí qué tirada repetir: no cuesta No2, pero después se tira la moneda (par se conserva, impar se rompe).`
-    : `No tenés una Moneda Re-Roll equipada (cinturón o mochila). Podés ver tus últimas tiradas igual.`;
-  $('#reroll-lista').innerHTML = lista.length ? lista.map(h => {
-    const usada = TiradasPropias.usada(h, S.rerollUsados);
-    return `<div class="item"><div class="ihead"><div><div class="iname">${esc(h.origen)}</div><div class="idesc">${esc(h.formula || '')}${h.rolls && h.rolls.length ? ' → ' + h.rolls.join(' + ') : ''}${num(h.mod) ? ' ' + (num(h.mod) > 0 ? '+' : '−') + ' ' + Math.abs(num(h.mod)) : ''} = <b>${fmt(num(h.total))}</b></div></div>
-      ${usada ? '<span class="tag">ya usó su re-roll</span>' : `<button type="button" class="mini" data-rerollpick="${esc(h.clave)}"${m ? '' : ' disabled'}>🪙 Re-roll</button>`}</div></div>`;
-  }).join('') : '<div class="hint">Todavía no hiciste ninguna tirada.</div>';
+  const r = FichaDuelo.rerollHtml(S, tiradasPropias());   // comun/ficha-duelo.js (A6a; el mapa usa lo mismo)
+  $('#reroll-aviso').innerHTML = r.aviso;
+  $('#reroll-lista').innerHTML = r.filas;
 }
 function abrirReroll(){
   renderReroll();
@@ -600,13 +583,8 @@ $('#scrim-reroll').addEventListener('mousedown', e => { if(e.target.id === 'scri
 $('#reroll-lista').addEventListener('click', e => {
   const b = e.target.closest('[data-rerollpick]');
   if(!b) return;
-  const clave = b.dataset.rerollpick;
-  const h = tiradasPropias().find(x => x.clave === clave);
-  const m = monedaReroll();
-  if(!h || !m || TiradasPropias.usada(h, S.rerollUsados)) return;
-  S.rerollUsados = [...(S.rerollUsados || []), clave, ...(h.docId && h.docId !== clave ? [h.docId] : [])].slice(-50);
-  if(!repetirTirada(h)) return;
-  setTimeout(() => tirarMonedaReroll(m), 900);
+  const h = tiradasPropias().find(x => x.clave === b.dataset.rerollpick);
+  if(!FichaDuelo.usarReroll(S, h, combateUi)) return;
   renderReroll();
 });
 // Botón 🪙 (Botonera y mapa): abre la ventana de re-roll.

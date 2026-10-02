@@ -111,9 +111,9 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/ficha-stats.js?v=20261002a', '../comun/ficha-equipo.js?v=20261002b', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261002a', '../comun/ficha-mantenimiento.js?v=20261002a', '../comun/ficha-calculo.js?v=20261002j', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js?v=20261002i', '../comun/ficha-habilidades.js?v=20261001c',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261002a', '../comun/ficha-equipo.js?v=20261002b', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261002a', '../comun/ficha-mantenimiento.js?v=20261002a', '../comun/ficha-calculo.js?v=20261002j', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js?v=20261002i', '../comun/ficha-habilidades.js?v=20261001c',
   '../comun/catalogo.js?v=20261002i', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261002d', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261002i', '../comun/ficha-resumen.js?v=20261002o', '../comun/inv-calculo.js?v=20261002d', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/inv-duelo.js?v=20261001a', '../comun/ficha-acciones.js?v=20261002i', '../comun/inv-habilidades.js?v=20261002g', '../comun/inv-lupa.js?v=20261001a',
-  '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
+  '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261002a', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
    anterior"): en la ficha las columnas se juntan recién con la PANTALLA angosta (@media), pero en el mapa la pantalla es ancha y el panel
@@ -786,6 +786,10 @@ function bnCrear(){
       <header><h3>🛡 Equipo y mochila</h3><button class="iconbtn" data-bn-eq="cerrar">Cerrar</button></header>
       <div class="body" id="bn-equipo-cuerpo"></div>
     </div></div>
+    <div class="scrim" id="bn-reroll"><div class="modal" style="max-width:560px">
+      <header><h3>🪙 Moneda Re-Roll</h3><button class="iconbtn" data-bn-rr="cerrar">Cerrar</button></header>
+      <div class="body"><p class="hint" id="bn-reroll-aviso" style="margin:0 0 10px"></p><div id="bn-reroll-lista"></div></div>
+    </div></div>
     <div class="scrim" id="bn-stats"><div class="modal" style="max-width:820px">
       <header><h3>📊 Stats</h3><button class="iconbtn" data-bn-st="cerrar">Cerrar</button></header>
       <div class="body">
@@ -907,6 +911,17 @@ function bnCrear(){
   raiz.querySelector('#bn-botin').addEventListener('mousedown', e => { if(e.target.id === 'bn-botin') bnBotinCerrar(); });
   raiz.querySelector('#bn-tienda').addEventListener('mousedown', e => { if(e.target.id === 'bn-tienda') bnTiendaCerrar(); });
   raiz.querySelector('#bn-stats').addEventListener('mousedown', e => { if(e.target.id === 'bn-stats') bnStatsCerrar(); });
+  raiz.querySelector('#bn-reroll').addEventListener('mousedown', e => { if(e.target.id === 'bn-reroll') bnRerollCerrar(); });
+  raiz.querySelector('#bn-reroll').addEventListener('click', e => {
+    const b = e.composedPath()[0].closest && e.composedPath()[0].closest('button');
+    if(!b) return;
+    if(b.dataset.bnRr === 'cerrar'){ bnRerollCerrar(); return; }
+    if(b.dataset.rerollpick && bn.S){
+      if(!bnPuedeGuardar()){ toast('Ese personaje no lo manejás vos'); return; }
+      const h = bnRerollLista.find(x => x.clave === b.dataset.rerollpick);
+      if(FichaDuelo.usarReroll(bn.S, h, bnCombateUi())) bnRerollDibujar();
+    }
+  });
   // 📊 Stats (A6a): tocar un stat abre su desglose; el número grande de un atributo y las fórmulas se guardan al confirmar.
   raiz.querySelector('#bn-stats').addEventListener('click', e => {
     const t = e.composedPath()[0];
@@ -1323,6 +1338,36 @@ function bnVerItemSuelto(it){
   r.querySelector('[data-bn-ver="borrar"]').style.display = 'none';
   r.querySelector('#bn-ver').classList.add('open');
 }
+/* ---------- 🪙 La Moneda Re-Roll, hecha por el mapa (2026-10-02, hoja de ruta A6a) ----------
+   El 🪙 fijo del mapa abría la ventana de la ficha escondida. Ahora la muestra el mapa adentro del recuadro de la Botonera nueva, con
+   comun/ficha-duelo.js (rerollHtml, usarReroll: lo mismo que la ficha) y "mis últimas tiradas" de la Mesa (comun/tiradas-propias.js,
+   escuchadas mientras la ventana está abierta). */
+let bnRerollLista = [], bnRerollEscucha = null;
+async function abrirRerollMapa(fichaId){
+  try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo abrir la Moneda Re-Roll'); return; }
+  const yaVisible = bn && bn.host && !bn.host.hidden && bn.fichaId === fichaId && !bn.invId;
+  if(!yaVisible) await abrirBotoneraNueva(fichaId, '');
+  if(!bn) return;
+  bn.soloReroll = !yaVisible;
+  if(!(await bnSesionLista(fichaId))){ toast('No se pudo leer el personaje'); return; }
+  if(bnRerollEscucha) bnRerollEscucha();
+  bnRerollLista = [];
+  bnRerollEscucha = TiradasPropias.escuchar(fbDb, fbRutaCampana('tiradas'), fichaId, ((bn.S.meta && bn.S.meta.nombre) || '').trim(), lista => { bnRerollLista = lista; bnRerollDibujar(); });
+  bn.raiz.querySelector('#bn-reroll').classList.add('open');
+  bnRerollDibujar();
+}
+function bnRerollDibujar(){
+  if(!bn || !bn.S || !bn.raiz.querySelector('#bn-reroll').classList.contains('open')) return;
+  const r = FichaDuelo.rerollHtml(bn.S, bnRerollLista);
+  bn.raiz.querySelector('#bn-reroll-aviso').innerHTML = r.aviso;
+  bn.raiz.querySelector('#bn-reroll-lista').innerHTML = r.filas;
+}
+function bnRerollCerrar(){
+  if(!bn) return;
+  bn.raiz.querySelector('#bn-reroll').classList.remove('open');
+  if(bnRerollEscucha){ bnRerollEscucha(); bnRerollEscucha = null; }
+  if(bn.soloReroll){ bn.soloReroll = false; cerrarBotoneraNueva(); }
+}
 /* ---------- 📊 Stats, hecho por el mapa (2026-10-02, hoja de ruta A6a) ----------
    El 📊 de la ficha lite abría la ventana de Stats de la ficha escondida. Ahora la muestra el mapa adentro del recuadro de la Botonera
    nueva, con comun/ficha-stats.js (lo mismo que la ficha): los cinco atributos con sus derivados, el desglose de cada stat, las
@@ -1509,6 +1554,7 @@ document.addEventListener('keydown', e => {
   if(cartel && cartel.id === 'bn-botin'){ bnBotinCerrar(); return; }
   if(cartel && cartel.id === 'bn-tienda'){ bnTiendaCerrar(); return; }
   if(cartel && cartel.id === 'bn-stats'){ bnStatsCerrar(); return; }
+  if(cartel && cartel.id === 'bn-reroll'){ bnRerollCerrar(); return; }
   if(cartel){ cartel.classList.remove('open'); if(cartel.id === 'bn-comparar') bnComparando = null; bnViendo = null; bnCostoX = null; bnSobrepeso = null; bnSinNitrosSeguir = null; return; }
   cerrarBotoneraNueva();
 });

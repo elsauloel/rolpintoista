@@ -16,6 +16,7 @@
 const FichaDuelo = (() => {
   const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
   function fmt(n){ return Number.isInteger(n) ? n : Math.round(n*100)/100; }
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
   /* ---------- Moneda Re-Roll (js/02) ---------- */
   const esMonedaReroll = i => !!i && !!(i.rerollMoneda || /moneda re-?roll/i.test(String(i.nombre || '')));
@@ -222,5 +223,43 @@ const FichaDuelo = (() => {
     };
   }
 
-  return {esMonedaReroll, monedaReroll, tirarMonedaReroll, costoFlashDe, pagarFlash, usarFlashFueraDelDuelo, hooks};
+  /* ---------- La ventana de la Moneda Re-Roll (2026-10-02, hoja de ruta A6a: la usan la ficha y el mapa) ----------
+     rerollHtml(S, lista): el aviso (¿tiene moneda?) y la lista de "mis últimas tiradas" (comun/tiradas-propias.js) con su botón
+     (`data-rerollpick` = la clave) o "ya usó su re-roll". repetirTirada(u, registrar): vuelve a tirar los mismos dados de una tirada
+     (con sus mismos bonos y mitades) y la registra con registrar(origen, r); false si no se puede. */
+  function rerollHtml(S, lista){
+    const m = monedaReroll(S);
+    lista = (lista || []).filter(h => !/^🪙 Moneda Re-Roll/.test(String(h.origen)));
+    const aviso = m
+      ? `Tenés una Moneda Re-Roll en <b>${m.key === 'cinturon' ? 'el cinturón' : 'la mochila'}</b>. Elegí qué tirada repetir: no cuesta No2, pero después se tira la moneda (par se conserva, impar se rompe).`
+      : `No tenés una Moneda Re-Roll equipada (cinturón o mochila). Podés ver tus últimas tiradas igual.`;
+    const filas = lista.length ? lista.map(h => {
+      const usada = TiradasPropias.usada(h, S.rerollUsados);
+      return `<div class="item"><div class="ihead"><div><div class="iname">${esc(h.origen)}</div><div class="idesc">${esc(h.formula || '')}${h.rolls && h.rolls.length ? ' → ' + h.rolls.join(' + ') : ''}${num(h.mod) ? ' ' + (num(h.mod) > 0 ? '+' : '−') + ' ' + Math.abs(num(h.mod)) : ''} = <b>${fmt(num(h.total))}</b></div></div>
+      ${usada ? '<span class="tag">ya usó su re-roll</span>' : `<button type="button" class="mini" data-rerollpick="${esc(h.clave)}"${m ? '' : ' disabled'}>🪙 Re-roll</button>`}</div></div>`;
+    }).join('') : '<div class="hint">Todavía no hiciste ninguna tirada.</div>';
+    return {aviso, filas};
+  }
+  function repetirTirada(u, registrar, toast){
+    const mit = (String(u.formula || '').match(/÷2/g) || []).length;
+    const base = String(u.formula || '').replace(/÷2/g, '').replace(/\+\s*\d+\s*⚡/g, '');
+    const p = typeof parseDados === 'function' ? parseDados(base) : null;
+    if(!p || !p.dados.length){ if(toast) toast('No se puede repetir esa tirada'); return false; }
+    const rolls = [];
+    p.dados.forEach(g => { for(let k = 0; k < g.n; k++) rolls.push(1 + Math.floor(Math.random() * g.caras)); });
+    const total = Combatiente.aplicarMitades(rolls.reduce((a, b) => a + b, 0) + num(u.mod), mit);
+    registrar(`${String(u.origen).replace(/ \(re-roll\)$/, '')} (re-roll)`, {formula: u.formula, rolls, mod: u.mod, total, estados: u.estados});
+    return true;
+  }
+  // Usar la moneda en una tirada: la marca (una moneda por tirada), la repite y, un momento después, tira la moneda.
+  function usarReroll(S, h, ui){
+    const m = monedaReroll(S);
+    if(!h || !m || TiradasPropias.usada(h, S.rerollUsados)) return false;
+    S.rerollUsados = [...(S.rerollUsados || []), h.clave, ...(h.docId && h.docId !== h.clave ? [h.docId] : [])].slice(-50);
+    if(!repetirTirada(h, ui.registrarTirada, ui.toast)) return false;
+    setTimeout(() => tirarMonedaReroll(S, m, ui), 900);
+    return true;
+  }
+
+  return {esMonedaReroll, monedaReroll, tirarMonedaReroll, rerollHtml, repetirTirada, usarReroll, costoFlashDe, pagarFlash, usarFlashFueraDelDuelo, hooks};
 })();

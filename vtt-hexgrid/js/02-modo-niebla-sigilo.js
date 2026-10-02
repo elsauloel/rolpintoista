@@ -266,7 +266,7 @@ $('#btn-rango-magico').onclick = () => alternarRango(true);
 $('#btn-reroll').onclick = () => {
   const fid = fichaPrincipalId();
   if(!fid){ toast('Necesitás un personaje para usar la Moneda Re-Roll'); return; }
-  abrirBotonera(fid, {tipo: 'abrir-reroll'});
+  abrirRerollMapa(fid);   // el mapa (js/11, A6a)
 };
 
 let verZonas = false;          // modo lentes prendido

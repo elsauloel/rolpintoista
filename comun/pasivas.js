@@ -72,3 +72,20 @@ const PASIVAS_BASE = [
   {poolId: 'bolsillos-extra', nombre: 'Bolsillos extra', jobCosto: 1, etiquetas: ['stat', 'utilidad'],
    detalle: '+1 ranura de cinturón para consumibles.', mods: [{stat: 'capcinturon', val: 1}]},
 ];
+
+/* Categorías de una pasiva (2026-10-02, pedido del dueño: filtrar las pasivas por categoría; las armó el asistente). Salen de sus etiquetas y de
+   lo que suma, así una pasiva subida sin categoría igual cae en una: Recuperación (regenera), Recursos (SP o No2), Ofensivas, Defensivas
+   (incluye las resistencias) y Utilidad (visión, percepción, carga…). Una pasiva va en una sola, la primera que le corresponde en ese orden. */
+const CATEGORIAS_PASIVA = [
+  {id: 'ofensiva', nombre: '🗡 Ofensivas'}, {id: 'defensiva', nombre: '🛡 Defensivas'}, {id: 'recuperacion', nombre: '❤ Recuperación'},
+  {id: 'recursos', nombre: '⚡ Recursos'}, {id: 'utilidad', nombre: '🧭 Utilidad'},
+];
+function categoriaDePasiva(p){
+  const et = (p && p.etiquetas || []).map(e => String(e).toLowerCase());
+  const stats = (p && p.mods || []).map(m => m && m.stat);
+  if(et.includes('regeneración') || et.includes('regeneracion') || (p && Number(p.regenHp) > 0)) return 'recuperacion';
+  if(stats.some(s => ['sp', 'nitros', 'spregen'].includes(s))) return 'recursos';
+  if(et.includes('ofensiva')) return 'ofensiva';
+  if(et.includes('defensiva') || et.includes('resistencia')) return 'defensiva';
+  return 'utilidad';
+}

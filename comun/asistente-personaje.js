@@ -10,7 +10,9 @@
      AsistentePersonaje.abrir({
        base(),                         // un personaje en blanco ya normalizado (FichaGuardado.normalizar)
        clases,                         // CLASES_SKILLS
-       pool(claseId), habilidad(claseId, habId),   // las habilidades de una clase (con lo subido) y la copia lista para el personaje
+       pool(claseId), habilidad(claseId, habId),   // las habilidades de una clase (con lo subido; '_custom' = el pool custom) y la copia lista
+       editarHabilidad(S, id, alCambiar),          // abre el paso a paso de habilidades sobre el personaje en armado (id null = una nueva,
+                                                   // custom); lo guardado queda en S.habilidades y avisa con alCambiar()
        pasivas(), pasiva(datos, meta), // [{datos, meta}] del catálogo de pasivas, y la copia lista
        tienda(),                       // Promise: la tienda publicada (FichaTienda.desdeDoc) o null
        ddeInicial(),                   // Promise: el DDE inicial de la partida (300 si el GM no fijó otro)
@@ -81,12 +83,12 @@ const AsistentePersonaje = (() => {
     S.meta.nivel = 1;
     ATTRS.forEach(a => { S.attrs[a] = MIN_ATTR; });
     const st = {
-      claseId: '', claseOtra: '', concepto: '', historia: '',
+      claseId: '', claseOtra: '', concepto: '', historia: '', catPasiva: '',
       habs: new Map(),        // `${claseId}:${habId}` → {claseId, habId}
       pasivas: new Set(),     // índice en ctx.pasivas()
       talentos: [],           // [{nombre, puntos}]
       carrito: new Map(),     // id del ítem → cantidad
-      tienda: undefined, dde: DDE_POR_DEFECTO, abiertas: new Set(),
+      tienda: undefined, dde: DDE_POR_DEFECTO, ddeGM: null, ddeTocado: false, abiertas: new Set(),
     };
     const clases = ctx.clases || [];
     const pasivasLista = ctx.pasivas ? ctx.pasivas() : [];
@@ -96,7 +98,11 @@ const AsistentePersonaje = (() => {
     const sugerencia = () => rol() ? Combatiente.repartirAtributos(33, Combatiente.PESOS_ROL[rol()], MIN_ATTR) : null;
     const labelAttr = id => (FichaCalculo.ATTR_LIST.find(a => a.id === id) || {}).full || id;
     const jobTotal = () => FichaCalculo.jobTotal(1);
-    const jobUsado = () => st.habs.size * 1 + [...st.pasivas].reduce((a, i) => a + Math.max(0, num((pasivasLista[i] || {}).datos && pasivasLista[i].datos.jobCosto) || 1), 0);
+    const costoHab = claseId => claseId === '_custom' || claseId === '_creep' ? 2 : 1;
+    const propiasArmadas = () => (S.habilidades || []);   // las custom armadas en el paso a paso de habilidades
+    const jobUsado = () => [...st.habs.values()].reduce((a, x) => a + costoHab(x.claseId), 0)
+      + propiasArmadas().reduce((a, h) => a + (h.job === false ? 0 : Math.max(0, num(h.jobCosto))), 0)
+      + [...st.pasivas].reduce((a, i) => a + Math.max(0, num((pasivasLista[i] || {}).datos && pasivasLista[i].datos.jobCosto) || 1), 0);
     const intTotal = () => FichaBotonera.inteligenciaAuto(S);
     const intUsado = () => st.talentos.reduce((a, t) => a + Math.max(0, num(t.puntos)), 0);
     const totalCompra = () => { let t = 0; st.carrito.forEach((n, id) => { const it = itemTienda(id); if(it) t += precioDe(it) * n; }); return t; };
@@ -104,7 +110,7 @@ const AsistentePersonaje = (() => {
     const precioDe = it => FichaTienda.precioDeCompra({tienda: st.tienda || null}, it);
 
     // Lo que se lee de la partida (tienda y DDE inicial), una vez.
-    Promise.resolve(ctx.ddeInicial ? ctx.ddeInicial() : DDE_POR_DEFECTO).then(v => { st.dde = Number.isFinite(Number(v)) ? Number(v) : DDE_POR_DEFECTO; if(api && api.abierto()) api.redibujar(); }).catch(() => {});
+    Promise.resolve(ctx.ddeInicial ? ctx.ddeInicial() : DDE_POR_DEFECTO).then(v => { st.ddeGM = Number.isFinite(Number(v)) ? Number(v) : DDE_POR_DEFECTO; if(!st.ddeTocado){ st.dde = st.ddeGM; if(api && api.abierto() && api.pasoId() === 'equipo') api.redibujar(); } }).catch(() => {});
     Promise.resolve(ctx.tienda ? ctx.tienda() : null).then(t => { st.tienda = t || null; if(api && api.abierto() && api.pasoId() === 'equipo') api.redibujar(); }).catch(() => { st.tienda = null; });
 
     function guia(t){ return `<div class="ap-guia">🧭 ${t}</div>`; }
@@ -154,7 +160,7 @@ const AsistentePersonaje = (() => {
       const k = `${claseId}:${h.id}`, on = st.habs.has(k);
       const costo = [h.costo ? `${h.costo}${/sp/i.test(String(h.costo)) ? '' : ' SP'}` : '', h.nitrosCosto !== undefined && h.nitrosCosto !== '' ? `${h.nitrosCosto} No2` : ''].filter(Boolean).join(' · ');
       const det = String(h.detalle || '').split(/⚙|✋/)[0].trim();
-      return `<button type="button" class="ap-op${on ? ' on' : ''}" data-ap-hab="${esc(k)}"><span class="ap-cab"><b>${propia ? '★ ' : ''}${esc(h.nombre)}</b><em>${on ? '✔ ' : ''}1 Job</em></span>
+      return `<button type="button" class="ap-op${on ? ' on' : ''}" data-ap-hab="${esc(k)}"><span class="ap-cab"><b>${propia ? '★ ' : ''}${esc(h.nombre)}</b><em>${on ? '✔ ' : ''}${costoHab(claseId)} Job</em></span>
         <small>${esc(costo)}${costo && det ? ' — ' : ''}${esc(det.length > 170 ? det.slice(0, 170) + '…' : det)}</small></button>`;
     }
     function pasoHabilidades(){
@@ -164,6 +170,11 @@ const AsistentePersonaje = (() => {
       return guia(clase() ? `Las de <b>${esc(clase().nombre)}</b> (★) van primero: son las que mejor acompañan tu idea. Podés llevarte las de cualquier clase (cada habilidad de clase cuesta 1 de Job).`
           : 'Cada habilidad de clase cuesta 1 de Job. Elegí las que vayan con tu idea, de cualquier clase.')
         + contador(`Job: ${ju} de ${jt} (habilidades + pasivas)${ju > jt ? ` · ${ju - jt} de más` : ''}`, ju > jt)
+        + `<h4>Una habilidad propia</h4>
+          <div class="pap-fila" style="flex-wrap:wrap;gap:8px"><button type="button" class="pap-boton" data-ap-hab-nueva="1">＋ Crear una habilidad nueva (custom · 2 de Job)</button>
+            <span class="pap-nota" style="margin:0">Se arma en su propio paso a paso, como en la ficha.</span></div>
+          ${propiasArmadas().length ? `<div class="ap-grid" style="margin-top:8px">${propiasArmadas().map(h => `<div class="ap-op on" style="cursor:default"><span class="ap-cab"><b>✎ ${esc(h.nombre || 'Sin nombre')}</b><em>${fmt(h.job === false ? 0 : num(h.jobCosto))} Job</em></span>
+            <small>${esc(String(h.detalle || '').slice(0, 140))}</small><span class="pap-fila" style="gap:6px;margin-top:4px"><button type="button" class="pap-boton" data-ap-hab-editar="${esc(h.id)}">Editar</button><button type="button" class="pap-boton" data-ap-hab-quitar="${esc(h.id)}">Quitar</button></span></div>`).join('')}</div>` : ''}`
         + (propias.length ? `<h4>De tu clase</h4><div class="ap-grid">${propias.map(h => tarjetaHab(clase().id, h, true)).join('')}</div>` : '')
         + otras.map(c => {
           const lista = ctx.pool(c.id);
@@ -171,16 +182,32 @@ const AsistentePersonaje = (() => {
           const abierta = st.abiertas.has(c.id) || [...st.habs.values()].some(x => x.claseId === c.id);
           return `<h4><button type="button" class="ap-chip" data-ap-abrir="${esc(c.id)}">${abierta ? '▾' : '▸'} ${esc(c.nombre)} (${lista.length})</button></h4>${abierta ? `<div class="ap-grid">${lista.map(h => tarjetaHab(c.id, h, false)).join('')}</div>` : ''}`;
         }).join('')
-        + '<p class="pap-nota">Una habilidad propia (custom, 2 de Job) la armás después desde la ficha, con «+ Habilidad».</p>';
+        + (() => {   // 🧩 El pool custom: habilidades ya armadas por el grupo, de ninguna clase (2 de Job cada una).
+          const lista = ctx.pool('_custom') || [];
+          if(!lista.length) return '';
+          const abierta = st.abiertas.has('_custom') || [...st.habs.values()].some(x => x.claseId === '_custom');
+          return `<h4><button type="button" class="ap-chip" data-ap-abrir="_custom">${abierta ? '▾' : '▸'} 🧩 Pool custom (${lista.length}) · 2 de Job c/u</button></h4>${abierta ? `<div class="ap-grid">${lista.map(h => tarjetaHab('_custom', h, false)).join('')}</div>` : ''}`;
+        })();
     }
+    // Las pasivas, agrupadas por categoría (comun/pasivas.js: CATEGORIAS_PASIVA, categoriaDePasiva) y con un filtro arriba.
     function pasoPasivas(){
       const jt = jobTotal(), ju = jobUsado();
+      const cats = typeof CATEGORIAS_PASIVA !== 'undefined' ? CATEGORIAS_PASIVA : [{id: 'utilidad', nombre: 'Pasivas'}];
+      const catDe = d => typeof categoriaDePasiva === 'function' ? categoriaDePasiva(d) : 'utilidad';
+      const conIndice = pasivasLista.map((p, i) => ({p, i, cat: catDe(p.datos || {})}));
+      const tarjeta = ({p, i}) => {
+        const d = p.datos || {}, on = st.pasivas.has(i);
+        return `<button type="button" class="ap-op${on ? ' on' : ''}" data-ap-pasiva="${i}"><span class="ap-cab"><b>${esc(d.nombre)}</b><em>${on ? '✔ ' : ''}${fmt(Math.max(1, num(d.jobCosto) || 1))} Job</em></span><small>${esc(d.detalle || '')}</small></button>`;
+      };
+      const chip = (id, txt, n) => `<button type="button" class="ap-chip${st.catPasiva === id ? ' on' : ''}" data-ap-catpasiva="${id}"${st.catPasiva === id ? ' style="border-style:solid;border-color:var(--pap-laton);color:var(--pap-laton)"' : ''}>${esc(txt)}${n !== undefined ? ` (${n})` : ''}</button>`;
+      const visibles = cats.filter(c => !st.catPasiva || c.id === st.catPasiva);
       return guia('Las pasivas funcionan solas, siempre: más vida, más SP, regenerar… Comparten el Job con las habilidades.')
         + contador(`Job: ${ju} de ${jt} (habilidades + pasivas)${ju > jt ? ` · ${ju - jt} de más` : ''}`, ju > jt)
-        + `<div class="ap-grid">${pasivasLista.map((p, i) => {
-          const d = p.datos || {}, on = st.pasivas.has(i);
-          return `<button type="button" class="ap-op${on ? ' on' : ''}" data-ap-pasiva="${i}"><span class="ap-cab"><b>${esc(d.nombre)}</b><em>${on ? '✔ ' : ''}${fmt(Math.max(1, num(d.jobCosto) || 1))} Job</em></span><small>${esc(d.detalle || '')}</small></button>`;
-        }).join('')}</div>`;
+        + `<div class="ap-chips" style="margin-bottom:6px">${chip('', 'Todas')}${cats.map(c => chip(c.id, c.nombre, conIndice.filter(x => x.cat === c.id).length)).join('')}</div>`
+        + visibles.map(c => {
+          const lista = conIndice.filter(x => x.cat === c.id);
+          return lista.length ? `<h4>${esc(c.nombre)}</h4><div class="ap-grid">${lista.map(tarjeta).join('')}</div>` : '';
+        }).join('');
     }
     function pasoTalentos(){
       const it = intTotal(), iu = intUsado();
@@ -194,12 +221,15 @@ const AsistentePersonaje = (() => {
           <button type="button" class="pap-boton" data-ap-tal-quitar="${i}">Quitar</button></div>`).join('') : '<p class="pap-nota">Todavía ninguno. Podés dejarlo para después.</p>'}`;
     }
     function pasoEquipo(){
-      const head = guia(`Arrancás con <b>${fmt(st.dde)} DDE</b> (doblones del espacio)${st.dde === DDE_POR_DEFECTO ? ', lo estándar' : ', lo que fijó el GM para esta partida'}.`);
+      // El DDE inicial, editable (pedido del dueño): arranca en 300 (o lo que fijó el GM en ⚙ Partida); si en la mesa corresponde otro, se cambia acá.
+      const head = guia(`<b>¿Con cuántos DDE (doblones del espacio) arrancás?</b> Lo estándar son ${fmt(DDE_POR_DEFECTO)}${st.ddeGM !== null && st.ddeGM !== DDE_POR_DEFECTO ? `; el GM fijó ${fmt(st.ddeGM)} para esta partida` : ''}.
+          Si en tu mesa corresponde otro valor, preguntale al GM y cambialo acá.
+          <div class="pap-fila" style="margin-top:8px;align-items:center"><input id="ap-dde" type="number" min="0" step="10" value="${fmt(st.dde)}" style="max-width:140px"> <span>DDE</span></div>`);
       if(st.tienda === undefined) return head + '<p class="pap-nota">Mirando si el GM publicó una tienda…</p>';
       if(!st.tienda) return head + '<p>El GM todavía no publicó una tienda: cuando la abra, comprás desde 🏪 en la ficha o en el mapa, con tus DDE.</p>';
       if(!st.tienda.abierta) return head + '<p>La tienda de la partida está cerrada: cuando el GM la abra, comprás desde 🏪 con tus DDE.</p>';
       const total = totalCompra(), items = (st.tienda.items || []).map(itemTienda).filter(Boolean);
-      return head + contador(`Gastás ${fmt(total)} de ${fmt(st.dde)} · te quedan ${fmt(st.dde - total)}`, total > st.dde)
+      return head + `<span data-ap-gasto>${contador(`Gastás ${fmt(total)} de ${fmt(st.dde)} · te quedan ${fmt(st.dde - total)}`, total > st.dde)}</span>`
         + `<div class="ap-grid">${items.map(it => {
           const n = st.carrito.get(it.id) || 0;
           return `<div class="ap-op${n ? ' on' : ''}" style="cursor:default"><span class="ap-cab"><b>${esc(it.nombre)}</b><em>${fmt(precioDe(it))} DDE</em></span>
@@ -226,7 +256,7 @@ const AsistentePersonaje = (() => {
     function pasoResumen(){
       const fila = (t, v) => `<div class="ap-rf"><span>${t}</span><b>${v}</b></div>`;
       const c = FichaCalculo.calcular(datosFinales()).final;   // con las pasivas y el equipo elegidos
-      const habs = [...st.habs.values()].map(x => (ctx.pool(x.claseId).find(h => h.id === x.habId) || {}).nombre).filter(Boolean);
+      const habs = [...propiasArmadas().map(h => h.nombre), ...[...st.habs.values()].map(x => (ctx.pool(x.claseId).find(h => h.id === x.habId) || {}).nombre)].filter(Boolean);
       const pas = [...st.pasivas].map(i => pasivasLista[i] && pasivasLista[i].datos.nombre).filter(Boolean);
       const compra = [...st.carrito.entries()].filter(([, n]) => n > 0).map(([id, n]) => { const it = itemTienda(id); return it ? `${it.nombre}${n > 1 ? ' ×' + n : ''}` : ''; }).filter(Boolean);
       const av = avisos();
@@ -259,7 +289,7 @@ const AsistentePersonaje = (() => {
       const d = structuredClone(S);
       d.meta.clase = nombreClase();
       d.meta.dde = Math.max(0, st.dde - totalCompra());
-      d.habilidades = [...st.habs.values()].map(x => ctx.habilidad(x.claseId, x.habId)).filter(Boolean);
+      d.habilidades = [...(d.habilidades || []), ...[...st.habs.values()].map(x => ctx.habilidad(x.claseId, x.habId)).filter(Boolean)];   // las armadas a mano + las elegidas
       d.pasivas = [...st.pasivas].map(i => pasivasLista[i] ? ctx.pasiva(pasivasLista[i].datos, pasivasLista[i].meta) : null).filter(Boolean);
       d.sociales = st.talentos.map(t => ({...FichaEditor.borrador(null), id: uid(), nombre: t.nombre, detalle: '', puntosInt: Math.max(0, num(t.puntos)), nivelExtra: 0}));
       d.inventario = [];
@@ -280,7 +310,7 @@ const AsistentePersonaje = (() => {
     }
 
     const api = PasoAPaso.abrir({
-      titulo: '＋ Personaje nuevo', crear: true, z: 56, textoCrear: '✔ Crear el personaje',
+      titulo: '＋ Personaje nuevo', crear: true, z: 52, textoCrear: '✔ Crear el personaje',   // debajo del editor de habilidades (55)
       pasos: PASOS,
       puedeIr: i => i > 0 ? faltaNombre() : '',
       alInput: e => {
@@ -291,6 +321,11 @@ const AsistentePersonaje = (() => {
         else if(t.id === 'ap-concepto') st.concepto = t.value;
         else if(t.id === 'ap-clase-otra') st.claseOtra = t.value;
         else if(t.id === 'ap-historia') st.historia = t.value;
+        else if(t.id === 'ap-dde'){   // sin redibujar (se perdería el foco): solo el contador de lo que se gasta
+          st.dde = Math.max(0, Math.round(num(t.value))); st.ddeTocado = true;
+          const g = api.raiz.querySelector('[data-ap-gasto]'), total = totalCompra();
+          if(g) g.innerHTML = contador(`Gastás ${fmt(total)} de ${fmt(st.dde)} · te quedan ${fmt(st.dde - total)}`, total > st.dde);
+        }
       },
       alCambio: async e => {
         const t = e.target;
@@ -309,7 +344,14 @@ const AsistentePersonaje = (() => {
         if(d.apSugerencia){ const v = sugerencia(); if(v) ATTRS.forEach((a, i) => { S.attrs[a] = v[i]; }); api.redibujar(); return; }
         if(d.apAttr){ S.attrs[d.apAttr] = Math.max(MIN_ATTR, num(S.attrs[d.apAttr]) + num(d.apDelta)); api.redibujar(); return; }
         if(d.apHab){ const [claseId, ...resto] = d.apHab.split(':'), habId = resto.join(':'); if(st.habs.has(d.apHab)) st.habs.delete(d.apHab); else st.habs.set(d.apHab, {claseId, habId}); api.redibujar(); return; }
+        if(d.apHabNueva || d.apHabEditar){
+          if(!ctx.editarHabilidad){ if(ctx.toast) ctx.toast('Una habilidad propia se arma después desde la ficha (+ Habilidad)'); return; }
+          ctx.editarHabilidad(S, d.apHabEditar || null, () => { if(api.abierto()) api.redibujar(); });
+          return;
+        }
+        if(d.apHabQuitar){ S.habilidades = (S.habilidades || []).filter(h => h.id !== d.apHabQuitar); api.redibujar(); return; }
         if(d.apAbrir){ if(st.abiertas.has(d.apAbrir)) st.abiertas.delete(d.apAbrir); else st.abiertas.add(d.apAbrir); api.redibujar(); return; }
+        if(d.apCatpasiva !== undefined){ st.catPasiva = d.apCatpasiva; api.redibujar(); return; }
         if(d.apPasiva !== undefined){ const i = num(d.apPasiva); if(st.pasivas.has(i)) st.pasivas.delete(i); else st.pasivas.add(i); api.redibujar(); return; }
         if(d.apTalento){ st.talentos.push({nombre: d.apTalento, puntos: intUsado() < intTotal() ? 1 : 0}); api.redibujar(); return; }
         if(d.apTalentoPropio){ const i = api.raiz.querySelector('#ap-talento-propio'), n = i && i.value.trim(); if(n){ st.talentos.push({nombre: n.slice(0, 40), puntos: 0}); api.redibujar(); } return; }
@@ -328,7 +370,7 @@ const AsistentePersonaje = (() => {
         if(e.target.id === 'ap-talento-propio'){ const n = e.target.value.trim(); if(n){ st.talentos.push({nombre: n.slice(0, 40), puntos: 0}); api.redibujar(); } return; }
         if(api.paso() < PASOS.length - 1) api.irA(api.paso() + 1);
       },
-      confirmarCancelar: () => S.meta.nombre.trim() || st.habs.size || st.talentos.length ? '¿Cancelar? El personaje que estás armando se descarta.' : '',
+      confirmarCancelar: () => S.meta.nombre.trim() || st.habs.size || (S.habilidades || []).length || st.talentos.length ? '¿Cancelar? El personaje que estás armando se descarta.' : '',
       alCrear: () => crear(),
     });
     return api;

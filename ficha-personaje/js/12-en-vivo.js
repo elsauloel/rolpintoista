@@ -481,6 +481,12 @@ function abrirPersonajeNuevo(){
     clases: CLASES_SKILLS,
     pool: claseId => habsDelPool(claseId),
     habilidad: (claseId, habId) => habDeClase(claseId, habId),
+    // Una habilidad propia (custom), con el mismo paso a paso de la ficha (comun/ficha-editor.js) pero sobre el personaje que se está armando.
+    editarHabilidad: (draft, id, alCambiar) => FichaEditor.crear(document.body, {
+      S: () => draft, toast: m => toast(m), confirmar: t => confirm(t), alCambiar: () => alCambiar(),
+      elegirTipoItem: actual => elegirTipoItemFicha(actual), elegirEstadoItem: () => elegirEstadoItemFicha(), elegirEstadoDuelo: () => elegirEstadoDuelo(),
+      alSubirCatalogo: () => {},
+    }).abrir('habilidades', id || null),
     pasivas: () => pasivasDelCatalogo(),
     pasiva: (datos, meta) => pasivaDeCatalogo(datos, meta),
     tienda: async () => FichaTienda.desdeDoc(await fbDb.doc(fbRutaCampana('tienda/publicada')).get()),

@@ -1275,3 +1275,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `mantenimientoCreeps(numero)` (js/12, solo el GM) toma los turnos con `CreepAcciones.reclamarMantenimiento` (`gm/mantenimiento`),
   pasa el turno de cada creep de la partida con `modificarCreep` + `CreepAcciones.mantenimiento`, sube `gm/estado.turno` y anota en el
   📜 Historial. El marco invisible del Mantenimiento (`mantenimientoEncolar`…) quedó sin uso: va a la limpieza (A′).
+- **"+ Estado" lo hace el mapa** (2026-10-02, hoja de ruta A3): `abrirEstadoNuevo(t)` (js/10) carga `SE_PIEZAS` (`estado-preguntas.js`,
+  `asistente-estado.js`, `comun/selector-estados.js`) y abre `SelectorEstados.abrir`; el estado se arma con
+  `SelectorEstados.estadoPersonaje/estadoInvocacion/estadoCreep` y se agrega con `Combatiente.agregarEstado`. Personajes e invocaciones:
+  `editarPersonajeMapa(fichaId, cambiar)` (js/11, también la usa el Mantenimiento: sesión de la Botonera nueva si está abierta, si no
+  una de un rato); creeps: `abrirEstadoNuevoCreep` con `modificarCreep`. El ⚙ de un estado (`abrirEditarEstado`) sigue yendo al
+  editor de la ficha / GM Tools (A6).

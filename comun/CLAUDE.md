@@ -944,6 +944,12 @@ versión parecida en más de una, es candidato a juntar.
   turnos de muerte, No2, invocaciones; deja `S.turno` y `S.log`; devuelve `{rep, avisos}`), `reclamar(db, rutaFicha, objetivo, marca)`
   (la transacción de `partes/mantenimiento`: cuántos turnos aplicar), `publicarReporte` y `publicarRecordatorios`. Lo usan la ficha
   (`js/11`, `js/14`) y el mapa (`mantenimientoPersonajes`). Necesita combatiente, ficha-calculo, ficha-botonera e inv-calculo.
+- **`selector-estados.js`** (`SelectorEstados`, 2026-10-02, hoja de ruta A3) — **el "+ Estado" para cualquier pantalla**: `abrir({titulo,
+  para, presets, propios, cfgPreguntas, stats, armarDeAsistente})` → Promise de `{preset, guardar}` o null (la grilla por Buffs/Debuffs/
+  Otros, "Mis presets", "＋ Crear estado nuevo (paso a paso)"; un preset estándar pregunta sus cantidades con `EstadoPreguntas`), más
+  `estadoPersonaje/estadoInvocacion/estadoCreep(preset, id[, flags])` (el estado como lo arma cada herramienta) y `textoAgregado(r,
+  campoHp)`. Lo usa el mapa; la ficha y GM Tools siguen con su grilla propia (misma regla). Necesita `estado-preguntas.js` y
+  `asistente-estado.js`.
 - **`CreepAcciones.mantenimiento(sc)` y `reclamarMantenimiento(db, ref, objetivo, marca)`** (2026-10-02, hoja de ruta A2b): el pase de
   turno de un creep (copia textual de `mantenimiento()` de GM Tools, por creep) y la transacción de `gm/mantenimiento`. Lo usan GM Tools
   (`js/07`, `js/12`) y el mapa del GM (`mantenimientoCreeps`).

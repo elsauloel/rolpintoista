@@ -32,7 +32,12 @@
      con `modificarCreep`, sube el contador de GM Tools (`gm/estado`) y anota en el 📜 Historial. Probado en vivo: el creep con una
      quemadura de prueba hizo 5 → 4 y pasó a 1 turno, No2 a full, ataques a 0, el contador 3 → 4, la línea en el Historial, y no se
      cargó GM Tools en ningún marco invisible.
-3. [ ] **"+ Estado"** (el selector de estados de un personaje, una invocación o un creep, con sus preguntas).
+3. [x] **"+ Estado"** (2026-10-02): el "+ Estado" del HUD lo hace el mapa con `comun/selector-estados.js` (la grilla de presets con sus
+   preguntas, los "Mis presets" del personaje y "Crear estado nuevo (paso a paso)") y la regla común (`Combatiente.agregarEstado`);
+   personajes e invocaciones se guardan con `editarPersonajeMapa` (la misma función que usa el Mantenimiento), creeps con
+   `modificarCreep`. Probado en vivo: Veneno ×3 / 2 turnos a Silvia (ficha y token), Pajaritos 2 turnos al creep (con su marca de
+   mitad de PdG/Eva), y el asistente de "Crear estado nuevo" abre y, al cancelarlo, vuelve a la grilla. El **⚙ de un estado** (su
+   editor completo) sigue yendo a la ficha / GM Tools: es parte del punto 6 (el editor).
 4. [ ] **Equipo y mochila** (equipar, desequipar, mirar la mochila).
 5. [ ] **Tienda y Botín**.
 6. [ ] **El editor** (editar una habilidad, un ítem, un creep): lo más grande y lo que menos se usa en partida; puede seguir abriéndose
@@ -52,6 +57,9 @@
 
 **B. Puntual (después de A):**
 7. [ ] **Una invocación sin No2 para atacar, adentro del duelo** (ver §2): igual que los creeps.
+7b. [ ] **Los "Mis presets" de estados del GM se pierden al recargar** (visto 2026-10-02 al mudar el "+ Estado"): GM Tools los guarda en
+   `S.estadosPersonalizados`, que no se sube a Firebase (los creeps sí; esto no). Por eso el "+ Estado" de un creep en el mapa no los
+   ofrece. Guardarlos en la partida (p. ej. `gm/presets`) y ofrecerlos en los dos lados.
 8. [ ] **Aplicar estados a otros desde las habilidades de personaje** (hoy solo creeps y trampas): destraba Lisiar, Confusión, Marcar,
    Maldiciones y otras skills de clase (§7).
 9. [ ] **Auditoría de skills de clase** (§7): Tanque 9/10 (falta Miti-Miti), después una skill por clase alternando.

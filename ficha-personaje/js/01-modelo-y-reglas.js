@@ -38,24 +38,7 @@ const migrarObjTipos = FichaGuardado.migrarObjTipos;
 const migrarEstadoTipos = FichaGuardado.migrarEstadoTipos;
 let tiposGuardarJunto = false;  // recién migrada a la escala de Tipos: todas las partes se guardan en el mismo lote
 
-const CATEGORIAS = [
-  {id:'', label:'— elegir categoría —'},
-  {id:'arma_1m', label:'Arma de una mano', arma:true},
-  {id:'arma_2m', label:'Arma de dos manos', arma:true},
-  {id:'escudo_1m', label:'Escudo de una mano', defensivo:true},
-  {id:'escudo_2m', label:'Escudo de dos manos', defensivo:true},
-  {id:'armadura_blanda', label:'Armadura blanda', defensivo:true},
-  {id:'armadura_rigida', label:'Armadura rígida', defensivo:true},
-  {id:'manos', label:'Manos', defensivo:true},
-  {id:'piernas', label:'Piernas', defensivo:true},
-  {id:'cabeza', label:'Cabeza', defensivo:true},
-  {id:'pies', label:'Pies', defensivo:true},
-  {id:'cinturon', label:'Cinturón', defensivo:true},
-  {id:'mochila', label:'Mochila', defensivo:true},
-  {id:'anillos', label:'Anillos'},
-  {id:'otros', label:'Otros'},
-  {id:'consumibles', label:'Consumibles'},
-];
+const CATEGORIAS = FichaEquipo.CATEGORIAS;   // comun/ficha-equipo.js (A5, 2026-10-02)
 const CATEGORIA_LABEL = Object.fromEntries(CATEGORIAS.map(c=>[c.id, c.label]));
 
 // Slot de equipamiento, para el filtro por slot del catálogo del
@@ -201,10 +184,7 @@ function compute(){ return FichaCalculo.calcular(S); }
 // con "Ranuras +N" o "Ranuras para consumibles +N" en el detalle carga
 // ese mod).
 // La mochila es un slot de equipo (2026-09-25): la base la pone el jugador a mano (S.caps.mochila) y la mochila equipada la amplía con el mod "capmochila".
-function capMochilaEfectivo(){
-  const bonus = compute().final.capmochila;
-  return num(S.caps.mochila) + (Number.isNaN(bonus) ? 0 : bonus);
-}
+function capMochilaEfectivo(){ return FichaEquipo.capMochila(S); }   // comun/ficha-equipo.js
 function capCinturonEfectivo(){
   const bonus = compute().final.capcinturon;
   return num(S.caps.cinturon) + (Number.isNaN(bonus) ? 0 : bonus);

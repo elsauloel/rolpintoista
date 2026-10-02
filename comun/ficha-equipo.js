@@ -37,6 +37,33 @@ const FichaEquipo = (() => {
   ];
   const STAT_COMPARABLE_LABEL = {def:'Defensa', danoprom:'Daño prom.'};
   const L = () => FichaCalculo.STAT_LABEL, F = () => FichaCalculo.STAT_FULL;
+  // Las categorías de ítem de la ficha (js/01, A5) y la mochila: ranuras de un ítem, cuántas usa la mochila y su capacidad (la base la
+  // pone el jugador, S.caps.mochila, y la mochila equipada la amplía con el mod "capmochila").
+  const CATEGORIAS = [
+    {id:'', label:'— elegir categoría —'},
+    {id:'arma_1m', label:'Arma de una mano', arma:true},
+    {id:'arma_2m', label:'Arma de dos manos', arma:true},
+    {id:'escudo_1m', label:'Escudo de una mano', defensivo:true},
+    {id:'escudo_2m', label:'Escudo de dos manos', defensivo:true},
+    {id:'armadura_blanda', label:'Armadura blanda', defensivo:true},
+    {id:'armadura_rigida', label:'Armadura rígida', defensivo:true},
+    {id:'manos', label:'Manos', defensivo:true},
+    {id:'piernas', label:'Piernas', defensivo:true},
+    {id:'cabeza', label:'Cabeza', defensivo:true},
+    {id:'pies', label:'Pies', defensivo:true},
+    {id:'cinturon', label:'Cinturón', defensivo:true},
+    {id:'mochila', label:'Mochila', defensivo:true},
+    {id:'anillos', label:'Anillos'},
+    {id:'otros', label:'Otros'},
+    {id:'consumibles', label:'Consumibles'},
+  ];
+  const CATEGORIA_LABEL = Object.fromEntries(CATEGORIAS.map(c=>[c.id, c.label]));
+  const ranuras = i => (i.ranuras === undefined || i.ranuras === '') ? 1 : num(i.ranuras);
+  const mochilaUsada = S => (S.inventario || []).filter(i => !i.equipado).reduce((a, i) => a + ranuras(i), 0);
+  function capMochila(S){
+    const bonus = FichaCalculo.calcular(S).final.capmochila;
+    return num(S.caps && S.caps.mochila) + (Number.isNaN(bonus) ? 0 : bonus);
+  }
 
   /* ---------- Los slots ---------- */
   function slots(S){
@@ -288,6 +315,6 @@ const FichaEquipo = (() => {
   `};
   }
 
-  return {SLOT_DEFS, TIER_COLOR, STAT_COMPARABLE_LABEL, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
+  return {SLOT_DEFS, TIER_COLOR, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
     modTags, thumb, statTxt, html, slotLlenoHtml, compararHtml};
 })();

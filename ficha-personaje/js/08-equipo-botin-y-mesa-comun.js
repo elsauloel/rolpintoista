@@ -97,16 +97,7 @@ const combatePublicado = () => !!(combateActual && combateActual.estado === 'pub
 function botinLootEscuchar(){
   if(!fbUsuario) return;
   fbDb.collection(fbRutaCampana('botin')).onSnapshot(snap => {
-    botinLoot = [];
-    snap.docs.forEach(d => {
-      const x = d.data();
-      if(x.tomadoPor) return;
-      let item = null;
-      try{ item = JSON.parse(x.json || 'null'); }catch(e){}
-      if(!item) return;
-      item.id = 'botin-' + d.id;
-      botinLoot.push({docId: d.id, nombre: x.nombre || item.nombre, item, despojos: num(x.despojos), origen: x.origen || ''});
-    });
+    botinLoot = FichaBotin.loot(snap);   // comun/ficha-botin.js (A5)
     botinLootRender();
   }, err => console.error('Error escuchando el botín:', err));
 }
@@ -118,20 +109,8 @@ function botinPuedeTomar(){
   const f = fichaVivo;
   return !!(f && f.cargada && !f.soloLectura && !f.editaGM);
 }
-function mochilaUsada(){ return S.inventario.filter(i => !i.equipado).reduce((a, i) => a + ranurasDe(i), 0); }
-function botinTextoItem(item){
-  const partes = [];
-  if(item.tier) partes.push(item.tier);
-  if(CATEGORIA_LABEL[item.tipoItem]) partes.push(CATEGORIA_LABEL[item.tipoItem]);
-  const dano = ES_ARMA(item.tipoItem) ? armaDanoTxt(item) : '';
-  if(dano) partes.push('Daño ' + dano);
-  const st = statsComparablesDe(item);
-  Object.keys(st).forEach(k => { if(k !== 'danoprom') partes.push(`${STAT_COMPARABLE_LABEL[k] || STAT_LABEL[k] || k} ${st[k] > 0 ? '+' : ''}${fmt(st[k])}`); });
-  (item.efectosGolpe || []).forEach(e => { if(e && e.nombre) partes.push('Al golpear: ' + e.nombre); });
-  partes.push(`Peso ${fmt(num(item.peso))}`);
-  if(item.detalle) partes.push(item.detalle);
-  return partes.join(' · ');
-}
+function mochilaUsada(){ return FichaEquipo.mochilaUsada(S); }   // comun/ficha-equipo.js
+const botinTextoItem = item => FichaBotin.textoItem(item);   // comun/ficha-botin.js (A5)
 function botinLootRender(){
   const btn = $('#btn-botin-loot');
   if(btn){
@@ -140,86 +119,12 @@ function botinLootRender(){
   }
   if($('#scrim-botin-loot').classList.contains('open')) botinLootCuerpo();
 }
+// La ventana y «Sumar a la mochila»: comun/ficha-botin.js (A5, 2026-10-02; el mapa usa lo mismo).
 function botinLootCuerpo(){
-  const cap = capMochilaEfectivo(), usado = mochilaUsada();
-  const libres = cap > 0 ? Math.max(0, cap - usado) : null;
-  const puede = botinPuedeTomar() && combatePublicado();
-  const yo = fichaVivo && fichaVivo.id;
-  const js = (combateActual && Array.isArray(combateActual.jugadores)) ? combateActual.jugadores : [];
-  const recompensas = js.length ? `<div style="margin-bottom:14px">
-      <div class="hint" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Lo que recibe cada jugador</div>
-      <div style="display:flex;flex-direction:column;gap:4px">${js.map(j => `<div style="display:flex;gap:10px;align-items:center;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,${j.fichaId === yo ? '.10' : '.04'});${j.fichaId === yo ? 'outline:1px solid var(--copper, #B87333)' : ''}">
-        <b style="flex:1">${esc(j.nombre)}${j.fichaId === yo ? ' <span class="hint">(vos)</span>' : ''}</b>
-        <span class="hint">${esc(j.estado || '')}</span>
-        <span style="min-width:90px;text-align:right"><b>+${fmt(num(j.xp))}</b> XP</span>
-        <span style="min-width:90px;text-align:right"><b>+${fmt(num(j.dde))}</b> DDE</span></div>`).join('')}</div>
-      <div class="hint" style="margin-top:4px">${combatePublicado() ? 'La experiencia y el oro se cargan en las fichas cuando el GM cierra el botín, después de que todos elijan.' : 'La experiencia y el oro ya se cargaron en las fichas.'}</div></div>` : '';
-  const cerrado = combateActual && combateActual.estado === 'cerrado' && botinLoot.length === 0
-    ? '<div class="hint" style="margin-bottom:8px">El botín ya está cerrado: lo que nadie tomó se convirtió en despojos.</div>' : '';
-  $('#botin-loot-body').innerHTML = `
-    ${recompensas}${cerrado}
-    <div class="hint" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Despojos: elegí lo que te llevás</div>
-    <div class="hint" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
-      <span>Mochila: <b>${fmt(usado)}${cap > 0 ? ' / ' + fmt(cap) : ''}</b> ranuras${libres !== null ? ` · <b>${fmt(libres)}</b> libres` : ''}</span>
-      <button type="button" class="mini" id="botin-loot-mochila">🎒 Abrir mochila</button>
-    </div>
-    ${puede ? '' : '<div class="hint" style="margin-bottom:8px">Abrí tu personaje (con permiso de edición) para tomar cosas del botín.</div>'}
-    ${botinLoot.length ? botinLoot.map(b => {
-      const info = slotOcupadoInfo(b.item);
-      const comparar = info && info.equipados.length;
-      return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line, #444)">
-        <div style="flex:1;min-width:0" title="${esc(botinTextoItem(b.item))}">
-          <div style="font-weight:600">${esc(b.nombre)}${b.item.trofeo ? ' <span class="hint">(trofeo)</span>' : ''}</div>
-          <div class="hint">≈ ${fmt(b.despojos)} despojos${b.origen ? ' · de ' + esc(b.origen) : ''}${info && info.ocupado ? ' · slot ocupado' : ''}</div>
-        </div>
-        <button type="button" class="mini" data-view="catalogo:${esc(b.item.id)}">Ver</button>
-        ${comparar ? `<button type="button" class="mini" data-botin-comparar="${esc(b.item.id)}">Comparar</button>` : ''}
-        <button type="button" class="btn primary" data-botin-tomar="${esc(b.docId)}"${puede ? '' : ' disabled'}>Sumar a la mochila</button>
-      </div>`;
-    }).join('') : '<div class="hint">No queda nada sin tomar.</div>'}`;
+  $('#botin-loot-body').innerHTML = FichaBotin.html(S, {combate: combateActual, loot: botinLoot, puede: botinPuedeTomar(), fichaId: fichaVivo && fichaVivo.id});
 }
-async function botinTomar(docId){
-  if(!botinPuedeTomar()){ toast('Abrí tu personaje para tomar el botín'); return; }
-  const b = botinLoot.find(x => x.docId === docId);
-  if(!b) return;
-  const item = b.item;
-  const igual = item.trofeo ? S.inventario.find(i => i.trofeo && i.nombre === item.nombre) : null;   // los trofeos iguales se apilan en una ranura
-  const cap = capMochilaEfectivo();
-  if(!igual && cap > 0 && mochilaUsada() + ranurasDe(item) > cap){ toast(`Mochila llena: ${b.nombre} no entra (se va a convertir en despojos si nadie lo toma)`); return; }
-  const ref = fbDb.collection(fbRutaCampana('botin')).doc(docId);
-  let ok = false, quien = '';
-  try{
-    ok = await fbDb.runTransaction(async tx => {
-      const x = await tx.get(ref);
-      if(!x.exists) return false;
-      if(x.data().tomadoPor){ quien = x.data().tomadoNombre || ''; return false; }
-      tx.update(ref, {tomadoPor: fbUsuario.uid, tomadoNombre: String(S.meta.nombre || fbMiembro.nombre || '').slice(0, 60)});
-      return true;
-    });
-  }catch(err){
-    console.error('No se pudo tomar el botín:', err);
-    toast('No se pudo tomar' + (err.code === 'permission-denied' ? ' (sin permiso: faltan pegar las reglas)' : ''));
-    return;
-  }
-  if(!ok){ toast(quien ? `${b.nombre} ya lo tomó ${quien}` : `${b.nombre} ya no está`); return; }
-  if(igual){ igual.unidades = num(igual.unidades) + 1; }
-  else{
-    const nuevo = structuredClone(item);
-    nuevo.id = uid();
-    nuevo.equipado = false;
-    nuevo.unidades = 1;
-    nuevo.ranuras = item.ranuras ?? 1;
-    S.inventario.push(nuevo);
-  }
-  renderInventario();
-  refresh();
-  toast(`${b.nombre} → mochila`);
-  try{
-    await fbDb.collection(fbRutaCampana('tiradas')).add({
-      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: String(S.meta.nombre || ''), origen: `🎁 ${S.meta.nombre || fbMiembro.nombre} tomó ${b.nombre}`, formula: '',
-      rolls: [], mod: 0, total: 0, desde: 'recompensa', cuando: firebase.firestore.FieldValue.serverTimestamp(),
-    });
-  }catch(err){ console.error('No se pudo escribir en la Mesa:', err); }
+function botinTomar(docId){
+  return FichaBotin.tomar(S, botinLoot.find(x => x.docId === docId), {toast: t => toast(t), puede: botinPuedeTomar, cambio: () => { renderInventario(); refresh(); }});
 }
 $('#btn-botin-loot').onclick = () => { botinLootCuerpo(); $('#scrim-botin-loot').classList.add('open'); };
 $('#botin-loot-x').onclick = () => $('#scrim-botin-loot').classList.remove('open');

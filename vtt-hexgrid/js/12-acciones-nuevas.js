@@ -483,7 +483,7 @@ function actualizarBotonDespojosMapa(){
 function abrirBatallaDeJugador(){
   const fichaId = fichaPrincipalId();
   if(!fichaId){ toast('🎁 Hay botín del combate, pero no tenés un personaje para tomarlo'); return; }
-  abrirBotonera(fichaId, {tipo: 'abrir-botin'});
+  abrirBotinMapa(fichaId);   // el mapa (js/11, A5)
 }
 function escucharBotinParaJugador(){
   if(!fbUsuario) return;
@@ -500,7 +500,9 @@ function escucharBotinParaJugador(){
       clearTimeout(combateTimer);
       combateTimer = setTimeout(() => { toast('⚔ Batalla terminada'); abrirBatallaDeJugador(); }, 600);
     }
-    if(cerrada && botonera.completa && !$('#botonera-capa').hidden){ cerrarBotonera(); toast('El GM cerró el botín: lo que nadie tomó se convirtió en despojos'); }
+    if(cerrada && bnBotinCombateCerrado()) toast('El GM cerró el botín: lo que nadie tomó se convirtió en despojos');
+    else if(cerrada && botonera.completa && !$('#botonera-capa').hidden){ cerrarBotonera(); toast('El GM cerró el botín: lo que nadie tomó se convirtió en despojos'); }
+    if(typeof bnBotinDibujar === 'function') bnBotinDibujar();
   }, err => console.error('Error escuchando el fin del combate:', err));
 }
 // 🏪 Tienda (2026-09-24, pedido del dueño): abre la tienda que publicó el GM, sin salir del mapa, en la ventana de la ficha del

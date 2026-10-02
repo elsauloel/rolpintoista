@@ -70,6 +70,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-mantenimiento.js"></script>
 <script src="selector-estados.js"></script>
 <script src="ficha-equipo.js"></script>
+<script src="ficha-botin.js"></script>
 <script src="tiradas-propias.js"></script>
 <script src="efectos-golpe.js"></script>
 <script src="confirmar-turno.js"></script>
@@ -583,6 +584,18 @@ prueba('equipar: slot lleno pide reemplazar, un consumible pasa al cinturón, un
   FichaEquipo.reemplazar(S, 'a1', 'a3', ui);
   igual([lleno, S.cinturon.some(i => i.id === 'p'), avisos.some(t => /trofeo/.test(t)), casco.equipado, S.inventario.find(i => i.id === 'a3').equipado, S.inventario.find(i => i.id === 'a1').equipado, S.nitros, avisos.includes('sin No2'), FichaEquipo.slotLlenoHtml(S, S.inventario.find(i => i.id === 'a1')).includes('data-reemplazar')],
     ['a3', true, true, true, true, false, 0, false, true]);   // casco −1 No2 (3 → 2), reemplazar −2 (2 → 0)
+});
+
+prueba('el botín: se lista lo que nadie tomó y la ventana muestra lo de cada jugador, la mochila y «Sumar a la mochila»', () => {
+  const snap = {docs: [
+    {id: 'b1', data: () => ({nombre: 'Hacha vieja', json: JSON.stringify({nombre: 'Hacha vieja', tipoItem: 'arma_1m', peso: 1, tipoDado: 6}), despojos: 3, origen: 'Orco'})},
+    {id: 'b2', data: () => ({nombre: 'Colmillo', json: JSON.stringify({nombre: 'Colmillo', trofeo: true}), tomadoPor: 'otro'})}]};
+  const lista = FichaBotin.loot(snap);
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, caps: {mochila: 10}, inventario: [{id: 'a', nombre: 'Espada', tipoItem: 'arma_1m', equipado: true}]}).S);
+  const combate = {numero: 1, estado: 'publicado', jugadores: [{fichaId: 'f1', nombre: 'Silvia', estado: 'en pie', xp: 20, dde: 15}]};
+  const html = FichaBotin.html(S, {combate, loot: lista, puede: true, fichaId: 'f1'});
+  igual([lista.length, lista[0].item.id, lista[0].despojos, html.includes('+20</b> XP'), html.includes('(vos)'), html.includes('data-botin-tomar="b1"'), html.includes('data-botin-comparar'), /disabled/.test(FichaBotin.html(S, {combate, loot: lista, puede: false}))],
+    [1, 'botin-b1', 3, true, true, true, true, true]);
 });
 
 /* ---------- El dibujo de la Botonera (comun/ficha-botonera.js, paso 4 etapa 3b) ---------- */

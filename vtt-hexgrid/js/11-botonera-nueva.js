@@ -111,7 +111,7 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/ficha-equipo.js?v=20261002a', '../comun/ficha-mantenimiento.js?v=20261002a', '../comun/ficha-calculo.js?v=20261002i', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js?v=20261002i', '../comun/ficha-habilidades.js?v=20261001c',
+const BN_PIEZAS = ['../comun/ficha-equipo.js?v=20261002b', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-mantenimiento.js?v=20261002a', '../comun/ficha-calculo.js?v=20261002i', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js?v=20261002i', '../comun/ficha-habilidades.js?v=20261001c',
   '../comun/catalogo.js?v=20261002i', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261002d', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261002i', '../comun/ficha-resumen.js?v=20261002o', '../comun/inv-calculo.js?v=20261002d', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/inv-duelo.js?v=20261001a', '../comun/ficha-acciones.js?v=20261002i', '../comun/inv-habilidades.js?v=20261002g', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
@@ -742,6 +742,7 @@ function bnVer(key, id){
   // Como la ficha: un ítem de un personaje que no podés guardar se edita como copia para subir ("Editar y subir"), sin Eliminar.
   const ajeno = !puede && (key === 'inventario' || key === 'cinturon');
   const editar = r.querySelector('[data-bn-ver="editar"]');
+  editar.style.display = '';
   editar.textContent = ajeno ? '✎ Editar y subir' : 'Editar';
   editar.title = ajeno ? 'Editá una copia y subila al catálogo compartido (no cambia este ítem)' : '';
   r.querySelector('[data-bn-ver="borrar"]').style.display = puede ? '' : 'none';
@@ -784,6 +785,10 @@ function bnCrear(){
     <div class="scrim" id="bn-equipo"><div class="modal" style="max-width:1400px;width:96vw">
       <header><h3>🛡 Equipo y mochila</h3><button class="iconbtn" data-bn-eq="cerrar">Cerrar</button></header>
       <div class="body" id="bn-equipo-cuerpo"></div>
+    </div></div>
+    <div class="scrim" id="bn-botin"><div class="modal" style="max-width:920px;width:94vw">
+      <header><h3>⚔ Batalla terminada</h3><button class="iconbtn" data-bn-eq="botin-no">Cerrar</button></header>
+      <div class="body" id="bn-botin-cuerpo"></div>
     </div></div>
     <div class="scrim" id="bn-slot-lleno"><div class="modal" style="max-width:460px">
       <header><h3>Slot equipado</h3><button class="iconbtn" data-bn-eq="slot-no">Cerrar</button></header>
@@ -842,6 +847,7 @@ function bnCrear(){
   raiz.querySelector('#bn-costox').addEventListener('mousedown', e => { if(e.target.id === 'bn-costox'){ bnCostoX = null; e.target.classList.remove('open'); } });
   ['bn-slot-lleno', 'bn-comparar'].forEach(id => raiz.querySelector('#' + id).addEventListener('mousedown', e => { if(e.target.id === id) e.target.classList.remove('open'); }));
   raiz.querySelector('#bn-equipo').addEventListener('mousedown', e => { if(e.target.id === 'bn-equipo') bnEquipoCerrar(); });
+  raiz.querySelector('#bn-botin').addEventListener('mousedown', e => { if(e.target.id === 'bn-botin') bnBotinCerrar(); });
   ['bn-sobrepeso', 'bn-elegir-arma', 'bn-tipo-ataque', 'bn-ver', 'bn-verinv'].forEach(id => raiz.querySelector('#' + id).addEventListener('mousedown', e => { if(e.target.id === id){ e.target.classList.remove('open'); if(id === 'bn-sobrepeso') bnSobrepeso = null; } }));
   raiz.addEventListener('click', e => {
     const b = e.target.closest('button');
@@ -1116,9 +1122,9 @@ function bnEquipoUi(){
     },
   };
 }
-let bnComparando = null;   // {itemId, equipadoId}
+let bnComparando = null;   // {item, equipadoId}: un ítem de la mochila o del botín contra uno equipado
 function bnCompararDibujar(){
-  const c = bnComparando, it = c && (bn.S.inventario || []).find(x => x.id === c.itemId);
+  const c = bnComparando, it = c && ((bn.S.inventario || []).find(x => x.id === c.item.id) || c.item);
   const res = it && FichaEquipo.compararHtml(bn.S, it, c.equipadoId);
   if(!res){ bn.raiz.querySelector('#bn-comparar').classList.remove('open'); bnComparando = null; return; }
   c.equipadoId = res.equipadoId;
@@ -1127,9 +1133,10 @@ function bnCompararDibujar(){
 // Los clics de la ventana de Equipo (y de sus carteles). true si era de acá.
 function bnEquipoClic(b){
   const r = bn.raiz;
-  const enEquipo = !!b.closest('#bn-equipo, #bn-slot-lleno, #bn-comparar');
+  const enEquipo = !!b.closest('#bn-equipo, #bn-slot-lleno, #bn-comparar, #bn-botin');
   if(b.dataset.bnEq){
     if(b.dataset.bnEq === 'cerrar') bnEquipoCerrar();
+    else if(b.dataset.bnEq === 'botin-no') bnBotinCerrar();
     else if(b.dataset.bnEq === 'slot-no') r.querySelector('#bn-slot-lleno').classList.remove('open');
     else if(b.dataset.bnEq === 'comparar-no'){ r.querySelector('#bn-comparar').classList.remove('open'); bnComparando = null; }
     return true;
@@ -1140,9 +1147,31 @@ function bnEquipoClic(b){
   if(b.dataset.reemplazar){ if(!soloLeer()){ const [eqId, nuevoId] = b.dataset.reemplazar.split(':'); FichaEquipo.reemplazar(bn.S, eqId, nuevoId, bnEquipoUi()); } return true; }
   if(b.dataset.slotComparar){
     r.querySelector('#bn-slot-lleno').classList.remove('open');
-    bnComparando = {itemId: b.dataset.slotComparar, equipadoId: ''};
+    const it = (bn.S.inventario || []).find(x => x.id === b.dataset.slotComparar);
+    if(!it) return true;
+    bnComparando = {item: it, equipadoId: ''};
     bnCompararDibujar();
     if(bnComparando) r.querySelector('#bn-comparar').classList.add('open');
+    return true;
+  }
+  // El botín (A5): sumar a la mochila, comparar, ver, ir a la mochila.
+  if(b.dataset.botinTomar){
+    const entrada = bnBotinLoot.find(x => x.docId === b.dataset.botinTomar), antes = FichaGuardado.partes(bn.S);
+    FichaBotin.tomar(bn.S, entrada, {toast: t => toast(t), puede: () => bnPuedeGuardar(), cambio: () => { bnUi(antes).cambio(); bnBotinDibujar(); }});
+    return true;
+  }
+  if(b.dataset.botinComparar){
+    const entrada = bnBotinLoot.find(x => x.item.id === b.dataset.botinComparar);
+    if(!entrada) return true;
+    bnComparando = {item: entrada.item, equipadoId: ''};
+    bnCompararDibujar();
+    if(bnComparando) r.querySelector('#bn-comparar').classList.add('open');
+    return true;
+  }
+  if(b.id === 'botin-loot-mochila'){ bnBotinCerrar(true); abrirEquipoMapa(bn.fichaId); return true; }
+  if(b.dataset.view && b.closest('#bn-botin')){
+    const entrada = bnBotinLoot.find(x => x.item.id === b.dataset.view.split(':')[1]);
+    if(entrada) bnVerItemSuelto(entrada.item);
     return true;
   }
   if(b.dataset.compararElegir){ if(bnComparando){ bnComparando.equipadoId = b.dataset.compararElegir; bnCompararDibujar(); } return true; }
@@ -1153,6 +1182,54 @@ function bnEquipoClic(b){
     return true;
   }
   return false;   // data-view (Ver) lo atiende el resto del recuadro
+}
+/* ---------- ⚔ El botín del combate, hecho por el mapa (2026-10-02, hoja de ruta A5) ----------
+   La ventana «Batalla terminada» (lo que recibe cada jugador y los despojos para «Sumar a la mochila») la abría la ficha escondida.
+   Ahora la muestra el mapa adentro del recuadro de la Botonera nueva, con comun/ficha-botin.js (lo mismo que la ficha). El combate
+   lo escucha js/12 (combateMapa); el botín (`botin`) se escucha desde la primera vez que se abre. */
+let bnBotinLoot = [], bnBotinEscucha = null;
+function bnBotinEscuchar(){
+  if(bnBotinEscucha || !fbDb) return;
+  bnBotinEscucha = fbDb.collection(fbRutaCampana('botin')).onSnapshot(snap => { bnBotinLoot = FichaBotin.loot(snap); bnBotinDibujar(); },
+    err => console.error('Error escuchando el botín:', err));
+}
+async function abrirBotinMapa(fichaId){
+  if(!combatePublicado() && !(combateMapa && (combateMapa.jugadores || []).length)){ toast('No hay botín publicado'); return; }
+  try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo abrir el botín'); return; }
+  bnBotinEscuchar();
+  const yaVisible = bn && bn.host && !bn.host.hidden && bn.fichaId === fichaId && !bn.invId;
+  if(!yaVisible) await abrirBotoneraNueva(fichaId, '');
+  if(!bn) return;
+  bn.soloBotin = !yaVisible;
+  if(!(await bnSesionLista(fichaId))){ toast('No se pudo leer el personaje'); return; }
+  bn.raiz.querySelector('#bn-botin').classList.add('open');
+  bnBotinDibujar();
+}
+function bnBotinDibujar(){
+  if(!bn || !bn.S || !bn.raiz.querySelector('#bn-botin').classList.contains('open')) return;
+  bn.raiz.querySelector('#bn-botin-cuerpo').innerHTML = FichaBotin.html(bn.S, {combate: combateMapa, loot: bnBotinLoot, puede: bnPuedeGuardar(), fichaId: bn.fichaId});
+}
+// seguir: no cerrar la Botonera aunque se haya abierto para esto (se pasa a otra ventana del recuadro, la mochila).
+function bnBotinCerrar(seguir){
+  if(!bn) return;
+  bn.raiz.querySelector('#bn-botin').classList.remove('open');
+  if(bn.soloBotin){ bn.soloBotin = false; if(seguir) bn.host.hidden = true; else cerrarBotoneraNueva(); }
+}
+// El GM cerró el botín (js/12, escucharBotinParaJugador): la ventana se cierra.
+function bnBotinCombateCerrado(){
+  if(!bn || !bn.raiz.querySelector('#bn-botin').classList.contains('open')) return false;
+  bnBotinCerrar();
+  return true;
+}
+// El «Ver» de un ítem que no es del personaje (uno del botín): la misma tarjeta, sin Editar ni Eliminar.
+function bnVerItemSuelto(it){
+  const v = FichaLupa.ver(bn.S, 'catalogo', it), r = bn.raiz;
+  bnViendo = null;
+  r.querySelector('#bn-ver-titulo').textContent = v.titulo;
+  r.querySelector('#bn-ver-cuerpo').innerHTML = v.html;
+  r.querySelector('[data-bn-ver="editar"]').style.display = 'none';
+  r.querySelector('[data-bn-ver="borrar"]').style.display = 'none';
+  r.querySelector('#bn-ver').classList.add('open');
 }
 function cerrarBotoneraNueva(){
   if(!bn) return;
@@ -1166,6 +1243,7 @@ document.addEventListener('keydown', e => {
   e.preventDefault();
   const abiertos = [...bn.raiz.querySelectorAll('.scrim.open')], cartel = abiertos[abiertos.length - 1];   // el de más arriba
   if(cartel && cartel.id === 'bn-equipo'){ bnEquipoCerrar(); return; }
+  if(cartel && cartel.id === 'bn-botin'){ bnBotinCerrar(); return; }
   if(cartel){ cartel.classList.remove('open'); if(cartel.id === 'bn-comparar') bnComparando = null; bnViendo = null; bnCostoX = null; bnSobrepeso = null; bnSinNitrosSeguir = null; return; }
   cerrarBotoneraNueva();
 });

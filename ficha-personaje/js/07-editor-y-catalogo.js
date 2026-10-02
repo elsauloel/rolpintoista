@@ -604,7 +604,7 @@ function abrirChooser(target, equipadoPreset){
   $('#scrim-chooser').classList.add('open');
 }
 
-const TIER_COLOR = {'Común':'#9A867E', 'Buena Calidad':'#A8C256', 'Raro':'#5B8DBE', 'Excepcional':'#E0A458', 'Legendario':'#9B7BD4', 'A definir':'#D4574E'};
+const TIER_COLOR = FichaEquipo.TIER_COLOR;   // comun/ficha-equipo.js
 
 // Lista legible de TODOS los mods del ítem (menos Defensa, que ya se ve en
 // el resumen) — atributos secundarios, resistencias a crítico, lo que sea.
@@ -644,14 +644,7 @@ function precioTiendaHtml(item){
 // Slot que ocupa un ítem según SLOT_DEFS, y si ese slot ya está lleno o
 // ya hay algo del mismo tipo puesto (para el botón Comparar). Devuelve
 // null para lo que no ocupa un slot del cuerpo (consumibles, etc.).
-function slotOcupadoInfo(item){
-  const slotDef = SLOT_DEFS.find(sd => sd.cats.includes(item.tipoItem));
-  if(!slotDef) return null;
-  const usado = computeSlots().find(s => s.id === slotDef.id)?.usado || 0;
-  const propio = slotDef.peso ? (slotDef.peso[item.tipoItem] || 1) : 1;
-  const equipados = S.inventario.filter(i => i.equipado && i.tipoItem === item.tipoItem);
-  return {ocupado: usado + propio > slotDef.max, equipados};
-}
+function slotOcupadoInfo(item){ return FichaEquipo.slotOcupado(S, item); }   // comun/ficha-equipo.js
 
 function catalogoRowHtml(item){
   const dano = armaDanoTxt(item);
@@ -691,19 +684,6 @@ function catalogoRowHtml(item){
 // Stats de un ítem en forma comparable: Defensa, daño promedio del arma
 // (dados*(caras+1)/2 + fijo, no la tirada exacta) y todos sus mods menos
 // Defensa (que ya va aparte).
-const STAT_COMPARABLE_LABEL = {def:'Defensa', danoprom:'Daño prom.'};
-function statsComparablesDe(item){
-  const out = {};
-  const defVal = defValorDe(item);
-  if(defVal) out.def = defVal;
-  if(ES_ARMA(item.tipoItem)){
-    const dados = Math.max(1, num(item.peso) || 1) + Math.max(0, num(item.danoAmplificado)), caras = num(item.tipoDado) || 8, fijo = num(item.danoFijo);
-    out.danoprom = Math.round((dados * (caras + 1) / 2 + fijo) * 10) / 10;
-  }
-  (item.mods || []).forEach(m => {
-    if(!m.stat || m.stat === 'def') return;
-    out[m.stat] = (out[m.stat] || 0) + num(m.val);
-  });
-  return out;
-}
+const STAT_COMPARABLE_LABEL = FichaEquipo.STAT_COMPARABLE_LABEL;
+const statsComparablesDe = item => FichaEquipo.statsComparables(item);   // comun/ficha-equipo.js
 

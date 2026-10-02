@@ -377,37 +377,9 @@ document.addEventListener('click', async e => {
   }
   if(b.dataset.toggle){
     const id = b.dataset.toggle;
-    { const enM = S.inventario.find(x => x.id === id); if(enM && enM.enMesa){ toast('Está ofrecido en la mesa común: retiralo primero'); return; } }
-    let it = S.inventario.find(x=>x.id===id);
-    if(it){
-      if(!it.equipado && it.trofeo){ toast('Un trofeo no se equipa: se vende en una tienda o se convierte en despojos'); return; }
-      if(!it.equipado && it.tipoItem === 'consumibles'){
-        S.inventario = S.inventario.filter(x => x.id !== id);
-        it.equipado = false;
-        S.cinturon.push(it);
-        renderInventario(); renderList('cinturon'); refresh();
-        toast(`${it.nombre} pasó al cinturón`);
-        return;
-      }
-      if(!it.equipado && it.tipoItem){
-        const slotDef = SLOT_DEFS.find(sd => sd.cats.includes(it.tipoItem));
-        if(slotDef){
-          const usadoSinEste = computeSlots().find(s => s.id === slotDef.id)?.usado || 0;
-          const propio = slotDef.peso ? (slotDef.peso[it.tipoItem] || 1) : 1;
-          if(usadoSinEste + propio > slotDef.max){
-            if(abrirSlotLleno(it.id)) return;  // menú: Reemplazar o Comparar
-            toast(`No entra: ${slotDef.label} quedaría en ${fmt(usadoSinEste + propio)} / ${fmt(slotDef.max)}`);
-            return;
-          }
-        }
-      }
-      const eraEquipado = it.equipado;
-      conCostoEquipar(1, `${eraEquipado ? 'desequipar' : 'equipar'} ${it.nombre}`, `${eraEquipado ? 'desequipó' : 'equipó'} ${it.nombre}`, () => {
-        it.equipado = !it.equipado; renderInventario(); refresh();
-      });
-      return;
-    }
-    it = S.efectos.find(x=>x.id===id);
+    // Equipar / sacar un ítem de la mochila: comun/ficha-equipo.js (hoja de ruta A4; el mapa usa la misma regla).
+    if(FichaEquipo.equipar(S, id, equipoUi)) return;
+    const it = S.efectos.find(x=>x.id===id);
     if(it){ it.activo = it.activo === false; renderList('efectos'); refresh(); return; }
   }
   if(b.dataset.tirararma){

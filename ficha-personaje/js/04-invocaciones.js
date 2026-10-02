@@ -803,9 +803,7 @@ $('#scrim-botonera-inv').addEventListener('mousedown', e => { if(e.target.id==='
 $('#verhabinv-x').onclick = () => $('#scrim-verhabinv').classList.remove('open');
 $('#scrim-verhabinv').addEventListener('mousedown', e => { if(e.target.id==='scrim-verhabinv') $('#scrim-verhabinv').classList.remove('open'); });
 
-function defValorDe(i){
-  return (i.mods||[]).filter(m => m.stat === 'def').reduce((a,m) => a + num(m.val), 0);
-}
+const defValorDe = i => FichaEquipo.defValor(i);   // comun/ficha-equipo.js
 
 function invRow(i, contexto){
   const dano = armaDanoTxt(i);

@@ -92,18 +92,7 @@ function ordenEquipoDe(i){
 const ES_ARMA = catId => CATEGORIAS.find(c=>c.id===catId)?.arma === true;
 const ES_MANO = catId => ['arma_1m','arma_2m','escudo_1m','escudo_2m'].includes(catId);
 
-const SLOT_DEFS = [
-  {id:'cabeza', label:'Cabeza', cats:['cabeza'], max:1},
-  {id:'torso_blanda', label:'Armadura blanda', cats:['armadura_blanda'], max:1},
-  {id:'torso_rigida', label:'Armadura rígida', cats:['armadura_rigida'], max:1},
-  {id:'manos', label:'Manos', cats:['manos'], max:1},
-  {id:'manos_arma', label:'Manos (armas y escudos)', cats:['arma_1m','arma_2m','escudo_1m','escudo_2m'], max:2, peso:{arma_1m:1, arma_2m:2, escudo_1m:1, escudo_2m:2}},
-  {id:'anillos', label:'Anillos', cats:['anillos'], max:2},
-  {id:'pies', label:'Pies', cats:['pies'], max:1},
-  {id:'piernas', label:'Piernas', cats:['piernas'], max:1},
-  {id:'cinturon', label:'Cinturón', cats:['cinturon'], max:1},
-  {id:'mochila', label:'Mochila', cats:['mochila'], max:1},   // un solo cinturón y una sola mochila puestos (2026-09-25)
-];
+const SLOT_DEFS = FichaEquipo.SLOT_DEFS;   // comun/ficha-equipo.js (hoja de ruta A4, 2026-10-02)
 const ATTR_LIST = FichaCalculo.ATTR_LIST;
 const MOD_TARGETS = FichaCalculo.MOD_TARGETS;
 const STAT_LABEL = FichaCalculo.STAT_LABEL;

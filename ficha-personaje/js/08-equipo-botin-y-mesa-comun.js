@@ -4,81 +4,8 @@
    Los botones Sacar / Equipar son los mismos data-toggle de la lista de
    inventario (si el slot está lleno abre Reemplazar/Comparar). El mapa lo
    pide con el mensaje 'abrir-equipo' (ver MODO_BOTONERA). */
-function equipoStatTxt(it){
-  const d = armaDanoTxt(it);
-  const df = defValorDe(it);
-  return [d ? `Daño ${d}` : '', df ? `Def ${df > 0 ? '+' : ''}${fmt(df)}` : '', `Peso ${fmt(num(it.peso))}`].filter(Boolean).join(' · ');
-}
-function equipoFilaHtml(it, boton){
-  const tierColor = TIER_COLOR[it.tier] || '';
-  return `<div class="equipo-fila">
-    ${thumb(it)}
-    <div class="equipo-info">
-      <div class="cat-nombre"${tierColor ? ` style="color:${tierColor}"` : ''}>${esc(it.nombre)}</div>
-      <div class="cat-meta">${esc(equipoStatTxt(it))}</div>
-      <div class="imeta">${modTags(it.mods)}</div>
-    </div>
-    <button type="button" class="mini" data-view="inventario:${it.id}">Ver</button><button type="button" class="mini" data-edit="inventario:${it.id}">Editar</button>
-    ${boton}
-  </div>`;
-}
-function renderEquipo(){
-  const slots = computeSlots();
-  const equipados = S.inventario.filter(i => i.equipado);
-  const izq = slots.map(sd => {
-    const puestos = equipados.filter(i => sd.cats.includes(i.tipoItem));
-    return `<div class="equipo-slot">
-      <div class="equipo-slot-cab"><span>${esc(sd.label)}</span><span class="hint">${fmt(sd.usado)} / ${fmt(sd.max)}</span></div>
-      ${puestos.length ? puestos.map(it => equipoFilaHtml(it, `<button type="button" class="mini" data-toggle="${it.id}" title="Pasarlo a la mochila">Sacar</button>`)).join('') : '<div class="hint equipo-vacio">Vacío</div>'}
-    </div>`;
-  }).join('');
-  const mochila = S.inventario.filter(i => !i.equipado && SLOT_DEFS.some(sd => sd.cats.includes(i.tipoItem)));
-  const der = SLOT_DEFS.map(sd => {
-    const items = mochila.filter(i => sd.cats.includes(i.tipoItem));
-    if(!items.length) return '';
-    return `<div class="equipo-slot">
-      <div class="equipo-slot-cab"><span>${esc(sd.label)}</span></div>
-      ${items.map(it => {
-        const info = slotOcupadoInfo(it);
-        return equipoFilaHtml(it, `<button type="button" class="mini on" data-toggle="${it.id}" title="${info && info.ocupado ? 'El slot está lleno: te deja reemplazar o comparar' : 'Equipar'}">${info && info.ocupado ? 'Cambiar…' : 'Equipar'}</button>`);
-      }).join('')}
-    </div>`;
-  }).join('');
-  const cEq = compute();
-  const crgEq = Number.isNaN(cEq.final.crgmax) ? 0 : cEq.final.crgmax;
-  const pesoEq = `<div class="equipo-peso">Peso equipado <b>${fmt(cEq.pesoEquipado)}</b> / ${fmt(crgEq)}${cEq.sobrecarga > 0 ? ` · <span style="color:var(--danger)">te pasás por ${fmt(cEq.sobrecarga)}</span>` : ''}</div>`;
-  // Resumen arriba de todo (2026-09-27, pedido del dueño): qué hay en cada mano (nombre + efecto
-  // nomás, sin la tarjeta completa de abajo) y Defensa/Resistencia a crítico con su 🔍 — mismos
-  // datos y mismas claves de lupa que ya usa la Botonera (`defensa:def`, `defensa:tipoN`).
-  const manos = equipados.filter(i => ['arma_1m', 'arma_2m', 'escudo_1m', 'escudo_2m'].includes(i.tipoItem));
-  const manoEfecto = it => esc((it.detalle || '').trim() || equipoStatTxt(it) || 'Sin efecto');
-  const manosHtml = manos.length
-    ? manos.map(it => `<div class="equipo-mano"><div class="equipo-mano-nombre">${esc(it.nombre)}</div><div class="hint">${manoEfecto(it)}</div></div>`).join('')
-    : '<div class="hint equipo-vacio">Nada en las manos</div>';
-  const resumen = `<div class="equipo-resumen">
-    <div class="equipo-manos">${manosHtml}</div>
-    <div class="botonera-defensa">
-      <div class="botonera-tile bt-info" title="Defensa (no se tira)">
-        ${lupaBotonHtml('defensa:def')}
-        <span class="bt-label">Defensa</span><span class="bt-value">${Number.isNaN(cEq.final.def) ? '?' : fmt(cEq.final.def)}</span>
-      </div>
-      <div class="botonera-crit">
-        <div class="botonera-crit-t">Resistencia a críticos</div>
-        <div class="botonera-crit-grid">
-          ${TIPOS_IDS.map(id => `
-          <div class="botonera-tile bt-info" title="${esc(STAT_FULL[id])} (no se tira)">
-            ${lupaBotonHtml(`defensa:${id}`)}
-            <span class="bt-label">${esc(STAT_LABEL[id])}</span><span class="bt-value">${Number.isNaN(cEq.final[id]) ? '?' : fmt(cEq.final[id])}</span>
-          </div>`).join('')}
-        </div>
-      </div>
-    </div>
-  </div>`;
-  $('#equipo-body').innerHTML = resumen + pesoEq + `<div class="equipo-cols">
-    <div><h4 class="equipo-tit">Equipado</h4>${izq}</div>
-    <div><h4 class="equipo-tit">Mochila</h4>${der || '<div class="hint">No hay nada equipable en la mochila.</div>'}</div>
-  </div>`;
-}
+// Lo que se ve y la regla viven en comun/ficha-equipo.js (hoja de ruta A4, 2026-10-02): el mapa muestra la misma ventana.
+function renderEquipo(){ $('#equipo-body').innerHTML = FichaEquipo.html(S, {lupa: true}); }
 /* ---------- Ficha liviana dentro del mapa (2026-09-26, pedido del dueño) ----------
    El 📜 del token propio abre este menú: un resumen chico (Nivel, Despojos, DDE y Defensa, cada uno con su descripción al pasar el mouse; la vida, el SP y los No2 ya se
    ven en los circulitos del token) y un botón por módulo. Cada módulo se abre en su propia ventana encima del menú (las mismas ventanas de siempre); al cerrarla se vuelve

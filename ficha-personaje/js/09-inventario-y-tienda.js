@@ -32,64 +32,35 @@ let slotLlenoItemId = null;
    reemplazar uno por otro son dos. Sin No2 suficientes: el pop-up de siempre (cancelar o
    hacerlo igual, con la línea roja en la Mesa). En narrativo no cuesta nada. `accion` es lo que
    se hace una vez pagado. */
-function conCostoEquipar(veces, infinitivo, pasado, accion){
-  const costo = (modoMapaListo && modoMapa === 'combate') ? veces * IT2.nitrosEquipar : 0;
-  if(!costo){ accion(); return; }
-  const pagar = forzar => {
-    const gasto = forzar && costo > num(S.nitros) ? gastoNitrosForzado(costo, pasado) : costo;
-    S.nitros = num(S.nitros) - gasto;
-    renderNitros();
-    accion();
-    toast(`−${fmt(gasto)} No2 (equipar en combate)`);
-  };
-  if(costo > num(S.nitros)) avisarSinNitros(costo, infinitivo, () => pagar(true));
-  else pagar(false);
-}
+// Equipar / sacar / reemplazar: la regla vive en comun/ficha-equipo.js (la usa también el mapa); acá, lo que se ve.
+const equipoUi = {
+  toast: t => toast(t),
+  avisarSinNitros: (costo, accion, continuar) => avisarSinNitros(costo, accion, continuar),
+  modoCombate: () => modoMapaListo && modoMapa === 'combate',
+  alPagar: () => renderNitros(),
+  slotLleno: it => abrirSlotLleno(it.id),
+  cambio: (partes, o) => {
+    if(o && o.reemplazo){ $('#scrim-comparar').classList.remove('open'); $('#scrim-slot-lleno').classList.remove('open'); }
+    renderInventario();
+    if(partes.includes('cinturon')) renderList('cinturon');
+    refresh();
+  },
+};
+function conCostoEquipar(veces, infinitivo, pasado, accion){ FichaEquipo.conCosto(S, veces, infinitivo, pasado, accion, equipoUi); }
 
 function abrirSlotLleno(itemId){
   const it = S.inventario.find(x => x.id === itemId);
-  const info = it && slotOcupadoInfo(it);
-  if(!it || !info || !info.equipados.length) return false;
+  const cuerpo = it && FichaEquipo.slotLlenoHtml(S, it);
+  if(!cuerpo) return false;
   slotLlenoItemId = itemId;
-  const slotDef = SLOT_DEFS.find(sd => sd.cats.includes(it.tipoItem));
-  $('#slot-lleno-body').innerHTML = `
-    <div class="hint" style="margin-bottom:10px">${esc(slotDef.label)} no tiene lugar para <b>${esc(it.nombre)}</b>. Ya tenés equipado:</div>
-    ${info.equipados.map(e => `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px">
-      <b>${esc(e.nombre)}</b>
-      <button type="button" class="btn" data-reemplazar="${e.id}:${it.id}">Reemplazar</button>
-    </div>`).join('')}
-    <button type="button" class="btn" data-slot-comparar="1" style="width:100%;margin-top:8px">Comparar</button>`;
+  $('#slot-lleno-body').innerHTML = cuerpo;
   $('#scrim-slot-lleno').classList.add('open');
   return true;
 }
 
 // Saca el equipado y pone el de la mochila. Si el slot igual no alcanza
 // (ej. un arma de dos manos con escudo puesto), se deshace y se avisa.
-function reemplazarEquipado(equipadoId, nuevoId){
-  const nuevo = S.inventario.find(x => x.id === nuevoId);
-  const viejo = S.inventario.find(x => x.id === equipadoId);
-  if(!nuevo || !viejo) return;
-  const slotDef = SLOT_DEFS.find(sd => sd.cats.includes(nuevo.tipoItem));
-  // Se prueba si entra ANTES de cobrar nada.
-  viejo.equipado = false;
-  nuevo.equipado = true;
-  const usado = slotDef ? (computeSlots().find(s => s.id === slotDef.id)?.usado || 0) : 0;
-  viejo.equipado = true;
-  nuevo.equipado = false;
-  if(slotDef && usado > slotDef.max){
-    toast(`Igual no entra: ${slotDef.label} quedaría en ${fmt(usado)} / ${fmt(slotDef.max)}. Sacá otro ítem del slot primero.`);
-    return;
-  }
-  conCostoEquipar(2, `reemplazar ${viejo.nombre} por ${nuevo.nombre}`, `reemplazó ${viejo.nombre} por ${nuevo.nombre}`, () => {
-    viejo.equipado = false;
-    nuevo.equipado = true;
-    $('#scrim-comparar').classList.remove('open');
-    $('#scrim-slot-lleno').classList.remove('open');
-    renderInventario();
-    refresh();
-    toast(`${nuevo.nombre} equipado en lugar de ${viejo.nombre}`);
-  });
-}
+function reemplazarEquipado(equipadoId, nuevoId){ FichaEquipo.reemplazar(S, equipadoId, nuevoId, equipoUi); }
 $('#slot-lleno-x').onclick = () => $('#scrim-slot-lleno').classList.remove('open');
 $('#scrim-slot-lleno').addEventListener('mousedown', e => { if(e.target.id === 'scrim-slot-lleno') $('#scrim-slot-lleno').classList.remove('open'); });
 
@@ -109,48 +80,9 @@ function abrirComparar(itemId){
 function renderComparar(){
   const item = itemCatalogo(comparandoItemId);
   if(!item){ $('#scrim-comparar').classList.remove('open'); return; }
-  const info = slotOcupadoInfo(item);
-  const equipados = info ? info.equipados : [];
-  const equipado = equipados.find(e => e.id === comparandoEquipadoId) || equipados[0];
-  if(!equipado){ $('#scrim-comparar').classList.remove('open'); return; }
-
-  const statsEq = statsComparablesDe(equipado);
-  const statsNuevo = statsComparablesDe(item);
-  const claves = [...new Set([...Object.keys(statsEq), ...Object.keys(statsNuevo)])];
-
-  const elegirHtml = equipados.length > 1 ? `<div class="comparar-elegir">
-    ${equipados.map(e => `<button type="button" class="${e.id===equipado.id?'activo':''}" data-comparar-elegir="${e.id}">${esc(e.nombre)}</button>`).join('')}
-  </div>` : '';
-
-  const pesoEq = num(equipado.peso), pesoNuevo = num(item.peso);
-  const pesoCls = pesoNuevo < pesoEq ? 'mejora' : pesoNuevo > pesoEq ? 'empeora' : '';
-  const filaPeso = `<tr><td>Peso</td><td>${fmt(pesoEq)}</td><td class="${pesoCls}">${fmt(pesoNuevo)}${pesoNuevo<pesoEq?' ▲':pesoNuevo>pesoEq?' ▼':''}</td></tr>`;
-
-  const filasHtml = filaPeso + claves.map(k => {
-    const ve = statsEq[k] || 0, vn = statsNuevo[k] || 0;
-    const cls = vn > ve ? 'mejora' : vn < ve ? 'empeora' : '';
-    const label = STAT_COMPARABLE_LABEL[k] || STAT_LABEL[k] || k;
-    return `<tr><td>${esc(label)}</td><td>${fmt(ve)}</td><td class="${cls}">${fmt(vn)}${vn>ve?' ▲':vn<ve?' ▼':''}</td></tr>`;
-  }).join('');
-
-  $('#comparar-body').innerHTML = `
-    ${elegirHtml}
-    <div class="comparar-cabeceras">
-      <div class="comparar-cabecera">
-        <div class="cat-nombre">${esc(equipado.nombre)} <span class="hint">(equipado)</span></div>
-        <div class="cat-meta">Peso ${fmt(num(equipado.peso))}</div>
-      </div>
-      <div class="comparar-cabecera">
-        <div class="cat-nombre">${esc(item.nombre)}</div>
-        <div class="cat-meta">${precioTiendaHtml(item)} · Peso ${fmt(num(item.peso))}</div>
-      </div>
-    </div>
-    <table class="comparar-tabla">
-      <thead><tr><th>Stat</th><th>Equipado</th><th>Nuevo</th></tr></thead>
-      <tbody>${filasHtml}</tbody>
-    </table>
-    ${S.inventario.some(x => x.id === item.id && !x.equipado) ? `<button type="button" class="btn primary" data-reemplazar="${equipado.id}:${item.id}" style="width:100%;margin-top:12px">Reemplazar ${esc(equipado.nombre)}</button>` : ''}
-  `;
+  const r = FichaEquipo.compararHtml(S, item, comparandoEquipadoId, {precioHtml: precioTiendaHtml});   // comun/ficha-equipo.js
+  if(!r){ $('#scrim-comparar').classList.remove('open'); return; }
+  $('#comparar-body').innerHTML = r.html;
 }
 
 let carritoCatalogo = [];

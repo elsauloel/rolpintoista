@@ -307,17 +307,7 @@ function renderEfectosOtros(){
   $('#efectos-otros').innerHTML = lineas.length ? lineas.join('') : `<div class="empty">Sin efectos adicionales equipados.</div>`;
 }
 
-function computeSlots(){
-  const equipados = S.inventario.filter(i => i.equipado);
-  return SLOT_DEFS.map(sd => {
-    let usado = 0;
-    equipados.forEach(i => {
-      if(!sd.cats.includes(i.tipoItem)) return;
-      usado += sd.peso ? (sd.peso[i.tipoItem] || 1) : 1;
-    });
-    return {...sd, usado};
-  });
-}
+function computeSlots(){ return FichaEquipo.slots(S); }   // comun/ficha-equipo.js
 
 // Consume 1 unidad del Ankh (esté donde esté) y revive con 25% del HP
 // máximo (mínimo 1, para no reventar todos los Ankh de un saque si el HP
@@ -448,14 +438,8 @@ function jobTag(i){
   return `<span class="tag job">${costo === 1 ? "Job" : `Job ${fmt(costo)}`}</span>`;
 }
 
-function modTags(mods){
-  return (mods||[]).filter(m=>m.stat).map(m =>
-    `<span class="tag mod ${num(m.val)<0?'neg':''}" title="${esc(STAT_FULL[m.stat]||'')}">${STAT_LABEL[m.stat]||m.stat} ${num(m.val)>0?'+':''}${fmt(num(m.val))}</span>`).join('');
-}
-
-function thumb(i){
-  return i.imagen ? `<img class="item-thumb" src="${i.imagen}" alt="">` : '';
-}
+const modTags = mods => FichaEquipo.modTags(mods);   // comun/ficha-equipo.js
+const thumb = i => FichaEquipo.thumb(i);
 
 function ranurasDe(i){
   return (i.ranuras === undefined || i.ranuras === '') ? 1 : num(i.ranuras);

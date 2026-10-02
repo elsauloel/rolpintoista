@@ -1136,7 +1136,8 @@ versión parecida en más de una, es candidato a juntar.
   alGuardar/alCrear, alCancelar, confirmarCancelar, extras, contenedor, z})` → `{raiz, cuerpo, paso, pasoId, irA, redibujar, aviso, cerrar}`.
   Trae su CSS (paleta cobre) y clases de base (`.pap-campo`, `.pap-fila`, `.pap-nota`, `.pap-boton`); Escape cancela solo si es la ventana
   de más arriba. **Todo asistente nuevo o rehecho va sobre esta pieza** (tandas en el plan). La usan el asistente de creeps de GM Tools y los
-  tres editores de habilidades (personaje en `ficha-editor.js`, creep en `creep-editor.js`, invocación en la ficha). Un paso puede devolver HTML o
+  tres editores de habilidades (personaje en `ficha-editor.js`, creep en `creep-editor.js`, invocación en la ficha) y el asistente de ítems
+  (`asistente-item.js`: su contenido por paso es `contenidoPaso` → {h, ayuda}; los botones extra de `cfg.botones` van al pie). Un paso puede devolver HTML o
   **un bloque ya armado** (un elemento): se muestra tal cual, conserva lo escrito y vuelve a su lugar al cambiar de paso (así los editores que
   guardan todo en sus campos, como el de creeps y el de invocaciones, no se reescribieron). Ancha por defecto (hasta 1100 px; `ancho: 'completo'`
   para toda la pantalla): el juego es para PC.

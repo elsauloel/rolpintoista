@@ -631,4 +631,4 @@ resuelven a mano, como el resto de los avisos).
   «a fines prácticos no es igual al arcano». Por ahora Tóxico es un tipo más del paso «Daño» (etiqueta propia: "4 de daño tóxico") y,
   como los mágicos, arranca con «Ignora la Defensa» tildado (un gas pasa la armadura; se puede destildar). Abierto: en un duelo, el daño
   de habilidad que ignora la Defensa se reduce con la **Armadura mágica** del objetivo — ¿también el tóxico, o lo frena otra cosa
-  (Inmunidad a veneno, Constitución…)? En las zonas persistentes hoy no resta Armadura mágica (ningún tipo).
+  (Inmunidad a veneno, Constitución…)? En las zonas persistentes hoy no resta Armadura mágica (ningún tipo).~~

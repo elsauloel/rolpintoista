@@ -1183,33 +1183,47 @@ async function mantenimientoPersonaje(fichaId, numero){
     return true;
   });
 }
-/* ---------- Los estados que otros le dejan a un personaje, aplicados por el mapa (2026-10-02, hoja de ruta B-8) ----------
-   Una habilidad de creep, una trampa, una zona o la Ejecución ✨ de otro dejan un aviso en campanas/<id>/estados. Antes solo lo
-   aplicaba la ficha abierta (con el mapa solo, quedaba esperando); ahora también el mapa, para los personajes que maneja este
-   usuario (bnManejo: los suyos, o los que el GM controla con 🎮), y sus invocaciones. La transacción de comun/estados-recibidos.js
-   hace que lo aplique una sola pantalla aunque la ficha también esté abierta. */
-let estRecPendientes = [], estRecCola = Promise.resolve();
-const estRecEnCurso = new Set();
-function estadosRecibidosEscuchar(){ EstadosRecibidos.escuchar(docs => { estRecPendientes = docs; estadosRecibidosRevisar(); }); }
-function estadosRecibidosRevisar(){
-  new Set(estRecPendientes.map(d => String(d.data().fichaId || '').split(SEP_INVOCACION)[0])).forEach(id => {
-    if(!id || !bnManejo(id) || estRecEnCurso.has(id)) return;
-    estRecEnCurso.add(id);
-    estRecCola = estRecCola.then(() => estadosRecibidosAplicar(id))
-      .catch(err => console.error('No se pudieron aplicar los estados recibidos:', err))
-      .then(() => estRecEnCurso.delete(id));
+/* ---------- Lo que le llega a un personaje desde afuera, aplicado por el mapa (2026-10-02, hoja de ruta B-8) ----------
+   Los estados que le dejan una habilidad de creep, una trampa, una zona o la Ejecución ✨ de otro (campanas/<id>/estados, también a sus
+   invocaciones) y las recompensas del combate (campanas/<id>/recompensas: XP, DDE, despojos, trampas que vuelven). Antes solo los
+   aplicaba la ficha abierta (con el mapa solo, quedaban esperando); ahora también el mapa, para los personajes que maneja este usuario
+   (bnManejo: los suyos, o los que el GM controla con 🎮). La transacción de comun/recibidos.js hace que lo aplique una sola pantalla
+   aunque la ficha también esté abierta. La subida de nivel la muestra el mapa solo, mirando el resumen (mostrarSubidaNivelMapa). */
+const recibidosPend = {estados: [], recompensas: []}, recibidosEnCurso = new Set();
+let recibidosCola = Promise.resolve();
+function recibidosEscuchar(){
+  ['estados', 'recompensas'].forEach(col => Recibidos.escuchar(col, docs => { recibidosPend[col] = docs; recibidosRevisar(); }));
+}
+function recibidosRevisar(){
+  const ids = new Set([...recibidosPend.estados, ...recibidosPend.recompensas].map(d => String(d.data().fichaId || '').split(SEP_INVOCACION)[0]));
+  ids.forEach(id => {
+    if(!id || !bnManejo(id) || recibidosEnCurso.has(id)) return;
+    recibidosEnCurso.add(id);
+    recibidosCola = recibidosCola.then(() => recibidosAplicar(id))
+      .catch(err => console.error('No se pudo aplicar lo recibido:', err))
+      .then(() => recibidosEnCurso.delete(id));
   });
 }
-async function estadosRecibidosAplicar(fichaId){
-  if(!EstadosRecibidos.deFicha(estRecPendientes, fichaId).length) return;
+async function recibidosAplicar(fichaId){
+  const de = col => Recibidos.deFicha(recibidosPend[col], fichaId);
+  if(!de('estados').length && !de('recompensas').length) return;
   await editarPersonajeMapa(fichaId, async S => {
     const nombre = ((S.meta && S.meta.nombre) || '').trim();
-    const ui = {presets: estadosPresetFicha(), cambio: () => {},
-      toast: t => toast(nombre && !String(t).includes(nombre) ? `${nombre} · ${t}` : t)};
+    const aviso = t => toast(nombre && !String(t).includes(nombre) ? `${nombre} · ${t}` : t);
+    const ui = {presets: estadosPresetFicha(), cambio: () => {}, toast: aviso};
+    const borrar = controloFicha(fichaId);   // 🎮 el GM lo borra en vez de marcarlo
     let hubo = false;
-    for(const d of EstadosRecibidos.deFicha(estRecPendientes, fichaId)){
-      if(!await EstadosRecibidos.tomar(d, controloFicha(fichaId))) continue;   // 🎮 el GM lo borra en vez de marcarlo
-      EstadosRecibidos.aplicar(S, d, ui);
+    for(const d of de('recompensas')){
+      if(!await Recibidos.tomar(d, borrar)) continue;
+      const r = Recibidos.recompensa(S, d);
+      if(r.partes.length) aviso(`🎁 ${r.partes.join(' · ')}`);
+      const vueltas = Recibidos.textoVueltas(r.vueltas);
+      if(vueltas) aviso(vueltas);
+      hubo = true;
+    }
+    for(const d of de('estados')){
+      if(!await Recibidos.tomar(d, borrar)) continue;
+      Recibidos.estado(S, d, ui);
       hubo = true;
     }
     return hubo;

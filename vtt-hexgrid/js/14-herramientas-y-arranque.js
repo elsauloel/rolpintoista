@@ -796,7 +796,7 @@ function arrancarEnVivo(){
   escucharMiembros();
   escucharVinculables();
   escucharMantenimiento();
-  estadosRecibidosEscuchar();   // los estados que otros le dejan a mis personajes (B-8)
+  recibidosEscuchar();   // los estados y las recompensas que les llegan a mis personajes (B-8)
   // Estos dos disparan cambiarMapaMostrado (y con eso, fondo/modo/
   // iniciativa/tokens del mapa que corresponda).
   escucharMapas();

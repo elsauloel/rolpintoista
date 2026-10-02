@@ -159,31 +159,18 @@ function capCinturonEfectivo(){
    RENDER
    ========================================================= */
 
-function expThreshold(nivel){
-  return Math.max(1, num(nivel) || 1) * 100;
-}
+// La XP y el nivel: comun/recibidos.js (B-8, 2026-10-02; la usan también las recompensas que aplica el mapa).
+function expThreshold(nivel){ return Recibidos.expParaNivel(nivel); }
 
 function renderExp(){
   $('#v-exp-max').textContent = fmt(expThreshold(S.meta.nivel));
 }
 
 function applyExp(rawValue){
-  let nivel = Math.max(1, num(S.meta.nivel) || 1);
-  let exp = Math.max(0, num(rawValue));
-  let subio = false;
-  let thr = expThreshold(nivel);
-  while(exp >= thr){
-    exp -= thr;
-    nivel += 1;
-    subio = true;
-    thr = expThreshold(nivel);
-  }
-  S.meta.exp = exp;
-  S.meta.nivel = nivel;
-  if(subio){
+  if(Recibidos.aplicarExp(S, rawValue)){
     $('#f-exp').value = S.meta.exp;
     $('#f-nivel').value = S.meta.nivel;
-    mostrarSubidaNivel(nivel);
+    mostrarSubidaNivel(S.meta.nivel);
   }
   renderExp();
 }

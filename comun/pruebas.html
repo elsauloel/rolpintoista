@@ -51,7 +51,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-combate.js"></script>
 <script src="estados-presets.js"></script>
 <script src="estados-aplicar.js"></script>
-<script src="estados-recibidos.js"></script>
+<script src="recibidos.js"></script>
 <script src="modificadores-tirada.js"></script>
 <script src="plantillas.js"></script>
 <script src="catalogo.js"></script>
@@ -1356,11 +1356,18 @@ prueba('estados recibidos (B-8): los del personaje y los de sus invocaciones; ca
   const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, estados: []});
   const S = {efectos: [], invocaciones: [inv]}, avisos = [];
   const ui = {presets: estadosPresetFicha(), toast: t => avisos.push(t), cambio: () => {}};
-  const mios = EstadosRecibidos.deFicha(docs, 'F');
-  const r = mios.map(d => !!EstadosRecibidos.aplicar(S, d, ui).inv);
-  const sinInv = EstadosRecibidos.aplicar({efectos: [], invocaciones: []}, docs[1], ui);
+  const mios = Recibidos.deFicha(docs, 'F');
+  const r = mios.map(d => !!Recibidos.estado(S, d, ui).inv);
+  const sinInv = Recibidos.estado({efectos: [], invocaciones: []}, docs[1], ui);
   igual([mios.length, r, S.efectos.map(e => e.nombre), inv.estados.map(e => e.nombre), avisos[1].includes('Lobo'), !!sinInv.inv, avisos[2].includes('ya no está')],
     [2, [false, true], ['Veneno'], ['Stun'], true, false, true]);
+});
+prueba('recompensas recibidas (B-8): XP con subida de nivel, DDE, despojos y una trampa que vuelve a la mochila', () => {
+  const S = FichaGuardado.normalizar({meta: {nombre: 'Tita', nivel: 1, exp: 90, dde: 5}, loot: {normal: 2}}).S;
+  const trampa = JSON.stringify({nombre: 'Trampa de oso', consumible: true, categoria: 'consumible', unidades: 1, ranuras: 1});
+  const r = Recibidos.recompensa(S, {data: () => ({fichaId: 'F', xp: 230, dde: 12.5, despojos: 3, devolver: [trampa]})});
+  igual([r.subio, S.meta.nivel, S.meta.exp, S.meta.dde, S.loot.normal, r.partes, S.inventario.filter(i => i.nombre === 'Trampa de oso').length, Recibidos.textoVueltas(r.vueltas)],
+    [true, 3, 20, 17.5, 5, ['+230 XP', '+12.5 DDE', '+3 despojos'], 1, '🪤 1 trampa sin disparar se desarmó y volvió a tu mochila']);
 });
 prueba('el duelo de una invocación: defensa con Parry (cobra y deja el Bloqueo), crítico y contraataque', () => {
   const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, armaNombre: 'Colmillo', armaTipo: 8, armaPeso: 2, nitros: 3, crit: [0, 1, 2, 3, 4]});

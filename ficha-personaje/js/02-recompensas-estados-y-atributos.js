@@ -1,70 +1,33 @@
 // js/02-recompensas-estados-y-atributos.js — tramo 2 de 14 del script de ficha.html (paso 5, nivel A: mismo código, en el mismo orden).
-/* ---------- Recompensas del combate (XP y DDE) ----------
-   El GM las publica en campanas/<id>/recompensas (una por personaje); la ficha las aplica UNA sola vez (transacción
-   sobre el documento) apenas está abierta y editable, y avisa con un pop-up si sube de nivel. */
+/* ---------- Lo que te llega desde afuera (comun/recibidos.js, B-8, 2026-10-02: el mapa hace lo mismo con la misma pieza) ----------
+   Recompensas del combate: el GM las publica en campanas/<id>/recompensas (una por personaje): XP, DDE, despojos y las trampas
+   consumibles que no se dispararon (vuelven a la mochila o al cinturón).
+   Estados que te dejan otros (una habilidad de un creep, una trampa, la Ejecución de otro): un aviso en campanas/<id>/estados, al
+   personaje o a una de sus invocaciones (`fichaId~invId`), respetando Invulnerable, Inmunidad a CC, Sangre pura y Coagulación extrema.
+   La ficha los aplica UNA sola vez (transacción sobre el documento) apenas está abierta y editable. El GM escucha todos los pendientes:
+   si toma el control de un personaje, le toca aplicarle los suyos (🎮, 2026-09-30), y los borra en vez de marcarlos. */
 let recompensasPendientes = [], recompensasAplicando = false;
-function recompensasEscuchar(){
-  if(!fbUsuario) return;
-  // El GM escucha todas las pendientes: si toma el control de un personaje, le toca aplicarle las suyas (🎮, 2026-09-30).
-  const col = fbDb.collection(fbRutaCampana('recompensas'));
-  (fbMiembro && fbMiembro.gm ? col.where('aplicada', '==', false) : col.where('duenoUid', '==', fbUsuario.uid).where('aplicada', '==', false)).onSnapshot(snap => {
-    recompensasPendientes = snap.docs;
-    recompensasRevisar();
-  }, err => console.error('Error escuchando las recompensas:', err));
-}
-// Trampas consumibles que no se dispararon: vuelven a la MOCHILA (se apilan con las iguales, que no ocupan ranura nueva) y, si la mochila no tiene lugar, al CINTURÓN.
-// Si tampoco hay lugar allá, se dejan en la mochila igual (que quede de más) antes que perderlas.
-function devolverTrampasAlJugador(items){
-  let aMochila = 0, aCinturon = 0;
-  items.forEach(js => {
-    let it = null;
-    try{ it = JSON.parse(js); }catch(e){}
-    if(!it) return;
-    const pila = S.inventario.find(x => !x.equipado && x.consumible && x.nombre === it.nombre);
-    if(pila){ pila.unidades = num(pila.unidades) + 1; aMochila++; return; }
-    const cap = capMochilaEfectivo();
-    if(!(cap > 0) || mochilaUsada() + ranurasDe(it) <= cap){ agregarConsumibleAInventario(it, 1); aMochila++; return; }
-    const pilaC = S.cinturon.find(x => x.consumible && x.nombre === it.nombre);
-    if(pilaC){ pilaC.unidades = num(pilaC.unidades) + 1; aCinturon++; return; }
-    if(S.cinturon.length < capCinturonEfectivo()){
-      const c = structuredClone(it); c.id = uid(); c.unidades = 1; c.ranuras = 1; c.equipado = false;
-      S.cinturon.push(c); aCinturon++; return;
-    }
-    agregarConsumibleAInventario(it, 1); aMochila++;   // sin lugar en ningún lado: mejor de más que perdida
-  });
-  renderInventario(); renderList('cinturon');
-  return {total: aMochila + aCinturon, aMochila, aCinturon};
-}
+function recompensasEscuchar(){ Recibidos.escuchar('recompensas', docs => { recompensasPendientes = docs; recompensasRevisar(); }); }
 async function recompensasRevisar(){
   const f = fichaVivo;
   if(!f || !f.cargada || f.soloLectura || f.editaGM || recompensasAplicando) return;
-  const mias = recompensasPendientes.filter(d => d.data().fichaId === f.id);
+  const mias = Recibidos.deFicha(recompensasPendientes, f.id);
   if(!mias.length) return;
   recompensasAplicando = true;
   try{
     for(const d of mias){
-      const tomada = await fbDb.runTransaction(async tx => {
-        const x = await tx.get(d.ref);
-        if(!x.exists || x.data().aplicada) return false;
-        // El GM con el control no puede marcarla como aplicada (las reglas se lo dejan al dueño), pero sí borrarla: mismo efecto.
-        if(fichaControloYo(f)) tx.delete(d.ref); else tx.update(d.ref, {aplicada: true});
-        return true;
-      });
+      const tomada = await Recibidos.tomar(d, fichaControloYo(f));
       if(!tomada || fichaVivo !== f) continue;
-      const r = d.data();
-      const nivelAntes = num(S.meta.nivel);
-      if(num(r.xp) > 0) applyExp(num(S.meta.exp) + num(r.xp));
-      if(num(r.dde) > 0){ S.meta.dde = Math.round((num(S.meta.dde) + num(r.dde)) * 100) / 100; $('#f-dde').value = fmt(S.meta.dde); }
-      if(num(r.despojos) > 0){ S.loot.normal = num(S.loot.normal) + num(r.despojos); $('#f-loot-normal').value = S.loot.normal; }
-      let vueltas = null;
-      if(Array.isArray(r.devolver) && r.devolver.length) vueltas = devolverTrampasAlJugador(r.devolver);
+      const r = Recibidos.recompensa(S, d);
+      if(r.subio){ $('#f-exp').value = S.meta.exp; $('#f-nivel').value = S.meta.nivel; mostrarSubidaNivel(S.meta.nivel); }
+      renderExp();
+      $('#f-dde').value = fmt(S.meta.dde);
+      $('#f-loot-normal').value = S.loot.normal;
+      if(r.vueltas){ renderInventario(); renderList('cinturon'); }
       refresh();
-      const partes = [];
-      if(num(r.xp) > 0) partes.push(`+${fmt(num(r.xp))} XP`);
-      if(num(r.dde) > 0) partes.push(`+${fmt(num(r.dde))} DDE`);
-      if(num(r.despojos) > 0) partes.push(`+${fmt(num(r.despojos))} despojos`);
-      if(partes.length) toast(`🎁 ${partes.join(' · ')}`);
-      if(vueltas && vueltas.total) toast(`🪤 ${vueltas.total} trampa${vueltas.total === 1 ? '' : 's'} sin disparar ${vueltas.total === 1 ? 'se desarmó' : 'se desarmaron'} y volvió${vueltas.total === 1 ? '' : 'eron'} ${vueltas.aCinturon ? (vueltas.aMochila ? 'a tu mochila y al cinturón' : 'a tu cinturón') : 'a tu mochila'}`);
+      if(r.partes.length) toast(`🎁 ${r.partes.join(' · ')}`);
+      const vueltas = Recibidos.textoVueltas(r.vueltas);
+      if(vueltas) toast(vueltas);
     }
   }catch(err){
     console.error('No se pudieron aplicar las recompensas:', err);
@@ -73,26 +36,19 @@ async function recompensasRevisar(){
   }
 }
 
-/* ---------- Estados que te dejan otros (una habilidad de un creep, una trampa, la Ejecución de otro) ----------
-   El GM o el mapa dejan un aviso en campanas/<id>/estados; la ficha lo aplica UNA sola vez (transacción sobre el documento) apenas
-   está abierta y editable, respetando Invulnerable, Inmunidad a CC, Sangre pura y Coagulación extrema. Al personaje o a una de sus
-   invocaciones (`fichaId~invId`). Escuchar, tomar y aplicar: comun/estados-recibidos.js (B-8, 2026-10-02: el mapa hace lo mismo). */
 let estadosPendientes = [], estadosAplicando = false;
-function estadosEscuchar(){
-  // El GM escucha todos los pendientes: si toma el control de un personaje, le toca aplicarle los suyos (🎮, 2026-09-30).
-  EstadosRecibidos.escuchar(docs => { estadosPendientes = docs; estadosRevisar(); });
-}
+function estadosEscuchar(){ Recibidos.escuchar('estados', docs => { estadosPendientes = docs; estadosRevisar(); }); }
 async function estadosRevisar(){
   const f = fichaVivo;
   if(!f || !f.cargada || f.soloLectura || f.editaGM || estadosAplicando) return;
-  const mios = EstadosRecibidos.deFicha(estadosPendientes, f.id);
+  const mios = Recibidos.deFicha(estadosPendientes, f.id);
   if(!mios.length) return;
   estadosAplicando = true;
   try{
     for(const d of mios){
-      const tomada = await EstadosRecibidos.tomar(d, fichaControloYo(f));   // 🎮 el GM lo borra en vez de marcarlo
+      const tomada = await Recibidos.tomar(d, fichaControloYo(f));
       if(!tomada || fichaVivo !== f) continue;
-      if(EstadosRecibidos.aplicar(S, d, habUi).inv) renderInvocaciones();
+      if(Recibidos.estado(S, d, habUi).inv) renderInvocaciones();
     }
   }catch(err){
     console.error('No se pudieron aplicar los estados recibidos:', err);

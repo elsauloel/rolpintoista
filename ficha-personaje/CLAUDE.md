@@ -665,3 +665,7 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   promesas que usa el componente. Los botones del editor llevan `data-ed` en vez de id (el CSS de "Guardar como preset" también). El ✚ Revivir
   usa `FichaAcciones.hpRevivir`/`revivir`. El mapa ya no pide `editar-en-ficha`, `abrir-revivir` ni el `editar-estado` de un personaje:
   quedan para la limpieza (A′).
+- **Lo recibido, común** (2026-10-02, hoja de ruta B-8): las recompensas y los estados que le llegan al personaje (`recompensasEscuchar`,
+  `recompensasRevisar`, `estadosEscuchar`, `estadosRevisar` en `js/02`; `applyExp`/`expThreshold` en `js/01`) usan `comun/recibidos.js`, y
+  ahora también se aplican los estados de sus **invocaciones** (`fichaId~invId`). El mapa hace lo mismo con la misma pieza, así que ya
+  no hace falta tener la ficha abierta para recibirlos. `devolverTrampasAlJugador` pasó a `Recibidos.devolverTrampas`.

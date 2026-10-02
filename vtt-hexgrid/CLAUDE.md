@@ -1318,3 +1318,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `acCambiarCreep`), **⬆ Subir** (`acSubirHab`) y **↻ Reemplazar** (`acReemplazarHab`; carga `creeps-base.js` + `skills-creep-base.js`,
   `ACE_BASE`); el **⚙ de un estado de un creep** (`abrirEditarEstadoCreepMapa`, `CreepEditor.crearEstado`; las Acciones se abren solo para eso,
   `ac.soloEstado`). Los estados para la Ejecución, con `SelectorEstados`. Ya no se usa `acDelegar` para nada de esto (limpieza A′).
+- **Lo que le llega a un personaje, aplicado por el mapa** (2026-10-02, hoja de ruta B-8): `recibidosEscuchar` (js/11, arranca en
+  `arrancarEnVivo`) escucha los avisos de `campanas/<id>/estados` y `campanas/<id>/recompensas` y, para los personajes que maneja este
+  usuario (`bnManejo`), los aplica con `editarPersonajeMapa` (`comun/recibidos.js`: estados al personaje o a su invocación; XP, DDE,
+  despojos y trampas que vuelven). Antes quedaban esperando a que se abriera la ficha. En el duelo, `dueloAplicarEfecto` ya no deja «a
+  mano» a una invocación: el estado va con el mismo aviso (`fichaId~invId`) y la cura con `dueloCurarInv` (js/13, transacción sobre la
+  parte `invocaciones`, como `danioInv`).

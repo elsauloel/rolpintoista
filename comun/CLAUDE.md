@@ -980,6 +980,14 @@ versión parecida en más de una, es candidato a juntar.
   `preguntaSinNitros(inv)`, `pagarAtaque(inv, forzar)` (forzado: gasta los que tenga hasta 0 y devuelve `forzado: {costo, tenia}`) y
   `alertaSinNitros(inv, forzado)` (la línea roja). Lo usan `InvDuelo` (el ataque del duelo; `ui.confirmar` opcional, si no `confirm`),
   `invAtacarSuelto` de la ficha y `bnInvAtacar` del mapa.
+- **`recibidos.js`** (`Recibidos`, 2026-10-02, hoja de ruta B-8) — **lo que le llega a un personaje desde afuera**, el lado que recibe
+  los avisos: `campanas/<id>/estados` (lo que deja `EstadosAplicar.encolarPj`: al personaje o a una invocación suya, `fichaId~invId`, sin
+  reglas nuevas) y `campanas/<id>/recompensas` (XP, DDE, despojos y trampas que vuelven, del fin del combate). `escuchar(col, cb)` (los
+  pendientes de este usuario; el GM, todos), `deFicha(docs, fichaId)`, `tomar(doc, borrar)` (transacción: lo aplica una sola pantalla;
+  `borrar` = el GM con 🎮 el control), `estado(S, doc, ui)` (con `FichaAcciones.aplicarEstadoRecibido` o `InvHabilidades.ponerEstado`),
+  `recompensa(S, doc)` → `{partes, subio, vueltas}`, `aplicarExp(S, exp)`/`expParaNivel` (la XP y la subida de nivel, antes `applyExp` de
+  la ficha), `devolverTrampas` y `textoVueltas`. Lo usan la ficha (`js/02`, y `applyExp` de `js/01`) y el mapa (`recibidosEscuchar`, para
+  los personajes que maneja ese usuario): antes solo la ficha abierta los aplicaba.
 - **`creep-lupa.js`** (`CreepLupa`, 2026-10-01, paso 4 etapa 4c, tanda 6) — **la 🔍 y el "Ver" de un creep**, para GM Tools y el
   mapa: `contenido(sc, clave)` → `{titulo, html}` (clave `"creepId|tipo|ref"`, la de los `data-lupa` de `creep-botonera.js`:
   stat, defensa, atacar, daño, habilidad), `verHab(sc, h)` → `{titulo, html}` (la tarjeta de Ver de una habilidad), `paraHtml(h)`

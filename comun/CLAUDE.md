@@ -981,3 +981,8 @@ versión parecida en más de una, es candidato a juntar.
   `tirada(inv, nombre, valor, statId)`, `tirarStat(inv, statId, {parryPendiente, trasParry})` (el Parry cobra 1 No2 y deja el
   Bloqueo pendiente; el Bloqueo lo cierra), `dano(inv, mods)`, `ataqueDuelo(inv)`, `pagarAtaque(inv)` y `tiradaAtaque(inv)`. Devuelven
   `{origen, r}` / `{error}` / `{aviso}`: cada pantalla publica y guarda a su manera. Lo usan la ficha (`js/04`) y el mapa (`bnInvAca`).
+- **`inv-duelo.js`** (`InvDuelo`, 2026-10-01, paso 4 etapa 4e, tanda 4) — **lo que el duelo le pide a una invocación** (lado
+  `fichaId~invId`): `hooks(ui)` devuelve los ganchos (`soy`, `atacar`, `statsCritico`, `resistenciaCritico`, `efectosArma`, `dano`,
+  `rerollInfo`, `flashOpciones`, `flashUsar`, `habTirar`, `habValor`, `puedeParry`, `opcionesDefensa`, `defender`, `fuerza`,
+  `bloquear`, `armaContra`) con `ui = {inv(lado), registrar(origen, r), toast, cambiar(fn), parry, soy}`; también `pagarFlash(inv, h,
+  ui)` y `costoFlash(h)`. Lo usan la ficha (`dueloInv`, `js/11`) y el mapa (`bnHooksDueloInv`, en `hooksLocal`).

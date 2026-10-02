@@ -1152,3 +1152,6 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `comun/inv-acciones.js`): tiradas de stats, Esquivar, Parry, Bloqueo, Daño y Atacar (`bnInvAtacar`); publica a nombre de la
   invocación (`bnPublicarInv`) y guarda la parte `invocaciones` (`bnUi`). El Parry pendiente, en `bn.invParry`. Ver, Ejecutar y la
   🎲 segunda tirada siguen yendo a la ficha.
+  Desde la tanda 4, **lo que el duelo le pide a esa invocación** también lo contesta el mapa (`bnHooksDueloInv`, con
+  `comun/inv-duelo.js`, en `hooksLocal` después de `bnHooksDuelo`): si puede guardar al personaje y con ⚗. Publica con
+  `bnRegistrarInv` y guarda la parte `invocaciones`.

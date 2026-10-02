@@ -28,7 +28,7 @@ El mapa guarda con `modificarCreep` (transacción + resumen + firma); GM Tools, 
    `invocaciones` del personaje con `FichaSesion` ✅ (2026-10-01).
 4. Lo que el duelo le pide a una invocación (`dueloInvDe`, `js/11`) → `comun/inv-duelo.js`, en `hooksLocal` del mapa. Con los
    datos de la invocación a mano, el daño que recibe en el duelo puede dejar de ser a mano (hoy `dueloAplicarDano` lo marca
-   "es una invocación").
+   "es una invocación"). ✅ los ganchos (2026-10-01); el daño automático queda como paso aparte.
 5. Las habilidades (`invEjecutarHab` y compañía).
 6. La 🔍 (`lupaHtmlInv`) y el Ver (`verHabInv`).
 
@@ -245,3 +245,19 @@ puede empezar.
   guardado), Bloqueo (habilitado con los Colmillos), Daño, y Atacar sin objetivo — con 3 No2 avisó que no alcanzaba; con 6, cobró 4,
   sumó el ataque y tiró el PdG. **Ningún pedido a la ficha.** Restaurado: invocaciones vacías, control devuelto y el resumen de
   Silvia idéntico al de antes. Lo que sigue: tanda 4, lo que el duelo le pide a una invocación.
+- 2026-10-01: **4e, tanda 4 hecha** (7febfab) — `comun/inv-duelo.js` (`InvDuelo.hooks(ui)`, `pagarFlash`, `costoFlash`), copiado de
+  las ramas «si el lado es una invocación» de `window.DUELO_HOOKS` (`js/11`) y de `pagarFlashInv`/`costoFlashInv` (`js/04`, que
+  quedan como atajos). `ui` = {`inv(lado)`, `registrar(origen, r)`, `toast`, `cambiar(fn)` (fn devuelve false si no cambió nada),
+  `parry` (el Set), `soy`}. Ficha: `dueloInvUi` + `dueloInv` (`js/11`). Mapa: `bnHooksDueloInv` en `hooksLocal` (invocación del
+  personaje de la Botonera nueva, si puede guardarlo y con ⚗), con `bnRegistrarInv` (publica a nombre de la invocación si la
+  tirada empieza con su nombre, como `mesaQuien` de la ficha). Comparado contra los ganchos viejos en 600 duelos al azar (17
+  ganchos, con Flash y respuestas simuladas): 600 iguales; 9 de 10 mutaciones detectadas (la que no, «Tipo desconocido → 0», la
+  tapa en la ficha el mismo control antes de llamar; una prueba permanente la cubre). `pruebas.html`: 188 (1 nueva). **En vivo**
+  (GM con 🎮 el control de Silvia, ⚗, un Lobo de prueba con token al lado del Creep nuevo): el Lobo atacó al creep — el mapa cobró
+  sus 4 No2 (guardado) y tiró su PdG; empate, el creep ganó la paridad —; después el creep atacó al Lobo — el mapa armó las opciones
+  de defensa del Lobo (Evasión, Parry con los Colmillos y el Bloqueo que seguiría), cobró el Parry (guardado) y tiró el Bloqueo: el
+  golpe quedó bloqueado y ofreció el contraataque. **Ningún pedido fue a la ficha** (`dueloRelayMapa` sin llamadas). Restaurado:
+  token del Lobo borrado, creep tal cual, invocaciones vacías, control devuelto. El resumen público de Silvia decía 0 No2 contra 3 en
+  sus datos (venía así de antes); quedó el que calcula la ficha con sus datos (3 No2).
+  **Lo que sigue**: el daño que recibe una invocación en el duelo, automático (hoy `dueloAplicarDano` lo deja a mano), y la tanda 5
+  (habilidades).

@@ -1060,10 +1060,13 @@ async function abrirEstadoNuevoCreep(t){
 // estado se saca con × ahí mismo).
 function abrirEditarEstado(t, nombre){
   if(!puedeAgregarEstado(t)) return;
-  if(t.tipo === 'creep') abrirAcciones(t.fichaId, {tipo: 'editar-estado', creep: t.fichaId, nombre});
+  if(t.tipo === 'creep') abrirAcciones(t.fichaId, {tipo: 'editar-estado', creep: t.fichaId, nombre});   // los creeps: con la A6c (GM Tools)
   else{
     const invId = t.fichaId.includes(SEP_INVOCACION) ? t.fichaId.split(SEP_INVOCACION)[1] : '';
-    abrirBotonera(t.fichaId.split(SEP_INVOCACION)[0], {tipo: 'editar-estado', nombre, inv: invId}, invId);
+    // Personaje: el editor común en el mapa (js/11, A6b). Una invocación no tiene editor de estado individual (como en la ficha):
+    // se abre su Botonera, donde se le sacan.
+    if(invId) abrirBotonera(t.fichaId.split(SEP_INVOCACION)[0], undefined, invId);
+    else abrirEditarEstadoMapa(t.fichaId, nombre);
   }
 }
 

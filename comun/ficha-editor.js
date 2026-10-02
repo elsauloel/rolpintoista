@@ -178,6 +178,7 @@ const FichaEditor = (() => {
        elegirEstadoItem()      → Promise<{nombre, armado, estandar, detalle} | null>  (estado al usar/consumir).
        elegirEstadoDuelo()     → Promise (el `elegirEstado` de AsistenteDueloHab).
        alSubirCatalogo()       después de ⬆ Subir al catálogo (releer lo subido).
+       alCerrar()              (opcional) la ventana se cerró (guardada, eliminada o cancelada).
      editor = {abrir(key, id, equipadoPreset, opciones), cerrar(), dibujar(), irAPaso(n), abrirAsistenteItem(key, id, op),
        aplicarTipoItem(id), estado (get/set: {key, id, draft, paso…} o null)}.
      Necesita además ficha-combate, ficha-lupa, ficha-tienda, ficha-habilidades, combatiente, estados-presets y, al usarlos,
@@ -750,7 +751,7 @@ const FichaEditor = (() => {
       els.scrim.classList.add('open');
       setTimeout(()=>q('input')?.focus(), 40);
     }
-    function cerrar(){ els.scrim.classList.remove('open'); editing = null; }
+    function cerrar(){ els.scrim.classList.remove('open'); editing = null; if(ctx.alCerrar) ctx.alCerrar(); }
 
     // Pasos del asistente abierto (habilidades), o null si es el formulario común.
     function pasosDelEditor(){ return editing && editing.key === 'habilidades' ? pasosHabilidad(editing.draft) : null; }

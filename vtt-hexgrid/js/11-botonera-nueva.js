@@ -424,7 +424,8 @@ function opcionesGuardadoMapa(f, getS, getDoc, vigente){
   };
 }
 // La interfaz que le da el mapa a FichaAcciones. `antes`: las partes antes de la acción, para escribir solo lo que tocó.
-function bnUi(antes){
+// comoGM (A6b): el GM edita a un personaje sin tener 🎮 el control (como "Editar como GM" de la ficha): se guarda igual.
+function bnUi(antes, comoGM){
   const f = bn.sesion;
   return {
     presets: estadosPresetFicha(),
@@ -434,7 +435,7 @@ function bnUi(antes){
       bnRevisarVida();
       const despues = FichaGuardado.partes(bn.S);
       Object.keys(despues).forEach(p => { if(despues[p] === antes[p] && despues[p] !== f.ultimo[p]) f.ultimo[p] = despues[p]; });
-      f.soloLectura = !bnPuedeGuardar();
+      f.soloLectura = !(bnPuedeGuardar() || comoGM);
       FichaSesion.guardar(f, true, bnOpcionesGuardado(f));
       bnDibujar();
     },
@@ -1424,16 +1425,33 @@ function bnRerollDibujar(){
    (comun/ficha-editor.js: el mismo formulario, el paso a paso de las habilidades, el asistente de ítems, la trampa y la Ejecución ✨),
    adentro del recuadro de la Botonera nueva (#bn-editor). Guardar pasa por bnUi (las partes que cambiaron y el resumen). Los estados de
    la lista (para "estado al usar" y para la Ejecución) se eligen con el selector común (comun/selector-estados.js). */
-const ED_PIEZAS = ['../comun/ficha-editor.js?v=20261002b', '../comun/asistente-item.js?v=20260930b', '../comun/asistente-duelo-hab.js?v=20261002i'];
+const ED_PIEZAS = ['../comun/ficha-editor.js?v=20261002c', '../comun/asistente-item.js?v=20260930b', '../comun/asistente-duelo-hab.js?v=20261002i'];
 let bnTipoItemResolver = null;
-async function bnEditar(key, id){
-  if(!bn || !bn.S) return;
-  if(!bnPuedeGuardar()){ toast('Ese personaje no lo manejás vos: solo se puede mirar'); return; }
+// op.comoGM: el GM sin el control (el ⚙ de un estado del HUD, como hacía la ficha con "Editar como GM"). → true si se abrió.
+async function bnEditar(key, id, op = {}){
+  if(!bn || !bn.S) return false;
+  const comoGM = !bnPuedeGuardar() && soyGM && !!op.comoGM;
+  if(!bnPuedeGuardar() && !comoGM){ toast('Ese personaje no lo manejás vos: solo se puede mirar'); return false; }
   try{ await bnCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ED_PIEZAS); }
   catch(err){ console.error(err); toast('No se pudo abrir el editor'); return; }
   if(!bn.editor) bn.editor = bnCrearEditor();
+  bn.editorComoGM = comoGM;
   bn.editorAntes = FichaGuardado.partes(bn.S);
   bn.editor.abrir(key, id);
+  return true;
+}
+// El ⚙ de un estado del HUD (A6b-b5): su editor, el común, en el mapa. Si la Botonera nueva no estaba a la vista, se abre solo para esto.
+async function abrirEditarEstadoMapa(fichaId, nombre){
+  try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo abrir el editor'); return; }
+  const yaVisible = bn && bn.host && !bn.host.hidden && bn.fichaId === fichaId && !bn.invId;
+  if(!yaVisible) await abrirBotoneraNueva(fichaId, '');
+  if(!bn) return;
+  bn.soloEditor = !yaVisible;
+  const cerrarSiSolo = () => { if(bn.soloEditor){ bn.soloEditor = false; cerrarBotoneraNueva(); } };
+  if(!(await bnSesionLista(fichaId))){ toast('No se pudo leer el personaje'); cerrarSiSolo(); return; }
+  const ef = (bn.S.efectos || []).find(x => x && x.activo !== false && x.nombre === nombre);
+  if(!ef){ toast('No encontré ese estado en la ficha'); cerrarSiSolo(); return; }
+  if(!(await bnEditar('efectos', ef.id, {comoGM: true}))) cerrarSiSolo();
 }
 // Elegir un estado de la lista (el selector común, con los "Mis presets" del personaje). → {preset, guardar} o null.
 async function bnElegirEstadoLista(){
@@ -1461,7 +1479,7 @@ function bnCrearEditor(){
     confirmar: t => confirm(t),
     // Se guardó o se borró algo: se guarda (solo lo que cambió) y se redibuja lo que esté abierto.
     alCambiar: () => {
-      bnUi(bn.editorAntes || FichaGuardado.partes(bn.S)).cambio();
+      bnUi(bn.editorAntes || FichaGuardado.partes(bn.S), bn.editorComoGM).cambio();
       bn.editorAntes = FichaGuardado.partes(bn.S);
       if(bn.raiz.querySelector('#bn-equipo').classList.contains('open')) bnEquipoDibujar();
     },
@@ -1483,6 +1501,8 @@ function bnCrearEditor(){
       return {modo: 'preset', nombre: p.nombre, turnos: p.turnos, permanente: !!p.permanente, hp: num(p.hpturno), mods: p.mods, stacks: p.stacks, escudoMagico: num(p.escudoMagico), polaridad: p.polaridad, detalle: p.detalle};
     },
     alSubirCatalogo: () => ItemsSubidos.cargar().then(l => { bnItemsSubidos = l || []; }),
+    // Abierto solo para editar (el ⚙ de un estado): al cerrarse, se cierra también la Botonera (la sesión sigue: lo guardado se sube igual).
+    alCerrar: () => { if(bn.soloEditor){ bn.soloEditor = false; setTimeout(() => cerrarBotoneraNueva(), 0); } },
   });
 }
 function bnTipoItemCerrar(valor){

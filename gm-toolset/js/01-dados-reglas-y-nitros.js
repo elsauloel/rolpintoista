@@ -573,7 +573,7 @@ function normalizarCreep(sc){ return CreepCalculo.normalizar(sc); }
 
 // Un creep de la biblioteca que se está viendo/editando ("Ver" → ✎ Editar) vive un rato en S.creeps marcado `_borrador`, para
 // poder usar los mismos editores: no se guarda en la mesa, no se ve en la grilla ni en el Tablero y no recibe el Mantenimiento.
-function creepsReales(){ return S.creeps.filter(sc => !sc._borrador); }
+function creepsReales(){ return S.creeps.filter(sc => !sc._borrador && !sc._creando); }   // _creando: el asistente de creeps, hasta «✔ Crear»
 
 function renderAll(){
   $('#turno-badge').textContent = 'Turno ' + S.turno;

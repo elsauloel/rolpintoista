@@ -16,7 +16,7 @@ const mapasOrdenadosGM = () => CreepsMapas.ordenar(mapasGM);
 function mapaDeCreepGM(sc){ return mapasGMListos ? CreepsMapas.mapaDe(sc, new Set(mapasOrdenadosGM().map(m => m.id))) : (sc.mapa || ''); }
 function nombreDeMapaGM(id){ return id === CreepsMapas.RESERVA ? 'Reserva' : ((mapasGM.get(id) || {}).nombre || (id === CreepsMapas.PRINCIPAL ? 'Mapa 1' : 'Mapa')); }
 function pasaPestana(sc){
-  if(sc._borrador) return false;
+  if(sc._borrador || sc._creando) return false;
   return pestanaMapa === PESTANA_TODOS || mapaDeCreepGM(sc) === pestanaMapa;
 }
 function mapaParaNuevo(){ return pestanaMapa === PESTANA_TODOS ? CreepsMapas.RESERVA : pestanaMapa; }

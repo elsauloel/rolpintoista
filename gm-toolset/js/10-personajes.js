@@ -203,7 +203,6 @@ document.addEventListener('keydown', e => {
   const capa = s => num(getComputedStyle(s).zIndex);
   const arriba = abiertos.reduce((a, s) => capa(s) >= capa(a) ? s : a);
   if(arriba.id === 'scrim-editar-creep'){ cerrarEditarCreep(); return; }
-  if(arriba.id === 'scrim-asistente-creep'){ const c = arriba.querySelector('[data-ac-cancelar]'); if(c) c.click(); return; }
   const closeBtn = arriba.querySelector('[id$="-x"]');
   if(closeBtn) closeBtn.click(); else arriba.classList.remove('open');
 });

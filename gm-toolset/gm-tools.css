@@ -553,7 +553,6 @@ input[type=file]{display:none}
    #scrim-ver-item). */
 #scrim-presets-creep{z-index:85}
 #scrim-editar-creep{z-index:79}
-#scrim-asistente-creep{z-index:79}
 .ayuda-q{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;border:1px solid var(--copper);color:var(--brass);font-size:10px;font-weight:700;cursor:help;margin-left:4px;text-transform:none;vertical-align:middle}
 .ayuda-q.con-tip:hover::after{min-width:280px;max-width:320px;left:auto;right:-8px}
 .editar-creep-modal{max-width:620px;border-top:none;background:none}

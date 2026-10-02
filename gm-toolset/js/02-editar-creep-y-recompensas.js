@@ -121,8 +121,8 @@ document.addEventListener('click', e => {
 });
 
 /* =========================================================
-   Asistente paso a paso para crear o editar un creep entero
-   Trabaja sobre el creep real: "crear" lo agrega al empezar y lo quita si se cancela.
+   Asistente paso a paso para crear o editar un creep entero (la referencia del estándar paso a paso: docs/plan-paso-a-paso.md;
+   la ventana es comun/paso-a-paso.js). Crear: «✔ Crear» al final; editar: Guardar siempre visible, Cancelar repone la copia.
    ========================================================= */
 const ASIST_PASOS = ['Qué es', 'Atributos', 'Arma', 'Armadura', 'Habilidades', 'Recompensas', 'Resumen'];
 const ROLES_CREEP = {brutal: 'Brutal (pega fuerte)', tanque: 'Tanque (aguanta)', rapido: 'Rápido (asalto)', rango: 'A distancia', mago: 'Mago', apoyo: 'Apoyo', debuffer: 'Debuffer (maldiciones)'};
@@ -130,8 +130,18 @@ const PESOS_ROL = {brutal: [.26, .30, .14, .16, .14], tanque: [.36, .26, .10, .1
   rango: [.18, .10, .24, .32, .16], mago: [.20, .08, .16, .16, .40], apoyo: [.24, .10, .16, .14, .36], debuffer: [.22, .08, .18, .14, .38]};
 const RAREZA_ARMA = ['Común', 'Común', 'Común (o Buena Calidad)', 'Buena Calidad', 'Buena Calidad (o Raro)'];
 const RAREZA_ARMADURA = ['ninguna (opcional)', 'Común', 'Buena Calidad (o Común)', 'Buena Calidad', 'Raro (o Buena Calidad)'];
-let asist = null;   // {id, paso, nuevo, rol}
+let asist = null;   // {id, nuevo, rol, copia, api}: la ventana es la común (comun/paso-a-paso.js, 2026-10-02)
 function asistCreepAbierto(){ try{ return !!asist; }catch(e){ return false; } }
+const creepAsist = () => asist ? S.creeps.find(s => s.id === asist.id) : null;
+const ASIST_AYUDA = [
+  'Lo básico: cómo se llama, de qué nivel es y qué tipo de criatura. El tipo sugiere el oro que deja y si su arma es natural.',
+  'Cómo se reparten sus cinco atributos. Elegí un rol para cargar un reparto sugerido y después ajustalo a gusto.',
+  'Con qué ataca: creala paso a paso, equipala del fabricante o elegí un arma natural del catálogo.',
+  'Lo que lleva puesto para defenderse. Es opcional.',
+  'Lo que sabe hacer además de atacar.',
+  'Lo que deja cuando lo derrotan: oro, trofeo y equipo.',
+  'Revisá cómo quedó. Todo se puede volver a cambiar desde cualquier paso.',
+];
 
 function repartirAtributos(total, pesos){
   const v = pesos.map(p => Math.max(1, Math.floor(total * p)));
@@ -146,146 +156,144 @@ function cambiarAtributoBase(sc, id, valor){
   if(id === 'con') actualizarHpMaxPorCon(sc);
   if(agl) actualizarNo2PorAgl(sc, agl);
 }
+// Crear (sin scId) o editar un creep, paso a paso. Al crear, el creep vive en S.creeps marcado `_creando` (no se ve en la grilla ni se
+// guarda en la partida) hasta «✔ Crear»; al editar se guarda una copia y Cancelar la repone.
 function abrirAsistenteCreep(scId){
+  if(asist) return;
   let nuevo = false;
   if(!scId){
     const sc = nuevoCreep();
     sc.nombre = 'Creep nuevo';
     sc.mapa = mapaParaNuevo();
+    sc._creando = true;
     S.creeps.push(sc);
     scId = sc.id;
     nuevo = true;
-    renderAll();
   }
-  asist = {id: scId, paso: 0, nuevo, rol: 'brutal'};
-  $('#scrim-asistente-creep').classList.add('open');
-  renderAsistenteCreep();
-}
-function cerrarAsistenteCreep(cancelar){
-  if(!asist) return;
-  if(cancelar && asist.nuevo){
-    S.creeps = S.creeps.filter(s => s.id !== asist.id);   // el creep no se llegó a terminar
-  }
-  asist = null;
-  $('#scrim-asistente-creep').classList.remove('open');
+  const sc0 = S.creeps.find(s => s.id === scId);
+  if(!sc0) return;
+  asist = {id: scId, nuevo, rol: 'brutal', copia: nuevo ? null : structuredClone(sc0)};
+  asist.api = PasoAPaso.abrir({
+    titulo: () => asist && asist.nuevo ? 'Crear un creep' : 'Editar creep',
+    crear: nuevo, z: 79,
+    pasos: ASIST_PASOS.map((nombre, i) => ({id: String(i), nombre, ayuda: ASIST_AYUDA[i], html: () => htmlPasoAsistCreep(i),
+      alMontar: i === 1 ? () => { const sc = creepAsist(); if(sc) actualizarAsistAtributos(sc); } : undefined})),
+    confirmarCancelar: () => asist && !asist.nuevo && JSON.stringify(creepAsist()) !== JSON.stringify(asist.copia) ? '¿Descartar los cambios de este creep?'
+      : asist && asist.nuevo ? '¿Cancelar? El creep que estás armando se descarta.' : '',
+    alClic: e => clicAsistCreep(e), alInput: e => inputAsistCreep(e), alCambio: e => { const t = e.target; if(t.dataset && t.dataset.acRol !== undefined) asist.rol = t.value; },
+    alCrear: () => { const sc = creepAsist(); if(sc){ delete sc._creando; toast(`${nombreLimpioCreep(sc)} creado`); } terminarAsistCreep(); },
+    alGuardar: () => { const sc = creepAsist(); if(sc) toast(`${nombreLimpioCreep(sc)} guardado`); terminarAsistCreep(); },
+    alCancelar: () => {
+      if(asist.nuevo) S.creeps = S.creeps.filter(s => s.id !== asist.id);   // el creep no se llegó a terminar
+      else if(asist.copia){ const i = S.creeps.findIndex(s => s.id === asist.id); if(i >= 0) S.creeps[i] = asist.copia; }
+      terminarAsistCreep();
+    },
+  });
   renderAll();
 }
+function terminarAsistCreep(){ asist = null; renderAll(); }
 function renderAsistenteCreep(){
   if(!asist) return;
-  const sc = S.creeps.find(s => s.id === asist.id);
-  if(!sc){ cerrarAsistenteCreep(false); return; }
-  const modal = $('#asistente-creep-body');
-  const scroll = $('#scrim-asistente-creep').scrollTop;
+  if(!creepAsist()){ asist.api.cerrar(); asist = null; return; }   // lo borraron desde otro lado
+  asist.api.redibujar();
+}
+function htmlPasoAsistCreep(p){
+  const sc = creepAsist();
+  if(!sc) return '';
   const n = Math.max(1, Math.round(num(sc.nivel)) || 1);
-  const p = asist.paso;
-  const campo = (et, html, ayuda) => `<div class="mini-f" style="margin-bottom:12px"><label>${et}</label>${html}${ayuda ? `<div class="hint" style="margin-top:4px">${ayuda}</div>` : ''}</div>`;
-  let h = '';
+  const campo = (et, html, ayuda) => `<div class="pap-campo"><label>${et}</label>${html}${ayuda ? `<div class="pap-nota">${ayuda}</div>` : ''}</div>`;
   if(p === 0){
     const t = sc.tipoCriatura || '';
-    h = campo('Nombre', `<input type="text" data-ac-campo="nombre" value="${esc(sc.nombre)}" maxlength="60">`)
-      + `<div style="display:flex;gap:12px">${campo('Nivel', `<input type="number" min="1" max="30" data-ac-campo="nivel" value="${n}" style="width:90px">`)}
-          ${campo('Color', `<input type="color" data-ac-campo="color" value="${esc(sc.color || '#B87333')}" style="width:60px;height:34px;padding:2px">`)}</div>`
+    return campo('Nombre', `<input type="text" data-ac-campo="nombre" value="${esc(sc.nombre)}" maxlength="60">`)
+      + `<div class="pap-fila">${campo('Nivel', `<input type="number" min="1" max="30" data-ac-campo="nivel" value="${n}" style="width:90px">`)}
+          ${campo('Color', `<input type="color" data-ac-campo="color" value="${esc(sc.color || '#B87333')}" style="width:60px;height:36px;padding:2px">`)}</div>`
       + campo('Tipo de criatura', `<select data-rec="tipoCriatura" data-id="${sc.id}">
           <option value="">(elegí uno)</option>${TIPOS_CRIATURA.map(x => `<option value="${x}"${t === x ? ' selected' : ''}>${x}</option>`).join('')}
           <option value="otros"${t === 'otros' ? ' selected' : ''}>Otros…</option></select>
           ${t === 'otros' ? `<input type="text" data-rec="tipoCriaturaOtro" data-id="${sc.id}" value="${esc(sc.tipoCriaturaOtro || '')}" placeholder="Escribí qué tipo es" maxlength="30" style="margin-top:6px">` : ''}`,
           'Define cuánto oro se sugiere y si el arma es natural por defecto (podés cambiar ambas cosas después).')
-      + campo('¿Es un jefe?', `<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-rec="jefe" data-id="${sc.id}"${sc.jefe ? ' checked' : ''}> Sí: deja el doble de oro y de trofeo, es inmune a Stun y tiene +1 Res.Esp (protección de jefe)</label>`)
-      + campo('Imagen (opcional)', `<button type="button" class="addhab" data-ac-img="1" style="margin:0">${sc.imagen ? 'Cambiar imagen' : '+ Elegir imagen'}</button>
+      + campo('¿Es un jefe?', `<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-rec="jefe" data-id="${sc.id}"${sc.jefe ? ' checked' : ''}> Sí: deja el doble de oro y de trofeo, es inmune a Stun y tiene +1 Res.Esp (protección de jefe)</label>`)
+      + campo('Imagen (opcional)', `<button type="button" class="pap-boton" data-ac-img="1">${sc.imagen ? 'Cambiar imagen' : '+ Elegir imagen'}</button>
           <input type="file" data-imginput="${sc.id}" accept="image/*" hidden>`)
-      + campo('Nota (opcional)', `<textarea rows="3" data-ac-campo="notas" maxlength="600" style="width:100%">${esc(sc.notas || '')}</textarea>`);
-  }else if(p === 1){
+      + campo('Nota (opcional)', `<textarea rows="3" data-ac-campo="notas" maxlength="600">${esc(sc.notas || '')}</textarea>`);
+  }
+  if(p === 1){
     const b = attrBudgetCreep(sc);
-    h = `<p class="hint" style="margin:0 0 10px">Elegí un <b>rol</b> y cargá el preset para el nivel ${n}: reparte solo los <b>${fmt(b.total)}</b> puntos (33 + 3 por nivel). Después ajustás lo que quieras: el presupuesto es una guía, solo avisa.</p>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
-        <select data-ac-rol="1">${Object.entries(ROLES_CREEP).map(([k, v]) => `<option value="${k}"${asist.rol === k ? ' selected' : ''}>${v}</option>`).join('')}</select>
-        <button type="button" class="addhab" data-ac-preset="1" style="margin:0">Cargar preset</button>
+    return `<p class="pap-nota" style="margin:0 0 10px">Nivel ${n}: <b>${fmt(b.total)}</b> puntos para repartir (33 + 3 por nivel). El presupuesto es una guía: solo avisa.</p>
+      <div class="pap-fila" style="align-items:center;margin-bottom:12px">
+        <select data-ac-rol="1" style="width:auto">${Object.entries(ROLES_CREEP).map(([k, v]) => `<option value="${k}"${asist.rol === k ? ' selected' : ''}>${v}</option>`).join('')}</select>
+        <button type="button" class="pap-boton" data-ac-preset="1">Cargar el reparto de ese rol</button>
       </div>
-      <div class="row5" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">${ATTR_IDS.map(a => `<div class="mini-f"><label>${ATTR_LABELS[a]}</label><input type="number" min="1" data-ac-attr="${a}" value="${num(sc[a])}"></div>`).join('')}</div>
-      <div class="hint" style="margin-top:8px" id="ac-derivados"></div>
-      <div class="hint" style="margin-top:4px" id="ac-presupuesto" style="${attrBudgetStyle(sc)}"></div>`;
-  }else if(p === 2){
-    h = `<p class="hint" style="margin:0 0 10px">Rareza sugerida para el nivel ${n}: <b>${RAREZA_ARMA[Math.min(n, 5) - 1]}</b>.</p>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">${ATTR_IDS.map(a => `<div class="pap-campo"><label>${ATTR_LABELS[a]}</label><input type="number" min="1" data-ac-attr="${a}" value="${num(sc[a])}"></div>`).join('')}</div>
+      <div class="pap-nota" id="ac-derivados"></div>
+      <div class="pap-nota" id="ac-presupuesto"></div>`;
+  }
+  if(p === 2){
+    return `<p class="pap-nota" style="margin:0 0 10px">Rareza sugerida para el nivel ${n}: <b>${RAREZA_ARMA[Math.min(n, 5) - 1]}</b>.</p>
       <div class="arma-compacta"><div class="arma-compacta-top"><span class="equipado-nombre">${sc.armaNombre ? esc(sc.armaNombre) : '<span class="hint">Sin arma</span>'}</span><span class="valor-caja">${danoTxt(sc)}</span></div>
         <div class="arma-detalle">${sc.armaDetalle ? esc(sc.armaDetalle) : 'Sin efecto.'}</div></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
-        <button type="button" class="addhab" data-editararma="${sc.id}" style="margin:0">✎ Crear o editar el arma (paso a paso)</button>
-        <button type="button" class="addhab" data-equipardelfabricante="${sc.id}" style="margin:0">⚔ Elegir del fabricante</button>
-        <button type="button" class="addhab" data-armanat="${sc.id}" style="margin:0">🐾 Arma natural del catálogo</button>
+      <div class="pap-fila" style="gap:8px;margin:10px 0">
+        <button type="button" class="pap-boton" data-editararma="${sc.id}">✎ Crear o editar el arma (paso a paso)</button>
+        <button type="button" class="pap-boton" data-equipardelfabricante="${sc.id}">⚔ Elegir del fabricante</button>
+        <button type="button" class="pap-boton" data-armanat="${sc.id}">🐾 Arma natural del catálogo</button>
       </div>
-      ${campo('¿El arma es parte del cuerpo?', `<label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-rec="armaNatural" data-id="${sc.id}"${sc.armaNatural ? ' checked' : ''}> Arma natural (colmillo, garra, puño…) ${ayudaQ(AYUDA_NATURAL)}</label>`,
+      ${campo('¿El arma es parte del cuerpo?', `<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-rec="armaNatural" data-id="${sc.id}"${sc.armaNatural ? ' checked' : ''}> Arma natural (colmillo, garra, puño…) ${ayudaQ(AYUDA_NATURAL)}</label>`,
           'Si es natural, al morir suelta un trofeo en vez del arma y ningún jugador la puede equipar.')}`;
-  }else if(p === 3){
-    h = `<p class="hint" style="margin:0 0 10px">Rareza sugerida para el nivel ${n}: <b>${RAREZA_ARMADURA[Math.min(n, 5) - 1]}</b>. Defensa total: <b>${fmt(num(sc.defensa))}</b>.</p>
+  }
+  if(p === 3){
+    return `<p class="pap-nota" style="margin:0 0 10px">Rareza sugerida para el nivel ${n}: <b>${RAREZA_ARMADURA[Math.min(n, 5) - 1]}</b>. Defensa total: <b>${fmt(num(sc.defensa))}</b>.</p>
       <div class="equipo-list">${sc.equipo.length ? sc.equipo.map(it => `<div class="equipo-item"><div class="equipo-item-info"><div class="equipo-item-top">
         <span class="equipado-nombre">${esc(it.nombre)}</span><span class="valor-caja"><small>DEF</small>+${fmt(num(it.def))}</span>
         <button class="rm" data-verequipocreep="${sc.id}:${it.id}" title="Ver la pieza (y editarla y subirla al catálogo)">👁</button>
         <button class="rm" data-quitarequipo="${sc.id}:${it.id}" title="Quitar">×</button></div>
         <div class="equipo-item-meta">${esc(TIPOITEM_LABEL_GM[it.tipoItem] || it.tipoItem)}</div></div></div>`).join('') : '<div class="hint">Sin armadura.</div>'}</div>
-      <button type="button" class="addhab" data-equipardelfabricante="${sc.id}" style="margin-top:8px">⚔ Equipar del fabricante</button>`;
-  }else if(p === 4){
-    h = `<p class="hint" style="margin:0 0 10px">Podés crear una habilidad <b>custom</b> con el asistente. Se sugiere <b>una rápida (cooldown 2) y una lenta</b> (cooldown 3 a 6, arranca en cooldown). Un pool de habilidades prediseñadas queda para más adelante.</p>
+      <button type="button" class="pap-boton" data-equipardelfabricante="${sc.id}" style="margin-top:10px">⚔ Equipar del fabricante</button>`;
+  }
+  if(p === 4){
+    return `<p class="pap-nota" style="margin:0 0 10px">Se sugiere <b>una rápida (cooldown 2) y una lenta</b> (cooldown 3 a 6, arranca en cooldown).</p>
       <div class="hab-list">${sc.habilidades.length ? sc.habilidades.map(x => `<div class="equipo-item"><div class="equipo-item-top">
         <span class="equipado-nombre">${esc(x.nombre || '(sin nombre)')}</span><span class="hint">${esc(costoHabCreepTxt(sc, x))}${num(x.cd) > 0 ? ` · CD ${fmt(num(x.cd))}` : ''}${x.cdArranca ? ' · lenta' : ''}</span>
         <button class="rm" data-edithab="${sc.id}:${x.id}" title="Editar">✎</button><button class="rm" data-rmhab="${sc.id}:${x.id}">×</button></div></div>`).join('') : '<div class="hint">Sin habilidades.</div>'}</div>
-      <button type="button" class="addhab" data-addhab="${sc.id}" style="margin-top:8px">+ Habilidad custom</button>`;
-  }else if(p === 5){
+      <button type="button" class="pap-boton" data-addhab="${sc.id}" style="margin-top:10px">+ Habilidad</button>`;
+  }
+  if(p === 5){
     const xp = xpBasePorNivel(n);
-    h = `<p class="hint" style="margin:0 0 10px">Lo que suelta este creep cuando lo derrotan. La XP que da es <b>${fmt(xp)}</b> (sale del nivel; no se edita acá).</p>${recompensasHtml(sc).replace(/<div class="editar-separador">.*?<\/div>/s, '')}`;
-  }else{
-    h = `<p class="hint" style="margin:0 0 10px">Revisá cómo quedó. Todo se puede volver a cambiar desde cualquier paso.</p>
-      <div class="vc-cajas vc-2">
+    return `<p class="pap-nota" style="margin:0 0 10px">La XP que da es <b>${fmt(xp)}</b> (sale del nivel; no se edita acá).</p>${recompensasHtml(sc).replace(/<div class="editar-separador">.*?<\/div>/s, '')}`;
+  }
+  return `<div class="vc-cajas vc-2">
         <div class="vc-caja"><span class="vc-caja-label">HP</span><span class="vc-caja-valor">${fmt(num(sc.hpMax))}</span></div>
         <div class="vc-caja"><span class="vc-caja-label">No2</span><span class="vc-caja-valor">${fmt(creepNitrosMax(sc))}</span></div>
         <div class="vc-caja"><span class="vc-caja-label">Ataque</span><span class="vc-caja-valor">${esc(ataqueCreepTxt(sc))}</span></div>
         <div class="vc-caja"><span class="vc-caja-label">Defensa</span><span class="vc-caja-valor">${fmt(creepDefensaEfectiva(sc))}</span></div>
       </div>
-      <div class="hint" style="margin-top:8px"><b>${esc(nombreLimpioCreep(sc))}</b> · nivel ${n} · ${esc(tipoDeCreep(sc) || 'tipo sin definir')}${sc.jefe ? ' · jefe' : ''} · ${ATTR_IDS.map(a => `${ATTR_LABELS[a]} ${num(sc[a])}`).join(' · ')}</div>
-      <div class="hint" style="margin-top:6px"><b>Habilidades:</b> ${esc(sc.habilidades.map(x => x.nombre).join(', ') || 'ninguna')}</div>
-      <div class="hint" style="margin-top:6px"><b>Al morir suelta:</b> ${esc(dropsResumenCreep(sc))}</div>
-      <div style="margin-top:12px"><button type="button" class="addhab" data-ac-bib="1" style="margin:0">📚 Guardar en la biblioteca (propuesta)</button></div>`;
-  }
-  const pasos = ASIST_PASOS.map((t, i) => `<button type="button" class="btn${i === p ? ' primary' : ''}" data-ac-paso="${i}" style="padding:4px 9px;font-size:12px">${i + 1}. ${t}</button>`).join('');
-  modal.innerHTML = `<header><h3>${asist.nuevo ? 'Crear un creep' : 'Editar creep'} · paso ${p + 1} de ${ASIST_PASOS.length}: ${ASIST_PASOS[p]}</h3><button class="iconbtn" data-ac-cancelar="1">${asist.nuevo ? 'Cancelar' : 'Cerrar'}</button></header>
-    <div class="body"><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">${pasos}</div>${h}</div>
-    <footer style="display:flex;justify-content:space-between;gap:8px"><button type="button" class="btn ghost" data-ac-nav="atras"${p === 0 ? ' disabled' : ''}>← Atrás</button>
-      ${p === ASIST_PASOS.length - 1 ? '<button type="button" class="btn primary" data-ac-listo="1">✔ Listo</button>' : '<button type="button" class="btn primary" data-ac-nav="sig">Siguiente →</button>'}</footer>`;
-  $('#scrim-asistente-creep').scrollTop = scroll;
-  if(p === 1) actualizarAsistAtributos(sc);
+      <div class="pap-nota" style="margin-top:8px"><b>${esc(nombreLimpioCreep(sc))}</b> · nivel ${n} · ${esc(tipoDeCreep(sc) || 'tipo sin definir')}${sc.jefe ? ' · jefe' : ''} · ${ATTR_IDS.map(a => `${ATTR_LABELS[a]} ${num(sc[a])}`).join(' · ')}</div>
+      <div class="pap-nota" style="margin-top:6px"><b>Habilidades:</b> ${esc(sc.habilidades.map(x => x.nombre).join(', ') || 'ninguna')}</div>
+      <div class="pap-nota" style="margin-top:6px"><b>Al morir suelta:</b> ${esc(dropsResumenCreep(sc))}</div>
+      <div style="margin-top:12px"><button type="button" class="pap-boton" data-ac-bib="1">📚 Guardar en la biblioteca (propuesta)</button></div>`;
 }
 function actualizarAsistAtributos(sc){
-  const d = $('#ac-derivados'), pres = $('#ac-presupuesto');
+  const raiz = asist && asist.api ? asist.api.raiz : document;
+  const d = raiz.querySelector('#ac-derivados'), pres = raiz.querySelector('#ac-presupuesto');
   if(d) d.innerHTML = `HP máximo: <b>${fmt(num(sc.hpMax))}</b> · No2: <b>${fmt(creepNitrosMax(sc))}</b>`;
   if(pres){ const b = attrBudgetCreep(sc); pres.innerHTML = `Presupuesto: <b>${fmt(b.usado)}</b> de ${fmt(b.total)}${b.pend < 0 ? ` <span style="color:var(--danger)">(+${fmt(Math.abs(b.pend))} de más: es solo una guía)</span>` : b.pend > 0 ? ` (te sobran ${fmt(b.pend)})` : ''}`; }
 }
-document.addEventListener('click', e => {
-  if(!asist) return;
-  const cap = e.target.closest('#scrim-asistente-creep');
-  if(!cap) return;
-  const sc = S.creeps.find(s => s.id === asist.id);
-  const b = e.target.closest('[data-ac-paso],[data-ac-nav],[data-ac-cancelar],[data-ac-listo],[data-ac-preset],[data-ac-img],[data-ac-bib]');
+// Los botones propios del asistente (el resto —arma, equipo, habilidades, recompensas— los atiende GM Tools como en la ficha del creep).
+function clicAsistCreep(e){
+  const sc = creepAsist();
+  const b = e.target.closest('[data-ac-preset],[data-ac-img],[data-ac-bib]');
   if(!b || !sc) return;
-  if(b.dataset.acPaso !== undefined){ asist.paso = +b.dataset.acPaso; renderAsistenteCreep(); }
-  else if(b.dataset.acNav){ asist.paso = Math.max(0, Math.min(ASIST_PASOS.length - 1, asist.paso + (b.dataset.acNav === 'sig' ? 1 : -1))); renderAsistenteCreep(); }
-  else if(b.dataset.acCancelar){
-    if(asist.nuevo && !confirm('¿Cancelar? El creep que estás armando se descarta.')) return;
-    cerrarAsistenteCreep(true);
-  }
-  else if(b.dataset.acListo){ toast(`${nombreLimpioCreep(sc)} listo`); cerrarAsistenteCreep(false); }
-  else if(b.dataset.acPreset){
+  if(b.dataset.acPreset){
     const n = Math.max(1, Math.round(num(sc.nivel)) || 1);
     const v = repartirAtributos(33 + 3 * (n - 1), PESOS_ROL[asist.rol]);
     ATTR_IDS.forEach((a, i) => cambiarAtributoBase(sc, a, v[i]));
     renderAll();
   }
-  else if(b.dataset.acImg){ cap.querySelector('[data-imginput]')?.click(); }
+  else if(b.dataset.acImg){ const inp = asist.api.raiz.querySelector('[data-imginput]'); if(inp) inp.click(); }
   else if(b.dataset.acBib){ guardarCreepEnBiblioteca(sc); }
-});
-document.addEventListener('input', e => {
-  if(!asist) return;
-  const t = e.target;
-  const sc = S.creeps.find(s => s.id === asist.id);
-  if(!sc || !t.closest('#scrim-asistente-creep')) return;
+}
+function inputAsistCreep(e){
+  const t = e.target, sc = creepAsist();
+  if(!sc) return;
   if(t.dataset.acCampo){
     const c = t.dataset.acCampo;
     sc[c] = c === 'nivel' ? Math.max(1, num(t.value)) : t.value;
@@ -294,12 +302,7 @@ document.addEventListener('input', e => {
     cambiarAtributoBase(sc, t.dataset.acAttr, t.value);
     actualizarAsistAtributos(sc);
   }
-});
-document.addEventListener('change', e => {
-  if(!asist) return;
-  const t = e.target;
-  if(t.dataset && t.dataset.acRol !== undefined){ asist.rol = t.value; }
-});
+}
 
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-asistente]');

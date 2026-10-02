@@ -54,6 +54,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="recibidos.js"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js"></script>
+<script src="paso-a-paso.js"></script>
 <script src="modificadores-tirada.js"></script>
 <script src="plantillas.js"></script>
 <script src="catalogo.js"></script>
@@ -1351,6 +1352,44 @@ prueba('una invocación sin No2 para atacar: sin forzar no cobra; forzado gasta 
   respuesta = true; h.atacar(d);
   igual([falta, !!no.error, antes, inv.nitros, si.forzado, si.aviso.includes('(costaba 4)'), preguntas.length, preguntas[0].includes('¿Atacar igual?'), trasNo, inv2.nitros, reg],
     [true, true, 2, 0, {costo: 4, tenia: 2}, true, 2, true, [1, 0], 0, ['Oso · Atacar (PdG)']]);
+});
+/* ---------- La ventana paso a paso (comun/paso-a-paso.js, 2026-10-02) ---------- */
+prueba('paso a paso: título con el paso, pestañas que saltan, Siguiente/Atrás, un paso bloqueado avisa y al editar Guardar está siempre', async () => {
+  const hechos = [];
+  const api = PasoAPaso.abrir({titulo: 'Editar cosa', crear: false,
+    pasos: [{id: 'a', nombre: 'Qué es', ayuda: 'Lo básico', html: () => '<input data-x="1">'}, {id: 'b', nombre: 'Números', html: () => 'num'}, {id: 'c', nombre: 'Resumen', html: () => 'res'}],
+    puedeIr: i => i === 2 && !hechos.includes('ok') ? 'Falta el nombre' : '',
+    alGuardar: () => { hechos.push('guardar'); }});
+  const tit = () => api.raiz.querySelector('.pap-cab h3').textContent;
+  const clic = sel => api.raiz.querySelector(sel).click();
+  const r = [tit(), api.raiz.querySelectorAll('[data-pap-paso]').length, !!api.raiz.querySelector('[data-pap="guardar"]'), api.raiz.querySelector('.pap-ayuda').textContent];
+  clic('[data-pap="sig"]'); r.push(api.pasoId(), !!api.raiz.querySelector('[data-pap="guardar"]'));
+  clic('[data-pap-paso="2"]'); r.push(api.pasoId(), api.raiz.querySelector('.pap-aviso').textContent);
+  hechos.push('ok'); clic('[data-pap-paso="2"]'); r.push(tit(), !api.raiz.querySelector('[data-pap="sig"]'));
+  clic('[data-pap="atras"]'); r.push(api.pasoId());
+  clic('[data-pap="guardar"]'); await new Promise(res => setTimeout(res, 0));
+  r.push(hechos.includes('guardar'), api.abierto());
+  igual(r, ['Editar cosa · paso 1 de 3: Qué es', 3, true, 'Lo básico', 'b', true, 'b', 'Falta el nombre', 'Editar cosa · paso 3 de 3: Resumen', true, 'b', true, false]);
+});
+prueba('paso a paso: al crear, «✔ Crear» solo en el último paso; Cancelar pregunta y descarta; los pasos pueden depender de lo elegido', async () => {
+  const hechos = [];
+  let conExtra = false;
+  const orig = window.confirm; window.confirm = () => true;
+  const api = PasoAPaso.abrir({titulo: 'Crear cosa', crear: true,
+    pasos: () => [{id: 'a', nombre: 'Uno', html: () => '<button data-extra="1">x</button>'}, ...(conExtra ? [{id: 'x', nombre: 'Extra'}] : []), {id: 'z', nombre: 'Resumen'}],
+    alClic: e => { if(e.target.dataset.extra){ conExtra = true; api.redibujar(); } },
+    alCrear: () => { hechos.push('crear'); return false; },   // false: no se cierra
+    alCancelar: () => hechos.push('cancelar')});
+  const r = [!!api.raiz.querySelector('[data-pap="crear"]'), api.raiz.querySelectorAll('[data-pap-paso]').length];
+  api.raiz.querySelector('[data-extra]').click();
+  r.push(api.raiz.querySelectorAll('[data-pap-paso]').length);
+  api.irA('z'); r.push(!!api.raiz.querySelector('[data-pap="crear"]'));
+  api.raiz.querySelector('[data-pap="crear"]').click(); await new Promise(res => setTimeout(res, 0));
+  r.push(api.abierto());
+  api.raiz.querySelector('[data-pap="cancelar"]').click();
+  window.confirm = orig;
+  r.push(hechos, api.abierto());
+  igual(r, [false, 2, 3, true, true, ['crear', 'cancelar'], false]);
 });
 /* ---------- Creeps por mapa (comun/creeps-mapas.js, 2026-10-02: los grupos pasaron a ser mapas) ---------- */
 // Una base de datos de mentira, lo justo para CreepsMapas: colecciones y documentos en memoria.

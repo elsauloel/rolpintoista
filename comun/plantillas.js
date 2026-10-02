@@ -53,7 +53,7 @@ const Plantillas = (() => {
   /* ---- Creep ---- sin imagen, con la vida llena, sin estados pasajeros ni lo de la mesa de quien lo sube. */
   function creep(c){
     const out = clon(c);
-    ['id', 'imagen', '_borrador', 'grupo', 'mapa', 'recompensado'].forEach(k => delete out[k]);
+    ['id', 'imagen', '_borrador', '_creando', 'grupo', 'mapa', 'recompensado'].forEach(k => delete out[k]);
     if(out.hpMax !== undefined) out.hp = out.hpMax;
     out.nitros = null;
     out.ataquesTurno = 0;

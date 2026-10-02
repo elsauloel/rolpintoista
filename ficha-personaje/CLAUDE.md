@@ -646,3 +646,9 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   `renderComparar` y el botón de equipar (`data-toggle` de un ítem de la mochila, `js/06`) usan `comun/ficha-equipo.js` (`equipoUi` en
   `js/09` es lo que hace la ficha: redibujar y los carteles). El mapa ya no le pide `abrir-equipo` (lo muestra él): ese mensaje y
   `equipoModoAbrir` quedan sin uso desde el mapa, para la limpieza (A′).
+- **Botín y tienda, compartidos (2026-10-02, hoja de ruta A5)**: la ventana del botín (`botinLootCuerpo`, `botinTomar`,
+  `botinTextoItem`, `mochilaUsada`) usa `comun/ficha-botin.js`; la tienda (catálogo, carrito, comprar, vender, reparar, ítem al azar,
+  `itemCatalogo`, `precioDeCompra`, `tiendaDesdeDoc`, `catalogoRowHtml`, `precioTiendaHtml`, `textoBusquedaDe`, `precioVentaDe`, los grupos
+  de compra) usa `comun/ficha-tienda.js` con `tiendaSt` (`js/09`: conecta la pieza con `tiendaCargada`, `carritoCatalogo`, `venderSel`,
+  `catalogoOrden`… y los filtros de la ventana) y `tiendaUi`. `CATEGORIAS` y `capMochilaEfectivo` vienen de `comun/ficha-equipo.js`. El mapa
+  ya no le pide `abrir-botin` ni `abrir-tienda` (los muestra él): esos mensajes y `botinModoAbrir` quedan para la limpieza (A′).

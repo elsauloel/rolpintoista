@@ -44,7 +44,7 @@
    editor de la ficha (punto 6). Probado en vivo (combate, Silvia con el control del GM): sacar/equipar el Broquel 6 → 5 → 4 No2 y
    guardado; una daga de prueba con el slot lleno → «Reemplazar o Comparar», la tabla de Comparar, Reemplazar (−2 No2); Escape cierra
    todo; y en la ficha suelta, sacar/equipar igual (2 → 1 → 0). Silvia quedó con la «Daga de prueba» equipada en lugar de la Cimitarra.
-5. [ ] **Tienda y Botín**.
+5. [x] **Tienda y Botín** (2026-10-02).
    - [x] **Botín** (2026-10-02): la ventana «⚔ Batalla terminada» salió a `comun/ficha-botin.js` (la ficha la usa) y el mapa la muestra
      adentro de la Botonera nueva (`abrirBotinMapa`: la abre sola al terminar un combate, el 🎁 del borde y la ficha lite); se cierra sola
      cuando el GM cierra el botín. Las categorías de ítem y la mochila pasaron a `comun/ficha-equipo.js`. Probado en vivo (GM con 🎮
@@ -52,7 +52,14 @@
      el cierre del GM. (Ojo al armar un botín de prueba a mano: el documento tiene que llevar `tomadoPor: ''`, si no las reglas no dejan
      tomarlo — GM Tools ya lo hace así.) La ventana del GM (Finalizar combate / Despojar, `abrirModoGM`) sigue en GM Tools: es otra
      pantalla, se anota aparte.
-   - [ ] **Tienda**.
+   - [x] **Tienda** (2026-10-02): la regla y el dibujo salieron a `comun/ficha-tienda.js` (precio con el ajuste del vendedor, filtros y
+     orden, carrito y compra, agregar gratis, vender, reparar con el herrero, ítem al azar, la tienda publicada) y la usan la ficha (con
+     `tiendaSt`, que conecta la pieza con sus variables de siempre) y el mapa (`abrirTiendaMapa`: el 🏪 del borde y la ficha lite, adentro
+     de la Botonera nueva; los cambios del GM llegan solos y si la cierra, la ventana se cierra). **Arreglo de paso**: la búsqueda del
+     catálogo de la ficha daba error (`SLOT_LABEL` había quedado encerrado en `comun/ficha-calculo.js` desde el 30/9; ahora se exporta).
+     Probado en vivo (tienda de prueba de 5 ítems con herrero, GM con 🎮 Silvia): en el mapa, buscar, carrito y comprar (500 → 480),
+     vender (+10), reparar bloqueado en combate y permitido en narrativo (durabilidad 1 → 3, −2 DDE), el cierre del GM, y el DDE guardado
+     en la ficha; en la ficha suelta, buscar (ya no da error), carrito y comprar (488 → 468). La tienda de prueba quedó cerrada.
 6. [ ] **El editor** (editar una habilidad, un ítem, un creep): lo más grande y lo que menos se usa en partida; puede seguir abriéndose
    en la ficha o en GM Tools si conviene.
 
@@ -62,7 +69,7 @@
   false`) ni apareció un problema que solo se arregle con lo viejo. Mientras tanto queda "dormido", sin tocarlo ni probarlo.
 - **Cómo** — de a un paso y probando: sacar `BN_SIEMPRE`, el interruptor ⚗ y `bnAlternar`; los pedidos de botón al marco
   (`bnDelegar`/`botonera-delegar`, `acDelegar`/`acciones-delegar`) y lo que los atiende en la ficha y en GM Tools (`modo=botonera` sin
-  mensaje, `modo=acciones`); la ficha liviana vieja (`fichaMapaAbrir`, `abrir-ficha-mapa`); `abrir-equipo`/`equipoModoAbrir` (A4); el Mantenimiento en un marco invisible (en el
+  mensaje, `modo=acciones`); la ficha liviana vieja (`fichaMapaAbrir`, `abrir-ficha-mapa`); `abrir-equipo`/`equipoModoAbrir` (A4); `abrir-botin`/`botinModoAbrir` y `abrir-tienda` (A5); el Mantenimiento en un marco invisible (en el
   mapa `mantenimientoEncolar`/`mantenimientoSiguiente`/`mantenimientoCerrarMarco` y el aviso `mantenimiento-listo`; en la ficha y en GM
   Tools el `?modo=mantenimiento`), sin uso desde A2/A2b; los mensajes que queden sin uso en `comun/mensajes-mapa.js`. **No** se borra la Botonera de la ficha suelta (`ficha.html` sin el mapa): usa las mismas piezas de
   `comun/` y es la de la página de la ficha.

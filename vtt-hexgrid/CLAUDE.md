@@ -1287,3 +1287,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `FichaEquipo.equipar/reemplazar` (`bnEquipoUi`: el cartel de sin No2 del recuadro, `modoMapa`, guarda con `bnUi`), «slot lleno»
   (`#bn-slot-lleno`) y Comparar (`#bn-comparar`, `bnComparando`); Ver con `bnVer`; Editar → `bnAlMarco('editar-en-ficha')` (A6). Escape
   cierra primero el cartel de más arriba.
+- **El botín y la tienda los muestra el mapa** (2026-10-02, hoja de ruta A5): adentro del recuadro de la Botonera nueva, como el Equipo.
+  Botín: `abrirBotinMapa(fichaId)` (al terminar un combate, el 🎁 y la ficha lite) con `comun/ficha-botin.js` (`#bn-botin`, `bnBotinLoot`
+  escuchando `botin`, `bnBotinCombateCerrado` cuando el GM lo cierra); Ver de un ítem ajeno con `bnVerItemSuelto`. Tienda:
+  `abrirTiendaMapa(fichaId)` (el 🏪 y la ficha lite) con `comun/ficha-tienda.js` (`#bn-tienda` con sus filtros `data-bn-tf`, `#bn-vender`,
+  `#bn-reparar`, `#bn-aleatorio`; el estado en `bnTiendaSt`; `bnTiendaClic`; escucha `tienda/publicada` mientras está abierta). Comparar
+  (`bnComparando = {item, equipadoId}`) sirve para la mochila, el botín y la tienda. Siguen yendo a la ficha / GM Tools escondidas: el
+  Editar del Ver y el ⚙ de un estado (el editor, A6), 📊 Stats de la ficha lite, la Moneda Re-Roll fija, el 🔍 Ver de un creep y las
+  ventanas del GM de fin de combate (Finalizar / Despojar).

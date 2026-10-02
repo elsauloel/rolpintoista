@@ -950,6 +950,16 @@ versión parecida en más de una, es candidato a juntar.
   (el cobro de equipar en combate); y el dibujo: `html(S, {lupa})`, `slotLlenoHtml(S, it)`, `compararHtml(S, item, equipadoId,
   {precioHtml})`. `ui = {toast, avisarSinNitros, modoCombate(), alPagar?(), slotLleno(it), cambio(partes, o)}`. Lo usan la ficha (sus
   nombres de siempre son atajos) y el mapa (`abrirEquipoMapa`). Necesita ficha-calculo, ficha-combate y ficha-acciones.
+- **`ficha-botin.js`** (`FichaBotin`, 2026-10-02, hoja de ruta A5) — **el botín del combate visto por un jugador**: `loot(snap)` (lo que
+  nadie tomó), `textoItem`, `html(S, {combate, loot, puede, fichaId})` (la ventana «Batalla terminada») y `tomar(S, entrada, ui)` («Sumar a
+  la mochila», con su transacción y la línea en la Mesa). Lo usan la ficha y el mapa (`abrirBotinMapa`).
+- **`ficha-tienda.js`** (`FichaTienda`, 2026-10-02, hoja de ruta A5) — **la tienda vista por un personaje**: los grupos de compra, el
+  precio con el ajuste del vendedor, la búsqueda, el orden y los filtros (`visibles`), la fila y el catálogo (`rowHtml`, `catalogoHtml`),
+  el carrito y comprar, agregar gratis, crear ítems (las pilas de consumibles), vender (`vendibles`, `venderHtml`, `venderCambio`,
+  `vender`), reparar (`aReparar`, `repararHtml`, `reparar`), el ítem al azar y `desdeDoc` (la tienda publicada). Todo recibe el personaje
+  (`S`) y el estado de la tienda en pantalla (`st`: tienda, carrito, venderSel, orden, ordenDesc, verCompleto, filtros, extraItem). Lo
+  usan la ficha (`tiendaSt`, getters sobre sus variables) y el mapa (`bnTiendaSt`). `ficha-equipo.js` suma `CATEGORIAS`,
+  `CATEGORIA_LABEL`, `ranuras`, `mochilaUsada` y `capMochila`; `ficha-calculo.js` ahora exporta `SLOT_LABEL`.
 - **`selector-estados.js`** (`SelectorEstados`, 2026-10-02, hoja de ruta A3) — **el "+ Estado" para cualquier pantalla**: `abrir({titulo,
   para, presets, propios, cfgPreguntas, stats, armarDeAsistente})` → Promise de `{preset, guardar}` o null (la grilla por Buffs/Debuffs/
   Otros, "Mis presets", "＋ Crear estado nuevo (paso a paso)"; un preset estándar pregunta sus cantidades con `EstadoPreguntas`), más

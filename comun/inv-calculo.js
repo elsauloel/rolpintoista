@@ -25,11 +25,11 @@ const InvCalculo = (() => {
   const INV_STAT_ATTR = Object.fromEntries(GRUPOS.flatMap(g => g.derived.map(d => [d.id, g.id])));
   // Mismo criterio que STATS_CON_TIRADA en la Botonera de la ficha: los 5
   // atributos base + los secundarios que no tienen ya su propio botón en Combate.
-  const INV_STATS_TIRADA_IDS = ['con','fue','agl','des','esp','resmg','rescc','ini','pdgmg','resm'];
+  const INV_STATS_TIRADA_IDS = ['con','fue','agl','des','esp','resmg','rescc','ini','pdgmg','dmgesp','resm'];
   // Stats que puede tirar una habilidad (incluye PdG, Bloqueo y Parry, que
   // en la Botonera ya tienen su propio botón de Combate y por eso no están
   // en INV_STATS_TIRADA_IDS) — mismos que ofrece gm-tools para un creep.
-  const INV_STATS_HAB = ['resmg','rescc','bloqueo','eva','ini','pdg','parry','pdgmg','resm'];
+  const INV_STATS_HAB = ['resmg','rescc','bloqueo','eva','ini','pdg','parry','pdgmg','dmgesp','resm'];
 
   function fuentesEquipo(inv){ return FichaResumen.invFuentesEquipo(inv); }   // comun/ficha-resumen.js
   function modTotal(inv, statId){ return FichaResumen.invModTotal(inv, statId); }

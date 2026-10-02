@@ -181,7 +181,7 @@ const FichaGuardado = (() => {
       dmg: 'fue', bloqueo: 'fue', crgmax: 'fue',
       eva: 'agl', ini: 'agl', nitros: 'agl',
       rng: 'des', pdg: 'des', crit: '0', critpot: '0', pdgcontra: '0', pdgopor: '0', parry: 'des', percepcion: 'des',   // crit = Crítico frecuente (2026-09-25): ya no sale de la Destreza
-      pdgmg: 'esp', resm: 'esp', sp: 'esp*3', spregen: 'floor(esp/2)', rangocasteo: 'esp',
+      pdgmg: 'esp', dmgesp: 'esp', resm: 'esp', sp: 'esp*3', spregen: 'floor(esp/2)', rangocasteo: 'esp',
       def: '0', armadmg: '0', tipo1: '0', tipo2: '0', tipo3: '0', tipo4: '0', tipo5: '0', capcinturon: '0', capmochila: '0', luz: '0', veoculto: '0', vision: '6'
     },
     inventario: [],

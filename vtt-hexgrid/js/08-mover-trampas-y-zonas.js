@@ -277,7 +277,7 @@ async function fuegoMantenimiento(numero){
    sus creeps) al entrar y en cada Mantenimiento. Pedido explícito del dueño: "que la automatización no quite el
    momento de esto está pasando" — nunca se resuelve en silencio, siempre aparece #zona-banner con lo que
    corresponde (tirar para resistir, o un simple "Aplicar" si no hay nada que tirar) antes de tocar nada. */
-const ZONA_STAT_LABEL = {resmg: 'Res.Esp', resm: 'Res.Mt', con: 'Constitución', fue: 'Fuerza', agl: 'Agilidad', des: 'Destreza', esp: 'Especial', eva: 'Evasión', pdg: 'PdG', pdgmg: 'PdG.Esp'};
+const ZONA_STAT_LABEL = {resmg: 'Res.Esp', dmgesp: 'Dmg.Esp', resm: 'Res.Mt', con: 'Constitución', fue: 'Fuerza', agl: 'Agilidad', des: 'Destreza', esp: 'Especial', eva: 'Evasión', pdg: 'PdG', pdgmg: 'PdG.Esp'};
 // El stat de un creep para resistir una zona: el mismo cálculo que GM Tools (comun/creep-calculo.js, paso 4 etapa 4a). Antes era
 // una cuenta propia que no sumaba lo que sube el atributo (Res.Esp sin los bonos de Constitución, Evasión sin los de Agilidad)
 // ni el +1 de Res.Esp de los jefes.

@@ -60,6 +60,8 @@ const PASIVAS_BASE = [
    detalle: '+1 Parry.', mods: [{stat: 'parry', val: 1}]},
   {poolId: 'punteria-arcana', nombre: 'Puntería arcana', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],
    detalle: '+1 PdG.Esp (probabilidad de golpe mágico).', mods: [{stat: 'pdgmg', val: 1}]},
+  {poolId: 'potencia-especial', nombre: 'Potencia especial', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],
+   detalle: '+1 Dmg.Esp (daño especial).', mods: [{stat: 'dmgesp', val: 1}]},
   {poolId: 'mente-serena', nombre: 'Mente serena', jobCosto: 1, etiquetas: ['stat', 'resistencia'],
    detalle: '+1 Res.Mt (resistencia mental).', mods: [{stat: 'resm', val: 1}]},
   {poolId: 'largo-alcance-arcano', nombre: 'Largo alcance arcano', jobCosto: 1, etiquetas: ['stat', 'utilidad'],

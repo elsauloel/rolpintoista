@@ -36,6 +36,9 @@ const FichaCalculo = (() => {
       {id:'percepcion', label:'Percep.', full:'Percepción'}]},
     {id:'esp', label:'Esp', full:'Especial', color:'#9B7BD4', derived:[
       {id:'pdgmg', label:'PdG.Esp', full:'Probabilidad de golpe especial'},
+      // Daño especial (2026-10-02, pedido del dueño): el par del Dmg de Fuerza, para tiradas puntuales que miden "cuánto daño" del
+      // Especial en vez de "si pega" (ej. Pedos Tóxicos tira Dmg.Esp contra Res.Esp).
+      {id:'dmgesp', label:'Dmg.Esp', full:'Daño especial: tirada de daño que sale del Especial, para habilidades puntuales'},
       {id:'resm', label:'Res.Mt', full:'Resistencia mental'},
       {id:'sp', label:'SP', full:'Special Power'},
       {id:'spregen', label:'SP Regen', full:'Regeneración de SP por turno'},

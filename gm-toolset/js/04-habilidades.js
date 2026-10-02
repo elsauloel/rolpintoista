@@ -516,7 +516,7 @@ function hcMostrarPaso(n){
 
 // Stats que un creep puede tirar en una habilidad: los 5 atributos y los
 // secundarios con tirada (los mismos que ofrece la ficha).
-const HC_STATS_SECUNDARIOS = ["resmg", "rescc", "bloqueo", "eva", "ini", "pdg", "parry", "pdgmg", "resm", "percepcion"];
+const HC_STATS_SECUNDARIOS = ["resmg", "rescc", "bloqueo", "eva", "ini", "pdg", "parry", "pdgmg", "dmgesp", "resm", "percepcion"];
 function hcStatLabel(id){
   const d = id ? CREEP_STAT_LOOKUP[id] : null;
   return d ? (ATTR_NOMBRE[id] || d.label) : "";

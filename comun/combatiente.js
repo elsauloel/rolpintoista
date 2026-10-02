@@ -382,7 +382,7 @@ const Combatiente = (() => {
     if(modo === 'adyacente') return 1;
     if(modo === 'ilimitado') return 0;
     if(modo === 'fijo') return Math.max(0, Math.round(nf(c.alcanceN)));
-    return statTira === 'pdgmg' ? v('rangocasteo') : 0;
+    return statTira === 'pdgmg' || statTira === 'dmgesp' ? v('rangocasteo') : 0;   // Dmg.Esp (2026-10-02): también del Especial
   }
   // Un efecto de la Ejecución, en la forma que usa el cuadro del duelo (y el estado que pone, `spec`).
   function efectoDeEjecucion(e){

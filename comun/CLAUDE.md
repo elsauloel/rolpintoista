@@ -1011,3 +1011,9 @@ versión parecida en más de una, es candidato a juntar.
   cada resultado; aplicarlo sigue a mano). Tipo de daño nuevo **Tóxico** (P142). `Combatiente.zonaDeHab` manda `zonaDanoDif`,
   `zonaDanoTipo`, `zonaTiraExtra`, `zonaNota`. **Regla del dueño: resistir una zona evita todo** (antes el daño de fórmula entraba igual).
   Reglas de Firestore nuevas (esos cuatro campos del elemento).
+- **Daño especial — `dmgesp`, «Dmg.Esp»** (2026-10-02, pedido del dueño): stat secundario nuevo del Especial (fórmula por defecto
+  `esp`, como el Dmg de la Fuerza), para tiradas puntuales de "cuánto daño" (ej. Pedos Tóxicos tira Dmg.Esp contra Res.Esp). Está en
+  `FichaCalculo.GRUPOS`, `FichaGuardado.DEFAULT.formulas` (una ficha vieja lo recibe sola al mezclarse), `CreepCalculo` (derivados y botón de
+  tirada), `InvCalculo` (botón y editor), el ✨ (`TIRA` de `asistente-duelo-hab.js`; su alcance automático es el Rango de casteo, como
+  PdG.Esp) y el editor de habilidades de creep. Lo suben los **Anillos / Pociones / Pergaminos de Furia Arcana** (`comun/catalogo.js`, +1/+2/+3,
+  pares de los de Furia de Combate) y la pasiva **Potencia especial** (`comun/pasivas.js`, +1).

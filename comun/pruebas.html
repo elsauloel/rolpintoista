@@ -76,6 +76,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-lupa.js"></script>
 <script src="creep-lupa.js"></script>
 <script src="ficha-lite.js"></script>
+<script src="pasivas.js"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -1111,6 +1112,23 @@ prueba('la marca ⚠️ no impide encontrar un ítem por nombre', () => {
   if(!marcado) return;   // sin ítems marcados no hay nada que probar
   const sinMarca = sinAviso(marcado.nombre);
   igual(ItemsSubidos.basadoEn({nombre: sinMarca, id: 'otro'}, CATALOGO_BASE), {id: 'base-' + marcado.id, nombre: marcado.nombre});
+});
+
+/* ---------- Daño especial (Dmg.Esp, 2026-10-02) ---------- */
+grupo('Daño especial (Dmg.Esp)');
+prueba('personaje: sale del Especial, también en una ficha vieja sin la fórmula; el anillo y la pasiva lo suben', () => {
+  const vieja = FichaGuardado.normalizar({attrs: {con: 2, fue: 2, agl: 2, des: 2, esp: 5}, formulas: {dmg: 'fue'}}).S;
+  igual([vieja.formulas.dmgesp, FichaCalculo.calcular(vieja).final.dmgesp, FichaCalculo.STAT_LABEL.dmgesp], ['esp', 5, 'Dmg.Esp']);
+  const anillo = CATALOGO_BASE.find(i => i.id === 'new-anillo-de-furia-arcana-mayor');
+  const pasiva = PASIVAS_BASE.find(p => p.poolId === 'potencia-especial');
+  const S = fichaBotonera({inventario: [{...anillo, id: 'an', equipado: true}], pasivas: [{...pasiva, id: 'p1'}]});
+  igual(FichaCalculo.calcular(S).final.dmgesp, S.attrs.esp + 2 + 1);
+});
+prueba('creep e invocación: Dmg.Esp sale del Especial; los consumibles de Furia Arcana lo suben', () => {
+  igual(CreepCalculo.statValor(creepPrueba({esp: 4}), 'dmgesp'), 4);
+  igual(InvCalculo.statValor(InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 1, fue: 1, agl: 1, des: 1, esp: 3}), 'dmgesp'), 3);
+  const ids = ['new-pocion-de-furia-arcana', 'new-pocion-de-furia-arcana-superior', 'new-pergamino-de-furia-arcana-mayor'];
+  igual(ids.map(id => (CATALOGO_BASE.find(i => i.id === id).efectoMods || [])[0]), [{stat: 'dmgesp', val: 1}, {stat: 'dmgesp', val: 3}, {stat: 'dmgesp', val: 2}]);
 });
 
 /* ---------- Zona con daño «la diferencia» (Combatiente.zonaDeHab, 2026-10-02) ---------- */

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="ficha.css?v=20261002a">
+<link rel="stylesheet" href="ficha.css?v=20261002zq">
 <style>
 .dock-btn:disabled{opacity:.4;cursor:not-allowed}
 </style>
@@ -615,15 +615,8 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 
 <!-- Habilidad de invocación: asistente paso a paso, mismos campos que el
      de un creep en gm-tools (ids con prefijo hi-). -->
-<div class="scrim" id="scrim-hab-inv">
-  <div class="modal" style="max-width:460px">
-    <header><h3 id="hi-titulo-modal">Habilidad</h3><button class="iconbtn" id="habinv-x">Cerrar</button></header>
-    <div class="body" style="display:flex;flex-direction:column;gap:10px">
-      <div class="pasos-hab" id="hi-pasos"></div>
-      <div>
-        <div class="paso-titulo" id="hi-paso-titulo"></div>
-        <p class="paso-ayuda" id="hi-paso-ayuda"></p>
-      </div>
+<!-- Los bloques de cada paso del editor de habilidades de invocación: los muestra la ventana común paso a paso (comun/paso-a-paso.js). -->
+<div id="hi-bloques" hidden>
       <div class="hi-paso" data-hi-paso="6"><div class="modos-hab" id="hi-modos"></div></div>
       <div class="hi-paso" data-hi-paso="7">
         <div class="hint" id="hi-ejecucion-resumen" style="margin-bottom:10px"></div>
@@ -682,16 +675,6 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
       <div class="hi-paso" data-hi-paso="5">
         <div class="resumen-hab" id="hi-resumen"></div>
       </div>
-      <div class="paso-nav">
-        <button type="button" class="btn ghost" id="hi-atras">← Atrás</button>
-        <button type="button" class="btn primary" id="hi-siguiente">Siguiente →</button>
-      </div>
-    </div>
-    <footer>
-      <button class="btn ghost" id="habinv-cancel">Cancelar</button>
-      <button class="btn primary" id="habinv-guardar">Guardar</button>
-    </footer>
-  </div>
 </div>
 
 <div class="scrim" id="scrim-portrait">
@@ -920,8 +903,8 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/ficha-acciones.js?v=20261002j"></script>
 <script src="../comun/ficha-duelo.js?v=20261002a"></script>
 <script src="../comun/ficha-lupa.js?v=20261001a"></script>
-<script src="../comun/paso-a-paso.js?v=20261002d"></script>
-<script src="../comun/ficha-editor.js?v=20261002d"></script>
+<script src="../comun/paso-a-paso.js?v=20261002e"></script>
+<script src="../comun/ficha-editor.js?v=20261002e"></script>
 <script src="../comun/editar-item.js?v=20260930a"></script>
 <script src="../comun/skills-clase.js?v=20261002i"></script>
 <script src="../comun/pasivas.js?v=20261002i"></script>
@@ -931,7 +914,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="js/01-modelo-y-reglas.js?v=20261002zr"></script>
 <script src="js/02-recompensas-estados-y-atributos.js?v=20261002zc"></script>
 <script src="js/03-tiradas.js?v=20261001g"></script>
-<script src="js/04-invocaciones.js?v=20261002z"></script>
+<script src="js/04-invocaciones.js?v=20261002zq"></script>
 <script src="js/05-estados-y-botonera.js?v=20261001f"></script>
 <script src="js/06-cajas-y-carga.js?v=20261002y"></script>
 <script src="js/07-editor-y-catalogo.js?v=20261002za"></script>

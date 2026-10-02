@@ -566,11 +566,11 @@ function hiAbrirEjecucion(){
         $('#hi-hpcosto').value = Math.max(0, num(r.costo.hpCosto));
         hiAplicarModoNitros();
       }else{ e.duelo = null; e.modo = 'semi'; }
-      hiMostrarPaso(e.paso);
+      if(e.pap) e.pap.redibujar();
     }});
 }
 
-let editingHabInv = null;   // {invId, habId, paso}
+let editingHabInv = null;   // {invId, habId, modo, duelo, pap}: pap = la ventana común (comun/paso-a-paso.js)
 let editingHabInvPdgAuto = false;
 
 function hiAplicarModoNitros(){
@@ -585,33 +585,32 @@ function hiAplicarModoNitros(){
   else if(modo !== 'ataque' && editingHabInvPdgAuto){ $('#hi-tirada-stat').value = ''; editingHabInvPdgAuto = false; }
 }
 
-// `n` es la posición dentro de los pasos visibles (hiOrden), no el índice de PASOS_HAB_INV.
-function hiMostrarPaso(n){
-  if(!editingHabInv) return;
-  const orden = hiOrden(), total = orden.length;
-  let destino = Math.max(0, Math.min(total - 1, n));
-  if(destino > 0 && editingHabInv.modo === null){ toast('Primero elegí cómo se ejecuta'); destino = 0; }
-  else if(destino > 1 && !$('#hi-nombre').value.trim()){ toast('Primero ponele un nombre'); destino = 1; }
-  editingHabInv.paso = destino;
-  const paso = destino, idx = orden[paso];
-  const nueva = !editingHabInv.habId;
-  const listoParaSeguir = editingHabInv.modo !== null && !!$('#hi-nombre').value.trim();
-  $('#hi-pasos').innerHTML = orden.map((ix, i) => {
-    const bloqueado = nueva && i > paso && !listoParaSeguir;
-    return `<button type="button" class="paso-chip${i === paso ? ' activo' : ''}${i < paso ? ' hecho' : ''}" data-hi-ir="${i}" ${bloqueado ? 'disabled' : ''}>${i + 1}. ${PASOS_HAB_INV[ix].corto}</button>`;
-  }).join('');
-  $('#hi-paso-titulo').textContent = PASOS_HAB_INV[idx].titulo;
-  $('#hi-paso-ayuda').textContent = PASOS_HAB_INV[idx].ayuda;
-  document.querySelectorAll('#scrim-hab-inv .hi-paso').forEach(el => { el.hidden = num(el.dataset.hiPaso) !== idx; });
-  if(idx === 6) hiModosRender();
-  if(idx === 7) hiEjecucionRender();
-  if(idx === 8) hiTrampaRender();
-  $('#hi-atras').style.visibility = paso > 0 ? 'visible' : 'hidden';
-  $('#hi-siguiente').hidden = paso === total - 1;
-  $('#habinv-guardar').hidden = nueva && paso !== total - 1;
-  if(paso === total - 1) $('#hi-resumen').innerHTML = hiResumenHtml();
-  const primero = document.querySelector(`#scrim-hab-inv .hi-paso[data-hi-paso="${idx}"] input:not([type=hidden]),#scrim-hab-inv .hi-paso[data-hi-paso="${idx}"] select,#scrim-hab-inv .hi-paso[data-hi-paso="${idx}"] textarea`);
-  if(primero) setTimeout(() => primero.focus(), 30);
+// `n` es la posición dentro de los pasos visibles (hiOrden), no el índice de PASOS_HAB_INV. Lo que todavía no se puede lo avisa la
+// ventana común (puedeIr).
+function hiMostrarPaso(n){ if(editingHabInv && editingHabInv.pap) editingHabInv.pap.irA(n); }
+// El paso `idx` (índice de PASOS_HAB_INV) para la ventana común: su bloque de ficha.html, tal cual (conserva lo escrito).
+function hiPasoVentana(idx){
+  const P = PASOS_HAB_INV[idx], bloque = document.querySelector(`.hi-paso[data-hi-paso="${idx}"]`);
+  return {id: String(idx), nombre: P.corto, ayuda: `<b>${P.titulo}</b> ${P.ayuda}`, html: () => {
+    if(idx === 6) hiModosRender();
+    if(idx === 7) hiEjecucionRender();
+    if(idx === 8) hiTrampaRender();
+    if(idx === 5) $('#hi-resumen').innerHTML = hiResumenHtml();
+    bloque.hidden = false;
+    return bloque;
+  }, alMontar: () => {
+    const primero = bloque.querySelector('input:not([type=hidden]):not([type=checkbox]),select,textarea');
+    if(primero) setTimeout(() => primero.focus(), 30);
+  }};
+}
+function cerrarEditorHabInv(){
+  const e = editingHabInv;
+  editingHabInv = null;
+  if(e && e.pap) e.pap.cerrar();
+}
+function hiDatosPantalla(){
+  return ['hi-nombre', 'hi-detalle', 'hi-nitros-modo', 'hi-acciones', 'hi-cd', 'hi-hpcosto', 'hi-tirada', 'hi-tirada-stat', 'hi-efecto-nombre', 'hi-efecto-turnos', 'hi-efecto-hpturno', 'hi-efecto-detalle']
+    .map(id => $('#' + id).value).concat([$('#hi-efecto-permanente').checked, $('#hi-trampa-on').checked]);
 }
 
 function hiOpcionesStat(elegido){
@@ -673,8 +672,8 @@ function abrirEditorHabInv(invId, habId){
   if(!inv) return;
   const h = habId ? inv.habilidades.find(x => x.id === habId) : {};
   if(!h) return;
-  editingHabInv = {invId, habId: habId || null, paso: 0, modo: habId ? modoHab(h) : null, duelo: h.duelo && typeof h.duelo === 'object' ? structuredClone(h.duelo) : null};
-  $('#hi-titulo-modal').textContent = habId ? `Editar habilidad · ${inv.nombre}` : `Nueva habilidad · ${inv.nombre}`;
+  cerrarEditorHabInv();
+  editingHabInv = {invId, habId: habId || null, modo: habId ? modoHab(h) : null, duelo: h.duelo && typeof h.duelo === 'object' ? structuredClone(h.duelo) : null};
   $('#hi-nombre').value = h.nombre || '';
   $('#hi-nitros-modo').value = habInvAtaque(h) ? 'ataque' : 'num';
   $('#hi-acciones').value = habInvAtaque(h) ? IT2_INV.nitrosHabilidad : (h.nitrosCosto ?? IT2_INV.nitrosHabilidad);
@@ -695,8 +694,22 @@ function abrirEditorHabInv(invId, habId){
   hiTrampa = h.trampaColocar ? Plantillas.trampaDesde(h.trampaColocar) : null;   // 4f: la trampa que coloca (las viejas se traducen solas)
   $('#hi-trampa-on').checked = !!hiTrampa;
   hiAplicarModoNitros();
-  $('#scrim-hab-inv').classList.add('open');
-  hiMostrarPaso(0);
+  const e = editingHabInv, inicial = JSON.stringify(hiDatosPantalla());
+  e.pap = PasoAPaso.abrir({
+    titulo: habId ? `Editar habilidad · ${inv.nombre}` : `Nueva habilidad · ${inv.nombre}`, crear: !habId, z: 55,
+    pasos: () => hiOrden().map(hiPasoVentana),
+    puedeIr: i => i > 0 && e.modo === null ? 'Primero elegí cómo se ejecuta' : i > 1 && !$('#hi-nombre').value.trim() ? 'Primero ponele un nombre' : '',
+    alClic: ev => { const b = ev.target.closest('[data-hi-modo]'); if(b && editingHabInv === e){ e.modo = b.dataset.hiModo; e.pap.redibujar(); } },
+    alTecla: ev => {
+      if(ev.key !== 'Enter' || !ev.target.matches('[data-hi-enter]')) return;
+      ev.preventDefault();
+      if(e.pap.paso() < hiOrden().length - 1) hiMostrarPaso(e.pap.paso() + 1);
+    },
+    confirmarCancelar: () => JSON.stringify(hiDatosPantalla()) === inicial && e.modo === (habId ? modoHab(h) : null) ? ''
+      : (habId ? '¿Descartar los cambios de esta habilidad?' : '¿Cancelar? La habilidad que estás armando se descarta.'),
+    alGuardar: () => guardarEditorHabInv(), alCrear: () => guardarEditorHabInv(),
+    alCancelar: () => { if(editingHabInv === e) editingHabInv = null; },
+  });
 }
 
 function guardarEditorHabInv(){
@@ -705,7 +718,7 @@ function guardarEditorHabInv(){
   if(!inv){ editingHabInv = null; return; }
   let h = editingHabInv.habId ? inv.habilidades.find(x => x.id === editingHabInv.habId) : null;
   if(editingHabInv.habId && !h){ editingHabInv = null; return; }
-  if(!$('#hi-nombre').value.trim()){ hiMostrarPaso(1); return; }
+  if(!$('#hi-nombre').value.trim()){ hiMostrarPaso(1); if(editingHabInv.pap) editingHabInv.pap.aviso('Ponele un nombre antes de guardarla'); return false; }
   if(!h){
     h = {id: uid(), cdActual: 0};
     inv.habilidades.push(h);
@@ -730,8 +743,7 @@ function guardarEditorHabInv(){
   if(editingHabInv.duelo) h.duelo = editingHabInv.duelo; else delete h.duelo;
   if($('#hi-trampa-on').checked && hiTrampa) h.trampaColocar = {...structuredClone(hiTrampa), nombre: String(hiTrampa.nombre || '').trim().slice(0, 40) || h.nombre};
   else delete h.trampaColocar;
-  editingHabInv = null;
-  $('#scrim-hab-inv').classList.remove('open');
+  cerrarEditorHabInv();
   renderInvocaciones();
   toast(`${h.nombre} guardada`);
 }
@@ -759,31 +771,12 @@ function activarEfectoPresetInv(preset){
 
 // Cableado del editor de habilidad de invocación (campos fijos, no el
 // editor genérico) — mismo patrón que gm-tools con sus habilidades de creep.
-$('#habinv-guardar').onclick = guardarEditorHabInv;
 $('#hi-ejecucion-abrir').onclick = hiAbrirEjecucion;
-$('#hi-modos').addEventListener('click', e => {
-  const b = e.target.closest('[data-hi-modo]');
-  if(!b || !editingHabInv) return;
-  editingHabInv.modo = b.dataset.hiModo;
-  hiMostrarPaso(0);
-});
-$('#hi-pasos').addEventListener('click', e => {
-  const chip = e.target.closest('[data-hi-ir]');
-  if(chip && editingHabInv) hiMostrarPaso(num(chip.dataset.hiIr));
-});
 document.querySelectorAll('[data-hi-nitros-modo]').forEach(b => b.onclick = () => {
   $('#hi-nitros-modo').value = b.dataset.hiNitrosModo;
   hiAplicarModoNitros();
 });
 $('#hi-tirada-stat').addEventListener('change', () => { editingHabInvPdgAuto = false; });
-$('#hi-siguiente').onclick = () => { if(editingHabInv) hiMostrarPaso(editingHabInv.paso + 1); };
-$('#hi-atras').onclick = () => { if(editingHabInv) hiMostrarPaso(editingHabInv.paso - 1); };
-$('#scrim-hab-inv').addEventListener('keydown', e => {
-  if(e.key !== 'Enter' || !editingHabInv || !e.target.matches('[data-hi-enter]')) return;
-  e.preventDefault();
-  if(editingHabInv.paso < hiOrden().length - 1) hiMostrarPaso(editingHabInv.paso + 1);
-});
-$('#hi-nombre').addEventListener('input', () => { if(editingHabInv && !editingHabInv.habId) hiMostrarPaso(editingHabInv.paso); });
 $('#hi-efecto-preset').addEventListener('change', e => {
   if(!e.target.value) return;
   const [tipo, idx] = e.target.value.split(':');
@@ -796,10 +789,9 @@ $('#hi-efecto-preset').addEventListener('change', e => {
   $('#hi-efecto-permanente').checked = !!preset.permanente;
   $('#hi-efecto-polaridad').value = preset.polaridad || 'otro';
   $('#hi-efecto-mods').value = JSON.stringify(preset.mods || []);
+  if(editingHabInv && editingHabInv.pap) editingHabInv.pap.redibujar();   // con estado, el paso Estado ya cuenta en las pestañas
 });
-$('#habinv-cancel').onclick = () => { editingHabInv = null; $('#scrim-hab-inv').classList.remove('open'); };
-$('#habinv-x').onclick = () => { editingHabInv = null; $('#scrim-hab-inv').classList.remove('open'); };
-$('#scrim-hab-inv').addEventListener('mousedown', e => { if(e.target.id==='scrim-hab-inv'){ editingHabInv = null; $('#scrim-hab-inv').classList.remove('open'); } });
+$('#hi-efecto-nombre').addEventListener('change', () => { if(editingHabInv && editingHabInv.pap) editingHabInv.pap.redibujar(); });
 $('#editarinv-x').onclick = cerrarEditarInv;
 $('#scrim-editar-inv').addEventListener('mousedown', e => { if(e.target.id==='scrim-editar-inv') cerrarEditarInv(); });
 $('#botonerainv-x').onclick = () => { botoneraInvId = null; $('#scrim-botonera-inv').classList.remove('open'); };

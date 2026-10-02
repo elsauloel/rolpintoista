@@ -101,6 +101,8 @@ const PasoAPaso = (() => {
     const caja = fondo.firstElementChild;
     const lista = () => (typeof o.pasos === 'function' ? o.pasos() : o.pasos) || [];
     let actual = 0, avisoTxt = '', vivo = true, ocupado = false;
+    let prestado = null;   // {nodo, de}: el bloque ya armado que se está mostrando y de dónde vino (vuelve ahí al cambiar de paso o al cerrar)
+    const devolver = () => { if(prestado && prestado.de) prestado.de.appendChild(prestado.nodo); prestado = null; };
     const api = {
       raiz: caja, cuerpo: null,
       paso: () => actual,
@@ -125,6 +127,7 @@ const PasoAPaso = (() => {
       const titulo = typeof o.titulo === 'function' ? o.titulo(api) : o.titulo;
       const ultimo = actual === pasos.length - 1;
       const scroll = fondo.scrollTop;
+      devolver();
       caja.innerHTML = `<div class="pap-cab"><h3>${esc(titulo)} · paso ${actual + 1} de ${pasos.length}: ${esc(p.nombre)}</h3>
           <button type="button" class="pap-btn chico" data-pap="cancelar">Cancelar</button></div>
         <div class="pap-cuerpo"><div class="pap-pestanas">${pasos.map((x, i) => `<button type="button" class="pap-btn${i === actual ? ' primario' : ''}" data-pap-paso="${i}">${i + 1}. ${esc(x.nombre)}</button>`).join('')}</div>
@@ -138,13 +141,15 @@ const PasoAPaso = (() => {
       api.cuerpo = caja.querySelector('.pap-paso');
       // El contenido: HTML nuevo, o un bloque ya armado (un elemento) que se muestra tal cual y conserva lo escrito al ir y volver.
       const contenido = p.html ? p.html(api) : '';
-      if(contenido instanceof Node) api.cuerpo.appendChild(contenido); else api.cuerpo.innerHTML = contenido || '';
+      if(contenido instanceof Node){ prestado = {nodo: contenido, de: contenido.parentNode}; api.cuerpo.appendChild(contenido); }
+      else api.cuerpo.innerHTML = contenido || '';
       fondo.scrollTop = scroll;
       if(p.alMontar) p.alMontar(api.cuerpo, api);
     }
     function cerrar(){
       if(!vivo) return;
       vivo = false;
+      devolver();
       fondo.remove();
       const k = abiertos.indexOf(control);
       if(k >= 0) abiertos.splice(k, 1);

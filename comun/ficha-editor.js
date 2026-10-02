@@ -549,7 +549,7 @@ const FichaEditor = (() => {
       ed.pap = PasoAPaso.abrir({
         titulo: ed.id ? 'Editar habilidad' : 'Nueva habilidad', crear: !ed.id,
         contenedor: raiz instanceof ShadowRoot ? raiz : document.body,
-        z: Math.max(60, num(getComputedStyle(els.scrim).zIndex) || 0),
+        z: 55,   // encima de las ventanas de la ficha (50) y debajo de las que se abren desde acá (la lista de estados, 60)
         pasos: () => pasosHabilidad(ed.draft).map(p => ({id: p.id, nombre: p.corto, ayuda: `<b>${p.titulo}</b> ${p.ayuda}`, html: () => htmlPasoHabilidad(p)})),
         // Lo primero: cómo se ejecuta; y con nombre ya se puede saltar a cualquier paso.
         puedeIr: i => i > 0 && modoHab(ed.draft) === null ? 'Primero elegí cómo se ejecuta' : i > 1 && !(ed.draft.nombre || '').trim() ? 'Primero ponele un nombre' : '',

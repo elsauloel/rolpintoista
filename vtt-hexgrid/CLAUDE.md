@@ -1158,8 +1158,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
 
 - **Daño a una invocación en el duelo, automático** (2026-10-01, paso 4 etapa 4e): `dueloAplicarDano` ya no lo deja a mano: lee la
   invocación de la parte `invocaciones` de su dueño (`invDeToken`), su Defensa y Armadura mágica con `comun/inv-calculo.js`
-  (`defensasDeInv`) y escribe con `danioInv` (transacción: HP, escudos y `resumen.invocaciones`). Las Espinas de una invocación
-  todavía no se devuelven solas.
+  (`defensasDeInv`) y escribe con `danioInv` (transacción: HP, escudos y `resumen.invocaciones`). Las Espinas también valen con invocaciones (2026-10-02):
+  `dueloEspinas` mira las de la invocación golpeada y le devuelve el daño a una invocación que atacó.
   Desde la tanda 5, **las habilidades de la invocación** también (Ejecutar/Anunciar y la 🎲 segunda tirada: `bnInvAca` con
   `comun/inv-habilidades.js` y `bnInvHabUi`). Solo el Ver sigue yendo a la ficha (tanda 6).
   Desde la tanda 6, **la 🔍 y el Ver** de la invocación también (`comun/inv-lupa.js`: `lupaContenido` reconoce `inv:…`; el Ver en

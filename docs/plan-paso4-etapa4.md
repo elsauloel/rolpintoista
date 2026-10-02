@@ -31,7 +31,7 @@ El mapa guarda con `modificarCreep` (transacción + resumen + firma); GM Tools, 
    "es una invocación"). ✅ los ganchos y el daño automático (2026-10-01).
 5. Las habilidades (`invEjecutarHab` y compañía) ✅ (2026-10-01).
 6. La 🔍 (`lupaHtmlInv`) y el Ver (`verHabInv`) ✅ (2026-10-01). **La 4e está terminada**: con ⚗, la Botonera nueva de una
-   invocación ya no le pide nada a la ficha. Queda: las Espinas de una invocación que recibe un golpe (`dueloEspinas`).
+   invocación ya no le pide nada a la ficha. Las Espinas con invocaciones, también (2026-10-02).
 
 **4d (pendiente del dueño)**: probar las Acciones nuevas de los creeps y la Botonera nueva de las invocaciones en una sesión real (el GM con ⚗ prendido, jugando un combate de verdad) y,
 si andan bien, dejarlas como las de siempre (como la 3d de la Botonera del personaje). Las Acciones nuevas ya no le piden nada
@@ -290,3 +290,7 @@ puede empezar.
   sin el control, solo mirando, ⚗, un Lobo de prueba): las 🔍 de Atacar («Ya atacó: Tipo completo, 8 No2») y de la habilidad
   («faltan 1» de cooldown, tirada del stat y fórmula) y el Ver (costo, cooldown, detalle) se abrieron en el mapa, sin pedir nada a
   la ficha. Restaurado (invocaciones vacías). **La 4e quedó terminada.**
+- 2026-10-02: **Espinas con invocaciones** (50088bb) — `dueloEspinas` mira las Espinas de una invocación que recibe el golpe (sus
+  estados, de la parte `invocaciones` de su dueño) y le devuelve el daño a una invocación que atacó (`danioInv`, directo a la vida).
+  **En vivo** (golpes armados a mano): el Lobo con Espinas recibió 8 y le devolvió 2 al creep (20 → 18); el creep con Espinas
+  recibió 6 del Lobo y le devolvió 2 (10 → 8, guardado con su resumen); a distancia, nada. Restaurado y verificado.

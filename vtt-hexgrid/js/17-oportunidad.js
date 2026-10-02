@@ -10,16 +10,24 @@
    - quien se aleja ve al centro «esperando…» (con «Seguir sin esperar», por si nadie contesta); si lo atacan, su camino se descarta: al
      terminar el duelo sigue su turno como quiera;
    - el resto, en la esquina.
-   Un mismo par (quien se aleja, rival) se ofrece una sola vez por turno (hasta el próximo ⟳ Mantenimiento): si después se vuelve a
-   alejar del mismo rival, no se vuelve a frenar. No aplica en modo narrativo, con 🦶 Mover libre, a un token oculto ni a uno en sigilo. */
+   La oportunidad dura lo que dura el contacto cuerpo a cuerpo (regla del dueño, 2026-10-02): una vez ofrecida (pegue, falle, la dejen
+   pasar o no alcancen los No2) queda usada MIENTRAS los dos sigan pegados — quien se frenó puede alejarse después sin otro ataque —;
+   apenas dejan de estar al lado (se mueva quien se mueva), se renueva: volver a pegarse y alejarse, aunque sea en el mismo turno o en el
+   mismo arrastre, es otro ataque de oportunidad. Sin tope: tantos como alcancen los No2. No aplica en modo narrativo, con 🦶 Mover libre,
+   a un token oculto ni a uno en sigilo. */
 let oportunidadPendiente = null;          // {tokenId, rivalId, resto} frenado acá, a resolver al llegar
-const oportunidadUsadas = new Map();      // 'mover|rival' → número de Mantenimiento en que ya se decidió
+const oportunidadUsadas = new Set();      // 'mover|rival': ya se ofreció y siguen pegados (se borra apenas dejan de estar al lado)
 let oporEspera = null;                    // pantalla de quien se aleja: {momentoId, tokenId, rivalId, resto, resultado}
 let oporDecision = null;                  // pantalla de quien decide: {id, d, armas, paso}
 
 const oporClave = (m, r) => m + '|' + r;
-const oporUsada = (m, r) => oportunidadUsadas.has(oporClave(m, r)) && oportunidadUsadas.get(oporClave(m, r)) === num(mantenimientoNumero);
-const oporMarcar = (m, r) => oportunidadUsadas.set(oporClave(m, r), num(mantenimientoNumero));
+const oporAlLado = (m, r) => { const a = tokens.get(m), b = tokens.get(r); return !!(a && b) && distanciaHex({col: a.col, fila: a.fila}, {col: b.col, fila: b.fila}) === 1; };
+const oporUsada = (m, r) => { oporLimpiar(); return oportunidadUsadas.has(oporClave(m, r)); };
+const oporMarcar = (m, r) => oportunidadUsadas.add(oporClave(m, r));
+// Se olvidan los pares que ya no están pegados (lo llama la llegada de los tokens, js/09: también si se movió el rival).
+function oporLimpiar(){
+  for(const k of [...oportunidadUsadas]){ const [m, r] = k.split('|'); if(!oporAlLado(m, r)) oportunidadUsadas.delete(k); }
+}
 const rutaTokenId = t => { for(const [id, x] of tokens) if(x === t) return id; return ''; };   // la clave de un token (no la lleva adentro)
 // ¿Le alcanzan los No2? (lo público; sin el dato, sí: mejor preguntar que perderlo)
 function oporPuede(r){
@@ -34,13 +42,17 @@ function oportunidadCorte(t, id, ruta){
   if(modoMapa !== 'combate') return null;   // en modo narrativo no hay ataques de oportunidad: se mueve sin frenar
   if(!t || t.oculto || enSigilo(t) || !ruta || ruta.length < 2) return null;
   const rivales = new Set(rivalesDe(t));
-  const ids = [...tokens.entries()].filter(([, r]) => rivales.has(r)).map(([rid, r]) => ({rid, r}))
-    .filter(x => !oporUsada(id, x.rid) && oporPuede(x.r));
+  const ids = [...tokens.entries()].filter(([, r]) => rivales.has(r) && oporPuede(r)).map(([rid, r]) => ({rid, r, usada: oporUsada(id, rid)}));
   if(!ids.length) return null;
   for(let i = 1; i < ruta.length; i++){
     const antes = ruta[i - 1], despues = ruta[i];
-    const x = ids.find(o => distanciaHex(antes, {col: o.r.col, fila: o.r.fila}) === 1 && distanciaHex(despues, {col: o.r.col, fila: o.r.fila}) > 1);
-    if(x) return {indice: i - 1, rivalId: x.rid};
+    for(const o of ids){
+      const c = {col: o.r.col, fila: o.r.fila};
+      if(distanciaHex(antes, c) === 1 && distanciaHex(despues, c) > 1){
+        if(!o.usada) return {indice: i - 1, rivalId: o.rid};
+        o.usada = false;   // se alejó con la oportunidad ya usada: si se vuelve a pegar, es otra
+      }
+    }
   }
   return null;
 }

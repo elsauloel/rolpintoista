@@ -362,29 +362,32 @@ let sigiloFirmaRev = '';
 /* ---------- Ataque de oportunidad: el rival no tiene No2 (2026-10-02, pedido del dueño) ----------
    Cuando un token se aleja de un rival que PUEDE aprovecharlo, el movimiento se frena y se le pregunta (js/17). Si el rival NO tiene
    No2 suficientes (`oporPuede`), no se frena, pero queda dicho: una línea en la Mesa y un momento en la esquina (js/16), «no hay ataque
-   de oportunidad: Fulano no tiene No2 suficientes». Solo en modo combate, no con un token oculto o en sigilo, y una vez por par y turno
-   (como el que sí frena). Se cuenta sobre el camino que de verdad se hizo (después de los cortes). */
+   de oportunidad: Fulano no tiene No2 suficientes». Solo en modo combate, no con un token oculto o en sigilo. Cuenta como oportunidad
+   usada (no se avisa de nuevo mientras sigan pegados); cada vez que se pega y se aleja, otra (js/17). Se cuenta sobre el camino que de
+   verdad se hizo (después de los cortes). */
 function oportunidadEvaluarRuta(t, ruta){
   if(modoMapa !== 'combate') return [];
   if(!ruta || ruta.length < 2) return [];
   if(t.oculto || enSigilo(t)) return [];  // un token oculto no delata su movimiento
   const id = rutaTokenId(t);
   const rivales = new Set(rivalesDe(t));
-  const ids = [...tokens.entries()].filter(([rid, r]) => rivales.has(r) && !oporPuede(r) && !oporUsada(id, rid));
+  const ids = [...tokens.entries()].filter(([, r]) => rivales.has(r) && !oporPuede(r)).map(([rid, r]) => ({rid, r, usada: oporUsada(id, rid)}));
   const salidos = [];
   for(let i = 1; i < ruta.length; i++){
     const antes = ruta[i - 1], despues = ruta[i];
-    ids.forEach(([rid, r]) => {
-      if(salidos.some(x => x.rid === rid)) return;
-      if(distanciaHex(antes, {col: r.col, fila: r.fila}) === 1 && distanciaHex(despues, {col: r.col, fila: r.fila}) > 1) salidos.push({rid, r, mid: id});
+    ids.forEach(o => {
+      const c = {col: o.r.col, fila: o.r.fila};
+      if(distanciaHex(antes, c) === 1 && distanciaHex(despues, c) > 1){
+        if(!o.usada) salidos.push({rid: o.rid, r: o.r});
+        o.usada = false;   // se alejó: si se vuelve a pegar y a alejar en el mismo camino, es otra
+      }
     });
   }
   return salidos;
 }
 async function oportunidadPublicarAvisos(t, salidos){
   if(!salidos || !salidos.length || !fbDb || !fbUsuario || !fbMiembro) return;
-  for(const {rid, r, mid} of salidos){
-    oporMarcar(mid, rid);   // `mid` viene de cuando se soltó: al guardarse el movimiento, el token ya es otro objeto (no se lo encuentra en `tokens`)
+  for(const {r} of salidos){
     const texto = `${nombreDe(t)} se alejó de ${nombreDe(r)}: no hay ataque de oportunidad (${nombreDe(r)} no tiene No2 suficientes)`;
     try{
       await fbDb.collection(fbRutaCampana('tiradas')).add({

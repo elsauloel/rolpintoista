@@ -161,6 +161,7 @@ function escucharTokens(){
     // mucho en notarse aunque la posición ya hubiera llegado por Firebase. Se llama acá
     // también, directo desde la llegada del dato, así no depende de que se esté dibujando.
     sigiloRevisar();
+    if(typeof oporLimpiar === 'function') oporLimpiar();   // ataque de oportunidad: los pares que ya no están pegados se renuevan (js/17)
     pedirDibujo();
   }, err => {
     console.error('Error escuchando los tokens:', err);

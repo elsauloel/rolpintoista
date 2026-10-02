@@ -1333,3 +1333,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
 - **Cabecera por rol** (2026-10-02, pedido del dueño): `#estado` dice «Partida · GM · Usuario» para el GM y «Partida · Personaje · Usuario» para un
   jugador (`actualizarCabecera`, js/01, con `barraTextoRol` de `comun/barra.js`; el personaje es `fichaPrincipalId`: el de su token en el
   mapa que se ve o su primera ficha). Se rearma al llegar miembros, fichas y tokens.
+- **Tanda 6 del paso a paso** (2026-10-02, `../docs/plan-paso-a-paso.md`): **＋ Token nuevo** (`abrirTokenNuevo`, js/09: Qué es · Cuál · Cómo se ve ·
+  Dueño · Listo; el jugador ve «⬇ Traer a … ya») y **Editar token** (`abrirEditarToken`, desde el ✎ del HUD: Vinculado a · Cómo se ve · Dueño, Guardar
+  siempre, «Sacar del mapa» en el pie) en la ventana común; **＋ Nuevo mapa** con `comun/asistente-mapa.js` (los creeps marcados se mudan con
+  `modificarCreep` + `CreepsMapas.mudarTokens`). El mapa carga `comun/paso-a-paso.js` de entrada (ya no como pieza). Se sacaron `#nuevo-token-capa`,
+  `#editar-token-capa` y `#bn-editor` (el editor común de la Botonera nueva abre la ventana común adentro del recuadro).

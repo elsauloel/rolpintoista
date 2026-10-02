@@ -104,7 +104,7 @@
 
 **C. Paso a paso unificado (pedido del dueño, 2026-10-02) → [`plan-paso-a-paso.md`](plan-paso-a-paso.md):** una sola ventana para crear y editar
 (`comun/paso-a-paso.js`) y todos los asistentes sobre ella, en tandas; al final, el asistente de **personaje nuevo**, y después, cómo se ven los ítems
-en el catálogo y las tiendas. Tanda 1 hecha (la pieza + el asistente de creeps, probado en vivo en «Claude · pruebas»).
+en el catálogo y las tiendas. Tandas 1–6 hechas y probadas en vivo (2026-10-02); sigue la 7 (personaje nuevo).
 
 **B. Puntual (después de A):**
 7. [x] **Una invocación sin No2 para atacar, adentro del duelo** — hecho 2026-10-02: pregunta «¿Atacar igual?» (duelo, Botonera de la

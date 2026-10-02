@@ -1147,4 +1147,11 @@ versión parecida en más de una, es candidato a juntar.
   pestañas saltan hasta donde lo anterior está completo (`faltaAntes(i)` como `puedeIr`) y `alCancelar` de cada uno se llama al cancelar. Ya no
   existen `#ae-fondo`, `#at-fondo`, `#az-fondo`, `#ep-fondo` ni `#adh-fondo`: para "¿hay una ventana abierta?" alcanza con `.pap-fondo`. Un Escape
   lo atiende solo la ventana de más arriba (`stopImmediatePropagation`), así no cierra también la ventana que la abrió.
+  **Tanda 6 (2026-10-02):** `asistente-mapa.js` (abajo); `FichaEditor.crear(donde, ctx)` ya no recibe una ventana (`donde` = dónde se abre la
+  ventana común: `document.body` en la ficha, el recuadro aislado en el mapa) y **todo** lo edita por pasos — el formulario genérico se arma con
+  `pasosFormulario(key, draft)` (pasivas, talentos, estados, consumibles y el «formulario completo» de un ítem) + `htmlFormulario(key, draft,
+  bloques)` + Resumen; `CreepEditor.crearEstado(contenedor, ctx)` → `{abrir, cerrar, raiz, estado}` (Qué es · Duración · Vida · Números · Resumen).
+- **`asistente-mapa.js`** (`AsistenteMapa`, 2026-10-02, tanda 6) — «＋ Mapa nuevo» paso a paso: Nombre → Creeps (cuáles se mudan a este mapa, agrupados
+  por dónde están) → Listo. `abrir({nombre, creeps: [{id, nombre, donde}], marcados, alCrear({nombre, creeps}), alCancelar})`; no escribe nada: el
+  mapa (`crearMapa`, js/01) y GM Tools (`pedirMapaNuevo`, js/09) crean el mapa y mudan los creeps a su manera.
 

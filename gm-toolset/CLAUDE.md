@@ -443,4 +443,6 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   se guarda) hasta «✔ Crear»; Cancelar lo descarta. Editar: Guardar siempre visible; Cancelar repone la copia del creep (pregunta si cambió algo).
 - **El editor de habilidades de creep, en la ventana común** (2026-10-02, tanda 2): `comun/creep-editor.js` abre `comun/paso-a-paso.js` con los
   bloques de cada paso; ya no existe `#scrim-hab-creep` (ni su CSS). Mismo en las Acciones del mapa.
-
+- **Tanda 6 del paso a paso** (2026-10-02): **＋ Mapa nuevo** (`pedirMapaNuevo(marcado)`, js/09) con `comun/asistente-mapa.js` (los creeps marcados se
+  mudan con `moverCreepAMapa`; desde «Mover a… ＋ mapa nuevo» el creep arranca marcado) y el editor de **estados de creep** en la ventana común
+  (`CreepEditor.crearEstado(document.body, …)`, sin `#scrim-estado-creep`).

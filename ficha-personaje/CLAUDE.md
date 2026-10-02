@@ -673,4 +673,7 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   componente `comun/ficha-editor.js` abre `comun/paso-a-paso.js` en vez de su ventana) y la de una invocación (`abrirEditorHabInv`, js/04: los
   bloques de cada paso viven en `#hi-bloques` de ficha.html y la ventana común los muestra; ya no existe `#scrim-hab-inv`). Pestañas que saltan,
   Guardar siempre al editar, «✔ Crear» al final, Eliminar en el pie. Se sacó el CSS de `.pasos-hab`/`.paso-chip`.
-
+- **Tanda 6 del paso a paso** (2026-10-02): el editor común (`editorFicha = FichaEditor.crear(document.body, …)`) edita por pasos también pasivas,
+  talentos, estados y consumibles (se sacó la ventana `#scrim` y su `#modal-activar`); **＋ Invocación** abre el editor de la invocación paso a paso
+  (`abrirEditarInv(id, {nueva})`, js/04: `INV_PASOS`, `invPasoHtml`; los campos se guardan al escribir con los manejadores de siempre de js/06; al
+  editar, Cancelar repone la copia; al crear, Cancelar la saca). Se sacó `#scrim-editar-inv`.

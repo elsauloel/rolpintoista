@@ -62,6 +62,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js"></script>
 <script src="inv-botonera.js"></script>
+<script src="inv-acciones.js"></script>
 <script src="ficha-acciones.js"></script>
 <script src="tiradas-propias.js"></script>
 <script src="efectos-golpe.js"></script>
@@ -1004,6 +1005,17 @@ prueba('FichaSesion: la primera carga espera al servidor (no arma el personaje c
   alPartes.cb(snap(true, ['invocaciones']));
   alPartes.cb(snap(false, ['general', 'invocaciones', 'otros']));
   return f.cola.then(() => igual([alPartes.opc && alPartes.opc.includeMetadataChanges, cargas], [true, ['general,invocaciones,otros']]));
+});
+
+prueba('botones de una invocación: el Parry cobra y deja el Bloqueo pendiente; atacar cobra Tipo ÷ 2 el primero y suma al conteo', () => {
+  const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, armaNombre: 'Colmillo', armaTipo: 8, armaPeso: 2, nitros: 5});
+  const sinParry = InvAcciones.tirarStat(inv, 'bloqueo', {});
+  const p = InvAcciones.tirarStat(inv, 'parry', {});
+  const b = InvAcciones.tirarStat(inv, 'bloqueo', {parryPendiente: true});
+  const a = InvAcciones.pagarAtaque(inv);
+  const caro = InvAcciones.pagarAtaque(Object.assign({}, inv, {nitros: 1}));
+  igual([!!sinParry.error, p.parry, p.cambio, b.parry, b.tirada.origen, inv.nitros, inv.ataquesTurno, !!caro.error, InvAcciones.ataqueDuelo(inv).tipoDado],
+    [true, 'poner', true, 'sacar', 'Lobo · Bloqueo', 0, 1, true, 8]);
 });
 
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */

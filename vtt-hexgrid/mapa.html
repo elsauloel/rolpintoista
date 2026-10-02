@@ -9097,7 +9097,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001c',
-  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/inv-calculo.js?v=20261001b', '../comun/inv-botonera.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001h',
+  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/inv-calculo.js?v=20261001b', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001h',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
@@ -9206,10 +9206,81 @@ function bnDibujarInv(cuerpo){
       <div style="display:flex;gap:6px;flex:none"><button class="iconbtn" data-bn-cerrar title="Cerrar (B o Esc)">Cerrar</button></div>
     </header>`;
   if(inv.activa === false){ cuerpo.innerHTML = marco(cab(inv.nombre) + `<div class="body"><div class="hint">${esc(inv.nombre)} está dormida — tocá «Invocar» en la ficha para reactivarla.</div></div>`); return; }
-  const r = InvBotonera.html(inv, {lupa: false});
+  const r = InvBotonera.html(inv, {lupa: false, parryPendiente: !!(bn.invParry && bn.invParry.has(inv.id))});
   const scroll = bn.host.scrollTop;
   cuerpo.innerHTML = marco(cab(r.titulo, r.badge) + `<div class="body" id="botonerainv-body">${r.html}</div>`);
   bn.host.scrollTop = scroll;
+}
+/* Paso 4, etapa 4e (tanda 3): los botones de la invocación que ya hace el mapa — tiradas de stats, Esquivar, Parry, Bloqueo,
+   Daño y Atacar — con comun/inv-acciones.js (el mismo código que la ficha). Como los del personaje, solo si este usuario puede
+   guardarlo (bnPuedeGuardar); si no, van a la ficha del marco. Lo que cambia a la invocación (el Parry, el ataque) se guarda en
+   la parte `invocaciones` del personaje (bnUi). El Parry que espera su Bloqueo vive acá (bn.invParry). Las tiradas se publican a
+   nombre de la invocación y con la ficha de su dueño, como las publica la ficha. */
+function bnPublicarInv(inv, t){
+  if(!t) return;
+  if(t.error){ toast(t.error); return; }
+  mesaPublicar(t.origen, {...t.r, quien: inv.nombre, ficha: bn.fichaId});
+  window.dispatchEvent(new CustomEvent('tirada-registrada', {detail: {origen: t.origen, r: t.r}}));
+}
+function bnInvAca(b){
+  const d = b.dataset, ref = d.invtirarstat || d.invatacar || d.invdanio;
+  if(!ref || !bnPuedeGuardar()) return false;
+  const inv = (bn.S.invocaciones || []).find(x => x && x.id === ref.split(':')[0]);
+  if(!inv){ toast('Esa invocación ya no está'); return true; }
+  InvCalculo.migrar(inv);   // como la ficha al dibujarla (una vieja puede no tener todos los campos)
+  if(!bn.invParry) bn.invParry = new Set();
+  if(d.invtirarstat){
+    const ui = bnUi(FichaGuardado.partes(bn.S));
+    const p = InvAcciones.tirarStat(inv, d.invtirarstat.split(':')[1], {parryPendiente: bn.invParry.has(inv.id)});
+    if(p.error){ toast(p.error); return true; }
+    if(p.parry === 'sacar') bn.invParry.delete(inv.id);
+    if(p.parry === 'poner') bn.invParry.add(inv.id);
+    if(p.cambio) ui.cambio(); else if(p.parry) bnDibujar();
+    if(p.aviso) toast(p.aviso);
+    bnPublicarInv(inv, p.tirada);
+    return true;
+  }
+  if(d.invdanio){
+    const t = InvAcciones.dano(inv);
+    if(!t) return true;
+    bnPublicarInv(inv, t);
+    // Los efectos al golpear de su arma: recordar y tirar, no aplicar (como la ficha).
+    if((inv.armaEfectos || []).length) EfectosGolpe.alPegar({arma: inv.armaNombre || 'el arma', efectos: inv.armaEfectos, publicar: linea => {
+      if(!fbDb || !fbUsuario || !fbMiembro) return;
+      fbDb.collection(fbRutaCampana('tiradas')).add({
+        uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: inv.nombre,
+        origen: linea.origen.slice(0, 120), formula: linea.formula.slice(0, 900),
+        rolls: linea.rolls.slice(0, 100), mod: 0, total: 0, desde: 'efecto',
+        cuando: firebase.firestore.FieldValue.serverTimestamp(),
+      }).catch(err => console.error('No se pudieron publicar los efectos en la Mesa:', err));
+    }});
+    return true;
+  }
+  bnInvAtacar(inv.id);
+  return true;
+}
+// Atacar con la invocación: el objetivo con un clic en el token (dueloElegirObjetivoMapa, a su nombre: `fichaId~invId`) y el
+// duelo; "Sin objetivo" (o sin duelo) cobra y tira el PdG acá.
+function bnInvAtacar(invId){
+  const buscar = () => (bn && bn.S && (bn.S.invocaciones || []).find(x => x && x.id === invId)) || null;
+  const hacer = () => {
+    const inv = buscar();
+    if(!inv) return;
+    const ui = bnUi(FichaGuardado.partes(bn.S));
+    const p = InvAcciones.pagarAtaque(inv);
+    if(p.error){ toast(p.error); return; }
+    if(bn.invParry) bn.invParry.delete(inv.id);   // atacar cierra el Parry que esperaba su Bloqueo
+    ui.cambio();
+    bnPublicarInv(inv, InvAcciones.tiradaAtaque(inv));
+    toast(p.aviso);
+  };
+  const inv = buscar();
+  if(!inv) return;
+  if(typeof Duelo === 'undefined' || !Duelo.disponible()){ hacer(); return; }
+  const reabrir = () => { if(bn){ bn.host.hidden = false; bnUbicar(); bnDibujar(); } };
+  bn.host.hidden = true;
+  dueloElegirObjetivoMapa({yo: {ref: bn.fichaId + SEP_INVOCACION + inv.id, tipo: 'pj', nombre: inv.nombre}, ataque: InvAcciones.ataqueDuelo(inv),
+    conSuelto: true, alSuelto: () => { reabrir(); hacer(); }, alCancelar: () => {}});
 }
 // Un botón de la Botonera nueva: se lo pide a la ficha escondida en el marco (la carga si hace falta).
 function bnDelegar(datos){ bnAlMarco({tipo: 'botonera-delegar', datos, ...(bn.invId ? {inv: bn.invId} : {})}); }
@@ -9665,7 +9736,7 @@ function bnCrear(){
       return;
     }
     if(!bn.S) return;
-    if(bnTirarAca(b) || bnAccionAca(b)) return;
+    if(bn.invId ? bnInvAca(b) : (bnTirarAca(b) || bnAccionAca(b))) return;
     const datos = {...b.dataset};
     if(!Object.keys(datos).length) return;
     bnDelegar(datos);

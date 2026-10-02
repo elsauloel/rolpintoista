@@ -348,10 +348,11 @@ function verHabInv(invId, habId){
    mecánica que un creep, publicado en la Mesa a su propio nombre
    ("Invocación · Acción", igual que gm-tools arma "Creep · Acción"). ---------- */
 // La misma tirada que el personaje y los creeps (comun/combatiente.js): con Afortunado también tira dos veces (P100).
-function tirarValorStatInv(inv, nombre, valor, statId){
-  const r = Combatiente.tirarStat(valor, inv.estados, statId);
-  if(!r){ toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
-  registrarTirada(`${inv.nombre} · ${nombre}`, r);
+function tirarValorStatInv(inv, nombre, valor, statId){ publicarTiradaInv(InvAcciones.tirada(inv, nombre, valor, statId)); }   // comun/inv-acciones.js (4e, tanda 3)
+function publicarTiradaInv(t){
+  if(!t) return;
+  if(t.error){ toast(t.error); return; }
+  registrarTirada(t.origen, t.r);
 }
 // Atacar con una invocación: igual que el personaje, primero se elige el token al que ataca (duelo, comun/duelo.js).
 function invAtacar(invId){
@@ -359,36 +360,25 @@ function invAtacar(invId){
   if(!inv) return;
   if(typeof Duelo !== 'undefined' && Duelo.disponible() && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM){
     Duelo.elegirObjetivo({yo: {ref: fichaVivo.id + '~' + inv.id, tipo: 'pj', nombre: inv.nombre},
-      ataque: {tipo: 'normal', armaId: '', armaNombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8, rango: !!inv.armaDeRango, alcance: inv.armaDeRango ? Math.max(1, Math.round(num(invStatValor(inv, 'rng')))) : 1}, suelto: () => invAtacarSuelto(invId)});
+      ataque: InvAcciones.ataqueDuelo(inv), suelto: () => invAtacarSuelto(invId)});
   }else invAtacarSuelto(invId);
 }
 function invAtacarSuelto(invId){
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
-  const costo = costoAtaqueInv(inv);
-  if(costo > num(inv.nitros)){
-    toast(`${inv.nombre}: no le alcanzan los Nitros — este ataque cuesta ${fmt(costo)} y tiene ${fmt(num(inv.nitros))}`);
-    return;
-  }
-  const primero = num(inv.ataquesTurno) === 0;
-  inv.nitros = num(inv.nitros) - costo;
-  inv.ataquesTurno = num(inv.ataquesTurno) + 1;
+  const p = InvAcciones.pagarAtaque(inv);   // comun/inv-acciones.js
+  if(p.error){ toast(p.error); return; }
   parryPendienteInv.delete(inv.id);   // atacar cierra el Parry que esperaba su Bloqueo
   renderInvocaciones();
-  tirarValorStatInv(inv, 'Atacar (PdG)', invStatValor(inv, 'pdg'), 'pdg');
-  toast(`${inv.nombre}: -${fmt(costo)} No2 · ${primero ? 'primer ataque del turno' : 'ataque extra'}`);
+  publicarTiradaInv(InvAcciones.tiradaAtaque(inv));
+  toast(p.aviso);
 }
 function invDanio(invId, sinEfectos, mods){   // sinEfectos: el duelo resuelve los efectos del golpe por su cuenta; mods: lo que suma un ataque con arreglos
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
-  let formula = invDanoTxt(inv, invStatValor(inv, 'dmg'));
-  if(mods){
-    if(num(mods.dados) > 0) formula += ` + ${Math.round(num(mods.dados))}d${num(inv.armaTipo) || 8}`;
-    if(num(mods.fijo)) formula += ` ${num(mods.fijo) > 0 ? '+' : '-'} ${fmt(Math.abs(num(mods.fijo)))}`;
-  }
-  const r = tirarDados(formula);
-  if(!r) return;
-  registrarTirada(`${inv.nombre} · Daño Arma`, r);
+  const t = InvAcciones.dano(inv, mods);   // comun/inv-acciones.js
+  if(!t) return;
+  registrarTirada(t.origen, t.r);
   if(!sinEfectos && (inv.armaEfectos||[]).length) EfectosGolpe.alPegar({
     arma: inv.armaNombre || 'el arma',
     efectos: inv.armaEfectos,
@@ -410,25 +400,13 @@ const parryPendienteInv = new Set();
 function invTirarStat(invId, statId, o){
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
-  if((statId === 'parry' || statId === 'bloqueo') && !defensaInv(inv)){ toast(`${inv.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`); return; }
-  if(statId === 'bloqueo'){
-    if(!(o && o.trasParry) && !parryPendienteInv.has(inv.id)){ toast(`${inv.nombre}: ${Combatiente.BLOQUEO_SOLO_TRAS_PARRY}`); return; }
-    parryPendienteInv.delete(inv.id);
-    renderInvocaciones();
-  }
-  if(statId === 'parry'){
-    const costo = Combatiente.costoParry();   // el Parry siempre cuesta 1 No2
-    if(costo > num(inv.nitros)){
-      toast(`${inv.nombre}: no le alcanzan los No2 — el Parry cuesta ${fmt(costo)} No2 y tiene ${fmt(num(inv.nitros))}`);
-      return;
-    }
-    inv.nitros = num(inv.nitros) - costo;
-    parryPendienteInv.add(inv.id);   // si gana el Parry, sigue el Bloqueo
-    renderInvocaciones();
-    toast(`${inv.nombre}: Parry −${fmt(costo)} No2 · quedan ${fmt(inv.nitros)}`);
-  }
-  const valor = statId === 'bloqueo' ? bloqueoValorInv(inv) : invStatValor(inv, statId);
-  tirarValorStatInv(inv, STAT_LABEL[statId] || statId, valor, statId);
+  const p = InvAcciones.tirarStat(inv, statId, {...(o || {}), parryPendiente: parryPendienteInv.has(inv.id)});   // comun/inv-acciones.js
+  if(p.error){ toast(p.error); return; }
+  if(p.parry === 'sacar') parryPendienteInv.delete(inv.id);
+  if(p.parry === 'poner') parryPendienteInv.add(inv.id);
+  if(p.parry) renderInvocaciones();
+  if(p.aviso) toast(p.aviso);
+  publicarTiradaInv(p.tirada);
 }
 function habilidadInvTira(h){ return !!(h.tiradaStat || (h.tiradaExtra||'').trim()); }
 function mesaPublicarHabilidadInv(inv, nombre, detalle){

@@ -402,12 +402,18 @@ async function zonaResolverBanner(){
     if(el.zonaDanoDif) monto = diferencia;
     else{ const r = tirarDados(el.zonaDano); if(r) monto = r.total; }
     const tipoTxt = el.zonaDanoTipo ? ` ${el.zonaDanoTipo}` : '';
+    // Una zona de HABILIDAD cuyo daño ignora la Defensa es daño de casteo: le resta la Armadura mágica de quien lo recibe, como en el
+    // duelo (dueloAplicarDano). Lo confirmó el dueño para el tóxico (P142, 2026-10-02). Las zonas del GM y de trampas, no.
+    const armadmg = !el.zonaIgnoraDef || !el.zonaCasteadorRef ? 0
+      : t.tipo === 'creep' ? (() => { const sc = creepPrivadoDe(t.fichaId); return sc ? creepArmadmgMapa(sc) : 0; })()
+      : (() => { const f = fichasPub.get(t.fichaId); return f && f.resumen ? num(f.resumen.armadmg || 0) : 0; })();
     if(monto > 0){
       try{
-        if(t.tipo === 'creep') await danioCreep(t, String(monto), !!el.zonaIgnoraDef);
-        else if(puedoMover(t)) await danioPj(t, String(monto), !!el.zonaIgnoraDef);
-        partes.push(`${monto} de daño${tipoTxt}`);
-        danoHecho = monto;
+        let res = null;
+        if(t.tipo === 'creep') res = await danioCreep(t, String(monto), !!el.zonaIgnoraDef, armadmg);
+        else if(puedoMover(t)) res = await danioPj(t, String(monto), !!el.zonaIgnoraDef, armadmg);
+        partes.push(`${monto} de daño${tipoTxt}${armadmg > 0 ? ` (− ${armadmg} de Armadura mágica)` : ''}`);
+        danoHecho = res && res.r ? num(res.r.recibido) : monto;   // lo que llegó a la vida (escudos y Armadura mágica ya restados)
       }catch(err){ console.error('No se pudo aplicar el daño de la zona:', err); partes.push(`${monto} de daño${tipoTxt} (aplicalo a mano)`); danoHecho = monto; }
     }else if(monto === 0) partes.push('sin daño');
   }

@@ -1085,3 +1085,16 @@ versión parecida en más de una, es candidato a juntar.
     `despojar`), más `lineaVerde`. El estado (antes `combateRep`, `xpContarEscapados`, `botinGM` de GM Tools) se pasa como parámetro.
     `confirmar(texto)` y `alEmpezar()` los pone cada pantalla. Lo usan GM Tools (`js/08`, `js/09`) y el mapa del GM (`js/18`). Necesita
     `creep-calculo.js` e `items-subidos.js` (`sinAviso`).
+- **`ficha-editor.js`** (`FichaEditor`, 2026-10-02, hoja de ruta A6b, `../docs/plan-a6b-editor.md`) — **el editor de la ficha, común**: las
+  tablas (`SCHEMA`, `CAMPO_LABEL`, `CAMPO_NUM`: qué campos tiene cada tipo de entrada), `borrador`, `getModVal`/`setModVal`,
+  `itemComoEntradaDeCatalogo`, `PASOS_HAB`/`MODOS_HAB`/`pasosHabilidad`/`habLegado`, `statOptions`, `agregarEstadoConAviso`,
+  `resumenEjecucionHab`, `abrirEjecucionHab`, `tipoItemHtml`, `subirAlCatalogo`, `imagenADatos` (antes `fileToDataURL`), `portador`, y
+  **`crear(els, ctx)`**: el editor como componente sobre una ventana que pone cada pantalla (`els` = scrim, título, cuerpo y los botones del
+  pie) — formulario, paso a paso de habilidades, trampa, estado al usar/equipar, imagen, mods, Guardar/Eliminar, el asistente de ítems, la
+  Ejecución ✨. `ctx = {S(), toast, confirmar, alCambiar(keys), elegirTipoItem(actual), elegirEstadoItem(), elegirEstadoDuelo(),
+  alSubirCatalogo(), alCerrar?()}`. Devuelve `{abrir(key, id, equipadoPreset, opciones), cerrar, dibujar, irAPaso, abrirAsistenteItem,
+  aplicarTipoItem, estado}`. Lo usan la ficha (`editorFicha`, js/10) y el mapa (`bnEditar`, adentro de la Botonera nueva). **Un campo nuevo
+  de un tipo de entrada** va en `SCHEMA` de este archivo (y en `CAMPO_LABEL`, y en `CAMPO_NUM` si es un número). Los botones del editor
+  llevan `data-ed` (antes ids), así andan también adentro del recuadro aislado del mapa.
+- **`ficha-acciones.js`, ✚ Revivir** (2026-10-02, A6b): `hpRevivir(S, modo, pct, valor)` → `{hpmax, val}` y `revivir(S, val)`. Lo usan la
+  ficha y el mapa (`abrirRevivirMapa`).

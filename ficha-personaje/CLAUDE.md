@@ -657,3 +657,11 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   de un atributo o una fórmula en `js/06`) usan `comun/ficha-stats.js`; la ventana de la Moneda (`renderReroll`, `repetirTirada`, el clic de
   una tirada) usa `comun/ficha-duelo.js` (`rerollHtml`, `usarReroll`). El mapa abre las mismas ventanas él mismo, sin la ficha escondida:
   los mensajes `abrir-stats` y `abrir-reroll` quedaron sin uso (limpieza A′).
+- **El editor, común** (2026-10-02, hoja de ruta A6b, `../docs/plan-a6b-editor.md`): `openEditor`, `drawEditor`, `closeModal`,
+  `abrirAsistenteItem`, `habilidadIrAPaso` son atajos al componente de `comun/ficha-editor.js` (`editorFicha`, al final de `js/10`, sobre la
+  ventana `#scrim` de siempre); `editing` es un getter sobre su estado. `SCHEMA`/`CAMPO_LABEL`/`CAMPO_NUM` (js/07), `statOptions`,
+  `resumenEjecucionHab`, `abrirEjecucionHab` (js/02), `fileToDataURL` (js/01) y `agregarEstadoConAviso` (js/07) también son atajos. La categoría
+  de un ítem (`elegirTipoItemFicha`) y el "estado al usar" (`elegirEstadoItemFicha`, la grilla de presets con destino `'item'`) devuelven
+  promesas que usa el componente. Los botones del editor llevan `data-ed` en vez de id (el CSS de "Guardar como preset" también). El ✚ Revivir
+  usa `FichaAcciones.hpRevivir`/`revivir`. El mapa ya no pide `editar-en-ficha`, `abrir-revivir` ni el `editar-estado` de un personaje:
+  quedan para la limpieza (A′).

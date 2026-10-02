@@ -6,8 +6,7 @@
 
 ## ▶ Para retomar
 
-- **Hecho**: b0 (✚ Revivir).
-- **Sigue**: b1.
+- **Hecho**: todo (b0–b5, 2026-10-02). La A6b está terminada; sigue la **A6c** (el editor de creeps), en [`pendientes.md`](pendientes.md) §0.
 - Antes de cada tanda: `git status`, `git log --oneline -5`; después: `comun/pruebas.html` en verde, prueba en vivo en
   "Test con claude elsaulo" (GM con 🎮 Silvia, fichaId `auUUMObQv3EVeeWgwh7c`), subir `?v=` de cada archivo tocado.
 
@@ -37,18 +36,38 @@ Todo vive hoy en `ficha-personaje/js/10-habilidades-pasivas-e-items.js` (y algo 
 
 - [x] **b0. ✚ Revivir** (2026-10-02): `FichaAcciones.hpRevivir`/`revivir`; el mapa muestra el diálogo en la Botonera nueva
   (`abrirRevivirMapa`). Probado en vivo: Silvia en 0 → 50 % = 10/20 → valor neto 7 → revive con 7 y deja de estar inconsciente.
-- [ ] **b1. Las tablas y los ayudantes puros** a `comun/ficha-editor.js` (`FichaEditor`): `SCHEMA`, `CAMPO_LABEL`, `CAMPO_NUM`, el
+- [x] **b1. Las tablas y los ayudantes puros** (2026-10-02) a `comun/ficha-editor.js` (`FichaEditor`): `SCHEMA`, `CAMPO_LABEL`, `CAMPO_NUM`, el
   borrador por defecto de `openEditor`, `getModVal`/`setModVal`, `itemComoEntradaDeCatalogo`, `PASOS_HAB`, `MODOS_HAB`,
   `pasosHabilidad`, `habLegado`. La ficha, atajos. Pruebas: el borrador, los pasos según el modo, setModVal.
-- [ ] **b2. El dibujo**: `FichaEditor.html(S, ed)` (formulario y paso a paso, con estado al usar / al equipar, trampa, imagen, mods)
+- [x] **b2. El dibujo** (2026-10-02, junto con la b3): `FichaEditor.html(S, ed)` (formulario y paso a paso, con estado al usar / al equipar, trampa, imagen, mods)
   → la ficha pone el HTML en `#modal-body`. Lo que dependía de variables de la ficha (job disponible, costo de ataque, slots) sale
   de `S` con las piezas comunes.
-- [ ] **b3. Los manejadores y Guardar/Eliminar**: `FichaEditor.cambio(S, ed, t)`, `clic(S, ed, b, ui)`, `guardar(S, ed, ui)`,
+- [x] **b3. Los manejadores y Guardar/Eliminar** (2026-10-02): `FichaEditor.cambio(S, ed, t)`, `clic(S, ed, b, ui)`, `guardar(S, ed, ui)`,
   `eliminar(S, ed, ui)`; `ui` = lo que hace cada pantalla (redibujar, carteles, ventanitas). Las ventanitas (categoría, presets
   para "estado al usar", Ejecución, trampa, imagen) pasan por `ui` o por piezas comunes (`SelectorEstados` para los presets: una
   sola grilla en todos lados).
-- [ ] **b4. El mapa**: la ventana del editor adentro de la Botonera nueva (`#bn-editor`), el Editar del Ver la abre (sin la ficha
+- [x] **b4. El mapa** (2026-10-02): la ventana del editor adentro de la Botonera nueva (`#bn-editor`), el Editar del Ver la abre (sin la ficha
   escondida); guardar con `bnUi`. Lo mismo para el asistente de ítems (`portadorFicha` → común).
-- [ ] **b5. El ⚙ de un estado** del HUD para personajes e invocaciones abre el editor común en el mapa (los creeps van con la A6c).
-- [ ] Documentar (CLAUDE.md de comun, ficha y mapa; pendientes §0) y sumar a la limpieza A′ lo que quede sin uso
-  (`editar-en-ficha`, `abrir-revivir`).
+- [x] **b5. El ⚙ de un estado** (2026-10-02) del HUD para personajes e invocaciones abre el editor común en el mapa (los creeps van con la A6c).
+- [x] Documentado (CLAUDE.md de comun, ficha y mapa; pendientes §0; limpieza A′).
+
+## Cómo quedó (2026-10-02)
+
+- **`comun/ficha-editor.js`** (`FichaEditor`): las tablas (`SCHEMA`, `CAMPO_LABEL`, `CAMPO_NUM`), el borrador, los pasos de una
+  habilidad, y **`crear(els, ctx)`**: el editor como componente (formulario, paso a paso de habilidades, trampa, estado al usar y al
+  equipar, imagen, modificadores, Guardar/Eliminar, el asistente de ítems, la Ejecución ✨, ⬆ Subir al catálogo). Copiado de la ficha y
+  comparado función por función contra el original (las únicas diferencias: los ids pasaron a `data-ed`, `S` sale de `ctx.S()`, y lo
+  que cada pantalla muestra a su manera va por `ctx`).
+- **La ficha** usa el componente en su ventana `#scrim` (`editorFicha`, js/10); `openEditor`, `drawEditor`, `closeModal`,
+  `abrirAsistenteItem`, `habilidadIrAPaso` y `editing` (un getter) son atajos. La categoría (`elegirTipoItemFicha`) y el "estado al
+  usar" (`elegirEstadoItemFicha`, la grilla de siempre con destino `'item'`) devuelven promesas.
+- **El mapa** lo muestra adentro de la Botonera nueva (`#bn-editor`, `bnEditar`, `bnCrearEditor`; la categoría en `#bn-tipoitem`); los
+  estados de la lista con el selector común (`SelectorEstados`). El ⚙ de un estado del HUD (`abrirEditarEstadoMapa`) abre el editor; el
+  GM sin el control también puede (`bnUi(antes, comoGM)`, como "Editar como GM").
+- **Probado en vivo** ("Test con claude elsaulo"): en la ficha, una habilidad (pasos, ✨ Ejecución, 🪤 trampa), una pasiva nueva, el
+  asistente de un ítem, un consumible con categoría y "estado al usar" (Regeneración 4 HP × 3 turnos), guardar y eliminar; en el mapa, el
+  Editar del Ver de una habilidad (guardado en Firebase), el Editar del Equipo (asistente), un consumible nuevo con categoría y estado
+  elegido con el selector común, guardado y borrado, la ✨ Ejecución y la 🪤 trampa; el ⚙ de un estado en Silvia (con el control) y en
+  Xeena (el GM sin el control): 2 → 5 turnos.
+- **Diferencia en el mapa**: el selector común no tiene "— Empezar en blanco —" para la Ejecución (en la ficha sí): se elige un estado
+  de la lista o se cancela.

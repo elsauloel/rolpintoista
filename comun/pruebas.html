@@ -1364,8 +1364,8 @@ function fbFalso(datos){
   });
   return {
     collection: col,
-    doc: ruta => ({get: async () => ({exists: ruta in datos, data: () => datos[ruta]}), delete: async () => { delete datos[ruta]; }}),
-    batch: () => { const ops = []; return {delete: r => ops.push(() => delete datos[r.ruta]), set: (r, d) => ops.push(() => { datos[r.ruta] = d; }), commit: async () => ops.forEach(f => f())}; },
+    doc: ruta => ({ruta, get: async () => ({exists: ruta in datos, data: () => datos[ruta]}), delete: async () => { delete datos[ruta]; }}),
+    batch: () => { const ops = []; return {delete: r => ops.push(() => delete datos[r.ruta]), update: (r, d) => ops.push(() => { const x = {...(datos[r.ruta] || {}), ...d}; Object.keys(x).forEach(k => { if(x[k] === '__borrar') delete x[k]; }); datos[r.ruta] = x; }), set: (r, d) => ops.push(() => { datos[r.ruta] = d; }), commit: async () => ops.forEach(f => f())}; },
   };
 }
 let fbFalsoCola = Promise.resolve();   // de a una: las pruebas async corren a la vez y comparten window.fbDb
@@ -1373,7 +1373,7 @@ function conFbFalso(datos, fn){ const p = fbFalsoCola.then(() => conFbFalsoYa(da
 async function conFbFalsoYa(datos, fn){
   const antes = {fbDb: window.fbDb, fbRutaCampana: window.fbRutaCampana, firebase: window.firebase, fbUsuario: window.fbUsuario};
   window.fbDb = fbFalso(datos); window.fbRutaCampana = p => p; window.fbUsuario = {uid: 'gm'};
-  window.firebase = {firestore: {FieldValue: {serverTimestamp: () => 'ahora'}}};
+  window.firebase = {firestore: {FieldValue: {serverTimestamp: () => 'ahora', delete: () => '__borrar'}}};
   try{ return await fn(); }finally{ Object.assign(window, antes); }
 }
 prueba('creeps por mapa: el orden de las pestañas y el mapa de un creep (si su mapa ya no existe, la Reserva)', () => {
@@ -1383,14 +1383,14 @@ prueba('creeps por mapa: el orden de las pestañas y el mapa de un creep (si su 
     [['Cueva', 'Aldea', 'Bosque'], 'b', '', '']);
 });
 prueba('creeps por mapa: los grupos viejos pasan a ser mapas (con token → el mapa del token; vinculado → su mapa; con el nombre de un mapa → ese; si no, uno nuevo; los vacíos también)', () => conFbFalso({
-    'mapas/_principal': {nombre: 'Mapa 1'}, 'mapas/m2': {nombre: 'Mina'}, 'gm/gruposMapas': {enlaces: [{grupo: 'Goblins', mapaId: 'm2'}]}, 'tokens/t9': {tipo: 'creep', fichaId: 'd'},
+    'mapas/_principal': {nombre: 'Mapa 1'}, 'mapas/m2': {nombre: 'Mina'}, 'gm/gruposMapas': {enlaces: [{grupo: 'Goblins', mapaId: 'm2'}]}, 'tokens/t9': {tipo: 'creep', fichaId: 'd'}, 'creeps/a': {nombre: 'A', grupo: 'Goblins'},
   }, async () => {
     const creeps = [{id: 'a', grupo: 'Goblins'}, {id: 'b', grupo: 'mina'}, {id: 'c', grupo: 'Pantano'}, {id: 'd', grupo: 'Pantano'}, {id: 'e'}, {id: 'f', grupo: 'X', mapa: 'm2'}];
     const r = await CreepsMapas.migrar(creeps, {vacios: ['Torre']});
     const mapas = (await fbDb.collection('mapas').get()).docs.map(d => d.data().nombre).sort();
     const otra = await CreepsMapas.migrar(creeps, {});
-    igual([r, creeps.map(c => c.mapa || ''), creeps.some(c => 'grupo' in c), mapas, (await fbDb.doc('gm/gruposMapas').get()).exists, otra],
-      [{cambiados: 4, creados: 2}, ['m2', 'm2', creeps[2].mapa, '_principal', '', 'm2'], false, ['Mapa 1', 'Mina', 'Pantano', 'Torre'], false, {cambiados: 0, creados: 0}]);
+    igual([r, creeps.map(c => c.mapa || ''), creeps.some(c => 'grupo' in c), mapas, (await fbDb.doc('gm/gruposMapas').get()).exists, otra, (await fbDb.doc('creeps/a').get()).data()],
+      [{cambiados: 4, creados: 2}, ['m2', 'm2', creeps[2].mapa, '_principal', '', 'm2'], false, ['Mapa 1', 'Mina', 'Pantano', 'Torre'], false, {cambiados: 0, creados: 0}, {nombre: 'A'}]);
   }));
 prueba('creeps por mapa: mudar un creep se lleva su token (sale del mapa viejo y aparece oculto en el nuevo); a la Reserva solo lo saca', () => conFbFalso({
     'mapas/_principal': {nombre: 'Mapa 1'}, 'mapas/m2': {nombre: 'Mina'},

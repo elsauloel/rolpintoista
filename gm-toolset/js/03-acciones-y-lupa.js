@@ -227,12 +227,13 @@ function cardCompactoHtml(sc){
   <div class="card card-compacto${num(sc.hp)<=0?' card-muerto':''}" style="--accent:${sc.color}" data-id="${sc.id}">
     <div class="chead">
       <button type="button" class="eyebtn" data-editarcreep="${sc.id}" title="Editar creep">${SVG_LAPIZ}</button>
-      <span class="name-compacto">${esc(sc.nombre)}</span>${mapaSelectHtml(sc, true)}
+      <span class="name-compacto">${esc(sc.nombre)}</span>
       <span class="lv-compacto">Lv ${fmt(num(sc.nivel))}</span>
       ${versionNuevaDeCreep(sc) ? `<button class="verbtn" data-versioncreep="${sc.id}" title="Alguien corrigió el creep de la biblioteca del que salió este: ver y decidir si actualizarlo">🔔</button>` : ''}
       <button class="verbtn" data-ver="${sc.id}">Ver</button>
       <button class="xbtn" data-del="${sc.id}" title="Eliminar creep">×</button>
     </div>
+    <div class="mapa-fila">${mapaSelectHtml(sc, true)}</div>
     ${muertoBadgeHtml(sc)}
     <div class="cbody-compacto">
       <div class="vitalbar">

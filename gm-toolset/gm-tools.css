@@ -639,7 +639,8 @@ input[type=file]{display:none}
 .hint{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted)}
 .modal .body{padding:14px 16px}
 /* Grupos como contenedores: el creep se arrastra (⠿) hasta la pestaña de otro grupo. */
-.card-compacto .chead select.mapa-creep{width:auto;max-width:118px;font-size:11px;padding:1px 4px;margin-left:4px;flex:0 1 auto}
+.card-compacto .mapa-fila{padding:3px 10px;border-bottom:1px solid var(--line-soft)}
+.card-compacto .mapa-fila select.mapa-creep{width:auto;max-width:100%;font-size:11.5px;padding:1px 4px}
 /* Bitácora del GM: mismo formato que la de los jugadores (ficha.html). */
 .bitacora-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}
 .bit-entradas{display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow-y:auto;margin-bottom:9px}

@@ -94,6 +94,10 @@ const CreepsMapas = (() => {
       creados++;
     }
     conGrupo.forEach(sc => { sc.mapa = tokenEn.get(sc.id) || destino.get(sc.grupo) || RESERVA; });
+    // El campo viejo, también de la parte pública (la que leen el mapa y los jugadores).
+    const lote = fbDb.batch();
+    conGrupo.forEach(sc => lote.update(fbDb.doc(fbRutaCampana(`creeps/${sc.id}`)), {grupo: firebase.firestore.FieldValue.delete()}));
+    await lote.commit().catch(err => console.error('No se pudo limpiar el grupo viejo de los creeps:', err));
     creeps.forEach(sc => { if(sc && 'grupo' in sc) delete sc.grupo; });
     if(enl.exists) await refEnlaces.delete();
     return {cambiados: conGrupo.length, creados};

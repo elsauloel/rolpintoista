@@ -489,8 +489,9 @@ estado: confirmado
 Cuando **dos fichas de bandos distintos están adyacentes** (un casillero) y una **se aleja**, la otra tiene un **ataque de oportunidad**.
 
 - **Se puede hacer si tenés [[Nitros (No2)|No2]] disponibles**, y **cuesta lo mismo que un primer ataque**.
-- **No para el juego**: el mapa no frena el movimiento ni te obliga a nada. Solo avisa **en rojo, en la [[Mesa]]**, con los dos nombres — "*Fulano* se alejó de *Mengano*: posible ataque de oportunidad" — para que no se olvide de resolverse. **La tirada en sí es a mano.**
-- Se dispara la **primera vez** que dejás de estar adyacente durante el movimiento (si te alejás y volvés a acercarte en la misma jugada, ya sonó el aviso una vez).
+- **En el mapa, en modo combate**: si el rival **tiene los No2**, el movimiento **se frena** en el último casillero al lado y a quien maneja al rival le aparece al centro «¿Ataque de oportunidad?». Si dice que no, el otro sigue su camino; si dice que sí (y elige el arma, si tiene más de una con No2), se abre el duelo.
+- Si el rival **no tiene los No2**, no se frena nada, pero queda dicho en la [[Mesa]] y en la esquina del mapa: "*Fulano* se alejó de *Mengano*: no hay ataque de oportunidad (*Mengano* no tiene No2 suficientes)".
+- Cada par (quien se aleja, el rival) se ofrece **una vez por turno**: si en el mismo turno te volvés a acercar y a alejar del mismo rival, ya no se pregunta ni se avisa de nuevo.
 
 > [!info] Diseño futuro
 > Es la base para habilidades que jueguen con esto más adelante: más PdG o Evasión en ataques de oportunidad, habilidades que dejan bloquearlos, etc.

@@ -1243,3 +1243,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   ya no sale para quien no puede aprovecharlo o ya decidió. **Probado en vivo** (combate, Silvia con el control del GM): No → el creep
   siguió y se volvió a frenar al alejarse de Xeena; «Seguir sin esperar» → siguió; Sí → duelo de oportunidad con la Cimitarra (pagó 3 No2,
   pegó 7), «Terminar duelo»; todo restaurado.
+- **Ataque de oportunidad sin No2: no frena, pero avisa** (2026-10-02, pedido del dueño): si el rival del que se aleja NO tiene los No2
+  (`!oporPuede`), `oportunidadEvaluarRuta` (js/02; solo en combate, no oculto ni en sigilo, par no usado) lo cuenta sobre el camino hecho y
+  `oportunidadPublicarAvisos` publica en la Mesa (`desde: 'recordatorio'`) «⚔ Fulano se alejó de Mengano: no hay ataque de oportunidad
+  (Mengano no tiene No2 suficientes)» y un momento `oportunidad-sin` para la esquina; marca el par (una vez por turno, con el id `mid` que
+  viene de cuando se soltó). Reemplaza a la vieja línea roja «posible ataque de oportunidad». Probado en vivo (creep con 0 No2: avisó una
+  vez; al volver a acercarse y alejarse en el mismo turno, nada).

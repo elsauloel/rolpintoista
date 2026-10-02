@@ -6,8 +6,7 @@
 
 ## ▶ Para retomar
 
-- **Hecho**: c1 y c2 (2026-10-02).
-- **Sigue**: c3 (el editor de un estado de creep).
+- **Hecho**: todo (c1–c3, 2026-10-02). La A6c está terminada.
 - Antes de cada tanda: `git status`, `git log --oneline -5`. Probar primero en local (`.claude/launch.json` → "archivos", puerto 8765:
   `comun/pruebas.html`), después en "Test con claude elsaulo" (GM; creep de prueba `nvjcz6l`, token `QQUKbhYKfI1JcXBzj0rp`).
 
@@ -37,5 +36,8 @@ bloquea la limpieza A′. Si más adelante se quiere editar el creep entero aden
   con `modificarCreep`.
 - [x] **c2. ⬆ Subir y ↻ Reemplazar** (2026-10-02; probado en el mapa: Reemplazar abrió la biblioteca con su título, «Golpe fuerte» quedó
   en el lugar de la vieja con su origen; Subir abre el cartel de la biblioteca —cancelado, para no subir una de prueba—) de una habilidad de creep: comunes (`Biblioteca` ya lo es); el mapa los hace sin GM Tools.
-- [ ] **c3. El editor de un estado de creep** (`#scrim-estado-creep`) común; el ⚙ del HUD de un creep lo abre en el mapa.
-- [ ] Documentar y sumar a la limpieza A′: `acDelegar`/`acciones-delegar` (y el `boton` de `verhab-*`), el `editar-estado` de un creep.
+- [x] **c3. El editor de un estado de creep** (2026-10-02): `CreepEditor.crearEstado`; GM Tools lo usa con sus "Mis presets" (y el
+  "formulario completo" del asistente de estados le pasa `inicial`); el ⚙ del HUD de un creep lo abre en el mapa (`abrirEditarEstadoCreepMapa`,
+  sin "Mis presets": pendientes 7b). Probado: en GM Tools, Quemadura 2 → 4 turnos; en el mapa, el ⚙ de Pajaritos → 3 turnos en Firebase, sin
+  GM Tools, y las Acciones (abiertas solo para eso) se cerraron solas.
+- [x] Documentado y sumado a la limpieza A′: `acDelegar`/`acciones-delegar` (y el `boton` de `verhab-*`), el `editar-estado` de un creep.

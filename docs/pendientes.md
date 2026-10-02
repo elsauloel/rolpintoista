@@ -78,8 +78,12 @@
    - [x] **6b. El editor de la ficha** (2026-10-02): `comun/ficha-editor.js`, un componente que usan la ficha (en su ventana de siempre) y el
      mapa (adentro de la Botonera nueva, sin la ficha escondida); también el ✚ Revivir y el ⚙ de un estado. Detalle y pruebas en
      [`plan-a6b-editor.md`](plan-a6b-editor.md).
-   - [ ] **6c. El editor de creeps** (GM Tools) en piezas comunes: el editor de habilidades, Subir/Reemplazar y el editor de estados de un
-     creep. Por tandas, en [`plan-a6c-editor-creeps.md`](plan-a6c-editor-creeps.md) (ver su «▶ Para retomar»).
+   - [x] **6c. El editor de creeps** (2026-10-02): `comun/creep-editor.js` — el editor de habilidades (paso a paso), Subir/Reemplazar y el
+     editor de estados de un creep, que usan GM Tools (atajos) y el mapa (adentro de las Acciones nuevas). Detalle en
+     [`plan-a6c-editor-creeps.md`](plan-a6c-editor-creeps.md). La ficha completa del creep sigue siendo la pantalla de GM Tools (se abre
+     en otra pestaña, no por el marco).
+   - **Con esto, nada de la Botonera ni de las Acciones depende del marco escondido**: la A está terminada salvo la limpieza (A′), que
+     espera tres sesiones reales.
    - [ ] Después, la **limpieza** (A′): borrar el marco y lo que quedó sin uso.
 
 **A′. Limpieza: borrar el camino viejo (cuándo y cómo, criterio propuesto por el asistente, 2026-10-02; el dueño lo dejó a su criterio):**
@@ -88,7 +92,8 @@
   false`) ni apareció un problema que solo se arregle con lo viejo. Mientras tanto queda "dormido", sin tocarlo ni probarlo.
 - **Cómo** — de a un paso y probando: sacar `BN_SIEMPRE`, el interruptor ⚗ y `bnAlternar`; los pedidos de botón al marco
   (`bnDelegar`/`botonera-delegar`, `acDelegar`/`acciones-delegar`) y lo que los atiende en la ficha y en GM Tools (`modo=botonera` sin
-  mensaje, `modo=acciones`); la ficha liviana vieja (`fichaMapaAbrir`, `abrir-ficha-mapa`); `abrir-equipo`/`equipoModoAbrir` (A4); `abrir-botin`/`botinModoAbrir` y `abrir-tienda` (A5); `abrir-stats`, `abrir-reroll`, `abrir-revivir`, `editar-en-ficha` y el `editar-estado` de un personaje (A6b), `abrir-ver-creep` (y el `&ver=1` de
+  mensaje, `modo=acciones`); la ficha liviana vieja (`fichaMapaAbrir`, `abrir-ficha-mapa`); `abrir-equipo`/`equipoModoAbrir` (A4); `abrir-botin`/`botinModoAbrir` y `abrir-tienda` (A5); `abrir-stats`, `abrir-reroll`, `abrir-revivir`, `editar-en-ficha` y el `editar-estado` de un personaje (A6b), el `editar-estado` de un
+  creep y el `boton` de `acciones-delegar` (A6c), `abrir-ver-creep` (y el `&ver=1` de
   GM Tools), `abrirModoGM` y el `?modo=finalizar|botin` de GM Tools (A6a); el Mantenimiento en un marco invisible (en el
   mapa `mantenimientoEncolar`/`mantenimientoSiguiente`/`mantenimientoCerrarMarco` y el aviso `mantenimiento-listo`; en la ficha y en GM
   Tools el `?modo=mantenimiento`), sin uso desde A2/A2b; los mensajes que queden sin uso en `comun/mensajes-mapa.js`. **No** se borra la Botonera de la ficha suelta (`ficha.html` sin el mapa): usa las mismas piezas de

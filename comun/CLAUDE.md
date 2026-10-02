@@ -1098,3 +1098,12 @@ versión parecida en más de una, es candidato a juntar.
   llevan `data-ed` (antes ids), así andan también adentro del recuadro aislado del mapa.
 - **`ficha-acciones.js`, ✚ Revivir** (2026-10-02, A6b): `hpRevivir(S, modo, pct, valor)` → `{hpmax, val}` y `revivir(S, val)`. Lo usan la
   ficha y el mapa (`abrirRevivirMapa`).
+- **`creep-editor.js`** (`CreepEditor`, 2026-10-02, hoja de ruta A6c, `../docs/plan-a6c-editor-creeps.md`) — **el editor de creeps, común**:
+  `crear(contenedor, ctx, {id})` (el editor paso a paso de una habilidad de creep, que arma su propia ventana —la de GM Tools, con `data-hc`—;
+  `ctx = {creep(scId), guardarHab(scId, aplicar), personalizados(), elegirEstadoDuelo(), toast, alCerrar?}`; `abrir(scId, habId, {borrador,
+  alGuardar, encima})`), `crearEstado(contenedor, ctx, {id})` (el editor de un estado de creep, `data-ec`; `ctx = {creep, guardar(scId,
+  aplicar), toast, confirmar?, alCerrar?, personalizados?(), guardarPresets?(lista)}`; `abrir(scId, esId, inicial)`), las habilidades de la
+  biblioteca para un creep (`habDeBiblioteca`, `subirHab`, `ponerHab`, `elegirDeBiblioteca`, `LEGADO_HABS`, `paraDeDatos`, `PARA_TXT`,
+  `HABS_CREEP_GRUPOS`), `MODOS_HAB_CREEP`, `PASOS_HAB_CREEP`, `statLabel`, `opcionesStat`, `opcionesEstadosHtml`, `textoEstadoAgregado`. Lo
+  usan GM Tools (en `#scrim-hab-creep` / `#scrim-estado-creep`, que crea el componente) y el mapa (adentro de las Acciones nuevas). Para
+  Reemplazar con recetas de fábrica necesita `creeps-base.js` + `skills-creep-base.js` (el mapa los carga recién ahí).

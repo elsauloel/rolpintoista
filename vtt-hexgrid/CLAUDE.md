@@ -1313,3 +1313,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   estado** del HUD (`abrirEditarEstado` → `abrirEditarEstadoMapa`) abre ese editor (la Botonera se abre solo para eso, `bn.soloEditor`); el GM
   sin 🎮 el control también puede (`bnUi(antes, comoGM)`, como "Editar como GM"); una invocación abre su Botonera. El **✚ Revivir** de la
   pantalla de muerte abre `#bn-revivir` (`abrirRevivirMapa`). Los creeps (su ⚙ y su editor) siguen en GM Tools: A6c.
+- **Hoja de ruta A6c: el editor de creeps, hecho por el mapa** (2026-10-02, `../docs/plan-a6c-editor-creeps.md`): desde el Ver de una
+  habilidad de las Acciones nuevas, **✎ Editar** (`acEditarHab`, el componente de `comun/creep-editor.js` adentro del recuadro, guarda con
+  `acCambiarCreep`), **⬆ Subir** (`acSubirHab`) y **↻ Reemplazar** (`acReemplazarHab`; carga `creeps-base.js` + `skills-creep-base.js`,
+  `ACE_BASE`); el **⚙ de un estado de un creep** (`abrirEditarEstadoCreepMapa`, `CreepEditor.crearEstado`; las Acciones se abren solo para eso,
+  `ac.soloEstado`). Los estados para la Ejecución, con `SelectorEstados`. Ya no se usa `acDelegar` para nada de esto (limpieza A′).

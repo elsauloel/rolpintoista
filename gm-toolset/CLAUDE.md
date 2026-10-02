@@ -422,3 +422,10 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   `verCreepDatos` y `verItemDatos` arman su HTML con `comun/creep-lupa.js` (`verCreep`, `verItem`). El mapa del GM muestra las mismas
   ventanas él mismo (`vtt-hexgrid/js/18-ventanas-gm.js`): el `?modo=finalizar|botin` y el `&ver=1` de `modo=acciones` quedaron sin uso
   (limpieza A′).
+
+- **El editor de creeps, en `comun/creep-editor.js`** (2026-10-02, hoja de ruta A6c): el editor de habilidades (`editorHabCreep`, js/04;
+  `abrirEditorHabCreep` es un atajo; la ventana `#scrim-hab-creep` ya no está en `gm-tools.html`: la arma el componente), Subir y Reemplazar
+  (`proponerHabilidadABiblioteca`, `abrirCatalogoHabilidades`, `habDeBiblioteca`… atajos en js/05) y el editor de un estado (`editorEstadoCreep`,
+  js/05; `abrirEditorEstadoCreep(scId, esId, inicial)`; tampoco está ya `#scrim-estado-creep` en el HTML). `MODOS_HAB_CREEP`,
+  `HABS_CREEP_GRUPOS`, `textoEstadoAgregado` y `hcStatLabel` son atajos. El mapa usa las mismas piezas y ya no le pide nada a GM Tools
+  escondido: `acciones-delegar` y el `editar-estado` de un creep quedaron sin uso (limpieza A′).

@@ -555,70 +555,10 @@ function editarHabDeCreepBib(scId, habId){
 }
 let verCreepMesaId = null;   // el creep de la mesa que se está viendo (para el botón ✎ Editar)
 function verCreepDatos(sc, completo){
-  // Recuadro con título chico y valor destacado; tip = texto al pasar el mouse.
-  const caja = (label, valor, tip) => `<div class="vc-caja${tip ? ' con-tip' : ''}"${tip ? ` data-tip="${esc(tip)}"` : ''}>
-      <span class="vc-caja-label">${esc(label)}</span><span class="vc-caja-valor">${esc(valor)}</span></div>`;
-  const seccion = (titulo, contenido) => `<div class="vc-seccion"><div class="sect-label">${esc(titulo)}</div>${contenido}</div>`;
-
-  const critLabels = ['Tipo 4','Tipo 6','Tipo 8','Tipo 10','Tipo 12'];
-  const crits = sc.crit.map((v, i) => num(v) ? caja(`Res. ${critLabels[i]}`, conSigno(creepCritEfectivo(sc, i)), critOrigenTxt(sc, i)) : '').join('');
-
-  const habilidades = sc.habilidades.map(h => {
-    const partes = [];
-    const costo = costoNitrosHabCreep(sc, h);
-    partes.push(costoHabCreepTxt(sc, h));
-    if(num(h.cd) > 0) partes.push(`CD ${fmt(num(h.cd))}`);
-    const tip = `${partes.join(' · ')}\n${h.detalle || 'Sin descripción.'}`;
-    return `<span class="vc-chip con-tip" data-tip="${esc(tip)}">${esc(h.nombre || '(sin nombre)')}</span>`;
-  }).join('');
-
-  const estados = sc.estados.map(es => {
-    const dura = es.permanente ? 'permanente' : `${fmt(num(es.turnos))}t`;
-    return `<span class="vc-chip vc-estado-${es.polaridad || 'otro'} con-tip" data-tip="${esc(es.detalle || 'Sin descripción.')}">${esc(es.nombre || '(sin nombre)')} · ${dura}</span>`;
-  }).join('');
-
-  // Todo lo equipado: el arma y cada pieza de armadura, con su número destacado.
-  const equipado = (nombre, tipo, valor, detalle) => `<div class="vc-equipo">
-      <div class="equipo-item-top">
-        <span class="equipado-nombre">${esc(nombre)}</span>
-        <span class="valor-caja">${valor}</span>
-      </div>
-      <div class="equipo-item-meta">${esc(tipo)}</div>
-      ${detalle ? `<div class="arma-detalle">${esc(detalle)}</div>` : ''}
-    </div>`;
-  const equipo = [
-    equipado(sc.armaNombre || 'Arma sin nombre', sc.armaDeRango ? 'Arma de rango' : 'Arma', esc(danoTxt(sc)),
-      [sc.armaDetalle, (sc.armaEfectos || []).length ? `Al golpear: ${EfectosGolpe.resumenLista(sc.armaEfectos)}` : ''].filter(Boolean).join(' · ')),
-    ...(sc.equipo || []).map(it => equipado(it.nombre || '(sin nombre)', TIPOITEM_LABEL_GM[it.tipoItem] || it.tipoItem || '', `<small>DEF</small>+${fmt(num(it.def))}`, it.detalle)),
-  ].join('');
-
-  $('#view-title-header').textContent = sc.nombre || 'Creep';
-  $('#view-body').innerHTML = `
-    <div class="view-wrap">
-      <div class="view-image-wrap">${sc.imagen ? `<img src="${esc(sc.imagen)}" class="view-image" alt="">` : `<span class="view-image-empty">Sin imagen</span>`}</div>
-      <div class="view-info">
-        <div class="view-title">${esc(sc.nombre)} <span class="vc-nivel">Lv ${fmt(num(sc.nivel))}</span></div>
-        <div class="vc-cajas vc-2">
-          ${caja('HP', `${fmt(num(sc.hp))} / ${fmt(num(sc.hpMax))}`)}
-          ${caja('No2', `${fmt(num(sc.nitros))} / ${fmt(creepNitrosMax(sc))}`)}
-        </div>
-        <div class="sect-label" style="margin-top:12px">Estados alterados</div>
-        ${estados ? `<div class="vc-chips" style="margin-top:6px">${estados}</div>` : '<div class="hint" style="margin-top:4px">Sin estados.</div>'}
-      </div>
-    </div>
-    <div class="vc-cuerpo">
-      ${seccion('Atributos', `<div class="vc-cajas vc-5">${ATTR_IDS.map(a => {
-        const mod = creepModTotal(sc, a);
-        return `<div class="attr-col">${caja(ATTR_LABELS[a], fmt(num(sc[a]) + mod), mod ? `Base ${fmt(num(sc[a]))} ${conSigno(mod)} por ${origenesModCreep(sc, a).join(', ')}` : '')}${derivadosHtml(sc, a)}</div>`;
-      }).join('')}</div>`)}
-      ${seccion('Daño y defensa', `<div class="vc-cajas vc-2">
-        ${caja('Daño', ataqueCreepTxt(sc), ataqueOrigenTxt(sc))}
-        ${caja('Defensa', fmt(creepDefensaEfectiva(sc)), defensaOrigenTxt(sc))}
-        ${creepArmadmgEfectiva(sc) ? caja('Armadura mágica', fmt(creepArmadmgEfectiva(sc)), armadmgOrigenTxt(sc)) : ''}
-      </div>
-      ${crits ? `<div class="vc-cajas vc-5">${crits}</div>` : ''}`)}
-      ${seccion('Habilidades', completo
-        ? (sc.habilidades.length ? sc.habilidades.map(h => `<div class="vc-equipo">
+  // El dibujo es común (comun/creep-lupa.js, A6a: el mapa muestra el mismo); acá, para un creep de la biblioteca, la lista de
+  // habilidades con sus botones (Ver, ✎ Editar, 📚 Biblioteca).
+  const habsCompleto = completo
+    ? (sc.habilidades.length ? sc.habilidades.map(h => `<div class="vc-equipo">
             <div class="equipo-item-top"><span class="equipado-nombre">${esc(h.nombre || '(sin nombre)')}</span>
               <span class="vc-hab-acc">
                 <button type="button" class="btn ghost" data-vc-hab="ver" data-vc-id="${esc(h.id)}" title="Ver la habilidad en detalle">👁 Ver</button>
@@ -627,12 +567,10 @@ function verCreepDatos(sc, completo){
               </span></div>
             <div class="equipo-item-meta">${esc([costoHabCreepTxt(sc, h), num(h.cd) > 0 ? `CD ${fmt(num(h.cd))}` : '', h.cdArranca ? 'lenta (arranca en cooldown)' : ''].filter(Boolean).join(' · '))}</div>
             ${h.detalle ? `<div class="arma-detalle">${esc(h.detalle)}</div>` : ''}</div>`).join('') : '<div class="hint">Sin habilidades.</div>')
-        : (habilidades ? `<div class="vc-chips">${habilidades}</div>` : '<div class="hint">Sin habilidades.</div>'))}
-      ${seccion('Equipo', `<div class="vc-equipos">${equipo}</div>`)}
-      ${seccion('Recompensas', recompensasVerHtml(sc))}
-    </div>
-    ${sc.notas ? `<div class="view-detalle"><span class="view-label">Notas</span>${esc(sc.notas)}</div>` : ''}
-  `;
+    : undefined;
+  const v = CreepLupa.verCreep(sc, {habilidades: habsCompleto});
+  $('#view-title-header').textContent = v.titulo;
+  $('#view-body').innerHTML = v.html;
   $('#scrim-view').classList.toggle('desde-biblioteca', !!completo);   // por encima de la ventana de la biblioteca
   // Un creep de la mesa (no una copia de la biblioteca): el pie trae solo «✎ Editar», que abre la ficha completa para modificar los stats a mano.
   const enMesa = !completo && !sc._borrador;

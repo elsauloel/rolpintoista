@@ -1000,6 +1000,21 @@ prueba('normalizar pasa Inteligencia a Especial, corre la escala de Tipos y saca
   const sc = CreepCalculo.normalizar({nombre: 'Viejo', int: 3, armaTipo: 6, habilidades: [{nombre: 'Movimiento'}, {nombre: 'Golpe', detalle: 'Crítico 4 y 6', tiradaStat: 'int'}]});
   igual([sc.esp, sc.int, sc.armaTipo, sc.habilidades.length, sc.habilidades[0].tiradaStat, sc.habilidades[0].detalle, sc.crit], [3, undefined, 8, 1, 'esp', 'Crítico 6 y 8', [0, 0, 0, 0, 0]]);
 });
+prueba('recompensas de un creep: oro sugerido por tipo y nivel (jefe ×2), trofeo del arma natural y lo que suelta', () => {
+  const humano = creepPrueba({tipoCriatura: 'humano', nivel: 2}), jefe = creepPrueba({tipoCriatura: 'humanoide', nivel: 2, jefe: true});
+  const bestia = creepPrueba({nombre: 'Lobo (auditar)', tipoCriatura: 'bestia', nivel: 3, armaNatural: true, armaNombre: 'Colmillos'});
+  const tr = CreepCalculo.trofeo(bestia);
+  igual([CreepCalculo.oroSugerido(humano), CreepCalculo.oroSugerido(jefe), CreepCalculo.oroSugerido(bestia), tr.nombre, tr.precioCompra, CreepCalculo.despojosDePrecio(tr.precioCompra),
+    CreepCalculo.trofeo(humano), CreepCalculo.dropsResumen(creepPrueba({oroBase: 10, equipo: [{nombre: 'Yelmo'}]})), CreepCalculo.tipoDe(creepPrueba({tipoCriatura: 'otros', tipoCriaturaOtro: ' Gólem '}))],
+    [40, 40, 0, 'Colmillos de Lobo', 50, 13, null, 'Hacha (arma equipable) · Yelmo (equipo) · 10 DDE de oro (±20% al final del combate)', 'gólem']);
+});
+prueba('el «Ver» de un creep (comun/creep-lupa.js): título, nivel, habilidades en chips o la lista que se le pase, recompensas', () => {
+  const sc = creepPrueba({nivel: 2, habilidades: [{id: 'h', nombre: 'Rugido', cd: 2}], notas: 'Huele mal'});
+  const v = CreepLupa.verCreep(sc), otra = CreepLupa.verCreep(sc, {habilidades: '<i>lista propia</i>'});
+  igual([v.titulo, v.html.includes('Lv 2'), v.html.includes('vc-chip con-tip" data-tip="1 No2 · CD 2'), otra.html.includes('<i>lista propia</i>'), otra.html.includes('vc-chip con-tip'),
+    v.html.includes('Al morir suelta:</b> Hacha (arma equipable)'), v.html.includes('Huele mal'), CreepLupa.derivadosHtml(sc, 'des').includes('data-deriv="pdg"')],
+    ['Orco', true, true, true, false, true, true, true]);
+});
 
 prueba('las Acciones de un creep: sin arma no hay Parry; el Bloqueo se habilita tras un Parry; Anunciar en una manual', () => {
   const sc = creepPrueba({id: 'k', nitros: 6, habilidades: [{id: 'h1', nombre: 'Rugido', automatizada: false}, {id: 'h2', nombre: 'Mordisco', nitrosCosto: 2, cd: 2, cdActual: 1}]});

@@ -324,11 +324,7 @@ function abrirEquiparCreep(scId){
   $('#scrim-equipar-creep').classList.add('open');
 }
 
-const TIPOITEM_LABEL_GM = {
-  escudo_1m:'Escudo 1 mano', escudo_2m:'Escudo 2 manos',
-  armadura_blanda:'Armadura blanda', armadura_rigida:'Armadura rígida',
-  manos:'Manos', cabeza:'Cabeza', pies:'Pies', piernas:'Piernas',
-};
+const TIPOITEM_LABEL_GM = CreepCalculo.TIPOITEM_LABEL;   // comun/creep-calculo.js
 const TIPO_STAT_A_CRIT_IDX = {tipo1:0, tipo2:1, tipo3:2, tipo4:3, tipo5:4};
 
 // Aplica (signo 1) o revierte (signo -1) los modificadores de un ítem de

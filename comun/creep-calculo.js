@@ -470,7 +470,58 @@ const CreepCalculo = (() => {
     return sc;
   }
 
+  /* ---------- Recompensas del creep: oro, arma natural y trofeo (2026-10-02, hoja de ruta A6a) ----------
+     Copiado tal cual de gm-toolset/js/02 (tipoDeCreep, oroSugeridoCreep, trofeoDeCreep, dropsResumenCreep…): lo usan GM Tools y
+     el «Ver» de un creep (comun/creep-lupa.js), también en el mapa. */
+  const TIPOS_CRIATURA = ['humano', 'humanoide', 'bestia', 'planta', 'elemental', 'constructo', 'no-muerto', 'alienígena'];
+  const TIPOS_CON_ARMA_NATURAL = ['bestia', 'planta', 'elemental', 'alienígena', 'constructo', 'no-muerto'];
+  const TROFEO_PRECIO_NIVEL = [16, 30, 50, 75, 110];
+  const TIPOITEM_LABEL = {
+    escudo_1m:'Escudo 1 mano', escudo_2m:'Escudo 2 manos',
+    armadura_blanda:'Armadura blanda', armadura_rigida:'Armadura rígida',
+    manos:'Manos', cabeza:'Cabeza', pies:'Pies', piernas:'Piernas',
+  };
+  function nombreLimpio(sc){ return String(sc.nombre || 'Creep').replace(/\s*\(auditar\)\s*$/i, '').trim(); }
+  function tipoDe(sc){
+    return sc.tipoCriatura === 'otros' ? String(sc.tipoCriaturaOtro || '').trim().toLowerCase() : String(sc.tipoCriatura || '');
+  }
+  function oroSugerido(sc){
+    const n = Math.max(1, Math.round(num(sc.nivel)) || 1);
+    const humano = 5 * n * n + 10 * n;   // 15, 40, 75, 120, 175
+    const t = tipoDe(sc);
+    let v = 0;
+    if(t === 'humano') v = humano;
+    else if(t === 'humanoide') v = Math.floor(humano / 2 / 5 + 0.5) * 5;   // la mitad, a múltiplos de 5
+    return sc.jefe ? v * 2 : v;
+  }
+  function trofeoPrecioAuto(sc){
+    const n = Math.max(1, Math.round(num(sc.nivel)) || 1);
+    const base = n <= 5 ? TROFEO_PRECIO_NIVEL[n - 1] : 110 + 40 * (n - 5);
+    return sc.jefe ? base * 2 : base;
+  }
+  // El trofeo que suelta al morir (o null). El "especial" reemplaza al automático.
+  function trofeo(sc){
+    const esp = sc.trofeoEspecial || {};
+    const nombreEsp = String(esp.nombre || '').trim();
+    if(!nombreEsp && !sc.armaNatural) return null;
+    const nombre = nombreEsp || `${sc.armaNombre || 'Arma natural'} de ${nombreLimpio(sc)}`;
+    const precio = num(esp.precio) > 0 ? num(esp.precio) : trofeoPrecioAuto(sc);
+    return {nombre, precioCompra: precio, especial: !!nombreEsp};
+  }
+  function despojosDePrecio(precioCompra){ return Math.ceil(num(precioCompra) / 4); }   // un cuarto del precio de compra
+  function dropsResumen(sc){
+    const partes = [];
+    if(sc.armaNombre && !sc.armaNatural) partes.push(`${sc.armaNombre} (arma equipable)`);
+    (sc.equipo || []).forEach(it => partes.push(`${it.nombre} (equipo)`));
+    const tr = trofeo(sc);
+    if(tr) partes.push(`${tr.nombre} (trofeo: compra ${fmt(tr.precioCompra)}, venta ${fmt(tr.precioCompra / 2)}, ${fmt(despojosDePrecio(tr.precioCompra))} despojos)`);
+    if(num(sc.oroBase) > 0) partes.push(`${fmt(num(sc.oroBase))} DDE de oro (±20% al final del combate)`);
+    return partes.length ? partes.join(' · ') : 'nada';
+  }
+
   return {IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
+    TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto,
+    trofeo, despojosDePrecio, dropsResumen,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,
     danoTxt, fuentesEquipo, modTotal, estadosArmadura, aporteArmadura, defensaEfectiva, armadmgEfectiva, critEfectivo,
     statValor, estadoActivo, aportesMod, origenesMod, conSigno, statOrigenTxt, armadmgOrigenTxt, ataqueTxt, ataqueOrigenTxt,

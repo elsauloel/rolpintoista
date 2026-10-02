@@ -249,12 +249,7 @@ function statOrigenTxt(sc, statId, label){ return CreepCalculo.statOrigenTxt(sc,
 
 function creepEstadoActivo(sc, flag){ return CreepCalculo.estadoActivo(sc, flag); }
 
-function derivadosHtml(sc, attr){
-  return `<div class="derivados">${CREEP_DERIVADOS_POR_ATTR[attr].map(([id, label]) => `
-    <div class="derivado con-tip" data-deriv="${id}" data-tip="${esc(statOrigenTxt(sc, id, label))}">
-      <span>${label}</span><b>${fmt(creepStatValor(sc, id))}</b>
-    </div>`).join('')}</div>`;
-}
+function derivadosHtml(sc, attr){ return CreepLupa.derivadosHtml(sc, attr); }   // comun/creep-lupa.js
 
 // Al tipear un atributo no se redibuja la tarjeta: se refrescan sus secundarios acá.
 function actualizarDerivadosEnDOM(sc, card){

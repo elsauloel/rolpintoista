@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/creep-lupa.js?v=20261001a', '../comun/creep-botonera.js?v=20261001b', '../comun/creep-acciones.js?v=20261002i', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261002a'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/creep-lupa.js?v=20261002a', '../comun/creep-botonera.js?v=20261001b', '../comun/creep-acciones.js?v=20261002i', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261002a'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -50,6 +50,7 @@ function acDibujar(){
     <div class="body">${r.html}</div>
   </div>`;
   ac.host.scrollTop = scroll;
+  acVerCreepDibujar();   // el 🔍 Ver todo, si está abierto (A6a)
 }
 /* Paso 4c (tandas 1 y 2): lo que el mapa ya hace él mismo, con comun/creep-acciones.js — las tiradas de stats, Esquivar, Fuerza
    del golpe, Daño (con los efectos al golpear de su arma), Levantarse, Parry y Bloqueo. Lo que cambia al creep (No2, Sentado) se
@@ -402,6 +403,11 @@ function acCrear(){
         <button class="btn primary" data-ac-ver="verhab-editar" title="Abrir el editor paso a paso de esta habilidad">✎ Editar</button>
       </footer>
     </div></div>
+    <div class="scrim" id="ac-vercreep"><div class="modal" style="max-width:820px">
+      <header><h3 id="ac-vercreep-titulo">Creep</h3><button class="iconbtn" data-ac-vc="no">Cerrar</button></header>
+      <div class="body" id="ac-vercreep-cuerpo"></div>
+      <footer><button class="btn primary" data-ac-vc="editar" title="Abrir la ficha completa del creep en GM Tools (otra pestaña) para cambiar sus números">✎ Editar en GM Tools</button></footer>
+    </div></div>
     <div class="scrim" id="ac-tipo-ataque"><div class="modal" style="max-width:360px">
       <header><h3>¿Qué ataque es?</h3><button class="iconbtn" data-ac-tipo="no">Cerrar</button></header>
       <div class="body" id="ac-tipo-lista" style="display:flex;flex-direction:column;gap:9px"></div>
@@ -409,6 +415,7 @@ function acCrear(){
   raiz.querySelector('#ac-tipo-ataque').addEventListener('mousedown', e => { if(e.target.id === 'ac-tipo-ataque') e.target.classList.remove('open'); });
   raiz.querySelector('#ac-ver').addEventListener('mousedown', e => { if(e.target.id === 'ac-ver'){ e.target.classList.remove('open'); acViendo = null; } });
   raiz.querySelector('#ac-objetivo').addEventListener('mousedown', e => { if(e.target.id === 'ac-objetivo'){ e.target.classList.remove('open'); acObjetivoPendiente = null; } });
+  raiz.querySelector('#ac-vercreep').addEventListener('mousedown', e => { if(e.target.id === 'ac-vercreep') acVerCreepCerrar(); });
   raiz.addEventListener('click', e => {
     const b = e.target.closest('button');
     if(!b || !ac) return;
@@ -426,6 +433,12 @@ function acCrear(){
       acViendo = null;
       // Editar, Subir y Reemplazar: los hace GM Tools en el marco (abre el Ver de esa habilidad y toca el mismo botón).
       if(v && b.dataset.acVer !== 'no') acDelegar({verhabaccion: v}, b.dataset.acVer);
+      return;
+    }
+    if(b.dataset.acVc){
+      const id = ac.creepId;
+      acVerCreepCerrar();
+      if(b.dataset.acVc === 'editar') window.open('../gm-toolset/gm-tools.html?partida=' + encodeURIComponent(FB_CAMPANA) + '&editar=' + encodeURIComponent(id), '_blank', 'noopener');
       return;
     }
     if(b.dataset.acTipo){
@@ -458,12 +471,42 @@ async function abrirAccionesNuevas(creepId){
 function cerrarAccionesNuevas(){
   if(!ac) return;
   ac.host.hidden = true;
+  ac.raiz.querySelector('#ac-vercreep').classList.remove('open');
+  ac.soloVer = false;
+}
+/* ---------- 🔍 Ver todo de un creep, hecho por el mapa (2026-10-02, hoja de ruta A6a) ----------
+   El 🔍 Ver todo de la ficha lite abría la ventana «Ver» de GM Tools escondido en el marco. Ahora la muestra el mapa adentro del
+   recuadro de las Acciones nuevas, con comun/creep-lupa.js (verCreep: el mismo dibujo que GM Tools), y se redibuja con cada cambio
+   del creep (acDibujar). Si las Acciones no estaban a la vista, se abren solo para esto (ac.soloVer: al cerrar el Ver se cierran).
+   ✎ Editar abre GM Tools en otra pestaña (el editor del creep pasa al mapa en la A6c). */
+async function abrirVerCreepMapa(creepId){
+  const yaVisible = ac && !ac.host.hidden && ac.creepId === creepId;
+  if(!yaVisible) await abrirAccionesNuevas(creepId);
+  if(!ac || ac.host.hidden || ac.creepId !== creepId) return;
+  ac.soloVer = !yaVisible;
+  ac.raiz.querySelector('#ac-vercreep').classList.add('open');
+  acVerCreepDibujar();
+}
+function acVerCreepDibujar(){
+  if(!ac || !ac.raiz.querySelector('#ac-vercreep').classList.contains('open')) return;
+  const sc = acCreep();
+  if(!sc){ ac.raiz.querySelector('#ac-vercreep-cuerpo').innerHTML = '<div class="hint">Cargando el creep…</div>'; return; }
+  if(!sc.imagen){ const pub = creepsPub.get(ac.creepId); sc.imagen = pub && (pub.tarjeta || pub.miniatura) || ''; }   // la foto completa es privada del GM: la tarjeta pública alcanza
+  const v = CreepLupa.verCreep(sc);
+  ac.raiz.querySelector('#ac-vercreep-titulo').textContent = v.titulo;
+  ac.raiz.querySelector('#ac-vercreep-cuerpo').innerHTML = v.html;
+}
+function acVerCreepCerrar(){
+  if(!ac) return;
+  ac.raiz.querySelector('#ac-vercreep').classList.remove('open');
+  if(ac.soloVer){ ac.soloVer = false; cerrarAccionesNuevas(); }
 }
 document.addEventListener('keydown', e => {
   if(!ac || ac.host.hidden || !$('#botonera-capa').hidden || elegirDestinoCb) return;
   if(e.key !== 'Escape') return;
   e.preventDefault();
   const cartel = ac.raiz.querySelector('.scrim.open');
+  if(cartel && cartel.id === 'ac-vercreep'){ acVerCreepCerrar(); return; }
   if(cartel){ cartel.classList.remove('open'); acObjetivoPendiente = null; return; }
   cerrarAccionesNuevas();
 });

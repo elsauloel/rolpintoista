@@ -134,7 +134,7 @@ function flBoton(id){
   else if(id === 'botin') abrirBotinMapa(fichaId);   // el mapa (js/11, A5)
   else if(id === 'botonera') abrirBotonera(fichaId, undefined, invId);
   else if(id === 'acciones') abrirAcciones(creepId);
-  else if(id === 'ver') abrirAcciones(creepId, {tipo: 'abrir-ver-creep', creep: creepId});
+  else if(id === 'ver') abrirVerCreepMapa(creepId);   // el mapa (js/12, A6a)
 }
 // El creep cambió (su parte privada): si su ficha lite está abierta, se redibuja (lo llama actualizarEscuchasCreeps).
 function flCreepCambio(id){ if(flAbierta() && fl.tipo === 'creep' && fl.creepId === id) flDibujar(); }

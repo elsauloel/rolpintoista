@@ -36,50 +36,21 @@ function cerrarEditarCreep(){
 /* =========================================================
    Recompensas del creep: oro, arma natural y trofeo
    ========================================================= */
-const TIPOS_CRIATURA = ['humano', 'humanoide', 'bestia', 'planta', 'elemental', 'constructo', 'no-muerto', 'alienígena'];
-const TIPOS_CON_ARMA_NATURAL = ['bestia', 'planta', 'elemental', 'alienígena', 'constructo', 'no-muerto'];
-const TROFEO_PRECIO_NIVEL = [16, 30, 50, 75, 110];
+// Las reglas de recompensas viven en comun/creep-calculo.js (2026-10-02, A6a): acá quedan los nombres de siempre.
+const TIPOS_CRIATURA = CreepCalculo.TIPOS_CRIATURA;
+const TIPOS_CON_ARMA_NATURAL = CreepCalculo.TIPOS_CON_ARMA_NATURAL;
+const TROFEO_PRECIO_NIVEL = CreepCalculo.TROFEO_PRECIO_NIVEL;
 const AYUDA_ORO = 'Cuánto oro (doblones del espacio) suelta este creep al morir.\nSugerido: humanos 15 / 40 / 75 / 120 / 175 (nivel 1 a 5); humanoides la mitad (10 / 20 / 40 / 60 / 90); jefes el doble; el resto 0.\nAl finalizar el combate se tira una variación al azar de ±20% y el GM puede ajustar el total antes de repartirlo.';
 const AYUDA_NATURAL = 'Marcala si el arma es parte del cuerpo (colmillo, garra, puño, tentáculo).\nUn arma natural no se puede equipar: al morir el creep suelta un TROFEO (que se guarda en la mochila y se vende o se convierte en despojos).\nSin marcar, el arma es un objeto y se suelta como ítem equipable.';
 const AYUDA_TROFEO = 'Es opcional: solo para cambiar lo automático.\nSi el creep tiene arma natural, ya suelta un trofeo con el nombre de su arma y un valor según su nivel (16 / 30 / 50 / 75 / 110; jefes el doble).\nUsalo cuando quieras algo único: un dragón que deja «Escama de ceniza» por 400 en vez de sus colmillos. Vacío = el automático.';
 
-function nombreLimpioCreep(sc){ return String(sc.nombre || 'Creep').replace(/\s*\(auditar\)\s*$/i, '').trim(); }
-function tipoDeCreep(sc){
-  return sc.tipoCriatura === 'otros' ? String(sc.tipoCriaturaOtro || '').trim().toLowerCase() : String(sc.tipoCriatura || '');
-}
-function oroSugeridoCreep(sc){
-  const n = Math.max(1, Math.round(num(sc.nivel)) || 1);
-  const humano = 5 * n * n + 10 * n;   // 15, 40, 75, 120, 175
-  const t = tipoDeCreep(sc);
-  let v = 0;
-  if(t === 'humano') v = humano;
-  else if(t === 'humanoide') v = Math.floor(humano / 2 / 5 + 0.5) * 5;   // la mitad, a múltiplos de 5
-  return sc.jefe ? v * 2 : v;
-}
-function trofeoPrecioAuto(sc){
-  const n = Math.max(1, Math.round(num(sc.nivel)) || 1);
-  const base = n <= 5 ? TROFEO_PRECIO_NIVEL[n - 1] : 110 + 40 * (n - 5);
-  return sc.jefe ? base * 2 : base;
-}
-// El trofeo que suelta al morir (o null). El "especial" reemplaza al automático.
-function trofeoDeCreep(sc){
-  const esp = sc.trofeoEspecial || {};
-  const nombreEsp = String(esp.nombre || '').trim();
-  if(!nombreEsp && !sc.armaNatural) return null;
-  const nombre = nombreEsp || `${sc.armaNombre || 'Arma natural'} de ${nombreLimpioCreep(sc)}`;
-  const precio = num(esp.precio) > 0 ? num(esp.precio) : trofeoPrecioAuto(sc);
-  return {nombre, precioCompra: precio, especial: !!nombreEsp};
-}
-function despojosDePrecio(precioCompra){ return Math.ceil(num(precioCompra) / 4); }   // un cuarto del precio de compra
-function dropsResumenCreep(sc){
-  const partes = [];
-  if(sc.armaNombre && !sc.armaNatural) partes.push(`${sc.armaNombre} (arma equipable)`);
-  (sc.equipo || []).forEach(it => partes.push(`${it.nombre} (equipo)`));
-  const tr = trofeoDeCreep(sc);
-  if(tr) partes.push(`${tr.nombre} (trofeo: compra ${fmt(tr.precioCompra)}, venta ${fmt(tr.precioCompra / 2)}, ${fmt(despojosDePrecio(tr.precioCompra))} despojos)`);
-  if(num(sc.oroBase) > 0) partes.push(`${fmt(num(sc.oroBase))} DDE de oro (±20% al final del combate)`);
-  return partes.length ? partes.join(' · ') : 'nada';
-}
+function nombreLimpioCreep(sc){ return CreepCalculo.nombreLimpio(sc); }
+function tipoDeCreep(sc){ return CreepCalculo.tipoDe(sc); }
+function oroSugeridoCreep(sc){ return CreepCalculo.oroSugerido(sc); }
+function trofeoPrecioAuto(sc){ return CreepCalculo.trofeoPrecioAuto(sc); }
+function trofeoDeCreep(sc){ return CreepCalculo.trofeo(sc); }   // el trofeo que suelta al morir (o null)
+function despojosDePrecio(precioCompra){ return CreepCalculo.despojosDePrecio(precioCompra); }
+function dropsResumenCreep(sc){ return CreepCalculo.dropsResumen(sc); }
 function ayudaQ(txt){ return `<span class="ayuda-q con-tip" data-tip="${esc(txt)}">?</span>`; }
 
 function recompensasHtml(sc){
@@ -118,14 +89,7 @@ function recompensasHtml(sc){
     </div>
     <div class="hint" style="margin-top:6px"><b>Al morir suelta:</b> ${esc(dropsResumenCreep(sc))}</div>`;
 }
-function recompensasVerHtml(sc){
-  const t = tipoDeCreep(sc);
-  return `<div class="vc-cajas vc-2">
-      <div class="vc-caja"><span class="vc-caja-label">Oro</span><span class="vc-caja-valor">${fmt(num(sc.oroBase))} DDE</span></div>
-      <div class="vc-caja"><span class="vc-caja-label">Tipo</span><span class="vc-caja-valor">${esc(t || '—')}${sc.jefe ? ' · jefe' : ''}</span></div>
-    </div>
-    <div class="hint" style="margin-top:6px"><b>Al morir suelta:</b> ${esc(dropsResumenCreep(sc))}</div>`;
-}
+function recompensasVerHtml(sc){ return CreepLupa.recompensasVerHtml(sc); }   // comun/creep-lupa.js
 
 document.addEventListener('change', e => {
   const t = e.target;

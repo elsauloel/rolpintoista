@@ -108,5 +108,96 @@ const CreepLupa = (() => {
     <div>${h.detalle ? esc(h.detalle) : 'Sin detalle cargado — tocá ✎ en la habilidad para escribir uno.'}</div>`};
   }
 
-  return {contenido, verHab, paraHtml, stat};
+  /* ---------- El «Ver» de un creep entero (2026-10-02, hoja de ruta A6a) ----------
+     Copiado tal cual de gm-toolset/js/05 (verCreepDatos) y js/01-02 (derivadosHtml, recompensasVerHtml): lo usan GM Tools (su
+     ventana «Ver») y el mapa (🔍 Ver todo de la ficha lite, adentro del recuadro de las Acciones). Solo arma el HTML, con las
+     clases de gm-tools.css. verCreep(sc, {habilidades}) → {titulo, html}: `habilidades` reemplaza la lista de chips (GM Tools
+     la arma con sus botones cuando muestra un creep de la biblioteca). */
+  const ATTR_IDS = ['con','fue','agl','des','esp'];
+  const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp'};
+  function derivadosHtml(sc, attr){
+    return `<div class="derivados">${K.DERIVADOS_POR_ATTR[attr].map(([id, label]) => `
+    <div class="derivado con-tip" data-deriv="${id}" data-tip="${esc(K.statOrigenTxt(sc, id, label))}">
+      <span>${label}</span><b>${fmt(K.statValor(sc, id))}</b>
+    </div>`).join('')}</div>`;
+  }
+  function recompensasVerHtml(sc){
+    const t = K.tipoDe(sc);
+    return `<div class="vc-cajas vc-2">
+      <div class="vc-caja"><span class="vc-caja-label">Oro</span><span class="vc-caja-valor">${fmt(num(sc.oroBase))} DDE</span></div>
+      <div class="vc-caja"><span class="vc-caja-label">Tipo</span><span class="vc-caja-valor">${esc(t || '—')}${sc.jefe ? ' · jefe' : ''}</span></div>
+    </div>
+    <div class="hint" style="margin-top:6px"><b>Al morir suelta:</b> ${esc(K.dropsResumen(sc))}</div>`;
+  }
+  function verCreep(sc, {habilidades: habsHtml} = {}){
+    // Recuadro con título chico y valor destacado; tip = texto al pasar el mouse.
+    const caja = (label, valor, tip) => `<div class="vc-caja${tip ? ' con-tip' : ''}"${tip ? ` data-tip="${esc(tip)}"` : ''}>
+      <span class="vc-caja-label">${esc(label)}</span><span class="vc-caja-valor">${esc(valor)}</span></div>`;
+    const seccion = (titulo, contenido) => `<div class="vc-seccion"><div class="sect-label">${esc(titulo)}</div>${contenido}</div>`;
+
+    const critLabels = ['Tipo 4','Tipo 6','Tipo 8','Tipo 10','Tipo 12'];
+    const crits = sc.crit.map((v, i) => num(v) ? caja(`Res. ${critLabels[i]}`, K.conSigno(K.critEfectivo(sc, i)), K.critOrigenTxt(sc, i)) : '').join('');
+
+    const habilidades = sc.habilidades.map(h => {
+      const partes = [];
+      partes.push(K.costoHabTxt(sc, h));
+      if(num(h.cd) > 0) partes.push(`CD ${fmt(num(h.cd))}`);
+      const tip = `${partes.join(' · ')}\n${h.detalle || 'Sin descripción.'}`;
+      return `<span class="vc-chip con-tip" data-tip="${esc(tip)}">${esc(h.nombre || '(sin nombre)')}</span>`;
+    }).join('');
+
+    const estados = sc.estados.map(es => {
+      const dura = es.permanente ? 'permanente' : `${fmt(num(es.turnos))}t`;
+      return `<span class="vc-chip vc-estado-${es.polaridad || 'otro'} con-tip" data-tip="${esc(es.detalle || 'Sin descripción.')}">${esc(es.nombre || '(sin nombre)')} · ${dura}</span>`;
+    }).join('');
+
+    // Todo lo equipado: el arma y cada pieza de armadura, con su número destacado.
+    const equipado = (nombre, tipo, valor, detalle) => `<div class="vc-equipo">
+      <div class="equipo-item-top">
+        <span class="equipado-nombre">${esc(nombre)}</span>
+        <span class="valor-caja">${valor}</span>
+      </div>
+      <div class="equipo-item-meta">${esc(tipo)}</div>
+      ${detalle ? `<div class="arma-detalle">${esc(detalle)}</div>` : ''}
+    </div>`;
+    const efectos = (sc.armaEfectos || []).length && typeof EfectosGolpe !== 'undefined' ? `Al golpear: ${EfectosGolpe.resumenLista(sc.armaEfectos)}` : '';
+    const equipo = [
+      equipado(sc.armaNombre || 'Arma sin nombre', sc.armaDeRango ? 'Arma de rango' : 'Arma', esc(K.danoTxt(sc)),
+        [sc.armaDetalle, efectos].filter(Boolean).join(' · ')),
+      ...(sc.equipo || []).map(it => equipado(it.nombre || '(sin nombre)', K.TIPOITEM_LABEL[it.tipoItem] || it.tipoItem || '', `<small>DEF</small>+${fmt(num(it.def))}`, it.detalle)),
+    ].join('');
+
+    return {titulo: sc.nombre || 'Creep', html: `
+    <div class="view-wrap">
+      <div class="view-image-wrap">${sc.imagen ? `<img src="${esc(sc.imagen)}" class="view-image" alt="">` : `<span class="view-image-empty">Sin imagen</span>`}</div>
+      <div class="view-info">
+        <div class="view-title">${esc(sc.nombre)} <span class="vc-nivel">Lv ${fmt(num(sc.nivel))}</span></div>
+        <div class="vc-cajas vc-2">
+          ${caja('HP', `${fmt(num(sc.hp))} / ${fmt(num(sc.hpMax))}`)}
+          ${caja('No2', `${fmt(num(sc.nitros))} / ${fmt(K.nitrosMax(sc))}`)}
+        </div>
+        <div class="sect-label" style="margin-top:12px">Estados alterados</div>
+        ${estados ? `<div class="vc-chips" style="margin-top:6px">${estados}</div>` : '<div class="hint" style="margin-top:4px">Sin estados.</div>'}
+      </div>
+    </div>
+    <div class="vc-cuerpo">
+      ${seccion('Atributos', `<div class="vc-cajas vc-5">${ATTR_IDS.map(a => {
+        const mod = K.modTotal(sc, a);
+        return `<div class="attr-col">${caja(ATTR_LABELS[a], fmt(num(sc[a]) + mod), mod ? `Base ${fmt(num(sc[a]))} ${K.conSigno(mod)} por ${K.origenesMod(sc, a).join(', ')}` : '')}${derivadosHtml(sc, a)}</div>`;
+      }).join('')}</div>`)}
+      ${seccion('Daño y defensa', `<div class="vc-cajas vc-2">
+        ${caja('Daño', K.ataqueTxt(sc), K.ataqueOrigenTxt(sc))}
+        ${caja('Defensa', fmt(K.defensaEfectiva(sc)), K.defensaOrigenTxt(sc))}
+        ${K.armadmgEfectiva(sc) ? caja('Armadura mágica', fmt(K.armadmgEfectiva(sc)), K.armadmgOrigenTxt(sc)) : ''}
+      </div>
+      ${crits ? `<div class="vc-cajas vc-5">${crits}</div>` : ''}`)}
+      ${seccion('Habilidades', habsHtml !== undefined ? habsHtml : (habilidades ? `<div class="vc-chips">${habilidades}</div>` : '<div class="hint">Sin habilidades.</div>'))}
+      ${seccion('Equipo', `<div class="vc-equipos">${equipo}</div>`)}
+      ${seccion('Recompensas', recompensasVerHtml(sc))}
+    </div>
+    ${sc.notas ? `<div class="view-detalle"><span class="view-label">Notas</span>${esc(sc.notas)}</div>` : ''}
+  `};
+  }
+
+  return {contenido, verHab, paraHtml, stat, derivadosHtml, recompensasVerHtml, verCreep};
 })();

@@ -3,6 +3,19 @@
 > Lista viva para ir tachando. Las **decisiones de diseño** sin cerrar viven en [`preguntas-abiertas.md`](preguntas-abiertas.md) (con número P);
 > acá van las **tareas**. Al terminar una, marcarla `[x]` con la fecha; al aparecer una nueva, sumarla. Última revisión: 2026-09-21.
 
+## 0. Hoja de ruta acordada (2026-10-02, a seguir en este orden)
+1. [x] **Ataque de oportunidad desde el lado del jugador** (2026-10-02, probado en "Claude · pruebas" como Saulo-Prueba con Clementino):
+   la pregunta le aparece al centro al jugador dueño, «Sí» con dos armas abre «¿Con qué arma?» (Aguja 2 No2 / Bastón de monje 5 No2) y
+   el duelo de oportunidad sale con el arma elegida (Tipo 10) y su línea en la Mesa. Lo del GM (frenar y mandar la pregunta) ya estaba
+   probado; acá el aviso se mandó a mano (la cuenta del GM no estaba conectada). Clementino quedó con esas dos armas equipadas.
+2. [ ] **Un creep sin No2 para atacar, adentro del duelo** (ver §2): alinearlo con "avisar y dejar seguir".
+3. [ ] **Aplicar estados a otros desde las habilidades de personaje** (hoy solo creeps y trampas): destraba Lisiar, Confusión, Marcar,
+   Maldiciones y otras skills de clase (§7).
+4. [ ] **Auditoría de skills de clase** (§7): Tanque 9/10 (falta Miti-Miti), después una skill por clase alternando.
+5. [ ] **Paso 8 del casteo** (§1): quedan 10 skills de clase que tocan casteo.
+6. [ ] **Rework de armas no mágicas** elemento por elemento y el crítico nuevo en ficha y mapa (§8).
+7. [ ] **Preguntas para la mesa**: P143 (la tirada de la zona) y P144 (la armadura mágica), esperan la opinión del grupo.
+
 ## 1. Casteo con SP — **proceso paso a paso en [`proceso-casteo.md`](proceso-casteo.md)** (reglas en [`reglas-casteo.md`](reglas-casteo.md), decisiones en P97)
 > **Los 5 pasos de decisión, el Paso 6 y el Paso 7 (en su mayoría) están cerrados (2026-09-27).** Retomar por el
 > primer paso sin ✅ de `proceso-casteo.md` (hoy: **paso 8**, auditoría de contenido). Lo de abajo es solo un resumen.

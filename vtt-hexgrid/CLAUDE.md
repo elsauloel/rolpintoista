@@ -1255,3 +1255,6 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   alejarse). **Probado en vivo con la regla del contacto**: dos veces en el mismo turno pegarse-alejarse → dos preguntas (las dos «No», la
   Mesa con las 4 líneas); con la oportunidad usada y pegada, alejarse no frena; en un mismo camino alejarse, volver a pegarse por otro
   casillero y alejarse → frena; si el creep se separa, la marca se borra.
+  **Lado del jugador** (2026-10-02, "Claude · pruebas" con la cuenta de Saulo-Prueba): un creep que se aleja de Clementino → la pregunta le
+  sale al jugador al centro (no en la esquina); «Sí» con dos armas equipadas → «¿Con qué arma?» con el costo de cada una; el duelo de
+  oportunidad se abre con el arma elegida.

@@ -619,7 +619,7 @@ function actualizarMuerteMapa(){
     el.innerHTML = '<div id="muerte-mapa-txt" style="position:absolute;top:14px;left:50%;transform:translateX(-50%);text-align:center;color:#FFB4B4;font-family:\'Space Mono\',monospace;text-shadow:0 0 10px #000;background:rgba(40,0,0,.55);padding:8px 16px;border-radius:8px"></div>' +
       '<button type="button" id="muerte-mapa-revivir" class="btn" style="position:absolute;bottom:26px;left:50%;transform:translateX(-50%);pointer-events:auto;padding:10px 22px;font-size:15px;font-weight:700;background:#7A1E1E;border:1px solid #FF7E7E;color:#fff">✚ Revivir</button>';
     document.body.appendChild(el);
-    el.querySelector('#muerte-mapa-revivir').onclick = () => abrirBotonera(fichaPrincipalId(), {tipo: 'abrir-revivir'});
+    el.querySelector('#muerte-mapa-revivir').onclick = () => abrirRevivirMapa(fichaPrincipalId());   // el mapa (js/11, A6b)
   }
   el.hidden = false;
   $('#muerte-mapa-txt').innerHTML = m.definitivo

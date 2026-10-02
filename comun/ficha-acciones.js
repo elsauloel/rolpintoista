@@ -101,6 +101,21 @@ const FichaAcciones = (() => {
     if(idx < 0) return null;
     return aplicarRevivirConAnkh(S, 'cinturon', S.cinturon[idx].id);
   }
+  // ✚ Revivir (2026-10-02, A6b; antes calcularHpRevivir de la ficha, js/11): con cuánto HP revive — un % del máximo o un valor neto,
+  // mínimo 1. → {hpmax, val}. El diálogo lo pone cada pantalla; revivir(S, val) deja el HP (y el estado de muerte, al día).
+  function hpRevivir(S, modo, pct, valor){
+    const c = FichaCalculo.calcular(S);
+    const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
+    if(modo === 'pct'){
+      const p = Math.max(0, Math.min(100, num(pct) || 0));
+      return {hpmax, val: Math.max(1, Math.floor(hpmax * p / 100))};
+    }
+    return {hpmax, val: Math.max(1, Math.floor(num(valor) || 1))};
+  }
+  function revivir(S, val){
+    S.hp = val;
+    return revisarMuerte(S);
+  }
   // Con HP > 0 deja de estar inconsciente; con 0, queda inconsciente (5 turnos para morir). Devuelve {vivo, revivio} o {vivo: false, cayo}.
   function revisarMuerte(S){
     if(!S.muerto) S.muerto = {activo:false, turnos:5, definitivo:false};
@@ -730,7 +745,7 @@ const FichaAcciones = (() => {
     return aplicarRevivirConAnkh(S, key, id);
   }
 
-  return {gastoNitrosForzado, alternarSigilo, levantarse,
+  return {gastoNitrosForzado, alternarSigilo, levantarse, hpRevivir, revivir,
     tirarSocial, colocarTrampaDeItem, ankhAMano,
     TRAMPA_DANO_RE, avisarZonaAlMapa, colocarTrampaDeHab, colocarZonaDeHab,
     durAviso, desgastarItem, rompeArmaduraAlAzar, estadoDeSpec, aplicarEstadoRecibido, dueloAplicarEfectoPropio, xDeHab, habDueloDatos,

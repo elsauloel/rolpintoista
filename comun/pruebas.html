@@ -754,6 +754,13 @@ prueba('curar a quien estaba inconsciente lo despierta; quedar en 0 lo desmaya (
   const ankh = FichaAcciones.revisarAnkh(T);
   igual([despierto, cae, S.muerto.turnos, ankh, T.hp > 0, T.cinturon.length], [{vivo: true, revivio: true}, {vivo: false, cayo: true}, 5, 'Ankh de Reencarnación', true, 0]);
 });
+prueba('✚ Revivir: con un % del HP máximo (para abajo, mínimo 1) o un valor neto; deja de estar inconsciente', () => {
+  const S = fichaBotonera({hp: 0, muerto: {activo: true, turnos: 3, definitivo: false}});
+  const max = FichaCalculo.calcular(S).final.hpmax;
+  const pct = FichaAcciones.hpRevivir(S, 'pct', 50, 0), cero = FichaAcciones.hpRevivir(S, 'pct', 0, 0), neto = FichaAcciones.hpRevivir(S, 'valor', 50, 7);
+  const r = FichaAcciones.revivir(S, neto.val);
+  igual([pct, cero.val, neto.val, r, S.hp, S.muerto.activo], [{hpmax: max, val: Math.max(1, Math.floor(max / 2))}, 1, 7, {vivo: true, revivio: true}, 7, false]);
+});
 
 grupo('Combate suelto (Parry, Bloqueo, Fuerza del golpe, Evasión, Daño)');
 const uiCombate = (reg, estado) => ({...uiPrueba(reg), registrarTirada: (o, r) => reg.push('🎲 ' + o), preguntarSobrepeso: p => reg.push('sobrepeso ' + p.sobre),

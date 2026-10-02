@@ -522,15 +522,7 @@ $('#reminder-x').onclick = () => $('#scrim-reminder').classList.remove('open');
 $('#scrim-reminder').addEventListener('mousedown', e => { if(e.target.id==='scrim-reminder') $('#scrim-reminder').classList.remove('open'); });
 $('#muerte-cerrar').onclick = () => $('#scrim-muerte').classList.remove('open');
 let revivirModo = 'pct';
-function calcularHpRevivir(){
-  const c = compute();
-  const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
-  if(revivirModo === 'pct'){
-    const pct = Math.max(0, Math.min(100, num($('#f-revivir-pct').value) || 0));
-    return {hpmax, val: Math.max(1, Math.floor(hpmax * pct / 100))};
-  }
-  return {hpmax, val: Math.max(1, Math.floor(num($('#f-revivir-valor').value) || 1))};
-}
+function calcularHpRevivir(){ return FichaAcciones.hpRevivir(S, revivirModo, $('#f-revivir-pct').value, $('#f-revivir-valor').value); }   // comun/ficha-acciones.js (A6b)
 function actualizarRevivirUI(){
   $('#revivir-modo-pct').classList.toggle('primary', revivirModo === 'pct');
   $('#revivir-modo-valor').classList.toggle('primary', revivirModo === 'valor');
@@ -551,7 +543,7 @@ $('#f-revivir-pct').addEventListener('input', actualizarRevivirUI);
 $('#f-revivir-valor').addEventListener('input', actualizarRevivirUI);
 $('#revivir-confirmar').onclick = () => {
   const {val} = calcularHpRevivir();
-  S.hp = val;
+  FichaAcciones.revivir(S, val);
   $('#f-hp').value = S.hp;
   $('#scrim-revivir').classList.remove('open');
   refresh();

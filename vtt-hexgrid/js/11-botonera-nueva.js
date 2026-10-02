@@ -112,7 +112,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261002a', '../comun/ficha-equipo.js?v=20261002b', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261002a', '../comun/ficha-mantenimiento.js?v=20261002a', '../comun/ficha-calculo.js?v=20261002j', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js?v=20261002i', '../comun/ficha-habilidades.js?v=20261001c',
-  '../comun/catalogo.js?v=20261002i', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261002d', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261002i', '../comun/ficha-resumen.js?v=20261002o', '../comun/inv-calculo.js?v=20261002d', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/inv-duelo.js?v=20261001a', '../comun/ficha-acciones.js?v=20261002i', '../comun/inv-habilidades.js?v=20261002g', '../comun/inv-lupa.js?v=20261001a',
+  '../comun/catalogo.js?v=20261002i', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261002d', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261002i', '../comun/ficha-resumen.js?v=20261002o', '../comun/inv-calculo.js?v=20261002d', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/inv-duelo.js?v=20261001a', '../comun/ficha-acciones.js?v=20261002j', '../comun/inv-habilidades.js?v=20261002g', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261002a', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -786,6 +786,19 @@ function bnCrear(){
       <header><h3>🛡 Equipo y mochila</h3><button class="iconbtn" data-bn-eq="cerrar">Cerrar</button></header>
       <div class="body" id="bn-equipo-cuerpo"></div>
     </div></div>
+    <div class="scrim" id="bn-revivir"><div class="modal" style="max-width:340px">
+      <header><h3>¿Con cuánto HP revivir?</h3><button class="iconbtn" data-bn-rv="cerrar">Cerrar</button></header>
+      <div class="body" style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;gap:8px">
+          <button type="button" class="btn" data-bn-rv="pct" style="flex:1">Por %</button>
+          <button type="button" class="btn" data-bn-rv="valor" style="flex:1">Valor neto</button>
+        </div>
+        <div class="f" id="bn-rv-campo-pct"><label>Porcentaje del HP máximo</label><input type="number" id="bn-rv-pct" value="50" min="1" max="100"></div>
+        <div class="f" id="bn-rv-campo-valor" style="display:none"><label>HP exacto</label><input type="number" id="bn-rv-valor" value="1" min="1"></div>
+        <div class="hint" id="bn-rv-preview" style="font-size:14px;color:var(--paper)"></div>
+      </div>
+      <footer><button class="btn ghost" data-bn-rv="cerrar">Cancelar</button><button class="btn primary" data-bn-rv="si">Revivir</button></footer>
+    </div></div>
     <div class="scrim" id="bn-reroll"><div class="modal" style="max-width:560px">
       <header><h3>🪙 Moneda Re-Roll</h3><button class="iconbtn" data-bn-rr="cerrar">Cerrar</button></header>
       <div class="body"><p class="hint" id="bn-reroll-aviso" style="margin:0 0 10px"></p><div id="bn-reroll-lista"></div></div>
@@ -912,6 +925,25 @@ function bnCrear(){
   raiz.querySelector('#bn-tienda').addEventListener('mousedown', e => { if(e.target.id === 'bn-tienda') bnTiendaCerrar(); });
   raiz.querySelector('#bn-stats').addEventListener('mousedown', e => { if(e.target.id === 'bn-stats') bnStatsCerrar(); });
   raiz.querySelector('#bn-reroll').addEventListener('mousedown', e => { if(e.target.id === 'bn-reroll') bnRerollCerrar(); });
+  raiz.querySelector('#bn-revivir').addEventListener('mousedown', e => { if(e.target.id === 'bn-revivir') bnRevivirCerrar(); });
+  raiz.querySelector('#bn-revivir').addEventListener('input', () => bnRevivirDibujar());
+  raiz.querySelector('#bn-revivir').addEventListener('click', e => {
+    e.stopPropagation();   // sus botones son solo de esta ventana
+    const b = e.composedPath()[0].closest && e.composedPath()[0].closest('button');
+    if(!b || !b.dataset.bnRv) return;
+    const a = b.dataset.bnRv;
+    if(a === 'cerrar'){ bnRevivirCerrar(); return; }
+    if(a === 'pct' || a === 'valor'){ bnRevivirModo = a; bnRevivirDibujar(); return; }
+    if(a === 'si' && bn.S){
+      if(!bnPuedeGuardar()){ toast('Ese personaje no lo manejás vos'); return; }
+      const antes = FichaGuardado.partes(bn.S);
+      const {val} = bnRevivirCuenta();
+      FichaAcciones.revivir(bn.S, val);
+      bnUi(antes).cambio();
+      toast(`Revivido con ${fmt(bn.S.hp)} HP`);
+      bnRevivirCerrar();
+    }
+  });
   raiz.querySelector('#bn-reroll').addEventListener('click', e => {
     e.stopPropagation();   // sus botones son solo de esta ventana: que no los atienda también el manejador general del recuadro
     const b = e.composedPath()[0].closest && e.composedPath()[0].closest('button');
@@ -1364,6 +1396,38 @@ function bnRerollDibujar(){
   bn.raiz.querySelector('#bn-reroll-aviso').innerHTML = r.aviso;
   bn.raiz.querySelector('#bn-reroll-lista').innerHTML = r.filas;
 }
+/* ---------- ✚ Revivir, hecho por el mapa (2026-10-02, hoja de ruta A6b) ----------
+   El ✚ Revivir de la pantalla de muerte del mapa abría el diálogo de la ficha escondida ('abrir-revivir'). Ahora lo muestra el mapa adentro
+   del recuadro de la Botonera nueva, con la misma cuenta (FichaAcciones.hpRevivir / revivir). */
+let bnRevivirModo = 'pct';
+async function abrirRevivirMapa(fichaId){
+  try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo abrir Revivir'); return; }
+  const yaVisible = bn && bn.host && !bn.host.hidden && bn.fichaId === fichaId && !bn.invId;
+  if(!yaVisible) await abrirBotoneraNueva(fichaId, '');
+  if(!bn) return;
+  bn.soloRevivir = !yaVisible;
+  if(!(await bnSesionLista(fichaId))){ toast('No se pudo leer el personaje'); return; }
+  bnRevivirModo = 'pct';
+  bn.raiz.querySelector('#bn-rv-pct').value = 50;
+  bn.raiz.querySelector('#bn-revivir').classList.add('open');
+  bnRevivirDibujar();
+}
+function bnRevivirCuenta(){ const r = bn.raiz; return FichaAcciones.hpRevivir(bn.S, bnRevivirModo, r.querySelector('#bn-rv-pct').value, r.querySelector('#bn-rv-valor').value); }
+function bnRevivirDibujar(){
+  if(!bn || !bn.S || !bn.raiz.querySelector('#bn-revivir').classList.contains('open')) return;
+  const r = bn.raiz;
+  r.querySelector('[data-bn-rv="pct"]').classList.toggle('primary', bnRevivirModo === 'pct');
+  r.querySelector('[data-bn-rv="valor"]').classList.toggle('primary', bnRevivirModo === 'valor');
+  r.querySelector('#bn-rv-campo-pct').style.display = bnRevivirModo === 'pct' ? '' : 'none';
+  r.querySelector('#bn-rv-campo-valor').style.display = bnRevivirModo === 'valor' ? '' : 'none';
+  const {hpmax, val} = bnRevivirCuenta();
+  r.querySelector('#bn-rv-preview').textContent = `Revive con ${fmt(val)} / ${fmt(hpmax)} HP`;
+}
+function bnRevivirCerrar(){
+  if(!bn) return;
+  bn.raiz.querySelector('#bn-revivir').classList.remove('open');
+  if(bn.soloRevivir){ bn.soloRevivir = false; cerrarBotoneraNueva(); }
+}
 function bnRerollCerrar(){
   if(!bn) return;
   bn.raiz.querySelector('#bn-reroll').classList.remove('open');
@@ -1557,6 +1621,7 @@ document.addEventListener('keydown', e => {
   if(cartel && cartel.id === 'bn-tienda'){ bnTiendaCerrar(); return; }
   if(cartel && cartel.id === 'bn-stats'){ bnStatsCerrar(); return; }
   if(cartel && cartel.id === 'bn-reroll'){ bnRerollCerrar(); return; }
+  if(cartel && cartel.id === 'bn-revivir'){ bnRevivirCerrar(); return; }
   if(cartel){ cartel.classList.remove('open'); if(cartel.id === 'bn-comparar') bnComparando = null; bnViendo = null; bnCostoX = null; bnSobrepeso = null; bnSinNitrosSeguir = null; return; }
   cerrarBotoneraNueva();
 });

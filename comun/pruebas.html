@@ -71,6 +71,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="selector-estados.js"></script>
 <script src="ficha-equipo.js"></script>
 <script src="ficha-botin.js"></script>
+<script src="ficha-tienda.js"></script>
 <script src="tiradas-propias.js"></script>
 <script src="efectos-golpe.js"></script>
 <script src="confirmar-turno.js"></script>
@@ -596,6 +597,28 @@ prueba('el botín: se lista lo que nadie tomó y la ventana muestra lo de cada j
   const html = FichaBotin.html(S, {combate, loot: lista, puede: true, fichaId: 'f1'});
   igual([lista.length, lista[0].item.id, lista[0].despojos, html.includes('+20</b> XP'), html.includes('(vos)'), html.includes('data-botin-tomar="b1"'), html.includes('data-botin-comparar'), /disabled/.test(FichaBotin.html(S, {combate, loot: lista, puede: false}))],
     [1, 'botin-b1', 3, true, true, true, true, true]);
+});
+
+grupo('Tienda (A5)');
+prueba('la tienda: precio con ajuste, solo lo del vendedor, comprar del carrito, vender con ajuste y reparar con el herrero', () => {
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, meta: {nombre: 'Prueba', dde: 500}, loot: {normal: 2},
+    inventario: [{id: 'casco', nombre: 'Casco gastado', tipoItem: 'cabeza', peso: 2, precioCompra: 10, equipado: false, dur: 3}]}).S);
+  const arma = CATALOGO_BASE.find(i => i.tipoItem === 'arma_1m' && num(i.precioCompra) >= 4 && !i.consumible);
+  const st = FichaTienda.nueva();
+  st.tienda = {items: [arma.id], itemsDatos: [], ajustePrecio: 50, ajusteVenta: -50, herrero: true, precioReparacion: 2};
+  const precio = FichaTienda.precioDeCompra(st, arma), vis = FichaTienda.visibles(S, st).map(i => i.id);
+  const avisos = [], ui = {toast: t => avisos.push(t), cambio: () => {}};
+  FichaTienda.agregarAlCarrito(S, st, arma.id, 1, ui);
+  FichaTienda.comprar(S, st, ui);
+  const tras = num(S.meta.dde), compro = S.inventario.some(i => i.nombre === arma.nombre);
+  st.venderSel = {despojos: 2};
+  FichaTienda.vender(S, st, ui);
+  const casco = S.inventario.find(i => i.id === 'casco'), faltan = FichaCalculo.durMax(casco) - FichaCalculo.durActual(casco);
+  const antesRep = num(S.meta.dde);
+  FichaTienda.reparar(S, st, [{it: casco, pts: 1}], false, ui);
+  igual([precio, vis, tras, compro, st.carrito.length, num(S.loot.normal), antesRep, num(S.meta.dde), FichaCalculo.durActual(casco), faltan > 0, FichaTienda.reparar(S, st, [{it: casco, pts: 1}], true, ui), avisos.includes('No se puede reparar durante el combate')],
+    [Math.max(1, Math.round(num(arma.precioCompra) * 1.5)), [arma.id], 500 - Math.max(1, Math.round(num(arma.precioCompra) * 1.5)), true, 0, 0,
+     500 - Math.max(1, Math.round(num(arma.precioCompra) * 1.5)) + 1, 500 - Math.max(1, Math.round(num(arma.precioCompra) * 1.5)) + 1 - 2, 4, true, undefined, true]);   // 2 despojos a la mitad = +1; reparar 1 punto a 2 DDE
 });
 
 /* ---------- El dibujo de la Botonera (comun/ficha-botonera.js, paso 4 etapa 3b) ---------- */

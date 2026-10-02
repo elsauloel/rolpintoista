@@ -626,60 +626,16 @@ function modsResumenHtml(item){
 // categoría/slot y todos los mods en su forma legible — así "stun",
 // "veneno" o "constitución" encuentran el ítem aunque esas palabras no
 // estén en el nombre.
-function textoBusquedaDe(item){
-  const partes = [item.nombre, item.detalle, item.tier, CATEGORIA_LABEL[item.tipoItem], SLOT_LABEL[slotDe(item.tipoItem)]];
-  (item.mods || []).forEach(m => {
-    partes.push(STAT_LABEL[m.stat] || m.stat, STAT_FULL[m.stat]);
-  });
-  return normalizarBusqueda(partes.filter(Boolean).join(' '));
-}
+function textoBusquedaDe(item){ return FichaTienda.textoBusqueda(item); }   // comun/ficha-tienda.js (A5)
 
-function precioTiendaHtml(item){
-  const base = num(item.precioCompra);
-  const final = precioDeCompra(item);
-  if(final === base) return `<b>${fmt(base)} DDE</b>`;
-  return `<span class="precio-lista">${fmt(base)}</span><b>${fmt(final)} DDE</b>`;
-}
+function precioTiendaHtml(item){ return FichaTienda.precioHtml(tiendaSt, item); }
 
 // Slot que ocupa un ítem según SLOT_DEFS, y si ese slot ya está lleno o
 // ya hay algo del mismo tipo puesto (para el botón Comparar). Devuelve
 // null para lo que no ocupa un slot del cuerpo (consumibles, etc.).
 function slotOcupadoInfo(item){ return FichaEquipo.slotOcupado(S, item); }   // comun/ficha-equipo.js
 
-function catalogoRowHtml(item){
-  const dano = armaDanoTxt(item);
-  const defVal = defValorDe(item);
-  const statTxt = dano ? `Daño ${dano}` : (defVal ? `Defensa ${defVal>0?'+':''}${fmt(defVal)}` : '');
-  const tierColor = TIER_COLOR[item.tier] || TIER_COLOR['Común'];
-  const catLabel = CATEGORIA_LABEL[item.tipoItem];
-  const slotInfo = slotOcupadoInfo(item);
-  return `<div class="cat-row cat-card" data-catid="${item.id}">
-    ${thumb(item)}
-    <div class="cat-info">
-      <div class="cat-card-titulo">
-        <div class="cat-nombre">${esc(item.nombre)}${item._bib ? ` <span class="hint" style="font-weight:600;${item._bib.auditado ? '' : 'color:#e0a040'}" title="Lo subió alguien del grupo${item._bib.auditado ? '' : ' y todavía no lo revisó el dueño (se puede usar igual)'}">${esc(ItemsSubidos.etiqueta(item))}</span>` : ''}</div>
-        ${item.tier ? `<div class="cat-tier-badge" style="color:${tierColor};border-color:${tierColor};background:${tierColor}22">${esc(item.tier)}</div>` : ''}
-      </div>
-      <div class="cat-meta">${precioTiendaHtml(item)} · Peso ${fmt(num(item.peso))}${statTxt ? ` · ${esc(statTxt)}` : ''}${item.consumible?` · consumible${item.curahp?` (${num(item.curahp)>0?'+':''}${fmt(num(item.curahp))} HP)`:''}`:''}</div>
-      ${catLabel ? `<div class="cat-tipo">${esc(catLabel)}</div>` : ''}
-      ${slotInfo && (slotInfo.ocupado || slotInfo.equipados.length) ? `<div class="cat-slot-fila">
-        ${slotInfo.ocupado ? `<span class="cat-slot-badge">Slot ocupado</span>` : ''}
-        ${slotInfo.equipados.length ? `<button type="button" class="cat-btn-comparar" data-comparar="${item.id}">Comparar</button>` : ''}
-      </div>` : ''}
-      ${item.detalle ? `<div class="cat-detalle">${esc(item.detalle)}</div>` : ''}
-    </div>
-    <div class="cat-actions">
-      <input type="number" class="cat-qty" data-catqty="${item.id}" value="1" min="1">
-      ${tiendaCargada && tiendaCargada.agregarGratis ? `<button class="cat-btn add" data-catalogoadd="${item.id}" title="El GM permitió agregar ítems gratis en esta tienda">Agregar a mochila (gratis)</button>` : ''}
-      <button class="cat-btn buy" data-catalogocarrito="${item.id}">+ Carrito</button>
-    </div>
-    <div class="cat-manage">
-      <button data-view="catalogo:${item.id}">Ver</button>
-      <button data-catalogoedit="${item.id}">Editar</button>
-      <button data-catalogodel="${item.id}">Eliminar</button>
-    </div>
-  </div>`;
-}
+function catalogoRowHtml(item){ return FichaTienda.rowHtml(S, tiendaSt, item); }   // comun/ficha-tienda.js (A5)
 
 // Stats de un ítem en forma comparable: Defensa, daño promedio del arma
 // (dados*(caras+1)/2 + fijo, no la tirada exacta) y todos sus mods menos

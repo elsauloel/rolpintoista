@@ -87,134 +87,62 @@ function renderComparar(){
 
 let carritoCatalogo = [];
 
-const normalizarBusqueda = s => (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
-
-// Devuelve los ítems del catálogo que pasan los filtros activos ahora
-// mismo (categoría, slot, tier, búsqueda) — la usan tanto el render de
-// la grilla como el botón de Ítem aleatorio, para que "aleatorio" sea
-// siempre "aleatorio dentro de lo que se está viendo".
-// Ordenar por categoría deja los grupos de siempre; cualquier otro
-// criterio pasa a lista plana, porque agrupado no se puede ver de un
-// vistazo lo más caro o lo más pesado del catálogo.
-const TIERS_ORDEN = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
-
-// Daño máximo posible del arma. Lo que no es arma da 0 y queda al final
-// del orden por daño (ver ordenarCatalogo).
-function danoDe(item){
-  if(!ES_ARMA(item.tipoItem)) return 0;
-  const dados = Math.max(1, num(item.peso) || 1) + Math.max(0, num(item.danoAmplificado));
-  return dados * (num(item.tipoDado) || 8) + num(item.danoFijo);
-}
-
-const ORDENES_CATALOGO = {
-  categoria: {label:'Categoría', cmp:(a,b) => TIERS_ORDEN.indexOf(a.tier) - TIERS_ORDEN.indexOf(b.tier)},
-  nombre:    {label:'Nombre',    cmp:(a,b) => a.nombre.localeCompare(b.nombre, 'es')},
-  precio:    {label:'Precio',    cmp:(a,b) => precioDeCompra(a) - precioDeCompra(b)},
-  peso:      {label:'Peso',      cmp:(a,b) => num(a.peso) - num(b.peso)},
-  rareza:    {label:'Rareza',    cmp:(a,b) => TIERS_ORDEN.indexOf(a.tier) - TIERS_ORDEN.indexOf(b.tier)},
-  dano:      {label:'Daño',     valor: danoDe},
-  defensa:   {label:'Defensa',  valor: defValorDe},
-};
-
+// La tienda vive en comun/ficha-tienda.js (hoja de ruta A5, 2026-10-02: el mapa usa lo mismo); acá, la ventana de la ficha. El
+// estado de la tienda en pantalla son las variables de siempre (tiendaCargada, carritoCatalogo, venderSel, catalogoOrden…), que la
+// pieza común lee y escribe a través de `tiendaSt`.
+const normalizarBusqueda = FichaTienda.normalizarBusqueda;
+const TIERS_ORDEN = FichaTienda.TIERS_ORDEN;
+const danoDe = item => FichaTienda.danoDe(item);
 let catalogoOrden = 'categoria';
 let catalogoOrdenDesc = false;
-
-function ordenarCatalogo(items){
-  const def = ORDENES_CATALOGO[catalogoOrden] || ORDENES_CATALOGO.categoria;
-  const porNombre = (a, b) => a.nombre.localeCompare(b.nombre, 'es');
-  // Criterio con valor propio (daño, defensa): lo que no aplica queda al
-  // final siempre, no mezclado entre los que sí tienen.
-  if(def.valor){
-    const con = items.filter(i => def.valor(i) > 0);
-    const sin = items.filter(i => def.valor(i) <= 0).sort(porNombre);
-    con.sort((a, b) => def.valor(a) - def.valor(b) || porNombre(a, b));
-    if(catalogoOrdenDesc) con.reverse();
-    return [...con, ...sin];
-  }
-  const orden = items.slice().sort((a,b) => def.cmp(a,b) || porNombre(a,b));
-  return catalogoOrdenDesc ? orden.reverse() : orden;
-}
-
-// Dentro de "consumibles": si hay una tienda cargada, primero su stock
-// fijo (tiendaCargada.garantizados), después los legacy ("los de
-// siempre"), después el resto. Sin tienda cargada no hay stock fijo, así
-// que solo se aplica el criterio legacy. No toca el orden de nada que no
-// sea consumible: el sort es estable y el comparador da 0 apenas uno de
-// los dos no es consumible.
-function conStockYLegacyPrimero(items){
-  const garantizados = tiendaCargada && Array.isArray(tiendaCargada.garantizados) ? new Set(tiendaCargada.garantizados) : null;
-  const rango = it => (garantizados && garantizados.has(it.id)) ? 0 : (it.legacy ? 1 : 2);
-  return items.slice().sort((a, b) => {
-    if(grupoCompraDe(a.tipoItem) !== 'consumibles' || grupoCompraDe(b.tipoItem) !== 'consumibles') return 0;
-    return rango(a) - rango(b);
-  });
-}
-
+function ordenarCatalogo(items){ return FichaTienda.ordenar(tiendaSt, items); }
+function conStockYLegacyPrimero(items){ return FichaTienda.conStockYLegacyPrimero(tiendaSt, items); }
 function renderCatalogoOrdenControles(){
   const sel = $('#catalogo-orden');
   if(sel && !sel.dataset.listo){
-    sel.innerHTML = Object.entries(ORDENES_CATALOGO).map(([k,v]) => `<option value="${k}">${esc(v.label)}</option>`).join('');
+    sel.innerHTML = FichaTienda.opcionesOrden(tiendaSt);
     sel.dataset.listo = '1';
   }
   if(sel) sel.value = catalogoOrden;
   const b = $('#catalogo-orden-dir');
-  if(b) b.textContent = catalogoOrdenDesc ? '↓ Mayor a menor' : '↑ Menor a mayor';
+  if(b) b.textContent = FichaTienda.etiquetaOrden(tiendaSt);
 }
-
 // Rarezas que no se ofrecen en el catálogo general del jugador.
-const TIERS_OCULTOS = ['Excepcional', 'Legendario'];
-
-// Botón del ojo en el footer: ignora tanto el recorte de la tienda cargada
-// como el filtro de tier/consumibles del catálogo general — muestra
-// literalmente todo lo que hay en S.catalogo, de referencia.
+const TIERS_OCULTOS = FichaTienda.TIERS_OCULTOS;
+// Botón del ojo en el footer: muestra literalmente todo lo que hay en S.catalogo, de referencia.
 let verCatalogoCompleto = false;
-
 function catalogoVisibles(){
   if(!Array.isArray(S.catalogo)) S.catalogo = structuredClone(DEFAULT.catalogo);
-  const filtro = $('#catalogo-filtro') ? $('#catalogo-filtro').value : '';
-  const filtroSlot = $('#catalogo-filtro-slot') ? $('#catalogo-filtro-slot').value : '';
-  const filtroTier = $('#catalogo-filtro-tier') ? $('#catalogo-filtro-tier').value : '';
-  const busqueda = normalizarBusqueda($('#catalogo-buscar') ? $('#catalogo-buscar').value : '');
-  // Con una tienda cargada, el catálogo se recorta a lo que ese vendedor
-  // ofrece; los filtros, la búsqueda y el carrito siguen funcionando igual.
-  let base = S.catalogo;
-  if(tiendaCargada && !verCatalogoCompleto){
-    base = tiendaCargada.items.map(itemCatalogo).filter(Boolean);
-  }
-  // En el catálogo abierto solo se llega hasta Raro. Lo Excepcional y lo
-  // Legendario existe igual: entra por un vendedor que lo ofrezca o de la
-  // mano del máster, no comprándolo de la lista general.
-  if(!tiendaCargada && !verCatalogoCompleto){
-    base = base.filter(item => !TIERS_OCULTOS.includes(item.tier));
-    // De los consumibles, el catálogo abierto solo ofrece los esenciales.
-    // El resto existe igual, pero se consigue en un vendedor.
-    base = base.filter(item => !item.consumible || item.legacy);
-    // El equipo con nombre propio de los creeps (soloBotin) se consigue derrotándolos, no comprándolo de la lista general.
-    base = base.filter(item => !item.soloBotin);
-  }
-  let visibles = filtro ? base.filter(item => grupoCompraDe(item.tipoItem) === filtro) : base;
-  if(filtroSlot) visibles = visibles.filter(item => slotDe(item.tipoItem) === filtroSlot);
-  if(filtroTier) visibles = visibles.filter(item => item.tier === filtroTier);
-  if(busqueda) visibles = visibles.filter(item => textoBusquedaDe(item).includes(busqueda));
-  return visibles;
+  return FichaTienda.visibles(S, tiendaSt);
 }
 
-// Tienda publicada por el GM desde el generador de tiendas, en
-// campanas/<partida>/tienda/publicada ({json, actualizado}). Trae los ids
-// que ofrece y los datos de esos ítems (itemsDatos, sin imagen): si esta
-// ficha tiene el ítem en su catálogo se usa el suyo (con imagen), y si no
-// (un ítem creado por el GM) el de la tienda.
 let tiendaCargada = null;
 let tiendaEscucha = null;  // listener de la tienda publicada, mientras haya uno
 const ARCHIVO_CATALOGO = 'datos/catalogo.json';
 
-function itemCatalogo(id){
-  return S.catalogo.find(x => x.id === id)
-    || (tiendaCargada && Array.isArray(tiendaCargada.itemsDatos) ? tiendaCargada.itemsDatos.find(x => x && x.id === id) : null)
-    || S.inventario.find(x => x.id === id)  // un ítem de la mochila (Comparar desde "Equipar")
-    || botinItemPorId(id)                   // un ítem del botín (Comparar desde "Botín")
-    || null;
-}
+function itemCatalogo(id){ return FichaTienda.itemCatalogo(S, tiendaSt, id); }
+const tiendaSt = {
+  get tienda(){ return tiendaCargada; }, set tienda(v){ tiendaCargada = v; },
+  get carrito(){ return carritoCatalogo; }, set carrito(v){ carritoCatalogo = v; },
+  get venderSel(){ return venderSel; }, set venderSel(v){ venderSel = v; },
+  get orden(){ return catalogoOrden; }, set orden(v){ catalogoOrden = v; },
+  get ordenDesc(){ return catalogoOrdenDesc; }, set ordenDesc(v){ catalogoOrdenDesc = v; },
+  get verCompleto(){ return verCatalogoCompleto; }, set verCompleto(v){ verCatalogoCompleto = v; },
+  get filtros(){ return {cat: $('#catalogo-filtro') ? $('#catalogo-filtro').value : '', slot: $('#catalogo-filtro-slot') ? $('#catalogo-filtro-slot').value : '',
+    tier: $('#catalogo-filtro-tier') ? $('#catalogo-filtro-tier').value : '', buscar: $('#catalogo-buscar') ? $('#catalogo-buscar').value : ''}; },
+  extraItem: id => botinItemPorId(id),   // un ítem del botín (Comparar desde "Botín")
+};
+// Lo que cambia al personaje en la tienda (comprar, agregar gratis, vender, reparar): se redibuja como siempre.
+const tiendaUi = {
+  toast: t => toast(t),
+  cambio: partes => {
+    if(partes.includes('meta')) $('#f-dde').value = fmt(S.meta.dde);
+    if(partes.includes('loot')) $('#f-loot-normal').value = S.loot.normal;
+    renderInventario();
+    if(partes.includes('cinturon')) renderList('cinturon');
+    refresh();
+  },
+};
 
 function renderCabeceraTienda(){
   const badge = $('#tienda-badge');
@@ -224,10 +152,7 @@ function renderCabeceraTienda(){
   if($('#tienda-vender')) $('#tienda-vender').style.display = 'none';
   if($('#tienda-reparar')) $('#tienda-reparar').style.display = 'none';
   if(tiendaCargada){
-    const pct = Number(tiendaCargada.ajustePrecio) || 0;
-    const extra = pct ? ` · ${pct < 0 ? '-' : '+'}${Math.abs(pct)}%` : '';
-    const pv = Number(tiendaCargada.ajusteVenta) || 0;
-    badge.textContent = `Tienda · ${tiendaCargada.tamanoLabel || 'vendedor'}${extra}${pv ? ` · venta ${pv < 0 ? '-' : '+'}${Math.abs(pv)}%` : ''}`;
+    badge.textContent = FichaTienda.badge(tiendaSt);
     if($('#tienda-vender')) $('#tienda-vender').style.display = '';
     if($('#tienda-reparar')) $('#tienda-reparar').style.display = tiendaCargada.herrero ? '' : 'none';   // solo las tiendas con herrero reparan
     badge.style.display = '';
@@ -255,12 +180,7 @@ function limpiarFiltrosCatalogo(){
 // El vendedor puede tener un descuento o recargo para toda la tienda. Se
 // aplica al vuelo sobre el precio de catálogo: nada reescribe S.catalogo,
 // así al salir de la tienda los precios vuelven solos a los de siempre.
-function precioDeCompra(item){
-  const base = num(item.precioCompra);
-  const pct = tiendaCargada ? (Number(tiendaCargada.ajustePrecio) || 0) : 0;
-  if(!pct) return base;
-  return Math.max(1, Math.round(base * (1 + pct / 100)));
-}
+function precioDeCompra(item){ return FichaTienda.precioDeCompra(tiendaSt, item); }
 
 function salirDeLaTienda(){
   tiendaCargada = null;
@@ -270,20 +190,7 @@ function salirDeLaTienda(){
   toast('Catálogo completo');
 }
 
-function tiendaDesdeDoc(snap){
-  if(!snap.exists) return null;
-  let t;
-  try{ t = JSON.parse(snap.data().json || ''); }catch(e){ return null; }
-  // Ítems creados por el GM antes de correr la escala de Tipos (sin marca propia).
-  (Array.isArray(t && t.itemsDatos) ? t.itemsDatos : []).forEach(it => {
-    if(!it || CATALOGO_IDS.has(it.id) || num(it.escalaTipos) >= ESCALA_TIPOS) return;
-    migrarObjTipos(it);
-    it.escalaTipos = ESCALA_TIPOS;
-  });
-  if(!(t && Array.isArray(t.items) && t.items.length)) return null;
-  t.abierta = snap.data().abierta === true;   // el GM decide cuándo está accesible
-  return t;
-}
+function tiendaDesdeDoc(snap){ return FichaTienda.desdeDoc(snap); }
 
 /* ---------- Tienda abierta o cerrada ----------
    El GM abre y cierra la tienda con un interruptor (vendor-generator). Mientras está cerrada, el botón
@@ -308,38 +215,12 @@ function tiendaEstadoEscuchar(){
    ítems de la mochila y del cinturón, y despojos (1 DDE cada uno). El "ajuste al vender" de la tienda
    sube o baja lo que se cobra, también en los despojos. */
 let venderSel = {};   // clave 'inventario:id' | 'cinturon:id' | 'despojos' -> cantidad elegida
-function ajusteVentaTienda(){ return tiendaCargada ? (Number(tiendaCargada.ajusteVenta) || 0) : 0; }
-function precioVentaTienda(base){ return Math.max(0, Math.round(num(base) * (1 + ajusteVentaTienda() / 100) * 100) / 100); }
-function itemsVendibles(){
-  const out = [];
-  ['inventario', 'cinturon'].forEach(key => (S[key] || []).forEach(it => {
-    if(it.equipado) return;
-    const base = precioVentaDe(it);
-    if(base > 0) out.push({clave: `${key}:${it.id}`, key, it, unidades: num(it.unidades) || 1, unit: precioVentaTienda(base)});
-  }));
-  return out;
-}
-function totalVenta(){
-  let t = 0;
-  itemsVendibles().forEach(v => { t += (venderSel[v.clave] || 0) * v.unit; });
-  t += (venderSel.despojos || 0) * precioVentaTienda(1);
-  return Math.round(t * 100) / 100;
-}
+function ajusteVentaTienda(){ return FichaTienda.ajusteVenta(tiendaSt); }
+function precioVentaTienda(base){ return FichaTienda.precioVentaTienda(tiendaSt, base); }
+function itemsVendibles(){ return FichaTienda.vendibles(S, tiendaSt); }
+function totalVenta(){ return FichaTienda.totalVenta(S, tiendaSt); }
 function renderVender(){
-  const lista = itemsVendibles();
-  const desp = Math.max(0, Math.floor(num(S.loot.normal)));
-  const ajuste = ajusteVentaTienda();
-  const fila = (clave, nombre, max, unit, extra) => `<div class="vender-fila" style="display:grid;grid-template-columns:24px 1fr auto 74px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line-soft)">
-      <input type="checkbox" data-vender-chk="${esc(clave)}"${venderSel[clave] ? ' checked' : ''}>
-      <span>${esc(nombre)}${extra || ''}</span>
-      <span class="hint">${fmt(unit)} DDE c/u</span>
-      ${max > 1 ? `<input type="number" min="1" max="${max}" data-vender-cant="${esc(clave)}" value="${venderSel[clave] || max}" style="width:70px">` : `<span class="hint">×1</span>`}
-    </div>`;
-  $('#vender-cuerpo').innerHTML = `
-    <p class="hint" style="margin:0 0 8px">${ajuste ? `Esta tienda paga con un ajuste de ${ajuste > 0 ? '+' : ''}${ajuste}%. ` : ''}Lo que tenés equipado no se puede vender: sacalo antes.</p>
-    ${desp > 0 ? fila('despojos', 'Despojos', desp, precioVentaTienda(1)) : ''}
-    ${lista.map(v => fila(v.clave, v.it.nombre || '(sin nombre)', v.unidades, v.unit, v.unidades > 1 ? ` <span class="hint">(tenés ${fmt(v.unidades)})</span>` : '')).join('')}
-    ${!lista.length && !desp ? '<div class="hint">No tenés nada para vender.</div>' : ''}`;
+  $('#vender-cuerpo').innerHTML = FichaTienda.venderHtml(S, tiendaSt);
   $('#vender-total').innerHTML = `Vas a cobrar: <b>${fmt(totalVenta())} DDE</b>`;
 }
 function abrirVender(){
@@ -349,68 +230,22 @@ function abrirVender(){
   $('#scrim-vender').classList.add('open');
 }
 function confirmarVender(){
-  if(!tiendaCargada){ toast('La tienda está cerrada'); return; }
-  const total = totalVenta();
-  if(!total){ toast('Elegí qué vender'); return; }
-  let nombres = [];
-  itemsVendibles().forEach(v => {
-    const q = Math.min(venderSel[v.clave] || 0, v.unidades);
-    if(!q) return;
-    nombres.push(q > 1 ? `${v.it.nombre} ×${q}` : v.it.nombre);
-    if(q >= v.unidades) S[v.key] = S[v.key].filter(x => x.id !== v.it.id); else v.it.unidades = v.unidades - q;
-  });
-  const qd = Math.min(venderSel.despojos || 0, Math.max(0, Math.floor(num(S.loot.normal))));
-  if(qd){ S.loot.normal = num(S.loot.normal) - qd; nombres.push(`${qd} despojo${qd === 1 ? '' : 's'}`); $('#f-loot-normal').value = S.loot.normal; }
-  S.meta.dde = Math.round((num(S.meta.dde) + total) * 100) / 100;
-  $('#f-dde').value = fmt(S.meta.dde);
-  renderInventario(); renderList('cinturon'); refresh();
-  venderSel = {};
-  $('#scrim-vender').classList.remove('open');
-  toast(`Vendiste ${nombres.join(', ')} · +${fmt(total)} DDE (tenés ${fmt(num(S.meta.dde))})`);
+  if(FichaTienda.vender(S, tiendaSt, tiendaUi)) $('#scrim-vender').classList.remove('open');
 }
 /* ---------- Reparación con el herrero (2026-09-26, pedido del dueño) ----------
    Las tiendas que el GM marca como «herrero» tienen el botón 🔧 Reparación. Se repara por punto de durabilidad (por defecto 1 DDE por punto; lo fija la tienda) y cada
    punto reparado también devuelve 1 de Armadura rota de esa pieza. NO se puede reparar durante el combate (cuando el mapa está en modo combate). */
-function precioReparacion(){ return tiendaCargada ? Math.max(0, num(tiendaCargada.precioReparacion === undefined ? 1 : tiendaCargada.precioReparacion)) : 1; }
-function itemsAReparar(){
-  return S.inventario.filter(i => durableItem(i) && (durActual(i) < durMax(i) || armRotaDe(i) > 0))
-    .map(i => ({it: i, faltan: Math.max(0, durMax(i) - durActual(i))}));
-}
+function precioReparacion(){ return FichaTienda.precioReparacion(tiendaSt); }
+function itemsAReparar(){ return FichaTienda.aReparar(S); }
 const enCombateAhora = () => !!(typeof modoMapaListo !== 'undefined' && modoMapaListo && modoMapa === 'combate');
 function renderReparar(){
-  const p = precioReparacion(), lista = itemsAReparar(), dde = num(S.meta.dde);
-  const totalPts = lista.reduce((a, x) => a + x.faltan, 0);
-  const bloqueado = enCombateAhora();
-  $('#reparar-cuerpo').innerHTML = `
-    <p class="hint" style="margin:0 0 8px">${p > 0 ? `El herrero cobra <b>${fmt(p)} DDE por punto</b> de durabilidad.` : 'Este herrero repara gratis.'} Cada punto reparado también devuelve 1 de Armadura rota de esa pieza. Tenés <b>${fmt(dde)} DDE</b>.</p>
-    ${bloqueado ? '<p class="hint" style="margin:0 0 8px;color:#FF9E7E">⚔ No se puede reparar durante el combate: esperá a que el GM pase el mapa a modo narrativo.</p>' : ''}
-    ${lista.length ? lista.map(({it, faltan}) => `<div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)">
-        <div><b>${esc(it.nombre)}</b> ${it.equipado ? '<span class="tag">equipado</span>' : ''}<div class="hint">🔧 ${fmt(durActual(it))}/${fmt(durMax(it))}${armRotaDe(it) ? ` · Armadura rota ×${fmt(armRotaDe(it))}` : ''}${itemRoto(it) ? ' · <b style="color:#FF7E7E">ROTO</b>' : ''} · faltan ${fmt(faltan)} punto${faltan === 1 ? '' : 's'}</div></div>
-        <button class="mini" data-rep="${esc(it.id)}:1"${bloqueado || faltan < 1 ? ' disabled' : ''}>+1 · ${fmt(p)} DDE</button>
-        <button class="mini" data-rep="${esc(it.id)}:${faltan}"${bloqueado || faltan < 1 ? ' disabled' : ''}>Todo · ${fmt(Math.round(faltan * p * 100) / 100)} DDE</button>
-      </div>`).join('') : '<div class="hint">No tenés nada para reparar: todo tu equipo está entero.</div>'}`;
-  $('#reparar-total').innerHTML = `Reparar todo cuesta: <b>${fmt(Math.round(totalPts * p * 100) / 100)} DDE</b> (${fmt(totalPts)} punto${totalPts === 1 ? '' : 's'})`;
-  $('#reparar-todo').disabled = bloqueado || !totalPts;
+  const bloqueado = enCombateAhora(), r = FichaTienda.repararHtml(S, tiendaSt, bloqueado);
+  $('#reparar-cuerpo').innerHTML = r.html;
+  $('#reparar-total').innerHTML = r.total;
+  $('#reparar-todo').disabled = bloqueado || !r.totalPts;
 }
 function repararItems(pares){   // pares: [{it, pts}]
-  if(enCombateAhora()){ toast('No se puede reparar durante el combate'); return; }
-  const p = precioReparacion();
-  const pts = pares.reduce((a, x) => a + Math.min(x.pts, Math.max(0, durMax(x.it) - durActual(x.it))), 0);
-  if(!pts){ toast('No hay nada para reparar'); return; }
-  const costo = Math.round(pts * p * 100) / 100;
-  if(costo > num(S.meta.dde) + 1e-9){ toast(`No te alcanza: reparar ${fmt(pts)} punto${pts === 1 ? '' : 's'} cuesta ${fmt(costo)} DDE y tenés ${fmt(num(S.meta.dde))}`); return; }
-  pares.forEach(({it, pts: n}) => {
-    const q = Math.min(n, Math.max(0, durMax(it) - durActual(it)));
-    if(q <= 0) return;
-    it.dur = durActual(it) + q;
-    it.armRota = Math.max(0, armRotaDe(it) - q);
-  });
-  S.meta.dde = Math.round((num(S.meta.dde) - costo) * 100) / 100;
-  $('#f-dde').value = fmt(S.meta.dde);
-  renderInventario();
-  refresh();
-  renderReparar();
-  toast(`🔧 Reparaste ${fmt(pts)} punto${pts === 1 ? '' : 's'} por ${fmt(costo)} DDE (te quedan ${fmt(num(S.meta.dde))})`);
+  FichaTienda.reparar(S, tiendaSt, pares, enCombateAhora(), {toast: t => toast(t), cambio: p => { tiendaUi.cambio(p); renderReparar(); }});
 }
 function abrirReparar(){
   if(!tiendaCargada || !tiendaCargada.herrero){ toast('Esta tienda no tiene herrero'); return; }
@@ -433,17 +268,7 @@ $('#tienda-vender').onclick = abrirVender;
 $('#vender-x').onclick = () => $('#scrim-vender').classList.remove('open');
 $('#vender-confirmar').onclick = confirmarVender;
 $('#vender-cuerpo').addEventListener('change', e => {
-  const chk = e.target.dataset.venderChk, cant = e.target.dataset.venderCant;
-  if(chk !== undefined){
-    const fila = e.target.closest('.vender-fila').querySelector('[data-vender-cant]');
-    const max = fila ? num(fila.max) : 1;
-    venderSel[chk] = e.target.checked ? (fila ? Math.max(1, Math.min(max, num(fila.value))) : 1) : 0;
-  }else if(cant !== undefined){
-    const max = num(e.target.max);
-    const q = Math.max(1, Math.min(max, Math.round(num(e.target.value)) || 1));
-    e.target.value = q;
-    if(venderSel[cant]) venderSel[cant] = q;
-  }
+  FichaTienda.venderCambio(tiendaSt, e.target);
   $('#vender-total').innerHTML = `Vas a cobrar: <b>${fmt(totalVenta())} DDE</b>`;
 });
 
@@ -507,9 +332,9 @@ let itemAleatorioActual = null;
 // Elige un ítem al azar entre los que pasan los filtros activos en ese
 // momento (no de todo el catálogo) — para botín o recompensas rápidas.
 function elegirItemAleatorio(){
-  const visibles = catalogoVisibles();
-  if(!visibles.length){ toast('No hay ítems que coincidan con los filtros activos'); return; }
-  itemAleatorioActual = visibles[Math.floor(Math.random() * visibles.length)];
+  if(!Array.isArray(S.catalogo)) S.catalogo = structuredClone(DEFAULT.catalogo);
+  itemAleatorioActual = FichaTienda.aleatorio(S, tiendaSt);
+  if(!itemAleatorioActual){ toast('No hay ítems que coincidan con los filtros activos'); return; }
   $('#item-aleatorio-body').innerHTML = `<div class="cat-grid">${catalogoRowHtml(itemAleatorioActual)}</div>`;
   $('#scrim-item-aleatorio').classList.add('open');
 }
@@ -526,32 +351,10 @@ function ajustarFiltroTier(){
 
 function renderCatalogoModal(){
   ajustarFiltroTier();
-  const visibles = catalogoVisibles();
-  const grupos = {};
-  visibles.forEach(item => {
-    const g = grupoCompraDe(item.tipoItem);
-    (grupos[g] = grupos[g] || []).push(item);
-  });
-  let html;
-  if(catalogoOrden === 'categoria'){
-    const claves = GRUPO_COMPRA_ORDEN.filter(g => grupos[g] && grupos[g].length);
-    html = claves.map(g => `
-      <div class="cat-grouphead">${esc(GRUPO_COMPRA_LABEL[g])}</div>
-      <div class="cat-grid">${conStockYLegacyPrimero(ordenarCatalogo(grupos[g])).map(catalogoRowHtml).join('')}</div>
-    `).join('');
-  }else{
-    const orden = conStockYLegacyPrimero(ordenarCatalogo(visibles));
-    html = orden.length
-      ? `<div class="cat-grouphead">${esc(ORDENES_CATALOGO[catalogoOrden].label)} · ${fmt(orden.length)}</div>
-         <div class="cat-grid">${orden.map(catalogoRowHtml).join('')}</div>`
-      : '';
-  }
+  if(!Array.isArray(S.catalogo)) S.catalogo = structuredClone(DEFAULT.catalogo);
+  const html = FichaTienda.catalogoHtml(S, tiendaSt);
   renderCatalogoOrdenControles();
-  const textoBusqueda = $('#catalogo-buscar') ? $('#catalogo-buscar').value.trim() : '';
-  let vacioMsg = 'El catálogo está vacío. Tocá "+ Ítem al catálogo" para cargar el primero.';
-  if(tiendaCargada) vacioMsg = textoBusqueda ? `El vendedor no tiene nada que coincida con "${esc(textoBusqueda)}".` : 'El vendedor no tiene nada en esta categoría.';
-  else if(S.catalogo.length) vacioMsg = textoBusqueda ? `No hay ítems que coincidan con "${esc(textoBusqueda)}".` : 'No hay ítems en esta categoría.';
-  $('#catalogo-body').innerHTML = html || `<div class="hint">${vacioMsg}</div>`;
+  $('#catalogo-body').innerHTML = html;
   renderCabeceraTienda();
   $('#catalogo-dde').textContent = fmt(num(S.meta.dde));
   renderCarritoCatalogo();
@@ -560,128 +363,35 @@ function renderCatalogoModal(){
 function renderCarritoCatalogo(){
   const cont = $('#carrito-lista');
   if(!cont) return;
-  if(!carritoCatalogo.length){
-    cont.innerHTML = `<div class="carrito-vacio">Carrito vacío — usá "+ Carrito" en los ítems que quieras comprar.</div>`;
-    $('#carrito-total').textContent = '0';
-    $('#carrito-comprar').disabled = true;
-    return;
-  }
-  let total = 0;
-  cont.innerHTML = carritoCatalogo.map(ent => {
-    const item = itemCatalogo(ent.catId);
-    if(!item) return '';
-    const subtotal = precioDeCompra(item) * ent.cantidad;
-    total += subtotal;
-    return `<div class="carrito-item">
-      <span class="carrito-nombre">${esc(item.nombre)} ×${fmt(ent.cantidad)}</span>
-      <span class="carrito-subtotal">${fmt(subtotal)} DDE</span>
-      <button class="carrito-rm" data-carritorm="${ent.catId}">×</button>
-    </div>`;
-  }).join('');
-  $('#carrito-total').textContent = fmt(total);
-  $('#carrito-comprar').disabled = total > num(S.meta.dde);
-  $('#carrito-comprar').title = total > num(S.meta.dde) ? `Te faltan ${fmt(total - num(S.meta.dde))} DDE` : '';
+  const c = FichaTienda.carrito(S, tiendaSt);
+  cont.innerHTML = c.html;
+  $('#carrito-total').textContent = fmt(c.total);
+  $('#carrito-comprar').disabled = !carritoCatalogo.length || !c.puede;
+  $('#carrito-comprar').title = c.falta > 0 ? `Te faltan ${fmt(c.falta)} DDE` : '';
 }
 
-const STACK_MAX = 5;
+const STACK_MAX = FichaTienda.STACK_MAX;
 // Las trampas consumibles (`pilaInfinita`) se apilan sin límite: una sola ranura de la mochila para todas las iguales (pedido del dueño, 2026-09-25).
-const stackMaxDe = it => (it && it.pilaInfinita) ? Infinity : STACK_MAX;
+const stackMaxDe = it => FichaTienda.stackMaxDe(it);
 
 function purgarSiAgotado(key, id){ return FichaAcciones.purgarSiAgotado(S, key, id); }   // comun/ficha-acciones.js
 
-function agregarConsumibleAInventario(itemBase, cantidad){
-  let restante = num(cantidad);
-  const existentes = S.inventario.filter(i => !i.equipado && i.consumible && i.nombre === itemBase.nombre);
-  for(const stack of existentes){
-    if(restante <= 0) break;
-    const espacio = stackMaxDe(itemBase) - num(stack.unidades);
-    if(espacio <= 0) continue;
-    const mover = Math.min(espacio, restante);
-    stack.unidades = num(stack.unidades) + mover;
-    restante -= mover;
-  }
-  while(restante > 0){
-    const nuevo = structuredClone(itemBase);
-    nuevo.id = uid();
-    nuevo.equipado = false;
-    nuevo.ranuras = itemBase.ranuras ?? 1;
-    const enEsteStack = Math.min(stackMaxDe(itemBase), restante);
-    nuevo.unidades = enEsteStack;
-    nuevo.cargaActual = Math.max(1, num(itemBase.cargaMax) || 1);
-    S.inventario.push(nuevo);
-    restante -= enEsteStack;
-  }
-}
-
-function crearItemsDesdeCatalogo(item, cantidad){
-  if(item.consumible){
-    agregarConsumibleAInventario(item, cantidad);
-  }else{
-    for(let i=0; i<cantidad; i++){
-      const nuevo = structuredClone(item);
-      nuevo.id = uid();
-      nuevo.equipado = false;
-      nuevo.unidades = 1;
-      nuevo.ranuras = item.ranuras ?? 1;
-      S.inventario.push(nuevo);
-    }
-  }
-}
-
-function agregarDesdeCatalogo(id){
-  // Agregar gratis solo si el GM lo permitió en la tienda abierta (por defecto se compra con el carrito).
-  if(!(tiendaCargada && tiendaCargada.agregarGratis)){ toast('Esta tienda no permite agregar ítems gratis: usá el carrito'); return; }
-  const item = itemCatalogo(id);
-  if(!item) return;
-  const qtyInput = document.querySelector(`[data-catqty="${id}"]`);
-  const cantidad = Math.max(1, num(qtyInput ? qtyInput.value : 1));
-  crearItemsDesdeCatalogo(item, cantidad);
-  renderInventario();
-  refresh();
-  toast(`${item.nombre} ×${cantidad} agregado a la mochila (gratis)`);
-}
-
+function agregarConsumibleAInventario(itemBase, cantidad){ FichaTienda.agregarConsumible(S, itemBase, cantidad); }
+function crearItemsDesdeCatalogo(item, cantidad){ FichaTienda.crearItems(S, item, cantidad); }
+const cantidadEnFila = id => { const q = document.querySelector(`[data-catqty="${id}"]`); return Math.max(1, num(q ? q.value : 1)); };
+function agregarDesdeCatalogo(id){ FichaTienda.agregarGratis(S, tiendaSt, id, cantidadEnFila(id), tiendaUi); }
 function agregarAlCarrito(id){
-  const item = itemCatalogo(id);
-  if(!item) return;
-  const qtyInput = document.querySelector(`[data-catqty="${id}"]`);
-  const cantidad = Math.max(1, num(qtyInput ? qtyInput.value : 1));
-  const existente = carritoCatalogo.find(e=>e.catId===id);
-  if(existente) existente.cantidad += cantidad;
-  else carritoCatalogo.push({catId:id, cantidad});
+  FichaTienda.agregarAlCarrito(S, tiendaSt, id, cantidadEnFila(id), tiendaUi);
   renderCarritoCatalogo();
-  toast(`${item.nombre} ×${cantidad} agregado al carrito`);
 }
-
 function quitarDelCarrito(catId){
-  carritoCatalogo = carritoCatalogo.filter(e=>e.catId!==catId);
+  FichaTienda.quitarDelCarrito(tiendaSt, catId);
   renderCarritoCatalogo();
 }
-
 function comprarCarrito(){
-  if(!carritoCatalogo.length) return;
-  let total = 0;
-  carritoCatalogo.forEach(ent => {
-    const item = itemCatalogo(ent.catId);
-    if(item) total += precioDeCompra(item) * ent.cantidad;
-  });
-  if(total > num(S.meta.dde)){
-    toast(`No te alcanzan los DDE — necesitás ${fmt(total)} y tenés ${fmt(num(S.meta.dde))}`);
-    return;
-  }
-  S.meta.dde = num(S.meta.dde) - total;
-  $('#f-dde').value = fmt(S.meta.dde);
-  carritoCatalogo.forEach(ent => {
-    const item = itemCatalogo(ent.catId);
-    if(item) crearItemsDesdeCatalogo(item, ent.cantidad);
-  });
-  const cantidadItems = carritoCatalogo.length;
-  carritoCatalogo = [];
-  renderInventario();
-  refresh();
+  FichaTienda.comprar(S, tiendaSt, tiendaUi);
   renderCarritoCatalogo();
   $('#catalogo-dde').textContent = fmt(num(S.meta.dde));
-  toast(`Compra realizada · ${cantidadItems} tipo(s) de ítem · -${fmt(total)} DDE`);
 }
 
 

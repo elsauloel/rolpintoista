@@ -48,19 +48,10 @@ const CATEGORIA_LABEL = Object.fromEntries(CATEGORIAS.map(c=>[c.id, c.label]));
 const SLOT_MAP = FichaCalculo.SLOT_MAP;
 const slotDe = FichaCalculo.slotDe;
 
-const GRUPO_COMPRA_MAP = {
-  arma_1m:'armas', arma_2m:'armas',
-  escudo_1m:'escudos', escudo_2m:'escudos',
-  armadura_blanda:'defensa', armadura_rigida:'defensa',
-  manos:'defensa', piernas:'defensa', cabeza:'defensa', pies:'defensa',
-  cinturon:'defensa', mochila:'defensa',
-  consumibles:'consumibles',
-  anillos:'accesorios',
-  otros:'otros', '':'otros'
-};
-const GRUPO_COMPRA_LABEL = {armas:'Armas', escudos:'Escudos', defensa:'Defensa', accesorios:'Accesorios', consumibles:'Consumibles', otros:'Otros'};
-const GRUPO_COMPRA_ORDEN = ['consumibles','armas','defensa','escudos','accesorios','otros'];
-function grupoCompraDe(tipoItem){ return GRUPO_COMPRA_MAP[tipoItem] || 'otros'; }
+const GRUPO_COMPRA_MAP = FichaTienda.GRUPO_COMPRA_MAP;   // comun/ficha-tienda.js (A5, 2026-10-02)
+const GRUPO_COMPRA_LABEL = FichaTienda.GRUPO_COMPRA_LABEL;
+const GRUPO_COMPRA_ORDEN = FichaTienda.GRUPO_COMPRA_ORDEN;
+const grupoCompraDe = tipoItem => FichaTienda.grupoCompraDe(tipoItem);
 const ORDEN_EQUIPO = {
   arma_1m:1, arma_2m:1,
   escudo_1m:2, escudo_2m:2,

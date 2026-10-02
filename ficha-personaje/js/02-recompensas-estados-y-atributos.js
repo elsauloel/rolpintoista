@@ -696,9 +696,7 @@ function priceTags(i){
   return out;
 }
 
-function precioVentaDe(i){
-  return Math.round((num(i.precioCompra) / 2) * 100) / 100;
-}
+function precioVentaDe(i){ return FichaTienda.precioVenta(i); }   // comun/ficha-tienda.js (A5)
 
 function armaDanoTxt(i, extra){ return FichaCombate.armaDanoTxt(i, extra); }   // comun/ficha-combate.js
 

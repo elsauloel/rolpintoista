@@ -217,6 +217,6 @@ const FichaCalculo = (() => {
   };
 
   return {IT2, GRUPOS, EXTRA, STAT_LIST, ATTR_LIST, MOD_TARGETS, STAT_LABEL, STAT_FULL, ES_ATTR,
-    SLOT_MAP, slotDe, SLOTS_DURABLES, SLOTS_ARMADURA, durableItem, esArmaduraItem, durMax, durActual, itemRoto, armRotaDe,
+    SLOT_MAP, SLOT_LABEL, slotDe, SLOTS_DURABLES, SLOTS_ARMADURA, durableItem, esArmaduraItem, durMax, durActual, itemRoto, armRotaDe,
     pasivaCompras, jobTotal, modsDe, evalFormula, calcular};
 })();

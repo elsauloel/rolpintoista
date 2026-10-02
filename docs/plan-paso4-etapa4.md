@@ -30,9 +30,10 @@ El mapa guarda con `modificarCreep` (transacción + resumen + firma); GM Tools, 
    datos de la invocación a mano, el daño que recibe en el duelo puede dejar de ser a mano (hoy `dueloAplicarDano` lo marca
    "es una invocación"). ✅ los ganchos y el daño automático (2026-10-01).
 5. Las habilidades (`invEjecutarHab` y compañía) ✅ (2026-10-01).
-6. La 🔍 (`lupaHtmlInv`) y el Ver (`verHabInv`).
+6. La 🔍 (`lupaHtmlInv`) y el Ver (`verHabInv`) ✅ (2026-10-01). **La 4e está terminada**: con ⚗, la Botonera nueva de una
+   invocación ya no le pide nada a la ficha. Queda: las Espinas de una invocación que recibe un golpe (`dueloEspinas`).
 
-**4d (pendiente del dueño)**: probar las Acciones nuevas en una sesión real (el GM con ⚗ prendido, jugando un combate de verdad) y,
+**4d (pendiente del dueño)**: probar las Acciones nuevas de los creeps y la Botonera nueva de las invocaciones en una sesión real (el GM con ⚗ prendido, jugando un combate de verdad) y,
 si andan bien, dejarlas como las de siempre (como la 3d de la Botonera del personaje). Las Acciones nuevas ya no le piden nada
 a GM Tools salvo Editar / Subir / Reemplazar del Ver de una habilidad (y lo que abre "+ Estado" o el editor del creep). Después,
 **4e** (invocaciones), que espera P137.
@@ -281,3 +282,11 @@ puede empezar.
   Silvia, ⚗, un Lobo con tres habilidades): 📣 Aullido se anunció sin cobrar; 💰 Mordida cobró 1 No2, puso cooldown 2 y tiró Fue, y
   su 🎲 el 1d6; ✨ Piel dura cobró 1 No2, cooldown 3 y le puso Blindado (2 turnos); Mordida otra vez se negó por el cooldown. Todo
   guardado, **ningún pedido a la ficha**. Restaurado y verificado. Lo que sigue: tanda 6, la 🔍 y el Ver.
+- 2026-10-01: **4e, tanda 6 hecha** (ded18a3) — `comun/inv-lupa.js` (`InvLupa.contenido(inv, clave)`, `verHab(inv, h)`, `stat`),
+  copiado de `lupaStatInv`/`lupaHtmlInv` (`js/11`) y de lo que arma `verHabInv` (`js/04`), que quedan con atajos. En el mapa, la
+  Botonera nueva de una invocación dibuja sus 🔍 (`lupaContenido` reconoce `inv:…`, sobre una copia migrada) y el Ver se muestra en
+  el recuadro (`#bn-verinv`; no cambia nada, así que no pide poder guardar). Comparado contra el código viejo en 500 invocaciones
+  (9 306 🔍 y el Ver de cada habilidad): 500 iguales; 6 de 6 mutaciones detectadas. `pruebas.html`: 190 (1 nueva). **En vivo** (GM
+  sin el control, solo mirando, ⚗, un Lobo de prueba): las 🔍 de Atacar («Ya atacó: Tipo completo, 8 No2») y de la habilidad
+  («faltan 1» de cooldown, tirada del stat y fórmula) y el Ver (costo, cooldown, detalle) se abrieron en el mapa, sin pedir nada a
+  la ficha. Restaurado (invocaciones vacías). **La 4e quedó terminada.**

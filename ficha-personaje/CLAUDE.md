@@ -628,3 +628,5 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
   (`js/11`) llaman a `dueloInv = InvDuelo.hooks(dueloInvUi)` (`comun/inv-duelo.js`); `pagarFlashInv`/`costoFlashInv` (`js/04`) son atajos.
 - **Las habilidades de una invocación, compartidas (paso 4, etapa 4e, tanda 5, 2026-10-01)**: `invEjecutarHab` y sus ayudantes
   (`js/04`) usan `comun/inv-habilidades.js`; `invHabUi` es lo que hace la ficha (publicar, redibujar, el duelo).
+- **La 🔍 y el Ver de una invocación, compartidos (paso 4, etapa 4e, tanda 6, 2026-10-01)**: `lupaStatInv`/`lupaHtmlInv` (`js/11`) y
+  `verHabInv` (`js/04`) usan `comun/inv-lupa.js`.

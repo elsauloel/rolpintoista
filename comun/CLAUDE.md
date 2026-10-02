@@ -992,3 +992,6 @@ versión parecida en más de una, es candidato a juntar.
   `ataqueDeHab`, `lanzarAtaque`, `usarFlashFuera`, `ponerEstado`, `aplicarSpec`, `anunciar`. `ui = {mesaHabilidad, mesaConTexto, publicar,
   toast, cambio, cambiar, parry, dueloDisponible, elegirObjetivo(inv, cfg)}`. Lo usan la ficha (`invHabUi`, `js/04`) y el mapa
   (`bnInvHabUi`).
+- **`inv-lupa.js`** (`InvLupa`, 2026-10-01, paso 4 etapa 4e, tanda 6) — **la 🔍 y el Ver de una invocación**: `contenido(inv, clave)`
+  (clave `"inv:invId:tipo:ref"`, la de `inv-botonera.js`), `verHab(inv, h)` y `stat(inv, statId, o)`. Solo arma el HTML. Lo usan la
+  ficha (`lupaHtmlInv`, `verHabInv`) y el mapa (`lupaContenido`, `#bn-verinv`).

@@ -1162,3 +1162,5 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   todavía no se devuelven solas.
   Desde la tanda 5, **las habilidades de la invocación** también (Ejecutar/Anunciar y la 🎲 segunda tirada: `bnInvAca` con
   `comun/inv-habilidades.js` y `bnInvHabUi`). Solo el Ver sigue yendo a la ficha (tanda 6).
+  Desde la tanda 6, **la 🔍 y el Ver** de la invocación también (`comun/inv-lupa.js`: `lupaContenido` reconoce `inv:…`; el Ver en
+  `#bn-verinv`). Con ⚗, la Botonera nueva de una invocación ya no le pide nada a la ficha.

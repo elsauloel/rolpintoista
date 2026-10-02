@@ -299,7 +299,11 @@ const AsistenteDueloHab = (() => {
         h += `<div class="aviso" style="margin-top:10px">Sin tirada: al ejecutarla se abre el cuadro con los efectos y su botón <b>Aplicar</b>. Así la acción tiene su momento en pantalla igual.</div>`;
         return h;
       }
-      h += `<select data-tira-modo style="margin-top:10px"><option value="stat"${st.tiraModo !== 'custom' ? ' selected' : ''}>Un stat de la ficha</option><option value="custom"${st.tiraModo === 'custom' ? ' selected' : ''}>Personalizada: mi propia fórmula, con mi texto</option></select>`;
+      // Las dos maneras a la vista (2026-10-02, pedido del dueño: antes «Personalizada» quedaba escondida adentro de un desplegable).
+      h += `<div class="adh-modo">
+          <label class="op"><input type="radio" name="tiramodo" value="stat" ${st.tiraModo !== 'custom' ? 'checked' : ''}> Un stat de la ficha</label>
+          <label class="op"><input type="radio" name="tiramodo" value="custom" ${st.tiraModo === 'custom' ? 'checked' : ''}> Tirada custom: mi propia fórmula de dados, con mi texto (ej. «X + 1dX», «2d6 + 3»)</label>
+        </div>`;
       if(st.tiraModo === 'custom'){
         h += `<div class="fila" style="margin-top:8px"><input type="text" style="min-width:160px" data-tira-formula placeholder="ej. X+1dX (podés usar «X»)" value="${esc(st.tiraFormula)}"></div>
           <div class="fila"><input type="text" style="min-width:240px" data-tira-etiqueta placeholder="¿Qué representa? (ej. Drenaje)" value="${esc(st.tiraEtiqueta)}"></div>
@@ -467,7 +471,7 @@ const AsistenteDueloHab = (() => {
           : st.contraModo === 'otro' ? `${esc(st.contraOtro) || '(sin especificar)'} (a mano)`
           : 'nadie: se aplica directo';
         filas.push(sinOp() ? '<b>Sin tirada</b>: se aplica directo'
-          : st.tiraModo === 'custom' ? `<b>Tirada personalizada</b>: ${esc(st.tiraFormula) || '(sin fórmula)'}${st.tiraEtiqueta ? ' · ' + esc(st.tiraEtiqueta) : ''} contra ${contraTxt}`
+          : st.tiraModo === 'custom' ? `<b>Tirada custom</b>: ${esc(st.tiraFormula) || '(sin fórmula)'}${st.tiraEtiqueta ? ' · ' + esc(st.tiraEtiqueta) : ''} contra ${contraTxt}`
           : `<b>Tirada</b>: ${STAT_TXT[st.tira] || st.tira} contra ${contraTxt}`);
         if(st.dano) filas.push(`<b>Daño</b>: ${st.objetivo === 'zona' && st.danoDif ? 'la diferencia entre las tiradas, ' : ''}tipo ${st.tipoDano}${st.ignoraDano ? ', ignora la Defensa' : ''}${cfg.costoVariable && st.danoFijoPorX ? `, +${st.danoFijoPorX} por X` : ''}${st.objetivo === 'zona' && st.danoExtra ? `; si entra, tira ${esc(st.danoExtra)}` : ''}`);
         if(st.efectoLibreOn && st.efectoLibre.trim()){ const t = st.efectoLibre.trim(); filas.push(`<b>Efecto a mano</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
@@ -521,7 +525,7 @@ const AsistenteDueloHab = (() => {
       f.querySelectorAll('[data-arma]').forEach(i => i.onchange = () => { st.arma[i.dataset.arma] = Number(i.value) || 0; });
       q('[data-tira]', e => { st.tira = e.target.value; dibujar(); });
       q('[data-tira-ninguna]', e => { st.tiraNinguna = e.target.checked; dibujar(); });
-      q('[data-tira-modo]', e => { st.tiraModo = e.target.value; dibujar(); });
+      f.querySelectorAll('[name=tiramodo]').forEach(x => x.onchange = () => { st.tiraModo = x.value; dibujar(); });
       q('[data-tira-formula]', e => { st.tiraFormula = e.target.value; });
       q('[data-tira-etiqueta]', e => { st.tiraEtiqueta = e.target.value; });
       q('[data-alcance]', e => { st.alcance = e.target.value; dibujar(); });
@@ -623,7 +627,7 @@ const AsistenteDueloHab = (() => {
           cerrar(); cfg.alGuardar({duelo: o2, costo: costoResultado()}); return;
         }
         const hayTira = !st.tiraNinguna && (st.tiraModo === 'custom' ? !!st.tiraFormula.trim() : !!st.tira);
-        if(!st.tiraNinguna && st.tiraModo === 'custom' && !st.tiraFormula.trim()){ alert('Escribí la fórmula de la tirada personalizada (podés usar «X»), o tildá «No lleva tirada».'); return false; }
+        if(!st.tiraNinguna && st.tiraModo === 'custom' && !st.tiraFormula.trim()){ alert('Escribí la fórmula de la tirada custom (podés usar «X»), o tildá «No lleva tirada».'); return false; }
         const esArea = st.objetivo === 'area' || st.objetivo === 'onda';
         const out = {objetivo: st.objetivo, tira: (!st.tiraNinguna && st.tiraModo === 'stat') ? (st.tira || '') : '', contra: (hayTira && (esArea || st.contraModo === 'stats')) ? [...st.contra] : []};
         if(!st.tiraNinguna && st.tiraModo === 'custom'){ out.tiraFormula = st.tiraFormula.trim(); out.tiraEtiqueta = st.tiraEtiqueta.trim() || 'Tirada'; }

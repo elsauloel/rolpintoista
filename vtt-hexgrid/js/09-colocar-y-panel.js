@@ -758,110 +758,6 @@ function renderPanel(forzar){
   $('#toolkit-tienda').hidden = !fbMiembro;   // jugadores: comprar y vender; GM: abre el generador de tiendas
   $('#toolkit-tienda').title = soyGM ? 'Tienda: abrir el generador de tiendas (en otra pestaña) para armar, publicar y abrir o cerrar la tienda' : 'Tienda: abrir la tienda que publicó el GM y comprar o vender (solo se puede con la tienda abierta)';
   actualizarBotonMapas();
-  $('#nuevo-token-capa').hidden = !creando;
-  if(!creando) $('#nuevo-token-ventana').innerHTML = '';
-
-
-  if(creando){
-    let color = COLORES[Math.floor(Math.random() * COLORES.length)];
-    let imagenNueva = '';   // solo para tokens sin vincular (NPC, objetos)
-    const tipoInicial = soyGM ? 'creep' : 'pj';
-    // Ventana propia, centrada sobre el mapa (no en la barra lateral).
-    const ventana = $('#nuevo-token-ventana');
-    ventana.innerHTML =
-      '<div class="nt-cab"><span>➕ Nuevo token</span><button type="button" id="nuevo-x" title="Cancelar (Esc o clic derecho)">✕</button></div>' +
-      (!soyGM ? '<div class="nt-campo"><button type="button" class="btn primary" id="nuevo-traer" style="width:100%" title="Pone en el mapa el token de tu personaje, ya vinculado a su ficha">⬇ Traer mi token al mapa</button></div>' : '') +
-      (soyGM ? '<div class="nt-campo"><label class="etiqueta">Tipo</label><select id="nuevo-tipo"><option value="creep">Creep o NPC (lo mueve el GM)</option><option value="pj">Personaje (lo mueve su dueño)</option></select></div>' : '') +
-      `<div class="nt-campo"><label class="etiqueta">Vincular a ${soyGM ? 'un creep o ficha' : 'uno de tus personajes'}</label><select id="nuevo-vinculo">${opcionesVinculo(tipoInicial, '', soyGM)}</select>` +
-        '<p class="nt-pista">Vinculado, toma el nombre, la imagen, las barras y los estados de su ficha' + (soyGM ? ' (creep: borde rojo). Sin vincular: NPC, borde gris.' : '.') + '</p></div>' +
-      '<div class="nt-campo" id="nuevo-dueno-caja"></div>' +
-      '<div class="nt-campo"><label class="etiqueta">Nombre</label><input id="nuevo-nombre" maxlength="40" placeholder="Ej: Aurelio"></div>' +
-      '<div class="nt-campo" id="nuevo-imagen"></div>' +
-      '<div class="nt-campo"><label class="etiqueta">Color (se ve si no tiene imagen)</label>' + htmlColores(color, true) + '</div>' +
-      '<div class="nt-pie"><span class="nt-pista" style="margin:0 auto 0 0">Aparece en el centro de lo que estás viendo.</span><button type="button" class="btn" id="nuevo-cancelar">Cancelar</button><button type="button" class="btn primary" id="nuevo-crear">Poner en el mapa</button></div>';
-    // Imagen propia: solo tiene sentido sin vincular (vinculado, la toma de
-    // la ficha o el creep). Se guarda ya achicada, lista para crear el token.
-    const imagenNuevaHtml = () => {
-      if($('#nuevo-vinculo').value) return '';
-      return '<label class="etiqueta">Imagen (opcional)</label>' +
-        '<div class="fila" style="margin-top:0;align-items:center">' +
-          (imagenNueva ? `<img src="${esc(imagenNueva)}" alt="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid ${esc(color)}">` : '') +
-          `<button type="button" class="btn" id="nuevo-imagen-elegir">${imagenNueva ? 'Cambiar imagen' : 'Elegir imagen'}</button>` +
-          (imagenNueva ? '<button type="button" class="btn peligro" id="nuevo-imagen-quitar">Quitar</button>' : '') +
-        '</div>';
-    };
-    const actualizarImagenNueva = () => {
-      $('#nuevo-imagen').innerHTML = imagenNuevaHtml();
-      const elegir = $('#nuevo-imagen-elegir');
-      if(elegir) elegir.onclick = () => {
-        const entrada = $('#token-imagen-archivo');
-        entrada.onchange = async ev => {
-          const file = ev.target.files[0];
-          ev.target.value = '';
-          if(!file) return;
-          try{ imagenNueva = await recortarImagen(file, {lado: TOKEN_IMG_PX, tope: TOKEN_IMG_MAX}); actualizarImagenNueva(); }
-          catch(err){
-            if(err.message === 'cancelado') return;
-            console.error('No se pudo preparar la imagen del token:', err);
-            toast(err.message === 'no-image' ? 'Eso no es una imagen' : 'No se pudo usar esa imagen');
-          }
-        };
-        entrada.click();
-      };
-      const quitar = $('#nuevo-imagen-quitar');
-      if(quitar) quitar.onclick = () => { imagenNueva = ''; actualizarImagenNueva(); };
-    };
-    actualizarImagenNueva();
-    conectarColores(ventana, c => { color = c; actualizarImagenNueva(); });
-    const tipoActual = () => soyGM ? $('#nuevo-tipo').value : 'pj';
-    // Dueño: solo el GM lo elige, y solo para un token de tipo "pj" — el
-    // token queda de quien se elija acá, no de quien lo crea (para poder
-    // armar el token de cada jugador de antemano en un mapa que todavía no
-    // se publicó). Arranca en el dueño de la ficha vinculada, si hay.
-    const actualizarDueno = duenoSugerido => {
-      const caja = $('#nuevo-dueno-caja');
-      if(!soyGM || tipoActual() !== 'pj'){ caja.innerHTML = ''; return; }
-      const previo = $('#nuevo-dueno') ? $('#nuevo-dueno').value : '';
-      caja.innerHTML = '<label class="etiqueta">Dueño (quién lo mueve)</label>' +
-        `<select id="nuevo-dueno">${opcionesDueno(duenoSugerido || previo)}</select>`;
-    };
-    actualizarDueno();
-    const alVincular = () => {
-      const id = $('#nuevo-vinculo').value;
-      const vv = id ? vinculo({tipo: tipoActual(), fichaId: id}) : null;
-      if(vv) $('#nuevo-nombre').value = vv.nombre.slice(0, 40);
-      actualizarDueno(vv && vv.duenoUid);
-      actualizarImagenNueva();
-    };
-    $('#nuevo-vinculo').onchange = alVincular;
-    if(soyGM) $('#nuevo-tipo').onchange = () => {
-      $('#nuevo-vinculo').innerHTML = opcionesVinculo(tipoActual(), '', true);
-      actualizarDueno();
-      actualizarImagenNueva();
-    };
-    const crear = () => {
-      const nombre = $('#nuevo-nombre').value.trim();
-      if(!nombre){ $('#nuevo-nombre').focus(); return; }
-      const fichaId = $('#nuevo-vinculo').value;
-      const duenoUid = soyGM && tipoActual() === 'pj' && $('#nuevo-dueno') ? $('#nuevo-dueno').value : undefined;
-      iniciarColocacion({nombre, color, tipo: tipoActual(), fichaId, imagen: fichaId ? '' : imagenNueva, duenoUid});
-    };
-    $('#nuevo-crear').onclick = crear;
-    $('#nuevo-nombre').onkeydown = e => { if(e.key === 'Enter') crear(); };
-    // Jugador: un solo botón para poner en el mapa a su personaje (el primero que todavía no tenga token), ya vinculado a su ficha.
-    if($('#nuevo-traer')) $('#nuevo-traer').onclick = () => {
-      const propias = [...fichasPub.entries()].filter(([, f]) => f.duenoUid === fbUsuario.uid).sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, 'es'));
-      if(!propias.length){ toast('Todavía no tenés personajes: creá uno en tu ficha'); return; }
-      const enMapa = new Set([...tokens.values()].map(t => t.fichaId).filter(Boolean));
-      const libre = propias.find(([id]) => !enMapa.has(id));
-      if(!libre){ cancelarNuevoToken(); centrarEnMios(); toast('Tu token ya está en el mapa'); return; }
-      iniciarColocacion({nombre: String(libre[1].nombre || 'Personaje').slice(0, 40), color, tipo: 'pj', fichaId: libre[0], imagen: ''});
-    };
-    $('#nuevo-cancelar').onclick = cancelarNuevoToken;
-    $('#nuevo-x').onclick = cancelarNuevoToken;
-    $('#nuevo-vinculo').focus();
-    // Sin return: el costado queda con su panel de siempre.
-  }
 
   // Los datos del token se ven en los controles flotantes (HUD): el panel
   // del costado queda solo con Token (?) y la configuración de los dados.
@@ -1010,17 +906,128 @@ $('#mapas-menu').addEventListener('click', e => e.stopPropagation());
 // Solo se cierra con el mismo botón o con Esc: mientras se acomoda el fondo hay que poder tocar el mapa con el menú abierto.
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && mapasMenuAbierto && !editandoElemento && !moverLibre && !herramientaActiva && !colocando && !creando) abrirMapasMenu(false); });
 
+/* ---------- ＋ Token nuevo, paso a paso (2026-10-02, tanda 6 de docs/plan-paso-a-paso.md) ----------
+   En la ventana común (comun/paso-a-paso.js). GM: Qué es (creep de la lista / NPC u objeto / personaje) → Cuál (el creep o la ficha) →
+   Cómo se ve (nombre, imagen si no está vinculado, color) → Dueño (solo un personaje) → Listo. Jugador: Cuál (sus personajes e invocaciones,
+   o sin vincular) → Cómo se ve → Listo. Al terminar se elige la casilla y hacia dónde mira (iniciarColocacion). */
+let tokenNuevoPap = null;
 function cancelarNuevoToken(){
   if(!creando) return;
   creando = false;
+  if(tokenNuevoPap){ const v = tokenNuevoPap; tokenNuevoPap = null; v.cerrar(); }
   renderPanel(true); pedirDibujo();
 }
-// Clic derecho fuera de un campo de texto, sobre la ventana o su fondo: cancela.
-$('#nuevo-token-capa').addEventListener('contextmenu', e => {
-  if(e.target.closest('input,textarea,select')) return;
-  e.preventDefault();
-  cancelarNuevoToken();
-});
+function abrirTokenNuevo(){
+  if(!fbMiembro) return;
+  if(tokenNuevoPap) tokenNuevoPap.cerrar();
+  creando = true; seleccion = null; moverFondo = false;
+  renderPanel(true); pedirDibujo();
+  const st = {tipo: soyGM ? 'creep' : 'pj', vinculo: '', nombre: '', nombreTocado: false, color: COLORES[Math.floor(Math.random() * COLORES.length)], imagen: '', dueno: ''};
+  const tipoDato = () => st.tipo === 'npc' ? 'creep' : st.tipo;
+  const vinc = () => st.vinculo ? vinculo({tipo: tipoDato(), fichaId: st.vinculo}) : null;
+  // Mis personajes que todavía no tienen token en el mapa (jugador: el atajo "Traer a …").
+  const libre = () => {
+    if(soyGM) return null;
+    const enMapa = new Set([...tokens.values()].map(t => t.fichaId).filter(Boolean));
+    return [...fichasPub.entries()].filter(([id, f]) => f.duenoUid === fbUsuario.uid && !enMapa.has(id)).sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, 'es'))[0] || null;
+  };
+  const TIPOS = [
+    ['creep', '👹', 'Un creep de tu lista', 'Toma el nombre, la imagen, la vida y los estados del creep (borde rojo). Lo mueve el GM.'],
+    ['npc', '🪨', 'Un NPC o un objeto', 'Sin ficha: un personaje de la historia, un cofre, una marca (borde gris). Lo mueve el GM.'],
+    ['pj', '🧙', 'Un personaje o una invocación', 'Vinculado a la ficha de un jugador: lo mueve su dueño. Sirve para dejar listo el token de cada uno en un mapa que todavía no se publicó.'],
+  ];
+  const pasos = () => [
+    ...(soyGM ? [{id: 'que', nombre: 'Qué es', ayuda: '<b>¿Qué vas a poner en el mapa?</b> Define quién lo mueve y de dónde saca sus datos.', html: () => TIPOS.map(([id, ico, t, d]) =>
+      `<button type="button" class="pap-boton tn-op${st.tipo === id ? ' on' : ''}" data-tn-tipo="${id}"><span class="tn-ico">${ico}</span><span><b>${t}</b><small>${d}</small></span></button>`).join('')}] : []),
+    ...(st.tipo !== 'npc' ? [{id: 'cual', nombre: 'Cuál', ayuda: st.tipo === 'creep' ? '<b>¿Qué creep?</b> Primero los de este mapa; si elegís uno de la Reserva o de otro mapa, se muda a este.'
+      : soyGM ? '<b>¿La ficha de quién?</b> Vinculado, toma el nombre, la imagen, las barras y los estados de la ficha.' : '<b>¿Cuál de tus personajes?</b> Vinculado, toma el nombre, la imagen, las barras y los estados de su ficha. Sin vincular sirve para una marca o un objeto.',
+      html: () => {
+        const l = libre();
+        return (l ? `<button type="button" class="pap-boton primario" data-tn-traer="1" style="margin-bottom:12px">⬇ Traer a ${esc(l[1].nombre)} ya (vinculado a su ficha)</button>` : '') +
+          `<div class="pap-campo"><label>${st.tipo === 'creep' ? 'Creep' : 'Personaje o invocación'}</label><select id="tn-vinculo" size="12">${opcionesVinculo(tipoDato(), st.vinculo, soyGM)}</select></div>`;
+      }}] : []),
+    {id: 've', nombre: 'Cómo se ve', ayuda: '<b>Nombre y aspecto.</b> El color se ve si no tiene imagen.', html: () => {
+      const v = vinc();
+      return `<div class="pap-campo"><label>Nombre</label><input id="tn-nombre" maxlength="40" placeholder="Ej: Aurelio" value="${esc(st.nombre)}"></div>` +
+        (v ? '<p class="pap-nota">Vinculado: la imagen sale de su ficha.</p>' : `<div class="pap-campo"><label>Imagen (opcional)</label><div class="pap-fila" style="align-items:center">` +
+          (st.imagen ? `<img src="${esc(st.imagen)}" alt="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid ${esc(st.color)}">` : '') +
+          `<button type="button" class="pap-boton" data-tn-img="elegir">${st.imagen ? 'Cambiar imagen' : 'Elegir imagen'}</button>` +
+          (st.imagen ? '<button type="button" class="pap-boton" data-tn-img="quitar">Quitar</button>' : '') + '</div></div>') +
+        `<div class="pap-campo"><label>Color</label>${htmlColores(st.color, true)}</div>`;
+    }, alMontar: (c, a) => { conectarColores(a.raiz, col => { st.color = col; }); const n = a.raiz.querySelector('#tn-nombre'); if(n) setTimeout(() => n.focus(), 30); }},
+    ...(soyGM && st.tipo === 'pj' ? [{id: 'dueno', nombre: 'Dueño', ayuda: '<b>¿Quién lo mueve?</b> El token queda de quien elijas acá, no de quien lo crea.',
+      html: () => `<div class="pap-campo"><label>Dueño</label><select id="tn-dueno">${opcionesDueno(st.dueno)}</select></div>`}] : []),
+    {id: 'listo', nombre: 'Listo', ayuda: '<b>Así queda.</b> Al tocar «✔ Poner en el mapa» elegís la casilla con un clic y después hacia dónde mira.', html: () => {
+      const t = TIPOS.find(x => x[0] === st.tipo);
+      const v = vinc();
+      return `<div class="tn-resumen"><span class="tn-punto" style="background:${esc(st.color)}">${st.imagen ? `<img src="${esc(st.imagen)}" alt="">` : ''}</span><div>
+        <b>${esc(st.nombre || '—')}</b><br><small>${soyGM ? t[2] : 'Tu token'}${v ? ' · vinculado a ' + esc(v.nombre) : ' · sin vincular'}${soyGM && st.tipo === 'pj' ? ' · lo mueve ' + esc(nombreMiembro(st.dueno)) : ''}</small></div></div>`;
+    }},
+  ];
+  const leerVinculo = id => {
+    st.vinculo = id;
+    const v = vinc();
+    if(v && !st.nombreTocado) st.nombre = String(v.nombre || '').slice(0, 40);
+    if(v && v.duenoUid) st.dueno = v.duenoUid;
+    if(v) st.imagen = '';
+  };
+  if(soyGM) st.dueno = fbUsuario.uid;
+  const falta = id => {
+    if(id === 'cual' && st.tipo === 'creep' && !st.vinculo) return 'Elegí qué creep (o volvé y elegí «NPC u objeto»).';
+    if(id === 've' && !st.nombre.trim()) return 'Ponele un nombre.';
+    return '';
+  };
+  const api = tokenNuevoPap = PasoAPaso.abrir({
+    titulo: '➕ Token nuevo', crear: true, z: 95, textoCrear: '✔ Poner en el mapa',
+    pasos,
+    puedeIr: i => { const ps = pasos(); for(let k = 0; k < Math.min(i, ps.length); k++){ const f = falta(ps[k].id); if(f) return f; } return ''; },
+    alClic: e => {
+      const b = e.target.closest('button'); if(!b) return;
+      if(b.dataset.tnTipo){ st.tipo = b.dataset.tnTipo; st.vinculo = ''; if(!st.nombreTocado) st.nombre = ''; st.dueno = fbUsuario.uid; api.redibujar(); return; }
+      if(b.dataset.tnTraer){
+        const l = libre(); if(!l) return;
+        api.cerrar(); tokenNuevoPap = null;
+        iniciarColocacion({nombre: String(l[1].nombre || 'Personaje').slice(0, 40), color: st.color, tipo: 'pj', fichaId: l[0], imagen: ''});
+        return;
+      }
+      if(b.dataset.tnImg === 'quitar'){ st.imagen = ''; api.redibujar(); return; }
+      if(b.dataset.tnImg === 'elegir'){
+        const entrada = $('#token-imagen-archivo');
+        entrada.onchange = async ev => {
+          const file = ev.target.files[0];
+          ev.target.value = '';
+          if(!file) return;
+          try{ st.imagen = await recortarImagen(file, {lado: TOKEN_IMG_PX, tope: TOKEN_IMG_MAX}); if(tokenNuevoPap === api) api.redibujar(); }
+          catch(err){
+            if(err.message === 'cancelado') return;
+            console.error('No se pudo preparar la imagen del token:', err);
+            toast(err.message === 'no-image' ? 'Eso no es una imagen' : 'No se pudo usar esa imagen');
+          }
+        };
+        entrada.click();
+      }
+    },
+    alInput: e => { if(e.target.id === 'tn-nombre'){ st.nombre = e.target.value; st.nombreTocado = true; } },
+    alCambio: e => {
+      if(e.target.id === 'tn-vinculo') leerVinculo(e.target.value);
+      else if(e.target.id === 'tn-dueno') st.dueno = e.target.value;
+    },
+    alTecla: e => {
+      if(e.key !== 'Enter' || e.target.tagName === 'BUTTON') return;
+      e.preventDefault();
+      if(api.paso() < pasos().length - 1) api.irA(api.paso() + 1);
+      else{ const f = falta('cual') || falta('ve'); if(f) api.aviso(f); else{ api.cerrar(); poner(); } }
+    },
+    confirmarCancelar: '',
+    alCrear: () => { const f = falta('cual') || falta('ve'); if(f){ api.aviso(f); return false; } poner(); },
+    alCancelar: () => { tokenNuevoPap = null; creando = false; renderPanel(true); pedirDibujo(); },
+  });
+  function poner(){
+    tokenNuevoPap = null;
+    iniciarColocacion({nombre: st.nombre.trim().slice(0, 40), color: st.color, tipo: tipoDato(), fichaId: st.vinculo, imagen: st.vinculo ? '' : st.imagen,
+      duenoUid: soyGM && st.tipo === 'pj' ? st.dueno : undefined});
+  }
+}
 
 // Editar token: ventana emergente. Se cierra con clic en el fondo, clic derecho (fuera de un campo) o Esc.
 function cerrarEditarToken(){ if(!editandoToken) return; editandoToken = false; renderPanel(true); pedirDibujo(); }
@@ -1033,8 +1040,6 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape' && editandoTok
 
 $('#btn-nuevo').onclick = e => {
   if(e && e.target.closest('.ayuda-icono')) return;   // tocar el (?) no crea un token
-  if(!fbMiembro) return;
-  creando = true; seleccion = null; moverFondo = false;
-  renderPanel(true); pedirDibujo();
+  abrirTokenNuevo();
 };
 

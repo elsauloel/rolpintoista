@@ -44,9 +44,10 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
 /* Ventana de "Nuevo token": centrada sobre el mapa, con el fondo oscurecido
    (Esc o clic derecho la cierran sin crear nada). */
-#nuevo-token-capa,#editar-token-capa{position:fixed;inset:0;z-index:95;background:rgba(15,12,14,.6);display:flex;align-items:center;justify-content:center;padding:16px}
-#nuevo-token-capa[hidden],#editar-token-capa[hidden]{display:none}
-#nuevo-token-ventana,#editar-token-ventana{width:420px;max-width:100%;max-height:calc(100vh - 32px);overflow-y:auto;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6);padding:16px 18px}
+#editar-token-capa{position:fixed;inset:0;z-index:95;background:rgba(15,12,14,.6);display:flex;align-items:center;justify-content:center;padding:16px}
+#editar-token-capa[hidden]{display:none}
+#editar-token-ventana{width:420px;max-width:100%;max-height:calc(100vh - 32px);overflow-y:auto;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6);padding:16px 18px}
+.nt-pista{font-size:11.5px;color:var(--muted);margin:5px 0 0;line-height:1.4}
 
 /* 📋 Tablero de combate: solo lo que tiene token en el mapa PUBLICADO, filtrado por lo que
    cada uno puede ver (oculto/sigilo) — ver comentario de tableroTokensEscuchar() en el JS. */
@@ -78,14 +79,6 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .tablero-estado{font-size:10px;padding:2px 6px;border-radius:99px;border:1px solid var(--line);position:relative}
 .tablero-estado.con-tip:hover .tablero-estado-tip{display:block}
 .tablero-estado-tip{display:none;position:absolute;bottom:calc(100% + 4px);left:0;z-index:2;width:180px;background:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:11px;color:var(--paper);white-space:normal;box-shadow:0 6px 16px rgba(0,0,0,.5)}
-.nt-cab{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--paper);font-size:15px;padding-bottom:10px;border-bottom:1px solid var(--line)}
-.nt-cab button{font-size:16px;color:var(--muted);line-height:1}
-.nt-cab button:hover{color:var(--paper)}
-.nt-campo{margin-top:12px}
-.nt-campo:empty{display:none}
-.nt-campo .etiqueta{margin:0 0 4px}
-.nt-pista{font-size:11.5px;color:var(--muted);margin:5px 0 0;line-height:1.4}
-.nt-pie{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
 
 /* Editor de un elemento de Terreno/Formas ya creado (⚙️ al seleccionarlo):
    flotante, no tapa el mapa — los cambios se ven ahí atrás en vivo antes
@@ -708,3 +701,13 @@ body.con-ruta .toast{bottom:auto;top:74px}
   main{flex-direction:column}
   aside{width:auto;height:45vh;border-left:none;border-top:1px solid var(--line)}
 }
+
+/* ＋ Token nuevo, paso a paso (la ventana es comun/paso-a-paso.js) */
+.pap .tn-op{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;margin:0 0 8px;padding:12px 14px;text-transform:none;letter-spacing:0;font-family:inherit;font-size:14px}
+.pap .tn-op.on{border-color:var(--pap-laton);background:rgba(224,164,88,.12)}
+.pap .tn-op .tn-ico{font-size:24px;line-height:1}
+.pap .tn-op b{display:block;font-size:15px}.pap .tn-op small{display:block;color:var(--pap-tenue);margin-top:3px;line-height:1.4}
+.pap #tn-vinculo{width:100%;font-size:14px}
+.pap .tn-resumen{display:flex;gap:14px;align-items:center;font-size:15px;line-height:1.5}
+.pap .tn-punto{width:56px;height:56px;border-radius:50%;flex:none;overflow:hidden;border:2px solid var(--pap-linea)}
+.pap .tn-punto img{width:100%;height:100%;object-fit:cover}

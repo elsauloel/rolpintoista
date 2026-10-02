@@ -1154,8 +1154,12 @@ versión parecida en más de una, es candidato a juntar.
 - **`asistente-personaje.js`** (`AsistentePersonaje`, 2026-10-02, tanda 7) — «＋ Personaje nuevo» paso a paso: Idea · Imagen · Atributos (33 puntos,
   mínimo 3, con «Usar la sugerencia» de la clase) · Habilidades (las de su clase primero, ★) · Pasivas · Talentos (6 de Inteligencia) · Equipo (la
   tienda publicada y abierta, con el DDE inicial: 300 o el de `ajustes/partida`) · Historia · Resumen (con los avisos de lo que sobra o falta). No
-  escribe nada: `ctx = {base, clases, pool, habilidad, pasivas, pasiva, tienda, ddeInicial, imagen, alCrear, toast}` (la ficha: `abrirPersonajeNuevo`,
-  js/12). `Combatiente.ROLES`/`PESOS_ROL`/`ROL_DE_CLASE`/`repartirAtributos(total, pesos, minimo)`: los repartos sugeridos (los usa también el asistente
+  escribe nada: `ctx = {base, clases, pool, habilidad, editarHabilidad, pasivas, pasiva, tienda, ddeInicial, imagen, alCrear, toast}` (la ficha:
+  `abrirPersonajeNuevo`, js/12). Pedidos del dueño del mismo día: en Habilidades, «＋ Crear una habilidad nueva» (abre el paso a paso de
+  habilidades de `ficha-editor.js` sobre el personaje en armado: `editarHabilidad(S, id, alCambiar)`; queda en `S.habilidades`, con Editar/Quitar) y
+  el 🧩 Pool custom (2 de Job); en Pasivas, categorías con filtro (`CATEGORIAS_PASIVA` y `categoriaDePasiva(p)` en `pasivas.js`: Ofensivas,
+  Defensivas, Recuperación, Recursos, Utilidad — salen de las etiquetas y de lo que suma); en Equipo, el DDE inicial en una caja editable (300 o el
+  del GM; el texto invita a preguntarle al GM). `Combatiente.ROLES`/`PESOS_ROL`/`ROL_DE_CLASE`/`repartirAtributos(total, pesos, minimo)`: los repartos sugeridos (los usa también el asistente
   de creeps de GM Tools).
 - **`asistente-mapa.js`** (`AsistenteMapa`, 2026-10-02, tanda 6) — «＋ Mapa nuevo» paso a paso: Nombre → Creeps (cuáles se mudan a este mapa, agrupados
   por dónde están) → Listo. `abrir({nombre, creeps: [{id, nombre, donde}], marcados, alCrear({nombre, creeps}), alCancelar})`; no escribe nada: el

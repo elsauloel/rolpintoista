@@ -49,7 +49,7 @@ const PasoAPaso = (() => {
 .pap-pie{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 15px;border-top:1px solid var(--pap-linea)}
 .pap-pie .der{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
 .pap-campo{margin-bottom:12px}
-.pap-campo > label{display:block;font-family:"Space Mono",ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--pap-tenue);margin-bottom:4px}
+.pap-campo > label:first-child{display:block;font-family:"Space Mono",ui-monospace,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--pap-tenue);margin-bottom:4px}
 .pap-fila{display:flex;gap:12px;flex-wrap:wrap}
 .pap-nota{font-family:"Space Mono",ui-monospace,monospace;font-size:11px;color:var(--pap-tenue);margin-top:4px}
 .pap input[type=text],.pap input[type=number],.pap select,.pap textarea{width:100%;background:#120D10;border:1px solid var(--pap-linea);border-radius:3px;color:var(--pap-papel);

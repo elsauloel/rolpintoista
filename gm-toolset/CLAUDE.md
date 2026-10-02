@@ -437,3 +437,8 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   nuevos van al mapa de la pestaña abierta (`mapaParaNuevo`). Al entrar, `gmMigrarGrupos` convierte los grupos viejos (una vez). Se sacaron el
   arrastre (⠿), los grupos con nombre libre, el selector 🗺 de vínculo y `gruposMapas`. Lo de "Grupos de creeps", "Grupo ↔ mapa" y "Mover
   creeps entre grupos arrastrando" de más arriba quedó viejo.
+
+- **El asistente de creeps, sobre la ventana común** (2026-10-02, tanda 1 de `../docs/plan-paso-a-paso.md`): `abrirAsistenteCreep` usa
+  `comun/paso-a-paso.js` (ya no está `#scrim-asistente-creep`). Crear: el creep vive marcado `_creando` (fuera de `creepsReales`: no se ve ni
+  se guarda) hasta «✔ Crear»; Cancelar lo descarta. Editar: Guardar siempre visible; Cancelar repone la copia del creep (pregunta si cambió algo).
+

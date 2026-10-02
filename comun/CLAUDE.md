@@ -1129,3 +1129,11 @@ versión parecida en más de una, es candidato a juntar.
   en el destino; a la Reserva solo se van), `crearMapa(nombre)` y `migrar(creeps, {vacios})` (los grupos viejos → mapas, una vez: con token →
   el mapa del token; vinculado → su mapa; si no, el mapa con su nombre o uno nuevo). Lo usan GM Tools (pestañas, «🗺 Mover a…», la
   conversión al entrar, borrar un creep) y el mapa (🎭 "Traer los creeps de este mapa", el panel de Mapas, `creepLlegoAlMapa`).
+- **`paso-a-paso.js`** (`PasoAPaso`, 2026-10-02, pedido del dueño; plan en `../docs/plan-paso-a-paso.md`) — **la ventana única para crear y editar
+  paso a paso**, con el formato del asistente de creeps: cabecera «Crear un X / Editar X · paso N de M: Nombre» y Cancelar; pestañas «1. QUÉ ES…»
+  que saltan (salvo que `puedeIr` diga por qué todavía no); la ayuda de cada paso; pie con «← Atrás», «Siguiente →» y **Guardar siempre visible al
+  editar** o **«✔ Crear» en el último paso al crear**. `PasoAPaso.abrir({titulo, crear, pasos (o función), puedeIr, alClic/alInput/alCambio,
+  alGuardar/alCrear, alCancelar, confirmarCancelar, extras, contenedor, z})` → `{raiz, cuerpo, paso, pasoId, irA, redibujar, aviso, cerrar}`.
+  Trae su CSS (paleta cobre) y clases de base (`.pap-campo`, `.pap-fila`, `.pap-nota`, `.pap-boton`); Escape cancela solo si es la ventana
+  de más arriba. **Todo asistente nuevo o rehecho va sobre esta pieza** (tandas en el plan). La usa el asistente de creeps de GM Tools.
+

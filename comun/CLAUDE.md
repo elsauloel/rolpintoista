@@ -1142,4 +1142,9 @@ versión parecida en más de una, es candidato a juntar.
   **un bloque ya armado** (un elemento): se muestra tal cual, conserva lo escrito y vuelve a su lugar al cambiar de paso (así los editores que
   guardan todo en sus campos, como el de creeps y el de invocaciones, no se reescribieron). Ancha por defecto (hasta 1100 px; `ancho: 'completo'`
   para toda la pantalla): el juego es para PC.
+  Desde la tanda 5 también los asistentes de **estados**, **trampas** y **zonas** y las **cantidades de un preset** (`EstadoPreguntas.preguntar`,
+  640 px, «✔ Listo»; sigue avisando con el evento `ep-cerrado`): su CSS de contenido cuelga de `.ae-c` / `.at-c` / `.az-c` / `.ep-c`, las
+  pestañas saltan hasta donde lo anterior está completo (`faltaAntes(i)` como `puedeIr`) y `alCancelar` de cada uno se llama al cancelar. Ya no
+  existen `#ae-fondo`, `#at-fondo`, `#az-fondo`, `#ep-fondo` ni `#adh-fondo`: para "¿hay una ventana abierta?" alcanza con `.pap-fondo`. Un Escape
+  lo atiende solo la ventana de más arriba (`stopImmediatePropagation`), así no cierra también la ventana que la abrió.
 

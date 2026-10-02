@@ -30,8 +30,8 @@ probada y publicada antes de la siguiente:
 | 2 ✅ | **Habilidades**: de personaje (`ficha-editor.js`), de creep (`creep-editor.js`) y de invocación (js/04 de la ficha) | hecho 2026-10-02 (se sacó el CSS de las pastillitas) |
 | 3 ✅ | **Ítems** (`asistente-item.js`) en la ventana común (hecho 2026-10-02). **Falta**: los **consumibles**, que siguen en el formulario aparte | — |
 | 4 ✅ | **Ejecución ✨** (`asistente-duelo-hab.js`) en la ventana común, con la paleta de todos | hecho 2026-10-02 |
-| 5 | **Estado** (crear y el ⚙ de editar, hoy formulario), **Trampa**, **Zona** y las preguntas de un preset (`estado-preguntas.js`) | barra de progreso, sin saltar |
-| 6 | Lo que hoy es formulario o `prompt`: **invocación** (como el de creeps), **pasiva**, **talento**, **token nuevo**, **mapa**, **tienda**, **partida** | formularios / prompt |
+| 5 ✅ | **Estado** (`asistente-estado.js`), **Trampa** (`asistente-trampa.js`; al editar una ya colocada, Guardar siempre), **Zona** (`asistente-zona.js`, pasó de verde a la paleta de todos) y las cantidades de un preset (`estado-preguntas.js`: una pregunta por pestaña, «✔ Listo») en la ventana común. De paso: un Escape cierra una sola ventana (antes, con el asistente de estados abierto desde "+ Estado", cerraba también la grilla) y el mapa carga la ventana común de entrada | hecho 2026-10-02 |
+| 6 | Lo que hoy es formulario o `prompt`: **invocación** (como el de creeps), **pasiva**, **talento**, **token nuevo**, **mapa**, **tienda**, **partida**, y los formularios ⚙ completos de un **estado** y de un **creep** | formularios / prompt |
 | 7 | **Personaje nuevo** (abajo) | un `confirm` y una ficha en blanco |
 
 Al terminar: sacar el código muerto del asistente viejo de trampas del mapa (`vtt-hexgrid/js/03-asistente-trampa.js`) y el CSS duplicado de

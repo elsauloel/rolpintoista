@@ -1266,3 +1266,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   Botonera** (2026-10-02, A1): `bnHooksDuelo`/`bnHooksDueloInv` abren la sesión del personaje sin mostrarla (`bnAbrirSesion`,
   `bnSesionLista`, `bnPrepararParaDuelo`; `bnManejo(fichaId)`: su dueño sin el GM con el control, o quien tiene 🎮 el control) y
   devuelven una promesa con los ganchos; no cambian de personaje si la Botonera está a la vista con otro. Los títulos ya no llevan ⚗.
+- **El Mantenimiento de los personajes lo hace el mapa** (2026-10-02, hoja de ruta A2): en cada ⟳, `mantenimientoPersonajes(numero)`
+  (js/11, llamado desde `escucharMantenimiento` en js/04) recorre los personajes que maneja este usuario (`bnManejo`: los suyos, o los
+  que el GM controla con 🎮) y, de a uno (`mantPersonajesCola`), los lee (la sesión de la Botonera nueva si está abierta; si no,
+  `mantSesionTemporal`), toma sus turnos con `FichaMantenimiento.reclamar` (la misma transacción de la ficha), aplica
+  `FichaMantenimiento.aplicar`, publica el reporte y los recordatorios en la Mesa y guarda (`opcionesGuardadoMapa`, compartida con
+  `bnOpcionesGuardado`). Ya no se carga la ficha en el marco invisible para eso; GM Tools sí, para los creeps (A2b).

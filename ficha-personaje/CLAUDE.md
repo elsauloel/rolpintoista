@@ -637,3 +637,7 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
 - **Ficha lite (2026-10-02)**: el 📜 del token y la F ya no abren la ficha liviana de acá (`fichaMapaAbrir`, `#scrim-ficha-mapa`,
   mensaje `abrir-ficha-mapa`, sin uso: candidatos a sacar); la dibuja el mapa (`comun/ficha-lite.js`). Su botón 📊 Stats manda el
   mensaje nuevo `abrir-stats` (`js/14`: abre `#scrim-stats-mapa`).
+- **El Mantenimiento, compartido (2026-10-02, hoja de ruta A2)**: `mantenimiento()` (`js/11`) llama a `FichaMantenimiento.aplicar` y
+  `mantenimientoRevisar` (`js/14`) a `FichaMantenimiento.reclamar` (`comun/ficha-mantenimiento.js`); acá queda lo que se ve (redibujar,
+  cartel de recordatorios, reporte con `mesaPublicarReporte`). El mapa ya no carga la ficha en `?modo=mantenimiento` para pasar el turno
+  (lo hace él con la misma pieza); el modo sigue existiendo, sin uso desde el mapa: candidato a la limpieza (A′).

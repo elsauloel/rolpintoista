@@ -23,8 +23,12 @@
    (`bnPrepararParaDuelo`, `bnAbrirSesion`) y contesta él; `comun/duelo.js` acepta que `hooksLocal` devuelva una promesa. Probado en
    vivo (GM con 🎮 Silvia, mapa recién cargado): las opciones de defensa y la Evasión las contestó el mapa, el duelo se resolvió y
    la ficha escondida nunca se cargó (en el marco siguió GM Tools).
-2. [ ] **El Mantenimiento en segundo plano**: hoy carga la ficha escondida de cada jugador en cada turno; que lo haga el mapa con el
-   motor común (`Combatiente.pasarTurnoEstados` y compañía).
+2. [x] **El Mantenimiento de los personajes** (2026-10-02): la regla salió a `comun/ficha-mantenimiento.js` (la ficha la usa igual) y
+   el mapa, en cada ⟳, lee a los personajes que maneja ese usuario, toma sus turnos con la misma transacción, los aplica, publica el
+   reporte y guarda — sin cargar la ficha en un marco invisible. Probado en vivo (GM con 🎮 Silvia): dos ⟳ seguidos, una quemadura de
+   prueba hizo 10 → 9 → 8 y terminó, No2 a full, SP Regen, reporte en la Mesa, una sola vez por turno, sin ficha escondida.
+   - [ ] **A2b. El Mantenimiento de los creeps**: el mapa del GM todavía carga GM Tools en un marco invisible para pasarles el turno.
+     Que lo haga el mapa con la regla de GM Tools llevada a `comun/` (como los personajes).
 3. [ ] **"+ Estado"** (el selector de estados de un personaje, una invocación o un creep, con sus preguntas).
 4. [ ] **Equipo y mochila** (equipar, desequipar, mirar la mochila).
 5. [ ] **Tienda y Botín**.

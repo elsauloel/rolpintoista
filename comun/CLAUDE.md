@@ -939,6 +939,11 @@ versión parecida en más de una, es candidato a juntar.
   después; `ui = {mesaHabilidad, mesaConTexto, publicar, toast, habDuelo, lanzarAtaque, lanzarDuelo, colocarTrampa(sc, h, auto),
   colocarZona, elegirObjetivo}`), más `habEjecucion`, `ataqueDeHab`, `habTira`, `efectoDeHab`, `sobreSi`, `tiradaPrimeraHab`,
   `tiradaSegundaHab`, `zonaDeHab` y `cdMod`. Necesita `estados-aplicar.js` y `combatiente.js`.
+- **`ficha-mantenimiento.js`** (`FichaMantenimiento`, 2026-10-02, hoja de ruta A2) — **el ⟳ Mantenimiento de un personaje y sus
+  invocaciones**: `aplicar(S, ui)` (copia textual de `mantenimiento()` de la ficha: SP Regen, estados, pasivas, vida por `ui.fijarHp`,
+  turnos de muerte, No2, invocaciones; deja `S.turno` y `S.log`; devuelve `{rep, avisos}`), `reclamar(db, rutaFicha, objetivo, marca)`
+  (la transacción de `partes/mantenimiento`: cuántos turnos aplicar), `publicarReporte` y `publicarRecordatorios`. Lo usan la ficha
+  (`js/11`, `js/14`) y el mapa (`mantenimientoPersonajes`). Necesita combatiente, ficha-calculo, ficha-botonera e inv-calculo.
 - **`duelo.js`: `hooksLocal` puede devolver una promesa** (2026-10-02): `enviar` la espera; si termina en null va por `relay` como
   siempre. Lo usa el mapa para leer al personaje la primera vez que el duelo le pide algo.
 - **Creep sin No2 para atacar** (2026-10-02, como con los personajes: avisar y dejar seguir): `CreepAcciones.faltanNitros(sc, tipo)`,

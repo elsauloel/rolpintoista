@@ -206,7 +206,7 @@ $('#catalogo-orden-dir').addEventListener('click', () => { catalogoOrdenDesc = !
 
 $('#personajes-nuevo').onclick = () => {
   $('#scrim-personajes').classList.remove('open');
-  crearPersonajeNuevo();
+  abrirPersonajeNuevo();   // paso a paso (comun/asistente-personaje.js)
 };
 $('#personajes-archivo').onclick = () => {
   $('#scrim-personajes').classList.remove('open');

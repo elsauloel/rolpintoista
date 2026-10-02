@@ -472,7 +472,34 @@ async function fichaAbrir(id){
   return true;
 }
 
-async function crearPersonajeNuevo(datos){
+// «＋ Personaje nuevo»: el asistente paso a paso (comun/asistente-personaje.js, tanda 7 de docs/plan-paso-a-paso.md).
+function abrirPersonajeNuevo(){
+  if(!fbDb || !fbMiembro){ toast('Sin conexión con la partida: no se pueden crear personajes'); return; }
+  if(fbMiembro.gm){ toast(GM_SIN_PERSONAJES); return; }
+  AsistentePersonaje.abrir({
+    base: () => FichaGuardado.normalizar({}, {mezclarCatalogo: lista => ItemsSubidos.mezclar(lista, itemsSubidos, DEFAULT.catalogo)}).S,
+    clases: CLASES_SKILLS,
+    pool: claseId => habsDelPool(claseId),
+    habilidad: (claseId, habId) => habDeClase(claseId, habId),
+    pasivas: () => pasivasDelCatalogo(),
+    pasiva: (datos, meta) => pasivaDeCatalogo(datos, meta),
+    tienda: async () => FichaTienda.desdeDoc(await fbDb.doc(fbRutaCampana('tienda/publicada')).get()),
+    // El DDE con que arranca un personaje: 300 (lo estándar), salvo que el GM fije otro en ⚙ Partida (campanas/<id>/ajustes/partida).
+    ddeInicial: async () => {
+      try{ const d = await fbDb.doc(fbRutaCampana('ajustes/partida')).get(); const v = d.exists ? Number(d.data().ddeInicial) : NaN; return Number.isFinite(v) ? v : AsistentePersonaje.DDE_POR_DEFECTO; }
+      catch(e){ return AsistentePersonaje.DDE_POR_DEFECTO; }
+    },
+    imagen: async file => {
+      const imagen = await fileToDataURL(file, 480, 0.85);
+      let miniatura = '';
+      try{ miniatura = await recortarImagen(file, {lado: MINIATURA_PX, tope: MINIATURA_MAX}); }catch(e){ if(e.message !== 'cancelado') throw e; }
+      return {imagen, miniatura};
+    },
+    alCrear: datos => crearPersonajeNuevo(datos, {asistente: true}),
+    toast,
+  });
+}
+async function crearPersonajeNuevo(datos, o){
   if(!fbDb || !fbMiembro){ toast('Sin conexión con la partida: no se pueden crear personajes'); return; }
   if(fbMiembro.gm){ toast(GM_SIN_PERSONAJES); return; }
   if(!datos && !confirm('¿Crear un personaje nuevo, en blanco, en la mesa?\n\nEl personaje que tenés abierto queda guardado como está.')) return;
@@ -494,7 +521,7 @@ async function crearPersonajeNuevo(datos){
     fichaRecordar(ref.id);
     fichaEscuchar(f);
     await fichaGuardarTick(true);
-    toast(datos ? 'Archivo cargado como personaje nuevo' : 'Personaje nuevo creado en la mesa');
+    toast(o && o.asistente ? `${fichaNombre()} creado: ya está en la mesa` : datos ? 'Archivo cargado como personaje nuevo' : 'Personaje nuevo creado en la mesa');
   }catch(err){
     console.error('No se pudo crear el personaje:', err);
     toast('No se pudo crear el personaje en la mesa — revisá la consola');

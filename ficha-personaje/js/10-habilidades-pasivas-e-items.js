@@ -160,19 +160,19 @@ function abrirHabClase(claseId, yaLeido){
     $('#pool-filtro-tipodano').onchange = e => { poolFiltroTipoDano = e.target.value; abrirHabClase('_custom', true); };
   }
 }
-function agregarHabClase(claseId, habId){
+// La habilidad `habId` del pool `claseId`, lista para el personaje (la usan «+ Habilidad → De clase» y el asistente de personaje nuevo).
+function habDeClase(claseId, habId){
   const deCreep = claseId === '_creep';
   const esCustomPool = claseId === '_custom' || deCreep;
   const clase = esCustomPool ? null : CLASES_SKILLS.find(c => c.id === claseId);
   const base = habsDelPool(claseId).find(h => h.id === habId);
-  if(!base) return;
-  if(S.habilidades.some(x => claveHabClase(x) === base.id)){ toast(`${base.nombre} ya está en tu pool`); return; }
+  if(!base) return null;
   const job = esCustomPool ? HAB_JOB_CUSTOM : HAB_JOB_CLASE;
   // Se copia todo lo que trae la skill (costo, tirada, estado al ejecutar, la Ejecución completa…), y de dónde salió
   // (`bibOrigen`) para el aviso de versión nueva. Una subida sin Ejecución queda sin (null): si no, `dueloDe` caería en
   // la Ejecución de la de fábrica con el mismo id.
   const {_bib, para, clase: _clase, ...copia} = structuredClone(base);
-  S.habilidades.push({
+  return {
     ...copia,
     id: uid(), costo: base.costo || '', nitrosCosto: base.nitrosCosto ?? IT2.nitrosHabilidad,
     automatizada: base.automatizada !== false, job: true, jobCosto: job, origen: '', imagen: '',
@@ -180,7 +180,16 @@ function agregarHabClase(claseId, habId){
     ...(para === 'creep' ? {para: 'creep'} : {}),   // queda la marca 🐾 a la vista en la ficha
     ...(_bib ? {bibOrigen: {tipo: 'skills', id: _bib.id, version: _bib.version}} : {}),
     ...(_bib && _bib.subida ? {duelo: copia.duelo || null} : {}),
-  });
+  };
+}
+function agregarHabClase(claseId, habId){
+  const deCreep = claseId === '_creep';
+  const esCustomPool = claseId === '_custom' || deCreep;
+  const base = habsDelPool(claseId).find(h => h.id === habId);
+  if(!base) return;
+  if(S.habilidades.some(x => claveHabClase(x) === base.id)){ toast(`${base.nombre} ya está en tu pool`); return; }
+  const job = esCustomPool ? HAB_JOB_CUSTOM : HAB_JOB_CLASE;
+  S.habilidades.push(habDeClase(claseId, habId));
   $('#scrim-hab-clase').classList.remove('open');
   renderList('habilidades');
   refresh();
@@ -248,6 +257,25 @@ function abrirPasivaNueva(){
   });
 }
 
+// Una pasiva del catálogo, lista para el personaje (la usan «+ Pasiva» y el asistente de personaje nuevo).
+function pasivaDeCatalogo(datos, meta){
+  const clave = datos.poolId || (meta && String(meta.reemplaza || '').startsWith('base-') ? meta.reemplaza.slice(5) : claveDePasiva(datos));
+  return {
+    ...structuredClone(datos), id: uid(), poolId: clave, compras: 1,
+    mods: (datos.mods || []).map(m => ({...m})), regenHp: num(datos.regenHp) || 0,
+    job: true, jobCosto: Math.max(0, num(datos.jobCosto) || 1), origen: '', imagen: '',
+    ...(meta && meta.id ? {bibOrigen: {tipo: 'pasivas', id: meta.id, version: meta.version || 1}} : {}),
+  };
+}
+// Las pasivas del catálogo (de fábrica, con sus correcciones, y lo subido), como {datos, meta}.
+function pasivasDelCatalogo(){
+  const subidas = (typeof pasivasSubidas !== 'undefined' ? pasivasSubidas : []) || [];
+  const base = (typeof PASIVAS_BASE !== 'undefined' ? PASIVAS_BASE : []).map(p => {
+    const corr = subidas.find(e => e.reemplaza === 'base-' + p.poolId);
+    return corr ? {datos: corr.datos, meta: corr} : {datos: p, meta: null};
+  });
+  return base.concat(subidas.filter(e => !e.reemplaza && e.datos && !e.datos.baja).map(e => ({datos: e.datos, meta: e})));
+}
 function agregarPasivaDeCatalogo(datos, meta){
   // La corrección de una de fábrica se acumula con la de fábrica (misma clave), no como otra pasiva distinta.
   const clave = datos.poolId || (meta && String(meta.reemplaza || '').startsWith('base-') ? meta.reemplaza.slice(5) : claveDePasiva(datos));
@@ -259,12 +287,7 @@ function agregarPasivaDeCatalogo(datos, meta){
     ya.compras = pasivaCompras(ya) + 1;
     toast(`${ya.nombre} ×${ya.compras} (+${costo} de Job) · te quedan ${fmt(jobBudget().resto)}`);
   }else{
-    S.pasivas.push({
-      ...structuredClone(datos), id: uid(), poolId: clave, compras: 1,
-      mods: (datos.mods || []).map(m => ({...m})), regenHp: num(datos.regenHp) || 0,
-      job: true, jobCosto: costo, origen: '', imagen: '',
-      ...(meta && meta.id ? {bibOrigen: {tipo: 'pasivas', id: meta.id, version: meta.version || 1}} : {}),
-    });
+    S.pasivas.push(pasivaDeCatalogo(datos, meta));
     toast(`${datos.nombre} agregada (${costo} de Job) · te quedan ${fmt(jobBudget().resto)}`);
   }
   renderList('pasivas');

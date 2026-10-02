@@ -125,9 +125,8 @@ document.addEventListener('click', e => {
    la ventana es comun/paso-a-paso.js). Crear: «✔ Crear» al final; editar: Guardar siempre visible, Cancelar repone la copia.
    ========================================================= */
 const ASIST_PASOS = ['Qué es', 'Atributos', 'Arma', 'Armadura', 'Habilidades', 'Recompensas', 'Resumen'];
-const ROLES_CREEP = {brutal: 'Brutal (pega fuerte)', tanque: 'Tanque (aguanta)', rapido: 'Rápido (asalto)', rango: 'A distancia', mago: 'Mago', apoyo: 'Apoyo', debuffer: 'Debuffer (maldiciones)'};
-const PESOS_ROL = {brutal: [.26, .30, .14, .16, .14], tanque: [.36, .26, .10, .12, .16], rapido: [.16, .18, .30, .24, .12],
-  rango: [.18, .10, .24, .32, .16], mago: [.20, .08, .16, .16, .40], apoyo: [.24, .10, .16, .14, .36], debuffer: [.22, .08, .18, .14, .38]};
+const ROLES_CREEP = Combatiente.ROLES;      // los roles y sus repartos viven en comun/combatiente.js (los usa también el personaje nuevo)
+const PESOS_ROL = Combatiente.PESOS_ROL;
 const RAREZA_ARMA = ['Común', 'Común', 'Común (o Buena Calidad)', 'Buena Calidad', 'Buena Calidad (o Raro)'];
 const RAREZA_ARMADURA = ['ninguna (opcional)', 'Común', 'Buena Calidad (o Común)', 'Buena Calidad', 'Raro (o Buena Calidad)'];
 let asist = null;   // {id, nuevo, rol, copia, api}: la ventana es la común (comun/paso-a-paso.js, 2026-10-02)
@@ -143,13 +142,7 @@ const ASIST_AYUDA = [
   'Revisá cómo quedó. Todo se puede volver a cambiar desde cualquier paso.',
 ];
 
-function repartirAtributos(total, pesos){
-  const v = pesos.map(p => Math.max(1, Math.floor(total * p)));
-  let resto = total - v.reduce((a, b) => a + b, 0);
-  const orden = pesos.map((p, i) => [p, i]).sort((a, b) => b[0] - a[0]).map(x => x[1]);
-  for(let k = 0; resto > 0; k++, resto--) v[orden[k % orden.length]]++;
-  return v;
-}
+function repartirAtributos(total, pesos){ return Combatiente.repartirAtributos(total, pesos, 1); }
 function cambiarAtributoBase(sc, id, valor){
   const agl = id === 'agl' && sc.nitros !== null && sc.nitros !== undefined ? {full: num(sc.nitros) >= creepNitrosMax(sc)} : null;
   sc[id] = Math.max(1, Math.round(num(valor)) || 1);

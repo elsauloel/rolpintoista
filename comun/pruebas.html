@@ -97,6 +97,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
+<script src="skills-clase.js"></script>
+<script src="asistente-personaje.js"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -1530,6 +1532,38 @@ prueba('mapa nuevo en la ventana común: sin nombre no avanza; los creeps se agr
   v.clic('[data-pap="crear"]'); await new Promise(r => setTimeout(r, 0));
   igual([tabs, aviso, grupos, res && res.nombre, res && res.creeps.sort(), v.mia.isConnected],
     [['Nombre', 'Creeps', 'Listo'], 'Ponele un nombre al mapa.', ['🎒 Reserva (en ningún mapa)', '🗺 En «Mina»'], 'Cueva', ['a', 'b', 'c'], false]);
+});
+const ATTRS_PRUEBA = ['con', 'fue', 'agl', 'des', 'esp'];
+prueba('personaje nuevo paso a paso: sin nombre no avanza; la clase sugiere el reparto (mínimo 3); habilidades, pasivas, talentos y compra quedan en el personaje', async () => {
+  let datos = null;
+  const arma = CATALOGO_BASE.find(i => i.tipoItem === 'arma_1m' && num(i.precioCompra) > 0 && num(i.precioCompra) <= 300);
+  AsistentePersonaje.abrir({
+    base: () => FichaGuardado.normalizar({}).S, clases: CLASES_SKILLS,
+    pool: c => ((CLASES_SKILLS.find(x => x.id === c) || {}).habilidades || []),
+    habilidad: (c, h) => ({...structuredClone(((CLASES_SKILLS.find(x => x.id === c) || {}).habilidades || []).find(x => x.id === h)), jobCosto: 1}),
+    pasivas: () => PASIVAS_BASE.map(p => ({datos: p, meta: null})), pasiva: d => ({...structuredClone(d), compras: 1}),
+    tienda: async () => ({items: [arma.id], itemsDatos: [], abierta: true}), ddeInicial: async () => 300,
+    alCrear: d => { datos = d; },
+  });
+  const v = papUltima();
+  const tabs = v.tabs();
+  v.clic('[data-pap="sig"]'); const aviso = v.q('.pap-aviso').textContent;
+  v.escribir('#ap-nombre', 'Aurelia'); v.clic('[data-ap-clase="warrior"]');
+  v.ir('Atributos'); const antes = ATTRS_PRUEBA.map(a => +v.mia.querySelectorAll('.ap-attr .ap-num')[ATTRS_PRUEBA.indexOf(a)].textContent);
+  v.clic('[data-ap-sugerencia="1"]');
+  const nums = [...v.mia.querySelectorAll('.ap-attr .ap-num')].map(n => +n.textContent);
+  v.ir('Habilidades'); v.clic('[data-ap-hab]');
+  v.ir('Pasivas'); v.clic('[data-ap-pasiva="0"]');
+  v.ir('Talentos'); v.clic('[data-ap-talento="Persuadir"]');
+  await new Promise(r => setTimeout(r, 0));
+  v.ir('Equipo'); v.clic(`[data-ap-item="${arma.id}"][data-ap-delta="1"]`);
+  v.ir('Resumen'); const avisos = [...v.mia.querySelectorAll('.ap-aviso')].map(x => x.textContent);
+  v.clic('[data-pap="crear"]'); await new Promise(r => setTimeout(r, 0));
+  const suma = ATTRS_PRUEBA.reduce((a, k) => a + datos.attrs[k], 0);
+  igual([tabs, aviso, antes, nums.reduce((a, b) => a + b, 0), Math.min(...nums) >= 3, nums[1] >= nums[2], datos.meta.nombre, datos.meta.clase, suma, datos.habilidades.length, datos.pasivas.length,
+    datos.sociales.map(t => t.nombre + ' ' + t.puntosInt), datos.inventario.map(i => i.nombre), datos.meta.dde, datos.hp === FichaCalculo.calcular(datos).final.hpmax, avisos.some(a => a.includes('Job')), v.mia.isConnected],
+    [['Idea', 'Imagen', 'Atributos', 'Habilidades', 'Pasivas', 'Talentos', 'Equipo', 'Historia', 'Resumen'], 'Ponele un nombre a tu personaje.', [3, 3, 3, 3, 3], 33, true, true, 'Aurelia', 'Warrior', 33, 1, 1,
+     ['Persuadir 1'], [arma.nombre], 300 - num(arma.precioCompra), true, true, false]);
 });
 /* ---------- Creeps por mapa (comun/creeps-mapas.js, 2026-10-02: los grupos pasaron a ser mapas) ---------- */
 // Una base de datos de mentira, lo justo para CreepsMapas: colecciones y documentos en memoria.

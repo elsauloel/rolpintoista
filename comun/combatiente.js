@@ -512,7 +512,27 @@ const Combatiente = (() => {
     return '';
   }
 
-  return {mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+  /* ---------- Repartos sugeridos de atributos (2026-10-02: los de los roles de creeps; los usan el asistente de creeps de GM Tools y el de
+     personaje nuevo, comun/asistente-personaje.js — decisión del dueño: las clases sugieren el reparto de su rol, siempre como orientación).
+     Pesos en el orden de los atributos: Con, Fue, Agl, Des, Esp. ---------- */
+  const ROLES = {brutal: 'Brutal (pega fuerte)', tanque: 'Tanque (aguanta)', rapido: 'Rápido (asalto)', rango: 'A distancia', mago: 'Mago', apoyo: 'Apoyo', debuffer: 'Debuffer (maldiciones)'};
+  const PESOS_ROL = {brutal: [.26, .30, .14, .16, .14], tanque: [.36, .26, .10, .12, .16], rapido: [.16, .18, .30, .24, .12],
+    rango: [.18, .10, .24, .32, .16], mago: [.20, .08, .16, .16, .40], apoyo: [.24, .10, .16, .14, .36], debuffer: [.22, .08, .18, .14, .38]};
+  // Cada clase de personaje, con el rol de creep que comparte su reparto.
+  const ROL_DE_CLASE = {warrior: 'brutal', asalto: 'rapido', tanque: 'tanque', mago: 'mago', shooter: 'rango', support: 'apoyo', debuffer: 'debuffer'};
+  // `total` puntos repartidos según `pesos`, con `minimo` en cada uno (los creeps: 1; un personaje nuevo: 3).
+  // (Con mínimo 1 da lo mismo que la cuenta que tenía GM Tools.)
+  function repartirAtributos(total, pesos, minimo){
+    const m = Math.max(0, Number(minimo) || 1);
+    const v = pesos.map(p => Math.max(m, Math.floor(total * p)));
+    let resto = total - v.reduce((a, b) => a + b, 0);
+    const orden = pesos.map((p, i) => [p, i]).sort((a, b) => b[0] - a[0]).map(x => x[1]);
+    for(let k = 0; resto > 0; k++, resto--) v[orden[k % orden.length]]++;
+    for(let k = 0, vueltas = 0; resto < 0 && vueltas < 1000; k++, vueltas++){ const i = orden[k % orden.length]; if(v[i] > m){ v[i]--; resto++; } }   // los mínimos se pasaron del total
+    return v;
+  }
+
+  return {ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

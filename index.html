@@ -262,6 +262,18 @@ select option{background:var(--panel)}
         </div>
 
         <div class="caja" style="margin-top:12px">
+          <form id="form-dde-inicial">
+            <label for="in-dde-inicial" style="margin-top:0"><b style="color:var(--paper);font-size:15px">DDE inicial de los personajes nuevos</b></label>
+            <p class="vacio" style="margin:2px 0 6px">Con cuántos doblones del espacio arranca un personaje creado paso a paso. Lo estándar: 300.</p>
+            <div class="fila" style="margin-top:4px;flex-wrap:nowrap">
+              <input id="in-dde-inicial" type="number" min="0" step="10" value="300" style="max-width:140px">
+              <button type="submit" class="btn">Guardar</button>
+            </div>
+            <div class="error" id="dde-inicial-error"></div>
+          </form>
+        </div>
+
+        <div class="caja" style="margin-top:12px">
           <form id="form-renombrar">
             <label for="in-renombrar" style="margin-top:0"><b style="color:var(--paper);font-size:15px">Nombre de la partida</b></label>
             <div class="fila" style="margin-top:4px;flex-wrap:nowrap">
@@ -645,6 +657,7 @@ async function irAPartida(id){
     $('#in-renombrar').value = p.nombre;
     cerrarBorrar();
     cargarGestion();
+    cargarDdeInicial();
   }
 }
 
@@ -892,6 +905,32 @@ async function borrarPersonajeGM(id, boton){
   }
 }
 
+// DDE inicial de los personajes nuevos (2026-10-02, decisión del dueño: 300 salvo que el GM fije otro): campanas/<id>/ajustes/partida.
+// Lo lee el asistente de personaje nuevo (comun/asistente-personaje.js).
+async function cargarDdeInicial(){
+  $('#dde-inicial-error').textContent = '';
+  try{
+    const d = await fbDb.doc(fbRutaCampana('ajustes/partida')).get();
+    const v = d.exists ? Number(d.data().ddeInicial) : NaN;
+    $('#in-dde-inicial').value = Number.isFinite(v) ? v : 300;
+  }catch(err){ $('#in-dde-inicial').value = 300; }
+}
+$('#form-dde-inicial').onsubmit = async e => {
+  e.preventDefault();
+  const v = Math.max(0, Math.round(Number($('#in-dde-inicial').value) || 0));
+  const boton = $('#form-dde-inicial button');
+  $('#dde-inicial-error').textContent = '';
+  boton.disabled = true;
+  try{
+    await fbDb.doc(fbRutaCampana('ajustes/partida')).set({ddeInicial: v, actualizado: firebase.firestore.FieldValue.serverTimestamp()}, {merge: true});
+    boton.textContent = '✓ Guardado';
+    setTimeout(() => { boton.textContent = 'Guardar'; }, 1800);
+  }catch(err){
+    console.error('No se pudo guardar el DDE inicial:', err);
+    $('#dde-inicial-error').textContent = textoError(err) + ' (¿se pegaron las reglas nuevas de Firebase?)';
+  }finally{ boton.disabled = false; }
+};
+
 $('#form-renombrar').onsubmit = async e => {
   e.preventDefault();
   const nombre = $('#in-renombrar').value.trim().slice(0, 60);
@@ -974,7 +1013,7 @@ $('#btn-borrar-definitivo').onclick = async () => {
       for(const d of snap.docs) await borrarDocumentos((await d.ref.collection(sub).get()).docs.map(h => h.ref));
       await borrarDocumentos(snap.docs.map(d => d.ref));
     }
-    for(const [col, texto] of [['tokens', 'tokens'], ['tiradas', 'tiradas'], ['historial', 'historial del GM'], ['mapa', 'mapa'], ['gm', 'datos del GM'], ['tienda', 'tienda'], ['tiendas', 'tiendas guardadas']]){
+    for(const [col, texto] of [['tokens', 'tokens'], ['tiradas', 'tiradas'], ['historial', 'historial del GM'], ['mapa', 'mapa'], ['gm', 'datos del GM'], ['tienda', 'tienda'], ['tiendas', 'tiendas guardadas'], ['ajustes', 'ajustes']]){
       estado(`Borrando ${texto}…`);
       await borrarDocumentos((await base.collection(col).get()).docs.map(d => d.ref));
     }

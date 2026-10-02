@@ -375,6 +375,8 @@ function oportunidadEvaluarRuta(t, ruta){
     const antes = ruta[i - 1], despues = ruta[i];
     rivales.forEach(r => {
       if(avisados.has(r)) return;
+      // Desde 2026-10-02 el ataque de oportunidad frena y pregunta (js/17): la línea de la Mesa ya no va para quien no puede aprovecharlo o ya decidió.
+      if(!oporPuede(r) || oporUsada(rutaTokenId(t), [...tokens.entries()].find(([, x]) => x === r)[0])) return;
       if(distanciaHex(antes, {col: r.col, fila: r.fila}) === 1 && distanciaHex(despues, {col: r.col, fila: r.fila}) > 1){
         avisados.add(r);
         salidos.push(r);

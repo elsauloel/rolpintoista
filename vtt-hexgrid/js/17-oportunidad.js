@@ -20,6 +20,7 @@ let oporDecision = null;                  // pantalla de quien decide: {id, d, a
 const oporClave = (m, r) => m + '|' + r;
 const oporUsada = (m, r) => oportunidadUsadas.has(oporClave(m, r)) && oportunidadUsadas.get(oporClave(m, r)) === num(mantenimientoNumero);
 const oporMarcar = (m, r) => oportunidadUsadas.set(oporClave(m, r), num(mantenimientoNumero));
+const rutaTokenId = t => { for(const [id, x] of tokens) if(x === t) return id; return ''; };   // la clave de un token (no la lleva adentro)
 // ¿Le alcanzan los No2? (lo público; sin el dato, sí: mejor preguntar que perderlo)
 function oporPuede(r){
   const v = vinculo(r), rs = v && v.resumen;

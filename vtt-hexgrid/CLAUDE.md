@@ -1233,3 +1233,13 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   nuevo (9 y después 2), con su d20 y su momento. Sigilo: el camino que deja al creep en la zona de alerta se corta solo con la pasiva; el
   pedido llegó al GM, que tiró Destreza 1 contra Percepción 6 y le sacó el Sigilo; el cartel del jugador pasó a «¡Encontraste a alguien!».
   La esquina mostró un aviso de trampa pisada. Todo restaurado y borrado (verificado).
+- **Ataque de oportunidad que frena (2026-10-02, pedido del dueño; `js/17-oportunidad.js`)**: en modo combate, si un token se aleja de un
+  rival que puede aprovecharlo (le alcanzan los No2 con alguna mano: `resumen.opor` de un creep, `nitros ≥ oporCosto` de un personaje o
+  invocación; sin el dato, se pregunta igual), `rutaSoltada` (js/06, lo que antes estaba suelto en `soltar`) lo frena en el último casillero
+  al lado y guarda el resto del camino. Quien decide por el rival (el GM si es un creep o tiene 🎮 el control; si no, el jugador dueño) ve al
+  centro «¿Ataque de oportunidad?» → No: el otro sigue su camino tal cual (`oporContinuar`, por las mismas reglas); Sí: «¿con qué arma?» si
+  tiene más de una con No2, y se abre el duelo (tipo 'oportunidad'). Quien se aleja espera al centro (con «Seguir sin esperar»); el resto
+  lo ve en la esquina. Un par (quien se aleja, rival) se ofrece una vez por turno (hasta el ⟳ Mantenimiento). La línea vieja de la Mesa
+  ya no sale para quien no puede aprovecharlo o ya decidió. **Probado en vivo** (combate, Silvia con el control del GM): No → el creep
+  siguió y se volvió a frenar al alejarse de Xeena; «Seguir sin esperar» → siguió; Sí → duelo de oportunidad con la Cimitarra (pagó 3 No2,
+  pegó 7), «Terminar duelo»; todo restaurado.

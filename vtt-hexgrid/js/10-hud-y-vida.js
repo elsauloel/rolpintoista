@@ -676,7 +676,7 @@ function hudConectar(t){
     if(clave === 'ficha'){ abrirFichaDeToken(t); return; }
     if(clave === 'libre'){ activarMoverLibre(seleccion); return; }
     if(clave === 'oculto'){ editarToken(seleccion, {oculto: !t.oculto}); return; }
-    if(clave === 'equipo'){ abrirBotonera(t.fichaId.split(SEP_INVOCACION)[0], {tipo: 'abrir-equipo'}); return; }
+    if(clave === 'equipo'){ abrirEquipoMapa(t.fichaId.split(SEP_INVOCACION)[0]); return; }   // el mapa (js/11, A4)
     if(clave === 'rayo'){
       const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
       const invDeToken = t.tipo === 'pj' && t.fichaId && t.fichaId.includes(SEP_INVOCACION) ? t.fichaId.split(SEP_INVOCACION)[1] : '';

@@ -69,6 +69,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-acciones.js"></script>
 <script src="ficha-mantenimiento.js"></script>
 <script src="selector-estados.js"></script>
+<script src="ficha-equipo.js"></script>
 <script src="tiradas-propias.js"></script>
 <script src="efectos-golpe.js"></script>
 <script src="confirmar-turno.js"></script>
@@ -562,6 +563,26 @@ prueba('el estado se arma como en cada herramienta y la regla común lo acumula 
   const jefe = Combatiente.agregarEstado([], creep, {jefe: true});
   igual([pj.id, pj.activo, pj.nombre, creep.hpTurno, creep.activo, creep.esCC, r.que, lista.length, jefe.ok, SelectorEstados.textoAgregado({que: 'nuevo', estado: {nombre: 'Stun'}}, 'hpTurno')],
     ['e1', true, 'Veneno', 0, true, true, 'acumulado', 1, false, 'Stun activado']);
+});
+
+/* ---------- Equipo y mochila (comun/ficha-equipo.js, hoja de ruta A4, 2026-10-02) ---------- */
+grupo('Equipo y mochila (A4)');
+prueba('equipar: slot lleno pide reemplazar, un consumible pasa al cinturón, un trofeo no se equipa, en combate cuesta No2', () => {
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, nitros: 3, inventario: [
+    {id: 'a1', nombre: 'Espada', tipoItem: 'arma_1m', equipado: true, peso: 1}, {id: 'a2', nombre: 'Hacha', tipoItem: 'arma_1m', equipado: true, peso: 1},
+    {id: 'a3', nombre: 'Daga', tipoItem: 'arma_1m', equipado: false, peso: 1}, {id: 'p', nombre: 'Poción', tipoItem: 'consumibles', equipado: false},
+    {id: 't', nombre: 'Colmillo', tipoItem: 'arma_1m', trofeo: true, equipado: false}, {id: 'c', nombre: 'Casco', tipoItem: 'cabeza', equipado: false}]}).S);
+  const avisos = [], cambios = [];
+  let lleno = null;
+  const ui = {toast: t => avisos.push(t), avisarSinNitros: () => avisos.push('sin No2'), modoCombate: () => true, slotLleno: it => { lleno = it.id; return true; }, cambio: p => cambios.push(p.join(','))};
+  FichaEquipo.equipar(S, 'a3', ui);
+  FichaEquipo.equipar(S, 'p', ui);
+  FichaEquipo.equipar(S, 't', ui);
+  FichaEquipo.equipar(S, 'c', ui);
+  const casco = S.inventario.find(i => i.id === 'c');
+  FichaEquipo.reemplazar(S, 'a1', 'a3', ui);
+  igual([lleno, S.cinturon.some(i => i.id === 'p'), avisos.some(t => /trofeo/.test(t)), casco.equipado, S.inventario.find(i => i.id === 'a3').equipado, S.inventario.find(i => i.id === 'a1').equipado, S.nitros, avisos.includes('sin No2'), FichaEquipo.slotLlenoHtml(S, S.inventario.find(i => i.id === 'a1')).includes('data-reemplazar')],
+    ['a3', true, true, true, true, false, 0, false, true]);   // casco −1 No2 (3 → 2), reemplazar −2 (2 → 0)
 });
 
 /* ---------- El dibujo de la Botonera (comun/ficha-botonera.js, paso 4 etapa 3b) ---------- */

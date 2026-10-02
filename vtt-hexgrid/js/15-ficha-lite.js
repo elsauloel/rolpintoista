@@ -129,7 +129,7 @@ function flBoton(id){
   if(id === 'gmtools'){ window.open('../gm-toolset/gm-tools.html?partida=' + encodeURIComponent(FB_CAMPANA) + '&editar=' + encodeURIComponent(creepId), '_blank', 'noopener'); return; }
   cerrarFichaLite();   // lo demás abre otra ventana encima del mapa
   if(id === 'stats') abrirBotonera(fichaId, {tipo: 'abrir-stats'});
-  else if(id === 'mochila') abrirBotonera(fichaId, {tipo: 'abrir-equipo'});
+  else if(id === 'mochila') abrirEquipoMapa(fichaId);   // el mapa (js/11, A4)
   else if(id === 'tienda') abrirBotonera(fichaId, {tipo: 'abrir-tienda'});
   else if(id === 'botin') abrirBotonera(fichaId, {tipo: 'abrir-botin'});
   else if(id === 'botonera') abrirBotonera(fichaId, undefined, invId);

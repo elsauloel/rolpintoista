@@ -65,6 +65,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-acciones.js"></script>
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
+<script src="inv-lupa.js"></script>
 <script src="ficha-acciones.js"></script>
 <script src="tiradas-propias.js"></script>
 <script src="efectos-golpe.js"></script>
@@ -1043,6 +1044,14 @@ prueba('habilidades de una invocación: la 💰 cobra No2 y cooldown y tira; en 
   const otra = InvHabilidades.ejecutar(inv, inv.habilidades[0], estadosPresetFicha(), false);
   igual([inv.nitros, inv.habilidades[0].cdActual, reg, !!otra.error, InvHabilidades.ejecutar(inv, inv.habilidades[1], [], false).modo, InvHabilidades.tiradaSegunda(inv, inv.habilidades[0]).error],
     [2, 2, ['texto', 'Lobo · Mordida · Fue', 'cambio', 'aviso'], true, 'manual', 'La fórmula de la habilidad no es válida']);
+});
+
+prueba('la 🔍 y el Ver de una invocación: costo de atacar, cooldown que falta y sin cooldown', () => {
+  const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, armaTipo: 8, nitros: 1, ataquesTurno: 0,
+    habilidades: [{id: 'm', nombre: 'Mordida', nitrosCosto: 2, cd: 2, cdActual: 1}, {id: 'a', nombre: 'Aullido', nitrosCosto: 1, detalle: 'Aúlla'}]});
+  const atq = InvLupa.contenido(inv, 'inv:i:atacar'), hab = InvLupa.contenido(inv, 'inv:i:hab:m'), ver = InvLupa.verHab(inv, inv.habilidades[1]);
+  igual([atq.titulo, /4 No2/.test(atq.html), /lupa-falta/.test(atq.html), /faltan 1/.test(hab.html), ver.titulo, /sin cooldown/.test(ver.html), /Aúlla/.test(ver.html), InvLupa.contenido(null, 'inv:x:stat:con').html],
+    ['Lobo · Atacar', true, true, true, 'Aullido', true, true, '']);
 });
 
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */

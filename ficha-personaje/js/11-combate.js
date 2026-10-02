@@ -379,67 +379,9 @@ function lupaContenido(clave){
 /* ---------- Lupa de la Botonera de una invocación (igual que la de un
    creep en gm-tools): de qué stat sale, sus modificadores, cómo se
    reparte en dados y el costo en No2. ---------- */
-function lupaStatInv(inv, statId, {sinTirada = false} = {}){
-  const attr = INV_STAT_ATTR[statId] || statId;
-  let h = lupaFila(`${STAT_LABEL[attr]} base`, fmt(num(inv[attr])));
-  aportesModInv(inv, attr).forEach(a => { h += lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${esc(STAT_LABEL[attr])})</span>`, lupaSigno(a.val)); });
-  if(statId !== attr) aportesModInv(inv, statId).forEach(a => { h += lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${esc(STAT_LABEL[statId]||statId)})</span>`, lupaSigno(a.val)); });
-  if(!aportesModInv(inv, attr).length && (statId === attr || !aportesModInv(inv, statId).length)) h += lupaFila('<span class="lupa-gris">Sin modificadores</span>', '–');
-  if((statId === 'pdg' || statId === 'parry') && invEstadoActivo(inv, 'lisiado')) h += lupaFila('Lisiado <span class="lupa-gris">(la mitad, para abajo)</span>', '÷ 2');
-  const valor = invStatValor(inv, statId);
-  h += lupaFila(esc(STAT_LABEL[statId]||statId), fmt(valor), 'lupa-total');
-  let out = lupaSeccion('De dónde sale', h);
-  if(sinTirada) return out;
-  out += lupaTirada(valor);
-  return out;
-}
-function lupaHtmlInv(clave){
-  const [, invId, tipo, ref] = clave.split(':');
-  const inv = S.invocaciones.find(x => x.id === invId);
-  if(!inv) return {titulo: '', html: ''};
-  const sinCosto = lupaSeccion('Costo', lupaFila('Esta tirada', 'sin costo'));
-  if(tipo === 'stat') return {titulo: `${inv.nombre} · ${STAT_LABEL[ref]||ref}`, html: lupaStatInv(inv, ref) + sinCosto};
-  if(tipo === 'atacar'){
-    const tipoArma = num(inv.armaTipo) || 8;
-    const hechos = num(inv.ataquesTurno);
-    const costo = costoAtaqueInv(inv);
-    let h = lupaFila(`Tipo del arma${inv.armaNombre ? ` (${esc(inv.armaNombre)})` : ''}: d${fmt(tipoArma)}`, fmt(tipoArma));
-    h += lupaFila('Ataques este turno', fmt(hechos));
-    h += hechos === 0
-      ? lupaFila(`Primer ataque: Tipo ÷ 2${tipoArma % 2 ? ', para arriba' : ''}`, `${fmt(costo)} No2`, 'lupa-total')
-      : lupaFila('Ya atacó: Tipo completo', `${fmt(costo)} No2`, 'lupa-total');
-    h += lupaFila('No2 disponibles', fmt(num(inv.nitros)), costo > num(inv.nitros) ? 'lupa-falta' : '');
-    h += lupaNota('El primer ataque del turno cuesta la mitad. Se reinicia en el Mantenimiento.');
-    return {titulo: `${inv.nombre} · Atacar`, html: lupaStatInv(inv, 'pdg') + lupaSeccion('Costo', h)};
-  }
-  if(tipo === 'danio'){
-    const dmg = invStatValor(inv, 'dmg');
-    let h = lupaFila('Peso del arma (cantidad de dados)', fmt(Math.max(1, num(inv.armaPeso) || 1)));
-    if(num(inv.armaAmplificado) > 0) h += lupaFila('Daño amplificado (dados extra)', lupaSigno(num(inv.armaAmplificado)));
-    h += lupaFila('Tipo (caras del dado)', `d${fmt(num(inv.armaTipo) || 8)}`);
-    if(num(inv.armaFijo)) h += lupaFila('Daño fijo del arma', lupaSigno(num(inv.armaFijo)));
-    h += inv.armaDeRango
-      ? lupaFila('Dmg <span class="lupa-gris">(arma de rango: no suma)</span>', '–', 'lupa-tachado')
-      : lupaFila('Dmg (de Fuerza)', lupaSigno(dmg));
-    h += lupaFila('Daño', esc(invDanoTxt(inv, dmg)), 'lupa-total');
-    let out = lupaSeccion('De dónde sale', h);
-    if(!inv.armaDeRango) out += lupaStatInv(inv, 'dmg', {sinTirada: true}).replace('De dónde sale', 'Dmg (de Fuerza)');
-    return {titulo: `${inv.nombre} · Daño${inv.armaNombre ? ` (${inv.armaNombre})` : ''}`, html: out + sinCosto};
-  }
-  if(tipo === 'hab'){
-    const h0 = inv.habilidades.find(x => x.id === ref);
-    if(!h0) return {titulo: '', html: ''};
-    const n = costoNitrosHabInv(inv, h0);
-    const porDefecto = h0.nitrosCosto === undefined || h0.nitrosCosto === null || h0.nitrosCosto === '';
-    let h = lupaFila(habInvAtaque(h0) ? `No2 · como un ataque <span class="lupa-gris">(${num(inv.ataquesTurno) ? 'Tipo completo' : 'primer ataque, Tipo ÷ 2'})</span>` : porDefecto ? `No2 (por defecto, ${fmt(IT2_INV.nitrosHabilidad)})` : 'No2 de la habilidad', `${fmt(n)} No2`, 'lupa-total');
-    if(num(h0.cd) > 0) h += lupaFila('Cooldown', `${fmt(num(h0.cd))} turno(s)${num(h0.cdActual) > 0 ? ` · faltan ${fmt(num(h0.cdActual))}` : ''}`);
-    h += lupaFila('No2 disponibles', fmt(num(inv.nitros)), n > num(inv.nitros) ? 'lupa-falta' : '');
-    let out = lupaSeccion('Costo', h);
-    if(h0.tiradaStat) out += lupaSeccion('Tirada del stat', lupaFila(esc(STAT_LABEL[h0.tiradaStat]||h0.tiradaStat), fmt(invStatValor(inv, h0.tiradaStat))));
-    if((h0.tiradaExtra || '').trim()) out += lupaSeccion('Tirada', lupaFila('Fórmula de la habilidad', esc(h0.tiradaExtra)));
-    return {titulo: `${inv.nombre} · ${h0.nombre || 'Habilidad'}`, html: out};
-  }
-  return {titulo: '', html: ''};
+function lupaStatInv(inv, statId, o){ return InvLupa.stat(inv, statId, o); }   // comun/inv-lupa.js (4e, tanda 6)
+function lupaHtmlInv(clave){   // comun/inv-lupa.js (4e, tanda 6): lo usa también el mapa
+  return InvLupa.contenido(S.invocaciones.find(x => x.id === clave.split(':')[1]), clave);
 }
 
 function atacar(){

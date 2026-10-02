@@ -338,9 +338,9 @@ function verHabInv(invId, habId){
   const inv = S.invocaciones.find(x => x.id === invId);
   const h = inv && inv.habilidades.find(x => x.id === habId);
   if(!inv || !h) return;
-  $('#verhabinv-nombre').textContent = h.nombre || 'Sin nombre';
-  $('#verhabinv-body').innerHTML = `<div class="hint" style="margin-bottom:10px">${esc(costoHabInvTxt(inv,h))}${num(h.cd)>0?` · ${fmt(num(h.cd))} turno(s) de cooldown`:' · sin cooldown'}</div>
-    <div>${h.detalle ? esc(h.detalle) : 'Sin detalle cargado.'}</div>`;
+  const v = InvLupa.verHab(inv, h);   // comun/inv-lupa.js
+  $('#verhabinv-nombre').textContent = v.titulo;
+  $('#verhabinv-body').innerHTML = v.html;
   $('#scrim-verhabinv').classList.add('open');
 }
 

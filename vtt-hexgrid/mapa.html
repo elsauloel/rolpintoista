@@ -9133,7 +9133,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001c',
-  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/inv-calculo.js?v=20261001b', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/inv-duelo.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001h', '../comun/inv-habilidades.js?v=20261001a',
+  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/inv-calculo.js?v=20261001b', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/inv-duelo.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001h', '../comun/inv-habilidades.js?v=20261001a', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
@@ -9242,7 +9242,7 @@ function bnDibujarInv(cuerpo){
       <div style="display:flex;gap:6px;flex:none"><button class="iconbtn" data-bn-cerrar title="Cerrar (B o Esc)">Cerrar</button></div>
     </header>`;
   if(inv.activa === false){ cuerpo.innerHTML = marco(cab(inv.nombre) + `<div class="body"><div class="hint">${esc(inv.nombre)} está dormida — tocá «Invocar» en la ficha para reactivarla.</div></div>`); return; }
-  const r = InvBotonera.html(inv, {lupa: false, parryPendiente: !!(bn.invParry && bn.invParry.has(inv.id))});
+  const r = InvBotonera.html(inv, {parryPendiente: !!(bn.invParry && bn.invParry.has(inv.id))});
   const scroll = bn.host.scrollTop;
   cuerpo.innerHTML = marco(cab(r.titulo, r.badge) + `<div class="body" id="botonerainv-body">${r.html}</div>`);
   bn.host.scrollTop = scroll;
@@ -9259,6 +9259,17 @@ function bnPublicarInv(inv, t){
   window.dispatchEvent(new CustomEvent('tirada-registrada', {detail: {origen: t.origen, r: t.r}}));
 }
 function bnInvAca(b){
+  // Tanda 6: el Ver de una habilidad de la invocación, adentro del recuadro (no cambia nada: lo ve cualquiera que la abra).
+  if(b.dataset.verhabinv){
+    const [invId, habId] = b.dataset.verhabinv.split(':');
+    const cruda = (bn.S.invocaciones || []).find(x => x && x.id === invId), h = cruda && (cruda.habilidades || []).find(x => x && x.id === habId);
+    if(!h) return true;
+    const v = InvLupa.verHab(InvCalculo.migrar(structuredClone(cruda)), h);
+    bn.raiz.querySelector('#bn-verinv-titulo').textContent = v.titulo;
+    bn.raiz.querySelector('#bn-verinv-cuerpo').innerHTML = v.html;
+    bn.raiz.querySelector('#bn-verinv').classList.add('open');
+    return true;
+  }
   const d = b.dataset, ref = d.invtirarstat || d.invatacar || d.invdanio || d.ejecutarhabinv || d.danohabinv;
   if(!ref || !bnPuedeGuardar()) return false;
   const inv = (bn.S.invocaciones || []).find(x => x && x.id === ref.split(':')[0]);
@@ -9688,6 +9699,11 @@ function bnAccionAca(b){
    contenido con lupaContenido (acá, solo para el personaje de la Botonera nueva). El "Ver" se muestra adentro del recuadro;
    Eliminar lo hace el mapa (si puede guardar al personaje) y Editar abre el editor de la ficha escondida ('editar-en-ficha'). */
 function lupaContenido(clave){
+  // La de una invocación de la Botonera nueva ("inv:invId:tipo:ref"): comun/inv-lupa.js, sobre una copia migrada (4e, tanda 6).
+  if(String(clave).startsWith('inv:')){
+    const cruda = bn && bn.S ? (bn.S.invocaciones || []).find(x => x && x.id === String(clave).split(':')[1]) : null;
+    return InvLupa.contenido(cruda ? InvCalculo.migrar(structuredClone(cruda)) : null, clave);
+  }
   // La de un creep (Acciones nuevas, "creepId|tipo|ref"): comun/creep-lupa.js, con su parte privada (paso 4c, tanda 6).
   if(String(clave).includes('|') && typeof CreepLupa !== 'undefined'){
     const id = String(clave).split('|')[0], crudo = creepPrivadoDe(id);
@@ -9779,6 +9795,10 @@ function bnCrear(){
       <header><h3>¿Con qué arma?</h3><button class="iconbtn" data-bn-arma="no">Cerrar</button></header>
       <div class="body" id="bn-arma-lista" style="display:flex;flex-direction:column;gap:9px"></div>
     </div></div>
+    <div class="scrim" id="bn-verinv"><div class="modal" style="max-width:420px">
+      <header><h3 id="bn-verinv-titulo">Habilidad</h3><button class="iconbtn" data-bn-verinv="no">Cerrar</button></header>
+      <div class="body" id="bn-verinv-cuerpo"></div>
+    </div></div>
     <div class="scrim" id="bn-ver"><div class="modal view-modal">
       <header><h3 id="bn-ver-titulo">Ítem</h3><button class="iconbtn" data-bn-ver="no">Cerrar</button></header>
       <div class="body" id="bn-ver-cuerpo"></div>
@@ -9789,7 +9809,7 @@ function bnCrear(){
     </div></div>`;
   raiz.querySelector('#bn-sin-nitros').addEventListener('mousedown', e => { if(e.target.id === 'bn-sin-nitros') bnCerrarSinNitros(); });
   raiz.querySelector('#bn-costox').addEventListener('mousedown', e => { if(e.target.id === 'bn-costox'){ bnCostoX = null; e.target.classList.remove('open'); } });
-  ['bn-sobrepeso', 'bn-elegir-arma', 'bn-tipo-ataque', 'bn-ver'].forEach(id => raiz.querySelector('#' + id).addEventListener('mousedown', e => { if(e.target.id === id){ e.target.classList.remove('open'); if(id === 'bn-sobrepeso') bnSobrepeso = null; } }));
+  ['bn-sobrepeso', 'bn-elegir-arma', 'bn-tipo-ataque', 'bn-ver', 'bn-verinv'].forEach(id => raiz.querySelector('#' + id).addEventListener('mousedown', e => { if(e.target.id === id){ e.target.classList.remove('open'); if(id === 'bn-sobrepeso') bnSobrepeso = null; } }));
   raiz.addEventListener('click', e => {
     const b = e.target.closest('button');
     if(!b || !bn) return;
@@ -9832,6 +9852,7 @@ function bnCrear(){
       return;
     }
     if(b.dataset.bnVer){ bnVerAccion(b.dataset.bnVer); return; }
+    if(b.dataset.bnVerinv){ raiz.querySelector('#bn-verinv').classList.remove('open'); return; }
     if(b.dataset.view){ const [key, id] = b.dataset.view.split(':'); bnVer(key, id); return; }
     if(b.dataset.bnCerrar !== undefined){ cerrarBotoneraNueva(); return; }
     if(b.dataset.colapsar){

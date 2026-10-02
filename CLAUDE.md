@@ -29,6 +29,11 @@
 > token o la F abren encima del mapa lo esencial del combate, para personajes, invocaciones y creeps (`comun/ficha-lite.js`,
 > `vtt-hexgrid/js/15-ficha-lite.js`).
 >
+> **Hoja de ruta A (estructural, 2026-10-02) → [`docs/pendientes.md`](docs/pendientes.md) §0**: A1–A6 hechas (el mapa ya no carga la
+> ficha ni GM Tools escondidas para nada; los editores son comunes: `comun/ficha-editor.js`, `comun/creep-editor.js`). Falta la limpieza
+> A′ (después de tres sesiones reales) y sigue la B (lo puntual). Reportes: [`docs/reporte-estructural-2026-10-02.md`](docs/reporte-estructural-2026-10-02.md),
+> [`docs/reporte-a6-2026-10-02.md`](docs/reporte-a6-2026-10-02.md).
+>
 > **Tareas pendientes → [`docs/pendientes.md`](docs/pendientes.md)** (lista viva para ir tachando; las decisiones de diseño
 > siguen en `preguntas-abiertas.md`). Al terminar o descubrir una tarea, actualizarla ahí.
 >

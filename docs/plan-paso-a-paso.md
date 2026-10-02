@@ -29,7 +29,7 @@ probada y publicada antes de la siguiente:
 | 1 ✅ | **La pieza común** + el asistente de **creeps** pasado a ella (con Guardar/Cancelar) | hecho 2026-10-02 |
 | 2 ✅ | **Habilidades**: de personaje (`ficha-editor.js`), de creep (`creep-editor.js`) y de invocación (js/04 de la ficha) | hecho 2026-10-02 (se sacó el CSS de las pastillitas) |
 | 3 ✅ | **Ítems** (`asistente-item.js`) en la ventana común (hecho 2026-10-02). **Falta**: los **consumibles**, que siguen en el formulario aparte | — |
-| 4 | **Ejecución ✨** (`asistente-duelo-hab.js`) | azul, pastillitas |
+| 4 ✅ | **Ejecución ✨** (`asistente-duelo-hab.js`) en la ventana común, con la paleta de todos | hecho 2026-10-02 |
 | 5 | **Estado** (crear y el ⚙ de editar, hoy formulario), **Trampa**, **Zona** y las preguntas de un preset (`estado-preguntas.js`) | barra de progreso, sin saltar |
 | 6 | Lo que hoy es formulario o `prompt`: **invocación** (como el de creeps), **pasiva**, **talento**, **token nuevo**, **mapa**, **tienda**, **partida** | formularios / prompt |
 | 7 | **Personaje nuevo** (abajo) | un `confirm` y una ficha en blanco |

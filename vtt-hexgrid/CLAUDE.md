@@ -1227,3 +1227,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   lugar… tirá Percepción» (`percepcionAbrir`). Como la Destreza de un creep es privada, el momento pasa a `esperandoGM` y **la pantalla del
   GM** muestra al centro «… tira Destreza» (`deteccionGMAbrir`/`deteccionGMResolver`): si la Percepción es mayor (empate: sigue
   escondido), `romperSigilo` le saca el Sigilo. Hace falta el mapa del GM abierto.
+- **Probado en vivo (2026-10-02, "Test con claude elsaulo", con las reglas publicadas):** trampa fácil (dificultad 1): corte al lado, cartel
+  al centro sin nombrarla, Percepción 1d6+1 (d4 → d6), descubierta y su momento; imposible (99): «Mmm... Puede que estés flasheando.», el
+  mismo casillero no vuelve a pedir y otro al lado sí; pisarla la detona. Pedos Tóxicos sobre un creep: cada exposición tira un Ef.Esp
+  nuevo (9 y después 2), con su d20 y su momento. Sigilo: el camino que deja al creep en la zona de alerta se corta solo con la pasiva; el
+  pedido llegó al GM, que tiró Destreza 1 contra Percepción 6 y le sacó el Sigilo; el cartel del jugador pasó a «¡Encontraste a alguien!».
+  La esquina mostró un aviso de trampa pisada. Todo restaurado y borrado (verificado).

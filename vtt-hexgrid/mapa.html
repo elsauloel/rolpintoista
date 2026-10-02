@@ -9133,7 +9133,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/ficha-calculo.js?v=20261001b', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js', '../comun/ficha-habilidades.js?v=20261001c',
-  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/inv-calculo.js?v=20261001b', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/inv-duelo.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001h',
+  '../comun/catalogo.js?v=20260929b', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261001b', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261001b', '../comun/ficha-resumen.js?v=20261001a', '../comun/inv-calculo.js?v=20261001b', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261001a', '../comun/inv-duelo.js?v=20261001a', '../comun/ficha-acciones.js?v=20261001h', '../comun/inv-habilidades.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261001b', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 var bn = null;          // {fichaId, sesion, S, host, raiz} (var: renderModo puede llamar a bnModoCambio durante la carga)
@@ -9259,7 +9259,7 @@ function bnPublicarInv(inv, t){
   window.dispatchEvent(new CustomEvent('tirada-registrada', {detail: {origen: t.origen, r: t.r}}));
 }
 function bnInvAca(b){
-  const d = b.dataset, ref = d.invtirarstat || d.invatacar || d.invdanio;
+  const d = b.dataset, ref = d.invtirarstat || d.invatacar || d.invdanio || d.ejecutarhabinv || d.danohabinv;
   if(!ref || !bnPuedeGuardar()) return false;
   const inv = (bn.S.invocaciones || []).find(x => x && x.id === ref.split(':')[0]);
   if(!inv){ toast('Esa invocación ya no está'); return true; }
@@ -9274,6 +9274,19 @@ function bnInvAca(b){
     if(p.cambio) ui.cambio(); else if(p.parry) bnDibujar();
     if(p.aviso) toast(p.aviso);
     bnPublicarInv(inv, p.tirada);
+    return true;
+  }
+  // Tanda 5: las habilidades (Ejecutar / Anunciar y la 🎲 segunda tirada), con comun/inv-habilidades.js.
+  if(d.danohabinv || d.ejecutarhabinv){
+    const h = (inv.habilidades || []).find(x => x && x.id === (d.danohabinv || d.ejecutarhabinv).split(':')[1]);
+    if(!h) return true;
+    if(d.danohabinv){ bnPublicarInv(inv, InvHabilidades.tiradaSegunda(inv, h)); return true; }
+    const ui = bnInvHabUi();   // antes de cobrar: así guarda solo lo que cambió
+    const p = InvHabilidades.ejecutar(inv, h, estadosPresetFicha(), ui.dueloDisponible());
+    if(p.modo === 'manual'){ ui.mesaHabilidad(inv, h.nombre, h.detalle || h.efectoDetalle || ''); toast(`${h.nombre || 'Habilidad'} anunciada`); return true; }
+    if(p.modo === 'flash'){ InvHabilidades.usarFlashFuera(inv, h, ui); return true; }
+    if(p.error){ toast(p.error); return true; }
+    InvHabilidades.terminar(inv, h, p, ui);
     return true;
   }
   if(d.invdanio){
@@ -9294,6 +9307,34 @@ function bnInvAca(b){
   }
   bnInvAtacar(inv.id);
   return true;
+}
+// Lo que el mapa hace después de ejecutar una habilidad de la invocación (comun/inv-habilidades.js): como la ficha, publica a su
+// nombre, guarda la parte `invocaciones` y el duelo va a nombre de `fichaId~invId`.
+function bnInvHabUi(){
+  const u = bnUi(FichaGuardado.partes(bn.S));
+  return {
+    mesaHabilidad: (inv, nombre, detalle) => {
+      if(!fbDb || !fbUsuario || !fbMiembro) return;
+      fbDb.collection(fbRutaCampana('tiradas')).add({
+        uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: inv.nombre,
+        origen: String(nombre || 'Habilidad').slice(0, 80), formula: String(detalle || '').slice(0, 300),
+        rolls: [], mod: 0, total: 0, desde: 'habilidad', cuando: firebase.firestore.FieldValue.serverTimestamp(),
+      }).catch(err => console.error('No se pudo publicar la habilidad de la invocación en la Mesa:', err));
+    },
+    mesaConTexto: t => mesaConTexto(t),
+    publicar: t => { if(!t) return; if(t.error){ toast(t.error); return; } bnRegistrarInv(t.origen, t.r); },
+    toast: t => toast(t),
+    cambio: () => u.cambio(),
+    cambiar: fn => { const u2 = bnUi(FichaGuardado.partes(bn.S)); if(fn() !== false) u2.cambio(); },
+    parry: bn.invParry || (bn.invParry = new Set()),
+    dueloDisponible: () => !!(typeof Duelo !== 'undefined' && Duelo.disponible()),
+    elegirObjetivo: (inv, cfg) => {
+      const reabrir = () => { if(bn){ bn.host.hidden = false; bnUbicar(); bnDibujar(); } };
+      bn.host.hidden = true;
+      dueloElegirObjetivoMapa({yo: {ref: bn.fichaId + SEP_INVOCACION + inv.id, tipo: 'pj', nombre: inv.nombre}, ataque: cfg.ataque,
+        conSuelto: true, alSuelto: () => { reabrir(); cfg.suelto(); }, alCancelar: () => {}});
+    },
+  };
 }
 // Atacar con la invocación: el objetivo con un clic en el token (dueloElegirObjetivoMapa, a su nombre: `fichaId~invId`) y el
 // duelo; "Sin objetivo" (o sin duelo) cobra y tira el PdG acá.

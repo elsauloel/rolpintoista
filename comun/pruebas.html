@@ -64,6 +64,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-botonera.js"></script>
 <script src="inv-acciones.js"></script>
 <script src="inv-duelo.js"></script>
+<script src="inv-habilidades.js"></script>
 <script src="ficha-acciones.js"></script>
 <script src="tiradas-propias.js"></script>
 <script src="efectos-golpe.js"></script>
@@ -1030,6 +1031,18 @@ prueba('el duelo de una invocación: defensa con Parry (cobra y deja el Bloqueo)
   h.bloquear(d);
   igual([ops, tras, parry.has('i'), reg, h.resistenciaCritico(d), h.resistenciaCritico({...d, ataque: {tipoDado: 3}}), h.armaContra(d).tipoDado, h.soy(d.defensor), h.rerollInfo(d).disponible],
     [['evasion', 'parry'], [2, true], false, ['Lobo · Parry', 'Lobo · Bloqueo'], 2, 0, 8, true, false]);
+});
+
+prueba('habilidades de una invocación: la 💰 cobra No2 y cooldown y tira; en cooldown no se puede; la 📣 solo se anuncia', () => {
+  const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, nitros: 4,
+    habilidades: [{id: 'm', nombre: 'Mordida', modo: 'semi', nitrosCosto: 2, cd: 2, tiradaStat: 'fue'}, {id: 'a', nombre: 'Aullido', modo: 'manual'}]});
+  const reg = [], ui = {mesaHabilidad: (i, n) => reg.push('mesa ' + n), mesaConTexto: () => reg.push('texto'), publicar: t => reg.push(t.origen), toast: t => reg.push('aviso'),
+    cambio: () => reg.push('cambio'), cambiar: fn => fn(), parry: new Set(), dueloDisponible: () => false, elegirObjetivo: () => {}};
+  const p = InvHabilidades.ejecutar(inv, inv.habilidades[0], estadosPresetFicha(), false);
+  InvHabilidades.terminar(inv, inv.habilidades[0], p, ui);
+  const otra = InvHabilidades.ejecutar(inv, inv.habilidades[0], estadosPresetFicha(), false);
+  igual([inv.nitros, inv.habilidades[0].cdActual, reg, !!otra.error, InvHabilidades.ejecutar(inv, inv.habilidades[1], [], false).modo, InvHabilidades.tiradaSegunda(inv, inv.habilidades[0]).error],
+    [2, 2, ['texto', 'Lobo · Mordida · Fue', 'cambio', 'aviso'], true, 'manual', 'La fórmula de la habilidad no es válida']);
 });
 
 /* ---------- Mis últimas tiradas (comun/tiradas-propias.js, P138) ---------- */

@@ -408,7 +408,7 @@ function invTirarStat(invId, statId, o){
   if(p.aviso) toast(p.aviso);
   publicarTiradaInv(p.tirada);
 }
-function habilidadInvTira(h){ return !!(h.tiradaStat || (h.tiradaExtra||'').trim()); }
+function habilidadInvTira(h){ return InvHabilidades.tira(h); }   // comun/inv-habilidades.js (4e, tanda 5)
 function mesaPublicarHabilidadInv(inv, nombre, detalle){
   if(!fbDb || !fbUsuario || !fbMiembro) return;
   fbDb.collection(fbRutaCampana('tiradas')).add({
@@ -419,140 +419,67 @@ function mesaPublicarHabilidadInv(inv, nombre, detalle){
     cuando: firebase.firestore.FieldValue.serverTimestamp(),
   }).catch(err => console.error('No se pudo publicar la habilidad de la invocación en la Mesa:', err));
 }
-function anunciarHabilidadInv(inv, h){
-  const detalle = (h && (h.detalle || h.efectoDetalle)) || '';
-  if(habilidadInvTira(h)) mesaConTexto(detalle);
-  else mesaPublicarHabilidadInv(inv, h.nombre, detalle);
-}
+function anunciarHabilidadInv(inv, h){ InvHabilidades.anunciar(inv, h, invHabUi); }
 // Igual que en el personaje (tirarPrimeraDeHab): al ejecutar se tira solo la primera; la fórmula, si hay stat, va con el botón 🎲.
 function tirarExtraDeHabInv(inv, h){
-  if(h.tiradaStat){
-    tirarValorStatInv(inv, `${h.nombre} · ${STAT_LABEL[h.tiradaStat]||h.tiradaStat}`, invStatValor(inv, h.tiradaStat), h.tiradaStat);
-    return true;
-  }
-  const formula = (h.tiradaExtra||'').trim();
-  if(formula){
-    const r = tirarDados(formula);
-    if(r){ registrarTirada(`${inv.nombre} · ${h.nombre}`, r); return true; }
-  }
-  return false;
+  const t = InvHabilidades.tiradaPrimera(inv, h);
+  if(!t) return false;
+  publicarTiradaInv(t);
+  return true;
 }
 function tirarSegundaDeHabInv(invId, habId){
   const inv = S.invocaciones.find(x => x.id === invId);
   const h = inv && inv.habilidades.find(x => x.id === habId);
   if(!h) return;
-  const r = tirarDados((h.tiradaExtra||'').trim());
-  if(r) registrarTirada(`${inv.nombre} · ${h.nombre} · Efecto`, r); else toast('La fórmula de la habilidad no es válida');
+  publicarTiradaInv(InvHabilidades.tiradaSegunda(inv, h));
 }
 const botonSegundaHabInv = (inv, h) => InvBotonera.botonSegundaHab(inv, h);   // comun/inv-botonera.js
 // Tres modos (2026-09-30): 📣 manual solo anuncia; 💰 semi cobra No2 y cooldown y tira la primera; ✨ auto abre la Ejecución
 // paso a paso a nombre de la invocación (ref `fichaId~invId`, como su ataque), o aplica directo si es solo sobre ella y sin tiradas.
-function alcanceDeHabInv(inv, c, statTira){ return Combatiente.alcanceHab(c, statTira, s => invStatValor(inv, s)); }   // comun/combatiente.js
+function alcanceDeHabInv(inv, c, statTira){ return InvHabilidades.alcanceHab(inv, c, statTira); }   // comun/combatiente.js
 // La Ejecución de una invocación: la misma regla que el personaje y el creep (comun/combatiente.js, habEjecucion). Las
 // invocaciones no tienen costo variable, así que ninguna «X» se toca.
-function habDueloInv(inv, h){
-  return Combatiente.habEjecucion(h, h && h.duelo, {stat: s => invStatValor(inv, s), etq: s => STAT_LABEL[s] || s});
-}
+function habDueloInv(inv, h){ return InvHabilidades.habEjecucion(inv, h); }
 // «Ataque con mi arma, con arreglos» de una invocación (2026-09-30, P134): el mismo armado que el personaje y el creep
 // (comun/combatiente.js, ataqueConArreglos), con el arma de la invocación y su alcance (o el que diga la habilidad).
-function ataqueDeHabInv(inv, h){
-  const c = h && h.duelo;
-  return Combatiente.ataqueConArreglos(h, c, {arma: {id: '', nombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8, rango: !!inv.armaDeRango},
-    alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? alcanceDeHabInv(inv, c, 'pdg') : (inv.armaDeRango ? Math.max(1, Math.round(num(invStatValor(inv, 'rng')))) : 1)});
-}
+function ataqueDeHabInv(inv, h){ return InvHabilidades.ataqueDeHab(inv, h); }
 // El PdG del ataque con arreglos, con lo que le suma la habilidad (los No2 ya los cobró la habilidad).
-function tirarPdgDeArreglosInv(inv, atq){
-  tirarValorStatInv(inv, 'Atacar (PdG)', invStatValor(inv, 'pdg') + num(atq && atq.mods && atq.mods.pdg), 'pdg');
-}
+function tirarPdgDeArreglosInv(inv, atq){ publicarTiradaInv(InvHabilidades.tiradaPdgArreglos(inv, atq)); }
 // Se anuncia y va al cuadro del duelo como un ataque de la invocación; sin duelo, se tira el PdG suelto.
-function lanzarAtaqueDeHabInv(inv, h){
-  const atq = ataqueDeHabInv(inv, h);
-  parryPendienteInv.delete(inv.id);   // atacar cierra el Parry que esperaba su Bloqueo
-  mesaPublicarHabilidadInv(inv, h.nombre, h.detalle || h.efectoDetalle || '');
-  if(atq && typeof Duelo !== 'undefined' && Duelo.disponible() && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM)
-    Duelo.elegirObjetivo({yo: {ref: fichaVivo.id + '~' + inv.id, tipo: 'pj', nombre: inv.nombre}, ataque: atq, suelto: () => tirarPdgDeArreglosInv(inv, atq)});
-  else tirarPdgDeArreglosInv(inv, atq);
-}
+function lanzarAtaqueDeHabInv(inv, h){ InvHabilidades.lanzarAtaque(inv, h, invHabUi); }
 // ⚡ Flash de una invocación (igual que un creep, P135/P136): cooldown y vida — el doble en turno ajeno —, nunca No2.
 const costoFlashInv = h => InvDuelo.costoFlash(h);   // comun/inv-duelo.js (4e, tanda 4)
 function pagarFlashInv(inv, h){ return InvDuelo.pagarFlash(inv, h, dueloInvUi); }   // comun/inv-duelo.js; dueloInvUi en js/11
-async function usarFlashFueraDelDueloInv(inv, h){
-  const p = await pagarFlashInv(inv, h);
-  if(!p) return;
-  const f = h.duelo.flash || {};
-  mesaPublicarHabilidadInv(inv, h.nombre, `${h.detalle || ''}${h.detalle ? ' — ' : ''}⚡ Flash: +${fmt(num(f.bono))} a la tirada.`);
-  toast(`${h.nombre}: ⚡ +${fmt(num(f.bono))} (sumalo a mano a la tirada; dentro del duelo se suma solo) · ${ConfirmarTurno.textoCosto(p)}`);
-}
+function usarFlashFueraDelDueloInv(inv, h){ return InvHabilidades.usarFlashFuera(inv, h, invHabUi); }
 // Pone un estado en la invocación con la regla común (inmunidades, acumulación y renovación: comun/combatiente.js,
 // agregarEstado — antes se sumaba directo y duplicaba). Devuelve el texto para la Mesa.
-function ponerEstadoEnInv(inv, d){
-  inv.estados = inv.estados || [];
-  const r = Combatiente.agregarEstado(inv.estados, d);
-  if(!r.ok) return `${d.nombre}: no le hizo efecto (${r.motivo})`;
-  if(r.que === 'yaLoTiene') return `${d.nombre}: ya lo tenía`;
-  const e = r.estado;
-  if(modsAfectanHpInv(e.mods || [])) actualizarHpMaxPorConInv(inv);
-  if(r.que === 'acumulado') return `${e.nombre} ×${fmt(num(e.stacks))}`;
-  return `${e.nombre}${r.que === 'renovado' ? ' renovado' : ''}${e.permanente ? ' (no vence)' : e.turnos ? ` (${fmt(e.turnos)} turno${e.turnos === 1 ? '' : 's'})` : ''}${e.escudoMagico ? `, 🛡${fmt(e.escudoMagico)}` : ''}`;
-}
+function ponerEstadoEnInv(inv, d){ return InvHabilidades.ponerEstado(inv, d); }
 // Un efecto del cuadro de Ejecución sobre la propia invocación: cura, o el estado armado igual que uno recibido (el preset
 // con lo que traiga la habilidad encima, o uno propio).
-function aplicarSpecAInv(inv, ef){
-  if(ef.cura){ inv.hp = Math.min(num(inv.hpMax) > 0 ? num(inv.hpMax) : Infinity, num(inv.hp) + num(ef.cura)); return `+${fmt(num(ef.cura))} HP`; }
-  return ponerEstadoEnInv(inv, estadoDeSpec(ef.spec || {nombre: ef.nombre}));
-}
+function aplicarSpecAInv(inv, ef){ return InvHabilidades.aplicarSpec(inv, ef, EFECTOS_PRESET); }
+// Lo que la ficha hace después de ejecutar una habilidad de invocación (comun/inv-habilidades.js): publicar a su nombre, redibujar,
+// el duelo a nombre de la invocación (ref `fichaId~invId`, como su ataque).
+const invDueloDisponible = () => !!(typeof Duelo !== 'undefined' && Duelo.disponible() && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM);
+const invHabUi = {
+  mesaHabilidad: (inv, nombre, detalle) => mesaPublicarHabilidadInv(inv, nombre, detalle),
+  mesaConTexto: t => mesaConTexto(t),
+  publicar: t => publicarTiradaInv(t),
+  toast: t => toast(t),
+  cambio: () => renderInvocaciones(),
+  cambiar: fn => { if(fn() !== false) renderInvocaciones(); },
+  parry: parryPendienteInv,
+  dueloDisponible: () => invDueloDisponible(),
+  elegirObjetivo: (inv, cfg) => Duelo.elegirObjetivo({yo: {ref: fichaVivo.id + '~' + inv.id, tipo: 'pj', nombre: inv.nombre}, ...cfg}),
+};
 function invEjecutarHab(invId, habId){
   const inv = S.invocaciones.find(x => x.id === invId);
   const h = inv && inv.habilidades.find(x => x.id === habId);
   if(!inv || !h) return;
-  const modo = modoHab(h);
-  if(modo === 'manual'){ mesaPublicarHabilidadInv(inv, h.nombre, h.detalle || h.efectoDetalle || ''); toast(`${h.nombre || 'Habilidad'} anunciada`); return; }
-  if(modo === 'auto' && Combatiente.tipoEjecucion(h.duelo) === 'flash'){ usarFlashFueraDelDueloInv(inv, h); return; }   // ⚡ su propia regla de costo (P136)
-  const bloqueo = bloqueoHabInv(inv, h);
-  if(bloqueo){ toast(`${inv.nombre}: ${h.nombre||'Habilidad'} — ${bloqueo}`); return; }
-  // Se cobra lo que la habilidad tenga cargado (P133): No2, cooldown y vida; y si trae una cura del sistema anterior, cura.
-  const costo = costoNitrosHabInv(inv, h), costoHp = num(h.hpCosto), curaHp = num(h.curaHp);
-  inv.nitros = num(inv.nitros) - costo;
-  if(habInvAtaque(h)) inv.ataquesTurno = num(inv.ataquesTurno) + 1;
-  if(num(h.cd) > 0) h.cdActual = num(h.cd);
-  if(costoHp > 0) inv.hp = num(inv.hp) - costoHp;
-  if(curaHp > 0) inv.hp = Math.min(num(inv.hpMax) > 0 ? num(inv.hpMax) : Infinity, num(inv.hp) + curaHp);
-  let efectoTxt = '';
-  if((h.efectoNombre||'').trim()){
-    const nombre = h.efectoNombre.trim();
-    // Estado al ejecutar (sistema anterior): con las marcas de su preset, si tiene uno, para que valgan las inmunidades.
-    efectoTxt = ponerEstadoEnInv(inv, {...flagsDePreset(nombre), id: uid(), nombre, detalle: h.efectoDetalle||'', turnos: Math.max(0,num(h.efectoTurnos)||0),
-      hpturno: num(h.efectoHpTurno)||0, permanente: Combatiente.efectoPermanente(h, presetPorNombre(EFECTOS_PRESET, nombre)), activo: true, stacks:1, stacksturno:0,
-      polaridad: h.efectoPolaridad||'otro', mods: structuredClone(h.efectoMods||[])});
-  }
-  let hDuelo = null, aplicadoDirecto = '', falta = '', esArma = false;
-  if(modo === 'auto'){
-    // Lo que todavía no anda para invocaciones (la zona persistente — P134) se avisa y va como 💰.
-    falta = Combatiente.ejecucionNoDisponible(h.duelo, 'inv');
-    esArma = !falta && Combatiente.tipoEjecucion(h.duelo) === 'arma';   // ataque con arreglos: al duelo como un ataque
-    const hab = falta || esArma ? null : habDueloInv(inv, h);
-    if(falta || esArma){ /* el aviso va al final, junto con lo que se cobró; el ataque, más abajo */ }
-    else if(Combatiente.sobreSiSinTiradas(hab)){
-      aplicadoDirecto = hab.efectos.map(ef => aplicarSpecAInv(inv, ef)).join(' · ');
-      mesaPublicarHabilidadInv(inv, h.nombre, [h.detalle || '', aplicadoDirecto ? '→ ' + aplicadoDirecto : '', hab.efectoLibre || '', hab.efectosNota || ''].filter(Boolean).join(' '));
-    }else if(typeof Duelo !== 'undefined' && Duelo.disponible() && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM) hDuelo = hab;
-  }
-  if(esArma) lanzarAtaqueDeHabInv(inv, h);
-  else if(hDuelo){
-    mesaPublicarHabilidadInv(inv, h.nombre, h.detalle || h.efectoDetalle || '');
-    Duelo.elegirObjetivo({yo: {ref: fichaVivo.id + '~' + inv.id, tipo: 'pj', nombre: inv.nombre}, ataque: {tipo: 'habilidad', hab: hDuelo, alcance: hDuelo.alcance}, suelto: () => tirarExtraDeHabInv(inv, h)});
-  }else if(!aplicadoDirecto){
-    anunciarHabilidadInv(inv, h);
-    tirarExtraDeHabInv(inv, h);
-  }
-  renderInvocaciones();
-  const partes = ['ejecutada', costo?`-${fmt(costo)} No2`:'sin costo de Nitros'];
-  if(costoHp > 0) partes.push(`-${fmt(costoHp)} HP`);
-  if(curaHp > 0) partes.push(`+${fmt(curaHp)} HP`);
-  if(falta) partes.push(`⚠ ${falta}: se ejecutó como semiautomática`);
-  if(aplicadoDirecto) partes.push(aplicadoDirecto);
-  if(efectoTxt) partes.push(efectoTxt);
-  toast(`${h.nombre||'Habilidad'} ${partes.join(' · ')}`);
+  const p = InvHabilidades.ejecutar(inv, h, EFECTOS_PRESET, invDueloDisponible());   // comun/inv-habilidades.js
+  if(p.modo === 'manual'){ mesaPublicarHabilidadInv(inv, h.nombre, h.detalle || h.efectoDetalle || ''); toast(`${h.nombre || 'Habilidad'} anunciada`); return; }
+  if(p.modo === 'flash'){ usarFlashFueraDelDueloInv(inv, h); return; }
+  if(p.error){ toast(p.error); return; }
+  InvHabilidades.terminar(inv, h, p, invHabUi);
 }
 
 function duplicarInvocacion(invId){

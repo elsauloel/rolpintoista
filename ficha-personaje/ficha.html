@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="ficha.css?v=20261002zr">
+<link rel="stylesheet" href="ficha.css?v=20261002zs">
 <style>
 .dock-btn:disabled{opacity:.4;cursor:not-allowed}
 </style>
@@ -830,23 +830,6 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
   <div id="overlay-muerte-centro" class="muerte-centro"></div>
 </div>
 
-<!-- MODAL -->
-<div class="scrim" id="scrim">
-  <div class="modal">
-    <header><h3 id="modal-title">Editar</h3><button class="iconbtn" id="modal-activar" style="display:none">Activar</button><button class="iconbtn" id="modal-x">Cerrar</button></header>
-    <div class="body" id="modal-body"></div>
-    <footer>
-      <div style="display:flex;gap:9px">
-        <button class="btn del" id="modal-del">Eliminar</button>
-        <button class="btn ghost" id="modal-catalogo" style="display:none" title="Sube este ítem al catálogo compartido: queda disponible al instante para que cualquiera lo compre (si salió de un ítem del catálogo, podés elegir que sea una corrección)">⬆ Subir al catálogo</button>
-      </div>
-      <div style="display:flex;gap:9px">
-        <button class="btn ghost" id="modal-cancel">Cancelar</button>
-        <button class="btn primary" id="modal-save">Guardar</button>
-      </div>
-    </footer>
-  </div>
-</div>
 
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
@@ -904,7 +887,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/ficha-duelo.js?v=20261002a"></script>
 <script src="../comun/ficha-lupa.js?v=20261001a"></script>
 <script src="../comun/paso-a-paso.js?v=20261002g"></script>
-<script src="../comun/ficha-editor.js?v=20261002e"></script>
+<script src="../comun/ficha-editor.js?v=20261002f"></script>
 <script src="../comun/editar-item.js?v=20260930a"></script>
 <script src="../comun/skills-clase.js?v=20261002i"></script>
 <script src="../comun/pasivas.js?v=20261002i"></script>
@@ -920,7 +903,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="js/07-editor-y-catalogo.js?v=20261002za"></script>
 <script src="js/08-equipo-botin-y-mesa-comun.js?v=20261002y"></script>
 <script src="js/09-inventario-y-tienda.js?v=20261002y"></script>
-<script src="js/10-habilidades-pasivas-e-items.js?v=20261002j"></script>
+<script src="js/10-habilidades-pasivas-e-items.js?v=20261002k"></script>
 <script src="js/11-combate.js?v=20261002b"></script>
 <script src="js/12-en-vivo.js?v=20261002n"></script>
 <script src="js/13-bitacora.js?v=20260930a"></script>

@@ -918,20 +918,6 @@ function bnCrear(){
         <button class="btn primary" data-bn-ver="editar">Editar</button>
       </footer>
     </div></div>
-    <div class="scrim" id="bn-editor"><div class="modal">
-      <header><h3 data-bned="titulo">Editar</h3><button class="iconbtn" data-bned="activar" style="display:none">Activar</button><button class="iconbtn" data-bned="x">Cerrar</button></header>
-      <div class="body" data-bned="cuerpo"></div>
-      <footer>
-        <div style="display:flex;gap:9px">
-          <button class="btn del" data-bned="eliminar">Eliminar</button>
-          <button class="btn ghost" data-bned="catalogo" style="display:none" title="Sube este ítem al catálogo compartido: queda disponible al instante para que cualquiera lo compre (si salió de un ítem del catálogo, podés elegir que sea una corrección)">⬆ Subir al catálogo</button>
-        </div>
-        <div style="display:flex;gap:9px">
-          <button class="btn ghost" data-bned="cancelar">Cancelar</button>
-          <button class="btn primary" data-bned="guardar">Guardar</button>
-        </div>
-      </footer>
-    </div></div>
     <div class="scrim" id="bn-tipoitem"><div class="modal" style="max-width:620px">
       <header><h3>Categoría del ítem</h3><button class="iconbtn" data-bn-tipoitem="">Cerrar</button></header>
       <div class="body" id="bn-tipoitem-cuerpo"></div>
@@ -945,8 +931,6 @@ function bnCrear(){
   raiz.querySelector('#bn-stats').addEventListener('mousedown', e => { if(e.target.id === 'bn-stats') bnStatsCerrar(); });
   raiz.querySelector('#bn-reroll').addEventListener('mousedown', e => { if(e.target.id === 'bn-reroll') bnRerollCerrar(); });
   raiz.querySelector('#bn-revivir').addEventListener('mousedown', e => { if(e.target.id === 'bn-revivir') bnRevivirCerrar(); });
-  // El editor común (A6b): sus botones son solo suyos (el componente los atiende antes, en su cuerpo y su pie).
-  ['click', 'change', 'input'].forEach(ev => raiz.querySelector('#bn-editor').addEventListener(ev, e => e.stopPropagation()));
   raiz.querySelector('#bn-tipoitem').addEventListener('mousedown', e => { if(e.target.id === 'bn-tipoitem') bnTipoItemCerrar(null); });
   raiz.querySelector('#bn-tipoitem').addEventListener('click', e => {
     e.stopPropagation();
@@ -1475,7 +1459,7 @@ function bnRerollDibujar(){
    (comun/ficha-editor.js: el mismo formulario, el paso a paso de las habilidades, el asistente de ítems, la trampa y la Ejecución ✨),
    adentro del recuadro de la Botonera nueva (#bn-editor). Guardar pasa por bnUi (las partes que cambiaron y el resumen). Los estados de
    la lista (para "estado al usar" y para la Ejecución) se eligen con el selector común (comun/selector-estados.js). */
-const ED_PIEZAS = ['../comun/ficha-editor.js?v=20261002e', '../comun/asistente-item.js?v=20261002a', '../comun/asistente-duelo-hab.js?v=20261002j'];
+const ED_PIEZAS = ['../comun/ficha-editor.js?v=20261002f', '../comun/asistente-item.js?v=20261002a', '../comun/asistente-duelo-hab.js?v=20261002j'];
 let bnTipoItemResolver = null;
 // op.comoGM: el GM sin el control (el ⚙ de un estado del HUD, como hacía la ficha con "Editar como GM"). → true si se abrió.
 async function bnEditar(key, id, op = {}){
@@ -1521,9 +1505,8 @@ async function bnElegirEstadoLista(){
   return r;
 }
 function bnCrearEditor(){
-  const r = bn.raiz, el = n => r.querySelector(`#bn-editor [data-bned="${n}"]`);
-  return FichaEditor.crear({scrim: r.querySelector('#bn-editor'), titulo: el('titulo'), cuerpo: el('cuerpo'), guardar: el('guardar'), eliminar: el('eliminar'),
-    catalogo: el('catalogo'), activar: el('activar'), cancelar: el('cancelar'), x: el('x')}, {
+  // Las ventanas paso a paso del editor se abren adentro del recuadro aislado de la Botonera nueva.
+  return FichaEditor.crear(bn.raiz, {
     S: () => bn.S,
     toast: m => toast(m),
     confirmar: t => confirm(t),
@@ -1786,7 +1769,6 @@ document.addEventListener('keydown', e => {
   if(cartel && cartel.id === 'bn-tienda'){ bnTiendaCerrar(); return; }
   if(cartel && cartel.id === 'bn-stats'){ bnStatsCerrar(); return; }
   if(cartel && cartel.id === 'bn-reroll'){ bnRerollCerrar(); return; }
-  if(cartel && cartel.id === 'bn-editor'){ bn.editor.cerrar(); return; }
   if(cartel && cartel.id === 'bn-tipoitem'){ bnTipoItemCerrar(null); return; }
   if(cartel && cartel.id === 'bn-revivir'){ bnRevivirCerrar(); return; }
   if(cartel){ cartel.classList.remove('open'); if(cartel.id === 'bn-comparar') bnComparando = null; bnViendo = null; bnCostoX = null; bnSobrepeso = null; bnSinNitrosSeguir = null; return; }

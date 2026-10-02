@@ -799,33 +799,34 @@ prueba('un ítem de la mochila convertido en entrada de catálogo: id del nombre
 
 // El componente del editor en un recuadro de prueba (fuera de la pantalla): abrir, cambiar campos, guardar y eliminar.
 function editorDePrueba(S, extra){
-  const caja = document.createElement('div');
-  caja.style.cssText = 'position:absolute;left:-9999px;top:0';
-  caja.innerHTML = '<div data-e="scrim"><h3 data-e="titulo"></h3><div data-e="cuerpo"></div><button data-e="guardar"></button><button data-e="eliminar"></button><button data-e="catalogo"></button><button data-e="activar"></button><button data-e="cancelar"></button><button data-e="x"></button></div>';
-  document.body.appendChild(caja);
-  const el = n => caja.querySelector(`[data-e="${n}"]`);
   const avisos = [], cambios = [];
-  const ed = FichaEditor.crear({scrim: el('scrim'), titulo: el('titulo'), cuerpo: el('cuerpo'), guardar: el('guardar'), eliminar: el('eliminar'), catalogo: el('catalogo'),
-    activar: el('activar'), cancelar: el('cancelar'), x: el('x')}, Object.assign({S: () => S, toast: m => avisos.push(m), confirmar: () => true, alCambiar: k => cambios.push(...k),
+  const ed = FichaEditor.crear(document.body, Object.assign({S: () => S, toast: m => avisos.push(m), confirmar: () => true, alCambiar: k => cambios.push(...k),
     elegirTipoItem: () => Promise.resolve('arma_1m'), elegirEstadoItem: () => Promise.resolve({nombre: 'Furia', armado: {turnos: 2, hpturno: 0, mods: [{stat: 'dmg', val: 2}]}, estandar: true, detalle: 'Pega más'}),
     elegirEstadoDuelo: () => Promise.resolve(null), alSubirCatalogo: () => {}}, extra || {}));
-  const escribir = (sel, valor) => { const i = el('cuerpo').querySelector(sel); i.value = valor; i.dispatchEvent(new Event('input', {bubbles: true})); };
-  const tocar = sel => el('cuerpo').querySelector(sel).dispatchEvent(new MouseEvent('click', {bubbles: true}));
-  return {ed, el, avisos, cambios, escribir, tocar, sacar: () => caja.remove()};
+  // La ventana común abierta por el editor (comun/paso-a-paso.js): sus campos y sus botones.
+  const pap = () => ed.estado && ed.estado.pap, en = sel => pap() && pap().raiz.querySelector(sel);
+  const escribir = (sel, valor) => { const i = en(sel); i.value = valor; i.dispatchEvent(new Event('input', {bubbles: true})); };
+  const tocar = sel => en(sel).dispatchEvent(new MouseEvent('click', {bubbles: true}));
+  const boton = id => en(`[data-pap="${id}"]`) || en(`[data-pap-extra="${id}"]`);
+  const ir = id => pap().irA(id);
+  return {ed, pap, en, avisos, cambios, escribir, tocar, boton, ir, sacar: () => { if(pap()) ed.cerrar(); }};
 }
-prueba('editor común: una pasiva nueva se escribe y se guarda; editarla y eliminarla', () => {
+prueba('editor común: una pasiva nueva, paso a paso, se escribe y se crea; editarla (Guardar siempre) y eliminarla', async () => {
   const S = fichaBotonera({pasivas: []}), t = editorDePrueba(S);
+  const espera = () => new Promise(r => setTimeout(r, 0));
   t.ed.abrir('pasivas', null);
-  const titulo = t.el('titulo').textContent, abierto = t.el('scrim').classList.contains('open');
-  t.escribir('[data-c="nombre"]', 'Piel dura'); t.escribir('[data-c="regenHp"]', '2');
-  t.el('guardar').click();
+  const titulo = t.en('.pap-cab h3').textContent, pestanas = [...t.pap().raiz.querySelectorAll('[data-pap-paso]')].map(b => b.textContent.replace(/^\d+\. /, ''));
+  t.escribir('[data-c="nombre"]', 'Piel dura'); t.ir('numeros'); t.escribir('[data-c="regenHp"]', '2');
+  t.ir('resumen'); const resumen = t.en('.resumen-hab').textContent.includes('+2');
+  t.boton('crear').click(); await espera();
   const guardada = S.pasivas.map(p => p.nombre + ' ' + p.regenHp), id = S.pasivas[0].id;
-  t.ed.abrir('pasivas', id); t.escribir('[data-c="nombre"]', 'Piel muy dura'); t.el('guardar').click();
+  t.ed.abrir('pasivas', id); const guardarVisible = !!t.boton('guardar');
+  t.escribir('[data-c="nombre"]', 'Piel muy dura'); t.boton('guardar').click(); await espera();
   const editada = S.pasivas[0].nombre;
-  t.ed.abrir('pasivas', id); t.el('eliminar').click();
+  t.ed.abrir('pasivas', id); t.boton('eliminar').click(); await espera();
   t.sacar();
-  igual([titulo, abierto, guardada, editada, S.pasivas.length, t.cambios, t.el('scrim').classList.contains('open')],
-    ['Nueva pasiva', true, ['Piel dura 2'], 'Piel muy dura', 0, ['pasivas', 'pasivas', 'pasivas'], false]);
+  igual([titulo, pestanas, resumen, guardada, guardarVisible, editada, S.pasivas.length, t.cambios, !!t.pap()],
+    ['Nueva pasiva · paso 1 de 4: Qué es', ['Qué es', 'Números', 'Cómo se consiguió', 'Resumen'], true, ['Piel dura 2'], true, 'Piel muy dura', 0, ['pasivas', 'pasivas', 'pasivas'], false]);
 });
 prueba('editor común: una habilidad nueva pide primero cómo se ejecuta; semi = 7 pasos; el estado al usar se carga de la lista', async () => {
   const S = fichaBotonera(), t = editorDePrueba(S);
@@ -839,18 +840,19 @@ prueba('editor común: una habilidad nueva pide primero cómo se ejecuta; semi =
   const conModo = pap.paso();
   t.ed.cerrar();
   t.ed.abrir('cinturon', null); t.escribir('[data-c="nombre"]', 'Poción');
-  const cons = t.el('cuerpo').querySelector('[data-c="consumible"]'); cons.checked = true; cons.dispatchEvent(new Event('change', {bubbles: true}));
+  t.ir('uso'); const cons = t.en('[data-c="consumible"]'); cons.checked = true; cons.dispatchEvent(new Event('change', {bubbles: true}));
   t.tocar('[data-ed="estado-preset"]'); await new Promise(r => setTimeout(r, 0));
   const d = t.ed.estado.draft;
   t.sacar();
   igual([sinModo, chips, conModo, d.efectoNombre, d.efectoTurnos, d.efectoMods, d.efectoDetalle], [[0, 'Primero elegí cómo se ejecuta'], 7, 5, 'Furia', 2, [{stat: 'dmg', val: 2}], 'Pega más']);
 });
-prueba('editor común: un consumible marcado como equipado pasa al cinturón; un estado nuevo se agrega con la regla común', () => {
+prueba('editor común: un consumible marcado como equipado pasa al cinturón; un estado nuevo se agrega con la regla común', async () => {
   const S = fichaBotonera({inventario: [], cinturon: [], efectos: []}), t = editorDePrueba(S);
+  const espera = () => new Promise(r => setTimeout(r, 0));
   t.ed.abrir('inventario', null, undefined, {formulario: true, draft: {nombre: 'Elixir', tipoItem: 'consumibles', consumible: true, equipado: true}});
-  t.el('guardar').click();
-  t.ed.abrir('efectos', null); t.escribir('[data-c="nombre"]', 'Bendición'); t.escribir('[data-c="turnos"]', '3');
-  t.el('activar').click();
+  t.ir('resumen'); t.boton('crear').click(); await espera();
+  t.ed.abrir('efectos', null); t.escribir('[data-c="nombre"]', 'Bendición'); t.ir('dura'); t.escribir('[data-c="turnos"]', '3');
+  t.ir('resumen'); t.boton('crear').click(); await espera();
   t.sacar();
   igual([S.inventario.length, S.cinturon.map(i => i.nombre + ' ' + i.equipado), S.efectos.map(e => e.nombre + ' ' + e.turnos), t.avisos.slice(-2)],
     [0, ['Elixir false'], ['Bendición 3'], ['Elixir pasó al cinturón', 'Bendición activado']]);

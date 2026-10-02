@@ -284,7 +284,7 @@ function proponerPasiva(id){
 }
 
 /* El editor (formulario, paso a paso de habilidades, asistente de ítems) es un componente común: comun/ficha-editor.js (A6b,
-   2026-10-02). La ventana sigue siendo #scrim de ficha.html; editorFicha (al final de este archivo) la conecta. */
+   2026-10-02). La ventana es la común paso a paso (comun/paso-a-paso.js); editorFicha (al final de este archivo) lo conecta. */
 function openEditor(key, id, equipadoPreset, opciones){ return editorFicha.abrir(key, id, equipadoPreset, opciones); }
 // Los pasos y los modos del editor de habilidades viven en comun/ficha-editor.js (A6b): acá, los nombres de siempre.
 const PASOS_HAB = FichaEditor.PASOS_HAB;
@@ -345,9 +345,8 @@ function cargarItemsSubidos(){
 }
 
 document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); $('#scrim-reminder').classList.remove('open'); $('#scrim-view').classList.remove('open'); $('#scrim-costox').classList.remove('open'); $('#scrim-chooser').classList.remove('open'); $('#scrim-catalogo').classList.remove('open'); $('#scrim-portrait').classList.remove('open'); $('#scrim-elegir-arma').classList.remove('open'); $('#scrim-revivir').classList.remove('open'); $('#scrim-item-aleatorio').classList.remove('open'); if(presetDestino === 'duelo') cerrarPresetsDuelo(null); else $('#scrim-presets').classList.remove('open'); $('#scrim-tipoitem').classList.remove('open'); $('#scrim-comparar').classList.remove('open'); $('#scrim-slot-lleno').classList.remove('open'); $('#scrim-equipo').classList.remove('open'); $('#scrim-sin-nitros').classList.remove('open'); $('#scrim-todos-estados').classList.remove('open'); document.querySelectorAll('.dock-panel').forEach(p => { p.hidden = true; }); } });
-// El editor común (comun/ficha-editor.js, A6b) en la ventana #scrim de la ficha. Lo que la ficha hace a su manera va en el ctx.
-const editorFicha = FichaEditor.crear({scrim: $('#scrim'), titulo: $('#modal-title'), cuerpo: $('#modal-body'), guardar: $('#modal-save'),
-  eliminar: $('#modal-del'), catalogo: $('#modal-catalogo'), activar: $('#modal-activar'), cancelar: $('#modal-cancel'), x: $('#modal-x')}, {
+// El editor común (comun/ficha-editor.js, A6b): todo se edita en la ventana común paso a paso. Lo que la ficha hace a su manera va en el ctx.
+const editorFicha = FichaEditor.crear(document.body, {
   S: () => S,
   toast: m => toast(m),
   confirmar: t => confirm(t),

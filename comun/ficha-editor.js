@@ -168,7 +168,8 @@ const FichaEditor = (() => {
      (agregarEstadoConAviso, statOptions, resumenEjecucionHab, abrirEjecucionHab, la categoría del ítem). Lo que leía variables
      de la ficha ahora sale del personaje (`ctx.S()`) y de las piezas comunes; lo que cada pantalla muestra a su manera va por `ctx`.
 
-     crear(els, ctx) → editor. `els` = la ventana: {scrim, titulo, cuerpo, guardar, eliminar, catalogo, activar, cancelar, x}.
+     crear(donde, ctx) → editor. `donde`: un elemento (o un ShadowRoot) de la pantalla; las ventanas paso a paso se abren en su documento
+     (o adentro de su recuadro aislado, en el mapa). Desde la tanda 6 (2026-10-02) TODO se edita en la ventana común paso a paso.
      `ctx`:
        S()                     el personaje.
        toast(msg)              un aviso.
@@ -316,13 +317,14 @@ const FichaEditor = (() => {
     return EstadosAplicar.DEBUFFS.filter(p => !p.permanente && Number(p.turnos) > 0 && !p.esVeneno).map(p => ({nombre: p.nombre, detalle: p.detalle || '', turnos: Number(p.turnos), permanente: false}));
   }
 
-  function crear(els, ctx){
+  function crear(donde, ctx){
+    const lugar = () => { const r = donde && donde.getRootNode ? donde.getRootNode() : document; return r instanceof ShadowRoot ? r : document.body; };
     const S = () => ctx.S();
     const toast = m => ctx.toast(m);
     const confirmar = t => (ctx.confirmar || (x => confirm(x)))(t);
     let editing = null;
     // Una habilidad se edita en la ventana común paso a paso (editing.pap, comun/paso-a-paso.js); el resto, en la ventana del editor.
-    const q = sel => (editing && editing.pap ? editing.pap.raiz : els.cuerpo).querySelector(sel);
+    const q = sel => editing && editing.pap ? editing.pap.raiz.querySelector(sel) : null;
 
     function campoImagenHtml(draft){
       return `<div class="f">
@@ -544,11 +546,11 @@ const FichaEditor = (() => {
     }
     // La ventana paso a paso de una habilidad (la común: pestañas que saltan, Guardar al editar, «✔ Crear» al final).
     function abrirHabilidadPaso(){
-      const ed = editing, raiz = els.scrim.getRootNode();
+      const ed = editing;
       ed.inicial = JSON.stringify(ed.draft);
       ed.pap = PasoAPaso.abrir({
         titulo: ed.id ? 'Editar habilidad' : 'Nueva habilidad', crear: !ed.id,
-        contenedor: raiz instanceof ShadowRoot ? raiz : document.body,
+        contenedor: lugar(),
         z: 55,   // encima de las ventanas de la ficha (50) y debajo de las que se abren desde acá (la lista de estados, 60)
         pasos: () => pasosHabilidad(ed.draft).map(p => ({id: p.id, nombre: p.corto, ayuda: `<b>${p.titulo}</b> ${p.ayuda}`, html: () => htmlPasoHabilidad(p)})),
         // Lo primero: cómo se ejecuta; y con nombre ya se puede saltar a cualquier paso.
@@ -562,11 +564,12 @@ const FichaEditor = (() => {
       });
     }
 
-    function dibujar(){
-      if(!editing) return;
-      const {key, draft} = editing;
-      if(key === "habilidades"){ if(editing.pap) editing.pap.redibujar(); return; }
-      els.guardar.style.display = '';
+    function dibujar(){ if(editing && editing.pap) editing.pap.redibujar(); }
+
+    // El formulario de una entrada (todo lo que no es habilidad), por pasos: arma solo los bloques del paso (`bloques`: nombres de campo
+    // o de bloque — 'categoria', 'mano', 'defensa', 'estadoAlUsar', 'arma', 'precioVenta', 'mods', 'estadoEquipar', 'preset').
+    function htmlFormulario(key, draft, bloques){
+      const en = b => bloques.includes(b);
       const sc = SCHEMA[key];
       const FLAGS = ['equipado','activo','permanente','popup','job','consumible','mitadPdgEva','armaduraRota','armaDeRango'];
       const ESPECIALES = ['imagen','categoria','tipoItem','tipoDado','danoFijo','precioVentaAuto','manoPreferida'];
@@ -576,11 +579,8 @@ const FichaEditor = (() => {
       const CATEGORIAS = FichaEquipo.CATEGORIAS;
 
       let html = '';
-      html += `<div class="f"><label>${CAMPO_LABEL.nombre}</label><input data-c="nombre" value="${esc(draft.nombre)}"></div>`;
-      if(key === 'habilidades' && sc.campos.includes('detalle')){
-        html += `<div class="f"><label>${CAMPO_LABEL.detalle}</label><textarea data-c="detalle">${esc(draft.detalle)}</textarea></div>`;
-      }
-      if(key === 'efectos'){
+      if(en('nombre')) html += `<div class="f"><label>${CAMPO_LABEL.nombre}</label><input data-c="nombre" value="${esc(draft.nombre)}"></div>`;
+      if(key === 'efectos' && en('preset')){
         const personalizados = S().efectosPersonalizados || [];
         const yaGuardado = personalizados.some(p => p.nombre === draft.nombre);
         html += `<div class="f">
@@ -588,9 +588,8 @@ const FichaEditor = (() => {
       ${yaGuardado ? `<button type="button" class="mini danger" data-ed="efecto-preset-borrar" style="margin-left:6px">Borrar preset "${esc(draft.nombre)}"</button>` : ''}
       <div class="hint" style="margin-top:5px">Guarda esta configuración (turnos, stacks, HP por turno, modificadores, etc.) para poder elegirla de nuevo junto a los demás presets.</div>
     </div>`;
-        html += `<div class="f"><label>${CAMPO_LABEL.detalle}</label><textarea data-c="detalle">${esc(draft.detalle)}</textarea></div>`;
       }
-      if(sc.campos.includes('tipoItem')){
+      if(sc.campos.includes('tipoItem') && en('categoria')){
         const catActual = CATEGORIAS.find(c => c.id === draft.tipoItem);
         html += `<div class="f"><label>${CAMPO_LABEL.tipoItem}</label>
       <button type="button" class="btn preset-abrir" data-ed="tipoitem">${esc(catActual && catActual.id ? catActual.label : '— elegir categoría —')}</button></div>`;
@@ -602,7 +601,7 @@ const FichaEditor = (() => {
           html += `<div class="hint" style="margin:-4px 0 8px${sobre?';color:var(--danger)':''}">${esc(slotDef.label)}: ${fmt(usado)} / ${fmt(slotDef.max)} ocupados${sobre?' — te pasaste':''}</div>`;
         }
       }
-      if(draft.tipoItem === 'arma_1m' || draft.tipoItem === 'escudo_1m'){
+      if((draft.tipoItem === 'arma_1m' || draft.tipoItem === 'escudo_1m') && en('mano')){
         html += `<div class="f"><label>${CAMPO_LABEL.manoPreferida}</label>
       <select data-c="manoPreferida">
         <option value="" ${!draft.manoPreferida?'selected':''}>Automática</option>
@@ -612,9 +611,7 @@ const FichaEditor = (() => {
       <div class="hint" style="margin-top:5px">Define en qué mano aparece dentro de "Efectos de equipo" cuando tenés dos cosas equipadas.</div>
     </div>`;
       }
-      if(sc.campos.includes('imagen') && key !== 'habilidades' && key !== 'efectos'){
-        html += campoImagenHtml(draft);
-      }
+
       const resto = cortos.filter(c => {
         if(c==='nombre') return false;
         if(c==='curahp') return false;
@@ -623,36 +620,15 @@ const FichaEditor = (() => {
         if(c==='forzarNitros') return false;
         if(c==='ranuras' && draft.equipado) return false;
         if(['unidades','cargaMax','cargaActual'].includes(c) && !draft.consumible) return false;
-        if(key === 'habilidades' && c === 'tiradaExtra') return false;
-        return true;
+        return en(c);
       });
-      const esDefensivo = CATEGORIAS.find(c => c.id === draft.tipoItem)?.defensivo === true;
+      const esDefensivo = CATEGORIAS.find(c => c.id === draft.tipoItem)?.defensivo === true && en('defensa');
       if(resto.length || esDefensivo){
         html += `<div class="f2">`
           + resto.map(c => `<div class="f"><label>${CAMPO_LABEL[c]}</label>
       <input data-c="${c}" ${CAMPO_NUM.includes(c)?'type="number" step="any"':''} value="${esc(draft[c]??'')}"></div>`).join('')
           + (esDefensivo ? `<div class="f"><label>Defensa</label><input data-defmod="def" type="number" step="any" value="${getModVal(draft,'def')}"></div>` : '')
           + `</div>`;
-      }
-      if(key === 'habilidades'){
-        const opcionStat = s => `<option value="${s.id}" ${draft.tiradaStat === s.id ? 'selected' : ''}>${esc(s.label)} · ${esc(s.full)}</option>`;
-        html += `<div class="f2">
-      <div class="f"><label>${CAMPO_LABEL.tiradaStat}</label>
-        <select data-c="tiradaStat">
-          <option value="">— ninguno —</option>
-          <optgroup label="Principales">${FichaCalculo.ATTR_LIST.map(opcionStat).join('')}</optgroup>
-          <optgroup label="Secundarios">${FichaBotonera.statsConTirada().map(opcionStat).join('')}</optgroup>
-        </select>
-      </div>
-      <div class="f"><label>${CAMPO_LABEL.tiradaExtra}</label><input data-c="tiradaExtra" value="${esc(draft.tiradaExtra??'')}"></div>
-    </div>
-    <div class="hint" style="margin:-4px 0 8px">El stat se tira con su valor del momento (con los modificadores de equipo y estados activos), igual que su 🎲. Si cargás las dos cosas, se tiran las dos.</div>
-    <div class="f2">
-      <label class="f" style="display:flex;align-items:center;height:100%;gap:8px;cursor:pointer">
-        <input type="checkbox" data-c="job" ${draft.job !== false ? 'checked' : ''} style="width:auto">
-        <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">${CAMPO_LABEL.job}</span>
-      </label>
-    </div>`;
       }
       if(esDefensivo){
         html += `<div class="f">
@@ -668,16 +644,16 @@ const FichaEditor = (() => {
       </div>
     </div>`;
       }
-      if(sc.campos.includes('curahp') && draft.consumible){
+      if(sc.campos.includes('curahp') && draft.consumible && en('curahp')){
         html += `<div class="f"><label>${CAMPO_LABEL.curahp}</label>
       <input data-c="curahp" type="number" step="any" value="${esc(draft.curahp??0)}"></div>`;
       }
-      if(sc.campos.includes('curaspPct') && draft.consumible){
+      if(sc.campos.includes('curaspPct') && draft.consumible && en('curaspPct')){
         html += `<div class="f"><label>${CAMPO_LABEL.curaspPct}</label>
       <input data-c="curaspPct" type="number" step="any" min="0" max="100" value="${esc(draft.curaspPct??0)}"></div>`;
       }
-      if(sc.campos.includes('efectoNombre') && (draft.consumible || key === 'habilidades')) html += htmlEstadoAlUsar(key, draft);
-      if(esArma && (sc.campos.includes('tipoDado') || sc.campos.includes('danoFijo'))){
+      if(sc.campos.includes('efectoNombre') && draft.consumible && en('estadoAlUsar')) html += htmlEstadoAlUsar(key, draft);
+      if(esArma && en('arma') && (sc.campos.includes('tipoDado') || sc.campos.includes('danoFijo'))){
         html += `<div class="f2">
       <div class="f"><label>${CAMPO_LABEL.tipoDado}</label>
         <select data-c="tipoDado">
@@ -688,22 +664,22 @@ const FichaEditor = (() => {
     </div>
     <div class="hint" data-ed="dano-hint" style="margin:-4px 0 8px">Daño: ${FichaCombate.armaDanoTxt(draft)} (peso × d${num(draft.tipoDado)||8}${num(draft.danoAmplificado)?` + ${num(draft.danoAmplificado)} dado${num(draft.danoAmplificado)>1?'s':''} por daño amplificado`:''}, más el fijo)</div>`;
       }
-      if(sc.campos.includes('precioVentaAuto')){
+      if(sc.campos.includes('precioVentaAuto') && en('precioVenta')){
         html += `<div class="f"><label>Precio de venta (mitad de compra)</label>
       <div style="font-family:'Space Mono',monospace;font-weight:700;color:var(--brass);padding:5px 7px">${fmt(FichaTienda.precioVenta(draft))}</div>
     </div>`;
       }
       const FLAGS_OCULTOS = ['mitadPdgEva','armaduraRota'];
-      flags.filter(c => !FLAGS_OCULTOS.includes(c) && !(key === 'habilidades' && c === 'job')).forEach(c => {
+      flags.filter(c => !FLAGS_OCULTOS.includes(c) && en(c)).forEach(c => {
         const on = (c==='activo' || c==='job') ? draft[c] !== false : !!draft[c];
         html += `<label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer">
       <input type="checkbox" data-c="${c}" ${on?'checked':''} style="width:auto">
       <span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">${CAMPO_LABEL[c]}</span></label>`;
       });
-      if(sc.campos.includes('detalle') && key !== 'habilidades' && key !== 'efectos')
-        html += `<div class="f"><label>Detalle</label><textarea data-c="detalle">${esc(draft.detalle)}</textarea></div>`;
+      if(sc.campos.includes('detalle') && en('detalle'))
+        html += `<div class="f"><label>${key === 'efectos' || key === 'pasivas' || key === 'sociales' ? 'Qué hace (en palabras)' : 'Detalle'}</label><textarea data-c="detalle">${esc(draft.detalle)}</textarea></div>`;
 
-      if(sc.mods){
+      if(sc.mods && en('mods')){
         const esEstado = key === "efectos";
         html += `<div class="f"><label>${esEstado ? "Modificadores de atributo (opcional)" : "Modificadores"}</label>
       <div class="mods">${(draft.mods||[]).map((m,i)=>{
@@ -724,11 +700,86 @@ const FichaEditor = (() => {
         : "Se suman al stat mientras el ítem esté equipado o el efecto activo."}</div>
     </div>`;
       }
-      if(sc.campos.includes('tipoItem') && !draft.consumible) html += htmlEstadoAlEquipar(draft);
-      if((key === 'habilidades' || key === 'efectos') && sc.campos.includes('imagen')){
-        html += campoImagenHtml(draft);
+      if(sc.campos.includes('tipoItem') && !draft.consumible && en('estadoEquipar')) html += htmlEstadoAlEquipar(draft);
+      if(sc.campos.includes('imagen') && en('imagen')) html += campoImagenHtml(draft);
+      return `<div class="fe-paso">${html}</div>`;
+    }
+
+    // Los pasos del formulario de cada tipo de entrada (2026-10-02, tanda 6 de docs/plan-paso-a-paso.md): {id, corto, titulo, ayuda,
+    // bloques}. El último es siempre Resumen.
+    function pasosFormulario(key, draft){
+      const esItem = key === 'inventario' || key === 'cinturon' || key === 'catalogo';
+      const P = (id, corto, titulo, ayuda, bloques) => ({id, corto, titulo, ayuda, bloques});
+      const lista = key === 'pasivas' ? [
+        P('que', 'Qué es', '¿Qué es?', 'El nombre y qué hace, en palabras: es lo que se lee en la ficha.', ['nombre', 'detalle', 'imagen']),
+        P('numeros', 'Números', '¿Qué suma?', 'Los bonos que da mientras la tengas, la vida que recupera en cada Mantenimiento y cuántas veces la compraste (los efectos y el costo se multiplican).', ['mods', 'regenHp', 'compras']),
+        P('job', 'Cómo se consiguió', '¿Cómo se consiguió?', 'Con puntos de Job (cuenta para el presupuesto del nivel) o de otra forma: un premio, la historia, un objeto.', ['job', 'jobCosto', 'origen']),
+      ] : key === 'sociales' ? [
+        P('que', 'Qué es', '¿Qué talento es?', 'Una habilidad social o de conocimiento (Persuadir, Historia, Trampas…). Su dado sale del nivel: se sube con «+ Nivel» en la lista.', ['nombre', 'detalle', 'imagen']),
+      ] : key === 'efectos' ? [
+        P('que', 'Qué es', '¿Qué estado es?', 'El nombre y qué le pasa a quien lo tiene, en palabras.', ['nombre', 'detalle', 'imagen']),
+        P('dura', 'Duración', '¿Cuánto dura?', 'Cada ⟳ Mantenimiento descuenta un turno. Permanente: no vence solo. Inactivo: queda en la lista sin hacer efecto.', ['turnos', 'permanente', 'activo', 'popup']),
+        P('vida', 'Vida', '¿Toca la vida?', 'HP por turno: negativo daña (veneno), positivo cura (regeneración); se multiplica por los stacks. El escudo es una barra aparte que absorbe el daño antes que la vida.', ['hpturno', 'stacks', 'stacksturno', 'escudoMagico']),
+        P('numeros', 'Números', '¿Cambia algún número?', 'Suma o resta a un atributo o a un stat mientras dure (+2 Fuerza, −1 PdG…).', ['mods']),
+      ] : esItem ? [
+        P('que', 'Qué es', '¿Qué es?', 'El nombre, la categoría y qué hace, en palabras.', ['nombre', 'categoria', 'detalle', 'imagen']),
+        ...(draft.consumible ? [
+          P('uso', 'Al usarlo', '¿Qué pasa al usarlo?', 'Cuántas unidades y cargas tiene, cuánto cura o daña, el estado que deja y una tirada propia (opcional).', ['consumible', 'unidades', 'cargaMax', 'cargaActual', 'curahp', 'curaspPct', 'estadoAlUsar', 'tiradaExtra']),
+        ] : [
+          P('uso', 'Equipado', '¿Cómo se usa?', 'Si está equipado, en qué mano, el daño si es un arma y el estado que da mientras está puesto.', ['consumible', 'equipado', 'ranuras', 'mano', 'arma', 'armaDeRango', 'defensa', 'tiradaExtra', 'estadoEquipar']),
+          P('bonos', 'Bonos', '¿Qué suma?', 'Los bonos que da mientras está equipado.', ['mods']),
+        ]),
+        P('precio', 'Peso y precio', 'Peso y precio', 'Lo que pesa (ocupa lugar en la mochila) y lo que cuesta; se vende a la mitad.', ['peso', 'precioCompra', 'precioVenta']),
+      ] : [P('todo', 'Datos', 'Datos', '', SCHEMA[key].campos.concat(['mods']))];
+      return lista.concat([P('resumen', 'Resumen', 'Así queda.', key === 'efectos' && !editing.id ? 'Al tocar «✔ Activar» se le pone a este personaje.' : '', key === 'efectos' ? ['preset'] : [])]);
+    }
+    // Resumen de lo cargado, en una tarjeta.
+    function resumenFormulario(key, draft){
+      const fila = (t, v) => v === '' || v === null || v === undefined ? '' : `<div class="resumen-fila"><span>${t}</span><b>${v}</b></div>`;
+      const mods = (draft.mods || []).filter(m => m && m.stat && num(m.val)).map(m => `${num(m.val) > 0 ? '+' : ''}${fmt(num(m.val))} ${esc((FichaCalculo.STAT_LABEL || {})[m.stat] || m.stat)}`).join(' · ');
+      let h = fila('Nombre', esc(draft.nombre || 'Sin nombre'));
+      if(key === 'pasivas') h += fila('Suma', mods || '—') + (num(draft.regenHp) ? fila('Vida por Mantenimiento', '+' + fmt(num(draft.regenHp))) : '') + fila('Compras', fmt(num(draft.compras) || 1))
+        + fila('Se consiguió', draft.job !== false ? `con Job (${fmt(num(draft.jobCosto))})` : esc(draft.origen || 'de otra forma'));
+      else if(key === 'efectos') h += fila('Dura', draft.permanente ? 'no vence' : `${fmt(num(draft.turnos))} turno(s)`) + (num(draft.hpturno) ? fila('HP por turno', fmt(num(draft.hpturno)) + (num(draft.stacks) > 1 ? ` × ${fmt(num(draft.stacks))} stacks` : '')) : '')
+        + (num(draft.escudoMagico) ? fila('Escudo', fmt(num(draft.escudoMagico)) + ' HP') : '') + (mods ? fila('Números', mods) : '') + (draft.activo === false ? fila('Activo', 'no') : '');
+      else if(key === 'inventario' || key === 'cinturon' || key === 'catalogo'){
+        const cat = FichaEquipo.CATEGORIAS.find(c => c.id === draft.tipoItem);
+        h += fila('Categoría', esc(cat ? cat.label : '—')) + fila('Peso', fmt(num(draft.peso))) + fila('Precio', fmt(num(draft.precioCompra)))
+          + (draft.consumible ? fila('Unidades', fmt(num(draft.unidades) || 1)) + (num(draft.curahp) ? fila('HP al usarlo', fmt(num(draft.curahp))) : '') + (draft.efectoNombre ? fila('Deja', esc(draft.efectoNombre)) : '') : '')
+          + (mods ? fila('Bonos', mods) : '');
       }
-      els.cuerpo.innerHTML = html;
+      if((draft.detalle || '').trim()) h += `<p class="hint" style="margin-top:10px">${esc(draft.detalle)}</p>`;
+      return `<div class="resumen-hab">${h}</div>`;
+    }
+    function abrirFormularioPaso(){
+      const ed = editing, sc = SCHEMA[ed.key];
+      const esItem = ed.key === 'inventario' || ed.key === 'cinturon' || ed.key === 'catalogo';
+      const tit = sc.titulo.toLowerCase();
+      ed.inicial = JSON.stringify(ed.draft);
+      ed.pap = PasoAPaso.abrir({
+        titulo: ed.id ? `Editar ${tit}${ed.draft.nombre ? ' · ' + ed.draft.nombre : ''}` : `${ed.key === 'pasivas' ? 'Nueva' : 'Nuevo'} ${tit}`, crear: !ed.id,
+        contenedor: lugar(), z: 55,
+        textoCrear: ed.key === 'efectos' ? '✔ Activar el estado' : '✔ Crear',
+        pasos: () => pasosFormulario(ed.key, ed.draft).map(p => ({id: p.id, nombre: p.corto, ayuda: `<b>${p.titulo}</b> ${p.ayuda}`,
+          html: () => p.id === 'resumen' ? resumenFormulario(ed.key, ed.draft) + htmlFormulario(ed.key, ed.draft, p.bloques) : htmlFormulario(ed.key, ed.draft, p.bloques),
+          alMontar: (c, a) => { const i = a.cuerpo.querySelector('input:not([type=checkbox]):not([type=file]),textarea'); if(i && p.id === 'que') setTimeout(() => i.focus(), 30); }})),
+        alClic: e => clic(e), alInput: e => cambio(e),
+        alCambio: e => { cambio(e); cambioImagen(e); },
+        alTecla: e => {
+          const t = e.composedPath ? e.composedPath()[0] : e.target;
+          if(e.key !== 'Enter' || !t || t.tagName !== 'INPUT') return;
+          e.preventDefault();
+          const n = pasosFormulario(ed.key, ed.draft).length;
+          if(ed.pap.paso() < n - 1) ed.pap.irA(ed.pap.paso() + 1);
+        },
+        confirmarCancelar: () => JSON.stringify(ed.draft) === ed.inicial ? '' : (ed.id ? '¿Descartar los cambios?' : '¿Cancelar? Lo que estás armando se descarta.'),
+        alGuardar: () => { guardar(); }, alCrear: () => { guardar(); },
+        alCancelar: () => cerrar(),
+        extras: [
+          ...(esItem ? [{id: 'catalogo', texto: '⬆ Subir al catálogo', alClic: () => { if(editing === ed) subirAlCatalogo(S(), ed.draft, ed.key, {toast, alSubir: ctx.alSubirCatalogo}); }}] : []),
+          ...(ed.id ? [{id: 'eliminar', texto: 'Eliminar', alClic: () => eliminar()}] : []),
+        ],
+      });
     }
 
     function abrir(key, id, equipadoPreset, opciones){
@@ -744,19 +795,12 @@ const FichaEditor = (() => {
       // Una habilidad nueva arranca sin respuesta a "¿automatizarla?": es lo primero que se pregunta. Las que ya existen (sin el
       // dato) cuentan como automatizadas.
       if(key === 'habilidades' && !id && !op.draft){ editing.draft.automatizada = null; editing.draft.modo = null; editing.draft.jobCosto = HAB_JOB_CUSTOM; }
-      if(key === 'habilidades'){ abrirHabilidadPaso(); return; }
-      els.guardar.style.display = "";
-      els.titulo.textContent = (id ? 'Editar ' : 'Nueva ') + sc.titulo.toLowerCase();
-      els.eliminar.style.display = id ? 'block' : 'none';
-      els.catalogo.style.display = (key === 'inventario' || key === 'cinturon' || key === 'catalogo') ? 'block' : 'none';
-      els.activar.style.display = key === 'efectos' ? '' : 'none';
-      dibujar();
-      els.scrim.classList.add('open');
-      setTimeout(()=>q('input')?.focus(), 40);
+      if(key === 'habilidades') abrirHabilidadPaso();
+      else abrirFormularioPaso();
     }
     function cerrar(){
       if(editing && editing.pap){ const pap = editing.pap; editing.pap = null; pap.cerrar(); }
-      els.scrim.classList.remove('open'); editing = null; if(ctx.alCerrar) ctx.alCerrar();
+      editing = null; if(ctx.alCerrar) ctx.alCerrar();
     }
 
     // Pasos del asistente abierto (habilidades), o null si es el formulario común.
@@ -1023,20 +1067,6 @@ const FichaEditor = (() => {
         },
       });
     }
-
-    els.cuerpo.addEventListener('input', cambio);
-    els.cuerpo.addEventListener('change', cambio);
-    els.cuerpo.addEventListener('change', redibujarTrasCambio);
-    els.cuerpo.addEventListener('change', cambioImagen);
-    els.cuerpo.addEventListener('click', clic);
-    els.cuerpo.addEventListener('keydown', teclas);
-    els.guardar.addEventListener('click', guardar);
-    els.activar.addEventListener('click', guardar);
-    els.eliminar.addEventListener('click', eliminar);
-    els.catalogo.addEventListener('click', () => { if(editing) subirAlCatalogo(S(), editing.draft, editing.key, {toast, alSubir: ctx.alSubirCatalogo}); });
-    els.cancelar.addEventListener('click', cerrar);
-    els.x.addEventListener('click', cerrar);
-    els.scrim.addEventListener('mousedown', e => { if((e.composedPath ? e.composedPath()[0] : e.target) === els.scrim) cerrar(); });
 
     return {abrir, cerrar, dibujar, irAPaso, abrirAsistenteItem, aplicarTipoItem,
       get estado(){ return editing; }, set estado(v){ editing = v; }};

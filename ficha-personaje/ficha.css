@@ -253,8 +253,6 @@ a{color:var(--brass)}
   border-color:var(--copper);color:var(--brass);background:rgba(201,133,69,.14);font-weight:700
 }
 .iconbtn-add:hover{background:var(--copper);color:#180F08}
-#modal-activar{background:var(--bottle);border-color:var(--bottle);color:#EAF3E6;font-weight:700}
-#modal-activar:hover{background:#3B8A6E;border-color:#3B8A6E}
 
 /* ---------- Atributos ---------- */
 .ptbar{

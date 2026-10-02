@@ -45,6 +45,14 @@
    guardado; una daga de prueba con el slot lleno → «Reemplazar o Comparar», la tabla de Comparar, Reemplazar (−2 No2); Escape cierra
    todo; y en la ficha suelta, sacar/equipar igual (2 → 1 → 0). Silvia quedó con la «Daga de prueba» equipada en lugar de la Cimitarra.
 5. [ ] **Tienda y Botín**.
+   - [x] **Botín** (2026-10-02): la ventana «⚔ Batalla terminada» salió a `comun/ficha-botin.js` (la ficha la usa) y el mapa la muestra
+     adentro de la Botonera nueva (`abrirBotinMapa`: la abre sola al terminar un combate, el 🎁 del borde y la ficha lite); se cierra sola
+     cuando el GM cierra el botín. Las categorías de ítem y la mochila pasaron a `comun/ficha-equipo.js`. Probado en vivo (GM con 🎮
+     Silvia): lo de cada jugador, Ver (sin Editar), Comparar, «Sumar a la mochila» (transacción, mochila guardada, línea en la Mesa) y
+     el cierre del GM. (Ojo al armar un botín de prueba a mano: el documento tiene que llevar `tomadoPor: ''`, si no las reglas no dejan
+     tomarlo — GM Tools ya lo hace así.) La ventana del GM (Finalizar combate / Despojar, `abrirModoGM`) sigue en GM Tools: es otra
+     pantalla, se anota aparte.
+   - [ ] **Tienda**.
 6. [ ] **El editor** (editar una habilidad, un ítem, un creep): lo más grande y lo que menos se usa en partida; puede seguir abriéndose
    en la ficha o en GM Tools si conviene.
 

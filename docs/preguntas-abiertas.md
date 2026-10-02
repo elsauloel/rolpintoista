@@ -641,3 +641,7 @@ resuelven a mano, como el resto de los avisos).
   ese alguien. **Mientras se decide, quedó armado como (b)** (2026-10-02). ¿Vale igual para todas las zonas de habilidad o depende de cada
   una? (2) Daño tóxico: hoy va directo a la vida por defecto (se puede destildar) y lo reduce la Armadura mágica (P142). ¿La Inmunidad a
   veneno lo anula? ¿Algo más lo frena (Constitución, una máscara…)? ¿Otra peculiaridad frente al arcano (acumular, dejar Veneno…)?
+  **Planteo del dueño (2026-10-02):** el tóxico ya trae de por sí una resistencia propia — quien lo recibe tira **Res.Esp** contra el
+  daño —, y el daño arcano esa resistencia no la tiene. Entonces no es daño físico (que frena la Defensa) ni arcano (que va directo,
+  solo con la Armadura mágica): es un **lugar intermedio**. ¿Lo consolidamos como **regla del tipo tóxico** (todo daño tóxico se resiste
+  con Res.Esp) o es una **peculiaridad de esta skill puntual** (Pedos Tóxicos)?

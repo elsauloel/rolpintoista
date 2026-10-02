@@ -106,7 +106,7 @@ function nuevoCreep(){
     habilidades:[],
     estados:[],
     notas:'',
-    grupo:'', tipoCriatura:'', tipoCriaturaOtro:'', jefe:false, oroBase:0, armaNatural:false, trofeoEspecial:{nombre:'', precio:0},   // recompensas
+    mapa:'', tipoCriatura:'', tipoCriaturaOtro:'', jefe:false, oroBase:0, armaNatural:false, trofeoEspecial:{nombre:'', precio:0},   // recompensas
     escalaTipos: ESCALA_TIPOS,
   };
 }
@@ -141,7 +141,7 @@ function cargarCreepsSubidos(){
 const versionNuevaDeCreep = sc => typeof Biblioteca !== 'undefined' && Biblioteca.versionNueva ? Biblioteca.versionNueva(creepsSubidos, sc.bibOrigen, sc.bibIgnorada) : null;
 function actualizarCreepDesdeBib(sc, e){
   const d = Plantillas.creep(e.datos);
-  const combate = {id: sc.id, imagen: sc.imagen, grupo: sc.grupo, color: sc.color, estados: sc.estados, hp: sc.hp, nitros: sc.nitros,
+  const combate = {id: sc.id, imagen: sc.imagen, mapa: sc.mapa, color: sc.color, estados: sc.estados, hp: sc.hp, nitros: sc.nitros,
     ataquesTurno: sc.ataquesTurno, recompensado: sc.recompensado};
   Object.assign(sc, d, combate);
   sc.habilidades = (d.habilidades || []).map(h => ({...h, id: uid(), cdActual: h.cdArranca ? num(h.cd) : 0}));
@@ -154,13 +154,13 @@ function abrirVersionNuevaCreep(sc){
   const e = versionNuevaDeCreep(sc);
   if(!e) return;
   Biblioteca.avisoVersion({nombre: sc.nombre, entrada: e, que: 'El creep', dejarTxt: 'Dejar el mío',
-    actualizarTxt: 'cambia sus atributos, arma, equipo y habilidades por los nuevos; se quedan su vida (con el tope del máximo nuevo), sus estados, su grupo y su imagen.',
+    actualizarTxt: 'cambia sus atributos, arma, equipo y habilidades por los nuevos; se quedan su vida (con el tope del máximo nuevo), sus estados, su mapa y su imagen.',
     alActualizar: () => { actualizarCreepDesdeBib(sc, e); toast(`${sc.nombre} actualizado a la versión ${fmt(e.version || 1)}`); renderAll(); },
     alDejar: () => { sc.bibIgnorada = e.id + ':' + (e.version || 1); renderAll(); }});
 }
 
 function agregarCreepDeBiblioteca(datos, meta){
-  const sc = Object.assign(creepBaseGuardado(), datos, {id: uid(), imagen: '', grupo: grupoParaNuevo()});
+  const sc = Object.assign(creepBaseGuardado(), datos, {id: uid(), imagen: '', mapa: mapaParaNuevo()});
   if(meta && meta.id) sc.bibOrigen = {tipo: 'creeps', id: meta.id, version: meta.version || 1};
   sc.habilidades = (sc.habilidades || []).map(h => ({...h, id: uid(), cdActual: h.cdArranca ? num(h.cd) : 0}));
   sc.estados = (sc.estados || []).map(es => ({...es, id: uid()}));
@@ -581,8 +581,8 @@ function renderAll(){
   const grid = $('#grid');
   $('#empty').style.display = creepsReales().length ? 'none' : 'block';
   S.creeps.forEach(normalizarCreep);
-  renderGruposBarra();
-  const visibles = S.creeps.filter(pasaGrupo);
+  renderMapasBarra();
+  const visibles = S.creeps.filter(pasaPestana);
   grid.innerHTML = visibles.map(sc => cardCompactoHtml(sc)).join('');
   if(creepsReales().length && !visibles.length){ $('#empty').style.display = 'block'; $('#empty').textContent = 'No hay creeps en este grupo. Con el grupo abierto, "+ Creep" agrega uno acá, o cambiale el grupo a un creep desde su ficha.'; }
   else $('#empty').textContent = 'Sin creeps todavía. Tocá "+ Creep" para agregar el primero.';

@@ -79,6 +79,8 @@ async function crearToken(datos){
     const ref = await coleccionTokens().add(doc);
     creando = false;
     seleccionar(ref.id);
+    if(doc.tipo === 'creep' && doc.fichaId) creepLlegoAlMapa(doc.fichaId);   // el creep pasa a este mapa (comun/creeps-mapas.js)
+    if(doc.tipo === 'creep' && doc.fichaId) creepLlegoAlMapa(doc.fichaId);   // el creep pasa a este mapa (comun/creeps-mapas.js)
   }catch(err){
     console.error('No se pudo crear el token:', err);
     toast('No se pudo crear el token' + (err.code === 'permission-denied' ? ' (sin permiso)' : ''));
@@ -272,11 +274,12 @@ function escucharVinculables(){
     sigiloRevisar();   // por si el estado Sigilo se aplicó/quitó a mano estando ya en un cono rival
     revisarAutoLentes();   // entrar en sigilo prende el modo lentes solo (no muestra todo de una)
     if(tableroAbierto) renderTablero();   // el HP/estados de las fichas o creeps del tablero cambió
+    if(coleccion === 'creeps' && soyGM){ renderMapasMenu(true); if(!$('#tokens-menu').hidden) renderTokensMenu(); }   // cuántos creeps tiene cada mapa
     renderPolillaBoton();   // el estado «Polilla revoloteando» se aplicó/gastó (propio o desde otra pantalla)
     pedirDibujo();
   }, err => console.error(`Error escuchando ${coleccion}:`, err));
   escuchar('fichas', fichasPub, ['duenoUid', 'resumen', 'miniatura']);
-  escuchar('creeps', creepsPub, ['orden', 'resumen', 'miniatura', 'tarjeta', 'grupo', 'color']);
+  escuchar('creeps', creepsPub, ['orden', 'resumen', 'miniatura', 'tarjeta', 'mapa', 'color']);
 }
 
 function componerFondo(){
@@ -506,16 +509,19 @@ function opcionesVinculo(tipo, elegido, todasLasFichas){
       });
   }
   const enMapa = new Set([...tokens.values()].map(t => t.fichaId).filter(Boolean));
-  const opcion = ([id, v], grupo) => `<option value="${esc(id)}"${id === elegido ? ' selected' : ''}>${esc(v.nombre)}${grupo ? ' · ' + esc(grupo) : ''}${enMapa.has(id) && id !== elegido ? ' (ya en el mapa)' : ''}</option>`;
+  const opcion = ([id, v]) => `<option value="${esc(id)}"${id === elegido ? ' selected' : ''}>${esc(v.nombre)}${enMapa.has(id) && id !== elegido ? ' (ya en el mapa)' : ''}</option>`;
   if(tipo === 'creep'){
-    // Los creeps pueden repetir nombre en grupos distintos: se listan agrupados y cada uno lleva el nombre de su grupo.
-    const porGrupo = new Map();
-    lista.forEach(e => { const g = String(e[1].grupo || '').trim(); if(!porGrupo.has(g)) porGrupo.set(g, []); porGrupo.get(g).push(e); });
-    const grupos = [...porGrupo.keys()].sort((x, y) => (x === '' ? 1 : y === '' ? -1 : x.localeCompare(y, 'es')));
-    return '<option value="">Sin vincular</option>' + grupos.map(g =>
-      `<optgroup label="${esc(g || 'Sin grupo')}">${porGrupo.get(g).map(e => opcion(e, g)).join('')}</optgroup>`).join('');
+    // Por mapa (comun/creeps-mapas.js): primero los de este mapa, después la Reserva y los demás mapas. Elegir uno de otro mapa lo
+    // muda a este (creepLlegoAlMapa).
+    const ids = new Set([...mapasLista.keys(), MAPA_PRINCIPAL]);
+    const porMapa = new Map();
+    lista.forEach(e => { const m = CreepsMapas.mapaDe(e[1], ids); if(!porMapa.has(m)) porMapa.set(m, []); porMapa.get(m).push(e); });
+    const orden = [mapaMostrado, CreepsMapas.RESERVA, ...CreepsMapas.ordenar(mapasLista).map(m => m.id)].filter((m, i, a) => a.indexOf(m) === i && porMapa.has(m));
+    const titulo = m => m === mapaMostrado ? `En este mapa (${nombreMapa(m)})` : m === CreepsMapas.RESERVA ? 'Reserva (en ningún mapa)' : `En «${nombreMapa(m)}» (se muda a este)`;
+    return '<option value="">Sin vincular</option>' + orden.map(m =>
+      `<optgroup label="${esc(titulo(m))}">${porMapa.get(m).map(opcion).join('')}</optgroup>`).join('');
   }
-  return '<option value="">Sin vincular</option>' + lista.map(e => opcion(e, '')).join('');
+  return '<option value="">Sin vincular</option>' + lista.map(opcion).join('');
 }
 
 // Lista de miembros para elegir dueño de un token de tipo "pj" (igual
@@ -590,6 +596,7 @@ async function modificarCreep(creepId, cambiar){
     const parteImagen = firmaVieja.includes('-') ? firmaVieja.slice(firmaVieja.indexOf('-') + 1) : hashGm('');
     tx.set(privRef, {json});
     tx.update(base, {
+      mapa: String(sc.mapa || '').slice(0, 80),   // en qué mapa está (comun/creeps-mapas.js)
       'resumen.hpPct': hpMax > 0 ? Math.round(Math.max(0, Math.min(1, sc.hp / hpMax)) * 100) : 0,
       'resumen.muerto': sc.hp <= 0,
       'resumen.opor': CreepCalculo.oportunidadPosible(sc),   // ataque de oportunidad (2026-10-02)
@@ -900,6 +907,7 @@ function renderPanel(forzar){
       const cambios = {nombre, color};
       cambios.fichaId = fichaId ? fichaId : firebase.firestore.FieldValue.delete();
       await editarToken(seleccion, cambios);
+      if(t.tipo === 'creep' && fichaId && fichaId !== t.fichaId) creepLlegoAlMapa(fichaId);   // vinculado a un creep de otro mapa: se muda acá
       editandoToken = false;
       renderPanel(true);
     };
@@ -914,7 +922,7 @@ function renderPanel(forzar){
 }
 
 /* ---------- 🗺 Mapas: botón del borde izquierdo (solo GM) ----------
-   Mapas guardados (ver, publicar, renombrar, borrar, grupos de creeps vinculados, + Nuevo mapa) y el fondo del mapa que se está mirando.
+   Mapas guardados (ver, publicar, renombrar, borrar, cuántos creeps tiene y traer sus tokens, + Nuevo mapa) y el fondo del mapa que se está mirando.
    Vive en un menú al costado del botón, como el de 🎭 Tokens: la barra lateral (donde se ve la Mesa) no se usa para menús. */
 let mapasMenuFirma = '';
 function renderMapasMenu(forzar){
@@ -937,7 +945,7 @@ function renderMapasMenu(forzar){
           <button type="button" class="btn" data-mapa-renombrar="${esc(id)}" title="Renombrar">✎</button>
           ${id === MAPA_PRINCIPAL ? '' : `<button type="button" class="btn peligro" data-mapa-borrar="${esc(id)}" title="Borrar">✕</button>`}
         </div>
-        ${gruposDeMapaHtml(id)}
+        ${creepsDeMapaHtml(id)}
       </div>`;
     }).join('');
   const casillas = fondo ? Math.round(fondo.ancho / ANCHO_CASILLA * 10) / 10 : 20;
@@ -963,14 +971,7 @@ function renderMapasMenu(forzar){
   menu.querySelectorAll('[data-mapa-publicar]').forEach(b => b.onclick = () => publicarMapa(b.dataset.mapaPublicar));
   menu.querySelectorAll('[data-mapa-renombrar]').forEach(b => b.onclick = () => renombrarMapa(b.dataset.mapaRenombrar));
   menu.querySelectorAll('[data-mapa-borrar]').forEach(b => b.onclick = () => borrarMapa(b.dataset.mapaBorrar));
-  menu.querySelectorAll('[data-mapa-grupo-add]').forEach(sel => sel.onchange = async () => {
-    if(!sel.value) return;
-    const g = sel.value, mapaId = sel.dataset.mapaGrupoAdd;
-    await vincularGrupoAMapa(g, mapaId);
-    if(confirm(`Grupo «${g}» vinculado a «${nombreMapa(mapaId)}».\n\n¿Traer ahora los tokens de ese grupo a ese mapa? (Salen ocultos; los que ya tienen token se saltean.)`)) traerTokensDeGrupos([g], mapaId);
-  });
-  menu.querySelectorAll('[data-mapa-traer]').forEach(b => b.onclick = () => traerTokensDeGrupos(TokensAuto.gruposDeMapa(enlacesGM, b.dataset.mapaTraer), b.dataset.mapaTraer));
-  menu.querySelectorAll('[data-mapa-grupo-quitar]').forEach(b => b.onclick = () => vincularGrupoAMapa(b.dataset.mapaGrupoQuitar, ''));
+  menu.querySelectorAll('[data-mapa-traer]').forEach(b => b.onclick = () => traerCreepsDelMapa(b.dataset.mapaTraer));
   $('#mapa-nuevo').onclick = crearMapa;
   $('#fondo-cargar').onclick = () => $('#fondo-archivo').click();
   if($('#fondo-quitar')) $('#fondo-quitar').onclick = async () => {

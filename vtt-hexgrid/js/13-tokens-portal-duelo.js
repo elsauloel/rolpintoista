@@ -1,33 +1,35 @@
 // js/13-tokens-portal-duelo.js — tramo 13 de 14 del script de mapa.html (paso 5, nivel A: mismo código, en el mismo orden): botón de tokens, portal, zonas de habilidad, duelo, hechizos de área, dodge, muerte.
 /* ---------- Tokens: botón del borde izquierdo (🎭) ----------
-   Jugador: abre directo la ventana de "Nuevo token". GM: un menú con "Nuevo token", "Traer tokens de jugadores" y "Traer tokens de
-   creeps" (por grupo; los grupos vinculados a este mapa van primero y se pueden traer todos juntos). Los tokens salen en fila, en el
-   centro de lo que se ve, saltean los que ya están, y los de creeps nacen ocultos (comun/tokens-auto.js). */
-let enlacesGM = [];   // [{grupo, mapaId}] (campanas/<id>/gm/gruposMapas, solo el GM)
-function escucharEnlaces(){
-  if(!soyGM || typeof TokensAuto.enlacesEscuchar !== 'function') return;
-  try{ TokensAuto.enlacesEscuchar(l => {
-    enlacesGM = l;
-    renderMapasMenu(true);
-    if(!$('#tokens-menu').hidden) renderTokensMenu();
-  }); }catch(err){ console.error('No se pudieron escuchar los grupos vinculados:', err); }
+   Jugador: abre directo la ventana de "Nuevo token". GM: un menú con "Nuevo token", "Traer tokens de jugadores" y "Traer los creeps de
+   este mapa" (los que GM Tools tiene en este mapa: comun/creeps-mapas.js). Los tokens salen en fila, en el centro de lo que se ve,
+   saltean los que ya están, y los de creeps nacen ocultos (comun/tokens-auto.js). */
+// Los creeps (públicos) que están en ese mapa: [[id, creep]].
+function creepsDelMapa(mapaId){
+  const ids = new Set([...mapasLista.keys(), MAPA_PRINCIPAL]);
+  return [...creepsPub.entries()].filter(([, c]) => CreepsMapas.mapaDe(c, ids) === mapaId);
 }
-function gruposDeCreepsPub(){
-  const m = new Map();
-  creepsPub.forEach(c => { if(c.grupo) m.set(c.grupo, (m.get(c.grupo) || 0) + 1); });
-  return m;
-}
-async function traerTokensDeGrupos(nombres, mapaDestino){   // mapaDestino: el mapa donde crear los tokens (por defecto el que se está mirando)
-  const lista = [];
-  creepsPub.forEach((c, id) => { if(nombres.includes(c.grupo)) lista.push({nombre: c.nombre, color: c.color, tipo: 'creep', fichaId: id, oculto: true}); });
-  if(!lista.length){ toast('Esos grupos no tienen creeps'); return; }
+async function traerCreepsDelMapa(mapaId){
+  mapaId = mapaId || mapaMostrado;
+  const lista = creepsDelMapa(mapaId).map(([id, c]) => ({nombre: c.nombre, color: c.color, tipo: 'creep', fichaId: id, oculto: true}));
+  if(!lista.length){ toast(`«${nombreMapa(mapaId)}» no tiene creeps: ubicalos desde GM Tools («🗺 Mover a…»)`); return; }
   try{
-    const r = await TokensAuto.crear(lista, {mapaId: mapaDestino || mapaMostrado, centro: centroDeLaVista()});
-    toast(r.creados ? `👹 ${r.creados} token(s) de creeps creados, ocultos a los jugadores${r.salteados ? ` · ${r.salteados} ya estaban` : ''}` : 'Todos esos creeps ya tienen token en este mapa');
+    const r = await TokensAuto.crear(lista, {mapaId, ...(mapaId === mapaMostrado ? {centro: centroDeLaVista()} : {})});
+    toast(r.creados ? `👹 ${r.creados} token(s) de creeps en «${nombreMapa(mapaId)}», ocultos a los jugadores${r.salteados ? ` · ${r.salteados} ya estaban` : ''}` : `Todos los creeps de «${nombreMapa(mapaId)}» ya tienen su token`);
   }catch(err){
     console.error('No se pudieron traer los tokens de creeps:', err);
     toast('No se pudieron crear los tokens' + (err.code === 'permission-denied' ? ' (sin permiso)' : ''));
   }
+}
+// Un token de un creep apareció en este mapa (creado a mano o vinculado): el creep pasa a este mapa y su token se va de los demás,
+// como una piedrita (comun/creeps-mapas.js). Solo el GM.
+async function creepLlegoAlMapa(creepId){
+  const c = creepsPub.get(creepId);
+  if(!soyGM || !c || c.mapa === mapaMostrado) return;
+  try{
+    await modificarCreep(creepId, sc => { sc.mapa = mapaMostrado; });
+    const r = await CreepsMapas.mudarTokens({id: creepId, nombre: c.nombre, color: c.color}, mapaMostrado);
+    toast(`🗺 ${c.nombre} pasó a «${nombreMapa(mapaMostrado)}»${r.borrados ? ' (su token se fue del otro mapa)' : ''}`);
+  }catch(err){ console.error('No se pudo mudar el creep a este mapa:', err); }
 }
 async function traerTokensDeJugadores(){
   const fichas = [...fichasPub.entries()].filter(([id]) => !String(id).includes(SEP_INVOCACION));
@@ -42,34 +44,20 @@ async function traerTokensDeJugadores(){
     toast('No se pudieron crear los tokens' + (err.code === 'permission-denied' ? ' (sin permiso)' : ''));
   }
 }
-let tokensMenuCreeps = false;   // el submenú de grupos está desplegado
 function renderTokensMenu(){
-  const menu = $('#tokens-menu');
-  const grupos = gruposDeCreepsPub();
-  const deEsteMapa = TokensAuto.gruposDeMapa(enlacesGM, mapaMostrado).filter(g => grupos.has(g));
-  const filaGrupo = g => {
-    const otro = TokensAuto.mapaDeGrupo(enlacesGM, g);
-    const nota = otro === mapaMostrado ? '★ ' : '';
-    const sufijo = otro && otro !== mapaMostrado ? ` → ${nombreMapa(otro)}` : '';
-    return `<button type="button" class="btn chico" data-tm-grupo="${esc(g)}" style="text-align:left">${nota}${esc(g)} · ${grupos.get(g)}${esc(sufijo)}</button>`;
-  };
-  menu.innerHTML =
+  const n = creepsDelMapa(mapaMostrado).length;
+  $('#tokens-menu').innerHTML =
     `<div class="tm-tit"><span>🎭 Tokens</span></div>` +
     '<button type="button" class="btn primary chico" data-tm="nuevo" style="text-align:left">＋ Token nuevo</button>' +
     '<button type="button" class="btn chico" data-tm="jugadores" style="text-align:left" title="Crea los tokens de los personajes que todavía no tienen token en este mapa">👥 Traer tokens de jugadores</button>' +
-    `<button type="button" class="btn chico" data-tm="creeps" style="text-align:left" title="Crea un token por cada creep de un grupo de GM Tools (ocultos)">👹 Traer tokens de creeps ${tokensMenuCreeps ? '▴' : '▾'}</button>` +
-    (tokensMenuCreeps
-      ? '<div class="tm-sub">' + (grupos.size
-          ? (deEsteMapa.length ? `<button type="button" class="btn primary chico" data-tm="vinculados" style="text-align:left" title="Los grupos que vinculaste a este mapa (en GM Tools o en 🗺 Mapas)">★ Grupos de este mapa: ${esc(deEsteMapa.join(', '))}</button>` : '')
-            + [...grupos.keys()].sort((a, b) => a.localeCompare(b, 'es')).map(filaGrupo).join('')
-          : '<div class="hint">No hay grupos de creeps: armalos en GM Tools.</div>') + '</div>'
-      : '');
+    `<button type="button" class="btn chico" data-tm="creeps" style="text-align:left" title="Crea (ocultos) los tokens de los creeps que GM Tools tiene en este mapa; los que ya tienen se saltean"${n ? '' : ' disabled'}>👹 Traer los creeps de este mapa (${n})</button>` +
+    (n ? '' : '<div class="hint" style="margin-top:4px">Este mapa no tiene creeps: ubicalos desde GM Tools («🗺 Mover a…»).</div>');
 }
 function abrirTokensMenu(abrir){
   const menu = $('#tokens-menu');
   menu.hidden = !abrir;
   $('#toolkit-tokens').classList.toggle('activo', abrir);
-  if(abrir){ tokensMenuCreeps = false; renderTokensMenu(); if(mapasMenuAbierto) abrirMapasMenu(false); }
+  if(abrir){ renderTokensMenu(); if(mapasMenuAbierto) abrirMapasMenu(false); }
 }
 $('#toolkit-tokens').onclick = e => {
   e.stopPropagation();
@@ -78,15 +66,12 @@ $('#toolkit-tokens').onclick = e => {
 };
 $('#tokens-menu').addEventListener('click', e => {
   e.stopPropagation();
-  const g = e.target.closest('[data-tm-grupo]');
-  if(g){ abrirTokensMenu(false); traerTokensDeGrupos([g.dataset.tmGrupo]); return; }
   const b = e.target.closest('[data-tm]');
   if(!b) return;
   const que = b.dataset.tm;
   if(que === 'nuevo'){ abrirTokensMenu(false); $('#btn-nuevo').click(); }
   else if(que === 'jugadores'){ abrirTokensMenu(false); traerTokensDeJugadores(); }
-  else if(que === 'creeps'){ tokensMenuCreeps = !tokensMenuCreeps; renderTokensMenu(); }
-  else if(que === 'vinculados'){ abrirTokensMenu(false); traerTokensDeGrupos(TokensAuto.gruposDeMapa(enlacesGM, mapaMostrado)); }
+  else if(que === 'creeps'){ abrirTokensMenu(false); traerCreepsDelMapa(mapaMostrado); }
 });
 document.addEventListener('mousedown', e => { if(!$('#tokens-menu').hidden && !e.target.closest('#tokens-menu, #toolkit-tokens')) abrirTokensMenu(false); });
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('#tokens-menu').hidden) abrirTokensMenu(false); });
@@ -417,17 +402,17 @@ async function dueloVincularSiFalta(t){
   const nom = String(t.nombre || '').trim().toLowerCase();
   const usados = new Set([...tokens.values()].filter(x => x.tipo === 'creep' && x.fichaId).map(x => x.fichaId));
   const mismos = [...creepsPub.entries()].filter(([, c]) => String(c.nombre || '').trim().toLowerCase() === nom);
-  // Puede haber creeps con el mismo nombre en grupos distintos: se prefiere los de los grupos vinculados a ESTE mapa y los que todavía no tienen token; si sigue habiendo más de uno, no se adivina.
-  const gruposDelMapa = new Set(TokensAuto.gruposDeMapa(enlacesGM, mapaMostrado));
-  let cands = mismos.filter(([, c]) => gruposDelMapa.has(c.grupo));
+  // Puede haber creeps con el mismo nombre en mapas distintos: se prefiere los de ESTE mapa y los que todavía no tienen token; si sigue habiendo más de uno, no se adivina.
+  let cands = mismos.filter(([, c]) => c.mapa === mapaMostrado);
   if(!cands.length) cands = mismos;
   const libres = cands.filter(([cid]) => !usados.has(cid));
   const finales = libres.length ? libres : cands;
   if(!finales.length){ toast(`El token «${t.nombre}» no está vinculado a ningún creep de GM Tools (y no hay uno con ese nombre): el duelo no va a tener sus datos`); return t; }
-  if(finales.length > 1){ toast(`Hay ${finales.length} creeps llamados «${t.nombre}» en distintos grupos: vinculá este token a uno desde sus ajustes (⚙) para que el duelo tenga sus datos`); return t; }
+  if(finales.length > 1){ toast(`Hay ${finales.length} creeps llamados «${t.nombre}» en distintos mapas: vinculá este token a uno desde sus ajustes (⚙) para que el duelo tenga sus datos`); return t; }
   const elegido = finales[0];
   await coleccionTokens().doc(t.id).update({fichaId: elegido[0]});
-  toast(`Vinculé el token «${t.nombre}» al creep «${elegido[1].nombre}»${elegido[1].grupo ? ' (grupo ' + elegido[1].grupo + ')' : ''} de GM Tools`);
+  toast(`Vinculé el token «${t.nombre}» al creep «${elegido[1].nombre}» de GM Tools`);
+  creepLlegoAlMapa(elegido[0]);
   return {...t, fichaId: elegido[0]};
 }
 

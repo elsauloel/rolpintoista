@@ -99,7 +99,7 @@ document.addEventListener('click', e => {
       textoAsistente: '🧭 Crear paso a paso',
       alAsistente: () => abrirAsistenteCreep(null),
       base: typeof CREEPS_BASE !== 'undefined' ? CREEPS_BASE : [],
-      alCrearDeCero: () => { const nuevo = nuevoCreep(); nuevo.grupo = grupoParaNuevo(); S.creeps.push(nuevo); renderAll(); },
+      alCrearDeCero: () => { const nuevo = nuevoCreep(); nuevo.mapa = mapaParaNuevo(); S.creeps.push(nuevo); renderAll(); },
       alElegir: agregarCreepDeBiblioteca,
       alVer: verCreepDeBiblioteca,
       grupos: CREEPS_GRUPOS,

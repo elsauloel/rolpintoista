@@ -151,7 +151,7 @@ function abrirAsistenteCreep(scId){
   if(!scId){
     const sc = nuevoCreep();
     sc.nombre = 'Creep nuevo';
-    sc.grupo = grupoParaNuevo();
+    sc.mapa = mapaParaNuevo();
     S.creeps.push(sc);
     scId = sc.id;
     nuevo = true;

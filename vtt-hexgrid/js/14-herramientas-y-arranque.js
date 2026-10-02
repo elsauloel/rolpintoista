@@ -801,7 +801,6 @@ function arrancarEnVivo(){
   // iniciativa/tokens del mapa que corresponda).
   escucharMapas();
   escucharMapaActivo();
-  escucharEnlaces();
   escucharBotinParaJugador();
   mesaEscuchar();
   mesaHistorialAlEntrar();

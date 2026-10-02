@@ -1,179 +1,126 @@
 // js/09-grupos-botin-y-bitacora.js — tramo 9 de 12 del script de gm-tools.html (paso 5, nivel A: mismo código, en el mismo orden).
 /* =========================================================
-   Grupos de creeps (pestañas por escenario) y tokens automáticos
-   Un creep pertenece a UN solo grupo (campo `grupo`); para repetir uno en otro escenario se lo duplica.
+   Los creeps por mapa (pestañas) y tokens automáticos — comun/creeps-mapas.js
+   (2026-10-02, pedido del dueño: "los grupos en realidad son mapas": antes eran grupos con nombre libre, vinculados a mano a un mapa.)
+   Cada creep está en UN mapa (`sc.mapa`) o en la Reserva (''); las pestañas son los mapas de la partida, en el orden del panel de
+   Mapas del mapa. «🗺 Mover a…» (en la tarjeta y en la ficha completa) lo muda de mapa con su token, como una piedrita. Para repetir
+   un creep en otro mapa se lo duplica.
    ========================================================= */
-let grupoActivo = '';   // '' = todos · '__sin' = sin grupo · si no, el nombre del grupo
-// Ojo (2026-09-22, bug real): estas dos claves tienen que ir por partida (FB_CAMPANA), igual que
-// gbit-activa-/bitacora-activa- más abajo — sin el sufijo, un grupo vacío creado en una partida
-// aparecía como pestaña en cualquier otra partida abierta en el mismo navegador.
-try{ grupoActivo = localStorage.getItem('gm-grupo-activo-' + FB_CAMPANA) || ''; }catch(e){}
-function gruposExtra(){ try{ const g = JSON.parse(localStorage.getItem('gm-grupos-extra-' + FB_CAMPANA) || '[]'); return Array.isArray(g) ? g : []; }catch(e){ return []; } }
-function guardarGruposExtra(l){ try{ localStorage.setItem('gm-grupos-extra-' + FB_CAMPANA, JSON.stringify(l)); }catch(e){} }
-function nombresDeGrupos(){
-  const set = new Set(gruposExtra());
-  S.creeps.forEach(sc => { if(sc.grupo) set.add(sc.grupo); });
-  return [...set].sort((a, b) => a.localeCompare(b, 'es'));
-}
-function pasaGrupo(sc){
+const PESTANA_TODOS = '__todos';
+let pestanaMapa = PESTANA_TODOS;   // la pestaña abierta: PESTANA_TODOS, '' (Reserva) o el id de un mapa
+try{ const v = localStorage.getItem('gm-pestana-mapa-' + FB_CAMPANA); if(v !== null) pestanaMapa = v; }catch(e){}
+const mapasGM = new Map();   // id → {nombre, creadoMs}
+let mapasGMListos = false;
+const mapasOrdenadosGM = () => CreepsMapas.ordenar(mapasGM);
+// El mapa de un creep (si el suyo ya no existe, la Reserva).
+function mapaDeCreepGM(sc){ return mapasGMListos ? CreepsMapas.mapaDe(sc, new Set(mapasOrdenadosGM().map(m => m.id))) : (sc.mapa || ''); }
+function nombreDeMapaGM(id){ return id === CreepsMapas.RESERVA ? 'Reserva' : ((mapasGM.get(id) || {}).nombre || (id === CreepsMapas.PRINCIPAL ? 'Mapa 1' : 'Mapa')); }
+function pasaPestana(sc){
   if(sc._borrador) return false;
-  if(!grupoActivo) return true;
-  if(grupoActivo === '__sin') return !sc.grupo;
-  return sc.grupo === grupoActivo;
+  return pestanaMapa === PESTANA_TODOS || mapaDeCreepGM(sc) === pestanaMapa;
 }
-function grupoParaNuevo(){ return grupoActivo && grupoActivo !== '__sin' ? grupoActivo : ''; }
-function fijarGrupoActivo(g){
-  grupoActivo = g;
-  try{ localStorage.setItem('gm-grupo-activo-' + FB_CAMPANA, g); }catch(e){}
+function mapaParaNuevo(){ return pestanaMapa === PESTANA_TODOS ? CreepsMapas.RESERVA : pestanaMapa; }
+function fijarPestanaMapa(id){
+  pestanaMapa = id;
+  try{ localStorage.setItem('gm-pestana-mapa-' + FB_CAMPANA, id); }catch(e){}
   renderAll();
 }
-function renderGruposBarra(){
-  const caja = $('#grupos-barra');
+function renderMapasBarra(){
+  const caja = $('#mapas-barra');
   if(!caja) return;
-  const grupos = nombresDeGrupos();
-  const cuenta = g => creepsReales().filter(sc => g === '' ? true : g === '__sin' ? !sc.grupo : sc.grupo === g).length;
-  const sinGrupo = cuenta('__sin');
-  const tab = (id, texto, n) => `<button type="button" class="btn${grupoActivo === id ? ' primary' : ''}" data-grupo-tab="${esc(id)}" style="padding:4px 10px;font-size:12.5px">${esc(texto)} <span class="hint">${n}</span></button>`;
-  const real = grupoActivo && grupoActivo !== '__sin' && grupos.includes(grupoActivo);
+  const mapas = mapasOrdenadosGM();
+  if(mapasGMListos && pestanaMapa !== PESTANA_TODOS && pestanaMapa !== CreepsMapas.RESERVA && !mapas.some(m => m.id === pestanaMapa)) pestanaMapa = PESTANA_TODOS;   // ese mapa se borró
+  const reales = creepsReales();
+  const cuenta = id => reales.filter(sc => id === PESTANA_TODOS || mapaDeCreepGM(sc) === id).length;
+  const tab = (id, texto, titulo) => `<button type="button" class="btn${pestanaMapa === id ? ' primary' : ''}" data-mapa-tab="${esc(id)}" style="padding:4px 10px;font-size:12.5px"${titulo ? ` title="${esc(titulo)}"` : ''}>${esc(texto)} <span class="hint">${cuenta(id)}</span></button>`;
+  const enUnMapa = pestanaMapa !== PESTANA_TODOS && pestanaMapa !== CreepsMapas.RESERVA;
   caja.innerHTML = `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 10px">
-      ${tab('', 'Todos', cuenta(''))}${grupos.map(g => tab(g, g, cuenta(g))).join('')}${grupos.length ? tab('__sin', 'Sin grupo', sinGrupo) : ''}
-      <button type="button" class="btn ghost" data-grupo-nuevo="1" style="padding:4px 10px;font-size:12.5px" title="Crear un grupo (un escenario de combate)">＋ Grupo</button>
-      ${real ? `<span style="margin-left:auto;display:flex;gap:6px;align-items:center">
-        <label class="hint" style="display:flex;gap:4px;align-items:center" title="Mapa vinculado a este grupo: Crear tokens y Traer tokens (en el mapa) lo usan">🗺 <select data-grupo-mapa="1" style="padding:3px 6px;font-size:12.5px"><option value="">sin mapa</option>${[...mapasNombres.keys()].map(id => `<option value="${esc(id)}"${TokensAuto.mapaDeGrupo(gruposMapas, grupoActivo) === id ? ' selected' : ''}>${esc(nombreDeMapaGM(id))}</option>`).join('')}</select></label>
-        <button type="button" class="btn primary" data-grupo-tokens="1" title="Crea un token por cada creep de este grupo, en fila, en el centro del mapa que estás viendo (ocultos a los jugadores)">🎯 Crear tokens (${cuenta(grupoActivo)})</button>
-        <button type="button" class="btn ghost" data-grupo-renombrar="1" title="Renombrar el grupo">✎</button>
-        <button type="button" class="btn ghost" data-grupo-borrar="1" title="Quitar el grupo (los creeps quedan sin grupo)">🗑</button></span>` : ''}
+      ${tab(PESTANA_TODOS, 'Todos')}${mapas.map(m => tab(m.id, '🗺 ' + m.nombre)).join('')}${tab(CreepsMapas.RESERVA, '🎒 Reserva', 'Los creeps que todavía no están en ningún mapa')}
+      <button type="button" class="btn ghost" data-mapa-nuevo="1" style="padding:4px 10px;font-size:12.5px" title="Crear un mapa nuevo (un escenario de combate); aparece también en 🗺 Mapas del mapa">＋ Mapa</button>
+      ${enUnMapa ? `<span style="margin-left:auto;display:flex;gap:6px;align-items:center">
+        <button type="button" class="btn primary" data-mapa-tokens="1" title="Pone en «${esc(nombreDeMapaGM(pestanaMapa))}» un token oculto por cada creep de este mapa que todavía no tenga, en fila, en el centro de la vista">🎯 Poner sus tokens (${cuenta(pestanaMapa)})</button></span>` : ''}
     </div>`;
 }
-/* Grupo ↔ mapa: cada grupo puede tener un mapa vinculado (el mismo dato se edita desde el panel de Mapas del mapa). Si lo tiene,
-   "Crear tokens" los pone en ese mapa; si no, en el que el GM está viendo. */
-let gruposMapas = [];
-const mapasNombres = new Map();
-function nombreDeMapaGM(id){ return mapasNombres.get(id) || (id === '_principal' ? 'Mapa 1' : id); }
-function gruposMapasEscuchar(){
-  TokensAuto.enlacesEscuchar(l => { gruposMapas = l; renderGruposBarra(); });
+function mapasGMEscuchar(){
   fbDb.collection(fbRutaCampana('mapas')).onSnapshot(snap => {
-    mapasNombres.clear();
-    snap.docs.forEach(d => mapasNombres.set(d.id, String(d.data().nombre || 'Mapa')));
-    if(!mapasNombres.has('_principal')) mapasNombres.set('_principal', 'Mapa 1');
-    renderGruposBarra();
+    mapasGM.clear();
+    snap.docs.forEach(d => mapasGM.set(d.id, {nombre: String(d.data().nombre || 'Mapa').slice(0, 40), creadoMs: d.data().creado && d.data().creado.toMillis ? d.data().creado.toMillis() : 0}));
+    mapasGMListos = true;
+    renderAll();
   }, err => console.error('Error escuchando la lista de mapas:', err));
 }
-async function crearTokensDelGrupo(){
+async function crearTokensDelMapa(){
   if(!fbDb || !fbMiembro || !fbMiembro.gm){ toast('Sin conexión con la partida como GM'); return; }
-  const lista = S.creeps.filter(sc => sc.grupo === grupoActivo);
-  if(!lista.length){ toast('Ese grupo no tiene creeps'); return; }
+  const mapaId = pestanaMapa, lista = creepsReales().filter(sc => mapaDeCreepGM(sc) === mapaId);
+  if(!lista.length){ toast('Ese mapa no tiene creeps'); return; }
   try{
-    const mapaVinculado = TokensAuto.mapaDeGrupo(gruposMapas, grupoActivo);
-    const r = await TokensAuto.crear(lista.map(sc => ({nombre: nombreLimpioCreep(sc), color: sc.color, tipo: 'creep', fichaId: sc.id, oculto: true})), mapaVinculado ? {mapaId: mapaVinculado} : undefined);
-    toast(r.creados ? `🎯 ${r.creados} token(s) creados en el mapa que estás viendo, ocultos a los jugadores${r.salteados ? ` · ${r.salteados} ya estaban` : ''}` : 'Todos los creeps de ese grupo ya tienen token en ese mapa');
+    const r = await TokensAuto.crear(lista.map(sc => ({nombre: nombreLimpioCreep(sc), color: sc.color, tipo: 'creep', fichaId: sc.id, oculto: true})), {mapaId});
+    toast(r.creados ? `🎯 ${r.creados} token(s) en «${nombreDeMapaGM(mapaId)}», ocultos a los jugadores${r.salteados ? ` · ${r.salteados} ya estaban` : ''}` : `Todos los creeps de «${nombreDeMapaGM(mapaId)}» ya tienen su token`);
   }catch(err){
     console.error('No se pudieron crear los tokens:', err);
     toast('No se pudieron crear los tokens — mirá la consola');
   }
 }
-document.addEventListener('click', e => {
+async function pedirMapaNuevo(){
+  const n = (prompt('Nombre del mapa nuevo (por ejemplo, el escenario de combate):') || '').trim().slice(0, 40);
+  if(!n) return null;
+  try{ return await CreepsMapas.crearMapa(n); }
+  catch(err){ console.error('No se pudo crear el mapa:', err); toast('No se pudo crear el mapa'); return null; }
+}
+// Mudar un creep a otro mapa (o a la Reserva), con su token: si tenía uno, aparece oculto en el mapa nuevo y se va del viejo.
+async function moverCreepAMapa(sc, destino){
+  if(mapaDeCreepGM(sc) === destino) return;
+  sc.mapa = destino;
+  renderAll();
+  if(!fbDb || !fbMiembro || !fbMiembro.gm){ toast(`🗺 ${nombreLimpioCreep(sc)} → ${nombreDeMapaGM(destino)}`); return; }
+  try{
+    const r = await CreepsMapas.mudarTokens({id: sc.id, nombre: nombreLimpioCreep(sc), color: sc.color}, destino);
+    toast(`🗺 ${nombreLimpioCreep(sc)} → ${nombreDeMapaGM(destino)}${r.creado ? ' (con su token, oculto)' : r.borrados ? ' (su token salió del mapa)' : ''}`);
+  }catch(err){
+    console.error('No se pudo mudar el token del creep:', err);
+    toast('Se movió de mapa, pero no se pudo mudar su token — movelo a mano en el mapa');
+  }
+}
+document.addEventListener('click', async e => {
   const b = e.target.closest('button');
   if(!b) return;
-  if(b.dataset.grupoTab !== undefined){ fijarGrupoActivo(b.dataset.grupoTab); return; }
-  if(b.dataset.grupoNuevo){
-    const n = (prompt('Nombre del grupo (por ejemplo, el escenario de combate):') || '').trim().slice(0, 40);
-    if(!n) return;
-    if(!nombresDeGrupos().includes(n)) guardarGruposExtra([...gruposExtra(), n]);
-    fijarGrupoActivo(n);
-    return;
-  }
-  if(b.dataset.grupoTokens){ crearTokensDelGrupo(); return; }
-  if(b.dataset.grupoRenombrar){
-    const n = (prompt('Nuevo nombre del grupo:', grupoActivo) || '').trim().slice(0, 40);
-    if(!n || n === grupoActivo) return;
-    S.creeps.forEach(sc => { if(sc.grupo === grupoActivo) sc.grupo = n; });
-    const mapaDelGrupo = TokensAuto.mapaDeGrupo(gruposMapas, grupoActivo);
-    if(mapaDelGrupo) TokensAuto.enlacesGuardar(TokensAuto.vincular(TokensAuto.vincular(gruposMapas, grupoActivo, ''), n, mapaDelGrupo)).catch(err => console.error(err));
-    guardarGruposExtra(gruposExtra().filter(x => x !== grupoActivo).concat(n));
-    fijarGrupoActivo(n);
-    return;
-  }
-  if(b.dataset.grupoBorrar){
-    if(!confirm(`¿Quitar el grupo "${grupoActivo}"? Los creeps no se borran: quedan sin grupo.`)) return;
-    S.creeps.forEach(sc => { if(sc.grupo === grupoActivo) sc.grupo = ''; });
-    if(TokensAuto.mapaDeGrupo(gruposMapas, grupoActivo)) TokensAuto.enlacesGuardar(TokensAuto.vincular(gruposMapas, grupoActivo, '')).catch(err => console.error(err));
-    guardarGruposExtra(gruposExtra().filter(x => x !== grupoActivo));
-    fijarGrupoActivo('');
-  }
+  if(b.dataset.mapaTab !== undefined){ fijarPestanaMapa(b.dataset.mapaTab); return; }
+  if(b.dataset.mapaNuevo){ const id = await pedirMapaNuevo(); if(id) fijarPestanaMapa(id); return; }
+  if(b.dataset.mapaTokens){ crearTokensDelMapa(); return; }
 });
 document.addEventListener('change', async e => {
   const t = e.target;
-  if(t.dataset.grupoMapa !== undefined){
-    try{
-      await TokensAuto.enlacesGuardar(TokensAuto.vincular(gruposMapas, grupoActivo, t.value));
-      toast(t.value ? `🗺 ${grupoActivo} vinculado a ${nombreDeMapaGM(t.value)}` : `🗺 ${grupoActivo} ya no tiene mapa vinculado`);
-    }catch(err){ console.error(err); toast('No se pudo vincular el mapa'); }
-    return;
-  }
-  if(t.dataset.grupoCreep === undefined) return;
-  const sc = S.creeps.find(s => s.id === t.dataset.grupoCreep);
+  if(t.dataset.mapaCreep === undefined) return;
+  const sc = S.creeps.find(s => s.id === t.dataset.mapaCreep);
   if(!sc) return;
-  let g = t.value;
-  if(g === '__nuevo'){
-    g = (prompt('Nombre del grupo nuevo:') || '').trim().slice(0, 40);
-    if(!g){ renderAll(); return; }
-    if(!nombresDeGrupos().includes(g)) guardarGruposExtra([...gruposExtra(), g]);
+  let destino = t.value;
+  if(destino === '__nuevo'){
+    destino = await pedirMapaNuevo();
+    if(destino === null){ renderAll(); return; }
+    if(!mapasGM.has(destino)) mapasGM.set(destino, {nombre: 'Mapa nuevo', creadoMs: Date.now()});   // hasta que llegue de Firebase
   }
-  sc.grupo = g;
-  renderAll();
+  moverCreepAMapa(sc, destino);
 });
-/* Arrastrar un creep (⠿) a la pestaña de un grupo (o a "Sin grupo") lo mueve. "Todos" no es un contenedor: no recibe. */
-let creepArrastrado = '';
-function grupoDestinoDeTab(tab){
-  if(!tab || tab.dataset.grupoTab === undefined || tab.dataset.grupoTab === '') return null;
-  return tab.dataset.grupoTab === '__sin' ? '' : tab.dataset.grupoTab;
+// «🗺 Mover a…»: el mapa del creep, para mudarlo. compacto: el de la tarjeta; si no, el de la ficha completa.
+function mapaSelectHtml(sc, compacto){
+  const actual = mapaDeCreepGM(sc);
+  const ops = [...mapasOrdenadosGM(), {id: CreepsMapas.RESERVA, nombre: '🎒 Reserva'}]
+    .map(m => `<option value="${esc(m.id)}"${m.id === actual ? ' selected' : ''}>${esc(m.id === CreepsMapas.RESERVA ? m.nombre : '🗺 ' + m.nombre)}</option>`).join('')
+    + '<option value="__nuevo">＋ mapa nuevo…</option>';
+  return compacto
+    ? `<select class="mapa-creep" data-mapa-creep="${sc.id}" title="En qué mapa está: elegí otro para mudarlo (su token se muda con él)">${ops}</select>`
+    : `<div class="mini-f" style="margin-bottom:8px"><label>Mapa (elegí otro para mudarlo, con su token)</label><select data-mapa-creep="${sc.id}">${ops}</select></div>`;
 }
-document.addEventListener('dragstart', e => {
-  const grip = e.target.closest && e.target.closest('[data-arrastrar-creep]');
-  if(!grip) return;
-  creepArrastrado = grip.dataset.arrastrarCreep;
-  e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('text/plain', creepArrastrado);
-  const card = grip.closest('.card');
-  if(card) e.dataTransfer.setDragImage(card, 20, 20);
-  document.body.classList.add('arrastrando-creep');
-});
-document.addEventListener('dragend', () => {
-  creepArrastrado = '';
-  document.body.classList.remove('arrastrando-creep');
-  document.querySelectorAll('.arrastrando-encima').forEach(x => x.classList.remove('arrastrando-encima'));
-});
-document.addEventListener('dragover', e => {
-  if(!creepArrastrado) return;
-  const tab = e.target.closest && e.target.closest('#grupos-barra [data-grupo-tab]');
-  if(grupoDestinoDeTab(tab) === null) return;
-  e.preventDefault();
-  e.dataTransfer.dropEffect = 'move';
-  tab.classList.add('arrastrando-encima');
-});
-document.addEventListener('dragleave', e => {
-  const tab = e.target.closest && e.target.closest('#grupos-barra [data-grupo-tab]');
-  if(tab && !tab.contains(e.relatedTarget)) tab.classList.remove('arrastrando-encima');
-});
-document.addEventListener('drop', e => {
-  if(!creepArrastrado) return;
-  const tab = e.target.closest && e.target.closest('#grupos-barra [data-grupo-tab]');
-  const destino = grupoDestinoDeTab(tab);
-  if(destino === null) return;
-  e.preventDefault();
-  const sc = S.creeps.find(s => s.id === creepArrastrado);
-  creepArrastrado = '';
-  document.body.classList.remove('arrastrando-creep');
-  if(!sc || (sc.grupo || '') === destino){ renderAll(); return; }
-  sc.grupo = destino;
-  renderAll();
-  toast(`📦 ${nombreLimpioCreep(sc)} → ${destino || 'Sin grupo'}`);
-});
-function grupoSelectHtml(sc){
-  const gs = nombresDeGrupos();
-  return `<div class="mini-f" style="margin-bottom:8px"><label>Grupo (escenario)</label>
-    <select data-grupo-creep="${sc.id}"><option value="">(sin grupo)</option>${gs.map(g => `<option value="${esc(g)}"${sc.grupo === g ? ' selected' : ''}>${esc(g)}</option>`).join('')}<option value="__nuevo">＋ nuevo grupo…</option></select></div>`;
+// Los grupos viejos pasan a ser mapas, una vez (comun/creeps-mapas.js, migrar): al entrar el GM, con los creeps ya leídos.
+async function gmMigrarGrupos(){
+  let vacios = [];
+  try{ vacios = JSON.parse(localStorage.getItem('gm-grupos-extra-' + FB_CAMPANA) || '[]'); }catch(e){}
+  try{
+    const r = await CreepsMapas.migrar(creepsReales(), {vacios: Array.isArray(vacios) ? vacios : []});
+    try{ localStorage.removeItem('gm-grupos-extra-' + FB_CAMPANA); localStorage.removeItem('gm-grupo-activo-' + FB_CAMPANA); }catch(e){}
+    renderAll();
+    if(r.cambiados || r.creados) toast(`🗺 Los grupos pasaron a ser mapas: ${r.cambiados} creep(s) ubicados${r.creados ? ` · ${r.creados} mapa(s) nuevo(s)` : ''}`);
+  }catch(err){ console.error('No se pudieron pasar los grupos a mapas:', err); }
 }
 
 /* =========================================================

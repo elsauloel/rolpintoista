@@ -434,7 +434,7 @@ const CreepCalculo = (() => {
     migrarCreepEspecial(sc);
     migrarHabPdg(sc);
     // Recompensas (2026-09-20): los creeps viejos no las traen.
-    if(typeof sc.grupo !== 'string') sc.grupo = '';
+    if(typeof sc.mapa !== 'string') sc.mapa = '';   // en qué mapa está (comun/creeps-mapas.js; '' = la Reserva)
     if(sc.tipoCriatura === undefined) sc.tipoCriatura = '';
     if(sc.tipoCriaturaOtro === undefined) sc.tipoCriaturaOtro = '';
     sc.jefe = sc.jefe === true;

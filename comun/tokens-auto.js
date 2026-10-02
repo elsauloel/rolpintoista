@@ -1,7 +1,8 @@
 /* =========================================================
    TOKENS AUTOMÁTICOS
-   Crea de una vez los tokens de un grupo de creeps o de los personajes de los jugadores, en el mapa que el GM
-   está mirando. Lo usan GM Tools ("🎯 Crear tokens") y el mapa ("📥 Importar tokens", "👥 Tokens de jugadores").
+   Crea de una vez los tokens de los creeps de un mapa o de los personajes de los jugadores, en el mapa que se le pida (o el que el GM
+   está mirando). Lo usan GM Tools ("🎯 Poner sus tokens") y el mapa (🎭 "Traer los creeps de este mapa", "Traer tokens de jugadores").
+   En qué mapa está cada creep: comun/creeps-mapas.js.
 
    - Los tokens salen en UNA FILA ORDENADA en el centro de lo que el GM está viendo (el mapa guarda ese centro en
      localStorage 'mapa-centro' cada vez que mueve la vista), mirando hacia abajo. Van en columnas de a dos para que
@@ -187,26 +188,5 @@ const TokensAuto = (() => {
     return n;
   }
 
-  /* ---------- Grupos de creeps ↔ mapas ----------
-     Cada grupo de creeps (GM Tools) puede vincularse a un mapa guardado, para "Traer tokens" de un golpe. Un grupo tiene a lo sumo un
-     mapa; un mapa puede tener varios grupos. Vive en campanas/<id>/gm/gruposMapas = {enlaces: [{grupo, mapaId}]} (solo el GM). */
-  const refEnlaces = () => fbDb.doc(fbRutaCampana('gm/gruposMapas'));
-  function enlacesEscuchar(alCambiar){
-    return refEnlaces().onSnapshot(snap => {
-      const d = snap.exists ? snap.data() : {};
-      alCambiar((Array.isArray(d.enlaces) ? d.enlaces : []).filter(e => e && e.grupo && e.mapaId));
-    }, err => console.error('Error escuchando los grupos vinculados a mapas:', err));
-  }
-  async function enlacesGuardar(lista){
-    await refEnlaces().set({
-      enlaces: lista.slice(0, 200).map(e => ({grupo: String(e.grupo).slice(0, 40), mapaId: String(e.mapaId).slice(0, 80)})),
-      actualizado: firebase.firestore.FieldValue.serverTimestamp(),
-    });
-  }
-  // Lista nueva con el grupo vinculado a ese mapa (o sin mapa si mapaId viene vacío).
-  const vincular = (lista, grupo, mapaId) => [...lista.filter(e => e.grupo !== grupo), ...(mapaId ? [{grupo, mapaId}] : [])];
-  const mapaDeGrupo = (lista, grupo) => { const e = lista.find(x => x.grupo === grupo); return e ? e.mapaId : ''; };
-  const gruposDeMapa = (lista, mapaId) => lista.filter(e => e.mapaId === mapaId).map(e => e.grupo);
-
-  return {crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, enlacesEscuchar, enlacesGuardar, vincular, mapaDeGrupo, gruposDeMapa};
+  return {crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles};
 })();

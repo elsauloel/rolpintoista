@@ -85,7 +85,7 @@ function creepPublico(sc, orden){
     nombre: String(sc.nombre || 'Creep').slice(0, 60),
     orden,
     color: String(sc.color || ''),
-    grupo: String(sc.grupo || '').slice(0, 40),   // el mapa lo usa para "Importar tokens" de un grupo
+    mapa: String(sc.mapa || '').slice(0, 80),   // en qué mapa está (comun/creeps-mapas.js): el mapa lo usa para "Traer los creeps de este mapa"
     resumen: {
       hpPct: hpMax > 0 ? Math.round(Math.max(0, Math.min(1, hp / hpMax)) * 100) : 0,
       muerto: hp <= 0,
@@ -315,6 +315,7 @@ async function gmProcesarSnapshot(snap){
     }catch(err){ console.error('No se pudo leer el turno:', err); }
     g.listo = true;
     gmEstadoAlDia();
+    if(!MODO_ACCIONES && fbMiembro && fbMiembro.gm) gmMigrarGrupos();   // los grupos viejos pasan a ser mapas (una vez)
     gmMantenimientoRevisar();
     const modoGM = new URLSearchParams(location.search).get('modo');
     if(modoGM === 'finalizar'){ abrirReporteFinalizar(); gmAvisarMapa('acciones-lista'); }
@@ -390,7 +391,7 @@ function gmAlEntrar(){
   cargarItemsSubidosGM();   // ítems que subió el grupo (catálogo compartido, paso 5)
   // Los "Mis presets" de estados, guardados en la partida (comun/presets-gm.js, B-7b): antes se perdían al recargar.
   if(gmVivo.activo) PresetsGM.escuchar(l => { S.estadosPersonalizados = l; });
-  if(gmVivo.activo){ gmEscuchar(); gmMantenimientoEscuchar(); try{ gruposMapasEscuchar(); }catch(err){ console.error('No se pudieron escuchar los grupos vinculados:', err); } combateEscuchar(); gbitEscuchar(); }
+  if(gmVivo.activo){ gmEscuchar(); gmMantenimientoEscuchar(); try{ mapasGMEscuchar(); }catch(err){ console.error('No se pudo escuchar la lista de mapas:', err); } combateEscuchar(); gbitEscuchar(); }
 }
 
 /* ---------- Mantenimiento del GM ----------

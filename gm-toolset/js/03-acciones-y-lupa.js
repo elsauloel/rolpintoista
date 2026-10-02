@@ -81,7 +81,7 @@ function cardHtml(sc){
     </div>
     <div class="cbody">
 
-      ${grupoSelectHtml(sc)}
+      ${mapaSelectHtml(sc)}
 
       <div class="vitalbar">
         <div class="vital-mini hp">
@@ -226,9 +226,8 @@ function cardCompactoHtml(sc){
   return `
   <div class="card card-compacto${num(sc.hp)<=0?' card-muerto':''}" style="--accent:${sc.color}" data-id="${sc.id}">
     <div class="chead">
-      <span class="grip-creep" draggable="true" data-arrastrar-creep="${sc.id}" title="Arrastrá hasta un grupo de arriba para mover este creep${sc.grupo ? ` (ahora está en «${esc(sc.grupo)}»)` : ' (ahora está sin grupo)'}">⠿</span>
       <button type="button" class="eyebtn" data-editarcreep="${sc.id}" title="Editar creep">${SVG_LAPIZ}</button>
-      <span class="name-compacto">${esc(sc.nombre)}</span>${grupoActivo === '' && sc.grupo ? `<span class="grupo-tag" title="Grupo de este creep">${esc(sc.grupo)}</span>` : ''}
+      <span class="name-compacto">${esc(sc.nombre)}</span>${mapaSelectHtml(sc, true)}
       <span class="lv-compacto">Lv ${fmt(num(sc.nivel))}</span>
       ${versionNuevaDeCreep(sc) ? `<button class="verbtn" data-versioncreep="${sc.id}" title="Alguien corrigió el creep de la biblioteca del que salió este: ver y decidir si actualizarlo">🔔</button>` : ''}
       <button class="verbtn" data-ver="${sc.id}">Ver</button>

@@ -52,6 +52,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="estados-presets.js"></script>
 <script src="estados-aplicar.js"></script>
 <script src="recibidos.js"></script>
+<script src="tokens-auto.js"></script>
+<script src="creeps-mapas.js"></script>
 <script src="modificadores-tirada.js"></script>
 <script src="plantillas.js"></script>
 <script src="catalogo.js"></script>
@@ -1005,9 +1007,9 @@ prueba('Invocar portal y una zona de habilidad se le avisan al mapa; sin mapa no
 });
 prueba('una ✨ con trampa se anuncia y le pide la casilla al mapa', async () => {
   const h = {id: 't', nombre: 'Lazo', modo: 'auto', detalle: 'atrapa', trampaColocar: {nombre: 'Lazo', dano: '2d6', tipo: 'flor', tamano: 0, cant: 1}};
-  const reg = [], viejo = window.TokensAuto;
-  window.TokensAuto = {colocarTrampas: async () => ({colocadas: 1})};
-  try{ await FichaAcciones.colocarTrampaDeHab(fichaBotonera({}), h, uiMapa(reg, true)); }finally{ window.TokensAuto = viejo; }
+  const reg = [], viejo = TokensAuto.colocarTrampas;
+  TokensAuto.colocarTrampas = async () => ({colocadas: 1});
+  try{ await FichaAcciones.colocarTrampaDeHab(fichaBotonera({}), h, uiMapa(reg, true)); }finally{ TokensAuto.colocarTrampas = viejo; }
   igual(reg, ['mesa Lazo', 'alMapa trampa-habilidad']);
 });
 prueba('una zona persistente no tira al lanzarla: manda al mapa el stat y su valor (la zona tira en cada exposición, P143)', () => {
@@ -1055,12 +1057,12 @@ prueba('tirar un talento: 1d(nivel × 2) + la Inteligencia sin invertir', () => 
 });
 prueba('una trampa consumible se coloca junto al token; sin personaje en la mesa no se gasta', async () => {
   const it = {nombre: 'Cepo', unidades: 2, imagen: 'x', trampaDatos: {dano: '2d6', tipo: 'flor', tamano: 0}};
-  const reg = [], viejo = window.TokensAuto;
-  window.TokensAuto = {colocarTrampas: async a => { reg.push(`${a.fichaId} ${a.trampa.nombre} ${a.trampa.cant} ${JSON.parse(a.item).unidades}`); return {colocadas: 1}; }};
-  // Las dos se arrancan antes del primer await: otra prueba async también cambia window.TokensAuto.
+  const reg = [], viejo = TokensAuto.colocarTrampas;
+  TokensAuto.colocarTrampas = async a => { reg.push(`${a.fichaId} ${a.trampa.nombre} ${a.trampa.cant} ${JSON.parse(a.item).unidades}`); return {colocadas: 1}; };
+  // Las dos se arrancan antes del primer await: otra prueba async también cambia TokensAuto.colocarTrampas.
   const ui = {toast: () => {}};
   const sin = FichaAcciones.colocarTrampaDeItem('', it, ui), con = FichaAcciones.colocarTrampaDeItem('F1', it, ui);
-  window.TokensAuto = viejo;
+  TokensAuto.colocarTrampas = viejo;
   igual([await sin, await con, reg], [false, true, ['F1 Cepo 1 1']]);
 });
 prueba('el Ankh a mano revive con el 25 % del HP máximo y gasta una unidad', () => {
@@ -1350,6 +1352,57 @@ prueba('una invocación sin No2 para atacar: sin forzar no cobra; forzado gasta 
   igual([falta, !!no.error, antes, inv.nitros, si.forzado, si.aviso.includes('(costaba 4)'), preguntas.length, preguntas[0].includes('¿Atacar igual?'), trasNo, inv2.nitros, reg],
     [true, true, 2, 0, {costo: 4, tenia: 2}, true, 2, true, [1, 0], 0, ['Oso · Atacar (PdG)']]);
 });
+/* ---------- Creeps por mapa (comun/creeps-mapas.js, 2026-10-02: los grupos pasaron a ser mapas) ---------- */
+// Una base de datos de mentira, lo justo para CreepsMapas: colecciones y documentos en memoria.
+function fbFalso(datos){
+  const col = ruta => ({
+    get: async () => ({docs: Object.keys(datos).filter(k => k.startsWith(ruta + '/') && !k.slice(ruta.length + 1).includes('/'))
+      .map(k => ({id: k.slice(ruta.length + 1), ref: {ruta: k}, data: () => datos[k]}))}),
+    where: (campo, op, v) => ({get: async () => ({docs: (await col(ruta).get()).docs.filter(d => d.data()[campo] === v)})}),
+    add: async d => { const id = 'n' + Object.keys(datos).length; datos[ruta + '/' + id] = d; return {id}; },
+    doc: () => { const id = 'n' + Object.keys(datos).length + Math.random().toString(36).slice(2, 5); return {ruta: ruta + '/' + id}; },
+  });
+  return {
+    collection: col,
+    doc: ruta => ({get: async () => ({exists: ruta in datos, data: () => datos[ruta]}), delete: async () => { delete datos[ruta]; }}),
+    batch: () => { const ops = []; return {delete: r => ops.push(() => delete datos[r.ruta]), set: (r, d) => ops.push(() => { datos[r.ruta] = d; }), commit: async () => ops.forEach(f => f())}; },
+  };
+}
+let fbFalsoCola = Promise.resolve();   // de a una: las pruebas async corren a la vez y comparten window.fbDb
+function conFbFalso(datos, fn){ const p = fbFalsoCola.then(() => conFbFalsoYa(datos, fn)); fbFalsoCola = p.catch(() => {}); return p; }
+async function conFbFalsoYa(datos, fn){
+  const antes = {fbDb: window.fbDb, fbRutaCampana: window.fbRutaCampana, firebase: window.firebase, fbUsuario: window.fbUsuario};
+  window.fbDb = fbFalso(datos); window.fbRutaCampana = p => p; window.fbUsuario = {uid: 'gm'};
+  window.firebase = {firestore: {FieldValue: {serverTimestamp: () => 'ahora'}}};
+  try{ return await fn(); }finally{ Object.assign(window, antes); }
+}
+prueba('creeps por mapa: el orden de las pestañas y el mapa de un creep (si su mapa ya no existe, la Reserva)', () => {
+  const mapas = new Map([['b', {nombre: 'Bosque', creadoMs: 20}], ['_principal', {nombre: 'Cueva', creadoMs: 99}], ['a', {nombre: 'Aldea', creadoMs: 10}]]);
+  const ids = new Set(['_principal', 'a', 'b']);
+  igual([CreepsMapas.ordenar(mapas).map(m => m.nombre), CreepsMapas.mapaDe({mapa: 'b'}, ids), CreepsMapas.mapaDe({mapa: 'zz'}, ids), CreepsMapas.mapaDe({}, ids)],
+    [['Cueva', 'Aldea', 'Bosque'], 'b', '', '']);
+});
+prueba('creeps por mapa: los grupos viejos pasan a ser mapas (vinculado → su mapa; con el nombre de un mapa → ese; si no, uno nuevo; los vacíos también)', () => conFbFalso({
+    'mapas/_principal': {nombre: 'Mapa 1'}, 'mapas/m2': {nombre: 'Mina'}, 'gm/gruposMapas': {enlaces: [{grupo: 'Goblins', mapaId: 'm2'}]},
+  }, async () => {
+    const creeps = [{id: 'a', grupo: 'Goblins'}, {id: 'b', grupo: 'mina'}, {id: 'c', grupo: 'Pantano'}, {id: 'd', grupo: 'Pantano'}, {id: 'e'}, {id: 'f', grupo: 'X', mapa: 'm2'}];
+    const r = await CreepsMapas.migrar(creeps, {vacios: ['Torre']});
+    const mapas = (await fbDb.collection('mapas').get()).docs.map(d => d.data().nombre).sort();
+    const otra = await CreepsMapas.migrar(creeps, {});
+    igual([r, creeps.map(c => c.mapa || ''), creeps.some(c => 'grupo' in c), mapas, (await fbDb.doc('gm/gruposMapas').get()).exists, otra],
+      [{cambiados: 4, creados: 2}, ['m2', 'm2', creeps[2].mapa, creeps[2].mapa, '', 'm2'], false, ['Mapa 1', 'Mina', 'Pantano', 'Torre'], false, {cambiados: 0, creados: 0}]);
+  }));
+prueba('creeps por mapa: mudar un creep se lleva su token (sale del mapa viejo y aparece oculto en el nuevo); a la Reserva solo lo saca', () => conFbFalso({
+    'mapas/_principal': {nombre: 'Mapa 1'}, 'mapas/m2': {nombre: 'Mina'},
+    'tokens/t1': {tipo: 'creep', fichaId: 'a', col: 3, fila: 4}, 'tokens/t2': {tipo: 'creep', fichaId: 'z'},
+  }, async () => {
+    const r1 = await CreepsMapas.mudarTokens({id: 'a', nombre: 'Goblin', color: '#112233'}, 'm2', {centro: {col: 0, fila: 0}});
+    const enMina = (await fbDb.collection('mapas/m2/tokens').get()).docs.map(d => d.data());
+    const r2 = await CreepsMapas.mudarTokens({id: 'z', nombre: 'Orco'}, '');
+    const r3 = await CreepsMapas.mudarTokens({id: 'q', nombre: 'Sin token'}, 'm2');
+    igual([r1, enMina.map(t => [t.fichaId, t.oculto, t.tipo]), (await fbDb.collection('tokens').get()).docs.length, r2, r3],
+      [{borrados: 1, creado: true}, [['a', true, 'creep']], 0, {borrados: 1, creado: false}, {borrados: 0, creado: false}]);
+  }));
 prueba('estados recibidos (B-8): los del personaje y los de sus invocaciones; cada uno a quien corresponde', () => {
   const doc = (fichaId, spec, origen) => ({data: () => ({fichaId, spec: JSON.stringify(spec), origen}), ref: null});
   const docs = [doc('F', {nombre: 'Veneno', stacks: 2}, 'Goblin · Dardo'), doc('F~i', {nombre: 'Stun', turnos: 1}, 'Mago · Rayo'), doc('G', {nombre: 'Sangrado'}), doc('Fx', {nombre: 'Stun'})];

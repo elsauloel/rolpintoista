@@ -175,24 +175,14 @@ let arrastreTrazo = null;     // {id, dx, dy, inicioX, inicioY, movio}: arrastra
 let rotandoTrazo = null;      // {id, cx, cy} (cx,cy: centro en pantalla, fijo durante el arrastre)
 let arrastreElemento = null;  // {id, inicioX, inicioY, movio}: arrastra un elemento de terreno/formas
 let rotandoElemento = null;   // {id}
-// Grupos de creeps vinculados a un mapa (para "Traer tokens de creeps"): chips con ✕ y un selector para sumar otro.
-function gruposDeMapaHtml(mapaId){
-  try{ return gruposDeMapaHtmlSeguro(mapaId); }catch(err){ console.error('No se pudieron listar los grupos del mapa:', err); return ''; }   // que esto nunca rompa el panel de Mapas
-}
-function gruposDeMapaHtmlSeguro(mapaId){
-  const propios = TokensAuto.gruposDeMapa(enlacesGM, mapaId);
-  const existentes = new Set([...gruposDeCreepsPub().keys(), ...enlacesGM.map(e => e.grupo)]);
-  const libres = [...existentes].filter(g => TokensAuto.mapaDeGrupo(enlacesGM, g) !== mapaId).sort((a, b) => a.localeCompare(b, 'es'));
-  return `<div class="fila" style="margin-top:4px;flex-wrap:wrap;gap:4px;align-items:center" title="Los grupos de creeps vinculados a este mapa se traen juntos con 🎭 → Traer tokens de creeps">
-      <span class="ayuda" style="margin:0">Grupos:</span>
-      ${propios.length ? `<button type="button" class="btn" data-mapa-traer="${esc(mapaId)}" style="padding:2px 8px;font-size:11.5px" title="Crea (ocultos) los tokens de los creeps de estos grupos en este mapa; los que ya tienen token se saltean">👹 Traer tokens</button>` : ''}
-      ${propios.map(g => `<span class="btn" style="padding:2px 6px;font-size:11.5px;display:inline-flex;gap:4px;align-items:center">${esc(g)} <a href="#" data-mapa-grupo-quitar="${esc(g)}" title="Desvincular" style="text-decoration:none;color:inherit">✕</a></span>`).join('') || '<span class="ayuda" style="margin:0">ninguno</span>'}
-      ${libres.length ? `<select data-mapa-grupo-add="${esc(mapaId)}" style="max-width:130px;font-size:11.5px"><option value="">＋ vincular grupo…</option>${libres.map(g => `<option value="${esc(g)}">${esc(g)}${TokensAuto.mapaDeGrupo(enlacesGM, g) ? ' (hoy: ' + esc(nombreMapa(TokensAuto.mapaDeGrupo(enlacesGM, g))) + ')' : ''}</option>`).join('')}</select>` : ''}
+// Los creeps de un mapa (comun/creeps-mapas.js: cada creep está en UN mapa, lo que antes eran los grupos de GM Tools): cuántos tiene y
+// el botón para traer sus tokens. En GM Tools cada creep se muda de mapa con «🗺 Mover a…».
+function creepsDeMapaHtml(mapaId){
+  const n = creepsDelMapa(mapaId).length;
+  return `<div class="fila" style="margin-top:4px;gap:6px;align-items:center" title="Los creeps se ubican en un mapa desde GM Tools («🗺 Mover a…»), o vinculando un token a un creep">
+      <span class="ayuda" style="margin:0">👹 ${n ? `${n} creep${n === 1 ? '' : 's'}` : 'sin creeps'}</span>
+      ${n ? `<button type="button" class="btn" data-mapa-traer="${esc(mapaId)}" style="padding:2px 8px;font-size:11.5px" title="Crea (ocultos) los tokens de los creeps de este mapa que todavía no tienen">👹 Traer sus tokens</button>` : ''}
     </div>`;
-}
-async function vincularGrupoAMapa(grupo, mapaId){
-  try{ await TokensAuto.enlacesGuardar(TokensAuto.vincular(enlacesGM, grupo, mapaId)); }
-  catch(err){ console.error('No se pudo vincular el grupo:', err); toast('No se pudo vincular el grupo'); }
 }       // GM: panel de mapas guardados abierto
 
 /* ---------- Lápiz (caja de herramientas) ----------

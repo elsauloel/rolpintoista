@@ -119,10 +119,7 @@ async function colocarTrampaDeHab(sc, h){
 async function preguntarBorrarTokensDeCreep(creepId){
   if(!fbDb || !fbUsuario) return;
   try{
-    const mapas = await fbDb.collection(fbRutaCampana('mapas')).get();
-    const colecciones = [fbDb.collection(fbRutaCampana('tokens')), ...mapas.docs.map(m => fbDb.collection(fbRutaCampana(`mapas/${m.id}/tokens`)))];
-    const snaps = await Promise.all(colecciones.map(c => c.where('fichaId', '==', creepId).get()));
-    const tokens = snaps.flatMap(sn => sn.docs).filter(d => d.data().tipo === 'creep');
+    const tokens = await CreepsMapas.tokensDeCreep(creepId);   // en todos los mapas (comun/creeps-mapas.js)
     if(!tokens.length) return;
     if(!confirm(`Ese creep tiene ${tokens.length} token${tokens.length === 1 ? '' : 's'} en el mapa (contando todos los mapas guardados).\n\n¿Borrar también ${tokens.length === 1 ? 'ese token' : 'esos tokens'}?\nSi elegís "Cancelar", quedan en el mapa como tokens sin vincular.`)) return;
     const lote = fbDb.batch();

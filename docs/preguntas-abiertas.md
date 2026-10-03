@@ -686,3 +686,10 @@ resuelven a mano, como el resto de los avisos).
 - 🔲 **P150. El daño de un ataque sin arma** (2026-10-03, apareció probando un duelo: juan atacó sin arma y el duelo quedó «Tirando…» porque no
   había daño definido). **Provisorio:** 1 dado del Tipo sin arma (P22: 4) + Dmg = `1d4 + Dmg` (`FichaCombate.danoSinArmaTxt`), en el duelo y en el
   botón Daño de la Botonera. ¿Así, o los puños pegan distinto (sin Dmg, mitad, un efecto propio)? *(código)*
+
+- 🔲 **P151. Qué ve de un duelo ajeno quien lo minimizó** (2026-10-03, probado en vivo: GM con el control de juan contra un creep, mirado
+  desde la cuenta de un jugador). Hoy el cuadro se le abre solo a todos con el paso a paso; minimizado queda el chip «⚔ Ver duelo: A → B»
+  **sin cambiar de texto** hasta que el duelo termina (ahí desaparece), y los pasos solo llegan como tiradas sueltas en la Mesa (PdG,
+  Evasión, Daño) más el resumen al final. **Nada va a la Crónica ni al Aviso.** Propuesta: (a) el chip dice en qué va («PdG 6 contra
+  Evasión 4 → pegó», «Daño 4 → 0»); (b) cada momento clave (pegó/falló, crítico, daño aplicado, fin) como tarjeta de la Crónica para
+  quien lo tiene minimizado; (c) las dos. *(código)*

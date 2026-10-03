@@ -511,3 +511,26 @@ y algo de humor. Aplicado a las 18 T4 Comunes (las copias de los humanos en `cre
 18. Lanza de leva — *Tipo 4 · 2 manos · 3 dados · Alcance +1 · Lisiado 25 %* — «La lanza de todo recluta: pesada, larga y repartida sin preguntar si sabías usarla.»
 
 **✅ Aplicado (2026-10-03, OK del dueño):** las 18 de Buena calidad (v3, con los tres textos) reemplazaron a las 14 T4 de Buena calidad del catálogo. La Daga de la viuda verde y la Daga del sacrificio dejaron de ser copias (son armas propias; las siguen llevando el Envenenador, el Saboteador y el Sacerdote oscuro). La **Daga de guardia** y el **Pico de guerra** pasaron a **Raro** (con ⚠️) para repensarlos en ese tier.
+
+### T4 Raro — lo que hay hoy (tabla comparativa y análisis, 2026-10-03)
+Calculadora v0: PC de Raro = 11 a 17 (menos = Buena; 17 o más = Excepcional). Precio de Raro: 150 a 350. Cuota ~12; hay 13 (11 + las 2 que bajaron… subieron de Buena).
+
+| # | Arma | Manos | Dados | Fijo | Bonos | Al golpear | Precio | PC → tier calc. | Precio calc. | Observación |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | ⚠️ Daga de guardia | 1 | 1 | +1 | — | Ignora 1 de Res. crítico | 60 | 9,6 · Buena | 130 | 🔧 Ignora no anda en armas; regalada |
+| 2 | Rompemalla | 1 | 2 | — | — | Rompe armadura 50 % | 75 | 7,6 · Buena | 80 | el ✨ «rompemalla» del T4; floja y barata |
+| 3 | ⚠️ Pico de guerra | 1 | 2 | — | Alcance +1 | Rompe armadura 50 % | 90 | 10,6 · Buena | 150 | 2.º Rompe armadura |
+| 4 | Puñal aserrado | 1 | 2 | — | — | Rompe armadura (siempre) | 100 | 10,6 · Buena | 150 | 3.er Rompe armadura; el nombre pide Sangrado |
+| 5 | Aguijón de esgrima | 1 | 2 | — | PdG +1, Parry +2 | — | 110 | 10,6 · Buena | 150 | el ✨ Parry (main gauche); barato |
+| 6 | Lanza militar | 1 | 2 | +2 | Alcance +1 | — | 110 | 11,6 · Raro | 170 | barata |
+| 7 | Lanza del guardián del paso | 2 | 2 | — | Alcance +1, PdG oport. +3 | Lisiado 33 % | 150 | 11,0 · Raro | 150 | casi la Lanza del portón (Buena) + Lisiado |
+| 8 | Pica de retaguardia | 2 | 3 | — | Alcance +2, PdG oport. +2 | — | 200 | 12,5 · Raro | 200 | — |
+| 9 | ⚠️ Puñal envenenado | 1 | 2 | +1 | Crít. potente +3 | Veneno siempre | 250 | 12,7 · Raro | 210 | el Detalle dice 3 stacks y el dato no tiene stacks (entra con 4) |
+| 10 | ⚠️ Puñal del sereno | 1 | 1 | — | PdG oport. +3, Crít. potente +3, Crít. frecuente +1 | Lisiado 33 % | 270 | 14,6 · Raro | 270 | — |
+| 11 | ⚠️ Lanza de lisiar | 2 | 3 | — | Alcance +2, Crít. potente +3 | Lisiado 33 % | 300 | 15,5 · Raro | 300 | — |
+| 12 | ⚠️ Estoque de esgrima | 1 | 2 | — | Alcance +1, Crít. potente +3, Crít. frecuente +1 | — | 350 | 16,5 · Raro | 350 | Alcance en un estoque, raro |
+| 13 | Estoque de duelista | 1 | 1 | +2 | — | Ignora 2 de Res. crítico | 80 | **16,8 · Raro** | 350 | 🔧 Ignora no anda en armas; precio regalado («Ingora») |
+
+**Lo que muestra:** cinco son de Buena calidad por poder (1–5); siete están muy baratas para lo que dan (Estoque de duelista a 80 con poder de
+350); hay **tres Rompe armadura** (debería ser una excepción escasa); dos usan «Ignora Res. crítico», que **en un arma no hace nada solo**; ninguna
+usa Sangrado, Drena vida, «seguro si es crítico», por la espalda ni durabilidad; ninguna tiene todavía los tres textos.

@@ -1044,3 +1044,36 @@ Alcance +2). El Hacha de asta larga pasa a Alcance +1 · Parry +1 · Bloqueo +1 
 **T8 Raro cargada (2026-10-03):** las 18 con sus tres textos. La Rara «⚠️ Hacha de doble filo» quedó como **Hacha de doble hoja** (mismo id). El
 texto corto de un arma dice «Armadura rota doble» cuando deja 2 stacks (`ItemCorto`). El **Hacha arrojadiza** sigue igual hasta revisar las de
 rango. En los creeps, el equipo Raro del Tipo 8 suma el Hacha de batalla. **Tipo 8: Común, Buena y Rara hechas.** Sigue: Tipo 10.
+
+## Tipo 10 — Contundentes (arranca 2026-10-03)
+Estado hoy (cuerpo a cuerpo): Común 13 · Buena 10 · Raro 9 · Excepcional 6 · Legendario 4; de rango (aparte): Exc. 1 · Leg. 1.
+
+### Tipo 10 — definiciones (propuesta del asistente, ⬜ sin responder)
+**Identidad:** mazas, martillos, garrotes, porras y bastones. **Las más caras en Nitros** (primer ataque 5, los siguientes 10): pocos golpes y
+que se sientan. Un dado de 10 ya pega mucho: **2 dados son Buena** (en la Común, 1 dado). El golpe que **desordena**: **Demora** (baja 1 lugar en
+la iniciativa) y **Aturdir** (Stun).
+- 🏠 **Propio:** Demora · Aturdir · Bloqueo y Parry (el mango ataja) · daño fijo · daño amplificado.
+- 🤝 **Puede ir:** Derribar · Rompe armadura (martillos contra placas, bajo) · Crít. potente · Alcance (solo bastones y martillos a dos manos).
+- ✨ **Excepción:** Sangrado (la maza con pinchos) · Rengo (rodillas) · Iniciativa · Drena (Excepcional+).
+- 🚫 **Ajeno:** Ignora resistencia a crítico · Crít. frecuente (con un d10 casi no rinde) · Critical Matters (mismo criterio que las hachas) ·
+  por la espalda · PdG en oportunidad · Veneno · Explosión.
+- **Piso propuesto de la Común:** 1d10 con **Demora 33 %** en la mitad; la otra mitad juega con Bloqueo, Parry, daño fijo y Derribar.
+  **Aturdir desde Buena** (bajo, 20–25 %). Comunes: 24.
+- **Demora todavía no es automática** (el duelo la recuerda a mano). Propuesta: que el mapa la aplique (baja al golpeado 1 lugar en el orden de turnos).
+
+### T10 Común — lo que hay hoy (2026-10-03)
+| Arma | Lo que hace · precio hoy → libre · rinde como · qué hacer |
+|---|---|
+| Cachiporra | 1 dado · 40 → 60 · Común · queda |
+| Bate de Baseball | 1 dado · +1 · 90 → 70 · Común · queda |
+| Maza de hierro | 1 dado · Bloqueo +1 · 90 → 75 · Común · queda |
+| Garrote de pastor | 1 dado · Demora 25 % · 70 → 75 · Común · Demora a 33 % |
+| Mazo de carnicero | 1 dado · +1 · Demora 25 % · 75 → 85 · Común · Demora a 33 % |
+| Porra de guardia | 1 dado · Bloqueo +1 · Demora 25 % · 80 → 95 · Común · Demora a 33 % |
+| Martillo de cantero | 1 dado · Alcance +1 con una mano · 70 → 110 · Buena · Alcance en una mano |
+| Bastón de monje | 1 dado · +1 · Alcance +1 con una mano · 90 → 130 · Buena · **idéntico** al del trueno; un bastón es a dos manos |
+| Bastón del trueno | igual al de monje · rehacer |
+| Garrote | 2 dados · 60 → 140 · **Buena** · pasa a Buena |
+| ⚠️ Martillo de bola | 2 dados · Bloqueo +1 · 115 → 170 · **Rara** · **idéntico** al garrote de hueso |
+| ⚠️ garrote de hueso | igual al martillo de bola · rehacer |
+| ⚠️ Maza | 2 dados + 1 amplificado · 50 → 350 · **Rara** · rehacer o subir de tier |

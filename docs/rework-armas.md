@@ -931,3 +931,18 @@ Crít. potente +2). Raras: Espada bastarda, Katana de maestro, Sable del capitá
 Sable del general, Rompeespadas (para que entre: contraataque +4 → +3; queda con +3 de durabilidad). Los precios se recalcularon.
 
 Cargadas (2026-10-03): las 24 con sus tres textos; sale la Lanza de caza (el Goblin cazador de jabalíes pasa a la Lanza corta); el Hacha del clan es arma propia (sigue de botín); en los creeps, el equipo común del Tipo 8 suma el Hacha de mano. Hacha de piedra, Hacha de leñador, Hacha de constructor, Hachón y Hacha de asta rinden un poco por encima de Común (2 dados, dos manos o daño amplificado), como en la propuesta.
+
+### T8 Buena calidad — lo que hay hoy y diagnóstico (2026-10-03)
+| Arma | Lo que hace · precio hoy → libre · rinde como · qué hacer |
+|---|---|
+| Hacha de guerra ligera | 2 dados · +1 · 100 → 120 · Buena · queda |
+| Hacha de doble filo | +1 · Rompe armadura **siempre** · 100 → 120 · Buena · queda (choca de nombre con la Rara) |
+| Hacha dentada | 2 dados · Sangrado 50 % · 115 → 130 · Buena · queda |
+| Hachón de minero | 2 dados · +1 · Rompe armadura 33 % · 160 → 150 · Buena · queda |
+| Hacha de guerra | 2 dados · Rompe armadura 25 % · 130 → 120 · Buena · por debajo del piso nuevo: sube a 33 % |
+| Hacha de abordaje | Bloqueo +1 · Alcance +1 · 100 → 110 · Buena · Alcance en una mano: o pasa a dos manos o cambia el Alcance |
+| Hacha con pico | 2 dados · Ignora 1 de Res. crítico · 110 → 150 · Buena · «ignora» es ajeno al Tipo 8: rehacer |
+| Espadón de batalla | 2 manos · 2 dados · +1 · 170 → 120 · Buena · es una espada en el Tipo 8: renombrar o mudar |
+| Hacha de batalla | 2 dados · Bloqueo +1 · Rompe armadura siempre · 110 → 250 · **Rara** |
+| Hacha de la furia roja | **idéntica** a la de batalla · **Rara** |
+| (Arcabuz de mecha) | de rango, va con las de rango |

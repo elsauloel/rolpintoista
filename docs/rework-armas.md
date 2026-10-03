@@ -637,7 +637,22 @@ Pica del Muro Eterno, Aguijón de la Reina Avispa, Lanza del alba (las cuatro re
 ## Tipo 6 — Cortantes (arranca 2026-10-03)
 Estado hoy: Común 18 · Buena 13 · Raro 9 (cuerpo a cuerpo) · Excepcional 6 · Legendario 4; de rango (aparte): Común 3 · Buena 7 · Raro 1 · Exc. 2.
 
-### Tipo 6 — definiciones (propuesta del asistente, ⬜ sin responder)
+### Tipo 6 — definiciones (✅ ajustadas por el dueño, 2026-10-03 — mandan sobre la propuesta de abajo)
+- **El piso del tipo:** la espada común base, **no menos que esto**: 1d6 con **25 % de Sangrado de 3 turnos** (con crítico, permanente).
+- **De casa y frecuentes:** bonos al **Parry**, a la **Iniciativa** y **PdG en contraataque**.
+- **Crítico frecuente +4:** una sola en Rara y un par en Excepcional (es muy fuerte). **Ignora resistencia a crítico:** igual de escaso.
+- **Para diversificar en todos los tiers:** PdG, daño fijo y daño amplificado.
+- **Alcance +1:** solo espadones a dos manos; muy puntual en Buena calidad, un poco más en Rara, pero poco.
+- **Rengo** pasa a 🤝 puede ir: desde Buena calidad con 25 %, más frecuente y con porcentajes más altos desde Rara.
+- **Por la espalda:** desde Rara.
+- **Bloqueo:** algún ítem de Buena calidad; combinado con Parry, desde Rara.
+- **Daño mágico:** siempre Excepcional o más.
+- **Rompe armadura:** muy ocasional y con porcentaje bajo desde Buena calidad; en Rara, pocos y bajo o medio; desde Excepcional, se puede jugar.
+- **Veneno:** desde Común con porcentaje muy bajo, mejorando en Buena y más arriba. **Veneno severo:** Excepcional y Legendaria, con
+  porcentajes bajos y más altos.
+- **Legendaria** habilita prácticamente cualquier mecánica, pero siempre con conceptos acordes al tipo (narrativa).
+
+#### (propuesta original del asistente)
 **Identidad:** espadas, sables, cimitarras, katanas. **Costo medio en Nitros** (primer ataque 3, los siguientes 6). La familia del **filo**: el
 **Sangrado** es su efecto de casa; juegan con el **Crítico frecuente** (acento del T6: rango 6, rinde hasta +4) más que con el potente, y con la
 **defensa activa**: Parry, Iniciativa y el **PdG en contraataque** (stats de casa, sin recargo). Duelistas y espadachines.
@@ -649,3 +664,31 @@ Estado hoy: Común 18 · Buena 13 · Raro 9 (cuerpo a cuerpo) · Excepcional 6 �
   asesino) · daño mágico (hojas encantadas, Excepcional+).
 - 🚫 **Ajeno:** Rompe armadura (hachas), Demora / Aturdir / Derribar (contundentes), Explosión (T12). Veneno severo seguro: solo Legendaria.
 - **Fuera del Tipo:** los arcos y ballestas de Tipo 6 van con las armas de rango.
+
+### T6 Común — lo que hay hoy (tabla comparativa, 2026-10-03)
+«Libre» = el precio con la regla nueva. Piso del tipo (dueño): **1d6 con 25 % de Sangrado de 3 turnos**.
+
+| # | Arma | Manos | Dados | Fijo | Bonos | Al golpear | Precio | Libre | Observación |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | Espada corta | 1 | 1 | — | — | — | 30 | 45 | por debajo del piso (sin Sangrado) |
+| 2 | Sable común | 1 | 1 | — | Iniciativa +1 | — | 40 | 50 | sin Sangrado |
+| 3 | Sable de abordaje | 1 | 1 | — | Iniciativa +1 | — | 40 | 50 | **copia** del Sable común (botín) |
+| 4 | Sable mellado del camino real | 1 | 1 | — | Iniciativa +1 | — | 40 | 50 | **copia** del Sable común (botín) |
+| 5 | Cimitarra | 1 | 1 | — | Parry +1 | — | 69 | 55 | sin Sangrado |
+| 6 | Espada ancha | 1 | 1 | +1 | — | — | 70 | 55 | sin Sangrado |
+| 7 | Espada de taberna | 1 | 1 | +1 | — | — | 70 | 55 | **copia** de la Espada ancha (botín) |
+| 8 | Machete de chacarero | 1 | 1 | +1 | Iniciativa +1 | — | 60 | 60 | sin Sangrado |
+| 9 | Espada corta de instrucción | 1 | 2 | — | — | — | 50 | 75 | sin Sangrado |
+| 10 | Espada de recluta de la guardia | 1 | 2 | — | — | — | 50 | 75 | **copia** de la de instrucción (botín) |
+| 11 | Espada de entrenamiento | 1 | 1 | — | — | Lisiado 25 % | 55 | 55 | Lisiado ok; sin Sangrado |
+| 12 | Sable de abordaje oxidado | 1 | 1 | — | — | Sangrado 25 % | 50 | 50 | **es el piso** |
+| 13 | Hoz | 1 | 1 | — | — | Sangrado 50 % | 75 | 55 | — |
+| 14 | Hoz ceremonial | 1 | 1 | — | — | Sangrado 50 % | 75 | 55 | **copia** de la Hoz (botín) |
+| 15 | Espada corta oxidada | 1 | 1 | — | — | Veneno 50 % | 70 | 55 | veneno demasiado alto para Común; sin Sangrado |
+| 16 | Espada de alquiler oxidada | 1 | 1 | — | — | Veneno 50 % | 70 | 55 | **copia** de la anterior (botín) |
+| 17 | Machete | 1 | 1 | — | — | Rompe armadura 50 % | 60 | 75 | Rompe armadura no va en Común |
+| 18 | Bastón ferrado | 2 | 1 | +1 | Parry +1 | — | 50 | 65 | un bastón no es cortante: es del Tipo 10 |
+
+**Lo que muestra:** 6 copias (quedan 12 distintas); **15 de 18 están por debajo del piso** (no sangran); el Machete trae Rompe armadura
+(no va en Común); la Espada corta oxidada envenena 50 % (en Común, porcentaje muy bajo); el Bastón ferrado no es del Tipo 6; nadie usa el
+PdG en contraataque (de casa) ni el daño amplificado; precios desparejos.

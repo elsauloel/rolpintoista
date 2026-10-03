@@ -990,3 +990,17 @@ ganaron durabilidad (Resistente, 9) para seguir Raras. El **Hacha grande del ase
 **T8 Buena cargada (2026-10-03), 9 y 9 (dueño):** para volver a 9 con Rompe armadura, el **Hacha de guerra ligera** pasa a 1 dado · +2 · Rompe armadura
 50 % (100; con 2 dados +1 y 33 % quedaba igual al Hachón de minero). El Espadón de batalla quedó como Hacha grande del aserradero (mismo id). El
 **Hacha de batalla** pasó a Raro (precio 250) para revisarla con las Raras; la Rara «⚠️ Hacha de doble filo» se renombra en esa revisión. Sigue: T8 Raro.
+
+### T8 Raro — lo que hay hoy y diagnóstico (2026-10-03)
+| Arma | Lo que hace · precio hoy → libre · rinde como · qué hacer |
+|---|---|
+| Alabarda de guardia | 2 manos · 2 dados · +1 · Alcance +1 · Derribar 25 % · 230 → 220 · Rara · queda |
+| Sagaris | 2 dados · +1 · Rompe armadura siempre · Sangrado siempre · 130 → 400 · Rara alta · queda (precio a corregir) |
+| Segur de verdugo | 2 dados · Alcance +1 con una mano · Rompe armadura 50 % · 240 → 250 · Rara · Alcance en una mano: pasa a dos manos |
+| Hacha danesa | 2 dados · Alcance +1 con una mano · Rompe armadura siempre · 130 → 350 · Rara · **idéntica** al Hacha del Jefe de Guerra; la danesa histórica es a dos manos |
+| Hacha del Jefe de Guerra | igual a la danesa · rehacer |
+| Hacha de batalla (viene de Buena) | 2 dados · Bloqueo +1 · Rompe armadura siempre · 250 · Rara · **idéntica** al Hacha del Caudillo |
+| Hacha del Caudillo | igual a la de batalla · rehacer |
+| ⚠️ Hacha de doble filo | 3 dados · Rompe armadura siempre · Ignora 1 de Res. crítico · 120 → 600 · **Excepcional** · «ignora» es ajeno; renombrar (choca con la Buena) |
+| ⚠️ Hacha de guerra pesada | 2 dados · «Arruina armadura» (efecto que ya no existe) · 130 → 110 · Buena · rehacer (¿Armadura rota doble?) |
+| Hacha arrojadiza | 2 dados · Alcance +2 con una mano · Sangrado 50 % · 240 → 260 · Rara · es arrojadiza: va con las de rango |

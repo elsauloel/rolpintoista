@@ -783,3 +783,31 @@ crítico** (una común puede tener Crít. frecuente +1 **o** Crít. potente +2, 
 | Cuchillo de la pensión | +1 dado amplificado · 60 |
 
 **✅ T4 Común: 6 más cargadas (2026-10-03, OK del dueño; la Tacuara pasó a llamarse **Chuza**, la lanza criolla de cuchillo atado a un palo): quedan 24.**
+
+### T6 Buena calidad — propuesta v1: 18 armas (2026-10-03, ⬜ a revisar por el dueño)
+Las 5 copias pasan a ser armas propias (las siguen llevando los mismos creeps); 9 con Sangrado (mejor que el piso) y 9 sin, con efectos que lo
+igualan o superan. Habilitado en Buena: Parry con 2 dados, Bloqueo (uno), Rengo 25 %, Rompe armadura bajo, Veneno más alto, Alcance +1 a dos
+manos (uno), Crítico frecuente +2 (uno).
+
+| Arma | Lo que hace · precio |
+|---|---|
+| **Con Sangrado** | |
+| Cimitarra del desierto | 2 dados · +1 de daño · Iniciativa +1 · contraataque +1 · Sangrado 33 % · 150 |
+| 🆕 Facón de plata | +2 de daño · Iniciativa +2 · Sangrado 50 % · 100 |
+| 🆕 Hoz de cosecha | +1 de daño · Iniciativa +2 · contraataque +1 · Sangrado 75 % · 110 |
+| Espada del veterano de mil batallas (era copia) | 2 dados · contraataque +1 · Sangrado de 3 stacks 25 % · 110 |
+| Sable de mando del capitán (era copia) | PdG +1 · Parry +1 · Sangrado 25 % · 140 |
+| 🆕 Machete del monte | +1 dado amplificado · Sangrado 33 % · 90 |
+| Sable del sargento (era copia) | 2 dados · contraataque +2 · Sangrado 25 % · 120 |
+| Espada del Jefe de los Mil Caminos (era copia) | Crít. potente +3 · Sangrado 33 % · 100 |
+| Cimitarra del contramaestre (era copia) | +1 de daño · contraataque +2 · Veneno 3 stacks 33 % · Sangrado 25 % · 110 |
+| **Sin Sangrado** | |
+| Cimitarra de guardia | 2 dados · Parry +2 · 110 |
+| Sable de caballería | PdG +1 · Parry +1 · 120 |
+| Espada larga de infantería | 2 dados · Parry +1 · contraataque +1 · 110 |
+| Espada de la guardia | 2 dados · Parry +1 · Crít. frecuente +1 · 160 |
+| Espada del herrero (era Falchion) | 2 dados · +1 de daño · Bloqueo +1 · Rompe armadura 20 % · 150 |
+| Sable militar | 2 dados · Iniciativa +1 · Rengo 25 % · 110 |
+| Espada larga | PdG +1 · Crít. potente +2 · 150 |
+| 🆕 Espada del timbero | Crít. frecuente +2 · 120 |
+| 🆕 Espadón del capataz | 2 manos · 2 dados · Alcance +1 · 140 |

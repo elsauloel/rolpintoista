@@ -922,3 +922,10 @@ juega con los demás parámetros (sin quedar por debajo); puede haber alguna con
 | 🆕 Hachuela de camping | Parry +1 · Bloqueo +1 · 85 |
 
 Sale la **Lanza de caza** (es una lanza: el Tipo 4 ya tiene sus lanzas comunes).
+
+**Durabilidad en las espadas (dueño, 2026-10-03):** «ninguna de las espadas tiene más durabilidad»: pesa poco en la calidad, así que se sumó donde
+había margen sin cambiar de tier, sobre todo a las que juegan con **Parry** (afianza que están pensadas para esa mecánica). +3 en Común y Buena,
++6 en Rara. Comunes: Caronero, Sable del club de barrio, Sable de desfile (la Espada del duelista novato no tenía margen). Buena: Sable de mando
+del capitán, Cimitarra de guardia, Sable de caballería, Espada larga de infantería, Espada de la guardia (para que entre: Crít. frecuente +1 →
+Crít. potente +2). Raras: Espada bastarda, Katana de maestro, Sable del capitán pirata, Mandoble, Espada vampírica menor, Sable del comandante,
+Sable del general, Rompeespadas (para que entre: contraataque +4 → +3; queda con +3 de durabilidad). Los precios se recalcularon.

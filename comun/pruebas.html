@@ -128,6 +128,7 @@ function cierto(v, que){ if(!v) throw new Error(que || 'se esperaba verdadero');
 /* ---------- Dados (comun/tiradas.js) ---------- */
 grupo('Dados');
 prueba('parseDados entiende "2d6+3"', () => igual(parseDados('2d6+3'), {dados: [{n: 2, caras: 6}], mod: 3}));
+prueba('parseDados: un número fijo adelante del dado también cuenta («6+1d6» = 1d6 + 6)', () => igual([parseDados('6+1d6'), parseDados('2+1d4-1'), parseDados('1d6+6')], [{dados: [{n: 1, caras: 6}], mod: 6}, {dados: [{n: 1, caras: 4}], mod: 1}, {dados: [{n: 1, caras: 6}], mod: 6}]));
 prueba('parseDados rechaza una fórmula con letras sueltas', () => igual(parseDados('2d6+x'), null));
 prueba('tirarDados da un total entre el mínimo y el máximo', () => {
   for(let i = 0; i < 200; i++){ const r = tirarDados('3d4+1'); cierto(r.total >= 4 && r.total <= 13, `total ${r.total} fuera de 4–13`); }

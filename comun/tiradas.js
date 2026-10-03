@@ -19,7 +19,8 @@ function parseDados(formula){
     if(n < 1 || n > 100 || caras < 2) return null;
     dados.push({n, caras});
   }
-  const sinDados = limpio.replace(/\d*d\d+/g, '');
+  let sinDados = limpio.replace(/\d*d\d+/g, '');
+  if(/^\d/.test(sinDados)) sinDados = '+' + sinDados;   // un fijo adelante («6+1d6», «X+1dX» de Drenar Vida): sin el signo se perdía
   let mod = 0;
   const modRe = /([+-]\d+)/g;
   let mm;

@@ -305,7 +305,7 @@ const CombateFin = (() => {
       <div class="reporte-total">Calculado — oro total: <b>${fmt(rp.oroTotal)} DDE</b> (ya incluye su variación de ±20%, no se vuelve a tirar) · ${rp.n ? `<b>${fmt(rp.ddeCada)}</b> DDE por jugador (hacia arriba)` : ''}</div>
     </div>
     <div>
-      <div class="reporte-seccion-titulo">Despojos: equipos y trofeos que los jugadores van a poder elegir</div>
+      <div class="reporte-seccion-titulo">Despojos: equipos, trofeos y consumibles (🎲 = soltado al azar) que los jugadores van a poder elegir</div>
       <div class="reporte-loot-lista">${lootHtml}</div>
       <div style="display:flex;gap:6px;margin-top:8px"><input type="text" data-rep-extra-nombre placeholder="Ítem extra (nombre)" style="flex:1"><input type="number" min="0" data-rep-extra-precio placeholder="Precio" style="width:90px"><button type="button" class="btn" data-rep-extra-add>+ Sumar</button></div>
     </div>`;

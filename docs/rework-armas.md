@@ -769,3 +769,5 @@ crítico** (una común puede tener Crít. frecuente +1 **o** Crít. potente +2, 
 | 🆕 Facón del matrero | Crít. frecuente +1 · contraataque +1 · 90 |
 | 🆕 Sable fino | Crít. potente +2 · Iniciativa +1 · 80 |
 | 🆕 Espada del duelista novato | Crít. frecuente +1 · Parry +1 · 95 |
+
+**✅ T6 Común v2 cargado (2026-10-03, OK del dueño):** 24 armas (12 con Sangrado 25 %, 12 con efectos que lo igualan o superan; 5 con crítico).

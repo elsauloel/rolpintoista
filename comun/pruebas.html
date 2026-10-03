@@ -2070,7 +2070,7 @@ prueba('cómo se ve un arma: en la grilla lo esencial (= el Detalle de las T4 Co
   const punzon = t4.find(i => i.nombre === 'Punzón de matarife'), ver = ItemCorto.verHtml(punzon), grilla = ItemCorto.grillaHtml(punzon);
   igual([t4.length, distintos, t4.every(i => i.descripcionNarrativa), /Detalles técnicos/.test(ver), /Lisiado: 3 turnos/.test(ver), /Seguro si es crítico/.test(ver), /Lisiado: 3 turnos/.test(grilla),
     ItemCorto.armaEsencial({tipoItem: 'arma_2m', tipoDado: 4, peso: 2, mods: [{stat: 'rng', val: 1}], efectosGolpe: [{nombre: 'Sangrado', caras: 2, exitos: 1, turnos: 2}]})],
-    [90, [], true, true, true, true, false, 'Tipo 4 · 2 manos · 2 dados · Alcance +1 · Sangrado 50 % · 2 turnos']);
+    [96, [], true, true, true, true, false, 'Tipo 4 · 2 manos · 2 dados · Alcance +1 · Sangrado 50 % · 2 turnos']);
 });
 
 prueba('arma que ignora Resistencia a crítico: el duelo se la resta al defensor (campo nuevo y efecto viejo); no aparece como efecto al golpear', () => {

@@ -509,3 +509,5 @@ y algo de humor. Aplicado a las 18 T4 Comunes (las copias de los humanos en `cre
 16. Daga de duelo — *Tipo 4 · 2 dados · PdG +1 · Crítico potente +2* — «Equilibrada para encontrar el hueco. Viene con un manual de etiqueta que nadie lee.»
 17. Aguja de acupunturista — *Tipo 4 · 1 dado + 1 amplificado · PdG +1 · Sangrado 33 %* — «Fina como un pelo. Alivia contracturas y, mal usada, también la vida entera.»
 18. Lanza de leva — *Tipo 4 · 2 manos · 3 dados · Alcance +1 · Lisiado 25 %* — «La lanza de todo recluta: pesada, larga y repartida sin preguntar si sabías usarla.»
+
+**✅ Aplicado (2026-10-03, OK del dueño):** las 18 de Buena calidad (v3, con los tres textos) reemplazaron a las 14 T4 de Buena calidad del catálogo. La Daga de la viuda verde y la Daga del sacrificio dejaron de ser copias (son armas propias; las siguen llevando el Envenenador, el Saboteador y el Sacerdote oscuro). La **Daga de guardia** y el **Pico de guerra** pasaron a **Raro** (con ⚠️) para repensarlos en ese tier.

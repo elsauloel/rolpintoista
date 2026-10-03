@@ -1971,7 +1971,7 @@ const Duelo = (() => {
           try{ cfgEscuchar.paso(dd, nuevos, pasosRevelados(dd)); }catch(err){ console.error('Duelo: paso', err); }
         }
       };
-      if(nuevos.some(p => p.dados)) esperarDados(revelar); else revelar();
+      if(nuevos.some(p => p.dados) && !document.hidden) esperarDados(revelar); else revelar();   // oculta: no hay dados que esperar
     });
     pasosListo = true;
   }
@@ -2018,6 +2018,8 @@ const Duelo = (() => {
         contenedorAvisos().appendChild(el);
         chips.set(id, el);
       }
+      // Mientras un paso espera a los dados, el botón no lo adelanta (ni el «💥 Crítico» que viene después).
+      if(el.textContent && [...pasosEnEspera].some(k => k.startsWith(id + ':'))) return;
       el.className = 'duelo-chip' + (d.estado === 'resuelto' ? ' res' : '');
       el.textContent = txt;
       el.title = d.hab ? 'Ver la ejecución' : 'Ver el duelo';

@@ -1353,3 +1353,5 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `#editar-token-capa` y `#bn-editor` (el editor común de la Botonera nueva abre la ventana común adentro del recuadro).
 
 - **Por la espalda** (2026-10-03): `porLaEspalda(atq, def)` (js/13) — quien ataca está en sigilo (`enSigilo`) y en la cuña ciega del defensor (la misma de la visión, `VISION_CUNA_CIEGA`: el casillero justo de atrás). Se pasa a `Duelo.crear` en el ataque normal (en un try: nunca traba el ataque). Ver `comun/CLAUDE.md`.
+
+- **Duelos en la Crónica** (2026-10-03, P151): `dueloPasoCronica` (js/16) recibe los pasos de un duelo que esta pantalla no tiene abierto (hook `paso` de `Duelo.escuchar`, js/14) y arma una tarjeta por duelo en `#momentos-feed`, con un renglón por paso (`lineas`; el último resaltado). Es local, no escribe nada.

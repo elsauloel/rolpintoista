@@ -344,6 +344,18 @@ const FichaEditor = (() => {
       <div style="display:flex;gap:8px"><button type="button" class="btn" data-ed="trampa-elegir" style="flex:1">🪤 Elegir otra trampa</button>
       <button type="button" class="btn primary" data-ed="trampa-asistente" style="flex:1">🪄 Ajustar todo, paso a paso</button></div>` : ''}`;
     }
+    // ¿La habilidad invoca a una de tus invocaciones? (2026-10-02): al ejecutarla la despierta (o crea una copia, si ya está en juego)
+    // y elegís en el mapa dónde aparece (FichaAcciones.invocarConHab).
+    function invocaHtml(draft){
+      const lista = ((S() || {}).invocaciones || []).filter(i => i && !i.copiaDe);
+      const sel = draft.invoca && draft.invoca.invId || '';
+      return `<div class="f" style="margin-top:14px"><label>🔮 ¿Invoca a una de tus invocaciones?</label>
+      <select data-invoca="1">
+        <option value="">— no invoca —</option>
+        ${lista.map(i => `<option value="${esc(i.id)}" ${sel === i.id ? 'selected' : ''}>${esc(i.nombre || 'Invocación')}${num(i.cooldown) ? ` (dura ${fmt(num(i.cooldown))} turnos)` : ''}</option>`).join('')}
+      </select>
+      <div class="hint" style="margin-top:5px">${lista.length ? 'Al ejecutarla se despierta con la vida y los No2 llenos y elegís en el mapa dónde aparece. Si ya está en juego, se crea una copia («… 2»), así se puede usar varias veces seguidas. Cada una se duerme sola al terminar sus turnos.' : 'Todavía no tenés invocaciones: armala primero en la sección Invocaciones de tu ficha y después elegila acá.'}</div></div>`;
+    }
     function trampaAbrirAsistente(){
       const ed = editing, t = ed.draft.trampaColocar || {};
       AsistenteTrampa.abrir({
@@ -469,6 +481,7 @@ const FichaEditor = (() => {
       <button type="button" class="btn primary" data-hab-ejecucion="1" style="width:100%">✨ ${c ? 'Cambiar' : 'Armar'} la ejecución paso a paso</button>
       <div class="hint" style="margin:14px 0 0">¿La habilidad coloca una trampa? Tildalo acá: al ejecutarla se cobra el costo, se anuncia en la Mesa (sin decir dónde) y elegís la casilla en el mapa.</div>`;
         html += trampaHtml(draft);
+        html += invocaHtml(draft);
       }
       if(info.id === 'anterior'){
         html += `<div class="hint" style="margin:0 0 10px">Tiene: <b>${esc(habLegado(draft).join(' · '))}</b>.</div>`;
@@ -847,6 +860,7 @@ const FichaEditor = (() => {
       const t = e.composedPath ? e.composedPath()[0] : e.target;
       if(!editing || !t || !t.dataset) return;
       if(t.dataset.tr){ trampaGuardarCampo(t); return; }
+      if(t.dataset.invoca){ if(t.value) editing.draft.invoca = {invId: t.value}; else delete editing.draft.invoca; return; }
       if(t.dataset.c){
         const c = t.dataset.c;
         editing.draft[c] = t.type === "checkbox" ? t.checked : (CAMPO_NUM.includes(c) ? (t.value===""?"":num(t.value)) : t.value);

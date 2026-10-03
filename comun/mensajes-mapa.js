@@ -39,6 +39,7 @@ const MensajesMapa = (() => {
     'portal-habilidad': {de: 'ficha', a: 'mapa', que: 'elegir los dos puntos de un portal (`turnos`)'},
     'zona-persistente-habilidad': {de: 'marco', a: 'mapa', que: 'dejar una zona persistente (lo arma Combatiente.zonaDeHab)'},
     'trampa-habilidad': {de: 'marco', a: 'mapa', que: 'elegir la casilla de una trampa (`trampa`, lo arma Combatiente.trampaDeHab)'},
+    'invocacion-habilidad': {de: 'marco', a: 'mapa', que: 'elegir dónde aparece una invocación (`ref` = fichaId~invId, nombre, color; FichaAcciones.invocarConHab)'},
     // ---- El duelo (comun/duelo.js) entre el mapa y el marco ----
     'duelo-elegir-objetivo': {de: 'marco', a: 'mapa', que: 'elegir el objetivo de un ataque o habilidad con un clic en el mapa'},
     'duelo-suelto':     {de: 'mapa', a: 'marco', que: '«sin objetivo»: tirar suelto'},

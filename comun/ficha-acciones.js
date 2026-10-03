@@ -474,8 +474,9 @@ const FichaAcciones = (() => {
     const efecto = ui.efecto(it);
     ui.colocarTrampa(it);
     ui.avisarZona(it);
+    const invocada = invocarConHab(S, it, ui);
     ui.terminar(it, arma, 0, 0);
-    ui.cambio(['habilidades', ...(efecto ? ['efectos'] : []), 'nitros', 'vitals']);
+    ui.cambio(['habilidades', ...(efecto ? ['efectos'] : []), ...(invocada ? ['invocaciones'] : []), 'nitros', 'vitals']);
     const partes = [`ejecutada`];
     if(costoSp) partes.push(`-${fmt(costoSp)} SP`);
     partes.push(costoNitros ? `-${fmt(costoNitros)} No2` : 'sin costo de Nitros');
@@ -507,9 +508,10 @@ const FichaAcciones = (() => {
     const efecto = ui.efecto(it);
     ui.colocarTrampa(it);
     ui.avisarZona(it);
+    const invocada = invocarConHab(S, it, ui);
     ui.terminar(it, arma, sp, nitros);
     ui.cerrarCostoX();
-    ui.cambio(['habilidades', ...(efecto ? ['efectos'] : []), 'nitros', 'vitals']);
+    ui.cambio(['habilidades', ...(efecto ? ['efectos'] : []), ...(invocada ? ['invocaciones'] : []), 'nitros', 'vitals']);
     const partes = [`ejecutada`, `-${fmt(sp)} SP`, `-${fmt(nitros)} No2`];
     if(costoHp > 0) partes.push(`-${fmt(costoHp)} HP`);
     if(ataque) partes.push(ataque);
@@ -635,6 +637,7 @@ const FichaAcciones = (() => {
     if(FichaBotonera.modoHab(it) !== 'auto'){ anunciarHabilidad(S, it, ui); tirarPrimeraDeHab(S, it, ui); return; }
     if(!FichaBotonera.dueloDe(it)){
       if(it.trampaColocar) return;   // una trampa sola: el anuncio y la casilla ya los maneja colocarTrampa
+      if(it.invoca && it.invoca.invId){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // solo invoca: se anuncia (la invocación ya la hizo invocarConHab)
       ui.toast(`${it.nombre}: todavía no tiene armada la ejecución paso a paso (✨) — se ejecutó como semiautomática`); anunciarHabilidad(S, it, ui); tirarPrimeraDeHab(S, it, ui); return;
     }
     const aArma = ataqueDeHabArma(S, it, arma, xSp, xNitros, ui);
@@ -714,6 +717,53 @@ const FichaAcciones = (() => {
     }catch(err){ console.error('No se pudo avisar la zona al mapa:', err); return false; }
   }
 
+  /* ---------- Habilidad que invoca (2026-10-02, pedido del dueño: «Invocar Abeja» de Bizzante) ----------
+     `h.invoca = {invId}`: una de las invocaciones del personaje, la plantilla. Al ejecutarla (después de cobrar) despierta la
+     plantilla —o una copia suya que esté dormida— con sus turnos («Cuántos turnos dura»), la vida y los No2 llenos y los cooldowns a
+     cero; si ya están todas en juego, crea una copia nueva («Abeja 2», con `copiaDe`), así se puede usar varias veces seguidas. Con el
+     mapa abierto le pide la casilla donde aparece (el mapa mueve su token o lo crea, y la mesa se entera por la Crónica). Devuelve la
+     invocación, {falta: true} si la invocación elegida ya no existe, o null si la habilidad no invoca. */
+  function invocacionDeHab(S, h){
+    const c = h && h.invoca;
+    if(!c || !c.invId) return null;
+    const lista = S.invocaciones = Array.isArray(S.invocaciones) ? S.invocaciones : [];
+    const plantilla = lista.find(i => i && i.id === c.invId);
+    if(!plantilla) return {falta: true};
+    const familia = [plantilla, ...lista.filter(i => i && i.copiaDe === plantilla.id)];
+    let inv = familia.find(i => i.activa === false);
+    if(!inv){
+      inv = structuredClone(plantilla);
+      inv.id = uid();
+      inv.copiaDe = plantilla.id;
+      const base = plantilla.nombre || 'Invocación';
+      let n = familia.length + 1;
+      while(lista.some(i => i && i.nombre === `${base} ${n}`)) n++;
+      inv.nombre = `${base} ${n}`;
+      inv.habilidades = (inv.habilidades || []).map(x => ({...x, id: uid()}));
+      inv.estados = (inv.estados || []).map(x => ({...x, id: uid()}));
+      inv.equipo = (inv.equipo || []).map(x => ({...x, id: uid()}));
+      lista.splice(lista.indexOf(familia[familia.length - 1]) + 1, 0, inv);
+    }
+    inv.activa = true;
+    inv.cooldownActual = num(inv.cooldown);
+    if(num(inv.hpMax) > 0) inv.hp = num(inv.hpMax);
+    inv.nitros = InvCalculo.nitrosMax(inv);
+    (inv.habilidades || []).forEach(x => { x.cdActual = 0; });
+    return inv;
+  }
+  function invocarConHab(S, h, ui){
+    const inv = invocacionDeHab(S, h);
+    if(!inv) return null;
+    if(inv.falta){ ui.toast(`${h.nombre}: la invocación que tenía elegida ya no está en tu ficha — elegí otra en el editor de la habilidad`); return null; }
+    const turnos = num(inv.cooldown);
+    const ref = ui.yo().ref;
+    if(ref && ui.enMapa()){
+      try{ ui.alMapa('invocacion-habilidad', {fichaId: ref, ref: `${ref}~${inv.id}`, nombre: inv.nombre, color: inv.color || '', quien: (S.meta && S.meta.nombre) || 'Personaje', habilidad: h.nombre, turnos}); }
+      catch(err){ console.error('No se pudo avisar la invocación al mapa:', err); }
+    }else ui.toast(`🔮 ${inv.nombre} invocada${turnos ? ` (${fmt(turnos)} turnos)` : ''} — poné su token en el mapa`);
+    return inv;
+  }
+
   /* ---------- Talentos, trampas consumibles y el Ankh a mano (paso 4, etapa 3c-7, 2026-10-01; antes en js/05, js/10 y js/06) ---------- */
   // Tirar un talento: 1d(nivel × 2) + la Inteligencia sin invertir. La publica cada pantalla (ui.registrarTirada).
   function tirarSocial(S, i, ui){
@@ -747,7 +797,7 @@ const FichaAcciones = (() => {
 
   return {gastoNitrosForzado, alternarSigilo, levantarse, hpRevivir, revivir,
     tirarSocial, colocarTrampaDeItem, ankhAMano,
-    TRAMPA_DANO_RE, avisarZonaAlMapa, colocarTrampaDeHab, colocarZonaDeHab,
+    TRAMPA_DANO_RE, avisarZonaAlMapa, colocarTrampaDeHab, colocarZonaDeHab, invocacionDeHab, invocarConHab,
     durAviso, desgastarItem, rompeArmaduraAlAzar, estadoDeSpec, aplicarEstadoRecibido, dueloAplicarEfectoPropio, xDeHab, habDueloDatos,
     ataqueDeHabArma, aplicarHabSobreMiDirecto, terminarEjecucionHab,
     habilidadTira, anunciarHabilidad, tirarPrimeraDeHab, tirarSegundaDeHab, registrarAtaqueDeHabilidad, limiteCostoX,

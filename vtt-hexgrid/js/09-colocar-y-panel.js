@@ -80,7 +80,6 @@ async function crearToken(datos){
     creando = false;
     seleccionar(ref.id);
     if(doc.tipo === 'creep' && doc.fichaId) creepLlegoAlMapa(doc.fichaId);   // el creep pasa a este mapa (comun/creeps-mapas.js)
-    if(doc.tipo === 'creep' && doc.fichaId) creepLlegoAlMapa(doc.fichaId);   // el creep pasa a este mapa (comun/creeps-mapas.js)
   }catch(err){
     console.error('No se pudo crear el token:', err);
     toast('No se pudo crear el token' + (err.code === 'permission-denied' ? ' (sin permiso)' : ''));

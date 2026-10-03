@@ -200,6 +200,7 @@ const dueloInv = InvDuelo.hooks(dueloInvUi);
 const habUi = {...combateUi,
   cambio: lista => lista.forEach(k => {
     if(k === 'habilidades' || k === 'efectos' || k === 'equipo' || k === 'mochila') renderList(k);
+    else if(k === 'invocaciones') renderInvocaciones();
     else combateUi.cambio([k]);
   }),
   presets: EFECTOS_PRESET,

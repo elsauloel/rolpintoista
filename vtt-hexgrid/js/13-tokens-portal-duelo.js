@@ -243,6 +243,22 @@ function trampaDeHabilidad(msg){
     }catch(err){ console.error('No se pudo colocar la trampa:', err); toast('No se pudo colocar la trampa — revisá la consola'); }
   }, `<b>🪤 ${msg.nombre ? esc(msg.nombre) + ': elegí dónde colocar la trampa' : 'Elegí dónde colocar la trampa'}</b> <span>clic en el mapa · Esc o clic derecho cancelan</span>`, true);
 }
+// Habilidad que invoca (2026-10-02): la ficha ya despertó (o copió) la invocación (FichaAcciones.invocarConHab); acá se elige la casilla
+// donde aparece. Si ya tiene token en este mapa (el de cuando se durmió) se mueve ahí; si no, se crea. La mesa se entera por la Crónica.
+function invocacionDeHabilidad(msg){
+  const nombre = String(msg.nombre || 'Invocación').slice(0, 40);
+  elegirDestino(async h => {
+    try{
+      let id = null;
+      tokens.forEach((t, k) => { if(t.fichaId === msg.ref) id = k; });
+      if(id) await coleccionTokens().doc(id).update({col: h.col, fila: h.fila, ruta: firebase.firestore.FieldValue.delete()});
+      else await crearToken({nombre, color: /^#[0-9a-fA-F]{6}$/.test(msg.color || '') ? msg.color : '#9B7BD4', tipo: 'pj', fichaId: msg.ref, col: h.col, fila: h.fila});
+      momentoAbrir({tipo: 'invocacion', icono: '🔮', titulo: `${msg.quien || 'Alguien'} invocó a ${nombre}`,
+        resultado: `con «${msg.habilidad || 'una habilidad'}»${num(msg.turnos) ? ` · dura ${fmt(num(msg.turnos))} turnos` : ''}`, estado: 'listo'});
+    }catch(err){ console.error('No se pudo poner la invocación en el mapa:', err); toast('No se pudo poner la invocación en el mapa — ponela a mano'); }
+  }, `<b>🔮 ${esc(nombre)}: elegí dónde aparece</b> <span>clic en el mapa · Esc o clic derecho cancelan</span>`, true,
+  () => toast(`${nombre} quedó invocada sin lugar: poné su token a mano`));
+}
 // 🌫 Zonas con efectos persistentes: el asistente paso a paso (comun/asistente-zona.js, 2026-09-28, pedido del
 // dueño). Cualquier miembro lo puede usar (mismo criterio que Formas libres y Trampas); el casteador queda como
 // "el bando de quien la coloca" (el GM = rival de los PJ; un jugador = rival de los creeps), no un token puntual.
@@ -285,6 +301,7 @@ window.addEventListener('message', e => {
   if(e.data.tipo === 'portal-habilidad') portalDeHabilidad(e.data);
   if(e.data.tipo === 'zona-persistente-habilidad') zonaPersistenteDeHabilidad(e.data);
   if(e.data.tipo === 'trampa-habilidad') trampaDeHabilidad(e.data);
+  if(e.data.tipo === 'invocacion-habilidad') invocacionDeHabilidad(e.data);
   if(e.data.tipo === 'duelo-elegir-objetivo') dueloElegirObjetivoMapa(e.data);
   if(e.data.tipo === 'duelo-reroll-info-res') Duelo.recibirRerollInfo(e.data.id, e.data.lado, e.data.info);   // ¿tiene una moneda de re-roll quien tira?
   if(e.data.tipo === 'duelo-flash-res') Duelo.recibirFlash(e.data.id, e.data.campo, e.data.opciones);   // los Flash que tiene quien va a tirar

@@ -1036,6 +1036,20 @@ prueba('una zona persistente no tira al lanzarla: manda al mapa el stat y su val
   const ok = FichaAcciones.colocarZonaDeHab(fichaBotonera({}), h, 0, 0, uiMapa(reg, true));
   igual([ok, reg], [true, ['alMapa zona-persistente-habilidad']]);
 });
+prueba('una habilidad que invoca: despierta la plantilla dormida (vida y No2 llenos); en juego, crea «Abeja 2»; una copia dormida se reusa', () => {
+  const abeja = {id: 'a', nombre: 'Abeja', agl: 4, cooldown: 3, cooldownActual: 0, hp: 2, hpMax: 10, nitros: 0, activa: false, habilidades: [{id: 'x', cdActual: 2}], estados: [], equipo: []};
+  const S = fichaBotonera({invocaciones: [abeja]}), h = {id: 'i', nombre: 'Invocar Abeja', modo: 'auto', invoca: {invId: 'a'}};
+  const reg = [], ui = uiMapa(reg, true);
+  const uno = FichaAcciones.invocarConHab(S, h, ui);
+  const despierta = [uno === abeja, abeja.activa, abeja.cooldownActual, abeja.hp, abeja.nitros > 0, abeja.habilidades[0].cdActual];
+  const dos = FichaAcciones.invocarConHab(S, h, ui);
+  const copia = [dos.nombre, dos.copiaDe, dos.id !== 'a', dos.habilidades[0].id !== 'x', S.invocaciones.length];
+  dos.activa = false;
+  const tres = FichaAcciones.invocarConHab(S, h, ui);
+  const falta = FichaAcciones.invocarConHab(S, {nombre: 'X', invoca: {invId: 'nada'}}, ui);
+  igual([despierta, copia, tres === dos, S.invocaciones.length, falta, reg.filter(r => r.startsWith('alMapa')).length, FichaAcciones.invocarConHab(S, {nombre: 'Y'}, ui)],
+    [[true, true, 3, 10, true, 0], ['Abeja 2', 'a', true, true, 2], true, 2, null, 3, null]);
+});
 
 /* ---------- La 🔍 y el "Ver" de un personaje (comun/ficha-lupa.js, paso 4 etapa 3c-6) ---------- */
 grupo('Lupa y Ver del personaje (paso 4)');

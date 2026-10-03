@@ -1134,6 +1134,22 @@ prueba('recompensas de un creep: oro sugerido por tipo y nivel (jefe ×2), trofe
     CreepCalculo.trofeo(humano), CreepCalculo.dropsResumen(creepPrueba({oroBase: 10, equipo: [{nombre: 'Yelmo'}]})), CreepCalculo.tipoDe(creepPrueba({tipoCriatura: 'otros', tipoCriaturaOtro: ' Gólem '}))],
     [40, 40, 0, 'Colmillos de Lobo', 50, 13, null, 'Hacha (arma equipable) · Yelmo (equipo) · 10 DDE de oro (±20% al final del combate)', 'gólem']);
 });
+prueba('drop de consumibles (comun/combate-fin.js): humano 30 %, humanoide 20 %, el resto 0; jefe ×2 y +1 nivel; mejores tiers con el nivel; se tira una vez', () => {
+  const ch = t => CombateFin.dropChance({tipoCriatura: t});
+  const t1 = CombateFin.dropTabla(1), t5 = CombateFin.dropTabla(5), t9 = CombateFin.dropTabla(9);
+  const suma = t => Math.round(t.reduce((a, x) => a + x, 0));
+  const cat = CATALOGO_BASE.filter(i => i.tipoItem).map(CreepCalculo.itemParaCreep);
+  const rep = CombateFin.nuevo(), humano = {id: 'h', tipoCriatura: 'humano', nivel: 3, jefe: true, nombre: 'Bandido'};
+  const orig = Math.random; let items1, items2;
+  try{ Math.random = () => 0.01; items1 = CombateFin.dropDeCreep(rep, cat, humano); Math.random = () => 0.99; items2 = CombateFin.dropDeCreep(rep, cat, humano); }finally{ Math.random = orig; }
+  const bestia = CombateFin.dropDeCreep(CombateFin.nuevo(), cat, {id: 'b', tipoCriatura: 'bestia', nivel: 5});
+  const tpl = items1[0] && items1[0].template;
+  const full = tpl && CATALOGO_BASE.find(i => i.nombre === tpl.nombre);
+  igual([ch('humano'), ch('humanoide'), ch('bestia'), CombateFin.dropChance({tipoCriatura: 'humano', jefe: true}), suma(t1), suma(t9), t5[0] < t1[0], t5[2] > t1[2], t9[0] >= 9.9,
+    CombateFin.dropTier(1, 0), CombateFin.dropTier(1, 0.999), items1.length, items2.length && items2[0].nombre === items1[0].nombre, bestia.length,
+    !!(tpl && tpl.consumible && tpl.tipoItem === 'consumibles' && !tpl.id), !!(full && JSON.stringify(full.trampaDatos || full.efectoNombre || full.curahp || '') === JSON.stringify(tpl.trampaDatos || tpl.efectoNombre || tpl.curahp || ''))],
+    [0.3, 0.2, 0, 0.6, 100, 100, true, true, true, 'Común', 'Excepcional', 1, true, 0, true, true]);
+});
 prueba('fin del combate (comun/combate-fin.js): XP por creep (escapado 20%), quién cobra, inconsciente 25%, extras y despojos', () => {
   const rep = CombateFin.nuevo();
   rep.enMapa = new Set(['a', 'b', 'c']);

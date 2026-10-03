@@ -40,7 +40,7 @@ const CombateFin = (() => {
   /* ---------- Reporte del combate: XP, oro, ítems y jugadores; se publica a las fichas ----------
      El GM revisa y ajusta (ítems, XP, oro, quién cobra) y publica: cada jugador recibe su XP y su oro solos en la
      ficha (campanas/<id>/recompensas) y los ítems quedan en el botín para tomarlos (campanas/<id>/botin). */
-  function nuevo(){ return {oro: {}, extra: {}, xpPorJugador: null, ddePorJugador: null, quitados: new Set(), extras: [], jugadores: null, cargando: false, publicando: false, enMapa: null, contarEscapados: true}; }
+  function nuevo(){ return {oro: {}, drops: {}, extra: {}, xpPorJugador: null, ddePorJugador: null, quitados: new Set(), extras: [], jugadores: null, cargando: false, publicando: false, enMapa: null, contarEscapados: true}; }
 
   /* Solo cuentan para la recompensa los creeps que tienen un token vinculado en el MAPA PUBLICADO (el que ven los jugadores):
      puede haber muchos creeps armados de antemano que no están en la pelea. Devuelve el Set de sus ids. */
@@ -131,6 +131,64 @@ const CombateFin = (() => {
     if(tr) out.push({clave: `${sc.id}:trofeo`, nombre: tr.nombre, precioCompra: tr.precioCompra, template: plantillaTrofeo(tr, sc), origen: nom, trofeo: true});
     return out;
   }
+  /* --- El consumible que suelta un creep (2026-10-03, pedido del dueño) ---
+     Solo humanos (30 %) y humanoides (20 %); el resto, nada. Un jefe: el doble de chance (tope 90 %) y la tabla de tiers como si tuviera un
+     nivel más. Si suelta, se tira el tier —a más nivel, mejores tiers— y sale un consumible al azar de ese tier (trampas incluidas). Se tira
+     UNA sola vez por creep, como el oro (`rep.drops`): reabrir el reporte no lo cambia. Los números, acá abajo, en un solo lugar. */
+  const DROP_CHANCE = {humano: 0.30, humanoide: 0.20};
+  const DROP_TIERS = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
+  const DROP_BASE = [50, 35, 12, 3, 0];           // % en nivel 1
+  const DROP_POR_NIVEL = [-6, 2, 2.5, 1, 0.5];    // lo que se mueve por cada nivel de más (Común nunca baja de DROP_COMUN_MIN)
+  const DROP_COMUN_MIN = 10;
+  function dropChance(sc){
+    const p = DROP_CHANCE[K.tipoDe(sc)] || 0;
+    return sc.jefe ? Math.min(0.9, p * 2) : p;
+  }
+  // La tabla de tiers de un nivel: % por tier (suma 100).
+  function dropTabla(nivel){
+    const n = Math.max(0, Math.round(num(nivel) || 1) - 1);
+    const w = DROP_BASE.map((b, i) => Math.max(0, b + DROP_POR_NIVEL[i] * n));
+    const comun = Math.max(DROP_COMUN_MIN, w[0]);
+    // Los tiers mejores se reparten lo que deja Común (si se pasan, se achican en proporción): Común nunca baja del piso.
+    const resto = w.slice(1), tot = resto.reduce((a, x) => a + x, 0), lugar = 100 - comun;
+    return [comun, ...resto.map(x => tot ? x * lugar / tot : 0)];
+  }
+  function dropTier(nivel, azar){
+    const t = dropTabla(nivel);
+    let r = (azar === undefined ? Math.random() : azar) * 100;
+    for(let i = 0; i < t.length; i++){ if(r < t[i]) return DROP_TIERS[i]; r -= t[i]; }
+    return DROP_TIERS[0];
+  }
+  // El consumible de ese tier (si no hay ninguno, el tier más cercano: primero para abajo).
+  function dropElegir(cat, tier){
+    const cons = cat.filter(i => i.tipoItem === 'consumibles');
+    const k = DROP_TIERS.indexOf(tier);
+    const orden = [k, ...DROP_TIERS.map((_, i) => i).filter(i => i !== k).sort((a, b) => (Math.abs(a - k) - Math.abs(b - k)) || (a - b))];
+    for(const i of orden){ const pool = cons.filter(c => (c.tier || 'Común') === DROP_TIERS[i]); if(pool.length) return pool[Math.floor(Math.random() * pool.length)]; }
+    return null;
+  }
+  // El ítem completo para el botín: el del catálogo de fábrica (con sus efectos y su trampa); si es uno subido por el grupo, lo que llegó.
+  function plantillaConsumible(c){
+    const full = typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(i => i.nombre === c.nombre && i.tipoItem === 'consumibles') : null;
+    const t = structuredClone(full || c);
+    delete t.id; delete t.imagen; delete t._bib; delete t.equipado;
+    return {...t, tipoItem: 'consumibles', consumible: true, unidades: 1, precioCompra: num(t.precioCompra), estimado: false};
+  }
+  function dropDeCreep(rep, cat, sc){
+    rep.drops = rep.drops || {};
+    if(rep.drops[sc.id] === undefined){
+      let nombre = '';
+      if(Math.random() < dropChance(sc)){
+        const c = dropElegir(cat, dropTier(num(sc.nivel) + (sc.jefe ? 1 : 0)));
+        if(c) nombre = c.nombre;
+      }
+      rep.drops[sc.id] = nombre;
+    }
+    const c = rep.drops[sc.id] ? cat.find(i => i.nombre === rep.drops[sc.id] && i.tipoItem === 'consumibles') : null;
+    if(!c) return [];
+    const t = plantillaConsumible(c);
+    return [{clave: `${sc.id}:drop`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: K.nombreLimpio(sc), drop: true}];
+  }
   function itemsExtra(rep){
     return rep.extras.map((e, i) => ({clave: `extra:${i}`, nombre: e.nombre, precioCompra: e.precioCompra, origen: 'Botín extra',
       template: {nombre: e.nombre, tipoItem: 'otros', tier: 'Común', peso: 0, ranuras: 1, precioCompra: e.precioCompra, tipoDado: 0, danoFijo: 0, danoAmplificado: 0, armaDeRango: false,
@@ -143,7 +201,7 @@ const CombateFin = (() => {
       const xpBase = xpBasePorNivel(sc.nivel);
       const xp = derrotado ? xpBase : Math.round(xpBase * XP_ESCAPO_PCT);
       const cuenta = derrotado || rep.contarEscapados;
-      return {sc, derrotado, xp, cuenta, oro: derrotado ? oroDeCreep(rep, sc) : 0, items: derrotado ? itemsDeCreep(cat, sc) : []};
+      return {sc, derrotado, xp, cuenta, oro: derrotado ? oroDeCreep(rep, sc) : 0, items: derrotado ? [...itemsDeCreep(cat, sc), ...dropDeCreep(rep, cat, sc)] : []};
     });
     const xpTotal = filas.reduce((a, f) => a + (f.cuenta ? f.xp : 0), 0);
     return {filas, xpTotal};
@@ -206,7 +264,7 @@ const CombateFin = (() => {
     </div>`).join('');
 
     const itemHtml = i => `<label class="reporte-loot-item" style="cursor:pointer;display:inline-flex;gap:5px;align-items:center${rep.quitados.has(i.clave) ? ';opacity:.45' : ''}" title="${i.template.estimado ? 'Precio estimado por comparación con el catálogo' : ''}">
-      <input type="checkbox" data-rep-item="${esc(i.clave)}"${rep.quitados.has(i.clave) ? '' : ' checked'}>${esc(i.nombre)}${i.trofeo ? ' 🏆' : ''} <span class="reporte-loot-precio">${fmt(i.precioCompra)} DDE${i.template.estimado ? ' (est.)' : ''}</span><button type="button" class="iconbtn" data-rep-ver="${esc(i.clave)}" style="padding:2px 8px;font-size:11px">Ver</button></label>`;
+      <input type="checkbox" data-rep-item="${esc(i.clave)}"${rep.quitados.has(i.clave) ? '' : ' checked'}>${esc(i.nombre)}${i.trofeo ? ' 🏆' : ''}${i.drop ? ' <span title="Consumible que soltó al azar (humano / humanoide)">🎲</span>' : ''} <span class="reporte-loot-precio">${fmt(i.precioCompra)} DDE${i.template.estimado ? ' (est.)' : ''}</span><button type="button" class="iconbtn" data-rep-ver="${esc(i.clave)}" style="padding:2px 8px;font-size:11px">Ver</button></label>`;
     const conItems = filas.filter(f => f.items.length);
     const extras = itemsExtra(rep);
     const lootHtml = (conItems.length || extras.length)
@@ -412,7 +470,7 @@ const CombateFin = (() => {
     }
   }
 
-  return {xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
+  return {xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_TIERS, dropChance, dropTabla, dropTier, dropDeCreep, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
     plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, calcularReparto,
     itemsPublicables, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

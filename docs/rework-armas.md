@@ -578,3 +578,27 @@ de esgrima 260 · Vigilia eterna 350 · Alquimista 190 · Misericordia 300 · Pu
 **✅ Aplicado (2026-10-03, dueño: «ajustar con este criterio y después lo reviso en cada caso»):** las 36 T4 Comunes y de Buena calidad tienen el precio libre.
 
 **✅ Cargado (2026-10-03, dueño: «avancemos con las raras y cuando las tengas pasame la lista»):** las 18 Raras reemplazaron a las 13 T4 Raras del catálogo, con los tres textos y el precio libre. Construido para ellas: efectos «solo si es crítico» y «Drena vida» en armas. Salieron: Aguijón de esgrima, Daga de guardia, Pico de guerra, Puñal aserrado, Lanza militar, Lanza de lisiar. Queda la revisión del dueño.
+
+### T4 Excepcional — diagnóstico y posibles diseños (2026-10-03)
+Hoy hay **6** (cuota original ~9; las anteriores las llevamos a 18). Precio libre = lo que diría la calculadora con la regla nueva.
+
+| # | Arma | Manos | Dados | Fijo | Bonos | Al golpear | Precio | PC → tier calc. | Precio libre | Observación |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | Colmillo dientes de sable | 1 | 2 | +1 | — | Sangrado (siempre) | **900** | 9,1 · Buena | 110 | rinde como una de Buena calidad y cuesta 900 |
+| 2 | Puñal de Dorne | 1 | 2 | +2 | — | Veneno 4 (siempre) | **850** | 11,1 · Raro | 160 | ídem; además el nombre es de una saga ajena |
+| 3 | ⚠️ Báculo mágico | 1 | 2 | — | Esp +2, Rango de casteo +5, «bonos» +2 | — | 200 | 12,7 · Raro | 240 | es un foco mágico, no un arma punzante: no es del Tipo 4 |
+| 4 | ⚠️ Pica del Muro Eterno | 2 | 3 | — | Alcance +2, PdG oport. +3, PdG +1 | Lisiado 50 % | 450 | 18,3 · Excepcional | 650 | bien ubicada |
+| 5 | ⚠️ Aguijón de la Reina Avispa | 1 | 2 | +2 | Crít. potente +4, Crít. frecuente +1 | Veneno severo (siempre) | 700 | 22,4 · Excepcional | 1100 | bien ubicada; el Detalle dice «4 turnos» y el Veneno severo no vence solo |
+| 6 | Lanza del alba | 2 | 4 | — | Alcance +2, PdG +1, Crít. potente +2, Crít. frecuente +1 | Lisiado 50 % | 900 | 25,8 · casi Legendaria | 2200 | al borde de Legendaria |
+
+**Diagnóstico:** dos son Excepcionales de nombre pero rinden como Buena/Rara y cuestan 850–900 (Colmillo, Puñal de Dorne); el Báculo no
+pertenece al Tipo 4 (es un foco de mago: va a otra categoría o al Tipo 10); la Lanza del alba roza Legendaria; ninguna usa lo nuevo
+(crítico «si es crítico», drena, por la espalda, ignora, «seguro si es crítico», turnos); ninguna tiene los tres textos; cuatro con ⚠️.
+
+**Lo que abre el Excepcional (definiciones del T4):** Veneno severo (desde acá) · Ignora 2 · Crítico frecuente +2 (el máximo útil del T4) ·
+Crítico potente +4/+5 · combinaciones de los tres ejes del crítico · Drena 75–100 % · Critical Matters fuertes («si es crítico: Veneno severo»,
+o dos efectos) · por la espalda grande · PdG +3. Excepciones ✨ todavía sin construir en armas: Rengo, Prende fuego (híbridas).
+
+**Mecánicas de firma posibles (🔧 a construir, una por arma):** «+1 d20 en el crítico» (más chance de ×3/×4 y de supercrítico); «no se puede
+parrear» (ya existe para habilidades: `sinParry`); «el ataque de oportunidad no cuesta No2»; «el primer ataque del turno cuesta 1 No2 menos»
+(los Nitros valen mucho); «con crítico, el Veneno pasa a severo»; «con crítico, drena el 100 %»; «Sangrado que entra con 2 stacks».

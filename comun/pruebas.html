@@ -77,6 +77,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
 <script src="asistente-trampa.js"></script>
+<script src="elegir-trampa.js"></script>
 <script src="asistente-zona.js"></script>
 <script src="asistente-mapa.js"></script>
 <script src="selector-estados.js"></script>
@@ -1592,6 +1593,31 @@ prueba('personaje nuevo: pool custom (2 de Job), una habilidad propia armada en 
   v.ir('Resumen'); v.clic('[data-pap="crear"]'); await new Promise(r => setTimeout(r, 0));
   igual([pedida, trasCrear, armada, conPool, chips.length, recursos, datos && datos.habilidades.map(h => h.nombre + ' ' + h.jobCosto), categoriaDePasiva({etiquetas: ['resistencia']}), categoriaDePasiva({regenHp: 2}), dde300, datos && datos.meta.dde],
     [null, 'Job: 2 de 3 (habilidades + pasivas)', true, 'Job: 4 de 3 (habilidades + pasivas) · 1 de más', 6, ['Reserva de poder', 'Impulso'], ['Mi grito 2', 'Rayo casero 2'], 'defensiva', 'recuperacion', '300', 450]);
+});
+prueba('trampa de una habilidad: una conocida por tipo (veneno: daño por turno y turnos; púas: daño y efecto adicional) o armar de cero', async () => {
+  let res = null;
+  ElegirTrampa.abrir({alTerminar: t => { res = t; }});
+  let v = papUltima();
+  const antes = v.tabs();
+  v.clic('[data-et-modo="concepto"]'); v.clic('[data-et-concepto="veneno"]');
+  const pasosVeneno = v.tabs();
+  v.ir('Qué le deja'); const estadoOn = v.q('[data-et-estado].on b').textContent; v.escribir('[data-et="estadoStacks"]', '4'); v.escribir('[data-et="estadoTurnos"]', '5');
+  v.ir('Resumen'); v.clic('[data-pap="crear"]'); await new Promise(r => setTimeout(r, 0));
+  const veneno = res;
+  ElegirTrampa.abrir({alTerminar: t => { res = t; }});
+  v = papUltima();
+  v.clic('[data-et-modo="concepto"]'); v.clic('[data-et-concepto="puas"]');
+  const pasosPuas = v.tabs();
+  v.ir('Daño'); v.escribir('[data-et="dados"]', '4');
+  v.ir('Efecto adicional'); v.clic('[data-et-estado=""]');
+  v.ir('Resumen'); v.clic('[data-pap="crear"]'); await new Promise(r => setTimeout(r, 0));
+  const puas = res;
+  ElegirTrampa.abrir({alTerminar: () => {}});
+  v = papUltima(); v.clic('[data-et-modo="cero"]');
+  const cero = papUltima().q('.pap-cab h3').textContent; papUltima().clic('[data-pap="cancelar"]');
+  igual([antes, pasosVeneno, estadoOn, veneno.estado, veneno.estadoStacks, veneno.estadoTurnos, veneno.dano, veneno.tipo, pasosPuas, puas.dano, puas.estado, puas.nombre, cero.startsWith('Trampa de la habilidad')],
+    [['Cómo', 'Tipo'], ['Cómo', 'Tipo', 'Tamaño', 'Daño', 'Qué le deja', 'Se evita', 'Nombre', 'Resumen'], 'Veneno', 'Veneno', 4, 5, '1d6', 'linea',
+     ['Cómo', 'Tipo', 'Tamaño', 'Daño', 'Efecto adicional', 'Se evita', 'Nombre', 'Resumen'], '4d6', '', 'Púas y estacas', true]);
 });
 /* ---------- Creeps por mapa (comun/creeps-mapas.js, 2026-10-02: los grupos pasaron a ser mapas) ---------- */
 // Una base de datos de mentira, lo justo para CreepsMapas: colecciones y documentos en memoria.

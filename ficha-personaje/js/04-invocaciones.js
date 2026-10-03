@@ -698,7 +698,8 @@ function hiTrampaRender(){
   const nom = hiTrampa ? String(hiTrampa.nombre || '').trim() : '';
   $('#hi-trampa-resumen').innerHTML = on
     ? `<div class="hint" style="margin-bottom:8px"><b>${esc(nom || $('#hi-nombre').value.trim() || 'Sin nombre')}</b><br>${esc(hiTrampaResumen())}</div>
-      <button type="button" class="btn primary" id="hi-trampa-asistente" style="width:100%">🪄 ${nom ? 'Cambiar' : 'Armar'} la trampa paso a paso</button>`
+      <div style="display:flex;gap:8px"><button type="button" class="btn" id="hi-trampa-elegir" style="flex:1">🪤 Elegir otra trampa</button>
+      <button type="button" class="btn primary" id="hi-trampa-asistente" style="flex:1">🪄 Ajustar todo, paso a paso</button></div>`
     : '';
   $('#hi-trampa-ayuda').textContent = on
     ? 'Al ejecutarla se coloca la trampa (y la habilidad se anuncia como siempre, sin decir dónde quedó).'
@@ -711,8 +712,18 @@ function hiAbrirAsistenteTrampa(){
     alCancelar: () => { if(!hiTrampaArmada()){ $('#hi-trampa-on').checked = false; hiTrampaRender(); } },
   });
 }
-document.addEventListener('change', e => { if(e.target && e.target.id === 'hi-trampa-on'){ hiTrampaRender(); if(e.target.checked && !hiTrampaArmada()) hiAbrirAsistenteTrampa(); } });
-document.addEventListener('click', e => { if(e.target && e.target.closest && e.target.closest('#hi-trampa-asistente')) hiAbrirAsistenteTrampa(); });
+// Al tildar la trampa (o «Elegir otra trampa»): el menú común — una conocida por tipo, de cero (comun/elegir-trampa.js).
+function hiElegirTrampa(){
+  ElegirTrampa.abrir({inicial: hiTrampa,
+    alTerminar: t => { hiTrampa = t; $('#hi-trampa-on').checked = true; hiTrampaRender(); },
+    alCancelar: () => { if(!hiTrampaArmada()){ $('#hi-trampa-on').checked = false; hiTrampaRender(); } }});
+}
+document.addEventListener('change', e => { if(e.target && e.target.id === 'hi-trampa-on'){ hiTrampaRender(); if(e.target.checked && !hiTrampaArmada()) hiElegirTrampa(); } });
+document.addEventListener('click', e => {
+  if(!e.target || !e.target.closest) return;
+  if(e.target.closest('#hi-trampa-asistente')) hiAbrirAsistenteTrampa();
+  else if(e.target.closest('#hi-trampa-elegir')) hiElegirTrampa();
+});
 
 function abrirEditorHabInv(invId, habId){
   const inv = S.invocaciones.find(x => x.id === invId);

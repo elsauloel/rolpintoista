@@ -93,6 +93,7 @@ const AsistenteTrampa = (() => {
       contemplaArmadura: ini.contemplaArmadura !== false,
       aplicaEstado: !!ini.estado, estado: ini.estado || '', estadoTurnos: num(ini.estadoTurnos) || 0,
       estadoPropio: ini.estado || '', estadoMods: Array.isArray(ini.estadoMods) ? ini.estadoMods : null,   // un estado propio (fuera de la lista) que ya traía
+      estadoStacks: num(ini.estadoStacks) || 0, estadoDeStacks: ini.estado || '',   // los stacks que ya traía (Veneno, Sangrado): se conservan si no cambia el estado
       seEvita: !!(ini.salvacion && ini.salvacion.stat), salStat: (ini.salvacion && ini.salvacion.stat) || 'Evasión', salDif: (ini.salvacion && ini.salvacion.dif) || 10,
       dura: num(ini.turnos) > 0, turnos: num(ini.turnos) || 3,
       teleport: !!ini.teleport,
@@ -275,6 +276,7 @@ const AsistenteTrampa = (() => {
       dano: danoTxt(), contemplaArmadura: est.contemplaArmadura,
       estado: est.aplicaEstado && preset() ? est.estado : '', estadoTurnos: est.aplicaEstado && preset() ? durEstado() : 0,
       estadoMods: est.aplicaEstado && est.estado === est.estadoPropio && est.estadoMods ? est.estadoMods : null,
+      estadoStacks: est.aplicaEstado && est.estado === est.estadoDeStacks && est.estadoStacks ? est.estadoStacks : 0,
       teleport: !deHab && !!est.teleport,
       salvacion: est.seEvita ? {stat: est.salStat, dif: est.salDif} : null,
       turnos: est.dura ? est.turnos : 0, guardar: !!est.guardar,
@@ -358,7 +360,7 @@ const AsistenteTrampa = (() => {
     if(r.descripcion) partes.push(r.descripcion.replace(/[.!?]+$/, ''));
     else{
       if(r.dano) partes.push(`${r.dano} de daño${r.contemplaArmadura ? '' : ' directo'}`);
-      if(r.estado) partes.push(`deja ${r.estado}${r.estadoTurnos ? ' ' + r.estadoTurnos + ' turnos' : ''}`);
+      if(r.estado) partes.push(`deja ${r.estado}${num(r.estadoStacks) > 0 ? ' ×' + r.estadoStacks : ''}${r.estadoTurnos ? ' ' + r.estadoTurnos + ' turnos' : ''}`);
       if(r.teleport) partes.push('teletransporta a quien la pisa');
       if(!partes.length) partes.push('solo avisa cuando se activa');
     }
@@ -370,6 +372,7 @@ const AsistenteTrampa = (() => {
     const linea = r.forma === 'linea';
     return {nombre: String(r.nombre || '').trim().slice(0, 40), detalle: detalleFinal(r), amiga: !!r.amiga, ignoraDef: !r.contemplaArmadura, dano: r.dano || '',
       estado: r.estado || '', estadoTurnos: r.estado ? Math.max(0, num(r.estadoTurnos)) : 0, ...(r.estado && r.estadoMods ? {estadoMods: r.estadoMods} : {}),
+      ...(r.estado && num(r.estadoStacks) > 0 ? {estadoStacks: Math.min(20, Math.round(num(r.estadoStacks)))} : {}),
       tipo: linea ? 'linea' : 'flor', tamano: linea ? Math.max(1, Math.min(20, num(r.largo) || 3)) : Math.max(0, Math.min(6, num(r.radio))),
       color: r.color, alfa: Number.isFinite(r.alfa) ? r.alfa : 45, ...(r.teleport ? {teleport: true} : {}),
       ...(r.dejaZona ? {dejaZona: true, zonaTurnos: Math.max(1, num(r.zonaTurnos) || 3), zonaEnMantenimiento: r.zonaEnMant !== false, zonaCadaPaso: !!r.zonaCadaPaso,
@@ -382,7 +385,7 @@ const AsistenteTrampa = (() => {
     const linea = t.tipo === 'linea';
     return {nombre: t.nombre || '', descripcion: t.detalle || '', forma: linea ? 'linea' : 'flor', radio: linea ? 0 : Math.max(0, num(t.tamano)), largo: linea ? num(t.tamano) || 3 : 3,
       cant: t.cant || 1, color: t.color, alfa: t.alfa, amiga: !!t.amiga, dano: t.dano || '', contemplaArmadura: !t.ignoraDef,
-      estado: t.estado || '', estadoTurnos: t.estadoTurnos || 0, estadoMods: t.estadoMods, teleport: !!t.teleport,
+      estado: t.estado || '', estadoTurnos: t.estadoTurnos || 0, estadoMods: t.estadoMods, estadoStacks: t.estadoStacks || 0, teleport: !!t.teleport,
       dejaZona: !!t.dejaZona, zonaTurnos: t.zonaTurnos, zonaEnMant: t.zonaEnMantenimiento !== false, zonaCadaPaso: !!t.zonaCadaPaso,
       zonaResistStat: t.zonaResistStat || '', zonaResistValor: t.zonaResistValor, turnos: t.turnos || 0, detectar: t.detectar, detectarStat: t.detectarStat};
   }
@@ -391,7 +394,7 @@ const AsistenteTrampa = (() => {
     const t = typeof Plantillas !== 'undefined' && Plantillas.trampaDesde ? Plantillas.trampaDesde(t0 || {}) : (t0 || {});
     const p = [];
     if(t.dano) p.push(`${t.dano} de daño ${t.ignoraDef ? '(directo a la vida)' : '(contempla la armadura)'}`);
-    if(t.estado) p.push(`deja ${t.estado}`);
+    if(t.estado) p.push(`deja ${t.estado}${num(t.estadoStacks) > 0 ? ' ×' + t.estadoStacks : ''}${num(t.estadoTurnos) > 0 ? ' ' + t.estadoTurnos + ' turnos' : ''}`);
     if(!p.length) p.push('solo avisa cuando se activa');
     p.push(t.tipo === 'linea' ? `línea de ${t.tamano}` : `radio ${Math.max(0, num(t.tamano))}`);
     if((t.cant || 1) > 1) p.push(`×${t.cant}`);

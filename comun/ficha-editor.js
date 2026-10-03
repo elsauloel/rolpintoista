@@ -340,9 +340,9 @@ const FichaEditor = (() => {
       const t = draft.trampaColocar || null;
       return `<div class="f" style="margin-top:10px"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 10px;border:1px solid var(--copper);border-radius:var(--r);background:rgba(201,133,69,.10)">
       <input type="checkbox" data-tr="on" ${t ? 'checked' : ''} style="width:auto"> <span><b>🪤 Esta habilidad coloca una trampa</b><br><span style="font-size:12px;color:var(--muted);text-transform:none;letter-spacing:0">${modoHab(draft) === 'auto' ? 'Al ejecutarla elegís en el mapa dónde colocarla. La ven solo los de tu bando: el GM se entera de que la colocaste, pero no de dónde.' : 'Al ejecutarla deja sola una trampa oculta al lado de tu token, en el mapa que se está jugando.'}</span></span></label></div>
-    ${t ? `<button type="button" class="btn" data-ed="trampa-pre" style="width:100%;margin-bottom:8px">📚 Trampas preconstruidas</button>
-      <div class="hint" style="margin:4px 0 8px"><b>${esc(t.nombre || 'Sin nombre')}</b><br>${esc(AsistenteTrampa.resumenTexto(t))}</div>
-      <button type="button" class="btn primary" data-ed="trampa-asistente" style="width:100%">🪄 ${t.nombre ? 'Cambiar' : 'Armar'} la trampa paso a paso</button>` : ''}`;
+    ${t ? `<div class="hint" style="margin:4px 0 8px"><b>${esc(t.nombre || 'Sin nombre')}</b><br>${esc(AsistenteTrampa.resumenTexto(t))}</div>
+      <div style="display:flex;gap:8px"><button type="button" class="btn" data-ed="trampa-elegir" style="flex:1">🪤 Elegir otra trampa</button>
+      <button type="button" class="btn primary" data-ed="trampa-asistente" style="flex:1">🪄 Ajustar todo, paso a paso</button></div>` : ''}`;
     }
     function trampaAbrirAsistente(){
       const ed = editing, t = ed.draft.trampaColocar || {};
@@ -356,9 +356,17 @@ const FichaEditor = (() => {
         alCancelar: () => { if(editing === ed && ed.draft.trampaColocar && !String(ed.draft.trampaColocar.nombre || '').trim() && !ed.draft.trampaColocar.dano){ delete ed.draft.trampaColocar; dibujar(); } },
       });
     }
+    // Al tildar la trampa (o «Elegir otra trampa»): el menú común — una conocida por tipo, de cero o del catálogo (comun/elegir-trampa.js).
+    function trampaElegir(){
+      const ed = editing;
+      ElegirTrampa.abrir({inicial: ed.draft.trampaColocar || null,
+        alTerminar: t => { if(editing !== ed) return; ed.draft.trampaColocar = t; dibujar(); },
+        alCancelar: () => { if(editing === ed && ed.draft.trampaColocar && !String(ed.draft.trampaColocar.nombre || '').trim() && !ed.draft.trampaColocar.dano){ delete ed.draft.trampaColocar; dibujar(); } },
+        alCatalogo: () => trampaPreconstruidas()});
+    }
     function trampaGuardarCampo(el){
       const d = editing.draft, k = el.dataset.tr;
-      if(k === 'on'){ d.trampaColocar = el.checked ? (d.trampaColocar || {nombre: '', detalle: '', dano: '', ignoraDef: false, tipo: 'flor', tamano: 0, cant: 1}) : undefined; if(!el.checked) delete d.trampaColocar; dibujar(); if(el.checked && !String(d.trampaColocar.nombre || '').trim()) trampaAbrirAsistente(); return; }
+      if(k === 'on'){ d.trampaColocar = el.checked ? (d.trampaColocar || {nombre: '', detalle: '', dano: '', ignoraDef: false, tipo: 'flor', tamano: 0, cant: 1}) : undefined; if(!el.checked) delete d.trampaColocar; dibujar(); if(el.checked && !String(d.trampaColocar.nombre || '').trim()) trampaElegir(); return; }
       const t = d.trampaColocar; if(!t) return;
       if(k === 'ignoraDef') t[k] = el.checked;
       else if(k === 'radio' || k === 'cant') t[k] = Math.max(k === 'cant' ? 1 : 0, Math.min(6, Math.round(num(el.value) || 0)));
@@ -909,6 +917,7 @@ const FichaEditor = (() => {
       if(a === 'addmod'){ editing.draft.mods = editing.draft.mods||[]; editing.draft.mods.push({stat:'', val:0}); dibujar(); }
       if(b.dataset.rmmod !== undefined){ editing.draft.mods.splice(+b.dataset.rmmod,1); dibujar(); }
       if(a === 'trampa-pre'){ trampaPreconstruidas(); return; }
+      if(a === 'trampa-elegir'){ trampaElegir(); return; }
       if(a === 'trampa-asistente'){ trampaAbrirAsistente(); return; }
       if(a === 'addefectomod'){ editing.draft.efectoMods = editing.draft.efectoMods||[]; editing.draft.efectoMods.push({stat:'', val:0}); dibujar(); }
       if(b.dataset.rmefectomod !== undefined){ editing.draft.efectoMods.splice(+b.dataset.rmefectomod,1); dibujar(); }

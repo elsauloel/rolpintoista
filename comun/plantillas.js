@@ -81,7 +81,7 @@ const Plantillas = (() => {
      que se ejecuta). Una habilidad guarda esto mismo en `trampaColocar`, así una trampa del catálogo sirve para las dos cosas.
      `trampaDesde(t)` traduce cualquier trampa, también las viejas de las habilidades ({radio, cant, estado: {nombre,
      turnos}}), a esta forma. */
-  const TRAMPA = ['nombre', 'detalle', 'amiga', 'tipo', 'tamano', 'color', 'alfa', 'dano', 'ignoraDef', 'estado', 'estadoTurnos', 'estadoMods', 'teleport',
+  const TRAMPA = ['nombre', 'detalle', 'amiga', 'tipo', 'tamano', 'color', 'alfa', 'dano', 'ignoraDef', 'estado', 'estadoTurnos', 'estadoMods', 'estadoStacks', 'teleport',
     'dejaZona', 'zonaTurnos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaResistStat', 'zonaResistValor', 'turnos', 'cant',
     'detectar', 'detectarStat'];   // dificultad para detectarla (P145): un número (mapa) o de qué stat de quien la coloca sale (habilidad)
   function trampaDesde(t){

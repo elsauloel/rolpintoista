@@ -244,7 +244,8 @@ const CreepEditor = (() => {
       const nom = trampa ? String(trampa.nombre || '').trim() : '';
       $h('trampa-resumen').innerHTML = on
         ? `<div class="hint" style="margin-bottom:8px"><b>${esc(nom || $h('nombre').value.trim() || 'Sin nombre')}</b><br>${esc(trampaResumen())}</div>
-      <button type="button" class="btn primary" data-hc="trampa-asistente" style="width:100%">🪄 ${nom ? 'Cambiar' : 'Armar'} la trampa paso a paso</button>`
+      <div style="display:flex;gap:8px"><button type="button" class="btn" data-hc="trampa-elegir" style="flex:1">🪤 Elegir otra trampa</button>
+      <button type="button" class="btn primary" data-hc="trampa-asistente" style="flex:1">🪄 Ajustar todo, paso a paso</button></div>`
         : '';
     }
     function cargarTrampa(h){
@@ -256,7 +257,14 @@ const CreepEditor = (() => {
       if(!on || !trampa){ delete h.trampaColocar; return; }
       h.trampaColocar = {...structuredClone(trampa), nombre: String(trampa.nombre || '').trim().slice(0, 40) || h.nombre};
     }
-    // Menú paso a paso de trampas (comun/asistente-trampa.js, 2026-09-25).
+    // Al tildar la trampa (o «Elegir otra trampa»): el menú común — una conocida por tipo, de cero o del catálogo (comun/elegir-trampa.js).
+    function elegirTrampa(){
+      ElegirTrampa.abrir({inicial: trampa,
+        alTerminar: t => { trampa = t; $h('trampa-on').checked = true; trampaRender(); },
+        alCancelar: () => { if(!(trampa && (String(trampa.nombre || '').trim() || trampa.dano))){ $h('trampa-on').checked = false; trampaRender(); if(pap) pap.redibujar(); } },
+        alCatalogo: () => trampasPreconstruidas()});
+    }
+    // Menú paso a paso de trampas (comun/asistente-trampa.js, 2026-09-25): «Ajustar todo».
     function abrirAsistenteTrampa(){
       const lista = EstadosAplicar.DEBUFFS.filter(p => !p.permanente && num(p.turnos) > 0 && !p.esVeneno).map(p => ({nombre: p.nombre, detalle: p.detalle || '', turnos: num(p.turnos), permanente: false}));
       AsistenteTrampa.abrir({
@@ -446,6 +454,7 @@ const CreepEditor = (() => {
       if(a === 'ejecucion-abrir') abrirEjecucion();
       else if(a === 'trampa-asistente') abrirAsistenteTrampa();
       else if(a === 'trampa-preconstruidas') trampasPreconstruidas();
+      else if(a === 'trampa-elegir') elegirTrampa();
     }
     // Enter en un campo de una línea: al paso siguiente.
     function teclas(ev){
@@ -471,7 +480,7 @@ const CreepEditor = (() => {
       $h('efecto-mods').value = JSON.stringify(preset.mods || []);
       if(pap) pap.redibujar();   // con estado, el paso Estado ya cuenta en las pestañas
     });
-    $h('trampa-on').addEventListener('change', () => { trampaRender(); if($h('trampa-on').checked && !(trampa && (String(trampa.nombre || '').trim() || trampa.dano))) abrirAsistenteTrampa(); });
+    $h('trampa-on').addEventListener('change', () => { trampaRender(); if($h('trampa-on').checked && !(trampa && (String(trampa.nombre || '').trim() || trampa.dano))) elegirTrampa(); });
     // Los pasos que se ven dependen de si hay estado y de si coloca trampa (orden): al cambiarlos, se rearman las pestañas.
     $h('trampa-on').addEventListener('change', () => { if(pap) pap.redibujar(); });
     $h('efecto-nombre').addEventListener('change', () => { if(pap) pap.redibujar(); });

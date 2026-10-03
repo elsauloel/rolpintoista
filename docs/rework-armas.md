@@ -387,3 +387,32 @@ Calculadora v0: **PC** = puntos de calidad (Común < 7,5 ≤ Buena calidad). «P
 - **Casi ninguna usa lo propio del T4**: Lisiado (solo la Lezna), Crítico potente (ninguna), y ninguna mecánica nueva (por la espalda,
   durabilidad de diseño, Critical Matters).
 - **Precios desparejos**: la Daga de vigía (45) y el Cuchillo de cocina (65) tienen poder parecido.
+
+### T4 Común — propuesta v1 (2026-10-03, ⬜ a revisar por el dueño)
+Pedido del dueño: sacar las copias; a las lanzas, un dado menos; al estileto, Crítico potente en vez de frecuente; sumar armas con 25 % o 50 % de
+aplicar estados del tipo, alguna resistente (+3 de durabilidad) y alguna con 25 % que, si el golpe es crítico, aplica seguro; precios a criterio.
+Todas: una mano, Tipo 4. PC = calculadora v0 (Común < 7,5).
+
+| # | Arma | Dados | Fijo | Bonos | Al golpear | Durab. | PC | Precio | Cambio |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | Cuchillo de cazador | 1 | — | — | — | 3 | 2,3 | 30 | igual |
+| 2 | Daga | 1 | +1 | — | — | 3 | 4,3 | 45 | 40 → 45 |
+| 3 | Pica Hielos | 2 | — | — | — | 6 | 4,6 | 45 | 40 → 45 |
+| 4 | Cuchillo de cocina reconvertido | 1 | — | PdG +1 | — | 3 | 5,8 | 60 | 65 → 60 |
+| 5 | Lezna de zapatero | 1 | — | PdG +1 | Lisiado 25 % | 3 | 6,5 | 70 | igual |
+| 6 | Daga de vigía | 1 | — | PdG de oportunidad +1 | — | 3 | 3,1 | 40 | 45 → 40 |
+| 7 | Estilete de centinela | 1 | — | PdG de oportunidad +2 | — | 3 | 3,9 | 50 | igual |
+| 8 | Estoque de guardia | 1 | — | Iniciativa +1, PdG de oportunidad +2 | — | 3 | 4,5 | 55 | igual (sale de ⚠️) |
+| 9 | Horquilla | 1 | — | Alcance +1 | Lisiado 25 % | 3 | 6,1 | 70 | + Lisiado (si no, quedaba igual a la Lanza corta) |
+| 10 | Lanza corta | 1 | — | Alcance +1 | — | 3 | 5,3 | 55 | 2 dados → 1; 75 → 55 |
+| 11 | Estileto | 1 | — | Crítico potente +1 | — | 3 | 3,5 | 45 | frecuente → potente; 50 → 45 |
+| 12 | 🆕 Clavo de herrador | 1 | — | — | Lisiado 50 % | 3 | 3,8 | 50 | nueva |
+| 13 | 🆕 Puñal aserrado | 1 | — | — | Sangrado 25 % | 3 | 2,9 | 40 | nueva |
+| 14 | 🆕 Aguja de zurcir untada | 1 | — | — | Veneno (2) 50 % | 3 | 3,6 | 50 | nueva |
+| 15 | 🆕 Cuchillo de trinchera | 1 | +1 | — | — | **6** (resistente) | 4,3 | 60 | nueva |
+| 16 | 🆕 Punzón de matarife | 1 | — | — | Lisiado 25 %, **seguro si es crítico** | 3 | ~3,5 | 50 | nueva 🔧 |
+| 17 | 🆕 Aguja de la envenenadora | 1 | — | — | Veneno (2) 25 %, **seguro si es crítico** | 3 | ~3,3 | 45 | nueva 🔧 |
+| 18 | 🆕 Lanza de pescador | 1 | — | Alcance +1, PdG de oportunidad +1 | — | 3 | 6,1 | 65 | nueva |
+
+Salen (copias): Cuchillo del grumete polizón, Punzón del ladronzuelo, Lanza de guardia de puerta, Estileto ritual del acólito.
+🔧 «Seguro si es crítico» en un efecto de arma no existe todavía (Critical Matters hoy es solo de habilidades): se construye si se aprueba.

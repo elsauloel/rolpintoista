@@ -564,3 +564,13 @@ Critical Matters (efecto solo si es crítico); 2–3 por la espalda; algunas con
 Conteo: veneno 3 (+1 con crítico) · lisiado 3 (+1) · sangrado 1 (+2) · Critical Matters 4 · drena 1 · rompe armadura 1 · por la espalda 3 ·
 crítico potente 6 · frecuente 3 · ignora 4. Salen: Aguijón de esgrima (Parry), Daga de guardia, Pico de guerra y Puñal aserrado (Rompe armadura),
 Lanza militar, Lanza de lisiar. 🔧 Hay que construir: **Critical Matters en armas** y **Drena vida en armas** (% del daño que pasa la Defensa).
+
+### Precio libre (regla del dueño, 2026-10-03)
+El precio **ya no depende de una banda por tier**: sale del valor del arma (daño —con los dados amplificados—, crítico, ignora, durabilidad, bonos,
+efectos, por la espalda, Critical Matters) con una curva continua, y **sube por combinación**: cada cosa de más en el mismo slot suma un 10 % (las
+sinergias valen en sí mismas). `calculadora_armas.py`: `precio_libre(arma)` (y `extras(arma)`). De paso se corrigió que la calculadora no contaba
+los dados amplificados. El tier sigue siendo una decisión de diseño; la banda vieja (`precio(pc, tier)`) queda solo para las herramientas viejas.
+
+Precios de la propuesta Raro v1 con la regla nueva: Puñal desgarrador 200 · Viuda negra 260 · Cirujano 200 · Estilete de maestro 200 · Escolta 220 ·
+Sedienta 280 · Guardián del paso 180 · Estoque de duelista 290 · Sereno 300 · Comodoro 300 · Pica de retaguardia 210 · Montero mayor 220 · Estoque
+de esgrima 260 · Vigilia eterna 350 · Alquimista 190 · Misericordia 300 · Puñal envenenado 270 · Rompemalla 300.

@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """Calculadora de calidad, tier y precio de armas (rework del catálogo, 2026-09-25).
 
+Precio (2026-10-03, dueño): `precio_libre(arma)` — sin bandas por tier; el valor del arma con una curva continua y un recargo por cada
+efecto de más en el mismo slot (la combinación vale en sí misma). `precio(pc, tier)` queda para las herramientas viejas.
+
 Fórmula v0 (TASAS INICIALES: se ajustan con ejemplos junto al dueño; ver docs/rework-armas.md, preguntas 8 a 10).
 Unidad: 1 PUNTO DE CALIDAD (PC) = 1 punto de daño esperado por ataque.
 
@@ -90,7 +93,8 @@ def probabilidad(e):
 def puntaje(arma):
     """Devuelve (PC total, desglose)."""
     tipo, peso, fijo = int(arma.get('tipoDado') or 0), int(arma.get('peso') or 1), float(arma.get('danoFijo') or 0)
-    d = {'daño': peso * (tipo + 1) / 2 + fijo * factor_plano(tipo)}
+    amp = int(arma.get('danoAmplificado') or 0)   # los dados amplificados también pegan (no pesan)
+    d = {'daño': (peso + amp) * (tipo + 1) / 2 + fijo * factor_plano(tipo)}
     fam = familia(arma)
     bonos = crit = 0.0
     for m in arma.get('mods') or []:
@@ -128,12 +132,48 @@ def puntaje(arma):
         if nombre == 'Explosión' and st > 1: escala = 1 + 0.5 * (st - 1)      # radio de la Explosión (stacks): radio 2 = ×1,5; radio 3 = ×2
         if nombre == 'Rompe armadura' and st > 1: escala = 1 + 0.5 * (st - 1)      # cada stack extra de Armadura rota por golpe suma +50 %
         if nombre == 'Envenenar' and st and 'severo' not in str(e.get('detalle', '')).lower(): escala = st / 2   # el peso 2 del Veneno es a 2 stacks
-        ef += base * escala * probabilidad(e) * K_EFECTO * modulacion(nombre, fam)
+        if nombre == 'Drena vida' and e.get('drenaPct'): escala = float(e['drenaPct']) / 50   # el peso 4 de Drena vida es a 50 % del daño que pasa
+        prob = probabilidad(e) * (P_CRITICO if e.get('soloCritico') else 1.0)   # Critical Matters: solo con un golpe crítico
+        if e.get('seguroCritico') and not e.get('soloCritico'): prob = min(1.0, prob + (1 - prob) * P_CRITICO)   # con crítico entra seguro
+        ef += base * escala * prob * K_EFECTO * modulacion(nombre, fam)
     if arma.get('ignoraResistCrit'):   # el campo nuevo del arma (2026-10-03): igual que el efecto viejo «Ignora N», siempre
         ef += float(arma['ignoraResistCrit']) * PESO_CRIT * K_EFECTO * FACTOR_CRIT.get(tipo, 1.0)
     d['efectos'] = ef
+    es = arma.get('espalda') or {}
+    if es:   # por la espalda: vale como sus bonos, pero es situacional (solo en sigilo y por atrás)
+        d['por la espalda'] = ESPALDA_FACTOR * (float(es.get('pdg') or 0) * TASA_STAT['pdg'] + float(es.get('fijo') or 0) * factor_plano(tipo)
+                                                 + min(float(es.get('critpot') or 0), 6) * PESO_CRIT * PESO_CRITPOT)
+    if float(arma.get('durPorPeso') or 0) > 3:   # durabilidad de más que la normal (3 por punto de Peso)
+        d['durabilidad'] = TASA_DUR * (float(arma['durPorPeso']) - 3) * peso
     d['peso del arma'] = -TASA_PESO * peso
     return sum(d.values()), d
+
+
+# ---------------------------------------------------------------- precio libre (dueño, 2026-10-03)
+# El precio ya NO sale de una banda por tier: sale del valor del arma (daño, crítico, durabilidad, efectos) con una curva continua, y sube
+# además por COMBINACIÓN: cada cosa de más en el mismo slot tiene un valor en sí misma (sinergias), un recargo de RECARGO_COMBO por extra.
+P_CRITICO = 0.25          # chance aproximada de que un golpe sea crítico (Critical Matters / «seguro si es crítico»)
+ESPALDA_FACTOR = 0.3      # lo que rinde un bono por la espalda frente a uno permanente
+TASA_DUR = 0.25           # PC por cada punto de durabilidad de más
+PRECIO_A, PRECIO_B = 27, 0.158   # precio = A · e^(B · PC): ~40 con 2,3 PC, ~90 con 7,5, ~150 con 11, ~400 con 17, ~1650 con 26
+RECARGO_COMBO = 0.10      # +10 % por cada extra después del primero
+
+
+def extras(arma):
+    """Cuántas cosas trae el arma además del daño: cada bono, cada efecto al golpear, ignora, por la espalda, durabilidad de más."""
+    n = len([m for m in arma.get('mods') or [] if float(m.get('val') or 0) and m.get('stat') != 'def'])
+    n += len([e for e in arma.get('efectosGolpe') or [] if e.get('nombre')])
+    n += 1 if arma.get('ignoraResistCrit') else 0
+    n += 1 if arma.get('espalda') else 0
+    n += 1 if float(arma.get('durPorPeso') or 0) > 3 else 0
+    return n
+
+
+def precio_libre(arma):
+    """(precio, PC, recargo): el precio por el valor del arma y por la combinación de efectos."""
+    pc, _ = puntaje(arma)
+    recargo = 1 + RECARGO_COMBO * max(0, extras(arma) - 1)
+    return redondo(PRECIO_A * math.exp(PRECIO_B * pc) * recargo), pc, recargo
 
 
 def tier_de(pc):

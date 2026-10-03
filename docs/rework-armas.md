@@ -574,3 +574,5 @@ los dados amplificados. El tier sigue siendo una decisión de diseño; la banda 
 Precios de la propuesta Raro v1 con la regla nueva: Puñal desgarrador 200 · Viuda negra 260 · Cirujano 200 · Estilete de maestro 200 · Escolta 220 ·
 Sedienta 280 · Guardián del paso 180 · Estoque de duelista 290 · Sereno 300 · Comodoro 300 · Pica de retaguardia 210 · Montero mayor 220 · Estoque
 de esgrima 260 · Vigilia eterna 350 · Alquimista 190 · Misericordia 300 · Puñal envenenado 270 · Rompemalla 300.
+
+**✅ Aplicado (2026-10-03, dueño: «ajustar con este criterio y después lo reviso en cada caso»):** las 36 T4 Comunes y de Buena calidad tienen el precio libre.

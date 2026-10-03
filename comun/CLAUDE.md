@@ -1161,6 +1161,13 @@ versión parecida en más de una, es candidato a juntar.
   Defensivas, Recuperación, Recursos, Utilidad — salen de las etiquetas y de lo que suma); en Equipo, el DDE inicial en una caja editable (300 o el
   del GM; el texto invita a preguntarle al GM). `Combatiente.ROLES`/`PESOS_ROL`/`ROL_DE_CLASE`/`repartirAtributos(total, pesos, minimo)`: los repartos sugeridos (los usa también el asistente
   de creeps de GM Tools).
+- **`elegir-trampa.js`** (`ElegirTrampa`, 2026-10-02, pedido del dueño) — al tildar «🪤 Esta habilidad coloca una trampa» (en los tres editores de
+  habilidades: personaje, creep, invocación) se abre este menú: **una trampa conocida** (12 tipos con sus valores sugeridos, sacados del catálogo
+  de trampas hasta auditarlo: `CONCEPTOS` — púas, cepo, red, veneno, gas, explosiva, fuego, hielo, eléctrica, pegajosa, runa, alarma — y un paso a
+  paso con lo que importa de cada tipo: Tamaño, Daño, Qué le deja / Efecto adicional, Se evita, Nombre, Resumen), **armar de cero**
+  (`AsistenteTrampa`) o **del catálogo** (`cfg.alCatalogo`). Devuelve la trampa en la forma única (`AsistenteTrampa.aTrampa`). Una trampa puede
+  llevar **`estadoStacks`** (Veneno, Sangrado: el daño por turno): `Plantillas.TRAMPA`, `TokensAuto.colocarTrampas` (va en el `stacks` del estado) y
+  `AsistenteTrampa` (lo conserva). Con la trampa ya elegida, el editor ofrece «🪤 Elegir otra trampa» y «🪄 Ajustar todo, paso a paso».
 - **`asistente-mapa.js`** (`AsistenteMapa`, 2026-10-02, tanda 6) — «＋ Mapa nuevo» paso a paso: Nombre → Creeps (cuáles se mudan a este mapa, agrupados
   por dónde están) → Listo. `abrir({nombre, creeps: [{id, nombre, donde}], marcados, alCrear({nombre, creeps}), alCancelar})`; no escribe nada: el
   mapa (`crearMapa`, js/01) y GM Tools (`pedirMapaNuevo`, js/09) crean el mapa y mudan los creeps a su manera.

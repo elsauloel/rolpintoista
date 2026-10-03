@@ -248,6 +248,9 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Por la espalda: probarlo en el mapa** (construido 2026-10-03, pruebas automáticas en verde): un token en sigilo, en el casillero de atrás
   de un rival, ataca con un arma que tenga el bono → el cuadro del duelo dice «🗡 por la espalda» y suma PdG, daño y Crítico potente. Ninguna arma del
   catálogo lo trae todavía (ninguna T4 Común lo usó): aparecerá más adelante en el rework.
+- [ ] **Drena vida y «solo si es crítico» de un arma: probarlos en el mapa** (construidos 2026-10-03, pruebas automáticas en verde): atacar con la
+  Daga sedienta y ver que quien ataca se cura el 50 % de la vida que le sacó al otro (lo que frena la armadura no cuenta); con un crítico de la
+  Misericordia o el Estilete de maestro, que aparezca su efecto, y sin crítico, que no.
 - [ ] **Arma que ignora Resistencia a crítico: verla con un crítico real en el mapa** (construido 2026-10-03; probado en vivo hasta el contacto:
   Clementino con «ignora 2» contra el Escarabajo con Resistencia T4 2 — el duelo recibió los dos datos; el golpe empató y no pegó. La cuenta
   del crítico, con pruebas automáticas).

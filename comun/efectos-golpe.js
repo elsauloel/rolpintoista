@@ -37,6 +37,7 @@ const EfectosGolpe = (() => {
       dado: String((ef && ef.dado) || '').trim(),
       detalle: String((ef && ef.detalle) || '').trim(),
       ...(n(ef && ef.stacks) > 0 ? {stacks: Math.round(n(ef.stacks))} : {}),   // ej. Veneno de 2 stacks (antes se perdía al guardar)
+      ...(n(ef && ef.turnos) > 0 ? {turnos: Math.round(n(ef.turnos))} : {}),   // ej. Sangrado por 2 turnos (0 = lo que dure el estado)
       ...(ef && ef.seguroCritico ? {seguroCritico: true} : {}),   // con porcentaje, pero si el golpe es crítico entra seguro (2026-10-03)
     };
   }
@@ -57,7 +58,7 @@ const EfectosGolpe = (() => {
 
   // "Envenenar (50%, +1d6)"
   function resumenTxt(ef){
-    const extras = [probTxt(ef), ef.seguroCritico && !siempre(ef) ? 'seguro si es crítico' : '', ef.dado ? `+${ef.dado}` : ''].filter(Boolean).join(', ');
+    const extras = [probTxt(ef), ef.stacks ? `${ef.stacks} stacks` : '', ef.turnos ? `${ef.turnos} turnos` : '', ef.seguroCritico && !siempre(ef) ? 'seguro si es crítico' : '', ef.dado ? `+${ef.dado}` : ''].filter(Boolean).join(', ');
     return `${ef.nombre} (${extras})`;
   }
   const resumenLista = efs => lista(efs).map(resumenTxt).join(' · ');

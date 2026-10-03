@@ -415,6 +415,8 @@ const AsistenteItem = (() => {
             ${conocida ? '' : `<option value="${probSel}" selected>${x.exitos} en 1d${x.caras}</option>`}
           </select>
           <input data-aa-golpe="${i}" data-campo="dado" value="${e(ef.dado || '')}" placeholder="tirada extra: ej. 1d6">
+          <input data-aa-golpe="${i}" data-campo="stacks" type="number" min="0" step="1" value="${e(ef.stacks || '')}" placeholder="stacks" title="Stacks (Veneno, Armadura rota…); vacío = los del estado" style="max-width:80px">
+          <input data-aa-golpe="${i}" data-campo="turnos" type="number" min="0" step="1" value="${e(ef.turnos || '')}" placeholder="turnos" title="Cuántos turnos dura; vacío = lo que dure el estado" style="max-width:80px">
           <button type="button" class="aa-x" data-aa-golperm="${i}">×</button>
           <input class="aa-ancho" data-aa-golpe="${i}" data-campo="detalle" value="${e(ef.detalle || '')}" placeholder="qué hace (opcional): ej. Veneno de 4 stacks">
           ${x.caras > 1 ? `<label class="aa-ancho" style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-aa-golpe="${i}" data-campo="seguroCritico" ${ef.seguroCritico ? 'checked' : ''} style="width:auto"> Si el golpe es crítico, entra seguro (sin tirar)</label>` : ''}

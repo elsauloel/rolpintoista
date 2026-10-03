@@ -722,6 +722,11 @@ const Duelo = (() => {
     if(ef.no2 !== undefined) return {nombre: 'Pierde No2', no2: Math.max(0, Math.round(_num(ef.no2))), no2Dif: !!ef.no2Dif, no2Sentado: !!ef.no2Sentado};   // Sonic Boom
     const n = String(ef.nombre || '').trim().toLowerCase();
     const st = Math.max(0, Math.round(_num(ef.stacks)));
+    const tu = Math.max(0, Math.round(_num(ef.turnos)));   // turnos puestos en el efecto del arma (ej. Sangrado 2 turnos); 0 = los del estado
+    const conTurnos = sp => sp && tu ? {...sp, turnos: tu} : sp;
+    return conTurnos(specArma(n, st, ef));
+  }
+  function specArma(n, st, ef){
     if(n === 'rompe armadura' || n === 'arruina armadura' || n === 'media armadura') return {nombre: 'Armadura rota', stacks: Math.max(1, st)};
     if(n === 'sangrado' || n === 'primera sangre') return {nombre: 'Sangrado'};
     if(n === 'envenenar' || n === 'veneno severo') return (n === 'veneno severo' || /severo/i.test(ef.detalle || '')) ? {nombre: 'Veneno severo'} : (st ? {nombre: 'Veneno', stacks: st} : {nombre: 'Veneno'});
@@ -737,6 +742,7 @@ const Duelo = (() => {
     return (Array.isArray(lista) ? lista : []).slice(0, 8).map(e => {
       const caras = Math.max(1, Math.round(_num(e.caras)) || 1), exitos = Math.min(caras, Math.max(1, Math.round(_num(e.exitos)) || 1));
       const o = {nombre: String(e.nombre || '').trim().slice(0, 40), caras, exitos, dado: String(e.dado || '').trim().slice(0, 20), detalle: String(e.detalle || '').trim().slice(0, 200), stacks: Math.max(0, Math.round(_num(e.stacks)))};
+      if(_num(e.turnos) > 0) o.turnos = Math.round(_num(e.turnos));
       if(e.spec && e.spec.nombre) o.spec = e.spec;
       if(_num(e.cura) > 0) o.cura = Math.round(_num(e.cura));
       if(e.no2 !== undefined){ o.no2 = Math.max(0, Math.round(_num(e.no2))); o.no2Dif = !!e.no2Dif; o.no2Sentado = !!e.no2Sentado; }

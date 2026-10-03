@@ -50,18 +50,19 @@ const InvDuelo = (() => {
     }
     // El ataque suelto (sin arreglos): cobra, cierra el Parry pendiente y tira el PdG: invAtacarSuelto.
     // Sin No2 suficientes pregunta «¿Atacar igual?» (B-7, 2026-10-02: antes se rechazaba): gasta los que tenga y deja la línea roja.
-    function atacarSuelto(inv){
-      const forzar = A().faltanNitros(inv);
-      if(forzar && !(ui.confirmar || (t => confirm(t)))(A().preguntaSinNitros(inv))) return;
+    // tipo: 'normal', 'oportunidad' o 'contra' (los dos últimos, como los creeps: lo de un primer ataque y el PdG especial de su arma).
+    function atacarSuelto(inv, tipo){
+      const forzar = A().faltanNitros(inv, tipo);
+      if(forzar && !(ui.confirmar || (t => confirm(t)))(A().preguntaSinNitros(inv, tipo))) return;
       let p;
       ui.cambiar(() => {
-        p = A().pagarAtaque(inv, forzar);
+        p = A().pagarAtaque(inv, forzar, tipo);
         if(p.error) return false;
-        ui.parry.delete(inv.id);   // atacar cierra el Parry que esperaba su Bloqueo
+        if(tipo !== 'oportunidad' && tipo !== 'contra') ui.parry.delete(inv.id);   // atacar cierra el Parry que esperaba su Bloqueo
       });
       if(p.error){ ui.toast(p.error); return; }
-      A().alertaSinNitros(inv, p.forzado);
-      publicar(A().tiradaAtaque(inv));
+      A().alertaSinNitros(inv, p.forzado, tipo);
+      publicar(A().tiradaAtaque(inv, tipo));
       ui.toast(p.aviso);
     }
     const ladoDe = (d, campo) => (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
@@ -73,7 +74,7 @@ const InvDuelo = (() => {
         const inv = ui.inv(d.atacante);
         if(!inv) return;
         if(d.ataque.tipo === 'habilidad-arma') publicar(A().tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + num(d.ataque && d.ataque.mods && d.ataque.mods.pdg), 'pdg'));
-        else atacarSuelto(inv);
+        else atacarSuelto(inv, d.ataque.tipo);
       },
       // Las invocaciones siguen las mismas reglas que los creeps.
       statsCritico: d => {

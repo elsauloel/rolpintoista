@@ -2017,9 +2017,24 @@ prueba('efecto «seguro si es crítico»: el asistente lo conserva (y los stacks
     await Duelo.guardarDano('c', {total: 3, formula: '1d4', rolls: [3]}, efs);
     await Duelo.guardarDano('s', {total: 3, formula: '1d4', rolls: [3]}, efs);
     igual([n.stacks, n.seguroCritico, EfectosGolpe.resumenTxt(n), docs.c.efectos.map(e => e.caras), docs.s.efectos.map(e => e.caras), /crítico/.test(docs.c.efectos[0].detalle)],
-      [2, true, 'Envenenar (25%, seguro si es crítico)', [1, 4], [4, 4], true]);
+      [2, true, 'Envenenar (25%, 2 stacks, seguro si es crítico)', [1, 4], [4, 4], true]);
   }finally{ Object.assign(window, antes); }
 }); fbFalsoCola = pp.catch(() => {}); return pp; });
+
+prueba('efecto de arma con turnos: Sangrado por 2 turnos vence (deja de ser permanente); Veneno 3 stacks = 3 turnos', () => {
+  const sp = Duelo.specDeEfecto({nombre: 'Sangrado', turnos: 2}), sv = Duelo.specDeEfecto({nombre: 'Envenenar', stacks: 3});
+  const es = EstadosAplicar.componer(sp), ev = EstadosAplicar.componer(sv), ep = EstadosAplicar.componer({nombre: 'Sangrado'});
+  igual([sp, es.turnos, es.permanente, ev.stacks, ev.turnos, ep.permanente, EfectosGolpe.normalizar({nombre: 'Sangrado', caras: 2, exitos: 1, turnos: 2}).turnos],
+    [{nombre: 'Sangrado', turnos: 2}, 2, false, 3, 3, true, 2]);
+});
+prueba('invocación: el ataque de oportunidad cuesta lo de un primer ataque, no cuenta como ataque y suma el PdG en oportunidad de su arma', () => {
+  const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, armaNombre: 'Colmillo', armaTipo: 8, armaPeso: 2, nitros: 10,
+    armaMods: [{stat: 'pdgopor', val: 2}]});
+  const p = InvAcciones.pagarAtaque(inv, false, 'oportunidad');
+  const t = InvAcciones.tiradaAtaque(inv, 'oportunidad'), tn = InvAcciones.tiradaAtaque(inv);
+  igual([inv.nitros, num(inv.ataquesTurno), /PdG \+2 por oportunidad/.test(p.aviso), t.origen, InvAcciones.bonoEspecial(inv, 'oportunidad'), InvAcciones.bonoEspecial(inv, 'contra'), tn.origen],
+    [6, 0, true, 'Lobo · Ataque de oportunidad (PdG)', 2, 0, 'Lobo · Atacar (PdG)']);
+});
 
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {

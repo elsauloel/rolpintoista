@@ -296,6 +296,7 @@ const Combatiente = (() => {
   function ajustarPreset(base, spec, campoHp){
     const s = spec || {};
     if(s.turnos !== undefined && s.turnos !== null) base.turnos = n(s.turnos);
+    if(n(s.turnos) > 0 && base.permanente) base.permanente = false;   // con turnos puestos, vence (ej. Sangrado por 2 turnos de un arma, 2026-10-03)
     if(Array.isArray(s.mods) && s.mods.length) base.mods = s.mods.map(m => ({stat: m.stat, val: n(m.val)}));
     if(n(s.hp)) base[campoHp || 'hpTurno'] = n(s.hp);
     if(n(s.stacks) && base.esVeneno && !base.permanente){ base.stacks = n(s.stacks); base.turnos = base.stacks; }

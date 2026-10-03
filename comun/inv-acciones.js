@@ -64,29 +64,41 @@ const InvAcciones = (() => {
   }
   /* Sin No2 suficientes (2026-10-02, hoja de ruta B-7, igual que los creeps y los personajes: avisar y dejar seguir): faltanNitros, la
      pregunta «¿Atacar igual?», pagar forzando (gasta los que tenga, hasta 0) y la línea roja de la Mesa (alertaSinNitros). */
-  const faltanNitros = inv => I().costoAtaque(inv) > num(inv.nitros);
-  function preguntaSinNitros(inv){
-    return `${inv.nombre} no tiene No2 suficientes: este ataque cuesta ${fmt(I().costoAtaque(inv))} y tiene ${fmt(Math.max(0, num(inv.nitros)))}.\n\n¿Atacar igual? Gasta los No2 que tenga y queda anotado en rojo en la Mesa.`;
+  /* Ataque de oportunidad y contraataque (2026-10-03, como los creeps — CreepAcciones): cuestan lo de un primer ataque (Tipo ÷ 2), no cuentan
+     como ataque del turno y suman el «PdG en oportunidad» / «PdG en contraataque» de su arma. Antes se cobraban y tiraban como uno normal. */
+  const NOMBRE_ESPECIAL = {oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
+  const bonoEspecial = (inv, tipo) => (inv.armaMods || []).filter(m => m.stat === (tipo === 'contra' ? 'pdgcontra' : tipo === 'oportunidad' ? 'pdgopor' : '')).reduce((a, m) => a + num(m.val), 0);
+  const especial = tipo => tipo === 'oportunidad' || tipo === 'contra';
+  const costoAtaqueDe = (inv, tipo) => especial(tipo) ? Combatiente.costoPrimerAtaque(num(inv.armaTipo) || 8) : I().costoAtaque(inv);
+  const faltanNitros = (inv, tipo) => costoAtaqueDe(inv, tipo) > num(inv.nitros);
+  function preguntaSinNitros(inv, tipo){
+    return `${inv.nombre} no tiene No2 suficientes: ${especial(tipo) ? 'el ' + NOMBRE_ESPECIAL[tipo].toLowerCase() : 'este ataque'} cuesta ${fmt(costoAtaqueDe(inv, tipo))} y tiene ${fmt(Math.max(0, num(inv.nitros)))}.\n\n¿Atacar igual? Gasta los No2 que tenga y queda anotado en rojo en la Mesa.`;
   }
-  function pagarAtaque(inv, forzar){
-    const costo = I().costoAtaque(inv), tenia = Math.max(0, num(inv.nitros));
+  function pagarAtaque(inv, forzar, tipo){
+    const costo = costoAtaqueDe(inv, tipo), tenia = Math.max(0, num(inv.nitros));
     const forzado = costo > num(inv.nitros) ? {costo, tenia} : null;
-    if(forzado && !forzar) return {error: `${inv.nombre}: no le alcanzan los Nitros — este ataque cuesta ${fmt(costo)} y tiene ${fmt(num(inv.nitros))}`};
+    if(forzado && !forzar) return {error: `${inv.nombre}: no le alcanzan los Nitros — ${especial(tipo) ? 'el ' + NOMBRE_ESPECIAL[tipo].toLowerCase() : 'este ataque'} cuesta ${fmt(costo)} y tiene ${fmt(num(inv.nitros))}`};
+    if(especial(tipo)){
+      inv.nitros = forzado ? 0 : num(inv.nitros) - costo;
+      const bono = bonoEspecial(inv, tipo);
+      return {forzado, aviso: `${inv.nombre}: ${NOMBRE_ESPECIAL[tipo].toLowerCase()} −${fmt(forzado ? tenia : costo)} No2 ${forzado ? `(costaba ${fmt(costo)})` : '(lo de un primer ataque)'}${bono ? ` · PdG +${fmt(bono)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''}`};
+    }
     const primero = num(inv.ataquesTurno) === 0;
     inv.nitros = forzado ? 0 : num(inv.nitros) - costo;
     inv.ataquesTurno = num(inv.ataquesTurno) + 1;
     return {forzado, aviso: `${inv.nombre}: -${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · ${primero ? 'primer ataque del turno' : 'ataque extra'}`};
   }
-  function alertaSinNitros(inv, forzado){
+  function alertaSinNitros(inv, forzado, tipo){
     if(!forzado || typeof fbDb === 'undefined' || !fbDb || typeof fbUsuario === 'undefined' || !fbUsuario || !fbMiembro) return;
     fbDb.collection(fbRutaCampana('tiradas')).add({
       uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
-      origen: `⚠ ${inv.nombre} atacó sin No2 suficientes`, formula: `Costaba ${fmt(forzado.costo)} No2 y tenía ${fmt(forzado.tenia)}`,
+      origen: `⚠ ${inv.nombre} ${especial(tipo) ? 'hizo un ' + NOMBRE_ESPECIAL[tipo].toLowerCase() : 'atacó'} sin No2 suficientes`, formula: `Costaba ${fmt(forzado.costo)} No2 y tenía ${fmt(forzado.tenia)}`,
       rolls: [], mod: 0, total: 0, desde: 'alerta-roja',
       cuando: firebase.firestore.FieldValue.serverTimestamp(),
     }).catch(err => console.error('No se pudo publicar la alerta de No2:', err));
   }
-  const tiradaAtaque = inv => tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg'), 'pdg');
+  const tiradaAtaque = (inv, tipo) => especial(tipo) ? tirada(inv, `${NOMBRE_ESPECIAL[tipo]} (PdG)`, I().statValor(inv, 'pdg') + bonoEspecial(inv, tipo), 'pdg')
+    : tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg'), 'pdg');
 
-  return {tirada, tirarStat, dano, ataqueDuelo, pagarAtaque, tiradaAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros};
+  return {tirada, tirarStat, dano, ataqueDuelo, pagarAtaque, tiradaAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros, bonoEspecial, costoAtaqueDe};
 })();

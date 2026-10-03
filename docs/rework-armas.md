@@ -472,3 +472,11 @@ efectos de los que quedaron afuera; mínimo 14, armar 18.
 
 Salen de Buena calidad: Daga de guardia (Ignora 1 de Res. crítico: se repiensa en Raro) y Pico de guerra (Rompe armadura: se repiensa en Raro).
 Dudas: las tres pedidas (1–3) por la calculadora son Comunes (no valora lo simple ni el «seguro»); el Puñal de hoja ancha es igual a la Pica Hielos Común.
+
+**Propuesta v2 (2026-10-03, cambios del dueño sobre la v1):**
+- 1 Puñal de hoja ancha: + **Sangrado 50 % por 2 turnos** (efecto de arma con turnos: construido el mismo día) · 90.
+- 2 Daga de la viuda verde: **Veneno 3 stacks siempre** (3 turnos) · 95.
+- 3 Daga de tendón: + **1 de daño fijo** (1d4 +1, Lisiado 75 %) · 95.
+- 17 Aguja de acupunturista: en vez de +2 fijo, **+1 dado de daño amplificado** (2d4, pesa 1) · 140.
+- De paso (pregunta del dueño): el «PdG en oportunidad» del arma ya se sumaba solo en personajes y creeps; las **invocaciones** lo ignoraban y
+  cobraban el ataque de oportunidad como uno normal — corregido (como los creeps: lo de un primer ataque, no cuenta como ataque del turno).

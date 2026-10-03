@@ -324,7 +324,7 @@ Pedido del dueño: *«empecemos un plan metódico de rework del catálogo, por l
 
 > **▶ Para retomar — hoja de ruta (cambiada por el dueño, 2026-10-03):** por cada Tipo, **los tres primeros tiers** (Común, Buena calidad,
 > Raro); después el Tipo siguiente; **al terminar todos, se vuelve atrás** a hacer Excepcional y Legendario de cada uno. ✅ T4 Común, Buena y Raro.
-> ⏸ T4 Excepcional: la propuesta v1 está más abajo (con las mecánicas de firma a construir), en pausa. **▶ Ahora: Tipo 6** (cortantes).
+> ✅ T4 Excepcional (cargado, a revisar). ✅ Tipo 6: Común (24), Buena y Rara. **▶ Ahora: Tipo 8** (hachas): definiciones, después Común.
 
 **El paso a paso (decidido por el dueño, 2026-10-03 — «me gustó mucho cómo me permitió auditar y comparar»).** Se hace juntos, Tipo por Tipo y
 tier por tier; el dueño dice cuál («ahora vamos a hacer espadas, de Buena calidad») y se sigue siempre este orden:

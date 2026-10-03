@@ -950,3 +950,33 @@ Cargadas (2026-10-03): las 24 con sus tres textos; sale la Lanza de caza (el Gob
 **Respuestas del dueño sobre T8 Buena (2026-10-03):** **sin Critical Matters** en las hachas («los críticos con hacha van a ser poco
 frecuentes: no les suma demasiado, no las hace atractivas») — por la misma razón, tampoco «seguro si es crítico». **Puede haber alguna hacha con
 Crítico frecuente +1.** Derribar = deja Sentado (se usa en las hachas); Demora = baja 1 lugar en la iniciativa (es de los contundentes).
+
+**Más respuestas (2026-10-03):** el piso ✅; puede haber un hacha de 1 dado con Rompe armadura siempre y nada más, en Buena; el Espadón de batalla
+pasa a ser un hacha a dos manos con otro nombre; el Hacha con pico es la de Crítico frecuente +1; Hacha de batalla → a la revisión de las Raras,
+Hacha de la furia roja → se rehace como Buena.
+
+### T8 Buena calidad — propuesta v1: 18 armas (2026-10-03, ⬜ a revisar por el dueño)
+| Arma | Lo que hace · precio |
+|---|---|
+| **Con Rompe armadura** | |
+| Hacha del calderero 🆕 | 1 dado · Rompe armadura siempre (y nada más) · 100 |
+| Hacha de doble filo | 1 dado · +1 · Rompe armadura siempre · 120 |
+| Hacha del forjador 🆕 | 1 dado · Bloqueo +1 · Rompe armadura 50 % · muy resistente · 120 |
+| Hacha de guerra | 2 dados · Rompe armadura 33 % (era 25 %) · 130 |
+| Hachón de minero | 2 dados · +1 · Rompe armadura 33 % · 150 |
+| Hacha grande del aserradero (era el Espadón de batalla) | 2 manos · 2 dados · +1 · Rompe armadura 33 % · 150 |
+| Hacha de la furia roja (rehecha) | 2 dados · Bloqueo +1 · Rompe armadura 33 % · 170 |
+| Hacha del aserrador 🆕 | 2 dados · Derribar 25 % · Rompe armadura 33 % · 170 |
+| Hacha del monte 🆕 | 2 dados · Rengo 20 % · Rompe armadura 33 % · 160 |
+| **Sin Rompe armadura** | |
+| Hacha de abordaje | 1 dado · Bloqueo +2 · Derribar 33 % · resistente · 110 (sale el Alcance) |
+| Hacha del campeón de hachazos 🆕 | 1 dado + 1 amplificado · Crít. potente +1 · 130 |
+| Hacha de guardia del fortín 🆕 | 2 manos · 1 dado · Alcance +1 · Bloqueo +2 · resistente · 150 |
+| Hacha de guerra ligera | 2 dados · +1 · 120 |
+| Hacha dentada | 2 dados · Sangrado 50 % · 130 |
+| Hacha del pantano 🆕 | 2 dados · Veneno 2 stacks 25 % · Sangrado 25 % · 140 |
+| Hacha del frigorífico 🆕 | 2 dados · +2 · 140 |
+| Hacha del verdugo de la capital 🆕 | 2 dados · Derribar 50 % · 140 |
+| Hacha con pico (rehecha) | 2 dados · Crít. frecuente +1 · 150 |
+
+Sale de las Buenas: **Hacha de batalla** (rinde como Rara: se revisa con las Raras).

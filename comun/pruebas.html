@@ -1984,6 +1984,18 @@ prueba('invocación: arma, Defensa y estados; el HTML trae los tres orígenes y 
   cierto(/Resistencia a crítico de armas Tipo 4/.test(h) && /data-fl="botonera"/.test(h) && /Daña 2 HP en cada Mantenimiento/.test(h), 'falta algo en el HTML');
 });
 
+grupo('Por la espalda (2026-10-03: en sigilo y en el punto ciego del defensor)');
+prueba('el bono se limpia: solo positivos y enteros; todo en 0 = nada', () => {
+  igual([Duelo.limpiarEspalda({pdg: 2, fijo: '1.4', critpot: -3}), Duelo.limpiarEspalda({pdg: 0}), Duelo.limpiarEspalda(null)],
+    [{pdg: 2, fijo: 1, critpot: 0}, null, null]);
+});
+prueba('habilidad con el arma: suma el bono del arma y el de la habilidad', () => {
+  const c = {modo: 'arma', arma: {espaldaPdg: 1, espaldaCritpot: 2}};
+  const a = Combatiente.ataqueConArreglos({nombre: 'Backstab'}, c, {arma: {nombre: 'Daga', tipoDado: 4, espalda: {pdg: 2, fijo: 1}}, alcance: 1});
+  const b = Combatiente.ataqueConArreglos({nombre: 'Corte'}, {modo: 'arma', arma: {}}, {arma: {nombre: 'Espada', tipoDado: 6}, alcance: 1});
+  igual([a.espalda, b.espalda], [{pdg: 3, fijo: 1, critpot: 2}, undefined]);
+});
+
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {
 const malas = resultados.filter(r => !r.ok);

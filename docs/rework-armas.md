@@ -322,15 +322,23 @@ Dueño: *«Hay algo conceptual que no estás entendiendo en las armas de tipo 12
 ## Rework metódico por Tipo (arranca 2026-10-03)
 Pedido del dueño: *«empecemos un plan metódico de rework del catálogo, por las armas; tipo a tipo, de menor a mayor tier, empezando por el Tipo 4. Antes, definiciones: qué efectos y mecánicas le son propias, cuáles ajenas, y cuáles pueden ir aunque no le sean exclusivas; por dónde podemos jugar con las mecánicas disponibles.»*
 
-**Método (propuesta, por cada Tipo):**
-1. **Definiciones del Tipo** (esta sección para el T4): 🏠 propio · 🤝 puede ir (no exclusivo) · ✨ excepción puntual · 🚫 ajeno (no va).
-2. **Inventario actual del Tipo por tier** (catálogo + tandas ya cargadas) con la calculadora: duplicados, fuera de reglas, huecos.
-3. **Tier por tier, de Común a Legendario:** auditar las existentes (confirmar / reajustar / reimaginar / descartar) y proponer las que falten hasta la cuota del tier.
-4. **Cargar** lo aprobado al catálogo (editor o scripts), `buscar_duplicados.py`, y pasar al tier siguiente. Al cerrar el Tipo, al siguiente.
+> **▶ Para retomar (ruta pendiente, el dueño la retoma cuando tiene tiempo — 2026-10-03):** Tipo 4 → tier **Común**. Ya está la tabla
+> comparativa de las que hay hoy (abajo, «T4 Común — lo que hay hoy»). Lo que sigue: definir las armas **una por una** con el dueño
+> (las que se quedan, cómo quedan y las nuevas hasta ~18); cuando dio el OK a todas, **reemplazan a todas las T4 Comunes del catálogo**
+> (`comun/catalogo.js`) y se pasa a **Buena calidad** → Raro → Excepcional → Legendario. Después, el Tipo siguiente.
+
+**Método (decidido por el dueño, 2026-10-03):** *«vamos a trabajar las armas tipo 4, comunes, las definimos una a una, cuando las vi a todas
+y les di el ok, pasan a reemplazar todas las que estén en el catálogo, y pasamos a las de buena calidad. Así hasta llegar a las legendarias.
+Luego pasamos de tipo.»*
+1. **Definiciones del Tipo** (esta sección para el T4): 🏠 propio · 🤝 puede ir (no exclusivo) · ✨ excepción puntual · 🚫 ajeno (no va). ✅ T4.
+2. **Tabla comparativa** de lo que hay hoy en el tier (con la calculadora `herramientas/calculadora_armas.py`): duplicados, fuera de precio, huecos.
+3. **Una por una**: cada arma del tier (las que se quedan, reajustadas, y las nuevas hasta la cuota) se define con el dueño.
+4. **Con el OK de todas, reemplazan a todo el tier en el catálogo** (`comun/catalogo.js`, `buscar_duplicados.py`) y se pasa al tier siguiente.
+   Al cerrar el Legendario, el Tipo siguiente.
 
 **Cuota del Tipo 4** (20 % de ~300 = ~60 armas, con la pirámide de P1): Común ~18 · Buena ~16 · Raro ~12 · Excepcional ~9 · Legendario ~5. **Hoy hay 53** (Común 19 · Buena 14 · Raro 11 · Excepcional 6 · Legendario 3), con 4 de rango (hondas, cerbatana) y 14 marcadas ⚠️ (a auditar).
 
-### Tipo 4 — Punzantes: definiciones (propuesta del asistente, ⬜ sin responder)
+### Tipo 4 — Punzantes: definiciones (✅ aprobadas por el dueño, 2026-10-03: «están bien, pero podemos sumar las mecánicas que no existían cuando se hizo la primera tanda»)
 **Identidad:** el arma **barata en Nitros** (el primer ataque cuesta 2, los siguientes 4): muchos golpes chicos y precisos. Daño bajo por golpe, que se compensa con **precisión y crítico potente** (el T4 aprovecha hasta 6 puntos de potente; de frecuente solo 2). Dagas, cuchillos, estiletes, punzones, agujas, estoques, lanzas.
 - 🏠 **Propio:** **Lisiado** (efecto de casa) · **PdG** y **Alcance** (stats de casa; Alcance = lanzas) · **Crítico potente** (su universo) · **Ignora N de Res. crítico** (solo T4 y T6, desde Raro) · **PdG de oportunidad** (`pdgopor`, nuevo: dagas y lanzas castigan al que se aleja).
 - 🤝 **Puede ir (no exclusivo):** **Envenenar** y **Veneno severo** (agujas, aguijones; Veneno severo desde Excepcional) · **Sangrado** (puñales aserrados) · **Drena vida** (desde Raro; colmillos, «sacrificio») · **Crítico frecuente** (máx. +2 útil) · **Iniciativa** (armas livianas; es de casa de los cortantes) · **daño fijo / Dmg** (valen doble en T4: ×2) · **Critical Matters** (algo extra solo si es crítico: encaja con el crítico potente).
@@ -340,8 +348,42 @@ Pedido del dueño: *«empecemos un plan metódico de rework del catálogo, por l
 **Mecánicas nuevas desde el 2026-09-25 que abren juego en el T4:**
 - **Los efectos al golpear ya se aplican solos** en el duelo (botón «Aplicar»): Lisiado, Veneno, Sangrado, etc. dejan de ser «a mano».
 - **Ataque de oportunidad** (frena al que se aleja) + **PdG de oportunidad**: identidad de lanzas y dagas de guardia.
-- **Por la espalda**: el mapa sabe hacia dónde mira cada token (cono y punto ciego). Se podría automatizar un bono «si atacás desde su espalda» (puñal trapero, Backstab). 🔧 a construir.
-- **Sigilo**: dagas de asesino con bono al atacar desde el sigilo (✋ hoy; 🔧 automatizable).
+- **Por la espalda** ✅ construido (2026-10-03): un arma puede traer `espalda: {pdg, fijo, critpot}` (asistente de ítems, paso «Peso y daño»;
+  también una habilidad con el arma, en el ✨) y el mapa lo suma solo **si quien ataca está en sigilo** y en el punto ciego del defensor (el
+  casillero justo de atrás; las diagonales sí se ven). Regla del dueño: *si el defensor lo puede ver, aunque venga por la espalda, se da vuelta
+  para defenderse* — por eso solo en sigilo. Junta lo que antes eran dos ideas (por la espalda / desde el sigilo).
 - **Critical Matters**, **Drena vida con Excedente**, **Veneno ×N / Veneno severo**, **Pierde No2** (una punción que corta el aire), **Rengo**.
-- **Arrojadizas**: dagas y dardos con Alcance o Rango (¿van acá o con las de rango?).
+- **Arrojadizas** ✅ decidido (2026-10-03): dagas arrojadizas, dardos, hondas y cerbatanas van **aparte, con las de rango** (no cuentan en la
+  cuota del T4).
 - **Durabilidad de diseño** (`durPorPeso`): estiletes frágiles, puñales robustos.
+
+### T4 Común — lo que hay hoy (tabla comparativa, 2026-10-03)
+Calculadora v0: **PC** = puntos de calidad (Común < 7,5 ≤ Buena calidad). «Precio calc.» = lo que diría la calculadora como Común.
+
+| # | Arma | Peso (dados) | Daño fijo | Bonos | Al golpear | Precio hoy | PC → tier calc. | Precio calc. | Observación |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | Cuchillo de cazador | 1 | — | — | — | 30 | 2,3 · Común | 40 | la base más pelada |
+| 2 | Cuchillo del grumete polizón | 1 | — | — | — | 30 | 2,3 · Común | 40 | **copia** de la 1 con otra historia |
+| 3 | Daga | 1 | +1 | — | — | 40 | 4,3 · Común | 55 | «todos empiezan con una» |
+| 4 | Punzón del ladronzuelo | 1 | +1 | — | — | 40 | 4,3 · Común | 55 | **copia** de la Daga |
+| 5 | Pica Hielos | 2 | — | — | — | 40 | 4,6 · Común | 55 | la única de 2 dados sin nada más |
+| 6 | Cuchillo de cocina reconvertido | 1 | — | PdG +1 | — | 65 | 5,8 · Común | 65 | — |
+| 7 | Lezna de zapatero | 1 | — | PdG +1 | Lisiado 25 % | 70 | 6,5 · Común | 70 | la única con el efecto de casa |
+| 8 | Daga de vigía | 1 | — | PdG de oportunidad +1 | — | 45 | 3,1 · Común | 45 | — |
+| 9 | Estilete de centinela | 1 | — | PdG de oportunidad +2 | — | 50 | 3,9 · Común | 50 | casi igual a la 8 |
+| 10 | ⚠️ Estoque de guardia | 1 | — | Iniciativa +1, PdG de oportunidad +2 | — | 55 | 4,5 · Común | 55 | marcada a auditar |
+| 11 | Horquilla | 1 | — | Alcance +1 | — | 50 | 5,3 · Común | 60 | — |
+| 12 | Lanza corta | 2 | — | Alcance +1 | — | 75 | **7,6 · Buena** | 120 | por poder ya es Buena calidad |
+| 13 | Lanza de guardia de puerta | 2 | — | Alcance +1 | — | 75 | **7,6 · Buena** | 120 | **copia** de la Lanza corta |
+| 14 | ⚠️ Estileto común | 1 | — | Crítico frecuente +1 | — | 50 | **7,5 · Buena** | 120 | por poder ya es Buena calidad |
+| 15 | ⚠️ Estileto ritual del acólito | 1 | — | Crítico frecuente +1 | — | 50 | **7,5 · Buena** | 120 | **copia** del Estileto común |
+
+**Fuera de la cuota del T4 (van con las de rango):** Cerbatana (Rango +3, Veneno 25 %, 60), Honda de cuero (Rango +3, 40), Honda de pastor
+(+1 fijo, Rango +3, 70), Honda del cazador de jabalíes (copia de la Honda de cuero, 40).
+
+**Lo que muestra la tabla:**
+- **4 copias** (2, 4, 13, 15): mismo número, otra historia. Quedan **11 armas distintas** de las 15; la cuota es ~18 → faltan ~7.
+- **3 son Buena calidad por poder** (las dos lanzas y el estileto): o bajan, o suben de tier.
+- **Casi ninguna usa lo propio del T4**: Lisiado (solo la Lezna), Crítico potente (ninguna), y ninguna mecánica nueva (por la espalda,
+  durabilidad de diseño, Critical Matters).
+- **Precios desparejos**: la Daga de vigía (45) y el Cuchillo de cocina (65) tienen poder parecido.

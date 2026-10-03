@@ -630,7 +630,7 @@ const FichaAcciones = (() => {
     const c = FichaBotonera.dueloDe(it);
     if(!c || c.modo !== 'arma' || !ui.dueloDisponible()) return null;
     return Combatiente.ataqueConArreglos(it, c, {X: c.x === 'sp' ? num(xSp) : num(xNitros),
-      arma: {id: arma ? arma.id : '', nombre: arma ? arma.nombre : '', tipoDado: FichaCombate.tipoAtaque(arma), rango: !!(arma && arma.armaDeRango)},
+      arma: {id: arma ? arma.id : '', nombre: arma ? arma.nombre : '', tipoDado: FichaCombate.tipoAtaque(arma), rango: !!(arma && arma.armaDeRango), espalda: arma && arma.espalda},
       alcance: c.alcance !== undefined && c.alcance !== 'auto' ? Combatiente.alcanceHab(c, 'pdg', s => FichaCalculo.calcular(S).final[s]) : FichaCombate.alcanceDeArma(S, arma)});
   }
   // ✨ Automática, solo sobre uno mismo y sin tiradas (Blindaje y parecidos): se aplica directo, sin abrir el cuadro, y se anuncia.

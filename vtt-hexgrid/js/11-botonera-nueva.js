@@ -580,7 +580,8 @@ function bnAtacar(tipo, armaId){
   const reabrir = () => { if(bn){ bn.host.hidden = false; bnUbicar(); bnDibujar(); } };
   bn.host.hidden = true;
   dueloElegirObjetivoMapa({yo: {ref: bn.fichaId, tipo: 'pj', nombre: (S.meta && S.meta.nombre) || 'Personaje'},
-    ataque: {tipo, armaId: arma ? arma.id : '', armaNombre: arma ? arma.nombre : '', tipoDado: FichaCombate.tipoAtaque(arma), rango: !!(arma && arma.armaDeRango), alcance: FichaCombate.alcanceDeArma(S, arma)},
+    ataque: {tipo, armaId: arma ? arma.id : '', armaNombre: arma ? arma.nombre : '', tipoDado: FichaCombate.tipoAtaque(arma), rango: !!(arma && arma.armaDeRango), alcance: FichaCombate.alcanceDeArma(S, arma),
+      ...(arma && arma.espalda ? {espalda: arma.espalda} : {})},   // por la espalda (el bono del arma)
     conSuelto: true, alSuelto: () => { reabrir(); hacer(); }, alCancelar: () => {}});
 }
 function bnCombateAca(b){

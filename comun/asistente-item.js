@@ -352,6 +352,12 @@ const AsistenteItem = (() => {
       </div>`;
       h += efecto(`<span id="aa-dano">${danoHtml()}</span>`);
       h += `<div class="aa-nota"><b>Daño fijo</b>: se suma siempre al resultado de los dados. <b>Daño amplificado</b>: dados de más que no pesan (un arma liviana que pega como una pesada).</div>`;
+      if(!d.armaDeRango){   // por la espalda (2026-10-03): solo si quien ataca está en sigilo y en el punto ciego del defensor; el mapa lo suma solo
+        const es = d.espalda || {};
+        const ne = k => `<input data-aa-esp="${k}" type="number" step="1" min="0" value="${n(es[k]) || 0}" style="max-width:110px">`;
+        h += `<div class="aa-campo"><label>🗡 Por la espalda (opcional)</label><div class="aa-fila">${campo('+ PdG', ne('pdg'))}${campo('+ Daño', ne('fijo'))}${campo('+ Crítico potente', ne('critpot'))}</div></div>`;
+        h += `<div class="aa-nota">Cuenta solo si quien ataca está <b>en sigilo</b> y pegado al defensor <b>por atrás</b> (el casillero justo de atrás, su punto ciego): si lo ve, se da vuelta. El mapa lo suma solo. Típico de dagas y estiletes.</div>`;
+      }
       if(q.ctx !== 'creep') h += efecto(`<span id="aa-carga">${cargaHtml()}</span>`);
       h += durCampo();
     }
@@ -481,6 +487,7 @@ const AsistenteItem = (() => {
         ${g === 'arma' ? fila('Tipo', e(`Tipo ${tipo} · ${TIPOS[tipo].nombre}`)) + fila('Distancia', d.armaDeRango ? 'a distancia (no suma Dmg)' : 'cuerpo a cuerpo')
           + fila('Daño', e(danoTxt(d))) + fila('Atacar', `${primer(tipo)} No2 el primero, ${tipo} los siguientes`)
           + (modVal(d, 'rng') ? fila(d.armaDeRango ? 'Rango' : 'Alcance', `+${f(modVal(d, 'rng'))}`) : '')
+          + (!d.armaDeRango && espaldaTxt(d.espalda) ? fila('Por la espalda', e(espaldaTxt(d.espalda) + ' (en sigilo)')) : '')
           + fila('Al golpear', e((eg && eg.resumenLista(d.efectosGolpe)) || 'nada')) : ''}
         ${g === 'defensa' ? fila('Defensa', f(modVal(d, 'def'))) + fila('Res. crítico', e(CRIT_IDS.filter(id => modVal(d, id)).map(id => `T${CRIT_TIPO[id]} +${f(modVal(d, id))}`).join(', ') || 'ninguna')) : ''}
         ${fila('Bonos', e(bonos || 'ninguno'))}
@@ -593,6 +600,8 @@ const AsistenteItem = (() => {
     dibujar();
   }
 
+  // «+2 PdG, +1 de daño» (el bono por la espalda de un arma).
+  const espaldaTxt = es => es ? [n(es.pdg) ? `+${f(n(es.pdg))} PdG` : '', n(es.fijo) ? `+${f(n(es.fijo))} de daño` : '', n(es.critpot) ? `+${f(n(es.critpot))} Crítico potente` : ''].filter(Boolean).join(', ') : '';
   const NUMERICOS = ['peso', 'danoFijo', 'danoAmplificado', 'precioCompra', 'ranuras', 'equipoEstadoHpTurno', 'durPorPeso'];
   function alEscribir(ev){
     if(!st) return;
@@ -609,6 +618,7 @@ const AsistenteItem = (() => {
       if(c === 'precioCompra') poner('aa-precio', precioHtml());
     }
     if(t.dataset.aaMod1) setMod(d, t.dataset.aaMod1, n(t.value));
+    if(t.dataset.aaEsp) d.espalda = {...(d.espalda || {}), [t.dataset.aaEsp]: Math.max(0, Math.round(n(t.value)))};
     if(t.dataset.aaModstat !== undefined) d.mods[n(t.dataset.aaModstat)].stat = t.value;
     if(t.dataset.aaModval !== undefined) d.mods[n(t.dataset.aaModval)].val = n(t.value);
     if(t.dataset.aaGolpe !== undefined){
@@ -649,9 +659,12 @@ const AsistenteItem = (() => {
     if(grupoDe(d.tipoItem) === 'arma'){
       d.peso = Math.max(1, n(d.peso) || 1);
       d.danoAmplificado = Math.max(0, n(d.danoAmplificado));
+      const es = d.espalda || {}, eo = {};
+      ['pdg', 'fijo', 'critpot'].forEach(k => { if(n(es[k]) > 0) eo[k] = Math.round(n(es[k])); });
+      if(d.armaDeRango || !Object.keys(eo).length) delete d.espalda; else d.espalda = eo;
     }else{
       // Lo que es solo de armas no viaja en el resto.
-      delete d.efectosGolpe; delete d.tipoDado; delete d.danoFijo; delete d.danoAmplificado; delete d.armaDeRango;
+      delete d.efectosGolpe; delete d.tipoDado; delete d.danoFijo; delete d.danoAmplificado; delete d.armaDeRango; delete d.espalda;
     }
     // Durabilidad: solo se guarda si no es la de siempre (3 por Peso) y el ítem la tiene.
     if(!DURABLE(d) || !(n(d.durPorPeso) > 0) || n(d.durPorPeso) === 3) delete d.durPorPeso;

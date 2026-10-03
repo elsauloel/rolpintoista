@@ -350,6 +350,15 @@ const Duelo = (() => {
     });
   }
 
+  /* «Por la espalda» (2026-10-03, pedido del dueño): el mapa avisa (`cfg.espalda`) si el atacante está en el punto ciego del defensor (la
+     misma cuña ciega de la visión) y está EN SIGILO —si lo ve, se da vuelta— y el ataque trae el bono de su arma o habilidad (`cfg.ataque.espalda` = {pdg, fijo, critpot}). Queda en
+     `ataque.porLaEspalda` y `ataque.espalda`, y se suma acá mismo, igual para todos: el PdG al guardarlo, el daño fijo al guardar el daño y el
+     Crítico potente al evaluar el crítico. */
+  function limpiarEspalda(e){
+    const o = {pdg: Math.max(0, Math.round(_num(e && e.pdg))), fijo: Math.max(0, Math.round(_num(e && e.fijo))), critpot: Math.max(0, Math.round(_num(e && e.critpot)))};
+    return (o.pdg || o.fijo || o.critpot) ? o : null;
+  }
+  const espaldaTxt = e => [e.pdg ? `+${e.pdg} PdG` : '', e.fijo ? `+${e.fijo} de daño` : '', e.critpot ? `+${e.critpot} Crítico potente` : ''].filter(Boolean).join(', ');
   // tokDef = un token del mapa ({id, nombre, tipo, fichaId, duenoUid}); miTokenId = el token del atacante (o ''); contraDe = id del duelo que se contraataca.
   async function crear(cfg, tokDef, miTokenId, contraDe){
     const hab = limpiarHab(cfg.ataque.hab);
@@ -379,6 +388,11 @@ const Duelo = (() => {
     // ya resuelta del primer objetivo) llega precargada acá, así que este sub-duelo arranca con el contacto ya
     // "medio hecho" — nada más pide la Evasión de este objetivo (mismo camino que cuando un lado tira antes que el otro).
     if(cfg.pdgCompartido) inicial.pdg = limpiarTiro(cfg.pdgCompartido);
+    if(cfg.espalda && !hab){
+      inicial.ataque.porLaEspalda = true;
+      const be = limpiarEspalda(cfg.ataque.espalda);
+      if(be) inicial.ataque.espalda = be;
+    }
     if(hab){
       inicial.hab = hab;   // (la regla de Firestore tiene que conocer el campo `hab`)
       if(hab.sinOposicion){ inicial.resultado = 'pego'; entrarHab(inicial); }   // sin oposición: el cuadro se abre directo en los efectos
@@ -408,6 +422,7 @@ const Duelo = (() => {
     if(_num(m.dados)) t.push(`+${_fmt(m.dados)} dado${_num(m.dados) === 1 ? '' : 's'} de daño`);
     if(_num(m.fijo)) t.push(`${_num(m.fijo) > 0 ? '+' : ''}${_fmt(m.fijo)} de daño fijo`);
     if(d.ataque && d.ataque.sinParry) t.push('no se puede parrear');
+    if(d.ataque && d.ataque.porLaEspalda) t.push(`🗡 por la espalda${d.ataque.espalda ? ': ' + espaldaTxt(d.ataque.espalda) : ''}`);
     return t.join(' · ');
   };
   const escRe = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -557,7 +572,7 @@ const Duelo = (() => {
     // un Efecto sobre uno mismo (que sí deja un estado real), esto se suma acá nomás, para ESTE golpe: no
     // escribe nada en la ficha ni en S.efectos.
     const frecuente = _num(dd.frecuente) + _num(m.ataque && m.ataque.mods && m.ataque.mods.critBono);
-    const potente = _num(dd.potente) + _num(m.ataque && m.ataque.mods && m.ataque.mods.critpotBono);
+    const potente = _num(dd.potente) + _num(m.ataque && m.ataque.mods && m.ataque.mods.critpotBono) + _num(m.ataque && m.ataque.espalda && m.ataque.espalda.critpot);   // + por la espalda
     let e = null;
     if(typeof Critico !== 'undefined' && m.pdg && m.eva){
       e = Critico.evaluar({pdg: m.pdg.total, eva: m.eva.total, tipo: m.ataque.tipoDado, frecuente, potente, resistencia});
@@ -653,6 +668,8 @@ const Duelo = (() => {
       const m = {...doc.data()};
       if(m.estado !== 'esperando' || m.fase !== fase || m[campo]) return;   // ya resuelto, otra fase o ya tiró
       m[campo] = tiro;
+      const be = campo === 'pdg' && m.ataque && m.ataque.espalda;   // por la espalda: el PdG del arma o la habilidad
+      if(be && be.pdg) m.pdg = {...tiro, total: tiro.total + be.pdg, mod: tiro.mod + be.pdg, formula: `${tiro.formula} +${be.pdg} espalda`.slice(0, 60)};
       if(campo === 'eva' && defensa) m.defensa = defensa;
       if(extra && (campo === 'pdg' || campo === 'eva')) m.critDatos = {...(m.critDatos || {}), ...extra};   // Crítico frecuente/potente del atacante; Resistencia a crítico del defensor
       anuncio = avanzar(m) || '';
@@ -803,6 +820,8 @@ const Duelo = (() => {
       const m = {...doc.data()};
       if(m.estado !== 'esperando' || m.fase !== 'dano' || m.dano) return;
       m.dano = {crudo: Math.max(0, Math.round(_num(r.total))), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod), reclamado: '', aplicado: false};
+      const be = m.ataque && m.ataque.espalda;   // por la espalda: el daño fijo del arma o la habilidad
+      if(be && be.fijo) m.dano = {...m.dano, crudo: m.dano.crudo + be.fijo, mod: m.dano.mod + be.fijo, formula: `${m.dano.formula} +${be.fijo} espalda`.slice(0, 60)};
       m.efectos = normalizarEfectos(m.hab ? m.hab.efectos : efectos);
       tx.update(ref, cambiosDe(m));
     });
@@ -1467,6 +1486,7 @@ const Duelo = (() => {
       ...(ignoraResistCrit ? [`${_esc(nombreHab)} ignora ${_fmt(ignoraResistCrit)} de Resistencia a crítico del defensor.`] : []),
       ...(critBono ? [`${_esc(nombreHab)} suma +${_fmt(critBono)} a tu Crítico frecuente, solo en esta tirada.`] : []),
       ...(critpotBono ? [`${_esc(nombreHab)} suma +${_fmt(critpotBono)} a tu Crítico potente, solo en esta tirada.`] : []),
+      ...(_num(d.ataque && d.ataque.espalda && d.ataque.espalda.critpot) ? [`Por la espalda: +${_fmt(d.ataque.espalda.critpot)} a tu Crítico potente.`] : []),
       `Nivel del crítico: ${_fmt(c.nivel)}${_num(c.resistencia) ? ` − Resistencia a crítico ${_fmt(c.resistencia)} = ${_fmt(c.dados)} d20` : ''}`];
     let cuerpo;
     const viz = criticoVizHtml(d);
@@ -1987,5 +2007,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab};
+  return {limpiarEspalda, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab};
 })();

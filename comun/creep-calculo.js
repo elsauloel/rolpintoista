@@ -498,6 +498,7 @@ const CreepCalculo = (() => {
     if(arma && it.danoAmplificado) o.danoAmplificado = it.danoAmplificado;
     if(it.durPorPeso) o.durPorPeso = it.durPorPeso;   // durabilidad de diseño (si no es la de siempre)
     if(arma && it.armaDeRango) o.armaDeRango = true;
+    if(arma && it.espalda) o.espalda = structuredClone(it.espalda);   // por la espalda
     if(arma && (it.efectosGolpe || []).length) o.efectosGolpe = structuredClone(it.efectosGolpe);
     if(it.tipoItem === 'consumibles'){ o.consumible = true; if(it.curahp) o.curahp = it.curahp; if(it.legacy) o.legacy = true; }
     const otros = (it.mods || []).filter(m => m.stat !== 'def');

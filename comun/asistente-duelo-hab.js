@@ -256,7 +256,9 @@ const AsistenteDueloHab = (() => {
         <label class="op"><input type="checkbox" data-ignoraresistcrit-on ${a.ignoraResistCrit > 0 ? 'checked' : ''}> Ignora Resistencia a crítico</label>
         ${a.ignoraResistCrit > 0 ? `<div class="fila"><span style="min-width:250px">¿Cuántos puntos ignora?</span><input type="number" min="1" style="width:80px" data-arma="ignoraResistCrit" value="${esc(a.ignoraResistCrit)}"></div>` : ''}
         ${fila('critBono', '+ Crítico frecuente (solo en esta tirada)')}${fila('critpotBono', '+ Crítico potente (solo en esta tirada)')}
-        <p class="nota" style="margin-top:2px">A diferencia de un «Efecto sobre uno mismo» (que dura al menos 1 turno y podría alcanzar a otro ataque), estos dos suman solo para EL crítico de este ataque puntual — no dejan ningún estado activo.</p>`;
+        <p class="nota" style="margin-top:2px">A diferencia de un «Efecto sobre uno mismo» (que dura al menos 1 turno y podría alcanzar a otro ataque), estos dos suman solo para EL crítico de este ataque puntual — no dejan ningún estado activo.</p>
+        <p class="nota" style="margin-top:10px"><b>🗡 Por la espalda</b> (opcional): se suma a lo que ya dé el arma, solo si quien ataca está <b>en sigilo</b> y pegado al defensor por atrás (su punto ciego). El mapa lo detecta solo.</p>
+        ${fila('espaldaPdg', '+ PdG por la espalda')}${fila('espaldaFijo', '+ Daño por la espalda')}${fila('espaldaCritpot', '+ Crítico potente por la espalda')}`;
       return h;
     }
     function cuerpoObjetivo(){
@@ -480,6 +482,8 @@ const AsistenteDueloHab = (() => {
         if(a.ignoraResistCrit) partes.push(`ignora ${a.ignoraResistCrit} de Resistencia a crítico`);
         if(a.critBono) partes.push(`+${a.critBono} Crítico frecuente (solo esta tirada)`);
         if(a.critpotBono) partes.push(`+${a.critpotBono} Crítico potente (solo esta tirada)`);
+        const esp = [a.espaldaPdg ? `+${a.espaldaPdg} PdG` : '', a.espaldaFijo ? `+${a.espaldaFijo} de daño` : '', a.espaldaCritpot ? `+${a.espaldaCritpot} Crítico potente` : ''].filter(Boolean);
+        if(esp.length) partes.push(`por la espalda (en sigilo): ${esp.join(', ')}`);
         filas.push(`<b>Ataque con arma</b>: ${partes.join(', ') || 'sin arreglos'} · X en ${st.x === 'sp' ? 'SP' : 'Nitros'}`);
         if(st.alcance !== 'auto') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
       }else{

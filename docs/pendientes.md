@@ -233,6 +233,13 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Rework del catálogo** con los preceptos de `docs/guia-de-diseno.md` (familias y efectos de arma en tres niveles, peso de cada efecto P112, Resistencia a crítico por slots P114, anillos escasos y caros): el asistente propone por tandas y el dueño audita. Falta definir los slots exactos de cada Tipo de resistencia.
 - [ ] **Diseño de armas, paso a paso (plan del dueño, 2026-09-25):** primero **todas las armas NO mágicas, elemento por elemento** (orden propuesto: 1 Tipo y Peso con su costo en Nitros; 2 empuñadura y mano izquierda; 3 Rango / Alcance; 4 bonos; 5 efectos al golpear por familia; 6 crítico frecuente y potente; 7 estado al equipar; 8 tier, calidad y precio). **Después**, con esa base como referencia, armar los **paralelismos mágicos con nociones matemáticas** (daño en función de Nitros, etc.) — el dueño pidió ayuda para pensarlos. Ver P116 y `docs/guia-de-diseno.md`.
 - [ ] **Rework del catálogo — hoja de ruta:** ver [`hoja-de-ruta-rework-catalogo.md`](hoja-de-ruta-rework-catalogo.md) (fases 0–7; se hace paso a paso, el asistente propone y el dueño audita).
+- [ ] **Rework metódico de armas, por Tipo y tier (ruta pendiente; el dueño la retoma cuando tiene tiempo, 2026-10-03)** — en
+  [`rework-armas.md`](rework-armas.md), «Rework metódico por Tipo» (ahí está el «▶ Para retomar»). Va por el **Tipo 4, Común**: definiciones ✅,
+  tabla comparativa ✅; sigue definir las armas **una por una** con el dueño; con el OK de todas reemplazan a las T4 Comunes del catálogo y se pasa a
+  Buena calidad → … → Legendario; después, el Tipo siguiente.
+- [ ] **Por la espalda: probarlo en el mapa** (construido 2026-10-03, pruebas automáticas en verde): un token en sigilo, en el casillero de atrás
+  de un rival, ataca con un arma que tenga el bono → el cuadro del duelo dice «🗡 por la espalda» y suma PdG, daño y Crítico potente. Ninguna arma del
+  catálogo lo trae todavía: aparecerá con el rework del T4.
 - [ ] **Generador de tiendas: cupo mínimo de armas mágicas en cada generación** (pedido del dueño, 2026-09-25): diseñarlo cuando existan las armas mágicas del catálogo (ver `rework-armas.md`, armas mágicas). Preguntas para ese momento: ¿cuántas por tienda?, ¿depende del tamaño/tipo de tienda?, ¿pisa el azar de tier?
 - [ ] **Sondeo de mecánicas** ([`sondeo-mecanicas.md`](sondeo-mecanicas.md)): resistencias por elemento mágico, ampliar el equipo con las mecánicas que faltan, relevar creeps y después **reworkear las skills de creeps** coordinadas con el equipo (pedido del dueño, 2026-09-25).
 - [ ] **Auditoría de defensa** (`datos/auditoria-defensa.html`): que el dueño audite; después el asistente aplica al catálogo con `importar_json.py`.

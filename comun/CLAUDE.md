@@ -1181,3 +1181,5 @@ versión parecida en más de una, es candidato a juntar.
   por dónde están) → Listo. `abrir({nombre, creeps: [{id, nombre, donde}], marcados, alCrear({nombre, creeps}), alCancelar})`; no escribe nada: el
   mapa (`crearMapa`, js/01) y GM Tools (`pedirMapaNuevo`, js/09) crean el mapa y mudan los creeps a su manera.
 
+
+- **Por la espalda** (2026-10-03, pedido del dueño): un arma puede traer `espalda: {pdg, fijo, critpot}` (asistente de ítems, paso «Peso y daño»; creeps `sc.armaEspalda`, invocaciones `inv.armaEspalda`; una habilidad con el arma suma `arma.espaldaPdg/Fijo/Critpot` del ✨). El mapa avisa a `Duelo.crear` (`cfg.espalda`) si quien ataca está **en sigilo** y en el punto ciego del defensor; el duelo lo guarda en `ataque.porLaEspalda`/`ataque.espalda` (`limpiarEspalda`) y lo suma: PdG al guardar la tirada, daño fijo al guardar el daño, Crítico potente en `entrarCritico`. Sin reglas nuevas (va dentro de `ataque`).

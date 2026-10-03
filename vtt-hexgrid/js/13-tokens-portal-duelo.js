@@ -405,7 +405,9 @@ function dueloElegirObjetivoMapa(msg){
       dueloAvisoObjetivoOcultar();
       try{ t = await dueloVincularSiFalta(t); }catch(err){ console.error('No se pudo vincular el token al creep:', err); }
       const mio = todos.find(propio);
-      Duelo.crear({yo, ataque}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
+      let espalda = false;
+      try{ espalda = porLaEspalda(mio, t); }catch(err){ console.error('No se pudo ver si es por la espalda:', err); }   // nunca traba el ataque
+      Duelo.crear({yo, ataque, espalda}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
     }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : ''}</span>`, true, cancelado);
     dueloAvisoObjetivo(yo.nombre, msg.conSuelto, alSuelto, ataque && ataque.hab ? ataque.hab.nombre : '');
@@ -567,6 +569,19 @@ async function dodgeDeclinar(){
 // escucharAreas() apenas llega el snapshot nuevo (mismo camino que cualquier avance de la cascada).
 // Las casillas del cono de un área (`centro` = {col, fila, cono, rot}): el mismo de la detección, desde esa casilla y mirando para ahí.
 function conoDeArea(c){ return new Set(zonasSigilo({col: c.col, fila: c.fila, rotacion: num(c.rot)}).cono.map(x => nbPack(x.col, x.fila))); }
+// «Por la espalda» (2026-10-03): el atacante está en el punto ciego del defensor — la misma cuña ciega de la visión (VISION_CUNA_CIEGA a cada
+// lado de atrás; las diagonales de atrás sí se ven): pegado, solo el casillero justo de atrás. Y SOLO si el atacante está en sigilo (dueño,
+// 2026-10-03): si el defensor lo puede ver, aunque venga por atrás, se da vuelta para defenderse.
+function porLaEspalda(atq, def){
+  if(!atq || !def || !enSigilo(atq)) return false;
+  const k = ((Math.round(num(def.rotacion || 0) / 60) % 6) + 6) % 6;
+  const rot = k * 60 * Math.PI / 180, bx = Math.sin(rot), by = -Math.cos(rot);   // "atrás" del defensor (como offsetsVision)
+  const a = hexCentro(atq.col, atq.fila), d = hexCentro(def.col, def.fila);
+  const vx = a.x - d.x, vy = a.y - d.y, largo = Math.hypot(vx, vy);
+  if(!largo) return false;
+  const ang = Math.acos(Math.max(-1, Math.min(1, (vx * bx + vy * by) / largo))) * 180 / Math.PI;
+  return ang < VISION_CUNA_CIEGA - 1;
+}
 function dueloElegirAreaMapa(msg){
   const yo = msg.yo, hab = msg.ataque.hab;
   cerrarBotonera();

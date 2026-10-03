@@ -76,7 +76,7 @@ function armaDeInvComoDraft(inv){
     nombre: inv.armaNombre || '', tipoItem: inv.armaManos || 'arma_1m', tipoDado: num(inv.armaTipo) || 8,
     peso: Math.max(1, num(inv.armaPeso) || 1), danoFijo: num(inv.armaFijo), danoAmplificado: num(inv.armaAmplificado),
     armaDeRango: !!inv.armaDeRango, mods: structuredClone(inv.armaMods || []), detalle: inv.armaDetalle || '',
-    efectosGolpe: structuredClone(inv.armaEfectos || []),
+    efectosGolpe: structuredClone(inv.armaEfectos || []), ...(inv.armaEspalda ? {espalda: structuredClone(inv.armaEspalda)} : {}),
   };
 }
 function ponerArmaEnInv(inv, d){
@@ -89,6 +89,7 @@ function ponerArmaEnInv(inv, d){
   inv.armaDeRango = !!d.armaDeRango;
   inv.armaMods = structuredClone(d.mods || []);
   inv.armaEfectos = structuredClone(d.efectosGolpe || []);
+  if(d.espalda) inv.armaEspalda = structuredClone(d.espalda); else delete inv.armaEspalda;   // por la espalda
   inv.armaDetalle = d.detalle || '';
 }
 function ponerEquipoEnInv(inv, d){

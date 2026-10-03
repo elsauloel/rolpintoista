@@ -1351,3 +1351,5 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   siempre, «Sacar del mapa» en el pie) en la ventana común; **＋ Nuevo mapa** con `comun/asistente-mapa.js` (los creeps marcados se mudan con
   `modificarCreep` + `CreepsMapas.mudarTokens`). El mapa carga `comun/paso-a-paso.js` de entrada (ya no como pieza). Se sacaron `#nuevo-token-capa`,
   `#editar-token-capa` y `#bn-editor` (el editor común de la Botonera nueva abre la ventana común adentro del recuadro).
+
+- **Por la espalda** (2026-10-03): `porLaEspalda(atq, def)` (js/13) — quien ataca está en sigilo (`enSigilo`) y en la cuña ciega del defensor (la misma de la visión, `VISION_CUNA_CIEGA`: el casillero justo de atrás). Se pasa a `Duelo.crear` en el ataque normal (en un try: nunca traba el ataque). Ver `comun/CLAUDE.md`.

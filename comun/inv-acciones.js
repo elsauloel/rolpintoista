@@ -59,7 +59,7 @@ const InvAcciones = (() => {
      turno Tipo ÷ 2, después el Tipo completo; suma al conteo) y tirar el PdG (tiradaAtaque). Atacar cierra el Parry pendiente:
      lo borra cada pantalla. */
   function ataqueDuelo(inv){
-    return {tipo: 'normal', armaId: '', armaNombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8, rango: !!inv.armaDeRango,
+    return {tipo: 'normal', armaId: '', armaNombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8, rango: !!inv.armaDeRango, ...(inv.armaEspalda ? {espalda: inv.armaEspalda} : {}),
       alcance: inv.armaDeRango ? Math.max(1, Math.round(num(I().statValor(inv, 'rng')))) : 1};
   }
   /* Sin No2 suficientes (2026-10-02, hoja de ruta B-7, igual que los creeps y los personajes: avisar y dejar seguir): faltanNitros, la

@@ -813,3 +813,20 @@ manos (uno), Crítico frecuente +2 (uno).
 | 🆕 Espadón del capataz | 2 manos · 2 dados · Alcance +1 · 140 |
 
 **✅ T6 Buena calidad cargado (2026-10-03, OK del dueño):** las 18 de la propuesta v1, con los tres textos y el precio libre; las 5 copias quedaron como armas propias (mismos creeps).
+
+### T6 Raro — lo que hay hoy (2026-10-03)
+| Arma | Lo que hace · precio hoy → libre · rinde como |
+|---|---|
+| Espada bastarda | 2 dados · +1 · Parry +1 · Bloqueo +1 · 120 → 150 · Buena |
+| Espada bastarda del Espectro | **copia** de la anterior (botín) |
+| Mandoble | 2 dados · Parry +2 · Bloqueo +1 · 110 → 140 · Buena (es «a una mano», y el nombre es poco usado) |
+| Cuchilla de carnicero | 2 dados · Rompe armadura **siempre** · 110 → 200 · Rara (en Rara va bajo o medio) |
+| Espada vampírica menor | 2 dados · Parry +1 · contraataque +2 · Drena vida · 260 → 300 · Rara |
+| Katana | 2 dados · PdG +2 · Crít. frecuente +1 · **120** → 550 · **Excepcional** |
+| Katana del cazarrecompensas | **copia** de la Katana (botín) |
+| ⚠️ Katana de maestro | 2 dados · Parry +2 · Iniciativa +1 · Crít. frecuente +1 · contraataque +3 · Sangrado 50 % · 300 → 450 · Rara |
+| Sable del capitán pirata | 2 dados · +2 · Parry +1 · Crít. frecuente +1 · contraataque +2 · Sangrado siempre · 350 → 500 · casi Excepcional |
+
+**Lo que muestra:** solo 9 (7 distintas, 2 copias); dos rinden como Buena (Espada bastarda, Mandoble); la Katana rinde como Excepcional y cuesta
+120; la Cuchilla de carnicero trae Rompe armadura siempre; nadie usa lo que abre Rara: Crít. frecuente +4 (una), Ignora, por la espalda, Rengo
+más alto, Parry + Bloqueo combinados (sí hay dos), Critical Matters, «seguro si es crítico», Veneno.

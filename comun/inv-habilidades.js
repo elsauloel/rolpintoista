@@ -47,7 +47,7 @@ const InvHabilidades = (() => {
   function alcanceHab(inv, c, statTira){ return Combatiente.alcanceHab(c, statTira, s => I().statValor(inv, s)); }   // comun/combatiente.js
   // La Ejecución de una invocación: la misma regla que el personaje y el creep. Las invocaciones no tienen costo variable.
   function habEjecucion(inv, h){
-    return Combatiente.habEjecucion(h, h && h.duelo, {stat: s => I().statValor(inv, s), etq});
+    return Combatiente.habEjecucion(h, h && h.duelo, {stat: s => I().statValor(inv, s), etq, armaDano: I().ataqueTxt(inv)});
   }
   // «Ataque con mi arma, con arreglos» de una invocación (P134), con su arma y su alcance (o el que diga la habilidad).
   function ataqueDeHab(inv, h){

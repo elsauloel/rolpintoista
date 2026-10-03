@@ -403,7 +403,8 @@ const Combatiente = (() => {
     const sx = t => conX ? sustituirX(t, X) : t;
     const stat = c.tira !== undefined ? c.tira : (h.tiradaStat || '');
     const tipo = c.tipoDano || 'arcano';
-    const formula = formulaDanoHab(h, c, o.X);
+    // «El daño de tu arma» (2026-10-02, Daño en área): la fórmula del arma de quien la usa (`o.armaDano`, la que tira «Daño»).
+    const formula = c.danoArma ? formulaDanoHab({tiradaExtra: o.armaDano || ''}, c, o.X) : formulaDanoHab(h, c, o.X);
     return {
       nombre: h.nombre, objetivo: c.objetivo || 'enemigo',
       alcance: c.objetivo === 'uno mismo' || c.objetivo === 'area' || c.objetivo === 'onda' ? 0 : alcanceHab(c, stat, o.stat),
@@ -415,6 +416,7 @@ const Combatiente = (() => {
         ...(c.danoDiferencia ? {diferencia: true} : {}), ...(c.drena ? {drena: true, drenaTope: Math.max(0, nf(c.drenaTope))} : {})} : null,
       efectos: (c.efectos || []).map(efectoDeEjecucion),
       ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: nf(c.radio)} : {}),
+      ...(c.objetivo === 'onda' && c.ondaDodge ? {dodge: true} : {}),   // la onda que deja dodge roll (Daño en área)
       ...(c.efectoLibre ? {efectoLibre: sx(c.efectoLibre)} : {}),
       ...(c.efectosNota ? {efectosNota: sx(c.efectosNota)} : {}),
       ...(c.contraOtro ? {contraOtro: c.contraOtro} : {}),

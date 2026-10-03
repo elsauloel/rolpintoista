@@ -455,6 +455,7 @@ const Duelo = (() => {
     const efectos = limpiarEfectos(h.efectos);
     const objetivo = ['enemigo', 'aliado', 'uno mismo', 'area', 'onda'].includes(h.objetivo) ? h.objetivo : 'enemigo';
     return {nombre: txtCorto(h.nombre, 60), objetivo, tira: t, contra, dano, efectos, sinOposicion: !(t && contra.length),
+      ...(objetivo === 'onda' && h.dodge ? {dodge: true} : {}),
       ...(h.efectoLibre ? {efectoLibre: txtCorto(h.efectoLibre, 200)} : {}),
       ...(h.efectosNota ? {efectosNota: txtCorto(h.efectosNota, 200)} : {}),
       // «Otro»: se resiste con algo que no está en la lista de stats — texto libre para que la mesa lo
@@ -523,7 +524,7 @@ const Duelo = (() => {
     if(par === 'contacto' && m.hab){   // habilidad dirigida: gana quien la usa → sigue; gana el objetivo → se resistió
       m.contacto = info;
       if(r.gana === 'atacante'){ m.resultado = 'pego'; entrarHab(m); }
-      else if(m.grupo && m.hab.objetivo !== 'onda'){   // hechizo de área (Paso 4 del casteo): ganar la Evasión no termina el duelo, gana el DERECHO a un dodge roll (la onda alrededor de quien la usa no da dodge: no hay a dónde salir)
+      else if(m.grupo && (m.hab.objetivo !== 'onda' || m.hab.dodge)){   // (una onda solo si deja dodge: `hab.dodge`, Daño en área)   // hechizo de área (Paso 4 del casteo): ganar la Evasión no termina el duelo, gana el DERECHO a un dodge roll (la onda alrededor de quien la usa no da dodge: no hay a dónde salir)
         m.fase = 'dodge'; m.estado = 'esperando';
       }
       else{ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; }

@@ -129,7 +129,8 @@ const AsistenteDueloHab = (() => {
       contraModo: (ini && ini.contraOtro) ? 'otro' : (ini && Array.isArray(ini.contra) && ini.contra.length) ? 'stats' : (ini && ini.tira !== undefined) ? 'ninguna' : 'stats',
       contraOtro: (ini && ini.contraOtro) || '',
       dano: !!(ini && ini.dano), tipoDano: (ini && ini.tipoDano) || 'arcano',
-      danoDif: !!(ini && ini.danoDiferencia), danoExtra: (ini && ini.danoExtra) || '',   // la diferencia: zona y dirigida; la tirada extra: solo zona (2026-10-02)
+      danoDif: !!(ini && ini.danoDiferencia), danoExtra: (ini && ini.danoExtra) || '',
+      danoArma: !!(ini && ini.danoArma),   // el daño del arma de quien la usa (2026-10-02, Daño en área): dirigida, área u onda   // la diferencia: zona y dirigida; la tirada extra: solo zona (2026-10-02)
       drena: !!(ini && ini.drena), drenaTope: ini && ini.drenaTope !== undefined ? Number(ini.drenaTope) || 0 : 50,   // drena (2026-10-02, Drenar Vida): no en una zona
       // Efecto que no se puede automatizar del todo (2026-09-27, pedido del dueño): texto libre que se muestra
       // en el cuadro del duelo junto al resultado, para lo que hay que resolver a mano (ej. "drenás la diferencia").
@@ -149,7 +150,8 @@ const AsistenteDueloHab = (() => {
       ignoraDano: (ini && ini.ignoraDano !== undefined) ? !!ini.ignoraDano : ((ini && ini.tipoDano) || 'arcano') !== 'fisico',
       efectos: ini && Array.isArray(ini.efectos) ? ini.efectos.map(e => ({...e})) : [],
       alcance: (ini && ini.alcance) || 'auto', alcanceN: (ini && ini.alcanceN) || 3,
-      radio: (ini && ini.radio) || 2,   // hechizo de área (Paso 4/7 del casteo): radio del área, en casilleros
+      radio: (ini && ini.radio) || 2,
+      ondaDodge: !!(ini && ini.ondaDodge),   // la onda deja dodge roll a quien gana (2026-10-02, Daño en área)   // hechizo de área (Paso 4/7 del casteo): radio del área, en casilleros
       modo: (ini && ini.modo) || 'hab', x: (ini && ini.x) || 'nitros',
       flashEn: new Set(ini && ini.flash && Array.isArray(ini.flash.en) ? ini.flash.en : ['pdg', 'parry', 'bloqueo', 'dano']), flashBono: (ini && ini.flash && ini.flash.bono) || 2,
       arma: {pdg: 0, pdgPorX: 0, dadosPorX: 0, fijo: 0, fijoPorX: 0, sinParry: false, ignoraResistCrit: 0, critBono: 0, critpotBono: 0, ...((ini && ini.arma) || {})},
@@ -261,8 +263,10 @@ const AsistenteDueloHab = (() => {
       let h = titulo('', '¿A quién apunta?', 'Elegí quién puede recibir esta habilidad.');
       h += `<select data-objetivo>${[['enemigo', 'A un enemigo (o a cualquier otro token)'], ['aliado', 'A un aliado'], ['uno mismo', 'A uno mismo (no hay que elegir)'], ['area', 'A un área (varios objetivos, en cascada — Orbe arcano, Tormenta arcana…)'], ['onda', 'Onda alrededor de quien la usa (sin marcar centro — Shockwave…)'], ['zona', 'Zona persistente (queda puesta varios turnos — Nube tóxica…)']].map(([v, t]) => `<option value="${v}"${st.objetivo === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
       if(st.objetivo === 'onda'){
-        h += `<p class="nota" style="margin-top:10px">No hay que marcar nada: al ejecutarla, todo rival dentro de este radio <b>alrededor de tu token</b> entra en la cascada, uno detrás del otro. Vos tirás una sola vez y cada uno se resiste por separado. No hay dodge roll: no tienen a dónde salir. No te afecta a vos.</p>
-          <div class="fila"><input type="number" min="1" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros de radio (1 = los adyacentes)</span></div>`;
+        h += `<p class="nota" style="margin-top:10px">No hay que marcar nada: al ejecutarla, todo rival dentro de este radio <b>alrededor de tu token</b> entra en la cascada, uno detrás del otro. Vos tirás una sola vez y cada uno se resiste por separado. No te afecta a vos.</p>
+          <div class="fila"><input type="number" min="1" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros de radio (1 = los adyacentes)</span></div>
+          <label class="op" style="margin-top:8px"><input type="checkbox" data-ondadodge ${st.ondaDodge ? 'checked' : ''}> Quien gana su tirada tiene derecho a un dodge roll (salir de la onda moviéndose, como en un área)</label>
+          <p class="nota">${st.ondaDodge ? 'Si gana, puede moverse para salir del radio: si sale, la esquiva; si se queda adentro, le pega igual.' : 'Sin tildar: quien gana su tirada no recibe nada (como Shockwave).'}</p>`;
       }
       if(st.objetivo === 'area'){
         h += `<p class="nota" style="margin-top:10px">Marcás el centro en el mapa al ejecutarla; todo rival adentro de este radio entra en la cascada, uno detrás del otro (Paso 4 del casteo: primero tira Evasión contra tu tirada; si la gana, tiene derecho a un dodge roll).</p>
@@ -344,11 +348,15 @@ const AsistenteDueloHab = (() => {
       const esZona = st.objetivo === 'zona';
       const puedeDif = st.objetivo !== 'uno mismo';
       const dif = puedeDif && st.dano && st.danoDif;
+      const puedeArma = !esZona && st.objetivo !== 'uno mismo';
+      const conArma = puedeArma && st.dano && st.danoArma && !dif;
       h += `<div class="adh-modo">
         <label class="op"><input type="radio" name="hacedano" value="no" ${!st.dano ? 'checked' : ''}> No hace daño</label>
-        <label class="op"><input type="radio" name="hacedano" value="si" ${st.dano && !dif ? 'checked' : ''}> Sí, con su fórmula${cfg.tieneFormula === false ? ' <span class="nota">(esta habilidad todavía no tiene fórmula: escribila en su editor)</span>' : ''}</label>
+        <label class="op"><input type="radio" name="hacedano" value="si" ${st.dano && !dif && !conArma ? 'checked' : ''}> Sí, con su fórmula${cfg.tieneFormula === false ? ' <span class="nota">(esta habilidad todavía no tiene fórmula: escribila en su editor)</span>' : ''}</label>
         ${puedeDif ? `<label class="op"><input type="radio" name="hacedano" value="dif" ${dif ? 'checked' : ''}> Sí: la diferencia entre las tiradas</label>` : ''}
+        ${puedeArma ? `<label class="op"><input type="radio" name="hacedano" value="arma" ${conArma ? 'checked' : ''}> Sí: el daño de tu arma</label>` : ''}
       </div>`;
+      if(conArma) h += `<p class="nota">Se tira el daño del arma con la que la usás (la que elegís si cuesta lo mismo que un ataque; si no, la principal), con su Fuerza, como el botón «Daño». A cada uno se le resta su Defensa, salvo que marques «Ignora la Defensa».</p>`;
       if(dif) h += `<p class="nota">${esZona ? 'Cada uno que no resiste recibe' : 'Si no la resiste, recibe'} tu tirada menos la suya (si empatan, nada). Si resiste, no le pasa nada. Necesita una tirada (paso «Tirada») y una resistencia (paso «Resistencia»).</p>`;
       if(st.dano){
         h += `<div class="fila"><span>Tipo:</span><select data-tipodano>${TIPOS.map(([v, t]) => `<option value="${v}"${st.tipoDano === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
@@ -480,7 +488,7 @@ const AsistenteDueloHab = (() => {
         filas.push(sinOp() ? '<b>Sin tirada</b>: se aplica directo'
           : st.tiraModo === 'custom' ? `<b>Tirada custom</b>: ${esc(st.tiraFormula) || '(sin fórmula)'}${st.tiraEtiqueta ? ' · ' + esc(st.tiraEtiqueta) : ''} contra ${contraTxt}`
           : `<b>Tirada</b>: ${STAT_TXT[st.tira] || st.tira} contra ${contraTxt}`);
-        if(st.dano) filas.push(`<b>Daño</b>: ${st.danoDif && st.objetivo !== 'uno mismo' ? 'la diferencia entre las tiradas, ' : ''}${st.drena && st.objetivo !== 'zona' ? `drena (se cura lo que hace${st.drenaTope ? `, hasta +${st.drenaTope} % de su máximo` : ''}), ` : ''}tipo ${st.tipoDano}${st.ignoraDano ? ', ignora la Defensa' : ''}${cfg.costoVariable && st.danoFijoPorX ? `, +${st.danoFijoPorX} por X` : ''}${st.objetivo === 'zona' && st.danoExtra ? `; si entra, tira ${esc(st.danoExtra)}` : ''}`);
+        if(st.dano) filas.push(`<b>Daño</b>: ${st.danoDif && st.objetivo !== 'uno mismo' ? 'la diferencia entre las tiradas, ' : st.danoArma && st.objetivo !== 'zona' && st.objetivo !== 'uno mismo' ? 'el de tu arma, ' : ''}${st.drena && st.objetivo !== 'zona' ? `drena (se cura lo que hace${st.drenaTope ? `, hasta +${st.drenaTope} % de su máximo` : ''}), ` : ''}tipo ${st.tipoDano}${st.ignoraDano ? ', ignora la Defensa' : ''}${cfg.costoVariable && st.danoFijoPorX ? `, +${st.danoFijoPorX} por X` : ''}${st.objetivo === 'zona' && st.danoExtra ? `; si entra, tira ${esc(st.danoExtra)}` : ''}`);
         if(st.efectoLibreOn && st.efectoLibre.trim()){ const t = st.efectoLibre.trim(); filas.push(`<b>Efecto a mano</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
       }
       if(st.modo !== 'flash' && st.objetivo !== 'zona'){
@@ -549,8 +557,14 @@ const AsistenteDueloHab = (() => {
       });
       f.querySelectorAll('[name=contramodo]').forEach(r => r.onchange = () => { st.contraModo = r.value; dibujar(); });
       q('[data-contraotro]', e => { st.contraOtro = e.target.value; });
-      f.querySelectorAll('[name=hacedano]').forEach(r => r.onchange = () => { st.dano = r.value !== 'no'; st.danoDif = r.value === 'dif'; dibujar(); });
+      f.querySelectorAll('[name=hacedano]').forEach(r => r.onchange = () => {
+        const antesArma = st.danoArma;
+        st.dano = r.value !== 'no'; st.danoDif = r.value === 'dif'; st.danoArma = r.value === 'arma';
+        if(st.danoArma && !antesArma){ st.tipoDano = 'fisico'; st.ignoraDano = false; }   // un arma: físico, contra la Defensa
+        dibujar();
+      });
       q('[data-drena]', e => { st.drena = e.target.checked; dibujar(); });
+      q('[data-ondadodge]', e => { st.ondaDodge = e.target.checked; dibujar(); });
       q('[data-drenatope]', e => { st.drenaTope = Math.max(0, Number(e.target.value) || 0); });
       q('[data-danoextra]', e => { st.danoExtra = e.target.value.trim(); });
       q('[data-tipodano]', e => { st.tipoDano = e.target.value; st.ignoraDano = st.tipoDano !== 'fisico'; dibujar(); });
@@ -652,6 +666,7 @@ const AsistenteDueloHab = (() => {
           if(!hayTira || !out.contra.length){ alert('El daño «la diferencia» necesita una tirada (paso Tirada) y algo con qué resistirla (paso Resistencia).'); return false; }
           out.danoDiferencia = true;
         }
+        if(st.dano && st.danoArma && !st.danoDif && st.objetivo !== 'zona' && st.objetivo !== 'uno mismo') out.danoArma = true;
         if(st.dano && st.objetivo !== 'zona' && st.drena){ out.drena = true; out.drenaTope = Math.max(0, Math.round(Number(st.drenaTope) || 0)); }
         if(st.objetivo === 'zona' && st.dano){
           if(st.danoDif){
@@ -666,6 +681,7 @@ const AsistenteDueloHab = (() => {
         if(st.efectoLibreOn && st.efectoLibre.trim()) out.efectoLibre = st.efectoLibre.trim();
         if(st.efectosNotaOn && st.efectosNota.trim()) out.efectosNota = st.efectosNota.trim();
         if(st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'zona') out.radio = Math.max(st.objetivo === 'area' ? 0 : 1, st.radio);
+        if(st.objetivo === 'onda' && st.ondaDodge) out.ondaDodge = true;
         if(st.objetivo === 'zona'){
           out.zonaTurnos = st.zonaTurnos;
           if(st.zonaAmiga) out.zonaAmiga = true;

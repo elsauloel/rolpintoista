@@ -1454,6 +1454,24 @@ prueba('Ejecución ✨: «la diferencia» y «drena» se eligen en el paso Daño
     [[true, true, '50'], [true, true, 50, undefined], {formula: '', tipo: 'arcano', ignoraDef: true, diferencia: true, drena: true, drenaTope: 50},
      {formula: '', tipo: 'arcano', ignoraDef: true, diferencia: true, drena: true, drenaTope: 50}, {formula: '3+1d3', etq: 'Drenar'}]);
 });
+prueba('Ejecución ✨: «el daño de tu arma» y la onda con dodge roll (Daño en área) — editor, regla común y duelo', async () => {
+  let r = 'nada';
+  const ini = {objetivo: 'onda', radio: 1, ondaDodge: true, tira: 'pdg', contra: ['eva'], dano: true, danoArma: true, tipoDano: 'fisico', ignoraDano: false, efectos: []};
+  AsistenteDueloHab.abrir({nombre: 'Daño en área', inicial: ini, costoInicial: {sp: '2', nitrosCosto: 'ATAQUE'}, alGuardar: x => { r = x; }});
+  const mia = [...document.querySelectorAll('.pap')].pop(), q = s => mia.querySelector(s);
+  const tabs = [...mia.querySelectorAll('[data-pap-paso]')].map(b => b.textContent.replace(/^\d+\. /, ''));
+  q(`[data-pap-paso="${tabs.findIndex(t => /Da[ñn]o/.test(t))}"]`).click();
+  const armaUi = !!q('input[name=hacedano][value=arma]:checked');
+  q(`[data-pap-paso="${tabs.indexOf('Objetivo')}"]`).click();
+  const dodgeUi = !!q('[data-ondadodge]:checked');
+  q('[data-pap="guardar"]').click(); await new Promise(res => setTimeout(res, 0));
+  const c = r && r.duelo, h = Combatiente.habEjecucion({nombre: 'Daño en área'}, c, {stat: () => 6, etq: s => s, armaDano: '1d8 + 3'});
+  const sinArma = Combatiente.habEjecucion({nombre: 'X'}, c, {stat: () => 6, etq: s => s});
+  const S = fichaBotonera({inventario: [{id: 'e', nombre: 'Espada', tipoItem: 'arma_1m', equipado: true, peso: 1, tipoDado: 8, danoFijo: 0}], habilidades: [{id: 'd', nombre: 'Daño en área', modo: 'auto', duelo: c}]});
+  const pj = FichaAcciones.habDueloDatos(S, S.habilidades[0], 0, 0);
+  igual([armaUi, dodgeUi, c && [c.danoArma, c.ondaDodge, c.tipoDano], h.dano, h.dodge, Duelo.limpiarHab(h).dodge, sinArma.dano, !!(pj.dano && pj.dano.formula === FichaCombate.armaDanoTxt(S.inventario[0], FichaCalculo.calcular(S).final.dmg))],
+    [true, true, [true, true, 'fisico'], {formula: '1d8 + 3', tipo: 'fisico', ignoraDef: false}, true, true, null, true]);
+});
 prueba('paso a paso: al crear, «✔ Crear» solo en el último paso; Cancelar pregunta y descarta; los pasos pueden depender de lo elegido', async () => {
   const hechos = [];
   let conExtra = false;

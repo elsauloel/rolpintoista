@@ -608,8 +608,12 @@ const FichaAcciones = (() => {
   }
   function xDeHab(it, xSp, xNitros){ return FichaHabilidades.spVariable(it) ? num(xSp) : FichaHabilidades.nitrosVariable(it) ? num(xNitros) : 0; }
   // La Ejecución para el cuadro del duelo: la regla común (comun/combatiente.js, habEjecucion).
-  function habDueloDatos(S, it, xSp, xNitros){
-    return Combatiente.habEjecucion(it, FichaBotonera.dueloDe(it), {stat: s => FichaCalculo.calcular(S).final[s], etq: s => FichaCalculo.STAT_LABEL[s] || s, X: xDeHab(it, xSp, xNitros)});
+  // `arma`: con la que se ejecuta (si cuesta lo mismo que un ataque); sin ella, la principal — para «el daño de tu arma».
+  function habDueloDatos(S, it, xSp, xNitros, arma){
+    const c = FichaCalculo.calcular(S);
+    const a = arma || ((FichaCombate.armasEquipadasConDano(S)[0] || {}).item) || null;
+    return Combatiente.habEjecucion(it, FichaBotonera.dueloDe(it), {stat: s => c.final[s], etq: s => FichaCalculo.STAT_LABEL[s] || s, X: xDeHab(it, xSp, xNitros),
+      armaDano: a ? FichaCombate.armaDanoTxt(a, c.final.dmg) : ''});
   }
   // Ataque con arma hecho con una habilidad (`duelo.modo === 'arma'`): el ataque con arreglos (comun/combatiente.js).
   function ataqueDeHabArma(S, it, arma, xSp, xNitros, ui){
@@ -654,8 +658,8 @@ const FichaAcciones = (() => {
       return;
     }
     // Solo sobre uno mismo y sin nada que tirar (Blindaje y parecidos): no hace falta el cuadro — se aplica directo y se anuncia.
-    if(aplicarHabSobreMiDirecto(S, it, habDueloDatos(S, it, xSp, xNitros), ui)) return;
-    const hDuelo = ui.dueloDisponible() ? habDueloDatos(S, it, xSp, xNitros) : null;   // habilidad dirigida (duelo): se anuncia sin tirada y la contienda va en el cuadro
+    if(aplicarHabSobreMiDirecto(S, it, habDueloDatos(S, it, xSp, xNitros, arma), ui)) return;
+    const hDuelo = ui.dueloDisponible() ? habDueloDatos(S, it, xSp, xNitros, arma) : null;   // habilidad dirigida (duelo): se anuncia sin tirada y la contienda va en el cuadro
     if(hDuelo) ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); else anunciarHabilidad(S, it, ui);
     if(hDuelo) ui.elegirObjetivo({yo: ui.yo(), ataque: {tipo: 'habilidad', hab: hDuelo, alcance: hDuelo.alcance}, suelto: () => tirarPrimeraDeHab(S, it, ui)});
     else tirarPrimeraDeHab(S, it, ui);

@@ -640,7 +640,7 @@ Estado hoy: Común 18 · Buena 13 · Raro 9 (cuerpo a cuerpo) · Excepcional 6 �
 ### Tipo 6 — definiciones (✅ ajustadas por el dueño, 2026-10-03 — mandan sobre la propuesta de abajo)
 - **El piso del tipo:** la espada común base, **no menos que esto**: 1d6 con **25 % de Sangrado de 3 turnos** (con crítico, permanente).
 - **De casa y frecuentes:** bonos al **Parry**, a la **Iniciativa** y **PdG en contraataque**.
-- **Crítico frecuente +4:** una sola en Rara y un par en Excepcional (es muy fuerte). **Ignora resistencia a crítico:** igual de escaso.
+- **Crítico frecuente +4:** ~~una sola en Rara~~ **no va en Rara** (corregido por el dueño, 2026-10-03); un par en Excepcional (es muy fuerte). **Ignora resistencia a crítico:** igual de escaso.
 - **Para diversificar en todos los tiers:** PdG, daño fijo y daño amplificado.
 - **Alcance +1:** solo espadones a dos manos; muy puntual en Buena calidad, un poco más en Rara, pero poco.
 - **Rengo** pasa a 🤝 puede ir: desde Buena calidad con 25 %, más frecuente y con porcentajes más altos desde Rara.
@@ -854,3 +854,5 @@ más alto, Parry + Bloqueo combinados (sí hay dos), Critical Matters, «seguro 
 | 🆕 Sable del comandante | 2 dados · +1 · Parry +1 · contraataque +3 · ⚡ si es crítico: Rengo · 230 |
 | 🆕 Sable del general | 2 dados · Iniciativa +2 · Parry +1 · contraataque +1 · Rengo 50 %, seguro si es crítico · 220 |
 | 🆕 As de espadas | **Crít. frecuente +4** (la única) · 300 |
+
+**✅ T6 Raro cargado (2026-10-03, OK del dueño):** las 18 de la propuesta v1, salvo el As de espadas (Crít. frecuente +4: «en Rara me sigue pareciendo muy alto»), reemplazado por el **Rompeespadas** (Parry +4, Bloqueo +2, contraataque +4: el máximo de defensa activa sin pasar a Excepcional). **Regla nueva: Crít. frecuente +4 no va en Rara.** ✅ Tipo 6: Común, Buena y Rara terminados.

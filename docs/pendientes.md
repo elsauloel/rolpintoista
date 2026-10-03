@@ -244,7 +244,7 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Rework metódico de armas, por Tipo y tier (ruta pendiente; el dueño la retoma cuando tiene tiempo, 2026-10-03)** — en
   [`rework-armas.md`](rework-armas.md), «Rework metódico por Tipo» (ahí está el «▶ Para retomar» y **el paso a paso**: mecánicas → tabla de lo que
   hay → lista nueva → OK → reemplaza). **Hoja de ruta (dueño, 2026-10-03): de cada Tipo, Común → Buena → Raro; después el Tipo siguiente; al
-  final, Excepcional y Legendario de cada uno.** ✅ T4 Común, Buena, Raro · ⏸ T4 Excepcional (propuesta en pausa) · ▶ Tipo 6.
+  final, Excepcional y Legendario de cada uno.** ✅ T4 Común (24), Buena, Raro, Excepcional · ✅ T6 Común (24), Buena, Raro · ▶ Tipo 8 (hachas).
 - [ ] **Por la espalda: probarlo en el mapa** (construido 2026-10-03, pruebas automáticas en verde): un token en sigilo, en el casillero de atrás
   de un rival, ataca con un arma que tenga el bono → el cuadro del duelo dice «🗡 por la espalda» y suma PdG, daño y Crítico potente. Ninguna arma del
   catálogo lo trae todavía (ninguna T4 Común lo usó): aparecerá más adelante en el rework.

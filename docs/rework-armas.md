@@ -856,3 +856,34 @@ más alto, Parry + Bloqueo combinados (sí hay dos), Critical Matters, «seguro 
 | 🆕 As de espadas | **Crít. frecuente +4** (la única) · 300 |
 
 **✅ T6 Raro cargado (2026-10-03, OK del dueño):** las 18 de la propuesta v1, salvo el As de espadas (Crít. frecuente +4: «en Rara me sigue pareciendo muy alto»), reemplazado por el **Rompeespadas** (Parry +4, Bloqueo +2, contraataque +4: el máximo de defensa activa sin pasar a Excepcional). **Regla nueva: Crít. frecuente +4 no va en Rara.** ✅ Tipo 6: Común, Buena y Rara terminados.
+
+## Tipo 8 — Hachas, siempre (arranca 2026-10-03)
+Estado hoy (cuerpo a cuerpo): Común 11 · Buena 10 · Raro 9 · Excepcional 5 · Legendario 3; de rango (aparte): Buena 1 · Raro 4 · Exc. 1 · Leg. 2.
+
+### Tipo 8 — definiciones (propuesta del asistente, ⬜ sin responder)
+**Identidad:** hachas de mano, de leñador, de guerra, dobles. **Caras en Nitros** (primer ataque 4, los siguientes 8): pocos golpes y pesados.
+La familia que **rompe armaduras**: su efecto de casa es **Rompe armadura**; juegan con el **Peso** (más dados), el **daño fijo** y el
+**Bloqueo** (el hacha ataja con el mango y la cabeza). **Piso propuesto de la Común:** 1d8 con **25 % de Rompe armadura**.
+- 🏠 **Propio:** Rompe armadura · Bloqueo · daño fijo / Dmg · más dados (Peso) · Alcance (hachas de asta, a dos manos).
+- 🤝 **Puede ir:** Sangrado (tajos profundos) · Derribar (el hachazo que voltea) · Rengo (talar piernas) · Envenenar (bajo) · daño
+  amplificado · Crít. potente (poco) · Critical Matters («si es crítico: Armadura rota doble», «si es crítico: Derribar») · «seguro si es crítico» ·
+  Parry (hachas de mano, poco).
+- ✨ **Excepción:** Demora (más de los contundentes) · Lisiado · Iniciativa (las hachas son lentas) · Drena (Excepcional+).
+- 🚫 **Ajeno:** Ignora resistencia a crítico (solo T4 y T6) · Crít. frecuente alto · Aturdir · por la espalda · PdG en oportunidad (lanzas) ·
+  Explosión. Veneno severo seguro: solo Legendaria.
+- **Fuera del Tipo:** las lanzas (Lanza de caza → Tipo 4) y las arrojadizas (con las de rango).
+
+### T8 Común — lo que hay hoy (2026-10-03)
+| Arma | Lo que hace · precio hoy → libre · rinde como |
+|---|---|
+| Hachuela | 1 dado · 40 → 55 · Común |
+| Hachuela de leñador | 1 dado · Iniciativa +1 · 60 → 60 · Común |
+| Hacha de mano | 1 dado · +1 · Rompe armadura 25 % · 70 → 75 · Común (es el piso) |
+| Hacha oxidada | 1 dado · Veneno 50 % · 50 → 65 · Común (veneno alto para Común) |
+| Tomahawk | 1 dado · Alcance +1 · 60 → 85 · Común |
+| Tomahawk de pantano | 1 dado · Bloqueo +1 · 60 → 60 · Común |
+| Hacha | 1 dado · Rompe armadura **siempre** · 60 → 100 · Buena |
+| Hacha del clan | **copia** del Hacha (botín) |
+| Hacha de leñador | 2 dados · 60 → 110 · Buena |
+| Hacha de constructor | 2 dados · Rompe armadura **siempre** · 90 → 200 · **Rara** |
+| Lanza de caza | 2 manos · 1 dado · Alcance +1 · 65 → 85 · Común — **es una lanza: va al Tipo 4** |

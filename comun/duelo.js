@@ -727,18 +727,22 @@ const Duelo = (() => {
     const conTurnos = sp => sp && tu ? {...sp, turnos: tu} : sp;
     return conTurnos(specArma(n, st, ef));
   }
+  const SANGRADO_ARMA_TURNOS = 2;
   const esDrenaEf = ef => /^drena(r)?\s+vida$/i.test(String((ef && ef.nombre) || '').trim());
   const esSangradoEf = ef => /^(sangrado|primera sangre)$/i.test(String((ef.spec && ef.spec.nombre) || ef.nombre || '').trim());
   // El Sangrado con turnos pasa a permanente (le saca los turnos, al efecto y a su estado ya armado).
   function sangradoPermanente(ef){
-    if(!esSangradoEf(ef) || !(_num(ef.turnos) > 0 || (ef.spec && _num(ef.spec.turnos) > 0))) return ef;
+    if(!esSangradoEf(ef) || ef.permanente) return ef;
     const {turnos, ...r} = ef;
     if(r.spec){ const {turnos: t2, ...sp} = r.spec; r.spec = sp; }
+    if(!r.spec) r.permanente = true;   // el de un arma: si no, quedaría con los 2 turnos estándar
     return {...r, detalle: `${r.detalle ? r.detalle + ' ' : ''}(Fue crítico: el Sangrado queda permanente.)`.slice(0, 200)};
   }
   function specArma(n, st, ef){
     if(n === 'rompe armadura' || n === 'arruina armadura' || n === 'media armadura') return {nombre: 'Armadura rota', stacks: Math.max(1, st)};
-    if(n === 'sangrado' || n === 'primera sangre') return st ? {nombre: 'Sangrado', stacks: st} : {nombre: 'Sangrado'};   // con más stacks (2026-10-03)
+    // Sangrado de un arma (regla del dueño, 2026-10-03): 2 de daño por turno durante SANGRADO_ARMA_TURNOS (2), salvo que el arma diga otros turnos
+    // o «permanente»; con un golpe crítico, permanente (sangradoPermanente). Con más stacks si el arma lo dice.
+    if(n === 'sangrado' || n === 'primera sangre') return {nombre: 'Sangrado', ...(st ? {stacks: st} : {}), ...(ef.permanente ? {} : {turnos: _num(ef.turnos) > 0 ? Math.round(_num(ef.turnos)) : SANGRADO_ARMA_TURNOS})};
     if(n === 'rengo') return {nombre: 'Rengo'};   // Rengo en armas (2026-10-03)
     if(n === 'envenenar' || n === 'veneno severo') return (n === 'veneno severo' || /severo/i.test(ef.detalle || '')) ? {nombre: 'Veneno severo'} : (st ? {nombre: 'Veneno', stacks: st} : {nombre: 'Veneno'});
     if(n === 'lisiado') return {nombre: 'Lisiado'};
@@ -755,6 +759,7 @@ const Duelo = (() => {
       const caras = Math.max(1, Math.round(_num(e.caras)) || 1), exitos = Math.min(caras, Math.max(1, Math.round(_num(e.exitos)) || 1));
       const o = {nombre: String(e.nombre || '').trim().slice(0, 40), caras, exitos, dado: String(e.dado || '').trim().slice(0, 20), detalle: String(e.detalle || '').trim().slice(0, 200), stacks: Math.max(0, Math.round(_num(e.stacks)))};
       if(_num(e.turnos) > 0) o.turnos = Math.round(_num(e.turnos));
+      if(e.permanente) o.permanente = true;
       if(e.spec && e.spec.nombre) o.spec = e.spec;
       if(_num(e.cura) > 0) o.cura = Math.round(_num(e.cura));
       if(e.no2 !== undefined){ o.no2 = Math.max(0, Math.round(_num(e.no2))); o.no2Dif = !!e.no2Dif; o.no2Sentado = !!e.no2Sentado; }

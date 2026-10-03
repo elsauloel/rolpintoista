@@ -93,7 +93,7 @@ const ItemCorto = (() => {
     if(n === 'Drena vida') return `${e.soloCritico ? 'Si es crítico: drena otro' : 'Drena vida'} ${num(e.drenaPct) > 0 ? num(e.drenaPct) : 50} %`;
     if(e.soloCritico) return `Si es crítico: ${n}${num(e.stacks) > 0 && /^(Veneno|Sangrado)$/.test(n) ? ` ${num(e.stacks)} stacks` : ''}${pct < 100 ? ` ${pct} %` : ''}${num(e.turnos) > 0 ? ` · ${num(e.turnos)} turnos` : ''}`;
     const st = num(e.stacks) > 0 && /^(Veneno|Sangrado)$/.test(n) ? ` ${num(e.stacks)} stacks` : '';
-    return `${n}${st} ${pct >= 100 ? '(siempre)' : pct + ' %'}${num(e.turnos) > 0 ? ` · ${num(e.turnos)} turnos` : ''}${e.seguroCritico && pct < 100 ? ', seguro si es crítico' : ''}`;
+    return `${n}${st} ${pct >= 100 ? '(siempre)' : pct + ' %'}${e.permanente ? ' · permanente' : num(e.turnos) > 0 ? ` · ${num(e.turnos)} turnos` : ''}${e.seguroCritico && pct < 100 ? ', seguro si es crítico' : ''}`;
   }
   function armaEsencial(it){
     if(!esArma(it)) return '';
@@ -133,7 +133,7 @@ const ItemCorto = (() => {
     'Drena vida': 'Drena vida N %: quien ataca se cura el N % de la vida que el golpe le sacó de verdad al defensor (lo que frena la armadura no cuenta; curar redondea para arriba). Lo que pase de su máximo se pierde.',
     Rengo: 'Rengo: 3 turnos en que moverse le cuesta 2 No2 por casillero.',
     Lisiado: 'Lisiado: 3 turnos con el PdG y el Parry a la mitad (se tira el dado completo y el resultado se divide por 2).',
-    Sangrado: 'Sangrado: pierde 1 HP por stack en cada Mantenimiento (entra con 2, o los stacks que diga el arma). Si ya sangraba, suma +1 stack. Sin turnos dura hasta que lo curen; con turnos vence, salvo que entre con un golpe crítico: ahí queda permanente.',
+    Sangrado: 'Sangrado: pierde 1 HP por stack en cada Mantenimiento (entra con 2, o los stacks que diga el arma). El de un arma dura 2 turnos salvo que diga otra cosa; con un golpe crítico, queda permanente. Si ya sangraba: +1 stack y los turnos vuelven a empezar.',
     Veneno: 'Veneno: pierde 1 HP por stack en cada Mantenimiento y un stack por turno (los turnos son los stacks). Los stacks nuevos se suman a los que ya tenía.',
     'Veneno severo': 'Veneno severo: daño por turno que crece en cada Mantenimiento y no se va solo: hay que curarlo.',
     'Rompe armadura': 'Rompe armadura: deja Armadura rota (−1 de Defensa por stack).',

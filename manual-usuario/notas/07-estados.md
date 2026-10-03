@@ -163,6 +163,7 @@ estado: borrador
 
 
 - **Se acumula (2026-09-22): si te vuelven a sangrar mientras ya sangrás, no se duplica el estado — suma +1 al daño por turno** (2 → 3 → 4…). Mismo criterio que Armadura rota: un stack más en el mismo estado, no una tirada nueva.
+- **Sangrado de un arma (2026-10-03, regla del dueño):** salvo que el arma diga otra cosa, deja **2 de daño por turno durante 2 turnos**. **Si ya estaba sangrando:** +1 stack (un punto más de daño por turno) y los turnos vuelven a empezar. Con un golpe crítico, queda permanente (abajo).
 - **Sangrado por unos turnos (2026-10-03):** algunas armas y habilidades dejan un Sangrado que dura solo unos turnos (por ejemplo, 2). **Pero si entra con un golpe crítico de arma, queda permanente**, como el de siempre — venga del arma o de la habilidad con la que se atacó. Es una característica del Sangrado (regla del dueño). El duelo lo hace solo.
 
 - Lo cura una habilidad o un ítem (por ejemplo, *Vendas*).

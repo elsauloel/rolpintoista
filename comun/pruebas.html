@@ -2113,7 +2113,7 @@ prueba('firmas de arma: costos (primer ataque −N, oportunidad gratis), sin Par
   igual([FichaCombate.costoAtaque(S, arma), FichaCombate.costoAtaqueEspecial(arma, 'oportunidad'), FichaCombate.costoAtaqueEspecial(arma, 'contra'),
     CreepCalculo.costoAtaque(sc), CreepCalculo.costoOportunidad(sc), Combatiente.ataqueDeArma(arma), Duelo.specDeEfecto({nombre: 'Rengo'}), Duelo.specDeEfecto({nombre: 'Sangrado', stacks: 3}),
     EstadosAplicar.componer({nombre: 'Sangrado', stacks: 3}).stacks, m.crit.dados - sin.crit.dados, ItemCorto.armaEsencial(arma)],
-    [1, 0, 2, 3, 0, {sinParry: true}, {nombre: 'Rengo'}, {nombre: 'Sangrado', stacks: 3}, 3, 1, 'Tipo 4 · 1 dado · No se puede parrear · Oportunidad sin No2 · Primer ataque −1 No2 · +1 d20 en el crítico']);
+    [1, 0, 2, 3, 0, {sinParry: true}, {nombre: 'Rengo'}, {nombre: 'Sangrado', stacks: 3, turnos: 2}, 3, 1, 'Tipo 4 · 1 dado · No se puede parrear · Oportunidad sin No2 · Primer ataque −1 No2 · +1 d20 en el crítico']);
 });
 prueba('daño mágico de un arma: se tira al guardar el daño, aparte, y no queda como efecto al golpear', () => { const pp = fbFalsoCola.then(async () => {
   const docs = {};
@@ -2129,6 +2129,17 @@ prueba('daño mágico de un arma: se tira al guardar el daño, aparte, y no qued
       [['Lisiado'], 'Rayo', true, 5, 'Tipo 4 · 2 manos · 3 dados · +1d4 de rayo']);
   }finally{ Object.assign(window, antes); }
 }); fbFalsoCola = pp.catch(() => {}); return pp; });
+
+prueba('Sangrado de arma: 2 de daño por 2 turnos (salvo que diga otra cosa); si ya sangraba, +1 stack y los turnos vuelven a 2; permanente se queda permanente', () => {
+  const comp = ef => EstadosAplicar.componer(Duelo.specDeEfecto(ef));
+  const base = comp({nombre: 'Sangrado'});
+  const est = [comp({nombre: 'Sangrado'})]; est[0].turnos = 1;
+  Combatiente.agregarEstado(est, comp({nombre: 'Sangrado'}), {});
+  const perm = [comp({nombre: 'Sangrado', permanente: true})];
+  Combatiente.agregarEstado(perm, comp({nombre: 'Sangrado'}), {});
+  igual([base.stacks, base.turnos, base.permanente, est[0].stacks, est[0].turnos, perm[0].permanente, perm[0].stacks, comp({nombre: 'Sangrado', turnos: 3}).turnos],
+    [2, 2, false, 3, 2, true, 3, 3]);
+});
 
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {

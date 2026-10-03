@@ -40,6 +40,7 @@ const EfectosGolpe = (() => {
       ...(n(ef && ef.turnos) > 0 ? {turnos: Math.round(n(ef.turnos))} : {}),   // ej. Sangrado por 2 turnos (0 = lo que dure el estado)
       ...(ef && ef.seguroCritico ? {seguroCritico: true} : {}),   // con porcentaje, pero si el golpe es crítico entra seguro (2026-10-03)
       ...(ef && ef.soloCritico ? {soloCritico: true} : {}),       // ⚡ Critical Matters: solo si el golpe es crítico (2026-10-03)
+      ...(ef && ef.permanente ? {permanente: true} : {}),         // Sangrado de arma permanente (si no: 2 turnos)
       ...(ef && ef.danoMagico ? {danoMagico: true} : {}),         // la tirada extra es daño mágico (rayo, hielo): ignora la Defensa, no se multiplica
       ...(n(ef && ef.drenaPct) > 0 ? {drenaPct: Math.round(n(ef.drenaPct))} : {}),   // Drena vida: % de la vida que le saca de verdad
     };

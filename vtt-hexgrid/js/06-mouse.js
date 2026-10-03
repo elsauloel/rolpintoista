@@ -676,7 +676,7 @@ document.addEventListener('keydown', e => {
   if((e.key === 'c' || e.key === 'C') && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey && fbMiembro){
     e.preventDefault();
     const tc = seleccion ? tokens.get(seleccion) : null;
-    if(tc && (soyGM || puedoMover(tc))){ const cc = hexCentro(tc.col, tc.fila); centrarEn(cc.x, cc.y); }   // el GM en cualquiera; un jugador en un token suyo
+    if(tc && (soyGM || puedoMover(tc))){ const cc = hexCentro(tc.col, tc.fila); centrarEn(cc.x, cc.y); pulsarTokens([seleccion]); }   // el GM en cualquiera; un jugador en un token suyo
     else centrarEnMios();
     return;
   }

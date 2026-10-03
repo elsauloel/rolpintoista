@@ -34,11 +34,20 @@ function zoomEn(px, py, factor){
   guardarVista(); pedirDibujo();
 }
 function centrarEnMios(){
-  const mios = [...tokens.values()].filter(t => puedoMover(t) && t.tipo === 'pj');
-  const lista = mios.length ? mios : (soyGM ? [...tokens.values()] : []);
+  const mios = [...tokens.entries()].filter(([, t]) => puedoMover(t) && t.tipo === 'pj');
+  const lista = mios.length ? mios : (soyGM ? [...tokens.entries()] : []);
   if(!lista.length){ centrarEn(0, 0); return; }
-  const cs = lista.map(t => hexCentro(t.col, t.fila));
+  const cs = lista.map(([, t]) => hexCentro(t.col, t.fila));
   centrarEn(cs.reduce((a, c) => a + c.x, 0) / cs.length, cs.reduce((a, c) => a + c.y, 0) / cs.length);
+  if(mios.length) pulsarTokens(mios.map(([id]) => id));   // tus tokens laten un momento (el GM sin personaje propio, no: serían todos)
+}
+// Centrar en un token (botón Centrar, la C): el token late un momento, para encontrarlo de un vistazo (2026-10-02, pedido del dueño).
+// El mismo anillo que la lista de turnos (iniResaltado), con varios tokens a la vez si hace falta.
+function pulsarTokens(ids, ms){
+  ids = (ids || []).filter(id => tokens.has(id));
+  if(!ids.length) return;
+  iniResaltado = {id: ids[0], ids, hasta: Date.now() + (ms || 1600)};
+  pedirDibujo();
 }
 
 function ajustarTamano(){
@@ -967,10 +976,11 @@ function dibujar(){
   // Anillo pulsante sobre el token al que se llegó desde la lista de turnos (unos segundos).
   if(iniResaltado){
     const restante = iniResaltado.hasta - Date.now();
-    const tk = tokens.get(iniResaltado.id);
-    if(restante <= 0 || !tk){ iniResaltado = null; }
-    else{
-      const v = visibles.get(iniResaltado.id) || hexCentro(tk.col, tk.fila);
+    const idsR = (iniResaltado.ids || [iniResaltado.id]).filter(id => tokens.has(id));
+    if(restante <= 0 || !idsR.length){ iniResaltado = null; }
+    else idsR.forEach(idR => {
+      const tk = tokens.get(idR);
+      const v = visibles.get(idR) || hexCentro(tk.col, tk.fila);
       const pulso = 0.5 + 0.5 * Math.sin(Date.now() / 140);
       const alfa = Math.min(1, restante / 700);
       ctx.save();
@@ -987,7 +997,7 @@ function dibujar(){
       }
       ctx.restore();
       animando = true;
-    }
+    });
   }
 
   // Pulso de duelo minimizado/de fondo: ver dueloParesActivos() más arriba.

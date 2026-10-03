@@ -205,10 +205,11 @@ header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 <div class="toast" id="toast"></div>
 
 <script src="../comun/efectos-golpe.js"></script>
+<script src="../comun/item-corto.js?v=20261002a"></script>
 <script src="../comun/combatiente.js?v=20261002j"></script>
 <script src="../comun/paso-a-paso.js?v=20261002g"></script>
 <script src="../comun/asistente-item.js?v=20261002a"></script>
-<script src="../comun/catalogo.js?v=20261002i"></script>
+<script src="../comun/catalogo.js?v=20261002t"></script>
 <script>
 /* =========================================================
    Editor de catálogo — edita el catálogo de FÁBRICA: comun/catalogo.js (CATALOGO_BASE), la única copia que usan la ficha,
@@ -224,13 +225,13 @@ header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
 const GH_REPO = 'elsauloel/rolpintoista';
 const GH_BRANCH = 'nueva-version';
-const ARCHIVO_CATALOGO = 'comun/catalogo.js?v=20261002i';
+const ARCHIVO_CATALOGO = 'comun/catalogo.js';   // la ruta en el repo (sin ?v=: no es una carga del navegador)
 let textoRemoto = null;   // el archivo tal como estaba al traerlo (para avisar si alguien lo cambió antes de guardar)
 // comun/catalogo.js → lista de ítems (un JSON por renglón entre "const CATALOGO_BASE = [" y "];").
 function leerCatalogoJs(texto){
   const i = texto.indexOf('[', texto.indexOf('const CATALOGO_BASE'));
   const j = texto.lastIndexOf('];');
-  if(i < 0 || j < i) throw new Error('No encontré CATALOGO_BASE en comun/catalogo.js?v=20261002i');
+  if(i < 0 || j < i) throw new Error('No encontré CATALOGO_BASE en comun/catalogo.js');
   return JSON.parse(texto.slice(i, j + 1).replace(/,\s*\]$/, ']'));
 }
 // Lista de ítems → comun/catalogo.js, conservando la cabecera del archivo actual.
@@ -385,7 +386,7 @@ function renderLista(){
             <div class="cnombre">${esc(it.nombre)}</div>
             <div class="ctier" style="color:var(--copper)">${esc(it.tier)} · ${esc(CATEGORIA_LABEL[it.tipoItem] || it.tipoItem)}</div>
             <div class="cmeta">${esc(metaTxt(it))}</div>
-            ${it.detalle ? `<div class="cdetalle">${esc(it.detalle)}</div>` : ''}
+            ${ItemCorto.grillaHtml(it)}
           </div>
         </div>
         <div class="card-acciones">
@@ -441,7 +442,7 @@ function verItem(id){
         <div class="view-lines">${L.filter(Boolean).join('')}</div>
       </div>
     </div>
-    ${item.detalle ? `<div class="view-detalle"><span class="view-label">Detalle</span>${esc(item.detalle)}</div>` : ''}
+    ${ItemCorto.verHtml(item)}
     ${esCons && item.efectoDetalle ? `<div class="view-detalle"><span class="view-label">Detalle del estado</span>${esc(item.efectoDetalle)}</div>` : ''}
     ${!esCons && item.equipoEstadoDetalle ? `<div class="view-detalle"><span class="view-label">Detalle del estado</span>${esc(item.equipoEstadoDetalle)}</div>` : ''}
     ${(item.descripcionNarrativa || '').trim() ? `<div class="view-detalle view-narrativa">${esc(item.descripcionNarrativa)}</div>` : ''}

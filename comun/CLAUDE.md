@@ -1161,6 +1161,11 @@ versión parecida en más de una, es candidato a juntar.
   Defensivas, Recuperación, Recursos, Utilidad — salen de las etiquetas y de lo que suma); en Equipo, el DDE inicial en una caja editable (300 o el
   del GM; el texto invita a preguntarle al GM). `Combatiente.ROLES`/`PESOS_ROL`/`ROL_DE_CLASE`/`repartirAtributos(total, pesos, minimo)`: los repartos sugeridos (los usa también el asistente
   de creeps de GM Tools).
+- **`item-corto.js`** (`ItemCorto`, 2026-10-02, pedido del dueño) — **cómo se ve un ítem o una trampa en una grilla para elegir**: solo lo que hace
+  (`grillaHtml(item)`; una trampa en filas cortas, `trampaHtml(t)`/`trampaFilas(t)`), y en «Ver» lo mismo más el recuadro «Detalles técnicos»
+  (`verHtml(item)`, `tecnicoHtml(item|texto)`; las notas ⚙/✋ las separa `partes(texto)`). `ItemCorto.CSS` (el mapa lo copia en sus recuadros
+  aislados). Lo usan `ficha-tienda.js`, `ficha-lupa.js`, `creep-lupa.js`, el generador de tiendas, el editor del catálogo y `biblioteca.js` (las
+  trampas: su ficha corta y «Ver detalles técnicos»; otras listas pueden pasar `opts.cuerpo(e)`/`opts.tecnico(e)`; `opts.z` la abre por encima).
 - **`elegir-trampa.js`** (`ElegirTrampa`, 2026-10-02, pedido del dueño) — al tildar «🪤 Esta habilidad coloca una trampa» (en los tres editores de
   habilidades: personaje, creep, invocación) se abre este menú: **una trampa conocida** (12 tipos con sus valores sugeridos, sacados del catálogo
   de trampas hasta auditarlo: `CONCEPTOS` — púas, cepo, red, veneno, gas, explosiva, fuego, hielo, eléctrica, pegajosa, runa, alarma — y un paso a

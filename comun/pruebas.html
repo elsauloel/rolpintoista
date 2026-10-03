@@ -83,6 +83,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="selector-estados.js"></script>
 <script src="ficha-equipo.js"></script>
 <script src="ficha-botin.js"></script>
+<script src="trampas-base.js"></script>
+<script src="item-corto.js"></script>
 <script src="ficha-tienda.js"></script>
 <script src="ficha-stats.js"></script>
 <script src="tiradas-propias.js"></script>
@@ -1618,6 +1620,17 @@ prueba('trampa de una habilidad: una conocida por tipo (veneno: daño por turno 
   igual([antes, pasosVeneno, estadoOn, veneno.estado, veneno.estadoStacks, veneno.estadoTurnos, veneno.dano, veneno.tipo, pasosPuas, puas.dano, puas.estado, puas.nombre, cero.startsWith('Trampa de la habilidad')],
     [['Cómo', 'Tipo'], ['Cómo', 'Tipo', 'Tamaño', 'Daño', 'Qué le deja', 'Se evita', 'Nombre', 'Resumen'], 'Veneno', 'Veneno', 4, 5, '1d6', 'linea',
      ['Cómo', 'Tipo', 'Tamaño', 'Daño', 'Efecto adicional', 'Se evita', 'Nombre', 'Resumen'], '4d6', '', 'Púas y estacas', true]);
+});
+prueba('cómo se ve un ítem: la trampa en datos cortos (forma, daño, efecto, salvación, detección) y lo técnico solo en «Ver»', () => {
+  const oso = CATALOGO_BASE.find(i => i.id === 'nuevo-trampa-trampa-de-oso-r2'), menor = CATALOGO_BASE.find(i => i.id === 'nuevo-trampa-trampa-de-oso-r1');
+  const filas = ItemCorto.trampaFilas(oso.trampaDatos).map(f => f[0] + ': ' + f[1] + (f[2] ? ' (' + f[2] + ')' : ''));
+  const grilla = ItemCorto.grillaHtml(oso), ver = ItemCorto.verHtml(oso);
+  const p = ItemCorto.partes('Da +2 a la Fuerza. ⚙ Automático: se suma solo. ✋ A mano: nada.');
+  const base = TRAMPAS_BASE.find(t => t.nombre === 'Trampa de oso');
+  igual([filas, grilla.includes('⚙'), grilla.includes('Automático'), ver.includes('Detalles técnicos'), ver.includes('⚙ Automático'), ItemCorto.trampaFilas(menor.trampaDatos).find(f => f[0] === 'Detectarla')[1],
+    p.hace, p.tecnico.startsWith('⚙'), base.datos.efectoTxt, base.datos.detectar, ItemCorto.tecnicoHtml('Solo dice qué hace.')],
+    [['Forma: Flor de radio 2 (19 casillas)', 'Daño: 2d6 · contempla la armadura', 'Efecto: Inmovilizado (para liberarse: 2 No2) (a mano)', 'Se evita: Fuerza contra 8 para liberarse (a mano)', 'Detectarla: Percepción contra 8', 'Alcanza: también a los aliados del área'],
+     false, false, true, true, 'Percepción contra 6', 'Da +2 a la Fuerza.', true, 'Inmovilizado (para liberarse: 2 No2)', 8, '']);
 });
 /* ---------- Creeps por mapa (comun/creeps-mapas.js, 2026-10-02: los grupos pasaron a ser mapas) ---------- */
 // Una base de datos de mentira, lo justo para CreepsMapas: colecciones y documentos en memoria.

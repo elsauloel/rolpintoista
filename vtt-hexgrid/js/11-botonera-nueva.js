@@ -111,9 +111,9 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261002a', '../comun/ficha-equipo.js?v=20261002b', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261002a', '../comun/ficha-mantenimiento.js?v=20261002a', '../comun/ficha-calculo.js?v=20261002j', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js?v=20261002i', '../comun/ficha-habilidades.js?v=20261001c',
-  '../comun/catalogo.js?v=20261002i', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261002d', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261002i', '../comun/ficha-resumen.js?v=20261002o', '../comun/inv-calculo.js?v=20261002d', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261002b', '../comun/inv-duelo.js?v=20261002b', '../comun/ficha-acciones.js?v=20261002j', '../comun/inv-habilidades.js?v=20261002g', '../comun/inv-lupa.js?v=20261001a',
-  '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261002a', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261001a'];
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261002a', '../comun/ficha-equipo.js?v=20261002b', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261002b', '../comun/ficha-mantenimiento.js?v=20261002a', '../comun/ficha-calculo.js?v=20261002j', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js?v=20261002i', '../comun/ficha-habilidades.js?v=20261001c',
+  '../comun/catalogo.js?v=20261002t', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261002d', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261002i', '../comun/ficha-resumen.js?v=20261002o', '../comun/inv-calculo.js?v=20261002d', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261002b', '../comun/inv-duelo.js?v=20261002b', '../comun/ficha-acciones.js?v=20261002j', '../comun/inv-habilidades.js?v=20261002g', '../comun/inv-lupa.js?v=20261001a',
+  '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261002a', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261002b'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
    anterior"): en la ficha las columnas se juntan recién con la PANTALLA angosta (@media), pero en el mapa la pantalla es ancha y el panel
@@ -1073,7 +1073,7 @@ async function abrirBotoneraNueva(fichaId, invId){
   try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo cargar la Botonera nueva — se abre la de siempre'); abrirBotonera(fichaId, null, invId, true); return; }
   bnAbrirSesion(fichaId);
   const lupaCss = (document.getElementById('lupa-css') || {}).textContent || '';   // los 🔍 (comun/lupa.js)
-  bn.raiz.querySelector('#bn-css').textContent = bnCss + lupaCss + PANEL_CSS + ' #bn-contenido{font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--paper)}';
+  bn.raiz.querySelector('#bn-css').textContent = bnCss + lupaCss + (typeof ItemCorto !== 'undefined' ? ItemCorto.CSS : '') + PANEL_CSS + ' #bn-contenido{font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--paper)}';
   bn.invId = invId;   // la Botonera de una de sus invocaciones (4e), o '' para la del personaje
   if(ac && !ac.host.hidden) cerrarAccionesNuevas();
   bn.host.hidden = false;

@@ -397,10 +397,11 @@ input[type=checkbox]{width:auto}
 <script src="../comun/barra.js?v=20261002a"></script>
 <script src="../comun/menu-sitio.js"></script>
 <script src="../comun/efectos-golpe.js"></script>
-<script src="../comun/catalogo.js?v=20261002i"></script>
+<script src="../comun/catalogo.js?v=20261002t"></script>
 <script src="../comun/items-subidos.js?v=20260930a"></script>
-<script src="../comun/plantillas.js?v=20261002l"></script>
-<script src="../comun/biblioteca.js?v=20261002j"></script>
+<script src="../comun/plantillas.js?v=20261002m"></script>
+<script src="../comun/item-corto.js?v=20261002a"></script>
+<script src="../comun/biblioteca.js?v=20261002k"></script>
 <script src="../comun/combatiente.js?v=20261002j"></script>
 <script src="../comun/paso-a-paso.js?v=20261002g"></script>
 <script src="../comun/asistente-item.js?v=20261002a"></script>
@@ -946,7 +947,7 @@ function itemCardHtml(item, esGarantizado){
     </div>
     <div class="cat-meta">${precioHtmlDe(item)} · Peso ${fmt(num(item.peso))}${statTxt ? ` · ${esc(statTxt)}` : ''}${item.consumible?` · consumible${item.curahp?` (${num(item.curahp)>0?'+':''}${fmt(num(item.curahp))} HP)`:''}`:''}</div>
     ${modsHtml ? `<div class="cat-mods">${modsHtml}</div>` : ''}
-    ${item.detalle ? `<div class="cat-detalle">${esc(item.detalle)}</div>` : ''}
+    ${ItemCorto.grillaHtml(item)}
     <div class="cat-card-pie">
       ${esGarantizado ? '<span class="cat-garantizado">Stock fijo</span>' : '<span></span>'}
       <span class="acciones">
@@ -998,7 +999,7 @@ function verItem(id){
         <div class="view-lines">${L.filter(Boolean).join('')}</div>
       </div>
     </div>
-    ${item.detalle ? `<div class="view-detalle"><span class="view-label">Detalle</span>${esc(item.detalle)}</div>` : ''}
+    ${ItemCorto.verHtml(item)}
     ${(item.descripcionNarrativa||'').trim() ? `<div class="view-detalle view-narrativa">${esc(item.descripcionNarrativa)}</div>` : ''}
   `;
   const btn = $('#ver-toggle');
@@ -1307,7 +1308,7 @@ function renderAgregarLista(){
         <button type="button" class="iconbtn" data-ver="${esc(it.id)}">Ver</button>
         <button type="button" class="iconbtn" data-agregar="${esc(it.id)}">Agregar</button>
       </div>
-      ${it.detalle ? `<div class="cat-detalle">${esc(it.detalle)}</div>` : ''}
+      ${ItemCorto.grillaHtml(it)}
     </div>`;
   }).join('');
 }

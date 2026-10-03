@@ -146,6 +146,7 @@ const Biblioteca = (() => {
       .bib-grupo.abierto .bib-pop{display:block}
       .bib-activos{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;width:100%}
       .bib-sinaud{font-size:11px;font-weight:600;color:#e0a040;margin-left:6px;white-space:nowrap}
+      .bib-tec{margin-top:6px}.bib-tec summary{cursor:pointer;font-size:11.5px;color:var(--copper,#c98545);display:inline-block;border:1px solid var(--line,#3B2E34);border-radius:3px;padding:2px 8px}
       .bib-ver{font-size:11px;opacity:.7;margin-left:6px}
       .bib-cual{display:flex;flex-direction:column;gap:6px}
       .bib-cual button{text-align:left;white-space:normal}
@@ -324,6 +325,14 @@ const Biblioteca = (() => {
     return Object.values(req).every(ts => ts.some(t => e.etiquetas.includes(t)));
   }
 
+  // Lo que se ve de una entrada: su descripción, o (opts.cuerpo; las trampas, solas) lo que hace en corto y los detalles técnicos en «Ver».
+  function cuerpoDe(st, e){
+    const conCorto = typeof ItemCorto !== 'undefined';
+    const cuerpo = st.opts.cuerpo || (actual === 'trampas' && conCorto && e.datos ? (x => ItemCorto.trampaHtml(x.datos)) : null);
+    if(!cuerpo) return e.descripcion ? `<div class="desc">${esc(e.descripcion)}</div>` : '';
+    const tec = st.opts.tecnico ? st.opts.tecnico(e) : conCorto ? ItemCorto.tecnicoHtml(e.descripcion || '') : '';
+    return `<div class="desc">${cuerpo(e)}</div>${tec ? `<details class="bib-tec"><summary>Ver detalles técnicos</summary>${tec}</details>` : ''}`;
+  }
   function pintarLista(){
     const st = estado[actual];
     const propuestas = st.vista === 'propuestas';
@@ -338,7 +347,7 @@ const Biblioteca = (() => {
             ${!propuestas && !e.auditado ? '<span class="bib-sinaud" title="Lo subió alguien del grupo y todavía no lo revisó el dueño. Se puede usar igual.">🔶 sin auditar</span>' : ''}
             ${e.version > 1 ? `<span class="bib-ver" title="Veces que se corrigió">v${esc(e.version)}</span>` : ''}</div>
           <div class="tags">${e.etiquetas.map(esc).join(' · ') || 'sin etiquetas'}${(propuestas || !e.base) && e.autorNombre ? ` · de ${esc(e.autorNombre)}` : ''}${e.editorNombre ? ` · corregido por ${esc(e.editorNombre)}` : ''}</div>
-          ${e.descripcion ? `<div class="desc">${esc(e.descripcion)}</div>` : ''}
+          ${cuerpoDe(st, e)}
         </div>
         <div class="acc">
           <button class="btn primary" data-bibacc="agregar" data-id="${esc(e.id)}">${propuestas ? 'Traer a mi mesa' : 'Agregar'}</button>

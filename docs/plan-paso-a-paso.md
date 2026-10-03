@@ -63,7 +63,7 @@ creeps** (Warrior→brutal, Asalto→rápido, Tanque→tanque, Mago→mago, Shoo
 después desde 🏪); lo comprado queda en la mochila; la idea y la historia van a una página «Historia» de la bitácora; el personaje arranca con la
 vida y los No2 llenos. Una habilidad custom (2 de Job) se arma después desde la ficha.
 
-## Después de los paso a paso: cómo se ve un ítem en el catálogo y en las tiendas (pedido del dueño, 2026-10-02)
+## ✅ Después de los paso a paso: cómo se ve un ítem en el catálogo y en las tiendas (pedido del dueño, 2026-10-02; hecho el mismo día)
 
 *"Me parece un espanto cómo se ven hoy las trampas en el catálogo y las tiendas."* Hoy cada tarjeta de la grilla muestra el texto completo del
 Detalle (forma, daño, "⚙ Automático…", "✋ A mano…", cómo se apila…), y el Ver repite lo mismo.
@@ -75,3 +75,11 @@ Detalle (forma, daño, "⚙ Automático…", "✋ A mano…", cómo se apila…)
 - Vale para el catálogo de la ficha, las tiendas (generador y la tienda del jugador), el editor del catálogo y el botín. Se encara al terminar las
   tandas de arriba.
 
+**Cómo quedó (2026-10-02):** `comun/item-corto.js` (`ItemCorto`). En las grillas (catálogo de la ficha, tiendas de la ficha y del mapa, generador de
+tiendas, editor del catálogo y la biblioteca de trampas) se ve solo lo que hace: una trampa, en filas cortas (Forma · Daño · Efecto · Se evita ·
+Detectarla · Alcanza; lo que va a mano, marcado); otro ítem, su Detalle sin las notas ⚙/✋. En «Ver»: lo mismo y el recuadro **«Detalles técnicos»**
+(lo de ⚙ Automático / ✋ A mano, cómo se apila, si falta auditar), solo si hay algo. En la biblioteca de trampas, «Ver detalles técnicos» se despliega
+en la fila. Para eso las trampas del catálogo pasaron a tener en datos su efecto (`efectoTxt`, `efectoAuto`), su salvación (`salvaTxt`) y la
+dificultad para detectarla (`detectar`: común 8, menor 6, mayor 10; la de un consumible ahora llega al mapa al colocarla) — `FICHA_TRAMPAS` en
+`comun/trampas-base.js`, también en el generador `herramientas/generar_trampas_consumibles.py`. Las cifras siguen a auditar. Pendiente para decidir:
+los efectos que hoy son «a mano» (Inmovilizado, Sentado, Veneno…) se podrían automatizar (el mapa ya sabe dejar un estado al dispararse).

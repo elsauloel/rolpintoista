@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002b', '../comun/creep-botonera.js?v=20261001b', '../comun/creep-acciones.js?v=20261002i', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261002a'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002c', '../comun/creep-botonera.js?v=20261001b', '../comun/creep-acciones.js?v=20261002i', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261002a'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -463,7 +463,7 @@ async function abrirAccionesNuevas(creepId){
   try{ await acCargarPiezas(); }catch(err){ console.error(err); toast('No se pudieron cargar las Acciones nuevas — se abren las de siempre'); abrirAcciones(creepId, null, true); return; }
   if(!ac) ac = Object.assign({creepId: ''}, acCrear());
   const lupaCss = (document.getElementById('lupa-css') || {}).textContent || '';   // los 🔍 (comun/lupa.js)
-  ac.raiz.querySelector('#ac-css').textContent = acCss + lupaCss + PANEL_CSS + ' #ac-contenido{font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--paper)}';
+  ac.raiz.querySelector('#ac-css').textContent = acCss + lupaCss + (typeof ItemCorto !== 'undefined' ? ItemCorto.CSS : '') + PANEL_CSS + ' #ac-contenido{font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--paper)}';
   ac.creepId = creepId;
   if(bn && !bn.host.hidden) cerrarBotoneraNueva();
   ac.host.hidden = false;

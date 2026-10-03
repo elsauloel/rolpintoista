@@ -20,6 +20,36 @@
   // (púas, cuchillas, derrumbes, gases, minas…) sí; lo mágico (arcano, relámpago, runas) distingue aliados de rivales. Los aliados NUNCA disparan una trampa.
   const FISICAS = new Set(['Trampa de oso', 'Foso con estacas', 'Red de caza', 'Brea pegajosa', 'Aceite resbaladizo', 'Dardos envenenados', 'Cuchillas de guadaña', 'Cable de alarma',
     'Arena movediza', 'Derrumbe', 'Nube de veneno', 'Gas somnífero', 'Bomba de esporas', 'Mina explosiva', 'Barril de pólvora']);
+  // Lo que hace además del daño y cómo se resiste, en datos (2026-10-02: la ficha corta del catálogo, comun/item-corto.js; a auditar).
+  // [efectoTxt, salvaTxt, efectoAuto]. Detectarla: 8 (una trampa común, P145).
+  const FICHA_TRAMPAS = {
+    "Trampa de oso": ["Inmovilizado (para liberarse: 2 No2)", "Fuerza contra 8 para liberarse", false],
+    "Foso con estacas": ["Sentado (pararse cuesta 1 No2)", "Evasión contra 12 evita la caída", false],
+    "Red de caza": ["Inmovilizado 2 turnos (para liberarse: 2 No2)", "Fuerza contra 8 para liberarse", false],
+    "Brea pegajosa": ["Rengo 3 turnos (moverse cuesta 2 No2)", "", false],
+    "Aceite resbaladizo": ["Sentado y −2 Evasión hasta su próximo turno", "Evasión contra 8 para no caer", false],
+    "Dardos envenenados": ["Veneno ×3 (1 de daño por stack por turno)", "Evasión contra 10 los esquiva", false],
+    "Cuchillas de guadaña": ["Sangrado (2 HP por turno hasta curarse)", "Evasión contra 16 lo evita", false],
+    "Cable de alarma": ["Suena: alerta a los enemigos a 8 casillas y saca del sigilo a quien la toca", "", false],
+    "Arena movediza": ["Inmovilizado (salir cuesta 3 No2; 2 si gana Fuerza contra 8)", "Fuerza contra 8 para salir más barato", false],
+    "Derrumbe": ["Sentados", "Evasión contra 14: mitad de daño", false],
+    "Nube de veneno": ["Veneno ×2 a todos los de adentro", "Res.CC contra 12 lo evita", false],
+    "Gas somnífero": ["Exhausto 2 turnos (1 No2 como mucho)", "Res.CC contra 10 lo evita", false],
+    "Bomba de esporas": ["Veneno ×3", "Res.CC contra 14 evita el veneno", false],
+    "Mina explosiva": ["", "Evasión contra 12: mitad de daño", false],
+    "Barril de pólvora": ["Pajaritos hasta el final de su turno", "Evasión contra 14: mitad de daño", false],
+    "Llamarada": ["Quemadura: 1 de daño por turno, 3 turnos", "Evasión contra 10 evita la quemadura", false],
+    "Runa de silencio": ["No puede usar habilidades con SP 1 turno", "Res.Mt contra 12 lo evita", false],
+    "Runa de debilidad": ["−2 a todas las tiradas 2 turnos", "Res.Mt contra 10 lo evita", false],
+    "Niebla de confusión": ["Confusión 2 turnos (antes de cada acción tira 1d4)", "Res.Mt contra 12 la evita", false],
+    "Trampa de escarcha": ["Escarcha (−1 No2 máx.)", "Res.Esp contra 12 la evita", true],
+    "Descarga eléctrica": ["Stun 1 turno (sin No2)", "Res.CC contra 12 evita el Stun", false],
+    "Succión arcana": ["Drena 2d6 de SP (no hace daño)", "Res.Mt contra 12: la mitad", false],
+    "Espejo de discordia": ["Pajaritos 2 turnos y ve a sus aliados como enemigos", "Res.Mt contra 14 lo evita", false],
+    "Portal cósmico": ["Lo teletransporta a 10 casillas (elige el GM) y Pajaritos 1 turno", "Res.Mt contra 16 lo evita", false],
+    "Trampa de teleport": ["Lo teletransporta al destino que se marcó al colocarla", "", true]
+  };
+  const ficha = nombre => { const f = FICHA_TRAMPAS[nombre]; return f ? {efectoTxt: f[0], salvaTxt: f[1], ...(f[2] ? {efectoAuto: true} : {}), detectar: 8} : {detectar: 8}; };
   function tr(nombre, nivel, etiquetas, tipo, tamano, color, dano, detalle, amiga, ignoraDef, estado){
     amiga = amiga || FISICAS.has(nombre);
     const auto = dano
@@ -29,7 +59,7 @@
       poolId: 'trampa-' + slug(nombre), nombre, nivel,
       etiquetas: [...etiquetas, 'nivel ' + nivel, 'auditar'],
       detalle: `${AVISO} ${detalle}${amiga ? ' Fuego amigo: su efecto también alcanza a los aliados que estén en el área.' : ''} ⚙ Automático: ${auto}${estado ? `; deja el estado ${estado.nombre} (los turnos los elegís al colocarla)` : ''}. ✋ A mano: estados, tiradas para evitarla y todo lo demás que dice el texto.`,
-      datos: {nombre, detalle, amiga: !!amiga, tipo, tamano, color, alfa: 45, dano, ...(ignoraDef ? {ignoraDef: true} : {}), ...(estado ? {estado: estado.nombre, estadoTurnos: estado.turnos} : {})},
+      datos: {nombre, detalle, amiga: !!amiga, tipo, tamano, color, alfa: 45, dano, ...(ignoraDef ? {ignoraDef: true} : {}), ...(estado ? {estado: estado.nombre, estadoTurnos: estado.turnos} : {}), ...ficha(nombre)},
     });
   }
 
@@ -38,7 +68,7 @@
     poolId: 'trampa-trampa-de-teleport', nombre: 'Trampa de teleport', nivel: 3,
     etiquetas: ['control', 'mágica', 'nivel 3', 'auditar'],
     detalle: `${AVISO} Un glifo que, al pisarlo, teletransporta a quien lo activa a otro punto del mapa. ⚙ Automático: al colocarla te pide hacer clic en el mapa para marcar el destino, y al dispararse mueve a quien la pisó a la casilla libre más cercana a ese punto (que tiene que ser un punto transitable a pie: sin Sólido ni pared) (se puede cambiar el destino con el ⚙ de la trampa). Es mágica: no alcanza a los aliados del área. ✋ A mano: lo demás (estados, tiradas para evitarla).`,
-    datos: {nombre: 'Trampa de teleport', detalle: 'Glifo que teletransporta a quien lo pisa a otro punto del mapa (el destino se marca al colocarla).', amiga: false, teleport: true, tipo: 'flor', tamano: 1, color: '#9B5FD0', alfa: 45, dano: ''},
+    datos: {nombre: 'Trampa de teleport', detalle: 'Glifo que teletransporta a quien lo pisa a otro punto del mapa (el destino se marca al colocarla).', amiga: false, teleport: true, tipo: 'flor', tamano: 1, color: '#9B5FD0', alfa: 45, dano: '', ...ficha('Trampa de teleport')},
   });
 
   // ---- Mecánicas clásicas ----

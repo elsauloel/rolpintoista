@@ -338,7 +338,7 @@ const FichaLupa = (() => {
         <div class="view-lines">${L.filter(Boolean).join('') || '<div class="view-line"><span class="view-value">Sin datos adicionales.</span></div>'}</div>
       </div>
     </div>
-    ${it.detalle ? `<div class="view-detalle"><span class="view-label">Detalle</span>${esc(it.detalle)}</div>` : ''}
+    ${ItemCorto.verHtml(it)}
     ${narrativa ? `<div class="view-detalle view-narrativa">${esc(narrativa)}</div>` : ''}
   `};
   }

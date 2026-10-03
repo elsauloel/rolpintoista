@@ -152,7 +152,7 @@ const FichaTienda = (() => {
         ${slotInfo.ocupado ? `<span class="cat-slot-badge">Slot ocupado</span>` : ''}
         ${slotInfo.equipados.length ? `<button type="button" class="cat-btn-comparar" data-comparar="${item.id}">Comparar</button>` : ''}
       </div>` : ''}
-      ${item.detalle ? `<div class="cat-detalle">${esc(item.detalle)}</div>` : ''}
+      ${ItemCorto.grillaHtml(item)}
     </div>
     <div class="cat-actions">
       <input type="number" class="cat-qty" data-catqty="${item.id}" value="1" min="1">

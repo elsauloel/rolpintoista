@@ -230,7 +230,7 @@ const CreepLupa = (() => {
         <div class="view-lines">${L.filter(Boolean).join('')}</div>
       </div>
     </div>
-    ${item.detalle ? `<div class="view-detalle"><span class="view-label">Detalle</span>${esc(item.detalle)}</div>` : ''}
+    ${ItemCorto.verHtml(item)}
     ${(item.descripcionNarrativa||'').trim() ? `<div class="view-detalle view-narrativa">${esc(item.descripcionNarrativa)}</div>` : ''}
   `};
   }

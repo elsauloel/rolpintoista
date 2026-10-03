@@ -61,6 +61,15 @@ NARR = {
     'Espejo de discordia': 'Un espejo de mano puesto boca arriba, con un hechizo que vuelve a los amigos enemigos.',
     'Portal cósmico': 'Un glifo circular que, al ser pisado, abre una fisura hacia otro lugar.',
 }
+def leer_ficha():
+    # [efectoTxt, salvaTxt, efectoAuto] de cada trampa base: FICHA_TRAMPAS de comun/trampas-base.js.
+    t = open(SRC, encoding='utf-8').read()
+    cuerpo = t[t.index('const FICHA_TRAMPAS = {') + len('const FICHA_TRAMPAS = '):]
+    cuerpo = cuerpo[:cuerpo.index('};') + 1].replace('true', 'True').replace('false', 'False')
+    return eval(cuerpo)
+
+
+FICHA = leer_ficha()
 ESCALA_PRECIO = {1: 0.7, 2: 1.0, 3: 1.5}
 SUF = {1: ' menor', 2: '', 3: ' mayor'}
 GRADO = {1: 'menor', 2: 'común', 3: 'mayor'}
@@ -112,6 +121,13 @@ def main():
                 detalle += ' Dificultades y duraciones %s.' % ('−2 respecto de la trampa común' if p == 1 else '+2 respecto de la trampa común')
             detalle += ' ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.'
             datos = {'nombre': nombre[:40], 'detalle': (texto[:190]), 'amiga': bool(b['amiga'] or b['nombre'] in FISICAS), 'tipo': b['tipo'], 'tamano': tamano, 'color': b['color'], 'alfa': 45, 'dano': dano}
+            # La ficha corta (2026-10-02): efecto, salvación (dificultades ±2 según la potencia) y dificultad para detectarla (6 / 8 / 10).
+            f = FICHA.get(b['nombre'])
+            if f:
+                datos['efectoTxt'] = f[0]
+                datos['salvaTxt'] = re.sub(r'contra (\d+)', lambda m: f'contra {max(1, int(m.group(1)) + 2 * (p - 2))}', f[1])
+                if f[2]: datos['efectoAuto'] = True
+            datos['detectar'] = 8 + 2 * (p - 2)
             if b['ignoraDef']:
                 datos['ignoraDef'] = True
             if b['estado']:

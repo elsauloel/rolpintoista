@@ -694,3 +694,13 @@ Estado hoy: Común 18 · Buena 13 · Raro 9 (cuerpo a cuerpo) · Excepcional 6 �
 PdG en contraataque (de casa) ni el daño amplificado; precios desparejos.
 
 **✅ T4 Excepcional cargado (2026-10-03, dueño: «subilas, después las reviso»):** las 18 de la propuesta v1 (con el Colmillo sangrando permanente) reemplazaron a las 6 Excepcionales del Tipo 4, con los tres textos y el precio libre. Construidas las mecánicas de firma (no se puede parrear, oportunidad sin No2, primer ataque −1 No2, +1 d20 en el crítico, Rengo, Sangrado con stacks, daño mágico de rayo / hielo sin multiplicar con el crítico). Salieron el Báculo mágico y el Puñal de Dorne. Queda la revisión del dueño.
+
+**Criterios del dueño para las Comunes del T6 (2026-10-03):** el daño amplificado en una común ya es «tirando a bueno» (una sola, la mejor);
+la Iniciativa es un efecto bajo-mediano (+1, +2 y hasta +3 en las mejores comunes); Parry en tier bajo sí, pero **no combinado con más
+Peso** (eso, desde Buena calidad: el Peso ya da Bloqueo); los bonos al **contraataque** son bienvenidos y pesan poco (es circunstancial,
+no depende del jugador).
+
+**✅ T6 Común cargado (2026-10-03):** 18 armas, todas con el piso (1d6 y 25 % de Sangrado 3 turnos; con crítico, permanente). Salieron las 6
+copias (los humanos que las llevaban usan el arma del catálogo: Sable común, Espada ancha, Espada corta de instrucción, Hoz, Espada corta oxidada)
+y el Bastón ferrado (no es del Tipo 6). El Machete cambió Rompe armadura por +1 dado amplificado. Nuevas: Sable de húsar, Sable de duelo
+callejero, Espada de la milicia, Espada del aprendiz de esgrima, Alfanje, Cuchilla de matarife, Navaja de barbero. Queda la revisión del dueño.

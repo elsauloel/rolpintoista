@@ -704,3 +704,12 @@ no depende del jugador).
 copias (los humanos que las llevaban usan el arma del catálogo: Sable común, Espada ancha, Espada corta de instrucción, Hoz, Espada corta oxidada)
 y el Bastón ferrado (no es del Tipo 6). El Machete cambió Rompe armadura por +1 dado amplificado. Nuevas: Sable de húsar, Sable de duelo
 callejero, Espada de la milicia, Espada del aprendiz de esgrima, Alfanje, Cuchilla de matarife, Navaja de barbero. Queda la revisión del dueño.
+
+### Nombres (criterio del dueño, 2026-10-03)
+Los nombres de las armas, **en términos rioplatenses y criollos**, frecuentes para quienes juegan: gaucho, comisario, policía, cuatrero, milico,
+colimba, facón, rural, barrio. También **fantasía absurda, anacrónica y atemporal**, y cosas modernas o contemporáneas. **Nada de tecnicismos
+militares europeos** (húsar, alfanje, cimitarra…) que el grupo no conoce. La narrativa acompaña el nombre. Primera tanda con este criterio: T6
+Común (Facón de paisano, Sable de milico, Sable de granadero, Navaja del compadrito, Caronero, Sable del club de barrio, Sable herrumbrado del
+cuartel, Espada del comisario, Espada de la feria de Mataderos, Cuchilla del frigorífico, Machete de chacarero, Machete chaqueño, Espada de la
+colimba, Sable del cuatrero, Hoz del quintero, Sable de utilería, Facón del baldío, Navaja del peluquero de la esquina). **Si al dueño le gusta, se
+vuelve atrás y se renombran con este criterio las tandas ya hechas del Tipo 4.**

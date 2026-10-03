@@ -70,7 +70,7 @@ const CreepAcciones = (() => {
   const NOMBRE_ESPECIAL = {oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
   // PdG en contraataque (o en oportunidad): la regla universal (Combatiente.statAtaqueEspecial), venga de su arma, su equipo o sus estados.
   const bonoEspecial = (sc, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return st ? C().modTotal(sc, st) : 0; };
-  const costoAtaqueDe = (sc, tipo) => tipo === 'normal' ? C().costoAtaque(sc) : C().costoContraataque(sc);
+  const costoAtaqueDe = (sc, tipo) => tipo === 'normal' ? C().costoAtaque(sc) : tipo === 'oportunidad' ? C().costoOportunidad(sc) : C().costoContraataque(sc);
   const faltanNitros = (sc, tipo) => costoAtaqueDe(sc, tipo) > num(sc.nitros);
   // El texto de «¿Atacar igual?» (cada pantalla lo muestra a su manera).
   function preguntaSinNitros(sc, tipo){
@@ -126,7 +126,7 @@ const CreepAcciones = (() => {
   // «Ataque con mi arma, con arreglos» de un creep (Golpe brutal, Carga…; P134): el mismo armado que el personaje, con su arma.
   function ataqueDeHab(sc, h){
     const c = h && h.duelo;
-    return Combatiente.ataqueConArreglos(h, c, {arma: {id: '', nombre: sc.armaNombre || '', tipoDado: num(sc.armaTipo) || 8, rango: !!sc.armaDeRango},
+    return Combatiente.ataqueConArreglos(h, c, {arma: {...Combatiente.armaDeCombatiente(sc), id: '', nombre: sc.armaNombre || '', rango: !!sc.armaDeRango},
       alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? Combatiente.alcanceHab(c, 'pdg', s => C().statValor(sc, s)) : C().alcance(sc)});
   }
   // ¿Tira algo? El stat vinculado (con su valor del momento) y/o la fórmula.

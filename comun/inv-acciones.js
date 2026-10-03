@@ -59,7 +59,7 @@ const InvAcciones = (() => {
      turno Tipo ÷ 2, después el Tipo completo; suma al conteo) y tirar el PdG (tiradaAtaque). Atacar cierra el Parry pendiente:
      lo borra cada pantalla. */
   function ataqueDuelo(inv, tipo){
-    return {tipo: tipo === 'oportunidad' || tipo === 'contra' ? tipo : 'normal', armaId: '', armaNombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8, rango: !!inv.armaDeRango, ...(inv.armaEspalda ? {espalda: inv.armaEspalda} : {}),
+    return {tipo: tipo === 'oportunidad' || tipo === 'contra' ? tipo : 'normal', armaId: '', armaNombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8, rango: !!inv.armaDeRango, ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(inv)),
       alcance: inv.armaDeRango ? Math.max(1, Math.round(num(I().statValor(inv, 'rng')))) : 1};
   }
   /* Sin No2 suficientes (2026-10-02, hoja de ruta B-7, igual que los creeps y los personajes: avisar y dejar seguir): faltanNitros, la
@@ -70,7 +70,7 @@ const InvAcciones = (() => {
   // La regla universal (Combatiente.statAtaqueEspecial): el PdG especial venga de su arma, su equipo o sus estados.
   const bonoEspecial = (inv, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return st ? I().modTotal(inv, st) : 0; };
   const especial = tipo => tipo === 'oportunidad' || tipo === 'contra';
-  const costoAtaqueDe = (inv, tipo) => especial(tipo) ? Combatiente.costoPrimerAtaque(num(inv.armaTipo) || 8) : I().costoAtaque(inv);
+  const costoAtaqueDe = (inv, tipo) => especial(tipo) ? Combatiente.costoEspecial(num(inv.armaTipo) || 8, Combatiente.armaDeCombatiente(inv), tipo) : I().costoAtaque(inv);
   const faltanNitros = (inv, tipo) => costoAtaqueDe(inv, tipo) > num(inv.nitros);
   function preguntaSinNitros(inv, tipo){
     return `${inv.nombre} no tiene No2 suficientes: ${especial(tipo) ? 'el ' + NOMBRE_ESPECIAL[tipo].toLowerCase() : 'este ataque'} cuesta ${fmt(costoAtaqueDe(inv, tipo))} y tiene ${fmt(Math.max(0, num(inv.nitros)))}.\n\n¿Atacar igual? Gasta los No2 que tenga y queda anotado en rojo en la Mesa.`;
@@ -103,6 +103,6 @@ const InvAcciones = (() => {
 
   // El menú «¿Qué ataque es?» de una invocación (el mismo de personajes y creeps: Combatiente.menuTipoAtaqueHtml).
   const menuTipoAtaque = (inv, attr) => Combatiente.menuTipoAtaqueHtml({nombre: inv.nombre, normal: I().costoAtaque(inv), primero: num(inv.ataquesTurno) === 0,
-    especial: costoAtaqueDe(inv, 'oportunidad'), attr, ref: inv.id});
+    especial: costoAtaqueDe(inv, 'contra'), especialOpor: costoAtaqueDe(inv, 'oportunidad'), attr, ref: inv.id});
   return {tirada, tirarStat, dano, ataqueDuelo, pagarAtaque, tiradaAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros, bonoEspecial, costoAtaqueDe, menuTipoAtaque};
 })();

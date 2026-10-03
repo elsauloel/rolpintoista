@@ -75,7 +75,7 @@ const CreepDuelo = (() => {
       statsCritico: d => {
         const sc = deLado(d.atacante);
         return sc ? {frecuente: Math.max(0, Math.round(C().modTotal(sc, 'crit'))), potente: Math.max(0, Math.round(C().modTotal(sc, 'critpot'))),
-          ignora: Combatiente.ignoraResistCritArma({ignoraResistCrit: sc.armaIgnoraResistCrit, efectosGolpe: sc.armaEfectos})} : {frecuente: 0, potente: 0};
+          ignora: Combatiente.ignoraResistCritArma(Combatiente.armaDeCombatiente(sc)), d20: Math.max(0, Math.round(num(Combatiente.armaDeCombatiente(sc).critD20)))} : {frecuente: 0, potente: 0};
       },
       resistenciaCritico: d => {
         const sc = deLado(d.defensor);

@@ -100,7 +100,7 @@ const FichaResumen = (() => {
       nitrosMax: n(c.final.nitros),
       // Lo menos que le cuesta un ataque de oportunidad con alguna de sus manos (2026-10-02): el mapa frena a un rival que se aleja solo si
       // nitros ≥ esto. Sin armas con daño, a mano limpia.
-      oporCosto: (() => { const armas = FichaCombate.armasEquipadasConDano(S).map(x => x.item); return Math.min(...(armas.length ? armas : [null]).map(a => FichaCombate.costoAtaqueEspecial(a))); })(),
+      oporCosto: (() => { const armas = FichaCombate.armasEquipadasConDano(S).map(x => x.item); return Math.min(...(armas.length ? armas : [null]).map(a => FichaCombate.costoAtaqueEspecial(a, 'oportunidad'))); })(),
       costoMover: IT2().inmovilizadoBloqueaMover && estadoActivo(S, 'inmovilizado') ? 0 : costoMoverCasillero(S),
       muerto: !!(S.muerto && S.muerto.activo),
       muertoDef: !!(S.muerto && S.muerto.definitivo),   // muerto de verdad (el GM lo usa al repartir la experiencia)
@@ -131,7 +131,7 @@ const FichaResumen = (() => {
           // que un PJ o un creep (barra de No2, estados con su detalle).
           nitros: num(inv.nitros),
           nitrosMax: invNitrosMax(inv),
-          oporCosto: Combatiente.costoPrimerAtaque(num(inv.armaTipo) || 8),   // ataque de oportunidad (2026-10-02)
+          oporCosto: Combatiente.costoEspecial(num(inv.armaTipo) || 8, Combatiente.armaDeCombatiente(inv), 'oportunidad'),   // ataque de oportunidad (2026-10-02)
           activa: inv.activa !== false,
           miniatura: miniaturaInv(inv.imagen),
           estados: (inv.estados || [])

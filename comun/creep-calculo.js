@@ -349,7 +349,7 @@ const CreepCalculo = (() => {
 
   /* ---------- Costos ---------- */
   // Primer ataque del turno: Tipo ÷ 2 (redondeado para arriba); los demás, Tipo completo.
-  function costoAtaque(sc){ return Combatiente.costoAtaque(num(sc.armaTipo) || 8, sc.ataquesTurno); }   // regla común (comun/combatiente.js)
+  function costoAtaque(sc){ return Combatiente.costoConAhorro(Combatiente.costoAtaque(num(sc.armaTipo) || 8, sc.ataquesTurno), Combatiente.armaDeCombatiente(sc), sc.ataquesTurno); }   // regla común (comun/combatiente.js)
   // Nitros de una habilidad: un número, o "ATAQUE" = lo que le cuesta un
   // ataque con su arma (Tipo ÷ 2 el primero del turno) y cuenta como ese ataque.
   function habAtaque(h){ return String((h && h.nitrosCosto) ?? "").trim().toUpperCase() === "ATAQUE"; }
@@ -394,9 +394,11 @@ const CreepCalculo = (() => {
   function costoContraataque(sc){ return Combatiente.costoPrimerAtaque(num(sc.armaTipo) || 8); }   // regla común (comun/combatiente.js)
   // ¿Le alcanzan los No2 para un ataque de oportunidad (lo de un primer ataque con su arma)? (2026-10-02, pedido del dueño: el mapa solo
   // frena a quien se aleja si el que se queda puede aprovecharlo.) Se publica en su resumen (`opor`): los jugadores no ven sus No2.
+  // El ataque de oportunidad: lo de un primer ataque, o nada si su arma es oporGratis.
+  function costoOportunidad(sc){ return Combatiente.costoEspecial(num(sc.armaTipo) || 8, Combatiente.armaDeCombatiente(sc), 'oportunidad'); }
   function oportunidadPosible(sc){
     const n = sc.nitros === null || sc.nitros === undefined ? nitrosMax(sc) : num(sc.nitros);
-    return !(num(sc.hp) <= 0) && n >= costoContraataque(sc);
+    return !(num(sc.hp) <= 0) && n >= costoOportunidad(sc);
   }
   // Alcance de su arma, en casilleros: un arma de rango usa su Rango; una de cuerpo a cuerpo, 1 + lo que le sume a Rango.
   function alcance(sc){
@@ -498,8 +500,7 @@ const CreepCalculo = (() => {
     if(arma && it.danoAmplificado) o.danoAmplificado = it.danoAmplificado;
     if(it.durPorPeso) o.durPorPeso = it.durPorPeso;   // durabilidad de diseño (si no es la de siempre)
     if(arma && it.armaDeRango) o.armaDeRango = true;
-    if(arma && it.espalda) o.espalda = structuredClone(it.espalda);   // por la espalda
-    if(arma && num(it.ignoraResistCrit) > 0) o.ignoraResistCrit = num(it.ignoraResistCrit);   // ignora Resistencia a crítico
+    if(arma) Object.assign(o, Combatiente.rasgosDeItem(it));   // los rasgos del arma (por la espalda, ignora, sin Parry, firmas…)
     if(arma && (it.efectosGolpe || []).length) o.efectosGolpe = structuredClone(it.efectosGolpe);
     if(it.tipoItem === 'consumibles'){ o.consumible = true; if(it.curahp) o.curahp = it.curahp; if(it.legacy) o.legacy = true; }
     const otros = (it.mods || []).filter(m => m.stat !== 'def');
@@ -554,5 +555,5 @@ const CreepCalculo = (() => {
     statValor, estadoActivo, aportesMod, origenesMod, conSigno, statOrigenTxt, armadmgOrigenTxt, ataqueTxt, ataqueOrigenTxt,
     defensaOrigenTxt, critOrigenTxt, armaduraOrigenTxt, modsAfectanHp, actualizarHpMaxPorCon, nitrosMax, actualizarNo2PorAgl,
     costoAtaque, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor,
-    fuerzaGolpeValor, costoContraataque, oportunidadPosible, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
+    fuerzaGolpeValor, costoContraataque, costoOportunidad, oportunidadPosible, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
 })();

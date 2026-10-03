@@ -185,11 +185,11 @@ async function oporArmasDe(r){
   if(r.tipo === 'creep'){
     const sc = creepPrivadoDe(r.fichaId);
     if(!sc) return [];
-    const costo = CreepCalculo.costoContraataque(sc);
+    const costo = CreepCalculo.costoOportunidad(sc);
     const n = sc.nitros === null || sc.nitros === undefined ? CreepCalculo.nitrosMax(sc) : num(sc.nitros);
     if(n < costo) return [];
     return [{nombre: sc.armaNombre || 'su arma', costo, yo: {ref: r.fichaId, tipo: 'creep', nombre},
-      ataque: {tipo: 'oportunidad', armaId: '', armaNombre: sc.armaNombre || '', tipoDado: num(sc.armaTipo) || 8, rango: !!sc.armaDeRango, alcance: CreepCalculo.alcance(sc)}}];
+      ataque: {tipo: 'oportunidad', armaId: '', armaNombre: sc.armaNombre || '', tipoDado: num(sc.armaTipo) || 8, rango: !!sc.armaDeRango, alcance: CreepCalculo.alcance(sc), ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(sc))}}];
   }
   await bnCargarPiezas();
   const [fichaId, invId] = String(r.fichaId).split(SEP_INVOCACION);
@@ -199,17 +199,17 @@ async function oporArmasDe(r){
   if(invId){
     const inv = (S.invocaciones || []).find(x => x && x.id === invId);
     if(!inv) return [];
-    const costo = Combatiente.costoPrimerAtaque(num(inv.armaTipo) || 8);
+    const costo = Combatiente.costoEspecial(num(inv.armaTipo) || 8, Combatiente.armaDeCombatiente(inv), 'oportunidad');
     if(num(inv.nitros) < costo) return [];
     return [{nombre: inv.armaNombre || 'su arma', costo, yo: {ref: r.fichaId, tipo: 'pj', nombre},
-      ataque: {tipo: 'oportunidad', armaId: '', armaNombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8, rango: !!inv.armaDeRango, alcance: 1}}];
+      ataque: {tipo: 'oportunidad', armaId: '', armaNombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8, rango: !!inv.armaDeRango, alcance: 1, ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(inv))}}];
   }
   const disponibles = S.nitros === null || S.nitros === undefined ? num(FichaCalculo.calcular(S).final.nitros) : num(S.nitros);
   const lista = FichaCombate.armasEquipadasConDano(S).map(x => x.item);
-  return (lista.length ? lista : [null]).map(arma => ({arma, costo: FichaCombate.costoAtaqueEspecial(arma)}))
+  return (lista.length ? lista : [null]).map(arma => ({arma, costo: FichaCombate.costoAtaqueEspecial(arma, 'oportunidad')}))
     .filter(x => x.costo <= disponibles)
     .map(({arma, costo}) => ({nombre: arma ? arma.nombre : 'sin arma', costo, yo: {ref: fichaId, tipo: 'pj', nombre},
-      ataque: {tipo: 'oportunidad', armaId: arma ? arma.id : '', armaNombre: arma ? arma.nombre : '', tipoDado: FichaCombate.tipoAtaque(arma), rango: !!(arma && arma.armaDeRango), alcance: FichaCombate.alcanceDeArma(S, arma)}}));
+      ataque: {tipo: 'oportunidad', armaId: arma ? arma.id : '', armaNombre: arma ? arma.nombre : '', tipoDado: FichaCombate.tipoAtaque(arma), rango: !!(arma && arma.armaDeRango), alcance: FichaCombate.alcanceDeArma(S, arma), ...Combatiente.ataqueDeArma(arma)}}));
 }
 async function oporAtacar(a){
   const od = oporDecision;

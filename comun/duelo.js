@@ -578,7 +578,8 @@ const Duelo = (() => {
       e = Critico.evaluar({pdg: m.pdg.total, eva: m.eva.total, tipo: m.ataque.tipoDado, frecuente, potente, resistencia});
     }
     if(e && e.critico){
-      m.crit = {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados, critico: true, frecuente, potente, resistencia, d20: null, mejor: 0, mult: 1};
+      const d20extra = Math.max(0, Math.round(_num(dd.d20)));   // el arma tira N d20 más en el crítico (2026-10-03)
+      m.crit = {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados + d20extra, critico: true, frecuente, potente, resistencia, d20: null, mejor: 0, mult: 1, ...(d20extra ? {d20extra} : {})};
       m.fase = 'critico';
       m.estado = 'esperando';
     }else{
@@ -709,7 +710,7 @@ const Duelo = (() => {
 
   /* ---------- efectos del golpe ---------- */
   // Efectos que SOLO entran si el golpe hizo daño (decidido por el dueño, 2026-09-26). El resto entra aunque la armadura absorba todo. Un efecto puede traer `requiereDano` propio.
-  const EFECTOS_CON_DANO = ['envenenar', 'veneno severo', 'sangrado', 'drena vida', 'lisiado'];
+  const EFECTOS_CON_DANO = ['envenenar', 'veneno severo', 'sangrado', 'drena vida', 'lisiado', 'rengo'];
   const requiereDanoDe = ef => (typeof ef.requiereDano === 'boolean') ? ef.requiereDano : EFECTOS_CON_DANO.includes(String(ef.nombre || '').trim().toLowerCase());
   const siempreEf = ef => _num(ef.caras) <= 1 || _num(ef.exitos) >= _num(ef.caras);
   const pctEf = ef => Math.round(_num(ef.exitos) / Math.max(1, _num(ef.caras)) * 100);
@@ -737,7 +738,8 @@ const Duelo = (() => {
   }
   function specArma(n, st, ef){
     if(n === 'rompe armadura' || n === 'arruina armadura' || n === 'media armadura') return {nombre: 'Armadura rota', stacks: Math.max(1, st)};
-    if(n === 'sangrado' || n === 'primera sangre') return {nombre: 'Sangrado'};
+    if(n === 'sangrado' || n === 'primera sangre') return st ? {nombre: 'Sangrado', stacks: st} : {nombre: 'Sangrado'};   // con más stacks (2026-10-03)
+    if(n === 'rengo') return {nombre: 'Rengo'};   // Rengo en armas (2026-10-03)
     if(n === 'envenenar' || n === 'veneno severo') return (n === 'veneno severo' || /severo/i.test(ef.detalle || '')) ? {nombre: 'Veneno severo'} : (st ? {nombre: 'Veneno', stacks: st} : {nombre: 'Veneno'});
     if(n === 'lisiado') return {nombre: 'Lisiado'};
     if(n === 'pajaritos') return {nombre: 'Pajaritos'};
@@ -849,6 +851,15 @@ const Duelo = (() => {
         // sacó de verdad al defensor (lo que frena la armadura no cuenta). No es un estado sobre el golpeado: lo aplica el mapa con el daño.
         const drenas = crudos.filter(esDrenaEf);
         if(drenas.length){ m.dano.drenaPct = Math.min(100, drenas.reduce((a, e) => a + (_num(e.drenaPct) > 0 ? _num(e.drenaPct) : 50), 0)); crudos = crudos.filter(e => !esDrenaEf(e)); }
+        // Daño mágico de un arma (2026-10-03, rayo / hielo): se tira acá, ignora la Defensa (resta la Armadura mágica) y queda AFUERA del
+        // multiplicador del crítico (regla del dueño). Lo aplica el mapa junto con el daño.
+        const magicos = crudos.filter(e => e && e.danoMagico && e.dado);
+        if(magicos.length && typeof tirarDados === 'function'){
+          const tiros = magicos.map(e => ({e, r: tirarDados(e.dado)})).filter(x => x.r);
+          if(tiros.length) m.dano.magico = {tipo: tiros.map(x => String(x.e.nombre || 'mágico').slice(0, 20)).join(' y '), total: tiros.reduce((a, x) => a + Math.max(0, Math.round(_num(x.r.total))), 0),
+            formula: tiros.map(x => x.r.formula).join(' + ').slice(0, 60), rolls: tiros.flatMap(x => x.r.rolls || []).slice(0, 12).map(_num)};
+          crudos = crudos.filter(e => !(e && e.danoMagico));
+        }
       }
       m.efectos = normalizarEfectos(crudos);
       // «Seguro si es crítico» (2026-10-03): un efecto con porcentaje que, si el golpe fue crítico, entra sin tirar.
@@ -884,6 +895,7 @@ const Duelo = (() => {
       else if(dn.mitad) L.push(`Daño: pasó la mitad → ${dn.recibido} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
       else L.push(`Daño: ${dn.crudo} − Defensa ${dn.defensa} = ${dn.recibido} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
     }
+    if(dn && dn.magico) L.push(`Daño de ${dn.magico.tipo}: ${dn.magico.total} (${dn.magico.formula}; ignora la Defensa, sin multiplicar)${dn.magico.recibido !== undefined ? ` → recibió ${dn.magico.recibido}` : ''}${dn.magico.hpDespues !== undefined ? ` (${dn.magico.hpAntes} → ${dn.magico.hpDespues} HP)` : ''}`);
     if(dn && dn.drena) L.push(`Drena: ${dn.drena.quien || d.atacante.nombre} se cura ${dn.drena.monto}${dn.drena.manual ? ` (a mano${dn.drena.motivo ? ': ' + dn.drena.motivo : ''})` : `${dn.drena.hpAntes !== undefined && dn.drena.hpAntes !== null ? ` (${dn.drena.hpAntes} → ${dn.drena.hpDespues} HP)` : ''}${_num(dn.drena.excedente) ? ` · Excedente de vida ${dn.drena.excedente}` : ''}${dn.drena.nota ? ' · ' + dn.drena.nota : ''}`}`);
     if(dn && dn.espinas) L.push(`Espinas: ${dn.espinas.quien || d.atacante.nombre} recibe ${dn.espinas.monto} de daño devuelto${dn.espinas.manual ? ' (a mano)' : dn.espinas.hpAntes !== undefined && dn.espinas.hpAntes !== null ? ` (${dn.espinas.hpAntes} → ${dn.espinas.hpDespues} HP)` : ''}`);
     if(d.resultado === 'mitad') L.push(`Durabilidad: ${d.defensa && d.defensa.itemNombre ? d.defensa.itemNombre : 'el objeto que bloqueó'} pierde 1 punto`);
@@ -1409,7 +1421,8 @@ const Duelo = (() => {
           ? `<div class="duelo-mini">${_esc(d.defensor.nombre)}: <b>${_fmt(dn.hpAntes)}</b> → <b>${_fmt(dn.hpDespues)}</b> HP${_num(dn.absorbido) ? ` · el escudo absorbió ${_fmt(dn.absorbido)}` : ''}</div>` : '';
         const esp = dn.espinas ? `<div class="duelo-mini" style="color:#8fe3a9">🌵 Espinas: ${_esc(dn.espinas.quien || d.atacante.nombre)} recibe <b>${_fmt(dn.espinas.monto)}</b> de daño devuelto (1/4 del daño del golpe, directo a la vida)${dn.espinas.manual ? ' — <b>aplicalo a mano</b>' + (dn.espinas.motivo ? ' (' + _esc(dn.espinas.motivo) + ')' : '') : (dn.espinas.hpAntes !== undefined && dn.espinas.hpAntes !== null ? ` · ${_fmt(dn.espinas.hpAntes)} → ${_fmt(dn.espinas.hpDespues)} HP` : '')}</div>` : '';
         const dr = dn.drena ? `<div class="duelo-mini" style="color:#8fe3a9">🩸 Drena: ${_esc(dn.drena.quien || d.atacante.nombre)} se cura <b>${_fmt(dn.drena.monto)}</b>${dn.drena.manual ? ' — <b>aplicalo a mano</b>' + (dn.drena.motivo ? ' (' + _esc(dn.drena.motivo) + ')' : '') : `${dn.drena.hpAntes !== undefined && dn.drena.hpAntes !== null ? ` · ${_fmt(dn.drena.hpAntes)} → ${_fmt(dn.drena.hpDespues)} HP` : ''}${_num(dn.drena.excedente) ? ` · Excedente de vida ${_fmt(dn.drena.excedente)}` : ''}${dn.drena.nota ? ' · ' + _esc(dn.drena.nota) : ''}`}</div>` : '';
-        cuerpo = tiro + `<div class="duelo-danobox${dn.ignoraDef ? ' crit' : ''}">${grande}</div>${vida}${esp}${dr}`;
+        const mg = dn.magico ? `<div class="duelo-mini" style="color:#9cc7ff">⚡ Daño de ${_esc(dn.magico.tipo)}: <b>${_fmt(dn.magico.total)}</b> (${_esc(dn.magico.formula || '')}) · ignora la Defensa, sin multiplicar${dn.magico.recibido !== undefined ? ` · recibió <b>${_fmt(dn.magico.recibido)}</b>` : ''}${dn.magico.hpDespues !== undefined ? ` · ${_fmt(dn.magico.hpAntes)} → ${_fmt(dn.magico.hpDespues)} HP` : ''}</div>` : '';
+        cuerpo = tiro + `<div class="duelo-danobox${dn.ignoraDef ? ' crit' : ''}">${grande}</div>${vida}${mg}${esp}${dr}`;
       }
     }
     return `<div class="duelo-paso"><h4><span class="n">5</span>Daño</h4>${cuerpo}</div>`;
@@ -1520,6 +1533,7 @@ const Duelo = (() => {
       ...(critBono ? [`${_esc(nombreHab)} suma +${_fmt(critBono)} a tu Crítico frecuente, solo en esta tirada.`] : []),
       ...(critpotBono ? [`${_esc(nombreHab)} suma +${_fmt(critpotBono)} a tu Crítico potente, solo en esta tirada.`] : []),
       ...(_num(d.critDatos && d.critDatos.ignora) ? [`${_esc(d.ataque.armaNombre || 'El arma')} ignora ${_fmt(d.critDatos.ignora)} de Resistencia a crítico del defensor.`] : []),
+      ...(_num(c.d20extra) ? [`${_esc(d.ataque.armaNombre || 'El arma')} tira ${_fmt(c.d20extra)} d20 más en el crítico.`] : []),
       ...(_num(d.ataque && d.ataque.espalda && d.ataque.espalda.critpot) ? [`Por la espalda: +${_fmt(d.ataque.espalda.critpot)} a tu Crítico potente.`] : []),
       `Nivel del crítico: ${_fmt(c.nivel)}${_num(c.resistencia) ? ` − Resistencia a crítico ${_fmt(c.resistencia)} = ${_fmt(c.dados)} d20` : ''}`];
     let cuerpo;

@@ -81,7 +81,7 @@ const ItemCorto = (() => {
   const BONO = {pdg: 'PdG', pdgopor: 'PdG en oportunidad', pdgcontra: 'PdG en contraataque', rng: 'Alcance', ini: 'Iniciativa', crit: 'Crítico frecuente',
     critpot: 'Crítico potente', parry: 'Parry', bloqueo: 'Bloqueo', dmg: 'Dmg', eva: 'Evasión'};
   const EFECTO = {envenenar: 'Veneno', 'veneno severo': 'Veneno severo', sangrado: 'Sangrado', lisiado: 'Lisiado', 'rompe armadura': 'Rompe armadura',
-    aturdir: 'Aturdir', derribar: 'Derribar', 'prende fuego': 'Prende fuego', 'drena vida': 'Drena vida', demora: 'Demora'};
+    aturdir: 'Aturdir', derribar: 'Derribar', rengo: 'Rengo', 'prende fuego': 'Prende fuego', 'drena vida': 'Drena vida', demora: 'Demora'};
   const nombreEf = e => EFECTO[String(e.nombre || '').trim().toLowerCase()] || String(e.nombre || '').trim();
   const pctEf = e => { const c = Math.max(1, num(e.caras) || 1), x = Math.min(c, Math.max(1, num(e.exitos) || 1)); return x >= c ? 100 : Math.round(x / c * 100); };
   const durPP = it => num(it.durPorPeso) > 0 ? num(it.durPorPeso) : 3;
@@ -89,9 +89,10 @@ const ItemCorto = (() => {
   // «Sangrado 50 % · 2 turnos», «Veneno 3 stacks (siempre)», «Lisiado 25 %, seguro si es crítico».
   function efectoCorto(e){
     const n = nombreEf(e), pct = pctEf(e);
+    if(e.danoMagico) return `+${e.dado} de ${String(e.nombre || 'magia').toLowerCase()}`;
     if(n === 'Drena vida') return `Drena vida ${num(e.drenaPct) > 0 ? num(e.drenaPct) : 50} %`;
     if(e.soloCritico) return `Si es crítico: ${n}${num(e.stacks) > 0 && /^Veneno$/.test(n) ? ` ${num(e.stacks)} stacks` : ''}${pct < 100 ? ` ${pct} %` : ''}${num(e.turnos) > 0 ? ` · ${num(e.turnos)} turnos` : ''}`;
-    const st = num(e.stacks) > 0 && /^Veneno$/.test(n) ? ` ${num(e.stacks)} stacks` : '';
+    const st = num(e.stacks) > 0 && /^(Veneno|Sangrado)$/.test(n) ? ` ${num(e.stacks)} stacks` : '';
     return `${n}${st} ${pct >= 100 ? '(siempre)' : pct + ' %'}${num(e.turnos) > 0 ? ` · ${num(e.turnos)} turnos` : ''}${e.seguroCritico && pct < 100 ? ', seguro si es crítico' : ''}`;
   }
   function armaEsencial(it){
@@ -106,6 +107,10 @@ const ItemCorto = (() => {
     const ign = num(it.ignoraResistCrit) + (it.efectosGolpe || []).reduce((a, e) => { const m = /^ignora\s+(\d+)\s+de\s+res/i.exec(String((e && e.nombre) || '').trim()); return a + (m ? num(m[1]) : 0); }, 0);
     if(ign) p.push(`Ignora ${ign} de Res. crítico`);
     (it.efectosGolpe || []).forEach(e => { if(e && e.nombre && !/^ignora\s+\d+\s+de\s+res/i.test(String(e.nombre).trim())) p.push(efectoCorto(e)); });
+    if(it.sinParry) p.push('No se puede parrear');
+    if(it.oporGratis) p.push('Oportunidad sin No2');
+    if(num(it.ahorroNitros)) p.push(`Primer ataque −${num(it.ahorroNitros)} No2`);
+    if(num(it.critD20)) p.push(`+${num(it.critD20)} d20 en el crítico`);
     if(num(it.durPorPeso) > 3) p.push(`Resistente (durabilidad ${durMax(it)})`);
     else if(num(it.durPorPeso) > 0 && num(it.durPorPeso) < 3) p.push(`Frágil (durabilidad ${durMax(it)})`);
     const es = it.espalda;
@@ -126,8 +131,9 @@ const ItemCorto = (() => {
   };
   const MEC_EFECTO = {
     'Drena vida': 'Drena vida N %: quien ataca se cura el N % de la vida que el golpe le sacó de verdad al defensor (lo que frena la armadura no cuenta; curar redondea para arriba). Lo que pase de su máximo se pierde.',
+    Rengo: 'Rengo: 3 turnos en que moverse le cuesta 2 No2 por casillero.',
     Lisiado: 'Lisiado: 3 turnos con el PdG y el Parry a la mitad (se tira el dado completo y el resultado se divide por 2).',
-    Sangrado: 'Sangrado: pierde 1 HP por stack en cada Mantenimiento (entra con 2). Si ya sangraba, suma +1 stack. Sin turnos dura hasta que lo curen; con turnos vence, salvo que entre con un golpe crítico: ahí queda permanente.',
+    Sangrado: 'Sangrado: pierde 1 HP por stack en cada Mantenimiento (entra con 2, o los stacks que diga el arma). Si ya sangraba, suma +1 stack. Sin turnos dura hasta que lo curen; con turnos vence, salvo que entre con un golpe crítico: ahí queda permanente.',
     Veneno: 'Veneno: pierde 1 HP por stack en cada Mantenimiento y un stack por turno (los turnos son los stacks). Los stacks nuevos se suman a los que ya tenía.',
     'Veneno severo': 'Veneno severo: daño por turno que crece en cada Mantenimiento y no se va solo: hay que curarlo.',
     'Rompe armadura': 'Rompe armadura: deja Armadura rota (−1 de Defensa por stack).',
@@ -146,6 +152,11 @@ const ItemCorto = (() => {
       L.push('Ignora N de Resistencia a crítico: al calcular el crítico, el defensor cuenta N puntos menos de Resistencia a crítico contra este golpe: es más fácil que salga crítico y se tiran más d20. ⚙ El duelo lo resta solo y lo muestra en la cuenta.');
     const efs = (it.efectosGolpe || []).filter(e => e && e.nombre && !/^ignora\s+\d+\s+de\s+res/i.test(String(e.nombre).trim()));
     efs.forEach(e => { const n = nombreEf(e); if(MEC_EFECTO[n] && !vistos.has(n)){ vistos.add(n); L.push(MEC_EFECTO[n]); } });
+    if(it.sinParry) L.push('No se puede parrear: contra esta arma el defensor solo puede esquivar (Evasión). ⚙ El duelo no le ofrece el Parry.');
+    if(it.oporGratis) L.push('Oportunidad sin No2: el ataque de oportunidad con esta arma no cuesta Nitros. ⚙ Automatizado.');
+    if(num(it.ahorroNitros)) L.push(`Primer ataque −${num(it.ahorroNitros)} No2: el primer ataque normal del turno con esta arma cuesta ${num(it.ahorroNitros)} No2 menos. ⚙ Automatizado.`);
+    if(num(it.critD20)) L.push(`+${num(it.critD20)} d20 en el crítico: cuando el golpe es crítico se tira${num(it.critD20) === 1 ? ' un d20' : 'n ' + num(it.critD20) + ' d20'} más para el multiplicador (más chance de ×3, ×4 y de supercrítico). ⚙ Automatizado.`);
+    if(efs.some(e => e.danoMagico)) L.push('Daño mágico (rayo, hielo…): se tira aparte cuando el golpe pega; ignora la Defensa (solo resta la Armadura mágica) y queda afuera del multiplicador del crítico. ⚙ Automatizado.');
     if(efs.some(e => e.soloCritico)) L.push('⚡ Si es crítico (Critical Matters): ese efecto solo entra si el golpe fue crítico; si no, ni aparece.');
     if(efs.some(e => pctEf(e) < 100 && !e.soloCritico)) L.push('Los porcentajes se tiran en el duelo, después del daño (50 % = una moneda, 25 % = un d4, 75 % = un d4 que falla solo con 1). Lisiado, Veneno y Sangrado necesitan que el golpe haga daño.');
     if(efs.some(e => e.seguroCritico)) L.push('Seguro si es crítico: con un golpe crítico, el efecto entra sin tirar.');

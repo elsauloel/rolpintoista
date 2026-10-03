@@ -103,9 +103,9 @@ const FichaCombate = (() => {
   const claveAtaque = arma => arma ? arma.id : 'sin-arma';
   const tipoAtaque = arma => arma ? (num(arma.tipoDado) || 8) : TIPO_SIN_ARMA;
   const ataquesConArma = (S, arma) => num((S.ataquesArma || {})[claveAtaque(arma)]);
-  const costoAtaque = (S, arma) => Combatiente.costoAtaque(tipoAtaque(arma), ataquesConArma(S, arma));
-  // Ataque de oportunidad y contraataque: siempre lo de un primer ataque, y no cuentan como ataque del turno.
-  const costoAtaqueEspecial = arma => Combatiente.costoPrimerAtaque(tipoAtaque(arma));
+  const costoAtaque = (S, arma) => Combatiente.costoConAhorro(Combatiente.costoAtaque(tipoAtaque(arma), ataquesConArma(S, arma)), arma, ataquesConArma(S, arma));   // − ahorroNitros del arma en el primero
+  // Ataque de oportunidad y contraataque: siempre lo de un primer ataque, y no cuentan como ataque del turno (oportunidad: gratis si el arma es oporGratis).
+  const costoAtaqueEspecial = (arma, tipo) => Combatiente.costoEspecial(tipoAtaque(arma), arma, tipo);
   // Cuenta un ataque con esa arma (el próximo ya paga el Tipo completo). Devuelve si era el primero con ella.
   function registrarAtaque(S, arma){
     const primero = ataquesConArma(S, arma) === 0;

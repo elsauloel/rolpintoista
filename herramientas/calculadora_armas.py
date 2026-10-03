@@ -59,12 +59,12 @@ ORDEN = [t for t, _ in UMBRAL_TIER]
 
 # Pesos de los efectos (P7, cerrado) y familias (de casa / habilitado). Familia por Tipo: 4 punzante, 6 cortante, 8 hacha, 10 contundente, 12 explosivo; de rango aparte.
 PESO_EFECTO = {'Rompe armadura': 4, 'Demora': 4, 'Aturdir': 5, 'Lisiado': 3, 'Sangrado': 2, 'Envenenar': 2, 'Veneno severo': 3,
-               'Derribar': 3, 'Prende fuego': 3.5, 'Drena vida': 4, 'Explosión': 6}   # Explosión: la razón de ser del Tipo 12; el peso es a radio 1, cada radio extra suma +50 %
+               'Derribar': 3, 'Prende fuego': 3.5, 'Drena vida': 4, 'Explosión': 6, 'Rengo': 3}   # Explosión: la razón de ser del Tipo 12; el peso es a radio 1, cada radio extra suma +50 %
 CASA = {'hacha': {'Rompe armadura'}, 'contundente': {'Demora', 'Aturdir'}, 'punzante': {'Lisiado'}, 'cortante': {'Sangrado'}, 'explosivo': {'Explosión'}}
 HABILITADO = {'Envenenar': {'hacha', 'cortante', 'punzante', 'rango'}, 'Veneno severo': {'hacha', 'cortante', 'punzante', 'rango'},
               'Sangrado': {'punzante', 'hacha'}, 'Lisiado': {'cortante'}, 'Rompe armadura': {'contundente'}, 'Aturdir': {'explosivo'},
               'Demora': {'explosivo'}, 'Derribar': {'contundente', 'hacha', 'explosivo'}, 'Prende fuego': {'explosivo', 'rango'},
-              'Drena vida': {'cortante', 'punzante'}}
+              'Drena vida': {'cortante', 'punzante'}, 'Rengo': {'punzante', 'cortante'}}
 FAMILIA_POR_TIPO = {4: 'punzante', 6: 'cortante', 8: 'hacha', 10: 'contundente', 12: 'explosivo'}
 # efectos del catálogo actual que ya no existen en el diseño nuevo (no suman)
 DESCARTADOS = {'Arruina armadura', 'Media armadura', 'Ignora armadura', 'Agarrar', 'Primera sangre', 'Golpes seguidos', 'Estruendo', 'Empuje', 'Pajaritos'}
@@ -116,6 +116,11 @@ def puntaje(arma):
     d['crítico'] = crit
     ef = 0.0
     for e in arma.get('efectosGolpe') or []:
+        if e.get('danoMagico') and e.get('dado'):   # daño mágico extra: el promedio del dado, ×1,5 porque ignora la Defensa (sin multiplicar con el crítico)
+            try:
+                cant, caras = str(e['dado']).lower().split('d'); ef += (int(cant or 1) * (int(caras) + 1) / 2) * 1.5
+            except Exception: pass
+            continue
         nombre = ALIAS.get(e.get('nombre'), e.get('nombre'))
         if nombre in DESCARTADOS or nombre not in PESO_EFECTO and not str(nombre).startswith('Ignora'):
             continue
@@ -133,6 +138,7 @@ def puntaje(arma):
         if nombre == 'Rompe armadura' and st > 1: escala = 1 + 0.5 * (st - 1)      # cada stack extra de Armadura rota por golpe suma +50 %
         if nombre == 'Envenenar' and st and 'severo' not in str(e.get('detalle', '')).lower(): escala = st / 2   # el peso 2 del Veneno es a 2 stacks
         if nombre == 'Drena vida' and e.get('drenaPct'): escala = float(e['drenaPct']) / 50   # el peso 4 de Drena vida es a 50 % del daño que pasa
+        if nombre == 'Sangrado' and st: escala = st / 2   # el peso 2 del Sangrado es a 2 stacks
         prob = probabilidad(e) * (P_CRITICO if e.get('soloCritico') else 1.0)   # Critical Matters: solo con un golpe crítico
         if e.get('seguroCritico') and not e.get('soloCritico'): prob = min(1.0, prob + (1 - prob) * P_CRITICO)   # con crítico entra seguro
         ef += base * escala * prob * K_EFECTO * modulacion(nombre, fam)
@@ -143,6 +149,8 @@ def puntaje(arma):
     if es:   # por la espalda: vale como sus bonos, pero es situacional (solo en sigilo y por atrás)
         d['por la espalda'] = ESPALDA_FACTOR * (float(es.get('pdg') or 0) * TASA_STAT['pdg'] + float(es.get('fijo') or 0) * factor_plano(tipo)
                                                  + min(float(es.get('critpot') or 0), 6) * PESO_CRIT * PESO_CRITPOT)
+    firma = (2.0 if arma.get('sinParry') else 0) + (2.0 if arma.get('oporGratis') else 0) + 3.0 * float(arma.get('ahorroNitros') or 0) + 3.0 * float(arma.get('critD20') or 0)
+    if firma: d['firma'] = firma   # mecánicas de firma (2026-10-03): sin Parry 2 · oportunidad sin No2 2 · −1 No2 en el primero 3 · +1 d20 en el crítico 3
     if float(arma.get('durPorPeso') or 0) > 3:   # durabilidad de más que la normal (3 por punto de Peso)
         d['durabilidad'] = TASA_DUR * (float(arma['durPorPeso']) - 3) * peso
     d['peso del arma'] = -TASA_PESO * peso
@@ -166,6 +174,7 @@ def extras(arma):
     n += 1 if arma.get('ignoraResistCrit') else 0
     n += 1 if arma.get('espalda') else 0
     n += 1 if float(arma.get('durPorPeso') or 0) > 3 else 0
+    n += sum(1 for k in ('sinParry', 'oporGratis', 'ahorroNitros', 'critD20') if arma.get(k))
     return n
 
 

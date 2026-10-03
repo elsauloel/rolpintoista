@@ -536,8 +536,8 @@ function ataqueEspecialCreep(sc, tipo){
   toast(x.aviso);
 }
 function preguntarTipoAtaqueCreep(sc){
-  const normal = costoAtaqueCreep(sc), primero = num(sc.ataquesTurno) === 0, especial = costoContraataqueCreep(sc);
-  $('#tipo-ataque-creep-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: sc.nombre, normal, primero, especial, attr: 'data-tipoataquecreep', ref: sc.id});   // el menú común
+  const normal = costoAtaqueCreep(sc), primero = num(sc.ataquesTurno) === 0, especial = costoContraataqueCreep(sc), especialOpor = CreepCalculo.costoOportunidad(sc);
+  $('#tipo-ataque-creep-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: sc.nombre, normal, primero, especial, especialOpor, attr: 'data-tipoataquecreep', ref: sc.id});   // el menú común
   $('#scrim-tipo-ataque-creep').classList.add('open');
 }
 function costoAtaqueCreep(sc){ return CreepCalculo.costoAtaque(sc); }   // regla común (comun/combatiente.js)

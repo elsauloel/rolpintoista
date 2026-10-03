@@ -40,6 +40,7 @@ const EfectosGolpe = (() => {
       ...(n(ef && ef.turnos) > 0 ? {turnos: Math.round(n(ef.turnos))} : {}),   // ej. Sangrado por 2 turnos (0 = lo que dure el estado)
       ...(ef && ef.seguroCritico ? {seguroCritico: true} : {}),   // con porcentaje, pero si el golpe es crítico entra seguro (2026-10-03)
       ...(ef && ef.soloCritico ? {soloCritico: true} : {}),       // ⚡ Critical Matters: solo si el golpe es crítico (2026-10-03)
+      ...(ef && ef.danoMagico ? {danoMagico: true} : {}),         // la tirada extra es daño mágico (rayo, hielo): ignora la Defensa, no se multiplica
       ...(n(ef && ef.drenaPct) > 0 ? {drenaPct: Math.round(n(ef.drenaPct))} : {}),   // Drena vida: % de la vida que le saca de verdad
     };
   }
@@ -60,6 +61,7 @@ const EfectosGolpe = (() => {
 
   // "Envenenar (50%, +1d6)"
   function resumenTxt(ef){
+    if(ef.danoMagico) return `${ef.nombre} (+${ef.dado || '?'} de daño mágico, ignora la Defensa)`;
     if(ef.soloCritico) return `${ef.nombre} (solo si es crítico${ef.stacks ? `, ${ef.stacks} stacks` : ''}${siempre(ef) ? '' : ', ' + pct(ef) + '%'})`;
     if(/^drena(r)?\s+vida$/i.test(ef.nombre)) return `${ef.nombre} (${ef.drenaPct || 50} % de la vida que saca)`;
     const extras = [probTxt(ef), ef.stacks ? `${ef.stacks} stacks` : '', ef.turnos ? `${ef.turnos} turnos` : '', ef.seguroCritico && !siempre(ef) ? 'seguro si es crítico' : '', ef.dado ? `+${ef.dado}` : ''].filter(Boolean).join(', ');

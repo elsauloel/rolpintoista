@@ -763,11 +763,18 @@ async function dueloAplicarDano(d){
     const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando)
       : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando);
     const espinas = res.r.invulnerable ? null : await dueloEspinas(d, golpe);   // el daño inflictido (con el multiplicador del crítico), antes de la Defensa
+    // Daño mágico del arma (rayo / hielo): aparte, después del golpe — ignora la Defensa (resta la Armadura mágica) y no se multiplica.
+    let magico = null;
+    if(dn.magico && num(dn.magico.total) > 0 && !res.r.invulnerable){
+      const rm = esInv ? await danioInv(t, String(num(dn.magico.total)), true, armadmg)
+        : t.tipo === 'creep' ? await danioCreep(t, String(num(dn.magico.total)), true, armadmg) : await danioPj(t, String(num(dn.magico.total)), true, armadmg);
+      magico = {...dn.magico, recibido: num(rm.r.recibido), hpAntes: num(rm.previo), hpDespues: num(rm.nuevo)};
+    }
     const perdio = Math.max(0, num(res.previo) - num(res.nuevo));
     // Habilidad que drena: todo lo que perdió. Arma que drena (2026-10-03): su % de lo que perdió de verdad (curar redondea para arriba).
     const drena = d.hab && d.hab.dano && d.hab.dano.drena ? await dueloDrenar(d, perdio)
       : !d.hab && num(dn.drenaPct) > 0 ? await dueloDrenar(d, Math.ceil(perdio * num(dn.drenaPct) / 100)) : null;
-    return {...base, desgaste, defensa: crit ? restaIgnorando : def, recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(drena ? {drena} : {})};
+    return {...base, desgaste, defensa: crit ? restaIgnorando : def, recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);
     return {...base, defensa: def, manual: true, golpe: base.mitad ? aplicar : golpe, motivoManual: err && err.message === 'SIN_DEF' ? 'la ficha todavía no publicó su Defensa' : 'falló la escritura'};

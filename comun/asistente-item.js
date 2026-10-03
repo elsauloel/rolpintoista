@@ -352,6 +352,13 @@ const AsistenteItem = (() => {
       </div>`;
       h += efecto(`<span id="aa-dano">${danoHtml()}</span>`);
       h += `<div class="aa-nota"><b>Daño fijo</b>: se suma siempre al resultado de los dados. <b>Daño amplificado</b>: dados de más que no pesan (un arma liviana que pega como una pesada).</div>`;
+      // Mecánicas de firma (2026-10-03): lo que el arma cambia en cómo se ataca.
+      const chk = (k, txt) => `<label style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-aa-firma="${k}" ${d[k] ? 'checked' : ''} style="width:auto"> ${txt}</label>`;
+      h += `<div class="aa-campo"><label>Mecánicas de firma (opcional)</label>
+        ${chk('sinParry', 'No se puede parrear (el defensor solo puede esquivar)')}
+        ${chk('oporGratis', 'El ataque de oportunidad con esta arma no cuesta No2')}
+        <div class="aa-fila">${campo('Primer ataque del turno: No2 de menos', `<input data-aa-c="ahorroNitros" type="number" step="1" min="0" value="${n(d.ahorroNitros) || 0}" style="max-width:110px">`)}
+        ${campo('d20 de más en el crítico', `<input data-aa-c="critD20" type="number" step="1" min="0" value="${n(d.critD20) || 0}" style="max-width:110px">`)}</div></div>`;
       h += `<div class="aa-fila">${campo('Ignora Resistencia a crítico', `<input data-aa-c="ignoraResistCrit" type="number" step="1" min="0" value="${n(d.ignoraResistCrit) || 0}" style="max-width:110px">`,
         'Puntos de Resistencia a crítico del defensor que este arma no cuenta al calcular el crítico (el duelo los resta solo). Típico de estiletes y estoques, desde Raro.')}</div>`;
       if(!d.armaDeRango){   // por la espalda (2026-10-03): solo si quien ataca está en sigilo y en el punto ciego del defensor; el mapa lo suma solo
@@ -423,11 +430,12 @@ const AsistenteItem = (() => {
           <input class="aa-ancho" data-aa-golpe="${i}" data-campo="detalle" value="${e(ef.detalle || '')}" placeholder="qué hace (opcional): ej. Veneno de 4 stacks">
           ${x.caras > 1 && !ef.soloCritico ? `<label class="aa-ancho" style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-aa-golpe="${i}" data-campo="seguroCritico" ${ef.seguroCritico ? 'checked' : ''} style="width:auto"> Si el golpe es crítico, entra seguro (sin tirar)</label>` : ''}
           <label class="aa-ancho" style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-aa-golpe="${i}" data-campo="soloCritico" ${ef.soloCritico ? 'checked' : ''} style="width:auto"> ⚡ Solo si el golpe es crítico (Critical Matters)</label>
+          ${ef.dado ? `<label class="aa-ancho" style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-aa-golpe="${i}" data-campo="danoMagico" ${ef.danoMagico ? 'checked' : ''} style="width:auto"> La tirada extra es daño mágico (ignora la Defensa, resta la Armadura mágica y no se multiplica con el crítico)</label>` : ''}
           ${/^drena(r)?\s+vida$/i.test(String(ef.nombre || '').trim()) ? `<label class="aa-ancho" style="display:flex;gap:6px;align-items:center;font-size:12.5px">Drena el <input data-aa-golpe="${i}" data-campo="drenaPct" type="number" min="1" max="100" step="5" value="${e(ef.drenaPct || 50)}" style="max-width:70px"> % de la vida que le saca de verdad (lo que frena la armadura no cuenta)</label>` : ''}
           <div class="aa-regla">${eg && x.nombre ? e(eg.reglaTxt(x)) + (x.seguroCritico && x.caras > 1 ? ' Con un crítico, entra seguro.' : '') + (x.dado ? ` Si entra, se tira además ${e(x.dado)}.` : '') : ''}</div>
         </div>`;
       }).join('')) + `<div class="aa-opciones">
-        ${['Envenenar', 'Sangrado', 'Lisiado', 'Drena vida', 'Rompe armadura'].map(t => `<button type="button" class="aa-op" data-aa-golpeadd="${t}">+ ${t}</button>`).join('')}
+        ${['Envenenar', 'Sangrado', 'Lisiado', 'Rengo', 'Drena vida', 'Rompe armadura'].map(t => `<button type="button" class="aa-op" data-aa-golpeadd="${t}">+ ${t}</button>`).join('')}
         <button type="button" class="aa-op" data-aa-golpeadd="">+ Otro efecto</button></div>`;
       h += efecto(d.efectosGolpe.length && eg
         ? `Al tirar el Daño: ${e(eg.resumenLista(d.efectosGolpe)) || '(poné el nombre de cada efecto)'}. ${d.efectosGolpe.some(x => !eg.siempre(eg.normalizar(x))) ? 'Los que tienen porcentaje abren el pop-up para tirar: 50% es una moneda (2 = éxito), 25% un d4 (4 = éxito), y así.' : 'Salen como recordatorio en la Mesa, sin tirar.'}`
@@ -495,6 +503,8 @@ const AsistenteItem = (() => {
           + fila('Daño', e(danoTxt(d))) + fila('Atacar', `${primer(tipo)} No2 el primero, ${tipo} los siguientes`)
           + (modVal(d, 'rng') ? fila(d.armaDeRango ? 'Rango' : 'Alcance', `+${f(modVal(d, 'rng'))}`) : '')
           + (n(d.ignoraResistCrit) > 0 ? fila('Ignora', `${f(n(d.ignoraResistCrit))} de Resistencia a crítico`) : '')
+          + ([d.sinParry ? 'no se puede parrear' : '', d.oporGratis ? 'oportunidad sin No2' : '', n(d.ahorroNitros) ? `primer ataque −${f(n(d.ahorroNitros))} No2` : '', n(d.critD20) ? `+${f(n(d.critD20))} d20 en el crítico` : ''].filter(Boolean).length
+            ? fila('Firma', e([d.sinParry ? 'no se puede parrear' : '', d.oporGratis ? 'oportunidad sin No2' : '', n(d.ahorroNitros) ? `primer ataque −${f(n(d.ahorroNitros))} No2` : '', n(d.critD20) ? `+${f(n(d.critD20))} d20 en el crítico` : ''].filter(Boolean).join(' · '))) : '')
           + (!d.armaDeRango && espaldaTxt(d.espalda) ? fila('Por la espalda', e(espaldaTxt(d.espalda) + ' (en sigilo)')) : '')
           + fila('Al golpear', e((eg && eg.resumenLista(d.efectosGolpe)) || 'nada')) : ''}
         ${g === 'defensa' ? fila('Defensa', f(modVal(d, 'def'))) + fila('Res. crítico', e(CRIT_IDS.filter(id => modVal(d, id)).map(id => `T${CRIT_TIPO[id]} +${f(modVal(d, id))}`).join(', ') || 'ninguna')) : ''}
@@ -610,7 +620,7 @@ const AsistenteItem = (() => {
 
   // «+2 PdG, +1 de daño» (el bono por la espalda de un arma).
   const espaldaTxt = es => es ? [n(es.pdg) ? `+${f(n(es.pdg))} PdG` : '', n(es.fijo) ? `+${f(n(es.fijo))} de daño` : '', n(es.critpot) ? `+${f(n(es.critpot))} Crítico potente` : ''].filter(Boolean).join(', ') : '';
-  const NUMERICOS = ['peso', 'danoFijo', 'danoAmplificado', 'ignoraResistCrit', 'precioCompra', 'ranuras', 'equipoEstadoHpTurno', 'durPorPeso'];
+  const NUMERICOS = ['peso', 'danoFijo', 'danoAmplificado', 'ignoraResistCrit', 'ahorroNitros', 'critD20', 'precioCompra', 'ranuras', 'equipoEstadoHpTurno', 'durPorPeso'];
   function alEscribir(ev){
     if(!st) return;
     const t = ev.target, d = st.d;
@@ -626,6 +636,7 @@ const AsistenteItem = (() => {
       if(c === 'precioCompra') poner('aa-precio', precioHtml());
     }
     if(t.dataset.aaMod1) setMod(d, t.dataset.aaMod1, n(t.value));
+    if(t.dataset.aaFirma){ if(t.checked) d[t.dataset.aaFirma] = true; else delete d[t.dataset.aaFirma]; }
     if(t.dataset.aaEsp) d.espalda = {...(d.espalda || {}), [t.dataset.aaEsp]: Math.max(0, Math.round(n(t.value)))};
     if(t.dataset.aaModstat !== undefined) d.mods[n(t.dataset.aaModstat)].stat = t.value;
     if(t.dataset.aaModval !== undefined) d.mods[n(t.dataset.aaModval)].val = n(t.value);
@@ -634,7 +645,7 @@ const AsistenteItem = (() => {
       if(t.dataset.campo === 'prob'){
         const [caras, exitos] = t.value.split('/').map(n);
         ef.caras = caras; ef.exitos = exitos;
-      }else if(t.dataset.campo === 'seguroCritico' || t.dataset.campo === 'soloCritico'){
+      }else if(t.dataset.campo === 'seguroCritico' || t.dataset.campo === 'soloCritico' || t.dataset.campo === 'danoMagico'){
         if(t.checked) ef[t.dataset.campo] = true; else delete ef[t.dataset.campo];
       }else{
         ef[t.dataset.campo] = t.value;
@@ -648,7 +659,7 @@ const AsistenteItem = (() => {
     alEscribir(ev);
     if(t.dataset.aaDestino){ st.destino = t.value; dibujar(); return; }
     // La regla de cada efecto y la lista de resistencias dependen de lo elegido.
-    if((t.dataset.aaGolpe !== undefined && (t.dataset.campo === 'prob' || t.dataset.campo === 'seguroCritico' || t.dataset.campo === 'soloCritico' || t.dataset.campo === 'nombre')) || (t.dataset.aaMod1 && CRIT_IDS.includes(t.dataset.aaMod1))){
+    if((t.dataset.aaGolpe !== undefined && (t.dataset.campo === 'prob' || t.dataset.campo === 'seguroCritico' || t.dataset.campo === 'soloCritico' || t.dataset.campo === 'danoMagico' || t.dataset.campo === 'nombre' || t.dataset.campo === 'dado')) || (t.dataset.aaMod1 && CRIT_IDS.includes(t.dataset.aaMod1))){
       setTimeout(() => { if(st) dibujar(); }, 0);
       return;
     }
@@ -673,9 +684,11 @@ const AsistenteItem = (() => {
       ['pdg', 'fijo', 'critpot'].forEach(k => { if(n(es[k]) > 0) eo[k] = Math.round(n(es[k])); });
       if(d.armaDeRango || !Object.keys(eo).length) delete d.espalda; else d.espalda = eo;
       if(n(d.ignoraResistCrit) > 0) d.ignoraResistCrit = Math.round(n(d.ignoraResistCrit)); else delete d.ignoraResistCrit;
+      ['ahorroNitros', 'critD20'].forEach(k => { if(n(d[k]) > 0) d[k] = Math.round(n(d[k])); else delete d[k]; });
+      ['sinParry', 'oporGratis'].forEach(k => { if(d[k]) d[k] = true; else delete d[k]; });
     }else{
       // Lo que es solo de armas no viaja en el resto.
-      delete d.efectosGolpe; delete d.tipoDado; delete d.danoFijo; delete d.danoAmplificado; delete d.armaDeRango; delete d.espalda; delete d.ignoraResistCrit;
+      delete d.efectosGolpe; delete d.tipoDado; delete d.danoFijo; delete d.danoAmplificado; delete d.armaDeRango; delete d.espalda; delete d.ignoraResistCrit; delete d.sinParry; delete d.oporGratis; delete d.ahorroNitros; delete d.critD20;
     }
     // Durabilidad: solo se guarda si no es la de siempre (3 por Peso) y el ítem la tiene.
     if(!DURABLE(d) || !(n(d.durPorPeso) > 0) || n(d.durPorPeso) === 3) delete d.durPorPeso;

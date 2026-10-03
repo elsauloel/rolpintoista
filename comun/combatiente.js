@@ -173,6 +173,35 @@ const Combatiente = (() => {
      efecto al golpear «Ignora N de Res. crítico», que no se aplicaba solo). El duelo se lo resta a la Resistencia del defensor antes de
      calcular el crítico (lo pide al atacante con statsCritico). `arma` = {ignoraResistCrit, efectosGolpe} (un creep o una invocación: sus
      campos armaIgnoraResistCrit / armaEfectos). */
+  /* Rasgos de un arma (2026-10-03, mecánicas de firma): lo que el arma cambia en CÓMO se ataca —no el daño ni los efectos al golpear—.
+     espalda {pdg, fijo, critpot} · ignoraResistCrit N · sinParry (no se puede parrear) · oporGratis (el ataque de oportunidad no cuesta No2) ·
+     ahorroNitros N (el primer ataque del turno con ella cuesta N menos) · critD20 N (N d20 más al tirar el crítico). Un ítem los lleva sueltos; un
+     creep o una invocación, en `armaRasgos` (los campos viejos armaEspalda / armaIgnoraResistCrit también cuentan). */
+  const RASGOS_ARMA = ['espalda', 'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20'];
+  function rasgosDeItem(it){
+    const o = {};
+    if(!it) return o;
+    RASGOS_ARMA.forEach(k => { const v = it[k]; if(v && (typeof v !== 'object' || Object.keys(v).length)) o[k] = typeof v === 'object' ? structuredClone(v) : v; });
+    return o;
+  }
+  // El arma de un creep o de una invocación (sus campos arma*), en la forma de un ítem: Tipo, efectos al golpear y rasgos.
+  function armaDeCombatiente(x){
+    if(!x) return null;
+    const r = {...(x.armaRasgos || {})};
+    if(x.armaEspalda && !r.espalda) r.espalda = x.armaEspalda;
+    if(n(x.armaIgnoraResistCrit) && !r.ignoraResistCrit) r.ignoraResistCrit = n(x.armaIgnoraResistCrit);
+    return {nombre: x.armaNombre || '', tipoDado: n(x.armaTipo) || 8, efectosGolpe: x.armaEfectos || [], ...r};
+  }
+  // Lo que el ataque lleva al duelo por su arma: el bono por la espalda y «no se puede parrear».
+  function ataqueDeArma(arma){
+    const o = {};
+    if(arma && arma.espalda) o.espalda = arma.espalda;
+    if(arma && arma.sinParry) o.sinParry = true;
+    return o;
+  }
+  // Costos con los rasgos: el primer ataque del turno con el arma (ahorroNitros) y el ataque de oportunidad (oporGratis).
+  const costoConAhorro = (costo, arma, previos) => Math.max(0, costo - (n(previos) === 0 ? n(arma && arma.ahorroNitros) : 0));
+  const costoEspecial = (tipoDado, arma, tipo) => tipo === 'oportunidad' && arma && arma.oporGratis ? 0 : costoPrimerAtaque(tipoDado);
   const RE_IGNORA_CRIT = /^ignora\s+(\d+)\s+de\s+res/i;
   const esEfectoIgnora = e => RE_IGNORA_CRIT.test(String((e && e.nombre) || '').trim());
   function ignoraResistCritArma(arma){
@@ -187,7 +216,7 @@ const Combatiente = (() => {
     const b = (tipo, txt) => `<button class="btn" ${o.attr}="${tipo}:${e(o.ref)}" style="width:100%">${txt}</button>`;
     return `<div class="hint">${e(o.nombre)}</div>
     ${b('normal', `⚔ Ataque normal — ${n(o.normal)} No2<br><span class="hint">${o.primero ? (o.primeroTxt || 'primer ataque del turno (Tipo ÷ 2)') : (o.siguienteTxt || 'Tipo completo (ya atacó este turno)')}</span>`)}
-    ${b('oportunidad', `🏃 Ataque de oportunidad — ${n(o.especial)} No2<br><span class="hint">siempre Tipo ÷ 2; no suma al conteo de ataques</span>`)}
+    ${b('oportunidad', `🏃 Ataque de oportunidad — ${n(o.especialOpor ?? o.especial)} No2<br><span class="hint">${o.especialOpor === 0 ? 'gratis con esta arma' : 'siempre Tipo ÷ 2'}; no suma al conteo de ataques</span>`)}
     ${b('contra', `↩ Contraataque — ${n(o.especial)} No2<br><span class="hint">solo tras ganar un Parry y un Bloqueo; siempre Tipo ÷ 2; no suma al conteo de ataques</span>`)}`;
   }
   function costoAtaque(tipo, ataquesPrevios){ return n(ataquesPrevios) === 0 ? costoPrimerAtaque(tipo) : n(tipo); }
@@ -326,6 +355,7 @@ const Combatiente = (() => {
     if(Array.isArray(s.mods) && s.mods.length) base.mods = s.mods.map(m => ({stat: m.stat, val: n(m.val)}));
     if(n(s.hp)) base[campoHp || 'hpTurno'] = n(s.hp);
     if(n(s.stacks) && base.esVeneno && !base.permanente){ base.stacks = n(s.stacks); base.turnos = base.stacks; }
+    if(n(s.stacks) && base.esSangrado) base.stacks = n(s.stacks);   // un arma que deja Sangrado con más stacks (2026-10-03)
     if(n(s.escudoMagico)) base.escudoMagico = n(s.escudoMagico);
     if(s.detalle) base.detalle = s.detalle;
     return base;
@@ -512,7 +542,7 @@ const Combatiente = (() => {
     const ESP = {pdg: 'espaldaPdg', fijo: 'espaldaFijo', critpot: 'espaldaCritpot'};
     const esp = Object.keys(ESP).reduce((acc, k) => { const v = nf(arma.espalda && arma.espalda[k]) + nf(a[ESP[k]]); if(v > 0) acc[k] = v; return acc; }, {});
     return {tipo: 'habilidad-arma', habNombre: h.nombre, armaId: arma.id || '', armaNombre: arma.nombre || '', tipoDado: arma.tipoDado, rango: !!arma.rango,
-      alcance: o.alcance, sinParry: !!a.sinParry, ...(Object.keys(esp).length ? {espalda: esp} : {}),
+      alcance: o.alcance, sinParry: !!a.sinParry || !!arma.sinParry, ...(Object.keys(esp).length ? {espalda: esp} : {}),
       mods: {pdg: nf(a.pdg) + nf(a.pdgPorX) * X, dados: nf(a.dadosPorX) * X, fijo: nf(a.fijo) + nf(a.fijoPorX) * X, ignoraResistCrit: nf(a.ignoraResistCrit), critBono: nf(a.critBono), critpotBono: nf(a.critpotBono)},
       efectos: (c.efectos || []).map(mapEf),
       ...(c.efectosNota ? {efectosNota: sx(c.efectosNota)} : {}),
@@ -570,7 +600,7 @@ const Combatiente = (() => {
     return v;
   }
 
-  return {ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+  return {ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

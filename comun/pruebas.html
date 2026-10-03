@@ -2102,6 +2102,34 @@ prueba('armas: el efecto «solo si es crítico» entra solo con crítico; «Dren
   }finally{ Object.assign(window, antes); }
 }); fbFalsoCola = pp.catch(() => {}); return pp; });
 
+prueba('firmas de arma: costos (primer ataque −N, oportunidad gratis), sin Parry al duelo, Rengo y Sangrado con stacks, +d20 en el crítico', () => {
+  const arma = {id: 'a', nombre: 'Daga del almirante', tipoItem: 'arma_1m', tipoDado: 4, peso: 1, ahorroNitros: 1, oporGratis: true, sinParry: true, critD20: 1, equipado: true};
+  const S = {ataquesArma: {}};
+  const sc = CreepCalculo.normalizar({id: 'c', nombre: 'Orco', nivel: 1, armaTipo: 6, nitros: 10, armaRasgos: {ahorroNitros: 1, oporGratis: true}});
+  const m = {pdg: {total: 15}, eva: {total: 3}, ataque: {tipoDado: 4, mods: {}}, critDatos: {frecuente: 0, potente: 0, resistencia: 0, d20: 1}};
+  Duelo.entrarCritico(m);
+  const sin = {pdg: {total: 15}, eva: {total: 3}, ataque: {tipoDado: 4, mods: {}}, critDatos: {frecuente: 0, potente: 0, resistencia: 0}};
+  Duelo.entrarCritico(sin);
+  igual([FichaCombate.costoAtaque(S, arma), FichaCombate.costoAtaqueEspecial(arma, 'oportunidad'), FichaCombate.costoAtaqueEspecial(arma, 'contra'),
+    CreepCalculo.costoAtaque(sc), CreepCalculo.costoOportunidad(sc), Combatiente.ataqueDeArma(arma), Duelo.specDeEfecto({nombre: 'Rengo'}), Duelo.specDeEfecto({nombre: 'Sangrado', stacks: 3}),
+    EstadosAplicar.componer({nombre: 'Sangrado', stacks: 3}).stacks, m.crit.dados - sin.crit.dados, ItemCorto.armaEsencial(arma)],
+    [1, 0, 2, 3, 0, {sinParry: true}, {nombre: 'Rengo'}, {nombre: 'Sangrado', stacks: 3}, 3, 1, 'Tipo 4 · 1 dado · No se puede parrear · Oportunidad sin No2 · Primer ataque −1 No2 · +1 d20 en el crítico']);
+});
+prueba('daño mágico de un arma: se tira al guardar el daño, aparte, y no queda como efecto al golpear', () => { const pp = fbFalsoCola.then(async () => {
+  const docs = {};
+  const tx = {get: async r => ({exists: !!docs[r.id], data: () => docs[r.id]}), update: (r, c) => { docs[r.id] = {...docs[r.id], ...c}; }};
+  const antes = {fbDb: window.fbDb, fbRutaCampana: window.fbRutaCampana};
+  window.fbDb = {collection: () => ({doc: id => ({id})}), runTransaction: fn => fn(tx)}; window.fbRutaCampana = p => p;
+  try{
+    docs.x = {estado: 'esperando', fase: 'dano', dano: null, atacante: {nombre: 'A'}, defensor: {nombre: 'B'}, ataque: {}, crit: null};
+    await Duelo.guardarDano('x', {total: 5, formula: '3d4', rolls: [5]}, [{nombre: 'Rayo', caras: 1, exitos: 1, dado: '1d4', danoMagico: true}, {nombre: 'Lisiado', caras: 2, exitos: 1}]);
+    const mg = docs.x.dano.magico;
+    igual([docs.x.efectos.map(e => e.nombre), mg.tipo, mg.total >= 1 && mg.total <= 4, docs.x.dano.crudo,
+      ItemCorto.armaEsencial({tipoItem: 'arma_2m', tipoDado: 4, peso: 3, efectosGolpe: [{nombre: 'Rayo', caras: 1, exitos: 1, dado: '1d4', danoMagico: true}]})],
+      [['Lisiado'], 'Rayo', true, 5, 'Tipo 4 · 2 manos · 3 dados · +1d4 de rayo']);
+  }finally{ Object.assign(window, antes); }
+}); fbFalsoCola = pp.catch(() => {}); return pp; });
+
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {
 const malas = resultados.filter(r => !r.ok);

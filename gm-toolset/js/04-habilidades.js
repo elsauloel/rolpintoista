@@ -346,8 +346,7 @@ function equiparItemEnCreep(idx){
     sc.armaFijo = item.danoFijo;
     sc.armaAmplificado = num(item.danoAmplificado);
     sc.armaDeRango = !!item.armaDeRango;
-    if(item.espalda) sc.armaEspalda = structuredClone(item.espalda); else delete sc.armaEspalda;   // por la espalda
-    if(num(item.ignoraResistCrit) > 0) sc.armaIgnoraResistCrit = num(item.ignoraResistCrit); else delete sc.armaIgnoraResistCrit;
+    sc.armaRasgos = Combatiente.rasgosDeItem(item); delete sc.armaEspalda; delete sc.armaIgnoraResistCrit;   // los rasgos del arma (comun/combatiente.js)
     sc.armaNombre = item.nombre;
     sc.armaDetalle = item.detalle || '';
     sc.armaMods = structuredClone(item.mods || []);

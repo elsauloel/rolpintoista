@@ -145,9 +145,9 @@ const costoAtaqueEspecial = FichaCombate.costoAtaqueEspecial;
 const NOMBRE_ATAQUE_ESPECIAL = FichaAcciones.NOMBRE_ATAQUE_ESPECIAL;
 function ataqueEspecialConArma(arma, tipo, forzar){ FichaAcciones.ataqueEspecialConArma(S, arma, tipo, forzar, combateUi); }   // comun/ficha-acciones.js
 function preguntarTipoAtaque(arma){
-  const costoNormal = costoAtaqueNitros(arma), primero = ataquesConArma(arma) === 0, especial = costoAtaqueEspecial(arma);
+  const costoNormal = costoAtaqueNitros(arma), primero = ataquesConArma(arma) === 0, especial = costoAtaqueEspecial(arma, 'contra'), especialOpor = costoAtaqueEspecial(arma, 'oportunidad');
   const id = arma ? arma.id : '';
-  $('#tipo-ataque-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: arma ? arma.nombre : 'Sin arma', normal: costoNormal, primero, especial, attr: 'data-tipoataque', ref: id, primeroTxt: 'primer ataque con esta arma (Tipo ÷ 2)', siguienteTxt: 'Tipo completo (ya atacaste con esta arma este turno)'});   // el menú común
+  $('#tipo-ataque-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: arma ? arma.nombre : 'Sin arma', normal: costoNormal, primero, especial, especialOpor, attr: 'data-tipoataque', ref: id, primeroTxt: 'primer ataque con esta arma (Tipo ÷ 2)', siguienteTxt: 'Tipo completo (ya atacaste con esta arma este turno)'});   // el menú común
   $('#scrim-tipo-ataque').classList.add('open');
 }
 $('#tipo-ataque-x').onclick = () => $('#scrim-tipo-ataque').classList.remove('open');
@@ -163,7 +163,7 @@ $('#tipo-ataque-lista').addEventListener('click', e => {
   // «Sin objetivo» deja el ataque suelto de siempre.
   if(typeof Duelo !== 'undefined' && Duelo.disponible() && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM){
     Duelo.elegirObjetivo({yo: {ref: fichaVivo.id, tipo: 'pj', nombre: (S.meta && S.meta.nombre) || 'Personaje'},
-      ataque: {tipo, armaId: arma ? arma.id : '', armaNombre: arma ? arma.nombre : '', tipoDado: tipoAtaque(arma), rango: !!(arma && arma.armaDeRango), alcance: alcanceDeArma(arma)}, suelto: hacer});
+      ataque: {tipo, armaId: arma ? arma.id : '', armaNombre: arma ? arma.nombre : '', tipoDado: tipoAtaque(arma), rango: !!(arma && arma.armaDeRango), alcance: alcanceDeArma(arma), ...Combatiente.ataqueDeArma(arma)}, suelto: hacer});
   }else hacer();
 });
 

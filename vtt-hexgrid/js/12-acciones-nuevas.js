@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002c', '../comun/creep-botonera.js?v=20261002bot', '../comun/creep-acciones.js?v=20261003tb', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261003ig'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002c', '../comun/creep-botonera.js?v=20261002bot', '../comun/creep-acciones.js?v=20261003fi', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261003fi'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -206,8 +206,8 @@ function acHooksDuelo(lado){
    hace el ataque suelto acá (cobra con modificarCreep y tira el PdG). Las tiradas que pide el duelo las sigue haciendo GM Tools
    en el marco (tanda 4). */
 function acPreguntarTipoAtaque(sc){
-  const normal = CreepCalculo.costoAtaque(sc), primero = num(sc.ataquesTurno) === 0, especial = CreepCalculo.costoContraataque(sc);
-  ac.raiz.querySelector('#ac-tipo-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: sc.nombre, normal, primero, especial, attr: 'data-ac-tipo', ref: sc.id});   // el menú común
+  const normal = CreepCalculo.costoAtaque(sc), primero = num(sc.ataquesTurno) === 0, especial = CreepCalculo.costoContraataque(sc), especialOpor = CreepCalculo.costoOportunidad(sc);
+  ac.raiz.querySelector('#ac-tipo-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: sc.nombre, normal, primero, especial, especialOpor, attr: 'data-ac-tipo', ref: sc.id});   // el menú común
   ac.raiz.querySelector('#ac-tipo-ataque').classList.add('open');
 }
 function acAtacar(tipo){
@@ -229,7 +229,7 @@ function acAtacar(tipo){
   };
   if(typeof Duelo === 'undefined' || !Duelo.disponible()){ hacer(); return; }
   acElegirObjetivo(sc, {tipo, armaId: '', armaNombre: sc.armaNombre || '', tipoDado: num(sc.armaTipo) || 8, rango: !!sc.armaDeRango, alcance: CreepCalculo.alcance(sc),
-    ...(sc.armaEspalda ? {espalda: sc.armaEspalda} : {})}, hacer);   // por la espalda (el bono de su arma)
+    ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(sc))}, hacer);   // los rasgos de su arma: por la espalda, sin Parry
 }
 // Elegir el objetivo (de un ataque o de una habilidad) con un clic en el token: mientras tanto las Acciones nuevas se esconden
 // (tapan el mapa); "Sin objetivo" o cancelar las vuelven a mostrar. `suelto`: lo que se hace sin objetivo.

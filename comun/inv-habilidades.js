@@ -52,7 +52,7 @@ const InvHabilidades = (() => {
   // «Ataque con mi arma, con arreglos» de una invocación (P134), con su arma y su alcance (o el que diga la habilidad).
   function ataqueDeHab(inv, h){
     const c = h && h.duelo;
-    return Combatiente.ataqueConArreglos(h, c, {arma: {id: '', nombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8, rango: !!inv.armaDeRango},
+    return Combatiente.ataqueConArreglos(h, c, {arma: {...Combatiente.armaDeCombatiente(inv), id: '', nombre: inv.armaNombre || '', rango: !!inv.armaDeRango},
       alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? alcanceHab(inv, c, 'pdg') : (inv.armaDeRango ? Math.max(1, Math.round(num(I().statValor(inv, 'rng')))) : 1)});
   }
   // El PdG del ataque con arreglos, con lo que le suma la habilidad (los No2 ya los cobró la habilidad).

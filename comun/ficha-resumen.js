@@ -79,6 +79,8 @@ const FichaResumen = (() => {
       muerto: {activo: !!(S.muerto && S.muerto.activo), turnos: num(S.muerto && S.muerto.turnos), definitivo: !!(S.muerto && S.muerto.definitivo)},   // el mapa tiñe de rojo la pantalla de su jugador y le da el botón Revivir
       esp: n(c.final.esp),   // Especial
       resmg: n(c.final.resmg),   // Res.Esp (2026-09-28): el mapa la usa para tirar sola la resistencia de una zona persistente, sin que la ficha esté abierta
+      // Evasión, Fuerza, Res.CC y Res.Mt (2026-10-02): el mapa tira con esto la salvación de una trampa por quien la pisa.
+      eva: n(c.final.eva), fue: n(c.final.fue), rescc: n(c.final.rescc), resm: n(c.final.resm),
       percepcion: n(c.final.percepcion),   // Percepción (de Destreza, 2026-09-22): por si el mapa la necesita más adelante
       rng: n(c.final.rng),               // Rango (de Destreza): el mapa lo usa para el visualizador de rango (📏)
       rangocasteo: n(c.final.rangocasteo),   // Rango de casteo (de Especial): visualizador de rango mágico (🔮)

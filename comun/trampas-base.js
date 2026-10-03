@@ -20,46 +20,61 @@
   // (púas, cuchillas, derrumbes, gases, minas…) sí; lo mágico (arcano, relámpago, runas) distingue aliados de rivales. Los aliados NUNCA disparan una trampa.
   const FISICAS = new Set(['Trampa de oso', 'Foso con estacas', 'Red de caza', 'Brea pegajosa', 'Aceite resbaladizo', 'Dardos envenenados', 'Cuchillas de guadaña', 'Cable de alarma',
     'Arena movediza', 'Derrumbe', 'Nube de veneno', 'Gas somnífero', 'Bomba de esporas', 'Mina explosiva', 'Barril de pólvora']);
-  // Lo que hace además del daño y cómo se resiste, en datos (2026-10-02: la ficha corta del catálogo, comun/item-corto.js; a auditar).
-  // [efectoTxt, salvaTxt, efectoAuto]. Detectarla: 8 (una trampa común, P145).
+  // Lo que hace cada trampa, automatizado donde se puede (2026-10-02, regla del dueño: 3 turnos; Stun 1; Sentado y Sangrado no vencen solos).
+  // estado (+ estadoTurnos, estadoStacks, estadoHp): lo aplica el mapa solo al dispararse. efectoManual: lo que queda a mano. salvacion: la tira
+  // el mapa sola por quien la pisa ({stat, etq, dif, que: "todo" la evita entera, "efecto" evita el estado, "mitad" la mitad del daño}).
+  // detectar: 8, una trampa común (P145). Lo usan el mapa (comun/tokens-auto.js, js/08) y la ficha corta del catálogo (comun/item-corto.js).
   const FICHA_TRAMPAS = {
-    "Trampa de oso": ["Inmovilizado (para liberarse: 2 No2)", "Fuerza contra 8 para liberarse", false],
-    "Foso con estacas": ["Sentado (pararse cuesta 1 No2)", "Evasión contra 12 evita la caída", false],
-    "Red de caza": ["Inmovilizado 2 turnos (para liberarse: 2 No2)", "Fuerza contra 8 para liberarse", false],
-    "Brea pegajosa": ["Rengo 3 turnos (moverse cuesta 2 No2)", "", false],
-    "Aceite resbaladizo": ["Sentado y −2 Evasión hasta su próximo turno", "Evasión contra 8 para no caer", false],
-    "Dardos envenenados": ["Veneno ×3 (1 de daño por stack por turno)", "Evasión contra 10 los esquiva", false],
-    "Cuchillas de guadaña": ["Sangrado (2 HP por turno hasta curarse)", "Evasión contra 16 lo evita", false],
-    "Cable de alarma": ["Suena: alerta a los enemigos a 8 casillas y saca del sigilo a quien la toca", "", false],
-    "Arena movediza": ["Inmovilizado (salir cuesta 3 No2; 2 si gana Fuerza contra 8)", "Fuerza contra 8 para salir más barato", false],
-    "Derrumbe": ["Sentados", "Evasión contra 14: mitad de daño", false],
-    "Nube de veneno": ["Veneno ×2 a todos los de adentro", "Res.CC contra 12 lo evita", false],
-    "Gas somnífero": ["Exhausto 2 turnos (1 No2 como mucho)", "Res.CC contra 10 lo evita", false],
-    "Bomba de esporas": ["Veneno ×3", "Res.CC contra 14 evita el veneno", false],
-    "Mina explosiva": ["", "Evasión contra 12: mitad de daño", false],
-    "Barril de pólvora": ["Pajaritos hasta el final de su turno", "Evasión contra 14: mitad de daño", false],
-    "Llamarada": ["Quemadura: 1 de daño por turno, 3 turnos", "Evasión contra 10 evita la quemadura", false],
-    "Runa de silencio": ["No puede usar habilidades con SP 1 turno", "Res.Mt contra 12 lo evita", false],
-    "Runa de debilidad": ["−2 a todas las tiradas 2 turnos", "Res.Mt contra 10 lo evita", false],
-    "Niebla de confusión": ["Confusión 2 turnos (antes de cada acción tira 1d4)", "Res.Mt contra 12 la evita", false],
-    "Trampa de escarcha": ["Escarcha (−1 No2 máx.)", "Res.Esp contra 12 la evita", true],
-    "Descarga eléctrica": ["Stun 1 turno (sin No2)", "Res.CC contra 12 evita el Stun", false],
-    "Succión arcana": ["Drena 2d6 de SP (no hace daño)", "Res.Mt contra 12: la mitad", false],
-    "Espejo de discordia": ["Pajaritos 2 turnos y ve a sus aliados como enemigos", "Res.Mt contra 14 lo evita", false],
-    "Portal cósmico": ["Lo teletransporta a 10 casillas (elige el GM) y Pajaritos 1 turno", "Res.Mt contra 16 lo evita", false],
-    "Trampa de teleport": ["Lo teletransporta al destino que se marcó al colocarla", "", true]
+    "Trampa de oso": {"estado": "Inmovilizado", "estadoTurnos": 3, "efectoManual": "para liberarse: 2 No2 y Fuerza contra 8", "detectar": 8},
+    "Foso con estacas": {"estado": "Sentado", "estadoTurnos": 0, "efectoManual": "pararse cuesta 1 No2", "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 12, "que": "efecto"}, "detectar": 8},
+    "Red de caza": {"estado": "Inmovilizado", "estadoTurnos": 3, "efectoManual": "para liberarse: 2 No2 y Fuerza contra 8", "detectar": 8},
+    "Brea pegajosa": {"estado": "Rengo", "estadoTurnos": 3, "detectar": 8},
+    "Aceite resbaladizo": {"estado": "Sentado", "estadoTurnos": 0, "efectoManual": "−2 Evasión hasta su próximo turno", "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 8, "que": "efecto"}, "detectar": 8},
+    "Dardos envenenados": {"estado": "Veneno", "estadoTurnos": 0, "estadoStacks": 3, "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 10, "que": "todo"}, "detectar": 8},
+    "Cuchillas de guadaña": {"estado": "Sangrado", "estadoTurnos": 0, "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 16, "que": "todo"}, "detectar": 8},
+    "Cable de alarma": {"efectoManual": "suena: alerta a los enemigos a 8 casillas y saca del sigilo a quien la toca", "detectar": 8},
+    "Arena movediza": {"estado": "Inmovilizado", "estadoTurnos": 3, "efectoManual": "salir cuesta 3 No2 (2 si gana Fuerza contra 8)", "detectar": 8},
+    "Derrumbe": {"estado": "Sentado", "estadoTurnos": 0, "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 14, "que": "mitad"}, "detectar": 8},
+    "Nube de veneno": {"estado": "Veneno", "estadoTurnos": 0, "estadoStacks": 2, "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 12, "que": "efecto"}, "detectar": 8},
+    "Gas somnífero": {"estado": "Exhausto", "estadoTurnos": 3, "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 10, "que": "efecto"}, "detectar": 8},
+    "Bomba de esporas": {"estado": "Veneno", "estadoTurnos": 0, "estadoStacks": 3, "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 14, "que": "efecto"}, "detectar": 8},
+    "Mina explosiva": {"salvacion": {"stat": "eva", "etq": "Evasión", "dif": 12, "que": "mitad"}, "detectar": 8},
+    "Barril de pólvora": {"estado": "Pajaritos", "estadoTurnos": 3, "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 14, "que": "mitad"}, "detectar": 8},
+    "Llamarada": {"estado": "Quemadura", "estadoTurnos": 3, "estadoHp": -1, "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 10, "que": "efecto"}, "detectar": 8},
+    "Runa de silencio": {"efectoManual": "no puede usar habilidades con SP 1 turno", "salvacion": {"stat": "resm", "etq": "Res.Mt", "dif": 12, "que": "efecto"}, "detectar": 8},
+    "Runa de debilidad": {"efectoManual": "−2 a todas las tiradas 3 turnos", "salvacion": {"stat": "resm", "etq": "Res.Mt", "dif": 10, "que": "efecto"}, "detectar": 8},
+    "Niebla de confusión": {"efectoManual": "Confusión 3 turnos: antes de cada acción tira 1d4 (1 elige el GM, 2 pierde la acción, 3 al azar, 4 normal)", "salvacion": {"stat": "resm", "etq": "Res.Mt", "dif": 12, "que": "efecto"}, "detectar": 8},
+    "Trampa de escarcha": {"estado": "Escarcha", "estadoTurnos": 3, "salvacion": {"stat": "resmg", "etq": "Res.Esp", "dif": 12, "que": "efecto"}, "detectar": 8},
+    "Descarga eléctrica": {"estado": "Stun", "estadoTurnos": 1, "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 12, "que": "efecto"}, "detectar": 8},
+    "Succión arcana": {"efectoManual": "drena 2d6 de SP (la mitad si resiste)", "salvacion": {"stat": "resm", "etq": "Res.Mt", "dif": 12, "que": "efecto"}, "detectar": 8},
+    "Espejo de discordia": {"estado": "Pajaritos", "estadoTurnos": 3, "efectoManual": "ve a sus aliados como enemigos hasta su próximo turno", "salvacion": {"stat": "resm", "etq": "Res.Mt", "dif": 14, "que": "efecto"}, "detectar": 8},
+    "Portal cósmico": {"estado": "Pajaritos", "estadoTurnos": 3, "efectoManual": "lo teletransporta a 10 casillas (elige el GM)", "salvacion": {"stat": "resm", "etq": "Res.Mt", "dif": 16, "que": "efecto"}, "detectar": 8},
+    "Trampa de teleport": {"detectar": 8}
   };
-  const ficha = nombre => { const f = FICHA_TRAMPAS[nombre]; return f ? {efectoTxt: f[0], salvaTxt: f[1], ...(f[2] ? {efectoAuto: true} : {}), detectar: 8} : {detectar: 8}; };
+  const ficha = nombre => FICHA_TRAMPAS[nombre] ? JSON.parse(JSON.stringify(FICHA_TRAMPAS[nombre])) : {detectar: 8};
+  // Lo que hace, en palabras, a partir de sus datos (2026-10-02): lo automático y lo que queda a mano (igual que herramientas/generar_trampas_consumibles.py).
+  const QUE = {todo: 'la evita', efecto: 'evita el efecto', mitad: 'le saca la mitad del daño'};
+  function textoDe(f, dano, ignoraDef){
+    const p = [];
+    const est = f.estado ? `${f.estado}${f.estadoStacks ? ' ×' + f.estadoStacks : ''}${f.estadoHp ? ` (${-f.estadoHp} de daño por turno)` : ''}${f.estadoTurnos ? ' ' + f.estadoTurnos + ' turnos' : ''}` : '';
+    const partes = [dano ? `${dano} de daño${ignoraDef ? ' directo' : ''}` : '', est].filter(Boolean);
+    if(partes.length) p.push(partes.join(' y ') + ' (automático).');
+    if(f.salvacion) p.push(`${f.salvacion.etq} contra ${f.salvacion.dif} ${QUE[f.salvacion.que] || 'la evita'} (automático).`);
+    if(f.efectoManual) p.push(f.efectoManual[0].toUpperCase() + f.efectoManual.slice(1) + ' (a mano).');
+    return p.join(' ') || 'Solo avisa en la Mesa cuando se dispara.';
+  }
   function tr(nombre, nivel, etiquetas, tipo, tamano, color, dano, detalle, amiga, ignoraDef, estado){
     amiga = amiga || FISICAS.has(nombre);
+    const f = ficha(nombre);
+    detalle = textoDe(f, dano, ignoraDef);   // (el texto que se escribía a mano en cada trampa quedó superado por los datos)
     const auto = dano
       ? `tira ${dano} de daño y se lo aplica a quien la activa (${ignoraDef ? 'directo a la vida: ignora su Defensa' : 'restando su Defensa'})${tamano > 1 && tipo === 'flor' ? '; en el área, también a los creeps si mueve el GM, y a los demás se les avisa en la Mesa' : ''}`
       : 'solo avisa en la Mesa cuando se dispara';
     lista.push({
       poolId: 'trampa-' + slug(nombre), nombre, nivel,
       etiquetas: [...etiquetas, 'nivel ' + nivel, 'auditar'],
-      detalle: `${AVISO} ${detalle}${amiga ? ' Fuego amigo: su efecto también alcanza a los aliados que estén en el área.' : ''} ⚙ Automático: ${auto}${estado ? `; deja el estado ${estado.nombre} (los turnos los elegís al colocarla)` : ''}. ✋ A mano: estados, tiradas para evitarla y todo lo demás que dice el texto.`,
-      datos: {nombre, detalle, amiga: !!amiga, tipo, tamano, color, alfa: 45, dano, ...(ignoraDef ? {ignoraDef: true} : {}), ...(estado ? {estado: estado.nombre, estadoTurnos: estado.turnos} : {}), ...ficha(nombre)},
+      detalle: `${AVISO} ${detalle}${amiga ? ' Fuego amigo: su efecto también alcanza a los aliados que estén en el área.' : ''} ⚙ Automático: al dispararse tira el daño y la salvación de cada uno y le deja el estado; el afectado recibe el Aviso y la mesa lo ve en la Crónica.${f.efectoManual ? ` ✋ A mano: ${f.efectoManual}.` : ''}`,
+      datos: {nombre, detalle, amiga: !!amiga, tipo, tamano, color, alfa: 45, dano, ...(ignoraDef ? {ignoraDef: true} : {}), ...f},
     });
   }
 

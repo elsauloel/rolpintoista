@@ -94,7 +94,8 @@ const AsistenteTrampa = (() => {
       aplicaEstado: !!ini.estado, estado: ini.estado || '', estadoTurnos: num(ini.estadoTurnos) || 0,
       estadoPropio: ini.estado || '', estadoMods: Array.isArray(ini.estadoMods) ? ini.estadoMods : null,   // un estado propio (fuera de la lista) que ya traía
       estadoStacks: num(ini.estadoStacks) || 0, estadoDeStacks: ini.estado || '',   // los stacks que ya traía (Veneno, Sangrado): se conservan si no cambia el estado
-      seEvita: !!(ini.salvacion && ini.salvacion.stat), salStat: (ini.salvacion && ini.salvacion.stat) || 'Evasión', salDif: (ini.salvacion && ini.salvacion.dif) || 10,
+      seEvita: !!(ini.salvacion && ini.salvacion.stat), salStat: (ini.salvacion && (ini.salvacion.etq || ini.salvacion.stat)) || 'Evasión', salDif: (ini.salvacion && ini.salvacion.dif) || 10,
+      salQue: (ini.salvacion && ini.salvacion.que) || 'todo',   // qué evita: 'todo' | 'efecto' (el estado) | 'mitad' (la mitad del daño)
       dura: num(ini.turnos) > 0, turnos: num(ini.turnos) || 3,
       teleport: !!ini.teleport,
       // Trampa persistente (2026-09-28, pedido del dueño): al dispararse, además de su efecto de siempre, queda
@@ -123,7 +124,7 @@ const AsistenteTrampa = (() => {
       if(est.aplicaEstado && preset()){ const d = durEstado(); f.push(`Deja el estado ${preset().nombre}${preset().permanente ? ' (no vence solo)' : ` durante ${d} turno${d === 1 ? '' : 's'}`}`); }
       if(est.dejaZona) f.push(`Al dispararse queda ${est.zonaTurnos} turno${est.zonaTurnos === 1 ? '' : 's'} como zona con el mismo efecto${est.zonaSeResiste ? ` (se resiste con ${(ZSTATS.find(s => s[0] === est.zonaResistStat) || [])[1]} contra ${est.zonaResistValor})` : ''}`);
       if(est.teleport && !deHab) f.push('Teletransporta a quien la pisa a otro punto del mapa (el destino se elige en el mapa)');
-      if(est.seEvita) f.push(`Se evita con ${est.salStat} contra ${est.salDif} (a mano)`);
+      if(est.seEvita) f.push(`${est.salStat} contra ${est.salDif} ${est.salQue === 'mitad' ? 'le saca la mitad del daño' : est.salQue === 'efecto' ? 'evita el efecto' : 'la evita'} (la tira el mapa solo)`);
       f.push(deHab ? `Para detectarla: Percepción contra ${est.detectarStat === 'dmgesp' ? 'el Efecto especial' : 'la Destreza'} de quien la coloca` : `Para detectarla: Percepción contra ${est.detectar}`);
       if(!f.length) f.push('No hace daño ni deja estados: solo avisa en la Mesa cuando se activa');
       return f;
@@ -238,10 +239,13 @@ const AsistenteTrampa = (() => {
       }
       if(id === 'evita'){
         return `<div class="at-preg">¿Se puede evitar con una tirada?</div>
-          <p class="at-ayuda">Solo queda escrito en la descripción para que la mesa la resuelva a mano (la tirada no es automática).</p>
-          <label class="at-sin"><input type="checkbox" id="at-seEvita"${est.seEvita ? ' checked' : ''}> Sí: quien la activa puede tirar algo para evitarla</label>
+          <p class="at-ayuda">La tira el mapa solo, por quien la pisa (y por cada uno del área), con su stat: si llega a la dificultad, se salva de lo que elijas acá. Sale en la Mesa y en el Aviso.</p>
+          <label class="at-sin"><input type="checkbox" id="at-seEvita"${est.seEvita ? ' checked' : ''}> Sí: quien la activa tira algo para evitarla</label>
           ${est.seEvita ? `<div class="at-fila"><select id="at-salStat" style="flex:1.4">${SALVACIONES.map(s => `<option value="${s.id}"${est.salStat === s.id ? ' selected' : ''}>${s.texto}</option>`).join('')}</select>
-            <label>contra</label><input type="number" id="at-salDif" min="1" value="${esc(est.salDif)}" style="width:80px"></div>` : ''}`;
+            <label>contra</label><input type="number" id="at-salDif" min="1" value="${esc(est.salDif)}" style="width:80px"></div>
+            <div class="at-preg">Si la pasa…</div>
+            ${[['todo', 'La evita entera', 'Ni daño ni estado.'], ['efecto', 'Evita el efecto', 'El estado no le entra; el daño, sí.'], ['mitad', 'Recibe la mitad del daño', 'El estado le entra igual.']].map(([v, t, d]) =>
+              `<button type="button" class="at-op${est.salQue === v ? ' on' : ''}" data-sal-que="${v}"><span><b>${t}</b><small>${d}</small></span></button>`).join('')}` : ''}`;
       }
       if(id === 'detecta'){
         return deHab
@@ -278,7 +282,7 @@ const AsistenteTrampa = (() => {
       estadoMods: est.aplicaEstado && est.estado === est.estadoPropio && est.estadoMods ? est.estadoMods : null,
       estadoStacks: est.aplicaEstado && est.estado === est.estadoDeStacks && est.estadoStacks ? est.estadoStacks : 0,
       teleport: !deHab && !!est.teleport,
-      salvacion: est.seEvita ? {stat: est.salStat, dif: est.salDif} : null,
+      salvacion: est.seEvita ? {stat: est.salStat, dif: est.salDif, que: est.salQue} : null,
       turnos: est.dura ? est.turnos : 0, guardar: !!est.guardar,
       dejaZona: !!est.dejaZona, zonaTurnos: est.zonaTurnos, zonaEnMant: est.zonaEnMant, zonaCadaPaso: est.zonaCadaPaso,
       zonaResistStat: est.zonaSeResiste ? est.zonaResistStat : '', zonaResistValor: est.zonaResistValor,
@@ -304,6 +308,7 @@ const AsistenteTrampa = (() => {
       if(d.estado){ est.estado = d.estado; est.estadoTurnos = 0; est.error = ''; dibujar(); return; }
       if(d.zonaEnMant !== undefined){ est.zonaEnMant = d.zonaEnMant === '1'; dibujar(); return; }
       if(d.zonaCadaPaso !== undefined){ est.zonaCadaPaso = d.zonaCadaPaso === '1'; dibujar(); return; }
+      if(d.salQue){ est.salQue = d.salQue; dibujar(); return; }
     };
     // Los campos se guardan al escribir (sin volver a dibujar, para no perder el foco).
     const alInput = e => {
@@ -364,7 +369,7 @@ const AsistenteTrampa = (() => {
       if(r.teleport) partes.push('teletransporta a quien la pisa');
       if(!partes.length) partes.push('solo avisa cuando se activa');
     }
-    if(r.salvacion) partes.push(`${r.salvacion.stat} contra ${r.salvacion.dif} la evita (a mano)`);
+    if(r.salvacion){ const s = r.salvacion, etq = s.etq || s.stat; partes.push(`${etq} contra ${s.dif} ${s.que === 'mitad' ? 'le saca la mitad del daño' : s.que === 'efecto' ? 'evita el efecto' : 'la evita'}`); }
     return (partes.join('. ') + '.').slice(0, 200);
   }
   // El resultado del asistente (contexto 'habilidad') en la forma única de trampa (comun/plantillas.js).
@@ -373,6 +378,7 @@ const AsistenteTrampa = (() => {
     return {nombre: String(r.nombre || '').trim().slice(0, 40), detalle: detalleFinal(r), amiga: !!r.amiga, ignoraDef: !r.contemplaArmadura, dano: r.dano || '',
       estado: r.estado || '', estadoTurnos: r.estado ? Math.max(0, num(r.estadoTurnos)) : 0, ...(r.estado && r.estadoMods ? {estadoMods: r.estadoMods} : {}),
       ...(r.estado && num(r.estadoStacks) > 0 ? {estadoStacks: Math.min(20, Math.round(num(r.estadoStacks)))} : {}),
+      ...(r.salvacion && r.salvacion.stat ? {salvacion: {stat: r.salvacion.stat, dif: num(r.salvacion.dif), que: r.salvacion.que || 'todo'}} : {}),
       tipo: linea ? 'linea' : 'flor', tamano: linea ? Math.max(1, Math.min(20, num(r.largo) || 3)) : Math.max(0, Math.min(6, num(r.radio))),
       color: r.color, alfa: Number.isFinite(r.alfa) ? r.alfa : 45, ...(r.teleport ? {teleport: true} : {}),
       ...(r.dejaZona ? {dejaZona: true, zonaTurnos: Math.max(1, num(r.zonaTurnos) || 3), zonaEnMantenimiento: r.zonaEnMant !== false, zonaCadaPaso: !!r.zonaCadaPaso,
@@ -385,7 +391,7 @@ const AsistenteTrampa = (() => {
     const linea = t.tipo === 'linea';
     return {nombre: t.nombre || '', descripcion: t.detalle || '', forma: linea ? 'linea' : 'flor', radio: linea ? 0 : Math.max(0, num(t.tamano)), largo: linea ? num(t.tamano) || 3 : 3,
       cant: t.cant || 1, color: t.color, alfa: t.alfa, amiga: !!t.amiga, dano: t.dano || '', contemplaArmadura: !t.ignoraDef,
-      estado: t.estado || '', estadoTurnos: t.estadoTurnos || 0, estadoMods: t.estadoMods, estadoStacks: t.estadoStacks || 0, teleport: !!t.teleport,
+      estado: t.estado || '', estadoTurnos: t.estadoTurnos || 0, estadoMods: t.estadoMods, estadoStacks: t.estadoStacks || 0, teleport: !!t.teleport, salvacion: t.salvacion || null,
       dejaZona: !!t.dejaZona, zonaTurnos: t.zonaTurnos, zonaEnMant: t.zonaEnMantenimiento !== false, zonaCadaPaso: !!t.zonaCadaPaso,
       zonaResistStat: t.zonaResistStat || '', zonaResistValor: t.zonaResistValor, turnos: t.turnos || 0, detectar: t.detectar, detectarStat: t.detectarStat};
   }

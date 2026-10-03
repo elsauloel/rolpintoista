@@ -72,7 +72,8 @@ function momentoRecibido(id, d){
   // Si otra pantalla del GM ya lo resolvió, esta cierra su cartelito.
   if(deteccionBanner && deteccionBanner.id === id && d.estado === 'listo' && deteccionBanner.resultado === null){ deteccionBanner = null; renderDeteccionBanner(); }
   // Lo que me toca a mí (el jugador dueño, cuando el GM toma o devuelve el control de su personaje): al centro, no en la esquina.
-  if(d.datos && d.datos.paraUid && d.datos.paraUid === fbUsuario.uid && d.creadoPor !== fbUsuario.uid){ momentoAvisoCentro(id, d); return; }
+  // (datos.aviso: el Aviso de lo que le pasó, ej. una trampa — le llega aunque lo haya publicado su propia pantalla.)
+  if(d.datos && d.datos.paraUid && d.datos.paraUid === fbUsuario.uid && (d.creadoPor !== fbUsuario.uid || d.datos.aviso)){ momentoAvisoCentro(id, d); return; }
   // La esquina: todo, salvo lo que esta pantalla ya sigue al centro.
   const mio = d.creadoPor === fbUsuario.uid && d.datos && d.datos.centro;
   if(d.tipo === 'oportunidad' && oporSoyDecisor(d)){ momentosFeed.delete(id); renderMomentosFeed(); return; }   // lo decide esta pantalla, al centro

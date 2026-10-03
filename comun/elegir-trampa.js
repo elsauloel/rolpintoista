@@ -21,37 +21,37 @@ const ElegirTrampa = (() => {
   const CONCEPTOS = [
     {id: 'puas', icono: '🗡', nombre: 'Púas y estacas', idea: 'Un pozo o un piso de púas: daño físico a quien la pisa.', base: 'Foso con estacas',
       pasos: ['dano', 'extra', 'evita'], sugeridos: ['Sentado', 'Sangrado', 'Rengo'],
-      def: {forma: 'flor', radio: 0, dados: 3, caras: 6, armadura: true, estado: 'Sentado', estadoTurnos: 1, sal: ['Evasión', 12], color: '#5C4033', amiga: true, detectar: 'des'}},
+      def: {forma: 'flor', radio: 0, dados: 3, caras: 6, armadura: true, estado: 'Sentado', sal: ['Evasión', 12, 'efecto'], color: '#5C4033', amiga: true, detectar: 'des'}},
     {id: 'cepo', icono: '🪤', nombre: 'Cepo (trampa de oso)', idea: 'Mandíbulas de metal: daño y queda agarrado.', base: 'Trampa de oso',
       pasos: ['dano', 'estado', 'evita'], sugeridos: ['Inmovilizado', 'Rengo', 'Sangrado'],
-      def: {forma: 'flor', radio: 0, dados: 2, caras: 6, armadura: true, estado: 'Inmovilizado', estadoTurnos: 2, sal: null, color: '#8A8A8A', amiga: true, detectar: 'des'}},
+      def: {forma: 'flor', radio: 0, dados: 2, caras: 6, armadura: true, estado: 'Inmovilizado', estadoTurnos: 3, sal: null, color: '#8A8A8A', amiga: true, detectar: 'des'}},
     {id: 'red', icono: '🕸', nombre: 'Red', idea: 'Atrapa sin lastimar.', base: 'Red de caza',
       pasos: ['estado', 'evita'], sugeridos: ['Inmovilizado', 'Rengo'],
-      def: {forma: 'flor', radio: 1, dados: 0, estado: 'Inmovilizado', estadoTurnos: 1, sal: ['Evasión', 10], color: '#B5A642', amiga: true, detectar: 'des'}},
+      def: {forma: 'flor', radio: 1, dados: 0, estado: 'Inmovilizado', estadoTurnos: 3, sal: ['Evasión', 10, 'todo'], color: '#B5A642', amiga: true, detectar: 'des'}},
     {id: 'veneno', icono: '☠', nombre: 'Veneno', idea: 'Dardos o púas envenenadas: un pinchazo y el veneno sigue haciendo daño.', base: 'Dardos envenenados',
       pasos: ['dano', 'estado', 'evita'], sugeridos: ['Veneno', 'Veneno severo'],
-      def: {forma: 'linea', largo: 3, dados: 1, caras: 6, armadura: true, estado: 'Veneno', estadoStacks: 3, estadoTurnos: 3, sal: ['Evasión', 10], color: '#6B8E23', amiga: true, detectar: 'des'}},
+      def: {forma: 'linea', largo: 3, dados: 1, caras: 6, armadura: true, estado: 'Veneno', estadoStacks: 3, sal: ['Evasión', 10, 'todo'], color: '#6B8E23', amiga: true, detectar: 'des'}},
     {id: 'gas', icono: '☁', nombre: 'Gas', idea: 'Una nube que adormece, marea o envenena a los de adentro.', base: 'Gas somnífero',
       pasos: ['estado', 'evita'], sugeridos: ['Exhausto', 'Pajaritos', 'Veneno', 'Cansado'],
-      def: {forma: 'flor', radio: 2, dados: 0, estado: 'Exhausto', estadoTurnos: 2, sal: ['Res.CC', 10], color: '#8FBC8F', amiga: true, detectar: 'des'}},
+      def: {forma: 'flor', radio: 2, dados: 0, estado: 'Exhausto', estadoTurnos: 3, sal: ['Res.CC', 10, 'efecto'], color: '#8FBC8F', amiga: true, detectar: 'des'}},
     {id: 'explosiva', icono: '💥', nombre: 'Explosiva', idea: 'Una mina o un barril: mucho daño en área; la armadura no sirve.', base: 'Mina explosiva',
       pasos: ['dano', 'extra', 'evita'], sugeridos: ['Sentado', 'Pajaritos', 'Armadura rota'],
-      def: {forma: 'flor', radio: 2, dados: 3, caras: 6, armadura: false, estado: '', sal: ['Evasión', 12], color: '#D9531E', amiga: true, detectar: 'des'}},
+      def: {forma: 'flor', radio: 2, dados: 3, caras: 6, armadura: false, estado: '', sal: ['Evasión', 12, 'mitad'], color: '#D9531E', amiga: true, detectar: 'des'}},
     {id: 'fuego', icono: '🔥', nombre: 'Fuego', idea: 'Una llamarada al pisarla.', base: 'Llamarada',
       pasos: ['dano', 'extra', 'evita'], sugeridos: ['Pajaritos', 'Miedo'],
-      def: {forma: 'flor', radio: 1, dados: 2, caras: 6, armadura: false, estado: '', sal: ['Evasión', 10], color: '#E25822', amiga: true, detectar: 'des'}},
+      def: {forma: 'flor', radio: 1, dados: 2, caras: 6, armadura: false, estado: '', sal: ['Evasión', 10, 'efecto'], color: '#E25822', amiga: true, detectar: 'des'}},
     {id: 'hielo', icono: '❄', nombre: 'Hielo', idea: 'Escarcha repentina: daño y la deja lenta.', base: 'Trampa de escarcha',
       pasos: ['dano', 'estado', 'evita'], sugeridos: ['Escarcha', 'Rengo', 'Inmovilizado'],
-      def: {forma: 'flor', radio: 1, dados: 2, caras: 6, armadura: false, estado: 'Escarcha', estadoTurnos: 2, sal: ['Res.Esp', 10], color: '#7FB3D5', amiga: false, detectar: 'dmgesp'}},
+      def: {forma: 'flor', radio: 1, dados: 2, caras: 6, armadura: false, estado: 'Escarcha', estadoTurnos: 3, sal: ['Res.Esp', 10, 'efecto'], color: '#7FB3D5', amiga: false, detectar: 'dmgesp'}},
     {id: 'electrica', icono: '⚡', nombre: 'Eléctrica', idea: 'Una descarga: daño y la deja aturdida.', base: 'Descarga eléctrica',
       pasos: ['dano', 'estado', 'evita'], sugeridos: ['Stun', 'Parálisis', 'Pajaritos'],
-      def: {forma: 'flor', radio: 1, dados: 3, caras: 6, armadura: false, estado: 'Stun', estadoTurnos: 1, sal: ['Res.Esp', 12], color: '#E6D84A', amiga: false, detectar: 'dmgesp'}},
+      def: {forma: 'flor', radio: 1, dados: 3, caras: 6, armadura: false, estado: 'Stun', estadoTurnos: 1, sal: ['Res.CC', 12, 'efecto'], color: '#E6D84A', amiga: false, detectar: 'dmgesp'}},
     {id: 'pegajosa', icono: '🫗', nombre: 'Pegajosa o resbaladiza', idea: 'Brea o aceite: frena a quien la pisa.', base: 'Brea pegajosa',
       pasos: ['estado', 'evita'], sugeridos: ['Rengo', 'Sentado', 'Inmovilizado'],
-      def: {forma: 'flor', radio: 2, dados: 0, estado: 'Rengo', estadoTurnos: 2, sal: ['Evasión', 10], color: '#3A2A20', amiga: true, detectar: 'des'}},
+      def: {forma: 'flor', radio: 2, dados: 0, estado: 'Rengo', estadoTurnos: 3, sal: ['Evasión', 10, 'efecto'], color: '#3A2A20', amiga: true, detectar: 'des'}},
     {id: 'runa', icono: '🔮', nombre: 'Runa (maldición)', idea: 'Un glifo mágico que maldice a quien lo pisa: debilidad, miedo, confusión…', base: 'Runa de debilidad',
       pasos: ['estado', 'evita'], sugeridos: ['Lisiado', 'Miedo', 'Pajaritos', 'Cansado'],
-      def: {forma: 'flor', radio: 1, dados: 0, estado: 'Lisiado', estadoTurnos: 2, sal: ['Res.Esp', 10], color: '#8E6BBF', amiga: false, detectar: 'dmgesp'}},
+      def: {forma: 'flor', radio: 1, dados: 0, estado: 'Lisiado', estadoTurnos: 3, sal: ['Res.Mt', 10, 'efecto'], color: '#8E6BBF', amiga: false, detectar: 'dmgesp'}},
     {id: 'alarma', icono: '🔔', nombre: 'Alarma', idea: 'No lastima: avisa cuando alguien pasa.', base: 'Cable de alarma',
       pasos: [], sugeridos: [],
       def: {forma: 'linea', largo: 3, dados: 0, estado: '', sal: null, color: '#C0A060', amiga: true, detectar: 'des'}},
@@ -85,7 +85,8 @@ const ElegirTrampa = (() => {
     document.head.appendChild(s);
   }
 
-  const debuffs = () => (typeof EstadosAplicar !== 'undefined' && EstadosAplicar.DEBUFFS ? EstadosAplicar.DEBUFFS : []).filter(p => !p.permanente);
+  // Todos los estados en contra (también los que no vencen solos, como Sentado o Sangrado: a esos no se les pregunta los turnos).
+  const debuffs = () => (typeof EstadosAplicar !== 'undefined' && EstadosAplicar.DEBUFFS ? EstadosAplicar.DEBUFFS : []);
   const presetDe = nombre => debuffs().find(p => p.nombre === nombre) || null;
   const conStacks = nombre => { const p = presetDe(nombre); return !!(p && (p.esVeneno || p.esSangrado)); };
 
@@ -99,7 +100,7 @@ const ElegirTrampa = (() => {
       Object.assign(st, {concepto: con.id, forma: d.forma, radio: d.radio || 0, largo: d.largo || 3, cant: 1,
         haceDano: d.dados > 0, dados: d.dados || 2, caras: d.caras || 6, fijo: 0, armadura: d.armadura !== false,
         estado: d.estado || '', estadoTurnos: d.estadoTurnos || 0, estadoStacks: d.estadoStacks || 0,
-        seEvita: !!d.sal, salStat: d.sal ? d.sal[0] : 'Evasión', salDif: d.sal ? d.sal[1] : 10,
+        seEvita: !!d.sal, salStat: d.sal ? d.sal[0] : 'Evasión', salDif: d.sal ? d.sal[1] : 10, salQue: d.sal && d.sal[2] ? d.sal[2] : 'todo',
         nombre: con.base === 'Cable de alarma' ? 'Alarma' : con.nombre.replace(/ \(.*\)$/, ''), descripcion: '', color: d.color, amiga: !!d.amiga, detectar: d.detectar});
     }
     const pasos = () => {
@@ -128,7 +129,8 @@ const ElegirTrampa = (() => {
         + `<h4><button type="button" class="pap-boton" data-et-otros="1">${st.verOtros ? '▾' : '▸'} Otros estados (${otros.length})</button></h4>${st.verOtros ? `<div class="et-grid">${otros.map(tarjeta).join('')}</div>` : ''}`
         + (st.estado ? `<h4>${esc(st.estado)}</h4>
           ${conStacks(st.estado) ? `<div class="et-fila"><label>¿Cuánto daño por turno?</label><input type="number" min="1" max="20" data-et="estadoStacks" value="${st.estadoStacks || num(pre && pre.stacks) || 1}"><span class="pap-nota" style="margin:0">stacks (1 de daño cada uno, por turno)</span></div>` : ''}
-          <div class="et-fila"><label>¿Cuántos turnos?</label><input type="number" min="1" max="20" data-et="estadoTurnos" value="${st.estadoTurnos || num(pre && pre.turnos) || 1}"></div>` : '');
+          ${pre && (pre.permanente || pre.esVeneno) ? `<p class="pap-nota">${pre.esVeneno ? 'Dura lo que sus stacks: baja uno por turno.' : 'No vence solo: dura hasta que se resuelva (pararse, curarse…).'}</p>`
+            : `<div class="et-fila"><label>¿Cuántos turnos?</label><input type="number" min="1" max="20" data-et="estadoTurnos" value="${st.estadoTurnos || 3}"></div>`}` : '');
     }
     function cuerpo(id){
       if(id === 'como') return `<div class="et-grid">
@@ -155,15 +157,17 @@ const ElegirTrampa = (() => {
             <label class="et-fila" style="cursor:pointer"><input type="checkbox" data-et="armadura" ${st.armadura ? 'checked' : ''} style="width:auto"> Contempla la armadura (se le resta la Defensa, como un golpe). Destildado: va directo a la vida.</label>` : ''}`;
       if(id === 'estado') return htmlEstado(true);
       if(id === 'extra') return `<p class="pap-nota">Algo más que le pasa a quien la pisa, además del daño (por ejemplo, queda Sentado o Sangrando).</p>` + htmlEstado(true);
-      if(id === 'evita') return `<label class="et-fila" style="cursor:pointer"><input type="checkbox" data-et="seEvita" ${st.seEvita ? 'checked' : ''} style="width:auto"> Se puede evitar con una tirada (la resuelve la mesa a mano)</label>
-          ${st.seEvita ? `<div class="et-fila"><select data-et="salStat">${SALVACIONES.map(([v, t]) => `<option value="${v}"${st.salStat === v ? ' selected' : ''}>${t}</option>`).join('')}</select><span>contra</span><input type="number" min="1" data-et="salDif" value="${st.salDif}"></div>` : ''}`;
+      if(id === 'evita') return `<label class="et-fila" style="cursor:pointer"><input type="checkbox" data-et="seEvita" ${st.seEvita ? 'checked' : ''} style="width:auto"> Se puede evitar con una tirada (la tira el mapa solo, por quien la pisa)</label>
+          ${st.seEvita ? `<div class="et-fila"><select data-et="salStat">${SALVACIONES.map(([v, t]) => `<option value="${v}"${st.salStat === v ? ' selected' : ''}>${t}</option>`).join('')}</select><span>contra</span><input type="number" min="1" data-et="salDif" value="${st.salDif}"></div>
+          <h4>Si la pasa…</h4><div class="et-grid">${[['todo', 'La evita entera', 'Ni daño ni estado.'], ['efecto', 'Evita el efecto', 'El estado no le entra; el daño, sí.'], ['mitad', 'Recibe la mitad del daño', 'El estado le entra igual.']].map(([v, t, d]) =>
+            `<button type="button" class="et-op${st.salQue === v ? ' on' : ''}" data-et-que="${v}"><b>${t}</b><small>${d}</small></button>`).join('')}</div>` : ''}`;
       if(id === 'nombre') return `<div class="pap-campo"><label>Nombre</label><input data-et="nombre" maxlength="40" value="${esc(st.nombre)}"></div>
           <div class="pap-campo"><label>Qué hace, en palabras (opcional)</label><textarea data-et="descripcion" maxlength="200" placeholder="Si lo dejás vacío, se arma solo con lo que elegiste.">${esc(st.descripcion)}</textarea></div>
           <div class="pap-campo"><label>Color</label><div class="et-colores">${[...new Set([c().def.color, ...COLORES])].map(col => `<button type="button" class="et-color${st.color === col ? ' on' : ''}" data-et-color="${col}" style="background:${col}" title="${col}"></button>`).join('')}</div></div>
           <div class="pap-campo"><label>Para detectarla</label><select data-et="detectar"><option value="des"${st.detectar !== 'dmgesp' ? ' selected' : ''}>Percepción contra tu Destreza (trampa física)</option><option value="dmgesp"${st.detectar === 'dmgesp' ? ' selected' : ''}>Percepción contra tu Efecto especial (trampa mágica)</option></select></div>`;
       // resumen
       const t = AsistenteTrampa.aTrampa(resultado()), fila = (a, b) => `<div class="et-rf"><span>${a}</span><b>${esc(b)}</b></div>`;
-      return `<div>${fila('Trampa', `${c().icono} ${t.nombre}`)}${fila('Qué hace', AsistenteTrampa.resumenTexto(t))}${fila('Se evita', st.seEvita ? `${st.salStat} contra ${st.salDif} (a mano)` : 'no')}
+      return `<div>${fila('Trampa', `${c().icono} ${t.nombre}`)}${fila('Qué hace', AsistenteTrampa.resumenTexto(t))}${fila('Se evita', st.seEvita ? `${st.salStat} contra ${st.salDif}: ${st.salQue === 'mitad' ? 'la mitad del daño' : st.salQue === 'efecto' ? 'evita el efecto' : 'la evita'} (la tira el mapa)` : 'no')}
         ${fila('Detectarla', st.detectar === 'dmgesp' ? 'Percepción contra tu Efecto especial' : 'Percepción contra tu Destreza')}</div>
         <p class="pap-nota" style="margin-top:10px">${esc(t.detalle)}</p>`;
     }
@@ -172,7 +176,7 @@ const ElegirTrampa = (() => {
       return {nombre: String(st.nombre || '').trim(), descripcion: String(st.descripcion || '').trim(), forma: st.forma, color: st.color, alfa: 45, amiga: !!st.amiga,
         radio: st.radio, cant: st.cant, largo: st.largo, dano: danoTxt(), contemplaArmadura: st.armadura,
         estado: tieneEstado ? st.estado : '', estadoTurnos: tieneEstado ? st.estadoTurnos : 0, estadoStacks: tieneEstado && conStacks(st.estado) ? st.estadoStacks : 0,
-        teleport: false, salvacion: st.seEvita ? {stat: st.salStat, dif: st.salDif} : null, turnos: 0, dejaZona: false, detectarStat: st.detectar === 'dmgesp' ? 'dmgesp' : 'des'};
+        teleport: false, salvacion: st.seEvita ? {stat: st.salStat, dif: st.salDif, que: st.salQue} : null, turnos: 0, dejaZona: false, detectarStat: st.detectar === 'dmgesp' ? 'dmgesp' : 'des'};
     }
     function deCero(){
       api.cerrar();
@@ -193,9 +197,10 @@ const ElegirTrampa = (() => {
         if(d.etModo){ if(d.etModo === 'cero'){ deCero(); return; } if(d.etModo === 'catalogo'){ api.cerrar(); cfg.alCatalogo(); return; } st.modo = d.etModo; api.redibujar(); api.irA('tipo'); return; }
         if(d.etConcepto){ cargar(CONCEPTOS.find(x => x.id === d.etConcepto)); api.redibujar(); api.irA('tamano'); return; }
         if(d.etForma){ st.forma = d.etForma; api.redibujar(); return; }
-        if(d.etEstado !== undefined){ st.estado = d.etEstado; const p = presetDe(st.estado); st.estadoTurnos = num(p && p.turnos) || 1; st.estadoStacks = conStacks(st.estado) ? (num(p && p.stacks) || 1) : 0; api.redibujar(); return; }
+        if(d.etEstado !== undefined){ st.estado = d.etEstado; const p = presetDe(st.estado); st.estadoTurnos = p && (p.permanente || p.esVeneno) ? 0 : st.estado === 'Stun' ? 1 : 3; st.estadoStacks = conStacks(st.estado) ? (num(p && p.stacks) || 1) : 0; api.redibujar(); return; }
         if(d.etOtros){ st.verOtros = !st.verOtros; api.redibujar(); return; }
         if(d.etColor){ st.color = d.etColor; api.redibujar(); return; }
+        if(d.etQue){ st.salQue = d.etQue; api.redibujar(); return; }
       },
       alInput: e => {
         const t = e.target, k = t.dataset && t.dataset.et; if(!k || t.type === 'checkbox' || t.tagName === 'SELECT') return;

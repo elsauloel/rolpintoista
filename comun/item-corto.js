@@ -50,13 +50,18 @@ const ItemCorto = (() => {
     const tam = Math.max(0, num(t.tamano));
     f.push(['Forma', t.tipo === 'linea' ? `Línea de ${Math.max(1, tam)}` : tam ? `Flor de radio ${tam} (${casillas(tam)} casillas)` : 'Una casilla']);
     if(t.dano) f.push(['Daño', `${t.dano} · ${t.ignoraDef ? 'directo a la vida' : 'contempla la armadura'}`]);
-    const efecto = t.efectoTxt || (t.estado ? `${t.estado}${num(t.estadoStacks) > 0 ? ' ×' + t.estadoStacks : ''}${num(t.estadoTurnos) > 0 ? ' ' + t.estadoTurnos + ' turnos' : ''}` : '');
-    const efectoAuto = !t.efectoTxt ? !!t.estado : !!t.efectoAuto;
-    if(efecto) f.push(['Efecto', efecto, efectoAuto ? '' : 'a mano']);
-    if(t.teleport && !t.efectoTxt) f.push(['Efecto', 'Teletransporta a quien la pisa']);
-    if(!t.dano && !efecto && !t.teleport) f.push(['Efecto', 'Solo avisa cuando se dispara']);
-    const salva = t.salvaTxt || (t.salvacion && t.salvacion.stat ? `${t.salvacion.stat} contra ${t.salvacion.dif}` : '');
-    f.push(['Se evita', salva || 'no', salva ? 'a mano' : '']);
+    // El efecto: lo que aplica el mapa solo (el estado) y lo que queda a mano (efectoManual).
+    if(t.estado){
+      const sinFin = {Sentado: 'hasta que se pare', Sangrado: 'hasta que lo curen'}[t.estado];
+      const txt = `${t.estado}${num(t.estadoStacks) > 0 ? ' ×' + t.estadoStacks : ''}${num(t.estadoHp) ? ` (${Math.abs(num(t.estadoHp))} de daño por turno)` : ''}${num(t.estadoTurnos) > 0 ? ` · ${t.estadoTurnos} turno${num(t.estadoTurnos) === 1 ? '' : 's'}` : sinFin ? ` · ${sinFin}` : ''}`;
+      f.push(['Efecto', txt]);
+    }
+    if(t.efectoManual) f.push([t.estado ? 'Además' : 'Efecto', t.efectoManual, 'a mano']);
+    if(t.teleport) f.push(['Efecto', 'Teletransporta a quien la pisa']);
+    if(!t.dano && !t.estado && !t.efectoManual && !t.teleport) f.push(['Efecto', 'Solo avisa cuando se dispara']);
+    const s = t.salvacion && t.salvacion.stat ? t.salvacion : null;
+    const QUE = {todo: 'la evita entera', efecto: t.dano ? 'evita el efecto (el daño entra igual)' : 'la evita', mitad: 'la mitad del daño'};
+    f.push(['Se evita', s ? `${s.etq || s.stat} contra ${s.dif} → ${QUE[s.que] || QUE.todo}` : 'no']);
     f.push(['Detectarla', t.detectarStat ? `Percepción contra ${t.detectarStat === 'dmgesp' ? 'el Efecto especial' : 'la Destreza'} de quien la pone` : num(t.detectar) >= 1 ? `Percepción contra ${num(t.detectar)}` : 'sin definir']);
     if(t.dejaZona) f.push(['Después', `queda como zona ${num(t.zonaTurnos) || 3} turnos`]);
     if(t.amiga) f.push(['Alcanza', 'también a los aliados del área']);

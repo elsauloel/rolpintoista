@@ -15,6 +15,23 @@ const TokensAuto = (() => {
   const MAPA_PRINCIPAL_ID = '_principal';
 
   function rutaTokens(mapaId){ return mapaId === MAPA_PRINCIPAL_ID ? 'tokens' : `mapas/${mapaId}/tokens`; }
+  // La tirada para evitar una trampa, como la guarda el mapa: `salva` adentro del JSON de trampaEstado (2026-10-02; así no hace falta un
+  // campo ni reglas nuevas): {stat (id), etq, dif, que: 'todo' | 'efecto' | 'mitad'}. Acepta el stat por su nombre (los asistentes guardan
+  // 'Evasión', 'Res.CC'…). null si no hay una tirada completa.
+  const SALVA_IDS = {'Evasión': 'eva', 'Fuerza': 'fue', 'Res.CC': 'rescc', 'Res.Esp': 'resmg', 'Res.Mt': 'resm', 'Agilidad': 'agl', 'Constitución': 'con'};
+  const SALVA_ETQ = {eva: 'Evasión', fue: 'Fuerza', rescc: 'Res.CC', resmg: 'Res.Esp', resm: 'Res.Mt', agl: 'Agilidad', con: 'Constitución'};
+  function salvaNorm(s){
+    if(!s || !s.stat || !(Number(s.dif) >= 1)) return null;
+    const stat = SALVA_IDS[s.stat] || s.stat;
+    return {stat, etq: s.etq || SALVA_ETQ[stat] || stat, dif: Math.round(Number(s.dif)), que: ['todo', 'efecto', 'mitad'].includes(s.que) ? s.que : 'todo'};
+  }
+  // El JSON de trampaEstado: el estado que deja y la salvación ('' si no hay ninguno de los dos).
+  function estadoJson(estado, salvacion){
+    const sv = salvaNorm(salvacion);
+    const o = {...(estado && estado.nombre ? estado : {}), ...(sv ? {salva: sv} : {})};
+    const j = Object.keys(o).length ? JSON.stringify(o) : '';
+    return j.length <= 300 ? j : '';
+  }
 
   // El mapa que el GM está mirando en este navegador (si eligió uno que ya no existe, el publicado).
   async function mapaQueMiraElGM(){
@@ -105,7 +122,8 @@ const TokensAuto = (() => {
       const linea = t.tipo === 'linea';
       o = {...o, nombre: t.nombre, detalle: t.detalle, dano: t.dano, ignoraDef: !!t.ignoraDef, fuegoAmigo: !!t.amiga, color: t.color, alfa: t.alfa,
         forma: linea ? 'linea' : 'flor', radio: linea ? 0 : Plantillas.radioDeTrampa(t), largo: linea ? t.tamano : 0, cant: t.cant,
-        estado: t.estado ? {nombre: t.estado, ...(t.estadoTurnos ? {turnos: t.estadoTurnos} : {}), ...(t.estadoMods ? {mods: t.estadoMods} : {}), ...(t.estadoStacks ? {stacks: t.estadoStacks} : {})} : null,
+        estado: t.estado ? {nombre: t.estado, ...(t.estadoTurnos ? {turnos: t.estadoTurnos} : {}), ...(t.estadoMods ? {mods: t.estadoMods} : {}), ...(t.estadoStacks ? {stacks: t.estadoStacks} : {}), ...(t.estadoHp ? {hp: t.estadoHp} : {})} : null,
+        salvacion: t.salvacion || null,
         dejaZona: t.dejaZona ? t : null, turnos: Math.max(0, Math.round(Number(t.turnos) || 0)), detectar: t.detectar};
     }
     const mapaId = o.mapaId || await mapaQueMiraElGM();
@@ -146,9 +164,9 @@ const TokensAuto = (() => {
         trampa: true, trampaNombre: String(o.nombre || 'Trampa').slice(0, 40), trampaDetalle: String(o.detalle || '').slice(0, 200),
         disparada: false, fuegoAmigo: !!o.fuegoAmigo, trampaDano: String(o.dano || '').slice(0, 12),
         ...(o.ignoraDef ? {trampaIgnoraDef: true} : {}),
-        ...(Number.isFinite(Number(o.detectar)) && Number(o.detectar) >= 1 ? {trampaDetectar: Math.round(Number(o.detectar))} : {}),   // dificultad para detectarla (P145; sin el dato, 8)
+        ...(Number.isFinite(Number(o.detectar)) && Number(o.detectar) >= 1 ? {trampaDetectar: Math.round(Number(o.detectar))} : {}),
         ...(o.item ? {trampaItem: String(o.item).slice(0, 4000), trampaFicha: String(o.fichaId || '').slice(0, 80)} : {}),   // trampa que salió de un consumible: al cerrar el botín, si no se disparó, se desarma y vuelve a su dueño
-        ...(o.estado && JSON.stringify(o.estado).length <= 300 ? {trampaEstado: JSON.stringify(o.estado)} : {}),
+        ...(estadoJson(o.estado, o.salvacion) ? {trampaEstado: estadoJson(o.estado, o.salvacion)} : {}),   // el estado y la salvación (la tira el mapa solo)
         ...(venceMant !== null ? {turnos: o.turnos, venceMant} : {}),
         // Trampa persistente: al dispararse queda como zona (el mapa la convierte, ver trampaResolver) — mismos campos que pone el mapa.
         ...(z ? {trampaDejaZona: true, zonaTurnos: Math.max(1, Math.round(Number(z.zonaTurnos) || 3)), zonaEnMantenimiento: z.zonaEnMantenimiento !== false, zonaCadaPaso: !!z.zonaCadaPaso,
@@ -188,5 +206,5 @@ const TokensAuto = (() => {
     return n;
   }
 
-  return {crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles};
+  return {salvaNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles};
 })();

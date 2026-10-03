@@ -478,46 +478,77 @@ function trampaAfectados(t, el){
   if(celdas.size > 1) tokens.forEach(x => { if(x !== t && celdas.has(nbPack(x.col, x.fila)) && (el.fuegoAmigo || trampaDispara(x, el))) afectados.push(x); });
   return afectados;
 }
-// Daño automático de la trampa: se tira solo y se descuenta (con la Defensa) de quien la activó. En un área
-// también de los creeps de adentro si mueve el GM; a los personajes de otros jugadores solo se les avisa en la Mesa.
-async function trampaAplicarDano(t, el){
-  if(!trampaDanoValido(el.trampaDano)) return;
-  const tir = tirarDados(el.trampaDano.trim());
-  if(!tir) return;
-  const afectados = trampaAfectados(t, el);
-  const partes = [];
-  for(const x of afectados){
-    let hecho = false;
-    try{
-      if(x.tipo === 'creep' && x.fichaId && soyGM){ await danioCreep(x, String(tir.total), !!el.trampaIgnoraDef); hecho = true; }
-      else if(x.tipo === 'pj' && x.fichaId && !String(x.fichaId).includes(SEP_INVOCACION) && puedoMover(x)){ await danioPj(x, String(tir.total), !!el.trampaIgnoraDef); hecho = true; }
-    }catch(err){ console.error('No se pudo aplicar el daño de la trampa:', err); }
-    partes.push(`${x.oculto ? 'Alguien' : nombreDe(x)}: ${hecho ? 'daño aplicado solo' : 'aplicalo a mano'}`);
-  }
-  alertaRojaAnonima(`💥 ${el.trampaNombre || 'Trampa'}: ${tir.formula} = ${tir.total} de daño (${el.trampaIgnoraDef ? 'ignora la Defensa' : 'menos la Defensa de cada uno'})`, partes.join(' · '));
+/* Lo que le hace la trampa a cada afectado, automático donde se puede (2026-10-02, regla del dueño): la salvación (el mapa la tira sola con el
+   stat de quien la pisó: `salva` dentro de trampaEstado = {stat, etq, dif, que} — 'todo' la evita entera, 'efecto' evita el estado, 'mitad' la
+   mitad del daño),
+   el daño (una sola tirada para todos) y el estado (`trampaEstado`). A cada afectado le llega **el Aviso** al centro de su pantalla (a un
+   creep, al GM); los demás lo ven en **la Crónica** (la esquina de arriba a la derecha, js/16). Lo que no se pudo aplicar desde esta pantalla
+   (el daño de un personaje ajeno) queda dicho «aplicalo a mano». */
+function trampaSalvaDe(el){
+  let e = null; try{ e = el.trampaEstado ? JSON.parse(el.trampaEstado) : null; }catch(x){}
+  const s = e && e.salva;
+  return s && s.stat && num(s.dif) >= 1 ? s : null;
 }
-// Estado alterado de la trampa (Inmovilizado, Veneno, −2 Daño…): se aplica solo a quien la pisó y, si es de área, a todos los de adentro.
-// Un creep lo recibe directo (solo si mueve el GM); un personaje, por un aviso que su ficha aplica sola (comun/estados-aplicar.js).
-async function trampaAplicarEstado(t, el){
-  if(!el.trampaEstado) return;
-  let spec = null;
-  try{ spec = JSON.parse(el.trampaEstado); }catch(e){ return; }
-  if(!spec || !spec.nombre) return;
-  const afectados = trampaAfectados(t, el);
-  const nombres = [];
+function trampaValorStat(x, stat){
+  if(x.tipo === 'creep'){ const sc = creepPrivadoDe(x.fichaId); return sc ? zonaStatCreep(sc, stat) : 0; }
+  const f = fichasPub.get(String(x.fichaId || '').split(SEP_INVOCACION)[0]);
+  return f && f.resumen ? num(f.resumen[stat]) : 0;
+}
+async function trampaAplicarEfectos(t, el){
+  const afectados = trampaAfectados(t, el), salva = trampaSalvaDe(el);
+  let spec = null; try{ spec = el.trampaEstado ? JSON.parse(el.trampaEstado) : null; }catch(e){}
+  if(spec && !spec.nombre) spec = null;
+  const tir = trampaDanoValido(el.trampaDano) ? tirarDados(el.trampaDano.trim()) : null;
+  const nombreT = el.trampaNombre || 'una trampa';
+  const gmUid = ([...miembros.entries()].find(([, m]) => m && m.gm) || [])[0] || '';
+  const aMano = (String(el.trampaDetalle || '').match(/[^.]*\(a mano\)\./g) || []).map(x => x.trim()).join(' ');   // lo que el texto dice que va a mano
+  const mesa = [];
   for(const x of afectados){
-    if(!x.fichaId || String(x.fichaId).includes(SEP_INVOCACION)) continue;
-    try{
-      if(x.tipo === 'creep'){
-        if(!soyGM) continue;
-        await modificarCreep(x.fichaId, sc => { const r = EstadosAplicar.aplicarACreep(sc, spec); if(!r.ok) throw new Error('inmune'); });
-      }else{
-        await EstadosAplicar.encolarPj({fichaId: x.fichaId, duenoUid: x.duenoUid, spec, origen: el.trampaNombre || 'Trampa'});
+    const quien = x.oculto ? 'Alguien' : nombreDe(x);
+    const esInv = String(x.fichaId || '').includes(SEP_INVOCACION);
+    const partes = [];
+    let evita = '';
+    if(salva){
+      const estadosDe = x.tipo === 'creep' ? ((creepPrivadoDe(x.fichaId) || {}).estados || []) : (((fichasPub.get(x.fichaId) || {}).resumen || {}).estados || []);
+      const rd = Combatiente.tirarStat(trampaValorStat(x, salva.stat), estadosDe, salva.stat);
+      if(rd){
+        const etq = salva.etq || ZONA_STAT_LABEL[salva.stat] || salva.stat;
+        try{ mesaPublicar(`${quien} · ${etq} (${nombreT})`, {formula: rd.formula, rolls: rd.rolls, mod: rd.mod, total: rd.total}); }catch(err){}
+        const ok = rd.total >= num(salva.dif);   // llegar a la dificultad alcanza (como detectarla)
+        if(ok) evita = salva.que || 'todo';
+        partes.push(`${etq} ${rd.total} contra ${salva.dif}: ${!ok ? 'no la evitó' : evita === 'mitad' ? 'la mitad del daño' : evita === 'efecto' && tir ? 'esquivó el efecto' : 'la evitó'}`);
       }
-      nombres.push(x.oculto ? 'Alguien' : nombreDe(x));
-    }catch(err){ console.error('No se pudo aplicar el estado de la trampa:', err); }
+    }
+    if(tir && evita !== 'todo'){
+      const monto = evita === 'mitad' ? Math.floor(tir.total / 2) : tir.total;
+      let hecho = false;
+      try{
+        if(monto > 0 && x.tipo === 'creep' && x.fichaId && soyGM){ await danioCreep(x, String(monto), !!el.trampaIgnoraDef); hecho = true; }
+        else if(monto > 0 && x.tipo === 'pj' && x.fichaId && !esInv && puedoMover(x)){ await danioPj(x, String(monto), !!el.trampaIgnoraDef); hecho = true; }
+      }catch(err){ console.error('No se pudo aplicar el daño de la trampa:', err); }
+      partes.push(monto > 0 ? `${monto} de daño${el.trampaIgnoraDef ? ' directo a la vida' : ' (menos su Defensa)'}${hecho ? '' : ' — aplicalo a mano'}` : 'sin daño');
+    }
+    if(spec && evita !== 'todo' && evita !== 'efecto'){
+      let que = ' — aplicalo a mano';
+      try{
+        if(x.tipo === 'creep' && x.fichaId && soyGM){
+          let inmune = '';
+          await modificarCreep(x.fichaId, sc => { const r = EstadosAplicar.aplicarACreep(sc, spec); if(!r.ok) inmune = r.motivo || 'inmune'; });
+          que = inmune ? ` — no le hace nada (${inmune})` : '';
+        }else if(x.tipo === 'pj' && x.fichaId && !esInv){
+          await EstadosAplicar.encolarPj({fichaId: x.fichaId, duenoUid: x.duenoUid, spec, origen: nombreT});
+          que = '';
+        }
+      }catch(err){ console.error('No se pudo aplicar el estado de la trampa:', err); }
+      partes.push(`${EstadosAplicar.texto(spec)}${que}`);
+    }
+    const resultado = partes.join(' · ') || 'no le hizo nada';
+    mesa.push(`${quien}: ${resultado}`);
+    momentoAbrir({tipo: 'trampa', icono: '🪤', titulo: x === t ? `${quien} pisó «${nombreT}»` : `${quien} quedó en el área de «${nombreT}»`,
+      resultado: resultado + (aMano ? ` · ✋ ${aMano}` : ''), estado: 'listo',
+      datos: {paraUid: x.tipo === 'creep' ? gmUid : (x.duenoUid || ''), aviso: true}});
   }
-  if(nombres.length) alertaRojaAnonima(`🎯 ${el.trampaNombre || 'Trampa'}: ${EstadosAplicar.texto(spec)}`, `${nombres.join(', ')}: estado aplicado solo`);
+  if(mesa.length && (tir || spec || salva)) alertaRojaAnonima(`🪤 ${nombreT}${tir ? ` · ${tir.formula} = ${tir.total}` : ''}`, mesa.join(' · '));
 }
 
 // Después de que el token llegó a la casilla donde se cortó.
@@ -537,11 +568,9 @@ async function trampaResolver(){
     catch(err){ console.error('No se pudo marcar la trampa como disparada:', err); }
     const nombre = p.el.trampaNombre ? ': ' + p.el.trampaNombre : '';
     alertaRojaAnonima(`⚠ Trampa de ${nombreMiembro(p.el.duenoUid)}${nombre}`, `${nombreDe(t)} la activó${p.el.trampaDetalle ? ' — ' + p.el.trampaDetalle : ''}`);
-    momentoAbrir({tipo: 'trampa', icono: '⚠', titulo: `¡${nombreDe(t)} pisó una trampa${p.el.trampaNombre ? ': «' + p.el.trampaNombre + '»' : ''}!`, resultado: p.el.trampaDetalle || '', estado: 'listo'});   // P146 (js/16)
     // Activar una trampa rompe el sigilo (2026-09-24, regla dicha por el dueño).
     if(enSigilo(t)) await romperSigilo(p.tokenId, '', `${nombreDe(t)} activó una trampa`);
-    await trampaAplicarDano(t, p.el);
-    await trampaAplicarEstado(t, p.el);
+    await trampaAplicarEfectos(t, p.el);   // la salvación, el daño y el estado de cada uno, con su Aviso y la Crónica
     if(p.el.trampaDestino) await trampaTeleportar(p.tokenId, tokens.get(p.tokenId), p.el);
     // Trampa persistente (2026-09-28, pedido del dueño): además del golpe de siempre (arriba), se convierte en
     // zona — mismas celdas y el mismo daño/estado, quedando puesta zonaTurnos turnos. Segunda escritura aparte
@@ -556,7 +585,7 @@ async function trampaResolver(){
       };
       if(p.el.fuegoAmigo) cambios.zonaAmiga = true;
       if(trampaDanoValido(p.el.trampaDano)){ cambios.zonaDano = p.el.trampaDano; if(p.el.trampaIgnoraDef) cambios.zonaIgnoraDef = true; }
-      if(p.el.trampaEstado) cambios.zonaEstado = p.el.trampaEstado;
+      if(p.el.trampaEstado){ try{ const e = JSON.parse(p.el.trampaEstado); delete e.salva; if(e.nombre) cambios.zonaEstado = JSON.stringify(e); }catch(err){} }   // sin la salvación (es del disparo)
       if(p.el.zonaResistStat && Number.isFinite(p.el.zonaResistValor)){ cambios.zonaResistStat = p.el.zonaResistStat; cambios.zonaResistValor = p.el.zonaResistValor; }
       try{ await coleccionElementos().doc(p.id).update(cambios); }
       catch(err){ console.error('No se pudo convertir la trampa en zona:', err); }

@@ -1603,7 +1603,7 @@ prueba('trampa de una habilidad: una conocida por tipo (veneno: daño por turno 
   const antes = v.tabs();
   v.clic('[data-et-modo="concepto"]'); v.clic('[data-et-concepto="veneno"]');
   const pasosVeneno = v.tabs();
-  v.ir('Qué le deja'); const estadoOn = v.q('[data-et-estado].on b').textContent; v.escribir('[data-et="estadoStacks"]', '4'); v.escribir('[data-et="estadoTurnos"]', '5');
+  v.ir('Qué le deja'); const estadoOn = v.q('[data-et-estado].on b').textContent; v.escribir('[data-et="estadoStacks"]', '4'); const sinTurnos = !v.q('[data-et="estadoTurnos"]');   // el veneno dura lo que sus stacks
   v.ir('Resumen'); v.clic('[data-pap="crear"]'); await new Promise(r => setTimeout(r, 0));
   const veneno = res;
   ElegirTrampa.abrir({alTerminar: t => { res = t; }});
@@ -1617,8 +1617,8 @@ prueba('trampa de una habilidad: una conocida por tipo (veneno: daño por turno 
   ElegirTrampa.abrir({alTerminar: () => {}});
   v = papUltima(); v.clic('[data-et-modo="cero"]');
   const cero = papUltima().q('.pap-cab h3').textContent; papUltima().clic('[data-pap="cancelar"]');
-  igual([antes, pasosVeneno, estadoOn, veneno.estado, veneno.estadoStacks, veneno.estadoTurnos, veneno.dano, veneno.tipo, pasosPuas, puas.dano, puas.estado, puas.nombre, cero.startsWith('Trampa de la habilidad')],
-    [['Cómo', 'Tipo'], ['Cómo', 'Tipo', 'Tamaño', 'Daño', 'Qué le deja', 'Se evita', 'Nombre', 'Resumen'], 'Veneno', 'Veneno', 4, 5, '1d6', 'linea',
+  igual([antes, pasosVeneno, estadoOn, veneno.estado, veneno.estadoStacks, sinTurnos, veneno.salvacion, veneno.dano, veneno.tipo, pasosPuas, puas.dano, puas.estado, puas.nombre, cero.startsWith('Trampa de la habilidad')],
+    [['Cómo', 'Tipo'], ['Cómo', 'Tipo', 'Tamaño', 'Daño', 'Qué le deja', 'Se evita', 'Nombre', 'Resumen'], 'Veneno', 'Veneno', 4, true, {stat: 'Evasión', dif: 10, que: 'todo'}, '1d6', 'linea',
      ['Cómo', 'Tipo', 'Tamaño', 'Daño', 'Efecto adicional', 'Se evita', 'Nombre', 'Resumen'], '4d6', '', 'Púas y estacas', true]);
 });
 prueba('cómo se ve un ítem: la trampa en datos cortos (forma, daño, efecto, salvación, detección) y lo técnico solo en «Ver»', () => {
@@ -1628,9 +1628,20 @@ prueba('cómo se ve un ítem: la trampa en datos cortos (forma, daño, efecto, s
   const p = ItemCorto.partes('Da +2 a la Fuerza. ⚙ Automático: se suma solo. ✋ A mano: nada.');
   const base = TRAMPAS_BASE.find(t => t.nombre === 'Trampa de oso');
   igual([filas, grilla.includes('⚙'), grilla.includes('Automático'), ver.includes('Detalles técnicos'), ver.includes('⚙ Automático'), ItemCorto.trampaFilas(menor.trampaDatos).find(f => f[0] === 'Detectarla')[1],
-    p.hace, p.tecnico.startsWith('⚙'), base.datos.efectoTxt, base.datos.detectar, ItemCorto.tecnicoHtml('Solo dice qué hace.')],
-    [['Forma: Flor de radio 2 (19 casillas)', 'Daño: 2d6 · contempla la armadura', 'Efecto: Inmovilizado (para liberarse: 2 No2) (a mano)', 'Se evita: Fuerza contra 8 para liberarse (a mano)', 'Detectarla: Percepción contra 8', 'Alcanza: también a los aliados del área'],
-     false, false, true, true, 'Percepción contra 6', 'Da +2 a la Fuerza.', true, 'Inmovilizado (para liberarse: 2 No2)', 8, '']);
+    p.hace, p.tecnico.startsWith('⚙'), base.datos.estado, base.datos.detectar, ItemCorto.tecnicoHtml('Solo dice qué hace.')],
+    [['Forma: Flor de radio 2 (19 casillas)', 'Daño: 2d6 · contempla la armadura', 'Efecto: Inmovilizado · 3 turnos', 'Además: para liberarse: 2 No2 y Fuerza contra 8 (a mano)', 'Se evita: no', 'Detectarla: Percepción contra 8', 'Alcanza: también a los aliados del área'],
+     false, false, true, true, 'Percepción contra 6', 'Da +2 a la Fuerza.', true, 'Inmovilizado', 8, '']);
+});
+prueba('trampas automáticas: el estado y la salvación viajan juntos en trampaEstado; 3 turnos (Stun 1); los textos dicen qué va solo y qué a mano', () => {
+  const oso = TRAMPAS_BASE.find(t => t.nombre === 'Trampa de oso').datos, dardos = TRAMPAS_BASE.find(t => t.nombre === 'Dardos envenenados').datos, descarga = TRAMPAS_BASE.find(t => t.nombre === 'Descarga eléctrica').datos;
+  const j = JSON.parse(TokensAuto.estadoJson({nombre: dardos.estado, stacks: dardos.estadoStacks}, dardos.salvacion));
+  const solo = JSON.parse(TokensAuto.estadoJson(null, {stat: 'Evasión', dif: 12, que: 'mitad'}));
+  const filasDardos = ItemCorto.trampaFilas(dardos).map(f => f[0] + ': ' + f[1]);
+  igual([oso.estado, oso.estadoTurnos, descarga.estadoTurnos, j, solo, TokensAuto.estadoJson(null, null), filasDardos.filter(f => /^(Efecto|Se evita)/.test(f)), oso.detalle,
+    Plantillas.trampa({...dardos}).salvacion],
+    ['Inmovilizado', 3, 1, {nombre: 'Veneno', stacks: 3, salva: {stat: 'eva', etq: 'Evasión', dif: 10, que: 'todo'}}, {salva: {stat: 'eva', etq: 'Evasión', dif: 12, que: 'mitad'}}, '',
+     ['Efecto: Veneno ×3', 'Se evita: Evasión contra 10 → la evita entera'], '2d6 de daño y Inmovilizado 3 turnos (automático). Para liberarse: 2 No2 y Fuerza contra 8 (a mano).',
+     {stat: 'eva', etq: 'Evasión', dif: 10, que: 'todo'}]);
 });
 /* ---------- Creeps por mapa (comun/creeps-mapas.js, 2026-10-02: los grupos pasaron a ser mapas) ---------- */
 // Una base de datos de mentira, lo justo para CreepsMapas: colecciones y documentos en memoria.

@@ -84,7 +84,7 @@ const Plantillas = (() => {
   const TRAMPA = ['nombre', 'detalle', 'amiga', 'tipo', 'tamano', 'color', 'alfa', 'dano', 'ignoraDef', 'estado', 'estadoTurnos', 'estadoMods', 'estadoStacks', 'teleport',
     'dejaZona', 'zonaTurnos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaResistStat', 'zonaResistValor', 'turnos', 'cant',
     'detectar', 'detectarStat',   // dificultad para detectarla (P145): un número (mapa) o de qué stat de quien la coloca sale (habilidad)
-    'efectoTxt', 'salvaTxt', 'efectoAuto'];   // lo que hace además del daño y cómo se resiste, en palabras (la ficha corta del catálogo, comun/item-corto.js)
+    'estadoHp', 'salvacion', 'efectoManual'];   // un estado propio con daño por turno; la tirada para evitarla ({stat, etq, dif, que}); lo que queda a mano
   function trampaDesde(t){
     if(!t || typeof t !== 'object') return null;
     const n = v => Number(v) || 0;

@@ -251,6 +251,8 @@ let elemAlfa = 45;
 let elemSolido = false;
 let elemInvisible = false;
 let elemTrampaEstado = '', elemTrampaEstadoTurnos = 0;   // estado automático de la trampa (nombre de un preset de EstadosAplicar) y cuántos turnos dura (0 = el del preset)
+let elemTrampaEstadoStacks = 0, elemTrampaEstadoHp = 0;   // sus stacks (Veneno) y su daño por turno (un estado propio, ej. Quemadura) — 2026-10-02
+let elemTrampaSalva = null;   // la tirada para evitarla, que el mapa tira sola por quien la pisa: {stat, etq, dif, que} (2026-10-02)
 let elemTrampaTeleport = false, elemTrampaDestino = '';   // trampa de teleport: destino "col,fila" (se elige con un clic en el mapa)
 // Trampa persistente (2026-09-28, pedido del dueño): al dispararse, además del efecto de siempre (una vez, a
 // quien la pisó), el elemento se convierte en una zona (zona:true, ver comun/CLAUDE.md) con el mismo daño/estado,

@@ -328,6 +328,7 @@ $('#herramienta-flotante').addEventListener('change', e => {
   }
   if(e.target.id === 'elem-trampa-estado'){
     elemTrampaEstado = e.target.value;
+    elemTrampaEstadoStacks = 0; elemTrampaEstadoHp = 0;   // eligió otro estado a mano: los stacks y el daño por turno eran del anterior
     if(!elemTrampaEstado) elemTrampaEstadoTurnos = 0;
     renderHerramientaFlotante();
     return;

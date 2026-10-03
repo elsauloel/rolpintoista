@@ -61,12 +61,35 @@ NARR = {
     'Espejo de discordia': 'Un espejo de mano puesto boca arriba, con un hechizo que vuelve a los amigos enemigos.',
     'Portal cósmico': 'Un glifo circular que, al ser pisado, abre una fisura hacia otro lugar.',
 }
+QUE = {'todo': 'la evita', 'efecto': 'evita el efecto', 'mitad': 'le saca la mitad del daño'}
+
+
+def texto_de(f, dano, ignora_def):
+    # Lo que hace, en palabras, a partir de los datos (2026-10-02): lo automático y lo que queda a mano.
+    p = []
+    est = ''
+    if f.get('estado'):
+        est = f['estado'] + (' ×%d' % f['estadoStacks'] if f.get('estadoStacks') else '') + (' (%d de daño por turno)' % -f['estadoHp'] if f.get('estadoHp') else '') + (' %d turnos' % f['estadoTurnos'] if f.get('estadoTurnos') else '')
+    partes = [x for x in [('%s de daño%s' % (dano, ' directo' if ignora_def else '')) if dano else '', est] if x]
+    if partes: p.append(' y '.join(partes) + ' (automático).')
+    s = f.get('salvacion')
+    if s: p.append('%s contra %d %s (automático).' % (s['etq'], s['dif'], QUE.get(s['que'], 'la evita')))
+    if f.get('efectoManual'): p.append(f['efectoManual'][0].upper() + f['efectoManual'][1:] + ' (a mano).')
+    return ' '.join(p) or 'Solo avisa en la Mesa cuando se dispara.'
+
+
+def detalle_item(grado, forma, texto, manual):
+    return ('Trampa %s: al usarla se coloca en el mapa una trampa en %s. %s' % (grado, forma, texto)
+            + ' ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). Al dispararse tira el daño y la salvación de cada uno y le deja el estado: el afectado recibe el Aviso y la mesa lo ve en la Crónica.'
+            + (' ✋ A mano: %s.' % manual if manual else '') + ' Se apila sin límite en la mochila.')
+
+
 def leer_ficha():
-    # [efectoTxt, salvaTxt, efectoAuto] de cada trampa base: FICHA_TRAMPAS de comun/trampas-base.js.
+    # Lo que hace cada trampa base (estado, efectoManual, salvacion): FICHA_TRAMPAS de comun/trampas-base.js (JSON por renglón).
     t = open(SRC, encoding='utf-8').read()
     cuerpo = t[t.index('const FICHA_TRAMPAS = {') + len('const FICHA_TRAMPAS = '):]
-    cuerpo = cuerpo[:cuerpo.index('};') + 1].replace('true', 'True').replace('false', 'False')
-    return eval(cuerpo)
+    cuerpo = cuerpo[:cuerpo.index('\n  };') + 4]
+    return json.loads(cuerpo)
 
 
 FICHA = leer_ficha()
@@ -109,30 +132,21 @@ def main():
             linea = b['tipo'] == 'linea'
             tamano = (3, 5, 7)[p - 1] if linea else p
             dano = dados(b['dano'], p)
-            texto = b['detalle']
-            if b['dano'] and dano != b['dano']:
-                texto = texto.replace(b['dano'], dano)
-            if not linea:
-                texto = re.sub(r'flor de %d' % b['tamano'], 'flor de %d' % tamano, texto)   # el texto de las explosivas nombra su área
             precio = redondo5((10 + 12 * b['nivel']) * ESCALA_PRECIO[p])
             forma = ('línea de largo %d' % tamano) if linea else ('flor de radio %d (%d casilleros)' % (tamano, hexes(tamano)))
-            detalle = ('Trampa %s: al usarla se coloca en el mapa una trampa en %s. %s' % (GRADO[p], forma, texto))
-            if p != 2:
-                detalle += ' Dificultades y duraciones %s.' % ('−2 respecto de la trampa común' if p == 1 else '+2 respecto de la trampa común')
-            detalle += ' ⚙ Automático: al consumirla se coloca sola en el mapa, en la casilla libre al frente de tu token, con estas cifras; después la arrastrás adonde la quieras (solo la ven vos y el GM y la disparan los rivales; los aliados nunca). ✋ A mano: estados, tiradas para evitarla y lo demás que dice el texto. Se apila sin límite en la mochila.'
-            datos = {'nombre': nombre[:40], 'detalle': (texto[:190]), 'amiga': bool(b['amiga'] or b['nombre'] in FISICAS), 'tipo': b['tipo'], 'tamano': tamano, 'color': b['color'], 'alfa': 45, 'dano': dano}
-            # La ficha corta (2026-10-02): efecto, salvación (dificultades ±2 según la potencia) y dificultad para detectarla (6 / 8 / 10).
-            f = FICHA.get(b['nombre'])
-            if f:
-                datos['efectoTxt'] = f[0]
-                datos['salvaTxt'] = re.sub(r'contra (\d+)', lambda m: f'contra {max(1, int(m.group(1)) + 2 * (p - 2))}', f[1])
-                if f[2]: datos['efectoAuto'] = True
-            datos['detectar'] = 8 + 2 * (p - 2)
+            # Lo que hace, automatizado donde se puede (2026-10-02): estado, lo que queda a mano y la salvación (dificultades ±2 según la
+            # potencia), y la dificultad para detectarla (6 / 8 / 10). Sale de FICHA_TRAMPAS de comun/trampas-base.js.
+            f = json.loads(json.dumps(FICHA.get(b['nombre'], {})))
+            d = 2 * (p - 2)
+            if f.get('salvacion'): f['salvacion']['dif'] = max(1, f['salvacion']['dif'] + d)
+            if f.get('efectoManual'): f['efectoManual'] = re.sub(r'contra (\d+)', lambda m: f'contra {max(1, int(m.group(1)) + d)}', f['efectoManual'])
+            f['detectar'] = 8 + d
+            texto = texto_de(f, dano, bool(b['ignoraDef']))
+            detalle = detalle_item(GRADO[p], forma, texto, f.get('efectoManual', ''))
+            datos = {'nombre': nombre[:40], 'detalle': texto[:200], 'amiga': bool(b['amiga'] or b['nombre'] in FISICAS), 'tipo': b['tipo'], 'tamano': tamano, 'color': b['color'], 'alfa': 45, 'dano': dano}
             if b['ignoraDef']:
                 datos['ignoraDef'] = True
-            if b['estado']:
-                datos['estado'] = b['estado']['nombre']
-                datos['estadoTurnos'] = b['estado']['turnos']
+            datos.update(f)
             items.append({
                 'id': 'nuevo-trampa-%s-r%d' % (slug(b['nombre']), p), 'nombre': nombre, 'tier': tier_por_precio(precio), 'tipoItem': 'consumibles', 'peso': 0, 'ranuras': 1,
                 'precioCompra': precio, 'detalle': detalle, 'descripcionNarrativa': NARR[b['nombre']], 'unidades': 1, 'consumible': True,

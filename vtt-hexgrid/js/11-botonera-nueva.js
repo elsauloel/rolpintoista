@@ -544,7 +544,7 @@ function bnCombateUi(){
       bn.raiz.querySelector('#bn-sobre-texto').innerHTML = `Tu equipo pesa <b>${fmt(p.sobre)}</b> de más. ¿Pagás <b>1 No2</b> para tirar la evasión sin penalidad, o tirás con <b>−${fmt(p.sobre)}</b>? (tenés ${fmt(Math.max(0, num(bn.S.nitros)))} No2)`;
       bn.raiz.querySelector('[data-bn-sobre="penal"]').textContent = `Tirar con −${fmt(p.sobre)}`;
       bn.raiz.querySelector('[data-bn-sobre="pagar"]').disabled = num(bn.S.nitros) < 1;
-      bn.raiz.querySelector('#bn-sobrepeso').classList.add('open');
+      bnAbrirCartel('bn-sobrepeso');
     },
     getParry: () => bn.parryPendiente || null,
     setParry: id => { bn.parryPendiente = id; },
@@ -552,7 +552,7 @@ function bnCombateUi(){
       const dmg = FichaCalculo.calcular(bn.S).final.dmg;
       bn.raiz.querySelector('#bn-arma-lista').innerHTML = (tipo === 'dano' ? '' : `<div class="hint">${tipo === 'parry' ? 'Parry: siempre cuesta 1 No2, sea cual sea el arma o escudo que elijas.' : tipo === 'fuerza' ? 'Fuerza del golpe: tu Fuerza + el peso del arma que elijas; esa suma es el dado (contra el Bloqueo del defensor).' : 'Bloqueo: tu Bloqueo + el peso del arma o escudo que elijas; esa suma es el dado que tirás. (Después de un Parry se usa el mismo, solo.)'}</div>`) +
         armas.map(a => `<button class="btn" data-bn-arma="${tipo}:${a.item.id}" style="width:100%">${a.mano ? `Mano ${a.mano}: ` : ''}${esc(a.item.nombre)} — ${tipo === 'dano' ? esc(FichaCombate.armaDanoTxt(a.item, dmg)) : tipo === 'parry' ? `${fmt(Combatiente.costoParry())} No2` : `+${fmt(num(a.item.peso))} de peso`}</button>`).join('');
-      bn.raiz.querySelector('#bn-elegir-arma').classList.add('open');
+      bnAbrirCartel('bn-elegir-arma');
     },
     // Los efectos al golpear del arma (comun/efectos-golpe.js): recordar y tirar, no aplicar — igual que la ficha.
     efectosAlPegar: it => EfectosGolpe.alPegar({arma: it.nombre, efectos: it.efectosGolpe, publicar: linea => {
@@ -673,7 +673,7 @@ function bnHabUi(){
     elegirArmaHab: (it, opciones) => {
       bn.raiz.querySelector('#bn-arma-lista').innerHTML = `<div class="hint">${esc(it.nombre)}: cuesta lo mismo que un ataque con el arma que elijas, y cuenta como ese ataque.</div>` +
         opciones.map(o => `<button class="btn" data-bn-habarma="${esc(it.id)}:${esc(o.arma.id)}" style="width:100%">${o.mano ? `Mano ${o.mano}: ` : ''}${esc(o.arma.nombre)} — ${fmt(FichaCombate.costoAtaque(bn.S, o.arma))} No2${FichaCombate.ataquesConArma(bn.S, o.arma) ? '' : ' (primer ataque)'}${FichaCombate.costoAtaque(bn.S, o.arma) > num(bn.S.nitros) ? ' · no te alcanza' : ''}</button>`).join('');
-      bn.raiz.querySelector('#bn-elegir-arma').classList.add('open');
+      bnAbrirCartel('bn-elegir-arma');
     },
     pedirCostoX: (it, armaPend) => {
       const S = bn.S, arma = armaPend === undefined ? null : armaPend, r = bn.raiz;
@@ -777,10 +777,16 @@ function bnVerAccion(accion){
 }
 // El cartel de "No te alcanzan los Nitros" (el mismo de la ficha), adentro del recuadro.
 let bnSinNitrosSeguir = null;
+// Un cartel de la Botonera que pide algo (sin No2, sobrepeso, ¿con qué arma?) se tiene que ver aunque la Botonera esté escondida (2026-10-03:
+// el duelo le pide el PdG mientras se eligió el objetivo y el cartel quedaba invisible, esperando).
+function bnAbrirCartel(id){
+  if(bn.host.hidden){ bn.host.hidden = false; bnUbicar(); }
+  bn.raiz.querySelector('#' + id).classList.add('open');
+}
 function bnSinNitros(costo, accion, continuar){
   bnSinNitrosSeguir = continuar;
   bn.raiz.querySelector('#bn-sn-texto').innerHTML = `No podés <b>${esc(accion)}</b>: cuesta <b>${fmt(costo)} No2</b> y tenés <b>${fmt(Math.max(0, num(bn.S.nitros)))}</b>.`;
-  bn.raiz.querySelector('#bn-sin-nitros').classList.add('open');
+  bnAbrirCartel('bn-sin-nitros');
 }
 function bnCerrarSinNitros(){ bnSinNitrosSeguir = null; if(bn) bn.raiz.querySelector('#bn-sin-nitros').classList.remove('open'); }
 function bnCrear(){

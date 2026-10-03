@@ -248,6 +248,12 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Por la espalda: probarlo en el mapa** (construido 2026-10-03, pruebas automáticas en verde): un token en sigilo, en el casillero de atrás
   de un rival, ataca con un arma que tenga el bono → el cuadro del duelo dice «🗡 por la espalda» y suma PdG, daño y Crítico potente. Ninguna arma del
   catálogo lo trae todavía (ninguna T4 Común lo usó): aparecerá más adelante en el rework.
+- [ ] **Arma que ignora Resistencia a crítico: verla con un crítico real en el mapa** (construido 2026-10-03; probado en vivo hasta el contacto:
+  Clementino con «ignora 2» contra el Escarabajo con Resistencia T4 2 — el duelo recibió los dos datos; el golpe empató y no pegó. La cuenta
+  del crítico, con pruebas automáticas).
+- [x] (2026-10-03) **Cartel invisible en la Botonera**: si el duelo le pedía el PdG a un personaje sin No2 mientras la Botonera estaba escondida
+  (eligiendo objetivo), el «¿Atacar igual?» quedaba oculto y el duelo esperando. Ahora esos carteles (sin No2, sobrepeso, ¿con qué arma?)
+  muestran la Botonera (`bnAbrirCartel`). Falta verlo en una sesión real.
 - [ ] **«Seguro si es crítico» de un arma: probarlo en el mapa** (construido 2026-10-03; Punzón de matarife, Aguja de la envenenadora): con un golpe
   crítico, el efecto del arma aparece como «Entra siempre», sin tirar.
 - [ ] **Generador de tiendas: cupo mínimo de armas mágicas en cada generación** (pedido del dueño, 2026-09-25): diseñarlo cuando existan las armas mágicas del catálogo (ver `rework-armas.md`, armas mágicas). Preguntas para ese momento: ¿cuántas por tienda?, ¿depende del tamaño/tipo de tienda?, ¿pisa el azar de tier?

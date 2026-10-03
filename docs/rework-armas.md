@@ -830,3 +830,27 @@ manos (uno), Crítico frecuente +2 (uno).
 **Lo que muestra:** solo 9 (7 distintas, 2 copias); dos rinden como Buena (Espada bastarda, Mandoble); la Katana rinde como Excepcional y cuesta
 120; la Cuchilla de carnicero trae Rompe armadura siempre; nadie usa lo que abre Rara: Crít. frecuente +4 (una), Ignora, por la espalda, Rengo
 más alto, Parry + Bloqueo combinados (sí hay dos), Critical Matters, «seguro si es crítico», Veneno.
+
+### T6 Raro — propuesta v1: 18 armas (2026-10-03, ⬜ a revisar por el dueño)
+| Arma | Lo que hace · precio |
+|---|---|
+| **Con Sangrado** | |
+| Espada bastarda | 2 dados · +1 · Parry +1 · Bloqueo +1 · Sangrado 3 stacks 33 % · 190 |
+| Katana de maestro | 2 dados · Parry +2 · Iniciativa +1 · Crít. frecuente +1 · contraataque +2 · Sangrado 50 %, seguro si es crítico · 400 |
+| Sable del capitán pirata | 2 dados · +2 · Parry +1 · contraataque +2 · Sangrado 50 % · 250 |
+| 🆕 Cimitarra del sol | 2 dados · +1 · Iniciativa +2 · contraataque +2 · Sangrado 50 % · 200 |
+| 🆕 Facón de oro | +2 · Iniciativa +2 · Crít. frecuente +1 · contraataque +1 · Sangrado 50 % · 230 |
+| 🆕 Guadaña | 2 manos · 2 dados · Alcance +1 · Sangrado 75 % · Rengo 33 % · 260 |
+| 🆕 Machete del Impenetrable | +1 · +1 dado amplificado · Iniciativa +1 · contraataque +1 · Rengo 33 % · Sangrado 50 % · 220 |
+| 🆕 Cimitarra del corsario | +1 · contraataque +2 · Crít. potente +2 · Veneno 3 stacks 50 % · Sangrado 33 % · 210 |
+| 🆕 Espadón del estanciero | 2 manos · 3 dados · Alcance +1 · Bloqueo +1 · Sangrado 33 % · 400 |
+| **Sin Sangrado** | |
+| Espada bastarda del Espectro (era copia) | 2 dados · Crít. potente +2 · 🗡 espalda +3 PdG, +2 daño · ⚡ si es crítico: Sangrado 3 stacks · 280 |
+| Mandoble | 2 manos · 3 dados · Parry +2 · Bloqueo +1 · 240 |
+| Cuchilla de carnicero | 2 dados · +2 · Bloqueo +1 · Rompe armadura 33 % · 210 |
+| Espada vampírica menor | 2 dados · Parry +1 · contraataque +2 · Drena vida 50 % · 300 |
+| Katana | 2 dados · Crít. potente +3 · Ignora 1 de Res. crítico · 240 |
+| Katana del cazarrecompensas (era copia) | Iniciativa +2 · Crít. frecuente +2 · 🗡 espalda +2 PdG, +2 daño · 260 |
+| 🆕 Sable del comandante | 2 dados · +1 · Parry +1 · contraataque +3 · ⚡ si es crítico: Rengo · 230 |
+| 🆕 Sable del general | 2 dados · Iniciativa +2 · Parry +1 · contraataque +1 · Rengo 50 %, seguro si es crítico · 220 |
+| 🆕 As de espadas | **Crít. frecuente +4** (la única) · 300 |

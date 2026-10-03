@@ -433,6 +433,8 @@ const Biblioteca = (() => {
       q('bib-cero-btn').onclick = () => { q('scrim-biblioteca').classList.remove('open'); opts.alCrearDeCero(); };
       if(opts.alAsistente) q('bib-asistente-btn').onclick = () => { q('scrim-biblioteca').classList.remove('open'); opts.alAsistente(); };
     }else cero.style.display = 'none';
+    // opts.z: abrirla por encima de otra ventana (ej. el editor de una habilidad, en la ventana común paso a paso); si no, la altura de siempre.
+    q('scrim-biblioteca').style.zIndex = opts.z ? String(opts.z) : '';
     q('scrim-biblioteca').classList.add('open');
     q('bib-lista').innerHTML = '<div class="hint">Cargando…</div>';
     try{

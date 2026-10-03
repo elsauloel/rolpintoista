@@ -277,7 +277,7 @@ const CreepEditor = (() => {
     // sus cantidades — de qué tamaño, cuánto daño y cuántas — antes de cargarla en el editor.
     function trampasPreconstruidas(){
       Biblioteca.abrir({
-        tipo: 'trampas', titulo: 'Trampa preconstruida',
+        tipo: 'trampas', titulo: 'Trampa preconstruida', z: 99600,   // por encima del editor de la habilidad
         base: typeof TRAMPAS_BASE !== 'undefined' ? TRAMPAS_BASE : [],
         subtitulo: x => (x.nivel ? ` · nivel ${x.nivel}` : '') + (x.datos && x.datos.amiga ? ' · 🔥 daña a aliados en el área' : '') + (x.datos && x.datos.dano ? ` · 💥 ${x.datos.dano}` : ''),
         grupos: [{nombre: 'Efecto', tags: ['daño', 'veneno', 'explosiva', 'fuego', 'inmoviliza', 'debuff', 'control', 'alarma']}, {nombre: 'Origen', tags: ['mecánica', 'mágica', 'natural']}, {nombre: 'Nivel', tags: ['nivel 1', 'nivel 2', 'nivel 3', 'nivel 4', 'nivel 5']}, {nombre: 'Alcance', tags: ['área']}],

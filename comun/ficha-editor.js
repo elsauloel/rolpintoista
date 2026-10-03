@@ -375,7 +375,7 @@ const FichaEditor = (() => {
     function trampaPreconstruidas(){
       const ed = editing;
       Biblioteca.abrir({
-        tipo: 'trampas', titulo: 'Trampa preconstruida',
+        tipo: 'trampas', titulo: 'Trampa preconstruida', z: 99600,   // por encima del editor de la habilidad
         base: typeof TRAMPAS_BASE !== 'undefined' ? TRAMPAS_BASE : [],
         subtitulo: e => (e.nivel ? ` · nivel ${e.nivel}` : '') + (e.datos && e.datos.dano ? ` · 💥 ${e.datos.dano}` : ''),
         grupos: [{nombre: 'Efecto', tags: ['daño', 'veneno', 'explosiva', 'fuego', 'inmoviliza', 'debuff', 'control', 'alarma']}, {nombre: 'Origen', tags: ['mecánica', 'mágica', 'natural']}, {nombre: 'Nivel', tags: ['nivel 1', 'nivel 2', 'nivel 3', 'nivel 4', 'nivel 5']}],

@@ -73,6 +73,7 @@ const ElegirTrampa = (() => {
 .et-c .et-op b{font-size:15px}.et-c .et-op small{color:var(--pap-tenue,#9A867E);font-size:12.5px;line-height:1.4}
 .et-c .et-op .et-ico{font-size:24px;line-height:1}
 .et-c .et-grande{flex-direction:row;gap:12px;align-items:flex-start;padding:14px}
+.et-c .et-grande b,.et-c .et-grande small{display:block}.et-c .et-grande small{margin-top:4px}
 .et-c h4{margin:14px 0 6px;font-family:"Space Mono",monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--pap-tenue,#9A867E)}
 .et-c .et-fila{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
 .et-c .et-fila input[type=number]{width:80px}

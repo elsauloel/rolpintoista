@@ -117,7 +117,7 @@ construir **«al hacer crítico: +N SP»** si Robar SP lo necesita.
 13 ya la tenían; se pasaron a ✨ «a uno mismo» Estoicismo, Dash, Ojo de asesino, Blindaje (costo en turno ajeno 2 SP), Aura de espinas, Recuperación, Piel
 resistente y Temple (se sacó el estado del sistema viejo para que no se aplique dos veces); Golpe brutal (Crítico potente +1 solo en ese golpe, −2 Evasión
 sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde el mapa: Piel resistente (Defensa 0 → 5, Res.Esp 5 → 10, resistencias 0 → 1).
-Faltan, porque necesitan algo nuevo: **Daño en área** (daño del arma en una onda), **Sonic Boom** (objetivo «cono» y el efecto «pierde No2»), **Cañón Vasco**
+✅ **Daño en área** (2026-10-02): onda de radio 1 con dodge roll, PdG contra la Evasión de cada uno, el daño de tu arma (construido: «el daño de tu arma» y «la onda deja dodge roll» en el editor); probado en vivo desde el mapa (Clementino con la Aguja: PdG 6 contra Eva 3, daño 9 − Defensa 4 = 5, la Bruja 23 → 18); el dodge roll de la onda no salió en la prueba (usa la regla de las áreas). Faltan, porque necesitan algo nuevo: **Sonic Boom** (objetivo «cono» y el efecto «pierde No2»), **Cañón Vasco**
 (daño «tu tirada + X»). Visto de paso: después de cargar el mapa, la primera B a veces no abre la Botonera (la segunda sí).
 
 **B. Puntual (después de A):**

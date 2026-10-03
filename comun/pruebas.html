@@ -178,6 +178,7 @@ prueba('un jefe es inmune a Stun', () => igual(EstadosAplicar.aplicarACreep({est
 prueba('estado propio con escudo queda como buff', () => igual(EstadosAplicar.componer({nombre: 'Blindaje improvisado', escudoMagico: 6}).polaridad, 'buff'));
 prueba('texto de un estado con turnos y escudo', () => igual(EstadosAplicar.texto({nombre: 'Escudo especial', turnos: 1, escudoMagico: 8}), 'Escudo especial (1 turno, 🛡8)'));
 prueba('texto de un Veneno con stacks: ×3, sin los turnos del preset', () => igual(EstadosAplicar.texto({nombre: 'Veneno', stacks: 3}), 'Veneno ×3'));
+prueba('texto de un estado con bonos: con el nombre del stat que ve la mesa', () => igual(EstadosAplicar.texto({nombre: 'Piel resistente', turnos: 2, mods: [{stat: 'def', val: 5}, {stat: 'tipo1', val: 1}]}), 'Piel resistente (2 turnos, +5 ' + FichaCalculo.STAT_LABEL.def + ', +1 ' + FichaCalculo.STAT_LABEL.tipo1 + ')'));
 
 /* ---------- Combatiente (comun/combatiente.js, paso 1 de la consolidación) ---------- */
 grupo('Combatiente');

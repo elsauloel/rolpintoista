@@ -113,6 +113,12 @@ tiendas (solo lo que hacen; «Detalles técnicos» en Ver, `comun/item-corto.js`
 Aviso al afectado y la Crónica para la mesa (P148 ✅). Habilidades: ver [`automatizar-habilidades-origen.md`](automatizar-habilidades-origen.md) — quedan
 Bizzante (Invocar Abeja, Robar SP: el dueño lo ve con Seba) e Invi (salteada). Pendiente: **probar en vivo la opción «Invoca»** (construida, sin probar) y
 construir **«al hacer crítico: +N SP»** si Robar SP lo necesita.
+**Habilidades de clase ya auditadas, con su automatización** (2026-10-02, pedido del dueño: que las auditadas tengan cargada la Ejecución y sus efectos):
+13 ya la tenían; se pasaron a ✨ «a uno mismo» Estoicismo, Dash, Ojo de asesino, Blindaje (costo en turno ajeno 2 SP), Aura de espinas, Recuperación, Piel
+resistente y Temple (se sacó el estado del sistema viejo para que no se aplique dos veces); Golpe brutal (Crítico potente +1 solo en ese golpe, −2 Evasión
+sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde el mapa: Piel resistente (Defensa 0 → 5, Res.Esp 5 → 10, resistencias 0 → 1).
+Faltan, porque necesitan algo nuevo: **Daño en área** (daño del arma en una onda), **Sonic Boom** (objetivo «cono» y el efecto «pierde No2»), **Cañón Vasco**
+(daño «tu tirada + X»). Visto de paso: después de cargar el mapa, la primera B a veces no abre la Botonera (la segunda sí).
 
 **B. Puntual (después de A):**
 7. [x] **Una invocación sin No2 para atacar, adentro del duelo** — hecho 2026-10-02: pregunta «¿Atacar igual?» (duelo, Botonera de la

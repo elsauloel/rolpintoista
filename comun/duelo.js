@@ -880,9 +880,9 @@ const Duelo = (() => {
   // Un renglón por cosa que pasó, para la línea de reporte de la Mesa.
   function lineasResumen(d){
     const L = [];
-    const arma = d.ataque.armaNombre ? d.ataque.armaNombre : 'sin arma';
+    const arma = d.ataque.armaNombre ? 'con ' + d.ataque.armaNombre : 'sin arma';
     if(d.hab) L.push(`${d.atacante.nombre} → ${d.defensor.nombre} · ✨ ${d.hab.nombre}${d.hab.sinOposicion ? '' : ' (' + etqTira(d) + ' contra ' + etqContra(d) + ')'}`);
-    else L.push(`${d.atacante.nombre} → ${d.defensor.nombre} · ${nombreAtq(d)} con ${arma} (Tipo ${_fmt(_num(d.ataque.tipoDado))})${modsTxt(d) ? ' · ' + modsTxt(d) : ''}`);
+    else L.push(`${d.atacante.nombre} → ${d.defensor.nombre} · ${nombreAtq(d)} ${arma} (Tipo ${_fmt(_num(d.ataque.tipoDado))})${modsTxt(d) ? ' · ' + modsTxt(d) : ''}`);
     const defTxt = d.defensa && d.defensa.modo === 'parry' ? 'Parry' + (d.defensa.itemNombre ? ' con ' + d.defensa.itemNombre : '') : 'Evasión';
     if(d.hab){
       if(d.pdg && d.eva) L.push(`${etqTira(d)} ${d.pdg.total} contra ${etqContra(d)} ${d.eva.total} → ${d.contacto && d.contacto.gana === 'atacante' ? 'funcionó' : 'se resistió'}${d.contacto && d.contacto.desempate ? ' (por desempate)' : ''}`);

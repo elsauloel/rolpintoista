@@ -1030,10 +1030,13 @@ puede haber más»).
 | **🏹 Asta** | |
 | Alabarda de guardia | 2 manos · 2 dados · +1 · Alcance +1 · Derribar 25 % · 220 |
 | Hacha danesa | 2 manos (era de una) · 2 dados · Alcance +1 · Rompe armadura siempre · 300 |
-| Hacha de asta larga 🆕 | 2 manos · 2 dados · Alcance +2 · Bloqueo +1 · 230 |
+| Hacha de asta larga 🆕 | 2 manos · 2 dados · Alcance +1 · Parry +1 · Bloqueo +1 · 260 |
 | **🩸 Salvaje** | |
 | Sagaris | 2 dados · +1 · Rompe armadura siempre · Sangrado siempre · 400 |
 | Hacha de colmillo de jabalí 🆕 | 2 dados · Sangrado de 3 stacks 50 % · Rompe armadura 33 % · 190 |
 | Hacha del pantano negro 🆕 | 2 dados · Veneno de 3 stacks 50 % · Sangrado 33 % · 180 |
 
 Con Rompe armadura: **11 de 18**. El **Hacha arrojadiza** queda afuera (va con las de rango).
+
+**Alcance +2 no va en las hachas (dueño, 2026-10-03):** «para un hacha no me gusta; sí en alguna Tipo 4 rara» (ya la hay: la Pica de retaguardia,
+Alcance +2). El Hacha de asta larga pasa a Alcance +1 · Parry +1 · Bloqueo +1 (260).

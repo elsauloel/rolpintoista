@@ -811,3 +811,5 @@ manos (uno), Crítico frecuente +2 (uno).
 | Espada larga | PdG +1 · Crít. potente +2 · 150 |
 | 🆕 Espada del timbero | Crít. frecuente +2 · 120 |
 | 🆕 Espadón del capataz | 2 manos · 2 dados · Alcance +1 · 140 |
+
+**✅ T6 Buena calidad cargado (2026-10-03, OK del dueño):** las 18 de la propuesta v1, con los tres textos y el precio libre; las 5 copias quedaron como armas propias (mismos creeps).

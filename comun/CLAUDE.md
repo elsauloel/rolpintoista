@@ -1166,6 +1166,7 @@ versión parecida en más de una, es candidato a juntar.
   (`verHtml(item)`, `tecnicoHtml(item|texto)`; las notas ⚙/✋ las separa `partes(texto)`). `ItemCorto.CSS` (el mapa lo copia en sus recuadros
   aislados). Lo usan `ficha-tienda.js`, `ficha-lupa.js`, `creep-lupa.js`, el generador de tiendas, el editor del catálogo y `biblioteca.js` (las
   trampas: su ficha corta y «Ver detalles técnicos»; otras listas pueden pasar `opts.cuerpo(e)`/`opts.tecnico(e)`; `opts.z` la abre por encima).
+- **Habilidad que invoca** (2026-10-02, `ficha-acciones.js`: `invocacionDeHab`/`invocarConHab`): en el paso Ejecución del editor (`ficha-editor.js`, `invocaHtml`) se elige una invocación del personaje (`h.invoca = {invId}`). Al ejecutarla, después de cobrar, la despierta con vida y No2 llenos y sus turnos, o crea una copia («Abeja 2», `copiaDe`) si ya está en juego (reusa una copia dormida). Con el mapa abierto manda `invocacion-habilidad` y el mapa pide la casilla (mueve el token que ya tenía o lo crea) y lo cuenta en la Crónica.
 - **`elegir-trampa.js`** (`ElegirTrampa`, 2026-10-02, pedido del dueño) — al tildar «🪤 Esta habilidad coloca una trampa» (en los tres editores de
   habilidades: personaje, creep, invocación) se abre este menú: **una trampa conocida** (12 tipos con sus valores sugeridos, sacados del catálogo
   de trampas hasta auditarlo: `CONCEPTOS` — púas, cepo, red, veneno, gas, explosiva, fuego, hielo, eléctrica, pegajosa, runa, alarma — y un paso a

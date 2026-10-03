@@ -3,6 +3,8 @@
 > Lista viva para ir tachando. Las **decisiones de diseño** sin cerrar viven en [`preguntas-abiertas.md`](preguntas-abiertas.md) (con número P);
 > acá van las **tareas**. Al terminar una, marcarla `[x]` con la fecha; al aparecer una nueva, sumarla. Última revisión: 2026-09-21.
 
+> **En curso (2026-10-02): automatizar las habilidades de los personajes de «El origen de las especies»** → [`automatizar-habilidades-origen.md`](automatizar-habilidades-origen.md) (cuál está hecha, cuál espera y por qué).
+
 ## 0. Hoja de ruta acordada (2026-10-02, a seguir en este orden)
 
 > **Criterio del dueño (2026-10-02): primero prolijar lo estructural, después lo puntual** ("tomándonos el tiempo que haga falta").

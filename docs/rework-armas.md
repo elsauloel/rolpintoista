@@ -714,3 +714,24 @@ cuartel, Espada del comisario, Espada de la feria de Mataderos, Cuchilla del fri
 colimba, Sable del cuatrero, Hoz del quintero, Sable de utilería, Facón del baldío, Navaja del peluquero de la esquina). **Respuesta del dueño (2026-10-03): «mucho no me
 convenció»: a lo sumo mitad y mitad (estilo anterior y criollo), porque todo criollo queda forzado; sí evitar palabras poco usadas en Argentina
 (húsar, matarife). Nombres en pausa: el dueño les busca la vuelta. No se renombran las tandas del Tipo 4.**
+
+### T6 Buena calidad — lo que hay hoy (tabla comparativa, 2026-10-03)
+| # | Arma | Dados | Fijo | Bonos | Al golpear | Precio | PC → tier | Libre | Observación |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | Cimitarra de guardia | 1 | — | Parry +2 | — | 75 | 5,3 · Común | 60 | rinde como común; sin Sangrado |
+| 2 | Cimitarra del contramaestre | 1 | — | Parry +2 | — | 75 | 5,3 · Común | 60 | **copia** de la 1 (botín) |
+| 3 | Sable de caballería | 1 | — | PdG +1, Parry +1 | — | 75 | 8,7 · Buena | 120 | sin Sangrado |
+| 4 | Sable de mando del capitán | 1 | — | PdG +1, Parry +1 | — | 75 | 8,7 · Buena | 120 | **copia** de la 3 (botín) |
+| 5 | Espada larga de infantería | 2 | — | Parry +1, contraataque +1 | — | 100 | 8,4 · Buena | 110 | sin Sangrado |
+| 6 | ⚠️ Falchion | 2 | — | — | Ignora 1 de Res. crítico | 75 | 9,6 · Buena | 120 | Ignora va desde Rara; nombre poco usado |
+| 7 | Cimitarra del desierto | 2 | +1 | Iniciativa +1, contraataque +1 | Sangrado 33 % | 130 | 9,9 · Buena | 150 | la única que sangra |
+| 8 | Espada de la guardia | 2 | — | Parry +1, Crít. frecuente +1 | — | 150 | 10,6 · Buena | 160 | sin Sangrado |
+| 9 | Sable militar | 2 | — | PdG +1 | — | 80 | 11,0 · borde Rara | 150 | sin Sangrado |
+| 10 | Sable del sargento | 2 | — | PdG +1 | — | 80 | 11,0 · borde Rara | 150 | **copia** de la 9 (botín) |
+| 11 | Espada larga | 1 | — | PdG +2 | — | 90 | 12,1 · Rara | 180 | rinde como Rara; sin Sangrado |
+| 12 | Espada del Jefe de los Mil Caminos | 1 | — | PdG +2 | — | 90 | 12,1 · Rara | 180 | **copia** de la 11 (botín) |
+| 13 | Espada del veterano de mil batallas | 1 | — | PdG +2 | — | 90 | 12,1 · Rara | 180 | **copia** de la 11 (botín) |
+
+**Lo que muestra:** 5 copias (quedan 8 distintas); 12 de 13 no sangran (ni siquiera el piso de la Común); la Cimitarra de guardia rinde como
+común; la Espada larga y el Sable militar, como Raras; el Falchion usa «Ignora» (desde Rara) y un nombre poco usado; nadie usa Rengo, Bloqueo,
+Veneno, Rompe armadura bajo, daño amplificado ni efectos «si es crítico».

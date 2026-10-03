@@ -771,3 +771,13 @@ crítico** (una común puede tener Crít. frecuente +1 **o** Crít. potente +2, 
 | 🆕 Espada del duelista novato | Crít. frecuente +1 · Parry +1 · 95 |
 
 **✅ T6 Común v2 cargado (2026-10-03, OK del dueño):** 24 armas (12 con Sangrado 25 %, 12 con efectos que lo igualan o superan; 5 con crítico).
+
+### T4 Común — 6 más, para llegar a 24 (propuesta, 2026-10-03, ⬜ a revisar)
+| Arma | Lo que hace · precio |
+|---|---|
+| Punzón de hielo | Crít. potente +2 · 55 |
+| Cortaplumas | Iniciativa +2 · 45 |
+| Tenedor de asado | Crít. potente +1 · Sangrado 25 % · 55 |
+| Aguja de tejer | Lisiado 25 % · PdG en oportunidad +1 · 55 |
+| Tacuara | Alcance +1 · Crít. potente +1 · 85 |
+| Cuchillo de la pensión | +1 dado amplificado · 60 |

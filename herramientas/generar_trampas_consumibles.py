@@ -69,7 +69,7 @@ def texto_de(f, dano, ignora_def):
     p = []
     est = ''
     if f.get('estado'):
-        est = f['estado'] + (' ×%d' % f['estadoStacks'] if f.get('estadoStacks') else '') + (' (%d de daño por turno)' % -f['estadoHp'] if f.get('estadoHp') else '') + (' %d turnos' % f['estadoTurnos'] if f.get('estadoTurnos') else '')
+        est = f['estado'] + (' ×%d' % f['estadoStacks'] if f.get('estadoStacks') else '') + (' (%d de daño por turno)' % -f['estadoHp'] if f.get('estadoHp') else '') + (' %d turno%s' % (f['estadoTurnos'], '' if f['estadoTurnos'] == 1 else 's') if f.get('estadoTurnos') else '')
     partes = [x for x in [('%s de daño%s' % (dano, ' directo' if ignora_def else '')) if dano else '', est] if x]
     if partes: p.append(' y '.join(partes) + ' (automático).')
     s = f.get('salvacion')

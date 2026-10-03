@@ -524,7 +524,8 @@ async function trampaAplicarEfectos(t, el){
       let hecho = false;
       try{
         if(monto > 0 && x.tipo === 'creep' && x.fichaId && soyGM){ await danioCreep(x, String(monto), !!el.trampaIgnoraDef); hecho = true; }
-        else if(monto > 0 && x.tipo === 'pj' && x.fichaId && !esInv && puedoMover(x)){ await danioPj(x, String(monto), !!el.trampaIgnoraDef); hecho = true; }
+        // Un personaje o una invocación: su dueño, o el GM (puede escribirle la vida, como en el duelo).
+        else if(monto > 0 && x.tipo === 'pj' && x.fichaId && (puedoMover(x) || soyGM)){ await (esInv ? danioInv : danioPj)(x, String(monto), !!el.trampaIgnoraDef); hecho = true; }
       }catch(err){ console.error('No se pudo aplicar el daño de la trampa:', err); }
       partes.push(monto > 0 ? `${monto} de daño${el.trampaIgnoraDef ? ' directo a la vida' : ' (menos su Defensa)'}${hecho ? '' : ' — aplicalo a mano'}` : 'sin daño');
     }
@@ -535,7 +536,7 @@ async function trampaAplicarEfectos(t, el){
           let inmune = '';
           await modificarCreep(x.fichaId, sc => { const r = EstadosAplicar.aplicarACreep(sc, spec); if(!r.ok) inmune = r.motivo || 'inmune'; });
           que = inmune ? ` — no le hace nada (${inmune})` : '';
-        }else if(x.tipo === 'pj' && x.fichaId && !esInv){
+        }else if(x.tipo === 'pj' && x.fichaId && x.duenoUid){   // al personaje o a su invocación: lo aplica quien lo maneja (comun/recibidos.js)
           await EstadosAplicar.encolarPj({fichaId: x.fichaId, duenoUid: x.duenoUid, spec, origen: nombreT});
           que = '';
         }

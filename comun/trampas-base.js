@@ -56,7 +56,7 @@
   const QUE = {todo: 'la evita', efecto: 'evita el efecto', mitad: 'le saca la mitad del daño'};
   function textoDe(f, dano, ignoraDef){
     const p = [];
-    const est = f.estado ? `${f.estado}${f.estadoStacks ? ' ×' + f.estadoStacks : ''}${f.estadoHp ? ` (${-f.estadoHp} de daño por turno)` : ''}${f.estadoTurnos ? ' ' + f.estadoTurnos + ' turnos' : ''}` : '';
+    const est = f.estado ? `${f.estado}${f.estadoStacks ? ' ×' + f.estadoStacks : ''}${f.estadoHp ? ` (${-f.estadoHp} de daño por turno)` : ''}${f.estadoTurnos ? ` ${f.estadoTurnos} turno${f.estadoTurnos === 1 ? '' : 's'}` : ''}` : '';
     const partes = [dano ? `${dano} de daño${ignoraDef ? ' directo' : ''}` : '', est].filter(Boolean);
     if(partes.length) p.push(partes.join(' y ') + ' (automático).');
     if(f.salvacion) p.push(`${f.salvacion.etq} contra ${f.salvacion.dif} ${QUE[f.salvacion.que] || 'la evita'} (automático).`);

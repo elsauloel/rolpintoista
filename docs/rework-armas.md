@@ -891,7 +891,7 @@ La familia que **rompe armaduras**: su efecto de casa es **Rompe armadura**; jue
 **Definiciones del Tipo 8 ✅ (dueño, 2026-10-03):** piso de la Común = **1d8 con 33 % de Rompe armadura**, en la mitad de las armas; la otra mitad
 juega con los demás parámetros (sin quedar por debajo); puede haber alguna con Rompe armadura 50 % y nada más. Comunes: **24**.
 
-### T8 Común — propuesta v1: 24 armas (2026-10-03, ⬜ a revisar por el dueño)
+### T8 Común — propuesta v1: 24 armas (2026-10-03, ✅ aprobada y cargada en el catálogo)
 | Arma | Lo que hace · precio |
 |---|---|
 | **Con Rompe armadura** | |
@@ -929,3 +929,5 @@ había margen sin cambiar de tier, sobre todo a las que juegan con **Parry** (af
 del capitán, Cimitarra de guardia, Sable de caballería, Espada larga de infantería, Espada de la guardia (para que entre: Crít. frecuente +1 →
 Crít. potente +2). Raras: Espada bastarda, Katana de maestro, Sable del capitán pirata, Mandoble, Espada vampírica menor, Sable del comandante,
 Sable del general, Rompeespadas (para que entre: contraataque +4 → +3; queda con +3 de durabilidad). Los precios se recalcularon.
+
+Cargadas (2026-10-03): las 24 con sus tres textos; sale la Lanza de caza (el Goblin cazador de jabalíes pasa a la Lanza corta); el Hacha del clan es arma propia (sigue de botín); en los creeps, el equipo común del Tipo 8 suma el Hacha de mano. Hacha de piedra, Hacha de leñador, Hacha de constructor, Hachón y Hacha de asta rinden un poco por encima de Común (2 dados, dos manos o daño amplificado), como en la propuesta.

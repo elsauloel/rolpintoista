@@ -610,7 +610,7 @@ Legendaria); el Báculo mágico sale del Tipo 4.
 
 | # | Arma (de la Rara…) | Manos | Dados | Fijo | Bonos | Al golpear | Firma 🔧 | Precio |
 |---|---|---|---|---|---|---|---|---|
-| 1 | Colmillo dientes de sable (desgarrador) | 1 | 2 | +2 | PdG +1, Crít. potente +3 | Sangrado **3 stacks** 75 % | Sangrado que entra con más stacks | 500 |
+| 1 | Colmillo dientes de sable (desgarrador) | 1 | 2 | +2 | PdG +1, Crít. potente +3 | Sangrado **3 stacks** 75 %, **permanente** (hasta que lo curen; decidido por el dueño) | Sangrado que entra con más stacks | 500 |
 | 2 | Beso de la viuda (viuda negra) | 1 | 1 | +2 | 🗡 espalda: +3 PdG, +3 daño | Veneno 5 stacks (siempre) · ⚡ si es crítico: Veneno severo | — | 600 |
 | 3 | Bisturí del anatomista (cirujano) | 1 | 1 | +2 | PdG +2, Crít. potente +2 | Lisiado 75 %, seguro si es crítico · **Rengo 50 %** | Rengo en armas | 850 |
 | 4 | Estilete del gran maestro (maestro) | 1 | 1 | +1 | PdG +3, Crít. frecuente +1 | ⚡ si es crítico: Lisiado | **No se puede parrear** | 1300 |

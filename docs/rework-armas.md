@@ -711,5 +711,6 @@ colimba, facón, rural, barrio. También **fantasía absurda, anacrónica y atem
 militares europeos** (húsar, alfanje, cimitarra…) que el grupo no conoce. La narrativa acompaña el nombre. Primera tanda con este criterio: T6
 Común (Facón de paisano, Sable de milico, Sable de granadero, Navaja del compadrito, Caronero, Sable del club de barrio, Sable herrumbrado del
 cuartel, Espada del comisario, Espada de la feria de Mataderos, Cuchilla del frigorífico, Machete de chacarero, Machete chaqueño, Espada de la
-colimba, Sable del cuatrero, Hoz del quintero, Sable de utilería, Facón del baldío, Navaja del peluquero de la esquina). **Si al dueño le gusta, se
-vuelve atrás y se renombran con este criterio las tandas ya hechas del Tipo 4.**
+colimba, Sable del cuatrero, Hoz del quintero, Sable de utilería, Facón del baldío, Navaja del peluquero de la esquina). **Respuesta del dueño (2026-10-03): «mucho no me
+convenció»: a lo sumo mitad y mitad (estilo anterior y criollo), porque todo criollo queda forzado; sí evitar palabras poco usadas en Argentina
+(húsar, matarife). Nombres en pausa: el dueño les busca la vuelta. No se renombran las tandas del Tipo 4.**

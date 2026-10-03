@@ -77,9 +77,15 @@ const InvBotonera = (() => {
         <div class="botonera-caja">
           <div class="cat-grouphead" style="margin-top:0"><span>Combate</span></div>
           <div class="botonera-combate-grid">${tilesCombate}</div>
-          <div class="botonera-defensa botonera-combate-bottom" style="margin-top:6px">
-            <div class="botonera-tile bt-info" title="Defensa (no se tira)">
-              <span class="bt-label">Defensa</span><span class="bt-value">${fmt(I.defensaEfectiva(inv))}</span>
+          <div class="botonera-valores">
+            <div class="botonera-valores-t">Valores (no se tiran)</div>
+            <div class="botonera-valores-fila">
+              <div class="botonera-tile bt-info" title="Defensa (no se tira)">
+                <span class="bt-label">Defensa</span><span class="bt-value">${fmt(I.defensaEfectiva(inv))}</span>
+              </div>
+              <div class="botonera-tile bt-info" title="Armadura mágica: se resta al daño de casteo que ignora la Defensa (no se tira)">
+                <span class="bt-label">Armad. mágica</span><span class="bt-value">${fmt(Math.max(0, num(I.statValor(inv, 'armadmg'))))}</span>
+              </div>
             </div>
             <div class="botonera-crit">
               <div class="botonera-crit-t">Resistencia a críticos</div>

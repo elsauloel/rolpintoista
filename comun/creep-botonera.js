@@ -123,14 +123,17 @@ const CreepBotonera = (() => {
       <div class="botonera-caja">
         <div class="acciones-grupo-label" style="margin-top:0">Combate</div>
         <div class="botonera-combate-grid">${tilesCombate}</div>
-        <div class="botonera-defensa">
-          <div class="botonera-tile bt-info" title="Defensa (no se tira)">
-            ${lupaBotonHtml(`${sc.id}|defensa|def`)}
-            <span class="bt-label">Defensa</span><span class="bt-value">${fmt(defensaEfectiva(sc))}</span>
-          </div>
-          <div class="botonera-tile bt-info" title="Armadura mágica: se resta al daño de casteo que ignora la Defensa (no se tira)">
-            ${lupaBotonHtml(`${sc.id}|defensa|armadmg`)}
-            <span class="bt-label">Armad. mágica</span><span class="bt-value">${fmt(armadmgEfectiva(sc))}</span>
+        <div class="botonera-valores">
+          <div class="botonera-valores-t">Valores (no se tiran)</div>
+          <div class="botonera-valores-fila">
+            <div class="botonera-tile bt-info" title="Defensa (no se tira)">
+              ${lupaBotonHtml(`${sc.id}|defensa|def`)}
+              <span class="bt-label">Defensa</span><span class="bt-value">${fmt(defensaEfectiva(sc))}</span>
+            </div>
+            <div class="botonera-tile bt-info" title="Armadura mágica: se resta al daño de casteo que ignora la Defensa (no se tira)">
+              ${lupaBotonHtml(`${sc.id}|defensa|armadmg`)}
+              <span class="bt-label">Armad. mágica</span><span class="bt-value">${fmt(armadmgEfectiva(sc))}</span>
+            </div>
           </div>
           <div class="botonera-crit">
             <div class="botonera-crit-t">Resistencia a críticos</div>

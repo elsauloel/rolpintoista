@@ -112,7 +112,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261002a', '../comun/ficha-equipo.js?v=20261002b', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261002b', '../comun/ficha-mantenimiento.js?v=20261002a', '../comun/ficha-calculo.js?v=20261002j', '../comun/ficha-combate.js?v=20261001a', '../comun/skills-clase.js?v=20261002i', '../comun/ficha-habilidades.js?v=20261001c',
-  '../comun/catalogo.js?v=20261002tr2', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261002d', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261002i', '../comun/ficha-resumen.js?v=20261002tr', '../comun/inv-calculo.js?v=20261002d', '../comun/inv-botonera.js?v=20261001a', '../comun/inv-acciones.js?v=20261002b', '../comun/inv-duelo.js?v=20261002b', '../comun/ficha-acciones.js?v=20261002inv', '../comun/inv-habilidades.js?v=20261002g', '../comun/inv-lupa.js?v=20261001a',
+  '../comun/catalogo.js?v=20261002tr2', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261002d', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261002bot', '../comun/ficha-resumen.js?v=20261002tr', '../comun/inv-calculo.js?v=20261002d', '../comun/inv-botonera.js?v=20261002bot', '../comun/inv-acciones.js?v=20261002b', '../comun/inv-duelo.js?v=20261002b', '../comun/ficha-acciones.js?v=20261002inv', '../comun/inv-habilidades.js?v=20261002g', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261002a', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261002b'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -173,7 +173,7 @@ function bnCargarPiezas(){
     bnCargando = cargarPiezas(BN_PIEZAS)
       // Lo que subió el grupo al catálogo (como la ficha): un consumible viejo busca ahí el estado que deja.
       .then(() => ItemsSubidos.cargar().then(l => { bnItemsSubidos = l || []; }))
-      .then(() => fetch('../ficha-personaje/ficha.css?v=20261002a').then(r => r.text()))
+      .then(() => fetch('../ficha-personaje/ficha.css?v=20261002bot').then(r => r.text()))
       .then(css => { bnCss = css.replace(/:root\b/g, ':host'); })
       .catch(err => { bnCargando = null; throw err; });
   }
@@ -923,6 +923,13 @@ function bnCrear(){
       <header><h3>Categoría del ítem</h3><button class="iconbtn" data-bn-tipoitem="">Cerrar</button></header>
       <div class="body" id="bn-tipoitem-cuerpo"></div>
     </div></div>`;
+  // Una ventanita que se abre adentro de la Botonera (costo X, elegir arma, sobrepeso, Ver…) queda a la vista aunque la Botonera esté
+  // desplazada hacia abajo (2026-10-02: el cartel del costo X aparecía arriba de todo, fuera de la vista).
+  new MutationObserver(ms => ms.forEach(m => {
+    const el = m.target;
+    if(!el.classList || !el.classList.contains('scrim') || !el.classList.contains('open') || /\bopen\b/.test(m.oldValue || '')) return;
+    try{ (el.querySelector('.modal') || el).scrollIntoView({block: 'nearest'}); }catch(err){}
+  })).observe(raiz, {subtree: true, attributes: true, attributeFilter: ['class'], attributeOldValue: true});
   raiz.querySelector('#bn-sin-nitros').addEventListener('mousedown', e => { if(e.target.id === 'bn-sin-nitros') bnCerrarSinNitros(); });
   raiz.querySelector('#bn-costox').addEventListener('mousedown', e => { if(e.target.id === 'bn-costox'){ bnCostoX = null; e.target.classList.remove('open'); } });
   ['bn-slot-lleno', 'bn-comparar'].forEach(id => raiz.querySelector('#' + id).addEventListener('mousedown', e => { if(e.target.id === id) e.target.classList.remove('open'); }));

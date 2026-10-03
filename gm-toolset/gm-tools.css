@@ -386,6 +386,13 @@ input[type=file]{display:none}
 .botonera-crit{display:flex;flex-direction:column;gap:4px;min-width:0;grid-column:1 / -1}
 .botonera-crit-t{font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .botonera-crit-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;flex:1}
+/* Combate: lo que se tira arriba; abajo, separados por una línea, los valores que no se tiran (2026-10-02, pedido del dueño):
+   Defensa y Armadura mágica en una fila y, debajo, las Resistencias a críticos. Igual en la Botonera del personaje, la de las
+   invocaciones y las Acciones de un creep. */
+.botonera-valores{margin-top:12px;padding-top:8px;border-top:2px solid var(--copper);display:flex;flex-direction:column;gap:6px}
+.botonera-valores-t{font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.botonera-valores-fila{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.botonera-valores .botonera-crit{grid-column:auto}
 @media(max-width:420px){.botonera-defensa{grid-template-columns:1fr}}
 .botonera-combate-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
 /* Esquivar ocupa las dos filas de la izquierda; Parry y Bloqueo se apilan

@@ -248,6 +248,11 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Por la espalda: probarlo en el mapa** (construido 2026-10-03, pruebas automáticas en verde): un token en sigilo, en el casillero de atrás
   de un rival, ataca con un arma que tenga el bono → el cuadro del duelo dice «🗡 por la espalda» y suma PdG, daño y Crítico potente. Ninguna arma del
   catálogo lo trae todavía (ninguna T4 Común lo usó): aparecerá más adelante en el rework.
+- [ ] **Mecánicas de firma de las armas: probarlas en el mapa** (construidas 2026-10-03 para las Excepcionales T4, pruebas automáticas en verde):
+  no se puede parrear (Estoque del campeón: el defensor solo ve Evasión) · oportunidad sin No2 (Daga del guardia real) · primer ataque −1 No2
+  (Daga del almirante) · +1 d20 en el crítico (Florete) · Rengo (Bisturí) · Sangrado de 3 stacks (Colmillo) · daño de rayo / hielo aparte, sin
+  multiplicar con el crítico (Lanza del alba, Aguja de escarcha). Ojo: los creeps que reciben armas por su equipo de fábrica (`EQUIPO_CREEP`) no
+  traen los rasgos (por la espalda, sin Parry…): solo los efectos y el «ignora».
 - [ ] **Drena vida y «solo si es crítico» de un arma: probarlos en el mapa** (construidos 2026-10-03, pruebas automáticas en verde): atacar con la
   Daga sedienta y ver que quien ataca se cura el 50 % de la vida que le sacó al otro (lo que frena la armadura no cuenta); con un crítico de la
   Misericordia o el Estilete de maestro, que aparezca su efecto, y sin crítico, que no.

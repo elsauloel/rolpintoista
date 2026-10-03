@@ -111,15 +111,15 @@ const FichaDuelo = (() => {
       dano: d => {
         const S = getS();
         const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : (FichaCombate.armasEquipadasConDano(S)[0] || {}).item || null;
-        if(!arma){ ui.toast('No hay un arma equipada con daño para tirar'); return; }
-        let formula = FichaCombate.armaDanoTxt(arma, compute().final.dmg);
+        // Sin arma: el daño sin arma (provisorio, P150) — antes avisaba y el duelo quedaba esperando.
+        let formula = arma ? FichaCombate.armaDanoTxt(arma, compute().final.dmg) : FichaCombate.danoSinArmaTxt(compute().final.dmg);
         const m = d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null;   // lo que le suma la habilidad: dados del Tipo del arma y daño fijo
         if(m){
-          if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${num(arma.tipoDado) || 8}`;
+          if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${FichaCombate.tipoAtaque(arma)}`;
           if(num(m.fijo)) formula += ` ${num(m.fijo) > 0 ? '+' : '−'} ${fmt(Math.abs(num(m.fijo)))}`.replace('−', '-');
         }
         const r = tirarDados(formula);
-        if(r) ui.registrarTirada(`Daño · ${arma.nombre}`, r);
+        if(r) ui.registrarTirada(`Daño · ${arma ? arma.nombre : 'sin arma'}`, r);
       },
       // Moneda Re-Roll: ¿tengo una? / usarla para reabrir una tirada del duelo.
       rerollInfo: d => {

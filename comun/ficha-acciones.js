@@ -335,7 +335,11 @@ const FichaAcciones = (() => {
   }
   function pedirArmaYTirar(S, ui){
     const armas = FichaCombate.armasEquipadasConDano(S);
-    if(!armas.length){ ui.toast('No tenés ningún arma equipada con daño para tirar'); return; }
+    if(!armas.length){   // sin arma: el daño sin arma (provisorio, P150)
+      const r = tirarDados(FichaCombate.danoSinArmaTxt(FichaCalculo.calcular(S).final.dmg));
+      if(r) ui.registrarTirada('Sin arma', r);
+      return;
+    }
     if(armas.length === 1){ tirarDanoDeArma(S, armas[0].item, ui); return; }
     ui.elegirArma('dano', armas);
   }

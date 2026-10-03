@@ -2141,6 +2141,10 @@ prueba('Sangrado de arma: 2 de daño por 2 turnos (salvo que diga otra cosa); si
     [2, 2, false, 3, 2, true, 3, 3]);
 });
 
+prueba('ataque sin arma: tiene daño (provisorio 1d4 + Dmg, P150)', () => {
+  igual([FichaCombate.danoSinArmaTxt(3), FichaCombate.danoSinArmaTxt(0), FichaCombate.tipoAtaque(null)], ['1d4 + 3', '1d4', 4]);
+});
+
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {
 const malas = resultados.filter(r => !r.ok);

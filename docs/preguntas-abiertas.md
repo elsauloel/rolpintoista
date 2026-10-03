@@ -682,3 +682,7 @@ resuelven a mano, como el resto de los avisos).
   `comun/trampas-base.js` (`FICHA_TRAMPAS`) y las 72 trampas consumibles del catálogo. Quedan a mano (dicho en cada texto, «(a mano)»):
   liberarse de Inmovilizado / Arena, pararse con No2, la confusión, el silencio de SP, drenar SP, −2 a todas las tiradas, ver aliados como
   enemigos y el teletransporte del portal.
+
+- 🔲 **P150. El daño de un ataque sin arma** (2026-10-03, apareció probando un duelo: juan atacó sin arma y el duelo quedó «Tirando…» porque no
+  había daño definido). **Provisorio:** 1 dado del Tipo sin arma (P22: 4) + Dmg = `1d4 + Dmg` (`FichaCombate.danoSinArmaTxt`), en el duelo y en el
+  botón Daño de la Botonera. ¿Así, o los puños pegan distinto (sin Dmg, mitad, un efecto propio)? *(código)*

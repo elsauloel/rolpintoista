@@ -102,6 +102,8 @@ const FichaCombate = (() => {
   /* ---------- Atacar: cada arma paga su primer ataque del turno (regla del motor común) ---------- */
   const claveAtaque = arma => arma ? arma.id : 'sin-arma';
   const tipoAtaque = arma => arma ? (num(arma.tipoDado) || 8) : TIPO_SIN_ARMA;
+  // El daño de un ataque sin arma (provisorio, P150): 1 dado del Tipo sin arma + Dmg. Antes no había, y el duelo quedaba «Tirando…».
+  const danoSinArmaTxt = dmg => `1d${TIPO_SIN_ARMA}${num(dmg) ? ` + ${fmt(num(dmg))}` : ''}`;
   const ataquesConArma = (S, arma) => num((S.ataquesArma || {})[claveAtaque(arma)]);
   const costoAtaque = (S, arma) => Combatiente.costoConAhorro(Combatiente.costoAtaque(tipoAtaque(arma), ataquesConArma(S, arma)), arma, ataquesConArma(S, arma));   // − ahorroNitros del arma en el primero
   // Ataque de oportunidad y contraataque: siempre lo de un primer ataque, y no cuentan como ataque del turno (oportunidad: gratis si el arma es oporGratis).
@@ -114,7 +116,7 @@ const FichaCombate = (() => {
     return primero;
   }
 
-  return {TIPO_SIN_ARMA, esArma, esMano, asignarManos, armaDanoTxt, armasEquipadasConDano, armasYEscudosParaParry,
+  return {TIPO_SIN_ARMA, danoSinArmaTxt, esArma, esMano, asignarManos, armaDanoTxt, armasEquipadasConDano, armasYEscudosParaParry,
     esArmaEnMano, esEnMano, pdgParaArma, STATS_DEFENSA_POR_ITEM, statParaArma, bloqueoValor, alcanceDeArma, formulasCombate,
     claveAtaque, tipoAtaque, ataquesConArma, costoAtaque, costoAtaqueEspecial, registrarAtaque};
 })();

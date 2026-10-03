@@ -513,7 +513,7 @@ y algo de humor. Aplicado a las 18 T4 Comunes (las copias de los humanos en `cre
 **✅ Aplicado (2026-10-03, OK del dueño):** las 18 de Buena calidad (v3, con los tres textos) reemplazaron a las 14 T4 de Buena calidad del catálogo. La Daga de la viuda verde y la Daga del sacrificio dejaron de ser copias (son armas propias; las siguen llevando el Envenenador, el Saboteador y el Sacerdote oscuro). La **Daga de guardia** y el **Pico de guerra** pasaron a **Raro** (con ⚠️) para repensarlos en ese tier.
 
 ### T4 Raro — lo que hay hoy (tabla comparativa y análisis, 2026-10-03)
-Calculadora v0: PC de Raro = 11 a 17 (menos = Buena; 17 o más = Excepcional). Precio de Raro: 150 a 350. Cuota ~12; hay 13 (11 + las 2 que bajaron… subieron de Buena).
+Calculadora v0: PC de Raro = 11 a 17 (menos = Buena; 17 o más = Excepcional). Precio de Raro: 150 a 350. Cuota ~12; hay 13 (11 + las 2 que subieron de Buena calidad).
 
 | # | Arma | Manos | Dados | Fijo | Bonos | Al golpear | Precio | PC → tier calc. | Precio calc. | Observación |
 |---|---|---|---|---|---|---|---|---|---|---|

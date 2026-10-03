@@ -781,3 +781,5 @@ crítico** (una común puede tener Crít. frecuente +1 **o** Crít. potente +2, 
 | Aguja de tejer | Lisiado 25 % · PdG en oportunidad +1 · 55 |
 | Tacuara | Alcance +1 · Crít. potente +1 · 85 |
 | Cuchillo de la pensión | +1 dado amplificado · 60 |
+
+**✅ T4 Común: 6 más cargadas (2026-10-03, OK del dueño; la Tacuara pasó a llamarse **Chuza**, la lanza criolla de cuchillo atado a un palo): quedan 24.**

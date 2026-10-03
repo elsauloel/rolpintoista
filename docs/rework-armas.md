@@ -322,9 +322,9 @@ Dueño: *«Hay algo conceptual que no estás entendiendo en las armas de tipo 12
 ## Rework metódico por Tipo (arranca 2026-10-03)
 Pedido del dueño: *«empecemos un plan metódico de rework del catálogo, por las armas; tipo a tipo, de menor a mayor tier, empezando por el Tipo 4. Antes, definiciones: qué efectos y mecánicas le son propias, cuáles ajenas, y cuáles pueden ir aunque no le sean exclusivas; por dónde podemos jugar con las mecánicas disponibles.»*
 
-> **▶ Para retomar (ruta pendiente, el dueño la retoma cuando tiene tiempo):** ✅ **T4 Común hecho** (2026-10-03: 18 armas, reemplazaron a
-> todas las T4 Comunes del catálogo). Lo que sigue lo elige el dueño («ahora vamos con espadas de Buena calidad»); el orden natural es T4 Buena
-> calidad → Raro → Excepcional → Legendario, y después el Tipo siguiente.
+> **▶ Para retomar — hoja de ruta (cambiada por el dueño, 2026-10-03):** por cada Tipo, **los tres primeros tiers** (Común, Buena calidad,
+> Raro); después el Tipo siguiente; **al terminar todos, se vuelve atrás** a hacer Excepcional y Legendario de cada uno. ✅ T4 Común, Buena y Raro.
+> ⏸ T4 Excepcional: la propuesta v1 está más abajo (con las mecánicas de firma a construir), en pausa. **▶ Ahora: Tipo 6** (cortantes).
 
 **El paso a paso (decidido por el dueño, 2026-10-03 — «me gustó mucho cómo me permitió auditar y comparar»).** Se hace juntos, Tipo por Tipo y
 tier por tier; el dueño dice cuál («ahora vamos a hacer espadas, de Buena calidad») y se sigue siempre este orden:
@@ -633,3 +633,19 @@ Salen: Báculo mágico (no es del Tipo 4), Puñal de Dorne (lo reemplaza el Beso
 Pica del Muro Eterno, Aguijón de la Reina Avispa, Lanza del alba (las cuatro reajustadas).
 **A construir (firmas):** +1 d20 en el crítico · no se puede parrear · ataque de oportunidad sin No2 · primer ataque −1 No2 · daño mágico extra
 (rayo / hielo, ignora la Defensa y resta la Armadura mágica; **queda afuera del multiplicador del crítico** — regla del dueño, 2026-10-03) · Rengo en armas · Sangrado con stacks.
+
+## Tipo 6 — Cortantes (arranca 2026-10-03)
+Estado hoy: Común 18 · Buena 13 · Raro 9 (cuerpo a cuerpo) · Excepcional 6 · Legendario 4; de rango (aparte): Común 3 · Buena 7 · Raro 1 · Exc. 2.
+
+### Tipo 6 — definiciones (propuesta del asistente, ⬜ sin responder)
+**Identidad:** espadas, sables, cimitarras, katanas. **Costo medio en Nitros** (primer ataque 3, los siguientes 6). La familia del **filo**: el
+**Sangrado** es su efecto de casa; juegan con el **Crítico frecuente** (acento del T6: rango 6, rinde hasta +4) más que con el potente, y con la
+**defensa activa**: Parry, Iniciativa y el **PdG en contraataque** (stats de casa, sin recargo). Duelistas y espadachines.
+- 🏠 **Propio:** **Sangrado** · **Parry** · **Iniciativa** · **PdG en contraataque** (`pdgcontra`) · **Crítico frecuente** (hasta +4 útil) ·
+  **Ignora N de Res. crítico** (solo T4 y T6, desde Raro).
+- 🤝 **Puede ir:** Lisiado (un tajo en el brazo) · Envenenar (hojas untadas) · Drena vida (desde Raro: espadas «vampíricas») · Crítico potente
+  (sin acento) · PdG · Dmg / daño fijo · Alcance (espadones a dos manos, alabardas) · Critical Matters · «seguro si es crítico» · Sangrado con turnos.
+- ✨ **Excepción (Raro+, escasa):** Rengo (un tajo a la pierna) · Bloqueo (espadones pesados) · por la espalda (dagas largas, sables cortos de
+  asesino) · daño mágico (hojas encantadas, Excepcional+).
+- 🚫 **Ajeno:** Rompe armadura (hachas), Demora / Aturdir / Derribar (contundentes), Explosión (T12). Veneno severo seguro: solo Legendaria.
+- **Fuera del Tipo:** los arcos y ballestas de Tipo 6 van con las armas de rango.

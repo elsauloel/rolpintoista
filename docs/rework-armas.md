@@ -444,3 +444,31 @@ Calculadora v0: PC de Buena calidad = 7,5 a 11 (menos = Común; 11 o más = Raro
 | 12 | Aguja de acupunturista | 1 | 1 | +2 | PdG +1 | Sangrado 33 % | 150 | 10,6 · Buena | 150 | — |
 | 13 | Pico de guerra | 1 | 2 | — | Alcance +1 | Rompe armadura 50 % | 90 | 10,6 · Buena | 150 | Rompe armadura es ✨ desde Raro; barata |
 | 14 | Lanza de leva | 2 | 3 | — | Alcance +1 | Lisiado 25 % | 150 | 10,7 · Buena | 150 | — |
+
+### T4 Buena calidad — propuesta v1 (2026-10-03, ⬜ a revisar por el dueño)
+Pedido del dueño: una daga de 2d4 y nada más; una de 1d4 que envenena seguro; una de 1d4 con Lisiado mejor que la Común; corregir lo sugerido; más
+efectos de los que quedaron afuera; mínimo 14, armar 18.
+
+| # | Arma | Manos | Dados | Fijo | Bonos | Al golpear | Durab. | Precio | Cambio |
+|---|---|---|---|---|---|---|---|---|---|
+| 1 | 🆕 Puñal de hoja ancha | 1 | 2 | — | — | — | 6 | 80 | nueva (pedida: 2d4 y listo) |
+| 2 | Daga de la viuda verde | 1 | 1 | — | — | Veneno (2) siempre | 3 | 85 | rehecha (pedida: envenena seguro); deja de ser copia |
+| 3 | 🆕 Daga de tendón | 1 | 1 | — | — | Lisiado 75 % | 3 | 80 | nueva (pedida; la mejor Común es 50 %) |
+| 4 | Estilete de práctica | 1 | 1 | +1 | PdG +1 | — | 3 | 85 | igual |
+| 5 | 🆕 Daga de guardaespaldas | 1 | 1 | +2 | PdG oport. +1 | — | **6** (resistente) | 85 | nueva |
+| 6 | Daga del sacrificio | 1 | 2 | +1 | — | Sangrado 50 % | 6 | 90 | rehecha; deja de ser copia |
+| 7 | Lanza de centinela | 2 | 2 | — | Alcance +1, PdG oport. +1 | — | 6 | 100 | igual |
+| 8 | Estoque | 1 | 2 | — | Iniciativa +1, PdG +1 | — | 6 | 110 | + PdG +1 (era Común); 60 → 110 |
+| 9 | 🆕 Puñal de sombra | 1 | 1 | — | PdG +1, Crít. potente +2 · 🗡 por la espalda: +2 PdG, +2 daño | — | 3 | 120 | nueva |
+| 10 | Daga de Capitán | 1 | 1 | — | PdG +2 | — | 3 | 120 | PdG +1 → +2 (era Común); 90 → 120 |
+| 11 | Lanza del portón | 2 | 2 | — | Alcance +1, PdG oport. +2 | — | **9** (resistente) | 125 | + resistente (era casi igual a la 7) |
+| 12 | 🆕 Lanza de montería | 2 | 2 | — | Alcance +1 | Lisiado 33 %, seguro si es crítico | 6 | 115 | nueva |
+| 13 | Estilete de competencia | 1 | 2 | — | Crít. frecuente +1 | — | 6 | 130 | 75 → 130 |
+| 14 | Aguja de la vigilia | 1 | 1 | — | PdG oport. +3, Crít. frecuente +1 | — | 3 | 140 | igual |
+| 15 | 🆕 Aguja del boticario | 1 | 1 | +1 | PdG +1 | Veneno (3) 50 %, seguro si es crítico | 3 | 140 | nueva |
+| 16 | Daga de duelo | 1 | 2 | — | PdG +1, Crít. potente +2 | — | 6 | 150 | sale de ⚠️ |
+| 17 | Aguja de acupunturista | 1 | 1 | +2 | PdG +1 | Sangrado 33 % | 3 | 150 | igual |
+| 18 | Lanza de leva | 2 | 3 | — | Alcance +1 | Lisiado 25 % | 9 | 150 | igual |
+
+Salen de Buena calidad: Daga de guardia (Ignora 1 de Res. crítico: se repiensa en Raro) y Pico de guerra (Rompe armadura: se repiensa en Raro).
+Dudas: las tres pedidas (1–3) por la calculadora son Comunes (no valora lo simple ni el «seguro»); el Puñal de hoja ancha es igual a la Pica Hielos Común.

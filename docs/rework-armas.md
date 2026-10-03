@@ -946,3 +946,7 @@ Cargadas (2026-10-03): las 24 con sus tres textos; sale la Lanza de caza (el Gob
 | Hacha de batalla | 2 dados · Bloqueo +1 · Rompe armadura siempre · 110 → 250 · **Rara** |
 | Hacha de la furia roja | **idéntica** a la de batalla · **Rara** |
 | (Arcabuz de mecha) | de rango, va con las de rango |
+
+**Respuestas del dueño sobre T8 Buena (2026-10-03):** **sin Critical Matters** en las hachas («los críticos con hacha van a ser poco
+frecuentes: no les suma demasiado, no las hace atractivas») — por la misma razón, tampoco «seguro si es crítico». **Puede haber alguna hacha con
+Crítico frecuente +1.** Derribar = deja Sentado (se usa en las hachas); Demora = baja 1 lugar en la iniciativa (es de los contundentes).

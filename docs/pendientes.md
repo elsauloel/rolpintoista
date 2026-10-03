@@ -7,7 +7,7 @@
 
 > **⭐ Prioridad (dueño, 2026-10-03): la auditoría del catálogo, con el paso a paso** ([`rework-armas.md`](rework-armas.md), «Rework metódico por
 > Tipo»): «el equipo es una parte esencial de la mecánica y si está desbalanceado te puede romper todo el juego». Tipo por Tipo y tier por tier.
-> - [ ] **Regla de cómo se ve un ítem** (dueño, 2026-10-03, como ya se hizo con las trampas): en la **grilla** del catálogo/tienda, solo lo esencial
+> - [x] (2026-10-03, armas: `ItemCorto.armaEsencial` / `armaTecnico`; aplicado a las T4 Comunes; falta el resto de los ítems a medida que se auditan) **Regla de cómo se ve un ítem** (dueño, 2026-10-03, como ya se hizo con las trampas): en la **grilla** del catálogo/tienda, solo lo esencial
 >   —Tipo, dados, daño fijo, bonos, efectos («Sangrado 50 % · 2 turnos»)—, dando por sabidas las reglas; las explicaciones (cómo funciona el
 >   Sangrado, frecuente vs. potente…) van en **«Detalles técnicos»**, que se ve solo al abrir la ficha completa del ítem (Ver).
 > - **Después del catálogo** (la próxima tarea grande): un sistema para probar que las habilidades de los **creeps usen maná (SP) en vez de

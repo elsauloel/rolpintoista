@@ -481,3 +481,31 @@ Dudas: las tres pedidas (1–3) por la calculadora son Comunes (no valora lo sim
 - De paso (pregunta del dueño): el «PdG en oportunidad» del arma ya se sumaba solo en personajes y creeps; las **invocaciones** lo ignoraban y
   cobraban el ataque de oportunidad como uno normal — corregido (como los creeps: lo de un primer ataque, no cuenta como ataque del turno).
 - **Regla (dueño, 2026-10-03), característica del Sangrado:** con un **golpe crítico de arma** queda **permanente** aunque diga turnos (ej. Puñal de hoja ancha, 2 turnos), venga del arma o de la habilidad con la que se atacó. Automatizado en el duelo.
+
+### Cómo se ve un arma: tres textos (regla del dueño, 2026-10-03)
+Como con las trampas: (1) **en la grilla**, lo esencial —Tipo, manos, dados, daño, bonos, efectos («Sangrado 50 % · 2 turnos»)—, dando por
+sabidas las reglas: es el **Detalle** del ítem y lo arma `ItemCorto.armaEsencial(item)` con los datos del arma (un arma sin Detalle muestra eso
+mismo); (2) **«Detalles técnicos»**, solo al abrir el ítem (Ver): explica cada mecánica que tiene (Tipo y costo en No2, Peso, Lisiado, Sangrado,
+Veneno, PdG en oportunidad, frecuente vs. potente, «seguro si es crítico», durabilidad, por la espalda, qué se automatiza) — lo arma
+`ItemCorto.armaTecnico(item)` de los datos, no se escribe a mano; (3) **la descripción narrativa** (`descripcionNarrativa`): decorativa, con color
+y algo de humor. Aplicado a las 18 T4 Comunes (las copias de los humanos en `creeps-base.js` también).
+
+**T4 Buena calidad, propuesta v3 — los tres textos** (Detalle = lo esencial; narrativa):
+1. Puñal de hoja ancha — *Tipo 4 · 2 dados · Sangrado 50 % · 2 turnos* — «Tan ancho que sirve de espejo, de pala y, en caso de apuro, de bandeja. Ah, y corta.»
+2. Daga de la viuda verde — *Tipo 4 · 1 dado · Veneno 3 stacks (siempre)* — «Tres maridos, tres funerales, una sola daga. La viuda insiste en que fueron accidentes.»
+3. Daga de tendón — *Tipo 4 · 1 dado · +1 de daño · Lisiado 75 %* — «Diseñada por un anatomista con mucho tiempo libre y muy pocos amigos.»
+4. Estilete de práctica — *Tipo 4 · 1 dado · +1 de daño · PdG +1* — «Afilado de más. El arma del que recién empieza, y por eso la usa con cuidado (y con miedo).»
+5. Daga de guardaespaldas — *Tipo 4 · 1 dado · +2 de daño · PdG en oportunidad +1 · Resistente (durabilidad 6)* — «Gruesa, pesada y leal. Recibió más golpes que el patrón al que cuida, que es justamente la idea.»
+6. Daga del sacrificio — *Tipo 4 · 2 dados · +1 de daño · Sangrado 50 %* — «Ceremonial, curva y siempre un poco pegajosa. Los cultistas dicen que es tradición; los vecinos, que es un asco.»
+7. Lanza de centinela — *Tipo 4 · 2 manos · 2 dados · Alcance +1 · PdG en oportunidad +1* — «Con el asta llega al que intenta pasar de largo. El centinela no duerme: descansa los ojos.»
+8. Estoque — *Tipo 4 · 2 dados · Iniciativa +1 · PdG +1* — «Todo punta, nada de filo. Llega antes que el resto y ya está esperando, con la mano en la cadera.»
+9. Puñal de sombra — *Tipo 4 · 1 dado · PdG +1 · Crítico potente +2 · Por la espalda (en sigilo): +2 PdG, +2 de daño* — «Hoja ennegrecida para no brillar. Si lo viste venir, el que tenía que esconderse lo hizo mal.»
+10. Daga de Capitán — *Tipo 4 · 1 dado · PdG +2* — «Empuñadura con el escudo de la compañía. Se entrega con el rango y se pierde con el primer motín.»
+11. Lanza del portón — *Tipo 4 · 2 manos · 2 dados · Alcance +1 · PdG en oportunidad +2 · Resistente (durabilidad 9)* — «Nadie pasa sin recibir un pinchazo. Ni siquiera el cartero.»
+12. Lanza de montería — *Tipo 4 · 2 manos · 2 dados · Alcance +1 · Lisiado 33 %, seguro si es crítico* — «Para jabalíes, ciervos y cualquier cosa que corra en cuatro patas. Las de dos patas también cuentan.»
+13. Estilete de competencia — *Tipo 4 · 2 dados · Crítico frecuente +1* — «Fabricado para el duelo reglado. Fino hasta lo absurdo, y caro hasta lo ofensivo.»
+14. Aguja de la vigilia — *Tipo 4 · 1 dado · PdG en oportunidad +3 · Crítico frecuente +1* — «Casi no se ve venir, y casi siempre acierta al que se descuida.»
+15. Aguja del boticario — *Tipo 4 · 1 dado · +1 de daño · PdG +1 · Veneno 3 stacks 50 %, seguro si es crítico* — «El boticario receta reposo. Si no le hacés caso, receta esto.»
+16. Daga de duelo — *Tipo 4 · 2 dados · PdG +1 · Crítico potente +2* — «Equilibrada para encontrar el hueco. Viene con un manual de etiqueta que nadie lee.»
+17. Aguja de acupunturista — *Tipo 4 · 1 dado + 1 amplificado · PdG +1 · Sangrado 33 %* — «Fina como un pelo. Alivia contracturas y, mal usada, también la vida entera.»
+18. Lanza de leva — *Tipo 4 · 2 manos · 3 dados · Alcance +1 · Lisiado 25 %* — «La lanza de todo recluta: pesada, larga y repartida sin preguntar si sabías usarla.»

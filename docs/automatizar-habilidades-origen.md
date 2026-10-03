@@ -13,7 +13,7 @@ cambia. Se escribe en la partida real (`1Fag8T0EDUsYiUdm136T`) con la cuenta del
 | Petro EskanderSon | Blindaje | ✅ 2026-10-02: modo ✨ fijo, costo en turno ajeno 2 SP (el cartelito pregunta y cobra), texto sin «pagá a mano», sacado el estado viejo «Barrera» repetido (queda el de la Ejecución: escudo 8, 1 turno). *(El «⚡ Flash» de la Ejecución es sumar a una tirada, no sirve para un escudo.)* |
 | Petro EskanderSon | Shockwave | ✅ 2026-10-02: revisada con el dueño (Pajaritos **2 turnos** está bien); modo ✨ fijo, sin «(Sin auditar)», el texto aclara el costo en turno ajeno (8). |
 | Aurelius Risus | Invi | 🔲 Le falta el SP (el texto dice 5). Duda: ¿«invisible» = el Sigilo del mapa? |
-| Aurelius Risus | Backstab | 🔲 Le falta el SP (el texto dice 2). Propuesta: ataque con arreglos +5 daño y −1 resistencia a crítico; «por la espalda» ✋. Duda: ¿No2 = un ataque? |
+| Aurelius Risus | Backstab | ✅ 2026-10-02: modo ✨, 2 SP + los No2 de un ataque; ataque con el arma con +5 de daño fijo e ignora 1 punto de resistencia a crítico del rival; «por la espalda» lo define la mesa (nota ✋ en el cuadro del ataque); sin «(Sin auditar)». |
 | Larry | Drenar Vida | 🔲 Falta construir: daño «la diferencia» en un ataque directo y curarse lo drenado (tope +50 %); puente ✋. |
 | Larry | Pedos Tóxicos | 🔲 Casi todo existe (zona persistente con daño «la diferencia» y 1d20 que se tira solo); la tabla del 1d20 aplica el estado a mano. Duda: ¿la nube sigue a Larry? |
 

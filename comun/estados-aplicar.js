@@ -36,6 +36,7 @@ const EstadosAplicar = (() => {
     // Escudo especial (2026-09-28): HP de una barra secundaria que absorbe daño antes que el HP real —
     // ver BUFFS. Un valor explícito manda sobre el del preset (se resuelve en `componer`).
     if(s.escudoMagico) out.escudoMagico = Math.max(0, Math.round(Number(s.escudoMagico) || 0));
+    if(s.sentadoEnCero) out.sentadoEnCero = true;   // «Pierde No2» (Sonic Boom): si llega a 0, queda Sentado
     return out;
   }
   const esPreset = nombre => !!presetPorNombre(nombre);

@@ -1015,7 +1015,15 @@ function dibujar(){
 
   // Hechizos de área en curso (Paso 4/7 del casteo, docs/reglas-casteo.md §1.3): el círculo se ve para
   // TODOS los conectados (no solo el GM) mientras dura la cascada — ver escucharAreas().
-  areasActivas.forEach(a => dibujarAuraHex(a.centro, {radio: a.radio, color: '#9B7BD4'}, z));
+  areasActivas.forEach(a => {
+    if(!(a.centro && a.centro.cono)){ dibujarAuraHex(a.centro, {radio: a.radio, color: '#9B7BD4'}, z); return; }
+    // El cono de una habilidad (Sonic Boom): sus casillas, en el mismo violeta.
+    const celdas = zonasSigilo({col: a.centro.col, fila: a.centro.fila, rotacion: num(a.centro.rot)}).cono;
+    ctx.beginPath();
+    celdas.forEach(c => { const p = hexCentro(c.col, c.fila); trazarHex(p.x, p.y); });
+    ctx.fillStyle = 'rgba(155,123,212,.28)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(155,123,212,.9)'; ctx.lineWidth = 2 / z; ctx.stroke();
+  });
 
   if(dibujarEfectosTeleport()) animando = true;
 

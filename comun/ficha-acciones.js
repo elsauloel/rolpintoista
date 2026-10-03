@@ -584,6 +584,16 @@ const FichaAcciones = (() => {
       return;
     }
     if(spec.nombre === 'Armadura rota'){ rompeArmaduraAlAzar(S, Math.max(1, num(spec.stacks) || 1), ui); return; }
+    // «Pierde No2» (2026-10-02, Sonic Boom): baja los No2 (`stacks` = cuántos); si llega a 0 y corresponde, queda Sentado.
+    if(spec.nombre === 'Pierde No2'){
+      const n = Math.max(0, Math.round(num(spec.stacks))), antes = num(S.nitros);
+      S.nitros = Math.max(0, antes - n);
+      let txt = `−${fmt(n)} No2 (${fmt(antes)} → ${fmt(S.nitros)})`;
+      if(S.nitros <= 0 && spec.sentadoEnCero){ const r = Combatiente.agregarEstado(S.efectos, estadoDeSpec({nombre: 'Sentado'}, ui.presets)); if(r.ok) txt += ' · quedás Sentado'; }
+      ui.cambio(['nitros', 'efectos', 'refresh']);
+      ui.toast(`${origen ? origen + ': ' : ''}${txt}`);
+      return;
+    }
     const draft = estadoDeSpec(spec, ui.presets);
     const quien = origen ? `${origen}: ` : '';
     // Inmunidades, acumulación y renovación: la regla común (comun/combatiente.js, agregarEstado).

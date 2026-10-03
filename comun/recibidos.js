@@ -54,6 +54,14 @@ const Recibidos = (() => {
     if(!invId){ FichaAcciones.aplicarEstadoRecibido(S, sp, origen, ui); return {}; }
     const inv = (S.invocaciones || []).find(i => i && i.id === invId);
     if(!inv){ ui.toast(`${origen ? origen + ': ' : ''}${sp.nombre} — la invocación ya no está`); return {}; }
+    if(sp.nombre === 'Pierde No2'){   // Sonic Boom (2026-10-02): a una invocación
+      const n = Math.max(0, Math.round(num(sp.stacks))), antes = num(inv.nitros);
+      inv.nitros = Math.max(0, antes - n);
+      let t2 = `−${fmt(n)} No2 (${fmt(antes)} → ${fmt(inv.nitros)})`;
+      if(inv.nitros <= 0 && sp.sentadoEnCero) t2 += ' · ' + InvHabilidades.ponerEstado(inv, FichaAcciones.estadoDeSpec({nombre: 'Sentado'}, ui.presets));
+      ui.toast(`🎯 ${origen ? origen + ' → ' : ''}${inv.nombre}: ${t2}`);
+      return {inv};
+    }
     const txt = InvHabilidades.ponerEstado(inv, FichaAcciones.estadoDeSpec(sp, ui.presets));
     ui.toast(`🎯 ${origen ? origen + ' → ' : ''}${inv.nombre}: ${txt}`);
     return {inv};

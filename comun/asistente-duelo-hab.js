@@ -206,7 +206,7 @@ const AsistenteDueloHab = (() => {
         L.push({id: 'arma', corto: 'Tu ataque'}, {id: 'alcance', corto: 'Alcance'}, {id: 'efectos', corto: 'Al pegar'});
       }else{
         L.push({id: 'objetivo', corto: 'Objetivo'});
-        if(st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda' && st.objetivo !== 'zona') L.push({id: 'alcance', corto: 'Alcance'});
+        if(st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda' && st.objetivo !== 'cono' && st.objetivo !== 'zona') L.push({id: 'alcance', corto: 'Alcance'});
         L.push({id: 'tira', corto: st.objetivo === 'zona' ? 'Tirada de la zona' : 'Tirada'});
         if(!sinOp()) L.push({id: 'contra', corto: 'Resistencia'});
         L.push({id: 'dano', corto: 'Daño'});
@@ -261,7 +261,10 @@ const AsistenteDueloHab = (() => {
     }
     function cuerpoObjetivo(){
       let h = titulo('', '¿A quién apunta?', 'Elegí quién puede recibir esta habilidad.');
-      h += `<select data-objetivo>${[['enemigo', 'A un enemigo (o a cualquier otro token)'], ['aliado', 'A un aliado'], ['uno mismo', 'A uno mismo (no hay que elegir)'], ['area', 'A un área (varios objetivos, en cascada — Orbe arcano, Tormenta arcana…)'], ['onda', 'Onda alrededor de quien la usa (sin marcar centro — Shockwave…)'], ['zona', 'Zona persistente (queda puesta varios turnos — Nube tóxica…)']].map(([v, t]) => `<option value="${v}"${st.objetivo === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
+      h += `<select data-objetivo>${[['enemigo', 'A un enemigo (o a cualquier otro token)'], ['aliado', 'A un aliado'], ['uno mismo', 'A uno mismo (no hay que elegir)'], ['area', 'A un área (varios objetivos, en cascada — Orbe arcano, Tormenta arcana…)'], ['onda', 'Onda alrededor de quien la usa (sin marcar centro — Shockwave…)'], ['cono', 'Cono al frente de quien la usa (sin marcar nada — Sonic Boom…)'], ['zona', 'Zona persistente (queda puesta varios turnos — Nube tóxica…)']].map(([v, t]) => `<option value="${v}"${st.objetivo === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
+      if(st.objetivo === 'cono'){
+        h += `<p class="nota" style="margin-top:10px">No hay que marcar nada: al ejecutarla, todo rival dentro del <b>cono al frente de tu token</b> (el mismo de 16 casillas de la detección, hacia donde mirás; lo que tapa un Sólido no entra) entra en la cascada, uno detrás del otro. Vos tirás una sola vez y cada uno se resiste por separado. Sin dodge roll. No te afecta a vos.</p>`;
+      }
       if(st.objetivo === 'onda'){
         h += `<p class="nota" style="margin-top:10px">No hay que marcar nada: al ejecutarla, todo rival dentro de este radio <b>alrededor de tu token</b> entra en la cascada, uno detrás del otro. Vos tirás una sola vez y cada uno se resiste por separado. No te afecta a vos.</p>
           <div class="fila"><input type="number" min="1" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros de radio (1 = los adyacentes)</span></div>
@@ -319,7 +322,7 @@ const AsistenteDueloHab = (() => {
       return h;
     }
     function cuerpoContra(){
-      const esArea = st.objetivo === 'area' || st.objetivo === 'onda';
+      const esArea = st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono';
       let h = titulo('', st.objetivo === 'zona' ? '¿Con qué se resiste quien la zona afecta?' : '¿Con qué se resiste el objetivo?', st.objetivo === 'zona'
         ? 'Cada vez que la zona afecta a alguien, esa persona tira esto contra la tirada de la zona. Si gana, no le pasa nada (ni daño ni estado).'
         : esArea
@@ -407,7 +410,12 @@ const AsistenteDueloHab = (() => {
     // Filas de una lista de efectos (◎ Estado / 💚 Cura). `clave(i)` arma la clave que llevan los data-attribute
     // (ver efRef) — así la misma función sirve para `st.efectos` (clave = i) y `st.efectosCritico` (clave = 'c'+i).
     function filaEfectosLista(lista, clave){
-      return lista.map((e, i) => e.cura !== undefined
+      return lista.map((e, i) => e.no2 !== undefined
+        ? `<div class="fila" style="flex-wrap:wrap"><span>⚡ Pierde</span><input type="number" min="0" style="width:70px" data-ef-no2="${clave(i)}" value="${esc(e.no2)}"><span>No2</span>
+            <label class="op" style="padding:0"><input type="checkbox" data-ef-no2dif="${clave(i)}" ${e.no2Dif ? 'checked' : ''}> + la diferencia entre las tiradas</label>
+            <label class="op" style="padding:0"><input type="checkbox" data-ef-no2sent="${clave(i)}" ${e.no2Sentado ? 'checked' : ''}> si llega a 0, queda Sentado</label>
+            <button type="button" class="rojo" data-ef-x="${clave(i)}">Quitar</button></div>`
+        : e.cura !== undefined
         ? `<div class="fila"><span>💚 Cura</span><input type="number" min="1" style="width:80px" data-ef-cura="${clave(i)}" value="${esc(e.cura)}"><span>HP</span><button type="button" class="rojo" data-ef-x="${clave(i)}">Quitar</button></div>`
         : e.origen === 'preset' ? filaEstadoPresetHtml(e, clave(i)) : filaEstadoManualHtml(e, clave(i))).join('');
     }
@@ -415,7 +423,7 @@ const AsistenteDueloHab = (() => {
       let h = titulo('', st.modo === 'arma' ? 'Efectos al pegar' : 'Efectos sobre el objetivo', 'Cada uno sale como un momento propio, con su botón «Aplicar» (los que no se puedan aplicar solos quedan «a mano»). Solo entran si la habilidad funciona.');
       h += filaEfectosLista(st.efectos, i => i);
       h += `<datalist id="adh-estados">${nombresEstado().map(n => `<option value="${esc(n)}">`).join('')}</datalist>
-        <div class="fila"><button type="button" class="sec" data-ef-mas="estado">＋ Estado</button><button type="button" class="sec" data-ef-mas="cura">＋ Cura</button></div>`;
+        <div class="fila"><button type="button" class="sec" data-ef-mas="estado">＋ Estado</button><button type="button" class="sec" data-ef-mas="cura">＋ Cura</button><button type="button" class="sec" data-ef-mas="no2">＋ Pierde No2</button></div>`;
       h += `<div class="fila" style="margin-top:14px"><label class="op" style="padding:0"><input type="checkbox" data-efectosnota-on ${st.efectosNotaOn ? 'checked' : ''}> Personalizar: tiene otro efecto que no está en la lista</label></div>`;
       if(st.efectosNotaOn){
         h += `<textarea data-efectosnota rows="3" style="width:100%;box-sizing:border-box;padding:8px;font-size:14px" placeholder="ej. Invertí el orden de turno de todos los presentes hasta tu próximo turno.">${esc(st.efectosNota)}</textarea>
@@ -475,13 +483,13 @@ const AsistenteDueloHab = (() => {
         filas.push(`<b>Ataque con arma</b>: ${partes.join(', ') || 'sin arreglos'} · X en ${st.x === 'sp' ? 'SP' : 'Nitros'}`);
         if(st.alcance !== 'auto') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
       }else{
-        filas.push(`<b>Objetivo</b>: ${st.objetivo === 'onda' ? 'onda alrededor de quien la usa' : st.objetivo === 'zona' ? `zona persistente, ${st.zonaTurnos} turnos` : st.objetivo}${['area', 'onda', 'zona'].includes(st.objetivo) ? ` (radio ${st.radio})` : ''}`);
+        filas.push(`<b>Objetivo</b>: ${st.objetivo === 'cono' ? 'cono al frente de quien la usa' : st.objetivo === 'onda' ? 'onda alrededor de quien la usa' : st.objetivo === 'zona' ? `zona persistente, ${st.zonaTurnos} turnos` : st.objetivo}${['area', 'onda', 'zona'].includes(st.objetivo) ? ` (radio ${st.radio})` : ''}`);
         if(st.objetivo === 'zona'){
           filas.push(`<b>Alcanza</b>: ${st.zonaAmiga ? 'rivales y aliados' : 'solo rivales'}`);
           if(st.zonaEstadoNombre) filas.push(`<b>Deja</b>: ${esc(st.zonaEstadoNombre)}${['Veneno', 'Veneno severo'].includes(st.zonaEstadoNombre) && st.zonaEstadoStacks ? ` ×${st.zonaEstadoStacks}` : ''} (${st.zonaEstadoTurnos}t)`);
         }
-        if(st.alcance !== 'auto' && st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda' && st.objetivo !== 'zona') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
-        const esArea2 = st.objetivo === 'area' || st.objetivo === 'onda';
+        if(st.alcance !== 'auto' && st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda' && st.objetivo !== 'cono' && st.objetivo !== 'zona') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
+        const esArea2 = st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono';
         const contraTxt = (esArea2 || st.contraModo === 'stats') ? ([...st.contra].map(v => STAT_TXT[v] || v).join(' / ') || '(elegí con qué se resiste)')
           : st.contraModo === 'otro' ? `${esc(st.contraOtro) || '(sin especificar)'} (a mano)`
           : 'nadie: se aplica directo';
@@ -492,7 +500,7 @@ const AsistenteDueloHab = (() => {
         if(st.efectoLibreOn && st.efectoLibre.trim()){ const t = st.efectoLibre.trim(); filas.push(`<b>Efecto a mano</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
       }
       if(st.modo !== 'flash' && st.objetivo !== 'zona'){
-        const efTxtDe = lista => lista.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.cura !== undefined ? `💚 ${e.cura} HP` : `◎ ${e.nombre} (${e.permanente ? 'no vence' : (e.turnos ?? 2) + 't'})${e.escudo ? ` · 🛡${e.escudo}` : ''}`).join(', ');
+        const efTxtDe = lista => lista.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.no2 !== undefined ? `⚡ pierde ${e.no2}${e.no2Dif ? ' + la diferencia' : ''} No2${e.no2Sentado ? ' (en 0, Sentado)' : ''}` : e.cura !== undefined ? `💚 ${e.cura} HP` : `◎ ${e.nombre} (${e.permanente ? 'no vence' : (e.turnos ?? 2) + 't'})${e.escudo ? ` · 🛡${e.escudo}` : ''}`).join(', ');
         filas.push(`<b>Efectos</b>: ${efTxtDe(st.efectos) || 'ninguno'}`);
         if(st.efectosNotaOn && st.efectosNota.trim()){ const t = st.efectosNota.trim(); filas.push(`<b>Efecto personalizado</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
         if(st.modo === 'arma' && st.critMatters){
@@ -530,7 +538,7 @@ const AsistenteDueloHab = (() => {
         dibujar();
       });
       q('[data-costoturno-sp]', e => { st.costoTurnoSp = e.target.value; });
-      q('[data-objetivo]', e => { st.objetivo = e.target.value; if(st.objetivo === 'onda' && st.radio > 1 && !ini) st.radio = 1; if((st.objetivo === 'area' || st.objetivo === 'onda') && st.contraModo !== 'stats') st.contraModo = 'stats'; dibujar(); });
+      q('[data-objetivo]', e => { st.objetivo = e.target.value; if(st.objetivo === 'onda' && st.radio > 1 && !ini) st.radio = 1; if((st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono') && st.contraModo !== 'stats') st.contraModo = 'stats'; dibujar(); });
       q('[data-modo]', e => { st.modo = e.target.value; dibujar(); });
       q('[data-flashbono]', e => { st.flashBono = Number(e.target.value) || 0; });
       f.querySelectorAll('[data-flashen]').forEach(c => c.onchange = () => { c.checked ? st.flashEn.add(c.dataset.flashen) : st.flashEn.delete(c.dataset.flashen); });
@@ -594,6 +602,9 @@ const AsistenteDueloHab = (() => {
       f.querySelectorAll('[data-ef-turnos]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efTurnos); arr[idx].turnos = Math.max(0, Math.round(Number(i.value) || 0)); });
       f.querySelectorAll('[data-ef-escudo]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efEscudo); arr[idx].escudo = Math.max(0, Math.round(Number(i.value) || 0)); });
       f.querySelectorAll('[data-ef-cura]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efCura); arr[idx].cura = Math.max(1, Math.round(Number(i.value) || 1)); });
+      f.querySelectorAll('[data-ef-no2]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efNo2); arr[idx].no2 = Math.max(0, Math.round(Number(i.value) || 0)); });
+      f.querySelectorAll('[data-ef-no2dif]').forEach(c => c.onchange = () => { const {arr, i: idx} = efRef(c.dataset.efNo2dif); arr[idx].no2Dif = c.checked; });
+      f.querySelectorAll('[data-ef-no2sent]').forEach(c => c.onchange = () => { const {arr, i: idx} = efRef(c.dataset.efNo2sent); arr[idx].no2Sentado = c.checked; });
       f.querySelectorAll('[data-ef-x]').forEach(b => b.onclick = () => { const {arr, i: idx} = efRef(b.dataset.efX); arr.splice(idx, 1); dibujar(); });
       // «◎ Estado»: con cfg.elegirEstado (el selector real de la página, ver docblock), abre ese menú en vez de
       // reinventar uno acá — «Empezar en blanco» cae en los campos de siempre (filaEstadoManualHtml).
@@ -604,6 +615,7 @@ const AsistenteDueloHab = (() => {
         const tipo = esCritico ? b.dataset.efMas.slice(2) : b.dataset.efMas;
         const arr = esCritico ? st.efectosCritico : st.efectos;
         if(tipo === 'cura'){ arr.push({cura: 5}); dibujar(); return; }
+        if(tipo === 'no2'){ arr.push({nombre: 'Pierde No2', no2: 1, no2Dif: true, no2Sentado: true}); dibujar(); return; }   // Sonic Boom (2026-10-02)
         if(cfg.elegirEstado){
           const r = await cfg.elegirEstado();
           if(!r) return;
@@ -651,7 +663,7 @@ const AsistenteDueloHab = (() => {
         }
         const hayTira = !st.tiraNinguna && (st.tiraModo === 'custom' ? !!st.tiraFormula.trim() : !!st.tira);
         if(!st.tiraNinguna && st.tiraModo === 'custom' && !st.tiraFormula.trim()){ alert('Escribí la fórmula de la tirada custom (podés usar «X»), o tildá «No lleva tirada».'); return false; }
-        const esArea = st.objetivo === 'area' || st.objetivo === 'onda';
+        const esArea = st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono';
         const out = {objetivo: st.objetivo, tira: (!st.tiraNinguna && st.tiraModo === 'stat') ? (st.tira || '') : '', contra: (hayTira && (esArea || st.contraModo === 'stats')) ? [...st.contra] : []};
         if(!st.tiraNinguna && st.tiraModo === 'custom'){ out.tiraFormula = st.tiraFormula.trim(); out.tiraEtiqueta = st.tiraEtiqueta.trim() || 'Tirada'; }
         if(esArea && !hayTira){ alert('Una habilidad de área u onda necesita una tirada (ej. PdG.Esp o Fuerza contra lo que resiste cada uno) — elegí qué tira quien la usa.'); return false; }
@@ -708,6 +720,7 @@ const AsistenteDueloHab = (() => {
     // Un efecto de la lista `st.efectos`, listo para guardar en `duelo.efectos` — mismo shape tanto si vino del
     // selector real (origen:'preset', con mods/hp/stacks/permanente/detalle) como si se escribió a mano.
     function mapEfectoOut(e){
+      if(e.no2 !== undefined) return {nombre: 'Pierde No2', no2: e.no2, ...(e.no2Dif ? {no2Dif: true} : {}), ...(e.no2Sentado ? {no2Sentado: true} : {})};
       if(e.cura !== undefined) return {cura: e.cura};
       return {
         nombre: e.nombre, turnos: e.turnos ?? 2,

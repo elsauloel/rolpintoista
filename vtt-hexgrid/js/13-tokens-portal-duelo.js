@@ -362,7 +362,7 @@ function dueloAvisoObjetivoOcultar(){ const el = $('#duelo-objetivo'); if(el) el
 
 function dueloElegirObjetivoMapa(msg){
   const yo = msg.yo, ataque = msg.ataque;
-  if(ataque && ataque.hab && (ataque.hab.objetivo === 'area' || ataque.hab.objetivo === 'onda')){ dueloElegirAreaMapa(msg); return; }   // hechizo de área: otro flujo (Paso 4/7)
+  if(ataque && ataque.hab && (ataque.hab.objetivo === 'area' || ataque.hab.objetivo === 'onda' || ataque.hab.objetivo === 'cono')){ dueloElegirAreaMapa(msg); return; }   // hechizo de área: otro flujo (Paso 4/7)
   cerrarBotonera();   // esconde la capa (la ficha queda cargada, para tirar después)
   seleccion = null; hudCerrar(); pedirDibujo();   // se guarda el menú de botones que rodea al token propio mientras se elige
   const propio = t => t.fichaId === yo.ref && t.tipo === yo.tipo;
@@ -565,6 +565,8 @@ async function dodgeDeclinar(){
 // centro: arma la lista de objetivos (adentro del radio, rivales — nunca el propio casteador ni tokens ocultos —
 // salvo que la habilidad tenga fuego amigo) y crea el documento del área; el primer sub-duelo lo crea
 // escucharAreas() apenas llega el snapshot nuevo (mismo camino que cualquier avance de la cascada).
+// Las casillas del cono de un área (`centro` = {col, fila, cono, rot}): el mismo de la detección, desde esa casilla y mirando para ahí.
+function conoDeArea(c){ return new Set(zonasSigilo({col: c.col, fila: c.fila, rotacion: num(c.rot)}).cono.map(x => nbPack(x.col, x.fila))); }
 function dueloElegirAreaMapa(msg){
   const yo = msg.yo, hab = msg.ataque.hab;
   cerrarBotonera();
@@ -576,14 +578,15 @@ function dueloElegirAreaMapa(msg){
     const todos = [...tokens.entries()].map(([id, t]) => ({...t, id}));
     const mio = todos.find(propio);
     const casteador = {ref: String(yo.ref || ''), tipo: yo.tipo, nombre: String(yo.nombre || '').slice(0, 40), uid: (mio && mio.duenoUid) || fbUsuario.uid, tokenId: mio ? mio.id : ''};
+    const enCono = h.cono ? conoDeArea(h) : null;   // el cono (Sonic Boom): sus casillas
     const objetivos = todos
-      .filter(t => !t.oculto && !propio(t) && distanciaHex(h, t) <= radio)
+      .filter(t => !t.oculto && !propio(t) && (enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio))
       .filter(t => hab.fuegoAmigo || dueloEsRival(yo, t))
       .map(t => t.id);
     if(!objetivos.length){ toast('No hay nadie adentro del área'); return; }
     try{
       await coleccionAreas().add({
-        casteador, hab: Duelo.limpiarHab(hab), centro: {col: h.col, fila: h.fila}, radio, objetivos, duelos: [], indice: 0, estado: 'en-curso',
+        casteador, hab: Duelo.limpiarHab(hab), centro: {col: h.col, fila: h.fila, ...(h.cono ? {cono: true, rot: h.rot} : {})}, radio, objetivos, duelos: [], indice: 0, estado: 'en-curso',
         creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
       });
     }catch(err){
@@ -591,6 +594,13 @@ function dueloElegirAreaMapa(msg){
       toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (areas)' : 'No se pudo lanzar el hechizo de área: ' + String((err && err.message) || err).slice(0, 120));
     }
   };
+  // Cono al frente de quien la usa (Sonic Boom, 2026-10-02): el mismo cono de la detección (zonasSigilo), hacia donde mira su token.
+  if(hab.objetivo === 'cono'){
+    const mio = [...tokens.values()].find(propio);
+    if(!mio){ toast('Tu token no está en el mapa: no se puede lanzar el cono'); cancelado(); return; }
+    lanzar({col: mio.col, fila: mio.fila, cono: true, rot: Math.round(num(mio.rotacion || 0))});
+    return;
+  }
   // Onda alrededor de quien la usa (Shockwave…): el centro es su propio token, no hay que marcar nada.
   if(hab.objetivo === 'onda'){
     const mio = [...tokens.values()].find(propio);
@@ -823,6 +833,20 @@ async function dueloAplicarEfecto(d, ef){
   if(!spec) return {manual: true, nota: 'a mano'};
   const t = tokens.get(d.defensor.tokenId);
   if(!t) return {manual: true, nota: 'el token ya no está: aplicalo a mano'};
+  // «Pierde No2» (2026-10-02, Sonic Boom): cuántos = el número + la diferencia entre las tiradas; en 0, Sentado si corresponde.
+  if(spec.nombre === 'Pierde No2'){
+    const n = Math.max(0, Math.round(num(spec.no2))) + (spec.no2Dif ? Math.abs(Math.round(num(d.contacto && d.contacto.dif))) : 0);
+    if(t.tipo === 'creep'){
+      const r = await modificarCreep(t.fichaId, sc => {
+        const antes = num(sc.nitros); sc.nitros = Math.max(0, antes - n);
+        const sentado = sc.nitros <= 0 && spec.no2Sentado ? EstadosAplicar.aplicarACreep(sc, {nombre: 'Sentado'}).ok : false;
+        return {antes, despues: sc.nitros, sentado};
+      });
+      return {nota: `−${n} No2 (${fmt(r.antes)} → ${fmt(r.despues)})${r.sentado ? ' · quedó Sentado' : ''}`};
+    }
+    await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Pierde No2', stacks: n, ...(spec.no2Sentado ? {sentadoEnCero: true} : {})}, origen: `${d.atacante.nombre} · ${ef.nombre}`});
+    return {nota: `le llegó a su ficha: −${n} No2${spec.no2Sentado ? ' (en 0, Sentado)' : ''}`};
+  }
   if(spec.cura){
     try{ const r = await dueloCurar(t, spec.cura); return {nota: `+${spec.cura} HP (${fmt(r.previo)} → ${fmt(r.nuevo)})`}; }
     catch(err){ console.error('No se pudo aplicar la cura del duelo:', err); return {manual: true, nota: 'no se pudo curar solo: aplicalo a mano'}; }

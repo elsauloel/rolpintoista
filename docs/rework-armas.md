@@ -632,4 +632,4 @@ Legendaria); el Báculo mágico sale del Tipo 4.
 Salen: Báculo mágico (no es del Tipo 4), Puñal de Dorne (lo reemplaza el Beso de la viuda). Siguen como referencia: Colmillo dientes de sable,
 Pica del Muro Eterno, Aguijón de la Reina Avispa, Lanza del alba (las cuatro reajustadas).
 **A construir (firmas):** +1 d20 en el crítico · no se puede parrear · ataque de oportunidad sin No2 · primer ataque −1 No2 · daño mágico extra
-(rayo / hielo, ignora la Defensa y resta la Armadura mágica) · Rengo en armas · Sangrado con stacks.
+(rayo / hielo, ignora la Defensa y resta la Armadura mágica; **queda afuera del multiplicador del crítico** — regla del dueño, 2026-10-03) · Rengo en armas · Sangrado con stacks.

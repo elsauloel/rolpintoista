@@ -1004,3 +1004,36 @@ ganaron durabilidad (Resistente, 9) para seguir Raras. El **Hacha grande del ase
 | ⚠️ Hacha de doble filo | 3 dados · Rompe armadura siempre · Ignora 1 de Res. crítico · 120 → 600 · **Excepcional** · «ignora» es ajeno; renombrar (choca con la Buena) |
 | ⚠️ Hacha de guerra pesada | 2 dados · «Arruina armadura» (efecto que ya no existe) · 130 → 110 · Buena · rehacer (¿Armadura rota doble?) |
 | Hacha arrojadiza | 2 dados · Alcance +2 con una mano · Sangrado 50 % · 240 → 260 · Rara · es arrojadiza: va con las de rango |
+
+**Decisión (dueño, 2026-10-03):** las 18 Raras **por arquetipos**, con Rompe armadura en **por lo menos la mitad** («es la identidad de las hachas;
+puede haber más»).
+
+### T8 Raro — propuesta v1: 18 armas por arquetipo (2026-10-03, ⬜ a revisar por el dueño)
+| Arma | Lo que hace · precio |
+|---|---|
+| **🔨 Rompecorazas** | |
+| Hacha de guerra pesada (rehecha) | 2 dados · Armadura rota doble 50 % · 170 |
+| Hacha del Caudillo (rehecha) | 2 dados · Bloqueo +1 · Armadura rota doble siempre · 350 |
+| Hacha de doble hoja (era la Rara «de doble filo») | 3 dados · Rompe armadura siempre · 400 |
+| **🛡 Muralla** | |
+| Hacha de batalla | 2 dados · Parry +1 · Bloqueo +2 · Rompe armadura 33 % · resistente · 300 |
+| Hacha del alcaide 🆕 | 2 dados · Parry +2 · Bloqueo +2 · muy resistente · 350 |
+| Hacha del baluarte 🆕 | 1 dado · Parry +1 · Bloqueo +3 · Rompe armadura 50 % · muy resistente · 210 |
+| **🪓 Verduga** | |
+| Segur de verdugo | 2 manos · 2 dados · Derribar 50 % · Rompe armadura 33 % · 170 |
+| Hacha del cazador de osos 🆕 | 2 dados · Rengo 33 % · Derribar 33 % · 180 |
+| Hacha del alguacil 🆕 | 2 dados · Bloqueo +1 · Derribar 50 % · Rengo 25 % · 240 |
+| **🌲 Leñador bruto** | |
+| Hacha del quebrachero 🆕 | 2 manos · 3 dados · +1 · 220 |
+| Gran hacha del monte 🆕 | 2 manos · 3 dados · Rompe armadura 33 % · 230 |
+| Hacha del Jefe de Guerra (rehecha) | 3 dados a una mano · Iniciativa −1 · Rompe armadura 33 % · 260 |
+| **🏹 Asta** | |
+| Alabarda de guardia | 2 manos · 2 dados · +1 · Alcance +1 · Derribar 25 % · 220 |
+| Hacha danesa | 2 manos (era de una) · 2 dados · Alcance +1 · Rompe armadura siempre · 300 |
+| Hacha de asta larga 🆕 | 2 manos · 2 dados · Alcance +2 · Bloqueo +1 · 230 |
+| **🩸 Salvaje** | |
+| Sagaris | 2 dados · +1 · Rompe armadura siempre · Sangrado siempre · 400 |
+| Hacha de colmillo de jabalí 🆕 | 2 dados · Sangrado de 3 stacks 50 % · Rompe armadura 33 % · 190 |
+| Hacha del pantano negro 🆕 | 2 dados · Veneno de 3 stacks 50 % · Sangrado 33 % · 180 |
+
+Con Rompe armadura: **11 de 18**. El **Hacha arrojadiza** queda afuera (va con las de rango).

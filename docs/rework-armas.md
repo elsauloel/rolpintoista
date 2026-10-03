@@ -735,3 +735,37 @@ convenció»: a lo sumo mitad y mitad (estilo anterior y criollo), porque todo c
 **Lo que muestra:** 5 copias (quedan 8 distintas); 12 de 13 no sangran (ni siquiera el piso de la Común); la Cimitarra de guardia rinde como
 común; la Espada larga y el Sable militar, como Raras; el Falchion usa «Ignora» (desde Rara) y un nombre poco usado; nadie usa Rengo, Bloqueo,
 Veneno, Rompe armadura bajo, daño amplificado ni efectos «si es crítico».
+
+### T6 Común — propuesta v2: 24 armas (2026-10-03, ⬜ a revisar por el dueño)
+Pedidos del dueño: Sangrado de arma estándar **2 de daño por 2 turnos** (✅ construido: reaplicar suma 1 stack y reinicia los turnos; con
+crítico, permanente); Sangrado 25 % en la **mitad**, y la otra mitad con efectos que lo igualen o superen (nada más débil); **más juego con el
+crítico** (una común puede tener Crít. frecuente +1 **o** Crít. potente +2, no los dos); si hace falta, 24 en vez de 18.
+
+| Arma | Lo que hace |
+|---|---|
+| **Con Sangrado 25 %** | |
+| Facón de paisano | Sangrado 25 % · 50 |
+| Sable de granadero | Iniciativa +2 · Sangrado 25 % · 65 |
+| Navaja del compadrito | Iniciativa +3 · Sangrado 25 % · 70 |
+| Sable del club de barrio | Parry +1 · contraataque +1 · Sangrado 25 % · 80 |
+| Sable herrumbrado del cuartel | contraataque +2 · Sangrado 25 % · 70 |
+| Cuchilla del frigorífico | +2 de daño · Sangrado 25 % · 75 |
+| Machete de chacarero | +1 de daño · Iniciativa +1 · Sangrado 25 % · 70 |
+| Espada de la colimba | 2 dados · Sangrado 25 % · 85 |
+| Sable del cuatrero | 2 dados · contraataque +1 · Sangrado 25 % · 100 |
+| Hoz del quintero | Sangrado 50 % · 55 |
+| Navaja del peluquero de la esquina | PdG +1 · Sangrado 25 % · 110 |
+| 🆕 Sable de desfile | Iniciativa +1 · Parry +1 · Sangrado 25 % · 75 |
+| **Sin Sangrado** | |
+| Sable de milico | Iniciativa +1 · contraataque +1 · 60 |
+| Caronero | Parry +1 · Iniciativa +1 · 65 |
+| Espada del comisario | contraataque +3 · 65 |
+| Espada de la feria de Mataderos | +1 de daño · contraataque +1 · 65 |
+| Machete chaqueño | +1 dado amplificado · 80 |
+| Sable de utilería | Lisiado 25 % · 55 |
+| Facón del baldío | Veneno 2 stacks 20 % · 50 |
+| 🆕 Sable del tahúr | Crít. frecuente +1 · 75 |
+| 🆕 Espada del afilador | Crít. potente +2 · 65 |
+| 🆕 Facón del matrero | Crít. frecuente +1 · contraataque +1 · 90 |
+| 🆕 Sable fino | Crít. potente +2 · Iniciativa +1 · 80 |
+| 🆕 Espada del duelista novato | Crít. frecuente +1 · Parry +1 · 95 |

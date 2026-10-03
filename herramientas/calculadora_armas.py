@@ -129,6 +129,8 @@ def puntaje(arma):
         if nombre == 'Rompe armadura' and st > 1: escala = 1 + 0.5 * (st - 1)      # cada stack extra de Armadura rota por golpe suma +50 %
         if nombre == 'Envenenar' and st and 'severo' not in str(e.get('detalle', '')).lower(): escala = st / 2   # el peso 2 del Veneno es a 2 stacks
         ef += base * escala * probabilidad(e) * K_EFECTO * modulacion(nombre, fam)
+    if arma.get('ignoraResistCrit'):   # el campo nuevo del arma (2026-10-03): igual que el efecto viejo «Ignora N», siempre
+        ef += float(arma['ignoraResistCrit']) * PESO_CRIT * K_EFECTO * FACTOR_CRIT.get(tipo, 1.0)
     d['efectos'] = ef
     d['peso del arma'] = -TASA_PESO * peso
     return sum(d.values()), d

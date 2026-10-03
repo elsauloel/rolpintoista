@@ -101,7 +101,9 @@ const ItemCorto = (() => {
     p.push(`${peso} dado${peso === 1 ? '' : 's'}${amp ? ` + ${amp} amplificado${amp === 1 ? '' : 's'}` : ''}`);
     if(num(it.danoFijo)) p.push(`${num(it.danoFijo) > 0 ? '+' : ''}${num(it.danoFijo)} de daño`);
     (it.mods || []).forEach(m => { if(m && m.stat && num(m.val) && m.stat !== 'def') p.push(`${BONO[m.stat] || m.stat} ${num(m.val) > 0 ? '+' : ''}${num(m.val)}`); });
-    (it.efectosGolpe || []).forEach(e => { if(e && e.nombre) p.push(efectoCorto(e)); });
+    const ign = num(it.ignoraResistCrit) + (it.efectosGolpe || []).reduce((a, e) => { const m = /^ignora\s+(\d+)\s+de\s+res/i.exec(String((e && e.nombre) || '').trim()); return a + (m ? num(m[1]) : 0); }, 0);
+    if(ign) p.push(`Ignora ${ign} de Res. crítico`);
+    (it.efectosGolpe || []).forEach(e => { if(e && e.nombre && !/^ignora\s+\d+\s+de\s+res/i.test(String(e.nombre).trim())) p.push(efectoCorto(e)); });
     if(num(it.durPorPeso) > 3) p.push(`Resistente (durabilidad ${durMax(it)})`);
     else if(num(it.durPorPeso) > 0 && num(it.durPorPeso) < 3) p.push(`Frágil (durabilidad ${durMax(it)})`);
     const es = it.espalda;
@@ -137,7 +139,9 @@ const ItemCorto = (() => {
     if(it.tipoItem === 'arma_2m') L.push('A dos manos: ocupa las dos manos.');
     const vistos = new Set();
     (it.mods || []).forEach(m => { if(m && MECANICA[m.stat] && !vistos.has(m.stat)){ vistos.add(m.stat); L.push(MECANICA[m.stat]); } });
-    const efs = (it.efectosGolpe || []).filter(e => e && e.nombre);
+    if(num(it.ignoraResistCrit) || (it.efectosGolpe || []).some(e => /^ignora\s+\d+\s+de\s+res/i.test(String((e && e.nombre) || '').trim())))
+      L.push('Ignora N de Resistencia a crítico: al calcular el crítico, el defensor cuenta N puntos menos de Resistencia a crítico contra este golpe: es más fácil que salga crítico y se tiran más d20. ⚙ El duelo lo resta solo y lo muestra en la cuenta.');
+    const efs = (it.efectosGolpe || []).filter(e => e && e.nombre && !/^ignora\s+\d+\s+de\s+res/i.test(String(e.nombre).trim()));
     efs.forEach(e => { const n = nombreEf(e); if(MEC_EFECTO[n] && !vistos.has(n)){ vistos.add(n); L.push(MEC_EFECTO[n]); } });
     if(efs.some(e => pctEf(e) < 100)) L.push('Los porcentajes se tiran en el duelo, después del daño (50 % = una moneda, 25 % = un d4, 75 % = un d4 que falla solo con 1). Lisiado, Veneno y Sangrado necesitan que el golpe haga daño.');
     if(efs.some(e => e.seguroCritico)) L.push('Seguro si es crítico: con un golpe crítico, el efecto entra sin tirar.');

@@ -74,7 +74,8 @@ const CreepDuelo = (() => {
       // Para el crítico: el Crítico frecuente y potente del creep y su Resistencia a crítico contra el Tipo del arma que lo ataca.
       statsCritico: d => {
         const sc = deLado(d.atacante);
-        return sc ? {frecuente: Math.max(0, Math.round(C().modTotal(sc, 'crit'))), potente: Math.max(0, Math.round(C().modTotal(sc, 'critpot')))} : {frecuente: 0, potente: 0};
+        return sc ? {frecuente: Math.max(0, Math.round(C().modTotal(sc, 'crit'))), potente: Math.max(0, Math.round(C().modTotal(sc, 'critpot'))),
+          ignora: Combatiente.ignoraResistCritArma({ignoraResistCrit: sc.armaIgnoraResistCrit, efectosGolpe: sc.armaEfectos})} : {frecuente: 0, potente: 0};
       },
       resistenciaCritico: d => {
         const sc = deLado(d.defensor);

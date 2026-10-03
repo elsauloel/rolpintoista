@@ -169,6 +169,7 @@ function armaDeCreepComoDraft(sc){
     peso: Math.max(1, num(sc.armaPeso) || 1), danoFijo: num(sc.armaFijo), danoAmplificado: num(sc.armaAmplificado),
     armaDeRango: !!sc.armaDeRango, mods: structuredClone(sc.armaMods || []), detalle: sc.armaDetalle || '',
     efectosGolpe: structuredClone(sc.armaEfectos || []), ...(sc.armaEspalda ? {espalda: structuredClone(sc.armaEspalda)} : {}),
+    ...(num(sc.armaIgnoraResistCrit) > 0 ? {ignoraResistCrit: num(sc.armaIgnoraResistCrit)} : {}),
   };
 }
 
@@ -183,6 +184,7 @@ function ponerArmaEnCreep(sc, d){
   sc.armaMods = structuredClone(d.mods || []);
   sc.armaEfectos = structuredClone(d.efectosGolpe || []);
   if(d.espalda) sc.armaEspalda = structuredClone(d.espalda); else delete sc.armaEspalda;   // por la espalda
+  if(num(d.ignoraResistCrit) > 0) sc.armaIgnoraResistCrit = num(d.ignoraResistCrit); else delete sc.armaIgnoraResistCrit;
   sc.armaDetalle = d.detalle || '';
 }
 

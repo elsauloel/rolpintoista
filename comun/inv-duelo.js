@@ -80,7 +80,8 @@ const InvDuelo = (() => {
       statsCritico: d => {
         const inv = ui.inv(d.atacante);
         const f = I().statValor(inv, 'crit'), p = I().statValor(inv, 'critpot');
-        return {frecuente: Number.isNaN(f) ? 0 : Math.max(0, Math.round(f)), potente: Number.isNaN(p) ? 0 : Math.max(0, Math.round(p))};
+        return {frecuente: Number.isNaN(f) ? 0 : Math.max(0, Math.round(f)), potente: Number.isNaN(p) ? 0 : Math.max(0, Math.round(p)),
+          ignora: Combatiente.ignoraResistCritArma({ignoraResistCrit: inv.armaIgnoraResistCrit, efectosGolpe: inv.armaEfectos})};
       },
       resistenciaCritico: d => {
         const i = [4, 6, 8, 10, 12].indexOf(num(d.ataque.tipoDado));

@@ -565,7 +565,7 @@ const Duelo = (() => {
     // "Ignora Resistencia a crítico" (2026-09-27, pedido del dueño): una habilidad tipo "ataque con mi arma, con
     // arreglos" (Golpe brutal y similares, duelo.arma.ignoraResistCrit) le resta puntos a la Resistencia del
     // defensor antes de calcular el crítico — a la vista en la cuenta y en los cuadraditos, como cualquier otra.
-    const ignora = _num(m.ataque && m.ataque.mods && m.ataque.mods.ignoraResistCrit);
+    const ignora = _num(m.ataque && m.ataque.mods && m.ataque.mods.ignoraResistCrit) + _num(dd.ignora);   // + lo que ignora el arma (statsCritico)
     const resistencia = Math.max(0, _num(dd.resistencia) - ignora);
     // Crítico frecuente/potente "solo esta tirada" (2026-09-29, pedido del dueño — Lisiar: el bono no puede
     // quedar como un estado de al menos 1 turno, que podría alcanzar a un ataque posterior). A diferencia de
@@ -747,7 +747,8 @@ const Duelo = (() => {
 
   // Los efectos que trae el arma, en el formato del duelo (los manda la página del atacante al tirar el daño).
   function normalizarEfectos(lista){
-    return (Array.isArray(lista) ? lista : []).slice(0, 8).map(e => {
+    // «Ignora N de Res. crítico» no es un efecto sobre el golpeado: ya se usó al calcular el crítico (2026-10-03).
+    return (Array.isArray(lista) ? lista : []).filter(e => !(typeof Combatiente !== 'undefined' && Combatiente.esEfectoIgnora(e))).slice(0, 8).map(e => {
       const caras = Math.max(1, Math.round(_num(e.caras)) || 1), exitos = Math.min(caras, Math.max(1, Math.round(_num(e.exitos)) || 1));
       const o = {nombre: String(e.nombre || '').trim().slice(0, 40), caras, exitos, dado: String(e.dado || '').trim().slice(0, 20), detalle: String(e.detalle || '').trim().slice(0, 200), stacks: Math.max(0, Math.round(_num(e.stacks)))};
       if(_num(e.turnos) > 0) o.turnos = Math.round(_num(e.turnos));
@@ -1506,6 +1507,7 @@ const Duelo = (() => {
       ...(ignoraResistCrit ? [`${_esc(nombreHab)} ignora ${_fmt(ignoraResistCrit)} de Resistencia a crítico del defensor.`] : []),
       ...(critBono ? [`${_esc(nombreHab)} suma +${_fmt(critBono)} a tu Crítico frecuente, solo en esta tirada.`] : []),
       ...(critpotBono ? [`${_esc(nombreHab)} suma +${_fmt(critpotBono)} a tu Crítico potente, solo en esta tirada.`] : []),
+      ...(_num(d.critDatos && d.critDatos.ignora) ? [`${_esc(d.ataque.armaNombre || 'El arma')} ignora ${_fmt(d.critDatos.ignora)} de Resistencia a crítico del defensor.`] : []),
       ...(_num(d.ataque && d.ataque.espalda && d.ataque.espalda.critpot) ? [`Por la espalda: +${_fmt(d.ataque.espalda.critpot)} a tu Crítico potente.`] : []),
       `Nivel del crítico: ${_fmt(c.nivel)}${_num(c.resistencia) ? ` − Resistencia a crítico ${_fmt(c.resistencia)} = ${_fmt(c.dados)} d20` : ''}`];
     let cuerpo;
@@ -2027,5 +2029,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {limpiarEspalda, guardarDano, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab};
+  return {limpiarEspalda, guardarDano, entrarCritico, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab};
 })();

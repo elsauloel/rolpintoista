@@ -2073,6 +2073,17 @@ prueba('cómo se ve un arma: en la grilla lo esencial (= el Detalle de las T4 Co
     [36, [], true, true, true, true, false, 'Tipo 4 · 2 manos · 2 dados · Alcance +1 · Sangrado 50 % · 2 turnos']);
 });
 
+prueba('arma que ignora Resistencia a crítico: el duelo se la resta al defensor (campo nuevo y efecto viejo); no aparece como efecto al golpear', () => {
+  const ign = Combatiente.ignoraResistCritArma({ignoraResistCrit: 1, efectosGolpe: [{nombre: 'Ignora 2 de Res. crítico'}, {nombre: 'Lisiado'}]});
+  const m = {pdg: {total: 15}, eva: {total: 3}, ataque: {tipoDado: 4, mods: {}}, critDatos: {frecuente: 0, potente: 0, resistencia: 3, ignora: 2}};
+  Duelo.entrarCritico(m);
+  const sin = {pdg: {total: 15}, eva: {total: 3}, ataque: {tipoDado: 4, mods: {}}, critDatos: {frecuente: 0, potente: 0, resistencia: 3}};
+  Duelo.entrarCritico(sin);
+  const arma = {tipoItem: 'arma_1m', tipoDado: 4, peso: 1, danoFijo: 2, ignoraResistCrit: 2};
+  igual([ign, m.crit.resistencia, sin.crit.resistencia, m.crit.dados - sin.crit.dados, ItemCorto.armaEsencial(arma), ItemCorto.armaTecnico(arma).some(l => /^Ignora N/.test(l)),
+    Combatiente.ignoraResistCritArma(null)], [3, 1, 3, 2, 'Tipo 4 · 1 dado · +2 de daño · Ignora 2 de Res. crítico', true, 0]);
+});
+
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {
 const malas = resultados.filter(r => !r.ok);

@@ -169,6 +169,17 @@ const Combatiente = (() => {
      pasivas, estados), igual para personajes, creeps e invocaciones. `statAtaqueEspecial(tipo)` → el stat ('' si es un ataque normal). */
   const ATAQUE_ESPECIAL = {oportunidad: {stat: 'pdgopor', nombre: 'Ataque de oportunidad'}, contra: {stat: 'pdgcontra', nombre: 'Contraataque'}};
   const statAtaqueEspecial = tipo => (ATAQUE_ESPECIAL[tipo] || {}).stat || '';
+  /* «Ignora N de Resistencia a crítico» de un arma (2026-10-03, pedido del dueño): el campo `ignoraResistCrit` del arma (también el viejo
+     efecto al golpear «Ignora N de Res. crítico», que no se aplicaba solo). El duelo se lo resta a la Resistencia del defensor antes de
+     calcular el crítico (lo pide al atacante con statsCritico). `arma` = {ignoraResistCrit, efectosGolpe} (un creep o una invocación: sus
+     campos armaIgnoraResistCrit / armaEfectos). */
+  const RE_IGNORA_CRIT = /^ignora\s+(\d+)\s+de\s+res/i;
+  const esEfectoIgnora = e => RE_IGNORA_CRIT.test(String((e && e.nombre) || '').trim());
+  function ignoraResistCritArma(arma){
+    if(!arma) return 0;
+    const viejo = (arma.efectosGolpe || []).reduce((a, e) => { const m = RE_IGNORA_CRIT.exec(String((e && e.nombre) || '').trim()); return a + (m ? n(m[1]) : 0); }, 0);
+    return Math.max(0, Math.round(n(arma.ignoraResistCrit) + viejo));
+  }
   // El menú «¿Qué ataque es?» (los tres botones), igual en todas las pantallas. o = {nombre, normal, primero, especial, attr, ref,
   // primeroTxt?, siguienteTxt?}: `attr` = el data-atributo de los botones, `ref` lo que va después de «tipo:».
   function menuTipoAtaqueHtml(o){
@@ -559,7 +570,7 @@ const Combatiente = (() => {
     return v;
   }
 
-  return {ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, menuTipoAtaqueHtml, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+  return {ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

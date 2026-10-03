@@ -576,3 +576,5 @@ Sedienta 280 · Guardián del paso 180 · Estoque de duelista 290 · Sereno 300 
 de esgrima 260 · Vigilia eterna 350 · Alquimista 190 · Misericordia 300 · Puñal envenenado 270 · Rompemalla 300.
 
 **✅ Aplicado (2026-10-03, dueño: «ajustar con este criterio y después lo reviso en cada caso»):** las 36 T4 Comunes y de Buena calidad tienen el precio libre.
+
+**✅ Cargado (2026-10-03, dueño: «avancemos con las raras y cuando las tengas pasame la lista»):** las 18 Raras reemplazaron a las 13 T4 Raras del catálogo, con los tres textos y el precio libre. Construido para ellas: efectos «solo si es crítico» y «Drena vida» en armas. Salieron: Aguijón de esgrima, Daga de guardia, Pico de guerra, Puñal aserrado, Lanza militar, Lanza de lisiar. Queda la revisión del dueño.

@@ -626,7 +626,7 @@ grupo('Tienda (A5)');
 prueba('la tienda: precio con ajuste, solo lo del vendedor, comprar del carrito, vender con ajuste y reparar con el herrero', () => {
   const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, meta: {nombre: 'Prueba', dde: 500}, loot: {normal: 2},
     inventario: [{id: 'casco', nombre: 'Casco gastado', tipoItem: 'cabeza', peso: 2, precioCompra: 10, equipado: false, dur: 3}]}).S);
-  const arma = CATALOGO_BASE.find(i => i.tipoItem === 'arma_1m' && num(i.precioCompra) >= 4 && !i.consumible);
+  const arma = CATALOGO_BASE.find(i => i.tipoItem === 'arma_1m' && num(i.precioCompra) >= 4 && num(i.precioCompra) <= 200 && !i.consumible);   // una que se pueda comprar con 500
   const st = FichaTienda.nueva();
   st.tienda = {items: [arma.id], itemsDatos: [], ajustePrecio: 50, ajusteVenta: -50, herrero: true, precioReparacion: 2};
   const precio = FichaTienda.precioDeCompra(st, arma), vis = FichaTienda.visibles(S, st).map(i => i.id);
@@ -2065,12 +2065,12 @@ prueba('regla universal: el PdG en oportunidad / contraataque cuenta venga del a
 });
 
 prueba('cómo se ve un arma: en la grilla lo esencial (= el Detalle de las T4 Comunes, armado de sus datos); en «Ver», «Detalles técnicos» explica cada mecánica', () => {
-  const t4 = CATALOGO_BASE.filter(i => /^arma_/.test(i.tipoItem) && i.tipoDado === 4 && (i.tier === 'Común' || i.tier === 'Buena Calidad') && !i.armaDeRango);
+  const t4 = CATALOGO_BASE.filter(i => /^arma_/.test(i.tipoItem) && i.tipoDado === 4 && ['Común', 'Buena Calidad', 'Raro'].includes(i.tier) && !i.armaDeRango);
   const distintos = t4.filter(i => i.detalle !== ItemCorto.armaEsencial(i)).map(i => i.nombre);
   const punzon = t4.find(i => i.nombre === 'Punzón de matarife'), ver = ItemCorto.verHtml(punzon), grilla = ItemCorto.grillaHtml(punzon);
   igual([t4.length, distintos, t4.every(i => i.descripcionNarrativa), /Detalles técnicos/.test(ver), /Lisiado: 3 turnos/.test(ver), /Seguro si es crítico/.test(ver), /Lisiado: 3 turnos/.test(grilla),
     ItemCorto.armaEsencial({tipoItem: 'arma_2m', tipoDado: 4, peso: 2, mods: [{stat: 'rng', val: 1}], efectosGolpe: [{nombre: 'Sangrado', caras: 2, exitos: 1, turnos: 2}]})],
-    [36, [], true, true, true, true, false, 'Tipo 4 · 2 manos · 2 dados · Alcance +1 · Sangrado 50 % · 2 turnos']);
+    [54, [], true, true, true, true, false, 'Tipo 4 · 2 manos · 2 dados · Alcance +1 · Sangrado 50 % · 2 turnos']);
 });
 
 prueba('arma que ignora Resistencia a crítico: el duelo se la resta al defensor (campo nuevo y efecto viejo); no aparece como efecto al golpear', () => {

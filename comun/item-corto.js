@@ -88,7 +88,9 @@ const ItemCorto = (() => {
   const durMax = it => typeof Combatiente !== 'undefined' && Combatiente.durMax ? Combatiente.durMax(it) : Math.max(3, Math.round(durPP(it) * Math.max(0, Math.round(num(it.peso)))));
   // «Sangrado 50 % · 2 turnos», «Veneno 3 stacks (siempre)», «Lisiado 25 %, seguro si es crítico».
   function efectoCorto(e){
-    const n = nombreEf(e), pct = pctEf(e);
+    const pct = pctEf(e);
+    let n = nombreEf(e);
+    if(n === 'Rompe armadura' && num(e.stacks) > 1) n = `Armadura rota ${num(e.stacks) === 2 ? 'doble' : '×' + num(e.stacks)}`;   // 2 stacks por golpe (Raras del Tipo 8)
     if(e.danoMagico) return `+${e.dado} de ${String(e.nombre || 'magia').toLowerCase()}`;
     if(n === 'Drena vida') return `${e.soloCritico ? 'Si es crítico: drena otro' : 'Drena vida'} ${num(e.drenaPct) > 0 ? num(e.drenaPct) : 50} %`;
     if(e.soloCritico) return `Si es crítico: ${n}${num(e.stacks) > 0 && /^(Veneno|Sangrado)$/.test(n) ? ` ${num(e.stacks)} stacks` : ''}${pct < 100 ? ` ${pct} %` : ''}${num(e.turnos) > 0 ? ` · ${num(e.turnos)} turnos` : ''}`;
@@ -136,7 +138,7 @@ const ItemCorto = (() => {
     Sangrado: 'Sangrado: pierde 1 HP por stack en cada Mantenimiento (entra con 2, o los stacks que diga el arma). El de un arma dura 2 turnos salvo que diga otra cosa; con un golpe crítico, queda permanente. Si ya sangraba: +1 stack y los turnos vuelven a empezar.',
     Veneno: 'Veneno: pierde 1 HP por stack en cada Mantenimiento y un stack por turno (los turnos son los stacks). Los stacks nuevos se suman a los que ya tenía.',
     'Veneno severo': 'Veneno severo: daño por turno que crece en cada Mantenimiento y no se va solo: hay que curarlo.',
-    'Rompe armadura': 'Rompe armadura: deja Armadura rota (−1 de Defensa por stack).',
+    'Rompe armadura': 'Rompe armadura: deja Armadura rota (−1 de Defensa por stack). «Armadura rota doble»: deja 2 stacks por golpe.',
   };
   function armaTecnico(it){
     if(!esArma(it)) return [];

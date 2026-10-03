@@ -1008,7 +1008,7 @@ ganaron durabilidad (Resistente, 9) para seguir Raras. El **Hacha grande del ase
 **Decisión (dueño, 2026-10-03):** las 18 Raras **por arquetipos**, con Rompe armadura en **por lo menos la mitad** («es la identidad de las hachas;
 puede haber más»).
 
-### T8 Raro — propuesta v1: 18 armas por arquetipo (2026-10-03, ⬜ a revisar por el dueño)
+### T8 Raro — propuesta v1: 18 armas por arquetipo (2026-10-03, ✅ aprobada y cargada)
 | Arma | Lo que hace · precio |
 |---|---|
 | **🔨 Rompecorazas** | |
@@ -1040,3 +1040,7 @@ Con Rompe armadura: **11 de 18**. El **Hacha arrojadiza** queda afuera (va con l
 
 **Alcance +2 no va en las hachas (dueño, 2026-10-03):** «para un hacha no me gusta; sí en alguna Tipo 4 rara» (ya la hay: la Pica de retaguardia,
 Alcance +2). El Hacha de asta larga pasa a Alcance +1 · Parry +1 · Bloqueo +1 (260).
+
+**T8 Raro cargada (2026-10-03):** las 18 con sus tres textos. La Rara «⚠️ Hacha de doble filo» quedó como **Hacha de doble hoja** (mismo id). El
+texto corto de un arma dice «Armadura rota doble» cuando deja 2 stacks (`ItemCorto`). El **Hacha arrojadiza** sigue igual hasta revisar las de
+rango. En los creeps, el equipo Raro del Tipo 8 suma el Hacha de batalla. **Tipo 8: Común, Buena y Rara hechas.** Sigue: Tipo 10.

@@ -1505,6 +1505,16 @@ prueba('Ejecución ✨: el cono y «Pierde No2» (Sonic Boom) — editor, regla 
   igual([tabs.includes('Alcance'), no2Ui, c && c.objetivo, h.alcance, lh.objetivo, !!lh.dodge, spec, S.nitros, S.efectos.some(e => e.sentado)],
     [false, ['1', true, true], 'cono', 0, 'cono', false, {nombre: 'Pierde No2', no2: 1, no2Dif: true, no2Sentado: true}, 0, true]);
 });
+prueba('duelo minimizado (P151): un texto por paso, sin la vida que le queda; el fin al resolverse', () => {
+  const base = {atacante: {nombre: 'juan'}, defensor: {nombre: 'Coloso'}, ataque: {tipo: 'normal', tipoDado: 4}};
+  const enCurso = Duelo.pasosDe({...base, estado: 'esperando', fase: 'dano', pdg: {total: 6}, eva: {total: 4}, contacto: {gana: 'atacante'}});
+  const fin = Duelo.pasosDe({...base, estado: 'resuelto', fase: 'fin', resultado: 'pego', pdg: {total: 9}, eva: {total: 2}, defensa: {modo: 'evasion'}, contacto: {gana: 'atacante'},
+    crit: {critico: true, d20: [18], mult: 3}, dano: {aplicado: true, golpe: 12, recibido: 12, hpAntes: 85, hpDespues: 73}, efectos: [{nombre: 'Sangrado', caras: 4, exitos: 1, res: {exito: false}}]});
+  const parry = Duelo.pasosDe({...base, estado: 'esperando', fase: 'bloqueo', pdg: {total: 3}, eva: {total: 5}, defensa: {modo: 'parry'}, contacto: {gana: 'defensor'}});
+  igual([enCurso.map(p => p.txt), fin.map(p => p.txt), fin.some(p => /85|73/.test(p.txt)), parry.map(p => p.txt)],
+    [['PdG 6 contra Evasión 4 → pegó'], ['PdG 9 contra Evasión 2 → pegó', '¡Crítico ×3!', 'Coloso recibe 12 de daño', 'Sangrado: no funcionó', '🏁 El golpe pegó'], false,
+     ['PdG 3 contra Parry 5 → lo frena el Parry']]);
+});
 prueba('paso a paso: al crear, «✔ Crear» solo en el último paso; Cancelar pregunta y descarta; los pasos pueden depender de lo elegido', async () => {
   const hechos = [];
   let conExtra = false;

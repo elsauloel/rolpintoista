@@ -1910,6 +1910,72 @@ const Duelo = (() => {
     if(reg) reg(`Daño · ${d.hab.nombre}`, r);
   }
 
+  /* ---------- lo que se ve de un duelo que esta pantalla no tiene abierto (P151, dueño 2026-10-03: «las dos») ----------
+     Cada paso que ya pasó (contacto, Bloqueo, crítico, daño, efectos, fin) se revela en esta pantalla recién cuando los dados 3D quedan
+     quietos («primero los dados, después el resultado»): el botón «Ver duelo» dice en qué va y, si el cuadro no está abierto acá,
+     `cfg.paso(d, nuevos, todos)` (el mapa) lo cuenta en la Crónica. Solo lo público: el daño que recibió, no la vida que le queda. */
+  const pasosVistos = new Map();       // id → Set de claves ya reveladas en esta pantalla
+  const pasosEnEspera = new Set();     // 'id:clave' esperando a los dados
+  const resueltoDesde = new Map();     // id → cuándo esta pantalla lo vio resolverse (el botón queda un rato)
+  let pasosListo = false;              // el primer aviso: lo que ya había pasado no se anuncia
+  function pasosDe(d){
+    const P = [];
+    const g = d.contacto && d.contacto.gana;
+    if(d.pdg && d.eva && g){
+      const desemp = d.contacto.desempate ? ' (desempate)' : '';
+      if(d.hab) P.push({clave: 'contacto', dados: 1, txt: `${etqTira(d)} ${d.pdg.total} contra ${etqContra(d)} ${d.eva.total} → ${g === 'atacante' ? 'funcionó' : 'se resistió'}${desemp}`});
+      else{
+        const parry = d.defensa && d.defensa.modo === 'parry';
+        P.push({clave: 'contacto', dados: 1, txt: `PdG ${d.pdg.total} contra ${parry ? 'Parry' : 'Evasión'} ${d.eva.total} → ${g === 'atacante' ? 'pegó' : parry ? 'lo frena el Parry' : 'falló'}${desemp}`});
+      }
+    }
+    if(d.fuerza && d.bloqueo && d.bloq && d.bloq.gana) P.push({clave: 'bloqueo', dados: 1, txt: `Fuerza ${d.fuerza.total} contra Bloqueo ${d.bloqueo.total} → ${d.bloq.gana === 'defensor' ? 'bloqueó' : 'pasa la mitad'}`});
+    if(d.crit && d.crit.d20 && d.crit.critico) P.push({clave: 'critico', dados: 1, txt: `${_num(d.crit.supercritico) >= 2 ? '¡SUPERCRÍTICO' : '¡Crítico'} ×${d.crit.mult}!`});
+    const dn = d.dano;
+    if(dn && dn.aplicado){
+      const n = dn.recibido !== undefined && dn.recibido !== null ? dn.recibido : dn.golpe;
+      P.push({clave: 'dano', txt: dn.invulnerable ? `${d.defensor.nombre} es Invulnerable: no le hace nada`
+        : dn.manual ? `Daño ${_num(dn.golpe)} (se aplica a mano)` : `${d.defensor.nombre} recibe ${_num(n)} de daño`});
+      if(dn.magico && dn.magico.recibido !== undefined) P.push({clave: 'magico', txt: `…y ${_num(dn.magico.recibido)} de ${dn.magico.tipo}`});
+      if(dn.drena && !dn.drena.manual) P.push({clave: 'drena', txt: `${dn.drena.quien || d.atacante.nombre} se cura ${_num(dn.drena.monto)}`});
+      if(dn.espinas) P.push({clave: 'espinas', txt: `Espinas: ${dn.espinas.quien || d.atacante.nombre} recibe ${_num(dn.espinas.monto)}`});
+    }
+    (d.efectos || []).forEach((ef, i) => {
+      if(ef.omitido) P.push({clave: 'ef' + i, txt: `${ef.nombre}: no entra`});
+      else if(ef.res) P.push({clave: 'ef' + i, dados: siempreEf(ef) ? 0 : 1, txt: `${ef.nombre}: ${ef.res.exito ? 'funcionó' : 'no funcionó'}`});
+    });
+    if(d.estado === 'resuelto'){
+      const fin = d.hab ? {pego: 'La habilidad funcionó', fallo: 'El objetivo la resistió'}[d.resultado]
+        : {pego: 'El golpe pegó', fallo: 'El golpe falló', bloqueado: 'El golpe fue bloqueado', mitad: 'Pasó la mitad del daño'}[d.resultado];
+      P.push({clave: 'fin', txt: `🏁 ${fin || 'Terminó'}`});
+    }
+    return P;
+  }
+  const pasosRevelados = d => { const v = pasosVistos.get(d.id); return v ? pasosDe(d).filter(p => v.has(p.clave)) : []; };
+  function revisarPasos(){
+    const ahora = Date.now();
+    listaDuelos.forEach(d => {
+      if(d.estado === 'resuelto' && !resueltoDesde.has(d.id)) resueltoDesde.set(d.id, pasosListo ? ahora : (d.creado && d.creado.toMillis ? d.creado.toMillis() : ahora));
+      let vistos = pasosVistos.get(d.id);
+      if(!vistos){ vistos = new Set(); pasosVistos.set(d.id, vistos); }
+      const nuevos = pasosDe(d).filter(p => !vistos.has(p.clave) && !pasosEnEspera.has(d.id + ':' + p.clave));
+      if(!nuevos.length) return;
+      const grande = actual && actual.id === d.id && !actual.min;
+      if(!pasosListo || grande || descartados.has(d.id)){ nuevos.forEach(p => vistos.add(p.clave)); return; }   // ya se ve en el cuadro (o no interesa)
+      nuevos.forEach(p => pasosEnEspera.add(d.id + ':' + p.clave));
+      const revelar = () => {
+        nuevos.forEach(p => { vistos.add(p.clave); pasosEnEspera.delete(d.id + ':' + p.clave); });
+        const dd = listaDuelos.find(x => x.id === d.id) || d;
+        dibujarChips();
+        if(cfgEscuchar.paso && !(actual && actual.id === d.id && !actual.min)){
+          try{ cfgEscuchar.paso(dd, nuevos, pasosRevelados(dd)); }catch(err){ console.error('Duelo: paso', err); }
+        }
+      };
+      if(nuevos.some(p => p.dados)) esperarDados(revelar); else revelar();
+    });
+    pasosListo = true;
+  }
+
   /* ---------- botones «Ver duelo» y apertura automática ---------- */
   function contenedorAvisos(){
     inyectarCss();
@@ -1925,7 +1991,7 @@ const Duelo = (() => {
       if(descartados.has(d.id)) return;
       const t = d.creado && d.creado.toMillis ? d.creado.toMillis() : ahora;
       if(abierto(d) && ahora - t > VIGENCIA_MS) return;
-      if(d.estado === 'resuelto' && ahora - t > RESUELTO_VISIBLE_MS) return;
+      if(d.estado === 'resuelto' && ahora - (resueltoDesde.get(d.id) || t) > RESUELTO_VISIBLE_MS) return;   // a contar desde que se resolvió
       if(d.estado === 'cancelado') return;
       const abiertoAhora = actual && actual.id === d.id && !actual.min;
       if(abiertoAhora) return;
@@ -1936,11 +2002,13 @@ const Duelo = (() => {
     const RES = {pego: '⚔ Pegó', fallo: '🛡 Falló', bloqueado: '🛡 Bloqueó', mitad: '⚠ Pasó la mitad'};
     const critico = d => d.resultado === 'pego' && d.crit && d.crit.critico;
     mostrar.forEach((d, id) => {
+      const ult = pasosRevelados(d).filter(p => p.clave !== 'fin').pop();   // en qué va (lo ya revelado en esta pantalla)
       const txt = d.estado === 'resuelto'
         ? `${critico(d) ? '💥 ¡CRÍTICO ×' + d.crit.mult + '!' : (RES[d.resultado] || 'Resuelto')}: ${d.atacante.nombre} → ${d.defensor.nombre} · ver`
         : d.fase === 'critico' ? `💥 Crítico: ${d.atacante.nombre} → ${d.defensor.nombre} · tirar d20`
         : d.fase === 'dodge' ? `🏃 Dodge roll: ${d.defensor.nombre} vs. ${d.hab ? d.hab.nombre : 'área'}`
         : d.estado === 'empate' ? `⚖ Empate: ${d.atacante.nombre} → ${d.defensor.nombre} · elegir par o impar`
+        : ult ? `${d.hab ? '✨' : '⚔'} ${d.atacante.nombre} → ${d.defensor.nombre} · ${ult.txt}`
         : d.hab ? `✨ Ver ejecución: ${d.atacante.nombre} → ${d.defensor.nombre}` : `⚔ Ver duelo: ${d.atacante.nombre} → ${d.defensor.nombre}`;
       let el = chips.get(id);
       if(!el){
@@ -1952,6 +2020,7 @@ const Duelo = (() => {
       }
       el.className = 'duelo-chip' + (d.estado === 'resuelto' ? ' res' : '');
       el.textContent = txt;
+      el.title = d.hab ? 'Ver la ejecución' : 'Ver el duelo';
     });
     // Hook opcional (2026-09-27, pedido del dueño): el mapa lo usa para hacer latir en el
     // lienzo a los dos tokens de cada duelo que quedó minimizado/de fondo para esta pantalla —
@@ -1982,6 +2051,7 @@ const Duelo = (() => {
         autoAbiertos.add(d.id);
         if(!actual || (actual.dato && (actual.dato.estado === 'resuelto' || actual.dato.estado === 'cancelado'))) abrir(d.id);
       });
+      revisarPasos();
       dibujarChips();
       listaDuelos.forEach(publicarResumenSiCorresponde);   // el resumen final en la Mesa
       // Hechizo de área (Paso 4/7 del casteo): un sub-duelo con `grupo` que se resolvió — el mapa (GM) avanza la cascada
@@ -2060,5 +2130,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {limpiarEspalda, guardarDano, entrarCritico, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab};
+  return {limpiarEspalda, guardarDano, entrarCritico, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

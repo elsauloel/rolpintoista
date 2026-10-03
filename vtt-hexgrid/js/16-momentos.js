@@ -107,11 +107,24 @@ function renderMomentosFeed(){
     const d = v.d, queda = v.hasta - ahora;
     return `<div style="pointer-events:auto;background:rgba(21,26,38,.94);border:1px solid #39435c;border-left:3px solid #c98545;border-radius:8px;padding:8px 10px;color:#e9ecf4;font-size:13px;line-height:1.35;box-shadow:0 6px 18px rgba(0,0,0,.45);opacity:${queda < 1500 ? Math.max(0.15, queda / 1500) : 1};transition:opacity .4s">
       <div><span style="font-size:15px">${esc(d.icono || '•')}</span> <b>${esc(d.titulo || '')}</b></div>
-      ${d.resultado ? `<div style="margin-top:3px;color:#cfd6e6">${esc(d.resultado)}</div>` : (d.estado === 'listo' ? '' : '<div style="margin-top:3px;color:#8d97ad">…</div>')}
+      ${d.lineas ? d.lineas.map((l, i) => `<div style="margin-top:3px;color:${i === d.lineas.length - 1 ? '#e9ecf4' : '#9aa3b8'}">${esc(l)}</div>`).join('')
+        : d.resultado ? `<div style="margin-top:3px;color:#cfd6e6">${esc(d.resultado)}</div>` : (d.estado === 'listo' ? '' : '<div style="margin-top:3px;color:#8d97ad">…</div>')}
     </div>`;
   }).join('');
   clearTimeout(momentosFeedTimer);
   if(momentosFeed.size) momentosFeedTimer = setTimeout(renderMomentosFeed, 500);
+}
+
+/* ---------- Un duelo que esta pantalla no tiene abierto (P151, dueño 2026-10-03) ----------
+   comun/duelo.js avisa cada paso (contacto, Bloqueo, crítico, daño, efectos, fin) recién cuando los dados quedaron quietos: una tarjeta por
+   duelo en la Crónica, con un renglón por paso (el último, resaltado). Es local: cada pantalla la arma con el duelo que ya escucha, sin
+   escribir nada. */
+function dueloPasoCronica(d, nuevos, todos){
+  const id = 'duelo:' + d.id;
+  const ya = momentosFeed.get(id);
+  momentosFeed.set(id, {d: {icono: d.hab ? '✨' : '⚔', titulo: `${d.atacante.nombre} → ${d.defensor.nombre}${d.hab ? ' · ' + d.hab.nombre : ''}`,
+    lineas: todos.map(p => p.txt), estado: 'listo'}, hasta: Date.now() + MOMENTO_DURA_MS, orden: ya ? ya.orden : ++momentosOrden});
+  renderMomentosFeed();
 }
 
 /* ---------- «Algo está fuera de lugar» (Percepción aumentada, P145) ----------

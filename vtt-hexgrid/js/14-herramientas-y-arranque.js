@@ -811,7 +811,7 @@ function arrancarEnVivo(){
     if(!lado || lado.tipo !== 'pj') return '';
     const f = fichasPub.get(String(lado.ref || '').split(SEP_INVOCACION)[0]);
     return (f && f.resumen && f.resumen.control) || '';
-  }, aplicar: dueloAplicarDano, aplicarEfecto: dueloAplicarEfecto, opcionesLocal: dueloOpcionesLocal, flashLocal: dueloFlashLocal, grupoResuelto: dueloGrupoResuelto, chequearDodge: dueloChequearDodge, dodgeEmpieza: dueloDodgeEmpieza, dodgeTermina: dueloDodgeTermina});
+  }, aplicar: dueloAplicarDano, aplicarEfecto: dueloAplicarEfecto, opcionesLocal: dueloOpcionesLocal, flashLocal: dueloFlashLocal, grupoResuelto: dueloGrupoResuelto, chequearDodge: dueloChequearDodge, dodgeEmpieza: dueloDodgeEmpieza, dodgeTermina: dueloDodgeTermina, paso: (...a) => dueloPasoCronica(...a)});   // js/16 carga después
   escucharAreas();   // hechizos de área (Paso 4/7 del casteo): el círculo compartido y, el GM, la cascada
   actualizarBotonMapas();
   // Si ya estaba abierta de una sesión anterior, recién ahora hay conexión.

@@ -138,6 +138,9 @@ const ItemCorto = (() => {
     Sangrado: 'Sangrado: pierde 1 HP por stack en cada Mantenimiento (entra con 2, o los stacks que diga el arma). El de un arma dura 2 turnos salvo que diga otra cosa; con un golpe crítico, queda permanente. Si ya sangraba: +1 stack y los turnos vuelven a empezar.',
     Veneno: 'Veneno: pierde 1 HP por stack en cada Mantenimiento y un stack por turno (los turnos son los stacks). Los stacks nuevos se suman a los que ya tenía.',
     'Veneno severo': 'Veneno severo: daño por turno que crece en cada Mantenimiento y no se va solo: hay que curarlo.',
+    Demora: 'Demora: baja al golpeado 1 lugar en el orden de turnos, para siempre (hasta que el GM reordene). Lo hace solo el mapa.',
+    Aturdir: 'Aturdir: queda Stun (sin No2 por 2 turnos: no puede actuar).',
+    Derribar: 'Derribar: cae al suelo y queda Sentado (Evasión a la mitad; no ataca hasta levantarse).',
     'Rompe armadura': 'Rompe armadura: deja Armadura rota (−1 de Defensa por stack). «Armadura rota doble»: deja 2 stacks por golpe.',
   };
   function armaTecnico(it){

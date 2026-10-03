@@ -2082,6 +2082,11 @@ prueba('cómo se ve un arma: en la grilla lo esencial (= el Detalle de las T4 Co
     ItemCorto.armaEsencial({tipoItem: 'arma_2m', tipoDado: 4, peso: 2, mods: [{stat: 'rng', val: 1}], efectosGolpe: [{nombre: 'Sangrado', caras: 2, exitos: 1, turnos: 2}]})],
     [198, [], true, true, true, true, false, 'Tipo 4 · 2 manos · 2 dados · Alcance +1 · Sangrado 50 % · 2 turnos']);
 });
+prueba('Demora (Tipo 10): el duelo la reconoce (también el nombre viejo, Knockdown) y «Detalles técnicos» la explica; Derribar sigue siendo Sentado', () => {
+  const ver = ItemCorto.verHtml({nombre: 'Garrote de pastor', tipoItem: 'arma_1m', tipoDado: 10, peso: 1, efectosGolpe: [{nombre: 'Demora', caras: 3, exitos: 1}]});
+  igual([Duelo.specDeEfecto({nombre: 'Demora'}), Duelo.specDeEfecto({nombre: 'Knockdown'}), Duelo.specDeEfecto({nombre: 'Derribar'}), /1 lugar en el orden de turnos/.test(ver)],
+    [{nombre: 'Demora'}, {nombre: 'Demora'}, {nombre: 'Sentado'}, true]);
+});
 prueba('Armadura rota doble (Raras del Tipo 8): el texto lo dice y el duelo deja 2 stacks', () => {
   const ra = {nombre: 'Rompe armadura', caras: 2, exitos: 1, stacks: 2};
   igual([ItemCorto.armaEsencial({tipoItem: 'arma_1m', tipoDado: 8, peso: 2, efectosGolpe: [ra]}), Duelo.specDeEfecto(ra)],

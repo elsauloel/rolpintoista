@@ -244,9 +244,11 @@ async function guardarIniciativa(cambios){
   };
   try{
     await fbDb.doc(fbRutaCampana(rutaMapaEstado('iniciativa'))).set(datos);
+    return true;
   }catch(err){
     console.error('No se pudo guardar la iniciativa:', err);
     toast(err.code === 'permission-denied' ? 'No podés cambiar eso del orden de turnos' : 'No se pudo guardar el orden de turnos');
+    return false;
   }
 }
 

@@ -1048,7 +1048,7 @@ rango. En los creeps, el equipo Raro del Tipo 8 suma el Hacha de batalla. **Tipo
 ## Tipo 10 — Contundentes (arranca 2026-10-03)
 Estado hoy (cuerpo a cuerpo): Común 13 · Buena 10 · Raro 9 · Excepcional 6 · Legendario 4; de rango (aparte): Exc. 1 · Leg. 1.
 
-### Tipo 10 — definiciones (propuesta del asistente, ⬜ sin responder)
+### Tipo 10 — definiciones (✅ aprobadas por el dueño, 2026-10-03, con los cambios de abajo)
 **Identidad:** mazas, martillos, garrotes, porras y bastones. **Las más caras en Nitros** (primer ataque 5, los siguientes 10): pocos golpes y
 que se sientan. Un dado de 10 ya pega mucho: **2 dados son Buena** (en la Común, 1 dado). El golpe que **desordena**: **Demora** (baja 1 lugar en
 la iniciativa) y **Aturdir** (Stun).
@@ -1077,3 +1077,8 @@ la iniciativa) y **Aturdir** (Stun).
 | ⚠️ Martillo de bola | 2 dados · Bloqueo +1 · 115 → 170 · **Rara** · **idéntico** al garrote de hueso |
 | ⚠️ garrote de hueso | igual al martillo de bola · rehacer |
 | ⚠️ Maza | 2 dados + 1 amplificado · 50 → 350 · **Rara** · rehacer o subir de tier |
+
+**Respuestas del dueño sobre el Tipo 10 (2026-10-03):** las definiciones sirven así, con estos cambios: **sin Sangrado** (poco intuitivo en un
+contundente); la maza con pinchos, a lo sumo, es la que **rompe armadura**, y que sea algo raro; **Aturdir es muy bueno: porcentajes bajos**.
+**Demora automatizada** (`dueloDemora`, js/13 del mapa): baja al golpeado 1 lugar en el orden de turnos; queda a mano si es su turno o si ya
+actuó y quedaría después de quien tiene el turno. Garrote, Martillo de bola y Maza (rinden de más): a criterio del asistente.

@@ -858,6 +858,7 @@ async function dueloAplicarEfecto(d, ef){
   if(!spec) return {manual: true, nota: 'a mano'};
   const t = tokens.get(d.defensor.tokenId);
   if(!t) return {manual: true, nota: 'el token ya no está: aplicalo a mano'};
+  if(spec.nombre === 'Demora') return dueloDemora(d.defensor.tokenId);
   // «Pierde No2» (2026-10-02, Sonic Boom): cuántos = el número + la diferencia entre las tiradas; en 0, Sentado si corresponde.
   if(spec.nombre === 'Pierde No2'){
     const n = Math.max(0, Math.round(num(spec.no2))) + (spec.no2Dif ? Math.abs(Math.round(num(d.contacto && d.contacto.dif))) : 0);
@@ -884,6 +885,23 @@ async function dueloAplicarEfecto(d, ef){
   }
   for(let i = 0; i < veces; i++) await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: unico, origen: `${d.atacante.nombre} · ${ef.nombre}`});
   return {nota: 'le llegó a su ficha: ' + EstadosAplicar.texto(unico) + (veces > 1 ? ` ×${veces}` : '')};
+}
+
+// Demora (Tipo 10, dueño 2026-10-03): baja al golpeado 1 lugar en el orden de turnos, definitivo (como el ▼ del GM: el turno sigue con quien
+// lo tenía). Dos casos quedan a mano, porque moverlo solo rompería la ronda: si ya actuó y quedaría después de quien tiene el turno (actuaría
+// dos veces), o si es su propio turno (el de abajo perdería el suyo).
+async function dueloDemora(tokenId){
+  const orden = iniciativa.orden.slice();
+  const i = orden.findIndex(o => o.id === tokenId);
+  if(i < 0) return {manual: true, nota: 'no está en el orden de turnos: a mano'};
+  if(i === orden.length - 1) return {nota: 'ya era el último del orden de turnos'};
+  if(i === iniciativa.turno) return {manual: true, nota: 'es su turno: bajalo 1 lugar (▼) cuando termine'};
+  if(i + 1 === iniciativa.turno) return {manual: true, nota: 'ya actuó esta ronda: bajalo 1 lugar (▼) al empezar la próxima'};
+  const activo = orden[iniciativa.turno] ? orden[iniciativa.turno].id : null;
+  [orden[i], orden[i + 1]] = [orden[i + 1], orden[i]];
+  const turno = activo ? Math.max(0, orden.findIndex(o => o.id === activo)) : iniciativa.turno;
+  if(!(await guardarIniciativa({orden, turno}))) return {manual: true, nota: 'no se pudo mover en el orden de turnos: a mano'};
+  return {nota: `baja 1 lugar en el orden de turnos (${i + 1}.º → ${i + 2}.º)`};
 }
 
 // Le manda un pedido del duelo (opciones de defensa, tirar, contraatacar) al iframe de la ficha o de las Acciones del creep de ese lado, sin mostrarlo.

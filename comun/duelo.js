@@ -748,7 +748,8 @@ const Duelo = (() => {
     if(n === 'lisiado') return {nombre: 'Lisiado'};
     if(n === 'pajaritos') return {nombre: 'Pajaritos'};
     if(n === 'aturdir') return {nombre: 'Stun'};
-    if(n === 'derribar' || n === 'knockdown') return {nombre: 'Sentado'};
+    if(n === 'derribar') return {nombre: 'Sentado'};
+    if(n === 'demora' || n === 'knockdown') return {nombre: 'Demora'};   // baja 1 lugar en el orden de turnos: lo hace el mapa (`aplicaDemora`)
     return null;
   }
 
@@ -2108,6 +2109,8 @@ const Duelo = (() => {
           (d.efectos || []).forEach((ef, i) => {
             const clave = d.id + ':' + i;
             if(ef.aplicar !== 'pedido' || ef.aplicado || aplicando.has(clave)) return;
+            const sp = specDeEfecto(ef);
+            if(sp && sp.nombre === 'Demora' && !cfgEscuchar.aplicaDemora) return;   // el orden de turnos lo mueve el mapa
             aplicando.add(clave);
             reclamarEfecto(d.id, i).then(async mio => {
               if(!mio) return;

@@ -887,3 +887,38 @@ La familia que **rompe armaduras**: su efecto de casa es **Rompe armadura**; jue
 | Hacha de leñador | 2 dados · 60 → 110 · Buena |
 | Hacha de constructor | 2 dados · Rompe armadura **siempre** · 90 → 200 · **Rara** |
 | Lanza de caza | 2 manos · 1 dado · Alcance +1 · 65 → 85 · Común — **es una lanza: va al Tipo 4** |
+
+**Definiciones del Tipo 8 ✅ (dueño, 2026-10-03):** piso de la Común = **1d8 con 33 % de Rompe armadura**, en la mitad de las armas; la otra mitad
+juega con los demás parámetros (sin quedar por debajo); puede haber alguna con Rompe armadura 50 % y nada más. Comunes: **24**.
+
+### T8 Común — propuesta v1: 24 armas (2026-10-03, ⬜ a revisar por el dueño)
+| Arma | Lo que hace · precio |
+|---|---|
+| **Con Rompe armadura** | |
+| Hachuela | Rompe armadura 33 % · 65 |
+| Hacha de mano | +1 · Rompe armadura 33 % · 75 |
+| Hacha | Rompe armadura **50 %** (y nada más) · 75 |
+| Hachuela de leñador | Iniciativa +1 · Rompe armadura 33 % · 80 |
+| 🆕 Hacha de bombero | Bloqueo +1 · Rompe armadura 33 % · 85 |
+| Hacha del clan (era copia) | Sangrado 25 % · Rompe armadura 33 % · 80 |
+| 🆕 Hachuela de cocina | Crít. potente +1 · Rompe armadura 33 % · 85 |
+| 🆕 Hacha de cotillón vikingo | Derribar 25 % · Rompe armadura 33 % · 85 |
+| 🆕 Hacha del herrero de pueblo | Parry +1 · Rompe armadura 33 % · 90 |
+| 🆕 Hacha de guardabosque | Rengo 20 % · Rompe armadura 33 % · 85 |
+| 🆕 Hacha de piedra | +1 · Bloqueo +1 · Rompe armadura 33 % · 100 |
+| Hacha oxidada | Veneno 2 stacks 20 % · Rompe armadura 33 % · 80 |
+| **Sin Rompe armadura** | |
+| Hacha de leñador | 2 dados · 110 |
+| Hacha de constructor | 2 dados · +1 · 120 |
+| Tomahawk | Alcance +1 · 85 |
+| Tomahawk de pantano | Bloqueo +2 · 75 |
+| 🆕 Hacha de doble filo barata | +1 · Sangrado 33 % · 70 |
+| 🆕 Hacha de verdugo de pueblo | Derribar 50 % · 70 |
+| 🆕 Hachón | +1 dado amplificado · 110 |
+| 🆕 Hacha de asta | 2 manos · +1 · Alcance +1 · 100 |
+| 🆕 Hacha afilada a la piedra | Crít. potente +2 · 80 |
+| 🆕 Hacha con garfio | Bloqueo +1 · Derribar 25 % · 80 |
+| 🆕 Hacha de leñador del sur | +2 · 75 |
+| 🆕 Hachuela de camping | Parry +1 · Bloqueo +1 · 85 |
+
+Sale la **Lanza de caza** (es una lanza: el Tipo 4 ya tiene sus lanzas comunes).

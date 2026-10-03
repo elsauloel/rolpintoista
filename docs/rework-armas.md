@@ -534,3 +534,33 @@ Calculadora v0: PC de Raro = 11 a 17 (menos = Buena; 17 o más = Excepcional). P
 **Lo que muestra:** cinco son de Buena calidad por poder (1–5); siete están muy baratas para lo que dan (Estoque de duelista a 80 con poder de
 350); hay **tres Rompe armadura** (debería ser una excepción escasa); dos usan «Ignora Res. crítico», que **en un arma no hace nada solo**; ninguna
 usa Sangrado, Drena vida, «seguro si es crítico», por la espalda ni durabilidad; ninguna tiene todavía los tres textos.
+
+### T4 Raro — propuesta v1 (2026-10-03, ⬜ a revisar por el dueño)
+Pedido del dueño: 18; versión mejorada de las de Buena calidad y variantes; mucho juego con el crítico (frecuente, potente, ignora, combinados);
+1 drena vida (50 % del daño que **pasa** la armadura; el % se puede afinar); 1 sola Rompe armadura; 2–3 veneno; 2–3 lisiado; 1–2 sangrado; 3–4
+Critical Matters (efecto solo si es crítico); 2–3 por la espalda; algunas con PdG y PdG en oportunidad; **sin Parry ni Bloqueo y sin resistentes**.
+
+| # | Arma (de la Buena…) | Manos | Dados | Fijo | Bonos | Al golpear | PC | Precio |
+|---|---|---|---|---|---|---|---|---|
+| 1 | Puñal desgarrador (hoja ancha) | 1 | 2 | +1 | PdG +1 | Sangrado 75 % · 3 turnos | 12,0 | 180 |
+| 2 | Daga de la viuda negra (viuda verde) | 1 | 1 | +1 | 🗡 espalda: +2 PdG, +2 daño | Veneno 5 stacks (siempre) | 11,8 | 180 |
+| 3 | Daga del cirujano (tendón) | 1 | 1 | +1 | PdG +1, Crít. potente +1 | Lisiado 75 %, seguro si es crítico | 11,3 | 160 |
+| 4 | Estilete de maestro (práctica) | 1 | 1 | +1 | PdG +2 | ⚡ si es crítico: Lisiado | 12,2 | 190 |
+| 5 | Daga de escolta (guardaespaldas) | 1 | 1 | +2 | PdG +1, PdG oport. +2 | ⚡ si es crítico: Sangrado | 12,3 | 190 |
+| 6 | Daga sedienta (sacrificio) | 1 | 2 | +1 | 🗡 espalda: +2 PdG, +1 daño | Drena vida 50 % (del daño que pasa) | 12,5 | 200 |
+| 7 | Lanza del guardián del paso (centinela) | 2 | 2 | — | Alcance +1, PdG oport. +3 | Lisiado 33 % | 11,0 | 150 |
+| 8 | Estoque de duelista (estoque) | 1 | 2 | — | Iniciativa +1, PdG +1, Ignora 1 | — | 14,0 | 250 |
+| 9 | Puñal del sereno (sombra) | 1 | 1 | — | PdG +1, Crít. potente +3 · 🗡 espalda: +3 PdG, +3 daño | — | 11,2 | 160 |
+| 10 | Daga del comodoro (capitán) | 1 | 1 | — | PdG +2, Crít. frecuente +1 | — | 14,6 | 270 |
+| 11 | Pica de retaguardia (portón) | 2 | 3 | — | Alcance +2, PdG oport. +2 | — | 12,5 | 200 |
+| 12 | Lanza del montero mayor (montería) | 2 | 2 | — | Alcance +1, PdG oport. +1, Crít. potente +1 | Lisiado 50 %, seguro si es crítico | 11,1 | 150 |
+| 13 | Estoque de esgrima (competencia) | 1 | 2 | — | Crít. frecuente +1, Crít. potente +2 | ⚡ si es crítico: Veneno 3 stacks | 13,2 | 220 |
+| 14 | Aguja de la vigilia eterna (vigilia) | 1 | 1 | — | PdG oport. +3, Crít. frecuente +1, Ignora 1 | — | 15,2 | 290 |
+| 15 | Aguja del alquimista (boticario) | 1 | 1 | +1 | PdG +1 | Veneno 4 stacks 75 %, seguro si es crítico | 11,6 | 170 |
+| 16 | Misericordia (duelo) | 1 | 2 | — | Crít. potente +3, Ignora 1 | ⚡ si es crítico: Sangrado | 14,1 | 250 |
+| 17 | Puñal envenenado (acupunturista) | 1 | 2 | +1 | Crít. potente +3 | Veneno 3 stacks (siempre) | 14,0 | 250 |
+| 18 | Rompemalla (leva) | 1 | 2 | +1 | Ignora 1 | Rompe armadura 50 % | 14,9 | 280 |
+
+Conteo: veneno 3 (+1 con crítico) · lisiado 3 (+1) · sangrado 1 (+2) · Critical Matters 4 · drena 1 · rompe armadura 1 · por la espalda 3 ·
+crítico potente 6 · frecuente 3 · ignora 4. Salen: Aguijón de esgrima (Parry), Daga de guardia, Pico de guerra y Puñal aserrado (Rompe armadura),
+Lanza militar, Lanza de lisiar. 🔧 Hay que construir: **Critical Matters en armas** y **Drena vida en armas** (% del daño que pasa la Defensa).

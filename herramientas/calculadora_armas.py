@@ -154,6 +154,8 @@ def puntaje(arma):
     if float(arma.get('durPorPeso') or 0) > 3:   # durabilidad de más que la normal (3 por punto de Peso)
         d['durabilidad'] = TASA_DUR * (float(arma['durPorPeso']) - 3) * peso
     d['peso del arma'] = -TASA_PESO * peso
+    if arma.get('tipoItem') == 'arma_2m':   # dos manos (dueño, 2026-10-03): sin segunda arma ni escudo, un poco menos de valor
+        d['dos manos'] = -DESCUENTO_DOS_MANOS
     return sum(d.values()), d
 
 
@@ -163,6 +165,7 @@ def puntaje(arma):
 P_CRITICO = 0.25          # chance aproximada de que un golpe sea crítico (Critical Matters / «seguro si es crítico»)
 ESPALDA_FACTOR = 0.3      # lo que rinde un bono por la espalda frente a uno permanente
 TASA_DUR = 0.25           # PC por cada punto de durabilidad de más
+DESCUENTO_DOS_MANOS = 0.75   # PC que resta usarla a dos manos (dueño, 2026-10-03: "baja un poquito el precio, no demasiado"): ~10 % del precio
 PRECIO_A, PRECIO_B = 27, 0.158   # precio = A · e^(B · PC): ~40 con 2,3 PC, ~90 con 7,5, ~150 con 11, ~400 con 17, ~1650 con 26
 RECARGO_COMBO = 0.10      # +10 % por cada extra después del primero
 

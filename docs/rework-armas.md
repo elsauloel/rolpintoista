@@ -964,14 +964,14 @@ Hacha de la furia roja → se rehace como Buena.
 | Hacha del forjador 🆕 | 1 dado · Bloqueo +1 · Rompe armadura 50 % · muy resistente · 120 |
 | Hacha de guerra | 2 dados · Rompe armadura 33 % (era 25 %) · 130 |
 | Hachón de minero | 2 dados · +1 · Rompe armadura 33 % · 150 |
-| Hacha grande del aserradero (era el Espadón de batalla) | 2 manos · 2 dados · +1 · Rompe armadura 33 % · 150 |
+| Hacha grande del aserradero (era el Espadón de batalla) | 2 manos · 2 dados · Alcance +1 · 150 |
 | Hacha de la furia roja (rehecha) | 2 dados · Bloqueo +1 · Rompe armadura 33 % · 170 |
 | Hacha del aserrador 🆕 | 2 dados · Derribar 25 % · Rompe armadura 33 % · 170 |
 | Hacha del monte 🆕 | 2 dados · Rengo 20 % · Rompe armadura 33 % · 160 |
 | **Sin Rompe armadura** | |
 | Hacha de abordaje | 1 dado · Bloqueo +2 · Derribar 33 % · resistente · 110 (sale el Alcance) |
 | Hacha del campeón de hachazos 🆕 | 1 dado + 1 amplificado · Crít. potente +1 · 130 |
-| Hacha de guardia del fortín 🆕 | 2 manos · 1 dado · Alcance +1 · Bloqueo +2 · resistente · 150 |
+| Hacha de guardia del fortín 🆕 | 2 manos · 1 dado · Alcance +1 · Bloqueo +2 · resistente · 130 |
 | Hacha de guerra ligera | 2 dados · +1 · 120 |
 | Hacha dentada | 2 dados · Sangrado 50 % · 130 |
 | Hacha del pantano 🆕 | 2 dados · Veneno 2 stacks 25 % · Sangrado 25 % · 140 |
@@ -980,3 +980,9 @@ Hacha de la furia roja → se rehace como Buena.
 | Hacha con pico (rehecha) | 2 dados · Crít. frecuente +1 · 150 |
 
 Sale de las Buenas: **Hacha de batalla** (rinde como Rara: se revisa con las Raras).
+
+**Dos manos baja un poco el precio (dueño, 2026-10-03):** «te imposibilita tener otra arma o un escudo; en su defecto te da alcance, entonces un
+poco se balancea». En la calculadora, `DESCUENTO_DOS_MANOS` = 0,75 PC (~10 % del precio). Se recalcularon las armas a dos manos ya cargadas
+(T4, T6 y T8 Común): todas bajaron ~10 %; la **Lanza del guardián del paso** y la **Lanza del montero mayor** quedaban apenas debajo de Raro y
+ganaron durabilidad (Resistente, 9) para seguir Raras. El **Hacha grande del aserradero** queda con la opción (b): 2 manos · 2 dados · Alcance +1
+(150, Buena). Con eso las Buenas quedan 8 con Rompe armadura y 10 sin.

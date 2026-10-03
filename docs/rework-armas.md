@@ -318,3 +318,30 @@ Dueño: *«Hay algo conceptual que no estás entendiendo en las armas de tipo 12
 - **Los dos T12 que ya estaban en el catálogo** (Lanzallamas y Martillo del Titán) **quedan marcados para rediseñar** (no se tocaron: el Martillo del Titán es justo «un martillo que solo pega más»). Pendiente decidir qué hacer con ellos.
 - **Definición exacta de la Explosión: a confirmar** (P-Explosión en `preguntas-abiertas.md`): radio, cuánto daño recibe el área, si el objetivo recibe el golpe completo, fuego amigo, probabilidad.
 - **Decisión posterior (2026-09-26): el mundo T12 queda EN PAUSA.** Dueño: *«El Martillo del Titán lo vamos a quitar, el Lanzallamas lo vamos a dejar como Excepcional, y el mundo de armas de Tipo 12 por ahora lo vamos a dejar en pausa: no vamos a inventarlo hasta que esté más consolidado todo el resto.»* → **se quitó el Martillo del Titán** del catálogo; **el Lanzallamas quedó Excepcional ($700)**; **la tanda 6 (las 5 armas con Explosión) se retiró del catálogo y de `armas-nuevas.json`**. El único T12 que queda es el Lanzallamas. **No se diseñan armas T12 ni se define la Explosión hasta nuevo aviso.** La regla «T12 = Explosión» sigue vigente para cuando se retome (la calculadora ya tiene el efecto listo).
+
+## Rework metódico por Tipo (arranca 2026-10-03)
+Pedido del dueño: *«empecemos un plan metódico de rework del catálogo, por las armas; tipo a tipo, de menor a mayor tier, empezando por el Tipo 4. Antes, definiciones: qué efectos y mecánicas le son propias, cuáles ajenas, y cuáles pueden ir aunque no le sean exclusivas; por dónde podemos jugar con las mecánicas disponibles.»*
+
+**Método (propuesta, por cada Tipo):**
+1. **Definiciones del Tipo** (esta sección para el T4): 🏠 propio · 🤝 puede ir (no exclusivo) · ✨ excepción puntual · 🚫 ajeno (no va).
+2. **Inventario actual del Tipo por tier** (catálogo + tandas ya cargadas) con la calculadora: duplicados, fuera de reglas, huecos.
+3. **Tier por tier, de Común a Legendario:** auditar las existentes (confirmar / reajustar / reimaginar / descartar) y proponer las que falten hasta la cuota del tier.
+4. **Cargar** lo aprobado al catálogo (editor o scripts), `buscar_duplicados.py`, y pasar al tier siguiente. Al cerrar el Tipo, al siguiente.
+
+**Cuota del Tipo 4** (20 % de ~300 = ~60 armas, con la pirámide de P1): Común ~18 · Buena ~16 · Raro ~12 · Excepcional ~9 · Legendario ~5. **Hoy hay 53** (Común 19 · Buena 14 · Raro 11 · Excepcional 6 · Legendario 3), con 4 de rango (hondas, cerbatana) y 14 marcadas ⚠️ (a auditar).
+
+### Tipo 4 — Punzantes: definiciones (propuesta del asistente, ⬜ sin responder)
+**Identidad:** el arma **barata en Nitros** (el primer ataque cuesta 2, los siguientes 4): muchos golpes chicos y precisos. Daño bajo por golpe, que se compensa con **precisión y crítico potente** (el T4 aprovecha hasta 6 puntos de potente; de frecuente solo 2). Dagas, cuchillos, estiletes, punzones, agujas, estoques, lanzas.
+- 🏠 **Propio:** **Lisiado** (efecto de casa) · **PdG** y **Alcance** (stats de casa; Alcance = lanzas) · **Crítico potente** (su universo) · **Ignora N de Res. crítico** (solo T4 y T6, desde Raro) · **PdG de oportunidad** (`pdgopor`, nuevo: dagas y lanzas castigan al que se aleja).
+- 🤝 **Puede ir (no exclusivo):** **Envenenar** y **Veneno severo** (agujas, aguijones; Veneno severo desde Excepcional) · **Sangrado** (puñales aserrados) · **Drena vida** (desde Raro; colmillos, «sacrificio») · **Crítico frecuente** (máx. +2 útil) · **Iniciativa** (armas livianas; es de casa de los cortantes) · **daño fijo / Dmg** (valen doble en T4: ×2) · **Critical Matters** (algo extra solo si es crítico: encaja con el crítico potente).
+- ✨ **Excepción puntual (Raro+, escasa):** **Parry** (la daga de mano izquierda / *main gauche*) · **Rengo** (un pinchazo en la pierna) · **Rompe armadura** (el *rompemalla*, que perfora cota) · **Prende fuego** (solo híbridas/mágicas).
+- 🚫 **Ajeno (no va):** **Demora**, **Aturdir**, **Derribar** (son golpes contundentes) · **Bloqueo** (una daga no aguanta un golpe; quizás las lanzas pesadas a dos manos, a decidir) · **Explosión** (solo T12).
+
+**Mecánicas nuevas desde el 2026-09-25 que abren juego en el T4:**
+- **Los efectos al golpear ya se aplican solos** en el duelo (botón «Aplicar»): Lisiado, Veneno, Sangrado, etc. dejan de ser «a mano».
+- **Ataque de oportunidad** (frena al que se aleja) + **PdG de oportunidad**: identidad de lanzas y dagas de guardia.
+- **Por la espalda**: el mapa sabe hacia dónde mira cada token (cono y punto ciego). Se podría automatizar un bono «si atacás desde su espalda» (puñal trapero, Backstab). 🔧 a construir.
+- **Sigilo**: dagas de asesino con bono al atacar desde el sigilo (✋ hoy; 🔧 automatizable).
+- **Critical Matters**, **Drena vida con Excedente**, **Veneno ×N / Veneno severo**, **Pierde No2** (una punción que corta el aire), **Rengo**.
+- **Arrojadizas**: dagas y dardos con Alcance o Rango (¿van acá o con las de rango?).
+- **Durabilidad de diseño** (`durPorPeso`): estiletes frágiles, puñales robustos.

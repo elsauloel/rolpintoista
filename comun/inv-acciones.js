@@ -58,8 +58,8 @@ const InvAcciones = (() => {
      Con el duelo: el ataque que va al cuadro (ataqueDuelo). Sin duelo (o "Sin objetivo"): cobrar (pagarAtaque: el primero del
      turno Tipo ÷ 2, después el Tipo completo; suma al conteo) y tirar el PdG (tiradaAtaque). Atacar cierra el Parry pendiente:
      lo borra cada pantalla. */
-  function ataqueDuelo(inv){
-    return {tipo: 'normal', armaId: '', armaNombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8, rango: !!inv.armaDeRango, ...(inv.armaEspalda ? {espalda: inv.armaEspalda} : {}),
+  function ataqueDuelo(inv, tipo){
+    return {tipo: tipo === 'oportunidad' || tipo === 'contra' ? tipo : 'normal', armaId: '', armaNombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8, rango: !!inv.armaDeRango, ...(inv.armaEspalda ? {espalda: inv.armaEspalda} : {}),
       alcance: inv.armaDeRango ? Math.max(1, Math.round(num(I().statValor(inv, 'rng')))) : 1};
   }
   /* Sin No2 suficientes (2026-10-02, hoja de ruta B-7, igual que los creeps y los personajes: avisar y dejar seguir): faltanNitros, la
@@ -67,7 +67,8 @@ const InvAcciones = (() => {
   /* Ataque de oportunidad y contraataque (2026-10-03, como los creeps — CreepAcciones): cuestan lo de un primer ataque (Tipo ÷ 2), no cuentan
      como ataque del turno y suman el «PdG en oportunidad» / «PdG en contraataque» de su arma. Antes se cobraban y tiraban como uno normal. */
   const NOMBRE_ESPECIAL = {oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
-  const bonoEspecial = (inv, tipo) => (inv.armaMods || []).filter(m => m.stat === (tipo === 'contra' ? 'pdgcontra' : tipo === 'oportunidad' ? 'pdgopor' : '')).reduce((a, m) => a + num(m.val), 0);
+  // La regla universal (Combatiente.statAtaqueEspecial): el PdG especial venga de su arma, su equipo o sus estados.
+  const bonoEspecial = (inv, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return st ? I().modTotal(inv, st) : 0; };
   const especial = tipo => tipo === 'oportunidad' || tipo === 'contra';
   const costoAtaqueDe = (inv, tipo) => especial(tipo) ? Combatiente.costoPrimerAtaque(num(inv.armaTipo) || 8) : I().costoAtaque(inv);
   const faltanNitros = (inv, tipo) => costoAtaqueDe(inv, tipo) > num(inv.nitros);
@@ -100,5 +101,8 @@ const InvAcciones = (() => {
   const tiradaAtaque = (inv, tipo) => especial(tipo) ? tirada(inv, `${NOMBRE_ESPECIAL[tipo]} (PdG)`, I().statValor(inv, 'pdg') + bonoEspecial(inv, tipo), 'pdg')
     : tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg'), 'pdg');
 
-  return {tirada, tirarStat, dano, ataqueDuelo, pagarAtaque, tiradaAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros, bonoEspecial, costoAtaqueDe};
+  // El menú «¿Qué ataque es?» de una invocación (el mismo de personajes y creeps: Combatiente.menuTipoAtaqueHtml).
+  const menuTipoAtaque = (inv, attr) => Combatiente.menuTipoAtaqueHtml({nombre: inv.nombre, normal: I().costoAtaque(inv), primero: num(inv.ataquesTurno) === 0,
+    especial: costoAtaqueDe(inv, 'oportunidad'), attr, ref: inv.id});
+  return {tirada, tirarStat, dano, ataqueDuelo, pagarAtaque, tiradaAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros, bonoEspecial, costoAtaqueDe, menuTipoAtaque};
 })();

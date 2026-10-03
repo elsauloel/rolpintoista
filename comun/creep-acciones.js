@@ -68,8 +68,8 @@ const CreepAcciones = (() => {
      `forzar`, pagarAtaque gasta los que tenga (hasta 0) y devuelve `forzado: {costo, tenia}`, y alertaSinNitros deja la línea roja
      en la Mesa. Cada pantalla pregunta antes («¿Atacar igual?», preguntaSinNitros). */
   const NOMBRE_ESPECIAL = {oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
-  // PdG en contraataque (o en oportunidad) que le suma su arma.
-  const bonoEspecial = (sc, tipo) => (sc.armaMods || []).filter(m => m.stat === (tipo === 'contra' ? 'pdgcontra' : tipo === 'oportunidad' ? 'pdgopor' : '')).reduce((a, m) => a + num(m.val), 0);
+  // PdG en contraataque (o en oportunidad): la regla universal (Combatiente.statAtaqueEspecial), venga de su arma, su equipo o sus estados.
+  const bonoEspecial = (sc, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return st ? C().modTotal(sc, st) : 0; };
   const costoAtaqueDe = (sc, tipo) => tipo === 'normal' ? C().costoAtaque(sc) : C().costoContraataque(sc);
   const faltanNitros = (sc, tipo) => costoAtaqueDe(sc, tipo) > num(sc.nitros);
   // El texto de «¿Atacar igual?» (cada pantalla lo muestra a su manera).

@@ -537,10 +537,7 @@ function ataqueEspecialCreep(sc, tipo){
 }
 function preguntarTipoAtaqueCreep(sc){
   const normal = costoAtaqueCreep(sc), primero = num(sc.ataquesTurno) === 0, especial = costoContraataqueCreep(sc);
-  $('#tipo-ataque-creep-lista').innerHTML = `<div class="hint">${esc(sc.nombre)}</div>
-    <button class="btn" data-tipoataquecreep="normal:${sc.id}" style="width:100%">⚔ Ataque normal — ${fmt(normal)} No2<br><span class="hint">${primero ? 'primer ataque del turno (Tipo ÷ 2)' : 'Tipo completo (ya atacó este turno)'}</span></button>
-    <button class="btn" data-tipoataquecreep="oportunidad:${sc.id}" style="width:100%">🏃 Ataque de oportunidad — ${fmt(especial)} No2<br><span class="hint">siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>
-    <button class="btn" data-tipoataquecreep="contra:${sc.id}" style="width:100%">↩ Contraataque — ${fmt(especial)} No2<br><span class="hint">solo tras ganar un Parry y un Bloqueo; siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>`;
+  $('#tipo-ataque-creep-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: sc.nombre, normal, primero, especial, attr: 'data-tipoataquecreep', ref: sc.id});   // el menú común
   $('#scrim-tipo-ataque-creep').classList.add('open');
 }
 function costoAtaqueCreep(sc){ return CreepCalculo.costoAtaque(sc); }   // regla común (comun/combatiente.js)

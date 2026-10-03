@@ -164,6 +164,21 @@ const Combatiente = (() => {
      de oportunidad y el contraataque cuestan siempre lo de un primer ataque y no suman al conteo. Antes estaba en la ficha, las
      invocaciones, los creeps y el asistente de ítems, cada uno con su copia. */
   function costoPrimerAtaque(tipo){ return Math.ceil(n(tipo) / 2); }
+  /* Ataque de oportunidad y contraataque (regla universal, dueño 2026-10-03): cuestan lo de un primer ataque (costoPrimerAtaque), no cuentan
+     como ataque del turno y suman su PdG especial — «PdG en oportunidad» / «PdG en contraataque» — venga de donde venga (arma, equipo,
+     pasivas, estados), igual para personajes, creeps e invocaciones. `statAtaqueEspecial(tipo)` → el stat ('' si es un ataque normal). */
+  const ATAQUE_ESPECIAL = {oportunidad: {stat: 'pdgopor', nombre: 'Ataque de oportunidad'}, contra: {stat: 'pdgcontra', nombre: 'Contraataque'}};
+  const statAtaqueEspecial = tipo => (ATAQUE_ESPECIAL[tipo] || {}).stat || '';
+  // El menú «¿Qué ataque es?» (los tres botones), igual en todas las pantallas. o = {nombre, normal, primero, especial, attr, ref,
+  // primeroTxt?, siguienteTxt?}: `attr` = el data-atributo de los botones, `ref` lo que va después de «tipo:».
+  function menuTipoAtaqueHtml(o){
+    const e = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+    const b = (tipo, txt) => `<button class="btn" ${o.attr}="${tipo}:${e(o.ref)}" style="width:100%">${txt}</button>`;
+    return `<div class="hint">${e(o.nombre)}</div>
+    ${b('normal', `⚔ Ataque normal — ${n(o.normal)} No2<br><span class="hint">${o.primero ? (o.primeroTxt || 'primer ataque del turno (Tipo ÷ 2)') : (o.siguienteTxt || 'Tipo completo (ya atacó este turno)')}</span>`)}
+    ${b('oportunidad', `🏃 Ataque de oportunidad — ${n(o.especial)} No2<br><span class="hint">siempre Tipo ÷ 2; no suma al conteo de ataques</span>`)}
+    ${b('contra', `↩ Contraataque — ${n(o.especial)} No2<br><span class="hint">solo tras ganar un Parry y un Bloqueo; siempre Tipo ÷ 2; no suma al conteo de ataques</span>`)}`;
+  }
   function costoAtaque(tipo, ataquesPrevios){ return n(ataquesPrevios) === 0 ? costoPrimerAtaque(tipo) : n(tipo); }
   // Cuántos ataques alcanzan con esos No2 (el primero a mitad de precio, los demás completos).
   function ataquesPosibles(tipo, nitros){ const t = n(tipo), p = costoPrimerAtaque(t); return n(nitros) < p ? 0 : 1 + (t > 0 ? Math.floor((n(nitros) - p) / t) : 0); }
@@ -544,7 +559,7 @@ const Combatiente = (() => {
     return v;
   }
 
-  return {ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+  return {ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, menuTipoAtaqueHtml, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

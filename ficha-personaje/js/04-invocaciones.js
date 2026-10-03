@@ -403,26 +403,41 @@ function publicarTiradaInv(t){
   registrarTirada(t.origen, t.r);
 }
 // Atacar con una invocación: igual que el personaje, primero se elige el token al que ataca (duelo, comun/duelo.js).
+// Primero «¿Qué ataque es?» (normal / oportunidad / contraataque, 2026-10-03: igual que personajes y creeps), en el mismo cartel del personaje.
 function invAtacar(invId){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  if(!inv) return;
+  $('#tipo-ataque-lista').innerHTML = InvAcciones.menuTipoAtaque(inv, 'data-invtipoataque');
+  $('#scrim-tipo-ataque').classList.add('open');
+}
+$('#tipo-ataque-lista').addEventListener('click', e => {
+  const b = e.target.closest('[data-invtipoataque]');
+  if(!b) return;
+  const [tipo, invId] = b.dataset.invtipoataque.split(':');
+  $('#scrim-tipo-ataque').classList.remove('open');
+  invAtacarCon(invId, tipo);
+});
+function invAtacarCon(invId, tipo){
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
   if(typeof Duelo !== 'undefined' && Duelo.disponible() && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM){
     Duelo.elegirObjetivo({yo: {ref: fichaVivo.id + '~' + inv.id, tipo: 'pj', nombre: inv.nombre},
-      ataque: InvAcciones.ataqueDuelo(inv), suelto: () => invAtacarSuelto(invId)});
-  }else invAtacarSuelto(invId);
+      ataque: InvAcciones.ataqueDuelo(inv, tipo), suelto: () => invAtacarSuelto(invId, tipo)});
+  }else invAtacarSuelto(invId, tipo);
 }
-function invAtacarSuelto(invId){
+function invAtacarSuelto(invId, tipo){
+  tipo = tipo || 'normal';
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
   // Sin No2 suficientes: «¿Atacar igual?» (B-7, como los creeps): gasta los que tenga y deja la línea roja.
-  const forzar = InvAcciones.faltanNitros(inv);
-  if(forzar && !confirm(InvAcciones.preguntaSinNitros(inv))) return;
-  const p = InvAcciones.pagarAtaque(inv, forzar);   // comun/inv-acciones.js
+  const forzar = InvAcciones.faltanNitros(inv, tipo);
+  if(forzar && !confirm(InvAcciones.preguntaSinNitros(inv, tipo))) return;
+  const p = InvAcciones.pagarAtaque(inv, forzar, tipo);   // comun/inv-acciones.js
   if(p.error){ toast(p.error); return; }
-  InvAcciones.alertaSinNitros(inv, p.forzado);
-  parryPendienteInv.delete(inv.id);   // atacar cierra el Parry que esperaba su Bloqueo
+  InvAcciones.alertaSinNitros(inv, p.forzado, tipo);
+  if(tipo === 'normal') parryPendienteInv.delete(inv.id);   // atacar cierra el Parry que esperaba su Bloqueo
   renderInvocaciones();
-  publicarTiradaInv(InvAcciones.tiradaAtaque(inv));
+  publicarTiradaInv(InvAcciones.tiradaAtaque(inv, tipo));
   toast(p.aviso);
 }
 function invDanio(invId, sinEfectos, mods){   // sinEfectos: el duelo resuelve los efectos del golpe por su cuenta; mods: lo que suma un ataque con arreglos

@@ -207,10 +207,7 @@ function acHooksDuelo(lado){
    en el marco (tanda 4). */
 function acPreguntarTipoAtaque(sc){
   const normal = CreepCalculo.costoAtaque(sc), primero = num(sc.ataquesTurno) === 0, especial = CreepCalculo.costoContraataque(sc);
-  ac.raiz.querySelector('#ac-tipo-lista').innerHTML = `<div class="hint">${esc(sc.nombre)}</div>
-    <button class="btn" data-ac-tipo="normal" style="width:100%">⚔ Ataque normal — ${fmt(normal)} No2<br><span class="hint">${primero ? 'primer ataque del turno (Tipo ÷ 2)' : 'Tipo completo (ya atacó este turno)'}</span></button>
-    <button class="btn" data-ac-tipo="oportunidad" style="width:100%">🏃 Ataque de oportunidad — ${fmt(especial)} No2<br><span class="hint">siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>
-    <button class="btn" data-ac-tipo="contra" style="width:100%">↩ Contraataque — ${fmt(especial)} No2<br><span class="hint">solo tras ganar un Parry y un Bloqueo; siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>`;
+  ac.raiz.querySelector('#ac-tipo-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: sc.nombre, normal, primero, especial, attr: 'data-ac-tipo', ref: sc.id});   // el menú común
   ac.raiz.querySelector('#ac-tipo-ataque').classList.add('open');
 }
 function acAtacar(tipo){
@@ -447,7 +444,7 @@ function acCrear(){
     }
     if(b.dataset.acTipo){
       raiz.querySelector('#ac-tipo-ataque').classList.remove('open');
-      if(b.dataset.acTipo !== 'no') acAtacar(b.dataset.acTipo);
+      if(b.dataset.acTipo !== 'no') acAtacar(b.dataset.acTipo.split(':')[0]);
       return;
     }
     if(acAccionAca(b)) return;

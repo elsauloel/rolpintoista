@@ -311,7 +311,7 @@ function bnInvAca(b){
     }});
     return true;
   }
-  bnInvAtacar(inv.id);
+  bnInvPreguntarTipo(inv.id);
   return true;
 }
 // Lo que el mapa hace después de ejecutar una habilidad de la invocación (comun/inv-habilidades.js): como la ficha, publica a su
@@ -351,21 +351,29 @@ function bnInvHabUi(){
 }
 // Atacar con la invocación: el objetivo con un clic en el token (dueloElegirObjetivoMapa, a su nombre: `fichaId~invId`) y el
 // duelo; "Sin objetivo" (o sin duelo) cobra y tira el PdG acá.
-function bnInvAtacar(invId){
+// Primero «¿Qué ataque es?» (normal / oportunidad / contraataque, 2026-10-03: igual que personajes y creeps).
+function bnInvPreguntarTipo(invId){
+  const inv = (bn && bn.S && (bn.S.invocaciones || []).find(x => x && x.id === invId)) || null;
+  if(!inv) return;
+  bn.raiz.querySelector('#bn-tipo-lista').innerHTML = InvAcciones.menuTipoAtaque(inv, 'data-bn-invtipo');
+  bn.raiz.querySelector('#bn-tipo-ataque').classList.add('open');
+}
+function bnInvAtacar(invId, tipo){
+  tipo = tipo || 'normal';
   const buscar = () => (bn && bn.S && (bn.S.invocaciones || []).find(x => x && x.id === invId)) || null;
   const hacer = () => {
     const inv = buscar();
     if(!inv) return;
     // Sin No2 suficientes: «¿Atacar igual?» (B-7, como los creeps): gasta los que tenga y deja la línea roja.
-    const forzar = InvAcciones.faltanNitros(inv);
-    if(forzar && !confirm(InvAcciones.preguntaSinNitros(inv))) return;
+    const forzar = InvAcciones.faltanNitros(inv, tipo);
+    if(forzar && !confirm(InvAcciones.preguntaSinNitros(inv, tipo))) return;
     const ui = bnUi(FichaGuardado.partes(bn.S));
-    const p = InvAcciones.pagarAtaque(inv, forzar);
+    const p = InvAcciones.pagarAtaque(inv, forzar, tipo);
     if(p.error){ toast(p.error); return; }
-    InvAcciones.alertaSinNitros(inv, p.forzado);
-    if(bn.invParry) bn.invParry.delete(inv.id);   // atacar cierra el Parry que esperaba su Bloqueo
+    InvAcciones.alertaSinNitros(inv, p.forzado, tipo);
+    if(tipo === 'normal' && bn.invParry) bn.invParry.delete(inv.id);   // atacar cierra el Parry que esperaba su Bloqueo
     ui.cambio();
-    bnPublicarInv(inv, InvAcciones.tiradaAtaque(inv));
+    bnPublicarInv(inv, InvAcciones.tiradaAtaque(inv, tipo));
     toast(p.aviso);
   };
   const inv = buscar();
@@ -373,7 +381,7 @@ function bnInvAtacar(invId){
   if(typeof Duelo === 'undefined' || !Duelo.disponible()){ hacer(); return; }
   const reabrir = () => { if(bn){ bn.host.hidden = false; bnUbicar(); bnDibujar(); } };
   bn.host.hidden = true;
-  dueloElegirObjetivoMapa({yo: {ref: bn.fichaId + SEP_INVOCACION + inv.id, tipo: 'pj', nombre: inv.nombre}, ataque: InvAcciones.ataqueDuelo(inv),
+  dueloElegirObjetivoMapa({yo: {ref: bn.fichaId + SEP_INVOCACION + inv.id, tipo: 'pj', nombre: inv.nombre}, ataque: InvAcciones.ataqueDuelo(inv, tipo),
     conSuelto: true, alSuelto: () => { reabrir(); hacer(); }, alCancelar: () => {}});
 }
 // Un botón de la Botonera nueva: se lo pide a la ficha escondida en el marco (la carga si hace falta).
@@ -566,10 +574,7 @@ var bnSobrepeso = null;
 function bnPreguntarTipoAtaque(arma){
   const S = bn.S, costoNormal = FichaCombate.costoAtaque(S, arma), primero = FichaCombate.ataquesConArma(S, arma) === 0, especial = FichaCombate.costoAtaqueEspecial(arma);
   const id = arma ? arma.id : '';
-  bn.raiz.querySelector('#bn-tipo-lista').innerHTML = `<div class="hint">${arma ? esc(arma.nombre) : 'Sin arma'}</div>
-    <button class="btn" data-bn-tipo="normal:${id}" style="width:100%">⚔ Ataque normal — ${fmt(costoNormal)} No2<br><span class="hint">${primero ? 'primer ataque con esta arma (Tipo ÷ 2)' : 'Tipo completo (ya atacaste con esta arma este turno)'}</span></button>
-    <button class="btn" data-bn-tipo="oportunidad:${id}" style="width:100%">🏃 Ataque de oportunidad — ${fmt(especial)} No2<br><span class="hint">siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>
-    <button class="btn" data-bn-tipo="contra:${id}" style="width:100%">↩ Contraataque — ${fmt(especial)} No2<br><span class="hint">solo tras ganar un Parry y un Bloqueo; siempre Tipo ÷ 2; no suma al conteo de ataques</span></button>`;
+  bn.raiz.querySelector('#bn-tipo-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: arma ? arma.nombre : 'Sin arma', normal: costoNormal, primero, especial, attr: 'data-bn-tipo', ref: id, primeroTxt: 'primer ataque con esta arma (Tipo ÷ 2)', siguienteTxt: 'Tipo completo (ya atacaste con esta arma este turno)'});   // el menú común
   bn.raiz.querySelector('#bn-tipo-ataque').classList.add('open');
 }
 function bnAtacar(tipo, armaId){
@@ -1022,6 +1027,12 @@ function bnCrear(){
       if(pagar && !FichaAcciones.sobrepesoPagar(bn.S, ui)) return;
       bnSobrepeso = null; raiz.querySelector('#bn-sobrepeso').classList.remove('open');
       FichaAcciones.tirarValorStat(bn.S, p.nombre, p.valor, 'eva', p.extra, pagar ? 'pagado' : 'penal', p.sobre, ui);
+      return;
+    }
+    if(b.dataset.bnInvtipo){
+      raiz.querySelector('#bn-tipo-ataque').classList.remove('open');
+      const [tipo, invId] = b.dataset.bnInvtipo.split(':');
+      bnInvAtacar(invId, tipo);
       return;
     }
     if(b.dataset.bnTipo){

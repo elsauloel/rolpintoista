@@ -2052,6 +2052,18 @@ prueba('invocación: el ataque de oportunidad cuesta lo de un primer ataque, no 
     [6, 0, true, 'Lobo · Ataque de oportunidad (PdG)', 2, 0, 'Lobo · Atacar (PdG)']);
 });
 
+prueba('regla universal: el PdG en oportunidad / contraataque cuenta venga del arma, del equipo o de un estado (creep e invocación); el menú «¿Qué ataque es?» es uno solo', () => {
+  const sc = CreepCalculo.normalizar({id: 'c', nombre: 'Orco', nivel: 1, armaTipo: 8, nitros: 10, armaMods: [{stat: 'pdgopor', val: 1}],
+    equipo: [{id: 'e', nombre: 'Brazal', mods: [{stat: 'pdgopor', val: 1}]}], estados: [{nombre: 'Al acecho', activo: true, mods: [{stat: 'pdgopor', val: 1}, {stat: 'pdgcontra', val: 2}]}]});
+  const pc = CreepAcciones.pagarAtaque(sc, 'oportunidad', false);
+  const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, armaNombre: 'Colmillo', armaTipo: 8, armaPeso: 2, nitros: 10,
+    estados: [{nombre: 'Al acecho', activo: true, mods: [{stat: 'pdgcontra', val: 2}]}]});
+  const h = InvAcciones.menuTipoAtaque(inv, 'data-x');
+  igual([/PdG \+3 por oportunidad/.test(pc.aviso), InvAcciones.bonoEspecial(inv, 'contra'), InvAcciones.ataqueDuelo(inv, 'oportunidad').tipo, InvAcciones.ataqueDuelo(inv).tipo,
+    (h.match(/data-x="/g) || []).length, h.includes('data-x="contra:i"'), Combatiente.statAtaqueEspecial('oportunidad'), Combatiente.statAtaqueEspecial('normal')],
+    [true, 2, 'oportunidad', 'normal', 3, true, 'pdgopor', '']);
+});
+
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {
 const malas = resultados.filter(r => !r.ok);

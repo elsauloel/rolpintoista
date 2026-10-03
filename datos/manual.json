@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-10-03T03:17:04Z",
+ "actualizado": "2026-10-03T11:16:35Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1090,7 +1090,7 @@
    ],
    "estado": "borrador",
    "capitulo": "estados",
-   "cuerpo": "**Sangrado** es un debuff **permanente** que hace perder **2 HP por turno** hasta que se cura.\n\n\n\n- **Se acumula (2026-09-22): si te vuelven a sangrar mientras ya sangrás, no se duplica el estado — suma +1 al daño por turno** (2 → 3 → 4…). Mismo criterio que Armadura rota: un stack más en el mismo estado, no una tirada nueva.\n\n- Lo cura una habilidad o un ítem (por ejemplo, *Vendas*).\n\n- Lo bloquea el estado **Coagulación extrema** (inmunidad a sangrado) e [[Invulnerable]]."
+   "cuerpo": "**Sangrado** es un debuff **permanente** que hace perder **2 HP por turno** hasta que se cura.\n\n\n\n- **Se acumula (2026-09-22): si te vuelven a sangrar mientras ya sangrás, no se duplica el estado — suma +1 al daño por turno** (2 → 3 → 4…). Mismo criterio que Armadura rota: un stack más en el mismo estado, no una tirada nueva.\n- **Sangrado por unos turnos (2026-10-03):** algunas armas dejan un Sangrado que dura solo unos turnos (por ejemplo, 2). **Pero si el golpe fue crítico, ese Sangrado queda permanente**, como el de siempre (regla del dueño). El duelo lo hace solo.\n\n- Lo cura una habilidad o un ítem (por ejemplo, *Vendas*).\n\n- Lo bloquea el estado **Coagulación extrema** (inmunidad a sangrado) e [[Invulnerable]]."
   },
   {
    "id": "regeneracion",

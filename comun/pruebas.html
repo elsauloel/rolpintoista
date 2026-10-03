@@ -2027,7 +2027,7 @@ prueba('efecto de arma con turnos: Sangrado por 2 turnos vence (deja de ser perm
   igual([sp, es.turnos, es.permanente, ev.stacks, ev.turnos, ep.permanente, EfectosGolpe.normalizar({nombre: 'Sangrado', caras: 2, exitos: 1, turnos: 2}).turnos],
     [{nombre: 'Sangrado', turnos: 2}, 2, false, 3, 3, true, 2]);
 });
-prueba('regla: el Sangrado de un arma con turnos queda permanente si el golpe fue crítico (sin crítico, conserva sus turnos)', () => { const pp = fbFalsoCola.then(async () => {
+prueba('regla: el Sangrado con turnos (del arma o de la habilidad) queda permanente con un golpe crítico de arma; sin crítico conserva sus turnos; los otros estados no cambian', () => { const pp = fbFalsoCola.then(async () => {
   const docs = {};
   const tx = {get: async r => ({exists: !!docs[r.id], data: () => docs[r.id]}), update: (r, c) => { docs[r.id] = {...docs[r.id], ...c}; }};
   const antes = {fbDb: window.fbDb, fbRutaCampana: window.fbRutaCampana};
@@ -2035,11 +2035,12 @@ prueba('regla: el Sangrado de un arma con turnos queda permanente si el golpe fu
   try{
     const base = {estado: 'esperando', fase: 'dano', dano: null, atacante: {nombre: 'A'}, defensor: {nombre: 'B'}, ataque: {}};
     docs.c = {...base, crit: {critico: true}}; docs.s = {...base, crit: null};
-    const efs = [{nombre: 'Sangrado', caras: 2, exitos: 1, turnos: 2}];
+    const efs = [{nombre: 'Sangrado', caras: 2, exitos: 1, turnos: 2}, {nombre: 'Sangrado', caras: 1, exitos: 1, spec: {nombre: 'Sangrado', turnos: 3}}, {nombre: 'Lisiado', caras: 1, exitos: 1, turnos: 2}];
     await Duelo.guardarDano('c', {total: 3, formula: '2d4', rolls: [3]}, efs);
     await Duelo.guardarDano('s', {total: 3, formula: '2d4', rolls: [3]}, efs);
     const sc = Duelo.specDeEfecto(docs.c.efectos[0]), ss = Duelo.specDeEfecto(docs.s.efectos[0]);
-    igual([sc, EstadosAplicar.componer(sc).permanente, ss, EstadosAplicar.componer(ss).permanente], [{nombre: 'Sangrado'}, true, {nombre: 'Sangrado', turnos: 2}, false]);
+    igual([sc, EstadosAplicar.componer(sc).permanente, ss, EstadosAplicar.componer(ss).permanente, Duelo.specDeEfecto(docs.c.efectos[1]), Duelo.specDeEfecto(docs.s.efectos[1]), Duelo.specDeEfecto(docs.c.efectos[2])],
+      [{nombre: 'Sangrado'}, true, {nombre: 'Sangrado', turnos: 2}, false, {nombre: 'Sangrado'}, {nombre: 'Sangrado', turnos: 3}, {nombre: 'Lisiado', turnos: 2}]);
   }finally{ Object.assign(window, antes); }
 }); fbFalsoCola = pp.catch(() => {}); return pp; });
 prueba('invocación: el ataque de oportunidad cuesta lo de un primer ataque, no cuenta como ataque y suma el PdG en oportunidad de su arma', () => {

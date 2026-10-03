@@ -480,4 +480,4 @@ Dudas: las tres pedidas (1–3) por la calculadora son Comunes (no valora lo sim
 - 17 Aguja de acupunturista: en vez de +2 fijo, **+1 dado de daño amplificado** (2d4, pesa 1) · 140.
 - De paso (pregunta del dueño): el «PdG en oportunidad» del arma ya se sumaba solo en personajes y creeps; las **invocaciones** lo ignoraban y
   cobraban el ataque de oportunidad como uno normal — corregido (como los creeps: lo de un primer ataque, no cuenta como ataque del turno).
-- **Regla (dueño, 2026-10-03):** el Sangrado que deja un arma con turnos (ej. Puñal de hoja ancha, 2 turnos) queda **permanente si el golpe fue crítico**. Automatizado en el duelo.
+- **Regla (dueño, 2026-10-03), característica del Sangrado:** con un **golpe crítico de arma** queda **permanente** aunque diga turnos (ej. Puñal de hoja ancha, 2 turnos), venga del arma o de la habilidad con la que se atacó. Automatizado en el duelo.

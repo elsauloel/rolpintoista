@@ -726,7 +726,14 @@ const Duelo = (() => {
     const conTurnos = sp => sp && tu ? {...sp, turnos: tu} : sp;
     return conTurnos(specArma(n, st, ef));
   }
-  const esSangradoEf = ef => /^(sangrado|primera sangre)$/i.test(String(ef.nombre || '').trim());
+  const esSangradoEf = ef => /^(sangrado|primera sangre)$/i.test(String((ef.spec && ef.spec.nombre) || ef.nombre || '').trim());
+  // El Sangrado con turnos pasa a permanente (le saca los turnos, al efecto y a su estado ya armado).
+  function sangradoPermanente(ef){
+    if(!esSangradoEf(ef) || !(_num(ef.turnos) > 0 || (ef.spec && _num(ef.spec.turnos) > 0))) return ef;
+    const {turnos, ...r} = ef;
+    if(r.spec){ const {turnos: t2, ...sp} = r.spec; r.spec = sp; }
+    return {...r, detalle: `${r.detalle ? r.detalle + ' ' : ''}(Fue crítico: el Sangrado queda permanente.)`.slice(0, 200)};
+  }
   function specArma(n, st, ef){
     if(n === 'rompe armadura' || n === 'arruina armadura' || n === 'media armadura') return {nombre: 'Armadura rota', stacks: Math.max(1, st)};
     if(n === 'sangrado' || n === 'primera sangre') return {nombre: 'Sangrado'};
@@ -833,8 +840,9 @@ const Duelo = (() => {
       m.efectos = normalizarEfectos(m.hab ? m.hab.efectos : efectos);
       // «Seguro si es crítico» (2026-10-03): un efecto con porcentaje que, si el golpe fue crítico, entra sin tirar.
       if(m.crit && m.crit.critico) m.efectos = m.efectos.map(ef => ef.seguroCritico ? {...ef, caras: 1, exitos: 1, detalle: `${ef.detalle ? ef.detalle + ' ' : ''}(Fue crítico: entra seguro.)`.slice(0, 200)} : ef);
-      // Regla del dueño (2026-10-03): el Sangrado que deja un ARMA con un golpe crítico es permanente, aunque el arma diga turnos.
-      if(m.crit && m.crit.critico && !m.hab) m.efectos = m.efectos.map(ef => esSangradoEf(ef) && ef.turnos ? (({turnos, ...r}) => ({...r, detalle: `${r.detalle ? r.detalle + ' ' : ''}(Fue crítico: el Sangrado queda permanente.)`.slice(0, 200)}))(ef) : ef);
+      // Regla del dueño (2026-10-03), característica del Sangrado: si entra con un golpe CRÍTICO de arma es permanente, aunque diga turnos —
+      // venga del arma o de la habilidad con la que se atacó (Ejecución «con tu arma», Critical Matters…). Solo hay crítico con un arma.
+      if(m.crit && m.crit.critico) m.efectos = m.efectos.map(sangradoPermanente);
       tx.update(ref, cambiosDe(m));
     });
   }

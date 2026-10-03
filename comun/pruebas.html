@@ -176,6 +176,7 @@ prueba('Invulnerable bloquea un debuff', () => {
 prueba('un jefe es inmune a Stun', () => igual(EstadosAplicar.aplicarACreep({estados: [], jefe: true}, {nombre: 'Stun'}).motivo, 'Protección de jefe'));
 prueba('estado propio con escudo queda como buff', () => igual(EstadosAplicar.componer({nombre: 'Blindaje improvisado', escudoMagico: 6}).polaridad, 'buff'));
 prueba('texto de un estado con turnos y escudo', () => igual(EstadosAplicar.texto({nombre: 'Escudo especial', turnos: 1, escudoMagico: 8}), 'Escudo especial (1 turno, 🛡8)'));
+prueba('texto de un Veneno con stacks: ×3, sin los turnos del preset', () => igual(EstadosAplicar.texto({nombre: 'Veneno', stacks: 3}), 'Veneno ×3'));
 
 /* ---------- Combatiente (comun/combatiente.js, paso 1 de la consolidación) ---------- */
 grupo('Combatiente');

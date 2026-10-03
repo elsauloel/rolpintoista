@@ -675,3 +675,10 @@ resuelven a mano, como el resto de los avisos).
 - ✅ **P147 — resuelta 2026-10-02 (dueño): el DDE inicial de un personaje nuevo es 300 doblones del espacio, salvo que el GM fije otro para su
   partida** («⚙ Partida» en la página de inicio; `campanas/<id>/ajustes/partida`). El acompañante del asistente de personaje nuevo sugiere los
   atributos con los repartos de los roles de creeps (siempre como orientación). Hecho: `comun/asistente-personaje.js`.
+- ✅ **P148 — resuelta 2026-10-02 (dueño): las trampas hacen solas todo lo que se pueda (daño, estado y la tirada para evitarla), siempre
+  anunciándolo: al afectado con **el Aviso** (cartel al centro de su pantalla) y al resto con **la Crónica** (las tarjetas de arriba a la
+  derecha del mapa, siempre iguales). Duración de los estados de trampa: **3 turnos como regla general; Stun 1** (sugerencias aceptadas:
+  Sentado y Sangrado no vencen solos —se paran / los curan—; el Veneno dura sus stacks).** Hecho: `vtt-hexgrid/js/08` (`trampaAplicarEfectos`),
+  `comun/trampas-base.js` (`FICHA_TRAMPAS`) y las 72 trampas consumibles del catálogo. Quedan a mano (dicho en cada texto, «(a mano)»):
+  liberarse de Inmovilizado / Arena, pararse con No2, la confusión, el silencio de SP, drenar SP, −2 a todas las tiradas, ver aliados como
+  enemigos y el teletransporte del portal.

@@ -1223,6 +1223,19 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   resuelve en un cartelito al **centro** (`momentoEstiloCentro`: el de las zonas, el de Percepción y el del GM); los demás lo ven en la
   **esquina de arriba a la derecha** del mapa (`#momentos-feed`), el título apenas empieza y el resultado al resolverse; se van solos a
   los ~14 s. Se cuenta solo lo público. El GM barre los de más de 2 h al entrar. Reglas nuevas (`momentos`).
+  **Nombres (dueño, 2026-10-02): la esquina es «la Crónica»** (siempre el mismo lugar y la misma tarjeta) **y el cartel del centro para
+  quien le pasó algo es «el Aviso»** (`momentoAvisoCentro`, `datos.paraUid`; con `datos.aviso: true` le llega aunque lo haya publicado su
+  propia pantalla). Lo que la mesa tenga que enterarse va por `momentoAbrir`, no por un cartel propio.
+- **Trampas automáticas (2026-10-02, regla del dueño: "las que puedan ser full automáticas, mejor, pero siempre anunciando")**:
+  `trampaAplicarEfectos(t, el)` en `js/08`, para cada afectado: **la salvación** (`salva` = {stat, etq, dif, que} **adentro del JSON de
+  `trampaEstado`**, así no hizo falta un campo ni reglas nuevas; la tira el mapa con el stat de quien la pisó y la publica en la Mesa;
+  llegar a la dificultad alcanza; `que`: 'todo' la evita entera, 'efecto' evita el estado, 'mitad' la mitad del daño), **el daño** (una
+  tirada para todos; a un creep lo aplica el GM, a un personaje o invocación su dueño o el GM, como en el duelo) y **el estado** (a un
+  creep directo; a un personaje o invocación, por `EstadosAplicar.encolarPj` → `comun/recibidos.js`). Después, **el Aviso** al afectado
+  (a un creep, al GM) y **la Crónica** para los demás, con lo que quedó a mano (las frases «(a mano).» del detalle). Duraciones: regla
+  general **3 turnos; Stun 1**; Sentado y Sangrado no vencen solos; el Veneno dura sus stacks. Probado en vivo en "Claude · pruebas":
+  Trampa de oso menor sobre Clementino (−4 de vida, Inmovilizado 3 turnos encolado, la Crónica en el GM) y Bomba de esporas menor sobre
+  un creep (Res.CC en la Mesa, −6 directo, Veneno ×3, el Aviso en el GM).
 - **Percepción aumentada y sigilo (2026-10-02, P145)**: con la pasiva, la zona de alerta de quien camina cuenta en cada paso
   (`percepcionEvaluarRuta` → corte `percibe`, una vez por oculto y casillero, `percepcionChequeados`); al llegar, «Algo está fuera de
   lugar… tirá Percepción» (`percepcionAbrir`). Como la Destreza de un creep es privada, el momento pasa a `esperandoGM` y **la pantalla del

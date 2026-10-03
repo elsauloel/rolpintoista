@@ -81,11 +81,13 @@ const EstadosAplicar = (() => {
   function texto(spec){
     const s = limpiarSpec(spec);
     const p = presetPorNombre(s.nombre);
-    const turnos = s.turnos !== undefined ? s.turnos : (p ? p.turnos : 0);
+    const stacks = Number(s.stacks) > 0 ? Math.round(Number(s.stacks)) : 0;
+    // El Veneno con stacks dura tantos turnos como stacks (Combatiente.ajustarPreset): se dice "Veneno ×3", sin los turnos del preset.
+    const turnos = stacks && p && p.esVeneno ? 0 : s.turnos !== undefined ? s.turnos : (p ? p.turnos : 0);
     const mods = (s.mods || (p && p.mods) || []).map(m => `${m.val > 0 ? '+' : '−'}${Math.abs(m.val)} ${m.stat}`);
     const escudo = s.escudoMagico !== undefined ? s.escudoMagico : (p ? p.escudoMagico : 0);
     const extra = [turnos ? `${turnos} turno${turnos === 1 ? '' : 's'}` : '', ...mods, s.hp ? `${s.hp > 0 ? '+' : '−'}${Math.abs(s.hp)} HP por turno` : '', escudo ? `🛡${escudo}` : ''].filter(Boolean);
-    return s.nombre + (extra.length ? ` (${extra.join(', ')})` : '');
+    return s.nombre + (stacks ? ` ×${stacks}` : '') + (extra.length ? ` (${extra.join(', ')})` : '');
   }
 
   return {DEBUFFS, BUFFS, limpiarSpec, esPreset, componer, bloqueadoCreep, aplicarACreep, encolarPj, texto};

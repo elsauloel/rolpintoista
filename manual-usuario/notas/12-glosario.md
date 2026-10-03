@@ -178,6 +178,10 @@ Todas las palabras y siglas del juego, con un enlace a la nota que las explica.
 
 | **Bitácora** | Diario compartido | [[La Bitácora]] |
 
+| **La Crónica** | Las tarjetas de arriba a la derecha del mapa que le cuentan a toda la mesa lo que pasó (una trampa, una zona, un sigilo roto), siempre en el mismo lugar | [[El mapa]] |
+
+| **El Aviso** | El cartel al centro de tu pantalla cuando algo te pasó a vos (pisaste una trampa), con «Entendido» | [[El mapa]] |
+
 
 
 > [!question] Términos que faltan

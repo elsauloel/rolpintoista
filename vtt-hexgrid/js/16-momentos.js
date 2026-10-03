@@ -4,8 +4,13 @@
    Lo que pasa en el mapa —percepción, zonas, trampas que se disparan, sigilo roto— es un documento de `campanas/<id>/momentos`
    ({tipo, icono, titulo, resultado, estado, resuelve, datos}) que ven TODAS las pantallas:
    - quien tiene que resolverlo (tirar algo) lo ve en un cartelito al CENTRO de su pantalla (`momentoEstiloCentro`), con su botón;
-   - los demás, en la ESQUINA de arriba a la derecha del mapa (`#momentos-feed`), sin interrumpir su juego: el título apenas empieza y
-     el resultado cuando se resuelve; cada tarjeta se va sola a los ~14 s de su último cambio.
+   - **el Aviso** (nombre dado por el dueño, 2026-10-02): a quien le pasó algo (`datos.paraUid`; ej. pisó una trampa) se le cuenta en el
+     mismo cartelito del centro, con «Entendido» (`momentoAvisoCentro`, `#momento-aviso-centro`). `datos.aviso: true` = le llega aunque lo
+     haya publicado su propia pantalla;
+   - **la Crónica** (nombre dado por el dueño, 2026-10-02): los demás lo ven en la ESQUINA de arriba a la derecha del mapa
+     (`#momentos-feed`), siempre igual —mismo lugar, misma tarjeta: ícono, título y resultado—, sin interrumpir su juego: el título apenas
+     empieza y el resultado cuando se resuelve; cada tarjeta se va sola a los ~14 s de su último cambio.
+   Todo lo que el resto de la mesa tenga que enterarse en el mapa va por acá (momentoAbrir), no por un cartel propio.
    Se cuenta lo que ya es público (el daño que recibe un creep, no la vida que le queda; el nombre de una trampa descubierta; un oculto sin
    descubrir no se nombra). `datos.centro`: quien lo creó lo sigue en un cartelito del centro (no se le repite en la esquina). */
 const MOMENTO_DURA_MS = 14000;

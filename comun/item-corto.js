@@ -89,6 +89,8 @@ const ItemCorto = (() => {
   // «Sangrado 50 % · 2 turnos», «Veneno 3 stacks (siempre)», «Lisiado 25 %, seguro si es crítico».
   function efectoCorto(e){
     const n = nombreEf(e), pct = pctEf(e);
+    if(n === 'Drena vida') return `Drena vida ${num(e.drenaPct) > 0 ? num(e.drenaPct) : 50} %`;
+    if(e.soloCritico) return `Si es crítico: ${n}${num(e.stacks) > 0 && /^Veneno$/.test(n) ? ` ${num(e.stacks)} stacks` : ''}${pct < 100 ? ` ${pct} %` : ''}${num(e.turnos) > 0 ? ` · ${num(e.turnos)} turnos` : ''}`;
     const st = num(e.stacks) > 0 && /^Veneno$/.test(n) ? ` ${num(e.stacks)} stacks` : '';
     return `${n}${st} ${pct >= 100 ? '(siempre)' : pct + ' %'}${num(e.turnos) > 0 ? ` · ${num(e.turnos)} turnos` : ''}${e.seguroCritico && pct < 100 ? ', seguro si es crítico' : ''}`;
   }
@@ -123,6 +125,7 @@ const ItemCorto = (() => {
     dmg: 'Dmg: se suma al daño de cada golpe.', eva: 'Evasión: se suma al esquivar.',
   };
   const MEC_EFECTO = {
+    'Drena vida': 'Drena vida N %: quien ataca se cura el N % de la vida que el golpe le sacó de verdad al defensor (lo que frena la armadura no cuenta; curar redondea para arriba). Lo que pase de su máximo se pierde.',
     Lisiado: 'Lisiado: 3 turnos con el PdG y el Parry a la mitad (se tira el dado completo y el resultado se divide por 2).',
     Sangrado: 'Sangrado: pierde 1 HP por stack en cada Mantenimiento (entra con 2). Si ya sangraba, suma +1 stack. Sin turnos dura hasta que lo curen; con turnos vence, salvo que entre con un golpe crítico: ahí queda permanente.',
     Veneno: 'Veneno: pierde 1 HP por stack en cada Mantenimiento y un stack por turno (los turnos son los stacks). Los stacks nuevos se suman a los que ya tenía.',
@@ -143,7 +146,8 @@ const ItemCorto = (() => {
       L.push('Ignora N de Resistencia a crítico: al calcular el crítico, el defensor cuenta N puntos menos de Resistencia a crítico contra este golpe: es más fácil que salga crítico y se tiran más d20. ⚙ El duelo lo resta solo y lo muestra en la cuenta.');
     const efs = (it.efectosGolpe || []).filter(e => e && e.nombre && !/^ignora\s+\d+\s+de\s+res/i.test(String(e.nombre).trim()));
     efs.forEach(e => { const n = nombreEf(e); if(MEC_EFECTO[n] && !vistos.has(n)){ vistos.add(n); L.push(MEC_EFECTO[n]); } });
-    if(efs.some(e => pctEf(e) < 100)) L.push('Los porcentajes se tiran en el duelo, después del daño (50 % = una moneda, 25 % = un d4, 75 % = un d4 que falla solo con 1). Lisiado, Veneno y Sangrado necesitan que el golpe haga daño.');
+    if(efs.some(e => e.soloCritico)) L.push('⚡ Si es crítico (Critical Matters): ese efecto solo entra si el golpe fue crítico; si no, ni aparece.');
+    if(efs.some(e => pctEf(e) < 100 && !e.soloCritico)) L.push('Los porcentajes se tiran en el duelo, después del daño (50 % = una moneda, 25 % = un d4, 75 % = un d4 que falla solo con 1). Lisiado, Veneno y Sangrado necesitan que el golpe haga daño.');
     if(efs.some(e => e.seguroCritico)) L.push('Seguro si es crítico: con un golpe crítico, el efecto entra sin tirar.');
     if(efs.length) L.push('⚙ Automatizado: el duelo tira cada efecto y lo aplica con «Aplicar».');
     if(num(it.durPorPeso) > 0 && num(it.durPorPeso) !== 3) L.push(`Durabilidad ${durMax(it)} (${durPP(it)} por punto de Peso; lo normal es 3): cuánto desgaste aguanta antes de romperse.`);

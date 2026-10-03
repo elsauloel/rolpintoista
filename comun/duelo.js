@@ -726,6 +726,7 @@ const Duelo = (() => {
     const conTurnos = sp => sp && tu ? {...sp, turnos: tu} : sp;
     return conTurnos(specArma(n, st, ef));
   }
+  const esDrenaEf = ef => /^drena(r)?\s+vida$/i.test(String((ef && ef.nombre) || '').trim());
   const esSangradoEf = ef => /^(sangrado|primera sangre)$/i.test(String((ef.spec && ef.spec.nombre) || ef.nombre || '').trim());
   // El Sangrado con turnos pasa a permanente (le saca los turnos, al efecto y a su estado ya armado).
   function sangradoPermanente(ef){
@@ -756,6 +757,7 @@ const Duelo = (() => {
       if(_num(e.cura) > 0) o.cura = Math.round(_num(e.cura));
       if(e.no2 !== undefined){ o.no2 = Math.max(0, Math.round(_num(e.no2))); o.no2Dif = !!e.no2Dif; o.no2Sentado = !!e.no2Sentado; }
       if(e.seguroCritico && caras > 1) o.seguroCritico = true;
+      if(e.soloCritico) o.soloCritico = true;
       o.requiereDano = requiereDanoDe(e);
       o.res = null; o.omitido = false; o.motivo = ''; o.aplicar = ''; o.aplicado = false; o.nota = '';
       return o;
@@ -838,7 +840,17 @@ const Duelo = (() => {
       m.dano = {crudo: Math.max(0, Math.round(_num(r.total))), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod), reclamado: '', aplicado: false};
       const be = m.ataque && m.ataque.espalda;   // por la espalda: el daño fijo del arma o la habilidad
       if(be && be.fijo) m.dano = {...m.dano, crudo: m.dano.crudo + be.fijo, mod: m.dano.mod + be.fijo, formula: `${m.dano.formula} +${be.fijo} espalda`.slice(0, 60)};
-      m.efectos = normalizarEfectos(m.hab ? m.hab.efectos : efectos);
+      const critGolpe = !!(m.crit && m.crit.critico);
+      let crudos = m.hab ? m.hab.efectos : efectos;
+      if(!m.hab){
+        // ⚡ Critical Matters de un arma (2026-10-03): el efecto con `soloCritico` entra solo si el golpe fue crítico.
+        crudos = (Array.isArray(crudos) ? crudos : []).filter(e => !(e && e.soloCritico) || critGolpe);
+        // Drena vida de un arma (2026-10-03, regla del dueño): quien ataca se cura un % (`drenaPct`, 50 si no dice) de la vida que el golpe le
+        // sacó de verdad al defensor (lo que frena la armadura no cuenta). No es un estado sobre el golpeado: lo aplica el mapa con el daño.
+        const drenas = crudos.filter(esDrenaEf);
+        if(drenas.length){ m.dano.drenaPct = Math.min(100, drenas.reduce((a, e) => a + (_num(e.drenaPct) > 0 ? _num(e.drenaPct) : 50), 0)); crudos = crudos.filter(e => !esDrenaEf(e)); }
+      }
+      m.efectos = normalizarEfectos(crudos);
       // «Seguro si es crítico» (2026-10-03): un efecto con porcentaje que, si el golpe fue crítico, entra sin tirar.
       if(m.crit && m.crit.critico) m.efectos = m.efectos.map(ef => ef.seguroCritico ? {...ef, caras: 1, exitos: 1, detalle: `${ef.detalle ? ef.detalle + ' ' : ''}(Fue crítico: entra seguro.)`.slice(0, 200)} : ef);
       // Regla del dueño (2026-10-03), característica del Sangrado: si entra con un golpe CRÍTICO de arma es permanente, aunque diga turnos —

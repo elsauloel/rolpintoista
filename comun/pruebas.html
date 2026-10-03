@@ -2084,6 +2084,24 @@ prueba('arma que ignora Resistencia a crítico: el duelo se la resta al defensor
     Combatiente.ignoraResistCritArma(null)], [3, 1, 3, 2, 'Tipo 4 · 1 dado · +2 de daño · Ignora 2 de Res. crítico', true, 0]);
 });
 
+prueba('armas: el efecto «solo si es crítico» entra solo con crítico; «Drena vida» no es un efecto sobre el golpeado: queda en el daño con su %', () => { const pp = fbFalsoCola.then(async () => {
+  const docs = {};
+  const tx = {get: async r => ({exists: !!docs[r.id], data: () => docs[r.id]}), update: (r, c) => { docs[r.id] = {...docs[r.id], ...c}; }};
+  const antes = {fbDb: window.fbDb, fbRutaCampana: window.fbRutaCampana};
+  window.fbDb = {collection: () => ({doc: id => ({id})}), runTransaction: fn => fn(tx)}; window.fbRutaCampana = p => p;
+  try{
+    const base = {estado: 'esperando', fase: 'dano', dano: null, atacante: {nombre: 'A'}, defensor: {nombre: 'B'}, ataque: {}};
+    docs.c = {...base, crit: {critico: true}}; docs.s = {...base, crit: null};
+    const efs = [{nombre: 'Lisiado', caras: 1, exitos: 1, soloCritico: true}, {nombre: 'Drena vida', caras: 1, exitos: 1, drenaPct: 50}, {nombre: 'Envenenar', caras: 2, exitos: 1, stacks: 2}];
+    await Duelo.guardarDano('c', {total: 6, formula: '2d4', rolls: [6]}, efs);
+    await Duelo.guardarDano('s', {total: 6, formula: '2d4', rolls: [6]}, efs);
+    const n = EfectosGolpe.normalizar({nombre: 'Drena vida', caras: 1, exitos: 1, drenaPct: 40});
+    igual([docs.c.efectos.map(e => e.nombre), docs.s.efectos.map(e => e.nombre), docs.c.dano.drenaPct, docs.s.dano.drenaPct, n.drenaPct, EfectosGolpe.normalizar({nombre: 'Lisiado', soloCritico: true}).soloCritico,
+      ItemCorto.armaEsencial({tipoItem: 'arma_1m', tipoDado: 4, peso: 2, danoFijo: 1, efectosGolpe: [{nombre: 'Drena vida', caras: 1, exitos: 1, drenaPct: 50}, {nombre: 'Sangrado', caras: 1, exitos: 1, soloCritico: true}]})],
+      [['Lisiado', 'Envenenar'], ['Envenenar'], 50, 50, 40, true, 'Tipo 4 · 2 dados · +1 de daño · Drena vida 50 % · Si es crítico: Sangrado']);
+  }finally{ Object.assign(window, antes); }
+}); fbFalsoCola = pp.catch(() => {}); return pp; });
+
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {
 const malas = resultados.filter(r => !r.ok);

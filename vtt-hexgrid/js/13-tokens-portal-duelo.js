@@ -697,7 +697,7 @@ async function dueloDrenar(d, monto){
   if(!monto) return {quien, monto: 0, nota: 'no hizo daño: no drena nada'};
   const ta = tokens.get(d.atacante.tokenId);
   if(!ta) return {quien, monto, manual: true, motivo: 'el token de quien la usó ya no está en el mapa'};
-  const pct = Math.max(0, num(d.hab.dano.drenaTope));
+  const pct = Math.max(0, num(d.hab && d.hab.dano ? d.hab.dano.drenaTope : 0));   // el Excedente de vida: solo las habilidades que lo dicen (un arma, no)
   const excedenteDe = estados => { const e = (estados || []).find(x => x && (x.excedenteVida || x.excedente || x.nombre === 'Excedente de vida')); return e ? num(e.escudoMagicoActual ?? e.escudo ?? e.escudoMagico) : 0; };
   try{
     if(ta.tipo === 'creep'){
@@ -721,7 +721,7 @@ async function dueloDrenar(d, monto){
     const f = fichasPub.get(ta.fichaId), rs = (f && f.resumen) || {};
     const max = num(rs.hpMax) > 0 ? num(rs.hpMax) : num(r.nuevo), tope = Math.floor(max * pct / 100), antes = excedenteDe(rs.estados);
     const exc = sobra > 0 && tope > antes ? Math.min(tope, antes + sobra) : 0;
-    if(exc) await EstadosAplicar.encolarPj({fichaId: ta.fichaId, duenoUid: ta.duenoUid, spec: {nombre: 'Excedente de vida', escudoMagico: exc}, origen: `${quien} · ${d.hab.nombre}`});
+    if(exc) await EstadosAplicar.encolarPj({fichaId: ta.fichaId, duenoUid: ta.duenoUid, spec: {nombre: 'Excedente de vida', escudoMagico: exc}, origen: `${quien} · ${d.hab ? d.hab.nombre : (d.ataque.armaNombre || 'su arma')}`});
     return {quien, monto, hpAntes: num(r.previo), hpDespues: num(r.nuevo), ...(exc ? {excedente: exc} : {})};
   }catch(err){
     console.error('No se pudo aplicar el drenaje:', err);
@@ -763,7 +763,10 @@ async function dueloAplicarDano(d){
     const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando)
       : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando);
     const espinas = res.r.invulnerable ? null : await dueloEspinas(d, golpe);   // el daño inflictido (con el multiplicador del crítico), antes de la Defensa
-    const drena = d.hab && d.hab.dano && d.hab.dano.drena ? await dueloDrenar(d, Math.max(0, num(res.previo) - num(res.nuevo))) : null;
+    const perdio = Math.max(0, num(res.previo) - num(res.nuevo));
+    // Habilidad que drena: todo lo que perdió. Arma que drena (2026-10-03): su % de lo que perdió de verdad (curar redondea para arriba).
+    const drena = d.hab && d.hab.dano && d.hab.dano.drena ? await dueloDrenar(d, perdio)
+      : !d.hab && num(dn.drenaPct) > 0 ? await dueloDrenar(d, Math.ceil(perdio * num(dn.drenaPct) / 100)) : null;
     return {...base, desgaste, defensa: crit ? restaIgnorando : def, recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(drena ? {drena} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);

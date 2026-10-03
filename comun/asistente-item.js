@@ -421,11 +421,13 @@ const AsistenteItem = (() => {
           <input data-aa-golpe="${i}" data-campo="turnos" type="number" min="0" step="1" value="${e(ef.turnos || '')}" placeholder="turnos" title="Cuántos turnos dura; vacío = lo que dure el estado" style="max-width:80px">
           <button type="button" class="aa-x" data-aa-golperm="${i}">×</button>
           <input class="aa-ancho" data-aa-golpe="${i}" data-campo="detalle" value="${e(ef.detalle || '')}" placeholder="qué hace (opcional): ej. Veneno de 4 stacks">
-          ${x.caras > 1 ? `<label class="aa-ancho" style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-aa-golpe="${i}" data-campo="seguroCritico" ${ef.seguroCritico ? 'checked' : ''} style="width:auto"> Si el golpe es crítico, entra seguro (sin tirar)</label>` : ''}
+          ${x.caras > 1 && !ef.soloCritico ? `<label class="aa-ancho" style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-aa-golpe="${i}" data-campo="seguroCritico" ${ef.seguroCritico ? 'checked' : ''} style="width:auto"> Si el golpe es crítico, entra seguro (sin tirar)</label>` : ''}
+          <label class="aa-ancho" style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-aa-golpe="${i}" data-campo="soloCritico" ${ef.soloCritico ? 'checked' : ''} style="width:auto"> ⚡ Solo si el golpe es crítico (Critical Matters)</label>
+          ${/^drena(r)?\s+vida$/i.test(String(ef.nombre || '').trim()) ? `<label class="aa-ancho" style="display:flex;gap:6px;align-items:center;font-size:12.5px">Drena el <input data-aa-golpe="${i}" data-campo="drenaPct" type="number" min="1" max="100" step="5" value="${e(ef.drenaPct || 50)}" style="max-width:70px"> % de la vida que le saca de verdad (lo que frena la armadura no cuenta)</label>` : ''}
           <div class="aa-regla">${eg && x.nombre ? e(eg.reglaTxt(x)) + (x.seguroCritico && x.caras > 1 ? ' Con un crítico, entra seguro.' : '') + (x.dado ? ` Si entra, se tira además ${e(x.dado)}.` : '') : ''}</div>
         </div>`;
       }).join('')) + `<div class="aa-opciones">
-        ${['Envenenar', 'Sangrado', 'Rompe armadura'].map(t => `<button type="button" class="aa-op" data-aa-golpeadd="${t}">+ ${t}</button>`).join('')}
+        ${['Envenenar', 'Sangrado', 'Lisiado', 'Drena vida', 'Rompe armadura'].map(t => `<button type="button" class="aa-op" data-aa-golpeadd="${t}">+ ${t}</button>`).join('')}
         <button type="button" class="aa-op" data-aa-golpeadd="">+ Otro efecto</button></div>`;
       h += efecto(d.efectosGolpe.length && eg
         ? `Al tirar el Daño: ${e(eg.resumenLista(d.efectosGolpe)) || '(poné el nombre de cada efecto)'}. ${d.efectosGolpe.some(x => !eg.siempre(eg.normalizar(x))) ? 'Los que tienen porcentaje abren el pop-up para tirar: 50% es una moneda (2 = éxito), 25% un d4 (4 = éxito), y así.' : 'Salen como recordatorio en la Mesa, sin tirar.'}`
@@ -632,8 +634,8 @@ const AsistenteItem = (() => {
       if(t.dataset.campo === 'prob'){
         const [caras, exitos] = t.value.split('/').map(n);
         ef.caras = caras; ef.exitos = exitos;
-      }else if(t.dataset.campo === 'seguroCritico'){
-        if(t.checked) ef.seguroCritico = true; else delete ef.seguroCritico;
+      }else if(t.dataset.campo === 'seguroCritico' || t.dataset.campo === 'soloCritico'){
+        if(t.checked) ef[t.dataset.campo] = true; else delete ef[t.dataset.campo];
       }else{
         ef[t.dataset.campo] = t.value;
       }
@@ -646,7 +648,7 @@ const AsistenteItem = (() => {
     alEscribir(ev);
     if(t.dataset.aaDestino){ st.destino = t.value; dibujar(); return; }
     // La regla de cada efecto y la lista de resistencias dependen de lo elegido.
-    if((t.dataset.aaGolpe !== undefined && (t.dataset.campo === 'prob' || t.dataset.campo === 'seguroCritico')) || (t.dataset.aaMod1 && CRIT_IDS.includes(t.dataset.aaMod1))){
+    if((t.dataset.aaGolpe !== undefined && (t.dataset.campo === 'prob' || t.dataset.campo === 'seguroCritico' || t.dataset.campo === 'soloCritico' || t.dataset.campo === 'nombre')) || (t.dataset.aaMod1 && CRIT_IDS.includes(t.dataset.aaMod1))){
       setTimeout(() => { if(st) dibujar(); }, 0);
       return;
     }

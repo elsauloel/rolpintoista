@@ -692,3 +692,5 @@ Estado hoy: Común 18 · Buena 13 · Raro 9 (cuerpo a cuerpo) · Excepcional 6 �
 **Lo que muestra:** 6 copias (quedan 12 distintas); **15 de 18 están por debajo del piso** (no sangran); el Machete trae Rompe armadura
 (no va en Común); la Espada corta oxidada envenena 50 % (en Común, porcentaje muy bajo); el Bastón ferrado no es del Tipo 6; nadie usa el
 PdG en contraataque (de casa) ni el daño amplificado; precios desparejos.
+
+**✅ T4 Excepcional cargado (2026-10-03, dueño: «subilas, después las reviso»):** las 18 de la propuesta v1 (con el Colmillo sangrando permanente) reemplazaron a las 6 Excepcionales del Tipo 4, con los tres textos y el precio libre. Construidas las mecánicas de firma (no se puede parrear, oportunidad sin No2, primer ataque −1 No2, +1 d20 en el crítico, Rengo, Sangrado con stacks, daño mágico de rayo / hielo sin multiplicar con el crítico). Salieron el Báculo mágico y el Puñal de Dorne. Queda la revisión del dueño.

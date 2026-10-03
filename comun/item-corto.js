@@ -90,8 +90,8 @@ const ItemCorto = (() => {
   function efectoCorto(e){
     const n = nombreEf(e), pct = pctEf(e);
     if(e.danoMagico) return `+${e.dado} de ${String(e.nombre || 'magia').toLowerCase()}`;
-    if(n === 'Drena vida') return `Drena vida ${num(e.drenaPct) > 0 ? num(e.drenaPct) : 50} %`;
-    if(e.soloCritico) return `Si es crítico: ${n}${num(e.stacks) > 0 && /^Veneno$/.test(n) ? ` ${num(e.stacks)} stacks` : ''}${pct < 100 ? ` ${pct} %` : ''}${num(e.turnos) > 0 ? ` · ${num(e.turnos)} turnos` : ''}`;
+    if(n === 'Drena vida') return `${e.soloCritico ? 'Si es crítico: drena otro' : 'Drena vida'} ${num(e.drenaPct) > 0 ? num(e.drenaPct) : 50} %`;
+    if(e.soloCritico) return `Si es crítico: ${n}${num(e.stacks) > 0 && /^(Veneno|Sangrado)$/.test(n) ? ` ${num(e.stacks)} stacks` : ''}${pct < 100 ? ` ${pct} %` : ''}${num(e.turnos) > 0 ? ` · ${num(e.turnos)} turnos` : ''}`;
     const st = num(e.stacks) > 0 && /^(Veneno|Sangrado)$/.test(n) ? ` ${num(e.stacks)} stacks` : '';
     return `${n}${st} ${pct >= 100 ? '(siempre)' : pct + ' %'}${num(e.turnos) > 0 ? ` · ${num(e.turnos)} turnos` : ''}${e.seguroCritico && pct < 100 ? ', seguro si es crítico' : ''}`;
   }

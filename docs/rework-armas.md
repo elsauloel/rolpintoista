@@ -424,3 +424,23 @@ Salen (copias): Cuchillo del grumete polizón, Punzón del ladronzuelo, Lanza de
 (Ladronzuelo y Trampero → Daga; Guardia de puerta y Vigía de patrulla → Lanza corta; Grumete → Cuchillo de cazador; Acólito → Estileto). Se construyó
 **«seguro si es crítico»** para los efectos de arma (`seguroCritico` en `efectosGolpe`: casilla en el asistente de ítems; el duelo, si el golpe fue
 crítico, lo deja entrar sin tirar). `buscar_duplicados.py` marca Daga ~ Cuchillo de trinchera: a propósito (la trinchera es la resistente).
+
+### T4 Buena calidad — lo que hay hoy (tabla comparativa, 2026-10-03)
+Calculadora v0: PC de Buena calidad = 7,5 a 11 (menos = Común; 11 o más = Raro). «Precio calc.» = como Buena calidad.
+
+| # | Arma | Manos | Dados | Fijo | Bonos | Al golpear | Precio | PC → tier calc. | Precio calc. | Observación |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | Daga de Capitán | 1 | 1 | — | PdG +1 | — | 90 | **5,8 · Común** | 65 | por poder es Común |
+| 2 | Daga del sacrificio | 1 | 1 | — | PdG +1 | — | 90 | **5,8 · Común** | 65 | **copia** de la 1 (botín del Sacerdote oscuro) |
+| 3 | Estoque | 1 | 2 | — | Iniciativa +1 | — | 60 | **5,2 · Común** | 60 | por poder es Común |
+| 4 | Estilete de práctica | 1 | 1 | +1 | PdG +1 | — | 85 | 7,8 · Buena | 85 | — |
+| 5 | Lanza de centinela | 2 | 2 | — | Alcance +1, PdG oport. +1 | — | 100 | 8,4 · Buena | 100 | — |
+| 6 | Lanza del portón | 2 | 2 | — | Alcance +1, PdG oport. +2 | — | 120 | 9,2 · Buena | 120 | casi igual a la 5 |
+| 7 | ⚠️ Daga de guardia | 1 | 1 | +1 | — | Ignora 1 de Res. crítico | 60 | 9,6 · Buena | 130 | Ignora N va desde Raro 🔧 en armas no se automatiza |
+| 8 | ⚠️ Daga de la viuda verde | 1 | 1 | +1 | — | Ignora 1 de Res. crítico | 60 | 9,6 · Buena | 130 | **copia** de la 7 (botín del Envenenador) |
+| 9 | Estilete de competencia | 1 | 2 | — | Crít. frecuente +1 | — | 75 | 9,8 · Buena | 130 | barata para lo que da |
+| 10 | Aguja de la vigilia | 1 | 1 | — | PdG oport. +3, Crít. frecuente +1 | — | 140 | 10,0 · Buena | 140 | — |
+| 11 | ⚠️ Daga de duelo | 1 | 2 | — | PdG +1, Crít. potente +2 | — | 150 | 10,5 · Buena | 150 | — |
+| 12 | Aguja de acupunturista | 1 | 1 | +2 | PdG +1 | Sangrado 33 % | 150 | 10,6 · Buena | 150 | — |
+| 13 | Pico de guerra | 1 | 2 | — | Alcance +1 | Rompe armadura 50 % | 90 | 10,6 · Buena | 150 | Rompe armadura es ✨ desde Raro; barata |
+| 14 | Lanza de leva | 2 | 3 | — | Alcance +1 | Lisiado 25 % | 150 | 10,7 · Buena | 150 | — |

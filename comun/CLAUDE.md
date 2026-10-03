@@ -1183,3 +1183,5 @@ versión parecida en más de una, es candidato a juntar.
 
 
 - **Por la espalda** (2026-10-03, pedido del dueño): un arma puede traer `espalda: {pdg, fijo, critpot}` (asistente de ítems, paso «Peso y daño»; creeps `sc.armaEspalda`, invocaciones `inv.armaEspalda`; una habilidad con el arma suma `arma.espaldaPdg/Fijo/Critpot` del ✨). El mapa avisa a `Duelo.crear` (`cfg.espalda`) si quien ataca está **en sigilo** y en el punto ciego del defensor; el duelo lo guarda en `ataque.porLaEspalda`/`ataque.espalda` (`limpiarEspalda`) y lo suma: PdG al guardar la tirada, daño fijo al guardar el daño, Crítico potente en `entrarCritico`. Sin reglas nuevas (va dentro de `ataque`).
+
+- **Efecto de arma «seguro si es crítico»** (2026-10-03, rework T4): `seguroCritico: true` en un efecto de `efectosGolpe` con porcentaje. `EfectosGolpe.normalizar` lo conserva (y ahora también `stacks`, que antes se perdían al guardar en el asistente); el asistente de ítems tiene la casilla; `Duelo.guardarDano` (exportado), si `m.crit.critico`, lo deja en 1/1 (entra sin tirar).

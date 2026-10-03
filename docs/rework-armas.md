@@ -322,21 +322,23 @@ Dueño: *«Hay algo conceptual que no estás entendiendo en las armas de tipo 12
 ## Rework metódico por Tipo (arranca 2026-10-03)
 Pedido del dueño: *«empecemos un plan metódico de rework del catálogo, por las armas; tipo a tipo, de menor a mayor tier, empezando por el Tipo 4. Antes, definiciones: qué efectos y mecánicas le son propias, cuáles ajenas, y cuáles pueden ir aunque no le sean exclusivas; por dónde podemos jugar con las mecánicas disponibles.»*
 
-> **▶ Para retomar (ruta pendiente, el dueño la retoma cuando tiene tiempo — 2026-10-03):** Tipo 4 → tier **Común**. Ya está la tabla
-> comparativa de las que hay hoy (abajo, «T4 Común — lo que hay hoy»). Lo que sigue: definir las armas **una por una** con el dueño
-> (las que se quedan, cómo quedan y las nuevas hasta ~18); cuando dio el OK a todas, **reemplazan a todas las T4 Comunes del catálogo**
-> (`comun/catalogo.js`) y se pasa a **Buena calidad** → Raro → Excepcional → Legendario. Después, el Tipo siguiente.
+> **▶ Para retomar (ruta pendiente, el dueño la retoma cuando tiene tiempo):** ✅ **T4 Común hecho** (2026-10-03: 18 armas, reemplazaron a
+> todas las T4 Comunes del catálogo). Lo que sigue lo elige el dueño («ahora vamos con espadas de Buena calidad»); el orden natural es T4 Buena
+> calidad → Raro → Excepcional → Legendario, y después el Tipo siguiente.
 
-**Método (decidido por el dueño, 2026-10-03):** *«vamos a trabajar las armas tipo 4, comunes, las definimos una a una, cuando las vi a todas
-y les di el ok, pasan a reemplazar todas las que estén en el catálogo, y pasamos a las de buena calidad. Así hasta llegar a las legendarias.
-Luego pasamos de tipo.»*
-1. **Definiciones del Tipo** (esta sección para el T4): 🏠 propio · 🤝 puede ir (no exclusivo) · ✨ excepción puntual · 🚫 ajeno (no va). ✅ T4.
-2. **Tabla comparativa** de lo que hay hoy en el tier (con la calculadora `herramientas/calculadora_armas.py`): duplicados, fuera de precio, huecos.
-3. **Una por una**: cada arma del tier (las que se quedan, reajustadas, y las nuevas hasta la cuota) se define con el dueño.
-4. **Con el OK de todas, reemplazan a todo el tier en el catálogo** (`comun/catalogo.js`, `buscar_duplicados.py`) y se pasa al tier siguiente.
-   Al cerrar el Legendario, el Tipo siguiente.
-
-**Cuota del Tipo 4** (20 % de ~300 = ~60 armas, con la pirámide de P1): Común ~18 · Buena ~16 · Raro ~12 · Excepcional ~9 · Legendario ~5. **Hoy hay 53** (Común 19 · Buena 14 · Raro 11 · Excepcional 6 · Legendario 3), con 4 de rango (hondas, cerbatana) y 14 marcadas ⚠️ (a auditar).
+**El paso a paso (decidido por el dueño, 2026-10-03 — «me gustó mucho cómo me permitió auditar y comparar»).** Se hace juntos, Tipo por Tipo y
+tier por tier; el dueño dice cuál («ahora vamos a hacer espadas, de Buena calidad») y se sigue siempre este orden:
+1. **Repasar las mecánicas del Tipo**: la lista lista para copiar (identidad · 🏠 propio · 🤝 puede ir · ✨ excepción · 🚫 ajeno · fuera del Tipo),
+   marcando con 🔧 lo que todavía no funciona solo en un arma. Si el Tipo no tiene definiciones, se arman primero y el dueño las aprueba.
+2. **Tabla comparativa de lo que hay hoy** en ese Tipo y tier (con `herramientas/calculadora_armas.py`): dados, fijo, bonos, al golpear, precio,
+   PC y tier calculado, precio calculado, observación (copias, fuera de tier, huecos, precios desparejos).
+3. **El dueño pide los cambios** (sacar, ajustar, sumar con tal mecánica…) y se arma **la lista nueva** completa en una tabla para revisar
+   (con «Cambio» por fila y las dudas aparte). Se guarda acá como «propuesta» y se itera hasta el OK.
+4. **Con el OK, reemplaza a todo ese Tipo y tier en el catálogo** (`comun/catalogo.js`): conservar los ids de las que siguen, ids `cat-<slug>` para
+   las nuevas, sin nombres repetidos con otros tiers, Detalle con ⚙/✋, narrativa. Revisar quién usa las que salen (los humanos de
+   `comun/creeps-base.js`: tabla `ITEMS`, sus `hu(…)` y la tabla `EQUIPO_CREEP` — retocar a mano, **no** regenerarla entera con
+   `generar_equipo_creeps.py`, que cambia el equipo de todos los creeps). Si hace falta una mecánica nueva (🔧), se construye. Pruebas en verde,
+   versiones, subir.
 
 ### Tipo 4 — Punzantes: definiciones (✅ aprobadas por el dueño, 2026-10-03: «están bien, pero podemos sumar las mecánicas que no existían cuando se hizo la primera tanda»)
 **Identidad:** el arma **barata en Nitros** (el primer ataque cuesta 2, los siguientes 4): muchos golpes chicos y precisos. Daño bajo por golpe, que se compensa con **precisión y crítico potente** (el T4 aprovecha hasta 6 puntos de potente; de frecuente solo 2). Dagas, cuchillos, estiletes, punzones, agujas, estoques, lanzas.
@@ -416,3 +418,9 @@ Todas: una mano, Tipo 4. PC = calculadora v0 (Común < 7,5).
 
 Salen (copias): Cuchillo del grumete polizón, Punzón del ladronzuelo, Lanza de guardia de puerta, Estileto ritual del acólito.
 🔧 «Seguro si es crítico» en un efecto de arma no existe todavía (Critical Matters hoy es solo de habilidades): se construye si se aprueba.
+
+**✅ Aplicado (2026-10-03, OK del dueño):** la propuesta v1 reemplazó a las 15 T4 Comunes cuerpo a cuerpo del catálogo (quedan 18). Cambios al cargarla:
+«Puñal aserrado» se llama **Cuchillo dentado** (ya había un Puñal aserrado Raro). Los humanos que llevaban las copias ahora llevan el arma del catálogo
+(Ladronzuelo y Trampero → Daga; Guardia de puerta y Vigía de patrulla → Lanza corta; Grumete → Cuchillo de cazador; Acólito → Estileto). Se construyó
+**«seguro si es crítico»** para los efectos de arma (`seguroCritico` en `efectosGolpe`: casilla en el asistente de ítems; el duelo, si el golpe fue
+crítico, lo deja entrar sin tirar). `buscar_duplicados.py` marca Daga ~ Cuchillo de trinchera: a propósito (la trinchera es la resistente).

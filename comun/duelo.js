@@ -740,6 +740,7 @@ const Duelo = (() => {
       if(e.spec && e.spec.nombre) o.spec = e.spec;
       if(_num(e.cura) > 0) o.cura = Math.round(_num(e.cura));
       if(e.no2 !== undefined){ o.no2 = Math.max(0, Math.round(_num(e.no2))); o.no2Dif = !!e.no2Dif; o.no2Sentado = !!e.no2Sentado; }
+      if(e.seguroCritico && caras > 1) o.seguroCritico = true;
       o.requiereDano = requiereDanoDe(e);
       o.res = null; o.omitido = false; o.motivo = ''; o.aplicar = ''; o.aplicado = false; o.nota = '';
       return o;
@@ -823,6 +824,8 @@ const Duelo = (() => {
       const be = m.ataque && m.ataque.espalda;   // por la espalda: el daño fijo del arma o la habilidad
       if(be && be.fijo) m.dano = {...m.dano, crudo: m.dano.crudo + be.fijo, mod: m.dano.mod + be.fijo, formula: `${m.dano.formula} +${be.fijo} espalda`.slice(0, 60)};
       m.efectos = normalizarEfectos(m.hab ? m.hab.efectos : efectos);
+      // «Seguro si es crítico» (2026-10-03): un efecto con porcentaje que, si el golpe fue crítico, entra sin tirar.
+      if(m.crit && m.crit.critico) m.efectos = m.efectos.map(ef => ef.seguroCritico ? {...ef, caras: 1, exitos: 1, detalle: `${ef.detalle ? ef.detalle + ' ' : ''}(Fue crítico: entra seguro.)`.slice(0, 200)} : ef);
       tx.update(ref, cambiosDe(m));
     });
   }
@@ -2007,5 +2010,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {limpiarEspalda, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab};
+  return {limpiarEspalda, guardarDano, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab};
 })();

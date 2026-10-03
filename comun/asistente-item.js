@@ -417,7 +417,8 @@ const AsistenteItem = (() => {
           <input data-aa-golpe="${i}" data-campo="dado" value="${e(ef.dado || '')}" placeholder="tirada extra: ej. 1d6">
           <button type="button" class="aa-x" data-aa-golperm="${i}">×</button>
           <input class="aa-ancho" data-aa-golpe="${i}" data-campo="detalle" value="${e(ef.detalle || '')}" placeholder="qué hace (opcional): ej. Veneno de 4 stacks">
-          <div class="aa-regla">${eg && x.nombre ? e(eg.reglaTxt(x)) + (x.dado ? ` Si entra, se tira además ${e(x.dado)}.` : '') : ''}</div>
+          ${x.caras > 1 ? `<label class="aa-ancho" style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-aa-golpe="${i}" data-campo="seguroCritico" ${ef.seguroCritico ? 'checked' : ''} style="width:auto"> Si el golpe es crítico, entra seguro (sin tirar)</label>` : ''}
+          <div class="aa-regla">${eg && x.nombre ? e(eg.reglaTxt(x)) + (x.seguroCritico && x.caras > 1 ? ' Con un crítico, entra seguro.' : '') + (x.dado ? ` Si entra, se tira además ${e(x.dado)}.` : '') : ''}</div>
         </div>`;
       }).join('')) + `<div class="aa-opciones">
         ${['Envenenar', 'Sangrado', 'Rompe armadura'].map(t => `<button type="button" class="aa-op" data-aa-golpeadd="${t}">+ ${t}</button>`).join('')}
@@ -626,6 +627,8 @@ const AsistenteItem = (() => {
       if(t.dataset.campo === 'prob'){
         const [caras, exitos] = t.value.split('/').map(n);
         ef.caras = caras; ef.exitos = exitos;
+      }else if(t.dataset.campo === 'seguroCritico'){
+        if(t.checked) ef.seguroCritico = true; else delete ef.seguroCritico;
       }else{
         ef[t.dataset.campo] = t.value;
       }
@@ -638,7 +641,7 @@ const AsistenteItem = (() => {
     alEscribir(ev);
     if(t.dataset.aaDestino){ st.destino = t.value; dibujar(); return; }
     // La regla de cada efecto y la lista de resistencias dependen de lo elegido.
-    if((t.dataset.aaGolpe !== undefined && t.dataset.campo === 'prob') || (t.dataset.aaMod1 && CRIT_IDS.includes(t.dataset.aaMod1))){
+    if((t.dataset.aaGolpe !== undefined && (t.dataset.campo === 'prob' || t.dataset.campo === 'seguroCritico')) || (t.dataset.aaMod1 && CRIT_IDS.includes(t.dataset.aaMod1))){
       setTimeout(() => { if(st) dibujar(); }, 0);
       return;
     }

@@ -129,7 +129,8 @@ const AsistenteDueloHab = (() => {
       contraModo: (ini && ini.contraOtro) ? 'otro' : (ini && Array.isArray(ini.contra) && ini.contra.length) ? 'stats' : (ini && ini.tira !== undefined) ? 'ninguna' : 'stats',
       contraOtro: (ini && ini.contraOtro) || '',
       dano: !!(ini && ini.dano), tipoDano: (ini && ini.tipoDano) || 'arcano',
-      danoDif: !!(ini && ini.danoDiferencia), danoExtra: (ini && ini.danoExtra) || '',   // solo zona (2026-10-02)
+      danoDif: !!(ini && ini.danoDiferencia), danoExtra: (ini && ini.danoExtra) || '',   // la diferencia: zona y dirigida; la tirada extra: solo zona (2026-10-02)
+      drena: !!(ini && ini.drena), drenaTope: ini && ini.drenaTope !== undefined ? Number(ini.drenaTope) || 0 : 50,   // drena (2026-10-02, Drenar Vida): no en una zona
       // Efecto que no se puede automatizar del todo (2026-09-27, pedido del dueño): texto libre que se muestra
       // en el cuadro del duelo junto al resultado, para lo que hay que resolver a mano (ej. "drenás la diferencia").
       efectoLibreOn: !!(ini && ini.efectoLibre), efectoLibre: (ini && ini.efectoLibre) || '',
@@ -341,20 +342,26 @@ const AsistenteDueloHab = (() => {
     function cuerpoDano(){
       let h = titulo('', 'Daño y lo que no se pueda automatizar', 'Si la habilidad hace daño, usa la fórmula que ya tiene cargada (su «segunda tirada», por ejemplo 2d6+3) — se escribe en el editor de siempre de la habilidad, no acá. Si además (o en vez de eso) tiene un efecto que el sistema no calcula solo, escribilo como texto.');
       const esZona = st.objetivo === 'zona';
-      const dif = esZona && st.dano && st.danoDif;
+      const puedeDif = st.objetivo !== 'uno mismo';
+      const dif = puedeDif && st.dano && st.danoDif;
       h += `<div class="adh-modo">
         <label class="op"><input type="radio" name="hacedano" value="no" ${!st.dano ? 'checked' : ''}> No hace daño</label>
         <label class="op"><input type="radio" name="hacedano" value="si" ${st.dano && !dif ? 'checked' : ''}> Sí, con su fórmula${cfg.tieneFormula === false ? ' <span class="nota">(esta habilidad todavía no tiene fórmula: escribila en su editor)</span>' : ''}</label>
-        ${esZona ? `<label class="op"><input type="radio" name="hacedano" value="dif" ${dif ? 'checked' : ''}> Sí: la diferencia entre las tiradas</label>` : ''}
+        ${puedeDif ? `<label class="op"><input type="radio" name="hacedano" value="dif" ${dif ? 'checked' : ''}> Sí: la diferencia entre las tiradas</label>` : ''}
       </div>`;
-      if(dif) h += `<p class="nota">Cada uno que no resiste recibe tu tirada menos la suya (si empatan, nada). Si resiste, no le pasa nada. Necesita una tirada (paso «Tirada») y una resistencia (paso «Resistencia»).</p>`;
+      if(dif) h += `<p class="nota">${esZona ? 'Cada uno que no resiste recibe' : 'Si no la resiste, recibe'} tu tirada menos la suya (si empatan, nada). Si resiste, no le pasa nada. Necesita una tirada (paso «Tirada») y una resistencia (paso «Resistencia»).</p>`;
       if(st.dano){
         h += `<div class="fila"><span>Tipo:</span><select data-tipodano>${TIPOS.map(([v, t]) => `<option value="${v}"${st.tipoDano === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
           <label class="op"><input type="checkbox" data-ignoradano ${st.ignoraDano ? 'checked' : ''}> Ignora la Defensa (va derecho a la vida y no critica)</label>
           <p class="nota">Arranca marcado o no según el tipo (mágico = sí, físico = no), pero es independiente: lo que decide no es el elemento, es cómo se narra la habilidad — una "ráfaga de hielo" (energía) ignora la Defensa; una "aguja de hielo" (un objeto físico arrojado) no, aunque las dos sean "Hielo". Destildá acá para esa excepción.</p>`;
-        if(cfg.costoVariable){
+        if(cfg.costoVariable && !dif){
           h += `<div class="fila" style="margin-top:8px"><span>Además, por cada punto de X (tu costo en ${cfg.costoVariable === 'sp' ? 'SP' : 'Nitros'}):</span><span>+</span><input type="number" style="width:70px" data-danoporx value="${esc(st.danoFijoPorX)}"><span>de daño fijo</span></div>
             <p class="nota">Ej. "amplifica el daño en el doble de X" → poné 2: con X = 3 suma +6 al tirar. Vacío o 0 = la fórmula no cambia con X.</p>`;
+        }
+        if(!esZona){
+          h += `<label class="op" style="margin-top:10px"><input type="checkbox" data-drena ${st.drena ? 'checked' : ''}> Drena: quien la usa se cura lo que hizo de daño</label>`;
+          if(st.drena) h += `<div class="fila"><span>Puede pasar su vida máxima hasta</span><input type="number" min="0" style="width:70px" data-drenatope value="${esc(st.drenaTope)}"><span>% (lo de más queda como Excedente de vida; 0 = no pasa el máximo)</span></div>
+            <p class="nota">Se cura lo que el objetivo perdió de verdad (si un escudo lo absorbió o era Invulnerable, drena menos o nada).</p>`;
         }
         if(esZona){
           h += `<div class="fila" style="margin-top:10px"><span>Si el daño entra, tirar además:</span><input type="text" style="width:90px" data-danoextra placeholder="ej. 1d20" value="${esc(st.danoExtra)}"></div>
@@ -473,7 +480,7 @@ const AsistenteDueloHab = (() => {
         filas.push(sinOp() ? '<b>Sin tirada</b>: se aplica directo'
           : st.tiraModo === 'custom' ? `<b>Tirada custom</b>: ${esc(st.tiraFormula) || '(sin fórmula)'}${st.tiraEtiqueta ? ' · ' + esc(st.tiraEtiqueta) : ''} contra ${contraTxt}`
           : `<b>Tirada</b>: ${STAT_TXT[st.tira] || st.tira} contra ${contraTxt}`);
-        if(st.dano) filas.push(`<b>Daño</b>: ${st.objetivo === 'zona' && st.danoDif ? 'la diferencia entre las tiradas, ' : ''}tipo ${st.tipoDano}${st.ignoraDano ? ', ignora la Defensa' : ''}${cfg.costoVariable && st.danoFijoPorX ? `, +${st.danoFijoPorX} por X` : ''}${st.objetivo === 'zona' && st.danoExtra ? `; si entra, tira ${esc(st.danoExtra)}` : ''}`);
+        if(st.dano) filas.push(`<b>Daño</b>: ${st.danoDif && st.objetivo !== 'uno mismo' ? 'la diferencia entre las tiradas, ' : ''}${st.drena && st.objetivo !== 'zona' ? `drena (se cura lo que hace${st.drenaTope ? `, hasta +${st.drenaTope} % de su máximo` : ''}), ` : ''}tipo ${st.tipoDano}${st.ignoraDano ? ', ignora la Defensa' : ''}${cfg.costoVariable && st.danoFijoPorX ? `, +${st.danoFijoPorX} por X` : ''}${st.objetivo === 'zona' && st.danoExtra ? `; si entra, tira ${esc(st.danoExtra)}` : ''}`);
         if(st.efectoLibreOn && st.efectoLibre.trim()){ const t = st.efectoLibre.trim(); filas.push(`<b>Efecto a mano</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
       }
       if(st.modo !== 'flash' && st.objetivo !== 'zona'){
@@ -543,6 +550,8 @@ const AsistenteDueloHab = (() => {
       f.querySelectorAll('[name=contramodo]').forEach(r => r.onchange = () => { st.contraModo = r.value; dibujar(); });
       q('[data-contraotro]', e => { st.contraOtro = e.target.value; });
       f.querySelectorAll('[name=hacedano]').forEach(r => r.onchange = () => { st.dano = r.value !== 'no'; st.danoDif = r.value === 'dif'; dibujar(); });
+      q('[data-drena]', e => { st.drena = e.target.checked; dibujar(); });
+      q('[data-drenatope]', e => { st.drenaTope = Math.max(0, Number(e.target.value) || 0); });
       q('[data-danoextra]', e => { st.danoExtra = e.target.value.trim(); });
       q('[data-tipodano]', e => { st.tipoDano = e.target.value; st.ignoraDano = st.tipoDano !== 'fisico'; dibujar(); });
       q('[data-ignoradano]', e => { st.ignoraDano = e.target.checked; });
@@ -638,7 +647,12 @@ const AsistenteDueloHab = (() => {
           if(!st.contraOtro.trim()){ alert('Escribí con qué se resiste (o elegí «Nadie» si no hay nada que resista).'); return false; }
           out.contraOtro = st.contraOtro.trim();
         }
-        if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; out.ignoraDano = st.ignoraDano; if(cfg.costoVariable && st.danoFijoPorX) out.danoFijoPorX = st.danoFijoPorX; }
+        if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; out.ignoraDano = st.ignoraDano; if(cfg.costoVariable && st.danoFijoPorX && !st.danoDif) out.danoFijoPorX = st.danoFijoPorX; }
+        if(st.dano && st.objetivo !== 'zona' && st.objetivo !== 'uno mismo' && st.danoDif){
+          if(!hayTira || !out.contra.length){ alert('El daño «la diferencia» necesita una tirada (paso Tirada) y algo con qué resistirla (paso Resistencia).'); return false; }
+          out.danoDiferencia = true;
+        }
+        if(st.dano && st.objetivo !== 'zona' && st.drena){ out.drena = true; out.drenaTope = Math.max(0, Math.round(Number(st.drenaTope) || 0)); }
         if(st.objetivo === 'zona' && st.dano){
           if(st.danoDif){
             if(!hayTira || st.tiraModo === 'custom' || !out.contra.length){ alert('El daño «la diferencia» necesita que quien la usa tire un stat (paso Tirada) y algo con qué resistirla (paso Resistencia).'); return false; }

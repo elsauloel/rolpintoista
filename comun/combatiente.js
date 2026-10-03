@@ -409,7 +409,10 @@ const Combatiente = (() => {
       alcance: c.objetivo === 'uno mismo' || c.objetivo === 'area' || c.objetivo === 'onda' ? 0 : alcanceHab(c, stat, o.stat),
       tira: c.tiraFormula ? {formula: sx(c.tiraFormula), etq: c.tiraEtiqueta || 'Tirada'} : (stat ? {stat, etq: etq(stat), bono: nf(h.tiradaBono)} : null),
       contra: (c.contra || []).map(s => ({modo: s, stat: s, etq: etq(s)})),
-      dano: c.dano && formula ? {formula, tipo, ignoraDef: c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico'} : null,
+      // Daño «la diferencia» (2026-10-02, Drenar Vida): no se tira, es lo que quien la usa le ganó a la resistencia. «Drena»: quien la
+      // usa se cura lo que hizo de daño, y puede pasar su vida máxima hasta `drenaTope` % (como Excedente de vida).
+      dano: c.dano && (formula || c.danoDiferencia) ? {formula: c.danoDiferencia ? '' : formula, tipo, ignoraDef: c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico',
+        ...(c.danoDiferencia ? {diferencia: true} : {}), ...(c.drena ? {drena: true, drenaTope: Math.max(0, nf(c.drenaTope))} : {})} : null,
       efectos: (c.efectos || []).map(efectoDeEjecucion),
       ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: nf(c.radio)} : {}),
       ...(c.efectoLibre ? {efectoLibre: sx(c.efectoLibre)} : {}),

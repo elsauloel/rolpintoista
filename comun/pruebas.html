@@ -1437,6 +1437,21 @@ prueba('Ejecución ✨ en la ventana común: los pasos dependen del objetivo y G
   igual([antes.includes('Alcance'), despues.includes('Alcance'), titulo, r && r.duelo && r.duelo.objetivo, r && r.costo && r.costo.sp, mia.isConnected],
     [true, false, `Ejecución ✨ · Rayo · paso ${antes.indexOf('Objetivo') + 1} de ${despues.length}: Objetivo`, 'uno mismo', '2', false]);
 });
+prueba('Ejecución ✨: «la diferencia» y «drena» se eligen en el paso Daño (no solo en zonas) y llegan al duelo', async () => {
+  let r = 'nada';
+  const ini = {objetivo: 'enemigo', tira: '', tiraFormula: 'X+1dX', tiraEtiqueta: 'Drenar', contra: ['resmg'], dano: true, tipoDano: 'arcano', ignoraDano: true, danoDiferencia: true, drena: true, drenaTope: 50, efectos: []};
+  AsistenteDueloHab.abrir({nombre: 'Drenar Vida', inicial: ini, costoInicial: {sp: 'X', nitrosCosto: 2}, costoVariable: 'sp', alGuardar: x => { r = x; }});
+  const mia = [...document.querySelectorAll('.pap')].pop(), q = s => mia.querySelector(s);
+  const tabs = [...mia.querySelectorAll('[data-pap-paso]')].map(b => b.textContent.replace(/^\d+\. /, ''));
+  q(`[data-pap-paso="${tabs.findIndex(t => /Da[ñn]o/.test(t))}"]`).click();
+  const ui = [!!q('input[name=hacedano][value=dif]:checked'), !!q('[data-drena]:checked'), q('[data-drenatope]') && q('[data-drenatope]').value];
+  q('[data-pap="guardar"]').click(); await new Promise(res => setTimeout(res, 0));
+  const c = r && r.duelo, h = Combatiente.habEjecucion({nombre: 'Drenar Vida', tiradaExtra: ''}, c, {X: 3});
+  const limpia = Duelo.limpiarHab(h);
+  igual([ui, c && [c.danoDiferencia, c.drena, c.drenaTope, c.danoFijoPorX], h && h.dano, limpia && limpia.dano, limpia && limpia.tira],
+    [[true, true, '50'], [true, true, 50, undefined], {formula: '', tipo: 'arcano', ignoraDef: true, diferencia: true, drena: true, drenaTope: 50},
+     {formula: '', tipo: 'arcano', ignoraDef: true, diferencia: true, drena: true, drenaTope: 50}, {formula: '3+1d3', etq: 'Drenar'}]);
+});
 prueba('paso a paso: al crear, «✔ Crear» solo en el último paso; Cancelar pregunta y descarta; los pasos pueden depender de lo elegido', async () => {
   const hechos = [];
   let conExtra = false;

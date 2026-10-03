@@ -662,6 +662,48 @@ async function dueloEspinas(d, golpe){
   }
 }
 
+/* Drena (2026-10-02, Drenar Vida): quien usó la habilidad se cura lo que el objetivo perdió de verdad (`monto`); lo que pasa de su vida
+   máxima queda como Excedente de vida, hasta `drenaTope` % del máximo (sumado al que ya tenía). A un personaje, la vida en su parte
+   `general` (como dueloCurar) y el Excedente por su cola de estados (comun/recibidos.js); a un creep, todo en sus datos; a una invocación,
+   la vida (el excedente, a mano). */
+async function dueloDrenar(d, monto){
+  const quien = d.atacante.nombre;
+  monto = Math.max(0, Math.round(num(monto)));
+  if(!monto) return {quien, monto: 0, nota: 'no hizo daño: no drena nada'};
+  const ta = tokens.get(d.atacante.tokenId);
+  if(!ta) return {quien, monto, manual: true, motivo: 'el token de quien la usó ya no está en el mapa'};
+  const pct = Math.max(0, num(d.hab.dano.drenaTope));
+  const excedenteDe = estados => { const e = (estados || []).find(x => x && (x.excedenteVida || x.excedente || x.nombre === 'Excedente de vida')); return e ? num(e.escudoMagicoActual ?? e.escudo ?? e.escudoMagico) : 0; };
+  try{
+    if(ta.tipo === 'creep'){
+      const r = await modificarCreep(ta.fichaId, sc => {
+        const previo = num(sc.hp), max = num(sc.hpMax) > 0 ? num(sc.hpMax) : previo + monto;
+        sc.hp = Math.min(max, previo + monto);
+        const sobra = monto - (sc.hp - previo), tope = Math.floor(max * pct / 100), antes = excedenteDe(sc.estados);
+        const exc = sobra > 0 && tope > antes ? Math.min(tope, antes + sobra) : 0;
+        if(exc) EstadosAplicar.aplicarACreep(sc, {nombre: 'Excedente de vida', escudoMagico: exc});
+        return {previo, nuevo: sc.hp, exc};
+      });
+      return {quien, monto, hpAntes: r.previo, hpDespues: r.nuevo, ...(r.exc ? {excedente: r.exc} : {})};
+    }
+    if(String(ta.fichaId).includes(SEP_INVOCACION)){
+      const r = await dueloCurarInv(ta, monto);
+      const sobra = monto - (num(r.nuevo) - num(r.previo));
+      return {quien, monto, hpAntes: num(r.previo), hpDespues: num(r.nuevo), ...(sobra > 0 && pct ? {nota: `lo que pasa del máximo (${sobra}), a mano`} : {})};
+    }
+    const r = await dueloCurar(ta, monto);
+    const sobra = monto - (num(r.nuevo) - num(r.previo));
+    const f = fichasPub.get(ta.fichaId), rs = (f && f.resumen) || {};
+    const max = num(rs.hpMax) > 0 ? num(rs.hpMax) : num(r.nuevo), tope = Math.floor(max * pct / 100), antes = excedenteDe(rs.estados);
+    const exc = sobra > 0 && tope > antes ? Math.min(tope, antes + sobra) : 0;
+    if(exc) await EstadosAplicar.encolarPj({fichaId: ta.fichaId, duenoUid: ta.duenoUid, spec: {nombre: 'Excedente de vida', escudoMagico: exc}, origen: `${quien} · ${d.hab.nombre}`});
+    return {quien, monto, hpAntes: num(r.previo), hpDespues: num(r.nuevo), ...(exc ? {excedente: exc} : {})};
+  }catch(err){
+    console.error('No se pudo aplicar el drenaje:', err);
+    return {quien, monto, manual: true, motivo: 'falló la escritura'};
+  }
+}
+
 async function dueloAplicarDano(d){
   const dn = d.dano, t = tokens.get(d.defensor.tokenId);
   const critReal = d.resultado === 'pego' && d.crit && d.crit.critico;   // un crítico siempre ignora la Defensa, aunque el d20 no multiplique (×1)
@@ -696,7 +738,8 @@ async function dueloAplicarDano(d){
     const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando)
       : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando);
     const espinas = res.r.invulnerable ? null : await dueloEspinas(d, golpe);   // el daño inflictido (con el multiplicador del crítico), antes de la Defensa
-    return {...base, desgaste, defensa: crit ? restaIgnorando : def, recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {})};
+    const drena = d.hab && d.hab.dano && d.hab.dano.drena ? await dueloDrenar(d, Math.max(0, num(res.previo) - num(res.nuevo))) : null;
+    return {...base, desgaste, defensa: crit ? restaIgnorando : def, recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(drena ? {drena} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);
     return {...base, defensa: def, manual: true, golpe: base.mitad ? aplicar : golpe, motivoManual: err && err.message === 'SIN_DEF' ? 'la ficha todavía no publicó su Defensa' : 'falló la escritura'};

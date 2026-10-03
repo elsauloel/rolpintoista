@@ -955,7 +955,7 @@ Crítico frecuente +1.** Derribar = deja Sentado (se usa en las hachas); Demora 
 pasa a ser un hacha a dos manos con otro nombre; el Hacha con pico es la de Crítico frecuente +1; Hacha de batalla → a la revisión de las Raras,
 Hacha de la furia roja → se rehace como Buena.
 
-### T8 Buena calidad — propuesta v1: 18 armas (2026-10-03, ⬜ a revisar por el dueño)
+### T8 Buena calidad — propuesta v1: 18 armas (2026-10-03, ✅ aprobada y cargada)
 | Arma | Lo que hace · precio |
 |---|---|
 | **Con Rompe armadura** | |
@@ -986,3 +986,7 @@ poco se balancea». En la calculadora, `DESCUENTO_DOS_MANOS` = 0,75 PC (~10 % de
 (T4, T6 y T8 Común): todas bajaron ~10 %; la **Lanza del guardián del paso** y la **Lanza del montero mayor** quedaban apenas debajo de Raro y
 ganaron durabilidad (Resistente, 9) para seguir Raras. El **Hacha grande del aserradero** queda con la opción (b): 2 manos · 2 dados · Alcance +1
 (150, Buena). Con eso las Buenas quedan 8 con Rompe armadura y 10 sin.
+
+**T8 Buena cargada (2026-10-03), 9 y 9 (dueño):** para volver a 9 con Rompe armadura, el **Hacha de guerra ligera** pasa a 1 dado · +2 · Rompe armadura
+50 % (100; con 2 dados +1 y 33 % quedaba igual al Hachón de minero). El Espadón de batalla quedó como Hacha grande del aserradero (mismo id). El
+**Hacha de batalla** pasó a Raro (precio 250) para revisarla con las Raras; la Rara «⚠️ Hacha de doble filo» se renombra en esa revisión. Sigue: T8 Raro.

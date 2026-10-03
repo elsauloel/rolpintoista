@@ -102,8 +102,8 @@ const GuiaDiseno = (() => {
     {n: 'Estado al equipar', d: 'Un estado que se activa solo cuando la equipás.'},
   ];
   const FAMILIAS = [
-    {id: 'hacha', ico: '🪓', n: 'Hachas', resumen: 'Cortantes pesadas que abren la armadura.', dado: 'Tipo 8 (cortante pesado), orientativo', casa: 'Rompe armadura'},
-    {id: 'contundente', ico: '🔨', n: 'Contundentes', resumen: 'Mazas y martillos: golpes que aturden y desordenan.', dado: 'Tipo 8–10 (contundente liviano / pesado)', casa: 'Demora (baja 1 lugar en la iniciativa)'},
+    {id: 'hacha', ico: '🪓', n: 'Hachas', resumen: 'Cortantes pesadas que abren la armadura.', dado: 'Tipo 8 (hachas, siempre)', casa: 'Rompe armadura'},
+    {id: 'contundente', ico: '🔨', n: 'Contundentes', resumen: 'Mazas y martillos: golpes que aturden y desordenan.', dado: 'Tipo 10 (contundente)', casa: 'Demora (baja 1 lugar en la iniciativa)'},
     {id: 'punzante', ico: '🔱', n: 'Punzantes', resumen: 'Lanzas, dagas y estoques: precisión que lisia.', dado: 'Tipo 4 (perforante)', casa: 'Lisiado'},
     {id: 'cortante', ico: '🗡️', n: 'Cortantes', resumen: 'Espadas y sables: cortes que sangran.', dado: 'Tipo 6', casa: 'Sangrado'},
     {id: 'explosivo', ico: '💣', n: 'Explosivos', resumen: 'Muy raros: el Tipo 12 es solo del efecto Explosión (daño en área).', dado: 'Tipo 12 (solo con Explosión)', casa: 'Explosión'},

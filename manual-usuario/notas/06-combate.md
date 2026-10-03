@@ -236,7 +236,7 @@ Cada arma tiene un **Tipo** y un **Peso**. Con esos dos números sabés cuánto 
 |---|---|---|
 | **4** | Perforante | Daga, cuchillo, honda |
 | **6** | Cortante | Espada corta, katana, arco |
-| **8** | Cortante pesado / contundente liviano | Hacha, lanza, ballesta |
+| **8** | Hachas | Hacha de mano, hacha de guerra, hacha doble |
 | **10** | Contundente pesado | Maza, martillo |
 | **12** | Explosivo (excepcional) | Lanzallamas, martillo del Titán |
 

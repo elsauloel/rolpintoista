@@ -46,7 +46,7 @@ Para calcular calidad, tier y precio (P112), cada elemento del diseño tiene una
 | **Cortantes** (espadas, sables…) | **Sangrado** (pierde HP por turno; se acumula de a 1) | Lisiado | ✅ estado *Sangrado* |
 | Explosivos, de rango, escudos, armas naturales, mágicas | *por definir* | | 🔲 |
 
-- Los dados del tipo de arma ya orientan la familia (glosario: 4 perforante, 6 cortante, 8 cortante pesado / contundente liviano, 10 contundente pesado, 12 explosivo).
+- Los dados del tipo de arma ya orientan la familia (glosario: 4 perforante, 6 cortante, 8 hachas —siempre—, 10 contundente pesado, 12 explosivo).
 - El daño elemental (fuego, hielo, electricidad, veneno) suele ir por su lado: *Prende fuego*, *Escarcha*, *Stun*, *Envenenar*.
 - Hay que decidir qué pasa con los nombres: en el juego **"Derribar"** ya es un efecto de arma (cae al suelo, a mano). *Knockdown* como efecto de iniciativa necesita un nombre que no se pise con ese.
 

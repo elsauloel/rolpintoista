@@ -43,8 +43,8 @@ const AsistenteItem = (() => {
   const DADOS = [4, 6, 8, 10, 12];
   const TIPOS = {
     4: {nombre: 'Perforante', ejemplo: 'dagas, estoques, lanzas livianas'},
-    6: {nombre: 'Cortante', ejemplo: 'espadas, cimitarras, hachas de mano'},
-    8: {nombre: 'Cortante pesado o contundente liviano', ejemplo: 'hachas de guerra, mazas, bastones'},
+    6: {nombre: 'Cortante', ejemplo: 'espadas, cimitarras, sables'},
+    8: {nombre: 'Hachas', ejemplo: 'hachas de mano, hachas de guerra, hachas dobles'},   // el Tipo 8 es siempre hachas (dueño, 2026-10-03)
     10: {nombre: 'Contundente pesado', ejemplo: 'martillos de guerra, mazas de dos manos'},
     12: {nombre: 'Explosivo / armas modernas', ejemplo: 'lanzallamas, explosivos (tier Excepcional)'},
   };

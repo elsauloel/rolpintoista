@@ -354,7 +354,7 @@ Lo esencial en una pantalla. Para el detalle, seguí los enlaces.
 
 | 6 | d6 | Cortante |
 
-| 8 | d8 | Cortante pesado / contundente liviano |
+| 8 | d8 | Hachas |
 
 | 10 | d10 | Contundente pesado |
 

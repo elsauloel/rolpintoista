@@ -602,3 +602,34 @@ o dos efectos) · por la espalda grande · PdG +3. Excepciones ✨ todavía sin 
 **Mecánicas de firma posibles (🔧 a construir, una por arma):** «+1 d20 en el crítico» (más chance de ×3/×4 y de supercrítico); «no se puede
 parrear» (ya existe para habilidades: `sinParry`); «el ataque de oportunidad no cuesta No2»; «el primer ataque del turno cuesta 1 No2 menos»
 (los Nitros valen mucho); «con crítico, el Veneno pasa a severo»; «con crítico, drena el 100 %»; «Sangrado que entra con 2 stacks».
+
+### T4 Excepcional — propuesta v1 (2026-10-03, ⬜ a revisar por el dueño)
+Decisiones del dueño: 18; las que existen sirven de referencia conceptual y se reajustan a la progresión; **mecánicas de firma**; fuego afuera,
+alguna con **daño mágico** (rayo, hielo); **Rengo** en alguna; **Veneno severo nunca seguro** (solo con % o «si es crítico»: el seguro queda para
+Legendaria); el Báculo mágico sale del Tipo 4.
+
+| # | Arma (de la Rara…) | Manos | Dados | Fijo | Bonos | Al golpear | Firma 🔧 | Precio |
+|---|---|---|---|---|---|---|---|---|
+| 1 | Colmillo dientes de sable (desgarrador) | 1 | 2 | +2 | PdG +1, Crít. potente +3 | Sangrado **3 stacks** 75 % | Sangrado que entra con más stacks | 500 |
+| 2 | Beso de la viuda (viuda negra) | 1 | 1 | +2 | 🗡 espalda: +3 PdG, +3 daño | Veneno 5 stacks (siempre) · ⚡ si es crítico: Veneno severo | — | 600 |
+| 3 | Bisturí del anatomista (cirujano) | 1 | 1 | +2 | PdG +2, Crít. potente +2 | Lisiado 75 %, seguro si es crítico · **Rengo 50 %** | Rengo en armas | 850 |
+| 4 | Estilete del gran maestro (maestro) | 1 | 1 | +1 | PdG +3, Crít. frecuente +1 | ⚡ si es crítico: Lisiado | **No se puede parrear** | 1300 |
+| 5 | Daga del guardia real (escolta) | 1 | 1 | +2 | PdG +2, PdG oport. +3 | — | **Ataque de oportunidad sin No2** | 550 |
+| 6 | Colmillo del conde (sedienta) | 1 | 2 | +1 | PdG +1 · 🗡 espalda: +2 PdG, +2 daño | Drena vida 50 % · ⚡ si es crítico: drena 100 % | — | 800 |
+| 7 | Pica del Muro Eterno (guardián del paso) | 2 | 3 | — | Alcance +2, PdG oport. +3, PdG +1 | Lisiado 50 % | **Ataque de oportunidad sin No2** | 950 |
+| 8 | Estoque del campeón (duelista) | 1 | 2 | — | Iniciativa +2, PdG +2, Ignora 2 | — | **No se puede parrear** | 1900 |
+| 9 | Puñal de la noche sin luna (sereno) | 1 | 1 | — | PdG +2, Crít. potente +4 · 🗡 espalda: +4 PdG, +4 daño, +2 Crít. potente | — | — | 950 |
+| 10 | Daga del almirante (comodoro) | 1 | 1 | — | PdG +2, Crít. frecuente +2 | — | **Primer ataque del turno: −1 No2** | 1200 |
+| 11 | Lanza del alba (montero / referencia) | 2 | 3 | — | Alcance +2, PdG +1, Crít. potente +2 | Lisiado 50 % | **+1d4 de daño de rayo** (ignora la Defensa) | 1200 |
+| 12 | Lanza del cazador de dragones (montero mayor) | 2 | 2 | — | Alcance +1, PdG +1, PdG oport. +2, Crít. potente +3 | **Rengo 50 %**, seguro si es crítico | Rengo en armas | 700 |
+| 13 | Florete del maestro de armas (esgrima) | 1 | 2 | — | Crít. frecuente +2, Crít. potente +3 | ⚡ si es crítico: Sangrado y Lisiado | **+1 d20 en el crítico** | 1400 |
+| 14 | Aguja de los mil años (vigilia eterna) | 1 | 1 | — | PdG oport. +4, Crít. frecuente +1, Ignora 2 | — | **Primer ataque del turno: −1 No2** | 1600 |
+| 15 | Aguijón de la Reina Avispa (alquimista / referencia) | 1 | 2 | +2 | Crít. potente +4, Crít. frecuente +1 | **Veneno severo 50 %** | — | 850 |
+| 16 | Misericordia del verdugo (misericordia) | 1 | 2 | — | Crít. potente +4, Ignora 2 | ⚡ si es crítico: Sangrado 3 stacks | **+1 d20 en el crítico** | 1400 |
+| 17 | Aguja de escarcha (puñal envenenado) | 1 | 2 | +1 | PdG +1, Crít. potente +3 | ⚡ si es crítico: Rengo | **+1d4 de daño de hielo** (ignora la Defensa) | 650 |
+| 18 | Perforacotas (rompemalla) | 1 | 2 | +2 | PdG +1, Ignora 1 | Rompe armadura 75 % (la única) | — | 1000 |
+
+Salen: Báculo mágico (no es del Tipo 4), Puñal de Dorne (lo reemplaza el Beso de la viuda). Siguen como referencia: Colmillo dientes de sable,
+Pica del Muro Eterno, Aguijón de la Reina Avispa, Lanza del alba (las cuatro reajustadas).
+**A construir (firmas):** +1 d20 en el crítico · no se puede parrear · ataque de oportunidad sin No2 · primer ataque −1 No2 · daño mágico extra
+(rayo / hielo, ignora la Defensa y resta la Armadura mágica) · Rengo en armas · Sangrado con stacks.

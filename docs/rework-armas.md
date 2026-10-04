@@ -1148,3 +1148,6 @@ para nada más**; a dos manos le entra una cosa chica (Demora 25 %, Bloqueo +1).
 **Pajaritos entra a los contundentes (dueño, 2026-10-03):** «podemos incluir Pajaritos entre los efectos para diseño, inclusive en algunos
 Común, 25 % o 50 %». Es el estado de siempre (PdG y Evasión a la mitad, 3 turnos; el duelo ya lo aplica solo). En la calculadora vale **4** (como
 la Demora) y es de casa del Tipo 10 (habilitado en el 12); se sacó de los efectos descartados. «Detalles técnicos» y la Guía de diseño lo explican.
+Pajaritos en la Común (dueño, 2026-10-03): Cachiporra → Pajaritos 25 % (75); Bate de Baseball → +1 · Pajaritos 25 % (85); Sartén de hierro →
+Pajaritos 50 % (85). **Para la Buena:** el diseño propuesto (mitad con Demora, Aturdir en 2–3 bajo, báculos a dos manos con Alcance) ✅ y
+**Pajaritos en por lo menos un tercio**, con porcentajes según el resto de los efectos.

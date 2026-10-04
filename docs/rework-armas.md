@@ -1096,7 +1096,7 @@ actuó y quedaría después de quien tiene el turno. Garrote, Martillo de bola y
 | Martillo de carpintero 🆕 | Iniciativa +1 · Demora 33 % · 95 |
 | Llave inglesa 🆕 | Rengo 20 % · Demora 33 % · 100 |
 | Rebenque emplomado 🆕 | Derribar 20 % · Demora 33 % · 95 |
-| Pata de mesa 🆕 | Derribar 20 % · Demora 25 % · 90 |
+| Pata de mesa 🆕 | +2 · Iniciativa −1 · Demora 33 % · 100 |
 | Mazo de bombo 🆕 | 2 manos · Bloqueo +1 · Demora 33 % · 90 |
 | Bastón del trueno (rehecho) | 2 manos · +1 · Demora 50 % · 85 |
 | **Sin Demora** | |

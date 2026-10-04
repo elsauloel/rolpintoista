@@ -189,6 +189,8 @@ Reemplazan a las 72 de antes (24 × menor/normal/mayor). Común / Buena / Rara p
   daño** (es lo que entra seguro) y después se tira para resistir. Y **antes de tirar se ve claro qué se resiste**: «Para resistir: Parálisis»,
   «Tirá Res.CC para resistir Parálisis (2 turnos)», y el botón lo repite. Vale para las trampas y para las zonas. Además, el rayo de cada salto
   de la Descarga se ve 2,5 s antes del Anuncio siguiente (y recién cuando se cierra el anterior).
+- **Decididos con la prueba en vivo (dueño, 2026-10-04):** el salto de la Descarga **no alcanza a tokens ocultos** (no los delata); el objetivo al
+  azar de la Confusión **no tiene distancia máxima** (cualquier token visible). Los dos ya funcionaban así.
 - **Arena movediza ✅ (dueño, 2026-10-04):** atrapa a cualquiera que entre después de disparada (queda en el terreno sus 3 turnos). Ya lo hace la
   regla del efecto persistente (al entrar), **en cuanto se peguen las reglas de Firestore**.
 - **Confusión ✅ (dueño, 2026-10-04, hecha y probada en vivo):** afecta a **quién elegís como objetivo de una acción hostil**; las defensas no.

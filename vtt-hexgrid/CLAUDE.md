@@ -1393,3 +1393,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   el objetivo al azar se resuelve a mano. Solo en el mapa (la ficha suelta y GM Tools no preguntan). Probado en vivo con un creep.
 - **Quemadura** (2026-10-04): estado estándar, 2 de daño por turno, 3 turnos; reaplicarla solo reinicia los turnos; la Res. fuego le resta a cada
   turno (`Combatiente.pasarTurnoEstados`, `resFuego`).
+- **Anuncio de una trampa: daño primero y qué se resiste** (2026-10-04, norma general del dueño): si la salvación resiste solo el efecto
+  (`que: 'efecto'`), el orden es daño → resistir (`trampaDanoPrimero`, `trampaFaseInicial`); el paso de la tirada dice «Para resistir: Parálisis»
+  y el botón «Tirar Res.CC para resistir Parálisis» (`trampaQueSeResiste`). El cartel de una zona también nombra lo que se resiste. Un salto de la
+  Descarga que llega con otro Anuncio abierto espera en la fila y su rayo se ve al cerrarlo, 2,5 s antes de su Anuncio (`rayoPendientes`).

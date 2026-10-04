@@ -374,8 +374,11 @@ function renderZonaBanner(){
     AvisoCombate.cartel('zona', {icono, titulo: `${nombreZ} · ${nombreT}`, texto: zonaBanner.resultado,
       botones: [{texto: 'Listo', id: 'zona-banner-ok', alClic: () => { zonaBanner = null; zonaMostrarSiguiente(); }}]});
   }else if(stat){
-    AvisoCombate.cartel('zona', {icono, titulo: `${nombreT} entró en ${nombreZ}`, texto: `Tirá ${stat} para resistir lo que deja la zona.`,
-      botones: [{texto: `🎲 Tirar ${stat}`, id: 'zona-banner-ir', alClic: zonaResolverBanner}]});
+    // Qué se resiste, a la vista antes de tirar (dueño, 2026-10-04, norma general). Resistir una zona evita todo: el daño y lo que deja.
+    let spec = null; try{ spec = el.zonaEstado ? JSON.parse(el.zonaEstado) : null; }catch(err){}
+    const que = [...(spec && spec.nombre ? [EstadosAplicar.texto(spec)] : []), ...(el.zonaDanoDif ? ['el daño (la diferencia de las tiradas)'] : el.zonaDano ? [`${el.zonaDano} de daño${el.zonaDanoTipo ? ' ' + el.zonaDanoTipo : ''}`] : [])].join(' y ') || 'lo que deja la zona';
+    AvisoCombate.cartel('zona', {icono, titulo: `${nombreT} entró en ${nombreZ}`, texto: `Para resistir: ${que}. Tirá ${stat}: si resiste, no le pasa nada.`,
+      botones: [{texto: `🎲 Tirar ${stat} para resistir ${spec && spec.nombre ? spec.nombre : 'la zona'}`, id: 'zona-banner-ir', alClic: zonaResolverBanner}]});
   }else{
     AvisoCombate.cartel('zona', {icono, titulo: `${nombreZ}: le toca a ${nombreT}`, texto: 'No hay nada que tirar: se aplica lo que deja la zona.',
       botones: [{texto: 'Aplicar', id: 'zona-banner-ir', alClic: zonaResolverBanner}]});

@@ -24,7 +24,19 @@ const trampaEtq = s => s.etq || ZONA_STAT_LABEL[s.stat] || s.stat;
 const trampaEsperarDados = () => new Promise(r => { if(document.hidden || typeof Duelo === 'undefined' || !Duelo.esperarDados) r(); else Duelo.esperarDados(r); });
 
 // Esquivarla entera es la excepción; lo común es resistir lo que deja (dueño, 2026-10-04). `logra`: el texto propio de la trampa.
-const trampaTituloSalva = s => s.que === 'efecto' ? 'Para resistirlo' : 'Para esquivarla';
+// Qué se resiste (dueño, 2026-10-04, norma general: «antes de tirar, el usuario tiene que ver claramente qué está tirando para resistir»).
+function trampaQueSeResiste(dt){
+  const sp = trampaSpec(dt), cosas = [];
+  if(sp && sp.nombre) cosas.push(sp.nombre);
+  if(dt.pierdeSp) cosas.push('perder SP');
+  if(dt.portal) cosas.push('el portal');
+  return cosas.join(' y ') || 'lo que deja';
+}
+const trampaTituloSalva = (s, dt) => s.que === 'efecto' ? `Para resistir: ${dt ? trampaQueSeResiste(dt) : 'el efecto'}` : s.que === 'mitad' ? 'Para recibir la mitad del daño' : 'Para esquivarla';
+// El orden (dueño, 2026-10-04): si la tirada resiste solo el efecto, primero se anuncia el daño (que entra seguro) y después se tira para
+// resistir lo que deja. Si la tirada esquiva la trampa o la mitad del daño, va antes.
+const trampaDanoPrimero = dt => !!(dt.requiereDano || (dt.salva && dt.salva.que === 'efecto' && (dt.dano || dt.danoFijo)));
+const trampaFaseInicial = dt => trampaDanoPrimero(dt) ? trampaFaseSiguiente(dt, 'empuje') : dt.salva ? 'salva' : trampaFaseSiguiente(dt, 'salva');
 function trampaLogra(dt){
   const s = dt.salva;
   if(s.logra) return s.logra;
@@ -35,7 +47,7 @@ function trampaLogra(dt){
 // con «▶ Seguir» (sin tirada).
 function trampaFaseSiguiente(dt, fase){
   // El Dardo (requiereDano, 2026-10-04): primero el daño; si no pasa la Defensa, lo que deja no entra (ni se tira para resistirlo).
-  const orden = dt.requiereDano ? ['empuje', 'dano', 'salva', 'sp', 'portal', 'estado', 'mano', 'muro', 'zona', 'fin'] : ['empuje', 'salva', 'dano', 'sp', 'portal', 'estado', 'mano', 'muro', 'zona', 'fin'];
+  const orden = trampaDanoPrimero(dt) ? ['empuje', 'dano', 'salva', 'sp', 'portal', 'estado', 'mano', 'muro', 'zona', 'fin'] : ['empuje', 'salva', 'dano', 'sp', 'portal', 'estado', 'mano', 'muro', 'zona', 'fin'];
   const agarro = dt.evita !== 'todo' && dt.evita !== 'efecto';
   for(const f of orden.slice(orden.indexOf(fase) + 1)){
     if(f === 'salva' && dt.salva && agarro) return f;
@@ -63,7 +75,11 @@ function trampaPasoQueFalta(dt){
     boton: '🎲 Tirar adónde sale (1d6)', espera: `${dt.quien} tira adónde sale despedido…`};
   if(dt.fase === 'salva' && dt.salva){
     const s = dt.salva, etq = trampaEtq(s);
-    return {titulo: trampaTituloSalva(s), texto: `${etq} contra ${s.dif}: con ${s.dif} o más, ${trampaLogra(dt)}.`, boton: `🎲 Tirar ${etq}`, espera: `${dt.quien} tira ${etq}…`};
+    const efecto = s.que === 'efecto', que = trampaQueSeResiste(dt), sp = trampaSpec(dt);
+    const detalle = efecto && sp && sp.nombre ? ` (${EstadosAplicar.texto(sp)})` : '';
+    return {titulo: trampaTituloSalva(s, dt),
+      texto: efecto ? `Tira ${etq} para resistir ${que}${detalle}. Contra ${s.dif}: con ${s.dif} o más, ${trampaLogra(dt)}.` : `${etq} contra ${s.dif}: con ${s.dif} o más, ${trampaLogra(dt)}.`,
+      boton: efecto ? `🎲 Tirar ${etq} para resistir ${que}` : `🎲 Tirar ${etq}`, espera: `${dt.quien} tira ${etq}${efecto ? ` para resistir ${que}` : ''}…`};
   }
   if(dt.fase === 'dano' && dt.danoFijo) return {titulo: 'Le llega la descarga', texto: `${dt.danoFijo} de daño${dt.elemento ? ' ' + Combatiente.ELEMENTOS[dt.elemento].icono : ''}, directo a la vida (la mitad del salto anterior; lo frenan ${dt.elemento ? Combatiente.ELEMENTOS[dt.elemento].etq + ' y ' : ''}la Armadura mágica).`,
     boton: '▶ Recibir la descarga', espera: `a ${dt.quien} le llega la descarga…`};
@@ -108,7 +124,7 @@ async function trampaMomentoNuevo(p){
     portal: p.portal ? {rango: num(p.portal.rango) || 8} : null, duenoTrampa: p.duenoTrampa || '', requiereDano: !!p.requiereDano, spec: p.specJson || '', muro: num(p.muro), muroLargo: num(p.muroLargo), zona: num(p.zona), aMano: p.aMano || '',
     fase: '', tirando: false, evita: '', pasos: [],
   };
-  dt.fase = dt.requiereDano ? trampaFaseSiguiente(dt, 'empuje') : dt.salva ? 'salva' : trampaFaseSiguiente(dt, 'salva');
+  dt.fase = trampaFaseInicial(dt);
   const titulo = p.pisador ? `${p.quien} pisó «${p.nombreT}»` : `${p.quien} quedó en el área de «${p.nombreT}»`;
   if(dt.fase === 'fin'){   // nada que tirar ni mostrar: solo se anuncia
     const f = trampaFinal(dt);
@@ -153,7 +169,7 @@ async function trampaSaltar(dt){
   const nd = {tokenId: hid, creep: h.tipo === 'creep', fichaId: String(h.fichaId || ''), quien, nombreT: dt.nombreT, pisador: false, salva: dt.salva || null,
     dano: '', danoFijo: n, ignoraDef: true, elemento: dt.elemento || '', pierdeSp: '', spec: dt.spec || '', muro: 0, muroLargo: 0, zona: 0, aMano: '',
     fase: '', tirando: false, evita: '', pasos: [], cadena: {rango: num(c.rango) || 3, golpeados: [...golpeados, hid]}, salto: {desde: dt.tokenId, hacia: hid}};
-  nd.fase = nd.salva ? 'salva' : trampaFaseSiguiente(nd, 'salva');
+  nd.fase = trampaFaseInicial(nd);
   nd.lineas = trampaLineas(nd);
   await momentoAbrir({tipo: 'trampa', icono: '⚡', titulo: `La descarga salta a ${quien}`, estado: 'paso', datos: nd});
 }
@@ -382,7 +398,7 @@ async function trampaPasoSalva(id, dt){
     const no = s.que === 'efecto' ? 'no lo resistió' : 'no la esquivó';
     texto = `${etq} ${rd.total} contra ${s.dif} → ${!ok ? no : s.logra ? (s.que === 'efecto' ? `lo resistió: ${s.logra}` : s.logra) : s.que === 'mitad' ? 'recibe la mitad del daño' : s.que === 'efecto' ? '¡lo resistió!' : '¡la esquivó!'}`;
   }else texto = `${etq}: no tiene ese número cargado → ${s.que === 'efecto' ? 'no lo resistió' : 'no la esquivó'} (si correspondía, ajustalo a mano)`;
-  const sig = {...dt, evita: ok ? (s.que || 'todo') : '', pasos: [...(dt.pasos || []), {titulo: trampaTituloSalva(s), texto}]};
+  const sig = {...dt, evita: ok ? (s.que || 'todo') : '', pasos: [...(dt.pasos || []), {titulo: trampaTituloSalva(s, dt), texto}]};
   sig.fase = trampaFaseSiguiente(sig, 'salva');
   await trampaGuardar(id, sig);
 }

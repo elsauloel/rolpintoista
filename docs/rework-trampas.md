@@ -185,6 +185,10 @@ Reemplazan a las 72 de antes (24 × menor/normal/mayor). Común / Buena / Rara p
   **la Res. fuego le resta a cada turno** (sola, en el
   Mantenimiento de personajes, invocaciones y creeps). Para que no le entre, sigue la tirada de Res.Esp de la trampa (regla de las trampas:
   quemaduras y venenos con Res.Esp). La usa el Géiser de fuego.
+- **Orden y claridad del Anuncio ✅ (dueño, 2026-10-04, norma general, hecho):** si la tirada resiste solo el efecto, **primero se anuncia el
+  daño** (es lo que entra seguro) y después se tira para resistir. Y **antes de tirar se ve claro qué se resiste**: «Para resistir: Parálisis»,
+  «Tirá Res.CC para resistir Parálisis (2 turnos)», y el botón lo repite. Vale para las trampas y para las zonas. Además, el rayo de cada salto
+  de la Descarga se ve 2,5 s antes del Anuncio siguiente (y recién cuando se cierra el anterior).
 - **Arena movediza ✅ (dueño, 2026-10-04):** atrapa a cualquiera que entre después de disparada (queda en el terreno sus 3 turnos). Ya lo hace la
   regla del efecto persistente (al entrar), **en cuanto se peguen las reglas de Firestore**.
 - **Confusión ✅ (dueño, 2026-10-04, hecha y probada en vivo):** afecta a **quién elegís como objetivo de una acción hostil**; las defensas no.

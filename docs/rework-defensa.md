@@ -379,3 +379,8 @@ desventaja Iniciativa −1 devuelve 1,5. Ajustes: Casaca de salteador suma Perce
 (110); Coraza de guardia 85; Escudo de hierro macizo 90. En la propuesta de cascos: la Gorra de la Federal suma Percepción +1; el Bacinete baja a
 Res.CC +1 (50).
 
+## Cabeza Común: cargada (2026-10-04)
+24 cascos y sombreros reemplazan a los 24 viejos (14 conservan nombre, id y narrativa). **Iniciativa en la cabeza ✅** (la Gorra de la Federal).
+**Topes de Defensa de la cabeza ✅:** Común 1, Buena 2, Rara 3. Los de peso 0 llenan la bolsa con dos cosas; los cascos pesados traen tres o cuatro
+y se pagan en carga, o bajan de precio (Cofia 35, Bacinete, Bombero 50).
+

@@ -20,7 +20,9 @@ const AvisoCombate = (() => {
       .aviso-combate-fondo .duelo-caja{width:min(560px,100%)}
       .aviso-combate-fondo .duelo-paso p{margin:0;line-height:1.4}
       .aviso-combate-fondo .duelo-veredicto .grande{font-size:34px}
-      .aviso-combate-fondo .duelo-pie{display:flex;justify-content:center}
+      .aviso-combate-fondo .duelo-pie{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+      .aviso-combate-fondo .duelo-pie button:disabled{opacity:.55;cursor:default}
+      .aviso-combate-fondo .duelo-paso.aviso-espera{border-style:dashed;opacity:.9}
       .aviso-combate-fondo .aviso-mano{font-size:13px;color:#c7cee2;background:#1a2030;border:1px dashed #39435c;border-radius:10px;padding:8px 12px}`;
     document.head.appendChild(s);
   }
@@ -31,31 +33,40 @@ const AvisoCombate = (() => {
     a.el.remove();
     if(a.alCerrar) try{ a.alCerrar(); }catch(err){ console.error(err); }
   }
+  /* Paso a paso (2026-10-04, trampas: «cada tirada en su momento y cada resultado anunciado»): `botones: [{texto, alClic, sec, deshabilitado}]`
+     reemplazan a «Entendido» (la tirada que toca ahora); un paso con `espera: true` es el que falta (punteado). Con `clave`, volver a llamar
+     con la misma clave redibuja la ventana abierta sin cerrarla (ni llamar a alCerrar). */
   function mostrar(o){
     o = o || {};
     if(typeof Duelo !== 'undefined' && Duelo.estilos) Duelo.estilos();
     estilosPropios();
-    if(abierto){ const a = abierto; abierto = null; a.el.remove(); }
+    const mismo = abierto && o.clave && abierto.clave === o.clave;
+    if(abierto && !mismo){ const a = abierto; abierto = null; a.el.remove(); }
     const pasos = (o.pasos || []).map(p => typeof p === 'string' ? {texto: p} : p).filter(p => p && (p.texto || p.titulo));
     const v = o.veredicto && o.veredicto.grande ? o.veredicto : null;
-    const f = document.createElement('div');
+    const botones = o.botones || [];
+    const f = mismo ? abierto.el : document.createElement('div');
     f.className = 'aviso-combate-fondo';
     f.innerHTML = `<div class="duelo-caja" role="dialog" aria-modal="true">
       <div class="duelo-cab"><span>${e(o.icono || '⚔')} ${e(o.titulo || '')}</span><div class="bt"><button type="button" data-aviso-x title="Cerrar">✕</button></div></div>
       <div class="duelo-cuerpo">
-        ${pasos.length ? pasos.map((p, i) => `<div class="duelo-paso"><h4><span class="n">${i + 1}</span>${e(p.titulo || 'Qué pasó')}</h4><p>${e(p.texto || '')}</p></div>`).join('')
+        ${pasos.length ? pasos.map((p, i) => `<div class="duelo-paso${p.espera ? ' aviso-espera' : ''}"><h4><span class="n">${i + 1}</span>${e(p.titulo || 'Qué pasó')}</h4><p>${e(p.texto || '')}</p></div>`).join('')
           : o.texto ? `<div class="duelo-paso"><p>${e(o.texto)}</p></div>` : ''}
         ${v ? `<div class="duelo-veredicto ${TONO[v.tono] || 'bloqueado'}"><div class="grande">${e(v.grande)}</div>${v.chico ? `<div class="chico">${e(v.chico)}</div>` : ''}</div>` : ''}
         ${o.aMano ? `<div class="aviso-mano">✋ ${e(o.aMano)}</div>` : ''}
-        <div class="duelo-pie"><button type="button" data-aviso-ok>${e(o.boton || 'Entendido')}</button></div>
+        <div class="duelo-pie">${botones.length
+          ? botones.map((b, i) => `<button type="button" data-aviso-b="${i}"${b.sec ? ' class="sec"' : ''}${b.titulo ? ` title="${e(b.titulo)}"` : ''}${b.deshabilitado ? ' disabled' : ''}>${e(b.texto)}</button>`).join('')
+          : `<button type="button" data-aviso-ok>${e(o.boton || 'Entendido')}</button>`}</div>
       </div>
     </div>`;
-    f.addEventListener('click', ev => {
+    f.onclick = ev => {
+      const b = ev.target.closest('[data-aviso-b]');
+      if(b){ const x = botones[Number(b.dataset.avisoB)]; if(x && x.alClic && !b.disabled) x.alClic(); return; }
       if(ev.target === f || ev.target.closest('[data-aviso-x],[data-aviso-ok]')) cerrar();
-    });
-    document.body.appendChild(f);
-    abierto = {el: f, alCerrar: o.alCerrar};
-    const ok = f.querySelector('[data-aviso-ok]');
+    };
+    if(!mismo) document.body.appendChild(f);
+    abierto = {el: f, alCerrar: o.alCerrar, clave: o.clave || ''};
+    const ok = f.querySelector('[data-aviso-b]:not([disabled]),[data-aviso-ok]');
     if(ok) ok.focus();
   }
   document.addEventListener('keydown', ev => { if(abierto && ev.key === 'Escape'){ ev.stopImmediatePropagation(); cerrar(); } }, true);
@@ -113,5 +124,5 @@ const AvisoCombate = (() => {
     acomodarCarteles();
     return el;
   }
-  return {mostrar, cerrar, abierto: () => !!abierto, cartel};
+  return {mostrar, cerrar, abierto: () => !!abierto, abiertoClave: () => abierto ? abierto.clave : null, cartel};
 })();

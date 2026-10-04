@@ -1776,6 +1776,20 @@ prueba('el pop-up de efectos de combate usa la estética del duelo: cabecera, un
   igual([...datos, !!document.querySelector('.aviso-combate-fondo'), cerrado, AvisoCombate.abierto()],
     [true, 2, 'duelo-veredicto fallo', '¡CAYÓ EN LA TRAMPA!', false, 1, false]);
 });
+prueba('trampa paso a paso: el pop-up lleva el botón de la tirada que toca, el paso que falta punteado, y con la misma clave se redibuja sin cerrarse', () => {
+  let cerrado = 0, clics = 0;
+  const abrir = (pasos, botones) => AvisoCombate.mostrar({clave: 'trampa:x', icono: '🪤', titulo: 'Clementino pisó «Trampa de oso»', pasos, botones, alCerrar: () => cerrado++});
+  abrir([{titulo: 'Para esquivarla', texto: 'Evasión contra 7', espera: true}], [{texto: '🎲 Tirar Evasión', alClic: () => clics++}]);
+  const f1 = document.querySelector('.aviso-combate-fondo');
+  f1.querySelector('[data-aviso-b]').click();
+  const antes = [!!f1.querySelector('.duelo-paso.aviso-espera'), !f1.querySelector('[data-aviso-ok]'), clics];
+  abrir([{titulo: 'Para esquivarla', texto: 'Evasión 3 contra 7 → no la esquivó'}, {titulo: 'Daño', texto: 'La trampa pega 2d6', espera: true}], [{texto: '🎲 Rodando…', deshabilitado: true, alClic: () => clics++}]);
+  const f2 = document.querySelector('.aviso-combate-fondo');
+  f2.querySelector('[data-aviso-b]').click();   // deshabilitado: no hace nada
+  const despues = [f1 === f2, document.querySelectorAll('.aviso-combate-fondo').length, f2.querySelectorAll('.duelo-paso').length, cerrado, clics, AvisoCombate.abiertoClave()];
+  AvisoCombate.cerrar();
+  igual([...antes, ...despues, cerrado], [true, true, 1, true, 1, 2, 0, 1, 'trampa:x', 1]);
+});
 prueba('los carteles que piden algo (zonas, percepción, oportunidad, dodge) usan el mismo marco, no tapan el mapa, se redibujan por clave y se apilan', () => {
   let clics = 0;
   AvisoCombate.cartel('a', {icono: '🌫', titulo: 'Clementino entró en Nube tóxica', texto: 'Tirá Res.Esp.', botones: [{texto: '🎲 Tirar Res.Esp', id: 'zona-banner-ir', alClic: () => clics++}]});

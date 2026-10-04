@@ -485,12 +485,11 @@ function trampaAfectados(t, el, celdaPisada){
   tokens.forEach(x => { if(x !== t && dentro(x)) afectados.push(x); });
   return afectados;
 }
-/* Lo que le hace la trampa a cada afectado, automático donde se puede (2026-10-02, regla del dueño): la salvación (el mapa la tira sola con el
-   stat de quien la pisó: `salva` dentro de trampaEstado = {stat, etq, dif, que} — 'todo' la evita entera, 'efecto' evita el estado, 'mitad' la
-   mitad del daño),
-   el daño (una sola tirada para todos) y el estado (`trampaEstado`). A cada afectado le llega **el Aviso** al centro de su pantalla (a un
-   creep, al GM); los demás lo ven en **la Crónica** (la esquina de arriba a la derecha, js/16). Lo que no se pudo aplicar desde esta pantalla
-   (el daño de un personaje ajeno) queda dicho «aplicalo a mano». */
+/* Lo que le hace la trampa a cada afectado (2026-10-02, regla del dueño: automático donde se puede, siempre anunciado; 2026-10-04, pedido del
+   dueño: **paso a paso, con su momento para cada tirada y el anuncio de cada resultado, y las tiradas las hace la víctima**). Al dispararse,
+   esta pantalla (la de quien movió) solo crea un momento por afectado con lo que hace la trampa: la salvación (`salva` dentro de trampaEstado =
+   {stat, etq, dif, que} — 'todo' la evita entera, 'efecto' evita el estado, 'mitad' la mitad del daño), el daño y el estado. Lo resuelve la
+   pantalla de quien maneja a cada víctima, botón por botón (js/19-trampa-paso-a-paso.js); el resto de la mesa lo sigue en la Crónica. */
 function trampaSalvaDe(el){
   let e = null; try{ e = el.trampaEstado ? JSON.parse(el.trampaEstado) : null; }catch(x){}
   const s = e && e.salva;
@@ -504,66 +503,15 @@ function trampaValorStat(x, stat){
 async function trampaAplicarEfectos(t, el, celdaPisada){
   const afectados = trampaAfectados(t, el, celdaPisada), salva = trampaSalvaDe(el);
   let spec = null; try{ spec = el.trampaEstado ? JSON.parse(el.trampaEstado) : null; }catch(e){}
-  if(spec && !spec.nombre) spec = null;
-  const tir = trampaDanoValido(el.trampaDano) ? tirarDados(el.trampaDano.trim()) : null;
-  const nombreT = el.trampaNombre || 'una trampa';
-  const gmUid = ([...miembros.entries()].find(([, m]) => m && m.gm) || [])[0] || '';
-  const aMano = (String(el.trampaDetalle || '').match(/[^.]*\(a mano\)\./g) || []).map(x => x.trim()).join(' ');   // lo que el texto dice que va a mano
-  const mesa = [];
+  const muro = trampaMuroDe(el);
+  const comun = {
+    nombreT: el.trampaNombre || 'una trampa', salva, dano: trampaDanoValido(el.trampaDano) ? el.trampaDano.trim() : '', ignoraDef: !!el.trampaIgnoraDef,
+    specJson: spec && spec.nombre ? el.trampaEstado : '',
+    aMano: (String(el.trampaDetalle || '').match(/[^.]*\(a mano\)\./g) || []).map(x => x.trim()).join(' '),   // lo que el texto dice que va a mano
+  };
   for(const x of afectados){
-    const quien = x.oculto ? 'Alguien' : nombreDe(x);
-    const esInv = String(x.fichaId || '').includes(SEP_INVOCACION);
-    const partes = [], pasos = [];   // pasos: {titulo, texto} para el pop-up (comun/aviso-combate.js); partes: la línea de la Mesa
-    let evita = '';
-    if(salva){
-      const estadosDe = x.tipo === 'creep' ? ((creepPrivadoDe(x.fichaId) || {}).estados || []) : (((fichasPub.get(x.fichaId) || {}).resumen || {}).estados || []);
-      const rd = Combatiente.tirarStat(trampaValorStat(x, salva.stat), estadosDe, salva.stat);
-      if(rd){
-        const etq = salva.etq || ZONA_STAT_LABEL[salva.stat] || salva.stat;
-        try{ mesaPublicar(`${quien} · ${etq} (${nombreT})`, {formula: rd.formula, rolls: rd.rolls, mod: rd.mod, total: rd.total}); }catch(err){}
-        const ok = rd.total >= num(salva.dif);   // llegar a la dificultad alcanza (como detectarla)
-        if(ok) evita = salva.que || 'todo';
-        partes.push(`${etq} ${rd.total} contra ${salva.dif}: ${!ok ? 'no la evitó' : evita === 'mitad' ? 'la mitad del daño' : evita === 'efecto' && tir ? 'esquivó el efecto' : 'la evitó'}`);
-        pasos.push({titulo: 'Para esquivarla', texto: partes[partes.length - 1]});
-      }
-    }
-    if(tir && evita !== 'todo'){
-      const monto = evita === 'mitad' ? Math.floor(tir.total / 2) : tir.total;
-      let hecho = false;
-      try{
-        if(monto > 0 && x.tipo === 'creep' && x.fichaId && soyGM){ await danioCreep(x, String(monto), !!el.trampaIgnoraDef); hecho = true; }
-        // Un personaje o una invocación: su dueño, o el GM (puede escribirle la vida, como en el duelo).
-        else if(monto > 0 && x.tipo === 'pj' && x.fichaId && (puedoMover(x) || soyGM)){ await (esInv ? danioInv : danioPj)(x, String(monto), !!el.trampaIgnoraDef); hecho = true; }
-      }catch(err){ console.error('No se pudo aplicar el daño de la trampa:', err); }
-      partes.push(monto > 0 ? `${monto} de daño${el.trampaIgnoraDef ? ' directo a la vida' : ' (menos su Defensa)'}${hecho ? '' : ' — aplicalo a mano'}` : 'sin daño');
-      pasos.push({titulo: 'Daño', texto: `${tir.formula} = ${tir.total}${evita === 'mitad' ? ' (la mitad)' : ''} → ${partes[partes.length - 1]}`});
-    }
-    if(spec && evita !== 'todo' && evita !== 'efecto'){
-      let que = ' — aplicalo a mano';
-      try{
-        if(x.tipo === 'creep' && x.fichaId && soyGM){
-          let inmune = '';
-          await modificarCreep(x.fichaId, sc => { const r = EstadosAplicar.aplicarACreep(sc, spec); if(!r.ok) inmune = r.motivo || 'inmune'; });
-          que = inmune ? ` — no le hace nada (${inmune})` : '';
-        }else if(x.tipo === 'pj' && x.fichaId && x.duenoUid){   // al personaje o a su invocación: lo aplica quien lo maneja (comun/recibidos.js)
-          await EstadosAplicar.encolarPj({fichaId: x.fichaId, duenoUid: x.duenoUid, spec, origen: nombreT});
-          que = '';
-        }
-      }catch(err){ console.error('No se pudo aplicar el estado de la trampa:', err); }
-      partes.push(`${EstadosAplicar.texto(spec)}${que}`);
-      pasos.push({titulo: 'Lo que le deja', texto: partes[partes.length - 1]});
-    }
-    if(x === t && trampaMuroDe(el)){ partes.push('se levanta un muro delante'); pasos.push({titulo: 'El muro', texto: `Se levanta una pared delante, por ${trampaMuroDe(el).turnos} turnos: hay que rodearla.`}); }
-    const resultado = partes.join(' · ') || 'no le hizo nada';
-    // El cartel grande del pop-up: rojo si lo agarró, verde si la esquivó entera, azul si esquivó solo el efecto o la mitad.
-    const veredicto = evita === 'todo' ? {tono: 'bueno', grande: '¡LA ESQUIVÓ!'} : (evita === 'efecto' || evita === 'mitad') ? {tono: 'neutro', grande: evita === 'mitad' ? 'LA MITAD' : 'ESQUIVÓ EL EFECTO'}
-      : {tono: 'malo', grande: x === t ? '¡CAYÓ EN LA TRAMPA!' : '¡LO ALCANZÓ!'};
-    mesa.push(`${quien}: ${resultado}`);
-    momentoAbrir({tipo: 'trampa', icono: '🪤', titulo: x === t ? `${quien} pisó «${nombreT}»` : `${quien} quedó en el área de «${nombreT}»`,
-      resultado: resultado + (aMano ? ` · ✋ ${aMano}` : ''), estado: 'listo',
-      datos: {paraUid: x.tipo === 'creep' ? gmUid : (x.duenoUid || ''), aviso: true, pasos, veredicto, ...(aMano ? {aMano} : {})}});
+    await trampaMomentoNuevo({...comun, x, tokenId: zonaIdDe(x), quien: x.oculto ? 'Alguien' : nombreDe(x), pisador: x === t, muro: x === t && muro ? muro.turnos : 0});
   }
-  if(mesa.length && (tir || spec || salva)) alertaRojaAnonima(`🪤 ${nombreT}${tir ? ` · ${tir.formula} = ${tir.total}` : ''}`, mesa.join(' · '));
 }
 
 /* Trampa de muro (2026-10-03, pedido del dueño: «al triggerearla se levanta una pared impenetrable, para tener que rodear»; delante del que la

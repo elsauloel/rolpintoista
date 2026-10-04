@@ -66,6 +66,8 @@ const momentosArranque = setInterval(() => { if(typeof fbMiembro !== 'undefined'
 
 function momentoRecibido(id, d){
   oporMomento(id, d);   // el ataque de oportunidad: la pregunta a quien decide y la respuesta a quien se aleja (js/17)
+  // Una trampa, paso a paso (js/19): la víctima la resuelve al centro; el resto, en la Crónica.
+  if(d.tipo === 'trampa' && d.datos && d.datos.fase){ trampaMomento(id, d); return; }
   // El pedido de detección al GM (P145): la pantalla del GM tira la Destreza del oculto.
   if(d.tipo === 'sigilo-pedido' && d.estado === 'esperandoGM' && soyGM) deteccionGMAbrir(id, d);
   // Quien está esperando la respuesta en su cartelito.
@@ -94,17 +96,19 @@ function renderMomentosFeed(){
     feed = document.createElement('div');
     feed.id = 'momentos-feed';
     feed.style.cssText = 'position:absolute;right:12px;top:118px;width:min(300px,60vw);z-index:31;display:flex;flex-direction:column;gap:6px;pointer-events:none';
+    feed.addEventListener('click', ev => { const b = ev.target.closest('[data-trampa-seguir]'); if(b) trampaSeguir(b.dataset.trampaSeguir); });
     caja.appendChild(feed);
   }
   const ahora = Date.now();
   momentosFeed.forEach((v, k) => { if(v.hasta < ahora) momentosFeed.delete(k); });
   const lista = [...momentosFeed.entries()].sort((a, b) => b[1].orden - a[1].orden).slice(0, 4);
   feed.innerHTML = lista.map(([k, v]) => {
-    const d = v.d, queda = v.hasta - ahora;
+    const d = v.d, queda = v.hasta - ahora, lineas = d.lineas || (d.datos && d.datos.lineas);
     return `<div style="pointer-events:auto;background:rgba(21,26,38,.94);border:1px solid #39435c;border-left:3px solid #c98545;border-radius:8px;padding:8px 10px;color:#e9ecf4;font-size:13px;line-height:1.35;box-shadow:0 6px 18px rgba(0,0,0,.45);opacity:${queda < 1500 ? Math.max(0.15, queda / 1500) : 1};transition:opacity .4s">
       <div><span style="font-size:15px">${esc(d.icono || '•')}</span> <b>${esc(d.titulo || '')}</b></div>
-      ${d.lineas ? d.lineas.map((l, i) => `<div style="margin-top:3px;color:${i === d.lineas.length - 1 ? '#e9ecf4' : '#9aa3b8'}">${esc(l)}</div>`).join('')
+      ${lineas ? lineas.map((l, i) => `<div style="margin-top:3px;color:${i === lineas.length - 1 ? '#e9ecf4' : '#9aa3b8'}">${esc(l)}</div>`).join('')
         : d.resultado ? `<div style="margin-top:3px;color:#cfd6e6">${esc(d.resultado)}</div>` : (d.estado === 'listo' ? '' : '<div style="margin-top:3px;color:#8d97ad">…</div>')}
+      ${d.tipo === 'trampa' && d.datos && d.datos.fase ? trampaBotonFeed(k, d) : ''}
     </div>`;
   }).join('');
   clearTimeout(momentosFeedTimer);

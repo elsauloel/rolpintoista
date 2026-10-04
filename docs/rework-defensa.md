@@ -406,3 +406,15 @@ Parry +1 · Res. ácido +2. Las ranuras de cinturón van donde se puede guardar 
 **Para Buena y Rara (dueño, 2026-10-04): la Iniciativa también es una variable de los guantes** (tiene sentido narrativo: manos rápidas), con su
 costo de siempre (1,5). No se rehacen los Comunes por esto: se suma recién al diseñar los guantes de calidades más altas.
 
+## Piernas — lluvia de mecánicas, de cualquier calidad (2026-10-04, para que el dueño filtre)
+Pedido del dueño: «tirá de más antes que de menos»; afuera las ranuras de bebibles y consumibles.
+**Ya existen hoy:** Defensa · Evasión · Iniciativa · Carga · resistencia a crítico (T4, T6, T8, T10) · Res.CC · Sigilo · resistencia elemental (de
+extra) · Resistente / Frágil · Movimiento (−1 Mov = −1 No2: muy caro) · un estado al equiparlas (Regeneración, Afortunado…).
+**Necesitan algo nuevo (a construir):** pisar fuerte en el terreno lento (arena, barro: el paso cuesta menos) · soltarse más fácil de lo que atrapa
+(+N a Soltarse) · menos turnos de Inmovilizado o Rengo · levantarse sin pagar No2 · inmunidad a Sentado / Derribar · alejarse sin provocar ataque de
+oportunidad (o que provocarlo cueste más) · mejor dodge roll para salir de un área · pisar con cuidado (chance de no disparar una trampa, o
+detectarla con Percepción al pisar) · carrera (más casilleros por No2 si no ataca ese turno) · embestida (PdG o daño extra después de moverse N
+casilleros en línea) · patada (un ataque con la pierna: Demora o Derribar) · caminar en la zona de alerta sin pedir tirada (sigilo al moverse) · resistir
+el empuje del muro o de una explosión · cruzar zonas persistentes sin que se disparen al entrar · reducir el sobrepeso (cargar más sin penalidad) ·
+no hacer ruido al moverse (no rompe el sigilo al cruzar un cono, una vez por turno).
+

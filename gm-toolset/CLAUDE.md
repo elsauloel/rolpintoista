@@ -159,7 +159,7 @@ hay trabajo reciente o en curso de otra conversación (ver
   Tools (ya no hay "⌂ Partida", lo reemplaza el menú ☰).
 - `generarTienda(tamano, categoria)` sortea el stock según los pesos de
   rareza de cada tamaño (`TAMANOS`) y el reparto por categoría
-  (`REPARTO_POR_CATEGORIA`: Ramos generales / Alquimista / Herrero / Inicio
+  (`REPARTO_POR_CATEGORIA`: Ramos generales / Bazar arcano —el viejo Alquimista, clave `alquimista`— / Herrero / Inicio
   de partida). Alquimista tiene un piso de 40% de ítems "legacy", con el
   tamaño topeado si no hay suficientes legacy disponibles para sostenerlo.
 - **Categorías con reglas fijas** (`CATEGORIA_TAMANO_FIJO`,

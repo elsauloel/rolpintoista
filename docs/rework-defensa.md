@@ -133,3 +133,22 @@ o por nivel (la referencia contra la que comparar este número).
 6. **Contrapesos de lo pesado**: −Evasión, −Iniciativa, peso (sobrepeso → No2).
 7. **Avisar, no bloquear**: la 🔍 de la Defensa y de las resistencias avisa si está por encima de lo esperado para el nivel (ayuda al GM).
 8. Más adelante: conjuntos (bono con 3 piezas) y el herrero que sube una pieza un escalón por oro.
+
+## Respuestas del dueño a las ideas (2026-10-04)
+- **Curva, nivel 1: Defensa en un espectro de 4 a 10.** «Un tanque va a querer invertir más en defensa que en todo lo demás: tiene que haber un
+  margen. Vamos a trabajar en espectros.» Para tener 10 tiene que gastar mucha plata: arma común barata y todo lo demás en defensa. **Resistencias
+  en nivel 1: hasta 2 de Tipo 4 y hasta 1 de Tipo 6.** (Ejemplo, ajustable.)
+- **Rubros de tienda: tres** (eventualmente un cuarto): **Almacén de ramos generales, Herrero y Bazar arcano.** El Bazar arcano es el viejo
+  Alquimista con un nombre más amplio: pociones, pergaminos, algún objeto mágico. *(Hecho: el generador y el manual ya dicen «Bazar arcano»; la
+  clave interna sigue siendo `alquimista`.)*
+- **Simulador de tiendas:** «fabuloso»; se arma a medida que avancemos.
+- **Lo más escaso, de los jefes:** sí, **pero todo tiene que poder aparecer en una tienda, con chance baja** (nunca cero): el GM igual revisa la
+  tienda antes de publicarla y puede re-rolear cualquier ítem.
+- **Reparar:** todavía no se probó cuán seguido se rompen las armaduras. **Defensa y durabilidad son cosas distintas:** la Defensa de una pieza
+  puede llegar a 0 (Armadura rota) mientras la durabilidad sigue bajando; **recién con la durabilidad en 0 se anulan todos los demás efectos de la
+  pieza**. *(Ya funciona así: cada Armadura rota baja 1 la Defensa de la pieza —hasta 0— y 1 su durabilidad; con la durabilidad en 0 la pieza no
+  da nada, `FichaCalculo.itemRoto`.)*
+- **Sobrepeso → Iniciativa:** «puede ser exactamente la solución»; lo consulta con sus colegas (P154). Por ahora el sobrepeso queda como está.
+- **Avisar, no bloquear:** como **herramienta solo para el GM**, para plantear estrategias y diseñar creeps que sorteen esa dificultad.
+- **El orden propuesto, aprobado:** curva por nivel → presupuesto por pieza y calculadora → catálogo parte por parte (torso primero) → escasez en
+  el generador con el simulador → drops de jefes y reparar.

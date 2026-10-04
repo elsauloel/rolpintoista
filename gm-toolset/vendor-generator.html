@@ -260,7 +260,7 @@ input[type=checkbox]{width:auto}
         <label for="f-categoria">Categoría de tienda</label>
         <select id="f-categoria">
           <option value="ramos" selected>Ramos generales</option>
-          <option value="alquimista">Alquimista</option>
+          <option value="alquimista">Bazar arcano</option>
           <option value="herrero">Herrero</option>
           <option value="inicio">Inicio de partida</option>
         </select>
@@ -524,7 +524,8 @@ const REPARTO_POR_CATEGORIA = {
   // todavía. El tamaño sí lo elige el GM, como en cualquier otra.
   inicio:     {armas:0.35, defensivos:0.35, escudos:0.20, consumibles:0.10},
 };
-const CATEGORIA_TIENDA_LABEL = {ramos:'Ramos generales', alquimista:'Alquimista', herrero:'Herrero', inicio:'Inicio de partida'};
+// «Bazar arcano» (2026-10-04, dueño): el viejo Alquimista, con un nombre más amplio (pociones, pergaminos, objetos mágicos). La clave sigue siendo 'alquimista'.
+const CATEGORIA_TIENDA_LABEL = {ramos:'Ramos generales', alquimista:'Bazar arcano', herrero:'Herrero', inicio:'Inicio de partida'};
 
 // Categorías con tamaño fijo (el GM no lo elige, ver aplicarTamanoFijo) —
 // por ahora ninguna, queda el mecanismo por si hace falta más adelante.

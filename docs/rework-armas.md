@@ -1083,7 +1083,7 @@ contundente); la maza con pinchos, a lo sumo, es la que **rompe armadura**, y qu
 **Demora automatizada** (`dueloDemora`, js/13 del mapa): baja al golpeado 1 lugar en el orden de turnos; queda a mano si es su turno o si ya
 actuó y quedaría después de quien tiene el turno. Garrote, Martillo de bola y Maza (rinden de más): a criterio del asistente.
 
-### T10 Común — propuesta v1: 24 armas (2026-10-03, ⬜ a revisar por el dueño)
+### T10 Común — propuesta v1: 24 armas (2026-10-03, ✅ aprobada y cargada)
 | Arma | Lo que hace · precio |
 |---|---|
 | **Con Demora** | |
@@ -1120,3 +1120,8 @@ Pasan a otras tandas: **Garrote** y **Martillo de bola** (2 dados) a Buena, **Ma
 **Sin Crítico potente en los contundentes (dueño, 2026-10-03):** «no le va a sumar nada; nadie cuenta con un crítico en un arma» (con un d10 el
 crítico es raro). Sale de «Puede ir» del Tipo 10. En la Común: Garrote de hueso → muy resistente; Pilón de mortero → +1 · Bloqueo +1; Martillo
 de cantero → +1 · muy resistente.
+
+**T10 Común cargada (2026-10-03):** las 24 con sus tres textos. Garrote y ⚠️ Martillo de bola pasaron a Buena y ⚠️ Maza a Rara (para sus tandas);
+el «⚠️ garrote de hueso» quedó como Garrote de hueso. **Hachas sin Crítico potente** (dueño): Hachuela de cocina → Rompe armadura 33 % · muy
+resistente (80); Hacha afilada a la piedra → Sangrado de 3 stacks 50 % (70); Hacha del campeón de hachazos → 1 dado + 1 amplificado · Derribar 25 %
+(130). Sigue: T10 Buena.

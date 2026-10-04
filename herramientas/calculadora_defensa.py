@@ -20,7 +20,8 @@ from catalogo_comun import leer_catalogo
 # ------------------------------------------------------------ costos (dueño, 2026-10-04; se ajustan con el uso)
 COSTO = {
     'def': 1, 'tipo1': 1, 'tipo2': 2, 'tipo3': 3, 'tipo4': 4, 'tipo5': 5,          # Defensa y resistencias a crítico (T4…T12)
-    'eva': 2, 'ini': 2, 'rescc': 1, 'resmg': 1, 'resm': 0.5,                         # Res.Mt 0,5: los efectos que la piden son escasos
+    'eva': 2, 'ini': 1.5, 'rescc': 1,   # Iniciativa = 0,75 de la Evasión (dueño, 2026-10-04: la Evasión protege de más, también de críticos)
+     'resmg': 1, 'resm': 0.5,                         # Res.Mt 0,5: los efectos que la piden son escasos
     'vision': 0.5, 'percepcion': 0.5, 'luz': 0.5, 'veoculto': 1,
     'hpmax': 0.2, 'nitros': 4, 'mov': 4,                                              # +5 vida = 1 · No2 lo más valioso (−1 Mov = −1 No2)
     'armadmg': 3,   # Armadura mágica: escasa, cara y rara — resta TODO daño mágico, arcano y elemental (dueño, 2026-10-04)

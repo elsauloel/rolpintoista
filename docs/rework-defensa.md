@@ -374,4 +374,8 @@ más; los simples bajan: Saco 20, Chaleco 50, Campera 70, Peto de tablas 15, Cor
 devuelve su peso queda más barata, y una que lo usa en bonos queda al precio completo. En los torsos Comunes, seis vuelven a su versión sin el bono
 agregado (pesadas y baratas): Pechera acolchada 100, Gambesón 100, Coraza del clan 85, Cota de malla 70, Coraza de guardia 70, Armadura pesada de
 hierro 60. En la propuesta de cascos, igual: Cofia de anillas 35, Casco de bombero 50, Yelmo de hierro 50.
+**Iniciativa = 1,5 (dueño, 2026-10-04):** vale el 75 % de la Evasión (2), porque la Evasión protege de más cosas, también de los críticos. Una
+desventaja Iniciativa −1 devuelve 1,5. Ajustes: Casaca de salteador suma Percepción +1 (110); Peto de placas y Puerta de auto sacan el Resistente ×2
+(110); Coraza de guardia 85; Escudo de hierro macizo 90. En la propuesta de cascos: la Gorra de la Federal suma Percepción +1; el Bacinete baja a
+Res.CC +1 (50).
 

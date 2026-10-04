@@ -181,14 +181,18 @@ Reemplazan a las 72 de antes (24 × menor/normal/mayor). Común / Buena / Rara p
   mandando a un creep), lo mueve la pantalla de quien maneja a la víctima. Todos ven los pulsos del teleport. Si resiste (Res.Esp), no se la lleva.
 - **Mina napalm, Runa de silencio, Succión arcana y Descarga en cadena ✅ (hechos, ver arriba y `comun/CLAUDE.md`).**
 - **Quemadura ✅ (dueño, 2026-10-04, hecha):** «como un Sangrado que se resiste con resistencia a fuego». Estado estándar nuevo: 2 de daño por
-  turno, 3 turnos; si lo vuelven a quemar, +1 al daño por turno y vuelven a contar los turnos; **la Res. fuego le resta a cada turno** (sola, en el
+  turno, 3 turnos; si lo vuelven a quemar, **solo vuelven a contar los turnos** (no se suma: así tiene identidad propia y no es igual al Sangrado);
+  **la Res. fuego le resta a cada turno** (sola, en el
   Mantenimiento de personajes, invocaciones y creeps). Para que no le entre, sigue la tirada de Res.Esp de la trampa (regla de las trampas:
   quemaduras y venenos con Res.Esp). La usa el Géiser de fuego.
 - **Arena movediza ✅ (dueño, 2026-10-04):** atrapa a cualquiera que entre después de disparada (queda en el terreno sus 3 turnos). Ya lo hace la
   regla del efecto persistente (al entrar), **en cuanto se peguen las reglas de Firestore**.
-- **Confusión:** el dueño quiere la tirada **antes** de moverse o actuar (si no, se gasta los No2 en el movimiento y saca provecho): el Anuncio
-  «estás confundido, tirá antes» con qué significa cada resultado. Falta cerrar la propuesta (objetivo al azar entre los tokens visibles, qué
-  dado; qué se cobra al perder la acción). Ver P155 en `preguntas-abiertas.md`.
+- **Confusión ✅ (dueño, 2026-10-04, hecha y probada en vivo):** afecta a **quién elegís como objetivo de una acción hostil**; las defensas no.
+  La tirada va **antes de la primera acción del turno** (moverse incluido: si no, se gastaría los No2 moviéndose y sacaría provecho) y **vale
+  todo el turno, sin segundo intento**. 1d4: 1 decide el GM · 2 **pierde el turno** · 3 **objetivo al azar** entre los tokens que ve (aunque
+  intentara moverse: se elige un objetivo y la acción hostil va contra él; los pormenores, a mano en la mesa) · 4 actúa normal. El objetivo al azar:
+  cada candidato lleva su número en el mapa y se tira el dado común más chico que alcance (se repite lo que se pase). Con 1 o 2 la herramienta
+  avisa y deja «Hacerlo igual» (sandbox). Ver P155.
 - **Idea a futuro (consumibles):** métodos para que los jugadores accedan a ítems al azar (como el drop de los creeps) para probarlos, y que
   después estén accesibles en el catálogo. La escasez de las tiendas tiene que poder dejar a los jugadores con oro que no mejora su equipo
   (el vendedor no tiene nada mejor): ahí van a los consumibles.

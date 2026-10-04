@@ -20,7 +20,8 @@ rayo en cadena, creeps privados) · `11-botonera-nueva` (la Botonera de la ficha
 `12-acciones-nuevas` (Acciones nuevas de un creep ⚗) · `13-tokens-portal-duelo` (botón 🎭, portal, zonas de habilidad, duelo,
 hechizos de área, dodge, muerte) · `14-herramientas-y-arranque` (caja de herramientas, bitácora, Mesa y el arranque) ·
 `15-ficha-lite` (la ficha lite, 2026-10-02: va después del arranque porque solo define funciones y escuchas) · `16-momentos` · `17-oportunidad` ·
-`18-ventanas-gm` (las ventanas del GM de fin de combate, 2026-10-02, A6a) · `19-trampa-paso-a-paso` (caer en una trampa, 2026-10-04).
+`18-ventanas-gm` (las ventanas del GM de fin de combate, 2026-10-02, A6a) · `19-trampa-paso-a-paso` (caer en una trampa, 2026-10-04) ·
+`20-confusion` (la Confusión, 2026-10-04).
 **Es el mismo programa de antes, en el mismo orden**: comparten las variables globales. Cuidados (los mismos que la ficha): una
 línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar lo de su archivo o de los anteriores — el arranque
 (`iniciar()`) está al final de `14-…`; cada archivo lleva su `?v=` en `mapa.html` y se sube solo el del que cambia. Para buscar algo,
@@ -1380,3 +1381,15 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `costoRuta` (js/04); los usan el costo de la ruta (`rutaPendiente.costo`, js/06), el cartel y el cobro (js/08: «salir de la arena cuesta más»), los
   numeritos de la estela y la esferita de No2 (js/05). Solo en modo combate (en narrativo moverse no cuesta). La Arena movediza: Inmovilizado 1 turno,
   🔓 Soltarse con Fuerza 6 (1 No2; si falla, se hunde: +1 turno) y, ya libre, 2 No2 por cada paso que sale de la arena.
+
+- **😵 Confusión, automatizada** (2026-10-04, regla del dueño; `js/20-confusion.js`): en modo combate, un token con Confusión (marca `confusion`
+  del estado; el resumen público de la ficha la publica) que intenta su **primera acción del turno** —soltar una ruta (`rutaSoltada`, js/06) o
+  apretar una acción de la Botonera nueva o de las Acciones (`confusionEsAccion`: atacar, una habilidad, un consumible, levantarse, soltarse,
+  sigilo; **las defensas y las tiradas sueltas no**)— ve antes el Anuncio «Estás confundido: tirá antes» y tira 1d4: 1 decide el GM, 2 pierde el
+  turno, 3 objetivo al azar entre los tokens que ve (numerados en el mapa, `dibujarConfusionNumeros`; dado común más chico que alcance, se repite
+  lo que se pase), 4 actúa normal. **Una vez por turno** (`token@Mantenimiento`), el resultado vale todo el turno: queda en un momento
+  `tipo: 'confusion'` (lo ven todas las pantallas, `confusionMomento`; una pantalla que abre después lo busca, `confusionBuscar`). Con 4 o 3, «Seguir»
+  hace la acción (la ruta, o vuelve a apretar el botón: `confusionReclic`/`confusionPase`); con 1 o 2 avisa y deja «Hacerlo igual». Lo que pasa con
+  el objetivo al azar se resuelve a mano. Solo en el mapa (la ficha suelta y GM Tools no preguntan). Probado en vivo con un creep.
+- **Quemadura** (2026-10-04): estado estándar, 2 de daño por turno, 3 turnos; reaplicarla solo reinicia los turnos; la Res. fuego le resta a cada
+  turno (`Combatiente.pasarTurnoEstados`, `resFuego`).

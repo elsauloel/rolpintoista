@@ -712,7 +712,7 @@ resuelven a mano, como el resto de los avisos).
   Iniciativa, como contrapeso natural de mucha Defensa. Al dueño le parece que «puede ser exactamente la solución que estábamos buscando»;
   **lo va a consultar con sus colegas**. Por ahora las penalidades de sobrepeso quedan como están. *(diseño, para el grupo)* **Publicada en 🛠 Herramientas de diseño → 💬 Preguntas (2026-10-04).**
 
-### P155 — Confusión: cómo se automatiza (2026-10-04)
+### P155 — Confusión: cómo se automatiza (2026-10-04) ✅ decidida y hecha el mismo día (ver `rework-trampas.md`)
 **Contexto:** la Niebla de confusión deja Confusión. El dueño: la tirada tiene que ser **antes** de moverse o de cualquier acción (si no, el
 jugador gasta los No2 moviéndose y saca provecho): al confirmar la ruta o la acción, antes de que pase, aparece el Anuncio «Estás confundido:
 tirá antes» con qué significa cada resultado y el botón; según lo que salga se resuelve. El objetivo al azar se elige entre los tokens visibles.

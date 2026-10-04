@@ -30,6 +30,7 @@ const CONFUSION_TEXTOS = {
   3: ['Objetivo al azar', 'Se elige al azar un objetivo entre los que ve: toda acción hostil de este turno va contra él.'],
   4: ['Actúa normal', 'Este turno actúa normal.'],
 };
+const CONFUSION_CORTO = {1: 'decide el GM', 2: 'pierde el turno', 3: 'objetivo al azar', 4: 'actúa normal'};
 const confusionClave = id => `${id}@${Math.round(num(mantenimientoNumero))}`;
 
 // Los estados de un token (personaje, invocación o creep), como los ve esta pantalla.
@@ -88,7 +89,7 @@ function confusionYaTirada(t, r, seguir){
 function confusionPedirTirada(tokenId, seguir){
   const t = tokens.get(tokenId);
   if(!t) return;
-  const tabla = [1, 2, 3, 4].map(n => `${n}: ${CONFUSION_TEXTOS[n][0].toLowerCase()}`).join(' · ');
+  const tabla = [1, 2, 3, 4].map(n => `${n}: ${CONFUSION_CORTO[n]}`).join(' · ');
   const dibujar = (rodando) => AvisoCombate.mostrar({clave: 'confusion:' + tokenId, icono: '😵', titulo: `${nombreDe(t)} está confundido`,
     pasos: [{titulo: 'Estás confundido: tirá antes', texto: `Antes de su primera acción del turno tira 1d4. ${tabla}. El resultado vale para todo el turno (las defensas no se tocan).`, espera: true}],
     botones: [{texto: rodando ? '🎲 Rodando…' : '🎲 Tirar 1d4', deshabilitado: !!rodando, alClic: () => confusionTirar(tokenId, seguir, dibujar)},
@@ -106,7 +107,7 @@ async function confusionTirar(tokenId, seguir, dibujar){
     const quien = nombreDe(t), r = tirarDados('1d4');
     try{ await mesaPublicar(`Confusión de ${quien}`, {formula: r.formula, rolls: r.rolls, mod: r.mod, total: r.total, quien, ...(t.tipo === 'creep' ? {desde: 'gm'} : {})}); }catch(err){}
     await trampaEsperarDados();
-    const res = r.total, pasos = [{titulo: 'Confusión', texto: `1d4 = ${res} → ${CONFUSION_TEXTOS[res][0].toLowerCase()}`}];
+    const res = r.total, pasos = [{titulo: 'Confusión', texto: `1d4 = ${res} → ${CONFUSION_CORTO[res]}`}];
     let objetivoId = '', objetivo = '';
     if(res === 3){
       const o = await confusionAlAzar(tokenId);

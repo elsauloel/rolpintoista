@@ -417,4 +417,9 @@ detectarla con Percepción al pisar) · carrera (más casilleros por No2 si no a
 casilleros en línea) · patada (un ataque con la pierna: Demora o Derribar) · caminar en la zona de alerta sin pedir tirada (sigilo al moverse) · resistir
 el empuje del muro o de una explosión · cruzar zonas persistentes sin que se disparen al entrar · reducir el sobrepeso (cargar más sin penalidad) ·
 no hacer ruido al moverse (no rompe el sigilo al cruzar un cono, una vez por turno).
+**Idea del dueño (2026-10-04): un bono al movimiento que no sea dar o sacar No2** (eso afecta todas las demás acciones): **el primer movimiento del
+turno gratis**, o como desventaja **el primer movimiento cuesta el doble**. Da identidad a las piernas. Propuesta de peso: 1er casillero gratis = 2
+puntos (ahorra 1 No2 por turno, solo para moverse; un No2 de verdad vale 4) · 1er casillero al doble = devuelve 2. Más alto: los 2 primeros gratis
+(Rara). A construir en el mapa (el costo de la ruta, `costoPasos`, sabiendo qué token ya usó su primer paso en este turno, de Mantenimiento a
+Mantenimiento). *(Esperando el OK del dueño: si es el primer casillero o el primer movimiento entero, y el peso.)*
 

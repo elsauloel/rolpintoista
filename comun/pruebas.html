@@ -92,6 +92,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
 <script src="duelo.js"></script>
+<script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
 <script src="ficha-editor.js"></script>
@@ -1764,6 +1765,16 @@ prueba('Soltarse (trampas de Atrapar): el estado guarda qué tirar y cuánto cue
   igual([est.soltar, Combatiente.textoSoltarse(est), S.nitros, reg.some(r => /Soltarse \(Inmovilizado\) · Fuerza contra 6/.test(r)), t.ok, sc.nitros, sc.estados.length, /se soltó/.test(x.aviso),
     inv.estados.length, inv.nitros, Combatiente.estadoSoltable([{nombre: 'Inmovilizado', activo: true}])],
     [{stat: 'fue', etq: 'Fuerza', dif: 6, no2: 2}, '🔓 Soltarse · Fuerza contra 6 · 2 No2', 8, true, true, 3, 0, true, 0, 2, null]);
+});
+prueba('el pop-up de efectos de combate usa la estética del duelo: cabecera, una tarjeta por paso, el veredicto con su color y «Entendido»', () => {
+  let cerrado = 0;
+  AvisoCombate.mostrar({icono: '🪤', titulo: 'Clementino pisó «Foso con estacas»', pasos: [{titulo: 'Para esquivarla', texto: 'Evasión 5 contra 7: no la evitó'}, 'Sentado'],
+    veredicto: {tono: 'malo', grande: '¡CAYÓ EN LA TRAMPA!'}, aMano: 'nada', alCerrar: () => cerrado++});
+  const f = document.querySelector('.aviso-combate-fondo');
+  const datos = [!!f.querySelector('.duelo-caja .duelo-cab'), f.querySelectorAll('.duelo-paso').length, f.querySelector('.duelo-veredicto').className, f.querySelector('.duelo-veredicto .grande').textContent];
+  f.querySelector('[data-aviso-ok]').click();
+  igual([...datos, !!document.querySelector('.aviso-combate-fondo'), cerrado, AvisoCombate.abierto()],
+    [true, 2, 'duelo-veredicto fallo', '¡CAYÓ EN LA TRAMPA!', false, 1, false]);
 });
 prueba('superficie de efecto de una trampa: solo quien la pisó, toda la trampa o una flor de radio 1 o 2 alrededor de la casilla pisada', () => {
   igual([JSON.parse(TokensAuto.estadoJson({nombre: 'Veneno'}, null, null, {area: 'flor', radio: 3})), TokensAuto.efectoNorm({area: 'pisador', radio: 2}),

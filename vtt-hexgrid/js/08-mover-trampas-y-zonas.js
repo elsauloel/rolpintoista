@@ -520,7 +520,7 @@ async function trampaAplicarEfectos(t, el, celdaPisada){
   for(const x of afectados){
     const quien = x.oculto ? 'Alguien' : nombreDe(x);
     const esInv = String(x.fichaId || '').includes(SEP_INVOCACION);
-    const partes = [];
+    const partes = [], pasos = [];   // pasos: {titulo, texto} para el pop-up (comun/aviso-combate.js); partes: la línea de la Mesa
     let evita = '';
     if(salva){
       const estadosDe = x.tipo === 'creep' ? ((creepPrivadoDe(x.fichaId) || {}).estados || []) : (((fichasPub.get(x.fichaId) || {}).resumen || {}).estados || []);
@@ -531,6 +531,7 @@ async function trampaAplicarEfectos(t, el, celdaPisada){
         const ok = rd.total >= num(salva.dif);   // llegar a la dificultad alcanza (como detectarla)
         if(ok) evita = salva.que || 'todo';
         partes.push(`${etq} ${rd.total} contra ${salva.dif}: ${!ok ? 'no la evitó' : evita === 'mitad' ? 'la mitad del daño' : evita === 'efecto' && tir ? 'esquivó el efecto' : 'la evitó'}`);
+        pasos.push({titulo: 'Para esquivarla', texto: partes[partes.length - 1]});
       }
     }
     if(tir && evita !== 'todo'){
@@ -542,6 +543,7 @@ async function trampaAplicarEfectos(t, el, celdaPisada){
         else if(monto > 0 && x.tipo === 'pj' && x.fichaId && (puedoMover(x) || soyGM)){ await (esInv ? danioInv : danioPj)(x, String(monto), !!el.trampaIgnoraDef); hecho = true; }
       }catch(err){ console.error('No se pudo aplicar el daño de la trampa:', err); }
       partes.push(monto > 0 ? `${monto} de daño${el.trampaIgnoraDef ? ' directo a la vida' : ' (menos su Defensa)'}${hecho ? '' : ' — aplicalo a mano'}` : 'sin daño');
+      pasos.push({titulo: 'Daño', texto: `${tir.formula} = ${tir.total}${evita === 'mitad' ? ' (la mitad)' : ''} → ${partes[partes.length - 1]}`});
     }
     if(spec && evita !== 'todo' && evita !== 'efecto'){
       let que = ' — aplicalo a mano';
@@ -556,12 +558,17 @@ async function trampaAplicarEfectos(t, el, celdaPisada){
         }
       }catch(err){ console.error('No se pudo aplicar el estado de la trampa:', err); }
       partes.push(`${EstadosAplicar.texto(spec)}${que}`);
+      pasos.push({titulo: 'Lo que le deja', texto: partes[partes.length - 1]});
     }
-    const resultado = partes.join(' · ') || (x === t && trampaMuroDe(el) ? 'se levanta un muro delante' : 'no le hizo nada');
+    if(x === t && trampaMuroDe(el)){ partes.push('se levanta un muro delante'); pasos.push({titulo: 'El muro', texto: `Se levanta una pared delante, por ${trampaMuroDe(el).turnos} turnos: hay que rodearla.`}); }
+    const resultado = partes.join(' · ') || 'no le hizo nada';
+    // El cartel grande del pop-up: rojo si lo agarró, verde si la esquivó entera, azul si esquivó solo el efecto o la mitad.
+    const veredicto = evita === 'todo' ? {tono: 'bueno', grande: '¡LA ESQUIVÓ!'} : (evita === 'efecto' || evita === 'mitad') ? {tono: 'neutro', grande: evita === 'mitad' ? 'LA MITAD' : 'ESQUIVÓ EL EFECTO'}
+      : {tono: 'malo', grande: x === t ? '¡CAYÓ EN LA TRAMPA!' : '¡LO ALCANZÓ!'};
     mesa.push(`${quien}: ${resultado}`);
     momentoAbrir({tipo: 'trampa', icono: '🪤', titulo: x === t ? `${quien} pisó «${nombreT}»` : `${quien} quedó en el área de «${nombreT}»`,
       resultado: resultado + (aMano ? ` · ✋ ${aMano}` : ''), estado: 'listo',
-      datos: {paraUid: x.tipo === 'creep' ? gmUid : (x.duenoUid || ''), aviso: true}});
+      datos: {paraUid: x.tipo === 'creep' ? gmUid : (x.duenoUid || ''), aviso: true, pasos, veredicto, ...(aMano ? {aMano} : {})}});
   }
   if(mesa.length && (tir || spec || salva)) alertaRojaAnonima(`🪤 ${nombreT}${tir ? ` · ${tir.formula} = ${tir.total}` : ''}`, mesa.join(' · '));
 }

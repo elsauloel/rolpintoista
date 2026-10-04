@@ -280,16 +280,9 @@ async function deteccionGMResolver(){
 let avisoCentro = null;   // {id, d}
 function momentoAvisoCentro(id, d){
   avisoCentro = {id, d};
-  let el2 = document.getElementById('momento-aviso-centro');
-  if(!el2){
-    el2 = document.createElement('div');
-    el2.id = 'momento-aviso-centro';
-    momentoEstiloCentro(el2);
-    el2.style.top = '35%';
-    el2.style.zIndex = '77';
-    document.body.appendChild(el2);
-  }
-  el2.hidden = false;
-  el2.innerHTML = `<div style="flex:1 1 100%"><div style="font-size:30px;line-height:1">${esc(d.icono || '•')}</div><div style="font-size:18px;font-weight:700;margin-top:6px">${esc(d.titulo || '')}</div>${d.resultado ? `<div style="margin-top:4px;color:#cfd6e6">${esc(d.resultado)}</div>` : ''}</div><button type="button" class="btn" id="momento-aviso-ok">Entendido</button>`;
-  document.getElementById('momento-aviso-ok').onclick = () => { el2.hidden = true; avisoCentro = null; };
+  // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los pop-ups de efectos de combate): comun/aviso-combate.js.
+  const dt = d.datos || {};
+  AvisoCombate.mostrar({icono: d.icono || '•', titulo: d.titulo || '', pasos: Array.isArray(dt.pasos) ? dt.pasos : [],
+    texto: Array.isArray(dt.pasos) && dt.pasos.length ? '' : (d.resultado || ''), veredicto: dt.veredicto || null, aMano: dt.aMano || '',
+    alCerrar: () => { avisoCentro = null; }});
 }

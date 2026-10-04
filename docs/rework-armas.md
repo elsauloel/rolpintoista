@@ -1216,7 +1216,7 @@ mucho más: dos efectos y un bono.
 **Decisiones (dueño, 2026-10-03):** Raras por arquetipos ✅; Mangual (4 dados), Martillo de sargento y Maza de acero → a las Excepcionales; el
 Lucero del alba es la maza con pinchos que rompe armadura; el Hacha de batalla a dos manos se renombra (y se rediseña si hace falta).
 
-### T10 Raro — propuesta v1: 18 armas por arquetipo (2026-10-03, ⬜ a revisar por el dueño)
+### T10 Raro — propuesta v1: 18 armas por arquetipo (2026-10-03, ✅ aprobada y cargada)
 | Arma | Lo que hace · precio |
 |---|---|
 | **⏳ La que atrasa** | |
@@ -1245,3 +1245,7 @@ Lucero del alba es la maza con pinchos que rompe armadura; el Hacha de batalla a
 | Lucero del alba (rehecho) | 2 dados · +1 · Rompe armadura 50 % · Pajaritos 25 % · 300 (la maza con pinchos) |
 
 Demora 6 · Pajaritos 7 · Derribar 6 · Aturdir 3 (17–20 %) · Rompe armadura 1.
+
+**T10 Raro cargada (2026-10-03):** las 18 con sus tres textos. Mangual (4 dados), Martillo de sargento y Maza de acero pasaron a Excepcional (para
+esa vuelta). El Mangual de 2 dados quedó como Mangual de cadena y el Hacha de batalla a dos manos como Mazo de demolición (mismos ids); «⚠️ Maza» y
+«⚠️ Lucero del alba» sin la marca. **Tipo 10: Común, Buena y Rara hechas.** Sigue: Tipo 12 (explosivos).

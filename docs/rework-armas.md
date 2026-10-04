@@ -1212,3 +1212,36 @@ bola» quedó como Martillo de bola (a dos manos). «Detalles técnicos» de Der
 Hoy, de los tres efectos de la casa: Demora 2 · Derribar 0 · Pajaritos 0 (Aturdir 1).
 **La cuenta del Tipo 10 en Rara:** 3 dados a una mano ya rinden 15,9 (techo 17): casi sin lugar; a dos manos, 15,2. Con 2 dados (10,6) entra
 mucho más: dos efectos y un bono.
+
+**Decisiones (dueño, 2026-10-03):** Raras por arquetipos ✅; Mangual (4 dados), Martillo de sargento y Maza de acero → a las Excepcionales; el
+Lucero del alba es la maza con pinchos que rompe armadura; el Hacha de batalla a dos manos se renombra (y se rediseña si hace falta).
+
+### T10 Raro — propuesta v1: 18 armas por arquetipo (2026-10-03, ⬜ a revisar por el dueño)
+| Arma | Lo que hace · precio |
+|---|---|
+| **⏳ La que atrasa** | |
+| Maza de justicia | 3 dados · Demora 25 % · 400 |
+| Mazo del juez 🆕 | 2 dados · Demora siempre · Pajaritos 25 % · 350 |
+| Cachiporra reforzada | 2 dados · +2 · Bloqueo +1 · Demora 50 % (era 25 %) · 350 |
+| **🐦 La que marea** | |
+| Maza del estibador 🆕 | 2 dados · +1 · Pajaritos siempre · 300 |
+| Martillo de cabeza plana | 2 dados · Bloqueo +2 · Pajaritos 50 % · 300 |
+| Martillo de la campana 🆕 | 2 manos · 2 dados · Pajaritos 50 % · Demora 25 % · 230 |
+| **🪨 La que tumba** | |
+| Mangual de cadena (era el Mangual de 2 dados) | 2 dados · +1 · Derribar 50 % (sin Alcance) · 220 |
+| Mazo de demolición (era el Hacha de batalla a dos manos) | 2 manos · 3 dados · Derribar 33 % · 350 |
+| Martillo de asta 🆕 | 2 manos · 2 dados · Alcance +1 · Derribar 50 % · 350 |
+| **💫 La que aturde** | |
+| Martillo del sargento mayor | 2 dados · Parry +1 · Bloqueo +1 · Aturdir 17 % · 270 |
+| Mazo de la tormenta 🆕 | 2 dados · Aturdir 20 % · Pajaritos 33 % · 230 |
+| Rompecráneos 🆕 | 2 dados · +1 · Aturdir 20 % · Derribar 25 % · 240 |
+| **🛡 La muralla** | |
+| Maza de guardia (rehecha) | 2 dados · Parry +1 · Bloqueo +2 · Derribar 25 % · resistente · 400 |
+| Maza del castellano 🆕 | 2 dados · Parry +1 · Bloqueo +2 · Demora 25 % · muy resistente · 450 |
+| Bastón herrado del portero 🆕 | 2 manos · 2 dados · Parry +1 · Bloqueo +2 · Pajaritos 25 % · muy resistente · 400 |
+| **🔨 La pesada** | |
+| Martillo | 3 dados · Demora 25 % · 400 |
+| Maza | 2 dados + 1 amplificado · Derribar 20 % · 400 |
+| Lucero del alba (rehecho) | 2 dados · +1 · Rompe armadura 50 % · Pajaritos 25 % · 300 (la maza con pinchos) |
+
+Demora 6 · Pajaritos 7 · Derribar 6 · Aturdir 3 (17–20 %) · Rompe armadura 1.

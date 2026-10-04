@@ -671,7 +671,8 @@ const Duelo = (() => {
 
   // Anota la tirada de `campo` ('pdg'|'eva'|'fuerza'|'bloqueo'); si ya está el otro del par, lo resuelve en la misma transacción.
   async function guardarTiro(id, campo, r, defensa, extra){
-    const tiro = {total: campo === 'eva' ? Math.max(1, Math.round(_num(r.total))) : Math.round(_num(r.total)), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod)};
+    const tiro = {total: campo === 'eva' ? Math.max(1, Math.round(_num(r.total))) : Math.round(_num(r.total)), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod),
+      ...(r.nota ? {nota: String(r.nota).slice(0, 60)} : {})};   // lo que se sumó a la tirada (2026-10-04: «+2 contra oportunidad»): se ve en el cuadro y en la Mesa
     const fase = (campo === 'pdg' || campo === 'eva') ? 'contacto' : 'bloqueo';
     const ref = col().doc(id);
     let anuncio = '', par = null;
@@ -692,7 +693,8 @@ const Duelo = (() => {
       const a = fase === 'contacto' ? m.pdg : m.fuerza, b = fase === 'contacto' ? m.eva : m.bloqueo;
       if(a && b){
         const nb = fase === 'contacto' ? etqContra(m) : 'Bloqueo';
-        par = [{origen: `${m.atacante.nombre} · ${fase === 'contacto' ? etqTira(m) : 'Fuerza del golpe'}`, r: a}, {origen: `${m.defensor.nombre} · ${nb}`, r: b}];
+        const notaDe = t => t && t.nota ? ` (${t.nota})` : '';
+        par = [{origen: `${m.atacante.nombre} · ${fase === 'contacto' ? etqTira(m) : 'Fuerza del golpe'}${notaDe(a)}`, r: a}, {origen: `${m.defensor.nombre} · ${nb}${notaDe(b)}`, r: b}];
       }
     });
     // Las dos tiradas se publican a la vez para que los dos juegos de dados 3D rueden juntos.
@@ -1282,7 +1284,7 @@ const Duelo = (() => {
   const nombreDefensa = d => d.hab ? etqContra(d) : d.defensa ? (d.defensa.modo === 'parry' ? 'Parry' + (d.defensa.itemNombre ? ' · ' + d.defensa.itemNombre : '') : 'Evasión') : 'Defensa';
 
   function numerosHtml(tiro, esNuevo, que, quien){
-    return `<div class="duelo-tiro${esNuevo ? ' nuevo' : ''}"><div class="que">${_esc(que)} · ${_esc(quien)}</div><div class="num">${_fmt(tiro.total)}</div><div class="det">${_esc(tiro.formula || '')}${tiro.rolls && tiro.rolls.length ? ' → ' + tiro.rolls.join(' + ') : ''}${_num(tiro.mod) ? ' ' + (_num(tiro.mod) > 0 ? '+' : '−') + ' ' + Math.abs(_num(tiro.mod)) : ''}</div></div>`;
+    return `<div class="duelo-tiro${esNuevo ? ' nuevo' : ''}"><div class="que">${_esc(que)}${tiro.nota ? ' (' + _esc(tiro.nota) + ')' : ''} · ${_esc(quien)}</div><div class="num">${_fmt(tiro.total)}</div><div class="det">${_esc(tiro.formula || '')}${tiro.rolls && tiro.rolls.length ? ' → ' + tiro.rolls.join(' + ') : ''}${_num(tiro.mod) ? ' ' + (_num(tiro.mod) > 0 ? '+' : '−') + ' ' + Math.abs(_num(tiro.mod)) : ''}</div></div>`;
   }
 
   // El «?» que explica Esquivar, Parry y Bloqueo (comun/modificadores-tirada.js; si la página no lo carga, no aparece).
@@ -1929,6 +1931,9 @@ const Duelo = (() => {
     esperaTiro = null;
     retener(false);
     let rr = r;
+    // Una Evasión contra oportunidad / contra contraataque (2026-10-04): la página la etiqueta «Evasión (+2 contra oportunidad)»; el duelo guarda esa nota.
+    const notaEsp = String(det.origen || '').match(/\(([+−-]\s*\d+\s+contra [^)]*)\)/);
+    if(notaEsp) rr = {...r, nota: notaEsp[1]};
     if(flash && _num(flash.bono)){   // el Flash suma un «+» fijo a la tirada (y cuenta como tal en el desempate)
       rr = {...r, mod: _num(r.mod) + _num(flash.bono), total: _num(r.total) + _num(flash.bono), formula: String(r.formula || '') + ` +${_num(flash.bono)} ⚡`};
       anunciarMesa(`⚡ ${flash.etq || 'Flash'}: +${_num(flash.bono)} a ${ETQ_FLASH[campo === 'eva' ? 'eva' : campo] || 'la tirada'} (${flash.quien || 'un jugador'})`);

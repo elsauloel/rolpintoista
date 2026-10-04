@@ -789,6 +789,10 @@ function dueloOpcionesLocal(d){
   if(!sc) return motivo('no encuentro los datos de ese creep');
   window.DUELO_MOTIVO = '';
   if(d.hab) return Duelo.opcionesHab(d, {puedeParry: () => !!defensaCreepMapa(sc)});   // habilidad dirigida: lo que puede tirar el creep contra ella
+  // Con las Acciones nuevas cargadas, las mismas opciones que GM Tools (comun/creep-duelo.js: con los dados que tiraría y la Evasión contra
+  // oportunidad / contraataque, 2026-10-04); si no, la versión corta de abajo.
+  const hk = typeof acHooksDuelo === 'function' ? acHooksDuelo(d.defensor) : null;
+  if(hk && hk.opcionesDefensa){ const o = hk.opcionesDefensa(d) || []; return d.ataque && d.ataque.sinParry ? o.filter(x => x.modo !== 'parry') : o; }
   // Parry solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30, comun/combatiente.js; la misma que GM Tools).
   const def = defensaCreepMapa(sc), c = Combatiente.costoParry();
   const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión'}];

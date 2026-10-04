@@ -35,7 +35,7 @@ const AvisoCombate = (() => {
     if(a.alCerrar) try{ a.alCerrar(); }catch(err){ console.error(err); }
   }
   /* Paso a paso (2026-10-04, trampas: «cada tirada en su momento y cada resultado anunciado»): `botones: [{texto, alClic, sec, deshabilitado}]`
-     reemplazan a «Entendido» (la tirada que toca ahora); un paso con `espera: true` es el que falta (punteado). Con `clave`, volver a llamar
+     reemplazan a «Entendido» (la tirada que toca ahora; `detalle`: una línea chica debajo del texto del botón, ej. qué hace el arma, 2026-10-04); un paso con `espera: true` es el que falta (punteado). Con `clave`, volver a llamar
      con la misma clave redibuja la ventana abierta sin cerrarla (ni llamar a alCerrar). */
   function mostrar(o){
     o = o || {};
@@ -56,7 +56,7 @@ const AvisoCombate = (() => {
         ${v ? `<div class="duelo-veredicto ${TONO[v.tono] || 'bloqueado'}"><div class="grande">${e(v.grande)}</div>${v.chico ? `<div class="chico">${e(v.chico)}</div>` : ''}</div>` : ''}
         ${o.aMano ? `<div class="aviso-mano">✋ ${e(o.aMano)}</div>` : ''}
         <div class="duelo-pie">${botones.length
-          ? botones.map((b, i) => `<button type="button" data-aviso-b="${i}"${b.sec ? ' class="sec"' : ''}${b.titulo ? ` title="${e(b.titulo)}"` : ''}${b.deshabilitado ? ' disabled' : ''}>${e(b.texto)}</button>`).join('')
+          ? botones.map((b, i) => `<button type="button" data-aviso-b="${i}"${b.sec ? ' class="sec"' : ''}${b.titulo ? ` title="${e(b.titulo)}"` : ''}${b.deshabilitado ? ' disabled' : ''}>${e(b.texto)}${b.detalle ? `<small style="display:block;font-weight:400;font-size:12px;line-height:1.35;opacity:.88;margin-top:4px;white-space:normal;text-align:left">${e(b.detalle)}</small>` : ''}</button>`).join('')
           : `<button type="button" data-aviso-ok>${e(o.boton || 'Entendido')}</button>`}</div>
       </div>
     </div>`;
@@ -118,7 +118,7 @@ const AvisoCombate = (() => {
         ${o.texto ? `<p class="aviso-texto">${e(o.texto)}</p>` : ''}
         ${v ? `<div class="duelo-veredicto ${TONO[v.tono] || 'bloqueado'}"><div class="grande">${e(v.grande)}</div>${v.chico ? `<div class="chico">${e(v.chico)}</div>` : ''}</div>` : ''}
         ${o.aMano ? `<div class="aviso-mano">✋ ${e(o.aMano)}</div>` : ''}
-        ${botones.length ? `<div class="duelo-pie">${botones.map((b, i) => `<button type="button" data-cartel-b="${i}"${b.id ? ` id="${e(b.id)}"` : ''}${b.sec ? ' class="sec"' : ''}${b.titulo ? ` title="${e(b.titulo)}"` : ''}${b.deshabilitado ? ' disabled' : ''}>${e(b.texto)}</button>`).join('')}</div>` : ''}
+        ${botones.length ? `<div class="duelo-pie"${botones.some(b => b.detalle) ? ' style="flex-direction:column;align-items:stretch"' : ''}>${botones.map((b, i) => `<button type="button" data-cartel-b="${i}"${b.id ? ` id="${e(b.id)}"` : ''}${b.sec ? ' class="sec"' : ''}${b.titulo ? ` title="${e(b.titulo)}"` : ''}${b.deshabilitado ? ' disabled' : ''}>${e(b.texto)}${b.detalle ? `<small style="display:block;font-weight:400;font-size:12px;line-height:1.35;opacity:.88;margin-top:4px;white-space:normal;text-align:left">${e(b.detalle)}</small>` : ''}</button>`).join('')}</div>` : ''}
       </div>
     </div>`;
     el.querySelectorAll('[data-cartel-b]').forEach(b => { const x = botones[Number(b.dataset.cartelB)]; b.onclick = () => { if(x && x.alClic) x.alClic(); }; });

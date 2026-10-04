@@ -301,3 +301,23 @@ el nombre conservan su id y su narrativa). Precio = 10 + 25 por punto de la bols
   repare de a un punto: `reparoRoto`). *Por qué:* premia cuidar el equipo antes de que se rompa del todo. El sistema completo de reparación está
   en Herramientas de diseño → A desarrollar.
 
+## Ruta del diseño de los equipos (dueño, 2026-10-04)
+**Alcance:** de Común a Rara. Excepcional y Legendaria quedan para otro momento.
+
+**Ruta: a lo ancho, calidad por calidad** (el dueño lo dejó a criterio; se eligió así). *Por qué:* cada calidad corresponde a un tramo de niveles
+(Común ↔ N1–2, Buena ↔ N3–4, Rara ↔ N5), y el balance se mide con el **equipo completo** de ese tramo: la Defensa y sobre todo las resistencias a
+crítico **se acumulan entre partes**, y eso no se ve diseñando una parte de arriba abajo. Así, al cerrar cada calidad, hay un equipo entero que se
+puede medir contra la curva.
+
+1. **Común:** torso ✅ · escudo · cabeza · manos · piernas · pies · cinturón · anillos. **Control:** la calculadora sobre el equipo Común completo
+   contra la curva de N1 (Defensa 4–10, T4 ≤ 2, T6 ≤ 1) y N2 (5–12).
+2. **Buena:** las mismas partes, en el mismo orden. **Control:** N3 (6–14, T4 ≤ 3, T6 ≤ 2, T8 ≤ 1) y N4 (7–16, T10 ≤ 1).
+3. **Rara:** las mismas partes; aparece «Indestructible» (muy escaso). **Control:** N5 (8–18, T4 ≤ 4, T6 ≤ 3, T8 ≤ 2, T10 ≤ 1, T12 ≤ 1).
+4. Con el catálogo defensivo armado: **escasez en el generador de tiendas** (elegir rubro y parte del cuerpo antes que la pieza) y el **simulador
+   de tiendas**; después, la **hoja de ruta del oro del GM**.
+5. Al final: el **manual de diseño** para los colegas.
+
+Cada parte, como hasta ahora: propuesta en una tabla → OK del dueño → se carga reemplazando las viejas de esa calidad. Las piezas viejas de las
+calidades que todavía no se rehicieron quedan como están hasta que les toque. La identidad de cada parte (ver «Paleta de variables») ya marca
+qué le toca a cada calidad: así lo Común no gasta las ideas de lo Raro.
+

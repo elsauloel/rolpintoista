@@ -448,7 +448,9 @@ de su bolsa. Se construyeron las tres mecánicas nuevas, iguales para personajes
 - **Evasión contra oportunidad** (`evaopor`) y **contra contraataque** (`evacontra`): suman a la Evasión del defensor solo en un duelo de ese tipo
   de ataque (no al Parry). `Combatiente.statEvaEspecial`; los ganchos `defender`/`opcionesDefensa` de `ficha-duelo.js`, `creep-duelo.js`, `inv-duelo.js`.
 - **Retirada limpia** (`retirada`, en %): al alejarse de un rival, quien se aleja tira 1d6 (33 % = 5–6, 50 % = 4–6; 100 = siempre, sin tirar) antes
-  de que el rival decida; si sale, sigue su camino sin ataque de oportunidad (`vtt-hexgrid/js/17`, `oporRetirada`). Las invocaciones todavía no la
+  de que el rival decida; si sale, sigue su camino sin ataque de oportunidad (`vtt-hexgrid/js/17`, `oporRetirada`). **Nunca silenciosa** (dueño,
+  2026-10-04: «el anuncio y la tirada no pueden ser silenciosas y automáticas en el log»): a quien se aleja se le abre un cartel paso a paso con su
+  chance y el botón «🎲 Tirar 1d6»; los dados ruedan, el cartel muestra el resultado y el resto de la mesa lo ve en la Crónica. Las invocaciones todavía no la
   leen en el mapa (como los Pasos gratis).
 - Pesos en `herramientas/calculadora_defensa.py`: `evaopor` 1, `evacontra` 2/3, `retirada` 0,03 por punto (33 % ≈ 1, 50 % = 1,5) y 4 si es 100.
 

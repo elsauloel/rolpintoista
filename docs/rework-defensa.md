@@ -403,4 +403,6 @@ Ninguna pieza da solo resistencias elementales (el Pañuelo mojado pasó a Defen
 **consumibles** (ver pendientes).
 **Sin ranuras de consumibles en los guantes (dueño, 2026-10-04):** «uno no guardaría una poción en el guante». Los Mitones del boticario pasan a
 Parry +1 · Res. ácido +2. Las ranuras de cinturón van donde se puede guardar algo de verdad (cinturón, túnicas, el casco cervecero).
+**Para Buena y Rara (dueño, 2026-10-04): la Iniciativa también es una variable de los guantes** (tiene sentido narrativo: manos rápidas), con su
+costo de siempre (1,5). No se rehacen los Comunes por esto: se suma recién al diseñar los guantes de calidades más altas.
 

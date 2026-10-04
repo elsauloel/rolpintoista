@@ -422,4 +422,10 @@ turno gratis**, o como desventaja **el primer movimiento cuesta el doble**. Da i
 puntos (ahorra 1 No2 por turno, solo para moverse; un No2 de verdad vale 4) · 1er casillero al doble = devuelve 2. Más alto: los 2 primeros gratis
 (Rara). A construir en el mapa (el costo de la ruta, `costoPasos`, sabiendo qué token ya usó su primer paso en este turno, de Mantenimiento a
 Mantenimiento). *(Esperando el OK del dueño: si es el primer casillero o el primer movimiento entero, y el peso.)*
+**Pasos gratis: construido y probado en vivo (2026-10-04).** Stat `pasosgratis` (equipo, pasivas, estados): los primeros N casilleros de cada turno
+no cuestan No2; el mapa los descuenta, los anuncia («2 casilleros gratis») y Ctrl+Z los devuelve. Escala con la calidad: 1 / 2 / 3. Peso propuesto:
+2 por el primero (a confirmar los siguientes). El «primero al doble» como desventaja queda para otros contextos, no para las piernas.
+**Idea del dueño (2026-10-04): Evasión contra ataques de oportunidad y contra contraataques** (cuando te los hacen a vos). La de oportunidad vale
+más, porque depende de vos (vos elegís alejarte y le sacás provecho); la de contraataque no depende de vos para nada. Propuesta de peso: Evasión en
+oportunidad 1, Evasión en contraataque 0,5. A construir en el duelo (la Evasión del defensor suma el bono según el tipo de ataque).
 

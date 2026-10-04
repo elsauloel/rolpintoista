@@ -88,6 +88,7 @@ const Plantillas = (() => {
     'muro',   // trampa de muro (2026-10-03): {largo: 3 | 5, turnos} — al dispararse se levanta una pared delante de quien la pisó
     'soltar',   // cómo se suelta quien quedó agarrado (2026-10-03, Atrapar): {stat, etq, dif, no2} — va con el estado que deja
     'efecto',   // superficie de efecto (2026-10-03): {area: 'pisador' | 'trampa' | 'flor', radio} — si no dice, la deduce el mapa
+    'lento',   // terreno lento (2026-10-04, arena movediza): una vez disparada, cada paso que sale de ella cuesta ese No2
     'elemento'];   // de qué elemento es el daño (2026-10-04): 'fuego' | 'hielo' | 'rayo' | 'toxico' | 'acido' — se resta esa resistencia
   function trampaDesde(t){
     if(!t || typeof t !== 'object') return null;

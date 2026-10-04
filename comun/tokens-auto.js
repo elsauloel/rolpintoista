@@ -41,10 +41,12 @@ const TokensAuto = (() => {
   }
   // El JSON de trampaEstado: el estado que deja, la salvación, el muro y la superficie de efecto ('' si no hay ninguno).
   // `elemento` (2026-10-04): de qué es el daño ('fuego' | 'hielo' | 'rayo' | 'toxico' | 'acido'): se resta la resistencia a ese elemento.
-  function estadoJson(estado, salvacion, muro, efecto, elemento){
+  // `lento` (2026-10-04, arena movediza): una vez disparada, cada paso que sale de una de sus casillas cuesta ese No2.
+  function estadoJson(estado, salvacion, muro, efecto, elemento, lento){
     const sv = salvaNorm(salvacion), mu = muroNorm(muro), ef = efectoNorm(efecto);
     const elem = ['fuego', 'hielo', 'rayo', 'toxico', 'acido'].includes(elemento) ? elemento : '';
-    const o = {...(estado && estado.nombre ? estado : {}), ...(sv ? {salva: sv} : {}), ...(mu ? {muro: mu} : {}), ...(ef ? {efecto: ef} : {}), ...(elem ? {elemento: elem} : {})};
+    const le = Math.max(0, Math.min(5, Math.round(Number(lento) || 0)));
+    const o = {...(estado && estado.nombre ? estado : {}), ...(sv ? {salva: sv} : {}), ...(mu ? {muro: mu} : {}), ...(ef ? {efecto: ef} : {}), ...(elem ? {elemento: elem} : {}), ...(le ? {lento: le} : {})};
     const j = Object.keys(o).length ? JSON.stringify(o) : '';
     return j.length <= 300 ? j : '';
   }
@@ -139,7 +141,7 @@ const TokensAuto = (() => {
       o = {...o, nombre: t.nombre, detalle: t.detalle, dano: t.dano, ignoraDef: !!t.ignoraDef, fuegoAmigo: !!t.amiga, color: t.color, alfa: t.alfa,
         forma: linea ? 'linea' : 'flor', radio: linea ? 0 : Plantillas.radioDeTrampa(t), largo: linea ? t.tamano : 0, cant: t.cant,
         estado: t.estado ? {nombre: t.estado, ...(t.estadoTurnos ? {turnos: t.estadoTurnos} : {}), ...(t.estadoMods ? {mods: t.estadoMods} : {}), ...(t.estadoStacks ? {stacks: t.estadoStacks} : {}), ...(t.estadoHp ? {hp: t.estadoHp} : {}), ...(t.soltar ? {soltar: t.soltar} : {})} : null,
-        salvacion: t.salvacion || null, muro: t.muro || null, efecto: t.efecto || null, elemento: t.elemento || '',
+        salvacion: t.salvacion || null, muro: t.muro || null, efecto: t.efecto || null, elemento: t.elemento || '', lento: t.lento || 0,
         dejaZona: t.dejaZona ? t : null, turnos: Math.max(0, Math.round(Number(t.turnos) || 0)), detectar: t.detectar};
     }
     const mapaId = o.mapaId || await mapaQueMiraElGM();
@@ -182,7 +184,7 @@ const TokensAuto = (() => {
         ...(o.ignoraDef ? {trampaIgnoraDef: true} : {}),
         ...(Number.isFinite(Number(o.detectar)) && Number(o.detectar) >= 1 ? {trampaDetectar: Math.round(Number(o.detectar))} : {}),
         ...(o.item ? {trampaItem: String(o.item).slice(0, 4000), trampaFicha: String(o.fichaId || '').slice(0, 80)} : {}),   // trampa que salió de un consumible: al cerrar el botín, si no se disparó, se desarma (50 % de romperse) y, si aguanta, vuelve a su dueño
-        ...(estadoJson(o.estado, o.salvacion, o.muro, o.efecto, o.elemento) ? {trampaEstado: estadoJson(o.estado, o.salvacion, o.muro, o.efecto, o.elemento)} : {}),   // el estado y la salvación (la tira el mapa solo)
+        ...(estadoJson(o.estado, o.salvacion, o.muro, o.efecto, o.elemento, o.lento) ? {trampaEstado: estadoJson(o.estado, o.salvacion, o.muro, o.efecto, o.elemento, o.lento)} : {}),   // el estado y la salvación (la tira el mapa solo)
         ...(venceMant !== null ? {turnos: o.turnos, venceMant} : {}),
         // Trampa persistente: al dispararse queda como zona (el mapa la convierte, ver trampaResolver) — mismos campos que pone el mapa.
         ...(z ? {trampaDejaZona: true, zonaTurnos: Math.max(1, Math.round(Number(z.zonaTurnos) || 3)), zonaEnMantenimiento: z.zonaEnMantenimiento !== false, zonaCadaPaso: !!z.zonaCadaPaso,

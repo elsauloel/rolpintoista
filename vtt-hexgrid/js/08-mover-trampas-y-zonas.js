@@ -14,14 +14,14 @@ function resaltarRutaConfirmar(){
 function mostrarConfirmacionRuta(){
   const p = rutaPendiente;
   if(!p) return;
-  const costo = p.pasos * p.porCasillero;
+  const costo = p.costo !== undefined ? p.costo : p.pasos * p.porCasillero;   // con el terreno lento, paso por paso
   const exceso = costo - Math.max(0, p.disponibles);
   // Sin No2 suficientes el movimiento NO se hace (no hay No2 negativos; para moverse igual está 🦶 Mover libre): el cartel lo dice
   // claro en vez de invitar a confirmar (2026-09-24).
   $('#ruta-texto').textContent = exceso > 0
     ? `Mover ${p.pasos} casillero${p.pasos === 1 ? '' : 's'} cuesta ${fmt(costo)} No2 y tenés ${fmt(Math.max(0, p.disponibles))} · ⚠ te faltan ${fmt(exceso)}: no se puede hacer · clic afuera lo cancela (para moverte igual, usá Mover libre 🦶)`
     : `Mover ${p.pasos} casillero${p.pasos === 1 ? '' : 's'} · −${fmt(costo)} No2 (te quedan ${fmt(p.disponibles - costo)})` +
-      (p.porCasillero !== 1 ? ` · ${fmt(p.porCasillero)} por casillero` : '') +
+      (p.porCasillero !== 1 ? ` · ${fmt(p.porCasillero)} por casillero` : '') + (costo > p.pasos * p.porCasillero ? ' · salir de la arena cuesta más' : '') +
       ' · clic afuera para confirmar';
   $('#ruta-confirmar').classList.toggle('excede', exceso > 0);
   $('#ruta-confirmar').hidden = false;
@@ -685,7 +685,7 @@ async function confirmarRuta(){
   $('#ruta-confirmar').hidden = true;
   document.body.classList.remove('con-ruta');
   if(!t){ cancelarRuta(); return; }
-  const costo = p.pasos * p.porCasillero;
+  const costo = p.costo !== undefined ? p.costo : p.pasos * p.porCasillero;   // con el terreno lento, paso por paso
   // Sin No2 suficientes no se mueve (no hay No2 negativos): para eso está Mover libre.
   const cm = costoMoverDe(t);
   if(cm && costo > cm.disponibles){

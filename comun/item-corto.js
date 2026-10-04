@@ -66,6 +66,7 @@ const ItemCorto = (() => {
     const QUE = {todo: 'la evita entera', efecto: t.dano ? 'resiste lo que le deja (el daño entra igual)' : 'lo resiste', mitad: 'la mitad del daño'};
     if(!s) f.push(['Se resiste', 'no']);
     else f.push([s.que === 'efecto' ? 'Se resiste' : 'Se evita', `${s.etq || s.stat} contra ${s.dif} → ${s.logra || QUE[s.que] || QUE.todo}`]);
+    if(num(t.lento) > 0) f.push(['Terreno', `una vez disparada, cada paso que sale de ella cuesta ${num(t.lento)} No2`]);
     const so = t.soltar && t.soltar.stat ? t.soltar : null;   // salir antes de que venza (el botón 🔓 Soltarse)
     if(so) f.push(['Para salir', `🔓 Soltarse: ${so.etq || so.stat} contra ${num(so.dif)} · ${num(so.no2)} No2${num(so.hunde) ? ` · si falla, se hunde más: +${num(so.hunde)} turno${num(so.hunde) === 1 ? '' : 's'}` : ''}`]);
     f.push(['Detectarla', t.detectarStat ? `Percepción contra ${t.detectarStat === 'dmgesp' ? 'el Efecto especial' : 'la Destreza'} de quien la pone` : num(t.detectar) >= 1 ? `Percepción contra ${num(t.detectar)}` : 'sin definir']);

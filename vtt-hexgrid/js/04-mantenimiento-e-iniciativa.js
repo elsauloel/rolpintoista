@@ -548,6 +548,29 @@ $('#modo-switch').onclick = async () => {
 // creeps vinculados (no las invocaciones ni los NPC). null = se mueve sin
 // costo, como también una ficha o creep que todavía no tiene No2 (abrila
 // una vez, o abrí gm-tools).
+/* Terreno lento (2026-10-04, dueño: arena movediza): una trampa ya disparada con `lento: N` adentro del JSON de trampaEstado hace que cada
+   paso que SALE de una de sus casillas cueste N No2 (o lo de siempre, si es más: Rengo). → el costo acumulado de cada paso de la ruta. */
+function lentoEn(col, fila){
+  let n = 0;
+  elementos.forEach(el => {
+    if(!el.trampa || !el.disparada || !el.trampaEstado) return;
+    let e = null; try{ e = JSON.parse(el.trampaEstado); }catch(x){}
+    if(!e || !(num(e.lento) > 0)) return;
+    if(celdasDeElemento(el).some(c => c.col === col && c.fila === fila)) n = Math.max(n, num(e.lento));
+  });
+  return n;
+}
+function costoPasos(ruta, porCasillero){
+  const acc = [];
+  let s = 0;
+  for(let i = 1; i < (ruta || []).length; i++){
+    s += porCasillero > 0 ? Math.max(porCasillero, lentoEn(ruta[i - 1].col, ruta[i - 1].fila)) : 0;
+    acc.push(s);
+  }
+  return acc;
+}
+const costoRuta = (ruta, porCasillero, pasos) => { const a = costoPasos((ruta || []).slice(0, pasos + 1), porCasillero); return a.length ? a[a.length - 1] : 0; };
+
 function costoMoverDe(t){
   if(modoMapa !== 'combate') return null;  // en modo narrativo se mueve sin contar No2
   if(t && t.tipo === 'creep') return costoMoverCreep(t);

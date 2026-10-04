@@ -1766,6 +1766,11 @@ prueba('Soltarse (trampas de Atrapar): el estado guarda qué tirar y cuánto cue
     inv.estados.length, inv.nitros, Combatiente.estadoSoltable([{nombre: 'Inmovilizado', activo: true}])],
     [{stat: 'fue', etq: 'Fuerza', dif: 6, no2: 2}, '🔓 Soltarse · Fuerza contra 6 · 2 No2', 8, true, true, 3, 0, true, 0, 2, null]);
 });
+prueba('arena movediza: Fuerza 6 para zafar (si falla, se hunde) y terreno lento (cada paso que sale de ella cuesta 2 No2)', () => {
+  const arena = CATALOGO_BASE.find(i => i.nombre === 'Arena movediza').trampaDatos;
+  igual([arena.soltar, arena.lento, TokensAuto.estadoJson({nombre: 'Inmovilizado', turnos: 1}, null, null, null, '', 2), ItemCorto.trampaFilas(arena).find(f => f[0] === 'Terreno')[1]],
+    [{stat: 'fue', etq: 'Fuerza', dif: 6, no2: 1, hunde: 1}, 2, '{"nombre":"Inmovilizado","turnos":1,"lento":2}', 'una vez disparada, cada paso que sale de ella cuesta 2 No2']);
+});
 prueba('resistencia elemental y Sigilo: el elemento de un daño, los stats nuevos de personajes y creeps, y el elemento de una trampa', () => {
   const S = FichaGuardado.normalizar({}).S;
   const c0 = FichaCalculo.calcular(S);

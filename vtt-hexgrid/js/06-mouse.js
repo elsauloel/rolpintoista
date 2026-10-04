@@ -373,8 +373,9 @@ lienzo.addEventListener('pointermove', e => {
 
 // Casilleros que alcanzan a pagarse con los Nitros disponibles (Infinity si
 // el token se mueve sin costo). Los que siguen se dibujan en rojo.
-function pasosPagables(costo){
+function pasosPagables(costo, ruta){
   if(!costo) return Infinity;
+  if(ruta){ const a = costoPasos(ruta, costo.porCasillero); let n = 0; while(n < a.length && a[n] <= costo.disponibles) n++; return n; }   // con terreno lento
   return Math.max(0, Math.floor(costo.disponibles / costo.porCasillero));
 }
 
@@ -395,7 +396,7 @@ function extenderRuta(a, casilla){
     if(ruta.length >= RUTA_MAX_CELDAS) break;
     ruta.push(c);
   }
-  if(a.costo && ruta.length - 1 > pasosPagables(a.costo) && !a.avisado){
+  if(a.costo && ruta.length - 1 > pasosPagables(a.costo, ruta) && !a.avisado){
     // Sin aviso verde: la estela en rojo y el cartel ya lo muestran.
     a.avisado = true;
   }
@@ -542,9 +543,10 @@ function rutaSoltada(a, t){
     visibles.set(a.id, {x: a.x, y: a.y});
     const oportunidad = oportunidadEvaluarRuta(t, a.ruta);
     if(a.costo){
-      rutaPendiente = {id: a.id, celdas: a.ruta, pasos, porCasillero: a.costo.porCasillero, disponibles: a.costo.disponibles, oportunidad};
+      const costoTotal = costoRuta(a.ruta, a.costo.porCasillero, pasos);   // con el terreno lento (arena movediza) paso por paso
+      rutaPendiente = {id: a.id, celdas: a.ruta, pasos, porCasillero: a.costo.porCasillero, costo: costoTotal, disponibles: a.costo.disponibles, oportunidad};
       // Solo se pregunta si el movimiento se pasa de los No2 que quedan.
-      if(pasos * a.costo.porCasillero > Math.max(0, a.costo.disponibles)) mostrarConfirmacionRuta();
+      if(costoTotal > Math.max(0, a.costo.disponibles)) mostrarConfirmacionRuta();
       else confirmarRuta();
     }else{
       const fin = a.ruta[pasos];

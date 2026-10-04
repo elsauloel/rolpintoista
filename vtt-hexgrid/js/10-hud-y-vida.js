@@ -704,6 +704,7 @@ function hudConectar(t){
     }
     hudGlobo = hudGlobo === clave ? '' : clave;
     hudEditando = '';
+    if(hudGlobo === 'estados') estadosPrecargar(t);   // así «+ Estado» abre enseguida
     pedirDibujo();
   });
   const nuevoEstado = hud.querySelector('[data-hud-estado-nuevo]');
@@ -1010,26 +1011,42 @@ const SE_STATS_CREEP = {def: ['Def', 'Defensa'], dmg: ['Dmg', 'Daño'], pdg: ['P
   crit: ['Crítico frecuente', 'Crítico frecuente (baja el rango del crítico)'], critpot: ['Crítico potente', 'Crítico potente (baja los umbrales del d20)']};
 const seStatsFicha = () => FichaCalculo.MOD_TARGETS.filter(s => !['sp', 'spregen', 'crgmax', 'capcinturon', 'capmochila', 'luz', 'veoculto'].includes(s.id))
   .map(s => ({id: s.id, label: FichaCalculo.STAT_LABEL[s.id] || s.id, full: FichaCalculo.STAT_FULL[s.id] || ''}));
+/* «+ Estado» rápido (2026-10-04, dueño: «tarda mucho en abrirse el menú»): antes cargaba las piezas y leía la ficha COMPLETA del personaje
+   (≈2 s) antes de mostrar nada. Ahora, al abrir el globo de estados (◎ o E) se adelantan las piezas y los "Mis presets" del personaje (una sola
+   parte de la ficha, `partes/efectos`); al tocar «+ Estado» el menú aparece enseguida, y la ficha completa se lee recién al elegir el estado. */
+const sePrecarga = new Map();   // fichaId → Promise de sus "Mis presets"
+async function leerPropiosFicha(fichaId){
+  try{ const d = await fbDb.doc(fbRutaCampana(`fichas/${fichaId}/partes/efectos`)).get(); return d.exists ? (JSON.parse(d.data().json || '{}').efectosPersonalizados || []) : []; }
+  catch(err){ return []; }
+}
+function estadosPrecargar(t){
+  if(!t || !puedoCambiarEstados(t)) return;
+  (async () => { await bnCargarPiezas(); await cargarPiezas(SE_PIEZAS); if(t.tipo === 'creep') await acCargarPiezas(); })().catch(() => {});
+  if(t.tipo === 'pj' && t.fichaId){ const id = t.fichaId.split(SEP_INVOCACION)[0]; if(!sePrecarga.has(id)) sePrecarga.set(id, leerPropiosFicha(id)); }
+}
 async function abrirEstadoNuevo(t){
   if(!puedeAgregarEstado(t) || !puedoCambiarEstados(t)) return;
   try{ await bnCargarPiezas(); await cargarPiezas(SE_PIEZAS); if(t.tipo === 'creep') await acCargarPiezas(); }
   catch(err){ console.error(err); toast('No se pudo abrir el selector de estados'); return; }
   if(t.tipo === 'creep') return abrirEstadoNuevoCreep(t);
   const [fichaId, invId] = t.fichaId.split(SEP_INVOCACION);
-  let elegido = null;
-  // Los "Mis presets" del personaje están en su ficha: se leen al abrir (y se guardan ahí si el asistente pide guardar uno nuevo).
+  const propios = await (sePrecarga.get(fichaId) || leerPropiosFicha(fichaId));
+  sePrecarga.delete(fichaId);   // la próxima vez se vuelven a leer (pueden haber cambiado)
+  const rs = (fichasPub.get(fichaId) || {}).resumen || {};
+  const invPub = invId ? (rs.invocaciones || []).find(x => x && x.id === invId) : null;
+  const elegido = await SelectorEstados.abrir({
+    titulo: 'Estado alterado', para: invPub ? invPub.nombre : nombreDe(t),
+    presets: estadosPresetFicha(), propios,
+    cfgPreguntas: {hp: 'hpturno', statLabel: id => FichaCalculo.STAT_LABEL[id] || id},
+    stats: seStatsFicha(),
+    armarDeAsistente: res => ({nombre: res.nombre, polaridad: res.polaridad, turnos: res.turnos, permanente: res.permanente, stacks: 1, hpturno: res.hp, stacksturno: 0,
+      escudoMagico: res.escudo, mods: res.mods, detalle: res.detalle, popup: false, ...res.flags, ...(res.forzarNitros !== undefined ? {forzarNitros: res.forzarNitros} : {})}),
+  });
+  if(!elegido) return;
+  // Recién ahora se abre la ficha para escribir el estado (y el preset nuevo, si se pidió guardarlo).
   await editarPersonajeMapa(fichaId, async S => {
     const inv = invId ? (S.invocaciones || []).find(x => x && x.id === invId) : null;
     if(invId && !inv){ toast('Esa invocación ya no está'); return false; }
-    elegido = await SelectorEstados.abrir({
-      titulo: 'Estado alterado', para: inv ? inv.nombre : ((S.meta && S.meta.nombre) || nombreDe(t)),
-      presets: estadosPresetFicha(), propios: S.efectosPersonalizados || [],
-      cfgPreguntas: {hp: 'hpturno', statLabel: id => FichaCalculo.STAT_LABEL[id] || id},
-      stats: seStatsFicha(),
-      armarDeAsistente: res => ({nombre: res.nombre, polaridad: res.polaridad, turnos: res.turnos, permanente: res.permanente, stacks: 1, hpturno: res.hp, stacksturno: 0,
-        escudoMagico: res.escudo, mods: res.mods, detalle: res.detalle, popup: false, ...res.flags, ...(res.forzarNitros !== undefined ? {forzarNitros: res.forzarNitros} : {})}),
-    });
-    if(!elegido) return false;
     const {preset, guardar} = elegido;
     if(guardar){
       S.efectosPersonalizados = S.efectosPersonalizados || [];

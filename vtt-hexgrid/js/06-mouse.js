@@ -721,6 +721,7 @@ document.addEventListener('keydown', e => {
     if(!seleccion || !tokens.get(seleccion)){ toast('Seleccioná un token para ver sus estados alterados'); return; }
     hudGlobo = hudGlobo === 'estados' ? '' : 'estados';
     hudEditando = '';
+    if(hudGlobo === 'estados') estadosPrecargar(tokens.get(seleccion));   // así «+ Estado» abre enseguida
     pedirDibujo();
     return;
   }

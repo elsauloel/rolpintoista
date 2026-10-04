@@ -35,9 +35,11 @@ const TokensAuto = (() => {
     return {largo: l >= 5 ? 5 : l >= 3 || !(l >= 1) ? 3 : 1, turnos: Math.max(1, Math.min(20, Math.round(Number(m.turnos)) || 4))};
   }
   // La superficie de efecto (2026-10-03): {area: 'pisador' | 'trampa' | 'flor', radio: 1 | 2 (solo la flor)}. null si no dice (la deduce el mapa).
+  // `centro: 'trampa'` (2026-10-04, dueño: gases que se disparan en una línea de 3 y la nube queda en la flor de 7 que la contiene): la flor va
+  // alrededor del centro de la trampa y no de la casilla que se pisó.
   function efectoNorm(e){
     if(!e || !['pisador', 'trampa', 'flor'].includes(e.area)) return null;
-    return e.area === 'flor' ? {area: 'flor', radio: Number(e.radio) >= 2 ? 2 : 1} : {area: e.area};
+    return e.area === 'flor' ? {area: 'flor', radio: Number(e.radio) >= 2 ? 2 : 1, ...(e.centro === 'trampa' ? {centro: 'trampa'} : {})} : {area: e.area};
   }
   // El JSON de trampaEstado: el estado que deja, la salvación, el muro y la superficie de efecto ('' si no hay ninguno).
   // `elemento` (2026-10-04): de qué es el daño ('fuego' | 'hielo' | 'rayo' | 'toxico' | 'acido'): se resta la resistencia a ese elemento.
@@ -50,8 +52,10 @@ const TokensAuto = (() => {
     const le = Math.max(0, Math.min(5, Math.round(Number(lento) || 0)));
     const ps = formulaOk(extra && extra.pierdeSp), dz = formulaOk(extra && extra.danoZona);
     const ca = extra && extra.cadena && Number(extra.cadena.rango) >= 1 ? {rango: Math.min(6, Math.round(Number(extra.cadena.rango)))} : null;   // la Descarga: salta de enemigo en enemigo
+    const rd = !!(extra && extra.requiereDano);   // el Dardo (2026-10-04, dueño): lo que deja solo entra si el daño pasó la Defensa
+    const po = extra && extra.portal && Number(extra.portal.rango) >= 1 ? {rango: Math.min(20, Math.round(Number(extra.portal.rango)))} : null;   // el Portal cósmico: su dueño elige adónde lo manda
     const o = {...(estado && estado.nombre ? estado : {}), ...(sv ? {salva: sv} : {}), ...(mu ? {muro: mu} : {}), ...(ef ? {efecto: ef} : {}), ...(elem ? {elemento: elem} : {}), ...(le ? {lento: le} : {}),
-      ...(ps ? {pierdeSp: ps} : {}), ...(dz ? {danoZona: dz} : {}), ...(ca ? {cadena: ca} : {})};
+      ...(ps ? {pierdeSp: ps} : {}), ...(dz ? {danoZona: dz} : {}), ...(ca ? {cadena: ca} : {}), ...(po ? {portal: po} : {}), ...(rd ? {requiereDano: true} : {})};
     const j = Object.keys(o).length ? JSON.stringify(o) : '';
     return j.length <= 300 ? j : '';
   }
@@ -147,7 +151,7 @@ const TokensAuto = (() => {
         forma: linea ? 'linea' : 'flor', radio: linea ? 0 : Plantillas.radioDeTrampa(t), largo: linea ? t.tamano : 0, cant: t.cant,
         estado: t.estado ? {nombre: t.estado, ...(t.estadoTurnos ? {turnos: t.estadoTurnos} : {}), ...(t.estadoMods ? {mods: t.estadoMods} : {}), ...(t.estadoStacks ? {stacks: t.estadoStacks} : {}), ...(t.estadoHp ? {hp: t.estadoHp} : {}), ...(t.soltar ? {soltar: t.soltar} : {})} : null,
         salvacion: t.salvacion || null, muro: t.muro || null, efecto: t.efecto || null, elemento: t.elemento || '', lento: t.lento || 0,
-        extraJson: {pierdeSp: t.pierdeSp || '', danoZona: t.danoZona || '', cadena: t.cadena || null},
+        extraJson: {pierdeSp: t.pierdeSp || '', danoZona: t.danoZona || '', cadena: t.cadena || null, portal: t.portal || null, requiereDano: !!t.requiereDano},
         dejaZona: t.dejaZona ? t : null, turnos: Math.max(0, Math.round(Number(t.turnos) || 0)), detectar: t.detectar};
     }
     const mapaId = o.mapaId || await mapaQueMiraElGM();

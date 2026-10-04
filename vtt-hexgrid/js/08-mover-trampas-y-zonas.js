@@ -302,8 +302,11 @@ function zonaAplicaA(el, t){
 // estado, solo si ese token no está ya en zonaResueltos (una vez que lo tiene, no se le vuelve a tirar la resistencia).
 // Las zonas que deja una trampa (efecto persistente, 2026-10-04, dueño) se RENUEVAN en cada Mantenimiento: a quien siga encima se le vuelve a
 // tirar y aplicar (lo que ya tenía no se le saca). Se anota «token@Mantenimiento», así cada Mantenimiento cuenta aparte.
+// (2026-10-04, dueño) Se disparan al detonar la trampa, al ENTRAR (viniendo de afuera) y en el Mantenimiento: moverse adentro no la vuelve a
+// disparar. Cuenta una vez por ronda, también el daño (el piso ardiendo de la Mina napalm).
 const zonaClave = (el, t) => el.trampa ? `${zonaIdDe(t)}@${Math.round(num(mantenimientoNumero))}` : zonaIdDe(t);
 function zonaLeFalta(el, t){
+  if(el.trampa) return !(el.zonaResueltos || []).includes(zonaClave(el, t));
   if(el.zonaDano || el.zonaDanoDif) return true;
   if(el.zonaEstado && !(el.zonaResueltos || []).includes(zonaClave(el, t))) return true;
   return false;
@@ -346,7 +349,7 @@ function zonaRevisarEntrada(id, celdas){
   if(!t || !zonaEsMia(t)) return;
   if(celdas && celdas.length > 1){
     elementos.forEach(el => {
-      if(!el.zona || !el.zonaCadaPaso || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;
+      if(!el.zona || !(el.zonaCadaPaso || el.trampa) || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;   // la de una trampa: al entrar, aunque solo la cruce
       const cs = celdasDeElemento(el);
       const enCelda = c => cs.some(x => x.col === c.col && x.fila === c.fila);
       for(let i = 1; i < celdas.length; i++){
@@ -462,7 +465,7 @@ async function zonaResolverBanner(){
       }catch(err){ console.error('No se pudo aplicar el estado de la zona:', err); partes.push(`${spec.nombre} (aplicalo a mano)`); }
     }
   }
-  if(el.zonaEstado && !resistio){
+  if((el.zonaEstado && !resistio) || el.trampa){   // la de una trampa: resista o no, ya le tocó en esta ronda
     try{ await coleccionElementos().doc(elId).update({zonaResueltos: firebase.firestore.FieldValue.arrayUnion(zonaClave(el, t))}); }
     catch(err){ console.error('No se pudo anotar zonaResueltos:', err); }
   }
@@ -481,12 +484,21 @@ function trampaEfectoDe(el){
   let e = null; try{ e = el.trampaEstado ? JSON.parse(el.trampaEstado) : null; }catch(x){}
   return e && e.efecto ? TokensAuto.efectoNorm(e.efecto) : null;
 }
+// El centro de una trampa: la casilla que tiene a todas las demás más cerca (la del medio de una línea).
+function trampaCentro(el){
+  const cs = celdasDeElemento(el);
+  let mejor = cs[0], peor = Infinity;
+  cs.forEach(c => { const m = Math.max(0, ...cs.map(x => distanciaHex(c, x))); if(m < peor){ peor = m; mejor = c; } });
+  return mejor;
+}
+// Dónde va la flor del efecto: alrededor de la casilla pisada o, con `centro: 'trampa'`, del centro de la trampa.
+const trampaCentroEfecto = (el, ef, celdaPisada, t) => ef && ef.centro === 'trampa' ? trampaCentro(el) : (celdaPisada || {col: t.col, fila: t.fila});
 function trampaAfectados(t, el, celdaPisada){
   const ef = trampaEfectoDe(el), celdas = celdasDeElemento(el);
   const area = ef ? ef.area : (celdas.length > 1 ? 'trampa' : 'pisador');
   const afectados = [t];
   if(area === 'pisador') return afectados;
-  const centro = celdaPisada || {col: t.col, fila: t.fila};
+  const centro = trampaCentroEfecto(el, ef, celdaPisada, t);
   const enTrampa = new Set(celdas.map(c => nbPack(c.col, c.fila)));
   const dentro = area === 'flor' ? (x => distanciaHex(x, centro) <= ef.radio) : (x => enTrampa.has(nbPack(x.col, x.fila)));
   tokens.forEach(x => { if(x !== t && dentro(x)) afectados.push(x); });
@@ -513,7 +525,7 @@ async function trampaAplicarEfectos(t, el, celdaPisada){
   const muro = trampaMuroDe(el);
   const comun = {
     nombreT: el.trampaNombre || 'una trampa', salva, dano: trampaDanoValido(el.trampaDano) ? el.trampaDano.trim() : '', ignoraDef: !!el.trampaIgnoraDef,
-    specJson: spec && spec.nombre ? el.trampaEstado : '', elemento: (spec && spec.elemento) || '', pierdeSp: (spec && spec.pierdeSp) || '', cadena: (spec && spec.cadena) || null,
+    specJson: spec && spec.nombre ? el.trampaEstado : '', elemento: (spec && spec.elemento) || '', pierdeSp: (spec && spec.pierdeSp) || '', cadena: (spec && spec.cadena) || null, portal: (spec && spec.portal) || null, requiereDano: !!(spec && spec.requiereDano), duenoTrampa: el.duenoUid || '',
     aMano: (String(el.trampaDetalle || '').match(/[^.]*\(a mano\)\./g) || []).map(x => x.trim()).join(' '),   // lo que el texto dice que va a mano
   };
   for(const x of afectados){
@@ -610,7 +622,8 @@ async function trampaResolver(){
       const dueno = miembros.get(p.el.duenoUid);
       const cambios = {
         zona: true, zonaNombre: p.el.trampaNombre || 'Trampa', zonaCasteadorRef: '', zonaCasteadorTipo: (dueno && dueno.gm) ? 'creep' : 'pj',
-        zonaResueltos: [], turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n,
+        zonaResueltos: trampaAfectados(t, p.el, p.celda).map(x => `${zonaIdDe(x)}@${Math.round(num(mantenimientoNumero))}`),   // ya la sufrieron al detonar
+        turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n,
         zonaEnMantenimiento: p.el.zonaEnMantenimiento !== false, zonaCadaPaso: !!p.el.zonaCadaPaso,
       };
       if(p.el.fuegoAmigo) cambios.zonaAmiga = true;
@@ -619,8 +632,20 @@ async function trampaResolver(){
       if(trampaDanoValido(danoZ)){ cambios.zonaDano = danoZ; if(p.el.trampaIgnoraDef) cambios.zonaIgnoraDef = true; }
       if(p.el.trampaEstado){ try{ const e = JSON.parse(p.el.trampaEstado); delete e.salva; delete e.muro; if(e.nombre) cambios.zonaEstado = JSON.stringify(e); }catch(err){} }   // sin la salvación (es del disparo)
       if(p.el.zonaResistStat && Number.isFinite(p.el.zonaResistValor)){ cambios.zonaResistStat = p.el.zonaResistStat; cambios.zonaResistValor = p.el.zonaResistValor; }
-      try{ await coleccionElementos().doc(p.id).update(cambios); }
-      catch(err){ console.error('No se pudo convertir la trampa en zona:', err); }
+      // La nube ocupa la superficie del efecto (2026-10-04, dueño): si es una flor, la flor alrededor del centro (aunque se dispare en menos casillas).
+      const ef = trampaEfectoDe(p.el), forma = {};
+      if(ef && ef.area === 'flor'){
+        const c = trampaCentroEfecto(p.el, ef, p.celda, t), plano = [];
+        celdasFlor(ef.radio).forEach(({dq, dr}) => plano.push(dq, dr));
+        Object.assign(forma, {tipo: 'flor', origen: {col: c.col, fila: c.fila}, rotacion: 0, celdas: plano});
+      }
+      try{ await coleccionElementos().doc(p.id).update({...cambios, ...forma}); }
+      catch(err){
+        if(Object.keys(forma).length){   // sin las reglas nuevas pegadas: queda la zona con las casillas de la trampa
+          try{ await coleccionElementos().doc(p.id).update(cambios); console.warn('La nube quedó en las casillas de la trampa: faltan pegar las reglas nuevas de Firestore.'); }
+          catch(err2){ console.error('No se pudo convertir la trampa en zona:', err2); }
+        }else console.error('No se pudo convertir la trampa en zona:', err);
+      }
     }
     return;
   }

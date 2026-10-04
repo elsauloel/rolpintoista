@@ -349,7 +349,7 @@ function dibujar(){
         const ef = trampaEfectoDe(el);
         if(ef && ef.area === 'flor'){
           const ya = new Set(celdas.map(c => nbPack(c.col, c.fila))), extra = [];
-          celdas.forEach(c => { const c0 = hexACubo(c);
+          (ef.centro === 'trampa' ? [trampaCentro(el)] : celdas).forEach(c => { const c0 = hexACubo(c);
             for(let dq = -ef.radio; dq <= ef.radio; dq++) for(let dr = -ef.radio; dr <= ef.radio; dr++){
               if(Math.max(Math.abs(dq), Math.abs(dr), Math.abs(dq + dr)) > ef.radio) continue;
               const x = {col: cuboACol(c0.q + dq, c0.r + dr), fila: cuboAFila(c0.q + dq, c0.r + dr)}, k = nbPack(x.col, x.fila);

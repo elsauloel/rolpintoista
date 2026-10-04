@@ -686,9 +686,12 @@ service cloud.firestore {
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['zonaResueltos'])
             && request.resource.data.zonaResueltos.size() == resource.data.get('zonaResueltos', []).size() + 1)
           // Trampa persistente ya disparada: cualquiera completa su conversión a zona (viene pre-armada por
-          // quien puso la trampa) — ver comun/CLAUDE.md "Trampas persistentes".
+          // quien puso la trampa) — ver comun/CLAUDE.md "Trampas persistentes". 2026-10-04: la nube puede ocupar la flor del efecto
+          // (tipo, origen, rotacion, celdas), aunque la trampa se dispare en menos casillas (los gases).
           || (resource.data.get('trampa', false) == true && resource.data.get('trampaDejaZona', false) == true && resource.data.get('disparada', false) == true
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['zona', 'zonaNombre', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'turnos', 'venceMant', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaAmiga', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaResistStat', 'zonaResistValor'])
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['zona', 'zonaNombre', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'turnos', 'venceMant', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaAmiga', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaResistStat', 'zonaResistValor', 'tipo', 'origen', 'rotacion', 'celdas'])
+            && request.resource.data.tipo in ['flor', 'linea', 'libre'] && request.resource.data.celdas is list && request.resource.data.celdas.size() <= 200
+            && request.resource.data.origen is map && request.resource.data.rotacion is int
             && request.resource.data.zona == true));
         allow delete: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c));

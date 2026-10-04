@@ -34,11 +34,14 @@ function trampaLogra(dt){
 // Cada efecto tiene su momento en el Anuncio (dueño, 2026-10-04): lo que le deja, lo que va a mano, el muro y la nube son pasos propios,
 // con «▶ Seguir» (sin tirada).
 function trampaFaseSiguiente(dt, fase){
-  const orden = ['empuje', 'salva', 'dano', 'sp', 'estado', 'mano', 'muro', 'zona', 'fin'];
+  // El Dardo (requiereDano, 2026-10-04): primero el daño; si no pasa la Defensa, lo que deja no entra (ni se tira para resistirlo).
+  const orden = dt.requiereDano ? ['empuje', 'dano', 'salva', 'sp', 'portal', 'estado', 'mano', 'muro', 'zona', 'fin'] : ['empuje', 'salva', 'dano', 'sp', 'portal', 'estado', 'mano', 'muro', 'zona', 'fin'];
   const agarro = dt.evita !== 'todo' && dt.evita !== 'efecto';
   for(const f of orden.slice(orden.indexOf(fase) + 1)){
+    if(f === 'salva' && dt.salva && agarro) return f;
     if(f === 'dano' && (dt.dano || dt.danoFijo) && dt.evita !== 'todo') return f;
     if(f === 'sp' && dt.pierdeSp && agarro) return f;
+    if(f === 'portal' && dt.portal && agarro) return f;
     if(f === 'estado' && dt.spec && agarro) return f;
     if(f === 'mano' && dt.aMano && agarro) return f;
     if(f === 'muro' && dt.muro) return f;
@@ -66,6 +69,12 @@ function trampaPasoQueFalta(dt){
     boton: '▶ Recibir la descarga', espera: `a ${dt.quien} le llega la descarga…`};
   if(dt.fase === 'dano') return {titulo: 'Daño', texto: `La trampa pega ${dt.dano}${dt.elemento ? ' ' + Combatiente.ELEMENTOS[dt.elemento].icono : ''}${dt.evita === 'mitad' ? ' (la mitad)' : ''}${dt.ignoraDef ? ', directo a la vida' : ', menos la Defensa'}${dt.elemento ? ` (lo frenan ${Combatiente.ELEMENTOS[dt.elemento].etq} y la Armadura mágica)` : ''}.`,
     boton: `🎲 Tirar el daño (${dt.dano})`, espera: `${dt.quien} tira el daño…`};
+  if(dt.fase === 'portal'){
+    const elige = trampaEligePortal(dt), dueno = nombreMiembro(dt.duenoTrampa) || 'quien la puso';
+    return {titulo: 'El portal', texto: elige ? `El portal se lo lleva: elegí en el mapa adónde lo mandás (hasta ${dt.portal.rango} casillas, una casilla libre).` : `El portal se lo lleva: ${dueno} elige adónde lo manda…`,
+      boton: elige ? '🌀 Elegir adónde lo mandás' : null, espera: `${dueno} elige adónde manda a ${dt.quien}…`};
+  }
+  if(dt.fase === 'portal-mover') return {titulo: 'El portal', texto: 'Lo manda al lugar elegido…', boton: null, espera: `${dt.quien} viaja por el portal…`};
   if(dt.fase === 'sp') return {titulo: 'Le chupa el SP', texto: `La runa le arranca ${dt.pierdeSp} de SP.`, boton: `🎲 Tirar cuánto SP pierde (${dt.pierdeSp})`, espera: `${dt.quien} tira cuánto SP pierde…`};
   if(dt.fase === 'estado'){ const sp = trampaSpec(dt); return {titulo: 'Lo que le deja', texto: sp ? EstadosAplicar.texto(sp) : '', boton: '▶ Seguir', espera: `${dt.quien}: lo que le deja…`}; }
   const info = trampaTextoInfo(dt);
@@ -95,10 +104,11 @@ async function trampaMomentoNuevo(p){
     tokenId: p.tokenId || '', creep: x.tipo === 'creep', fichaId: String(x.fichaId || ''), quien: p.quien, nombreT: p.nombreT, pisador: !!p.pisador,
     salva: s ? {stat: String(s.stat), etq: String(s.etq || ''), dif: num(s.dif), que: String(s.que || 'todo'), ...(s.logra ? {logra: String(s.logra)} : {})} : null,
     dano: p.dano || '', ignoraDef: !!p.ignoraDef, elemento: p.elemento || '', pierdeSp: p.pierdeSp || '',
-    cadena: p.cadena && p.pisador ? {rango: num(p.cadena.rango) || 3, golpeados: [p.tokenId || '']} : null, spec: p.specJson || '', muro: num(p.muro), muroLargo: num(p.muroLargo), zona: num(p.zona), aMano: p.aMano || '',
+    cadena: p.cadena && p.pisador ? {rango: num(p.cadena.rango) || 3, golpeados: [p.tokenId || '']} : null,
+    portal: p.portal ? {rango: num(p.portal.rango) || 8} : null, duenoTrampa: p.duenoTrampa || '', requiereDano: !!p.requiereDano, spec: p.specJson || '', muro: num(p.muro), muroLargo: num(p.muroLargo), zona: num(p.zona), aMano: p.aMano || '',
     fase: '', tirando: false, evita: '', pasos: [],
   };
-  dt.fase = dt.salva ? 'salva' : trampaFaseSiguiente(dt, 'salva');
+  dt.fase = dt.requiereDano ? trampaFaseSiguiente(dt, 'empuje') : dt.salva ? 'salva' : trampaFaseSiguiente(dt, 'salva');
   const titulo = p.pisador ? `${p.quien} pisó «${p.nombreT}»` : `${p.quien} quedó en el área de «${p.nombreT}»`;
   if(dt.fase === 'fin'){   // nada que tirar ni mostrar: solo se anuncia
     const f = trampaFinal(dt);
@@ -118,9 +128,12 @@ async function trampaMomentoEmpuje(e, nombreT, prohibidas){
   return momentoAbrir({tipo: 'trampa', icono: '🧱', titulo: `${quien}: el muro sale debajo de sus pies`, estado: 'paso', datos: dt});
 }
 
+// El destino del portal lo elige quien puso la trampa (o el GM, si quien la puso no está).
+const trampaEligePortal = dt => !!fbUsuario && (dt.duenoTrampa === fbUsuario.uid || (soyGM && !miembros.has(dt.duenoTrampa)));
 // ¿Esta pantalla resuelve a esta víctima?
 function trampaMeToca(id, dt){
   if(trampasTomadas.has(id)) return true;
+  if(dt.fase === 'portal' && trampaEligePortal(dt)) return true;
   if(dt.creep) return soyGM;
   const base = String(dt.fichaId || '').split(SEP_INVOCACION)[0];
   return base ? bnManejo(base) : soyGM;   // un token sin ficha: el GM
@@ -181,6 +194,12 @@ function dibujarEfectosRayo(){
 // Lo llama momentoRecibido (js/16) con cada cambio de un momento de trampa.
 function trampaMomento(id, d){
   const dt = d.datos || {};
+  // El portal: cuando se eligió el destino, todas las pantallas ven los pulsos (una vez).
+  if(dt.destino && dt.destino.desde && !saltosVistos.has(id + ':portal')){
+    saltosVistos.add(id + ':portal');
+    efectosTeleport.push({a: hexCentro(dt.destino.desde.col, dt.destino.desde.fila), b: hexCentro(dt.destino.col, dt.destino.fila), desde: Date.now()});
+    pedirDibujo();
+  }
   // Un salto de la Descarga: primero se ve el rayo en todas las pantallas y recién después aparece el Anuncio.
   if(dt.salto && !saltosVistos.has(id)){
     saltosVistos.add(id);
@@ -192,11 +211,13 @@ function trampaMomento(id, d){
     }
   }
   if(trampaRetenidas.has(id)){ trampasDatos.set(id, d); return; }
+  if(trampaEnPantalla === id){ trampasDatos.set(id, d); trampaDibujar(id); if(d.estado !== 'listo' && dt.fase === 'portal-mover' && !dt.tirando) trampaPasoPortalMover(id); return; }
   if(trampaMeToca(id, dt) && !trampasCerradas.has(id)){
     trampasDatos.set(id, d);
     if(momentosFeed.delete(id)) renderMomentosFeed();
     if(trampaEnPantalla === id) trampaDibujar(id);
     else{ if(!trampaCola.includes(id)) trampaCola.push(id); trampaMostrarSiguiente(); }
+    if(d.estado !== 'listo' && dt.fase === 'portal-mover' && !dt.tirando) trampaPasoPortalMover(id);   // lo mueve quien maneja a la víctima
     return;
   }
   if(trampasCerradas.has(id) && trampasDatos.has(id)) trampasDatos.set(id, d);
@@ -228,11 +249,11 @@ function trampaDibujar(id){
   let botones = [];
   if(falta){
     pasos.push({titulo: falta.titulo, texto: rodando ? '🎲 Rodando…' : dt.tirando ? 'Se está tirando en otra pantalla…' : falta.texto, espera: true});
-    if(falta.boton){
+    if(falta.boton && trampaMeToca(id, dt)){   // en otra pantalla (quien eligió el portal) se ve, sin botón
       const x = tokens.get(dt.tokenId);
       const f = dt.fase === 'salva' && x ? formulaParaValor(trampaValorStat(x, dt.salva.stat)) : null;
       botones = [{texto: rodando ? '🎲 Rodando…' : falta.boton + (f ? ` (${f.formula})` : ''), deshabilitado: rodando || dt.tirando, alClic: () => trampaTirar(id)}];
-    }else botones = [{texto: 'Aplicando…', deshabilitado: true}];
+    }else botones = [{texto: dt.fase === 'portal' ? 'Esperando…' : 'Aplicando…', deshabilitado: true}];
   }
   AvisoCombate.mostrar({clave: 'trampa:' + id, icono: d.icono || '🪤', titulo: d.titulo || '', pasos,
     veredicto: listo ? dt.veredicto : null, botones,   // lo que va a mano ya tuvo su paso propio
@@ -295,6 +316,7 @@ async function trampaTirar(id){
   if(trampaTirandoAca) return;
   const d = trampasDatos.get(id);
   const fase = d && d.datos && d.datos.fase;
+  if(fase === 'portal'){ trampaPasoPortal(id); return; }
   if(!['salva', 'dano', 'empuje', 'sp', ...TRAMPA_INFO].includes(fase)) return;
   const dt = await trampaTomar(id, fase);
   if(!dt){ toast('Ese paso ya se está tirando en otra pantalla'); return; }
@@ -383,8 +405,51 @@ async function trampaPasoDano(id, dt){
     texto += g.invulnerable ? ' → Invulnerable: no le hizo nada'
       : (dt.ignoraDef ? `${freno ? ` − ${freno}` : ''} → ${fmt(g.recibido)} de daño directo a la vida` : ` − Defensa ${fmt(g.defensa - (freno ? num(freno.split(' ').pop()) : 0))}${freno ? ` − ${freno}` : ''} → ${fmt(g.recibido)} de daño`) + (g.absorbido ? ` (el escudo absorbió ${fmt(g.absorbido)})` : '');
   }else texto += ` → ${monto} de daño${dt.ignoraDef ? ' directo a la vida' : ' menos su Defensa'} — aplicalo a mano`;
-  const sig = {...dt, danoTirado: r.total, pasos: [...(dt.pasos || []), {titulo: dt.danoFijo ? 'Le llega la descarga' : 'Daño', texto}]};
+  const entro = monto <= 0 ? 0 : res ? num(res.r.recibido) : monto;   // lo que llegó a la vida (sin poder aplicarlo, se da por hecho)
+  const sinHerida = dt.requiereDano && entro <= 0;
+  if(sinHerida) texto += ' → no lo lastimó: lo que deja no entra';
+  const sig = {...dt, danoTirado: r.total, ...(sinHerida ? {evita: 'efecto'} : {}), pasos: [...(dt.pasos || []), {titulo: dt.danoFijo ? 'Le llega la descarga' : 'Daño', texto}]};
   sig.fase = trampaFaseSiguiente(sig, 'dano');
+  await trampaGuardar(id, sig);
+}
+
+/* El portal (2026-10-04, dueño: Portal cósmico, rango 8): quien puso la trampa elige en el mapa adónde manda a la víctima (una casilla libre a
+   `rango` o menos de donde está). Si esa pantalla puede mover el token, lo mueve; si no (un jugador mandando a un creep), deja el destino y lo
+   mueve la pantalla de quien maneja a la víctima (paso «portal-mover»). Todos ven los pulsos del teleport. */
+function trampaPasoPortal(id){
+  const d = trampasDatos.get(id), dt = d && d.datos;
+  if(!dt || !trampaEligePortal(dt)) return;
+  const x = tokens.get(dt.tokenId);
+  if(!x){ toast('La víctima ya no está en el mapa'); return; }
+  trampaEnPantalla = null; AvisoCombate.cerrar(); trampaEnPantalla = id;   // se esconde mientras se elige (sin darla por cerrada)
+  const volver = () => trampaDibujar(id);
+  elegirDestino(async c => {
+    if(distanciaHex(c, x) > dt.portal.rango){ toast(`Tiene que ser a ${dt.portal.rango} casillas o menos de ${dt.quien}`); trampaPasoPortal(id); return; }
+    if(elementoSolidoEn(c.col, c.fila) || [...tokens.values()].some(y => y !== x && y.col === c.col && y.fila === c.fila)){ toast('Esa casilla no está libre: elegí otra'); trampaPasoPortal(id); return; }
+    elegirDestinoTerminar();
+    const tomado = await trampaTomar(id, 'portal');
+    if(!tomado){ volver(); return; }
+    const sig = {...tomado, destino: {col: c.col, fila: c.fila, desde: {col: x.col, fila: x.fila}}};
+    if(puedoMover(x) || soyGM){ await trampaPortalMover(id, sig); return; }
+    sig.fase = 'portal-mover';
+    await trampaGuardar(id, sig);
+  }, `<b>🌀 ¿Adónde lo mandás?</b> <span>clic en una casilla libre a ${dt.portal.rango} casillas o menos de ${esc(dt.quien)} · Esc o clic derecho cancelan</span>`, false, volver);
+}
+async function trampaPasoPortalMover(id){
+  const d = trampasDatos.get(id), dt0 = d && d.datos, x = dt0 && tokens.get(dt0.tokenId);
+  if(!x || !(puedoMover(x) || soyGM)) return;
+  const dt = await trampaTomar(id, 'portal-mover');
+  if(dt) await trampaPortalMover(id, dt);
+}
+async function trampaPortalMover(id, dt){
+  const c = dt.destino;
+  let texto;
+  try{
+    await coleccionTokens().doc(dt.tokenId).update({col: c.col, fila: c.fila, ruta: firebase.firestore.FieldValue.delete()});
+    texto = `El portal se lo lleva ${distanciaHex(c, c.desde)} casillas más allá.`;
+  }catch(err){ console.error('No se pudo mover a la víctima del portal:', err); texto = 'El portal se lo lleva — movelo a mano al lugar elegido.'; }
+  const sig = {...dt, pasos: [...(dt.pasos || []), {titulo: 'El portal', texto}]};
+  sig.fase = trampaFaseSiguiente(sig, 'portal');
   await trampaGuardar(id, sig);
 }
 

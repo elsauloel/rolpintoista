@@ -1778,6 +1778,16 @@ prueba('Silencio (habilidades con SP: avisa) · Pierde SP (Succión arcana) · M
     napalm.danoZona, napalm.dejaZona, napalm.elemento, succ.pierdeSp, JSON.parse(TokensAuto.estadoJson(null, {stat: 'resmg', dif: 9, que: 'efecto'}, null, null, '', 0, {pierdeSp: '2d6'})).pierdeSp],
     [true, 'Orco está en Silencio: no puede usar habilidades que cuestan SP. ¿Usar Rayo igual?', '', '', true, true, '1d6', true, 'fuego', '2d6', '2d6']);
 });
+prueba('portal (rango 8, lo elige quien la puso), dardos (el veneno solo si lastima), gases (disparo en línea de 3, nube en la flor de 7) y explosivas', () => {
+  const td = n => CATALOGO_BASE.find(i => i.nombre === n).trampaDatos;
+  const portal = td('Portal cósmico'), dardos = td('Dardos envenenados'), som = td('Gas somnífero'), barril = td('Barril de pólvora');
+  const j = JSON.parse(TokensAuto.estadoJson({nombre: 'Veneno', stacks: 3}, null, null, {area: 'flor', radio: 1, centro: 'trampa'}, '', 0, {portal: {rango: 8}, requiereDano: true}));
+  igual([portal.portal, portal.efectoManual || '', dardos.dano, dardos.requiereDano, som.tipo, som.tamano, som.efecto, barril.dano, barril.salvacion.stat, barril.salvacion.que,
+    j.portal, j.requiereDano, j.efecto, TokensAuto.efectoNorm({area: 'flor', radio: 1}),
+    ItemCorto.trampaFilas(portal).find(f => f[0] === 'Teletransporta')[1], ItemCorto.trampaFilas(dardos).some(f => f[0] === 'Si lastima')],
+    [{rango: 8}, '', '1d6+3', true, 'linea', 3, {area: 'flor', radio: 1, centro: 'trampa'}, '4d6', 'rescc', 'efecto',
+      {rango: 8}, true, {area: 'flor', radio: 1, centro: 'trampa'}, {area: 'flor', radio: 1}, 'quien la pone elige adónde lo manda, hasta 8 casillas', true]);
+});
 prueba('arena movediza: Fuerza 6 para zafar (si falla, se hunde) y terreno lento (cada paso que sale de ella cuesta 2 No2)', () => {
   const arena = CATALOGO_BASE.find(i => i.nombre === 'Arena movediza').trampaDatos;
   igual([arena.soltar, arena.lento, TokensAuto.estadoJson({nombre: 'Inmovilizado', turnos: 1}, null, null, null, '', 2), ItemCorto.trampaFilas(arena).find(f => f[0] === 'Terreno')[1]],

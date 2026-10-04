@@ -69,8 +69,9 @@ const AvisoCombate = (() => {
     if(document.getElementById('aviso-cartel-css')) return;
     const s = document.createElement('style');
     s.id = 'aviso-cartel-css';
-    s.textContent = `.aviso-combate-cartel{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);z-index:78;width:min(520px,94vw)}
-      .aviso-combate-cartel.abajo{top:auto;bottom:16px;transform:translateX(-50%)}
+    s.textContent = `.aviso-carteles-col{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);z-index:78;width:min(520px,94vw);display:flex;flex-direction:column;gap:10px;max-height:88vh;overflow:auto}
+      .aviso-carteles-col:empty{display:none}
+      .aviso-combate-cartel.abajo{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:78;width:min(520px,94vw)}
       .aviso-combate-cartel .duelo-caja{width:100%;max-height:70vh}
       .aviso-combate-cartel .duelo-cuerpo{gap:12px}
       .aviso-combate-cartel .duelo-paso p,.aviso-combate-cartel .aviso-texto{margin:0;line-height:1.45}
@@ -79,16 +80,21 @@ const AvisoCombate = (() => {
       .aviso-combate-cartel .duelo-pie button:disabled{opacity:.55;cursor:default}`;
     document.head.appendChild(s);
   }
+  // Los del centro van en una columna (uno debajo del otro, sin taparse); el de abajo (dodge roll) va suelto.
+  function columna(){
+    let c = document.getElementById('aviso-carteles-col');
+    if(!c){ c = document.createElement('div'); c.id = 'aviso-carteles-col'; c.className = 'aviso-carteles-col'; document.body.appendChild(c); }
+    return c;
+  }
   function acomodarCarteles(){
-    let i = 0;
-    carteles.forEach(el => { if(!el.classList.contains('abajo')){ el.style.top = `calc(38% + ${i * 28}px)`; el.style.zIndex = String(78 + i); i++; } });
+    carteles.forEach(el => { const destino = el.classList.contains('abajo') ? document.body : columna(); if(el.parentNode !== destino) destino.appendChild(el); });
   }
   function cartel(clave, o){
     let el = carteles.get(clave);
     if(!o){ if(el){ el.remove(); carteles.delete(clave); acomodarCarteles(); } return null; }
     if(typeof Duelo !== 'undefined' && Duelo.estilos) Duelo.estilos();
     estilosPropios(); estilosCartel();
-    if(!el){ el = document.createElement('div'); el.className = 'aviso-combate-cartel'; document.body.appendChild(el); carteles.set(clave, el); }
+    if(!el){ el = document.createElement('div'); el.className = 'aviso-combate-cartel'; carteles.set(clave, el); }
     el.classList.toggle('abajo', o.posicion === 'abajo');
     const pasos = (o.pasos || []).map(p => typeof p === 'string' ? {texto: p} : p).filter(p => p && (p.texto || p.titulo));
     const v = o.veredicto && o.veredicto.grande ? o.veredicto : null;

@@ -89,10 +89,12 @@ function confusionYaTirada(t, r, seguir){
 function confusionPedirTirada(tokenId, seguir){
   const t = tokens.get(tokenId);
   if(!t) return;
-  const tabla = [1, 2, 3, 4].map(n => `${n}: ${CONFUSION_CORTO[n]}`).join(' · ');
+  const tabla = [1, 2, 3, 4].map(n => `${n}: ${CONFUSION_CORTO[n]}`).join('\n');   // un resultado por renglón (dueño, 2026-10-04)
   const dibujar = (rodando) => AvisoCombate.mostrar({clave: 'confusion:' + tokenId, icono: '😵', titulo: `${nombreDe(t)} está confundido`,
     pasos: [{titulo: 'Anunciá en la Mesa cuál es tu intención de acción', texto: 'Antes de tirar, decí qué vas a hacer y contra quién si sale 4 (atacar a…, curar a…). Si sale «al azar», hacés esa misma acción, pero contra el objetivo que toque. Se resuelve a mano entre jugadores y GM.'},
-      {titulo: 'Estás confundido: tirá antes', texto: `Antes de su primera acción del turno tira 1d4. ${tabla}. El resultado vale para todo el turno (las defensas no se tocan).`, espera: true}],
+      {titulo: 'Estás confundido: tirá antes', texto: `Antes de su primera acción del turno tira 1d4:
+${tabla}
+El resultado vale para todo el turno (las defensas no se tocan).`, espera: true}],
     botones: [{texto: rodando ? '🎲 Rodando…' : '🎲 Tirar 1d4', deshabilitado: !!rodando, alClic: () => confusionTirar(tokenId, seguir, dibujar)},
       {texto: 'Ahora no', sec: true, alClic: () => AvisoCombate.cerrar()}]});
   dibujar(false);

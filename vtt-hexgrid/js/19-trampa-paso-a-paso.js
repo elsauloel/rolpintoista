@@ -157,7 +157,7 @@ async function trampaSaltar(dt){
   nd.lineas = trampaLineas(nd);
   await momentoAbrir({tipo: 'trampa', icono: '⚡', titulo: `La descarga salta a ${quien}`, estado: 'paso', datos: nd});
 }
-const efectosRayo = [], RAYO_FX_MS = 1900, saltosVistos = new Set(), trampaRetenidas = new Set();
+const efectosRayo = [], RAYO_FX_MS = 2900, saltosVistos = new Set(), trampaRetenidas = new Set();
 // Los saltos que llegaron con otro Anuncio a la vista: su rayo se muestra recién cuando les toca (2026-10-04, probado con el dueño: si no, el
 // rayo se dibujaba detrás de la ventana abierta y no se veía).
 const rayoPendientes = new Set();
@@ -165,7 +165,7 @@ function trampaRetenerConRayo(id){
   const d = trampasDatos.get(id), s = d && d.datos && d.datos.salto;
   if(s) rayoSaltoEfecto(s.desde, s.hacia);
   trampaRetenidas.add(id);
-  setTimeout(() => { trampaRetenidas.delete(id); trampaMomento(id, trampasDatos.get(id) || d); }, 1500);
+  setTimeout(() => { trampaRetenidas.delete(id); trampaMomento(id, trampasDatos.get(id) || d); }, 2500);   // 2,5 s para ver el rayo (dueño, 2026-10-04)
 }
 function rayoSaltoEfecto(desdeId, haciaId){
   const a = tokens.get(desdeId), b = tokens.get(haciaId);

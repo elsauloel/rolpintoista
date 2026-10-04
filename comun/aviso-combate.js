@@ -23,6 +23,7 @@ const AvisoCombate = (() => {
       .aviso-combate-fondo .duelo-pie{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
       .aviso-combate-fondo .duelo-pie button:disabled{opacity:.55;cursor:default}
       .aviso-combate-fondo .duelo-paso.aviso-espera{border-style:dashed;opacity:.9}
+      .aviso-combate-fondo .duelo-paso p{white-space:pre-line}
       .aviso-combate-fondo .aviso-mano{font-size:13px;color:#c7cee2;background:#1a2030;border:1px dashed #39435c;border-radius:10px;padding:8px 12px}`;
     document.head.appendChild(s);
   }

@@ -59,5 +59,53 @@ const AvisoCombate = (() => {
     if(ok) ok.focus();
   }
   document.addEventListener('keydown', ev => { if(abierto && ev.key === 'Escape'){ ev.stopImmediatePropagation(); cerrar(); } }, true);
-  return {mostrar, cerrar, abierto: () => !!abierto};
+
+  /* Los carteles que piden algo (tirar, decidir, esperar): el mismo marco, pero SIN oscurecer el mapa (hay que poder mirarlo, y en el dodge
+     roll mover el token). cartel(clave, o) dibuja o redibuja el de esa clave; cartel(clave, null) lo saca. Varios a la vez se apilan.
+     o: {icono, titulo, pasos, texto, veredicto, aMano, botones: [{texto, alClic, sec, id, titulo, deshabilitado}], posicion: 'centro' | 'abajo'}.
+     Lo usan los carteles del mapa: zonas, «Algo está fuera de lugar», la detección del GM, el ataque de oportunidad y el dodge roll. */
+  const carteles = new Map();
+  function estilosCartel(){
+    if(document.getElementById('aviso-cartel-css')) return;
+    const s = document.createElement('style');
+    s.id = 'aviso-cartel-css';
+    s.textContent = `.aviso-combate-cartel{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);z-index:78;width:min(520px,94vw)}
+      .aviso-combate-cartel.abajo{top:auto;bottom:16px;transform:translateX(-50%)}
+      .aviso-combate-cartel .duelo-caja{width:100%;max-height:70vh}
+      .aviso-combate-cartel .duelo-cuerpo{gap:12px}
+      .aviso-combate-cartel .duelo-paso p,.aviso-combate-cartel .aviso-texto{margin:0;line-height:1.45}
+      .aviso-combate-cartel .duelo-veredicto .grande{font-size:28px}
+      .aviso-combate-cartel .duelo-pie{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+      .aviso-combate-cartel .duelo-pie button:disabled{opacity:.55;cursor:default}`;
+    document.head.appendChild(s);
+  }
+  function acomodarCarteles(){
+    let i = 0;
+    carteles.forEach(el => { if(!el.classList.contains('abajo')){ el.style.top = `calc(38% + ${i * 28}px)`; el.style.zIndex = String(78 + i); i++; } });
+  }
+  function cartel(clave, o){
+    let el = carteles.get(clave);
+    if(!o){ if(el){ el.remove(); carteles.delete(clave); acomodarCarteles(); } return null; }
+    if(typeof Duelo !== 'undefined' && Duelo.estilos) Duelo.estilos();
+    estilosPropios(); estilosCartel();
+    if(!el){ el = document.createElement('div'); el.className = 'aviso-combate-cartel'; document.body.appendChild(el); carteles.set(clave, el); }
+    el.classList.toggle('abajo', o.posicion === 'abajo');
+    const pasos = (o.pasos || []).map(p => typeof p === 'string' ? {texto: p} : p).filter(p => p && (p.texto || p.titulo));
+    const v = o.veredicto && o.veredicto.grande ? o.veredicto : null;
+    const botones = o.botones || [];
+    el.innerHTML = `<div class="duelo-caja" role="dialog">
+      <div class="duelo-cab"><span>${e(o.icono || '⚔')} ${e(o.titulo || '')}</span></div>
+      <div class="duelo-cuerpo">
+        ${pasos.map((p, i) => `<div class="duelo-paso"><h4><span class="n">${i + 1}</span>${e(p.titulo || 'Qué pasó')}</h4><p>${e(p.texto || '')}</p></div>`).join('')}
+        ${o.texto ? `<p class="aviso-texto">${e(o.texto)}</p>` : ''}
+        ${v ? `<div class="duelo-veredicto ${TONO[v.tono] || 'bloqueado'}"><div class="grande">${e(v.grande)}</div>${v.chico ? `<div class="chico">${e(v.chico)}</div>` : ''}</div>` : ''}
+        ${o.aMano ? `<div class="aviso-mano">✋ ${e(o.aMano)}</div>` : ''}
+        ${botones.length ? `<div class="duelo-pie">${botones.map((b, i) => `<button type="button" data-cartel-b="${i}"${b.id ? ` id="${e(b.id)}"` : ''}${b.sec ? ' class="sec"' : ''}${b.titulo ? ` title="${e(b.titulo)}"` : ''}${b.deshabilitado ? ' disabled' : ''}>${e(b.texto)}</button>`).join('')}</div>` : ''}
+      </div>
+    </div>`;
+    el.querySelectorAll('[data-cartel-b]').forEach(b => { const x = botones[Number(b.dataset.cartelB)]; b.onclick = () => { if(x && x.alClic) x.alClic(); }; });
+    acomodarCarteles();
+    return el;
+  }
+  return {mostrar, cerrar, abierto: () => !!abierto, cartel};
 })();

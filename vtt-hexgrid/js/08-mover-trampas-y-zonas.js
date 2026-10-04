@@ -355,32 +355,25 @@ function zonaRevisarEntrada(id, celdas){
 }
 function zonaRevisarMantenimiento(){ tokens.forEach(t => zonaRevisarToken(t, true)); }
 function renderZonaBanner(){
-  let el2 = document.getElementById('zona-banner');
-  if(!zonaBanner){ if(el2) el2.hidden = true; return; }
+  // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
+  if(!zonaBanner){ AvisoCombate.cartel('zona', null); return; }
   const el = elementos.get(zonaBanner.elId), t = tokens.get(zonaBanner.tokenId);
   if(!el || !el.zona || !t){ zonaBanner = null; zonaMostrarSiguiente(); return; }   // se borró la zona o el token mientras esperaba
-  if(!el2){
-    el2 = document.createElement('div');
-    el2.id = 'zona-banner';
-    momentoEstiloCentro(el2);   // al centro: es quien resuelve el momento (P146, js/16)
-    document.body.appendChild(el2);
-  }
-  el2.hidden = false;
   const icono = el.zonaDanoTipo === 'de fuego' || (!el.zonaEstado && !el.zonaDanoTipo) ? '🔥' : '🌫';   // 🔥 solo para el fuego (o una zona vieja de puro daño)
   // Su momento (P146): los demás lo ven en la esquina mientras se resuelve, y el resultado al final.
   if(!zonaBanner.resultado && !zonaBanner.momentoP) zonaBanner.momentoP = momentoAbrir({tipo: 'zona', icono, titulo: `${t.oculto ? 'Alguien' : nombreDe(t)} está en ${el.zonaNombre || 'la zona'}…`, estado: 'tirando', resuelve: fbUsuario.uid, datos: {centro: true}});
-  const nombreT = t.oculto ? 'Alguien' : nombreDe(t);
-  let cuerpo;
+  const nombreT = t.oculto ? 'Alguien' : nombreDe(t), nombreZ = el.zonaNombre || 'Zona';
+  const stat = el.zonaResistStat ? (ZONA_STAT_LABEL[el.zonaResistStat] || el.zonaResistStat) : '';
   if(zonaBanner.resultado){
-    cuerpo = `<span>${icono} <b>${esc(el.zonaNombre || 'Zona')}</b> · ${esc(nombreT)}: ${esc(zonaBanner.resultado)}</span><button type="button" class="btn" id="zona-banner-ok">Listo</button>`;
-  }else if(el.zonaResistStat){
-    cuerpo = `<span>${icono} <b>${esc(el.zonaNombre || 'Zona')}</b>: ${esc(nombreT)} entró — tirá ${esc(ZONA_STAT_LABEL[el.zonaResistStat] || el.zonaResistStat)} para resistir</span><button type="button" class="btn" id="zona-banner-ir">🎲 Tirar</button>`;
+    AvisoCombate.cartel('zona', {icono, titulo: `${nombreZ} · ${nombreT}`, texto: zonaBanner.resultado,
+      botones: [{texto: 'Listo', id: 'zona-banner-ok', alClic: () => { zonaBanner = null; zonaMostrarSiguiente(); }}]});
+  }else if(stat){
+    AvisoCombate.cartel('zona', {icono, titulo: `${nombreT} entró en ${nombreZ}`, texto: `Tirá ${stat} para resistir lo que deja la zona.`,
+      botones: [{texto: `🎲 Tirar ${stat}`, id: 'zona-banner-ir', alClic: zonaResolverBanner}]});
   }else{
-    cuerpo = `<span>${icono} <b>${esc(el.zonaNombre || 'Zona')}</b>: le toca a ${esc(nombreT)}</span><button type="button" class="btn" id="zona-banner-ir">Aplicar</button>`;
+    AvisoCombate.cartel('zona', {icono, titulo: `${nombreZ}: le toca a ${nombreT}`, texto: 'No hay nada que tirar: se aplica lo que deja la zona.',
+      botones: [{texto: 'Aplicar', id: 'zona-banner-ir', alClic: zonaResolverBanner}]});
   }
-  el2.innerHTML = cuerpo;
-  const bt = document.getElementById('zona-banner-ir'); if(bt) bt.onclick = zonaResolverBanner;
-  const bo = document.getElementById('zona-banner-ok'); if(bo) bo.onclick = () => { zonaBanner = null; zonaMostrarSiguiente(); };
 }
 async function zonaResolverBanner(){
   if(!zonaBanner) return;

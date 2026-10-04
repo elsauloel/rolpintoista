@@ -3,7 +3,7 @@
 /* ---------- Momentos (P146, pedido del dueño: "que tengan su momento", no que pasen silbando bajito por la Mesa) ----------
    Lo que pasa en el mapa —percepción, zonas, trampas que se disparan, sigilo roto— es un documento de `campanas/<id>/momentos`
    ({tipo, icono, titulo, resultado, estado, resuelve, datos}) que ven TODAS las pantallas:
-   - quien tiene que resolverlo (tirar algo) lo ve en un cartelito al CENTRO de su pantalla (`momentoEstiloCentro`), con su botón;
+   - quien tiene que resolverlo (tirar algo) lo ve en un cartel al CENTRO de su pantalla, con su botón (con la estética del duelo: `AvisoCombate.cartel`, comun/aviso-combate.js);
    - **el Aviso** (nombre dado por el dueño, 2026-10-02): a quien le pasó algo (`datos.paraUid`; ej. pisó una trampa) se le cuenta en el
      mismo cartelito del centro, con «Entendido» (`momentoAvisoCentro`, `#momento-aviso-centro`). `datos.aviso: true` = le llega aunque lo
      haya publicado su propia pantalla;
@@ -20,10 +20,6 @@ const momentosFeed = new Map();   // id → {d, hasta, orden}
 let momentosOrden = 0;
 const coleccionMomentos = () => fbDb.collection(fbRutaCampana('momentos'));
 
-// El cartelito de quien resuelve: al centro de la pantalla, sin oscurecer.
-function momentoEstiloCentro(el2){
-  el2.style.cssText = 'position:fixed;left:50%;top:42%;transform:translate(-50%,-50%);z-index:76;background:#151a26;border:1px solid #c98545;border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 12px 40px rgba(0,0,0,.6);min-width:min(340px,92vw);max-width:min(560px,92vw);flex-wrap:wrap;justify-content:center;color:#e9ecf4;font-size:16px;text-align:center';
-}
 async function momentoAbrir(m){   // → id del momento (o null si no se pudo: sin reglas publicadas, sin sesión)
   if(!fbDb || !fbUsuario || !fbMiembro) return null;
   try{
@@ -155,24 +151,19 @@ function percepcionSigiloResolver(){
   percepcionAbrir({tokenId: p.tokenId, ocultoId: p.ocultoId});
 }
 function renderPercepcionBanner(){
-  let el2 = document.getElementById('percepcion-banner');
-  if(!percepcionBanner){ if(el2) el2.hidden = true; return; }
-  if(!el2){
-    el2 = document.createElement('div');
-    el2.id = 'percepcion-banner';
-    momentoEstiloCentro(el2);
-    document.body.appendChild(el2);
-  }
-  el2.hidden = false;
+  // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
+  if(!percepcionBanner){ AvisoCombate.cartel('percepcion', null); return; }
   const t = tokens.get(percepcionBanner.tokenId);
   const quien = t ? nombreDe(t) : '';
-  el2.innerHTML = percepcionBanner.resultado
-    ? `<span>🔎 ${esc(quien)}: ${esc(percepcionBanner.resultado)}</span><button type="button" class="btn" id="percepcion-banner-ok">Listo</button>`
-    : percepcionBanner.esperando
-      ? `<span>🔎 ${esc(quien)} sacó ${esc(percepcionBanner.total)}… <span style="color:#8d97ad">esperando qué pasa</span></span>`
-      : `<span>🔎 <b>Algo está fuera de lugar…</b> ${esc(quien)}, tirá Percepción</span><button type="button" class="btn" id="percepcion-banner-ir">🎲 Tirar Percepción</button>`;
-  const bt = document.getElementById('percepcion-banner-ir'); if(bt) bt.onclick = percepcionResolverBanner;
-  const bo = document.getElementById('percepcion-banner-ok'); if(bo) bo.onclick = () => { percepcionBanner = null; renderPercepcionBanner(); };
+  if(percepcionBanner.resultado){
+    AvisoCombate.cartel('percepcion', {icono: '🔎', titulo: `${quien}: Percepción`, texto: percepcionBanner.resultado,
+      botones: [{texto: 'Listo', id: 'percepcion-banner-ok', alClic: () => { percepcionBanner = null; renderPercepcionBanner(); }}]});
+  }else if(percepcionBanner.esperando){
+    AvisoCombate.cartel('percepcion', {icono: '🔎', titulo: `${quien}: Percepción ${percepcionBanner.total}`, texto: 'Esperando qué pasa…'});
+  }else{
+    AvisoCombate.cartel('percepcion', {icono: '🔎', titulo: 'Algo está fuera de lugar…', texto: `${quien}, tirá Percepción.`,
+      botones: [{texto: '🎲 Tirar Percepción', id: 'percepcion-banner-ir', alClic: percepcionResolverBanner}]});
+  }
 }
 async function percepcionResolverBanner(){
   const pb = percepcionBanner;
@@ -229,24 +220,19 @@ function deteccionGMAbrir(id, d){
   renderDeteccionBanner();
 }
 function renderDeteccionBanner(){
-  let el2 = document.getElementById('deteccion-banner');
-  if(!deteccionBanner){ if(el2) el2.hidden = true; return; }
-  if(!el2){
-    el2 = document.createElement('div');
-    el2.id = 'deteccion-banner';
-    momentoEstiloCentro(el2);
-    el2.style.top = '58%';   // por si coincide con el cartelito de una zona
-    document.body.appendChild(el2);
-  }
-  el2.hidden = false;
+  // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
+  if(!deteccionBanner){ AvisoCombate.cartel('deteccion', null); return; }
   const dt = deteccionBanner.d.datos || {};
   const oculto = tokens.get(dt.ocultoId);
   const nomOculto = oculto ? nombreDe(oculto) : 'el oculto';
-  el2.innerHTML = deteccionBanner.resultado
-    ? `<span>🔎 ${esc(deteccionBanner.resultado)}</span><button type="button" class="btn" id="deteccion-banner-ok">Listo</button>`
-    : `<span>🔎 <b>${esc(dt.detector || 'Alguien')}</b> siente que algo está fuera de lugar (Percepción <b>${esc(dt.percepcion)}</b>). <b>${esc(nomOculto)}</b> (en sigilo) tira Destreza para seguir escondido.</span><button type="button" class="btn" id="deteccion-banner-ir">🎲 Tirar Destreza de ${esc(nomOculto)}</button>`;
-  const bt = document.getElementById('deteccion-banner-ir'); if(bt) bt.onclick = deteccionGMResolver;
-  const bo = document.getElementById('deteccion-banner-ok'); if(bo) bo.onclick = () => { deteccionBanner = null; renderDeteccionBanner(); };
+  if(deteccionBanner.resultado){
+    AvisoCombate.cartel('deteccion', {icono: '🔎', titulo: 'Detección', texto: deteccionBanner.resultado,
+      botones: [{texto: 'Listo', id: 'deteccion-banner-ok', alClic: () => { deteccionBanner = null; renderDeteccionBanner(); }}]});
+  }else{
+    AvisoCombate.cartel('deteccion', {icono: '🔎', titulo: `${dt.detector || 'Alguien'} siente que algo está fuera de lugar`,
+      pasos: [{titulo: 'Percepción', texto: `${dt.detector || 'Alguien'} sacó ${dt.percepcion}.`}, {titulo: 'Para seguir escondido', texto: `${nomOculto} (en sigilo) tira Destreza: tiene que sacar ${dt.percepcion} o más.`}],
+      botones: [{texto: `🎲 Tirar Destreza de ${nomOculto}`, id: 'deteccion-banner-ir', alClic: deteccionGMResolver}]});
+  }
 }
 async function deteccionGMResolver(){
   const db = deteccionBanner;

@@ -94,24 +94,23 @@ async function oportunidadResolver(){
   if(!e.momentoId && oporEspera === e){ oporEspera = null; renderOporEspera(); oporContinuar(e); }   // sin reglas publicadas: sigue como antes
 }
 function renderOporEspera(){
-  let el2 = document.getElementById('opor-espera');
-  if(!oporEspera){ if(el2) el2.hidden = true; return; }
-  if(!el2){ el2 = document.createElement('div'); el2.id = 'opor-espera'; momentoEstiloCentro(el2); document.body.appendChild(el2); }
-  el2.hidden = false;
+  // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
+  if(!oporEspera){ AvisoCombate.cartel('opor-espera', null); return; }
   const r = tokens.get(oporEspera.rivalId);
   const nomR = r ? nombreDe(r) : 'el rival';
-  el2.innerHTML = oporEspera.resultado
-    ? `<span>⚔ ${esc(oporEspera.resultado)}</span><button type="button" class="btn" id="opor-espera-ok">Entendido</button>`
-    : `<span>⚔ Te alejás de <b>${esc(nomR)}</b>: esperando a ver si aprovecha el ataque de oportunidad…</span><button type="button" class="btn" id="opor-espera-seguir" title="Si nadie contesta: seguís tu camino como lo marcaste">Seguir sin esperar</button>`;
-  const ok = document.getElementById('opor-espera-ok'); if(ok) ok.onclick = () => { oporEspera = null; renderOporEspera(); };
-  const seg = document.getElementById('opor-espera-seguir');
-  if(seg) seg.onclick = () => {
-    const e = oporEspera; oporEspera = null; renderOporEspera();
-    if(e.momentoId) momentoActualizar(e.momentoId, {estado: 'no', resultado: '…nadie contestó: sigue su camino.'});
-    const t = tokens.get(e.tokenId), r = tokens.get(e.rivalId);
-    oporMesa(`${t ? nombreDe(t) : 'Quien se alejaba'} siguió sin esperar: ${r ? nombreDe(r) : 'el rival'} no contestó a tiempo`);
-    oporContinuar(e);
-  };
+  if(oporEspera.resultado){
+    AvisoCombate.cartel('opor-espera', {icono: '⚔', titulo: 'Ataque de oportunidad', texto: oporEspera.resultado,
+      botones: [{texto: 'Entendido', id: 'opor-espera-ok', alClic: () => { oporEspera = null; renderOporEspera(); }}]});
+    return;
+  }
+  AvisoCombate.cartel('opor-espera', {icono: '⚔', titulo: `Te alejás de ${nomR}`, texto: 'Esperando a ver si aprovecha el ataque de oportunidad…',
+    botones: [{texto: 'Seguir sin esperar', sec: true, id: 'opor-espera-seguir', titulo: 'Si nadie contesta: seguís tu camino como lo marcaste', alClic: () => {
+      const e = oporEspera; oporEspera = null; renderOporEspera();
+      if(e.momentoId) momentoActualizar(e.momentoId, {estado: 'no', resultado: '…nadie contestó: sigue su camino.'});
+      const t = tokens.get(e.tokenId), r2 = tokens.get(e.rivalId);
+      oporMesa(`${t ? nombreDe(t) : 'Quien se alejaba'} siguió sin esperar: ${r2 ? nombreDe(r2) : 'el rival'} no contestó a tiempo`);
+      oporContinuar(e);
+    }}]});
 }
 // Sigue el camino que había marcado, desde donde se frenó (el resto pasa por las mismas reglas: trampas, percepción, otros rivales).
 function oporContinuar(e){
@@ -140,24 +139,18 @@ function oporMomento(id, d){
   }
 }
 function renderOporDecision(){
-  let el2 = document.getElementById('opor-decision');
-  if(!oporDecision){ if(el2) el2.hidden = true; return; }
-  if(!el2){ el2 = document.createElement('div'); el2.id = 'opor-decision'; momentoEstiloCentro(el2); el2.style.top = '50%'; el2.style.zIndex = '78'; document.body.appendChild(el2); }
-  el2.hidden = false;
+  // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
+  if(!oporDecision){ AvisoCombate.cartel('opor-decision', null); return; }
   const dt = oporDecision.d.datos || {};
   const m = tokens.get(dt.moverId), r = tokens.get(dt.rivalId);
   const nomM = m ? nombreDe(m) : 'Alguien', nomR = r ? nombreDe(r) : 'tu personaje';
   if(oporDecision.paso === 'arma'){
-    el2.innerHTML = `<div style="flex:1 1 100%">⚔ <b>¿Con qué arma ataca ${esc(nomR)}?</b></div>` + oporDecision.armas.map((a, i) =>
-      `<button type="button" class="btn" data-opor-arma="${i}">${esc(a.nombre)} — ${esc(a.costo)} No2</button>`).join('') +
-      `<button type="button" class="btn" data-opor-no="1">Mejor no</button>`;
+    AvisoCombate.cartel('opor-decision', {icono: '⚔', titulo: `¿Con qué arma ataca ${nomR}?`, texto: 'Ataque de oportunidad: cuesta lo de un primer ataque y no cuenta como ataque del turno.',
+      botones: [...oporDecision.armas.map(a => ({texto: `${a.nombre} — ${a.costo} No2`, alClic: () => oporAtacar(a)})), {texto: 'Mejor no', sec: true, alClic: () => oporResponder(false)}]});
   }else{
-    el2.innerHTML = `<div style="flex:1 1 100%">⚔ <b>${esc(nomM)}</b> se aleja de <b>${esc(nomR)}</b>. ¿Ataque de oportunidad?</div>
-      <button type="button" class="btn primary" data-opor-si="1">Sí, atacar</button><button type="button" class="btn" data-opor-no="1">No, dejarlo pasar</button>`;
+    AvisoCombate.cartel('opor-decision', {icono: '⚔', titulo: `${nomM} se aleja de ${nomR}`, texto: '¿Ataque de oportunidad?',
+      botones: [{texto: 'Sí, atacar', alClic: () => oporResponder(true)}, {texto: 'No, dejarlo pasar', sec: true, alClic: () => oporResponder(false)}]});
   }
-  el2.querySelectorAll('[data-opor-no]').forEach(b => b.onclick = () => oporResponder(false));
-  el2.querySelectorAll('[data-opor-si]').forEach(b => b.onclick = () => oporResponder(true));
-  el2.querySelectorAll('[data-opor-arma]').forEach(b => b.onclick = () => oporAtacar(oporDecision.armas[num(b.dataset.oporArma)]));
 }
 async function oporResponder(si){
   const od = oporDecision;

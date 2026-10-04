@@ -542,18 +542,11 @@ function dueloDodgeTermina(d){
   if(d.defensor && (soyGM || (fbUsuario && d.defensor.uid === fbUsuario.uid))) Duelo.abrir(d.id);
 }
 function renderDodgeBanner(){
-  let el = document.getElementById('dodge-banner');
-  if(!dodgeBanner){ if(el) el.hidden = true; return; }
-  if(!el){
-    el = document.createElement('div');
-    el.id = 'dodge-banner';
-    el.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:96;background:var(--bottle,#1f3d2f);color:#EAF3E6;border:2px solid var(--brass,#E0A458);border-radius:var(--r,3px);padding:12px 18px;font-family:"Space Mono",monospace;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.6);text-align:center;max-width:92vw;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center';
-    document.body.appendChild(el);
-  }
-  el.hidden = false;
-  el.innerHTML = `<span>🏃 <b>${esc(dodgeBanner.nombre)}</b> ganó la Evasión: arrastrá el token hasta <b>2 casilleros</b> para intentar salir del área</span><button type="button" class="btn" data-dodge-ver>🔎 Ver el duelo</button><button type="button" class="btn" data-dodge-no-mover>✋ No me quiero mover</button>`;
-  el.querySelector('[data-dodge-ver]').onclick = () => Duelo.abrir(dodgeBanner.id);
-  el.querySelector('[data-dodge-no-mover]').onclick = () => dodgeDeclinar();
+  // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
+  if(!dodgeBanner){ AvisoCombate.cartel('dodge', null); return; }
+  AvisoCombate.cartel('dodge', {icono: '🏃', titulo: `${dodgeBanner.nombre} ganó la Evasión`, posicion: 'abajo',
+    texto: 'Arrastrá el token hasta 2 casilleros para intentar salir del área.',
+    botones: [{texto: '🔎 Ver el duelo', sec: true, alClic: () => Duelo.abrir(dodgeBanner.id)}, {texto: '✋ No me quiero mover', alClic: () => dodgeDeclinar()}]});
 }
 async function dodgeDeclinar(){
   if(!dodgeBanner) return;

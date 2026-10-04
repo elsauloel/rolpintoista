@@ -1776,6 +1776,18 @@ prueba('el pop-up de efectos de combate usa la estética del duelo: cabecera, un
   igual([...datos, !!document.querySelector('.aviso-combate-fondo'), cerrado, AvisoCombate.abierto()],
     [true, 2, 'duelo-veredicto fallo', '¡CAYÓ EN LA TRAMPA!', false, 1, false]);
 });
+prueba('los carteles que piden algo (zonas, percepción, oportunidad, dodge) usan el mismo marco, no tapan el mapa, se redibujan por clave y se apilan', () => {
+  let clics = 0;
+  AvisoCombate.cartel('a', {icono: '🌫', titulo: 'Clementino entró en Nube tóxica', texto: 'Tirá Res.Esp.', botones: [{texto: '🎲 Tirar Res.Esp', id: 'zona-banner-ir', alClic: () => clics++}]});
+  AvisoCombate.cartel('b', {icono: '🏃', titulo: 'Dodge', posicion: 'abajo', botones: [{texto: 'Ver', sec: true}]});
+  const a = document.querySelectorAll('.aviso-combate-cartel');
+  document.getElementById('zona-banner-ir').click();
+  AvisoCombate.cartel('a', {icono: '🌫', titulo: 'Nube tóxica · Clementino', texto: 'Resistió.', botones: [{texto: 'Listo'}]});
+  const datos = [a.length, !!document.querySelector('.aviso-combate-fondo'), clics, document.querySelectorAll('.aviso-combate-cartel').length,
+    document.querySelector('.aviso-combate-cartel .duelo-cab').textContent.trim(), document.querySelectorAll('.aviso-combate-cartel.abajo').length];
+  AvisoCombate.cartel('a', null); AvisoCombate.cartel('b', null);
+  igual([...datos, document.querySelectorAll('.aviso-combate-cartel').length], [2, false, 1, 2, '🌫 Nube tóxica · Clementino', 1, 0]);
+});
 prueba('superficie de efecto de una trampa: solo quien la pisó, toda la trampa o una flor de radio 1 o 2 alrededor de la casilla pisada', () => {
   igual([JSON.parse(TokensAuto.estadoJson({nombre: 'Veneno'}, null, null, {area: 'flor', radio: 3})), TokensAuto.efectoNorm({area: 'pisador', radio: 2}),
     TokensAuto.efectoNorm({area: 'cualquiera'}), Plantillas.trampa({nombre: 'Mina', tipo: 'flor', tamano: 0, efecto: {area: 'flor', radio: 1}}).efecto],

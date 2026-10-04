@@ -70,3 +70,10 @@ Va dentro del JSON de `trampaEstado` (`muro: {largo: 3 | 5, turnos}`), sin regla
 **Trampas sin disparar al final del combate (regla del dueño, 2026-10-03; reemplaza «vuelven a tu inventario»):** al cerrar el botín, cada
 trampa consumible que no se disparó se desarma y tiene **50 % de romperse**; las que aguantan vuelven a la mochila (o al cinturón) de su dueño. La
 línea verde de la Mesa dice cuántas volvieron y cuáles se rompieron (`TokensAuto.desarmarTrampasConsumibles`, `ROMPE_AL_DESARMAR`).
+
+### 🗡 Púas y cortes — definición ✅ y Común ✅ (dueño, 2026-10-03)
+- **Identidad:** daño físico (se resta la Defensa); lo propio: Sentado (caer), Sangrado (cortes), Rengo (pincharse el pie). Se evita con Evasión.
+- **Disparo:** una casilla · flor de 7 · línea (la línea **puede ser más larga que 4**: se ve caso por caso).
+- **Efecto:** el foso, solo a quien lo pisó; el piso de púas y las cuchillas, a todos los que estén encima.
+- **La Común (referencia de la familia): Foso con estacas** — disparo 1 casilla · efecto solo quien lo pisa · 2d6 de daño (menos su Defensa) ·
+  queda Sentado · **Evasión 6** evita caer (recibe el daño, no queda Sentado) · detectarla: 8 · **30**.

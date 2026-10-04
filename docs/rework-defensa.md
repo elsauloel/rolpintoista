@@ -267,3 +267,6 @@ pesan 1, Defensa 1–3, solo Tipo 4. Rígidas: pesan 2–4, Defensa 3–5, Tipo 
 
 Abierto: ¿entran ya las de resistencia elemental (Capa de viajero, Delantal, Peto de escamas) y sigilo (Ropas de sombra) con «✋ a mano» hasta
 que exista la mecánica, o esperan?
+
+**Resistencias elementales y Sigilo: construidos (2026-10-04)** — ver `comun/CLAUDE.md`. Las piezas con Res. fuego / hielo / … y Sigilo +N ya
+funcionan solas (no van «✋ a mano»). Probado en vivo: Llamarada contra un creep con Res. fuego 2 → «2d6 = 9 − Res. fuego 2 → 7 de daño directo».

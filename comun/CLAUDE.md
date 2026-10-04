@@ -1214,3 +1214,13 @@ versión parecida en más de una, es candidato a juntar.
   `destacar: 'idx:0,2'` (los dados de los efectos que funcionaron) y `dados3d.js` (`dadosDestacar(c, notacion, cual)`, que también sigue aceptando
   `'max'`) agranda, sube, hace brillar y suelta ondas en esos dados; la Mesa (`mesa.js`) acepta ese formato. En el tablero del duelo, el número
   de un efecto que funcionó es grande y dorado, late y dice «¡FUNCIONÓ!». (El tablero se probó en vivo; los dados 3D, no: la ventana estaba oculta.)
+- **Resistencias elementales y Sigilo** (2026-10-04, pedido del dueño). Stats nuevos: **`resfuego`, `reshielo`, `resrayo`, `restoxico`, `resacido`**
+  (`FichaCalculo.EXTRA`, base 0; los suben ítems, pasivas y estados) y **`sigilo`** (derivado de Destreza, fórmula `des`: la tirada para no ser descubierto).
+  Fichas (y su resumen público), invocaciones (`InvCalculo.statValor`) y creeps (`CreepCalculo.resElemental(sc, el)` = la base que pone el GM —fila
+  🔥 ❄ ⚡ ☠ 🧪 del editor del creep en GM Tools— + equipo y estados; Sigilo entre los derivados de Destreza). `Combatiente.ELEMENTOS` y
+  `Combatiente.elementoDe(texto)` ('Fuego', 'de fuego', 'tóxico' → 'fuego'…). **Se restan solos** al daño de su elemento, junto con la **Armadura mágica**
+  (que frena todo daño mágico, arcano o elemental): en el duelo (habilidad con `dano.tipo`), en las zonas (`zonaDanoTipo`) y en las trampas (`elemento`
+  adentro del JSON de `trampaEstado`: `TokensAuto.estadoJson(…, elemento)`, `Plantillas.TRAMPA`; Llamarada y Géiser fuego, Escarcha y Tumba de hielo hielo,
+  Descarga rayo, Bomba de esporas tóxico). El mapa los lee con `resistenciasDe(t, el)` (js/10) y `danioCreep/Pj/Inv` aceptan una resta extra. La
+  detección del sigilo (js/16) tira **Sigilo** en vez de Destreza. La ficha lite muestra Sigilo y las resistencias que no están en 0. Falta: el daño de las
+  armas (las armas mágicas, en su rework).

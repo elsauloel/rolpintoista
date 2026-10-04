@@ -50,7 +50,7 @@ const TRAMPA_INFO = ['estado', 'mano', 'muro', 'zona'];   // los pasos sin tirad
 function trampaTextoInfo(dt){
   if(dt.fase === 'mano') return {titulo: 'Lo que va a mano', texto: dt.aMano};
   if(dt.fase === 'muro') return {titulo: 'El muro', texto: `Se levanta ${num(dt.muroLargo) === 1 ? 'un pilar' : `un muro de ${num(dt.muroLargo) || 3} casillas`} justo delante, por ${dt.muro} turnos: hay que rodearlo.`};
-  if(dt.fase === 'zona') return {titulo: 'La nube', texto: `La trampa queda como nube ${dt.zona} turnos: quien entre o se quede adentro vuelve a tirar para resistirla.`};
+  if(dt.fase === 'zona') return {titulo: 'Queda en el piso', texto: `El efecto dura ${dt.zona} turnos: en cada Mantenimiento, a quien siga encima se le renueva (con su tirada para resistirlo), y quien entre también lo sufre.`};
   return null;
 }
 // Lo que falta: {titulo, texto, boton, espera} (espera = el renglón de la Crónica mientras tanto).

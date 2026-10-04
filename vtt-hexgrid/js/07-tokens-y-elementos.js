@@ -365,6 +365,16 @@ function escucharElementos(){
    la forma se elimina sola. Lo borra SIEMPRE el GM (las reglas dejan borrar a su dueño o al GM, y así no se borra dos veces):
    al llegar el Mantenimiento y al cargar los elementos (por si el GM no estaba conectado). Solo barre el mapa que el GM mira. */
 const elementosVencidosBorrando = new Set();
+// Una trampa ya detonada queda roja hasta el próximo Mantenimiento y después desaparece (2026-10-04, dueño). Las que quedaron como zona
+// (efecto persistente) se van solas con sus turnos. La borra el GM.
+function trampasDisparadasBarrer(){
+  if(!soyGM) return;
+  elementos.forEach((el, id) => {
+    if(!el.trampa || !el.disparada || el.zona || el.trampaDejaZona || elementosVencidosBorrando.has(id)) return;
+    elementosVencidosBorrando.add(id);
+    borrarElemento(id).finally(() => setTimeout(() => elementosVencidosBorrando.delete(id), 5000));
+  });
+}
 function elementosVencidosBarrer(){
   if(!soyGM || mantenimientoNumero === null) return;
   elementos.forEach((el, id) => {

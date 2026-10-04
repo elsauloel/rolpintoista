@@ -21,6 +21,7 @@ function escucharMantenimiento(){
     if(antes === null || numero <= antes || doc.metadata.hasPendingWrites) return;
     toast(`⟳ Mantenimiento: pasó el turno`);
     fuegoMantenimiento(numero);   // terreno incendiado: daño a los que siguen adentro
+    trampasDisparadasBarrer();   // las trampas ya detonadas (rojas) desaparecen
     zonaRevisarMantenimiento();   // zonas persistentes: a quien le falte algo, le aparece el cartelito
     // Los creeps (solo el GM): desde el 2026-10-02 (A2b) el pase de turno lo hace el mapa (js/12, mantenimientoCreeps), sin cargar GM
     // Tools en un marco invisible.

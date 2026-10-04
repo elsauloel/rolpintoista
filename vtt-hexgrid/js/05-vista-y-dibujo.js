@@ -341,14 +341,31 @@ function dibujar(){
       ctx.lineWidth = 2 / z;
       ctx.stroke();
     }
-    if(el.trampa){
-      // Trampa: armada = ámbar con ⚠ (solo la ven su dueño y el GM); disparada = roja con ✖ (la ven todos).
+    if(el.trampa && !el.zona){   // la que ya quedó como efecto persistente se dibuja como zona
+      // Trampa: armada = la ve su equipo (2026-10-04, dueño): DORADO donde se pisa (la superficie de disparo) y CELESTE hasta donde llega el
+      // efecto si es más grande (una flor alrededor); disparada = roja con ✖ (la ven todos) hasta el próximo Mantenimiento.
       const disp = !!el.disparada;
+      if(!disp){
+        const ef = trampaEfectoDe(el);
+        if(ef && ef.area === 'flor'){
+          const ya = new Set(celdas.map(c => nbPack(c.col, c.fila))), extra = [];
+          celdas.forEach(c => { const c0 = hexACubo(c);
+            for(let dq = -ef.radio; dq <= ef.radio; dq++) for(let dr = -ef.radio; dr <= ef.radio; dr++){
+              if(Math.max(Math.abs(dq), Math.abs(dr), Math.abs(dq + dr)) > ef.radio) continue;
+              const x = {col: cuboACol(c0.q + dq, c0.r + dr), fila: cuboAFila(c0.q + dq, c0.r + dr)}, k = nbPack(x.col, x.fila);
+              if(!ya.has(k)){ ya.add(k); extra.push(x); }
+            } });
+          if(extra.length){
+            trazarCeldas(extra); ctx.fillStyle = 'rgba(80,200,255,.16)'; ctx.fill();
+            bordeCeldas(extra); ctx.setLineDash([6 / z, 5 / z]); ctx.strokeStyle = 'rgba(80,200,255,.95)'; ctx.lineWidth = 2.5 / z; ctx.stroke(); ctx.setLineDash([]);
+          }
+        }
+      }
       trazarCeldas(celdas);
-      ctx.fillStyle = disp ? 'rgba(216,82,75,.28)' : 'rgba(224,164,88,.18)'; ctx.fill();
+      ctx.fillStyle = disp ? 'rgba(216,82,75,.28)' : 'rgba(255,196,50,.34)'; ctx.fill();
       bordeCeldas(celdas);
-      ctx.setLineDash([8 / z, 5 / z]);
-      ctx.strokeStyle = disp ? 'rgba(232,90,80,1)' : 'rgba(255,190,90,1)';
+      ctx.setLineDash(disp ? [8 / z, 5 / z] : []);
+      ctx.strokeStyle = disp ? 'rgba(232,90,80,1)' : 'rgba(255,200,60,1)';
       ctx.lineWidth = 3.5 / z; ctx.stroke();
       ctx.setLineDash([]);
       const pT = hexCentro(celdas[0].col, celdas[0].fila);

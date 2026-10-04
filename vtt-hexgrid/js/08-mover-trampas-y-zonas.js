@@ -300,9 +300,12 @@ function zonaAplicaA(el, t){
 }
 // ¿Todavía le falta algo a este par (zona, token)? El daño se vuelve a chequear siempre (como el fuego); el
 // estado, solo si ese token no está ya en zonaResueltos (una vez que lo tiene, no se le vuelve a tirar la resistencia).
+// Las zonas que deja una trampa (efecto persistente, 2026-10-04, dueño) se RENUEVAN en cada Mantenimiento: a quien siga encima se le vuelve a
+// tirar y aplicar (lo que ya tenía no se le saca). Se anota «token@Mantenimiento», así cada Mantenimiento cuenta aparte.
+const zonaClave = (el, t) => el.trampa ? `${zonaIdDe(t)}@${Math.round(num(mantenimientoNumero))}` : zonaIdDe(t);
 function zonaLeFalta(el, t){
   if(el.zonaDano || el.zonaDanoDif) return true;
-  if(el.zonaEstado && !(el.zonaResueltos || []).includes(zonaIdDe(t))) return true;
+  if(el.zonaEstado && !(el.zonaResueltos || []).includes(zonaClave(el, t))) return true;
   return false;
 }
 // El id de un token (la clave en `tokens`): los objetos del token no lo llevan adentro (antes se leía t.id, que no existe, y el cartelito
@@ -406,7 +409,7 @@ async function zonaResolverBanner(){
     const rd = Combatiente.tirarStat(valor, estadosDe, el.zonaResistStat);
     if(rd){
       const total = rd.total;
-      resistio = total > contra;   // empate: gana la zona (quien la creó)
+      resistio = el.zonaTiraStat && Number.isFinite(el.zonaTiraValor) ? total > contra : total >= contra;   // contra una tirada, el empate gana la zona; contra un número fijo, alcanza con llegar
       diferencia = Math.max(0, contra - total);
       try{ mesaPublicar(`${quienTxt} · ${ZONA_STAT_LABEL[el.zonaResistStat] || el.zonaResistStat}`, {formula: rd.formula, rolls: rd.rolls, mod: rd.mod, total}); }catch(err){}
       const tuyo = `${ZONA_STAT_LABEL[el.zonaResistStat] || el.zonaResistStat} ${total}`;
@@ -459,7 +462,7 @@ async function zonaResolverBanner(){
     }
   }
   if(el.zonaEstado && !resistio){
-    try{ await coleccionElementos().doc(elId).update({zonaResueltos: firebase.firestore.FieldValue.arrayUnion(tokenId)}); }
+    try{ await coleccionElementos().doc(elId).update({zonaResueltos: firebase.firestore.FieldValue.arrayUnion(zonaClave(el, t))}); }
     catch(err){ console.error('No se pudo anotar zonaResueltos:', err); }
   }
   zonaBanner = {...zonaBanner, el, t, resultado: partes.join(' · ') || 'sin efecto'};

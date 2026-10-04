@@ -33,7 +33,9 @@ const FichaCalculo = (() => {
       {id:'critpot', label:'Crít.Pot.', full:'Crítico potente (baja los umbrales del d20: doble, triple y cuádruple daño)'},
       {id:'crit', label:'Crít.Frec.', full:'Crítico frecuente (baja el rango del crítico; ver Calculadora de crítico)'},
       {id:'parry', label:'Parry', full:'Parry'},
-      {id:'percepcion', label:'Percep.', full:'Percepción'}]},
+      {id:'percepcion', label:'Percep.', full:'Percepción'},
+      // Sigilo (2026-10-04, dueño): la tirada para NO ser descubierto (Destreza + bonos) contra la Percepción de quien busca.
+      {id:'sigilo', label:'Sigilo', full:'Sigilo: tu tirada para no ser descubierto (Destreza + bonos) contra la Percepción de quien te busca'}]},
     {id:'esp', label:'Esp', full:'Especial', color:'#9B7BD4', derived:[
       {id:'pdgmg', label:'PdG.Esp', full:'Probabilidad de golpe especial'},
       // Efecto especial (2026-10-02, pedido del dueño; se llamó "Daño especial" unas horas — el id quedó `dmgesp`): la potencia de los
@@ -68,6 +70,12 @@ const FichaCalculo = (() => {
     // guerra: P47). Se ve en un cuadro junto a Defensa; lo modifican pasivas,
     // ítems y estados. La niebla del mapa todavía no lo lee.
     {id:'vision', label:'Campo de visión', full:'Campo de visión (radio en hexágonos)'},
+    // Resistencias elementales (2026-10-04, dueño): cada una se resta al daño de su elemento (además de la Armadura mágica). Situacionales: pesan poco.
+    {id:'resfuego', label:'Res. fuego', full:'Resistencia al fuego: se resta a todo daño de fuego'},
+    {id:'reshielo', label:'Res. hielo', full:'Resistencia al hielo: se resta a todo daño de hielo'},
+    {id:'resrayo', label:'Res. rayo', full:'Resistencia al rayo: se resta a todo daño de rayo'},
+    {id:'restoxico', label:'Res. tóxico', full:'Resistencia a lo tóxico: se resta a todo daño tóxico'},
+    {id:'resacido', label:'Res. ácido', full:'Resistencia al ácido: se resta a todo daño de ácido'},
   ];
   const STAT_LIST = [...GRUPOS.flatMap(g=>g.derived), ...EXTRA];
   const ATTR_LIST = GRUPOS.map(g => ({id:g.id, label:g.label, full:g.full}));

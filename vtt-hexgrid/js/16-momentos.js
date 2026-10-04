@@ -234,8 +234,8 @@ function renderDeteccionBanner(){
       botones: [{texto: 'Listo', id: 'deteccion-banner-ok', alClic: () => { deteccionBanner = null; renderDeteccionBanner(); }}]});
   }else{
     AvisoCombate.cartel('deteccion', {icono: '🔎', titulo: `${dt.detector || 'Alguien'} siente que algo está fuera de lugar`,
-      pasos: [{titulo: 'Percepción', texto: `${dt.detector || 'Alguien'} sacó ${dt.percepcion}.`}, {titulo: 'Para seguir escondido', texto: `${nomOculto} (en sigilo) tira Destreza: tiene que sacar ${dt.percepcion} o más.`}],
-      botones: [{texto: `🎲 Tirar Destreza de ${nomOculto}`, id: 'deteccion-banner-ir', alClic: deteccionGMResolver}]});
+      pasos: [{titulo: 'Percepción', texto: `${dt.detector || 'Alguien'} sacó ${dt.percepcion}.`}, {titulo: 'Para seguir escondido', texto: `${nomOculto} (en sigilo) tira Sigilo (Destreza + bonos): tiene que sacar ${dt.percepcion} o más.`}],
+      botones: [{texto: `🎲 Tirar Sigilo de ${nomOculto}`, id: 'deteccion-banner-ir', alClic: deteccionGMResolver}]});
   }
 }
 async function deteccionGMResolver(){
@@ -245,21 +245,22 @@ async function deteccionGMResolver(){
   const dt = db.d.datos || {};
   const oculto = tokens.get(dt.ocultoId);
   const nomOculto = oculto ? nombreDe(oculto) : 'el oculto';
+  // Sigilo (2026-10-04, dueño): el oculto tira su Sigilo = Destreza + lo que le den ítems, pasivas o estados (las fichas viejas: Destreza).
   let des = 0, estados = [];
   if(oculto && oculto.tipo === 'creep'){
     const sc = creepPrivadoDe(oculto.fichaId);
-    if(sc){ des = CreepCalculo.statValor(sc, 'des'); estados = sc.estados || []; }
+    if(sc){ des = CreepCalculo.statValor(sc, 'sigilo'); estados = sc.estados || []; }
   }else if(oculto){
     const f = fichasPub.get(String(oculto.fichaId).split(SEP_INVOCACION)[0]);
-    des = f && f.resumen ? num(f.resumen.des) : 0;
+    des = f && f.resumen ? num(f.resumen.sigilo !== undefined ? f.resumen.sigilo : f.resumen.des) : 0;
   }
   const rd = Combatiente.tirarStat(des, estados, 'des');
   const total = rd ? rd.total : 0;
   const detectado = !!oculto && enSigilo(oculto) && num(dt.percepcion) > total;   // empate: sigue escondido
   if(detectado) await romperSigilo(dt.ocultoId, dt.detector || 'alguien', `Lo descubrió ${dt.detector || 'alguien'} con Percepción aumentada`, true);
   db.resultado = detectado   // antes de avisar: el aviso vuelve enseguida por la escucha y no tiene que cerrar este cartelito
-    ? `${dt.detector || 'Alguien'} descubre a ${nomOculto} (Percepción ${dt.percepcion} contra Destreza ${total}).`
-    : `${nomOculto} sigue escondido (Percepción ${dt.percepcion} contra Destreza ${total}).`;
+    ? `${dt.detector || 'Alguien'} descubre a ${nomOculto} (Percepción ${dt.percepcion} contra Sigilo ${total}).`
+    : `${nomOculto} sigue escondido (Percepción ${dt.percepcion} contra Sigilo ${total}).`;
   renderDeteccionBanner();
   await momentoActualizar(db.id, {estado: 'listo', resultado: detectado ? `…¡y descubre a ${nomOculto}!` : 'Mmm... puede que esté flasheando.',
     datos: {...dt, detectado, ...(detectado ? {ocultoNombre: nomOculto} : {})}});

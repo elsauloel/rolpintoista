@@ -423,15 +423,18 @@ async function zonaResolverBanner(){
     const tipoTxt = el.zonaDanoTipo ? ` ${el.zonaDanoTipo}` : '';
     // Una zona de HABILIDAD cuyo daño ignora la Defensa es daño de casteo: le resta la Armadura mágica de quien lo recibe, como en el
     // duelo (dueloAplicarDano). Lo confirmó el dueño para el tóxico (P142, 2026-10-02). Las zonas del GM y de trampas, no.
-    const armadmg = !el.zonaIgnoraDef || !el.zonaCasteadorRef ? 0
-      : t.tipo === 'creep' ? (() => { const sc = creepPrivadoDe(t.fichaId); return sc ? creepArmadmgMapa(sc) : 0; })()
-      : (() => { const f = fichasPub.get(t.fichaId); return f && f.resumen ? num(f.resumen.armadmg || 0) : 0; })();
+    // Resistencia elemental (2026-10-04): el daño de un elemento resta la resistencia a ese elemento, y como es daño mágico también la Armadura mágica.
+    const elZ = Combatiente.elementoDe(el.zonaDanoTipo || '');
+    const rz = await resistenciasDe(t, elZ);
+    const armadmg = el.zonaIgnoraDef && (el.zonaCasteadorRef || elZ) ? rz.armadmg : 0;
+    const resEl = elZ ? rz.res : 0;
     if(monto > 0){
       try{
         let res = null;
-        if(t.tipo === 'creep') res = await danioCreep(t, String(monto), !!el.zonaIgnoraDef, armadmg);
-        else if(puedoMover(t)) res = await danioPj(t, String(monto), !!el.zonaIgnoraDef, armadmg);
-        partes.push(`${monto} de daño${tipoTxt}${armadmg > 0 ? ` (− ${armadmg} de Armadura mágica)` : ''}`);
+        if(t.tipo === 'creep') res = await danioCreep(t, String(monto), !!el.zonaIgnoraDef, armadmg, resEl);
+        else if(puedoMover(t)) res = await (String(t.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(t, String(monto), !!el.zonaIgnoraDef, armadmg, resEl);
+        const freno = [...(armadmg > 0 ? [`${armadmg} de Armadura mágica`] : []), ...(resEl > 0 ? [`${resEl} de ${Combatiente.ELEMENTOS[elZ].etq}`] : [])];
+        partes.push(`${monto} de daño${tipoTxt}${freno.length ? ` (− ${freno.join(' − ')})` : ''}`);
         danoHecho = res && res.r ? num(res.r.recibido) : monto;   // lo que llegó a la vida (escudos y Armadura mágica ya restados)
       }catch(err){ console.error('No se pudo aplicar el daño de la zona:', err); partes.push(`${monto} de daño${tipoTxt} (aplicalo a mano)`); danoHecho = monto; }
     }else if(monto === 0) partes.push('sin daño');
@@ -506,7 +509,7 @@ async function trampaAplicarEfectos(t, el, celdaPisada){
   const muro = trampaMuroDe(el);
   const comun = {
     nombreT: el.trampaNombre || 'una trampa', salva, dano: trampaDanoValido(el.trampaDano) ? el.trampaDano.trim() : '', ignoraDef: !!el.trampaIgnoraDef,
-    specJson: spec && spec.nombre ? el.trampaEstado : '',
+    specJson: spec && spec.nombre ? el.trampaEstado : '', elemento: (spec && spec.elemento) || '',
     aMano: (String(el.trampaDetalle || '').match(/[^.]*\(a mano\)\./g) || []).map(x => x.trim()).join(' '),   // lo que el texto dice que va a mano
   };
   for(const x of afectados){

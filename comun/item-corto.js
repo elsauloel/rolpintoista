@@ -49,7 +49,8 @@ const ItemCorto = (() => {
     const f = [];
     const tam = Math.max(0, num(t.tamano));
     f.push(['Forma', t.tipo === 'linea' ? `Línea de ${Math.max(1, tam)}` : tam ? `Flor de radio ${tam} (${casillas(tam)} casillas)` : 'Una casilla']);
-    if(t.dano) f.push(['Daño', `${t.dano} · ${t.ignoraDef ? 'directo a la vida' : 'contempla la armadura'}`]);
+    const ELEM = {fuego: 'de fuego', hielo: 'de hielo', rayo: 'de rayo', toxico: 'tóxico', acido: 'de ácido'};
+    if(t.dano) f.push(['Daño', `${t.dano}${ELEM[t.elemento] ? ' ' + ELEM[t.elemento] : ''} · ${t.ignoraDef ? 'directo a la vida' : 'contempla la armadura'}${ELEM[t.elemento] ? ' (lo frena su resistencia y la Armadura mágica)' : ''}`]);
     // El efecto: lo que aplica el mapa solo (el estado) y lo que queda a mano (efectoManual).
     if(t.estado){
       const sinFin = {Sentado: 'hasta que se pare', Sangrado: 'hasta que lo curen'}[t.estado];

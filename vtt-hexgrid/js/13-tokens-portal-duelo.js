@@ -731,12 +731,13 @@ async function dueloAplicarDano(d){
   const base = {crudo, mult, golpe, ignoraDef: crit, mitad: d.resultado === 'mitad'};
   if(!t) return {...base, manual: true, motivoManual: 'el token ya no está en el mapa'};
   const esInv = t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION);
-  let def = 0, armadmg = 0;
+  let def = 0, armadmg = 0, invLeida = null;
   if(esInv){   // 4e: su Defensa y su Armadura mágica, de sus datos (comun/inv-calculo.js, que se carga si hace falta)
     try{
       await bnCargarPiezas();
       const inv = await invDeToken(t);
       if(!inv) return {...base, manual: true, motivoManual: 'la invocación ya no está'};
+      invLeida = inv;
       ({def, armadmg} = defensasDeInv(inv));
     }catch(err){ console.error('No se pudieron leer los datos de la invocación:', err); return {...base, manual: true, motivoManual: 'es una invocación (no se pudieron leer sus datos)'}; }
   }
@@ -744,6 +745,10 @@ async function dueloAplicarDano(d){
   else{ const f = fichasPub.get(t.fichaId); def = f && f.resumen && f.resumen.def !== undefined ? num(f.resumen.def) : 0; armadmg = f && f.resumen ? num(f.resumen.armadmg || 0) : 0; }
   // Un crítico real ignora la Defensa entera (0); el daño de casteo que la ignora (Paso 1) resta la Armadura mágica (Paso 3) en vez de nada.
   const restaIgnorando = magico ? armadmg : 0;
+  // El elemento del daño de la habilidad (2026-10-04): se resta además la resistencia de quien lo recibe a ese elemento (Res. fuego…).
+  const elDano = d.hab && d.hab.dano ? Combatiente.elementoDe(d.hab.dano.tipo) : '';
+  const resEl = elDano ? (await resistenciasDe(t, elDano, invLeida)).res : 0;
+  const freno = [...(magico && armadmg ? [`Armadura mágica ${armadmg}`] : []), ...(resEl ? [`${Combatiente.ELEMENTOS[elDano].etq} ${resEl}`] : [])].join(' − ');
   let aplicar = golpe, ignoraDef = crit;
   if(base.mitad){ aplicar = Math.ceil(Math.max(0, golpe - def) / 2); ignoraDef = true; }
   // Bloqueo perdido (mitad del daño): el arma o escudo con el que bloqueó pierde 1 punto de durabilidad (solo personajes: los creeps y las invocaciones no llevan).
@@ -753,8 +758,8 @@ async function dueloAplicarDano(d){
     catch(err){ console.error('No se pudo pedir el desgaste del ítem:', err); }
   }
   try{
-    const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando)
-      : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando);
+    const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando, resEl)
+      : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando, resEl) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando, resEl);
     const espinas = res.r.invulnerable ? null : await dueloEspinas(d, golpe);   // el daño inflictido (con el multiplicador del crítico), antes de la Defensa
     // Daño mágico del arma (rayo / hielo): aparte, después del golpe — ignora la Defensa (resta la Armadura mágica) y no se multiplica.
     let magico = null;
@@ -767,7 +772,7 @@ async function dueloAplicarDano(d){
     // Habilidad que drena: todo lo que perdió. Arma que drena (2026-10-03): su % de lo que perdió de verdad (curar redondea para arriba).
     const drena = d.hab && d.hab.dano && d.hab.dano.drena ? await dueloDrenar(d, perdio)
       : !d.hab && num(dn.drenaPct) > 0 ? await dueloDrenar(d, Math.ceil(perdio * num(dn.drenaPct) / 100)) : null;
-    return {...base, desgaste, defensa: crit ? restaIgnorando : def, recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {})};
+    return {...base, desgaste, defensa: crit ? restaIgnorando : def, ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);
     return {...base, defensa: def, manual: true, golpe: base.mitad ? aplicar : golpe, motivoManual: err && err.message === 'SIN_DEF' ? 'la ficha todavía no publicó su Defensa' : 'falló la escritura'};

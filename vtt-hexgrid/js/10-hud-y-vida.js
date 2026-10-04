@@ -142,11 +142,12 @@ function golpeTexto(nombre, golpe, r, previo, nuevo){
 // de nada, se le resta ESTO (la Armadura mágica) — solo lo usa el daño de casteo
 // que ignora la Defensa (dueloAplicarDano); todo lo demás (críticos, trampas,
 // fuego, Rayo en cadena) sigue ignorando la Defensa entera, sin cambios.
-async function danioCreep(t, texto, ignoraDef, restaIgnorando){
+// restaExtra (2026-10-04): lo que se resta además (la resistencia al elemento del daño), con o sin Defensa.
+async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra){
   const golpe = leerGolpe(texto);
   if(golpe === null) throw new Error(ERROR_TIPEO);
   const res = await modificarCreep(t.fichaId, sc => {
-    const r = resolverGolpe(golpe, ignoraDef ? num(restaIgnorando || 0) : creepDefensaMapa(sc), sc.estados);
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : creepDefensaMapa(sc)) + num(restaExtra || 0), sc.estados);
     const previo = num(sc.hp);
     sc.hp = Math.max(0, previo - r.recibido);
     return {r, previo, nuevo: sc.hp};
@@ -155,7 +156,7 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando){
   return res;
 }
 
-async function danioPj(t, texto, ignoraDef, restaIgnorando){
+async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra){
   const golpe = leerGolpe(texto);
   if(golpe === null) throw new Error(ERROR_TIPEO);
   const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}`));
@@ -167,7 +168,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando){
     const datos = JSON.parse(parte.data().json || '{}');
     const rs = ficha.data().resumen || {};
     if(rs.def === undefined) throw new Error('SIN_DEF');
-    const r = resolverGolpe(golpe, ignoraDef ? num(restaIgnorando || 0) : num(rs.def), datos.efectos);
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : num(rs.def)) + num(restaExtra || 0), datos.efectos);
     const previo = num(datos.hp);
     datos.hp = Math.max(0, previo - r.recibido);
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
@@ -188,7 +189,7 @@ async function invDeToken(t){
   return (JSON.parse(parte.data().json || '{}').invocaciones || []).find(i => i && i.id === invId) || null;
 }
 const defensasDeInv = inv => { const x = InvCalculo.migrar(structuredClone(inv)); return {def: InvCalculo.defensaEfectiva(x), armadmg: Math.max(0, num(InvCalculo.statValor(x, 'armadmg')))}; };
-async function danioInv(t, texto, ignoraDef, restaIgnorando){
+async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra){
   const golpe = leerGolpe(texto);
   if(golpe === null) throw new Error(ERROR_TIPEO);
   const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
@@ -202,7 +203,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando){
     const inv = (datos.invocaciones || []).find(i => i && i.id === invId);
     if(!inv) throw new Error('La invocación ya no existe');
     if(!Array.isArray(inv.estados)) inv.estados = [];
-    const r = resolverGolpe(golpe, ignoraDef ? num(restaIgnorando || 0) : defensasDeInv(inv).def, inv.estados);
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : defensasDeInv(inv).def) + num(restaExtra || 0), inv.estados);
     const previo = num(inv.hp);
     inv.hp = Math.max(0, previo - r.recibido);
     const rs = ficha.data().resumen || {};
@@ -212,6 +213,24 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando){
   });
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
   return res;
+}
+
+/* La resistencia de un token a un elemento y su Armadura mágica (2026-10-04), para restarlas al daño mágico o elemental: personaje (su resumen),
+   creep (su parte privada, solo el GM), invocación (sus datos). → {res, armadmg}; con `inv` ya leída, sin volver a leerla. */
+async function resistenciasDe(t, el, inv){
+  if(!t) return {res: 0, armadmg: 0};
+  if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return {res: sc && el ? CreepCalculo.resElemental(sc, el) : 0, armadmg: sc ? creepArmadmgMapa(sc) : 0}; }
+  if(String(t.fichaId || '').includes(SEP_INVOCACION)){
+    try{
+      await bnCargarPiezas();
+      const i = inv || await invDeToken(t);
+      if(!i) return {res: 0, armadmg: 0};
+      const x = InvCalculo.migrar(structuredClone(i));
+      return {res: el ? Math.max(0, num(InvCalculo.statValor(x, 'res' + el))) : 0, armadmg: Math.max(0, num(InvCalculo.statValor(x, 'armadmg')))};
+    }catch(err){ return {res: 0, armadmg: 0}; }
+  }
+  const f = fichasPub.get(t.fichaId), r = (f && f.resumen) || {};
+  return {res: el ? Math.max(0, num(r['res' + el])) : 0, armadmg: Math.max(0, num(r.armadmg))};
 }
 
 function hudHpHtml(t, d){

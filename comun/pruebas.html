@@ -1766,6 +1766,20 @@ prueba('Soltarse (trampas de Atrapar): el estado guarda qué tirar y cuánto cue
     inv.estados.length, inv.nitros, Combatiente.estadoSoltable([{nombre: 'Inmovilizado', activo: true}])],
     [{stat: 'fue', etq: 'Fuerza', dif: 6, no2: 2}, '🔓 Soltarse · Fuerza contra 6 · 2 No2', 8, true, true, 3, 0, true, 0, 2, null]);
 });
+prueba('resistencia elemental y Sigilo: el elemento de un daño, los stats nuevos de personajes y creeps, y el elemento de una trampa', () => {
+  const S = FichaGuardado.normalizar({}).S;
+  const c0 = FichaCalculo.calcular(S);
+  S.inventario = [{id: 'cap', nombre: 'Capa de prueba', tipoItem: 'armadura_blanda', equipado: true, mods: [{stat: 'resfuego', val: 2}, {stat: 'sigilo', val: 1}]}];
+  const c1 = FichaCalculo.calcular(S);
+  const sc = CreepCalculo.normalizar({id: 'e', nombre: 'Elemental de fuego', nivel: 2, des: 4, resfuego: 3, equipo: [{nombre: 'Brasa', tipoItem: 'cabeza', mods: [{stat: 'resfuego', val: 1}]}]});
+  const llama = CATALOGO_BASE.find(i => i.nombre === 'Llamarada');
+  igual([Combatiente.elementoDe('Fuego'), Combatiente.elementoDe('tóxico'), Combatiente.elementoDe('de hielo'), Combatiente.elementoDe('Físico'), Combatiente.elementoDe('Arcano'),
+    c0.final.sigilo === c0.final.des, c0.final.resfuego, c1.final.resfuego, c1.final.sigilo === c1.final.des + 1,
+    CreepCalculo.resElemental(sc, 'fuego'), CreepCalculo.resElemental(sc, 'hielo'), CreepCalculo.statValor(sc, 'sigilo'),
+    TokensAuto.estadoJson(null, null, null, null, 'fuego'), TokensAuto.estadoJson(null, null, null, null, 'agua'), llama.trampaDatos.elemento,
+    ItemCorto.trampaFilas(llama.trampaDatos).find(f => f[0] === 'Daño')[1].includes('de fuego')],
+    ['fuego', 'toxico', 'hielo', '', '', true, 0, 2, true, 4, 0, 4, '{"elemento":"fuego"}', '', 'fuego', true]);
+});
 prueba('💰 botín estimado de un mapa: el oro de cada creep + lo que suelta a precio de venta (la mitad) + el consumible al azar como valor esperado', () => {
   const cat = CATALOGO_BASE.filter(i => i.tipoItem).map(CreepCalculo.itemParaCreep);
   const bandido = CreepCalculo.normalizar({id: 'b', nombre: 'Bandido (auditar)', nivel: 1, tipoCriatura: 'humano', oroBase: 20, armaNombre: 'Garrote de prueba', armaTipo: 8, armaPeso: 1});

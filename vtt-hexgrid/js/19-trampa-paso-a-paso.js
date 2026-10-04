@@ -61,7 +61,7 @@ function trampaPasoQueFalta(dt){
     const s = dt.salva, etq = trampaEtq(s);
     return {titulo: trampaTituloSalva(s), texto: `${etq} contra ${s.dif}: con ${s.dif} o más, ${trampaLogra(dt)}.`, boton: `🎲 Tirar ${etq}`, espera: `${dt.quien} tira ${etq}…`};
   }
-  if(dt.fase === 'dano') return {titulo: 'Daño', texto: `La trampa pega ${dt.dano}${dt.evita === 'mitad' ? ' (la mitad)' : ''}${dt.ignoraDef ? ', directo a la vida' : ', menos la Defensa'}.`,
+  if(dt.fase === 'dano') return {titulo: 'Daño', texto: `La trampa pega ${dt.dano}${dt.elemento ? ' ' + Combatiente.ELEMENTOS[dt.elemento].icono : ''}${dt.evita === 'mitad' ? ' (la mitad)' : ''}${dt.ignoraDef ? ', directo a la vida' : ', menos la Defensa'}${dt.elemento ? ` (lo frenan ${Combatiente.ELEMENTOS[dt.elemento].etq} y la Armadura mágica)` : ''}.`,
     boton: `🎲 Tirar el daño (${dt.dano})`, espera: `${dt.quien} tira el daño…`};
   if(dt.fase === 'estado'){ const sp = trampaSpec(dt); return {titulo: 'Lo que le deja', texto: sp ? EstadosAplicar.texto(sp) : '', boton: '▶ Seguir', espera: `${dt.quien}: lo que le deja…`}; }
   const info = trampaTextoInfo(dt);
@@ -90,7 +90,7 @@ async function trampaMomentoNuevo(p){
   const dt = {
     tokenId: p.tokenId || '', creep: x.tipo === 'creep', fichaId: String(x.fichaId || ''), quien: p.quien, nombreT: p.nombreT, pisador: !!p.pisador,
     salva: s ? {stat: String(s.stat), etq: String(s.etq || ''), dif: num(s.dif), que: String(s.que || 'todo'), ...(s.logra ? {logra: String(s.logra)} : {})} : null,
-    dano: p.dano || '', ignoraDef: !!p.ignoraDef, spec: p.specJson || '', muro: num(p.muro), muroLargo: num(p.muroLargo), zona: num(p.zona), aMano: p.aMano || '',
+    dano: p.dano || '', ignoraDef: !!p.ignoraDef, elemento: p.elemento || '', spec: p.specJson || '', muro: num(p.muro), muroLargo: num(p.muroLargo), zona: num(p.zona), aMano: p.aMano || '',
     fase: '', tirando: false, evita: '', pasos: [],
   };
   dt.fase = dt.salva ? 'salva' : trampaFaseSiguiente(dt, 'salva');
@@ -292,11 +292,15 @@ async function trampaPasoDano(id, dt){
   await trampaEsperarDados();
   const monto = dt.evita === 'mitad' ? Math.floor(r.total / 2) : r.total;
   const x = tokens.get(dt.tokenId);
-  let res = null;
+  let res = null, freno = '';
   if(monto > 0 && x && x.fichaId){
     try{
-      if(x.tipo === 'creep'){ if(soyGM) res = await danioCreep(x, String(monto), dt.ignoraDef); }
-      else res = await (String(x.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(x, String(monto), dt.ignoraDef);
+      // Daño de un elemento (2026-10-04): resta la resistencia a ese elemento y, como es daño mágico, la Armadura mágica.
+      const rr = dt.elemento ? await resistenciasDe(x, dt.elemento) : {res: 0, armadmg: 0};
+      const arm = dt.elemento && dt.ignoraDef ? rr.armadmg : 0;
+      freno = [...(arm ? [`Armadura mágica ${arm}`] : []), ...(rr.res ? [`${Combatiente.ELEMENTOS[dt.elemento].etq} ${rr.res}`] : [])].join(' − ');
+      if(x.tipo === 'creep'){ if(soyGM) res = await danioCreep(x, String(monto), dt.ignoraDef, arm, rr.res); }
+      else res = await (String(x.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(x, String(monto), dt.ignoraDef, arm, rr.res);
     }catch(err){ console.error('No se pudo aplicar el daño de la trampa:', err); }
   }
   let texto = `${r.formula} = ${r.total}${dt.evita === 'mitad' ? ` → la mitad: ${monto}` : ''}`;
@@ -304,7 +308,7 @@ async function trampaPasoDano(id, dt){
   else if(res){
     const g = res.r;
     texto += g.invulnerable ? ' → Invulnerable: no le hizo nada'
-      : (dt.ignoraDef ? ` → ${fmt(g.recibido)} de daño directo a la vida` : ` − Defensa ${fmt(g.defensa)} → ${fmt(g.recibido)} de daño`) + (g.absorbido ? ` (el escudo absorbió ${fmt(g.absorbido)})` : '');
+      : (dt.ignoraDef ? `${freno ? ` − ${freno}` : ''} → ${fmt(g.recibido)} de daño directo a la vida` : ` − Defensa ${fmt(g.defensa - (freno ? num(freno.split(' ').pop()) : 0))}${freno ? ` − ${freno}` : ''} → ${fmt(g.recibido)} de daño`) + (g.absorbido ? ` (el escudo absorbió ${fmt(g.absorbido)})` : '');
   }else texto += ` → ${monto} de daño${dt.ignoraDef ? ' directo a la vida' : ' menos su Defensa'} — aplicalo a mano`;
   const sig = {...dt, pasos: [...(dt.pasos || []), {titulo: 'Daño', texto}]};
   sig.fase = trampaFaseSiguiente(sig, 'dano');

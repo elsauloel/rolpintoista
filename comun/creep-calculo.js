@@ -145,6 +145,11 @@ const CreepCalculo = (() => {
   // (no tiene un campo propio como "def" en las piezas de armadura). Protege
   // el daño de casteo que "ignora la Defensa" (Paso 1); no tiene nada que ver
   // con Escudo especial ni con la habilidad "Armadura arcana" del Mago.
+  // Resistencia elemental de un creep (2026-10-04): la base que le pone el GM (sc.resfuego…) + lo que dan su equipo y sus estados.
+  function resElemental(sc, el){
+    const id = 'res' + el;
+    return Math.max(0, num(sc[id]) + modTotal(sc, id));
+  }
   function armadmgEfectiva(sc){
     return Math.max(0, num(sc.armadmg) + modTotal(sc, 'armadmg'));
   }
@@ -158,7 +163,7 @@ const CreepCalculo = (() => {
     con: [['resmg', 'Res.Esp'], ['rescc', 'Res.CC']],
     fue: [['dmg', 'Dmg'], ['bloqueo', 'Bloqueo']],
     agl: [['eva', 'Eva'], ['ini', 'Iniciativa']],
-    des: [['rng', 'Rng'], ['pdg', 'PdG'], ['crit', 'Crít.Frec.'], ['critpot', 'Crít.Pot.'], ['parry', 'Parry'], ['percepcion', 'Percep.']],
+    des: [['rng', 'Rng'], ['pdg', 'PdG'], ['crit', 'Crít.Frec.'], ['critpot', 'Crít.Pot.'], ['parry', 'Parry'], ['percepcion', 'Percep.'], ['sigilo', 'Sigilo']],
     esp: [['pdgmg', 'PdG.Esp'], ['dmgesp', 'Ef.Esp'], ['resm', 'Res.Mt'], ['rangocasteo', 'Rango Cast.']],
   };
   const ATTR_NOMBRE = {con:'Constitución', fue:'Fuerza', agl:'Agilidad', des:'Destreza', esp:'Especial'};
@@ -174,13 +179,13 @@ const CreepCalculo = (() => {
     {id:'resmg', label:'Res.Esp', attr:'con'}, {id:'rescc', label:'Res.CC', attr:'con'},
     {id:'dmg', label:'Dmg', attr:'fue'}, {id:'bloqueo', label:'Bloqueo', attr:'fue'},
     {id:'eva', label:'Eva', attr:'agl'}, {id:'ini', label:'Iniciativa', attr:'agl'}, {id:'mov', label:'Mov', attr:'agl'},
-    {id:'rng', label:'Rango', attr:'des'}, {id:'pdg', label:'PdG', attr:'des'}, {id:'crit', label:'Crítico frecuente', attr:'des'}, {id:'critpot', label:'Crítico potente', attr:'des'}, {id:'parry', label:'Parry', attr:'des'}, {id:'percepcion', label:'Percepción', attr:'des'},
+    {id:'rng', label:'Rango', attr:'des'}, {id:'pdg', label:'PdG', attr:'des'}, {id:'crit', label:'Crítico frecuente', attr:'des'}, {id:'critpot', label:'Crítico potente', attr:'des'}, {id:'parry', label:'Parry', attr:'des'}, {id:'percepcion', label:'Percepción', attr:'des'}, {id:'sigilo', label:'Sigilo', attr:'des'},
     {id:'pdgmg', label:'PdG.Esp', attr:'esp'}, {id:'dmgesp', label:'Ef.Esp', attr:'esp'}, {id:'resm', label:'Res.Mt', attr:'esp'}, {id:'rangocasteo', label:'Rango de casteo', attr:'esp'},
   ];
   // Mismo criterio que STATS_SIN_TIRADA/STATS_REDUNDANTES_COMBATE en la
   // Botonera de la ficha: los 5 atributos base + los secundarios que no
   // tienen ya su propio botón en la caja de Combate.
-  const STATS_TIRADA_IDS = ['con', 'fue', 'agl', 'des', 'esp', 'resmg', 'rescc', 'ini', 'pdgmg', 'dmgesp', 'resm', 'percepcion'];
+  const STATS_TIRADA_IDS = ['con', 'fue', 'agl', 'des', 'esp', 'resmg', 'rescc', 'ini', 'pdgmg', 'dmgesp', 'resm', 'percepcion', 'sigilo'];
   const STAT_LOOKUP = Object.fromEntries(DERIVED_STATS.map(d => [d.id, d]));
   function statValor(sc, statId){
     const d = STAT_LOOKUP[statId];
@@ -551,7 +556,7 @@ const CreepCalculo = (() => {
     TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto,
     trofeo, despojosDePrecio, dropsResumen,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,
-    danoTxt, fuentesEquipo, modTotal, estadosArmadura, aporteArmadura, defensaEfectiva, armadmgEfectiva, critEfectivo,
+    danoTxt, fuentesEquipo, modTotal, estadosArmadura, aporteArmadura, defensaEfectiva, armadmgEfectiva, resElemental, critEfectivo,
     statValor, estadoActivo, aportesMod, origenesMod, conSigno, statOrigenTxt, armadmgOrigenTxt, ataqueTxt, ataqueOrigenTxt,
     defensaOrigenTxt, critOrigenTxt, armaduraOrigenTxt, modsAfectanHp, actualizarHpMaxPorCon, nitrosMax, actualizarNo2PorAgl,
     costoAtaque, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor,

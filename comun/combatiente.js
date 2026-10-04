@@ -633,7 +633,23 @@ const Combatiente = (() => {
     return v;
   }
 
-  return {ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, preguntaSentado, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+  /* Elementos (2026-10-04, dueño): el daño de un elemento se frena con la resistencia a ese elemento (Res. fuego…) y con la Armadura mágica
+     (que resta TODO daño mágico, arcano o elemental). `elementoDe(texto)` reconoce el elemento en el tipo de un daño ('Fuego', 'de fuego',
+     'tóxico'…) → 'fuego' | 'hielo' | 'rayo' | 'toxico' | 'acido' | ''. */
+  const ELEMENTOS = {fuego: {etq: 'Res. fuego', icono: '🔥'}, hielo: {etq: 'Res. hielo', icono: '❄'}, rayo: {etq: 'Res. rayo', icono: '⚡'},
+    toxico: {etq: 'Res. tóxico', icono: '☠'}, acido: {etq: 'Res. ácido', icono: '🧪'}};
+  function elementoDe(texto){
+    const t = String(texto || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if(/fuego|llama|quema/.test(t)) return 'fuego';
+    if(/hielo|escarcha|frio/.test(t)) return 'hielo';
+    if(/rayo|electric|relampago/.test(t)) return 'rayo';
+    if(/toxic|veneno|espora/.test(t)) return 'toxico';
+    if(/acido/.test(t)) return 'acido';
+    return '';
+  }
+  const esMagicoTipo = texto => !!elementoDe(texto) || /arcan|magic/i.test(String(texto || ''));
+
+  return {ELEMENTOS, elementoDe, esMagicoTipo, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, preguntaSentado, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

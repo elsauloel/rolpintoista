@@ -82,6 +82,9 @@ const FichaResumen = (() => {
       // Evasión, Fuerza, Res.CC y Res.Mt (2026-10-02): el mapa tira con esto la salvación de una trampa por quien la pisa.
       eva: n(c.final.eva), fue: n(c.final.fue), rescc: n(c.final.rescc), resm: n(c.final.resm),
       percepcion: n(c.final.percepcion),   // Percepción (de Destreza, 2026-09-22): por si el mapa la necesita más adelante
+      sigilo: n(c.final.sigilo),   // Sigilo (2026-10-04): el mapa lo tira cuando lo intentan descubrir
+      // Resistencias elementales (2026-10-04): el mapa las resta al daño de su elemento.
+      resfuego: n(c.final.resfuego), reshielo: n(c.final.reshielo), resrayo: n(c.final.resrayo), restoxico: n(c.final.restoxico), resacido: n(c.final.resacido),
       rng: n(c.final.rng),               // Rango (de Destreza): el mapa lo usa para el visualizador de rango (📏)
       rangocasteo: n(c.final.rangocasteo),   // Rango de casteo (de Especial): visualizador de rango mágico (🔮)
       luz: n(c.final.luz), veoculto: n(c.final.veoculto),   // luz que lleva encima y radio en el que ve lo oculto: el mapa los lee (farol, bengala, yelmo del ojo que todo lo ve)

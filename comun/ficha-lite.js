@@ -38,6 +38,10 @@ const FichaLite = (() => {
     return {valor: total, lineas};
   }
 
+  // Los extras de la franja de abajo (2026-10-04): Sigilo, Armadura mágica y las resistencias elementales.
+  const ELEM = {resfuego: 'fuego', reshielo: 'hielo', resrayo: 'rayo', restoxico: 'toxico', resacido: 'acido'};
+  const ETQ_EXTRA = {sigilo: '🕶 Sigilo', armadmg: '✨ Armadura mágica', resfuego: '🔥 Res. fuego', reshielo: '❄ Res. hielo', resrayo: '⚡ Res. rayo', restoxico: '☠ Res. tóxico', resacido: '🧪 Res. ácido'};
+
   /* ---------- Personaje ---------- */
   function lineasFicha(S, c, stat){
     const L = [];
@@ -118,6 +122,8 @@ const FichaLite = (() => {
         {etq: 'DDE', valor: fmt(num(meta.dde)), lineas: [{txt: 'Tu dinero: para comprar en las tiendas; es lo que cobrás al vender.'}]},
         {etq: 'Despojos', valor: `${fmt(num(S.loot && S.loot.normal))} · ${fmt(num(S.loot && S.loot.magico))} · ${fmt(esp)}`,
           lineas: [{txt: 'Normales · mágicos · especiales: los materiales que soltaron los rivales. Las tiendas los compran y sirven para reparar.'}]},
+        // Sigilo y las resistencias que no están en 0 (2026-10-04), con de dónde salen.
+        ...['sigilo', 'armadmg', ...Object.keys(ELEM)].filter(id => id === 'sigilo' || num(c.final[id]) > 0).map(id => ({etq: ETQ_EXTRA[id], valor: fmt(num(c.final[id])), lineas: lineasFicha(S, c, id).lineas})),
       ],
     };
   }
@@ -176,7 +182,9 @@ const FichaLite = (() => {
       crit: [0, 1, 2, 3, 4].map(i => lineasGuardadas(sc, C.critEfectivo(sc, i), (sc.crit || [])[i], modDe('tipo' + (i + 1)), () => 0)),
       equipo: equipoGuardado(sc, C.slotDe),
       estados: estadosLista(sc.estados),
-      extras: [],
+      extras: [{etq: ETQ_EXTRA.sigilo, valor: fmt(C.statValor(sc, 'sigilo')), lineas: []},
+        ...(C.armadmgEfectiva(sc) > 0 ? [{etq: ETQ_EXTRA.armadmg, valor: fmt(C.armadmgEfectiva(sc)), lineas: []}] : []),
+        ...Object.keys(ELEM).filter(el => C.resElemental && C.resElemental(sc, ELEM[el]) > 0).map(el => ({etq: ETQ_EXTRA[el], valor: fmt(C.resElemental(sc, ELEM[el])), lineas: []}))],
     };
   }
   function invocacion(inv, duenoNombre){
@@ -192,7 +200,8 @@ const FichaLite = (() => {
       crit: [0, 1, 2, 3, 4].map(i => lineasGuardadas(inv, I.critEfectivo(inv, i), (inv.crit || [])[i], modDe('tipo' + (i + 1)), () => 0)),
       equipo: equipoGuardado(inv, slotDe),
       estados: estadosLista(inv.estados),
-      extras: [],
+      extras: [{etq: ETQ_EXTRA.sigilo, valor: fmt(I.statValor(inv, 'sigilo')), lineas: []},
+        ...['armadmg', ...Object.keys(ELEM)].filter(id => num(I.statValor(inv, id)) > 0).map(id => ({etq: ETQ_EXTRA[id], valor: fmt(num(I.statValor(inv, id))), lineas: []}))],
     };
   }
 

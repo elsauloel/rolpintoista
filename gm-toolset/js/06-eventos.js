@@ -32,7 +32,7 @@ document.addEventListener('input', e => {
     // El HP se resuelve al salir del campo o con Enter: si se guardara
     // mientras se escribe, "+10" quedaría en 10 apenas se teclea el 1.
     if(campo === 'hp') return;
-    const numericos = ['nivel','hp','hpMax','nitros','spd','defensa','armadmg'];
+    const numericos = ['nivel','hp','hpMax','nitros','spd','defensa','armadmg','resfuego','reshielo','resrayo','restoxico','resacido'];
     sc[campo] = numericos.includes(campo) ? num(t.value) : t.value;
     if(campo === 'nivel'){
       actualizarBadgePresupuesto(sc, t.closest('.card'));

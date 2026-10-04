@@ -543,7 +543,7 @@ async function trampaAplicarEfectos(t, el){
       }catch(err){ console.error('No se pudo aplicar el estado de la trampa:', err); }
       partes.push(`${EstadosAplicar.texto(spec)}${que}`);
     }
-    const resultado = partes.join(' · ') || 'no le hizo nada';
+    const resultado = partes.join(' · ') || (x === t && trampaMuroDe(el) ? 'se levanta un muro delante' : 'no le hizo nada');
     mesa.push(`${quien}: ${resultado}`);
     momentoAbrir({tipo: 'trampa', icono: '🪤', titulo: x === t ? `${quien} pisó «${nombreT}»` : `${quien} quedó en el área de «${nombreT}»`,
       resultado: resultado + (aMano ? ` · ✋ ${aMano}` : ''), estado: 'listo',

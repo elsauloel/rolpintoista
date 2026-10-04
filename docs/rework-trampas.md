@@ -52,3 +52,7 @@ Hoja de trabajo, como `rework-armas.md`: lo que hay, las preguntas, las propuest
 - **Tamaño:** una casilla, o una flor de radio 1 (7 casillas) como máximo; más grande «es mucho». En línea sí: **línea de 3 o de 4**.
 - **Trampa nueva: el muro.** Al dispararse se levanta una pared impenetrable, para tener que rodear. *(Hay que construir la mecánica: hoy una
   trampa puede dejar una zona al dispararse, pero no una pared.)*
+
+**Trampa de muro (dueño, 2026-10-03): delante del que la pisó, 4 turnos, familia propia (🧱 Muro).** Construida y probada en vivo en «Claude ·
+pruebas»: la Bruja bajó a la trampa y la pared (3 casillas: el frente y las dos diagonales de adelante) se levantó sólida y fijada, por 4 turnos.
+Va dentro del JSON de `trampaEstado` (`muro: {largo: 3 | 5, turnos}`), sin reglas nuevas. Familias: ahora 11.

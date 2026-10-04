@@ -356,3 +356,9 @@ peso 3 o más dejan de llevar Bloqueo extra (su peso ya bloquea) para no pasarse
 **nunca menos de 1** (salvo que se rompa). *Por qué:* da más margen de diseño y de ajuste que «puntos por cada Peso». En las calculadoras vale
 **0,25 por punto** (la misma tasa que ya usaba la de armas). Las 39 piezas que tenían `durPorPeso` pasaron a `durExtra` con la misma durabilidad de
 siempre; `durPorPeso` queda solo para leer copias viejas (`Combatiente.durExtra`, `durBase`, `durMax`).
+
+## Escudos Comunes: cargados (2026-10-04)
+26 escudos de una mano reemplazan a los 10 viejos (los que conservan el nombre conservan su id y su narrativa). Fuera por ahora los escudos **a dos
+manos** (dueño: no hay diseñada ninguna mecánica de pelear sin armas). «Broquel de hierro» ya existía en Buena: el Común se llama **Disco de arado**.
+Precios desde la calculadora (bolsa 3; peso 0,25 por punto sobre el primero; Resistente/Frágil 0,25 por punto).
+

@@ -84,18 +84,21 @@ const ItemCorto = (() => {
     aturdir: 'Aturdir', derribar: 'Derribar', rengo: 'Rengo', 'prende fuego': 'Prende fuego', 'drena vida': 'Drena vida', demora: 'Demora'};
   const nombreEf = e => EFECTO[String(e.nombre || '').trim().toLowerCase()] || String(e.nombre || '').trim();
   const pctEf = e => { const c = Math.max(1, num(e.caras) || 1), x = Math.min(c, Math.max(1, num(e.exitos) || 1)); return x >= c ? 100 : Math.round(x / c * 100); };
+  // Qué se tira para un efecto con porcentaje (dueño, 2026-10-03: «17 % (6 en d6)», bien sintético): «6 en d6», «5–6 en d6».
+  const dadoEf = e => { const c = Math.max(1, num(e.caras) || 1), x = Math.min(c, Math.max(1, num(e.exitos) || 1)); return `${x > 1 ? (c - x + 1) + '–' : ''}${c} en d${c}`; };
+  const pctTxt = e => `${pctEf(e)} % (${dadoEf(e)})`;
   const durPP = it => num(it.durPorPeso) > 0 ? num(it.durPorPeso) : 3;
   const durMax = it => typeof Combatiente !== 'undefined' && Combatiente.durMax ? Combatiente.durMax(it) : Math.max(3, Math.round(durPP(it) * Math.max(0, Math.round(num(it.peso)))));
-  // «Sangrado 50 % · 2 turnos», «Veneno 3 stacks (siempre)», «Lisiado 25 %, seguro si es crítico».
+  // «Sangrado 50 % (2 en d2) · 2 turnos», «Veneno 3 stacks (siempre)», «Lisiado 25 % (4 en d4), seguro si es crítico».
   function efectoCorto(e){
     const pct = pctEf(e);
     let n = nombreEf(e);
     if(n === 'Rompe armadura' && num(e.stacks) > 1) n = `Armadura rota ${num(e.stacks) === 2 ? 'doble' : '×' + num(e.stacks)}`;   // 2 stacks por golpe (Raras del Tipo 8)
     if(e.danoMagico) return `+${e.dado} de ${String(e.nombre || 'magia').toLowerCase()}`;
     if(n === 'Drena vida') return `${e.soloCritico ? 'Si es crítico: drena otro' : 'Drena vida'} ${num(e.drenaPct) > 0 ? num(e.drenaPct) : 50} %`;
-    if(e.soloCritico) return `Si es crítico: ${n}${num(e.stacks) > 0 && /^(Veneno|Sangrado)$/.test(n) ? ` ${num(e.stacks)} stacks` : ''}${pct < 100 ? ` ${pct} %` : ''}${num(e.turnos) > 0 ? ` · ${num(e.turnos)} turnos` : ''}`;
+    if(e.soloCritico) return `Si es crítico: ${n}${num(e.stacks) > 0 && /^(Veneno|Sangrado)$/.test(n) ? ` ${num(e.stacks)} stacks` : ''}${pct < 100 ? ` ${pctTxt(e)}` : ''}${num(e.turnos) > 0 ? ` · ${num(e.turnos)} turnos` : ''}`;
     const st = num(e.stacks) > 0 && /^(Veneno|Sangrado)$/.test(n) ? ` ${num(e.stacks)} stacks` : '';
-    return `${n}${st} ${pct >= 100 ? '(siempre)' : pct + ' %'}${e.permanente ? ' · permanente' : num(e.turnos) > 0 ? ` · ${num(e.turnos)} turnos` : ''}${e.seguroCritico && pct < 100 ? ', seguro si es crítico' : ''}`;
+    return `${n}${st} ${pct >= 100 ? '(siempre)' : pctTxt(e)}${e.permanente ? ' · permanente' : num(e.turnos) > 0 ? ` · ${num(e.turnos)} turnos` : ''}${e.seguroCritico && pct < 100 ? ', seguro si es crítico' : ''}`;
   }
   function armaEsencial(it){
     if(!esArma(it)) return '';

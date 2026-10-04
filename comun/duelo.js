@@ -1368,7 +1368,7 @@ const Duelo = (() => {
       const clave = d.id + ':ef' + i;
       const nuevo = ef.res && !revelado[clave];
       if(ef.res) revelado[clave] = true;
-      const prob = siempreEf(ef) ? 'siempre' : pctEf(ef) + ' %';
+      const prob = siempreEf(ef) ? 'siempre' : `${pctEf(ef)} % (${ef.exitos > 1 ? (ef.caras - ef.exitos + 1) + '–' : ''}${ef.caras} en d${ef.caras})`;   // «17 % (6 en d6)»
       const spec = specDeEfecto(ef);
       let estado;
       if(ef.omitido) estado = `<div class="duelo-ef-res no">✘ No entra: ${_esc(ef.motivo || 'el golpe no hizo daño')}</div>`;

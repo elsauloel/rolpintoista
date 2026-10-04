@@ -370,4 +370,8 @@ las piezas «solo Defensa» no suman nada y **bajan de precio**. Los escudos sig
 *Por qué:* lo liviano es lo valioso; lo pesado se paga en carga y trae más. Aplicado a los 33 torsos Comunes (los completos siguen a 110 con un bono
 más; los simples bajan: Saco 20, Chaleco 50, Campera 70, Peto de tablas 15, Coraza de latón 35, Peto de hierro 60, Pechera de hierro 70).
 *Consecuencia:* el Tipo 10 llega a Buena también en yelmos pesados (un yelmo de peso 2 devuelve 1 punto), además de los escudos.
+**Compensar el peso con bonos o con precio: las dos (dueño, 2026-10-04).** El precio sale de los puntos, así que una pieza pesada que no usa lo que
+devuelve su peso queda más barata, y una que lo usa en bonos queda al precio completo. En los torsos Comunes, seis vuelven a su versión sin el bono
+agregado (pesadas y baratas): Pechera acolchada 100, Gambesón 100, Coraza del clan 85, Cota de malla 70, Coraza de guardia 70, Armadura pesada de
+hierro 60. En la propuesta de cascos, igual: Cofia de anillas 35, Casco de bombero 50, Yelmo de hierro 50.
 

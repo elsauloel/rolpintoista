@@ -40,6 +40,10 @@ const ESTADOS_PRESET = [
   // Sangrado (2026-09-22): N de daño = N stacks de 1 HP, así cada reaplicación suma +1 al daño por turno.
   {nombre:'Sangrado', polaridad:'debuff', stacks:2, turnos:0, hpTurno:-1, stacksTurno:0, permanente:true, esSangrado:true,
     detalle:'Pierde HP por turno. Si se lo vuelven a aplicar mientras ya lo tiene, no se duplica: suma +1 al daño por turno.'},
+  // Quemadura (2026-10-04, dueño: «como un Sangrado que se resiste con resistencia a fuego»): 2 de daño por turno, 3 turnos; si lo vuelven a
+  // quemar, +1 al daño por turno y vuelve a los turnos del nuevo. La Res. fuego le resta a cada turno (Combatiente.pasarTurnoEstados).
+  {nombre:'Quemadura', polaridad:'debuff', stacks:2, turnos:3, hpTurno:-1, stacksTurno:0, esQuemadura:true,
+    detalle:'Arde: pierde 2 HP por turno, 3 turnos. Si lo vuelven a quemar, +1 al daño por turno y vuelven a contar los turnos. ⚙ Automatizado: su Res. fuego le resta a cada turno.'},
   {nombre:'Lisiado', polaridad:'debuff', turnos:3, lisiado:true, esCC:true,
     detalle:'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},
   {nombre:'Inmovilizado', polaridad:'debuff', turnos:3, inmovilizado:true, esCC:true,

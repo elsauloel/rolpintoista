@@ -34,7 +34,7 @@ const EstadoPreguntas = (() => {
     if(p.excedenteVida) qs.push({clave: 'tope', etiqueta: 'Tope', min: 1, sinLimite: true, sinLimiteInicial: true,
       sinLimiteTexto: 'Sin tope (se puede acumular lo que sea)', texto: '¿Tiene un tope máximo de excedente?'});
     // Sangrado no: sus stacks SON el daño (N de daño = N stacks de 1 HP), ya salen de la pregunta de HP.
-    if(num(p.stacks) > 1 && !p.esSangrado) qs.push({clave: 'stacks', etiqueta: 'Stacks', min: 1, texto: '¿Cuántos stacks?'});
+    if(num(p.stacks) > 1 && !p.esSangrado && !p.esQuemadura) qs.push({clave: 'stacks', etiqueta: 'Stacks', min: 1, texto: '¿Cuántos stacks?'});
     if(!p.armaduraRota){   // Armadura rota resta 1 por acumulación: es la regla, no una cantidad a elegir
       (p.mods || []).forEach((m, i) => {
         if(!m || !m.stat) return;
@@ -54,7 +54,7 @@ const EstadoPreguntas = (() => {
     cfg = conf(cfg);
     const r = structuredClone(p);
     if('hp' in resp){
-      if(p.esSangrado){ r[cfg.hp] = -1; r.stacks = resp.hp; }   // Sangrado sube de a 1 con cada aplicación: N stacks de 1 HP
+      if(p.esSangrado || p.esQuemadura){ r[cfg.hp] = -1; r.stacks = resp.hp; }   // Sangrado sube de a 1 con cada aplicación: N stacks de 1 HP
       else r[cfg.hp] = (num(p[cfg.hp]) < 0 ? -1 : 1) * resp.hp;
     }
     if('escudo' in resp) r.escudoMagico = resp.escudo;

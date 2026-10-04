@@ -119,7 +119,7 @@ const Plantillas = (() => {
   }
 
   /* ---- Estado alterado propio ("Mis presets") ---- en la forma de comun/estados-presets.js (hpTurno/stacksTurno). */
-  const MARCAS_ESTADO = ['esCC', 'esVeneno', 'esSangrado', 'mitadPdgEva', 'lisiado', 'paralisis', 'silencio', 'esEscarcha', 'inmovilizado',
+  const MARCAS_ESTADO = ['esCC', 'esVeneno', 'esSangrado', 'esQuemadura', 'mitadPdgEva', 'lisiado', 'paralisis', 'silencio', 'esEscarcha', 'inmovilizado',
     'rengo', 'cansado', 'exhausto', 'hypeado', 'sentado', 'invulnerable', 'inmunidadCC', 'sangrePura', 'coagulacionExtrema',
     'afortunado', 'blindado', 'espinas', 'armaduraRota', 'excedenteVida'];
   function estado(e){

@@ -163,7 +163,7 @@ const CreepAcciones = (() => {
     const detalle = h.efectoDetalle || '';
     const mods = structuredClone(h.efectoMods || []);
     // Con un preset conocido (Invulnerable, Espinas, Escudo especial, Sigilo…) el estado lleva todas sus marcas, no solo las categorías.
-    const categorias = preset ? {esCC:preset.esCC, esVeneno:preset.esVeneno, esSangrado:preset.esSangrado,
+    const categorias = preset ? {esCC:preset.esCC, esVeneno:preset.esVeneno, esSangrado:preset.esSangrado, esQuemadura:preset.esQuemadura,
       stacksTurno: preset.stacksTurno ?? 0, permanente: !!preset.permanente, escudoMagico: preset.escudoMagico ?? 0, forzarNitros: preset.forzarNitros ?? ''} : {};
     if(preset) FLAGS_ESTADO.forEach(f => { categorias[f] = !!preset[f]; });
     // P137 (2026-10-01): "no vence" lo decide la habilidad si lo marca (como en personajes e invocaciones); si no, el estado.
@@ -296,7 +296,7 @@ const CreepAcciones = (() => {
       }
     });
     // Lo que hacen los estados en el pase de turno: la regla común de personajes, invocaciones y creeps (comun/combatiente.js).
-    const turnoEst = Combatiente.pasarTurnoEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno'});
+    const turnoEst = Combatiente.pasarTurnoEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno', resFuego: C().resElemental(sc, 'fuego')});
     if(turnoEst.hp){ sc.hp = Math.max(0, Math.min(num(sc.hpMax), num(sc.hp) + turnoEst.hp)); }
     const hpAplicado = turnoEst.eventos.filter(ev => ev.tipo === 'hp').length;
     rep.push(...Combatiente.reporteTurno(turnoEst.eventos));

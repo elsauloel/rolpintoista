@@ -39,7 +39,7 @@ const FichaHabilidades = (() => {
   const presetPorNombre = (lista, nombre) => (lista || []).find(p => p.nombre === nombre || (p.alias || []).includes(nombre));
   // (afortunado, inmunidades, etc.) — un ítem puede pedir "activate igual que este preset" sin copiarle el nombre
   // (equipoEstadoPreset), para poder mostrar un nombre propio sin perder la mecánica real del preset.
-  const FLAGS_ESPECIALES = ['esCC', 'esVeneno', 'esSangrado', 'afortunado', 'invulnerable',
+  const FLAGS_ESPECIALES = ['esCC', 'esVeneno', 'esSangrado', 'esQuemadura', 'afortunado', 'invulnerable',
     'inmunidadCC', 'sangrePura', 'coagulacionExtrema', 'blindado', 'espinas', 'mitadPdgEva',
     'lisiado', 'paralisis', 'silencio', 'esEscarcha', 'inmovilizado', 'rengo', 'cansado', 'exhausto', 'hypeado', 'sentado',
     'armaduraRota', 'escudoMagico', 'excedenteVida', 'forzarNitros'];

@@ -711,3 +711,12 @@ resuelven a mano, como el resto de los avisos).
 - 🔲 **P154. ¿El sobrepeso baja la Iniciativa?** (2026-10-04, del rework de la defensa). Idea: que llevar de más (armaduras pesadas) cueste
   Iniciativa, como contrapeso natural de mucha Defensa. Al dueño le parece que «puede ser exactamente la solución que estábamos buscando»;
   **lo va a consultar con sus colegas**. Por ahora las penalidades de sobrepeso quedan como están. *(diseño, para el grupo)* **Publicada en 🛠 Herramientas de diseño → 💬 Preguntas (2026-10-04).**
+
+### P155 — Confusión: cómo se automatiza (2026-10-04)
+**Contexto:** la Niebla de confusión deja Confusión. El dueño: la tirada tiene que ser **antes** de moverse o de cualquier acción (si no, el
+jugador gasta los No2 moviéndose y saca provecho): al confirmar la ruta o la acción, antes de que pase, aparece el Anuncio «Estás confundido:
+tirá antes» con qué significa cada resultado y el botón; según lo que salga se resuelve. El objetivo al azar se elige entre los tokens visibles.
+**Propuesta (2026-10-04, esperando OK):** 1d4 — 1 el GM elige (destino u objetivo, en el mapa, como el Portal); 2 pierde la acción (se cobra
+igual, para que no se pueda reintentar); 3 al azar (ataque/habilidad: a cada candidato visible a su alcance se le pone un número en el mapa y se
+tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimiento: 1d6 para la dirección, los mismos pasos); 4 normal.
+

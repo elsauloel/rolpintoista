@@ -41,7 +41,7 @@ const FichaMantenimiento = (() => {
 
     // Lo que hacen los estados en el pase de turno (escudo, daño/cura con inmunidades, stacks, turnos): regla común de
     // personajes, invocaciones y creeps (comun/combatiente.js). La vida se aplica más abajo, con fijarHp (tope, Ankh, muerte).
-    const turnoEst = Combatiente.pasarTurnoEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno'});
+    const turnoEst = Combatiente.pasarTurnoEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(c.final.resfuego)});
     hpDelta += turnoEst.hp;
     Combatiente.reporteTurno(turnoEst.eventos).forEach(l => { rep.push(l); log.push(esc(l)); });
 
@@ -99,7 +99,7 @@ const FichaMantenimiento = (() => {
       inv.ataquesTurno = 0;
       inv.habilidades.forEach(h => { if(num(h.cdActual) > 0) h.cdActual = Math.max(0, num(h.cdActual) - 1); });
       // Estados alterados de la invocación: la MISMA regla que el personaje y los creeps (comun/combatiente.js).
-      const turnoInv = Combatiente.pasarTurnoEstados(inv.estados, {hp: 'hpturno', stacks: 'stacksturno'});
+      const turnoInv = Combatiente.pasarTurnoEstados(inv.estados, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(InvCalculo.statValor(inv, 'resfuego'))});
       if(turnoInv.hp) inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, num(inv.hp) + turnoInv.hp));
       inv.estados = turnoInv.quedan;
       if(num(inv.cooldown) > 0){

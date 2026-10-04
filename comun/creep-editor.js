@@ -577,7 +577,7 @@ const CreepEditor = (() => {
     const x = r.estado;
     if(r.que === 'acumulado'){
       if(x.esEscarcha) return `${x.nombre} ×${x.stacks} (−${x.stacks} No2 máx.)`;
-      if(x.esSangrado) return `${x.nombre} +1 al daño por turno (${fmt(Math.abs(num(x[campoHp])) * num(x.stacks))} ahora)`;
+      if(x.esSangrado || x.esQuemadura) return `${x.nombre} +1 al daño por turno (${fmt(Math.abs(num(x[campoHp])) * num(x.stacks))} ahora)`;
       return `${x.nombre} ×${x.stacks}`;
     }
     return r.que === 'renovado' ? `${x.nombre} renovado (ya lo tenía)` : `${x.nombre} activado`;

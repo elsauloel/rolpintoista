@@ -93,6 +93,7 @@ const Combatiente = (() => {
      ({hp:'hpturno', stacks:'stacksturno'} en la ficha; {hp:'hpTurno', stacks:'stacksTurno'} en los creeps). */
   function pasarTurnoEstados(estados, campos){
     const lista = estados || [], c = campos || {hp: 'hpTurno', stacks: 'stacksTurno'};
+    const resFuego = Math.max(0, n(c.resFuego));   // la Quemadura (2026-10-04): la Res. fuego le resta a cada turno
     const act = activos(lista);
     const invulnerable = act.some(e => e.invulnerable), sangrePura = act.some(e => e.sangrePura), coagulacion = act.some(e => e.coagulacionExtrema);
     const eventos = [], fin = new Set();
@@ -107,6 +108,7 @@ const Combatiente = (() => {
       const hayStacks = e.stacks !== undefined && e.stacks !== null && e.stacks !== '';
       const stacks = Math.max(1, n(e.stacks) || 1);
       let d = n(e[c.hp]) * stacks;
+      if(d < 0 && e.esQuemadura && resFuego){ const antes = d; d = Math.min(0, d + resFuego); eventos.push({tipo: 'resfuego', nombre: e.nombre, de: -antes, a: -d, res: resFuego}); }
       if(d < 0 && (invulnerable || (e.esVeneno && sangrePura) || (e.esSangrado && coagulacion))){ eventos.push({tipo: 'inmune', nombre: e.nombre}); d = 0; }
       if(d){ hp += d; eventos.push({tipo: 'hp', nombre: e.nombre, hp: d, stacks}); }
       const ds = n(e[c.stacks]);
@@ -132,6 +134,7 @@ const Combatiente = (() => {
     return (eventos || []).map(ev => {
       if(ev.tipo === 'escudo') return `${ev.nombre}: escudo especial ${fmtN(ev.de)} → ${fmtN(ev.a)}`;
       if(ev.tipo === 'inmune') return `${ev.nombre}: no le hizo efecto (inmunidad)`;
+      if(ev.tipo === 'resfuego') return `${ev.nombre}: Res. fuego ${fmtN(ev.res)} le saca ${fmtN(ev.de - ev.a)} (de ${fmtN(ev.de)} a ${fmtN(ev.a)})`;
       if(ev.tipo === 'hp') return `${ev.nombre}: ${ev.hp > 0 ? '+' : '−'}${fmtN(Math.abs(ev.hp))} HP${ev.stacks > 1 ? ` (${fmtN(ev.stacks)} stacks)` : ''}`;
       if(ev.tipo === 'stacks') return `${ev.nombre}: stacks ${fmtN(ev.de)} → ${fmtN(ev.a)}`;
       if(ev.tipo === 'turnos') return `${ev.nombre}: ${fmtN(ev.de)} → ${fmtN(ev.a)} turno${ev.a === 1 ? '' : 's'}`;
@@ -326,13 +329,14 @@ const Combatiente = (() => {
   // Sangrado (2026-09-22) y Escarcha (2026-09-25): cada reaplicación suma +1 stack (el daño por turno sube de a 1; la
   // Escarcha además renueva su duración), no una tirada nueva de stacks.
   function acumularSangrado(estados, nuevo){
-    const clave = nuevo && nuevo.esSangrado ? 'esSangrado' : nuevo && nuevo.esEscarcha ? 'esEscarcha' : '';
+    const clave = nuevo && nuevo.esSangrado ? 'esSangrado' : nuevo && nuevo.esQuemadura ? 'esQuemadura' : nuevo && nuevo.esEscarcha ? 'esEscarcha' : '';
     if(!clave) return null;
     const ya = (estados || []).find(e => e[clave] && e.nombre === nuevo.nombre);
     if(!ya) return null;
     ya.stacks = Math.max(1, n(ya.stacks) || 1) + 1;
     ya.activo = true;
     if(clave === 'esEscarcha') ya.turnos = Math.max(n(ya.turnos), n(nuevo.turnos));
+    if(clave === 'esQuemadura' && n(nuevo.turnos) > 0) ya.turnos = n(nuevo.turnos);   // la Quemadura: +1 y vuelven a contar los turnos
     // Sangrado (regla del dueño, 2026-10-03): +1 stack y los turnos vuelven a los del Sangrado nuevo (el estándar); si alguno es permanente, queda permanente.
     if(clave === 'esSangrado'){
       if(nuevo.permanente){ ya.permanente = true; ya.turnos = 0; }
@@ -392,7 +396,7 @@ const Combatiente = (() => {
     if(Array.isArray(s.mods) && s.mods.length) base.mods = s.mods.map(m => ({stat: m.stat, val: n(m.val)}));
     if(n(s.hp)) base[campoHp || 'hpTurno'] = n(s.hp);
     if(n(s.stacks) && base.esVeneno && !base.permanente){ base.stacks = n(s.stacks); base.turnos = base.stacks; }
-    if(n(s.stacks) && base.esSangrado) base.stacks = n(s.stacks);   // un arma que deja Sangrado con más stacks (2026-10-03)
+    if(n(s.stacks) && (base.esSangrado || base.esQuemadura)) base.stacks = n(s.stacks);   // un arma que deja Sangrado con más stacks (2026-10-03)
     if(n(s.escudoMagico)) base.escudoMagico = n(s.escudoMagico);
     if(s.detalle) base.detalle = s.detalle;
     return base;

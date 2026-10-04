@@ -88,7 +88,7 @@ const ElegirTrampa = (() => {
   // Todos los estados en contra (también los que no vencen solos, como Sentado o Sangrado: a esos no se les pregunta los turnos).
   const debuffs = () => (typeof EstadosAplicar !== 'undefined' && EstadosAplicar.DEBUFFS ? EstadosAplicar.DEBUFFS : []);
   const presetDe = nombre => debuffs().find(p => p.nombre === nombre) || null;
-  const conStacks = nombre => { const p = presetDe(nombre); return !!(p && (p.esVeneno || p.esSangrado)); };
+  const conStacks = nombre => { const p = presetDe(nombre); return !!(p && (p.esVeneno || p.esSangrado || p.esQuemadura)); };
 
   function abrir(cfg){
     cfg = cfg || {};

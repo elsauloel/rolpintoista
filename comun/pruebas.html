@@ -1788,6 +1788,18 @@ prueba('portal (rango 8, lo elige quien la puso), dardos (el veneno solo si last
     [{rango: 8}, '', '1d6+3', true, 'linea', 3, {area: 'flor', radio: 1, centro: 'trampa'}, '4d6', 'rescc', 'efecto',
       {rango: 8}, true, {area: 'flor', radio: 1, centro: 'trampa'}, {area: 'flor', radio: 1}, 'quien la pone elige adónde lo manda, hasta 8 casillas', true]);
 });
+prueba('Quemadura: como un Sangrado de fuego (2 por turno, +1 al reaplicar y vuelven los turnos); la Res. fuego le resta a cada turno', () => {
+  const q = () => estadosPresetCreep().find(p => p.nombre === 'Quemadura');
+  const est = [];
+  Combatiente.agregarEstado(est, q());
+  const t1 = Combatiente.pasarTurnoEstados(est, {hp: 'hpTurno', stacks: 'stacksTurno', resFuego: 1});
+  Combatiente.agregarEstado(est, q());
+  const t2 = Combatiente.pasarTurnoEstados(est, {hp: 'hpTurno', stacks: 'stacksTurno'});
+  const geiser = CATALOGO_BASE.find(i => i.nombre === 'Géiser de fuego').trampaDatos;
+  igual([t1.hp, Combatiente.reporteTurno(t1.eventos)[0], est[0].stacks, t2.hp, est[0].turnos, geiser.estado, geiser.estadoHp || 0,
+    JSON.parse(TokensAuto.estadoJson({nombre: 'Quemadura', turnos: 3})).nombre],
+    [-1, 'Quemadura: Res. fuego 1 le saca 1 (de 2 a 1)', 3, -3, 2, 'Quemadura', 0, 'Quemadura']);
+});
 prueba('arena movediza: Fuerza 6 para zafar (si falla, se hunde) y terreno lento (cada paso que sale de ella cuesta 2 No2)', () => {
   const arena = CATALOGO_BASE.find(i => i.nombre === 'Arena movediza').trampaDatos;
   igual([arena.soltar, arena.lento, TokensAuto.estadoJson({nombre: 'Inmovilizado', turnos: 1}, null, null, null, '', 2), ItemCorto.trampaFilas(arena).find(f => f[0] === 'Terreno')[1]],

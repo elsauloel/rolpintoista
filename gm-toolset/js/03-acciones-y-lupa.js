@@ -284,7 +284,7 @@ function habsMiniHtml(sc){
 // (nombre/turnos/stacks/hpTurno/etc.) — se guardan/leen todas igual, así
 // que un solo array evita repetirlas en los 4 lugares que las tocan
 // (abrir editor, guardar, elegir preset, guardar como preset personalizado).
-const FLAGS_ESTADO_CREEP = ['armaduraRota','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
+const FLAGS_ESTADO_CREEP = ['armaduraRota','silencio','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
 
 // Presets estándar de estados: la lista vive en comun/estados-presets.js (una sola
 // para ficha, gm-tools y mapa); acá se pide en la forma de un creep.

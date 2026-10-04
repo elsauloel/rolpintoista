@@ -463,6 +463,9 @@ const FichaAcciones = (() => {
       ui.toast(`${it.nombre} anunciada`);
       return;
     }
+    // Silencio (2026-10-04): avisa y deja seguir.
+    const sil = Combatiente.preguntaSilencio(S.efectos, it);
+    if(sil && !(ui.confirmar || (txt => typeof confirm === 'function' && confirm(txt)))(sil)) return;
     if(Combatiente.tipoEjecucion(FichaBotonera.dueloDe(it)) === 'flash'){ ui.flashFuera(it); return; }   // ⚡ su propia regla de costo (P136)
     // Costo en vida: hace falta que sobre vida después de pagarlo.
     if(num(it.hpCosto) > 0 && num(S.hp) <= num(it.hpCosto)){
@@ -611,6 +614,15 @@ const FichaAcciones = (() => {
       return;
     }
     if(spec.nombre === 'Armadura rota'){ rompeArmaduraAlAzar(S, Math.max(1, num(spec.stacks) || 1), ui); return; }
+    // «Pierde SP» (2026-10-04, Succión arcana): gasta `stacks` SP (sin pasar de lo que tiene).
+    if(spec.nombre === 'Pierde SP'){
+      const max = num(FichaCalculo.calcular(S).final.sp), antes = Math.max(0, max - num(S.spGastado));
+      const n = Math.min(antes, Math.max(0, Math.round(num(spec.stacks))));
+      S.spGastado = num(S.spGastado) + n;
+      ui.cambio(['vitals', 'refresh']);
+      ui.toast(`${origen ? origen + ': ' : ''}−${fmt(n)} SP (${fmt(antes)} → ${fmt(antes - n)})`);
+      return;
+    }
     // «Pierde No2» (2026-10-02, Sonic Boom): baja los No2 (`stacks` = cuántos); si llega a 0 y corresponde, queda Sentado.
     if(spec.nombre === 'Pierde No2'){
       const n = Math.max(0, Math.round(num(spec.stacks))), antes = num(S.nitros);

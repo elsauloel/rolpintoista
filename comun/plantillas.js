@@ -88,6 +88,7 @@ const Plantillas = (() => {
     'muro',   // trampa de muro (2026-10-03): {largo: 3 | 5, turnos} — al dispararse se levanta una pared delante de quien la pisó
     'soltar',   // cómo se suelta quien quedó agarrado (2026-10-03, Atrapar): {stat, etq, dif, no2} — va con el estado que deja
     'efecto',   // superficie de efecto (2026-10-03): {area: 'pisador' | 'trampa' | 'flor', radio} — si no dice, la deduce el mapa
+    'pierdeSp', 'danoZona',   // 2026-10-04: lo que hace perder de SP (Succión arcana) y el daño por Mantenimiento de la zona que deja (Mina napalm)
     'lento',   // terreno lento (2026-10-04, arena movediza): una vez disparada, cada paso que sale de ella cuesta ese No2
     'elemento'];   // de qué elemento es el daño (2026-10-04): 'fuego' | 'hielo' | 'rayo' | 'toxico' | 'acido' — se resta esa resistencia
   function trampaDesde(t){
@@ -118,7 +119,7 @@ const Plantillas = (() => {
   }
 
   /* ---- Estado alterado propio ("Mis presets") ---- en la forma de comun/estados-presets.js (hpTurno/stacksTurno). */
-  const MARCAS_ESTADO = ['esCC', 'esVeneno', 'esSangrado', 'mitadPdgEva', 'lisiado', 'paralisis', 'esEscarcha', 'inmovilizado',
+  const MARCAS_ESTADO = ['esCC', 'esVeneno', 'esSangrado', 'mitadPdgEva', 'lisiado', 'paralisis', 'silencio', 'esEscarcha', 'inmovilizado',
     'rengo', 'cansado', 'exhausto', 'hypeado', 'sentado', 'invulnerable', 'inmunidadCC', 'sangrePura', 'coagulacionExtrema',
     'afortunado', 'blindado', 'espinas', 'armaduraRota', 'excedenteVida'];
   function estado(e){

@@ -133,7 +133,7 @@ const CreepAcciones = (() => {
      acá (los resuelve cada pantalla antes). */
   const uid = () => Math.random().toString(36).slice(2,9);
   const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp'};
-  const FLAGS_ESTADO = ['armaduraRota','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
+  const FLAGS_ESTADO = ['armaduraRota','silencio','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','esCC','esVeneno','esSangrado'];
   const habEtq = stat => (C().STAT_LOOKUP[stat] && C().STAT_LOOKUP[stat].label) || ATTR_LABELS[stat] || stat;
   // La Ejecución de un creep: la misma regla que personajes e invocaciones (comun/combatiente.js, habEjecucion). Sin costo variable.
   function habEjecucion(sc, h){
@@ -194,6 +194,8 @@ const CreepAcciones = (() => {
   }
   // Lo que cambia al ejecutar una 💰 o ✨ (no manual ni Flash): {error} o el plan para terminarHab.
   function ejecutarHab(sc, h, presets){
+    const sil = Combatiente.preguntaSilencio(sc.estados, h, sc.nombre);   // Silencio (2026-10-04): avisa y deja seguir
+    if(sil && !(typeof confirm === 'function' && confirm(sil))) return {error: `${sc.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`};
     const modo = C().modoHab(h);
     const bloqueo = C().bloqueoHab(sc, h);
     if(bloqueo) return {error: `${sc.nombre}: ${h.nombre || 'Habilidad'} no se puede usar — ${bloqueo}`};

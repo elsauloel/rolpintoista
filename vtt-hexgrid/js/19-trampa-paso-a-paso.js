@@ -34,10 +34,11 @@ function trampaLogra(dt){
 // Cada efecto tiene su momento en el Anuncio (dueño, 2026-10-04): lo que le deja, lo que va a mano, el muro y la nube son pasos propios,
 // con «▶ Seguir» (sin tirada).
 function trampaFaseSiguiente(dt, fase){
-  const orden = ['empuje', 'salva', 'dano', 'estado', 'mano', 'muro', 'zona', 'fin'];
+  const orden = ['empuje', 'salva', 'dano', 'sp', 'estado', 'mano', 'muro', 'zona', 'fin'];
   const agarro = dt.evita !== 'todo' && dt.evita !== 'efecto';
   for(const f of orden.slice(orden.indexOf(fase) + 1)){
     if(f === 'dano' && dt.dano && dt.evita !== 'todo') return f;
+    if(f === 'sp' && dt.pierdeSp && agarro) return f;
     if(f === 'estado' && dt.spec && agarro) return f;
     if(f === 'mano' && dt.aMano && agarro) return f;
     if(f === 'muro' && dt.muro) return f;
@@ -63,6 +64,7 @@ function trampaPasoQueFalta(dt){
   }
   if(dt.fase === 'dano') return {titulo: 'Daño', texto: `La trampa pega ${dt.dano}${dt.elemento ? ' ' + Combatiente.ELEMENTOS[dt.elemento].icono : ''}${dt.evita === 'mitad' ? ' (la mitad)' : ''}${dt.ignoraDef ? ', directo a la vida' : ', menos la Defensa'}${dt.elemento ? ` (lo frenan ${Combatiente.ELEMENTOS[dt.elemento].etq} y la Armadura mágica)` : ''}.`,
     boton: `🎲 Tirar el daño (${dt.dano})`, espera: `${dt.quien} tira el daño…`};
+  if(dt.fase === 'sp') return {titulo: 'Le chupa el SP', texto: `La runa le arranca ${dt.pierdeSp} de SP.`, boton: `🎲 Tirar cuánto SP pierde (${dt.pierdeSp})`, espera: `${dt.quien} tira cuánto SP pierde…`};
   if(dt.fase === 'estado'){ const sp = trampaSpec(dt); return {titulo: 'Lo que le deja', texto: sp ? EstadosAplicar.texto(sp) : '', boton: '▶ Seguir', espera: `${dt.quien}: lo que le deja…`}; }
   const info = trampaTextoInfo(dt);
   if(info) return {...info, boton: '▶ Seguir', espera: `${dt.quien}: ${info.titulo.toLowerCase()}…`};
@@ -90,7 +92,7 @@ async function trampaMomentoNuevo(p){
   const dt = {
     tokenId: p.tokenId || '', creep: x.tipo === 'creep', fichaId: String(x.fichaId || ''), quien: p.quien, nombreT: p.nombreT, pisador: !!p.pisador,
     salva: s ? {stat: String(s.stat), etq: String(s.etq || ''), dif: num(s.dif), que: String(s.que || 'todo'), ...(s.logra ? {logra: String(s.logra)} : {})} : null,
-    dano: p.dano || '', ignoraDef: !!p.ignoraDef, elemento: p.elemento || '', spec: p.specJson || '', muro: num(p.muro), muroLargo: num(p.muroLargo), zona: num(p.zona), aMano: p.aMano || '',
+    dano: p.dano || '', ignoraDef: !!p.ignoraDef, elemento: p.elemento || '', pierdeSp: p.pierdeSp || '', spec: p.specJson || '', muro: num(p.muro), muroLargo: num(p.muroLargo), zona: num(p.zona), aMano: p.aMano || '',
     fase: '', tirando: false, evita: '', pasos: [],
   };
   dt.fase = dt.salva ? 'salva' : trampaFaseSiguiente(dt, 'salva');
@@ -226,7 +228,7 @@ async function trampaTirar(id){
   if(trampaTirandoAca) return;
   const d = trampasDatos.get(id);
   const fase = d && d.datos && d.datos.fase;
-  if(!['salva', 'dano', 'empuje', ...TRAMPA_INFO].includes(fase)) return;
+  if(!['salva', 'dano', 'empuje', 'sp', ...TRAMPA_INFO].includes(fase)) return;
   const dt = await trampaTomar(id, fase);
   if(!dt){ toast('Ese paso ya se está tirando en otra pantalla'); return; }
   trampaTirandoAca = id;
@@ -234,6 +236,7 @@ async function trampaTirar(id){
   try{
     if(fase === 'salva') await trampaPasoSalva(id, dt);
     else if(fase === 'empuje') await trampaPasoEmpuje(id, dt);
+    else if(fase === 'sp') await trampaPasoSp(id, dt);
     else if(fase === 'estado') await trampaPasoEstado(id, dt);
     else if(TRAMPA_INFO.includes(fase)) await trampaPasoInfo(id, dt);
     else await trampaPasoDano(id, dt);
@@ -312,6 +315,23 @@ async function trampaPasoDano(id, dt){
   }else texto += ` → ${monto} de daño${dt.ignoraDef ? ' directo a la vida' : ' menos su Defensa'} — aplicalo a mano`;
   const sig = {...dt, pasos: [...(dt.pasos || []), {titulo: 'Daño', texto}]};
   sig.fase = trampaFaseSiguiente(sig, 'dano');
+  await trampaGuardar(id, sig);
+}
+
+// Le chupa el SP (2026-10-04, Succión arcana): tira cuánto y se lo saca a un personaje (las invocaciones y los creeps no tienen SP).
+async function trampaPasoSp(id, dt){
+  const r = tirarDados(dt.pierdeSp);
+  if(!r) throw new Error('Fórmula de SP inválida: ' + dt.pierdeSp);
+  try{ await mesaPublicar(`SP que pierde ${dt.quien}`, {formula: r.formula, rolls: r.rolls, mod: r.mod, total: r.total, quien: `🪤 ${dt.nombreT}`}); }catch(err){}
+  await trampaEsperarDados();
+  const x = tokens.get(dt.tokenId);
+  let texto = `${r.formula} = ${r.total}`;
+  if(x && x.tipo === 'pj' && x.fichaId && !String(x.fichaId).includes(SEP_INVOCACION) && x.duenoUid){
+    try{ await EstadosAplicar.encolarPj({fichaId: x.fichaId, duenoUid: x.duenoUid, spec: {nombre: 'Pierde SP', stacks: r.total}, origen: dt.nombreT}); texto += ` → pierde ${r.total} de SP`; }
+    catch(err){ console.error('No se pudo sacar el SP:', err); texto += ` → pierde ${r.total} de SP (aplicalo a mano)`; }
+  }else texto += ' → no tiene SP: no le hace nada';
+  const sig = {...dt, pasos: [...(dt.pasos || []), {titulo: 'Le chupa el SP', texto}]};
+  sig.fase = trampaFaseSiguiente(sig, 'sp');
   await trampaGuardar(id, sig);
 }
 

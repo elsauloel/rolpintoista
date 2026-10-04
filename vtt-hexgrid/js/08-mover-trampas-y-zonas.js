@@ -427,7 +427,8 @@ async function zonaResolverBanner(){
     // Una zona de HABILIDAD cuyo daño ignora la Defensa es daño de casteo: le resta la Armadura mágica de quien lo recibe, como en el
     // duelo (dueloAplicarDano). Lo confirmó el dueño para el tóxico (P142, 2026-10-02). Las zonas del GM y de trampas, no.
     // Resistencia elemental (2026-10-04): el daño de un elemento resta la resistencia a ese elemento, y como es daño mágico también la Armadura mágica.
-    const elZ = Combatiente.elementoDe(el.zonaDanoTipo || '');
+    let elZ = Combatiente.elementoDe(el.zonaDanoTipo || '');
+    if(!elZ && el.trampa){ try{ elZ = (JSON.parse(el.trampaEstado || '{}') || {}).elemento || ''; }catch(err){} }   // la zona que dejó una trampa: el elemento de la trampa
     const rz = await resistenciasDe(t, elZ);
     const armadmg = el.zonaIgnoraDef && (el.zonaCasteadorRef || elZ) ? rz.armadmg : 0;
     const resEl = elZ ? rz.res : 0;
@@ -512,7 +513,7 @@ async function trampaAplicarEfectos(t, el, celdaPisada){
   const muro = trampaMuroDe(el);
   const comun = {
     nombreT: el.trampaNombre || 'una trampa', salva, dano: trampaDanoValido(el.trampaDano) ? el.trampaDano.trim() : '', ignoraDef: !!el.trampaIgnoraDef,
-    specJson: spec && spec.nombre ? el.trampaEstado : '', elemento: (spec && spec.elemento) || '',
+    specJson: spec && spec.nombre ? el.trampaEstado : '', elemento: (spec && spec.elemento) || '', pierdeSp: (spec && spec.pierdeSp) || '',
     aMano: (String(el.trampaDetalle || '').match(/[^.]*\(a mano\)\./g) || []).map(x => x.trim()).join(' '),   // lo que el texto dice que va a mano
   };
   for(const x of afectados){
@@ -613,7 +614,9 @@ async function trampaResolver(){
         zonaEnMantenimiento: p.el.zonaEnMantenimiento !== false, zonaCadaPaso: !!p.el.zonaCadaPaso,
       };
       if(p.el.fuegoAmigo) cambios.zonaAmiga = true;
-      if(trampaDanoValido(p.el.trampaDano)){ cambios.zonaDano = p.el.trampaDano; if(p.el.trampaIgnoraDef) cambios.zonaIgnoraDef = true; }
+      let ej = {}; try{ ej = JSON.parse(p.el.trampaEstado || '{}') || {}; }catch(err){}
+      const danoZ = trampaDanoValido(ej.danoZona) ? ej.danoZona : p.el.trampaDano;   // la Mina napalm: el piso quema menos que la explosión
+      if(trampaDanoValido(danoZ)){ cambios.zonaDano = danoZ; if(p.el.trampaIgnoraDef) cambios.zonaIgnoraDef = true; }
       if(p.el.trampaEstado){ try{ const e = JSON.parse(p.el.trampaEstado); delete e.salva; delete e.muro; if(e.nombre) cambios.zonaEstado = JSON.stringify(e); }catch(err){} }   // sin la salvación (es del disparo)
       if(p.el.zonaResistStat && Number.isFinite(p.el.zonaResistValor)){ cambios.zonaResistStat = p.el.zonaResistStat; cambios.zonaResistValor = p.el.zonaResistValor; }
       try{ await coleccionElementos().doc(p.id).update(cambios); }

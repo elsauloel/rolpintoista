@@ -1766,6 +1766,18 @@ prueba('Soltarse (trampas de Atrapar): el estado guarda qué tirar y cuánto cue
     inv.estados.length, inv.nitros, Combatiente.estadoSoltable([{nombre: 'Inmovilizado', activo: true}])],
     [{stat: 'fue', etq: 'Fuerza', dif: 6, no2: 2}, '🔓 Soltarse · Fuerza contra 6 · 2 No2', 8, true, true, 3, 0, true, 0, 2, null]);
 });
+prueba('Silencio (habilidades con SP: avisa) · Pierde SP (Succión arcana) · Mina napalm deja el piso ardiendo', () => {
+  const sil = estadosPresetFicha().find(p => p.nombre === 'Silencio');
+  const S = FichaGuardado.normalizar({}).S;
+  const max = FichaCalculo.calcular(S).final.sp;
+  const msgs = [];
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Pierde SP', stacks: 2}, 'Succión arcana', {toast: m => msgs.push(m), cambio: () => {}, presets: estadosPresetFicha()});
+  const napalm = CATALOGO_BASE.find(i => i.nombre === 'Mina napalm').trampaDatos, succ = CATALOGO_BASE.find(i => i.nombre === 'Succión arcana').trampaDatos;
+  igual([!!sil.silencio, Combatiente.preguntaSilencio([{nombre: 'Silencio', silencio: true}], {nombre: 'Rayo', costo: '3'}, 'Orco'), Combatiente.preguntaSilencio([{nombre: 'Silencio', silencio: true}], {nombre: 'Golpe', costo: '0'}),
+    Combatiente.preguntaSilencio([], {nombre: 'Rayo', costo: '3'}), S.spGastado === Math.min(2, max), /−\d+ SP/.test(msgs[0] || ''),
+    napalm.danoZona, napalm.dejaZona, napalm.elemento, succ.pierdeSp, JSON.parse(TokensAuto.estadoJson(null, {stat: 'resmg', dif: 9, que: 'efecto'}, null, null, '', 0, {pierdeSp: '2d6'})).pierdeSp],
+    [true, 'Orco está en Silencio: no puede usar habilidades que cuestan SP. ¿Usar Rayo igual?', '', '', true, true, '1d6', true, 'fuego', '2d6', '2d6']);
+});
 prueba('arena movediza: Fuerza 6 para zafar (si falla, se hunde) y terreno lento (cada paso que sale de ella cuesta 2 No2)', () => {
   const arena = CATALOGO_BASE.find(i => i.nombre === 'Arena movediza').trampaDatos;
   igual([arena.soltar, arena.lento, TokensAuto.estadoJson({nombre: 'Inmovilizado', turnos: 1}, null, null, null, '', 2), ItemCorto.trampaFilas(arena).find(f => f[0] === 'Terreno')[1]],
@@ -1777,7 +1789,7 @@ prueba('resistencia elemental y Sigilo: el elemento de un daño, los stats nuevo
   S.inventario = [{id: 'cap', nombre: 'Capa de prueba', tipoItem: 'armadura_blanda', equipado: true, mods: [{stat: 'resfuego', val: 2}, {stat: 'sigilo', val: 1}]}];
   const c1 = FichaCalculo.calcular(S);
   const sc = CreepCalculo.normalizar({id: 'e', nombre: 'Elemental de fuego', nivel: 2, des: 4, resfuego: 3, equipo: [{nombre: 'Brasa', tipoItem: 'cabeza', mods: [{stat: 'resfuego', val: 1}]}]});
-  const llama = CATALOGO_BASE.find(i => i.nombre === 'Llamarada');
+  const llama = CATALOGO_BASE.find(i => i.nombre === 'Mina napalm');
   igual([Combatiente.elementoDe('Fuego'), Combatiente.elementoDe('tóxico'), Combatiente.elementoDe('de hielo'), Combatiente.elementoDe('Físico'), Combatiente.elementoDe('Arcano'),
     c0.final.sigilo === c0.final.des, c0.final.resfuego, c1.final.resfuego, c1.final.sigilo === c1.final.des + 1,
     CreepCalculo.resElemental(sc, 'fuego'), CreepCalculo.resElemental(sc, 'hielo'), CreepCalculo.statValor(sc, 'sigilo'),

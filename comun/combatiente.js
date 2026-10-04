@@ -195,6 +195,10 @@ const Combatiente = (() => {
   }
   // Sentado no puede atacar (regla del dueño, 2026-10-03: igual para personajes, invocaciones y creeps, y para cualquier ataque): se avisa y
   // se deja seguir. Se pregunta al pagar el ataque. → el texto de la pregunta, o '' si no está Sentado. Sin nombre, en segunda persona.
+  // Silencio (2026-10-04): una habilidad que cuesta SP (un número o «X») no se puede usar; se avisa y se deja seguir. → la pregunta, o ''.
+  const cuestaSp = h => !!h && (String(h.costo || '').trim().toUpperCase() === 'X' || n(h.costo) > 0);
+  const preguntaSilencio = (estados, h, nombre) => !(estados || []).some(e => e && e.activo !== false && e.silencio) || !cuestaSp(h) ? ''
+    : `${nombre ? nombre + ' está' : 'Estás'} en Silencio: no ${nombre ? 'puede' : 'podés'} usar habilidades que cuestan SP. ¿Usar ${(h && h.nombre) || 'la habilidad'} igual?`;
   const preguntaSentado = (estados, nombre) => !(estados || []).some(e => e && e.activo !== false && e.sentado) ? ''
     : nombre ? `${nombre} está Sentado y no puede atacar. ¿Atacar igual?` : 'Estás Sentado: no podés atacar. ¿Atacar igual?';
   /* «Ignora N de Resistencia a crítico» de un arma (2026-10-03, pedido del dueño): el campo `ignoraResistCrit` del arma (también el viejo
@@ -649,7 +653,7 @@ const Combatiente = (() => {
   }
   const esMagicoTipo = texto => !!elementoDe(texto) || /arcan|magic/i.test(String(texto || ''));
 
-  return {ELEMENTOS, elementoDe, esMagicoTipo, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, preguntaSentado, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+  return {ELEMENTOS, elementoDe, esMagicoTipo, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

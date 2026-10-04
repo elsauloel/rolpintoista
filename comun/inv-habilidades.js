@@ -105,6 +105,8 @@ const InvHabilidades = (() => {
      (no se puede usar ahora) o el plan {costo, costoHp, curaHp, efectoTxt, falta, esArma, sobreSi, hab, aplicadoDirecto, hDuelo}
      después de cobrar. terminar(inv, h, p, ui) hace lo que sigue. */
   function ejecutar(inv, h, presets, dueloDisponible){
+    const sil = Combatiente.preguntaSilencio(inv.estados, h, inv.nombre);   // Silencio (2026-10-04): avisa y deja seguir
+    if(sil && !(typeof confirm === 'function' && confirm(sil))) return {error: `${inv.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`};
     const modo = FichaBotonera.modoHab(h);
     if(modo === 'manual') return {modo: 'manual'};
     if(modo === 'auto' && Combatiente.tipoEjecucion(h.duelo) === 'flash') return {modo: 'flash'};   // ⚡ su propia regla de costo (P136)

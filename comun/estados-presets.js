@@ -58,6 +58,9 @@ const ESTADOS_PRESET = [
     detalle:'Crítico frecuente +1: el rango del crítico baja 1 punto (un arma Tipo 4 hace crítico con diferencia 3; mínimo 2), y también la diferencia para el doble crítico. Editá el valor para darle más puntos. La duración la elige quien lo da.'},
   {nombre:'Crítico potente', polaridad:'buff', turnos:2, mods:[{stat:'critpot', val:1}],
     detalle:'Crítico potente +1: los umbrales del d20 bajan (doble daño desde 6, triple y cuádruple más lento: 1 de cada 2 y 1 de cada 3 puntos). Editá el valor para darle más puntos. La duración la elige quien lo da.'},
+  // Silencio (2026-10-04, dueño: la Runa de silencio automatizada): no puede usar habilidades que cuestan SP. Se avisa al ejecutarla y se deja seguir.
+  {nombre:'Silencio', polaridad:'debuff', turnos:1, silencio:true, esCC:true,
+    detalle:'Silenciado: no puede usar habilidades que cuestan SP mientras dure. ⚙ Automatizado: al ejecutar una habilidad con costo en SP, avisa (y deja seguir si la mesa lo decide).'},
   {nombre:'Sentado', polaridad:'debuff', permanente:true, turnos:0, sentado:true, esCC:true,
     detalle:'Está en el piso: su Evasión se parte a la mitad (al resultado de la tirada, redondeado hacia abajo), no puede atacar y no puede hacer dodge roll (✋ a mano). No vence solo: levantarse cuesta 1 No2 (botón Levantarse de la Botonera o de las Acciones del creep).'},
   {nombre:'Invulnerable', polaridad:'buff', turnos:3, invulnerable:true,

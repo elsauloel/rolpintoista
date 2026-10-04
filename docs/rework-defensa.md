@@ -401,4 +401,6 @@ de la identidad de su parte; lo elemental (y lo utilitario) va encima, nunca sol
 slot entero de su equipo en defensa elemental de manera exclusiva; si van a ir a un volcán, se compran pociones y pergaminos de resistencia al fuego».
 Ninguna pieza da solo resistencias elementales (el Pañuelo mojado pasó a Defensa +1 · Res. tóxico +2). Las situaciones elementales se resuelven con
 **consumibles** (ver pendientes).
+**Sin ranuras de consumibles en los guantes (dueño, 2026-10-04):** «uno no guardaría una poción en el guante». Los Mitones del boticario pasan a
+Parry +1 · Res. ácido +2. Las ranuras de cinturón van donde se puede guardar algo de verdad (cinturón, túnicas, el casco cervecero).
 

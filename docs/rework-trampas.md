@@ -43,3 +43,6 @@ Hoja de trabajo, como `rework-armas.md`: lo que hay, las preguntas, las propuest
 2. **Una Común por familia:** la trampa de referencia de cada tipo.
 3. **Mejor calidad:** a partir de la Común, qué sube en Buena y Rara (daño, efecto, dificultad para evitarla o detectarla, área, duración).
 4. Recién ahí: regenerar las compradas, el catálogo del mapa y los valores del menú de habilidades desde la misma definición.
+
+**Alcance (dueño, 2026-10-03): por ahora se auditan solamente las trampas del catálogo, las que se compran.** Esas son la base para todo lo demás
+(catálogo del mapa, habilidades de creep, menú «trampa conocida»), que se arma después desde ellas.

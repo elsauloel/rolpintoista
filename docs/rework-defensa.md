@@ -362,3 +362,12 @@ siempre; `durPorPeso` queda solo para leer copias viejas (`Combatiente.durExtra`
 manos** (dueño: no hay diseñada ninguna mecánica de pelear sin armas). «Broquel de hierro» ya existía en Buena: el Común se llama **Disco de arado**.
 Precios desde la calculadora (bolsa 3; peso 0,25 por punto sobre el primero; Resistente/Frágil 0,25 por punto).
 
+## El peso en las armaduras (dueño, 2026-10-04) ✅
+«Una armadura que da 1 de Defensa y pesa 0 tiene que ser mucho más cara que una que da 1 y pesa 10; la durabilidad suma menos de lo que resta el
+peso.» → En torso, cabeza, manos, piernas, pies y cinturón, **cada punto de peso devuelve 0,5 de la bolsa, desde peso 0** (la carga es la Fuerza:
+el peso molesta de verdad). Lo devuelto **se compensa con bonos** (livianos, resistencias, durabilidad), sin pasar el tope de Defensa de la parte;
+las piezas «solo Defensa» no suman nada y **bajan de precio**. Los escudos siguen con su regla (+0,25 por punto sobre el primero: su peso bloquea).
+*Por qué:* lo liviano es lo valioso; lo pesado se paga en carga y trae más. Aplicado a los 33 torsos Comunes (los completos siguen a 110 con un bono
+más; los simples bajan: Saco 20, Chaleco 50, Campera 70, Peto de tablas 15, Coraza de latón 35, Peto de hierro 60, Pechera de hierro 70).
+*Consecuencia:* el Tipo 10 llega a Buena también en yelmos pesados (un yelmo de peso 2 devuelve 1 punto), además de los escudos.
+

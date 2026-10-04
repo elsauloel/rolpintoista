@@ -52,6 +52,10 @@ def durabilidad_extra(it):
 # Peso de un escudo (dueño, 2026-10-04): suma a la tirada de Bloqueo y a la durabilidad → cada punto por encima del primero cuesta 0,25.
 # En las demás partes el peso no se cobra: la durabilidad que da se compensa con la carga que ocupa.
 COSTO_PESO_ESCUDO = 0.25
+# Peso de una armadura (torso, cabeza, manos, piernas, pies, cinturón; dueño, 2026-10-04): es una contra — ocupa carga y acerca al sobrepeso, y la
+# durabilidad que trae no lo compensa —, así que cada punto DEVUELVE 0,5 desde peso 0. Lo liviano es caro; lo pesado trae más bonos (sin pasar el
+# tope de Defensa de su parte).
+DEVUELVE_PESO_ARMADURA = 0.5
 
 # ------------------------------------------------------------ bolsas por parte y calidad (dueño, 2026-10-04)
 TIERS = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario']
@@ -92,8 +96,10 @@ def puntos(it):
         avisos.append('estado al equipar: revisar a mano')
     dx = durabilidad_extra(it)
     if dx: det.append((f"{'Resistente' if dx > 0 else 'Frágil'} ×{abs(dx)}", dx * COSTO_DUR))
-    if PARTE.get(it.get('tipoItem'), '').startswith('escudo') and float(it.get('peso', 0) or 0) > 1:
-        det.append((f"pesa {it.get('peso')} (escudo)", (float(it['peso']) - 1) * COSTO_PESO_ESCUDO))
+    peso = float(it.get('peso', 0) or 0)
+    if PARTE.get(it.get('tipoItem'), '').startswith('escudo'):
+        if peso > 1: det.append((f"pesa {it.get('peso')} (escudo)", (peso - 1) * COSTO_PESO_ESCUDO))
+    elif peso > 0: det.append((f"pesa {it.get('peso')}", -peso * DEVUELVE_PESO_ARMADURA))
     return sum(p for _, p in det), det, avisos
 
 

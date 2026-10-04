@@ -152,8 +152,9 @@ def puntaje(arma):
                                                  + min(float(es.get('critpot') or 0), 6) * PESO_CRIT * PESO_CRITPOT)
     firma = (2.0 if arma.get('sinParry') else 0) + (2.0 if arma.get('oporGratis') else 0) + 3.0 * float(arma.get('ahorroNitros') or 0) + 3.0 * float(arma.get('critD20') or 0)
     if firma: d['firma'] = firma   # mecánicas de firma (2026-10-03): sin Parry 2 · oportunidad sin No2 2 · −1 No2 en el primero 3 · +1 d20 en el crítico 3
-    if float(arma.get('durPorPeso') or 0) > 3:   # durabilidad de más que la normal (3 por punto de Peso)
-        d['durabilidad'] = TASA_DUR * (float(arma['durPorPeso']) - 3) * peso
+    dx = round(float(arma.get('durExtra') or 0)) + ((float(arma['durPorPeso']) - 3) * peso if float(arma.get('durPorPeso') or 0) > 3 else 0)
+    if dx:   # Resistente ×N / Frágil ×N (2026-10-04: durabilidad total de más o de menos; antes, por punto de Peso)
+        d['durabilidad'] = TASA_DUR * dx
     d['peso del arma'] = -TASA_PESO * peso
     if arma.get('tipoItem') == 'arma_2m':   # dos manos (dueño, 2026-10-03): sin segunda arma ni escudo, un poco menos de valor
         d['dos manos'] = -DESCUENTO_DOS_MANOS
@@ -177,7 +178,7 @@ def extras(arma):
     n += len([e for e in arma.get('efectosGolpe') or [] if e.get('nombre')])
     n += 1 if arma.get('ignoraResistCrit') else 0
     n += 1 if arma.get('espalda') else 0
-    n += 1 if float(arma.get('durPorPeso') or 0) > 3 else 0
+    n += 1 if float(arma.get('durPorPeso') or 0) > 3 or round(float(arma.get('durExtra') or 0)) else 0
     n += sum(1 for k in ('sinParry', 'oporGratis', 'ahorroNitros', 'critD20') if arma.get(k))
     return n
 

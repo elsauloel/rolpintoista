@@ -285,12 +285,17 @@ const Combatiente = (() => {
   const TIPOS_DURABLES = ['cabeza', 'manos', 'piernas', 'pies'];
   function esDurable(item){ const t = String((item && item.tipoItem) || ''); return !(item && item.consumible) && (/^(arma_|escudo_|armadura_)/.test(t) || TIPOS_DURABLES.includes(t)); }
   function durPorPeso(item){ const v = n(item && item.durPorPeso); return v > 0 ? v : DUR_POR_PESO; }
-  function durMax(item){ return Math.max(DUR_MIN, Math.round(durPorPeso(item) * Math.max(0, Math.round(n(item && item.peso))))); }
-  // Texto para las características del ítem: «12 (4 por punto de Peso)»; null si el ítem no tiene durabilidad.
+  /* Resistente / Frágil (dueño, 2026-10-04): `durExtra` suma o resta durabilidad TOTAL (Resistente ×N = +N, Frágil ×N = −N), no por Peso: más
+     margen de diseño. Con Frágil (u otro efecto que la baje) puede quedar por debajo de 3, pero nunca menos de 1. `durPorPeso` queda solo para las
+     copias viejas que lo traen. */
+  function durExtra(item){ return Math.round(n(item && item.durExtra)); }
+  function durBase(item){ return Math.max(DUR_MIN, Math.round(durPorPeso(item) * Math.max(0, Math.round(n(item && item.peso))))); }
+  function durMax(item){ const b = durBase(item), x = durExtra(item); return x < 0 ? Math.max(1, b + x) : b + x; }
+  // Texto para las características del ítem: «12 (Resistente ×3)»; null si el ítem no tiene durabilidad.
   function durTexto(item){
     if(!esDurable(item)) return null;
-    const pp = durPorPeso(item), max = durMax(item);
-    const nota = max === DUR_MIN && pp * Math.max(0, Math.round(n(item.peso))) < DUR_MIN ? 'el mínimo' : `${pp} por punto de Peso${pp > DUR_POR_PESO ? ', más resistente' : pp < DUR_POR_PESO ? ', frágil' : ''}`;
+    const x = durExtra(item), pp = durPorPeso(item), max = durMax(item);
+    const nota = x > 0 ? `Resistente ×${x}` : x < 0 ? `Frágil ×${-x}` : pp !== DUR_POR_PESO ? `${pp} por punto de Peso` : `${DUR_POR_PESO} por punto de Peso`;
     return `${max} (${nota})`;
   }
 
@@ -658,7 +663,7 @@ const Combatiente = (() => {
   const esMagicoTipo = texto => !!elementoDe(texto) || /arcan|magic/i.test(String(texto || ''));
 
   return {ELEMENTOS, elementoDe, esMagicoTipo, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
-    DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
+    DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
     formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, flashPara, cdFlash, costoFlash};

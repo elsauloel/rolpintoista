@@ -504,6 +504,7 @@ const CreepCalculo = (() => {
       peso: it.peso || 0, precioCompra: it.precioCompra || 0, def: (it.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + (Number(m.val) || 0), 0)};
     if(arma && it.danoAmplificado) o.danoAmplificado = it.danoAmplificado;
     if(it.durPorPeso) o.durPorPeso = it.durPorPeso;   // durabilidad de diseño (si no es la de siempre)
+    if(it.durExtra) o.durExtra = it.durExtra;         // Resistente / Frágil (2026-10-04)
     if(arma && it.armaDeRango) o.armaDeRango = true;
     if(arma) Object.assign(o, Combatiente.rasgosDeItem(it));   // los rasgos del arma (por la espalda, ignora, sin Parry, firmas…)
     if(arma && (it.efectosGolpe || []).length) o.efectosGolpe = structuredClone(it.efectosGolpe);

@@ -1224,3 +1224,8 @@ versión parecida en más de una, es candidato a juntar.
   Descarga rayo, Bomba de esporas tóxico). El mapa los lee con `resistenciasDe(t, el)` (js/10) y `danioCreep/Pj/Inv` aceptan una resta extra. La
   detección del sigilo (js/16) tira **Sigilo** en vez de Destreza. La ficha lite muestra Sigilo y las resistencias que no están en 0. Falta: el daño de las
   armas (las armas mágicas, en su rework).
+- **Durabilidad: Resistente / Frágil** (2026-10-04, dueño): `durExtra` en el ítem (Resistente ×N = +N, Frágil ×N = −N a la durabilidad total, nunca
+  menos de 1). `Combatiente.durBase` (3 por Peso, mínimo 3; o el `durPorPeso` de una copia vieja) y `durMax` = base + extra. El asistente de ítems
+  pregunta «Durabilidad: Resistente (+) o Frágil (−)» y convierte un `durPorPeso` viejo al guardar. Una pieza rota cuesta el doble de reparar hasta
+  quedar entera (`FichaTienda.costoReparar`, `reparoRoto`).
+

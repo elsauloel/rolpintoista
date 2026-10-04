@@ -128,8 +128,9 @@ const ItemCorto = (() => {
     if(it.oporGratis) p.push('Oportunidad sin No2');
     if(num(it.ahorroNitros)) p.push(`Primer ataque −${num(it.ahorroNitros)} No2`);
     if(num(it.critD20)) p.push(`+${num(it.critD20)} d20 en el crítico`);
-    if(num(it.durPorPeso) > 3) p.push(`Resistente (durabilidad ${durMax(it)})`);
-    else if(num(it.durPorPeso) > 0 && num(it.durPorPeso) < 3) p.push(`Frágil (durabilidad ${durMax(it)})`);
+    const dx = Math.round(num(it.durExtra));
+    if(dx > 0 || num(it.durPorPeso) > 3) p.push(`Resistente${dx > 0 ? ' ×' + dx : ''} (durabilidad ${durMax(it)})`);
+    else if(dx < 0 || (num(it.durPorPeso) > 0 && num(it.durPorPeso) < 3)) p.push(`Frágil${dx < 0 ? ' ×' + (-dx) : ''} (durabilidad ${durMax(it)})`);
     const es = it.espalda;
     if(es && (num(es.pdg) || num(es.fijo) || num(es.critpot))) p.push(`Por la espalda (en sigilo): ${[num(es.pdg) ? `+${num(es.pdg)} PdG` : '', num(es.fijo) ? `+${num(es.fijo)} de daño` : '', num(es.critpot) ? `+${num(es.critpot)} Crítico potente` : ''].filter(Boolean).join(', ')}`);
     return p.join(' · ');
@@ -182,7 +183,9 @@ const ItemCorto = (() => {
     if(efs.some(e => pctEf(e) < 100 && !e.soloCritico)) L.push('Los porcentajes se tiran en el duelo, después del daño (50 % = una moneda, 25 % = un d4, 75 % = un d4 que falla solo con 1). Lisiado, Veneno y Sangrado necesitan que el golpe haga daño.');
     if(efs.some(e => e.seguroCritico)) L.push('Seguro si es crítico: con un golpe crítico, el efecto entra sin tirar.');
     if(efs.length) L.push('⚙ Automatizado: el duelo tira cada efecto y lo aplica con «Aplicar».');
-    if(num(it.durPorPeso) > 0 && num(it.durPorPeso) !== 3) L.push(`Durabilidad ${durMax(it)} (${durPP(it)} por punto de Peso; lo normal es 3): cuánto desgaste aguanta antes de romperse.`);
+    { const dx = Math.round(num(it.durExtra));
+      if(dx) L.push(`Durabilidad ${durMax(it)} (${dx > 0 ? `Resistente ×${dx}: +${dx}` : `Frágil ×${-dx}: −${-dx}`} sobre lo normal, 3 por punto de Peso): cuánto desgaste aguanta antes de romperse.`);
+      else if(num(it.durPorPeso) > 0 && num(it.durPorPeso) !== 3) L.push(`Durabilidad ${durMax(it)} (${durPP(it)} por punto de Peso; lo normal es 3): cuánto desgaste aguanta antes de romperse.`); }
     const es = it.espalda;
     if(es && (num(es.pdg) || num(es.fijo) || num(es.critpot))) L.push('Por la espalda: cuenta solo si quien ataca está en sigilo y en el casillero justo de atrás del defensor (si lo ve, se da vuelta). ⚙ El mapa lo suma solo.');
     return L;

@@ -111,7 +111,7 @@ function durLineaHtml(i){
   const max = durMax(i), act = durActual(i), ar = armRotaDe(i);
   const cls = act <= 0 ? 'roto' : act <= 1 ? 'aviso' : '';
   const est = act <= 0 ? ' · ROTO (sin efectos)' : act <= 1 ? ' · a punto de romperse' : '';
-  return `<div class="idur ${cls}" title="Durabilidad: ${fmt(Combatiente.durPorPeso(i))} puntos por cada punto de Peso (mínimo ${Combatiente.DUR_MIN}). Reparar solo fuera de combate: herrero (1 de oro por punto) o talento con despojos (2 por punto).">🔧 ${fmt(act)}/${fmt(max)}${ar ? ` · Armadura rota ×${fmt(ar)}` : ''}${est}
+  return `<div class="idur ${cls}" title="Durabilidad: ${Combatiente.durTexto(i) || fmt(max)} (3 por punto de Peso, mínimo ${Combatiente.DUR_MIN}; Resistente suma, Frágil resta). Reparar solo fuera de combate: herrero (1 de oro por punto) o talento con despojos (2 por punto).">🔧 ${fmt(act)}/${fmt(max)}${ar ? ` · Armadura rota ×${fmt(ar)}` : ''}${est}
     <button class="mini" data-durmod="${i.id}:-1" title="Un punto menos (a mano)">−</button><button class="mini" data-durmod="${i.id}:1" title="Reparar 1 punto (solo fuera de combate)">+</button></div>`;
 }
 

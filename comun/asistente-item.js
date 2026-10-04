@@ -511,7 +511,7 @@ const AsistenteItem = (() => {
         ${fila('Bonos', e(bonos || 'ninguno'))}
         ${cfg.conEstadoEquipar ? fila('Al equipar', e(String(d.equipoEstadoNombre || '').trim() || 'ningún estado')) : ''}
         ${q.ctx !== 'creep' || g !== 'arma' ? fila('Peso', f(n(d.peso))) : ''}
-        ${DURABLE(d) ? fila('Durabilidad', `${f(durTotal(d))} (${f(durPP(d))} por punto de Peso${durPP(d) > 3 ? ', más resistente' : durPP(d) < 3 ? ', frágil' : ''})`) : ''}
+        ${DURABLE(d) ? fila('Durabilidad', `${f(durTotal(d))}${Math.round(n(d.durExtra)) > 0 ? ` (Resistente ×${Math.round(n(d.durExtra))})` : Math.round(n(d.durExtra)) < 0 ? ` (Frágil ×${-Math.round(n(d.durExtra))})` : ' (lo normal: 3 por punto de Peso)'}`) : ''}
         ${cfg.conPrecio ? fila('Precio', `${f(n(d.precioCompra))} DDE`) : ''}
         ${cfg.conLugar ? fila('Dónde', d.equipado ? 'equipado' : `mochila (${f(n(d.ranuras))} ranura${n(d.ranuras) === 1 ? '' : 's'})`) : cfg.conRanuras ? fila('Ranuras', f(n(d.ranuras))) : ''}
       </div>`;
@@ -564,17 +564,18 @@ const AsistenteItem = (() => {
   /* Durabilidad: variable de diseño del ítem (2026-09-30, dueño). Puntos por cada punto de Peso: 3 lo normal, más = mejor
      calidad, menos = frágil; mínimo 3 en total. La regla es la del motor (comun/combatiente.js). */
   const DURABLE = d => /^(arma_|escudo_|armadura_)/.test(String(d.tipoItem || '')) || ['cabeza', 'manos', 'piernas', 'pies'].includes(d.tipoItem);
-  const durPP = d => n(d.durPorPeso) > 0 ? n(d.durPorPeso) : 3;
-  const durTotal = d => typeof Combatiente !== 'undefined' ? Combatiente.durMax(d) : Math.max(3, Math.round(durPP(d) * Math.max(0, Math.round(n(d.peso)))));
+  // Resistente / Frágil (dueño, 2026-10-04): un número que suma o resta durabilidad total (no por Peso). Con Frágil, nunca menos de 1.
+  const durBase = d => typeof Combatiente !== 'undefined' ? Combatiente.durBase(d) : Math.max(3, 3 * Math.max(0, Math.round(n(d.peso))));
+  const durTotal = d => typeof Combatiente !== 'undefined' ? Combatiente.durMax(d) : Math.max(1, durBase(d) + Math.round(n(d.durExtra)));
   function durHtml(){
-    const d = st.d, pp = durPP(d), tot = durTotal(d), peso = Math.max(0, Math.round(n(d.peso)));
-    const calidad = pp > 3 ? ' — <b>más resistente</b> que lo normal para su peso' : pp < 3 ? ' — <b>frágil</b> para su peso' : ' (lo normal)';
-    return `Durabilidad <b>${f(tot)}</b>: ${f(peso)} de Peso × ${f(pp)}${tot > pp * peso ? ' (sube al mínimo de 3)' : ''}${calidad}. Cada Bloqueo perdido (o una pieza de armadura dañada) le saca 1 punto; en 0 se rompe y no da efectos hasta repararlo.`;
+    const d = st.d, x = Math.round(n(d.durExtra)), base = durBase(d), tot = durTotal(d);
+    const calidad = x > 0 ? ` + <b>Resistente ×${x}</b>` : x < 0 ? ` − <b>Frágil ×${-x}</b>` : ' (lo normal)';
+    return `Durabilidad <b>${f(tot)}</b>: ${f(base)} por su Peso (3 por punto, mínimo 3)${calidad}${x < 0 && base + x < 1 ? ' (nunca menos de 1)' : ''}. Cada Bloqueo perdido (o una pieza de armadura dañada) le saca 1 punto; en 0 se rompe y no da efectos hasta repararlo.`;
   }
   function durCampo(){
     const d = st.d;
-    return campo('Durabilidad: puntos por cada punto de Peso', num('durPorPeso', durPP(d), 'step="1" min="1" style="max-width:120px"'),
-      '3 es lo normal. Un ítem de mejor calidad puede tener 4 o 5; uno frágil, 2.' + (quien().ctx === 'creep' ? ' (Los creeps no gastan durabilidad: vale si se publica en el catálogo o se suelta como botín.)' : ''))
+    return campo('Durabilidad: Resistente (+) o Frágil (−)', num('durExtra', Math.round(n(d.durExtra)), 'step="1" style="max-width:120px"'),
+      '0 es lo normal. Resistente ×N suma N a la durabilidad total; Frágil ×N la baja N (puede quedar por debajo de 3, nunca menos de 1).' + (quien().ctx === 'creep' ? ' (Los creeps no gastan durabilidad: vale si se publica en el catálogo o se suelta como botín.)' : ''))
       + efecto(`<span id="aa-dur">${durHtml()}</span>`);
   }
 
@@ -620,7 +621,7 @@ const AsistenteItem = (() => {
 
   // «+2 PdG, +1 de daño» (el bono por la espalda de un arma).
   const espaldaTxt = es => es ? [n(es.pdg) ? `+${f(n(es.pdg))} PdG` : '', n(es.fijo) ? `+${f(n(es.fijo))} de daño` : '', n(es.critpot) ? `+${f(n(es.critpot))} Crítico potente` : ''].filter(Boolean).join(', ') : '';
-  const NUMERICOS = ['peso', 'danoFijo', 'danoAmplificado', 'ignoraResistCrit', 'ahorroNitros', 'critD20', 'precioCompra', 'ranuras', 'equipoEstadoHpTurno', 'durPorPeso'];
+  const NUMERICOS = ['peso', 'danoFijo', 'danoAmplificado', 'ignoraResistCrit', 'ahorroNitros', 'critD20', 'precioCompra', 'ranuras', 'equipoEstadoHpTurno', 'durExtra', 'durPorPeso'];
   function alEscribir(ev){
     if(!st) return;
     const t = ev.target, d = st.d;
@@ -632,7 +633,7 @@ const AsistenteItem = (() => {
       d[c] = NUMERICOS.includes(c) ? n(t.value) : t.value;
       if(['peso', 'danoFijo', 'danoAmplificado'].includes(c)) poner('aa-dano', danoHtml());
       if(c === 'peso') poner('aa-carga', cargaHtml());
-      if(c === 'peso' || c === 'durPorPeso') poner('aa-dur', durHtml());
+      if(c === 'peso' || c === 'durExtra') poner('aa-dur', durHtml());
       if(c === 'precioCompra') poner('aa-precio', precioHtml());
     }
     if(t.dataset.aaMod1) setMod(d, t.dataset.aaMod1, n(t.value));
@@ -691,8 +692,11 @@ const AsistenteItem = (() => {
       delete d.efectosGolpe; delete d.tipoDado; delete d.danoFijo; delete d.danoAmplificado; delete d.armaDeRango; delete d.espalda; delete d.ignoraResistCrit; delete d.sinParry; delete d.oporGratis; delete d.ahorroNitros; delete d.critD20;
     }
     // Durabilidad: solo se guarda si no es la de siempre (3 por Peso) y el ítem la tiene.
-    if(!DURABLE(d) || !(n(d.durPorPeso) > 0) || n(d.durPorPeso) === 3) delete d.durPorPeso;
-    else d.durPorPeso = Math.round(n(d.durPorPeso));
+    // Una pieza vieja con durPorPeso: se pasa a Resistente / Frágil conservando su durabilidad.
+    if(n(d.durPorPeso) > 0 && n(d.durPorPeso) !== 3 && typeof Combatiente !== 'undefined'){ const tot = Combatiente.durMax(d); delete d.durPorPeso; d.durExtra = tot - Combatiente.durBase(d); }
+    delete d.durPorPeso;
+    if(!DURABLE(d) || !Math.round(n(d.durExtra))) delete d.durExtra;
+    else d.durExtra = Math.round(n(d.durExtra));
     return d;
   }
 

@@ -38,8 +38,17 @@ COSTO = {
 COSTO_DEFECTO = 1
 OFENSIVOS = {'pdg', 'dmg', 'crit', 'critpot', 'rng', 'pdgmg', 'dmgesp', 'rangocasteo', 'accionesmax'}
 COSTO_ESTADO_EQUIPO = 2          # un estado que se pone al equipar (Espinas, Regeneración…): a revisar caso por caso
-# Durabilidad (dueño, 2026-10-04): frágil (2 por Peso) devuelve 0,5; resistente (5 por Peso) cuesta 0,5 (0,25 por punto por encima de 3).
-COSTO_DUR_ARRIBA, COSTO_DUR_ABAJO = 0.25, 0.5
+# Durabilidad (dueño, 2026-10-04): Resistente ×N suma N a la durabilidad TOTAL y Frágil ×N la resta (no por Peso); 0,25 por punto, como la
+# calculadora de armas. Una pieza vieja con durPorPeso se cuenta por la diferencia con lo normal (3 por punto de Peso, mínimo 3).
+COSTO_DUR = 0.25
+
+
+def durabilidad_extra(it):
+    peso = max(0, round(float(it.get('peso', 0) or 0)))
+    dx = round(float(it.get('durExtra', 0) or 0))
+    dpp = float(it.get('durPorPeso', 0) or 0)
+    if dpp and dpp != 3: dx += max(3, round(dpp * peso + 1e-9)) - max(3, 3 * peso)
+    return dx
 # Peso de un escudo (dueño, 2026-10-04): suma a la tirada de Bloqueo y a la durabilidad → cada punto por encima del primero cuesta 0,25.
 # En las demás partes el peso no se cobra: la durabilidad que da se compensa con la carga que ocupa.
 COSTO_PESO_ESCUDO = 0.25
@@ -81,10 +90,8 @@ def puntos(it):
     if it.get('equipoEstadoNombre'):
         det.append((f"estado al equipar: {it['equipoEstadoNombre']}", COSTO_ESTADO_EQUIPO))
         avisos.append('estado al equipar: revisar a mano')
-    dpp = it.get('durPorPeso')
-    if dpp:
-        d = float(dpp) - 3
-        det.append((f"durabilidad {dpp} por Peso", d * (COSTO_DUR_ARRIBA if d > 0 else COSTO_DUR_ABAJO)))
+    dx = durabilidad_extra(it)
+    if dx: det.append((f"{'Resistente' if dx > 0 else 'Frágil'} ×{abs(dx)}", dx * COSTO_DUR))
     if PARTE.get(it.get('tipoItem'), '').startswith('escudo') and float(it.get('peso', 0) or 0) > 1:
         det.append((f"pesa {it.get('peso')} (escudo)", (float(it['peso']) - 1) * COSTO_PESO_ESCUDO))
     return sum(p for _, p in det), det, avisos

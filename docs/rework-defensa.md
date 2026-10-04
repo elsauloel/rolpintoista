@@ -351,3 +351,8 @@ carga que ocupa); rango fijo: blandas 1, rígidas 2–4 según la Defensa. Frág
 entran en su bolsa; la Coraza de puerta pasó de 90 a 100 (frágil = 3,5 puntos). Con la regla del peso, los escudos Comunes se recalcularon: los de
 peso 3 o más dejan de llevar Bloqueo extra (su peso ya bloquea) para no pasarse de la bolsa.
 
+**Resistente / Frágil (dueño, 2026-10-04): un número sobre la durabilidad TOTAL, no por Peso.** La base sigue siendo 3 por punto de Peso (mínimo 3);
+`durExtra` le suma o resta: **Resistente ×N = +N**, **Frágil ×N = −N**. Con Frágil (u otro efecto especial) puede quedar por debajo de 3, pero
+**nunca menos de 1** (salvo que se rompa). *Por qué:* da más margen de diseño y de ajuste que «puntos por cada Peso». En las calculadoras vale
+**0,25 por punto** (la misma tasa que ya usaba la de armas). Las 39 piezas que tenían `durPorPeso` pasaron a `durExtra` con la misma durabilidad de
+siempre; `durPorPeso` queda solo para leer copias viejas (`Combatiente.durExtra`, `durBase`, `durMax`).

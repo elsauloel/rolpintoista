@@ -67,3 +67,9 @@ El **Parry cuesta siempre 1 No2**, **sin importar el Peso** del arma o escudo (y
 **Falta:** la reparación por **talento con despojos** (2 despojos por punto) y el destino del Óleo reparador; mostrar la durabilidad al comprar.
 
 **Idea a futuro (dueño, 2026-09-26):** usar la durabilidad **como elemento de diseño del catálogo** (escudos y armas resistentes, armas y escudos optimizados para el Parry). Detalle en `pendientes.md` y `guia-de-diseno.md`.
+
+**Resistente / Frágil (dueño, 2026-10-04): un número sobre la durabilidad TOTAL, no por Peso.** La base sigue siendo 3 por punto de Peso (mínimo 3);
+`durExtra` le suma o resta: **Resistente ×N = +N**, **Frágil ×N = −N**. Con Frágil (u otro efecto especial) puede quedar por debajo de 3, pero
+**nunca menos de 1** (salvo que se rompa). *Por qué:* da más margen de diseño y de ajuste que «puntos por cada Peso». En las calculadoras vale
+**0,25 por punto** (la misma tasa que ya usaba la de armas). Las 39 piezas que tenían `durPorPeso` pasaron a `durExtra` con la misma durabilidad de
+siempre; `durPorPeso` queda solo para leer copias viejas (`Combatiente.durExtra`, `durBase`, `durMax`).

@@ -1370,3 +1370,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   renglón. Un paso se toma con una transacción (`datos.tirando`). Cerrar el cuadro sin terminar deja la tarjeta en la Crónica con «🪤 Seguir»;
   el GM puede resolver por un jugador que no está con «🎲 Tirar por él». En una trampa de área, cada afectado tira su propio daño. Sin reglas
   nuevas (`momentos.datos` es libre). Probado en vivo (creep, personaje ajeno con «Tirar por él», cerrar y «Seguir»).
+- **El Anuncio y cada efecto en su momento** (2026-10-04, dueño): la ventana del centro se llama **el Anuncio** (antes «el Aviso»; la esquina sigue
+  siendo **la Crónica**). En una trampa cada efecto tiene su paso: `datos.fase` = empuje → salva → dano → estado → mano → muro → zona → fin; los
+  pasos sin tirada (`TRAMPA_INFO`) tienen «▶ Seguir» (el estado se aplica al apretarlo). **Pilar** (`muro.largo` 1) y muros con un token encima:
+  `trampaLevantarMuro` crea un momento «Sale despedido» para ese token (`trampaMomentoEmpuje`): tira 1d6 (las 6 vecinas en ronda desde el frente,
+  `trampaVecinaLibre`), se mueve y recibe 1d6 directo; sin vecina libre, esa casilla queda sin muro. Probado en vivo.

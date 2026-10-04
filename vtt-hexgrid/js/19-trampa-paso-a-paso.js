@@ -167,7 +167,7 @@ function trampaDibujar(id){
     }else botones = [{texto: 'Aplicando…', deshabilitado: true}];
   }
   AvisoCombate.mostrar({clave: 'trampa:' + id, icono: d.icono || '🪤', titulo: d.titulo || '', pasos,
-    veredicto: listo ? dt.veredicto : null, aMano: listo ? dt.aMano : '', botones,
+    veredicto: listo ? dt.veredicto : null, botones,   // lo que va a mano ya tuvo su paso propio
     alCerrar: () => {
       if(trampaEnPantalla !== id) return;
       trampaEnPantalla = null;

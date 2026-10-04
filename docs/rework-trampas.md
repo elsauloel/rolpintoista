@@ -99,3 +99,53 @@ dicen tal cual («Res.CC 8 contra 7 → lo resistió: se agarra del borde y no q
   1 turno** · 🔓 Soltarse: Fuerza 6, 2 No2 · detectarla 8 · 30. **Mejor calidad = más daño y más turnos** (dueño).
 
 El daño de las dos queda provisorio hasta revisar el catalogo defensivo.
+
+## Las 39 trampas reimaginadas (2026-10-04, pedido del dueño: «reimaginá todas y reemplazalas; ninguna de más de 7 casilleros; después las audito»)
+
+Reemplazan a las 72 de antes (24 × menor/normal/mayor). Común / Buena / Rara por **calidad**, no por tamaño: la dificultad sube 7 → 9 → 11 y la detección 8 → 10 → 12. Casi ninguna se esquiva: se **resiste el efecto** (tabla de arriba); la excepción son las explosivas (Evasión: se tira al piso, la mitad). Lo de área tiene fuego amigo. **Pendiente de auditar por el dueño.** Después: regenerar desde acá el catálogo de trampas del mapa (`comun/trampas-base.js`), el menú «trampa conocida» y las trampas de las habilidades de creep.
+
+**Nombres (dueño, 2026-10-04):** la ventana del centro, paso a paso, es **el Anuncio**; la esquina, **la Crónica**. Cada efecto de una trampa tiene su momento en el Anuncio (lo que le deja, lo que va a mano, el muro, la nube: «▶ Seguir»).
+
+**Pilar / muro con alguien encima:** sale despedido a una vecina libre (tira 1d6: las 6 vecinas en ronda, la 1 hacia el frente; si está ocupada, la siguiente libre) y recibe 1d6 directo. Sin vecina libre, ahí no sale.
+
+| Trampa · calidad · precio | Qué hace |
+|---|---|
+| **Foso con estacas** · C · 30 | 1 casilla. 3d6 de daño (menos su Defensa) y Sentado. Res.CC contra 7: se agarra del borde y no queda Sentado. Detectarla 8. |
+| **Piso de púas** · B · 50 | flor de 7 → a todos encima. 3d6 de daño (menos su Defensa) y Rengo 2 turnos. Res.CC contra 9: pisa entre las púas sin clavarse el pie. Detectarla 10. |
+| **Cuchillas de guadaña** · R · 90 | línea de 5 → a todos encima. 5d6 de daño (menos su Defensa) y Sangrado. Res.Esp contra 11: el corte no abre la herida y no sangra. Detectarla 12. |
+| **Trampa de oso** · C · 30 | 1 casilla. 2d6 de daño (menos su Defensa) y Inmovilizado 1 turno. No se esquiva ni se resiste. Para salir antes: 🔓 Soltarse, Fuerza contra 6 · 2 No2. Detectarla 8. |
+| **Cepo reforzado** · B · 50 | 1 casilla. 3d6 de daño (menos su Defensa) y Inmovilizado 2 turnos. No se esquiva ni se resiste. Para salir antes: 🔓 Soltarse, Fuerza contra 8 · 2 No2. Detectarla 10. |
+| **Cepo de dientes de sierra** · R · 85 | 1 casilla. 4d6 de daño (menos su Defensa) y Inmovilizado 3 turnos. No se esquiva ni se resiste. Para salir antes: 🔓 Soltarse, Fuerza contra 10 · 2 No2. Detectarla 12. |
+| **Red de caza** · C · 25 | 1 casilla → alcanza 7 alrededor. Inmovilizado 1 turno. Res.CC contra 7: se escurre antes de que la red caiga. Para salir antes: 🔓 Soltarse, Fuerza contra 6 · 1 No2. Detectarla 8. |
+| **Arena movediza** · B · 45 | flor de 7 → a todos encima. Inmovilizado 2 turnos. No se esquiva ni se resiste. Para salir antes: 🔓 Soltarse, Fuerza contra 8 · 3 No2. Detectarla 10. |
+| **Aceite resbaladizo** · C · 20 | flor de 7 → a todos encima. Sentado. Res.CC contra 7: mantiene el equilibrio y no se cae. Detectarla 8. |
+| **Brea pegajosa** · C · 20 | flor de 7 → a todos encima. Rengo 2 turnos. Res.CC contra 7: despega los pies a tiempo. Detectarla 8. |
+| **Cola de carpintero** · B · 45 | flor de 7 → a todos encima. Inmovilizado 1 turno. Res.CC contra 9: arranca los pies antes de que fragüe. Para salir antes: 🔓 Soltarse, Fuerza contra 8 · 1 No2. Detectarla 10. |
+| **Resina de árbol negro** · R · 75 | flor de 7 → a todos encima. Inmovilizado 2 turnos. Res.CC contra 11: arranca los pies antes de que la resina lo atrape. Para salir antes: 🔓 Soltarse, Fuerza contra 10 · 2 No2. Detectarla 12. |
+| **Dardos envenenados** · C · 30 | línea de 3. 1d6 de daño (menos su Defensa) y Veneno ×3. Res.Esp contra 7: el dardo pega, pero el veneno no entra. Detectarla 8. |
+| **Aguja emponzoñada** · B · 50 | 1 casilla. 1d6 de daño (menos su Defensa) y Veneno ×5. Res.Esp contra 9: la aguja pincha, pero el veneno no hace efecto. Detectarla 10. |
+| **Espina de mantícora** · R · 85 | 1 casilla. 2d6 de daño (menos su Defensa) y Veneno severo. Res.Esp contra 11: el cuerpo rechaza el veneno. Detectarla 12. |
+| **Gas adormecedor** · C · 30 | 1 casilla → alcanza 7 alrededor. Cansado 2 turnos. Res.Mt contra 7: se sacude el sopor. Detectarla 8. |
+| **Gas somnífero** · B · 50 | 1 casilla → alcanza 7 alrededor. Exhausto 2 turnos. Res.Mt contra 9: aguanta despierto. Detectarla 10. |
+| **Nube de veneno** · B · 55 | flor de 7 → a todos encima. Veneno ×3. Res.Esp contra 9: aguanta la respiración y el veneno no entra. Queda como nube 2 turnos. Detectarla 10. |
+| **Bomba de esporas** · R · 90 | flor de 7 → a todos encima. 2d6 de daño directo a la vida y Veneno ×4. Res.Esp contra 11: aguanta la respiración y las esporas no prenden. Queda como nube 3 turnos. Detectarla 12. |
+| **Petardo trampa** · C · 30 | 1 casilla → alcanza 7 alrededor. 2d6 de daño directo a la vida. Evasión contra 7: se tira al piso: recibe la mitad del daño. Detectarla 8. |
+| **Mina explosiva** · B · 55 | 1 casilla → alcanza 7 alrededor. 3d6 de daño directo a la vida y Pajaritos 2 turnos. Evasión contra 9: se tira al piso: recibe la mitad del daño. Detectarla 10. |
+| **Barril de pólvora** · R · 90 | 1 casilla → alcanza 7 alrededor. 5d6 de daño directo a la vida y Pajaritos 3 turnos. Evasión contra 11: se tira al piso: recibe la mitad del daño. Detectarla 12. |
+| **Derrumbe** · B · 60 | 1 casilla → alcanza 7 alrededor. 3d6 de daño (menos su Defensa) y Sentado. Res.CC contra 9: aguanta el golpe de pie. Detectarla 10. |
+| **Llamarada** · C · 30 | 1 casilla. 2d6 de daño directo a la vida y Quemadura (1 de daño por turno) 2 turnos. Res.Esp contra 7: apaga las llamas de la ropa a tiempo. Detectarla 8. |
+| **Trampa de escarcha** · C · 30 | 1 casilla. 2d6 de daño directo a la vida y Escarcha 2 turnos. Res.Esp contra 7: se sacude la escarcha. Detectarla 8. |
+| **Descarga eléctrica** · B · 55 | 1 casilla → alcanza 7 alrededor. 3d6 de daño directo a la vida y Stun 1 turno. Res.CC contra 9: los músculos aguantan la descarga. Detectarla 10. |
+| **Géiser de fuego** · R · 90 | 1 casilla → alcanza 7 alrededor. 4d6 de daño directo a la vida y Quemadura (2 de daño por turno) 3 turnos. Res.Esp contra 11: apaga las llamas de la ropa a tiempo. Detectarla 12. |
+| **Tumba de hielo** · R · 85 | 1 casilla. 3d6 de daño directo a la vida y Inmovilizado 2 turnos. Res.CC contra 11: rompe el hielo antes de que lo cierre. Para salir antes: 🔓 Soltarse, Fuerza contra 10 · 2 No2. Detectarla 12. |
+| **Runa de debilidad** · C · 30 | 1 casilla. Debilidad (-1 PdG, -1 Evasión, -1 Dmg) 2 turnos. Res.Esp contra 7: la runa se apaga sin tocarlo. Detectarla 8. |
+| **Runa de silencio** · B · 50 | 1 casilla. Silencio 1 turno. Res.Esp contra 9: la runa no le cierra la boca. No puede usar habilidades con SP mientras dure (a mano). Detectarla 10. |
+| **Succión arcana** · B · 50 | 1 casilla. Res.Esp contra 9: la runa no le saca nada. Pierde 2d6 de SP si no la resiste (a mano). Detectarla 10. |
+| **Niebla de confusión** · B · 55 | 1 casilla → alcanza 7 alrededor. Confusión 2 turnos. Res.Mt contra 9: no se deja confundir. Antes de cada acción tira 1d4: 1 elige el GM, 2 pierde la acción, 3 al azar, 4 normal (a mano). Detectarla 10. |
+| **Espejo de discordia** · R · 85 | 1 casilla → alcanza 7 alrededor. Pajaritos 2 turnos. Res.Mt contra 11: no se deja engañar por el espejo. Ve a sus aliados como enemigos hasta su próximo turno (a mano). Detectarla 12. |
+| **Portal cósmico** · R · 90 | 1 casilla. Pajaritos 1 turno. Res.Esp contra 11: se aferra al suelo y el portal no lo lleva. Lo teletransporta hasta 10 casillas, adonde elija el GM (a mano). Detectarla 12. |
+| **Cable de alarma** · C · 15 | línea de 5. Suena: alerta a los enemigos a 8 casillas (a mano). Detectarla 8. |
+| **Cable con campanas** · B · 30 | línea de 7. Sentado. Res.CC contra 9: salta el cable sin caerse. Suena: alerta a los enemigos a 8 casillas (a mano). Detectarla 10. |
+| **Pilar de piedra** · C · 20 | 1 casilla. Levanta un pilar justo delante de quien la pisa, por 4 turnos. Detectarla 8. |
+| **Muro de piedra** · B · 45 | 1 casilla. Levanta un muro de 3 casillas justo delante de quien la pisa, por 4 turnos. Detectarla 10. |
+| **Muralla repentina** · R · 75 | 1 casilla. Levanta un muro de 5 casillas justo delante de quien la pisa, por 5 turnos. Detectarla 12. |

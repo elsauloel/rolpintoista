@@ -1375,3 +1375,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   pasos sin tirada (`TRAMPA_INFO`) tienen «▶ Seguir» (el estado se aplica al apretarlo). **Pilar** (`muro.largo` 1) y muros con un token encima:
   `trampaLevantarMuro` crea un momento «Sale despedido» para ese token (`trampaMomentoEmpuje`): tira 1d6 (las 6 vecinas en ronda desde el frente,
   `trampaVecinaLibre`), se mueve y recibe 1d6 directo; sin vecina libre, esa casilla queda sin muro. Probado en vivo.
+- **Terreno lento** (2026-10-04, dueño: arena movediza): una trampa ya disparada con `lento: N` adentro del JSON de `trampaEstado` hace que cada paso
+  que **sale** de una de sus casillas cueste N No2 (o lo de siempre si es más, como Rengo). `lentoEn(col, fila)`, `costoPasos(ruta, porCasillero)` y
+  `costoRuta` (js/04); los usan el costo de la ruta (`rutaPendiente.costo`, js/06), el cartel y el cobro (js/08: «salir de la arena cuesta más»), los
+  numeritos de la estela y la esferita de No2 (js/05). Solo en modo combate (en narrativo moverse no cuesta). La Arena movediza: Inmovilizado 1 turno,
+  🔓 Soltarse con Fuerza 6 (1 No2; si falla, se hunde: +1 turno) y, ya libre, 2 No2 por cada paso que sale de la arena.

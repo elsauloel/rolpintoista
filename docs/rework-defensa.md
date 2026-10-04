@@ -183,3 +183,9 @@ armadura** (el contrapeso del tanque). A diseñar.
 
 **Siguiente (dueño):** antes de crear ítems, hablar de **otras herramientas de diseño** además de la Defensa y las resistencias a crítico: bonos a
 la Evasión, a la visión… variables más sutiles para un catálogo diverso.
+
+**El techo del tanque sube de a 2 por nivel ✅ (dueño, 2026-10-04):** el tanque queda igual de duro en todos los niveles (un golpe normal de un
+brutal le saca 3–4) y se lo atraviesa con las herramientas especiales. **Condición anotada:** esas herramientas (crítico de las armas mejores, daño
+mágico que escala, veneno y sangrado, el ácido que rompe armadura) tienen que crecer con los niveles; se mide cuando se revisen. Recordatorio del
+dueño: la defensa se acumula en muchos slots y el arma pega de a una — la curva es el total del equipo completo; el presupuesto de cada pieza se mide
+contra ese total.

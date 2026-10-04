@@ -174,7 +174,7 @@ function nieblaDeshacer(seq0, pend0){
    dificultad de la trampa (`trampaDetectar`, 8 si no tiene), la descubre y la ve todo su equipo
    (`descubierta`); si pierde, sigue libre: pisarla la detona y pasar por OTRO casillero al lado
    vuelve a pedir la tirada (una vez por casillero). */
-let trampaPendiente = null;   // {tokenId, tipo: 'pisa' | 'cerca', id, el, celda}
+let trampaPendiente = null;   // {tokenId, tipo: 'pisa' | 'cerca', id, el, celda, desde (la casilla anterior: hacia dónde caminaba)}
 const trampasAvisadas = new Set();   // 'token:trampa:casillero' que ya pidieron la tirada
 
 // Criterio del dueño (2026-09-25): los aliados NUNCA disparan una trampa (solo la activan los rivales de quien la puso). "Fuego amigo"
@@ -552,6 +552,43 @@ async function trampaAplicarEfectos(t, el){
   if(mesa.length && (tir || spec || salva)) alertaRojaAnonima(`🪤 ${nombreT}${tir ? ` · ${tir.formula} = ${tir.total}` : ''}`, mesa.join(' · '));
 }
 
+/* Trampa de muro (2026-10-03, pedido del dueño: «al triggerearla se levanta una pared impenetrable, para tener que rodear»; delante del que la
+   pisó, 4 turnos, familia propia). `muro` va adentro del JSON de trampaEstado ({largo: 3 | 5, turnos}). Se levanta en las casillas de ADELANTE
+   de quien la pisó, según hacia dónde caminaba (la casilla anterior de su recorrido): 3 = el frente y las dos diagonales de adelante; 5 = además
+   los dos costados. Es una forma Sólida y fijada (no se pasa ni se ve a través), que se va sola con los turnos; una casilla con un token o que ya
+   es sólida queda libre. La crea la pantalla de quien movió (como el resto del disparo). */
+function trampaMuroDe(el){
+  let e = null; try{ e = el.trampaEstado ? JSON.parse(el.trampaEstado) : null; }catch(x){}
+  return e && e.muro ? TokensAuto.muroNorm(e.muro) : null;
+}
+function trampaCeldasMuro(celda, desde, largo){
+  const c0 = hexACubo(celda), d0 = desde ? hexACubo(desde) : null;
+  let i = d0 ? VECINO_LADO.findIndex(([dq, dr]) => dq === c0.q - d0.q && dr === c0.r - d0.r) : -1;
+  if(i < 0) i = 1;   // sin saber de dónde venía: hacia abajo (el frente por defecto)
+  const lados = largo >= 5 ? [0, 1, 5, 2, 4] : [0, 1, 5];
+  return lados.map(k => { const [dq, dr] = VECINO_LADO[(i + k) % 6]; return {dq, dr}; });
+}
+async function trampaLevantarMuro(t, celda, desde, muro, nombre){
+  const ocupadas = new Set([...tokens.values()].map(x => nbPack(x.col, x.fila)));
+  const c0 = hexACubo(celda);
+  const celdas = trampaCeldasMuro(celda, desde, muro.largo).filter(({dq, dr}) => {
+    const col = cuboACol(c0.q + dq, c0.r + dr), fila = cuboAFila(c0.q + dq, c0.r + dr);
+    return !ocupadas.has(nbPack(col, fila)) && !elementoSolidoEn(col, fila);
+  });
+  if(!celdas.length || !fbUsuario) return;
+  try{
+    await coleccionElementos().add({
+      tipo: 'libre', origen: {col: celda.col, fila: celda.fila}, celdas: celdas.flatMap(c => [c.dq, c.dr]), rotacion: 0,
+      color: '#6B5B4B', alfa: 90, solido: true, invisible: false, imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true,
+      turnos: muro.turnos, venceMant: Math.round(num(mantenimientoNumero)) + muro.turnos,
+      duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    const quien = t.oculto ? 'Alguien' : nombreDe(t);
+    alertaRojaAnonima(`🧱 ${nombre}`, `Se levantó un muro delante de ${quien}: ${celdas.length} casillas, ${muro.turnos} turnos`);
+    momentoAbrir({tipo: 'trampa', icono: '🧱', titulo: `Se levantó un muro delante de ${quien}`, resultado: `«${nombre}»: ${celdas.length} casillas que no se pueden pasar por ${muro.turnos} turnos`, estado: 'listo'});
+  }catch(err){ console.error('No se pudo levantar el muro de la trampa:', err); toast('No se pudo levantar el muro'); }
+}
+
 // Después de que el token llegó a la casilla donde se cortó.
 async function trampaResolver(){
   const p = trampaPendiente;
@@ -573,6 +610,8 @@ async function trampaResolver(){
     if(enSigilo(t)) await romperSigilo(p.tokenId, '', `${nombreDe(t)} activó una trampa`);
     await trampaAplicarEfectos(t, p.el);   // la salvación, el daño y el estado de cada uno, con su Aviso y la Crónica
     if(p.el.trampaDestino) await trampaTeleportar(p.tokenId, tokens.get(p.tokenId), p.el);
+    const muro = trampaMuroDe(p.el);
+    if(muro) await trampaLevantarMuro(t, p.celda || t, p.desde, muro, p.el.trampaNombre || 'Trampa de muro');
     // Trampa persistente (2026-09-28, pedido del dueño): además del golpe de siempre (arriba), se convierte en
     // zona — mismas celdas y el mismo daño/estado, quedando puesta zonaTurnos turnos. Segunda escritura aparte
     // (regla nueva de Firestore: cualquiera puede completarla, ya viene pre-armada por quien puso la trampa).
@@ -586,7 +625,7 @@ async function trampaResolver(){
       };
       if(p.el.fuegoAmigo) cambios.zonaAmiga = true;
       if(trampaDanoValido(p.el.trampaDano)){ cambios.zonaDano = p.el.trampaDano; if(p.el.trampaIgnoraDef) cambios.zonaIgnoraDef = true; }
-      if(p.el.trampaEstado){ try{ const e = JSON.parse(p.el.trampaEstado); delete e.salva; if(e.nombre) cambios.zonaEstado = JSON.stringify(e); }catch(err){} }   // sin la salvación (es del disparo)
+      if(p.el.trampaEstado){ try{ const e = JSON.parse(p.el.trampaEstado); delete e.salva; delete e.muro; if(e.nombre) cambios.zonaEstado = JSON.stringify(e); }catch(err){} }   // sin la salvación (es del disparo)
       if(p.el.zonaResistStat && Number.isFinite(p.el.zonaResistValor)){ cambios.zonaResistStat = p.el.zonaResistStat; cambios.zonaResistValor = p.el.zonaResistValor; }
       try{ await coleccionElementos().doc(p.id).update(cambios); }
       catch(err){ console.error('No se pudo convertir la trampa en zona:', err); }

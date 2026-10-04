@@ -1747,6 +1747,11 @@ prueba('trampas automáticas: el estado y la salvación viajan juntos en trampaE
      ['Efecto: Veneno ×3', 'Se evita: Evasión contra 10 → la evita entera'], '2d6 de daño y Inmovilizado 3 turnos (automático). Para liberarse: 2 No2 y Fuerza contra 8 (a mano).',
      {stat: 'eva', etq: 'Evasión', dif: 10, que: 'todo'}]);
 });
+prueba('trampa de muro: el muro viaja en trampaEstado (largo 3 o 5, 4 turnos si no dice) y la plantilla lo conserva', () => {
+  igual([JSON.parse(TokensAuto.estadoJson(null, null, {largo: 3})), JSON.parse(TokensAuto.estadoJson({nombre: 'Sentado'}, null, {largo: 7, turnos: 2})),
+    TokensAuto.muroNorm(null), Plantillas.trampa({nombre: 'Muro', tipo: 'flor', tamano: 0, muro: {largo: 3, turnos: 4}}).muro],
+    [{muro: {largo: 3, turnos: 4}}, {nombre: 'Sentado', muro: {largo: 5, turnos: 2}}, null, {largo: 3, turnos: 4}]);
+});
 /* ---------- Creeps por mapa (comun/creeps-mapas.js, 2026-10-02: los grupos pasaron a ser mapas) ---------- */
 // Una base de datos de mentira, lo justo para CreepsMapas: colecciones y documentos en memoria.
 function fbFalso(datos){

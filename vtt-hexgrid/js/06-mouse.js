@@ -522,7 +522,7 @@ function rutaSoltada(a, t){
       if(corteSigilo && corteSigilo.tipo === 'percibe') percepcionSigiloPendiente = {tokenId: a.id, ocultoId: corteSigilo.ocultoId, celda: fc};   // P145: se resuelve al llegar (js/16)
       else if(corteSigilo) toast(`🕶 Viste a ${corteSigilo.ocultos.map(o => o.nombre).join(', ')}: el movimiento se corta acá y pierde el sigilo`);
       else{
-        trampaPendiente = {tokenId: a.id, tipo: corteTrampa.tipo, id: corteTrampa.id, el: corteTrampa.el, celda: a.ruta[a.ruta.length - 1]};
+        trampaPendiente = {tokenId: a.id, tipo: corteTrampa.tipo, id: corteTrampa.id, el: corteTrampa.el, celda: a.ruta[a.ruta.length - 1], desde: a.ruta[a.ruta.length - 2]};
         if(corteTrampa.tipo === 'pisa') toast('⚠ Pisaste algo: el movimiento se corta acá');   // 'cerca': lo dice el cartelito, sin nombrar la trampa (P145)
       }
     }

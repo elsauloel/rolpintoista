@@ -309,7 +309,7 @@ el nombre conservan su id y su narrativa). Precio = 10 + 25 por punto de la bols
 crítico **se acumulan entre partes**, y eso no se ve diseñando una parte de arriba abajo. Así, al cerrar cada calidad, hay un equipo entero que se
 puede medir contra la curva.
 
-1. **Común:** torso ✅ · escudo ✅ · cabeza ✅ · manos · piernas · pies · cinturón · anillos. **Control:** la calculadora sobre el equipo Común completo
+1. **Común:** torso ✅ · escudo ✅ · cabeza ✅ · manos ✅ · piernas · pies · cinturón · anillos. **Control:** la calculadora sobre el equipo Común completo
    contra la curva de N1 (Defensa 4–10, T4 ≤ 2, T6 ≤ 1) y N2 (5–12). **Y la Res.CC (dueño, 2026-10-04):** medir cuánta se junta con el equipo completo,
    para que no sea tan abundante que le quite peso a los personajes y efectos que juegan con control (hoy, con torso y cabeza: hasta +4).
 2. **Buena:** las mismas partes, en el mismo orden. **Control:** N3 (6–14, T4 ≤ 3, T6 ≤ 2, T8 ≤ 1) y N4 (7–16, T10 ≤ 1).
@@ -384,4 +384,12 @@ Res.CC +1 (50).
 24 cascos y sombreros reemplazan a los 24 viejos (14 conservan nombre, id y narrativa). **Iniciativa en la cabeza ✅** (la Gorra de la Federal).
 **Topes de Defensa de la cabeza ✅:** Común 1, Buena 2, Rara 3. Los de peso 0 llenan la bolsa con dos cosas; los cascos pesados traen tres o cuatro
 y se pagan en carga, o bajan de precio (Cofia 35, Bacinete, Bombero 50).
+
+## Manos Común: cargadas (2026-10-04)
+31 guantes reemplazan a los 11 viejos. **Identidad de las manos (dueño, 2026-10-04):** los guantes están en el ataque además de la defensa →
+**PdG en todas sus formas, Parry y Evasión**, más presentes que las resistencias elementales («van a resultar muy poco atractivas para los
+jugadores; se pueden usar para rellenar»). **Costos nuevos en la bolsa ✅:** PdG 2 (espejo de la Evasión), PdG en contraataque 1, PdG en ataque de
+oportunidad 0,75. **La oportunidad tiene que estar presente desde Común y en varios ítems** (dueño): 7 guantes la llevan. Por ahora el PdG va
+**solo en los guantes**; en el resto del equipo, a considerar más adelante. Res.CC en una sola pieza (Muñequeras de cuero crudo).
+**Criterio general (dueño): las resistencias elementales son relleno**; lo que da identidad a una pieza son los bonos que se juegan en cada combate.
 

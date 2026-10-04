@@ -28,7 +28,9 @@ COSTO = {
     'capcinturon': 1, 'capmochila': 0.5, 'crgmax': 0.25,
     'parry': 1, 'bloqueo': 1,
     # Ofensivo en una pieza defensiva: con la escala de la calculadora de armas (se marca aparte).
-    'pdg': 3.5, 'dmg': 1, 'crit': 3, 'critpot': 1.2, 'rng': 0.75, 'rangocasteo': 0.5, 'pdgmg': 2, 'dmgesp': 1,
+    # PdG en una pieza defensiva (dueño, 2026-10-04, por ahora solo en guantes): espejo de la Evasión; contraataque y oportunidad, situacionales.
+    'pdgcontra': 1, 'pdgopor': 0.75,
+    'pdg': 2, 'dmg': 1, 'crit': 3, 'critpot': 1.2, 'rng': 0.75, 'rangocasteo': 0.5, 'pdgmg': 2, 'dmgesp': 1,
     # Atributos: suben varios stats a la vez (Agilidad = Evasión + Iniciativa + No2).
     'fue': 2.5, 'con': 3, 'agl': 8, 'des': 3, 'esp': 3,
     'bonos': 1, 'accionesmax': 4,

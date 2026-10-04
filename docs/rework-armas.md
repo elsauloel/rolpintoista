@@ -1091,7 +1091,7 @@ actuó y quedaría después de quien tiene el turno. Garrote, Martillo de bola y
 | Palo de amasar 🆕 | Demora 50 % (y nada más) · 85 |
 | Mazo de carnicero | +1 · Demora 33 % · 85 |
 | Porra de guardia | Bloqueo +1 · Demora 33 % · 100 |
-| Garrote de hueso (rehecho) | Crít. potente +1 · Demora 33 % · 100 |
+| Garrote de hueso (rehecho) | Demora 33 % · muy resistente · 95 |
 | Martillo del herrero de pueblo 🆕 | Parry +1 · Demora 33 % · 100 |
 | Martillo de carpintero 🆕 | Iniciativa +1 · Demora 33 % · 95 |
 | Llave inglesa 🆕 | Rengo 20 % · Demora 33 % · 100 |
@@ -1106,9 +1106,9 @@ actuó y quedaría después de quien tiene el turno. Garrote, Martillo de bola y
 | Mazo de goma 🆕 | Derribar 33 % · 75 |
 | Garrote de quebracho 🆕 | +2 · 80 |
 | Caño de plomo 🆕 | +1 · Derribar 25 % · 80 |
-| Pilón de mortero 🆕 | +1 · Crít. potente +1 · 85 |
+| Pilón de mortero 🆕 | +1 · Bloqueo +1 · 85 |
 | Porra de sereno 🆕 | Bloqueo +2 · 85 |
-| Martillo de cantero | Crít. potente +2 (era Alcance con una mano) · 90 |
+| Martillo de cantero | +1 · muy resistente (era Alcance con una mano) · 80 |
 | Sartén de hierro 🆕 | Parry +1 · Bloqueo +1 · 95 |
 | Bastón de monje | 2 manos · Parry +1 · Bloqueo +1 (sin Alcance) · 85 |
 | Bastón de caminante 🆕 | 2 manos · +1 · Bloqueo +2 · 85 |
@@ -1116,3 +1116,7 @@ actuó y quedaría después de quien tiene el turno. Garrote, Martillo de bola y
 Todas de 1 dado. Sin Aturdir (desde Buena), sin Rompe armadura, sin Alcance (con un d10, Alcance en Común ya rinde Buena: arranca en Buena).
 Porra de guardia, Garrote de hueso, Martillo del herrero, Llave inglesa y Martillo de cantero rinden apenas por encima de Común (7,5–7,8).
 Pasan a otras tandas: **Garrote** y **Martillo de bola** (2 dados) a Buena, **Maza** (2 dados + 1 amplificado) a Rara.
+
+**Sin Crítico potente en los contundentes (dueño, 2026-10-03):** «no le va a sumar nada; nadie cuenta con un crítico en un arma» (con un d10 el
+crítico es raro). Sale de «Puede ir» del Tipo 10. En la Común: Garrote de hueso → muy resistente; Pilón de mortero → +1 · Bloqueo +1; Martillo
+de cantero → +1 · muy resistente.

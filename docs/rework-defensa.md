@@ -274,3 +274,29 @@ funcionan solas (no van «✋ a mano»). Probado en vivo: Llamarada contra un cr
 **Herramienta de diseño nueva (dueño, 2026-10-04): «Indestructible»** — en armaduras Raras (muy escaso), Excepcionales (infrecuente) y Legendarias
 (libre). **Decidido (dueño, 2026-10-04): las dos cosas** — nunca se rompe (no pierde durabilidad) **y** no pierde Defensa con la Armadura rota.
 *(Falta: cuánto pesa en la calculadora, y construirlo cuando se cargue la primera pieza que lo lleve.)*
+
+## Torso Común: aprobado y cargado (2026-10-04)
+**Dueño: «la lista está bien»**, y le sumó piezas que **solo dan Defensa +1, +2, +3 y +4 en cada categoría**, sin nada más, «para que haya más
+diversidad aún y opciones baratas». *Por qué:* no todo tiene que ser una pieza con identidad; las simples son el piso barato del mercado y
+dejan el presupuesto para el resto del equipo. Cargados en `comun/catalogo.js` (34 torsos Comunes; reemplazan a los 18 viejos — los que conservan
+el nombre conservan su id y su narrativa). Precio = 10 + 25 por punto de la bolsa.
+
+| Simples · precio | Qué da |
+|---|---|
+| Saco de arpillera (blando) · 35 | Defensa +1 |
+| Chaleco de cuero (blando) · 60 | Defensa +2 |
+| Campera de cuero grueso (blando) · 85 | Defensa +3 |
+| Gabán acolchado de cuero (blando) · 110 | Defensa +4 |
+| Peto de tablas (rígido, pesa 2) · 35 | Defensa +1 |
+| Coraza de latón (rígido, pesa 2) · 60 | Defensa +2 |
+| Peto de hierro (rígido, pesa 2) · 85 | Defensa +3 |
+| Pechera de hierro (rígido, pesa 3) · 110 | Defensa +4 |
+
+- Se fue la **Campera de marinero espacial** (no estaba en la lista nueva).
+- **Escasez y generador de tiendas:** sumar piezas simples no interfiere, siempre que el generador elija **primero el rubro y la parte del cuerpo y
+  después la pieza** (si eligiera al azar entre todos los ítems, cuantas más piezas de torso haya, más torsos saldrían). Queda para el simulador
+  de tiendas.
+- **Reparación (dueño, 2026-10-04, hecho):** una pieza **rota** (durabilidad 0) cuesta **el doble** de reparar hasta quedar entera (aunque se
+  repare de a un punto: `reparoRoto`). *Por qué:* premia cuidar el equipo antes de que se rompa del todo. El sistema completo de reparación está
+  en Herramientas de diseño → A desarrollar.
+

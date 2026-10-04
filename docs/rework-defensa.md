@@ -214,3 +214,12 @@ Percepción 0,5 · +5 vida 1 · Armadura mágica 1 · No2 máximo 4 · ranura de
 parte, van atadas a las **trampas** (que ya tienen familias elementales: fuego, hielo, rayo, gas/tóxico). Después, **las armas mágicas**: el dueño
 las tiene pendientes porque «las posibilidades son tantas y las mecánicas tan variables» que todavía no sabe por dónde arrancar; la idea es crear
 eventualmente un pool grande y diverso.
+
+**Bolsas, reparto por parte y desventajas ✅ (dueño, 2026-10-04).** **Sigilo +N** (dueño): mejora la tirada del que está escondido cuando lo
+intentan descubrir (en las zonas de riesgo o con otro mecanismo), es decir, la Destreza contra la Percepción del que busca.
+
+**Calculadora de defensa** (`herramientas/calculadora_defensa.py`, 2026-10-04): puntos por bono, bolsa por parte y calidad, precio sugerido
+(10 + 25 por punto: un equipo Común completo al máximo ≈ 420 + el arma), máximo equipable contra la curva. **El catálogo de hoy:** de 438 piezas
+defensivas, **346 se pasan de su bolsa**; con lo mejor de cada parte hasta Común se llega a Defensa 34 (la curva dice 5–12) y T4 7 / T6 6 (≤2 / ≤1).
+Confirma que el catálogo defensivo se rehace entero, parte por parte. Las 52 piezas con Movimiento negativo cuestan carísimo (−1 Mov = −1 No2 = 4
+puntos): en la versión nueva, las desventajas van por Evasión o Iniciativa.

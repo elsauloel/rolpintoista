@@ -17,6 +17,8 @@ Ya no hace falta correr nada para que un cambio del catálogo llegue a las herra
   editor, conserva la cabecera) y `normalizar_item(it)` (un ítem de trabajo en la forma del catálogo).
 - **calculadora_armas.py** — puntaje y precio de armas; auditoría de armas (`datos/auditoria-armas-datos.json`).
 - **reajuste_defensa.py** — reparto de resistencias a crítico por slot y tier; auditoría de defensa.
+- **calculadora_defensa.py** (2026-10-04) — presupuesto por pieza: puntos de cada bono (`COSTO`), bolsa por parte y calidad (`BOLSA`), precio
+  sugerido y el máximo equipable contra la curva por nivel (`resumen`, `pieza NOMBRE`, `equipos`, `lista [PARTE]`).
 - **buscar_duplicados.py** — ítems idénticos con distinto nombre.
 - **variaciones_armas.py**, **generar_trampas_consumibles.py** — ítems del rework en archivos aparte (`datos/*-nuevos.json`,
   `datos/trampas-consumibles.json`).

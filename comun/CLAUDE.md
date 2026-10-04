@@ -1205,3 +1205,8 @@ versión parecida en más de una, es candidato a juntar.
   todos: el oro de cada creep sin el ±20 %, su arma no natural, su equipo y su trofeo a precio de venta —la mitad de la compra— y el consumible al azar
   como valor esperado, `dropEsperado`) y `estimadoHtml(est, titulo)` (la tabla, con el reparto entre 3, 4 y 5). Lo usan el mapa (🗺 Mapas → «💰 Botín
   estimado», `abrirBotinEstimadoMapa`, js/18) y GM Tools (la pestaña de un mapa, `abrirBotinEstimado`, js/09). Primer paso de la hoja de ruta del GM.
+- **Efectos del golpe, todos juntos** (2026-10-04, pedido del dueño: «para que pegar con un arma no sea una eternidad»): en el paso de efectos del
+  duelo, un solo botón «🎲 Tirar los efectos (1d6 · 1d3 · 1d4)» (`tirarEfectos` en `duelo.js`) tira un dado por cada efecto con probabilidad; la Mesa
+  recibe UNA tirada con todos los dados (`1d6+1d3+1d4`) y una línea con lo que funcionó y lo que no. El cuadro muestra un **tablero** (dado · efecto
+  y su % · con qué número funciona · qué salió, ✔/✘) y debajo solo las tarjetas de lo que funcionó (o entra siempre), con su «Aplicar». Si ningún
+  efecto tiene probabilidad, queda el botón por efecto de antes. Probado en vivo.

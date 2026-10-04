@@ -73,7 +73,7 @@ async function trampaMomentoNuevo(p){
   const x = p.x, s = p.salva;
   const dt = {
     tokenId: p.tokenId || '', creep: x.tipo === 'creep', fichaId: String(x.fichaId || ''), quien: p.quien, nombreT: p.nombreT, pisador: !!p.pisador,
-    salva: s ? {stat: String(s.stat), etq: String(s.etq || ''), dif: num(s.dif), que: String(s.que || 'todo')} : null,
+    salva: s ? {stat: String(s.stat), etq: String(s.etq || ''), dif: num(s.dif), que: String(s.que || 'todo'), ...(s.logra ? {logra: String(s.logra)} : {})} : null,
     dano: p.dano || '', ignoraDef: !!p.ignoraDef, spec: p.specJson || '', muro: num(p.muro), aMano: p.aMano || '',
     fase: '', tirando: false, evita: '', pasos: [],
   };

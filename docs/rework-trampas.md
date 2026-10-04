@@ -77,3 +77,16 @@ línea verde de la Mesa dice cuántas volvieron y cuáles se rompieron (`TokensA
 - **Efecto:** el foso, solo a quien lo pisó; el piso de púas y las cuchillas, a todos los que estén encima.
 - **La Común (referencia de la familia): Foso con estacas** — disparo 1 casilla · efecto solo quien lo pisa · 2d6 de daño (menos su Defensa) ·
   queda Sentado · **Evasión 7** evita caer (recibe el daño, no queda Sentado) · detectarla: 8 · **30**. (El dueño corrigió 6 → 7.)
+
+**Esquivar vs. resistir (dueño, 2026-10-04): «la mayoría de las trampas no se esquivarían, pero muchas podrán resistir su efecto».** Una trampa
+pisada te agarra: el daño entra siempre. Lo que se tira (si se tira algo) es para **resistir lo que deja** (`salva.que = 'efecto'`). Esquivarla
+entera (Evasión, `que = 'todo'`) queda como excepción. Propuesta de qué stat resiste cada efecto (a confirmar, 2026-10-04):
+
+| Lo que deja | Se resiste con |
+|---|---|
+| Sentado, Inmovilizado, Rengo, Stun, Pajaritos (quedar trabado o aturdido) | Res.CC |
+| Veneno, Sangrado, Quemadura, Escarcha (el cuerpo lo aguanta) | Constitución |
+| Sueño, confusión, discordia (la cabeza) | Res.Mt |
+| Maldiciones de runa, succión arcana, teleport | Res.Esp |
+
+Se sigue tipo por tipo; cada Común se revisa con esta regla (el Foso con estacas tenía «Evasión 7 evita caer»).

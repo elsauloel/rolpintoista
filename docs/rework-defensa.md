@@ -433,4 +433,10 @@ más, porque depende de vos (vos elegís alejarte y le sacás provecho); la de c
 oportunidad 1, Evasión en contraataque 0,5. A construir en el duelo (la Evasión del defensor suma el bono según el tipo de ataque).
 **Carga en las piernas, no en Común (dueño, 2026-10-04):** «te da +1 de carga pero pesa 1: se cancela, no sirve de nada». Solo tiene sentido en piernas
 de peso 0 que la sumen de verdad, y eso es de calidades altas. Las piernas Comunes van sin Carga; el Pantalón de corredor estrena los Pasos gratis.
+**Distribución piernas / pies y pesos ✅ (dueño, 2026-10-04).** Piernas (potencia, moverse rápido): Pasos gratis 2 · Sigilo 1 · Retirada limpia
+(33 % = 1, 50 % = 1,5, siempre = 4, solo Rara o más) · Evasión contra oportunidad 1. Pies (apoyo y reflejos): Recuperarse rápido (los estados que
+traban el movimiento —Inmovilizado, Rengo, Sentado y el estado nuevo **Lento**, «el primer casillero cuesta el doble»— duran un turno menos; 2, o 1
+con 50 %) · Reflejos de mangosta (al pisar una trampa, chance de un dodge roll a ciegas: 33 % = 1, siempre = 2,5) · Evasión contra contraataque.
+**Evasión contra contraataque = 2/3 por +1** (dueño: Evasión +1 ≈ Evasión contra oportunidad +2 ≈ Evasión contra contraataque +3). El bonus al
+sobrepeso queda para cuando se defina su penalidad. Propuesta grande de piernas Comunes (29 piezas) en la conversación del 2026-10-04.
 

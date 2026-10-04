@@ -472,7 +472,55 @@ const CombateFin = (() => {
     }
   }
 
-  return {xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_TIERS, dropChance, dropTabla, dropTier, dropDeCreep, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
+  /* ---------- 💰 Botín estimado de un mapa (2026-10-04, pedido del dueño: «que el máster tenga, al armar un mapa con todos los creeps, cuánto
+     oro va a soltar aproximadamente al final: el oro de los creeps y también la venta de todos los ítems que van a dropear») ----------
+     Lo mismo que reparte el fin del combate si derrotan a todos: el oro de cada creep (sin el ±20 %), su arma (si no es natural), su equipo y
+     su trofeo, contados a lo que paga una tienda (la mitad del precio de compra, como FichaTienda.precioVenta), y el consumible al azar de
+     humanos y humanoides como valor esperado (chance × lo que vale en promedio un consumible de cada tier). Es una guía para el GM. */
+  const ventaDe = p => Math.round(num(p) / 2 * 100) / 100;
+  function dropEsperado(cat, sc){
+    const chance = dropChance(sc);
+    if(!chance) return {chance: 0, venta: 0};
+    const tabla = dropTabla(num(sc.nivel) + (sc.jefe ? 1 : 0));
+    const cons = cat.filter(i => i.tipoItem === 'consumibles' && num(i.precioCompra) > 0);
+    let compra = 0;
+    DROP_TIERS.forEach((t, i) => {
+      const pool = cons.filter(c => (c.tier || 'Común') === t);
+      if(pool.length) compra += tabla[i] / 100 * pool.reduce((a, c) => a + num(c.precioCompra), 0) / pool.length;
+    });
+    return {chance, venta: Math.round(chance * compra / 2)};
+  }
+  function estimar(creeps, cat){
+    const filas = (creeps || []).filter(sc => !sc.recompensado).map(sc => {
+      const items = itemsDeCreep(cat, sc).map(x => ({nombre: x.nombre, compra: num(x.precioCompra), venta: ventaDe(x.precioCompra), trofeo: !!x.trofeo,
+        estimado: !!(x.template && x.template.estimado)}));
+      const oro = Math.max(0, num(sc.oroBase)), venta = items.reduce((a, i) => a + i.venta, 0), drop = dropEsperado(cat, sc);
+      return {nombre: K.nombreLimpio(sc), nivel: num(sc.nivel) || 1, jefe: !!sc.jefe, oro, items, venta, drop, xp: xpBasePorNivel(sc.nivel), total: oro + venta + drop.venta};
+    });
+    const suma = f => filas.reduce((a, x) => a + f(x), 0);
+    return {filas, oro: suma(x => x.oro), venta: suma(x => x.venta), drop: suma(x => x.drop.venta), xp: suma(x => x.xp), total: suma(x => x.total)};
+  }
+  function estimadoHtml(est, titulo){
+    const r = n => fmt(Math.round(n));
+    if(!est.filas.length) return `<p class="hint">${esc(titulo || 'Este mapa')} no tiene creeps (o ya se repartió lo de todos).</p>`;
+    const porJug = [3, 4, 5].map(n => `${n}: ~${r(est.total / n)}`).join(' · ');
+    const filas = est.filas.sort((a, b) => b.total - a.total).map(f => `<tr style="border-top:1px solid var(--line)">
+      <td style="padding:6px 8px;vertical-align:top"><b>${esc(f.nombre)}</b> <span class="hint">Lv ${fmt(f.nivel)}${f.jefe ? ' · jefe' : ''}</span>
+        ${f.items.length ? `<div class="hint" style="font-size:12px">${f.items.map(i => `${esc(i.nombre)}${i.trofeo ? ' 🏆' : ''} ${r(i.compra)} → ${fmt(i.venta)}${i.estimado ? ' (est.)' : ''}`).join(' · ')}</div>` : ''}
+        ${f.drop.chance ? `<div class="hint" style="font-size:12px">🎲 ${Math.round(f.drop.chance * 100)} % de soltar un consumible (vale ~${r(f.drop.venta)} en promedio)</div>` : ''}</td>
+      <td style="padding:6px 8px;text-align:right;vertical-align:top">${r(f.oro)}</td>
+      <td style="padding:6px 8px;text-align:right;vertical-align:top">${r(f.venta + f.drop.venta)}</td>
+      <td style="padding:6px 8px;text-align:right;vertical-align:top"><b>${r(f.total)}</b></td></tr>`).join('');
+    return `<div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:15px">Si derrotan a todos: <b>~${r(est.total)} DDE</b> <span class="hint">(oro ${r(est.oro)} ±20 % · venta de lo que sueltan ${r(est.venta)} · consumibles al azar ~${r(est.drop)}) · ${r(est.xp)} XP</span></div>
+      <div class="hint">Repartido entre ${porJug} cada uno. Lo que sueltan se cuenta a lo que paga una tienda (la mitad del precio de compra); si se lo quedan, vale como equipo.</div>
+      <table style="width:100%;border-collapse:collapse;font-size:13.5px">
+        <thead><tr><th style="text-align:left;padding:4px 8px">Creep · lo que suelta (compra → venta)</th><th style="text-align:right;padding:4px 8px">Oro</th><th style="text-align:right;padding:4px 8px">Venta</th><th style="text-align:right;padding:4px 8px">Total</th></tr></thead>
+        <tbody>${filas}</tbody></table>
+    </div>`;
+  }
+
+  return {estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_TIERS, dropChance, dropTabla, dropTier, dropDeCreep, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
     plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, calcularReparto,
     itemsPublicables, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

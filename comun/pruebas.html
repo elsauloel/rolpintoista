@@ -1766,6 +1766,17 @@ prueba('Soltarse (trampas de Atrapar): el estado guarda qué tirar y cuánto cue
     inv.estados.length, inv.nitros, Combatiente.estadoSoltable([{nombre: 'Inmovilizado', activo: true}])],
     [{stat: 'fue', etq: 'Fuerza', dif: 6, no2: 2}, '🔓 Soltarse · Fuerza contra 6 · 2 No2', 8, true, true, 3, 0, true, 0, 2, null]);
 });
+prueba('💰 botín estimado de un mapa: el oro de cada creep + lo que suelta a precio de venta (la mitad) + el consumible al azar como valor esperado', () => {
+  const cat = CATALOGO_BASE.filter(i => i.tipoItem).map(CreepCalculo.itemParaCreep);
+  const bandido = CreepCalculo.normalizar({id: 'b', nombre: 'Bandido (auditar)', nivel: 1, tipoCriatura: 'humano', oroBase: 20, armaNombre: 'Garrote de prueba', armaTipo: 8, armaPeso: 1});
+  const lobo = CreepCalculo.normalizar({id: 'l', nombre: 'Lobo', nivel: 2, tipoCriatura: 'bestia', armaNatural: true, armaNombre: 'Colmillos'});
+  const ya = CreepCalculo.normalizar({id: 'y', nombre: 'Ya cobrado', nivel: 1, oroBase: 99, recompensado: true});
+  const e = CombateFin.estimar([bandido, lobo, ya], cat);
+  const b = e.filas.find(f => f.nombre === 'Bandido'), l = e.filas.find(f => f.nombre === 'Lobo');
+  igual([e.filas.length, b.oro, b.items.length, b.items[0].venta === b.items[0].compra / 2, b.drop.chance, b.drop.venta > 0, l.items.map(i => i.trofeo), l.items[0].venta, l.drop.chance,
+    Math.round(e.total) === Math.round(b.total + l.total), Math.round(b.total) === Math.round(b.oro + b.venta + b.drop.venta), /~\d+ DDE/.test(CombateFin.estimadoHtml(e, 'Mapa'))],
+    [2, 20, 1, true, 0.3, true, [true], 15, 0, true, true, true]);
+});
 prueba('arena movediza: si falla al soltarse, se hunde más (+1 turno), en personajes y creeps; el botón lo dice', () => {
   const soltar = {stat: 'fue', dif: 99, no2: 1, hunde: 1};
   const est = EstadosAplicar.componer({nombre: 'Inmovilizado', turnos: 1, soltar});

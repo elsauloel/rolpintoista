@@ -38,6 +38,7 @@ function renderMapasBarra(){
       ${tab(PESTANA_TODOS, 'Todos')}${mapas.map(m => tab(m.id, '🗺 ' + m.nombre)).join('')}${tab(CreepsMapas.RESERVA, '🎒 Reserva', 'Los creeps que todavía no están en ningún mapa')}
       <button type="button" class="btn ghost" data-mapa-nuevo="1" style="padding:4px 10px;font-size:12.5px" title="Crear un mapa nuevo (un escenario de combate); aparece también en 🗺 Mapas del mapa">＋ Mapa</button>
       ${enUnMapa ? `<span style="margin-left:auto;display:flex;gap:6px;align-items:center">
+        <button type="button" class="btn" data-mapa-estimado="1" title="Cuánto oro van a sacar aproximadamente si derrotan a todos los creeps de este mapa: su oro y la venta de lo que sueltan">💰 Botín estimado</button>
         <button type="button" class="btn primary" data-mapa-tokens="1" title="Pone en «${esc(nombreDeMapaGM(pestanaMapa))}» un token oculto por cada creep de este mapa que todavía no tenga, en fila, en el centro de la vista">🎯 Poner sus tokens (${cuenta(pestanaMapa)})</button></span>` : ''}
     </div>`;
 }
@@ -96,7 +97,17 @@ document.addEventListener('click', async e => {
   if(b.dataset.mapaTab !== undefined){ fijarPestanaMapa(b.dataset.mapaTab); return; }
   if(b.dataset.mapaNuevo){ const id = await pedirMapaNuevo(); if(id) fijarPestanaMapa(id); return; }
   if(b.dataset.mapaTokens){ crearTokensDelMapa(); return; }
+  if(b.dataset.mapaEstimado){ abrirBotinEstimado(); return; }
 });
+// 💰 Botín estimado de la pestaña abierta (2026-10-04): comun/combate-fin.js (estimar), el mismo que muestra el mapa en 🗺 Mapas.
+function abrirBotinEstimado(){
+  const lista = creepsReales().filter(sc => mapaDeCreepGM(sc) === pestanaMapa);
+  $('#veritem-titulo').textContent = `💰 Botín estimado · ${nombreDeMapaGM(pestanaMapa)}`;
+  $('#veritem-body').innerHTML = CombateFin.estimadoHtml(CombateFin.estimar(lista, CATALOGO_EQUIPO), nombreDeMapaGM(pestanaMapa));
+  $('#veritem-baja').style.display = 'none';
+  verItemActual = null;
+  $('#scrim-ver-item').classList.add('open');
+}
 document.addEventListener('change', async e => {
   const t = e.target;
   if(t.dataset.mapaCreep === undefined) return;

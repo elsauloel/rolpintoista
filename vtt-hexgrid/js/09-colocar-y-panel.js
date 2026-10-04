@@ -867,6 +867,7 @@ function renderMapasMenu(forzar){
   menu.querySelectorAll('[data-mapa-renombrar]').forEach(b => b.onclick = () => renombrarMapa(b.dataset.mapaRenombrar));
   menu.querySelectorAll('[data-mapa-borrar]').forEach(b => b.onclick = () => borrarMapa(b.dataset.mapaBorrar));
   menu.querySelectorAll('[data-mapa-traer]').forEach(b => b.onclick = () => traerCreepsDelMapa(b.dataset.mapaTraer));
+  menu.querySelectorAll('[data-mapa-botin]').forEach(b => b.onclick = () => abrirBotinEstimadoMapa(b.dataset.mapaBotin));
   $('#mapa-nuevo').onclick = crearMapa;
   $('#fondo-cargar').onclick = () => $('#fondo-archivo').click();
   if($('#fondo-quitar')) $('#fondo-quitar').onclick = async () => {

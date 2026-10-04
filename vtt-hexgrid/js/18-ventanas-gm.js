@@ -5,7 +5,7 @@
    terminada» (XP, oro, quién cobra, despojos), 📢 Publicar despojos y el botín para despojar. Los creeps salen de su parte privada
    (solo cuentan los que tienen token en el mapa publicado); al publicar, se marcan recompensados con modificarCreep (GM Tools, abierto
    en otra pestaña, se entera por la firma). El Ver de un ítem, con comun/creep-lupa.js (verItem). */
-const VG_PIEZAS = ['../comun/combate-fin.js?v=20261004rt'];
+const VG_PIEZAS = ['../comun/combate-fin.js?v=20261004ga'];
 var vg = null;            // {host, raiz}
 var vgRep = null;         // el estado del reporte (CombateFin.nuevo)
 var vgCreeps = [];        // los creeps del reporte, con su parte privada
@@ -45,13 +45,17 @@ function vgCrear(){
         <button class="btn primary" data-vg="despojar" title="Último paso: convierte en despojos lo que nadie tomó, carga la XP, el oro y los despojos en las fichas y cierra el botín del todo">🏁 Cerrar botín y repartir XP y oro</button>
       </footer>
     </div></div>
+    <div class="scrim" id="vg-estimado"><div class="modal" style="max-width:820px;width:94vw">
+      <header><h3 id="vg-estimado-titulo">💰 Botín estimado</h3><button class="iconbtn" data-vg="cerrar-estimado">Cerrar</button></header>
+      <div class="body" id="vg-estimado-cuerpo"></div>
+    </div></div>
     <div class="scrim" id="vg-veritem"><div class="modal">
       <header><h3 id="vg-veritem-titulo">Ítem</h3><button class="iconbtn" data-vg="cerrar-item">Cerrar</button></header>
       <div class="body" id="vg-veritem-cuerpo"></div>
     </div></div>
   </div>`;
   // Clic en el fondo de una ventana: se cierra esa (cerrar el botín no despoja).
-  ['vg-finalizar', 'vg-botin', 'vg-veritem'].forEach(id => raiz.querySelector('#' + id).addEventListener('mousedown', e => { if(e.target.id === id) vgCerrar(id); }));
+  ['vg-finalizar', 'vg-botin', 'vg-veritem', 'vg-estimado'].forEach(id => raiz.querySelector('#' + id).addEventListener('mousedown', e => { if(e.target.id === id) vgCerrar(id); }));
   raiz.addEventListener('change', e => {
     const t = e.composedPath()[0];
     if(vgRep && raiz.querySelector('#vg-fin-cuerpo').contains(t) && CombateFin.cambio(vgRep, t)) vgFinDibujar();
@@ -64,6 +68,7 @@ function vgCrear(){
     if(a === 'cerrar-fin'){ vgCerrar('vg-finalizar'); return; }
     if(a === 'cerrar-botin'){ vgCerrar('vg-botin'); return; }
     if(a === 'cerrar-item'){ vgCerrar('vg-veritem'); return; }
+    if(a === 'cerrar-estimado'){ vgCerrar('vg-estimado'); return; }
     if(a === 'publicar'){ vgPublicar(); return; }
     if(a === 'despojar'){ vgDespojar(); return; }
     if(b.dataset.botinVer !== undefined){ const it = vgBotin && CombateFin.botinItem(vgBotin, b.dataset.botinVer); if(it) vgVerItem(it); return; }
@@ -88,6 +93,20 @@ function vgVerItem(item){
   vg.raiz.querySelector('#vg-veritem-titulo').textContent = v.titulo;
   vg.raiz.querySelector('#vg-veritem-cuerpo').innerHTML = v.html;
   vgAbrir('vg-veritem');
+}
+
+/* --- 💰 Botín estimado de un mapa (2026-10-04): lo que suelta cada creep de ese mapa si lo derrotan (comun/combate-fin.js, estimar) --- */
+async function abrirBotinEstimadoMapa(mapaId){
+  if(!soyGM) return;
+  try{ await vgCargar(); }catch(err){ console.error(err); toast('No se pudo abrir el botín estimado'); return; }
+  const titulo = vg.raiz.querySelector('#vg-estimado-titulo'), cuerpo = vg.raiz.querySelector('#vg-estimado-cuerpo');
+  titulo.textContent = `💰 Botín estimado · ${nombreMapa(mapaId)}`;
+  cuerpo.innerHTML = '<p class="hint">Leyendo los creeps…</p>';
+  vgAbrir('vg-estimado');
+  try{
+    const creeps = await vgLeerCreeps(creepsDelMapa(mapaId).map(([id]) => id));
+    cuerpo.innerHTML = CombateFin.estimadoHtml(CombateFin.estimar(creeps, vgCatalogo()), nombreMapa(mapaId));
+  }catch(err){ console.error('No se pudo calcular el botín estimado:', err); cuerpo.innerHTML = '<p class="hint">No se pudieron leer los creeps de este mapa.</p>'; }
 }
 
 /* --- 🏁 Finalizar combate --- */

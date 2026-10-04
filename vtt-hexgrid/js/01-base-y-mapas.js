@@ -191,7 +191,8 @@ function creepsDeMapaHtml(mapaId){
   const n = creepsDelMapa(mapaId).length;
   return `<div class="fila" style="margin-top:4px;gap:6px;align-items:center" title="Los creeps se ubican en un mapa desde GM Tools («🗺 Mover a…»), o vinculando un token a un creep">
       <span class="ayuda" style="margin:0">👹 ${n ? `${n} creep${n === 1 ? '' : 's'}` : 'sin creeps'}</span>
-      ${n ? `<button type="button" class="btn" data-mapa-traer="${esc(mapaId)}" style="padding:2px 8px;font-size:11.5px" title="Crea (ocultos) los tokens de los creeps de este mapa que todavía no tienen">👹 Traer sus tokens</button>` : ''}
+      ${n ? `<button type="button" class="btn" data-mapa-traer="${esc(mapaId)}" style="padding:2px 8px;font-size:11.5px" title="Crea (ocultos) los tokens de los creeps de este mapa que todavía no tienen">👹 Traer sus tokens</button>
+        <button type="button" class="btn" data-mapa-botin="${esc(mapaId)}" style="padding:2px 8px;font-size:11.5px" title="Cuánto oro van a sacar aproximadamente si derrotan a todos: el oro de los creeps y la venta de lo que sueltan">💰 Botín estimado</button>` : ''}
     </div>`;
 }       // GM: panel de mapas guardados abierto
 

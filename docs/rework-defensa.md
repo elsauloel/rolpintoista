@@ -321,3 +321,21 @@ Cada parte, como hasta ahora: propuesta en una tabla → OK del dueño → se ca
 calidades que todavía no se rehicieron quedan como están hasta que les toque. La identidad de cada parte (ver «Paleta de variables») ya marca
 qué le toca a cada calidad: así lo Común no gasta las ideas de lo Raro.
 
+## Escudos — mecánicas, Común y mapa conceptual (2026-10-04, propuesta a revisar)
+**Dueño:** crear con total libertad (lo viejo solo como referencia), tantos objetos como hagan falta, abundancia de opciones; evaluar primero las
+mecánicas; a medida que se sube de calidad, más libertad para probar elementos diversos. **Bloqueo = 1 punto ✅.**
+
+**Mecánicas que ya existen y le sientan a un escudo** (costo en la bolsa): Defensa 1 · Bloqueo 1 (y el **peso** ya suma a la tirada de Bloqueo) ·
+Parry 1 (un escudo habilita Parry) · Res. crítico T4 1 / T6 2 / T8 3 / T10 4 · Res.CC 1 · Res.Esp 1 · Res.Mt 0,5 · resistencia elemental 0,5 ·
+Luz portada 0,5 · ranura de cinturón 1 · +5 vida 1 · PdG de contraataque 1 *(propuesto)* · durabilidad: frágil −0,5 / resistente +0,5 *(propuesto)* ·
+desventajas Evasión −1 / Iniciativa −1 (devuelven 2). Bolsa: 3 / 5 / 7 (a dos manos 4 / 6,5 / 9). Tope de Defensa del escudo Común: 2
+(propuesto: 3 si es a dos manos).
+
+**Mecánicas nuevas que piden los escudos** (para Buena y Rara, a construir): golpe de escudo (atacar con el escudo: daño chico y chance de Demora
+o Derribar), cubrir a un aliado de al lado (bloquear por él), bloquear proyectiles y hechizos, estado al equipar (Espinas, Escudo especial que se
+recarga) — este último ya existe como mecánica de ítems.
+
+**Mapa conceptual:** Buena — Tipo 8 con Defensa, aparece Tipo 10 en los pesados, broqueles de duelista (Parry +2), pavés de verdad a dos manos,
+combos de dos elementos, Ve lo oculto (escudo espejado), contraataque +2, golpe de escudo. Rara — Armadura mágica (escudo rúnico),
+Indestructible (muy escaso), Espinas o Escudo especial al equiparlo, Tipo 10 / Tipo 8 +2, reflejar proyectiles y hechizos, elemental fuerte.
+

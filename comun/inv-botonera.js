@@ -47,7 +47,14 @@ const InvBotonera = (() => {
           // Apagado hasta el Parry, pero muestra lo que tiraría (para decidir entre Parry y Evasión).
           : {stat:'bloqueo', nombre:'Bloqueo · tras el Parry', dado: f(I.bloqueoValor(inv)), sinNitros: true, clave:`inv:${inv.id}:stat:bloqueo`, motivo: `${Combatiente.BLOQUEO_SOLO_TRAS_PARRY} · con ${defInv.nombre} tiraría esto`, attr:`data-invtirarstat="${inv.id}:bloqueo"`}] : []),
     ];
-    const tilesCombate = combate.map(c => {
+    // Levantarse y Soltarse (2026-10-03): las mismas que un personaje y un creep, con lo que tira y cuesta escrito en el botón.
+    const sentadaInv = (inv.estados || []).some(e => e && e.activo !== false && e.sentado), soltableInv = Combatiente.estadoSoltable(inv.estados);
+    const costoLev = num(FichaCalculo.IT2.nitrosLevantarse), sSol = soltableInv && Combatiente.soltarNorm(soltableInv.soltar);
+    const tilesExtra = (sentadaInv ? `
+      <button type="button" class="botonera-tile${num(inv.nitros) < costoLev ? ' bt-sin-nitros' : ''}" data-invlevantarse="${inv.id}" title="Cuesta ${fmt(costoLev)} No2 y saca el estado Sentado"><span class="bt-label">🧍 Levantarse · ${fmt(costoLev)} No2</span></button>` : '')
+      + (sSol ? `
+      <button type="button" class="botonera-tile${num(inv.nitros) < sSol.no2 ? ' bt-sin-nitros' : ''}" data-invsoltarse="${inv.id}" title="${esc(`${soltableInv.nombre}: tira ${sSol.etq} contra ${sSol.dif}; si llega, se suelta. Cuesta ${sSol.no2} No2 aunque no lo logre`)}"><span class="bt-label">${esc(Combatiente.textoSoltarse(soltableInv))}</span></button>` : '');
+    const tilesCombate = tilesExtra + combate.map(c => {
       const mt = c.stat ? ModTirada.tile(inv.estados, c.stat) : {clase: '', html: '', titulo: ''};
       return `
       <button type="button" class="botonera-tile${c.sinNitros?' bt-sin-nitros':''}${mt.clase}" ${c.attr} title="${esc(c.motivo + mt.titulo)}">

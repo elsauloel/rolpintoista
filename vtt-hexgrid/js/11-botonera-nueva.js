@@ -112,7 +112,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261002a', '../comun/ficha-equipo.js?v=20261002b', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261002b', '../comun/ficha-mantenimiento.js?v=20261002a', '../comun/ficha-calculo.js?v=20261002j', '../comun/ficha-combate.js?v=20261003sa', '../comun/skills-clase.js?v=20261002sb', '../comun/ficha-habilidades.js?v=20261001c',
-  '../comun/catalogo.js?v=20261003du', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261002d', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261002bot', '../comun/ficha-resumen.js?v=20261003fi', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261002bot', '../comun/inv-acciones.js?v=20261003fi', '../comun/inv-duelo.js?v=20261003sn', '../comun/ficha-acciones.js?v=20261003sn', '../comun/inv-habilidades.js?v=20261003fi', '../comun/inv-lupa.js?v=20261001a',
+  '../comun/catalogo.js?v=20261003du', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261002d', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261004so', '../comun/ficha-resumen.js?v=20261003fi', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261004so', '../comun/inv-acciones.js?v=20261004so', '../comun/inv-duelo.js?v=20261003sn', '../comun/ficha-acciones.js?v=20261004so', '../comun/inv-habilidades.js?v=20261003fi', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261003sa', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261002b'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -265,7 +265,7 @@ function bnInvAca(b){
     bn.raiz.querySelector('#bn-verinv').classList.add('open');
     return true;
   }
-  const d = b.dataset, ref = d.invtirarstat || d.invatacar || d.invdanio || d.ejecutarhabinv || d.danohabinv;
+  const d = b.dataset, ref = d.invtirarstat || d.invatacar || d.invdanio || d.ejecutarhabinv || d.danohabinv || d.invlevantarse || d.invsoltarse;
   if(!ref || !bnPuedeGuardar()) return false;
   const inv = (bn.S.invocaciones || []).find(x => x && x.id === ref.split(':')[0]);
   if(!inv){ toast('Esa invocación ya no está'); return true; }
@@ -280,6 +280,23 @@ function bnInvAca(b){
     if(p.cambio) ui.cambio(); else if(p.parry) bnDibujar();
     if(p.aviso) toast(p.aviso);
     bnPublicarInv(inv, p.tirada);
+    return true;
+  }
+  // Levantarse y Soltarse (2026-10-03, comun/inv-acciones.js): las mismas reglas que el personaje y los creeps.
+  if(d.invlevantarse || d.invsoltarse){
+    const ui = bnUi(FichaGuardado.partes(bn.S));
+    if(d.invlevantarse){
+      const x = InvAcciones.levantarse(inv);
+      if(!x) return true;
+      if(x.error){ toast(x.error); return true; }
+      ui.cambio(); toast(x.aviso); return true;
+    }
+    const t = InvAcciones.tiradaSoltarse(inv);
+    if(!t) return true;
+    if(num(inv.nitros) < t.s.no2){ toast(`${inv.nombre}: no le alcanzan los No2 — soltarse cuesta ${t.s.no2}`); return true; }
+    bnPublicarInv(inv, {origen: t.origen, r: t.r});
+    const x = InvAcciones.aplicarSoltarse(inv, t);
+    ui.cambio(); toast(x.error || x.aviso);
     return true;
   }
   // Tanda 5: las habilidades (Ejecutar / Anunciar y la 🎲 segunda tirada), con comun/inv-habilidades.js.
@@ -527,6 +544,7 @@ function bnHooksDueloInvYa(lado){
 const BN_ACCIONES = {
   sigilo: (S, ui) => FichaAcciones.alternarSigilo(S, false, ui),
   levantarse: (S, ui) => FichaAcciones.levantarse(S, false, ui),
+  soltarse: (S, ui) => FichaAcciones.soltarse(S, false, {...ui, registrarTirada: (o, r) => bnPublicar(o, r)}),
   // Consumir: la vida, el estado que deja, sus tiradas y la trampa consumible los resuelve el mapa con las piezas comunes.
   consumir: (S, ui, id) => FichaAcciones.consumir(S, id, false, {...ui,
     fijarHp: v => FichaAcciones.fijarHp(S, v),
@@ -723,7 +741,7 @@ function bnAccionAca(b){
     toast(`${nombre} activado a mano. Revivís con ${fmt(bn.S.hp)} HP.`);
     return true;
   }
-  const accion = b.dataset.sigilo ? 'sigilo' : b.dataset.levantarse ? 'levantarse' : b.dataset.consume ? 'consumir' : '';
+  const accion = b.dataset.sigilo ? 'sigilo' : b.dataset.levantarse ? 'levantarse' : b.dataset.soltarse ? 'soltarse' : b.dataset.consume ? 'consumir' : '';
   if(!accion || !bnPuedeGuardar()) return false;
   BN_ACCIONES[accion](bn.S, bnUi(FichaGuardado.partes(bn.S)), b.dataset.consume);
   return true;

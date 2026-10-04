@@ -442,6 +442,25 @@ function invAtacarSuelto(invId, tipo){
   publicarTiradaInv(InvAcciones.tiradaAtaque(inv, tipo));
   toast(p.aviso);
 }
+// Levantarse y Soltarse de una invocación (2026-10-03, comun/inv-acciones.js): las mismas reglas que el personaje y los creeps.
+function invLevantarse(invId){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  const x = inv && InvAcciones.levantarse(inv);
+  if(!x) return;
+  if(x.error){ toast(x.error); return; }
+  renderInvocaciones();
+  toast(x.aviso);
+}
+function invSoltarse(invId){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  const t = inv && InvAcciones.tiradaSoltarse(inv);
+  if(!t) return;
+  if(num(inv.nitros) < t.s.no2){ toast(`${inv.nombre}: no le alcanzan los No2 — soltarse cuesta ${t.s.no2}`); return; }
+  publicarTiradaInv({origen: t.origen, r: t.r});
+  const x = InvAcciones.aplicarSoltarse(inv, t);
+  renderInvocaciones();
+  toast(x.error || x.aviso);
+}
 function invDanio(invId, sinEfectos, mods){   // sinEfectos: el duelo resuelve los efectos del golpe por su cuenta; mods: lo que suma un ataque con arreglos
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;

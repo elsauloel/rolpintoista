@@ -198,6 +198,17 @@ document.addEventListener('click', e => {
     preguntarTipoAtaqueCreep(sc);
     return;
   }
+  if(b.dataset.soltarcreep){   // trampas de Atrapar (2026-10-03): la tirada una vez, después cobra y, si salió, saca el estado
+    const sc = S.creeps.find(s=>s.id===b.dataset.soltarcreep);
+    const t = sc && CreepAcciones.tiradaSoltarse(sc);
+    if(!t) return;
+    if(num(sc.nitros) < t.s.no2){ toast(`${sc.nombre}: no le alcanzan los No2 — soltarse cuesta ${t.s.no2}`); return; }
+    publicarTiradaCreep({origen: t.origen, r: t.r});
+    const x = CreepAcciones.aplicarSoltarse(sc, t);
+    renderAll();
+    toast(x.error || x.aviso);
+    return;
+  }
   if(b.dataset.levantarcreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.levantarcreep);
     if(!sc) return;

@@ -51,6 +51,21 @@ const CreepAcciones = (() => {
     sc.estados = (sc.estados || []).filter(e => !(e.activo !== false && e.sentado));
     return {aviso: `${sc.nombre} se levantó · −1 No2 · quedan ${fmt(sc.nitros)}`};
   }
+  // Soltarse (2026-10-03): primero la tirada (afuera de cualquier transacción: se tira una sola vez) y después aplicarla (cobra y, si salió,
+  // saca el estado). tiradaSoltarse → {s, r, ok, estId, origen} o null; aplicarSoltarse → {error} o {aviso}.
+  function tiradaSoltarse(sc){
+    const est = Combatiente.estadoSoltable(sc.estados);
+    if(!est) return null;
+    const s = Combatiente.soltarNorm(est.soltar);
+    const t = Combatiente.tiradaSoltarse(est, C().statValor(sc, s.stat), sc.estados);
+    return {...t, estId: est.id, origen: `${sc.nombre} · Soltarse (${est.nombre}) · ${s.etq} contra ${s.dif}`};
+  }
+  function aplicarSoltarse(sc, t){
+    if(num(sc.nitros) < t.s.no2) return {error: `${sc.nombre}: no le alcanzan los No2 — soltarse cuesta ${t.s.no2}`};
+    sc.nitros = num(sc.nitros) - t.s.no2;
+    if(t.ok) sc.estados = (sc.estados || []).filter(e => e.id !== t.estId);
+    return {aviso: `${sc.nombre} ${t.ok ? 'se soltó' : 'no se soltó'} (${t.r ? t.r.total : '—'} contra ${t.s.dif}) · −${fmt(t.s.no2)} No2 · quedan ${fmt(sc.nitros)}`};
+  }
   // Pagar el Parry (siempre 1 No2, solo con un arma de verdad o un escudo). Después: la tirada (parry) y anotar el Parry pendiente.
   function pagarParry(sc){
     if(!C().defensa(sc)) return {error: `${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`};
@@ -300,7 +315,7 @@ const CreepAcciones = (() => {
   }
 
   return {mantenimiento, reclamarMantenimiento,
-    tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
+    tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, tiradaSoltarse, aplicarSoltarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
     costoAtaqueDe, faltanNitros, preguntaSinNitros, alertaSinNitros,
     FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,
     zonaDeHab, cdMod};

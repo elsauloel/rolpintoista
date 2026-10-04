@@ -37,6 +37,7 @@ const EstadosAplicar = (() => {
     // ver BUFFS. Un valor explícito manda sobre el del preset (se resuelve en `componer`).
     if(s.escudoMagico) out.escudoMagico = Math.max(0, Math.round(Number(s.escudoMagico) || 0));
     if(s.sentadoEnCero) out.sentadoEnCero = true;   // «Pierde No2» (Sonic Boom): si llega a 0, queda Sentado
+    if(s.soltar && Combatiente.soltarNorm(s.soltar)) out.soltar = Combatiente.soltarNorm(s.soltar);   // cómo se suelta (trampas de Atrapar)
     return out;
   }
   const esPreset = nombre => !!presetPorNombre(nombre);
@@ -56,7 +57,7 @@ const EstadosAplicar = (() => {
       if(base.escudoMagico) partes.push(`escudo de ${base.escudoMagico}`);
       base.detalle = partes.length ? partes.join(', ') + (base.turnos ? ` durante ${base.turnos} turno(s).` : '.') : '';
     }
-    return {id: id(), activo: true, stacks: 1, hpTurno: 0, stacksTurno: 0, permanente: false, escudoMagico: 0, forzarNitros: '', mods: [], ...base};
+    return {id: id(), activo: true, stacks: 1, hpTurno: 0, stacksTurno: 0, permanente: false, escudoMagico: 0, forzarNitros: '', mods: [], ...base, ...(s.soltar ? {soltar: s.soltar} : {})};
   }
 
   // Inmunidades del que recibe el estado: la regla vive en comun/combatiente.js (la misma para ficha, gm-tools y mapa).

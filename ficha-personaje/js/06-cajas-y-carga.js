@@ -460,6 +460,7 @@ document.addEventListener('click', async e => {
   }
   if(b.dataset.sigilo){ alternarSigilo(); return; }
   if(b.dataset.levantarse){ levantarse(); return; }
+  if(b.dataset.soltarse){ soltarse(); return; }
   if(b.dataset.danohab){ tirarSegundaDeHab(b.dataset.danohab); return; }
   if(b.dataset.ejecutar){ ejecutarHabilidad(b.dataset.ejecutar); return; }
   if(b.id === 'btn-invocar'){
@@ -533,6 +534,8 @@ document.addEventListener('click', async e => {
   }
   if(b.dataset.invatacar){ invAtacar(b.dataset.invatacar); return; }
   if(b.dataset.invdanio){ invDanio(b.dataset.invdanio); return; }
+  if(b.dataset.invlevantarse){ invLevantarse(b.dataset.invlevantarse); return; }
+  if(b.dataset.invsoltarse){ invSoltarse(b.dataset.invsoltarse); return; }
   if(b.dataset.invtirarstat){
     const [invId, statId] = b.dataset.invtirarstat.split(':');
     invTirarStat(invId, statId);

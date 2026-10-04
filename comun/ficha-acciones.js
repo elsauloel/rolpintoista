@@ -72,6 +72,24 @@ const FichaAcciones = (() => {
     ui.toast(`Te levantaste${costo ? ` · -${fmt(costo)} No2` : ''}`);
   }
 
+  /* ---------- Soltarse (2026-10-03): el estado que dejó una trampa de Atrapar dice qué tirar y cuánto cuesta (Combatiente.soltarNorm) ----------
+     Se paga se suelte o no; si la tirada llega a la dificultad, se saca el estado. ui = el de Levantarse + registrarTirada(origen, r). */
+  function soltarse(S, forzar, ui){
+    const est = Combatiente.estadoSoltable(S.efectos);
+    if(!est) return;
+    const s = Combatiente.soltarNorm(est.soltar);
+    if(num(S.nitros) < s.no2 && !forzar){
+      ui.avisarSinNitros(s.no2, 'intentar soltarte', () => soltarse(S, true, ui));
+      return;
+    }
+    S.nitros = num(S.nitros) - (forzar && s.no2 > num(S.nitros) ? gastoNitrosForzado(S, s.no2, 'intentó soltarse') : s.no2);
+    const t = Combatiente.tiradaSoltarse(est, num(FichaCalculo.calcular(S).final[s.stat]), S.efectos);
+    if(t.r && ui.registrarTirada) ui.registrarTirada(`Soltarse (${est.nombre}) · ${s.etq} contra ${s.dif}`, t.r);
+    if(t.ok) S.efectos = S.efectos.filter(e => e !== est);
+    ui.cambio(['efectos', 'nitros']);
+    ui.toast(`${t.ok ? 'Te soltaste' : 'No te soltaste'} (${t.r ? t.r.total : '—'} contra ${s.dif})${s.no2 ? ` · −${fmt(s.no2)} No2` : ''}`);
+  }
+
   /* ---------- La vida: Ankh y estado de muerte (js/02) ----------
      Lo que cambia en el personaje; lo que se ve (el campo de HP, el cartel de "Inconsciente", el aviso) lo pone cada pantalla. */
   // Usa un Ankh: gasta una unidad y revive con el 25 % del HP máximo. Devuelve el nombre del ítem (o null).
@@ -580,6 +598,7 @@ const FichaAcciones = (() => {
     }
     draft.activo = true;
     if(!draft.polaridad) draft.polaridad = 'debuff';
+    if(spec.soltar && Combatiente.soltarNorm(spec.soltar)) draft.soltar = Combatiente.soltarNorm(spec.soltar);   // cómo se suelta (trampas de Atrapar)
     return draft;
   }
   function aplicarEstadoRecibido(S, spec, origen, ui){
@@ -816,7 +835,7 @@ const FichaAcciones = (() => {
     return aplicarRevivirConAnkh(S, key, id);
   }
 
-  return {gastoNitrosForzado, alternarSigilo, levantarse, hpRevivir, revivir,
+  return {gastoNitrosForzado, alternarSigilo, levantarse, soltarse, hpRevivir, revivir,
     tirarSocial, colocarTrampaDeItem, ankhAMano,
     TRAMPA_DANO_RE, avisarZonaAlMapa, colocarTrampaDeHab, colocarZonaDeHab, invocacionDeHab, invocarConHab,
     durAviso, desgastarItem, rompeArmaduraAlAzar, estadoDeSpec, aplicarEstadoRecibido, dueloAplicarEfectoPropio, xDeHab, habDueloDatos,

@@ -86,6 +86,7 @@ const Plantillas = (() => {
     'detectar', 'detectarStat',   // dificultad para detectarla (P145): un número (mapa) o de qué stat de quien la coloca sale (habilidad)
     'estadoHp', 'salvacion', 'efectoManual',   // un estado propio con daño por turno; la tirada para evitarla ({stat, etq, dif, que}); lo que queda a mano
     'muro',   // trampa de muro (2026-10-03): {largo: 3 | 5, turnos} — al dispararse se levanta una pared delante de quien la pisó
+    'soltar',   // cómo se suelta quien quedó agarrado (2026-10-03, Atrapar): {stat, etq, dif, no2} — va con el estado que deja
     'efecto'];   // superficie de efecto (2026-10-03): {area: 'pisador' | 'trampa' | 'flor', radio} — si no dice, la deduce el mapa
   function trampaDesde(t){
     if(!t || typeof t !== 'object') return null;

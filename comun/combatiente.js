@@ -169,6 +169,23 @@ const Combatiente = (() => {
      pasivas, estados), igual para personajes, creeps e invocaciones. `statAtaqueEspecial(tipo)` → el stat ('' si es un ataque normal). */
   const ATAQUE_ESPECIAL = {oportunidad: {stat: 'pdgopor', nombre: 'Ataque de oportunidad'}, contra: {stat: 'pdgcontra', nombre: 'Contraataque'}};
   const statAtaqueEspecial = tipo => (ATAQUE_ESPECIAL[tipo] || {}).stat || '';
+  /* Soltarse (2026-10-03, trampas de Atrapar; pedido del dueño: «que el botón diga exactamente qué tira y cuánto cuesta»): un estado puede
+     traer `soltar: {stat, etq, dif, no2}` (lo pone la trampa que lo dejó). Igual para personajes, invocaciones y creeps: se paga lo que diga
+     (se suelte o no), se tira el stat contra la dificultad y, si llega, se saca el estado. */
+  const SOLTAR_ETQ = {fue: 'Fuerza', agl: 'Agilidad', des: 'Destreza', con: 'Constitución'};
+  function soltarNorm(s){
+    if(!s || !s.stat || !(Number(s.dif) >= 1)) return null;
+    return {stat: String(s.stat), etq: String(s.etq || SOLTAR_ETQ[s.stat] || s.stat).slice(0, 20), dif: Math.round(Number(s.dif)), no2: Math.max(0, Math.round(Number(s.no2) || 0))};
+  }
+  const estadoSoltable = estados => (estados || []).find(e => e && e.activo !== false && soltarNorm(e.soltar)) || null;
+  const textoSoltarse = e => { const s = soltarNorm(e && e.soltar); return s ? `🔓 Soltarse · ${s.etq} contra ${s.dif} · ${s.no2} No2` : ''; };
+  // La tirada (no cobra ni saca nada: eso lo hace cada uno). valor = el stat de quien se suelta. → {s, r, ok}
+  function tiradaSoltarse(e, valor, estados, azar){
+    const s = soltarNorm(e && e.soltar);
+    if(!s) return null;
+    const r = tirarStat(valor, estados, s.stat, azar ? {azar} : undefined);
+    return {s, r, ok: !!r && r.total >= s.dif};
+  }
   // Sentado no puede atacar (regla del dueño, 2026-10-03: igual para personajes, invocaciones y creeps, y para cualquier ataque): se avisa y
   // se deja seguir. Se pregunta al pagar el ataque. → el texto de la pregunta, o '' si no está Sentado. Sin nombre, en segunda persona.
   const preguntaSentado = (estados, nombre) => !(estados || []).some(e => e && e.activo !== false && e.sentado) ? ''
@@ -609,7 +626,7 @@ const Combatiente = (() => {
     return v;
   }
 
-  return {ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, preguntaSentado, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+  return {ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, preguntaSentado, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

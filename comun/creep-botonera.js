@@ -87,6 +87,12 @@ const CreepBotonera = (() => {
       const sinNitrosLev = num(sc.nitros) < 1;
       combate.push({nombre:'🧍 Levantarse · 1 No2', dado:'', soloTexto:true, sinNitros: sinNitrosLev, motivo: `${sinNitrosLev ? 'Sin No2 · ' : ''}Cuesta 1 No2 y saca el estado Sentado`, attr:`data-levantarcreep="${sc.id}"`});
     }
+    // Soltarse (2026-10-03): el estado que dejó una trampa de Atrapar dice qué tira y cuánto cuesta.
+    const soltableCreep = Combatiente.estadoSoltable(sc.estados);
+    if(soltableCreep){
+      const s = Combatiente.soltarNorm(soltableCreep.soltar), sinNitrosSol = num(sc.nitros) < s.no2;
+      combate.push({nombre: Combatiente.textoSoltarse(soltableCreep), dado:'', soloTexto:true, sinNitros: sinNitrosSol, motivo: `${sinNitrosSol ? 'Sin No2 · ' : ''}${soltableCreep.nombre}: tira ${s.etq} contra ${s.dif}; si llega, se suelta. Cuesta ${s.no2} No2 aunque no lo logre`, attr:`data-soltarcreep="${sc.id}"`});
+    }
     // Estados alterados que modifican cada tirada (2026-09-25): el botón se pinta de verde/rojo y dice cuáles (comun/modificadores-tirada.js).
     combate.forEach(f => { f.mt = f.stat ? ModTirada.tile(sc.estados, f.stat) : {clase: '', html: '', titulo: ''}; });
     const tilesCombate = combate.map(f => f.soloTexto ? `

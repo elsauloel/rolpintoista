@@ -104,5 +104,30 @@ const InvAcciones = (() => {
   // El menú «¿Qué ataque es?» de una invocación (el mismo de personajes y creeps: Combatiente.menuTipoAtaqueHtml).
   const menuTipoAtaque = (inv, attr) => Combatiente.menuTipoAtaqueHtml({nombre: inv.nombre, normal: I().costoAtaque(inv), primero: num(inv.ataquesTurno) === 0,
     especial: costoAtaqueDe(inv, 'contra'), especialOpor: costoAtaqueDe(inv, 'oportunidad'), attr, ref: inv.id});
-  return {tirada, tirarStat, dano, ataqueDuelo, pagarAtaque, tiradaAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros, bonoEspecial, costoAtaqueDe, menuTipoAtaque};
+  /* Levantarse (Sentado) y Soltarse (trampas de Atrapar): 2026-10-03, «las reglas de combate aplican a creeps, personajes e invocaciones
+     por igual». Levantarse cuesta lo mismo que a un personaje (FichaCalculo.IT2.nitrosLevantarse). Soltarse: primero la tirada (una sola
+     vez), después aplicarla (cobra y, si salió, saca el estado). → {error} / {aviso}; tiradaSoltarse → {s, r, ok, est, origen} o null. */
+  function levantarse(inv){
+    const est = (inv.estados || []).find(e => e && e.activo !== false && e.sentado);
+    if(!est) return null;
+    const costo = num(FichaCalculo.IT2.nitrosLevantarse);
+    if(num(inv.nitros) < costo) return {error: `${inv.nombre}: no le alcanzan los No2 — levantarse cuesta ${costo}`};
+    inv.nitros = num(inv.nitros) - costo;
+    inv.estados = inv.estados.filter(e => e !== est);
+    return {aviso: `${inv.nombre} se levantó${costo ? ` · −${fmt(costo)} No2` : ''}`};
+  }
+  function tiradaSoltarse(inv){
+    const est = Combatiente.estadoSoltable(inv.estados);
+    if(!est) return null;
+    const s = Combatiente.soltarNorm(est.soltar);
+    const t = Combatiente.tiradaSoltarse(est, I().statValor(inv, s.stat), inv.estados);
+    return {...t, est, origen: `${inv.nombre} · Soltarse (${est.nombre}) · ${s.etq} contra ${s.dif}`};
+  }
+  function aplicarSoltarse(inv, t){
+    if(num(inv.nitros) < t.s.no2) return {error: `${inv.nombre}: no le alcanzan los No2 — soltarse cuesta ${t.s.no2}`};
+    inv.nitros = num(inv.nitros) - t.s.no2;
+    if(t.ok) inv.estados = (inv.estados || []).filter(e => e !== t.est && !(t.est.id && e.id === t.est.id));
+    return {aviso: `${inv.nombre} ${t.ok ? 'se soltó' : 'no se soltó'} (${t.r ? t.r.total : '—'} contra ${t.s.dif}) · −${fmt(t.s.no2)} No2`};
+  }
+  return {levantarse, tiradaSoltarse, aplicarSoltarse, tirada, tirarStat, dano, ataqueDuelo, pagarAtaque, tiradaAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros, bonoEspecial, costoAtaqueDe, menuTipoAtaque};
 })();

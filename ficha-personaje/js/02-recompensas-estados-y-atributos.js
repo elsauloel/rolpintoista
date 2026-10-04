@@ -365,6 +365,7 @@ function alternarSigilo(forzar){ FichaAcciones.alternarSigilo(S, forzar, accione
    El estado Sentado no vence solo; el botón "Levantarse" de la Botonera lo saca y cobra IT2.nitrosLevantarse. */
 const efectoSentado = () => FichaBotonera.efectoSentado(S);   // comun/ficha-botonera.js
 function levantarse(forzar){ FichaAcciones.levantarse(S, forzar, accionesUi); }
+function soltarse(forzar){ FichaAcciones.soltarse(S, forzar, {...accionesUi, registrarTirada: (o, r) => registrarTirada(o, r)}); }   // trampas de Atrapar (2026-10-03)
 // Consumir (comun/ficha-acciones.js): la vida, el estado, las tiradas y la trampa los pone la ficha; redibuja lo que cambió.
 const consumoUi = {
   toast: t => toast(t),

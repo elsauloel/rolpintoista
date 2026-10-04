@@ -439,4 +439,6 @@ traban el movimiento —Inmovilizado, Rengo, Sentado y el estado nuevo **Lento**
 con 50 %) · Reflejos de mangosta (al pisar una trampa, chance de un dodge roll a ciegas: 33 % = 1, siempre = 2,5) · Evasión contra contraataque.
 **Evasión contra contraataque = 2/3 por +1** (dueño: Evasión +1 ≈ Evasión contra oportunidad +2 ≈ Evasión contra contraataque +3). El bonus al
 sobrepeso queda para cuando se defina su penalidad. Propuesta grande de piernas Comunes (29 piezas) en la conversación del 2026-10-04.
+**Pasos gratis = 3 por casillero (dueño, 2026-10-04):** el 75 % de +1 No2 (4 puntos): «no es lo mismo que un No2, pero sigue siendo relevante» (antes 2).
+En Común (bolsa 1,5) solo entra pagado con desventajas y peso; su lugar natural es Buena (bolsa 3) en adelante.
 

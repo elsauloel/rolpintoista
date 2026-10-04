@@ -542,7 +542,8 @@ function actualizarEtiquetaElemento(){
 // Qué es un elemento especial, para el cartel de arriba: el nombre, de quién es, en qué estado está y qué hace. '' si es una forma común.
 function elementoQueEs(e){
   const dueno = nombreMiembro(e.duenoUid), de = esc(/^\(/.test(dueno) ? dueno : `(${dueno})`);
-  const det = txt => txt ? `<div class="que-hace">${esc(String(txt).replace(/\s*⚙[\s\S]*$/, '').slice(0, 260))}</div>` : '';
+  const corto = txt => { const t = String(txt).replace(/\s*⚙[\s\S]*$/, '').trim(); if(t.length <= 480) return t; const c = t.slice(0, 480); return c.slice(0, Math.max(c.lastIndexOf('. ') + 1, 200)) + ' …'; };
+  const det = txt => txt ? `<div class="que-hace">${esc(corto(txt))}</div>` : '';
   if(e.zona){
     const t = num(e.turnos) > 0 && mantenimientoNumero !== null ? Math.max(0, num(e.venceMant) - Math.round(num(mantenimientoNumero))) : 0;
     return `<b>🌫 ZONA · ${esc(e.zonaNombre || 'Efecto persistente')}</b> <span>${de}</span>${t ? ` · <span>quedan ${t} turno${t === 1 ? '' : 's'}</span>` : ''}` +

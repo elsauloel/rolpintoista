@@ -127,7 +127,8 @@ const InvAcciones = (() => {
     if(num(inv.nitros) < t.s.no2) return {error: `${inv.nombre}: no le alcanzan los No2 — soltarse cuesta ${t.s.no2}`};
     inv.nitros = num(inv.nitros) - t.s.no2;
     if(t.ok) inv.estados = (inv.estados || []).filter(e => e !== t.est && !(t.est.id && e.id === t.est.id));
-    return {aviso: `${inv.nombre} ${t.ok ? 'se soltó' : 'no se soltó'} (${t.r ? t.r.total : '—'} contra ${t.s.dif}) · −${fmt(t.s.no2)} No2`};
+    const hundio = Combatiente.hundirSiFalla((inv.estados || []).find(e => e === t.est || (t.est.id && e.id === t.est.id)), t);
+    return {aviso: `${inv.nombre} ${t.ok ? 'se soltó' : 'no se soltó'} (${t.r ? t.r.total : '—'} contra ${t.s.dif}) · −${fmt(t.s.no2)} No2${hundio ? ` · se hundió más: +${t.s.hunde} turno${t.s.hunde === 1 ? '' : 's'}` : ''}`};
   }
   return {levantarse, tiradaSoltarse, aplicarSoltarse, tirada, tirarStat, dano, ataqueDuelo, pagarAtaque, tiradaAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros, bonoEspecial, costoAtaqueDe, menuTipoAtaque};
 })();

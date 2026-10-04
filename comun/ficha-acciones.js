@@ -86,8 +86,9 @@ const FichaAcciones = (() => {
     const t = Combatiente.tiradaSoltarse(est, num(FichaCalculo.calcular(S).final[s.stat]), S.efectos);
     if(t.r && ui.registrarTirada) ui.registrarTirada(`Soltarse (${est.nombre}) · ${s.etq} contra ${s.dif}`, t.r);
     if(t.ok) S.efectos = S.efectos.filter(e => e !== est);
+    const hundio = Combatiente.hundirSiFalla(est, t);
     ui.cambio(['efectos', 'nitros']);
-    ui.toast(`${t.ok ? 'Te soltaste' : 'No te soltaste'} (${t.r ? t.r.total : '—'} contra ${s.dif})${s.no2 ? ` · −${fmt(s.no2)} No2` : ''}`);
+    ui.toast(`${t.ok ? 'Te soltaste' : 'No te soltaste'} (${t.r ? t.r.total : '—'} contra ${s.dif})${s.no2 ? ` · −${fmt(s.no2)} No2` : ''}${hundio ? ` · te hundiste más: +${s.hunde} turno${s.hunde === 1 ? '' : 's'}` : ''}`);
   }
 
   /* ---------- La vida: Ankh y estado de muerte (js/02) ----------

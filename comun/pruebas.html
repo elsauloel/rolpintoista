@@ -1766,6 +1766,17 @@ prueba('Soltarse (trampas de Atrapar): el estado guarda qué tirar y cuánto cue
     inv.estados.length, inv.nitros, Combatiente.estadoSoltable([{nombre: 'Inmovilizado', activo: true}])],
     [{stat: 'fue', etq: 'Fuerza', dif: 6, no2: 2}, '🔓 Soltarse · Fuerza contra 6 · 2 No2', 8, true, true, 3, 0, true, 0, 2, null]);
 });
+prueba('arena movediza: si falla al soltarse, se hunde más (+1 turno), en personajes y creeps; el botón lo dice', () => {
+  const soltar = {stat: 'fue', dif: 99, no2: 1, hunde: 1};
+  const est = EstadosAplicar.componer({nombre: 'Inmovilizado', turnos: 1, soltar});
+  const t = Combatiente.tiradaSoltarse(est, 3, [est]);
+  const hundio = Combatiente.hundirSiFalla(est, t);
+  const sc = CreepCalculo.normalizar({id: 'c', nombre: 'Orco', nivel: 1, fue: 3, nitros: 5, estados: [EstadosAplicar.componer({nombre: 'Inmovilizado', turnos: 1, soltar})]});
+  const tc = CreepAcciones.tiradaSoltarse(sc), x = CreepAcciones.aplicarSoltarse(sc, tc);
+  igual([est.soltar.hunde, t.ok, hundio, est.turnos, Combatiente.textoSoltarse(est), tc.ok, sc.estados[0].turnos, /se hundió más: \+1 turno/.test(x.aviso), sc.nitros,
+    Combatiente.hundirSiFalla({turnos: 1}, {ok: true, s: {hunde: 1}})],
+    [1, false, true, 2, '🔓 Soltarse · Fuerza contra 99 · 1 No2 · si falla, se hunde: +1 turno', false, 2, true, 4, false]);
+});
 prueba('el pop-up de efectos de combate usa la estética del duelo: cabecera, una tarjeta por paso, el veredicto con su color y «Entendido»', () => {
   let cerrado = 0;
   AvisoCombate.mostrar({icono: '🪤', titulo: 'Clementino pisó «Foso con estacas»', pasos: [{titulo: 'Para esquivarla', texto: 'Evasión 5 contra 7: no la evitó'}, 'Sentado'],

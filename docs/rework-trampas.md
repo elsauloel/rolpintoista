@@ -46,3 +46,9 @@ Hoja de trabajo, como `rework-armas.md`: lo que hay, las preguntas, las propuest
 
 **Alcance (dueño, 2026-10-03): por ahora se auditan solamente las trampas del catálogo, las que se compran.** Esas son la base para todo lo demás
 (catálogo del mapa, habilidades de creep, menú «trampa conocida»), que se arma después desde ellas.
+
+**Respuestas del dueño (2026-10-03):**
+- Las **10 familias** ✅ (Púas y cortes · Atrapar · Pegajosa/resbaladiza · Veneno · Gas · Explosiva/derrumbe · Elementales · Runas · Portal · Alarma).
+- **Tamaño:** una casilla, o una flor de radio 1 (7 casillas) como máximo; más grande «es mucho». En línea sí: **línea de 3 o de 4**.
+- **Trampa nueva: el muro.** Al dispararse se levanta una pared impenetrable, para tener que rodear. *(Hay que construir la mecánica: hoy una
+  trampa puede dejar una zona al dispararse, pero no una pared.)*

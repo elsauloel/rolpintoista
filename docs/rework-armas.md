@@ -1178,3 +1178,12 @@ Pajaritos 50 % (85). **Para la Buena:** el diseño propuesto (mitad con Demora, 
 
 Pajaritos en 6 (un tercio), Aturdir en 2 (20 %), Rompe armadura solo en la Estrella del alba. Pasan a Rara: **Martillo**, **Maza de guardia**
 (3 dados) y **Martillo de cabeza plana** (2 dados · Bloqueo +2).
+
+**Los tres efectos del Tipo 10 (dueño, 2026-10-03):** Demora, Derribar y Pajaritos son la identidad del contundente; «quizás parejo». Conteo:
+- Común hoy: Demora 12 · Derribar 3 · Pajaritos 3 · ninguno 7 (más un Rengo). **Propuesta:** Demora 8 · Pajaritos 7 · Derribar 6 · ninguno 3.
+  Cambios: Martillo del herrero de pueblo → Parry +1 · Pajaritos 33 %; Pata de mesa → +2 · Iniciativa −1 · Pajaritos 33 %; Porra de sereno →
+  Bloqueo +1 · Pajaritos 33 %; Bastón de monje → + Pajaritos 25 %; Llave inglesa → Rengo 20 % · Derribar 25 %; Rebenque emplomado →
+  Iniciativa +1 · Derribar 25 %; Bastón de caminante → 2 manos · +1 · Bloqueo +1 · Derribar 25 %; Martillo de cantero → + Derribar 20 %.
+- Buena propuesta: Demora 9 · Pajaritos 6 · Derribar 2. **Propuesta pareja:** Demora 6 · Pajaritos 6 · Derribar 6 (con Aturdir en 2 y Rompe
+  armadura en 1). Cambios: Martillo de bola → Derribar 25 %; Maza del sargento → Derribar 50 %; Martillo de herrero → Derribar 25 %; Martillo
+  ergonómico → Bloqueo +2 · Derribar 25 % · resistente.

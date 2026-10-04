@@ -1125,3 +1125,22 @@ de cantero → +1 · muy resistente.
 el «⚠️ garrote de hueso» quedó como Garrote de hueso. **Hachas sin Crítico potente** (dueño): Hachuela de cocina → Rompe armadura 33 % · muy
 resistente (80); Hacha afilada a la piedra → Sangrado de 3 stacks 50 % (70); Hacha del campeón de hachazos → 1 dado + 1 amplificado · Derribar 25 %
 (130). Sigue: T10 Buena.
+
+### T10 Buena calidad — lo que hay hoy y diagnóstico (2026-10-03)
+| Arma | Lo que hace · precio hoy → libre · rinde como · qué hacer |
+|---|---|
+| Garrote (viene de Común) | 2 dados · 140 → 140 · Buena · queda |
+| Maza de guerra | 2 dados · 150 → 140 · Buena · **idéntica** al Garrote: rehacer |
+| Estrella del alba | +1 · Rompe armadura 33 % · 85 → 90 · Buena · queda (la maza con pinchos: la única que rompe armadura) |
+| Martillo de herrero | +1 · Parry +1 · Bloqueo +1 · Demora 25 % · 120 → 140 · Buena · queda |
+| Martillo ergonómico | Bloqueo +3 · 130 → 100 · Buena · queda |
+| ⚠️ Martillo de bola (viene de Común) | 2 dados · Bloqueo +1 · 170 · apenas Rara · a dos manos entra en Buena |
+| Martillo de cabeza plana | 2 dados · Bloqueo +2 · 135 → 200 · Rara · rehacer o a Rara |
+| Martillo | 3 dados · 100 → 350 · Rara · a Rara |
+| Maza de guardia | 3 dados · 90 → 350 · Rara · a Rara |
+| Báculo de batalla | 2 dados · Bloqueo +1 · Alcance +1 con una mano · 140 → 350 · Rara · **tres idénticos**; un báculo es a dos manos |
+| Báculo del Sumo Profeta | igual · rehacer |
+| Báculo del inquisidor | igual · rehacer |
+
+**La cuenta clave del Tipo 10:** 2 dados de d10 ya rinden 10,6 (el techo de Buena es 11). Un arma Buena de 2 dados **a una mano no tiene lugar
+para nada más**; a dos manos le entra una cosa chica (Demora 25 %, Bloqueo +1). El resto de la Buena es **1 dado con varias cosas**.

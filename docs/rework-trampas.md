@@ -76,4 +76,4 @@ línea verde de la Mesa dice cuántas volvieron y cuáles se rompieron (`TokensA
 - **Disparo:** una casilla · flor de 7 · línea (la línea **puede ser más larga que 4**: se ve caso por caso).
 - **Efecto:** el foso, solo a quien lo pisó; el piso de púas y las cuchillas, a todos los que estén encima.
 - **La Común (referencia de la familia): Foso con estacas** — disparo 1 casilla · efecto solo quien lo pisa · 2d6 de daño (menos su Defensa) ·
-  queda Sentado · **Evasión 6** evita caer (recibe el daño, no queda Sentado) · detectarla: 8 · **30**.
+  queda Sentado · **Evasión 7** evita caer (recibe el daño, no queda Sentado) · detectarla: 8 · **30**. (El dueño corrigió 6 → 7.)

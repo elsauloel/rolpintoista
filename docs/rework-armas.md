@@ -1152,7 +1152,7 @@ Pajaritos en la Común (dueño, 2026-10-03): Cachiporra → Pajaritos 25 % (75);
 Pajaritos 50 % (85). **Para la Buena:** el diseño propuesto (mitad con Demora, Aturdir en 2–3 bajo, báculos a dos manos con Alcance) ✅ y
 **Pajaritos en por lo menos un tercio**, con porcentajes según el resto de los efectos.
 
-### T10 Buena calidad — propuesta v1: 18 armas (2026-10-03, ⬜ a revisar por el dueño)
+### T10 Buena calidad — propuesta v1: 18 armas (2026-10-03, ✅ aprobada y cargada con el reparto parejo de abajo)
 | Arma | Lo que hace · precio |
 |---|---|
 | **Con Demora** | |
@@ -1187,3 +1187,7 @@ Pajaritos en 6 (un tercio), Aturdir en 2 (20 %), Rompe armadura solo en la Estre
 - Buena propuesta: Demora 9 · Pajaritos 6 · Derribar 2. **Propuesta pareja:** Demora 6 · Pajaritos 6 · Derribar 6 (con Aturdir en 2 y Rompe
   armadura en 1). Cambios: Martillo de bola → Derribar 25 %; Maza del sargento → Derribar 50 %; Martillo de herrero → Derribar 25 %; Martillo
   ergonómico → Bloqueo +2 · Derribar 25 % · resistente.
+
+**T10 Común y Buena con los tres efectos parejos (cargado, 2026-10-03):** Común Demora 8 · Pajaritos 7 · Derribar 6 · ninguno 3; Buena Demora 6 ·
+Pajaritos 6 · Derribar 6 (Aturdir en 2, Rompe armadura en 1). Martillo, Maza de guardia y Martillo de cabeza plana pasaron a Rara; «⚠️ Martillo de
+bola» quedó como Martillo de bola (a dos manos). «Detalles técnicos» de Derribar ahora dice que levantarse cuesta 1 No2. Sigue: T10 Raro.

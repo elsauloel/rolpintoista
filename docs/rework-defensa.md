@@ -270,3 +270,6 @@ que exista la mecánica, o esperan?
 
 **Resistencias elementales y Sigilo: construidos (2026-10-04)** — ver `comun/CLAUDE.md`. Las piezas con Res. fuego / hielo / … y Sigilo +N ya
 funcionan solas (no van «✋ a mano»). Probado en vivo: Llamarada contra un creep con Res. fuego 2 → «2d6 = 9 − Res. fuego 2 → 7 de daño directo».
+
+**Herramienta de diseño nueva (dueño, 2026-10-04): «Indestructible»** — en armaduras Raras (muy escaso), Excepcionales (infrecuente) y Legendarias
+(libre). *(A definir: si también es inmune a la Armadura rota o solo no se rompe nunca; y cuánto pesa en la calculadora.)*

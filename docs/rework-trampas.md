@@ -149,3 +149,19 @@ Reemplazan a las 72 de antes (24 × menor/normal/mayor). Común / Buena / Rara p
 | **Pilar de piedra** · C · 20 | 1 casilla. Levanta un pilar justo delante de quien la pisa, por 4 turnos. Detectarla 8. |
 | **Muro de piedra** · B · 45 | 1 casilla. Levanta un muro de 3 casillas justo delante de quien la pisa, por 4 turnos. Detectarla 10. |
 | **Muralla repentina** · R · 75 | 1 casilla. Levanta un muro de 5 casillas justo delante de quien la pisa, por 5 turnos. Detectarla 12. |
+
+## Revisión del dueño (2026-10-04, segunda tanda)
+- **Cómo se ven ✅ (hecho):** el equipo de quien la pone ve **dorado** donde se pisa (superficie de disparo) y **celeste** hasta donde llega el
+  efecto si es más grande. **Detonada:** roja hasta el próximo Mantenimiento y después desaparece (la borra el GM en el Mantenimiento; las que
+  quedan como efecto persistente se van con sus turnos).
+- **Zafar de la Trampa de oso y los cepos: 1 No2 ✅ (hecho).**
+- **Efecto persistente ✅ (hecho):** Aceite, Brea, Cola de carpintero, Resina, Arena movediza, Gas adormecedor, Gas somnífero y Nube de veneno
+  quedan **3 turnos**; en cada Mantenimiento, a quien siga encima se le **renueva** el efecto con su tirada para resistirlo (lo que ya tenía no se
+  le saca), y quien entre también lo sufre. Los gases pasan a dispararse en las 7 casillas (la zona queda sobre la trampa). **La Bomba de esporas
+  no es persistente.** Una dificultad fija de zona se pasa llegando a ella (como la salvación de una trampa).
+- **Dardos envenenados:** dilema — si el daño no pasa la Defensa, no tiene sentido que envenene. Opciones: tirada de Evasión y rango de crítico
+  2 (como un ataque), u otra vuelta. Y la «línea de 3» es la superficie de disparo; el efecto, solo a quien la pisó. *(En discusión.)*
+- **«Tirarse al piso» (explosivas):** al dueño no le cierra; se explica y se debate. *(En discusión.)*
+- **Idea a futuro (consumibles):** métodos para que los jugadores accedan a ítems al azar (como el drop de los creeps) para probarlos, y que
+  después estén accesibles en el catálogo. La escasez de las tiendas tiene que poder dejar a los jugadores con oro que no mejora su equipo
+  (el vendedor no tiene nada mejor): ahí van a los consumibles.

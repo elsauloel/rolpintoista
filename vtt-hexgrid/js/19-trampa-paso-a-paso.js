@@ -277,7 +277,7 @@ async function trampaPasoEstado(id){
   }catch(err){ console.error('No se pudo aplicar el estado de la trampa:', err); }
   let texto = `${spec ? EstadosAplicar.texto(spec) : 'un estado'}${que}`;
   const suelta = spec && !inmune ? Combatiente.textoSoltarse(spec) : '';
-  if(suelta) texto += ` · Para salir, en la Botonera: ${suelta}`;
+  if(suelta) texto += ` · Para salir, ${dt.creep ? 'en sus Acciones' : 'en la Botonera'}: ${suelta}`;
   const sig = {...dt, pasos: [...(dt.pasos || []), {titulo: 'Lo que le deja', texto}]};
   sig.fase = trampaFaseSiguiente(sig, 'estado');
   await trampaGuardar(id, sig);

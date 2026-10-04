@@ -20,7 +20,7 @@ rayo en cadena, creeps privados) · `11-botonera-nueva` (la Botonera de la ficha
 `12-acciones-nuevas` (Acciones nuevas de un creep ⚗) · `13-tokens-portal-duelo` (botón 🎭, portal, zonas de habilidad, duelo,
 hechizos de área, dodge, muerte) · `14-herramientas-y-arranque` (caja de herramientas, bitácora, Mesa y el arranque) ·
 `15-ficha-lite` (la ficha lite, 2026-10-02: va después del arranque porque solo define funciones y escuchas) · `16-momentos` · `17-oportunidad` ·
-`18-ventanas-gm` (las ventanas del GM de fin de combate, 2026-10-02, A6a).
+`18-ventanas-gm` (las ventanas del GM de fin de combate, 2026-10-02, A6a) · `19-trampa-paso-a-paso` (caer en una trampa, 2026-10-04).
 **Es el mismo programa de antes, en el mismo orden**: comparten las variables globales. Cuidados (los mismos que la ficha): una
 línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar lo de su archivo o de los anteriores — el arranque
 (`iniciar()`) está al final de `14-…`; cada archivo lleva su `?v=` en `mapa.html` y se sube solo el del que cambia. Para buscar algo,
@@ -1226,7 +1226,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   **Nombres (dueño, 2026-10-02): la esquina es «la Crónica»** (siempre el mismo lugar y la misma tarjeta) **y el cartel del centro para
   quien le pasó algo es «el Aviso»** (`momentoAvisoCentro`, `datos.paraUid`; con `datos.aviso: true` le llega aunque lo haya publicado su
   propia pantalla). Lo que la mesa tenga que enterarse va por `momentoAbrir`, no por un cartel propio.
-- **Trampas automáticas (2026-10-02, regla del dueño: "las que puedan ser full automáticas, mejor, pero siempre anunciando")**:
+- **Trampas automáticas (2026-10-02, regla del dueño: "las que puedan ser full automáticas, mejor, pero siempre anunciando"; desde el 2026-10-04, paso a paso con las tiradas de la víctima: ver «Caer en una trampa, paso a paso», más abajo)**:
   `trampaAplicarEfectos(t, el)` en `js/08`, para cada afectado: **la salvación** (`salva` = {stat, etq, dif, que} **adentro del JSON de
   `trampaEstado`**, así no hizo falta un campo ni reglas nuevas; la tira el mapa con el stat de quien la pisó y la publica en la Mesa;
   llegar a la dificultad alcanza; `que`: 'todo' la evita entera, 'efecto' evita el estado, 'mitad' la mitad del daño), **el daño** (una
@@ -1359,3 +1359,14 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
 - **Demora en el duelo** (2026-10-03): `dueloDemora(tokenId)` (js/13) baja al golpeado 1 lugar en `mapa/iniciativa` (como el ▼ del GM, el turno sigue con quien lo tenía; `guardarIniciativa` ahora devuelve si pudo). A mano si es su turno, si ya actuó y quedaría después del que tiene el turno, o si no está en el orden.
 
 - **Trampa de muro** (2026-10-03, pedido del dueño): una trampa con `muro` adentro del JSON de `trampaEstado` ({largo: 3 | 5, turnos}; `TokensAuto.muroNorm`) levanta al dispararse una forma Sólida y fijada **delante de quien la pisó**, según hacia dónde caminaba (`trampaPendiente.desde`, js/06): 3 = el frente y las dos diagonales de adelante, 5 = además los costados (`trampaCeldasMuro`, `trampaLevantarMuro`, js/08). Se va sola a los turnos (4 si no dice); deja libres las casillas con un token o ya sólidas. Sin campos ni reglas nuevas.
+
+- **Caer en una trampa, paso a paso** (2026-10-04, pedido del dueño: «con su momento para cada tirada y su anuncio de cada resultado»; «que lo
+  tire la víctima»; `js/19-trampa-paso-a-paso.js`): al dispararse, `trampaAplicarEfectos` (js/08) ya no resuelve nada: crea un momento por
+  afectado (`trampaMomentoNuevo`, tipo `trampa`, `datos.fase` = salva → dano → estado → fin). Lo resuelve la pantalla de quien maneja a la
+  víctima (`trampaMeToca`: su dueño, el GM con 🎮 el control, el GM para un creep) en el cuadro del duelo (`AvisoCombate.mostrar` con `clave`):
+  «🎲 Tirar Evasión (fórmula)» → los dados ruedan y recién quietos se anuncia («Evasión 3 contra 7 → no la esquivó»); «🎲 Tirar el daño» → se
+  aplica y se anuncia (Defensa, escudo, Invulnerable; sin la vida que queda); lo que le deja se aplica solo y dice cómo soltarse; al final el
+  cartel grande y «Entendido». Cada paso se escribe en el momento (`datos.pasos`, `datos.lineas`) y el resto lo sigue en la Crónica renglón por
+  renglón. Un paso se toma con una transacción (`datos.tirando`). Cerrar el cuadro sin terminar deja la tarjeta en la Crónica con «🪤 Seguir»;
+  el GM puede resolver por un jugador que no está con «🎲 Tirar por él». En una trampa de área, cada afectado tira su propio daño. Sin reglas
+  nuevas (`momentos.datos` es libre). Probado en vivo (creep, personaje ajeno con «Tirar por él», cerrar y «Seguir»).

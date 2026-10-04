@@ -83,7 +83,7 @@ async function mesaPublicar(origen, r){
   const ventaja = r.ventaja && Array.isArray(r.ventaja.rolls)
     ? {rolls: r.ventaja.rolls.slice(0, 100).map(num), total: num(r.ventaja.total), elegido: num(r.ventaja.elegido)} : null;
   // Reglas viejas (no conocen "ventaja", "estados", "estilo" o "texto"): se reintenta quitando campos de a uno, la tirada sale igual.
-  const extras = [['texto', texto], ['estilo', estilo], ['estados', estados.length ? estados : null], ['ventaja', ventaja], ['destacar', r.destacar === 'max' ? 'max' : ''], ['ficha', ficha]].filter(x => x[1]);   // destacar: 'max' = los dados 3D hacen brillar el más alto (crítico)
+  const extras = [['texto', texto], ['estilo', estilo], ['estados', estados.length ? estados : null], ['ventaja', ventaja], ['destacar', r.destacar === 'max' || /^idx:\d{1,2}(,\d{1,2}){0,19}$/.test(String(r.destacar || '')) ? r.destacar : ''], ['ficha', ficha]].filter(x => x[1]);   // destacar: 'max' = los dados 3D hacen brillar el más alto (crítico); 'idx:0,2' = esos dados (los efectos que funcionaron, 2026-10-04)
   const intentos = [];
   for(let n = extras.length; n >= 0; n--) intentos.push({...doc, ...Object.fromEntries(extras.slice(0, n))});
   let err = null;

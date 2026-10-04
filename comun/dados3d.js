@@ -223,7 +223,8 @@ function dadosNotacion(formula, rolls){
 
 /* Destacar el dado más alto (2026-09-26, pedido del dueño, primero para los d20 del crítico; sirve para cualquier tirada de varios dados donde importa el mejor):
    cuando los dados quedan quietos, el más alto se agranda, sube hacia la cámara, brilla y suelta ondas concéntricas. Todo es opcional: si algo falla, los dados
-   ruedan igual. Se pide con `destacar: 'max'` en la tirada (campo de la Mesa). */
+   ruedan igual. Se pide con `destacar: 'max'` en la tirada (campo de la Mesa); con `destacar: 'idx:0,2'`, esos dados (2026-10-04: los efectos de un arma
+   que funcionaron brillan igual que el d20 del crítico). */
 function dadosEstilosOnda(){
   if(document.getElementById('dados3d-css')) return;
   const st = document.createElement('style');
@@ -233,17 +234,24 @@ function dadosEstilosOnda(){
   document.head.appendChild(st);
 }
 
-function dadosDestacarMayor(c, notacion){
+// `cual`: 'max' (el más alto, el crítico) o 'idx:0,2' (esos dados, en el orden de la tirada: los efectos de un arma que funcionaron, 2026-10-04).
+function dadosDestacar(c, notacion, cual){
   const valores = String(notacion).split('@')[1];
   if(!valores) return;
   const vals = valores.split(',').map(v => parseInt(v, 10)).filter(v => Number.isFinite(v));
   const lista = c.caja.diceList || [];
   if(!vals.length || lista.length < vals.length) return;
   const nuevos = lista.slice(-vals.length);
-  const die = nuevos[vals.indexOf(Math.max(...vals))];
-  if(!die || !die.position || !die.scale) return;
+  const idx = cual === 'max' ? [vals.indexOf(Math.max(...vals))] : String(cual).replace(/^idx:/, '').split(',').map(n => parseInt(n, 10)).filter(n => n >= 0 && n < nuevos.length);
+  if(!idx.length) return;
   dadosEstilosOnda();
   if(c.destacado) c.destacado.cancelar();
+  const cancelar = idx.map(i => dadosDestacarDado(c, nuevos[i])).filter(Boolean);
+  c.destacado = {cancelar: () => cancelar.forEach(f => f())};
+}
+const dadosDestacarMayor = (c, notacion) => dadosDestacar(c, notacion, 'max');
+function dadosDestacarDado(c, die){
+  if(!die || !die.position || !die.scale) return null;
   // Materiales propios (los de la librería se comparten entre dados del mismo tipo).
   const orig = die.material;
   const mats = (Array.isArray(orig) ? orig : [orig]).map(m => (m && m.clone ? m.clone() : m));
@@ -262,7 +270,6 @@ function dadosDestacarMayor(c, notacion){
   let vivo = true;
   const t0 = performance.now();
   const fin = () => { vivo = false; centro.remove(); };
-  c.destacado = {cancelar: fin};
   const paso = ahora => {
     if(!vivo) return;
     const k = Math.min(1, (ahora - t0) / 800), c1 = 1.70158, c3 = c1 + 1;
@@ -275,6 +282,7 @@ function dadosDestacarMayor(c, notacion){
     if(ahora - t0 < DADOS_QUIETOS_MS - 300) requestAnimationFrame(paso); else fin();
   };
   requestAnimationFrame(paso);
+  return fin;
 }
 
 async function dadosTirar(notacion, estilo, opts){
@@ -293,7 +301,7 @@ async function dadosTirar(notacion, estilo, opts){
     const enMesa = (c.caja.diceList || []).length;
     if(c.pendientes === 1 && enMesa > DADOS_EN_MESA_MAX - DADOS_MAX) c.caja.clearDice();
     await c.caja.add(notacion);
-    if(opts && opts.destacar === 'max'){ try{ dadosDestacarMayor(c, notacion); }catch(err){ console.error('Dados 3D: no se pudo destacar el más alto', err); } }
+    if(opts && opts.destacar){ try{ dadosDestacar(c, notacion, opts.destacar); }catch(err){ console.error('Dados 3D: no se pudo destacar el dado', err); } }
   }catch(err){
     console.error('Dados 3D:', err);
   }finally{

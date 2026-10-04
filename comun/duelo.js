@@ -143,6 +143,11 @@ const Duelo = (() => {
 .duelo-ef-tablero .no{color:#9aa4bd;font-weight:700}
 .duelo-dado{display:inline-block;min-width:28px;text-align:center;font-size:18px;padding:2px 6px;border-radius:8px;background:#1d2a4a;border:1px solid #5aa7e8;color:#fff}
 .duelo-dado.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both}
+.duelo-dado.ok{font-size:26px;min-width:40px;padding:4px 8px;background:radial-gradient(circle at 50% 35%,#7a5a12,#3d2c08);border:2px solid #ffd25a;color:#fff6d8;box-shadow:0 0 14px rgba(255,190,60,.75);animation:duelo-brillo 1.4s ease-in-out infinite}
+.duelo-dado.ok.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both,duelo-brillo 1.4s ease-in-out .55s infinite}
+.duelo-funciono{font-size:15px;letter-spacing:.03em;text-shadow:0 0 10px rgba(79,206,124,.7)}
+.duelo-funciono.nuevo{display:inline-block;animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) .15s both}
+@keyframes duelo-brillo{0%,100%{box-shadow:0 0 8px rgba(255,190,60,.55)}50%{box-shadow:0 0 22px rgba(255,190,60,1),0 0 4px #fff inset}}
 .duelo-danobox{margin-top:10px;text-align:center;border-radius:12px;padding:14px;background:rgba(0,0,0,.25);border:1px solid #39435c}
 .duelo-danobox.crit{border-color:#ff5a5a;background:radial-gradient(circle at 50% 30%,rgba(120,20,20,.55),rgba(40,8,8,.6))}
 .duelo-danonum{font-size:96px;font-weight:900;line-height:1;animation:duelo-num .6s ease-out both}
@@ -811,7 +816,7 @@ const Duelo = (() => {
       m.efectos = m.efectos.map((e, k) => k === i ? ef : e);
       cerrarSiListo(m);
       tx.update(ref, cambiosDe(m));
-      if(!siempreEf(ef)) publicar = {origen: `${m.atacante.nombre} · ${ef.nombre} ${pctEf(ef)}%`, r: {formula: `1d${ef.caras}`, rolls: [r.dado], mod: 0, total: r.dado}};
+      if(!siempreEf(ef)) publicar = {origen: `${m.atacante.nombre} · ${ef.nombre} ${pctEf(ef)}%`, r: {formula: `1d${ef.caras}`, rolls: [r.dado], mod: 0, total: r.dado, ...(r.exito ? {destacar: 'idx:0'} : {})}};
       anuncio = r.exito ? `✔ ${ef.nombre}${siempreEf(ef) ? '' : ' (' + pctEf(ef) + '%)'} de ${m.atacante.nombre} sobre ${m.defensor.nombre}: ${siempreEf(ef) ? '' : 'salió ' + r.dado + ' → '}¡FUNCIONÓ!${r.extra ? ' · ' + ef.dado + ' = ' + r.extra.total : ''}`
         : `✘ ${ef.nombre} (${pctEf(ef)}%) de ${m.atacante.nombre} sobre ${m.defensor.nombre}: salió ${r.dado} → no funcionó`;
     });
@@ -838,7 +843,7 @@ const Duelo = (() => {
         if(!siempreEf(ef)){
           r.dado = 1 + Math.floor(Math.random() * ef.caras);
           r.exito = r.dado >= ef.caras - ef.exitos + 1;
-          dados.push({caras: ef.caras, dado: r.dado});
+          dados.push({caras: ef.caras, dado: r.dado, exito: r.exito});
         }
         if(r.exito && ef.dado && typeof tirarDados === 'function'){
           const x = tirarDados(ef.dado);
@@ -851,7 +856,10 @@ const Duelo = (() => {
       if(!partes.length) return;
       cerrarSiListo(m);
       tx.update(ref, cambiosDe(m));
-      if(dados.length) publicar = {origen: `${m.atacante.nombre} · Efectos del golpe`, r: {formula: dados.map(x => `1d${x.caras}`).join('+'), rolls: dados.map(x => x.dado), mod: 0, total: dados.reduce((a, x) => a + x.dado, 0)}};
+      // Los dados que funcionaron brillan en 3D como el d20 del crítico (2026-10-04, dueño): `destacar: 'idx:…'`.
+      const ok = dados.map((x, k) => x.exito ? k : -1).filter(k => k >= 0);
+      if(dados.length) publicar = {origen: `${m.atacante.nombre} · Efectos del golpe`, r: {formula: dados.map(x => `1d${x.caras}`).join('+'), rolls: dados.map(x => x.dado), mod: 0, total: dados.reduce((a, x) => a + x.dado, 0),
+        ...(ok.length ? {destacar: 'idx:' + ok.join(',')} : {})}};
       anuncio = `🎲 Efectos de ${m.atacante.nombre} sobre ${m.defensor.nombre}: ${partes.join(' · ')}`;
     });
     if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
@@ -1419,7 +1427,8 @@ const Duelo = (() => {
       if(ef.res) revelado[clave] = true;
       const desde = ef.caras - ef.exitos + 1;
       const res = ef.omitido ? `<span class="no">no entra</span>` : !ef.res ? '<span class="espera">—</span>'
-        : `<b class="duelo-dado${nuevo ? ' nuevo' : ''}">${_fmt(ef.res.dado)}</b> <span class="${ef.res.exito ? 'ok' : 'no'}">${ef.res.exito ? '✔ funcionó' : '✘ no funcionó'}</span>`;
+        : ef.res.exito ? `<b class="duelo-dado ok${nuevo ? ' nuevo' : ''}">${_fmt(ef.res.dado)}</b> <span class="ok duelo-funciono${nuevo ? ' nuevo' : ''}">¡FUNCIONÓ!</span>`
+        : `<b class="duelo-dado${nuevo ? ' nuevo' : ''}">${_fmt(ef.res.dado)}</b> <span class="no">✘ no funcionó</span>`;
       return `<tr><td>🎲 d${_fmt(ef.caras)}</td><td><b>${_esc(ef.nombre)}</b> <span class="hint">${pctEf(ef)} %</span></td><td>${desde === ef.caras ? _fmt(desde) : `${_fmt(desde)}–${_fmt(ef.caras)}`}</td><td>${res}</td></tr>`;
     };
     const tablero = conDado.length ? `<div class="duelo-ef duelo-ef-tablero"><table><thead><tr><th>Dado</th><th>Efecto</th><th>Funciona con</th><th>Salió</th></tr></thead><tbody>${conDado.map(fila).join('')}</tbody></table>

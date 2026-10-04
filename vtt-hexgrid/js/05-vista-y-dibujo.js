@@ -1055,6 +1055,7 @@ function dibujar(){
 
   if(dibujarEfectosTeleport()) animando = true;
   if(typeof dibujarEfectosRayo === 'function' && dibujarEfectosRayo()) animando = true;   // la Descarga que salta (js/19)
+  if(typeof dibujarConfusionNumeros === 'function') dibujarConfusionNumeros();   // el objetivo al azar de la Confusión (js/20)
 
   // Mientras se arrastra un token en combate, una esferita con los Nitros que le quedarían al llegar a donde está el
   // mouse queda pegada al token (verde; en magenta si se pasa) — no depende del anillo del HUD (2026-09-24).

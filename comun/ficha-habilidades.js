@@ -41,7 +41,7 @@ const FichaHabilidades = (() => {
   // (equipoEstadoPreset), para poder mostrar un nombre propio sin perder la mecánica real del preset.
   const FLAGS_ESPECIALES = ['esCC', 'esVeneno', 'esSangrado', 'esQuemadura', 'afortunado', 'invulnerable',
     'inmunidadCC', 'sangrePura', 'coagulacionExtrema', 'blindado', 'espinas', 'mitadPdgEva',
-    'lisiado', 'paralisis', 'silencio', 'esEscarcha', 'inmovilizado', 'rengo', 'cansado', 'exhausto', 'hypeado', 'sentado',
+    'lisiado', 'paralisis', 'silencio', 'confusion', 'esEscarcha', 'inmovilizado', 'rengo', 'cansado', 'exhausto', 'hypeado', 'sentado',
     'armaduraRota', 'escudoMagico', 'excedenteVida', 'forzarNitros'];
   function flagsDePreset(presets, nombrePreset){
     const p = presetPorNombre(presets, (nombrePreset || '').trim());

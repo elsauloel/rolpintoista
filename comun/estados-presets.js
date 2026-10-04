@@ -41,9 +41,12 @@ const ESTADOS_PRESET = [
   {nombre:'Sangrado', polaridad:'debuff', stacks:2, turnos:0, hpTurno:-1, stacksTurno:0, permanente:true, esSangrado:true,
     detalle:'Pierde HP por turno. Si se lo vuelven a aplicar mientras ya lo tiene, no se duplica: suma +1 al daño por turno.'},
   // Quemadura (2026-10-04, dueño: «como un Sangrado que se resiste con resistencia a fuego»): 2 de daño por turno, 3 turnos; si lo vuelven a
-  // quemar, +1 al daño por turno y vuelve a los turnos del nuevo. La Res. fuego le resta a cada turno (Combatiente.pasarTurnoEstados).
+  // quemar, solo vuelven a contar los turnos (no sube, para que no sea igual al Sangrado). La Res. fuego le resta a cada turno.
   {nombre:'Quemadura', polaridad:'debuff', stacks:2, turnos:3, hpTurno:-1, stacksTurno:0, esQuemadura:true,
-    detalle:'Arde: pierde 2 HP por turno, 3 turnos. Si lo vuelven a quemar, +1 al daño por turno y vuelven a contar los turnos. ⚙ Automatizado: su Res. fuego le resta a cada turno.'},
+    detalle:'Arde: pierde 2 HP por turno, 3 turnos. Si lo vuelven a quemar, vuelven a contar los turnos (no se suma). ⚙ Automatizado: su Res. fuego le resta a cada turno.'},
+  // Confusión (2026-10-04, dueño): afecta a quién elige como objetivo de una acción hostil; las defensas no. ⚙ La tira el mapa (js/20).
+  {nombre:'Confusión', polaridad:'debuff', turnos:2, confusion:true, esCC:true,
+    detalle:'Confundido: antes de su primera acción de cada turno (moverse incluido) tira 1d4 — 1 el GM decide qué hace, 2 pierde el turno, 3 objetivo al azar entre los que ve (toda acción hostil del turno va contra él), 4 actúa normal. El resultado vale para todo el turno. Las defensas no se tocan. ⚙ Automatizado en el mapa: la tirada aparece sola.'},
   {nombre:'Lisiado', polaridad:'debuff', turnos:3, lisiado:true, esCC:true,
     detalle:'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},
   {nombre:'Inmovilizado', polaridad:'debuff', turnos:3, inmovilizado:true, esCC:true,

@@ -137,7 +137,7 @@ const SelectorEstados = (() => {
     const e = r.estado;
     if(r.que === 'acumulado'){
       if(e.esEscarcha) return `${e.nombre} ×${e.stacks} (−${e.stacks} No2 máx.)`;
-      if(e.esSangrado || e.esQuemadura) return `${e.nombre} +1 al daño por turno (${fmt(Math.abs(num(e[campoHp])) * num(e.stacks))} ahora)`;
+      if(e.esSangrado) return `${e.nombre} +1 al daño por turno (${fmt(Math.abs(num(e[campoHp])) * num(e.stacks))} ahora)`;
       return `${e.nombre} ×${e.stacks}`;
     }
     return r.que === 'renovado' ? `${e.nombre} renovado (ya lo tenía)` : `${e.nombre} activado`;

@@ -333,10 +333,10 @@ const Combatiente = (() => {
     if(!clave) return null;
     const ya = (estados || []).find(e => e[clave] && e.nombre === nuevo.nombre);
     if(!ya) return null;
-    ya.stacks = Math.max(1, n(ya.stacks) || 1) + 1;
+    if(clave !== 'esQuemadura') ya.stacks = Math.max(1, n(ya.stacks) || 1) + 1;   // la Quemadura no sube (dueño, 2026-10-04: identidad propia)
     ya.activo = true;
     if(clave === 'esEscarcha') ya.turnos = Math.max(n(ya.turnos), n(nuevo.turnos));
-    if(clave === 'esQuemadura' && n(nuevo.turnos) > 0) ya.turnos = n(nuevo.turnos);   // la Quemadura: +1 y vuelven a contar los turnos
+    if(clave === 'esQuemadura' && n(nuevo.turnos) > 0) ya.turnos = n(nuevo.turnos);   // la Quemadura: solo vuelven a contar los turnos
     // Sangrado (regla del dueño, 2026-10-03): +1 stack y los turnos vuelven a los del Sangrado nuevo (el estándar); si alguno es permanente, queda permanente.
     if(clave === 'esSangrado'){
       if(nuevo.permanente){ ya.permanente = true; ya.turnos = 0; }

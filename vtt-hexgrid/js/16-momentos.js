@@ -65,6 +65,7 @@ async function momentosBarrerViejos(){
 const momentosArranque = setInterval(() => { if(typeof fbMiembro !== 'undefined' && fbMiembro && fbUsuario && fbDb){ clearInterval(momentosArranque); momentosEscuchar(); } }, 1000);
 
 function momentoRecibido(id, d){
+  if(d.tipo === 'confusion') confusionMomento(d);   // la tirada de Confusión del turno (js/20)
   oporMomento(id, d);   // el ataque de oportunidad: la pregunta a quien decide y la respuesta a quien se aleja (js/17)
   // Una trampa, paso a paso (js/19): la víctima la resuelve al centro; el resto, en la Crónica.
   if(d.tipo === 'trampa' && d.datos && d.datos.fase){ trampaMomento(id, d); return; }

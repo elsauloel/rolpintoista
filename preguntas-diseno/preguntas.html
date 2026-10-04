@@ -101,6 +101,8 @@ main{max-width:640px;margin:0 auto;padding:14px 14px 0}
 .mio > .p-cab{padding-right:64px}
 
 .p-orden{display:flex;gap:6px;margin-left:auto}
+.p-orden[hidden]{display:none}
+.p-nuevo{margin-left:8px;font-size:12px;font-weight:700;color:#1d3d10;background:#b8e986;border-radius:99px;padding:1px 9px}
 .p-arrastrar{touch-action:none;cursor:grab}
 .pregunta.arrastrando{opacity:.9;border-color:var(--brass);box-shadow:0 8px 24px rgba(0,0,0,.65);position:relative;z-index:3}
 body.arrastrando-body{user-select:none;-webkit-user-select:none;cursor:grabbing}
@@ -154,6 +156,7 @@ body.arrastrando-body{user-select:none;-webkit-user-select:none;cursor:grabbing}
   </div>
   <div class="filtros">
     <label><input type="checkbox" id="chk-resueltas"> <span id="chk-resueltas-txt">Mostrar las resueltas</span></label>
+    <button type="button" class="btn chico ghost" id="btn-orden" title="Cambiar entre «lo que tuvo movimiento más reciente, arriba» y el orden a mano (⤒ ⤓ ⠿)">🆕 Orden: novedades primero</button>
   </div>
   <div id="lista"><div class="cargando">Cargando…</div></div>
 </main>
@@ -231,6 +234,17 @@ let arrastre = null;          // {id, card, pointerId, y} mientras se arrastra u
 // lo más nuevo primero, como era antes. Es un orden único y compartido: lo ve igual todo el grupo.
 const ordenEfectivo = e => typeof e.orden === 'number' ? e.orden : -(e.creadoMs || 0);
 
+/* Novedades primero (2026-10-04, pedido del dueño): por defecto, arriba va lo que tuvo movimiento más reciente — una publicación nueva o
+   una respuesta nueva a una vieja —, así al entrar se ven las novedades aunque alguien haya respondido algo de más abajo. Lo nuevo desde la
+   última visita (de este navegador) lleva 🆕 (lo propio no). El orden manual de antes (⤒ ⤓ ⠿) sigue, eligiendo «✋ A mano». */
+const respuestasDe = id => entradas.filter(e => e.tipo === 'respuesta' && e.padreId === id);
+const actividadMs = p => Math.max(p.creadoMs || 0, ...respuestasDe(p.id).map(r => r.creadoMs || 0));
+let ordenModo = 'novedades';
+try{ if(localStorage.getItem('preguntas-orden') === 'mano') ordenModo = 'mano'; }catch(e){}
+let ultimaVisita = 0;
+try{ ultimaVisita = Number(localStorage.getItem('preguntas-ultima-visita')) || 0; localStorage.setItem('preguntas-ultima-visita', String(Date.now())); }catch(e){}
+const esNuevo = e => ultimaVisita > 0 && (e.creadoMs || 0) > ultimaVisita && !(fbUsuario && e.autorUid === fbUsuario.uid);
+
 function fechaTxt(ts){
   if(!ts || !ts.toDate) return 'ahora';
   const d = ts.toDate(), ahora = new Date();
@@ -273,24 +287,26 @@ function render(){
 
   const cont = $('#lista');
   const preguntas = entradas.filter(e => e.tipo === tabActiva && (mostrarResueltas || !e.resuelta))
-    .sort((a, b) => ordenEfectivo(a) - ordenEfectivo(b));
+    .sort((a, b) => ordenModo === 'mano' ? ordenEfectivo(a) - ordenEfectivo(b) : actividadMs(b) - actividadMs(a));
+  const bo = $('#btn-orden');
+  if(bo) bo.textContent = ordenModo === 'mano' ? '✋ Orden: a mano' : '🆕 Orden: novedades primero';
   if(!preguntas.length){
     cont.innerHTML = `<div class="vacio">${mostrarResueltas ? 'Todavía no hay nada acá.' : t.vacioAbiertas}</div>`;
     return;
   }
   cont.innerHTML = preguntas.map(p => {
     const mias = fbUsuario && p.autorUid === fbUsuario.uid;
-    const respuestas = entradas.filter(e => e.tipo === 'respuesta' && e.padreId === p.id)
-      .sort((a, b) => (a.creadoMs || 0) - (b.creadoMs || 0));
+    const respuestas = respuestasDe(p.id).sort((a, b) => (a.creadoMs || 0) - (b.creadoMs || 0));
+    const nuevasResp = respuestas.filter(esNuevo).length;
     return `<div class="pregunta${p.resuelta ? ' resuelta' : ''}${mias ? ' mio' : ''}" data-id="${esc(p.id)}">
       ${mias ? botonesPropios(p.id) : ''}
-      <div class="p-cab"><span class="p-autor">${esc(p.autorNombre)}</span><span class="p-fecha">${fechaTxt(p.creado)}</span>${p.resuelta ? `<span class="p-badge">${t.badge}</span>` : ''}</div>
+      <div class="p-cab"><span class="p-autor">${esc(p.autorNombre)}</span><span class="p-fecha">${fechaTxt(p.creado)}</span>${p.resuelta ? `<span class="p-badge">${t.badge}</span>` : ''}${esNuevo(p) ? '<span class="p-nuevo">🆕 nueva</span>' : nuevasResp ? `<span class="p-nuevo">🆕 ${nuevasResp} respuesta${nuevasResp === 1 ? '' : 's'} nueva${nuevasResp === 1 ? '' : 's'}</span>` : ''}</div>
       ${textoHtml(p)}
       <div class="p-acciones">
         <button type="button" class="btn chico" data-responder="${esc(p.id)}">💬 Responder</button>
         <button type="button" class="btn chico ghost" data-resolver="${esc(p.id)}">${p.resuelta ? t.accionReabrir : t.accionHecha}</button>
         <button type="button" class="btn chico ghost" data-copiar="${esc(p.id)}" title="Copiar el texto">📋 Copiar</button>
-        <span class="p-orden">
+        <span class="p-orden"${ordenModo === 'mano' ? '' : ' hidden'}>
           <button type="button" class="btn chico ghost" data-arriba="${esc(p.id)}" title="Mandar arriba de todo">⤒</button>
           <button type="button" class="btn chico ghost" data-abajo="${esc(p.id)}" title="Mandar abajo de todo">⤓</button>
           <button type="button" class="btn chico ghost p-arrastrar" title="Mantené apretado y arrastrá para cambiar el lugar">⠿</button>
@@ -299,7 +315,7 @@ function render(){
       ${respuestas.length ? `<div class="respuestas">${respuestas.map(r => `
         <div class="respuesta${fbUsuario && r.autorUid === fbUsuario.uid ? ' mio' : ''}" data-id="${esc(r.id)}">
           ${fbUsuario && r.autorUid === fbUsuario.uid ? botonesPropios(r.id) : ''}
-          <div class="p-cab"><span class="p-autor">${esc(r.autorNombre)}</span><span class="p-fecha">${fechaTxt(r.creado)}</span></div>
+          <div class="p-cab"><span class="p-autor">${esc(r.autorNombre)}</span><span class="p-fecha">${fechaTxt(r.creado)}</span>${esNuevo(r) ? '<span class="p-nuevo">🆕</span>' : ''}</div>
           ${textoHtml(r)}
         </div>`).join('')}</div>` : ''}
       <div class="responder-caja" id="responder-${esc(p.id)}">
@@ -508,6 +524,7 @@ $('#btn-nueva').onclick = () => {
   $('#txt-nueva').value = '';
 };
 $('#chk-resueltas').onchange = e => { mostrarResueltas = e.target.checked; render(); };
+$('#btn-orden').onclick = () => { ordenModo = ordenModo === 'mano' ? 'novedades' : 'mano'; try{ localStorage.setItem('preguntas-orden', ordenModo); }catch(e){} render(); };
 $('#btn-salir').onclick = () => firebase.auth().signOut();
 
 $('#btn-google').onclick = async () => {

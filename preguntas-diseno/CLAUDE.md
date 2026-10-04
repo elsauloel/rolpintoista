@@ -158,3 +158,11 @@ correspondiente, igual que siempre.
 ## Respaldo sin iniciar sesión (2026-09-27, pedido del dueño)
 
 `respaldo.md` es una copia de solo lectura de **A desarrollar** y **Preguntas** (solo lo abierto, con las respuestas) y `respaldo.html` la muestra con buscador, sin Firebase ni login: `https://elsauloel.github.io/rolpintoista/preguntas-diseno/respaldo.html` (también hay un link «📥 Respaldo sin login» en la cabecera de `preguntas.html`). **Se actualiza a mano**: el log vive en Firestore, así que para refrescarlo hay que leerlo con la sesión del dueño en el Browser pane (colección `preguntas_diseno`) y volver a escribir `respaldo.md`. Al cerrar una sesión de trabajo larga, o cuando el dueño lo pida ("actualizá el respaldo"), hacerlo.
+
+## Novedades primero (2026-10-04, pedido del dueño)
+
+Por defecto las publicaciones se ordenan por **la última actividad** (`actividadMs`: su fecha o la de su respuesta más nueva): una pregunta
+nueva o una respuesta nueva a una vieja sube arriba de todo, así al entrar se ven las novedades aunque alguien haya respondido algo de más abajo.
+Lo nuevo desde la última visita de ese navegador (`localStorage` `preguntas-ultima-visita`) lleva **🆕** («🆕 nueva», «🆕 2 respuestas nuevas»);
+lo propio no. El botón **«🆕 Orden: novedades primero / ✋ Orden: a mano»** (junto a «Mostrar las resueltas», recordado en `preguntas-orden`)
+vuelve al orden manual de antes (⤒ ⤓ ⠿, que solo se ven en ese modo). Editar un texto no cuenta como actividad (no queda la fecha de la edición).

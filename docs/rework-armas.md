@@ -1191,3 +1191,24 @@ Pajaritos en 6 (un tercio), Aturdir en 2 (20 %), Rompe armadura solo en la Estre
 **T10 Común y Buena con los tres efectos parejos (cargado, 2026-10-03):** Común Demora 8 · Pajaritos 7 · Derribar 6 · ninguno 3; Buena Demora 6 ·
 Pajaritos 6 · Derribar 6 (Aturdir en 2, Rompe armadura en 1). Martillo, Maza de guardia y Martillo de cabeza plana pasaron a Rara; «⚠️ Martillo de
 bola» quedó como Martillo de bola (a dos manos). «Detalles técnicos» de Derribar ahora dice que levantarse cuesta 1 No2. Sigue: T10 Raro.
+
+### T10 Raro — lo que hay hoy y diagnóstico (2026-10-03)
+| Arma | Lo que hace · precio hoy → libre · rinde como · qué hacer |
+|---|---|
+| Cachiporra reforzada | 2 dados · +2 · Bloqueo +1 · Demora 25 % · 260 → 280 · Rara · queda |
+| Martillo del sargento mayor | 2 dados · Parry +1 · Bloqueo +1 · Aturdir 17 % · 230 → 270 · Rara · queda |
+| Martillo de cabeza plana (viene de Buena) | 2 dados · Bloqueo +2 · 200 · Rara · queda (sin ninguno de los tres efectos) |
+| ⚠️ Maza (viene de Común) | 2 dados + 1 amplificado · 350 · Rara · queda (sin efecto) |
+| Martillo (viene de Buena) | 3 dados · 350 · Rara · **igual** a la Maza de guardia |
+| Maza de guardia (viene de Buena) | 3 dados · 350 · Rara · rehacer |
+| Maza de justicia | 3 dados · Demora 25 % · 350 → 400 · Rara alta · queda |
+| Hacha de batalla a dos manos | 2 manos · 3 dados · 250 → 300 · Rara · es un «hacha» en el Tipo 10: renombrar |
+| Mangual | 2 dados · +1 · Alcance +1 con una mano · 160 → 300 · Rara · **dos armas con el mismo nombre**; Alcance en una mano |
+| Mangual (el otro) | 4 dados · Alcance +1 · 150 → 1400 · **Excepcional** · a la vuelta de las Excepcionales |
+| Martillo de sargento | 4 dados · Parry +1 · 140 → 900 · **Excepcional** · ídem |
+| Maza de acero | 3 dados · Bloqueo +3 · 160 → 550 · **Excepcional** · ídem (o rehacer) |
+| ⚠️ Lucero del alba | 2 dados · Alcance +1 con una mano · Ignora 1 de Res. crítico · 150 → 400 · Rara · «ignora» es ajeno: rehacer (¿la maza con pinchos que rompe armadura?) |
+
+Hoy, de los tres efectos de la casa: Demora 2 · Derribar 0 · Pajaritos 0 (Aturdir 1).
+**La cuenta del Tipo 10 en Rara:** 3 dados a una mano ya rinden 15,9 (techo 17): casi sin lugar; a dos manos, 15,2. Con 2 dados (10,6) entra
+mucho más: dos efectos y un bono.

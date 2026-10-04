@@ -158,6 +158,15 @@ async function trampaSaltar(dt){
   await momentoAbrir({tipo: 'trampa', icono: '⚡', titulo: `La descarga salta a ${quien}`, estado: 'paso', datos: nd});
 }
 const efectosRayo = [], RAYO_FX_MS = 1900, saltosVistos = new Set(), trampaRetenidas = new Set();
+// Los saltos que llegaron con otro Anuncio a la vista: su rayo se muestra recién cuando les toca (2026-10-04, probado con el dueño: si no, el
+// rayo se dibujaba detrás de la ventana abierta y no se veía).
+const rayoPendientes = new Set();
+function trampaRetenerConRayo(id){
+  const d = trampasDatos.get(id), s = d && d.datos && d.datos.salto;
+  if(s) rayoSaltoEfecto(s.desde, s.hacia);
+  trampaRetenidas.add(id);
+  setTimeout(() => { trampaRetenidas.delete(id); trampaMomento(id, trampasDatos.get(id) || d); }, 1500);
+}
 function rayoSaltoEfecto(desdeId, haciaId){
   const a = tokens.get(desdeId), b = tokens.get(haciaId);
   if(!a || !b) return;
@@ -203,11 +212,12 @@ function trampaMomento(id, d){
   // Un salto de la Descarga: primero se ve el rayo en todas las pantallas y recién después aparece el Anuncio.
   if(dt.salto && !saltosVistos.has(id)){
     saltosVistos.add(id);
-    rayoSaltoEfecto(dt.salto.desde, dt.salto.hacia);
-    if(d.estado !== 'listo' && trampaMeToca(id, dt)){
-      trampaRetenidas.add(id); trampasDatos.set(id, d);
-      setTimeout(() => { trampaRetenidas.delete(id); trampaMomento(id, trampasDatos.get(id) || d); }, 1500);
-      return;
+    const mia = d.estado !== 'listo' && trampaMeToca(id, dt);
+    const ocupada = trampaEnPantalla && trampaEnPantalla !== id && AvisoCombate.abiertoClave() === 'trampa:' + trampaEnPantalla;
+    if(mia && ocupada) rayoPendientes.add(id);   // espera en la fila; el rayo, cuando le toque (trampaMostrarSiguiente)
+    else{
+      if(mia){ trampasDatos.set(id, d); trampaRetenerConRayo(id); return; }
+      rayoSaltoEfecto(dt.salto.desde, dt.salto.hacia);
     }
   }
   if(trampaRetenidas.has(id)){ trampasDatos.set(id, d); return; }
@@ -233,6 +243,7 @@ function trampaMostrarSiguiente(){
   while(trampaCola.length){
     const id = trampaCola.shift();
     if(!trampasDatos.has(id) || trampasCerradas.has(id)) continue;
+    if(rayoPendientes.delete(id)){ trampaRetenerConRayo(id); return; }   // primero el rayo en el mapa; el Anuncio, 1,5 s después
     trampaEnPantalla = id;
     trampaDibujar(id);
     return;

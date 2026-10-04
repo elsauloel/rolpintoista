@@ -606,7 +606,7 @@ service cloud.firestore {
           // Trampa: solo su dueño (y el GM) la ve hasta que se dispara.
           && (!('trampa' in d) || d.trampa is bool)
           && (!('trampaNombre' in d) || (d.trampaNombre is string && d.trampaNombre.size() <= 40))
-          && (!('trampaDetalle' in d) || (d.trampaDetalle is string && d.trampaDetalle.size() <= 200))
+          && (!('trampaDetalle' in d) || (d.trampaDetalle is string && d.trampaDetalle.size() <= 600))
           && (!('trampaDano' in d) || (d.trampaDano is string && d.trampaDano.size() <= 12))
           && (!('trampaEstado' in d) || (d.trampaEstado is string && d.trampaEstado.size() <= 300))
           && (!('disparada' in d) || d.disparada is bool)

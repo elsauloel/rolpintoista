@@ -542,7 +542,10 @@ function actualizarEtiquetaElemento(){
 // Qué es un elemento especial, para el cartel de arriba: el nombre, de quién es, en qué estado está y qué hace. '' si es una forma común.
 function elementoQueEs(e){
   const dueno = nombreMiembro(e.duenoUid), de = esc(/^\(/.test(dueno) ? dueno : `(${dueno})`);
-  const corto = txt => { const t = String(txt).replace(/\s*⚙[\s\S]*$/, '').trim(); if(t.length <= 480) return t; const c = t.slice(0, 480); return c.slice(0, Math.max(c.lastIndexOf('. ') + 1, 200)) + ' …'; };
+  const corto = txt => { const t = String(txt).replace(/\s*⚙[\s\S]*$/, '').trim();
+    if(t.length <= 480 && !/[^.!?…)]$/.test(t)) return t;
+    if(t.length <= 480){ const p = t.lastIndexOf('. '); return p > 40 ? t.slice(0, p + 1) : t; }   // una trampa vieja, guardada cortada: hasta la última frase entera
+    const c = t.slice(0, 480); return c.slice(0, Math.max(c.lastIndexOf('. ') + 1, 200)) + ' …'; };
   const det = txt => txt ? `<div class="que-hace">${esc(corto(txt))}</div>` : '';
   if(e.zona){
     const t = num(e.turnos) > 0 && mantenimientoNumero !== null ? Math.max(0, num(e.venceMant) - Math.round(num(mantenimientoNumero))) : 0;

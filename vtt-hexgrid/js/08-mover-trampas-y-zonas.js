@@ -472,10 +472,24 @@ async function zonaResolverBanner(){
 }
 
 // Quiénes sufren el efecto: quien la activó y, si es de área, los de adentro (todos con fuego amigo; si no, solo los que ella considera rivales).
-function trampaAfectados(t, el){
-  const celdas = new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila)));
+/* Superficie de disparo y superficie de efecto (dueño, 2026-10-03: «no siempre van a ser la misma»). La de disparo son las casillas de la trampa;
+   la de efecto va adentro del JSON de trampaEstado: `efecto: {area: 'pisador' | 'trampa' | 'flor', radio: 1 | 2}` — solo a quien la pisó, a todos
+   los que estén sobre la trampa, o una flor alrededor de la casilla pisada. Sin `efecto`: una casilla = solo quien la pisó; más = la trampa. (El
+   muro, «delante», y la zona que deja van aparte.) **Regla general del dueño (2026-10-03): lo que es de área tiene fuego amigo** — alcanza a todos
+   los que estén adentro, aliados incluidos (lo que salta de enemigo en enemigo, como el rayo, no es de área). Los aliados igual nunca la DISPARAN. */
+function trampaEfectoDe(el){
+  let e = null; try{ e = el.trampaEstado ? JSON.parse(el.trampaEstado) : null; }catch(x){}
+  return e && e.efecto ? TokensAuto.efectoNorm(e.efecto) : null;
+}
+function trampaAfectados(t, el, celdaPisada){
+  const ef = trampaEfectoDe(el), celdas = celdasDeElemento(el);
+  const area = ef ? ef.area : (celdas.length > 1 ? 'trampa' : 'pisador');
   const afectados = [t];
-  if(celdas.size > 1) tokens.forEach(x => { if(x !== t && celdas.has(nbPack(x.col, x.fila)) && (el.fuegoAmigo || trampaDispara(x, el))) afectados.push(x); });
+  if(area === 'pisador') return afectados;
+  const centro = celdaPisada || {col: t.col, fila: t.fila};
+  const enTrampa = new Set(celdas.map(c => nbPack(c.col, c.fila)));
+  const dentro = area === 'flor' ? (x => distanciaHex(x, centro) <= ef.radio) : (x => enTrampa.has(nbPack(x.col, x.fila)));
+  tokens.forEach(x => { if(x !== t && dentro(x)) afectados.push(x); });
   return afectados;
 }
 /* Lo que le hace la trampa a cada afectado, automático donde se puede (2026-10-02, regla del dueño): la salvación (el mapa la tira sola con el
@@ -494,8 +508,8 @@ function trampaValorStat(x, stat){
   const f = fichasPub.get(String(x.fichaId || '').split(SEP_INVOCACION)[0]);
   return f && f.resumen ? num(f.resumen[stat]) : 0;
 }
-async function trampaAplicarEfectos(t, el){
-  const afectados = trampaAfectados(t, el), salva = trampaSalvaDe(el);
+async function trampaAplicarEfectos(t, el, celdaPisada){
+  const afectados = trampaAfectados(t, el, celdaPisada), salva = trampaSalvaDe(el);
   let spec = null; try{ spec = el.trampaEstado ? JSON.parse(el.trampaEstado) : null; }catch(e){}
   if(spec && !spec.nombre) spec = null;
   const tir = trampaDanoValido(el.trampaDano) ? tirarDados(el.trampaDano.trim()) : null;
@@ -608,7 +622,7 @@ async function trampaResolver(){
     alertaRojaAnonima(`⚠ Trampa de ${nombreMiembro(p.el.duenoUid)}${nombre}`, `${nombreDe(t)} la activó${p.el.trampaDetalle ? ' — ' + p.el.trampaDetalle : ''}`);
     // Activar una trampa rompe el sigilo (2026-09-24, regla dicha por el dueño).
     if(enSigilo(t)) await romperSigilo(p.tokenId, '', `${nombreDe(t)} activó una trampa`);
-    await trampaAplicarEfectos(t, p.el);   // la salvación, el daño y el estado de cada uno, con su Aviso y la Crónica
+    await trampaAplicarEfectos(t, p.el, p.celda);   // la salvación, el daño y el estado de cada uno, con su Aviso y la Crónica
     if(p.el.trampaDestino) await trampaTeleportar(p.tokenId, tokens.get(p.tokenId), p.el);
     const muro = trampaMuroDe(p.el);
     if(muro) await trampaLevantarMuro(t, p.celda || t, p.desde, muro, p.el.trampaNombre || 'Trampa de muro');

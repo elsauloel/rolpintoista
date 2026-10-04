@@ -702,3 +702,8 @@ resuelven a mano, como el resto de los avisos).
   del Tipo: un d10 amplificado vale 5,5 y un d4, 2,5). Lo que lo compensa hoy: la Defensa se resta en cada golpe (golpes chicos rinden poco contra
   armadura) y el techo de cada calidad es el mismo para todos los Tipos. **Decisión provisoria del dueño: seguir así; lo vuelve a evaluar con
   más tiempo.** *(diseño, `herramientas/calculadora_armas.py`)*
+
+- 🔲 **P153. ¿El fuego amigo en área vale también para las habilidades?** (2026-10-03). El dueño fijó como regla general que **lo que es de área
+  tiene fuego amigo** (salvo lo que salta de enemigo en enemigo, como el rayo en cadena, que no es de área). Ya se aplica a las **trampas**. Hoy,
+  en cambio, un **hechizo de área** y la **onda** alrededor de quien la usa eligen solo rivales (`dueloElegirAreaMapa`, js/13), y una **zona
+  persistente** deja elegir si afecta a los aliados (`zonaAmiga`). ¿Pasan todas a pegarle también a los aliados? *(diseño + código)*

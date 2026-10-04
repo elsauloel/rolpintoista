@@ -1752,6 +1752,11 @@ prueba('trampa de muro: el muro viaja en trampaEstado (largo 3 o 5, 4 turnos si 
     TokensAuto.muroNorm(null), Plantillas.trampa({nombre: 'Muro', tipo: 'flor', tamano: 0, muro: {largo: 3, turnos: 4}}).muro],
     [{muro: {largo: 3, turnos: 4}}, {nombre: 'Sentado', muro: {largo: 5, turnos: 2}}, null, {largo: 3, turnos: 4}]);
 });
+prueba('superficie de efecto de una trampa: solo quien la pisó, toda la trampa o una flor de radio 1 o 2 alrededor de la casilla pisada', () => {
+  igual([JSON.parse(TokensAuto.estadoJson({nombre: 'Veneno'}, null, null, {area: 'flor', radio: 3})), TokensAuto.efectoNorm({area: 'pisador', radio: 2}),
+    TokensAuto.efectoNorm({area: 'cualquiera'}), Plantillas.trampa({nombre: 'Mina', tipo: 'flor', tamano: 0, efecto: {area: 'flor', radio: 1}}).efecto],
+    [{nombre: 'Veneno', efecto: {area: 'flor', radio: 2}}, {area: 'pisador'}, null, {area: 'flor', radio: 1}]);
+});
 /* ---------- Creeps por mapa (comun/creeps-mapas.js, 2026-10-02: los grupos pasaron a ser mapas) ---------- */
 // Una base de datos de mentira, lo justo para CreepsMapas: colecciones y documentos en memoria.
 function fbFalso(datos){

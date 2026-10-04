@@ -56,3 +56,13 @@ Hoja de trabajo, como `rework-armas.md`: lo que hay, las preguntas, las propuest
 **Trampa de muro (dueño, 2026-10-03): delante del que la pisó, 4 turnos, familia propia (🧱 Muro).** Construida y probada en vivo en «Claude ·
 pruebas»: la Bruja bajó a la trampa y la pared (3 casillas: el frente y las dos diagonales de adelante) se levantó sólida y fijada, por 4 turnos.
 Va dentro del JSON de `trampaEstado` (`muro: {largo: 3 | 5, turnos}`), sin reglas nuevas. Familias: ahora 11.
+
+**Superficie de disparo y superficie de efecto (dueño, 2026-10-03: «no siempre van a ser la misma»)** ✅ en principio.
+- **Disparo** (dónde hay que pisar): una casilla · flor de radio 1 (7 casillas) · línea de 3 o 4.
+- **Efecto** (a quién le pasa): solo a quien la pisó · a todos los que estén sobre la trampa · una flor alrededor del punto pisado (**radio 1, o 2
+  en alguna**) · delante de quien la pisó (el muro) · una zona que queda · a otro lugar (teleport, portal).
+- **Regla general: lo que es de área tiene fuego amigo** (alcanza a los aliados). Lo que salta de enemigo en enemigo (el rayo en cadena) no es de
+  área. Los aliados igual nunca disparan una trampa.
+- En el juego: `efecto: {area: 'pisador' | 'trampa' | 'flor', radio}` adentro del JSON de `trampaEstado` (`TokensAuto.efectoNorm`); el mapa decide a
+  quién le llega con eso (`trampaAfectados`, js/08). Sin `efecto`: una casilla = quien la pisó; más grande = toda la trampa. Reemplaza al criterio
+  del 2026-09-25 (lo mágico distinguía aliados).

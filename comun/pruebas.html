@@ -1727,7 +1727,7 @@ prueba('trampa de una habilidad: una conocida por tipo (veneno: daño por turno 
      ['Cómo', 'Tipo', 'Tamaño', 'Daño', 'Efecto adicional', 'Se evita', 'Nombre', 'Resumen'], '4d6', '', 'Púas y estacas', true]);
 });
 prueba('cómo se ve un ítem: la trampa en datos cortos (forma, daño, efecto, salvación, detección) y lo técnico solo en «Ver»', () => {
-  const oso = CATALOGO_BASE.find(i => i.id === 'nuevo-trampa-trampa-de-oso-r2'), menor = CATALOGO_BASE.find(i => i.id === 'nuevo-trampa-trampa-de-oso-r1');
+  const oso = CATALOGO_BASE.find(i => i.id === 'trampa-trampa-de-oso'), menor = CATALOGO_BASE.find(i => i.id === 'trampa-cepo-reforzado');
   const filas = ItemCorto.trampaFilas(oso.trampaDatos).map(f => f[0] + ': ' + f[1] + (f[2] ? ' (' + f[2] + ')' : ''));
   const grilla = ItemCorto.grillaHtml(oso), ver = ItemCorto.verHtml(oso);
   const p = ItemCorto.partes('Da +2 a la Fuerza. ⚙ Automático: se suma solo. ✋ A mano: nada.');
@@ -1735,7 +1735,7 @@ prueba('cómo se ve un ítem: la trampa en datos cortos (forma, daño, efecto, s
   igual([filas, grilla.includes('⚙'), grilla.includes('Automático'), ver.includes('Detalles técnicos'), ver.includes('⚙ Automático'), ItemCorto.trampaFilas(menor.trampaDatos).find(f => f[0] === 'Detectarla')[1],
     p.hace, p.tecnico.startsWith('⚙'), base.datos.estado, base.datos.detectar, ItemCorto.tecnicoHtml('Solo dice qué hace.')],
     [['Forma: Una casilla', 'Daño: 2d6 · contempla la armadura', 'Efecto: Inmovilizado · 1 turno', 'Se resiste: no', 'Para salir: 🔓 Soltarse: Fuerza contra 6 · 2 No2', 'Detectarla: Percepción contra 8'],
-     false, false, true, true, 'Percepción contra 6', 'Da +2 a la Fuerza.', true, 'Inmovilizado', 8, '']);
+     false, false, true, true, 'Percepción contra 10', 'Da +2 a la Fuerza.', true, 'Inmovilizado', 8, '']);
 });
 prueba('trampas automáticas: el estado y la salvación viajan juntos en trampaEstado; 3 turnos (Stun 1); los textos dicen qué va solo y qué a mano', () => {
   const oso = TRAMPAS_BASE.find(t => t.nombre === 'Trampa de oso').datos, dardos = TRAMPAS_BASE.find(t => t.nombre === 'Dardos envenenados').datos, descarga = TRAMPAS_BASE.find(t => t.nombre === 'Descarga eléctrica').datos;

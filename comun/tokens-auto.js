@@ -27,10 +27,12 @@ const TokensAuto = (() => {
     const logra = String(s.logra || '').trim().slice(0, 120);   // lo que pasa si la resiste, con las palabras de la trampa (dueño, 2026-10-04)
     return {stat, etq: s.etq || SALVA_ETQ[stat] || stat, dif: Math.round(Number(s.dif)), que: ['todo', 'efecto', 'mitad'].includes(s.que) ? s.que : 'todo', ...(logra ? {logra} : {})};
   }
-  // El muro (2026-10-03, trampa de muro): {largo: 3 (las casillas de adelante) | 5 (y los costados), turnos (4 si no dice)}. null si no hay.
+  // El muro (2026-10-03, trampa de muro): {largo: 1 (un pilar justo adelante, 2026-10-04) | 3 (las casillas de adelante) | 5 (y los costados),
+  // turnos (4 si no dice)}. null si no hay.
   function muroNorm(m){
     if(!m || typeof m !== 'object') return null;
-    return {largo: Number(m.largo) >= 5 ? 5 : 3, turnos: Math.max(1, Math.min(20, Math.round(Number(m.turnos)) || 4))};
+    const l = Number(m.largo);
+    return {largo: l >= 5 ? 5 : l >= 3 || !(l >= 1) ? 3 : 1, turnos: Math.max(1, Math.min(20, Math.round(Number(m.turnos)) || 4))};
   }
   // La superficie de efecto (2026-10-03): {area: 'pisador' | 'trampa' | 'flor', radio: 1 | 2 (solo la flor)}. null si no dice (la deduce el mapa).
   function efectoNorm(e){

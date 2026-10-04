@@ -510,7 +510,8 @@ async function trampaAplicarEfectos(t, el, celdaPisada){
     aMano: (String(el.trampaDetalle || '').match(/[^.]*\(a mano\)\./g) || []).map(x => x.trim()).join(' '),   // lo que el texto dice que va a mano
   };
   for(const x of afectados){
-    await trampaMomentoNuevo({...comun, x, tokenId: zonaIdDe(x), quien: x.oculto ? 'Alguien' : nombreDe(x), pisador: x === t, muro: x === t && muro ? muro.turnos : 0});
+    await trampaMomentoNuevo({...comun, x, tokenId: zonaIdDe(x), quien: x.oculto ? 'Alguien' : nombreDe(x), pisador: x === t, muro: x === t && muro ? muro.turnos : 0,
+      muroLargo: muro ? muro.largo : 0, zona: x === t && el.trampaDejaZona ? (Math.max(1, Math.round(num(el.zonaTurnos)) || 3)) : 0});
   }
 }
 
@@ -527,15 +528,34 @@ function trampaCeldasMuro(celda, desde, largo){
   const c0 = hexACubo(celda), d0 = desde ? hexACubo(desde) : null;
   let i = d0 ? VECINO_LADO.findIndex(([dq, dr]) => dq === c0.q - d0.q && dr === c0.r - d0.r) : -1;
   if(i < 0) i = 1;   // sin saber de dónde venía: hacia abajo (el frente por defecto)
-  const lados = largo >= 5 ? [0, 1, 5, 2, 4] : [0, 1, 5];
-  return lados.map(k => { const [dq, dr] = VECINO_LADO[(i + k) % 6]; return {dq, dr}; });
+  const lados = largo >= 5 ? [0, 1, 5, 2, 4] : largo >= 3 ? [0, 1, 5] : [0];
+  return lados.map(k => { const [dq, dr] = VECINO_LADO[(i + k) % 6]; return {dq, dr, frente: (i + k) % 6}; });
+}
+/* Si en una casilla del muro hay un token (2026-10-04, dueño): sale despedido a una vecina libre — la elige un d6 que tira él (js/19, paso
+   «Sale despedido») — y recibe 1d6 de daño directo. Si no tiene ninguna vecina libre, el muro no sale en esa casilla. */
+function trampaVecinaLibre(col, fila, frente, prohibidas, desde){
+  const c0 = hexACubo({col, fila});
+  for(let k = 0; k < 6; k++){
+    const [dq, dr] = VECINO_LADO[(frente + (desde || 0) + k) % 6];
+    const c = cuboACol(c0.q + dq, c0.r + dr), f = cuboAFila(c0.q + dq, c0.r + dr);
+    if(prohibidas.has(nbPack(c, f)) || elementoSolidoEn(c, f) || [...tokens.values()].some(x => x.col === c && x.fila === f)) continue;
+    return {col: c, fila: f, k};
+  }
+  return null;
 }
 async function trampaLevantarMuro(t, celda, desde, muro, nombre){
-  const ocupadas = new Set([...tokens.values()].map(x => nbPack(x.col, x.fila)));
   const c0 = hexACubo(celda);
-  const celdas = trampaCeldasMuro(celda, desde, muro.largo).filter(({dq, dr}) => {
-    const col = cuboACol(c0.q + dq, c0.r + dr), fila = cuboAFila(c0.q + dq, c0.r + dr);
-    return !ocupadas.has(nbPack(col, fila)) && !elementoSolidoEn(col, fila);
+  const todas = trampaCeldasMuro(celda, desde, muro.largo).map(x => ({...x, col: cuboACol(c0.q + x.dq, c0.r + x.dr), fila: cuboAFila(c0.q + x.dq, c0.r + x.dr)}));
+  const delMuro = new Set(todas.map(x => nbPack(x.col, x.fila)));
+  delMuro.add(nbPack(celda.col, celda.fila));   // tampoco se lo despide encima de quien la pisó
+  const empujes = [];
+  const celdas = todas.filter(x => {
+    if(elementoSolidoEn(x.col, x.fila)) return false;
+    const id = [...tokens.entries()].find(([, y]) => y.col === x.col && y.fila === x.fila);
+    if(!id) return true;
+    if(!trampaVecinaLibre(x.col, x.fila, x.frente, delMuro)) return false;   // sin lugar adonde salir: ahí no sale
+    empujes.push({tokenId: id[0], x: id[1], col: x.col, fila: x.fila, frente: x.frente});
+    return true;
   });
   if(!celdas.length || !fbUsuario) return;
   try{
@@ -547,7 +567,8 @@ async function trampaLevantarMuro(t, celda, desde, muro, nombre){
     });
     const quien = t.oculto ? 'Alguien' : nombreDe(t);
     alertaRojaAnonima(`🧱 ${nombre}`, `Se levantó un muro delante de ${quien}: ${celdas.length} casillas, ${muro.turnos} turnos`);
-    momentoAbrir({tipo: 'trampa', icono: '🧱', titulo: `Se levantó un muro delante de ${quien}`, resultado: `«${nombre}»: ${celdas.length} casillas que no se pueden pasar por ${muro.turnos} turnos`, estado: 'listo'});
+    momentoAbrir({tipo: 'trampa', icono: '🧱', titulo: `Se levantó un muro delante de ${quien}`, resultado: `«${nombre}»: ${celdas.length} casilla${celdas.length === 1 ? '' : 's'} que no se pueden pasar por ${muro.turnos} turnos`, estado: 'listo'});
+    for(const e of empujes) await trampaMomentoEmpuje(e, nombre, [...delMuro]);
   }catch(err){ console.error('No se pudo levantar el muro de la trampa:', err); toast('No se pudo levantar el muro'); }
 }
 

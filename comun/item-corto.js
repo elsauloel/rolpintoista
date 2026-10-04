@@ -58,7 +58,9 @@ const ItemCorto = (() => {
     }
     if(t.efectoManual) f.push([t.estado ? 'Además' : 'Efecto', t.efectoManual, 'a mano']);
     if(t.teleport) f.push(['Efecto', 'Teletransporta a quien la pisa']);
-    if(!t.dano && !t.estado && !t.efectoManual && !t.teleport) f.push(['Efecto', 'Solo avisa cuando se dispara']);
+    if(t.muro){ const l = num(t.muro.largo) >= 5 ? 5 : num(t.muro.largo) >= 3 ? 3 : 1;
+      f.push(['Efecto', `${l === 1 ? 'Un pilar' : `Un muro de ${l} casillas`} justo delante de quien la pisa · ${num(t.muro.turnos) || 4} turnos (si hay alguien ahí, sale despedido y recibe 1d6)`]); }
+    if(!t.dano && !t.estado && !t.efectoManual && !t.teleport && !t.muro) f.push(['Efecto', 'Solo avisa cuando se dispara']);
     const s = t.salvacion && t.salvacion.stat ? t.salvacion : null;
     const QUE = {todo: 'la evita entera', efecto: t.dano ? 'resiste lo que le deja (el daño entra igual)' : 'lo resiste', mitad: 'la mitad del daño'};
     if(!s) f.push(['Se resiste', 'no']);

@@ -1151,3 +1151,30 @@ la Demora) y es de casa del Tipo 10 (habilitado en el 12); se sacó de los efect
 Pajaritos en la Común (dueño, 2026-10-03): Cachiporra → Pajaritos 25 % (75); Bate de Baseball → +1 · Pajaritos 25 % (85); Sartén de hierro →
 Pajaritos 50 % (85). **Para la Buena:** el diseño propuesto (mitad con Demora, Aturdir en 2–3 bajo, báculos a dos manos con Alcance) ✅ y
 **Pajaritos en por lo menos un tercio**, con porcentajes según el resto de los efectos.
+
+### T10 Buena calidad — propuesta v1: 18 armas (2026-10-03, ⬜ a revisar por el dueño)
+| Arma | Lo que hace · precio |
+|---|---|
+| **Con Demora** | |
+| Maza de guerra (rehecha) | 1 dado · Demora 50 % · Pajaritos 25 % · 110 |
+| Porra del comisario 🆕 | 1 dado · Demora 33 % · Aturdir 20 % · 100 |
+| Martillo de forja 🆕 | 1 dado · Demora 33 % · Pajaritos 33 % · muy resistente · 130 |
+| Garrote del matrero 🆕 | 1 dado · +2 · Demora 50 % · 110 |
+| Maza del sargento 🆕 | 1 dado · +1 · Bloqueo +1 · Demora 50 % · 130 |
+| Martillo de herrero | 1 dado · +1 · Parry +1 · Bloqueo +1 · Demora 25 % · 140 |
+| Mazo del tambor mayor 🆕 | 2 manos · 1 dado · Bloqueo +2 · Demora 50 % · Pajaritos 25 % · 150 |
+| Báculo de batalla (rehecho) | 2 manos · 1 dado · Alcance +1 · Bloqueo +1 · Demora 33 % · 170 |
+| Martillo de bola (a dos manos) | 2 manos · 2 dados · Demora 25 % · 150 |
+| **Sin Demora** | |
+| Estrella del alba | 1 dado · +1 · Rompe armadura 33 % · 90 |
+| Porra de goma del boliche 🆕 | 1 dado · Bloqueo +1 · Pajaritos 50 % · 110 |
+| Martillo de la bodega 🆕 | 1 dado · +1 · Pajaritos 33 % · Derribar 25 % · 110 |
+| Martillo ergonómico | 1 dado · Bloqueo +3 · resistente · 120 |
+| Báculo del Sumo Profeta (rehecho) | 2 manos · 1 dado · Alcance +1 · Aturdir 20 % · 130 |
+| Báculo del inquisidor (rehecho) | 2 manos · 1 dado · Alcance +1 · Derribar 33 % · 130 |
+| Bastón de quebracho 🆕 | 2 manos · 1 dado · Parry +1 · Bloqueo +2 · muy resistente · 120 |
+| Garrote | 2 dados · 140 |
+| Mazo de feria 🆕 | 2 manos · 2 dados · Pajaritos 25 % · 150 |
+
+Pajaritos en 6 (un tercio), Aturdir en 2 (20 %), Rompe armadura solo en la Estrella del alba. Pasan a Rara: **Martillo**, **Maza de guardia**
+(3 dados) y **Martillo de cabeza plana** (2 dados · Bloqueo +2).

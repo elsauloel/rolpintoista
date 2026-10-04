@@ -695,3 +695,10 @@ resuelven a mano, como el resto de los avisos).
   Evasión, Daño) más el resumen al final. **Nada va a la Crónica ni al Aviso.** Propuesta: (a) el chip dice en qué va («PdG 6 contra
   Evasión 4 → pegó», «Daño 4 → 0»); (b) cada momento clave (pegó/falló, crítico, daño aplicado, fin) como tarjeta de la Crónica para
   quien lo tiene minimizado; (c) las dos. *(código)*
+
+- 🔲 **P152. ¿El precio de un arma tiene que contar la velocidad (el costo en Nitros)?** (2026-10-03, pregunta del dueño durante el rework del
+  Tipo 10). Hoy `precio_libre` cuenta el daño de los dados por golpe, no por Nitro: una daga 1d4 (2 No2) y un martillo 1d10 (5 No2) se valoran por
+  lo que pegan en un golpe. El Tipo sí cuenta en el daño fijo / Dmg (valen más en Tipos bajos), en el crítico y en el daño amplificado (un dado más
+  del Tipo: un d10 amplificado vale 5,5 y un d4, 2,5). Lo que lo compensa hoy: la Defensa se resta en cada golpe (golpes chicos rinden poco contra
+  armadura) y el techo de cada calidad es el mismo para todos los Tipos. **Decisión provisoria del dueño: seguir así; lo vuelve a evaluar con
+  más tiempo.** *(diseño, `herramientas/calculadora_armas.py`)*

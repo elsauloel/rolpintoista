@@ -707,3 +707,4 @@ resuelven a mano, como el resto de los avisos).
   tiene fuego amigo** (salvo lo que salta de enemigo en enemigo, como el rayo en cadena, que no es de área). Ya se aplica a las **trampas**. Hoy,
   en cambio, un **hechizo de área** y la **onda** alrededor de quien la usa eligen solo rivales (`dueloElegirAreaMapa`, js/13), y una **zona
   persistente** deja elegir si afecta a los aliados (`zonaAmiga`). ¿Pasan todas a pegarle también a los aliados? *(diseño + código)*
+  **Para debatir con el grupo** (dueño, 2026-10-03): publicada en 🛠 Herramientas de diseño → 💬 Preguntas.

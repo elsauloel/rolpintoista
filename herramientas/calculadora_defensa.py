@@ -22,7 +22,8 @@ COSTO = {
     'def': 1, 'tipo1': 1, 'tipo2': 2, 'tipo3': 3, 'tipo4': 4, 'tipo5': 5,          # Defensa y resistencias a crítico (T4…T12)
     'eva': 2, 'ini': 2, 'rescc': 1, 'resmg': 1, 'resm': 0.5,                         # Res.Mt 0,5: los efectos que la piden son escasos
     'vision': 0.5, 'percepcion': 0.5, 'luz': 0.5, 'veoculto': 1,
-    'hpmax': 0.2, 'armadmg': 1, 'nitros': 4, 'mov': 4,                                # +5 vida = 1 · No2 lo más valioso (−1 Mov = −1 No2)
+    'hpmax': 0.2, 'nitros': 4, 'mov': 4,                                              # +5 vida = 1 · No2 lo más valioso (−1 Mov = −1 No2)
+    'armadmg': 3,   # Armadura mágica: escasa, cara y rara — resta TODO daño mágico, arcano y elemental (dueño, 2026-10-04)
     'capcinturon': 1, 'capmochila': 0.5, 'crgmax': 0.25,
     'parry': 1, 'bloqueo': 1,
     # Ofensivo en una pieza defensiva: con la escala de la calculadora de armas (se marca aparte).

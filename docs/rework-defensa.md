@@ -223,3 +223,7 @@ intentan descubrir (en las zonas de riesgo o con otro mecanismo), es decir, la D
 defensivas, **346 se pasan de su bolsa**; con lo mejor de cada parte hasta Común se llega a Defensa 34 (la curva dice 5–12) y T4 7 / T6 6 (≤2 / ≤1).
 Confirma que el catálogo defensivo se rehace entero, parte por parte. Las 52 piezas con Movimiento negativo cuestan carísimo (−1 Mov = −1 No2 = 4
 puntos): en la versión nueva, las desventajas van por Evasión o Iniciativa.
+
+**Armadura mágica (dueño, 2026-10-04): escasa, cara y rara** — resta **todo** daño mágico, arcano o elemental. Pesa **3 puntos** por +1 en la
+calculadora (antes 1); solo en piezas Raras o mejores (como ya decía su regla). **Resistencia elemental: 0,5 ✅.** *(Pendiente para cuando se
+construya la resistencia elemental: que el daño elemental de las trampas, que hoy ignora la Defensa entera, también descuente la Armadura mágica.)*

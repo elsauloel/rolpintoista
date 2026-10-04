@@ -392,4 +392,9 @@ jugadores; se pueden usar para rellenar»). **Costos nuevos en la bolsa ✅:** P
 oportunidad 0,75. **La oportunidad tiene que estar presente desde Común y en varios ítems** (dueño): 7 guantes la llevan. Por ahora el PdG va
 **solo en los guantes**; en el resto del equipo, a considerar más adelante. Res.CC en una sola pieza (Muñequeras de cuero crudo).
 **Criterio general (dueño): las resistencias elementales son relleno**; lo que da identidad a una pieza son los bonos que se juegan en cada combate.
+**Ajuste del dueño a los guantes (2026-10-04):** «la resistencia elemental es un extra a un guante que ya te brinda lo que uno busca en un guante: Defensa,
+resistencia a crítico, Parry, Bloqueo o PdG en todas sus variantes; uno que solo da elementales nunca nadie lo va a elegir». Se rehicieron los que no
+daban nada de eso (Guantes de goma → Defensa + Res. rayo; Mitones del boticario → Parry + ranura; Guantes de crupier → oportunidad + Percepción) y el
+duplicado (Guantes de arquero → Guanteletes de cazador: PdG, Defensa y Tipo 4 con Iniciativa −1). **Regla para todas las partes:** cada pieza da algo
+de la identidad de su parte; lo elemental (y lo utilitario) va encima, nunca solo.
 

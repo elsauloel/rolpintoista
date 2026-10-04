@@ -209,3 +209,8 @@ Percepción 0,5 · +5 vida 1 · Armadura mágica 1 · No2 máximo 4 · ranura de
   un stat «Sigilo +N» que se sume al esconderse.)*
 - **Cantidad de ítems:** no hay un número fijo por slot (ni «tantos cascos comunes»): **se crean tantos como hagan falta para tener amplitud y
   diversidad de efectos**, pensando en que al final el generador de tiendas, por estadística, ofrezca cosas útiles.
+
+**Resistencia elemental: por dónde se empieza (dueño, 2026-10-04):** se empieza a implementar **en los creeps**; las zonas y áreas, en buena
+parte, van atadas a las **trampas** (que ya tienen familias elementales: fuego, hielo, rayo, gas/tóxico). Después, **las armas mágicas**: el dueño
+las tiene pendientes porque «las posibilidades son tantas y las mecánicas tan variables» que todavía no sabe por dónde arrancar; la idea es crear
+eventualmente un pool grande y diverso.

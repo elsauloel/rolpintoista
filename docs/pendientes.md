@@ -272,6 +272,9 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Generador de tiendas: cupo mínimo de armas mágicas en cada generación** (pedido del dueño, 2026-09-25): diseñarlo cuando existan las armas mágicas del catálogo (ver `rework-armas.md`, armas mágicas). Preguntas para ese momento: ¿cuántas por tienda?, ¿depende del tamaño/tipo de tienda?, ¿pisa el azar de tier?
 - [ ] **Sondeo de mecánicas** ([`sondeo-mecanicas.md`](sondeo-mecanicas.md)): resistencias por elemento mágico, ampliar el equipo con las mecánicas que faltan, relevar creeps y después **reworkear las skills de creeps** coordinadas con el equipo (pedido del dueño, 2026-09-25).
 - [ ] **Auditoría de defensa** (`datos/auditoria-defensa.html`): que el dueño audite; después el asistente aplica al catálogo con `importar_json.py`.
+- [ ] **Consumibles de resistencia elemental** (dueño, 2026-10-04): pociones y pergaminos de resistencia al fuego, hielo, rayo, tóxico y ácido para
+  las situaciones puntuales (ir a un volcán): el equipo no se ocupa de eso (la resistencia elemental en el equipo es solo un extra). Usan los stats
+  `resfuego`… como un estado por turnos.
 - [ ] **Diseñar un universo de consumibles que revelen** (dueño, 2026-10-04, a partir del Cable de alarma): un mecanismo para elegir una
   superficie (flor de 1 hasta X casillas) que destapa la niebla **y lo oculto** (sigilo, trampas, alarmas). Base para varios consumibles
   (bengalas, polvos, campanas…). Se cruza con el ítem siguiente.

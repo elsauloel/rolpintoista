@@ -397,4 +397,8 @@ resistencia a crítico, Parry, Bloqueo o PdG en todas sus variantes; uno que sol
 daban nada de eso (Guantes de goma → Defensa + Res. rayo; Mitones del boticario → Parry + ranura; Guantes de crupier → oportunidad + Percepción) y el
 duplicado (Guantes de arquero → Guanteletes de cazador: PdG, Defensa y Tipo 4 con Iniciativa −1). **Regla para todas las partes:** cada pieza da algo
 de la identidad de su parte; lo elemental (y lo utilitario) va encima, nunca solo.
+**Regla general del equipo (dueño, 2026-10-04): la resistencia elemental es un detallecito extra.** *Por qué:* «ningún jugador va a querer ocupar un
+slot entero de su equipo en defensa elemental de manera exclusiva; si van a ir a un volcán, se compran pociones y pergaminos de resistencia al fuego».
+Ninguna pieza da solo resistencias elementales (el Pañuelo mojado pasó a Defensa +1 · Res. tóxico +2). Las situaciones elementales se resuelven con
+**consumibles** (ver pendientes).
 

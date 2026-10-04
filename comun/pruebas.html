@@ -1788,6 +1788,20 @@ prueba('portal (rango 8, lo elige quien la puso), dardos (el veneno solo si last
     [{rango: 8}, '', '1d6+3', true, 'linea', 3, {area: 'flor', radio: 1, centro: 'trampa'}, '4d6', 'rescc', 'efecto',
       {rango: 8}, true, {area: 'flor', radio: 1, centro: 'trampa'}, {area: 'flor', radio: 1}, 'quien la pone elige adónde lo manda, hasta 8 casillas', true]);
 });
+prueba('reparar: una pieza rota (durabilidad 0) cuesta el doble hasta quedar entera, aunque se repare de a 1', () => {
+  const S = FichaGuardado.normalizar({}).S;
+  S.meta.dde = 1000;
+  const casco = {id: 'c1', nombre: 'Casco de prueba', tipoItem: 'cabeza', peso: 2, dur: 0, equipado: true};
+  const botas = {id: 'b1', nombre: 'Botas de prueba', tipoItem: 'pies', peso: 1, dur: 1, equipado: true};
+  S.inventario = [casco, botas];
+  const st = FichaTienda.nueva(), ui = {toast: () => {}, cambio: () => {}};
+  const c0 = FichaTienda.costoReparar(casco, 1, 1), b0 = FichaTienda.costoReparar(botas, 1, 1);
+  FichaTienda.reparar(S, st, [{it: casco, pts: 1}], false, ui);
+  const tras1 = [1000 - S.meta.dde, !!casco.reparoRoto, FichaTienda.costoReparar(casco, 1, 1)];
+  FichaTienda.reparar(S, st, [{it: casco, pts: 99}], false, ui);
+  igual([c0, b0, tras1, casco.dur === Combatiente.durMax(casco), casco.reparoRoto, FichaTienda.costoReparar(casco, 1, 1), Plantillas.limpiar('items', {...casco, reparoRoto: true}).reparoRoto],
+    [2, 1, [2, true, 2], true, undefined, 1, undefined]);
+});
 prueba('Quemadura: 2 por turno; al reaplicar solo vuelven los turnos (no sube); la Res. fuego le resta a cada turno', () => {
   const q = () => estadosPresetCreep().find(p => p.nombre === 'Quemadura');
   const est = [];

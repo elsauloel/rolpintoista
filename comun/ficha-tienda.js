@@ -367,34 +367,42 @@ const FichaTienda = (() => {
      Las tiendas que el GM marca como «herrero» reparan por punto de durabilidad (por defecto 1 DDE por punto) y cada punto reparado
      también devuelve 1 de Armadura rota de esa pieza. NO se puede reparar durante el combate. */
   const precioReparacion = st => st.tienda ? Math.max(0, num(st.tienda.precioReparacion === undefined ? 1 : st.tienda.precioReparacion)) : 1;
+  // Una pieza rota (durabilidad 0) cuesta el doble de reparar (dueño, 2026-10-04: cuidar el equipo antes de que se rompa del todo).
+  const RECARGO_ROTO = 2;
+  // `reparoRoto`: se rompió y todavía no se terminó de reparar (así no se puede reparar 1 punto al doble y el resto a precio normal).
+  const factorRoto = it => C().itemRoto(it) || it.reparoRoto ? RECARGO_ROTO : 1;
+  const costoDe = (it, pts, p) => Math.round(pts * p * factorRoto(it) * 100) / 100;
   function aReparar(S){
     return (S.inventario || []).filter(i => C().durableItem(i) && (C().durActual(i) < C().durMax(i) || C().armRotaDe(i) > 0))
       .map(i => ({it: i, faltan: Math.max(0, C().durMax(i) - C().durActual(i))}));
   }
   function repararHtml(S, st, bloqueado){
     const p = precioReparacion(st), lista = aReparar(S), dde = num(S.meta.dde);
-    const totalPts = lista.reduce((a, x) => a + x.faltan, 0);
+    const totalPts = lista.reduce((a, x) => a + x.faltan, 0), totalCosto = Math.round(lista.reduce((a, x) => a + costoDe(x.it, x.faltan, p), 0) * 100) / 100;
     const html = `
-    <p class="hint" style="margin:0 0 8px">${p > 0 ? `El herrero cobra <b>${fmt(p)} DDE por punto</b> de durabilidad.` : 'Este herrero repara gratis.'} Cada punto reparado también devuelve 1 de Armadura rota de esa pieza. Tenés <b>${fmt(dde)} DDE</b>.</p>
+    <p class="hint" style="margin:0 0 8px">${p > 0 ? `El herrero cobra <b>${fmt(p)} DDE por punto</b> de durabilidad; una pieza <b>rota</b> (durabilidad 0) cuesta el doble.` : 'Este herrero repara gratis.'} Cada punto reparado también devuelve 1 de Armadura rota de esa pieza. Tenés <b>${fmt(dde)} DDE</b>.</p>
     ${bloqueado ? '<p class="hint" style="margin:0 0 8px;color:#FF9E7E">⚔ No se puede reparar durante el combate: esperá a que el GM pase el mapa a modo narrativo.</p>' : ''}
     ${lista.length ? lista.map(({it, faltan}) => `<div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)">
-        <div><b>${esc(it.nombre)}</b> ${it.equipado ? '<span class="tag">equipado</span>' : ''}<div class="hint">🔧 ${fmt(C().durActual(it))}/${fmt(C().durMax(it))}${C().armRotaDe(it) ? ` · Armadura rota ×${fmt(C().armRotaDe(it))}` : ''}${C().itemRoto(it) ? ' · <b style="color:#FF7E7E">ROTO</b>' : ''} · faltan ${fmt(faltan)} punto${faltan === 1 ? '' : 's'}</div></div>
-        <button class="mini" data-rep="${esc(it.id)}:1"${bloqueado || faltan < 1 ? ' disabled' : ''}>+1 · ${fmt(p)} DDE</button>
-        <button class="mini" data-rep="${esc(it.id)}:${faltan}"${bloqueado || faltan < 1 ? ' disabled' : ''}>Todo · ${fmt(Math.round(faltan * p * 100) / 100)} DDE</button>
+        <div><b>${esc(it.nombre)}</b> ${it.equipado ? '<span class="tag">equipado</span>' : ''}<div class="hint">🔧 ${fmt(C().durActual(it))}/${fmt(C().durMax(it))}${C().armRotaDe(it) ? ` · Armadura rota ×${fmt(C().armRotaDe(it))}` : ''}${C().itemRoto(it) ? ' · <b style="color:#FF7E7E">ROTO: reparar cuesta el doble</b>' : it.reparoRoto ? ' · <b style="color:#FF9E7E">se rompió: hasta dejarla entera, cuesta el doble</b>' : ''} · faltan ${fmt(faltan)} punto${faltan === 1 ? '' : 's'}</div></div>
+        <button class="mini" data-rep="${esc(it.id)}:1"${bloqueado || faltan < 1 ? ' disabled' : ''}>+1 · ${fmt(costoDe(it, 1, p))} DDE</button>
+        <button class="mini" data-rep="${esc(it.id)}:${faltan}"${bloqueado || faltan < 1 ? ' disabled' : ''}>Todo · ${fmt(costoDe(it, faltan, p))} DDE</button>
       </div>`).join('') : '<div class="hint">No tenés nada para reparar: todo tu equipo está entero.</div>'}`;
-    return {html, totalPts, total: `Reparar todo cuesta: <b>${fmt(Math.round(totalPts * p * 100) / 100)} DDE</b> (${fmt(totalPts)} punto${totalPts === 1 ? '' : 's'})`};
+    return {html, totalPts, total: `Reparar todo cuesta: <b>${fmt(totalCosto)} DDE</b> (${fmt(totalPts)} punto${totalPts === 1 ? '' : 's'})`};
   }
   function reparar(S, st, pares, bloqueado, ui){   // pares: [{it, pts}]
     if(bloqueado){ ui.toast('No se puede reparar durante el combate'); return; }
     const p = precioReparacion(st);
-    const pts = pares.reduce((a, x) => a + Math.min(x.pts, Math.max(0, C().durMax(x.it) - C().durActual(x.it))), 0);
+    const cuantos = x => Math.min(x.pts, Math.max(0, C().durMax(x.it) - C().durActual(x.it)));
+    const pts = pares.reduce((a, x) => a + cuantos(x), 0);
     if(!pts){ ui.toast('No hay nada para reparar'); return; }
-    const costo = Math.round(pts * p * 100) / 100;
+    const costo = Math.round(pares.reduce((a, x) => a + costoDe(x.it, cuantos(x), p), 0) * 100) / 100;   // las rotas, el doble
     if(costo > num(S.meta.dde) + 1e-9){ ui.toast(`No te alcanza: reparar ${fmt(pts)} punto${pts === 1 ? '' : 's'} cuesta ${fmt(costo)} DDE y tenés ${fmt(num(S.meta.dde))}`); return; }
     pares.forEach(({it, pts: n}) => {
       const q = Math.min(n, Math.max(0, C().durMax(it) - C().durActual(it)));
       if(q <= 0) return;
+      if(C().itemRoto(it)) it.reparoRoto = true;
       it.dur = C().durActual(it) + q;
+      if(it.dur >= C().durMax(it)) delete it.reparoRoto;
       it.armRota = Math.max(0, C().armRotaDe(it) - q);
     });
     S.meta.dde = Math.round((num(S.meta.dde) - costo) * 100) / 100;
@@ -423,5 +431,5 @@ const FichaTienda = (() => {
     precioDeCompra, precioVenta, precioHtml, normalizarBusqueda, textoBusqueda, itemCatalogo, danoDe, ordenes, ordenar, conStockYLegacyPrimero,
     visibles, rowHtml, catalogoHtml, badge, opcionesOrden, etiquetaOrden, carrito, agregarAlCarrito, quitarDelCarrito, agregarConsumible,
     crearItems, agregarGratis, comprar, aleatorio, ajusteVenta, precioVentaTienda, vendibles, totalVenta, venderHtml, venderCambio, vender,
-    precioReparacion, aReparar, repararHtml, reparar, desdeDoc};
+    precioReparacion, costoReparar: costoDe, RECARGO_ROTO, aReparar, repararHtml, reparar, desdeDoc};
 })();

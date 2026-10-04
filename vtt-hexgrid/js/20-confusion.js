@@ -27,7 +27,7 @@ function confusionReclic(raiz, b, tokenId){
 const CONFUSION_TEXTOS = {
   1: ['El GM decide', 'Este turno, lo que hace lo decide el GM.'],
   2: ['Pierde el turno', 'Este turno no hace nada.'],
-  3: ['Objetivo al azar', 'Se elige al azar un objetivo entre los que ve: toda acción hostil de este turno va contra él.'],
+  3: ['Objetivo al azar', 'Hace la acción que anunció, pero contra un objetivo al azar entre los que ve (si iba a curar a un aliado, puede terminar curando a un enemigo).'],
   4: ['Actúa normal', 'Este turno actúa normal.'],
 };
 const CONFUSION_CORTO = {1: 'decide el GM', 2: 'pierde el turno', 3: 'objetivo al azar', 4: 'actúa normal'};
@@ -91,7 +91,8 @@ function confusionPedirTirada(tokenId, seguir){
   if(!t) return;
   const tabla = [1, 2, 3, 4].map(n => `${n}: ${CONFUSION_CORTO[n]}`).join(' · ');
   const dibujar = (rodando) => AvisoCombate.mostrar({clave: 'confusion:' + tokenId, icono: '😵', titulo: `${nombreDe(t)} está confundido`,
-    pasos: [{titulo: 'Estás confundido: tirá antes', texto: `Antes de su primera acción del turno tira 1d4. ${tabla}. El resultado vale para todo el turno (las defensas no se tocan).`, espera: true}],
+    pasos: [{titulo: 'Anunciá en la Mesa cuál es tu intención de acción', texto: 'Antes de tirar, decí qué vas a hacer y contra quién si sale 4 (atacar a…, curar a…). Si sale «al azar», hacés esa misma acción, pero contra el objetivo que toque. Se resuelve a mano entre jugadores y GM.'},
+      {titulo: 'Estás confundido: tirá antes', texto: `Antes de su primera acción del turno tira 1d4. ${tabla}. El resultado vale para todo el turno (las defensas no se tocan).`, espera: true}],
     botones: [{texto: rodando ? '🎲 Rodando…' : '🎲 Tirar 1d4', deshabilitado: !!rodando, alClic: () => confusionTirar(tokenId, seguir, dibujar)},
       {texto: 'Ahora no', sec: true, alClic: () => AvisoCombate.cerrar()}]});
   dibujar(false);
@@ -121,7 +122,7 @@ async function confusionTirar(tokenId, seguir, dibujar){
     const [tit, txt] = CONFUSION_TEXTOS[res];
     const sigue = res === 4 || res === 3;
     AvisoCombate.mostrar({clave: 'confusion:' + tokenId, icono: '😵', titulo: `${quien} está confundido`, pasos,
-      veredicto: {tono: sigue ? 'neutro' : 'malo', grande: tit.toUpperCase(), chico: res === 3 && objetivo ? `Toda acción hostil de este turno va contra ${objetivo} (los pormenores, a mano en la mesa).` : txt},
+      veredicto: {tono: sigue ? 'neutro' : 'malo', grande: tit.toUpperCase(), chico: res === 3 && objetivo ? `Hace la acción que anunció, pero contra ${objetivo} (los pormenores, a mano en la mesa).` : txt},
       botones: sigue ? [{texto: 'Seguir', alClic: () => { AvisoCombate.cerrar(); seguir(); }}, {texto: 'Cerrar', sec: true, alClic: () => AvisoCombate.cerrar()}]
         : [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}]});
   }catch(err){ console.error('No se pudo tirar la Confusión:', err); toast('No se pudo tirar la Confusión'); AvisoCombate.cerrar(); }

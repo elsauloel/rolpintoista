@@ -1382,7 +1382,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   numeritos de la estela y la esferita de No2 (js/05). Solo en modo combate (en narrativo moverse no cuesta). La Arena movediza: Inmovilizado 1 turno,
   🔓 Soltarse con Fuerza 6 (1 No2; si falla, se hunde: +1 turno) y, ya libre, 2 No2 por cada paso que sale de la arena.
 
-- **😵 Confusión, automatizada** (2026-10-04, regla del dueño; `js/20-confusion.js`): en modo combate, un token con Confusión (marca `confusion`
+- **😵 Confusión, automatizada** (2026-10-04, regla del dueño; `js/20-confusion.js`; el Anuncio pide antes «anunciá en la Mesa tu intención de acción»: con «al azar» hace esa misma acción contra el objetivo que toque): en modo combate, un token con Confusión (marca `confusion`
   del estado; el resumen público de la ficha la publica) que intenta su **primera acción del turno** —soltar una ruta (`rutaSoltada`, js/06) o
   apretar una acción de la Botonera nueva o de las Acciones (`confusionEsAccion`: atacar, una habilidad, un consumible, levantarse, soltarse,
   sigilo; **las defensas y las tiradas sueltas no**)— ve antes el Anuncio «Estás confundido: tirá antes» y tira 1d4: 1 decide el GM, 2 pierde el

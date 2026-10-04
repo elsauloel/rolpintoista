@@ -1251,3 +1251,8 @@ esa vuelta). El Mangual de 2 dados quedó como Mangual de cadena y el Hacha de b
 «⚠️ Lucero del alba» sin la marca. **Tipo 10: Común, Buena y Rara hechas.** Sigue: Tipo 12 (explosivos).
 **Mangual de cadena (dueño, 2026-10-03):** una mano · 1 dado · **Alcance +1** (excepción: la cadena llega lejos aunque sea de una mano) · Derribar
 33 % · Pajaritos 25 % · 190. Sin el efecto extra rendía como Buena (9,1).
+
+## ⏸ Pausa del rework de armas (dueño, 2026-10-03)
+Hecho: Tipo 4 (Común, Buena, Rara, Excepcional), Tipo 6, 8 y 10 (Común, Buena, Rara). **Tipo 12: no va a haber armas explosivas** salvo en una
+situación muy excepcional. **Excepcionales y Legendarias** (de todos los Tipos): para otro momento. Las que quedaron a la espera en Excepcional
+(Mangual de 4 dados, Martillo de sargento, Maza de acero, las Excepcionales viejas de T6/T8/T10) siguen como estaban. Sigue: auditoría de trampas.

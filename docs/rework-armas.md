@@ -1102,7 +1102,7 @@ actuó y quedaría después de quien tiene el turno. Garrote, Martillo de bola y
 | **Sin Demora** | |
 | Cachiporra | 1 dado · 60 |
 | Bate de Baseball | +1 · 70 |
-| Maza de hierro | Bloqueo +1 · 75 |
+| Maza de hierro | Bloqueo +1 · muy resistente · 90 |
 | Mazo de goma 🆕 | Derribar 33 % · 75 |
 | Garrote de quebracho 🆕 | +2 · 80 |
 | Caño de plomo 🆕 | +1 · Derribar 25 % · 80 |

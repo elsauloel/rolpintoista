@@ -202,3 +202,8 @@ Reemplazan a las 72 de antes (24 × menor/normal/mayor). Común / Buena / Rara p
 - **Idea a futuro (consumibles):** métodos para que los jugadores accedan a ítems al azar (como el drop de los creeps) para probarlos, y que
   después estén accesibles en el catálogo. La escasez de las tiendas tiene que poder dejar a los jugadores con oro que no mejora su equipo
   (el vendedor no tiene nada mejor): ahí van a los consumibles.
+- **Brea pegajosa → «Pies pegajosos» (dueño, 2026-10-04, a construir):** estado nuevo (cada casillero cuesta 2 No2, como Rengo; lo cubre
+  «Recuperarse rápido» de los pies) que **se renueva por cada casillero de brea que se pisa** (cruzarla entera te deja pegado más tiempo). Propuesta:
+  la tirada para resistir es solo al entrar; si ya estás pegado, cada paso nuevo renueva sin tirar (si no, una tirada por casillero frena el juego).
+  Hoy: Rengo 2 turnos, se renueva al entrar y en el Mantenimiento.
+

@@ -172,6 +172,25 @@ const Combatiente = (() => {
      pasivas, estados), igual para personajes, creeps e invocaciones. `statAtaqueEspecial(tipo)` → el stat ('' si es un ataque normal). */
   const ATAQUE_ESPECIAL = {oportunidad: {stat: 'pdgopor', nombre: 'Ataque de oportunidad'}, contra: {stat: 'pdgcontra', nombre: 'Contraataque'}};
   const statAtaqueEspecial = tipo => (ATAQUE_ESPECIAL[tipo] || {}).stat || '';
+  /* Evasión contra oportunidad / contra contraataque (dueño, 2026-10-04, mecánicas de las piernas): suman a la Evasión del defensor solo
+     contra ese tipo de ataque (no al Parry). Peso de diseño: Evasión +1 ≈ contra oportunidad +2 ≈ contra contraataque +3.
+     `statEvaEspecial(tipo)` → el stat ('' si es un ataque normal). */
+  const EVA_ESPECIAL = {oportunidad: {stat: 'evaopor', nombre: 'contra oportunidad'}, contra: {stat: 'evacontra', nombre: 'contra contraataque'}};
+  const statEvaEspecial = tipo => (EVA_ESPECIAL[tipo] || {}).stat || '';
+  /* Retirada limpia (dueño, 2026-10-04): al alejarse de un rival, chance de no darle ataque de oportunidad. Stat 'retirada' en %, tope 100
+     (100 = siempre, sin tirar). Se tira 1d6: 33 % = 5–6, 50 % = 4–6. `retiradaDado(pct)` → {caras, exitos} o null (siempre / nunca). */
+  const retiradaPct = v => Math.max(0, Math.min(100, Math.round(n(v))));
+  function retiradaDado(v){
+    const pct = retiradaPct(v);
+    if(pct <= 0 || pct >= 100) return null;
+    return {caras: 6, exitos: Math.min(5, Math.max(1, Math.round(pct * 6 / 100)))};
+  }
+  function retiradaTexto(v){
+    const pct = retiradaPct(v), d = retiradaDado(pct);
+    if(pct >= 100) return 'siempre';
+    if(!d) return '';
+    return `${pct} % (${d.exitos > 1 ? (d.caras - d.exitos + 1) + '–' : ''}${d.caras} en d${d.caras})`;
+  }
   /* Soltarse (2026-10-03, trampas de Atrapar; pedido del dueño: «que el botón diga exactamente qué tira y cuánto cuesta»): un estado puede
      traer `soltar: {stat, etq, dif, no2}` (lo pone la trampa que lo dejó). Igual para personajes, invocaciones y creeps: se paga lo que diga
      (se suelte o no), se tira el stat contra la dificultad y, si llega, se saca el estado. */
@@ -662,7 +681,7 @@ const Combatiente = (() => {
   }
   const esMagicoTipo = texto => !!elementoDe(texto) || /arcan|magic/i.test(String(texto || ''));
 
-  return {ELEMENTOS, elementoDe, esMagicoTipo, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+  return {ELEMENTOS, elementoDe, esMagicoTipo, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, retiradaPct, retiradaDado, retiradaTexto, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

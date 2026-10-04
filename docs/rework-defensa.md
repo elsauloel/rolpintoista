@@ -309,7 +309,7 @@ el nombre conservan su id y su narrativa). Precio = 10 + 25 por punto de la bols
 crítico **se acumulan entre partes**, y eso no se ve diseñando una parte de arriba abajo. Así, al cerrar cada calidad, hay un equipo entero que se
 puede medir contra la curva.
 
-1. **Común:** torso ✅ · escudo ✅ · cabeza ✅ · manos ✅ · piernas · pies · cinturón · anillos. **Control:** la calculadora sobre el equipo Común completo
+1. **Común:** torso ✅ · escudo ✅ · cabeza ✅ · manos ✅ · piernas ✅ · pies · cinturón · anillos. **Control:** la calculadora sobre el equipo Común completo
    contra la curva de N1 (Defensa 4–10, T4 ≤ 2, T6 ≤ 1) y N2 (5–12). **Y la Res.CC (dueño, 2026-10-04):** medir cuánta se junta con el equipo completo,
    para que no sea tan abundante que le quite peso a los personajes y efectos que juegan con control (hoy, con torso y cabeza: hasta +4).
 1b. **Lluvia de mecánicas por parte (dueño, 2026-10-04):** el ejercicio de las piernas («imaginá todas las mecánicas, tirá de más, yo filtro») se
@@ -441,4 +441,14 @@ con 50 %) · Reflejos de mangosta (al pisar una trampa, chance de un dodge roll 
 sobrepeso queda para cuando se defina su penalidad. Propuesta grande de piernas Comunes (29 piezas) en la conversación del 2026-10-04.
 **Pasos gratis = 3 por casillero (dueño, 2026-10-04):** el 75 % de +1 No2 (4 puntos): «no es lo mismo que un No2, pero sigue siendo relevante» (antes 2).
 En Común (bolsa 1,5) solo entra pagado con desventajas y peso; su lugar natural es Buena (bolsa 3) en adelante.
+
+**Piernas Común cargadas ✅ (2026-10-04).** El dueño revisó la lista («lo conceptual de las piernas ya está; el resto lo vi bien»): 28 piezas en
+`comun/catalogo.js` (el Pantalón de corredor pasó a Buena; las Bermudas de cartero quedaron Pasos gratis +1 · Iniciativa −1 · pesa 1). Ninguna pasa
+de su bolsa. Se construyeron las tres mecánicas nuevas, iguales para personajes, creeps e invocaciones:
+- **Evasión contra oportunidad** (`evaopor`) y **contra contraataque** (`evacontra`): suman a la Evasión del defensor solo en un duelo de ese tipo
+  de ataque (no al Parry). `Combatiente.statEvaEspecial`; los ganchos `defender`/`opcionesDefensa` de `ficha-duelo.js`, `creep-duelo.js`, `inv-duelo.js`.
+- **Retirada limpia** (`retirada`, en %): al alejarse de un rival, quien se aleja tira 1d6 (33 % = 5–6, 50 % = 4–6; 100 = siempre, sin tirar) antes
+  de que el rival decida; si sale, sigue su camino sin ataque de oportunidad (`vtt-hexgrid/js/17`, `oporRetirada`). Las invocaciones todavía no la
+  leen en el mapa (como los Pasos gratis).
+- Pesos en `herramientas/calculadora_defensa.py`: `evaopor` 1, `evacontra` 2/3, `retirada` 0,03 por punto (33 % ≈ 1, 50 % = 1,5) y 4 si es 100.
 

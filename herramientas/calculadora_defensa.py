@@ -38,7 +38,13 @@ COSTO = {
     'resfuego': 0.5, 'reshielo': 0.5, 'resrayo': 0.5, 'restoxico': 0.5, 'resacido': 0.5,
     'pasosgratis': 3,   # el primer casillero del turno gratis (dueño, 2026-10-04): el 75 % de +1 No2 (4) — no es un No2, pero sigue siendo relevante
     'sigilo': 1,   # Sigilo +N (2026-10-04): mejora la tirada del que se esconde contra la Percepción de quien lo busca
+    # Mecánicas de las piernas (dueño, 2026-10-04): Evasión +1 (2) ≈ contra oportunidad +2 ≈ contra contraataque +3 — la oportunidad pasa más seguido.
+    'evaopor': 1, 'evacontra': 2 / 3,
+    # Retirada limpia (en %, ver costo_retirada): 33 % = 1, 50 % = 1,5, siempre = 4 (desde Rara).
+    'retirada': 0.03,
 }
+def costo_retirada(pct):
+    return 4 if pct >= 100 else pct * 0.03
 COSTO_DEFECTO = 1
 OFENSIVOS = {'pdg', 'dmg', 'crit', 'critpot', 'rng', 'pdgmg', 'dmgesp', 'rangocasteo', 'accionesmax'}
 COSTO_ESTADO_EQUIPO = 2          # un estado que se pone al equipar (Espinas, Regeneración…): a revisar caso por caso
@@ -92,7 +98,7 @@ def puntos(it):
     for m in it.get('mods', []):
         v = float(m.get('val', 0) or 0)
         c = COSTO.get(m['stat'], COSTO_DEFECTO)
-        det.append((f"{v:+g} {NOMBRE.get(m['stat'], m['stat'])}", v * c))
+        det.append((f"{v:+g} {NOMBRE.get(m['stat'], m['stat'])}", costo_retirada(v) if m['stat'] == 'retirada' else v * c))
         if m['stat'] in OFENSIVOS and v > 0: avisos.append(f"bono ofensivo ({NOMBRE.get(m['stat'], m['stat'])})")
         if m['stat'] not in COSTO: avisos.append(f"sin costo definido: {m['stat']}")
     if it.get('equipoEstadoNombre'):

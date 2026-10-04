@@ -73,6 +73,10 @@ const FichaCalculo = (() => {
     // Pasos gratis (2026-10-04, dueño: un bono al movimiento que no sea dar No2): los primeros N casilleros de cada turno (de Mantenimiento a
     // Mantenimiento) no cuestan No2. Lo dan sobre todo las piernas; sube con la calidad (1, 2, 3).
     {id:'pasosgratis', label:'Pasos gratis', full:'Casilleros que te movés gratis al comienzo de cada turno (sin gastar No2)'},
+    // Mecánicas de las piernas (2026-10-04, dueño): Evasión solo contra un tipo de ataque, y la chance de alejarse sin ataque de oportunidad.
+    {id:'evaopor', label:'Evasión contra oportunidad', full:'Evasión extra cuando te atacan de oportunidad (no suma al Parry)'},
+    {id:'evacontra', label:'Evasión contra contraataque', full:'Evasión extra cuando te contraatacan (no suma al Parry)'},
+    {id:'retirada', label:'Retirada limpia (%)', full:'Chance (en %) de alejarte de un rival sin darle ataque de oportunidad: 33 = 5–6 en d6, 50 = 4–6, 100 = siempre'},
     // Resistencias elementales (2026-10-04, dueño): cada una se resta al daño de su elemento (además de la Armadura mágica). Situacionales: pesan poco.
     {id:'resfuego', label:'Res. fuego', full:'Resistencia al fuego: se resta a todo daño de fuego'},
     {id:'reshielo', label:'Res. hielo', full:'Resistencia al hielo: se resta a todo daño de hielo'},

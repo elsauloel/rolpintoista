@@ -84,6 +84,7 @@ async function oportunidadResolver(){
   const t = tokens.get(p.tokenId), r = tokens.get(p.rivalId);
   if(!t || !r) return;
   oporMarcar(p.tokenId, p.rivalId);
+  if(await oporRetirada(t, r, p)) return;   // Retirada limpia: se fue sin darle la oportunidad
   const decide = oporDecide(r);
   oporEspera = {...p, momentoId: null, resultado: null};
   const e = oporEspera;
@@ -92,6 +93,37 @@ async function oportunidadResolver(){
   e.momentoId = await momentoAbrir({tipo: 'oportunidad', icono: '⚔', titulo: `${nombreDe(t)} se aleja de ${nombreDe(r)}…`, estado: 'esperando', resuelve: decide,
     datos: {centro: true, moverId: p.tokenId, rivalId: p.rivalId, decide}});
   if(!e.momentoId && oporEspera === e){ oporEspera = null; renderOporEspera(); oporContinuar(e); }   // sin reglas publicadas: sigue como antes
+}
+/* Retirada limpia (2026-10-04, dueño, mecánica de las piernas): quien se aleja tiene una chance de no darle el ataque de oportunidad al
+   rival. La tira quien se aleja (su pantalla), antes de preguntarle nada al rival; con 100 % sale siempre, sin tirar. Si sale, sigue su
+   camino como lo marcó; si no, el rival decide como siempre. Las invocaciones, por ahora sin este dato (como los Pasos gratis). */
+function retiradaDe(t){
+  if(!t || !t.fichaId) return 0;
+  if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return sc ? Combatiente.retiradaPct(CreepCalculo.modTotal(sc, 'retirada')) : 0; }
+  if(String(t.fichaId).includes(SEP_INVOCACION)) return 0;
+  const f = fichasPub.get(t.fichaId);
+  return Combatiente.retiradaPct(f && f.resumen && f.resumen.retirada);
+}
+async function oporRetirada(t, r, p){
+  const pct = retiradaDe(t);
+  if(pct <= 0) return false;
+  const d = Combatiente.retiradaDado(pct);
+  let sale = pct >= 100, tr = null;
+  if(d){
+    tr = tirarDados('1d' + d.caras);
+    if(!tr) return false;
+    sale = tr.total > d.caras - d.exitos;
+    try{ await mesaPublicar(`Retirada limpia · ${Combatiente.retiradaTexto(pct)}`, {formula: tr.formula, rolls: tr.rolls, mod: tr.mod, total: tr.total, quien: nombreDe(t), ...(t.tipo === 'creep' ? {desde: 'gm'} : {})}); }catch(err){}
+    await new Promise(res => (typeof Duelo !== 'undefined' && Duelo.esperarDados) ? Duelo.esperarDados(res) : res());
+  }
+  if(!sale){
+    oporMesa(`${nombreDe(t)} intentó una Retirada limpia (sacó ${tr.total}, necesitaba ${d.caras - d.exitos + 1} o más): no le alcanzó`);
+    return false;
+  }
+  oporMesa(`${nombreDe(t)} se alejó de ${nombreDe(r)} con Retirada limpia${tr ? ` (sacó ${tr.total})` : ''}: sin ataque de oportunidad`);
+  toast(`🦵 Retirada limpia: ${nombreDe(t)} se aleja de ${nombreDe(r)} sin darle ataque de oportunidad`);
+  oporContinuar(p);
+  return true;
 }
 function renderOporEspera(){
   // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.

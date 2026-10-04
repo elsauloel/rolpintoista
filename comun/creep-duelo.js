@@ -64,6 +64,8 @@ const CreepDuelo = (() => {
 
   function hooks(ui){
     const deLado = lado => lado ? ui.creep(lado.ref) : null;
+    // Evasión contra oportunidad / contra contraataque (2026-10-04): lo que suma a la Evasión contra el ataque de este duelo.
+    const evaEsp = (sc, d) => { const st = Combatiente.statEvaEspecial(d && d.ataque && d.ataque.tipo), val = st && sc ? num(C().modTotal(sc, st)) : 0; return {val, txt: val ? `${val > 0 ? '+' : '−'}${fmt(Math.abs(val))} ${Combatiente.EVA_ESPECIAL[d.ataque.tipo].nombre}` : ''}; };
     return {
       soy: lado => ui.soy(lado),
       atacar: d => {
@@ -146,7 +148,8 @@ const CreepDuelo = (() => {
         // «Cuánto tirarías» antes de elegir (2026-09-27, pedido del dueño).
         const fx = (v, statId) => { const f = formulaParaValor(v); if(!f) return fmt(num(v)); const mit = statId ? Combatiente.mitadesDeTirada(sc.estados, statId) : 0; return f.formula + ' ÷2'.repeat(mit); };
         const c = C().costoParry(sc);
-        const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${fx(C().statValor(sc, 'eva'), 'eva')}`]}];
+        const ee = evaEsp(sc, d);
+        const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${fx(C().statValor(sc, 'eva') + ee.val, 'eva')}${ee.val ? ` (con ${ee.txt})` : ''}`]}];
         // Parry solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30; un arma natural no alcanza, por ahora).
         const def = C().defensa(sc);
         if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === sc.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}`, costo: c, motivoNo: c > num(sc.nitros) ? 'no le alcanzan los No2' : '',
@@ -169,7 +172,8 @@ const CreepDuelo = (() => {
             ui.toast(x.aviso);
           });
         }
-        ui.publicar(sc, A().tirada(`${sc.nombre} · Evasión`, C().statValor(sc, 'eva'), sc, 'eva'));
+        const ee = evaEsp(sc, d);
+        ui.publicar(sc, A().tirada(`${sc.nombre} · Evasión${ee.val ? ` (${ee.txt})` : ''}`, C().statValor(sc, 'eva') + ee.val, sc, 'eva'));
       },
       fuerza: d => {
         const sc = deLado(d.atacante);

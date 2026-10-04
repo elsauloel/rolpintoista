@@ -1799,6 +1799,30 @@ prueba('Pasos gratis: un stat que suben las piezas y que el resumen publica para
   S.inventario = [{id: 'p1', nombre: 'Piernas de prueba', tipoItem: 'piernas', equipado: true, mods: [{stat: 'pasosgratis', val: 2}]}];
   igual([c0.final.pasosgratis, FichaCalculo.calcular(S).final.pasosgratis, FichaResumen.resumen(S).pasosGratis, FichaCalculo.STAT_LABEL.pasosgratis], [0, 2, 2, 'Pasos gratis']);
 });
+prueba('piernas: Evasión contra oportunidad / contra contraataque suman solo contra ese ataque, y no al Parry', async () => {
+  const creeps = {k: creepPrueba({id: 'k', nitros: 3, eva: 2, equipo: [{nombre: 'Calzas de escapista', tipoItem: 'piernas', mods: [{stat: 'evaopor', val: 2}, {stat: 'evacontra', val: 3}]}]})}, reg = [];
+  const ui = {creep: ref => creeps[ref] || null, cambiar: () => Promise.resolve(null), publicar: (sc, t) => reg.push(t && t.origen + ' ' + t.r.formula), toast: () => {}, confirmar: () => true,
+    soy: l => l.tipo === 'creep', borrarParry: () => {}};
+  const H = CreepDuelo.hooks(ui), d = tipo => ({atacante: {ref: 'k', tipo: 'creep'}, defensor: {ref: 'k', tipo: 'creep'}, ataque: {tipo, tipoDado: 8}});
+  const base = CreepCalculo.statValor(creeps.k, 'eva');
+  ['normal', 'oportunidad', 'contra'].forEach(t => H.defender(d(t), 'evasion'));
+  const forma = v => formulaParaValor(v).formula;
+  igual([reg, Combatiente.statEvaEspecial('oportunidad'), Combatiente.statEvaEspecial('contra'), Combatiente.statEvaEspecial('normal'), H.opcionesDefensa(d('oportunidad'))[0].info[0]],
+    [[`Orco · Evasión ${forma(base)}`, `Orco · Evasión (+2 contra oportunidad) ${forma(base + 2)}`, `Orco · Evasión (+3 contra contraataque) ${forma(base + 3)}`],
+     'evaopor', 'evacontra', '', `Evasión 🎲 ${forma(base + 2)} (con +2 contra oportunidad)`]);
+});
+prueba('piernas: Retirada limpia — 33 % = 5–6 en d6, 50 % = 4–6, 100 = siempre sin tirar; el resumen del personaje la publica', () => {
+  const S = FichaGuardado.normalizar({}).S;
+  S.inventario = [{id: 'p1', nombre: 'Bombacha de gaucho matrero', tipoItem: 'piernas', equipado: true, mods: [{stat: 'retirada', val: 50}]}];
+  igual([Combatiente.retiradaDado(33), Combatiente.retiradaTexto(33), Combatiente.retiradaTexto(50), Combatiente.retiradaDado(100), Combatiente.retiradaTexto(100),
+    Combatiente.retiradaDado(0), Combatiente.retiradaPct(140), FichaResumen.resumen(S).retirada],
+    [{caras: 6, exitos: 2}, '33 % (5–6 en d6)', '50 % (4–6 en d6)', null, 'siempre', null, 100, 50]);
+});
+prueba('catálogo: las piernas Común (28) — ninguna pasa de Defensa 1, y las mecánicas nuevas están', () => {
+  const L = CATALOGO_BASE.filter(i => i.tipoItem === 'piernas' && i.tier === 'Común');
+  const stats = new Set(L.flatMap(i => (i.mods || []).map(m => m.stat)));
+  igual([L.length, L.every(i => (i.mods || []).every(m => m.stat !== 'def' || m.val <= 1)), ['evaopor', 'evacontra', 'retirada', 'pasosgratis', 'sigilo'].every(x => stats.has(x))], [28, true, true]);
+});
 prueba('durabilidad: Resistente ×N suma N y Frágil ×N resta N a la total (no por Peso); con Frágil puede bajar de 3, nunca de 1', () => {
   const d = (peso, x, extra) => Combatiente.durMax({tipoItem: 'escudo_1m', peso, ...(x ? {durExtra: x} : {}), ...(extra || {})});
   const puerta = CATALOGO_BASE.find(i => i.nombre === 'Coraza de puerta');

@@ -513,7 +513,7 @@ async function trampaAplicarEfectos(t, el, celdaPisada){
   const muro = trampaMuroDe(el);
   const comun = {
     nombreT: el.trampaNombre || 'una trampa', salva, dano: trampaDanoValido(el.trampaDano) ? el.trampaDano.trim() : '', ignoraDef: !!el.trampaIgnoraDef,
-    specJson: spec && spec.nombre ? el.trampaEstado : '', elemento: (spec && spec.elemento) || '', pierdeSp: (spec && spec.pierdeSp) || '',
+    specJson: spec && spec.nombre ? el.trampaEstado : '', elemento: (spec && spec.elemento) || '', pierdeSp: (spec && spec.pierdeSp) || '', cadena: (spec && spec.cadena) || null,
     aMano: (String(el.trampaDetalle || '').match(/[^.]*\(a mano\)\./g) || []).map(x => x.trim()).join(' '),   // lo que el texto dice que va a mano
   };
   for(const x of afectados){

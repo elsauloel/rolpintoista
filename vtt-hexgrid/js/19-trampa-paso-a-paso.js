@@ -37,7 +37,7 @@ function trampaFaseSiguiente(dt, fase){
   const orden = ['empuje', 'salva', 'dano', 'sp', 'estado', 'mano', 'muro', 'zona', 'fin'];
   const agarro = dt.evita !== 'todo' && dt.evita !== 'efecto';
   for(const f of orden.slice(orden.indexOf(fase) + 1)){
-    if(f === 'dano' && dt.dano && dt.evita !== 'todo') return f;
+    if(f === 'dano' && (dt.dano || dt.danoFijo) && dt.evita !== 'todo') return f;
     if(f === 'sp' && dt.pierdeSp && agarro) return f;
     if(f === 'estado' && dt.spec && agarro) return f;
     if(f === 'mano' && dt.aMano && agarro) return f;
@@ -62,6 +62,8 @@ function trampaPasoQueFalta(dt){
     const s = dt.salva, etq = trampaEtq(s);
     return {titulo: trampaTituloSalva(s), texto: `${etq} contra ${s.dif}: con ${s.dif} o más, ${trampaLogra(dt)}.`, boton: `🎲 Tirar ${etq}`, espera: `${dt.quien} tira ${etq}…`};
   }
+  if(dt.fase === 'dano' && dt.danoFijo) return {titulo: 'Le llega la descarga', texto: `${dt.danoFijo} de daño${dt.elemento ? ' ' + Combatiente.ELEMENTOS[dt.elemento].icono : ''}, directo a la vida (la mitad del salto anterior; lo frenan ${dt.elemento ? Combatiente.ELEMENTOS[dt.elemento].etq + ' y ' : ''}la Armadura mágica).`,
+    boton: '▶ Recibir la descarga', espera: `a ${dt.quien} le llega la descarga…`};
   if(dt.fase === 'dano') return {titulo: 'Daño', texto: `La trampa pega ${dt.dano}${dt.elemento ? ' ' + Combatiente.ELEMENTOS[dt.elemento].icono : ''}${dt.evita === 'mitad' ? ' (la mitad)' : ''}${dt.ignoraDef ? ', directo a la vida' : ', menos la Defensa'}${dt.elemento ? ` (lo frenan ${Combatiente.ELEMENTOS[dt.elemento].etq} y la Armadura mágica)` : ''}.`,
     boton: `🎲 Tirar el daño (${dt.dano})`, espera: `${dt.quien} tira el daño…`};
   if(dt.fase === 'sp') return {titulo: 'Le chupa el SP', texto: `La runa le arranca ${dt.pierdeSp} de SP.`, boton: `🎲 Tirar cuánto SP pierde (${dt.pierdeSp})`, espera: `${dt.quien} tira cuánto SP pierde…`};
@@ -92,7 +94,8 @@ async function trampaMomentoNuevo(p){
   const dt = {
     tokenId: p.tokenId || '', creep: x.tipo === 'creep', fichaId: String(x.fichaId || ''), quien: p.quien, nombreT: p.nombreT, pisador: !!p.pisador,
     salva: s ? {stat: String(s.stat), etq: String(s.etq || ''), dif: num(s.dif), que: String(s.que || 'todo'), ...(s.logra ? {logra: String(s.logra)} : {})} : null,
-    dano: p.dano || '', ignoraDef: !!p.ignoraDef, elemento: p.elemento || '', pierdeSp: p.pierdeSp || '', spec: p.specJson || '', muro: num(p.muro), muroLargo: num(p.muroLargo), zona: num(p.zona), aMano: p.aMano || '',
+    dano: p.dano || '', ignoraDef: !!p.ignoraDef, elemento: p.elemento || '', pierdeSp: p.pierdeSp || '',
+    cadena: p.cadena && p.pisador ? {rango: num(p.cadena.rango) || 3, golpeados: [p.tokenId || '']} : null, spec: p.specJson || '', muro: num(p.muro), muroLargo: num(p.muroLargo), zona: num(p.zona), aMano: p.aMano || '',
     fase: '', tirando: false, evita: '', pasos: [],
   };
   dt.fase = dt.salva ? 'salva' : trampaFaseSiguiente(dt, 'salva');
@@ -123,9 +126,72 @@ function trampaMeToca(id, dt){
   return base ? bnManejo(base) : soyGM;   // un token sin ficha: el GM
 }
 
+/* La Descarga que salta (2026-10-04, dueño): cuando a una víctima se le terminó de resolver, la descarga salta al enemigo más cercano (del
+   mismo bando que la víctima) a `rango` casillas o menos, con la mitad del daño (para arriba), una sola vez por enemigo. Cada salto es un
+   momento propio: todas las pantallas ven el rayo en el mapa y, después, a quien lo recibe le aparece el Anuncio para resistir la Parálisis. */
+async function trampaSaltar(dt){
+  const c = dt.cadena, n = Math.ceil(num(dt.danoTirado) / 2), de = tokens.get(dt.tokenId);
+  if(!c || n < 1 || !de) return;
+  const golpeados = new Set(c.golpeados || []), lado = x => x.tipo === 'creep' ? 'creep' : 'pj';
+  const cand = [...tokens.entries()].filter(([id, x]) => !golpeados.has(id) && x.fichaId && !x.oculto && lado(x) === lado(de) && distanciaHex(x, de) <= (num(c.rango) || 3))
+    .sort((a, b) => distanciaHex(a[1], de) - distanciaHex(b[1], de));
+  if(!cand.length) return;
+  const [hid, h] = cand[0], quien = nombreDe(h);
+  const nd = {tokenId: hid, creep: h.tipo === 'creep', fichaId: String(h.fichaId || ''), quien, nombreT: dt.nombreT, pisador: false, salva: dt.salva || null,
+    dano: '', danoFijo: n, ignoraDef: true, elemento: dt.elemento || '', pierdeSp: '', spec: dt.spec || '', muro: 0, muroLargo: 0, zona: 0, aMano: '',
+    fase: '', tirando: false, evita: '', pasos: [], cadena: {rango: num(c.rango) || 3, golpeados: [...golpeados, hid]}, salto: {desde: dt.tokenId, hacia: hid}};
+  nd.fase = nd.salva ? 'salva' : trampaFaseSiguiente(nd, 'salva');
+  nd.lineas = trampaLineas(nd);
+  await momentoAbrir({tipo: 'trampa', icono: '⚡', titulo: `La descarga salta a ${quien}`, estado: 'paso', datos: nd});
+}
+const efectosRayo = [], RAYO_FX_MS = 1900, saltosVistos = new Set(), trampaRetenidas = new Set();
+function rayoSaltoEfecto(desdeId, haciaId){
+  const a = tokens.get(desdeId), b = tokens.get(haciaId);
+  if(!a || !b) return;
+  efectosRayo.push({a: hexCentro(a.col, a.fila), b: hexCentro(b.col, b.fila), desde: Date.now()});
+  pedirDibujo();
+}
+function dibujarEfectosRayo(){
+  const ahora = Date.now();
+  let activo = false;
+  for(let i = efectosRayo.length - 1; i >= 0; i--){
+    const fx = efectosRayo[i], edad = ahora - fx.desde;
+    if(edad > RAYO_FX_MS){ efectosRayo.splice(i, 1); continue; }
+    const k = Math.min(1, edad / 350), apagar = Math.min(1, (RAYO_FX_MS - edad) / 500);
+    const bx = fx.a.x + (fx.b.x - fx.a.x) * k, by = fx.a.y + (fx.b.y - fx.a.y) * k;   // el rayo llega en un tercio de segundo
+    const dx = bx - fx.a.x, dy = by - fx.a.y, largo = Math.hypot(dx, dy) || 1, nx = -dy / largo, ny = dx / largo;
+    ctx.save();
+    [[9, `rgba(255,230,90,${0.35 * apagar})`], [3.5, `rgba(255,250,210,${apagar})`]].forEach(([ancho, color]) => {
+      ctx.beginPath(); ctx.moveTo(fx.a.x, fx.a.y);
+      const tramos = 9;
+      for(let s = 1; s < tramos; s++){ const f = s / tramos, desvio = (Math.random() - 0.5) * HEX * 0.6; ctx.lineTo(fx.a.x + dx * f + nx * desvio, fx.a.y + dy * f + ny * desvio); }
+      ctx.lineTo(bx, by); ctx.strokeStyle = color; ctx.lineWidth = ancho / vista.zoom; ctx.lineJoin = 'round'; ctx.stroke();
+    });
+    if(k >= 1){   // el que recibe: un anillo que late
+      const fase = ((edad - 350) / 600) % 1;
+      ctx.beginPath(); ctx.arc(fx.b.x, fx.b.y, HEX * (0.6 + 0.9 * fase), 0, 2 * Math.PI);
+      ctx.strokeStyle = `rgba(255,230,90,${(1 - fase) * apagar})`; ctx.lineWidth = 4 / vista.zoom; ctx.stroke();
+    }
+    ctx.restore();
+    activo = true;
+  }
+  return activo;
+}
+
 // Lo llama momentoRecibido (js/16) con cada cambio de un momento de trampa.
 function trampaMomento(id, d){
   const dt = d.datos || {};
+  // Un salto de la Descarga: primero se ve el rayo en todas las pantallas y recién después aparece el Anuncio.
+  if(dt.salto && !saltosVistos.has(id)){
+    saltosVistos.add(id);
+    rayoSaltoEfecto(dt.salto.desde, dt.salto.hacia);
+    if(d.estado !== 'listo' && trampaMeToca(id, dt)){
+      trampaRetenidas.add(id); trampasDatos.set(id, d);
+      setTimeout(() => { trampaRetenidas.delete(id); trampaMomento(id, trampasDatos.get(id) || d); }, 1500);
+      return;
+    }
+  }
+  if(trampaRetenidas.has(id)){ trampasDatos.set(id, d); return; }
   if(trampaMeToca(id, dt) && !trampasCerradas.has(id)){
     trampasDatos.set(id, d);
     if(momentosFeed.delete(id)) renderMomentosFeed();
@@ -219,6 +285,7 @@ async function trampaGuardar(id, dt){
     const f = trampaFinal(dt);
     await momentoActualizar(id, {estado: 'listo', resultado: f.resultado, datos: f.datos});
     if(f.datos.pasos.length) alertaRojaAnonima(`🪤 ${dt.nombreT}`, `${dt.quien}: ${f.resultado}`);
+    if(dt.cadena) await trampaSaltar(f.datos).catch(err => console.error('No se pudo hacer saltar la descarga:', err));
     return;
   }
   await momentoActualizar(id, {datos: {...dt, tirando: false, lineas: trampaLineas(dt)}});
@@ -289,10 +356,13 @@ async function trampaPasoSalva(id, dt){
 
 // 2 · Daño: la víctima tira los dados de la trampa; se aplica y se anuncia (sin la vida que le queda: la de un creep es privada).
 async function trampaPasoDano(id, dt){
-  const r = tirarDados(dt.dano);
+  // Un salto de la Descarga trae su daño ya fijo (la mitad del anterior): no se tira.
+  const r = dt.danoFijo ? {formula: String(dt.danoFijo), total: num(dt.danoFijo), rolls: [], mod: 0} : tirarDados(dt.dano);
   if(!r) throw new Error('Fórmula de daño inválida: ' + dt.dano);
-  try{ await mesaPublicar(`Daño a ${dt.quien}`, {formula: r.formula, rolls: r.rolls, mod: r.mod, total: r.total, quien: `🪤 ${dt.nombreT}`}); }catch(err){}
-  await trampaEsperarDados();
+  if(!dt.danoFijo){
+    try{ await mesaPublicar(`Daño a ${dt.quien}`, {formula: r.formula, rolls: r.rolls, mod: r.mod, total: r.total, quien: `🪤 ${dt.nombreT}`}); }catch(err){}
+    await trampaEsperarDados();
+  }
   const monto = dt.evita === 'mitad' ? Math.floor(r.total / 2) : r.total;
   const x = tokens.get(dt.tokenId);
   let res = null, freno = '';
@@ -306,14 +376,14 @@ async function trampaPasoDano(id, dt){
       else res = await (String(x.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(x, String(monto), dt.ignoraDef, arm, rr.res);
     }catch(err){ console.error('No se pudo aplicar el daño de la trampa:', err); }
   }
-  let texto = `${r.formula} = ${r.total}${dt.evita === 'mitad' ? ` → la mitad: ${monto}` : ''}`;
+  let texto = dt.danoFijo ? `${r.total} de descarga` : `${r.formula} = ${r.total}${dt.evita === 'mitad' ? ` → la mitad: ${monto}` : ''}`;
   if(monto <= 0) texto += ' → sin daño';
   else if(res){
     const g = res.r;
     texto += g.invulnerable ? ' → Invulnerable: no le hizo nada'
       : (dt.ignoraDef ? `${freno ? ` − ${freno}` : ''} → ${fmt(g.recibido)} de daño directo a la vida` : ` − Defensa ${fmt(g.defensa - (freno ? num(freno.split(' ').pop()) : 0))}${freno ? ` − ${freno}` : ''} → ${fmt(g.recibido)} de daño`) + (g.absorbido ? ` (el escudo absorbió ${fmt(g.absorbido)})` : '');
   }else texto += ` → ${monto} de daño${dt.ignoraDef ? ' directo a la vida' : ' menos su Defensa'} — aplicalo a mano`;
-  const sig = {...dt, pasos: [...(dt.pasos || []), {titulo: 'Daño', texto}]};
+  const sig = {...dt, danoTirado: r.total, pasos: [...(dt.pasos || []), {titulo: dt.danoFijo ? 'Le llega la descarga' : 'Daño', texto}]};
   sig.fase = trampaFaseSiguiente(sig, 'dano');
   await trampaGuardar(id, sig);
 }

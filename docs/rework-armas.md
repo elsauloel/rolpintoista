@@ -1249,3 +1249,5 @@ Demora 6 · Pajaritos 7 · Derribar 6 · Aturdir 3 (17–20 %) · Rompe armadura
 **T10 Raro cargada (2026-10-03):** las 18 con sus tres textos. Mangual (4 dados), Martillo de sargento y Maza de acero pasaron a Excepcional (para
 esa vuelta). El Mangual de 2 dados quedó como Mangual de cadena y el Hacha de batalla a dos manos como Mazo de demolición (mismos ids); «⚠️ Maza» y
 «⚠️ Lucero del alba» sin la marca. **Tipo 10: Común, Buena y Rara hechas.** Sigue: Tipo 12 (explosivos).
+**Mangual de cadena (dueño, 2026-10-03):** una mano · 1 dado · **Alcance +1** (excepción: la cadena llega lejos aunque sea de una mano) · Derribar
+33 % · Pajaritos 25 % · 190. Sin el efecto extra rendía como Buena (9,1).

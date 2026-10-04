@@ -512,6 +512,9 @@ aside{
 #elemento-etiqueta .es-libre{color:#8EE6A8;font-weight:700}
 #elemento-etiqueta.solido{border-color:rgba(216,82,75,.85)}
 #elemento-etiqueta.libre{border-color:rgba(142,230,168,.55)}
+#elemento-etiqueta.especial{border-color:rgba(255,200,60,.85);white-space:normal;max-width:min(520px,70%)}
+#elemento-etiqueta .es-trampa{color:#FFD25A;font-weight:700}
+#elemento-etiqueta .que-hace{margin-top:4px;font-size:12px;color:var(--paper);line-height:1.35}
 /* Anillo: cada botón se ubica en ronda alrededor del token (hudUbicar). */
 #hud .hud-anillo{position:absolute;left:0;top:0}
 #hud .hud-anillo > *{position:absolute;transform:translate(-50%,-50%);pointer-events:auto}

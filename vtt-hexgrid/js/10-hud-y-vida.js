@@ -513,6 +513,17 @@ function actualizarEtiquetaElemento(){
     return;
   }
   const forma = e.tipo === 'linea' ? 'Línea' : e.tipo === 'libre' ? 'Forma libre' : 'Flor';
+  // Una trampa, una zona o un portal dicen qué son (2026-10-04, dueño: «debe ser claro lo que es el objeto al seleccionarlo»).
+  const especial = elementoQueEs(e);
+  if(especial){
+    const clave = 'especial|' + especial;
+    if(clave === etiquetaElementoTexto) return;
+    etiquetaElementoTexto = clave;
+    el.className = 'especial';
+    el.innerHTML = especial;
+    el.hidden = false;
+    return;
+  }
   const estado = e.solido
     ? '<span class="es-solido">🧱 SÓLIDO · bloquea el paso</span>'
     : '<span class="es-libre">🚶 TRANSITABLE · se puede pisar</span>';
@@ -526,6 +537,23 @@ function actualizarEtiquetaElemento(){
   el.className = clase;
   el.innerHTML = html;
   el.hidden = false;
+}
+
+// Qué es un elemento especial, para el cartel de arriba: el nombre, de quién es, en qué estado está y qué hace. '' si es una forma común.
+function elementoQueEs(e){
+  const dueno = nombreMiembro(e.duenoUid), de = esc(/^\(/.test(dueno) ? dueno : `(${dueno})`);
+  const det = txt => txt ? `<div class="que-hace">${esc(String(txt).replace(/\s*⚙[\s\S]*$/, '').slice(0, 260))}</div>` : '';
+  if(e.zona){
+    const t = num(e.turnos) > 0 && mantenimientoNumero !== null ? Math.max(0, num(e.venceMant) - Math.round(num(mantenimientoNumero))) : 0;
+    return `<b>🌫 ZONA · ${esc(e.zonaNombre || 'Efecto persistente')}</b> <span>${de}</span>${t ? ` · <span>quedan ${t} turno${t === 1 ? '' : 's'}</span>` : ''}` +
+      ` · <span class="es-libre">la sufre quien entra y quien sigue adentro en el Mantenimiento</span>`;
+  }
+  if(e.portal) return `<b>🌀 PORTAL</b> <span>${de}</span> · <span class="es-libre">lo usan los aliados de quien lo abrió: lleva al otro portal</span>`;
+  if(e.trampa){
+    const estado = e.disparada ? '<span class="es-solido">💥 DETONADA</span>' : '<span class="es-trampa">⚠ ARMADA · la disparan los rivales de quien la puso (los aliados no)</span>';
+    return `<b>🪤 TRAMPA · ${esc(e.trampaNombre || 'sin nombre')}</b> <span>${de}</span> · ${estado}${det(e.trampaDetalle)}`;
+  }
+  return '';
 }
 
 function actualizarEtiquetaToken(){

@@ -312,6 +312,9 @@ puede medir contra la curva.
 1. **Común:** torso ✅ · escudo ✅ · cabeza ✅ · manos ✅ · piernas · pies · cinturón · anillos. **Control:** la calculadora sobre el equipo Común completo
    contra la curva de N1 (Defensa 4–10, T4 ≤ 2, T6 ≤ 1) y N2 (5–12). **Y la Res.CC (dueño, 2026-10-04):** medir cuánta se junta con el equipo completo,
    para que no sea tan abundante que le quite peso a los personajes y efectos que juegan con control (hoy, con torso y cabeza: hasta +4).
+1b. **Lluvia de mecánicas por parte (dueño, 2026-10-04):** el ejercicio de las piernas («imaginá todas las mecánicas, tirá de más, yo filtro») se
+   repite con cada parte ya hecha (torso, escudo, cabeza, manos) y con las que faltan. Lo que salga se usa sobre todo en Buena y Rara; en Común, solo
+   alguna pieza suelta que se sume a la lista (sin rehacer lo cargado).
 2. **Buena:** las mismas partes, en el mismo orden. **Control:** N3 (6–14, T4 ≤ 3, T6 ≤ 2, T8 ≤ 1) y N4 (7–16, T10 ≤ 1).
 3. **Rara:** las mismas partes; aparece «Indestructible» (muy escaso). **Control:** N5 (8–18, T4 ≤ 4, T6 ≤ 3, T8 ≤ 2, T10 ≤ 1, T12 ≤ 1).
 4. Con el catálogo defensivo armado: **escasez en el generador de tiendas** (elegir rubro y parte del cuerpo antes que la pieza) y el **simulador

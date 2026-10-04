@@ -52,6 +52,8 @@ const InvDuelo = (() => {
     // Sin No2 suficientes pregunta «¿Atacar igual?» (B-7, 2026-10-02: antes se rechazaba): gasta los que tenga y deja la línea roja.
     // tipo: 'normal', 'oportunidad' o 'contra' (los dos últimos, como los creeps: lo de un primer ataque y el PdG especial de su arma).
     function atacarSuelto(inv, tipo){
+      const qs = Combatiente.preguntaSentado(inv.estados, inv.nombre);   // Sentado no puede atacar: avisa y deja seguir
+      if(qs && !(ui.confirmar || (t => confirm(t)))(qs)) return;
       const forzar = A().faltanNitros(inv, tipo);
       if(forzar && !(ui.confirmar || (t => confirm(t)))(A().preguntaSinNitros(inv, tipo))) return;
       let p;

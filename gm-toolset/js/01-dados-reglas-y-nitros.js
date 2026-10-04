@@ -514,7 +514,8 @@ function costoContraataqueCreep(sc){ return CreepCalculo.costoContraataque(sc); 
 // Menú de Atacar del creep (2026-09-26, pedido del dueño): Ataque normal / Ataque de oportunidad / Contraataque. Normal: el primero del turno cuesta Tipo ÷ 2 y los siguientes el Tipo completo;
 // oportunidad y contraataque siempre cuestan Tipo ÷ 2 y no suman al conteo de ataques del turno.
 function atacarNormalCreep(sc){
-  if((sc.estados || []).some(e => e.activo !== false && e.sentado) && !confirm(`${sc.nombre} está Sentado y no puede atacar. ¿Atacar igual?`)) return;
+  const qs = Combatiente.preguntaSentado(sc.estados, sc.nombre);   // Sentado no puede atacar: avisa y deja seguir
+  if(qs && !confirm(qs)) return;
   const forzar = CreepAcciones.faltanNitros(sc, 'normal');   // sin No2: avisar y dejar seguir (2026-10-02)
   if(forzar && !confirm(CreepAcciones.preguntaSinNitros(sc, 'normal'))) return;
   const x = CreepAcciones.pagarAtaque(sc, 'normal', forzar);   // comun/creep-acciones.js
@@ -526,6 +527,8 @@ function atacarNormalCreep(sc){
   toast(x.aviso);
 }
 function ataqueEspecialCreep(sc, tipo){
+  const qs = Combatiente.preguntaSentado(sc.estados, sc.nombre);   // Sentado no puede atacar (cualquier ataque)
+  if(qs && !confirm(qs)) return;
   const forzar = CreepAcciones.faltanNitros(sc, tipo);
   if(forzar && !confirm(CreepAcciones.preguntaSinNitros(sc, tipo))) return;
   const x = CreepAcciones.pagarAtaque(sc, tipo, forzar);   // comun/creep-acciones.js

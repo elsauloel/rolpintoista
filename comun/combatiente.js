@@ -169,6 +169,10 @@ const Combatiente = (() => {
      pasivas, estados), igual para personajes, creeps e invocaciones. `statAtaqueEspecial(tipo)` → el stat ('' si es un ataque normal). */
   const ATAQUE_ESPECIAL = {oportunidad: {stat: 'pdgopor', nombre: 'Ataque de oportunidad'}, contra: {stat: 'pdgcontra', nombre: 'Contraataque'}};
   const statAtaqueEspecial = tipo => (ATAQUE_ESPECIAL[tipo] || {}).stat || '';
+  // Sentado no puede atacar (regla del dueño, 2026-10-03: igual para personajes, invocaciones y creeps, y para cualquier ataque): se avisa y
+  // se deja seguir. Se pregunta al pagar el ataque. → el texto de la pregunta, o '' si no está Sentado. Sin nombre, en segunda persona.
+  const preguntaSentado = (estados, nombre) => !(estados || []).some(e => e && e.activo !== false && e.sentado) ? ''
+    : nombre ? `${nombre} está Sentado y no puede atacar. ¿Atacar igual?` : 'Estás Sentado: no podés atacar. ¿Atacar igual?';
   /* «Ignora N de Resistencia a crítico» de un arma (2026-10-03, pedido del dueño): el campo `ignoraResistCrit` del arma (también el viejo
      efecto al golpear «Ignora N de Res. crítico», que no se aplicaba solo). El duelo se lo resta a la Resistencia del defensor antes de
      calcular el crítico (lo pide al atacante con statsCritico). `arma` = {ignoraResistCrit, efectosGolpe} (un creep o una invocación: sus
@@ -605,7 +609,7 @@ const Combatiente = (() => {
     return v;
   }
 
-  return {ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+  return {ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, preguntaSentado, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

@@ -383,8 +383,7 @@ function lupaHtmlInv(clave){   // comun/inv-lupa.js (4e, tanda 6): lo usa tambi�
 }
 
 function atacar(){
-  // Sentado no puede atacar: se avisa y se deja seguir (las herramientas ayudan, no prohíben).
-  if(efectoSentado() && !confirm('Estás Sentado: no podés atacar. ¿Atacar igual?')) return;
+  // Sentado no puede atacar: lo pregunta FichaAcciones al pagar el ataque (Combatiente.preguntaSentado), suelto o en el duelo.
   const armas = armasEquipadasConDano();
   if(armas.length <= 1){ preguntarTipoAtaque(armas.length ? armas[0].item : null); return; }
   $('#elegir-arma-lista').innerHTML = armas.map(a => `

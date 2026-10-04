@@ -45,7 +45,8 @@ const CreepDuelo = (() => {
   function atacarCon(ui, ref, tipo){
     const sc = ui.creep(ref);
     if(!sc) return;
-    if(tipo === 'normal' && (sc.estados || []).some(e => e.activo !== false && e.sentado) && !ui.confirmar(`${sc.nombre} está Sentado y no puede atacar. ¿Atacar igual?`)) return;
+    const qs = Combatiente.preguntaSentado(sc.estados, sc.nombre);   // Sentado no puede atacar (cualquier ataque): avisa y deja seguir
+    if(qs && !ui.confirmar(qs)) return;
     const forzar = A().faltanNitros(sc, tipo);
     if(forzar && !ui.confirmar(A().preguntaSinNitros(sc, tipo))) return;
     return ui.cambiar(ref, c => A().pagarAtaque(c, tipo, forzar)).then(x => {

@@ -911,6 +911,17 @@ prueba('el primer ataque con un arma cuesta Tipo ÷ 2 y el siguiente el Tipo com
   FichaAcciones.atacarConArma(S, espada, false, uiCombate(reg, est));
   igual([50 - tras1, tras1 - S.nitros, est.parry, reg.filter(x => x.startsWith('🎲')).length], [Combatiente.costoPrimerAtaque(tipo), tipo, null, 2]);
 });
+prueba('Sentado no puede atacar (personaje, invocación y creep, cualquier ataque): pregunta al pagar; si dice que no, no cobra nada', () => {
+  const sentado = [{nombre: 'Sentado', activo: true, sentado: true}];
+  const S = fichaBotonera({nitros: 20, inventario: [espada], efectos: sentado}), reg = [], preguntas = [];
+  const ui = r => ({...uiCombate(reg, {}), confirmar: q => { preguntas.push(q); return r; }});
+  FichaAcciones.atacarConArma(S, espada, false, ui(false));
+  FichaAcciones.ataqueEspecialConArma(S, espada, 'oportunidad', false, ui(false));
+  const sinCobrar = S.nitros;
+  FichaAcciones.atacarConArma(S, espada, false, ui(true));
+  igual([Combatiente.preguntaSentado(sentado), Combatiente.preguntaSentado(sentado, 'Orco'), Combatiente.preguntaSentado([]), preguntas.length, sinCobrar, S.nitros < 20],
+    ['Estás Sentado: no podés atacar. ¿Atacar igual?', 'Orco está Sentado y no puede atacar. ¿Atacar igual?', '', 3, 20, true]);
+});
 prueba('oportunidad y contraataque cuestan siempre lo de un primer ataque y no suman al conteo', () => {
   const S = fichaBotonera({nitros: 20, inventario: [espada], ataquesArma: {[FichaCombate.claveAtaque(espada)]: 3}}), reg = [];
   FichaAcciones.ataqueEspecialConArma(S, espada, 'contra', false, uiCombate(reg, {}));

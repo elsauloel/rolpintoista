@@ -348,7 +348,9 @@ const FichaAcciones = (() => {
      Lo que hace el ataque suelto (sin objetivo) o el que el duelo le pide al atacante: cobrar los No2 y tirar el PdG.
      Ataque normal: el primero del turno con esa arma cuesta Tipo ÷ 2, los siguientes el Tipo completo (cuenta como ataque).
      Ataque de oportunidad y Contraataque (regla a prueba, P139): SIEMPRE Tipo ÷ 2 y NO suman al conteo de ataques. */
+  const confirmarSentado = (S, ui) => { const q = Combatiente.preguntaSentado(S.efectos); return !q || (ui.confirmar || (t => confirm(t)))(q); };
   function atacarConArma(S, arma, forzar, ui){
+    if(!forzar && !confirmarSentado(S, ui)) return;   // Sentado no puede atacar: avisa y deja seguir
     ui.setParry(null);
     const costo = FichaCombate.costoAtaque(S, arma);
     if(costo > num(S.nitros) && !forzar){
@@ -367,6 +369,7 @@ const FichaAcciones = (() => {
   function ataqueEspecialConArma(S, arma, tipo, forzar, ui){
     const costo = FichaCombate.costoAtaqueEspecial(arma, tipo), nombre = NOMBRE_ATAQUE_ESPECIAL[tipo] || 'Ataque';
     const con = arma ? ' con ' + arma.nombre : '';
+    if(!forzar && !confirmarSentado(S, ui)) return;
     if(costo > num(S.nitros) && !forzar){
       ui.avisarSinNitros(costo, `hacer un ${nombre.toLowerCase()}${con}`, () => ataqueEspecialConArma(S, arma, tipo, true, ui));
       return;

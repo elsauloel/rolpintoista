@@ -429,6 +429,8 @@ function invAtacarSuelto(invId, tipo){
   tipo = tipo || 'normal';
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
+  const qs = Combatiente.preguntaSentado(inv.estados, inv.nombre);   // Sentado no puede atacar: avisa y deja seguir
+  if(qs && !confirm(qs)) return;
   // Sin No2 suficientes: «¿Atacar igual?» (B-7, como los creeps): gasta los que tenga y deja la línea roja.
   const forzar = InvAcciones.faltanNitros(inv, tipo);
   if(forzar && !confirm(InvAcciones.preguntaSinNitros(inv, tipo))) return;

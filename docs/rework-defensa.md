@@ -189,3 +189,23 @@ brutal le saca 3–4) y se lo atraviesa con las herramientas especiales. **Condi
 mágico que escala, veneno y sangrado, el ácido que rompe armadura) tienen que crecer con los niveles; se mide cuando se revisen. Recordatorio del
 dueño: la defensa se acumula en muchos slots y el arma pega de a una — la curva es el total del equipo completo; el presupuesto de cada pieza se mide
 contra ese total.
+
+## Paleta de variables e identidad por slot (2026-10-04)
+**Identidad por slot ✅** («me parece bárbara»): cabeza → visión, Percepción, Res.Mt, T10 · torso → la Defensa principal, vida, Armadura mágica
+(túnicas) · manos → Parry, Res.CC · piernas → Evasión, carga · pies → Iniciativa, Evasión, Res.CC contra caerse o trabarse · escudo → Defensa,
+Bloqueo, T8/T10 · cinturón → ranuras, T12 · anillos → una resistencia o un stat chico, sin Defensa.
+
+**Costo en puntos de presupuesto ✅** (punto de partida, se ajusta con la calculadora): Defensa 1 · Res. crítico T4/6/8/10/12 = 1/2/3/4/5 ·
+Evasión 2 · Iniciativa 2 · Res.CC 1 · Res.Esp 1 · **Res.Mt 0,5** (dueño: los efectos que se resisten con Res.Mt son escasos) · Visión 0,5 ·
+Percepción 0,5 · +5 vida 1 · Armadura mágica 1 · No2 máximo 4 · ranura de cinturón 1.
+
+**Agregados del dueño:**
+- **Resistencia elemental específica** (fuego, hielo, rayo, tóxico, ácido…): tan situacional que **pesa poco**; sirve para sumarle un bonus a una
+  pieza sin desbalancearla. *(Mecánica nueva a construir: un stat por elemento que se resta al daño de ese tipo; hace falta que el daño de las trampas
+  y las armas diga su elemento — hoy solo lo dicen las habilidades y las zonas. Hasta entonces, ✋ a mano.)*
+- **Ranuras de cinturón en otros slots:** una **túnica de maestre** (como los maestres de Game of Thrones, con pociones y venenos escondidos en la
+  túnica) y un **casco tonto** como el de Homero en Los Simpsons (dos cervezas con pajitas curvas que llegan a la boca): un casco con dos pociones.
+- **Bono de sigilo:** en alguna armadura blanda o en una máscara / capucha. *(Mecánica nueva: hoy el sigilo es Destreza contra Percepción; haría falta
+  un stat «Sigilo +N» que se sume al esconderse.)*
+- **Cantidad de ítems:** no hay un número fijo por slot (ni «tantos cascos comunes»): **se crean tantos como hagan falta para tener amplitud y
+  diversidad de efectos**, pensando en que al final el generador de tiendas, por estadística, ofrezca cosas útiles.

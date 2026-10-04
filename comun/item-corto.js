@@ -139,6 +139,7 @@ const ItemCorto = (() => {
     Veneno: 'Veneno: pierde 1 HP por stack en cada Mantenimiento y un stack por turno (los turnos son los stacks). Los stacks nuevos se suman a los que ya tenía.',
     'Veneno severo': 'Veneno severo: daño por turno que crece en cada Mantenimiento y no se va solo: hay que curarlo.',
     Demora: 'Demora: baja al golpeado 1 lugar en el orden de turnos, para siempre (hasta que el GM reordene). Lo hace solo el mapa.',
+    Pajaritos: 'Pajaritos: 3 turnos con el PdG y la Evasión a la mitad (se tira el dado completo y el resultado se divide por 2).',
     Aturdir: 'Aturdir: queda Stun (sin No2 por 2 turnos: no puede actuar).',
     Derribar: 'Derribar: cae al suelo y queda Sentado (Evasión a la mitad; no ataca hasta levantarse).',
     'Rompe armadura': 'Rompe armadura: deja Armadura rota (−1 de Defensa por stack). «Armadura rota doble»: deja 2 stacks por golpe.',

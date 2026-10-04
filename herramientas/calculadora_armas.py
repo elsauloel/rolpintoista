@@ -59,15 +59,16 @@ ORDEN = [t for t, _ in UMBRAL_TIER]
 
 # Pesos de los efectos (P7, cerrado) y familias (de casa / habilitado). Familia por Tipo: 4 punzante, 6 cortante, 8 hacha, 10 contundente, 12 explosivo; de rango aparte.
 PESO_EFECTO = {'Rompe armadura': 4, 'Demora': 4, 'Aturdir': 5, 'Lisiado': 3, 'Sangrado': 2, 'Envenenar': 2, 'Veneno severo': 3,
-               'Derribar': 3, 'Prende fuego': 3.5, 'Drena vida': 4, 'Explosión': 6, 'Rengo': 3}   # Explosión: la razón de ser del Tipo 12; el peso es a radio 1, cada radio extra suma +50 %
-CASA = {'hacha': {'Rompe armadura'}, 'contundente': {'Demora', 'Aturdir'}, 'punzante': {'Lisiado'}, 'cortante': {'Sangrado'}, 'explosivo': {'Explosión'}}
+               'Derribar': 3, 'Prende fuego': 3.5, 'Drena vida': 4, 'Explosión': 6, 'Rengo': 3,
+               'Pajaritos': 4}   # Pajaritos (2026-10-03, dueño: de los contundentes): PdG y Evasión a la mitad 3 turnos   # Explosión: la razón de ser del Tipo 12; el peso es a radio 1, cada radio extra suma +50 %
+CASA = {'hacha': {'Rompe armadura'}, 'contundente': {'Demora', 'Aturdir', 'Pajaritos'}, 'punzante': {'Lisiado'}, 'cortante': {'Sangrado'}, 'explosivo': {'Explosión'}}
 HABILITADO = {'Envenenar': {'hacha', 'cortante', 'punzante', 'rango'}, 'Veneno severo': {'hacha', 'cortante', 'punzante', 'rango'},
               'Sangrado': {'punzante', 'hacha'}, 'Lisiado': {'cortante'}, 'Rompe armadura': {'contundente'}, 'Aturdir': {'explosivo'},
               'Demora': {'explosivo'}, 'Derribar': {'contundente', 'hacha', 'explosivo'}, 'Prende fuego': {'explosivo', 'rango'},
-              'Drena vida': {'cortante', 'punzante'}, 'Rengo': {'punzante', 'cortante'}}
+              'Drena vida': {'cortante', 'punzante'}, 'Rengo': {'punzante', 'cortante'}, 'Pajaritos': {'explosivo'}}
 FAMILIA_POR_TIPO = {4: 'punzante', 6: 'cortante', 8: 'hacha', 10: 'contundente', 12: 'explosivo'}
 # efectos del catálogo actual que ya no existen en el diseño nuevo (no suman)
-DESCARTADOS = {'Arruina armadura', 'Media armadura', 'Ignora armadura', 'Agarrar', 'Primera sangre', 'Golpes seguidos', 'Estruendo', 'Empuje', 'Pajaritos'}
+DESCARTADOS = {'Arruina armadura', 'Media armadura', 'Ignora armadura', 'Agarrar', 'Primera sangre', 'Golpes seguidos', 'Estruendo', 'Empuje'}
 ALIAS = {'Knockdown': 'Demora'}
 
 
@@ -282,7 +283,7 @@ def hoja():
 
 
 # ---------------------------------------------------------------- reajuste de las armas ACTUALES a las reglas nuevas (propuesta automática, el dueño audita)
-MAPA_EFECTOS = {'Arruina armadura': 'Rompe armadura', 'Media armadura': 'Rompe armadura', 'Primera sangre': 'Sangrado', 'Empuje': 'Demora', 'Pajaritos': 'Lisiado', 'Knockdown': 'Demora'}
+MAPA_EFECTOS = {'Arruina armadura': 'Rompe armadura', 'Media armadura': 'Rompe armadura', 'Primera sangre': 'Sangrado', 'Empuje': 'Demora', 'Knockdown': 'Demora'}
 DESCARTAR_EFECTOS = {'Ignora armadura', 'Golpes seguidos', 'Estruendo', 'Agarrar'}
 MAX_BONOS = {'Común': 1, 'Buena Calidad': 2, 'Raro': 3, 'Excepcional': 4, 'Legendario': 6}
 PROB_POR_TIER = {'Aturdir': {'Raro': (1, 6), 'Excepcional': (1, 4), 'Legendario': (1, 2)}, 'Lisiado': {'Común': (1, 4), 'Buena Calidad': (1, 4), 'Raro': (1, 3), 'Excepcional': (1, 2), 'Legendario': (3, 4)}}

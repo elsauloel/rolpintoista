@@ -116,6 +116,7 @@ const GuiaDiseno = (() => {
   const EFECTOS_ARMA = [
     {n: 'Rompe armadura', d: 'Quita Defensa al golpeado (estado Armadura rota, se acumula de a 1 y se puede reparar).', e: 'auto', casa: ['hacha'], comp: ['contundente'], peso: 4},
     {n: 'Demora (baja 1 lugar en la iniciativa)', d: 'Baja al golpeado 1 lugar en la tabla de iniciativa, y el cambio es definitivo (queda hasta que el GM reordene). Antes se llamaba Knockdown. La aplica sola el mapa en el duelo.', e: 'auto', casa: ['contundente'], comp: ['explosivo'], peso: 4},
+    {n: 'Pajaritos', d: 'PdG y Evasión a la mitad por 3 turnos (el golpe en la cabeza: ve pajaritos).', e: 'auto', casa: ['contundente'], comp: ['explosivo'], peso: 4},
     {n: 'Aturdir', d: 'Deja al rival sin acciones (Stun: sin No2 por 2 turnos).', e: 'auto', casa: ['contundente'], comp: ['explosivo'], peso: 5},
     {n: 'Lisiado', d: 'PdG y Parry a la mitad por unos turnos.', e: 'auto', casa: ['punzante'], comp: ['cortante'], peso: 3},
     {n: 'Sangrado', d: 'Pierde HP por turno; reaplicarlo suma +1 de daño por turno.', e: 'auto', casa: ['cortante'], comp: ['punzante', 'hacha'], peso: 3},

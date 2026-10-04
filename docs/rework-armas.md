@@ -1144,3 +1144,7 @@ resistente (80); Hacha afilada a la piedra → Sangrado de 3 stacks 50 % (70); H
 
 **La cuenta clave del Tipo 10:** 2 dados de d10 ya rinden 10,6 (el techo de Buena es 11). Un arma Buena de 2 dados **a una mano no tiene lugar
 para nada más**; a dos manos le entra una cosa chica (Demora 25 %, Bloqueo +1). El resto de la Buena es **1 dado con varias cosas**.
+
+**Pajaritos entra a los contundentes (dueño, 2026-10-03):** «podemos incluir Pajaritos entre los efectos para diseño, inclusive en algunos
+Común, 25 % o 50 %». Es el estado de siempre (PdG y Evasión a la mitad, 3 turnos; el duelo ya lo aplica solo). En la calculadora vale **4** (como
+la Demora) y es de casa del Tipo 10 (habilitado en el 12); se sacó de los efectos descartados. «Detalles técnicos» y la Guía de diseño lo explican.

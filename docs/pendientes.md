@@ -188,6 +188,11 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Hechizo de área en cascada** (Paso 7b del casteo): armar una habilidad de prueba con objetivo "A un área", castearla contra 2-3 objetivos y ver que la cascada, el círculo compartido y la fase `dodge` anden con varias pantallas abiertas a la vez.
 
 ## 3. Documentación
+- [ ] **Manual de diseño del catálogo, para los colegas** (pedido del dueño, 2026-10-04; se hace **al final** del rework de armas, defensa y
+  trampas): todo el criterio de diseño y gestión de ítems compilado para compartir con el grupo — por qué cada mecánica está en cada tipo de
+  arma, cómo se arma una pieza defensiva, cómo se gestiona la escasez (tiendas, drops, oro, reparar), las curvas por nivel — para que lo lean,
+  opinen y ajusten: el dueño lo decide solo ahora para poder avanzar, pero la decisión final es de la mesa. Fuentes: `rework-armas.md`,
+  `rework-defensa.md`, `rework-trampas.md`, `guia-de-diseno.md` (y su espejo `comun/guia-diseno.js`). Cada decisión, con su porqué.
 - [ ] **Manual** (`manual-usuario/notas`): grupos y tokens automáticos, botín, Despojar, Finalizar combate en el mapa, trampas automáticas, estados sobre otros, protección de jefe, botón 🎭 y grupos ↔ mapas, y una nota de casteo cuando estén las reglas.
 
 ## 4. Diseño pendiente

@@ -1781,6 +1781,18 @@ async function conFbFalsoYa(datos, fn){
   window.firebase = {firestore: {FieldValue: {serverTimestamp: () => 'ahora', delete: () => '__borrar'}}};
   try{ return await fn(); }finally{ Object.assign(window, antes); }
 }
+prueba('fin del combate: cada trampa consumible sin disparar tiene 50 % de romperse al desarmarla; las sanas vuelven a su dueño (y las disparadas no se tocan)', () => {
+  const datos = {'elementos/a': {trampaItem: '{"nombre":"Trampa de oso menor"}', trampaNombre: 'Trampa de oso menor', duenoUid: 'u1', trampaFicha: 'f1', disparada: false},
+    'elementos/b': {trampaItem: '{"nombre":"Red de caza"}', trampaNombre: 'Red de caza', duenoUid: 'u1', trampaFicha: 'f1', disparada: false},
+    'elementos/c': {trampaItem: '{"nombre":"Mina"}', trampaNombre: 'Mina', duenoUid: 'u1', trampaFicha: 'f1', disparada: true}};
+  const tiros = [0.2, 0.9];   // la primera se rompe (menos de 0,5), la segunda aguanta
+  return conFbFalso(datos, async () => {
+    const r = await TokensAuto.desarmarTrampasConsumibles('_principal', () => tiros.shift());
+    const vuelta = Object.entries(datos).find(([k]) => k.startsWith('recompensas/'));
+    igual([r, Object.keys(datos).filter(k => k.startsWith('elementos/')), vuelta && vuelta[1].devolver, TokensAuto.ROMPE_AL_DESARMAR],
+      [{total: 2, vuelven: 1, rotas: ['Trampa de oso menor']}, ['elementos/c'], ['{"nombre":"Red de caza"}'], 0.5]);
+  });
+});
 prueba('creeps por mapa: el orden de las pestañas y el mapa de un creep (si su mapa ya no existe, la Reserva)', () => {
   const mapas = new Map([['b', {nombre: 'Bosque', creadoMs: 20}], ['_principal', {nombre: 'Cueva', creadoMs: 99}], ['a', {nombre: 'Aldea', creadoMs: 10}]]);
   const ids = new Set(['_principal', 'a', 'b']);

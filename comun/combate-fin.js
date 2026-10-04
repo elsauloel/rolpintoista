@@ -458,10 +458,12 @@ const CombateFin = (() => {
       batch.set(fbDb.doc(fbRutaCampana('combate/actual')), {estado: 'cerrado', cerrado: ts}, {merge: true});   // se inhabilitan los botones 🎁 y se cierra la ventana de los jugadores
       await batch.commit();
       await lineaVerde('🏁 Botín cerrado', `${libres.length ? `${libres.length} ítem(s) sin tomar → ${fmt(total)} despojos: +${fmt(cada)} c/u a ${elegidos.map(j => j.nombre).join(', ')} · ` : ''}XP y oro cargados en las fichas`);
-      let desarmadas = 0;
-      try{ desarmadas = await TokensAuto.desarmarTrampasConsumibles(); }catch(err){ console.error('No se pudieron desarmar las trampas consumibles:', err); }
-      if(desarmadas) await lineaVerde('🪤 Trampas desarmadas', `${desarmadas} trampa${desarmadas === 1 ? '' : 's'} de consumible sin disparar ${desarmadas === 1 ? 'volvió' : 'volvieron'} a la mochila o al cinturón de su dueño`);
-      return {ok: true, mensaje: 'Botín cerrado ✓ — XP, oro y despojos cargados en las fichas' + (desarmadas ? ` · ${desarmadas} trampa${desarmadas === 1 ? '' : 's'} desarmada${desarmadas === 1 ? '' : 's'}` : '')};
+      let des = {total: 0, vuelven: 0, rotas: []};
+      try{ des = await TokensAuto.desarmarTrampasConsumibles() || des; }catch(err){ console.error('No se pudieron desarmar las trampas consumibles:', err); }
+      // Regla del dueño (2026-10-03): al desarmarla, cada trampa tiene 50 % de romperse; las que aguantan vuelven a la mochila de su dueño.
+      const nR = des.rotas.length;
+      if(des.total) await lineaVerde('🪤 Trampas desarmadas', `${des.total} trampa${des.total === 1 ? '' : 's'} de consumible sin disparar (cada una, 50 % de romperse al desarmarla): ${des.vuelven ? `${des.vuelven} ${des.vuelven === 1 ? 'volvió' : 'volvieron'} a la mochila o al cinturón de su dueño` : 'ninguna volvió'}${nR ? ` · ${nR} se ${nR === 1 ? 'rompió' : 'rompieron'} (${des.rotas.join(', ')})` : ''}`);
+      return {ok: true, mensaje: 'Botín cerrado ✓ — XP, oro y despojos cargados en las fichas' + (des.total ? ` · ${des.total} trampa${des.total === 1 ? '' : 's'} desarmada${des.total === 1 ? '' : 's'}${nR ? ` (${nR} rota${nR === 1 ? '' : 's'})` : ''}` : '')};
     }catch(err){
       console.error('No se pudo despojar:', err);
       return {error: err.code === 'permission-denied' ? 'Faltan las reglas nuevas de Firebase' : 'No se pudo despojar — mirá la consola'};

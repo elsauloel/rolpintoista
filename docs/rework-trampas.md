@@ -66,3 +66,7 @@ Va dentro del JSON de `trampaEstado` (`muro: {largo: 3 | 5, turnos}`), sin regla
 - En el juego: `efecto: {area: 'pisador' | 'trampa' | 'flor', radio}` adentro del JSON de `trampaEstado` (`TokensAuto.efectoNorm`); el mapa decide a
   quién le llega con eso (`trampaAfectados`, js/08). Sin `efecto`: una casilla = quien la pisó; más grande = toda la trampa. Reemplaza al criterio
   del 2026-09-25 (lo mágico distinguía aliados).
+
+**Trampas sin disparar al final del combate (regla del dueño, 2026-10-03; reemplaza «vuelven a tu inventario»):** al cerrar el botín, cada
+trampa consumible que no se disparó se desarma y tiene **50 % de romperse**; las que aguantan vuelven a la mochila (o al cinturón) de su dueño. La
+línea verde de la Mesa dice cuántas volvieron y cuáles se rompieron (`TokensAuto.desarmarTrampasConsumibles`, `ROMPE_AL_DESARMAR`).

@@ -175,7 +175,7 @@ const TokensAuto = (() => {
         disparada: false, fuegoAmigo: !!o.fuegoAmigo, trampaDano: String(o.dano || '').slice(0, 12),
         ...(o.ignoraDef ? {trampaIgnoraDef: true} : {}),
         ...(Number.isFinite(Number(o.detectar)) && Number(o.detectar) >= 1 ? {trampaDetectar: Math.round(Number(o.detectar))} : {}),
-        ...(o.item ? {trampaItem: String(o.item).slice(0, 4000), trampaFicha: String(o.fichaId || '').slice(0, 80)} : {}),   // trampa que salió de un consumible: al cerrar el botín, si no se disparó, se desarma y vuelve a su dueño
+        ...(o.item ? {trampaItem: String(o.item).slice(0, 4000), trampaFicha: String(o.fichaId || '').slice(0, 80)} : {}),   // trampa que salió de un consumible: al cerrar el botín, si no se disparó, se desarma (50 % de romperse) y, si aguanta, vuelve a su dueño
         ...(estadoJson(o.estado, o.salvacion, o.muro, o.efecto) ? {trampaEstado: estadoJson(o.estado, o.salvacion, o.muro, o.efecto)} : {}),   // el estado y la salvación (la tira el mapa solo)
         ...(venceMant !== null ? {turnos: o.turnos, venceMant} : {}),
         // Trampa persistente: al dispararse queda como zona (el mapa la convierte, ver trampaResolver) — mismos campos que pone el mapa.
@@ -192,29 +192,35 @@ const TokensAuto = (() => {
      Al cerrar el botín (el GM reparte XP y despoja lo que nadie tomó), las trampas que un jugador puso desde un consumible y que NO se
      dispararon se desarman solas y vuelven a su dueño: se borra el elemento y se deja un aviso en `recompensas` con el ítem en `devolver`;
      la ficha del dueño lo suma a la mochila (o al cinturón si la mochila no tiene lugar). Devuelve cuántas trampas se desarmaron. */
-  async function desarmarTrampasConsumibles(mapaId){
+  // Al terminar el combate (regla del dueño, 2026-10-03; antes volvían todas): cada trampa consumible que no se disparó se desarma y tiene
+  // 50 % de romperse (`ROMPE_AL_DESARMAR`); las que aguantan vuelven a la mochila de su dueño. → {total, vuelven, rotas: [nombres]}.
+  // `azar` (opcional, para las pruebas): la función que tira, de 0 a 1.
+  const ROMPE_AL_DESARMAR = 0.5;
+  async function desarmarTrampasConsumibles(mapaId, azar){
+    azar = azar || Math.random;
     mapaId = mapaId || await mapaQueMiraElGM();
     const col = fbDb.collection(fbRutaCampana(mapaId === MAPA_PRINCIPAL_ID ? 'elementos' : `mapas/${mapaId}/elementos`));
     const snap = await col.get();
-    const lote = fbDb.batch(), porFicha = new Map();
+    const lote = fbDb.batch(), porFicha = new Map(), rotas = [];
     let n = 0;
     snap.docs.forEach(d => {
       const e = d.data();
       if(!e.trampaItem || e.disparada || !e.duenoUid || !e.trampaFicha) return;
       lote.delete(d.ref);
       n++;
+      if(azar() < ROMPE_AL_DESARMAR){ rotas.push(String(e.trampaNombre || 'Trampa')); return; }
       const g = porFicha.get(e.trampaFicha) || {duenoUid: e.duenoUid, nombre: '', items: []};
       g.items.push(e.trampaItem);
       porFicha.set(e.trampaFicha, g);
     });
-    if(!n) return 0;
+    if(!n) return {total: 0, vuelven: 0, rotas: []};
     porFicha.forEach((g, fichaId) => lote.set(fbDb.collection(fbRutaCampana('recompensas')).doc(), {
       fichaId, duenoUid: g.duenoUid, nombre: g.nombre, xp: 0, dde: 0, despojos: 0, estado: 'trampas', aplicada: false, devolver: g.items,
       creado: firebase.firestore.FieldValue.serverTimestamp(),
     }));
     await lote.commit();
-    return n;
+    return {total: n, vuelven: n - rotas.length, rotas};
   }
 
-  return {salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles};
+  return {salvaNorm, muroNorm, efectoNorm, estadoJson, crear, mapaQueMiraElGM, centroGuardado, rutaTokens, colocarTrampas, desarmarTrampasConsumibles, ROMPE_AL_DESARMAR};
 })();

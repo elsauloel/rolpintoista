@@ -1210,3 +1210,7 @@ versión parecida en más de una, es candidato a juntar.
   recibe UNA tirada con todos los dados (`1d6+1d3+1d4`) y una línea con lo que funcionó y lo que no. El cuadro muestra un **tablero** (dado · efecto
   y su % · con qué número funciona · qué salió, ✔/✘) y debajo solo las tarjetas de lo que funcionó (o entra siempre), con su «Aplicar». Si ningún
   efecto tiene probabilidad, queda el botón por efecto de antes. Probado en vivo.
+- **El dado de un efecto que funciona brilla** (2026-10-04, pedido del dueño: «como el d20 del crítico»): la tirada de los efectos lleva
+  `destacar: 'idx:0,2'` (los dados de los efectos que funcionaron) y `dados3d.js` (`dadosDestacar(c, notacion, cual)`, que también sigue aceptando
+  `'max'`) agranda, sube, hace brillar y suelta ondas en esos dados; la Mesa (`mesa.js`) acepta ese formato. En el tablero del duelo, el número
+  de un efecto que funcionó es grande y dorado, late y dice «¡FUNCIONÓ!». (El tablero se probó en vivo; los dados 3D, no: la ventana estaba oculta.)

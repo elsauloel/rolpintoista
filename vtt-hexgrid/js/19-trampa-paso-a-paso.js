@@ -76,9 +76,9 @@ function trampaPasoQueFalta(dt){
   if(dt.fase === 'salva' && dt.salva){
     const s = dt.salva, etq = trampaEtq(s);
     const efecto = s.que === 'efecto', que = trampaQueSeResiste(dt), sp = trampaSpec(dt);
-    const detalle = efecto && sp && sp.nombre ? ` (${EstadosAplicar.texto(sp)})` : '';
+    const queLargo = efecto && sp && sp.nombre ? que.replace(sp.nombre, EstadosAplicar.texto(sp)) : que;   // «Parálisis (2 turnos)»
     return {titulo: trampaTituloSalva(s, dt),
-      texto: efecto ? `Tira ${etq} para resistir ${que}${detalle}. Contra ${s.dif}: con ${s.dif} o más, ${trampaLogra(dt)}.` : `${etq} contra ${s.dif}: con ${s.dif} o más, ${trampaLogra(dt)}.`,
+      texto: efecto ? `Tira ${etq} para resistir ${queLargo}. Contra ${s.dif}: con ${s.dif} o más, ${trampaLogra(dt)}.` : `${etq} contra ${s.dif}: con ${s.dif} o más, ${trampaLogra(dt)}.`,
       boton: efecto ? `🎲 Tirar ${etq} para resistir ${que}` : `🎲 Tirar ${etq}`, espera: `${dt.quien} tira ${etq}${efecto ? ` para resistir ${que}` : ''}…`};
   }
   if(dt.fase === 'dano' && dt.danoFijo) return {titulo: 'Le llega la descarga', texto: `${dt.danoFijo} de daño${dt.elemento ? ' ' + Combatiente.ELEMENTOS[dt.elemento].icono : ''}, directo a la vida (la mitad del salto anterior; lo frenan ${dt.elemento ? Combatiente.ELEMENTOS[dt.elemento].etq + ' y ' : ''}la Armadura mágica).`,

@@ -336,6 +336,11 @@ o Derribar), cubrir a un aliado de al lado (bloquear por él), bloquear proyecti
 recarga) — este último ya existe como mecánica de ítems.
 
 **Mapa conceptual:** Buena — Tipo 8 con Defensa, aparece Tipo 10 en los pesados, broqueles de duelista (Parry +2), pavés de verdad a dos manos,
-combos de dos elementos, Ve lo oculto (escudo espejado), contraataque +2, golpe de escudo. Rara — Armadura mágica (escudo rúnico),
+combos de dos elementos, Ve lo oculto (escudo espejado), golpe de escudo. Rara — Armadura mágica (escudo rúnico),
 Indestructible (muy escaso), Espinas o Escudo especial al equiparlo, Tipo 10 / Tipo 8 +2, reflejar proyectiles y hechizos, elemental fuerte.
+
+**Ajuste del dueño (2026-10-04): el escudo está en la mano, no en el cuerpo.** *Por qué:* lo que protege al cuerpo o a la mente (Res.CC, Res.Esp,
+Res.Mt) y lo que se lleva encima (ranuras de cinturón) no es del escudo; y el **contraataque va con el arma**, no con el escudo. Quedan para el
+escudo: Defensa, Bloqueo, Parry, resistencia a crítico, resistencia elemental (lo que frena el escudo de frente), luz portada (un farol en la mano),
+durabilidad y las desventajas. Costos sugeridos ✅ (frágil −0,5, resistente +0,5). La lista Común se rehízo con eso (27 piezas, a revisar en detalle).
 

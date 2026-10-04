@@ -1788,6 +1788,12 @@ prueba('portal (rango 8, lo elige quien la puso), dardos (el veneno solo si last
     [{rango: 8}, '', '1d6+3', true, 'linea', 3, {area: 'flor', radio: 1, centro: 'trampa'}, '4d6', 'rescc', 'efecto',
       {rango: 8}, true, {area: 'flor', radio: 1, centro: 'trampa'}, {area: 'flor', radio: 1}, 'quien la pone elige adónde lo manda, hasta 8 casillas', true]);
 });
+prueba('Pasos gratis: un stat que suben las piezas y que el resumen publica para el mapa', () => {
+  const S = FichaGuardado.normalizar({}).S;
+  const c0 = FichaCalculo.calcular(S);
+  S.inventario = [{id: 'p1', nombre: 'Piernas de prueba', tipoItem: 'piernas', equipado: true, mods: [{stat: 'pasosgratis', val: 2}]}];
+  igual([c0.final.pasosgratis, FichaCalculo.calcular(S).final.pasosgratis, FichaResumen.resumen(S).pasosGratis, FichaCalculo.STAT_LABEL.pasosgratis], [0, 2, 2, 'Pasos gratis']);
+});
 prueba('durabilidad: Resistente ×N suma N y Frágil ×N resta N a la total (no por Peso); con Frágil puede bajar de 3, nunca de 1', () => {
   const d = (peso, x, extra) => Combatiente.durMax({tipoItem: 'escudo_1m', peso, ...(x ? {durExtra: x} : {}), ...(extra || {})});
   const puerta = CATALOGO_BASE.find(i => i.nombre === 'Coraza de puerta');

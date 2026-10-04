@@ -561,16 +561,41 @@ function lentoEn(col, fila){
   });
   return n;
 }
-function costoPasos(ruta, porCasillero){
+// `gratis` (2026-10-04, Pasos gratis): los primeros casilleros de la ruta no cuestan (los que le quedan a ese token en este turno).
+function costoPasos(ruta, porCasillero, gratis){
   const acc = [];
   let s = 0;
   for(let i = 1; i < (ruta || []).length; i++){
-    s += porCasillero > 0 ? Math.max(porCasillero, lentoEn(ruta[i - 1].col, ruta[i - 1].fila)) : 0;
+    if(i > num(gratis)) s += porCasillero > 0 ? Math.max(porCasillero, lentoEn(ruta[i - 1].col, ruta[i - 1].fila)) : 0;
     acc.push(s);
   }
   return acc;
 }
-const costoRuta = (ruta, porCasillero, pasos) => { const a = costoPasos((ruta || []).slice(0, pasos + 1), porCasillero); return a.length ? a[a.length - 1] : 0; };
+const costoRuta = (ruta, porCasillero, pasos, gratis) => { const a = costoPasos((ruta || []).slice(0, pasos + 1), porCasillero, gratis); return a.length ? a[a.length - 1] : 0; };
+
+/* Pasos gratis (2026-10-04, dueño): cuántos le quedan a un token en este turno (de Mantenimiento a Mantenimiento). Los usados se anotan en esta
+   pantalla (y en el navegador, por si se recarga): los mueve casi siempre la misma persona. */
+const pasosGratisUsados = new Map();
+const pasosGratisClave = id => `${id}@${Math.round(num(mantenimientoNumero))}`;
+try{ const g = JSON.parse(localStorage.getItem('pasos-gratis') || '{}'); Object.entries(g).forEach(([k, v]) => pasosGratisUsados.set(k, num(v))); }catch(e){}
+function pasosGratisDe(t){
+  if(!t || !t.fichaId) return 0;
+  if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return sc && typeof CreepCalculo !== 'undefined' ? Math.max(0, Math.round(num(CreepCalculo.modTotal(sc, 'pasosgratis')))) : 0; }
+  if(String(t.fichaId).includes(SEP_INVOCACION)) return 0;
+  const f = fichasPub.get(t.fichaId);
+  return Math.max(0, Math.round(num(f && f.resumen && f.resumen.pasosGratis)));
+}
+function pasosGratisRestantes(id){
+  const t = tokens.get(id);
+  return Math.max(0, pasosGratisDe(t) - num(pasosGratisUsados.get(pasosGratisClave(id))));
+}
+function pasosGratisUsar(id, n){
+  if(!n) return;   // negativo: los devuelve (Ctrl+Z)
+  const k = pasosGratisClave(id);
+  pasosGratisUsados.set(k, Math.max(0, num(pasosGratisUsados.get(k)) + n));
+  try{ const g = {}; pasosGratisUsados.forEach((v, kk) => { if(kk.endsWith('@' + Math.round(num(mantenimientoNumero)))) g[kk] = v; }); localStorage.setItem('pasos-gratis', JSON.stringify(g)); }catch(e){}
+}
+const idDeToken = t => { for(const [id, x] of tokens) if(x === t) return id; return ''; };
 
 function costoMoverDe(t){
   if(modoMapa !== 'combate') return null;  // en modo narrativo se mueve sin contar No2
@@ -579,7 +604,7 @@ function costoMoverDe(t){
   const f = fichasPub.get(t.fichaId);
   const r = f && f.resumen;
   if(!r || r.costoMover === undefined) return null;
-  return {porCasillero: num(r.costoMover), disponibles: num(r.nitros)};
+  return {porCasillero: num(r.costoMover), disponibles: num(r.nitros), gratis: pasosGratisRestantes(idDeToken(t))};
 }
 
 // Mismas reglas que la ficha publica en resumen.costoMover: 1 por
@@ -590,7 +615,7 @@ function costoMoverCreep(t){
   if(!sc || sc.nitros === undefined || sc.nitros === null) return null;
   const activos = (Array.isArray(sc.estados) ? sc.estados : []).filter(e => e && e.activo !== false);
   const porCasillero = activos.some(e => e.inmovilizado) ? 0 : activos.some(e => e.rengo) ? 2 : 1;
-  return {porCasillero, disponibles: num(sc.nitros)};
+  return {porCasillero, disponibles: num(sc.nitros), gratis: pasosGratisRestantes(idDeToken(t))};
 }
 
 // 🎮 El GM tomó el control de este personaje (la ficha publica resumen.control = su uid, 2026-09-30): lo usa como si fuera su

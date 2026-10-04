@@ -88,7 +88,8 @@ const FichaResumen = (() => {
       rng: n(c.final.rng),               // Rango (de Destreza): el mapa lo usa para el visualizador de rango (📏)
       rangocasteo: n(c.final.rangocasteo),   // Rango de casteo (de Especial): visualizador de rango mágico (🔮)
       luz: n(c.final.luz), veoculto: n(c.final.veoculto),   // luz que lleva encima y radio en el que ve lo oculto: el mapa los lee (farol, bengala, yelmo del ojo que todo lo ve)
-      vision: n(c.final.vision),   // Campo de visión (base 6 + ítems, pasivas y estados): el mapa lo suma a la luz de la escena para el radio de cada token
+      vision: n(c.final.vision),
+      pasosGratis: n(c.final.pasosgratis),   // los primeros casilleros de cada turno, gratis (el mapa los descuenta del costo de moverse)   // Campo de visión (base 6 + ítems, pasivas y estados): el mapa lo suma a la luz de la escena para el radio de cada token
       // Crítico (2026-09-25): el mapa arma con esto la Calculadora de crítico sin que haya que escribirlo (equipo, habilidades y estados ya sumados).
       // Crítico frecuente y potente DE ESA ARMA (la misma de armaTipo): lo de la otra arma equipada no cuenta.
       ...(() => { const a = (S.inventario || []).find(i => i.equipado && /^arma/.test(i.tipoItem || '') && [4, 6, 8, 10, 12].includes(num(i.tipoDado))); return {crit: n(statParaArma('crit', a || null)), critpot: n(statParaArma('critpot', a || null))}; })(),

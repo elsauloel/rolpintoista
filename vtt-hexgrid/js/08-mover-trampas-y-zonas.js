@@ -22,6 +22,7 @@ function mostrarConfirmacionRuta(){
     ? `Mover ${p.pasos} casillero${p.pasos === 1 ? '' : 's'} cuesta ${fmt(costo)} No2 y tenés ${fmt(Math.max(0, p.disponibles))} · ⚠ te faltan ${fmt(exceso)}: no se puede hacer · clic afuera lo cancela (para moverte igual, usá Mover libre 🦶)`
     : `Mover ${p.pasos} casillero${p.pasos === 1 ? '' : 's'} · −${fmt(costo)} No2 (te quedan ${fmt(p.disponibles - costo)})` +
       (p.porCasillero !== 1 ? ` · ${fmt(p.porCasillero)} por casillero` : '') + (costo > p.pasos * p.porCasillero ? ' · salir de la arena cuesta más' : '') +
+      (p.gratis > 0 ? ` · ${p.gratis} gratis` : '') +
       ' · clic afuera para confirmar';
   $('#ruta-confirmar').classList.toggle('excede', exceso > 0);
   $('#ruta-confirmar').hidden = false;
@@ -119,6 +120,7 @@ async function deshacerUltimoMovimiento(){
       if(u.esCreep) await gastarNitrosCreep(u.fichaId, -u.costo);
       else await gastarNitros(u.fichaId, -u.costo);
     }
+    if(u.pasosGratis > 0) pasosGratisUsar(u.id, -u.pasosGratis);   // los pasos gratis de este turno vuelven
     const doc = coleccionTokens().doc(u.id);
     if(u.tipo === 'giro'){
       t.rotacion = u.rotacion;
@@ -731,6 +733,7 @@ async function confirmarRuta(){
   try{
     const esCreep = t.tipo === 'creep';
     const quedan = esCreep ? await gastarNitrosCreep(t.fichaId, costo) : await gastarNitros(t.fichaId, costo);
+    pasosGratisUsar(p.id, num(p.gratis));   // los primeros casilleros de este turno ya se usaron
     rutaPendiente = null;
     const fin = p.celdas[p.celdas.length - 1];
     await moverToken(p.id, fin.col, fin.fila, p.celdas);
@@ -738,10 +741,10 @@ async function confirmarRuta(){
     if(percepcionSigiloPendiente && percepcionSigiloPendiente.tokenId === p.id) percepcionSigiloResolver();   // P145 (js/16)
     if(oportunidadPendiente && oportunidadPendiente.tokenId === p.id) oportunidadResolver();   // ataque de oportunidad (js/17)
     oportunidadPublicarAvisos(t, p.oportunidad);
-    if(origen && (origen.col !== fin.col || origen.fila !== fin.fila)) deshacerRegistrar({tipo: 'mover', id: p.id, fichaId: t.fichaId, esCreep, costo, col: origen.col, fila: origen.fila, rotacion: rotAntes, seq0, pend0});
+    if(origen && (origen.col !== fin.col || origen.fila !== fin.fila)) deshacerRegistrar({tipo: 'mover', id: p.id, fichaId: t.fichaId, esCreep, costo, pasosGratis: num(p.gratis), col: origen.col, fila: origen.fila, rotacion: rotAntes, seq0, pend0});
     toast(esCreep
-      ? `${nombreDe(t)}: −${fmt(costo)} No2 · le quedan ${fmt(quedan)}${quedan < 0 ? ' ⚠ se pasó de sus No2' : ''}`
-      : `−${fmt(costo)} No2 · te quedan ${fmt(quedan)}${quedan < 0 ? ' ⚠ te pasaste de tus No2' : ''}`);
+      ? `${nombreDe(t)}: −${fmt(costo)} No2${p.gratis > 0 ? ` (${p.gratis} casillero${p.gratis === 1 ? '' : 's'} gratis)` : ''} · le quedan ${fmt(quedan)}${quedan < 0 ? ' ⚠ se pasó de sus No2' : ''}`
+      : `−${fmt(costo)} No2${p.gratis > 0 ? ` (${p.gratis} casillero${p.gratis === 1 ? '' : 's'} gratis)` : ''} · te quedan ${fmt(quedan)}${quedan < 0 ? ' ⚠ te pasaste de tus No2' : ''}`);
   }catch(err){
     console.error('No se pudo mover gastando Nitros:', err);
     toast(err.code === 'permission-denied' ? 'No podés gastar los Nitros de esa ficha' : 'No se pudo mover — mirá la consola');

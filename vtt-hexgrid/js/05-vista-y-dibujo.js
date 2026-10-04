@@ -1060,7 +1060,7 @@ function dibujar(){
   // Mientras se arrastra un token en combate, una esferita con los Nitros que le quedarían al llegar a donde está el
   // mouse queda pegada al token (verde; en magenta si se pasa) — no depende del anillo del HUD (2026-09-24).
   if(arrastre && arrastre.movio && !arrastre.libre && arrastre.costo && modoMapa === 'combate' && tokens.has(arrastre.id)){
-    const porCas = arrastre.costo.porCasillero, gastado = costoRuta(arrastre.ruta, porCas, Math.max(0, arrastre.ruta.length - 1));
+    const porCas = arrastre.costo.porCasillero, gastado = costoRuta(arrastre.ruta, porCas, Math.max(0, arrastre.ruta.length - 1), arrastre.costo.gratis);
     const quedan = arrastre.costo.disponibles - gastado;
     const bx = arrastre.x + HEX * 0.75, by = arrastre.y - HEX * 0.75, rad = 17 / z;
     ctx.save();

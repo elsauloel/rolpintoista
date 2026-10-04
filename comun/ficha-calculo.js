@@ -70,6 +70,9 @@ const FichaCalculo = (() => {
     // guerra: P47). Se ve en un cuadro junto a Defensa; lo modifican pasivas,
     // ítems y estados. La niebla del mapa todavía no lo lee.
     {id:'vision', label:'Campo de visión', full:'Campo de visión (radio en hexágonos)'},
+    // Pasos gratis (2026-10-04, dueño: un bono al movimiento que no sea dar No2): los primeros N casilleros de cada turno (de Mantenimiento a
+    // Mantenimiento) no cuestan No2. Lo dan sobre todo las piernas; sube con la calidad (1, 2, 3).
+    {id:'pasosgratis', label:'Pasos gratis', full:'Casilleros que te movés gratis al comienzo de cada turno (sin gastar No2)'},
     // Resistencias elementales (2026-10-04, dueño): cada una se resta al daño de su elemento (además de la Armadura mágica). Situacionales: pesan poco.
     {id:'resfuego', label:'Res. fuego', full:'Resistencia al fuego: se resta a todo daño de fuego'},
     {id:'reshielo', label:'Res. hielo', full:'Resistencia al hielo: se resta a todo daño de hielo'},

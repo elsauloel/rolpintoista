@@ -135,6 +135,14 @@ const Duelo = (() => {
 .duelo-ef-res.ok{background:rgba(79,206,124,.16);color:#8fe3a9;border:1px solid #4fce7c}
 .duelo-ef-res.no{background:rgba(154,134,126,.14);color:#9aa4bd;border:1px solid #39435c;text-decoration:none}
 .duelo-ef-res.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both}
+.duelo-ef-tablero table{width:100%;border-collapse:collapse;font-size:14px}
+.duelo-ef-tablero th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8d97ad;padding:2px 6px 6px}
+.duelo-ef-tablero td{padding:7px 6px;border-top:1px solid #2f3852;vertical-align:middle}
+.duelo-ef-tablero .hint{color:#ffd25a;font-size:12px}
+.duelo-ef-tablero .ok{color:#8fe3a9;font-weight:800}
+.duelo-ef-tablero .no{color:#9aa4bd;font-weight:700}
+.duelo-dado{display:inline-block;min-width:28px;text-align:center;font-size:18px;padding:2px 6px;border-radius:8px;background:#1d2a4a;border:1px solid #5aa7e8;color:#fff}
+.duelo-dado.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both}
 .duelo-danobox{margin-top:10px;text-align:center;border-radius:12px;padding:14px;background:rgba(0,0,0,.25);border:1px solid #39435c}
 .duelo-danobox.crit{border-color:#ff5a5a;background:radial-gradient(circle at 50% 30%,rgba(120,20,20,.55),rgba(40,8,8,.6))}
 .duelo-danonum{font-size:96px;font-weight:900;line-height:1;animation:duelo-num .6s ease-out both}
@@ -811,6 +819,45 @@ const Duelo = (() => {
     anunciarMesa(anuncio);
   }
 
+  /* Todos los efectos con dado, juntos (2026-10-04, pedido del dueño: «para que pegar con un arma no sea una eternidad»): un solo botón tira un
+     dado por cada efecto que lo necesite; la Mesa recibe UNA tirada con todos los dados y una línea con lo que funcionó y lo que no; el cuadro
+     muestra el tablero (qué dado va con qué efecto, con qué número funciona, qué salió). */
+  async function tirarEfectos(id){
+    const ref = col().doc(id);
+    let publicar = null, anuncio = '';
+    await fbDb.runTransaction(async tx => {
+      publicar = null; anuncio = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.fase !== 'efectos') return;
+      const dados = [], partes = [];
+      m.efectos = (m.efectos || []).map(e => {
+        if(!e || e.res || e.omitido || !necesitaTiradaEf(e)) return e;
+        const ef = {...e}, r = {dado: 0, exito: true, extra: null};
+        if(!siempreEf(ef)){
+          r.dado = 1 + Math.floor(Math.random() * ef.caras);
+          r.exito = r.dado >= ef.caras - ef.exitos + 1;
+          dados.push({caras: ef.caras, dado: r.dado});
+        }
+        if(r.exito && ef.dado && typeof tirarDados === 'function'){
+          const x = tirarDados(ef.dado);
+          if(x) r.extra = {formula: x.formula, total: x.total, rolls: (x.rolls || []).slice(0, 10)};
+        }
+        ef.res = r;
+        partes.push(`${r.exito ? '✔' : '✘'} ${ef.nombre}${siempreEf(ef) ? '' : ` ${pctEf(ef)} % (salió ${r.dado} en d${ef.caras})`}${r.extra ? ` · ${ef.dado} = ${r.extra.total}` : ''}`);
+        return ef;
+      });
+      if(!partes.length) return;
+      cerrarSiListo(m);
+      tx.update(ref, cambiosDe(m));
+      if(dados.length) publicar = {origen: `${m.atacante.nombre} · Efectos del golpe`, r: {formula: dados.map(x => `1d${x.caras}`).join('+'), rolls: dados.map(x => x.dado), mod: 0, total: dados.reduce((a, x) => a + x.dado, 0)}};
+      anuncio = `🎲 Efectos de ${m.atacante.nombre} sobre ${m.defensor.nombre}: ${partes.join(' · ')}`;
+    });
+    if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
+    anunciarMesa(anuncio);
+  }
+
   // Pedir «Aplicar» (lo ejecuta el mapa del GM) o dar por hecho uno que se hace a mano.
   async function marcarEfecto(id, i, cambios){
     const ref = col().doc(id);
@@ -1364,7 +1411,22 @@ const Duelo = (() => {
     const contraOtro = (d.hab && d.hab.contraOtro) || '';
     if(!efs.length && !nota && !notaCritico && !contraOtro) return '';
     const puedeAtq = esMio(d.atacante) || soyGM();
+    // El tablero de los dados (2026-10-04): una fila por efecto que se tira — su dado, con qué número funciona y qué salió.
+    const conDado = efs.map((ef, i) => [ef, i]).filter(([ef]) => !siempreEf(ef));
+    const faltan = efs.filter(ef => !ef.res && !ef.omitido && necesitaTiradaEf(ef));
+    const fila = ([ef, i]) => {
+      const clave = d.id + ':efd' + i, nuevo = ef.res && !revelado[clave];
+      if(ef.res) revelado[clave] = true;
+      const desde = ef.caras - ef.exitos + 1;
+      const res = ef.omitido ? `<span class="no">no entra</span>` : !ef.res ? '<span class="espera">—</span>'
+        : `<b class="duelo-dado${nuevo ? ' nuevo' : ''}">${_fmt(ef.res.dado)}</b> <span class="${ef.res.exito ? 'ok' : 'no'}">${ef.res.exito ? '✔ funcionó' : '✘ no funcionó'}</span>`;
+      return `<tr><td>🎲 d${_fmt(ef.caras)}</td><td><b>${_esc(ef.nombre)}</b> <span class="hint">${pctEf(ef)} %</span></td><td>${desde === ef.caras ? _fmt(desde) : `${_fmt(desde)}–${_fmt(ef.caras)}`}</td><td>${res}</td></tr>`;
+    };
+    const tablero = conDado.length ? `<div class="duelo-ef duelo-ef-tablero"><table><thead><tr><th>Dado</th><th>Efecto</th><th>Funciona con</th><th>Salió</th></tr></thead><tbody>${conDado.map(fila).join('')}</tbody></table>
+      ${faltan.length ? (puedeAtq ? `<button type="button" data-ef-tirar-todos>🎲 Tirar ${faltan.length === 1 ? 'el efecto' : 'los efectos'} (${faltan.map(ef => siempreEf(ef) ? _esc(ef.dado) : '1d' + _fmt(ef.caras)).join(' · ')})</button>`
+        : `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire los efectos…</div>`) : ''}</div>` : '';
     const cards = efs.map((ef, i) => {
+      if(!siempreEf(ef) && !(ef.res && ef.res.exito && !ef.omitido && !ef.aplicado) && !ef.aplicado) return '';   // en el tablero: sin tirar, falló o no entra
       const clave = d.id + ':ef' + i;
       const nuevo = ef.res && !revelado[clave];
       if(ef.res) revelado[clave] = true;
@@ -1383,7 +1445,7 @@ const Duelo = (() => {
         else acc = `<div class="duelo-nota">✋ A mano: ${_esc(ef.detalle || 'aplicalo vos, no hay un estado automático para este efecto')}</div><button type="button" data-ef-mano="${i}">Listo, lo apliqué a mano</button>`;
         estado = cab + acc;
       }
-      else if(puedeAtq) estado = `<button type="button" data-ef-tirar="${i}">🎲 Tirar ${siempreEf(ef) ? _esc(ef.dado) : '1d' + _fmt(ef.caras)}</button><div class="duelo-nota">${siempreEf(ef) ? '' : 'de ' + _fmt(ef.caras - ef.exitos + 1) + (ef.exitos > 1 ? ' a ' + _fmt(ef.caras) : '') + ' funciona · '}${ef.requiereDano ? 'necesita que el golpe haga daño' : 'entra aunque no pase el daño'}</div>`;
+      else if(puedeAtq && !conDado.length) estado = `<button type="button" data-ef-tirar="${i}">🎲 Tirar ${siempreEf(ef) ? _esc(ef.dado) : '1d' + _fmt(ef.caras)}</button><div class="duelo-nota">${siempreEf(ef) ? '' : 'de ' + _fmt(ef.caras - ef.exitos + 1) + (ef.exitos > 1 ? ' a ' + _fmt(ef.caras) : '') + ' funciona · '}${ef.requiereDano ? 'necesita que el golpe haga daño' : 'entra aunque no pase el daño'}</div>`;
       else estado = `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire…</div>`;
       return `<div class="duelo-ef"><div class="duelo-ef-top"><b>${_esc(ef.nombre)}</b><span class="duelo-ef-prob">${_esc(prob)}</span></div>${ef.detalle ? `<div class="duelo-nota">${_esc(ef.detalle)}</div>` : ''}${estado}</div>`;
     }).join('');
@@ -1391,7 +1453,7 @@ const Duelo = (() => {
     const notaCard = contraCard + (nota ? `<div class="duelo-ef"><div class="duelo-nota">✋ ${_esc(nota)}</div></div>` : '')
       + (notaCritico ? `<div class="duelo-ef"><div class="duelo-nota">⚡ Crítico: ${_esc(notaCritico)}</div></div>` : '');
     const pendiente = d.fase === 'efectos' && efs.length;
-    return `<div class="duelo-paso"><h4><span class="n">${d.hab ? (d.hab.sinOposicion ? 2 : d.hab.dano ? 4 : 3) : 6}</span>${d.hab ? 'Efectos de la habilidad' : 'Efectos del golpe'}</h4>${notaCard}${cards}${pendiente && puedeAtq ? '<div class="duelo-pie" style="margin-top:8px"><button type="button" class="sec" data-ef-terminar>Terminar sin resolver los que faltan</button></div>' : ''}</div>`;
+    return `<div class="duelo-paso"><h4><span class="n">${d.hab ? (d.hab.sinOposicion ? 2 : d.hab.dano ? 4 : 3) : 6}</span>${d.hab ? 'Efectos de la habilidad' : 'Efectos del golpe'}</h4>${notaCard}${tablero}${cards}${pendiente && puedeAtq ? '<div class="duelo-pie" style="margin-top:8px"><button type="button" class="sec" data-ef-terminar>Terminar sin resolver los que faltan</button></div>' : ''}</div>`;
   }
   const EstadosAplicarTexto = (spec, ef) => spec.cura ? `Curación de ${spec.cura} HP` : (typeof EstadosAplicar !== 'undefined' ? EstadosAplicar.texto(spec) : spec.nombre) + (spec.nombre === 'Armadura rota' && spec.stacks > 1 ? ` ×${spec.stacks}` : '');
 
@@ -1719,6 +1781,8 @@ const Duelo = (() => {
     f.querySelectorAll('[data-tirarpor]').forEach(b => b.onclick = () => tirarPorAusente(d, b.dataset.tirarpor));
     const brd = f.querySelector('[data-reintentar-def]');
     if(brd) brd.onclick = () => { opcionesPedidas.delete(d.id); delete opcionesFalla[d.id]; delete opciones[d.id]; dibujar(); };
+    const btt = f.querySelector('[data-ef-tirar-todos]');
+    if(btt) btt.onclick = () => { btt.disabled = true; btt.textContent = 'Tirando…'; tirarEfectos(d.id).catch(err => { console.error(err); _toast('No se pudieron tirar los efectos'); }); };
     f.querySelectorAll('[data-ef-tirar]').forEach(b => b.onclick = () => { b.disabled = true; b.textContent = 'Tirando…'; tirarEfecto(d.id, Number(b.dataset.efTirar)).catch(err => { console.error(err); _toast('No se pudo tirar el efecto'); }); });
     f.querySelectorAll('[data-ef-aplicar]').forEach(b => b.onclick = () => { b.disabled = true; marcarEfecto(d.id, Number(b.dataset.efAplicar), {aplicar: 'pedido'}).catch(err => { console.error(err); _toast('No se pudo pedir la aplicación'); }); });
     f.querySelectorAll('[data-ef-mano]').forEach(b => b.onclick = () => { b.disabled = true; marcarEfecto(d.id, Number(b.dataset.efMano), {aplicado: true, aplicar: '', nota: 'a mano'}).catch(err => console.error(err)); });

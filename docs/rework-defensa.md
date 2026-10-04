@@ -344,3 +344,10 @@ Res.Mt) y lo que se lleva encima (ranuras de cinturón) no es del escudo; y el *
 escudo: Defensa, Bloqueo, Parry, resistencia a crítico, resistencia elemental (lo que frena el escudo de frente), luz portada (un farol en la mano),
 durabilidad y las desventajas. Costos sugeridos ✅ (frágil −0,5, resistente +0,5). La lista Común se rehízo con eso (27 piezas, a revisar en detalle).
 
+**El peso en el precio (dueño, 2026-10-04):** en un **escudo**, cada punto de peso por encima del primero cuesta **0,25 de la bolsa** (el peso suma a
+la tirada de Bloqueo y a la durabilidad: es casi todo ventaja). En las demás partes el peso **no se cobra** (la durabilidad que da se compensa con la
+carga que ocupa); rango fijo: blandas 1, rígidas 2–4 según la Defensa. Frágil devuelve 0,5 y resistente cuesta 0,5. Todo en `herramientas/calculadora_defensa.py`
+(antes la calculadora cobraba la durabilidad distinto, y el Sigilo no tenía costo: ahora 1). Revisión de los torsos Comunes con la calculadora: todos
+entran en su bolsa; la Coraza de puerta pasó de 90 a 100 (frágil = 3,5 puntos). Con la regla del peso, los escudos Comunes se recalcularon: los de
+peso 3 o más dejan de llevar Bloqueo extra (su peso ya bloquea) para no pasarse de la bolsa.
+

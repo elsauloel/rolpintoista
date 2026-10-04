@@ -33,11 +33,16 @@ COSTO = {
     'bonos': 1, 'accionesmax': 4,
     # Resistencia elemental (a construir): situacional, pesa poco.
     'resfuego': 0.5, 'reshielo': 0.5, 'resrayo': 0.5, 'restoxico': 0.5, 'resacido': 0.5,
+    'sigilo': 1,   # Sigilo +N (2026-10-04): mejora la tirada del que se esconde contra la Percepción de quien lo busca
 }
 COSTO_DEFECTO = 1
 OFENSIVOS = {'pdg', 'dmg', 'crit', 'critpot', 'rng', 'pdgmg', 'dmgesp', 'rangocasteo', 'accionesmax'}
 COSTO_ESTADO_EQUIPO = 2          # un estado que se pone al equipar (Espinas, Regeneración…): a revisar caso por caso
-COSTO_DUR = 0.25                 # cada punto de durabilidad por Peso por encima de 3 (o lo que devuelve por debajo)
+# Durabilidad (dueño, 2026-10-04): frágil (2 por Peso) devuelve 0,5; resistente (5 por Peso) cuesta 0,5 (0,25 por punto por encima de 3).
+COSTO_DUR_ARRIBA, COSTO_DUR_ABAJO = 0.25, 0.5
+# Peso de un escudo (dueño, 2026-10-04): suma a la tirada de Bloqueo y a la durabilidad → cada punto por encima del primero cuesta 0,25.
+# En las demás partes el peso no se cobra: la durabilidad que da se compensa con la carga que ocupa.
+COSTO_PESO_ESCUDO = 0.25
 
 # ------------------------------------------------------------ bolsas por parte y calidad (dueño, 2026-10-04)
 TIERS = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario']
@@ -77,7 +82,11 @@ def puntos(it):
         det.append((f"estado al equipar: {it['equipoEstadoNombre']}", COSTO_ESTADO_EQUIPO))
         avisos.append('estado al equipar: revisar a mano')
     dpp = it.get('durPorPeso')
-    if dpp: det.append((f"durabilidad {dpp} por Peso", (float(dpp) - 3) * COSTO_DUR))
+    if dpp:
+        d = float(dpp) - 3
+        det.append((f"durabilidad {dpp} por Peso", d * (COSTO_DUR_ARRIBA if d > 0 else COSTO_DUR_ABAJO)))
+    if PARTE.get(it.get('tipoItem'), '').startswith('escudo') and float(it.get('peso', 0) or 0) > 1:
+        det.append((f"pesa {it.get('peso')} (escudo)", (float(it['peso']) - 1) * COSTO_PESO_ESCUDO))
     return sum(p for _, p in det), det, avisos
 
 

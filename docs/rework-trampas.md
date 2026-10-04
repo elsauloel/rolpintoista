@@ -159,9 +159,28 @@ Reemplazan a las 72 de antes (24 × menor/normal/mayor). Común / Buena / Rara p
   quedan **3 turnos**; en cada Mantenimiento, a quien siga encima se le **renueva** el efecto con su tirada para resistirlo (lo que ya tenía no se
   le saca), y quien entre también lo sufre. Los gases pasan a dispararse en las 7 casillas (la zona queda sobre la trampa). **La Bomba de esporas
   no es persistente.** Una dificultad fija de zona se pasa llegando a ella (como la salvación de una trampa).
-- **Dardos envenenados:** dilema — si el daño no pasa la Defensa, no tiene sentido que envenene. Opciones: tirada de Evasión y rango de crítico
-  2 (como un ataque), u otra vuelta. Y la «línea de 3» es la superficie de disparo; el efecto, solo a quien la pisó. *(En discusión.)*
-- **«Tirarse al piso» (explosivas):** al dueño no le cierra; se explica y se debate. *(En discusión.)*
+- **Dardos envenenados ✅ (dueño, 2026-10-04, hecho):** opción A con **1d6+3** de daño (menos la Defensa): **el veneno solo entra si el dardo
+  lastima** (`requiereDano` en la trampa: el Anuncio tira primero el daño; si no pasó la Defensa, no hay tirada para resistir ni veneno). *Por qué:*
+  un dardo que rebota en la armadura no puede envenenar; el +3 hace que contra armaduras livianas casi siempre entre. La «línea de 3» es la
+  superficie de disparo; el efecto, solo a quien la pisó.
+- **Explosivas ✅ (dueño, 2026-10-04, hecho):** opción 2 — **daño directo, sin tirarse al piso**; lo que dejan (Pajaritos) se resiste con Res.CC.
+  Ajuste: Petardo trampa 2d6 y baja a 25; Mina explosiva 3d6 + Pajaritos 2t; Barril de pólvora baja de 5d6 a **4d6** + Pajaritos 2t (era 3t). *Por qué:*
+  la regla general de las trampas es «no se esquivan, se resiste el efecto»; tirarse al piso era una excepción que confundía.
+- **Efecto persistente: cuándo se dispara ✅ (dueño, 2026-10-04, hecho):** al **detonar** la trampa, al **entrar** al terreno (viniendo de afuera,
+  aunque solo lo cruce) y en cada **Mantenimiento**. Moverse adentro no lo vuelve a disparar: cuenta **una vez por ronda** (también el daño del piso
+  ardiendo de la Mina napalm). Quien ya lo sufrió al detonar queda anotado para esa ronda.
+- **Gases: la superficie de disparo cuenta en el precio ✅ (dueño, 2026-10-04, hecho):** pisar en más casillas la hace mejor trampa. Escalera:
+  **Gas adormecedor (Común, 25): se dispara en 1 casilla**; **Gas somnífero y Nube de veneno (Buena): se disparan en una línea de 3** (el precio
+  «intermedio» que propuso el dueño); la **nube queda siempre en la flor de 7** que las contiene (la superficie del efecto), 3 turnos. Bomba de
+  esporas (Rara): se dispara en las 7, no persiste. Mecánica nueva: `efecto.centro: 'trampa'` (la flor del efecto va alrededor del centro de la
+  trampa, no de la casilla pisada) y la zona que deja toma la forma del efecto. **Necesita pegar `firebase/firestore.rules`**: los permisos
+  publicados no dejan convertir una trampa en zona (probado en vivo el 2026-10-04: «Missing or insufficient permissions»), así que hoy ninguna
+  trampa persistente deja su zona hasta que se peguen.
+- **Portal cósmico ✅ (dueño, 2026-10-04, hecho y probado en vivo):** rango **8**; el destino lo elige **quien puso la trampa**: al detonarse, a esa
+  pantalla le aparece el mapa para elegir una casilla libre a 8 o menos (si quien la puso no está, el GM). Si no puede mover el token (un jugador
+  mandando a un creep), lo mueve la pantalla de quien maneja a la víctima. Todos ven los pulsos del teleport. Si resiste (Res.Esp), no se la lleva.
+- **Mina napalm, Runa de silencio, Succión arcana y Descarga en cadena ✅ (hechos, ver arriba y `comun/CLAUDE.md`).**
+- **Quemadura y Confusión:** a definir (ver la pregunta al dueño del 2026-10-04).
 - **Idea a futuro (consumibles):** métodos para que los jugadores accedan a ítems al azar (como el drop de los creeps) para probarlos, y que
   después estén accesibles en el catálogo. La escasez de las tiendas tiene que poder dejar a los jugadores con oro que no mejora su equipo
   (el vendedor no tiene nada mejor): ahí van a los consumibles.

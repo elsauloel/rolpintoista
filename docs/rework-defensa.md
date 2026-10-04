@@ -272,4 +272,5 @@ que exista la mecánica, o esperan?
 funcionan solas (no van «✋ a mano»). Probado en vivo: Llamarada contra un creep con Res. fuego 2 → «2d6 = 9 − Res. fuego 2 → 7 de daño directo».
 
 **Herramienta de diseño nueva (dueño, 2026-10-04): «Indestructible»** — en armaduras Raras (muy escaso), Excepcionales (infrecuente) y Legendarias
-(libre). *(A definir: si también es inmune a la Armadura rota o solo no se rompe nunca; y cuánto pesa en la calculadora.)*
+(libre). **Decidido (dueño, 2026-10-04): las dos cosas** — nunca se rompe (no pierde durabilidad) **y** no pierde Defensa con la Armadura rota.
+*(Falta: cuánto pesa en la calculadora, y construirlo cuando se cargue la primera pieza que lo lleve.)*

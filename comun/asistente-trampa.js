@@ -96,7 +96,7 @@ const AsistenteTrampa = (() => {
       estadoStacks: num(ini.estadoStacks) || 0, estadoDeStacks: ini.estado || '',   // los stacks que ya traía (Veneno, Sangrado): se conservan si no cambia el estado
       seEvita: !!(ini.salvacion && ini.salvacion.stat), salStat: (ini.salvacion && (ini.salvacion.etq || ini.salvacion.stat)) || 'Evasión', salDif: (ini.salvacion && ini.salvacion.dif) || 10,
       salQue: (ini.salvacion && ini.salvacion.que) || 'todo', salLogra: (ini.salvacion && ini.salvacion.logra) || '',   // el texto al resistirla se conserva
-      elemento: ini.elemento || '', lento: ini.lento || 0, pierdeSp: ini.pierdeSp || '', danoZona: ini.danoZona || '', cadena: ini.cadena || null, portal: ini.portal || null, requiereDano: !!ini.requiereDano,   // el elemento del daño y el terreno lento (2026-10-04) se conservan   // qué evita: 'todo' | 'efecto' (el estado) | 'mitad' (la mitad del daño)
+      elemento: ini.elemento || '', lento: ini.lento || 0, pierdeSp: ini.pierdeSp || '', danoZona: ini.danoZona || '', cadena: ini.cadena || null, portal: ini.portal || null, requiereDano: !!ini.requiereDano, renuevaPaso: !!ini.renuevaPaso,   // el elemento del daño y el terreno lento (2026-10-04) se conservan   // qué evita: 'todo' | 'efecto' (el estado) | 'mitad' (la mitad del daño)
       dura: num(ini.turnos) > 0, turnos: num(ini.turnos) || 3,
       teleport: !!ini.teleport,
       // Trampa persistente (2026-09-28, pedido del dueño): al dispararse, además de su efecto de siempre, queda
@@ -284,7 +284,7 @@ const AsistenteTrampa = (() => {
       estadoStacks: est.aplicaEstado && est.estado === est.estadoDeStacks && est.estadoStacks ? est.estadoStacks : 0,
       teleport: !deHab && !!est.teleport,
       salvacion: est.seEvita ? {stat: est.salStat, dif: est.salDif, que: est.salQue, ...(est.salLogra ? {logra: est.salLogra} : {})} : null,
-      ...(est.elemento ? {elemento: est.elemento} : {}), ...(est.lento ? {lento: est.lento} : {}), ...(est.pierdeSp ? {pierdeSp: est.pierdeSp} : {}), ...(est.danoZona ? {danoZona: est.danoZona} : {}), ...(est.cadena ? {cadena: est.cadena} : {}), ...(est.portal ? {portal: est.portal} : {}), ...(est.requiereDano ? {requiereDano: true} : {}),
+      ...(est.elemento ? {elemento: est.elemento} : {}), ...(est.lento ? {lento: est.lento} : {}), ...(est.pierdeSp ? {pierdeSp: est.pierdeSp} : {}), ...(est.danoZona ? {danoZona: est.danoZona} : {}), ...(est.cadena ? {cadena: est.cadena} : {}), ...(est.portal ? {portal: est.portal} : {}), ...(est.requiereDano ? {requiereDano: true} : {}), ...(est.renuevaPaso ? {renuevaPaso: true} : {}),
       turnos: est.dura ? est.turnos : 0, guardar: !!est.guardar,
       dejaZona: !!est.dejaZona, zonaTurnos: est.zonaTurnos, zonaEnMant: est.zonaEnMant, zonaCadaPaso: est.zonaCadaPaso,
       zonaResistStat: est.zonaSeResiste ? est.zonaResistStat : '', zonaResistValor: est.zonaResistValor,
@@ -381,7 +381,7 @@ const AsistenteTrampa = (() => {
       estado: r.estado || '', estadoTurnos: r.estado ? Math.max(0, num(r.estadoTurnos)) : 0, ...(r.estado && r.estadoMods ? {estadoMods: r.estadoMods} : {}),
       ...(r.estado && num(r.estadoStacks) > 0 ? {estadoStacks: Math.min(20, Math.round(num(r.estadoStacks)))} : {}),
       ...(r.salvacion && r.salvacion.stat ? {salvacion: {stat: r.salvacion.stat, dif: num(r.salvacion.dif), que: r.salvacion.que || 'todo', ...(r.salvacion.logra ? {logra: r.salvacion.logra} : {})}} : {}),
-      ...(r.elemento ? {elemento: r.elemento} : {}), ...(r.lento ? {lento: r.lento} : {}), ...(r.pierdeSp ? {pierdeSp: r.pierdeSp} : {}), ...(r.danoZona ? {danoZona: r.danoZona} : {}), ...(r.cadena ? {cadena: r.cadena} : {}), ...(r.portal ? {portal: r.portal} : {}), ...(r.requiereDano ? {requiereDano: true} : {}),
+      ...(r.elemento ? {elemento: r.elemento} : {}), ...(r.lento ? {lento: r.lento} : {}), ...(r.pierdeSp ? {pierdeSp: r.pierdeSp} : {}), ...(r.danoZona ? {danoZona: r.danoZona} : {}), ...(r.cadena ? {cadena: r.cadena} : {}), ...(r.portal ? {portal: r.portal} : {}), ...(r.requiereDano ? {requiereDano: true} : {}), ...(r.renuevaPaso ? {renuevaPaso: true} : {}),
       tipo: linea ? 'linea' : 'flor', tamano: linea ? Math.max(1, Math.min(20, num(r.largo) || 3)) : Math.max(0, Math.min(6, num(r.radio))),
       color: r.color, alfa: Number.isFinite(r.alfa) ? r.alfa : 45, ...(r.teleport ? {teleport: true} : {}),
       ...(r.dejaZona ? {dejaZona: true, zonaTurnos: Math.max(1, num(r.zonaTurnos) || 3), zonaEnMantenimiento: r.zonaEnMant !== false, zonaCadaPaso: !!r.zonaCadaPaso,

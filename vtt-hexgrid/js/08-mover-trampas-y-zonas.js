@@ -359,7 +359,26 @@ function zonaRevisarEntrada(id, celdas){
       }
     });
   }
+  // La Brea (2026-10-04, dueño): a quien ya tiene el estado de la zona, cada paso sobre ella se lo vuelve a poner en sus turnos, sin tirar de
+  // nuevo (la tirada para resistir es solo al entrar).
+  if(celdas && celdas.length > 1) elementos.forEach(el => {
+    if(!el.zona || !el.zonaEstado) return;
+    let spec = null; try{ spec = JSON.parse(el.zonaEstado); }catch(err){}
+    if(!spec || !spec.renuevaPaso || !spec.nombre) return;
+    const cs = celdasDeElemento(el), enCelda = c => cs.some(x => x.col === c.col && x.fila === c.fila);
+    if(!celdas.slice(1).some(enCelda)) return;
+    if(!confusionEstadosDe(t).some(e => e && e.activo !== false && e.nombre === spec.nombre)) return;
+    zonaRenovarEstado(t, spec, el);
+  });
   zonaRevisarToken(t, false);
+}
+async function zonaRenovarEstado(t, spec, el){
+  const nombre = el.zonaNombre || 'la zona';
+  try{
+    if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
+    else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: nombre});
+    toast(`${nombre}: ${t.oculto ? 'el' : nombreDe(t) + ':'} ${spec.nombre} vuelve a ${spec.turnos || ''} turno${num(spec.turnos) === 1 ? '' : 's'}`.replace(': el ', ': '));
+  }catch(err){ console.error('No se pudo renovar el estado de la zona:', err); }
 }
 function zonaRevisarMantenimiento(){ tokens.forEach(t => zonaRevisarToken(t, true)); }
 function renderZonaBanner(){

@@ -67,6 +67,7 @@ const ItemCorto = (() => {
     if(!s) f.push(['Se resiste', 'no']);
     else f.push([s.que === 'efecto' ? 'Se resiste' : 'Se evita', `${s.etq || s.stat} contra ${s.dif} → ${s.logra || QUE[s.que] || QUE.todo}`]);
     if(t.pierdeSp) f.push(['Efecto', `pierde ${t.pierdeSp} de SP`]);
+    if(t.renuevaPaso) f.push(['Al caminarla', 'cada paso sobre ella le vuelve a poner el estado en sus turnos']);
     if(t.requiereDano) f.push(['Si lastima', 'lo que deja solo entra si el daño pasa la Defensa']);
     if(t.portal && num(t.portal.rango) > 0) f.push(['Teletransporta', `quien la pone elige adónde lo manda, hasta ${num(t.portal.rango)} casillas`]);
     if(t.cadena && num(t.cadena.rango) > 0) f.push(['Salta', `al enemigo más cercano a ${num(t.cadena.rango)} casillas o menos, con la mitad del daño; una vez por enemigo`]);

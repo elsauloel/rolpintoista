@@ -208,4 +208,6 @@ Reemplazan a las 72 de antes (24 × menor/normal/mayor). Común / Buena / Rara p
   Hoy: Rengo 2 turnos, se renueva al entrar y en el Mantenimiento.
   **Descartado (dueño, 2026-10-04):** «Pies pegajosos y Rengo a fines prácticos son lo mismo»: no se crea un estado nuevo; la Brea queda como estaba
   (Rengo 2 turnos, se renueva al entrar y en el Mantenimiento).
+  **Pero sí (dueño, 2026-10-04): cada paso sobre la brea renueva el Rengo a sus turnos** (construido: `renuevaPaso` en el JSON de la trampa; a quien
+  ya lo tiene, cada paso sobre la zona se lo vuelve a poner sin tirar; la tirada para resistir es solo al entrar).
 

@@ -1788,6 +1788,11 @@ prueba('portal (rango 8, lo elige quien la puso), dardos (el veneno solo si last
     [{rango: 8}, '', '1d6+3', true, 'linea', 3, {area: 'flor', radio: 1, centro: 'trampa'}, '4d6', 'rescc', 'efecto',
       {rango: 8}, true, {area: 'flor', radio: 1, centro: 'trampa'}, {area: 'flor', radio: 1}, 'quien la pone elige adónde lo manda, hasta 8 casillas', true]);
 });
+prueba('Brea pegajosa: cada paso sobre ella renueva el Rengo (renuevaPaso viaja en el JSON de la trampa y se ve en la ficha corta)', () => {
+  const brea = CATALOGO_BASE.find(i => i.nombre === 'Brea pegajosa').trampaDatos;
+  igual([brea.renuevaPaso, brea.estado, JSON.parse(TokensAuto.estadoJson({nombre: 'Rengo', turnos: 2}, null, null, null, '', 0, {renuevaPaso: true})).renuevaPaso,
+    ItemCorto.trampaFilas(brea).some(f => f[0] === 'Al caminarla')], [true, 'Rengo', true, true]);
+});
 prueba('Pasos gratis: un stat que suben las piezas y que el resumen publica para el mapa', () => {
   const S = FichaGuardado.normalizar({}).S;
   const c0 = FichaCalculo.calcular(S);

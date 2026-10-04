@@ -152,3 +152,34 @@ o por nivel (la referencia contra la que comparar este número).
 - **Avisar, no bloquear:** como **herramienta solo para el GM**, para plantear estrategias y diseñar creeps que sorteen esa dificultad.
 - **El orden propuesto, aprobado:** curva por nivel → presupuesto por pieza y calculadora → catálogo parte por parte (torso primero) → escasez en
   el generador con el simulador → drops de jefes y reparar.
+
+**Curva por nivel ✅ para empezar a probar (dueño, 2026-10-04)** y **calidad ↔ nivel ✅** (Común niveles 1–2, Buena 3–4, Rara 5):
+
+| Nivel | Defensa (liviano–tanque) · resistencia a crítico máxima |
+|---|---|
+| 1 | 4–10 · T4 ≤2 · T6 ≤1 |
+| 2 | 5–12 · T4 ≤2 · T6 ≤1 |
+| 3 | 6–14 · T4 ≤3 · T6 ≤2 · T8 ≤1 |
+| 4 | 7–16 · T4 ≤3 · T6 ≤2 · T8 ≤1 · T10 ≤1 |
+| 5 | 8–18 · T4 ≤4 · T6 ≤3 · T8 ≤2 · T10 ≤1 · T12 ≤1 (legendario) |
+
+**Medición: cuánto daño entra contra esa Defensa (2026-10-04).** Golpe = dados del arma + daño fijo + Dmg (= Fuerza). Armas cuerpo a cuerpo del
+catálogo de la calidad del nivel; Fuerza según el reparto sugerido (brutal 30 %, rápido 18 %, mago 8 % de 33 + 3 por nivel). Daño que entra por
+golpe, promedio (y % de golpes que hacen algo) contra Defensa piso / medio / techo:
+
+| Nivel | Brutal · rápido · mago |
+|---|---|
+| 1 (4/7/10) | 9,5 / 6,4 / 3,5 · 5,6 / 2,7 / 0,9 (32 %) · 2,7 / 0,9 / 0,2 |
+| 3 (6/10/14) | 11,3 / 7,1 / 3,4 · 7,2 / 3,3 / 1,0 · 3,3 / 1,0 / 0,2 |
+| 5 (8/13/18) | 13,4 / 8,5 / 4,0 · 8,5 / 4,0 / 1,3 · 4,0 / 1,2 / 0,3 |
+
+Vida: liviano 25–35, tanque 55–80. **Lectura:** contra el piso y el medio el combate físico funciona (3 a 8 golpes para tumbar a alguien liviano);
+**contra el techo, un tanque es casi inmune al golpe físico** (un brutal le hace 3–4 por golpe: 15–20 golpes para tumbarlo; uno rápido, menos de 1).
+Lo que lo atraviesa: el crítico (ignora la Defensa), el daño mágico, el veneno y el sangrado, y romperle la armadura. Con un techo que suba de a 1 por
+nivel (10, 11, 12, 13, 14) el brutal le hace 3,5 → 7,5 por golpe (11–16 golpes). A decidir si el techo sube de a 2 o de a 1.
+
+**Nota del dueño (2026-10-04): daño ácido.** Que sea frecuente en creeps, daños mágicos, habilidades y trampas, para tener opciones de **romper
+armadura** (el contrapeso del tanque). A diseñar.
+
+**Siguiente (dueño):** antes de crear ítems, hablar de **otras herramientas de diseño** además de la Defensa y las resistencias a crítico: bonos a
+la Evasión, a la visión… variables más sutiles para un catálogo diverso.

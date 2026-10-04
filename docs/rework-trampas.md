@@ -206,4 +206,6 @@ Reemplazan a las 72 de antes (24 × menor/normal/mayor). Común / Buena / Rara p
   «Recuperarse rápido» de los pies) que **se renueva por cada casillero de brea que se pisa** (cruzarla entera te deja pegado más tiempo). Propuesta:
   la tirada para resistir es solo al entrar; si ya estás pegado, cada paso nuevo renueva sin tirar (si no, una tirada por casillero frena el juego).
   Hoy: Rengo 2 turnos, se renueva al entrar y en el Mantenimiento.
+  **Descartado (dueño, 2026-10-04):** «Pies pegajosos y Rengo a fines prácticos son lo mismo»: no se crea un estado nuevo; la Brea queda como estaba
+  (Rengo 2 turnos, se renueva al entrar y en el Mantenimiento).
 

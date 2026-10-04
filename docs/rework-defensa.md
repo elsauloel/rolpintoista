@@ -227,3 +227,43 @@ puntos): en la versión nueva, las desventajas van por Evasión o Iniciativa.
 **Armadura mágica (dueño, 2026-10-04): escasa, cara y rara** — resta **todo** daño mágico, arcano o elemental. Pesa **3 puntos** por +1 en la
 calculadora (antes 1); solo en piezas Raras o mejores (como ya decía su regla). **Resistencia elemental: 0,5 ✅.** *(Pendiente para cuando se
 construya la resistencia elemental: que el daño elemental de las trampas, que hoy ignora la Defensa entera, también descuente la Armadura mágica.)*
+
+## Torso Común — propuesta de cero (2026-10-04, a revisar por el dueño)
+Diseñado de cero (el catálogo anterior solo da nombres y conceptos). Bolsa 4 puntos, tope de Defensa 4 (5 si es pesada, con desventaja). Blandas:
+pesan 1, Defensa 1–3, solo Tipo 4. Rígidas: pesan 2–4, Defensa 3–5, Tipo 4 o 6, las fuertes cobran Evasión o Iniciativa.
+
+| Torso blando · precio | Qué da |
+|---|---|
+| Saco de arpillera · 35 | Defensa 1 |
+| Camiseta de lona · 60 | Defensa 1 · +1 ranura de cinturón |
+| Pechera acolchada · 110 | Defensa 2 · Res.CC +2 |
+| Armadura de cuero blando · 110 | Defensa 2 · Evasión +1 |
+| Casaca curtida de salteador · 110 | Defensa 2 · Iniciativa +1 |
+| Jubón de cuero curtido · 110 | Defensa 3 · Tipo 4 +1 |
+| Peto de cuero curtido · 110 | Defensa 3 · Vida +5 |
+| Gambesón de lana · 110 | Defensa 3 · Res.CC +1 |
+| Campera de cuero con tachas · 110 | Defensa 2 · Tipo 4 +1 · Vida +5 |
+| Chaleco de cazador · 110 | Defensa 2 · +1 ranura · Percepción +2 |
+| Ropa de explorador · 110 | Defensa 1 · Visión +2 · Percepción +2 · Res.Esp +1 |
+| Túnica de aprendiz · 110 | Defensa 1 · Res.Esp +2 · Res.Mt +2 |
+| Túnica de maestre · 110 | Defensa 1 · +2 ranuras · Res.Esp +1 |
+| Capa de viajero · 110 | Defensa 1 · Res.Esp +1 · Res. hielo +2 · Vida +5 |
+| Delantal de herrero · 110 | Defensa 2 · Res. fuego +2 · Res.CC +1 |
+| Ropas de sombra · 110 | Defensa 1 · Evasión +1 · Sigilo +1 |
+
+| Torso rígido · precio | Qué da |
+|---|---|
+| Coraza de puerta · 90 | Defensa 4 · frágil · pesa 3 |
+| Armadura de hojalata · 100 | Defensa 3 · Res.CC +1 · frágil |
+| Coraza de cuero hervido · 110 | Defensa 3 · Tipo 4 +1 |
+| Armadura con tachas · 110 | Defensa 3 · Res.CC +1 |
+| Coraza del clan · 110 | Defensa 3 · Res.Esp +1 |
+| Peto de escamas de pez gigante · 110 | Defensa 3 · Res. hielo +2 |
+| Cota de malla de hierro · 110 | Defensa 4 · Tipo 6 +1 · Evasión −1 |
+| Coraza de guardia de cuartel · 110 | Defensa 4 · Tipo 6 +1 · Iniciativa −1 |
+| Peto de placas de aprendiz · 110 | Defensa 4 · Tipo 4 +1 · Vida +5 · Iniciativa −1 |
+| Puerta de auto ajustada con alambre · 110 | Defensa 4 · Tipo 4 +1 · Res.CC +1 · Iniciativa −1 |
+| Armadura pesada de hierro · 110 | Defensa 5 · Tipo 4 +1 · Evasión −1 · pesa 4 |
+
+Abierto: ¿entran ya las de resistencia elemental (Capa de viajero, Delantal, Peto de escamas) y sigilo (Ropas de sombra) con «✋ a mano» hasta
+que exista la mecánica, o esperan?

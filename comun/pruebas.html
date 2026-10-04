@@ -1734,7 +1734,7 @@ prueba('cómo se ve un ítem: la trampa en datos cortos (forma, daño, efecto, s
   const base = TRAMPAS_BASE.find(t => t.nombre === 'Trampa de oso');
   igual([filas, grilla.includes('⚙'), grilla.includes('Automático'), ver.includes('Detalles técnicos'), ver.includes('⚙ Automático'), ItemCorto.trampaFilas(menor.trampaDatos).find(f => f[0] === 'Detectarla')[1],
     p.hace, p.tecnico.startsWith('⚙'), base.datos.estado, base.datos.detectar, ItemCorto.tecnicoHtml('Solo dice qué hace.')],
-    [['Forma: Flor de radio 2 (19 casillas)', 'Daño: 2d6 · contempla la armadura', 'Efecto: Inmovilizado · 3 turnos', 'Además: para liberarse: 2 No2 y Fuerza contra 8 (a mano)', 'Se evita: no', 'Detectarla: Percepción contra 8', 'Alcanza: también a los aliados del área'],
+    [['Forma: Una casilla', 'Daño: 2d6 · contempla la armadura', 'Efecto: Inmovilizado · 1 turno', 'Se resiste: no', 'Para salir: 🔓 Soltarse: Fuerza contra 6 · 2 No2', 'Detectarla: Percepción contra 8'],
      false, false, true, true, 'Percepción contra 6', 'Da +2 a la Fuerza.', true, 'Inmovilizado', 8, '']);
 });
 prueba('trampas automáticas: el estado y la salvación viajan juntos en trampaEstado; 3 turnos (Stun 1); los textos dicen qué va solo y qué a mano', () => {

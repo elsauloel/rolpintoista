@@ -17,13 +17,15 @@ const TokensAuto = (() => {
   function rutaTokens(mapaId){ return mapaId === MAPA_PRINCIPAL_ID ? 'tokens' : `mapas/${mapaId}/tokens`; }
   // La tirada para evitar una trampa, como la guarda el mapa: `salva` adentro del JSON de trampaEstado (2026-10-02; así no hace falta un
   // campo ni reglas nuevas): {stat (id), etq, dif, que: 'todo' | 'efecto' | 'mitad'}. Acepta el stat por su nombre (los asistentes guardan
-  // 'Evasión', 'Res.CC'…). null si no hay una tirada completa.
+  // 'Evasión', 'Res.CC'…). null si no hay una tirada completa. `logra`: el texto de la trampa si la resiste («se agarra del borde y no queda
+  // Sentado»); lo dicen el cuadro y la Crónica.
   const SALVA_IDS = {'Evasión': 'eva', 'Fuerza': 'fue', 'Res.CC': 'rescc', 'Res.Esp': 'resmg', 'Res.Mt': 'resm', 'Agilidad': 'agl', 'Constitución': 'con'};
   const SALVA_ETQ = {eva: 'Evasión', fue: 'Fuerza', rescc: 'Res.CC', resmg: 'Res.Esp', resm: 'Res.Mt', agl: 'Agilidad', con: 'Constitución'};
   function salvaNorm(s){
     if(!s || !s.stat || !(Number(s.dif) >= 1)) return null;
     const stat = SALVA_IDS[s.stat] || s.stat;
-    return {stat, etq: s.etq || SALVA_ETQ[stat] || stat, dif: Math.round(Number(s.dif)), que: ['todo', 'efecto', 'mitad'].includes(s.que) ? s.que : 'todo'};
+    const logra = String(s.logra || '').trim().slice(0, 120);   // lo que pasa si la resiste, con las palabras de la trampa (dueño, 2026-10-04)
+    return {stat, etq: s.etq || SALVA_ETQ[stat] || stat, dif: Math.round(Number(s.dif)), que: ['todo', 'efecto', 'mitad'].includes(s.que) ? s.que : 'todo', ...(logra ? {logra} : {})};
   }
   // El muro (2026-10-03, trampa de muro): {largo: 3 (las casillas de adelante) | 5 (y los costados), turnos (4 si no dice)}. null si no hay.
   function muroNorm(m){

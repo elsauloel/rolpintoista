@@ -60,8 +60,11 @@ const ItemCorto = (() => {
     if(t.teleport) f.push(['Efecto', 'Teletransporta a quien la pisa']);
     if(!t.dano && !t.estado && !t.efectoManual && !t.teleport) f.push(['Efecto', 'Solo avisa cuando se dispara']);
     const s = t.salvacion && t.salvacion.stat ? t.salvacion : null;
-    const QUE = {todo: 'la evita entera', efecto: t.dano ? 'evita el efecto (el daño entra igual)' : 'la evita', mitad: 'la mitad del daño'};
-    f.push(['Se evita', s ? `${s.etq || s.stat} contra ${s.dif} → ${QUE[s.que] || QUE.todo}` : 'no']);
+    const QUE = {todo: 'la evita entera', efecto: t.dano ? 'resiste lo que le deja (el daño entra igual)' : 'lo resiste', mitad: 'la mitad del daño'};
+    if(!s) f.push(['Se resiste', 'no']);
+    else f.push([s.que === 'efecto' ? 'Se resiste' : 'Se evita', `${s.etq || s.stat} contra ${s.dif} → ${s.logra || QUE[s.que] || QUE.todo}`]);
+    const so = t.soltar && t.soltar.stat ? t.soltar : null;   // salir antes de que venza (el botón 🔓 Soltarse)
+    if(so) f.push(['Para salir', `🔓 Soltarse: ${so.etq || so.stat} contra ${num(so.dif)} · ${num(so.no2)} No2`]);
     f.push(['Detectarla', t.detectarStat ? `Percepción contra ${t.detectarStat === 'dmgesp' ? 'el Efecto especial' : 'la Destreza'} de quien la pone` : num(t.detectar) >= 1 ? `Percepción contra ${num(t.detectar)}` : 'sin definir']);
     if(t.dejaZona) f.push(['Después', `queda como zona ${num(t.zonaTurnos) || 3} turnos`]);
     if(t.amiga) f.push(['Alcanza', 'también a los aliados del área']);

@@ -72,7 +72,7 @@ trampa consumible que no se disparó se desarma y tiene **50 % de romperse**; la
 línea verde de la Mesa dice cuántas volvieron y cuáles se rompieron (`TokensAuto.desarmarTrampasConsumibles`, `ROMPE_AL_DESARMAR`).
 
 ### 🗡 Púas y cortes — definición ✅ y Común ✅ (dueño, 2026-10-03)
-- **Identidad:** daño físico (se resta la Defensa); lo propio: Sentado (caer), Sangrado (cortes), Rengo (pincharse el pie). Se evita con Evasión.
+- **Identidad:** daño físico (se resta la Defensa); lo propio: Sentado (caer), Sangrado (cortes), Rengo (pincharse el pie). ~~Se evita con Evasión~~ (2026-10-04: no se esquiva; se resiste el efecto).
 - **Disparo:** una casilla · flor de 7 · línea (la línea **puede ser más larga que 4**: se ve caso por caso).
 - **Efecto:** el foso, solo a quien lo pisó; el piso de púas y las cuchillas, a todos los que estén encima.
 - **La Común (referencia de la familia): Foso con estacas** — disparo 1 casilla · efecto solo quien lo pisa · 2d6 de daño (menos su Defensa) ·
@@ -85,8 +85,17 @@ entera (Evasión, `que = 'todo'`) queda como excepción. Propuesta de qué stat 
 | Lo que deja | Se resiste con |
 |---|---|
 | Sentado, Inmovilizado, Rengo, Stun, Pajaritos (quedar trabado o aturdido) | Res.CC |
-| Veneno, Sangrado, Quemadura, Escarcha (el cuerpo lo aguanta) | Constitución |
+| Veneno, Sangrado, Quemadura, Escarcha | **Res.Esp** (dueño: no Constitución) |
 | Sueño, confusión, discordia (la cabeza) | Res.Mt |
 | Maldiciones de runa, succión arcana, teleport | Res.Esp |
 
-Se sigue tipo por tipo; cada Común se revisa con esta regla (el Foso con estacas tenía «Evasión 7 evita caer»).
+✅ (dueño, 2026-10-04). Cada trampa puede traer **su propio texto para cuando la resisten** (`salvacion.logra`), y el cuadro y la Crónica lo
+dicen tal cual («Res.CC 8 contra 7 → lo resistió: se agarra del borde y no queda Sentado»); el cartel grande dice «¡LO RESISTIÓ!».
+
+**Comunes cargadas (2026-10-04)** — en el catálogo, el ítem `-r2` de cada una (los «menor» y «mayor» se reemplazan cuando se definan Buena y Rara):
+- **🗡 Foso con estacas** ✅: 1 casilla · solo quien lo pisa · no se esquiva · 3d6 (menos su Defensa) · Sentado (hasta que se pare) · **Res.CC 7**
+  resiste caer: «se agarra del borde y no queda Sentado» (el daño entra igual) · detectarla 8 · 30.
+- **🪤 Trampa de oso** ✅: 1 casilla · solo quien la pisa · no se esquiva ni se resiste (el cepo agarra) · 2d6 (menos su Defensa) · **Inmovilizado
+  1 turno** · 🔓 Soltarse: Fuerza 6, 2 No2 · detectarla 8 · 30. **Mejor calidad = más daño y más turnos** (dueño).
+
+El daño de las dos queda provisorio hasta revisar el catalogo defensivo.

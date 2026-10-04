@@ -36,6 +36,7 @@ COSTO = {
     'bonos': 1, 'accionesmax': 4,
     # Resistencia elemental (a construir): situacional, pesa poco.
     'resfuego': 0.5, 'reshielo': 0.5, 'resrayo': 0.5, 'restoxico': 0.5, 'resacido': 0.5,
+    'pasosgratis': 2,   # el primer casillero del turno gratis (2026-10-04): ahorra 1 No2 por turno, solo para moverse (un No2 de verdad vale 4)
     'sigilo': 1,   # Sigilo +N (2026-10-04): mejora la tirada del que se esconde contra la Percepción de quien lo busca
 }
 COSTO_DEFECTO = 1

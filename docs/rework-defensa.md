@@ -428,4 +428,6 @@ no cuestan No2; el mapa los descuenta, los anuncia («2 casilleros gratis») y C
 **Idea del dueño (2026-10-04): Evasión contra ataques de oportunidad y contra contraataques** (cuando te los hacen a vos). La de oportunidad vale
 más, porque depende de vos (vos elegís alejarte y le sacás provecho); la de contraataque no depende de vos para nada. Propuesta de peso: Evasión en
 oportunidad 1, Evasión en contraataque 0,5. A construir en el duelo (la Evasión del defensor suma el bono según el tipo de ataque).
+**Carga en las piernas, no en Común (dueño, 2026-10-04):** «te da +1 de carga pero pesa 1: se cancela, no sirve de nada». Solo tiene sentido en piernas
+de peso 0 que la sumen de verdad, y eso es de calidades altas. Las piernas Comunes van sin Carga; el Pantalón de corredor estrena los Pasos gratis.
 

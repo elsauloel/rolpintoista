@@ -633,7 +633,7 @@ resuelven a mano, como el resto de los avisos).
   de habilidad que ignora la Defensa se reduce con la **Armadura mágica** del objetivo — ¿también el tóxico, o lo frena otra cosa
   (Inmunidad a veneno, Constitución…)? En las zonas persistentes hoy no resta Armadura mágica (ningún tipo).~~
 
-- **P143. Zonas persistentes de habilidad (Pedos Tóxicos): ¿la fuerza de la nube se decide al lanzarla o en cada exposición? Y las
+- **P143. Zonas persistentes de habilidad (Pedos Tóxicos): ¿la fuerza de la nube se decide al lanzarla o en cada exposición? Y las **Actualización (dueño, 2026-10-05):** el daño tóxico (el que se respira, y los venenos) **se resiste con Res.Esp**, la que da la Constitución; no es exactamente mágico pero no contempla armadura. Queda: si lo frena la Armadura mágica (hoy sí).
   peculiaridades del daño tóxico (2026-10-02, abierta a pedido del dueño para que la discutan Enro y Seba — también va en la pestaña
   💬 Preguntas de las Herramientas de diseño).** (1) a) **Al lanzarla**: una tirada al crear la zona, el mismo número para todos los que
   entren durante sus turnos; b) **en cada exposición**: la habilidad no falla (la nube aparece siempre) y cada vez que afecta a alguien (al

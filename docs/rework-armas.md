@@ -1353,3 +1353,12 @@ van a contemplar como…»: falta completar.)
 - **La tirada para acertar es siempre la especial (dueño, 2026-10-05, corrige lo de «PdG común»):** un arma especial tira **siempre PdG.Esp**;
   si lo que lanza es un **proyectil físico** (una lanza de hielo), el rival lo **esquiva con Evasión**. «Es una nota de color para imaginar las
   armas.» → En la tanda Común, la Varita de escarcha y la Varita de cargas pasan a tirar PdG.Esp.
+- **Acertar depende del stat, como en lo físico (dueño, 2026-10-05):** igual que una espada rinde poco en alguien con poca Fuerza, un arma especial
+  rinde poco en alguien con poco Especial. Está bien así.
+- **Lo invocado físico tiene su Tipo por la forma (dueño, 2026-10-05):** una **aguja de hielo** es daño **físico Tipo 4**; un **piedrazo** invocado,
+  **Tipo 8**. No es daño mágico: lo frena la Defensa, critica, y cuentan las resistencias a crítico.
+- **El daño tóxico es su propia categoría (dueño, 2026-10-05):** el que se respira (como Pedos Tóxicos), y los venenos. **No es exactamente mágico**,
+  pero **no contempla armadura** y **se resiste con Res.Esp**, la resistencia que da la **Constitución**: la identidad de la Constitución es resistir
+  efectos físicos, y esto es un efecto físico gaseoso («la diferencia es muy sutil»). (Responde la segunda parte de P143: el tóxico se resiste con
+  Res.Esp.) Pregunta que queda: hoy al daño tóxico también lo reduce la **Armadura mágica** (y la Res. tóxico); si no es mágico, ¿la Armadura
+  mágica debería frenarlo?

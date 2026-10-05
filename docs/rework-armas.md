@@ -1411,3 +1411,9 @@ van a contemplar como…»: falta completar.)
 - **Filtro del dueño — D. Movimiento y espacio (2026-10-05):** ✅ 45 parpadeo (teletransporte corto), **propio y de un aliado; debe ser costoso** ·
   ✅ 46 portal, **para aliados**, y también **como trampa** · 🔀 47 intercambiar lugar y 48 mover a un aliado: el efecto está bien, pero **no para arma** ·
   🔀 49 levitar: para **unas botas Raras** (anotado para la ampliación del catálogo) · ❌ 50 ancla · ✅ 51 muro.
+- **Filtro del dueño — E. Apoyo (2026-10-05):** ✅ 52 cura chica · ✅ 62 iluminar («re sí»), en distintas variantes: hasta el próximo Mantenimiento o por
+  X turnos, que revele lo oculto o no. (53 a 61 —escudo, Excedente, quitar o acortar un estado, +PdG/+Evasión, Apuro, devolver SP, pasar vida, dar
+  Sigilo— sin respuesta: a preguntar.)
+- **Filtro del dueño — F. Debilitar (2026-10-05):** como **efecto secundario de un daño moderado**: 63 marca −Defensa, 64 −Res.Esp, 66 −Evasión,
+  67 maldición (crítico más fácil), 70 disipar (por %) · ✅ 65 **Armadura rota: obligatoria en el daño ácido** · ❌ 68 vulnerable a un elemento ·
+  ✅ 69 drenar SP, **muy moderado**.

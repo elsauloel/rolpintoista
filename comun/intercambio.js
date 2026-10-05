@@ -414,6 +414,7 @@ const Intercambio = (() => {
     const opcDest = dest.length ? dest.map(d => `<option value="${esc(d.id)}">${esc(d.nombre)}</option>`).join('') : '<option value="">(no hay otros personajes)</option>';
     const mios = paquetes.filter(p => p.deFicha === fichaId && p.estado === 'pendiente');
     const desp = despojosDe(S);
+    const propios = ['inventario', 'cinturon'].flatMap(key => (S[key] || []).filter(it => it && !it.equipado && !reservado(it) && (!it.consumible || num(it.unidades) > 0)).map(it => ({it, key})));
     let que = '';
     if(abierta.itemId){
       if(!f) que = '<div class="ix-paso"><p>Ese ítem ya no está.</p></div>';
@@ -428,12 +429,14 @@ const Intercambio = (() => {
       ${combate ? '<div class="ix-aviso">⚔ En combate no se pasan cosas así: en combate cuesta No2 y solo a un aliado al lado (todavía no está hecho).</div>' : ''}
       ${que}
       <div class="ix-paso"><h4>A quién</h4><p><select id="ix-dest">${opcDest}</select></p>
-        <p class="ix-hint">Le llega un aviso para aceptarlo o rechazarlo. Hasta que acepte, ${abierta.itemId ? 'el ítem queda reservado en tu mochila (sigue ocupando lugar y no se puede usar)' : 'lo que ofrecés queda apartado; si no lo acepta, vuelve'}.</p></div>
+        <p class="ix-hint">Le llega un aviso para aceptarlo o rechazarlo. Hasta que acepte, ${abierta.itemId ? 'el ítem queda reservado en tu mochila (sigue ocupando lugar y no se puede usar)' : 'un ítem queda reservado en tu mochila (ocupa su lugar y no se usa) y el oro o los despojos quedan apartados; si no lo acepta, vuelve'}.</p></div>
       ${abierta.itemId ? (f && !f.it.equipado && !reservado(f.it) ? `<div class="ix-pie"><button type="button" data-ix-dar-item${combate || !dest.length ? ' disabled' : ''}>🤝 Ofrecérselo</button></div>` : '') : `
       <div class="ix-paso"><h4>Oro y despojos</h4>
         <div class="ix-fila"><span class="ix-q">💰 DDE <span class="ix-hint">(tenés ${fmt(num(S.meta.dde))})</span></span><input id="ix-dde" type="number" min="0" step="1" value="${esc(previo.dde)}"><button type="button" data-ix-dar-dde${combate || !dest.length ? ' disabled' : ''}>Ofrecer</button></div>
         <div class="ix-fila"><span class="ix-q">🦴 Despojos <select id="ix-dt">${desp.map(d => `<option value="${esc(d.tipo === 'especial' ? 'esp:' + d.nombre : d.tipo)}">${esc(d.tipo === 'especial' ? d.nombre : DESP_TXT[d.tipo])} (${fmt(d.n)})</option>`).join('') || '<option value="">(no tenés)</option>'}</select></span><input id="ix-dn" type="number" min="0" step="1" value="${esc(previo.dn)}"><button type="button" data-ix-dar-desp${combate || !dest.length || !desp.length ? ' disabled' : ''}>Ofrecer</button></div>
-        <p class="ix-hint">Un ítem: botón 🤝 Dar en la mochila.</p></div>`}
+      </div>
+      <div class="ix-paso"><h4>Ítems de tu mochila y tu cinturón</h4>
+        ${propios.length ? propios.map(({it, key}) => `<div class="ix-fila"><span class="ix-q" title="${esc(textoItem(it))}">${key === 'cinturon' ? '🧷' : '🎒'} ${esc(it.nombre)}${num(it.unidades) > 1 ? ` <span class="ix-hint">(tenés ${fmt(num(it.unidades))})</span>` : ''}</span>${it.consumible && num(it.unidades) > 1 ? `<input data-ix-u="${esc(it.id)}" type="number" min="1" max="${fmt(num(it.unidades))}" step="1" value="1">` : ''}<button type="button" data-ix-dar-este="${esc(it.id)}"${combate || !dest.length ? ' disabled' : ''}>Ofrecer</button></div>`).join('') : '<p class="ix-hint">No hay nada para ofrecer (lo equipado o lo ya ofrecido no cuenta).</p>'}</div>`}
       ${mios.length ? `<div class="ix-paso"><h4>Lo que ofreciste y espera respuesta</h4>${mios.map(p => `<div class="ix-fila"><span class="ix-q">${esc(paqueteTxt(p))} → <b>${esc(p.paraNombre)}</b></span><button type="button" class="sec" data-ix-cancelar="${esc(p.id)}">Cancelar</button></div>`).join('')}</div>` : ''}`;
     const sel = el.querySelector('#ix-dest'); if(sel && previo.dest && [...sel.options].some(x => x.value === previo.dest)) sel.value = previo.dest;
     const dt = el.querySelector('#ix-dt'); if(dt && previo.dt && [...dt.options].some(x => x.value === previo.dt)) dt.value = previo.dt;
@@ -446,6 +449,7 @@ const Intercambio = (() => {
     const para = fichas.find(f => f.id === valor(el, '#ix-dest'));
     let que = null;
     if(b.hasAttribute('data-ix-dar-item')) que = {tipo: 'item', itemId: abierta.itemId, unidades: valor(el, '#ix-u')};
+    else if(b.dataset.ixDarEste){ const u = el.querySelector(`[data-ix-u="${CSS.escape(b.dataset.ixDarEste)}"]`); que = {tipo: 'item', itemId: b.dataset.ixDarEste, unidades: u ? u.value : ''}; }
     else if(b.hasAttribute('data-ix-dar-dde')) que = {tipo: 'dde', cantidad: valor(el, '#ix-dde')};
     else if(b.hasAttribute('data-ix-dar-desp')){ const v = valor(el, '#ix-dt'); que = {tipo: 'despojos', despojo: v.startsWith('esp:') ? 'especial' : v, despojoNombre: v.startsWith('esp:') ? v.slice(4) : '', cantidad: valor(el, '#ix-dn')}; }
     if(!que) return;
@@ -458,7 +462,7 @@ const Intercambio = (() => {
     if(error){ host.toast(error); return; }
     if(hubo){
       host.toast(`🤝 Se lo ofreciste a ${para.nombre}: le llega un aviso para aceptarlo`);
-      if(que.tipo === 'item') cerrar(); else{ ['#ix-dde', '#ix-dn'].forEach(s => { const x = el.querySelector(s); if(x) x.value = ''; }); dibujarDar(); }
+      if(abierta.itemId) cerrar(); else{ ['#ix-dde', '#ix-dn'].forEach(s => { const x = el.querySelector(s); if(x) x.value = ''; }); dibujarDar(); }
     }
   }
 

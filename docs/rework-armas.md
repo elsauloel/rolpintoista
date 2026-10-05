@@ -1444,3 +1444,8 @@ lluvia ácida 21 y báculo de sangre 19,5), 3 orbes.
   2 No2 se quedaba corto. Propuesta de Claude, a confirmar: **cada SP se puede reemplazar por 1 No2** (una varita de control de 2 SP, sin SP, cuesta
   3 No2 el primer uso). Con esto el SP es el freno real: un mago con Especial 6 (recupera 3 SP por turno) la sostiene sin parar; alguien con Especial
   3, unos pocos turnos, y después paga en No2.
+- **Pool Común, segunda vuelta (2026-10-05, «vamos por acá»):** con el costo nuevo (1 No2 + 1 SP), se fortalecieron las varitas de efecto chico hasta el
+  techo Común (aceite en línea de 3 y 2 turnos, espinas en línea de 3 con 1d4, runa que dura 3 turnos, muro de 3 casillas y 2 turnos, luz que revela,
+  cura 1d6, miasma 1d3, destello y susurro con 1d3) y se bajaron la ráfaga (a un solo objetivo) y el báculo de aprendiz (2 SP). El Báculo de brasas
+  pasó a candidato de Buena. Todas quedan con un neto de 3,5 a 8 por turno (techo Común ~6, de 2,3 a 9,6); la lanza de hielo queda en 3,5 porque la
+  calculadora no cuenta su crítico. El muro pasó a valer 2,5 (bloquea paso y visión).

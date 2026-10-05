@@ -375,8 +375,67 @@ const CreepAcciones = (() => {
      reclamarMantenimiento(db, ref, objetivo, marca): la transacción sobre gm/mantenimiento = {aplicado}: cuántos turnos aplicarles a
      los creeps (0 si ya los aplicó otra pantalla; si nunca se registró, arranca desde el actual), máximo 10. */
   const MANT_MAX_SEGUIDOS = 10;
+  /* ---------- ✨ Armas especiales de un creep (2026-10-05: las reglas de combate son las mismas para todos) ----------
+     La misma habilidad que arma la ficha con una varita equipada (su Ejecución ✨, su daño + Ef.Esp, su trampa), mandada por el camino de las
+     habilidades del creep (ejecutarHab / terminarHab). Los No2 igual que un personaje: 1 el primer uso del turno + 1 por cada uso más. Los creeps no
+     tienen SP: el SP de la varita se paga con ESPERA (dueño: «adaptar, medio a ojo, SP en CD»; provisorio hasta pasar los creeps a SP, ver la hoja de
+     ruta): ESPERA_POR_SP. Los orbes de la otra mano también valen (resguardo: Escudo especial; salvaje: 1d6). */
+  const ESPERA_POR_SP = sp => sp <= 0 ? 0 : sp <= 2 ? 1 : 2;   // SP 1–2 → 1 turno de espera; SP 3 o más → 2
+  const especialesCreep = sc => (sc.equipo || []).filter(it => it && it.especial);
+  function costoEspecialCreep(sc, it){
+    const e = (it && it.especial) || {}, usos = num((sc.usosEspecial || {})[it.id]);
+    return {no2: Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1)), espera: ESPERA_POR_SP(num(e.sp)), usos, enEspera: num((sc.esperaEspecial || {})[it.id])};
+  }
+  function habDeEspecialCreep(sc, it){
+    const e = it.especial || {}, dano = String(e.dano || '').trim();
+    const suma = e.sumaEspecial ? Math.floor(num(C().statValor(sc, 'dmgesp')) * (e.sumaEspecial === true ? 1 : num(e.sumaEspecial))) : 0;
+    return {id: 'esp:' + it.id, deItem: it.id, nombre: e.nombre || it.nombre, detalle: it.detalle || '', modo: 'auto', duelo: e.duelo ? structuredClone(e.duelo) : null,
+      tiradaStat: (e.duelo && e.duelo.tira) || 'pdgmg', tiradaExtra: dano ? dano + (suma > 0 ? '+' + suma : '') : '',
+      ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {}), nitrosCosto: costoEspecialCreep(sc, it).no2, cd: 0};
+  }
+  // Cobra y arma el plan (lo mismo que ejecutarHab, con la espera y los orbes). {error} o el plan, con `hab` (la habilidad de la varita).
+  function usarEspecialCreep(sc, itemId, presets){
+    const it = especialesCreep(sc).find(x => x.id === itemId);
+    if(!it) return {error: `${sc.nombre}: esa arma especial ya no está en su equipo`};
+    const c = costoEspecialCreep(sc, it);
+    if(c.enEspera > 0) return {error: `${sc.nombre}: ${it.nombre} está en espera ${fmt(c.enEspera)} turno${c.enEspera === 1 ? '' : 's'} (un creep paga el SP con espera)`};
+    const h = habDeEspecialCreep(sc, it);
+    const p = ejecutarHab(sc, h, presets);
+    if(p.error) return p;
+    sc.esperaEspecial = {...(sc.esperaEspecial || {}), [it.id]: c.espera};   // en el creep: la varita queda igual (si la saquean, vuelve a costar SP)
+    sc.usosEspecial = {...(sc.usosEspecial || {}), [it.id]: c.usos + 1};
+    const propio = it.especial.estadoPropio;   // lo que se pone quien la usa (la luz)
+    if(propio && propio.nombre) EstadosAplicar.aplicarACreep(sc, structuredClone(propio));
+    const avisos = [];
+    (sc.equipo || []).filter(o => o && o.orbe).forEach(o => {
+      const k = 'orbe:' + o.id;
+      if(o.orbeResguardo && !num(sc.usosEspecial[k])){
+        sc.usosEspecial[k] = 1;
+        const r = EstadosAplicar.aplicarACreep(sc, {nombre: 'Escudo especial', turnos: 1, escudoMagico: num(o.orbeResguardo)});
+        avisos.push(`${o.nombre}: ${r.ok ? `Escudo especial ${fmt(num(o.orbeResguardo))} hasta su próximo turno` : `no entra el Escudo especial (${r.motivo || 'bloqueado'})`}`);
+      }
+      if(o.orbeSalvaje){
+        const d = 1 + Math.floor(Math.random() * 6);
+        if(d === 1) sc.hp = Math.max(0, num(sc.hp) - 1);
+        if(d === 6) p.doble = true;
+        avisos.push(`${o.nombre}: 1d6 → ${d}: ${d === 1 ? 'le hace 1 de daño' : d === 6 ? (/\d+d\d+/.test(h.tiradaExtra) ? '¡el efecto sale doble! (los dados del daño, ×2)' : '¡el efecto sale doble! ✋ A mano: qué es el doble lo decide la mesa') : 'nada'}`);
+      }
+    });
+    p.hab = h; p.avisosOrbe = avisos; p.espera = c.espera;
+    return p;
+  }
+  // La habilidad de la varita para lo que sigue (terminarHab), con el «doble» del orbe salvaje si salió.
+  function habEspecialParaTerminar(sc, itemId, doble){
+    const it = especialesCreep(sc).find(x => x.id === itemId);
+    if(!it) return null;
+    const h = habDeEspecialCreep(sc, it);
+    if(doble) h.tiradaExtra = String(h.tiradaExtra || '').replace(/(\d+)d(\d+)/g, (m, n, k) => `${2 * num(n)}d${k}`);
+    return h;
+  }
   function mantenimiento(sc){
     sc.ataquesTurno = 0;
+    sc.usosEspecial = {};   // el No2 de las armas especiales vuelve a 1 (y los orbes, a su uso por turno)
+    Object.keys(sc.esperaEspecial || {}).forEach(k => { sc.esperaEspecial[k] = Math.max(0, num(sc.esperaEspecial[k]) - 1); if(!sc.esperaEspecial[k]) delete sc.esperaEspecial[k]; });   // la espera de sus varitas
     sc.saqueUsado = false;   // Saque rápido: vuelve con el turno (2026-10-05)
     const rep = [];
     let enCooldown = 0;
@@ -408,7 +467,7 @@ const CreepAcciones = (() => {
     });
   }
 
-  return {mantenimiento, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
+  return {ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
     tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, tiradaSoltarse, aplicarSoltarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
     costoAtaqueDe, faltanNitros, preguntaSinNitros, alertaSinNitros,
     FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,

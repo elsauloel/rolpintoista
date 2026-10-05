@@ -206,6 +206,7 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   un aliado al lado; Alforja compartida = un aliado saca un consumible de tu mochila por 1 No2. Catálogo: Faja de mandadero y Alforja de arriero.
 - [x] **Pegar las reglas de Firestore** (dueño, pegadas el 2026-10-05): la Alforja compartida (paquetes «pedido») y, desde el 2026-10-05, el campo
   `niebla` de los elementos (Varita de niebla). Sin eso la niebla no se puede poner («faltan publicar las reglas nuevas»).
+- [ ] **Creeps de cooldown a SP** (dueño, 2026-10-05): obra grande para después del catálogo — ver la fase 3d de `hoja-de-ruta-rework-catalogo.md`.
 - [ ] **Editar un arma especial en el asistente de ítems** (2026-10-05): `comun/asistente-item.js` todavía las trata como un arma física (Tipo, dados por
   Peso). Hasta que se haga, las varitas se tocan en `comun/catalogo.js` (o con el script de carga). Los visores (Ver, tienda, catálogo) ya las muestran bien.
 - [ ] **Equipo defensivo Común para casters** (dueño, 2026-10-05): después de las armas especiales Comunes; ver la fase 3b de

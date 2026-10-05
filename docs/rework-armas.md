@@ -1526,6 +1526,8 @@ lluvia ácida 21 y báculo de sangre 19,5), 3 orbes.
     Demora de las armas físicas (peso 4) × 0,75 por ser trampa → **1 SP, 45 DDE**. Quedan **30 armas + 3 orbes** Comunes.
   - Siguen a mano: el reparto de los misiles, el −1 por distancia de la pelea cercana, el empuje y el gancho, el fuego que deja la bola, el suelo de la
     ventisca, el +1d4 del miasma, el crítico de lo físico y los orbes de resguardo y salvaje.
+- **Armas especiales en creeps (2026-10-05, dueño):** las mismas reglas; los creeps no tienen SP y lo pagan con **espera** («medio a ojo»: SP 1–2 → 1 turno,
+  3+ → 2), hasta pasar los creeps a SP (obra grande después del catálogo). La varita mantiene su identidad: si la saquea un jugador, vuelve a costar SP.
 - **Zonas en su último turno (2026-10-05, salió en la prueba en vivo):** una zona de N turnos se borraba en el mismo Mantenimiento en que vencía,
   antes de hacer efecto: las de 1 turno (fuego de la bola, suelo de la ventisca, miasma) nunca le hacían nada a quien se quedaba adentro. Ahora en su
   último Mantenimiento primero la resuelven los de adentro y recién después se va (js/07, `zonaEsperaSuFin`; como mucho 2 minutos). Vale para toda zona.

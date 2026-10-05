@@ -81,6 +81,13 @@ const CreepBotonera = (() => {
           : {stat:'bloqueo', nombre:'Bloqueo · tras el Parry', dado: fc.bloqueo, sinNitros: true, lupa:'stat|bloqueo', motivo:`${Combatiente.BLOQUEO_SOLO_TRAS_PARRY} · con ${defCreep.nombre} tiraría esto`, attr:`data-bloqueocreep="${sc.id}"`}] : []),
       {nombre:'Fuerza del golpe', dado: fc.fuerza, motivo:`Sin costo · su Fuerza + el Peso de su arma (${fmt(pesoArma(sc))}) es el dado: su tirada contra el Bloqueo del defensor`, attr:`data-fuerzacreep="${sc.id}"`},
     ];
+    // ✨ Sus armas especiales (2026-10-05): un «Atacar» más cada una, con su costo (No2) y su espera (el SP de un creep, ver CreepAcciones).
+    if(typeof CreepAcciones !== 'undefined' && CreepAcciones.especialesCreep) CreepAcciones.especialesCreep(sc).forEach(it => {
+      const c = CreepAcciones.costoEspecialCreep(sc, it), e = it.especial || {}, sinNitros = num(sc.nitros) < c.no2;
+      combate.push({nombre: `✨ Atacar · ${e.nombre || it.nombre} · ${fmt(c.no2)} No2${c.enEspera ? ` · en espera ${fmt(c.enEspera)}` : ''}`, dado: e.dano ? `${e.dano}${e.sumaEspecial ? ' + Ef.Esp' : ''}` : '✨',
+        sinNitros: sinNitros || c.enEspera > 0, motivo: `${c.enEspera ? `En espera ${fmt(c.enEspera)} turno(s) · ` : sinNitros ? 'Sin No2 · ' : ''}Cuesta ${fmt(c.no2)} No2 y deja ${fmt(c.espera)} turno(s) de espera (su SP ${fmt(num(e.sp))}) · ${String(it.detalle || '').split(' ⚙')[0]}`,
+        attr: `data-especialcreep="${sc.id}:${it.id}"`});
+    });
     // Sentado: levantarse cuesta 1 No2 y saca el estado (ver data-levantarcreep).
     const sentadoCreep = (sc.estados || []).some(e => e.activo !== false && e.sentado);
     if(sentadoCreep){

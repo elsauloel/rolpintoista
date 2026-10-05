@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002c', '../comun/creep-botonera.js?v=20261005a2', '../comun/creep-acciones.js?v=20261005c1', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261004p1'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002c', '../comun/creep-botonera.js?v=20261005fn', '../comun/creep-acciones.js?v=20261005fn', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261004p1'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -206,6 +206,7 @@ function acAccionAca(b){
     return true;
   }
   if(d.ejecutar){ acEjecutarHab(sc, d.ejecutar.split(':')[1]); return true; }
+  if(d.especialcreep){ acUsarEspecial(sc, d.especialcreep.split(':')[1]); return true; }   // ✨ un arma especial
   if(d.danohabcreep){
     const h = (sc.habilidades || []).find(x => x.id === d.danohabcreep.split(':')[1]);
     if(h) acPublicar(sc, CreepAcciones.tiradaSegundaHab(sc, h));
@@ -385,6 +386,22 @@ async function acFlashFuera(sc, h){
   const f = h.duelo.flash || {};
   acMesaHabilidad(sc, h, `⚡ Flash: +${fmt(num(f.bono))} a la tirada.`);
   toast(`${h.nombre}: ⚡ +${fmt(num(f.bono))} (sumalo a mano a la tirada; dentro del duelo se suma solo) · ${ConfirmarTurno.textoCosto(p)}`);
+}
+// ✨ Un arma especial del creep (2026-10-05): cobra (No2 y espera) y sigue por el camino de sus habilidades (CreepAcciones.terminarHab).
+function acUsarEspecial(sc, itemId){
+  const id = sc.id;
+  acCambiar(c => {
+    const p = CreepAcciones.usarEspecialCreep(c, itemId, estadosPresetCreep());
+    if(!p.error) p.creep = c;
+    return p;
+  }).then(p => {
+    if(!p) return;   // (un error ya lo avisó acCambiar)
+    if(p.aviso) toast(p.aviso);
+    const sc2 = Object.assign(p.creep, {id}), h2 = CreepAcciones.habEspecialParaTerminar(sc2, itemId, p.doble);
+    (p.avisosOrbe || []).forEach(a => acMesaHabilidad(sc2, {nombre: a.split(':')[0]}, a.split(': ').slice(1).join(': ')));
+    if(h2) CreepAcciones.terminarHab(sc2, h2, p, acHabUi());
+    acDibujar();
+  });
 }
 function acEjecutarHab(sc, habId){
   const h = (sc.habilidades || []).find(x => x.id === habId);

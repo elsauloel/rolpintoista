@@ -1270,6 +1270,11 @@ versión parecida en más de una, es candidato a juntar.
 - **`capas.js`** (2026-10-05, dueño: «hay menús que quedan detrás de otros»): la última ventana (`.scrim`) que se abre queda arriba de las que ya
   estaban abiertas (le sube el z-index mientras está abierta; al cerrarse vuelve al suyo). Se carga en la ficha, GM Tools, el generador de tiendas y
   el mapa; no hay que llamar nada. Caso que lo motivó: en la ficha, «Vender a la tienda» quedaba detrás de la tienda.
+- **✨ Armas especiales de un creep** (2026-10-05, `comun/creep-acciones.js`): `especialesCreep(sc)` (las de su equipo), `costoEspecialCreep`, `habDeEspecialCreep`
+  (la misma habilidad que arma la ficha) y `usarEspecialCreep` (cobra y sigue por `ejecutarHab`/`terminarHab`, con sus orbes y su `estadoPropio`). No2 como un
+  personaje; el SP se paga con ESPERA (`ESPERA_POR_SP`: SP 1–2 → 1 turno, 3+ → 2; provisorio hasta pasar los creeps a SP). La espera y los usos viven en el
+  creep (`sc.esperaEspecial`, `sc.usosEspecial`), no en la varita: si la saquea un jugador, vuelve a costar SP. Botón `data-especialcreep` (Botonera del creep;
+  mapa js/12 `acUsarEspecial`, GM Tools js/06).
 - **Marcado** (2026-10-05): preset nuevo (`marcado: true`). `Combatiente.agregarEstado`: al ponerse saca el Sigilo; mientras dura, el Sigilo
   rebota (`inmunidad` → 'Marcado'); `Combatiente.marcadoEn(estados)`. `FichaAcciones.alternarSigilo` avisa y no entra. El mapa lo hace brillar
   (`marcado`, `brilloMarca`) y lo deja ver a través de la niebla.

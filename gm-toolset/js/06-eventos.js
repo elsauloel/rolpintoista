@@ -463,6 +463,19 @@ document.addEventListener('click', e => {
     CreepAcciones.terminarHab(sc, h, p, gmHabUi);
     return;
   }
+  if(b.dataset.especialcreep){   // ✨ un arma especial del creep (2026-10-05): el mismo camino que en el mapa (comun/creep-acciones.js)
+    const [scId, itemId] = b.dataset.especialcreep.split(':');
+    const sc = S.creeps.find(s=>s.id===scId);
+    if(!sc) return;
+    const p = CreepAcciones.usarEspecialCreep(sc, itemId, ESTADOS_PRESET_GM);
+    if(p.error){ toast(p.error); return; }
+    if(p.aviso) toast(p.aviso);
+    (p.avisosOrbe || []).forEach(a => toast(a));
+    renderAll();
+    const h = CreepAcciones.habEspecialParaTerminar(sc, itemId, p.doble);
+    if(h) CreepAcciones.terminarHab(sc, h, p, gmHabUi);
+    return;
+  }
   if(b.id === 'btn-mant'){
     // Conectado como GM: pasa el turno para toda la mesa (fichas y creeps).
     // Sin conexión: solo los creeps de esta pestaña, como antes.

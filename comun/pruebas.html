@@ -2031,6 +2031,19 @@ prueba('Botonera (dueño, 2026-10-05): «Tiradas de stats» muestra solo lo que 
   igual([caja && [...caja.querySelectorAll('.bt-label')].map(x => x.textContent.trim()), FichaBotonera.statsConTirada().some(s => /^(res(fuego|hielo|rayo|toxico|acido)|ranura|pasamanos|alforja|retirada)/.test(s.id))],
     [['Con', 'Res.Esp', 'Res.CC', 'Fue', 'Agi', 'Iniciativa', 'Des', 'Percep.', 'Sigilo', 'Esp', 'PdG.Esp', 'Ef.Esp', 'Res.Mt'], false]);
 });
+prueba('✨ armas especiales de un creep (2026-10-05): No2 como un personaje, el SP se paga con espera (SP 1–2 → 1, 3+ → 2) y la varita no cambia', () => {
+  const cat = id => ({...structuredClone(CATALOGO_BASE.find(i => i.id === id)), id: id});
+  const sc = creepPrueba({id: 'cr', nitros: 6, equipo: [cat('esp-varita-del-rastreador'), cat('esp-orbe-de-resguardo')]});
+  const varita = sc.equipo[0], antes = JSON.stringify(varita);
+  const h = CreepAcciones.habDeEspecialCreep(sc, varita);
+  const p1 = CreepAcciones.usarEspecialCreep(sc, varita.id, ESTADOS_PRESET);
+  const p2 = CreepAcciones.usarEspecialCreep(sc, varita.id, ESTADOS_PRESET);   // en espera: no se puede
+  const escudo = sc.estados.find(e => e.nombre === 'Escudo especial');
+  const r = CreepAcciones.mantenimiento(sc), espera1 = (sc.esperaEspecial || {})[varita.id];
+  CreepAcciones.mantenimiento(sc);
+  igual([h.tiradaExtra, h.duelo.objetivo, !!p1.error, sc.nitros < 6, /espera/.test(p2.error || ''), !!escudo, espera1, (sc.esperaEspecial || {})[varita.id], JSON.stringify(varita) === antes, CreepAcciones.ESPERA_POR_SP(1), CreepAcciones.ESPERA_POR_SP(4)],
+    ['1d4', 'enemigo', false, true, true, true, 1, undefined, true, 1, 2]);
+});
 prueba('✨ armas especiales Comunes (2026-10-05): 30 armas y 3 orbes; cada una automatiza algo o aclara lo que queda a mano', () => {
   const L = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-'));
   const armas = L.filter(i => i.especial), orbes = L.filter(i => i.orbe);

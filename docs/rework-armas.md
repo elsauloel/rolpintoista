@@ -1392,3 +1392,8 @@ van a contemplar como…»: falta completar.)
 - **Cerrado (dueño, 2026-10-05): las varitas cuestan 2, 3, 4 No2** (2 el primer uso del turno, +1 cada uno: 1 de base + 1 por ser de rango). Con 7 No2
   son 2 usos por turno (con 5, 2; con 9, 3). Con eso la calculadora deja las varitas de daño en ~6,3 a 7,8 por turno, en el orden de un arma física
   Común (6,1, de 2,3 a 9,6). Siguen altas: la Varita de aceite (12,6 por turno, con 4 SP) y el Báculo arcano con Especial (19,5).
+- **Lluvia de ideas (2026-10-05):** 11 tipos de objeto y 109 efectos (daño, control, movimiento, apoyo, debilitar, información, invocar, terreno,
+  combos, defensa del portador, riesgo, ritmo, fuera de combate), para que el dueño tache. **Tipos (dueño):** **grimorio** → vincularlo a los
+  pergaminos, más adelante · **instrumentos**, más adelante · **orbes**: diseñar un par en la primera tanda · **cetros de mando**: no · **guante o
+  brazal rúnico**: gran idea, cuando lo básico esté consolidado · **dagas rituales y demás híbridas**: más adelante («de lo básico a lo complejo»).
+  Primera tanda: **varitas, báculos (una mano, dos manos, híbrido defensivo) y un par de orbes**.

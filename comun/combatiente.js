@@ -177,20 +177,39 @@ const Combatiente = (() => {
      `statEvaEspecial(tipo)` → el stat ('' si es un ataque normal). */
   const EVA_ESPECIAL = {oportunidad: {stat: 'evaopor', nombre: 'contra oportunidad'}, contra: {stat: 'evacontra', nombre: 'contra contraataque'}};
   const statEvaEspecial = tipo => (EVA_ESPECIAL[tipo] || {}).stat || '';
-  /* Retirada limpia (dueño, 2026-10-04): al alejarse de un rival, chance de no darle ataque de oportunidad. Stat 'retirada' en %, tope 100
-     (100 = siempre, sin tirar). Se tira 1d6: 33 % = 5–6, 50 % = 4–6. `retiradaDado(pct)` → {caras, exitos} o null (siempre / nunca). */
-  const retiradaPct = v => Math.max(0, Math.min(100, Math.round(n(v))));
-  function retiradaDado(v){
-    const pct = retiradaPct(v);
+  /* Lo que se suma a la Evasión del defensor en un duelo (2026-10-04): la Evasión contra oportunidad / contraataque según el ataque, y Pasos de
+     baile si ya se movió en el turno (lo sabe el mapa: window.mapaSeMovio(tokenId); fuera del mapa no cuenta). `valorDe(statId)` → el valor de
+     ese stat en quien se defiende. → {val, txt} («+2 contra oportunidad · +1 Pasos de baile»). */
+  function evaExtraDuelo(d, valorDe){
+    const partes = [];
+    let val = 0;
+    const tipo = d && d.ataque && d.ataque.tipo, st = statEvaEspecial(tipo);
+    const fmtN = v => `${v > 0 ? '+' : '−'}${Math.abs(v)}`;
+    if(st){ const v = n(valorDe(st)); if(v){ val += v; partes.push(`${fmtN(v)} ${EVA_ESPECIAL[tipo].nombre}`); } }
+    const tokenId = d && d.defensor && d.defensor.tokenId;
+    const movio = !!tokenId && typeof window !== 'undefined' && typeof window.mapaSeMovio === 'function' && window.mapaSeMovio(tokenId);
+    if(movio){ const v = n(valorDe('pasosbaile')); if(v){ val += v; partes.push(`${fmtN(v)} Pasos de baile`); } }
+    return {val, txt: partes.join(' · ')};
+  }
+  /* Las mecánicas «con chance» de las piezas (dueño, 2026-10-04): Retirada limpia, Inamovible, Recuperarse rápido, Reflejos de mangosta. El stat
+     va en %, tope 100 (100 = siempre, sin tirar). Se tira 1d6: 33 % = 5–6, 50 % = 4–6. `chanceDado(pct)` → {caras, exitos} o null (siempre /
+     nunca); `chanceTexto(pct)` → «33 % (5–6 en d6)» o «siempre». (`retirada*`: los mismos, con el nombre con el que nacieron.) */
+  const chancePct = v => Math.max(0, Math.min(100, Math.round(n(v))));
+  function chanceDado(v){
+    const pct = chancePct(v);
     if(pct <= 0 || pct >= 100) return null;
     return {caras: 6, exitos: Math.min(5, Math.max(1, Math.round(pct * 6 / 100)))};
   }
-  function retiradaTexto(v){
-    const pct = retiradaPct(v), d = retiradaDado(pct);
+  function chanceTexto(v){
+    const pct = chancePct(v), d = chanceDado(pct);
     if(pct >= 100) return 'siempre';
     if(!d) return '';
     return `${pct} % (${d.exitos > 1 ? (d.caras - d.exitos + 1) + '–' : ''}${d.caras} en d${d.caras})`;
   }
+  const retiradaPct = chancePct, retiradaDado = chanceDado, retiradaTexto = chanceTexto;
+  /* Los estados que traban el movimiento (Recuperarse rápido, dueño 2026-10-04): duran 1 turno menos con la chance de los pies. */
+  const ESTADOS_TRABA = ['Inmovilizado', 'Rengo', 'Sentado', 'Lento'];
+  const esTraba = e => !!e && (e.inmovilizado || e.rengo || e.sentado || e.lento || ESTADOS_TRABA.includes(String(e.nombre || '').trim()));
   /* Soltarse (2026-10-03, trampas de Atrapar; pedido del dueño: «que el botón diga exactamente qué tira y cuánto cuesta»): un estado puede
      traer `soltar: {stat, etq, dif, no2}` (lo pone la trampa que lo dejó). Igual para personajes, invocaciones y creeps: se paga lo que diga
      (se suelte o no), se tira el stat contra la dificultad y, si llega, se saca el estado. */
@@ -681,7 +700,7 @@ const Combatiente = (() => {
   }
   const esMagicoTipo = texto => !!elementoDe(texto) || /arcan|magic/i.test(String(texto || ''));
 
-  return {ELEMENTOS, elementoDe, esMagicoTipo, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, retiradaPct, retiradaDado, retiradaTexto, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+  return {ELEMENTOS, elementoDe, esMagicoTipo, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

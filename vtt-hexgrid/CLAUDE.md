@@ -1397,3 +1397,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (`que: 'efecto'`), el orden es daño → resistir (`trampaDanoPrimero`, `trampaFaseInicial`); el paso de la tirada dice «Para resistir: Parálisis»
   y el botón «Tirar Res.CC para resistir Parálisis» (`trampaQueSeResiste`). El cartel de una zona también nombra lo que se resiste. Un salto de la
   Descarga que llega con otro Anuncio abierto espera en la fila y su rayo se ve al cerrarlo, 2,5 s antes de su Anuncio (`rayoPendientes`).
+
+- **`js/21-chance.js`** (2026-10-04, piernas y pies): las mecánicas «con chance» (stat en %, 1d6). `chanceDe(t, stat)` (el % de un token: creep por sus
+  datos, personaje por su resumen), `chanceCartel(o)` (el cartel paso a paso con su tirada: nunca en silencio — Crónica y Mesa), y **Recuperarse rápido**
+  (revisa cada 1,5 s los tokens que maneja esta pantalla; a un estado que traba NUEVO, cartel y, si sale, 1 turno menos). Lo usan la Retirada limpia
+  (js/17) y el paso a paso de las trampas (js/19: Reflejos de mangosta, Inamovible). En js/04: `marcarMovido` / `seMovioEsteTurno` / `window.mapaSeMovio`
+  (Lento y Pasos de baile) y `lentoRecargo` (el primer casillero doble).

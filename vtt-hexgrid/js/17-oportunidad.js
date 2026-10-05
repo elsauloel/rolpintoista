@@ -100,64 +100,22 @@ async function oportunidadResolver(){
    pueden ser silenciosas y automáticas en el log»). Los dados ruedan, el cartel muestra el resultado y el resto de la mesa lo ve en la
    Crónica. Con 100 % sale siempre: el cartel lo anuncia, sin tirar. Si sale, sigue su camino como lo marcó; si no, el rival decide como
    siempre. Las invocaciones, por ahora sin este dato (como los Pasos gratis). */
-function retiradaDe(t){
-  if(!t || !t.fichaId) return 0;
-  if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return sc ? Combatiente.retiradaPct(CreepCalculo.modTotal(sc, 'retirada')) : 0; }
-  if(String(t.fichaId).includes(SEP_INVOCACION)) return 0;
-  const f = fichasPub.get(t.fichaId);
-  return Combatiente.retiradaPct(f && f.resumen && f.resumen.retirada);
-}
+const retiradaDe = t => chanceDe(t, 'retirada');   // js/21
 async function oporRetirada(t, r, p){
   const pct = retiradaDe(t);
   if(pct <= 0) return false;
-  const d = Combatiente.retiradaDado(pct), nomT = nombreDe(t), nomR = nombreDe(r);
-  const necesita = d ? d.caras - d.exitos + 1 : 0;
-  const momentoId = await momentoAbrir({tipo: 'retirada', icono: '🦵', titulo: `${nomT} intenta una Retirada limpia de ${nomR}`, estado: 'tirando',
-    datos: {centro: true, moverId: p.tokenId, rivalId: p.rivalId}});
-  const paso1 = {titulo: `Te alejás de ${nomR}`, texto: pct >= 100
-    ? 'Tus piernas te sacan siempre del cuerpo a cuerpo: te alejás sin darle ataque de oportunidad.'
-    : `Retirada limpia ${Combatiente.retiradaTexto(pct)}: si sale, te alejás sin darle ataque de oportunidad; si no, ${nomR} puede atacarte.`};
-  const sale = await new Promise(fin => {
-    let listo = false;
-    const terminar = v => { if(listo) return; listo = true; AvisoCombate.cerrar(); fin(v); };
-    if(pct >= 100){
-      AvisoCombate.mostrar({clave: 'retirada', icono: '🦵', titulo: 'Retirada limpia', pasos: [paso1],
-        veredicto: {tono: 'bueno', grande: '¡RETIRADA LIMPIA!', chico: 'Seguís tu camino sin ataque de oportunidad'},
-        botones: [{texto: 'Seguir mi camino', alClic: () => terminar(true)}], alCerrar: () => terminar(true)});
-      return;
-    }
-    const tirar = async () => {
-      if(listo) return;
-      const tr = tirarDados('1d' + d.caras);
-      if(!tr) return;
-      AvisoCombate.mostrar({clave: 'retirada', icono: '🦵', titulo: 'Retirada limpia', pasos: [paso1, {titulo: 'Tirada', texto: 'Rodando el d6…', espera: true}],
-        botones: [{texto: '🎲 Tirando…', deshabilitado: true}], alCerrar: () => {}});
-      try{ await mesaPublicar(`Retirada limpia · ${Combatiente.retiradaTexto(pct)}`, {formula: tr.formula, rolls: tr.rolls, mod: tr.mod, total: tr.total, quien: nomT, ...(t.tipo === 'creep' ? {desde: 'gm'} : {})}); }catch(err){}
-      await new Promise(res => (typeof Duelo !== 'undefined' && Duelo.esperarDados) ? Duelo.esperarDados(res) : res());
-      const ok = tr.total >= necesita;
-      const paso2 = {titulo: 'Tirada', texto: `Sacaste ${tr.total} en el d6 (salías con ${necesita} o más).`};
-      if(ok){
-        oporMesa(`${nomT} se alejó de ${nomR} con Retirada limpia (sacó ${tr.total}): sin ataque de oportunidad`);
-        momentoActualizar(momentoId, {estado: 'listo', resultado: `…sacó ${tr.total}: ¡se fue limpio! Sin ataque de oportunidad.`});
-        AvisoCombate.mostrar({clave: 'retirada', icono: '🦵', titulo: 'Retirada limpia', pasos: [paso1, paso2],
-          veredicto: {tono: 'bueno', grande: '¡RETIRADA LIMPIA!', chico: 'Seguís tu camino sin ataque de oportunidad'},
-          botones: [{texto: 'Seguir mi camino', alClic: () => terminar(true)}], alCerrar: () => terminar(true)});
-      }else{
-        oporMesa(`${nomT} intentó una Retirada limpia (sacó ${tr.total}, necesitaba ${necesita} o más): no le alcanzó`);
-        momentoActualizar(momentoId, {estado: 'listo', resultado: `…sacó ${tr.total}: no le alcanzó. ${nomR} puede atacarlo de oportunidad.`});
-        AvisoCombate.mostrar({clave: 'retirada', icono: '🦵', titulo: 'Retirada limpia', pasos: [paso1, paso2],
-          veredicto: {tono: 'malo', grande: 'NO ALCANZÓ', chico: `${nomR} puede atacarte de oportunidad`},
-          botones: [{texto: 'Entendido', alClic: () => terminar(false)}], alCerrar: () => terminar(false)});
-      }
-    };
-    AvisoCombate.mostrar({clave: 'retirada', icono: '🦵', titulo: 'Retirada limpia', pasos: [paso1, {titulo: 'Tirada', texto: `1d6: salís limpio con ${necesita} o más.`, espera: true}],
-      botones: [{texto: '🎲 Tirar 1d6', alClic: tirar}],
-      alCerrar: () => { if(listo) return; listo = true; momentoActualizar(momentoId, {estado: 'listo', resultado: '…no la intentó.'}); fin(false); }});
-  });
-  if(pct >= 100){
-    oporMesa(`${nomT} se alejó de ${nomR} con Retirada limpia (siempre): sin ataque de oportunidad`);
-    momentoActualizar(momentoId, {estado: 'listo', resultado: '…se fue limpio (sus piernas lo sacan siempre). Sin ataque de oportunidad.'});
-  }
+  const nomT = nombreDe(t), nomR = nombreDe(r);
+  // El cartel común de las chances (js/21: cartel, dados, resultado, Crónica y Mesa).
+  const sale = await chanceCartel({clave: 'retirada', icono: '🦵', titulo: 'Retirada limpia', mecanica: 'Retirada limpia', pct, t,
+    paso1: {titulo: `Te alejás de ${nomR}`, texto: pct >= 100
+      ? 'Tus piernas te sacan siempre del cuerpo a cuerpo: te alejás sin darle ataque de oportunidad.'
+      : `Retirada limpia ${Combatiente.chanceTexto(pct)}: si sale, te alejás sin darle ataque de oportunidad; si no, ${nomR} puede atacarte.`},
+    momento: `${nomT} intenta una Retirada limpia de ${nomR}`,
+    exito: {grande: '¡RETIRADA LIMPIA!', chico: 'Seguís tu camino sin ataque de oportunidad', cronica: '…¡se fue limpio! Sin ataque de oportunidad.',
+      mesa: `⚔ ${nomT} se alejó de ${nomR} con Retirada limpia: sin ataque de oportunidad`},
+    fallo: {grande: 'NO ALCANZÓ', chico: `${nomR} puede atacarte de oportunidad`, cronica: `…no le alcanzó. ${nomR} puede atacarlo de oportunidad.`,
+      mesa: `⚔ ${nomT} intentó una Retirada limpia: no le alcanzó`},
+    botonOk: 'Seguir mi camino'});
   if(!sale) return false;
   oporContinuar(p);
   return true;

@@ -65,7 +65,7 @@ const CreepDuelo = (() => {
   function hooks(ui){
     const deLado = lado => lado ? ui.creep(lado.ref) : null;
     // Evasión contra oportunidad / contra contraataque (2026-10-04): lo que suma a la Evasión contra el ataque de este duelo.
-    const evaEsp = (sc, d) => { const st = Combatiente.statEvaEspecial(d && d.ataque && d.ataque.tipo), val = st && sc ? num(C().modTotal(sc, st)) : 0; return {val, txt: val ? `${val > 0 ? '+' : '−'}${fmt(Math.abs(val))} ${Combatiente.EVA_ESPECIAL[d.ataque.tipo].nombre}` : ''}; };
+    const evaEsp = (sc, d) => sc ? Combatiente.evaExtraDuelo(d, st => num(C().modTotal(sc, st))) : {val: 0, txt: ''};
     return {
       soy: lado => ui.soy(lado),
       atacar: d => {

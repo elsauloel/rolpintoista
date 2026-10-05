@@ -42,9 +42,17 @@ COSTO = {
     'evaopor': 1, 'evacontra': 2 / 3,
     # Retirada limpia (en %, ver costo_retirada): 33 % = 1, 50 % = 1,5, siempre = 4 (desde Rara).
     'retirada': 0.03,
+    # Mecánicas de los pies (dueño, 2026-10-04): Pasos de baile = 75 % de +1 Evasión; Pisada atenta 1; las de chance, en COSTO_CHANCE.
+    'pasosbaile': 1.5, 'pisadaatenta': 1,
+    'inamovible': 0, 'recuperarse': 0, 'reflejos': 0,
 }
 def costo_retirada(pct):
     return 4 if pct >= 100 else pct * 0.03
+# Las de chance (en %): (33 %, 50 %, siempre). Retirada limpia va aparte (por punto).
+COSTO_CHANCE = {'inamovible': (0.5, 0.75, 1.5), 'recuperarse': (0.5, 1, 2), 'reflejos': (1, 1.5, 2.5)}
+def costo_chance(stat, pct):
+    a, b, c = COSTO_CHANCE[stat]
+    return c if pct >= 100 else b if pct >= 50 else a
 COSTO_DEFECTO = 1
 OFENSIVOS = {'pdg', 'dmg', 'crit', 'critpot', 'rng', 'pdgmg', 'dmgesp', 'rangocasteo', 'accionesmax'}
 COSTO_ESTADO_EQUIPO = 2          # un estado que se pone al equipar (Espinas, Regeneración…): a revisar caso por caso
@@ -98,7 +106,7 @@ def puntos(it):
     for m in it.get('mods', []):
         v = float(m.get('val', 0) or 0)
         c = COSTO.get(m['stat'], COSTO_DEFECTO)
-        det.append((f"{v:+g} {NOMBRE.get(m['stat'], m['stat'])}", costo_retirada(v) if m['stat'] == 'retirada' else v * c))
+        det.append((f"{v:+g} {NOMBRE.get(m['stat'], m['stat'])}", costo_retirada(v) if m['stat'] == 'retirada' else costo_chance(m['stat'], v) if m['stat'] in COSTO_CHANCE else v * c))
         if m['stat'] in OFENSIVOS and v > 0: avisos.append(f"bono ofensivo ({NOMBRE.get(m['stat'], m['stat'])})")
         if m['stat'] not in COSTO: avisos.append(f"sin costo definido: {m['stat']}")
     if it.get('equipoEstadoNombre'):

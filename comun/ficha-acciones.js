@@ -623,6 +623,17 @@ const FichaAcciones = (() => {
       ui.toast(`${origen ? origen + ': ' : ''}−${fmt(n)} SP (${fmt(antes)} → ${fmt(antes - n)})`);
       return;
     }
+    // «Acortar estado» (2026-10-04, Recuperarse rápido de los pies): le saca `stacks` turnos al estado `estado` (si llega a 0, se va).
+    if(spec.nombre === 'Acortar estado'){
+      const e = (S.efectos || []).find(x => x && x.activo !== false && x.nombre === spec.estado && !x.permanente);
+      if(!e){ ui.toast(`${origen ? origen + ': ' : ''}ya no tenés ${spec.estado}`); return; }
+      const menos = Math.max(1, Math.round(num(spec.stacks) || 1));
+      e.turnos = Math.max(0, num(e.turnos) - menos);
+      if(e.turnos <= 0) S.efectos = S.efectos.filter(x => x !== e);
+      ui.cambio(['efectos', 'refresh']);
+      ui.toast(`${origen ? origen + ': ' : ''}${spec.estado} ${e.turnos > 0 ? `queda en ${e.turnos} turno${e.turnos === 1 ? '' : 's'}` : 'se terminó'}`);
+      return;
+    }
     // «Pierde No2» (2026-10-02, Sonic Boom): baja los No2 (`stacks` = cuántos); si llega a 0 y corresponde, queda Sentado.
     if(spec.nombre === 'Pierde No2'){
       const n = Math.max(0, Math.round(num(spec.stacks))), antes = num(S.nitros);

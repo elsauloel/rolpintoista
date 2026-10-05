@@ -36,7 +36,8 @@ const trampaTituloSalva = (s, dt) => s.que === 'efecto' ? `Para resistir: ${dt ?
 // El orden (dueño, 2026-10-04): si la tirada resiste solo el efecto, primero se anuncia el daño (que entra seguro) y después se tira para
 // resistir lo que deja. Si la tirada esquiva la trampa o la mitad del daño, va antes.
 const trampaDanoPrimero = dt => !!(dt.requiereDano || (dt.salva && dt.salva.que === 'efecto' && (dt.dano || dt.danoFijo)));
-const trampaFaseInicial = dt => trampaDanoPrimero(dt) ? trampaFaseSiguiente(dt, 'empuje') : dt.salva ? 'salva' : trampaFaseSiguiente(dt, 'salva');
+// Reflejos de mangosta (2026-10-04, pies): antes que nada, la chance de esquivarla entera.
+const trampaFaseInicial = dt => num(dt.reflejos) > 0 && !dt.reflejosHecho ? 'reflejos' : trampaDanoPrimero(dt) ? trampaFaseSiguiente(dt, 'empuje') : dt.salva ? 'salva' : trampaFaseSiguiente(dt, 'salva');
 function trampaLogra(dt){
   const s = dt.salva;
   if(s.logra) return s.logra;
@@ -53,7 +54,7 @@ function trampaFaseSiguiente(dt, fase){
     if(f === 'salva' && dt.salva && agarro) return f;
     if(f === 'dano' && (dt.dano || dt.danoFijo) && dt.evita !== 'todo') return f;
     if(f === 'sp' && dt.pierdeSp && agarro) return f;
-    if(f === 'portal' && dt.portal && agarro) return f;
+    if(f === 'portal' && dt.portal && agarro) return num(dt.inamovible) > 0 && !dt.firmePortal ? 'firme-portal' : f;   // Inamovible (pies): primero su chance
     if(f === 'estado' && dt.spec && agarro) return f;
     if(f === 'mano' && dt.aMano && agarro) return f;
     if(f === 'muro' && dt.muro) return f;
@@ -71,6 +72,15 @@ function trampaTextoInfo(dt){
 }
 // Lo que falta: {titulo, texto, boton, espera} (espera = el renglón de la Crónica mientras tanto).
 function trampaPasoQueFalta(dt){
+  // Las chances de los pies (2026-10-04): Reflejos de mangosta (esquivarla entera) e Inamovible (que no lo muevan).
+  if(dt.fase === 'reflejos' || dt.fase === 'firme-empuje' || dt.fase === 'firme-portal'){
+    const refl = dt.fase === 'reflejos', pct = refl ? dt.reflejos : dt.inamovible, siempre = num(pct) >= 100;
+    const que = refl ? 'esquiva la trampa entera' : dt.fase === 'firme-portal' ? 'el portal no se lo lleva' : 'no sale despedido';
+    const d = Combatiente.chanceDado(pct), necesita = d ? d.caras - d.exitos + 1 : 0;
+    return {titulo: refl ? 'Reflejos de mangosta' : 'Inamovible',
+      texto: siempre ? `${refl ? 'Reflejos de mangosta' : 'Inamovible'} (siempre): ${que}.` : `${refl ? 'Reflejos de mangosta' : 'Inamovible'} ${Combatiente.chanceTexto(pct)}: con ${necesita} o más en 1d6, ${que}.`,
+      boton: siempre ? '▶ Seguir' : `🎲 Tirar ${refl ? 'Reflejos de mangosta' : 'Inamovible'} (1d6)`, espera: `${dt.quien} tira ${refl ? 'Reflejos de mangosta' : 'Inamovible'}…`};
+  }
   if(dt.fase === 'empuje') return {titulo: 'Sale despedido', texto: 'El muro sale justo donde está parado: tira 1d6 para ver a qué casilla vecina sale despedido (las 6 vecinas en ronda, la 1 hacia el frente del muro; si le toca una ocupada, la siguiente libre). Después, 1d6 de daño directo.',
     boton: '🎲 Tirar adónde sale (1d6)', espera: `${dt.quien} tira adónde sale despedido…`};
   if(dt.fase === 'salva' && dt.salva){
@@ -124,6 +134,9 @@ async function trampaMomentoNuevo(p){
     portal: p.portal ? {rango: num(p.portal.rango) || 8} : null, duenoTrampa: p.duenoTrampa || '', requiereDano: !!p.requiereDano, spec: p.specJson || '', muro: num(p.muro), muroLargo: num(p.muroLargo), zona: num(p.zona), aMano: p.aMano || '',
     fase: '', tirando: false, evita: '', pasos: [],
   };
+  // Los pies de la víctima (2026-10-04, js/21): Reflejos de mangosta e Inamovible (para el portal).
+  const vic = tokens.get(p.tokenId);
+  if(vic){ const rf = chanceDe(vic, 'reflejos'), im = chanceDe(vic, 'inamovible'); if(rf) dt.reflejos = rf; if(im) dt.inamovible = im; }
   dt.fase = trampaFaseInicial(dt);
   const titulo = p.pisador ? `${p.quien} pisó «${p.nombreT}»` : `${p.quien} quedó en el área de «${p.nombreT}»`;
   if(dt.fase === 'fin'){   // nada que tirar ni mostrar: solo se anuncia
@@ -140,6 +153,8 @@ async function trampaMomentoEmpuje(e, nombreT, prohibidas){
   const dt = {tokenId: e.tokenId, creep: x.tipo === 'creep', fichaId: String(x.fichaId || ''), quien, nombreT, pisador: false, salva: null,
     dano: '1d6', ignoraDef: true, spec: '', muro: 0, aMano: '', fase: 'empuje', tirando: false, evita: '', pasos: [],
     empuje: {col: e.col, fila: e.fila, frente: e.frente, prohibidas}};
+  const im = chanceDe(x, 'inamovible');   // Inamovible (pies, js/21): primero su chance de que el muro no lo despida
+  if(im){ dt.inamovible = im; dt.fase = 'firme-empuje'; }
   dt.lineas = trampaLineas(dt);
   return momentoAbrir({tipo: 'trampa', icono: '🧱', titulo: `${quien}: el muro sale debajo de sus pies`, estado: 'paso', datos: dt});
 }
@@ -344,13 +359,14 @@ async function trampaTirar(id){
   const d = trampasDatos.get(id);
   const fase = d && d.datos && d.datos.fase;
   if(fase === 'portal'){ trampaPasoPortal(id); return; }
-  if(!['salva', 'dano', 'empuje', 'sp', ...TRAMPA_INFO].includes(fase)) return;
+  if(!['salva', 'dano', 'empuje', 'sp', 'reflejos', 'firme-empuje', 'firme-portal', ...TRAMPA_INFO].includes(fase)) return;
   const dt = await trampaTomar(id, fase);
   if(!dt){ toast('Ese paso ya se está tirando en otra pantalla'); return; }
   trampaTirandoAca = id;
   trampaDibujar(id);
   try{
-    if(fase === 'salva') await trampaPasoSalva(id, dt);
+    if(fase === 'reflejos' || fase === 'firme-empuje' || fase === 'firme-portal') await trampaPasoChance(id, dt, fase);
+    else if(fase === 'salva') await trampaPasoSalva(id, dt);
     else if(fase === 'empuje') await trampaPasoEmpuje(id, dt);
     else if(fase === 'sp') await trampaPasoSp(id, dt);
     else if(fase === 'estado') await trampaPasoEstado(id, dt);
@@ -364,6 +380,34 @@ async function trampaTirar(id){
     trampaTirandoAca = null;
     if(trampaEnPantalla === id) trampaDibujar(id);
   }
+}
+
+// Las chances de los pies (2026-10-04): Reflejos de mangosta (si sale, la esquiva entera) e Inamovible (si sale, no lo mueve: ni el muro ni el
+// portal). Con 100 % sale siempre, sin tirar.
+async function trampaPasoChance(id, dt, fase){
+  const refl = fase === 'reflejos', pct = Combatiente.chancePct(refl ? dt.reflejos : dt.inamovible), d = Combatiente.chanceDado(pct);
+  const mec = refl ? 'Reflejos de mangosta' : 'Inamovible';
+  let ok = pct >= 100, texto = `${mec} (siempre)`;
+  if(d){
+    const r = tirarDados('1d' + d.caras);
+    try{ await mesaPublicar(`${mec} · ${Combatiente.chanceTexto(pct)} (${dt.nombreT})`, {formula: r.formula, rolls: r.rolls, mod: r.mod, total: r.total, quien: dt.quien, ...(dt.creep ? {desde: 'gm'} : {})}); }catch(err){}
+    await trampaEsperarDados();
+    const necesita = d.caras - d.exitos + 1;
+    ok = r.total >= necesita;
+    texto = `1d6 = ${r.total} (con ${necesita} o más)`;
+  }
+  const res = refl ? (ok ? '¡la esquivó!' : 'no alcanzó: le cae encima') : fase === 'firme-portal' ? (ok ? 'no se mueve: el portal no se lo lleva' : 'no alcanzó: el portal se lo lleva')
+    : (ok ? 'no se mueve: el muro no lo despide' : 'no alcanzó: sale despedido');
+  const sig = {...dt, pasos: [...(dt.pasos || []), {titulo: mec, texto: `${texto} → ${res}`}]};
+  if(refl){
+    sig.reflejosHecho = true;
+    if(ok){ sig.evita = 'todo'; sig.fase = trampaFaseSiguiente(sig, 'empuje'); }
+    else sig.fase = trampaFaseInicial(sig);
+  }else if(fase === 'firme-portal'){
+    sig.firmePortal = ok ? 'si' : 'no';
+    sig.fase = ok ? trampaFaseSiguiente(sig, 'portal') : 'portal';
+  }else sig.fase = ok ? trampaFaseSiguiente(sig, 'empuje') : 'empuje';
+  await trampaGuardar(id, sig);
 }
 
 // 0 · Sale despedido (el muro salió donde estaba parado): tira 1d6 y se mueve a esa vecina (o la siguiente libre).

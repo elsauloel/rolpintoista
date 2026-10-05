@@ -309,7 +309,7 @@ el nombre conservan su id y su narrativa). Precio = 10 + 25 por punto de la bols
 crítico **se acumulan entre partes**, y eso no se ve diseñando una parte de arriba abajo. Así, al cerrar cada calidad, hay un equipo entero que se
 puede medir contra la curva.
 
-1. **Común:** torso ✅ · escudo ✅ · cabeza ✅ · manos ✅ · piernas ✅ · pies · cinturón · anillos. **Control:** la calculadora sobre el equipo Común completo
+1. **Común:** torso ✅ · escudo ✅ · cabeza ✅ · manos ✅ · piernas ✅ · pies ✅ · cinturón · anillos. **Control:** la calculadora sobre el equipo Común completo
    contra la curva de N1 (Defensa 4–10, T4 ≤ 2, T6 ≤ 1) y N2 (5–12). **Y la Res.CC (dueño, 2026-10-04):** medir cuánta se junta con el equipo completo,
    para que no sea tan abundante que le quite peso a los personajes y efectos que juegan con control (hoy, con torso y cabeza: hasta +4).
 1b. **Lluvia de mecánicas por parte (dueño, 2026-10-04):** el ejercicio de las piernas («imaginá todas las mecánicas, tirá de más, yo filtro») se
@@ -491,3 +491,14 @@ las tres ya aprobadas (Recuperarse rápido, Reflejos de mangosta, Evasión contr
 Quedan afuera (por ahora): Pie firme, Paso seguro, Suela gruesa, Suela aislante, Despegarse, Levantarse rápido, Botas ruidosas, Salto, Carrerita;
 Botas de marcha sigue en pausa. Propuesta de 27 pies Comunes en la conversación del 2026-10-04 (`pies_comun.py`).
 
+**Pies Común cargados ✅ (2026-10-04, «Listo» del dueño).** 27 piezas en `comun/catalogo.js`; ninguna pasa de su bolsa; el Tipo 6 salió de los pies.
+Pesos en `herramientas/calculadora_defensa.py`: Pasos de baile 1,5 · Pisada atenta 1 · `COSTO_CHANCE` (33 % / 50 % / siempre): Inamovible 0,5 / 0,75 / 1,5,
+Recuperarse rápido 0,5 / 1 / 2, Reflejos de mangosta 1 / 1,5 / 2,5. Construido (igual para personajes y creeps; las invocaciones, todavía no en el mapa):
+- **Lento** (estado nuevo): el primer casillero de cada turno cuesta el doble (`lentoRecargo`, js/04; el mapa anota quién ya se movió: `marcarMovido`).
+- **Pasos de baile**: +N a la Evasión del duelo si ya se movió en el turno (`Combatiente.evaExtraDuelo`, con la Evasión contra oportunidad/contraataque;
+  se ve en el botón y en la Mesa: «Evasión (+1 Pasos de baile)»).
+- **Pisada atenta**: la tirada de «algo está fuera de lugar» solo contra trampas, con la Percepción normal (js/08 `tokenPisadaAtenta`, js/16).
+- **Inamovible** y **Reflejos de mangosta**: fases nuevas del paso a paso de las trampas (`firme-empuje`, `firme-portal`, `reflejos`, js/19).
+- **Recuperarse rápido**: al aparecerle Inmovilizado, Rengo, Sentado o Lento, cartel con su chance; si sale, 1 turno menos (js/21; un personaje lo
+  recibe como «Acortar estado»).
+- Todas las chances usan la misma pieza (`chanceCartel`, js/21: cartel, botón, dados, resultado, Crónica y Mesa); la Retirada limpia pasó a usarla.

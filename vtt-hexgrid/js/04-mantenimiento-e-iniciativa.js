@@ -562,16 +562,36 @@ function lentoEn(col, fila){
   return n;
 }
 // `gratis` (2026-10-04, Pasos gratis): los primeros casilleros de la ruta no cuestan (los que le quedan a ese token en este turno).
-function costoPasos(ruta, porCasillero, gratis){
+// `recargo` (2026-10-04, estado Lento): lo que se suma al primer casillero (el primero del turno cuesta el doble).
+function costoPasos(ruta, porCasillero, gratis, recargo){
   const acc = [];
   let s = 0;
   for(let i = 1; i < (ruta || []).length; i++){
     if(i > num(gratis)) s += porCasillero > 0 ? Math.max(porCasillero, lentoEn(ruta[i - 1].col, ruta[i - 1].fila)) : 0;
+    if(i === 1) s += num(recargo);
     acc.push(s);
   }
   return acc;
 }
-const costoRuta = (ruta, porCasillero, pasos, gratis) => { const a = costoPasos((ruta || []).slice(0, pasos + 1), porCasillero, gratis); return a.length ? a[a.length - 1] : 0; };
+const costoRuta = (ruta, porCasillero, pasos, gratis, recargo) => { const a = costoPasos((ruta || []).slice(0, pasos + 1), porCasillero, gratis, recargo); return a.length ? a[a.length - 1] : 0; };
+
+/* Quién ya se movió en este turno (2026-10-04, los pies): Lento cobra doble el primer casillero del turno y Pasos de baile suma Evasión si ya se
+   movió. Como los Pasos gratis, lo anota esta pantalla (y el navegador, por si se recarga). El duelo lo pregunta con window.mapaSeMovio. */
+const movidosTurno = new Set();
+try{ JSON.parse(localStorage.getItem('movidos-turno') || '[]').forEach(k => movidosTurno.add(k)); }catch(e){}
+const seMovioEsteTurno = id => !!id && movidosTurno.has(`${id}@${Math.round(num(mantenimientoNumero))}`);
+function marcarMovido(id, si){
+  const k = `${id}@${Math.round(num(mantenimientoNumero))}`;
+  if(si === false) movidosTurno.delete(k); else movidosTurno.add(k);
+  try{ localStorage.setItem('movidos-turno', JSON.stringify([...movidosTurno].filter(x => x.endsWith('@' + Math.round(num(mantenimientoNumero)))))); }catch(e){}
+}
+window.mapaSeMovio = tokenId => seMovioEsteTurno(tokenId);
+// Lento: lo que se suma al primer casillero si todavía no se movió en este turno (0 si no está Lento o si no se puede mover).
+function lentoRecargo(t, porCasillero){
+  if(!(porCasillero > 0) || seMovioEsteTurno(idDeToken(t))) return 0;
+  const lento = (typeof confusionEstadosDe === 'function' ? confusionEstadosDe(t) : []).some(e => e && e.activo !== false && (e.lento || /^lento$/i.test(String(e.nombre || '').trim())));
+  return lento ? porCasillero : 0;
+}
 
 /* Pasos gratis (2026-10-04, dueño): cuántos le quedan a un token en este turno (de Mantenimiento a Mantenimiento). Los usados se anotan en esta
    pantalla (y en el navegador, por si se recarga): los mueve casi siempre la misma persona. */
@@ -604,7 +624,7 @@ function costoMoverDe(t){
   const f = fichasPub.get(t.fichaId);
   const r = f && f.resumen;
   if(!r || r.costoMover === undefined) return null;
-  return {porCasillero: num(r.costoMover), disponibles: num(r.nitros), gratis: pasosGratisRestantes(idDeToken(t))};
+  return {porCasillero: num(r.costoMover), disponibles: num(r.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, num(r.costoMover))};
 }
 
 // Mismas reglas que la ficha publica en resumen.costoMover: 1 por
@@ -615,7 +635,7 @@ function costoMoverCreep(t){
   if(!sc || sc.nitros === undefined || sc.nitros === null) return null;
   const activos = (Array.isArray(sc.estados) ? sc.estados : []).filter(e => e && e.activo !== false);
   const porCasillero = activos.some(e => e.inmovilizado) ? 0 : activos.some(e => e.rengo) ? 2 : 1;
-  return {porCasillero, disponibles: num(sc.nitros), gratis: pasosGratisRestantes(idDeToken(t))};
+  return {porCasillero, disponibles: num(sc.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, porCasillero)};
 }
 
 // 🎮 El GM tomó el control de este personaje (la ficha publica resumen.control = su uid, 2026-09-30): lo usa como si fuera su

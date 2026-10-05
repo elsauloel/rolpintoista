@@ -34,7 +34,7 @@ const InvDuelo = (() => {
 
   function hooks(ui){
     // Evasión contra oportunidad / contra contraataque (2026-10-04): lo que suma a la Evasión contra el ataque de este duelo.
-    const evaEsp = (inv, d) => { const st = Combatiente.statEvaEspecial(d && d.ataque && d.ataque.tipo), val = st && inv ? num(I().modTotal(inv, st)) : 0; return {val, txt: val ? `${val > 0 ? '+' : '−'}${fmt(Math.abs(val))} ${Combatiente.EVA_ESPECIAL[d.ataque.tipo].nombre}` : ''}; };
+    const evaEsp = (inv, d) => inv ? Combatiente.evaExtraDuelo(d, st => num(I().modTotal(inv, st))) : {val: 0, txt: ''};
     const publicar = t => { if(!t) return; if(t.error){ ui.toast(t.error); return; } ui.registrar(t.origen, t.r); };
     // Una tirada de stat con su regla (el Parry cobra y deja el Bloqueo pendiente; el Bloqueo lo cierra): invTirarStat.
     function tirarStat(inv, statId, o){

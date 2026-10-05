@@ -27,6 +27,7 @@ const AsistenteEstado = (() => {
     {id: 'mitadPar',   texto: 'Parte a la mitad el PdG y el Parry',               ayuda: 'Como Lisiado.', flags: {lisiado: true}},
     {id: 'inmov',      texto: 'No se puede mover',                                ayuda: 'Como Inmovilizado: no puede moverse (los No2 siguen sirviendo para lo demás).', flags: {inmovilizado: true, esCC: true}},
     {id: 'rengo',      texto: 'Moverse cuesta el doble de No2',                   ayuda: 'Como Rengo: 2 No2 por casillero.', flags: {rengo: true, esCC: true}},
+    {id: 'lento',      texto: 'El primer casillero del turno cuesta el doble',   ayuda: 'Como Lento: el primer paso de cada turno cuesta el doble de No2.', flags: {lento: true, esCC: true}},
     {id: 'cansado',    texto: 'Recorta los No2 máximos a 2/3',                    ayuda: 'Como Cansado (redondeado hacia abajo).', flags: {cansado: true}},
     {id: 'exhausto',   texto: 'Recorta los No2 máximos a 1/3',                    ayuda: 'Como Exhausto (redondeado hacia abajo).', flags: {exhausto: true, esCC: true}},
     {id: 'hypeado',    texto: 'Suma 1/3 a los No2 máximos',                       ayuda: 'Como Hypeado (redondeado hacia arriba).', flags: {hypeado: true}},

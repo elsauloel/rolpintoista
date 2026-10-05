@@ -90,7 +90,9 @@ const FichaResumen = (() => {
       luz: n(c.final.luz), veoculto: n(c.final.veoculto),   // luz que lleva encima y radio en el que ve lo oculto: el mapa los lee (farol, bengala, yelmo del ojo que todo lo ve)
       vision: n(c.final.vision),
       pasosGratis: n(c.final.pasosgratis),
-      retirada: n(c.final.retirada),   // Retirada limpia (%): el mapa la tira al alejarse de un rival (js/17)   // los primeros casilleros de cada turno, gratis (el mapa los descuenta del costo de moverse)   // Campo de visión (base 6 + ítems, pasivas y estados): el mapa lo suma a la luz de la escena para el radio de cada token
+      retirada: n(c.final.retirada),   // Retirada limpia (%): el mapa la tira al alejarse de un rival (js/17)
+      // Los pies (2026-10-04): el mapa las tira (js/08, js/19, js/21); Pasos de baile la lee el duelo.
+      pisadaAtenta: n(c.final.pisadaatenta) > 0, inamovible: n(c.final.inamovible), recuperarse: n(c.final.recuperarse), reflejos: n(c.final.reflejos),   // los primeros casilleros de cada turno, gratis (el mapa los descuenta del costo de moverse)   // Campo de visión (base 6 + ítems, pasivas y estados): el mapa lo suma a la luz de la escena para el radio de cada token
       // Crítico (2026-09-25): el mapa arma con esto la Calculadora de crítico sin que haya que escribirlo (equipo, habilidades y estados ya sumados).
       // Crítico frecuente y potente DE ESA ARMA (la misma de armaTipo): lo de la otra arma equipada no cuenta.
       ...(() => { const a = (S.inventario || []).find(i => i.equipado && /^arma/.test(i.tipoItem || '') && [4, 6, 8, 10, 12].includes(num(i.tipoDado))); return {crit: n(statParaArma('crit', a || null)), critpot: n(statParaArma('critpot', a || null))}; })(),
@@ -120,6 +122,7 @@ const FichaResumen = (() => {
           permanente: !!e.permanente,
           ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
           ...(e.derivado ? {derivado: true} : {}), ...(e.confusion ? {confusion: true} : {}),   // la Confusión: el mapa la tira (js/20)
+          ...(e.lento ? {lento: true} : {}),   // Lento: el primer casillero del turno cuesta el doble (el mapa, js/04)
           polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
           // Para el globito del mapa al pasar el mouse por el estado.
           detalle: String(e.detalle || '').slice(0, 300),

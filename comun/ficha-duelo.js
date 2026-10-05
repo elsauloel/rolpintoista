@@ -74,7 +74,7 @@ const FichaDuelo = (() => {
     const armasYEscudosParaParry = () => FichaCombate.armasYEscudosParaParry(getS());
     const statParaArma = (statId, arma) => FichaCombate.statParaArma(getS(), statId, arma);
     // Evasión contra oportunidad / contra contraataque (2026-10-04): lo que suma a la Evasión contra el ataque de este duelo.
-    const evaEsp = d => { const st = Combatiente.statEvaEspecial(d && d.ataque && d.ataque.tipo), val = st ? num(compute().final[st]) : 0; return {val, txt: val ? `${val > 0 ? '+' : '−'}${fmt(Math.abs(val))} ${Combatiente.EVA_ESPECIAL[d.ataque.tipo].nombre}` : ''}; };
+    const evaEsp = d => { const c = compute(); return Combatiente.evaExtraDuelo(d, st => num(c.final[st])); };
     return {
       soy: lado => ui.soy(lado),
       controlDe: lado => ui.controlDe ? ui.controlDe(lado) : '',

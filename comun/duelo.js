@@ -1932,7 +1932,7 @@ const Duelo = (() => {
     retener(false);
     let rr = r;
     // Una Evasión contra oportunidad / contra contraataque (2026-10-04): la página la etiqueta «Evasión (+2 contra oportunidad)»; el duelo guarda esa nota.
-    const notaEsp = String(det.origen || '').match(/\(([+−-]\s*\d+\s+contra [^)]*)\)/);
+    const notaEsp = String(det.origen || '').match(/\(([+−-]\s*\d+\s+(?:contra |Pasos de baile)[^)]*)\)/);   // y Pasos de baile
     if(notaEsp) rr = {...r, nota: notaEsp[1]};
     if(flash && _num(flash.bono)){   // el Flash suma un «+» fijo a la tirada (y cuenta como tal en el desempate)
       rr = {...r, mod: _num(r.mod) + _num(flash.bono), total: _num(r.total) + _num(flash.bono), formula: String(r.formula || '') + ` +${_num(flash.bono)} ⚡`};

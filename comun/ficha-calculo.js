@@ -76,6 +76,12 @@ const FichaCalculo = (() => {
     // Mecánicas de las piernas (2026-10-04, dueño): Evasión solo contra un tipo de ataque, y la chance de alejarse sin ataque de oportunidad.
     {id:'evaopor', label:'Evasión contra oportunidad', full:'Evasión extra cuando te atacan de oportunidad (no suma al Parry)'},
     {id:'evacontra', label:'Evasión contra contraataque', full:'Evasión extra cuando te contraatacan (no suma al Parry)'},
+    // Mecánicas de los pies (2026-10-04, dueño). Las de chance van en % (33 = 5–6 en d6, 50 = 4–6, 100 = siempre).
+    {id:'pasosbaile', label:'Pasos de baile', full:'Evasión extra si ya te moviste en el turno'},
+    {id:'pisadaatenta', label:'Pisada atenta', full:'Al pasar al lado de una trampa escondida, tirás Percepción para descubrirla (como la Percepción aumentada, solo trampas)'},
+    {id:'inamovible', label:'Inamovible (%)', full:'Chance (en %) de que no te muevan contra tu voluntad (empujes, portales): 33 = 5–6 en d6, 50 = 4–6, 100 = siempre'},
+    {id:'recuperarse', label:'Recuperarse rápido (%)', full:'Chance (en %) de que Inmovilizado, Rengo, Sentado o Lento te duren 1 turno menos: 50 = 4–6 en d6, 100 = siempre'},
+    {id:'reflejos', label:'Reflejos de mangosta (%)', full:'Chance (en %) de esquivar una trampa al pisarla: 33 = 5–6 en d6, 100 = siempre'},
     {id:'retirada', label:'Retirada limpia (%)', full:'Chance (en %) de alejarte de un rival sin darle ataque de oportunidad: 33 = 5–6 en d6, 50 = 4–6, 100 = siempre'},
     // Resistencias elementales (2026-10-04, dueño): cada una se resta al daño de su elemento (además de la Armadura mágica). Situacionales: pesan poco.
     {id:'resfuego', label:'Res. fuego', full:'Resistencia al fuego: se resta a todo daño de fuego'},

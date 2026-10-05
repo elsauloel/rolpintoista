@@ -53,6 +53,9 @@ const ESTADOS_PRESET = [
     detalle:'No se puede mover mientras dure (los Nitros siguen sirviendo para lo demás). ⚠ Regla provisoria.'},
   {nombre:'Rengo', polaridad:'debuff', turnos:3, rengo:true, esCC:true,
     detalle:'Moverse cuesta 2 Nitros por casillero mientras dure. ⚠ Valor provisorio (antes Movimiento a la mitad).'},
+  // Lento (2026-10-04, dueño, con las mecánicas de los pies): el primer casillero que se mueve en cada turno cuesta el doble. Lo acorta Recuperarse rápido.
+  {nombre:'Lento', polaridad:'debuff', turnos:2, lento:true, esCC:true,
+    detalle:'Lento: el primer casillero que se mueve en cada turno cuesta el doble de No2 mientras dure.'},
   {nombre:'Miedo', polaridad:'debuff', turnos:2, esCC:true, mods:[{stat:'pdg', val:-2}, {stat:'dmg', val:-2}],
     detalle:'Miedo: −2 PdG y −2 Daño mientras dure, y no puede acercarse voluntariamente a quien lo asustó (✋ a mano: el jugador o el GM lo respeta; si termina su turno más cerca de la fuente pierde 1 No2). Es un control (lo reducen la resistencia a CC y la Inmunidad a CC).'},
   {nombre:'Provocado', polaridad:'debuff', turnos:2, esCC:true,

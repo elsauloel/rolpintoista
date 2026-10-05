@@ -36,7 +36,8 @@ const EstadosAplicar = (() => {
     // Escudo especial (2026-09-28): HP de una barra secundaria que absorbe daño antes que el HP real —
     // ver BUFFS. Un valor explícito manda sobre el del preset (se resuelve en `componer`).
     if(s.escudoMagico) out.escudoMagico = Math.max(0, Math.round(Number(s.escudoMagico) || 0));
-    if(s.sentadoEnCero) out.sentadoEnCero = true;   // «Pierde No2» (Sonic Boom): si llega a 0, queda Sentado
+    if(s.sentadoEnCero) out.sentadoEnCero = true;
+    if(s.estado) out.estado = String(s.estado).slice(0, 40);   // «Acortar estado» (Recuperarse rápido, 2026-10-04): a cuál le saca turnos   // «Pierde No2» (Sonic Boom): si llega a 0, queda Sentado
     if(s.soltar && Combatiente.soltarNorm(s.soltar)) out.soltar = Combatiente.soltarNorm(s.soltar);   // cómo se suelta (trampas de Atrapar)
     return out;
   }

@@ -1818,6 +1818,34 @@ prueba('piernas: Retirada limpia — 33 % = 5–6 en d6, 50 % = 4–6, 100 = sie
     Combatiente.retiradaDado(0), Combatiente.retiradaPct(140), FichaResumen.resumen(S).retirada],
     [{caras: 6, exitos: 2}, '33 % (5–6 en d6)', '50 % (4–6 en d6)', null, 'siempre', null, 100, 50]);
 });
+prueba('pies: Pasos de baile suma a la Evasión del duelo solo si ya se movió en el turno (window.mapaSeMovio), junto a la Evasión contra oportunidad', () => {
+  const antes = window.mapaSeMovio;
+  const val = st => ({pasosbaile: 1, evaopor: 2})[st] || 0;
+  const d = (tipo, tokenId) => ({defensor: {tokenId}, ataque: {tipo}});
+  window.mapaSeMovio = id => id === 'movido';
+  const r = [Combatiente.evaExtraDuelo(d('normal', 'quieto'), val), Combatiente.evaExtraDuelo(d('normal', 'movido'), val), Combatiente.evaExtraDuelo(d('oportunidad', 'movido'), val)];
+  window.mapaSeMovio = antes;
+  igual([r, Combatiente.evaExtraDuelo(d('normal', 'movido'), val).val], [[{val: 0, txt: ''}, {val: 1, txt: '+1 Pasos de baile'}, {val: 3, txt: '+2 contra oportunidad · +1 Pasos de baile'}], antes ? 1 : 0]);
+});
+prueba('pies: las chances (33 % = 5–6, 50 % = 4–6, siempre), Lento y los estados que traban, y «Acortar estado» le saca un turno', () => {
+  const S = fichaBotonera({}); const reg = [];
+  const ui = {...uiHab(reg), presets: estadosPresetFicha()};
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Rengo', turnos: 2}, '', ui);
+  FichaAcciones.aplicarEstadoRecibido(S, EstadosAplicar.limpiarSpec({nombre: 'Acortar estado', estado: 'Rengo', stacks: 1}), 'Recuperarse rápido', ui);
+  const rengo1 = (S.efectos.find(e => e.nombre === 'Rengo') || {}).turnos;
+  FichaAcciones.aplicarEstadoRecibido(S, EstadosAplicar.limpiarSpec({nombre: 'Acortar estado', estado: 'Rengo', stacks: 1}), 'Recuperarse rápido', ui);
+  const lento = estadosPresetFicha().find(e => e.nombre === 'Lento');
+  igual([Combatiente.chanceTexto(33), Combatiente.chanceTexto(50), Combatiente.chanceTexto(100), Combatiente.chanceDado(50), !!(lento && lento.lento), Combatiente.esTraba(lento),
+    Combatiente.esTraba({nombre: 'Veneno'}), rengo1, S.efectos.some(e => e.nombre === 'Rengo')],
+    ['33 % (5–6 en d6)', '50 % (4–6 en d6)', 'siempre', {caras: 6, exitos: 3}, true, true, false, 1, false]);
+});
+prueba('pies: el resumen del personaje publica Pisada atenta, Inamovible, Recuperarse rápido y Reflejos de mangosta; y el catálogo tiene 27 pies Comunes', () => {
+  const S = FichaGuardado.normalizar({}).S;
+  S.inventario = [{id: 'p1', nombre: 'Botas de prueba', tipoItem: 'pies', equipado: true, mods: [{stat: 'pisadaatenta', val: 1}, {stat: 'inamovible', val: 33}, {stat: 'recuperarse', val: 50}, {stat: 'reflejos', val: 33}]}];
+  const r = FichaResumen.resumen(S), L = CATALOGO_BASE.filter(i => i.tipoItem === 'pies' && i.tier === 'Común');
+  igual([r.pisadaAtenta, r.inamovible, r.recuperarse, r.reflejos, L.length, L.every(i => (i.mods || []).every(m => m.stat !== 'def' || m.val <= 1)), L.some(i => (i.mods || []).some(m => m.stat === 'tipo2'))],
+    [true, 33, 50, 33, 27, true, false]);
+});
 prueba('catálogo: las piernas Común (28) — ninguna pasa de Defensa 1, y las mecánicas nuevas están', () => {
   const L = CATALOGO_BASE.filter(i => i.tipoItem === 'piernas' && i.tier === 'Común');
   const stats = new Set(L.flatMap(i => (i.mods || []).map(m => m.stat)));

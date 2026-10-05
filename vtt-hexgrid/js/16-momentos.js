@@ -179,10 +179,11 @@ async function percepcionResolverBanner(){
   try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo tirar Percepción'); if(bt) bt.disabled = false; return; }
   const f = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]);
   const valor = f && f.resumen ? num(f.resumen.percepcion) : 0;
-  const r = FichaBotonera.tiradaPercepcionValor(valor, true);
+  const aumentada = tokenPercepcionAumentada(t);   // con Pisada atenta sola (solo trampas), la Percepción normal
+  const r = FichaBotonera.tiradaPercepcionValor(valor, aumentada);
   if(!r){ toast('Percepción: sin valor para tirar (abrí la ficha una vez para que lo publique)'); percepcionBanner = null; renderPercepcionBanner(); return; }
   const nombre = nombreDe(t);
-  try{ mesaPublicar(`${nombre} · Percepción (aumentada)`, {...r, quien: nombre, ficha: String(t.fichaId).split(SEP_INVOCACION)[0]}); }catch(err){}
+  try{ mesaPublicar(`${nombre} · Percepción (${aumentada ? 'aumentada' : 'Pisada atenta'})`, {...r, quien: nombre, ficha: String(t.fichaId).split(SEP_INVOCACION)[0]}); }catch(err){}
   const mid = await pb.momentoP;
   if(pb.ocultoId){
     // Sigilo: la resuelve la pantalla del GM (la Destreza del oculto es privada).

@@ -1397,3 +1397,9 @@ van a contemplar como…»: falta completar.)
   pergaminos, más adelante · **instrumentos**, más adelante · **orbes**: diseñar un par en la primera tanda · **cetros de mando**: no · **guante o
   brazal rúnico**: gran idea, cuando lo básico esté consolidado · **dagas rituales y demás híbridas**: más adelante («de lo básico a lo complejo»).
   Primera tanda: **varitas, báculos (una mano, dos manos, híbrido defensivo) y un par de orbes**.
+- **Filtro del dueño — B. Daño (2026-10-05):** ✅ 12 proyectil arcano · ✅ 13 misiles múltiples · ✅ 14 rayo en cadena (la dinámica del daño eléctrico ya
+  está definida y programada) · ❌ 15 rebote (la cadena es la identidad del rayo) · ✅ 16 rayo en línea que atraviesa (con o sin daño que baja en cada
+  objetivo) · ✅ 17 flor de chispas · ✅ 18 cono de fuego («clásico») · ✅ 19 bola que explota (con quemadura y/o terreno incendiado) · ✅ 20 lanza de hielo
+  (física T4) · ✅ 21 piedrazo (físico T8) · ✅ 22 granizo (con Escarcha) · ✅ 23 ácido → **área de lluvia ácida que rompe armadura** · ✅ 24 nube tóxica
+  chica · ❌ 25 marca que explota · ⏳ 26 daño que crece al repetir (más adelante) · ✅ 27 pega más cuanto más cerca · ✅ 28 daño a quien se mueve en un
+  área · ❌ 29 mojado/aceitado.

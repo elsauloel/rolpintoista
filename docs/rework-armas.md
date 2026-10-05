@@ -1485,3 +1485,7 @@ lluvia ácida 21 y báculo de sangre 19,5), 3 orbes.
   través ni frenan el paso; adentro se ve a 1; desde afuera no se apunta adentro). **Precio en DDE** (pedido del dueño): la misma curva que las armas
   físicas (`27 · e^(0,158 · valor del tiro)`): las Comunes quedan de 45 a 120 DDE (las físicas Comunes, de 40 a 120, promedio 75). La ráfaga helada
   pasa a candidata de Buena. Tope Común: 4 SP.
+- **Más observaciones del dueño (2026-10-05):** **estaca**: Escarcha en vez de Lento · **piedrazo**: dado de 10 (equivale a un contundente, Tipo 10) ·
+  **varita nueva, chorro de ácido**: se esquiva; su objetivo es **romper la armadura** (Armadura rota al pegar) y le queda un resto de daño ·
+  **pelea cercana**: X de daño y −1 por cada casillero de distancia («hay que buscarle la vuelta»; propuesta: 1d10 arcano, al lado entero, −1 por
+  cada casillero más allá) · **susurro**: faltaba el tipo de daño (propuesta: arcano, y no se esquiva: PdG.Esp contra Res.Esp, como un efecto).

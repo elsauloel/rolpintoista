@@ -1340,3 +1340,7 @@ van a contemplar como…»: falta completar.)
 - **El rango ahorra No2 (dueño, 2026-10-05):** quien actúa a distancia no tiene que desplazarse, así que le quedan más No2 para actuar. **Todo lo
   pensado para hacerse a distancia debe cobrar No2 para compensar** que no se mueve. (Va en línea con lo de las armas de rango físicas del
   2026-09-25: «el rango vale mucho por sí mismo».)
+- **Control de terreno (dueño, 2026-10-05):** varitas de crowd control, por ejemplo **una varita con el mismo efecto que una trampa**: **manchas de
+  aceite** («puede ser muy divertido que un mago tire manchas de aceite, pum, pum, pum, que controle el terreno así»), con duración de **1 o 2
+  turnos**. Lo que no se mide en daño es menos cuantificable para ponerle costo: se va de a poco.
+- **Pedido del dueño:** ir anotando; cuando lo pida, **pasarle todas las conclusiones juntas en un gran mensaje**.

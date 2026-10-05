@@ -155,7 +155,7 @@ function renderCabeceraTienda(){
   if(tiendaCargada){
     badge.textContent = FichaTienda.badge(tiendaSt);
     if($('#tienda-vender')) $('#tienda-vender').style.display = '';
-    if($('#tienda-baul')) $('#tienda-baul').style.display = '';   // 📦 el baúl común se abre desde una tienda (P157)
+    if($('#tienda-baul')){ $('#tienda-baul').style.display = ''; Intercambio.pintarBotonBaul($('#tienda-baul')); }   // 📦 el baúl común se abre desde una tienda (P157); en combate, apagado
     if($('#tienda-reparar')) $('#tienda-reparar').style.display = tiendaCargada.herrero ? '' : 'none';   // solo las tiendas con herrero reparan
     badge.style.display = '';
     salir.style.display = '';

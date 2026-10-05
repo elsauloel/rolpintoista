@@ -658,6 +658,14 @@ const Intercambio = (() => {
   const capacidad = () => POR_INTEGRANTE * Math.max(1, fichas.length);
   const enBaul = it => Math.max(1, E().ranuras(it));   // en el baúl todo ocupa al menos 1 ranura (P158)
   const baulUsado = () => baul.filter(x => x.tipo === 'item').reduce((a, x) => a + Math.max(0, num(x.ranuras)), 0);
+  // El botón 📦 de la tienda (2026-10-05, dueño: «que se vea»): en combate se ve apagado y lo dice — el baúl no se usa en combate (P157).
+  function pintarBotonBaul(b){
+    if(!b) return;
+    const comb = !!(host && host.enCombate());
+    b.textContent = comb ? '📦 Baúl común · fuera de combate' : '📦 Baúl común';
+    b.style.opacity = comb ? '.55' : '';
+    b.title = comb ? 'En combate no se puede usar el baúl común: se abre desde una tienda, fuera de combate' : 'El baúl común del grupo: guardar y sacar ítems, oro y despojos (queda anotado quién)';
+  }
   function abrirBaul(fichaId){
     if(!host) return;
     if(!host.tienda()){ host.toast('El baúl común se abre desde una tienda abierta'); return; }
@@ -800,7 +808,7 @@ const Intercambio = (() => {
     return false;
   }
 
-  return {POR_INTEGRANTE, iniciar, revisar, reservado, botonDar, botonDespojos, despojosDeItem, clic, abrirDar, abrirBaul, cerrar,
+  return {POR_INTEGRANTE, iniciar, revisar, reservado, botonDar, botonDespojos, despojosDeItem, clic, abrirDar, abrirBaul, pintarBotonBaul, cerrar,
     // para las pruebas
     _ofrecer: ofrecer, _aDespojos: aDespojos, _liberar: liberar, _quitarReservado: quitarReservado, _separar: separar, _aMochila: aMochila, _despojo: despojo};
 })();

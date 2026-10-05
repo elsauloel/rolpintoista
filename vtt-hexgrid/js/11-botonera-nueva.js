@@ -1744,6 +1744,7 @@ function bnTiendaDibujar(){
   r.querySelector('#bn-tienda-orden-dir').textContent = FichaTienda.etiquetaOrden(st);
   r.querySelector('#bn-tienda-cuerpo').innerHTML = FichaTienda.catalogoHtml(bn.S, st, {gestion: false});
   r.querySelector('#bn-tienda-dde').textContent = fmt(num(bn.S.meta.dde));
+  if(typeof Intercambio !== 'undefined') Intercambio.pintarBotonBaul(r.querySelector('[data-bn-ti="baul"]'));   // en combate, apagado y lo dice
   const c = FichaTienda.carrito(bn.S, st);
   r.querySelector('#bn-carrito-lista').innerHTML = c.html;
   r.querySelector('#bn-carrito-total').textContent = fmt(c.total);

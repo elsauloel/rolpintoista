@@ -367,6 +367,7 @@ function estelaVisibleDe(t){
 // solo dentro del campo de visión.
 function tokenVisiblePorNiebla(t){
   if(tapadoPorNiebla(t)) return false;   // adentro de la niebla de una varita (2026-10-05)
+  if(!t.oculto && marcado(t)) return true;   // Marcado (dueño, 2026-10-05): aunque vuelva la niebla de guerra, se lo sigue viendo
   if(!soyGM && t.tipo === 'creep' && enSigilo(t) && !reveladaCasilla(t)) return false;   // creep en sigilo: los jugadores no lo ven (salvo que un aliado vea lo oculto ahí)
   if(soyGM && !ojoRevelando && t.tipo === 'pj' && enSigilo(t)) return false;   // personaje en sigilo: el GM no lo ve sin el 👁
   if(!nieblaAplica() || t.tipo === 'pj') return true;

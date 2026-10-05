@@ -1273,7 +1273,7 @@ versión parecida en más de una, es candidato a juntar.
 - **Marcado** (2026-10-05): preset nuevo (`marcado: true`). `Combatiente.agregarEstado`: al ponerse saca el Sigilo; mientras dura, el Sigilo
   rebota (`inmunidad` → 'Marcado'); `Combatiente.marcadoEn(estados)`. `FichaAcciones.alternarSigilo` avisa y no entra. El mapa lo hace brillar
   (`marcado`, `brilloMarca`) y lo deja ver a través de la niebla.
-- **Ejecución, lo nuevo del 2026-10-05:** objetivo `linea` (`largo`), `cadena: {saltos, rango}`, `soloSigilo` en una `onda` (la luz) y `niebla`
+- **Ejecución, lo nuevo del 2026-10-05:** objetivo `linea` (`largo`), `cadena: {saltos, rango}`, `conVista` en una `onda` (la luz: todos los rivales que ve, en sigilo o no) y `niebla`
   en una `zona` (crea un elemento `niebla`, no una zona con efecto). Una trampa con `pilar: true` levanta Sólidos de 1 casilla (uno por clic); con
   `portal: {rango, fijo: true}` se marca también el destino (`portal.destino` en su `trampaEstado`, `TokensAuto.estadoJson`). Las trampas con
   `cant` se colocan **de a una por clic** (js/13, `trampaDeHabilidad`). Tercera tanda (2026-10-05): `zonaQueda` (un área deja una zona al lanzarse,

@@ -1994,7 +1994,7 @@ prueba('✨ varitas del mapa (2026-10-05): la luz va solo a los que están en si
   const hl = hEj(luz), lim = Duelo.limpiarHab(hl), hr = hEj(ras);
   const z = Combatiente.zonaDeHab({nombre: 'Varita de niebla'}, nie.especial.duelo, {fichaId: 'f', tipo: 'pj'});
   const tp = Plantillas.trampa(pil.especial.trampaColocar);
-  igual([hl.objetivo, hl.radio, hl.soloSigilo, lim.soloSigilo, hl.contra.map(c => c.stat), hl.efectos[0].nombre, luz.especial.estadoPropio.mods.map(m => m.stat),
+  igual([hl.objetivo, hl.radio, hl.conVista, lim.conVista, hl.contra.map(c => c.stat), hl.efectos[0].nombre, luz.especial.estadoPropio.mods.map(m => m.stat),
     z.tipo, z.niebla, tp.pilar, tp.cant, por.especial.trampaColocar.portal, hr.contra.map(c => c.stat), CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-varita') && /✋ A mano por ahora/.test(i.detalle)).map(i => i.nombre)],
     ['onda', 3, true, true, ['resmg'], 'Marcado', ['luz', 'veoculto'], 'zona-persistente-habilidad', true, true, 2, {rango: 4, fijo: true}, ['resmg'], []]);
 });

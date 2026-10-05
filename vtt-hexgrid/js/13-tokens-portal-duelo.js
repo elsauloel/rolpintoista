@@ -741,9 +741,9 @@ function dueloElegirAreaMapa(msg){
     const objetivos = todos
       .filter(t => !t.oculto && !propio(t) && (enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio))
       .filter(t => hab.fuegoAmigo || h.linea || dueloEsRival(yo, t))   // (la línea tiene fuego amigo: dueño, 2026-10-05)
-      .filter(t => !hab.soloSigilo || (enSigilo(t) && lineaLibre(h, t, solidosSet())))   // la luz (Varita de la luz): los que estaban en sigilo y alcanza
+      .filter(t => !hab.conVista || lineaLibre(h, t, solidosSet()))   // la luz (Varita de la luz): todos los rivales que alcanza a ver, en sigilo o no (dueño, 2026-10-05)
       .map(t => t.id);
-    if(!objetivos.length){ toast(hab.soloSigilo ? `💡 ${hab.nombre || 'La luz'}: no había nadie en sigilo a su alcance` : 'No hay nadie adentro del área'); return; }
+    if(!objetivos.length){ toast(hab.conVista ? `💡 ${hab.nombre || 'La luz'}: no había ningún rival a su alcance` : 'No hay nadie adentro del área'); return; }
     try{
       await coleccionAreas().add({
         casteador, hab: Duelo.limpiarHab(hab), centro: {col: h.col, fila: h.fila, ...(h.cono ? {cono: true, rot: h.rot} : {}), ...(h.linea ? {linea: h.linea} : {})}, radio, objetivos, duelos: [], indice: 0, estado: 'en-curso',

@@ -376,10 +376,24 @@ function trampasDisparadasBarrer(){
     borrarElemento(id).finally(() => setTimeout(() => elementosVencidosBorrando.delete(id), 5000));
   });
 }
+/* Una zona persistente hace efecto en su ÚLTIMO Mantenimiento antes de irse (2026-10-05: antes se borraba en ese mismo Mantenimiento y una zona
+   de 1 turno —el fuego de la bola, el suelo de la ventisca, el miasma— nunca le hacía nada a quien se quedaba quieto adentro). En el Mantenimiento
+   en que vence, espera a que cada uno de los que siguen adentro la resuelva (al aplicar se anota «token@fin» en zonaResueltos) y recién ahí se
+   borra; como mucho espera ZONA_FIN_MS, por si alguien no está conectado. */
+const ZONA_FIN_MS = 120000, zonasFinDesde = new Map();
+function zonaEsperaSuFin(el, id){
+  if(!el.zona || el.zonaEnMantenimiento === false || mantenimientoNumero !== el.venceMant) return false;
+  if(!zonasFinDesde.has(id)){ zonasFinDesde.set(id, Date.now()); setTimeout(elementosVencidosBarrer, ZONA_FIN_MS + 500); }
+  if(Date.now() - zonasFinDesde.get(id) > ZONA_FIN_MS) return false;
+  const celdas = celdasDeElemento(el);
+  return [...tokens.entries()].some(([tid, t]) => celdas.some(c => c.col === t.col && c.fila === t.fila) && zonaAplicaA(el, t) && zonaLeFalta(el, t)
+    && !(el.zonaResueltos || []).includes(tid + '@fin'));
+}
 function elementosVencidosBarrer(){
   if(!soyGM || mantenimientoNumero === null) return;
   elementos.forEach((el, id) => {
     if(el.venceMant === null || el.venceMant === undefined || mantenimientoNumero < el.venceMant || elementosVencidosBorrando.has(id)) return;
+    if(zonaEsperaSuFin(el, id)) return;   // su último Mantenimiento: primero hace efecto
     elementosVencidosBorrando.add(id);
     borrarElemento(id).finally(() => setTimeout(() => elementosVencidosBorrando.delete(id), 5000));
   });

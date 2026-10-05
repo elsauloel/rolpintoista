@@ -528,8 +528,10 @@ async function zonaResolverBanner(){
       }catch(err){ console.error('No se pudo aplicar el estado de la zona:', err); partes.push(`${spec.nombre} (aplicalo a mano)`); }
     }
   }
-  if((el.zonaEstado && !resistio) || el.trampa){   // la de una trampa: resista o no, ya le tocó en esta ronda
-    try{ await coleccionElementos().doc(elId).update({zonaResueltos: firebase.firestore.FieldValue.arrayUnion(zonaClave(el, t))}); }
+  const finTurno = el.venceMant === Math.round(num(mantenimientoNumero));   // su último Mantenimiento: anota que ya lo resolvió (js/07, zonaEsperaSuFin)
+  if((el.zonaEstado && !resistio) || el.trampa || finTurno){   // la de una trampa: resista o no, ya le tocó en esta ronda
+    const claves = [...((el.zonaEstado && !resistio) || el.trampa ? [zonaClave(el, t)] : []), ...(finTurno ? [zonaIdDe(t) + '@fin'] : [])];
+    try{ await coleccionElementos().doc(elId).update({zonaResueltos: firebase.firestore.FieldValue.arrayUnion(...claves)}); }
     catch(err){ console.error('No se pudo anotar zonaResueltos:', err); }
   }
   zonaBanner = {...zonaBanner, el, t, resultado: partes.join(' · ') || 'sin efecto'};

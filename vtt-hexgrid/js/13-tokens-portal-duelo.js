@@ -189,7 +189,7 @@ async function crearElementoZona(centro, cfg){
   const datos = {
     // Las casillas se guardan planas [dq1, dr1, …], como guardarElemento (con los {dq, dr} sueltos Firestore la rechazaba).
     tipo: 'flor', origen: {col: centro.col, fila: centro.fila}, celdas: celdasFlor(radio).flatMap(c => [c.dq, c.dr]), rotacion: 0,
-    color: /^#[0-9a-fA-F]{6}$/.test(cfg.color || '') ? cfg.color : (cfg.estado ? '#4C9A2A' : '#D9531E'),
+    color: /^#[0-9a-fA-F]{6}$/.test(cfg.color || '') ? cfg.color : (cfg.estado || /t[oó]xic/i.test(cfg.danoTipo || '') ? '#4C9A2A' : '#D9531E'),   // lo tóxico, verde (no el naranja del fuego)
     alfa: Number.isFinite(cfg.alfa) ? cfg.alfa : 40, solido: false, invisible: false,
     imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true,
     turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n,

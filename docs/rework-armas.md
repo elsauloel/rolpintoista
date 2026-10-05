@@ -1408,3 +1408,6 @@ van a contemplar como…»: falta completar.)
   de rango cuando toquen («grappling hook»)** · ✅ 35 Demora, también como secundario (por ejemplo de un piedrazo) · ✅ 36 Pajaritos · ✅ 37 Silencio ·
   ✅ 38 Ceguera · 🔀 39 Miedo y 40 Sueño: valen, pero **para hechizos (habilidades), no para armas** · ✅ 41 Confusión y 42 Desarme, como secundarios ·
   ❌ 43 Gravedad · ❌ 44 Pierde No2 (se superpone con la Escarcha).
+- **Filtro del dueño — D. Movimiento y espacio (2026-10-05):** ✅ 45 parpadeo (teletransporte corto), **propio y de un aliado; debe ser costoso** ·
+  ✅ 46 portal, **para aliados**, y también **como trampa** · 🔀 47 intercambiar lugar y 48 mover a un aliado: el efecto está bien, pero **no para arma** ·
+  🔀 49 levitar: para **unas botas Raras** (anotado para la ampliación del catálogo) · ❌ 50 ancla · ✅ 51 muro.

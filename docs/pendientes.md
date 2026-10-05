@@ -213,6 +213,8 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   (sin tienda); de nivel más alto, uno que lo acompaña en los combates. Hoy el baúl común se abre solo desde una tienda abierta (10 ranuras
   por integrante; `Intercambio.POR_INTEGRANTE`).
 - [ ] **Armas de rango: «grappling hook»** (dueño, 2026-10-05): sumar el efecto de atraer al rival a las armas de rango cuando toque su rework.
+- [ ] **Botas Raras que dejan levitar** (dueño, 2026-10-05, para la ampliación del catálogo): ignoran el terreno y las trampas.
+- [ ] **Intercambiar lugar y mover a un aliado como hechizos** (dueño, 2026-10-05): el efecto vale, pero no para armas.
 - [ ] **Miedo y Sueño como hechizos** (dueño, 2026-10-05): valen como efectos de habilidades (no de armas). Estados a crear cuando se trabajen los hechizos.
 - [ ] **Despojos mágico/especial** de los ítems: siguen a mano.
 - [ ] **Protección de jefe, segunda versión** (P95): resistencia a otros controles (Exhausto, Inmovilizado…), contador de resistencia o fases.

@@ -803,7 +803,7 @@ async function confirmarRuta(){
     if(oportunidadPendiente && oportunidadPendiente.tokenId === p.id) oportunidadResolver();   // ataque de oportunidad (js/17)
     oportunidadPublicarAvisos(t, p.oportunidad);
     if(origen && (origen.col !== fin.col || origen.fila !== fin.fila)) deshacerRegistrar({tipo: 'mover', id: p.id, fichaId: t.fichaId, esCreep, costo, pasosGratis: num(p.gratis), primerMov, col: origen.col, fila: origen.fila, rotacion: rotAntes, seq0, pend0});
-    toast(esCreep
+    toast(esCreep || String(t.fichaId || '').includes(SEP_INVOCACION)   // un creep o una invocación: con su nombre
       ? `${nombreDe(t)}: −${fmt(costo)} No2${p.gratis > 0 ? ` (${p.gratis} casillero${p.gratis === 1 ? '' : 's'} gratis)` : ''}${p.lento ? ' (Lento: el primer casillero, doble)' : ''} · le quedan ${fmt(quedan)}${quedan < 0 ? ' ⚠ se pasó de sus No2' : ''}`
       : `−${fmt(costo)} No2${p.gratis > 0 ? ` (${p.gratis} casillero${p.gratis === 1 ? '' : 's'} gratis)` : ''}${p.lento ? ' (Lento: el primer casillero, doble)' : ''} · te quedan ${fmt(quedan)}${quedan < 0 ? ' ⚠ te pasaste de tus No2' : ''}`);
   }catch(err){

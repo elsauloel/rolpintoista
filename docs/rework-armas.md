@@ -1439,3 +1439,8 @@ el control va como secundario de un daño leve o en área. **Báculos**: suman E
 atacan. Números: `herramientas/calculadora_especiales.py` (efecto por turno con 7 No2; techo Común ~6,1, de 2,3 a 9,6; Buena ~9,2).
 Lista completa con números en la calculadora (`POOL`, `PARA_BUENA`, `ORBES`): 30 armas Comunes, 2 candidatas a Buena (en realidad, más que Rara:
 lluvia ácida 21 y báculo de sangre 19,5), 3 orbes.
+- **Costo de las varitas, segunda vuelta (dueño, 2026-10-05):** **1 No2 + 1 SP** el primer uso del turno, **o su equivalente** sin SP; después **el No2 sube
+  +1 por uso y el SP no** (1+1 SP, 2+1 SP, 3+1 SP · o 2, 3, 4 No2). Porqué: la daga juega con el crítico y el daño mágico no lo tiene, así que 1d4 por
+  2 No2 se quedaba corto. Propuesta de Claude, a confirmar: **cada SP se puede reemplazar por 1 No2** (una varita de control de 2 SP, sin SP, cuesta
+  3 No2 el primer uso). Con esto el SP es el freno real: un mago con Especial 6 (recupera 3 SP por turno) la sostiene sin parar; alguien con Especial
+  3, unos pocos turnos, y después paga en No2.

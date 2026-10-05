@@ -54,7 +54,9 @@ def dado_prom(dado):
     return int(cant or 1) * (int(caras) + 1) / 2
 
 
-COSTO_BASE, COSTO_SUBE = 2, 1   # varitas (dueño, 2026-10-05): 2 No2 el primer uso, y +1 cada uno (2, 3, 4…): 1 de base + 1 por ser de rango
+COSTO_BASE, COSTO_SUBE = 1, 1   # varitas (dueño, 2026-10-05, segunda vuelta): 1 No2 + 1 SP el primer uso; el No2 sube +1 por uso, el SP no.
+# El equivalente sin SP: cada SP se paga con 1 No2 más (2, 3, 4 No2). La calculadora mide la forma con SP (lo descuenta con TASA_SP).
+SP_MIN = 1      # toda varita cuesta al menos 1 SP por uso (o su equivalente en No2)
 
 
 def usos_por_turno(no2=NO2_REF, base=COSTO_BASE, sube=COSTO_SUBE):
@@ -165,10 +167,10 @@ def main():
     for a in POOL:
         d = valor_uso(a)
         turno = d['valor'] * usos
-        sp = a.get('sp', 0)
+        sp = max(SP_MIN, a.get('sp', 0)) if not a['nombre'].startswith('Báculo de sangre') else 0
         neto = turno - sp * usos * TASA_SP
         marca = '  ⚠ pasa la Común' if neto > ref['Común'][3] else ''
-        print(f"  {a['nombre']}: {d['valor']:.1f} por uso · {turno:.1f} por turno" + (f" · {sp} SP por uso ({sp * usos} por turno)" if sp else '') + marca)
+        print(f"  {a['nombre']}: {d['valor']:.1f} por uso · {turno:.1f} por turno" + (f" · {sp} SP por uso ({sp * usos} por turno) → neto {neto:.1f}" if sp else '') + marca)
 
     print('\nCandidatas a Buena (se pasan del techo Común):')
     for a in PARA_BUENA:

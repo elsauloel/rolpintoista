@@ -1344,3 +1344,6 @@ van a contemplar como…»: falta completar.)
   aceite** («puede ser muy divertido que un mago tire manchas de aceite, pum, pum, pum, que controle el terreno así»), con duración de **1 o 2
   turnos**. Lo que no se mide en daño es menos cuantificable para ponerle costo: se va de a poco.
 - **Pedido del dueño:** ir anotando; cuando lo pida, **pasarle todas las conclusiones juntas en un gran mensaje**.
+- **El rival puede esquivar (dueño, 2026-10-05):** un efecto de 1 No2 por uso no hace daño las 8 veces: el otro puede evitarlo. La chance de
+  acertar va en la balanza. → la medida «efecto por turno» se calcula con la **chance de acertar** (con stats parejos, más o menos la mitad); lo que
+  **no tiene tirada para acertar** (una flor que pega a todos) vale más por eso mismo.

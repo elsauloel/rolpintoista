@@ -1382,3 +1382,10 @@ van a contemplar como…»: falta completar.)
   **efectos de control y terreno**.
 - **Techo por calidad:** se trabaja con **Común, Buena y Rara**. Las Excepcionales y Legendarias son todas de antes del rework: se hacen todas juntas
   cuando terminen las Raras de todos los tipos.
+- **Cerrado (dueño, 2026-10-05):** **varitas de daño: costo 1, 2, 3 No2**, sin importar el alcance (todas usan el **Rango de casteo**). **Varitas de
+  control y terreno: sin límite por turno; el SP las limita** (se llevan mejor con magos con mucho SP, y está bien). Propuesta de Claude, a confirmar:
+  que también paguen 1, 2, 3 en No2, así todas las varitas comparten la regla. **Báculos con Especial: costo que sube y SP.**
+- **Calculadora** (`herramientas/calculadora_especiales.py`, 2026-10-05, tasas en borrador): mide el **efecto por turno** de cada arma especial contra el
+  de las armas físicas rehechas de su calidad (Común 6,1 por turno · Buena 9,2 · Rara 13,7, con 7 No2 y 2 gastados en moverse). Primera corrida con los
+  borradores Comunes: con 1-2-3 una varita da **3 usos por turno**, y la Varita arcana de 1d4 llega a **11,2 por turno: casi el doble que un arma física
+  Común** (que con 5 No2 pega una vez). A discutir.

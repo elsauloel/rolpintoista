@@ -1233,4 +1233,8 @@ versión parecida en más de una, es candidato a juntar.
   pone ahí el daño y lo que hace cada arma). En el duelo, una tirada cuyo origen trae «(+N contra …)» guarda esa `nota` (`tiro.nota`) y se muestra
   en el cuadro y en la Mesa («Evasión (+2 contra oportunidad)»). El mapa del GM arma las opciones de defensa de un creep con `CreepDuelo` (ya no con
   su copia corta), así se ven los dados que tiraría.
-
+- **Cinturón: 1 ranura = 1 unidad, para personajes y creeps** (2026-10-04/05, dueño): `FichaEquipo.alCinturon(S, it, cantidad)` (todos los caminos
+  que meten algo en el cinturón de un personaje: Equipar, «→ Cinturón», el editor, lo que vuelve del combate; lleno, no entra), `cinturonUsado`,
+  `capCinturon` (base `BASE_CINTURON` 5 + `capcinturon`), `textoAlCinturon`. Creeps: `CreepCalculo.capCinturon/cinturonUsado/cinturonLibre`,
+  `CreepAcciones.alCinturon/quitarDelCinturon/consumir/colocarTrampaDeItem/consumiblesDe` y la sección `CreepBotonera.cinturonHtml` de sus Acciones.
+  Las invocaciones no llevan cinturón (decisión del dueño).

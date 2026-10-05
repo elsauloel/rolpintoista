@@ -1871,6 +1871,17 @@ prueba('cinturón (dueño, 2026-10-04): 1 ranura = 1 unidad, base 5; lleno no en
   igual([r1, tras1, r2.movidas, /no entra, el cinturón está lleno \(5\/5\)/.test(txt), r3.movidas, S.inventario.length, S.cinturon.length, FichaEquipo.BASE_CINTURON],
     [{movidas: 2, quedan: 5, libre: 0}, [5, 5, 1, 5, 5, 1], 0, true, 1, 0, 2, 5]);
 });
+prueba('cinturón de un creep (2026-10-04): 5 ranuras, cargar (lleno no entra), usar cura, deja su estado y cobra 1 No2', () => {
+  const sc = creepPrueba({nitros: 3, hp: 10, hpMax: 20});
+  const poc = {id: 'cat-poc', nombre: 'Poción de prueba', tipoItem: 'consumibles', consumible: true, curahp: 6, efectoNombre: 'Bendición', efectoTurnos: 2, efectoPolaridad: 'buff', efectoMods: [{stat: 'pdg', val: 1}]};
+  const a1 = CreepAcciones.alCinturon(sc, poc, 4), a2 = CreepAcciones.alCinturon(sc, poc, 3), a3 = CreepAcciones.alCinturon(sc, poc, 1);
+  const lleno = [CreepCalculo.cinturonUsado(sc), CreepCalculo.capCinturon(sc), sc.cinturon.length, !!a3.error];
+  const r = CreepAcciones.consumir(sc, sc.cinturon[0].id, estadosPresetCreep(), false);
+  const html = CreepBotonera.cinturonHtml(sc, {consumibles: [{id: 'cat-poc', nombre: 'Poción de prueba'}]});
+  igual([!!a1.aviso, /no entraban más/.test(a2.aviso), lleno, sc.hp, sc.nitros, sc.estados.some(e => e.nombre === 'Bendición'), sc.cinturon[0].unidades, /4\/5 ranuras/.test(html), /data-cin-agregar/.test(html),
+    CreepAcciones.consumiblesDe([poc, {id: 'x', nombre: 'Espada', tipoItem: 'arma_1m'}]).map(c => c.id)],
+    [true, true, [5, 5, 1, true], 16, 2, true, 4, true, true, ['cat-poc']]);
+});
 prueba('catálogo: las piernas Común (28) — ninguna pasa de Defensa 1, y las mecánicas nuevas están', () => {
   const L = CATALOGO_BASE.filter(i => i.tipoItem === 'piernas' && i.tier === 'Común');
   const stats = new Set(L.flatMap(i => (i.mods || []).map(m => m.stat)));

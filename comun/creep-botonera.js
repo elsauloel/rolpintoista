@@ -161,9 +161,33 @@ const CreepBotonera = (() => {
     <div class="botonera-caja">
       <div class="acciones-grupo-label" style="margin-top:0">Habilidades</div>
       <div class="botonera-list-grid">${filasHab.map(filaHab).join('')}</div>
-    </div>`;
+    </div>
+    ${cinturonHtml(sc, o)}`;
     return {titulo: sc.nombre, badge: `No2 ${fmt(num(sc.nitros))}/${fmt(nitrosMax(sc))}`, html: cuerpo};
   }
 
-  return {html, formulasCombate, habStatTirable, habTieneSegunda, botonSegundaHab, botonHabTxt, cdControlesHtml};
+  /* El cinturón del creep (2026-10-04): 1 ranura = 1 unidad, base 5; usar uno cuesta 1 No2. opts.consumibles = [{id, nombre, tier}] del
+     catálogo para cargarle (null: todavía no llegó el catálogo). Botones: data-cin-consumir / data-cin-quitar ("creepId:itemId") y
+     data-cin-agregar (creepId, con el elegido en el desplegable data-cin-sel). */
+  function cinturonHtml(sc, opts){
+    const o = opts || {}, usado = C().cinturonUsado(sc), cap = C().capCinturon(sc);
+    const costo = typeof FichaCalculo !== 'undefined' ? num(FichaCalculo.IT2.nitrosConsumirCinturon) || 1 : 1;
+    const filas = (sc.cinturon || []).map(it => `
+      <div class="accion-row">
+        <div class="accion-nombre">${esc(it.nombre)} <span class="hint">×${fmt(num(it.unidades))}${num(it.curahp) ? ` · ${num(it.curahp) > 0 ? '+' : ''}${fmt(num(it.curahp))} HP` : ''}${it.efectoNombre ? ` · ${esc(it.efectoNombre)}` : ''}</span></div>
+        <button class="hab-ejecutar" data-cin-consumir="${sc.id}:${it.id}" ${num(sc.nitros) < costo ? 'title="No le alcanzan los No2: pregunta antes"' : ''}>Usar · ${fmt(costo)} No2</button>
+        <button class="verbtn" data-cin-quitar="${sc.id}:${it.id}" title="Sacarlo del cinturón">✕</button>
+      </div>`).join('');
+    const lista = o.consumibles;
+    const agregar = !lista ? '<div class="hint">Cargando el catálogo de consumibles…</div>'
+      : usado >= cap ? '<div class="hint">El cinturón está lleno.</div>'
+      : `<div class="accion-row"><select data-cin-sel="${sc.id}" style="flex:1;min-width:0">${lista.map(c => `<option value="${esc(c.id)}">${esc(c.nombre)}${c.tier ? ` · ${esc(c.tier)}` : ''}</option>`).join('')}</select>
+          <button class="hab-ejecutar" data-cin-agregar="${sc.id}">＋ Al cinturón</button></div>`;
+    return `<div class="botonera-caja">
+      <div class="acciones-grupo-label" style="margin-top:0">🧪 Cinturón · ${fmt(usado)}/${fmt(cap)} ranuras</div>
+      <div class="botonera-list-grid">${filas || '<div class="hint">Sin consumibles en el cinturón.</div>'}${agregar}</div>
+    </div>`;
+  }
+
+  return {html, cinturonHtml, formulasCombate, habStatTirable, habTieneSegunda, botonSegundaHab, botonHabTxt, cdControlesHtml};
 })();

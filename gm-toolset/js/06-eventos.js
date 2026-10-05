@@ -209,6 +209,45 @@ document.addEventListener('click', e => {
     toast(x.error || x.aviso);
     return;
   }
+  // El cinturón de un creep (2026-10-04): usar, sacar y cargar consumibles (comun/creep-acciones.js).
+  if(b.dataset.cinConsumir){
+    const [scId, itemId] = b.dataset.cinConsumir.split(':');
+    const sc = S.creeps.find(s => s.id === scId), it = sc && (sc.cinturon || []).find(x => x.id === itemId);
+    if(!it) return;
+    (async () => {
+      let forzar = false;
+      if(CreepAcciones.faltanNitrosConsumir(sc)){
+        if(!confirm(`${sc.nombre} no tiene los No2 para usar ${it.nombre} (cuesta ${CreepAcciones.costoConsumir()}). ¿Usarlo igual? Gasta los que tenga.`)) return;
+        forzar = true;
+      }
+      if(it.trampaDatos){ const t = await CreepAcciones.colocarTrampaDeItem(sc.id, it); toast(t.aviso); if(!t.ok) return; }
+      const res = CreepAcciones.consumir(sc, itemId, ESTADOS_PRESET_GM, forzar);
+      if(res.error){ toast(res.error); return; }
+      (res.tiradas || []).forEach(t => publicarTiradaCreep(t));
+      renderAll();
+      toast(res.aviso);
+    })();
+    return;
+  }
+  if(b.dataset.cinQuitar){
+    const [scId, itemId] = b.dataset.cinQuitar.split(':');
+    const sc = S.creeps.find(s => s.id === scId);
+    if(!sc) return;
+    const x = CreepAcciones.quitarDelCinturon(sc, itemId);
+    if(!x.error) renderAll();
+    toast(x.error || x.aviso);
+    return;
+  }
+  if(b.dataset.cinAgregar){
+    const sc = S.creeps.find(s => s.id === b.dataset.cinAgregar);
+    const sel = document.querySelector(`[data-cin-sel="${b.dataset.cinAgregar}"]`);
+    const it = sel ? CATALOGO_BASE.find(x => x.id === sel.value) : null;
+    if(!sc || !it){ toast('Elegí un consumible del catálogo'); return; }
+    const x = CreepAcciones.alCinturon(sc, it, 1);
+    if(!x.error) renderAll();
+    toast(x.error || x.aviso);
+    return;
+  }
   if(b.dataset.levantarcreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.levantarcreep);
     if(!sc) return;

@@ -428,6 +428,13 @@ const CreepCalculo = (() => {
   };
   // Rellena campos que creeps viejos (guardados antes de una función nueva)
   // pueden no tener, para que el resto del código no se tope con undefined.
+  /* El cinturón de un creep (dueño, 2026-10-04: «los creeps vienen por default con 5 ranuras de consumibles, aunque rara vez se usen»): la
+     misma regla que un personaje — 1 ranura = 1 unidad, base 5 + las ranuras que le dé su equipo (capcinturon). */
+  const BASE_CINTURON = 5;
+  const cinturonUsado = sc => (sc.cinturon || []).reduce((a, i) => a + (i && i.consumible ? Math.max(0, num(i.unidades)) : 1), 0);
+  const capCinturon = sc => BASE_CINTURON + num(modTotal(sc, 'capcinturon'));
+  const cinturonLibre = sc => Math.max(0, capCinturon(sc) - cinturonUsado(sc));
+
   function normalizar(sc){
     const crit = Array.isArray(sc.crit) ? sc.crit.map(v=>num(v)) : [];
     while(crit.length < 5) crit.push(0);
@@ -437,6 +444,7 @@ const CreepCalculo = (() => {
     sc.habilidades = Array.isArray(sc.habilidades) ? sc.habilidades : [];
     sc.armaMods = Array.isArray(sc.armaMods) ? sc.armaMods : [];
     sc.armaEfectos = Array.isArray(sc.armaEfectos) ? sc.armaEfectos : [];
+    sc.cinturon = Array.isArray(sc.cinturon) ? sc.cinturon : [];   // consumibles a mano (2026-10-04)
     migrarCreepTipos(sc);
     migrarCreepEspecial(sc);
     migrarHabPdg(sc);
@@ -553,7 +561,7 @@ const CreepCalculo = (() => {
     return partes.length ? partes.join(' · ') : 'nada';
   }
 
-  return {IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
+  return {BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
     TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto,
     trofeo, despojosDePrecio, dropsResumen,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,

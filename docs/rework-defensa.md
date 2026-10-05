@@ -600,3 +600,8 @@ bolsa (cuántos puntos) le damos a la mochila por calidad?
 - **Cinturón y mochila son dos slots de equipo** (existen desde el 2026-09-25, `SLOT_DEFS`): entran en la ruta del rework (la mochila no estaba) y
   en el control del equipo Común la Defensa del cinturón (+1 por calidad) cuenta para la curva.
 
+**Cinturón de los creeps ✅ (2026-10-05; dueño: «solo creeps, no invocaciones en este caso»).** 5 ranuras como cualquiera (`CreepCalculo.capCinturon`,
+1 ranura = 1 unidad, + `capcinturon` de su equipo). En sus Acciones (mapa y GM Tools, el mismo dibujo: `CreepBotonera.cinturonHtml`) hay una
+sección «🧪 Cinturón» con un desplegable de los consumibles del catálogo para cargarle, «Usar · 1 No2» y ✕ para sacarlo. Usar uno
+(`CreepAcciones.consumir`) cura, deja su estado (la misma regla que una habilidad: `efectoDeHab`), tira lo suyo y cobra 1 No2; sin No2 pregunta y,
+si se usa igual, gasta los que tenga (línea roja en la Mesa); una trampa consumible se coloca junto a su token (si no se puede, no se gasta).

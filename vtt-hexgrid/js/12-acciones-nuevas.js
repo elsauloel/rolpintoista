@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002c', '../comun/creep-botonera.js?v=20261004so', '../comun/creep-acciones.js?v=20261004p1', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261004p1'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002c', '../comun/creep-botonera.js?v=20261005a1', '../comun/creep-acciones.js?v=20261005a1', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261004p1'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -36,7 +36,10 @@ function acDibujar(){
   if(!crudo){ cuerpo.innerHTML = '<div class="modal acciones-modal"><div class="body"><div class="hint">Cargando el creep…</div></div></div>'; return; }
   const sc = CreepCalculo.normalizar(structuredClone(crudo));
   sc.id = ac.creepId;
-  const r = CreepBotonera.html(sc, {parryPendiente: acParry.has(ac.creepId)});
+  // El catálogo para cargarle consumibles al cinturón (2026-10-04): llega con las piezas de la Botonera nueva.
+  const consumibles = typeof CATALOGO_BASE !== 'undefined' ? CreepAcciones.consumiblesDe(CATALOGO_BASE) : null;
+  if(!consumibles && typeof bnCargarPiezas === 'function' && !ac.cargandoCatalogo){ ac.cargandoCatalogo = true; bnCargarPiezas().then(() => acDibujar()).catch(() => {}); }
+  const r = CreepBotonera.html(sc, {parryPendiente: acParry.has(ac.creepId), consumibles});
   const scroll = ac.host.scrollTop;
   cuerpo.innerHTML = `<div class="modal acciones-modal">
     <header>
@@ -135,6 +138,27 @@ function acEfectosAlPegar(sc){
     }).catch(err => console.error('No se pudieron publicar los efectos en la Mesa:', err));
   }});
 }
+// Usar un consumible del cinturón de un creep (2026-10-04): sin No2 pregunta; una trampa se coloca antes (si no se puede, no se gasta).
+async function acConsumir(sc, itemId){
+  const it = (sc.cinturon || []).find(x => x.id === itemId);
+  if(!it) return;
+  let forzar = false;
+  if(CreepAcciones.faltanNitrosConsumir(sc)){
+    if(!confirm(`${sc.nombre} no tiene los No2 para usar ${it.nombre} (cuesta ${CreepAcciones.costoConsumir()}). ¿Usarlo igual? Gasta los que tenga.`)) return;
+    forzar = true;
+  }
+  if(it.trampaDatos){
+    const t = await CreepAcciones.colocarTrampaDeItem(ac.creepId, it);
+    toast(t.aviso);
+    if(!t.ok) return;
+  }
+  let res = null;
+  const x = await acCambiar(c => { res = CreepAcciones.consumir(c, itemId, estadosPresetCreep(), forzar); return res; });
+  if(!x || !res) return;
+  (res.tiradas || []).forEach(t => acPublicar(sc, t));
+  if(res.forzado && typeof oporMesa === 'function') oporMesa(`⚠ ${sc.nombre} usó ${it.nombre} sin los No2 (cuesta ${res.forzado.costo}, tenía ${res.forzado.tenia})`, 'alerta-roja');
+  toast(res.aviso);
+}
 function acAccionAca(b){
   const d = b.dataset, sc = acCreep();
   if(!sc) return false;
@@ -168,6 +192,16 @@ function acAccionAca(b){
     return true;
   }
   if(d.atacarcreep){ acPreguntarTipoAtaque(sc); return true; }
+  // El cinturón (2026-10-04): usar, sacar y cargar consumibles.
+  if(d.cinConsumir){ acConsumir(sc, d.cinConsumir.split(':')[1]); return true; }
+  if(d.cinQuitar){ acCambiar(c => CreepAcciones.quitarDelCinturon(c, d.cinQuitar.split(':')[1])).then(x => { if(x) toast(x.aviso); }); return true; }
+  if(d.cinAgregar){
+    const sel = ac.raiz.querySelector(`[data-cin-sel="${d.cinAgregar}"]`);
+    const it = sel && typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(x => x.id === sel.value) : null;
+    if(!it){ toast('Elegí un consumible del catálogo'); return true; }
+    acCambiar(c => CreepAcciones.alCinturon(c, it, 1)).then(x => { if(x) toast(x.aviso); });
+    return true;
+  }
   if(d.ejecutar){ acEjecutarHab(sc, d.ejecutar.split(':')[1]); return true; }
   if(d.danohabcreep){
     const h = (sc.habilidades || []).find(x => x.id === d.danohabcreep.split(':')[1]);

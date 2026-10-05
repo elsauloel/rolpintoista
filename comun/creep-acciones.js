@@ -178,6 +178,82 @@ const CreepAcciones = (() => {
     if(!r.ok) return {estado: null, aviso: `${sc.nombre}: inmune ahora mismo (${r.motivo}) — ${nombre} no hizo efecto`};
     return {estado: r.estado};
   }
+  /* ---------- El cinturón (2026-10-04, dueño: 5 ranuras de consumibles para los creeps también) ----------
+     La misma regla que un personaje: 1 ranura = 1 unidad; usar uno cuesta 1 No2 (lo del cinturón: FichaCalculo.IT2); cura, deja su estado
+     (efectoDeHab, los mismos campos que una habilidad) y tira lo suyo. Sin No2 pregunta («¿Usarlo igual?») y, forzado, gasta los que tenga. */
+  const costoConsumir = () => typeof FichaCalculo !== 'undefined' ? num(FichaCalculo.IT2.nitrosConsumirCinturon) || 1 : 1;
+  // Carga `cantidad` unidades (1 si no se dice) de un consumible del catálogo en el cinturón, las que entren. → {error} o {aviso}.
+  function alCinturon(sc, item, cantidad){
+    if(!item || !item.consumible && item.tipoItem !== 'consumibles') return {error: 'Al cinturón solo van consumibles'};
+    const quiere = Math.max(1, Math.round(num(cantidad) || 1)), entran = Math.min(quiere, C().cinturonLibre(sc));
+    if(!entran) return {error: `${sc.nombre}: el cinturón está lleno (${C().cinturonUsado(sc)}/${C().capCinturon(sc)})`};
+    sc.cinturon = sc.cinturon || [];
+    const pila = sc.cinturon.find(x => x.consumible && x.nombre === item.nombre);
+    if(pila) pila.unidades = num(pila.unidades) + entran;
+    else{
+      const c = structuredClone(item);
+      delete c.imagen; delete c._bib; delete c.equipado;
+      c.id = uid(); c.consumible = true; c.unidades = entran; c.cargaActual = Math.max(1, num(item.cargaMax) || 1);
+      sc.cinturon.push(c);
+    }
+    return {aviso: `${sc.nombre}: ${item.nombre} ×${entran} al cinturón (${C().cinturonUsado(sc)}/${C().capCinturon(sc)})${entran < quiere ? ' · no entraban más' : ''}`};
+  }
+  function quitarDelCinturon(sc, id){
+    const it = (sc.cinturon || []).find(x => x.id === id);
+    if(!it) return {error: 'Ese consumible ya no está'};
+    sc.cinturon = sc.cinturon.filter(x => x !== it);
+    return {aviso: `${sc.nombre}: ${it.nombre} salió del cinturón`};
+  }
+  // Una trampa consumible: se coloca junto al token del creep (como la de un personaje); si no se puede, no se gasta. → {ok, aviso}.
+  async function colocarTrampaDeItem(creepId, it){
+    const d = it && it.trampaDatos;
+    if(!d || typeof TokensAuto === 'undefined') return {ok: false, aviso: 'Esta trampa se coloca desde el mapa'};
+    try{
+      const dano = /^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i.test(String(d.dano || '').trim()) ? String(d.dano).trim() : '';
+      const r = await TokensAuto.colocarTrampas({fichaId: creepId, tipoToken: 'creep', trampa: {...d, nombre: String(d.nombre || it.nombre).slice(0, 40), dano, cant: 1}});
+      if(r.colocadas) return {ok: true, aviso: `🪤 ${it.nombre} colocada junto al creep: arrastrala a donde la quieras`};
+      return {ok: false, aviso: r.motivo === 'sin-token' ? `🪤 ${it.nombre}: el creep no tiene token en el mapa — no se usó` : `🪤 ${it.nombre}: no hay lugar libre al lado del creep — no se usó`};
+    }catch(err){ console.error('No se pudo colocar la trampa:', err); return {ok: false, aviso: 'No se pudo colocar la trampa'}; }
+  }
+  // Los consumibles del catálogo para el desplegable del cinturón: [{id, nombre, tier}], por nombre. `cat`: la lista del catálogo.
+  const consumiblesDe = cat => (cat || []).filter(it => it && it.tipoItem === 'consumibles' && !it.trofeo)
+    .map(it => ({id: it.id, nombre: it.nombre, tier: it.tier || ''})).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+  function faltanNitrosConsumir(sc){ return num(sc.nitros) < costoConsumir(); }
+  // Usar un consumible del cinturón: → {error} | {aviso, tiradas: [{origen, r}], trampa} (trampa: el ítem, para que la pantalla la coloque).
+  function consumir(sc, id, presets, forzar){
+    const it = (sc.cinturon || []).find(x => x.id === id);
+    if(!it || num(it.unidades) <= 0) return {error: 'Ese consumible ya no está'};
+    const costo = costoConsumir();
+    if(costo > num(sc.nitros) && !forzar) return {error: `${sc.nombre}: no le alcanzan los No2 — usar ${it.nombre} cuesta ${fmt(costo)}`};
+    const pagado = Math.min(costo, Math.max(0, num(sc.nitros)));
+    sc.nitros = num(sc.nitros) - pagado;
+    const cargaMax = Math.max(1, num(it.cargaMax) || 1);
+    let carga = num(it.cargaActual ?? cargaMax);
+    if(carga <= 0) carga = cargaMax;
+    carga -= 1;
+    if(carga <= 0){ it.unidades = num(it.unidades) - 1; carga = cargaMax; }
+    it.cargaActual = carga;
+    if(num(it.unidades) <= 0) sc.cinturon = sc.cinturon.filter(x => x !== it);
+    const partes = [];
+    if(num(it.curahp)){
+      const tope = num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, antes = num(sc.hp);
+      sc.hp = Math.max(0, Math.min(tope, antes + num(it.curahp)));
+      partes.push(`${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp))} HP`);
+    }
+    const ef = efectoDeHab(sc, it, presets);
+    if(ef.estado){ if(C().modsAfectanHp(ef.estado.mods)) C().actualizarHpMaxPorCon(sc); partes.push(`${ef.estado.nombre}${ef.estado.permanente ? '' : ` (${fmt(ef.estado.turnos)} turnos)`}`); }
+    if(ef.aviso) partes.push(ef.aviso);
+    const tiradas = [];
+    const stat = it.tiradaStat;
+    const ATRIB = {fue: 'Fuerza', con: 'Constitución', agl: 'Agilidad', des: 'Destreza', esp: 'Especial'};
+    if(stat && (C().STAT_LOOKUP[stat] || ATRIB[stat])){ const valor = C().statValor(sc, stat) + num(it.tiradaBono); tiradas.push(tirada(`${sc.nombre} · ${it.nombre} · ${ATRIB[stat] || C().STAT_LOOKUP[stat].label || stat}`, valor, sc, stat)); }
+    const formula = String(it.tiradaExtra || '').trim();
+    if(formula){ const r = tirarDados(formula); if(r) tiradas.push({origen: `${sc.nombre} · ${it.nombre}`, r}); }
+    partes.push(`−${fmt(pagado)} No2${pagado < costo ? ' (no le alcanzaban)' : ''}`);
+    return {aviso: `${sc.nombre} usó ${it.nombre}: ${partes.join(' · ')}`, tiradas: tiradas.filter(t => t && !t.error), forzado: pagado < costo ? {costo, tenia: pagado} : null,
+      trampa: it.trampaDatos ? structuredClone(it) : null};
+  }
+
   // ✨ Automática, solo sobre el propio creep y sin tiradas: aplica los efectos del cuadro de Ejecución directo. Devuelve null si
   // no es ese caso; si no, {hechos} (para el aviso del GM) y {nota} (los textos «a mano», para la Mesa).
   function sobreSi(sc, h){
@@ -317,7 +393,7 @@ const CreepAcciones = (() => {
     });
   }
 
-  return {mantenimiento, reclamarMantenimiento,
+  return {mantenimiento, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
     tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, tiradaSoltarse, aplicarSoltarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
     costoAtaqueDe, faltanNitros, preguntaSinNitros, alertaSinNitros,
     FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,

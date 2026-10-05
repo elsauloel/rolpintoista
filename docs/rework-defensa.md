@@ -548,3 +548,41 @@ fuera de la trampa, la esquivás entera; si no, te cae encima. Sentado o Inmovil
 - **Bolsillo secreto** ✋: un consumible escondido que no se ve en la ficha lite ni se puede robar (no hay robo todavía). En pausa.
 - **Cinturón de lastre** (contra): Iniciativa −1 o pesa más, para abaratar piezas con muchas ranuras.
 
+**Decisiones del dueño sobre el cinturón (2026-10-04).** La categoría junta **cinturón y mochila**.
+1. **1 ranura = 1 poción** (una unidad, no una pila).
+2. **La base es 5 para todos**: todo personaje viene con un cinturón de 5 ranuras.
+3. El límite lo fijamos nosotros (a redefinir; propuesta: con el cinturón lleno, lo que no entra queda en la mochila).
+4. **Creeps e invocaciones** también tienen 5 ranuras de consumibles por defecto (aunque rara vez se usen).
+5. **Las ranuras son LA razón de ser del cinturón**; en otras piezas, solo de manera excepcional (como la Túnica de maestre).
+6. **Baja el peso de la ranura** (propuesta: 0,5).
+Mecánicas que quedan: Ranuras · **Saque rápido** · **Mano de boticario** (+X a lo que cura una poción) · **Portapergaminos** (los pergaminos
+se apilan de a 2, 3 o más por ranura; pesa bastante por stack) · **Vaina** (dejar un arma envainada en el cinturón para cambiarla sin gastar No2) ·
+**Pasamanos** · **Ranura exclusiva** (+1 ranura solo para pociones, pergaminos, trampas o el Ankh; «costaría 0,75») · **Defensa** (+1 habilitado
+por calidad) · resistencias elementales de relleno. **Brazo de lanzador**: a desarrollar con las reglas del lanzamiento (P156). El resto, afuera.
+
+## Mochila — panorama y lluvia de mecánicas (2026-10-04, para que el dueño filtre)
+
+**Cómo está hoy.** Slot de equipo (una sola). Ranuras de mochila = base que el jugador escribe a mano (20 por defecto) + `capmochila` de la mochila
+equipada. Lo que está adentro no suma bonos ni peso. Usar un consumible de la mochila cuesta 2 No2 (del cinturón, 1). Catálogo: 10 mochilas (2 por
+calidad), casi todas solo ranuras (+4 a +30), con contras en las grandes (Evasión −1, Movimiento −1). La calculadora todavía no tiene bolsa para
+la mochila; cada ranura vale 0,5.
+
+**Lluvia (cualquier calidad, peso propuesto; ⚙ = se automatiza con lo que hay, ✋ = hace falta algo nuevo).**
+- *Lo de siempre:* Ranuras (propuesta 0,25 cada una: una mochila tiene muchas) · contras para las grandes (Evasión, Movimiento, Iniciativa, Sigilo −1).
+- **Bolsillo exterior** ⚙: el primer consumible del turno sacado de la mochila cuesta 1 No2 en vez de 2. Peso 1.
+- **Correas laterales** ⚙: un arma o un escudo colgado afuera de la mochila se equipa en combate sin gastar No2 (como la Vaina del cinturón). Peso 1.
+- **Armazón** ⚙: Carga +N (la mochila con armazón reparte el peso). Peso 0,25 por +1.
+- **Espaldar** ⚙: los ataques por la espalda (en sigilo y por el punto ciego) no suman su bono contra vos. Peso 1.
+- **Bolsa del carroñero** ⚙: +N despojos al despojar. Peso 0,5 por +1.
+- **Morral de cazador** ⚙: los trofeos no ocupan ranuras. Peso 0,5.
+- **Mochila de mercader** ⚙: vendés un 10 % más caro en las tiendas. Peso 0,5 por cada 10 %.
+- **Farol colgado** ⚙: Luz +N (la luz que llevás alrededor). Peso 0,5 por +1.
+- **Alforja compartida** ⚙: un aliado al lado puede sacar un consumible de tu mochila (a lo que cuesta del cinturón). Peso 0,5.
+- **Alforja de invocación** ⚙: tus invocaciones usan los consumibles de tu mochila. Peso 0,5.
+- **Kit de herramientas** ✋: reparar fuera de combate (espera el sistema de reparación). En pausa.
+- **Botiquín de campaña** ✋: curar más al descansar (no hay reglas de descanso todavía). En pausa.
+- **Fondo falso** ✋: un compartimento que no se puede revisar ni robar (no hay robo). En pausa.
+- Resistencias elementales de relleno (una mochila que protege la espalda del fuego, etc.).
+**Preguntas:** ¿la base de 20 queda fija para todos, como el cinturón? ¿Creeps e invocaciones tienen mochila (o solo el cinturón de 5)? ¿Qué
+bolsa (cuántos puntos) le damos a la mochila por calidad?
+

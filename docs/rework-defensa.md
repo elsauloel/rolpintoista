@@ -511,3 +511,40 @@ Recuperarse rápido (el «Acortar estado» llega a su ficha por `Recibidos`), Re
 la chance, elegís en el mapa una casilla a 1 o 2 de distancia (pagando el movimiento en No2, como el dodge roll de los hechizos de área); si queda
 fuera de la trampa, la esquivás entera; si no, te cae encima. Sentado o Inmovilizado no pueden tirarse.
 
+## Cinturón — panorama y lluvia de mecánicas (2026-10-04, para que el dueño filtre)
+
+**Cómo está hoy (y lo que quedó a medias).**
+- Es un slot de equipo (uno solo). Lo que hace casi todo cinturón es dar **ranuras** (`capcinturon`).
+- Ranuras del cinturón = una **base que el jugador escribe a mano** en la ficha (5 por defecto) + las del cinturón y otras piezas (torsos y el Casco
+  cervecero también dan ranuras).
+- Usar un consumible del cinturón cuesta **1 No2**; de la mochila, **2**. El Ankh solo funciona desde el cinturón.
+- **A medias:** (1) el límite de ranuras se respeta solo con el botón «→ Cinturón» de la ficha (mueve de a una unidad); «Equipar» un consumible
+  (también desde el Equipo del mapa) mete **la pila entera** sin mirar el lugar, y la pila ocupa **una sola** ranura aunque tenga 5 unidades;
+  (2) la base de 5 la edita el jugador a mano (no sale de ninguna regla); (3) creeps e invocaciones no tienen cinturón.
+- **Catálogo:** 28 cinturones (7 Comunes). Casi todos son «ranuras +N», y los Comunes se pasan de su bolsa (1): cada ranura vale 1 punto,
+  así que una pieza Común solo podría dar +1.
+
+**Preguntas de base (antes de la lista).**
+1. ¿Una ranura = una unidad (5 pociones = 5 ranuras) o una pila (5 pociones iguales = 1 ranura, con un tope por pila)?
+2. ¿La base de 5 queda fija para todos (y el número a mano solo para casos especiales) o se calcula de algo (Agilidad, Constitución)?
+3. Pasar del límite: ¿avisar y dejar seguir, o no dejar? (sandbox: avisar).
+4. ¿Creeps e invocaciones llevan cinturón y consumibles? (las reglas, iguales para todos).
+5. ¿Las ranuras de cinturón son solo del cinturón (su identidad) o siguen también en torsos y cascos?
+6. El peso de una ranura: 1 punto deja al Común con +1. Propuesta: 0,5 (Común +2, Buena +3, Rara +4).
+
+**Lluvia de mecánicas (cualquier calidad, con peso propuesto; ⚙ = se automatiza con lo que hay, ✋ = hace falta algo nuevo).**
+- *Lo de siempre:* Ranuras · Defensa (poca: el cinturón no es armadura) · Res. crítico Tipo 12 (solo Legendario, decidido) · Res.CC · Constitución / vida.
+- **Saque rápido** ⚙: el primer consumible del turno sacado del cinturón cuesta 0 No2 (50 % al principio; siempre desde Rara). Peso 1 / 2.
+- **Bolsillo de emergencia** ⚙: al bajar del 25 % de vida, se toma solo una poción de curación del cinturón (como el Ankh), una vez por combate. Peso 1,5.
+- **Mano de boticario** ⚙: +N a lo que cura un consumible (o +1 turno a lo que deja). Peso 1 por +2 de cura.
+- **Portapergaminos / Portafrascos** ⚙: los pergaminos (o las pociones) del cinturón cuestan 0 No2. Peso 1,5.
+- **Desenvainar rápido (tahalí / vaina)** ⚙: equipar o cambiar de arma en combate cuesta 0 No2 una vez por turno (hoy 1). Peso 1.
+- **Pasamanos** ⚙: darle un consumible del cinturón a un aliado al lado cuesta 0 No2 (hoy es a mano). Peso 0,5.
+- **Brazo de lanzador** ✋: +N casilleros al tirar un consumible (bombas, frascos) o colocar una trampa consumible. Peso 0,5 por +1.
+- **Faja de cargador** ⚙: Carga +N (el cinturón reparte el peso; en las piernas no tenía sentido). Peso 0,25 por +1.
+- **Faja lumbar** ⚙: Res.CC solo contra empujes y derribos (como el Pie firme, desde el centro del cuerpo). Peso 0,5 por +1.
+- **Bolsa del carroñero** ⚙: +N despojos al despojar un creep. Peso 0,5 por +1.
+- **Cartuchera de trampero** ⚙: colocar una trampa consumible cuesta 1 No2 menos. Peso 1.
+- **Bolsillo secreto** ✋: un consumible escondido que no se ve en la ficha lite ni se puede robar (no hay robo todavía). En pausa.
+- **Cinturón de lastre** (contra): Iniciativa −1 o pesa más, para abaratar piezas con muchas ranuras.
+

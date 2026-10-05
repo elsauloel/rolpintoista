@@ -431,8 +431,8 @@ const CreepCalculo = (() => {
   /* El cinturón de un creep (dueño, 2026-10-04: «los creeps vienen por default con 5 ranuras de consumibles, aunque rara vez se usen»): la
      misma regla que un personaje — 1 ranura = 1 unidad, base 5 + las ranuras que le dé su equipo (capcinturon). */
   const BASE_CINTURON = 5;
-  // Pergaminos agrupados y ranuras exclusivas (2026-10-05): la cuenta común, Combatiente.ranurasCinturon.
-  const opcionesCinturon = sc => ({porPergamino: Math.max(1, Math.round(num(modTotal(sc, 'portapergaminos'))) || 1),
+  // Portapergaminos y ranuras exclusivas (2026-10-05): la cuenta común, Combatiente.ranurasCinturon.
+  const opcionesCinturon = sc => ({portapergaminos: num(modTotal(sc, 'portapergaminos')),
     excl: {pocion: num(modTotal(sc, 'ranurapocion')), pergamino: num(modTotal(sc, 'ranurapergamino')), trampa: num(modTotal(sc, 'ranuratrampa')), ankh: num(modTotal(sc, 'ranuraankh'))}});
   const cinturonUsado = sc => Combatiente.ranurasCinturon(sc.cinturon || [], opcionesCinturon(sc));
   const capCinturon = sc => BASE_CINTURON + num(modTotal(sc, 'capcinturon'));

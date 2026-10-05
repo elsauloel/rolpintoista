@@ -32,7 +32,9 @@ COSTO = {
     'boticario': 0.5,          # Mano de boticario: +1 a lo que cura una poción
     'vainas': 1, 'correas': 1,  # cada arma (o escudo) a mano, que se equipa sin No2
     'bolsilloext': 1, 'morral': 0.5,
-    'portapergaminos': 0, 'saquerapido': 0,   # especiales: ver costo_especial
+    'pasamanos': 0.75, 'alforja': 0.75,   # en combate (dueño, 2026-10-05): pasar del cinturón sin No2 / un aliado saca de tu mochila por 1
+    'portapergaminos': 0.4,   # por pergamino que entra en el Portapergaminos (dueño, 2026-10-05): apenas más que una ranura exclusiva
+    'saquerapido': 0,
     'parry': 1, 'bloqueo': 1,
     # Ofensivo en una pieza defensiva: con la escala de la calculadora de armas (se marca aparte).
     # PdG en una pieza defensiva (dueño, 2026-10-04, por ahora solo en guantes): espejo de la Evasión; contraataque y oportunidad, situacionales.
@@ -57,9 +59,7 @@ def costo_retirada(pct):
     return 4 if pct >= 100 else pct * 0.03
 # Las de chance (en %): (33 %, 50 %, siempre). Retirada limpia va aparte (por punto).
 COSTO_CHANCE = {'inamovible': (0.5, 0.75, 1.5), 'recuperarse': (0.5, 1, 2), 'reflejos': (1, 1.5, 2.5), 'saquerapido': (0.75, 1, 2)}
-# Portapergaminos: pergaminos de a 2 por ranura = 1, de a 3 = 2, de a 4 = 3 («pesa bastante por stack»).
 def costo_especial(stat, v):
-    if stat == 'portapergaminos': return max(0, v - 1) * 1.0
     return None
 def costo_chance(stat, pct):
     a, b, c = COSTO_CHANCE[stat]

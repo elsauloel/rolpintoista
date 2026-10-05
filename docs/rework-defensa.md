@@ -637,3 +637,10 @@ Calculadora: ranura de cinturón 0,5, de mochila 0,25; la mochila tiene bolsa pr
   usaban piezas de calidad Buena).
 - **Portapergaminos: en revisión** (dueño: «¿no es lo mismo que una ranura exclusiva de pergaminos?»): con pocos pergaminos, sí; la diferencia
   aparece con muchos. Afuera de la lista hasta decidir.
+
+**Decisiones del dueño (2026-10-05, cuarta vuelta: «tus propuestas me parecen bien»).**
+- **Portapergaminos = una ranura aparte del cinturón donde entran N pergaminos** (reemplaza a «agruparlos de a N por ranura»): `Combatiente.ranurasCinturon`
+  descuenta los primeros N pergaminos. Costo 0,4 por pergamino (apenas más que una ranura exclusiva, 0,375). En el Común entran 2 (con 3 se pasaba del
+  presupuesto): **Cinto portapergaminos**. El de 3, para calidad Buena.
+- **Pasamanos** (cinturón, 0,75) y **Alforja compartida** (mochila, 0,75): el dar en combate de P157. Comunes: **Faja de mandadero** y **Alforja de arriero**
+  (+2 ranuras). Quedan 12 cinturones y 10 mochilas Comunes, todos con un efecto propio.

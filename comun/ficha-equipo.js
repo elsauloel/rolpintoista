@@ -70,10 +70,10 @@ const FichaEquipo = (() => {
      el cinturón equipado —o, de manera excepcional, otra pieza— la amplía con «capcinturon». Con el cinturón lleno no entra nada más: lo que
      no entra se queda en la mochila. Todos los caminos que meten algo en el cinturón pasan por alCinturon. */
   const BASE_CINTURON = 5;
-  // Pergaminos agrupados y ranuras exclusivas (2026-10-05): la cuenta común, Combatiente.ranurasCinturon.
+  // Portapergaminos y ranuras exclusivas (2026-10-05): la cuenta común, Combatiente.ranurasCinturon.
   function opcionesCinturon(S){
     const f = FichaCalculo.calcular(S).final;
-    return {porPergamino: Math.max(1, Math.round(num(f.portapergaminos)) || 1),
+    return {portapergaminos: num(f.portapergaminos),
       excl: {pocion: num(f.ranurapocion), pergamino: num(f.ranurapergamino), trampa: num(f.ranuratrampa), ankh: num(f.ranuraankh)}};
   }
   const cinturonUsado = S => Combatiente.ranurasCinturon(S.cinturon || [], opcionesCinturon(S));

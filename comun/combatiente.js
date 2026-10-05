@@ -207,10 +207,10 @@ const Combatiente = (() => {
     return `${pct} % (${d.exitos > 1 ? (d.caras - d.exitos + 1) + '–' : ''}${d.caras} en d${d.caras})`;
   }
   const retiradaPct = chancePct, retiradaDado = chanceDado, retiradaTexto = chanceTexto;
-  /* Las ranuras del cinturón (dueño, 2026-10-04/05): 1 ranura = 1 unidad; los pergaminos se agrupan de a `porPergamino` por ranura
-     (Portapergaminos); las ranuras exclusivas (pociones, pergaminos, trampas, Ankh) se llenan primero con lo suyo. Igual para personajes y
+  /* Las ranuras del cinturón (dueño, 2026-10-04/05): 1 ranura = 1 unidad; el Portapergaminos es una ranura aparte donde entran
+     `portapergaminos` pergaminos (3 = entran 3; dueño, 2026-10-05: reemplaza a «agruparlos de a N por ranura»); las ranuras exclusivas (pociones, pergaminos, trampas, Ankh) se llenan primero con lo suyo. Igual para personajes y
      creeps. `ranurasCinturon(items, o)` → las ranuras COMUNES que ocupan; `entranEnCinturon(items, it, cuantas, cap, o)` → cuántas unidades de
-     `it` entran todavía. o = {porPergamino, excl: {pocion, pergamino, trampa, ankh}}. */
+     `it` entran todavía. o = {portapergaminos, excl: {pocion, pergamino, trampa, ankh}}. */
   function categoriaConsumible(it){
     const nom = String((it && it.nombre) || '').toLowerCase();
     if(it && it.trampaDatos) return 'trampa';
@@ -227,7 +227,7 @@ const Combatiente = (() => {
       const c = categoriaConsumible(it), u = it.consumible ? Math.max(0, n(it.unidades)) : 1;
       por[c] = (por[c] || 0) + u;
     });
-    if(por.pergamino) por.pergamino = Math.ceil(por.pergamino / Math.max(1, Math.round(n(o.porPergamino)) || 1));
+    if(por.pergamino) por.pergamino = Math.max(0, por.pergamino - Math.max(0, Math.round(n(o.portapergaminos))));   // los que van en el Portapergaminos
     const excl = o.excl || {};
     return Object.entries(por).reduce((a, [c, slots]) => a + Math.max(0, slots - Math.max(0, n(excl[c]))), 0);
   }

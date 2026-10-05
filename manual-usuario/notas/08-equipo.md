@@ -119,6 +119,7 @@ Los **consumibles** (pociones, pergaminos, vendas, bombas…) se gastan al usarl
 | En la **mochila** | **2** Nitros (el doble) |
 
 - Personajes y creeps arrancan con un **cinturón de 5 ranuras** (las invocaciones no llevan cinturón); un cinturón equipado lo amplía.
+- **Portapergaminos**: una ranura aparte, que no ocupa lugar del cinturón, donde entran N pergaminos (2 en el Común).
 - **1 ranura = 1 unidad**: 5 pociones ocupan las 5 ranuras. Con el cinturón lleno **no entra nada más**: lo que no entra se queda en la mochila.
 - Cada consumible viene en **unidades**; algunos tienen varias cargas.
 
@@ -147,7 +148,16 @@ estado: borrador
 2. Elegís a quién. **Hasta que acepte, el ítem queda reservado en tu mochila**: sigue ocupando su lugar y no se puede usar, equipar ni vender (el botón dice «🤝 Ofrecido a …»; tocándolo podés cancelar). El oro y los despojos se apartan al ofrecerlos.
 3. A quien lo recibe le aparece **«Fulano te ofrece X — Aceptar / Rechazar»** (en la ficha o en el mapa). Si acepta, va a su mochila (si no le entra, le avisa que haga lugar) y queda una línea en la Mesa. Si rechaza, vuelve a vos.
 
-**En combate** pasarle algo a otro va a costar [[Nitros (No2)|Nitros]] y solo a un aliado al lado (todavía no está hecho).
+**En combate** solo se le pasa un ítem a un **aliado al lado** (el mapa ofrece solo a los que están a un casillero), y cuesta [[Nitros (No2)|Nitros]]:
+
+| De dónde sale | Costo |
+|---|---|
+| Del **cinturón** | **1** No2 (**0** con *Pasamanos*) |
+| De la **mochila** | **2** No2 |
+
+Lo que llega va al **cinturón** de quien lo recibe si es un consumible y le entra. Si no lo acepta, el ítem vuelve pero los No2 no. Oro y despojos, solo fuera de combate.
+
+**Alforja compartida** (algunas mochilas): en combate, un aliado al lado puede **sacar él mismo** un consumible de tu mochila por **1** No2 (🤝 Pasar → «Sacar de la alforja de un aliado»). Se lo entrega tu pantalla sola, sin que tengas que hacer nada.
 
 +++
 titulo: Baúl común

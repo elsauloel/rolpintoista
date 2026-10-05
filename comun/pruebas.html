@@ -1883,14 +1883,14 @@ prueba('cinturón de un creep (2026-10-04): 5 ranuras, cargar (lleno no entra), 
     CreepAcciones.consumiblesDe([poc, {id: 'x', nombre: 'Espada', tipoItem: 'arma_1m'}]).map(c => c.id)],
     [true, true, [5, 5, 1, true], 16, 2, true, 4, true, true, ['cat-poc']]);
 });
-prueba('cinturón (2026-10-05): pergaminos agrupados (Portapergaminos) y ranuras exclusivas se llenan primero con lo suyo', () => {
+prueba('cinturón (2026-10-05): el Portapergaminos (una ranura aparte con N pergaminos) y las ranuras exclusivas se llenan primero con lo suyo', () => {
   const perg = n => ({nombre: 'Pergamino de fuego', consumible: true, unidades: n}), poc = n => ({nombre: 'Poción de vida', consumible: true, unidades: n, curahp: 5});
   const otro = n => ({nombre: 'Bomba de humo', consumible: true, unidades: n});
   const R = Combatiente.ranurasCinturon;
-  igual([R([perg(3), poc(2)], {}), R([perg(3), poc(2)], {porPergamino: 2}), R([perg(3), poc(2)], {excl: {pocion: 1}}), R([perg(4)], {porPergamino: 3, excl: {pergamino: 1}}),
+  igual([R([perg(3), poc(2)], {}), R([perg(3), poc(2)], {portapergaminos: 3}), R([perg(3), poc(2)], {excl: {pocion: 1}}), R([perg(5)], {portapergaminos: 3, excl: {pergamino: 1}}),
     Combatiente.entranEnCinturon([poc(4)], otro(1), 5, 5, {}), Combatiente.entranEnCinturon([poc(4)], poc(1), 5, 5, {excl: {pocion: 2}}),
     Combatiente.categoriaConsumible({nombre: 'Ankh de Reencarnación'}), Combatiente.categoriaConsumible({nombre: 'Cepo', trampaDatos: {}})],
-    [5, 4, 4, 1, 1, 3, 'ankh', 'trampa']);
+    [5, 2, 4, 1, 1, 3, 'ankh', 'trampa']);
 });
 prueba('vaina y correas (2026-10-05): un arma a mano se equipa sin No2 en combate y, si queda vaina, se guarda sin No2; sin vaina cuesta 1', () => {
   const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, nitros: 4, inventario: [
@@ -1948,10 +1948,10 @@ prueba('🤝 recibir (P157): un ítem llega a la mochila como copia nueva (sin r
     ['p1', 4, 2, false, false, false, true, 3]);
 });
 prueba('catálogo (dueño, 2026-10-05): cada cinturón y cada mochila Común tiene al menos un efecto propio de cinturón o mochila', () => {
-  const PROPIOS = ['capcinturon', 'capmochila', 'saquerapido', 'boticario', 'portapergaminos', 'ranurapocion', 'ranurapergamino', 'ranuratrampa', 'ranuraankh', 'vainas', 'correas', 'bolsilloext', 'morral', 'luz'];
+  const PROPIOS = ['capcinturon', 'capmochila', 'saquerapido', 'boticario', 'portapergaminos', 'ranurapocion', 'ranurapergamino', 'ranuratrampa', 'ranuraankh', 'vainas', 'correas', 'bolsilloext', 'morral', 'luz', 'pasamanos', 'alforja'];
   const L = CATALOGO_BASE.filter(i => (i.tipoItem === 'cinturon' || i.tipoItem === 'mochila') && i.tier === 'Común');
   const sin = L.filter(i => !(i.mods || []).some(m => PROPIOS.includes(m.stat))).map(i => i.nombre);
-  igual([L.filter(i => i.tipoItem === 'cinturon').length, L.filter(i => i.tipoItem === 'mochila').length, sin], [10, 9, []]);
+  igual([L.filter(i => i.tipoItem === 'cinturon').length, L.filter(i => i.tipoItem === 'mochila').length, sin], [12, 10, []]);
 });
 prueba('catálogo: las piernas Común (28) — ninguna pasa de Defensa 1, y las mecánicas nuevas están', () => {
   const L = CATALOGO_BASE.filter(i => i.tipoItem === 'piernas' && i.tier === 'Común');

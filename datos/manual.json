@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-10-05T11:01:10Z",
+ "actualizado": "2026-10-05T11:46:58Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1442,7 +1442,7 @@
    ],
    "estado": "borrador",
    "capitulo": "equipo",
-   "cuerpo": "Los **consumibles** (pociones, pergaminos, vendas, bombas…) se gastan al usarlos. Pueden **curar HP**, **aplicarte un estado** o dar un efecto especial.\n\n## Cinturón vs mochila\n| Dónde está | Costo de usarlo |\n|---|---|\n| En el **cinturón** | **1** [[Nitros (No2)\\|Nitro]] |\n| En la **mochila** | **2** Nitros (el doble) |\n\n- Personajes y creeps arrancan con un **cinturón de 5 ranuras** (las invocaciones no llevan cinturón); un cinturón equipado lo amplía.\n- **1 ranura = 1 unidad**: 5 pociones ocupan las 5 ranuras. Con el cinturón lleno **no entra nada más**: lo que no entra se queda en la mochila.\n- Cada consumible viene en **unidades**; algunos tienen varias cargas.\n\n> [!example] Efecto de un pergamino\n> *Pergamino de Buena Fortuna*: al usarlo se activa el estado [[Afortunado]] durante todo el combate. *Ankh de Reencarnación*: solo funciona si está **en el cinturón** cuando llegás a HP 0 ([[Muerte]]).\n\nVer también: [[Estados alterados]]."
+   "cuerpo": "Los **consumibles** (pociones, pergaminos, vendas, bombas…) se gastan al usarlos. Pueden **curar HP**, **aplicarte un estado** o dar un efecto especial.\n\n## Cinturón vs mochila\n| Dónde está | Costo de usarlo |\n|---|---|\n| En el **cinturón** | **1** [[Nitros (No2)\\|Nitro]] |\n| En la **mochila** | **2** Nitros (el doble) |\n\n- Personajes y creeps arrancan con un **cinturón de 5 ranuras** (las invocaciones no llevan cinturón); un cinturón equipado lo amplía.\n- **Portapergaminos**: una ranura aparte, que no ocupa lugar del cinturón, donde entran N pergaminos (2 en el Común).\n- **1 ranura = 1 unidad**: 5 pociones ocupan las 5 ranuras. Con el cinturón lleno **no entra nada más**: lo que no entra se queda en la mochila.\n- Cada consumible viene en **unidades**; algunos tienen varias cargas.\n\n> [!example] Efecto de un pergamino\n> *Pergamino de Buena Fortuna*: al usarlo se activa el estado [[Afortunado]] durante todo el combate. *Ankh de Reencarnación*: solo funciona si está **en el cinturón** cuando llegás a HP 0 ([[Muerte]]).\n\nVer también: [[Estados alterados]]."
   },
   {
    "id": "mochila",
@@ -1474,7 +1474,7 @@
    ],
    "estado": "borrador",
    "capitulo": "equipo",
-   "cuerpo": "**Fuera de combate** le podés pasar a cualquier personaje del grupo un ítem, parte de una pila (2 de tus 5 pociones), [[DDE]] o [[Despojos]]. Los jugadores deciden cuándo sí y cuándo no.\n\n1. En la mochila o el cinturón, el botón **🤝 Dar** del ítem (también en la ventana 🛡 Equipo del mapa). Para oro o despojos: **🤝 Pasar**, en la cabecera de la Mochila.\n2. Elegís a quién. **Hasta que acepte, el ítem queda reservado en tu mochila**: sigue ocupando su lugar y no se puede usar, equipar ni vender (el botón dice «🤝 Ofrecido a …»; tocándolo podés cancelar). El oro y los despojos se apartan al ofrecerlos.\n3. A quien lo recibe le aparece **«Fulano te ofrece X — Aceptar / Rechazar»** (en la ficha o en el mapa). Si acepta, va a su mochila (si no le entra, le avisa que haga lugar) y queda una línea en la Mesa. Si rechaza, vuelve a vos.\n\n**En combate** pasarle algo a otro va a costar [[Nitros (No2)|Nitros]] y solo a un aliado al lado (todavía no está hecho)."
+   "cuerpo": "**Fuera de combate** le podés pasar a cualquier personaje del grupo un ítem, parte de una pila (2 de tus 5 pociones), [[DDE]] o [[Despojos]]. Los jugadores deciden cuándo sí y cuándo no.\n\n1. En la mochila o el cinturón, el botón **🤝 Dar** del ítem (también en la ventana 🛡 Equipo del mapa). Para oro o despojos: **🤝 Pasar**, en la cabecera de la Mochila.\n2. Elegís a quién. **Hasta que acepte, el ítem queda reservado en tu mochila**: sigue ocupando su lugar y no se puede usar, equipar ni vender (el botón dice «🤝 Ofrecido a …»; tocándolo podés cancelar). El oro y los despojos se apartan al ofrecerlos.\n3. A quien lo recibe le aparece **«Fulano te ofrece X — Aceptar / Rechazar»** (en la ficha o en el mapa). Si acepta, va a su mochila (si no le entra, le avisa que haga lugar) y queda una línea en la Mesa. Si rechaza, vuelve a vos.\n\n**En combate** solo se le pasa un ítem a un **aliado al lado** (el mapa ofrece solo a los que están a un casillero), y cuesta [[Nitros (No2)|Nitros]]:\n\n| De dónde sale | Costo |\n|---|---|\n| Del **cinturón** | **1** No2 (**0** con *Pasamanos*) |\n| De la **mochila** | **2** No2 |\n\nLo que llega va al **cinturón** de quien lo recibe si es un consumible y le entra. Si no lo acepta, el ítem vuelve pero los No2 no. Oro y despojos, solo fuera de combate.\n\n**Alforja compartida** (algunas mochilas): en combate, un aliado al lado puede **sacar él mismo** un consumible de tu mochila por **1** No2 (🤝 Pasar → «Sacar de la alforja de un aliado»). Se lo entrega tu pantalla sola, sin que tengas que hacer nada."
   },
   {
    "id": "baul-comun",

@@ -85,7 +85,7 @@ const FichaCalculo = (() => {
     // Cinturón y mochila (2026-10-05, dueño).
     {id:'saquerapido', label:'Saque rápido (%)', full:'Chance (en %) de que el primer consumible del turno sacado del cinturón no cueste No2: 50 = 4–6 en d6, 100 = siempre'},
     {id:'boticario', label:'Mano de boticario', full:'Lo que suma a la curación de cada poción'},
-    {id:'portapergaminos', label:'Portapergaminos', full:'Cuántos pergaminos entran en cada ranura del cinturón (2, 3…)'},
+    {id:'portapergaminos', label:'Portapergaminos', full:'Portapergaminos: una ranura aparte del cinturón donde entran N pergaminos'},
     {id:'ranurapocion', label:'Ranuras para pociones', full:'Ranuras del cinturón solo para pociones'},
     {id:'ranurapergamino', label:'Ranuras para pergaminos', full:'Ranuras del cinturón solo para pergaminos'},
     {id:'ranuratrampa', label:'Ranuras para trampas', full:'Ranuras del cinturón solo para trampas'},
@@ -94,6 +94,8 @@ const FichaCalculo = (() => {
     {id:'correas', label:'Correas laterales', full:'Armas o escudos colgados de la mochila: se equipan o se guardan sin gastar No2'},
     {id:'bolsilloext', label:'Bolsillo exterior', full:'El primer consumible del turno sacado de la mochila cuesta 1 No2 en vez de 2'},
     {id:'morral', label:'Morral de cazador', full:'Los trofeos no ocupan ranuras de la mochila'},
+    {id:'pasamanos', label:'Pasamanos', full:'En combate, pasarle a un aliado al lado algo del cinturón no cuesta No2'},
+    {id:'alforja', label:'Alforja compartida', full:'En combate, un aliado al lado puede sacar un consumible de tu mochila por 1 No2'},
     {id:'retirada', label:'Retirada limpia (%)', full:'Chance (en %) de alejarte de un rival sin darle ataque de oportunidad: 33 = 5–6 en d6, 50 = 4–6, 100 = siempre'},
     // Resistencias elementales (2026-10-04, dueño): cada una se resta al daño de su elemento (además de la Armadura mágica). Situacionales: pesan poco.
     {id:'resfuego', label:'Res. fuego', full:'Resistencia al fuego: se resta a todo daño de fuego'},

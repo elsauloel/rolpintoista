@@ -17,10 +17,15 @@
       baul/dde {tipo: 'dde', cantidad}; los despojos en baul/desp-<tipo> {tipo: 'despojos', despojo, despojoNombre, cantidad}.
       Cada movimiento queda en el registro (campanas/<id>/baulLog, «para que nadie se haga el vivo sin que nadie más se entere»)
       y en la Mesa.
+   3) En combate (dueño, 2026-10-05): solo a un aliado al lado y solo ítems; cuesta 1 No2 si sale del cinturón (0 con Pasamanos) y 2 si sale de
+      la mochila; lo que llega va al cinturón si entra. Alforja compartida: un aliado al lado le saca a quien la tiene un consumible de la
+      mochila por 1 No2 (paquete `tipo: 'pedido'`: lo pide quien lo saca, la pantalla del dueño de la alforja lo entrega sola y quien lo pidió lo
+      recibe y paga).
    La pantalla («host») le dice a esta pieza cómo tocar a un personaje — Intercambio.iniciar(host):
      host = {maneja(fichaId) → ¿esta pantalla lo maneja?, leer(fichaId) → S o null (para dibujar),
              con(fichaId, async S => bool) → cambia al personaje y lo guarda (true = cambió),
-             enCombate() → bool, tienda() → la tienda abierta o null, toast(t)}
+             enCombate() → bool, tienda() → la tienda abierta o null, toast(t), propias() → los personajes que maneja,
+             adyacentes?(fichaId) → los ids de los personajes al lado de su token (sin esto, en combate se ofrecen todos con un aviso)}
    Ventanas: abrirDar(fichaId, {itemId}) (sin itemId: DDE y despojos, y lo que ya ofreciste), abrirBaul(fichaId).
    Para el resto: reservado(it), botonDar(it) (el botón de la mochila).
    ========================================================= */
@@ -118,10 +123,29 @@ const Intercambio = (() => {
     return false;
   }
 
+  /* ---------- En combate: el costo en No2 ---------- */
+  const finalDe = S => { try{ return FichaCalculo.calcular(S).final; }catch(e){ return {}; } };
+  // Pasarlo en combate: 1 desde el cinturón (0 con Pasamanos), 2 desde la mochila.
+  const costoCombate = (S, key) => key === 'cinturon' ? (num(finalDe(S).pasamanos) > 0 ? 0 : 1) : 2;
+  const COSTO_ALFORJA = 1;
+  // Paga `costo` No2: si no alcanzan, pregunta (se puede igual, con la línea roja de la Mesa). → false si no quiso.
+  function pagarNitros(S, costo, hizo, sinPreguntar){
+    if(!(costo > 0)) return true;
+    if(num(S.nitros) < costo){
+      if(!sinPreguntar && !window.confirm(`Cuesta ${fmt(costo)} No2 y tenés ${fmt(num(S.nitros))}. ¿Hacerlo igual?`)) return false;
+      const pagado = typeof FichaAcciones !== 'undefined' && FichaAcciones.gastoNitrosForzado ? FichaAcciones.gastoNitrosForzado(S, costo, hizo) : num(S.nitros);
+      S.nitros = Math.max(0, num(S.nitros) - pagado);
+      return true;
+    }
+    S.nitros = num(S.nitros) - costo;
+    return true;
+  }
+
   /* ---------- Ofrecer, aceptar, rechazar, cancelar ---------- */
   const paqueteTxt = p => p.tipo === 'item' ? `${p.nombre}${num(p.cantidad) > 1 ? ` ×${fmt(num(p.cantidad))}` : ''}` : p.nombre;
   // que = {tipo: 'item', itemId, unidades} | {tipo: 'dde', cantidad} | {tipo: 'despojos', despojo, despojoNombre, cantidad}; para = {id, nombre, duenoUid}
   async function ofrecer(S, deFicha, que, para){
+    if(host && host.enCombate() && que.tipo !== 'item') return 'En combate solo se pasan ítems';
     const base = {deFicha, deNombre: nombreDe(S), paraFicha: para.id, paraNombre: String(para.nombre || '').slice(0, 60), creadoPor: fbUsuario.uid,
       uids: [...new Set([fbUsuario.uid, (fichas.find(f => f.id === deFicha) || {}).duenoUid || fbUsuario.uid, para.duenoUid || ''].filter(Boolean))],
       estado: 'pendiente', resolvio: '', itemId: '', json: '', cantidad: 0, despojo: '', despojoNombre: '', creado: ts()};
@@ -134,7 +158,13 @@ const Intercambio = (() => {
       const total = num(f.it.unidades) || 1, k = f.it.consumible ? Math.max(1, Math.min(total, Math.round(num(que.unidades) || total))) : total;
       const json = JSON.stringify(copia(f.it, f.it.consumible ? k : undefined));
       if(json.length > 200000) return 'El ítem es demasiado grande para mandarlo';
-      await ref.set({...base, tipo: 'item', nombre: String(f.it.nombre || '').slice(0, 80), json, cantidad: f.it.consumible ? k : 1});
+      const combate = !!(host && host.enCombate());
+      const costo = combate ? costoCombate(S, f.key) : 0;
+      if(combate && !pagarNitros(S, costo, `le pasó ${f.it.nombre} a ${base.paraNombre}`)) return 'cancelado';
+      try{ await ref.set({...base, tipo: 'item', nombre: String(f.it.nombre || '').slice(0, 80), json, cantidad: f.it.consumible ? k : 1}); }
+      catch(err){ S.nitros = num(S.nitros) + costo; throw err; }
+      if(combate && typeof mesaLinea === 'function')
+        mesaLinea(`🤝 ${base.deNombre} le pasa ${f.it.nombre}${k > 1 ? ' ×' + fmt(k) : ''} a ${base.paraNombre} (${f.key === 'cinturon' ? 'del cinturón' : 'de la mochila'} · ${costo ? '−' + fmt(costo) + ' No2' : 'sin No2: Pasamanos'})`);
       const parte = separar(S, f, k);
       parte.reservado = ref.id; parte.reservadoPara = base.paraNombre;
       return null;
@@ -160,7 +190,16 @@ const Intercambio = (() => {
     const r = despojo(S, p.despojo, p.despojoNombre); r.set(r.get() + num(p.cantidad)); return true;
   }
   function recibir(S, p){
-    if(p.tipo === 'item'){ let it = null; try{ it = JSON.parse(p.json || 'null'); }catch(e){} if(it) aMochila(S, it); return; }
+    if(p.tipo === 'item' || p.tipo === 'pedido'){
+      let it = null; try{ it = JSON.parse(p.json || 'null'); }catch(e){}
+      if(!it) return '';
+      const nuevo = aMochila(S, it);
+      if(host && host.enCombate() && nuevo.consumible && typeof FichaEquipo !== 'undefined'){   // en combate, al cinturón si entra
+        const r = FichaEquipo.alCinturon(S, nuevo, num(it.unidades) || 1);
+        if(r.movidas) return ' (al cinturón)';
+      }
+      return '';
+    }
     if(p.tipo === 'dde'){ sumarDde(S, num(p.cantidad)); return; }
     const r = despojo(S, p.despojo, p.despojoNombre); r.set(r.get() + num(p.cantidad));
   }
@@ -183,8 +222,8 @@ const Intercambio = (() => {
         });
       }catch(err){ console.error('No se pudo aceptar:', err); host.toast('No se pudo aceptar' + errTxt(err)); return false; }
       if(!ok){ host.toast(`${paqueteTxt(p)}: ya no está (lo cancelaron)`); return false; }
-      recibir(S, p);
-      host.toast(`🤝 ${paqueteTxt(p)} → ${p.paraNombre}`);
+      const donde = recibir(S, p) || '';
+      host.toast(`🤝 ${paqueteTxt(p)} → ${p.paraNombre}${donde}`);
       if(typeof mesaLinea === 'function') mesaLinea(`🤝 ${p.deNombre} le pasó ${paqueteTxt(p)} a ${p.paraNombre}`, 'recompensa');
       return true;
     });
@@ -221,7 +260,7 @@ const Intercambio = (() => {
   const reconciliando = new Set();
   async function reconciliar(fichaId){
     if(!host || reconciliando.has(fichaId)) return;
-    const respondidos = paquetes.filter(p => p.deFicha === fichaId && p.estado !== 'pendiente');
+    const respondidos = paquetes.filter(p => p.tipo !== 'pedido' && p.deFicha === fichaId && p.estado !== 'pendiente');
     const S0 = host.leer(fichaId);
     const sueltas = !S0 ? [] : desdeServidor ? ['inventario', 'cinturon'].flatMap(k => (S0[k] || []).filter(it => it && it.reservado && !paquetes.some(p => p.id === it.reservado))) : [];
     if(!respondidos.length && !sueltas.length) return;
@@ -254,6 +293,64 @@ const Intercambio = (() => {
         return hubo;
       });
     }finally{ reconciliando.delete(fichaId); }
+  }
+
+  /* ---------- 🎒 Alforja compartida (en combate): un aliado al lado saca un consumible de tu mochila por 1 No2 ----------
+     pedirAlforja: quien saca deja el pedido. pedidos(fichaId): la pantalla del dueño de la alforja lo entrega sola (saca la unidad y la manda en
+     el json) o lo rechaza; la de quien lo pidió lo recibe, paga y lo anuncia. */
+  async function pedirAlforja(S, miFicha, aliado, it){
+    if(num(S.nitros) < COSTO_ALFORJA && !window.confirm(`Cuesta ${fmt(COSTO_ALFORJA)} No2 y tenés ${fmt(num(S.nitros))}. ¿Hacerlo igual?`)) return 'cancelado';
+    await col('paquetes').add({tipo: 'pedido', nombre: String(it.nombre || '').slice(0, 80), json: '', itemId: it.id, cantidad: 1, despojo: '', despojoNombre: '',
+      deFicha: aliado.id, deNombre: String(aliado.nombre || '').slice(0, 60), paraFicha: miFicha, paraNombre: nombreDe(S), creadoPor: fbUsuario.uid,
+      uids: [...new Set([fbUsuario.uid, aliado.duenoUid || '', (fichas.find(f => f.id === miFicha) || {}).duenoUid || ''].filter(Boolean))],
+      estado: 'pendiente', resolvio: '', creado: ts()});
+    return null;
+  }
+  const pidiendo = new Set();
+  async function pedidos(fichaId){
+    if(pidiendo.has(fichaId)) return;
+    const entregar = paquetes.filter(p => p.tipo === 'pedido' && p.estado === 'pendiente' && p.deFicha === fichaId);
+    const recibirlos = paquetes.filter(p => p.tipo === 'pedido' && p.estado !== 'pendiente' && p.paraFicha === fichaId);
+    if(!entregar.length && !recibirlos.length) return;
+    pidiendo.add(fichaId);
+    try{
+      await host.con(fichaId, async S => {
+        let hubo = false;
+        for(const p of entregar){   // soy el dueño de la alforja: la entrego sola (o digo que no se puede)
+          const it = (S.inventario || []).find(x => x && x.id === p.itemId && x.consumible && !reservado(x) && num(x.unidades) > 0);
+          const ok = !!it && num(finalDe(S).alforja) > 0;
+          const ref = col('paquetes').doc(p.id);
+          let hecho = false;
+          try{
+            hecho = await fbDb.runTransaction(async tx => {
+              const d = await tx.get(ref);
+              if(!d.exists || d.data().estado !== 'pendiente') return false;
+              tx.update(ref, ok ? {estado: 'aceptado', resolvio: fbUsuario.uid, json: JSON.stringify(copia(it, 1))} : {estado: 'rechazado', resolvio: fbUsuario.uid});
+              return true;
+            });
+          }catch(err){ console.error('No se pudo entregar de la alforja:', err); continue; }
+          if(!hecho || !ok) continue;
+          it.unidades = num(it.unidades) - 1;
+          if(it.unidades <= 0) S.inventario = S.inventario.filter(x => x !== it);
+          host.toast(`🎒 ${p.paraNombre} sacó ${it.nombre} de la alforja de ${p.deNombre}`);
+          hubo = true;
+        }
+        for(const p of recibirlos){   // lo pedí yo: lo recibo y pago
+          const ref = col('paquetes').doc(p.id);
+          let ok = false;
+          try{ ok = await fbDb.runTransaction(async tx => { const d = await tx.get(ref); if(!d.exists) return false; tx.delete(ref); return true; }); }
+          catch(err){ console.error('No se pudo cerrar el pedido:', err); continue; }
+          if(!ok) continue;
+          if(p.estado !== 'aceptado'){ host.toast(`🎒 ${p.nombre}: ya no está en la alforja de ${p.deNombre}`); continue; }
+          pagarNitros(S, COSTO_ALFORJA, `sacó ${p.nombre} de la alforja de ${p.deNombre}`, true);
+          const donde = recibir(S, p) || '';
+          host.toast(`🎒 ${p.nombre} → ${p.paraNombre}${donde}`);
+          if(typeof mesaLinea === 'function') mesaLinea(`🎒 ${p.paraNombre} sacó ${p.nombre} de la alforja de ${p.deNombre} (−${fmt(COSTO_ALFORJA)} No2)`);
+          hubo = true;
+        }
+        return hubo;
+      });
+    }finally{ pidiendo.delete(fichaId); }
   }
 
   /* ---------- Lo que quedó de la vieja mesa común ----------
@@ -302,15 +399,15 @@ const Intercambio = (() => {
   }
   function revisar(){
     if(!host) return;
-    const ids = new Set([...paquetes.map(p => p.deFicha), ...((host.propias && host.propias()) || [])]);
-    ids.forEach(id => { if(id && host.maneja(id)){ reconciliar(id); if(desdeServidor) legadoMesaComun(id); } });
+    const ids = new Set([...paquetes.map(p => p.deFicha), ...paquetes.filter(p => p.tipo === 'pedido').map(p => p.paraFicha), ...((host.propias && host.propias()) || [])]);
+    ids.forEach(id => { if(id && host.maneja(id)){ reconciliar(id); pedidos(id); if(desdeServidor) legadoMesaComun(id); } });
     mostrarPendientes();
     if(abierta && abierta.tipo === 'dar') dibujarDar();
   }
   // El cartel de lo que te ofrecen, uno por vez.
   let cartel = null;
   function mostrarPendientes(){
-    const p = paquetes.find(x => x.estado === 'pendiente' && host.maneja(x.paraFicha));
+    const p = paquetes.find(x => x.tipo !== 'pedido' && x.estado === 'pendiente' && host.maneja(x.paraFicha));
     if(!p){ if(cartel){ cartel.remove(); cartel = null; } return; }
     if(cartel && cartel.dataset.id === p.id) return;
     estilos();
@@ -398,11 +495,30 @@ const Intercambio = (() => {
     o = o || {};
     abierta = null;
     const el = marco('🤝 Pasarle algo a otro personaje');
-    abierta = {tipo: 'dar', fichaId, itemId: o.itemId || '', el};
+    abierta = {tipo: 'dar', fichaId, itemId: o.itemId || '', el, alforjas: []};
     el.addEventListener('click', ev => clicDar(ev));
     dibujarDar();
+    if(!o.itemId) cargarAlforjas(fichaId);
   }
-  function destinos(fichaId){ return fichas.filter(f => f.id !== fichaId).sort((a, b) => a.nombre.localeCompare(b.nombre)); }
+  // A quién: fuera de combate, a cualquiera; en combate, solo a los aliados al lado (si la pantalla sabe quiénes son).
+  function destinos(fichaId){
+    let L = fichas.filter(f => f.id !== fichaId);
+    if(host.enCombate() && host.adyacentes){ const ady = new Set(host.adyacentes(fichaId) || []); L = L.filter(f => ady.has(f.id)); }
+    return L.sort((a, b) => a.nombre.localeCompare(b.nombre));
+  }
+  // 🎒 Alforja compartida: lo que se puede sacar de la mochila de los aliados al lado que la tienen (se leen al abrir la ventana).
+  async function cargarAlforjas(fichaId){
+    if(!abierta || !host.enCombate() || typeof FichaGuardado === 'undefined') return;
+    const lista = [];
+    for(const a of destinos(fichaId)){
+      try{
+        const r = await FichaGuardado.cargar(fbDb, fbRutaCampana(`fichas/${a.id}`));
+        if(!r || !r.S || !(num(finalDe(r.S).alforja) > 0)) continue;
+        lista.push({aliado: a, items: (r.S.inventario || []).filter(it => it && it.consumible && !it.equipado && !reservado(it) && num(it.unidades) > 0)});
+      }catch(e){}
+    }
+    if(abierta && abierta.tipo === 'dar' && abierta.fichaId === fichaId){ abierta.alforjas = lista; dibujarDar(); }
+  }
   function dibujarDar(){
     if(!abierta || abierta.tipo !== 'dar') return;
     const {fichaId, el} = abierta, S = host.leer(fichaId), cuerpo = el.querySelector('.ix-cuerpo');
@@ -411,32 +527,39 @@ const Intercambio = (() => {
     const f = abierta.itemId ? buscar(S, abierta.itemId) : null;
     const combate = host.enCombate();
     const dest = destinos(fichaId);
-    const opcDest = dest.length ? dest.map(d => `<option value="${esc(d.id)}">${esc(d.nombre)}</option>`).join('') : '<option value="">(no hay otros personajes)</option>';
-    const mios = paquetes.filter(p => p.deFicha === fichaId && p.estado === 'pendiente');
+    const opcDest = dest.length ? dest.map(d => `<option value="${esc(d.id)}">${esc(d.nombre)}</option>`).join('')
+      : `<option value="">${combate ? '(no hay ningún aliado al lado)' : '(no hay otros personajes)'}</option>`;
+    const mios = paquetes.filter(p => p.tipo !== 'pedido' && p.deFicha === fichaId && p.estado === 'pendiente');
     const desp = despojosDe(S);
     const propios = ['inventario', 'cinturon'].flatMap(key => (S[key] || []).filter(it => it && !it.equipado && !reservado(it) && (!it.consumible || num(it.unidades) > 0)).map(it => ({it, key})));
+    const costoTxt = key => { if(!combate) return ''; const c = costoCombate(S, key); return c ? ` (${fmt(c)} No2)` : ' (0 No2: Pasamanos)'; };
+    const sinDest = !dest.length ? ' disabled' : '';
     let que = '';
     if(abierta.itemId){
       if(!f) que = '<div class="ix-paso"><p>Ese ítem ya no está.</p></div>';
       else{
         const total = num(f.it.unidades) || 1;
-        que = `<div class="ix-paso"><h4>Qué</h4><p class="ix-grande">🎒 ${esc(f.it.nombre)}</p><p class="ix-hint">${esc(textoItem(f.it))}</p>
+        que = `<div class="ix-paso"><h4>Qué</h4><p class="ix-grande">${f.key === 'cinturon' ? '🧷' : '🎒'} ${esc(f.it.nombre)}</p><p class="ix-hint">${esc(textoItem(f.it))}</p>
           ${f.it.consumible && total > 1 ? `<p>Cuántas: <input id="ix-u" type="number" min="1" max="${total}" step="1" value="${esc(previo.u || total)}"> <span class="ix-hint">de ${fmt(total)}</span></p>` : ''}
           ${f.it.equipado ? '<p class="ix-aviso">Está equipado: sacalo a la mochila primero.</p>' : reservado(f.it) ? `<p class="ix-aviso">Ya se lo ofreciste a ${esc(f.it.reservadoPara || 'alguien')}.</p>` : ''}</div>`;
       }
     }
+    const alforjas = (abierta.alforjas || []).filter(a => a.items.length);
     cuerpo.innerHTML = `
-      ${combate ? '<div class="ix-aviso">⚔ En combate no se pasan cosas así: en combate cuesta No2 y solo a un aliado al lado (todavía no está hecho).</div>' : ''}
+      ${combate ? `<div class="ix-aviso">⚔ En combate: solo a un aliado al lado${host.adyacentes ? '' : ' (fijate en el mapa)'} y solo ítems. Cuesta 1 No2 si sale del cinturón (0 con Pasamanos) y 2 si sale de la mochila; si es un consumible y le entra, le llega al cinturón.</div>` : ''}
       ${que}
       <div class="ix-paso"><h4>A quién</h4><p><select id="ix-dest">${opcDest}</select></p>
-        <p class="ix-hint">Le llega un aviso para aceptarlo o rechazarlo. Hasta que acepte, ${abierta.itemId ? 'el ítem queda reservado en tu mochila (sigue ocupando lugar y no se puede usar)' : 'un ítem queda reservado en tu mochila (ocupa su lugar y no se usa) y el oro o los despojos quedan apartados; si no lo acepta, vuelve'}.</p></div>
-      ${abierta.itemId ? (f && !f.it.equipado && !reservado(f.it) ? `<div class="ix-pie"><button type="button" data-ix-dar-item${combate || !dest.length ? ' disabled' : ''}>🤝 Ofrecérselo</button></div>` : '') : `
-      <div class="ix-paso"><h4>Oro y despojos</h4>
-        <div class="ix-fila"><span class="ix-q">💰 DDE <span class="ix-hint">(tenés ${fmt(num(S.meta.dde))})</span></span><input id="ix-dde" type="number" min="0" step="1" value="${esc(previo.dde)}"><button type="button" data-ix-dar-dde${combate || !dest.length ? ' disabled' : ''}>Ofrecer</button></div>
-        <div class="ix-fila"><span class="ix-q">🦴 Despojos <select id="ix-dt">${desp.map(d => `<option value="${esc(d.tipo === 'especial' ? 'esp:' + d.nombre : d.tipo)}">${esc(d.tipo === 'especial' ? d.nombre : DESP_TXT[d.tipo])} (${fmt(d.n)})</option>`).join('') || '<option value="">(no tenés)</option>'}</select></span><input id="ix-dn" type="number" min="0" step="1" value="${esc(previo.dn)}"><button type="button" data-ix-dar-desp${combate || !dest.length || !desp.length ? ' disabled' : ''}>Ofrecer</button></div>
-      </div>
+        <p class="ix-hint">Le llega un aviso para aceptarlo o rechazarlo. Hasta que acepte, ${abierta.itemId || combate ? 'el ítem queda reservado (sigue ocupando lugar y no se puede usar)' : 'un ítem queda reservado en tu mochila (ocupa su lugar y no se usa) y el oro o los despojos quedan apartados'}; si no lo acepta, vuelve${combate ? ' (los No2, no)' : ''}.</p></div>
+      ${abierta.itemId ? (f && !f.it.equipado && !reservado(f.it) ? `<div class="ix-pie"><button type="button" data-ix-dar-item${sinDest}>🤝 Ofrecérselo${costoTxt(f.key)}</button></div>` : '') : `
+      ${combate ? '' : `<div class="ix-paso"><h4>Oro y despojos</h4>
+        <div class="ix-fila"><span class="ix-q">💰 DDE <span class="ix-hint">(tenés ${fmt(num(S.meta.dde))})</span></span><input id="ix-dde" type="number" min="0" step="1" value="${esc(previo.dde)}"><button type="button" data-ix-dar-dde${sinDest}>Ofrecer</button></div>
+        <div class="ix-fila"><span class="ix-q">🦴 Despojos <select id="ix-dt">${desp.map(d => `<option value="${esc(d.tipo === 'especial' ? 'esp:' + d.nombre : d.tipo)}">${esc(d.tipo === 'especial' ? d.nombre : DESP_TXT[d.tipo])} (${fmt(d.n)})</option>`).join('') || '<option value="">(no tenés)</option>'}</select></span><input id="ix-dn" type="number" min="0" step="1" value="${esc(previo.dn)}"><button type="button" data-ix-dar-desp${sinDest || (!desp.length ? ' disabled' : '')}>Ofrecer</button></div>
+      </div>`}
       <div class="ix-paso"><h4>Ítems de tu mochila y tu cinturón</h4>
-        ${propios.length ? propios.map(({it, key}) => `<div class="ix-fila"><span class="ix-q" title="${esc(textoItem(it))}">${key === 'cinturon' ? '🧷' : '🎒'} ${esc(it.nombre)}${num(it.unidades) > 1 ? ` <span class="ix-hint">(tenés ${fmt(num(it.unidades))})</span>` : ''}</span>${it.consumible && num(it.unidades) > 1 ? `<input data-ix-u="${esc(it.id)}" type="number" min="1" max="${fmt(num(it.unidades))}" step="1" value="1">` : ''}<button type="button" data-ix-dar-este="${esc(it.id)}"${combate || !dest.length ? ' disabled' : ''}>Ofrecer</button></div>`).join('') : '<p class="ix-hint">No hay nada para ofrecer (lo equipado o lo ya ofrecido no cuenta).</p>'}</div>`}
+        ${propios.length ? propios.map(({it, key}) => `<div class="ix-fila"><span class="ix-q" title="${esc(textoItem(it))}">${key === 'cinturon' ? '🧷' : '🎒'} ${esc(it.nombre)}${num(it.unidades) > 1 ? ` <span class="ix-hint">(tenés ${fmt(num(it.unidades))})</span>` : ''}</span>${it.consumible && num(it.unidades) > 1 ? `<input data-ix-u="${esc(it.id)}" type="number" min="1" max="${fmt(num(it.unidades))}" step="1" value="1">` : ''}<button type="button" data-ix-dar-este="${esc(it.id)}"${sinDest}>Ofrecer${costoTxt(key)}</button></div>`).join('') : '<p class="ix-hint">No hay nada para ofrecer (lo equipado o lo ya ofrecido no cuenta).</p>'}</div>`}
+      ${combate && alforjas.length ? `<div class="ix-paso"><h4>🎒 Sacar de la alforja de un aliado (${fmt(COSTO_ALFORJA)} No2)</h4>
+        ${alforjas.map(a => a.items.map(it => `<div class="ix-fila"><span class="ix-q">${esc(it.nombre)} <span class="ix-hint">· de ${esc(a.aliado.nombre)} (tiene ${fmt(num(it.unidades))})</span></span><button type="button" data-ix-alforja="${esc(a.aliado.id)}|${esc(it.id)}">Sacar 1</button></div>`).join('')).join('')}
+        <p class="ix-hint">Con Alforja compartida, un aliado al lado saca él mismo un consumible de tu mochila. Llega a tu cinturón si entra.</p></div>` : ''}
       ${mios.length ? `<div class="ix-paso"><h4>Lo que ofreciste y espera respuesta</h4>${mios.map(p => `<div class="ix-fila"><span class="ix-q">${esc(paqueteTxt(p))} → <b>${esc(p.paraNombre)}</b></span><button type="button" class="sec" data-ix-cancelar="${esc(p.id)}">Cancelar</button></div>`).join('')}</div>` : ''}`;
     const sel = el.querySelector('#ix-dest'); if(sel && previo.dest && [...sel.options].some(x => x.value === previo.dest)) sel.value = previo.dest;
     const dt = el.querySelector('#ix-dt'); if(dt && previo.dt && [...dt.options].some(x => x.value === previo.dt)) dt.value = previo.dt;
@@ -446,6 +569,18 @@ const Intercambio = (() => {
     if(!b || b.disabled || !abierta) return;
     const {fichaId, el} = abierta;
     if(b.dataset.ixCancelar){ const p = paquetes.find(x => x.id === b.dataset.ixCancelar); if(p) await cancelar(p); dibujarDar(); return; }
+    if(b.dataset.ixAlforja){
+      const [aliadoId, itemId] = b.dataset.ixAlforja.split('|');
+      const a = (abierta.alforjas || []).find(x => x.aliado.id === aliadoId), it = a && a.items.find(x => x.id === itemId);
+      if(!a || !it) return;
+      b.disabled = true;
+      let error = null;
+      await hacer(fichaId, async S => { error = await pedirAlforja(S, fichaId, a.aliado, it); return false; });
+      if(error && error !== 'cancelado') host.toast(error);
+      else if(!error){ host.toast(`🎒 Le pediste ${it.nombre} a la alforja de ${a.aliado.nombre}: llega en un momento`); it.unidades = num(it.unidades) - 1; a.items = a.items.filter(x => num(x.unidades) > 0); dibujarDar(); }
+      b.disabled = false;
+      return;
+    }
     const para = fichas.find(f => f.id === valor(el, '#ix-dest'));
     let que = null;
     if(b.hasAttribute('data-ix-dar-item')) que = {tipo: 'item', itemId: abierta.itemId, unidades: valor(el, '#ix-u')};
@@ -453,13 +588,12 @@ const Intercambio = (() => {
     else if(b.hasAttribute('data-ix-dar-dde')) que = {tipo: 'dde', cantidad: valor(el, '#ix-dde')};
     else if(b.hasAttribute('data-ix-dar-desp')){ const v = valor(el, '#ix-dt'); que = {tipo: 'despojos', despojo: v.startsWith('esp:') ? 'especial' : v, despojoNombre: v.startsWith('esp:') ? v.slice(4) : '', cantidad: valor(el, '#ix-dn')}; }
     if(!que) return;
-    if(host.enCombate()){ host.toast('En combate no: fuera de combate'); return; }
-    if(!para){ host.toast('Elegí a quién'); return; }
+    if(!para){ host.toast(host.enCombate() ? 'En combate, solo a un aliado al lado' : 'Elegí a quién'); return; }
     b.disabled = true;
     let error = null;
     const hubo = await hacer(fichaId, async S => { error = await ofrecer(S, fichaId, que, para); return !error; });
     b.disabled = false;
-    if(error){ host.toast(error); return; }
+    if(error){ if(error !== 'cancelado') host.toast(error); return; }
     if(hubo){
       host.toast(`🤝 Se lo ofreciste a ${para.nombre}: le llega un aviso para aceptarlo`);
       if(abierta.itemId) cerrar(); else{ ['#ix-dde', '#ix-dn'].forEach(s => { const x = el.querySelector(s); if(x) x.value = ''; }); dibujarDar(); }
@@ -469,6 +603,7 @@ const Intercambio = (() => {
   /* — 📦 El baúl común — */
   let baul = [], baulLog = [];
   const capacidad = () => POR_INTEGRANTE * Math.max(1, fichas.length);
+  const enBaul = it => Math.max(1, E().ranuras(it));   // en el baúl todo ocupa al menos 1 ranura (en el catálogo hay armas y piezas con 0: P158)
   const baulUsado = () => baul.filter(x => x.tipo === 'item').reduce((a, x) => a + Math.max(0, num(x.ranuras)), 0);
   function abrirBaul(fichaId){
     if(!host) return;
@@ -505,7 +640,7 @@ const Intercambio = (() => {
         ${desps.map(x => `<div class="ix-fila"><span class="ix-q">🦴 ${fmt(num(x.cantidad))} despojos ${esc(despTxt(x.despojo, x.despojoNombre))}</span><input data-ix-sdn="${esc(x.id)}" type="number" min="0" step="1" value=""><button type="button" data-ix-sacar-desp="${esc(x.id)}">Sacar</button></div>`).join('')}
       </div>
       <div class="ix-paso"><h4>Guardar de tu mochila <span class="ix-hint">(${fmt(usM)}${capM > 0 ? ' / ' + fmt(capM) : ''} ranuras)</span></h4>
-        ${propios.length ? propios.map(it => `<div class="ix-fila"><span class="ix-q" title="${esc(textoItem(it))}">${esc(it.nombre)}${num(it.unidades) > 1 ? ` ×${fmt(num(it.unidades))}` : ''} <span class="ix-hint">· ${fmt(E().ranuras(it))} ranura${E().ranuras(it) === 1 ? '' : 's'}</span></span><button type="button" data-ix-guardar="${esc(it.id)}"${usado + E().ranuras(it) > cap ? ' disabled title="El baúl está lleno"' : ''}>Guardar</button></div>`).join('') : '<p class="ix-hint">No hay nada para guardar (lo equipado o lo ofrecido no se guarda).</p>'}
+        ${propios.length ? propios.map(it => `<div class="ix-fila"><span class="ix-q" title="${esc(textoItem(it))}">${esc(it.nombre)}${num(it.unidades) > 1 ? ` ×${fmt(num(it.unidades))}` : ''} <span class="ix-hint">· ${fmt(enBaul(it))} ranura${enBaul(it) === 1 ? '' : 's'}</span></span><button type="button" data-ix-guardar="${esc(it.id)}"${usado + enBaul(it) > cap ? ' disabled title="El baúl está lleno"' : ''}>Guardar</button></div>`).join('') : '<p class="ix-hint">No hay nada para guardar (lo equipado o lo ofrecido no se guarda).</p>'}
         <div class="ix-fila"><span class="ix-q">💰 DDE <span class="ix-hint">(tenés ${fmt(num(S.meta.dde))})</span></span><input id="ix-bdde" type="number" min="0" step="1" value="${esc(previo.dde)}"><button type="button" data-ix-guardar-dde>Guardar</button></div>
         <div class="ix-fila"><span class="ix-q">🦴 <select id="ix-bdt">${desp.map(d => `<option value="${esc(d.tipo === 'especial' ? 'esp:' + d.nombre : d.tipo)}">${esc(d.tipo === 'especial' ? d.nombre : DESP_TXT[d.tipo])} (${fmt(d.n)})</option>`).join('') || '<option value="">(no tenés despojos)</option>'}</select></span><input id="ix-bdn" type="number" min="0" step="1" value="${esc(previo.dn)}"><button type="button" data-ix-guardar-desp${desp.length ? '' : ' disabled'}>Guardar</button></div>
       </div>
@@ -530,7 +665,7 @@ const Intercambio = (() => {
         await hacer(fichaId, async S => {
           const it = (S.inventario || []).find(x => x.id === b.dataset.ixGuardar);
           if(!it || it.equipado || reservado(it)) return false;
-          const r = E().ranuras(it);
+          const r = enBaul(it);
           if(baulUsado() + r > capacidad()){ host.toast('El baúl está lleno'); return false; }
           await col('baul').add({tipo: 'item', nombre: String(it.nombre || '').slice(0, 80), json: JSON.stringify(copia(it)), ranuras: r, puso: fbUsuario.uid, pusoNombre: nombreDe(S), creado: ts()});
           S.inventario = S.inventario.filter(x => x !== it);

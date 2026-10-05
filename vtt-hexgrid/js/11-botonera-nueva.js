@@ -111,8 +111,8 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261002a', '../comun/ficha-equipo.js?v=20261005i2', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261005i1', '../comun/ficha-mantenimiento.js?v=20261004q', '../comun/ficha-calculo.js?v=20261005b1', '../comun/ficha-combate.js?v=20261003sa', '../comun/skills-clase.js?v=20261002sb', '../comun/ficha-habilidades.js?v=20261004p1',
-  '../comun/catalogo.js?v=20261005c2', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261004ja', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261004so', '../comun/ficha-resumen.js?v=20261004q1', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261004so', '../comun/inv-acciones.js?v=20261004fc', '../comun/inv-duelo.js?v=20261004p1', '../comun/ficha-acciones.js?v=20261005i1', '../comun/inv-habilidades.js?v=20261004na', '../comun/inv-lupa.js?v=20261001a',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261002a', '../comun/ficha-equipo.js?v=20261005i3', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261005i1', '../comun/ficha-mantenimiento.js?v=20261004q', '../comun/ficha-calculo.js?v=20261005i3', '../comun/ficha-combate.js?v=20261003sa', '../comun/skills-clase.js?v=20261002sb', '../comun/ficha-habilidades.js?v=20261004p1',
+  '../comun/catalogo.js?v=20261005i3', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261004ja', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261004so', '../comun/ficha-resumen.js?v=20261004q1', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261004so', '../comun/inv-acciones.js?v=20261004fc', '../comun/inv-duelo.js?v=20261004p1', '../comun/ficha-acciones.js?v=20261005i1', '../comun/inv-habilidades.js?v=20261004na', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261005i1', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261002b'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -1234,11 +1234,22 @@ function recibidosEscuchar(){
 const intercambioHostMapa = {
   maneja: id => bnManejo(id),
   leer: id => (bn && bn.fichaId === id && bn.S) ? bn.S : null,
-  con: async (id, fn) => !!(await editarPersonajeMapa(id, S => fn(S))),
+  con: async (id, fn) => {
+    const hubo = !!(await editarPersonajeMapa(id, S => fn(S)));
+    if(hubo && bn && bn.fichaId === id){ bnTiendaDibujar(); if(bn.raiz.querySelector('#bn-equipo.open')) bnEquipoDibujar(); }   // el DDE de la tienda, la mochila
+    return hubo;
+  },
   enCombate: () => modoMapa === 'combate',
   tienda: () => (bn && bn.raiz && bn.raiz.querySelector('#bn-tienda').classList.contains('open') && bnTiendaSt.tienda) || null,
   toast: t => toast(t),
   propias: () => [...fichasPub.keys()].filter(id => bnManejo(id)),
+  // En combate solo a un aliado al lado: los personajes con token a 1 casillero del suyo (en el mapa que se está mirando).
+  adyacentes: id => {
+    const pjs = [...tokens.values()].filter(t => t && t.tipo === 'pj' && t.fichaId && !String(t.fichaId).includes(SEP_INVOCACION));
+    const mio = pjs.find(t => t.fichaId === id);
+    if(!mio) return [];
+    return pjs.filter(t => t.fichaId !== id && distanciaHex({col: mio.col, fila: mio.fila}, {col: t.col, fila: t.fila}) <= 1).map(t => t.fichaId);
+  },
 };
 function recibidosRevisar(){
   const ids = new Set([...recibidosPend.estados, ...recibidosPend.recompensas].map(d => String(d.data().fichaId || '').split(SEP_INVOCACION)[0]));

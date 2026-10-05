@@ -167,7 +167,7 @@ const CreepBotonera = (() => {
   }
 
   /* El cinturón del creep (2026-10-04): 1 ranura = 1 unidad, base 5; usar uno cuesta 1 No2. opts.consumibles = [{id, nombre, tier}] del
-     catálogo para cargarle (null: todavía no llegó el catálogo). Botones: data-cin-consumir / data-cin-quitar ("creepId:itemId") y
+     catálogo para cargarle (null: todavía no llegó el catálogo); opts.cinSel: el último elegido (queda marcado). Botones: data-cin-consumir / data-cin-quitar ("creepId:itemId") y
      data-cin-agregar (creepId, con el elegido en el desplegable data-cin-sel). */
   function cinturonHtml(sc, opts){
     const o = opts || {}, usado = C().cinturonUsado(sc), cap = C().capCinturon(sc);
@@ -181,7 +181,7 @@ const CreepBotonera = (() => {
     const lista = o.consumibles;
     const agregar = !lista ? '<div class="hint">Cargando el catálogo de consumibles…</div>'
       : usado >= cap ? '<div class="hint">El cinturón está lleno.</div>'
-      : `<div class="accion-row"><select data-cin-sel="${sc.id}" style="flex:1;min-width:0">${lista.map(c => `<option value="${esc(c.id)}">${esc(c.nombre)}${c.tier ? ` · ${esc(c.tier)}` : ''}</option>`).join('')}</select>
+      : `<div class="accion-row"><select data-cin-sel="${sc.id}" style="flex:1;min-width:0">${lista.map(c => `<option value="${esc(c.id)}"${c.id === o.cinSel ? ' selected' : ''}>${esc(c.nombre)}${c.tier ? ` · ${esc(c.tier)}` : ''}</option>`).join('')}</select>
           <button class="hab-ejecutar" data-cin-agregar="${sc.id}">＋ Al cinturón</button></div>`;
     return `<div class="botonera-caja">
       <div class="acciones-grupo-label" style="margin-top:0">🧪 Cinturón · ${fmt(usado)}/${fmt(cap)} ranuras</div>

@@ -243,6 +243,7 @@ document.addEventListener('click', e => {
     const sel = document.querySelector(`[data-cin-sel="${b.dataset.cinAgregar}"]`);
     const it = sel ? CATALOGO_BASE.find(x => x.id === sel.value) : null;
     if(!sc || !it){ toast('Elegí un consumible del catálogo'); return; }
+    window.cinSelCreep = it.id;   // el desplegable recuerda el último elegido
     const x = CreepAcciones.alCinturon(sc, it, 1);
     if(!x.error) renderAll();
     toast(x.error || x.aviso);

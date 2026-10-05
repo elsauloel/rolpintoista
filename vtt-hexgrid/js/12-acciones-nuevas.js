@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002c', '../comun/creep-botonera.js?v=20261005a1', '../comun/creep-acciones.js?v=20261005a1', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261004p1'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002c', '../comun/creep-botonera.js?v=20261005a2', '../comun/creep-acciones.js?v=20261005a1', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261004p1'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -39,7 +39,7 @@ function acDibujar(){
   // El catálogo para cargarle consumibles al cinturón (2026-10-04): llega con las piezas de la Botonera nueva.
   const consumibles = typeof CATALOGO_BASE !== 'undefined' ? CreepAcciones.consumiblesDe(CATALOGO_BASE) : null;
   if(!consumibles && typeof bnCargarPiezas === 'function' && !ac.cargandoCatalogo){ ac.cargandoCatalogo = true; bnCargarPiezas().then(() => acDibujar()).catch(() => {}); }
-  const r = CreepBotonera.html(sc, {parryPendiente: acParry.has(ac.creepId), consumibles});
+  const r = CreepBotonera.html(sc, {parryPendiente: acParry.has(ac.creepId), consumibles, cinSel: ac.cinSel});
   const scroll = ac.host.scrollTop;
   cuerpo.innerHTML = `<div class="modal acciones-modal">
     <header>
@@ -199,6 +199,7 @@ function acAccionAca(b){
     const sel = ac.raiz.querySelector(`[data-cin-sel="${d.cinAgregar}"]`);
     const it = sel && typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(x => x.id === sel.value) : null;
     if(!it){ toast('Elegí un consumible del catálogo'); return true; }
+    ac.cinSel = it.id;   // el desplegable recuerda el último elegido
     acCambiar(c => CreepAcciones.alCinturon(c, it, 1)).then(x => { if(x) toast(x.aviso); });
     return true;
   }

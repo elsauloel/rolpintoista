@@ -19,7 +19,7 @@ function lupaHtmlCreep(clave){   // comun/creep-lupa.js (paso 4 etapa 4c, tanda 
 function renderAccionesCreep(){
   const sc = S.creeps.find(s => s.id === accionesCreepId);
   if(!sc) return;
-  const r = CreepBotonera.html(sc, {parryPendiente: parryPendienteCreep.has(sc.id), consumibles: CreepAcciones.consumiblesDe(CATALOGO_BASE)});   // el cinturón (2026-10-04)
+  const r = CreepBotonera.html(sc, {parryPendiente: parryPendienteCreep.has(sc.id), consumibles: CreepAcciones.consumiblesDe(CATALOGO_BASE), cinSel: window.cinSelCreep});   // el cinturón (2026-10-04)
   $('#acciones-creep-titulo').textContent = r.titulo;
   $('#acciones-creep-badge').textContent = r.badge;
   $('#acciones-creep-lista').innerHTML = r.html;

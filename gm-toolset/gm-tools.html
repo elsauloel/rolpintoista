@@ -27,7 +27,6 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
     <!-- BARRA SUPERIOR: accesos y herramientas, con botones chicos como en la ficha (los href los completa el script con la partida) -->
     <nav class="accesos">
       <a class="iconbtn" id="acceso-mapa" href="../vtt-hexgrid/mapa.html" target="_blank" rel="noopener" title="Abrir el mapa de la partida en una pestaña nueva">🗺 Mapa</a>
-      <a class="iconbtn" id="acceso-vendedor" href="vendor-generator.html" target="_blank" rel="noopener" title="Abrir el generador de tiendas en una pestaña nueva">🏪 Vendedor</a>
       <div class="desplegable" id="personajes-caja">
         <button type="button" class="iconbtn btn-personajes" id="btn-personajes" aria-expanded="false" title="Fichas de los personajes de la partida">👥 Personajes</button>
         <div class="desplegable-lista" id="personajes-lista" hidden></div>
@@ -56,6 +55,8 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
       <button class="btn maint" id="btn-mant" title="Pasa el turno para toda la mesa: fichas de los jugadores y creeps">Mantenimiento · toda la mesa</button>
       <button class="btn primary" id="btn-add">+ Creep</button>
       <button class="btn" id="btn-ia">+ Creep con IA</button>
+      <!-- 🏪 Vendedor: a la vista, al lado de Finalizar combate (dueño, 2026-10-05); el href lo completa js/10 con la partida -->
+      <a class="btn" id="acceso-vendedor" href="vendor-generator.html" target="_blank" rel="noopener" title="Abrir el generador de tiendas en una pestaña nueva" style="background:#1F4E79;border:1px solid #6FA8DC;color:#fff;font-weight:700;text-decoration:none;display:inline-flex;align-items:center">🏪 Vendedor</a>
       <button class="btn finalizar" id="btn-finalizar-combate">🏁 Finalizar Combate</button>
     </div>
   </div>

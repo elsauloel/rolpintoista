@@ -1337,3 +1337,6 @@ van a contemplar como…»: falta completar.)
   son los que **canalizan el Especial**.
 - **Los No2 son el otro regulador:** una varita barata de daño directo, aunque sea poco, gastando 8 No2 en un turno puede terminar rota. Hay que
   equilibrar el efecto **por cada No2** que gasta y por cuántas veces se puede usar en un turno.
+- **El rango ahorra No2 (dueño, 2026-10-05):** quien actúa a distancia no tiene que desplazarse, así que le quedan más No2 para actuar. **Todo lo
+  pensado para hacerse a distancia debe cobrar No2 para compensar** que no se mueve. (Va en línea con lo de las armas de rango físicas del
+  2026-09-25: «el rango vale mucho por sí mismo».)

@@ -853,8 +853,8 @@ function bnCrear(){
         <h3 id="bn-tienda-titulo">Tienda</h3>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <span class="tienda-badge" id="bn-tienda-badge"></span>
-          <button class="iconbtn" data-bn-ti="baul" title="El baúl común del grupo: guardar y sacar ítems, oro y despojos (queda anotado quién)">📦 Baúl común</button>
-          <button class="iconbtn" data-bn-ti="vender" title="Vender ítems de tu mochila y despojos a esta tienda">💰 Vender</button>
+          <button class="btn" data-bn-ti="baul" style="font-size:14px;padding:8px 16px;font-weight:700;letter-spacing:.02em;background:#1F4E79;border:1px solid #6FA8DC;color:#fff" title="El baúl común del grupo: guardar y sacar ítems, oro y despojos (queda anotado quién)">📦 Baúl común</button>
+          <button class="btn primary" data-bn-ti="vender" style="font-size:14px;padding:8px 16px;font-weight:700;letter-spacing:.02em" title="Vender ítems de tu mochila y despojos a esta tienda">💰 Vender</button>
           <button class="iconbtn" data-bn-ti="reparar" id="bn-tienda-reparar" title="Reparar tu equipo con el herrero (se paga por punto de durabilidad)">🔧 Reparación</button>
           <span class="catalogo-dde-badge">DDE disponibles: <b id="bn-tienda-dde">0</b></span>
           <button class="iconbtn" data-bn-ti="cerrar">Cerrar</button>

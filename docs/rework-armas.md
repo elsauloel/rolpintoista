@@ -1489,3 +1489,7 @@ lluvia ácida 21 y báculo de sangre 19,5), 3 orbes.
   **varita nueva, chorro de ácido**: se esquiva; su objetivo es **romper la armadura** (Armadura rota al pegar) y le queda un resto de daño ·
   **pelea cercana**: X de daño y −1 por cada casillero de distancia («hay que buscarle la vuelta»; propuesta: 1d10 arcano, al lado entero, −1 por
   cada casillero más allá) · **susurro**: faltaba el tipo de daño (propuesta: arcano, y no se esquiva: PdG.Esp contra Res.Esp, como un efecto).
+- **Niebla cara (dueño, 2026-10-05) → corregida la calculadora:** el terreno se multiplicaba por la forma (×1,75 por la flor) como si dañara a cada uno;
+  una zona vale por la zona, no por cuántos hay adentro. Ahora el terreno solo suma un poco por el tamaño (`TERRENO_FORMA`: flor ×1,3). Bajan la
+  niebla, el aceite, la telaraña, las espinas y la ventisca. **Varita de la luz**: al que revela lo deja **marcado 3 turnos** (la misma marca del
+  rastreador).

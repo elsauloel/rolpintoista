@@ -41,6 +41,8 @@ PESO_EXTRA = {'Silencio': 3.0, 'Atraer': 1.5, 'Marca': 1.0, 'Luz': 1.0, 'Muro': 
               'Niebla': 2.0, 'Marca +1 PdG': 1.0, 'Revela': 1.5, 'Cura': 1.0, 'Escudo': 0.8, 'Sigilo': 2.0}
 # Un terreno (zona) vale su efecto por cada turno que dura, pero solo si alguien lo pisa: × TERRENO por turno.
 TERRENO = 0.6
+# El tamaño de la zona sí cuenta, pero poco: una flor tapa más que una casilla (más chances de que alguien la pise o la use).
+TERRENO_FORMA = {'uno': 1.0, 'linea': 1.2, 'linea4': 1.3, 'flor1': 1.3, 'cono': 1.2, 'flor2': 1.6}
 TASA_SP = 2.0        # cuánto valor «compra» cada SP que cuesta un uso (el SP es el freno del control: dueño, 2026-10-05)
 
 
@@ -104,7 +106,9 @@ def valor_uso(a):
     if a.get('terreno'):
         n, turnos = a['terreno']
         d['terreno'] = peso_efecto(n) * turnos * TERRENO
-    d['valor'] = sum(d.values()) * FORMA.get(a.get('forma', 'uno'), 1.0)
+    terreno = d.pop('terreno', 0.0)   # el terreno vale por la zona, no por cuántos hay adentro: no se multiplica por la forma (2026-10-05)
+    d['valor'] = sum(d.values()) * FORMA.get(a.get('forma', 'uno'), 1.0) + terreno * TERRENO_FORMA.get(a.get('forma', 'uno'), 1.0)
+    d['terreno'] = terreno
     return d
 
 
@@ -162,7 +166,7 @@ POOL = [
     {'nombre': 'Varita de niebla: flor de niebla, 3 turnos (no se ve a través ni se apunta adentro desde afuera; adentro se ve a 1)', 'clase': 'arcano', 'terreno': ('Niebla', 3), 'forma': 'flor1', 'sp': 1},
     {'nombre': 'Varita de los pilares: 2 pilares de 1 casilla donde quieras (dentro del alcance), 3 turnos', 'clase': 'arcano', 'terreno': ('Muro', 3), 'forma': 'uno'},
     # — apoyo —
-    {'nombre': 'Varita de la luz: radio 3 hasta el final del turno; revela sigilo y trampas', 'clase': 'arcano', 'efectos': {'Luz': 1.5, 'Revela': 1.0}},
+    {'nombre': 'Varita de la luz: radio 3 hasta el final del turno; revela sigilo y trampas, y al que revela lo deja marcado 3 turnos', 'clase': 'arcano', 'efectos': {'Luz': 1.5, 'Revela': 1.0, 'Marca': 3.0 * 0.3}},
     {'nombre': 'Varita de cura: 1d8 + 1 a un aliado', 'clase': 'arcano', 'efectos': {'Cura': 5.5}, 'sp': 1},
     # — báculos (suman Especial; también una vez por turno) —
     {'nombre': 'Báculo de aprendiz (1 mano): 1d4 + la mitad del Especial', 'clase': 'arcano', 'dado': '1d4', 'sumaEspecial': 0.5, 'sp': 2},

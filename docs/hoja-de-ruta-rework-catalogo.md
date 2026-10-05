@@ -45,7 +45,7 @@ el dueño va a pedir pasarlas todas a ese momento.
   efecto especial), y las Excepcionales y Legendarias de las armas especiales.
 - **Guantes mágicos** y demás piezas de equipo con efectos especiales.
 - **Botas Raras que dejan levitar** (ignoran el terreno y las trampas).
-- **Hechizos (no armas)**: Miedo, Sueño, intercambiar lugar, mover a un aliado.
+- **Hechizos (no armas)**: Miedo, Sueño, intercambiar lugar, mover a un aliado, señuelo (un token falso que atrae ataques).
 - **Armas de rango con «grappling hook»** (atraer al rival), cuando toque su rework.
 - **Daño que crece si se repite sobre el mismo objetivo** (armas especiales).
 - Lo que está en `pendientes.md` como «a futuro» del inventario: solicitar un ítem de otro jugador, baúles móviles, kit de herramientas.

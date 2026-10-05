@@ -1417,3 +1417,8 @@ van a contemplar como…»: falta completar.)
 - **Filtro del dueño — F. Debilitar (2026-10-05):** como **efecto secundario de un daño moderado**: 63 marca −Defensa, 64 −Res.Esp, 66 −Evasión,
   67 maldición (crítico más fácil), 70 disipar (por %) · ✅ 65 **Armadura rota: obligatoria en el daño ácido** · ❌ 68 vulnerable a un elemento ·
   ✅ 69 drenar SP, **muy moderado**.
+- **Filtro del dueño — G. Información (2026-10-05):** 71 revelar sigilo y 72 revelar trampas → **van con las de luz** (iluminar que revela lo oculto) ·
+  ❌ 73 ver la vida del rival (el dueño escribió «72. no»; se entiende 73) · 74 ver stats o resistencias: puede ser, como secundario de un daño moderado ·
+  ✅ 75 marcar (se lo ve a través de la niebla), como secundario: «este me gusta mucho».
+- **Filtro del dueño — H. Invocar y colocar (2026-10-05):** ✅ 76 luz flotante · 🔀 77 señuelo: el efecto sí, pero **para skills**, no para arma ·
+  ❌ 78 torreta · ❌ 79 criatura chica · ✅ 80 runa (trampa mágica oculta) · ✅ 81 manchas de aceite · ✅ 82 telaraña, **igual a la Brea**.

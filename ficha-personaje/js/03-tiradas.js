@@ -89,7 +89,6 @@ function renderHistorialSesion(){
 
 /* ---------- Tirar dados a partir del valor de un stat (formulaParaValor: comun/tiradas.js) ---------- */
 
-const STATS_SIN_TIRADA = FichaBotonera.STATS_SIN_TIRADA;   // comun/ficha-botonera.js
 
 
 // Afortunado da ventaja en PdG/Parry/Evasión: tira dos veces y se queda

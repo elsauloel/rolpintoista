@@ -313,7 +313,7 @@ let accionesCreepId = null;
 // CREEP_STATS_TIRADA_IDS más abajo recorta cuáles se muestran como botón.
 const CREEP_DERIVED_STATS = CreepCalculo.DERIVED_STATS;   // comun/creep-calculo.js (paso 4 etapa 4a)
 
-// Mismo criterio que STATS_SIN_TIRADA/STATS_REDUNDANTES_COMBATE en la
+// Mismo criterio que STATS_CON_TIRADA_IDS/STATS_REDUNDANTES_COMBATE en la
 // Botonera de la ficha: los 5 atributos base + los secundarios que no
 // tienen ya su propio botón en la caja de Combate.
 const CREEP_STATS_TIRADA_IDS = CreepCalculo.STATS_TIRADA_IDS;

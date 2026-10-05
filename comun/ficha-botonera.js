@@ -19,7 +19,11 @@ const FichaBotonera = (() => {
   const IT2 = () => FichaCalculo.IT2;
 
   // Stats que no se tiran (no tienen 🎲 en Atributos) y los de resistencia a crítico.
-  const STATS_SIN_TIRADA = ['vision', 'hpmax', 'crgmax', 'sp', 'spregen','tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5', 'dmg', 'nitros', 'rng', 'crit', 'critpot', 'rangocasteo', 'def', 'capcinturon', 'capmochila', 'luz', 'veoculto', 'pdgcontra', 'pdgopor'];
+  /* Los stats secundarios que SÍ se tiran (2026-10-05, dueño: «¿en qué momento se puso todo esto como tiradas de stat?»). Antes era al revés —todos
+     menos una lista de excluidos— y cada stat nuevo de equipo (ranuras, pasamanos, resistencias elementales, %…) aparecía como tirada en la
+     Botonera y como opción de tirada en el editor de habilidades. Ahora es una lista fija, la misma de los creeps (comun/creep-calculo.js,
+     STATS_TIRADA_IDS) más los de la caja de Combate (PdG, Eva, Parry, Bloqueo). Un stat nuevo que se tire hay que sumarlo acá a propósito. */
+  const STATS_CON_TIRADA_IDS = ['resmg', 'rescc', 'ini', 'percepcion', 'sigilo', 'pdgmg', 'dmgesp', 'resm', 'pdg', 'eva', 'parry', 'bloqueo'];
   const TIPOS_IDS = ['tipo1','tipo2','tipo3','tipo4','tipo5'];
 
   /* ---------- Recursos ---------- */
@@ -45,7 +49,7 @@ const FichaBotonera = (() => {
   const efectoSentado = S => S.efectos.find(e => e.activo !== false && e.sentado);
 
   /* ---------- Habilidades ---------- */
-  function statsConTirada(){ return FichaCalculo.STAT_LIST.filter(s => !STATS_SIN_TIRADA.includes(s.id)); }
+  function statsConTirada(){ return FichaCalculo.STAT_LIST.filter(s => STATS_CON_TIRADA_IDS.includes(s.id)); }
   function habStatTirable(it){
     const s = it.tiradaStat;
     return !!(s && (FichaCalculo.ATTR_LIST.some(a => a.id === s) || statsConTirada().some(x => x.id === s)));
@@ -244,7 +248,7 @@ const FichaBotonera = (() => {
     const STATS_REDUNDANTES_COMBATE = ['pdg', 'eva', 'parry', 'bloqueo', 'armadmg'];
     const statsRollables = [
       ...FichaCalculo.ATTR_LIST,
-      ...FichaCalculo.STAT_LIST.filter(s => !STATS_SIN_TIRADA.includes(s.id) && !STATS_REDUNDANTES_COMBATE.includes(s.id)),
+      ...statsConTirada().filter(s => !STATS_REDUNDANTES_COMBATE.includes(s.id)),
     ];
     const fCombate = FichaCombate.formulasCombate(S);
     // Parry y Bloqueo solo con un arma o un escudo equipado (regla del dueño, 2026-09-30): sin eso quedan apagados.
@@ -440,7 +444,7 @@ const FichaBotonera = (() => {
     return {html, nitros: badgeNitros, sp: badgeSp, def: badgeDef};
   }
 
-  return {STATS_SIN_TIRADA, TIPOS_IDS, PERCEPCION_DADO_SUBE, html, tiradaStat, tiradaPercepcion, tiradaPercepcionValor,
+  return {STATS_CON_TIRADA_IDS, TIPOS_IDS, PERCEPCION_DADO_SUBE, html, tiradaStat, tiradaPercepcion, tiradaPercepcionValor,
     spMaximo, nitrosMaximo, tienePercepcionAumentada, tieneSigilo, efectoSigilo, efectoSentado,
     statsConTirada, habStatTirable, habTieneSegundaTirada, botonSegundaHab, dueloDe, modoHab, habAutomatizada,
     armasParaHabilidad, costoAtaqueMinimo, costoAtaqueHabTxt, costoNitrosHab, sinNitrosPara, costoHabilidadTxt,

@@ -105,7 +105,7 @@ que dos conversaciones la editen a la vez — antes de un cambio grande acá,
   Rng/PdG/Crit/Parry, fórmula por defecto `des`), pero con su propio botón
   dedicado en vez del genérico — `tirarPercepcion()` usa
   `compute().final.percepcion` y no aparece con 🎲 en la tarjeta de
-  Atributos (no está en `STATS_SIN_TIRADA`, simplemente su fila de
+  Atributos (está en `STATS_CON_TIRADA_IDS`; simplemente su fila de
   Destreza es una más; el botón vive aparte, arriba de Combate en la
   Botonera). La pasiva "Percepción aumentada" sigue subiendo un escalón
   cada dado (`PERCEPCION_DADO_SUBE`) sin importar de qué atributo salga el

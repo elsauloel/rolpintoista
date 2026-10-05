@@ -9,7 +9,7 @@
    - cambiarAtributo(S, attrId, valorFinal, mod): el número grande de un atributo — guarda el valor propio (final − lo que suma el
      equipo/estados) y la vida y los No2 siguen a su máximo nuevo (si estaban llenos, siguen llenos; si no, solo se recortan).
    - cambiarFormula(S, id, txt): la fórmula de un stat derivado.
-   Necesita comun/ficha-calculo.js y ficha-botonera.js (STATS_SIN_TIRADA).
+   Necesita comun/ficha-calculo.js y ficha-botonera.js (STATS_CON_TIRADA_IDS).
    ========================================================= */
 const FichaStats = (() => {
   const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
@@ -42,7 +42,7 @@ const FichaStats = (() => {
       const origenTxt = origins.length===1 ? origins[0].origen : origins.length>1 ? `${origins.length} orígenes` : '';
       descHtml = `<span class="dv-desc">${m>0?'+':''}${fmt(m)}${origenTxt?` · ${esc(origenTxt)}`:''}</span>`;
     }
-    const puedeTirar = !FichaBotonera.STATS_SIN_TIRADA.includes(d.id);
+    const puedeTirar = FichaBotonera.STATS_CON_TIRADA_IDS.includes(d.id);
     return `<div class="d ${cls}" data-stat="${d.id}" title="${esc(d.full)}">
     <span class="dl">${d.label}</span>
     <span class="dv ${valCls}">${val}</span>

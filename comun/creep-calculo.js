@@ -182,7 +182,7 @@ const CreepCalculo = (() => {
     {id:'rng', label:'Rango', attr:'des'}, {id:'pdg', label:'PdG', attr:'des'}, {id:'crit', label:'Crítico frecuente', attr:'des'}, {id:'critpot', label:'Crítico potente', attr:'des'}, {id:'parry', label:'Parry', attr:'des'}, {id:'percepcion', label:'Percepción', attr:'des'}, {id:'sigilo', label:'Sigilo', attr:'des'},
     {id:'pdgmg', label:'PdG.Esp', attr:'esp'}, {id:'dmgesp', label:'Ef.Esp', attr:'esp'}, {id:'resm', label:'Res.Mt', attr:'esp'}, {id:'rangocasteo', label:'Rango de casteo', attr:'esp'},
   ];
-  // Mismo criterio que STATS_SIN_TIRADA/STATS_REDUNDANTES_COMBATE en la
+  // Mismo criterio que STATS_CON_TIRADA_IDS/STATS_REDUNDANTES_COMBATE en la
   // Botonera de la ficha: los 5 atributos base + los secundarios que no
   // tienen ya su propio botón en la caja de Combate.
   const STATS_TIRADA_IDS = ['con', 'fue', 'agl', 'des', 'esp', 'resmg', 'rescc', 'ini', 'pdgmg', 'dmgesp', 'resm', 'percepcion', 'sigilo'];

@@ -2021,6 +2021,12 @@ prueba('✨ armas especiales, tercera tanda (2026-10-05): lo que queda en el sue
     esc.length, esc[0] && esc[0].escudoMagico, esc[0] && esc[0].turnos],
     ['1d4', 'Sentado', 'rescc', 6, 4, true, {casillas: 2, contra: 'fue', tiraValor: 6}, {cada: '1d4', total: 2}, '1d4', 1, 2, 1]);
 });
+prueba('Botonera (dueño, 2026-10-05): «Tiradas de stats» muestra solo lo que se tira — un stat nuevo de equipo (ranuras, resistencias, %) no se cuela', () => {
+  const h = FichaBotonera.html(fichaBotonera(), {modoMapa: 'combate'}).html, d = document.createElement('div'); d.innerHTML = h;
+  const caja = [...d.querySelectorAll('.botonera-caja')].find(c => /Tiradas de stats/i.test(c.textContent));
+  igual([caja && [...caja.querySelectorAll('.bt-label')].map(x => x.textContent.trim()), FichaBotonera.statsConTirada().some(s => /^(res(fuego|hielo|rayo|toxico|acido)|ranura|pasamanos|alforja|retirada)/.test(s.id))],
+    [['Con', 'Fue', 'Agi', 'Des', 'Esp', 'Res.Esp', 'Res.CC', 'Iniciativa', 'Percep.', 'Sigilo', 'PdG.Esp', 'Ef.Esp', 'Res.Mt'], false]);
+});
 prueba('✨ armas especiales Comunes (2026-10-05): 30 armas y 3 orbes; cada una automatiza algo o aclara lo que queda a mano', () => {
   const L = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-'));
   const armas = L.filter(i => i.especial), orbes = L.filter(i => i.orbe);

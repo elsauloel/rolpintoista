@@ -1462,3 +1462,22 @@ lluvia ácida 21 y báculo de sangre 19,5), 3 orbes.
   Con esto, en un combate de 4 turnos, **el mago queda en 11 a 18 por turno (unas 2 a 3 veces un arma física Común) y el que no es mago en 6 a 9**.
   No es un problema de las varitas: **Chispazo** (habilidad del Mago: 1d6 directo por 1 No2 + 1 SP, sin incremento) ya rinde más por SP que cualquier
   varita, como tiene que ser. Queda abierta la pregunta de fondo, de clases: **cuánto tiene que pegar un mago contra un guerrero** (P159).
+- **Observaciones del dueño al pool Común (2026-10-05: «ahora sí me gusta»):**
+  - **Relámpago → Varita láser**: línea recta que atraviesa (arcano). Hace falta que la herramienta de lápiz del mapa una dos casilleros con la línea
+    más recta posible en hexágonos, de forma automática (desarrollo pendiente).
+  - **Chispas**: además deja la flor **incendiada 2 turnos** (y/o chance de quemadura).
+  - **Lo físico invocado (estaca, piedrazo, granizo) suma el Ef.Esp y lo frena la Defensa**, como un arma física suma la Fuerza; si hiciera falta, se
+    sube el costo. En la calculadora queda igual (la Fuerza tampoco cuenta en el PC de un arma, porque la Defensa la compensa). Con eso el granizo
+    (que con 1d4 contra la Defensa no hacía nada) queda bien.
+  - **Lluvia ácida**: no contempla armadura (confirmado). **Miasma**: como los Pedos Tóxicos: Ef.Esp contra Res.Esp, el que no resiste recibe la
+    diferencia + 1d4.
+  - **Destello**: 1d4 (un área rara vez pega a más de 2 rivales y el fuego amigo la complica: no se cuenta el daño ×7; la calculadora usa ~1,75).
+  - **Ráfaga helada**: un frente de **3 de ancho, perpendicular al frente del token, y 5 de largo**; 1d4 de hielo, empuja 2, % de Escarcha. Forma
+    nueva para el mapa (desarrollo pendiente).
+  - **Gancho**: definido como lazo arcano; atrae 2 salvo que gane Fuerza contra el Ef.Esp de quien lo tira (Inamovible lo frena).
+  - **Rastreador**: la marca **impide el sigilo y el ocultamiento** y se lo ve a través de la niebla (estado nuevo, a programar).
+  - **Ventisca**: 1d4 y más SP. **Runa**: arcano 2d4 al pisarla (Evasión contra el Ef.Esp: la mitad); se detecta con Percepción contra el Ef.Esp.
+  - **Niebla**: falta definir qué hace (propuesta de Claude abajo). **Muro → pilares**: más barato y versátil. **Luz**: dura hasta el final del turno.
+  - **Orbe de luz**: no se entendió «luz de radio 1» (es el stat Luz portada, como un farol: ves e iluminás ese radio a tu alrededor, sin punto ciego).
+  - Con esto, varias pasan a 4 SP: propuesta, **tope Común en 4 SP** (el SP ya las frena: con 4 SP el mago rinde menos por turno que con las de 2).
+    La ráfaga helada (13,3 por tiro) queda para Buena o con el área recortada.

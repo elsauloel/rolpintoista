@@ -34,7 +34,7 @@ MULT_DANO = {'fisico': 1.0, 'toxico': 1.25, 'elemental': 1.4, 'arcano': 1.5}
 # típico; la Fuerza del arma física no cuenta en su PC porque la Defensa la compensa: el Especial, en cambio, no tiene quién lo frene.
 EF_ESP_REF = 4
 # La forma: cuántos objetivos alcanza en promedio (un área, además, le cuesta No2 al que la esquiva con dodge roll).
-FORMA = {'trampa': 0.75, 'linea4': 1.5, 'uno': 1.0, 'cadena': 1.4, 'linea': 1.3, 'cono': 1.5, 'flor1': 1.75, 'flor2': 2.5}
+FORMA = {'frente3x5': 2.0, 'trampa': 0.75, 'linea4': 1.5, 'uno': 1.0, 'cadena': 1.4, 'linea': 1.3, 'cono': 1.5, 'flor1': 1.75, 'flor2': 2.5}
 # Efectos: los mismos pesos de las armas físicas (PESO_EFECTO), más los de control que las armas físicas no tienen (en No2 o turnos que le hace perder).
 PESO_EXTRA = {'Silencio': 3.0, 'Atraer': 1.5, 'Marca': 1.0, 'Luz': 1.0, 'Muro': 2.5, 'Daño 1': 1.0, 'Daño 1d4': 2.5, 'Brea': 3.5,
               'Lento': 2.0, 'Sentado': 3.0, 'Inmovilizado': 3.5, 'Escarcha': 2.5, 'Parálisis': 4.0, 'Empuje': 1.5, '-2 PdG': 2.0,
@@ -58,7 +58,7 @@ COSTO_BASE, COSTO_SUBE = 1, 1   # varitas (dueño, 2026-10-05, cuarta vuelta): e
 # efecto: se parte de 1d4 por 1 SP y lo más fuerte cuesta más SP (no más No2). El SP es la reserva del combate: las caras dan una ráfaga y se apagan.
 # (Descartadas: 2-3-4 sin SP; 1 No2 + 1 SP con el No2 que sube — tiros chicos; una vez por turno — sin ritmo.)
 # Escala del SP según la fuerza del tiro (valor por uso): hasta 4,5 → 1 SP · hasta 6 → 2 · hasta 7,5 → 3 · más → 4 (Común llega a 3).
-ESCALA_SP = [(4.5, 1), (6.0, 2), (7.5, 3), (99, 4)]
+ESCALA_SP = [(4.5, 1), (6.0, 2), (7.5, 3), (9.5, 4), (11.5, 5), (99, 6)]   # Común llega a 4 (propuesta, 2026-10-05)
 def sp_de(valor):
     return next(sp for tope, sp in ESCALA_SP if valor <= tope + 1e-9)
 # Personajes de referencia para la simulación del combate (4 turnos, 7 No2): el mago y el que no es mago.
@@ -133,32 +133,32 @@ POOL = [
     {'nombre': 'Varita arcana mayor: 1d8 directo', 'clase': 'arcano', 'dado': '1d8'},
     {'nombre': 'Varita de misiles: 2 misiles de 1d4, a uno o a dos rivales', 'clase': 'arcano', 'dado': '1d4', 'golpes': 2, 'sp': 2},
     {'nombre': 'Varita de chispa eléctrica: 1d6 de rayo, salta 2 veces (la mitad cada salto), 10 % Parálisis al primero', 'clase': 'elemental', 'dado': '1d6', 'forma': 'cadena', 'efectos': {'Parálisis': 0.10}},
-    {'nombre': 'Varita del relámpago: 1d6 de rayo a todos en una línea de 4', 'clase': 'elemental', 'dado': '1d6', 'forma': 'linea4', 'sp': 2},
-    {'nombre': 'Varita de chispas: 1d4 de fuego en flor', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'sp': 1},
+    {'nombre': 'Varita láser: 1d6 arcano a todos en una línea recta de 4 (atraviesa)', 'clase': 'arcano', 'dado': '1d6', 'forma': 'linea4'},
+    {'nombre': 'Varita de chispas: 1d4 de fuego en flor; deja la flor incendiada 2 turnos', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'terreno': ('Daño 1', 2)},
     {'nombre': 'Varita del soplo de fuego: cono de 2, 1d4 de fuego, 25 % quemar', 'clase': 'elemental', 'dado': '1d4', 'forma': 'cono', 'efectos': {'Prende fuego': 0.25}, 'sp': 1},
     {'nombre': 'Varita de la bola de fuego: estalla en flor, 1d4 de fuego y deja fuego 1 turno', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'terreno': ('Daño 1', 1), 'sp': 2},
-    {'nombre': 'Varita de la estaca: lanza de hielo física T4, 2d4 (critica), 33 % Lento', 'clase': 'fisico', 'dado': '2d4', 'efectos': {'Lento': 1 / 3}, 'sp': 1},
-    {'nombre': 'Varita del canto rodado: piedrazo físico T8, 1d8 (critica), 25 % Demora', 'clase': 'fisico', 'dado': '1d8', 'efectos': {'Demora': 0.25}, 'sp': 1},
-    {'nombre': 'Varita de granizo: flor física T4, 1d4, 25 % Escarcha', 'clase': 'fisico', 'dado': '1d4', 'forma': 'flor1', 'efectos': {'Escarcha': 0.25}, 'sp': 1},
+    {'nombre': 'Varita de la estaca: lanza de hielo física T4, 2d4 + Ef.Esp − Defensa (critica), 33 % Lento', 'clase': 'fisico', 'dado': '2d4', 'efectos': {'Lento': 1 / 3}},
+    {'nombre': 'Varita del canto rodado: piedrazo físico T8, 1d8 + Ef.Esp − Defensa (critica), 25 % Demora', 'clase': 'fisico', 'dado': '1d8', 'efectos': {'Demora': 0.25}},
+    {'nombre': 'Varita de granizo: flor física T4, 1d4 + Ef.Esp − Defensa a cada uno, 25 % Escarcha', 'clase': 'fisico', 'dado': '1d4', 'forma': 'flor1', 'efectos': {'Escarcha': 0.25}},
     {'nombre': 'Varita de lluvia ácida: flor, 1d2 de ácido, 50 % Armadura rota', 'clase': 'elemental', 'dado': '1d2', 'forma': 'flor1', 'efectos': {'Rompe armadura': 0.5}, 'sp': 2},
-    {'nombre': 'Varita de miasma: nube tóxica de 1 turno en flor, 1d4 (se resiste con Res.Esp)', 'clase': 'toxico', 'dado': '1d4', 'forma': 'flor1'},
+    {'nombre': 'Varita de miasma: nube tóxica de 1 turno en flor; Ef.Esp contra Res.Esp, el que no resiste recibe la diferencia + 1d4', 'clase': 'toxico', 'dado': '1d4', 'forma': 'flor1', 'efectos': {'Daño 1': 2.0}},
     {'nombre': 'Varita de la pelea cercana: 1d6, +2 si el rival está al lado', 'clase': 'arcano', 'dado': '1d6', 'efectos': {'Daño 1': 1.0}, 'sp': 1},
     # — daño leve con control —
-    {'nombre': 'Varita del destello: flor, 1d2, 25 % Pajaritos', 'clase': 'arcano', 'dado': '1d2', 'forma': 'flor1', 'efectos': {'Pajaritos': 0.25}, 'sp': 1},
+    {'nombre': 'Varita del destello: flor, 1d4, 25 % Pajaritos', 'clase': 'arcano', 'dado': '1d4', 'forma': 'flor1', 'efectos': {'Pajaritos': 0.25}},
     {'nombre': 'Varita del susurro: 1d6, 25 % Silencio', 'clase': 'arcano', 'dado': '1d6', 'efectos': {'Silencio': 0.25}, 'sp': 1},
-    {'nombre': 'Varita de la ráfaga: 1d4 y lo empuja 2', 'clase': 'arcano', 'dado': '1d4', 'efectos': {'Empuje': 1.67}, 'sp': 1},
-    {'nombre': 'Varita del gancho: 1d4 y lo atrae 2', 'clase': 'arcano', 'dado': '1d4', 'efectos': {'Atraer': 1.67}, 'sp': 1},
-    {'nombre': 'Varita del rastreador: 1d4 y lo marca 3 turnos (visible a través de la niebla)', 'clase': 'arcano', 'dado': '1d4', 'efectos': {'Marca': 3.0}, 'sp': 1},
+    {'nombre': 'Varita de la ráfaga helada: frente de 3 de ancho y 5 de largo, 1d4 de hielo, empuja 2, 25 % Escarcha', 'clase': 'elemental', 'dado': '1d4', 'forma': 'frente3x5', 'efectos': {'Empuje': 1.67, 'Escarcha': 0.25}},
+    {'nombre': 'Varita del gancho: lazo arcano, 1d4 y lo atrae 2 (se resiste con Fuerza contra tu Ef.Esp)', 'clase': 'arcano', 'dado': '1d4', 'efectos': {'Atraer': 1.67 * 0.6}},
+    {'nombre': 'Varita del rastreador: 1d4 y lo marca 3 turnos (no puede entrar en sigilo ni ocultarse; se lo ve a través de la niebla)', 'clase': 'arcano', 'dado': '1d4', 'efectos': {'Marca': 3.0}},
     # — terreno y colocar —
     {'nombre': 'Varita del aceite: flor de aceite, 2 turnos (Sentado al entrar)', 'clase': 'arcano', 'terreno': ('Sentado', 2), 'forma': 'flor1', 'sp': 1},
     {'nombre': 'Varita de telaraña: línea de 3, 2 turnos, como la Brea', 'clase': 'arcano', 'terreno': ('Brea', 2), 'forma': 'linea', 'sp': 1},
-    {'nombre': 'Varita de la ventisca: flor, 1d2 de hielo y el suelo resbala 1 turno', 'clase': 'elemental', 'dado': '1d2', 'forma': 'flor1', 'terreno': ('Sentado', 1), 'sp': 1},
+    {'nombre': 'Varita de la ventisca: flor, 1d4 de hielo y el suelo resbala 1 turno', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'terreno': ('Sentado', 1)},
     {'nombre': 'Varita de espinas: línea de 3, 3 turnos, 1d4 al pasar', 'clase': 'arcano', 'terreno': ('Daño 1d4', 3), 'forma': 'linea', 'sp': 1},
-    {'nombre': 'Varita de la runa: trampa oculta de 2d4, hasta que la pisen', 'clase': 'arcano', 'dado': '2d4', 'forma': 'trampa', 'sp': 1},
+    {'nombre': 'Varita de la runa: trampa oculta, 2d4 arcano al pisarla (Evasión contra tu Ef.Esp: la mitad); se detecta con Percepción contra tu Ef.Esp', 'clase': 'arcano', 'dado': '2d4', 'forma': 'trampa'},
     {'nombre': 'Varita de niebla: flor de niebla, 3 turnos', 'clase': 'arcano', 'terreno': ('Niebla', 3), 'forma': 'flor1', 'sp': 1},
-    {'nombre': 'Varita del muro: muro de 4 casillas, 3 turnos', 'clase': 'arcano', 'terreno': ('Muro', 3), 'forma': 'linea4', 'sp': 1},
+    {'nombre': 'Varita de los pilares: 2 pilares de 1 casilla donde quieras (dentro del alcance), 3 turnos', 'clase': 'arcano', 'terreno': ('Muro', 3), 'forma': 'uno'},
     # — apoyo —
-    {'nombre': 'Varita de la luz: radio 3 hasta el Mantenimiento; revela sigilo y trampas', 'clase': 'arcano', 'efectos': {'Luz': 3.0, 'Revela': 1.0}, 'sp': 1},
+    {'nombre': 'Varita de la luz: radio 3 hasta el final del turno; revela sigilo y trampas', 'clase': 'arcano', 'efectos': {'Luz': 1.5, 'Revela': 1.0}},
     {'nombre': 'Varita de cura: 1d8 + 1 a un aliado', 'clase': 'arcano', 'efectos': {'Cura': 5.5}, 'sp': 1},
     # — báculos (suman Especial; también una vez por turno) —
     {'nombre': 'Báculo de aprendiz (1 mano): 1d4 + la mitad del Especial', 'clase': 'arcano', 'dado': '1d4', 'sumaEspecial': 0.5, 'sp': 2},
@@ -186,7 +186,7 @@ def main():
     for a in POOL:
         v = valor_uso(a)['valor']
         sp = 0 if a['nombre'].startswith('Báculo de sangre') else sp_de(v)
-        marca = '  ⚠ más de 3 SP: no es Común' if sp > 3 else ''
+        marca = '  ⚠ más de 4 SP: no es Común' if sp > 4 else ''
         print(f"  {v:4.1f} · {sp} · {combate(v, sp, MAGO):5.1f} · {combate(v, sp, NO_MAGO):5.1f} · {a['nombre']}{marca}")
     print('\nCandidatas a Buena (se pasan del techo Común):')
     for a in PARA_BUENA:

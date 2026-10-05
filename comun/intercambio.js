@@ -160,11 +160,13 @@ const Intercambio = (() => {
       if(json.length > 200000) return 'El ítem es demasiado grande para mandarlo';
       const combate = !!(host && host.enCombate());
       const costo = combate ? costoCombate(S, f.key) : 0;
+      const antes = num(S.nitros);
       if(combate && !pagarNitros(S, costo, `le pasó ${f.it.nombre} a ${base.paraNombre}`)) return 'cancelado';
+      const pagado = antes - num(S.nitros);
       try{ await ref.set({...base, tipo: 'item', nombre: String(f.it.nombre || '').slice(0, 80), json, cantidad: f.it.consumible ? k : 1}); }
-      catch(err){ S.nitros = num(S.nitros) + costo; throw err; }
+      catch(err){ S.nitros = antes; throw err; }
       if(combate && typeof mesaLinea === 'function')
-        mesaLinea(`🤝 ${base.deNombre} le pasa ${f.it.nombre}${k > 1 ? ' ×' + fmt(k) : ''} a ${base.paraNombre} (${f.key === 'cinturon' ? 'del cinturón' : 'de la mochila'} · ${costo ? '−' + fmt(costo) + ' No2' : 'sin No2: Pasamanos'})`);
+        mesaLinea(`🤝 ${base.deNombre} le pasa ${f.it.nombre}${k > 1 ? ' ×' + fmt(k) : ''} a ${base.paraNombre} (${f.key === 'cinturon' ? 'del cinturón' : 'de la mochila'} · ${costo ? '−' + fmt(pagado) + ' No2' + (pagado < costo ? ` de ${fmt(costo)}: no le alcanzaban` : '') : 'sin No2: Pasamanos'})`);
       const parte = separar(S, f, k);
       parte.reservado = ref.id; parte.reservadoPara = base.paraNombre;
       return null;

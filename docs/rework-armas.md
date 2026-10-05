@@ -1256,3 +1256,36 @@ esa vuelta). El Mangual de 2 dados quedó como Mangual de cadena y el Hacha de b
 Hecho: Tipo 4 (Común, Buena, Rara, Excepcional), Tipo 6, 8 y 10 (Común, Buena, Rara). **Tipo 12: no va a haber armas explosivas** salvo en una
 situación muy excepcional. **Excepcionales y Legendarias** (de todos los Tipos): para otro momento. Las que quedaron a la espera en Excepcional
 (Mangual de 4 dados, Martillo de sargento, Maza de acero, las Excepcionales viejas de T6/T8/T10) siguen como estaban. Sigue: auditoría de trampas.
+
+## Armas mágicas — panorama y lluvia de mecánicas (2026-10-05, arranque del rework mágico)
+Dueño: «vamos a avanzar con la obra titánica de encarar el diseño de armas mágicas». Ejercicio de siempre: panorama → lluvia de mecánicas → el
+dueño filtra → tabla por tier → OK → se carga.
+
+**Panorama (lo que hay hoy).**
+| Tema | Estado |
+|---|---|
+| Decidido | Armas de **daño** y de **efecto** (P116); varita 1d4 / buena 1d6 por 1 No2; daño mágico directo a la vida; **no critica**; híbridas desde Raro (P117); cadena del rayo (P118); Escarcha y Parálisis con %, nunca seguras |
+| Sin responder (2026-09-25) | Mapa elemento ↔ familia (arcano T4, rayo T6, fuego T8, hielo T10); si el dado es el daño y el Especial solo el PG; báculos cuerpo a cuerpo o solo casteo; usos por combate; las 16 ideas de efecto |
+| Contradicción abierta | Seba: sin SP y el costo sube con cada ataque, como un arma física — contra «1 No2 + SP» |
+| Catálogo | **Ninguna arma mágica de verdad.** 2 híbridas rehechas (Lanza del alba: rayo 1d4; Aguja de escarcha: hielo 1d4); 9 bastones, todos físicos (T10); los «focos» son anillos y diademas (PdG.Esp, Rango de casteo, Ef.Esp) |
+| Motor, ya está | Daño mágico extra al golpear (`danoMagico` + dado: ignora Defensa, resta Armadura mágica); stats del Especial (PdG.Esp, Ef.Esp, Rango de casteo, SP, SP Regen); resistencias elementales; cadena del rayo (a mano desde el token) |
+| Motor, falta | **Un ataque con arma que tire PdG.Esp** (hoy no existe); que el daño mágico de un arma reste la Res. elemental; que un arma dé un hechizo (habilidad) para castear; Escarcha/Parálisis/Prende fuego automáticos desde un arma; la calculadora no conoce el SP, los usos ni la forma, y las dos calculadoras valúan distinto PdG.Esp/Ef.Esp |
+
+**Primero los cimientos (propuestas para responder):**
+1. **El ataque mágico**: el arma tira **PdG.Esp contra Evasión**; el daño es el **dado del arma** (no suma Dmg ni Ef.Esp), **directo a la vida**, menos la **Armadura mágica** y la **Res. de su elemento**; no critica. A distancia: el **Rango de casteo**.
+2. **El costo — junta las dos posturas**: el **ataque básico** del arma mágica se paga **como un arma** (No2 que suben con cada ataque del turno, **sin SP**: Seba); los **hechizos** que da el arma (los efectos) cuestan **1 No2 + SP** (dueño). Así la varita sirve para pegar seguido y el SP queda para lo fuerte.
+3. **Mapa elemento ↔ familia** (el dado sube con el Tipo): arcano = varitas (T4) · rayo = T6 · fuego = T8 · hielo = báculos (T10).
+4. **Varita** a una mano (se puede llevar con un arma o un escudo); **báculo** a dos manos y, además, pega físico (híbrido de casa, con Alcance).
+5. **Hechizos del arma**: **usos por combate** (Común/Buena 3 · Raro 2 · Excepcional 1–2 · Legendario 1) además del costo.
+6. El daño mágico de un arma **resta la Res. de su elemento** (como el de las habilidades).
+
+**Lluvia de mecánicas (además de las 16 ideas de efecto de arriba):**
+- **Elemento**: arcano (sin efecto, pero ignora la Res. elemental / perfora 1 de Armadura mágica) · fuego (Prende fuego %, terreno incendiado) · hielo (Escarcha %) · rayo (Parálisis %, cadena) · tóxico (Veneno %).
+- **Canalizar**: +PdG.Esp · +Ef.Esp · +Rango de casteo · +SP máximo · +SP Regen · −1 SP a las habilidades de un elemento · +1 al daño de las habilidades de su elemento.
+- **Cargas**: la varita trae N cargas por combate y no usa SP (sirve para cualquiera, aunque no sea mago) · se recarga 1 por turno sin usarla · se rompe al vaciarse (barata).
+- **Forma del hechizo**: proyectil · cono · línea · flor · rebote al siguiente.
+- **Recursos**: drena SP del golpeado · drena vida (como el arma física) · magia de sangre: pagar SP con vida (para el Nigromante) · devuelve 1 SP al matar.
+- **Defensa del mago**: Escudo especial al castear · Armadura mágica (escasa, cara) · absorber un golpe elemental como SP.
+- **Riesgo (contras)**: sobrecarga (con un 1 en el dado te dañás) · inestable (el elemento sale al azar) · ruidosa (rompe el Sigilo).
+- **Firma** (como las armas físicas): «el primer hechizo del turno cuesta 1 No2 menos» · «+1 d20 de crítico» no (la magia no critica) → «+1 al dado de efecto».
+

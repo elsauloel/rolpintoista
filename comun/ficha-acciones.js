@@ -576,6 +576,28 @@ const FichaAcciones = (() => {
     return {costo: costoEspecialTxt(S, it), que: t.length <= 200 ? t : t.slice(0, 200).replace(/[\s,;:(]+\S*$/, '') + '…'};   // corta en una palabra, nunca a la mitad
   };
   const costoEspecialTxt = (S, it) => { const c = costoEspecial(S, it); return `${fmt(c.no2)} No2${c.sp ? ` + ${fmt(c.sp)} SP` : ''}${c.usos ? ` (uso ${c.usos + 1} del turno)` : ''}`; };
+  /* Los orbes equipados (2026-10-05) al usar un arma especial: el de resguardo te pone Escudo especial 2 hasta tu próximo turno (una vez por turno: el
+     conteo vive en S.ataquesArma, que vacía el Mantenimiento); el salvaje tira 1d6: con 1 te hace 1 de daño, con 6 el efecto sale doble (los dados del
+     daño ×2; si el arma no hace daño, el doble lo decide la mesa). Todo a la vista en la Mesa. Devuelve true si sale doble. */
+  function orbesAlUsar(S, item, it, ui){
+    let doble = false;
+    (S.inventario || []).filter(o => o && o.equipado && o.orbe && !FichaCalculo.itemRoto(o)).forEach(o => {
+      const k = 'orbe:' + o.id;
+      if(o.orbeResguardo && !num((S.ataquesArma || {})[k])){
+        S.ataquesArma = {...(S.ataquesArma || {}), [k]: 1};
+        S.efectos = Array.isArray(S.efectos) ? S.efectos : [];
+        const r = Combatiente.agregarEstado(S.efectos, estadoDeSpec({nombre: 'Escudo especial', turnos: 1, escudoMagico: num(o.orbeResguardo)}, ui.presets || []));
+        ui.mesaHabilidad(o.nombre, r.ok ? `Escudo especial ${fmt(num(o.orbeResguardo))} hasta tu próximo turno.` : `No entra el Escudo especial (${r.motivo || 'bloqueado'}).`);
+      }
+      if(o.orbeSalvaje){
+        const d = 1 + Math.floor(Math.random() * 6);
+        if(d === 1 && ui.fijarHp) ui.fijarHp(num(S.hp) - 1);
+        if(d === 6) doble = true;
+        ui.mesaHabilidad(o.nombre, `1d6 → ${d}: ${d === 1 ? 'te hace 1 de daño' : d === 6 ? (String(it.tiradaExtra || '').match(/\d+d\d+/) ? '¡el efecto sale doble! (los dados del daño, ×2)' : '¡el efecto sale doble! ✋ A mano: qué es el doble lo decide la mesa') : 'nada'}.`);
+      }
+    });
+    return doble;
+  }
   async function usarArmaEspecial(S, itemId, forzar, ui, sinSp){
     const item = armasEspeciales(S).find(x => x.id === itemId);
     if(!item){ ui.toast('Esa arma especial no está equipada'); return; }
@@ -594,6 +616,8 @@ const FichaAcciones = (() => {
     S.nitros = num(S.nitros) - (forzar && no2 > num(S.nitros) ? gastoNitrosForzado(S, no2, `usó ${it.nombre}`) : no2);
     S.spGastado = num(S.spGastado) + sp;
     S.ataquesArma = {...(S.ataquesArma || {}), [claveEsp(item)]: c.usos + 1};
+    const doble = orbesAlUsar(S, item, it, ui);   // los orbes de la otra mano (resguardo, salvaje)
+    if(doble) it.tiradaExtra = String(it.tiradaExtra || '').replace(/(\d+)d(\d+)/g, (m, n, k) => `${2 * num(n)}d${k}`);
     // Lo que el arma le pone a quien la usa (2026-10-05, Varita de la luz: luz y «ve lo oculto» hasta el final del turno).
     const propio = item.especial && item.especial.estadoPropio;
     if(propio && propio.nombre){
@@ -603,7 +627,7 @@ const FichaAcciones = (() => {
     }
     ui.colocarTrampa(it);
     ui.terminar(it, null, 0, 0);
-    ui.cambio(['nitros', 'vitals', 'habilidades', ...(propio && propio.nombre ? ['efectos'] : [])]);
+    ui.cambio(['nitros', 'vitals', 'habilidades', 'efectos']);
     ui.toast(`${it.nombre}: −${fmt(no2)} No2${sp ? ` · −${fmt(sp)} SP` : ''}${sinSp ? ' (sin SP: pagado con No2)' : ''}`);
   }
 

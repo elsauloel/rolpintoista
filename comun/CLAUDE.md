@@ -1273,4 +1273,7 @@ versión parecida en más de una, es candidato a juntar.
 - **Ejecución, lo nuevo del 2026-10-05:** objetivo `linea` (`largo`), `cadena: {saltos, rango}`, `soloSigilo` en una `onda` (la luz) y `niebla`
   en una `zona` (crea un elemento `niebla`, no una zona con efecto). Una trampa con `pilar: true` levanta Sólidos de 1 casilla (uno por clic); con
   `portal: {rango, fijo: true}` se marca también el destino (`portal.destino` en su `trampaEstado`, `TokensAuto.estadoJson`). Las trampas con
-  `cant` se colocan **de a una por clic** (js/13, `trampaDeHabilidad`).
+  `cant` se colocan **de a una por clic** (js/13, `trampaDeHabilidad`). Tercera tanda (2026-10-05): `zonaQueda` (un área deja una zona al lanzarse,
+  js/13 `dueloZonaQueda`), `menosDistancia` (−1 por casillero, `dueloAplicarDano`), `atrae` (el gancho, js/13 `dueloAtraer`), `reparte` (dos misiles,
+  js/13 `dueloSegundoMisil`, cascada sin dodge) y `critTipo` (una habilidad física critica como un arma de ese Tipo: `cerrarPar` → `entrarCritico`).
+  Orbes: `orbeResguardo` (Escudo especial N, una vez por turno) y `orbeSalvaje` (1d6) en `FichaAcciones.orbesAlUsar`.

@@ -2006,6 +2006,21 @@ prueba('✨ armas especiales (dueño, 2026-10-05): se usan desde Atacar, como un
   igual([/data-botoneraaccion="atacar" data-arma="vr"/.test(h) && !/data-botoneraaccion="atacar" data-arma=""/.test(h), /data-especial=/.test(h), /data-view="inventario:vr"/.test(h), que.costo, /⚙|✋/.test(que.que)],
     [true, false, true, '1 No2 + 3 SP', false]);
 });
+prueba('✨ armas especiales, tercera tanda (2026-10-05): lo que queda en el suelo, la distancia, el gancho, los misiles, el crítico de lo físico y los orbes', () => {
+  const S = FichaGuardado.normalizar({}).S, cat = id => ({...structuredClone(CATALOGO_BASE.find(i => i.id === id)), equipado: true});
+  const hEj = it => { const h = FichaAcciones.habDeArmaEspecial(S, it); return Combatiente.habEjecucion(h, h.duelo, {stat: s => s === 'dmgesp' ? 6 : 5, etq: x => x}); };
+  const bola = hEj(cat('esp-varita-de-la-bola-de-fuego')), ven = Duelo.limpiarHab(hEj(cat('esp-varita-de-la-ventisca'))), est = Duelo.limpiarHab(hEj(cat('esp-varita-de-la-estaca')));
+  const pel = Duelo.limpiarHab(hEj(cat('esp-varita-de-la-pelea-cercana'))), gan = Duelo.limpiarHab(hEj(cat('esp-varita-del-gancho'))), mis = Duelo.limpiarHab(hEj(cat('esp-varita-de-misiles')));
+  const mia = Combatiente.zonaDeHab({nombre: 'Miasma'}, cat('esp-varita-de-miasma').especial.duelo, {fichaId: 'f', tipo: 'pj'});
+  // El orbe de resguardo: Escudo especial 2, una sola vez por turno
+  const S2 = FichaGuardado.normalizar({}).S; S2.nitros = 10; S2.inventario = [cat('esp-varita-arcana'), cat('esp-orbe-de-resguardo')];
+  const ui = {toast: () => {}, cambio: () => {}, presets: estadosPresetFicha(), avisarSinNitros: () => {}, colocarTrampa: () => {}, terminar: () => {}, mesaHabilidad: () => {}, fijarHp: () => {}};
+  FichaAcciones.usarArmaEspecial(S2, S2.inventario[0].id, false, ui); FichaAcciones.usarArmaEspecial(S2, S2.inventario[0].id, false, ui);
+  const esc = S2.efectos.filter(e => e.nombre === 'Escudo especial');
+  igual([bola.zonaQueda.dano, ven.zonaQueda.estado.nombre, ven.zonaQueda.contra, ven.zonaQueda.tiraValor, est.critTipo, pel.menosDistancia, gan.atrae, mis.reparte, mia.zonaTiraExtra,
+    esc.length, esc[0] && esc[0].escudoMagico, esc[0] && esc[0].turnos],
+    ['1d4', 'Sentado', 'rescc', 6, 4, true, {casillas: 2, contra: 'fue', tiraValor: 6}, {cada: '1d4'}, '1d4', 1, 2, 1]);
+});
 prueba('✨ armas especiales Comunes (2026-10-05): 30 armas y 3 orbes; cada una automatiza algo o aclara lo que queda a mano', () => {
   const L = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-'));
   const armas = L.filter(i => i.especial), orbes = L.filter(i => i.orbe);

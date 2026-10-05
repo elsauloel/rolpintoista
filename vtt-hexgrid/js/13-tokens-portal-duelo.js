@@ -477,12 +477,31 @@ function dueloElegirObjetivoMapa(msg){
       const mio = todos.find(propio);
       let espalda = false;
       try{ espalda = porLaEspalda(mio, t); }catch(err){ console.error('No se pudo ver si es por la espalda:', err); }   // nunca traba el ataque
+      if(ataque && ataque.hab && ataque.hab.reparte){ dueloSegundoMisil(yo, ataque, t, mio); return; }   // Varita de misiles: ¿y el segundo?
       Duelo.crear({yo, ataque, espalda}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
     }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : ''}</span>`, true, cancelado);
     dueloAvisoObjetivo(yo.nombre, msg.conSuelto, alSuelto, ataque && ataque.hab ? ataque.hab.nombre : '');
   };
   pedir();
+}
+/* Los dos misiles (2026-10-05, Varita de misiles): elegido el primero, se marca a quién va el segundo. El mismo (o Esc): los dos juntos, un duelo
+   con el daño entero. Otro: una cascada de dos, como un área — se tira una vez y cada uno se resiste por separado, con el daño de un misil cada uno. */
+function dueloSegundoMisil(yo, ataque, t1, mio){
+  const hab = ataque.hab, juntos = () => Duelo.crear({yo, ataque}, {id: t1.id, nombre: nombreDe(t1), tipo: t1.tipo, fichaId: t1.fichaId, duenoUid: t1.duenoUid}, mio ? mio.id : '')
+    .catch(err => { console.error('No se pudo abrir el duelo:', err); toast('No se pudo abrir el duelo'); });
+  elegirDestino(async h => {
+    const t2 = [...tokens.entries()].map(([id, x]) => ({...x, id})).find(x => x.col === h.col && x.fila === h.fila && x.id !== (mio && mio.id) && (!x.oculto || soyGM) && !tapadoPorNiebla(x));
+    if(!t2 || t2.id === t1.id){ juntos(); return; }
+    try{
+      await coleccionAreas().add({
+        casteador: {ref: String(yo.ref || ''), tipo: yo.tipo, nombre: String(yo.nombre || '').slice(0, 40), uid: (mio && mio.duenoUid) || fbUsuario.uid, tokenId: mio ? mio.id : ''},
+        hab: Duelo.limpiarHab({...hab, dano: hab.dano ? {...hab.dano, formula: hab.reparte.cada} : hab.dano}),
+        centro: {col: mio ? mio.col : t1.col, fila: mio ? mio.fila : t1.fila, linea: [nbPack(t1.col, t1.fila), nbPack(t2.col, t2.fila)]}, radio: 0,
+        objetivos: [t1.id, t2.id], duelos: [], indice: 0, estado: 'en-curso', creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    }catch(err){ console.error('No se pudieron repartir los misiles:', err); toast('No se pudieron repartir los misiles: van los dos al primero'); juntos(); }
+  }, `<b>✨ ${esc(hab.nombre)}: ¿a quién va el segundo misil?</b> <span>clic en otro rival (o en ${esc(nombreDe(t1))} para los dos juntos) · Esc: los dos a ${esc(nombreDe(t1))}</span>`, true, juntos);
 }
 // Un token de creep sin ficha detrás (creado con «Nuevo token» en vez de traerlo de GM Tools) no tiene datos para pelear. Si el GM ataca a uno, se lo vincula solo
 // al creep de GM Tools con el mismo nombre (prefiere uno que todavía no tenga token) y se avisa.
@@ -658,6 +677,17 @@ function porLaEspalda(atq, def){
   const ang = Math.acos(Math.max(-1, Math.min(1, (vx * bx + vy * by) / largo))) * 180 / Math.PI;
   return ang < VISION_CUNA_CIEGA - 1;
 }
+// Lo que deja en el suelo un área (2026-10-05, armas especiales: el fuego de la bola, el suelo de la ventisca): una zona persistente del motor
+// de zonas, en la misma flor, con sus turnos, daño y/o estado (y su resistencia, contra el valor de quien la lanzó).
+function dueloZonaQueda(hab, centro, radio, yo){
+  const z = hab.zonaQueda;
+  crearElementoZona({col: centro.col, fila: centro.fila}, {
+    radio, turnos: z.turnos || 1, nombre: `${hab.nombre}${z.nombre ? ': ' + z.nombre : ''}`.slice(0, 40), color: z.color || '', amiga: true,
+    dano: z.dano || '', ignoraDef: true, danoTipo: z.tipoDano || '', estado: z.estado || null,
+    ...(z.contra ? {resistStat: z.contra, tiraStat: z.tira || 'dmgesp', tiraValor: num(z.tiraValor)} : {}),
+    enMantenimiento: true, cadaPaso: false, casteadorRef: String(yo.ref || ''), casteadorTipo: yo.tipo === 'creep' ? 'creep' : 'pj',
+  }).catch(err => console.error('No se pudo dejar la zona del área:', err));
+}
 function dueloElegirAreaMapa(msg){
   const yo = msg.yo, hab = msg.ataque.hab;
   cerrarBotonera();
@@ -670,6 +700,7 @@ function dueloElegirAreaMapa(msg){
     const mio = todos.find(propio);
     const casteador = {ref: String(yo.ref || ''), tipo: yo.tipo, nombre: String(yo.nombre || '').slice(0, 40), uid: (mio && mio.duenoUid) || fbUsuario.uid, tokenId: mio ? mio.id : ''};
     const enCono = h.cono ? conoDeArea(h) : h.linea ? new Set(h.linea) : null;   // el cono (Sonic Boom) o la línea (Varita láser): sus casillas
+    if(hab.zonaQueda) dueloZonaQueda(hab, h, Math.max(1, radio), yo);   // lo que deja en el suelo (bola de fuego, ventisca)
     const objetivos = todos
       .filter(t => !t.oculto && !propio(t) && (enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio))
       .filter(t => hab.fuegoAmigo || dueloEsRival(yo, t))
@@ -823,7 +854,10 @@ async function dueloAplicarDano(d){
   const critReal = d.resultado === 'pego' && d.crit && d.crit.critico;   // un crítico siempre ignora la Defensa, aunque el d20 no multiplique (×1)
   const magico = !!(d.hab && d.hab.dano && d.hab.dano.ignoraDef && d.resultado === 'pego');   // el daño mágico de una habilidad ignora la Defensa y no critica
   const crit = critReal || magico;
-  const mult = critReal ? d.crit.mult : 1, crudo = Math.max(0, num(dn.crudo)), golpe = crudo * mult;
+  // La pelea cercana (2026-10-05): pierde 1 por cada casillero de distancia después del primero (al lado, entero).
+  const ta0 = d.atacante && tokens.get(d.atacante.tokenId);
+  const menosDist = d.hab && d.hab.menosDistancia && ta0 && t ? Math.max(0, distanciaHex(ta0, t) - 1) : 0;
+  const mult = critReal ? d.crit.mult : 1, crudo = Math.max(0, num(dn.crudo) - menosDist), golpe = crudo * mult;
   const base = {crudo, mult, golpe, ignoraDef: crit, mitad: d.resultado === 'mitad'};
   if(!t) return {...base, manual: true, motivoManual: 'el token ya no está en el mapa'};
   const esInv = t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION);
@@ -845,7 +879,7 @@ async function dueloAplicarDano(d){
   const frenaAm = magico && Combatiente.frenaArmaduraMagica(elDano);   // lo tóxico no lo frena la Armadura mágica (2026-10-05)
   const restaIgnorando = frenaAm ? armadmg : 0;
   const resEl = elDano ? (await resistenciasDe(t, elDano, invLeida)).res : 0;
-  const freno = [...(frenaAm && armadmg ? [`Armadura mágica ${armadmg}`] : []), ...(resEl ? [`${Combatiente.ELEMENTOS[elDano].etq} ${resEl}`] : [])].join(' − ');
+  const freno = [...(menosDist ? [`la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Armadura mágica ${armadmg}`] : []), ...(resEl ? [`${Combatiente.ELEMENTOS[elDano].etq} ${resEl}`] : [])].join(' − ');
   let aplicar = golpe, ignoraDef = crit;
   if(base.mitad){ aplicar = Math.ceil(Math.max(0, golpe - def) / 2); ignoraDef = true; }
   // Bloqueo perdido (mitad del daño): el arma o escudo con el que bloqueó pierde 1 punto de durabilidad (solo personajes: los creeps y las invocaciones no llevan).
@@ -871,6 +905,7 @@ async function dueloAplicarDano(d){
       : !d.hab && num(dn.drenaPct) > 0 ? await dueloDrenar(d, Math.ceil(perdio * num(dn.drenaPct) / 100)) : null;
     // Rayo en cadena (2026-10-05): el golpe de una habilidad o arma especial de rayo salta (la misma regla de ⚡ Rayo en cadena del token).
     if(d.hab && d.hab.cadena && golpe > 0 && !res.r.invulnerable) await dueloCadena(d, golpe).catch(err => console.error('No se pudo hacer saltar el rayo:', err));
+    if(d.hab && d.hab.atrae && !res.r.invulnerable) await dueloAtraer(d).catch(err => console.error('No se pudo atraer al objetivo:', err));   // el gancho
     return {...base, desgaste, defensa: crit ? restaIgnorando : def, ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);
@@ -886,6 +921,30 @@ async function dueloCadena(d, golpe){
   const c = d.hab.cadena, cadena = rayoCadena(id, golpe).slice(0, 1 + Math.max(1, num(c.saltos) || 2));
   for(let i = 1; i < cadena.length; i++) if(typeof rayoSaltoEfecto === 'function') rayoSaltoEfecto(cadena[i - 1].id, cadena[i].id);
   await rayoCadenaAplicar(cadena);
+}
+
+/* El gancho (2026-10-05, Varita del gancho): si pegó, el objetivo tira su Fuerza contra el Ef.Esp de quien la usó (el valor de cuando la usó); si
+   pierde, lo trae hasta `casillas` hacia quien la usó, por casillas libres (Inamovible: su chance de no moverse). Todo a la vista en la Crónica. */
+async function dueloAtraer(d){
+  const t = tokens.get(d.defensor.tokenId), ta = tokens.get(d.atacante.tokenId), a = d.hab.atrae;
+  if(!t || !ta) return;
+  const nom = nombreDe(t), titulo = `🪝 ${d.hab.nombre}: ¿${nom} se resiste?`;
+  const fue = trampaValorStat(t, a.contra || 'fue'), fF = formulaParaValor(fue), fE = formulaParaValor(num(a.tiraValor));
+  const rF = fF ? tirarDados(fF.formula) : {total: 0}, rE = fE ? tirarDados(fE.formula) : {total: 0};
+  const cuenta = `Fuerza ${fF ? fF.formula : '0'} → ${rF.total} contra Ef.Esp ${fE ? fE.formula : '0'} → ${rE.total}`;
+  if(rF.total >= rE.total){ momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `${cuenta}: se planta y no lo mueve.`, estado: 'listo'}); return; }
+  const im = chanceDe(t, 'inamovible');
+  if(im && Math.random() * 100 < im){ momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `${cuenta}: pierde, pero es Inamovible (${im} %): no se mueve.`, estado: 'listo'}); return; }
+  let c = {col: t.col, fila: t.fila}, pasos = 0;
+  const ocupada = x => elementoSolidoEn(x.col, x.fila) || [...tokens.values()].some(y => y !== t && y.col === x.col && y.fila === x.fila);
+  for(let i = 0; i < a.casillas && distanciaHex(c, ta) > 1; i++){
+    const sig = vecinosDeCasilla(c).filter(v => !ocupada(v) && distanciaHex(v, ta) < distanciaHex(c, ta)).sort((p, q) => distanciaHex(p, ta) - distanciaHex(q, ta))[0];
+    if(!sig) break;
+    c = sig; pasos++;
+  }
+  if(!pasos){ momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `${cuenta}: pierde, pero no hay lugar para traerlo.`, estado: 'listo'}); return; }
+  await coleccionTokens().doc(d.defensor.tokenId).update({col: c.col, fila: c.fila, ruta: firebase.firestore.FieldValue.delete()});
+  momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `${cuenta}: pierde — lo trae ${pasos} casillero${pasos === 1 ? '' : 's'} hacia ${d.atacante.nombre}.`, estado: 'listo'});
 }
 
 // Opciones de defensa de un creep, calculadas en el mapa del GM sin cargar las Acciones: Evasión o Parry con su arma (siempre 1 No2). null = no es un creep mío.

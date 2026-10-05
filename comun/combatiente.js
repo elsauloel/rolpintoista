@@ -599,7 +599,15 @@ const Combatiente = (() => {
       ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: nf(c.radio)} : {}),
       ...(c.objetivo === 'linea' ? {largo: Math.max(1, Math.round(nf(c.largo)) || 4)} : {}),   // línea recta desde quien la usa (2026-10-05, Varita láser)
       ...(c.objetivo === 'onda' && c.ondaDodge ? {dodge: true} : {}),   // la onda que deja dodge roll (Daño en área)
-      ...(c.objetivo === 'onda' && c.soloSigilo ? {soloSigilo: true} : {}),   // la luz (2026-10-05, Varita de la luz): solo los rivales en sigilo que alcanza
+      ...(c.objetivo === 'onda' && c.soloSigilo ? {soloSigilo: true} : {}),
+      // Tercera tanda de armas especiales (2026-10-05): lo que deja en el suelo un área (bola de fuego, ventisca), el −1 por casillero (pelea
+      // cercana), lo que atrae (gancho, con la Fuerza del objetivo contra el Ef.Esp de quien la usa), los dos misiles que se reparten y el
+      // crítico de lo físico invocado (Tipo de su familia: estaca 4, canto rodado 10).
+      ...(c.zonaQueda ? {zonaQueda: {...c.zonaQueda, ...(c.zonaQueda.tira && o.stat ? {tiraValor: Math.round(nf(o.stat(c.zonaQueda.tira)))} : {})}} : {}),
+      ...(c.menosDistancia ? {menosDistancia: true} : {}),
+      ...(c.atrae ? {atrae: {casillas: Math.max(1, Math.round(nf(c.atrae.casillas)) || 2), contra: c.atrae.contra || 'fue', ...(o.stat ? {tiraValor: Math.round(nf(o.stat(c.atrae.tira || 'dmgesp')))} : {})}} : {}),
+      ...(c.reparte ? {reparte: {cada: String(c.reparte.cada || '1d4')}} : {}),
+      ...(nf(c.critTipo) ? {critTipo: Math.round(nf(c.critTipo))} : {}),   // la luz (2026-10-05, Varita de la luz): solo los rivales en sigilo que alcanza
       // Rayo en cadena (2026-10-05, Varita de chispa eléctrica): si el golpe entra, salta `saltos` veces al más cercano del mismo bando a
       // `rango` casillas o menos, la mitad cada salto (P118: la misma regla de ⚡ Rayo en cadena del token y de la trampa Descarga).
       ...(c.cadena ? {cadena: {saltos: Math.max(1, Math.round(nf(c.cadena.saltos)) || 2), rango: Math.max(1, Math.round(nf(c.cadena.rango)) || 3)}} : {}),

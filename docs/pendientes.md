@@ -204,7 +204,7 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   `pruebas-de-humo.md`); encontró y se corrigieron dos fallas de carteles tapados en el mapa.
 - [x] **Dar en combate** (P157, 2026-10-05): hecho (`comun/intercambio.js`): 1 No2 desde el cinturón (Pasamanos 0), 2 desde la mochila, solo a
   un aliado al lado; Alforja compartida = un aliado saca un consumible de tu mochila por 1 No2. Catálogo: Faja de mandadero y Alforja de arriero.
-- [ ] **Pegar las reglas de Firestore** (dueño, cuando vuelva a la compu): la Alforja compartida (paquetes «pedido») y, desde el 2026-10-05, el campo
+- [x] **Pegar las reglas de Firestore** (dueño, pegadas el 2026-10-05): la Alforja compartida (paquetes «pedido») y, desde el 2026-10-05, el campo
   `niebla` de los elementos (Varita de niebla). Sin eso la niebla no se puede poner («faltan publicar las reglas nuevas»).
 - [ ] **Equipo defensivo Común para casters** (dueño, 2026-10-05): después de las armas especiales Comunes; ver la fase 3b de
   `hoja-de-ruta-rework-catalogo.md` (ej.: Sombrero humectante, +1 a la regeneración de SP).

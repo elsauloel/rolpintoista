@@ -1526,3 +1526,11 @@ lluvia ácida 21 y báculo de sangre 19,5), 3 orbes.
     Demora de las armas físicas (peso 4) × 0,75 por ser trampa → **1 SP, 45 DDE**. Quedan **30 armas + 3 orbes** Comunes.
   - Siguen a mano: el reparto de los misiles, el −1 por distancia de la pelea cercana, el empuje y el gancho, el fuego que deja la bola, el suelo de la
     ventisca, el +1d4 del miasma, el crítico de lo físico y los orbes de resguardo y salvaje.
+- **Tercera tanda (2026-10-05, dueño: «se debería poder automatizar todo; el desarrollo ya está hecho»):** las armas especiales se usan desde **Atacar**
+  (cada una con su recorrido, sin oportunidad ni contraataque: P160) y quedan automatizadas: el **fuego** de la bola y el **suelo resbaladizo** de la
+  ventisca (`zonaQueda`: una zona de 1 turno en la flor, del motor de zonas), el **+1d4 del miasma** (`danoExtra` de la zona, como los Pedos Tóxicos),
+  la **pelea cercana** (`menosDistancia`: −1 por casillero después del primero, a la vista en el daño), el **gancho** (`atrae`: si pega, su Fuerza
+  contra tu Ef.Esp se tira sola en el mapa del GM; si pierde lo trae 2 por casillas libres; Inamovible vale), los **misiles** (`reparte`: después del
+  primero se marca el segundo; si es otro, cascada de dos con 1d4 cada uno), el **crítico de lo físico** (`critTipo`: estaca Tipo 4, canto rodado
+  Tipo 10, con el mismo crítico de las armas y la Resistencia a crítico del defensor) y los **orbes** (resguardo: Escudo especial 2, una vez por turno;
+  salvaje: 1d6, con 1 te hace 1, con 6 los dados del daño ×2). **Solo queda a mano** el «doble» del orbe salvaje con un arma sin daño (lo decide la mesa).

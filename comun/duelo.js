@@ -379,7 +379,7 @@ const Duelo = (() => {
       estado: 'esperando', fase: 'contacto',
       atacante: {ref: String(cfg.yo.ref), tipo: cfg.yo.tipo, nombre: String(cfg.yo.nombre || '').slice(0, 40), uid: cfg.yo.uid || yo(), tokenId: miTokenId || ''},
       defensor: {ref: String(tokDef.fichaId || ''), tipo: tokDef.tipo, nombre: String(tokDef.nombre || '').slice(0, 40), uid: String(tokDef.duenoUid || ''), tokenId: tokDef.id},
-      ataque: hab ? {tipo: 'habilidad', armaId: '', armaNombre: hab.nombre, tipoDado: 0, rango: true}
+      ataque: hab ? {tipo: 'habilidad', armaId: '', armaNombre: hab.nombre, tipoDado: _num(hab.critTipo), rango: true}
         : cfg.ataque.tipo === 'habilidad-arma' ? {tipo: 'habilidad-arma', habNombre: txtCorto(cfg.ataque.habNombre, 60), armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado), rango: !!cfg.ataque.rango,
           sinParry: !!cfg.ataque.sinParry, mods: {pdg: _num(cfg.ataque.mods && cfg.ataque.mods.pdg), dados: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.dados))), fijo: _num(cfg.ataque.mods && cfg.ataque.mods.fijo), ignoraResistCrit: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.ignoraResistCrit))),
             critBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critBono))), critpotBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critpotBono)))}, efectos: limpiarEfectos(cfg.ataque.efectos),
@@ -486,6 +486,15 @@ const Duelo = (() => {
     return {nombre: txtCorto(h.nombre, 60), objetivo, tira: t, contra, dano, efectos, sinOposicion: !(t && contra.length),
       ...(objetivo === 'onda' && h.dodge ? {dodge: true} : {}),
       ...(objetivo === 'onda' && h.soloSigilo ? {soloSigilo: true} : {}),   // la luz: solo a los que estaban en sigilo
+      ...(h.zonaQueda ? {zonaQueda: {turnos: Math.min(6, Math.max(1, Math.round(_num(h.zonaQueda.turnos)) || 1)), nombre: txtCorto(h.zonaQueda.nombre || '', 40),
+        ...(h.zonaQueda.dano ? {dano: txtCorto(h.zonaQueda.dano, 12)} : {}), ...(h.zonaQueda.tipoDano ? {tipoDano: txtCorto(h.zonaQueda.tipoDano, 20)} : {}),
+        ...(h.zonaQueda.estado ? {estado: {nombre: txtCorto(h.zonaQueda.estado.nombre || '', 40), ...(h.zonaQueda.estado.turnos ? {turnos: _num(h.zonaQueda.estado.turnos)} : {})}} : {}),
+        ...(h.zonaQueda.contra ? {contra: txtCorto(h.zonaQueda.contra, 12)} : {}), ...(h.zonaQueda.tira ? {tira: txtCorto(h.zonaQueda.tira, 12), tiraValor: _num(h.zonaQueda.tiraValor)} : {}),
+        ...(h.zonaQueda.color ? {color: txtCorto(h.zonaQueda.color, 7)} : {})}} : {}),   // lo que deja en el suelo (bola de fuego, ventisca)
+      ...(h.menosDistancia ? {menosDistancia: true} : {}),   // −1 por casillero después del primero (pelea cercana)
+      ...(h.reparte ? {reparte: {cada: txtCorto(h.reparte.cada || '1d4', 12)}} : {}),   // dos misiles que se pueden repartir
+      ...(h.atrae ? {atrae: {casillas: Math.min(6, Math.max(1, Math.round(_num(h.atrae.casillas)) || 2)), contra: txtCorto(h.atrae.contra || 'fue', 12), tiraValor: _num(h.atrae.tiraValor)}} : {}),   // el gancho
+      ...(_num(h.critTipo) ? {critTipo: Math.min(12, Math.max(1, Math.round(_num(h.critTipo))))} : {}),   // lo físico invocado critica como su Tipo
       ...(objetivo === 'linea' ? {largo: Math.min(12, Math.max(1, Math.round(_num(h.largo)) || 4))} : {}),
       ...(h.cadena ? {cadena: {saltos: Math.min(6, Math.max(1, Math.round(_num(h.cadena.saltos)) || 2)), rango: Math.min(6, Math.max(1, Math.round(_num(h.cadena.rango)) || 3))}} : {}),   // rayo en cadena (2026-10-05)
       ...(h.efectoLibre ? {efectoLibre: txtCorto(h.efectoLibre, 200)} : {}),
@@ -555,8 +564,8 @@ const Duelo = (() => {
     m.estado = 'esperando';
     if(par === 'contacto' && m.hab){   // habilidad dirigida: gana quien la usa → sigue; gana el objetivo → se resistió
       m.contacto = info;
-      if(r.gana === 'atacante'){ m.resultado = 'pego'; entrarHab(m); }
-      else if(m.grupo && ((m.hab.objetivo !== 'onda' && m.hab.objetivo !== 'cono') || m.hab.dodge)){   // (una onda solo si deja dodge: `hab.dodge`, Daño en área)   // hechizo de área (Paso 4 del casteo): ganar la Evasión no termina el duelo, gana el DERECHO a un dodge roll (la onda alrededor de quien la usa no da dodge: no hay a dónde salir)
+      if(r.gana === 'atacante'){ m.resultado = 'pego'; if(m.hab.critTipo && m.hab.dano) entrarCritico(m); else entrarHab(m); }   // lo físico invocado (estaca, canto rodado) critica
+      else if(m.grupo && m.hab.objetivo !== 'enemigo' && ((m.hab.objetivo !== 'onda' && m.hab.objetivo !== 'cono') || m.hab.dodge)){   // (dos misiles repartidos: sin dodge)   // (una onda solo si deja dodge: `hab.dodge`, Daño en área)   // hechizo de área (Paso 4 del casteo): ganar la Evasión no termina el duelo, gana el DERECHO a un dodge roll (la onda alrededor de quien la usa no da dodge: no hay a dónde salir)
         m.fase = 'dodge'; m.estado = 'esperando';
       }
       else{ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; }
@@ -1885,7 +1894,7 @@ const Duelo = (() => {
       }
       let extra = null;
       if(!d.hab && campo === 'pdg' && h.statsCritico) extra = h.statsCritico(d) || null;
-      if(!d.hab && campo === 'eva' && h.resistenciaCritico) extra = {resistencia: _num(h.resistenciaCritico(d))};
+      if((!d.hab || d.hab.critTipo) && campo === 'eva' && h.resistenciaCritico) extra = {resistencia: _num(h.resistenciaCritico(d))};   // (una habilidad física con crítico, también)
       // ⚡ Critical Matters (2026-09-29): a esta altura (el daño se tira después del crítico, ver entrarCritico)
       // d.crit ya está resuelto — si el golpe salió crítico, los efectos de duelo.critico.efectos se suman a
       // los de siempre (arma + habilidad), mismo mecanismo de "recordar y tirar" que ya usan efectosArma/efectos.

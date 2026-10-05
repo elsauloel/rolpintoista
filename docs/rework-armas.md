@@ -1403,3 +1403,8 @@ van a contemplar como…»: falta completar.)
   (física T4) · ✅ 21 piedrazo (físico T8) · ✅ 22 granizo (con Escarcha) · ✅ 23 ácido → **área de lluvia ácida que rompe armadura** · ✅ 24 nube tóxica
   chica · ❌ 25 marca que explota · ⏳ 26 daño que crece al repetir (más adelante) · ✅ 27 pega más cuanto más cerca · ✅ 28 daño a quien se mueve en un
   área · ❌ 29 mojado/aceitado.
+- **Filtro del dueño — C. Control (2026-10-05):** criterio general: **el control no va solo**; viene como **efecto secundario** de un daño bajo o moderado
+  (con %) **o aplicado en área**. ✅ 30 Lento · ✅ 31 Sentado · ✅ 32 Inmovilizado (los tres así) · ✅ 33 empujar · ✅ 34 atraer — **sumarlo también a las armas
+  de rango cuando toquen («grappling hook»)** · ✅ 35 Demora, también como secundario (por ejemplo de un piedrazo) · ✅ 36 Pajaritos · ✅ 37 Silencio ·
+  ✅ 38 Ceguera · 🔀 39 Miedo y 40 Sueño: valen, pero **para hechizos (habilidades), no para armas** · ✅ 41 Confusión y 42 Desarme, como secundarios ·
+  ❌ 43 Gravedad · ❌ 44 Pierde No2 (se superpone con la Escarcha).

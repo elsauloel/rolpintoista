@@ -1228,4 +1228,9 @@ versión parecida en más de una, es candidato a juntar.
   menos de 1). `Combatiente.durBase` (3 por Peso, mínimo 3; o el `durPorPeso` de una copia vieja) y `durMax` = base + extra. El asistente de ítems
   pregunta «Durabilidad: Resistente (+) o Frágil (−)» y convierte un `durPorPeso` viejo al guardar. Una pieza rota cuesta el doble de reparar hasta
   quedar entera (`FichaTienda.costoReparar`, `reparoRoto`).
+- **Botones con detalle y Evasión especial a la vista** (2026-10-04, dueño: «decidir con la información completa», «que no sea silencioso»): los
+  botones de `AvisoCombate.mostrar` / `cartel` aceptan `detalle` (una línea chica debajo; el cartel de «¿Con qué arma?» del ataque de oportunidad
+  pone ahí el daño y lo que hace cada arma). En el duelo, una tirada cuyo origen trae «(+N contra …)» guarda esa `nota` (`tiro.nota`) y se muestra
+  en el cuadro y en la Mesa («Evasión (+2 contra oportunidad)»). El mapa del GM arma las opciones de defensa de un creep con `CreepDuelo` (ya no con
+  su copia corta), así se ven los dados que tiraría.
 

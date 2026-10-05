@@ -1297,3 +1297,28 @@ algo para hacer a quien no pelea, aparte del casteo de sus habilidades.** Se arr
 elemento). Inquietudes abiertas (sin definir, «ayudame a pensar»): qué forma tiene cada una; si el daño directo a la vida suma el Ef.Esp (el
 equivalente a la Fuerza del guerrero); y cómo se regula, si casi no hay defensa contra lo mágico. Lo de arriba (panorama, lluvia) queda como
 material de consulta, no como decisión.
+
+**2026-10-05 · Sin paridad (dueño): «con las armas especiales vamos a dejar de lado la paridad. Vamos a tener una variedad mucho más grande de cada
+tier para poder explorar a fondo la versatilidad de mecánicas».** → no se mide cada arma especial contra una física del mismo tier; el tier da el
+techo de potencia y la gracia está en la variedad. Primera tanda propuesta: **Comunes**, cada una con una mecánica distinta, combinando cinco ejes:
+cómo acierta (PdG.Esp / PdG común / sin tirada) · qué lo frena (Evasión, Defensa, Res.Esp, Res. elemental, nada) · qué hace (daño, estado, forma
+en el mapa, apoyo) · qué gasta (No2, cargas por combate, SP) · la forma (proyectil, flor, cono, línea, uno mismo, aliado).
+
+| Nombre (borrador) | Qué hace |
+|---|---|
+| Varita arcana | Proyectil: PdG.Esp contra Evasión, 1d4 directo a la vida. 1 No2. La de referencia |
+| Varita de escarcha | Lanza de hielo física: PdG común contra Evasión, 1d4 que resta Defensa y critica; 33 % Lento |
+| Varita de estática | PdG.Esp contra Evasión, 1d3 directo; salta a uno al lado con la mitad |
+| Varita de chispas | Flor de radio 1 a ≤ 4 casillas: 1 de daño de fuego a cada uno (resta Res. fuego). Sin tirada para acertar |
+| Frasco de miasma | Sin daño: PdG.Esp contra Res.Esp; si entra, Veneno 2 |
+| Silbato de ráfaga | Empuja 1 casillero (cono corto); Inamovible lo frena |
+| Varita de lodo | 3 casillas de barro 2 turnos: quien entra queda Lento |
+| Vara de destello | Flor sin daño: PdG.Esp contra Res.Esp; −2 PdG en su próximo ataque |
+| Varita de bruma | Niebla de radio 1, 2 turnos |
+| Varita de cuerdas | Atrapa: Inmovilizado 1 turno (se suelta con Fuerza contra 5) |
+| Amuleto de la chispa vital | Cura 1d4 a un aliado al lado. 2 cargas por combate |
+| Varita del amparo | Escudo especial 3 a un aliado, 1 turno. 2 cargas |
+| Campanita de vigía | Revela lo que está en sigilo en radio 3 (tirada de Percepción con Ef.Esp) |
+| Bastón zahorí | Marca a un rival: el próximo aliado que lo ataque, +1 PdG |
+| Pipa de humo | Entrás en Sigilo sin pagar No2, una vez por combate |
+| Varita de cargas | 3 disparos arcanos de 1d6 por combate, sin tirada de Especial (PdG común): la del que no es mago |

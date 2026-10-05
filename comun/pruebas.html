@@ -1960,7 +1960,7 @@ prueba('daño tóxico (dueño, 2026-10-05): no lo frena la Armadura mágica; el 
 prueba('✨ armas especiales (2026-10-05): la varita arma su tiro como una Ejecución; el No2 sube 1 por uso en el turno; suma el Ef.Esp si lo dice; no parrea', () => {
   const S = FichaGuardado.normalizar({}).S;
   const cat = id => structuredClone(CATALOGO_BASE.find(i => i.id === id));
-  const arc = {...cat('esp-varita-arcana'), id: 'v1', equipado: true}, est = {...cat('esp-varita-de-la-estaca'), id: 'v2', equipado: true}, orbe = {...cat('esp-orbe-de-luz'), id: 'o1', equipado: true};
+  const arc = {...cat('esp-varita-arcana'), id: 'v1', equipado: true}, est = {...cat('esp-varita-de-la-pua-de-hielo'), id: 'v2', equipado: true}, orbe = {...cat('esp-orbe-de-luz'), id: 'o1', equipado: true};
   S.inventario = [arc, est, orbe];
   const h = FichaAcciones.habDeArmaEspecial(S, arc), h2 = FichaAcciones.habDeArmaEspecial(S, est);
   const ef = FichaCalculo.calcular(S).final.dmgesp;
@@ -2009,7 +2009,7 @@ prueba('✨ armas especiales (dueño, 2026-10-05): se usan desde Atacar, como un
 prueba('✨ armas especiales, tercera tanda (2026-10-05): lo que queda en el suelo, la distancia, el gancho, los misiles, el crítico de lo físico y los orbes', () => {
   const S = FichaGuardado.normalizar({}).S, cat = id => ({...structuredClone(CATALOGO_BASE.find(i => i.id === id)), equipado: true});
   const hEj = it => { const h = FichaAcciones.habDeArmaEspecial(S, it); return Combatiente.habEjecucion(h, h.duelo, {stat: s => s === 'dmgesp' ? 6 : 5, etq: x => x}); };
-  const bola = hEj(cat('esp-varita-de-la-bola-de-fuego')), ven = Duelo.limpiarHab(hEj(cat('esp-varita-de-la-ventisca'))), est = Duelo.limpiarHab(hEj(cat('esp-varita-de-la-estaca')));
+  const bola = hEj(cat('esp-varita-de-la-bola-de-fuego')), ven = Duelo.limpiarHab(hEj(cat('esp-varita-de-la-ventisca'))), est = Duelo.limpiarHab(hEj(cat('esp-varita-de-la-pua-de-hielo')));
   const pel = Duelo.limpiarHab(hEj(cat('esp-varita-de-la-pelea-cercana'))), gan = Duelo.limpiarHab(hEj(cat('esp-varita-del-gancho'))), mis = Duelo.limpiarHab(hEj(cat('esp-varita-de-misiles')));
   const mia = Combatiente.zonaDeHab({nombre: 'Miasma'}, cat('esp-varita-de-miasma').especial.duelo, {fichaId: 'f', tipo: 'pj'});
   // El orbe de resguardo: Escudo especial 2, una sola vez por turno
@@ -2020,6 +2020,10 @@ prueba('✨ armas especiales, tercera tanda (2026-10-05): lo que queda en el sue
   igual([bola.zonaQueda.dano, ven.zonaQueda.estado.nombre, ven.zonaQueda.contra, ven.zonaQueda.tiraValor, est.critTipo, pel.menosDistancia, gan.atrae, mis.reparte, mia.zonaTiraExtra,
     esc.length, esc[0] && esc[0].escudoMagico, esc[0] && esc[0].turnos],
     ['1d4', 'Sentado', 'rescc', 6, 4, true, {casillas: 2, contra: 'fue', tiraValor: 6}, {cada: '1d4', total: 2}, '1d4', 1, 2, 1]);
+});
+prueba('efectos con 33 % (dueño, 2026-10-05: «tirar d3 es feo»): se tiran con d6 y salen con 5 o 6 — en el duelo y en las armas', () => {
+  const g = EfectosGolpe.normalizar({nombre: 'Escarcha', caras: 3, exitos: 1});
+  igual([g.caras, g.exitos, EfectosGolpe.normalizar({nombre: 'X', caras: 4, exitos: 1}).caras], [6, 2, 4]);
 });
 prueba('Botonera (dueño, 2026-10-05): «Tiradas de stats» muestra solo lo que se tira — un stat nuevo de equipo (ranuras, resistencias, %) no se cuela', () => {
   const h = FichaBotonera.html(fichaBotonera(), {modoMapa: 'combate'}).html, d = document.createElement('div'); d.innerHTML = h;

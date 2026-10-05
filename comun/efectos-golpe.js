@@ -19,7 +19,7 @@ const EfectosGolpe = (() => {
     {caras: 1, exitos: 1, texto: 'Siempre'},
     {caras: 4, exitos: 3, texto: '75%'},
     {caras: 2, exitos: 1, texto: '50%'},
-    {caras: 3, exitos: 1, texto: '33%'},
+    {caras: 6, exitos: 2, texto: '33%'},   // con d6: 5 o 6 (no d3)
     {caras: 4, exitos: 1, texto: '25%'},
     {caras: 5, exitos: 1, texto: '20%'},
     {caras: 10, exitos: 1, texto: '10%'},
@@ -29,8 +29,9 @@ const EfectosGolpe = (() => {
   const e = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 
   function normalizar(ef){
-    const caras = Math.max(1, n(ef && ef.caras) || 1);
-    const exitos = Math.min(caras, Math.max(1, n(ef && ef.exitos) || 1));
+    let caras = Math.max(1, n(ef && ef.caras) || 1);
+    let exitos = Math.min(caras, Math.max(1, n(ef && ef.exitos) || 1));
+    if(caras === 3){ caras = 6; exitos *= 2; }   // un d3 se tira con d6 (dueño, 2026-10-05: «tirar d3 es feo»): 33 % = 5 o 6
     return {
       nombre: String((ef && ef.nombre) || '').trim(),
       caras, exitos,

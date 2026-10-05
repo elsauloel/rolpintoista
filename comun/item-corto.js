@@ -195,7 +195,7 @@ const ItemCorto = (() => {
     if(num(it.critD20)) L.push(`+${num(it.critD20)} d20 en el crítico: cuando el golpe es crítico se tira${num(it.critD20) === 1 ? ' un d20' : 'n ' + num(it.critD20) + ' d20'} más para el multiplicador (más chance de ×3, ×4 y de supercrítico). ⚙ Automatizado.`);
     if(efs.some(e => e.danoMagico)) L.push('Daño mágico (rayo, hielo…): se tira aparte cuando el golpe pega; ignora la Defensa (solo resta la Armadura mágica) y queda afuera del multiplicador del crítico. ⚙ Automatizado.');
     if(efs.some(e => e.soloCritico)) L.push('⚡ Si es crítico (Critical Matters): ese efecto solo entra si el golpe fue crítico; si no, ni aparece.');
-    if(efs.some(e => pctEf(e) < 100 && !e.soloCritico)) L.push('Los porcentajes se tiran en el duelo, después del daño (50 % = una moneda, 25 % = un d4, 75 % = un d4 que falla solo con 1). Lisiado, Veneno y Sangrado necesitan que el golpe haga daño.');
+    if(efs.some(e => pctEf(e) < 100 && !e.soloCritico)) L.push('Los porcentajes se tiran en el duelo, después del daño (50 % = una moneda, 33 % = un d6 que sale con 5 o 6, 25 % = un d4, 75 % = un d4 que falla solo con 1). Lisiado, Veneno y Sangrado necesitan que el golpe haga daño.');
     if(efs.some(e => e.seguroCritico)) L.push('Seguro si es crítico: con un golpe crítico, el efecto entra sin tirar.');
     if(efs.length) L.push('⚙ Automatizado: el duelo tira cada efecto y lo aplica con «Aplicar».');
     { const dx = Math.round(num(it.durExtra));

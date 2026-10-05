@@ -784,7 +784,8 @@ const Duelo = (() => {
   function normalizarEfectos(lista){
     // «Ignora N de Res. crítico» no es un efecto sobre el golpeado: ya se usó al calcular el crítico (2026-10-03).
     return (Array.isArray(lista) ? lista : []).filter(e => !(typeof Combatiente !== 'undefined' && Combatiente.esEfectoIgnora(e))).slice(0, 8).map(e => {
-      const caras = Math.max(1, Math.round(_num(e.caras)) || 1), exitos = Math.min(caras, Math.max(1, Math.round(_num(e.exitos)) || 1));
+      let caras = Math.max(1, Math.round(_num(e.caras)) || 1), exitos = Math.min(caras, Math.max(1, Math.round(_num(e.exitos)) || 1));
+      if(caras === 3){ caras = 6; exitos *= 2; }   // un d3 se tira con d6 (dueño, 2026-10-05: «tirar d3 es feo»): 33 % = 5 o 6
       const o = {nombre: String(e.nombre || '').trim().slice(0, 40), caras, exitos, dado: String(e.dado || '').trim().slice(0, 20), detalle: String(e.detalle || '').trim().slice(0, 200), stacks: Math.max(0, Math.round(_num(e.stacks)))};
       if(_num(e.turnos) > 0) o.turnos = Math.round(_num(e.turnos));
       if(e.permanente) o.permanente = true;

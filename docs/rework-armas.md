@@ -1526,6 +1526,8 @@ lluvia ácida 21 y báculo de sangre 19,5), 3 orbes.
     Demora de las armas físicas (peso 4) × 0,75 por ser trampa → **1 SP, 45 DDE**. Quedan **30 armas + 3 orbes** Comunes.
   - Siguen a mano: el reparto de los misiles, el −1 por distancia de la pelea cercana, el empuje y el gancho, el fuego que deja la bola, el suelo de la
     ventisca, el +1d4 del miasma, el crítico de lo físico y los orbes de resguardo y salvaje.
+- **Dueño, 2026-10-05:** la estaca pasa a **Varita de la púa de hielo** (le faltaba el hielo en el nombre). Y una regla para todo efecto con **33 %**:
+  se tira con **d6 y sale con 5 o 6** (no d3, «tirar d3 es feo»), en varitas, armas y creeps.
 - **Luz y Marca (dueño, 2026-10-05):** la luz marca a **todo rival que alcanza** (con vista), esté en sigilo o no; la idea de la marca es que **aunque
   vuelva la niebla de guerra, el marcado siga visible** (el mapa lo muestra igual).
 - **Láser, 12 direcciones (dueño, 2026-10-05, con dibujo):** 6 de lado (pega en las 4 casillas) y 6 diagonales (solo las casillas justo sobre la línea:

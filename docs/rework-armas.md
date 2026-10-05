@@ -1377,3 +1377,8 @@ van a contemplar como…»: falta completar.)
 - **El techo de cada calidad, a definir juntos:** buscar un valor numérico promedio de las armas físicas por calidad y alcanzarlo, en cada calidad
   de las especiales, con los distintos efectos. Referencia de la calculadora de armas (armas físicas ya rehechas, en sus puntos de valor, PC):
   Común 6 (de 2,3 a 9,6) · Buena 9 · Rara 13,7 · Excepcional 20,5 · Legendaria 30. 1 PC ≈ 1 punto de daño promedio por golpe.
+- **Frenos (dueño, 2026-10-05):** **no** a las cargas ni a los usos por combate. **Por turno**, sí, si es una solución consistente. Otra opción suya:
+  **un costo que sube, pero menos que en las armas**: el primer uso 1 No2, el segundo 2, el tercero 3. Y el **SP** como freno, pensado para los
+  **efectos de control y terreno**.
+- **Techo por calidad:** se trabaja con **Común, Buena y Rara**. Las Excepcionales y Legendarias son todas de antes del rework: se hacen todas juntas
+  cuando terminen las Raras de todos los tipos.

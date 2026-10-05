@@ -720,3 +720,5 @@ tirá antes» con qué significa cada resultado y el botón; según lo que salga
 igual, para que no se pueda reintentar); 3 al azar (ataque/habilidad: a cada candidato visible a su alcance se le pone un número en el mapa y se
 tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimiento: 1d6 para la dirección, los mismos pasos); 4 normal.
 
+
+- 🔲 **P156. Lanzamiento: tirar un consumible o colocar una trampa a distancia** (2026-10-04, del rework del cinturón). ¿Cómo se tira un frasco o una bomba, o se coloca una trampa lejos (alcance, puntería, qué pasa si falla)? Hasta definirlo queda en pausa la mecánica de cinturón «Brazo de lanzador» (+N casilleros al tirar o colocar algo). También anotada en las Preguntas de las Herramientas de diseño.

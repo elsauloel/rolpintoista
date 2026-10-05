@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-10-05T12:00:57Z",
+ "actualizado": "2026-10-05T12:06:47Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1616,7 +1616,7 @@
    ],
    "estado": "borrador",
    "capitulo": "equipo",
-   "cuerpo": "Los **despojos** son lo que dejan los enemigos y nadie se llevó. Se anotan en el dock de la ficha (**💰 DDE y despojos**).\n\n- **Qué son:** una moneda intermedia. Cuando termina un combate, los ítems que soltaron los enemigos quedan en una lista; los jugadores toman los que quieran, y lo que sobra, cuando el GM aprieta **Despojar**, se convierte en despojos y se reparte entre los jugadores.\n- **Cuánto valen:** **1 despojo se vende por 1 DDE** en cualquier tienda ([[Tiendas]]). Un ítem despojado da despojos por la **mitad de su valor de venta** (un cuarto de su precio de compra, si no tiene uno propio).\n- **Tipos:** además del despojo común, la ficha tiene contadores de despojos **mágicos** y **especiales** que se anotan a mano por ahora.\n\n> [!question] A futuro\n> Se piensa un sistema de crafteo donde los despojos sirvan para fabricar cosas. Todavía no está diseñado."
+   "cuerpo": "Los **despojos** son lo que dejan los enemigos y nadie se llevó. Se anotan en el dock de la ficha (**💰 DDE y despojos**).\n\n- **Qué son:** una moneda intermedia. Cuando termina un combate, los ítems que soltaron los enemigos quedan en una lista; los jugadores toman los que quieran, y lo que sobra, cuando el GM aprieta **Despojar**, se convierte en despojos y se reparte entre los jugadores.\n- **Cuánto valen:** **1 despojo se vende por 1 DDE** en cualquier tienda ([[Tiendas]]). Un ítem despojado da despojos por la **mitad de su valor de venta** (un cuarto de su precio de compra, si no tiene uno propio).\n- **Convertir un ítem en despojos:** en cualquier momento, desde la mochila (botón **♻** del ítem, o **🤝 Pasar · ♻** en la ventana de Equipo del mapa). Da lo mismo que daría ese ítem en el botín: **un cuarto de su precio de compra** (para arriba), por cada unidad que conviertas. **En combate cuesta 1** [[Nitros (No2)|Nitro]]. Queda una línea en la Mesa. No se puede deshacer.\n- **Tipos:** además del despojo común, la ficha tiene contadores de despojos **mágicos** y **especiales** que se anotan a mano por ahora.\n\n> [!question] A futuro\n> Se piensa un sistema de crafteo donde los despojos sirvan para fabricar cosas. Todavía no está diseñado."
   },
   {
    "id": "experiencia-y-despojos",

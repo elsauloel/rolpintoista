@@ -305,6 +305,7 @@ Los **despojos** son lo que dejan los enemigos y nadie se llevó. Se anotan en e
 
 - **Qué son:** una moneda intermedia. Cuando termina un combate, los ítems que soltaron los enemigos quedan en una lista; los jugadores toman los que quieran, y lo que sobra, cuando el GM aprieta **Despojar**, se convierte en despojos y se reparte entre los jugadores.
 - **Cuánto valen:** **1 despojo se vende por 1 DDE** en cualquier tienda ([[Tiendas]]). Un ítem despojado da despojos por la **mitad de su valor de venta** (un cuarto de su precio de compra, si no tiene uno propio).
+- **Convertir un ítem en despojos:** en cualquier momento, desde la mochila (botón **♻** del ítem, o **🤝 Pasar · ♻** en la ventana de Equipo del mapa). Da lo mismo que daría ese ítem en el botín: **un cuarto de su precio de compra** (para arriba), por cada unidad que conviertas. **En combate cuesta 1** [[Nitros (No2)|Nitro]]. Queda una línea en la Mesa. No se puede deshacer.
 - **Tipos:** además del despojo común, la ficha tiene contadores de despojos **mágicos** y **especiales** que se anotan a mano por ahora.
 
 > [!question] A futuro

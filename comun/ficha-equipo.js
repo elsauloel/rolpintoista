@@ -310,7 +310,7 @@ const FichaEquipo = (() => {
       <div class="equipo-slot-cab"><span>${esc(sd.label)}</span></div>
       ${items.map(it => {
         const info = slotOcupado(S, it);
-        return filaHtml(it, `${typeof Intercambio !== 'undefined' ? Intercambio.botonDar(it) : ''}${aManoBoton(S, it)}<button type="button" class="mini on" data-toggle="${it.id}" title="${info && info.ocupado ? 'El slot está lleno: te deja reemplazar o comparar' : 'Equipar'}">${info && info.ocupado ? 'Cambiar…' : 'Equipar'}</button>`);
+        return filaHtml(it, `${typeof Intercambio !== 'undefined' ? Intercambio.botonDar(it) + Intercambio.botonDespojos(it) : ''}${aManoBoton(S, it)}<button type="button" class="mini on" data-toggle="${it.id}" title="${info && info.ocupado ? 'El slot está lleno: te deja reemplazar o comparar' : 'Equipar'}">${info && info.ocupado ? 'Cambiar…' : 'Equipar'}</button>`);
       }).join('')}
     </div>`;
     }).join('');
@@ -344,7 +344,7 @@ const FichaEquipo = (() => {
   </div>`;
     return resumen + pesoEq + `<div class="equipo-cols">
     <div><h4 class="equipo-tit">Equipado</h4>${izq}</div>
-    <div><h4 class="equipo-tit">Mochila${typeof Intercambio !== 'undefined' ? ` <button type="button" class="mini" data-ix-abrir-dar="" title="Pasarle a otro personaje un ítem (también pociones y trofeos), DDE o despojos">🤝 Pasar</button>` : ''}</h4>${der || '<div class="hint">No hay nada equipable en la mochila.</div>'}</div>
+    <div><h4 class="equipo-tit">Mochila${typeof Intercambio !== 'undefined' ? ` <button type="button" class="mini" data-ix-abrir-dar="" title="Pasarle a otro personaje un ítem (también pociones y trofeos), DDE o despojos, o convertir un ítem en despojos (♻)">🤝 Pasar · ♻</button>` : ''}</h4>${der || '<div class="hint">No hay nada equipable en la mochila.</div>'}</div>
   </div>`;
   }
   // El cuerpo de «el slot está lleno»: Reemplazar cada uno de los equipados del mismo tipo, o Comparar. null si no hay con qué.

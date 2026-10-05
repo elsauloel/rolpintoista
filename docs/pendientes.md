@@ -204,6 +204,11 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   `pruebas-de-humo.md`); encontró y se corrigieron dos fallas de carteles tapados en el mapa.
 - [x] **Dar en combate** (P157, 2026-10-05): hecho (`comun/intercambio.js`): 1 No2 desde el cinturón (Pasamanos 0), 2 desde la mochila, solo a
   un aliado al lado; Alforja compartida = un aliado saca un consumible de tu mochila por 1 No2. Catálogo: Faja de mandadero y Alforja de arriero.
+- [ ] **Solicitar un ítem** (dueño, 2026-10-05, para más adelante): un jugador entra a la ficha de otro, mira su mochila y aprieta «🙋 Solicitar»
+  en un ítem; al dueño le llega el pedido y lo acepta o no (si acepta, es una oferta de las de 🤝, con su reserva). Se puede armar sobre los paquetes de
+  `comun/intercambio.js` (como el pedido de la Alforja compartida, pero contestado a mano). Fuera de combate; en combate, ¿solo al lado y con No2?
+- [x] **♻ Convertir en despojos** (dueño, 2026-10-05): hecho — cualquier ítem de la mochila, en cualquier momento; un cuarto del precio de compra (como el
+  botín que nadie toma); en combate 1 No2; línea en la Mesa (`Intercambio.botonDespojos`, `comun/intercambio.js`).
 - [ ] **Baúles móviles** (dueño, 2026-10-05, a futuro): por una quest u otro hallazgo, un baúl que sigue al grupo por el bosque o las cuevas
   (sin tienda); de nivel más alto, uno que lo acompaña en los combates. Hoy el baúl común se abre solo desde una tienda abierta (10 ranuras
   por integrante; `Intercambio.POR_INTEGRANTE`).

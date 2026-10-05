@@ -21,6 +21,8 @@
       la mochila; lo que llega va al cinturón si entra. Alforja compartida: un aliado al lado le saca a quien la tiene un consumible de la
       mochila por 1 No2 (paquete `tipo: 'pedido'`: lo pide quien lo saca, la pantalla del dueño de la alforja lo entrega sola y quien lo pidió lo
       recibe y paga).
+   4) ♻ Convertir en despojos (dueño, 2026-10-05): cualquier ítem de la mochila (o parte de una pila), en cualquier momento; da los despojos
+      que daría el botín que nadie toma (un cuarto del precio de compra, para arriba); en combate cuesta 1 No2. Se anuncia en la Mesa.
    La pantalla («host») le dice a esta pieza cómo tocar a un personaje — Intercambio.iniciar(host):
      host = {maneja(fichaId) → ¿esta pantalla lo maneja?, leer(fichaId) → S o null (para dibujar),
              con(fichaId, async S => bool) → cambia al personaje y lo guarda (true = cambió),
@@ -297,6 +299,54 @@ const Intercambio = (() => {
     }finally{ reconciliando.delete(fichaId); }
   }
 
+  /* ---------- ♻ Convertir en despojos ----------
+     Lo mismo que vale un ítem del botín que nadie toma (CreepCalculo.despojosDePrecio: un cuarto del precio de compra, para arriba), por las
+     unidades que se conviertan. Despojos comunes (los mágicos y especiales siguen a mano). En combate, 1 No2. */
+  const COSTO_DESPOJOS = 1;
+  const despojosDeItem = (it, k) => Math.ceil(num(it && it.precioCompra) * Math.max(1, num(k) || 1) / 4);
+  function aDespojos(S, itemId, unidades){
+    const it = (S.inventario || []).find(x => x && x.id === itemId);
+    if(!it) return {error: 'Ese ítem ya no está'};
+    if(it.equipado) return {error: 'Está equipado: sacalo a la mochila primero'};
+    if(reservado(it)) return {error: `Está ofrecido a ${it.reservadoPara || 'otro personaje'}: cancelá la oferta primero`};
+    const total = it.consumible || it.trofeo ? Math.max(1, num(it.unidades) || 1) : 1;
+    const k = Math.max(1, Math.min(total, Math.round(num(unidades)) || total));
+    const n = despojosDeItem(it, k);
+    const combate = !!(host && host.enCombate());
+    const antes = num(S.nitros);
+    if(combate && !pagarNitros(S, COSTO_DESPOJOS, `convirtió ${it.nombre} en despojos`)) return {error: 'cancelado'};
+    if(k >= total) S.inventario = S.inventario.filter(x => x !== it); else it.unidades = total - k;
+    S.loot = S.loot || {};
+    S.loot.normal = num(S.loot.normal) + n;
+    const pagado = antes - num(S.nitros);
+    const txt = `♻ ${nombreDe(S)} convirtió ${it.nombre}${k > 1 ? ' ×' + fmt(k) : ''} en ${fmt(n)} despojos${combate ? ` (−${fmt(pagado)} No2)` : ''}`;
+    if(typeof mesaLinea === 'function') mesaLinea(txt);
+    return {n, k, txt};
+  }
+  async function convertir(fichaId, itemId, unidades){
+    const S0 = host.leer(fichaId);
+    const it0 = S0 && (S0.inventario || []).find(x => x && x.id === itemId);
+    if(!it0){ host.toast('Ese ítem ya no está'); return; }
+    const total = it0.consumible || it0.trofeo ? Math.max(1, num(it0.unidades) || 1) : 1;
+    let k = num(unidades) || total;
+    if(!unidades && total > 1){
+      const r = window.prompt(`¿Cuántas de ${it0.nombre} convertís en despojos? (tenés ${fmt(total)})`, String(total));
+      if(r === null) return;
+      k = Math.max(1, Math.min(total, Math.round(num(r)) || 0));
+      if(!k) return;
+    }
+    const n = despojosDeItem(it0, k);
+    if(!window.confirm(`¿Convertir ${it0.nombre}${k > 1 ? ' ×' + fmt(k) : ''} en ${fmt(n)} despojos?${host.enCombate() ? ` En combate cuesta ${fmt(COSTO_DESPOJOS)} No2.` : ''} No se puede deshacer.`)) return;
+    let res = null;
+    await hacer(fichaId, async S => { res = aDespojos(S, itemId, k); return !res.error; });
+    if(res && res.error){ if(res.error !== 'cancelado') host.toast(res.error); return; }
+    if(res) host.toast(res.txt);
+    if(abierta && abierta.tipo === 'dar') dibujarDar();
+  }
+  // El botón de la mochila (la ficha, la ventana de Equipo y 🤝 Pasar).
+  const botonDespojos = it => (!it || it.equipado || reservado(it)) ? ''
+    : `<button type="button" class="mini" data-ix-despojos="${esc(it.id)}" title="Convertirlo en despojos: ${fmt(despojosDeItem(it, 1))} por unidad (un cuarto de su precio). En combate cuesta 1 No2.">♻</button>`;
+
   /* ---------- 🎒 Alforja compartida (en combate): un aliado al lado saca un consumible de tu mochila por 1 No2 ----------
      pedirAlforja: quien saca deja el pedido. pedidos(fichaId): la pantalla del dueño de la alforja lo entrega sola (saca la unidad y la manda en
      el json) o lo rechaza; la de quien lo pidió lo recibe, paga y lo anuncia. */
@@ -558,7 +608,7 @@ const Intercambio = (() => {
         <div class="ix-fila"><span class="ix-q">🦴 Despojos <select id="ix-dt">${desp.map(d => `<option value="${esc(d.tipo === 'especial' ? 'esp:' + d.nombre : d.tipo)}">${esc(d.tipo === 'especial' ? d.nombre : DESP_TXT[d.tipo])} (${fmt(d.n)})</option>`).join('') || '<option value="">(no tenés)</option>'}</select></span><input id="ix-dn" type="number" min="0" step="1" value="${esc(previo.dn)}"><button type="button" data-ix-dar-desp${sinDest || (!desp.length ? ' disabled' : '')}>Ofrecer</button></div>
       </div>`}
       <div class="ix-paso"><h4>Ítems de tu mochila y tu cinturón</h4>
-        ${propios.length ? propios.map(({it, key}) => `<div class="ix-fila"><span class="ix-q" title="${esc(textoItem(it))}">${key === 'cinturon' ? '🧷' : '🎒'} ${esc(it.nombre)}${num(it.unidades) > 1 ? ` <span class="ix-hint">(tenés ${fmt(num(it.unidades))})</span>` : ''}</span>${it.consumible && num(it.unidades) > 1 ? `<input data-ix-u="${esc(it.id)}" type="number" min="1" max="${fmt(num(it.unidades))}" step="1" value="1">` : ''}<button type="button" data-ix-dar-este="${esc(it.id)}"${sinDest}>Ofrecer${costoTxt(key)}</button></div>`).join('') : '<p class="ix-hint">No hay nada para ofrecer (lo equipado o lo ya ofrecido no cuenta).</p>'}</div>`}
+        ${propios.length ? propios.map(({it, key}) => `<div class="ix-fila"><span class="ix-q" title="${esc(textoItem(it))}">${key === 'cinturon' ? '🧷' : '🎒'} ${esc(it.nombre)}${num(it.unidades) > 1 ? ` <span class="ix-hint">(tenés ${fmt(num(it.unidades))})</span>` : ''}</span>${it.consumible && num(it.unidades) > 1 ? `<input data-ix-u="${esc(it.id)}" type="number" min="1" max="${fmt(num(it.unidades))}" step="1" value="1">` : ''}<button type="button" data-ix-dar-este="${esc(it.id)}"${sinDest}>Ofrecer${costoTxt(key)}</button>${key === 'inventario' ? botonDespojos(it).replace('class="mini"', 'class="sec"') : ''}</div>`).join('') : '<p class="ix-hint">No hay nada para ofrecer (lo equipado o lo ya ofrecido no cuenta).</p>'}</div>`}
       ${combate && alforjas.length ? `<div class="ix-paso"><h4>🎒 Sacar de la alforja de un aliado (${fmt(COSTO_ALFORJA)} No2)</h4>
         ${alforjas.map(a => a.items.map(it => `<div class="ix-fila"><span class="ix-q">${esc(it.nombre)} <span class="ix-hint">· de ${esc(a.aliado.nombre)} (tiene ${fmt(num(it.unidades))})</span></span><button type="button" data-ix-alforja="${esc(a.aliado.id)}|${esc(it.id)}">Sacar 1</button></div>`).join('')).join('')}
         <p class="ix-hint">Con Alforja compartida, un aliado al lado saca él mismo un consumible de tu mochila. Llega a tu cinturón si entra.</p></div>` : ''}
@@ -571,6 +621,7 @@ const Intercambio = (() => {
     if(!b || b.disabled || !abierta) return;
     const {fichaId, el} = abierta;
     if(b.dataset.ixCancelar){ const p = paquetes.find(x => x.id === b.dataset.ixCancelar); if(p) await cancelar(p); dibujarDar(); return; }
+    if(b.dataset.ixDespojos){ const u = el.querySelector(`[data-ix-u="${CSS.escape(b.dataset.ixDespojos)}"]`); convertir(fichaId, b.dataset.ixDespojos, u ? u.value : 0); return; }
     if(b.dataset.ixAlforja){
       const [aliadoId, itemId] = b.dataset.ixAlforja.split('|');
       const a = (abierta.alforjas || []).find(x => x.aliado.id === aliadoId), it = a && a.items.find(x => x.id === itemId);
@@ -744,11 +795,12 @@ const Intercambio = (() => {
   function clic(b, fichaId){
     if(!b || !b.dataset) return false;
     if(b.dataset.ixDar){ abrirDar(fichaId, {itemId: b.dataset.ixDar}); return true; }
+    if(b.dataset.ixDespojos){ convertir(fichaId, b.dataset.ixDespojos); return true; }
     if(b.hasAttribute('data-ix-abrir-dar')){ abrirDar(fichaId); return true; }
     return false;
   }
 
-  return {POR_INTEGRANTE, iniciar, revisar, reservado, botonDar, clic, abrirDar, abrirBaul, cerrar,
+  return {POR_INTEGRANTE, iniciar, revisar, reservado, botonDar, botonDespojos, despojosDeItem, clic, abrirDar, abrirBaul, cerrar,
     // para las pruebas
-    _ofrecer: ofrecer, _liberar: liberar, _quitarReservado: quitarReservado, _separar: separar, _aMochila: aMochila, _despojo: despojo};
+    _ofrecer: ofrecer, _aDespojos: aDespojos, _liberar: liberar, _quitarReservado: quitarReservado, _separar: separar, _aMochila: aMochila, _despojo: despojo};
 })();

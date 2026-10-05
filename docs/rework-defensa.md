@@ -605,3 +605,18 @@ bolsa (cuántos puntos) le damos a la mochila por calidad?
 sección «🧪 Cinturón» con un desplegable de los consumibles del catálogo para cargarle, «Usar · 1 No2» y ✕ para sacarlo. Usar uno
 (`CreepAcciones.consumir`) cura, deja su estado (la misma regla que una habilidad: `efectoDeHab`), tira lo suyo y cobra 1 No2; sin No2 pregunta y,
 si se usa igual, gasta los que tenga (línea roja en la Mesa); una trampa consumible se coloca junto a su token (si no se puede, no se gasta).
+
+**Mecánicas de cinturón y mochila construidas ✅ (2026-10-05).** Stats nuevos (`FichaCalculo.EXTRA`), iguales para personajes y creeps donde aplica:
+- **Saque rápido** (`saquerapido`, %): el primer consumible del turno sacado del cinturón no cuesta No2 (chance a la vista con 1d6; siempre = sin
+  tirar). Se marca por turno (`S.meta.saqueTurno`; el creep, `sc.saqueUsado`, que vuelve en su Mantenimiento). Peso 33 % 0,75 · 50 % 1 · siempre 2.
+- **Mano de boticario** (`boticario`): +N a lo que cura una poción. Peso 0,5 por +1.
+- **Portapergaminos** (`portapergaminos` = cuántos por ranura): los pergaminos se agrupan. Peso (N − 1) × 1.
+- **Ranuras exclusivas** (`ranurapocion`, `ranurapergamino`, `ranuratrampa`, `ranuraankh`): se llenan primero con lo suyo. Peso 0,375.
+  La cuenta de ranuras es una sola para todos: `Combatiente.ranurasCinturon` / `entranEnCinturon` (con `categoriaConsumible`).
+- **Vaina** (`vainas`, cinturón: armas) y **Correas laterales** (`correas`, mochila: armas o escudos): un arma «a mano» (`aMano`, botón «🗡 Vaina /
+  correa» en el Equipo) se equipa sin No2, y una equipada se guarda ahí sin No2 si queda lugar (`FichaEquipo.aManoEntra`). Peso 1 cada una.
+- **Bolsillo exterior** (`bolsilloext`): el primer consumible del turno sacado de la mochila cuesta 1 No2 en vez de 2. Peso 1.
+- **Morral de cazador** (`morral`): los trofeos no ocupan ranuras de mochila. Peso 0,5.
+- **Farol colgado**: Luz +1 (ya existía el stat).
+- **Falta: Pasamanos y Alforja compartida**, que necesitan la regla base de «darle un consumible a otro» (no existe todavía).
+Calculadora: ranura de cinturón 0,5, de mochila 0,25; la mochila tiene bolsa propia (como los pies).

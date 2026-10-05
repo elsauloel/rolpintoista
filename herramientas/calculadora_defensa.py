@@ -25,7 +25,14 @@ COSTO = {
     'vision': 0.5, 'percepcion': 0.5, 'luz': 0.5, 'veoculto': 1,
     'hpmax': 0.2, 'nitros': 4, 'mov': 4,                                              # +5 vida = 1 · No2 lo más valioso (−1 Mov = −1 No2)
     'armadmg': 3,   # Armadura mágica: escasa, cara y rara — resta TODO daño mágico, arcano y elemental (dueño, 2026-10-04)
-    'capcinturon': 1, 'capmochila': 0.5, 'crgmax': 0.25,
+    # Cinturón y mochila (dueño, 2026-10-04/05): la ranura de cinturón baja a 0,5; la exclusiva (solo pociones, pergaminos, trampas o el Ankh) es
+    # el 75 % de una común; la de mochila, 0,25 (una mochila tiene muchas).
+    'capcinturon': 0.5, 'capmochila': 0.25, 'crgmax': 0.25,
+    'ranurapocion': 0.375, 'ranurapergamino': 0.375, 'ranuratrampa': 0.375, 'ranuraankh': 0.375,
+    'boticario': 0.5,          # Mano de boticario: +1 a lo que cura una poción
+    'vainas': 1, 'correas': 1,  # cada arma (o escudo) a mano, que se equipa sin No2
+    'bolsilloext': 1, 'morral': 0.5,
+    'portapergaminos': 0, 'saquerapido': 0,   # especiales: ver costo_especial
     'parry': 1, 'bloqueo': 1,
     # Ofensivo en una pieza defensiva: con la escala de la calculadora de armas (se marca aparte).
     # PdG en una pieza defensiva (dueño, 2026-10-04, por ahora solo en guantes): espejo de la Evasión; contraataque y oportunidad, situacionales.
@@ -49,7 +56,11 @@ COSTO = {
 def costo_retirada(pct):
     return 4 if pct >= 100 else pct * 0.03
 # Las de chance (en %): (33 %, 50 %, siempre). Retirada limpia va aparte (por punto).
-COSTO_CHANCE = {'inamovible': (0.5, 0.75, 1.5), 'recuperarse': (0.5, 1, 2), 'reflejos': (1, 1.5, 2.5)}
+COSTO_CHANCE = {'inamovible': (0.5, 0.75, 1.5), 'recuperarse': (0.5, 1, 2), 'reflejos': (1, 1.5, 2.5), 'saquerapido': (0.75, 1, 2)}
+# Portapergaminos: pergaminos de a 2 por ranura = 1, de a 3 = 2, de a 4 = 3 («pesa bastante por stack»).
+def costo_especial(stat, v):
+    if stat == 'portapergaminos': return max(0, v - 1) * 1.0
+    return None
 def costo_chance(stat, pct):
     a, b, c = COSTO_CHANCE[stat]
     return c if pct >= 100 else b if pct >= 50 else a
@@ -78,11 +89,12 @@ DEVUELVE_PESO_ARMADURA = 0.5
 # ------------------------------------------------------------ bolsas por parte y calidad (dueño, 2026-10-04)
 TIERS = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario']
 PARTE = {'cabeza': 'cabeza', 'armadura_blanda': 'torso', 'armadura_rigida': 'torso', 'manos': 'manos', 'piernas': 'piernas', 'pies': 'pies',
-         'escudo_1m': 'escudo', 'escudo_2m': 'escudo a 2 manos', 'cinturon': 'cinturón', 'anillos': 'anillo'}
+         'escudo_1m': 'escudo', 'escudo_2m': 'escudo a 2 manos', 'cinturon': 'cinturón', 'anillos': 'anillo', 'mochila': 'mochila'}
 BOLSA = {   # Común, Buena, Rara, Excepcional, Legendaria (las dos últimas, extrapoladas)
     'torso': [4, 7, 10, 13, 16], 'escudo': [3, 5, 7, 9, 11], 'escudo a 2 manos': [4, 6.5, 9, 12, 15], 'cabeza': [2, 3.5, 5, 6.5, 8],
     'piernas': [1.5, 3, 4, 5.5, 7], 'pies': [1.5, 2.5, 3.5, 4.5, 5.5], 'manos': [1.5, 2.5, 3.5, 4.5, 5.5],
     'cinturón': [1, 1.5, 2, 2.5, 3], 'anillo': [1, 1.5, 2, 2.5, 3],
+    'mochila': [1.5, 2.5, 3.5, 4.5, 5.5],   # como los pies (dueño, 2026-10-04)
 }
 TOLERANCIA = 1.1                 # hasta un 10 % por encima de la bolsa se acepta
 PRECIO_BASE, PRECIO_PUNTO = 10, 25
@@ -106,7 +118,7 @@ def puntos(it):
     for m in it.get('mods', []):
         v = float(m.get('val', 0) or 0)
         c = COSTO.get(m['stat'], COSTO_DEFECTO)
-        det.append((f"{v:+g} {NOMBRE.get(m['stat'], m['stat'])}", costo_retirada(v) if m['stat'] == 'retirada' else costo_chance(m['stat'], v) if m['stat'] in COSTO_CHANCE else v * c))
+        det.append((f"{v:+g} {NOMBRE.get(m['stat'], m['stat'])}", costo_retirada(v) if m['stat'] == 'retirada' else costo_chance(m['stat'], v) if m['stat'] in COSTO_CHANCE else costo_especial(m['stat'], v) if costo_especial(m['stat'], v) is not None else v * c))
         if m['stat'] in OFENSIVOS and v > 0: avisos.append(f"bono ofensivo ({NOMBRE.get(m['stat'], m['stat'])})")
         if m['stat'] not in COSTO: avisos.append(f"sin costo definido: {m['stat']}")
     if it.get('equipoEstadoNombre'):

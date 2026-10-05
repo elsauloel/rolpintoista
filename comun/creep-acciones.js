@@ -185,7 +185,7 @@ const CreepAcciones = (() => {
   // Carga `cantidad` unidades (1 si no se dice) de un consumible del catálogo en el cinturón, las que entren. → {error} o {aviso}.
   function alCinturon(sc, item, cantidad){
     if(!item || !item.consumible && item.tipoItem !== 'consumibles') return {error: 'Al cinturón solo van consumibles'};
-    const quiere = Math.max(1, Math.round(num(cantidad) || 1)), entran = Math.min(quiere, C().cinturonLibre(sc));
+    const quiere = Math.max(1, Math.round(num(cantidad) || 1)), entran = C().cuantasEntran(sc, item, quiere);
     if(!entran) return {error: `${sc.nombre}: el cinturón está lleno (${C().cinturonUsado(sc)}/${C().capCinturon(sc)})`};
     sc.cinturon = sc.cinturon || [];
     const pila = sc.cinturon.find(x => x.consumible && x.nombre === item.nombre);
@@ -223,7 +223,17 @@ const CreepAcciones = (() => {
   function consumir(sc, id, presets, forzar){
     const it = (sc.cinturon || []).find(x => x.id === id);
     if(!it || num(it.unidades) <= 0) return {error: 'Ese consumible ya no está'};
-    const costo = costoConsumir();
+    // Saque rápido (2026-10-05): el primero del turno puede no costar (la chance se tira a la vista: va en las tiradas).
+    let costo = costoConsumir();
+    const tiradasSaque = [];
+    const pctSaque = Combatiente.chancePct(C().modTotal(sc, 'saquerapido'));
+    if(pctSaque > 0 && !sc.saqueUsado){
+      const d = Combatiente.chanceDado(pctSaque);
+      let sale = pctSaque >= 100;
+      if(d){ const r = tirarDados('1d' + d.caras); if(r){ sale = r.total >= d.caras - d.exitos + 1; tiradasSaque.push({origen: `${sc.nombre} · Saque rápido · ${Combatiente.chanceTexto(pctSaque)}`, r}); } }
+      sc.saqueUsado = true;
+      if(sale) costo = 0;
+    }
     if(costo > num(sc.nitros) && !forzar) return {error: `${sc.nombre}: no le alcanzan los No2 — usar ${it.nombre} cuesta ${fmt(costo)}`};
     const pagado = Math.min(costo, Math.max(0, num(sc.nitros)));
     sc.nitros = num(sc.nitros) - pagado;
@@ -236,20 +246,21 @@ const CreepAcciones = (() => {
     if(num(it.unidades) <= 0) sc.cinturon = sc.cinturon.filter(x => x !== it);
     const partes = [];
     if(num(it.curahp)){
+      const boticario = num(it.curahp) > 0 ? num(C().modTotal(sc, 'boticario')) : 0;   // Mano de boticario (2026-10-05)
       const tope = num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, antes = num(sc.hp);
-      sc.hp = Math.max(0, Math.min(tope, antes + num(it.curahp)));
-      partes.push(`${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp))} HP`);
+      sc.hp = Math.max(0, Math.min(tope, antes + num(it.curahp) + boticario));
+      partes.push(`${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`);
     }
     const ef = efectoDeHab(sc, it, presets);
     if(ef.estado){ if(C().modsAfectanHp(ef.estado.mods)) C().actualizarHpMaxPorCon(sc); partes.push(`${ef.estado.nombre}${ef.estado.permanente ? '' : ` (${fmt(ef.estado.turnos)} turnos)`}`); }
     if(ef.aviso) partes.push(ef.aviso);
-    const tiradas = [];
+    const tiradas = [...tiradasSaque];
     const stat = it.tiradaStat;
     const ATRIB = {fue: 'Fuerza', con: 'Constitución', agl: 'Agilidad', des: 'Destreza', esp: 'Especial'};
     if(stat && (C().STAT_LOOKUP[stat] || ATRIB[stat])){ const valor = C().statValor(sc, stat) + num(it.tiradaBono); tiradas.push(tirada(`${sc.nombre} · ${it.nombre} · ${ATRIB[stat] || C().STAT_LOOKUP[stat].label || stat}`, valor, sc, stat)); }
     const formula = String(it.tiradaExtra || '').trim();
     if(formula){ const r = tirarDados(formula); if(r) tiradas.push({origen: `${sc.nombre} · ${it.nombre}`, r}); }
-    partes.push(`−${fmt(pagado)} No2${pagado < costo ? ' (no le alcanzaban)' : ''}`);
+    partes.push(`−${fmt(pagado)} No2${pagado < costo ? ' (no le alcanzaban)' : !costo && tiradasSaque.length + (pctSaque >= 100 ? 1 : 0) ? ' (Saque rápido)' : ''}`);
     return {aviso: `${sc.nombre} usó ${it.nombre}: ${partes.join(' · ')}`, tiradas: tiradas.filter(t => t && !t.error), forzado: pagado < costo ? {costo, tenia: pagado} : null,
       trampa: it.trampaDatos ? structuredClone(it) : null};
   }
@@ -363,6 +374,7 @@ const CreepAcciones = (() => {
   const MANT_MAX_SEGUIDOS = 10;
   function mantenimiento(sc){
     sc.ataquesTurno = 0;
+    sc.saqueUsado = false;   // Saque rápido: vuelve con el turno (2026-10-05)
     const rep = [];
     let enCooldown = 0;
     (sc.habilidades || []).forEach(h => {

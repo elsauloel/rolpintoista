@@ -255,7 +255,7 @@ function renderVitals(){
   const crg = Number.isNaN(c.final.crgmax) ? 0 : c.final.crgmax;
   setCap('equipo', c.pesoEquipado, crg);
   const capMochilaTotal = capMochilaEfectivo();
-  setCap('mochila', S.inventario.filter(i=>!i.equipado).reduce((a,i)=>a+ranurasDe(i),0), capMochilaTotal);
+  setCap('mochila', FichaEquipo.mochilaUsada(S), capMochilaTotal);   // con el Morral de cazador, los trofeos no ocupan (2026-10-05)
   const bonusMochila = capMochilaTotal - num(S.caps.mochila);
   $('#cap-mochila-bonus-txt').textContent = bonusMochila ? ` (+${fmt(bonusMochila)} de la mochila equipada)` : '';
   const capCinturonBase = num(S.caps.cinturon);

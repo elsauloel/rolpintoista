@@ -1882,6 +1882,44 @@ prueba('cinturón de un creep (2026-10-04): 5 ranuras, cargar (lleno no entra), 
     CreepAcciones.consumiblesDe([poc, {id: 'x', nombre: 'Espada', tipoItem: 'arma_1m'}]).map(c => c.id)],
     [true, true, [5, 5, 1, true], 16, 2, true, 4, true, true, ['cat-poc']]);
 });
+prueba('cinturón (2026-10-05): pergaminos agrupados (Portapergaminos) y ranuras exclusivas se llenan primero con lo suyo', () => {
+  const perg = n => ({nombre: 'Pergamino de fuego', consumible: true, unidades: n}), poc = n => ({nombre: 'Poción de vida', consumible: true, unidades: n, curahp: 5});
+  const otro = n => ({nombre: 'Bomba de humo', consumible: true, unidades: n});
+  const R = Combatiente.ranurasCinturon;
+  igual([R([perg(3), poc(2)], {}), R([perg(3), poc(2)], {porPergamino: 2}), R([perg(3), poc(2)], {excl: {pocion: 1}}), R([perg(4)], {porPergamino: 3, excl: {pergamino: 1}}),
+    Combatiente.entranEnCinturon([poc(4)], otro(1), 5, 5, {}), Combatiente.entranEnCinturon([poc(4)], poc(1), 5, 5, {excl: {pocion: 2}}),
+    Combatiente.categoriaConsumible({nombre: 'Ankh de Reencarnación'}), Combatiente.categoriaConsumible({nombre: 'Cepo', trampaDatos: {}})],
+    [5, 4, 4, 1, 1, 3, 'ankh', 'trampa']);
+});
+prueba('vaina y correas (2026-10-05): un arma a mano se equipa sin No2 en combate y, si queda vaina, se guarda sin No2; sin vaina cuesta 1', () => {
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, nitros: 4, inventario: [
+    {id: 'v', nombre: 'Tahalí', tipoItem: 'cinturon', equipado: true, mods: [{stat: 'vainas', val: 1}]},
+    {id: 'a1', nombre: 'Espada', tipoItem: 'arma_1m', equipado: true, peso: 1}, {id: 'a2', nombre: 'Daga', tipoItem: 'arma_1m', equipado: false, peso: 1},
+    {id: 'e', nombre: 'Rodela', tipoItem: 'escudo_1m', equipado: false, peso: 1}]}).S);
+  const avisos = [], ui = {toast: t => avisos.push(t), avisarSinNitros: () => avisos.push('sin No2'), modoCombate: () => true, slotLleno: () => false, cambio: () => {}};
+  FichaEquipo.alternarAMano(S, 'a2', ui);
+  const enVaina = S.inventario.find(i => i.id === 'a2').aMano;
+  FichaEquipo.alternarAMano(S, 'e', ui);   // un escudo solo va en una correa: no hay
+  const escudo = !!S.inventario.find(i => i.id === 'e').aMano;
+  FichaEquipo.equipar(S, 'a2', ui);   // sale de la vaina: gratis
+  const n1 = S.nitros;
+  FichaEquipo.equipar(S, 'a1', ui);   // se guarda en la vaina libre: gratis
+  const n2 = S.nitros, a1 = S.inventario.find(i => i.id === 'a1');
+  igual([enVaina, escudo, n1, n2, a1.equipado, a1.aMano, S.inventario.find(i => i.id === 'a2').equipado], [true, false, 4, 4, false, true, true]);
+});
+prueba('consumir (2026-10-05): Saque rápido siempre = el primero del turno del cinturón gratis; Bolsillo exterior = de la mochila 1; Mano de boticario suma a la poción', async () => {
+  const S = fichaBotonera({}); const reg = [];
+  S.turno = 3; S.nitros = 6; S.hp = 5;
+  S.inventario.push({id: 'cin', nombre: 'Faja de prueba', tipoItem: 'cinturon', equipado: true, mods: [{stat: 'saquerapido', val: 100}, {stat: 'boticario', val: 2}, {stat: 'bolsilloext', val: 1}]});
+  S.cinturon = [{id: 'p1', nombre: 'Poción de vida', consumible: true, unidades: 2, curahp: 3}];
+  S.inventario.push({id: 'p2', nombre: 'Poción de vida', tipoItem: 'consumibles', consumible: true, unidades: 2, curahp: 3});
+  const ui = {...uiHab(reg), presets: estadosPresetFicha(), registrarTirada: () => {}, fijarHp: v => { S.hp = v; }, efecto: () => null, tirarExtra: () => {}, colocarTrampa: async () => true};
+  await FichaAcciones.consumir(S, 'p1', false, ui); const t1 = [S.nitros, S.hp];
+  await FichaAcciones.consumir(S, 'p1', false, ui); const t2 = S.nitros;
+  await FichaAcciones.consumir(S, 'p2', false, ui); const t3 = S.nitros;
+  await FichaAcciones.consumir(S, 'p2', false, ui); const t4 = S.nitros;
+  igual([t1, t2, t3, t4], [[6, 10], 5, 4, 2]);
+});
 prueba('catálogo: las piernas Común (28) — ninguna pasa de Defensa 1, y las mecánicas nuevas están', () => {
   const L = CATALOGO_BASE.filter(i => i.tipoItem === 'piernas' && i.tier === 'Común');
   const stats = new Set(L.flatMap(i => (i.mods || []).map(m => m.stat)));

@@ -204,17 +204,41 @@ const FichaAcciones = (() => {
      null), tirarExtra(it) (sus tiradas), colocarTrampa(it) (async → true si se colocó; una trampa consumible no se gasta si
      no). cambio(lista) recibe 'inventario' o 'cinturon', 'efectos' si hubo estado o reparación, 'vitals' y 'nitros'. */
   const consumiendoTrampa = new Set();
-  async function consumir(S, id, forzar, ui){
+  /* Lo que cuesta sacar este consumible (2026-10-05): del cinturón 1 No2, de la mochila 2; el primero del turno, con Saque rápido (cinturón,
+     una chance que se tira a la vista) puede no costar, y con Bolsillo exterior (mochila) cuesta 1. → {costo, saque: bool, bolsillo: bool}. */
+  function costoDeSacar(S, key, ui){
+    const f = FichaCalculo.calcular(S).final, meta = S.meta || (S.meta = {}), turno = num(S.turno) || 1;
+    let costo = FichaBotonera.costoConsumirNitros(key), saque = false, bolsillo = false;
+    if(key === 'cinturon' && num(f.saquerapido) > 0 && meta.saqueTurno !== turno){
+      const pct = Combatiente.chancePct(f.saquerapido), d = Combatiente.chanceDado(pct);
+      let sale = pct >= 100;
+      if(d){
+        const r = tirarDados('1d' + d.caras);
+        if(r){
+          sale = r.total >= d.caras - d.exitos + 1;
+          const reg = ui.registrarTirada || ((o, x) => { if(typeof registrarTirada === 'function') registrarTirada(o, x); });
+          reg(`Saque rápido · ${Combatiente.chanceTexto(pct)}`, r);
+        }
+      }
+      saque = true;
+      if(sale) costo = 0;
+      ui.toast(sale ? '⚡ Saque rápido: este consumible no cuesta No2' : 'Saque rápido: no salió — cuesta lo de siempre');
+    }
+    if(key === 'inventario' && num(f.bolsilloext) > 0 && meta.bolsilloTurno !== turno){ costo = Math.max(0, costo - 1); bolsillo = true; }
+    return {costo, saque, bolsillo};
+  }
+  async function consumir(S, id, forzar, ui, sacado){
     { const enM = S.inventario.find(x => x.id === id); if(enM && enM.enMesa){ ui.toast('Está ofrecido en la mesa común: retiralo primero'); return; } }
     let it = S.inventario.find(x=>x.id===id);
     let key = 'inventario';
     if(!it){ it = S.cinturon.find(x=>x.id===id); key = 'cinturon'; }
     if(it && num(it.unidades) > 0){
-      const costoNitros = FichaBotonera.costoConsumirNitros(key);
+      const sac = sacado || costoDeSacar(S, key, ui);   // Saque rápido / Bolsillo exterior: se calcula una vez (si pide «hacerlo igual», no se vuelve a tirar)
+      const costoNitros = sac.costo;
       let gastoNitros = costoNitros;
       if(costoNitros > num(S.nitros)){
         if(!forzar){
-          ui.avisarSinNitros(costoNitros, `consumir ${it.nombre} ${key === 'cinturon' ? 'del cinturón' : 'de la mochila'}`, () => consumir(S, id, true, ui));
+          ui.avisarSinNitros(costoNitros, `consumir ${it.nombre} ${key === 'cinturon' ? 'del cinturón' : 'de la mochila'}`, () => consumir(S, id, true, ui, sac));
           return;
         }
         gastoNitros = gastoNitrosForzado(S, costoNitros, `consumió ${it.nombre}`);
@@ -228,6 +252,8 @@ const FichaAcciones = (() => {
         if(!ok) return;
       }
       S.nitros = num(S.nitros) - gastoNitros;
+      if(sac.saque) S.meta.saqueTurno = num(S.turno) || 1;   // el primero del turno ya se sacó
+      if(sac.bolsillo) S.meta.bolsilloTurno = num(S.turno) || 1;
 
       const cargaMax = Math.max(1, num(it.cargaMax) || 1);
       let carga = num(it.cargaActual ?? cargaMax);
@@ -245,8 +271,10 @@ const FichaAcciones = (() => {
       // Solo se toca el HP si el ítem efectivamente cura o daña: si no,
       // el clamp contra hpmax lo bajaría igual (con la ficha recién
       // abierta hpmax es 0 y eso mataba al personaje de una).
+      // Mano de boticario (2026-10-05): suma a lo que cura una poción.
+      const boticario = num(it.curahp) > 0 ? num(FichaCalculo.calcular(S).final.boticario) : 0;
       if(num(it.curahp)){
-        ui.fijarHp(num(S.hp) + num(it.curahp));
+        ui.fijarHp(num(S.hp) + num(it.curahp) + boticario);
       }
       const efecto = ui.efecto(it);
       ui.tirarExtra(it);
@@ -254,9 +282,9 @@ const FichaAcciones = (() => {
       const reparados = it.nombre === 'Oleo reparador' ? repararArmadura(S) : 0;
       ui.cambio([key, ...(efecto || reparados ? ['efectos'] : []), 'vitals', 'nitros']);
       const partes = [];
-      if(it.curahp) partes.push(`${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp))} HP`);
+      if(it.curahp) partes.push(`${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp) + boticario)} HP${boticario ? ` (+${fmt(boticario)} de Mano de boticario)` : ''}`);
       if(spRestaurado) partes.push(`+${fmt(spRestaurado)} SP`);
-      partes.push(`-${costoNitros} No2`);
+      partes.push(`-${costoNitros} No2${sac.saque && !costoNitros ? ' (Saque rápido)' : sac.bolsillo ? ' (Bolsillo exterior)' : ''}`);
       if(cargaMax > 1) partes.push(gastoUnidad ? 'última carga usada' : `carga ${carga}/${cargaMax}`);
       if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
       if(reparados) partes.push(reparados > 1 ? 'armadura reparada por completo' : 'armadura reparada');

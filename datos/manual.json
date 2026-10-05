@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-10-04T14:22:27Z",
+ "actualizado": "2026-10-05T02:52:37Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1442,7 +1442,7 @@
    ],
    "estado": "borrador",
    "capitulo": "equipo",
-   "cuerpo": "Los **consumibles** (pociones, pergaminos, vendas, bombas…) se gastan al usarlos. Pueden **curar HP**, **aplicarte un estado** o dar un efecto especial.\n\n## Cinturón vs mochila\n| Dónde está | Costo de usarlo |\n|---|---|\n| En el **cinturón** | **1** [[Nitros (No2)\\|Nitro]] |\n| En la **mochila** | **2** Nitros (el doble) |\n\n- El **cinturón** tiene **5 ranuras** por defecto; se compran cinturones para ampliarlo.\n- Cada consumible viene en **unidades**; algunos tienen varias cargas.\n\n> [!example] Efecto de un pergamino\n> *Pergamino de Buena Fortuna*: al usarlo se activa el estado [[Afortunado]] durante todo el combate. *Ankh de Reencarnación*: solo funciona si está **en el cinturón** cuando llegás a HP 0 ([[Muerte]]).\n\nVer también: [[Estados alterados]]."
+   "cuerpo": "Los **consumibles** (pociones, pergaminos, vendas, bombas…) se gastan al usarlos. Pueden **curar HP**, **aplicarte un estado** o dar un efecto especial.\n\n## Cinturón vs mochila\n| Dónde está | Costo de usarlo |\n|---|---|\n| En el **cinturón** | **1** [[Nitros (No2)\\|Nitro]] |\n| En la **mochila** | **2** Nitros (el doble) |\n\n- Todos arrancan con un **cinturón de 5 ranuras** (personajes, invocaciones y creeps); un cinturón equipado lo amplía.\n- **1 ranura = 1 unidad**: 5 pociones ocupan las 5 ranuras. Con el cinturón lleno **no entra nada más**: lo que no entra se queda en la mochila.\n- Cada consumible viene en **unidades**; algunos tienen varias cargas.\n\n> [!example] Efecto de un pergamino\n> *Pergamino de Buena Fortuna*: al usarlo se activa el estado [[Afortunado]] durante todo el combate. *Ankh de Reencarnación*: solo funciona si está **en el cinturón** cuando llegás a HP 0 ([[Muerte]]).\n\nVer también: [[Estados alterados]]."
   },
   {
    "id": "mochila",

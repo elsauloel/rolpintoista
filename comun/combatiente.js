@@ -207,6 +207,35 @@ const Combatiente = (() => {
     return `${pct} % (${d.exitos > 1 ? (d.caras - d.exitos + 1) + '–' : ''}${d.caras} en d${d.caras})`;
   }
   const retiradaPct = chancePct, retiradaDado = chanceDado, retiradaTexto = chanceTexto;
+  /* Las ranuras del cinturón (dueño, 2026-10-04/05): 1 ranura = 1 unidad; los pergaminos se agrupan de a `porPergamino` por ranura
+     (Portapergaminos); las ranuras exclusivas (pociones, pergaminos, trampas, Ankh) se llenan primero con lo suyo. Igual para personajes y
+     creeps. `ranurasCinturon(items, o)` → las ranuras COMUNES que ocupan; `entranEnCinturon(items, it, cuantas, cap, o)` → cuántas unidades de
+     `it` entran todavía. o = {porPergamino, excl: {pocion, pergamino, trampa, ankh}}. */
+  function categoriaConsumible(it){
+    const nom = String((it && it.nombre) || '').toLowerCase();
+    if(it && it.trampaDatos) return 'trampa';
+    if(/ankh/.test(nom)) return 'ankh';
+    if(/pergamino/.test(nom)) return 'pergamino';
+    if(/poci[oó]n|elixir|t[oó]nico|brebaje|ung[uü]ento|filtro/.test(nom) || n(it && it.curahp) > 0) return 'pocion';
+    return 'otro';
+  }
+  function ranurasCinturon(items, o){
+    o = o || {};
+    const por = {};
+    (items || []).forEach(it => {
+      if(!it) return;
+      const c = categoriaConsumible(it), u = it.consumible ? Math.max(0, n(it.unidades)) : 1;
+      por[c] = (por[c] || 0) + u;
+    });
+    if(por.pergamino) por.pergamino = Math.ceil(por.pergamino / Math.max(1, Math.round(n(o.porPergamino)) || 1));
+    const excl = o.excl || {};
+    return Object.entries(por).reduce((a, [c, slots]) => a + Math.max(0, slots - Math.max(0, n(excl[c]))), 0);
+  }
+  function entranEnCinturon(items, it, cuantas, cap, o){
+    let k = 0;
+    while(k < cuantas && ranurasCinturon([...(items || []), {...it, consumible: true, unidades: k + 1}], o) <= cap) k++;
+    return k;
+  }
   /* Los estados que traban el movimiento (Recuperarse rápido, dueño 2026-10-04): duran 1 turno menos con la chance de los pies. */
   const ESTADOS_TRABA = ['Inmovilizado', 'Rengo', 'Sentado', 'Lento'];
   const esTraba = e => !!e && (e.inmovilizado || e.rengo || e.sentado || e.lento || ESTADOS_TRABA.includes(String(e.nombre || '').trim()));
@@ -700,7 +729,7 @@ const Combatiente = (() => {
   }
   const esMagicoTipo = texto => !!elementoDe(texto) || /arcan|magic/i.test(String(texto || ''));
 
-  return {ELEMENTOS, elementoDe, esMagicoTipo, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+  return {ELEMENTOS, elementoDe, esMagicoTipo, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

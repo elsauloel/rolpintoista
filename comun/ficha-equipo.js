@@ -59,7 +59,8 @@ const FichaEquipo = (() => {
   ];
   const CATEGORIA_LABEL = Object.fromEntries(CATEGORIAS.map(c=>[c.id, c.label]));
   const ranuras = i => (i.ranuras === undefined || i.ranuras === '') ? 1 : num(i.ranuras);
-  const mochilaUsada = S => (S.inventario || []).filter(i => !i.equipado).reduce((a, i) => a + ranuras(i), 0);
+  // Lo que ocupa la mochila (con el Morral de cazador, los trofeos no ocupan: 2026-10-05).
+  const mochilaUsada = S => { const morral = num(FichaCalculo.calcular(S).final.morral) > 0; return (S.inventario || []).filter(i => !i.equipado && !(morral && i.trofeo)).reduce((a, i) => a + ranuras(i), 0); };
   function capMochila(S){
     const bonus = FichaCalculo.calcular(S).final.capmochila;
     return num(S.caps && S.caps.mochila) + (Number.isNaN(bonus) ? 0 : bonus);
@@ -69,8 +70,14 @@ const FichaEquipo = (() => {
      el cinturón equipado —o, de manera excepcional, otra pieza— la amplía con «capcinturon». Con el cinturón lleno no entra nada más: lo que
      no entra se queda en la mochila. Todos los caminos que meten algo en el cinturón pasan por alCinturon. */
   const BASE_CINTURON = 5;
-  const unidadesDe = i => i && i.consumible ? Math.max(0, num(i.unidades)) : 1;
-  const cinturonUsado = S => (S.cinturon || []).reduce((a, i) => a + unidadesDe(i), 0);
+  // Pergaminos agrupados y ranuras exclusivas (2026-10-05): la cuenta común, Combatiente.ranurasCinturon.
+  function opcionesCinturon(S){
+    const f = FichaCalculo.calcular(S).final;
+    return {porPergamino: Math.max(1, Math.round(num(f.portapergaminos)) || 1),
+      excl: {pocion: num(f.ranurapocion), pergamino: num(f.ranurapergamino), trampa: num(f.ranuratrampa), ankh: num(f.ranuraankh)}};
+  }
+  const cinturonUsado = S => Combatiente.ranurasCinturon(S.cinturon || [], opcionesCinturon(S));
+  const cuantasEntran = (S, it, cuantas) => Combatiente.entranEnCinturon(S.cinturon || [], it, cuantas, capCinturon(S), opcionesCinturon(S));
   function capCinturon(S){
     const bonus = FichaCalculo.calcular(S).final.capcinturon;
     const base = S.caps && S.caps.cinturon !== undefined && S.caps.cinturon !== '' ? num(S.caps.cinturon) : BASE_CINTURON;
@@ -84,7 +91,7 @@ const FichaEquipo = (() => {
     if(!it) return {movidas: 0, quedan: 0, libre: cinturonLibre(S)};
     const tiene = it.consumible ? Math.max(0, num(it.unidades)) : 1;
     const quiere = Math.min(tiene, cantidad === undefined ? tiene : Math.max(0, Math.round(num(cantidad))));
-    const movidas = Math.min(quiere, cinturonLibre(S));
+    const movidas = cuantasEntran(S, it, quiere);
     if(movidas > 0){
       const pila = it.consumible ? (S.cinturon || []).find(x => x.consumible && x.nombre === it.nombre) : null;
       if(pila) pila.unidades = num(pila.unidades) + movidas;
@@ -106,6 +113,37 @@ const FichaEquipo = (() => {
     if(!r.movidas) return `${it.nombre}: no entra, ${lleno}`;
     return `${it.nombre}: ${r.movidas === 1 ? '1 unidad pasó' : r.movidas + ' unidades pasaron'} al cinturón` + (r.quedan ? ` · ${r.quedan} quedan en la mochila (${lleno})` : '');
   }
+
+  /* ---------- Vaina (cinturón) y Correas laterales (mochila), 2026-10-05 ----------
+     Un arma (vaina o correa) o un escudo (solo correa) que está «a mano» (`aMano`) se equipa sin gastar No2; y uno equipado, si queda una
+     vaina o correa libre, se guarda ahí sin gastar No2. Cuántas hay: los stats `vainas` y `correas`. Fuera de combate no cuesta nada igual. */
+  const esEscudo = it => String((it && it.tipoItem) || '').startsWith('escudo');
+  const aManoApto = it => !!it && (FichaCombate.esArma(it.tipoItem) || esEscudo(it));
+  function aManoCap(S){ const f = FichaCalculo.calcular(S).final; return {vainas: Math.max(0, Math.round(num(f.vainas))), correas: Math.max(0, Math.round(num(f.correas)))}; }
+  // ¿Entra `it` a mano, junto con los que ya están (salvo `sin`)?
+  function aManoEntra(S, it, sin){
+    if(!aManoApto(it)) return false;
+    const lista = (S.inventario || []).filter(x => !x.equipado && x.aMano && x !== it && x !== sin).concat([it]);
+    const cap = aManoCap(S);
+    let v = cap.vainas, c = cap.correas;
+    for(const x of lista.filter(esEscudo)){ if(c > 0) c--; else return false; }
+    for(const x of lista.filter(x => !esEscudo(x))){ if(v > 0) v--; else if(c > 0) c--; else return false; }
+    return true;
+  }
+  function alternarAMano(S, id, ui){
+    const it = (S.inventario || []).find(x => x.id === id);
+    if(!it || it.equipado) return;
+    if(it.aMano){ it.aMano = false; ui.cambio(['inventario']); ui.toast(`${it.nombre} vuelve a la mochila`); return; }
+    if(!aManoEntra(S, it)){ ui.toast(esEscudo(it) ? 'No te queda una correa libre para el escudo' : 'No te queda una vaina ni una correa libre'); return; }
+    it.aMano = true;
+    ui.cambio(['inventario']);
+    ui.toast(`${it.nombre} queda a mano: se equipa sin gastar No2`);
+  }
+  const aManoBoton = (S, it) => {
+    const cap = aManoCap(S);
+    if(!aManoApto(it) || (!cap.vainas && !cap.correas) || it.equipado) return '';
+    return `<button type="button" class="mini${it.aMano ? ' on' : ''}" data-amano="${it.id}" title="${it.aMano ? 'Está a mano (se equipa sin No2): devolverlo a la mochila' : 'Dejarlo a mano (vaina o correa): se equipa sin gastar No2'}">${it.aMano ? '🗡 A mano' : '🗡 Vaina / correa'}</button>`;
+  };
 
   /* ---------- Los slots ---------- */
   function slots(S){
@@ -189,9 +227,13 @@ const FichaEquipo = (() => {
       }
     }
     const eraEquipado = it.equipado;
-    conCosto(S, 1, `${eraEquipado ? 'desequipar' : 'equipar'} ${it.nombre}`, `${eraEquipado ? 'desequipó' : 'equipó'} ${it.nombre}`, () => {
+    // Vaina o correa: desde ahí se equipa sin No2, y se guarda ahí sin No2 si queda una libre (2026-10-05).
+    const aMano = eraEquipado ? aManoEntra(S, it) : !!it.aMano;
+    conCosto(S, aMano ? 0 : 1, `${eraEquipado ? 'desequipar' : 'equipar'} ${it.nombre}`, `${eraEquipado ? 'desequipó' : 'equipó'} ${it.nombre}`, () => {
       it.equipado = !it.equipado;
+      it.aMano = !it.equipado && aMano;
       ui.cambio(['inventario']);
+      if(aMano && ui.modoCombate()) ui.toast(`${it.nombre}: ${it.equipado ? 'sale de la vaina' : 'a la vaina'}, sin gastar No2`);
     }, ui);
     return true;
   }
@@ -211,7 +253,10 @@ const FichaEquipo = (() => {
       ui.toast(`Igual no entra: ${slotDef.label} quedaría en ${fmt(usado)} / ${fmt(slotDef.max)}. Sacá otro ítem del slot primero.`);
       return;
     }
-    conCosto(S, 2, `reemplazar ${viejo.nombre} por ${nuevo.nombre}`, `reemplazó ${viejo.nombre} por ${nuevo.nombre}`, () => {
+    // Vaina o correa (2026-10-05): el que sale de ahí no cuesta; el que se guarda ahí (si queda lugar) tampoco.
+    const nuevoAMano = !!nuevo.aMano, viejoAMano = aManoEntra(S, viejo, nuevo);
+    conCosto(S, (nuevoAMano ? 0 : 1) + (viejoAMano ? 0 : 1), `reemplazar ${viejo.nombre} por ${nuevo.nombre}`, `reemplazó ${viejo.nombre} por ${nuevo.nombre}`, () => {
+      nuevo.aMano = false; viejo.aMano = viejoAMano;
       viejo.equipado = false;
       nuevo.equipado = true;
       ui.cambio(['inventario'], {reemplazo: true});
@@ -263,7 +308,7 @@ const FichaEquipo = (() => {
       <div class="equipo-slot-cab"><span>${esc(sd.label)}</span></div>
       ${items.map(it => {
         const info = slotOcupado(S, it);
-        return filaHtml(it, `<button type="button" class="mini on" data-toggle="${it.id}" title="${info && info.ocupado ? 'El slot está lleno: te deja reemplazar o comparar' : 'Equipar'}">${info && info.ocupado ? 'Cambiar…' : 'Equipar'}</button>`);
+        return filaHtml(it, `${aManoBoton(S, it)}<button type="button" class="mini on" data-toggle="${it.id}" title="${info && info.ocupado ? 'El slot está lleno: te deja reemplazar o comparar' : 'Equipar'}">${info && info.ocupado ? 'Cambiar…' : 'Equipar'}</button>`);
       }).join('')}
     </div>`;
     }).join('');
@@ -356,6 +401,6 @@ const FichaEquipo = (() => {
   `};
   }
 
-  return {SLOT_DEFS, TIER_COLOR, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, alCinturon, textoAlCinturon, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
+  return {SLOT_DEFS, TIER_COLOR, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, alCinturon, textoAlCinturon, aManoCap, aManoEntra, alternarAMano, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
     modTags, thumb, statTxt, html, slotLlenoHtml, compararHtml};
 })();

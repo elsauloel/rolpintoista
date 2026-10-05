@@ -82,6 +82,18 @@ const FichaCalculo = (() => {
     {id:'inamovible', label:'Inamovible (%)', full:'Chance (en %) de que no te muevan contra tu voluntad (empujes, portales): 33 = 5–6 en d6, 50 = 4–6, 100 = siempre'},
     {id:'recuperarse', label:'Recuperarse rápido (%)', full:'Chance (en %) de que Inmovilizado, Rengo, Sentado o Lento te duren 1 turno menos: 50 = 4–6 en d6, 100 = siempre'},
     {id:'reflejos', label:'Reflejos de mangosta (%)', full:'Al pisar una trampa, chance (en %) de un dodge roll hacia donde quieras (hasta 2 casilleros) para esquivarla: 33 = 5–6 en d6, 100 = siempre'},
+    // Cinturón y mochila (2026-10-05, dueño).
+    {id:'saquerapido', label:'Saque rápido (%)', full:'Chance (en %) de que el primer consumible del turno sacado del cinturón no cueste No2: 50 = 4–6 en d6, 100 = siempre'},
+    {id:'boticario', label:'Mano de boticario', full:'Lo que suma a la curación de cada poción'},
+    {id:'portapergaminos', label:'Portapergaminos', full:'Cuántos pergaminos entran en cada ranura del cinturón (2, 3…)'},
+    {id:'ranurapocion', label:'Ranuras para pociones', full:'Ranuras del cinturón solo para pociones'},
+    {id:'ranurapergamino', label:'Ranuras para pergaminos', full:'Ranuras del cinturón solo para pergaminos'},
+    {id:'ranuratrampa', label:'Ranuras para trampas', full:'Ranuras del cinturón solo para trampas'},
+    {id:'ranuraankh', label:'Ranura para el Ankh', full:'Ranura del cinturón solo para el Ankh'},
+    {id:'vainas', label:'Vainas', full:'Armas que podés llevar envainadas: se equipan o se guardan sin gastar No2'},
+    {id:'correas', label:'Correas laterales', full:'Armas o escudos colgados de la mochila: se equipan o se guardan sin gastar No2'},
+    {id:'bolsilloext', label:'Bolsillo exterior', full:'El primer consumible del turno sacado de la mochila cuesta 1 No2 en vez de 2'},
+    {id:'morral', label:'Morral de cazador', full:'Los trofeos no ocupan ranuras de la mochila'},
     {id:'retirada', label:'Retirada limpia (%)', full:'Chance (en %) de alejarte de un rival sin darle ataque de oportunidad: 33 = 5–6 en d6, 50 = 4–6, 100 = siempre'},
     // Resistencias elementales (2026-10-04, dueño): cada una se resta al daño de su elemento (además de la Armadura mágica). Situacionales: pesan poco.
     {id:'resfuego', label:'Res. fuego', full:'Resistencia al fuego: se resta a todo daño de fuego'},

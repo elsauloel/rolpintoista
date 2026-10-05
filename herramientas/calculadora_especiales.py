@@ -59,6 +59,10 @@ COSTO_BASE, COSTO_SUBE = 1, 1   # varitas (dueño, 2026-10-05, cuarta vuelta): e
 # (Descartadas: 2-3-4 sin SP; 1 No2 + 1 SP con el No2 que sube — tiros chicos; una vez por turno — sin ritmo.)
 # Escala del SP según la fuerza del tiro (valor por uso): hasta 4,5 → 1 SP · hasta 6 → 2 · hasta 7,5 → 3 · más → 4 (Común llega a 3).
 ESCALA_SP = [(4.5, 1), (6.0, 2), (7.5, 3), (9.5, 4), (11.5, 5), (99, 6)]   # Común llega a 4 (propuesta, 2026-10-05)
+def precio_de(valor):
+    return CA.redondo(CA.PRECIO_A * math.exp(CA.PRECIO_B * valor))   # la curva de las armas físicas (Común: 40 a 120 DDE)
+
+
 def sp_de(valor):
     return next(sp for tope, sp in ESCALA_SP if valor <= tope + 1e-9)
 # Personajes de referencia para la simulación del combate (4 turnos, 7 No2): el mago y el que no es mago.
@@ -134,7 +138,7 @@ POOL = [
     {'nombre': 'Varita de misiles: 2 misiles de 1d4, a uno o a dos rivales', 'clase': 'arcano', 'dado': '1d4', 'golpes': 2, 'sp': 2},
     {'nombre': 'Varita de chispa eléctrica: 1d6 de rayo, salta 2 veces (la mitad cada salto), 10 % Parálisis al primero', 'clase': 'elemental', 'dado': '1d6', 'forma': 'cadena', 'efectos': {'Parálisis': 0.10}},
     {'nombre': 'Varita láser: 1d6 arcano a todos en una línea recta de 4 (atraviesa)', 'clase': 'arcano', 'dado': '1d6', 'forma': 'linea4'},
-    {'nombre': 'Varita de chispas: 1d4 de fuego en flor; deja la flor incendiada 2 turnos', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'terreno': ('Daño 1', 2)},
+    {'nombre': 'Varita de la fogata: 1d4 de fuego en flor; deja la flor incendiada 2 turnos', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'terreno': ('Daño 1', 2)},
     {'nombre': 'Varita del soplo de fuego: cono de 2, 1d4 de fuego, 25 % quemar', 'clase': 'elemental', 'dado': '1d4', 'forma': 'cono', 'efectos': {'Prende fuego': 0.25}, 'sp': 1},
     {'nombre': 'Varita de la bola de fuego: estalla en flor, 1d4 de fuego y deja fuego 1 turno', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'terreno': ('Daño 1', 1), 'sp': 2},
     {'nombre': 'Varita de la estaca: lanza de hielo física T4, 2d4 + Ef.Esp − Defensa (critica), 33 % Lento', 'clase': 'fisico', 'dado': '2d4', 'efectos': {'Lento': 1 / 3}},
@@ -146,7 +150,6 @@ POOL = [
     # — daño leve con control —
     {'nombre': 'Varita del destello: flor, 1d4, 25 % Pajaritos', 'clase': 'arcano', 'dado': '1d4', 'forma': 'flor1', 'efectos': {'Pajaritos': 0.25}},
     {'nombre': 'Varita del susurro: 1d6, 25 % Silencio', 'clase': 'arcano', 'dado': '1d6', 'efectos': {'Silencio': 0.25}, 'sp': 1},
-    {'nombre': 'Varita de la ráfaga helada: frente de 3 de ancho y 5 de largo, 1d4 de hielo, empuja 2, 25 % Escarcha', 'clase': 'elemental', 'dado': '1d4', 'forma': 'frente3x5', 'efectos': {'Empuje': 1.67, 'Escarcha': 0.25}},
     {'nombre': 'Varita del gancho: lazo arcano, 1d4 y lo atrae 2 (se resiste con Fuerza contra tu Ef.Esp)', 'clase': 'arcano', 'dado': '1d4', 'efectos': {'Atraer': 1.67 * 0.6}},
     {'nombre': 'Varita del rastreador: 1d4 y lo marca 3 turnos (no puede entrar en sigilo ni ocultarse; se lo ve a través de la niebla)', 'clase': 'arcano', 'dado': '1d4', 'efectos': {'Marca': 3.0}},
     # — terreno y colocar —
@@ -155,7 +158,7 @@ POOL = [
     {'nombre': 'Varita de la ventisca: flor, 1d4 de hielo y el suelo resbala 1 turno', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'terreno': ('Sentado', 1)},
     {'nombre': 'Varita de espinas: línea de 3, 3 turnos, 1d4 al pasar', 'clase': 'arcano', 'terreno': ('Daño 1d4', 3), 'forma': 'linea', 'sp': 1},
     {'nombre': 'Varita de la runa: trampa oculta, 2d4 arcano al pisarla (Evasión contra tu Ef.Esp: la mitad); se detecta con Percepción contra tu Ef.Esp', 'clase': 'arcano', 'dado': '2d4', 'forma': 'trampa'},
-    {'nombre': 'Varita de niebla: flor de niebla, 3 turnos', 'clase': 'arcano', 'terreno': ('Niebla', 3), 'forma': 'flor1', 'sp': 1},
+    {'nombre': 'Varita de niebla: flor de niebla, 3 turnos (no se ve a través ni se apunta adentro desde afuera; adentro se ve a 1)', 'clase': 'arcano', 'terreno': ('Niebla', 3), 'forma': 'flor1', 'sp': 1},
     {'nombre': 'Varita de los pilares: 2 pilares de 1 casilla donde quieras (dentro del alcance), 3 turnos', 'clase': 'arcano', 'terreno': ('Muro', 3), 'forma': 'uno'},
     # — apoyo —
     {'nombre': 'Varita de la luz: radio 3 hasta el final del turno; revela sigilo y trampas', 'clase': 'arcano', 'efectos': {'Luz': 1.5, 'Revela': 1.0}},
@@ -164,6 +167,7 @@ POOL = [
     {'nombre': 'Báculo de aprendiz (1 mano): 1d4 + la mitad del Especial', 'clase': 'arcano', 'dado': '1d4', 'sumaEspecial': 0.5, 'sp': 2},
 ]
 PARA_BUENA = [   # candidatas a calidad Buena o más
+    {'nombre': 'Varita de la ráfaga helada: frente de 3 de ancho y 5 de largo, 1d4 de hielo, empuja 2, 25 % Escarcha', 'clase': 'elemental', 'dado': '1d4', 'forma': 'frente3x5', 'efectos': {'Empuje': 1.67, 'Escarcha': 0.25}},
     {'nombre': 'Báculo de brasas (2 manos): 1d6 de fuego + la mitad del Especial, 25 % quemar', 'clase': 'elemental', 'dado': '1d6', 'sumaEspecial': 0.5, 'efectos': {'Prende fuego': 0.25}, 'sp': 2},
     {'nombre': 'Báculo de sangre (2 manos): 1d6 + el Especial entero, se paga con 2 de vida', 'clase': 'arcano', 'dado': '1d6', 'sumaEspecial': True, 'sp': 0},
 ]
@@ -182,17 +186,17 @@ def main():
     usos = usos_por_turno()
     print(f'\nVaritas y báculos: 1, 2, 3 No2 por uso y el SP de su efecto. Combate de {TURNOS} turnos con {NO2_REF} No2; mago {MAGO[0]} SP (+{MAGO[1]}), no mago {NO_MAGO[0]} SP (+{NO_MAGO[1]})')
     print(f'  (arma física Común: ~{ref["Común"][1]:.1f} por turno, de {ref["Común"][2]:.1f} a {ref["Común"][3]:.1f}; Buena ~{ref["Buena Calidad"][1]:.1f})\n')
-    print('  tiro · SP · mago/turno · no mago/turno · arma')
+    print('  tiro · SP · DDE · mago/turno · no mago/turno · arma')
     for a in POOL:
         v = valor_uso(a)['valor']
         sp = 0 if a['nombre'].startswith('Báculo de sangre') else sp_de(v)
         marca = '  ⚠ más de 4 SP: no es Común' if sp > 4 else ''
-        print(f"  {v:4.1f} · {sp} · {combate(v, sp, MAGO):5.1f} · {combate(v, sp, NO_MAGO):5.1f} · {a['nombre']}{marca}")
+        print(f"  {v:4.1f} · {sp} · {precio_de(v):3d} · {combate(v, sp, MAGO):5.1f} · {combate(v, sp, NO_MAGO):5.1f} · {a['nombre']}{marca}")
     print('\nCandidatas a Buena (se pasan del techo Común):')
     for a in PARA_BUENA:
         v = valor_uso(a)['valor']
         sp = 0 if a['nombre'].startswith('Báculo de sangre') else sp_de(v)
-        print(f"  {v:4.1f} · {sp} SP · {a['nombre']}")
+        print(f"  {v:4.1f} · {sp} SP · {precio_de(v)} DDE · {a['nombre']}")
     print('\nOrbes (otra mano, no atacan; valor a definir):')
     for n, t in ORBES: print(f'  {n}: {t}')
 

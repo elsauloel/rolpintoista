@@ -1481,3 +1481,7 @@ lluvia ácida 21 y báculo de sangre 19,5), 3 orbes.
   - **Orbe de luz**: no se entendió «luz de radio 1» (es el stat Luz portada, como un farol: ves e iluminás ese radio a tu alrededor, sin punto ciego).
   - Con esto, varias pasan a 4 SP: propuesta, **tope Común en 4 SP** (el SP ya las frena: con 4 SP el mago rinde menos por turno que con las de 2).
     La ráfaga helada (13,3 por tiro) queda para Buena o con el área recortada.
+- **2026-10-05:** «Chispas» → **Varita de la fogata** (sonaba eléctrico). **Niebla**: aprobada como la propuso Claude (casillas que no dejan ver a
+  través ni frenan el paso; adentro se ve a 1; desde afuera no se apunta adentro). **Precio en DDE** (pedido del dueño): la misma curva que las armas
+  físicas (`27 · e^(0,158 · valor del tiro)`): las Comunes quedan de 45 a 120 DDE (las físicas Comunes, de 40 a 120, promedio 75). La ráfaga helada
+  pasa a candidata de Buena. Tope Común: 4 SP.

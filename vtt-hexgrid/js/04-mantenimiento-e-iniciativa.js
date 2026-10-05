@@ -598,10 +598,17 @@ function lentoRecargo(t, porCasillero){
 const pasosGratisUsados = new Map();
 const pasosGratisClave = id => `${id}@${Math.round(num(mantenimientoNumero))}`;
 try{ const g = JSON.parse(localStorage.getItem('pasos-gratis') || '{}'); Object.entries(g).forEach(([k, v]) => pasosGratisUsados.set(k, num(v))); }catch(e){}
+// Lo público de una invocación (lo publica la ficha de su dueño en resumen.invocaciones), o null.
+function resumenDeInv(t){
+  if(!t || !t.fichaId || !String(t.fichaId).includes(SEP_INVOCACION)) return null;
+  const [base, invId] = String(t.fichaId).split(SEP_INVOCACION);
+  const r = (fichasPub.get(base) || {}).resumen || {};
+  return (r.invocaciones || []).find(i => i && i.id === invId) || null;
+}
 function pasosGratisDe(t){
   if(!t || !t.fichaId) return 0;
   if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return sc && typeof CreepCalculo !== 'undefined' ? Math.max(0, Math.round(num(CreepCalculo.modTotal(sc, 'pasosgratis')))) : 0; }
-  if(String(t.fichaId).includes(SEP_INVOCACION)) return 0;
+  if(String(t.fichaId).includes(SEP_INVOCACION)){ const ri = resumenDeInv(t); return Math.max(0, Math.round(num(ri && ri.pasosGratis))); }
   const f = fichasPub.get(t.fichaId);
   return Math.max(0, Math.round(num(f && f.resumen && f.resumen.pasosGratis)));
 }
@@ -620,11 +627,21 @@ const idDeToken = t => { for(const [id, x] of tokens) if(x === t) return id; ret
 function costoMoverDe(t){
   if(modoMapa !== 'combate') return null;  // en modo narrativo se mueve sin contar No2
   if(t && t.tipo === 'creep') return costoMoverCreep(t);
-  if(!t || t.tipo !== 'pj' || !t.fichaId || t.fichaId.includes(SEP_INVOCACION)) return null;
+  if(t && t.fichaId && String(t.fichaId).includes(SEP_INVOCACION)) return costoMoverInv(t);
+  if(!t || t.tipo !== 'pj' || !t.fichaId) return null;
   const f = fichasPub.get(t.fichaId);
   const r = f && f.resumen;
   if(!r || r.costoMover === undefined) return null;
   return {porCasillero: num(r.costoMover), disponibles: num(r.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, num(r.costoMover))};
+}
+
+// Una invocación paga moverse como cualquiera (dueño, 2026-10-04: las reglas de combate, iguales para todos): lo que publica la ficha de su dueño
+// (FichaResumen.invCostoMover). Sin ese dato (una ficha que todavía no se volvió a guardar), se mueve sin contar, como antes.
+function costoMoverInv(t){
+  const ri = resumenDeInv(t);
+  if(!ri || ri.costoMover === undefined) return null;
+  const por = num(ri.costoMover);
+  return {porCasillero: por, disponibles: num(ri.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, por)};
 }
 
 // Mismas reglas que la ficha publica en resumen.costoMover: 1 por

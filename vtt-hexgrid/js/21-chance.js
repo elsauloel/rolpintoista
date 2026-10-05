@@ -6,13 +6,14 @@
    ve en la Crónica (y queda una línea en la Mesa). Con 100 % sale siempre: el cartel lo anuncia, sin tirar.
    Inamovible y Reflejos de mangosta pasan dentro del paso a paso de las trampas (js/19, fases «firme-…» y «reflejos»). */
 
-// El % de un token en uno de estos stats: un creep, de sus datos (solo el GM); un personaje, de su resumen público. Las invocaciones, por
-// ahora sin estos datos (como los Pasos gratis).
+// El % de un token en uno de estos stats: un creep, de sus datos (solo el GM); un personaje o una invocación, de lo que publica la ficha de su
+// dueño (las reglas, iguales para todos: dueño, 2026-10-04).
 const CHANCE_RESUMEN = {retirada: 'retirada', inamovible: 'inamovible', recuperarse: 'recuperarse', reflejos: 'reflejos'};
 function chanceDe(t, stat){
   if(!t || !t.fichaId) return 0;
   if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return sc ? Combatiente.chancePct(CreepCalculo.modTotal(sc, stat)) : 0; }
-  if(String(t.fichaId).includes(SEP_INVOCACION)) return 0;
+  const ri = resumenDeInv(t);
+  if(ri) return Combatiente.chancePct(ri[CHANCE_RESUMEN[stat] || stat]);
   const f = fichasPub.get(t.fichaId);
   return Combatiente.chancePct(f && f.resumen && f.resumen[CHANCE_RESUMEN[stat] || stat]);
 }
@@ -62,7 +63,7 @@ async function chanceCartel(o){
 /* ---------- Recuperarse rápido (2026-10-04, pies) ----------
    Cuando a un token que maneja esta pantalla le aparece Inmovilizado, Rengo, Sentado o Lento (con turnos), y tiene Recuperarse rápido, se le abre
    el cartel de la chance: si sale, ese estado arranca con 1 turno menos (si le quedaba 1, se termina). Un creep, en sus datos; un personaje, con
-   el aviso de siempre a su ficha («Acortar estado»). Solo lo NUEVO: lo que ya tenía al abrir el mapa no cuenta. */
+   el aviso de siempre a su ficha («Acortar estado»; una invocación, igual, con su id). Solo lo NUEVO: lo que ya tenía al abrir el mapa no cuenta. */
 const recupVistos = new Map();   // tokenId → Set de los estados que traban que ya tenía
 const recupCola = [];
 let recupOcupado = false;
@@ -70,8 +71,9 @@ const recupInicio = Date.now();
 function recuperarseRevisar(){
   if(!fbUsuario || Date.now() - recupInicio < 8000) return;   // que lleguen los datos antes de mirar
   tokens.forEach((t, id) => {
-    if(!t || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) return;
-    if(t.tipo === 'creep' ? !(soyGM && creepPrivadoDe(t.fichaId)) : !(puedoMover(t) && fichasPub.get(t.fichaId))) return;   // solo lo que maneja esta pantalla, ya cargado
+    if(!t || !t.fichaId) return;
+    const cargado = t.tipo === 'creep' ? soyGM && creepPrivadoDe(t.fichaId) : puedoMover(t) && (String(t.fichaId).includes(SEP_INVOCACION) ? resumenDeInv(t) : fichasPub.get(t.fichaId));
+    if(!cargado) return;   // solo lo que maneja esta pantalla, ya cargado (personajes, invocaciones y creeps)
     const presentes = new Set(confusionEstadosDe(t).filter(e => e && e.activo !== false && Combatiente.esTraba(e) && !e.permanente && num(e.turnos) > 0).map(e => String(e.nombre)));
     const antes = recupVistos.get(id);
     recupVistos.set(id, presentes);

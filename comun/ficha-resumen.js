@@ -39,6 +39,13 @@ const FichaResumen = (() => {
     return estadoActivo(S, 'rengo') ? IT2().nitrosMoverRengo : IT2().nitrosMover;
   }
 
+  // Lo que le cuesta moverse un casillero a una invocación: como a un personaje (Rengo, el doble) y, como a un creep, Inmovilizado no se mueve.
+  function invCostoMover(inv){
+    const act = (inv.estados || []).filter(e => e && e.activo !== false);
+    if(act.some(e => e.inmovilizado)) return 0;
+    return act.some(e => e.rengo) ? IT2().nitrosMoverRengo : IT2().nitrosMover;
+  }
+
   /* ---------- No2 máximo de una invocación (js/04) ---------- */
   function invFuentesEquipo(inv){
     const arma = (inv.armaMods || []).length ? [{nombre: inv.armaNombre || 'Arma', mods: inv.armaMods}] : [];
@@ -140,6 +147,11 @@ const FichaResumen = (() => {
           nitros: num(inv.nitros),
           nitrosMax: invNitrosMax(inv),
           oporCosto: Combatiente.costoEspecial(num(inv.armaTipo) || 8, Combatiente.armaDeCombatiente(inv), 'oportunidad'),   // ataque de oportunidad (2026-10-02)
+          // Las reglas del mapa, iguales para todos (dueño, 2026-10-04): moverse cuesta No2 (Rengo el doble, Inmovilizado no se mueve), los Pasos
+          // gratis, las chances de las piezas (Retirada limpia, Inamovible, Recuperarse rápido, Reflejos de mangosta) y Pisada atenta con su Percepción.
+          costoMover: invCostoMover(inv), pasosGratis: num(invModTotal(inv, 'pasosgratis')), retirada: num(invModTotal(inv, 'retirada')),
+          inamovible: num(invModTotal(inv, 'inamovible')), recuperarse: num(invModTotal(inv, 'recuperarse')), reflejos: num(invModTotal(inv, 'reflejos')),
+          pisadaAtenta: num(invModTotal(inv, 'pisadaatenta')) > 0, ...(typeof InvCalculo !== 'undefined' ? {percepcion: num(InvCalculo.statValor(inv, 'percepcion'))} : {}),
           activa: inv.activa !== false,
           miniatura: miniaturaInv(inv.imagen),
           estados: (inv.estados || [])
@@ -150,12 +162,12 @@ const FichaResumen = (() => {
               turnos: num(e.turnos),
               permanente: !!e.permanente,
               ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
-              polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '', ...(e.confusion ? {confusion: true} : {}),
+              polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '', ...(e.confusion ? {confusion: true} : {}), ...(e.lento ? {lento: true} : {}),
               detalle: String(e.detalle || '').slice(0, 300),
             })),
         })),
     };
   }
 
-  return {estadosDePasivas, estadoSobrepeso, estadosTodos, estadoActivo, costoMoverCasillero, invFuentesEquipo, invModTotal, invNitrosMax, resumen};
+  return {estadosDePasivas, estadoSobrepeso, estadosTodos, estadoActivo, costoMoverCasillero, invCostoMover, invFuentesEquipo, invModTotal, invNitrosMax, resumen};
 })();

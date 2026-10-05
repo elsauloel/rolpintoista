@@ -42,6 +42,7 @@ function cancelarRuta(){
 // cambiarVidaPj con la vida. Puede quedar en negativo (moverse de más se
 // permite, avisando). Devuelve los que quedan.
 async function gastarNitros(fichaId, costo){
+  if(String(fichaId).includes(SEP_INVOCACION)) return gastarNitrosInv(fichaId, costo);   // una invocación: sus propios No2
   const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
   const parteRef = base.collection('partes').doc('general');
   const ts = firebase.firestore.FieldValue.serverTimestamp();
@@ -55,6 +56,26 @@ async function gastarNitros(fichaId, costo){
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
     tx.update(base, {'resumen.nitros': datos.nitros, actualizado: ts});
     return datos.nitros;
+  });
+}
+
+// Lo mismo sobre una invocación (parte «invocaciones» de la ficha de su dueño + su resumen), 2026-10-04.
+async function gastarNitrosInv(fichaIdInv, costo){
+  const [fichaId, invId] = String(fichaIdInv).split(SEP_INVOCACION);
+  const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
+  const parteRef = base.collection('partes').doc('invocaciones');
+  const ts = firebase.firestore.FieldValue.serverTimestamp();
+  return fbDb.runTransaction(async tx => {
+    const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
+    if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
+    const datos = JSON.parse(parte.data().json || '{}');
+    const inv = (datos.invocaciones || []).find(i => i && i.id === invId);
+    if(!inv) throw new Error('La invocación ya no existe');
+    inv.nitros = num(inv.nitros) - costo;
+    const rs = ficha.data().resumen || {};
+    tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
+    tx.update(base, {actualizado: ts, 'resumen.invocaciones': (rs.invocaciones || []).map(i => i.id === invId ? {...i, nitros: inv.nitros} : i)});
+    return inv.nitros;
   });
 }
 
@@ -193,8 +214,11 @@ function tokenPercepcionAumentada(t){
 }
 // Pisada atenta (2026-10-04, pies): la misma tirada de «algo está fuera de lugar», pero solo contra trampas (y con la Percepción normal).
 function tokenPisadaAtenta(t){
+  if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return !!sc && num(CreepCalculo.modTotal(sc, 'pisadaatenta')) > 0; }
+  const ri = resumenDeInv(t);
+  if(ri) return !!ri.pisadaAtenta;
   const v = vinculo(t), r = v && v.resumen;
-  return t.tipo === 'pj' && !String(t.fichaId || '').includes(SEP_INVOCACION) && !!(r && r.pisadaAtenta);
+  return t.tipo === 'pj' && !!(r && r.pisadaAtenta);
 }
 function vecinosDeCasilla(c){
   const c0 = hexACubo(c);
@@ -566,6 +590,7 @@ async function trampaAplicarEfectos(t, el, celdaPisada){
     nombreT: el.trampaNombre || 'una trampa', salva, dano: trampaDanoValido(el.trampaDano) ? el.trampaDano.trim() : '', ignoraDef: !!el.trampaIgnoraDef,
     specJson: spec && spec.nombre ? el.trampaEstado : '', elemento: (spec && spec.elemento) || '', pierdeSp: (spec && spec.pierdeSp) || '', cadena: (spec && spec.cadena) || null, portal: (spec && spec.portal) || null, requiereDano: !!(spec && spec.requiereDano), duenoTrampa: el.duenoUid || '',
     aMano: (String(el.trampaDetalle || '').match(/[^.]*\(a mano\)\./g) || []).map(x => x.trim()).join(' '),   // lo que el texto dice que va a mano
+    celdas: celdasDeElemento(el).flatMap(c => [c.col, c.fila]),   // dónde está la trampa (el dodge roll de Reflejos de mangosta: ¿quedó afuera?)
   };
   for(const x of afectados){
     await trampaMomentoNuevo({...comun, x, tokenId: zonaIdDe(x), quien: x.oculto ? 'Alguien' : nombreDe(x), pisador: x === t, muro: x === t && muro ? muro.turnos : 0,

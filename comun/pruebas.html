@@ -1846,6 +1846,16 @@ prueba('pies: el resumen del personaje publica Pisada atenta, Inamovible, Recupe
   igual([r.pisadaAtenta, r.inamovible, r.recuperarse, r.reflejos, L.length, L.every(i => (i.mods || []).every(m => m.stat !== 'def' || m.val <= 1)), L.some(i => (i.mods || []).some(m => m.stat === 'tipo2'))],
     [true, 33, 50, 33, 27, true, false]);
 });
+prueba('invocaciones iguales que todos (dueño, 2026-10-04): la ficha publica su costo de moverse (Rengo doble, Inmovilizado 0), Pasos gratis, las chances y Pisada atenta', () => {
+  const S = FichaGuardado.normalizar({}).S;
+  const patas = {nombre: 'Patas', mods: [{stat: 'reflejos', val: 33}, {stat: 'pasosgratis', val: 1}, {stat: 'inamovible', val: 50}, {stat: 'retirada', val: 33}, {stat: 'recuperarse', val: 50}, {stat: 'pisadaatenta', val: 1}]};
+  S.invocaciones = [{id: 'i1', nombre: 'Abeja', hp: 5, hpMax: 5, estados: [], equipo: [patas]},
+    {id: 'i2', nombre: 'Lobo', hp: 5, hpMax: 5, estados: [{nombre: 'Rengo', activo: true, rengo: true, turnos: 2}], equipo: []},
+    {id: 'i3', nombre: 'Oso', hp: 5, hpMax: 5, estados: [{nombre: 'Inmovilizado', activo: true, inmovilizado: true, turnos: 2}, {nombre: 'Lento', activo: true, lento: true, turnos: 2}], equipo: []}];
+  const [a, b, c] = FichaResumen.resumen(S).invocaciones;
+  igual([a.costoMover, a.pasosGratis, a.reflejos, a.inamovible, a.retirada, a.recuperarse, a.pisadaAtenta, b.costoMover, c.costoMover, c.estados.some(e => e.lento)],
+    [FichaCalculo.IT2.nitrosMover, 1, 33, 50, 33, 50, true, FichaCalculo.IT2.nitrosMoverRengo, 0, true]);
+});
 prueba('catálogo: las piernas Común (28) — ninguna pasa de Defensa 1, y las mecánicas nuevas están', () => {
   const L = CATALOGO_BASE.filter(i => i.tipoItem === 'piernas' && i.tier === 'Común');
   const stats = new Set(L.flatMap(i => (i.mods || []).map(m => m.stat)));

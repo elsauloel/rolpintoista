@@ -178,7 +178,9 @@ async function percepcionResolverBanner(){
   if(!t){ percepcionBanner = null; renderPercepcionBanner(); return; }
   try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo tirar Percepción'); if(bt) bt.disabled = false; return; }
   const f = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]);
-  const valor = f && f.resumen ? num(f.resumen.percepcion) : 0;
+  // La Percepción de quien camina: un personaje, su resumen; una invocación, la suya; un creep, sus datos (2026-10-04: iguales para todos).
+  const ri = resumenDeInv(t), sc = t.tipo === 'creep' ? creepPrivadoDe(t.fichaId) : null;
+  const valor = sc ? num(CreepCalculo.statValor(sc, 'percepcion')) : ri ? num(ri.percepcion) : f && f.resumen ? num(f.resumen.percepcion) : 0;
   const aumentada = tokenPercepcionAumentada(t);   // con Pisada atenta sola (solo trampas), la Percepción normal
   const r = FichaBotonera.tiradaPercepcionValor(valor, aumentada);
   if(!r){ toast('Percepción: sin valor para tirar (abrí la ficha una vez para que lo publique)'); percepcionBanner = null; renderPercepcionBanner(); return; }

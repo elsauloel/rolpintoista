@@ -1403,3 +1403,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (revisa cada 1,5 s los tokens que maneja esta pantalla; a un estado que traba NUEVO, cartel y, si sale, 1 turno menos). Lo usan la Retirada limpia
   (js/17) y el paso a paso de las trampas (js/19: Reflejos de mangosta, Inamovible). En js/04: `marcarMovido` / `seMovioEsteTurno` / `window.mapaSeMovio`
   (Lento y Pasos de baile) y `lentoRecargo` (el primer casillero doble).
+- **Invocaciones iguales en el mapa** (2026-10-04, dueño): `resumenDeInv(t)` (js/04) lee lo que la ficha publica de cada invocación; con eso se
+  mueven pagando No2 (`costoMoverInv`, `gastarNitrosInv` — `gastarNitros` deriva solo a la invocación si el id lleva `~`), con Lento y Pasos gratis,
+  y les valen las chances (`chanceDe`), Recuperarse rápido y Pisada atenta (también a los creeps). **Reflejos de mangosta = dodge roll**: fase
+  `reflejos-dodge` de js/19 (`trampaPasoDodge`: elegir casilla a 1–2, pagar el movimiento; afuera de la trampa la esquiva; «✋ No me tiro»).
+

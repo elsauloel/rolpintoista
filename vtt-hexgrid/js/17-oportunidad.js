@@ -99,7 +99,7 @@ async function oportunidadResolver(){
    qué chance tiene y con qué número sale, y el botón «🎲 Tirar 1d6» — no se tira solo ni en silencio (dueño: «el anuncio y la tirada no
    pueden ser silenciosas y automáticas en el log»). Los dados ruedan, el cartel muestra el resultado y el resto de la mesa lo ve en la
    Crónica. Con 100 % sale siempre: el cartel lo anuncia, sin tirar. Si sale, sigue su camino como lo marcó; si no, el rival decide como
-   siempre. Las invocaciones, por ahora sin este dato (como los Pasos gratis). */
+   siempre. Igual para personajes, invocaciones y creeps (chanceDe, js/21). */
 const retiradaDe = t => chanceDe(t, 'retirada');   // js/21
 async function oporRetirada(t, r, p){
   const pct = retiradaDe(t);

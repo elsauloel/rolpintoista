@@ -450,8 +450,7 @@ de su bolsa. Se construyeron las tres mecánicas nuevas, iguales para personajes
 - **Retirada limpia** (`retirada`, en %): al alejarse de un rival, quien se aleja tira 1d6 (33 % = 5–6, 50 % = 4–6; 100 = siempre, sin tirar) antes
   de que el rival decida; si sale, sigue su camino sin ataque de oportunidad (`vtt-hexgrid/js/17`, `oporRetirada`). **Nunca silenciosa** (dueño,
   2026-10-04: «el anuncio y la tirada no pueden ser silenciosas y automáticas en el log»): a quien se aleja se le abre un cartel paso a paso con su
-  chance y el botón «🎲 Tirar 1d6»; los dados ruedan, el cartel muestra el resultado y el resto de la mesa lo ve en la Crónica. Las invocaciones todavía no la
-  leen en el mapa (como los Pasos gratis).
+  chance y el botón «🎲 Tirar 1d6»; los dados ruedan, el cartel muestra el resultado y el resto de la mesa lo ve en la Crónica. Vale igual para invocaciones (ver más abajo).
 - Pesos en `herramientas/calculadora_defensa.py`: `evaopor` 1, `evacontra` 2/3, `retirada` 0,03 por punto (33 % ≈ 1, 50 % = 1,5) y 4 si es 100.
 
 ## Pies — panorama y lluvia de mecánicas (2026-10-04, para que el dueño filtre)
@@ -493,7 +492,7 @@ Botas de marcha sigue en pausa. Propuesta de 27 pies Comunes en la conversación
 
 **Pies Común cargados ✅ (2026-10-04, «Listo» del dueño).** 27 piezas en `comun/catalogo.js`; ninguna pasa de su bolsa; el Tipo 6 salió de los pies.
 Pesos en `herramientas/calculadora_defensa.py`: Pasos de baile 1,5 · Pisada atenta 1 · `COSTO_CHANCE` (33 % / 50 % / siempre): Inamovible 0,5 / 0,75 / 1,5,
-Recuperarse rápido 0,5 / 1 / 2, Reflejos de mangosta 1 / 1,5 / 2,5. Construido (igual para personajes y creeps; las invocaciones, todavía no en el mapa):
+Recuperarse rápido 0,5 / 1 / 2, Reflejos de mangosta 1 / 1,5 / 2,5. Construido (igual para personajes, invocaciones y creeps):
 - **Lento** (estado nuevo): el primer casillero de cada turno cuesta el doble (`lentoRecargo`, js/04; el mapa anota quién ya se movió: `marcarMovido`).
 - **Pasos de baile**: +N a la Evasión del duelo si ya se movió en el turno (`Combatiente.evaExtraDuelo`, con la Evasión contra oportunidad/contraataque;
   se ve en el botón y en la Mesa: «Evasión (+1 Pasos de baile)»).
@@ -502,3 +501,13 @@ Recuperarse rápido 0,5 / 1 / 2, Reflejos de mangosta 1 / 1,5 / 2,5. Construido 
 - **Recuperarse rápido**: al aparecerle Inmovilizado, Rengo, Sentado o Lento, cartel con su chance; si sale, 1 turno menos (js/21; un personaje lo
   recibe como «Acortar estado»).
 - Todas las chances usan la misma pieza (`chanceCartel`, js/21: cartel, botón, dados, resultado, Crónica y Mesa); la Retirada limpia pasó a usarla.
+
+**Invocaciones iguales que todos (dueño, 2026-10-04: «las reglas del combate serán iguales para todos los actores»).** La ficha publica de cada
+invocación (`resumen.invocaciones`) lo mismo que de un personaje: `costoMover` (Rengo el doble, Inmovilizado 0), `pasosGratis`, `retirada`,
+`inamovible`, `recuperarse`, `reflejos`, `pisadaAtenta` y `percepcion` (`FichaResumen.invCostoMover`). En el mapa (`resumenDeInv`, js/04): moverse
+le cuesta No2 (antes se movía gratis; `costoMoverInv`, `gastarNitrosInv`), con Lento y Pasos gratis; y le valen la Retirada limpia, Inamovible,
+Recuperarse rápido (el «Acortar estado» llega a su ficha por `Recibidos`), Reflejos de mangosta y Pisada atenta. Pisada atenta también para creeps.
+**Reflejos de mangosta = dodge roll** (dueño, 2026-10-04: «te permite tirar dodge roll en la dirección que quieras para intentar esquivar»): si sale
+la chance, elegís en el mapa una casilla a 1 o 2 de distancia (pagando el movimiento en No2, como el dodge roll de los hechizos de área); si queda
+fuera de la trampa, la esquivás entera; si no, te cae encima. Sentado o Inmovilizado no pueden tirarse.
+

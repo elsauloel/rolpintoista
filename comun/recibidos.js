@@ -54,6 +54,14 @@ const Recibidos = (() => {
     if(!invId){ FichaAcciones.aplicarEstadoRecibido(S, sp, origen, ui); return {}; }
     const inv = (S.invocaciones || []).find(i => i && i.id === invId);
     if(!inv){ ui.toast(`${origen ? origen + ': ' : ''}${sp.nombre} — la invocación ya no está`); return {}; }
+    if(sp.nombre === 'Acortar estado'){   // Recuperarse rápido (2026-10-04): le saca turnos a un estado de la invocación
+      const e = (inv.estados || []).find(x => x && x.activo !== false && x.nombre === sp.estado && !x.permanente);
+      if(!e){ ui.toast(`${inv.nombre}: ya no tiene ${sp.estado}`); return {}; }
+      e.turnos = Math.max(0, num(e.turnos) - Math.max(1, Math.round(num(sp.stacks) || 1)));
+      if(e.turnos <= 0) inv.estados = inv.estados.filter(x => x !== e);
+      ui.toast(`${origen ? origen + ' → ' : ''}${inv.nombre}: ${sp.estado} ${e.turnos > 0 ? `queda en ${e.turnos} turno${e.turnos === 1 ? '' : 's'}` : 'se terminó'}`);
+      return {inv};
+    }
     if(sp.nombre === 'Pierde No2'){   // Sonic Boom (2026-10-02): a una invocación
       const n = Math.max(0, Math.round(num(sp.stacks))), antes = num(inv.nitros);
       inv.nitros = Math.max(0, antes - n);

@@ -496,7 +496,7 @@ async function zonaResolverBanner(){
     let elZ = Combatiente.elementoDe(el.zonaDanoTipo || '');
     if(!elZ && el.trampa){ try{ elZ = (JSON.parse(el.trampaEstado || '{}') || {}).elemento || ''; }catch(err){} }   // la zona que dejó una trampa: el elemento de la trampa
     const rz = await resistenciasDe(t, elZ);
-    const armadmg = el.zonaIgnoraDef && (el.zonaCasteadorRef || elZ) ? rz.armadmg : 0;
+    const armadmg = el.zonaIgnoraDef && (el.zonaCasteadorRef || elZ) && Combatiente.frenaArmaduraMagica(elZ) ? rz.armadmg : 0;   // lo tóxico, no (2026-10-05)
     const resEl = elZ ? rz.res : 0;
     if(monto > 0){
       try{

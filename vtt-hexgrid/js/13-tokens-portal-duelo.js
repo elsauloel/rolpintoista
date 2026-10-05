@@ -744,11 +744,12 @@ async function dueloAplicarDano(d){
   else if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); def = sc ? creepDefensaMapa(sc) : 0; armadmg = sc ? creepArmadmgMapa(sc) : 0; }
   else{ const f = fichasPub.get(t.fichaId); def = f && f.resumen && f.resumen.def !== undefined ? num(f.resumen.def) : 0; armadmg = f && f.resumen ? num(f.resumen.armadmg || 0) : 0; }
   // Un crítico real ignora la Defensa entera (0); el daño de casteo que la ignora (Paso 1) resta la Armadura mágica (Paso 3) en vez de nada.
-  const restaIgnorando = magico ? armadmg : 0;
   // El elemento del daño de la habilidad (2026-10-04): se resta además la resistencia de quien lo recibe a ese elemento (Res. fuego…).
   const elDano = d.hab && d.hab.dano ? Combatiente.elementoDe(d.hab.dano.tipo) : '';
+  const frenaAm = magico && Combatiente.frenaArmaduraMagica(elDano);   // lo tóxico no lo frena la Armadura mágica (2026-10-05)
+  const restaIgnorando = frenaAm ? armadmg : 0;
   const resEl = elDano ? (await resistenciasDe(t, elDano, invLeida)).res : 0;
-  const freno = [...(magico && armadmg ? [`Armadura mágica ${armadmg}`] : []), ...(resEl ? [`${Combatiente.ELEMENTOS[elDano].etq} ${resEl}`] : [])].join(' − ');
+  const freno = [...(frenaAm && armadmg ? [`Armadura mágica ${armadmg}`] : []), ...(resEl ? [`${Combatiente.ELEMENTOS[elDano].etq} ${resEl}`] : [])].join(' − ');
   let aplicar = golpe, ignoraDef = crit;
   if(base.mitad){ aplicar = Math.ceil(Math.max(0, golpe - def) / 2); ignoraDef = true; }
   // Bloqueo perdido (mitad del daño): el arma o escudo con el que bloqueó pierde 1 punto de durabilidad (solo personajes: los creeps y las invocaciones no llevan).

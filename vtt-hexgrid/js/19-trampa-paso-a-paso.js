@@ -95,9 +95,9 @@ function trampaPasoQueFalta(dt){
       texto: efecto ? `Tira ${etq} para resistir ${queLargo}. Contra ${s.dif}: con ${s.dif} o más, ${trampaLogra(dt)}.` : `${etq} contra ${s.dif}: con ${s.dif} o más, ${trampaLogra(dt)}.`,
       boton: efecto ? `🎲 Tirar ${etq} para resistir ${que}` : `🎲 Tirar ${etq}`, espera: `${dt.quien} tira ${etq}${efecto ? ` para resistir ${que}` : ''}…`};
   }
-  if(dt.fase === 'dano' && dt.danoFijo) return {titulo: 'Le llega la descarga', texto: `${dt.danoFijo} de daño${dt.elemento ? ' ' + Combatiente.ELEMENTOS[dt.elemento].icono : ''}, directo a la vida (la mitad del salto anterior; lo frenan ${dt.elemento ? Combatiente.ELEMENTOS[dt.elemento].etq + ' y ' : ''}la Armadura mágica).`,
+  if(dt.fase === 'dano' && dt.danoFijo) return {titulo: 'Le llega la descarga', texto: `${dt.danoFijo} de daño${dt.elemento ? ' ' + Combatiente.ELEMENTOS[dt.elemento].icono : ''}, directo a la vida (la mitad del salto anterior; lo frenan ${dt.elemento ? Combatiente.ELEMENTOS[dt.elemento].etq + (Combatiente.frenaArmaduraMagica(dt.elemento) ? ' y la Armadura mágica' : '') : 'la Armadura mágica'}).`,
     boton: '▶ Recibir la descarga', espera: `a ${dt.quien} le llega la descarga…`};
-  if(dt.fase === 'dano') return {titulo: 'Daño', texto: `La trampa pega ${dt.dano}${dt.elemento ? ' ' + Combatiente.ELEMENTOS[dt.elemento].icono : ''}${dt.evita === 'mitad' ? ' (la mitad)' : ''}${dt.ignoraDef ? ', directo a la vida' : ', menos la Defensa'}${dt.elemento ? ` (lo frenan ${Combatiente.ELEMENTOS[dt.elemento].etq} y la Armadura mágica)` : ''}.`,
+  if(dt.fase === 'dano') return {titulo: 'Daño', texto: `La trampa pega ${dt.dano}${dt.elemento ? ' ' + Combatiente.ELEMENTOS[dt.elemento].icono : ''}${dt.evita === 'mitad' ? ' (la mitad)' : ''}${dt.ignoraDef ? ', directo a la vida' : ', menos la Defensa'}${dt.elemento ? ` (lo ${Combatiente.frenaArmaduraMagica(dt.elemento) ? `frenan ${Combatiente.ELEMENTOS[dt.elemento].etq} y la Armadura mágica` : `frena ${Combatiente.ELEMENTOS[dt.elemento].etq}`})` : ''}.`,
     boton: `🎲 Tirar el daño (${dt.dano})`, espera: `${dt.quien} tira el daño…`};
   if(dt.fase === 'portal'){
     const elige = trampaEligePortal(dt), dueno = nombreMiembro(dt.duenoTrampa) || 'quien la puso';
@@ -469,7 +469,7 @@ async function trampaPasoDano(id, dt){
     try{
       // Daño de un elemento (2026-10-04): resta la resistencia a ese elemento y, como es daño mágico, la Armadura mágica.
       const rr = dt.elemento ? await resistenciasDe(x, dt.elemento) : {res: 0, armadmg: 0};
-      const arm = dt.elemento && dt.ignoraDef ? rr.armadmg : 0;
+      const arm = dt.elemento && dt.ignoraDef && Combatiente.frenaArmaduraMagica(dt.elemento) ? rr.armadmg : 0;   // lo tóxico, no
       freno = [...(arm ? [`Armadura mágica ${arm}`] : []), ...(rr.res ? [`${Combatiente.ELEMENTOS[dt.elemento].etq} ${rr.res}`] : [])].join(' − ');
       if(x.tipo === 'creep'){ if(soyGM) res = await danioCreep(x, String(monto), dt.ignoraDef, arm, rr.res); }
       else res = await (String(x.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(x, String(monto), dt.ignoraDef, arm, rr.res);

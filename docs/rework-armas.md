@@ -1360,8 +1360,11 @@ van a contemplar como…»: falta completar.)
 - **El daño tóxico es su propia categoría (dueño, 2026-10-05):** el que se respira (como Pedos Tóxicos), y los venenos. **No es exactamente mágico**,
   pero **no contempla armadura** y **se resiste con Res.Esp**, la resistencia que da la **Constitución**: la identidad de la Constitución es resistir
   efectos físicos, y esto es un efecto físico gaseoso («la diferencia es muy sutil»). (Responde la segunda parte de P143: el tóxico se resiste con
-  Res.Esp.) Pregunta que queda: hoy al daño tóxico también lo reduce la **Armadura mágica** (y la Res. tóxico); si no es mágico, ¿la Armadura
-  mágica debería frenarlo?
+  Res.Esp.) **Al tóxico no lo frena la Armadura mágica** (dueño, mismo día): solo la Res. tóxico. Hecho en el motor (zonas, duelo, trampas).
 - **Las áreas se esquivan con dodge roll (dueño, 2026-10-05):** un efecto de área **sí se puede esquivar**: se tira Evasión, pero el dodge roll
   **cuesta No2**. Esquivar un área pesa más que una evasión normal: tenerlo en cuenta en la balanza (corrige «lo que no tiene tirada no se esquiva»:
   se esquiva, pero cuesta). Es lo que ya hace el motor con los hechizos de área (la fase de dodge del duelo).
+- **El peso de cada daño (dueño, 2026-10-05):** el **tóxico** ignora la armadura física pero tiene **tirada de resistencia (Res.Esp), que todo el mundo
+  tiene** → **pesa un poco menos** que los elementales y el arcano. Los **elementales** ignoran la armadura; sus resistencias de equipo existen pero
+  son marginales. El **arcano es el que más vale**, sobre todo **si suma el Especial**: va muy directo a la vida una vez que pasa las tiradas.
+  Orden de valor: arcano (con Especial) > arcano > elemental > tóxico.

@@ -1954,6 +1954,9 @@ prueba('♻ convertir en despojos (dueño, 2026-10-05): un cuarto del precio, pa
   const a = Intercambio._aDespojos(S, 'b'), b = Intercambio._aDespojos(S, 'p', 2), c = Intercambio._aDespojos(S, 'e'), d = Intercambio._aDespojos(S, 'r');
   igual([a.n, b.n, S.loot.normal, S.inventario.map(i => i.id + ':' + (i.unidades || 1)), !!c.error, !!d.error], [9, 13, 22, ['p:2', 'e:1', 'r:1'], true, true]);
 });
+prueba('daño tóxico (dueño, 2026-10-05): no lo frena la Armadura mágica; el resto de los elementos sí', () => {
+  igual(['toxico', 'fuego', 'hielo', 'rayo', 'acido', ''].map(Combatiente.frenaArmaduraMagica), [false, true, true, true, true, true]);
+});
 prueba('mochila (dueño, 2026-10-05, P158): todo ítem ocupa al menos 1 ranura (una pila, 1), salvo que diga lo contrario; el catálogo, todo en 1', () => {
   const R = FichaEquipo.ranuras;
   igual([R({ranuras: 0}), R({}), R({ranuras: 2}), R({consumible: true, unidades: 5, ranuras: 1}), R({ranuras: 3, sinRanura: true}), CATALOGO_BASE.filter(i => i.ranuras !== 1).map(i => i.nombre)],

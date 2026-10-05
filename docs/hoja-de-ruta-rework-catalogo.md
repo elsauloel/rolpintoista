@@ -48,4 +48,11 @@ el dueño va a pedir pasarlas todas a ese momento.
 - **Hechizos (no armas)**: Miedo, Sueño, intercambiar lugar, mover a un aliado, señuelo (un token falso que atrae ataques).
 - **Armas de rango con «grappling hook»** (atraer al rival), cuando toque su rework.
 - **Daño que crece si se repite sobre el mismo objetivo** (armas especiales).
+- **Armas especiales, lo que quedó para después** (2026-10-05): **combos entre elementos** (aceite + fuego, hielo apaga fuego, viento agranda la nube,
+  tóxico + fuego explota) · **defensa del portador en báculos híbridos** (+Bloqueo y +Parry, espinas mágicas, reflejar un proyectil, escudo al castear,
+  absorber un hechizo como SP) · **reacción en turno ajeno** (escudo o contrahechizo cuando te atacan, a costo doble como el Flash) · **marca de cosecha**:
+  deja una marca X turnos y, si el marcado muere con ella, recuperás SP.
+- **Ataque de oportunidad mágico como habilidad pasiva** (2026-10-05, atendible).
+- **Pergaminos con efectos fuera de combate** (2026-10-05): ilusión, abrir cerraduras, encender fuego, levantar objetos a distancia, cambiar la voz o la
+  cara, hablar con animales, detectar magia o tesoros.
 - Lo que está en `pendientes.md` como «a futuro» del inventario: solicitar un ítem de otro jugador, baúles móviles, kit de herramientas.

@@ -1422,3 +1422,9 @@ van a contemplar como…»: falta completar.)
   ✅ 75 marcar (se lo ve a través de la niebla), como secundario: «este me gusta mucho».
 - **Filtro del dueño — H. Invocar y colocar (2026-10-05):** ✅ 76 luz flotante · 🔀 77 señuelo: el efecto sí, pero **para skills**, no para arma ·
   ❌ 78 torreta · ❌ 79 criatura chica · ✅ 80 runa (trampa mágica oculta) · ✅ 81 manchas de aceite · ✅ 82 telaraña, **igual a la Brea**.
+- **Filtro del dueño — J a N (2026-10-05):** J combos entre elementos: **todos sí, para más adelante** · K defensa del portador (báculos híbridos: +Bloqueo
+  y +Parry, espinas, reflejar, escudo al castear, absorber): **todos sí, en la ampliación del catálogo** · L riesgo: **sí, con un menú acotado de opciones**
+  (se entiende sobrecarga, magia de sangre y la varita salvaje con una tabla corta) · ❌ 107 caprichosa · ❌ 108 recuperar SP al matar — **para más
+  adelante, otra versión: deja una marca por X turnos y, si el marcado muere con la marca, ahí sí se recupera** · ❌ 109 carga acumulada · M: ⏳ 112
+  reacción en turno ajeno, en la ampliación · 🔀 113 ataque de oportunidad mágico: **como habilidad pasiva**, atendible · N fuera de combate: todos
+  efectos interesantes, **más para pergaminos que para armas**: en la ampliación. (Sin respuesta todavía: I terreno, 110 canalizar, 111 concentración.)

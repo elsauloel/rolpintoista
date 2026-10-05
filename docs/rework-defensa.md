@@ -454,3 +454,30 @@ de su bolsa. Se construyeron las tres mecánicas nuevas, iguales para personajes
   leen en el mapa (como los Pasos gratis).
 - Pesos en `herramientas/calculadora_defensa.py`: `evaopor` 1, `evacontra` 2/3, `retirada` 0,03 por punto (33 % ≈ 1, 50 % = 1,5) y 4 si es 100.
 
+## Pies — panorama y lluvia de mecánicas (2026-10-04, para que el dueño filtre)
+
+**Panorama del catálogo viejo:** 12 pies Comunes; 9 se pasan de la bolsa (1,5): Defensa hasta +6, Movimiento +1 (vale 4, imposible en
+Común) y Tipo 6 en casi todos (el reparto aprobado deja el Tipo 6 en torso, manos y piernas; los pies llevan Tipo 4). Se rehacen de cero,
+como las otras partes. Identidad acordada: **apoyo y reflejos** — Iniciativa, Evasión, Res.CC contra caerse o trabarse, y las tres ya
+aprobadas: Recuperarse rápido, Reflejos de mangosta y Evasión contra contraataque.
+
+Lluvia (cualquier calidad, con propuesta de peso; ⚙ = se puede automatizar con lo que ya hay en el mapa, ✋ = haría falta algo nuevo):
+- Ya aprobadas: **Recuperarse rápido** (Inmovilizado, Rengo, Sentado y el nuevo Lento duran 1 turno menos; 50 % = 1, siempre = 2) · **Reflejos de
+  mangosta** (al pisar una trampa, chance de dodge roll a ciegas; 33 % = 1, siempre = 2,5) · **Evasión contra contraataque** (2/3 por +1).
+- **Pie firme**: Res.CC solo contra caerse o trabarse (Derribar/Sentado, Inmovilizado, Rengo, Demora, el empuje de las trampas). 0,5 por +1. ⚙
+- **Anclado**: chance de que un empuje (trampa, Shockwave, Takle) no te mueva. 33 % = 0,5 · siempre = 1,5. ⚙ (las trampas con empuje)
+- **Paso seguro**: el terreno lento (arena movediza) te cuesta lo normal. 1. ⚙
+- **Suela gruesa**: −N al daño de lo que pisás (zonas y trampas del piso: fuego, ácido, púas, brea). 1 por −1. ⚙
+- **Suela aislante / Suela de corcho**: la resistencia elemental, pero solo contra el piso (fuego del terreno, Descarga). 0,25 por +1 (la mitad de una
+  resistencia general). ⚙
+- **Despegarse**: no te pegás a la Brea ni a las trampas de Atrapar (o el Soltarse cuesta 1 No2 menos). 1. ⚙
+- **Pisada atenta**: +N a la Percepción solo para detectar trampas. 0,5 por +1. ⚙
+- **Levantarse rápido**: levantarse de Sentado cuesta 1 No2 menos (o es gratis). 1 por No2. ⚙
+- **Pisada silenciosa**: Sigilo +N (lo comparte con las piernas). 1. ⚙ — y su contra, **Botas ruidosas**: Sigilo −1, para abaratar piezas con más Defensa.
+- **Botas de marcha**: el primer punto de sobrepeso no te cobra en el movimiento. En pausa (el dueño la dejó para cuando se defina la penalidad del sobrepeso).
+- **Pasos de baile**: +1 Evasión si ya te moviste este turno. ✋ (el duelo tendría que saber si se movió).
+- **Salto**: una vez por turno, pasar por encima de un casillero (una trampa vista, un pozo) sin pisarlo. ✋ (la ruta del mapa no salta).
+- **Carrerita**: +1 a la Fuerza del golpe si te moviste 3 casilleros en línea antes de atacar. ✋, y es ofensivo (a revisar con el criterio de que el PdG
+  vive en los guantes).
+- Las de siempre: Defensa (tope Común 1), Tipo 4, Evasión, Iniciativa, Res.CC, y las resistencias elementales solo de relleno.
+

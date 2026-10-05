@@ -43,6 +43,8 @@ const FichaAcciones = (() => {
       ui.toast('Saliste del sigilo');
       return;
     }
+    // Marcado (2026-10-05): mientras dure la marca no se puede entrar en sigilo (se le saca a mano si la mesa decide otra cosa).
+    if(Combatiente.marcadoEn(S.efectos)){ ui.toast('Estás Marcado: no podés entrar en sigilo hasta que se te vaya la marca'); return; }
     const costo = num(IT2().nitrosSigilo);
     if(num(S.nitros) < costo && !forzar){
       ui.avisarSinNitros(costo, 'entrar en sigilo', () => alternarSigilo(S, true, ui));
@@ -587,9 +589,16 @@ const FichaAcciones = (() => {
     S.nitros = num(S.nitros) - (forzar && no2 > num(S.nitros) ? gastoNitrosForzado(S, no2, `usó ${it.nombre}`) : no2);
     S.spGastado = num(S.spGastado) + sp;
     S.ataquesArma = {...(S.ataquesArma || {}), [claveEsp(item)]: c.usos + 1};
+    // Lo que el arma le pone a quien la usa (2026-10-05, Varita de la luz: luz y «ve lo oculto» hasta el final del turno).
+    const propio = item.especial && item.especial.estadoPropio;
+    if(propio && propio.nombre){
+      S.efectos = Array.isArray(S.efectos) ? S.efectos : [];
+      Combatiente.agregarEstado(S.efectos, {id: uid(), imagen: '', stacks: 1, hpturno: 0, stacksturno: 0, permanente: false, activo: true, popup: false,
+        polaridad: 'buff', detalle: '', mods: [], ...structuredClone(propio)});
+    }
     ui.colocarTrampa(it);
     ui.terminar(it, null, 0, 0);
-    ui.cambio(['nitros', 'vitals', 'habilidades']);
+    ui.cambio(['nitros', 'vitals', 'habilidades', ...(propio && propio.nombre ? ['efectos'] : [])]);
     ui.toast(`${it.nombre}: −${fmt(no2)} No2${sp ? ` · −${fmt(sp)} SP` : ''}${sinSp ? ' (sin SP: pagado con No2)' : ''}`);
   }
 
@@ -830,11 +839,12 @@ const FichaAcciones = (() => {
     // ✨ Automática (2026-09-30): se anuncia (sin la ubicación) y se elige la casilla en el mapa. Sin el mapa abierto (ficha suelta),
     // queda al lado del token como siempre.
     if(FichaBotonera.modoHab(h) === 'auto' && ui.enMapa()){
-      ui.mesaHabilidad(h.nombre, `${h.detalle || ''}${h.detalle ? ' — ' : ''}🪤 colocó una trampa${t.nombre ? ` («${String(t.nombre).trim()}»)` : ''}.`);
+      ui.mesaHabilidad(h.nombre, `${h.detalle || ''}${h.detalle ? ' — ' : ''}${t.pilar ? '🧱 levanta pilares de piedra' : `🪤 colocó una trampa${t.nombre ? ` («${String(t.nombre).trim()}»)` : ''}`}.`);
       try{ ui.alMapa('trampa-habilidad', {fichaId: ui.yo().ref, tipoToken: 'pj', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h, valorDe)}); }
       catch(err){ console.error('No se pudo avisar la trampa al mapa:', err); }
       return;
     }
+    if(t.pilar){ ui.toast(`🧱 ${h.nombre}: los pilares se levantan desde el mapa (abrilo y usala ahí)`); return; }
     try{
       const dano = TRAMPA_DANO_RE.test(String(t.dano || '').trim()) ? String(t.dano).trim() : '';
       const r = await TokensAuto.colocarTrampas({fichaId: ui.yo().ref, tipoToken: 'pj', trampa: {...Combatiente.trampaDeHab(h, valorDe), dano}});

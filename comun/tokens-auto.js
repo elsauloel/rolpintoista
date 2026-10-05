@@ -54,7 +54,8 @@ const TokensAuto = (() => {
     const ca = extra && extra.cadena && Number(extra.cadena.rango) >= 1 ? {rango: Math.min(6, Math.round(Number(extra.cadena.rango)))} : null;   // la Descarga: salta de enemigo en enemigo
     const rd = !!(extra && extra.requiereDano);
     const rp = !!(extra && extra.renuevaPaso);   // la Brea (2026-10-04, dueño): cada paso sobre ella le renueva el estado a quien ya lo tiene   // el Dardo (2026-10-04, dueño): lo que deja solo entra si el daño pasó la Defensa
-    const po = extra && extra.portal && Number(extra.portal.rango) >= 1 ? {rango: Math.min(20, Math.round(Number(extra.portal.rango)))} : null;   // el Portal cósmico: su dueño elige adónde lo manda
+    const po = extra && extra.portal && Number(extra.portal.rango) >= 1 ? {rango: Math.min(20, Math.round(Number(extra.portal.rango))),
+      ...(/^-?\d+,-?\d+$/.test(String(extra.portal.destino || '')) ? {destino: String(extra.portal.destino)} : {})} : null;   // destino fijo: Varita del portal (2026-10-05)   // el Portal cósmico: su dueño elige adónde lo manda
     const o = {...(estado && estado.nombre ? estado : {}), ...(sv ? {salva: sv} : {}), ...(mu ? {muro: mu} : {}), ...(ef ? {efecto: ef} : {}), ...(elem ? {elemento: elem} : {}), ...(le ? {lento: le} : {}),
       ...(ps ? {pierdeSp: ps} : {}), ...(dz ? {danoZona: dz} : {}), ...(ca ? {cadena: ca} : {}), ...(po ? {portal: po} : {}), ...(rd ? {requiereDano: true} : {}), ...(rp ? {renuevaPaso: true} : {})};
     const j = Object.keys(o).length ? JSON.stringify(o) : '';

@@ -38,7 +38,8 @@ FORMA = {'frente3x5': 2.0, 'trampa': 0.75, 'linea4': 1.5, 'uno': 1.0, 'cadena': 
 # Efectos: los mismos pesos de las armas físicas (PESO_EFECTO), más los de control que las armas físicas no tienen (en No2 o turnos que le hace perder).
 PESO_EXTRA = {'Silencio': 3.0, 'Atraer': 1.5, 'Marca': 1.0, 'Luz': 1.0, 'Muro': 2.5, 'Daño 1': 1.0, 'Daño 1d4': 2.5, 'Brea': 3.5,
               'Lento': 2.0, 'Sentado': 3.0, 'Inmovilizado': 3.5, 'Escarcha': 2.5, 'Parálisis': 4.0, 'Empuje': 1.5, '-2 PdG': 2.0,
-              'Niebla': 2.0, 'Marca +1 PdG': 1.0, 'Revela': 1.5, 'Cura': 1.0, 'Escudo': 0.8, 'Sigilo': 2.0}
+              'Niebla': 2.0, 'Marca +1 PdG': 1.0, 'Revela': 1.5, 'Cura': 1.0, 'Escudo': 0.8, 'Sigilo': 2.0,
+              'Portal': 4.0}   # Portal (2026-10-05, dueño): «cuenta como hacerle perder un No2» = la Demora de las armas físicas (4)
 # Un terreno (zona) vale su efecto por cada turno que dura, pero solo si alguien lo pisa: × TERRENO por turno.
 TERRENO = 0.6
 # El tamaño de la zona sí cuenta, pero poco: una flor tapa más que una casilla (más chances de que alguien la pise o la use).
@@ -167,6 +168,7 @@ POOL = [
     {'nombre': 'Varita de los pilares: 2 pilares de 1 casilla donde quieras (dentro del alcance), 3 turnos', 'clase': 'arcano', 'terreno': ('Muro', 3), 'forma': 'uno'},
     # — apoyo —
     {'nombre': 'Varita de la luz: radio 3 hasta el final del turno; revela sigilo y trampas, y al que revela lo deja marcado 3 turnos', 'clase': 'arcano', 'efectos': {'Luz': 1.5, 'Revela': 1.0, 'Marca': 3.0 * 0.3}},
+    {'nombre': 'Varita del portal: trampa de portal oculta, lleva a quien la pisa a la casilla que marcaste (a 4 o menos; Res.Esp contra 7)', 'clase': 'arcano', 'efectos': {'Portal': 1.0}, 'forma': 'trampa'},
     {'nombre': 'Varita de cura: 1d8 + 1 a un aliado', 'clase': 'arcano', 'efectos': {'Cura': 5.5}, 'sp': 1},
     # — báculos (suman Especial; también una vez por turno) —
     {'nombre': 'Báculo de aprendiz (1 mano): 1d4 + la mitad del Especial', 'clase': 'arcano', 'dado': '1d4', 'sumaEspecial': 0.5, 'sp': 2},

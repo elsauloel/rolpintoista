@@ -296,7 +296,7 @@ const Duelo = (() => {
     }
     // Un hechizo de área (Paso 4/7 del casteo) necesita la geometría del mapa (marcar el centro, calcular quién
     // queda adentro): sin el mapa abierto no hay forma de resolverlo — ni siquiera la lista de "a quién apunta".
-    if(cfg.ataque && cfg.ataque.hab && (cfg.ataque.hab.objetivo === 'area' || cfg.ataque.hab.objetivo === 'onda' || cfg.ataque.hab.objetivo === 'cono')){ _toast('Las habilidades de área se lanzan desde el mapa (abrilo para ejecutar esta habilidad)'); return; }
+    if(cfg.ataque && cfg.ataque.hab && (cfg.ataque.hab.objetivo === 'area' || cfg.ataque.hab.objetivo === 'onda' || cfg.ataque.hab.objetivo === 'cono' || cfg.ataque.hab.objetivo === 'linea')){ _toast('Las habilidades de área se lanzan desde el mapa (abrilo para ejecutar esta habilidad)'); return; }
     // Sobre uno mismo (bug real, 2026-09-29 — reportado con Blindaje ejecutado desde la ficha suelta, fuera del
     // mapa): el mapa ya tenía este atajo (dueloElegirObjetivoMapa), pero acá faltaba — sin él, elegirObjetivoLista
     // mostraba "¿A quién atacás?" con la lista de TODOS los demás tokens (ni siquiera incluye el propio, porque
@@ -482,9 +482,11 @@ const Duelo = (() => {
     const dano = h.dano && (String(h.dano.formula || '').trim() || h.dano.diferencia) ? {formula: txtCorto(h.dano.formula, 40), tipo: txtCorto(h.dano.tipo || 'arcano', 20), ignoraDef: h.dano.ignoraDef !== false,
       ...(h.dano.diferencia ? {diferencia: true} : {}), ...(h.dano.drena ? {drena: true, drenaTope: Math.max(0, Math.round(_num(h.dano.drenaTope)))} : {})} : null;
     const efectos = limpiarEfectos(h.efectos);
-    const objetivo = ['enemigo', 'aliado', 'uno mismo', 'area', 'onda', 'cono'].includes(h.objetivo) ? h.objetivo : 'enemigo';
+    const objetivo = ['enemigo', 'aliado', 'uno mismo', 'area', 'onda', 'cono', 'linea'].includes(h.objetivo) ? h.objetivo : 'enemigo';
     return {nombre: txtCorto(h.nombre, 60), objetivo, tira: t, contra, dano, efectos, sinOposicion: !(t && contra.length),
       ...(objetivo === 'onda' && h.dodge ? {dodge: true} : {}),
+      ...(objetivo === 'onda' && h.soloSigilo ? {soloSigilo: true} : {}),   // la luz: solo a los que estaban en sigilo
+      ...(objetivo === 'linea' ? {largo: Math.min(12, Math.max(1, Math.round(_num(h.largo)) || 4))} : {}),
       ...(h.cadena ? {cadena: {saltos: Math.min(6, Math.max(1, Math.round(_num(h.cadena.saltos)) || 2)), rango: Math.min(6, Math.max(1, Math.round(_num(h.cadena.rango)) || 3))}} : {}),   // rayo en cadena (2026-10-05)
       ...(h.efectoLibre ? {efectoLibre: txtCorto(h.efectoLibre, 200)} : {}),
       ...(h.efectosNota ? {efectosNota: txtCorto(h.efectosNota, 200)} : {}),

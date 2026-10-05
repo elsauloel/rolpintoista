@@ -95,6 +95,9 @@ const ESTADOS_PRESET = [
     detalle:'✋ A mano: inmune a golpes críticos. Cuando le pegan con un crítico, la mesa lo anula (no le hace daño). El estado solo recuerda que está activo y cuántos turnos dura.'},
   {nombre:'Sigilo', polaridad:'buff', turnos:0, permanente:true,
     detalle:'Oculto: sus rivales no lo ven en el mapa. Se rompe si entra en el cono de detección de un rival o si hace una acción hostil (un ataque o una skill individual sobre un rival). Cada paso dentro de la zona de alerta de un rival pide una tirada de detección (en principio su Destreza contra el Especial del que vigila).'},
+  // Marcado (2026-10-05, Varita del rastreador y Varita de la luz): se resiste con Res.Esp (lo tira quien la usa: PdG.Esp contra Res.Esp).
+  {nombre:'Marcado', polaridad:'debuff', turnos:3, marcado:true,
+    detalle:'⚙ Automatizado: no puede entrar en sigilo (si estaba, sale) y se lo ve con un brillo, también a través de la niebla. Se resiste con Res.Esp.'},
 ];
 
 // La lista en la forma de la ficha: `hpturno`/`stacksturno`, y Armadura rota con su −1 Defensa como mod.

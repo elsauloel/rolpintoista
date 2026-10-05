@@ -435,6 +435,7 @@ const Combatiente = (() => {
     if(nuevo.activo !== false){
       const motivo = inmunidad(estados, nuevo, o);
       if(motivo) return {ok: false, que: 'bloqueado', motivo};
+      if(esMarca(nuevo)) for(let i = estados.length - 1; i >= 0; i--) if(esSigilo(estados[i])) estados.splice(i, 1);   // la marca le saca el sigilo
     }
     if(nuevo.armaduraRota){
       const ya = estados.find(e => e && e.armaduraRota);
@@ -485,7 +486,12 @@ const Combatiente = (() => {
   /* ---------- Inmunidades ----------
      ¿Este debuff rebota en quien lo recibe? Devuelve el motivo ('Invulnerable', 'Inmunidad a CC', 'Sangre pura',
      'Coagulación extrema', 'Protección de jefe') o false. `o.jefe`: un creep jefe es inmune a Stun (P95). */
+  // Marcado (2026-10-05): mientras dure no puede entrar en sigilo, y al ponérselo se le cae el que tenía.
+  const esSigilo = e => String((e && e.nombre) || '').trim().toLowerCase() === 'sigilo';
+  const esMarca = e => !!e && (!!e.marcado || String(e.nombre || '').trim().toLowerCase() === 'marcado');
+  const marcadoEn = estados => activos(estados).some(esMarca);
   function inmunidad(estados, est, o){
+    if(est && esSigilo(est) && marcadoEn(estados)) return 'Marcado';
     if(!est || est.polaridad !== 'debuff') return false;
     if(o && o.jefe && est.nombre === 'Stun') return 'Protección de jefe';
     const act = activos(estados);
@@ -582,7 +588,7 @@ const Combatiente = (() => {
     const formula = c.danoArma ? formulaDanoHab({tiradaExtra: o.armaDano || ''}, c, o.X) : formulaDanoHab(h, c, o.X);
     return {
       nombre: h.nombre, objetivo: c.objetivo || 'enemigo',
-      alcance: c.objetivo === 'uno mismo' || c.objetivo === 'area' || c.objetivo === 'onda' || c.objetivo === 'cono' ? 0 : alcanceHab(c, stat, o.stat),
+      alcance: c.objetivo === 'uno mismo' || c.objetivo === 'area' || c.objetivo === 'onda' || c.objetivo === 'cono' || c.objetivo === 'linea' ? 0 : alcanceHab(c, stat, o.stat),
       tira: c.tiraFormula ? {formula: sx(c.tiraFormula), etq: c.tiraEtiqueta || 'Tirada'} : (stat ? {stat, etq: etq(stat), bono: nf(h.tiradaBono)} : null),
       contra: (c.contra || []).map(s => ({modo: s, stat: s, etq: etq(s)})),
       // Daño «la diferencia» (2026-10-02, Drenar Vida): no se tira, es lo que quien la usa le ganó a la resistencia. «Drena»: quien la
@@ -591,7 +597,9 @@ const Combatiente = (() => {
         ...(c.danoDiferencia ? {diferencia: true} : {}), ...(c.drena ? {drena: true, drenaTope: Math.max(0, nf(c.drenaTope))} : {})} : null,
       efectos: (c.efectos || []).map(efectoDeEjecucion),
       ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: nf(c.radio)} : {}),
+      ...(c.objetivo === 'linea' ? {largo: Math.max(1, Math.round(nf(c.largo)) || 4)} : {}),   // línea recta desde quien la usa (2026-10-05, Varita láser)
       ...(c.objetivo === 'onda' && c.ondaDodge ? {dodge: true} : {}),   // la onda que deja dodge roll (Daño en área)
+      ...(c.objetivo === 'onda' && c.soloSigilo ? {soloSigilo: true} : {}),   // la luz (2026-10-05, Varita de la luz): solo los rivales en sigilo que alcanza
       // Rayo en cadena (2026-10-05, Varita de chispa eléctrica): si el golpe entra, salta `saltos` veces al más cercano del mismo bando a
       // `rango` casillas o menos, la mitad cada salto (P118: la misma regla de ⚡ Rayo en cadena del token y de la trampa Descarga).
       ...(c.cadena ? {cadena: {saltos: Math.max(1, Math.round(nf(c.cadena.saltos)) || 2), rango: Math.max(1, Math.round(nf(c.cadena.rango)) || 3)}} : {}),
@@ -624,7 +632,8 @@ const Combatiente = (() => {
       resistStat: (c.contra && c.contra[0]) || '', resistValor: o.resistValor === undefined ? null : o.resistValor,
       // La tirada de la zona (2026-10-02, P143): el stat de quien la crea y su VALOR en ese momento; el mapa lo tira cada vez que la zona
       // afecta a alguien (antes se tiraba una sola vez al ejecutar: `resistValor`, que sigue valiendo para las zonas viejas).
-      tiraStat: c.tira || '', tiraValor: Number.isFinite(o.tiraValor) ? Math.round(o.tiraValor) : null};
+      tiraStat: c.tira || '', tiraValor: Number.isFinite(o.tiraValor) ? Math.round(o.tiraValor) : null,
+      ...(c.niebla ? {niebla: true} : {})};   // la niebla (2026-10-05, Varita de niebla): tapa la vista, no hace nada más
   }
   // La trampa que coloca una habilidad, lista para el mapa: si no trae nombre propio, lleva el de la habilidad.
   // `valorDe(statId)` (2026-10-02, P145): el valor de un stat de quien la coloca — la dificultad para detectarla sale de su Destreza (trampas
@@ -740,6 +749,6 @@ const Combatiente = (() => {
   return {ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
-    modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
+    marcadoEn, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
     formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, flashPara, cdFlash, costoFlash};
 })();

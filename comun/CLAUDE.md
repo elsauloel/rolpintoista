@@ -1261,5 +1261,13 @@ versión parecida en más de una, es candidato a juntar.
   +1 por uso (el conteo es `S.ataquesArma['esp:<id>']`, que vacía el Mantenimiento) y su SP (sin SP alcanza: pregunta y cobra 1 No2 por SP).
   `armasEspeciales(S)` (las equipadas) y `costoEspecialTxt`; la Botonera (`ficha-botonera.js`) les arma su caja «✨ Armas especiales» con
   `data-especial` (ficha js/06, mapa js/11). `Combatiente.efectoDeEjecucion` ahora respeta `caras`/`exitos` (efectos con %). Una varita (arma
-  especial sin Tipo) no tiene daño físico (`FichaCombate.armaDanoTxt`) y una varita o un orbe (`orbe: true`) no parrean. Catálogo: 29 armas y 3
-  orbes Comunes (`esp-*`); las partes que todavía no se automatizan dicen «✋ A mano».
+  especial sin Tipo) no tiene daño físico (`FichaCombate.armaDanoTxt`) y una varita o un orbe (`orbe: true`) no parrean. Catálogo: 30 armas y 3
+  orbes Comunes (`esp-*`); las partes que todavía no se automatizan dicen «✋ A mano». `especial.estadoPropio` (2026-10-05, Varita de la luz): un
+  estado que se pone quien la usa al usarla (la luz: Luz portada 3 y Ve lo oculto 3, 1 turno).
+- **Marcado** (2026-10-05): preset nuevo (`marcado: true`). `Combatiente.agregarEstado`: al ponerse saca el Sigilo; mientras dura, el Sigilo
+  rebota (`inmunidad` → 'Marcado'); `Combatiente.marcadoEn(estados)`. `FichaAcciones.alternarSigilo` avisa y no entra. El mapa lo hace brillar
+  (`marcado`, `brilloMarca`) y lo deja ver a través de la niebla.
+- **Ejecución, lo nuevo del 2026-10-05:** objetivo `linea` (`largo`), `cadena: {saltos, rango}`, `soloSigilo` en una `onda` (la luz) y `niebla`
+  en una `zona` (crea un elemento `niebla`, no una zona con efecto). Una trampa con `pilar: true` levanta Sólidos de 1 casilla (uno por clic); con
+  `portal: {rango, fijo: true}` se marca también el destino (`portal.destino` en su `trampaEstado`, `TokensAuto.estadoJson`). Las trampas con
+  `cant` se colocan **de a una por clic** (js/13, `trampaDeHabilidad`).

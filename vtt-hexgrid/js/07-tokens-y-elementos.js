@@ -294,6 +294,7 @@ function escucharElementos(){
         alfa: Math.max(0, Math.min(100, Number.isFinite(d.alfa) ? d.alfa : 45)),
         solido: d.solido === true,
         invisible: d.invisible === true,
+        niebla: d.niebla === true,   // la niebla de una varita (2026-10-05)
         imagen: typeof d.imagen === 'string' ? d.imagen : '',
         imgZoom: Math.max(1, Math.min(6, num(d.imgZoom) || 1)),
         imgDX: num(d.imgDX) || 0,

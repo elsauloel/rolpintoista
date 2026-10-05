@@ -150,7 +150,7 @@ const AsistenteDueloHab = (() => {
       ignoraDano: (ini && ini.ignoraDano !== undefined) ? !!ini.ignoraDano : ((ini && ini.tipoDano) || 'arcano') !== 'fisico',
       efectos: ini && Array.isArray(ini.efectos) ? ini.efectos.map(e => ({...e})) : [],
       alcance: (ini && ini.alcance) || 'auto', alcanceN: (ini && ini.alcanceN) || 3,
-      radio: (ini && ini.radio) || 2,
+      radio: (ini && (ini.radio || ini.largo)) || 2,   // también el largo de la línea recta
       ondaDodge: !!(ini && ini.ondaDodge),   // la onda deja dodge roll a quien gana (2026-10-02, Daño en área)   // hechizo de área (Paso 4/7 del casteo): radio del área, en casilleros
       modo: (ini && ini.modo) || 'hab', x: (ini && ini.x) || 'nitros',
       flashEn: new Set(ini && ini.flash && Array.isArray(ini.flash.en) ? ini.flash.en : ['pdg', 'parry', 'bloqueo', 'dano']), flashBono: (ini && ini.flash && ini.flash.bono) || 2,
@@ -206,7 +206,7 @@ const AsistenteDueloHab = (() => {
         L.push({id: 'arma', corto: 'Tu ataque'}, {id: 'alcance', corto: 'Alcance'}, {id: 'efectos', corto: 'Al pegar'});
       }else{
         L.push({id: 'objetivo', corto: 'Objetivo'});
-        if(st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda' && st.objetivo !== 'cono' && st.objetivo !== 'zona') L.push({id: 'alcance', corto: 'Alcance'});
+        if(st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda' && st.objetivo !== 'cono' && st.objetivo !== 'linea' && st.objetivo !== 'zona') L.push({id: 'alcance', corto: 'Alcance'});
         L.push({id: 'tira', corto: st.objetivo === 'zona' ? 'Tirada de la zona' : 'Tirada'});
         if(!sinOp()) L.push({id: 'contra', corto: 'Resistencia'});
         L.push({id: 'dano', corto: 'Daño'});
@@ -263,7 +263,11 @@ const AsistenteDueloHab = (() => {
     }
     function cuerpoObjetivo(){
       let h = titulo('', '¿A quién apunta?', 'Elegí quién puede recibir esta habilidad.');
-      h += `<select data-objetivo>${[['enemigo', 'A un enemigo (o a cualquier otro token)'], ['aliado', 'A un aliado'], ['uno mismo', 'A uno mismo (no hay que elegir)'], ['area', 'A un área (varios objetivos, en cascada — Orbe arcano, Tormenta arcana…)'], ['onda', 'Onda alrededor de quien la usa (sin marcar centro — Shockwave…)'], ['cono', 'Cono al frente de quien la usa (sin marcar nada — Sonic Boom…)'], ['zona', 'Zona persistente (queda puesta varios turnos — Nube tóxica…)']].map(([v, t]) => `<option value="${v}"${st.objetivo === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
+      h += `<select data-objetivo>${[['enemigo', 'A un enemigo (o a cualquier otro token)'], ['aliado', 'A un aliado'], ['uno mismo', 'A uno mismo (no hay que elegir)'], ['area', 'A un área (varios objetivos, en cascada — Orbe arcano, Tormenta arcana…)'], ['onda', 'Onda alrededor de quien la usa (sin marcar centro — Shockwave…)'], ['cono', 'Cono al frente de quien la usa (sin marcar nada — Sonic Boom…)'], ['linea', 'Línea recta desde quien la usa (atraviesa — Varita láser…)'], ['zona', 'Zona persistente (queda puesta varios turnos — Nube tóxica…)']].map(([v, t]) => `<option value="${v}"${st.objetivo === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
+      if(st.objetivo === 'linea'){
+        h += `<p class="nota" style="margin-top:10px">Al ejecutarla marcás hacia dónde: sale una <b>línea recta desde tu token</b> de este largo y todo rival que esté en ella entra en la cascada, uno detrás del otro (vos tirás una sola vez; cada uno se resiste por separado y, si gana, tiene derecho a un dodge roll).</p>
+          <div class="fila"><input type="number" min="1" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros de largo</span></div>`;
+      }
       if(st.objetivo === 'cono'){
         h += `<p class="nota" style="margin-top:10px">No hay que marcar nada: al ejecutarla, todo rival dentro del <b>cono al frente de tu token</b> (el mismo de 16 casillas de la detección, hacia donde mirás; lo que tapa un Sólido no entra) entra en la cascada, uno detrás del otro. Vos tirás una sola vez y cada uno se resiste por separado. Sin dodge roll. No te afecta a vos.</p>`;
       }
@@ -324,7 +328,7 @@ const AsistenteDueloHab = (() => {
       return h;
     }
     function cuerpoContra(){
-      const esArea = st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono';
+      const esArea = st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono' || st.objetivo === 'linea';
       let h = titulo('', st.objetivo === 'zona' ? '¿Con qué se resiste quien la zona afecta?' : '¿Con qué se resiste el objetivo?', st.objetivo === 'zona'
         ? 'Cada vez que la zona afecta a alguien, esa persona tira esto contra la tirada de la zona. Si gana, no le pasa nada (ni daño ni estado).'
         : esArea
@@ -487,13 +491,13 @@ const AsistenteDueloHab = (() => {
         filas.push(`<b>Ataque con arma</b>: ${partes.join(', ') || 'sin arreglos'} · X en ${st.x === 'sp' ? 'SP' : 'Nitros'}`);
         if(st.alcance !== 'auto') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
       }else{
-        filas.push(`<b>Objetivo</b>: ${st.objetivo === 'cono' ? 'cono al frente de quien la usa' : st.objetivo === 'onda' ? 'onda alrededor de quien la usa' : st.objetivo === 'zona' ? `zona persistente, ${st.zonaTurnos} turnos` : st.objetivo}${['area', 'onda', 'zona'].includes(st.objetivo) ? ` (radio ${st.radio})` : ''}`);
+        filas.push(`<b>Objetivo</b>: ${st.objetivo === 'linea' ? `línea recta de ${st.radio} casilleros` : st.objetivo === 'cono' ? 'cono al frente de quien la usa' : st.objetivo === 'onda' ? 'onda alrededor de quien la usa' : st.objetivo === 'zona' ? `zona persistente, ${st.zonaTurnos} turnos` : st.objetivo}${['area', 'onda', 'zona'].includes(st.objetivo) ? ` (radio ${st.radio})` : ''}`);
         if(st.objetivo === 'zona'){
           filas.push(`<b>Alcanza</b>: ${st.zonaAmiga ? 'rivales y aliados' : 'solo rivales'}`);
           if(st.zonaEstadoNombre) filas.push(`<b>Deja</b>: ${esc(st.zonaEstadoNombre)}${['Veneno', 'Veneno severo'].includes(st.zonaEstadoNombre) && st.zonaEstadoStacks ? ` ×${st.zonaEstadoStacks}` : ''} (${st.zonaEstadoTurnos}t)`);
         }
-        if(st.alcance !== 'auto' && st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda' && st.objetivo !== 'cono' && st.objetivo !== 'zona') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
-        const esArea2 = st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono';
+        if(st.alcance !== 'auto' && st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda' && st.objetivo !== 'cono' && st.objetivo !== 'linea' && st.objetivo !== 'zona') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
+        const esArea2 = st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono' || st.objetivo === 'linea';
         const contraTxt = (esArea2 || st.contraModo === 'stats') ? ([...st.contra].map(v => STAT_TXT[v] || v).join(' / ') || '(elegí con qué se resiste)')
           : st.contraModo === 'otro' ? `${esc(st.contraOtro) || '(sin especificar)'} (a mano)`
           : 'nadie: se aplica directo';
@@ -542,7 +546,7 @@ const AsistenteDueloHab = (() => {
         dibujar();
       });
       q('[data-costoturno-sp]', e => { st.costoTurnoSp = e.target.value; });
-      q('[data-objetivo]', e => { st.objetivo = e.target.value; if(st.objetivo === 'onda' && st.radio > 1 && !ini) st.radio = 1; if((st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono') && st.contraModo !== 'stats') st.contraModo = 'stats'; dibujar(); });
+      q('[data-objetivo]', e => { st.objetivo = e.target.value; if(st.objetivo === 'onda' && st.radio > 1 && !ini) st.radio = 1; if((st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono' || st.objetivo === 'linea') && st.contraModo !== 'stats') st.contraModo = 'stats'; dibujar(); });
       q('[data-modo]', e => { st.modo = e.target.value; dibujar(); });
       q('[data-flashbono]', e => { st.flashBono = Number(e.target.value) || 0; });
       f.querySelectorAll('[data-flashen]').forEach(c => c.onchange = () => { c.checked ? st.flashEn.add(c.dataset.flashen) : st.flashEn.delete(c.dataset.flashen); });
@@ -667,7 +671,7 @@ const AsistenteDueloHab = (() => {
         }
         const hayTira = !st.tiraNinguna && (st.tiraModo === 'custom' ? !!st.tiraFormula.trim() : !!st.tira);
         if(!st.tiraNinguna && st.tiraModo === 'custom' && !st.tiraFormula.trim()){ alert('Escribí la fórmula de la tirada custom (podés usar «X»), o tildá «No lleva tirada».'); return false; }
-        const esArea = st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono';
+        const esArea = st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono' || st.objetivo === 'linea';
         const out = {objetivo: st.objetivo, tira: (!st.tiraNinguna && st.tiraModo === 'stat') ? (st.tira || '') : '', contra: (hayTira && (esArea || st.contraModo === 'stats')) ? [...st.contra] : []};
         if(!st.tiraNinguna && st.tiraModo === 'custom'){ out.tiraFormula = st.tiraFormula.trim(); out.tiraEtiqueta = st.tiraEtiqueta.trim() || 'Tirada'; }
         if(esArea && !hayTira){ alert('Una habilidad de área u onda necesita una tirada (ej. PdG.Esp o Fuerza contra lo que resiste cada uno) — elegí qué tira quien la usa.'); return false; }
@@ -697,6 +701,7 @@ const AsistenteDueloHab = (() => {
         if(st.efectoLibreOn && st.efectoLibre.trim()) out.efectoLibre = st.efectoLibre.trim();
         if(st.efectosNotaOn && st.efectosNota.trim()) out.efectosNota = st.efectosNota.trim();
         if(st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'zona') out.radio = Math.max(st.objetivo === 'area' ? 0 : 1, st.radio);
+        if(st.objetivo === 'linea') out.largo = Math.max(1, st.radio);
         if(st.objetivo === 'onda' && st.ondaDodge) out.ondaDodge = true;
         if(st.objetivo === 'zona'){
           out.zonaTurnos = st.zonaTurnos;

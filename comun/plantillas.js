@@ -89,6 +89,7 @@ const Plantillas = (() => {
     'soltar',   // cómo se suelta quien quedó agarrado (2026-10-03, Atrapar): {stat, etq, dif, no2} — va con el estado que deja
     'efecto',   // superficie de efecto (2026-10-03): {area: 'pisador' | 'trampa' | 'flor', radio} — si no dice, la deduce el mapa
     'pierdeSp', 'danoZona', 'cadena', 'portal', 'requiereDano', 'renuevaPaso',   // renuevaPaso (2026-10-04, Brea): cada paso sobre la zona renueva el estado   // requiereDano (2026-10-04, Dardos): lo que deja solo entra si el daño pasó la Defensa   // portal (2026-10-04): {rango} — su dueño elige adónde manda a quien la pisa   // cadena (2026-10-04, Descarga eléctrica): {rango} — salta al enemigo más cercano con la mitad del daño   // 2026-10-04: lo que hace perder de SP (Succión arcana) y el daño por Mantenimiento de la zona que deja (Mina napalm)
+    'pilar',   // pilar (2026-10-05, Varita de los pilares): no es una trampa, cada casilla es un Sólido de 1 casilla que dura `turnos`
     'lento',   // terreno lento (2026-10-04, arena movediza): una vez disparada, cada paso que sale de ella cuesta ese No2
     'elemento'];   // de qué elemento es el daño (2026-10-04): 'fuego' | 'hielo' | 'rayo' | 'toxico' | 'acido' — se resta esa resistencia
   function trampaDesde(t){
@@ -121,7 +122,7 @@ const Plantillas = (() => {
   /* ---- Estado alterado propio ("Mis presets") ---- en la forma de comun/estados-presets.js (hpTurno/stacksTurno). */
   const MARCAS_ESTADO = ['esCC', 'esVeneno', 'esSangrado', 'esQuemadura', 'mitadPdgEva', 'lisiado', 'paralisis', 'silencio', 'confusion', 'esEscarcha', 'inmovilizado',
     'rengo', 'lento', 'cansado', 'exhausto', 'hypeado', 'sentado', 'invulnerable', 'inmunidadCC', 'sangrePura', 'coagulacionExtrema',
-    'afortunado', 'blindado', 'espinas', 'armaduraRota', 'excedenteVida'];
+    'afortunado', 'blindado', 'espinas', 'armaduraRota', 'excedenteVida', 'marcado'];
   function estado(e){
     const out = {nombre: String(e.nombre || 'Estado'), polaridad: e.polaridad || 'otro', detalle: String(e.detalle || '')};
     const n = v => Number(v) || 0;

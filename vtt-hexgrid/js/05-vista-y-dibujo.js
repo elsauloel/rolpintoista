@@ -138,6 +138,41 @@ function dibujarRangoConVision(centro, radio, color, z){
   ctx.strokeStyle = colorConAlfa(color, 0.6); ctx.lineWidth = 2 / z; ctx.stroke();
 }
 
+// Marcado (2026-10-05): un brillo latente, lento y claro, alrededor del token (se ve también a través de la niebla).
+function brilloMarca(x, y, rad, z){
+  const p = 0.5 + 0.5 * Math.sin(performance.now() / 650);
+  ctx.save();
+  trazarPuntos(verticesHex(x, y, rad * (1.06 + 0.10 * p)));
+  ctx.fillStyle = `rgba(190,235,255,${0.07 + 0.11 * p})`; ctx.fill();
+  ctx.strokeStyle = `rgba(200,240,255,${0.45 + 0.4 * p})`; ctx.lineWidth = (2 + 2 * p) / z;
+  ctx.shadowColor = 'rgba(160,225,255,.95)'; ctx.shadowBlur = (10 + 16 * p) / z; ctx.stroke();
+  ctx.restore();
+}
+// 🌫 La niebla de una varita (2026-10-05): un velo con volutas que se mueven, encima de los tokens; los Marcados de adentro brillan por encima.
+// Devuelve true si hay que seguir animando.
+function dibujarNieblaVarita(z){
+  const nb = nieblaSet();
+  if(!nb.size) return false;
+  const s = performance.now() / 1000;
+  ctx.save();
+  ctx.beginPath();
+  nb.forEach(k => { const c = nbUnpack(k), h = hexCentro(c.col, c.fila); trazarHex(h.x, h.y); });
+  ctx.fillStyle = 'rgba(200,205,216,.62)'; ctx.fill();
+  nb.forEach(k => {
+    const c = nbUnpack(k), h = hexCentro(c.col, c.fila), f = (Math.sin(s * 0.7 + c.col * 1.3 + c.fila * 0.7) + 1) / 2;
+    ctx.beginPath();
+    ctx.arc(h.x + Math.cos(s * 0.5 + c.fila) * HEX * 0.25, h.y + Math.sin(s * 0.4 + c.col) * HEX * 0.2, HEX * (0.45 + 0.2 * f), 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(236,239,246,${0.16 + 0.14 * f})`; ctx.fill();
+  });
+  ctx.restore();
+  (disposicion || []).forEach(d => {
+    const t = tokens.get(d.id);
+    if(!t || !marcado(t) || !nb.has(nbPack(t.col, t.fila))) return;
+    const v = visibles.get(d.id) || d;
+    brilloMarca(v.x, v.y, d.radio, z);
+  });
+  return true;
+}
 function trazarHex(cx, cy){
   ctx.moveTo(cx + ESQUINAS[0][0], cy + ESQUINAS[0][1]);
   for(let i = 1; i < 6; i++) ctx.lineTo(cx + ESQUINAS[i][0], cy + ESQUINAS[i][1]);
@@ -375,7 +410,7 @@ function dibujar(){
       ctx.fillStyle = disp ? '#FF6A60' : '#FFC46B';
       ctx.fillText(disp ? '✖' : '⚠', pT.x, pT.y);
       ctx.restore();
-      const dst = destinoParsear(el.trampaDestino);
+      const dst = destinoParsear(el.trampaDestino) || portalFijoDe(el);   // también el portal de la Varita del portal
       if(dst){   // trampa de teleport: se marca el destino (lo ve quien ve la trampa)
         const pD = hexCentro(dst.col, dst.fila);
         ctx.save();
@@ -720,6 +755,7 @@ function dibujar(){
       ctx.restore();
       animando = true;
     }
+    if(marcado(t)){ brilloMarca(x, y, rad, z); animando = true; }   // Marcado (2026-10-05): un brillo latente
     // Oculto: solo lo dibuja el GM (los demás ni lo tienen en disposicion),
     // más transparente para acordarse de que los jugadores no lo ven.
     if(t.oculto || enSigilo(t)) ctx.globalAlpha = 0.5;
@@ -856,6 +892,7 @@ function dibujar(){
     }
     ctx.globalAlpha = 1;
   });
+  if(dibujarNieblaVarita(z)) animando = true;   // la niebla de una varita, encima de los tokens (2026-10-05)
 
   // Trazos del lápiz: los temporales se ven un rato y se desvanecen sobre
   // el final (los borra el que los ve, por eso conviene que se note antes
@@ -1044,9 +1081,9 @@ function dibujar(){
   // Hechizos de área en curso (Paso 4/7 del casteo, docs/reglas-casteo.md §1.3): el círculo se ve para
   // TODOS los conectados (no solo el GM) mientras dura la cascada — ver escucharAreas().
   areasActivas.forEach(a => {
-    if(!(a.centro && a.centro.cono)){ dibujarAuraHex(a.centro, {radio: a.radio, color: '#9B7BD4'}, z); return; }
-    // El cono de una habilidad (Sonic Boom): sus casillas, en el mismo violeta.
-    const celdas = zonasSigilo({col: a.centro.col, fila: a.centro.fila, rotacion: num(a.centro.rot)}).cono;
+    if(!(a.centro && (a.centro.cono || Array.isArray(a.centro.linea)))){ dibujarAuraHex(a.centro, {radio: a.radio, color: '#9B7BD4'}, z); return; }
+    // El cono de una habilidad (Sonic Boom) o su línea recta (Varita láser): sus casillas, en el mismo violeta.
+    const celdas = Array.isArray(a.centro.linea) ? a.centro.linea.map(k => nbUnpack(k)) : zonasSigilo({col: a.centro.col, fila: a.centro.fila, rotacion: num(a.centro.rot)}).cono;
     ctx.beginPath();
     celdas.forEach(c => { const p = hexCentro(c.col, c.fila); trazarHex(p.x, p.y); });
     ctx.fillStyle = 'rgba(155,123,212,.28)'; ctx.fill();

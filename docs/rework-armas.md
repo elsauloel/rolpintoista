@@ -1506,3 +1506,23 @@ lluvia ácida 21 y báculo de sangre 19,5), 3 orbes.
 - **Los saltos del rayo, automáticos (2026-10-05, el dueño: «ya está el efecto programado en las trampas eléctricas»):** la Ejecución puede llevar
   `cadena: {saltos, rango}`; cuando el golpe entra, el mapa del GM (`dueloCadena`, js/13) usa el mismo ⚡ Rayo en cadena del token (`rayoCadena` /
   `rayoCadenaAplicar`, js/10) con el rayo a la vista (`rayoSaltoEfecto`, js/19). La Varita de chispa eléctrica salta 2 veces.
+- **Automatización, segunda tanda (2026-10-05, el dueño: «la línea recta, la niebla, los pilares, la luz»):**
+  - **Línea recta** (Varita láser): objetivo nuevo de la Ejecución, `linea` con `largo`; se marca hacia dónde y sale del token; cada uno en la línea se
+    resiste por separado y tiene dodge roll.
+  - **Marcado** (estado nuevo, Rastreador y Luz): **se resiste con Res.Esp** (dueño: «el estado de marcado se debe poder resistir tirando resistencia
+    especial»): el Rastreador pasa a tirar PdG.Esp **contra Res.Esp** (antes Evasión). Al ponerse le saca el sigilo y, mientras dura, no deja entrar
+    (`Combatiente.agregarEstado`, igual para personaje, invocación y creep). En el mapa: **brillo latente** (pedido del dueño) y se lo ve a través de
+    la niebla.
+  - **Niebla**: elemento `niebla` con turnos. A los rivales que están adentro no se los ve ni se los puede elegir como objetivo desde afuera (salvo
+    Marcados o con un token de tu bando a 1); adentro se ve a 1; con la niebla de guerra no se ve a través. Se dibuja como un velo encima de los tokens.
+  - **Pilares**: un clic por pilar; cada uno es un Sólido de 1 casilla que se va solo a los 3 turnos (tapan el paso y la vista). Si la casilla queda
+    fuera del Rango de casteo, avisa y deja seguir.
+  - **Luz**: te da Luz portada 3 y Ve lo oculto 3 hasta el final del turno (ilumina y descubre trampas escondidas y rivales en sigilo) y a cada rival
+    en sigilo que alcanza le tira la Marca (PdG.Esp contra su Res.Esp; si lo marca, sale del sigilo).
+  - **Trampas que dejan varias** (Espinas): ahora **un clic por casilla** (antes quedaban juntas alrededor del clic) — vale para todas las habilidades
+    con `cant`, de personajes, invocaciones y creeps.
+  - **Varita del portal (nueva, pedido del dueño):** «lo mismo que la trampa de portal»: elegís la casilla que lo dispara y, a 4 o menos, adónde lleva;
+    al que la pisa se lo lleva ahí (Res.Esp contra 7: se aferra y no lo lleva; Inamovible vale). Costeada como «hacerle perder un No2» (dueño) = la
+    Demora de las armas físicas (peso 4) × 0,75 por ser trampa → **1 SP, 45 DDE**. Quedan **30 armas + 3 orbes** Comunes.
+  - Siguen a mano: el reparto de los misiles, el −1 por distancia de la pelea cercana, el empuje y el gancho, el fuego que deja la bola, el suelo de la
+    ventisca, el +1d4 del miasma, el crítico de lo físico y los orbes de resguardo y salvaje.

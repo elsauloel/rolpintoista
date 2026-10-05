@@ -366,6 +366,7 @@ function estelaVisibleDe(t){
 // Aliados (personajes jugadores e invocaciones) se ven siempre; el resto,
 // solo dentro del campo de visión.
 function tokenVisiblePorNiebla(t){
+  if(tapadoPorNiebla(t)) return false;   // adentro de la niebla de una varita (2026-10-05)
   if(!soyGM && t.tipo === 'creep' && enSigilo(t) && !reveladaCasilla(t)) return false;   // creep en sigilo: los jugadores no lo ven (salvo que un aliado vea lo oculto ahí)
   if(soyGM && !ojoRevelando && t.tipo === 'pj' && enSigilo(t)) return false;   // personaje en sigilo: el GM no lo ve sin el 👁
   if(!nieblaAplica() || t.tipo === 'pj') return true;
@@ -422,10 +423,13 @@ function radioVisionDe(t){
 function celdasVisionDe(t, ignorarSolidos){
   const k = ((Math.round(num(t.rotacion || 0) / 60) % 6) + 6) % 6;
   const c0 = hexACubo({col: t.col, fila: t.fila});
-  const solidos = ignorarSolidos ? new Set() : solidosSet();
+  const solidos0 = ignorarSolidos ? new Set() : solidosSet();
   const origen = {col: t.col, fila: t.fila};
+  // La niebla de una varita (2026-10-05): desde afuera tapa como un Sólido; desde adentro se ve a 1.
+  const nb = nieblaSet(), enNiebla = nb.has(nbPack(t.col, t.fila));
+  const solidos = nb.size && !enNiebla ? new Set([...solidos0, ...nb]) : solidos0;
   const res = [];
-  offsetsVision(k, radioVisionDe(t)).forEach(o => {
+  offsetsVision(k, enNiebla ? 1 : radioVisionDe(t)).forEach(o => {
     const col = cuboACol(c0.q + o.dq, c0.r + o.dr), fila = cuboAFila(c0.q + o.dq, c0.r + o.dr);
     // Los elementos Sólidos tapan la vista: no se ve lo que queda detrás.
     if(solidos.size && !lineaLibre(origen, {col, fila}, solidos)) return;
@@ -435,7 +439,7 @@ function celdasVisionDe(t, ignorarSolidos){
   const luz = luzPortadaDe(t);
   if(luz > 0){
     const vistas = new Set(res);
-    celdasDisco(luz).forEach(o => {
+    celdasDisco(enNiebla ? Math.min(1, luz) : luz).forEach(o => {
       const col = cuboACol(c0.q + o.dq, c0.r + o.dr), fila = cuboAFila(c0.q + o.dq, c0.r + o.dr);
       if(solidos.size && !lineaLibre(origen, {col, fila}, solidos)) return;
       vistas.add(nbPack(col, fila));
@@ -481,7 +485,7 @@ function nieblaActualizar(){
     if(nieblaVista.size || nieblaFantasmas.size || nieblaFirma){ nieblaVista = new Set(); nieblaFantasmas.clear(); nieblaFirma = ''; }
     return;
   }
-  const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${t.tipo},${enSigilo(t) ? 1 : 0},${daVision(t) ? radioVisionDe(t) + '/' + luzPortadaDe(t) : 0}`).join('|') + '#' + solidosFirma();
+  const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${t.tipo},${enSigilo(t) ? 1 : 0},${daVision(t) ? radioVisionDe(t) + '/' + luzPortadaDe(t) : 0}`).join('|') + '#' + solidosFirma() + '#' + nieblaSet().size;
   if(firma === nieblaFirma) return;
   nieblaFirma = firma;
   const vista = new Set();

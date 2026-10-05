@@ -1978,11 +1978,31 @@ prueba('✨ varita de chispa eléctrica (2026-10-05): su Ejecución lleva la cad
   const h = FichaAcciones.habDeArmaEspecial(S, v), hab = Combatiente.habEjecucion(h, h.duelo, {stat: () => 5, etq: x => x});
   igual([hab.cadena, hab.dano.tipo, hab.efectos[0].nombre, hab.efectos[0].caras], [{saltos: 2, rango: 3}, 'rayo', 'Parálisis', 10]);
 });
-prueba('✨ armas especiales Comunes (2026-10-05): 29 armas y 3 orbes; cada una automatiza algo o aclara lo que queda a mano', () => {
+prueba('Marcado (2026-10-05): saca el sigilo al ponerse y no deja entrar en sigilo mientras dure (personaje, invocación y creep por igual)', () => {
+  const E = [{nombre: 'Sigilo', polaridad: 'buff', activo: true}, {nombre: 'Lento', polaridad: 'debuff', activo: true}];
+  const r1 = Combatiente.agregarEstado(E, {nombre: 'Marcado', polaridad: 'debuff', marcado: true, turnos: 3, activo: true});
+  const r2 = Combatiente.agregarEstado(E, {nombre: 'Sigilo', polaridad: 'buff', activo: true});
+  const S = FichaGuardado.normalizar({}).S; S.efectos = [{nombre: 'Marcado', activo: true}]; S.nitros = 5;
+  let aviso = ''; FichaAcciones.alternarSigilo(S, false, {toast: t => { aviso = t; }, cambio: () => {}, presets: [], avisarSinNitros: () => {}});
+  igual([r1.que, E.map(e => e.nombre), r2.que, r2.motivo, Combatiente.marcadoEn(E), S.efectos.length, /Marcado/.test(aviso), ESTADOS_PRESET.some(p => p.nombre === 'Marcado' && p.marcado)],
+    ['nuevo', ['Lento', 'Marcado'], 'bloqueado', 'Marcado', true, 1, true, true]);
+});
+prueba('✨ varitas del mapa (2026-10-05): la luz va solo a los que están en sigilo y te da luz; la niebla, los pilares y el portal llevan lo suyo', () => {
+  const S = FichaGuardado.normalizar({}).S, cat = id => ({...structuredClone(CATALOGO_BASE.find(i => i.id === id)), equipado: true});
+  const luz = cat('esp-varita-de-la-luz'), nie = cat('esp-varita-de-niebla'), pil = cat('esp-varita-de-los-pilares'), por = cat('esp-varita-del-portal'), ras = cat('esp-varita-del-rastreador');
+  const hEj = it => { const h = FichaAcciones.habDeArmaEspecial(S, it); return Combatiente.habEjecucion(h, h.duelo, {stat: () => 5, etq: x => x}); };
+  const hl = hEj(luz), lim = Duelo.limpiarHab(hl), hr = hEj(ras);
+  const z = Combatiente.zonaDeHab({nombre: 'Varita de niebla'}, nie.especial.duelo, {fichaId: 'f', tipo: 'pj'});
+  const tp = Plantillas.trampa(pil.especial.trampaColocar);
+  igual([hl.objetivo, hl.radio, hl.soloSigilo, lim.soloSigilo, hl.contra.map(c => c.stat), hl.efectos[0].nombre, luz.especial.estadoPropio.mods.map(m => m.stat),
+    z.tipo, z.niebla, tp.pilar, tp.cant, por.especial.trampaColocar.portal, hr.contra.map(c => c.stat), CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-varita') && /✋ A mano por ahora/.test(i.detalle)).map(i => i.nombre)],
+    ['onda', 3, true, true, ['resmg'], 'Marcado', ['luz', 'veoculto'], 'zona-persistente-habilidad', true, true, 2, {rango: 4, fijo: true}, ['resmg'], []]);
+});
+prueba('✨ armas especiales Comunes (2026-10-05): 30 armas y 3 orbes; cada una automatiza algo o aclara lo que queda a mano', () => {
   const L = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-'));
   const armas = L.filter(i => i.especial), orbes = L.filter(i => i.orbe);
   const sinNada = armas.filter(i => !i.especial.duelo && !i.especial.trampaColocar && !/✋/.test(i.detalle)).map(i => i.nombre);
-  igual([armas.length, orbes.length, L.every(i => i.tier === 'Común' && i.ranuras === 1), sinNada, armas.every(i => /No2/.test(i.detalle))], [29, 3, true, [], true]);
+  igual([armas.length, orbes.length, L.every(i => i.tier === 'Común' && i.ranuras === 1), sinNada, armas.every(i => /No2/.test(i.detalle))], [30, 3, true, [], true]);
 });
 prueba('mochila (dueño, 2026-10-05, P158): todo ítem ocupa al menos 1 ranura (una pila, 1), salvo que diga lo contrario; el catálogo, todo en 1', () => {
   const R = FichaEquipo.ranuras;

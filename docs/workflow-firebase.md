@@ -289,7 +289,10 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   `alfa` 0 el GM y el creador también siguen viendo el contorno. `fijado: true`
   (pineado): no se puede mover ni rotar, se comporta como el terreno de
   abajo (clickear y arrastrar mueve el mapa, no el elemento) — sigue
-  siendo del dueño o el GM despinearlo.
+  siendo del dueño o el GM despinearlo. `niebla: true` (2026-10-05,
+  Varita de niebla): tapa la vista — a los rivales de adentro no se los ve
+  ni se los elige como objetivo desde afuera (salvo Marcados); lo dibuja y
+  lo aplica el mapa (`nieblaSet`/`tapadoPorNiebla`, js/02).
 
 `campanas/piratas-en-el-espacio` es el espacio de pruebas de antes de las
 cuentas (identidades anónimas, sin `gmUid`): no aparece en el inicio y se

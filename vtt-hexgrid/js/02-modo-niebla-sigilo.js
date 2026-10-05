@@ -69,7 +69,35 @@ function nieblaAplica(){ return nieblaActiva && (!soyGM || nieblaComoJugador); }
 // el cono y la alerta — ver docs/plan-sistema-nuevo.md, "Sigilo".)
 function enSigilo(t){
   const e = estadoDe(t);
-  return !!(e && e.estados.some(s => String((s && s.nombre) || '').trim().toLowerCase() === 'sigilo'));
+  if(!e) return false;
+  const nom = s => String((s && s.nombre) || '').trim().toLowerCase();
+  // Marcado (2026-10-05): no puede estar en sigilo (la marca se lo saca; esto cubre el ratito hasta que se guarda).
+  return e.estados.some(s => nom(s) === 'sigilo') && !e.estados.some(s => s && s.activo !== false && (s.marcado || nom(s) === 'marcado'));
+}
+// Marcado (2026-10-05, Varita del rastreador y de la luz): brilla y se lo ve también a través de la niebla.
+function marcado(t){
+  const e = estadoDe(t);
+  return !!(e && e.estados.some(s => s && s.activo !== false && (s.marcado || String(s.nombre || '').trim().toLowerCase() === 'marcado')));
+}
+/* 🌫 Niebla de una varita (2026-10-05): las casillas cubiertas (claves nbPack), recalculadas solo si cambian. Un rival adentro no se ve (salvo
+   Marcado, o con un token de tu bando a 1 casilla: adentro se ve a 1); no se ve a través (con la niebla de guerra) ni se lo elige como objetivo. */
+let nieblaVaritaCache = {firma: '', set: new Set()};
+function nieblaSet(){
+  let f = '';
+  elementos.forEach((el, id) => { if(el.niebla) f += `${id}:${el.origen.col},${el.origen.fila},${el.celdas.length};`; });
+  if(f !== nieblaVaritaCache.firma){
+    const s = new Set();
+    elementos.forEach(el => { if(el.niebla) celdasDeElemento(el).forEach(c => s.add(nbPack(c.col, c.fila))); });
+    nieblaVaritaCache = {firma: f, set: s};
+  }
+  return nieblaVaritaCache.set;
+}
+function tapadoPorNiebla(t){
+  if(!t || !nieblaSet().has(nbPack(t.col, t.fila)) || marcado(t)) return false;
+  if(soyGM ? (t.tipo !== 'pj' || ojoRevelando) : t.tipo !== 'creep') return false;   // solo tapa a los rivales (el GM, como con el sigilo: con el 👁 ve)
+  const mio = soyGM ? 'creep' : 'pj';
+  for(const x of tokens.values()) if(x !== t && x.tipo === mio && !x.oculto && distanciaHex(x, t) <= 1) return false;
+  return true;
 }
 /* ---------- Sigilo: cono de detección y zona de alerta ----------
    Cono (16 hexágonos azules): un rombo de 4 × 4 que arranca en el hexágono
@@ -506,6 +534,11 @@ function dibujarEfectosTeleport(){
 function destinoParsear(txt){
   const m = /^(-?\d+),(-?\d+)$/.exec(String(txt || ''));
   return m ? {col: parseInt(m[1], 10), fila: parseInt(m[2], 10)} : null;
+}
+// El destino fijo de una trampa de portal (2026-10-05, Varita del portal): va adentro de su trampaEstado ({portal: {rango, destino}}).
+function portalFijoDe(el){
+  if(!el || !el.trampaEstado || el.trampaEstado.indexOf('destino') < 0) return null;
+  try{ const p = JSON.parse(el.trampaEstado).portal; return p ? destinoParsear(p.destino) : null; }catch(e){ return null; }
 }
 let elegirDestinoLibre = false;   // true: vale cualquier casilla (elegir un token, no un destino a pie)
 let elegirDestinoCancel = null;   // qué hacer si se cancela con Esc o clic derecho

@@ -223,8 +223,29 @@ async function crearElementoZona(centro, cfg){
     return false;
   }
 }
+// 🌫 La niebla de una varita (2026-10-05): un elemento `niebla` con turnos. Adentro se ve a 1; desde afuera no se ve a través ni adentro
+// (salvo a los Marcados, que brillan) — ver tapadoPorNiebla y celdasVisionDe.
+async function crearNiebla(centro, radio, msg){
+  const n = Math.max(1, Math.round(num(msg.zonaTurnos)) || 3);
+  try{
+    await coleccionElementos().add({
+      tipo: 'flor', origen: {col: centro.col, fila: centro.fila}, celdas: celdasFlor(radio).flatMap(c => [c.dq, c.dr]), rotacion: 0,
+      color: '#C9CED8', alfa: 70, solido: false, invisible: false, imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true, niebla: true,
+      turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n,
+      duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    toast(`🌫 ${msg.nombre || 'Niebla'}: dura ${n} turno${n === 1 ? '' : 's'}`);
+  }catch(err){
+    console.error('No se pudo poner la niebla:', err);
+    toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (niebla)' : 'No se pudo poner la niebla');
+  }
+}
 function zonaPersistenteDeHabilidad(msg){
   const radio = Math.max(1, Math.round(num(msg.radio) || 1));
+  if(msg.niebla){
+    elegirDestino(h => crearNiebla(h, radio, msg), `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': ' : ''}marcá el centro de la niebla</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true);
+    return;
+  }
   elegirDestino(h => crearElementoZona(h, {
     radio, turnos: msg.zonaTurnos, nombre: msg.nombre, amiga: msg.zonaAmiga, dano: msg.zonaDano, ignoraDef: msg.zonaIgnoraDef,
     estado: msg.zonaEstado, resistStat: msg.resistStat, resistValor: msg.resistValor, enMantenimiento: true, cadaPaso: false,
@@ -235,13 +256,62 @@ function zonaPersistenteDeHabilidad(msg){
 }
 // 🪤 Trampa de una habilidad ✨ automática (2026-09-30, pedido del dueño): quien la usa elige la casilla con un clic (antes quedaba
 // sola al lado del token). El anuncio (sin la ubicación) ya lo publicó la ficha; la trampa la ve solo su bando (trampaDeMiBando).
+// Las que dejan varias (2026-10-05, Varita de espinas: «3 casillas donde quieras»): un clic por cada una; Esc termina antes. Los pilares
+// (Varita de los pilares) no son trampas: cada clic levanta un Sólido de 1 casilla con turnos. El portal con destino fijo (Varita del portal):
+// primero la casilla que lo dispara y después adónde lleva. Si la casilla queda fuera del Rango de casteo de quien la usa, avisa y deja seguir.
 function trampaDeHabilidad(msg){
-  elegirDestino(async h => {
+  const t = msg.trampa || {}, cant = Math.max(1, Math.min(6, Math.round(num(t.cant)) || 1));
+  const pilar = !!t.pilar, portal = t.portal && t.portal.fijo ? Math.max(1, Math.round(num(t.portal.rango)) || 4) : 0;
+  const nom = msg.nombre ? esc(msg.nombre) + ': ' : '';
+  let puestas = 0;
+  const fin = () => { if(cant > 1 && puestas) toast(pilar ? `🧱 ${msg.nombre}: ${puestas} pilar${puestas === 1 ? '' : 'es'}` : `🪤 ${msg.nombre}: ${puestas} trampa${puestas === 1 ? '' : 's'} colocada${puestas === 1 ? '' : 's'}`); };
+  const otra = i => {
+    const cuenta = cant > 1 ? ` (${i + 1} de ${cant})` : '';
+    elegirDestino(async h => {
+      trampaAvisarAlcance(msg, h);
+      try{
+        if(pilar){
+          if(!(await levantarPilar(h, t))){ otra(i); return; }   // casilla ocupada: la vuelve a pedir
+        }else if(portal){ portalElegirDestino(msg, t, h, portal); return; }
+        else{
+          const r = await TokensAuto.colocarTrampas({fichaId: msg.fichaId, tipoToken: msg.tipoToken || 'pj', trampa: {...t, cant: 1}, mapaId: mapaMostrado, celda: {col: h.col, fila: h.fila}});
+          if(!r.colocadas){ toast(`🪤 ${msg.nombre}: no se pudo colocar`); return; }
+          if(cant === 1) toast(`🪤 ${msg.nombre}: trampa colocada`);
+        }
+        puestas++;
+      }catch(err){ console.error('No se pudo colocar:', err); toast(pilar ? 'No se pudo levantar el pilar — revisá la consola' : 'No se pudo colocar la trampa — revisá la consola'); return; }
+      if(i + 1 < cant) otra(i + 1); else fin();
+    }, `<b>${pilar ? '🧱' : portal ? '🌀' : '🪤'} ${nom}${pilar ? 'elegí dónde sale el pilar' : portal ? 'elegí la casilla que dispara el portal' : 'elegí dónde colocar la trampa'}${cuenta}</b> <span>clic en el mapa · Esc o clic derecho ${i ? 'terminan' : 'cancelan'}</span>`, true, i ? fin : null);
+  };
+  otra(0);
+}
+// Si la casilla elegida queda fuera del Rango de casteo de quien la usa: avisa (la mesa decide), no bloquea.
+function trampaAvisarAlcance(msg, h){
+  const mio = [...tokens.values()].find(x => x.fichaId === msg.fichaId && x.tipo === (msg.tipoToken || 'pj'));
+  const rr = mio && typeof rangoDeToken === 'function' ? rangoDeToken(mio) : null;
+  if(rr && rr.casteo > 0 && distanciaHex(mio, h) > rr.casteo) toast(`⚠ Esa casilla queda a ${distanciaHex(mio, h)}: fuera de tu Rango de casteo (${fmt(rr.casteo)})`);
+}
+// Un pilar de piedra (Varita de los pilares): Sólido de 1 casilla, visible para todos, que se va solo a los `turnos` turnos. → false si no hay lugar.
+async function levantarPilar(h, t){
+  if(elementoSolidoEn(h.col, h.fila) || [...tokens.values()].some(x => x.col === h.col && x.fila === h.fila)){ toast('Esa casilla no está libre (hay un token o un Sólido): elegí otra'); return false; }
+  const n = Math.max(1, Math.round(num(t.turnos)) || 3);
+  await coleccionElementos().add({
+    tipo: 'libre', origen: {col: h.col, fila: h.fila}, celdas: [0, 0], rotacion: 0,
+    color: /^#[0-9a-fA-F]{6}$/.test(t.color || '') ? t.color : '#7A6A58', alfa: 90, solido: true, invisible: false, imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true,
+    turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n,
+    duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+  });
+  return true;
+}
+// El destino del portal (Varita del portal): a `rango` casillas o menos de la casilla que lo dispara; la trampa guarda los dos puntos.
+function portalElegirDestino(msg, t, h, rango){
+  elegirDestino(async d => {
+    if(distanciaHex(h, d) > rango || (d.col === h.col && d.fila === h.fila)){ toast(`El destino tiene que estar a ${rango} casillas o menos del portal (y no en el mismo lugar)`); portalElegirDestino(msg, t, h, rango); return; }
     try{
-      const r = await TokensAuto.colocarTrampas({fichaId: msg.fichaId, tipoToken: msg.tipoToken || 'pj', trampa: msg.trampa, mapaId: mapaMostrado, celda: {col: h.col, fila: h.fila}});
-      toast(r.colocadas ? `🪤 ${msg.nombre}: ${r.colocadas > 1 ? r.colocadas + ' trampas colocadas' : 'trampa colocada'}` : `🪤 ${msg.nombre}: no se pudo colocar`);
-    }catch(err){ console.error('No se pudo colocar la trampa:', err); toast('No se pudo colocar la trampa — revisá la consola'); }
-  }, `<b>🪤 ${msg.nombre ? esc(msg.nombre) + ': elegí dónde colocar la trampa' : 'Elegí dónde colocar la trampa'}</b> <span>clic en el mapa · Esc o clic derecho cancelan</span>`, true);
+      const r = await TokensAuto.colocarTrampas({fichaId: msg.fichaId, tipoToken: msg.tipoToken || 'pj', trampa: {...t, cant: 1, portal: {rango, destino: d.col + ',' + d.fila}}, mapaId: mapaMostrado, celda: {col: h.col, fila: h.fila}});
+      toast(r.colocadas ? `🌀 ${msg.nombre}: portal colocado (lleva ${distanciaHex(h, d)} casillas más allá)` : `🌀 ${msg.nombre}: no se pudo colocar`);
+    }catch(err){ console.error('No se pudo colocar el portal:', err); toast('No se pudo colocar el portal — revisá la consola'); }
+  }, `<b>🌀 ${msg.nombre ? esc(msg.nombre) + ': ' : ''}elegí adónde lleva el portal</b> <span>clic en una casilla a ${rango} o menos de la trampa · Esc o clic derecho cancelan</span>`, false);
 }
 // Habilidad que invoca (2026-10-02): la ficha ya despertó (o copió) la invocación (FichaAcciones.invocarConHab); acá se elige la casilla
 // donde aparece. Si ya tiene token en este mapa (el de cuando se durmió) se mueve ahí; si no, se crea. La mesa se entera por la Crónica.
@@ -362,7 +432,7 @@ function dueloAvisoObjetivoOcultar(){ const el = $('#duelo-objetivo'); if(el) el
 
 function dueloElegirObjetivoMapa(msg){
   const yo = msg.yo, ataque = msg.ataque;
-  if(ataque && ataque.hab && (ataque.hab.objetivo === 'area' || ataque.hab.objetivo === 'onda' || ataque.hab.objetivo === 'cono')){ dueloElegirAreaMapa(msg); return; }   // hechizo de área: otro flujo (Paso 4/7)
+  if(ataque && ataque.hab && (ataque.hab.objetivo === 'area' || ataque.hab.objetivo === 'onda' || ataque.hab.objetivo === 'cono' || ataque.hab.objetivo === 'linea')){ dueloElegirAreaMapa(msg); return; }   // hechizo de área: otro flujo (Paso 4/7)
   cerrarBotonera();   // esconde la capa (la ficha queda cargada, para tirar después)
   seleccion = null; hudCerrar(); pedirDibujo();   // se guarda el menú de botones que rodea al token propio mientras se elige
   const propio = t => t.fichaId === yo.ref && t.tipo === yo.tipo;
@@ -395,7 +465,7 @@ function dueloElegirObjetivoMapa(msg){
   const pedir = () => {
     elegirDestino(async h => {
       const todos = [...tokens.entries()].map(([id, t]) => ({...t, id}));   // los tokens del mapa no traen su id adentro: es la clave del Map
-      const cand = todos.filter(t => t.col === h.col && t.fila === h.fila && !propio(t) && (!t.oculto || soyGM));
+      const cand = todos.filter(t => t.col === h.col && t.fila === h.fila && !propio(t) && (!t.oculto || soyGM) && !tapadoPorNiebla(t));   // la niebla: no se apunta adentro
       if(!cand.length){ toast('Ahí no hay otro token: hacé clic sobre el que querés atacar'); pedir(); return; }
       let t = cand[0];
       if(esValido && !esValido(t)){
@@ -519,6 +589,7 @@ function dueloChequearDodge(d){
   const a = areasActivas.get(d.grupo.id);
   const t = tokens.get(d.defensor.tokenId);
   if(!a || !t) return true;   // sin datos: por las dudas, efecto completo (más seguro que dejarlo pasar gratis)
+  if(a.centro && Array.isArray(a.centro.linea)) return a.centro.linea.includes(nbPack(t.col, t.fila));   // la línea (Varita láser)
   return distanciaHex(a.centro, t) <= num(a.radio);
 }
 
@@ -561,6 +632,18 @@ async function dodgeDeclinar(){
 // salvo que la habilidad tenga fuego amigo) y crea el documento del área; el primer sub-duelo lo crea
 // escucharAreas() apenas llega el snapshot nuevo (mismo camino que cualquier avance de la cascada).
 // Las casillas del cono de un área (`centro` = {col, fila, cono, rot}): el mismo de la detección, desde esa casilla y mirando para ahí.
+// La línea recta de una habilidad (2026-10-05, Varita láser): desde `desde` hacia `hacia`, de `largo` casillas (aunque se marque más cerca o
+// más lejos), sin la casilla de quien la tira. → [{col, fila}]
+function lineaRecta(desde, hacia, largo){
+  const n = distanciaHex(desde, hacia);
+  if(!n) return [];
+  const A = hexACubo(desde), B = hexACubo(hacia), k = Math.max(1, largo) / n;
+  const q = A.q + (B.q - A.q) * k, r = A.r + (B.r - A.r) * k, s = -q - r;
+  let rq = Math.round(q), rr = Math.round(r);
+  const rs = Math.round(s), dq = Math.abs(rq - q), dr = Math.abs(rr - r), ds = Math.abs(rs - s);
+  if(dq > dr && dq > ds) rq = -rr - rs; else if(dr > ds) rr = -rq - rs;
+  return lineaHex(desde, {col: rq, fila: rr + (rq - (rq & 1)) / 2}).slice(0, Math.max(1, largo));
+}
 function conoDeArea(c){ return new Set(zonasSigilo({col: c.col, fila: c.fila, rotacion: num(c.rot)}).cono.map(x => nbPack(x.col, x.fila))); }
 // «Por la espalda» (2026-10-03): el atacante está en el punto ciego del defensor — la misma cuña ciega de la visión (VISION_CUNA_CIEGA a cada
 // lado de atrás; las diagonales de atrás sí se ven): pegado, solo el casillero justo de atrás. Y SOLO si el atacante está en sigilo (dueño,
@@ -586,15 +669,16 @@ function dueloElegirAreaMapa(msg){
     const todos = [...tokens.entries()].map(([id, t]) => ({...t, id}));
     const mio = todos.find(propio);
     const casteador = {ref: String(yo.ref || ''), tipo: yo.tipo, nombre: String(yo.nombre || '').slice(0, 40), uid: (mio && mio.duenoUid) || fbUsuario.uid, tokenId: mio ? mio.id : ''};
-    const enCono = h.cono ? conoDeArea(h) : null;   // el cono (Sonic Boom): sus casillas
+    const enCono = h.cono ? conoDeArea(h) : h.linea ? new Set(h.linea) : null;   // el cono (Sonic Boom) o la línea (Varita láser): sus casillas
     const objetivos = todos
       .filter(t => !t.oculto && !propio(t) && (enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio))
       .filter(t => hab.fuegoAmigo || dueloEsRival(yo, t))
+      .filter(t => !hab.soloSigilo || (enSigilo(t) && lineaLibre(h, t, solidosSet())))   // la luz (Varita de la luz): los que estaban en sigilo y alcanza
       .map(t => t.id);
-    if(!objetivos.length){ toast('No hay nadie adentro del área'); return; }
+    if(!objetivos.length){ toast(hab.soloSigilo ? `💡 ${hab.nombre || 'La luz'}: no había nadie en sigilo a su alcance` : 'No hay nadie adentro del área'); return; }
     try{
       await coleccionAreas().add({
-        casteador, hab: Duelo.limpiarHab(hab), centro: {col: h.col, fila: h.fila, ...(h.cono ? {cono: true, rot: h.rot} : {})}, radio, objetivos, duelos: [], indice: 0, estado: 'en-curso',
+        casteador, hab: Duelo.limpiarHab(hab), centro: {col: h.col, fila: h.fila, ...(h.cono ? {cono: true, rot: h.rot} : {}), ...(h.linea ? {linea: h.linea} : {})}, radio, objetivos, duelos: [], indice: 0, estado: 'en-curso',
         creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
       });
     }catch(err){
@@ -607,6 +691,18 @@ function dueloElegirAreaMapa(msg){
     const mio = [...tokens.values()].find(propio);
     if(!mio){ toast('Tu token no está en el mapa: no se puede lanzar el cono'); cancelado(); return; }
     lanzar({col: mio.col, fila: mio.fila, cono: true, rot: Math.round(num(mio.rotacion || 0))});
+    return;
+  }
+  // Línea recta desde quien la usa (Varita láser, 2026-10-05): se marca hacia dónde y sale del token, de `largo` casillas.
+  if(hab.objetivo === 'linea'){
+    const mio = [...tokens.values()].find(propio);
+    if(!mio){ toast('Tu token no está en el mapa: no se puede lanzar la línea'); cancelado(); return; }
+    const largo = Math.max(1, Math.round(num(hab.largo)) || 4);
+    elegirDestino(c => {
+      const celdas = lineaRecta(mio, c, largo);
+      if(!celdas.length){ toast('Marcá una casilla distinta de la tuya'); cancelado(); return; }
+      lanzar({col: mio.col, fila: mio.fila, linea: celdas.map(x => nbPack(x.col, x.fila))});
+    }, `<b>⚡ ${hab && hab.nombre ? esc(hab.nombre) + ': ' : ''}marcá hacia dónde sale la línea</b> <span>clic en el mapa (${largo} casillas desde tu token) · Esc o clic derecho cancelan</span>`, true, cancelado);
     return;
   }
   // Onda alrededor de quien la usa (Shockwave…): el centro es su propio token, no hay que marcar nada.

@@ -696,10 +696,10 @@ document.addEventListener('keydown', e => {
     e.preventDefault();
     if(flAbierta()){ cerrarFichaLite(); return; }   // F otra vez: se cierra la ficha lite (js/15)
     const tf = seleccion ? tokens.get(seleccion) : null;
-    if(soyGM){   // GM: la ficha lite del creep seleccionado, o la de un personaje del que tiene 🎮 el control
+    if(soyGM){   // GM: la ficha lite del creep o del personaje seleccionado (dueño, 2026-10-05: siempre la lite; de ahí, a la completa)
       if(tf && tf.tipo === 'creep'){ if(tf.fichaId && creepsPub.has(tf.fichaId)) abrirFichaDeToken(tf); else toast('Ese token no está vinculado a un creep de GM Tools'); }
-      else if(tf && tf.tipo === 'pj' && tf.fichaId && controloFicha(tf.fichaId)) abrirFichaDeToken(tf);
-      else toast('Seleccioná un creep (o un personaje del que tengas el control) para ver su ficha');
+      else if(tf && tf.tipo === 'pj' && tf.fichaId) abrirFichaDeToken(tf);
+      else toast('Seleccioná un creep o un personaje para ver su ficha');
     }else{   // jugador: su token seleccionado (personaje o invocación) o, si no, su personaje principal (aunque tenga seleccionado el de otro)
       if(tf && tf.tipo === 'pj' && tf.fichaId && tf.duenoUid === fbUsuario.uid) abrirFichaDeToken(tf);
       else{ const propio = fichaPrincipalId(); if(propio) abrirFichaLite({tipo: 'pj', fichaId: propio}); else toast('No tenés un personaje para abrir'); }

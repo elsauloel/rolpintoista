@@ -3,8 +3,8 @@
    El 📜 de un token (o la F) abre encima del mapa —centrada, sin oscurecer— lo que hace falta a mano en un combate: qué hay en cada
    mano, la Defensa y las resistencias a crítico (al pasar el mouse, de dónde sale cada número), el resto del equipo, los estados y,
    en un personaje, DDE y Despojos. El dibujo es común (comun/ficha-lite.js); acá se leen los datos y se atienden los botones.
-   - Un personaje o una invocación: su dueño, o el GM con 🎮 el control (sin el control, el GM sigue abriendo la ficha completa en
-     otra pestaña). Los lee con FichaSesion (en vivo, sin guardar nada).
+   - Un personaje o una invocación: su dueño, o el GM (con o sin 🎮 el control: dueño, 2026-10-05, siempre la lite; la completa, con su
+     botón). Los lee con FichaSesion (en vivo, sin guardar nada).
    - Un creep: el GM (de su parte privada, `creepsPriv`).
    Se cierra con F, Esc, ✕ o un clic afuera. Los botones abren las ventanas de siempre (Stats, Equipo y mochila, Tienda, Botín en la
    ficha del marco; Botonera, Acciones, Ver) o la ficha completa / GM Tools en otra pestaña. */

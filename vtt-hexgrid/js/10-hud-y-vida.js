@@ -1016,13 +1016,14 @@ function puedeAgregarEstado(t){
 
 // Abre el selector de estados de la herramienta que corresponde.
 function abrirFichaDeToken(t){
-  // Ficha lite (2026-10-02, js/15): un creep vinculado (el GM), y un personaje o una invocación que manejo — mío, o con 🎮 el control
-  // siendo GM — abren encima del mapa lo esencial del combate. La de otro jugador, o sin el control, se abre en otra pestaña como antes.
+  // Ficha lite (2026-10-02, js/15): un creep vinculado (el GM), y un personaje o una invocación mío — o cualquiera, siendo GM (dueño, 2026-10-05:
+  // «que ese botón siempre muestre la ficha lite; desde la lite se puede ir a la completa») — abren encima del mapa lo esencial del combate.
+  // La de otro jugador, para un jugador, se abre en otra pestaña como antes.
   if(t.tipo === 'creep' && t.fichaId && soyGM){ abrirFichaLite({tipo: 'creep', creepId: t.fichaId}); return; }
   const fichaId = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
   if(!fichaId) return;
   const invId = t.fichaId.includes(SEP_INVOCACION) ? t.fichaId.split(SEP_INVOCACION)[1] : '';
-  if(fbUsuario && (t.duenoUid === fbUsuario.uid || controloFicha(fichaId))){
+  if(fbUsuario && (t.duenoUid === fbUsuario.uid || controloFicha(fichaId) || soyGM)){
     abrirFichaLite(invId ? {tipo: 'inv', fichaId, invId} : {tipo: 'pj', fichaId});
     return;
   }

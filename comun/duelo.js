@@ -1161,15 +1161,16 @@ const Duelo = (() => {
 
   let opcionesFalla = {};   // id → true: las opciones no llegaron (tardaron demasiado o la ficha/Acciones no respondió)
   function pedirOpciones(d){
-    if(opcionesPedidas.has(d.id)) return;
-    opcionesPedidas.add(d.id);
-    delete opcionesFalla[d.id];
-    // Si la pestaña ya sabe calcularlas sola (el mapa del GM con un creep), no hace falta esperar a un iframe.
+    // Si la pestaña ya sabe calcularlas sola (el mapa del GM con un creep), no hace falta esperar a un iframe. Se prueba en cada dibujo
+    // (2026-10-05): recién cargada la página, los datos del creep llegan un momento después — apenas están, las opciones aparecen solas.
     if(cfgEscuchar.opcionesLocal){
       let ops = null;
       try{ ops = cfgEscuchar.opcionesLocal(d); }catch(err){ console.error('Duelo: opcionesLocal', err); }
-      if(ops){ recibirOpciones(d.id, ops); return; }
+      if(ops){ opcionesPedidas.add(d.id); recibirOpciones(d.id, ops); return; }
     }
+    if(opcionesPedidas.has(d.id)) return;
+    opcionesPedidas.add(d.id);
+    delete opcionesFalla[d.id];
     enviar(d.defensor, {tipo: 'duelo-opciones', id: d.id});
     setTimeout(() => { if(!opciones[d.id]){ opcionesFalla[d.id] = true; if(actual && actual.id === d.id && actual.dato) dibujar(); } }, 12000);
   }
@@ -1324,12 +1325,14 @@ const Duelo = (() => {
     let cuerpo;
     if(puedoTirarYo(lado)){
       if(campo === 'eva'){
+        if(!opciones[d.id] && !opcionesFalla[d.id]) pedirOpciones(d);   // (si esta pestaña las calcula sola, ya quedan acá mismo)
         const ops = opciones[d.id];
         if(!ops && opcionesFalla[d.id]){
           cuerpo = `<div class="espera">No llegaron tus opciones de defensa (la ficha o las Acciones no respondieron).</div>${window.DUELO_MOTIVO ? `<div class="det">${_esc(window.DUELO_MOTIVO)}</div>` : ''}<button type="button" class="sec" data-reintentar-def>↻ Reintentar</button>
             <div class="duelo-man"><input type="number" min="1" data-manual="eva" placeholder="valor" value="${_esc(manual.eva || '')}"><select data-manual-modo>${selModoHtml(d)}</select><button type="button" class="sec" data-tirarpor="eva">🎲 Tirar a mano</button></div>`;
         }
-        else if(!ops){ pedirOpciones(d); cuerpo = '<div class="espera">cargando tus opciones de defensa… <span class="det">(la primera vez puede tardar unos segundos)</span></div>'; }
+        else if(!ops){ setTimeout(() => { if(actual && actual.id === d.id && actual.dato && !opciones[d.id]) dibujar(); }, 2000);   // vuelve a mirar hasta que lleguen
+          cuerpo = '<div class="espera">cargando tus opciones de defensa… <span class="det">(la primera vez puede tardar unos segundos)</span></div>'; }
         else cuerpo = `<div class="det">Elegí cómo te defendés (antes de ver el PdG):</div><div class="duelo-opc">${ops.map((o, i) => `<button type="button" data-def="${i}"${o.motivoNo ? ' disabled' : ''}>${_esc(o.etiqueta)}${ayudaDefensa(o.modo === 'evasion' ? 'eva' : o.modo)}${o.costo ? `<small>${_fmt(o.costo)} No2</small>` : ''}${(o.info || []).map(t => `<small class="duelo-info">${_esc(t)}</small>`).join('')}${o.motivoNo ? `<small>${_esc(o.motivoNo)}</small>` : ''}</button>`).join('')}</div>`;
       }else{
         const txt = campo === 'pdg' ? (d.hab ? `🎲 Tirar ${_esc(etqTira(d))}` : '🎲 Pagar y tirar PdG') : campo === 'fuerza' ? '🎲 Tirar Fuerza del golpe' : `🎲 Tirar Bloqueo${d.defensa && d.defensa.itemNombre ? ' · ' + _esc(d.defensa.itemNombre) : ''}`;

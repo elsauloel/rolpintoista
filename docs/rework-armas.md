@@ -1347,3 +1347,6 @@ van a contemplar como…»: falta completar.)
 - **El rival puede esquivar (dueño, 2026-10-05):** un efecto de 1 No2 por uso no hace daño las 8 veces: el otro puede evitarlo. La chance de
   acertar va en la balanza. → la medida «efecto por turno» se calcula con la **chance de acertar** (con stats parejos, más o menos la mitad); lo que
   **no tiene tirada para acertar** (una flor que pega a todos) vale más por eso mismo.
+- **Se equilibran solas, en parte (dueño, 2026-10-05):** el arma física **suma la Fuerza** (Dmg) pero **la frena la Defensa**; la varita **no suma el
+  Especial** y **no la frena la Defensa** (solo se esquiva). «Puede ser que sea menos desparejo de lo que creía, siempre y cuando las varitas no
+  sumen su Especial.» **Lo que tiene que ser caro es el daño directo que suma el Especial y no contempla armadura.** A confirmar con pruebas numéricas.

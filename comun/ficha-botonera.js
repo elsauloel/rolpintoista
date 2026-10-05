@@ -287,6 +287,7 @@ const FichaBotonera = (() => {
       html += `<div class="botonera-caja" style="margin-bottom:8px"><button class="ejecutar-btn${dentro ? ' usada' : ''}${falta ? ' sin-recursos' : ''}" data-sigilo="1" style="width:100%" ${falta ? 'aria-disabled="true" title="No te alcanzan los Nitros"' : ''}>🕶 ${dentro ? 'Salir del sigilo' : `Entrar en sigilo · ${fmt(num(IT2().nitrosSigilo))} No2`}</button></div>`;
     }
 
+    const especiales = typeof FichaAcciones !== 'undefined' && FichaAcciones.armasEspeciales ? FichaAcciones.armasEspeciales(S) : [];   // ✨ armas especiales equipadas
     html += `<div class="botonera-grid botonera-grid-even">
     <div class="botonera-caja">
       <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-combate" title="Contraer/expandir">👁</button><span>Combate</span></div>
@@ -308,6 +309,19 @@ const FichaBotonera = (() => {
           <button type="button" class="botonera-tile" data-botoneraaccion="danio" data-arma="${arma ? arma.id : ''}" title="Daño${arma ? ` · ${esc(arma.nombre)}` : ''}" ${arma ? '' : 'disabled'}>
             ${arma ? lupaBotonHtml(`danio:${arma.id}`) : ''}
             <span class="bt-label">Daño${nombre || ' Arma'}</span><span class="bt-value bt-value-formula">🎲 ${esc(arma ? FichaCombate.armaDanoTxt(arma, c.final.dmg) : 'sin arma equipada')}</span>
+          </button>`;
+          }).join('')}
+          ${especiales.map(i => {
+            // ✨ Un arma especial (2026-10-05, dueño): se usa desde Atacar, como un ataque más — «¿Qué ataque es?» → Ataque normal → sus reglas.
+            const e = i.especial || {}, costo = FichaAcciones.costoEspecialTxt(S, i), falta = FichaAcciones.costoEspecial(S, i).no2 > num(S.nitros);
+            const tipo = e.duelo && e.duelo.tipoDano ? ` ${e.duelo.tipoDano}` : '';
+            return `
+          <button type="button" class="botonera-tile${falta ? ' bt-sin-nitros' : ''}" data-botoneraaccion="atacar" data-arma="${i.id}" title="Atacar con ${esc(i.nombre)} (arma especial) · ${esc(costo)}">
+            <span class="bt-label">✨ Atacar · ${esc(e.nombre || i.nombre)}</span><span class="bt-value bt-value-formula">${e.dano ? `🎲 ${esc(e.dano)}${esc(tipo)}` : '✨ sin daño'}</span>
+            <span class="bt-mod">${esc(costo)}</span>
+          </button>
+          <button type="button" class="botonera-tile" data-view="inventario:${i.id}" title="Qué hace ${esc(i.nombre)}">
+            <span class="bt-label">Qué hace · ${esc(e.nombre || i.nombre)}</span><span class="bt-value" style="font-size:11px;line-height:1.3;white-space:normal">${esc(FichaAcciones.ataqueEspecialMenu(S, i).que)}</span>
           </button>`;
           }).join('')}
         </div>
@@ -383,24 +397,6 @@ const FichaBotonera = (() => {
       ${consumeButton(i, key, true, lupaBotonHtml)}
     </div>
   </div>`;
-
-    // ✨ Armas especiales equipadas (2026-10-05): un tiro por botón; el costo sube con cada uso del turno (comun/ficha-acciones.js).
-    const especiales = typeof FichaAcciones !== 'undefined' && FichaAcciones.armasEspeciales ? FichaAcciones.armasEspeciales(S) : [];
-    if(especiales.length) html += `<div class="botonera-caja">
-      <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-especiales" title="Contraer/expandir">👁</button><span>✨ Armas especiales</span></div>
-      <div class="botonera-list-grid">
-        ${especiales.map(i => `<div class="cat-row bot-fila">
-          <div class="bot-fila-info">
-            <div class="cat-nombre">${esc((i.especial && i.especial.nombre) || i.nombre)}</div>
-            <div class="bot-fila-costo" title="Lo que cuesta usarla ahora (el No2 sube con cada uso en el turno)">${esc(FichaAcciones.costoEspecialTxt(S, i))}</div>
-          </div>
-          <div class="bot-fila-btns">
-            <button class="mini" data-view="inventario:${i.id}">Ver</button>
-            <button class="ejecutar-btn${num(S.nitros) < FichaAcciones.costoEspecial(S, i).no2 ? ' sin-recursos' : ''}" data-especial="${i.id}">Usar</button>
-          </div>
-        </div>`).join('')}
-      </div>
-    </div>`;
 
     html += `<div class="botonera-grid botonera-grid-even">
     <div class="botonera-caja">

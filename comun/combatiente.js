@@ -316,6 +316,10 @@ const Combatiente = (() => {
   function menuTipoAtaqueHtml(o){
     const e = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
     const b = (tipo, txt) => `<button class="btn" ${o.attr}="${tipo}:${e(o.ref)}" style="width:100%">${txt}</button>`;
+    // Un arma especial (2026-10-05, dueño: «se usa como un ataque, con su propio andamiaje de reglas»): el ataque normal con su costo y lo que hace.
+    if(o.armaEspecial) return `<div class="hint">${e(o.nombre)}</div>
+    ${b('normal', `✨ Ataque normal — ${e(o.armaEspecial.costo)}<br><span class="hint">${e(o.armaEspecial.que)}</span>`)}
+    <div class="hint" style="margin-top:6px">De oportunidad y contraataque: todavía no se usan con un arma especial (a definir).</div>`;
     return `<div class="hint">${e(o.nombre)}</div>
     ${b('normal', `⚔ Ataque normal — ${n(o.normal)} No2<br><span class="hint">${o.primero ? (o.primeroTxt || 'primer ataque del turno (Tipo ÷ 2)') : (o.siguienteTxt || 'Tipo completo (ya atacó este turno)')}</span>`)}
     ${b('oportunidad', `🏃 Ataque de oportunidad — ${n(o.especialOpor ?? o.especial)} No2<br><span class="hint">${o.especialOpor === 0 ? 'gratis con esta arma' : 'siempre Tipo ÷ 2'}; no suma al conteo de ataques</span>`)}

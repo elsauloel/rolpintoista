@@ -145,6 +145,11 @@ const costoAtaqueEspecial = FichaCombate.costoAtaqueEspecial;
 const NOMBRE_ATAQUE_ESPECIAL = FichaAcciones.NOMBRE_ATAQUE_ESPECIAL;
 function ataqueEspecialConArma(arma, tipo, forzar){ FichaAcciones.ataqueEspecialConArma(S, arma, tipo, forzar, combateUi); }   // comun/ficha-acciones.js
 function preguntarTipoAtaque(arma){
+  if(arma && arma.especial){   // ✨ arma especial: el ataque normal con sus reglas (comun/ficha-acciones.js)
+    $('#tipo-ataque-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: arma.nombre, attr: 'data-tipoataque', ref: arma.id, armaEspecial: FichaAcciones.ataqueEspecialMenu(S, arma)});
+    $('#scrim-tipo-ataque').classList.add('open');
+    return;
+  }
   const costoNormal = costoAtaqueNitros(arma), primero = ataquesConArma(arma) === 0, especial = costoAtaqueEspecial(arma, 'contra'), especialOpor = costoAtaqueEspecial(arma, 'oportunidad');
   const id = arma ? arma.id : '';
   $('#tipo-ataque-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: arma ? arma.nombre : 'Sin arma', normal: costoNormal, primero, especial, especialOpor, attr: 'data-tipoataque', ref: id, primeroTxt: 'primer ataque con esta arma (Tipo ÷ 2)', siguienteTxt: 'Tipo completo (ya atacaste con esta arma este turno)'});   // el menú común
@@ -158,6 +163,7 @@ $('#tipo-ataque-lista').addEventListener('click', e => {
   const [tipo, armaId] = b.dataset.tipoataque.split(':');
   $('#scrim-tipo-ataque').classList.remove('open');
   const arma = S.inventario.find(x => x.id === armaId) || null;
+  if(arma && arma.especial){ if(tipo === 'normal') FichaAcciones.usarArmaEspecial(S, arma.id, false, habUi); return; }   // ✨ elige su objetivo (o su lugar) solo
   const hacer = () => { if(tipo === 'normal') atacarConArma(arma); else ataqueEspecialConArma(arma, tipo); };
   // Duelo paso a paso (comun/duelo.js, 2026-09-26): primero se elige el token al que se ataca; el PdG (y sus No2) se tiran adentro del duelo.
   // «Sin objetivo» deja el ataque suelto de siempre.

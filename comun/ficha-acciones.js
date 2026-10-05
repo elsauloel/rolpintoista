@@ -570,6 +570,8 @@ const FichaAcciones = (() => {
       duelo: e.duelo ? structuredClone(e.duelo) : null, tiradaStat: (e.duelo && e.duelo.tira) || 'pdgmg',
       tiradaExtra: dano ? dano + (suma > 0 ? `+${suma}` : '') : '', ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {})};
   }
+  // Lo que dice «¿Qué ataque es?» de un arma especial: su costo ahora y la primera frase de lo que hace.
+  const ataqueEspecialMenu = (S, it) => ({costo: costoEspecialTxt(S, it), que: String(it.detalle || '').split(' ⚙')[0].split(' ✋')[0].slice(0, 160)});
   const costoEspecialTxt = (S, it) => { const c = costoEspecial(S, it); return `${fmt(c.no2)} No2${c.sp ? ` + ${fmt(c.sp)} SP` : ''}${c.usos ? ` (uso ${c.usos + 1} del turno)` : ''}`; };
   async function usarArmaEspecial(S, itemId, forzar, ui, sinSp){
     const item = armasEspeciales(S).find(x => x.id === itemId);
@@ -953,7 +955,7 @@ const FichaAcciones = (() => {
     durAviso, desgastarItem, rompeArmaduraAlAzar, estadoDeSpec, aplicarEstadoRecibido, dueloAplicarEfectoPropio, xDeHab, habDueloDatos,
     ataqueDeHabArma, aplicarHabSobreMiDirecto, terminarEjecucionHab,
     habilidadTira, anunciarHabilidad, tirarPrimeraDeHab, tirarSegundaDeHab, registrarAtaqueDeHabilidad, limiteCostoX,
-    ejecutarHabilidad, confirmarCostoVariable, armasEspeciales, costoEspecial, costoEspecialTxt, habDeArmaEspecial, usarArmaEspecial,
+    ejecutarHabilidad, confirmarCostoVariable, armasEspeciales, costoEspecial, costoEspecialTxt, habDeArmaEspecial, usarArmaEspecial, ataqueEspecialMenu,
     atacarConArma, ataqueEspecialConArma, NOMBRE_ATAQUE_ESPECIAL,
     tirarValorStat, sobrepesoPagar, parryConArma, bloqueoConArma, fuerzaGolpeValorConArma, fuerzaGolpeConArma, elegirArmaDefensa, armaElegida, tirarDanoDeArma, pedirArmaYTirar,
     aplicarRevivirConAnkh, fijarHp, revisarAnkh, revisarMuerte,

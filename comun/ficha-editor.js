@@ -1009,13 +1009,14 @@ const FichaEditor = (() => {
       }
       if(key === 'inventario' && draft.tipoItem === 'consumibles' && draft.equipado){
         // Los consumibles no van a "Equipo": si se marcan como equipados, pasan al cinturón.
+        // Al cinturón, las unidades que entren (1 ranura = 1 unidad, 2026-10-04); el resto queda en la mochila.
         if(id) P.inventario = P.inventario.filter(x => x.id !== id);
         draft.equipado = false;
-        const ya = P.cinturon.findIndex(x => x.id === draft.id);
-        if(ya >= 0) P.cinturon[ya] = draft; else P.cinturon.push(draft);
+        P.inventario.push(draft);
+        const r = FichaEquipo.alCinturon(P, draft);
         cerrar();
         ctx.alCambiar(['inventario', 'cinturon']);
-        toast(`${draft.nombre} pasó al cinturón`);
+        toast(FichaEquipo.textoAlCinturon(P, draft, r));
         return;
       }
       if(id){ const i = P[key].findIndex(x=>x.id===id); P[key][i] = draft; }

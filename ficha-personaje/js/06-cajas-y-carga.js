@@ -401,23 +401,9 @@ document.addEventListener('click', async e => {
     const it = S.inventario.find(x=>x.id===b.dataset.tocinturon);
     if(!it || num(it.unidades) <= 0) return;
     if(it.enMesa){ toast('Está ofrecido en la mesa común: retiralo primero'); return; }
-    if(S.cinturon.length >= capCinturonEfectivo()){
-      toast('No hay lugar en el cinturón');
-      return;
-    }
-    it.unidades = num(it.unidades) - 1;
-    const clon = structuredClone(it);
-    clon.id = uid();
-    clon.unidades = 1;
-    clon.ranuras = 1;
-    clon.equipado = false;
-    clon.cargaActual = Math.max(1, num(it.cargaMax) || 1);
-    S.cinturon.push(clon);
-    purgarSiAgotado('inventario', it.id);
-    renderInventario();
-    renderList('cinturon');
-    refresh();
-    toast(`${it.nombre} · 1 unidad movida al cinturón`);
+    const r = FichaEquipo.alCinturon(S, it, 1);   // 1 ranura = 1 unidad; lleno, no entra (comun/ficha-equipo.js)
+    if(r.movidas){ renderInventario(); renderList('cinturon'); refresh(); }
+    toast(FichaEquipo.textoAlCinturon(S, it, r));
     return;
   }
   if(b.dataset.tomochila){

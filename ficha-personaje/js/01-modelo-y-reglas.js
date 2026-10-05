@@ -150,10 +150,7 @@ function compute(){ return FichaCalculo.calcular(S); }
 // ese mod).
 // La mochila es un slot de equipo (2026-09-25): la base la pone el jugador a mano (S.caps.mochila) y la mochila equipada la amplía con el mod "capmochila".
 function capMochilaEfectivo(){ return FichaEquipo.capMochila(S); }   // comun/ficha-equipo.js
-function capCinturonEfectivo(){
-  const bonus = compute().final.capcinturon;
-  return num(S.caps.cinturon) + (Number.isNaN(bonus) ? 0 : bonus);
-}
+function capCinturonEfectivo(){ return FichaEquipo.capCinturon(S); }   // comun/ficha-equipo.js (base 5 + lo que suman las piezas)
 
 /* =========================================================
    RENDER

@@ -90,7 +90,6 @@ const Recibidos = (() => {
   // (antes devolverTrampasAlJugador de la ficha)
   function devolverTrampas(S, items){
     let aMochila = 0, aCinturon = 0;
-    const capCinturon = () => { const b = FichaCalculo.calcular(S).final.capcinturon; return num(S.caps.cinturon) + (Number.isNaN(b) ? 0 : b); };
     items.forEach(js => {
       let it = null;
       try{ it = JSON.parse(js); }catch(e){}
@@ -99,11 +98,11 @@ const Recibidos = (() => {
       if(pila){ pila.unidades = num(pila.unidades) + 1; aMochila++; return; }
       const cap = FichaEquipo.capMochila(S);
       if(!(cap > 0) || FichaEquipo.mochilaUsada(S) + FichaEquipo.ranuras(it) <= cap){ FichaTienda.agregarConsumible(S, it, 1); aMochila++; return; }
-      const pilaC = S.cinturon.find(x => x.consumible && x.nombre === it.nombre);
-      if(pilaC){ pilaC.unidades = num(pilaC.unidades) + 1; aCinturon++; return; }
-      if(S.cinturon.length < capCinturon()){
-        const c = structuredClone(it); c.id = uid(); c.unidades = 1; c.ranuras = 1; c.equipado = false;
-        S.cinturon.push(c); aCinturon++; return;
+      if(FichaEquipo.cinturonLibre(S) > 0){   // 1 ranura = 1 unidad (2026-10-04): solo si queda lugar
+        const c = structuredClone(it); c.unidades = 1; c.consumible = true;
+        S.inventario.push(c);
+        if(FichaEquipo.alCinturon(S, c, 1).movidas){ aCinturon++; return; }
+        S.inventario = S.inventario.filter(x => x !== c);
       }
       FichaTienda.agregarConsumible(S, it, 1); aMochila++;   // sin lugar en ningún lado: mejor de más que perdida
     });

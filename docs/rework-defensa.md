@@ -309,7 +309,7 @@ el nombre conservan su id y su narrativa). Precio = 10 + 25 por punto de la bols
 crítico **se acumulan entre partes**, y eso no se ve diseñando una parte de arriba abajo. Así, al cerrar cada calidad, hay un equipo entero que se
 puede medir contra la curva.
 
-1. **Común:** torso ✅ · escudo ✅ · cabeza ✅ · manos ✅ · piernas ✅ · pies ✅ · cinturón · anillos. **Control:** la calculadora sobre el equipo Común completo
+1. **Común:** torso ✅ · escudo ✅ · cabeza ✅ · manos ✅ · piernas ✅ · pies ✅ · cinturón · mochila · anillos. **Control:** la calculadora sobre el equipo Común completo
    contra la curva de N1 (Defensa 4–10, T4 ≤ 2, T6 ≤ 1) y N2 (5–12). **Y la Res.CC (dueño, 2026-10-04):** medir cuánta se junta con el equipo completo,
    para que no sea tan abundante que le quite peso a los personajes y efectos que juegan con control (hoy, con torso y cabeza: hasta +4).
 1b. **Lluvia de mecánicas por parte (dueño, 2026-10-04):** el ejercicio de las piernas («imaginá todas las mecánicas, tirá de más, yo filtro») se
@@ -585,4 +585,18 @@ la mochila; cada ranura vale 0,5.
 - Resistencias elementales de relleno (una mochila que protege la espalda del fuego, etc.).
 **Preguntas:** ¿la base de 20 queda fija para todos, como el cinturón? ¿Creeps e invocaciones tienen mochila (o solo el cinturón de 5)? ¿Qué
 bolsa (cuántos puntos) le damos a la mochila por calidad?
+
+**Decisiones del dueño sobre cinturón y mochila (2026-10-04, segunda vuelta).**
+- **No se puede meter una 6.ª unidad en un cinturón de 5** ✅ construido: `FichaEquipo.alCinturon` (todos los caminos: Equipar, «→ Cinturón», el
+  editor y lo que vuelve del combate) mete las que entren y deja el resto en la mochila, con aviso. 1 ranura = 1 unidad (`cinturonUsado`), base 5
+  (`BASE_CINTURON`, `capCinturon`). Falta: el cinturón de 5 de **creeps e invocaciones**.
+- **Ranura exclusiva** (solo pociones, pergaminos, trampas o el Ankh) = el 75 % de una ranura común: 0,375.
+- **Mochila: base 20 para todos** los personajes. **Las invocaciones no llevan mochila.** A los creeps se les pueden cargar objetos que dejen al
+  final del combate, sin restricción (caso muy excepcional). **Bolsa por calidad: como los pies** (1,5 · 2,5 · 3,5 · 4,5 · 5,5).
+- **Mecánicas de mochila que quedan:** Ranuras · **Bolsillo exterior** (el primer consumible del turno desde la mochila cuesta 1 No2 en vez de 2) ·
+  **Correas laterales** (un arma o escudo colgado se equipa sin No2; puede haber más de una correa) · **Morral de cazador** (los trofeos no ocupan
+  ranuras) · **Farol colgado** (valor 1) · **Alforja compartida** (un aliado al lado retira un consumible de tu mochila por 1 No2) · contras para
+  las grandes. **Kit de herramientas**: a evaluar a futuro. Afuera: Armazón, Espaldar, Bolsa del carroñero, Mochila de mercader, Alforja de invocación.
+- **Cinturón y mochila son dos slots de equipo** (existen desde el 2026-09-25, `SLOT_DEFS`): entran en la ruta del rework (la mochila no estaba) y
+  en el control del equipo Común la Defensa del cinturón (+1 por calidad) cuenta para la curva.
 

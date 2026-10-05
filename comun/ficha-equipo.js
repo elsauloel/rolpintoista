@@ -64,6 +64,48 @@ const FichaEquipo = (() => {
     const bonus = FichaCalculo.calcular(S).final.capmochila;
     return num(S.caps && S.caps.mochila) + (Number.isNaN(bonus) ? 0 : bonus);
   }
+  /* ---------- Las ranuras del cinturón (dueño, 2026-10-04) ----------
+     1 ranura = 1 unidad (5 pociones = 5 ranuras). La base es 5 para todos (S.caps.cinturon; el número a mano queda para casos especiales) y
+     el cinturón equipado —o, de manera excepcional, otra pieza— la amplía con «capcinturon». Con el cinturón lleno no entra nada más: lo que
+     no entra se queda en la mochila. Todos los caminos que meten algo en el cinturón pasan por alCinturon. */
+  const BASE_CINTURON = 5;
+  const unidadesDe = i => i && i.consumible ? Math.max(0, num(i.unidades)) : 1;
+  const cinturonUsado = S => (S.cinturon || []).reduce((a, i) => a + unidadesDe(i), 0);
+  function capCinturon(S){
+    const bonus = FichaCalculo.calcular(S).final.capcinturon;
+    const base = S.caps && S.caps.cinturon !== undefined && S.caps.cinturon !== '' ? num(S.caps.cinturon) : BASE_CINTURON;
+    return base + (Number.isNaN(bonus) ? 0 : bonus);
+  }
+  const cinturonLibre = S => Math.max(0, capCinturon(S) - cinturonUsado(S));
+  // Pasa al cinturón hasta `cantidad` unidades del consumible `it` de la mochila (todas si no se dice), las que entren: se suman a una pila
+  // igual que ya esté en el cinturón o forman una nueva. Lo que no entra queda en la mochila (y si la pila de la mochila se vacía, se va).
+  // → {movidas, quedan, libre} (libre: las ranuras que quedan después).
+  function alCinturon(S, it, cantidad){
+    if(!it) return {movidas: 0, quedan: 0, libre: cinturonLibre(S)};
+    const tiene = it.consumible ? Math.max(0, num(it.unidades)) : 1;
+    const quiere = Math.min(tiene, cantidad === undefined ? tiene : Math.max(0, Math.round(num(cantidad))));
+    const movidas = Math.min(quiere, cinturonLibre(S));
+    if(movidas > 0){
+      const pila = it.consumible ? (S.cinturon || []).find(x => x.consumible && x.nombre === it.nombre) : null;
+      if(pila) pila.unidades = num(pila.unidades) + movidas;
+      else{
+        const c = structuredClone(it);
+        c.id = 'cin-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+        c.equipado = false; c.ranuras = 1;
+        if(it.consumible){ c.unidades = movidas; c.cargaActual = Math.max(1, num(it.cargaMax) || 1); }
+        S.cinturon = [...(S.cinturon || []), c];
+      }
+      if(it.consumible) it.unidades = tiene - movidas;
+      if(!it.consumible || num(it.unidades) <= 0) S.inventario = (S.inventario || []).filter(x => x !== it);
+    }
+    return {movidas, quedan: (it.consumible ? Math.max(0, num(it.unidades)) : (movidas ? 0 : 1)), libre: cinturonLibre(S)};
+  }
+  // El aviso de un paso al cinturón (lo mismo en la ficha y en el mapa).
+  function textoAlCinturon(S, it, r){
+    const lleno = `el cinturón está lleno (${cinturonUsado(S)}/${capCinturon(S)})`;
+    if(!r.movidas) return `${it.nombre}: no entra, ${lleno}`;
+    return `${it.nombre}: ${r.movidas === 1 ? '1 unidad pasó' : r.movidas + ' unidades pasaron'} al cinturón` + (r.quedan ? ` · ${r.quedan} quedan en la mochila (${lleno})` : '');
+  }
 
   /* ---------- Los slots ---------- */
   function slots(S){
@@ -128,11 +170,10 @@ const FichaEquipo = (() => {
     if(it.enMesa){ ui.toast('Está ofrecido en la mesa común: retiralo primero'); return true; }
     if(!it.equipado && it.trofeo){ ui.toast('Un trofeo no se equipa: se vende en una tienda o se convierte en despojos'); return true; }
     if(!it.equipado && it.tipoItem === 'consumibles'){
-      S.inventario = S.inventario.filter(x => x.id !== id);
-      it.equipado = false;
-      S.cinturon.push(it);
-      ui.cambio(['inventario', 'cinturon']);
-      ui.toast(`${it.nombre} pasó al cinturón`);
+      // Al cinturón, las unidades que entren (1 ranura = 1 unidad; lleno, no entra nada más).
+      const r = alCinturon(S, it);
+      if(r.movidas) ui.cambio(['inventario', 'cinturon']);
+      ui.toast(textoAlCinturon(S, it, r));
       return true;
     }
     if(!it.equipado && it.tipoItem){
@@ -315,6 +356,6 @@ const FichaEquipo = (() => {
   `};
   }
 
-  return {SLOT_DEFS, TIER_COLOR, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
+  return {SLOT_DEFS, TIER_COLOR, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, alCinturon, textoAlCinturon, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
     modTags, thumb, statTxt, html, slotLlenoHtml, compararHtml};
 })();

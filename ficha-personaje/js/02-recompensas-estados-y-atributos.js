@@ -260,7 +260,7 @@ function renderVitals(){
   $('#cap-mochila-bonus-txt').textContent = bonusMochila ? ` (+${fmt(bonusMochila)} de la mochila equipada)` : '';
   const capCinturonBase = num(S.caps.cinturon);
   const capCinturonTotal = capCinturonEfectivo();
-  setCap('cinturon', S.cinturon.length, capCinturonTotal);
+  setCap('cinturon', FichaEquipo.cinturonUsado(S), capCinturonTotal);   // 1 ranura = 1 unidad (2026-10-04)
   $('#cap-cinturon-total').textContent = fmt(capCinturonTotal);
   const bonusCinturon = capCinturonTotal - capCinturonBase;
   $('#cap-cinturon-bonus-txt').textContent = bonusCinturon ? ` (+${fmt(bonusCinturon)} del cinturón equipado)` : '';

@@ -118,7 +118,8 @@ Los **consumibles** (pociones, pergaminos, vendas, bombas…) se gastan al usarl
 | En el **cinturón** | **1** [[Nitros (No2)\|Nitro]] |
 | En la **mochila** | **2** Nitros (el doble) |
 
-- El **cinturón** tiene **5 ranuras** por defecto; se compran cinturones para ampliarlo.
+- Todos arrancan con un **cinturón de 5 ranuras** (personajes, invocaciones y creeps); un cinturón equipado lo amplía.
+- **1 ranura = 1 unidad**: 5 pociones ocupan las 5 ranuras. Con el cinturón lleno **no entra nada más**: lo que no entra se queda en la mochila.
 - Cada consumible viene en **unidades**; algunos tienen varias cargas.
 
 > [!example] Efecto de un pergamino

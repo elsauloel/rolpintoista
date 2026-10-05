@@ -607,7 +607,7 @@ prueba('equipar: slot lleno pide reemplazar, un consumible pasa al cinturón, un
   FichaEquipo.equipar(S, 'c', ui);
   const casco = S.inventario.find(i => i.id === 'c');
   FichaEquipo.reemplazar(S, 'a1', 'a3', ui);
-  igual([lleno, S.cinturon.some(i => i.id === 'p'), avisos.some(t => /trofeo/.test(t)), casco.equipado, S.inventario.find(i => i.id === 'a3').equipado, S.inventario.find(i => i.id === 'a1').equipado, S.nitros, avisos.includes('sin No2'), FichaEquipo.slotLlenoHtml(S, S.inventario.find(i => i.id === 'a1')).includes('data-reemplazar')],
+  igual([lleno, S.cinturon.some(i => i.nombre === 'Poción') && !S.inventario.some(i => i.id === 'p'), avisos.some(t => /trofeo/.test(t)), casco.equipado, S.inventario.find(i => i.id === 'a3').equipado, S.inventario.find(i => i.id === 'a1').equipado, S.nitros, avisos.includes('sin No2'), FichaEquipo.slotLlenoHtml(S, S.inventario.find(i => i.id === 'a1')).includes('data-reemplazar')],
     ['a3', true, true, true, true, false, 0, false, true]);   // casco −1 No2 (3 → 2), reemplazar −2 (2 → 0)
 });
 
@@ -864,7 +864,7 @@ prueba('editor común: un consumible marcado como equipado pasa al cinturón; un
   t.ir('resumen'); t.boton('crear').click(); await espera();
   t.sacar();
   igual([S.inventario.length, S.cinturon.map(i => i.nombre + ' ' + i.equipado), S.efectos.map(e => e.nombre + ' ' + e.turnos), t.avisos.slice(-2)],
-    [0, ['Elixir false'], ['Bendición 3'], ['Elixir pasó al cinturón', 'Bendición activado']]);
+    [0, ['Elixir false'], ['Bendición 3'], ['Elixir: 1 unidad pasó al cinturón', 'Bendición activado']]);
 });
 
 grupo('Combate suelto (Parry, Bloqueo, Fuerza del golpe, Evasión, Daño)');
@@ -1855,6 +1855,21 @@ prueba('invocaciones iguales que todos (dueño, 2026-10-04): la ficha publica su
   const [a, b, c] = FichaResumen.resumen(S).invocaciones;
   igual([a.costoMover, a.pasosGratis, a.reflejos, a.inamovible, a.retirada, a.recuperarse, a.pisadaAtenta, b.costoMover, c.costoMover, c.estados.some(e => e.lento)],
     [FichaCalculo.IT2.nitrosMover, 1, 33, 50, 33, 50, true, FichaCalculo.IT2.nitrosMoverRengo, 0, true]);
+});
+prueba('cinturón (dueño, 2026-10-04): 1 ranura = 1 unidad, base 5; lleno no entra nada más (lo que sobra queda en la mochila) y se suma a la pila igual', () => {
+  const S = FichaGuardado.normalizar({}).S;
+  const poc = n => ({id: 'p' + n, nombre: 'Poción de vida', tipoItem: 'consumibles', consumible: true, unidades: n, ranuras: 1, curahp: 5});
+  S.cinturon = [{...poc(3), id: 'c1'}];
+  const it = poc(7); S.inventario = [it];
+  const r1 = FichaEquipo.alCinturon(S, it);
+  const tras1 = [FichaEquipo.cinturonUsado(S), FichaEquipo.capCinturon(S), S.cinturon.length, S.cinturon[0].unidades, it.unidades, S.inventario.length];
+  const r2 = FichaEquipo.alCinturon(S, it, 1);
+  const txt = FichaEquipo.textoAlCinturon(S, it, r2);
+  S.inventario[0].unidades = 0; S.cinturon[0].unidades = 1;
+  const otra = {...poc(1), id: 'p9', nombre: 'Pergamino de fuego'}; S.inventario = [otra];
+  const r3 = FichaEquipo.alCinturon(S, otra);
+  igual([r1, tras1, r2.movidas, /no entra, el cinturón está lleno \(5\/5\)/.test(txt), r3.movidas, S.inventario.length, S.cinturon.length, FichaEquipo.BASE_CINTURON],
+    [{movidas: 2, quedan: 5, libre: 0}, [5, 5, 1, 5, 5, 1], 0, true, 1, 0, 2, 5]);
 });
 prueba('catálogo: las piernas Común (28) — ninguna pasa de Defensa 1, y las mecánicas nuevas están', () => {
   const L = CATALOGO_BASE.filter(i => i.tipoItem === 'piernas' && i.tier === 'Común');

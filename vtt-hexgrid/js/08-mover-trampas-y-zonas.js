@@ -355,7 +355,8 @@ function zonaEncolar(el, t){
   zonaMostrarSiguiente();
 }
 function zonaMostrarSiguiente(){
-  if(zonaBanner || !zonaCola.length) return;
+  if(zonaBanner) return;
+  if(!zonaCola.length){ AvisoCombate.cartel('zona', null); return; }   // no queda nada: el cartel se cierra (antes quedaba colgado)
   const {elId, tokenId} = zonaCola.shift();
   const el = elementos.get(elId), t = tokens.get(tokenId);
   if(!el || !el.zona || !t || !zonaLeFalta(el, t)){ zonaMostrarSiguiente(); return; }
@@ -423,7 +424,8 @@ function zonaRevisarMantenimiento(){ tokens.forEach(t => zonaRevisarToken(t, tru
 function renderZonaBanner(){
   // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
   if(!zonaBanner){ AvisoCombate.cartel('zona', null); return; }
-  const el = elementos.get(zonaBanner.elId), t = tokens.get(zonaBanner.tokenId);
+  // Con el resultado ya puesto se muestra aunque la zona se haya borrado (2026-10-05: en su último turno se va apenas la resuelven).
+  const el = elementos.get(zonaBanner.elId) || (zonaBanner.resultado ? zonaBanner.el : null), t = tokens.get(zonaBanner.tokenId) || (zonaBanner.resultado ? zonaBanner.t : null);
   if(!el || !el.zona || !t){ zonaBanner = null; zonaMostrarSiguiente(); return; }   // se borró la zona o el token mientras esperaba
   const icono = el.zonaDanoTipo === 'de fuego' || (!el.zonaEstado && !el.zonaDanoTipo) ? '🔥' : '🌫';   // 🔥 solo para el fuego (o una zona vieja de puro daño)
   // Su momento (P146): los demás lo ven en la esquina mientras se resuelve, y el resultado al final.

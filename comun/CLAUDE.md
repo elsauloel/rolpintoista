@@ -1254,3 +1254,12 @@ versión parecida en más de una, es candidato a juntar.
   paga 1 No2 y queda en la Mesa. Reglas: `tipo` admite 'pedido' y su `json` se puede escribir al entregarlo.
 - **`Combatiente.ranurasCinturon`, Portapergaminos** (2026-10-05): `o.portapergaminos` = cuántos pergaminos entran en la ranura aparte (ya no
   `porPergamino`, que los agrupaba de a N).
+- **✨ Armas especiales** (2026-10-05, rework mágico, `../docs/rework-armas.md`): una varita o un báculo es **un hechizo equipable**. El ítem trae
+  `especial = {nombre?, sp, no2? (1), sube? (1), dano, sumaEspecial (true | 0.5), duelo (la Ejecución ✨: objetivo, tira, contra, tipoDano,
+  efectos con caras/éxitos, radio, zona…), trampaColocar?}`. `FichaAcciones.usarArmaEspecial(S, itemId, forzar, ui)` arma una habilidad con eso
+  (`habDeArmaEspecial`) y sigue el camino de una ✨ (`ui.terminar`, `ui.colocarTrampa`); cobra `costoEspecial` = 1 No2 el primer uso del turno,
+  +1 por uso (el conteo es `S.ataquesArma['esp:<id>']`, que vacía el Mantenimiento) y su SP (sin SP alcanza: pregunta y cobra 1 No2 por SP).
+  `armasEspeciales(S)` (las equipadas) y `costoEspecialTxt`; la Botonera (`ficha-botonera.js`) les arma su caja «✨ Armas especiales» con
+  `data-especial` (ficha js/06, mapa js/11). `Combatiente.efectoDeEjecucion` ahora respeta `caras`/`exitos` (efectos con %). Una varita (arma
+  especial sin Tipo) no tiene daño físico (`FichaCombate.armaDanoTxt`) y una varita o un orbe (`orbe: true`) no parrean. Catálogo: 29 armas y 3
+  orbes Comunes (`esp-*`); las partes que todavía no se automatizan dicen «✋ A mano».

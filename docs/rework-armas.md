@@ -1493,3 +1493,14 @@ lluvia ácida 21 y báculo de sangre 19,5), 3 orbes.
   una zona vale por la zona, no por cuántos hay adentro. Ahora el terreno solo suma un poco por el tamaño (`TERRENO_FORMA`: flor ×1,3). Bajan la
   niebla, el aceite, la telaraña, las espinas y la ventisca. **Varita de la luz**: al que revela lo deja **marcado 3 turnos** (la misma marca del
   rastreador).
+- **Espinas (dueño, 2026-10-05):** solo cierra si **los 3 casilleros se ubican en cualquier lado** (dentro del alcance), sueltos, no al lado de quien
+  la tira. → «3 casilleros de espinas donde quieras, dentro del alcance».
+- **Dueño: «avancemos con lo que haya que cambiar del sistema para poder automatizarlas».**
+- **Automatización, primera tanda (2026-10-05):** el motor (`FichaAcciones.usarArmaEspecial`, ver `comun/CLAUDE.md`) y las **29 armas + 3 orbes
+  Comunes cargadas** en `comun/catalogo.js` (`esp-*`). Lo que ya anda solo: proyectiles, áreas con dodge roll, cono, zonas (fogata, miasma, aceite),
+  trampas (telaraña, espinas, runa), cura a un aliado, efectos con % (Escarcha, Quemadura, Parálisis, Pajaritos, Silencio, Armadura rota, Demora),
+  lo físico contra la Defensa con el Ef.Esp sumado, y el costo (1 No2 + 1 por uso, más SP). **Falta (✋ en cada descripción):** la línea recta (láser),
+  los saltos del rayo, el reparto de los misiles, el −1 por distancia, el empuje/atracción, que la marca impida el sigilo, la niebla y los pilares
+  automáticos, la luz, el fuego que queda de la bola, el suelo resbaladizo de la ventisca, el +1d4 del miasma, el crítico de lo físico y los
+  orbes de resguardo y salvaje. La cura quedó en **5 fija** (en vez de 1d8+1: una cura de Ejecución es un número). Las armas especiales de los
+  **creeps** todavía no (rules iguales para todos: pendiente).

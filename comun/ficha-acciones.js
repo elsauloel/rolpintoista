@@ -546,6 +546,53 @@ const FichaAcciones = (() => {
     if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
     ui.toast(`${it.nombre} ${partes.join(' · ')}`);
   }
+  /* ---------- ✨ Armas especiales (2026-10-05, rework mágico, docs/rework-armas.md) ----------
+     Una varita o un báculo es «un hechizo equipable»: el ítem equipado trae `especial` = {nombre?, sp, no2? (1), sube? (1), dano (fórmula),
+     sumaEspecial (true = el Ef.Esp entero, 0.5 = la mitad), duelo (la misma Ejecución ✨ de una habilidad: objetivo, tira, contra, tipoDano,
+     efectos con caras/éxitos, radio…), trampaColocar?}. Usarla arma una habilidad con eso y sigue el mismo camino de una ✨ (cuadro del duelo,
+     área, cono, zona, trampa). Costo (dueño): 1 No2 el primer uso del turno y +1 por cada uso más de ESA arma (el conteo es el de los ataques de
+     cada arma, `S.ataquesArma['esp:<id>']`, que se vacía en el Mantenimiento), más su SP; sin SP, cada SP se paga con 1 No2 más. */
+  const claveEsp = it => 'esp:' + it.id;
+  const armasEspeciales = S => (S.inventario || []).filter(i => i && i.equipado && i.especial && !FichaCalculo.itemRoto(i));
+  const usosEspecial = (S, it) => num((S.ataquesArma || {})[claveEsp(it)]);
+  function costoEspecial(S, it){
+    const e = it.especial || {}, usos = usosEspecial(S, it);
+    return {no2: Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1)), sp: Math.max(0, num(e.sp)), usos};
+  }
+  const spDisponible = S => Math.max(0, num(FichaCalculo.calcular(S).final.sp) - num(S.spGastado));
+  function habDeArmaEspecial(S, it){
+    const e = it.especial || {}, f = FichaCalculo.calcular(S).final;
+    const suma = e.sumaEspecial ? Math.floor(num(f.dmgesp) * (e.sumaEspecial === true ? 1 : num(e.sumaEspecial))) : 0;
+    const dano = String(e.dano || '').trim();
+    return {id: claveEsp(it), deItem: it.id, nombre: e.nombre || it.nombre, detalle: it.detalle || '', modo: 'auto',
+      duelo: e.duelo ? structuredClone(e.duelo) : null, tiradaStat: (e.duelo && e.duelo.tira) || 'pdgmg',
+      tiradaExtra: dano ? dano + (suma > 0 ? `+${suma}` : '') : '', ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {})};
+  }
+  const costoEspecialTxt = (S, it) => { const c = costoEspecial(S, it); return `${fmt(c.no2)} No2${c.sp ? ` + ${fmt(c.sp)} SP` : ''}${c.usos ? ` (uso ${c.usos + 1} del turno)` : ''}`; };
+  async function usarArmaEspecial(S, itemId, forzar, ui, sinSp){
+    const item = armasEspeciales(S).find(x => x.id === itemId);
+    if(!item){ ui.toast('Esa arma especial no está equipada'); return; }
+    const it = habDeArmaEspecial(S, item), c = costoEspecial(S, item);
+    const confirmar = ui.confirmar || (t => typeof confirm === 'function' && confirm(t));
+    let no2 = c.no2, sp = c.sp;
+    if(sp > spDisponible(S) && !sinSp){
+      if(!(await confirmar(`Te falta SP: ${it.nombre} cuesta ${fmt(sp)} SP y tenés ${fmt(spDisponible(S))}. ¿La pagás con No2? (${fmt(no2 + sp)} No2 en vez de ${fmt(no2)} No2 + ${fmt(sp)} SP)`))) return;
+      return usarArmaEspecial(S, itemId, forzar, ui, true);
+    }
+    if(sinSp){ no2 += sp; sp = 0; }
+    if(no2 > num(S.nitros) && !forzar){
+      ui.avisarSinNitros(no2, `usar ${it.nombre}`, () => usarArmaEspecial(S, itemId, true, ui, sinSp));
+      return;
+    }
+    S.nitros = num(S.nitros) - (forzar && no2 > num(S.nitros) ? gastoNitrosForzado(S, no2, `usó ${it.nombre}`) : no2);
+    S.spGastado = num(S.spGastado) + sp;
+    S.ataquesArma = {...(S.ataquesArma || {}), [claveEsp(item)]: c.usos + 1};
+    ui.colocarTrampa(it);
+    ui.terminar(it, null, 0, 0);
+    ui.cambio(['nitros', 'vitals', 'habilidades']);
+    ui.toast(`${it.nombre}: −${fmt(no2)} No2${sp ? ` · −${fmt(sp)} SP` : ''}${sinSp ? ' (sin SP: pagado con No2)' : ''}`);
+  }
+
   // El costo X ya elegido en el cartel (sp y nitros): valida, cobra y sigue como Ejecutar. Devuelve true si se ejecutó.
   function confirmarCostoVariable(S, it, sp, nitros, arma, ui){
     if(sp < 0 || nitros < 0){
@@ -896,7 +943,7 @@ const FichaAcciones = (() => {
     durAviso, desgastarItem, rompeArmaduraAlAzar, estadoDeSpec, aplicarEstadoRecibido, dueloAplicarEfectoPropio, xDeHab, habDueloDatos,
     ataqueDeHabArma, aplicarHabSobreMiDirecto, terminarEjecucionHab,
     habilidadTira, anunciarHabilidad, tirarPrimeraDeHab, tirarSegundaDeHab, registrarAtaqueDeHabilidad, limiteCostoX,
-    ejecutarHabilidad, confirmarCostoVariable,
+    ejecutarHabilidad, confirmarCostoVariable, armasEspeciales, costoEspecial, costoEspecialTxt, habDeArmaEspecial, usarArmaEspecial,
     atacarConArma, ataqueEspecialConArma, NOMBRE_ATAQUE_ESPECIAL,
     tirarValorStat, sobrepesoPagar, parryConArma, bloqueoConArma, fuerzaGolpeValorConArma, fuerzaGolpeConArma, elegirArmaDefensa, armaElegida, tirarDanoDeArma, pedirArmaYTirar,
     aplicarRevivirConAnkh, fijarHp, revisarAnkh, revisarMuerte,

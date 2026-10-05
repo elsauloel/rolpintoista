@@ -450,6 +450,7 @@ document.addEventListener('click', async e => {
   if(b.dataset.soltarse){ soltarse(); return; }
   if(b.dataset.danohab){ tirarSegundaDeHab(b.dataset.danohab); return; }
   if(b.dataset.ejecutar){ ejecutarHabilidad(b.dataset.ejecutar); return; }
+  if(b.dataset.especial){ FichaAcciones.usarArmaEspecial(S, b.dataset.especial, false, habUi); return; }   // ✨ arma especial (2026-10-05)
   if(b.id === 'btn-invocar'){
     const inv = nuevaInvocacion();
     S.invocaciones.push(inv);

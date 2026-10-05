@@ -384,6 +384,24 @@ const FichaBotonera = (() => {
     </div>
   </div>`;
 
+    // ✨ Armas especiales equipadas (2026-10-05): un tiro por botón; el costo sube con cada uso del turno (comun/ficha-acciones.js).
+    const especiales = typeof FichaAcciones !== 'undefined' && FichaAcciones.armasEspeciales ? FichaAcciones.armasEspeciales(S) : [];
+    if(especiales.length) html += `<div class="botonera-caja">
+      <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-especiales" title="Contraer/expandir">👁</button><span>✨ Armas especiales</span></div>
+      <div class="botonera-list-grid">
+        ${especiales.map(i => `<div class="cat-row bot-fila">
+          <div class="bot-fila-info">
+            <div class="cat-nombre">${esc((i.especial && i.especial.nombre) || i.nombre)}</div>
+            <div class="bot-fila-costo" title="Lo que cuesta usarla ahora (el No2 sube con cada uso en el turno)">${esc(FichaAcciones.costoEspecialTxt(S, i))}</div>
+          </div>
+          <div class="bot-fila-btns">
+            <button class="mini" data-view="inventario:${i.id}">Ver</button>
+            <button class="ejecutar-btn${num(S.nitros) < FichaAcciones.costoEspecial(S, i).no2 ? ' sin-recursos' : ''}" data-especial="${i.id}">Usar</button>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+
     html += `<div class="botonera-grid botonera-grid-even">
     <div class="botonera-caja">
       <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-habilidades" title="Contraer/expandir">👁</button><span>Habilidades</span></div>

@@ -39,6 +39,7 @@ const FichaCombate = (() => {
   // El daño de un arma ("2d8 + 3"): dados = Peso (+ amplificado), caras = Tipo, fijo = el del arma + el `extra` (Dmg) si no es de rango.
   function armaDanoTxt(i, extra){
     if(!esArma(i.tipoItem)) return '';
+    if(i.especial && !num(i.tipoDado)) return '';   // una varita (arma especial sin Tipo) no tiene daño físico (2026-10-05)
     const dados = Math.max(1, num(i.peso) || 1) + Math.max(0, num(i.danoAmplificado));
     const tipo = num(i.tipoDado) || 8;
     const fijo = num(i.danoFijo) + (i.armaDeRango ? 0 : num(extra));
@@ -56,7 +57,7 @@ const FichaCombate = (() => {
   function armasYEscudosParaParry(S){
     const manos = asignarManos(S);
     return (S.inventario || [])
-      .filter(i => i.equipado && !FichaCalculo.itemRoto(i) && esMano(i.tipoItem))
+      .filter(i => i.equipado && !FichaCalculo.itemRoto(i) && esMano(i.tipoItem) && !((i.especial || i.orbe) && !armaDanoTxt(i)))   // una varita o un orbe no parrean (2026-10-05)
       .map(i => ({item: i, mano: manos.get(i.id) || null}))
       .sort((a, b) => (a.mano || 99) - (b.mano || 99));
   }

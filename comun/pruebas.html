@@ -873,7 +873,7 @@ const uiCombate = (reg, estado) => ({...uiPrueba(reg), registrarTirada: (o, r) =
   getParry: () => estado.parry, setParry: id => { estado.parry = id; }, elegirArma: (t, armas) => reg.push(`elegir ${t}: ${armas.length}`), efectosAlPegar: it => reg.push('efectos ' + it.nombre)});
 // Un arma y un escudo de verdad del catálogo (con otro nombre, para leer las pruebas).
 const espada = {...structuredClone(CATALOGO_BASE.find(i => i.tipoItem === 'arma_1m' && num(i.tipoDado))), id: 'esp', nombre: 'Espada', equipado: true, efectosGolpe: []};
-const escudo = {...structuredClone(CATALOGO_BASE.find(i => i.tipoItem === 'escudo_1m')), id: 'esc', nombre: 'Escudo', equipado: true};
+const escudo = {...structuredClone(CATALOGO_BASE.find(i => i.tipoItem === 'escudo_1m' && !i.orbe)), id: 'esc', nombre: 'Escudo', equipado: true};
 prueba('Parry cobra 1 No2, tira y deja el Bloqueo esperando con esa misma arma', () => {
   const S = fichaBotonera({nitros: 3, inventario: [espada]}), reg = [], est = {parry: null};
   FichaAcciones.elegirArmaDefensa(S, 'parry', uiCombate(reg, est));
@@ -1956,6 +1956,27 @@ prueba('♻ convertir en despojos (dueño, 2026-10-05): un cuarto del precio, pa
 });
 prueba('daño tóxico (dueño, 2026-10-05): no lo frena la Armadura mágica; el resto de los elementos sí', () => {
   igual(['toxico', 'fuego', 'hielo', 'rayo', 'acido', ''].map(Combatiente.frenaArmaduraMagica), [false, true, true, true, true, true]);
+});
+prueba('✨ armas especiales (2026-10-05): la varita arma su tiro como una Ejecución; el No2 sube 1 por uso en el turno; suma el Ef.Esp si lo dice; no parrea', () => {
+  const S = FichaGuardado.normalizar({}).S;
+  const cat = id => structuredClone(CATALOGO_BASE.find(i => i.id === id));
+  const arc = {...cat('esp-varita-arcana'), id: 'v1', equipado: true}, est = {...cat('esp-varita-de-la-estaca'), id: 'v2', equipado: true}, orbe = {...cat('esp-orbe-de-luz'), id: 'o1', equipado: true};
+  S.inventario = [arc, est, orbe];
+  const h = FichaAcciones.habDeArmaEspecial(S, arc), h2 = FichaAcciones.habDeArmaEspecial(S, est);
+  const ef = FichaCalculo.calcular(S).final.dmgesp;
+  const c0 = FichaAcciones.costoEspecial(S, arc);
+  S.ataquesArma = {'esp:v1': 2};
+  const c2 = FichaAcciones.costoEspecial(S, arc);
+  const hab = Combatiente.habEjecucion(h2, h2.duelo, {stat: () => 5, etq: x => x});
+  igual([h.duelo.objetivo, h.tiradaExtra, h2.tiradaExtra, c0, c2, FichaAcciones.armasEspeciales(S).map(i => i.id), FichaCombate.armasYEscudosParaParry(S).length,
+    hab.dano.ignoraDef, hab.efectos[0].nombre, hab.efectos[0].caras],
+    ['enemigo', '1d4', '2d4' + (ef > 0 ? '+' + Math.floor(ef) : ''), {no2: 1, sp: 1, usos: 0}, {no2: 3, sp: 1, usos: 2}, ['v1', 'v2'], 0, false, 'Escarcha', 3]);
+});
+prueba('✨ armas especiales Comunes (2026-10-05): 29 armas y 3 orbes; cada una automatiza algo o aclara lo que queda a mano', () => {
+  const L = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-'));
+  const armas = L.filter(i => i.especial), orbes = L.filter(i => i.orbe);
+  const sinNada = armas.filter(i => !i.especial.duelo && !i.especial.trampaColocar && !/✋/.test(i.detalle)).map(i => i.nombre);
+  igual([armas.length, orbes.length, L.every(i => i.tier === 'Común' && i.ranuras === 1), sinNada, armas.every(i => /No2/.test(i.detalle))], [29, 3, true, [], true]);
 });
 prueba('mochila (dueño, 2026-10-05, P158): todo ítem ocupa al menos 1 ranura (una pila, 1), salvo que diga lo contrario; el catálogo, todo en 1', () => {
   const R = FichaEquipo.ranuras;

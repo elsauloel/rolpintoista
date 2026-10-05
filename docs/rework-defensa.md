@@ -481,3 +481,13 @@ Lluvia (cualquier calidad, con propuesta de peso; ⚙ = se puede automatizar con
   vive en los guantes).
 - Las de siempre: Defensa (tope Común 1), Tipo 4, Evasión, Iniciativa, Res.CC, y las resistencias elementales solo de relleno.
 
+**Filtro del dueño (2026-10-04):** van las mecánicas de siempre (Defensa con tope Común 1, Tipo 4, Evasión, Iniciativa, Res.CC; elementales de relleno),
+las tres ya aprobadas (Recuperarse rápido, Reflejos de mangosta, Evasión contra contraataque) y las compartidas con las piernas. De la lluvia nueva:
+- **Inamovible** (antes «Anclado»): te hace invulnerable a cualquier movimiento involuntario en el mapa (empujes, portales, Shockwave, Takle), con
+  chance en las calidades bajas. Propuesta de peso: 33 % = 0,5 · 50 % = 0,75 · siempre = 1,5.
+- **Pisada atenta**: la misma tirada de «algo está fuera de lugar» de la Percepción aumentada, pero solo contra trampas. Propuesta: 1.
+- **Pisada silenciosa**: Sigilo.
+- **Pasos de baile**: +1 a la Evasión si ya te moviste en el turno. Peso: el 75 % de +1 Evasión = 1,5.
+Quedan afuera (por ahora): Pie firme, Paso seguro, Suela gruesa, Suela aislante, Despegarse, Levantarse rápido, Botas ruidosas, Salto, Carrerita;
+Botas de marcha sigue en pausa. Propuesta de 27 pies Comunes en la conversación del 2026-10-04 (`pies_comun.py`).
+

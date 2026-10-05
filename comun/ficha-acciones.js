@@ -571,7 +571,10 @@ const FichaAcciones = (() => {
       tiradaExtra: dano ? dano + (suma > 0 ? `+${suma}` : '') : '', ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {})};
   }
   // Lo que dice «¿Qué ataque es?» de un arma especial: su costo ahora y la primera frase de lo que hace.
-  const ataqueEspecialMenu = (S, it) => ({costo: costoEspecialTxt(S, it), que: String(it.detalle || '').split(' ⚙')[0].split(' ✋')[0].slice(0, 160)});
+  const ataqueEspecialMenu = (S, it) => {
+    const t = String(it.detalle || '').split(' ⚙')[0].split(' ✋')[0].trim();
+    return {costo: costoEspecialTxt(S, it), que: t.length <= 200 ? t : t.slice(0, 200).replace(/[\s,;:(]+\S*$/, '') + '…'};   // corta en una palabra, nunca a la mitad
+  };
   const costoEspecialTxt = (S, it) => { const c = costoEspecial(S, it); return `${fmt(c.no2)} No2${c.sp ? ` + ${fmt(c.sp)} SP` : ''}${c.usos ? ` (uso ${c.usos + 1} del turno)` : ''}`; };
   async function usarArmaEspecial(S, itemId, forzar, ui, sinSp){
     const item = armasEspeciales(S).find(x => x.id === itemId);

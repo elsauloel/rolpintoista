@@ -1499,8 +1499,10 @@ lluvia ácida 21 y báculo de sangre 19,5), 3 orbes.
 - **Automatización, primera tanda (2026-10-05):** el motor (`FichaAcciones.usarArmaEspecial`, ver `comun/CLAUDE.md`) y las **29 armas + 3 orbes
   Comunes cargadas** en `comun/catalogo.js` (`esp-*`). Lo que ya anda solo: proyectiles, áreas con dodge roll, cono, zonas (fogata, miasma, aceite),
   trampas (telaraña, espinas, runa), cura a un aliado, efectos con % (Escarcha, Quemadura, Parálisis, Pajaritos, Silencio, Armadura rota, Demora),
-  lo físico contra la Defensa con el Ef.Esp sumado, y el costo (1 No2 + 1 por uso, más SP). **Falta (✋ en cada descripción):** la línea recta (láser),
-  los saltos del rayo, el reparto de los misiles, el −1 por distancia, el empuje/atracción, que la marca impida el sigilo, la niebla y los pilares
+  lo físico contra la Defensa con el Ef.Esp sumado, y el costo (1 No2 + 1 por uso, más SP). **Falta (✋ en cada descripción):** la línea recta (láser), el reparto de los misiles, el −1 por distancia, el empuje/atracción, que la marca impida el sigilo, la niebla y los pilares
   automáticos, la luz, el fuego que queda de la bola, el suelo resbaladizo de la ventisca, el +1d4 del miasma, el crítico de lo físico y los
   orbes de resguardo y salvaje. La cura quedó en **5 fija** (en vez de 1d8+1: una cura de Ejecución es un número). Las armas especiales de los
   **creeps** todavía no (rules iguales para todos: pendiente).
+- **Los saltos del rayo, automáticos (2026-10-05, el dueño: «ya está el efecto programado en las trampas eléctricas»):** la Ejecución puede llevar
+  `cadena: {saltos, rango}`; cuando el golpe entra, el mapa del GM (`dueloCadena`, js/13) usa el mismo ⚡ Rayo en cadena del token (`rayoCadena` /
+  `rayoCadenaAplicar`, js/10) con el rayo a la vista (`rayoSaltoEfecto`, js/19). La Varita de chispa eléctrica salta 2 veces.

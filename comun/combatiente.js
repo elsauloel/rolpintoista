@@ -592,6 +592,9 @@ const Combatiente = (() => {
       efectos: (c.efectos || []).map(efectoDeEjecucion),
       ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: nf(c.radio)} : {}),
       ...(c.objetivo === 'onda' && c.ondaDodge ? {dodge: true} : {}),   // la onda que deja dodge roll (Daño en área)
+      // Rayo en cadena (2026-10-05, Varita de chispa eléctrica): si el golpe entra, salta `saltos` veces al más cercano del mismo bando a
+      // `rango` casillas o menos, la mitad cada salto (P118: la misma regla de ⚡ Rayo en cadena del token y de la trampa Descarga).
+      ...(c.cadena ? {cadena: {saltos: Math.max(1, Math.round(nf(c.cadena.saltos)) || 2), rango: Math.max(1, Math.round(nf(c.cadena.rango)) || 3)}} : {}),
       ...(c.efectoLibre ? {efectoLibre: sx(c.efectoLibre)} : {}),
       ...(c.efectosNota ? {efectosNota: sx(c.efectosNota)} : {}),
       ...(c.contraOtro ? {contraOtro: c.contraOtro} : {}),

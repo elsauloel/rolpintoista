@@ -773,11 +773,23 @@ async function dueloAplicarDano(d){
     // Habilidad que drena: todo lo que perdió. Arma que drena (2026-10-03): su % de lo que perdió de verdad (curar redondea para arriba).
     const drena = d.hab && d.hab.dano && d.hab.dano.drena ? await dueloDrenar(d, perdio)
       : !d.hab && num(dn.drenaPct) > 0 ? await dueloDrenar(d, Math.ceil(perdio * num(dn.drenaPct) / 100)) : null;
+    // Rayo en cadena (2026-10-05): el golpe de una habilidad o arma especial de rayo salta (la misma regla de ⚡ Rayo en cadena del token).
+    if(d.hab && d.hab.cadena && golpe > 0 && !res.r.invulnerable) await dueloCadena(d, golpe).catch(err => console.error('No se pudo hacer saltar el rayo:', err));
     return {...base, desgaste, defensa: crit ? restaIgnorando : def, ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);
     return {...base, defensa: def, manual: true, golpe: base.mitad ? aplicar : golpe, motivoManual: err && err.message === 'SIN_DEF' ? 'la ficha todavía no publicó su Defensa' : 'falló la escritura'};
   }
+}
+
+// Los saltos del rayo: al más cercano del mismo bando que el golpeado, la mitad cada salto (rayoCadena, js/10), hasta `saltos` veces; se ve el rayo
+// saltando en el mapa (rayoSaltoEfecto, js/19) y se aplica lo que este cliente puede (rayoCadenaAplicar: el GM los creeps; lo demás, en la Mesa).
+async function dueloCadena(d, golpe){
+  const id = d.defensor && d.defensor.tokenId;
+  if(!id || !tokens.get(id)) return;
+  const c = d.hab.cadena, cadena = rayoCadena(id, golpe).slice(0, 1 + Math.max(1, num(c.saltos) || 2));
+  for(let i = 1; i < cadena.length; i++) if(typeof rayoSaltoEfecto === 'function') rayoSaltoEfecto(cadena[i - 1].id, cadena[i].id);
+  await rayoCadenaAplicar(cadena);
 }
 
 // Opciones de defensa de un creep, calculadas en el mapa del GM sin cargar las Acciones: Evasión o Parry con su arma (siempre 1 No2). null = no es un creep mío.

@@ -1972,6 +1972,12 @@ prueba('✨ armas especiales (2026-10-05): la varita arma su tiro como una Ejecu
     hab.dano.ignoraDef, hab.efectos[0].nombre, hab.efectos[0].caras],
     ['enemigo', '1d4', '2d4' + (ef > 0 ? '+' + Math.floor(ef) : ''), {no2: 1, sp: 1, usos: 0}, {no2: 3, sp: 1, usos: 2}, ['v1', 'v2'], 0, false, 'Escarcha', 3]);
 });
+prueba('✨ varita de chispa eléctrica (2026-10-05): su Ejecución lleva la cadena del rayo (2 saltos, a 3 casillas)', () => {
+  const S = FichaGuardado.normalizar({}).S, v = {...structuredClone(CATALOGO_BASE.find(i => i.id === 'esp-varita-de-chispa-electrica')), id: 'r', equipado: true};
+  S.inventario = [v];
+  const h = FichaAcciones.habDeArmaEspecial(S, v), hab = Combatiente.habEjecucion(h, h.duelo, {stat: () => 5, etq: x => x});
+  igual([hab.cadena, hab.dano.tipo, hab.efectos[0].nombre, hab.efectos[0].caras], [{saltos: 2, rango: 3}, 'rayo', 'Parálisis', 10]);
+});
 prueba('✨ armas especiales Comunes (2026-10-05): 29 armas y 3 orbes; cada una automatiza algo o aclara lo que queda a mano', () => {
   const L = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-'));
   const armas = L.filter(i => i.especial), orbes = L.filter(i => i.orbe);

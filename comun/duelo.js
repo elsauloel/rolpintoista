@@ -485,6 +485,7 @@ const Duelo = (() => {
     const objetivo = ['enemigo', 'aliado', 'uno mismo', 'area', 'onda', 'cono'].includes(h.objetivo) ? h.objetivo : 'enemigo';
     return {nombre: txtCorto(h.nombre, 60), objetivo, tira: t, contra, dano, efectos, sinOposicion: !(t && contra.length),
       ...(objetivo === 'onda' && h.dodge ? {dodge: true} : {}),
+      ...(h.cadena ? {cadena: {saltos: Math.min(6, Math.max(1, Math.round(_num(h.cadena.saltos)) || 2)), rango: Math.min(6, Math.max(1, Math.round(_num(h.cadena.rango)) || 3))}} : {}),   // rayo en cadena (2026-10-05)
       ...(h.efectoLibre ? {efectoLibre: txtCorto(h.efectoLibre, 200)} : {}),
       ...(h.efectosNota ? {efectosNota: txtCorto(h.efectosNota, 200)} : {}),
       // «Otro»: se resiste con algo que no está en la lista de stats — texto libre para que la mesa lo

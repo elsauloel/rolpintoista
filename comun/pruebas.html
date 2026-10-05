@@ -2025,11 +2025,11 @@ prueba('efectos con 33 % (dueño, 2026-10-05: «tirar d3 es feo»): se tiran con
   const g = EfectosGolpe.normalizar({nombre: 'Escarcha', caras: 3, exitos: 1});
   igual([g.caras, g.exitos, EfectosGolpe.normalizar({nombre: 'X', caras: 4, exitos: 1}).caras], [6, 2, 4]);
 });
-prueba('Botonera (dueño, 2026-10-05): «Tiradas de stats» muestra solo lo que se tira — un stat nuevo de equipo (ranuras, resistencias, %) no se cuela', () => {
+prueba('Botonera (dueño, 2026-10-05): «Tiradas de stats» muestra solo lo que se tira — un stat nuevo de equipo (ranuras, resistencias, %) no se cuela — y cada uno debajo de su atributo', () => {
   const h = FichaBotonera.html(fichaBotonera(), {modoMapa: 'combate'}).html, d = document.createElement('div'); d.innerHTML = h;
   const caja = [...d.querySelectorAll('.botonera-caja')].find(c => /Tiradas de stats/i.test(c.textContent));
   igual([caja && [...caja.querySelectorAll('.bt-label')].map(x => x.textContent.trim()), FichaBotonera.statsConTirada().some(s => /^(res(fuego|hielo|rayo|toxico|acido)|ranura|pasamanos|alforja|retirada)/.test(s.id))],
-    [['Con', 'Fue', 'Agi', 'Des', 'Esp', 'Res.Esp', 'Res.CC', 'Iniciativa', 'Percep.', 'Sigilo', 'PdG.Esp', 'Ef.Esp', 'Res.Mt'], false]);
+    [['Con', 'Res.Esp', 'Res.CC', 'Fue', 'Agi', 'Iniciativa', 'Des', 'Percep.', 'Sigilo', 'Esp', 'PdG.Esp', 'Ef.Esp', 'Res.Mt'], false]);
 });
 prueba('✨ armas especiales Comunes (2026-10-05): 30 armas y 3 orbes; cada una automatiza algo o aclara lo que queda a mano', () => {
   const L = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-'));

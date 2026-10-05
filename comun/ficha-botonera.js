@@ -374,8 +374,10 @@ const FichaBotonera = (() => {
     </div>
     <div class="botonera-caja">
       <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-stats" title="Contraer/expandir">👁</button><span>Tiradas de stats</span></div>
-      <div class="botonera-stats-grid">
-        ${statsRollables.map(s => {
+      <div class="botonera-stats-cols">
+        ${/* Cada atributo con sus secundarios debajo (dueño, 2026-10-05: «PdG.Esp y Ef.Esp deberían estar abajo de Esp»): una columna por atributo,
+             con los que salen de él según FichaCalculo.GRUPOS. */ ''}
+        ${FichaCalculo.GRUPOS.map(g => `<div class="botonera-stats-col">${[g, ...g.derived].filter(s => statsRollables.some(x => x.id === s.id)).map(s => {
           const m = c.modTotal[s.id];
           const valCls = m>0 ? 'mod-plus' : m<0 ? 'mod-minus' : '';
           const origins = c.mods[s.id] || [];
@@ -388,7 +390,7 @@ const FichaBotonera = (() => {
             <span class="bt-value ${valCls}">${fmt(c.final[s.id])}</span>
             ${m ? `<span class="bt-mod">${m>0?'+':''}${fmt(m)}</span>` : ''}
           </button>`;
-        }).join('')}
+        }).join('')}</div>`).join('')}
       </div>
     </div>
   </div>`;

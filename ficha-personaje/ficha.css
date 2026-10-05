@@ -842,6 +842,9 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 }
 .botonera-list-subhead:first-child{margin-top:0}
 .botonera-stats-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+/* Tiradas de stats del personaje: una columna por atributo, con sus secundarios debajo (2026-10-05) */
+.botonera-stats-cols{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;align-items:start}
+.botonera-stats-col{display:flex;flex-direction:column;gap:6px}
 .botonera-combate-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
 /* Esquivar alto a la izquierda; Parry y Bloqueo apilados a la derecha,
    igual que en la caja Combate de la ficha. */

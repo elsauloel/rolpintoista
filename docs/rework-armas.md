@@ -1322,3 +1322,8 @@ en el mapa, apoyo) · qué gasta (No2, cargas por combate, SP) · la forma (proy
 | Bastón zahorí | Marca a un rival: el próximo aliado que lo ataque, +1 PdG |
 | Pipa de humo | Entrás en Sigilo sin pagar No2, una vez por combate |
 | Varita de cargas | 3 disparos arcanos de 1d6 por combate, sin tirada de Especial (PdG común): la del que no es mago |
+
+**2026-10-05 · Tipos y elementos (dueño):** asociar los Tipos (6, 8…) con elementos «me parece medio forzado» → **descartado**. En el daño que
+**no es físico**, el dado **no tiene Tipo ni familia** (no es punzante, cortante, contundente…): «los dados van a ser dados». Solo lo **físico**
+(una lanza de hielo, una piedra) sigue con su Tipo y lo que eso trae (Defensa, crítico, resistencias a crítico). (El dueño cortó la frase en «y se
+van a contemplar como…»: falta completar.)

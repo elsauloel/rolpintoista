@@ -1267,6 +1267,9 @@ versión parecida en más de una, es candidato a juntar.
   especial sin Tipo) no tiene daño físico (`FichaCombate.armaDanoTxt`) y una varita o un orbe (`orbe: true`) no parrean. Catálogo: 30 armas y 3
   orbes Comunes (`esp-*`); las partes que todavía no se automatizan dicen «✋ A mano». `especial.estadoPropio` (2026-10-05, Varita de la luz): un
   estado que se pone quien la usa al usarla (la luz: Luz portada 3 y Ve lo oculto 3, 1 turno).
+- **`capas.js`** (2026-10-05, dueño: «hay menús que quedan detrás de otros»): la última ventana (`.scrim`) que se abre queda arriba de las que ya
+  estaban abiertas (le sube el z-index mientras está abierta; al cerrarse vuelve al suyo). Se carga en la ficha, GM Tools, el generador de tiendas y
+  el mapa; no hay que llamar nada. Caso que lo motivó: en la ficha, «Vender a la tienda» quedaba detrás de la tienda.
 - **Marcado** (2026-10-05): preset nuevo (`marcado: true`). `Combatiente.agregarEstado`: al ponerse saca el Sigilo; mientras dura, el Sigilo
   rebota (`inmunidad` → 'Marcado'); `Combatiente.marcadoEn(estados)`. `FichaAcciones.alternarSigilo` avisa y no entra. El mapa lo hace brillar
   (`marcado`, `brilloMarca`) y lo deja ver a través de la niebla.

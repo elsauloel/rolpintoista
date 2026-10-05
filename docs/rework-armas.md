@@ -1449,3 +1449,10 @@ lluvia ácida 21 y báculo de sangre 19,5), 3 orbes.
   cura 1d6, miasma 1d3, destello y susurro con 1d3) y se bajaron la ráfaga (a un solo objetivo) y el báculo de aprendiz (2 SP). El Báculo de brasas
   pasó a candidato de Buena. Todas quedan con un neto de 3,5 a 8 por turno (techo Común ~6, de 2,3 a 9,6); la lanza de hielo queda en 3,5 porque la
   calculadora no cuenta su crítico. El muro pasó a valer 2,5 (bloquea paso y visión).
+- **Tercera vuelta del costo (dueño, 2026-10-05, «probemos así»): cada varita (y cada báculo) se usa UNA VEZ POR TURNO, y cuesta 1 No2 + el SP que diga.**
+  Porqué: con el costo que sube, cada tiro quedaba chico («un dado de 3 eléctrico que salta me parece muy triste»); sin incremento ni límite, un mago
+  con SP tiraba 7 veces por turno (4 veces un guerrero). Con una vez por turno el tiro tiene gracia y el número cierra: el valor por turno es el de
+  un uso. El SP frena a quien no tiene mucho; las varitas son de una mano, así que un mago con dos varitas tira dos veces (y renuncia a escudo y orbe).
+  La comparación no cuenta la esquiva (los dos lados tienen que acertar), pero la varita enfrenta menos capas de defensa que un arma física (sin Parry,
+  Bloqueo ni Defensa) y los saltos del rayo no se esquivan: por prudencia, cada tiro Común va de ~5,5 a ~7,5. Pool rehecho así (28 + 3 orbes, en
+  `herramientas/calculadora_especiales.py`).

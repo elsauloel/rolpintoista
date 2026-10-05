@@ -1238,3 +1238,12 @@ versión parecida en más de una, es candidato a juntar.
   `capCinturon` (base `BASE_CINTURON` 5 + `capcinturon`), `textoAlCinturon`. Creeps: `CreepCalculo.capCinturon/cinturonUsado/cinturonLibre`,
   `CreepAcciones.alCinturon/quitarDelCinturon/consumir/colocarTrampaDeItem/consumiblesDe` y la sección `CreepBotonera.cinturonHtml` de sus Acciones.
   Las invocaciones no llevan cinturón (decisión del dueño).
+- **`intercambio.js`** (`Intercambio`, 2026-10-05, P157; reemplaza a la «mesa común» de la ficha) — **pasarle cosas a otro personaje y el baúl
+  común**, para la ficha y el mapa. Ofrecer (fuera de combate, a cualquiera): el ítem queda `reservado` (+ `reservadoPara`) en quien lo ofrece hasta
+  que el otro acepta (no se usa, equipa ni vende: lo miran `FichaEquipo.equipar`, `FichaAcciones.consumir`, `FichaTienda.vendibles` y la Moneda
+  Re-Roll); oro y despojos se apartan al ofrecer. Quien recibe ve «Te ofrecen algo — Aceptar / Rechazar»; la pantalla de quien ofreció cierra el
+  paquete (transacción) y saca o libera lo reservado. El baúl: solo desde una tienda abierta y fuera de combate, 10 ranuras por personaje de la
+  partida (`POR_INTEGRANTE`), registro `baulLog` + Mesa. `iniciar(host)` con `host = {maneja(id), leer(id), con(id, async S => bool), enCombate(),
+  tienda(), toast, propias()}` (ficha: `intercambioHost`, js/08; mapa: `intercambioHostMapa`, js/11); `abrirDar(fichaId, {itemId})`,
+  `abrirBaul(fichaId)`, `botonDar(it)` (el botón de la mochila), `clic(b, fichaId)`. Devuelve sola lo que quedó en la vieja mesa común.
+  Colecciones `paquetes`, `baul`, `baulLog` (reglas nuevas).

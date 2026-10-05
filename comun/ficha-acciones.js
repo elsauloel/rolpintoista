@@ -224,7 +224,7 @@ const FichaAcciones = (() => {
     return {costo, saque, bolsillo};
   }
   async function consumir(S, id, forzar, ui, sacado){
-    { const enM = S.inventario.find(x => x.id === id); if(enM && enM.enMesa){ ui.toast('Está ofrecido en la mesa común: retiralo primero'); return; } }
+    { const it = [...(S.inventario || []), ...(S.cinturon || [])].find(x => x.id === id); if(it && (it.enMesa || it.reservado)){ ui.toast(`Está ofrecido a ${it.reservadoPara || 'otro personaje'}: cancelá la oferta primero (🤝)`); return; } }   // 🤝 comun/intercambio.js
     let it = S.inventario.find(x=>x.id===id);
     let key = 'inventario';
     if(!it){ it = S.cinturon.find(x=>x.id===id); key = 'cinturon'; }
@@ -876,7 +876,7 @@ const FichaAcciones = (() => {
       // Forma única de trampa (P123): el `tamano` de la flor es su radio (tamano 2 = flor de 19 casillas, como dice el ítem).
       const r = await TokensAuto.colocarTrampas({fichaId, tipoToken: 'pj',
         trampa: {...d, nombre: String(d.nombre || it.nombre).slice(0, 40), dano, cant: 1},
-        item: (() => { const c = structuredClone(it); delete c.imagen; delete c.equipado; delete c.enMesa; delete c.id; c.unidades = 1; c.cargaActual = 1; return JSON.stringify(c); })()});
+        item: (() => { const c = structuredClone(it); delete c.imagen; delete c.equipado; delete c.enMesa; delete c.reservado; delete c.reservadoPara; delete c.id; c.unidades = 1; c.cargaActual = 1; return JSON.stringify(c); })()});
       if(r.colocadas){ ui.toast(`🪤 ${it.nombre} colocada junto a tu token: arrastrala en el mapa a donde la quieras`); return true; }
       ui.toast(r.motivo === 'sin-token' ? `🪤 ${it.nombre}: tu personaje no tiene token en el mapa en juego — no se usó` : `🪤 ${it.nombre}: no hay lugar libre al lado de tu token — no se usó`);
       return false;

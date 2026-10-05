@@ -913,7 +913,7 @@ function invRow(i, contexto){
         </div>
         <div class="rowbtns">
           ${!i.consumible ? `<button class="mini ${i.equipado?'on':''}" data-toggle="${i.id}" title="${i.equipado?'Pasar a mochila':'Equipar'}">${i.equipado?'← Mochila':'Equipar'}</button>` : ''}
-          ${(contexto === 'mochila') ? (i.enMesa ? `<button class="mini" data-mesa-ret-item="${i.enMesa}" title="Sacarlo de la mesa común">🤝 En la mesa · retirar</button>` : `<button class="mini" data-mesa-pub="${i.id}" title="Ofrecerlo en la mesa común: sigue en tu mochila hasta que otro jugador se lo lleve">🤝 A la mesa</button>`) : ''}
+          ${(contexto === 'mochila') ? Intercambio.botonDar(i) : ''}
           ${(contexto === 'mochila' && i.consumible) ? `<button class="mini" data-tocinturon="${i.id}" ${num(i.unidades)<=0?'disabled':''} title="Mover 1 unidad de esta pila al cinturón">→ Cinturón</button>` : ''}
           <button class="mini" data-view="inventario:${i.id}">Ver</button><button class="mini" data-edit="inventario:${i.id}">Editar</button>
           <button class="mini danger" data-rmitem="inventario:${i.id}" title="Eliminar">×</button>
@@ -943,7 +943,7 @@ const LISTS = {
           ${i.detalle ? `<div class="idesc">${esc(i.detalle)}</div>` : ''}
         </div>
         <div class="rowbtns">
-          <button class="mini" data-tomochila="${i.id}" title="Devolver esta unidad a la mochila">← Mochila</button>
+          ${Intercambio.botonDar(i)}<button class="mini" data-tomochila="${i.id}" title="Devolver esta unidad a la mochila">← Mochila</button>
           <button class="mini" data-view="cinturon:${i.id}">Ver</button><button class="mini" data-edit="cinturon:${i.id}">Editar</button>
           <button class="mini danger" data-rmitem="cinturon:${i.id}" title="Eliminar">×</button>
         </div>

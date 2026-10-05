@@ -186,7 +186,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
       <section class="card card--mochila">
         <header>
           <div class="titulo-colapsable"><button type="button" class="colapsar-btn" data-colapsar="mochila" title="Contraer/expandir">👁</button><h2>Mochila</h2></div>
-          <div style="display:flex;gap:6px"><button class="iconbtn" id="btn-mesa-comun" title="Mesa común: ítems, DDE y despojos que se comparten entre los jugadores">🤝 Mesa <b id="mesa-comun-n"></b></button><button class="iconbtn iconbtn-add" data-add-inv="0">+ Ítem</button></div>
+          <div style="display:flex;gap:6px"><button class="iconbtn" id="btn-pasar" title="Pasarle DDE o despojos a otro personaje, y ver lo que ofreciste (un ítem: 🤝 Dar en su tarjeta)">🤝 Pasar</button><button class="iconbtn iconbtn-add" data-add-inv="0">+ Ítem</button></div>
         </header>
         <div class="body">
           <div class="cap"><span>Ranuras usadas</span><span><b id="cap-mochila-n">0</b> / <input id="f-capmochila" type="number" style="width:52px;display:inline-block;padding:1px 4px;font-family:'Space Mono',monospace"><span id="cap-mochila-bonus-txt" class="hint"></span></span></div>
@@ -436,6 +436,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
       <h3>Catálogo del fabricante</h3>
       <div style="display:flex;gap:8px;align-items:center">
         <span class="tienda-badge" id="tienda-badge" style="display:none"></span>
+        <button class="iconbtn" id="tienda-baul" style="display:none" title="El baúl común del grupo: guardar y sacar ítems, oro y despojos (queda anotado quién)">📦 Baúl común</button>
         <button class="iconbtn" id="tienda-vender" style="display:none" title="Vender ítems de tu mochila y despojos a esta tienda">💰 Vender</button>
         <button class="iconbtn" id="tienda-reparar" style="display:none" title="Reparar tu equipo con el herrero (se paga por punto de durabilidad)">🔧 Reparación</button>
         <button class="iconbtn" id="tienda-salir" style="display:none">Ver catálogo completo</button>
@@ -754,13 +755,6 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
   </div>
 </div>
 
-<div class="scrim" id="scrim-mesa-comun">
-  <div class="modal" style="max-width:760px;width:94vw">
-    <header><h3>🤝 Mesa común</h3><button class="iconbtn" id="mesa-comun-x">Cerrar</button></header>
-    <div class="body" id="mesa-comun-body"></div>
-  </div>
-</div>
-
 <div class="scrim" id="scrim-comparar">
   <div class="modal" style="max-width:560px">
     <header><h3>Comparar</h3><button class="iconbtn" id="comparar-x">Cerrar</button></header>
@@ -851,6 +845,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/estados-presets.js?v=20261004p1"></script>
 <script src="../comun/estados-aplicar.js?v=20261004p1"></script>
 <script src="../comun/recibidos.js?v=20261004r1"></script>
+<script src="../comun/intercambio.js?v=20261005i1"></script>
 <script src="../comun/trampas-base.js?v=20261002tr2"></script>
 <script src="../comun/asistente-trampa.js?v=20261004b1"></script>
 <script src="../comun/elegir-trampa.js?v=20261004q"></script>
@@ -868,18 +863,18 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/ficha-resumen.js?v=20261004q1"></script>
 <script src="../comun/inv-calculo.js?v=20261003fi"></script>
 <script src="../comun/ficha-mantenimiento.js?v=20261004q"></script>
-<script src="../comun/ficha-equipo.js?v=20261005b1"></script>
+<script src="../comun/ficha-equipo.js?v=20261005i1"></script>
 <script src="../comun/ficha-botin.js?v=20261002a"></script>
 <script src="../comun/item-corto.js?v=20261004b1"></script>
-<script src="../comun/ficha-tienda.js?v=20261004r2"></script>
+<script src="../comun/ficha-tienda.js?v=20261005i1"></script>
 <script src="../comun/ficha-stats.js?v=20261002a"></script>
 <script src="../comun/inv-botonera.js?v=20261004so"></script>
 <script src="../comun/inv-acciones.js?v=20261004fc"></script>
 <script src="../comun/inv-duelo.js?v=20261004p1"></script>
 <script src="../comun/inv-habilidades.js?v=20261004na"></script>
 <script src="../comun/inv-lupa.js?v=20261001a"></script>
-<script src="../comun/ficha-acciones.js?v=20261005c1"></script>
-<script src="../comun/ficha-duelo.js?v=20261004p1"></script>
+<script src="../comun/ficha-acciones.js?v=20261005i1"></script>
+<script src="../comun/ficha-duelo.js?v=20261005i1"></script>
 <script src="../comun/ficha-lupa.js?v=20261002b"></script>
 <script src="../comun/paso-a-paso.js?v=20261002g"></script>
 <script src="../comun/asistente-personaje.js?v=20261002c"></script>
@@ -893,16 +888,16 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="js/01-modelo-y-reglas.js?v=20261004r1"></script>
 <script src="js/02-recompensas-estados-y-atributos.js?v=20261005c1"></script>
 <script src="js/03-tiradas.js?v=20261001g"></script>
-<script src="js/04-invocaciones.js?v=20261004so"></script>
+<script src="js/04-invocaciones.js?v=20261005i1"></script>
 <script src="js/05-estados-y-botonera.js?v=20261001f"></script>
-<script src="js/06-cajas-y-carga.js?v=20261005b1"></script>
+<script src="js/06-cajas-y-carga.js?v=20261005i1"></script>
 <script src="js/07-editor-y-catalogo.js?v=20261002zt"></script>
-<script src="js/08-equipo-botin-y-mesa-comun.js?v=20261002y"></script>
-<script src="js/09-inventario-y-tienda.js?v=20261002y"></script>
+<script src="js/08-equipo-botin-y-mesa-comun.js?v=20261005i1"></script>
+<script src="js/09-inventario-y-tienda.js?v=20261005i1"></script>
 <script src="js/10-habilidades-pasivas-e-items.js?v=20261002l"></script>
 <script src="js/11-combate.js?v=20261003sn"></script>
 <script src="js/12-en-vivo.js?v=20261002zu"></script>
-<script src="js/13-bitacora.js?v=20260930a"></script>
+<script src="js/13-bitacora.js?v=20261005i1"></script>
 <script src="js/14-modo-botonera.js?v=20261002zs"></script>
 </body>
 </html>

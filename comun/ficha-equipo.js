@@ -205,7 +205,7 @@ const FichaEquipo = (() => {
   function equipar(S, id, ui){
     const it = (S.inventario || []).find(x => x.id === id);
     if(!it) return false;
-    if(it.enMesa){ ui.toast('Está ofrecido en la mesa común: retiralo primero'); return true; }
+    if(it.enMesa || it.reservado){ ui.toast(`Está ofrecido a ${it.reservadoPara || 'otro personaje'}: cancelá la oferta primero (🤝)`); return true; }   // 🤝 comun/intercambio.js
     if(!it.equipado && it.trofeo){ ui.toast('Un trofeo no se equipa: se vende en una tienda o se convierte en despojos'); return true; }
     if(!it.equipado && it.tipoItem === 'consumibles'){
       // Al cinturón, las unidades que entren (1 ranura = 1 unidad; lleno, no entra nada más).
@@ -308,7 +308,7 @@ const FichaEquipo = (() => {
       <div class="equipo-slot-cab"><span>${esc(sd.label)}</span></div>
       ${items.map(it => {
         const info = slotOcupado(S, it);
-        return filaHtml(it, `${aManoBoton(S, it)}<button type="button" class="mini on" data-toggle="${it.id}" title="${info && info.ocupado ? 'El slot está lleno: te deja reemplazar o comparar' : 'Equipar'}">${info && info.ocupado ? 'Cambiar…' : 'Equipar'}</button>`);
+        return filaHtml(it, `${typeof Intercambio !== 'undefined' ? Intercambio.botonDar(it) : ''}${aManoBoton(S, it)}<button type="button" class="mini on" data-toggle="${it.id}" title="${info && info.ocupado ? 'El slot está lleno: te deja reemplazar o comparar' : 'Equipar'}">${info && info.ocupado ? 'Cambiar…' : 'Equipar'}</button>`);
       }).join('')}
     </div>`;
     }).join('');

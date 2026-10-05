@@ -21,9 +21,9 @@ const FichaDuelo = (() => {
   /* ---------- Moneda Re-Roll (js/02) ---------- */
   const esMonedaReroll = i => !!i && !!(i.rerollMoneda || /moneda re-?roll/i.test(String(i.nombre || '')));
   function monedaReroll(S){
-    const enC = S.cinturon.find(i => esMonedaReroll(i) && num(i.unidades) > 0);
+    const enC = S.cinturon.find(i => esMonedaReroll(i) && num(i.unidades) > 0 && !i.reservado);
     if(enC) return {key: 'cinturon', it: enC};
-    const enM = S.inventario.find(i => esMonedaReroll(i) && num(i.unidades) > 0 && !i.enMesa);
+    const enM = S.inventario.find(i => esMonedaReroll(i) && num(i.unidades) > 0 && !i.enMesa && !i.reservado);
     return enM ? {key: 'inventario', it: enM} : null;
   }
   // Tira la moneda: par se conserva, impar se rompe.

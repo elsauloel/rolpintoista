@@ -86,6 +86,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="trampas-base.js"></script>
 <script src="item-corto.js"></script>
 <script src="ficha-tienda.js"></script>
+<script src="intercambio.js"></script>
 <script src="ficha-stats.js"></script>
 <script src="tiradas-propias.js"></script>
 <script src="efectos-golpe.js"></script>
@@ -1919,6 +1920,32 @@ prueba('consumir (2026-10-05): Saque rápido siempre = el primero del turno del 
   await FichaAcciones.consumir(S, 'p2', false, ui); const t3 = S.nitros;
   await FichaAcciones.consumir(S, 'p2', false, ui); const t4 = S.nitros;
   igual([t1, t2, t3, t4], [[6, 10], 5, 4, 2]);
+});
+prueba('🤝 pasar cosas (P157, 2026-10-05): separar parte de una pila la reserva sola; liberarla la vuelve a juntar; aceptada, sale', () => {
+  const S = FichaGuardado.normalizar({}).S;
+  S.inventario = [{id: 'p1', nombre: 'Poción de vida', tipoItem: 'consumibles', consumible: true, unidades: 4, ranuras: 1, precioCompra: 10}, {id: 'e1', nombre: 'Espada', tipoItem: 'arma_1m', ranuras: 1}];
+  const parte = Intercambio._separar(S, {it: S.inventario[0], key: 'inventario'}, 1);
+  parte.reservado = 'doc1'; parte.reservadoPara = 'Coloso';
+  const tras = [S.inventario.length, S.inventario[0].unidades, parte.unidades, Intercambio.reservado(parte)];
+  // lo reservado no se vende, no se usa ni se equipa
+  const vendible = FichaTienda.vendibles(S, FichaTienda.nueva()).map(v => v.it.id);
+  let aviso = ''; FichaAcciones.consumir(S, parte.id, false, {toast: t => { aviso = t; }});
+  S.inventario[1].reservado = 'doc2';
+  let aviso2 = ''; FichaEquipo.equipar(S, 'e1', {toast: t => { aviso2 = t; }});
+  const libre = Intercambio._liberar(S, 'doc1');
+  const junta = [libre, S.inventario.length, S.inventario[0].unidades];
+  Intercambio._quitarReservado(S, 'doc2');
+  igual([tras, vendible.includes(parte.id), vendible.includes('p1'), /ofrecido a Coloso/.test(aviso), /ofrecido/.test(aviso2), S.inventario[1] && S.inventario[1].equipado, junta, S.inventario.map(i => i.id)],
+    [[3, 3, 1, true], false, true, true, true, undefined, [true, 2, 4], ['p1']]);
+});
+prueba('🤝 recibir (P157): un ítem llega a la mochila como copia nueva (sin reserva ni equipado) y una poción se suma a su pila; los despojos especiales se crean si faltan', () => {
+  const S = FichaGuardado.normalizar({}).S;
+  S.inventario = [{id: 'p1', nombre: 'Poción de vida', tipoItem: 'consumibles', consumible: true, unidades: 2, ranuras: 1}];
+  const a = Intercambio._aMochila(S, {nombre: 'Poción de vida', consumible: true, unidades: 2, reservado: 'x'});
+  const b = Intercambio._aMochila(S, {nombre: 'Hacha', tipoItem: 'arma_1m', equipado: true, reservado: 'y', reservadoPara: 'Z', aMano: true});
+  const r = Intercambio._despojo(S, 'especial', 'Escamas de dragón'); r.set(r.get() + 3);
+  igual([a.id, a.unidades, S.inventario.length, b.equipado, 'reservado' in b, 'aMano' in b, b.id !== 'p1' && !!b.id, (S.loot.especial || []).find(l => l.nombre === 'Escamas de dragón').cantidad],
+    ['p1', 4, 2, false, false, false, true, 3]);
 });
 prueba('catálogo (dueño, 2026-10-05): cada cinturón y cada mochila Común tiene al menos un efecto propio de cinturón o mochila', () => {
   const PROPIOS = ['capcinturon', 'capmochila', 'saquerapido', 'boticario', 'portapergaminos', 'ranurapocion', 'ranurapergamino', 'ranuratrampa', 'ranuraankh', 'vainas', 'correas', 'bolsilloext', 'morral', 'luz'];

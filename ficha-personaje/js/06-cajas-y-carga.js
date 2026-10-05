@@ -396,12 +396,11 @@ document.addEventListener('click', async e => {
     if(it) preguntarTipoAtaque(it);
     return;
   }
-  if(b.dataset.mesaPub){ mesaComunPublicarItem(b.dataset.mesaPub); return; }
-  if(b.dataset.mesaRetItem){ mesaComunRetirar(b.dataset.mesaRetItem); return; }
+  if(Intercambio.clic(b, fichaVivo && fichaVivo.id)) return;   // 🤝 Dar / lo ofrecido (comun/intercambio.js)
   if(b.dataset.tocinturon){
     const it = S.inventario.find(x=>x.id===b.dataset.tocinturon);
     if(!it || num(it.unidades) <= 0) return;
-    if(it.enMesa){ toast('Está ofrecido en la mesa común: retiralo primero'); return; }
+    if(it.enMesa || it.reservado){ toast(`Está ofrecido a ${it.reservadoPara || 'otro personaje'}: cancelá la oferta primero (🤝)`); return; }
     const r = FichaEquipo.alCinturon(S, it, 1);   // 1 ranura = 1 unidad; lleno, no entra (comun/ficha-equipo.js)
     if(r.movidas){ renderInventario(); renderList('cinturon'); refresh(); }
     toast(FichaEquipo.textoAlCinturon(S, it, r));
@@ -427,6 +426,7 @@ document.addEventListener('click', async e => {
     const [key, id] = b.dataset.rmitem.split(':');
     const it = S[key].find(x=>x.id===id);
     if(!it) return;
+    if(it.reservado){ toast(`Está ofrecido a ${it.reservadoPara || 'otro personaje'}: cancelá la oferta primero (🤝)`); return; }
     if(!confirm(`¿Eliminar "${it.nombre}"? No se puede deshacer.`)) return;
     S[key] = S[key].filter(x=>x.id!==id);
     if(key === 'inventario') renderInventario(); else renderList(key);

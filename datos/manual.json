@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-10-05T02:52:37Z",
+ "actualizado": "2026-10-05T11:01:10Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1442,7 +1442,7 @@
    ],
    "estado": "borrador",
    "capitulo": "equipo",
-   "cuerpo": "Los **consumibles** (pociones, pergaminos, vendas, bombas…) se gastan al usarlos. Pueden **curar HP**, **aplicarte un estado** o dar un efecto especial.\n\n## Cinturón vs mochila\n| Dónde está | Costo de usarlo |\n|---|---|\n| En el **cinturón** | **1** [[Nitros (No2)\\|Nitro]] |\n| En la **mochila** | **2** Nitros (el doble) |\n\n- Todos arrancan con un **cinturón de 5 ranuras** (personajes, invocaciones y creeps); un cinturón equipado lo amplía.\n- **1 ranura = 1 unidad**: 5 pociones ocupan las 5 ranuras. Con el cinturón lleno **no entra nada más**: lo que no entra se queda en la mochila.\n- Cada consumible viene en **unidades**; algunos tienen varias cargas.\n\n> [!example] Efecto de un pergamino\n> *Pergamino de Buena Fortuna*: al usarlo se activa el estado [[Afortunado]] durante todo el combate. *Ankh de Reencarnación*: solo funciona si está **en el cinturón** cuando llegás a HP 0 ([[Muerte]]).\n\nVer también: [[Estados alterados]]."
+   "cuerpo": "Los **consumibles** (pociones, pergaminos, vendas, bombas…) se gastan al usarlos. Pueden **curar HP**, **aplicarte un estado** o dar un efecto especial.\n\n## Cinturón vs mochila\n| Dónde está | Costo de usarlo |\n|---|---|\n| En el **cinturón** | **1** [[Nitros (No2)\\|Nitro]] |\n| En la **mochila** | **2** Nitros (el doble) |\n\n- Personajes y creeps arrancan con un **cinturón de 5 ranuras** (las invocaciones no llevan cinturón); un cinturón equipado lo amplía.\n- **1 ranura = 1 unidad**: 5 pociones ocupan las 5 ranuras. Con el cinturón lleno **no entra nada más**: lo que no entra se queda en la mochila.\n- Cada consumible viene en **unidades**; algunos tienen varias cargas.\n\n> [!example] Efecto de un pergamino\n> *Pergamino de Buena Fortuna*: al usarlo se activa el estado [[Afortunado]] durante todo el combate. *Ankh de Reencarnación*: solo funciona si está **en el cinturón** cuando llegás a HP 0 ([[Muerte]]).\n\nVer también: [[Estados alterados]]."
   },
   {
    "id": "mochila",
@@ -1457,6 +1457,40 @@
    "estado": "borrador",
    "capitulo": "equipo",
    "cuerpo": "La **mochila** es tu inventario general (20 ranuras por defecto). Lo que está adentro **no suma bonos ni peso** a tu [[Carga máxima]]. Sacar un consumible de ahí cuesta el doble en Nitros: [[Cinturón y consumibles]]. Cada ítem ocupa una o más ranuras."
+  },
+  {
+   "id": "pasarle-cosas-a-otro-personaje",
+   "titulo": "Pasarle cosas a otro personaje",
+   "alias": [
+    "Dar",
+    "Ofrecer",
+    "Pasar",
+    "Intercambio",
+    "Regalar"
+   ],
+   "tags": [
+    "equipo",
+    "economía"
+   ],
+   "estado": "borrador",
+   "capitulo": "equipo",
+   "cuerpo": "**Fuera de combate** le podés pasar a cualquier personaje del grupo un ítem, parte de una pila (2 de tus 5 pociones), [[DDE]] o [[Despojos]]. Los jugadores deciden cuándo sí y cuándo no.\n\n1. En la mochila o el cinturón, el botón **🤝 Dar** del ítem (también en la ventana 🛡 Equipo del mapa). Para oro o despojos: **🤝 Pasar**, en la cabecera de la Mochila.\n2. Elegís a quién. **Hasta que acepte, el ítem queda reservado en tu mochila**: sigue ocupando su lugar y no se puede usar, equipar ni vender (el botón dice «🤝 Ofrecido a …»; tocándolo podés cancelar). El oro y los despojos se apartan al ofrecerlos.\n3. A quien lo recibe le aparece **«Fulano te ofrece X — Aceptar / Rechazar»** (en la ficha o en el mapa). Si acepta, va a su mochila (si no le entra, le avisa que haga lugar) y queda una línea en la Mesa. Si rechaza, vuelve a vos.\n\n**En combate** pasarle algo a otro va a costar [[Nitros (No2)|Nitros]] y solo a un aliado al lado (todavía no está hecho)."
+  },
+  {
+   "id": "baul-comun",
+   "titulo": "Baúl común",
+   "alias": [
+    "Baúl",
+    "Baúl del grupo",
+    "Inventario compartido"
+   ],
+   "tags": [
+    "equipo",
+    "economía"
+   ],
+   "estado": "borrador",
+   "capitulo": "equipo",
+   "cuerpo": "El **baúl común** es del grupo entero, como el cajero de los centros Pokémon de los juegos viejos: **se abre solo desde una tienda abierta** (📦 Baúl común, en la cabecera de la [[Tiendas|tienda]]) y **nunca en combate**.\n\n- Guardás ítems, [[DDE]] y [[Despojos]] de tu mochila; **cualquiera del grupo los saca** a la suya.\n- Tiene lugar para **10 ranuras por integrante del grupo** (cada personaje de la partida). El oro y los despojos no ocupan lugar.\n- **Cada movimiento queda anotado**: el registro del baúl dice quién guardó y quién sacó cada cosa, y además sale en la Mesa. Así nadie se hace el vivo sin que nadie más se entere.\n- Más adelante, jugando (una quest, un hallazgo…), puede aparecer un **baúl móvil** que sigue al grupo por el bosque o las cuevas, y hasta uno que lo acompaña en los combates."
   },
   {
    "id": "carga-maxima",
@@ -1565,7 +1599,7 @@
    ],
    "estado": "borrador",
    "capitulo": "equipo",
-   "cuerpo": "Los ítems se compran y se venden en **tiendas** que arma y maneja el GM con el [[Generador de tiendas]]:\n\n1. El GM arma la tienda (aleatoria o curada a mano) y la **publica**.\n2. **El GM decide cuándo está abierta.** Con un interruptor la abre o la cierra. Mientras está **cerrada**, tu botón **🏪 Vendedor** aparece desactivado y, al pasar el cursor, dice **\"Tienda cerrada\"**.\n3. Con la tienda abierta, entrás con **🏪 Vendedor** y ves su stock en vivo. Comprás y el ítem va a tu mochila, con el DDE descontado.\n4. **Vender solo se puede en una tienda.** Dentro del Vendedor, el botón **💰 Vender** abre tu mochila: elegís qué ítems vender (y cuántas unidades) y ves cuánto vas a cobrar. También ahí vendés tus [[Despojos]].\n5. **Cualquier tienda, de cualquier tamaño y tipo, compra de todo:** los ítems de los jugadores y los despojos.\n\n## Cuánto pagan\n- **Valor de venta de un ítem:** si el ítem no tiene uno propio, es **la mitad de su precio de compra**.\n- Cada tienda tiene dos **ajustes de precios**: uno **al comprar** (lo que pagás) y otro **al vender** (lo que cobrás, ítems y despojos incluidos). Un vendedor avaro puede cobrar caro y pagar poco.\n- Lo que tenés **equipado no se vende**: sacalo antes.\n\nAdemás hay **tiendas guardadas** (una por lugar) para volver a ellas."
+   "cuerpo": "Los ítems se compran y se venden en **tiendas** que arma y maneja el GM con el [[Generador de tiendas]]:\n\n1. El GM arma la tienda (aleatoria o curada a mano) y la **publica**.\n2. **El GM decide cuándo está abierta.** Con un interruptor la abre o la cierra. Mientras está **cerrada**, tu botón **🏪 Vendedor** aparece desactivado y, al pasar el cursor, dice **\"Tienda cerrada\"**.\n3. Con la tienda abierta, entrás con **🏪 Vendedor** y ves su stock en vivo. Comprás y el ítem va a tu mochila, con el DDE descontado.\n4. **Vender solo se puede en una tienda.** Dentro del Vendedor, el botón **💰 Vender** abre tu mochila: elegís qué ítems vender (y cuántas unidades) y ves cuánto vas a cobrar. También ahí vendés tus [[Despojos]].\n5. **Cualquier tienda, de cualquier tamaño y tipo, compra de todo:** los ítems de los jugadores y los despojos.\n\n## Cuánto pagan\n- **Valor de venta de un ítem:** si el ítem no tiene uno propio, es **la mitad de su precio de compra**.\n- Cada tienda tiene dos **ajustes de precios**: uno **al comprar** (lo que pagás) y otro **al vender** (lo que cobrás, ítems y despojos incluidos). Un vendedor avaro puede cobrar caro y pagar poco.\n- Lo que tenés **equipado no se vende**: sacalo antes.\n\nAdemás hay **tiendas guardadas** (una por lugar) para volver a ellas.\n\nDesde cualquier tienda abierta se llega también al [[Baúl común]] (**📦 Baúl común**, en la cabecera de la tienda)."
   },
   {
    "id": "despojos",

@@ -111,9 +111,9 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261002a', '../comun/ficha-equipo.js?v=20261005b1', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261004r2', '../comun/ficha-mantenimiento.js?v=20261004q', '../comun/ficha-calculo.js?v=20261005b1', '../comun/ficha-combate.js?v=20261003sa', '../comun/skills-clase.js?v=20261002sb', '../comun/ficha-habilidades.js?v=20261004p1',
-  '../comun/catalogo.js?v=20261005c2', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261004ja', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261004so', '../comun/ficha-resumen.js?v=20261004q1', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261004so', '../comun/inv-acciones.js?v=20261004fc', '../comun/inv-duelo.js?v=20261004p1', '../comun/ficha-acciones.js?v=20261005c1', '../comun/inv-habilidades.js?v=20261004na', '../comun/inv-lupa.js?v=20261001a',
-  '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261004p1', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261002b'];
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261002a', '../comun/ficha-equipo.js?v=20261005i1', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261005i1', '../comun/ficha-mantenimiento.js?v=20261004q', '../comun/ficha-calculo.js?v=20261005b1', '../comun/ficha-combate.js?v=20261003sa', '../comun/skills-clase.js?v=20261002sb', '../comun/ficha-habilidades.js?v=20261004p1',
+  '../comun/catalogo.js?v=20261005c2', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261004ja', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261004so', '../comun/ficha-resumen.js?v=20261004q1', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261004so', '../comun/inv-acciones.js?v=20261004fc', '../comun/inv-duelo.js?v=20261004p1', '../comun/ficha-acciones.js?v=20261005i1', '../comun/inv-habilidades.js?v=20261004na', '../comun/inv-lupa.js?v=20261001a',
+  '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261005i1', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261002b'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
    anterior"): en la ficha las columnas se juntan recién con la PANTALLA angosta (@media), pero en el mapa la pantalla es ancha y el panel
@@ -851,6 +851,7 @@ function bnCrear(){
         <h3 id="bn-tienda-titulo">Tienda</h3>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <span class="tienda-badge" id="bn-tienda-badge"></span>
+          <button class="iconbtn" data-bn-ti="baul" title="El baúl común del grupo: guardar y sacar ítems, oro y despojos (queda anotado quién)">📦 Baúl común</button>
           <button class="iconbtn" data-bn-ti="vender" title="Vender ítems de tu mochila y despojos a esta tienda">💰 Vender</button>
           <button class="iconbtn" data-bn-ti="reparar" id="bn-tienda-reparar" title="Reparar tu equipo con el herrero (se paga por punto de durabilidad)">🔧 Reparación</button>
           <span class="catalogo-dde-badge">DDE disponibles: <b id="bn-tienda-dde">0</b></span>
@@ -1226,7 +1227,19 @@ const recibidosPend = {estados: [], recompensas: []}, recibidosEnCurso = new Set
 let recibidosCola = Promise.resolve();
 function recibidosEscuchar(){
   ['estados', 'recompensas'].forEach(col => Recibidos.escuchar(col, docs => { recibidosPend[col] = docs; recibidosRevisar(); }));
+  Intercambio.iniciar(intercambioHostMapa);   // 🤝 lo que le ofrecen a un personaje y lo que él ofreció (comun/intercambio.js)
 }
+/* 🤝 Pasar cosas entre personajes y 📦 el baúl común (2026-10-05, P157): la regla y las ventanas en comun/intercambio.js; acá, cómo el mapa
+   toca a un personaje (editarPersonajeMapa: el de la Botonera nueva o una sesión de un rato). */
+const intercambioHostMapa = {
+  maneja: id => bnManejo(id),
+  leer: id => (bn && bn.fichaId === id && bn.S) ? bn.S : null,
+  con: async (id, fn) => !!(await editarPersonajeMapa(id, S => fn(S))),
+  enCombate: () => modoMapa === 'combate',
+  tienda: () => (bn && bn.raiz && bn.raiz.querySelector('#bn-tienda').classList.contains('open') && bnTiendaSt.tienda) || null,
+  toast: t => toast(t),
+  propias: () => [...fichasPub.keys()].filter(id => bnManejo(id)),
+};
 function recibidosRevisar(){
   const ids = new Set([...recibidosPend.estados, ...recibidosPend.recompensas].map(d => String(d.data().fichaId || '').split(SEP_INVOCACION)[0]));
   ids.forEach(id => {
@@ -1383,6 +1396,7 @@ function bnCompararDibujar(){
 function bnEquipoClic(b){
   const r = bn.raiz;
   const enEquipo = !!b.closest('#bn-equipo, #bn-slot-lleno, #bn-comparar, #bn-botin');   // (la tienda: bnTiendaClic)
+  if(enEquipo && Intercambio.clic(b, bn.fichaId)) return true;   // 🤝 Dar (comun/intercambio.js)
   if(b.dataset.bnEq){
     if(b.dataset.bnEq === 'cerrar') bnEquipoCerrar();
     else if(b.dataset.bnEq === 'botin-no') bnBotinCerrar();
@@ -1749,6 +1763,7 @@ function bnTiendaClic(b){
   const qty = id => { const el = r.querySelector(`#bn-tienda [data-catqty="${id}"]`); return Math.max(1, num(el ? el.value : 1)); };
   const a = b.dataset.bnTi;
   if(a === 'cerrar'){ bnTiendaCerrar(); return true; }
+  if(a === 'baul'){ Intercambio.abrirBaul(bn.fichaId); return true; }   // 📦 el baúl común (comun/intercambio.js)
   if(a === 'orden-dir'){ st.ordenDesc = !st.ordenDesc; bnTiendaDibujar(); return true; }
   if(a === 'limpiar'){ r.querySelectorAll('[data-bn-tf]').forEach(el => { if(el.dataset.bnTf !== 'orden') el.value = ''; }); bnTiendaDibujar(); return true; }
   if(a === 'vaciar'){ st.carrito = []; bnTiendaDibujar(); return true; }

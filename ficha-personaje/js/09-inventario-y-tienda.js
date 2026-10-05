@@ -150,10 +150,12 @@ function renderCabeceraTienda(){
   const nuevo = $('#btn-catalogo-nuevo');
   const verCompleto = $('#catalogo-ver-completo');
   if($('#tienda-vender')) $('#tienda-vender').style.display = 'none';
+  if($('#tienda-baul')) $('#tienda-baul').style.display = 'none';
   if($('#tienda-reparar')) $('#tienda-reparar').style.display = 'none';
   if(tiendaCargada){
     badge.textContent = FichaTienda.badge(tiendaSt);
     if($('#tienda-vender')) $('#tienda-vender').style.display = '';
+    if($('#tienda-baul')) $('#tienda-baul').style.display = '';   // 📦 el baúl común se abre desde una tienda (P157)
     if($('#tienda-reparar')) $('#tienda-reparar').style.display = tiendaCargada.herrero ? '' : 'none';   // solo las tiendas con herrero reparan
     badge.style.display = '';
     salir.style.display = '';

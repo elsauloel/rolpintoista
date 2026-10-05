@@ -118,7 +118,7 @@ Los **consumibles** (pociones, pergaminos, vendas, bombas…) se gastan al usarl
 | En el **cinturón** | **1** [[Nitros (No2)\|Nitro]] |
 | En la **mochila** | **2** Nitros (el doble) |
 
-- Todos arrancan con un **cinturón de 5 ranuras** (personajes, invocaciones y creeps); un cinturón equipado lo amplía.
+- Personajes y creeps arrancan con un **cinturón de 5 ranuras** (las invocaciones no llevan cinturón); un cinturón equipado lo amplía.
 - **1 ranura = 1 unidad**: 5 pociones ocupan las 5 ranuras. Con el cinturón lleno **no entra nada más**: lo que no entra se queda en la mochila.
 - Cada consumible viene en **unidades**; algunos tienen varias cargas.
 
@@ -134,6 +134,33 @@ tags: [equipo]
 estado: borrador
 +++
 La **mochila** es tu inventario general (20 ranuras por defecto). Lo que está adentro **no suma bonos ni peso** a tu [[Carga máxima]]. Sacar un consumible de ahí cuesta el doble en Nitros: [[Cinturón y consumibles]]. Cada ítem ocupa una o más ranuras.
+
++++
+titulo: Pasarle cosas a otro personaje
+alias: [Dar, Ofrecer, Pasar, Intercambio, Regalar]
+tags: [equipo, economía]
+estado: borrador
++++
+**Fuera de combate** le podés pasar a cualquier personaje del grupo un ítem, parte de una pila (2 de tus 5 pociones), [[DDE]] o [[Despojos]]. Los jugadores deciden cuándo sí y cuándo no.
+
+1. En la mochila o el cinturón, el botón **🤝 Dar** del ítem (también en la ventana 🛡 Equipo del mapa). Para oro o despojos: **🤝 Pasar**, en la cabecera de la Mochila.
+2. Elegís a quién. **Hasta que acepte, el ítem queda reservado en tu mochila**: sigue ocupando su lugar y no se puede usar, equipar ni vender (el botón dice «🤝 Ofrecido a …»; tocándolo podés cancelar). El oro y los despojos se apartan al ofrecerlos.
+3. A quien lo recibe le aparece **«Fulano te ofrece X — Aceptar / Rechazar»** (en la ficha o en el mapa). Si acepta, va a su mochila (si no le entra, le avisa que haga lugar) y queda una línea en la Mesa. Si rechaza, vuelve a vos.
+
+**En combate** pasarle algo a otro va a costar [[Nitros (No2)|Nitros]] y solo a un aliado al lado (todavía no está hecho).
+
++++
+titulo: Baúl común
+alias: [Baúl, Baúl del grupo, Inventario compartido]
+tags: [equipo, economía]
+estado: borrador
++++
+El **baúl común** es del grupo entero, como el cajero de los centros Pokémon de los juegos viejos: **se abre solo desde una tienda abierta** (📦 Baúl común, en la cabecera de la [[Tiendas|tienda]]) y **nunca en combate**.
+
+- Guardás ítems, [[DDE]] y [[Despojos]] de tu mochila; **cualquiera del grupo los saca** a la suya.
+- Tiene lugar para **10 ranuras por integrante del grupo** (cada personaje de la partida). El oro y los despojos no ocupan lugar.
+- **Cada movimiento queda anotado**: el registro del baúl dice quién guardó y quién sacó cada cosa, y además sale en la Mesa. Así nadie se hace el vivo sin que nadie más se entere.
+- Más adelante, jugando (una quest, un hallazgo…), puede aparecer un **baúl móvil** que sigue al grupo por el bosque o las cuevas, y hasta uno que lo acompaña en los combates.
 
 +++
 titulo: Carga máxima
@@ -255,6 +282,8 @@ Los ítems se compran y se venden en **tiendas** que arma y maneja el GM con el 
 - Lo que tenés **equipado no se vende**: sacalo antes.
 
 Además hay **tiendas guardadas** (una por lugar) para volver a ellas.
+
+Desde cualquier tienda abierta se llega también al [[Baúl común]] (**📦 Baúl común**, en la cabecera de la tienda).
 
 +++
 titulo: Despojos

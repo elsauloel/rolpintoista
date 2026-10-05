@@ -326,23 +326,56 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tomadoPor', 'tomadoNombre']);
       }
 
-      // Mesa común (2026-09-25): los jugadores ofrecen ítems, DDE y despojos y otro jugador se los lleva. Un doc por oferta.
-      // Cualquier miembro la lee; la crea el que ofrece (a su nombre); otro miembro la toma (`tomadoPor` de '' a su uid, solo esos campos);
-      // la borra el que la ofreció (retirarla, o limpiar lo que ya se llevaron) o el GM.
+      // Mesa común (2026-09-25, RETIRADA el 2026-10-05: la reemplazan paquetes y el baúl). Queda solo para leer y limpiar lo viejo:
+      // comun/intercambio.js le devuelve a cada uno lo que había ofrecido ahí y borra la oferta. Ya no se crea ni se toma nada.
       match /mesaComun/{id} {
         allow read: if esMiembro(c);
+        allow delete: if esMiembro(c) && (resource.data.ofrecidoPor == request.auth.uid || esGM(c));
+      }
+
+      // 🤝 Paquetes (2026-10-05, P157, comun/intercambio.js): un personaje le ofrece a otro un ítem, DDE o despojos. Lo leen los que figuran
+      // en `uids` (quien lo creó y los dueños de los dos personajes) y el GM. Lo crea quien ofrece (a su nombre, pendiente); quien figura en
+      // `uids` lo acepta o lo rechaza (solo estado y resolvio, una vez); lo borra cualquiera de ellos (cancelar, o cerrar lo respondido) o el GM.
+      match /paquetes/{id} {
+        allow read: if esGM(c) || (esMiembro(c) && (resource == null || request.auth.uid in resource.data.uids));   // null: mirar si sigue existiendo
         allow create: if esMiembro(c)
-          && request.resource.data.keys().hasOnly(['tipo', 'nombre', 'json', 'itemId', 'fichaId', 'cantidad', 'despojo', 'despojoNombre', 'ofrecidoPor', 'ofrecidoNombre', 'tomadoPor', 'tomadoNombre', 'creado'])
-          && request.resource.data.ofrecidoPor == request.auth.uid
-          && request.resource.data.tomadoPor == ''
+          && request.resource.data.keys().hasOnly(['tipo', 'nombre', 'json', 'itemId', 'cantidad', 'despojo', 'despojoNombre', 'deFicha', 'deNombre', 'paraFicha', 'paraNombre', 'uids', 'creadoPor', 'estado', 'resolvio', 'creado'])
+          && request.resource.data.creadoPor == request.auth.uid
+          && request.auth.uid in request.resource.data.uids
+          && request.resource.data.uids.size() <= 3
+          && request.resource.data.estado == 'pendiente'
           && request.resource.data.tipo in ['item', 'dde', 'despojos']
+          && request.resource.data.json.size() < 200000
           && request.resource.data.creado == request.time;
         allow update: if esMiembro(c)
-          && resource.data.tomadoPor == ''
-          && resource.data.ofrecidoPor != request.auth.uid
-          && request.resource.data.tomadoPor == request.auth.uid
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tomadoPor', 'tomadoNombre']);
-        allow delete: if esMiembro(c) && (resource.data.ofrecidoPor == request.auth.uid || esGM(c));
+          && (request.auth.uid in resource.data.uids || esGM(c))
+          && resource.data.estado == 'pendiente'
+          && request.resource.data.estado in ['aceptado', 'rechazado']
+          && request.resource.data.resolvio == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado', 'resolvio']);
+        allow delete: if esGM(c) || (esMiembro(c) && request.auth.uid in resource.data.uids);
+      }
+
+      // 📦 Baúl común (2026-10-05, P157): un ítem por documento ({tipo: 'item', nombre, json, ranuras, puso, pusoNombre, creado}); el oro en
+      // baul/dde y los despojos en baul/desp-<tipo> ({tipo, cantidad, despojo, despojoNombre}). Es del grupo: cualquier miembro guarda y saca
+      // (relajado a propósito; la honestidad la cuida el registro de abajo, que nadie puede tocar salvo el GM).
+      match /baul/{id} {
+        allow read, delete: if esMiembro(c);
+        allow create, update: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['tipo', 'nombre', 'json', 'ranuras', 'puso', 'pusoNombre', 'creado', 'cantidad', 'despojo', 'despojoNombre'])
+          && request.resource.data.tipo in ['item', 'dde', 'despojos']
+          && (request.resource.data.tipo != 'item' || (request.resource.data.puso == request.auth.uid && request.resource.data.json.size() < 200000))
+          && (request.resource.data.tipo == 'item' || (request.resource.data.cantidad is number && request.resource.data.cantidad >= 0));
+      }
+      // Registro del baúl: quién guardó y quién sacó cada cosa. Cualquier miembro lo lee y anota lo suyo; nadie lo cambia; lo borra el GM.
+      match /baulLog/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['accion', 'que', 'quien', 'jugador', 'personaje', 'cuando'])
+          && request.resource.data.quien == request.auth.uid
+          && request.resource.data.accion in ['metio', 'saco']
+          && request.resource.data.cuando == request.time;
+        allow delete: if esGM(c);
       }
 
       // Duelos (ataque paso a paso, comun/duelo.js): un documento por ataque, que atacante y defensor escriben en vivo (sus tiradas y el veredicto).

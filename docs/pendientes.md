@@ -202,6 +202,11 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   invocaciones desde el 2026-09-30.)
 - [x] **Probar en mesa el ataque con arreglos y el Flash de un creep** (2026-09-30): ✔ en "Claude · pruebas" (ver
   `pruebas-de-humo.md`); encontró y se corrigieron dos fallas de carteles tapados en el mapa.
+- [ ] **Dar en combate** (P157, 2026-10-05): 1 No2 desde el cinturón, 2 desde la mochila, solo a un aliado al lado; Pasamanos = 0 desde el
+  cinturón; Alforja compartida = un aliado saca un consumible de tu mochila por 1 No2. Fuera de combate ya anda (`comun/intercambio.js`).
+- [ ] **Baúles móviles** (dueño, 2026-10-05, a futuro): por una quest u otro hallazgo, un baúl que sigue al grupo por el bosque o las cuevas
+  (sin tienda); de nivel más alto, uno que lo acompaña en los combates. Hoy el baúl común se abre solo desde una tienda abierta (10 ranuras
+  por integrante; `Intercambio.POR_INTEGRANTE`).
 - [ ] **Despojos mágico/especial** de los ítems: siguen a mano.
 - [ ] **Protección de jefe, segunda versión** (P95): resistencia a otros controles (Exhausto, Inmovilizado…), contador de resistencia o fases.
 - [ ] **Estados sobre otros más finos**: los que faltan automatizar (empujar, derribar, huir, "pierde el sigilo", etc.).

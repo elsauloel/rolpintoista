@@ -680,3 +680,7 @@ elegir otra clase), para no dejarlo pegado la próxima vez que se abre.
 - **＋ Personaje nuevo, paso a paso** (2026-10-02, tanda 7): `abrirPersonajeNuevo` (js/12) abre `comun/asistente-personaje.js` y crea el personaje con
   `crearPersonajeNuevo(datos, {asistente: true})`. Se separaron `habDeClase(claseId, habId)`, `pasivaDeCatalogo(datos, meta)` y `pasivasDelCatalogo()`
   (js/10) para que los use el asistente.
+- **🤝 Dar, 🤝 Pasar y 📦 Baúl común** (2026-10-05, P157): la mesa común se retiró (código, ventana `#scrim-mesa-comun` y botón). Ahora cada ítem de
+  la mochila y del cinturón tiene **🤝 Dar** (`Intercambio.botonDar`), la cabecera de la Mochila **🤝 Pasar** (`#btn-pasar`: oro, despojos y lo
+  ofrecido) y la tienda **📦 Baúl común** (`#tienda-baul`). Todo en `comun/intercambio.js`; acá solo `intercambioHost` (js/08). El nombre del
+  archivo `08-equipo-botin-y-mesa-comun.js` quedó por historia.

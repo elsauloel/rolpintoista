@@ -301,7 +301,7 @@ const FichaTienda = (() => {
   function vendibles(S, st){
     const out = [];
     ['inventario', 'cinturon'].forEach(key => (S[key] || []).forEach(it => {
-      if(it.equipado) return;
+      if(it.equipado || it.reservado || it.enMesa) return;   // lo ofrecido a otro (🤝) no se vende
       const base = precioVenta(it);
       if(base > 0) out.push({clave: `${key}:${it.id}`, key, it, unidades: num(it.unidades) || 1, unit: precioVentaTienda(st, base)});
     }));

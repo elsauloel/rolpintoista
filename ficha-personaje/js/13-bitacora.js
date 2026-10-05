@@ -254,7 +254,7 @@ async function fbAlEntrar(){
   estadosEscuchar();
   combateEscuchar();
   botinLootEscuchar();
-  mesaComunEscuchar();
+  intercambioIniciar();   // 🤝 ofrecer a otro personaje y 📦 el baúl común (comun/intercambio.js)
   cargarSkillsSubidas().then(() => renderList('habilidades')).catch(() => {});   // avisos de 🔔 versión nueva
   cargarPasivasSubidas();
   cargarItemsSubidos();   // ítems que subió el grupo (catálogo compartido, paso 5)

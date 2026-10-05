@@ -565,7 +565,7 @@ const Combatiente = (() => {
     // «Pierde No2» (2026-10-02, Sonic Boom): el objetivo pierde `no2` (+ la diferencia entre las tiradas) No2; en 0, Sentado.
     if(e && e.no2 !== undefined) return {nombre: 'Pierde No2', caras: 1, exitos: 1, spec: null, no2: Math.max(0, Math.round(nf(e.no2))), no2Dif: !!e.no2Dif, no2Sentado: !!e.no2Sentado,
       detalle: `Pierde ${nf(e.no2)}${e.no2Dif ? ' + la diferencia' : ''} No2${e.no2Sentado ? '; si se queda sin No2, queda Sentado' : ''}.`};
-    // Con probabilidad (2026-10-05, armas especiales): `caras`/`exitos` como los efectos de un arma (33 % = 1 en d3); sin eso, entra siempre.
+    // Con probabilidad (2026-10-05, armas especiales): `caras`/`exitos` como los efectos de un arma (33 % = 5 o 6 en d6: el duelo tira un d3 como d6); sin eso, entra siempre.
     const caras = Math.max(1, Math.round(nf(e.caras)) || 1);
     return {nombre: e.nombre || (e.cura ? 'Curación' : ''), caras, exitos: Math.min(caras, Math.max(1, Math.round(nf(e.exitos)) || 1)),
       spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: nf(e.val)}] : e.mods,

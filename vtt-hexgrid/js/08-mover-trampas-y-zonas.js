@@ -377,7 +377,16 @@ async function zonaRenovarEstado(t, spec, el){
   try{
     if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
     else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: nombre});
-    toast(`${nombre}: ${t.oculto ? 'el' : nombreDe(t) + ':'} ${spec.nombre} vuelve a ${spec.turnos || ''} turno${num(spec.turnos) === 1 ? '' : 's'}`.replace(': el ', ': '));
+    // Que no pase en silencio (dueño, 2026-10-04): la Crónica para toda la mesa (también quien se movió) y una línea en la Mesa.
+    // Un token oculto no se nombra: solo lo ve esta pantalla.
+    const turnos = `${spec.turnos || ''} turno${num(spec.turnos) === 1 ? '' : 's'}`;
+    if(t.oculto){ toast(`${nombre}: ${spec.nombre} vuelve a ${turnos}`); return; }
+    const quien = nombreDe(t);
+    momentoAbrir({tipo: 'zona-renueva', icono: '🟫', titulo: `${quien} sigue pegado en ${nombre}`, resultado: `Cada paso sobre la zona le renueva el ${spec.nombre}: vuelve a ${turnos}.`, estado: 'listo', datos: {}});
+    try{
+      await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '', origen: `🟫 ${nombre}: ${quien} dio un paso sobre la zona — ${spec.nombre} vuelve a ${turnos}`,
+        formula: '', rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
+    }catch(err){}
   }catch(err){ console.error('No se pudo renovar el estado de la zona:', err); }
 }
 function zonaRevisarMantenimiento(){ tokens.forEach(t => zonaRevisarToken(t, true)); }

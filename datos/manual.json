@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-10-05T11:46:58Z",
+ "actualizado": "2026-10-05T12:00:57Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1456,7 +1456,7 @@
    ],
    "estado": "borrador",
    "capitulo": "equipo",
-   "cuerpo": "La **mochila** es tu inventario general (20 ranuras por defecto). Lo que está adentro **no suma bonos ni peso** a tu [[Carga máxima]]. Sacar un consumible de ahí cuesta el doble en Nitros: [[Cinturón y consumibles]]. Cada ítem ocupa una o más ranuras."
+   "cuerpo": "La **mochila** es tu inventario general (20 ranuras por defecto). Lo que está adentro **no suma bonos ni peso** a tu [[Carga máxima]]. Sacar un consumible de ahí cuesta el doble en Nitros: [[Cinturón y consumibles]]. Cada ítem ocupa **al menos una ranura**; una pila de algo apilable (pociones, trofeos iguales) ocupa una sola."
   },
   {
    "id": "pasarle-cosas-a-otro-personaje",

@@ -22,7 +22,7 @@ que usan las herramientas (los que no aplican se omiten):
   "imagen": "data:image/...",     // base64, opcional — solo ficha.html la conserva
   "tipoItem": "arma_1m",          // ver lista de categorías más abajo
   "peso": 1,                      // en armas, además: cantidad de dados de daño
-  "ranuras": 1,                   // ranuras que ocupa en la mochila si no está equipado
+  "ranuras": 1,                   // ranuras que ocupa en la mochila si no está equipado: mínimo 1 (P158; `sinRanura: true` = no ocupa)
   "precioCompra": 90,
   "durPorPeso": 4,                // opcional (armas, escudos y armaduras): puntos de durabilidad por punto de Peso; sin él, 3.
                                   // Durabilidad total = max(3, durPorPeso × Peso) (comun/combatiente.js, durMax). Variable de diseño.

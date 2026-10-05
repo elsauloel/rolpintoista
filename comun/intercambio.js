@@ -605,7 +605,7 @@ const Intercambio = (() => {
   /* — 📦 El baúl común — */
   let baul = [], baulLog = [];
   const capacidad = () => POR_INTEGRANTE * Math.max(1, fichas.length);
-  const enBaul = it => Math.max(1, E().ranuras(it));   // en el baúl todo ocupa al menos 1 ranura (en el catálogo hay armas y piezas con 0: P158)
+  const enBaul = it => Math.max(1, E().ranuras(it));   // en el baúl todo ocupa al menos 1 ranura (P158)
   const baulUsado = () => baul.filter(x => x.tipo === 'item').reduce((a, x) => a + Math.max(0, num(x.ranuras)), 0);
   function abrirBaul(fichaId){
     if(!host) return;

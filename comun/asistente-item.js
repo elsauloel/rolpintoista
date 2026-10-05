@@ -480,7 +480,7 @@ const AsistenteItem = (() => {
           : '<b>En la mochila</b>: no suma nada hasta equiparlo, pero ocupa ranuras de la mochila en vez de peso.');
       }
       if(cfg.conRanuras || (cfg.conLugar && !d.equipado)){
-        h += campo('Ranuras que ocupa en la mochila', num('ranuras', d.ranuras, 'step="1" min="0" style="max-width:120px"'),
+        h += campo('Ranuras que ocupa en la mochila', num('ranuras', d.ranuras, 'step="1" min="1" style="max-width:120px"'),
           cfg.conLugar ? '' : 'Lo que ocupa cuando el jugador lo guarda en vez de tenerlo equipado.');
       }
     }

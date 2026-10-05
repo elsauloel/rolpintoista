@@ -134,7 +134,7 @@ alias: [Inventario, Mochila (inventario)]
 tags: [equipo]
 estado: borrador
 +++
-La **mochila** es tu inventario general (20 ranuras por defecto). Lo que está adentro **no suma bonos ni peso** a tu [[Carga máxima]]. Sacar un consumible de ahí cuesta el doble en Nitros: [[Cinturón y consumibles]]. Cada ítem ocupa una o más ranuras.
+La **mochila** es tu inventario general (20 ranuras por defecto). Lo que está adentro **no suma bonos ni peso** a tu [[Carga máxima]]. Sacar un consumible de ahí cuesta el doble en Nitros: [[Cinturón y consumibles]]. Cada ítem ocupa **al menos una ranura**; una pila de algo apilable (pociones, trofeos iguales) ocupa una sola.
 
 +++
 titulo: Pasarle cosas a otro personaje

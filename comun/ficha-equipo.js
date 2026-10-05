@@ -58,7 +58,9 @@ const FichaEquipo = (() => {
     {id:'consumibles', label:'Consumibles'},
   ];
   const CATEGORIA_LABEL = Object.fromEntries(CATEGORIAS.map(c=>[c.id, c.label]));
-  const ranuras = i => (i.ranuras === undefined || i.ranuras === '') ? 1 : num(i.ranuras);
+  // Lo que ocupa un ítem en la mochila (dueño, 2026-10-05, P158): al menos 1 ranura, salvo que el ítem diga lo contrario (`sinRanura: true`);
+  // una pila de algo apilable (consumibles, trofeos iguales) ocupa 1 por pila. Antes había armas y piezas con 0 (no ocupaban lugar).
+  const ranuras = i => (i && i.sinRanura) ? 0 : Math.max(1, Math.round(num(i && i.ranuras)) || 1);
   // Lo que ocupa la mochila (con el Morral de cazador, los trofeos no ocupan: 2026-10-05).
   const mochilaUsada = S => { const morral = num(FichaCalculo.calcular(S).final.morral) > 0; return (S.inventario || []).filter(i => !i.equipado && !(morral && i.trofeo)).reduce((a, i) => a + ranuras(i), 0); };
   function capMochila(S){

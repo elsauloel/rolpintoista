@@ -1947,6 +1947,11 @@ prueba('🤝 recibir (P157): un ítem llega a la mochila como copia nueva (sin r
   igual([a.id, a.unidades, S.inventario.length, b.equipado, 'reservado' in b, 'aMano' in b, b.id !== 'p1' && !!b.id, (S.loot.especial || []).find(l => l.nombre === 'Escamas de dragón').cantidad],
     ['p1', 4, 2, false, false, false, true, 3]);
 });
+prueba('mochila (dueño, 2026-10-05, P158): todo ítem ocupa al menos 1 ranura (una pila, 1), salvo que diga lo contrario; el catálogo, todo en 1', () => {
+  const R = FichaEquipo.ranuras;
+  igual([R({ranuras: 0}), R({}), R({ranuras: 2}), R({consumible: true, unidades: 5, ranuras: 1}), R({ranuras: 3, sinRanura: true}), CATALOGO_BASE.filter(i => i.ranuras !== 1).map(i => i.nombre)],
+    [1, 1, 2, 1, 0, []]);
+});
 prueba('catálogo (dueño, 2026-10-05): cada cinturón y cada mochila Común tiene al menos un efecto propio de cinturón o mochila', () => {
   const PROPIOS = ['capcinturon', 'capmochila', 'saquerapido', 'boticario', 'portapergaminos', 'ranurapocion', 'ranurapergamino', 'ranuratrampa', 'ranuraankh', 'vainas', 'correas', 'bolsilloext', 'morral', 'luz', 'pasamanos', 'alforja'];
   const L = CATALOGO_BASE.filter(i => (i.tipoItem === 'cinturon' || i.tipoItem === 'mochila') && i.tier === 'Común');

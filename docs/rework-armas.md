@@ -1350,3 +1350,6 @@ van a contemplar como…»: falta completar.)
 - **Se equilibran solas, en parte (dueño, 2026-10-05):** el arma física **suma la Fuerza** (Dmg) pero **la frena la Defensa**; la varita **no suma el
   Especial** y **no la frena la Defensa** (solo se esquiva). «Puede ser que sea menos desparejo de lo que creía, siempre y cuando las varitas no
   sumen su Especial.» **Lo que tiene que ser caro es el daño directo que suma el Especial y no contempla armadura.** A confirmar con pruebas numéricas.
+- **La tirada para acertar es siempre la especial (dueño, 2026-10-05, corrige lo de «PdG común»):** un arma especial tira **siempre PdG.Esp**;
+  si lo que lanza es un **proyectil físico** (una lanza de hielo), el rival lo **esquiva con Evasión**. «Es una nota de color para imaginar las
+  armas.» → En la tanda Común, la Varita de escarcha y la Varita de cargas pasan a tirar PdG.Esp.

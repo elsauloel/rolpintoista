@@ -344,8 +344,8 @@ const Intercambio = (() => {
     if(abierta && abierta.tipo === 'dar') dibujarDar();
   }
   // El botón de la mochila (la ficha, la ventana de Equipo y 🤝 Pasar).
-  const botonDespojos = it => (!it || it.equipado || reservado(it)) ? ''
-    : `<button type="button" class="mini" data-ix-despojos="${esc(it.id)}" title="Convertirlo en despojos: ${fmt(despojosDeItem(it, 1))} por unidad (un cuarto de su precio). En combate cuesta 1 No2.">♻</button>`;
+  const botonDespojos = (it, texto) => (!it || it.equipado || reservado(it)) ? ''
+    : `<button type="button" class="mini" data-ix-despojos="${esc(it.id)}" title="Convertirlo en despojos: ${fmt(despojosDeItem(it, 1))} por unidad (un cuarto de su precio). En combate cuesta 1 No2.">♻${texto ? ' ' + texto : ''}</button>`;
 
   /* ---------- 🎒 Alforja compartida (en combate): un aliado al lado saca un consumible de tu mochila por 1 No2 ----------
      pedirAlforja: quien saca deja el pedido. pedidos(fichaId): la pantalla del dueño de la alforja lo entrega sola (saca la unidad y la manda en
@@ -608,7 +608,7 @@ const Intercambio = (() => {
         <div class="ix-fila"><span class="ix-q">🦴 Despojos <select id="ix-dt">${desp.map(d => `<option value="${esc(d.tipo === 'especial' ? 'esp:' + d.nombre : d.tipo)}">${esc(d.tipo === 'especial' ? d.nombre : DESP_TXT[d.tipo])} (${fmt(d.n)})</option>`).join('') || '<option value="">(no tenés)</option>'}</select></span><input id="ix-dn" type="number" min="0" step="1" value="${esc(previo.dn)}"><button type="button" data-ix-dar-desp${sinDest || (!desp.length ? ' disabled' : '')}>Ofrecer</button></div>
       </div>`}
       <div class="ix-paso"><h4>Ítems de tu mochila y tu cinturón</h4>
-        ${propios.length ? propios.map(({it, key}) => `<div class="ix-fila"><span class="ix-q" title="${esc(textoItem(it))}">${key === 'cinturon' ? '🧷' : '🎒'} ${esc(it.nombre)}${num(it.unidades) > 1 ? ` <span class="ix-hint">(tenés ${fmt(num(it.unidades))})</span>` : ''}</span>${it.consumible && num(it.unidades) > 1 ? `<input data-ix-u="${esc(it.id)}" type="number" min="1" max="${fmt(num(it.unidades))}" step="1" value="1">` : ''}<button type="button" data-ix-dar-este="${esc(it.id)}"${sinDest}>Ofrecer${costoTxt(key)}</button>${key === 'inventario' ? botonDespojos(it).replace('class="mini"', 'class="sec"') : ''}</div>`).join('') : '<p class="ix-hint">No hay nada para ofrecer (lo equipado o lo ya ofrecido no cuenta).</p>'}</div>`}
+        ${propios.length ? propios.map(({it, key}) => `<div class="ix-fila"><span class="ix-q" title="${esc(textoItem(it))}">${key === 'cinturon' ? '🧷' : '🎒'} ${esc(it.nombre)}${num(it.unidades) > 1 ? ` <span class="ix-hint">(tenés ${fmt(num(it.unidades))})</span>` : ''}</span>${it.consumible && num(it.unidades) > 1 ? `<input data-ix-u="${esc(it.id)}" type="number" min="1" max="${fmt(num(it.unidades))}" step="1" value="1">` : ''}<button type="button" data-ix-dar-este="${esc(it.id)}"${sinDest}>Ofrecer${costoTxt(key)}</button>${key === 'inventario' ? botonDespojos(it, 'Despojos').replace('class="mini"', 'class="sec"') : ''}</div>`).join('') : '<p class="ix-hint">No hay nada para ofrecer (lo equipado o lo ya ofrecido no cuenta).</p>'}</div>`}
       ${combate && alforjas.length ? `<div class="ix-paso"><h4>🎒 Sacar de la alforja de un aliado (${fmt(COSTO_ALFORJA)} No2)</h4>
         ${alforjas.map(a => a.items.map(it => `<div class="ix-fila"><span class="ix-q">${esc(it.nombre)} <span class="ix-hint">· de ${esc(a.aliado.nombre)} (tiene ${fmt(num(it.unidades))})</span></span><button type="button" data-ix-alforja="${esc(a.aliado.id)}|${esc(it.id)}">Sacar 1</button></div>`).join('')).join('')}
         <p class="ix-hint">Con Alforja compartida, un aliado al lado saca él mismo un consumible de tu mochila. Llega a tu cinturón si entra.</p></div>` : ''}

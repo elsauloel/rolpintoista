@@ -138,6 +138,26 @@ function dibujarRangoConVision(centro, radio, color, z){
   ctx.strokeStyle = colorConAlfa(color, 0.6); ctx.lineWidth = 2 / z; ctx.stroke();
 }
 
+// La línea recta que se está apuntando (2026-10-05, Varita láser): la punta de cada una de las 12 direcciones con un anillo, y la que apunta el
+// mouse con todas sus casillas (los tokens que alcanza ya titilan con objetivosResaltados).
+function dibujarLineaPreview(z){
+  const lp = lineaPreview;
+  ctx.save();
+  lp.lineas.forEach((cel, i) => {
+    const f = cel[cel.length - 1], p = hexCentro(f.col, f.fila);
+    ctx.beginPath(); trazarHex(p.x, p.y);
+    ctx.strokeStyle = i === lp.idx ? 'rgba(255,90,90,1)' : 'rgba(255,110,110,.55)'; ctx.lineWidth = (i === lp.idx ? 3 : 2) / z; ctx.stroke();
+  });
+  const sel = lp.lineas[lp.idx];
+  if(sel){
+    const o = hexCentro(lp.desde.col, lp.desde.fila), f = hexCentro(sel[sel.length - 1].col, sel[sel.length - 1].fila);
+    ctx.beginPath(); sel.forEach(c => { const p = hexCentro(c.col, c.fila); trazarHex(p.x, p.y); });
+    ctx.fillStyle = 'rgba(155,123,212,.30)'; ctx.fill(); ctx.strokeStyle = 'rgba(155,123,212,.9)'; ctx.lineWidth = 2 / z; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(o.x, o.y); ctx.lineTo(f.x, f.y);
+    ctx.strokeStyle = 'rgba(200,170,255,.85)'; ctx.lineWidth = 3 / z; ctx.setLineDash([8 / z, 6 / z]); ctx.stroke(); ctx.setLineDash([]);
+  }
+  ctx.restore();
+}
 // Marcado (2026-10-05): un brillo latente, lento y claro, alrededor del token (se ve también a través de la niebla).
 function brilloMarca(x, y, rad, z){
   const p = 0.5 + 0.5 * Math.sin(performance.now() / 650);
@@ -1090,6 +1110,7 @@ function dibujar(){
     ctx.strokeStyle = 'rgba(155,123,212,.9)'; ctx.lineWidth = 2 / z; ctx.stroke();
   });
 
+  if(typeof lineaPreview !== 'undefined' && lineaPreview) dibujarLineaPreview(z);   // la línea recta que se está apuntando
   if(dibujarEfectosTeleport()) animando = true;
   if(typeof dibujarEfectosRayo === 'function' && dibujarEfectosRayo()) animando = true;   // la Descarga que salta (js/19)
   if(typeof dibujarConfusionNumeros === 'function') dibujarConfusionNumeros();   // el objetivo al azar de la Confusión (js/20)

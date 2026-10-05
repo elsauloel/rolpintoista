@@ -214,6 +214,7 @@ lienzo.addEventListener('pointerdown', e => {
 
 lienzo.addEventListener('pointermove', e => {
   const {px, py} = posEvento(e);
+  if(lineaPreview) lineaPreviewMover(pantallaAMundo(px, py));   // la línea recta que se está apuntando (js/13)
   if(pincelNiebla){ nieblaPintar(px, py); return; }
   if(colocando){ colocacionMover(px, py); return; }
   if(dibujando){

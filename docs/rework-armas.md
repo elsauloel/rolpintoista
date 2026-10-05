@@ -1526,6 +1526,8 @@ lluvia ácida 21 y báculo de sangre 19,5), 3 orbes.
     Demora de las armas físicas (peso 4) × 0,75 por ser trampa → **1 SP, 45 DDE**. Quedan **30 armas + 3 orbes** Comunes.
   - Siguen a mano: el reparto de los misiles, el −1 por distancia de la pelea cercana, el empuje y el gancho, el fuego que deja la bola, el suelo de la
     ventisca, el +1d4 del miasma, el crítico de lo físico y los orbes de resguardo y salvaje.
+- **Láser, 12 direcciones (dueño, 2026-10-05, con dibujo):** 6 de lado (pega en las 4 casillas) y 6 diagonales (solo las casillas justo sobre la línea:
+  a 2 y a 4, como mucho 2 tokens). Al apuntar se ven las 12 puntas, la trayectoria de la que apunta el mouse y titilan los que alcanza. **Con fuego amigo.**
 - **Tercera tanda (2026-10-05, dueño: «se debería poder automatizar todo; el desarrollo ya está hecho»):** las armas especiales se usan desde **Atacar**
   (cada una con su recorrido, sin oportunidad ni contraataque: P160) y quedan automatizadas: el **fuego** de la bola y el **suelo resbaladizo** de la
   ventisca (`zonaQueda`: una zona de 1 turno en la flor, del motor de zonas), el **+1d4 del miasma** (`danoExtra` de la zona, como los Pedos Tóxicos),

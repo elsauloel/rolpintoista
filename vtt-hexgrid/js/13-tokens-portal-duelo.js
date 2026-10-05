@@ -665,17 +665,40 @@ async function dodgeDeclinar(){
 // salvo que la habilidad tenga fuego amigo) y crea el documento del área; el primer sub-duelo lo crea
 // escucharAreas() apenas llega el snapshot nuevo (mismo camino que cualquier avance de la cascada).
 // Las casillas del cono de un área (`centro` = {col, fila, cono, rot}): el mismo de la detección, desde esa casilla y mirando para ahí.
-// La línea recta de una habilidad (2026-10-05, Varita láser): desde `desde` hacia `hacia`, de `largo` casillas (aunque se marque más cerca o
-// más lejos), sin la casilla de quien la tira. → [{col, fila}]
-function lineaRecta(desde, hacia, largo){
-  const n = distanciaHex(desde, hacia);
-  if(!n) return [];
-  const A = hexACubo(desde), B = hexACubo(hacia), k = Math.max(1, largo) / n;
-  const q = A.q + (B.q - A.q) * k, r = A.r + (B.r - A.r) * k, s = -q - r;
-  let rq = Math.round(q), rr = Math.round(r);
-  const rs = Math.round(s), dq = Math.abs(rq - q), dr = Math.abs(rr - r), ds = Math.abs(rs - s);
-  if(dq > dr && dq > ds) rq = -rr - rs; else if(dr > ds) rr = -rq - rs;
-  return lineaHex(desde, {col: rq, fila: rr + (rq - (rq & 1)) / 2}).slice(0, Math.max(1, largo));
+/* Las 12 direcciones de una línea recta (2026-10-05, dueño, con dibujo): las 6 «de lado» (hacia cada vecino) pegan en todas las casillas hasta
+   `largo`; las 6 «diagonales» (entre dos vecinos) solo en las casillas que caen justo sobre la línea, salteadas (con largo 4: a 2 y a 4, como mucho
+   2 tokens). Coordenadas axiales (q, r) de hexACubo. → [[{col, fila}…] × 12] (las diagonales que no llegan a ninguna casilla, afuera). */
+const LINEA_LADOS = [[1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]], LINEA_DIAG = [[2, -1], [1, 1], [-1, 2], [-2, 1], [-1, -1], [1, -2]];
+function lineasPosibles(desde, largo){
+  const c0 = hexACubo(desde), celda = (dq, dr, k) => ({col: cuboACol(c0.q + k * dq, c0.r + k * dr), fila: cuboAFila(c0.q + k * dq, c0.r + k * dr)});
+  const out = LINEA_LADOS.map(([dq, dr]) => Array.from({length: largo}, (_, i) => celda(dq, dr, i + 1)));
+  LINEA_DIAG.forEach(([dq, dr]) => { const cel = []; for(let k = 1; 2 * k <= largo; k++) cel.push(celda(dq, dr, k)); if(cel.length) out.push(cel); });
+  return out;
+}
+// Cuál de las líneas apunta hacia `punto` (coordenadas del mundo): la de ángulo más parecido.
+function lineaHacia(desde, lineas, punto){
+  const o = hexCentro(desde.col, desde.fila), ang = Math.atan2(punto.y - o.y, punto.x - o.x);
+  let mejor = 0, md = Infinity;
+  lineas.forEach((cel, i) => {
+    const f = hexCentro(cel[cel.length - 1].col, cel[cel.length - 1].fila);
+    let d = Math.abs(Math.atan2(f.y - o.y, f.x - o.x) - ang);
+    if(d > Math.PI) d = 2 * Math.PI - d;
+    if(d < md){ md = d; mejor = i; }
+  });
+  return mejor;
+}
+// Mientras se elige la dirección: las 12 puntas marcadas, la trayectoria de la que apunta el mouse y, titilando, a quiénes alcanzaría (todos:
+// tiene fuego amigo). La dibuja js/05 (dibujarLineaPreview) y la mueve js/06 (lineaPreviewMover).
+let lineaPreview = null;   // {desde, lineas, idx, propioId}
+function lineaPreviewMover(punto){
+  const lp = lineaPreview;
+  if(!lp) return;
+  const i = lineaHacia(lp.desde, lp.lineas, punto);
+  if(i === lp.idx) return;
+  lp.idx = i;
+  const set = new Set(lp.lineas[i].map(c => nbPack(c.col, c.fila)));
+  objetivosResaltados = new Set([...tokens.entries()].filter(([id, t]) => id !== lp.propioId && set.has(nbPack(t.col, t.fila)) && (!t.oculto || soyGM) && !tapadoPorNiebla(t)).map(([id]) => id));
+  pedirDibujo();
 }
 function conoDeArea(c){ return new Set(zonasSigilo({col: c.col, fila: c.fila, rotacion: num(c.rot)}).cono.map(x => nbPack(x.col, x.fila))); }
 // «Por la espalda» (2026-10-03): el atacante está en el punto ciego del defensor — la misma cuña ciega de la visión (VISION_CUNA_CIEGA a cada
@@ -717,7 +740,7 @@ function dueloElegirAreaMapa(msg){
     if(hab.zonaQueda) dueloZonaQueda(hab, h, Math.max(1, radio), yo);   // lo que deja en el suelo (bola de fuego, ventisca)
     const objetivos = todos
       .filter(t => !t.oculto && !propio(t) && (enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio))
-      .filter(t => hab.fuegoAmigo || dueloEsRival(yo, t))
+      .filter(t => hab.fuegoAmigo || h.linea || dueloEsRival(yo, t))   // (la línea tiene fuego amigo: dueño, 2026-10-05)
       .filter(t => !hab.soloSigilo || (enSigilo(t) && lineaLibre(h, t, solidosSet())))   // la luz (Varita de la luz): los que estaban en sigilo y alcanza
       .map(t => t.id);
     if(!objetivos.length){ toast(hab.soloSigilo ? `💡 ${hab.nombre || 'La luz'}: no había nadie en sigilo a su alcance` : 'No hay nadie adentro del área'); return; }
@@ -743,11 +766,17 @@ function dueloElegirAreaMapa(msg){
     const mio = [...tokens.values()].find(propio);
     if(!mio){ toast('Tu token no está en el mapa: no se puede lanzar la línea'); cancelado(); return; }
     const largo = Math.max(1, Math.round(num(hab.largo)) || 4);
+    const propioId = ([...tokens.entries()].find(([, t]) => propio(t)) || [])[0] || '';
+    lineaPreview = {desde: {col: mio.col, fila: mio.fila}, lineas: lineasPosibles(mio, largo), idx: -1, propioId};
+    pedirDibujo();
+    const fin = () => { lineaPreview = null; objetivosResaltados = null; pedirDibujo(); };
     elegirDestino(c => {
-      const celdas = lineaRecta(mio, c, largo);
-      if(!celdas.length){ toast('Marcá una casilla distinta de la tuya'); cancelado(); return; }
+      const lp = lineaPreview;
+      fin();
+      if(!lp || (c.col === lp.desde.col && c.fila === lp.desde.fila)){ toast('Marcá hacia dónde, no tu propia casilla'); cancelado(); return; }
+      const celdas = lp.lineas[lineaHacia(lp.desde, lp.lineas, hexCentro(c.col, c.fila))];
       lanzar({col: mio.col, fila: mio.fila, linea: celdas.map(x => nbPack(x.col, x.fila))});
-    }, `<b>⚡ ${hab && hab.nombre ? esc(hab.nombre) + ': ' : ''}marcá hacia dónde sale la línea</b> <span>clic en el mapa (${largo} casillas desde tu token) · Esc o clic derecho cancelan</span>`, true, cancelado);
+    }, `<b>⚡ ${hab && hab.nombre ? esc(hab.nombre) + ': ' : ''}elegí la dirección</b> <span>mové el mouse: titilan los que alcanza (también aliados) · clic para tirar · Esc o clic derecho cancelan</span>`, true, () => { fin(); cancelado(); });
     return;
   }
   // Onda alrededor de quien la usa (Shockwave…): el centro es su propio token, no hay que marcar nada.
@@ -942,7 +971,7 @@ async function dueloCadena(d, golpe){
 async function dueloAtraer(d){
   const t = tokens.get(d.defensor.tokenId), ta = tokens.get(d.atacante.tokenId), a = d.hab.atrae;
   if(!t || !ta) return;
-  const nom = nombreDe(t), titulo = `🪝 ${d.hab.nombre}: ¿${nom} se resiste?`;
+  const nom = nombreDe(t), titulo = `${d.hab.nombre}: ¿${nom} se resiste?`;
   const fue = trampaValorStat(t, a.contra || 'fue'), fF = formulaParaValor(fue), fE = formulaParaValor(num(a.tiraValor));
   const rF = fF ? tirarDados(fF.formula) : {total: 0}, rE = fE ? tirarDados(fE.formula) : {total: 0};
   const cuenta = `Fuerza ${fF ? fF.formula : '0'} → ${rF.total} contra Ef.Esp ${fE ? fE.formula : '0'} → ${rE.total}`;

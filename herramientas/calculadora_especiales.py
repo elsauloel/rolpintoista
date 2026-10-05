@@ -36,7 +36,8 @@ EF_ESP_REF = 4
 # La forma: cuántos objetivos alcanza en promedio (un área, además, le cuesta No2 al que la esquiva con dodge roll).
 FORMA = {'uno': 1.0, 'cadena': 1.4, 'linea': 1.3, 'cono': 1.5, 'flor1': 1.75, 'flor2': 2.5}
 # Efectos: los mismos pesos de las armas físicas (PESO_EFECTO), más los de control que las armas físicas no tienen (en No2 o turnos que le hace perder).
-PESO_EXTRA = {'Lento': 2.0, 'Sentado': 3.0, 'Inmovilizado': 3.5, 'Escarcha': 2.5, 'Parálisis': 4.0, 'Empuje': 1.5, '-2 PdG': 2.0,
+PESO_EXTRA = {'Silencio': 3.0, 'Atraer': 1.5, 'Marca': 1.0, 'Luz': 1.0, 'Muro': 2.0, 'Daño 1': 1.0, 'Daño 1d4': 2.5, 'Brea': 3.5,
+              'Lento': 2.0, 'Sentado': 3.0, 'Inmovilizado': 3.5, 'Escarcha': 2.5, 'Parálisis': 4.0, 'Empuje': 1.5, '-2 PdG': 2.0,
               'Niebla': 2.0, 'Marca +1 PdG': 1.0, 'Revela': 1.5, 'Cura': 1.0, 'Escudo': 0.8, 'Sigilo': 2.0}
 # Un terreno (zona) vale su efecto por cada turno que dura, pero solo si alguien lo pisa: × TERRENO por turno.
 TERRENO = 0.6
@@ -67,9 +68,10 @@ def usos_por_turno(no2=NO2_REF, base=COSTO_BASE, sube=COSTO_SUBE):
 def valor_uso(a):
     d = {}
     clase = a.get('clase', 'arcano')
-    d['daño'] = dado_prom(a.get('dado')) * MULT_DANO.get(clase, 1.0)
-    if a.get('sumaEspecial'):
-        d['Especial'] = EF_ESP_REF * MULT_DANO.get(clase, 1.0)
+    d['daño'] = dado_prom(a.get('dado')) * MULT_DANO.get(clase, 1.0) * a.get('golpes', 1)
+    if a.get('sumaEspecial'):   # True = el Especial entero; un número = esa fracción (0.5 = la mitad)
+        f = 1.0 if a['sumaEspecial'] is True else float(a['sumaEspecial'])
+        d['Especial'] = EF_ESP_REF * f * MULT_DANO.get(clase, 1.0)
     ef = 0.0
     for nombre, prob in (a.get('efectos') or {}).items():
         ef += peso_efecto(nombre) * prob
@@ -101,25 +103,53 @@ def referencia():
     return out
 
 
-# ---------------------------------------------------------------- borradores Comunes (2026-10-05, a revisar con el dueño)
-# Todas: tiran PdG.Esp para acertar; costo en No2 que sube 2, 3, 4; las de control y terreno pagan además SP.
-BORRADORES = [
+# ---------------------------------------------------------------- pool Común (2026-10-05, después del filtro del dueño)
+# Varitas: sin Especial; tiran PdG.Esp; cuestan 2, 3, 4 No2; las de control y terreno, además SP. El control va como secundario de un daño
+# leve o en área (dueño). Báculos: suman Especial (en Común, la mitad) y cuestan SP. Orbes: van en la otra mano, no atacan (valor aparte).
+POOL = [
+    # — daño —
     {'nombre': 'Varita arcana', 'clase': 'arcano', 'dado': '1d4'},
-    {'nombre': 'Varita de escarcha (lanza de hielo, física T4)', 'clase': 'fisico', 'dado': '1d4', 'efectos': {'Lento': 1 / 3}},
-    {'nombre': 'Varita de estática', 'clase': 'elemental', 'dado': '1d3', 'forma': 'cadena'},
-    {'nombre': 'Varita de chispas', 'clase': 'elemental', 'dado': '1d2', 'forma': 'flor1'},
-    {'nombre': 'Frasco de miasma', 'clase': 'toxico', 'efectos': {'Envenenar': 1.0}, 'sp': 1},
-    {'nombre': 'Silbato de ráfaga', 'clase': 'arcano', 'efectos': {'Empuje': 1.0}, 'forma': 'cono', 'sp': 1},
-    {'nombre': 'Varita de lodo', 'clase': 'arcano', 'terreno': ('Lento', 2), 'forma': 'linea', 'sp': 2},
-    {'nombre': 'Vara de destello', 'clase': 'arcano', 'efectos': {'-2 PdG': 1.0}, 'forma': 'flor1', 'sp': 2},
-    {'nombre': 'Varita de bruma', 'clase': 'arcano', 'terreno': ('Niebla', 2), 'forma': 'flor1', 'sp': 1},
-    {'nombre': 'Varita de cuerdas', 'clase': 'arcano', 'efectos': {'Inmovilizado': 1.0}, 'sp': 2},
-    {'nombre': 'Varita de aceite', 'clase': 'arcano', 'terreno': ('Sentado', 2), 'forma': 'flor1', 'sp': 2},
-    {'nombre': 'Amuleto de la chispa vital (cura 1d4)', 'clase': 'arcano', 'efectos': {'Cura': 2.5}, 'sp': 1},
-    {'nombre': 'Varita del amparo (escudo 3)', 'clase': 'arcano', 'efectos': {'Escudo': 3}, 'sp': 1},
-    {'nombre': 'Campanita de vigía', 'clase': 'arcano', 'efectos': {'Revela': 1.0}, 'forma': 'flor2', 'sp': 1},
-    {'nombre': 'Bastón zahorí (marca +1 PdG)', 'clase': 'arcano', 'efectos': {'Marca +1 PdG': 1.0}},
-    {'nombre': 'Báculo arcano (suma Especial)', 'clase': 'arcano', 'dado': '1d4', 'sumaEspecial': True, 'sp': 2},
+    {'nombre': 'Varita de misiles', 'clase': 'arcano', 'dado': '1d2', 'golpes': 2},
+    {'nombre': 'Varita de chispa eléctrica (cadena)', 'clase': 'elemental', 'dado': '1d3', 'forma': 'cadena'},
+    {'nombre': 'Varita del relámpago (línea de 3)', 'clase': 'elemental', 'dado': '1d2', 'forma': 'linea'},
+    {'nombre': 'Varita de chispas (flor)', 'clase': 'elemental', 'dado': '1d2', 'forma': 'flor1'},
+    {'nombre': 'Varita del soplo de fuego (cono 2)', 'clase': 'elemental', 'dado': '1d2', 'forma': 'cono', 'efectos': {'Prende fuego': 0.25}},
+    {'nombre': 'Varita de la estaca (lanza de hielo, física T4)', 'clase': 'fisico', 'dado': '1d4', 'efectos': {'Lento': 0.25}},
+    {'nombre': 'Varita del canto rodado (piedrazo, físico T8)', 'clase': 'fisico', 'dado': '1d6', 'efectos': {'Demora': 0.25}},
+    {'nombre': 'Varita de granizo (flor, físico)', 'clase': 'fisico', 'dado': '1d2', 'forma': 'flor1', 'efectos': {'Escarcha': 0.25}, 'sp': 1},
+    {'nombre': 'Varita de ácido (1d2, Armadura rota 50 %)', 'clase': 'elemental', 'dado': '1d2', 'efectos': {'Rompe armadura': 0.5}},
+    {'nombre': 'Varita de miasma (nube 1 turno)', 'clase': 'toxico', 'dado': '1d2', 'forma': 'flor1', 'sp': 1},
+    {'nombre': 'Varita de la pelea cercana (1d4, +2 al lado)', 'clase': 'arcano', 'dado': '1d4', 'efectos': {'Daño 1': 1.0}},
+    # — daño leve con control —
+    {'nombre': 'Varita del destello (Pajaritos 25 %)', 'clase': 'arcano', 'dado': '1d2', 'efectos': {'Pajaritos': 0.25}},
+    {'nombre': 'Varita del susurro (Silencio 25 %)', 'clase': 'arcano', 'dado': '1d2', 'efectos': {'Silencio': 0.25}},
+    {'nombre': 'Varita de la ráfaga (cono 1, empuja)', 'clase': 'arcano', 'dado': '1d2', 'forma': 'cono', 'efectos': {'Empuje': 1.0}, 'sp': 1},
+    {'nombre': 'Varita del gancho (atrae 1)', 'clase': 'arcano', 'dado': '1d2', 'efectos': {'Atraer': 1.0}},
+    {'nombre': 'Varita del rastreador (marca 2 turnos)', 'clase': 'arcano', 'dado': '1d2', 'efectos': {'Marca': 2.0}},
+    # — terreno y colocar —
+    {'nombre': 'Varita del aceite (1 casilla, 1 turno)', 'clase': 'arcano', 'terreno': ('Sentado', 1), 'sp': 1},
+    {'nombre': 'Varita de telaraña (1 casilla, 2 turnos, como Brea)', 'clase': 'arcano', 'terreno': ('Brea', 2), 'sp': 1},
+    {'nombre': 'Varita de escarcha (2 casillas, 1 turno, resbala)', 'clase': 'arcano', 'terreno': ('Sentado', 1), 'forma': 'linea', 'sp': 1},
+    {'nombre': 'Varita de espinas (2 casillas, 2 turnos)', 'clase': 'arcano', 'terreno': ('Daño 1', 2), 'forma': 'linea', 'sp': 1},
+    {'nombre': 'Varita de la runa (trampa oculta 1d4)', 'clase': 'arcano', 'terreno': ('Daño 1d4', 1), 'sp': 1},
+    {'nombre': 'Varita de niebla (flor, 2 turnos)', 'clase': 'arcano', 'terreno': ('Niebla', 2), 'forma': 'flor1', 'sp': 1},
+    {'nombre': 'Varita de la ventisca (viento, cono, empuja)', 'clase': 'arcano', 'terreno': ('Empuje', 1), 'forma': 'cono', 'sp': 1},
+    {'nombre': 'Varita del muro (2 casillas, 1 turno)', 'clase': 'arcano', 'terreno': ('Muro', 1), 'forma': 'linea', 'sp': 2},
+    # — apoyo —
+    {'nombre': 'Varita de la luz (radio 2, hasta el Mantenimiento)', 'clase': 'arcano', 'efectos': {'Luz': 2.0}},
+    {'nombre': 'Varita de cura (1d4 a un aliado)', 'clase': 'arcano', 'efectos': {'Cura': 2.5}, 'sp': 1},
+    # — báculos (suman Especial) —
+    {'nombre': 'Báculo de aprendiz (1 mano: 1d2 + ½ Especial)', 'clase': 'arcano', 'dado': '1d2', 'sumaEspecial': 0.5, 'sp': 1},
+    {'nombre': 'Báculo de brasas (2 manos: 1d4 fuego + ½ Especial, 25 % quemar)', 'clase': 'elemental', 'dado': '1d4', 'sumaEspecial': 0.5, 'efectos': {'Prende fuego': 0.25}, 'sp': 2},
+]
+PARA_BUENA = [   # se pasan del techo Común: candidatas a calidad Buena
+    {'nombre': 'Varita de lluvia ácida (flor, Armadura rota segura)', 'clase': 'elemental', 'dado': '1d2', 'forma': 'flor1', 'efectos': {'Rompe armadura': 1.0}, 'sp': 1},
+    {'nombre': 'Báculo de sangre (2 manos: 1d4 + Especial, paga 2 de vida)', 'clase': 'arcano', 'dado': '1d4', 'sumaEspecial': True, 'sp': 0},
+]
+ORBES = [   # van en la otra mano y no atacan: su valor se compara con un escudo Común (a definir)
+    ('Orbe de resguardo', 'Una vez por turno, al usar una varita o un báculo, Escudo especial 2 hasta tu próximo turno.'),
+    ('Orbe de luz', 'Luz alrededor tuyo (radio 1) y +1 al campo de visión mientras lo llevás.'),
+    ('Orbe salvaje', 'Al usar una varita, tirás 1d6: con 1 te hace 1 de daño a vos; con 6 el efecto sale doble.'),
 ]
 
 
@@ -131,12 +161,17 @@ def main():
     usos = usos_por_turno()
     print(f'\nVaritas: costo {COSTO_BASE}, {COSTO_BASE + COSTO_SUBE}, {COSTO_BASE + 2 * COSTO_SUBE}… → {usos} usos por turno con {NO2_REF} No2 (sin moverse)\n')
     techo = ref['Común'][1]
-    for a in BORRADORES:
+    print(f'  (techo Común: ~{ref["Común"][1]:.1f} por turno, de {ref["Común"][2]:.1f} a {ref["Común"][3]:.1f}; Buena ~{ref["Buena Calidad"][1]:.1f})\n')
+    for a in POOL:
         d = valor_uso(a)
         turno = d['valor'] * usos
         sp = a.get('sp', 0)
-        marca = '  ⚠ pasa la Común' if turno - sp * usos * TASA_SP > ref['Común'][3] else ''
+        neto = turno - sp * usos * TASA_SP
+        marca = '  ⚠ pasa la Común' if neto > ref['Común'][3] else ''
         print(f"  {a['nombre']}: {d['valor']:.1f} por uso · {turno:.1f} por turno" + (f" · {sp} SP por uso ({sp * usos} por turno)" if sp else '') + marca)
+
+    print('\nOrbes (otra mano, no atacan; valor a definir):')
+    for n, t in ORBES: print(f'  {n}: {t}')
 
 
 if __name__ == '__main__':

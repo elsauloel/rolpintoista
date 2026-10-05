@@ -232,7 +232,7 @@ function abrirVender(){
   $('#scrim-vender').classList.add('open');
 }
 function confirmarVender(){
-  if(FichaTienda.vender(S, tiendaSt, tiendaUi)) $('#scrim-vender').classList.remove('open');
+  if(FichaTienda.vender(S, tiendaSt, tiendaUi)){ $('#scrim-vender').classList.remove('open'); $('#catalogo-dde').textContent = fmt(num(S.meta.dde)); }   // los DDE de la tienda, al día
 }
 /* ---------- Reparación con el herrero (2026-09-26, pedido del dueño) ----------
    Las tiendas que el GM marca como «herrero» tienen el botón 🔧 Reparación. Se repara por punto de durabilidad (por defecto 1 DDE por punto; lo fija la tienda) y cada

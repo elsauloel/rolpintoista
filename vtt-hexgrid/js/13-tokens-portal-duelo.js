@@ -477,7 +477,7 @@ function dueloElegirObjetivoMapa(msg){
       const mio = todos.find(propio);
       let espalda = false;
       try{ espalda = porLaEspalda(mio, t); }catch(err){ console.error('No se pudo ver si es por la espalda:', err); }   // nunca traba el ataque
-      if(ataque && ataque.hab && ataque.hab.reparte){ dueloSegundoMisil(yo, ataque, t, mio); return; }   // Varita de misiles: ¿y el segundo?
+      if(ataque && ataque.hab && ataque.hab.reparte){ dueloMisiles(yo, ataque, t, mio); return; }   // Varita de misiles: de a uno
       Duelo.crear({yo, ataque, espalda}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
     }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : ''}</span>`, true, cancelado);
@@ -485,23 +485,35 @@ function dueloElegirObjetivoMapa(msg){
   };
   pedir();
 }
-/* Los dos misiles (2026-10-05, Varita de misiles): elegido el primero, se marca a quién va el segundo. El mismo (o Esc): los dos juntos, un duelo
-   con el daño entero. Otro: una cascada de dos, como un área — se tira una vez y cada uno se resiste por separado, con el daño de un misil cada uno. */
-function dueloSegundoMisil(yo, ataque, t1, mio){
-  const hab = ataque.hab, juntos = () => Duelo.crear({yo, ataque}, {id: t1.id, nombre: nombreDe(t1), tipo: t1.tipo, fichaId: t1.fichaId, duenoUid: t1.duenoUid}, mio ? mio.id : '')
-    .catch(err => { console.error('No se pudo abrir el duelo:', err); toast('No se pudo abrir el duelo'); });
+/* Los misiles (2026-10-05, Varita de misiles; dueño: «el segundo objetivo se elige una vez que se recorrió todo el efecto del primero»): van de a uno,
+   como una cascada de área que se arma sobre la marcha. El primero es un duelo entero contra el rival elegido; cuando se resuelve, el área queda
+   «eligiendo» y a quien los tira se le pide el próximo objetivo (puede ser el mismo), con su propia tirada. Esc: ese misil no sale. */
+async function dueloMisiles(yo, ataque, t1, mio){
+  const hab = ataque.hab;
+  try{
+    await coleccionAreas().add({
+      casteador: {ref: String(yo.ref || ''), tipo: yo.tipo, nombre: String(yo.nombre || '').slice(0, 40), uid: (mio && mio.duenoUid) || fbUsuario.uid, tokenId: mio ? mio.id : ''},
+      hab: Duelo.limpiarHab({...hab, dano: hab.dano ? {...hab.dano, formula: hab.reparte.cada} : hab.dano}),
+      centro: {col: mio ? mio.col : t1.col, fila: mio ? mio.fila : t1.fila, linea: [nbPack(t1.col, t1.fila)]}, radio: 0,
+      objetivos: [t1.id], duelos: [], indice: 0, estado: 'en-curso', creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  }catch(err){ console.error('No se pudieron lanzar los misiles:', err); toast('No se pudieron lanzar los misiles — revisá la consola'); }
+}
+const misilesEligiendo = new Set();
+function misilSiguiente(id, a){
+  if(!fbUsuario || !a.casteador || a.casteador.uid !== fbUsuario.uid || misilesEligiendo.has(id)) return;
+  misilesEligiendo.add(id);
+  const n = (a.objetivos || []).length + 1, total = num(a.hab && a.hab.reparte && a.hab.reparte.total) || 2;
   elegirDestino(async h => {
-    const t2 = [...tokens.entries()].map(([id, x]) => ({...x, id})).find(x => x.col === h.col && x.fila === h.fila && x.id !== (mio && mio.id) && (!x.oculto || soyGM) && !tapadoPorNiebla(x));
-    if(!t2 || t2.id === t1.id){ juntos(); return; }
+    const t = [...tokens.entries()].map(([k, x]) => ({...x, id: k})).find(x => x.col === h.col && x.fila === h.fila && x.id !== a.casteador.tokenId && (!x.oculto || soyGM) && !tapadoPorNiebla(x));
+    if(!t){ toast('Ahí no hay nadie: hacé clic sobre un rival'); misilesEligiendo.delete(id); misilSiguiente(id, a); return; }
     try{
-      await coleccionAreas().add({
-        casteador: {ref: String(yo.ref || ''), tipo: yo.tipo, nombre: String(yo.nombre || '').slice(0, 40), uid: (mio && mio.duenoUid) || fbUsuario.uid, tokenId: mio ? mio.id : ''},
-        hab: Duelo.limpiarHab({...hab, dano: hab.dano ? {...hab.dano, formula: hab.reparte.cada} : hab.dano}),
-        centro: {col: mio ? mio.col : t1.col, fila: mio ? mio.fila : t1.fila, linea: [nbPack(t1.col, t1.fila), nbPack(t2.col, t2.fila)]}, radio: 0,
-        objetivos: [t1.id, t2.id], duelos: [], indice: 0, estado: 'en-curso', creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
-      });
-    }catch(err){ console.error('No se pudieron repartir los misiles:', err); toast('No se pudieron repartir los misiles: van los dos al primero'); juntos(); }
-  }, `<b>✨ ${esc(hab.nombre)}: ¿a quién va el segundo misil?</b> <span>clic en otro rival (o en ${esc(nombreDe(t1))} para los dos juntos) · Esc: los dos a ${esc(nombreDe(t1))}</span>`, true, juntos);
+      await coleccionAreas().doc(id).update({objetivos: [...(a.objetivos || []), t.id], estado: 'en-curso',
+        centro: {...a.centro, linea: [...((a.centro && a.centro.linea) || []), nbPack(t.col, t.fila)]}});
+    }catch(err){ console.error('No se pudo lanzar el misil:', err); toast('No se pudo lanzar el misil'); }
+    misilesEligiendo.delete(id);
+  }, `<b>✨ ${esc((a.hab && a.hab.nombre) || 'Misiles')}: misil ${n} de ${total} — ¿a quién?</b> <span>clic sobre un rival (puede ser el mismo) · Esc: ese misil no sale</span>`, true,
+  () => { misilesEligiendo.delete(id); coleccionAreas().doc(id).update({estado: 'terminado'}).catch(err => console.error(err)); toast('Ese misil no salió'); });
 }
 // Un token de creep sin ficha detrás (creado con «Nuevo token» en vez de traerlo de GM Tools) no tiene datos para pelear. Si el GM ataca a uno, se lo vincula solo
 // al creep de GM Tools con el mismo nombre (prefiere uno que todavía no tenga token) y se avisa.
@@ -539,15 +551,16 @@ let areasActivas = new Map();   // id → datos, solo las 'en-curso' (dibujar el
 
 const AREA_ATASCADA_MS = 5 * 60 * 1000;   // si sigue 'en-curso' pasado esto, se cierra sola (ver más abajo)
 function escucharAreas(){
-  coleccionAreas().where('estado', '==', 'en-curso').onSnapshot(snap => {
+  coleccionAreas().where('estado', 'in', ['en-curso', 'eligiendo']).onSnapshot(snap => {
     areasActivas.clear();
     snap.docs.forEach(doc => areasActivas.set(doc.id, doc.data()));
     pedirDibujo();
+    areasActivas.forEach((a, id) => { if(a.estado === 'eligiendo') misilSiguiente(id, a); });   // los misiles: el próximo lo elige quien los tira
     // Autocuración: si a un área en curso le falta el sub-duelo que le toca (recién creada, o
     // esta pestaña del GM no llegó a verlo antes), lo crea acá — cubre el primer objetivo y
     // cualquiera que se haya quedado a mitad de camino (ej. la pestaña del GM se cerró un instante).
     if(soyGM) areasActivas.forEach((a, id) => {
-      if(!(a.duelos || [])[num(a.indice)]){ areaCrearSiguienteSubDuelo(id, a); return; }
+      if(a.estado === 'en-curso' && !(a.duelos || [])[num(a.indice)]){ areaCrearSiguienteSubDuelo(id, a); return; }
       // Seguro contra que se quede pegada para siempre (ej. un dodge roll que nadie llegó a resolver, o
       // un permiso que falló en el último paso): pasados AREA_ATASCADA_MS igual 'en-curso', se cierra sola
       // — el pedido del dueño (2026-09-27) es que un área nunca deje una marca permanente en el mapa.
@@ -575,7 +588,7 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
     // El casteador tira su PdG.Esp/PdG UNA SOLA VEZ para toda la cascada (dicho por el dueño, 2026-09-27): del 2do
     // objetivo en adelante, `a.pdgCompartido` (capturado del primero al resolverse, ver dueloGrupoResuelto) llega
     // precargado — este sub-duelo solo le pide la Evasión a ESTE objetivo, contra esa misma tirada.
-    dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: a.hab, alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: objetivos.length}, pdgCompartido: a.pdgCompartido || null},
+    dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: a.hab, alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: Math.max(objetivos.length, num(a.hab && a.hab.reparte && a.hab.reparte.total))}, pdgCompartido: a.pdgCompartido || null},
       {id: tokenId, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, a.casteador.tokenId, '');
   }catch(err){ console.error('No se pudo crear el sub-duelo del área:', err); return; }
   try{
@@ -596,8 +609,9 @@ function dueloGrupoResuelto(d){
     const a = doc.data();
     if(a.estado !== 'en-curso' || num(a.indice) !== idx) return;   // ya avanzó por otra vía
     const siguiente = idx + 1, total = (a.objetivos || []).length;
-    const cambios = siguiente >= total ? {estado: 'terminado'} : {indice: siguiente};
-    if(!a.pdgCompartido && d.pdg) cambios.pdgCompartido = d.pdg;
+    const reparte = a.hab && a.hab.reparte, quedan = reparte ? (num(reparte.total) || 2) - total : 0;   // los misiles: ¿queda alguno por tirar?
+    const cambios = siguiente >= total ? (quedan > 0 ? {estado: 'eligiendo', indice: siguiente} : {estado: 'terminado'}) : {indice: siguiente};
+    if(!a.pdgCompartido && d.pdg && !reparte) cambios.pdgCompartido = d.pdg;   // (cada misil, con su propia tirada)
     return coleccionAreas().doc(areaId).update(cambios);
   }).catch(err => console.error('No se pudo avanzar la cascada del área:', err));
 }

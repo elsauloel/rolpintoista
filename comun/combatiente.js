@@ -606,7 +606,7 @@ const Combatiente = (() => {
       ...(c.zonaQueda ? {zonaQueda: {...c.zonaQueda, ...(c.zonaQueda.tira && o.stat ? {tiraValor: Math.round(nf(o.stat(c.zonaQueda.tira)))} : {})}} : {}),
       ...(c.menosDistancia ? {menosDistancia: true} : {}),
       ...(c.atrae ? {atrae: {casillas: Math.max(1, Math.round(nf(c.atrae.casillas)) || 2), contra: c.atrae.contra || 'fue', ...(o.stat ? {tiraValor: Math.round(nf(o.stat(c.atrae.tira || 'dmgesp')))} : {})}} : {}),
-      ...(c.reparte ? {reparte: {cada: String(c.reparte.cada || '1d4')}} : {}),
+      ...(c.reparte ? {reparte: {cada: String(c.reparte.cada || '1d4'), total: Math.max(2, Math.round(nf(c.reparte.total)) || 2)}} : {}),
       ...(nf(c.critTipo) ? {critTipo: Math.round(nf(c.critTipo))} : {}),   // la luz (2026-10-05, Varita de la luz): solo los rivales en sigilo que alcanza
       // Rayo en cadena (2026-10-05, Varita de chispa eléctrica): si el golpe entra, salta `saltos` veces al más cercano del mismo bando a
       // `rango` casillas o menos, la mitad cada salto (P118: la misma regla de ⚡ Rayo en cadena del token y de la trampa Descarga).

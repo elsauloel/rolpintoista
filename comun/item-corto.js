@@ -115,6 +115,10 @@ const ItemCorto = (() => {
   }
   function armaEsencial(it){
     if(!esArma(it)) return '';
+    if(it.especial){   // ✨ arma especial (2026-10-05): su daño (si tiene) y lo que cuesta, sin Tipo ni dados por Peso
+      const e = it.especial, du = e.duelo || {};
+      return ['✨ Arma especial', ...(e.dano ? [`${e.dano}${e.sumaEspecial ? ' + Ef.Esp' : ''} ${du.tipoDano || 'arcano'}`] : []), `${num(e.no2 ?? 1)} No2 + ${num(e.sp)} SP por uso`].join(' · ');
+    }
     const peso = Math.max(1, num(it.peso) || 1), amp = Math.max(0, num(it.danoAmplificado)), tipo = num(it.tipoDado) || 8;
     const p = [`Tipo ${tipo}`];
     if(it.tipoItem === 'arma_2m') p.push('2 manos');
@@ -163,6 +167,16 @@ const ItemCorto = (() => {
   };
   function armaTecnico(it){
     if(!esArma(it)) return [];
+    // Un arma especial (varita, báculo, 2026-10-05) no tiene Tipo ni dados por Peso: se explica lo suyo (cómo se usa y qué cuesta).
+    if(it.especial){
+      const e = it.especial, sp = num(e.sp), du = e.duelo || {};
+      const E = [`Arma especial: se usa desde «✨ Atacar» de la Botonera, con su propio recorrido (sin ataque de oportunidad ni contraataque). Cuesta ${num(e.no2 ?? 1)} No2 el primer uso del turno y ${num(e.sube ?? 1)} más por cada uso siguiente, más ${sp} SP por uso (sin SP: 1 No2 más por cada SP).`];
+      E.push(`Peso ${Math.max(1, num(it.peso) || 1)}: lo que carga mientras está equipada (no cambia el daño).`);
+      if(e.sumaEspecial) E.push(`Suma ${e.sumaEspecial === true ? 'tu Ef.Esp' : 'la mitad de tu Ef.Esp'} al daño.`);
+      if(num(du.critTipo)) E.push(`Es física: la frena la Defensa y critica como un arma de Tipo ${num(du.critTipo)} (contra la Resistencia a crítico Tipo ${num(du.critTipo)} del defensor).`);
+      E.push('No sirve para parrear ni bloquear.');
+      return E;
+    }
     const tipo = num(it.tipoDado) || 8, L = [];
     L.push(`Tipo ${tipo}: cada dado de daño es un d${tipo}. El primer ataque del turno con esta arma cuesta ${Math.ceil(tipo / 2)} No2 y los siguientes ${tipo}.`);
     L.push(`Peso ${Math.max(1, num(it.peso) || 1)}: es la cantidad de dados de daño y lo que carga mientras está equipada.`);

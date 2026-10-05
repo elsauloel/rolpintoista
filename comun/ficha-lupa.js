@@ -277,7 +277,7 @@ const FichaLupa = (() => {
 
     if(key === 'inventario' || key === 'cinturon' || key === 'catalogo'){
       if(it.tipoItem) L.push(linea('Categoría', CATEGORIA_LABEL[it.tipoItem] || it.tipoItem));
-      if(ES_ARMA(it.tipoItem)) L.push(linea('Tipo', fmt(num(it.tipoDado) || 8)));
+      if(ES_ARMA(it.tipoItem) && !it.especial) L.push(linea('Tipo', fmt(num(it.tipoDado) || 8)));   // (un arma especial no tiene Tipo)
       if(ES_ARMA(it.tipoItem) && EfectosGolpe.lista(it.efectosGolpe).length) L.push(linea('Al golpear', EfectosGolpe.resumenLista(it.efectosGolpe)));
       L.push(linea('Peso', fmt(num(it.peso))));
       // Durabilidad (variable de diseño del ítem): la de fábrica; en una copia propia, además cuánto le queda.

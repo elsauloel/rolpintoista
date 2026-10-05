@@ -492,7 +492,7 @@ const Duelo = (() => {
         ...(h.zonaQueda.contra ? {contra: txtCorto(h.zonaQueda.contra, 12)} : {}), ...(h.zonaQueda.tira ? {tira: txtCorto(h.zonaQueda.tira, 12), tiraValor: _num(h.zonaQueda.tiraValor)} : {}),
         ...(h.zonaQueda.color ? {color: txtCorto(h.zonaQueda.color, 7)} : {})}} : {}),   // lo que deja en el suelo (bola de fuego, ventisca)
       ...(h.menosDistancia ? {menosDistancia: true} : {}),   // −1 por casillero después del primero (pelea cercana)
-      ...(h.reparte ? {reparte: {cada: txtCorto(h.reparte.cada || '1d4', 12)}} : {}),   // dos misiles que se pueden repartir
+      ...(h.reparte ? {reparte: {cada: txtCorto(h.reparte.cada || '1d4', 12), total: Math.min(6, Math.max(2, Math.round(_num(h.reparte.total)) || 2))}} : {}),   // misiles de a uno (Varita de misiles)
       ...(h.atrae ? {atrae: {casillas: Math.min(6, Math.max(1, Math.round(_num(h.atrae.casillas)) || 2)), contra: txtCorto(h.atrae.contra || 'fue', 12), tiraValor: _num(h.atrae.tiraValor)}} : {}),   // el gancho
       ...(_num(h.critTipo) ? {critTipo: Math.min(12, Math.max(1, Math.round(_num(h.critTipo))))} : {}),   // lo físico invocado critica como su Tipo
       ...(objetivo === 'linea' ? {largo: Math.min(12, Math.max(1, Math.round(_num(h.largo)) || 4))} : {}),

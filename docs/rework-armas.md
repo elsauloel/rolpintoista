@@ -1432,3 +1432,10 @@ van a contemplar como…»: falta completar.)
   → **es lo mismo que la Brea: se unifican** · ✅ 86 espinas · ✅ 87 niebla · ❌ 88 oscuridad (se superpone con la niebla) · ❌ 89 agua · ✅ 90 viento ·
   🔀 91 hierba alta y 92 zona sagrada: el efecto gusta, no para arma · 🔀 93 Silencio: sí, pero **no en área**: como **% de efecto secundario** de un ataque
   leve o moderado. **110 canalizar y 111 concentración: no.** **Apoyo 53 a 61: no** («si no mencioné nada: no»). Filtro completo.
+
+### Pool Común de armas especiales — primera versión (2026-10-05, para que el dueño filtre)
+Reglas comunes: **varitas** sin Especial, tiran PdG.Esp, cuestan **2, 3, 4 No2** (las de control y terreno, además **SP**), alcance = Rango de casteo;
+el control va como secundario de un daño leve o en área. **Báculos**: suman Especial (en Común, la mitad) y cuestan SP. **Orbes**: en la otra mano, no
+atacan. Números: `herramientas/calculadora_especiales.py` (efecto por turno con 7 No2; techo Común ~6,1, de 2,3 a 9,6; Buena ~9,2).
+Lista completa con números en la calculadora (`POOL`, `PARA_BUENA`, `ORBES`): 30 armas Comunes, 2 candidatas a Buena (en realidad, más que Rara:
+lluvia ácida 21 y báculo de sangre 19,5), 3 orbes.

@@ -1456,3 +1456,9 @@ lluvia ácida 21 y báculo de sangre 19,5), 3 orbes.
   La comparación no cuenta la esquiva (los dos lados tienen que acertar), pero la varita enfrenta menos capas de defensa que un arma física (sin Parry,
   Bloqueo ni Defensa) y los saltos del rayo no se esquivan: por prudencia, cada tiro Común va de ~5,5 a ~7,5. Pool rehecho así (28 + 3 orbes, en
   `herramientas/calculadora_especiales.py`).
+- **Cuarta vuelta del costo, CERRADA (dueño, 2026-10-05: «dale, vamos por acá»): el No2 sube 1, 2, 3 por uso en el turno, y cada uso cuesta el SP de su
+  efecto.** Se parte de **1d4 por 1 SP**; lo más fuerte cuesta **más SP, no más No2**. Escala (calculadora): tiro de hasta 4,5 → 1 SP · hasta 6 → 2 ·
+  hasta 7,5 → 3 · más → 4 (Común llega a 3). El SP es la reserva del combate: las varitas caras dan una ráfaga y se apagan; las baratas se sostienen.
+  Con esto, en un combate de 4 turnos, **el mago queda en 11 a 18 por turno (unas 2 a 3 veces un arma física Común) y el que no es mago en 6 a 9**.
+  No es un problema de las varitas: **Chispazo** (habilidad del Mago: 1d6 directo por 1 No2 + 1 SP, sin incremento) ya rinde más por SP que cualquier
+  varita, como tiene que ser. Queda abierta la pregunta de fondo, de clases: **cuánto tiene que pegar un mago contra un guerrero** (P159).

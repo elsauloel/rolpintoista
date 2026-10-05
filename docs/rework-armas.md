@@ -1368,3 +1368,12 @@ van a contemplar como…»: falta completar.)
   tiene** → **pesa un poco menos** que los elementales y el arcano. Los **elementales** ignoran la armadura; sus resistencias de equipo existen pero
   son marginales. El **arcano es el que más vale**, sobre todo **si suma el Especial**: va muy directo a la vida una vez que pasa las tiradas.
   Orden de valor: arcano (con Especial) > arcano > elemental > tóxico.
+- **Varitas y báculos (dueño, 2026-10-05, a nivel narrativo):** las **varitas, sin Especial**; los **báculos, con Especial**. Hay **báculos de una mano y
+  de dos manos**, y báculos **híbridos** pensados para parrear, con algo defensivo (por ejemplo **bono al Bloqueo**, porque los magos suelen tener poca
+  Fuerza).
+- **Frenos para repetir: el dueño duda de su propio razonamiento y pide que se lo audite.** Idea nueva suya: las que **no suman Especial** quizás no
+  necesitan un costo que sube con cada uso (su impacto es chico); en cambio **cuestan 2 No2 siempre**, en vez de 1, para cobrar que el rango deja
+  muchos No2 libres.
+- **El techo de cada calidad, a definir juntos:** buscar un valor numérico promedio de las armas físicas por calidad y alcanzarlo, en cada calidad
+  de las especiales, con los distintos efectos. Referencia de la calculadora de armas (armas físicas ya rehechas, en sus puntos de valor, PC):
+  Común 6 (de 2,3 a 9,6) · Buena 9 · Rara 13,7 · Excepcional 20,5 · Legendaria 30. 1 PC ≈ 1 punto de daño promedio por golpe.

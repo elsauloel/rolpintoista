@@ -17,13 +17,7 @@ function chanceDe(t, stat){
   const f = fichasPub.get(t.fichaId);
   return Combatiente.chancePct(f && f.resumen && f.resumen[CHANCE_RESUMEN[stat] || stat]);
 }
-async function chanceMesa(texto){
-  if(!fbDb || !fbUsuario || !fbMiembro) return;
-  try{
-    await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '', origen: texto,
-      formula: '', rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
-  }catch(err){}
-}
+const chanceMesa = texto => mesaLinea(texto);   // la línea común de la Mesa (comun/mesa.js)
 /* El cartel de una chance → Promise<bool> (salió o no). o = {clave, icono, titulo (del cartel), mecanica (nombre para la Mesa), pct, t (el token),
    paso1: {titulo, texto}, momento: el título para la Crónica, exito: {grande, chico, cronica, mesa}, fallo: {grande, chico, cronica, mesa},
    botonOk / botonNo: el texto del botón final}. Cerrar el cartel antes de tirar = no la intenta. */
@@ -112,3 +106,14 @@ async function recuperarseAcortar(t, nombre){
   }catch(err){ console.error('No se pudo acortar el estado:', err); toast(`Recuperarse rápido: sacale 1 turno a ${nombre} a mano`); }
 }
 setInterval(recuperarseRevisar, 1500);
+
+/* ---------- Usar un consumible: el anuncio (dueño, 2026-10-05: «se anuncia en el log y en la crónica») ----------
+   Una línea en la Mesa y una tarjeta en la Crónica para los demás (quien lo usó ya lo vio en su pantalla). Con Saque rápido que salió, a quien
+   lo usó le aparece el aviso al centro. `oculto`: un token escondido (oculto o en sigilo) no se anuncia (solo el aviso a quien lo usó). */
+function anunciarConsumo(a, oculto){
+  if(!oculto){
+    mesaLinea(a.texto);
+    momentoAbrir({tipo: 'consumo', icono: '🧪', titulo: a.titulo, resultado: a.resultado || '', estado: 'listo', datos: {centro: true}});
+  }
+  if(a.saqueSalio) AvisoCombate.mostrar({icono: '⚡', titulo: 'Saque rápido', texto: `Sacar ${a.item} del cinturón no te costó No2.`});
+}

@@ -369,6 +369,7 @@ function soltarse(forzar){ FichaAcciones.soltarse(S, forzar, {...accionesUi, reg
 // Consumir (comun/ficha-acciones.js): la vida, el estado, las tiradas y la trampa los pone la ficha; redibuja lo que cambió.
 const consumoUi = {
   toast: t => toast(t),
+  anunciar: a => { mesaLinea(a.texto); if(a.saqueSalio) toast(`⚡ Saque rápido: sacar ${a.item} del cinturón no te costó No2`); },   // 2026-10-05
   avisarSinNitros: (costo, accion, continuar) => avisarSinNitros(costo, accion, continuar),
   fijarHp: v => fijarHp(v),
   efecto: it => aplicarEfectoDeConsumo(it),

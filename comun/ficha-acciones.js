@@ -211,18 +211,14 @@ const FichaAcciones = (() => {
     let costo = FichaBotonera.costoConsumirNitros(key), saque = false, bolsillo = false;
     if(key === 'cinturon' && num(f.saquerapido) > 0 && meta.saqueTurno !== turno){
       const pct = Combatiente.chancePct(f.saquerapido), d = Combatiente.chanceDado(pct);
-      let sale = pct >= 100;
+      // Sin dado que rueda (dueño, 2026-10-05: «sacar algo del cinturón no amerita pararse a tirar un dado»): se tira callado y se anuncia en texto.
+      let sale = pct >= 100, saqueTxt = '⚡ Saque rápido: no costó No2';
       if(d){
         const r = tirarDados('1d' + d.caras);
-        if(r){
-          sale = r.total >= d.caras - d.exitos + 1;
-          const reg = ui.registrarTirada || ((o, x) => { if(typeof registrarTirada === 'function') registrarTirada(o, x); });
-          reg(`Saque rápido · ${Combatiente.chanceTexto(pct)}`, r);
-        }
+        if(r){ sale = r.total >= d.caras - d.exitos + 1; saqueTxt = `⚡ Saque rápido (${Combatiente.chanceTexto(pct)}): 1d${d.caras} = ${r.total} → ${sale ? 'salió, no costó No2' : 'no salió'}`; }
       }
-      saque = true;
+      saque = {sale, txt: saqueTxt};
       if(sale) costo = 0;
-      ui.toast(sale ? '⚡ Saque rápido: este consumible no cuesta No2' : 'Saque rápido: no salió — cuesta lo de siempre');
     }
     if(key === 'inventario' && num(f.bolsilloext) > 0 && meta.bolsilloTurno !== turno){ costo = Math.max(0, costo - 1); bolsillo = true; }
     return {costo, saque, bolsillo};
@@ -284,11 +280,18 @@ const FichaAcciones = (() => {
       const partes = [];
       if(it.curahp) partes.push(`${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp) + boticario)} HP${boticario ? ` (+${fmt(boticario)} de Mano de boticario)` : ''}`);
       if(spRestaurado) partes.push(`+${fmt(spRestaurado)} SP`);
-      partes.push(`-${costoNitros} No2${sac.saque && !costoNitros ? ' (Saque rápido)' : sac.bolsillo ? ' (Bolsillo exterior)' : ''}`);
+      partes.push(`-${costoNitros} No2${sac.saque && sac.saque.sale ? ' (Saque rápido)' : sac.bolsillo ? ' (Bolsillo exterior)' : ''}`);
       if(cargaMax > 1) partes.push(gastoUnidad ? 'última carga usada' : `carga ${carga}/${cargaMax}`);
       if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
       if(reparados) partes.push(reparados > 1 ? 'armadura reparada por completo' : 'armadura reparada');
       ui.toast(`${it.nombre}: ${partes.join(' · ')}`);
+      // El anuncio (dueño, 2026-10-05: «se anuncia en el log y en la crónica»): una línea en la Mesa y, en el mapa, la Crónica para los demás.
+      const quien = (S.meta && S.meta.nombre) || 'Alguien';
+      const publicas = [...(it.curahp ? [`${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`] : []), ...(efecto ? [efecto.nombre] : [])];
+      const resultado = [publicas.join(' · '), sac.saque ? sac.saque.txt : ''].filter(Boolean).join(' · ');
+      const anuncio = {titulo: `${quien} usó ${it.nombre}`, resultado, texto: `🧪 ${quien} usó ${it.nombre}${resultado ? ': ' + resultado : ''}`, item: it.nombre, saqueSalio: !!(sac.saque && sac.saque.sale)};
+      if(ui.anunciar) ui.anunciar(anuncio);
+      else{ if(typeof mesaLinea === 'function') mesaLinea(anuncio.texto); if(anuncio.saqueSalio) ui.toast(`⚡ Saque rápido: sacar ${it.nombre} del cinturón no te costó No2`); }
     }
   }
 

@@ -64,16 +64,7 @@ function oporDecide(r){
 }
 // El registro en la Mesa (el dueño quiere que el evento quede en el log, no solo en el momento): la línea roja de siempre al frenarse,
 // y una línea con cómo terminó.
-async function oporMesa(texto, desde){
-  if(!fbDb || !fbUsuario || !fbMiembro) return;
-  try{
-    await fbDb.collection(fbRutaCampana('tiradas')).add({
-      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '', origen: '⚔ ' + texto,
-      formula: '', rolls: [], mod: 0, total: 0, desde: desde || 'recordatorio',
-      cuando: firebase.firestore.FieldValue.serverTimestamp(),
-    });
-  }catch(err){ console.error('No se pudo anotar el ataque de oportunidad en la Mesa:', err); }
-}
+const oporMesa = (texto, desde) => mesaLinea('⚔ ' + texto, desde);   // la línea común de la Mesa (comun/mesa.js)
 const oporSoyDecisor = d => !!(d && d.datos) && (d.datos.decide === 'gm' ? soyGM : d.datos.decide === fbUsuario.uid);
 
 // En la pantalla de quien se aleja, al llegar al casillero donde se frenó.

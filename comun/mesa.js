@@ -37,6 +37,14 @@ function mesaEstado(texto){
 // Descripción de la habilidad que se está ejecutando: viaja con su tirada,
 // para que sea una sola línea en la Mesa y no dos.
 let mesaTextoPendiente = '';
+// Una línea de texto en la Mesa, sin dados (2026-10-05): los anuncios del sistema (usar un consumible, el Saque rápido, la Retirada…).
+async function mesaLinea(texto, desde){
+  if(typeof fbDb === 'undefined' || !fbDb || !fbUsuario || !fbMiembro) return;
+  try{
+    await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '', origen: String(texto || '').slice(0, 400),
+      formula: '', rolls: [], mod: 0, total: 0, desde: desde || 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
+  }catch(err){ console.error('No se pudo anotar en la Mesa:', err); }
+}
 function mesaConTexto(detalle){ mesaTextoPendiente = String(detalle || '').slice(0, 300); }
 
 // Devuelve el id de la tirada en la Mesa (o undefined si no se publicó). r.quien: quién tira, si la herramienta no lo sabe por el

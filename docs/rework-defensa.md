@@ -622,3 +622,18 @@ si se usa igual, gasta los que tenga (línea roja en la Mesa); una trampa consum
 Calculadora: ranura de cinturón 0,5, de mochila 0,25; la mochila tiene bolsa propia (como los pies).
 
 **Propuesta de cinturones y mochilas Comunes (2026-10-05, esperando filtro del dueño):** 13 cinturones y 9 mochilas, ninguno pasa de su bolsa (cinturón 1, mochila 1,5); el script está en el scratchpad (`cin_moch_comun.py`). Abierto: la regla base de «darle un consumible a otro» (para Pasamanos y Alforja compartida) y si usar un consumible se anuncia en la Mesa.
+
+**Decisiones del dueño (2026-10-05, tercera vuelta) y lo que se hizo.**
+- **Darle un consumible a otro cuesta 1 No2 si está en el cinturón, 2 si está en la mochila** (base de Pasamanos y Alforja compartida). Falta
+  construirlo: hace falta un aviso nuevo «te llega esto» con reglas de Firestore nuevas.
+- **Usar un consumible se anuncia en la Mesa y en la Crónica** ✅: `mesaLinea` (comun/mesa.js, la línea común sin dados; ahora la usan también la
+  Retirada y el ataque de oportunidad), `anunciarConsumo` (js/21). Un creep escondido no se anuncia; de un creep no se dice la vida.
+- **Saque rápido sin momento de dado** ✅ (dueño: «sacar algo del cinturón no amerita pararse a tirar un dado»): se tira callado y queda en el
+  texto de la Mesa («⚡ Saque rápido (33 %): 1d6 = 5 → salió, no costó No2»); si salió, a quien lo usó le aparece el aviso al centro y los demás
+  lo ven en la Crónica. Es la excepción a la regla de que las chances tienen su momento.
+- **Regla de diseño: cada cinturón y cada mochila tiene al menos un efecto propio** (ranuras, Saque rápido, Vaina, Bolsillo exterior…); la defensa
+  y las resistencias solo acompañan. Se sacaron el Cinto de cuero remachado y la Faja de lana. Cargados ✅: 10 cinturones y 9 mochilas Comunes
+  (el «Cinturón de aprendiz de boticario» pasó a «Portafrascos de aprendiz» y la «Alforja de mula» a «Alforjas de burro»: esos nombres ya los
+  usaban piezas de calidad Buena).
+- **Portapergaminos: en revisión** (dueño: «¿no es lo mismo que una ranura exclusiva de pergaminos?»): con pocos pergaminos, sí; la diferencia
+  aparece con muchos. Afuera de la lista hasta decidir.

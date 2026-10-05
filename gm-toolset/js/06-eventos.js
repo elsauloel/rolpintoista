@@ -224,6 +224,7 @@ document.addEventListener('click', e => {
       const res = CreepAcciones.consumir(sc, itemId, ESTADOS_PRESET_GM, forzar);
       if(res.error){ toast(res.error); return; }
       (res.tiradas || []).forEach(t => publicarTiradaCreep(t));
+      if(res.anuncio) mesaLinea(res.anuncio.texto);   // el anuncio en la Mesa (la Crónica es del mapa)
       renderAll();
       toast(res.aviso);
     })();

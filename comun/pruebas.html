@@ -1920,6 +1920,12 @@ prueba('consumir (2026-10-05): Saque rápido siempre = el primero del turno del 
   await FichaAcciones.consumir(S, 'p2', false, ui); const t4 = S.nitros;
   igual([t1, t2, t3, t4], [[6, 10], 5, 4, 2]);
 });
+prueba('catálogo (dueño, 2026-10-05): cada cinturón y cada mochila Común tiene al menos un efecto propio de cinturón o mochila', () => {
+  const PROPIOS = ['capcinturon', 'capmochila', 'saquerapido', 'boticario', 'portapergaminos', 'ranurapocion', 'ranurapergamino', 'ranuratrampa', 'ranuraankh', 'vainas', 'correas', 'bolsilloext', 'morral', 'luz'];
+  const L = CATALOGO_BASE.filter(i => (i.tipoItem === 'cinturon' || i.tipoItem === 'mochila') && i.tier === 'Común');
+  const sin = L.filter(i => !(i.mods || []).some(m => PROPIOS.includes(m.stat))).map(i => i.nombre);
+  igual([L.filter(i => i.tipoItem === 'cinturon').length, L.filter(i => i.tipoItem === 'mochila').length, sin], [10, 9, []]);
+});
 prueba('catálogo: las piernas Común (28) — ninguna pasa de Defensa 1, y las mecánicas nuevas están', () => {
   const L = CATALOGO_BASE.filter(i => i.tipoItem === 'piernas' && i.tier === 'Común');
   const stats = new Set(L.flatMap(i => (i.mods || []).map(m => m.stat)));

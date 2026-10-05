@@ -224,14 +224,14 @@ const CreepAcciones = (() => {
     const it = (sc.cinturon || []).find(x => x.id === id);
     if(!it || num(it.unidades) <= 0) return {error: 'Ese consumible ya no está'};
     // Saque rápido (2026-10-05): el primero del turno puede no costar (la chance se tira a la vista: va en las tiradas).
-    let costo = costoConsumir();
-    const tiradasSaque = [];
+    let costo = costoConsumir(), saque = null;
     const pctSaque = Combatiente.chancePct(C().modTotal(sc, 'saquerapido'));
-    if(pctSaque > 0 && !sc.saqueUsado){
+    if(pctSaque > 0 && !sc.saqueUsado){   // sin dado que rueda: se tira callado y se anuncia en texto (dueño, 2026-10-05)
       const d = Combatiente.chanceDado(pctSaque);
-      let sale = pctSaque >= 100;
-      if(d){ const r = tirarDados('1d' + d.caras); if(r){ sale = r.total >= d.caras - d.exitos + 1; tiradasSaque.push({origen: `${sc.nombre} · Saque rápido · ${Combatiente.chanceTexto(pctSaque)}`, r}); } }
+      let sale = pctSaque >= 100, txt = '⚡ Saque rápido: no costó No2';
+      if(d){ const r = tirarDados('1d' + d.caras); if(r){ sale = r.total >= d.caras - d.exitos + 1; txt = `⚡ Saque rápido (${Combatiente.chanceTexto(pctSaque)}): 1d${d.caras} = ${r.total} → ${sale ? 'salió, no costó No2' : 'no salió'}`; } }
       sc.saqueUsado = true;
+      saque = {sale, txt};
       if(sale) costo = 0;
     }
     if(costo > num(sc.nitros) && !forzar) return {error: `${sc.nombre}: no le alcanzan los No2 — usar ${it.nombre} cuesta ${fmt(costo)}`};
@@ -254,14 +254,17 @@ const CreepAcciones = (() => {
     const ef = efectoDeHab(sc, it, presets);
     if(ef.estado){ if(C().modsAfectanHp(ef.estado.mods)) C().actualizarHpMaxPorCon(sc); partes.push(`${ef.estado.nombre}${ef.estado.permanente ? '' : ` (${fmt(ef.estado.turnos)} turnos)`}`); }
     if(ef.aviso) partes.push(ef.aviso);
-    const tiradas = [...tiradasSaque];
+    const tiradas = [];
     const stat = it.tiradaStat;
     const ATRIB = {fue: 'Fuerza', con: 'Constitución', agl: 'Agilidad', des: 'Destreza', esp: 'Especial'};
     if(stat && (C().STAT_LOOKUP[stat] || ATRIB[stat])){ const valor = C().statValor(sc, stat) + num(it.tiradaBono); tiradas.push(tirada(`${sc.nombre} · ${it.nombre} · ${ATRIB[stat] || C().STAT_LOOKUP[stat].label || stat}`, valor, sc, stat)); }
     const formula = String(it.tiradaExtra || '').trim();
     if(formula){ const r = tirarDados(formula); if(r) tiradas.push({origen: `${sc.nombre} · ${it.nombre}`, r}); }
-    partes.push(`−${fmt(pagado)} No2${pagado < costo ? ' (no le alcanzaban)' : !costo && tiradasSaque.length + (pctSaque >= 100 ? 1 : 0) ? ' (Saque rápido)' : ''}`);
-    return {aviso: `${sc.nombre} usó ${it.nombre}: ${partes.join(' · ')}`, tiradas: tiradas.filter(t => t && !t.error), forzado: pagado < costo ? {costo, tenia: pagado} : null,
+    partes.push(`−${fmt(pagado)} No2${pagado < costo ? ' (no le alcanzaban)' : saque && saque.sale ? ' (Saque rápido)' : ''}`);
+    // El anuncio para la Mesa y la Crónica: sin la vida del creep (es privada), con el estado que le dejó y el Saque rápido.
+    const publico = [ef.estado ? ef.estado.nombre : '', saque ? saque.txt : ''].filter(Boolean).join(' · ');
+    const anuncio = {titulo: `${sc.nombre} usó ${it.nombre}`, resultado: publico, texto: `🧪 ${sc.nombre} usó ${it.nombre}${publico ? ': ' + publico : ''}`, item: it.nombre, saqueSalio: !!(saque && saque.sale)};
+    return {aviso: `${sc.nombre} usó ${it.nombre}: ${partes.join(' · ')}`, anuncio, tiradas: tiradas.filter(t => t && !t.error), forzado: pagado < costo ? {costo, tenia: pagado} : null,
       trampa: it.trampaDatos ? structuredClone(it) : null};
   }
 

@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002c', '../comun/creep-botonera.js?v=20261005a2', '../comun/creep-acciones.js?v=20261005b1', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261004p1'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002c', '../comun/creep-botonera.js?v=20261005a2', '../comun/creep-acciones.js?v=20261005c1', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261004p1'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -156,7 +156,9 @@ async function acConsumir(sc, itemId){
   const x = await acCambiar(c => { res = CreepAcciones.consumir(c, itemId, estadosPresetCreep(), forzar); return res; });
   if(!x || !res) return;
   (res.tiradas || []).forEach(t => acPublicar(sc, t));
-  if(res.forzado && typeof oporMesa === 'function') oporMesa(`⚠ ${sc.nombre} usó ${it.nombre} sin los No2 (cuesta ${res.forzado.costo}, tenía ${res.forzado.tenia})`, 'alerta-roja');
+  const tok = [...tokens.values()].find(x => x.tipo === 'creep' && x.fichaId === ac.creepId);
+  if(res.anuncio) anunciarConsumo(res.anuncio, !tok || tok.oculto || enSigilo(tok));   // js/21: Mesa y Crónica (un creep escondido, no)
+  if(res.forzado) mesaLinea(`⚠ ${sc.nombre} usó ${it.nombre} sin los No2 (cuesta ${res.forzado.costo}, tenía ${res.forzado.tenia})`, 'alerta-roja');
   toast(res.aviso);
 }
 function acAccionAca(b){

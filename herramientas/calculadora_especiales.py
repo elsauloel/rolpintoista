@@ -161,9 +161,7 @@ def main():
     for t, (pc, turno, lo, hi, n) in ref.items():
         print(f'  {t}: PC por golpe {pc:.1f} · por turno {turno:.1f} (de {lo:.1f} a {hi:.1f}) · {n} armas')
     usos = usos_por_turno()
-    print('
-Varitas y báculos: una vez por turno, 1 No2 + el SP que diga (efecto por turno = el de un uso)
-')
+    print('\nVaritas y báculos: una vez por turno, 1 No2 + el SP que diga (efecto por turno = el de un uso)\n')
     techo = ref['Común'][1]
     print(f'  (techo Común: ~{ref["Común"][1]:.1f} por turno, de {ref["Común"][2]:.1f} a {ref["Común"][3]:.1f}; Buena ~{ref["Buena Calidad"][1]:.1f})\n')
     for a in POOL:

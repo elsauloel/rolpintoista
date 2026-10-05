@@ -170,6 +170,10 @@ def main():
         marca = '  ⚠ pasa la Común' if neto > ref['Común'][3] else ''
         print(f"  {a['nombre']}: {d['valor']:.1f} por uso · {turno:.1f} por turno" + (f" · {sp} SP por uso ({sp * usos} por turno)" if sp else '') + marca)
 
+    print('\nCandidatas a Buena (se pasan del techo Común):')
+    for a in PARA_BUENA:
+        d = valor_uso(a)
+        print(f"  {a['nombre']}: {d['valor'] * usos:.1f} por turno")
     print('\nOrbes (otra mano, no atacan; valor a definir):')
     for n, t in ORBES: print(f'  {n}: {t}')
 

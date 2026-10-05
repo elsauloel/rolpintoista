@@ -1428,3 +1428,7 @@ van a contemplar como…»: falta completar.)
   adelante, otra versión: deja una marca por X turnos y, si el marcado muere con la marca, ahí sí se recupera** · ❌ 109 carga acumulada · M: ⏳ 112
   reacción en turno ajeno, en la ampliación · 🔀 113 ataque de oportunidad mágico: **como habilidad pasiva**, atendible · N fuera de combate: todos
   efectos interesantes, **más para pergaminos que para armas**: en la ampliación. (Sin respuesta todavía: I terreno, 110 canalizar, 111 concentración.)
+- **Filtro del dueño — I. Terreno (2026-10-05):** ✅ 83 hielo resbaladizo (puede ir con una **ventisca**: daño de hielo en área) · ✅ 84 fuego · ✅ 85 barro
+  → **es lo mismo que la Brea: se unifican** · ✅ 86 espinas · ✅ 87 niebla · ❌ 88 oscuridad (se superpone con la niebla) · ❌ 89 agua · ✅ 90 viento ·
+  🔀 91 hierba alta y 92 zona sagrada: el efecto gusta, no para arma · 🔀 93 Silencio: sí, pero **no en área**: como **% de efecto secundario** de un ataque
+  leve o moderado. **110 canalizar y 111 concentración: no.** **Apoyo 53 a 61: no** («si no mencioné nada: no»). Filtro completo.

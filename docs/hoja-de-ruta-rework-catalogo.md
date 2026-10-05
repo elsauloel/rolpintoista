@@ -17,6 +17,7 @@
 | 5 | **Crítico nuevo en el código** (ficha y mapa): PdG − Evasión ≥ rango, niveles, N − Resistencia d20, doble/triple/cuádruple daño; nuevos estados Crítico frecuente/potente, Parálisis, Escarcha acumulable | 🔲 (cambio grande, en pasos chicos) |
 | 6 | **Generar el catálogo por grupos** (sets e ítems imaginados en tandas) y **auditar** con el dueño | 🔲 |
 | 7 | **Migrar** lo aprobado al catálogo (`herramientas/`, editor, sincronía con `main`), revisar el manual y la Guía de diseño (`comun/guia-diseno.js`) | 🔲 |
+| 8 | **Ampliación del catálogo** (dueño, 2026-10-05): cuando el equipo básico esté consolidado y lo esencial del sistema cerrado, el dueño va a pedirlo. Ahí se retoman las ideas que quedaron para después (lista abajo, «Para la ampliación del catálogo») | 🔲 Después de lo básico |
 
 ## Decidido hasta ahora (resumen; el detalle está en las preguntas)
 - **Nitros = recurso muy preciado**; peso = relevancia intermedia; SP barato para magos (regulador de la magia); la magia no tiene defensa: daño mágico directo a la vida y, por eso, caro (guía §0).
@@ -35,3 +36,16 @@
 - Efecto de casa de las familias explosivos y de rango; nombre definitivo del efecto de iniciativa (Knockdown).
 - Detalles de Escarcha acumulable y de fuego/hielo (cuánto por stack, cómo se cancelan).
 - Skills nuevas (Punto débil, Temple aprobadas; Ojo de asesino, Golpe brutal, Marca del cazador a revisar) y las skills de Mago con daño mágico por revisar (Rayo Mágico, Orbe, Tormenta, Ráfaga).
+
+## Para la ampliación del catálogo (se retoma cuando el dueño lo pida)
+Ideas que salieron mientras se trabajaba lo básico y quedaron para después, a propósito («de lo básico a lo complejo»). Al terminar lo esencial,
+el dueño va a pedir pasarlas todas a ese momento.
+- **Armas especiales (mágicas) más allá de las varitas, los báculos y los orbes** (2026-10-05, `rework-armas.md`): **grimorios** (vinculados a los
+  pergaminos), **instrumentos** (flauta, campana, tambor), **guantes o brazales rúnicos**, **dagas rituales y demás armas híbridas** (físicas con
+  efecto especial), y las Excepcionales y Legendarias de las armas especiales.
+- **Guantes mágicos** y demás piezas de equipo con efectos especiales.
+- **Botas Raras que dejan levitar** (ignoran el terreno y las trampas).
+- **Hechizos (no armas)**: Miedo, Sueño, intercambiar lugar, mover a un aliado.
+- **Armas de rango con «grappling hook»** (atraer al rival), cuando toque su rework.
+- **Daño que crece si se repite sobre el mismo objetivo** (armas especiales).
+- Lo que está en `pendientes.md` como «a futuro» del inventario: solicitar un ítem de otro jugador, baúles móviles, kit de herramientas.

@@ -436,7 +436,7 @@ function renderZonaBanner(){
   }else if(stat){
     // Qué se resiste, a la vista antes de tirar (dueño, 2026-10-04, norma general). Resistir una zona evita todo: el daño y lo que deja.
     let spec = null; try{ spec = el.zonaEstado ? JSON.parse(el.zonaEstado) : null; }catch(err){}
-    const que = [...(spec && spec.nombre ? [EstadosAplicar.texto(spec)] : []), ...(el.zonaDanoDif ? ['el daño (la diferencia de las tiradas)'] : el.zonaDano ? [`${el.zonaDano} de daño${el.zonaDanoTipo ? ' ' + el.zonaDanoTipo : ''}`] : [])].join(' y ') || 'lo que deja la zona';
+    const que = [...(spec && spec.nombre ? [EstadosAplicar.texto(spec)] : []), ...(el.zonaDanoDif ? [`el daño (la diferencia de las tiradas${el.zonaDano ? ' + ' + el.zonaDano : ''})`] : el.zonaDano ? [`${el.zonaDano} de daño${el.zonaDanoTipo ? ' ' + el.zonaDanoTipo : ''}`] : [])].join(' y ') || 'lo que deja la zona';
     AvisoCombate.cartel('zona', {icono, titulo: `${nombreT} entró en ${nombreZ}`, texto: `Para resistir: ${que}. Tirá ${stat}: si resiste, no le pasa nada.`,
       botones: [{texto: `🎲 Tirar ${stat} para resistir ${spec && spec.nombre ? spec.nombre : 'la zona'}`, id: 'zona-banner-ir', alClic: zonaResolverBanner}]});
   }else{
@@ -487,7 +487,7 @@ async function zonaResolverBanner(){
   let danoHecho = 0;
   if(!resistio && (el.zonaDano || el.zonaDanoDif)){
     let monto = null;
-    if(el.zonaDanoDif) monto = diferencia;
+    if(el.zonaDanoDif){ monto = diferencia; if(monto > 0 && el.zonaDano){ const r = tirarDados(el.zonaDano); if(r) monto += r.total; } }   // la diferencia (+ lo que se le suma: el 1d4 del miasma, si la diferencia entró)
     else{ const r = tirarDados(el.zonaDano); if(r) monto = r.total; }
     const tipoTxt = el.zonaDanoTipo ? ` ${el.zonaDanoTipo}` : '';
     // Una zona de HABILIDAD cuyo daño ignora la Defensa es daño de casteo: le resta la Armadura mágica de quien lo recibe, como en el

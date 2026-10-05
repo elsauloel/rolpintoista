@@ -2017,9 +2017,9 @@ prueba('✨ armas especiales, tercera tanda (2026-10-05): lo que queda en el sue
   const ui = {toast: () => {}, cambio: () => {}, presets: estadosPresetFicha(), avisarSinNitros: () => {}, colocarTrampa: () => {}, terminar: () => {}, mesaHabilidad: () => {}, fijarHp: () => {}};
   FichaAcciones.usarArmaEspecial(S2, S2.inventario[0].id, false, ui); FichaAcciones.usarArmaEspecial(S2, S2.inventario[0].id, false, ui);
   const esc = S2.efectos.filter(e => e.nombre === 'Escudo especial');
-  igual([bola.zonaQueda.dano, ven.zonaQueda.estado.nombre, ven.zonaQueda.contra, ven.zonaQueda.tiraValor, est.critTipo, pel.menosDistancia, gan.atrae, mis.reparte, mia.zonaTiraExtra,
+  igual([bola.zonaQueda.dano, ven.zonaQueda.estado.nombre, ven.zonaQueda.contra, ven.zonaQueda.tiraValor, est.critTipo, pel.menosDistancia, gan.atrae, mis.reparte, [mia.zonaDano, mia.zonaDanoDif, mia.zonaTiraExtra],
     esc.length, esc[0] && esc[0].escudoMagico, esc[0] && esc[0].turnos],
-    ['1d4', 'Sentado', 'rescc', 6, 4, true, {casillas: 2, contra: 'fue', tiraValor: 6}, {cada: '1d4', total: 2}, '1d4', 1, 2, 1]);
+    ['1d4', 'Sentado', 'rescc', 6, 4, true, {casillas: 2, contra: 'fue', tiraValor: 6}, {cada: '1d4', total: 2}, ['1d4', true, ''], 1, 2, 1]);
 });
 prueba('efectos con 33 % (dueño, 2026-10-05: «tirar d3 es feo»): se tiran con d6 y salen con 5 o 6 — en el duelo y en las armas', () => {
   const g = EfectosGolpe.normalizar({nombre: 'Escarcha', caras: 3, exitos: 1});

@@ -1289,3 +1289,11 @@ dueño filtra → tabla por tier → OK → se carga.
 - **Riesgo (contras)**: sobrecarga (con un 1 en el dado te dañás) · inestable (el elemento sale al azar) · ruidosa (rompe el Sigilo).
 - **Firma** (como las armas físicas): «el primer hechizo del turno cuesta 1 No2 menos» · «+1 d20 de crítico» no (la magia no critica) → «+1 al dado de efecto».
 
+**2026-10-05 · Reinicio (dueño): «lo que establecimos antes lo vamos a dejar de lado. Vamos a trabajar las armas mágicas de cero».** Criterios nuevos:
+el tier de un arma mágica se sopesa por su **efecto puesto en una balanza contra un arma física del mismo tier**; la diversidad del efecto «especial»
+deja explorar muchas mecánicas; **la mayoría de rango**; según el arma, tira **PdG.Esp** o **PdG común** (la invocación de algo físico, como una lanza
+de hielo), **contra Defensa**, **se resiste con Res.Esp** o va **directo menos su resistencia**; algunas no hacen daño sino efecto. **Objetivo: darle
+algo para hacer a quien no pelea, aparte del casteo de sus habilidades.** Se arranca por lo más básico: **varitas elementales** (arcana y una por
+elemento). Inquietudes abiertas (sin definir, «ayudame a pensar»): qué forma tiene cada una; si el daño directo a la vida suma el Ef.Esp (el
+equivalente a la Fuerza del guerrero); y cómo se regula, si casi no hay defensa contra lo mágico. Lo de arriba (panorama, lluvia) queda como
+material de consulta, no como decisión.

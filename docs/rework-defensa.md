@@ -620,3 +620,5 @@ si se usa igual, gasta los que tenga (línea roja en la Mesa); una trampa consum
 - **Farol colgado**: Luz +1 (ya existía el stat).
 - **Falta: Pasamanos y Alforja compartida**, que necesitan la regla base de «darle un consumible a otro» (no existe todavía).
 Calculadora: ranura de cinturón 0,5, de mochila 0,25; la mochila tiene bolsa propia (como los pies).
+
+**Propuesta de cinturones y mochilas Comunes (2026-10-05, esperando filtro del dueño):** 13 cinturones y 9 mochilas, ninguno pasa de su bolsa (cinturón 1, mochila 1,5); el script está en el scratchpad (`cin_moch_comun.py`). Abierto: la regla base de «darle un consumible a otro» (para Pasamanos y Alforja compartida) y si usar un consumible se anuncia en la Mesa.

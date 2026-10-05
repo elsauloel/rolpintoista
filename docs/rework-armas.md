@@ -1328,7 +1328,7 @@ en el mapa, apoyo) · qué gasta (No2, cargas por combate, SP) · la forma (proy
 (una lanza de hielo, una piedra) sigue con su Tipo y lo que eso trae (Defensa, crítico, resistencias a crítico). (El dueño cortó la frase en «y se
 van a contemplar como…»: falta completar.)
 
-**2026-10-05 · Principios de las armas especiales (dueño):**
+**2026-10-05 · Principios de las armas especiales (dueño, pensando en voz alta: «puedo estar equivocado, te estoy compartiendo ideas y nociones» — son nociones de trabajo, no decisiones cerradas):**
 - **Cada arma, su mecánica propia; no hay una mecánica universal.** Cada una explica sus tiradas (para acertar, para evitarla o resistirla, si tiene).
 - **Todas las opciones están abiertas.** Hay armas que **usa cualquiera**, sin importar su Especial, y armas que **rinden más con más Especial**.
 - **Sin romper el juego:** si un arma es muy fuerte (porque suma el Especial), **gasta más No2 y más SP**. Hay armas que gastan SP y armas que no:

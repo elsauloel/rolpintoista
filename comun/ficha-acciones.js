@@ -570,7 +570,7 @@ const FichaAcciones = (() => {
       duelo: e.duelo ? structuredClone(e.duelo) : null, tiradaStat: (e.duelo && e.duelo.tira) || 'pdgmg',
       tiradaExtra: dano ? dano + (suma > 0 ? `+${suma}` : '') : '', ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {})};
   }
-  // Lo que dice «¿Qué ataque es?» de un arma especial: su costo ahora y la primera frase de lo que hace.
+  // El «Qué hace» de un arma especial en la Botonera: su costo ahora y lo que hace (sin las notas de automatización).
   const ataqueEspecialMenu = (S, it) => {
     const t = String(it.detalle || '').split(' ⚙')[0].split(' ✋')[0].trim();
     return {costo: costoEspecialTxt(S, it), que: t.length <= 200 ? t : t.slice(0, 200).replace(/[\s,;:(]+\S*$/, '') + '…'};   // corta en una palabra, nunca a la mitad

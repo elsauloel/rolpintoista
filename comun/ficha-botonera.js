@@ -293,7 +293,8 @@ const FichaBotonera = (() => {
       <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-combate" title="Contraer/expandir">👁</button><span>Combate</span></div>
       <div class="botonera-combate-wrap">
         <div class="botonera-combate-grid">
-          ${(armasBotonera.length ? armasBotonera : [null]).map(a => {
+          ${/* Solo los ataques posibles (dueño, 2026-10-05): a mano limpia, solo si no lleva ninguna arma (ni física ni especial). */ ''}
+          ${(armasBotonera.length ? armasBotonera : especiales.length ? [] : [null]).map(a => {
             const arma = a && a.item;
             const nombre = armasBotonera.length > 1 ? ` · ${esc(arma.nombre)}` : '';
             const fPdg = formulaParaValor(FichaCombate.pdgParaArma(S, arma, c).valor);

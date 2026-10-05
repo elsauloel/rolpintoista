@@ -1998,13 +1998,13 @@ prueba('✨ varitas del mapa (2026-10-05): la luz va solo a los que están en si
     z.tipo, z.niebla, tp.pilar, tp.cant, por.especial.trampaColocar.portal, hr.contra.map(c => c.stat), CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-varita') && /✋ A mano por ahora/.test(i.detalle)).map(i => i.nombre)],
     ['onda', 3, true, true, ['resmg'], 'Marcado', ['luz', 'veoculto'], 'zona-persistente-habilidad', true, true, 2, {rango: 4, fijo: true}, ['resmg'], []]);
 });
-prueba('✨ armas especiales (dueño, 2026-10-05): se usan desde Atacar, como un ataque más (sin caja aparte); «¿Qué ataque es?» ofrece el normal con sus reglas', () => {
+prueba('✨ armas especiales (dueño, 2026-10-05): se usan desde Atacar, como un ataque más (sin caja aparte, y sin el Atacar a mano limpia si lleva una); su Atacar va directo a sus reglas (sin oportunidad ni contraataque)', () => {
   const S = fichaBotonera(), v = {...structuredClone(CATALOGO_BASE.find(i => i.id === 'esp-varita-del-rastreador')), id: 'vr', equipado: true};
   S.inventario.push(v);
   const h = FichaBotonera.html(S, {modoMapa: 'combate'}).html;
-  const menu = Combatiente.menuTipoAtaqueHtml({nombre: v.nombre, attr: 'data-x', ref: v.id, armaEspecial: FichaAcciones.ataqueEspecialMenu(S, v)});
-  igual([/data-botoneraaccion="atacar" data-arma="vr"/.test(h), /data-especial=/.test(h), /data-view="inventario:vr"/.test(h), /data-x="normal:vr"/.test(menu), /oportunidad:vr|contra:vr/.test(menu), /1 No2 \+ 3 SP/.test(menu)],
-    [true, false, true, true, false, true]);
+  const que = FichaAcciones.ataqueEspecialMenu(S, v);
+  igual([/data-botoneraaccion="atacar" data-arma="vr"/.test(h) && !/data-botoneraaccion="atacar" data-arma=""/.test(h), /data-especial=/.test(h), /data-view="inventario:vr"/.test(h), que.costo, /⚙|✋/.test(que.que)],
+    [true, false, true, '1 No2 + 3 SP', false]);
 });
 prueba('✨ armas especiales Comunes (2026-10-05): 30 armas y 3 orbes; cada una automatiza algo o aclara lo que queda a mano', () => {
   const L = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-'));

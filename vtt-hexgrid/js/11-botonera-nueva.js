@@ -112,7 +112,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261002a', '../comun/ficha-equipo.js?v=20261005i6', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261005i1', '../comun/ficha-mantenimiento.js?v=20261004q', '../comun/ficha-calculo.js?v=20261005i3', '../comun/ficha-combate.js?v=20261005e2', '../comun/skills-clase.js?v=20261005t1', '../comun/ficha-habilidades.js?v=20261004p1',
-  '../comun/catalogo.js?v=20261005f1', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261004ja', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261005f2', '../comun/ficha-resumen.js?v=20261004q1', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261004so', '../comun/inv-acciones.js?v=20261004fc', '../comun/inv-duelo.js?v=20261004p1', '../comun/ficha-acciones.js?v=20261005f3', '../comun/inv-habilidades.js?v=20261004na', '../comun/inv-lupa.js?v=20261001a',
+  '../comun/catalogo.js?v=20261005f1', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261004ja', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261005f4', '../comun/ficha-resumen.js?v=20261004q1', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261004so', '../comun/inv-acciones.js?v=20261004fc', '../comun/inv-duelo.js?v=20261004p1', '../comun/ficha-acciones.js?v=20261005f4', '../comun/inv-habilidades.js?v=20261004na', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261005i1', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261002b'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -593,11 +593,8 @@ var bnSobrepeso = null;
    hace el ataque suelto acá (FichaAcciones.atacarConArma / ataqueEspecialConArma). Las tiradas que pide el duelo las sigue
    haciendo la ficha escondida (paso 4c). */
 function bnPreguntarTipoAtaque(arma){
-  if(arma && arma.especial){   // ✨ arma especial: el ataque normal con sus reglas (comun/ficha-acciones.js)
-    bn.raiz.querySelector('#bn-tipo-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: arma.nombre, attr: 'data-bn-tipo', ref: arma.id, armaEspecial: FichaAcciones.ataqueEspecialMenu(bn.S, arma)});
-    bn.raiz.querySelector('#bn-tipo-ataque').classList.add('open');
-    return;
-  }
+  // ✨ Un arma especial tiene su propio recorrido (dueño, 2026-10-05): sin «¿Qué ataque es?» (no tiene oportunidad ni contraataque, P160), directo a sus reglas.
+  if(arma && arma.especial){ FichaAcciones.usarArmaEspecial(bn.S, arma.id, false, bnHabUi()); return; }
   const S = bn.S, costoNormal = FichaCombate.costoAtaque(S, arma), primero = FichaCombate.ataquesConArma(S, arma) === 0, especial = FichaCombate.costoAtaqueEspecial(arma, 'contra'), especialOpor = FichaCombate.costoAtaqueEspecial(arma, 'oportunidad');
   const id = arma ? arma.id : '';
   bn.raiz.querySelector('#bn-tipo-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: arma ? arma.nombre : 'Sin arma', normal: costoNormal, primero, especial, especialOpor, attr: 'data-bn-tipo', ref: id, primeroTxt: 'primer ataque con esta arma (Tipo ÷ 2)', siguienteTxt: 'Tipo completo (ya atacaste con esta arma este turno)'});   // el menú común
@@ -605,7 +602,6 @@ function bnPreguntarTipoAtaque(arma){
 }
 function bnAtacar(tipo, armaId){
   const S = bn.S, arma = S.inventario.find(x => x.id === armaId) || null;
-  if(arma && arma.especial){ if(tipo === 'normal') FichaAcciones.usarArmaEspecial(S, arma.id, false, bnHabUi()); return; }   // ✨ elige su objetivo (o su lugar) solo
   const hacer = () => { const ui = bnCombateUi(); if(tipo === 'normal') FichaAcciones.atacarConArma(S, arma, false, ui); else FichaAcciones.ataqueEspecialConArma(S, arma, tipo, false, ui); };
   if(typeof Duelo === 'undefined' || !Duelo.disponible()){ hacer(); return; }
   // Mientras se elige el objetivo la Botonera nueva se esconde (tapa el mapa); "Sin objetivo" la vuelve a mostrar.

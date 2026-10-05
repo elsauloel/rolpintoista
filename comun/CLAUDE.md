@@ -1261,8 +1261,9 @@ versión parecida en más de una, es candidato a juntar.
   +1 por uso (el conteo es `S.ataquesArma['esp:<id>']`, que vacía el Mantenimiento) y su SP (sin SP alcanza: pregunta y cobra 1 No2 por SP).
   `armasEspeciales(S)` (las equipadas) y `costoEspecialTxt`. **Se usan desde Atacar** (dueño, 2026-10-05: «se tratan como un ataque»): la
   Botonera (`ficha-botonera.js`) pone cada una en la caja Combate como un «✨ Atacar» más (`data-botoneraaccion="atacar" data-arma`) con su «Qué hace»;
-  «¿Qué ataque es?» (`Combatiente.menuTipoAtaqueHtml` con `armaEspecial` = `FichaAcciones.ataqueEspecialMenu`) ofrece el ataque normal con sus reglas
-  (de oportunidad y contraataque, a definir) y sigue en `usarArmaEspecial` (ficha js/11 y mapa js/11). `Combatiente.efectoDeEjecucion` ahora respeta `caras`/`exitos` (efectos con %). Una varita (arma
+  su Atacar va directo a `usarArmaEspecial` (ficha js/11 y mapa js/11), sin «¿Qué ataque es?»: no tiene oportunidad ni contraataque (P160, dueño:
+  «cada botón con su recorrido propio»). El «Qué hace» sale de `FichaAcciones.ataqueEspecialMenu`. Con un arma especial equipada no aparece el Atacar a
+  mano limpia (solo los ataques posibles). `Combatiente.efectoDeEjecucion` ahora respeta `caras`/`exitos` (efectos con %). Una varita (arma
   especial sin Tipo) no tiene daño físico (`FichaCombate.armaDanoTxt`) y una varita o un orbe (`orbe: true`) no parrean. Catálogo: 30 armas y 3
   orbes Comunes (`esp-*`); las partes que todavía no se automatizan dicen «✋ A mano». `especial.estadoPropio` (2026-10-05, Varita de la luz): un
   estado que se pone quien la usa al usarla (la luz: Luz portada 3 y Ve lo oculto 3, 1 turno).

@@ -730,7 +730,9 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   con un arma física Común; y la habilidad **Chispazo** (1d6 directo, 1 No2 + 1 SP, sin incremento ni límite por turno) rinde todavía más por SP. A
   favor del mago: menos vida y menos defensa, y gasta su SP (que no usa en otras habilidades). Pregunta para cuando se trabajen las clases: ¿está bien
   esa diferencia?, ¿Chispazo necesita un freno (costo que sube, una vez por turno)? La herramienta para medirlo: `herramientas/calculadora_especiales.py`.
-- 🔲 **P160. ¿Un arma especial se puede usar como ataque de oportunidad o contraataque?** (2026-10-05). Desde que las armas especiales se
+- ✅ **P160. ¿Un arma especial se puede usar como ataque de oportunidad o contraataque?** (2026-10-05). **Decidida por el dueño el mismo día: no** —
+  «no es dentro de sus opciones; que cada botón tenga su recorrido propio». El «✨ Atacar» de una varita va directo a sus reglas, sin el cartel «¿Qué ataque es?».
+  Pregunta original: Desde que las armas especiales se
   usan desde Atacar (dueño: «se tratan como un ataque»), el cartel «¿Qué ataque es?» solo ofrece el **ataque normal** con sus reglas (1 No2 + 1 por
   uso + su SP). ¿Una varita puede ir de oportunidad (cuando un rival sale de tu alcance) o de contraataque (tras ganar Parry y Bloqueo)? ¿Con qué
   costo, y solo las que apuntan a un rival? Mientras tanto, no aparecen (la mesa lo puede hacer a mano).

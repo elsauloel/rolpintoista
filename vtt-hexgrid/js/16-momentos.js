@@ -64,7 +64,18 @@ async function momentosBarrerViejos(){
 }
 const momentosArranque = setInterval(() => { if(typeof fbMiembro !== 'undefined' && fbMiembro && fbUsuario && fbDb){ clearInterval(momentosArranque); momentosEscuchar(); } }, 1000);
 
+// El rayo que salta (2026-10-05, Varita de chispa eléctrica): cada pantalla lo ve una vez, salto por salto (solo si es de recién: al entrar
+// al mapa no se repiten los viejos).
+const rayosVistos = new Set();
+function rayoMomento(id, d){
+  if(rayosVistos.has(id)) return;
+  rayosVistos.add(id);
+  const t = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
+  if(Date.now() - t > 20000 || typeof rayoSaltoEfecto !== 'function') return;
+  d.datos.saltos.forEach((s, i) => setTimeout(() => rayoSaltoEfecto(s.desde, s.hacia), i * 450));
+}
 function momentoRecibido(id, d){
+  if(d.tipo === 'rayo' && d.datos && Array.isArray(d.datos.saltos)) rayoMomento(id, d);
   if(d.tipo === 'confusion') confusionMomento(d);   // la tirada de Confusión del turno (js/20)
   oporMomento(id, d);   // el ataque de oportunidad: la pregunta a quien decide y la respuesta a quien se aleja (js/17)
   // Una trampa, paso a paso (js/19): la víctima la resuelve al centro; el resto, en la Crónica.

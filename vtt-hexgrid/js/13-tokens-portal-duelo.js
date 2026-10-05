@@ -962,7 +962,11 @@ async function dueloCadena(d, golpe){
   const id = d.defensor && d.defensor.tokenId;
   if(!id || !tokens.get(id)) return;
   const c = d.hab.cadena, cadena = rayoCadena(id, golpe).slice(0, 1 + Math.max(1, num(c.saltos) || 2));
-  for(let i = 1; i < cadena.length; i++) if(typeof rayoSaltoEfecto === 'function') rayoSaltoEfecto(cadena[i - 1].id, cadena[i].id);
+  if(cadena.length < 2) return;
+  // El rayo saltando se ve en TODAS las pantallas (2026-10-05, dueño): va en un momento de la Crónica (rayoMomento, js/16), no solo acá.
+  const saltos = cadena.slice(1).map((s, i) => ({desde: cadena[i].id, hacia: s.id}));
+  momentoAbrir({tipo: 'rayo', icono: '⚡', titulo: `${d.hab.nombre}: el rayo salta`, estado: 'listo', datos: {saltos},
+    resultado: cadena.slice(1).map(s => `${s.t.oculto ? 'Alguien' : nombreDe(s.t)} (${s.dano})`).join(' → ')});
   await rayoCadenaAplicar(cadena);
 }
 

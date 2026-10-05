@@ -1362,3 +1362,6 @@ van a contemplar como…»: falta completar.)
   efectos físicos, y esto es un efecto físico gaseoso («la diferencia es muy sutil»). (Responde la segunda parte de P143: el tóxico se resiste con
   Res.Esp.) Pregunta que queda: hoy al daño tóxico también lo reduce la **Armadura mágica** (y la Res. tóxico); si no es mágico, ¿la Armadura
   mágica debería frenarlo?
+- **Las áreas se esquivan con dodge roll (dueño, 2026-10-05):** un efecto de área **sí se puede esquivar**: se tira Evasión, pero el dodge roll
+  **cuesta No2**. Esquivar un área pesa más que una evasión normal: tenerlo en cuenta en la balanza (corrige «lo que no tiene tirada no se esquiva»:
+  se esquiva, pero cuesta). Es lo que ya hace el motor con los hechizos de área (la fase de dodge del duelo).

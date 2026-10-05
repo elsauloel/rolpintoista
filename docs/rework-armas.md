@@ -1389,3 +1389,6 @@ van a contemplar como…»: falta completar.)
   de las armas físicas rehechas de su calidad (Común 6,1 por turno · Buena 9,2 · Rara 13,7, con 7 No2 y 2 gastados en moverse). Primera corrida con los
   borradores Comunes: con 1-2-3 una varita da **3 usos por turno**, y la Varita arcana de 1d4 llega a **11,2 por turno: casi el doble que un arma física
   Común** (que con 5 No2 pega una vez). A discutir.
+- **Cerrado (dueño, 2026-10-05): las varitas cuestan 2, 3, 4 No2** (2 el primer uso del turno, +1 cada uno: 1 de base + 1 por ser de rango). Con 7 No2
+  son 2 usos por turno (con 5, 2; con 9, 3). Con eso la calculadora deja las varitas de daño en ~6,3 a 7,8 por turno, en el orden de un arma física
+  Común (6,1, de 2,3 a 9,6). Siguen altas: la Varita de aceite (12,6 por turno, con 4 SP) y el Báculo arcano con Especial (19,5).

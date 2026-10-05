@@ -7,7 +7,7 @@ lo que se mide es el EFECTO POR TURNO, comparado con lo que hace por turno un ar
 
   valor por uso  = daño (dado promedio × la clase de daño) + Especial (si lo suma) + efectos (peso × probabilidad) + terreno
                    × la forma (a uno, flor, cono, línea, cadena)
-  usos por turno = con los No2 de referencia y el costo que sube de a 1 (1, 2, 3…: dueño, 2026-10-05), sin moverse (es de rango)
+  usos por turno = con los No2 de referencia y el costo que sube de a 1 desde 2 (2, 3, 4…: dueño, 2026-10-05), sin moverse (es de rango)
   efecto por turno = valor por uso × usos por turno          (el SP que cuesta cada uso se muestra aparte: es su freno)
 
   Arma física de referencia: su PC × los ataques que le dan los No2 que le quedan después de moverse (Tipo ÷ 2 el primero, Tipo los siguientes).
@@ -53,7 +53,10 @@ def dado_prom(dado):
     return int(cant or 1) * (int(caras) + 1) / 2
 
 
-def usos_por_turno(no2=NO2_REF, base=1, sube=1):
+COSTO_BASE, COSTO_SUBE = 2, 1   # varitas (dueño, 2026-10-05): 2 No2 el primer uso, y +1 cada uno (2, 3, 4…): 1 de base + 1 por ser de rango
+
+
+def usos_por_turno(no2=NO2_REF, base=COSTO_BASE, sube=COSTO_SUBE):
     """Con el costo que sube: base, base + sube, base + 2·sube…"""
     n, gasto, c = 0, 0, base
     while gasto + c <= no2:
@@ -99,7 +102,7 @@ def referencia():
 
 
 # ---------------------------------------------------------------- borradores Comunes (2026-10-05, a revisar con el dueño)
-# Todas: tiran PdG.Esp para acertar; costo en No2 que sube 1, 2, 3; las de control y terreno pagan además SP.
+# Todas: tiran PdG.Esp para acertar; costo en No2 que sube 2, 3, 4; las de control y terreno pagan además SP.
 BORRADORES = [
     {'nombre': 'Varita arcana', 'clase': 'arcano', 'dado': '1d4'},
     {'nombre': 'Varita de escarcha (lanza de hielo, física T4)', 'clase': 'fisico', 'dado': '1d4', 'efectos': {'Lento': 1 / 3}},
@@ -126,7 +129,7 @@ def main():
     for t, (pc, turno, lo, hi, n) in ref.items():
         print(f'  {t}: PC por golpe {pc:.1f} · por turno {turno:.1f} (de {lo:.1f} a {hi:.1f}) · {n} armas')
     usos = usos_por_turno()
-    print(f'\nVaritas: costo 1, 2, 3… → {usos} usos por turno con {NO2_REF} No2 (sin moverse)\n')
+    print(f'\nVaritas: costo {COSTO_BASE}, {COSTO_BASE + COSTO_SUBE}, {COSTO_BASE + 2 * COSTO_SUBE}… → {usos} usos por turno con {NO2_REF} No2 (sin moverse)\n')
     techo = ref['Común'][1]
     for a in BORRADORES:
         d = valor_uso(a)

@@ -869,7 +869,6 @@ blandas Buena 4** (Común 3), rígidas Buena 6. La Armadura mágica sigue siendo
 | Chaqueta del corredor ⚙ | Defensa +2 · Iniciativa +1 · Evasión contra oportunidad +2. |
 | Capa del torero ⚙ | Defensa +2 · Evasión contra oportunidad +2 · Evasión contra contraataque +2. |
 | Ropas de sombra finas ⚙ | Defensa +2 · Sigilo +2 · Evasión +1. |
-| 🔧 Traje de camuflaje | Defensa +2 · Sigilo +3 si no te moviste en el turno. |
 
 **Espinas (pasaron de los guantes a las armaduras)**
 
@@ -895,3 +894,5 @@ blandas Buena 4** (Común 3), rígidas Buena 6. La Armadura mágica sigue siendo
 | Capa del explorador ⚙ | Defensa +2 · Visión +2 · Percepción +2 · Res. hielo +2. |
 | Abrigo de piel de oso ⚙ | Defensa +3 · Vida +5 · Res. hielo +2. |
 | ✋ Abrigo de bolsillos ocultos | Defensa +2 · lo que guardás en un bolsillo no lo encuentra quien te revisa (a mano). |
+
+**Filtro del dueño, torso blando (2026-10-06, en curso):** se quita el Traje de camuflaje.

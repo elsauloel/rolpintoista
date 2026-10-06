@@ -248,6 +248,16 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Estados sobre otros más finos**: los que faltan automatizar (empujar, derribar, huir, "pierde el sigilo", etc.).
 - [x] ~~**Grupos vacíos en el menú 🎭**~~ — ya no hay grupos: el 🎭 trae los creeps del mapa (2026-10-02, grupos → mapas).
 
+- [ ] **Asistente de IA para el GM** (idea del dueño, 2026-10-06, para pensar más adelante): dentro de GM Tools, contarle «se viene una pelea,
+  los personajes son tal y tal, con tal rol» y que proponga creeps (del catálogo o nuevos) y cómo equiparlos, con las reglas y las herramientas de
+  diseño como contexto. **Es posible y sin pagar**: ya existe la semilla, «Generar creep con IA» de GM Tools (`gm-toolset/js/07-tablero-e-ia.js`,
+  OpenRouter con modelos gratuitos y la clave gratuita de cada GM guardada en su navegador). Habría que sumarle: el resumen del grupo (lo arma el
+  motor: roles, stats, equipo), una lista corta del catálogo de creeps y habilidades (nombre, nivel, rol, etiquetas; el detalle lo busca la
+  herramienta después) y las reglas clave; que el modelo elija y explique, y que **los números los haga el motor** (botín estimado, dificultad), no
+  la IA. Límites: los modelos gratuitos son más flojos para balancear y tienen tope de pedidos por día. Alternativas: Gemini de Google (tiene
+  capa gratuita; Firebase tiene una forma de usarlo sin exponer la clave, a verificar), o un botón «Copiar el contexto» para pegar en cualquier
+  chat gratuito (Claude, ChatGPT, Gemini). Claude por API no tiene capa gratuita (se paga por uso, poco).
+
 ## 5. Contenido a revisar (números de primer borrador)
 - [ ] Las **321 habilidades de creeps**: daño, cooldowns, bonos, cuáles son rápidas y cuáles lentas.
 - [ ] Los **173 creeps base** (todos dicen "(auditar)") y sus recompensas.

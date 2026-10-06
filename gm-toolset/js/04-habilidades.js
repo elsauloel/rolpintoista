@@ -98,7 +98,7 @@ function modsResumenHtmlGM(mods){
   const list = (mods || []).filter(m => m.stat && m.stat !== 'def');
   if(!list.length) return '';
   return list.map(m => {
-    const label = TIPO_STAT_A_CRIT_IDX[m.stat] !== undefined ? `Res.Crít. ${STAT_LABEL_GM[m.stat]}` : (STAT_LABEL_GM[m.stat] || m.stat);
+    const label = TIPO_STAT_A_CRIT_IDX[m.stat] !== undefined ? `Res.Crít. ${STAT_LABEL_GM[m.stat]}` : (STAT_LABEL_GM[m.stat] || (typeof FichaCalculo !== 'undefined' && FichaCalculo.STAT_LABEL[m.stat]) || m.stat);   // los stats nuevos (guantes, cascos…) con su nombre, no el interno
     const val = num(m.val);
     const suf = '';
     const cls = val > 0 ? 'mod-plus' : val < 0 ? 'mod-minus' : '';

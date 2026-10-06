@@ -1112,8 +1112,15 @@ async function dueloAplicarEfecto(d, ef){
   const veces = spec.nombre === 'Armadura rota' ? Math.max(1, num(spec.stacks) || 1) : 1;
   const unico = spec.nombre === 'Armadura rota' ? {nombre: 'Armadura rota'} : spec;
   if(t.tipo === 'creep'){
-    const res = await modificarCreep(t.fichaId, sc => { let r = {ok: false}; for(let i = 0; i < veces; i++) r = EstadosAplicar.aplicarACreep(sc, unico); return r; });
-    return res && res.ok ? {nota: EstadosAplicar.texto(unico) + (veces > 1 ? ` ×${veces}` : '')} : {nota: 'no entró: ' + ((res && res.motivo) || 'está protegido')};
+    const res = await modificarCreep(t.fichaId, sc => {
+      let r = {ok: false};
+      for(let i = 0; i < veces; i++) r = EstadosAplicar.aplicarACreep(sc, unico);
+      const e = (sc.estados || []).find(x => x && x.nombre === unico.nombre);   // con cuánto quedó (si ya tenía, se acumula: 2026-10-06)
+      return {...r, total: e ? Number(e.stacks) || 0 : 0};
+    });
+    const sumado = EstadosAplicar.texto(unico) + (veces > 1 ? ` ×${veces}` : '');
+    const total = res && res.total > Math.max(1, num(unico.stacks) || 1) * veces ? ` → ahora ×${res.total}` : '';
+    return res && res.ok ? {nota: sumado + total} : {nota: 'no entró: ' + ((res && res.motivo) || 'está protegido')};
   }
   for(let i = 0; i < veces; i++) await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: unico, origen: `${d.atacante.nombre} · ${ef.nombre}`});
   return {nota: 'le llegó a su ficha: ' + EstadosAplicar.texto(unico) + (veces > 1 ? ` ×${veces}` : '')};

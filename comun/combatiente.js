@@ -49,7 +49,15 @@ const Combatiente = (() => {
   function tirarStat(valor, estados, statId, o){
     o = o || {};
     const f = formulaParaValor(valor);
-    if(!f) return null;
+    if(!f){
+      // Un stat en 0 o en negativo (2026-10-06: dos debuffs dejaron una Evasión en −5 y el duelo quedaba trabado): no hay dados que tirar; el
+      // resultado es el valor, y la Evasión nunca baja de 1. Antes devolvía null («no se puede tirar») y la tirada no salía.
+      const v = Math.round(n(valor));
+      if(!Number.isFinite(Number(valor)) || v > 0) return null;
+      const ex0 = n(o.extra), tot = v + ex0;
+      return {formula: `${v}${ex0 ? (ex0 > 0 ? `+${ex0}` : `${ex0}`) : ''} (sin dados)`, rolls: [], mod: tot, total: statId === 'eva' ? Math.max(1, tot) : tot,
+        estados: statId ? estadosQueAfectan(estados, statId, false) : []};
+    }
     const azar = o.azar || Math.random;
     const tirar = () => { const rolls = f.combo.map(d => 1 + Math.floor(azar() * d)); return {rolls, total: rolls.reduce((a, b) => a + b, 0) + f.mod}; };
     const conVentaja = afortunado(estados, statId);

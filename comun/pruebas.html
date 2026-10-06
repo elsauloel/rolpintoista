@@ -261,6 +261,10 @@ prueba('Afortunado: tira dos veces, queda la mejor y la otra viaja a la Mesa', (
   const r = Combatiente.tirarStat(6, [E({nombre: 'Afortunado', afortunado: true, polaridad: 'buff'})], 'eva', {azar: dadosFijos(0, 0.999)});
   igual([r.total, r.ventaja.total, r.ventaja.elegido, r.estados.map(e => e.n)], [6, 1, 6, ['Afortunado']]);
 });
+prueba('un stat en 0 o negativo se tira igual, sin dados (la Evasión, mínimo 1)', () => {
+  const e = Combatiente.tirarStat(-5, [], 'eva'), p = Combatiente.tirarStat(0, [], 'pdg'), x = Combatiente.tirarStat(3, [], 'eva');
+  igual([e.total, e.rolls.length, p.total, !!x], [1, 0, 0, true]);
+});
 prueba('Afortunado no cuenta para otros stats (Fuerza)', () => igual(!!Combatiente.tirarStat(6, [E({afortunado: true})], 'fue', {azar: dadosFijos(0)}).ventaja, false));
 prueba('Evasión partida nunca baja de 1; la fórmula muestra ÷2 ÷2', () => {
   const r = Combatiente.tirarStat(4, [E({nombre: 'Pajaritos', mitadPdgEva: true}), E({nombre: 'Sentado', sentado: true})], 'eva', {azar: dadosFijos(0)});

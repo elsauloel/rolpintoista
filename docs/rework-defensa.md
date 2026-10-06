@@ -1251,3 +1251,10 @@ ranuras son la razón de ser del cinturón; Saque rápido, Mano de boticario, Po
 no puede ser solo Defensa o solo resistencias; lo suyo son las ranuras y sus mecánicas). La **Bolsa del carroñero** está mal planteada: uno no
 despoja un creep, convierte un objeto en despojos (un cuarto de su precio; hoy lo hace solo el cierre del botín con lo que nadie tomó, y se
 reparte) → propuesta: sacarla, o cambiarla por algo de la venta en la tienda (a decidir).
+
+**✅ Cinturón Buena calidad: cargados (2026-10-06).** 12 cinturones (reemplazan a los 4 viejos), a 50 (el Cinto de peregrino, 45): Utilidad, Batalla,
+Aprendiz de boticario, Portafrascos de sanador, Cinto de prestidigitador, Faja de mandadero ligero, Tahalí de esgrimista, Cartuchera de trampero
+experto, Cinto portapergaminos de escriba, Cinto de peregrino, Faja de cargador y Faja de tela ignífuga. Salieron Guardia de puerta, Faja de luchador
+y la Bolsa del carroñero. **Bolsillo de emergencia: desde Raro** (dueño: «me interesa el concepto, pero a partir de raro»): la mecánica quedó
+programada (`emergencia`, 1,5 en la calculadora; `Combatiente.emergenciaCruza` / `pocionEmergencia`; el mapa, `vtt-hexgrid/js/24-emergencia.js`) y
+la pieza se suma cuando se armen los cinturones Raros.

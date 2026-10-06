@@ -98,7 +98,8 @@ const FichaResumen = (() => {
       vision: n(c.final.vision),
       venenista: n(c.final.venenista),
       guardian: n(c.final.guardian),
-      levitar: n(c.final.levitar), suelagruesa: n(c.final.suelagruesa), embestida: n(c.final.embestida), pasodoble: n(c.final.pasodoble),   // piernas (2026-10-06)   // pies (2026-10-06): el mapa los mira al moverse y al aplicar daño del piso   // Coraza del guardián (2026-10-06): el mapa se la suma a la Defensa de los aliados al lado
+      levitar: n(c.final.levitar), suelagruesa: n(c.final.suelagruesa), embestida: n(c.final.embestida), pasodoble: n(c.final.pasodoble),   // piernas (2026-10-06)
+      emergencia: n(c.final.emergencia), emergenciaUsada: !!S.emergenciaUsada,   // Bolsillo de emergencia (cinturón, 2026-10-06): el mapa lo mira   // pies (2026-10-06): el mapa los mira al moverse y al aplicar daño del piso   // Coraza del guardián (2026-10-06): el mapa se la suma a la Defensa de los aliados al lado
       defprimer: n(c.final.defprimer), defdist: n(c.final.defdist),   // torso blando (2026-10-06): el mapa los suma a la Defensa al aplicar el daño   // Guantes del envenenador (2026-10-05): el mapa le suma esos stacks a los venenos que pone en el duelo
       pasosGratis: n(c.final.pasosgratis),
       retirada: n(c.final.retirada),   // Retirada limpia (%): el mapa la tira al alejarse de un rival (js/17)

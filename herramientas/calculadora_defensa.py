@@ -75,6 +75,8 @@ COSTO = {
     # Piernas de Buena calidad (dueño, 2026-10-06): Embestida 1 por PdG (la mitad del PdG: pide llegar en línea recta, una vez por turno); el primer
     # paso al doble (la contra de las piernas pesadas, «Movimiento −1» traducido) devuelve 2.
     'embestida': 1, 'pasodoble': -2,
+    # Cinturón de Buena calidad (dueño, 2026-10-06): Bolsillo de emergencia (se toma sola una poción al bajar del 25 %, una vez por combate) 1,5.
+    'emergencia': 1.5,
 }
 def costo_retirada(pct):
     return 4 if pct >= 100 else pct * 0.03

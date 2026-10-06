@@ -63,6 +63,7 @@ const FichaCalculo = (() => {
     {id:'tipo4', label:'Tipo 10', full:'Resistencia a crítico — armas Tipo 10 (d10)'},
     {id:'tipo5', label:'Tipo 12', full:'Resistencia a crítico — armas Tipo 12 (d12, explosivos/modernas)'},
     {id:'capcinturon', label:'Ranuras cinturón', full:'Ranuras extra para consumibles que da el cinturón equipado'},
+    {id:'emergencia', label:'Bolsillo de emergencia', full:'Al bajar del 25 % de la vida, se toma sola la mejor poción de curación del cinturón, sin No2; una vez por combate'},
     {id:'capmochila', label:'Ranuras mochila', full:'Ranuras extra de la mochila que da la mochila equipada'},
     {id:'luz', label:'Luz portada', full:'Radio de luz que llevás encima (farol, bengala): iluminás y ves ese radio a tu alrededor, sin punto ciego'},
     {id:'veoculto', label:'Ve lo oculto', full:'Radio (dentro de tu campo de visión) en el que ves lo oculto: creeps en sigilo y trampas escondidas'},

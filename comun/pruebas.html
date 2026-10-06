@@ -1603,6 +1603,13 @@ prueba('Stun (2026-10-06): no le toca los No2; si lo atacan, su Evasión es 1 si
   const r = Combatiente.tirarStat(12, es, 'eva'), r2 = Combatiente.tirarStat(12, viejo, 'eva'), parry = Combatiente.tirarStat(12, es, 'parry');
   igual([stun.forzarNitros, stun.stun, r.total, r.rolls.length, r2.total, parry.rolls.length > 0, Combatiente.stuneado([]), barrera.turnos], [undefined, true, 1, 0, 1, true, false, 2]);
 });
+prueba('cinturones de Buena calidad (2026-10-06): 12 piezas; Bolsillo de emergencia (mecánica lista, la pieza es de Raro) — cruza el 25 % hacia abajo y toma la poción que más cura', () => {
+  const bc = CATALOGO_BASE.filter(i => i.tipoItem === 'cinturon' && i.tier === 'Buena Calidad' && !i.soloBotin);
+  const cint = [{id: 'a', nombre: 'Poción chica', curahp: 5, unidades: 2}, {id: 'b', nombre: 'Poción grande', curahp: 15, unidades: 1}, {id: 'c', nombre: 'Bomba', curahp: 0, unidades: 3}];
+  igual([bc.length, Combatiente.emergenciaCruza(10, 4, 20), Combatiente.emergenciaCruza(4, 3, 20), Combatiente.emergenciaCruza(10, 0, 20), Combatiente.emergenciaCruza(10, 6, 20),
+    Combatiente.pocionEmergencia(cint).nombre, Combatiente.pocionEmergencia([{curahp: 5, unidades: 0}]), bc.some(i => (i.mods || []).some(m => m.stat === 'emergencia'))],
+    [12, true, false, false, false, 'Poción grande', null, false]);
+});
 prueba('piernas de Buena calidad (2026-10-06): 19 piezas; el resumen del personaje publica Embestida y Primer paso doble; las Grebas del carnero llevan Embestida +2', () => {
   const bc = CATALOGO_BASE.filter(i => i.tipoItem === 'piernas' && i.tier === 'Buena Calidad' && !i.soloBotin);
   const carnero = bc.find(i => i.nombre === 'Grebas del carnero'), placas = bc.find(i => i.nombre === 'Grebas de placas');

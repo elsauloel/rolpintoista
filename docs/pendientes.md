@@ -258,6 +258,10 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   capa gratuita; Firebase tiene una forma de usarlo sin exponer la clave, a verificar), o un botón «Copiar el contexto» para pegar en cualquier
   chat gratuito (Claude, ChatGPT, Gemini). Claude por API no tiene capa gratuita (se paga por uso, poco).
 
+- [ ] **Artefactos fuera de la escalera** (idea aprobada por el dueño, 2026-10-06, falta ver cómo se implementa): piezas únicas que no entran en
+  ninguna bolsa de calidad (un anillo de Movimiento o de Agilidad, Evasión +3…), sin tienda, solo de botín. A pensar: cómo se marcan en el catálogo
+  (¿una calidad aparte, «Artefacto»?), que el generador de tiendas no las ofrezca, cómo las elige el GM para el botín y que haya una sola copia.
+
 ## 5. Contenido a revisar (números de primer borrador)
 - [ ] Las **321 habilidades de creeps**: daño, cooldowns, bonos, cuáles son rápidas y cuáles lentas.
 - [ ] Los **173 creeps base** (todos dicen "(auditar)") y sus recompensas.

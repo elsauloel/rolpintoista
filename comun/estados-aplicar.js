@@ -71,7 +71,7 @@ const EstadosAplicar = (() => {
     const r = Combatiente.agregarEstado(sc.estados, componer(spec), sc);
     if(!r.ok) return {ok: false, motivo: r.motivo};
     // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).
-    const d = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: typeof CreepCalculo !== 'undefined' ? CreepCalculo.resElemental(sc, 'fuego') : 0});
+    const d = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: typeof CreepCalculo !== 'undefined' ? CreepCalculo.resElemental(sc, 'fuego') : 0, hpActual: sc.hp});
     if(d.hp){ const tope = parseFloat(sc.hpMax) > 0 ? parseFloat(sc.hpMax) : Infinity; sc.hp = Math.max(0, Math.min(tope, (parseFloat(sc.hp) || 0) + d.hp)); }
     return {ok: true, estado: r.estado, que: r.que, disparo: d};
   }

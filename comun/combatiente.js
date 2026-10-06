@@ -188,10 +188,18 @@ const Combatiente = (() => {
     return {hp: d.hp, quedan: k.quedan, terminados: k.terminados, eventos: [...d.eventos, ...k.eventos]};
   }
   // Recién puesto (r = lo que devolvió agregarEstado): si es nuevo o se renovó, se dispara ya. → {hp, eventos}; la vida la aplica quien lo puso.
+  // `campos.hpActual` (opcional): la vida de quien lo recibe; si está caído (0), una cura no entra (curaQueEntra).
   function dispararAlAplicar(r, estados, campos){
     if(!r || !r.ok || !r.estado || (r.que !== 'nuevo' && r.que !== 'renovado')) return {hp: 0, eventos: []};
-    return dispararEstados([r.estado], {...(campos || {}), todos: estados});
+    const d = dispararEstados([r.estado], {...(campos || {}), todos: estados});
+    if(campos && campos.hpActual !== undefined && d.hp > 0 && n(campos.hpActual) <= 0) return {hp: 0, eventos: [...d.eventos, {tipo: 'caido', nombre: r.estado.nombre}]};
+    return d;
   }
+  /* Una cura no levanta a un caído (dueño, 2026-10-06: «una poción de cura normal no revive a alguien inconsciente; tiene que ser un efecto
+     que diga revivir»): con la vida en 0, lo que sume vida no entra (el daño sí, aunque ya no baja de 0). Para levantarlo: ✚ Revivir, un Ankh,
+     un efecto que reviva (y ahí queda Titilando). → lo que entra de `delta`. Igual para personajes, invocaciones y creeps. */
+  const curaQueEntra = (hpActual, delta) => (n(delta) > 0 && n(hpActual) <= 0 ? 0 : n(delta));
+  const CAIDO_TXT = 'está caído: una cura no lo levanta (hace falta revivirlo)';
   // El reporte en texto llano (Mesa del personaje, 📜 Historial del GM), un renglón por cosa que pasó.
   const fmtN = x => Number.isInteger(x) ? String(x) : String(Math.round(x * 100) / 100);
   function reporteTurno(eventos){
@@ -204,6 +212,7 @@ const Combatiente = (() => {
       if(ev.tipo === 'turnos') return `${ev.nombre}: ${fmtN(ev.de)} → ${fmtN(ev.a)} turno${ev.a === 1 ? '' : 's'}`;
       if(ev.tipo === 'vence') return `${ev.nombre}: ${fmtN(ev.de)} → 0 turnos, se terminó`;
       if(ev.tipo === 'fin') return `${ev.nombre}: se terminó`;
+      if(ev.tipo === 'caido') return `${ev.nombre}: no cura a un caído`;
       return '';
     }).filter(Boolean);
   }
@@ -870,7 +879,7 @@ const Combatiente = (() => {
     const st = AHORRO_ESPECIAL[tipo];
     return st && typeof valorDe === 'function' ? Math.max(0, Math.round(n(valorDe(st)))) : 0;
   }
-  return {vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+  return {curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

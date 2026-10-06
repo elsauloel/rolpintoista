@@ -780,7 +780,7 @@ function dibujar(){
     // más transparente para acordarse de que los jugadores no lo ven.
     if(t.oculto || enSigilo(t)) ctx.globalAlpha = 0.5;
     // Titila (2026-10-06, dueño: «como en el Contra»): con cualquier estado que lo hace invulnerable, prende y apaga rápido.
-    if(tokenTitila(t)){ if(Math.floor(performance.now() / 110) % 2) ctx.globalAlpha *= 0.18; animando = true; }
+    if(tokenTitila(t)){ if(Math.floor(performance.now() / 260) % 2) ctx.globalAlpha *= 0.2; animando = true; }
 
     trazarPuntos(verticesHex(x + 2 / z, y + 3 / z, rad));
     ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fill();

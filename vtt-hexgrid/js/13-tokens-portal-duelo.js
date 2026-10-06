@@ -1033,8 +1033,8 @@ async function dueloCurar(t, n){
   n = Math.max(0, Math.round(num(n)));
   if(t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION)) return dueloCurarInv(t, n);
   if(t.tipo === 'creep'){
-    const res = await modificarCreep(t.fichaId, sc => { const previo = num(sc.hp); const tope = num(sc.hpMax) > 0 ? num(sc.hpMax) : previo + n; sc.hp = Math.min(tope, previo + n); return {previo, nuevo: sc.hp}; });
-    return {previo: res.previo, nuevo: res.nuevo};
+    const res = await modificarCreep(t.fichaId, sc => { const previo = num(sc.hp); const tope = num(sc.hpMax) > 0 ? num(sc.hpMax) : previo + n; sc.hp = Math.min(tope, previo + Combatiente.curaQueEntra(previo, n)); return {previo, nuevo: sc.hp}; });
+    return {previo: res.previo, nuevo: res.nuevo, ...(n > 0 && res.previo <= 0 ? {caido: true} : {})};
   }
   const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}`));
   const parteRef = base.collection('partes').doc('general');
@@ -1045,6 +1045,7 @@ async function dueloCurar(t, n){
     const datos = JSON.parse(parte.data().json || '{}');
     const rs = ficha.data().resumen || {};
     const previo = num(datos.hp), tope = num(rs.hpMax) > 0 ? num(rs.hpMax) : previo + n;
+    if(n > 0 && previo <= 0) return {previo, nuevo: previo, caido: true};   // una cura no levanta a un caído (Combatiente.curaQueEntra)
     datos.hp = Math.min(tope, previo + n);
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
     tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp});
@@ -1065,6 +1066,7 @@ async function dueloCurarInv(t, n){
     const inv = (datos.invocaciones || []).find(i => i && i.id === invId);
     if(!inv) throw new Error('La invocación ya no existe');
     const previo = num(inv.hp), tope = num(inv.hpMax) > 0 ? num(inv.hpMax) : previo + n;
+    if(n > 0 && previo <= 0) return {previo, nuevo: previo, caido: true};   // una cura no levanta a un caído
     inv.hp = Math.min(tope, previo + n);
     const rs = ficha.data().resumen || {};
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
@@ -1102,7 +1104,7 @@ async function dueloAplicarEfecto(d, ef){
     return {nota: `le llegó a su ficha: −${n} No2${spec.no2Sentado ? ' (en 0, Sentado)' : ''}`};
   }
   if(spec.cura){
-    try{ const r = await dueloCurar(t, spec.cura); return {nota: `+${spec.cura} HP (${fmt(r.previo)} → ${fmt(r.nuevo)})`}; }
+    try{ const r = await dueloCurar(t, spec.cura); return {nota: r.caido ? Combatiente.CAIDO_TXT : `+${spec.cura} HP (${fmt(r.previo)} → ${fmt(r.nuevo)})`}; }
     catch(err){ console.error('No se pudo aplicar la cura del duelo:', err); return {manual: true, nota: 'no se pudo curar solo: aplicalo a mano'}; }
   }
   // Guantes del envenenador (2026-10-05): los venenos que pone quien atacó llevan esos stacks de más (un turno más y 1 de daño más por turno).

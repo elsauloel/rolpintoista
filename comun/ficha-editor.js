@@ -206,7 +206,7 @@ const FichaEditor = (() => {
       ? (e.esEscarcha ? `${e.nombre} ×${e.stacks} (−${e.stacks} No2 máx.)` : e.esSangrado ? `${e.nombre}: +1 al daño por turno (${fmt(Math.abs(num(e.hpturno)) * num(e.stacks))} ahora)` : `${e.nombre} ×${e.stacks}`)
       : r.que === 'renovado' ? `${e.nombre} renovado (ya lo tenía)` : `${e.nombre} activado`;
     // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161) — si quien llama sabe poner la vida.
-    const dis = o && o.alDisparar ? Combatiente.dispararAlAplicar(r, lista, {hp: 'hpturno', resFuego: num(o.resFuego)}) : {hp: 0};
+    const dis = o && o.alDisparar ? Combatiente.dispararAlAplicar(r, lista, {hp: 'hpturno', resFuego: num(o.resFuego), ...(o.hpActual !== undefined ? {hpActual: o.hpActual} : {})}) : {hp: 0};
     if(dis.hp) o.alDisparar(dis.hp);
     toast(q + txt + (dis.hp ? ` · ya ${dis.hp < 0 ? 'sacó' : 'curó'} ${fmt(Math.abs(dis.hp))} HP` : ''));
     return r;

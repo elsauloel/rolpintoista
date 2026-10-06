@@ -981,10 +981,20 @@ async function hudAplicar(clave, texto){
   const t = seleccion ? tokens.get(seleccion) : null;
   if(!t || !puedoCambiarVida(t) || !String(texto).trim()){ hudEditando = ''; pedirDibujo(); return; }
   const idTok = seleccion, antes = vitalActual(t, clave);
+  // Subirle la vida a un caído (2026-10-06, dueño: una cura no levanta a un inconsciente): avisa y deja seguir — a mano, lo decide la mesa;
+  // si sigue, queda de pie (sin Titilando: eso es de los efectos que reviven).
+  let levantar = false;
+  if(clave === 'hp' && antes !== null && antes !== undefined && num(antes) <= 0){
+    const nuevo = leerValorVital(texto, num(antes));
+    if(nuevo !== null && nuevo > 0){
+      if(!window.confirm(`${nombreDe(t)} ${Combatiente.CAIDO_TXT}: para eso está ✚ Revivir (o un Ankh).\n\n¿Cambiarle la vida igual, a mano? (Lo decide la mesa.)`)){ hudEditando = ''; pedirDibujo(); return; }
+      levantar = true;
+    }
+  }
   try{
     if(clave === 'no2') await cambiarNitros(t, texto);
     else if(t.tipo === 'creep') await cambiarVidaCreep(t.fichaId, texto);
-    else await cambiarVidaPj(t, clave, texto);
+    else await cambiarVidaPj(t, clave, texto, levantar);
     vitalRegistrar(idTok, clave, antes);
   }catch(err){
     console.error('No se pudo cambiar el valor:', err);
@@ -1158,7 +1168,7 @@ async function abrirEstadoNuevo(t){
     if(r.que === 'yaLoTiene'){ toast(`${quien}: ${nuevo.nombre} ya lo tiene, no se acumula`); return guardar; }
     if(inv && InvCalculo.modsAfectanHp(r.estado.mods)) InvCalculo.actualizarHpMaxPorCon(inv);
     // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).
-    const dis = Combatiente.dispararAlAplicar(r, lista, {hp: 'hpturno', resFuego: num(inv ? InvCalculo.statValor(inv, 'resfuego') : FichaCalculo.calcular(S).final.resfuego)});
+    const dis = Combatiente.dispararAlAplicar(r, lista, {hp: 'hpturno', resFuego: num(inv ? InvCalculo.statValor(inv, 'resfuego') : FichaCalculo.calcular(S).final.resfuego), hpActual: inv ? inv.hp : S.hp});
     if(dis.hp){ if(inv) inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, num(inv.hp) + dis.hp)); else mantFijarHp(S, num(S.hp) + dis.hp); }
     toast(`${quien}: ${SelectorEstados.textoAgregado(r, 'hpturno')}${dis.hp ? ` · ya ${dis.hp < 0 ? 'sacó' : 'curó'} ${fmt(Math.abs(dis.hp))} HP` : ''}`);
     return true;
@@ -1185,7 +1195,7 @@ async function abrirEstadoNuevoCreep(t){
       r = Combatiente.agregarEstado(sc.estados, SelectorEstados.estadoCreep(elegido.preset, idEstadoNuevo(), CreepAcciones.FLAGS_ESTADO), {jefe: sc.jefe});
       if(r.ok && CreepCalculo.modsAfectanHp(r.estado.mods)) CreepCalculo.actualizarHpMaxPorCon(sc);
       // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).
-      const dis = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: CreepCalculo.resElemental(sc, 'fuego')});
+      const dis = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: CreepCalculo.resElemental(sc, 'fuego'), hpActual: sc.hp});
       if(dis.hp){ sc.hp = Math.max(0, Math.min(num(sc.hpMax) || Infinity, num(sc.hp) + dis.hp)); r.disparo = dis; }
     });
   }catch(err){ console.error('No se pudo poner el estado al creep:', err); toast('No se pudo poner el estado — mirá la consola'); return; }

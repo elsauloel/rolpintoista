@@ -180,7 +180,7 @@ const CreepAcciones = (() => {
     const r = Combatiente.agregarEstado(sc.estados, nuevo, sc);
     if(!r.ok) return {estado: null, aviso: `${sc.nombre}: inmune ahora mismo (${r.motivo}) — ${nombre} no hizo efecto`};
     // Lo que se dispara (regeneración, veneno…) pega apenas se lo pone (2026-10-06, P161).
-    const dis = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: C().resElemental(sc, 'fuego')});
+    const dis = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: C().resElemental(sc, 'fuego'), hpActual: sc.hp});
     if(dis.hp) sc.hp = Math.max(0, Math.min(num(sc.hpMax) || Infinity, num(sc.hp) + dis.hp));
     return {estado: r.estado, disparo: dis};
   }
@@ -456,7 +456,9 @@ const CreepAcciones = (() => {
     const v = Combatiente.vencerAlEmpezar(sc.estados); sc.estados = v.quedan;   // Titilando se va al empezar su turno
     const d = Combatiente.dispararEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno', resFuego: C().resElemental(sc, 'fuego')});
     const rep = Combatiente.reporteTurno([...v.eventos, ...d.eventos]);
-    if(d.hp){ const antes = num(sc.hp); sc.hp = Math.max(0, Math.min(num(sc.hpMax), antes + d.hp)); rep.push(`HP total: ${antes} → ${sc.hp}`); }
+    const dh = Combatiente.curaQueEntra(sc.hp, d.hp);
+    if(d.hp && !dh) rep.push('Caído: la cura de este turno no lo levanta');
+    if(dh){ const antes = num(sc.hp); sc.hp = Math.max(0, Math.min(num(sc.hpMax), antes + dh)); rep.push(`HP total: ${antes} → ${sc.hp}`); }
     sc.nitros = Combatiente.recargarNo2(C().nitrosMax(sc), sc.nitros);
     return {rep, enCooldown, hpAplicado: d.eventos.filter(ev => ev.tipo === 'hp').length};
   }

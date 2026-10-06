@@ -81,7 +81,7 @@ const InvHabilidades = (() => {
     if(r.que === 'yaLoTiene') return `${d.nombre}: ya lo tenía`;
     const e = r.estado;
     // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).
-    const dis = Combatiente.dispararAlAplicar(r, inv.estados, {hp: 'hpturno', resFuego: num(I().statValor(inv, 'resfuego'))});
+    const dis = Combatiente.dispararAlAplicar(r, inv.estados, {hp: 'hpturno', resFuego: num(I().statValor(inv, 'resfuego')), hpActual: inv.hp});
     const ya = dis.hp ? ` · ya ${dis.hp < 0 ? 'le sacó' : 'le curó'} ${fmt(Math.abs(dis.hp))} HP` : '';
     if(dis.hp) inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, num(inv.hp) + dis.hp));
     if(I().modsAfectanHp(e.mods || [])) I().actualizarHpMaxPorCon(inv);

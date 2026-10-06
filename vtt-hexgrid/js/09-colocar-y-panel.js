@@ -626,7 +626,7 @@ async function cambiarVidaCreep(creepId, texto){
   });
 }
 
-async function cambiarVidaPj(t, clave, texto){
+async function cambiarVidaPj(t, clave, texto, levantar){   // levantar: a mano, deja de estar inconsciente (sin Titilando)
   const [fichaId, invId] = t.fichaId.split(SEP_INVOCACION);
   const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
   const parteRef = base.collection('partes').doc(invId ? 'invocaciones' : 'general');
@@ -650,6 +650,7 @@ async function cambiarVidaPj(t, clave, texto){
       if(nuevo === null) throw new Error(ERROR_TIPEO);
       datos.hp = Math.max(0, hpMax > 0 ? Math.min(hpMax, nuevo) : nuevo);
       cambios['resumen.hp'] = datos.hp;
+      if(levantar && datos.hp > 0 && datos.muerto && datos.muerto.activo && !datos.muerto.definitivo){ datos.muerto = {activo: false, turnos: 5, definitivo: false}; cambios['resumen.muerto'] = false; }
     }else{
       // SP disponible = máximo - gastado (igual que en la ficha).
       const {spMax, campoGastado, campoResumen} = spDeResumen(r);

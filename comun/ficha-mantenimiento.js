@@ -38,6 +38,7 @@ const FichaMantenimiento = (() => {
   }
   // La vida por fijarHp (para que el veneno que te deja en 0 active el Ankh antes de contar los turnos de muerte) y el reporte.
   function aplicarVida(S, ui, hpDelta, hpAntes, rep){
+    if(hpDelta > 0 && !Combatiente.curaQueEntra(S.hp, hpDelta)){ rep.push(`Caído: la cura de este turno no lo levanta (hace falta revivirlo)`); return; }
     if(!hpDelta) return;
     ui.fijarHp(num(S.hp) + hpDelta);
     rep.push(num(S.hp) !== hpAntes ? `HP total: ${fmt(hpAntes)} → ${fmt(num(S.hp))}` : `HP total: sigue en ${fmt(hpAntes)}`);
@@ -68,7 +69,9 @@ const FichaMantenimiento = (() => {
     const v = Combatiente.vencerAlEmpezar(inv.estados); inv.estados = v.quedan;   // Titilando se va al empezar su turno
     const d = Combatiente.dispararEstados(inv.estados, camposInv(inv));
     const rep = Combatiente.reporteTurno([...v.eventos, ...d.eventos]);
-    if(d.hp){ const antes = num(inv.hp); inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, antes + d.hp)); rep.push(`HP total: ${fmt(antes)} → ${fmt(inv.hp)}`); }
+    const dhInv = Combatiente.curaQueEntra(inv.hp, d.hp);
+    if(d.hp && !dhInv) rep.push('Caída: la cura de este turno no la levanta');
+    if(dhInv){ const antes = num(inv.hp); inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, antes + dhInv)); rep.push(`HP total: ${fmt(antes)} → ${fmt(inv.hp)}`); }
     if(num(inv.cooldown) > 0){
       inv.cooldownActual = Math.max(0, num(inv.cooldownActual) - 1);
       if(inv.cooldownActual === 0){ inv.activa = false; rep.push('Se duerme: llegó su cooldown a 0'); }

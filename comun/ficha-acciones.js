@@ -283,7 +283,9 @@ const FichaAcciones = (() => {
       // Mano de boticario (2026-10-05): suma a lo que cura una poción.
       const boticario = num(it.curahp) > 0 ? num(FichaCalculo.calcular(S).final.boticario) : 0;
       if(num(it.curahp)){
-        ui.fijarHp(num(S.hp) + num(it.curahp) + boticario);
+        const entra = Combatiente.curaQueEntra(S.hp, num(it.curahp) + boticario);
+        if(entra) ui.fijarHp(num(S.hp) + entra);
+        else if(num(it.curahp) > 0) ui.toast(`${it.nombre}: ${Combatiente.CAIDO_TXT}`);
       }
       const efecto = ui.efecto(it);
       ui.tirarExtra(it);
@@ -804,7 +806,7 @@ const FichaAcciones = (() => {
     // Lo que se dispara (veneno, regeneración…) pega apenas te lo ponen (2026-10-06, P161).
     let resF = 0;
     try{ resF = num(FichaCalculo.calcular(S).final.resfuego); }catch(e){}   // (un personaje a medio armar)
-    const dis = Combatiente.dispararAlAplicar(r, S.efectos, {hp: 'hpturno', resFuego: resF});
+    const dis = Combatiente.dispararAlAplicar(r, S.efectos, {hp: 'hpturno', resFuego: resF, hpActual: S.hp});
     if(dis.hp){ try{ fijarHp(S, num(S.hp) + dis.hp); revisarAnkh(S); revisarMuerte(S); }catch(e){ S.hp = Math.max(0, num(S.hp) + dis.hp); } }
     ui.cambio(['efectos', 'refresh', ...(dis.hp ? ['vitals'] : [])]);
     ui.toast(`🎯 ${quien}recibiste ${draft.nombre}${r.que === 'renovado' ? ' (se renovó el que tenías)' : r.que === 'acumulado' ? ` (×${r.estado.stacks})` : ''}${dis.hp ? ` · ya ${dis.hp < 0 ? 'te sacó' : 'te curó'} ${fmt(Math.abs(dis.hp))} HP` : ''}`);

@@ -79,7 +79,7 @@ const ESTADOS_PRESET = [
   // Titilando (dueño, 2026-10-06: «como en el Contra, cuando te morís y resucitás»): quien vuelve de estar caído titila y es invulnerable hasta que
   // empieza su próximo turno (`alEmpezarTurno`: se va al empezar su turno; sin orden de turnos, en el próximo Mantenimiento, con su turno 1).
   {nombre:'Titilando', polaridad:'buff', turnos:1, invulnerable:true, titilando:true, alEmpezarTurno:true,
-    detalle:'Recién revivido: titila y es invulnerable (no recibe daño ni debuffs) hasta que empieza su próximo turno. ⚙ Automatizado: lo pone el mapa al volver de estar caído (Ankh, ✚ Revivir, una cura, un hechizo) y se va solo al empezar su turno (sin orden de turnos, en el próximo Mantenimiento).'},
+    detalle:'Recién revivido: titila y es invulnerable (no recibe daño ni debuffs) hasta que empieza su próximo turno. ⚙ Automatizado: lo ponen los efectos que reviven (✚ Revivir, el Ankh) y se va solo al empezar su turno (sin orden de turnos, en el próximo Mantenimiento). Una cura normal no levanta a un caído.'},
   {nombre:'Inmunidad a CC', polaridad:'buff', turnos:2, inmunidadCC:true,
     detalle:'Inmune a los controles: Stun, Exhausto, Inmovilizado, Rengo, Lisiado y Pajaritos (no se le pueden aplicar mientras dure). Veneno y Sangrado no cuentan como control.'},
   {nombre:'Espinas', polaridad:'buff', turnos:3, espinas:true,

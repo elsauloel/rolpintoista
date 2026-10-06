@@ -1258,3 +1258,21 @@ experto, Cinto portapergaminos de escriba, Cinto de peregrino, Faja de cargador 
 y la Bolsa del carroñero. **Bolsillo de emergencia: desde Raro** (dueño: «me interesa el concepto, pero a partir de raro»): la mecánica quedó
 programada (`emergencia`, 1,5 en la calculadora; `Combatiente.emergenciaCruza` / `pocionEmergencia`; el mapa, `vtt-hexgrid/js/24-emergencia.js`) y
 la pieza se suma cuando se armen los cinturones Raros.
+
+## Mochila, Buena calidad — propuesta v1 (2026-10-06, ⬜ a revisar por el dueño)
+Lo que hay: 2 mochilas de Buena calidad (Campamento: Ranuras +8; Alforja de mula: Ranuras +10 · Evasión −1), las dos muy por debajo de su bolsa
+(2,5; cada ranura vale 0,25 y cada punto de peso devuelve 0,5). Con lo decidido el 2026-10-04/05: cada mochila con un efecto propio (ranuras o una
+mecánica); las resistencias solo acompañan; las grandes, con contras.
+
+| Mochila · pesa · precio | Qué hace |
+|---|---|
+| Mochila de campamento · 1 · 70 | Ranuras de mochila +12 |
+| Alforja de mula · 2 · 70 | Ranuras de mochila +20 · Iniciativa −1 |
+| Cajón de buhonero · 0 · 70 | Ranuras de mochila +14 · Sigilo −2 (hace ruido) |
+| Mochila de viajante experto · 0 · 70 | Bolsillo exterior · Ranuras +6 |
+| Mochila de soldado veterano · 0 · 70 | Correas laterales +2 · Ranuras +2 |
+| Mochila de mercenario · 0 · 70 | Bolsillo exterior · Correa lateral +1 · Ranuras +2 |
+| Morral de cazador mayor · 0 · 70 | Morral de cazador (los trofeos no ocupan ranuras) · Ranuras +8 |
+| Mochila de minero con farol de bronce · 0 · 70 | Luz +2 (farol colgado) · Ranuras +8 |
+| Alforja de baqueano · 0 · 70 | Alforja compartida · Bolsillo exterior · Ranuras +3 |
+| Mochila de cuero curtido · 0 · 70 | Ranuras +6 · Res. ácido +1 · Res. fuego +1 |

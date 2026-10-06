@@ -112,8 +112,8 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261005i6', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261005i1', '../comun/ficha-mantenimiento.js?v=20261006c', '../comun/ficha-calculo.js?v=20261006r', '../comun/ficha-combate.js?v=20261005mn', '../comun/skills-clase.js?v=20261005t1', '../comun/ficha-habilidades.js?v=20261006c',
-  '../comun/catalogo.js?v=20261006r', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261004ja', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261006a', '../comun/ficha-resumen.js?v=20261006r', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261006a', '../comun/inv-acciones.js?v=20261005mn', '../comun/inv-duelo.js?v=20261005mn', '../comun/ficha-acciones.js?v=20261006c', '../comun/inv-habilidades.js?v=20261006c', '../comun/inv-lupa.js?v=20261001a',
-  '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261005i1', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261005f6'];
+  '../comun/catalogo.js?v=20261006r', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261004ja', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261006e', '../comun/ficha-resumen.js?v=20261006r', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261006e', '../comun/inv-acciones.js?v=20261005mn', '../comun/inv-duelo.js?v=20261005mn', '../comun/ficha-acciones.js?v=20261006e', '../comun/inv-habilidades.js?v=20261006c', '../comun/inv-lupa.js?v=20261001a',
+  '../comun/confirmar-turno.js?v=20261006e', '../comun/ficha-duelo.js?v=20261006e', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261005f6'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
    anterior"): en la ficha las columnas se juntan recién con la PANTALLA angosta (@media), pero en el mapa la pantalla es ancha y el panel
@@ -1112,7 +1112,7 @@ function bnCrear(){
     }
     if(!bn.S) return;
     // Confusión (2026-10-04, js/20): la primera acción del turno tira antes.
-    if(confusionEsAccion(b)){ const tid = confusionTokenDe(bn.invId ? bn.fichaId + SEP_INVOCACION + bn.invId : bn.fichaId, 'pj'); if(confusionAntes(tid, () => confusionReclic(raiz, b, tid))) return; }
+    if(confusionEsAccion(b)){ const tid = confusionTokenDe(bn.invId ? bn.fichaId + SEP_INVOCACION + bn.invId : bn.fichaId, 'pj'); if(confusionAntes(tid, () => confusionReclic(raiz, b, tid))) return; avisarFueraDeTurno(tid, b); }
     if(bn.invId ? bnInvAca(b) : (bnTirarAca(b) || bnAccionAca(b))) return;
     const datos = {...b.dataset};
     if(!Object.keys(datos).length) return;

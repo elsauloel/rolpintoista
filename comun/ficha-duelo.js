@@ -45,7 +45,7 @@ const FichaDuelo = (() => {
      Nunca cuesta No2. Pregunta el turno, revisa que alcance y cobra; null = no se usó. ---------- */
   const costoFlashDe = h => ({sp: FichaHabilidades.parseCostoSp(h.costo), hp: num(h.hpCosto)});
   async function pagarFlash(S, h, ui){
-    const p = await ConfirmarTurno.flash(`⚡ ${h.nombre || 'Flash'}`, costoFlashDe(h), {spAjeno: h.turnoAjenoSp});
+    const p = await ConfirmarTurno.flash(`⚡ ${h.nombre || 'Flash'}`, costoFlashDe(h), {spAjeno: h.turnoAjenoSp, ident: {nombre: ((S.meta && S.meta.nombre) || '').trim()}});
     if(!p) return null;
     if(p.sp > FichaBotonera.spMaximo(S) - num(S.spGastado)){ ui.toast(`No te alcanzan los SP para ${h.nombre} (${fmt(p.sp)} SP)`); return null; }
     if(p.hp > 0 && num(S.hp) <= p.hp){ ui.toast(`No te alcanza la vida para ${h.nombre} (${fmt(p.hp)} HP)`); return null; }

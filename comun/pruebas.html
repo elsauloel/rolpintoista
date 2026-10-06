@@ -1581,6 +1581,19 @@ prueba('creeps: el turno propio (dispara al empezar, cuenta al terminar) y el Ma
   igual([a.hpAplicado, hpA, no2 > 0, sc.estados[0].stacks, b.vencidos, m.enTurno, p.hp, lista[0].turnos, lista[0].disparado], [1, 18, true, 1, 0, true, 0, 1, false]);
 });
 
+prueba('con el turno sabido, el Flash no pregunta: en turno ajeno cobra el doble y avisa; en el propio, lo normal', async () => {
+  const viejo = window.toast;
+  let aviso = '';
+  window.toast = t => { aviso = t; };
+  try{
+    window.confirmarTurnoSaber = () => false;
+    const ajeno = {sp: await ConfirmarTurno.pedir('⚡ Golpe veloz', 2, 4, {flash: true, ident: {nombre: 'juan'}})};   // (pedir: otra prueba reemplaza un rato a flash)
+    window.confirmarTurnoSaber = () => true;
+    const propio = {sp: await ConfirmarTurno.pedir('⚡ Golpe veloz', 2, 4, {flash: true})};
+    igual([ajeno.sp, propio.sp, /No es el turno de juan/.test(aviso), Combatiente.esFlash({duelo: {modo: 'flash'}}), Combatiente.esFlash({duelo: {modo: 'hab'}})],
+      [4, 2, true, true, false]);
+  }finally{ delete window.confirmarTurnoSaber; window.toast = viejo; }
+});
 prueba('torso rígido: el estado Inamovible (100 %), el guardián en el resumen y una resistencia elemental negativa (vulnerable)', () => {
   const S = {catalogo: [], efectos: []};
   const r = FichaHabilidades.aplicarEfectoDeConsumo(S, {nombre: 'Prueba', efectoNombre: 'Inamovible'}, estadosPresetFicha());

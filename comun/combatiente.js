@@ -744,6 +744,10 @@ const Combatiente = (() => {
   /* ⚡ Flash: ¿esta Ejecución es un Flash que vale para esa tirada del duelo? `campo`: 'pdg', 'eva' (la defensa), 'bloqueo',
      'fuerza' o 'dano'. Sin `modo`, para 'eva' vale si sirve para Evasión o Parry (la lista de opciones); con `modo`, para la
      defensa que se eligió ('parry' o la Evasión). */
+  // Una habilidad con ⚡ Flash (se puede usar en turno ajeno, al doble): en las Botoneras late con un brillo (dueño, 2026-10-06).
+  const esFlash = h => !!(h && h.duelo && h.duelo.modo === 'flash');
+  const FLASH_CSS = `<style>.bt-flash{animation:bt-flash-late 1.6s ease-in-out infinite;border-color:#ffd25a !important}
+@keyframes bt-flash-late{0%,100%{box-shadow:0 0 0 0 rgba(255,210,90,0)}50%{box-shadow:0 0 12px 3px rgba(255,210,90,.75)}}</style>`;
   function flashPara(c, campo, modo){
     if(!c || typeof c !== 'object' || c.modo !== 'flash' || !c.flash) return false;
     const en = c.flash.en || [];
@@ -831,5 +835,5 @@ const Combatiente = (() => {
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
-    formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, flashPara, cdFlash, costoFlash};
+    formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, esFlash, FLASH_CSS, flashPara, cdFlash, costoFlash};
 })();

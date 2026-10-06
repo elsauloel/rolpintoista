@@ -460,6 +460,7 @@ function soltar(){
     arrastre = null;
     const t = tokens.get(a.id);
     // Confusión (2026-10-04, js/20): antes de moverse, si es su primera acción del turno, tira; con «Seguir» se mueve por esta misma ruta.
+    if(a.movio && !a.libre) avisarFueraDeTurno(a.id, null);   // moverse fuera de turno: se avisa, no se frena (2026-10-06)
     if(!(a.movio && !a.libre && confusionAntes(a.id, () => rutaSoltada(a, tokens.get(a.id))))) rutaSoltada(a, t);   // (2026-10-02: separado para que el ataque de oportunidad pueda retomar el resto del camino, js/17)
     pedirDibujo();
   }

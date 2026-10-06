@@ -76,7 +76,7 @@ const InvBotonera = (() => {
         </div>
         <div class="bot-fila-btns">
           <button type="button" class="mini" data-verhabinv="${inv.id}:${h.id}">Ver</button>
-          <button type="button" class="ejecutar-btn con-lupa${bloqueo?' sin-recursos':''}" data-ejecutarhabinv="${inv.id}:${h.id}" ${bloqueo?`aria-disabled="true" title="${esc(bloqueo)}"`:''}>${FichaBotonera.modoHab(h) === 'manual' ? 'Anunciar' : 'Ejecutar'}${lupaBotonHtml(`inv:${inv.id}:hab:${h.id}`, 'en-boton')}</button>
+          <button type="button" class="ejecutar-btn con-lupa${bloqueo?' sin-recursos':''}${Combatiente.esFlash(h) ? ' bt-flash' : ''}" data-ejecutarhabinv="${inv.id}:${h.id}" ${bloqueo?`aria-disabled="true" title="${esc(bloqueo)}"`:''}>${FichaBotonera.modoHab(h) === 'manual' ? 'Anunciar' : 'Ejecutar'}${lupaBotonHtml(`inv:${inv.id}:hab:${h.id}`, 'en-boton')}</button>
           ${botonSegundaHab(inv, h)}
         </div>
       </div>`;
@@ -116,7 +116,7 @@ const InvBotonera = (() => {
       <div class="botonera-caja">
         <div class="cat-grouphead" style="margin-top:0"><span>Habilidades</span></div>
         <div class="botonera-list-grid">${inv.habilidades.length ? filasHab : '<div class="hint">Sin habilidades cargadas.</div>'}</div>
-      </div>`};
+      </div>` + Combatiente.FLASH_CSS};
   }
 
   return {html, botonSegundaHab};

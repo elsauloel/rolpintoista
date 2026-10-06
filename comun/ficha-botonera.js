@@ -423,7 +423,7 @@ const FichaBotonera = (() => {
             </div>
             <div class="bot-fila-btns">
               <button class="mini" data-view="habilidades:${i.id}">Ver</button>
-              <button class="ejecutar-btn${habAutomatizada(i) ? ' con-lupa' : ''}${sinNitros?" sin-recursos":""}" data-ejecutar="${i.id}" ${sinNitros?'aria-disabled="true" title="No te alcanzan los recursos"':""}>${habAutomatizada(i) ? 'Ejecutar' + lupaBotonHtml(`habx:${i.id}`, "en-boton") : 'Anunciar'}</button>
+              <button class="ejecutar-btn${habAutomatizada(i) ? ' con-lupa' : ''}${sinNitros?" sin-recursos":""}${Combatiente.esFlash(i) ? ' bt-flash' : ''}" data-ejecutar="${i.id}" ${sinNitros?'aria-disabled="true" title="No te alcanzan los recursos"':Combatiente.esFlash(i) ? 'title="⚡ Flash: se puede usar en turno ajeno (cuesta el doble)"' : ''}>${habAutomatizada(i) ? 'Ejecutar' + lupaBotonHtml(`habx:${i.id}`, "en-boton") : 'Anunciar'}</button>
               ${botonSegundaHab(i)}
             </div>
           </div>`;
@@ -447,6 +447,7 @@ const FichaBotonera = (() => {
 
     if(modoMapa !== 'narrativo') html += socialesHtml;
 
+    html += Combatiente.FLASH_CSS;   // el brillo de las habilidades con ⚡ Flash
     return {html, nitros: badgeNitros, sp: badgeSp, def: badgeDef};
   }
 

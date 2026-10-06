@@ -1324,3 +1324,8 @@ versión parecida en más de una, es candidato a juntar.
   de ganar el Parry y el Bloqueo. El menú de siempre queda en un botón chico de cada Botonera, «↪ Oportunidad o contraataque, a mano»
   (`data-botoneraaccion="otroataque"`, `data-otroataquecreep`, `data-invotroataque`), por si el mapa no lo detectó (narrativo, mover libre, la ficha suelta).
 
+- **Fuera de turno y Flash** (2026-10-06, dueño): con el orden de turnos el mapa sabe de quién es el turno (`esSuTurno`, js/04). Una acción
+  fuera de turno (atacar, habilidad, consumible, moverse) no se frena: `avisarFueraDeTurno` avisa con un toast y una línea en la Mesa (no avisan
+  las defensas, la oportunidad ni el contraataque). `ConfirmarTurno` ya no pregunta «¿es tu turno?» si la pantalla lo sabe
+  (`window.confirmarTurnoSaber(o)`, con `o.ident = {nombre, ref}`): en turno ajeno cobra lo de turno ajeno y avisa «No es tu turno · ⚡ Flash,
+  cuesta el doble». Las habilidades con Flash (`Combatiente.esFlash(h)`) laten con un brillo en las Botoneras (`bt-flash`, `Combatiente.FLASH_CSS`).

@@ -29,7 +29,7 @@ const CreepDuelo = (() => {
     if(!h) return null;
     const motivo = Combatiente.bloqueoHab(h, {hp: sc.hp});
     if(motivo){ ui.toast(`${sc.nombre}: ${h.nombre || 'Habilidad'} no se puede usar — ${motivo}`); return null; }
-    const p = await ConfirmarTurno.flash(`⚡ ${h.nombre || 'Flash'}`, costoFlash(h), {quien: sc.nombre});
+    const p = await ConfirmarTurno.flash(`⚡ ${h.nombre || 'Flash'}`, costoFlash(h), {quien: sc.nombre, ident: {nombre: sc.nombre, ref: sc.id}});
     if(!p) return null;
     return ui.cambiar(ref, c => {
       const hh = (c.habilidades || []).find(x => x.id === habId);

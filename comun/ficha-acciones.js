@@ -525,7 +525,7 @@ const FichaAcciones = (() => {
     let costoSp = FichaHabilidades.parseCostoSp(it.costo);
     // Costo distinto en turno ajeno (2026-09-28, pedido del dueño): antes de cobrar nada, un cartelito pregunta.
     if(String(it.turnoAjenoSp || '').trim() && !FichaHabilidades.spVariable(it)){
-      const elegido = await ConfirmarTurno.pedir(it.nombre, costoSp, num(it.turnoAjenoSp));
+      const elegido = await ConfirmarTurno.pedir(it.nombre, costoSp, num(it.turnoAjenoSp), {ident: {nombre: ((S.meta && S.meta.nombre) || '').trim(), ref: ui.yo ? (ui.yo() || {}).ref : ''}});
       if(elegido === null) return;   // canceló: no se cobra ni se ejecuta nada
       costoSp = elegido;
     }

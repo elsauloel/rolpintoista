@@ -439,6 +439,31 @@ async function turnoDeToken(tokenId, clave, inicio){
 const inicioDeTurno = (tokenId, clave) => turnoDeToken(tokenId, clave, true);
 const finDeTurno = (tokenId, clave) => turnoDeToken(tokenId, clave, false);
 
+/* ¿Es el turno de este token? true / false; null si no hay orden de turnos o no está en él (2026-10-06, P161). */
+function esSuTurno(tokenId){
+  if(!tokenId || !iniciativa.orden.length || !iniciativa.orden.some(o => o.id === tokenId)) return null;
+  return (iniciativa.orden[iniciativa.turno] || {}).id === tokenId;
+}
+// Para ConfirmarTurno (comun/confirmar-turno.js): el Flash y el costo de turno ajeno ya no preguntan «¿es tu turno?» si el mapa lo sabe.
+window.confirmarTurnoSaber = o => {
+  if(modoMapa !== 'combate' || !iniciativa.orden.length) return null;
+  const id = (o && o.ident) || {}, nombre = id.nombre || (o && o.quien) || '';
+  const tok = iniciativa.orden.map(x => x.id).find(tid => { const t = tokens.get(tid); return t && ((id.ref && t.fichaId === id.ref) || (nombre && nombreDe(t) === nombre)); });
+  return tok ? esSuTurno(tok) : null;
+};
+/* Una acción fuera de turno (dueño, 2026-10-06: «no se restringen, pero se comunican»): un toast a quien la hace y una línea en la Mesa para
+   todos. No avisan las defensas (no pasan por acá), la oportunidad y el contraataque (son de turno ajeno) ni el ⚡ Flash (avisa ConfirmarTurno). */
+function avisarFueraDeTurno(tokenId, b){
+  if(modoMapa !== 'combate' || esSuTurno(tokenId) !== false) return;
+  if(b && (b.dataset.botoneraaccion === 'otroataque' || b.classList.contains('bt-flash'))) return;
+  const t = tokens.get(tokenId);
+  if(!t) return;
+  const fila = b && b.closest('.bot-fila, .accion-row, .cat-row');
+  const accion = !b ? 'se mueve' : ((fila && fila.querySelector('.cat-nombre, .accion-nombre')) || b.querySelector('.bt-label') || b).textContent.trim().replace(/\s+/g, ' ').slice(0, 60);
+  toast(`⏱ No es el turno de ${nombreDe(t)}: se hace igual y queda en la Mesa`);
+  if(typeof mesaLinea === 'function') mesaLinea(`⏱ ${nombreDe(t)} actúa fuera de su turno: ${accion}`);
+}
+
 /* Una invocación nueva (dueño, 2026-10-06): si hay orden de turnos, entra al final y con «Mareo de invocación» (su primer turno no hace nada).
    Lo hace la pantalla del GM al ver aparecer el token. */
 async function invocacionAlOrden(tokenId){

@@ -26,10 +26,26 @@ const ConfirmarTurno = (() => {
 #ct-caja button.ct-cancelar{background:none;border:none;color:#9A867E;font-weight:400;text-align:center;margin-bottom:0;padding:6px}`;
     document.head.appendChild(s);
   }
+  /* Con turno propio (2026-10-06, P161): la pantalla que sabe de quién es el turno (el mapa, con el orden de turnos) define
+     `window.confirmarTurnoSaber(o)` → true (es su turno) / false (no lo es) / null (no sabe: se pregunta como siempre). `o.ident` =
+     {nombre, ref} de quien actúa (o `o.quien`). Si no es su turno no se frena nada: se cobra lo de turno ajeno y se avisa (dueño: «que aparezca
+     una notificación: No es tu turno, cuesta el doble»), con un toast y una línea en la Mesa. */
+  function saberTurno(o){
+    try{ return typeof window !== 'undefined' && typeof window.confirmarTurnoSaber === 'function' ? window.confirmarTurnoSaber(o) : null; }catch(e){ return null; }
+  }
+  function avisarAjeno(nombre, o, costoTxt){
+    const quien = (o.ident && o.ident.nombre) || o.quien || '';
+    const t = `⏱ No es ${quien ? `el turno de ${quien}` : 'tu turno'} — ${nombre}: ${o.flash ? '⚡ Flash, cuesta el doble' : 'cuesta lo de turno ajeno'} (${costoTxt})`;
+    if(typeof toast === 'function') toast(t);
+    if(typeof mesaLinea === 'function') mesaLinea(t);
+  }
   // pedir(nombre, costoPropio, costoAjeno, o) → Promise<number|null> (lo que se cobra; null = canceló, no cobra nada).
   function pedir(nombre, costoPropio, costoAjeno, o){
     o = o || {};
     const unidad = o.unidad || 'SP';
+    const sabe = saberTurno(o);
+    if(sabe === true) return Promise.resolve(costoPropio);
+    if(sabe === false){ avisarAjeno(nombre, o, o.textos ? o.textos[1] : `${costoAjeno} ${unidad}`); return Promise.resolve(costoAjeno); }
     estilos();
     return new Promise(resolver => {
       const fondo = document.createElement('div');
@@ -68,7 +84,7 @@ const ConfirmarTurno = (() => {
     o = o || {};
     const a = Combatiente.costoFlash(costo, true, o), b = Combatiente.costoFlash(costo, false, o);
     if(textoCosto(a) === 'sin costo' && textoCosto(b) === 'sin costo') return Promise.resolve(a);   // nada que cobrar: no pregunta
-    return pedir(nombre, a, b, {quien: o.quien, textos: [textoCosto(a), textoCosto(b)], pregunta: 'Un ⚡ Flash cuesta el doble fuera del propio turno.'});
+    return pedir(nombre, a, b, {quien: o.quien, ident: o.ident, flash: true, textos: [textoCosto(a), textoCosto(b)], pregunta: 'Un ⚡ Flash cuesta el doble fuera del propio turno.'});
   }
   return {pedir, flash, textoFlash, textoCosto};
 })();

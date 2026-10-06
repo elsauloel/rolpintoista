@@ -119,7 +119,7 @@ const CreepBotonera = (() => {
       const partes = [costoHabTxt(sc, h)];
       if(num(h.cd) > 0) partes.push(`CD ${fmt(num(h.cd))}`);
       const motivo = bloqueo ? `${bloqueo} · ${partes.join(' · ')}` : partes.join(' · ');
-      return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: !!bloqueo, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`, boton: botonHabTxt(h), segunda: botonSegundaHab(h, sc), cdHtml: cdControlesHtml(sc, h)};
+      return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: !!bloqueo, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`, flash: Combatiente.esFlash(h), boton: botonHabTxt(h), segunda: botonSegundaHab(h, sc), cdHtml: cdControlesHtml(sc, h)};
     });
 
     const filaHab = f => `
@@ -128,7 +128,7 @@ const CreepBotonera = (() => {
       <span class="hab-estado ${f.disabled?'cd':'ok'}">${esc(f.motivo)}</span>
       <button class="verbtn" data-verhabaccion="${sc.id}:${f.id}">Ver</button>
       ${lupaBotonHtml(`${sc.id}|hab|${f.id}`, 'mini')}
-      <button class="hab-ejecutar" ${f.attr} ${f.disabled?'disabled':''}>${f.boton || 'Ejecutar'}</button>
+      <button class="hab-ejecutar${f.flash ? ' bt-flash' : ''}" ${f.attr} ${f.disabled?'disabled':''}${f.flash ? ' title="⚡ Flash: se puede usar en turno ajeno (cuesta el doble)"' : ''}>${f.boton || 'Ejecutar'}</button>
       ${f.segunda || ''}
       ${f.cdHtml || ''}
     </div>`;
@@ -172,7 +172,7 @@ const CreepBotonera = (() => {
       <div class="botonera-list-grid">${filasHab.map(filaHab).join('')}</div>
     </div>
     ${cinturonHtml(sc, o)}`;
-    return {titulo: sc.nombre, badge: `No2 ${fmt(num(sc.nitros))}/${fmt(nitrosMax(sc))}`, html: cuerpo};
+    return {titulo: sc.nombre, badge: `No2 ${fmt(num(sc.nitros))}/${fmt(nitrosMax(sc))}`, html: cuerpo + Combatiente.FLASH_CSS};
   }
 
   /* El cinturón del creep (2026-10-04): 1 ranura = 1 unidad, base 5; usar uno cuesta 1 No2. opts.consumibles = [{id, nombre, tier}] del

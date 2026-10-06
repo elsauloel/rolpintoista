@@ -773,3 +773,11 @@ si quedó alguna idea afuera. Más ideas que se pueden sumar:
 | Guantes de la emboscada ⚙ R | El ataque de oportunidad no cuesta No2, una vez por turno (como el rasgo de algunas armas, pero en el guante). |
 | Guantes del contragolpe 🔧 R | Después de ganar un Parry, el contraataque cuesta 1 No2 menos. |
 | Guanteletes de agarre firme 🔧 B | Nadie te puede desarmar ni sacarte el escudo (✋ a mano mientras no exista el desarme). |
+
+**Filtro del dueño, Manos (2026-10-05, en curso):**
+- **Pegar:** van todos menos los Guantes de lanzador. **El Alcance y el Rango son siempre una característica intrínseca del arma**, nunca un bono
+  que dé una pieza defensiva.
+- **Guantes del reflejo:** que un Parry por turno no cueste No2 es mucho. Dato: hoy el Parry cuesta **1 No2 fijo** (`Combatiente.costoParry`),
+  sin importar el arma; «1 menos» sería lo mismo que gratis. A definir otra forma (ver la respuesta en la conversación).
+- **Espinas:** le gusta, pero **para las armaduras**, no los guantes.
+- **Orden:** después de Manos, Buena calidad sigue por **las armaduras** (torso).

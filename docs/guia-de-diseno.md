@@ -16,6 +16,7 @@
   catálogo de piezas «de caster». Alcanza con **uno a tres efectos pensados para casters por slot** (cabeza, manos, piernas, pies, armaduras,
   accesorios…), repartidos entre slots y no amontonados en uno, y en total **más o menos la parte que le toca a una clase** (≈ 1/7 hoy, 1/9 si se
   suman clases) de los ítems de cada tier.
+- **El Alcance y el Rango son del arma** (2026-10-05): una característica intrínseca del arma, nunca un bono que dé una pieza defensiva.
 - **Ve lo oculto no va en el equipo** (2026-10-05): ver lo oculto de forma permanente arruina el Sigilo y las trampas (mecánicas de personajes
   enteros). Solo de forma **excepcional** (Legendario) o temporal (consumibles, un efecto de un turno); lo más que da el equipo es **Percepción
   aumentada** (una tirada, no un ver automático).

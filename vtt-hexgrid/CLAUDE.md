@@ -1408,3 +1408,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   y les valen las chances (`chanceDe`), Recuperarse rápido y Pisada atenta (también a los creeps). **Reflejos de mangosta = dodge roll**: fase
   `reflejos-dodge` de js/19 (`trampaPasoDodge`: elegir casilla a 1–2, pagar el movimiento; afuera de la trampa la esquiva; «✋ No me tiro»).
 
+- **Menú del token en dos niveles** (2026-10-06, dueño): el **clic izquierdo** en un token muestra solo lo del combate (vida, SP, No2, ◎
+  estados, ⚡ Botonera/Acciones y **⋯**); el **clic derecho** sobre un token, el resto (🪪 tarjeta, 📜 ficha, ⚙ ajustes, 🦶 mover libre,
+  👁 ocultar, 🛡 equipo y **↩**). Otro clic derecho sobre el mismo vuelve; ⋯ / ↩ pasan de uno al otro. `hudNivel` / `hudPonerNivel` (js/10;
+  va en la firma del HUD), el clic derecho en js/06 (después de todo lo que el clic derecho cancela; afuera de un token, el ping de siempre).
+  Seleccionar otro token (por cualquier camino) vuelve a lo del combate.

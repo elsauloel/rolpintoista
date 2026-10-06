@@ -49,7 +49,7 @@ Junto en un lugar lo que se dejó para cuando terminen los tiers del catálogo (
 - **Regenerar el equipo de los creeps base** (`EQUIPO_CREEP`, `herramientas/generar_equipo_creeps.py`) con el catálogo defensivo nuevo — `rework-defensa.md`.
 - **Hoja de ruta del GM: cuánto oro dar** por combate o por nivel (el Botín estimado ya existe) — `rework-defensa.md`, Fase 3.
 - **Manual de diseño del catálogo** para los colegas: el criterio de los ítems con su porqué.
-- **Menú del token en dos niveles** (clic izquierdo lo vital, derecho el resto) — `pendientes.md`.
+- ✅ **Menú del token en dos niveles** (clic izquierdo lo vital, derecho el resto; hecho 2026-10-06) — `pendientes.md`.
 - **La ampliación del catálogo** — fase 8 y la lista de abajo.
 
 ## Para la ampliación del catálogo (se retoma cuando el dueño lo pida)

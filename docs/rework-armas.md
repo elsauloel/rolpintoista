@@ -1657,5 +1657,7 @@ Posible ayuda (a decidir): un control en el editor del catálogo que avise si un
 | Percepción | ✅ Ya existe en cascos (Monóculo del tasador, Capucha de vigía, Pasamontañas). |
 | Detectar trampas con una tirada | ✅ Va, **unificado**: es «Pisada atenta» (`pisadaatenta`, la misma regla que la Percepción aumentada, solo trampas), que ya tienen dos Pies Comunes. |
 
-No mencionadas (¿descartadas?): No2 solo para varitas, Res.Esp +2, gorro de papel de aluminio, varitas sin salir del Sigilo, sombrero espejado, Ve
-lo oculto, lector de auras, aprendiz distraído.
+| +1 No2 que solo sirve para varitas y armas especiales | ✅ Va. **Pesa 0,75 de lo que pesa un No2** (dueño, 2026-10-05). |
+| Usar varitas sin salir del Sigilo | ✅ Va, pero **tiene que costar: es para tiers altos**. |
+
+Descartadas (no mencionadas): Res.Esp +2, gorro de papel de aluminio, sombrero espejado, Ve lo oculto, lector de auras, aprendiz distraído.

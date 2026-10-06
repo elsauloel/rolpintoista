@@ -758,3 +758,13 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   **No aplica al ataque de oportunidad ni al contraataque** (dueño, 2026-10-06): son ataques, siguen sin bajar de 0 (sin No2 avisan y gastan lo
   que haya, con la línea roja, como siempre).
   Subida a 🛠 Herramientas de diseño → Preguntas (2026-10-06) como decisión ya establecida, **sujeta a la aprobación del grupo**.
+- **P164. Reflejos de mangosta: ¿tirada contra la trampa?** (2026-10-06, idea del dueño revisando los pies). Hoy: al pisar una trampa, con la
+  chance de Reflejos (las Sandalias de mangosta, siempre) se ofrece un dodge roll (salir a 1–2 casilleros pagando el movimiento). El dueño
+  propone que active un anuncio/duelo: la dificultad de la trampa contra tu Evasión (o el dodge). **Propuesta**: con Reflejos, el Anuncio
+  pide «Tirar Evasión contra N» (N = la dificultad de evitarla de la trampa si tiene; si no, su dificultad de detección, 8 la común);
+  si llega, el dodge roll de siempre (elegís la casilla, pagás el movimiento); si no, la trampa se dispara. Falta decidir: ¿qué número
+  es N?, ¿la tirada reemplaza a la chance o se suma (primero la chance, después la tirada)?
+- **P165. Titilando: ¿hasta cuándo?** (2026-10-06, hecho a pedido del dueño). Quien vuelve de estar caído titila y es invulnerable hasta
+  que **empieza** su próximo turno. Dos casos a confirmar en mesa: (1) si lo reviven **en su propio turno** (un Ankh que salta por el
+  veneno al empezar), se le va al terminar ese mismo turno (el contador baja al terminar el turno, P162); (2) sin orden de turnos, dura
+  hasta el próximo ⟳ Mantenimiento. Cualquier estado invulnerable (Invulnerable, Titilando) hace titilar el token.

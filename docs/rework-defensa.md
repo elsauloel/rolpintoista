@@ -1132,3 +1132,41 @@ casilleros que te movés en cada turno no tocan el piso: no te frena el terreno 
 incendiado; **al terminar el turno tocás el piso** (si quedaste parado sobre una trampa, se dispara). Las zonas sí te alcanzan (una nube tóxica no se
 esquiva levitando: falta distinguir zonas del piso y en el aire, `pendientes.md` §6). Barato: 0,25 por casillero. Zapatillas de levitación (Buena)
 Levitar 3 → 80; **Zapatillas de pluma** (Común, nueva) Levitar 1 · Defensa +1 → 40. El dueño va a revisar la lista de pies a fondo y pedir ajustes.
+
+## Piernas, Buena calidad — propuesta v1 (2026-10-06, ⬜ a revisar por el dueño)
+Lo que hay: 12 piernas de Buena calidad viejas, casi todas resistencias a crítico que valen 4–12 puntos (el doble de la bolsa de 3), una con
+Movimiento −1 y otra con «Daño mágico +3». Se reemplazan. Identidad (2026-10-04): **potencia y moverse rápido**. Bolsa 3 (hasta 3,3); cada punto
+de peso devuelve 0,5. **Tope de Defensa propuesto: 2** (como cabeza, manos y pies). Un bono grande o pocos medianos; sin Retirada limpia «siempre»
+(es de Raro). ⚙ = ya existe · 🔧 = mecánica nueva · 🧙 = caster.
+
+| Pierna · pesa · precio | Qué hace |
+|---|---|
+| Perneras de malla · 2 · 85 | Defensa +2 · Tipo 6 +1 |
+| Perneras de escamas · 2 · 85 | Defensa +1 · Tipo 4 +1 · Tipo 6 +1 |
+| Grebas de acero templado · 2 · 85 | Defensa +1 · Tipo 8 +1 |
+| Grebas de bandas articuladas · 3 · 85 | Defensa +2 · Tipo 4 +1 · Tipo 6 +1 · Sigilo −1 (ruidosas) |
+| Polainas tachonadas de taller · 1 · 85 | Defensa +2 · Tipo 4 +1 · Res. fuego +1 |
+| **Bono grande:** Pantalón de corredor · 0 · 85 | **Pasos gratis +1** (el primer casillero de cada turno no cuesta No2) |
+| Calzas de chasqui · 1 · 85 | Pasos gratis +1 · Res. hielo +1 |
+| Pantalón del desertor · 1 · 85 | Retirada limpia 50 % · Evasión contra oportunidad +1 · Sigilo +1 |
+| **Bono grande:** Calzas de contorsionista · 0 · 85 | **Evasión contra oportunidad +3** |
+| Calzas de cuero de ciervo · 0 · 85 | Evasión +1 · Sigilo +1 |
+| Rodilleras de luchador · 0 · 85 | Evasión contra contraataque +3 · Res.CC +1 |
+| **Bono grande:** Bombacha de cuadrero · 0 · 85 | **Iniciativa +2** |
+| **Bono grande:** Calzas de sombra · 0 · 85 | **Sigilo +3** |
+| Bombachas del forcejeo · 1 · 85 | Soltarse +6 (la tirada para zafar de lo que atrapa) · Defensa +1 · Res.CC +1 |
+| **Bono grande:** Pantalón de estibador · 0 · 85 | **Carga +4** · Res.CC +1 (ver «La Carga» abajo) |
+| Calzas de piel de carpincho · 1 · 85 | Vida +10 · Res. hielo +2 · Res. ácido +1 |
+| 🧙 Calzas de bordado rúnico · 0 · 85 | Res.Esp +2 · Res.Mt +2 |
+| 🔧 Grebas del carnero · 1 · 85 | **Embestida +2**: si te moviste 2 casilleros o más en línea recta hasta el rival, tu primer ataque del turno suma PdG +2 · Defensa +1 · Res.CC +1 |
+| 🔧 Calzas del silencioso · 0 · 85 | **Pasos en silencio**: una vez por turno, cruzar el cono de un rival no te saca el Sigilo · Sigilo +1 |
+
+Costos nuevos propuestos: Embestida 1 por PdG (la mitad del PdG: pide moverse antes) · Pasos en silencio 2 · **Carga 0,5 por punto** (hoy 0,25).
+
+**La Carga (idea del dueño, 2026-10-06: «una pierna que pese 0 y dé más carga»).** La Carga máxima es la Fuerza; cada punto de peso equipado
+por encima es sobrepeso (la Evasión pasa a costar No2). La calculadora la cobra 0,25 por punto, pero eso la deja muy barata: **un punto de
+peso en una armadura devuelve 0,5** (es su contra), y un punto de Carga anula justo esa contra — te deja llevar una pieza más pesada (con más
+bonos) sin pagarlo. Propuesta: **Carga = 0,5 por punto**. Con eso, en Buena calidad entra Carga +6 sola, o +4 con algo más. Tiene sentido como
+pieza de los que no tienen Fuerza y quieren armadura pesada (y de los tanques, para cargar escudo y torso rígido a la vez). Ojo: los Anillos de
+Alforja sin Fondo (Común +1, Raro +2, Legendario +3) quedarían baratísimos con 0,5 — revisarlos cuando lleguemos a los anillos. Escalera
+sugerida para las piernas: Común nada (dueño: «solo tiene sentido en piezas de peso 0», y eso es de calidad), Buena +4, Rara +6.

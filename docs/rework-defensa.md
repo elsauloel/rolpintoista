@@ -1386,3 +1386,5 @@ frecuente +1 en el primer ataque del combate), Vigilia (Iniciativa +2); más arr
 Mecánicas nuevas (iguales para personajes y creeps): `cascara`, `primerasangre`, `calma`, `foco`, `pulso`, `pasofantasma`, `cambiante`,
 `absorbearmadura`, `impulsofue/des/esp/con` — el duelo (js/13 `quietoDe`/`primeraSangreDe`, `comun/duelo.js`), el motor (`evaExtraDuelo`,
 `finTurno`, el escudo `sinRecarga`) y el vigía del combate del mapa (`vtt-hexgrid/js/25-anillos.js`).
+
+**Anillos al triple** (dueño, 2026-10-06: «me siguen pareciendo muy baratos… por el mismo efecto en otro equipo, que el anillo cueste el triple»): `PRECIO_ANILLO_MULT = 3`. Comunes: 105 los de un punto, 90 los de 0,75, 75 el Boticario, 60 los de 0,5.

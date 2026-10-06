@@ -174,9 +174,10 @@ def bolsa(it):
 
 def precio_sugerido(pts):
     return max(15, int(round((PRECIO_BASE + PRECIO_PUNTO * max(0, pts)) / 5.0)) * 5)
-# Los anillos cuestan el doble en oro por su efecto (dueño, 2026-10-06: «de forma completamente arbitraria»; los efectos y su peso por calidad se
+# Los anillos cuestan el triple en oro por su efecto (dueño, 2026-10-06: primero el doble, «de forma completamente arbitraria»; después «me siguen
+# pareciendo muy baratos»: el triple). Los efectos y su peso por calidad se
 # reimaginan después). Los de rango (Rango, Rango de casteo) quedan afuera hasta resolver los rangos.
-PRECIO_ANILLO_MULT = 2
+PRECIO_ANILLO_MULT = 3
 def precio_item(it, pts):
     return precio_sugerido(pts) * (PRECIO_ANILLO_MULT if it.get('tipoItem') == 'anillos' else 1)
 

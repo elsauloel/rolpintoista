@@ -507,6 +507,14 @@ const CreepCalculo = (() => {
     bonos:'Bonos', rangocasteo:'Rango Cast.', accionesmax:'Acciones máx.', nitros:'No2',
     resm:'Res.Mt', resmg:'Res.Esp', rescc:'Res.CC',
     con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp',
+    // Los que dan las piezas defensivas (2026-10-06: en GM Tools se veían con su nombre interno, «oporahorro +1»).
+    dmg:'Dmg', bloqueo:'Bloqueo', pdgopor:'PdG en oportunidad', pdgcontra:'PdG en contraataque', pdgmg:'PdG.Esp', dmgesp:'Ef.Esp',
+    percepcion:'Percepción', vision:'Visión', luz:'Luz', sigilo:'Sigilo', spregen:'SP Regen', boticario:'Mano de boticario',
+    resfuego:'Res. fuego', reshielo:'Res. hielo', resrayo:'Res. rayo', restoxico:'Res. tóxico', resacido:'Res. ácido', armadmg:'Armadura mágica',
+    pisadaatenta:'Pisada atenta', recuperarse:'Recuperarse rápido (%)', capcinturon:'Ranuras de cinturón',
+    pdgt4:'PdG con punzantes', pdgt6:'PdG con cortantes', pdgt8:'PdG con hachas', pdgt10:'PdG con contundentes', pdgdist:'PdG a distancia',
+    oporahorro:'Oportunidad: No2 de menos', contraahorro:'Contraataque: No2 de menos', soltarse:'Soltarse', trampaoculta:'Trampas mejor escondidas',
+    ahorroespsp:'Primer conjuro: SP de menos', venenista:'Envenenador: stacks de más',
   };
   // Un ítem del catálogo en la forma del equipo de un creep (antes itemParaCreep de GM Tools, js/01): sin id, la Defensa separada de los
   // otros bonos (`def`), sin los campos que un creep no usa. Es la forma de CATALOGO_EQUIPO (GM Tools) y del catálogo del fin del combate.

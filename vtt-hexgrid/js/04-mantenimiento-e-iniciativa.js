@@ -455,7 +455,7 @@ async function invocacionAlOrden(tokenId){
       const pre = estadosPresetFicha().find(p => p.nombre === 'Mareo de invocación');
       if(!pre) return false;
       inv.estados = inv.estados || [];
-      Combatiente.agregarEstado(inv.estados, SelectorEstados.estadoInvocacion(pre, idEstadoNuevo()));
+      Combatiente.agregarEstado(inv.estados, {id: idEstadoNuevo(), activo: true, ...structuredClone(pre)});   // (el selector de estados se carga recién al usarlo)
       return true;
     });
   }catch(err){ console.error('No se pudo marear a la invocación nueva:', err); }

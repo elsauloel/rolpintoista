@@ -677,15 +677,22 @@ Evasión: se cobra todos los turnos, es el más peligroso al acumularse — por 
 | Vincha del corredor · 100 | Defensa +1 · Iniciativa +1 · Res.CC +1. Pesa 0. |
 | Capucha de la hermandad · 100 | Defensa +1 · Sigilo +2 · Percepción +1. Pesa 0. |
 | Gorro de piel de zorro · 100 | Defensa +1 · Res.Mt +3 · Percepción +2. Pesa 0. |
-| Monóculo del cartógrafo · 100 | Visión +2 · Percepción +3 · Ve lo oculto +1. Pesa 0. |
+| Monóculo del cartógrafo · 100 | Visión +2 · Percepción +3 · Res.Mt +2. Pesa 0. |
 | 🧙 Sombrero humectante bordado · 100 | SP Regen +1 · Res.Mt +2 · Percepción +1. Pesa 0. |
-| 🧙 Antiparras del buscador · 100 | Pisada atenta · Ve lo oculto +1 · Percepción +2 · Visión +1. Pesa 0. |
+| 🧙 Antiparras del buscador · 100 | Pisada atenta · Percepción +2 · Visión +2 · Res. ácido +1. Pesa 0. |
 | 🧙 Corona de laureles dorada · 100 | Res.Mt +4 · Res.Esp +1 · Percepción +1. Pesa 0. |
 
 **Luz portada = 0,25 por punto (dueño, 2026-10-05):** «está bien que exista, pero debe pesar poco porque es muy circunstancial» (solo importa en
 lo oscuro; de día la Visión ya llega más lejos). En la v1: el Casco de minero reforzado pasa a Luz +4 · Percepción +1 y el Morrión a Luz +2 (mismo
 precio). En lo Común ya cargado, dos cascos quedan caros para lo que dan: Casco de minero (Defensa +1 · Luz +3) 60 → 40 y Casco de obra abollado
 (Defensa +1 · Res.CC +1 · Luz +1) 60 → 55.
+**Ve lo oculto: no en el equipo (dueño, 2026-10-05).** «Como estado permanente no lo habilitaría: arruina mecánicas de personajes enteros,
+arruina las trampas.» Puede existir de forma **excepcional** (hoy: el Yelmo del Ojo Que Todo Lo Ve, Legendario) y en lo temporal (consumibles, la
+Varita de la luz por un turno). Lo más que da el equipo es **Percepción aumentada** (una tirada, no un ver automático): hoy la da el Anillo de
+percepción aumentada (Raro). Se sacó de la v1 (Monóculo del cartógrafo y Antiparras del buscador). **Costo propuesto: Percepción aumentada = 2**
+(Pisada atenta, que es solo trampas y con el dado normal, cuesta 1).
+**Recuperarse rápido ✅ (dueño, 2026-10-05):** los estados que traban el movimiento (Inmovilizado, Rengo, Sentado, Lento) duran 1 turno menos, con
+su chance (50 % = 4–6 en d6, 100 % = siempre).
 Notas: el Tipo 10 (solo cascos y escudos) entra en Buena por los yelmos pesados (pesa 4 puntos; el peso y la desventaja lo pagan). Se van de lo
 viejo: Defensa +3 a +6 (pasan el tope de 2), Tipo 6 en la cabeza, PdG en un casco (el PdG es de los guantes) y Especial +1 (un atributo entero).
 🧙 = pensado para casters (3 de 19, la parte de una clase). Lo de caster que no entra acá: sigilo con armas especiales (Cabeza, Raro).

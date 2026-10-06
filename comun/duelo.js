@@ -2003,7 +2003,8 @@ const Duelo = (() => {
     const r = f && typeof tirarDados === 'function' ? tirarDados(f) : null;
     if(!r){ esperaTiro = null; retener(false); _toast('La fórmula de daño de la habilidad no es válida: ' + f); return; }
     const reg = (h && h.registrarTirada) || (typeof registrarTirada === 'function' ? registrarTirada : null);
-    if(reg) reg(`Daño · ${d.hab.nombre}`, r);
+    if(reg) reg(`Daño · ${d.hab.nombre}`, r, d);
+    else{ esperaTiro = null; retener(false); _toast('Esta pantalla no sabe publicar el daño de la habilidad: tiralo a mano'); }   // nunca callado
   }
 
   /* ---------- lo que se ve de un duelo que esta pantalla no tiene abierto (P151, dueño 2026-10-03: «las dos») ----------

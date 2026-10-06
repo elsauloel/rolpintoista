@@ -72,6 +72,7 @@ const InvDuelo = (() => {
     const ladoDe = (d, campo) => (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
     return {
       soy: lado => ui.soy(lado),
+      registrarTirada: (origen, r) => ui.registrar(origen, r),   // el daño de una habilidad dirigida (duelo.js, tirarDanoHab)
       controlDe: lado => ui.controlDe ? ui.controlDe(lado) : '',
       // El ataque de siempre (paga los No2 y tira el PdG); con arreglos, los No2 ya los cobró la habilidad.
       atacar: d => {

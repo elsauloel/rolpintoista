@@ -68,6 +68,8 @@ const CreepDuelo = (() => {
     const evaEsp = (sc, d) => sc ? Combatiente.evaExtraDuelo(d, st => num(C().modTotal(sc, st))) : {val: 0, txt: ''};
     return {
       soy: lado => ui.soy(lado),
+      // El daño de una habilidad dirigida (duelo.js, tirarDanoHab) se publica a nombre del creep (2026-10-05: en el mapa no había cómo y se quedaba callado).
+      registrarTirada: (origen, r, d) => { const sc = d ? deLado(d.atacante) : null; if(sc) ui.publicar(sc, {origen, r}); else ui.toast('No se encontró el creep para tirar el daño'); },
       atacar: d => {
         const sc = deLado(d.atacante);
         if(!sc) return;

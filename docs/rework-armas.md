@@ -1661,3 +1661,6 @@ Posible ayuda (a decidir): un control en el editor del catálogo que avise si un
 | Usar varitas sin salir del Sigilo | ✅ Va, pero **tiene que costar: es para tiers altos**. |
 
 Descartadas (no mencionadas): Res.Esp +2, gorro de papel de aluminio, sombrero espejado, Ve lo oculto, lector de auras, aprendiz distraído.
+
+**Alcance del rework de defensivos (dueño, 2026-10-05):** lo **Común se conserva** (como la Corona de laureles, Res.Mt +4) y se le suman las piezas
+de caster que falten; **Buena calidad, Raro y para arriba se reemplazan enteros** por listas nuevas, como se hizo con las armas.

@@ -160,6 +160,7 @@ const CreepBotonera = (() => {
               </div>`).join('')}
             </div>
           </div>
+          ${Combatiente.resElementalesHtml(el => CreepCalculo.resElemental(sc, el))}
         </div>
       </div>
       <div class="botonera-caja">

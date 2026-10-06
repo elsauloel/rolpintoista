@@ -374,6 +374,7 @@ const FichaBotonera = (() => {
               </div>`).join('')}
             </div>
           </div>
+          ${Combatiente.resElementalesHtml(el => c.final['res' + el], el => lupaBotonHtml(`defensa:res${el}`))}
         </div>
       </div>
     </div>

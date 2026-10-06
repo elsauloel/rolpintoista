@@ -106,6 +106,7 @@ const InvBotonera = (() => {
                 </div>`).join('')}
               </div>
             </div>
+            ${Combatiente.resElementalesHtml(el => I.statValor(inv, 'res' + el))}
           </div>
         </div>
         <div class="botonera-caja">

@@ -1299,3 +1299,10 @@ versión parecida en más de una, es candidato a juntar.
   js/13 `dueloZonaQueda`), `menosDistancia` (−1 por casillero, `dueloAplicarDano`), `atrae` (el gancho, js/13 `dueloAtraer`), `reparte` (dos misiles,
   js/13 `dueloSegundoMisil`, cascada sin dodge) y `critTipo` (una habilidad física critica como un arma de ese Tipo: `cerrarPar` → `entrarCritico`).
   Orbes: `orbeResguardo` (Escudo especial N, una vez por turno) y `orbeSalvaje` (1d6) en `FichaAcciones.orbesAlUsar`.
+- **Torso rígido de Buena calidad: mecánicas nuevas** (2026-10-06): **vulnerable** — una resistencia elemental negativa suma daño de ese elemento
+  (ya no se corta en 0: `CreepCalculo.resElemental`, `resistenciasDe` del mapa; el texto, `Combatiente.resElementalTxt(el, res)` → «Res. rayo −2
+  (vulnerable)»). **Guardián** (`guardian`, en el resumen público del personaje y de sus invocaciones): el mapa (`guardianDe`, js/10) le suma esa
+  Defensa a quien recibe el golpe si hay un aliado de su bando a 1 casillero con guardián (vale el mayor; solo si la Defensa cuenta) y abre un
+  momento (`tipo: 'guardian'`, `datos.chico`): la Crónica para todos y un toast para quien maneja al protegido (`momentoRecibido`, js/16).
+  **Inamovible** es un preset (buff, `inamovible 100`); la Armadura del inamovible lo pone al equiparla y trae el mismo bono. `escolta`: solo un
+  recordatorio (✋ a mano).

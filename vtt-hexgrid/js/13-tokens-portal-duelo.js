@@ -922,7 +922,7 @@ async function dueloAplicarDano(d){
   const frenaAm = magico && Combatiente.frenaArmaduraMagica(elDano);   // lo tóxico no lo frena la Armadura mágica (2026-10-05)
   const restaIgnorando = frenaAm ? armadmg : 0;
   const resEl = elDano ? (await resistenciasDe(t, elDano, invLeida)).res : 0;
-  const freno = [...(menosDist ? [`la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Armadura mágica ${armadmg}`] : []), ...(resEl ? [`${Combatiente.ELEMENTOS[elDano].etq} ${resEl}`] : [])].join(' − ');
+  const freno = [...(menosDist ? [`la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Armadura mágica ${armadmg}`] : []), ...(resEl ? [Combatiente.resElementalTxt(elDano, resEl)] : [])].join(' − ');
   let aplicar = golpe, ignoraDef = crit;
   if(base.mitad){ aplicar = Math.ceil(Math.max(0, golpe - def) / 2); ignoraDef = true; }
   // Bloqueo perdido (mitad del daño): el arma o escudo con el que bloqueó pierde 1 punto de durabilidad (solo personajes: los creeps y las invocaciones no llevan).

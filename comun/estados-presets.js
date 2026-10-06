@@ -96,6 +96,9 @@ const ESTADOS_PRESET = [
   {nombre:'Sigilo', polaridad:'buff', turnos:0, permanente:true,
     detalle:'Oculto: sus rivales no lo ven en el mapa. Se rompe si entra en el cono de detección de un rival o si hace una acción hostil (un ataque o una skill individual sobre un rival). Cada paso dentro de la zona de alerta de un rival pide una tirada de detección (en principio su Destreza contra el Especial del que vigila).'},
   // Marcado (2026-10-05, Varita del rastreador y Varita de la luz): se resiste con Res.Esp (lo tira quien la usa: PdG.Esp contra Res.Esp).
+  // Inamovible (2026-10-06, dueño: «el buff tiene que existir; la armadura simplemente te lo aplica»): la chance de no moverse, en 100 %.
+  {nombre:'Inamovible', polaridad:'buff', turnos:2, mods:[{stat:'inamovible', val:100}],
+    detalle:'No lo pueden empujar ni atraer (ganchos, muros que empujan, portales). ⚙ Automatizado: el mapa no lo mueve.'},
   {nombre:'Marcado', polaridad:'debuff', turnos:3, marcado:true,
     detalle:'⚙ Automatizado: no puede entrar en sigilo (si estaba, sale) y se lo sigue viendo con un brillo, aunque vuelva la niebla de guerra o esté en una nube de niebla. Se resiste con Res.Esp.'},
 ];

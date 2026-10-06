@@ -64,12 +64,19 @@ COSTO = {
     'sp': 0.75, 'defprimer': 0.75, 'defdist': 0.5, 'pagarhp': 2,
     'spregen': 2,   # SP Regen +1 (dueño, 2026-10-05): como la Evasión — rinde todos los turnos; vive solo en la cabeza (escasez controlada)
     'inamovible': 0, 'recuperarse': 0, 'reflejos': 0,
+    # Torso rígido de Buena calidad (dueño, 2026-10-06): los aliados al lado tuyo con +N Defensa (Coraza del guardián) 2 por punto; recibir el golpe
+    # de un aliado al lado (Armadura del escolta, a mano) 1,5.
+    'guardian': 2, 'escolta': 1.5,
 }
 def costo_retirada(pct):
     return 4 if pct >= 100 else pct * 0.03
 # Las de chance (en %): (33 %, 50 %, siempre). Retirada limpia va aparte (por punto).
 COSTO_CHANCE = {'inamovible': (0.5, 0.75, 1.5), 'recuperarse': (0.5, 1, 2), 'reflejos': (1, 1.5, 2.5), 'saquerapido': (0.75, 1, 2)}
+# Contrapesos baratos (dueño, 2026-10-06): «ruidosa» (Sigilo negativo) devuelve 0,5 por punto — al que lleva placas casi no le importa el sigilo — y
+# una resistencia elemental negativa («conductora»: recibe más daño de ese elemento) devuelve 0,25 por punto: tiene poco valor.
+NEGATIVO_BARATO = {'sigilo': 0.5, 'resfuego': 0.25, 'reshielo': 0.25, 'resrayo': 0.25, 'restoxico': 0.25, 'resacido': 0.25}
 def costo_especial(stat, v):
+    if v < 0 and stat in NEGATIVO_BARATO: return v * NEGATIVO_BARATO[stat]
     return None
 def costo_chance(stat, pct):
     a, b, c = COSTO_CHANCE[stat]
@@ -77,6 +84,8 @@ def costo_chance(stat, pct):
 COSTO_DEFECTO = 1
 OFENSIVOS = {'pdg', 'dmg', 'crit', 'critpot', 'rng', 'pdgmg', 'dmgesp', 'rangocasteo', 'accionesmax'}
 COSTO_ESTADO_EQUIPO = 2          # un estado que se pone al equipar (Espinas, Regeneración…): a revisar caso por caso
+# Estados al equipar cuyo efecto ya se cobra en un bono de la pieza (2026-10-06): Inamovible va con «inamovible 100» (la chance, siempre).
+COSTO_ESTADO_EQUIPO_NOMBRE = {'Inamovible': 0}
 # Durabilidad (dueño, 2026-10-04): Resistente ×N suma N a la durabilidad TOTAL y Frágil ×N la resta (no por Peso); 0,25 por punto, como la
 # calculadora de armas. Una pieza vieja con durPorPeso se cuenta por la diferencia con lo normal (3 por punto de Peso, mínimo 3).
 COSTO_DUR = 0.25
@@ -132,7 +141,7 @@ def puntos(it):
         if m['stat'] in OFENSIVOS and v > 0: avisos.append(f"bono ofensivo ({NOMBRE.get(m['stat'], m['stat'])})")
         if m['stat'] not in COSTO: avisos.append(f"sin costo definido: {m['stat']}")
     if it.get('equipoEstadoNombre'):
-        det.append((f"estado al equipar: {it['equipoEstadoNombre']}", COSTO_ESTADO_EQUIPO))
+        det.append((f"estado al equipar: {it['equipoEstadoNombre']}", COSTO_ESTADO_EQUIPO_NOMBRE.get(it['equipoEstadoNombre'], COSTO_ESTADO_EQUIPO)))
         avisos.append('estado al equipar: revisar a mano')
     dx = durabilidad_extra(it)
     if dx: det.append((f"{'Resistente' if dx > 0 else 'Frágil'} ×{abs(dx)}", dx * COSTO_DUR))

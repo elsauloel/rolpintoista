@@ -505,7 +505,7 @@ async function zonaResolverBanner(){
         let res = null;
         if(t.tipo === 'creep') res = await danioCreep(t, String(monto), !!el.zonaIgnoraDef, armadmg, resEl);
         else if(puedoMover(t)) res = await (String(t.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(t, String(monto), !!el.zonaIgnoraDef, armadmg, resEl);
-        const freno = [...(armadmg > 0 ? [`${armadmg} de Armadura mágica`] : []), ...(resEl > 0 ? [`${resEl} de ${Combatiente.ELEMENTOS[elZ].etq}`] : [])];
+        const freno = [...(armadmg > 0 ? [`${armadmg} de Armadura mágica`] : []), ...(resEl ? [Combatiente.resElementalTxt(elZ, resEl)] : [])];
         partes.push(`${monto} de daño${tipoTxt}${freno.length ? ` (− ${freno.join(' − ')})` : ''}`);
         danoHecho = res && res.r ? num(res.r.recibido) : monto;   // lo que llegó a la vida (escudos y Armadura mágica ya restados)
       }catch(err){ console.error('No se pudo aplicar el daño de la zona:', err); partes.push(`${monto} de daño${tipoTxt} (aplicalo a mano)`); danoHecho = monto; }

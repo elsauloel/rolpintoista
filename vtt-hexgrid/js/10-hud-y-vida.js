@@ -145,26 +145,58 @@ function golpeTexto(nombre, golpe, r, previo, nuevo){
 // restaExtra (2026-10-04): lo que se resta además (la resistencia al elemento del daño), con o sin Defensa.
 /* La Defensa extra de una pieza (torso blando, 2026-10-06): contra el primer golpe que recibe en el turno (`defprimer`; la marca vive en lo que vacía
    el Mantenimiento) y contra armas a distancia (`defdist`, con `o.distancia`). Solo cuando la Defensa cuenta (no en un crítico ni en lo que la ignora). */
+/* La Coraza del guardián (2026-10-06, dueño: automática): un aliado AL LADO (a 1 casillero, del mismo bando: creeps con creeps; personajes e
+   invocaciones entre sí) con `guardian` le suma esa Defensa a quien recibe el golpe, solo cuando la Defensa cuenta. No se acumulan: vale el mayor.
+   Cada vez que entra, la Crónica lo cuenta a todos y a quien maneja al protegido le aparece un aviso chico (momento con `datos.chico`). */
+function guardianValor(x){
+  if(!x || !x.fichaId) return 0;
+  if(x.tipo === 'creep'){ const sc = creepPrivadoDe(x.fichaId); return sc ? Math.max(0, num(CreepCalculo.modTotal(sc, 'guardian'))) : 0; }
+  const ri = resumenDeInv(x);
+  if(ri) return Math.max(0, num(ri.guardian));
+  const f = fichasPub.get(x.fichaId);
+  return Math.max(0, num(f && f.resumen && f.resumen.guardian));
+}
+function guardianDe(t){
+  if(!t || t.col === undefined || t.fila === undefined) return null;
+  const bando = x => x.tipo === 'creep' ? 'creep' : 'pj';
+  let mejor = null;
+  tokens.forEach(x => {
+    if(!x || x === t || !x.fichaId || x.fichaId === t.fichaId || bando(x) !== bando(t) || x.col === undefined) return;
+    if(distanciaHex({col: t.col, fila: t.fila}, {col: x.col, fila: x.fila}) > 1) return;
+    const val = guardianValor(x);
+    if(val > 0 && (!mejor || val > mejor.val)) mejor = {val, nombre: nombreDe(x)};
+  });
+  return mejor;
+}
+function guardianAviso(t, g){
+  if(!g || typeof momentoAbrir !== 'function') return;
+  const nom = nombreDe(t);
+  momentoAbrir({tipo: 'guardian', icono: '🛡', titulo: `${g.nombre} protege a ${nom}`, resultado: `+${g.val} Defensa contra el golpe, por estar al lado de su guardián.`,
+    estado: 'listo', datos: {...(t.tipo !== 'creep' && t.duenoUid ? {paraUid: t.duenoUid} : {}), chico: true, aviso: true}});
+}
 const defExtra = (ignoraDef, primero, valor, o) => ignoraDef ? 0 : (primero ? Math.max(0, num(valor('defprimer'))) : 0) + (o && o.distancia ? Math.max(0, num(valor('defdist'))) : 0);
 async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const golpe = leerGolpe(texto);
   if(golpe === null) throw new Error(ERROR_TIPEO);
+  const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
   const res = await modificarCreep(t.fichaId, sc => {
     const primero = !num((sc.usosEspecial || {})._golpe);
     sc.usosEspecial = {...(sc.usosEspecial || {}), _golpe: 1};   // (se vacía en su Mantenimiento)
-    const extra = defExtra(ignoraDef, primero, st => CreepCalculo.modTotal(sc, st), o);
+    const extra = defExtra(ignoraDef, primero, st => CreepCalculo.modTotal(sc, st), o) + (guarda ? guarda.val : 0);
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : creepDefensaMapa(sc) + extra) + num(restaExtra || 0), sc.estados);
     const previo = num(sc.hp);
     sc.hp = Math.max(0, previo - r.recibido);
     return {r, previo, nuevo: sc.hp};
   });
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
+  if(guarda && golpe > 0) guardianAviso(t, guarda);
   return res;
 }
 
 async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const golpe = leerGolpe(texto);
   if(golpe === null) throw new Error(ERROR_TIPEO);
+  const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
   const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}`));
   const parteRef = base.collection('partes').doc('general');
   const ts = firebase.firestore.FieldValue.serverTimestamp();
@@ -176,7 +208,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     if(rs.def === undefined) throw new Error('SIN_DEF');
     const primero = !num((datos.ataquesArma || {})._golpe);
     datos.ataquesArma = {...(datos.ataquesArma || {}), _golpe: 1};   // (el Mantenimiento la vacía)
-    const extra = defExtra(ignoraDef, primero, st => rs[st], o);
+    const extra = defExtra(ignoraDef, primero, st => rs[st], o) + (guarda ? guarda.val : 0);
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : num(rs.def) + extra) + num(restaExtra || 0), datos.efectos);
     const previo = num(datos.hp);
     datos.hp = Math.max(0, previo - r.recibido);
@@ -185,6 +217,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     return {r, previo, nuevo: datos.hp};
   });
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
+  if(guarda && golpe > 0) guardianAviso(t, guarda);
   return res;
 }
 
@@ -201,6 +234,7 @@ const defensasDeInv = inv => { const x = InvCalculo.migrar(structuredClone(inv))
 async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const golpe = leerGolpe(texto);
   if(golpe === null) throw new Error(ERROR_TIPEO);
+  const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
   const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
   const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
   const parteRef = base.collection('partes').doc('invocaciones');
@@ -214,7 +248,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     if(!Array.isArray(inv.estados)) inv.estados = [];
     const primero = !num(inv.golpeTurno);
     inv.golpeTurno = 1;   // (el Mantenimiento la vacía)
-    const extra = defExtra(ignoraDef, primero, st => FichaResumen.invModTotal(inv, st), o);
+    const extra = defExtra(ignoraDef, primero, st => FichaResumen.invModTotal(inv, st), o) + (guarda ? guarda.val : 0);
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : defensasDeInv(inv).def + extra) + num(restaExtra || 0), inv.estados);
     const previo = num(inv.hp);
     inv.hp = Math.max(0, previo - r.recibido);
@@ -224,6 +258,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     return {r, previo, nuevo: inv.hp};
   });
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
+  if(guarda && golpe > 0) guardianAviso(t, guarda);
   return res;
 }
 
@@ -238,11 +273,11 @@ async function resistenciasDe(t, el, inv){
       const i = inv || await invDeToken(t);
       if(!i) return {res: 0, armadmg: 0};
       const x = InvCalculo.migrar(structuredClone(i));
-      return {res: el ? Math.max(0, num(InvCalculo.statValor(x, 'res' + el))) : 0, armadmg: Math.max(0, num(InvCalculo.statValor(x, 'armadmg')))};
+      return {res: el ? num(InvCalculo.statValor(x, 'res' + el)) : 0, armadmg: Math.max(0, num(InvCalculo.statValor(x, 'armadmg')))};
     }catch(err){ return {res: 0, armadmg: 0}; }
   }
   const f = fichasPub.get(t.fichaId), r = (f && f.resumen) || {};
-  return {res: el ? Math.max(0, num(r['res' + el])) : 0, armadmg: Math.max(0, num(r.armadmg))};
+  return {res: el ? num(r['res' + el]) : 0, armadmg: Math.max(0, num(r.armadmg))};   // negativa = vulnerable (2026-10-06)
 }
 
 function hudHpHtml(t, d){

@@ -465,13 +465,14 @@ async function trampaPasoDano(id, dt){
   }
   const monto = dt.evita === 'mitad' ? Math.floor(r.total / 2) : r.total;
   const x = tokens.get(dt.tokenId);
-  let res = null, freno = '';
+  let res = null, freno = '', restaFreno = 0;
   if(monto > 0 && x && x.fichaId){
     try{
       // Daño de un elemento (2026-10-04): resta la resistencia a ese elemento y, como es daño mágico, la Armadura mágica.
       const rr = dt.elemento ? await resistenciasDe(x, dt.elemento) : {res: 0, armadmg: 0};
       const arm = dt.elemento && dt.ignoraDef && Combatiente.frenaArmaduraMagica(dt.elemento) ? rr.armadmg : 0;   // lo tóxico, no
-      freno = [...(arm ? [`Armadura mágica ${arm}`] : []), ...(rr.res ? [`${Combatiente.ELEMENTOS[dt.elemento].etq} ${rr.res}`] : [])].join(' − ');
+      freno = [...(arm ? [`Armadura mágica ${arm}`] : []), ...(rr.res ? [Combatiente.resElementalTxt(dt.elemento, rr.res)] : [])].join(' − ');
+      restaFreno = num(arm) + num(rr.res);
       if(x.tipo === 'creep'){ if(soyGM) res = await danioCreep(x, String(monto), dt.ignoraDef, arm, rr.res); }
       else res = await (String(x.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(x, String(monto), dt.ignoraDef, arm, rr.res);
     }catch(err){ console.error('No se pudo aplicar el daño de la trampa:', err); }
@@ -481,7 +482,7 @@ async function trampaPasoDano(id, dt){
   else if(res){
     const g = res.r;
     texto += g.invulnerable ? ' → Invulnerable: no le hizo nada'
-      : (dt.ignoraDef ? `${freno ? ` − ${freno}` : ''} → ${fmt(g.recibido)} de daño directo a la vida` : ` − Defensa ${fmt(g.defensa - (freno ? num(freno.split(' ').pop()) : 0))}${freno ? ` − ${freno}` : ''} → ${fmt(g.recibido)} de daño`) + (g.absorbido ? ` (el escudo absorbió ${fmt(g.absorbido)})` : '');
+      : (dt.ignoraDef ? `${freno ? ` − ${freno}` : ''} → ${fmt(g.recibido)} de daño directo a la vida` : ` − Defensa ${fmt(g.defensa - restaFreno)}${freno ? ` − ${freno}` : ''} → ${fmt(g.recibido)} de daño`) + (g.absorbido ? ` (el escudo absorbió ${fmt(g.absorbido)})` : '');
   }else texto += ` → ${monto} de daño${dt.ignoraDef ? ' directo a la vida' : ' menos su Defensa'} — aplicalo a mano`;
   const entro = monto <= 0 ? 0 : res ? num(res.r.recibido) : monto;   // lo que llegó a la vida (sin poder aplicarlo, se da por hecho)
   const sinHerida = dt.requiereDano && entro <= 0;

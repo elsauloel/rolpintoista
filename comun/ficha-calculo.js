@@ -110,6 +110,9 @@ const FichaCalculo = (() => {
     {id:'ahorroespsp', label:'Primer conjuro', full:'SP de menos que cuesta el primer uso de un arma especial en el turno'},
     {id:'venenista', label:'Envenenador', full:'Stacks de más en los venenos que ponés: cada stack es un turno más y 1 de daño más por turno'},
     // Torso blando de Buena calidad (2026-10-06, dueño).
+    // Torso rígido de Buena calidad (2026-10-06, dueño).
+    {id:'guardian', label:'Guardián', full:'Los aliados que están al lado tuyo tienen +N Defensa (el mapa la suma sola al aplicarles el daño; no se acumula con otro guardián)'},
+    {id:'escolta', label:'Escolta (a mano)', full:'Una vez por turno podés recibir vos el golpe dirigido a un aliado al lado (1 No2). Se resuelve a mano'},
     {id:'defprimer', label:'Defensa contra el primer golpe', full:'Defensa extra contra el primer golpe que recibís en cada turno'},
     {id:'defdist', label:'Defensa contra armas a distancia', full:'Defensa extra contra los golpes de armas a distancia'},
     {id:'pagarhp', label:'Pagar con vida', full:'Con un arma especial, elegís cada vez si pagás el SP con SP o con vida (1 HP por SP)'},

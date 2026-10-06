@@ -148,7 +148,7 @@ const CreepCalculo = (() => {
   // Resistencia elemental de un creep (2026-10-04): la base que le pone el GM (sc.resfuego…) + lo que dan su equipo y sus estados.
   function resElemental(sc, el){
     const id = 'res' + el;
-    return Math.max(0, num(sc[id]) + modTotal(sc, id));
+    return num(sc[id]) + modTotal(sc, id);   // negativa = vulnerable: recibe más daño de ese elemento (Coraza de acero pulido, 2026-10-06)
   }
   function armadmgEfectiva(sc){
     return Math.max(0, num(sc.armadmg) + modTotal(sc, 'armadmg'));
@@ -511,7 +511,7 @@ const CreepCalculo = (() => {
     dmg:'Dmg', bloqueo:'Bloqueo', pdgopor:'PdG en oportunidad', pdgcontra:'PdG en contraataque', pdgmg:'PdG.Esp', dmgesp:'Ef.Esp',
     percepcion:'Percepción', vision:'Visión', luz:'Luz', sigilo:'Sigilo', spregen:'SP Regen', boticario:'Mano de boticario',
     resfuego:'Res. fuego', reshielo:'Res. hielo', resrayo:'Res. rayo', restoxico:'Res. tóxico', resacido:'Res. ácido', armadmg:'Armadura mágica',
-    pisadaatenta:'Pisada atenta', recuperarse:'Recuperarse rápido (%)', capcinturon:'Ranuras de cinturón',
+    pisadaatenta:'Pisada atenta', recuperarse:'Recuperarse rápido (%)', capcinturon:'Ranuras de cinturón', inamovible:'Inamovible (%)', guardian:'Guardián', escolta:'Escolta (a mano)',
     pdgt4:'PdG con punzantes', pdgt6:'PdG con cortantes', pdgt8:'PdG con hachas', pdgt10:'PdG con contundentes', pdgdist:'PdG a distancia',
     oporahorro:'Oportunidad: No2 de menos', contraahorro:'Contraataque: No2 de menos', soltarse:'Soltarse', trampaoculta:'Trampas mejor escondidas',
     ahorroespsp:'Primer conjuro: SP de menos', venenista:'Envenenador: stacks de más',

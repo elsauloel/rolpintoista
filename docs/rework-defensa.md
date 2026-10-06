@@ -1074,3 +1074,12 @@ mover 0,5, Espinas 2 (como siempre). Las de «Peto anclado» quedaron adentro de
 | 🧙 Coraza rúnica · 3 · 190 | Defensa +4 · Res.Esp +2 · SP máximo +3 · Res.Mt +1 |
 
 Para Raro (caras): Placas templadas y Remaches reforzados.
+
+**✅ Torso rígido Buena calidad: cargado (2026-10-06).** «Todo me parece bien» (dueño), con cuatro indicaciones: **conductora programada** y
+como precedente (una resistencia elemental negativa = vulnerable: recibe más daño de ese elemento); **Coraza del guardián automática**, con la
+Crónica para todos y un aviso chico solo a quien maneja al protegido; **Inamovible como estado** (preset nuevo, la armadura te lo pone al
+equiparla); **Armadura del escolta a mano** (se resuelve fácil en la mesa). 15 armaduras (reemplazan a las 6 viejas que no eran «solo botín»;
+5 conservan nombre e id; sale la «Coraza»). Precios 185–200.
+- Calculadora: `guardian` 2 · `escolta` 1,5 · Sigilo negativo devuelve 0,5 por punto · resistencia elemental negativa 0,25 por punto · el estado
+  al equipar «Inamovible» no se cobra aparte (va con `inamovible 100`, la chance de siempre en 100 %).
+- Para Raro, caras: Placas templadas y Remaches reforzados.

@@ -1540,6 +1540,18 @@ prueba('torso blando: la Túnica de sangre paga el SP de un arma especial con vi
   const r = FichaResumen.resumen(S, {});
   igual([tras, r.defdist], [[17, 0, 9], 2]);
 });
+prueba('torso rígido: el estado Inamovible (100 %), el guardián en el resumen y una resistencia elemental negativa (vulnerable)', () => {
+  const S = {catalogo: [], efectos: []};
+  const r = FichaHabilidades.aplicarEfectoDeConsumo(S, {nombre: 'Prueba', efectoNombre: 'Inamovible'}, estadosPresetFicha());
+  const pre = estadosPresetCreep().find(p => p.nombre === 'Inamovible');
+  const {S: S2} = FichaGuardado.normalizar({}, {mezclarCatalogo: false});
+  S2.inventario = [{...structuredClone(CATALOGO_BASE.find(x => x.nombre === 'Coraza del guardián')), id: 'g', equipado: true}];
+  const sc = creepPrueba({equipo: [{nombre: 'Coraza', tipoItem: 'armadura_rigida', mods: [{stat: 'resrayo', val: -2}, {stat: 'guardian', val: 1}]}]});
+  const inam = CATALOGO_BASE.find(x => x.nombre === 'Armadura del inamovible');
+  igual([!!(r && r.estado), pre && pre.polaridad, pre && pre.mods[0].val, FichaResumen.resumen(S2, {}).guardian, CreepCalculo.resElemental(sc, 'rayo'),
+    CreepCalculo.modTotal(sc, 'guardian'), Combatiente.resElementalTxt('rayo', -2), inam.equipoEstadoPreset, inam.mods.find(m => m.stat === 'inamovible').val],
+    [true, 'buff', 100, 1, -2, 1, 'Res. rayo −2 (vulnerable)', 'Inamovible', 100]);
+});
 prueba('guantes del envenenador: el resumen público lleva los stacks de más (el mapa se los suma al veneno del duelo)', () => {
   const {S} = FichaGuardado.normalizar({}, {mezclarCatalogo: false});
   S.inventario = [{id: 'g', nombre: 'Guantes del envenenador', tipoItem: 'manos', equipado: true, mods: [{stat: 'venenista', val: 1}]}];

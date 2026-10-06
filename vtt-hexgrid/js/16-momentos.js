@@ -67,6 +67,7 @@ const momentosArranque = setInterval(() => { if(typeof fbMiembro !== 'undefined'
 // El rayo que salta (2026-10-05, Varita de chispa eléctrica): cada pantalla lo ve una vez, salto por salto (solo si es de recién: al entrar
 // al mapa no se repiten los viejos).
 const rayosVistos = new Set();
+const momentosChicosVistos = new Set();   // los avisos chicos ya mostrados (un momento puede llegar más de una vez)
 function rayoMomento(id, d){
   if(rayosVistos.has(id)) return;
   rayosVistos.add(id);
@@ -88,7 +89,10 @@ function momentoRecibido(id, d){
   if(deteccionBanner && deteccionBanner.id === id && d.estado === 'listo' && deteccionBanner.resultado === null){ deteccionBanner = null; renderDeteccionBanner(); }
   // Lo que me toca a mí (el jugador dueño, cuando el GM toma o devuelve el control de su personaje): al centro, no en la esquina.
   // (datos.aviso: el Aviso de lo que le pasó, ej. una trampa — le llega aunque lo haya publicado su propia pantalla.)
-  if(d.datos && d.datos.paraUid && d.datos.paraUid === fbUsuario.uid && (d.creadoPor !== fbUsuario.uid || d.datos.aviso)){ momentoAvisoCentro(id, d); return; }
+  // Un aviso chico (2026-10-06, la Coraza del guardián): a quien le toca, un toast — y la Crónica sigue, como para todos.
+  const chicoParaMi = d.datos && d.datos.chico && d.datos.paraUid && d.datos.paraUid === fbUsuario.uid;
+  if(chicoParaMi && !momentosChicosVistos.has(id)){ momentosChicosVistos.add(id); toast(`${d.icono || ''} ${d.titulo}: ${d.resultado || ''}`.trim()); }
+  if(!chicoParaMi && d.datos && d.datos.paraUid && d.datos.paraUid === fbUsuario.uid && (d.creadoPor !== fbUsuario.uid || d.datos.aviso)){ momentoAvisoCentro(id, d); return; }
   // La esquina: todo, salvo lo que esta pantalla ya sigue al centro.
   const mio = d.creadoPor === fbUsuario.uid && d.datos && d.datos.centro;
   if(d.tipo === 'oportunidad' && oporSoyDecisor(d)){ momentosFeed.delete(id); renderMomentosFeed(); return; }   // lo decide esta pantalla, al centro

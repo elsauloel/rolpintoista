@@ -749,6 +749,8 @@ const Combatiente = (() => {
      'tóxico'…) → 'fuego' | 'hielo' | 'rayo' | 'toxico' | 'acido' | ''. */
   const ELEMENTOS = {fuego: {etq: 'Res. fuego', icono: '🔥'}, hielo: {etq: 'Res. hielo', icono: '❄'}, rayo: {etq: 'Res. rayo', icono: '⚡'},
     toxico: {etq: 'Res. tóxico', icono: '☠'}, acido: {etq: 'Res. ácido', icono: '🧪'}};
+  // «Res. rayo 2» o, si es negativa, «Res. rayo −2 (vulnerable)»: lo que se muestra al restarla del daño (2026-10-06).
+  const resElementalTxt = (el, res) => `${ELEMENTOS[el] ? ELEMENTOS[el].etq : 'Res. ' + el} ${res < 0 ? '−' + (-res) + ' (vulnerable)' : res}`;
   function elementoDe(texto){
     const t = String(texto || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     if(/fuego|llama|quema/.test(t)) return 'fuego';
@@ -790,6 +792,6 @@ const Combatiente = (() => {
   return {pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
-    marcadoEn, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
+    marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
     formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, flashPara, cdFlash, costoFlash};
 })();

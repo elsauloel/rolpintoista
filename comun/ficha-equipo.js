@@ -340,7 +340,7 @@ const FichaEquipo = (() => {
           </div>`).join('')}
         </div>
       </div>
-      ${Combatiente.resElementalesHtml(el => cEq.final['res' + el], el => lupa(`defensa:res${el}`))}
+      <div style="grid-column:-2 / -1;min-width:0">${Combatiente.resElementalesHtml(el => cEq.final['res' + el], el => lupa(`defensa:res${el}`))}</div>   <!-- debajo de la de crítico (la última columna) -->
     </div>
   </div>`;
     return resumen + pesoEq + `<div class="equipo-cols">

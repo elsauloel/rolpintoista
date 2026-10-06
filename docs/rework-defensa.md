@@ -1159,7 +1159,7 @@ de peso devuelve 0,5. **Tope de Defensa propuesto: 2** (como cabeza, manos y pie
 | Calzas de piel de carpincho · 1 · 85 | Vida +10 · Res. hielo +2 · Res. ácido +1 |
 | 🧙 Calzas de bordado rúnico · 0 · 85 | Res.Esp +2 · Res.Mt +2 |
 | 🔧 Grebas del carnero · 1 · 85 | **Embestida +2**: si te moviste 2 casilleros o más en línea recta hasta el rival, tu primer ataque del turno suma PdG +2 · Defensa +1 · Res.CC +1 |
-| 🔧 Calzas del silencioso · 0 · 85 | **Pasos en silencio**: una vez por turno, cruzar el cono de un rival no te saca el Sigilo · Sigilo +1 |
+| 🔧 Calzas del silencioso · 0 · 85 | **Pasos en silencio**: una vez por turno, cruzar la zona de alerta de un rival no pide tirada de detección (bono grande, 3) |
 
 Costos nuevos propuestos: Embestida 1 por PdG (la mitad del PdG: pide moverse antes) · Pasos en silencio 2 · **Carga 0,5 por punto** (hoy 0,25).
 
@@ -1170,3 +1170,15 @@ bonos) sin pagarlo. Propuesta: **Carga = 0,5 por punto**. Con eso, en Buena cali
 pieza de los que no tienen Fuerza y quieren armadura pesada (y de los tanques, para cargar escudo y torso rígido a la vez). Ojo: los Anillos de
 Alforja sin Fondo (Común +1, Raro +2, Legendario +3) quedarían baratísimos con 0,5 — revisarlos cuando lleguemos a los anillos. Escalera
 sugerida para las piernas: Común nada (dueño: «solo tiene sentido en piezas de peso 0», y eso es de calidad), Buena +4, Rara +6.
+
+**Respuestas del dueño a la v1, primera tanda (2026-10-06)** (sigue leyendo; se carga todo junto al cerrar la lista):
+- **Movimiento −1 se traduce como «el primer paso cuesta el doble»** (el efecto de Lento, como marca de la pieza): contrapeso que devuelve 2.
+- Pasos gratis: 3 por casillero (lo decidido el 2026-10-04). Sigilo = la tirada del que se esconde contra la Percepción del que busca.
+- «Bombacha de cuadrero» va por el caballo cuadrero (carreras cuadreras, de tiro corto: Iniciativa); «cuatrero» podría ir en la de Retirada y Sigilo.
+- **La Carga, corregida: 1 por punto** (no 0,5): las armas también pesan (su peso son los dados de daño) y, pasado de peso, cada punto de Carga
+  saca la penalidad de la Evasión (1 No2 o −1); el Anillo de Alforja Común ya la trataba así (Carga +1 en una bolsa de 1). Estibador: Carga +3,
+  o Carga +2 · Res.CC +1.
+- **Embestida**: le gustó («no está mal»); se programaría guardando el último recorrido del turno y mirando, en el primer ataque, si los últimos 2
+  pasos fueron en línea recta hasta el rival → PdG +2 por el mismo camino que «Por la espalda». A definir: ¿los últimos 2 pasos o todo el recorrido?
+- **Pasos en silencio** (dueño): cruzar el cono sin perder el Sigilo, para un tier más alto (Raro o más); en Buena calidad, **cruzar la zona de
+  alerta de un rival sin tirada de detección, una vez por turno** — y que sea caro: bono grande, toda la bolsa (3).

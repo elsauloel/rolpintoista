@@ -1313,3 +1313,30 @@ del Conjuro y el Cazador: sin tocar); (2) **los anillos cuestan el doble en oro 
 `PRECIO_ANILLO_MULT = 2` y `precio_item` en la calculadora; aplicado a los otros 78 (de 1.200–11.000 a 40–1.220); (3) los efectos y su peso por
 calidad se reimaginan después (la propuesta por familia de arriba queda como punto de partida). Ojo para entonces: el Leprechaun (Afortunado siempre)
 y el Policromático quedaron a 120 porque la calculadora cobra 2 por cualquier estado al equipar: hay que valuarlos de verdad.
+
+**Decisiones del dueño (2026-10-06, segunda vuelta): los anillos se reinventan de cero**, partiendo de los Comunes y con lluvia de ideas. Lo que
+no entra en ninguna bolsa (Movimiento, Agilidad, Evasión +2/+3…): buscarle precio y calidad «buscándole la vuelta al razonamiento». **Artefactos
+fuera de la escalera** (piezas únicas, sin tienda, solo de botín): le gusta la idea, falta ver cómo se implementa (`pendientes.md`). Leprechaun y
+Policromático: se reimaginan por completo.
+
+### Anillos Comunes — lluvia de ideas (2026-10-06, para que el dueño filtre)
+Bolsa de un anillo Común: 1 punto (hasta 1,1); precio = el doble (≈ 70). Se llevan 2. ⚙ = existe · 🔧 = mecánica nueva.
+
+| Idea | Qué hace (costo) |
+|---|---|
+| ⚙ Un stat chico | Res.Esp +1 · Res.CC +1 · Parry +1 · Bloqueo +1 · Daño +1 · Ef.Esp +1 · Bonos +1 · Vida +5 · Res.Mt +2 · Percepción +2 · Visión +2 · una resistencia elemental +2 (1 cada uno) |
+| ⚙ Anillo de luz | Luz +4: llevás tu propia luz alrededor (1) |
+| ⚙ Anillo de pluma | Levitar 2 (0,5) + algo chico |
+| ⚙ Anillo de boticario | Cada poción cura 5 más (1) |
+| ⚙ Anillo del primer golpe | Defensa +1 contra el primer golpe del turno (0,75) |
+| 🔧 Anillo de una carga | Una vez por combate, gastás 1 No2 y te da Escudo especial 4 (≈ 1) |
+| 🔧 Moneda en el dedo | Una vez por combate, repetís una tirada (una Moneda Re-Roll que vuelve en cada combate) (≈ 1) |
+| 🔧 Anillo de canalización | La primera habilidad del turno cuesta 1 SP menos (≈ 1; de caster) |
+| 🔧 Anillo de la primera sangre | +2 de daño en tu primer golpe del combate (≈ 0,75) |
+| 🔧 Anillo de la vigilia | Iniciativa +2 solo en la primera ronda (que no te agarren dormido) (≈ 0,75) |
+| 🔧 Anillo antídoto | El Veneno te dura 1 turno menos (≈ 0,75) |
+| 🔧 Anillo de reflejo arcano | Evasión +2 solo contra habilidades (lo que tira PdG.Esp contra vos) (≈ 1) |
+| 🔧 Anillos gemelos | Cada uno da poco (Res.CC +1); si llevás los dos, además Evasión +1 (el par vale más que la suma) |
+| 🔧 Anillo maldito (con contra) | Un bono grande para Común y una contra que se nota: Daño +2 · Vida −5 (≈ 1) |
+| 🔧 Anillo de sello | Social: te reconocen como miembro de un gremio o casa (✋ a mano, narrativo) |
+| 🔧 Anillo de la calma | Si no atacaste en tu turno, al terminarlo recuperás 1 No2 (≈ 1) |

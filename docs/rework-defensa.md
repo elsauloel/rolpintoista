@@ -644,3 +644,44 @@ Calculadora: ranura de cinturón 0,5, de mochila 0,25; la mochila tiene bolsa pr
   presupuesto): **Cinto portapergaminos**. El de 3, para calidad Buena.
 - **Pasamanos** (cinturón, 0,75) y **Alforja compartida** (mochila, 0,75): el dar en combate de P157. Comunes: **Faja de mandadero** y **Alforja de arriero**
   (+2 ranuras). Quedan 12 cinturones y 10 mochilas Comunes, todos con un efecto propio.
+
+## Cabeza — piezas de caster y Buena calidad (2026-10-05, ⬜ a revisar por el dueño)
+Criterios: **uno a tres efectos de caster por parte** y la escasez controlada (ver `rework-armas.md`, «Defensivos para casters»); lo Común se
+conserva y se le suma lo que falte; **Buena calidad se reemplaza entera**. Bolsa de la cabeza: Común 2 · Buena 3,5 · Rara 5; tope de Defensa
+Común 1 · Buena 2 · Rara 3; el peso devuelve 0,5 por punto; precio = 10 + 25 × puntos. **Costo nuevo propuesto: SP Regen +1 = 2** (como la
+Evasión: se cobra todos los turnos, es el más peligroso al acumularse — por eso vive solo en la cabeza).
+
+**Cabeza Común — se suman 2 (quedan 26; con la Corona de laureles, 3 de caster):**
+
+| Casco · precio | Qué da |
+|---|---|
+| Sombrero humectante · 60 | SP Regen +1. Sin Defensa. Pesa 0. (El clásico del grupo.) |
+| Antiparras de rastreo · 60 | Pisada atenta · Percepción +2. Pesa 0. |
+
+**Cabeza Buena calidad — propuesta v1 (19, reemplazan a las 14 de hoy):**
+
+| Casco · precio | Qué da |
+|---|---|
+| Yelmo liviano · 50 | Defensa +2. Pesa 1. (El simple barato.) |
+| Yelmo de cubo · 85 | Defensa +2 · Res. crítico Tipo 10 +1 · Iniciativa −1. Pesa 3. |
+| Yelmo cerrado de torneo · 85 | Defensa +1 · Res. crítico Tipo 10 +1 · Visión −1. Pesa 3. |
+| Capellina de hierro · 85 | Defensa +2 · Res. crítico Tipo 4 +1 · Res.CC +1. Pesa 2. |
+| Yelmo de nasal · 85 | Defensa +2 · Res. crítico Tipo 4 +1 · Res.Esp +1. Pesa 2. |
+| Casco de bandas remachadas · 100 | Defensa +2 · Res. crítico Tipo 4 +1 · Res.CC +1 · Vida +5. Pesa 3. |
+| Yelmo de vigía · 100 | Defensa +2 · Res. crítico Tipo 4 +1 · Visión +2 · Percepción +1. Pesa 2. |
+| Morrión de explorador · 100 | Defensa +2 · Visión +2 · Percepción +2 · Luz +1. Pesa 2. |
+| Casco de minero reforzado · 85 | Defensa +2 · Luz +3. Pesa 1. |
+| Capucha acolchada de sastre · 100 | Defensa +2 · Res.CC +2. Pesa 1. |
+| Turbante de tela reforzada · 85 | Defensa +2 · Res. fuego +2 · Res. tóxico +1. Pesa 1. |
+| Cofia del veterano · 85 | Defensa +1 · Recuperarse rápido 50 % · Res.CC +1 · Res.Mt +1. Pesa 1. |
+| Vincha del corredor · 100 | Defensa +1 · Iniciativa +1 · Res.CC +1. Pesa 0. |
+| Capucha de la hermandad · 100 | Defensa +1 · Sigilo +2 · Percepción +1. Pesa 0. |
+| Gorro de piel de zorro · 100 | Defensa +1 · Res.Mt +3 · Percepción +2. Pesa 0. |
+| Monóculo del cartógrafo · 100 | Visión +2 · Percepción +3 · Ve lo oculto +1. Pesa 0. |
+| 🧙 Sombrero humectante bordado · 100 | SP Regen +1 · Res.Mt +2 · Percepción +1. Pesa 0. |
+| 🧙 Antiparras del buscador · 100 | Pisada atenta · Ve lo oculto +1 · Percepción +2 · Visión +1. Pesa 0. |
+| 🧙 Corona de laureles dorada · 100 | Res.Mt +4 · Res.Esp +1 · Percepción +1. Pesa 0. |
+
+Notas: el Tipo 10 (solo cascos y escudos) entra en Buena por los yelmos pesados (pesa 4 puntos; el peso y la desventaja lo pagan). Se van de lo
+viejo: Defensa +3 a +6 (pasan el tope de 2), Tipo 6 en la cabeza, PdG en un casco (el PdG es de los guantes) y Especial +1 (un atributo entero).
+🧙 = pensado para casters (3 de 19, la parte de una clase). Lo de caster que no entra acá: sigilo con armas especiales (Cabeza, Raro).

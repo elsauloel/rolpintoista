@@ -1642,10 +1642,10 @@ Posible ayuda (a decidir): un control en el editor del catálogo que avise si un
 |---|---|
 | SP Regen | ✅ Va. El **Sombrero humectante existe sí o sí** (clásico del grupo). |
 | +SP máximo | ✅ Va. |
-| La primera varita del turno cuesta 1 SP menos | ✅ Va. Liviano: relleno para dar color. |
+| El primer uso de un arma especial en el turno cuesta 1 SP menos | ✅ Va. Liviano: relleno para dar color. |
 | Si en el turno no gastaste SP, recuperás 1 de más (ayuno) | ✅ Va. Liviano: relleno para dar color. |
-| Pagar con vida (sangre) | ✅ Con una vuelta: con varitas y armas especiales **elegís cada vez** si pagás el SP con SP o con HP (no solo cuando falta SP). |
-| El No2 de la varita no sube en el segundo uso del turno | ✅ Va. |
+| Pagar con vida (sangre) | ✅ Con una vuelta: con las armas especiales **elegís cada vez** si pagás el SP con SP o con HP (no solo cuando falta SP). |
+| El No2 de un arma especial no sube en el segundo uso del turno | ✅ Va. |
 | PdG.Esp | ✅ Va. Campo de las **manos**. |
 | Ef.Esp | ✅ Va. |
 | Rango de casteo | ❌ Afuera por ahora: el rango de hoy alcanza; quizás se reworkee. |
@@ -1657,13 +1657,16 @@ Posible ayuda (a decidir): un control en el editor del catálogo que avise si un
 | Percepción | ✅ Ya existe en cascos (Monóculo del tasador, Capucha de vigía, Pasamontañas). |
 | Detectar trampas con una tirada | ✅ Va, **unificado**: es «Pisada atenta» (`pisadaatenta`, la misma regla que la Percepción aumentada, solo trampas), que ya tienen dos Pies Comunes. |
 
-| +1 No2 que solo sirve para varitas y armas especiales | ✅ Va. **Pesa 0,75 de lo que pesa un No2** (dueño, 2026-10-05). |
-| Usar varitas sin salir del Sigilo | ✅ Va, pero **tiene que costar: es para tiers altos**. |
+| +1 No2 que solo sirve para armas especiales | ✅ Va. **Pesa 0,75 de lo que pesa un No2** (dueño, 2026-10-05). |
+| Usar armas especiales sin salir del Sigilo | ✅ Va, pero **tiene que costar: es para tiers altos**. |
 
 Descartadas (no mencionadas): Res.Esp +2, gorro de papel de aluminio, sombrero espejado, Ve lo oculto, lector de auras, aprendiz distraído.
 
 **Alcance del rework de defensivos (dueño, 2026-10-05):** lo **Común se conserva** (como la Corona de laureles, Res.Mt +4) y se le suman las piezas
 de caster que falten; **Buena calidad, Raro y para arriba se reemplazan enteros** por listas nuevas, como se hizo con las armas.
 
-**Reparto, decisiones (dueño, 2026-10-05):** varitas sin salir del Sigilo → **Cabeza, desde Raro** ✅. El **Cinturón no suma más funciones**: lo de
-ahorro en varitas va a otro slot (a definir).
+**Reparto, decisiones (dueño, 2026-10-05):** armas especiales sin salir del Sigilo → **Cabeza, desde Raro** ✅. El **Cinturón no suma más funciones**: lo de
+ahorro en armas especiales va a otro slot (a definir).
+
+**«Arma especial», no «varita» (dueño, 2026-10-05):** todos estos efectos valen para **cualquier arma especial** (varitas, báculos…); decir
+«varita» los acota de más.

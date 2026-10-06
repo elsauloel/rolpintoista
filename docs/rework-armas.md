@@ -1556,7 +1556,15 @@ Cabeza completo** (todo, no solo casters); y así con el slot siguiente. Como si
 24 piezas. Casi todo es Defensa +1 con una resistencia, visión, percepción o sigilo. Lo único con algo de caster: Res.Esp +1 (Capucha de lana del
 culto, Vincha de cuero crudo) y Res.Mt (Corona de laureles +4). **Nada toca SP, SP Regen, PdG.Esp, Ef.Esp, Rango de casteo ni las varitas.**
 
-### Cabeza para casters — lluvia de ideas (2026-10-05, ⬜ para que el dueño filtre)
+### Criterio del dueño para los defensivos de caster (2026-10-05)
+
+Todos los cascos (y todo lo defensivo) le sirven igual a un caster. Por eso: **uno a tres efectos pensados para casters por slot**, repartidos entre
+todos los slots (no todo en la cabeza), y en total **la parte de una clase** de los ítems de cada tier (≈ 1/7 con las 7 clases de hoy; 1/9 si se
+suman). En Cabeza Común (24 piezas) eso son unas 3. La lluvia de abajo es el **pool para todos los slots**: algunas ideas se descartan, otras se
+les busca una vuelta, y las que quedan se reparten (ej.: SP Regen en la cabeza, Rango de casteo en las manos, Res.Esp en una armadura). El dueño
+las revisa punto por punto.
+
+### Cabeza para casters — lluvia de ideas (2026-10-05, ⬜ para que el dueño filtre; es el pool para todos los slots)
 
 ⚙ = ya se puede (un bono a un stat que existe) · 🔧 = mecánica nueva chica · ✋ = quedaría a mano (texto y tirada)
 

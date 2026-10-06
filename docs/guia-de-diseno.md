@@ -12,6 +12,10 @@
 > sí). Si algo se puede automatizar, se automatiza; si no, se aclara (⚙ / ✋). Y "equipo" incluye **las armas**, no solo lo defensivo.
 
 ## 0. Criterios generales de diseño (dichos por el dueño)
+- **Equipo para casters: poco y repartido** (2026-10-05): todo el equipo defensivo le sirve igual a un caster, así que no hace falta llenar el
+  catálogo de piezas «de caster». Alcanza con **uno a tres efectos pensados para casters por slot** (cabeza, manos, piernas, pies, armaduras,
+  accesorios…), repartidos entre slots y no amontonados en uno, y en total **más o menos la parte que le toca a una clase** (≈ 1/7 hoy, 1/9 si se
+  suman clases) de los ítems de cada tier.
 - **Los Nitros (No2) son un recurso MUY preciado** (2026-09-25). Se usan para acciones ofensivas, defensivas y para moverse, así que cada turno el jugador **optimiza y maximiza** su uso. Al diseñar **skills y objetos**, un costo en Nitros pesa mucho: 1 Nitro no es "casi gratis". Un arma o skill que cuesta pocos Nitros es barata *de verdad* y suele ser de calidad baja; los costos bajos hay que ganárselos con calidad o con límites. Ver también P112 (peso de los efectos) y P116 (armas mágicas).
 
 - **El peso regula las armas mágicas (relevancia intermedia):** una varita pesa 1 y un báculo puede pesar mucho; como el Sobrepeso hoy es un drawback moderado (P108), el peso pesa de forma intermedia en el balance del arma, no alta.

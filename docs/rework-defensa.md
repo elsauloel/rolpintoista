@@ -790,3 +790,46 @@ si quedó alguna idea afuera. Más ideas que se pueden sumar:
 - **Agarre firme (que no te desarmen):** le gusta, pero no existe el desarme → anotado para la **ampliación del catálogo** (hoja de ruta).
 - **Parry gratis una vez por turno:** ✅ va así, ahora que se sabe que el Parry cuesta 1 No2 fijo.
 - **Trampero:** ✅ **las trampas que colocás tienen +2 de dificultad para detectarlas**, con un valor **muy bajo** en la bolsa (muy circunstancial).
+
+## Manos Buena calidad — propuesta v1 (2026-10-05, ⬜ a revisar por el dueño)
+Dueño: «mantengamos la identidad de la Buena calidad y mejoramos la calidad; sin restricción de cantidad: que haya muchos y después restringe el
+generador de tiendas». Bolsa 2,5 (Común 1,5); tope de Defensa 2 (Común 1); el peso devuelve 0,5 por punto; precio = 10 + 25 × puntos.
+**Costos nuevos propuestos:** PdG +1 con una familia de armas 1 · PdG +1 a distancia 1 · Soltarse +1 0,25 · tus trampas +2 a detectar 0,25 · el
+primer uso de un arma especial −1 SP 0,75 · venenos +1 turno y +1 daño 1,5 · oportunidad −1 No2 2 · contraataque −1 No2 tras un Parry 2.
+🔧 = mecánica nueva a construir · 🧙 = pensado para casters.
+
+| Guante · precio | Qué da |
+|---|---|
+| Guantes de esgrimista de academia · 75 | PdG +1 · Parry +1. Pesa 1. |
+| Guantes lastrados · 75 | Dmg +1 · Defensa +1 · Bloqueo +1 · Res. fuego +1. Pesa 2. |
+| Guantes del verdugo · 80 | Crítico potente +1 · Defensa +1 · Parry +1. Pesa 1. |
+| 🔧 Guantes del espadachín · 75 | PdG +1 con armas cortantes (Tipo 6) · Parry +1 · Percepción +1. Pesa 0. |
+| 🔧 Guantes del estoque · 65 | PdG +1 con armas punzantes (Tipo 4) · PdG en oportunidad +1 · Percepción +1. Pesa 0. |
+| 🔧 Guantes de leñador · 75 | PdG +1 con hachas (Tipo 8) · Defensa +1 · Res.CC +1. Pesa 1. |
+| 🔧 Guanteletes del mazo · 60 | PdG +1 con contundentes (Tipo 10) · Defensa +1 · Bloqueo +1. Pesa 2. |
+| 🔧 Guantes de tirador · 75 | PdG +1 con armas a distancia · Iniciativa +1. Pesa 0. |
+| Guantes de duelista de salón · 75 | Parry +2 · Percepción +1. Pesa 0. |
+| Guantes de la réplica · 75 | PdG en contraataque +2 · Parry +1. Pesa 1. |
+| 🔧 Guantes del contragolpe · 75 | Después de ganar un Parry, el contraataque cuesta 1 No2 menos · Parry +1 · Percepción +1. Pesa 0. |
+| Guanteletes de bloqueo · 75 | Bloqueo +2 · Defensa +1 · Res. ácido +1. Pesa 2. |
+| Guantes de cuero reforzado · 75 | Defensa +2 · Parry +1. Pesa 1. |
+| Mitones de malla · 75 | Defensa +2 · Res. crítico Tipo 4 +1. Pesa 1. |
+| Guanteletes de acero templado · 75 | Defensa +2 · Res. crítico Tipo 4 +1 · Parry +1. Pesa 3. |
+| Manoplas de cota · 75 | Defensa +1 · Res. crítico Tipo 6 +1 · Res. hielo +1. Pesa 2. |
+| Muñequeras de hierro · 75 | Res.CC +2 · Defensa +1. Pesa 1. |
+| Guantes de goma reforzados · 75 | Defensa +1 · Res. rayo +2 · Parry +1. Pesa 1. |
+| Guantes de escalador encerados · 75 | Evasión +1 · Percepción +1. Pesa 0. |
+| Mitones del cuatrero · 65 | Iniciativa +1 · PdG en oportunidad +1. Pesa 0. |
+| Guantes de carterista · 75 | Iniciativa +1 · Sigilo +1. Pesa 0. |
+| 🔧 Mitones del emboscado · 80 | El ataque de oportunidad cuesta 1 No2 menos · PdG en oportunidad +1. Pesa 0. |
+| Guantes de boticario de oficio · 75 | Cada poción cura 1 más · Parry +1 · Defensa +1. Pesa 0. |
+| 🔧 Guantes de escapista · 65 | +1 a la tirada para soltarse · Parry +1 · Defensa +1. Pesa 0. |
+| 🔧 Guantes de trampero · 75 | Tus trampas tienen +2 de dificultad para detectarlas · PdG en oportunidad +1 · Defensa +1 · Percepción +1. Pesa 0. |
+| 🧙 Guantes para canalizar · 75 | PdG.Esp +1 · Res.Mt +1. Pesa 0. |
+| 🧙🔧 Guantes del envenenador · 75 | Tus venenos duran 1 turno más y hacen +1 de daño tóxico · Defensa +1. Pesa 0. |
+
+**Común, se suma 1:** 🧙🔧 **Mitones del primer conjuro · 50** — el primer uso de un arma especial en el turno cuesta 1 SP menos · PdG en oportunidad
++1. Pesa 0.
+
+Se van de los 9 viejos: Defensa +3 a +5 (pasan el tope de 2), el Tipo 8 en las manos (es de torso rígido y escudo) y el PdG mezclado con mucha
+Defensa. Quedan para Raro: Parry gratis una vez por turno, Crítico frecuente, Espinas (a las armaduras).

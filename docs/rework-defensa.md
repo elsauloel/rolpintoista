@@ -904,3 +904,34 @@ golpe es de un arma a distancia) y `pagarhp` (Túnica de sangre: «¿con SP o co
 estado al equipar. Precios 170–200 (bolsa 7).
 **Pendiente:** el equipo de los creeps base (`EQUIPO_CREEP` en `comun/creeps-base.js`) es una copia de los valores de cuando se generó: regenerarlo
 con `herramientas/generar_equipo_creeps.py` cuando el catálogo defensivo de Buena calidad esté completo (hoy siguen con las piezas viejas).
+
+## Bono grande en vez de muchos chicos, y la Mano de boticario (2026-10-06, ⬜ a revisar por el dueño)
+Pedido del dueño: «diseñar algunas que ofrezcan un bono alto, en lugar de muchos bonos chicos. El +1 a la curación de pociones parece malísimo:
+la poción común más baja cura 20, es un 5 %… parece un chiste». Criterio anotado en `guia-de-diseno.md` §0.
+
+**Mano de boticario, propuesta:** el costo baja de 0,5 a **0,1 por punto** (+10 a cada poción = 1 punto = lo mismo que Vida +5). Razón: solo vale
+si se toma una poción (gasta oro y No2); Vida +5 está siempre. Suma fija y no porcentaje: un % no se nota con las pociones baratas y se dispara con
+las grandes (Poción mayor, 100). Con eso:
+
+| Pieza | Antes → propuesta |
+|---|---|
+| Faja de curandero (cinturón, Común) | +2 → **+10** (sola) |
+| Guantes de boticario de oficio (manos, Buena) | +1 · Parry +1 · Def +1 → **+15** · Def +1 |
+| Delantal de boticario (torso blando, Buena) | +1 y 5 bonos más → Def +3 · **+25** · +2 ranuras de cinturón · Res. ácido +2 |
+
+**Piezas de un solo bono grande para los slots ya cargados (Buena calidad):**
+
+| Pieza | Qué hace |
+|---|---|
+| 🧙 Capucha del pozo hondo (cabeza) | SP máximo +4 · Res.Mt +1 |
+| Vincha del halcón (cabeza) | Iniciativa +2 · Percepción +1 (sin Defensa) |
+| Yelmo del sobreviviente (cabeza) | Vida +15 · Res.Mt +1 |
+| Guantes de maestro de esgrima (manos) | PdG con cortantes +2 · Percepción +1 |
+| Guantes de cetrero (manos) | PdG a distancia +2 · Percepción +1 |
+| Puños del rompehuesos (manos) | Crítico potente +2 |
+| Gambesón del veterano (torso blando) | Vida +30 · Defensa +1 |
+| 🧙 Túnica del pozo sin fondo (torso blando) | SP máximo +8 · Defensa +1 |
+| Chaleco de cuero de búfalo (torso blando) | Res. crítico Tipo 6 +2 · Defensa +3 |
+| Chaqueta del acróbata (torso blando) | Evasión +2 · Defensa +3 |
+
+Todas dentro de su bolsa (cabeza 3,5 · manos 2,5 · torso 7). El torso rígido se diseña ya con este criterio.

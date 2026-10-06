@@ -785,3 +785,8 @@ si quedó alguna idea afuera. Más ideas que se pueden sumar:
 - **Manos que curan y preparan:** sí. **Soltarse: un bono bajo** (+1), porque es muy circunstancial. **Trampero:** colocar una trampa cuesta lo
   que usar un consumible (1 No2 desde el cinturón, 2 desde la mochila), así que «1 menos» la deja gratis: es mucho, buscarle otra vuelta.
   **Desarmar trampas: afuera** — no está definido como concepto y, una vez que la ves, no vale la pena desarmarla.
+- **Oportunidad:** que no cueste No2 es muy caro. Mejor que **cueste 1 o 2 No2 menos**, y **una rebaja de No2 en el ataque de oportunidad vale el 50 %
+  de una rebaja de No2 a secas** (No2 = 4 → 2 por cada No2 menos en la oportunidad).
+- **Agarre firme (que no te desarmen):** le gusta, pero no existe el desarme → anotado para la **ampliación del catálogo** (hoja de ruta).
+- **Parry gratis una vez por turno:** ✅ va así, ahora que se sabe que el Parry cuesta 1 No2 fijo.
+- **Trampero:** ✅ **las trampas que colocás tienen +2 de dificultad para detectarlas**, con un valor **muy bajo** en la bolsa (muy circunstancial).

@@ -47,6 +47,8 @@ el dueño va a pedir pasarlas todas a ese momento.
   pergaminos), **instrumentos** (flauta, campana, tambor), **guantes o brazales rúnicos**, **dagas rituales y demás armas híbridas** (físicas con
   efecto especial), y las Excepcionales y Legendarias de las armas especiales.
 - **Guantes mágicos** y demás piezas de equipo con efectos especiales.
+- **Desarme** (dueño, 2026-10-05): la mecánica de desarmar a un rival (o sacarle el escudo) y su contra, unos **Guanteletes de agarre firme** (nadie te
+  puede desarmar ni sacarte el escudo).
 - **Botas Raras que dejan levitar** (ignoran el terreno y las trampas).
 - **Hechizos (no armas)**: Miedo, Sueño, intercambiar lugar, mover a un aliado, señuelo (un token falso que atrae ataques).
 - **Armas de rango con «grappling hook»** (atraer al rival), cuando toque su rework.

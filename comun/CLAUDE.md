@@ -1334,4 +1334,4 @@ versión parecida en más de una, es candidato a juntar.
   la pantalla lo define —el mapa: `AvisoCombate` para quien la hace y un momento `tipo: 'deuda'` en la Crónica—; si no, un toast). Parry
   (`FichaAcciones.parryConArma`, `CreepAcciones.pagarParry` → `{aviso, deuda}`, `InvAcciones.tirarStat`), la Evasión que paga el sobrepeso
   (`FichaAcciones.sobrepesoPagar`) y el dodge roll (js/06 y js/08: `enDodge(id)`) ya no se frenan sin No2; en el duelo, la opción se ofrece con
-  «⚠ sin No2: quedás en negativo».
+  «⚠ sin No2: quedás en negativo». **No aplica al ataque de oportunidad ni al contraataque** (dueño): son ataques y siguen sin bajar de 0.

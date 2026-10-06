@@ -169,6 +169,20 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] Paso 8: auditoría de contenido por tandas — skills de clase (13 de 62 tocan casteo; Chispazo, Orbe arcano y Rayo Mágico ya auditadas 2026-09-27, quedan 10) → habilidades de creeps → creeps base → armas naturales → trampas base → catálogo (~60 ítems) → pasivas y estados → manual.
 
 ## 2. Probar con la mesa abierta (nada de esto se probó con sesión iniciada y varios jugadores)
+- [ ] **Probar con el dueño mirando el mapa (anotado 2026-10-06; lo pidió para cuando vuelva y pueda ver la pantalla).** Ya probado por datos en
+  «Claude · pruebas», falta verlo y sentirlo en pantalla, desde la perspectiva del jugador y del GM:
+  - **Turno propio completo (P161):** ▶ Siguiente, la lista que gira con la línea «↻ Ronda N+1», la Crónica de cada pase («Empieza el turno
+    de…» y lo que pasó), la recarga de No2 y SP al empezar tu turno, el veneno que pega al aplicarse y al empezar el turno, el contador que
+    baja al terminarlo, el cambio de ronda que pasa el Mantenimiento solo sin tocar a quien tiene turno, y el ⟳ fuera de combate.
+  - **Invocación nueva:** entra al final del orden con Mareo de invocación (su primer turno, sin No2).
+  - **Atacar = ataque normal:** directo al objetivo; la oportunidad y el contraataque que ofrece el mapa solo; el botón chico «↪ Oportunidad o
+    contraataque, a mano».
+  - **Fuera de turno:** el aviso, la línea en la Mesa y la tarjeta en la Crónica; el ⚡ Flash que ya no pregunta «¿es tu turno?» y avisa que
+    cuesta el doble; el brillo que late en las habilidades con Flash.
+  - **Defensas sin No2 (P163):** Parry, Evasión pagando el sobrepeso y **dodge roll** (estos dos últimos, sin probar todavía ni por datos):
+    el cartel para quien se defiende, la Crónica para los demás y la deuda que se descuenta en la próxima recarga. **No aplica al ataque de
+    oportunidad ni al contraataque** (siguen sin bajar de 0).
+  - **Coraza del guardián** (Crónica + aviso chico al protegido), **Inamovible** y **vulnerable al rayo** (Coraza de acero pulido).
 - [ ] **Volver a pegar `firebase/firestore.rules`** (nueva colección `combate`): sin eso no se abre la ventana "Batalla terminada" ni se habilitan los botones 🎁.
 - [ ] Pegar `firebase/firestore.rules` en la consola (**Desarrollar y realizar pruebas** → Ctrl+A → pegar → Publicar) y verificar que quedó (buscar `estados` y `botin`).
 - [ ] Grupos de creeps, **tokens automáticos** (creeps y jugadores), **Finalizar combate y Botín desde el mapa**, botón **🎭** del borde izquierdo y **grupos vinculados a mapas**.

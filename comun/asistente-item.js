@@ -5,7 +5,9 @@
    palabras (todo lo que hace el ítem). Después, solo los pasos con
    aplicación práctica para esa categoría:
      armas     Tipo · empuñadura · peso y daño · bonos · efectos al golpear
-     defensa   defensa y resistencias a crítico · bonos
+     ✨ especial (varita, báculo: un hechizo equipable, 2026-10-05) empuñadura · hechizo (costo y daño) · Ejecución ✨ y trampa ·
+               ✋ a mano (texto y tirada para lo que no se automatiza) · bonos
+     defensa   defensa y resistencias a crítico · bonos  (🔮 un orbe: lo que hace al usar una varita, en vez de la Defensa)
      el resto  bonos
    y al final estado al equipar, precio/lugar y resumen. Los consumibles no
    pasan por acá: cfg.onConsumible los manda al formulario de cada herramienta.
@@ -38,6 +40,8 @@
      textoGuardar, onGuardar(d, destino) → false para no cerrar
      onFormulario(d) — si está, el resumen ofrece el formulario completo
      onConsumible(d) — al elegir la categoría Consumibles
+     sinEspecial   true = no ofrece «✨ arma especial» (el arma de un creep o de una invocación)
+     elegirEstado  () => Promise — el «+ Estado» de la página para la Ejecución ✨ de un arma especial (opcional; ver asistente-duelo-hab.js)
    ========================================================= */
 const AsistenteItem = (() => {
   const DADOS = [4, 6, 8, 10, 12];
@@ -103,6 +107,50 @@ const AsistenteItem = (() => {
   }
   const EG = () => (typeof EfectosGolpe !== 'undefined' ? EfectosGolpe : null);
 
+  /* ✨ Armas especiales y 🔮 orbes (2026-10-05, rework mágico): una varita o un báculo es un hechizo equipable (`especial` = {sp, no2, sube,
+     dano, sumaEspecial, duelo (la Ejecución ✨), trampaColocar?, estadoPropio?, aMano?}); un orbe va en la otra mano y actúa al usar una
+     varita (`orbe`, `orbeResguardo`, `orbeSalvaje`). Ver comun/CLAUDE.md «Armas especiales». */
+  const esEspecial = d => grupoDe(d.tipoItem) === 'arma' && !!d.especial;
+  const esOrbe = d => d.tipoItem === 'escudo_1m' && !!d.orbe;
+  const ESPECIAL_NUEVA = () => ({sp: 1, no2: 1, sube: 1, dano: ''});
+  const OBJETIVO_TXT = {enemigo: 'a un rival', aliado: 'a un aliado', 'uno mismo': 'a quien la usa', area: 'un área', onda: 'una onda alrededor', cono: 'un cono al frente', linea: 'una línea recta', zona: 'una zona que queda'};
+  const statTxt = id => {
+    if(!id) return '';
+    const L = (typeof FichaCalculo !== 'undefined' && FichaCalculo.STAT_LABEL) || {};
+    return L[id] || ({pdgmg: 'PdG.Esp', resmg: 'Res.Esp', dmgesp: 'Ef.Esp', eva: 'Evasión', rescc: 'Res.CC', resm: 'Res.Mt'})[id] || id;
+  };
+  const efectoTxt = x => x.cura !== undefined ? `cura ${x.cura}` : x.nombre === 'Pierde No2' ? `pierde ${x.no2} No2` : `${x.nombre}${Number(x.caras) > 1 ? ` (${Math.round(100 * Math.max(1, n(x.exitos)) / Number(x.caras))} %)` : ''}${x.turnos ? ` ${x.turnos} t.` : ''}`;
+  // Lo que hace la Ejecución ✨ de un arma especial, en palabras (una línea por cosa).
+  function ejecucionLineas(du){
+    if(!du) return [];
+    const L = [];
+    const ob = du.objetivo === 'zona' && du.niebla ? 'una nube de niebla' : (OBJETIVO_TXT[du.objetivo] || du.objetivo || 'a un rival');
+    const tam = du.objetivo === 'linea' ? ` de ${du.largo || du.radio || 4}` : (du.radio !== undefined && ['area', 'onda', 'zona'].includes(du.objetivo)) ? ` de radio ${du.radio}` : '';
+    L.push(`Objetivo: ${ob}${tam}${du.conVista ? ' (todos los rivales que ve)' : ''}`);
+    const tira = du.tiraFormula ? `${du.tiraEtiqueta || 'Tirada'} (${du.tiraFormula})` : statTxt(du.tira);
+    if(tira) L.push(`Tira ${tira}${(du.contra || []).length ? ` contra ${du.contra.map(statTxt).join(' o ')}` : du.contraOtro ? ` contra ${du.contraOtro} (a mano)` : ', sin resistencia'}`);
+    if(du.dano) L.push(`Daño ${du.tipoDano || 'arcano'}${du.danoDiferencia ? ': la diferencia de las tiradas' : ''}${du.ignoraDano === false ? ' (la Defensa lo frena)' : ''}`);
+    if((du.efectos || []).length) L.push('Efectos: ' + du.efectos.map(efectoTxt).join(', '));
+    if(du.cadena) L.push(`Salta a ${du.cadena.saltos} más (a ${du.cadena.rango} casillas)`);
+    if(du.reparte) L.push(`${du.reparte.total || 2} misiles de ${du.reparte.cada}, de a uno`);
+    if(du.zonaQueda) L.push(`Deja ${du.zonaQueda.nombre || 'una zona'} ${du.zonaQueda.turnos || 1} turno(s)`);
+    if(du.atrae) L.push(`Atrae ${du.atrae.casillas} casillas`);
+    if(du.menosDistancia) L.push('−1 de daño por casillero de distancia');
+    if(du.critTipo) L.push(`Critica como un arma de Tipo ${du.critTipo}`);
+    if(du.efectoLibre) L.push(`✋ ${du.efectoLibre}`);
+    if(du.efectosNota) L.push(`✋ ${du.efectosNota}`);
+    return L;
+  }
+  const trampaTxt = t => (typeof AsistenteTrampa !== 'undefined' && AsistenteTrampa.resumenTexto) ? AsistenteTrampa.resumenTexto(t) : `${t.nombre || 'Trampa'}${t.dano ? ` · ${t.dano}` : ''}`;
+  // Lo que la trampa de un arma especial trae y el asistente de trampas no conoce (los pilares, el portal): se conserva al ajustarla.
+  const TRAMPA_CONSERVA = ['pilar', 'portal'];
+  const costoEspTxt = es => {
+    const sp = Math.max(0, Math.round(n(es.sp))), no2 = Math.max(0, Math.round(n(es.no2 ?? 1))), sube = Math.max(0, Math.round(n(es.sube ?? 1)));
+    return `${no2} No2${sp ? ` + ${sp} SP (sin SP: ${no2 + sp} No2)` : ''}${sube ? `; el No2 sube ${sube} por cada uso más en el turno` : ''}`;
+  };
+  const esperaCreep = es => (typeof CreepAcciones !== 'undefined' && CreepAcciones.ESPERA_POR_SP) ? CreepAcciones.ESPERA_POR_SP(n(es.sp)) : (n(es.sp) <= 0 ? 0 : n(es.sp) <= 2 ? 1 : 2);
+  const espCostoHtml = es => `Cuesta <b>${e(costoEspTxt(es))}</b>. Un creep no tiene SP: la paga con <b>${esperaCreep(es)} turno(s) de espera</b> (provisorio).`;
+
   let st = null;  // {cfg, d, destino, estadoAbierto, api (la ventana común), inicial}
   let cssPuesto = false;
   const enVentana = sel => st && st.api ? st.api.raiz.querySelector(sel) : null;
@@ -111,10 +159,12 @@ const AsistenteItem = (() => {
     const {cfg, d} = st;
     const g = grupoDe(d.tipoItem);
     const L = [{id: 'que', corto: 'Qué es'}];
-    if(g === 'arma') L.push({id: 'tipo', corto: 'Tipo'}, {id: 'empunadura', corto: 'Empuñadura'}, {id: 'dano', corto: 'Peso y daño'});
-    if(g === 'defensa') L.push({id: 'defensa', corto: 'Defensa'});
+    const esp = esEspecial(d), orbe = esOrbe(d);
+    if(g === 'arma' && !esp) L.push({id: 'tipo', corto: 'Tipo'}, {id: 'empunadura', corto: 'Empuñadura'}, {id: 'dano', corto: 'Peso y daño'});
+    if(esp) L.push({id: 'empunadura', corto: 'Empuñadura'}, {id: 'hechizo', corto: 'Hechizo'}, {id: 'ejecucion', corto: 'Qué hace ✨'}, {id: 'amano', corto: '✋ A mano'});
+    if(g === 'defensa') L.push(orbe ? {id: 'orbe', corto: 'Orbe'} : {id: 'defensa', corto: 'Defensa'});
     if(g) L.push({id: 'bonos', corto: 'Bonos'});
-    if(g === 'arma') L.push({id: 'golpe', corto: 'Al golpear'});
+    if(g === 'arma' && !esp) L.push({id: 'golpe', corto: 'Al golpear'});
     if(g && cfg.conEstadoEquipar) L.push({id: 'equipar', corto: 'Al equipar'});
     if(g && (cfg.conPrecio || cfg.conRanuras || cfg.conLugar || g !== 'arma')) L.push({id: 'lugar', corto: cfg.conPrecio ? 'Precio' : 'Peso'});
     L.push({id: 'listo', corto: 'Listo'});
@@ -267,6 +317,15 @@ const AsistenteItem = (() => {
           <div class="aa-opciones">${permitidas.filter(c => c.grupo === gr).map(c => op('cat', c.id, d.tipoItem === c.id, e(c.label))).join('')}</div>`).join('')}</div>`;
         if(g) h += efecto(explicaCategoria(d.tipoItem, q));
       }
+      if(g === 'arma' && !cfg.sinEspecial){
+        h += campo('¿Qué clase de arma?', `<div class="aa-opciones">${op('clase', 'fisica', !d.especial, '⚔ Física (Tipo, peso y daño)')}${op('clase', 'especial', !!d.especial, '✨ Especial: varita o báculo')}</div>`,
+          d.especial ? 'Un <b>hechizo equipable</b>: se usa desde Atacar («✨ Atacar · nombre»), cuesta No2 y SP (un creep paga el SP con espera) y hace lo que diga su Ejecución ✨. No tiene Tipo, ni daño físico, ni Parry.'
+            : 'Un arma de las de siempre: Tipo, dados por Peso, Dmg, críticos.');
+      }
+      if(d.tipoItem === 'escudo_1m'){
+        h += campo('¿Escudo u orbe?', `<div class="aa-opciones">${op('orbe', '0', !d.orbe, '🛡 Escudo')}${op('orbe', '1', !!d.orbe, '🔮 Orbe (acompaña a las varitas)')}</div>`,
+          d.orbe ? 'Va en la otra mano y <b>actúa al usar una varita o un báculo</b> (un escudo, una tirada…). No parrea ni bloquea.' : 'Un escudo de los de siempre: Defensa, Bloqueo, Parry.');
+      }
       h += campo('Nombre', input('nombre', d.nombre, 'placeholder="ej. Hacha oxidada del pantano"'),
         q.ctx === 'creep' ? 'Se lee en la tarjeta del creep y en la Mesa.'
           : q.ctx === 'ficha' ? 'Aparece en tu Equipo, en la Botonera y en la Mesa.'
@@ -315,7 +374,8 @@ const AsistenteItem = (() => {
     }
 
     if(paso.id === 'empunadura'){
-      titulo('¿Cómo se empuña y a qué distancia pega?', 'Las manos que ocupa definen qué más se puede llevar al mismo tiempo; la distancia define si el daño suma el Dmg (que sale de la Fuerza).');
+      if(esEspecial(d)) titulo('¿Con cuántas manos se empuña?', 'Las manos que ocupa definen qué más se puede llevar al mismo tiempo (con una mano, en la otra puede ir un orbe).');
+      else titulo('¿Cómo se empuña y a qué distancia pega?', 'Las manos que ocupa definen qué más se puede llevar al mismo tiempo; la distancia define si el daño suma el Dmg (que sale de la Fuerza).');
       const dos = d.tipoItem === 'arma_2m';
       h += campo('Manos', `<div class="aa-opciones">${op('manos', 'arma_1m', !dos, 'Una mano')}${op('manos', 'arma_2m', dos, 'Dos manos')}</div>`);
       h += efecto(q.ctx === 'creep'
@@ -325,6 +385,7 @@ const AsistenteItem = (() => {
           : 'Ocupa <b>una mano</b>: la otra queda libre para un escudo o una segunda arma. Con dos armas, cada una paga su propio primer ataque del turno y el PdG de cada una solo cuenta cuando se ataca con ella.');
       if(p && p.manosUsadas !== undefined) h += `<div class="aa-nota">Manos ocupadas hoy: ${f(n(p.manosUsadas))} de 2.</div>`;
       if(cfg.conMano && !dos) h += campoMano(d);
+      if(esEspecial(d)) return {h: h + efecto('Un arma especial no tiene distancia propia: hasta dónde llega lo dice su Ejecución ✨ (el Rango de casteo, una línea, un área…).'), ayuda};
       h += campo('Distancia', `<div class="aa-opciones">${op('rango', '0', !d.armaDeRango, 'Cuerpo a cuerpo')}${op('rango', '1', !!d.armaDeRango, 'A distancia')}</div>`);
       h += efecto(d.armaDeRango
         ? `Es <b>de rango</b> (arco, pistola, lanzallamas…): tiene su propia mecánica — el daño <b>no suma el Dmg</b>, es solo el del arma. No confundir con el <b>Alcance</b> de las armas cuerpo a cuerpo: son dos cosas distintas.`
@@ -369,6 +430,55 @@ const AsistenteItem = (() => {
       }
       if(q.ctx !== 'creep') h += efecto(`<span id="aa-carga">${cargaHtml()}</span>`);
       h += durCampo();
+    }
+
+    if(paso.id === 'hechizo'){
+      const es = d.especial;
+      titulo('¿Cuánto cuesta y cuánto daño hace?', 'Usar un arma especial cuesta <b>No2</b> (el primer uso del turno; sube con cada uso más) y <b>SP</b> (sin SP alcanza, se paga con No2). El daño se tira al pegar; puede sumar el <b>Ef.Esp</b> de quien la usa.');
+      const ne = (k, v) => `<input data-aa-esp1="${k}" type="number" step="1" min="0" value="${e(v)}" style="max-width:110px">`;
+      h += `<div class="aa-fila">${campo('SP', ne('sp', Math.round(n(es.sp))))}${campo('No2 (primer uso)', ne('no2', Math.round(n(es.no2 ?? 1))))}${campo('+ No2 por uso más', ne('sube', Math.round(n(es.sube ?? 1))))}</div>`;
+      h += efecto(`<span id="aa-espcosto">${espCostoHtml(es)}</span>`);
+      h += campo('Daño (fórmula; vacío = no hace daño)', `<input data-aa-esp1="dano" value="${e(es.dano || '')}" placeholder="ej. 1d6" style="max-width:160px">`,
+        'El tipo (arcano, fuego, hielo…) y a quién le pega se eligen en el paso siguiente, «Qué hace ✨».');
+      const suma = es.sumaEspecial === true ? 'si' : n(es.sumaEspecial) === 0.5 ? 'mitad' : 'no';
+      h += campo('¿Suma el Ef.Esp de quien la usa?', `<div class="aa-opciones">${op('sumaesp', 'no', suma === 'no', 'No')}${op('sumaesp', 'si', suma === 'si', 'Sí, entero')}${op('sumaesp', 'mitad', suma === 'mitad', 'La mitad')}</div>`);
+      h += campo('Peso', num('peso', d.peso, 'step="1" min="1" style="max-width:120px"'), 'Una varita pesa 1; un báculo, 2.');
+      if(q.ctx !== 'creep') h += efecto(`<span id="aa-carga">${cargaHtml()}</span>`);
+      h += durCampo();
+    }
+
+    if(paso.id === 'ejecucion'){
+      const es = d.especial, du = es.duelo, t = es.trampaColocar, pr = es.estadoPropio;
+      titulo('¿Qué hace al usarla?', 'Su <b>Ejecución ✨</b>: a quién apunta, qué tira y contra qué, el daño y los efectos (lo mismo que una habilidad automatizada). Puede además <b>colocar una trampa</b>. Lo que no se pueda automatizar va en el paso siguiente, «✋ A mano».');
+      const hayEj = typeof AsistenteDueloHab !== 'undefined';
+      const conservado = du && ['cadena', 'reparte', 'zonaQueda', 'atrae', 'menosDistancia', 'critTipo', 'conVista', 'niebla'].some(k => du[k] !== undefined);
+      h += `<div class="aa-campo"><label>Ejecución ✨</label>${du ? efecto(ejecucionLineas(du).map(e).join('<br>')) : '<div class="aa-nota" style="margin:0 0 8px">Sin Ejecución: no apunta a nadie.</div>'}
+        <div class="aa-opciones">${hayEj ? `<button type="button" class="aa-op" data-aa-ejec="1">${du ? '✨ Ajustar la Ejecución' : '✨ Armar la Ejecución'}</button>` : ''}${du ? '<button type="button" class="aa-op" data-aa-ejecrm="1">Quitar</button>' : ''}</div>
+        ${hayEj ? '' : '<div class="aa-nota">La Ejecución se arma desde la ficha o GM Tools (esta pantalla no tiene ese asistente).</div>'}
+        ${conservado ? '<div class="aa-nota">«Salta», «misiles», «deja una zona», «atrae», «−1 por casillero», «critica como», la luz y la niebla todavía no se editan en la Ejecución: al ajustarla se conservan tal cual.</div>' : ''}</div>`;
+      const hayTr = typeof ElegirTrampa !== 'undefined' || typeof AsistenteTrampa !== 'undefined';
+      h += `<div class="aa-campo"><label>🪤 Trampa</label>${t ? efecto(e(trampaTxt(t)) + (t.pilar ? '<br>Levanta pilares sólidos (uno por clic).' : '') + (t.portal ? `<br>Portal: marcás también el destino (a ${e(t.portal.rango || '?')} casillas como mucho).` : '')) : '<div class="aa-nota" style="margin:0 0 8px">No coloca ninguna trampa.</div>'}
+        <div class="aa-opciones">${hayTr ? `<button type="button" class="aa-op" data-aa-trampa="1">${t ? '🪄 Ajustar la trampa' : '🪤 Coloca una trampa'}</button>` : ''}${t ? '<button type="button" class="aa-op" data-aa-tramparm="1">Quitar</button>' : ''}</div></div>`;
+      if(pr && pr.nombre) h += `<div class="aa-campo"><label>Se pone quien la usa</label>${efecto(`<b>${e(pr.nombre)}</b>${pr.turnos ? ` ${e(pr.turnos)} turno(s)` : ''}${pr.detalle ? ` — ${e(pr.detalle)}` : ''}`)}<div class="aa-opciones"><button type="button" class="aa-op" data-aa-propiorm="1">Quitar</button></div></div>`;
+      if(!du && !t) h += `<div class="aa-nota">Sin Ejecución ni trampa, al usarla solo cobra y se anuncia: contá qué hace en «✋ A mano».</div>`;
+    }
+
+    if(paso.id === 'amano'){
+      const am = d.especial.aMano || {};
+      titulo('¿Algo se resuelve a mano?', 'Si una parte es demasiado compleja para automatizarla, contala acá: al usar el arma, <b>el texto va a la Mesa</b> («✋ A mano: …») y, si ponés una tirada, <b>se tira sola</b> con ese texto, para que la mesa lo resuelva con el número a la vista. Si todo está automatizado, seguí.');
+      h += campo('Qué hay que resolver a mano', `<textarea data-aa-amano="texto" rows="3" placeholder="ej. Si el objetivo está mojado, el daño se duplica.">${e(am.texto || '')}</textarea>`);
+      h += `<div class="aa-fila">${campo('Tirada (opcional)', `<input data-aa-amano="tirada" value="${e(am.tirada || '')}" placeholder="ej. 1d6" style="max-width:140px">`)}${campo('Nombre de la tirada', `<input data-aa-amano="etiqueta" value="${e(am.etiqueta || '')}" placeholder="ej. Chispa" style="max-width:200px">`)}</div>`;
+      h += efecto(`<span id="aa-amano">${amanoHtml()}</span>`);
+      h += `<div class="aa-nota" id="aa-amano-ok" style="color:#d95a6e">${tiradaValida(am.tirada) ? '' : 'La tirada tiene que ser una fórmula de dados (ej. 1d6, 2d4+1).'}</div>`;
+      h += `<div class="aa-nota">Dejalo también en la descripción («✋ A mano: …»), para quien mire el ítem.</div>`;
+    }
+
+    if(paso.id === 'orbe'){
+      titulo('¿Qué hace el orbe?', 'Un orbe actúa <b>cada vez que se usa una varita o un báculo</b> con él en la otra mano. Los bonos que dé mientras se lleva (luz, visión…) van en el paso siguiente.');
+      h += campo('🛡 Resguardo: Escudo especial', `<input data-aa-orbe1="orbeResguardo" type="number" step="1" min="0" value="${Math.round(n(d.orbeResguardo)) || 0}" style="max-width:110px">`,
+        'Una vez por turno, al usar una varita: Escudo especial de este valor hasta tu próximo turno. 0 = no.');
+      h += `<label style="display:flex;gap:6px;align-items:center;font-size:12.5px;margin-bottom:10px"><input type="checkbox" data-aa-orbe1="orbeSalvaje" ${d.orbeSalvaje ? 'checked' : ''} style="width:auto"> 🎲 Salvaje: al usar una varita, 1d6 — con 1 te hace 1 de daño; con 6, el efecto sale doble</label>`;
+      h += efecto(`<span id="aa-orbe">${orbeHtml(d)}</span>`);
     }
 
     if(paso.id === 'defensa'){
@@ -499,7 +609,12 @@ const AsistenteItem = (() => {
         ${fila('Tipo de ítem', e(labelDe(d.tipoItem)))}
         ${cfg.destinos ? fila(cfg.destinos.label, e(dest || '—')) : ''}
         ${cfg.tiers ? fila('Tier', e(d.tier)) : ''}
-        ${g === 'arma' ? fila('Tipo', e(`Tipo ${tipo} · ${TIPOS[tipo].nombre}`)) + fila('Distancia', d.armaDeRango ? 'a distancia (no suma Dmg)' : 'cuerpo a cuerpo')
+        ${esEspecial(d) ? fila('Clase', '✨ arma especial') + fila('Cuesta', e(costoEspTxt(d.especial))) + fila('Daño', e(d.especial.dano ? d.especial.dano + (d.especial.sumaEspecial === true ? ' + Ef.Esp' : n(d.especial.sumaEspecial) === 0.5 ? ' + la mitad del Ef.Esp' : '') : 'no hace'))
+          + fila('Qué hace ✨', d.especial.duelo ? e(ejecucionLineas(d.especial.duelo).join(' · ')) : 'sin Ejecución')
+          + (d.especial.trampaColocar ? fila('Trampa', e(trampaTxt(d.especial.trampaColocar))) : '')
+          + (aManoTxt(d.especial) ? fila('✋ A mano', e(aManoTxt(d.especial))) : '') : ''}
+        ${esOrbe(d) ? fila('Clase', '🔮 orbe') + fila('Al usar una varita', e([n(d.orbeResguardo) ? `Escudo especial ${Math.round(n(d.orbeResguardo))} (1 vez por turno)` : '', d.orbeSalvaje ? '1d6 salvaje' : ''].filter(Boolean).join(' · ') || 'nada')) : ''}
+        ${g === 'arma' && !esEspecial(d) ? fila('Tipo', e(`Tipo ${tipo} · ${TIPOS[tipo].nombre}`)) + fila('Distancia', d.armaDeRango ? 'a distancia (no suma Dmg)' : 'cuerpo a cuerpo')
           + fila('Daño', e(danoTxt(d))) + fila('Atacar', `${primer(tipo)} No2 el primero, ${tipo} los siguientes`)
           + (modVal(d, 'rng') ? fila(d.armaDeRango ? 'Rango' : 'Alcance', `+${f(modVal(d, 'rng'))}`) : '')
           + (n(d.ignoraResistCrit) > 0 ? fila('Ignora', `${f(n(d.ignoraResistCrit))} de Resistencia a crítico`) : '')
@@ -507,7 +622,7 @@ const AsistenteItem = (() => {
             ? fila('Firma', e([d.sinParry ? 'no se puede parrear' : '', d.oporGratis ? 'oportunidad sin No2' : '', n(d.ahorroNitros) ? `primer ataque −${f(n(d.ahorroNitros))} No2` : '', n(d.critD20) ? `+${f(n(d.critD20))} d20 en el crítico` : ''].filter(Boolean).join(' · '))) : '')
           + (!d.armaDeRango && espaldaTxt(d.espalda) ? fila('Por la espalda', e(espaldaTxt(d.espalda) + ' (en sigilo)')) : '')
           + fila('Al golpear', e((eg && eg.resumenLista(d.efectosGolpe)) || 'nada')) : ''}
-        ${g === 'defensa' ? fila('Defensa', f(modVal(d, 'def'))) + fila('Res. crítico', e(CRIT_IDS.filter(id => modVal(d, id)).map(id => `T${CRIT_TIPO[id]} +${f(modVal(d, id))}`).join(', ') || 'ninguna')) : ''}
+        ${g === 'defensa' && !esOrbe(d) ? fila('Defensa', f(modVal(d, 'def'))) + fila('Res. crítico', e(CRIT_IDS.filter(id => modVal(d, id)).map(id => `T${CRIT_TIPO[id]} +${f(modVal(d, id))}`).join(', ') || 'ninguna')) : ''}
         ${fila('Bonos', e(bonos || 'ninguno'))}
         ${cfg.conEstadoEquipar ? fila('Al equipar', e(String(d.equipoEstadoNombre || '').trim() || 'ningún estado')) : ''}
         ${q.ctx !== 'creep' || g !== 'arma' ? fila('Peso', f(n(d.peso))) : ''}
@@ -520,6 +635,41 @@ const AsistenteItem = (() => {
     return {h, ayuda};
   }
 
+  const orbeHtml = d => n(d.orbeResguardo) || d.orbeSalvaje ? `⚙ Automatizado: ${[n(d.orbeResguardo) ? `Escudo especial ${Math.round(n(d.orbeResguardo))}, una vez por turno` : '', d.orbeSalvaje ? 'la tirada de 1d6 y los dados del daño ×2 con un 6 (el doble de un arma sin daño, a mano)' : ''].filter(Boolean).join('; ')}.` : 'Sin efecto al usar una varita: solo sus bonos (si tiene).';
+  const aManoTxt = es => { const a = es && es.aMano; return a ? [String(a.texto || '').trim(), String(a.tirada || '').trim() ? `tira ${String(a.tirada).trim()}` : ''].filter(Boolean).join(' · ') : ''; };
+  const tiradaValida = t => { const x = String(t || '').replace(/\s+/g, ''); return !x || (typeof parseDados === 'function' ? !!parseDados(x) : /^\d*d\d+([+-]\d+)?$/i.test(x)); };
+  function amanoHtml(){
+    const am = (st.d.especial && st.d.especial.aMano) || {}, txt = String(am.texto || '').trim(), tir = String(am.tirada || '').trim();
+    if(!txt && !tir) return 'Nada a mano: todo lo que hace está en su Ejecución ✨ (o en su trampa).';
+    return `Al usarla, la Mesa recibe ${tir ? `la tirada <b>${e(am.etiqueta || 'A mano')}: ${e(tir)}</b> con el texto` : 'el texto'} «✋ A mano: ${e(txt || '…')}».`;
+  }
+  // La Ejecución ✨ de un arma especial: la misma ventana que las habilidades (comun/asistente-duelo-hab.js), con el costo del arma.
+  function abrirEjecucion(){
+    const yo = st, es = st.d.especial;
+    AsistenteDueloHab.abrir({nombre: st.d.nombre || 'Arma especial', inicial: es.duelo || null, siempreActivo: true, tieneFormula: !!String(es.dano || '').trim(),
+      costoInicial: {sp: String(Math.round(n(es.sp))), nitrosCosto: Math.round(n(es.no2 ?? 1))}, elegirEstado: st.cfg.elegirEstado,
+      alGuardar: r => {
+        if(st !== yo) return;
+        if(r){
+          es.duelo = r.duelo;
+          if(r.costo){ const sp = parseInt(r.costo.sp, 10); if(Number.isFinite(sp)) es.sp = Math.max(0, sp); const nn = parseInt(r.costo.nitrosCosto, 10); if(Number.isFinite(nn)) es.no2 = Math.max(0, nn); }
+        }else delete es.duelo;
+        dibujar();
+      }});
+  }
+  function abrirTrampa(){
+    const yo = st, es = st.d.especial, vieja = es.trampaColocar || null;
+    const listo = t => {
+      if(st !== yo || !t) return;
+      const nueva = structuredClone(t);
+      if(vieja) TRAMPA_CONSERVA.forEach(k => { if(vieja[k] !== undefined && nueva[k] === undefined) nueva[k] = structuredClone(vieja[k]); });
+      es.trampaColocar = nueva;
+      dibujar();
+    };
+    if(typeof ElegirTrampa !== 'undefined') ElegirTrampa.abrir({inicial: vieja, alTerminar: listo, alCancelar: () => {}, z: 99400});
+    else AsistenteTrampa.abrir({contexto: 'habilidad', inicial: vieja ? AsistenteTrampa.inicialDe(vieja) : null, alTerminar: r => listo(AsistenteTrampa.aTrampa(r)), alCancelar: () => {}});
+  }
+
   function campoMano(d){
     return campo('Mano', `<select data-aa-c="manoPreferida">
         <option value="" ${!d.manoPreferida ? 'selected' : ''}>Automática</option>
@@ -530,6 +680,7 @@ const AsistenteItem = (() => {
 
   function explicaCategoria(id, q){
     const g = grupoDe(id);
+    if(g === 'arma' && st && st.d.especial) return `<b>Arma especial</b>: un hechizo equipable (varita, báculo). ${id === 'arma_2m' ? 'Ocupa las dos manos.' : 'Ocupa una mano; en la otra puede ir un orbe.'}`;
     if(g === 'arma') return `<b>Arma</b>: tiene Tipo, daño y ${q.ctx === 'creep' ? 'reemplaza el arma del creep' : 'aparece en la Botonera para atacar'}. ${id === 'arma_2m' ? 'Ocupa las dos manos.' : 'Ocupa una mano.'}`;
     if(g === 'defensa') return `<b>Defensa</b>: da Defensa y resistencia a críticos. ${/^escudo/.test(id) ? `Va en ${id === 'escudo_2m' ? 'las dos manos' : 'una mano'}.` : `Ocupa el lugar de ${labelDe(id).toLowerCase()}.`}`;
     if(id === 'cinturon') return '<b>Cinturón</b>: puede dar lugares extra para consumibles, además de bonos.';
@@ -602,6 +753,14 @@ const AsistenteItem = (() => {
       d.tipoItem = ds.aaCat;
       if(grupoDe(d.tipoItem) === 'arma' && !n(d.peso)) d.peso = 1;
     }
+    else if(ds.aaClase){ if(ds.aaClase === 'especial'){ d.especial = d.especial || ESPECIAL_NUEVA(); d.armaDeRango = false; } else delete d.especial; }
+    else if(ds.aaOrbe !== undefined){ if(ds.aaOrbe === '1') d.orbe = true; else { delete d.orbe; delete d.orbeResguardo; delete d.orbeSalvaje; } }
+    else if(ds.aaSumaesp && d.especial){ if(ds.aaSumaesp === 'si') d.especial.sumaEspecial = true; else if(ds.aaSumaesp === 'mitad') d.especial.sumaEspecial = 0.5; else delete d.especial.sumaEspecial; }
+    else if(ds.aaEjec && d.especial){ abrirEjecucion(); return; }
+    else if(ds.aaEjecrm && d.especial) delete d.especial.duelo;
+    else if(ds.aaTrampa && d.especial){ abrirTrampa(); return; }
+    else if(ds.aaTramparm && d.especial) delete d.especial.trampaColocar;
+    else if(ds.aaPropiorm && d.especial) delete d.especial.estadoPropio;
     else if(ds.aaTipo) d.tipoDado = n(ds.aaTipo);
     else if(ds.aaManos) d.tipoItem = ds.aaManos;
     else if(ds.aaRango) d.armaDeRango = ds.aaRango === '1';
@@ -637,6 +796,13 @@ const AsistenteItem = (() => {
       if(c === 'precioCompra') poner('aa-precio', precioHtml());
     }
     if(t.dataset.aaMod1) setMod(d, t.dataset.aaMod1, n(t.value));
+    if(t.dataset.aaEsp1 && d.especial){
+      const k = t.dataset.aaEsp1;
+      d.especial[k] = k === 'dano' ? t.value : Math.max(0, Math.round(n(t.value)));
+      poner('aa-espcosto', espCostoHtml(d.especial));
+    }
+    if(t.dataset.aaAmano && d.especial){ d.especial.aMano = {...(d.especial.aMano || {}), [t.dataset.aaAmano]: t.value}; poner('aa-amano', amanoHtml()); poner('aa-amano-ok', tiradaValida(d.especial.aMano.tirada) ? '' : 'La tirada tiene que ser una fórmula de dados (ej. 1d6, 2d4+1).'); }
+    if(t.dataset.aaOrbe1){ const k = t.dataset.aaOrbe1; if(k === 'orbeSalvaje'){ if(t.checked) d.orbeSalvaje = true; else delete d.orbeSalvaje; } else d[k] = Math.max(0, Math.round(n(t.value))); poner('aa-orbe', orbeHtml(d)); }
     if(t.dataset.aaFirma){ if(t.checked) d[t.dataset.aaFirma] = true; else delete d[t.dataset.aaFirma]; }
     if(t.dataset.aaEsp) d.espalda = {...(d.espalda || {}), [t.dataset.aaEsp]: Math.max(0, Math.round(n(t.value)))};
     if(t.dataset.aaModstat !== undefined) d.mods[n(t.dataset.aaModstat)].stat = t.value;
@@ -678,7 +844,22 @@ const AsistenteItem = (() => {
     d.mods = d.mods.filter(m => m.stat && n(m.val));
     const eg = EG();
     d.efectosGolpe = eg ? eg.lista(d.efectosGolpe) : d.efectosGolpe.filter(x => String(x.nombre || '').trim());
-    if(grupoDe(d.tipoItem) === 'arma'){
+    if(esEspecial(d)){
+      // ✨ Un arma especial: su hechizo, sin lo físico (Tipo, dados, Dmg, rasgos, efectos al golpear).
+      const es = d.especial;
+      es.sp = Math.max(0, Math.round(n(es.sp)));
+      es.no2 = Math.max(0, Math.round(n(es.no2 ?? 1))); if(es.no2 === 1) delete es.no2;
+      es.sube = Math.max(0, Math.round(n(es.sube ?? 1))); if(es.sube === 1) delete es.sube;
+      es.dano = String(es.dano || '').replace(/\s+/g, ''); if(!es.dano) delete es.dano;
+      if(es.sumaEspecial !== true && n(es.sumaEspecial) !== 0.5) delete es.sumaEspecial;
+      const am = es.aMano || {}, amT = String(am.texto || '').trim(), amR = String(am.tirada || '').replace(/\s+/g, ''), amE = String(am.etiqueta || '').trim();
+      if(amT || amR) es.aMano = {...(amT ? {texto: amT} : {}), ...(amR ? {tirada: amR} : {}), ...(amE ? {etiqueta: amE} : {})}; else delete es.aMano;
+      d.peso = Math.max(1, n(d.peso) || 1);
+      ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', ...(typeof Combatiente !== 'undefined' ? Combatiente.RASGOS_ARMA : ['ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20'])].forEach(k => delete d[k]);
+      if(!(d.efectosGolpe || []).length) delete d.efectosGolpe;
+      d.mods = d.mods.filter(m => m.stat !== 'rng');
+    }else if(grupoDe(d.tipoItem) === 'arma'){
+      delete d.especial;
       d.peso = Math.max(1, n(d.peso) || 1);
       d.danoAmplificado = Math.max(0, n(d.danoAmplificado));
       const es = d.espalda || {}, eo = {};
@@ -689,6 +870,9 @@ const AsistenteItem = (() => {
       ['sinParry', 'oporGratis'].forEach(k => { if(d[k]) d[k] = true; else delete d[k]; });
     }else{
       // Lo que es solo de armas no viaja en el resto.
+      delete d.especial;
+      if(esOrbe(d)){ d.orbe = true; if(Math.round(n(d.orbeResguardo)) > 0) d.orbeResguardo = Math.round(n(d.orbeResguardo)); else delete d.orbeResguardo; if(d.orbeSalvaje) d.orbeSalvaje = true; else delete d.orbeSalvaje; }
+      else { delete d.orbe; delete d.orbeResguardo; delete d.orbeSalvaje; }
       delete d.efectosGolpe; delete d.tipoDado; delete d.danoFijo; delete d.danoAmplificado; delete d.armaDeRango; delete d.espalda; delete d.ignoraResistCrit; delete d.sinParry; delete d.oporGratis; delete d.ahorroNitros; delete d.critD20;
     }
     // Durabilidad: solo se guarda si no es la de siempre (3 por Peso) y el ítem la tiene.
@@ -712,5 +896,16 @@ const AsistenteItem = (() => {
 
   const esCategoriaDelAsistente = id => !!grupoDe(id) && grupoDe(id) !== 'consumible';
 
-  return {abrir, cerrar, abierto: () => !!st, esCategoriaDelAsistente, grupoDe, CATEGORIAS, TIPOS, DADOS};
+  /* El ítem guardado = lo que había (`base`) con lo que devolvió el asistente (`d`) encima, SIN lo que el asistente sacó a propósito (2026-10-05):
+     con `{...base, ...d}` a una varita le quedaba el Tipo 8 de fábrica (y con él, daño físico y Parry), y a un arma que dejó de ser especial, su
+     hechizo. Todas las pantallas guardan con esto. */
+  const CONTROLADOS = ['especial', 'orbe', 'orbeResguardo', 'orbeSalvaje', 'tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', 'efectosGolpe',
+    'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'durExtra', 'durPorPeso'];
+  function fusionar(base, d){
+    const o = {...(base || {}), ...(d || {})};
+    CONTROLADOS.forEach(k => { if(!(k in (d || {}))) delete o[k]; });
+    return o;
+  }
+
+  return {abrir, fusionar, cerrar, abierto: () => !!st, esCategoriaDelAsistente, grupoDe, CATEGORIAS, TIPOS, DADOS};
 })();

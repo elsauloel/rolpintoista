@@ -156,6 +156,7 @@ function portadorCreep(scId){
 function cfgItemGM(){
   return {
     contexto: 'creep',
+    elegirEstado: () => elegirEstadoDuelo(),   // el «+ Estado» de la Ejecución ✨ de un arma especial
     stats: [...CREEP_DERIVED_STATS.map(s => ({id: s.id, label: s.label})),
       ...['tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5'].map(id => ({id, label: `Res. crítico ${STAT_LABEL_GM[id]}`})),
       {id: 'armadmg', label: 'Armadura mágica'},
@@ -194,19 +195,19 @@ function ponerEquipoEnCreep(sc, d){
   sc.defensa = num(sc.defensa) + def;
   aplicarModsEquipo(sc, mods, 1);
   sc.equipo = sc.equipo || [];
-  sc.equipo.push({id: uid(), nombre: d.nombre, tipoItem: d.tipoItem, def, mods, detalle: d.detalle || ''});
+  sc.equipo.push({id: uid(), nombre: d.nombre, tipoItem: d.tipoItem, def, mods, detalle: d.detalle || '', ...CreepCalculo.magiaDeItem(d)});
   actualizarArmaduraTipo(sc);
   if(modsAfectanHp(mods)) actualizarHpMaxPorCon(sc);
 }
 
 function itemComoEntradaCatalogoGM(d){
-  const esArma = String(d.tipoItem).startsWith('arma_');
+  const esArma = String(d.tipoItem).startsWith('arma_') && !d.especial;
   return {
     id: 'new-' + slugItemCatalogo(d.nombre), nombre: d.nombre, tier: d.tier || 'A definir', imagen: '',
     tipoItem: d.tipoItem, peso: num(d.peso), ranuras: num(d.ranuras), precioCompra: num(d.precioCompra),
     ...(esArma ? {tipoDado: d.tipoDado, danoFijo: num(d.danoFijo), danoAmplificado: num(d.danoAmplificado), armaDeRango: !!d.armaDeRango, efectosGolpe: d.efectosGolpe || []} : {}),
     unidades: 1, cargaMax: 0, consumible: false, curahp: 0, escalaTipos: ESCALA_TIPOS,
-    mods: d.mods || [], detalle: d.detalle || '', descripcionNarrativa: d.descripcionNarrativa || '',
+    mods: d.mods || [], detalle: d.detalle || '', descripcionNarrativa: d.descripcionNarrativa || '', ...CreepCalculo.magiaDeItem(d),
   };
 }
 
@@ -217,6 +218,7 @@ function abrirEditorArmaCreep(scId){
     titulo: `Arma de ${sc.nombre}`,
     nuevo: false,
     fijarCategoria: true,
+    sinEspecial: true,   // una varita no es el arma del creep: va a su equipo («✎ Ítem custom» o Equipar)
     draft: armaDeCreepComoDraft(sc),
     portador: () => portadorCreep(scId),
     tiers: Object.keys(TIER_COLOR),
@@ -254,8 +256,8 @@ function abrirItemCustomGM(){
     onGuardar: (d, scId) => {
       const sc = S.creeps.find(s => s.id === scId);
       if(!sc){ toast('Elegí a qué creep equiparlo (paso 1), o publicalo con "Agregar al catálogo"'); return false; }
-      if(String(d.tipoItem).startsWith('arma_')) ponerArmaEnCreep(sc, d);
-      else ponerEquipoEnCreep(sc, d);
+      if(CreepCalculo.vaAlEquipo(d)) ponerEquipoEnCreep(sc, d);   // (una varita va al equipo)
+      else ponerArmaEnCreep(sc, d);
       toast(`${sc.nombre} equipado con ${d.nombre}`);
       registrarEvento(`✎ Ítem custom: ${sc.nombre} equipado con ${d.nombre}`);
       renderAll();

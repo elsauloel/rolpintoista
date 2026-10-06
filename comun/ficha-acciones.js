@@ -598,6 +598,17 @@ const FichaAcciones = (() => {
     });
     return doble;
   }
+  // ✋ La parte a mano (Combatiente.aManoEspecial): el texto a la Mesa y, si hay, su tirada (con el texto pegado).
+  function aManoAlUsar(nombre, e, ui){
+    const am = Combatiente.aManoEspecial(e);
+    if(!am) return;
+    const r = am.tirada && typeof tirarDados === 'function' ? tirarDados(am.tirada) : null;
+    if(am.tirada && !r) ui.toast(`${nombre}: la tirada «${am.tirada}» no es una fórmula válida`);
+    if(r && ui.registrarTirada){
+      if(am.texto && typeof mesaConTexto === 'function') mesaConTexto('✋ A mano: ' + am.texto);
+      ui.registrarTirada(`${nombre} · ${am.etiqueta}`, r);
+    }else if(am.texto) ui.mesaHabilidad(nombre, '✋ A mano: ' + am.texto);
+  }
   async function usarArmaEspecial(S, itemId, forzar, ui, sinSp){
     const item = armasEspeciales(S).find(x => x.id === itemId);
     if(!item){ ui.toast('Esa arma especial no está equipada'); return; }
@@ -627,6 +638,7 @@ const FichaAcciones = (() => {
     }
     ui.colocarTrampa(it);
     ui.terminar(it, null, 0, 0);
+    aManoAlUsar(it.nombre, item.especial, ui);
     ui.cambio(['nitros', 'vitals', 'habilidades', 'efectos']);
     ui.toast(`${it.nombre}: −${fmt(no2)} No2${sp ? ` · −${fmt(sp)} SP` : ''}${sinSp ? ' (sin SP: pagado con No2)' : ''}`);
   }

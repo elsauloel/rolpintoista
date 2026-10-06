@@ -422,6 +422,12 @@ const CreepAcciones = (() => {
       }
     });
     p.hab = h; p.avisosOrbe = avisos; p.espera = c.espera;
+    // ✋ La parte a mano: el texto y, si hay, su tirada ya hecha (la publica cada pantalla con acPublicar / su Mesa).
+    const am = Combatiente.aManoEspecial(it.especial);
+    if(am){
+      const r = am.tirada && typeof tirarDados === 'function' ? tirarDados(am.tirada) : null;
+      p.aMano = {texto: am.texto, tirada: r ? {origen: `${it.nombre} · ${am.etiqueta}`, r} : null};
+    }
     return p;
   }
   // La habilidad de la varita para lo que sigue (terminarHab), con el «doble» del orbe salvaje si salió.

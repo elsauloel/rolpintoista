@@ -207,8 +207,14 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [x] **Pegar las reglas de Firestore** (dueño, pegadas el 2026-10-05): la Alforja compartida (paquetes «pedido») y, desde el 2026-10-05, el campo
   `niebla` de los elementos (Varita de niebla). Sin eso la niebla no se puede poner («faltan publicar las reglas nuevas»).
 - [ ] **Creeps de cooldown a SP** (dueño, 2026-10-05): obra grande para después del catálogo — ver la fase 3d de `hoja-de-ruta-rework-catalogo.md`.
-- [ ] **Editar un arma especial en el asistente de ítems** (2026-10-05): `comun/asistente-item.js` todavía las trata como un arma física (Tipo, dados por
-  Peso). Hasta que se haga, las varitas se tocan en `comun/catalogo.js` (o con el script de carga). Los visores (Ver, tienda, catálogo) ya las muestran bien.
+- [x] **Editar un arma especial en el asistente de ítems** (2026-10-05): hecho. «⚔ Física / ✨ Especial» en el primer paso; una especial pasa por
+  Empuñadura · Hechizo (SP, No2, daño, Ef.Esp, peso) · Qué hace ✨ (la Ejecución de siempre y la trampa) · ✋ A mano (texto y tirada para lo que no
+  se automatiza, dueño: «siempre se debe poder agregar una tirada o texto»). Un escudo de una mano puede ser 🔮 orbe (resguardo, salvaje). La
+  Ejecución conserva lo que todavía no edita (salta, misiles, zona que queda, atrae, −1 por casillero, critica como, luz, niebla) y ahora muestra y
+  edita la probabilidad de cada efecto. Equipar una varita a un creep la manda a su equipo con su hechizo (antes perdía la magia).
+- [ ] **Editar en la Ejecución ✨ lo nuevo de las armas especiales** (2026-10-05): salta en cadena, misiles de a uno, zona que queda, atrae, −1 por
+  casillero, critica como un Tipo, «todos los que ve» (la luz) y la nube de niebla se conservan pero solo se cambian en `comun/catalogo.js`.
+- [ ] **Armas especiales en las invocaciones** (2026-10-05): por ahora no (el asistente no ofrece «✨ Especial» para el arma de una invocación).
 - [ ] **Equipo defensivo Común para casters** (dueño, 2026-10-05): después de las armas especiales Comunes; ver la fase 3b de
   `hoja-de-ruta-rework-catalogo.md` (ej.: Sombrero humectante, +1 a la regeneración de SP).
 - [ ] **Solicitar un ítem** (dueño, 2026-10-05, para más adelante): un jugador entra a la ficha de otro, mira su mochila y aprieta «🙋 Solicitar»

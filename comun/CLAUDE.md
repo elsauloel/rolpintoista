@@ -1275,6 +1275,14 @@ versión parecida en más de una, es candidato a juntar.
   personaje; el SP se paga con ESPERA (`ESPERA_POR_SP`: SP 1–2 → 1 turno, 3+ → 2; provisorio hasta pasar los creeps a SP). La espera y los usos viven en el
   creep (`sc.esperaEspecial`, `sc.usosEspecial`), no en la varita: si la saquea un jugador, vuelve a costar SP. Botón `data-especialcreep` (Botonera del creep;
   mapa js/12 `acUsarEspecial`, GM Tools js/06).
+- **Asistente de ítems: armas especiales y orbes** (2026-10-05): `asistente-item.js` pregunta «⚔ Física / ✨ Especial» (un arma) y «🛡 Escudo / 🔮
+  Orbe» (un escudo de una mano). Especial: Empuñadura · Hechizo · Qué hace ✨ (abre `AsistenteDueloHab` con el costo del arma; la trampa con
+  `ElegirTrampa`, conservando `pilar`/`portal`) · ✋ A mano (`especial.aMano = {texto, tirada?, etiqueta?}`: al usarla, el texto a la Mesa y la
+  tirada se tira sola — `Combatiente.aManoEspecial`, en `FichaAcciones.usarArmaEspecial` y `CreepAcciones.usarEspecialCreep`). `cfg.sinEspecial`
+  (el arma de un creep o de una invocación) y `cfg.elegirEstado` (el «+ Estado» de la Ejecución). **Guardar con `AsistenteItem.fusionar(base, d)`**,
+  no con `{...base, ...d}`: si no, a una varita le vuelve el Tipo 8 de fábrica. La Ejecución (`asistente-duelo-hab.js`) conserva lo que no edita
+  (`CONSERVA`) y edita la probabilidad de cada efecto (`caras`/`exitos`). `CreepCalculo.magiaDeItem`/`vaAlEquipo`: una varita equipada a un creep va
+  a su equipo con su `especial`. El editor del catálogo y el generador de tiendas cargan ahora la Ejecución y las trampas.
 - **Marcado** (2026-10-05): preset nuevo (`marcado: true`). `Combatiente.agregarEstado`: al ponerse saca el Sigilo; mientras dura, el Sigilo
   rebota (`inmunidad` → 'Marcado'); `Combatiente.marcadoEn(estados)`. `FichaAcciones.alternarSigilo` avisa y no entra. El mapa lo hace brillar
   (`marcado`, `brilloMarca`) y lo deja ver a través de la niebla.

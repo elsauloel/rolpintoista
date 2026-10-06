@@ -394,6 +394,15 @@ const AsistenteDueloHab = (() => {
       }
       return h;
     }
+    /* ¿Con qué probabilidad entra? (2026-10-05, armas especiales: «Parálisis 1 en d10»). Las mismas opciones que los efectos al golpear de un arma
+       (EfectosGolpe.PROBABILIDADES); al usarse, el duelo tira el dado. Vacío = siempre. */
+    function probHtml(e, i){
+      const P = (typeof EfectosGolpe !== 'undefined' && EfectosGolpe.PROBABILIDADES) || [{caras: 1, exitos: 1, texto: 'Siempre'}, {caras: 2, exitos: 1, texto: '50%'}, {caras: 6, exitos: 2, texto: '33%'}, {caras: 4, exitos: 1, texto: '25%'}, {caras: 10, exitos: 1, texto: '10%'}];
+      const caras = Math.max(1, Number(e.caras) || 1), exitos = Math.max(1, Number(e.exitos) || 1), sel = `${caras}/${exitos}`;
+      const dado = x => x.caras > 1 ? ` (${x.exitos === 1 ? x.caras : `${x.caras - x.exitos + 1}–${x.caras}`} en d${x.caras})` : '';
+      const conocida = P.some(x => `${x.caras}/${x.exitos}` === sel);
+      return `<div class="fila" style="margin-left:22px"><span class="nota" style="margin:0">entra:</span><select data-ef-prob="${i}">${P.map(x => `<option value="${x.caras}/${x.exitos}"${`${x.caras}/${x.exitos}` === sel ? ' selected' : ''}>${esc(x.texto + dado(x))}</option>`).join('')}${conocida ? '' : `<option value="${sel}" selected>${exitos} en d${caras}</option>`}</select><span class="nota" style="margin:0">(con probabilidad, el duelo tira el dado)</span></div>`;
+    }
     // Una fila «◎ Estado» elegida del catálogo real (cfg.elegirEstado): de solo lectura, con ✎ Cambiar.
     function filaEstadoPresetHtml(e, i){
       const partes = [e.permanente ? 'no vence' : `${e.turnos ?? 0} turno${(e.turnos ?? 0) === 1 ? '' : 's'}`];
@@ -405,13 +414,13 @@ const AsistenteDueloHab = (() => {
       return `<div class="adh-ef-card">
         <div><b>◎ ${esc(e.nombre)}</b><div class="nota" style="margin:2px 0 0">${esc(partes.join(' · '))}</div>${det ? `<div class="nota" style="margin:2px 0 0">${esc(det.length > 90 ? det.slice(0, 88) + '…' : det)}</div>` : ''}</div>
         <div class="fila" style="gap:6px;flex-wrap:nowrap"><button type="button" class="sec" data-ef-recambiar="${i}">✎ Cambiar</button><button type="button" class="rojo" data-ef-x="${i}">Quitar</button></div>
-      </div>`;
+      </div>${probHtml(e, i)}`;
     }
     // Sin cfg.elegirEstado (o «Empezar en blanco»): los campos de siempre, a mano.
     function filaEstadoManualHtml(e, i){
-      return `<div class="fila"><span>◎ Estado</span><input type="text" list="adh-estados" data-ef-nombre="${i}" value="${esc(e.nombre)}" placeholder="nombre (elegí uno o escribí el tuyo)" style="width:200px"><span>durante</span><input type="number" min="0" style="width:64px" data-ef-turnos="${i}" value="${esc(e.turnos ?? 2)}"><span>turnos</span><button type="button" class="rojo" data-ef-x="${i}">Quitar</button></div>
+      return `<div class="fila"><span>◎ Estado</span><input type="text" list="adh-estados" data-ef-nombre="${i}" value="${esc(e.nombre)}" placeholder="nombre (elegí uno o escribí el tuyo)" style="width:200px"><span>durante</span><input type="number" min="0" style="width:64px" data-ef-turnos="${i}" value="${esc(e.turnos ?? '')}" placeholder="—" title="Vacío: lo que dure el estado"><span>turnos</span><button type="button" class="rojo" data-ef-x="${i}">Quitar</button></div>
           <div class="fila" style="margin-left:22px"><span class="nota" style="margin:0">y da (opcional):</span><select data-ef-stat="${i}"><option value="">— ningún bono —</option>${BONOS.map(([v, t]) => `<option value="${v}"${e.stat === v ? ' selected' : ''}>${t}</option>`).join('')}</select><input type="number" style="width:64px" data-ef-val="${i}" value="${esc(e.val ?? 1)}"><span class="nota" style="margin:0">(negativo = resta)</span></div>
-          <div class="fila" style="margin-left:22px"><span class="nota" style="margin:0">o un escudo de (opcional):</span><input type="number" min="0" style="width:64px" data-ef-escudo="${i}" placeholder="0" value="${esc(e.escudo || '')}"><span class="nota" style="margin:0">HP (absorbe daño antes que la vida — Escudo especial/Barrera)</span></div>`;
+          <div class="fila" style="margin-left:22px"><span class="nota" style="margin:0">o un escudo de (opcional):</span><input type="number" min="0" style="width:64px" data-ef-escudo="${i}" placeholder="0" value="${esc(e.escudo || '')}"><span class="nota" style="margin:0">HP (absorbe daño antes que la vida — Escudo especial/Barrera)</span></div>` + probHtml(e, i);
     }
     // Filas de una lista de efectos (◎ Estado / 💚 Cura). `clave(i)` arma la clave que llevan los data-attribute
     // (ver efRef) — así la misma función sirve para `st.efectos` (clave = i) y `st.efectosCritico` (clave = 'c'+i).
@@ -607,7 +616,8 @@ const AsistenteDueloHab = (() => {
       });
       f.querySelectorAll('[data-ef-stat]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efStat); arr[idx].stat = i.value; });
       f.querySelectorAll('[data-ef-val]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efVal); arr[idx].val = Number(i.value) || 0; });
-      f.querySelectorAll('[data-ef-turnos]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efTurnos); arr[idx].turnos = Math.max(0, Math.round(Number(i.value) || 0)); });
+      f.querySelectorAll('[data-ef-turnos]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efTurnos); if(String(i.value).trim() === '') delete arr[idx].turnos; else arr[idx].turnos = Math.max(0, Math.round(Number(i.value) || 0)); });
+      f.querySelectorAll('[data-ef-prob]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efProb); const [c, x] = i.value.split('/').map(Number); if(c > 1){ arr[idx].caras = c; arr[idx].exitos = x; } else { delete arr[idx].caras; delete arr[idx].exitos; } });
       f.querySelectorAll('[data-ef-escudo]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efEscudo); arr[idx].escudo = Math.max(0, Math.round(Number(i.value) || 0)); });
       f.querySelectorAll('[data-ef-cura]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efCura); arr[idx].cura = Math.max(1, Math.round(Number(i.value) || 1)); });
       f.querySelectorAll('[data-ef-no2]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efNo2); arr[idx].no2 = Math.max(0, Math.round(Number(i.value) || 0)); });
@@ -716,6 +726,9 @@ const AsistenteDueloHab = (() => {
         }
         if(st.alcance !== 'auto'){ out.alcance = st.alcance; if(st.alcance === 'fijo') out.alcanceN = st.alcanceN; }
         out.efectos = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(mapEfectoOut);
+        // Lo que este asistente todavía no edita (2026-10-05, armas especiales: salta en cadena, misiles, deja una zona, atrae, niebla, luz…)
+        // se conserva tal cual: ajustar otra cosa no lo borra.
+        if(ini) CONSERVA.forEach(k => { if(ini[k] !== undefined && out[k] === undefined) out[k] = structuredClone(ini[k]); });
         cerrar();
         cfg.alGuardar({duelo: out, costo: costoResultado()});
     }
@@ -728,11 +741,12 @@ const AsistenteDueloHab = (() => {
     }
     // Un efecto de la lista `st.efectos`, listo para guardar en `duelo.efectos` — mismo shape tanto si vino del
     // selector real (origen:'preset', con mods/hp/stacks/permanente/detalle) como si se escribió a mano.
+    const CONSERVA = ['cadena', 'conVista', 'niebla', 'zonaQueda', 'menosDistancia', 'atrae', 'reparte', 'critTipo', 'soloSigilo', 'fuegoAmigo'];
     function mapEfectoOut(e){
       if(e.no2 !== undefined) return {nombre: 'Pierde No2', no2: e.no2, ...(e.no2Dif ? {no2Dif: true} : {}), ...(e.no2Sentado ? {no2Sentado: true} : {})};
       if(e.cura !== undefined) return {cura: e.cura};
       return {
-        nombre: e.nombre, turnos: e.turnos ?? 2,
+        nombre: e.nombre, ...(e.turnos !== undefined && e.turnos !== '' ? {turnos: e.turnos} : {}),   // sin turnos: los del estado
         ...(e.permanente ? {permanente: true} : {}),
         ...(e.stat ? {stat: e.stat, val: e.val ?? 1} : {}),
         ...(e.mods && e.mods.length ? {mods: e.mods} : {}),
@@ -741,6 +755,7 @@ const AsistenteDueloHab = (() => {
         ...(e.stacks && e.stacks > 1 ? {stacks: e.stacks} : {}),
         ...(e.detalle ? {detalle: e.detalle} : {}),
         ...(e.polaridad ? {polaridad: e.polaridad} : {}),
+        ...(Number(e.caras) > 1 ? {caras: Number(e.caras), exitos: Math.max(1, Number(e.exitos) || 1)} : {}),   // con probabilidad (ej. Parálisis 1 en d10): se conserva
       };
     }
     api = PasoAPaso.abrir({

@@ -474,6 +474,10 @@ document.addEventListener('click', e => {
     renderAll();
     const h = CreepAcciones.habEspecialParaTerminar(sc, itemId, p.doble);
     if(h) CreepAcciones.terminarHab(sc, h, p, gmHabUi);
+    if(p.aMano){   // ✋ la parte a mano
+      if(p.aMano.tirada){ if(p.aMano.texto) mesaConTexto('✋ A mano: ' + p.aMano.texto); gmHabUi.publicar(sc, p.aMano.tirada); }
+      else gmHabUi.mesaHabilidad(sc, {nombre: (h || {}).nombre || 'Arma especial'}, '✋ A mano: ' + p.aMano.texto);
+    }
     return;
   }
   if(b.id === 'btn-mant'){

@@ -150,7 +150,7 @@ const EditarItem = (() => {
       textoGuardar: '⬆ Subir al catálogo',
       onConsumible: x => formularioSimple({...d, ...x, tipoItem: 'consumibles', consumible: true}, datos => subir(conId(datos), opSubir)),
       onGuardar: x => {
-        const item = {...d, ...x};
+        const item = AsistenteItem.fusionar(d, x);
         if(!AsistenteItem.grupoDe || AsistenteItem.grupoDe(item.tipoItem) !== 'arma') SOLO_ARMA.forEach(k => delete item[k]);
         subir(conId(item), opSubir);
         return true;

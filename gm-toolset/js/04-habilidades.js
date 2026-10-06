@@ -331,12 +331,12 @@ function equiparItemEnCreep(idx){
   const sc = S.creeps.find(s => s.id === equipandoCreepId);
   const item = CATALOGO_EQUIPO[idx];
   if(!sc || !item) return;
-  if(!item.tipoItem.startsWith('arma_')){
+  if(CreepCalculo.vaAlEquipo(item)){   // (un arma especial va al equipo: no le cambia el arma)
     const mods = structuredClone(item.mods || []);
     sc.defensa = num(sc.defensa) + num(item.def);
     aplicarModsEquipo(sc, mods, 1);
     sc.equipo = sc.equipo || [];
-    sc.equipo.push({id: uid(), nombre: item.nombre, tipoItem: item.tipoItem, def: num(item.def), mods, detalle: item.detalle || ''});
+    sc.equipo.push({id: uid(), nombre: item.nombre, tipoItem: item.tipoItem, def: num(item.def), mods, detalle: item.detalle || '', ...CreepCalculo.magiaDeItem(item)});
     actualizarArmaduraTipo(sc);
     if(modsAfectanHp(mods)) actualizarHpMaxPorCon(sc);
     toast(`${sc.nombre} equipado con ${item.nombre}`);

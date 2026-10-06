@@ -1062,13 +1062,14 @@ const FichaEditor = (() => {
         conImagen: true,
         imagenADatos: file => imagenADatos(file, 480, 0.85),
         conEstadoEquipar: true,
+        elegirEstado: ctx.elegirEstadoDuelo,   // el «+ Estado» de la Ejecución ✨ de un arma especial
         conPrecio: true,
         conLugar: enInventario,
         conRanuras: !enInventario,
         conMano: enInventario,
         textoGuardar: original ? 'Guardar' : 'Crear',
         botones: [
-          ...(enInventario ? [{texto: '⬆ Subir al catálogo', accion: d => subirAlCatalogo(S(), {...base, ...d}, 'inventario', {toast, alSubir: ctx.alSubirCatalogo})}] : []),
+          ...(enInventario ? [{texto: '⬆ Subir al catálogo', accion: d => subirAlCatalogo(S(), AsistenteItem.fusionar(base, d), 'inventario', {toast, alSubir: ctx.alSubirCatalogo})}] : []),
           ...(original ? [{texto: 'Eliminar', accion: () => {
             if(!confirmar(`¿Eliminar "${original.nombre}"? No se puede deshacer.`)) return;
             const Q = S();
@@ -1081,7 +1082,7 @@ const FichaEditor = (() => {
         onConsumible: d => abrir(key, id, undefined, {formulario: true, draft: {...base, ...d, tipoItem: 'consumibles', consumible: true}}),
         onGuardar: d => {
           const Q = S();
-          const item = {...base, ...d, consumible: false};
+          const item = {...AsistenteItem.fusionar(base, d), consumible: false};
           if(!ES_ARMA(item.tipoItem)) ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'efectosGolpe'].forEach(k => delete item[k]);
           const i = Q[key].findIndex(x => x.id === item.id);
           if(i >= 0) Q[key][i] = item; else Q[key].push(item);

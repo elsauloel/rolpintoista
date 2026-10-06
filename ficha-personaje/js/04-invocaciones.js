@@ -67,6 +67,7 @@ function portadorInv(invId){
 function cfgItemInv(){
   return {
     contexto: 'invocacion',
+    sinEspecial: true,   // las invocaciones todavía no usan armas especiales (ver docs/pendientes.md)
     stats: MOD_TARGETS.filter(s => !['sp','spregen','crgmax','capcinturon','capmochila','luz','veoculto'].includes(s.id)).map(s => ({id:s.id, label:s.label})),
     ejemplos: (tipoItem, t) => (S.catalogo || []).filter(it => ES_ARMA(it.tipoItem) && num(it.tipoDado) === t).map(it => it.nombre),
   };

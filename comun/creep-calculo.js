@@ -510,6 +510,15 @@ const CreepCalculo = (() => {
   };
   // Un ítem del catálogo en la forma del equipo de un creep (antes itemParaCreep de GM Tools, js/01): sin id, la Defensa separada de los
   // otros bonos (`def`), sin los campos que un creep no usa. Es la forma de CATALOGO_EQUIPO (GM Tools) y del catálogo del fin del combate.
+  // Lo mágico de un ítem (2026-10-05): el hechizo de un arma especial y lo de un orbe. Va igual en el equipo de un creep que en una ficha.
+  function magiaDeItem(it){
+    const o = {};
+    if(it && it.especial) o.especial = structuredClone(it.especial);
+    if(it && it.orbe){ o.orbe = true; if(it.orbeResguardo) o.orbeResguardo = it.orbeResguardo; if(it.orbeSalvaje) o.orbeSalvaje = true; }
+    return o;
+  }
+  // ¿Va en el equipo del creep (y no como su arma)? Todo lo que no es arma, y las armas especiales (2026-10-05: una varita no le cambia el arma).
+  const vaAlEquipo = it => !String((it && it.tipoItem) || '').startsWith('arma_') || !!(it && it.especial);
   function itemParaCreep(it){
     const arma = it.tipoItem.startsWith('arma_');
     const o = {nombre: it.nombre, tipoItem: it.tipoItem, tier: it.tier, tipoDado: arma ? (it.tipoDado || 0) : 0, danoFijo: arma ? (it.danoFijo || 0) : 0,
@@ -520,6 +529,7 @@ const CreepCalculo = (() => {
     if(arma && it.armaDeRango) o.armaDeRango = true;
     if(arma) Object.assign(o, Combatiente.rasgosDeItem(it));   // los rasgos del arma (por la espalda, ignora, sin Parry, firmas…)
     if(arma && (it.efectosGolpe || []).length) o.efectosGolpe = structuredClone(it.efectosGolpe);
+    Object.assign(o, magiaDeItem(it));   // ✨ arma especial / 🔮 orbe: viaja tal cual (si la saquean, vuelve a costar SP)
     if(it.tipoItem === 'consumibles'){ o.consumible = true; if(it.curahp) o.curahp = it.curahp; if(it.legacy) o.legacy = true; }
     const otros = (it.mods || []).filter(m => m.stat !== 'def');
     if(otros.length) o.mods = structuredClone(otros);
@@ -566,7 +576,7 @@ const CreepCalculo = (() => {
   }
 
   return {BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
-    TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto,
+    TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto,
     trofeo, despojosDePrecio, dropsResumen,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,
     danoTxt, fuentesEquipo, modTotal, estadosArmadura, aporteArmadura, defensaEfectiva, armadmgEfectiva, resElemental, critEfectivo,

@@ -1455,6 +1455,50 @@ prueba('asistente de ítems en la ventana común: sin categoría ni nombre no av
   igual([aviso, pestanas[1], titulo, guardado && guardado.nombre, guardado && guardado.tipoDado, AsistenteItem.abierto(), mia.isConnected],
     ['Primero elegí qué tipo de ítem es', '2. Tipo', `Ítem nuevo · paso ${pestanas.length} de ${pestanas.length}: Listo`, 'Hacha de prueba', 6, false, false]);
 });
+prueba('asistente de ítems: una varita del catálogo se edita como arma especial (sin Tipo ni daño físico) y conserva su hechizo', async () => {
+  let guardado = null;
+  const base = {...structuredClone(CATALOGO_BASE.find(x => x.id === 'esp-varita-de-chispa-electrica')), tipoDado: 8, danoFijo: 0, armaDeRango: false};   // como lo mezcla una pantalla
+  AsistenteItem.abrir({contexto: 'catalogo', nuevo: false, draft: base, stats: [{id: 'pdg', label: 'PdG'}], conPrecio: true, onGuardar: d => { guardado = AsistenteItem.fusionar(base, d); }});
+  const mia = [...document.querySelectorAll('.pap')].pop(), q = s => mia.querySelector(s);
+  const tabs = [...mia.querySelectorAll('[data-pap-paso]')].map(b => b.textContent.replace(/^\d+\. /, ''));
+  q(`[data-pap-paso="${tabs.indexOf('✋ A mano')}"]`).click();
+  const t = q('[data-aa-amano="texto"]'); t.value = 'Mojado: salta 1 vez más'; t.dispatchEvent(new Event('input', {bubbles: true}));
+  const r = q('[data-aa-amano="tirada"]'); r.value = '1d6'; r.dispatchEvent(new Event('input', {bubbles: true}));
+  q('[data-pap="guardar"]').click(); await new Promise(res => setTimeout(res, 0));
+  igual([tabs.slice(0, 5), guardado.tipoDado, guardado.danoFijo, guardado.especial.sp, guardado.especial.duelo.cadena, guardado.especial.duelo.efectos[0].caras, guardado.especial.aMano],
+    [['Qué es', 'Empuñadura', 'Hechizo', 'Qué hace ✨', '✋ A mano'], undefined, undefined, 3, {saltos: 2, rango: 3}, 10, {texto: 'Mojado: salta 1 vez más', tirada: '1d6'}]);
+});
+prueba('asistente de ítems: un orbe nuevo (escudo de una mano) pregunta lo del orbe en vez de la Defensa', async () => {
+  let guardado = null;
+  AsistenteItem.abrir({contexto: 'catalogo', nuevo: true, stats: [{id: 'luz', label: 'Luz'}], onGuardar: d => { guardado = d; }});
+  const mia = [...document.querySelectorAll('.pap')].pop(), q = s => mia.querySelector(s);
+  q('[data-aa-cat="escudo_1m"]').click(); q('[data-aa-orbe="1"]').click();
+  const n = q('[data-aa-c="nombre"]'); n.value = 'Orbe de prueba'; n.dispatchEvent(new Event('input', {bubbles: true}));
+  const tabs = [...mia.querySelectorAll('[data-pap-paso]')].map(b => b.textContent.replace(/^\d+\. /, ''));
+  q(`[data-pap-paso="${tabs.indexOf('Orbe')}"]`).click();
+  const o = q('[data-aa-orbe1="orbeResguardo"]'); o.value = '2'; o.dispatchEvent(new Event('input', {bubbles: true}));
+  q(`[data-pap-paso="${tabs.length - 1}"]`).click(); q('[data-pap="crear"]').click(); await new Promise(res => setTimeout(res, 0));
+  igual([tabs.includes('Defensa'), tabs[1], guardado.orbe, guardado.orbeResguardo, guardado.orbeSalvaje], [false, 'Orbe', true, 2, undefined]);
+});
+prueba('AsistenteItem.fusionar: lo que el asistente sacó no vuelve de lo que había; una varita equipada a un creep va a su equipo con su hechizo', () => {
+  const f = AsistenteItem.fusionar({nombre: 'x', tipoDado: 8, especial: {sp: 1}, mods: [{stat: 'pdg', val: 1}]}, {nombre: 'y', mods: []});
+  const v = CreepCalculo.itemParaCreep(CATALOGO_BASE.find(x => x.id === 'esp-varita-del-rastreador'));
+  const o = CreepCalculo.itemParaCreep(CATALOGO_BASE.find(x => x.id === 'esp-orbe-salvaje'));
+  igual([f, !!v.especial, v.especial.sp, CreepCalculo.vaAlEquipo(v), CreepCalculo.vaAlEquipo({tipoItem: 'arma_1m'}), o.orbe, o.orbeSalvaje],
+    [{nombre: 'y', mods: []}, true, 3, true, false, true, true]);
+});
+prueba('✋ La parte a mano de un arma especial: texto y tirada, o nada', () => {
+  igual([Combatiente.aManoEspecial({aMano: {texto: ' Mojado ', tirada: '1 d6'}}), Combatiente.aManoEspecial({aMano: {texto: '', tirada: ''}}), Combatiente.aManoEspecial({sp: 1})],
+    [{texto: 'Mojado', tirada: '1d6', etiqueta: 'A mano'}, null, null]);
+});
+prueba('Ejecución ✨: guardar sin cambios conserva lo que todavía no edita (salta, misiles) y la probabilidad de los efectos', async () => {
+  let r = null;
+  const ini = structuredClone(CATALOGO_BASE.find(x => x.id === 'esp-varita-de-chispa-electrica').especial.duelo);
+  AsistenteDueloHab.abrir({nombre: 'Chispa', inicial: ini, siempreActivo: true, costoInicial: {sp: '3', nitrosCosto: 1}, alGuardar: x => { r = x; }});
+  const mia = [...document.querySelectorAll('.pap')].pop();
+  mia.querySelector('[data-pap="guardar"]').click(); await new Promise(res => setTimeout(res, 0));
+  igual([r.duelo.cadena, r.duelo.efectos[0].caras, r.duelo.efectos[0].exitos, r.duelo.efectos[0].turnos], [{saltos: 2, rango: 3}, 10, 1, undefined]);
+});
 prueba('Ejecución ✨ en la ventana común: los pasos dependen del objetivo y Guardar devuelve la configuración', async () => {
   let r = 'nada';
   AsistenteDueloHab.abrir({nombre: 'Rayo', siempreActivo: true, costoInicial: {sp: '2', nitrosCosto: 1}, alGuardar: x => { r = x; }});

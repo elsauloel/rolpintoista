@@ -1635,3 +1635,27 @@ Posible ayuda (a decidir): un control en el editor del catálogo que avise si un
 | Antiparras de éter ⚙ | Ve lo oculto +1: ver trampas mágicas, runas y lo invisible. |
 | Tiara del lector de auras ✋ | Al mirar a alguien, el GM te dice si tiene SP para gastar y qué estados lleva. |
 | Bonete del aprendiz distraído 🔧 | +1 Ef.Esp, pero al usar una varita 1d6: con 1 el efecto sale para otro lado (a mano). |
+
+### Efectos de caster elegidos por el dueño (2026-10-05)
+
+| Efecto | Decisión |
+|---|---|
+| SP Regen | ✅ Va. El **Sombrero humectante existe sí o sí** (clásico del grupo). |
+| +SP máximo | ✅ Va. |
+| La primera varita del turno cuesta 1 SP menos | ✅ Va. Liviano: relleno para dar color. |
+| Si en el turno no gastaste SP, recuperás 1 de más (ayuno) | ✅ Va. Liviano: relleno para dar color. |
+| Pagar con vida (sangre) | ✅ Con una vuelta: con varitas y armas especiales **elegís cada vez** si pagás el SP con SP o con HP (no solo cuando falta SP). |
+| El No2 de la varita no sube en el segundo uso del turno | ✅ Va. |
+| PdG.Esp | ✅ Va. Campo de las **manos**. |
+| Ef.Esp | ✅ Va. |
+| Rango de casteo | ❌ Afuera por ahora: el rango de hoy alcanza; quizás se reworkee. |
+| +1 al radio de las áreas de las armas especiales | ✅ Va, pero **tiene que pesar mucho**. |
+| Afinidad | ✅ Con una vuelta: **+1 al daño mágico en general** (fuego, hielo, rayo… no un solo elemento). |
+| Salto extra del rayo en cadena | 🤔 Le gusta, pero en duda: no sabe cuánto se va a usar el rayo como para tener un ítem propio. |
+| Venenos: +1 turno y + daño tóxico | ✅ Va. |
+| Res.Mt | ✅ Va. Es bastante específico: **no debe pesar demasiado**. |
+| Percepción | ✅ Ya existe en cascos (Monóculo del tasador, Capucha de vigía, Pasamontañas). |
+| Detectar trampas con una tirada | ✅ Va, **unificado**: es «Pisada atenta» (`pisadaatenta`, la misma regla que la Percepción aumentada, solo trampas), que ya tienen dos Pies Comunes. |
+
+No mencionadas (¿descartadas?): No2 solo para varitas, Res.Esp +2, gorro de papel de aluminio, varitas sin salir del Sigilo, sombrero espejado, Ve
+lo oculto, lector de auras, aprendiz distraído.

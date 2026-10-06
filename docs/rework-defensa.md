@@ -1278,3 +1278,32 @@ mecánica); las resistencias solo acompañan; las grandes, con contras.
 | Mochila de cuero curtido · 0 · 70 | Ranuras +6 · Res. ácido +1 · Res. fuego +1 |
 
 **✅ Mochila Buena calidad: cargadas (2026-10-06).** El dueño: «van bien». 10 mochilas a 70 (reemplazan a las 2 viejas).
+
+## Anillos — panorama y propuesta (2026-10-06, ⬜ a revisar por el dueño)
+85 anillos, pensados antes del análisis de balance (dueño: «conceptualmente podemos mantenerlos, pero puede que caigan o suban de categoría y
+precio»). Se llevan 2 a la vez. Bolsa por anillo: 1 · 1,5 · 2 · 2,5 · 3 (Común → Legendario); identidad: una resistencia o un stat chico, sin Defensa.
+**Precios:** hoy van de 1.200 a 11.000 (un Común, 1.200: 30 veces lo de cualquier otra pieza Común). Con la calculadora: Común 35, Buena 50, Raro 60,
+Excepcional 70, Legendario 85.
+
+| Familia (hoy) | Propuesta |
+|---|---|
+| Escudo Arcano (Res.Esp +1/+2/+3) | Común +1 · Raro +2 · Legendario +3 (el «mayor» baja de Excepcional a Raro) |
+| Furia Arcana, Furia de Combate, Muralla Personal, Reflejo de Acero, Reserva Ampliada, Tenacidad (+1/+2/+3) | Quedan igual: Común +1 · Raro +2 · Legendario +3 |
+| Extensión del Conjuro, Voluntad de Hierro, Vista aguda (+1/+2/+3, valen 0,5 por punto) | Se duplican: Común +2 · Raro +4 · Legendario +6 |
+| Alcance Extendido (Rango +1/+2/+3) | Común +1 · Buena +2 · Legendario +4 |
+| Instinto de Combate (Iniciativa) | Buena +1 · Legendario +2 (el +3 no entra) |
+| Alforja sin Fondo (Carga) | Buena +1 · Legendario +2 (el +3 no entra) |
+| Vitalidad Extendida (Vida +10/+20/+30) | Común +5 · Raro +10 · Legendario +15 |
+| Paso Fantasma (Evasión), Puntería Certera (PdG), Foco Arcano (PdG.Esp) | Solo el +1, en Raro (el +2 y el +3 no entran en ninguna bolsa) |
+| Ojo del Verdugo (Crítico frecuente) | Solo el +1, en Legendario |
+| Fuerza del Toro (Fuerza) | Solo el +1, en Excepcional |
+| Clarividencia, Manos Ligeras, Piel de Roble (Especial, Destreza, Constitución) | Solo el +1, en Legendario |
+| Piernas de Viento (Movimiento), Pies Veloces (Agilidad) | No entran en ninguna bolsa: salen (o excepción de artefacto) |
+| Inmunidades: Inmutabilidad (Stun y Pajaritos), Sangre limpia (venenos), Superlinfocitos (Sangrado), Tendones firmes (Lisiado, Inmovilizado, Rengo), Vigor (Cansado, Exhausto), Mente certera (Confusión y control), Armadura indestructible (Armadura rota) | Raro (hoy figuran como Común) |
+| Percepción aumentada | Raro (queda) |
+| Cáscara protectora (anula el primer ataque o hechizo de cada combate) | Excepcional |
+| Leprechaun (Afortunado siempre) y Policromático (+2 a un atributo a elección) | Demasiado fuertes para un anillo: Legendario como excepción, o salen |
+| Combinados de Buena calidad: Centinela (Bloqueo +1 · Parry +1) | Raro |
+| Cazador (PdG +1 · Rango +1), Estudioso (PdG.Esp +1 · Res.Esp +1), Sobreviviente (Vida +15) | Legendario (el Sobreviviente repite a Vitalidad: sale o se funde) |
+| Corredor (Iniciativa +1 · Evasión +1) | No entra (3,5): sale o pierde un bono |
+| Pólvora Mansa (Res. crítico Tipo 12 +1 · Res.Mt +1) y Blindaje (Tipo 4, 6, 8 y 10 +1) | No entran (5,5 y 10): Pólvora Mansa como excepción legendaria (el Tipo 12 casi no se resiste); Blindaje queda en Tipo 4 +1 · Tipo 6 +1 (Legendario) |

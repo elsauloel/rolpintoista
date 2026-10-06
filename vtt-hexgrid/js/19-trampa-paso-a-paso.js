@@ -36,8 +36,8 @@ const trampaTituloSalva = (s, dt) => s.que === 'efecto' ? `Para resistir: ${dt ?
 // El orden (dueño, 2026-10-04): si la tirada resiste solo el efecto, primero se anuncia el daño (que entra seguro) y después se tira para
 // resistir lo que deja. Si la tirada esquiva la trampa o la mitad del daño, va antes.
 const trampaDanoPrimero = dt => !!(dt.requiereDano || (dt.salva && dt.salva.que === 'efecto' && (dt.dano || dt.danoFijo)));
-// Reflejos de mangosta (2026-10-04, pies): antes que nada, la chance de esquivarla entera.
-const trampaFaseInicial = dt => num(dt.reflejos) > 0 && !dt.reflejosHecho ? 'reflejos' : trampaDanoPrimero(dt) ? trampaFaseSiguiente(dt, 'empuje') : dt.salva ? 'salva' : trampaFaseSiguiente(dt, 'salva');
+// (Reflejos de mangosta ya no va acá: se juega ANTES de que la trampa se dispare, js/23 — 2026-10-06, P164.)
+const trampaFaseInicial = dt => trampaDanoPrimero(dt) ? trampaFaseSiguiente(dt, 'empuje') : dt.salva ? 'salva' : trampaFaseSiguiente(dt, 'salva');
 function trampaLogra(dt){
   const s = dt.salva;
   if(s.logra) return s.logra;
@@ -72,19 +72,15 @@ function trampaTextoInfo(dt){
 }
 // Lo que falta: {titulo, texto, boton, espera} (espera = el renglón de la Crónica mientras tanto).
 function trampaPasoQueFalta(dt){
-  // Las chances de los pies (2026-10-04): Reflejos de mangosta (esquivarla entera) e Inamovible (que no lo muevan).
-  if(dt.fase === 'reflejos' || dt.fase === 'firme-empuje' || dt.fase === 'firme-portal'){
-    const refl = dt.fase === 'reflejos', pct = refl ? dt.reflejos : dt.inamovible, siempre = num(pct) >= 100;
-    const que = refl ? 'podés tirar un dodge roll hacia donde quieras para intentar esquivarla' : dt.fase === 'firme-portal' ? 'el portal no se lo lleva' : 'no sale despedido';
+  // La chance de Inamovible (pies, 2026-10-04): que el muro o el portal no lo muevan.
+  if(dt.fase === 'firme-empuje' || dt.fase === 'firme-portal'){
+    const pct = dt.inamovible, siempre = num(pct) >= 100;
+    const que = dt.fase === 'firme-portal' ? 'el portal no se lo lleva' : 'no sale despedido';
     const d = Combatiente.chanceDado(pct), necesita = d ? d.caras - d.exitos + 1 : 0;
-    return {titulo: refl ? 'Reflejos de mangosta' : 'Inamovible',
-      texto: siempre ? `${refl ? 'Reflejos de mangosta' : 'Inamovible'} (siempre): ${que}.` : `${refl ? 'Reflejos de mangosta' : 'Inamovible'} ${Combatiente.chanceTexto(pct)}: con ${necesita} o más en 1d6, ${que}.`,
-      boton: siempre ? '▶ Seguir' : `🎲 Tirar ${refl ? 'Reflejos de mangosta' : 'Inamovible'} (1d6)`, espera: `${dt.quien} tira ${refl ? 'Reflejos de mangosta' : 'Inamovible'}…`};
+    return {titulo: 'Inamovible',
+      texto: siempre ? `Inamovible (siempre): ${que}.` : `Inamovible ${Combatiente.chanceTexto(pct)}: con ${necesita} o más en 1d${d ? d.caras : 6}, ${que}.`,
+      boton: siempre ? '▶ Seguir' : `🎲 Tirar Inamovible (1d${d ? d.caras : 6})`, espera: `${dt.quien} tira Inamovible…`};
   }
-  // El dodge roll de Reflejos de mangosta (dueño, 2026-10-04: «te permite tirar dodge roll en la dirección que quieras para intentar esquivar»):
-  // como el de los hechizos de área, hasta 2 casilleros, pagando el movimiento; si queda fuera de la trampa, la esquiva entera.
-  if(dt.fase === 'reflejos-dodge') return {titulo: 'Dodge roll', texto: '¡Los reflejos te avisan! Tirate hasta 2 casilleros hacia donde quieras (pagás el movimiento en No2): si quedás fuera de la trampa, la esquivás entera.',
-    boton: '🏃 Elegir adónde tirarte', boton2: '✋ No me tiro', espera: `${dt.quien} elige adónde tirarse…`};
   if(dt.fase === 'empuje') return {titulo: 'Sale despedido', texto: 'El muro sale justo donde está parado: tira 1d6 para ver a qué casilla vecina sale despedido (las 6 vecinas en ronda, la 1 hacia el frente del muro; si le toca una ocupada, la siguiente libre). Después, 1d6 de daño directo.',
     boton: '🎲 Tirar adónde sale (1d6)', espera: `${dt.quien} tira adónde sale despedido…`};
   if(dt.fase === 'salva' && dt.salva){
@@ -140,9 +136,9 @@ async function trampaMomentoNuevo(p){
     portal: p.portal ? {rango: num(p.portal.rango) || 8, ...(p.portal.destino ? {destino: String(p.portal.destino)} : {})} : null, duenoTrampa: p.duenoTrampa || '', requiereDano: !!p.requiereDano, spec: p.specJson || '', muro: num(p.muro), muroLargo: num(p.muroLargo), zona: num(p.zona), aMano: p.aMano || '',
     fase: '', tirando: false, evita: '', pasos: [],
   };
-  // Los pies de la víctima (2026-10-04, js/21): Reflejos de mangosta e Inamovible (para el portal).
+  // Los pies de la víctima (2026-10-04, js/21): Inamovible (para el portal). Reflejos de mangosta ya se jugó antes del disparo (js/23).
   const vic = tokens.get(p.tokenId);
-  if(vic){ const rf = chanceDe(vic, 'reflejos'), im = chanceDe(vic, 'inamovible'); if(rf) dt.reflejos = rf; if(im) dt.inamovible = im; }
+  if(vic){ const im = chanceDe(vic, 'inamovible'); if(im) dt.inamovible = im; }
   dt.fase = trampaFaseInicial(dt);
   const titulo = p.pisador ? `${p.quien} pisó «${p.nombreT}»` : `${p.quien} quedó en el área de «${p.nombreT}»`;
   if(dt.fase === 'fin'){   // nada que tirar ni mostrar: solo se anuncia
@@ -301,7 +297,6 @@ function trampaDibujar(id){
       const x = tokens.get(dt.tokenId);
       const f = dt.fase === 'salva' && x ? formulaParaValor(trampaValorStat(x, dt.salva.stat)) : null;
       botones = [{texto: rodando ? '🎲 Rodando…' : falta.boton + (f ? ` (${f.formula})` : ''), deshabilitado: rodando || dt.tirando, alClic: () => trampaTirar(id)}];
-      if(falta.boton2 && !rodando) botones.push({texto: falta.boton2, sec: true, deshabilitado: dt.tirando, alClic: () => trampaSinDodge(id)});
     }else botones = [{texto: dt.fase === 'portal' ? 'Esperando…' : 'Aplicando…', deshabilitado: true}];
   }
   AvisoCombate.mostrar({clave: 'trampa:' + id, icono: d.icono || '🪤', titulo: d.titulo || '', pasos,
@@ -366,14 +361,13 @@ async function trampaTirar(id){
   const d = trampasDatos.get(id);
   const fase = d && d.datos && d.datos.fase;
   if(fase === 'portal'){ trampaPasoPortal(id); return; }
-  if(fase === 'reflejos-dodge'){ trampaPasoDodge(id); return; }
-  if(!['salva', 'dano', 'empuje', 'sp', 'reflejos', 'firme-empuje', 'firme-portal', ...TRAMPA_INFO].includes(fase)) return;
+  if(!['salva', 'dano', 'empuje', 'sp', 'firme-empuje', 'firme-portal', ...TRAMPA_INFO].includes(fase)) return;
   const dt = await trampaTomar(id, fase);
   if(!dt){ toast('Ese paso ya se está tirando en otra pantalla'); return; }
   trampaTirandoAca = id;
   trampaDibujar(id);
   try{
-    if(fase === 'reflejos' || fase === 'firme-empuje' || fase === 'firme-portal') await trampaPasoChance(id, dt, fase);
+    if(fase === 'firme-empuje' || fase === 'firme-portal') await trampaPasoChance(id, dt, fase);
     else if(fase === 'salva') await trampaPasoSalva(id, dt);
     else if(fase === 'empuje') await trampaPasoEmpuje(id, dt);
     else if(fase === 'sp') await trampaPasoSp(id, dt);
@@ -390,11 +384,10 @@ async function trampaTirar(id){
   }
 }
 
-// Las chances de los pies (2026-10-04): Reflejos de mangosta (si sale, la esquiva entera) e Inamovible (si sale, no lo mueve: ni el muro ni el
-// portal). Con 100 % sale siempre, sin tirar.
+// La chance de Inamovible (pies, 2026-10-04): si sale, no lo mueve (ni el muro ni el portal). Con 100 % sale siempre, sin tirar.
 async function trampaPasoChance(id, dt, fase){
-  const refl = fase === 'reflejos', pct = Combatiente.chancePct(refl ? dt.reflejos : dt.inamovible), d = Combatiente.chanceDado(pct);
-  const mec = refl ? 'Reflejos de mangosta' : 'Inamovible';
+  const pct = Combatiente.chancePct(dt.inamovible), d = Combatiente.chanceDado(pct);
+  const mec = 'Inamovible';
   let ok = pct >= 100, texto = `${mec} (siempre)`;
   if(d){
     const r = tirarDados('1d' + d.caras);
@@ -402,15 +395,12 @@ async function trampaPasoChance(id, dt, fase){
     await trampaEsperarDados();
     const necesita = d.caras - d.exitos + 1;
     ok = r.total >= necesita;
-    texto = `1d6 = ${r.total} (con ${necesita} o más)`;
+    texto = `1d${d.caras} = ${r.total} (con ${necesita} o más)`;
   }
-  const res = refl ? (ok ? '¡salió! Puede tirar un dodge roll' : 'no alcanzó: le cae encima') : fase === 'firme-portal' ? (ok ? 'no se mueve: el portal no se lo lleva' : 'no alcanzó: el portal se lo lleva')
+  const res = fase === 'firme-portal' ? (ok ? 'no se mueve: el portal no se lo lleva' : 'no alcanzó: el portal se lo lleva')
     : (ok ? 'no se mueve: el muro no lo despide' : 'no alcanzó: sale despedido');
   const sig = {...dt, pasos: [...(dt.pasos || []), {titulo: mec, texto: `${texto} → ${res}`}]};
-  if(refl){
-    sig.reflejosHecho = true;
-    sig.fase = ok ? 'reflejos-dodge' : trampaFaseInicial(sig);   // si sale: el dodge roll (elige adónde tirarse)
-  }else if(fase === 'firme-portal'){
+  if(fase === 'firme-portal'){
     sig.firmePortal = ok ? 'si' : 'no';
     sig.fase = ok ? trampaFaseSiguiente(sig, 'portal') : 'portal';
   }else sig.fase = ok ? trampaFaseSiguiente(sig, 'empuje') : 'empuje';
@@ -492,53 +482,6 @@ async function trampaPasoDano(id, dt){
   const sig = {...dt, danoTirado: r.total, ...(sinHerida ? {evita: 'efecto'} : {}), pasos: [...(dt.pasos || []), {titulo: dt.danoFijo ? 'Le llega la descarga' : 'Daño', texto}]};
   sig.fase = trampaFaseSiguiente(sig, 'dano');
   await trampaGuardar(id, sig);
-}
-
-/* El dodge roll de Reflejos de mangosta (2026-10-04): quien maneja a la víctima elige en el mapa una casilla libre a 1 o 2 de distancia; paga el
-   movimiento en No2 (como cualquier paso; Sentado o Inmovilizado no pueden tirarse) y, si la casilla queda fuera de la trampa, la esquiva entera.
-   Si sigue adentro (una trampa grande) o no se tira, le cae encima como siempre. */
-function trampaPasoDodge(id){
-  const d = trampasDatos.get(id), dt = d && d.datos;
-  if(!dt || !trampaMeToca(id, dt)) return;
-  const x = tokens.get(dt.tokenId);
-  if(!x){ toast('La víctima ya no está en el mapa'); return; }
-  const traba = confusionEstadosDe(x).find(e => e && e.activo !== false && (e.sentado || e.inmovilizado || /^(sentado|inmovilizado)$/i.test(String(e.nombre || '').trim())));
-  if(traba){ trampaSinDodge(id, `está ${traba.nombre}: no puede tirarse`); return; }
-  const celdas = new Set();
-  for(let i = 0; i + 1 < (dt.celdas || []).length; i += 2) celdas.add(dt.celdas[i] + ',' + dt.celdas[i + 1]);
-  const cm = costoMoverDe(x), por = cm ? num(cm.porCasillero) : 0;
-  trampaEnPantalla = null; AvisoCombate.cerrar(); trampaEnPantalla = id;   // se esconde mientras se elige (sin darla por cerrada)
-  const volver = () => trampaDibujar(id);
-  elegirDestino(async c => {
-    const dist = distanciaHex(c, x);
-    if(dist < 1 || dist > 2){ toast('El dodge roll es de 1 o 2 casilleros'); trampaPasoDodge(id); return; }
-    if(elementoSolidoEn(c.col, c.fila) || [...tokens.values()].some(y => y !== x && y.col === c.col && y.fila === c.fila)){ toast('Esa casilla no está libre: elegí otra'); trampaPasoDodge(id); return; }
-    const costo = por * dist;
-    if(cm && costo > num(cm.disponibles)){ toast(`No te alcanzan los No2: tirarte ${dist} casillero${dist === 1 ? '' : 's'} cuesta ${fmt(costo)}`); trampaPasoDodge(id); return; }
-    elegirDestinoTerminar();
-    const tomado = await trampaTomar(id, 'reflejos-dodge');
-    if(!tomado){ volver(); return; }
-    try{
-      if(costo > 0) await (x.tipo === 'creep' ? gastarNitrosCreep(x.fichaId, costo) : gastarNitros(x.fichaId, costo));
-      await coleccionTokens().doc(dt.tokenId).update({col: c.col, fila: c.fila, ruta: firebase.firestore.FieldValue.delete()});
-      const afuera = !celdas.has(c.col + ',' + c.fila);
-      const texto = `se tira ${dist} casillero${dist === 1 ? '' : 's'}${costo > 0 ? ` (−${fmt(costo)} No2)` : ''} → ${afuera ? '¡quedó fuera: la esquivó!' : 'sigue adentro de la trampa: le cae encima'}`;
-      const sig = {...tomado, pasos: [...(tomado.pasos || []), {titulo: 'Dodge roll', texto}]};
-      if(afuera){ sig.evita = 'todo'; sig.fase = trampaFaseSiguiente(sig, 'empuje'); }
-      else sig.fase = trampaFaseInicial(sig);
-      await trampaGuardar(id, sig);
-    }catch(err){
-      console.error('No se pudo hacer el dodge roll:', err);
-      toast('No se pudo mover: hacelo a mano');
-      await trampaGuardar(id, {...tomado, pasos: [...(tomado.pasos || []), {titulo: 'Dodge roll', texto: 'no se pudo mover (hacelo a mano)'}], fase: trampaFaseInicial(tomado)});
-    }
-  }, `<b>🏃 Dodge roll</b> <span>clic en una casilla libre a 1 o 2 de ${esc(dt.quien)}${por ? ` (${fmt(por)} No2 por casillero)` : ''} · Esc o clic derecho: no te tirás</span>`, false, () => trampaSinDodge(id));
-}
-// No se tira (o no puede): la trampa sigue como siempre.
-async function trampaSinDodge(id, motivo){
-  const tomado = await trampaTomar(id, 'reflejos-dodge');
-  if(!tomado){ trampaDibujar(id); return; }
-  await trampaGuardar(id, {...tomado, pasos: [...(tomado.pasos || []), {titulo: 'Dodge roll', texto: motivo || 'no se tira'}], fase: trampaFaseInicial(tomado)});
 }
 
 /* El portal (2026-10-04, dueño: Portal cósmico, rango 8): quien puso la trampa elige en el mapa adónde manda a la víctima (una casilla libre a

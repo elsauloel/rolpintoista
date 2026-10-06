@@ -1,6 +1,6 @@
 // js/21-chance.js — las mecánicas «con chance» de las piezas (2026-10-04, piernas y pies). Va después del arranque: solo define funciones
 // (y una revisión periódica para Recuperarse rápido).
-/* Retirada limpia, Inamovible, Recuperarse rápido, Reflejos de mangosta: un stat en % (33 = 5–6 en d6, 50 = 4–6, 100 = siempre). Regla del dueño
+/* Retirada limpia, Inamovible, Recuperarse rápido, Reflejos de mangosta: un stat en % (con el dado de cada porcentaje: Combatiente.chanceDado; 100 = siempre). Regla del dueño
    (2026-10-04): «el anuncio y la tirada no pueden ser silenciosas y automáticas en el log» — a quien le toca se le abre un cartel paso a paso
    (la estética del duelo) con su chance y el botón «🎲 Tirar 1d6»; los dados ruedan, el cartel muestra el resultado y el resto de la mesa lo
    ve en la Crónica (y queda una línea en la Mesa). Con 100 % sale siempre: el cartel lo anuncia, sin tirar.
@@ -42,14 +42,14 @@ async function chanceCartel(o){
       if(listo) return;
       const tr = tirarDados('1d' + d.caras);
       if(!tr) return;
-      AvisoCombate.mostrar({...base, pasos: [o.paso1, {titulo: 'Tirada', texto: 'Rodando el d6…', espera: true}], botones: [{texto: '🎲 Tirando…', deshabilitado: true}], alCerrar: () => {}});
+      AvisoCombate.mostrar({...base, pasos: [o.paso1, {titulo: 'Tirada', texto: `Rodando el d${d.caras}…`, espera: true}], botones: [{texto: '🎲 Tirando…', deshabilitado: true}], alCerrar: () => {}});
       try{ await mesaPublicar(`${o.mecanica} · ${Combatiente.chanceTexto(pct)}`, {formula: tr.formula, rolls: tr.rolls, mod: tr.mod, total: tr.total, quien, ...(o.t.tipo === 'creep' ? {desde: 'gm'} : {})}); }catch(err){}
       await new Promise(res => (typeof Duelo !== 'undefined' && Duelo.esperarDados) ? Duelo.esperarDados(res) : res());
       const ok = tr.total >= necesita;
-      final(ok, {titulo: 'Tirada', texto: `Sacaste ${tr.total} en el d6 (${ok ? 'salía' : 'salías'} con ${necesita} o más).`});
+      final(ok, {titulo: 'Tirada', texto: `Sacaste ${tr.total} en el d${d.caras} (${ok ? 'salía' : 'salías'} con ${necesita} o más).`});
     };
-    AvisoCombate.mostrar({...base, pasos: [o.paso1, {titulo: 'Tirada', texto: `1d6: sale con ${necesita} o más.`, espera: true}],
-      botones: [{texto: '🎲 Tirar 1d6', alClic: tirar}],
+    AvisoCombate.mostrar({...base, pasos: [o.paso1, {titulo: 'Tirada', texto: `1d${d.caras}: sale con ${necesita} o más.`, espera: true}],
+      botones: [{texto: `🎲 Tirar 1d${d.caras}`, alClic: tirar}],
       alCerrar: () => { if(listo) return; listo = true; momentoActualizar(momentoId, {estado: 'listo', resultado: '…no la intentó.'}); fin(false); }});
   });
 }

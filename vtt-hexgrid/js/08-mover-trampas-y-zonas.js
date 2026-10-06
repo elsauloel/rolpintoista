@@ -561,15 +561,18 @@ function trampaCentro(el){
 }
 // Dónde va la flor del efecto: alrededor de la casilla pisada o, con `centro: 'trampa'`, del centro de la trampa.
 const trampaCentroEfecto = (el, ef, celdaPisada, t) => ef && ef.centro === 'trampa' ? trampaCentro(el) : (celdaPisada || {col: t.col, fila: t.fila});
-function trampaAfectados(t, el, celdaPisada){
+// `esquive` (Reflejos de mangosta, js/23): {pos, id} — quien la pisó se tiró a `pos` antes de que se disparara: solo lo alcanza si sigue adentro.
+function trampaAfectados(t, el, celdaPisada, esquive){
   const ef = trampaEfectoDe(el), celdas = celdasDeElemento(el);
   const area = ef ? ef.area : (celdas.length > 1 ? 'trampa' : 'pisador');
-  const afectados = [t];
-  if(area === 'pisador') return afectados;
   const centro = trampaCentroEfecto(el, ef, celdaPisada, t);
   const enTrampa = new Set(celdas.map(c => nbPack(c.col, c.fila)));
-  const dentro = area === 'flor' ? (x => distanciaHex(x, centro) <= ef.radio) : (x => enTrampa.has(nbPack(x.col, x.fila)));
-  tokens.forEach(x => { if(x !== t && dentro(x)) afectados.push(x); });
+  const pisada = celdaPisada || {col: t.col, fila: t.fila};
+  const dentro = area === 'pisador' ? (x => x.col === pisada.col && x.fila === pisada.fila)
+    : area === 'flor' ? (x => distanciaHex(x, centro) <= ef.radio) : (x => enTrampa.has(nbPack(x.col, x.fila)));
+  const afectados = !esquive || dentro(esquive.pos) ? [t] : [];
+  if(area === 'pisador') return afectados;
+  tokens.forEach((x, id) => { if(x !== t && !(esquive && id === esquive.id) && dentro(x)) afectados.push(x); });
   return afectados;
 }
 /* Lo que le hace la trampa a cada afectado (2026-10-02, regla del dueño: automático donde se puede, siempre anunciado; 2026-10-04, pedido del
@@ -587,8 +590,13 @@ function trampaValorStat(x, stat){
   const f = fichasPub.get(String(x.fichaId || '').split(SEP_INVOCACION)[0]);
   return f && f.resumen ? num(f.resumen[stat]) : 0;
 }
-async function trampaAplicarEfectos(t, el, celdaPisada){
-  const afectados = trampaAfectados(t, el, celdaPisada), salva = trampaSalvaDe(el);
+async function trampaAplicarEfectos(t, el, celdaPisada, esquive, idT){
+  const afectados = trampaAfectados(t, el, celdaPisada, esquive), salva = trampaSalvaDe(el);
+  if(esquive && !afectados.includes(t)){   // Reflejos de mangosta: se tiró y quedó fuera de su alcance
+    const quien = t.oculto ? 'Alguien' : nombreDe(t), nom = el.trampaNombre || 'una trampa';
+    alertaRojaAnonima(`🐍 ${nom}`, `${quien} zafó: con el dodge roll quedó fuera de su alcance`);
+    momentoAbrir({tipo: 'trampa', icono: '🐍', titulo: `${quien} zafó de «${nom}»`, estado: 'listo', resultado: 'Con el dodge roll quedó fuera de su alcance: no le hizo nada.', datos: {veredicto: {tono: 'bueno', grande: '¡ZAFÓ!'}}});
+  }
   let spec = null; try{ spec = el.trampaEstado ? JSON.parse(el.trampaEstado) : null; }catch(e){}
   const muro = trampaMuroDe(el);
   const comun = {
@@ -598,7 +606,7 @@ async function trampaAplicarEfectos(t, el, celdaPisada){
     celdas: celdasDeElemento(el).flatMap(c => [c.col, c.fila]),   // dónde está la trampa (el dodge roll de Reflejos de mangosta: ¿quedó afuera?)
   };
   for(const x of afectados){
-    await trampaMomentoNuevo({...comun, x, tokenId: zonaIdDe(x), quien: x.oculto ? 'Alguien' : nombreDe(x), pisador: x === t, muro: x === t && muro ? muro.turnos : 0,
+    await trampaMomentoNuevo({...comun, x, tokenId: x === t && idT ? idT : zonaIdDe(x), quien: x.oculto ? 'Alguien' : nombreDe(x), pisador: x === t, muro: x === t && muro ? muro.turnos : 0,
       muroLargo: muro ? muro.largo : 0, zona: x === t && el.trampaDejaZona ? (Math.max(1, Math.round(num(el.zonaTurnos)) || 3)) : 0});
   }
 }
@@ -673,14 +681,22 @@ async function trampaResolver(){
     return;
   }
   if(p.tipo === 'pisa'){
+    // Reflejos de mangosta (2026-10-06, P164): antes de que se dispare, la apuesta de tirarse (js/23). Después, la trampa alcanza a quien quede adentro.
+    const celda0 = p.celda || {col: t.col, fila: t.fila};
+    let esquive = null;
+    if(typeof trampaReflejosAntes === 'function' && chanceDe(t, 'reflejos') > 0){
+      try{ const r = await trampaReflejosAntes(p.tokenId, t, p.el); if(r && r.pos) esquive = {pos: r.pos, id: p.tokenId}; }
+      catch(err){ console.error('Reflejos de mangosta:', err); }
+    }
+    const zafo = !!esquive && !trampaAfectados(t, p.el, celda0, esquive).includes(t);
     try{ await coleccionElementos().doc(p.id).update({disparada: true}); }
     catch(err){ console.error('No se pudo marcar la trampa como disparada:', err); }
     const nombre = p.el.trampaNombre ? ': ' + p.el.trampaNombre : '';
     alertaRojaAnonima(`⚠ Trampa de ${nombreMiembro(p.el.duenoUid)}${nombre}`, `${nombreDe(t)} la activó${p.el.trampaDetalle ? ' — ' + p.el.trampaDetalle : ''}`);
     // Activar una trampa rompe el sigilo (2026-09-24, regla dicha por el dueño).
     if(enSigilo(t)) await romperSigilo(p.tokenId, '', `${nombreDe(t)} activó una trampa`);
-    await trampaAplicarEfectos(t, p.el, p.celda);   // la salvación, el daño y el estado de cada uno, con su Aviso y la Crónica
-    if(p.el.trampaDestino) await trampaTeleportar(p.tokenId, tokens.get(p.tokenId), p.el);
+    await trampaAplicarEfectos(t, p.el, celda0, esquive, p.tokenId);   // la salvación, el daño y el estado de cada uno, con su Aviso y la Crónica
+    if(p.el.trampaDestino && !zafo) await trampaTeleportar(p.tokenId, tokens.get(p.tokenId), p.el);
     const muro = trampaMuroDe(p.el);
     if(muro) await trampaLevantarMuro(t, p.celda || t, p.desde, muro, p.el.trampaNombre || 'Trampa de muro');
     // Trampa persistente (2026-09-28, pedido del dueño): además del golpe de siempre (arriba), se convierte en
@@ -691,7 +707,7 @@ async function trampaResolver(){
       const dueno = miembros.get(p.el.duenoUid);
       const cambios = {
         zona: true, zonaNombre: p.el.trampaNombre || 'Trampa', zonaCasteadorRef: '', zonaCasteadorTipo: (dueno && dueno.gm) ? 'creep' : 'pj',
-        zonaResueltos: trampaAfectados(t, p.el, p.celda).map(x => `${zonaIdDe(x)}@${Math.round(num(mantenimientoNumero))}`),   // ya la sufrieron al detonar
+        zonaResueltos: trampaAfectados(t, p.el, celda0, esquive).map(x => `${x === t ? p.tokenId : zonaIdDe(x)}@${Math.round(num(mantenimientoNumero))}`),   // ya la sufrieron al detonar
         turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n,
         zonaEnMantenimiento: p.el.zonaEnMantenimiento !== false, zonaCadaPaso: !!p.el.zonaCadaPaso,
       };

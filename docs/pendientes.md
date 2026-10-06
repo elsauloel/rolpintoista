@@ -262,6 +262,10 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   ninguna bolsa de calidad (un anillo de Movimiento o de Agilidad, Evasión +3…), sin tienda, solo de botín. A pensar: cómo se marcan en el catálogo
   (¿una calidad aparte, «Artefacto»?), que el generador de tiendas no las ofrezca, cómo las elige el GM para el botín y que haya una sola copia.
 
+- [ ] **Revisar los consumibles** (dueño, 2026-10-07: «los consumibles tendremos que revisarlos»): 16 todavía usan stats viejos que el juego
+  convierte solo al cargar (bonos → SP, mov / accionesmax → No2): Pociones y Pergaminos de Reserva Ampliada, Piernas de Viento e Ímpetu. Revisarlos
+  enteros (efecto, calidad y precio), no solo el stat. (El Cinturón del explorador, Raro, también lo tiene: se ignora, los Raros se rehacen.)
+
 ## 5. Contenido a revisar (números de primer borrador)
 - [ ] Las **321 habilidades de creeps**: daño, cooldowns, bonos, cuáles son rápidas y cuáles lentas.
 - [ ] Los **173 creeps base** (todos dicen "(auditar)") y sus recompensas.

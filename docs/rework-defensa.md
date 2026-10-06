@@ -991,3 +991,58 @@ slots, pero +2 como mucho por pieza en Buena calidad, y medir el total contra el
   Percepción +1), Yelmo del sobreviviente (Vida +20 · Res.Mt +1; pesa 2), Guantes de maestro de esgrima (PdG con cortantes +2 · Percepción +1),
   Guantes de cetrero (PdG a distancia +2 · Percepción +1), Gambesón del veterano (Vida +35 · Defensa +1; pesa 2), Túnica del pozo sin fondo (SP
   máx +8 · Defensa +1), Chaqueta del acróbata (Evasión +2 · Defensa +3). Las dos pesadas suben un escalón porque el peso devuelve puntos.
+
+## Torso rígido, Buena calidad — lluvia de mecánicas (2026-10-06, para que el dueño filtre)
+Lo que hay: 6 Buena calidad viejas (Armadura de placas, Coraza, Coraza de bandas remachadas, Cota de malla fina, Media armadura de escudero,
+Armadura compuesta), con Defensa 5–10 y tres Tipos de resistencia a crítico juntos: fuera de la bolsa y contra la escasez. Se reemplazan
+(conservan nombre e id las que sigan). Identidad: **la Defensa alta** (tope propuesto **6**), aguante, Res.CC; pesan 3–4 (el peso devuelve
+puntos) y las pesadas pagan con un contrapeso. Res. crítico repartida: +1 de un Tipo, a lo sumo de dos.
+⚙ = ya existe · 🔧 = mecánica nueva · ✋ = a mano · 🧙 = caster · ⚠ = toca una herramienta contra el tanque.
+
+**Defensa alta (lo de siempre, mejorado)**
+
+| Armadura | Qué hace |
+|---|---|
+| Armadura de placas ⚙ (pesa 4) | Defensa +6 · Res. crítico Tipo 4 +1 · Tipo 6 +1. |
+| Cota de malla fina ⚙ (pesa 3) | Defensa +5 · Res. crítico Tipo 6 +1 · Res.CC +1 · Vida +5. |
+| Media armadura de escudero ⚙ (pesa 3) | Defensa +5 · Res. crítico Tipo 4 +1 · Bloqueo +1 · Res.CC +1. |
+| Armadura compuesta ⚙ (pesa 3) | Defensa +5 · Tipo 4 +1 · Tipo 6 +1 · Vida +10 · Evasión −1. |
+| Coraza de bandas remachadas ⚙ (pesa 4) | Defensa +6 · Resistente ×3 (dura más) · Tipo 4 +1 · Iniciativa −1. |
+
+**Un solo bono grande**
+
+| Armadura | Qué hace |
+|---|---|
+| Peto del gigante (pesa 4) | Vida +30 · Defensa +3. |
+| Armadura del inamovible (pesa 4) | Res.CC +3 · Defensa +5 · Vida +5. |
+| Coraza consagrada (pesa 3) | Res.Esp +3 · Res.Mt +2 · Defensa +4 (la que aguanta a los magos). |
+
+**Defensa según el golpe (⚙ ya existen en las blandas)**
+
+| Armadura | Qué hace |
+|---|---|
+| Coraza de primera línea ⚙ | Defensa +4 · +3 contra el primer golpe del turno · Res.CC +1. |
+| Placas antibala ⚙ | Defensa +4 · +3 contra armas a distancia · Tipo 4 +1. |
+| Coraza de pinchos ⚙ | Defensa +5 · Espinas al equiparla · Tipo 4 +1. |
+
+**Mecánicas nuevas**
+
+| Armadura | Qué hace |
+|---|---|
+| 🔧 Coraza del guardián | Defensa +4 · los aliados que están al lado tuyo tienen +1 Defensa. |
+| ✋ Armadura del escolta | Defensa +5 · una vez por turno podés recibir vos el golpe dirigido a un aliado al lado (1 No2). A mano al principio. |
+| 🔧 Peto anclado | Defensa +5 · no te pueden empujar ni atraer (ganchos, ondas que empujan). |
+| 🔧⚠ Placas templadas | Defensa +5 · contra un golpe crítico cuenta la mitad de tu Defensa (hoy el crítico la ignora entera). |
+| 🔧⚠ Remaches reforzados | Defensa +5 · la primera Armadura rota de cada turno no te entra. |
+
+**Para casters**
+
+| Armadura | Qué hace |
+|---|---|
+| 🧙 Coraza rúnica (pesa 3) | Defensa +4 · Res.Esp +2 · SP máximo +3 (el mago de batalla). |
+
+**Contrapesos de las pesadas (propuesta):** además de Evasión −1 o Iniciativa −1, dos nuevos baratos: **ruidosa** (Sigilo −2: el metal
+suena) y **conductora** (Res. rayo −2: las placas de metal atraen la descarga).
+
+**Ojo con las ⚠:** el crítico y la Armadura rota (hachas, ácido) son justamente lo que atraviesa al tanque (Fase 3). Placas templadas y Remaches
+reforzados les sacan filo: o se dejan para Raro, o se descartan.

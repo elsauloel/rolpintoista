@@ -71,7 +71,7 @@ const CreepBotonera = (() => {
       // Atacar sin No2 no se deshabilita (un botón deshabilitado no deja abrir la 🔍): al tocarlo avisa.
       {stat:'pdg', nombre:`Atacar (PdG) · ${fmt(costoAtaqueSc)} No2`, dado: fc.pdg, sinNitros: sinNitrosAtaque, lupa:'atacar', motivo: `${sinNitrosAtaque ? 'Sin No2 · ' : ''}Cuesta ${fmt(costoAtaqueSc)} No2 · ${cualAtaque}`, attr:`data-atacarcreep="${sc.id}"`},
       {nombre:'Daño Arma', dado: danoTxt(sc, statValor(sc, 'dmg')), lupa:'danio', motivo:'Sin costo', attr:`data-daniocreep="${sc.id}"`},
-      {stat:'eva', nombre:'Esquivar (Eva)', dado: fc.eva, lupa:'stat|eva', motivo:'Sin costo', attr:`data-esquivarcreep="${sc.id}"`},
+      {stat:'eva', nombre:'Esquivar (Eva)', dado: Combatiente.stuneado(sc.estados) ? '1 (Stun)' : fc.eva, lupa:'stat|eva', motivo:'Sin costo', attr:`data-esquivarcreep="${sc.id}"`},
       // Parry y Bloqueo solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30): sin eso, o con un arma
       // natural, no aparecen (defensa).
       ...(defCreep ? [{stat:'parry', nombre:`Parry · ${fmt(costoParry(sc))} No2`, dado: fc.parry, sinNitros: num(sc.nitros) < costoParry(sc), lupa:'stat|parry', motivo:`${num(sc.nitros) < costoParry(sc) ? 'Sin No2 · ' : ''}Cuesta ${fmt(costoParry(sc))} No2 · con ${defCreep.nombre}`, attr:`data-parrycreep="${sc.id}"`},

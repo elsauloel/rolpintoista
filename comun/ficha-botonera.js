@@ -338,7 +338,7 @@ const FichaBotonera = (() => {
         <div class="botonera-combate-grid botonera-combate-bottom">
           <button type="button" class="botonera-tile${mtEva.clase}" data-botoneraaccion="esquivar" title="Esquivar${esc(mtEva.titulo)}">
             ${lupaBotonHtml('stat:eva')}${ModTirada.ayuda('eva')}
-            <span class="bt-label">Esquivar (Eva)</span><span class="bt-value bt-value-formula">🎲 ${esc(fCombate.eva)}</span>${mtEva.html}
+            <span class="bt-label">Esquivar (Eva)</span><span class="bt-value bt-value-formula">${Combatiente.stuneado(S.efectos) ? '1 (Stun)' : `🎲 ${esc(fCombate.eva)}`}</span>${mtEva.html}
           </button>
           <button type="button" class="botonera-tile${mtParry.clase}${sinDefArma ? ' bt-sin-nitros' : ''}" data-botoneraaccion="parry" title="${esc(sinDefArma ? Combatiente.SIN_ARMA_DEFENSA : 'Parry con arma o escudo: siempre cuesta 1 No2 (' + costoParryTxt(S) + ')' + mtParry.titulo)}">
             ${lupaBotonHtml('stat:parry')}${ModTirada.ayuda('parry')}

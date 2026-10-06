@@ -38,7 +38,7 @@ const InvBotonera = (() => {
     const combate = [
       {stat:'pdg', nombre:`Atacar (PdG) · ${fmt(costoAtaque)} No2`, dado: f(I.statValor(inv,'pdg')), sinNitros: sinNitrosAtaque, clave:`inv:${inv.id}:atacar`, motivo:`${sinNitrosAtaque?'Sin No2 · ':''}Cuesta ${fmt(costoAtaque)} No2 · ${cualAtaque}`, attr:`data-invatacar="${inv.id}"`},
       {nombre:'Daño Arma', dado: I.danoTxt(inv, I.statValor(inv,'dmg')), clave:`inv:${inv.id}:danio`, motivo:'Sin costo', attr:`data-invdanio="${inv.id}"`},
-      {stat:'eva', nombre:'Esquivar (Eva)', dado: f(I.statValor(inv,'eva')), clave:`inv:${inv.id}:stat:eva`, motivo:'Sin costo', attr:`data-invtirarstat="${inv.id}:eva"`},
+      {stat:'eva', nombre:'Esquivar (Eva)', dado: Combatiente.stuneado(inv.estados) ? '1 (Stun)' : f(I.statValor(inv,'eva')), clave:`inv:${inv.id}:stat:eva`, motivo:'Sin costo', attr:`data-invtirarstat="${inv.id}:eva"`},
       // Parry y Bloqueo solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30): sin eso, o con un arma
       // natural, no aparecen (I.defensa).
       ...(defInv ? [{stat:'parry', nombre:`Parry · ${fmt(Combatiente.costoParry())} No2`, dado: f(I.statValor(inv,'parry')), sinNitros: num(inv.nitros) < Combatiente.costoParry(), clave:`inv:${inv.id}:stat:parry`, motivo:`${num(inv.nitros) < Combatiente.costoParry() ? 'Sin No2 · ' : ''}Cuesta ${fmt(Combatiente.costoParry())} No2 · con ${defInv.nombre}`, attr:`data-invtirarstat="${inv.id}:parry"`},

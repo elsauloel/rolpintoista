@@ -1335,3 +1335,8 @@ versión parecida en más de una, es candidato a juntar.
   (`FichaAcciones.parryConArma`, `CreepAcciones.pagarParry` → `{aviso, deuda}`, `InvAcciones.tirarStat`), la Evasión que paga el sobrepeso
   (`FichaAcciones.sobrepesoPagar`) y el dodge roll (js/06 y js/08: `enDodge(id)`) ya no se frenan sin No2; en el duelo, la opción se ofrece con
   «⚠ sin No2: quedás en negativo». **No aplica al ataque de oportunidad ni al contraataque** (dueño): son ataques y siguen sin bajar de 0.
+- **Stun nuevo** (2026-10-06, dueño): no le toca los No2 (el preset ya no lleva `forzarNitros`, lleva `stun: true`); `Combatiente.stuneado(estados)`
+  (también reconoce un Stun viejo por el nombre). Su Evasión es 1 sin tirar (`Combatiente.tirarStat`); en el duelo solo se le ofrece la Evasión
+  (ficha, creep, invocación y el mapa); en el mapa, cualquier acción o movimiento de un stuneado muestra un cartel con «Hacerlo igual (lo decide la
+  mesa)» (`stunAntes`, js/20). Barrera: 2 turnos.
+

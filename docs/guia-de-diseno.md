@@ -30,6 +30,9 @@
   **Excepciones (dueño, 2026-10-06):** la **Resistencia a crítico**, el **Crítico frecuente** y el **Crítico potente** nunca van concentrados en
   una pieza: repartidos entre slots, de a poco. **Topes por pieza** (escaneo del 2026-10-06, `rework-defensa.md`): Evasión +2 en Buena calidad,
   resistencia elemental +2; una sola fuente por cada rebaja de No2; las chances en % con tope por equipo o en un solo slot.
+- **Lo de 1 turno que se activa en tu propio turno** (dueño, 2026-10-06, con el turno propio — P162): dura el resto de ese turno (el contador baja
+  al terminarlo). Está bien así: una trampa que te deja Lento 1 turno te deja lento lo que te queda del turno. Al diseñar un efecto de 1 turno
+  que puede caer en el turno propio (trampas, algunas skills), **valorarlo barato**; si tiene que durar más, darle 2 turnos (como la Barrera).
 - **Indestructible, nunca con Defensa alta ni Resistencia a crítico alta** (dueño, 2026-10-06, para cuando exista): una armadura que no se rompe
   le saca a la Armadura rota (hachas, ácido) su efecto contra el tanque; si además da mucha Defensa o mucha resistencia a crítico, el tanque queda
   sin contra. Indestructible va solo en piezas de Defensa y resistencia a crítico bajas.

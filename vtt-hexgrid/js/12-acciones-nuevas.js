@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002c', '../comun/creep-botonera.js?v=20261006e', '../comun/creep-acciones.js?v=20261006g', '../comun/confirmar-turno.js?v=20261006e', '../comun/creep-duelo.js?v=20261006g'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002c', '../comun/creep-botonera.js?v=20261006e', '../comun/creep-acciones.js?v=20261006i', '../comun/confirmar-turno.js?v=20261006e', '../comun/creep-duelo.js?v=20261006i'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -517,6 +517,7 @@ function acCrear(){
       return;
     }
     // Confusión (2026-10-04, js/20): la primera acción del turno tira antes.
+    if(stunEsAccion(b)){ const tid = confusionTokenDe(ac.creepId, 'creep'); if(stunAntes(tid, () => stunReclic(raiz, b, tid))) return; }   // Stun (2026-10-06)
     if(confusionEsAccion(b)){ const tid = confusionTokenDe(ac.creepId, 'creep'); if(confusionAntes(tid, () => confusionReclic(raiz, b, tid))) return; avisarFueraDeTurno(tid, b); }
     if(acAccionAca(b)) return;
     const datos = {...b.dataset};

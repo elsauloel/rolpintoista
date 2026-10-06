@@ -261,7 +261,12 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [~] **Revisar Pajaritos, Stun y los estados fuertes por 1 turno** (dueño, 2026-10-06; chequeo estado por estado con el turno propio hecho
   el mismo día). Con el turno propio, «N turnos» = N turnos del afectado (al empezar recarga y se dispara lo que se dispara; al terminar baja
   el contador, también si se lo pusieron en ese mismo turno — P162).
-  **Para mirar con cuidado (decisiones del dueño):**
+  **Decidido por el dueño (2026-10-06):** **Stun** = no puede hacer nada (ni atacar, moverse, habilidades, consumibles ni Parry) y si lo
+  atacan su Evasión es 1, sin tirar; **no le toca los No2** (hecho: `Combatiente.stuneado`, la Evasión en 1 en `tirarStat`, el duelo solo le
+  ofrece la Evasión, y en el mapa cualquier acción de un stuneado avisa con «Hacerlo igual» para la mesa). **Barrera: 2 turnos** (hecho, también
+  en Blindaje). **El resto está bien:** lo de 1 turno que cae en tu propio turno dura el resto de ese turno; se valora barato al diseñarlo (guía).
+  Lo que sigue abierto de esta lista: las duraciones por defecto de Stun, Pajaritos, Lisiado, Parálisis, Exhausto y los controles de movimiento.
+  **Para mirar con cuidado (lista original):**
   1. **Stun** (2 turnos): con el turno propio, 1 turno ya le saca un turno entero. Y choca con P163: hoy un stuneado puede hacer Parry
      quedando en negativo. ¿Bajar a 1 turno? ¿Un stuneado no puede defenderse con No2 (Parry, dodge roll)?
   2. **Pajaritos (3), Lisiado (3), Parálisis (2):** ahora son 3 turnos exactos del afectado (casi 3 rondas): largos. Pensar versiones de 1 y

@@ -1011,6 +1011,7 @@ function dueloOpcionesLocal(d){
   if(hk && hk.opcionesDefensa){ const o = hk.opcionesDefensa(d) || []; return d.ataque && d.ataque.sinParry ? o.filter(x => x.modo !== 'parry') : o; }
   // Parry solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30, comun/combatiente.js; la misma que GM Tools).
   const def = defensaCreepMapa(sc), c = Combatiente.costoParry();
+  if(Combatiente.stuneado(sc.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1'}];   // Stun (2026-10-06)
   const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión'}];
   if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === sc.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}`, costo: c, motivoNo: ''});   // sin No2: queda en negativo (2026-10-06)
   return d.ataque && d.ataque.sinParry ? ops.filter(o => o.modo !== 'parry') : ops;   // Takle y otros ataques que no se pueden parrear

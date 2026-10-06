@@ -190,6 +190,8 @@ const FichaDuelo = (() => {
           ops.push({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, etiqueta: `${String(a.item.tipoItem).startsWith('escudo') ? '🛡' : '🗡'} Parry · ${a.item.nombre}`, costo, motivoNo: '',
             info: [`Parry 🎲 ${fx(statParaArma('parry', a.item), 'parry', S.efectos)}`, `si ganás, Bloqueo 🎲 ${fx(FichaCombate.bloqueoValor(S, a.item))}`, ...(costo > num(S.nitros) ? ['⚠ sin No2: quedás en negativo (se descuenta al recargar)'] : [])]});
         });
+        // Stun (2026-10-06): no puede hacer nada; si lo atacan, su Evasión es 1 (sin Parry ni pagar el sobrepeso).
+        if(Combatiente.stuneado(S.efectos)) return [{modo: 'evasion', itemId: '', etiqueta: '🏃 Evasión · Stun: 1', motivoNo: '', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];
         return ops;
       },
       defender: (d, modo, itemId) => {

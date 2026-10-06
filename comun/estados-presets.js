@@ -29,8 +29,9 @@ const ESTADOS_PRESET = [
     detalle:'Sus No2 máximos quedan en 2/3 (redondeado hacia abajo). Ej.: con 9 de máximo, pierde 3 y le quedan 6.'},
   {nombre:'Exhausto', polaridad:'debuff', turnos:3, exhausto:true, esCC:true,
     detalle:'Sus No2 máximos quedan en un tercio (redondeado hacia abajo). Ej.: con 9 de máximo, le quedan 3.'},
-  {nombre:'Stun', polaridad:'debuff', turnos:2, forzarNitros:0, esCC:true,
-    detalle:'Sin No2 mientras dura: al empezar su turno no recarga. Mientras dura, cualquier tirada de Evasión falla directo: ni hace falta tirar el dado (a mano).'},
+  // Stun (dueño, 2026-10-06): «el Stun es no poder hacer nada; y si te atacan, tu Evasión es 1. Punto.» No le toca los No2.
+  {nombre:'Stun', polaridad:'debuff', turnos:2, stun:true, esCC:true,
+    detalle:'No puede hacer nada mientras dura: ni atacar, ni moverse, ni usar habilidades o consumibles, ni hacer Parry. Si lo atacan, su Evasión es 1 (sin tirar). No le toca los No2. ⚙ Automatizado: la Evasión sale 1 sola; en el mapa, cualquier acción avisa que está stuneado (y la mesa puede dejarla pasar).'},
   {nombre:'Hypeado', polaridad:'buff', turnos:3, hypeado:true,
     detalle:'Sus No2 máximos suben un tercio del natural (redondeado hacia arriba). Ej.: con 9 de máximo, gana 3 y llega a 12; con 7, gana 3 y llega a 10.'},
   {nombre:'Armadura rota', polaridad:'debuff', stacks:1, turnos:0, permanente:true, armaduraRota:true,
@@ -81,8 +82,9 @@ const ESTADOS_PRESET = [
     detalle:'Mientras dure, cada ataque cuerpo a cuerpo que recibe le devuelve al atacante 1/4 (25 %) del daño del golpe (con el crítico, antes de la Defensa), redondeado hacia arriba, directo a la vida. ⚙ Automatizado en el duelo; ✋ a mano fuera de él.'},
   {nombre:'Escudo especial', alias:['Escudo mágico'], polaridad:'buff', turnos:3, escudoMagico:10,
     detalle:'Funciona como una barra de HP secundaria: absorbe todo el daño que fuera a recibir de cualquier fuente —incluso daño verdadero (true damage)— antes de que le toquen el HP, y se recarga entera al empezar cada uno de sus turnos mientras el estado siga activo.'},
-  {nombre:'Barrera', polaridad:'buff', turnos:1, escudoMagico:8,
-    detalle:'Blindaje del Tanque: absorbe daño de la próxima fuente de daño, como una barra de HP secundaria (🛡). Si la fuente hace más, el resto entra normal. Dura hasta el próximo Mantenimiento.'},
+  // Barrera (dueño, 2026-10-06): 2 turnos — con el turno propio, la de 1 turno que uno se pone en su turno se iba antes de que lo atacaran.
+  {nombre:'Barrera', polaridad:'buff', turnos:2, escudoMagico:8,
+    detalle:'Blindaje del Tanque: absorbe daño de la próxima fuente de daño, como una barra de HP secundaria (🛡). Si la fuente hace más, el resto entra normal. Dura 2 turnos de quien la tiene (si se la pone en su turno, lo cubre hasta el final del siguiente).'},
   {nombre:'Excedente de vida', polaridad:'buff', permanente:true, turnos:0, escudoMagico:5, excedenteVida:true,
     detalle:'HP extra por encima de su máximo (por ejemplo, lo que drena de más). Es un valor neto: sin tope y sin recarga; absorbe el daño antes que la vida y se sube o baja a mano desde el chip. Por defecto no vence por turnos, pero se le pueden poner turnos.'},
   {nombre:'Afortunado', polaridad:'buff', turnos:3, afortunado:true,

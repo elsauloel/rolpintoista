@@ -181,3 +181,28 @@ function confusionMomento(d){
   const dt = d.datos || {};
   if(dt.clave && dt.res) confusionTurno.set(dt.clave, {res: num(dt.res), objetivoId: dt.objetivoId || '', objetivo: dt.objetivo || ''});
 }
+
+/* ---------- Stun (dueño, 2026-10-06: «el Stun es no poder hacer nada») ----------
+   Antes de una acción (las de Confusión, más el Parry y el Bloqueo) o de moverse: si el token está stuneado, un cartel lo dice y no la hace;
+   «Hacerlo igual» la deja pasar (la mesa decide: las herramientas avisan, no encierran). Lo llaman la Botonera nueva (js/11), las Acciones de
+   los creeps (js/12) y el soltar de una ruta (js/06). */
+let stunPase = '';
+const stunEsAccion = b => confusionEsAccion(b) || ['parry', 'bloqueo'].includes(b && b.dataset.botoneraaccion) ||
+  ['parrycreep', 'bloqueocreep'].some(k => b && k in b.dataset) || !!(b && b.dataset.invtirarstat && /:(parry|bloqueo)$/.test(b.dataset.invtirarstat));
+function stunAntes(tokenId, seguir){
+  if(tokenId && stunPase === tokenId){ stunPase = ''; return false; }
+  const t = tokens.get(tokenId);
+  if(!t || !Combatiente.stuneado(confusionEstadosDe(t))) return false;
+  AvisoCombate.mostrar({icono: '💫', titulo: `${nombreDe(t)} está stuneado`, pasos: [{titulo: 'No puede hacer nada',
+    texto: 'Mientras dura el Stun no puede atacar, moverse, usar habilidades o consumibles, ni hacer Parry. Si lo atacan, su Evasión es 1 (sin tirar).'}],
+    botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()},
+      {texto: 'Hacerlo igual (lo decide la mesa)', sec: true, alClic: () => { AvisoCombate.cerrar(); stunPase = tokenId; seguir(); }}]});
+  return true;
+}
+function stunReclic(raiz, b, tokenId){
+  let x = b && b.isConnected ? b : null;
+  if(!x && raiz) x = [...raiz.querySelectorAll('button')].find(y => Object.keys(b.dataset).every(k => y.dataset[k] === b.dataset[k]) && Object.keys(y.dataset).length === Object.keys(b.dataset).length);
+  if(!x){ toast('Volvé a apretar la acción'); return; }
+  x.click();
+}
+

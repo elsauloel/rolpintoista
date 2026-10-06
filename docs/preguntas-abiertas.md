@@ -746,8 +746,8 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   quien tuvo turno propio no le toca nada. **Las rondas se siguen contando.** Una **invocación nueva** entra al final del orden con **Mareo de
   invocación** (su primer turno no hace nada). Cada pase de turno se cuenta en la Crónica y en la Mesa. Después: revisar Pajaritos, Stun y los
   estados fuertes por 1 turno (`pendientes.md` §6) y pensar la herramienta de «pasa el tiempo» (fuera de combate).
-- **P162. Un estado que te ponen durante tu propio turno, ¿cuenta ese fin de turno?** (2026-10-06, el dueño lo sigue pensando). **Mientras
-  tanto: sí** — la regla limpia y pareja: el contador baja al terminar el turno del afectado, aunque se lo hayan puesto en ese mismo turno (un
+- ✅ **P162. Un estado que te ponen durante tu propio turno, ¿cuenta ese fin de turno?** (2026-10-06). **Decidida por el dueño el mismo día: sí**
+  (lo de 1 turno que cae en tu turno dura el resto de ese turno; se valora barato al diseñarlo, y la Barrera pasó a 2 turnos) — la regla limpia y pareja: el contador baja al terminar el turno del afectado, aunque se lo hayan puesto en ese mismo turno (un
   Stun de 1 turno puesto en tu turno se va al terminarlo; el veneno igual ya pegó al aplicarse). Consecuencia de diseño: lo que se activa en
   tu propio turno (sobre todo las **trampas**: Pajaritos, Stun) nunca dura menos de 2 turnos. La alternativa: que empiece a contar en el
   próximo (la marca `pasoTurno` de cada estado ya lo permitiría).

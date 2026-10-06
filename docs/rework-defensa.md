@@ -781,3 +781,7 @@ si quedó alguna idea afuera. Más ideas que se pueden sumar:
   sin importar el arma; «1 menos» sería lo mismo que gratis. A definir otra forma (ver la respuesta en la conversación).
 - **Espinas:** le gusta, pero **para las armaduras**, no los guantes.
 - **Orden:** después de Manos, Buena calidad sigue por **las armaduras** (torso).
+- **Manos rápidas:** el **Desenvaine queda solo para el cinturón** (fuera de los guantes). Los otros dos (cuatrero, carterista) siguen.
+- **Manos que curan y preparan:** sí. **Soltarse: un bono bajo** (+1), porque es muy circunstancial. **Trampero:** colocar una trampa cuesta lo
+  que usar un consumible (1 No2 desde el cinturón, 2 desde la mochila), así que «1 menos» la deja gratis: es mucho, buscarle otra vuelta.
+  **Desarmar trampas: afuera** — no está definido como concepto y, una vez que la ves, no vale la pena desarmarla.

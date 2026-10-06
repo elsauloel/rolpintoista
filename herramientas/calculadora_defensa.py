@@ -54,6 +54,10 @@ COSTO = {
     'retirada': 0.03,
     # Mecánicas de los pies (dueño, 2026-10-04): Pasos de baile = 75 % de +1 Evasión; Pisada atenta 1; las de chance, en COSTO_CHANCE.
     'pasosbaile': 1.5, 'pisadaatenta': 1,
+    # Guantes de Buena calidad (dueño, 2026-10-05): PdG con una familia de armas o a distancia (la mitad del PdG de todo); rebaja de No2 en la
+    # oportunidad o el contraataque (el 50 % de una rebaja de No2 a secas: 2 por No2); soltarse y trampas escondidas, muy circunstanciales.
+    'pdgt4': 1, 'pdgt6': 1, 'pdgt8': 1, 'pdgt10': 1, 'pdgdist': 1, 'oporahorro': 2, 'contraahorro': 2,
+    'soltarse': 0.25, 'trampaoculta': 0.125, 'ahorroespsp': 0.75, 'venenista': 2,
     'spregen': 2,   # SP Regen +1 (dueño, 2026-10-05): como la Evasión — rinde todos los turnos; vive solo en la cabeza (escasez controlada)
     'inamovible': 0, 'recuperarse': 0, 'reflejos': 0,
 }

@@ -69,8 +69,9 @@ const FichaCombate = (() => {
   function pdgParaArma(S, arma, c){
     c = calc(S, c);
     const excluidos = (c.mods.pdg || []).filter(m => m.itemId && m.itemId !== (arma && arma.id) && esArmaEnMano(S, m.itemId));
-    if(!excluidos.length || Number.isNaN(c.final.pdg)) return {valor: c.final.pdg, excluidos: []};
-    return {valor: c.base.pdg + c.modTotal.pdg - excluidos.reduce((a, m) => a + m.val, 0), excluidos};
+    const extra = Combatiente.pdgExtraArma(st => c.final[st], arma);   // guantes: PdG con esa familia de armas o a distancia (2026-10-05)
+    if(!excluidos.length || Number.isNaN(c.final.pdg)) return {valor: c.final.pdg + extra, excluidos: [], extra};
+    return {valor: c.base.pdg + c.modTotal.pdg - excluidos.reduce((a, m) => a + m.val, 0) + extra, excluidos, extra};
   }
   // El valor de un stat usando ESA arma: no cuentan los bonos de otra arma; para Parry y Bloqueo, tampoco los de un escudo que
   // no es con el que se para (P129, "cada uno con lo suyo").
@@ -108,7 +109,8 @@ const FichaCombate = (() => {
   const ataquesConArma = (S, arma) => num((S.ataquesArma || {})[claveAtaque(arma)]);
   const costoAtaque = (S, arma) => Combatiente.costoConAhorro(Combatiente.costoAtaque(tipoAtaque(arma), ataquesConArma(S, arma)), arma, ataquesConArma(S, arma));   // − ahorroNitros del arma en el primero
   // Ataque de oportunidad y contraataque: siempre lo de un primer ataque, y no cuentan como ataque del turno (oportunidad: gratis si el arma es oporGratis).
-  const costoAtaqueEspecial = (arma, tipo) => Combatiente.costoEspecial(tipoAtaque(arma), arma, tipo);
+  // S (opcional): con quien ataca, sus guantes que abaratan la oportunidad o el contraataque (2026-10-05).
+  const costoAtaqueEspecial = (arma, tipo, S) => Math.max(0, Combatiente.costoEspecial(tipoAtaque(arma), arma, tipo) - (S ? Combatiente.ahorroEspecial(tipo, st => calc(S).final[st]) : 0));
   // Cuenta un ataque con esa arma (el próximo ya paga el Tipo completo). Devuelve si era el primero con ella.
   function registrarAtaque(S, arma){
     const primero = ataquesConArma(S, arma) === 0;

@@ -396,11 +396,11 @@ const CreepCalculo = (() => {
   // Fuerza del golpe (reglas del escudo, 2026-09-26): la tirada del atacante contra el Bloqueo del defensor = su Fuerza (con los estados activos) + el peso de su arma; la SUMA es el dado.
   function fuerzaGolpeValor(sc){ return num(sc.fue) + (sc.estados || []).filter(e => e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'fue').reduce((x, m) => x + num(m.val) * Math.max(1, num(e.stacks) || 1), 0), 0) + pesoArma(sc); }
   // Contraataque (regla a prueba, 2026-09-26): tras un Parry, siempre cuesta lo de un primer ataque y no suma al conteo de ataques del turno.
-  function costoContraataque(sc){ return Combatiente.costoPrimerAtaque(num(sc.armaTipo) || 8); }   // regla común (comun/combatiente.js)
+  function costoContraataque(sc){ return Math.max(0, Combatiente.costoPrimerAtaque(num(sc.armaTipo) || 8) - Combatiente.ahorroEspecial('contra', st => modTotal(sc, st))); }   // regla común (comun/combatiente.js)
   // ¿Le alcanzan los No2 para un ataque de oportunidad (lo de un primer ataque con su arma)? (2026-10-02, pedido del dueño: el mapa solo
   // frena a quien se aleja si el que se queda puede aprovecharlo.) Se publica en su resumen (`opor`): los jugadores no ven sus No2.
   // El ataque de oportunidad: lo de un primer ataque, o nada si su arma es oporGratis.
-  function costoOportunidad(sc){ return Combatiente.costoEspecial(num(sc.armaTipo) || 8, Combatiente.armaDeCombatiente(sc), 'oportunidad'); }
+  function costoOportunidad(sc){ return Math.max(0, Combatiente.costoEspecial(num(sc.armaTipo) || 8, Combatiente.armaDeCombatiente(sc), 'oportunidad') - Combatiente.ahorroEspecial('oportunidad', st => modTotal(sc, st))); }
   function oportunidadPosible(sc){
     const n = sc.nitros === null || sc.nitros === undefined ? nitrosMax(sc) : num(sc.nitros);
     return !(num(sc.hp) <= 0) && n >= costoOportunidad(sc);

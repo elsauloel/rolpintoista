@@ -78,7 +78,7 @@ const InvDuelo = (() => {
       atacar: d => {
         const inv = ui.inv(d.atacante);
         if(!inv) return;
-        if(d.ataque.tipo === 'habilidad-arma') publicar(A().tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + num(d.ataque && d.ataque.mods && d.ataque.mods.pdg), 'pdg'));
+        if(d.ataque.tipo === 'habilidad-arma') publicar(A().tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + num(d.ataque && d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: num(inv.armaTipo), armaDeRango: !!inv.armaDeRango}), 'pdg'));
         else atacarSuelto(inv, d.ataque.tipo);
       },
       // Las invocaciones siguen las mismas reglas que los creeps.

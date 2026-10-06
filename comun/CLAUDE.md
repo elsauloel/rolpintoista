@@ -1283,6 +1283,12 @@ versión parecida en más de una, es candidato a juntar.
   no con `{...base, ...d}`: si no, a una varita le vuelve el Tipo 8 de fábrica. La Ejecución (`asistente-duelo-hab.js`) conserva lo que no edita
   (`CONSERVA`) y edita la probabilidad de cada efecto (`caras`/`exitos`). `CreepCalculo.magiaDeItem`/`vaAlEquipo`: una varita equipada a un creep va
   a su equipo con su `especial`. El editor del catálogo y el generador de tiendas cargan ahora la Ejecución y las trampas.
+- **Guantes de Buena calidad: mecánicas nuevas** (2026-10-05): stats `pdgt4/6/8/10` y `pdgdist` (`Combatiente.pdgExtraArma(valorDe, arma)`: en
+  `FichaCombate.pdgParaArma`, `CreepAcciones.tiradaAtaque`, `InvAcciones.tiradaAtaque` y los ataques con arreglos), `oporahorro`/`contraahorro`
+  (`Combatiente.ahorroEspecial(tipo, valorDe)`: `FichaCombate.costoAtaqueEspecial(arma, tipo, S)` —pasar S—, `CreepCalculo.costoOportunidad/
+  costoContraataque`, `InvAcciones`, el resumen `oporCosto`), `soltarse` (la tirada de Soltarse), `trampaoculta` (`Combatiente.trampaDeHab` y la trampa
+  consumible), `ahorroespsp` (`FichaAcciones.costoEspecial`, `CreepAcciones.costoEspecialCreep`) y `venenista` (en el resumen público; el mapa,
+  `venenistaDe` en js/13, se lo suma a los venenos del duelo).
 - **Marcado** (2026-10-05): preset nuevo (`marcado: true`). `Combatiente.agregarEstado`: al ponerse saca el Sigilo; mientras dura, el Sigilo
   rebota (`inmunidad` → 'Marcado'); `Combatiente.marcadoEn(estados)`. `FichaAcciones.alternarSigilo` avisa y no entra. El mapa lo hace brillar
   (`marcado`, `brilloMarca`) y lo deja ver a través de la niebla.

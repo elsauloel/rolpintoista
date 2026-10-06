@@ -96,6 +96,19 @@ const FichaCalculo = (() => {
     {id:'morral', label:'Morral de cazador', full:'Los trofeos no ocupan ranuras de la mochila'},
     {id:'pasamanos', label:'Pasamanos', full:'En combate, pasarle a un aliado al lado algo del cinturón no cuesta No2'},
     {id:'alforja', label:'Alforja compartida', full:'En combate, un aliado al lado puede sacar un consumible de tu mochila por 1 No2'},
+    // Guantes de Buena calidad (2026-10-05, dueño): PdG con una familia de armas o a distancia, ataques especiales más baratos, soltarse, trampas
+    // mejor escondidas, el primer conjuro más barato y los venenos con un stack más. Mismos ids para personajes, invocaciones y creeps.
+    {id:'pdgt4', label:'PdG con punzantes', full:'PdG extra al atacar con un arma punzante (Tipo 4)'},
+    {id:'pdgt6', label:'PdG con cortantes', full:'PdG extra al atacar con un arma cortante (Tipo 6)'},
+    {id:'pdgt8', label:'PdG con hachas', full:'PdG extra al atacar con un hacha (Tipo 8)'},
+    {id:'pdgt10', label:'PdG con contundentes', full:'PdG extra al atacar con un arma contundente (Tipo 10)'},
+    {id:'pdgdist', label:'PdG a distancia', full:'PdG extra al atacar con un arma a distancia'},
+    {id:'oporahorro', label:'Oportunidad más barata', full:'No2 de menos que cuesta tu ataque de oportunidad (nunca menos de 0)'},
+    {id:'contraahorro', label:'Contraataque más barato', full:'No2 de menos que cuesta tu contraataque, el que hacés después de ganar un Parry (nunca menos de 0)'},
+    {id:'soltarse', label:'Soltarse', full:'Suma a la tirada para soltarte de una red, un cepo o una telaraña'},
+    {id:'trampaoculta', label:'Trampas mejor escondidas', full:'Suma a la dificultad para detectar las trampas que colocás'},
+    {id:'ahorroespsp', label:'Primer conjuro', full:'SP de menos que cuesta el primer uso de un arma especial en el turno'},
+    {id:'venenista', label:'Envenenador', full:'Stacks de más en los venenos que ponés: cada stack es un turno más y 1 de daño más por turno'},
     {id:'retirada', label:'Retirada limpia (%)', full:'Chance (en %) de alejarte de un rival sin darle ataque de oportunidad: 33 = 5–6 en d6, 50 = 4–6, 100 = siempre'},
     // Resistencias elementales (2026-10-04, dueño): cada una se resta al daño de su elemento (además de la Armadura mágica). Situacionales: pesan poco.
     {id:'resfuego', label:'Res. fuego', full:'Resistencia al fuego: se resta a todo daño de fuego'},

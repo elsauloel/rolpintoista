@@ -70,7 +70,7 @@ const InvAcciones = (() => {
   // La regla universal (Combatiente.statAtaqueEspecial): el PdG especial venga de su arma, su equipo o sus estados.
   const bonoEspecial = (inv, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return st ? I().modTotal(inv, st) : 0; };
   const especial = tipo => tipo === 'oportunidad' || tipo === 'contra';
-  const costoAtaqueDe = (inv, tipo) => especial(tipo) ? Combatiente.costoEspecial(num(inv.armaTipo) || 8, Combatiente.armaDeCombatiente(inv), tipo) : I().costoAtaque(inv);
+  const costoAtaqueDe = (inv, tipo) => especial(tipo) ? Math.max(0, Combatiente.costoEspecial(num(inv.armaTipo) || 8, Combatiente.armaDeCombatiente(inv), tipo) - Combatiente.ahorroEspecial(tipo, st => I().modTotal(inv, st))) : I().costoAtaque(inv);
   const faltanNitros = (inv, tipo) => costoAtaqueDe(inv, tipo) > num(inv.nitros);
   function preguntaSinNitros(inv, tipo){
     return `${inv.nombre} no tiene No2 suficientes: ${especial(tipo) ? 'el ' + NOMBRE_ESPECIAL[tipo].toLowerCase() : 'este ataque'} cuesta ${fmt(costoAtaqueDe(inv, tipo))} y tiene ${fmt(Math.max(0, num(inv.nitros)))}.\n\n¿Atacar igual? Gasta los No2 que tenga y queda anotado en rojo en la Mesa.`;
@@ -98,8 +98,9 @@ const InvAcciones = (() => {
       cuando: firebase.firestore.FieldValue.serverTimestamp(),
     }).catch(err => console.error('No se pudo publicar la alerta de No2:', err));
   }
-  const tiradaAtaque = (inv, tipo) => especial(tipo) ? tirada(inv, `${NOMBRE_ESPECIAL[tipo]} (PdG)`, I().statValor(inv, 'pdg') + bonoEspecial(inv, tipo), 'pdg')
-    : tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg'), 'pdg');
+  const pdgExtraInv = inv => Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: num(inv.armaTipo), armaDeRango: !!inv.armaDeRango});   // guantes (2026-10-05)
+  const tiradaAtaque = (inv, tipo) => especial(tipo) ? tirada(inv, `${NOMBRE_ESPECIAL[tipo]} (PdG)`, I().statValor(inv, 'pdg') + bonoEspecial(inv, tipo) + pdgExtraInv(inv), 'pdg')
+    : tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + pdgExtraInv(inv), 'pdg');
 
   // El menú «¿Qué ataque es?» de una invocación (el mismo de personajes y creeps: Combatiente.menuTipoAtaqueHtml).
   const menuTipoAtaque = (inv, attr) => Combatiente.menuTipoAtaqueHtml({nombre: inv.nombre, normal: I().costoAtaque(inv), primero: num(inv.ataquesTurno) === 0,
@@ -120,7 +121,7 @@ const InvAcciones = (() => {
     const est = Combatiente.estadoSoltable(inv.estados);
     if(!est) return null;
     const s = Combatiente.soltarNorm(est.soltar);
-    const t = Combatiente.tiradaSoltarse(est, I().statValor(inv, s.stat), inv.estados);
+    const t = Combatiente.tiradaSoltarse(est, I().statValor(inv, s.stat) + Math.max(0, num(I().modTotal(inv, 'soltarse'))), inv.estados);
     return {...t, est, origen: `${inv.nombre} · Soltarse (${est.nombre}) · ${s.etq} contra ${s.dif}`};
   }
   function aplicarSoltarse(inv, t){

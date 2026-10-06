@@ -147,7 +147,7 @@ function ataqueEspecialConArma(arma, tipo, forzar){ FichaAcciones.ataqueEspecial
 function preguntarTipoAtaque(arma){
   // ✨ Un arma especial tiene su propio recorrido (dueño, 2026-10-05): sin «¿Qué ataque es?» (no tiene oportunidad ni contraataque, P160), directo a sus reglas.
   if(arma && arma.especial){ FichaAcciones.usarArmaEspecial(S, arma.id, false, habUi); return; }
-  const costoNormal = costoAtaqueNitros(arma), primero = ataquesConArma(arma) === 0, especial = costoAtaqueEspecial(arma, 'contra'), especialOpor = costoAtaqueEspecial(arma, 'oportunidad');
+  const costoNormal = costoAtaqueNitros(arma), primero = ataquesConArma(arma) === 0, especial = costoAtaqueEspecial(arma, 'contra', S), especialOpor = costoAtaqueEspecial(arma, 'oportunidad', S);
   const id = arma ? arma.id : '';
   $('#tipo-ataque-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: arma ? arma.nombre : 'Sin arma', normal: costoNormal, primero, especial, especialOpor, attr: 'data-tipoataque', ref: id, primeroTxt: 'primer ataque con esta arma (Tipo ÷ 2)', siguienteTxt: 'Tipo completo (ya atacaste con esta arma este turno)'});   // el menú común
   $('#scrim-tipo-ataque').classList.add('open');

@@ -1070,6 +1070,15 @@ async function dueloCurarInv(t, n){
     return {previo, nuevo: inv.hp};
   });
 }
+// Los stacks de veneno de más de quien atacó (Guantes del envenenador): un personaje o una invocación por su resumen; un creep, por su equipo.
+function venenistaDe(lado){
+  const t = lado && lado.tokenId ? tokens.get(lado.tokenId) : null;
+  if(!t) return 0;
+  if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return sc ? Math.max(0, Math.round(num(CreepCalculo.modTotal(sc, 'venenista')))) : 0; }
+  const ri = typeof resumenDeInv === 'function' ? resumenDeInv(t) : null;
+  if(ri) return Math.max(0, Math.round(num(ri.venenista)));
+  return statPjDe(t, 'venenista');
+}
 async function dueloAplicarEfecto(d, ef){
   const spec = Duelo.specDeEfecto(ef);
   if(!spec) return {manual: true, nota: 'a mano'};
@@ -1093,6 +1102,12 @@ async function dueloAplicarEfecto(d, ef){
   if(spec.cura){
     try{ const r = await dueloCurar(t, spec.cura); return {nota: `+${spec.cura} HP (${fmt(r.previo)} → ${fmt(r.nuevo)})`}; }
     catch(err){ console.error('No se pudo aplicar la cura del duelo:', err); return {manual: true, nota: 'no se pudo curar solo: aplicalo a mano'}; }
+  }
+  // Guantes del envenenador (2026-10-05): los venenos que pone quien atacó llevan esos stacks de más (un turno más y 1 de daño más por turno).
+  const vn = /veneno/i.test(String(spec.nombre || '')) ? venenistaDe(d.atacante) : 0;
+  if(vn > 0){
+    const base = Math.max(1, num(spec.stacks) || num(((EstadosAplicar.DEBUFFS || []).find(x => x.nombre === spec.nombre) || {}).stacks) || 1);
+    spec.stacks = base + vn;
   }
   const veces = spec.nombre === 'Armadura rota' ? Math.max(1, num(spec.stacks) || 1) : 1;
   const unico = spec.nombre === 'Armadura rota' ? {nombre: 'Armadura rota'} : spec;

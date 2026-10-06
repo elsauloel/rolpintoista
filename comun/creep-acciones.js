@@ -57,7 +57,7 @@ const CreepAcciones = (() => {
     const est = Combatiente.estadoSoltable(sc.estados);
     if(!est) return null;
     const s = Combatiente.soltarNorm(est.soltar);
-    const t = Combatiente.tiradaSoltarse(est, C().statValor(sc, s.stat), sc.estados);
+    const t = Combatiente.tiradaSoltarse(est, C().statValor(sc, s.stat) + Math.max(0, num(C().modTotal(sc, 'soltarse'))), sc.estados);
     return {...t, estId: est.id, origen: `${sc.nombre} · Soltarse (${est.nombre}) · ${s.etq} contra ${s.dif}`};
   }
   function aplicarSoltarse(sc, t){
@@ -120,10 +120,12 @@ const CreepAcciones = (() => {
       cuando: firebase.firestore.FieldValue.serverTimestamp(),
     }).catch(err => console.error('No se pudo publicar la alerta de No2:', err));
   }
+  const pdgExtraCreep = sc => Combatiente.pdgExtraArma(st => C().modTotal(sc, st), {tipoDado: num(sc.armaTipo), armaDeRango: !!sc.armaDeRango});
   function tiradaAtaque(sc, tipo){
-    if(tipo === 'normal') return tirada(`${sc.nombre} · PdG`, C().statValor(sc, 'pdg'), sc, 'pdg');
+    const extra = pdgExtraCreep(sc);   // guantes: PdG con esa familia de armas o a distancia (2026-10-05)
+    if(tipo === 'normal') return tirada(`${sc.nombre} · PdG`, C().statValor(sc, 'pdg') + extra, sc, 'pdg');
     const nombre = NOMBRE_ESPECIAL[tipo] || 'Contraataque';
-    return tirada(`${sc.nombre} · ${nombre} (PdG)`, C().statValor(sc, 'pdg') + bonoEspecial(sc, tipo), sc, 'pdg');
+    return tirada(`${sc.nombre} · ${nombre} (PdG)`, C().statValor(sc, 'pdg') + bonoEspecial(sc, tipo) + extra, sc, 'pdg');
   }
 
   /* ---------- Habilidades (paso 4c, tanda 5; antes el clic de data-ejecutar en js/06, y js/03, js/04 y js/10) ----------
@@ -384,7 +386,8 @@ const CreepAcciones = (() => {
   const especialesCreep = sc => (sc.equipo || []).filter(it => it && it.especial);
   function costoEspecialCreep(sc, it){
     const e = (it && it.especial) || {}, usos = num((sc.usosEspecial || {})[it.id]);
-    return {no2: Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1)), espera: ESPERA_POR_SP(num(e.sp)), usos, enEspera: num((sc.esperaEspecial || {})[it.id])};
+    const ahorro = usos ? 0 : Math.max(0, Math.round(num(C().modTotal(sc, 'ahorroespsp'))));   // primer conjuro: el SP de menos baja la espera
+    return {no2: Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1)), espera: ESPERA_POR_SP(Math.max(0, num(e.sp) - ahorro)), usos, enEspera: num((sc.esperaEspecial || {})[it.id])};
   }
   function habDeEspecialCreep(sc, it){
     const e = it.especial || {}, dano = String(e.dano || '').trim();

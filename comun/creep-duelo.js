@@ -59,7 +59,7 @@ const CreepDuelo = (() => {
   }
   // El PdG del ataque con arreglos, con lo que le suma la habilidad (los No2 ya los cobró la habilidad).
   function pdgDeArreglos(sc, atq){
-    return A().tirada(`${sc.nombre} · PdG`, C().statValor(sc, 'pdg') + num(atq && atq.mods && atq.mods.pdg), sc, 'pdg');
+    return A().tirada(`${sc.nombre} · PdG`, C().statValor(sc, 'pdg') + num(atq && atq.mods && atq.mods.pdg) + Combatiente.pdgExtraArma(st => C().modTotal(sc, st), {tipoDado: num(sc.armaTipo), armaDeRango: !!sc.armaDeRango}), sc, 'pdg');
   }
 
   function hooks(ui){

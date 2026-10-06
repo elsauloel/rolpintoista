@@ -96,6 +96,7 @@ const FichaResumen = (() => {
       rangocasteo: n(c.final.rangocasteo),   // Rango de casteo (de Especial): visualizador de rango mágico (🔮)
       luz: n(c.final.luz), veoculto: n(c.final.veoculto),   // luz que lleva encima y radio en el que ve lo oculto: el mapa los lee (farol, bengala, yelmo del ojo que todo lo ve)
       vision: n(c.final.vision),
+      venenista: n(c.final.venenista),   // Guantes del envenenador (2026-10-05): el mapa le suma esos stacks a los venenos que pone en el duelo
       pasosGratis: n(c.final.pasosgratis),
       retirada: n(c.final.retirada),   // Retirada limpia (%): el mapa la tira al alejarse de un rival (js/17)
       // Los pies (2026-10-04): el mapa las tira (js/08, js/19, js/21); Pasos de baile la lee el duelo.
@@ -114,7 +115,7 @@ const FichaResumen = (() => {
       nitrosMax: n(c.final.nitros),
       // Lo menos que le cuesta un ataque de oportunidad con alguna de sus manos (2026-10-02): el mapa frena a un rival que se aleja solo si
       // nitros ≥ esto. Sin armas con daño, a mano limpia.
-      oporCosto: (() => { const armas = FichaCombate.armasEquipadasConDano(S).map(x => x.item); return Math.min(...(armas.length ? armas : [null]).map(a => FichaCombate.costoAtaqueEspecial(a, 'oportunidad'))); })(),
+      oporCosto: (() => { const armas = FichaCombate.armasEquipadasConDano(S).map(x => x.item); return Math.min(...(armas.length ? armas : [null]).map(a => FichaCombate.costoAtaqueEspecial(a, 'oportunidad', S))); })(),
       costoMover: IT2().inmovilizadoBloqueaMover && estadoActivo(S, 'inmovilizado') ? 0 : costoMoverCasillero(S),
       muerto: !!(S.muerto && S.muerto.activo),
       muertoDef: !!(S.muerto && S.muerto.definitivo),   // muerto de verdad (el GM lo usa al repartir la experiencia)
@@ -146,11 +147,12 @@ const FichaResumen = (() => {
           // que un PJ o un creep (barra de No2, estados con su detalle).
           nitros: num(inv.nitros),
           nitrosMax: invNitrosMax(inv),
-          oporCosto: Combatiente.costoEspecial(num(inv.armaTipo) || 8, Combatiente.armaDeCombatiente(inv), 'oportunidad'),   // ataque de oportunidad (2026-10-02)
+          oporCosto: Math.max(0, Combatiente.costoEspecial(num(inv.armaTipo) || 8, Combatiente.armaDeCombatiente(inv), 'oportunidad') - Combatiente.ahorroEspecial('oportunidad', st => invModTotal(inv, st))),   // ataque de oportunidad (2026-10-02)
           // Las reglas del mapa, iguales para todos (dueño, 2026-10-04): moverse cuesta No2 (Rengo el doble, Inmovilizado no se mueve), los Pasos
           // gratis, las chances de las piezas (Retirada limpia, Inamovible, Recuperarse rápido, Reflejos de mangosta) y Pisada atenta con su Percepción.
           costoMover: invCostoMover(inv), pasosGratis: num(invModTotal(inv, 'pasosgratis')), retirada: num(invModTotal(inv, 'retirada')),
           inamovible: num(invModTotal(inv, 'inamovible')), recuperarse: num(invModTotal(inv, 'recuperarse')), reflejos: num(invModTotal(inv, 'reflejos')),
+          venenista: num(invModTotal(inv, 'venenista')),   // Guantes del envenenador (2026-10-05)
           pisadaAtenta: num(invModTotal(inv, 'pisadaatenta')) > 0, ...(typeof InvCalculo !== 'undefined' ? {percepcion: num(InvCalculo.statValor(inv, 'percepcion'))} : {}),
           activa: inv.activa !== false,
           miniatura: miniaturaInv(inv.imagen),

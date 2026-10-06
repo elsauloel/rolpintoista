@@ -85,7 +85,8 @@ const FichaAcciones = (() => {
       return;
     }
     S.nitros = num(S.nitros) - (forzar && s.no2 > num(S.nitros) ? gastoNitrosForzado(S, s.no2, 'intentó soltarse') : s.no2);
-    const t = Combatiente.tiradaSoltarse(est, num(FichaCalculo.calcular(S).final[s.stat]), S.efectos);
+    const f = FichaCalculo.calcular(S).final;
+    const t = Combatiente.tiradaSoltarse(est, num(f[s.stat]) + Math.max(0, num(f.soltarse)), S.efectos);   // + Guantes de escapista (2026-10-05)
     if(t.r && ui.registrarTirada) ui.registrarTirada(`Soltarse (${est.nombre}) · ${s.etq} contra ${s.dif}`, t.r);
     if(t.ok) S.efectos = S.efectos.filter(e => e !== est);
     const hundio = Combatiente.hundirSiFalla(est, t);
@@ -246,7 +247,9 @@ const FichaAcciones = (() => {
         if(consumiendoTrampa.has(id)) return;
         consumiendoTrampa.add(id);
         let ok = false;
-        try{ ok = await ui.colocarTrampa(it); }finally{ consumiendoTrampa.delete(id); }
+        const oculta = Math.max(0, Math.round(num(FichaCalculo.calcular(S).final.trampaoculta)));   // Guantes de trampero (2026-10-05)
+        const conOculta = oculta && it.trampaDatos ? {...it, trampaDatos: {...it.trampaDatos, detectar: (num(it.trampaDatos.detectar) || 8) + oculta}} : it;
+        try{ ok = await ui.colocarTrampa(conOculta); }finally{ consumiendoTrampa.delete(id); }
         if(!ok) return;
       }
       S.nitros = num(S.nitros) - gastoNitros;
@@ -419,7 +422,7 @@ const FichaAcciones = (() => {
   }
   const NOMBRE_ATAQUE_ESPECIAL = {oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
   function ataqueEspecialConArma(S, arma, tipo, forzar, ui){
-    const costo = FichaCombate.costoAtaqueEspecial(arma, tipo), nombre = NOMBRE_ATAQUE_ESPECIAL[tipo] || 'Ataque';
+    const costo = FichaCombate.costoAtaqueEspecial(arma, tipo, S), nombre = NOMBRE_ATAQUE_ESPECIAL[tipo] || 'Ataque';
     const con = arma ? ' con ' + arma.nombre : '';
     if(!forzar && !confirmarSentado(S, ui)) return;
     if(costo > num(S.nitros) && !forzar){
@@ -559,7 +562,8 @@ const FichaAcciones = (() => {
   const usosEspecial = (S, it) => num((S.ataquesArma || {})[claveEsp(it)]);
   function costoEspecial(S, it){
     const e = it.especial || {}, usos = usosEspecial(S, it);
-    return {no2: Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1)), sp: Math.max(0, num(e.sp)), usos};
+    const ahorro = usos ? 0 : Math.max(0, Math.round(num(FichaCalculo.calcular(S).final.ahorroespsp)));   // Mitones del primer conjuro (2026-10-05)
+    return {no2: Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1)), sp: Math.max(0, num(e.sp) - ahorro), usos};
   }
   const spDisponible = S => Math.max(0, num(FichaCalculo.calcular(S).final.sp) - num(S.spGastado));
   function habDeArmaEspecial(S, it){

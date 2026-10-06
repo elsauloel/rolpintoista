@@ -652,7 +652,8 @@ const Combatiente = (() => {
     const out = {...t, nombre: String(t.nombre || '').trim() || h.nombre};
     if(typeof valorDe === 'function'){
       const v = Number(valorDe(t.detectarStat === 'dmgesp' ? 'dmgesp' : 'des'));
-      if(Number.isFinite(v)) out.detectar = Math.max(1, Math.round(v));
+      const oculta = Math.max(0, Math.round(n(valorDe('trampaoculta'))));   // Guantes de trampero (2026-10-05): tus trampas, más difíciles de ver
+      if(Number.isFinite(v)) out.detectar = Math.max(1, Math.round(v)) + oculta;
     }
     return out;
   }
@@ -764,7 +765,21 @@ const Combatiente = (() => {
     if(!texto && !tirada) return null;
     return {texto, tirada, etiqueta: String(a.etiqueta || '').trim() || 'A mano'};
   }
-  return {aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+  /* Guantes de Buena calidad (2026-10-05, dueño). `valorDe(statId)` = el stat de quien ataca (personaje, invocación o creep).
+     pdgExtraArma: el PdG con una familia de armas (pdgt4/6/8/10, según el Tipo) o a distancia (pdgdist), al atacar con esa arma.
+     ahorroEspecial: los No2 de menos del ataque de oportunidad (oporahorro) o del contraataque (contraahorro); quien llama hace max(0, costo − ahorro). */
+  function pdgExtraArma(valorDe, arma){
+    if(!arma || typeof valorDe !== 'function') return 0;
+    const v = st => Math.max(0, Math.round(n(valorDe(st))));
+    const t = n(arma.tipoDado ?? arma.armaTipo);
+    return ([4, 6, 8, 10].includes(t) ? v('pdgt' + t) : 0) + (arma.armaDeRango ? v('pdgdist') : 0);
+  }
+  const AHORRO_ESPECIAL = {oportunidad: 'oporahorro', contra: 'contraahorro', contraataque: 'contraahorro'};
+  function ahorroEspecial(tipo, valorDe){
+    const st = AHORRO_ESPECIAL[tipo];
+    return st && typeof valorDe === 'function' ? Math.max(0, Math.round(n(valorDe(st)))) : 0;
+  }
+  return {pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

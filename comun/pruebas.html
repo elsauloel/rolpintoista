@@ -1487,6 +1487,46 @@ prueba('AsistenteItem.fusionar: lo que el asistente sacó no vuelve de lo que ha
   igual([f, !!v.especial, v.especial.sp, CreepCalculo.vaAlEquipo(v), CreepCalculo.vaAlEquipo({tipoItem: 'arma_1m'}), o.orbe, o.orbeSalvaje],
     [{nombre: 'y', mods: []}, true, 3, true, false, true, true]);
 });
+prueba('guantes de Buena calidad: PdG con una familia y a distancia, oportunidad y contraataque más baratos (personaje y creep)', () => {
+  const guante = (stat, val) => ({id: 'g' + stat, nombre: 'Guante', tipoItem: 'manos', equipado: true, peso: 0, mods: [{stat, val}]});
+  const {S} = FichaGuardado.normalizar({}, {mezclarCatalogo: false});
+  const espada = {id: 'esp', nombre: 'Espada', tipoItem: 'arma_1m', tipoDado: 6, peso: 1, equipado: true, mods: []};
+  const hacha = {id: 'hac', nombre: 'Hacha', tipoItem: 'arma_1m', tipoDado: 8, peso: 1, equipado: true, mods: []};
+  const arco = {id: 'arc', nombre: 'Arco', tipoItem: 'arma_2m', tipoDado: 6, peso: 1, equipado: true, armaDeRango: true, mods: []};
+  S.inventario = [espada, guante('pdgt6', 1)];
+  const conEspada = FichaCombate.pdgParaArma(S, espada).valor;
+  S.inventario = [espada]; const sinGuante = FichaCombate.pdgParaArma(S, espada).valor;
+  S.inventario = [hacha, guante('pdgt6', 1)]; const hachaG = FichaCombate.pdgParaArma(S, hacha).valor;
+  S.inventario = [hacha]; const hachaS = FichaCombate.pdgParaArma(S, hacha).valor;
+  S.inventario = [arco, guante('pdgdist', 1)]; const arcoG = FichaCombate.pdgParaArma(S, arco).valor;
+  S.inventario = [arco]; const arcoS = FichaCombate.pdgParaArma(S, arco).valor;
+  S.inventario = [espada, guante('oporahorro', 1)];
+  const oporCon = FichaCombate.costoAtaqueEspecial(espada, 'oportunidad', S), oporSin = FichaCombate.costoAtaqueEspecial(espada, 'oportunidad');
+  S.inventario = [espada, guante('contraahorro', 5)];
+  const contraCon = FichaCombate.costoAtaqueEspecial(espada, 'contra', S);
+  const sc = creepPrueba({armaTipo: 8, equipo: [{nombre: 'Guante', tipoItem: 'manos', mods: [{stat: 'oporahorro', val: 1}, {stat: 'pdgt8', val: 1}]}]});
+  const scSin = creepPrueba({armaTipo: 8});
+  igual([conEspada - sinGuante, hachaG - hachaS, arcoG - arcoS, oporSin - oporCon, contraCon, CreepCalculo.costoOportunidad(scSin) - CreepCalculo.costoOportunidad(sc),
+    Combatiente.pdgExtraArma(st => CreepCalculo.modTotal(sc, st), {tipoDado: 8})],
+    [1, 0, 1, 1, 0, 1, 1]);
+});
+prueba('guantes de Buena calidad: el primer conjuro (−1 SP, solo el primer uso del turno; en un creep, menos espera) y las trampas mejor escondidas', () => {
+  const {S} = FichaGuardado.normalizar({}, {mezclarCatalogo: false});
+  const varita = {...structuredClone(CATALOGO_BASE.find(x => x.id === 'esp-varita-de-chispa-electrica')), id: 'v1', equipado: true};
+  S.inventario = [varita, {id: 'm', nombre: 'Mitones', tipoItem: 'manos', equipado: true, mods: [{stat: 'ahorroespsp', val: 1}]}];
+  const primero = FichaAcciones.costoEspecial(S, varita).sp;
+  S.ataquesArma = {'esp:v1': 1};
+  const segundo = FichaAcciones.costoEspecial(S, varita).sp;
+  const sc = creepPrueba({equipo: [{id: 'v', nombre: 'Varita', tipoItem: 'arma_1m', especial: {sp: 3}}, {nombre: 'Mitones', tipoItem: 'manos', mods: [{stat: 'ahorroespsp', val: 1}]}]});
+  const esp = CreepAcciones.costoEspecialCreep(sc, sc.equipo[0]).espera;
+  const t = Combatiente.trampaDeHab({nombre: 'Cepo', trampaColocar: {nombre: 'Cepo'}}, st => st === 'des' ? 5 : st === 'trampaoculta' ? 2 : 0);
+  igual([primero, segundo, esp, t.detectar], [2, 3, 1, 7]);
+});
+prueba('guantes del envenenador: el resumen público lleva los stacks de más (el mapa se los suma al veneno del duelo)', () => {
+  const {S} = FichaGuardado.normalizar({}, {mezclarCatalogo: false});
+  S.inventario = [{id: 'g', nombre: 'Guantes del envenenador', tipoItem: 'manos', equipado: true, mods: [{stat: 'venenista', val: 1}]}];
+  igual(FichaResumen.resumen(S, {}).venenista, 1);
+});
 prueba('✋ La parte a mano de un arma especial: texto y tirada, o nada', () => {
   igual([Combatiente.aManoEspecial({aMano: {texto: ' Mojado ', tirada: '1 d6'}}), Combatiente.aManoEspecial({aMano: {texto: '', tirada: ''}}), Combatiente.aManoEspecial({sp: 1})],
     [{texto: 'Mojado', tirada: '1d6', etiqueta: 'A mano'}, null, null]);

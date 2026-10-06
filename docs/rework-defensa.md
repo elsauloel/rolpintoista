@@ -833,3 +833,13 @@ primer uso de un arma especial −1 SP 0,75 · venenos +1 turno y +1 daño 1,5 �
 
 Se van de los 9 viejos: Defensa +3 a +5 (pasan el tope de 2), el Tipo 8 en las manos (es de torso rígido y escudo) y el PdG mezclado con mucha
 Defensa. Quedan para Raro: Parry gratis una vez por turno, Crítico frecuente, Espinas (a las armaduras).
+
+**Manos Buena calidad: aprobada y cargada (2026-10-05).** «Démosle para adelante con los guantes.» En `comun/catalogo.js`: 27 guantes de Buena
+calidad (reemplazan a los 9 viejos; 5 conservan nombre, id y narrativa) y los Mitones del primer conjuro (Común). **Envenenador:** «un stack más»
+(un turno más y 1 de daño más por turno), con la explicación en los detalles técnicos. **Correcciones de la calculadora al cargar:** los Guantes
+del contragolpe pasan a «contraataque −1 No2 · Percepción +1» (con el Parry se pasaban de la bolsa) y el envenenador a «un stack más · Res. tóxico
++1» (con Defensa +1 sumaba 3 en una bolsa de 2,5); los precios salen de la calculadora (70 lo que gasta toda la bolsa). **Mecánicas nuevas
+construidas** (personajes, invocaciones y creeps): PdG con una familia de armas (`pdgt4/6/8/10`) y a distancia (`pdgdist`), oportunidad y
+contraataque más baratos (`oporahorro`, `contraahorro`), Soltarse (`soltarse`), trampas mejor escondidas (`trampaoculta`), el primer conjuro
+(`ahorroespsp`; un creep espera menos) y el envenenador (`venenista`: el mapa del GM le suma esos stacks a los venenos del duelo; los de zonas y
+trampas, a mano). Costos en la calculadora: familia/distancia 1, rebajas de No2 2, soltarse 0,25, trampas 0,125, primer conjuro 0,75, envenenador 2.

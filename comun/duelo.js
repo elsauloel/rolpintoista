@@ -1468,7 +1468,15 @@ const Duelo = (() => {
         let acc;
         if(ef.aplicar === 'pedido' || ef.aplicar === 'en-curso') acc = `<div class="duelo-nota">Aplicando sobre ${_esc(d.defensor.nombre)}…</div>`;
         else if(!puedeAtq) acc = `<div class="duelo-nota">esperando que ${_esc(d.atacante.nombre)} lo aplique…</div>`;
-        else if(spec) acc = `<button type="button" data-ef-aplicar="${i}">✔ Aplicar ${_esc(EstadosAplicarTexto(spec, ef))} sobre ${_esc(d.defensor.nombre)}</button>`;
+        else if(spec){
+          // Los stacks de más que suma quien atacó (Guantes del envenenador, 2026-10-05): el botón ya dice cuántos van a llegar.
+          let extra = 0;
+          try{ extra = cfgEscuchar.stacksExtra ? Math.max(0, Math.round(_num(cfgEscuchar.stacksExtra(d, spec)))) : 0; }catch(err){ extra = 0; }
+          const pre = ((typeof EstadosAplicar !== 'undefined' && EstadosAplicar.DEBUFFS) || []).find(x => x.nombre === spec.nombre) || {};
+          const base = Math.max(1, _num(spec.stacks) || _num(pre.stacks) || 1);
+          const txt = extra ? `${spec.nombre} ×${base + extra} (${base} + ${extra} del envenenador)` : EstadosAplicarTexto(spec, ef);
+          acc = `<button type="button" data-ef-aplicar="${i}">✔ Aplicar ${_esc(txt)} sobre ${_esc(d.defensor.nombre)}</button>`;
+        }
         else acc = `<div class="duelo-nota">✋ A mano: ${_esc(ef.detalle || 'aplicalo vos, no hay un estado automático para este efecto')}</div><button type="button" data-ef-mano="${i}">Listo, lo apliqué a mano</button>`;
         estado = cab + acc;
       }

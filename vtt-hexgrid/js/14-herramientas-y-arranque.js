@@ -807,7 +807,8 @@ function arrancarEnVivo(){
   mesaHistorialAlEntrar();
   // Duelo paso a paso (comun/duelo.js): el cuadro se abre solo para todos; las tiradas de cada uno se piden al iframe de su ficha (o de las Acciones del creep).
   setTimeout(precargarMarco, 6000);   // abrir más rápido la primera Botonera o Acciones (paso 4)
-  Duelo.escuchar({relay: dueloRelayMapa, hooksLocal: lado => bnHooksDuelo(lado) || bnHooksDueloInv(lado) || acHooksDuelo(lado), controlDe: lado => {   // 🎮 personaje controlado por el GM: su lado lo maneja el GM
+  Duelo.escuchar({stacksExtra: (d, spec) => /veneno/i.test(String(spec.nombre || '')) ? venenistaDe(d.atacante) : 0,   // el envenenador (js/13)
+    relay: dueloRelayMapa, hooksLocal: lado => bnHooksDuelo(lado) || bnHooksDueloInv(lado) || acHooksDuelo(lado), controlDe: lado => {   // 🎮 personaje controlado por el GM: su lado lo maneja el GM
     if(!lado || lado.tipo !== 'pj') return '';
     const f = fichasPub.get(String(lado.ref || '').split(SEP_INVOCACION)[0]);
     return (f && f.resumen && f.resumen.control) || '';

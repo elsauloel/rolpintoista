@@ -1664,3 +1664,6 @@ Descartadas (no mencionadas): Res.Esp +2, gorro de papel de aluminio, sombrero e
 
 **Alcance del rework de defensivos (dueño, 2026-10-05):** lo **Común se conserva** (como la Corona de laureles, Res.Mt +4) y se le suman las piezas
 de caster que falten; **Buena calidad, Raro y para arriba se reemplazan enteros** por listas nuevas, como se hizo con las armas.
+
+**Reparto, decisiones (dueño, 2026-10-05):** varitas sin salir del Sigilo → **Cabeza, desde Raro** ✅. El **Cinturón no suma más funciones**: lo de
+ahorro en varitas va a otro slot (a definir).

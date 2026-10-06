@@ -645,7 +645,7 @@ Calculadora: ranura de cinturón 0,5, de mochila 0,25; la mochila tiene bolsa pr
 - **Pasamanos** (cinturón, 0,75) y **Alforja compartida** (mochila, 0,75): el dar en combate de P157. Comunes: **Faja de mandadero** y **Alforja de arriero**
   (+2 ranuras). Quedan 12 cinturones y 10 mochilas Comunes, todos con un efecto propio.
 
-## Cabeza — piezas de caster y Buena calidad (2026-10-05, ⬜ a revisar por el dueño)
+## Cabeza — piezas de caster y Buena calidad (2026-10-05, ✅ aprobada con los cambios de abajo y cargada)
 Criterios: **uno a tres efectos de caster por parte** y la escasez controlada (ver `rework-armas.md`, «Defensivos para casters»); lo Común se
 conserva y se le suma lo que falte; **Buena calidad se reemplaza entera**. Bolsa de la cabeza: Común 2 · Buena 3,5 · Rara 5; tope de Defensa
 Común 1 · Buena 2 · Rara 3; el peso devuelve 0,5 por punto; precio = 10 + 25 × puntos. **Costo nuevo propuesto: SP Regen +1 = 2** (como la
@@ -696,3 +696,9 @@ su chance (50 % = 4–6 en d6, 100 % = siempre).
 Notas: el Tipo 10 (solo cascos y escudos) entra en Buena por los yelmos pesados (pesa 4 puntos; el peso y la desventaja lo pagan). Se van de lo
 viejo: Defensa +3 a +6 (pasan el tope de 2), Tipo 6 en la cabeza, PdG en un casco (el PdG es de los guantes) y Especial +1 (un atributo entero).
 🧙 = pensado para casters (3 de 19, la parte de una clase). Lo de caster que no entra acá: sigilo con armas especiales (Cabeza, Raro).
+
+**Cargado (2026-10-05):** «con esas salvedades, me parece bien la lista de Buena calidad». En `comun/catalogo.js`: los 2 cascos Comunes de caster
+(Sombrero humectante, Antiparras de rastreo) y los 19 de Buena calidad, que reemplazan a los 14 viejos (8 conservan nombre, id y narrativa).
+Calculadora: SP Regen = 2 y Luz = 0,25; cada pieza gasta su bolsa (las simples y las pesadas, menos). Probado en el motor: el sombrero suma
+SP Regen +1 y la Capucha de la hermandad, Sigilo +2. **Pendiente:** el Casco de minero y el Casco de obra abollado (Comunes) quedan caros con la
+Luz a 0,25 (60 → 40 y 60 → 55): a decidir si se les baja el precio.

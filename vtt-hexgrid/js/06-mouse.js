@@ -36,15 +36,6 @@ lienzo.addEventListener('pointerdown', e => {
     if(toolkitAbierto){ abrirToolkit(false); return; }
     const {px, py} = posEvento(e);
     const m = pantallaAMundo(px, py);
-    // Clic derecho sobre un token (dueño, 2026-10-06): lo selecciona con el resto de su menú (ficha, tarjeta, ajustes, mover libre,
-    // ocultar, equipo); otro clic derecho sobre el mismo vuelve a lo del combate. Afuera de un token, el ping de siempre.
-    const idDer = tokenEn(m.x, m.y);
-    if(idDer){
-      const ya = seleccion === idDer && hudNivel === 'resto';
-      seleccionar(idDer);
-      hudPonerNivel(ya ? 'vital' : 'resto');
-      return;
-    }
     guardarPing(m.x, m.y);
     return;
   }

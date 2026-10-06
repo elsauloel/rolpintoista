@@ -403,6 +403,6 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   un ítem del catálogo cambia el catálogo, pero no las copias que ya están en una mochila. Falta guardar de dónde salió
   cada ítem al comprarlo (`bibOrigen`) y mostrar el aviso (cartel `Biblioteca.avisoVersion`).
 - [ ] **Plan de consolidación** (2026-09-30, propuesta del asistente a pedido del dueño): un solo motor de reglas (personaje, invocación y creep) y la ficha, GM Tools y el mapa como ventanas; pasos 0 a 6 en `docs/plan-consolidacion.md`. **En curso** (2026-09-30): paso 0 hecho (`comun/pruebas.html`, `docs/pruebas-de-humo.md`); sigue el paso 1.
-- [x] **Menú del token en dos niveles** (idea del dueño, 2026-10-06; ✅ hecho y probado el mismo día, con ⋯ / ↩ para pasar de uno al otro): clic izquierdo = solo lo inmediato del combate (HP, SP, No2,
+- [x] **Menú del token en dos niveles** (idea del dueño, 2026-10-06; ✅ hecho y probado el mismo día; al final, solo con el botón ⋯ / ↩ — el clic derecho sigue siendo ping y cancelar): clic izquierdo = solo lo inmediato del combate (HP, SP, No2,
   ◎ Estados y quizás ⚡ Acciones/Botonera); clic derecho = todos los demás (🪪 tarjeta, 📜 ficha, ⚙ ajustes, 🦶 mover libre, 👁 ocultar, 🛡
   equipo). Ojo: hoy el clic derecho sobre el mapa cancela (elegir objetivo, colocar, cerrar la Botonera); sobre un token se podría usar igual.

@@ -1408,10 +1408,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   y les valen las chances (`chanceDe`), Recuperarse rápido y Pisada atenta (también a los creeps). **Reflejos de mangosta = dodge roll**: fase
   `reflejos-dodge` de js/19 (`trampaPasoDodge`: elegir casilla a 1–2, pagar el movimiento; afuera de la trampa la esquiva; «✋ No me tiro»).
 
-- **Menú del token en dos niveles** (2026-10-06, dueño): el **clic izquierdo** en un token muestra solo lo del combate (vida, SP, No2, ◎
-  estados, ⚡ Botonera/Acciones y **⋯**); el **clic derecho** sobre un token, el resto (🪪 tarjeta, 📜 ficha, ⚙ ajustes, 🦶 mover libre,
-  👁 ocultar, 🛡 equipo y **↩**). Otro clic derecho sobre el mismo vuelve; ⋯ / ↩ pasan de uno al otro. `hudNivel` / `hudPonerNivel` (js/10;
-  va en la firma del HUD), el clic derecho en js/06 (después de todo lo que el clic derecho cancela; afuera de un token, el ping de siempre).
-  Seleccionar otro token (por cualquier camino) vuelve a lo del combate.
+- **Menú del token en dos niveles** (2026-10-06, dueño): al seleccionar un token se ve solo lo del combate (vida, SP, No2, ◎ estados,
+  ⚡ Botonera/Acciones y **⋯**); el **⋯** muestra el resto (🪪 tarjeta, 📜 ficha, ⚙ ajustes, 🦶 mover libre, 👁 ocultar, 🛡 equipo y **↩**,
+  que vuelve). `hudNivel` / `hudPonerNivel` (js/10; va en la firma del HUD). El clic en un token y seleccionar otro vuelven a lo del combate.
+  **El clic derecho NO se usa para esto** (dueño, el mismo día: «dejemos sólo esa ruta»): sigue siendo ping y cancelar.
 
 - **Titilando** (2026-10-06, `js/22-titilando.js`): cada segundo, cada pantalla mira la vida de lo que maneja (`bnManejo`: sus personajes e invocaciones; el GM, los creeps); si pasa de 0 a más de 0 y no tiene ya Titilando, se lo pone (`editarPersonajeMapa` / `modificarCreep`) y lo cuenta en la Crónica («✨ juan vuelve a la vida»). La primera vez solo anota la vida. `tokenTitila(t)` (cualquier estado invulnerable) hace que el token prenda y apague en el dibujo (js/05).

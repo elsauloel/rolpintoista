@@ -374,6 +374,14 @@ async function iniciativaSiguiente(){
   const nuevaRonda = ronda !== iniciativa.ronda;
   const ok = await guardarIniciativa({turno: i, paso: pasoFin + 1, ...fin, ...(nuevaRonda ? {ronda} : {})});
   if(!ok) return;
+  // La Crónica, para todos (dueño, 2026-10-06): «Empieza el turno de Fulano» sale enseguida (antes esperaba a que se procesara todo, ~5 s) y
+  // después se le suman lo que pasó al terminar el anterior y al empezar el suyo.
+  const sig = iniciativa.orden[i] || {id: ''};
+  const tSig = tokens.get(sig.id);
+  const publico = (o, t) => !!t && !t.oculto && !(o && o.oculto) && !enSigilo(t);
+  const nomSig = publico(sig, tSig) ? nombreDe(tSig) : '';
+  const tarjeta = momentoAbrir({tipo: 'turno', icono: '▶', titulo: `${nuevaRonda ? `Ronda ${ronda} · ` : ''}${nomSig ? `Empieza el turno de ${nomSig}` : 'Pasa el turno'}`,
+    estado: 'listo', datos: {lineas: [nomSig ? `Le toca a ${nomSig}.` : 'Sigue el orden de turnos.']}});
   const lineas = [];
   if(termina) lineas.push(...await finDeTurno(termina.id, `${mapaFin}:${pasoFin}`));
   // Los caídos que se saltean: su turno pasa igual, sin jugar.
@@ -382,15 +390,9 @@ async function iniciativaSiguiente(){
     lineas.push(...ini2, ...fin2);
   }
   if(nuevaRonda) await pasarMantenimiento(`Ronda ${ronda}`);   // lo que es de la ronda (P161)
-  const sig = iniciativa.orden[i] || {id: ''};
   const lineasInicio = sig.id ? await inicioDeTurno(sig.id, `${mapaFin}:${pasoFin + 1}`) : [];
-  // La Crónica, para todos (dueño, 2026-10-06): «Empieza el turno de Fulano», lo que pasó al terminar el anterior y al empezar el suyo.
-  const tSig = tokens.get(sig.id);
-  const publico = (o, t) => !!t && !t.oculto && !(o && o.oculto) && !enSigilo(t);
-  const nomSig = publico(sig, tSig) ? nombreDe(tSig) : '';
   const todas = [...lineas, ...lineasInicio];
-  momentoAbrir({tipo: 'turno', icono: '▶', titulo: `${nuevaRonda ? `Ronda ${ronda} · ` : ''}${nomSig ? `Empieza el turno de ${nomSig}` : 'Pasa el turno'}`,
-    estado: 'listo', datos: {lineas: todas.length ? todas.slice(0, 14) : [nomSig ? `Le toca a ${nomSig}.` : 'Sigue el orden de turnos.']}});
+  if(todas.length) momentoActualizar(await tarjeta, {'datos.lineas': todas.slice(0, 14)});
 }
 // Las invocaciones de un personaje que tienen turno propio (su token está en el orden): las demás van con el personaje.
 function invConTurno(fichaId){

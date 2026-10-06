@@ -1046,3 +1046,31 @@ suena) y **conductora** (Res. rayo −2: las placas de metal atraen la descarga)
 
 **Ojo con las ⚠:** el crítico y la Armadura rota (hachas, ácido) son justamente lo que atraviesa al tanque (Fase 3). Placas templadas y Remaches
 reforzados les sacan filo: o se dejan para Raro, o se descartan.
+
+**Respuestas del dueño (2026-10-06):** las dos ⚠ (Placas templadas, Remaches reforzados) **van a Raro, y caras**. **Conductora:** mejor
+«recibe más daño de rayo» que «Res. rayo −2», y con poco valor. **Ruidosa (Sigilo −2): sí.** Todas tienen que decir cuánto pesan.
+
+### Torso rígido Buena calidad — propuesta v1 (2026-10-06, ⬜ a revisar por el dueño)
+Tope de Defensa 6. Bolsa 7 (hasta 7,7); cada punto de peso devuelve 0,5. Costos nuevos propuestos: ruidosa devuelve 0,5 por punto de Sigilo
+(−2 = 1), conductora 0,25 por punto (+2 de daño de rayo = 0,5), aliados al lado +1 Defensa 2, recibir el golpe de un aliado 1,5, no te pueden
+mover 0,5, Espinas 2 (como siempre). Las de «Peto anclado» quedaron adentro de la Armadura del inamovible.
+
+| Armadura · pesa · precio | Qué hace |
+|---|---|
+| Armadura de placas · 4 · 185 | Defensa +6 · Tipo 4 +1 · Tipo 6 +1 · Res.CC +1 · ruidosa (Sigilo −2) |
+| Coraza de acero pulido · 4 · 200 | Defensa +6 · Tipo 4 +1 · Res.CC +1 · Vida +10 · conductora (recibe 2 más de daño de rayo) |
+| Coraza de bandas remachadas · 4 · 190 | Defensa +6 · Resistente ×3 · Tipo 4 +1 · Vida +10 · Res.CC +1 · Iniciativa −1 |
+| Cota de malla fina · 3 · 200 | Defensa +5 · Tipo 6 +1 · Res.CC +1 · Vida +5 |
+| Media armadura de escudero · 3 · 200 | Defensa +5 · Tipo 4 +1 · Bloqueo +1 · Res.CC +1 · Vida +5 |
+| Armadura compuesta · 3 · 200 | Defensa +5 · Tipo 4 +1 · Tipo 6 +1 · Vida +10 · Res.CC +1 · Evasión −1 |
+| Peto del gigante · 4 · 185 | Vida +30 · Defensa +3 |
+| Armadura del inamovible · 4 · 200 | Res.CC +3 · no te pueden empujar ni atraer · Defensa +5 · Vida +5 |
+| Coraza consagrada · 3 · 200 | Res.Esp +3 · Res.Mt +4 · Defensa +4 |
+| Coraza de primera línea · 4 · 190 | Defensa +4 · +3 contra el primer golpe del turno · Res.CC +1 · Vida +10 |
+| Placas antibala · 3 · 185 | Defensa +4 · +3 contra armas a distancia · Tipo 4 +1 · Vida +10 |
+| Coraza de pinchos · 4 · 185 | Defensa +5 · Espinas · Tipo 4 +1 · Vida +10 · ruidosa (Sigilo −2) |
+| Coraza del guardián · 4 · 185 | Defensa +4 · los aliados al lado tuyo tienen +1 Defensa · Tipo 4 +1 · Res.CC +1 · Vida +5 |
+| Armadura del escolta · 3 · 185 | Defensa +5 · una vez por turno recibís vos el golpe dirigido a un aliado al lado (1 No2; ✋ a mano al principio) · Res.CC +1 · Vida +5 |
+| 🧙 Coraza rúnica · 3 · 190 | Defensa +4 · Res.Esp +2 · SP máximo +3 · Res.Mt +1 |
+
+Para Raro (caras): Placas templadas y Remaches reforzados.

@@ -762,3 +762,14 @@ Evasión**; desde Buena, **Iniciativa** (manos rápidas). Bolsa de las manos: Co
 | Muñequeras de hierro ⚙ B | Res.CC +2 · Defensa +1. |
 | Manoplas de cota ⚙ B | Defensa +2 · Res. crítico Tipo 6 +1 (las manos son de los pocos slots con Tipo 6). |
 | Guantes de goma reforzados ⚙ B | Defensa +1 · Res. rayo +2 · Parry +1 (lo elemental, encima de algo de manos). |
+
+**Cómo se usa esta lluvia (dueño, 2026-10-05):** lo que ya está en los Comunes **se vuelve a usar en Buena, mejorado**; la lluvia es para ver
+si quedó alguna idea afuera. Más ideas que se pueden sumar:
+
+| Guante | Qué hace |
+|---|---|
+| Guantes de esquiva ⚙ B | Evasión +1 (identidad de las manos; hoy solo un Común la da). |
+| Guantes de tirador ⚙ B | PdG +1 solo con armas a distancia (más barato que el PdG de todo). |
+| Guantes de la emboscada ⚙ R | El ataque de oportunidad no cuesta No2, una vez por turno (como el rasgo de algunas armas, pero en el guante). |
+| Guantes del contragolpe 🔧 R | Después de ganar un Parry, el contraataque cuesta 1 No2 menos. |
+| Guanteletes de agarre firme 🔧 B | Nadie te puede desarmar ni sacarte el escudo (✋ a mano mientras no exista el desarme). |

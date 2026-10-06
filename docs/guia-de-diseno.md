@@ -16,6 +16,9 @@
   catálogo de piezas «de caster». Alcanza con **uno a tres efectos pensados para casters por slot** (cabeza, manos, piernas, pies, armaduras,
   accesorios…), repartidos entre slots y no amontonados en uno, y en total **más o menos la parte que le toca a una clase** (≈ 1/7 hoy, 1/9 si se
   suman clases) de los ítems de cada tier.
+- **Escasez controlada** (2026-10-05): repartir por slot también sirve para que ciertos efectos **no se acumulen**. Si un efecto fuerte (ej. SP Regen)
+  aparece en todos los slots, se puede apilar sin control; los efectos más peligrosos al acumularse viven en **un solo slot** (y, si hace falta,
+  desde cierto tier). Ver la clasificación en `rework-armas.md`, «Escasez controlada».
 - **Los Nitros (No2) son un recurso MUY preciado** (2026-09-25). Se usan para acciones ofensivas, defensivas y para moverse, así que cada turno el jugador **optimiza y maximiza** su uso. Al diseñar **skills y objetos**, un costo en Nitros pesa mucho: 1 Nitro no es "casi gratis". Un arma o skill que cuesta pocos Nitros es barata *de verdad* y suele ser de calidad baja; los costos bajos hay que ganárselos con calidad o con límites. Ver también P112 (peso de los efectos) y P116 (armas mágicas).
 
 - **El peso regula las armas mágicas (relevancia intermedia):** una varita pesa 1 y un báculo puede pesar mucho; como el Sobrepeso hoy es un drawback moderado (P108), el peso pesa de forma intermedia en el balance del arma, no alta.

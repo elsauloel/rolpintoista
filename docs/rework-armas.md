@@ -1564,6 +1564,22 @@ suman). En Cabeza Común (24 piezas) eso son unas 3. La lluvia de abajo es el **
 les busca una vuelta, y las que quedan se reparten (ej.: SP Regen en la cabeza, Rango de casteo en las manos, Res.Esp en una armadura). El dueño
 las revisa punto por punto.
 
+### Escasez controlada: qué efecto se puede repetir entre slots (propuesta, 2026-10-05, ⬜ a revisar por el dueño)
+
+Dueño: «hay que ser más cautelosos, para generar una escasez controlada»: un efecto que se apila en todos los slots se sale de control. Propuesta:
+
+| Efecto | Dónde puede vivir |
+|---|---|
+| SP Regen | **Un solo slot** (Cabeza: el Sombrero humectante). Es el más peligroso: se acumula turno a turno. |
+| Ahorro en varitas (−SP, −No2, el No2 que no sube, No2 solo para varitas) | **Un solo slot**, el Cinturón (donde se llevan las varitas), y desde Buena calidad. |
+| PdG.Esp | **Un solo slot** (Manos: guantes para canalizar). |
+| Ef.Esp | Ya está en anillos, pociones y pergaminos (Furia Arcana): **no en defensivos**, o como mucho uno, Raro o más. |
+| Radio de áreas, salto extra del rayo, estados que duran más | **Un solo slot cada uno y desde Raro**: cambian mucho cómo pega una varita. |
+| SP máximo, Rango de casteo, afinidad elemental (+1 al daño de un elemento) | **Hasta dos slots**: suman, pero no se disparan. |
+| Res.Esp, Res.Mt, resistencias elementales, Ve lo oculto, Sigilo con varitas, lo ✋ a mano | **Pueden repetirse**: son defensivos o situacionales (las resistencias ya tienen su propio tope de diseño). |
+
+Posible ayuda (a decidir): un control en el editor del catálogo que avise si un efecto «de un solo slot» aparece en más de uno.
+
 ### Cabeza para casters — lluvia de ideas (2026-10-05, ⬜ para que el dueño filtre; es el pool para todos los slots)
 
 ⚙ = ya se puede (un bono a un stat que existe) · 🔧 = mecánica nueva chica · ✋ = quedaría a mano (texto y tirada)

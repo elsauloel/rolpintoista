@@ -1545,3 +1545,69 @@ lluvia ácida 21 y báculo de sangre 19,5), 3 orbes.
   primero se marca el segundo; si es otro, cascada de dos con 1d4 cada uno), el **crítico de lo físico** (`critTipo`: estaca Tipo 4, canto rodado
   Tipo 10, con el mismo crítico de las armas y la Resistencia a crítico del defensor) y los **orbes** (resguardo: Escudo especial 2, una vez por turno;
   salvaje: 1d6, con 1 te hace 1, con 6 los dados del daño ×2). **Solo queda a mano** el «doble» del orbe salvaje con un arma sin daño (lo decide la mesa).
+
+## Defensivos para casters (fase 3b, arranca 2026-10-05)
+
+Ruta del dueño (2026-10-05): **slot por slot**, empezando por **Cabeza**: primero lo Común pensado para casters, después el tier **Buena calidad de
+Cabeza completo** (todo, no solo casters); y así con el slot siguiente. Como siempre: imaginar → elegir → costear → cargar.
+
+### Cabeza Común — lo que hay hoy (2026-10-05)
+
+24 piezas. Casi todo es Defensa +1 con una resistencia, visión, percepción o sigilo. Lo único con algo de caster: Res.Esp +1 (Capucha de lana del
+culto, Vincha de cuero crudo) y Res.Mt (Corona de laureles +4). **Nada toca SP, SP Regen, PdG.Esp, Ef.Esp, Rango de casteo ni las varitas.**
+
+### Cabeza para casters — lluvia de ideas (2026-10-05, ⬜ para que el dueño filtre)
+
+⚙ = ya se puede (un bono a un stat que existe) · 🔧 = mecánica nueva chica · ✋ = quedaría a mano (texto y tirada)
+
+**Recursos: el SP**
+
+| Casco | Qué hace |
+|---|---|
+| Sombrero humectante ⚙ | +1 SP Regen. Sin Defensa. (El clásico del grupo.) |
+| Gorro de la alacena ⚙ | +2 SP máximo. Más tanque de SP, no más rápido. |
+| Bonete del primer conjuro 🔧 | El primer uso de una varita en el turno cuesta 1 SP menos. |
+| Capucha del ayuno 🔧 | Si en el turno no gastaste SP, en el Mantenimiento recuperás 1 SP de más. Premia esperar. |
+| Capucha de sangre 🔧 | Sin SP, una varita se paga con vida (1 HP por SP) en vez de con No2. |
+
+**Los No2 (muy preciados: probablemente para Buena calidad o más)**
+
+| Casco | Qué hace |
+|---|---|
+| Galera del prestidigitador 🔧 | El No2 de las varitas no sube con el segundo uso del turno (sí con el tercero). |
+| Turbante del canalizador 🔧 | +1 No2 que solo sirve para usar varitas o báculos. |
+
+**Puntería y potencia**
+
+| Casco | Qué hace |
+|---|---|
+| Monóculo arcano ⚙ | +1 PdG.Esp. |
+| Diadema del foco ⚙ | +1 Ef.Esp (como un Anillo de Furia Arcana, en la cabeza). |
+| Capucha del tirador arcano ⚙ | +2 Rango de casteo. |
+| Sombrero puntiagudo 🔧 | +1 al radio de tus áreas (bola de fuego, ventisca, nubes). |
+
+**Afinidad elemental (identidad del caster)**
+
+| Casco | Qué hace |
+|---|---|
+| Capucha de ceniza 🔧 | +1 al daño de fuego de tus varitas y habilidades. Res. fuego +1. |
+| Gorro de escarcha 🔧 | +1 al daño de hielo. Res. hielo +1. |
+| Casco pararrayos 🔧 | Res. rayo +2; tu rayo en cadena salta 1 vez más. |
+| Velo del pantano 🔧 | Tus estados tóxicos (Veneno, miasma) duran 1 turno más. |
+
+**Defensa propia del caster**
+
+| Casco | Qué hace |
+|---|---|
+| Pañuelo del eremita ⚙ | Res.Esp +2: resistir la magia de otros. |
+| Gorro de papel de aluminio ⚙ | Res.Mt +3 · Res. rayo +1 (humor). |
+| Capucha de las sombras 🔧 | Usar una varita no te saca del Sigilo (atacar con arma, sí). |
+| Sombrero espejado ✋ | Una vez por combate, si resistís un hechizo, 1d6: con 5–6 se lo devolvés (a mano). |
+
+**Información y utilidad**
+
+| Casco | Qué hace |
+|---|---|
+| Antiparras de éter ⚙ | Ve lo oculto +1: ver trampas mágicas, runas y lo invisible. |
+| Tiara del lector de auras ✋ | Al mirar a alguien, el GM te dice si tiene SP para gastar y qué estados lleva. |
+| Bonete del aprendiz distraído 🔧 | +1 Ef.Esp, pero al usar una varita 1d6: con 1 el efecto sale para otro lado (a mano). |

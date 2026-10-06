@@ -113,7 +113,7 @@ const FichaCalculo = (() => {
     // Torso rígido de Buena calidad (2026-10-06, dueño).
     // Pies de Buena calidad (2026-10-06, dueño).
     {id:'levantarse', label:'Levantarse rápido', full:'Levantarse de Sentado cuesta esta cantidad de No2 menos (nunca menos de 0)'},
-    {id:'pasoseguro', label:'Paso seguro', full:'El primer casillero de terreno lento (arena movediza, brea) de cada turno te cuesta lo normal'},
+    {id:'levitar', label:'Levitar', full:'Los primeros N casilleros que te movés en cada turno no tocan el piso: no te frena el terreno lento, no pisás ni detectás trampas y no te quema el terreno incendiado (las zonas sí te alcanzan: pueden ser nubes); al terminar el turno tocás el piso'},
     {id:'suelagruesa', label:'Suela gruesa', full:'Lo que pisás (zonas y trampas) te hace esta cantidad menos de daño'},
     {id:'meditar', label:'Meditar', full:'Si no te moviste en tu turno anterior, al empezar el tuyo recuperás esta cantidad de SP'},
     {id:'guardian', label:'Guardián', full:'Los aliados que están al lado tuyo tienen +N Defensa (el mapa la suma sola al aplicarles el daño; no se acumula con otro guardián)'},

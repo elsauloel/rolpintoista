@@ -1344,3 +1344,7 @@ versión parecida en más de una, es candidato a juntar.
   (el mapa: `costoPasos(ruta, por, gratis, recargo, seguro)`, `pasoSeguroDe(t)`, una vez por turno), `suelagruesa` (resta al daño de zonas y
   trampas: `statPiesDe(t, st)`, js/04) y `meditar` (`FichaMantenimiento.inicioTurno`: +SP si `movidoPaso` < `inicioPaso`; `gastarNitros` anota
   `movidoPaso`). El resumen público lleva `pasoseguro` y `suelagruesa` (personaje e invocaciones).
+- **Levitar** (pies, 2026-10-06; reemplaza a `pasoseguro`): `levitar` = los primeros N casilleros de cada turno sin tocar el piso. El mapa:
+  `costoPasos(…, levita)` (sin terreno lento), `trampasEvaluarRuta(…, levita)` (no pisa ni detecta), `moverToken(…, levita)` (el fuego del terreno
+  solo desde ahí; las zonas no, pueden ser nubes), `levitarRestante` / `levitarUsar` (por turno) y `levitarAterrizar` (al terminar su turno, la
+  trampa donde quedó parado se dispara).

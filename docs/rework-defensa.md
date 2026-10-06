@@ -1127,3 +1127,8 @@ para personajes, invocaciones y creeps: `levantarse` (`Combatiente.costoLevantar
 `pasoSeguroDe`, una vez por turno), `suelagruesa` (se resta al daño de zonas y trampas, js/08 y js/19), `meditar` (personajes: al empezar el turno,
 si no gastó No2 en moverse desde que empezó el anterior — el mapa anota `movidoPaso` al cobrar el movimiento). «Cuando los vea con precios y
 peso, ajustaremos» (dueño).
+**Levitar (dueño, 2026-10-06: «lo lindo de levitar es que no tocás el suelo»):** reemplaza al «Paso seguro». **Levitar N** = los primeros N
+casilleros que te movés en cada turno no tocan el piso: no te frena el terreno lento, no pisás ni detectás trampas, no te quema el terreno
+incendiado; **al terminar el turno tocás el piso** (si quedaste parado sobre una trampa, se dispara). Las zonas sí te alcanzan (una nube tóxica no se
+esquiva levitando: falta distinguir zonas del piso y en el aire, `pendientes.md` §6). Barato: 0,25 por casillero. Zapatillas de levitación (Buena)
+Levitar 3 → 80; **Zapatillas de pluma** (Común, nueva) Levitar 1 · Defensa +1 → 40. El dueño va a revisar la lista de pies a fondo y pedir ajustes.

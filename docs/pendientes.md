@@ -256,6 +256,10 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] El pool de **habilidades de clase** (`skills-clase.js`): 62 skills, casi todas todavía "(Sin auditar)".
 
 ## 6. Repaso de buffs y debuffs (en curso, 2026-09-21)
+- [ ] **Zonas del piso y zonas en el aire** (dueño, 2026-10-06): distinguir los efectos persistentes que están en el piso (brea, ácido, púas,
+  fuego del terreno) de los que ocupan un área (una nube tóxica, niebla). Hace falta para **Levitar** (hoy saltea trampas, terreno lento y el
+  terreno incendiado, pero ninguna zona: una nube no se esquiva levitando) y para las **Suelas de cuero de dragón** (hoy restan a todas las zonas;
+  deberían ser solo las del piso). Probable: una marca «del piso» en la zona (asistente de zonas, Ejecución de habilidades y trampas que dejan zona).
 - [ ] **Herramienta de «pasa el tiempo»** (dueño, 2026-10-06, P161 — hay que pensarla bien antes de construirla): fuera de combate, sin
   orden de turnos, algo que haga correr el tiempo (regenerar SP, bajar cooldowns, terminar estados, descansos). Hoy lo hace el ⟳ Mantenimiento.
 - [~] **Revisar Pajaritos, Stun y los estados fuertes por 1 turno** (dueño, 2026-10-06; chequeo estado por estado con el turno propio hecho

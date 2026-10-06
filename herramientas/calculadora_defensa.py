@@ -67,10 +67,10 @@ COSTO = {
     # Torso rígido de Buena calidad (dueño, 2026-10-06): los aliados al lado tuyo con +N Defensa (Coraza del guardián) 2 por punto; recibir el golpe
     # de un aliado al lado (Armadura del escolta, a mano) 1,5.
     'guardian': 2, 'escolta': 1.5,
-    # Pies de Buena calidad (dueño, 2026-10-06): levantarse de Sentado sin pagar el No2 1; el primer casillero de terreno lento de cada turno a
-    # costo normal 0,5; lo que pisás (zonas y trampas) hace N menos de daño 1 por N; meditar (+1 SP al empezar el turno si no se movió en el
-    # anterior) 1.
-    'levantarse': 1, 'pasoseguro': 0.5, 'suelagruesa': 1, 'meditar': 1,
+    # Pies de Buena calidad (dueño, 2026-10-06): levantarse de Sentado sin pagar el No2 1; Levitar (los primeros N casilleros de cada turno sin
+    # tocar el piso) 0,25 por casillero — barato, «se puede meter en una bota Común»; lo que pisás (zonas y trampas) hace N menos de daño 1 por N;
+    # meditar (+1 SP al empezar el turno si no se movió en el anterior) 1.
+    'levantarse': 1, 'levitar': 0.25, 'suelagruesa': 1, 'meditar': 1,
 }
 def costo_retirada(pct):
     return 4 if pct >= 100 else pct * 0.03

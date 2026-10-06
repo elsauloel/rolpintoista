@@ -2032,12 +2032,12 @@ prueba('pies: las chances (33 % = 5–6, 50 % = 4–6, siempre), Lento y los est
     Combatiente.esTraba({nombre: 'Veneno'}), rengo1, S.efectos.some(e => e.nombre === 'Rengo')],
     ['33 % (5–6 en d6)', '50 % (4–6 en d6)', 'siempre', {caras: 6, exitos: 3}, true, true, false, 1, false]);
 });
-prueba('pies: el resumen del personaje publica Pisada atenta, Inamovible, Recuperarse rápido y Reflejos de mangosta; y el catálogo tiene 27 pies Comunes', () => {
+prueba('pies: el resumen del personaje publica Pisada atenta, Inamovible, Recuperarse rápido y Reflejos de mangosta; y el catálogo tiene 28 pies Comunes (con las Zapatillas de pluma)', () => {
   const S = FichaGuardado.normalizar({}).S;
   S.inventario = [{id: 'p1', nombre: 'Botas de prueba', tipoItem: 'pies', equipado: true, mods: [{stat: 'pisadaatenta', val: 1}, {stat: 'inamovible', val: 33}, {stat: 'recuperarse', val: 50}, {stat: 'reflejos', val: 33}]}];
   const r = FichaResumen.resumen(S), L = CATALOGO_BASE.filter(i => i.tipoItem === 'pies' && i.tier === 'Común');
   igual([r.pisadaAtenta, r.inamovible, r.recuperarse, r.reflejos, L.length, L.every(i => (i.mods || []).every(m => m.stat !== 'def' || m.val <= 1)), L.some(i => (i.mods || []).some(m => m.stat === 'tipo2'))],
-    [true, 33, 50, 33, 27, true, false]);
+    [true, 33, 50, 33, 28, true, false]);
 });
 prueba('invocaciones iguales que todos (dueño, 2026-10-04): la ficha publica su costo de moverse (Rengo doble, Inmovilizado 0), Pasos gratis, las chances y Pisada atenta', () => {
   const S = FichaGuardado.normalizar({}).S;

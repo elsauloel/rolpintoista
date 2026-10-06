@@ -225,7 +225,7 @@ function vecinosDeCasilla(c){
   const c0 = hexACubo(c);
   return VECINO_LADO.map(([dq, dr]) => ({col: cuboACol(c0.q + dq, c0.r + dr), fila: cuboAFila(c0.q + dq, c0.r + dr)}));
 }
-function trampasEvaluarRuta(tokId, t, ruta){
+function trampasEvaluarRuta(tokId, t, ruta, levita){   // `levita`: los primeros casilleros no tocan el piso (Levitar)
   const trampas = [];
   elementos.forEach((el, id) => {
     if(el.trampa && !el.disparada && trampaDispara(t, el)) trampas.push({id, el, set: new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila)))});
@@ -234,7 +234,7 @@ function trampasEvaluarRuta(tokId, t, ruta){
   });
   if(!trampas.length) return null;
   const atento = tokenPercepcionAumentada(t) || tokenPisadaAtenta(t);   // Percepción aumentada o Pisada atenta (las trampas)
-  for(let i = 1; i < ruta.length; i++){
+  for(let i = 1 + Math.max(0, num(levita)); i < ruta.length; i++){
     const pisa = trampas.find(x => x.set.has(nbPack(ruta[i].col, ruta[i].fila)));
     if(pisa) return {indice: i, tipo: pisa.portal ? 'portal' : 'pisa', id: pisa.id, el: pisa.el};
     if(atento){
@@ -799,12 +799,12 @@ async function confirmarRuta(){
     const quedan = esCreep ? await gastarNitrosCreep(t.fichaId, costo) : await gastarNitros(t.fichaId, costo);
     if(p.dodge && quedan < 0) Combatiente.avisarDeudaNo2({nombre: nombreDe(t), accion: 'el dodge roll', costo, quedan});
     pasosGratisUsar(p.id, num(p.gratis));   // los primeros casilleros de este turno ya se usaron
-    if(p.seguro) pasoSeguroUsado.add(pasosGratisClave(p.id));   // el Paso seguro de este turno ya se usó (2026-10-06)
+    levitarUsar(p.id, num(p.levita));   // los casilleros levitados de este turno ya se usaron (2026-10-06)
     const primerMov = !seMovioEsteTurno(p.id);
     marcarMovido(p.id);   // ya se movió en este turno (Lento, Pasos de baile)
     rutaPendiente = null;
     const fin = p.celdas[p.celdas.length - 1];
-    await moverToken(p.id, fin.col, fin.fila, p.celdas);
+    await moverToken(p.id, fin.col, fin.fila, p.celdas, num(p.levita));
     if(trampaPendiente && trampaPendiente.tokenId === p.id) trampaResolver();
     if(percepcionSigiloPendiente && percepcionSigiloPendiente.tokenId === p.id) percepcionSigiloResolver();   // P145 (js/16)
     if(oportunidadPendiente && oportunidadPendiente.tokenId === p.id) oportunidadResolver();   // ataque de oportunidad (js/17)

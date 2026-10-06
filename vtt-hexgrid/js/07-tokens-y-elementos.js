@@ -983,7 +983,7 @@ function trazoEn(x, y){
 
 // La ruta viaja con el movimiento como [col, fila, col, fila…] para que
 // los demás vean la estela unos segundos.
-async function moverToken(id, col, fila, celdas){
+async function moverToken(id, col, fila, celdas, levita){
   const t = tokens.get(id);
   if(!t) return;
   giroLibre.clear();   // moverse es una acción: cierra los giros gratis de antes (el de este se abre al guardar)
@@ -1004,6 +1004,8 @@ async function moverToken(id, col, fila, celdas){
     if(rot === num(t.rotacion || 0)) rot = undefined; else t.rotacion = rot;
   }
   const conRot = rot === undefined ? {} : {rotacion: rot};
+  // Levitar (2026-10-06): los primeros casilleros no tocan el piso — el fuego del terreno solo mira desde ahí (las zonas, no: pueden ser nubes).
+  const pisadas = celdas && num(levita) > 0 ? celdas.slice(Math.min(num(levita), celdas.length - 1)) : celdas;
   renderPanel();
   pedirDibujo();
   const doc = coleccionTokens().doc(id);
@@ -1012,13 +1014,13 @@ async function moverToken(id, col, fila, celdas){
     sigiloPublicarAvisos(id);
     percepcionPublicarAvisos(id);
     abrirGiroLibre(id, celdas);
-    fuegoEntrada(id, celdas);
-    zonaRevisarEntrada(id, celdas);
+    fuegoEntrada(id, pisadas);
+    zonaRevisarEntrada(id, celdas);   // las zonas sí (una nube no se saltea levitando; falta distinguir las del piso)
   }catch(err){
     // Reglas de Firestore sin publicar todavía (no conocen "ruta"): se mueve
     // igual, solo que los demás no ven la estela.
     if(err.code === 'permission-denied' && ruta.length > 2){
-      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); percepcionPublicarAvisos(id); abrirGiroLibre(id, celdas); fuegoEntrada(id, celdas); zonaRevisarEntrada(id, celdas); return; }catch(e){ err = e; }
+      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); percepcionPublicarAvisos(id); abrirGiroLibre(id, celdas); fuegoEntrada(id, pisadas); zonaRevisarEntrada(id, celdas); return; }catch(e){ err = e; }
     }
     sigiloAvisosPendientes.delete(id);
     percepcionAvisosPendientes.delete(id);

@@ -401,6 +401,7 @@ function invConTurno(fichaId){
 async function turnoDeToken(tokenId, clave, inicio){
   const t = tokens.get(tokenId);
   if(!t || !t.fichaId) return [];
+  if(!inicio) try{ await levitarAterrizar(tokenId); }catch(err){ console.error('No se pudo resolver la trampa al aterrizar:', err); }   // Levitar: al terminar el turno toca el piso
   const o = iniciativa.orden.find(x => x.id === tokenId);
   const visible = !t.oculto && !(o && o.oculto) && !enSigilo(t);
   const titulo = inicio ? `Empieza el turno de ${nombreDe(t)}:` : `Terminó el turno de ${nombreDe(t)}:`;
@@ -715,22 +716,22 @@ function lentoEn(col, fila){
 }
 // `gratis` (2026-10-04, Pasos gratis): los primeros casilleros de la ruta no cuestan (los que le quedan a ese token en este turno).
 // `recargo` (2026-10-04, estado Lento): lo que se suma al primer casillero (el primero del turno cuesta el doble).
-// `seguro` (Paso seguro, 2026-10-06): cuántos casilleros de terreno lento cuestan lo normal (el primero de cada turno).
-function costoPasos(ruta, porCasillero, gratis, recargo, seguro){
+// `levita` (Levitar, 2026-10-06): los primeros casilleros de la ruta (los que le quedan levitando en este turno) no tocan el piso: el terreno
+// lento no los frena.
+function costoPasos(ruta, porCasillero, gratis, recargo, levita){
   const acc = [];
-  let s = 0, seg = num(seguro);
+  let s = 0;
   for(let i = 1; i < (ruta || []).length; i++){
     if(i > num(gratis)){
-      const lento = porCasillero > 0 ? lentoEn(ruta[i - 1].col, ruta[i - 1].fila) : 0;
-      if(lento > porCasillero && seg > 0){ seg--; s += porCasillero; }
-      else s += porCasillero > 0 ? Math.max(porCasillero, lento) : 0;
+      const lento = porCasillero > 0 && i > num(levita) ? lentoEn(ruta[i - 1].col, ruta[i - 1].fila) : 0;
+      s += porCasillero > 0 ? Math.max(porCasillero, lento) : 0;
     }
     if(i === 1) s += num(recargo);
     acc.push(s);
   }
   return acc;
 }
-const costoRuta = (ruta, porCasillero, pasos, gratis, recargo, seguro) => { const a = costoPasos((ruta || []).slice(0, pasos + 1), porCasillero, gratis, recargo, seguro); return a.length ? a[a.length - 1] : 0; };
+const costoRuta = (ruta, porCasillero, pasos, gratis, recargo, levita) => { const a = costoPasos((ruta || []).slice(0, pasos + 1), porCasillero, gratis, recargo, levita); return a.length ? a[a.length - 1] : 0; };
 
 /* Quién ya se movió en este turno (2026-10-04, los pies): Lento cobra doble el primer casillero del turno y Pasos de baile suma Evasión si ya se
    movió. Como los Pasos gratis, lo anota esta pantalla (y el navegador, por si se recarga). El duelo lo pregunta con window.mapaSeMovio. */
@@ -789,7 +790,7 @@ function costoMoverDe(t){
   const f = fichasPub.get(t.fichaId);
   const r = f && f.resumen;
   if(!r || r.costoMover === undefined) return null;
-  return {porCasillero: num(r.costoMover), disponibles: num(r.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, num(r.costoMover)), seguro: pasoSeguroDe(t)};
+  return {porCasillero: num(r.costoMover), disponibles: num(r.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, num(r.costoMover)), levita: levitarRestante(t)};
 }
 /* Stats de los pies (2026-10-06) de cualquier token: un personaje o una invocación, de lo que publica la ficha de su dueño; un creep, de sus datos. */
 function statPiesDe(t, st){
@@ -800,11 +801,21 @@ function statPiesDe(t, st){
   const f = fichasPub.get(t.fichaId);
   return num(f && f.resumen && f.resumen[st]);
 }
-// Paso seguro: el primer casillero de terreno lento de cada turno cuesta lo normal (se anota en esta pantalla, como los Pasos gratis).
-const pasoSeguroUsado = new Set();
-const pasoSeguroDe = t => statPiesDe(t, 'pasoseguro') > 0 && !pasoSeguroUsado.has(pasosGratisClave(idDeToken(t))) ? 1 : 0;
-// ¿La ruta pasó por terreno lento? (para anotar el Paso seguro como usado)
-const rutaPisaLento = (ruta, pasos, por) => (ruta || []).slice(0, pasos).some(c => lentoEn(c.col, c.fila) > por);
+/* Levitar (pies, 2026-10-06, dueño: «no tocás el suelo»): los primeros N casilleros que se mueve en cada turno no tocan el piso — el terreno
+   lento no lo frena, no pisa ni detecta trampas y no lo quema el terreno incendiado (las zonas sí: pueden ser nubes) —; al terminar su turno toca el piso (si quedó parado sobre una
+   trampa, se dispara: `levitarAterrizar`, desde el fin del turno). Los usados se anotan en esta pantalla, como los Pasos gratis. */
+const levitarUsados = new Map();
+const levitarRestante = t => Math.max(0, Math.round(statPiesDe(t, 'levitar')) - num(levitarUsados.get(pasosGratisClave(idDeToken(t)))));
+const levitarUsar = (id, n) => { if(n > 0){ const k = pasosGratisClave(id); levitarUsados.set(k, num(levitarUsados.get(k)) + n); } };
+async function levitarAterrizar(tokenId){
+  const t = tokens.get(tokenId);
+  if(!t || !(statPiesDe(t, 'levitar') > 0) || typeof trampaResolver !== 'function') return;
+  let pisada = null;
+  elementos.forEach((el, id) => { if(!pisada && el.trampa && !el.disparada && trampaDispara(t, el) && celdasDeElemento(el).some(c => c.col === t.col && c.fila === t.fila)) pisada = {id, el}; });
+  if(!pisada) return;
+  trampaPendiente = {tokenId, tipo: 'pisa', id: pisada.id, el: pisada.el, celda: {col: t.col, fila: t.fila}, desde: {col: t.col, fila: t.fila}};
+  await trampaResolver();
+}
 
 // Una invocación paga moverse como cualquiera (dueño, 2026-10-04: las reglas de combate, iguales para todos): lo que publica la ficha de su dueño
 // (FichaResumen.invCostoMover). Sin ese dato (una ficha que todavía no se volvió a guardar), se mueve sin contar, como antes.
@@ -812,7 +823,7 @@ function costoMoverInv(t){
   const ri = resumenDeInv(t);
   if(!ri || ri.costoMover === undefined) return null;
   const por = num(ri.costoMover);
-  return {porCasillero: por, disponibles: num(ri.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, por), seguro: pasoSeguroDe(t)};
+  return {porCasillero: por, disponibles: num(ri.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, por), levita: levitarRestante(t)};
 }
 
 // Mismas reglas que la ficha publica en resumen.costoMover: 1 por
@@ -823,7 +834,7 @@ function costoMoverCreep(t){
   if(!sc || sc.nitros === undefined || sc.nitros === null) return null;
   const activos = (Array.isArray(sc.estados) ? sc.estados : []).filter(e => e && e.activo !== false);
   const porCasillero = activos.some(e => e.inmovilizado) ? 0 : activos.some(e => e.rengo) ? 2 : 1;
-  return {porCasillero, disponibles: num(sc.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, porCasillero), seguro: pasoSeguroDe(t)};
+  return {porCasillero, disponibles: num(sc.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, porCasillero), levita: levitarRestante(t)};
 }
 
 // 🎮 El GM tomó el control de este personaje (la ficha publica resumen.control = su uid, 2026-09-30): lo usa como si fuera su

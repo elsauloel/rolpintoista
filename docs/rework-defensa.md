@@ -700,5 +700,65 @@ viejo: Defensa +3 a +6 (pasan el tope de 2), Tipo 6 en la cabeza, PdG en un casc
 **Cargado (2026-10-05):** «con esas salvedades, me parece bien la lista de Buena calidad». En `comun/catalogo.js`: los 2 cascos Comunes de caster
 (Sombrero humectante, Antiparras de rastreo) y los 19 de Buena calidad, que reemplazan a los 14 viejos (8 conservan nombre, id y narrativa).
 Calculadora: SP Regen = 2 y Luz = 0,25; cada pieza gasta su bolsa (las simples y las pesadas, menos). Probado en el motor: el sombrero suma
-SP Regen +1 y la Capucha de la hermandad, Sigilo +2. **Pendiente:** el Casco de minero y el Casco de obra abollado (Comunes) quedan caros con la
-Luz a 0,25 (60 → 40 y 60 → 55): a decidir si se les baja el precio.
+SP Regen +1 y la Capucha de la hermandad, Sigilo +2. Con la Luz a 0,25, **el Casco de minero baja a 40 y el Casco de obra abollado a 55** (dueño, 2026-10-05: «ajustales el precio»).
+
+## Manos — lluvia de mecánicas, de cualquier calidad (2026-10-05, para que el dueño filtre)
+Lo que hay: 31 guantes Comunes (Defensa, Parry, Bloqueo, PdG en oportunidad y en contraataque, Tipo 4, algo de Iniciativa y elementales) y 9 de
+Buena calidad viejos (Defensa +2 a +5 con Tipo 4/6/8: se reemplazan). Identidad de las manos: **PdG en todas sus formas, Parry, Bloqueo y
+Evasión**; desde Buena, **Iniciativa** (manos rápidas). Bolsa de las manos: Común 1,5 · Buena 2,5 · Rara 3,5.
+⚙ = ya existe la mecánica · 🔧 = mecánica nueva chica · ✋ = a mano. C / B / R = calidad sugerida.
+
+**Pegar (PdG en todas sus formas)**
+
+| Guante | Qué hace |
+|---|---|
+| Guantes de esgrimista ⚙ B | PdG +1 · Parry +1. |
+| Guantes lastrados ⚙ B | +1 al daño cuerpo a cuerpo (Dmg +1): puños pesados. |
+| Guantes del verdugo ⚙ R | Crítico potente +1. |
+| Guantes de precisión ⚙ R | Crítico frecuente +1 (caro: el crítico rompe el juego). |
+| Guantes de la familia 🔧 B | +1 PdG solo con un Tipo de arma (hachero: hachas; esgrimista: cortantes…). Refuerza las familias. |
+| Guantes del primer golpe 🔧 R | El primer ataque del turno cuesta 1 No2 menos (No2: muy caro). |
+| Guantes de lanzador ⚙ B | Rango +1 con armas a distancia (Alcance +1 cuerpo a cuerpo). |
+
+**Defenderse con el arma (Parry, Bloqueo, contraataque)**
+
+| Guante | Qué hace |
+|---|---|
+| Guantes de duelista ⚙ B | Parry +2. |
+| Guanteletes de bloqueo ⚙ B | Bloqueo +2 · Defensa +1. |
+| Guantes de la réplica ⚙ B | PdG en contraataque +2 · Parry +1. |
+| Guantes del reflejo 🔧 R | Un Parry por turno no cuesta No2. |
+| Guanteletes erizados ⚙ R | Espinas al equipar (devuelve parte del golpe cuerpo a cuerpo). |
+
+**Manos rápidas (Iniciativa, desde Buena)**
+
+| Guante | Qué hace |
+|---|---|
+| Mitones del cuatrero ⚙ B | Iniciativa +1 · PdG en oportunidad +1. |
+| Guantes de carterista ⚙ B | Iniciativa +1 · Sigilo +1. |
+| Guantes del desenvaine 🔧 R | Cambiar de arma (o equipar una del cinturón) no cuesta No2 una vez por turno. |
+
+**Las manos que curan y preparan**
+
+| Guante | Qué hace |
+|---|---|
+| Guantes de boticario ⚙ B | Mano de boticario +1 (cada poción cura 1 más) · Parry +1. |
+| Guantes de escapista 🔧 B | +2 a la tirada para soltarse (redes, cepos, telarañas). |
+| Guantes de trampero 🔧 B | Colocar una trampa cuesta 1 No2 menos; +2 a desarmarlas. |
+
+**Para casters (lo decidido: PdG.Esp vive solo acá)**
+
+| Guante | Qué hace |
+|---|---|
+| 🧙 Guantes para canalizar ⚙ B | PdG.Esp +1. |
+| 🧙 Mitones del primer conjuro 🔧 C | El primer uso de un arma especial en el turno cuesta 1 SP menos. Liviano: relleno de color. |
+| 🧙 Guantes del envenenador 🔧 B | Tus venenos (de armas, habilidades y armas especiales) duran 1 turno más y hacen +1 de daño tóxico. |
+| 🧙 Guantes de seda del conjurador ⚙ R | PdG.Esp +1 · Res.Esp +1 · Iniciativa +1. |
+
+**Control y resistencias**
+
+| Guante | Qué hace |
+|---|---|
+| Muñequeras de hierro ⚙ B | Res.CC +2 · Defensa +1. |
+| Manoplas de cota ⚙ B | Defensa +2 · Res. crítico Tipo 6 +1 (las manos son de los pocos slots con Tipo 6). |
+| Guantes de goma reforzados ⚙ B | Defensa +1 · Res. rayo +2 · Parry +1 (lo elemental, encima de algo de manos). |

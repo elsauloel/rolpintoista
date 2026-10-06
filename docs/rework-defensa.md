@@ -486,7 +486,7 @@ las tres ya aprobadas (Recuperarse rápido, Reflejos de mangosta, Evasión contr
   chance en las calidades bajas. Propuesta de peso: 33 % = 0,5 · 50 % = 0,75 · siempre = 1,5.
 - **Pisada atenta**: la misma tirada de «algo está fuera de lugar» de la Percepción aumentada, pero solo contra trampas. Propuesta: 1.
 - **Pisada silenciosa**: Sigilo.
-- **Pasos de baile**: +1 a la Evasión si ya te moviste en el turno. Peso: el 75 % de +1 Evasión = 1,5.
+- **Pasos de baile**: +1 a la Evasión si ya te moviste en la ronda. Peso: el 75 % de +1 Evasión = 1,5.
 Quedan afuera (por ahora): Pie firme, Paso seguro, Suela gruesa, Suela aislante, Despegarse, Levantarse rápido, Botas ruidosas, Salto, Carrerita;
 Botas de marcha sigue en pausa. Propuesta de 27 pies Comunes en la conversación del 2026-10-04 (`pies_comun.py`).
 

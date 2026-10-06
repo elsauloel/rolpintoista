@@ -1348,3 +1348,4 @@ versión parecida en más de una, es candidato a juntar.
   `costoPasos(…, levita)` (sin terreno lento), `trampasEvaluarRuta(…, levita)` (no pisa ni detecta), `moverToken(…, levita)` (el fuego del terreno
   solo desde ahí; las zonas no, pueden ser nubes), `levitarRestante` / `levitarUsar` (por turno) y `levitarAterrizar` (al terminar su turno, la
   trampa donde quedó parado se dispara).
+- **El dado de cada chance** (2026-10-06, dueño): `Combatiente.chanceDado(pct)` elige el dado que da justo ese porcentaje (10 % d10, 13 % d8, 17 % d6, 20 % 9–10 en d10, 25 % d4, 33 % 5–6 en d6, 50 % 2 en d2) y si ninguno, el más cercano (a igual, el más chico). Un efecto de arma con d5 se tira con d10 (`EfectosGolpe.normalizar`, `ItemCorto`), como el d3 con d6.

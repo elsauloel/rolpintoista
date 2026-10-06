@@ -1601,7 +1601,7 @@ prueba('Stun (2026-10-06): no le toca los No2; si lo atacan, su Evasión es 1 si
   const stun = estadosPresetFicha().find(p => p.nombre === 'Stun'), barrera = estadosPresetFicha().find(p => p.nombre === 'Barrera');
   const es = [{nombre: 'Stun', activo: true, stun: true}], viejo = [{nombre: 'Stun', activo: true, forzarNitros: 0}];
   const r = Combatiente.tirarStat(12, es, 'eva'), r2 = Combatiente.tirarStat(12, viejo, 'eva'), parry = Combatiente.tirarStat(12, es, 'parry');
-  igual([stun.forzarNitros, stun.stun, r.total, r.rolls.length, r2.total, parry.total > 1, Combatiente.stuneado([]), barrera.turnos], [undefined, true, 1, 0, 1, true, false, 2]);
+  igual([stun.forzarNitros, stun.stun, r.total, r.rolls.length, r2.total, parry.rolls.length > 0, Combatiente.stuneado([]), barrera.turnos], [undefined, true, 1, 0, 1, true, false, 2]);
 });
 prueba('pies de Buena calidad: levantarse gratis (Botas de jinete) y Meditar (+1 SP si no se movió desde el turno anterior)', () => {
   const sc = creepPrueba({nitros: 0, estados: [{nombre: 'Sentado', activo: true, sentado: true}], equipo: [{nombre: 'Botas de jinete', tipoItem: 'pies', mods: [{stat: 'levantarse', val: 1}]}]});
@@ -2004,12 +2004,18 @@ prueba('piernas: Evasión contra oportunidad / contra contraataque suman solo co
     [[`Orco · Evasión ${forma(base)}`, `Orco · Evasión (+2 contra oportunidad) ${forma(base + 2)}`, `Orco · Evasión (+3 contra contraataque) ${forma(base + 3)}`],
      'evaopor', 'evacontra', '', `Evasión 🎲 ${forma(base + 2)} (con +2 contra oportunidad)`]);
 });
+prueba('chances: el dado de cada porcentaje (10 % d10, 13 % d8, 17 % d6, 20 % 2 en d10, 25 % d4, 33 % 2 en d6, 50 % moneda, 75 % 3 en d4) y un d5 de arma pasa a d10', () => {
+  const d = p => { const x = Combatiente.chanceDado(p); return x.exitos + '/' + x.caras; };
+  const ef = EfectosGolpe.normalizar({nombre: 'Rengo', caras: 5, exitos: 1});
+  igual([d(10), d(13), d(17), d(20), d(25), d(33), d(50), d(75), d(5), d(66), Combatiente.chanceTexto(20), ef.caras + '/' + ef.exitos],
+    ['1/10', '1/8', '1/6', '2/10', '1/4', '2/6', '1/2', '3/4', '1/20', '4/6', '20 % (9–10 en d10)', '10/2']);
+});
 prueba('piernas: Retirada limpia — 33 % = 5–6 en d6, 50 % = 4–6, 100 = siempre sin tirar; el resumen del personaje la publica', () => {
   const S = FichaGuardado.normalizar({}).S;
   S.inventario = [{id: 'p1', nombre: 'Bombacha de gaucho matrero', tipoItem: 'piernas', equipado: true, mods: [{stat: 'retirada', val: 50}]}];
   igual([Combatiente.retiradaDado(33), Combatiente.retiradaTexto(33), Combatiente.retiradaTexto(50), Combatiente.retiradaDado(100), Combatiente.retiradaTexto(100),
     Combatiente.retiradaDado(0), Combatiente.retiradaPct(140), FichaResumen.resumen(S).retirada],
-    [{caras: 6, exitos: 2}, '33 % (5–6 en d6)', '50 % (4–6 en d6)', null, 'siempre', null, 100, 50]);
+    [{caras: 6, exitos: 2}, '33 % (5–6 en d6)', '50 % (2 en d2)', null, 'siempre', null, 100, 50]);
 });
 prueba('pies: Pasos de baile suma a la Evasión del duelo solo si ya se movió en el turno (window.mapaSeMovio), junto a la Evasión contra oportunidad', () => {
   const antes = window.mapaSeMovio;
@@ -2030,7 +2036,7 @@ prueba('pies: las chances (33 % = 5–6, 50 % = 4–6, siempre), Lento y los est
   const lento = estadosPresetFicha().find(e => e.nombre === 'Lento');
   igual([Combatiente.chanceTexto(33), Combatiente.chanceTexto(50), Combatiente.chanceTexto(100), Combatiente.chanceDado(50), !!(lento && lento.lento), Combatiente.esTraba(lento),
     Combatiente.esTraba({nombre: 'Veneno'}), rengo1, S.efectos.some(e => e.nombre === 'Rengo')],
-    ['33 % (5–6 en d6)', '50 % (4–6 en d6)', 'siempre', {caras: 6, exitos: 3}, true, true, false, 1, false]);
+    ['33 % (5–6 en d6)', '50 % (2 en d2)', 'siempre', {caras: 2, exitos: 1}, true, true, false, 1, false]);
 });
 prueba('pies: el resumen del personaje publica Pisada atenta, Inamovible, Recuperarse rápido y Reflejos de mangosta; y el catálogo tiene 28 pies Comunes (con las Zapatillas de pluma)', () => {
   const S = FichaGuardado.normalizar({}).S;

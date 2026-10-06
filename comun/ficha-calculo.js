@@ -76,8 +76,8 @@ const FichaCalculo = (() => {
     // Mecánicas de las piernas (2026-10-04, dueño): Evasión solo contra un tipo de ataque, y la chance de alejarse sin ataque de oportunidad.
     {id:'evaopor', label:'Evasión contra oportunidad', full:'Evasión extra cuando te atacan de oportunidad (no suma al Parry)'},
     {id:'evacontra', label:'Evasión contra contraataque', full:'Evasión extra cuando te contraatacan (no suma al Parry)'},
-    // Mecánicas de los pies (2026-10-04, dueño). Las de chance van en % (33 = 5–6 en d6, 50 = 4–6, 100 = siempre).
-    {id:'pasosbaile', label:'Pasos de baile', full:'Evasión extra si ya te moviste en el turno'},
+    // Mecánicas de los pies (2026-10-04, dueño). Las de chance van en % (33 = 5–6 en d6, 50 = 2 en d2, 20 = 9–10 en d10…: Combatiente.chanceDado; 100 = siempre).
+    {id:'pasosbaile', label:'Pasos de baile', full:'Evasión extra si ya te moviste en la ronda'},
     {id:'pisadaatenta', label:'Pisada atenta', full:'Al pasar al lado de una trampa escondida, tirás Percepción para descubrirla (como la Percepción aumentada, solo trampas)'},
     {id:'inamovible', label:'Inamovible (%)', full:'Chance (en %) de que no te muevan contra tu voluntad (empujes, portales): 33 = 5–6 en d6, 50 = 4–6, 100 = siempre'},
     {id:'recuperarse', label:'Recuperarse rápido (%)', full:'Chance (en %) de que Inmovilizado, Rengo, Sentado o Lento te duren 1 turno menos: 50 = 4–6 en d6, 100 = siempre'},

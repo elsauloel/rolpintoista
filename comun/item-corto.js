@@ -99,6 +99,7 @@ const ItemCorto = (() => {
   const pctEf = e => { const c = Math.max(1, num(e.caras) || 1), x = Math.min(c, Math.max(1, num(e.exitos) || 1)); return x >= c ? 100 : Math.round(x / c * 100); };
   // Qué se tira para un efecto con porcentaje (dueño, 2026-10-03: «17 % (6 en d6)», bien sintético): «6 en d6», «5–6 en d6».
   const dadoEf = e => { let c = Math.max(1, num(e.caras) || 1), x = Math.min(c, Math.max(1, num(e.exitos) || 1)); if(c === 3){ c = 6; x *= 2; }   // un d3 se tira con d6 (5 o 6)
+    if(c === 5){ c = 10; x *= 2; }  // y un d5 con d10 (9 o 10; dueño, 2026-10-06)
     return `${x > 1 ? (c - x + 1) + '–' : ''}${c} en d${c}`; };
   const pctTxt = e => `${pctEf(e)} % (${dadoEf(e)})`;
   const durPP = it => num(it.durPorPeso) > 0 ? num(it.durPorPeso) : 3;

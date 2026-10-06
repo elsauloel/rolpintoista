@@ -21,7 +21,7 @@ const EfectosGolpe = (() => {
     {caras: 2, exitos: 1, texto: '50%'},
     {caras: 6, exitos: 2, texto: '33%'},   // con d6: 5 o 6 (no d3)
     {caras: 4, exitos: 1, texto: '25%'},
-    {caras: 5, exitos: 1, texto: '20%'},
+    {caras: 10, exitos: 2, texto: '20%'},  // 9 o 10 en d10 (dueño, 2026-10-06: el d5 no se usa)
     {caras: 10, exitos: 1, texto: '10%'},
   ];
 
@@ -32,6 +32,7 @@ const EfectosGolpe = (() => {
     let caras = Math.max(1, n(ef && ef.caras) || 1);
     let exitos = Math.min(caras, Math.max(1, n(ef && ef.exitos) || 1));
     if(caras === 3){ caras = 6; exitos *= 2; }   // un d3 se tira con d6 (dueño, 2026-10-05: «tirar d3 es feo»): 33 % = 5 o 6
+    if(caras === 5){ caras = 10; exitos *= 2; }  // y un d5 con d10 (dueño, 2026-10-06): 20 % = 9 o 10
     return {
       nombre: String((ef && ef.nombre) || '').trim(),
       caras, exitos,

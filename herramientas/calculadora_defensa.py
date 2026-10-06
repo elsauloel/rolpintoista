@@ -30,7 +30,7 @@ COSTO = {
     # el 75 % de una común; la de mochila, 0,25 (una mochila tiene muchas).
     'capcinturon': 0.5, 'capmochila': 0.25, 'crgmax': 0.25,
     'ranurapocion': 0.375, 'ranurapergamino': 0.375, 'ranuratrampa': 0.375, 'ranuraankh': 0.375,
-    'boticario': 0.5,          # Mano de boticario: +1 a lo que cura una poción
+    'boticario': 0.2,          # Mano de boticario: +1 a lo que cura una poción (dueño, 2026-10-06: +5 = 1 punto, como Vida +5; Común +3, Buena +5)
     'vainas': 1, 'correas': 1,  # cada arma (o escudo) a mano, que se equipa sin No2
     'bolsilloext': 1, 'morral': 0.5,
     'pasamanos': 0.75, 'alforja': 0.75,   # en combate (dueño, 2026-10-05): pasar del cinturón sin No2 / un aliado saca de tu mochila por 1

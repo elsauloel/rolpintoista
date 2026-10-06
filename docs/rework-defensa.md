@@ -978,3 +978,16 @@ resisten con Evasión —; el PdG solo ayuda a quien ataca, y con su arma. (2) E
 (la Defensa, en cambio, resta de a poco). (3) Hoy está en 8 slots y el PdG en 2–3 (guantes, anillos, arma): si se habilita el PdG, que crezca en
 la misma proporción. (4) Los creeps no suben su PdG con equipo como los jugadores: el GM los tiene que compensar. Propuesta: Evasión libre entre
 slots, pero +2 como mucho por pieza en Buena calidad, y medir el total contra el PdG típico de cada nivel.
+
+**✅ Aprobado todo (dueño, 2026-10-06) y cargado:**
+- **Mano de boticario:** 0,2 por punto en la calculadora (+5 = 1 punto, como Vida +5). Faja de curandero (Común) +3 · +1 ranura de cinturón (40);
+  Guantes de boticario de oficio +5 · Defensa +1 · Percepción +1 (70); Delantal de boticario Defensa +3 · +5 · +2 ranuras · Res. fuego +2 · Res.
+  ácido +2 · Res.CC +1 (200).
+- **Crítico potente, como el frecuente:** repartido en distintos slots, ninguna pieza con mucho (los Puños del rompehuesos, +2, no se cargan).
+- **Topes del escaneo:** Evasión +2 como mucho por pieza en Buena calidad; resistencia elemental +2 como mucho por pieza (la Capa de viajero y el
+  Delantal de herrero, Comunes, bajaron de +3 a +2: 110 → 100); una sola fuente por cada rebaja de No2; las chances en % con tope por equipo
+  (ej. 75 %) o en un solo slot — se aplica al rehacer pies, piernas y cabeza Rara (hoy Recuperarse 50 + 50).
+- **8 piezas de un solo bono grande** (Buena calidad): Capucha del pozo hondo (SP máx +4 · Res.Mt +1), Vincha del halcón (Iniciativa +2 ·
+  Percepción +1), Yelmo del sobreviviente (Vida +20 · Res.Mt +1; pesa 2), Guantes de maestro de esgrima (PdG con cortantes +2 · Percepción +1),
+  Guantes de cetrero (PdG a distancia +2 · Percepción +1), Gambesón del veterano (Vida +35 · Defensa +1; pesa 2), Túnica del pozo sin fondo (SP
+  máx +8 · Defensa +1), Chaqueta del acróbata (Evasión +2 · Defensa +3). Las dos pesadas suben un escalón porque el peso devuelve puntos.

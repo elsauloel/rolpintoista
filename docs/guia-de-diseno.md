@@ -27,6 +27,9 @@
   haber algunas que pongan **toda la bolsa en una sola cosa** (Vida +30, Evasión +2, SP máximo +8…). Son las que definen una estrategia. Y un
   bono tiene que **notarse en la mesa**: medirlo contra lo que modifica (+1 a una poción que cura 25 es un 4 %: no se siente). Si no se
   nota, se sube el número y se baja el costo en la calculadora; no se deja un bono decorativo.
+  **Excepciones (dueño, 2026-10-06):** la **Resistencia a crítico**, el **Crítico frecuente** y el **Crítico potente** nunca van concentrados en
+  una pieza: repartidos entre slots, de a poco. **Topes por pieza** (escaneo del 2026-10-06, `rework-defensa.md`): Evasión +2 en Buena calidad,
+  resistencia elemental +2; una sola fuente por cada rebaja de No2; las chances en % con tope por equipo o en un solo slot.
 - **Los Nitros (No2) son un recurso MUY preciado** (2026-09-25). Se usan para acciones ofensivas, defensivas y para moverse, así que cada turno el jugador **optimiza y maximiza** su uso. Al diseñar **skills y objetos**, un costo en Nitros pesa mucho: 1 Nitro no es "casi gratis". Un arma o skill que cuesta pocos Nitros es barata *de verdad* y suele ser de calidad baja; los costos bajos hay que ganárselos con calidad o con límites. Ver también P112 (peso de los efectos) y P116 (armas mágicas).
 
 - **El peso regula las armas mágicas (relevancia intermedia):** una varita pesa 1 y un báculo puede pesar mucho; como el Sobrepeso hoy es un drawback moderado (P108), el peso pesa de forma intermedia en el balance del arma, no alta.

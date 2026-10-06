@@ -96,7 +96,8 @@ const FichaBotonera = (() => {
     if(!habAutomatizada(h)) return '';
     const partes = [];
     const nitros = costoNitrosHab(S, h);
-    if(FichaHabilidades.nitrosAtaque(h)) partes.push(costoAtaqueHabTxt(S));
+    if(Combatiente.esFlash(h)) partes.push('⚡ Flash (sin No2; el doble en turno ajeno)');   // un Flash nunca cobra No2 (P136)
+    else if(FichaHabilidades.nitrosAtaque(h)) partes.push(costoAtaqueHabTxt(S));
     else if(FichaHabilidades.nitrosVariable(h)) partes.push("X No2");
     else if(nitros) partes.push(`${fmt(nitros)} No2`);
     const costo = String(h.costo || '').trim();

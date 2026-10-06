@@ -49,7 +49,7 @@ const InvBotonera = (() => {
     ];
     // Levantarse y Soltarse (2026-10-03): las mismas que un personaje y un creep, con lo que tira y cuesta escrito en el botón.
     const sentadaInv = (inv.estados || []).some(e => e && e.activo !== false && e.sentado), soltableInv = Combatiente.estadoSoltable(inv.estados);
-    const costoLev = num(FichaCalculo.IT2.nitrosLevantarse), sSol = soltableInv && Combatiente.soltarNorm(soltableInv.soltar);
+    const costoLev = Math.max(0, num(FichaCalculo.IT2.nitrosLevantarse) - num(I.modTotal(inv, 'levantarse'))), sSol = soltableInv && Combatiente.soltarNorm(soltableInv.soltar);
     const tilesExtra = (sentadaInv ? `
       <button type="button" class="botonera-tile${num(inv.nitros) < costoLev ? ' bt-sin-nitros' : ''}" data-invlevantarse="${inv.id}" title="Cuesta ${fmt(costoLev)} No2 y saca el estado Sentado"><span class="bt-label">🧍 Levantarse · ${fmt(costoLev)} No2</span></button>` : '')
       + (sSol ? `

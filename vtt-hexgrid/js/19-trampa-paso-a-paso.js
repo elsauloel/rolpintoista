@@ -472,6 +472,8 @@ async function trampaPasoDano(id, dt){
       const rr = dt.elemento ? await resistenciasDe(x, dt.elemento) : {res: 0, armadmg: 0};
       const arm = dt.elemento && dt.ignoraDef && Combatiente.frenaArmaduraMagica(dt.elemento) ? rr.armadmg : 0;   // lo tóxico, no
       freno = [...(arm ? [`Armadura mágica ${arm}`] : []), ...(rr.res ? [Combatiente.resElementalTxt(dt.elemento, rr.res)] : [])].join(' − ');
+      const suela = Math.max(0, statPiesDe(x, 'suelagruesa'));   // Suela gruesa (pies, 2026-10-06): lo que pisás hace menos
+      if(suela){ rr.res = num(rr.res) + suela; freno = [freno, `Suela gruesa ${suela}`].filter(Boolean).join(' − '); }
       restaFreno = num(arm) + num(rr.res);
       if(x.tipo === 'creep'){ if(soyGM) res = await danioCreep(x, String(monto), dt.ignoraDef, arm, rr.res); }
       else res = await (String(x.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(x, String(monto), dt.ignoraDef, arm, rr.res);

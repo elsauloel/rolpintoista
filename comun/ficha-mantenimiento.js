@@ -141,6 +141,13 @@ const FichaMantenimiento = (() => {
     const c = FichaCalculo.calcular(S);
     const log = [], rep = [], hpAntes = num(S.hp);
     regenerarSp(S, c, rep);
+    // Meditar (pies, 2026-10-06): si no se movió desde que empezó su turno anterior, recupera SP (el mapa anota `movidoPaso` al cobrar el movimiento).
+    const paso = Number(String(clave || '').split(':')[1]);
+    if(num(c.final.meditar) > 0 && S.inicioPaso !== undefined && !(num(S.movidoPaso) >= num(S.inicioPaso))){
+      const m = Math.min(num(c.final.meditar), Math.max(0, num(S.spGastado)));
+      if(m){ S.spGastado = num(S.spGastado) - m; rep.push(`SP: +${fmt(m)} (Meditar: no se movió)`); }
+    }
+    if(Number.isFinite(paso)) S.inicioPaso = paso;
     const d = Combatiente.dispararEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(c.final.resfuego)});
     rep.push(...Combatiente.reporteTurno(d.eventos));
     aplicarVida(S, ui, d.hp + regenPasivas(S, log, rep), hpAntes, rep);

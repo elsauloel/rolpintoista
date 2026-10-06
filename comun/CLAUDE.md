@@ -1340,3 +1340,7 @@ versión parecida en más de una, es candidato a juntar.
   (ficha, creep, invocación y el mapa); en el mapa, cualquier acción o movimiento de un stuneado muestra un cartel con «Hacerlo igual (lo decide la
   mesa)» (`stunAntes`, js/20). Barrera: 2 turnos.
 
+- **Pies de Buena calidad** (2026-10-06): `levantarse` (`Combatiente.costoLevantarse(valorDe)`, en personajes, invocaciones y creeps), `pasoseguro`
+  (el mapa: `costoPasos(ruta, por, gratis, recargo, seguro)`, `pasoSeguroDe(t)`, una vez por turno), `suelagruesa` (resta al daño de zonas y
+  trampas: `statPiesDe(t, st)`, js/04) y `meditar` (`FichaMantenimiento.inicioTurno`: +SP si `movidoPaso` < `inicioPaso`; `gastarNitros` anota
+  `movidoPaso`). El resumen público lleva `pasoseguro` y `suelagruesa` (personaje e invocaciones).

@@ -46,10 +46,11 @@ const CreepAcciones = (() => {
   /* ---------- Lo que cambia al creep ---------- */
   // Levantarse (Sentado): cuesta 1 No2 y saca el estado.
   function levantarse(sc){
-    if(num(sc.nitros) < 1) return {error: `${sc.nombre}: no le alcanzan los No2 — levantarse cuesta 1`};
-    sc.nitros = num(sc.nitros) - 1;
+    const costo = Combatiente.costoLevantarse(st => C().modTotal(sc, st));   // Levantarse rápido (2026-10-06)
+    if(num(sc.nitros) < costo) return {error: `${sc.nombre}: no le alcanzan los No2 — levantarse cuesta ${costo}`};
+    sc.nitros = num(sc.nitros) - costo;
     sc.estados = (sc.estados || []).filter(e => !(e.activo !== false && e.sentado));
-    return {aviso: `${sc.nombre} se levantó · −1 No2 · quedan ${fmt(sc.nitros)}`};
+    return {aviso: `${sc.nombre} se levantó${costo ? ` · −${fmt(costo)} No2 · quedan ${fmt(sc.nitros)}` : ' (gratis)'}`};
   }
   // Soltarse (2026-10-03): primero la tirada (afuera de cualquier transacción: se tira una sola vez) y después aplicarla (cobra y, si salió,
   // saca el estado). tiradaSoltarse → {s, r, ok, estId, origen} o null; aplicarSoltarse → {error} o {aviso}.

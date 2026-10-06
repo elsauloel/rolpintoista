@@ -63,7 +63,7 @@ const FichaAcciones = (() => {
   function levantarse(S, forzar, ui){
     const actual = FichaBotonera.efectoSentado(S);
     if(!actual) return;
-    const costo = num(IT2().nitrosLevantarse);
+    const costo = Math.max(0, num(IT2().nitrosLevantarse) - num(FichaCalculo.calcular(S).final.levantarse));   // Levantarse rápido (2026-10-06)
     if(num(S.nitros) < costo && !forzar){
       ui.avisarSinNitros(costo, 'levantarte', () => levantarse(S, true, ui));
       return;

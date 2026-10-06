@@ -111,7 +111,7 @@ const InvAcciones = (() => {
   function levantarse(inv){
     const est = (inv.estados || []).find(e => e && e.activo !== false && e.sentado);
     if(!est) return null;
-    const costo = num(FichaCalculo.IT2.nitrosLevantarse);
+    const costo = Math.max(0, num(FichaCalculo.IT2.nitrosLevantarse) - num(I().modTotal(inv, 'levantarse')));   // Levantarse rápido (2026-10-06)
     if(num(inv.nitros) < costo) return {error: `${inv.nombre}: no le alcanzan los No2 — levantarse cuesta ${costo}`};
     inv.nitros = num(inv.nitros) - costo;
     inv.estados = inv.estados.filter(e => e !== est);

@@ -53,6 +53,7 @@ async function gastarNitros(fichaId, costo){
     const r = ficha.data().resumen || {};
     const actual = datos.nitros === null || datos.nitros === undefined ? num(r.nitros) : num(datos.nitros);
     datos.nitros = actual - costo;
+    if(iniciativa.orden.length) datos.movidoPaso = iniciativa.paso;   // Meditar (pies, 2026-10-06): se movió en este paso del orden de turnos
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
     tx.update(base, {'resumen.nitros': datos.nitros, actualizado: ts});
     return datos.nitros;
@@ -499,7 +500,7 @@ async function zonaResolverBanner(){
     if(!elZ && el.trampa){ try{ elZ = (JSON.parse(el.trampaEstado || '{}') || {}).elemento || ''; }catch(err){} }   // la zona que dejó una trampa: el elemento de la trampa
     const rz = await resistenciasDe(t, elZ);
     const armadmg = el.zonaIgnoraDef && (el.zonaCasteadorRef || elZ) && Combatiente.frenaArmaduraMagica(elZ) ? rz.armadmg : 0;   // lo tóxico, no (2026-10-05)
-    const resEl = elZ ? rz.res : 0;
+    const resEl = (elZ ? rz.res : 0) + Math.max(0, statPiesDe(t, 'suelagruesa'));   // + Suela gruesa (pies, 2026-10-06): lo que pisás hace menos
     if(monto > 0){
       try{
         let res = null;
@@ -798,6 +799,7 @@ async function confirmarRuta(){
     const quedan = esCreep ? await gastarNitrosCreep(t.fichaId, costo) : await gastarNitros(t.fichaId, costo);
     if(p.dodge && quedan < 0) Combatiente.avisarDeudaNo2({nombre: nombreDe(t), accion: 'el dodge roll', costo, quedan});
     pasosGratisUsar(p.id, num(p.gratis));   // los primeros casilleros de este turno ya se usaron
+    if(p.seguro) pasoSeguroUsado.add(pasosGratisClave(p.id));   // el Paso seguro de este turno ya se usó (2026-10-06)
     const primerMov = !seMovioEsteTurno(p.id);
     marcarMovido(p.id);   // ya se movió en este turno (Lento, Pasos de baile)
     rutaPendiente = null;

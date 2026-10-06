@@ -1118,3 +1118,12 @@ imposible en una bolsa de 2,5). Se reemplazan. Identidad: **apoyo y reflejos**. 
 
 Costos nuevos propuestos: Levantarse rápido 1 · Paso seguro 1 · Suela gruesa 1 por −1 · Meditar 1 (es un SP Regen +1 con condición; ojo: el SP Regen
 vive solo en la cabeza — este es más chico porque pide quedarse quieto).
+
+**✅ Pies Buena calidad: cargados (2026-10-06).** El dueño: tope de Defensa 2 ✓, Recuperarse rápido solo en los pies ✓ (la Cofia del veterano
+cambió su Recuperarse 50 % por Vida +5), «lo que vi me resulta bien». Dos ajustes suyos: **Inamovible siempre es alto para Buena calidad** → las
+Botas de ancla dan Inamovible 50 % (el «siempre» queda para Raro); **la levitación permanente no cierra** → Paso seguro solo para el primer
+casillero de terreno lento de cada turno. 19 pies (reemplazan a los 15 viejos; salen los de Movimiento), precios 70–80. Mecánicas nuevas, iguales
+para personajes, invocaciones y creeps: `levantarse` (`Combatiente.costoLevantarse`), `pasoseguro` (el mapa: `costoPasos(…, seguro)`,
+`pasoSeguroDe`, una vez por turno), `suelagruesa` (se resta al daño de zonas y trampas, js/08 y js/19), `meditar` (personajes: al empezar el turno,
+si no gastó No2 en moverse desde que empezó el anterior — el mapa anota `movidoPaso` al cobrar el movimiento). «Cuando los vea con precios y
+peso, ajustaremos» (dueño).

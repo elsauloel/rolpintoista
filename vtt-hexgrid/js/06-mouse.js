@@ -376,7 +376,7 @@ lienzo.addEventListener('pointermove', e => {
 // el token se mueve sin costo). Los que siguen se dibujan en rojo.
 function pasosPagables(costo, ruta){
   if(!costo || costo.dodge) return Infinity;   // el dodge roll se hace aunque no alcancen los No2 (queda en negativo, 2026-10-06)
-  if(ruta){ const a = costoPasos(ruta, costo.porCasillero, costo.gratis, costo.recargo); let n = 0; while(n < a.length && a[n] <= costo.disponibles) n++; return n; }   // con terreno lento
+  if(ruta){ const a = costoPasos(ruta, costo.porCasillero, costo.gratis, costo.recargo, costo.seguro); let n = 0; while(n < a.length && a[n] <= costo.disponibles) n++; return n; }   // con terreno lento
   return Math.max(0, Math.floor(costo.disponibles / costo.porCasillero));
 }
 
@@ -549,10 +549,10 @@ function rutaSoltada(a, t){
     visibles.set(a.id, {x: a.x, y: a.y});
     const oportunidad = oportunidadEvaluarRuta(t, a.ruta);
     if(a.costo){
-      const costoTotal = costoRuta(a.ruta, a.costo.porCasillero, pasos, a.costo.gratis, a.costo.recargo);   // con el terreno lento (arena movediza), los pasos gratis y Lento
+      const costoTotal = costoRuta(a.ruta, a.costo.porCasillero, pasos, a.costo.gratis, a.costo.recargo, a.costo.seguro);   // con el terreno lento (arena movediza), los pasos gratis y Lento
       const dodge = enDodge(a.id);   // el dodge roll: se hace aunque no alcancen los No2 (queda en negativo, 2026-10-06)
       rutaPendiente = {id: a.id, celdas: a.ruta, pasos, porCasillero: a.costo.porCasillero, costo: costoTotal, disponibles: a.costo.disponibles, oportunidad,
-        gratis: Math.min(pasos, num(a.costo.gratis)), lento: num(a.costo.recargo) > 0, dodge};
+        gratis: Math.min(pasos, num(a.costo.gratis)), lento: num(a.costo.recargo) > 0, dodge, seguro: num(a.costo.seguro) > 0 && rutaPisaLento(a.ruta, pasos, a.costo.porCasillero)};
       // Solo se pregunta si el movimiento se pasa de los No2 que quedan.
       if(costoTotal > Math.max(0, a.costo.disponibles) && !dodge) mostrarConfirmacionRuta();
       else confirmarRuta();

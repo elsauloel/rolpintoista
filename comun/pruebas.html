@@ -1603,6 +1603,21 @@ prueba('Stun (2026-10-06): no le toca los No2; si lo atacan, su Evasión es 1 si
   const r = Combatiente.tirarStat(12, es, 'eva'), r2 = Combatiente.tirarStat(12, viejo, 'eva'), parry = Combatiente.tirarStat(12, es, 'parry');
   igual([stun.forzarNitros, stun.stun, r.total, r.rolls.length, r2.total, parry.total > 1, Combatiente.stuneado([]), barrera.turnos], [undefined, true, 1, 0, 1, true, false, 2]);
 });
+prueba('pies de Buena calidad: levantarse gratis (Botas de jinete) y Meditar (+1 SP si no se movió desde el turno anterior)', () => {
+  const sc = creepPrueba({nitros: 0, estados: [{nombre: 'Sentado', activo: true, sentado: true}], equipo: [{nombre: 'Botas de jinete', tipoItem: 'pies', mods: [{stat: 'levantarse', val: 1}]}]});
+  const lev = CreepAcciones.levantarse(sc);
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, hp: 10, spGastado: 5,
+    inventario: [{id: 'b', nombre: 'Babuchas', tipoItem: 'pies', equipado: true, mods: [{stat: 'meditar', val: 1}]}]}).S);
+  const ui = {fijarHp: v => FichaAcciones.fijarHp(S, v)};
+  FichaMantenimiento.inicioTurno(S, ui, 'm:3', '', [], 1);
+  const sp1 = S.spGastado;
+  FichaMantenimiento.inicioTurno(S, ui, 'm:7', '', [], 2);   // no se movió: medita
+  const sp2 = S.spGastado;
+  S.movidoPaso = 8;
+  FichaMantenimiento.inicioTurno(S, ui, 'm:11', '', [], 3);   // se movió en el paso 8 (después de empezar el turno 7): no medita
+  igual([lev.error, sc.estados.length, sc.nitros, sp1 - sp2 >= 1, S.spGastado === sp2 - (sp2 - S.spGastado), Combatiente.costoLevantarse(st => st === 'levantarse' ? 1 : 0), Combatiente.costoLevantarse(null)],
+    [undefined, 0, 0, true, true, 0, 1]);
+});
 prueba('torso rígido: el estado Inamovible (100 %), el guardián en el resumen y una resistencia elemental negativa (vulnerable)', () => {
   const S = {catalogo: [], efectos: []};
   const r = FichaHabilidades.aplicarEfectoDeConsumo(S, {nombre: 'Prueba', efectoNombre: 'Inamovible'}, estadosPresetFicha());

@@ -97,7 +97,8 @@ const FichaResumen = (() => {
       luz: n(c.final.luz), veoculto: n(c.final.veoculto),   // luz que lleva encima y radio en el que ve lo oculto: el mapa los lee (farol, bengala, yelmo del ojo que todo lo ve)
       vision: n(c.final.vision),
       venenista: n(c.final.venenista),
-      guardian: n(c.final.guardian),   // Coraza del guardián (2026-10-06): el mapa se la suma a la Defensa de los aliados al lado
+      guardian: n(c.final.guardian),
+      pasoseguro: n(c.final.pasoseguro), suelagruesa: n(c.final.suelagruesa),   // pies (2026-10-06): el mapa los mira al moverse y al aplicar daño del piso   // Coraza del guardián (2026-10-06): el mapa se la suma a la Defensa de los aliados al lado
       defprimer: n(c.final.defprimer), defdist: n(c.final.defdist),   // torso blando (2026-10-06): el mapa los suma a la Defensa al aplicar el daño   // Guantes del envenenador (2026-10-05): el mapa le suma esos stacks a los venenos que pone en el duelo
       pasosGratis: n(c.final.pasosgratis),
       retirada: n(c.final.retirada),   // Retirada limpia (%): el mapa la tira al alejarse de un rival (js/17)
@@ -155,7 +156,8 @@ const FichaResumen = (() => {
           costoMover: invCostoMover(inv), pasosGratis: num(invModTotal(inv, 'pasosgratis')), retirada: num(invModTotal(inv, 'retirada')),
           inamovible: num(invModTotal(inv, 'inamovible')), recuperarse: num(invModTotal(inv, 'recuperarse')), reflejos: num(invModTotal(inv, 'reflejos')),
           venenista: num(invModTotal(inv, 'venenista')),   // Guantes del envenenador (2026-10-05)
-          guardian: num(invModTotal(inv, 'guardian')),   // Coraza del guardián (2026-10-06)
+          guardian: num(invModTotal(inv, 'guardian')),
+          pasoseguro: num(invModTotal(inv, 'pasoseguro')), suelagruesa: num(invModTotal(inv, 'suelagruesa')),   // Coraza del guardián (2026-10-06)
           pisadaAtenta: num(invModTotal(inv, 'pisadaatenta')) > 0, ...(typeof InvCalculo !== 'undefined' ? {percepcion: num(InvCalculo.statValor(inv, 'percepcion'))} : {}),
           activa: inv.activa !== false,
           miniatura: miniaturaInv(inv.imagen),

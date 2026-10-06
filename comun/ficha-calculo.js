@@ -111,6 +111,11 @@ const FichaCalculo = (() => {
     {id:'venenista', label:'Envenenador', full:'Stacks de más en los venenos que ponés: cada stack es un turno más y 1 de daño más por turno'},
     // Torso blando de Buena calidad (2026-10-06, dueño).
     // Torso rígido de Buena calidad (2026-10-06, dueño).
+    // Pies de Buena calidad (2026-10-06, dueño).
+    {id:'levantarse', label:'Levantarse rápido', full:'Levantarse de Sentado cuesta esta cantidad de No2 menos (nunca menos de 0)'},
+    {id:'pasoseguro', label:'Paso seguro', full:'El primer casillero de terreno lento (arena movediza, brea) de cada turno te cuesta lo normal'},
+    {id:'suelagruesa', label:'Suela gruesa', full:'Lo que pisás (zonas y trampas) te hace esta cantidad menos de daño'},
+    {id:'meditar', label:'Meditar', full:'Si no te moviste en tu turno anterior, al empezar el tuyo recuperás esta cantidad de SP'},
     {id:'guardian', label:'Guardián', full:'Los aliados que están al lado tuyo tienen +N Defensa (el mapa la suma sola al aplicarles el daño; no se acumula con otro guardián)'},
     {id:'escolta', label:'Escolta (a mano)', full:'Una vez por turno podés recibir vos el golpe dirigido a un aliado al lado (1 No2). Se resuelve a mano'},
     {id:'defprimer', label:'Defensa contra el primer golpe', full:'Defensa extra contra el primer golpe que recibís en cada turno'},

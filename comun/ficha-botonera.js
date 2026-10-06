@@ -274,7 +274,7 @@ const FichaBotonera = (() => {
 
     // Sentado: levantarse cuesta 1 No2.
     if(efectoSentado(S)){
-      const falta = num(S.nitros) < num(IT2().nitrosLevantarse);
+      const falta = num(S.nitros) < Math.max(0, num(IT2().nitrosLevantarse) - num(c.final.levantarse));
       html += `<div class="botonera-caja" style="margin-bottom:8px"><button class="ejecutar-btn${falta ? ' sin-recursos' : ''}" data-levantarse="1" style="width:100%" ${falta ? 'aria-disabled="true" title="No te alcanzan los Nitros"' : ''}>🧍 Levantarse · ${fmt(num(IT2().nitrosLevantarse))} No2</button></div>`;
     }
 

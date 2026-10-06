@@ -935,3 +935,46 @@ las grandes (Poción mayor, 100). Con eso:
 | Chaqueta del acróbata (torso blando) | Evasión +2 · Defensa +3 |
 
 Todas dentro de su bolsa (cabeza 3,5 · manos 2,5 · torso 7). El torso rígido se diseña ya con este criterio.
+
+**Respuesta del dueño (2026-10-06):** la Mano de boticario a +10/+25 es demasiado: **«quizás +5»**. El criterio del bono grande, ✅, con dos
+excepciones: **la Resistencia a crítico no entra** (nada de una pieza con mucha resistencia junta: el Chaleco de cuero de búfalo sale) y **el
+Crítico frecuente tampoco**: puede aparecer en distintos slots, pero ninguna pieza lo trae muy acumulado. Antes de seguir, pidió un escaneo de
+qué bonos hay que cuidar al acumularlos. Sobre la Evasión: «no me parece preocupante si también habilitamos PdG», abierto a contrapuntos.
+
+### Escaneo: bonos que hay que cuidar al acumularlos (2026-10-06)
+Medido con el catálogo de hoy: lo mejor de cada slot hasta Buena calidad, sumado (dos anillos). Ojo: piernas, pies, escudo, cinturón, anillos y
+mochila de Buena calidad todavía son las piezas viejas, sin rehacer.
+
+**El riesgo de verdad son los bonos con umbral** (pasado cierto número, la mecánica deja de existir), no los que suman de a poco.
+
+| Bono | Por qué cuidarlo |
+|---|---|
+| Crítico frecuente | Achica el rango hasta 2: cada golpe que pasa es crítico de varios niveles. Ya decidido: repartido, nunca acumulado. Hoy solo anillos (+1). |
+| Crítico potente | Baja los umbrales del d20 (doble 7−P, triple 17−P÷2): con P alto todo crítico es triple. Hoy solo guantes (+1). Tratarlo como el frecuente. |
+| Resistencia a crítico | Ya decidido (excepción). Hoy T4 8 · T6 8 · T8 4 hasta Buena: por encima de la curva (T4 ≤3, T6 ≤2, T8 ≤1) por las piezas viejas. |
+| Rebajas de No2 (oportunidad, contraataque, primer conjuro, desenvaine, primer paso gratis) | Topan en 0: dos fuentes de la misma rebaja = la acción gratis todos los turnos. Una sola fuente por rebaja (un slot). |
+| No2 máximo y Movimiento | Lo más valioso del juego. Hoy pies de Buena dan Mov +3 (pieza vieja): fuera de toda bolsa. |
+| Chances en % (Recuperarse, Retirada limpia, Reflejos, Inamovible, Saque rápido) | Sumadas llegan a 100 %: dejan de ser chance. Hoy Recuperarse 50 + 50 = 100 % y Retirada 83 %. Tope por equipo (ej. 75 %) o un solo slot. |
+| Resistencias elementales | Baratas (0,5) y de relleno: aparecen en 5–7 slots y suman sin que nadie lo note. Hoy Res. fuego 13 = inmune a casi todo fuego de nivel 3–4. Tope por pieza (+2) y mirar el total. |
+| Res.CC, Res.Mt, Res.Esp | Juntas en exceso apagan al Debuffer y al Taunt (inmunidad al control). Hoy Res.CC 11, Res.Mt 10, Res.Esp 5. Res.Mt es barata (0,5): vigilarla. |
+| Percepción y Sigilo | Cada una apaga una forma de jugar entera (el sigiloso, el trampero). Hoy 7 y 7. Que crezcan parejas y en pocos slots. |
+| Envenenador | Cada +1 suma un turno y un daño a cada veneno. Un solo slot (guantes). |
+| SP Regen, SP máximo, PdG.Esp, Ef.Esp, rango de casteo | Ya en escasez controlada (un slot o dos). |
+
+**Los que suman de a poco (menos riesgo):**
+
+| Bono | Comentario |
+|---|---|
+| Evasión | Ver contrapuntos abajo. Hoy 7 en 8 slots. |
+| Defensa | Ya tiene tope por slot y curva. Hoy 40 (piezas viejas de pies, piernas y escudo). |
+| Vida | Lineal, pero alarga el combate: hoy +70 hasta Buena (la vida de un liviano es 25–35). Vigilar el total. |
+| Iniciativa | Solo ordena el turno; acumulada, siempre primero. Riesgo bajo. |
+| Parry y Bloqueo | El Parry es una contienda (como la Evasión); el Bloqueo resta daño. Riesgo medio. |
+| Ranuras de cinturón + Mano de boticario | Más pociones y mejores, pero cuestan oro. Riesgo bajo. |
+| Estados al equipar (Regeneración, Espinas) | Revisar si dos piezas con Regeneración suman dos estados. |
+
+**Evasión, contrapuntos:** (1) la Evasión defiende de todo — golpes, críticos (resta a la diferencia que los decide) y muchas habilidades que se
+resisten con Evasión —; el PdG solo ayuda a quien ataca, y con su arma. (2) Es una contienda: pasado el máximo que tira el rival, no le pega nunca
+(la Defensa, en cambio, resta de a poco). (3) Hoy está en 8 slots y el PdG en 2–3 (guantes, anillos, arma): si se habilita el PdG, que crezca en
+la misma proporción. (4) Los creeps no suben su PdG con equipo como los jugadores: el GM los tiene que compensar. Propuesta: Evasión libre entre
+slots, pero +2 como mucho por pieza en Buena calidad, y medir el total contra el PdG típico de cada nivel.

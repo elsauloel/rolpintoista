@@ -983,7 +983,11 @@ function trazoEn(x, y){
 
 // La ruta viaja con el movimiento como [col, fila, col, fila…] para que
 // los demás vean la estela unos segundos.
+/* Embestida (piernas, 2026-10-06): el último recorrido de cada token en este turno (de Mantenimiento a Mantenimiento), para ver si llegó al rival en
+   línea recta (js/13, embestidaDe). Solo en esta pantalla: la que mueve al token es la que después lo hace atacar. */
+const embestidaRutas = new Map();   // tokenId → {clave: 'id@mantenimiento', celdas}
 async function moverToken(id, col, fila, celdas, levita){
+  if(celdas && celdas.length > 1) embestidaRutas.set(id, {clave: `${id}@${Math.round(num(mantenimientoNumero))}`, celdas: celdas.map(c => ({col: c.col, fila: c.fila}))});
   const t = tokens.get(id);
   if(!t) return;
   giroLibre.clear();   // moverse es una acción: cierra los giros gratis de antes (el de este se abre al guardar)

@@ -747,10 +747,11 @@ function marcarMovido(id, si){
 }
 window.mapaSeMovio = tokenId => seMovioEsteTurno(tokenId);
 // Lento: lo que se suma al primer casillero si todavía no se movió en este turno (0 si no está Lento o si no se puede mover).
+// El «primer paso doble» de unas piernas pesadas (2026-10-06, dueño: «Movimiento −1» traducido) hace lo mismo; no se suman entre sí.
 function lentoRecargo(t, porCasillero){
   if(!(porCasillero > 0) || seMovioEsteTurno(idDeToken(t))) return 0;
   const lento = (typeof confusionEstadosDe === 'function' ? confusionEstadosDe(t) : []).some(e => e && e.activo !== false && (e.lento || /^lento$/i.test(String(e.nombre || '').trim())));
-  return lento ? porCasillero : 0;
+  return lento || statPiesDe(t, 'pasodoble') > 0 ? porCasillero : 0;
 }
 
 /* Pasos gratis (2026-10-04, dueño): cuántos le quedan a un token en este turno (de Mantenimiento a Mantenimiento). Los usados se anotan en esta

@@ -1182,3 +1182,33 @@ sugerida para las piernas: Común nada (dueño: «solo tiene sentido en piezas d
   pasos fueron en línea recta hasta el rival → PdG +2 por el mismo camino que «Por la espalda». A definir: ¿los últimos 2 pasos o todo el recorrido?
 - **Pasos en silencio** (dueño): cruzar el cono sin perder el Sigilo, para un tier más alto (Raro o más); en Buena calidad, **cruzar la zona de
   alerta de un rival sin tirada de detección, una vez por turno** — y que sea caro: bono grande, toda la bolsa (3).
+
+### Piernas Buena calidad — propuesta v2 (2026-10-06, con las respuestas del dueño; ⬜ a revisar)
+Todas en la bolsa (3 puntos) y a 85. Cambios: el desertor pasa a **Bombacha de cuatrero**; **Carga a 1 por punto** (Estibador: Carga +3 sola); sale
+**Calzas del silencioso** (para más adelante); entra **Grebas de placas** con el **primer paso doble** (la contra de las piernas pesadas, devuelve 2);
+las **Grebas del carnero** pasan a pesar 2 (con Embestida +2 · Defensa +1 · Res.CC +1 se pasaban con 1). Mecánicas ya programadas (sin piezas
+cargadas todavía): `embestida` (el mapa guarda el último recorrido del turno, `embestidaRutas` en js/07; `embestidaDe` en js/13 mira si los
+últimos 2 pasos fueron en línea recta hasta el rival, una vez por turno; el duelo la suma al PdG: `ataque.embestida`) y `pasodoble` (el primer
+casillero del turno al doble, como Lento: `lentoRecargo`, js/04).
+
+| Pierna · pesa · precio | Qué hace |
+|---|---|
+| Perneras de malla · 2 · 85 | Defensa +2 · Tipo 6 +1 |
+| Perneras de escamas · 2 · 85 | Defensa +1 · Tipo 4 +1 · Tipo 6 +1 |
+| Grebas de acero templado · 2 · 85 | Defensa +1 · Tipo 8 +1 |
+| Grebas de bandas articuladas · 3 · 85 | Defensa +2 · Tipo 4 +1 · Tipo 6 +1 · Sigilo −1 |
+| Grebas de placas · 3 · 85 | Defensa +2 · Tipo 6 +1 · Tipo 8 +1 · Primer paso doble · Sigilo −1 |
+| Polainas tachonadas de taller · 1 · 85 | Defensa +2 · Tipo 4 +1 · Res. fuego +1 |
+| Pantalón de corredor · 0 · 85 | Pasos gratis +1 |
+| Calzas de chasqui · 1 · 85 | Pasos gratis +1 · Res. hielo +1 |
+| Bombacha de cuatrero · 1 · 85 | Retirada limpia 50 % · Evasión contra oportunidad +1 · Sigilo +1 |
+| Calzas de contorsionista · 0 · 85 | Evasión contra oportunidad +3 |
+| Calzas de cuero de ciervo · 0 · 85 | Evasión +1 · Sigilo +1 |
+| Rodilleras de luchador · 0 · 85 | Evasión contra contraataque +3 · Res.CC +1 |
+| Bombacha de cuadrero · 0 · 85 | Iniciativa +2 |
+| Calzas de sombra · 0 · 85 | Sigilo +3 |
+| Bombachas del forcejeo · 1 · 85 | Soltarse +6 · Defensa +1 · Res.CC +1 |
+| Pantalón de estibador · 0 · 85 | Carga +3 |
+| Calzas de piel de carpincho · 1 · 85 | Vida +10 · Res. hielo +2 · Res. ácido +1 |
+| Calzas de bordado rúnico · 0 · 85 | Res.Esp +2 · Res.Mt +2 |
+| Grebas del carnero · 2 · 85 | Embestida +2 · Defensa +1 · Res.CC +1 |

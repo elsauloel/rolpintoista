@@ -475,10 +475,12 @@ function dueloElegirObjetivoMapa(msg){
       dueloAvisoObjetivoOcultar();
       try{ t = await dueloVincularSiFalta(t); }catch(err){ console.error('No se pudo vincular el token al creep:', err); }
       const mio = todos.find(propio);
-      let espalda = false;
+      let espalda = false, embestida = 0;
       try{ espalda = porLaEspalda(mio, t); }catch(err){ console.error('No se pudo ver si es por la espalda:', err); }   // nunca traba el ataque
+      try{ if(!(ataque && ataque.hab)) embestida = embestidaDe(mio, t); }catch(err){ console.error('No se pudo ver la embestida:', err); }
       if(ataque && ataque.hab && ataque.hab.reparte){ dueloMisiles(yo, ataque, t, mio); return; }   // Varita de misiles: de a uno
-      Duelo.crear({yo, ataque, espalda}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
+      if(embestida) embestidaUsadas.add(`${mio.id}@${Math.round(num(mantenimientoNumero))}`);
+      Duelo.crear({yo, ataque, espalda, embestida}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
     }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : ''}</span>`, true, cancelado);
     dueloAvisoObjetivo(yo.nombre, msg.conSuelto, alSuelto, ataque && ataque.hab ? ataque.hab.nombre : '');
@@ -704,6 +706,25 @@ function conoDeArea(c){ return new Set(zonasSigilo({col: c.col, fila: c.fila, ro
 // «Por la espalda» (2026-10-03): el atacante está en el punto ciego del defensor — la misma cuña ciega de la visión (VISION_CUNA_CIEGA a cada
 // lado de atrás; las diagonales de atrás sí se ven): pegado, solo el casillero justo de atrás. Y SOLO si el atacante está en sigilo (dueño,
 // 2026-10-03): si el defensor lo puede ver, aunque venga por atrás, se da vuelta para defenderse.
+/* Embestida (piernas, 2026-10-06, dueño): el primer ataque del turno suma la Embestida de quien ataca (`embestida`, PdG) si sus últimos 2 pasos
+   (o más) fueron en línea recta, en la misma dirección, y el rival está en la casilla siguiente de esa línea (le llegó de frente). Una vez por
+   turno. → el PdG extra (0 si no corresponde). */
+const embestidaUsadas = new Set();
+function embestidaDe(atq, def){
+  if(!atq || !def || !atq.id) return 0;
+  const n = Math.max(0, Math.round(statPiesDe(atq, 'embestida')));
+  if(!n) return 0;
+  const clave = `${atq.id}@${Math.round(num(mantenimientoNumero))}`;
+  const r = embestidaRutas.get(atq.id);
+  if(embestidaUsadas.has(clave) || !r || r.clave !== clave || r.celdas.length < 3) return 0;
+  const c = r.celdas.slice(-3).map(x => hexACubo(x)), cd = hexACubo(def), ca = hexACubo(atq);
+  const fin = r.celdas[r.celdas.length - 1];
+  if(fin.col !== atq.col || fin.fila !== atq.fila) return 0;   // se movió después por otro lado
+  const paso = (a, b) => ({q: b.q - a.q, r: b.r - a.r});
+  const p1 = paso(c[0], c[1]), p2 = paso(c[1], c[2]), p3 = paso(ca, cd);
+  const igual = (a, b) => a.q === b.q && a.r === b.r;
+  return igual(p1, p2) && igual(p2, p3) && distanciaHex(atq, def) === 1 ? n : 0;
+}
 function porLaEspalda(atq, def){
   if(!atq || !def || !enSigilo(atq)) return false;
   const k = ((Math.round(num(def.rotacion || 0) / 60) % 6) + 6) % 6;

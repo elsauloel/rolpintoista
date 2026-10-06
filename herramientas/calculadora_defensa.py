@@ -28,7 +28,8 @@ COSTO = {
     'armadmg': 3,   # Armadura mágica: escasa, cara y rara — resta TODO daño mágico, arcano y elemental (dueño, 2026-10-04)
     # Cinturón y mochila (dueño, 2026-10-04/05): la ranura de cinturón baja a 0,5; la exclusiva (solo pociones, pergaminos, trampas o el Ankh) es
     # el 75 % de una común; la de mochila, 0,25 (una mochila tiene muchas).
-    'capcinturon': 0.5, 'capmochila': 0.25, 'crgmax': 0.25,
+    'capcinturon': 0.5, 'capmochila': 0.25,
+    'crgmax': 1,   # Carga (dueño, 2026-10-06): 1 por punto — las armas también pesan (su peso son los dados) y pasado de peso saca la penalidad de la Evasión
     'ranurapocion': 0.375, 'ranurapergamino': 0.375, 'ranuratrampa': 0.375, 'ranuraankh': 0.375,
     'boticario': 0.2,          # Mano de boticario: +1 a lo que cura una poción (dueño, 2026-10-06: +5 = 1 punto, como Vida +5; Común +3, Buena +5)
     'vainas': 1, 'correas': 1,  # cada arma (o escudo) a mano, que se equipa sin No2
@@ -71,6 +72,9 @@ COSTO = {
     # tocar el piso) 0,25 por casillero — barato, «se puede meter en una bota Común»; lo que pisás (zonas y trampas) hace N menos de daño 1 por N;
     # meditar (+1 SP al empezar el turno si no se movió en el anterior) 1.
     'levantarse': 1, 'levitar': 0.25, 'suelagruesa': 1, 'meditar': 1,
+    # Piernas de Buena calidad (dueño, 2026-10-06): Embestida 1 por PdG (la mitad del PdG: pide llegar en línea recta, una vez por turno); el primer
+    # paso al doble (la contra de las piernas pesadas, «Movimiento −1» traducido) devuelve 2.
+    'embestida': 1, 'pasodoble': -2,
 }
 def costo_retirada(pct):
     return 4 if pct >= 100 else pct * 0.03

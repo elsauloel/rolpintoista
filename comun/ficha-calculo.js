@@ -116,6 +116,9 @@ const FichaCalculo = (() => {
     {id:'levitar', label:'Levitar', full:'Los primeros N casilleros que te movés en cada turno no tocan el piso: no te frena el terreno lento, no pisás ni detectás trampas y no te quema el terreno incendiado (las zonas sí te alcanzan: pueden ser nubes); al terminar el turno tocás el piso'},
     {id:'suelagruesa', label:'Suela gruesa', full:'Lo que pisás (zonas y trampas) te hace esta cantidad menos de daño'},
     {id:'meditar', label:'Meditar', full:'Si no te moviste en tu turno anterior, al empezar el tuyo recuperás esta cantidad de SP'},
+    // Piernas de Buena calidad (2026-10-06, dueño).
+    {id:'embestida', label:'Embestida', full:'PdG extra en tu primer ataque del turno si llegaste al rival con tus últimos 2 pasos (o más) en línea recta hacia él'},
+    {id:'pasodoble', label:'Primer paso doble', full:'El primer casillero que te movés en cada turno cuesta el doble (como Lento): la contra de las piernas pesadas'},
     {id:'guardian', label:'Guardián', full:'Los aliados que están al lado tuyo tienen +N Defensa (el mapa la suma sola al aplicarles el daño; no se acumula con otro guardián)'},
     {id:'escolta', label:'Escolta (a mano)', full:'Una vez por turno podés recibir vos el golpe dirigido a un aliado al lado (1 No2). Se resuelve a mano'},
     {id:'defprimer', label:'Defensa contra el primer golpe', full:'Defensa extra contra el primer golpe que recibís en cada turno'},

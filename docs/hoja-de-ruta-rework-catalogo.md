@@ -16,6 +16,7 @@
 | 3b | **Equipo defensivo Común para casters** (dueño, 2026-10-05): cuando estén las armas especiales Comunes, volver a todos los equipables defensivos Común e imaginar efectos y mecánicas pensadas para un caster, costearlos y sumarlos. Ejemplo, un clásico del grupo: el **Sombrero humectante** (cabeza, sin Defensa, +1 a la regeneración de SP) | 🔲 Después de las armas especiales Comunes |
 | 3c | **Cierre de esta etapa** (dueño, 2026-10-05): terminar los tiers **Buena calidad y Raro de todo lo trabajado** (armas, armas especiales, defensivos slot por slot) y encarar el **generador de tiendas**: la pieza clave que articula todo, regulando la disponibilidad de los efectos de equipo para mantener cierto balance | 🔲 Siguiente, después de 3b |
 | 3d | **Creeps de cooldown a SP** (dueño, 2026-10-05, después del catálogo): pasar los creeps del uso de CD al de SP, para universalizar el combate y hacer equivalencias más parejas. Mientras tanto, un creep paga el SP de un arma especial con espera (`CreepAcciones.ESPERA_POR_SP`, provisorio) | 🔲 Obra grande, después del catálogo |
+| 3e | **Sistema de reparación de armadura** (dueño, 2026-10-06: «es importante desarrollarlo», después de terminar los tiers Raros del catálogo): hoy la durabilidad baja y el herrero repara (`FichaTienda.reparar`, el doble con la pieza rota), pero falta el resto: el **Óleo reparador** (quitado del catálogo hasta definirlo, `pendientes.md`), **reparar con talentos y despojos**, cuánto cuesta reparar según la Defensa y las resistencias de la pieza (reparar como **sumidero de oro**, idea 5 de la Fase 3 en `rework-defensa.md`), y medir cuán seguido se rompen las armaduras en mesa (hachas, ácido, Armadura rota) | 🔲 Después de los Raros (3c) |
 | 4 | **Motor de calidad, tier y precio** (P112): relevancia de cada elemento (tabla en la guía §0b), peso de los efectos, fórmula | 🔲 |
 | 5 | **Crítico nuevo en el código** (ficha y mapa): PdG − Evasión ≥ rango, niveles, N − Resistencia d20, doble/triple/cuádruple daño; nuevos estados Crítico frecuente/potente, Parálisis, Escarcha acumulable | 🔲 (cambio grande, en pasos chicos) |
 | 6 | **Generar el catálogo por grupos** (sets e ítems imaginados en tandas) y **auditar** con el dueño | 🔲 |
@@ -39,6 +40,17 @@
 - Efecto de casa de las familias explosivos y de rango; nombre definitivo del efecto de iniciativa (Knockdown).
 - Detalles de Escarcha acumulable y de fuego/hielo (cuánto por stack, cómo se cancelan).
 - Skills nuevas (Punto débil, Temple aprobadas; Ojo de asesino, Golpe brutal, Marca del cazador a revisar) y las skills de Mago con daño mágico por revisar (Rayo Mágico, Orbe, Tormenta, Ráfaga).
+
+## Para después del catálogo (lo que el dueño fue pidiendo, para no olvidarlo)
+Junto en un lugar lo que se dejó para cuando terminen los tiers del catálogo (el detalle vive donde se indica):
+- **Sistema de reparación de armadura** — fase 3e (arriba).
+- **Generador de tiendas** con escasez controlada y el **simulador de tiendas** — fase 3c y `rework-defensa.md` (Fase 3, idea 3).
+- **Creeps de cooldown a SP** — fase 3d.
+- **Regenerar el equipo de los creeps base** (`EQUIPO_CREEP`, `herramientas/generar_equipo_creeps.py`) con el catálogo defensivo nuevo — `rework-defensa.md`.
+- **Hoja de ruta del GM: cuánto oro dar** por combate o por nivel (el Botín estimado ya existe) — `rework-defensa.md`, Fase 3.
+- **Manual de diseño del catálogo** para los colegas: el criterio de los ítems con su porqué.
+- **Menú del token en dos niveles** (clic izquierdo lo vital, derecho el resto) — `pendientes.md`.
+- **La ampliación del catálogo** — fase 8 y la lista de abajo.
 
 ## Para la ampliación del catálogo (se retoma cuando el dueño lo pida)
 Ideas que salieron mientras se trabajaba lo básico y quedaron para después, a propósito («de lo básico a lo complejo»). Al terminar lo esencial,

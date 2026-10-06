@@ -1603,6 +1603,11 @@ prueba('Stun (2026-10-06): no le toca los No2; si lo atacan, su Evasión es 1 si
   const r = Combatiente.tirarStat(12, es, 'eva'), r2 = Combatiente.tirarStat(12, viejo, 'eva'), parry = Combatiente.tirarStat(12, es, 'parry');
   igual([stun.forzarNitros, stun.stun, r.total, r.rolls.length, r2.total, parry.rolls.length > 0, Combatiente.stuneado([]), barrera.turnos], [undefined, true, 1, 0, 1, true, false, 2]);
 });
+prueba('mochilas de Buena calidad (2026-10-06): 10 piezas, todas a 70 y con un efecto propio (ranuras o una mecánica de mochila)', () => {
+  const bc = CATALOGO_BASE.filter(i => i.tipoItem === 'mochila' && i.tier === 'Buena Calidad' && !i.soloBotin);
+  const propio = ['capmochila', 'bolsilloext', 'correas', 'morral', 'alforja'];
+  igual([bc.length, bc.every(i => i.precioCompra === 70), bc.every(i => (i.mods || []).some(m => propio.includes(m.stat) && m.val > 0))], [10, true, true]);
+});
 prueba('cinturones de Buena calidad (2026-10-06): 12 piezas; Bolsillo de emergencia (mecánica lista, la pieza es de Raro) — cruza el 25 % hacia abajo y toma la poción que más cura', () => {
   const bc = CATALOGO_BASE.filter(i => i.tipoItem === 'cinturon' && i.tier === 'Buena Calidad' && !i.soloBotin);
   const cint = [{id: 'a', nombre: 'Poción chica', curahp: 5, unidades: 2}, {id: 'b', nombre: 'Poción grande', curahp: 15, unidades: 1}, {id: 'c', nombre: 'Bomba', curahp: 0, unidades: 3}];

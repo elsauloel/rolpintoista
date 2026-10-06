@@ -1276,3 +1276,5 @@ mecánica); las resistencias solo acompañan; las grandes, con contras.
 | Mochila de minero con farol de bronce · 0 · 70 | Luz +2 (farol colgado) · Ranuras +8 |
 | Alforja de baqueano · 0 · 70 | Alforja compartida · Bolsillo exterior · Ranuras +3 |
 | Mochila de cuero curtido · 0 · 70 | Ranuras +6 · Res. ácido +1 · Res. fuego +1 |
+
+**✅ Mochila Buena calidad: cargadas (2026-10-06).** El dueño: «van bien». 10 mochilas a 70 (reemplazan a las 2 viejas).

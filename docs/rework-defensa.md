@@ -1340,3 +1340,36 @@ Bolsa de un anillo Común: 1 punto (hasta 1,1); precio = el doble (≈ 70). Se l
 | 🔧 Anillo maldito (con contra) | Un bono grande para Común y una contra que se nota: Daño +2 · Vida −5 (≈ 1) |
 | 🔧 Anillo de sello | Social: te reconocen como miembro de un gremio o casa (✋ a mano, narrativo) |
 | 🔧 Anillo de la calma | Si no atacaste en tu turno, al terminarlo recuperás 1 No2 (≈ 1) |
+
+### Anillos Comunes — los de siempre con una vuelta (2026-10-06, para que el dueño filtre)
+Dueño: «podemos tomar como referencia los que ya existían, pero buscarles vueltas creativas». Cada anillo viejo, en una versión Común (1 punto):
+si el stat entero no entra, vale una vez por combate, en un momento puntual o en chico. ⚙ = existe · 🔧 = mecánica nueva.
+
+| Anillo (de dónde sale) | Versión Común (costo) |
+|---|---|
+| ⚙ Escudo Arcano | Res.Esp +1 (1) |
+| ⚙ Furia de Combate | Daño +1 (1) |
+| ⚙ Furia Arcana | Ef.Esp +1 (1) |
+| ⚙ Muralla Personal | Bloqueo +1 (1) |
+| ⚙ Reflejo de Acero | Parry +1 (1) |
+| ⚙ Reserva Ampliada | Bonos +1 (1) |
+| ⚙ Tenacidad | Res.CC +1 (1) |
+| ⚙ Vitalidad | Vida +5 (1) |
+| ⚙ Voluntad de Hierro | Res.Mt +2 (1) |
+| ⚙ Vista aguda | Visión +2 (1) |
+| ⚙ Percepción aumentada | Percepción +2 (1) |
+| ⚙ Blindaje | Res. crítico Tipo 4 +1 (1) |
+| ⚙ Alforja sin Fondo | Un bolsillo que no se ve: Ranuras de cinturón +2 (1) |
+| ⚙ Piernas de Viento | Levitar 4: los primeros 4 casilleros de cada turno no tocan el piso (1) |
+| 🔧 Foco Arcano | Foco: si no te moviste en este turno, PdG.Esp +1 (≈ 1) |
+| 🔧 Puntería Certera | Pulso quieto: si no te moviste antes de atacar en este turno, PdG +1 (≈ 1; lo opuesto a la Embestida) |
+| 🔧 Paso Fantasma | Evasión +1 en el turno en que te moviste 3 casilleros o más (≈ 1) |
+| 🔧 Instinto de Combate | Vigilia: Iniciativa +2 solo en la primera ronda del combate (≈ 0,75) |
+| 🔧 Ojo del Verdugo | Una vez por combate, antes de tirar el PdG, lo declarás: ese golpe tiene Crítico frecuente +1 (≈ 1) |
+| 🔧 Leprechaun | Moneda en el dedo: una Moneda Re-Roll por combate (≈ 1) |
+| 🔧 Policromático | Cambiante: al empezar el combate elegís Res. fuego, hielo o rayo +2 (≈ 1) |
+| 🔧 Cáscara protectora | Al empezar cada combate, Escudo especial 3 (≈ 1) |
+| 🔧 Fuerza del Toro / Manos Ligeras / Clarividencia / Piel de Roble | Una vez por combate, +2 a una tirada de ese atributo (≈ 0,5; se puede sumar otra cosa chica) |
+| 🔧 Sangre limpia / Superlinfocitos / Vigor | El Veneno / el Sangrado / Cansado y Exhausto te duran 1 turno menos (≈ 0,75) |
+| 🔧 Armadura indestructible | Una vez por combate, la pieza que se iba a gastar no se gasta (≈ 0,75) |
+| — Inmutabilidad, Mente certera, Pólvora Mansa, Pies Veloces, los combinados | No tienen versión Común razonable: quedan para calidades más altas |

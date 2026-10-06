@@ -757,3 +757,4 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   también van a la Crónica. A revisar después de probarlo en mesa.
   **No aplica al ataque de oportunidad ni al contraataque** (dueño, 2026-10-06): son ataques, siguen sin bajar de 0 (sin No2 avisan y gastan lo
   que haya, con la línea roja, como siempre).
+  Subida a 🛠 Herramientas de diseño → Preguntas (2026-10-06) como decisión ya establecida, **sujeta a la aprobación del grupo**.

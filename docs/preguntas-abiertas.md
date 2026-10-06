@@ -751,3 +751,7 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   Stun de 1 turno puesto en tu turno se va al terminarlo; el veneno igual ya pegó al aplicarse). Consecuencia de diseño: lo que se activa en
   tu propio turno (sobre todo las **trampas**: Pajaritos, Stun) nunca dura menos de 2 turnos. La alternativa: que empiece a contar en el
   próximo (la marca `pasoTurno` de cada estado ya lo permitiría).
+- **P163. Defensas en No2 negativos** (2026-10-06, idea del dueño, a probar). Las defensas que cuestan No2 (Parry, la Evasión que paga el
+  sobrepeso, el dodge roll) se pueden hacer sin No2: quedás en negativo y la deuda se descuenta en tu próxima recarga. Solo las defensas; lo demás
+  sigue sin pasar de 0. Se avisa muy claro: a quien la hace, un cartel (como el Aviso); a los demás, la Crónica. Las acciones fuera de turno
+  también van a la Crónica. A revisar después de probarlo en mesa.

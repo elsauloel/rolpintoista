@@ -462,7 +462,20 @@ function avisarFueraDeTurno(tokenId, b){
   const accion = !b ? 'se mueve' : ((fila && fila.querySelector('.cat-nombre, .accion-nombre')) || b.querySelector('.bt-label') || b).textContent.trim().replace(/\s+/g, ' ').slice(0, 60);
   toast(`⏱ No es el turno de ${nombreDe(t)}: se hace igual y queda en la Mesa`);
   if(typeof mesaLinea === 'function') mesaLinea(`⏱ ${nombreDe(t)} actúa fuera de su turno: ${accion}`);
+  // y en la Crónica, para todos (dueño, 2026-10-06); quien la hizo ya lo vio en el aviso
+  momentoAbrir({tipo: 'fuera-de-turno', icono: '⏱', titulo: `${nombreDe(t)} actúa fuera de su turno`, resultado: accion, estado: 'listo', datos: {centro: true}});
 }
+/* Una defensa sin No2 (2026-10-06, dueño, a probar: Combatiente.avisarDeudaNo2): a quien la hace, un cartel como el Aviso; a los demás, la
+   Crónica. La deuda se descuenta en su próxima recarga. */
+window.avisoDeudaNo2 = o => {
+  const quien = o.nombre || 'Sin nombre';
+  AvisoCombate.mostrar({icono: '⚠', titulo: `${quien}: no tenés Nitros`, pasos: [{titulo: o.accion, texto: `Cuesta ${fmt(num(o.costo))} No2 y no te alcanzaban: igual se hace, porque es una defensa.`}],
+    veredicto: {tono: 'malo', grande: `${fmt(num(o.quedan))} No2`, chico: 'esa deuda se descuenta en tu próxima recarga'}});
+  momentoAbrir({tipo: 'deuda', icono: '⚠', titulo: `${quien} se defendió sin Nitros`, resultado: `${o.accion}: quedó en ${fmt(num(o.quedan))} No2 (se descuenta en su próxima recarga).`,
+    estado: 'listo', datos: {centro: true}});
+};
+// ¿Ese token está haciendo el dodge roll? (puede quedar en No2 negativos al moverse)
+const enDodge = id => typeof dodgeBanner !== 'undefined' && !!dodgeBanner && dodgeBanner.tokenId === id;
 
 /* Una invocación nueva (dueño, 2026-10-06): si hay orden de turnos, entra al final y con «Mareo de invocación» (su primer turno no hace nada).
    Lo hace la pantalla del GM al ver aparecer el token. */

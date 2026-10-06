@@ -34,8 +34,8 @@ const InvAcciones = (() => {
     }
     if(statId === 'parry'){
       const costo = Combatiente.costoParry();   // el Parry siempre cuesta 1 No2
-      if(costo > num(inv.nitros)) return {error: `${inv.nombre}: no le alcanzan los No2 — el Parry cuesta ${fmt(costo)} No2 y tiene ${fmt(num(inv.nitros))}`};
-      inv.nitros = num(inv.nitros) - costo;
+      inv.nitros = num(inv.nitros) - costo;   // sin No2 queda en negativo: se descuenta en su próxima recarga (2026-10-06)
+      Combatiente.avisarDeudaNo2({nombre: inv.nombre, accion: 'Parry', costo, quedan: num(inv.nitros)});
       parry = 'poner';   // si gana el Parry, sigue el Bloqueo
       cambio = true;
       aviso = `${inv.nombre}: Parry −${fmt(costo)} No2 · quedan ${fmt(inv.nitros)}`;

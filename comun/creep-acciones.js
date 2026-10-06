@@ -71,9 +71,9 @@ const CreepAcciones = (() => {
   function pagarParry(sc){
     if(!C().defensa(sc)) return {error: `${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`};
     const costo = C().costoParry(sc);
-    if(costo > num(sc.nitros)) return {error: `${sc.nombre}: no le alcanzan los No2 — el Parry cuesta ${fmt(costo)} No2 y tiene ${fmt(num(sc.nitros))}`};
-    sc.nitros = num(sc.nitros) - costo;
-    return {aviso: `${sc.nombre}: Parry −${fmt(costo)} No2 · quedan ${fmt(sc.nitros)} · si lo gana, tirá el Bloqueo`};
+    sc.nitros = num(sc.nitros) - costo;   // sin No2 queda en negativo: se descuenta en su próxima recarga (2026-10-06)
+    const deuda = sc.nitros < 0 ? {nombre: sc.nombre, accion: 'Parry', costo, quedan: sc.nitros} : null;
+    return {aviso: `${sc.nombre}: Parry −${fmt(costo)} No2 · quedan ${fmt(sc.nitros)} · si lo gana, tirá el Bloqueo`, deuda};
   }
 
   /* ---------- Atacar (menú de Atacar del creep, 2026-09-26) ----------
@@ -455,7 +455,7 @@ const CreepAcciones = (() => {
     const d = Combatiente.dispararEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno', resFuego: C().resElemental(sc, 'fuego')});
     const rep = Combatiente.reporteTurno(d.eventos);
     if(d.hp){ const antes = num(sc.hp); sc.hp = Math.max(0, Math.min(num(sc.hpMax), antes + d.hp)); rep.push(`HP total: ${antes} → ${sc.hp}`); }
-    sc.nitros = C().nitrosMax(sc);
+    sc.nitros = Combatiente.recargarNo2(C().nitrosMax(sc), sc.nitros);
     return {rep, enCooldown, hpAplicado: d.eventos.filter(ev => ev.tipo === 'hp').length};
   }
   function finCreep(sc){
@@ -468,8 +468,9 @@ const CreepAcciones = (() => {
   function mantenimiento(sc, numero){   // `numero` = el de ese Mantenimiento (sin él, se aplica siempre, como antes)
     if(numero !== undefined && !Combatiente.estadosEnMantenimiento(sc.finTurnoEn, numero)) return {rep: [], enCooldown: 0, hpAplicado: 0, vencidos: 0, enTurno: true};
     // Lo que se dispara va antes de recargar No2 (un Stun que vence ya no los topea): dispara, cuenta y recién ahí No2.
+    const deuda = Math.min(0, num(sc.nitros));
     const a = inicioCreep(sc), b = finCreep(sc);
-    sc.nitros = C().nitrosMax(sc);
+    sc.nitros = Combatiente.recargarNo2(C().nitrosMax(sc), deuda);
     return {rep: [...a.rep, ...b.rep], enCooldown: a.enCooldown, hpAplicado: a.hpAplicado, vencidos: b.vencidos};
   }
   // El turno propio de un creep en el orden de turnos (2026-10-06, P161). `clave` = «mapa:paso:…»; si ya se aplicó → null. `numero` = el

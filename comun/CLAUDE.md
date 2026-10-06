@@ -1329,3 +1329,9 @@ versión parecida en más de una, es candidato a juntar.
   las defensas, la oportunidad ni el contraataque). `ConfirmarTurno` ya no pregunta «¿es tu turno?» si la pantalla lo sabe
   (`window.confirmarTurnoSaber(o)`, con `o.ident = {nombre, ref}`): en turno ajeno cobra lo de turno ajeno y avisa «No es tu turno · ⚡ Flash,
   cuesta el doble». Las habilidades con Flash (`Combatiente.esFlash(h)`) laten con un brillo en las Botoneras (`bt-flash`, `Combatiente.FLASH_CSS`).
+- **Defensas en No2 negativos** (2026-10-06, P163, a probar): `Combatiente.recargarNo2(max, actual)` (la recarga descuenta la deuda: personaje,
+  invocación y creep, en el turno propio y en el ⟳) y `Combatiente.avisarDeudaNo2({nombre, accion, costo, quedan})` (usa `window.avisoDeudaNo2` si
+  la pantalla lo define —el mapa: `AvisoCombate` para quien la hace y un momento `tipo: 'deuda'` en la Crónica—; si no, un toast). Parry
+  (`FichaAcciones.parryConArma`, `CreepAcciones.pagarParry` → `{aviso, deuda}`, `InvAcciones.tirarStat`), la Evasión que paga el sobrepeso
+  (`FichaAcciones.sobrepesoPagar`) y el dodge roll (js/06 y js/08: `enDodge(id)`) ya no se frenan sin No2; en el duelo, la opción se ofrece con
+  «⚠ sin No2: quedás en negativo».

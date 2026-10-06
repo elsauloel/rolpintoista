@@ -787,7 +787,7 @@ async function confirmarRuta(){
   const costo = p.costo !== undefined ? p.costo : p.pasos * p.porCasillero;   // con el terreno lento, paso por paso
   // Sin No2 suficientes no se mueve (no hay No2 negativos): para eso está Mover libre.
   const cm = costoMoverDe(t);
-  if(cm && costo > cm.disponibles){
+  if(cm && costo > cm.disponibles && !p.dodge){   // (el dodge roll sí: es una defensa, queda en negativo — 2026-10-06)
     toast(`No te alcanzan los No2: mover ${p.pasos} casillero${p.pasos === 1 ? '' : 's'} cuesta ${fmt(costo)} y tenés ${fmt(Math.max(0, cm.disponibles))}. Para moverte igual, usá Mover libre (🦶).`);
     cancelarRuta();
     return;
@@ -796,6 +796,7 @@ async function confirmarRuta(){
   try{
     const esCreep = t.tipo === 'creep';
     const quedan = esCreep ? await gastarNitrosCreep(t.fichaId, costo) : await gastarNitros(t.fichaId, costo);
+    if(p.dodge && quedan < 0) Combatiente.avisarDeudaNo2({nombre: nombreDe(t), accion: 'el dodge roll', costo, quedan});
     pasosGratisUsar(p.id, num(p.gratis));   // los primeros casilleros de este turno ya se usaron
     const primerMov = !seMovioEsteTurno(p.id);
     marcarMovido(p.id);   // ya se movió en este turno (Lento, Pasos de baile)

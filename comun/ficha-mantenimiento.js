@@ -61,7 +61,7 @@ const FichaMantenimiento = (() => {
   function invInicio(inv){
     InvCalculo.migrar(inv);
     if(inv.activa === false) return [];
-    inv.nitros = InvCalculo.nitrosMax(inv);
+    inv.nitros = Combatiente.recargarNo2(InvCalculo.nitrosMax(inv), inv.nitros);
     inv.ataquesTurno = 0;
     inv.golpeTurno = 0;   // la Defensa contra el primer golpe vuelve a valer
     inv.habilidades.forEach(h => { if(num(h.cdActual) > 0) h.cdActual = Math.max(0, num(h.cdActual) - 1); });
@@ -103,7 +103,7 @@ const FichaMantenimiento = (() => {
     S.turno = turnoAntes + 1;
     if(ui.limpiarParry) ui.limpiarParry();
     // Nitros al máximo y el primer ataque vuelve a costar la mitad (el SP ya se regeneró al principio).
-    S.nitros = FichaBotonera.nitrosMaximo(S);
+    S.nitros = Combatiente.recargarNo2(FichaBotonera.nitrosMaximo(S), S.nitros);   // la deuda de una defensa sin No2 se descuenta acá
     S.ataquesTurno = 0;
     S.ataquesArma = {};
     let invocacionesVencidas = 0;
@@ -146,10 +146,11 @@ const FichaMantenimiento = (() => {
     aplicarVida(S, ui, d.hp + regenPasivas(S, log, rep), hpAntes, rep);
     contarMuerte(S, ui, log, rep);
     if(ui.limpiarParry) ui.limpiarParry();
-    S.nitros = FichaBotonera.nitrosMaximo(S);
+    const deudaAntes = num(S.nitros);
+    S.nitros = Combatiente.recargarNo2(FichaBotonera.nitrosMaximo(S), S.nitros);   // la deuda de una defensa sin No2 se descuenta acá
     S.ataquesTurno = 0;
     S.ataquesArma = {};
-    rep.push(`No2 recargados a ${fmt(num(S.nitros))}`);
+    rep.push(`No2 recargados a ${fmt(num(S.nitros))}${num(S.nitros) < FichaBotonera.nitrosMaximo(S) && deudaAntes < 0 ? ` (se descontó la deuda de ${fmt(-deudaAntes)})` : ''}`);
     (S.invocaciones || []).forEach(inv => { if(inv && inv.activa !== false && !sin.has(inv.id)){ inv.finTurnoEn = turno; invInicio(inv).forEach(l => rep.push(`${inv.nombre}: ${l}`)); } });
     return {rep, nombre: ((S.meta && S.meta.nombre) || '').trim(), avisos: (S.efectos || []).filter(e => e.popup && e.activo !== false)};
   }

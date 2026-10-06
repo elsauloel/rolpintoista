@@ -1285,11 +1285,14 @@ prueba('las Acciones de un creep: sin arma no hay Parry; el Bloqueo se habilita 
     [false, true, true, true, true, 'No2 6/3', 'Orco']);
 });
 
-prueba('acciones de un creep: levantarse y el Parry cobran No2; el Bloqueo solo tras un Parry; sin No2 no se cobra', () => {
+prueba('acciones de un creep: levantarse y el Parry cobran No2; el Bloqueo solo tras un Parry; el Parry sin No2 deja deuda que se descuenta al recargar', () => {
   const sc = creepPrueba({nitros: 2, estados: [{nombre: 'Sentado', activo: true, sentado: true}]});
   const lev = CreepAcciones.levantarse(sc), par = CreepAcciones.pagarParry(sc), sinNo2 = CreepAcciones.pagarParry(sc);
-  igual([!!lev.aviso, sc.estados.length, !!par.aviso, sc.nitros, !!sinNo2.error, !!CreepAcciones.bloqueo(sc, false).error, CreepAcciones.bloqueo(sc, true).origen, CreepAcciones.tiradaStat(sc, 'nada')],
-    [true, 0, true, 0, true, true, 'Orco · Bloqueo · Hacha', null]);
+  const deuda = sc.nitros;
+  CreepAcciones.inicioTurno(sc, 'p1', 1);
+  igual([!!lev.aviso, sc.estados.length, !!par.aviso, deuda, !!sinNo2.error, sinNo2.deuda && sinNo2.deuda.quedan, sc.nitros, CreepCalculo.nitrosMax(sc) - 1,
+    !!CreepAcciones.bloqueo(sc, false).error, CreepAcciones.bloqueo(sc, true).origen, CreepAcciones.tiradaStat(sc, 'nada'), Combatiente.recargarNo2(6, -2), Combatiente.recargarNo2(6, 3)],
+    [true, 0, true, -1, false, -1, CreepCalculo.nitrosMax(sc) - 1, CreepCalculo.nitrosMax(sc) - 1, true, 'Orco · Bloqueo · Hacha', null, 4, 6]);
 });
 
 prueba('atacar con un creep: el normal suma al conteo y el contraataque no; alcance cuerpo a cuerpo y de rango', () => {

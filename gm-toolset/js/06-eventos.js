@@ -280,6 +280,7 @@ document.addEventListener('click', e => {
     if(!sc) return;
     const x = CreepAcciones.pagarParry(sc);   // comun/creep-acciones.js
     if(x.error){ toast(x.error); return; }
+    if(x.deuda) Combatiente.avisarDeudaNo2(x.deuda);   // sin No2: queda en negativo (2026-10-06)
     parryPendienteCreep.add(sc.id);   // si gana el Parry, sigue el Bloqueo
     renderAll();
     publicarTiradaCreep(CreepAcciones.parry(sc));

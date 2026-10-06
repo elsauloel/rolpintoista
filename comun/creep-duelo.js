@@ -154,8 +154,8 @@ const CreepDuelo = (() => {
         const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${fx(C().statValor(sc, 'eva') + ee.val, 'eva')}${ee.val ? ` (con ${ee.txt})` : ''}`]}];
         // Parry solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30; un arma natural no alcanza, por ahora).
         const def = C().defensa(sc);
-        if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === sc.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}`, costo: c, motivoNo: c > num(sc.nitros) ? 'no le alcanzan los No2' : '',
-          info: [`Parry 🎲 ${fx(C().statValor(sc, 'parry'), 'parry')}`, `si gana, Bloqueo 🎲 ${fx(C().bloqueoValor(sc))}`]});
+        if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === sc.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}`, costo: c, motivoNo: '',
+          info: [`Parry 🎲 ${fx(C().statValor(sc, 'parry'), 'parry')}`, `si gana, Bloqueo 🎲 ${fx(C().bloqueoValor(sc))}`, ...(c > num(sc.nitros) ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
         return ops;
       },
       defender: (d, modo) => {
@@ -163,13 +163,9 @@ const CreepDuelo = (() => {
         if(!sc) return;
         if(modo === 'parry'){
           if(!C().defensa(sc)){ ui.toast(`${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`); return; }
-          return ui.cambiar(d.defensor.ref, c => {
-            const costo = C().costoParry(c);
-            if(costo > num(c.nitros)) return {error: `${c.nombre}: no le alcanzan los No2 — el Parry cuesta ${fmt(costo)} y tiene ${fmt(num(c.nitros))}`};
-            c.nitros = num(c.nitros) - costo;
-            return {aviso: `${c.nombre}: Parry −${fmt(costo)} No2 · quedan ${fmt(c.nitros)}`};
-          }).then(x => {
+          return ui.cambiar(d.defensor.ref, c => A().pagarParry(c)).then(x => {   // sin No2 queda en negativo (2026-10-06)
             if(!x) return;
+            if(x.deuda) Combatiente.avisarDeudaNo2(x.deuda);
             ui.publicar(sc, A().tirada(`${sc.nombre} · Parry`, C().statValor(sc, 'parry'), sc, 'parry'));
             ui.toast(x.aviso);
           });

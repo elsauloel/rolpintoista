@@ -326,21 +326,19 @@ const FichaAcciones = (() => {
   }
   // El cartel de sobrepeso, "Pagar 1 No2": devuelve false si no alcanzan (y no cierra el cartel).
   function sobrepesoPagar(S, ui){
-    if(num(S.nitros) < 1){ ui.toast('No tenés Nitros para pagar: tirá con la penalidad o cancelá'); return false; }
-    S.nitros = num(S.nitros) - 1;
+    S.nitros = num(S.nitros) - 1;   // una defensa: sin No2 queda en negativo, se descuenta en la próxima recarga (2026-10-06)
     ui.cambio(['nitros', 'refresh']);
+    Combatiente.avisarDeudaNo2({nombre: ((S.meta && S.meta.nombre) || '').trim(), accion: 'la Evasión (pagando el sobrepeso)', costo: 1, quedan: num(S.nitros)});
     return true;
   }
   // Parry: siempre 1 No2 (Combatiente.costoParry); queda esperando su Bloqueo con esa misma arma o escudo.
   function parryConArma(S, arma, forzar, ui){
     const costo = Combatiente.costoParry();
     const con = arma ? ' con ' + arma.nombre : '';
-    if(costo > num(S.nitros) && !forzar){
-      ui.avisarSinNitros(costo, `hacer Parry${con}`, () => parryConArma(S, arma, true, ui));
-      return;
-    }
-    S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, `hizo Parry${con}`) : costo);
+    // Una defensa: sin No2 se hace igual y queda en negativo; la deuda se descuenta en la próxima recarga (dueño, 2026-10-06).
+    S.nitros = num(S.nitros) - costo;
     ui.cambio(['nitros']);
+    Combatiente.avisarDeudaNo2({nombre: ((S.meta && S.meta.nombre) || '').trim(), accion: `Parry${con}`, costo, quedan: num(S.nitros)});
     ui.setParry(arma ? arma.id : null);   // queda esperando su Bloqueo (si ganás el Parry)
     tirarValorStat(S, arma ? `Parry · ${arma.nombre}` : 'Parry', FichaCombate.statParaArma(S, 'parry', arma), 'parry', undefined, undefined, undefined, ui);
     ui.toast(`Parry${con}: −${fmt(costo)} No2 · te quedan ${fmt(num(S.nitros))}${arma ? ' · si lo ganás, tirá el Bloqueo' : ''}`);

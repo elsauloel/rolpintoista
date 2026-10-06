@@ -258,11 +258,23 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 ## 6. Repaso de buffs y debuffs (en curso, 2026-09-21)
 - [ ] **Herramienta de «pasa el tiempo»** (dueño, 2026-10-06, P161 — hay que pensarla bien antes de construirla): fuera de combate, sin
   orden de turnos, algo que haga correr el tiempo (regenerar SP, bajar cooldowns, terminar estados, descansos). Hoy lo hace el ⟳ Mantenimiento.
-- [ ] **Revisar Pajaritos, Stun y los estados fuertes para darlos por 1 turno** (dueño, 2026-10-06): con los estados por turno propio (P161),
-  «1 turno» dura exactamente un turno del afectado; se pueden ofrecer por 1 turno con menos impacto y más seguido (más matices). Revisar también
-  el texto del Stun («contá un turno de más», que con el turno propio ya no hace falta en combate) y sus turnos por defecto.
-> **Regla de redondeo (2026-09-22):** salvo que se diga lo contrario, los **debuffs redondean hacia abajo** y los **buffs redondean hacia arriba**. Ya cumplen esto: Cansado, Exhausto, Pajaritos, Lisiado (todos `floor`). Tenerlo en cuenta al repasar los buffs que faltan y al sumar las habilidades de clase.
-- [x] **Veneno**: se acumula (suma stacks, turnos = stacks, sin tope); Veneno severo aparte y no se acumula.
+- [~] **Revisar Pajaritos, Stun y los estados fuertes por 1 turno** (dueño, 2026-10-06; chequeo estado por estado con el turno propio hecho
+  el mismo día). Con el turno propio, «N turnos» = N turnos del afectado (al empezar recarga y se dispara lo que se dispara; al terminar baja
+  el contador, también si se lo pusieron en ese mismo turno — P162).
+  **Para mirar con cuidado (decisiones del dueño):**
+  1. **Stun** (2 turnos): con el turno propio, 1 turno ya le saca un turno entero. Y choca con P163: hoy un stuneado puede hacer Parry
+     quedando en negativo. ¿Bajar a 1 turno? ¿Un stuneado no puede defenderse con No2 (Parry, dodge roll)?
+  2. **Pajaritos (3), Lisiado (3), Parálisis (2):** ahora son 3 turnos exactos del afectado (casi 3 rondas): largos. Pensar versiones de 1 y
+     de 2 turnos, y cuál es el valor por defecto.
+  3. **Barrera (1 turno) y todo buff de 1 turno que uno se pone en su propio turno:** con la regla pareja (P162) se va al terminar ese mismo
+     turno, antes de que lo ataquen: no protege nada. O Barrera pasa a 2 turnos, o P162 se resuelve al revés para lo que uno se pone a sí mismo.
+  4. **Exhausto (3 turnos, No2 a un tercio):** es casi un Stun parcial; revisar la duración junto con el Stun.
+  5. **Inmovilizado (3), Rengo (3), Lento (2):** controles de movimiento con valores «provisorios»; revisar las duraciones con el turno propio.
+  **Detalles menores:** re-quemar (Quemadura) renueva y pega al instante; re-envenenar suma stacks pero no pega al instante — ¿está bien la
+  diferencia? (Hecho el 2026-10-06: los textos de Stun, Veneno severo, Escudo especial y Espinas, que hablaban del Mantenimiento o de «a mano».)
+  **Siguen igual:** Veneno, Regeneración, Sangrado, Cansado, Hypeado, Armadura rota, Confusión, Miedo, Provocado, Escarcha, Crítico
+  frecuente y potente, Silencio, Sentado, Invulnerable, Inmunidad a CC, Excedente de vida, Afortunado, Sangre pura, Coagulación extrema,
+  Blindado, Sigilo, Mareo de invocación, Inamovible, Marcado.
 - [ ] **Mecánica "cura estados" en consumibles y habilidades — a propósito recién después de terminar todo el repaso** (decidido 2026-09-22): una vez repasados todos los debuffs y buffs, agruparlos por familia (venenos, controles físicos tipo Lisiado/Rengo, etc.) y ahí sí crear ítems curativos específicos por grupo — idea del usuario: el Antídoto cura **todos** los tipos de veneno (Veneno + Veneno severo), un vendaje cura Lisiado + Rengo. Hoy sacar cualquier estado sigue siendo a mano.
 - [ ] **Nube tóxica** del Debuffer: ¿sigue aplicando solo 1 stack a alguien ya envenenado?
 - [x] **Sangrado se acumula (decidido 2026-09-22): +1 al daño por turno por reaplicación** (2 → 3 → 4…), no un stack completo como Veneno. Se guarda como `stacks:2, hpTurno:-1` (antes `stacks:1, hpTurno:-2`) y cada reaplicación suma 1 stack — mismo mecanismo que Armadura rota. Hecho en ficha (PJ e invocaciones), gm-tools (creeps, directo y automático) y `comun/estados-aplicar.js` (habilidades/trampas).

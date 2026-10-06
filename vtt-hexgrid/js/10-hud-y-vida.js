@@ -8,6 +8,12 @@
 
 let hudGlobo = '';      // '' | 'estados' | 'ajustes'
 let hudEditando = '';   // 'hp' | 'sp' | 'no2'
+let hudNivel = 'vital'; // 'vital' (clic izquierdo: lo del combate) | 'resto' (clic derecho: lo demás)
+function hudPonerNivel(n){
+  if(hudNivel === n) return;
+  hudNivel = n; hudGlobo = ''; hudEditando = '';
+  pedirDibujo();
+}
 
 function hudCerrar(){
   hudGlobo = '';
@@ -63,10 +69,9 @@ function hudHtml(t){
       '<button type="button" class="hud-circulo icono abierto libre-activo" data-hud-boton="libre" title="Mover libre ACTIVO: tocá para apagarlo (M, Esc o clic derecho)">🦶</button>' +
       '</div><div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (la línea de color del marco). Girar no gasta No2">↻</div>';
   }
-  // Los botones se acomodan en ronda alrededor del token (ver hudUbicar).
-  let html = '<div class="hud-anillo">' +
-    circulo('hp', d.hp, HP_COLOR) + circulo('sp', d.sp, SP_COLOR) + circulo('no2', d.no2, NO2_COLOR) +
-    icono('estados', '◎', 'Estados alterados', hudGlobo === 'estados') +
+  // Los botones se acomodan en ronda alrededor del token (ver hudUbicar). Dos niveles (dueño, 2026-10-06): con el clic izquierdo, lo inmediato
+  // del combate (vida, SP, No2, estados, Botonera); con el clic derecho, todo lo demás. El ⋯ / ↩ del final pasa de uno al otro.
+  if(hudNivel === 'resto') return '<div class="hud-anillo">' +
     (t.tipo === 'creep' ? icono('tarjeta', '🪪', 'Ver tarjeta: imagen, equipo y nota', hudGlobo === 'tarjeta') : '') +
     (fichaDeToken ? icono('ficha', '📜', 'Abrir la ficha en otra pestaña') : '') +
     (soyGM && t.tipo === 'creep' && t.fichaId && creepsPub.has(t.fichaId) ? icono('ficha', '📜', 'Ver la ficha del creep (la misma ventana «Ver» de GM Tools)') : '') +
@@ -74,14 +79,21 @@ function hudHtml(t){
     (puedoMoverLibre(t) ? icono('libre', '🦶', 'Mover libre (atajo: M): llevarlo a otra casilla sin gastar No2 ni dejar estela', !!moverLibre && moverLibre === seleccion) : '') +
     (soyGM ? icono('oculto', t.oculto ? '🙈' : '👁', t.oculto ? 'Oculto: mostrarlo a los jugadores' : 'Ocultarlo (armarlo antes de que entre en la partida)', t.oculto) : '') +
     (propio && !t.fichaId.includes(SEP_INVOCACION) ? icono('equipo', '🛡', 'Equipo y mochila: ver lo que llevás puesto y cambiarlo') : '') +
+    '<button type="button" class="hud-circulo icono hud-nivel" data-hud-nivel="vital" title="Volver a lo del combate: vida, SP, No2, estados y Botonera (o clic izquierdo en el token)">↩</button>' +
+    '</div>' +
+    (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (la línea de color del marco). Girar no gasta No2">↻</div>' : '') +
+    (hudGlobo === 'tarjeta' && t.tipo === 'creep' ? '<div class="hud-globos">' + hudTarjetaHtml(t, d) + '</div>'
+      : hudGlobo === 'ajustes' && (puedoMover(t) || soyGM) ? '<div class="hud-globos">' + hudAjustesHtml(t, d) + '</div>' : '');
+  let html = '<div class="hud-anillo">' +
+    circulo('hp', d.hp, HP_COLOR) + circulo('sp', d.sp, SP_COLOR) + circulo('no2', d.no2, NO2_COLOR) +
+    icono('estados', '◎', 'Estados alterados', hudGlobo === 'estados') +
     (conRayo ? icono('rayo', '⚡', propio ? 'Abrir la Botonera (atajo: B, la de tu personaje principal)' : 'Abrir las Acciones del creep') : '') +
+    '<button type="button" class="hud-circulo icono hud-nivel" data-hud-nivel="resto" title="Más: ficha, tarjeta, ajustes, mover libre, equipo… (o clic derecho en el token)">⋯</button>' +
     '</div>' +
     (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (la línea de color del marco). Girar no gasta No2">↻</div>' : '');
   let globo = '';
   if(hudGlobo === 'estados') globo = hudEstadosHtml(t, d.estados, puedoCambiarEstados(t));
-  if(hudGlobo === 'tarjeta' && t.tipo === 'creep') globo = hudTarjetaHtml(t, d);
   if(hudGlobo === 'hp' && puede) globo = hudHpHtml(t, d);
-  if(hudGlobo === "ajustes" && (puedoMover(t) || soyGM)) globo = hudAjustesHtml(t, d);
   return html + (globo ? '<div class="hud-globos">' + globo + '</div>' : '');
 }
 
@@ -633,7 +645,7 @@ function hudUbicar(){
   const vis = visibles.get(seleccion) || (d ? {x: d.x, y: d.y} : hexCentro(t.col, t.fila));
   const radio = (d ? d.radio : HEX * 0.68) * vista.zoom;
   const px = vis.x * vista.zoom + vista.x, py = vis.y * vista.zoom + vista.y;
-  const firma = JSON.stringify([seleccion, hudGlobo, hudEditando, hpModo, hudDatos(t), barrasDe(t), t.aura || null, (t.imagen || '').length, soyGM, !!t.oculto, moverLibre === seleccion]);
+  const firma = JSON.stringify([seleccion, hudNivel, hudGlobo, hudEditando, hpModo, hudDatos(t), barrasDe(t), t.aura || null, (t.imagen || '').length, soyGM, !!t.oculto, moverLibre === seleccion]);
   if(hud.dataset.firma !== firma){
     hud.dataset.firma = firma;
     hud.innerHTML = hudHtml(t);
@@ -773,6 +785,7 @@ function hudConectar(t){
     };
     campo.onblur = () => { hudEditando = ''; pedirDibujo(); };
   }
+  hud.querySelectorAll('[data-hud-nivel]').forEach(b => b.onclick = () => hudPonerNivel(b.dataset.hudNivel));
   hud.querySelectorAll('[data-hud-boton]').forEach(b => b.onclick = () => {
     const clave = b.dataset.hudBoton;
     if(clave === 'ficha'){ abrirFichaDeToken(t); return; }

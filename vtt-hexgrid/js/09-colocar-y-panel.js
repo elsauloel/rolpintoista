@@ -453,7 +453,7 @@ let firmaPanel = '';
 function seleccionar(id){
   if(seleccion === id && !creando) return;
   const habiaBotonera = !$('#botonera-capa').hidden && botonera.lista && !botonera.completa;
-  if(seleccion !== id){ editandoToken = false; moverLibre = null; hudCerrar(); }
+  if(seleccion !== id){ editandoToken = false; moverLibre = null; hudCerrar(); hudNivel = 'vital'; }
   seleccion = id;
   if(id){ creando = false; trazoSeleccionado = null; elementoSeleccionado = null; }
   renderPanel();

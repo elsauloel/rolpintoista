@@ -81,11 +81,11 @@ async function publicarCambioIniciativa(id, antes, ahora){
 }
 
 // Línea en la Mesa para todos: "Mantenimiento · Turno N".
-async function publicarPaseDeTurno(turno){
+async function publicarPaseDeTurno(turno, titulo){
   try{
     await fbDb.collection(fbRutaCampana('tiradas')).add({
       uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
-      origen: `Mantenimiento · Turno ${turno}`, formula: '', rolls: [], mod: 0, total: turno,
+      origen: titulo ? `${titulo} · Mantenimiento de la ronda` : `Mantenimiento · Turno ${turno}`, formula: '', rolls: [], mod: 0, total: turno,
       desde: 'mantenimiento', cuando: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){ console.error('No se pudo anunciar el pase de turno en la Mesa:', err); }
@@ -164,21 +164,25 @@ document.addEventListener('pointerdown', e => {
 });
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('#personajes-lista').hidden) abrirListaPersonajes(false); });
 
+// ⟳ Mantenimiento (el GM): fuera de combate lo pasa a mano; con orden de turnos lo pasa solo el cambio de ronda (P161). `titulo`: lo que se
+// anuncia en la Mesa (sin él, «Mantenimiento · Turno N»).
+async function pasarMantenimiento(titulo){
+  const ref = fbDb.doc(fbRutaCampana('mapa/mantenimiento'));
+  // El turno que se anuncia es el de gm-tools (gm/estado) más uno.
+  const turno = await fbDb.runTransaction(async tx => {
+    const [doc, estado] = await Promise.all([tx.get(ref), tx.get(fbDb.doc(fbRutaCampana('gm/estado')))]);
+    const numero = (doc.exists ? Math.round(num(doc.data().numero)) : 0) + 1;
+    tx.set(ref, {numero, cuando: firebase.firestore.FieldValue.serverTimestamp()});
+    return (estado.exists ? Math.round(num(estado.data().turno)) : 0) + 1;
+  });
+  publicarPaseDeTurno(turno, titulo);
+}
 $('#btn-mantenimiento').onclick = async () => {
   if(!soyGM) return;
   const btn = $('#btn-mantenimiento');
   btn.disabled = true;
-  try{
-    const ref = fbDb.doc(fbRutaCampana('mapa/mantenimiento'));
-    // El turno que se anuncia es el de gm-tools (gm/estado) más uno.
-    const turno = await fbDb.runTransaction(async tx => {
-      const [doc, estado] = await Promise.all([tx.get(ref), tx.get(fbDb.doc(fbRutaCampana('gm/estado')))]);
-      const numero = (doc.exists ? Math.round(num(doc.data().numero)) : 0) + 1;
-      tx.set(ref, {numero, cuando: firebase.firestore.FieldValue.serverTimestamp()});
-      return (estado.exists ? Math.round(num(estado.data().turno)) : 0) + 1;
-    });
-    publicarPaseDeTurno(turno);
-  }catch(err){
+  try{ await pasarMantenimiento(); }
+  catch(err){
     console.error('No se pudo pasar el turno:', err);
     toast(err.code === 'permission-denied' ? 'Solo el GM puede pasar el turno' : 'No se pudo pasar el turno — mirá la consola');
   }finally{
@@ -349,60 +353,114 @@ function iniciativaFueraDeJuego(id){
   if(t.tipo !== 'pj') return false;
   return !!r && (!!r.muerto || (r.hp !== undefined && num(r.hpMax) > 0 && num(r.hp) <= 0));
 }
+/* ▶ Siguiente (el GM): el TURNO PROPIO (2026-10-06, P161 — turno completo). Termina el turno del que jugaba (baja el contador de sus
+   estados), empieza el del siguiente (recarga No2 y SP, bajan sus cooldowns y se dispara lo que se dispara) y, si se dio la vuelta, pasa el
+   ⟳ Mantenimiento de la ronda solo (lo que es de la ronda: formas que vencen, zonas, fuego, trampas; a los que tienen turno propio no les
+   toca nada). Los caídos que se saltean igual pasan su turno (su cuenta de muerte y su sangrado siguen). Lo aplica la pantalla que tocó
+   ▶ Siguiente, para que no dependa de que el jugador esté conectado. Todo se cuenta en la Crónica y en la Mesa. */
 async function iniciativaSiguiente(){
   const n = iniciativa.orden.length;
   if(!n) return;
   const termina = iniciativa.orden[iniciativa.turno], pasoFin = iniciativa.paso, mapaFin = mapaMostrado;
   let i = iniciativa.turno, ronda = iniciativa.ronda;
+  const salteados = [];
   for(let paso = 0; paso < n; paso++){
     i++;
     if(i >= n){ i = 0; ronda++; }
     if(!iniciativaFueraDeJuego(iniciativa.orden[i].id)) break;   // salta a los caídos (si caen todos, avanza normal)
+    salteados.push(iniciativa.orden[i].id);
   }
   const fin = termina ? {termino: {id: termina.id, paso: pasoFin}} : {};
   const nuevaRonda = ronda !== iniciativa.ronda;
   const ok = await guardarIniciativa({turno: i, paso: pasoFin + 1, ...fin, ...(nuevaRonda ? {ronda} : {})});
   if(!ok) return;
-  const lineas = termina ? await finDeTurno(termina.id, `${mapaFin}:${pasoFin}`) : [];
-  // La Crónica, para todos (dueño, 2026-10-06): «Empieza el turno de Fulano» y lo que pasó al terminar el anterior.
-  const sig = iniciativa.orden[i] || {id: ''}, tSig = tokens.get(sig.id);
+  const lineas = [];
+  if(termina) lineas.push(...await finDeTurno(termina.id, `${mapaFin}:${pasoFin}`));
+  // Los caídos que se saltean: su turno pasa igual, sin jugar.
+  for(const id of salteados.filter(x => x !== (iniciativa.orden[i] || {}).id)){
+    const ini2 = await inicioDeTurno(id, `${mapaFin}:${pasoFin}:${id}`), fin2 = await finDeTurno(id, `${mapaFin}:${pasoFin}:${id}`);
+    lineas.push(...ini2, ...fin2);
+  }
+  if(nuevaRonda) await pasarMantenimiento(`Ronda ${ronda}`);   // lo que es de la ronda (P161)
+  const sig = iniciativa.orden[i] || {id: ''};
+  const lineasInicio = sig.id ? await inicioDeTurno(sig.id, `${mapaFin}:${pasoFin + 1}`) : [];
+  // La Crónica, para todos (dueño, 2026-10-06): «Empieza el turno de Fulano», lo que pasó al terminar el anterior y al empezar el suyo.
+  const tSig = tokens.get(sig.id);
   const publico = (o, t) => !!t && !t.oculto && !(o && o.oculto) && !enSigilo(t);
   const nomSig = publico(sig, tSig) ? nombreDe(tSig) : '';
+  const todas = [...lineas, ...lineasInicio];
   momentoAbrir({tipo: 'turno', icono: '▶', titulo: `${nuevaRonda ? `Ronda ${ronda} · ` : ''}${nomSig ? `Empieza el turno de ${nomSig}` : 'Pasa el turno'}`,
-    estado: 'listo', datos: {lineas: lineas.length ? lineas : [nomSig ? `Le toca a ${nomSig}.` : 'Sigue el orden de turnos.']}});
+    estado: 'listo', datos: {lineas: todas.length ? todas.slice(0, 14) : [nomSig ? `Le toca a ${nomSig}.` : 'Sigue el orden de turnos.']}});
 }
-/* El fin del turno de un token (2026-10-06, turno propio): lo aplica la pantalla que tocó ▶ Siguiente (el GM), para que no dependa de que
-   el jugador esté conectado. Personaje e invocación: sus estados por editarPersonajeMapa (js/11); creep: modificarCreep. El reporte va a la
-   Mesa (personajes e invocaciones) o al 📜 Historial (creeps, como su Mantenimiento). Si ya se aplicó (misma clave), no hace nada. */
-async function finDeTurno(tokenId, clave){   // → las líneas públicas para la Crónica
+// Las invocaciones de un personaje que tienen turno propio (su token está en el orden): las demás van con el personaje.
+function invConTurno(fichaId){
+  return iniciativa.orden.map(o => tokens.get(o.id)).filter(t => t && String(t.fichaId || '').startsWith(fichaId + SEP_INVOCACION))
+    .map(t => String(t.fichaId).split(SEP_INVOCACION)[1]);
+}
+// El inicio o el fin del turno de un token → las líneas públicas para la Crónica (sin la vida de los creeps, sin nombrar ocultos ni en sigilo).
+async function turnoDeToken(tokenId, clave, inicio){
   const t = tokens.get(tokenId);
   if(!t || !t.fichaId) return [];
   const o = iniciativa.orden.find(x => x.id === tokenId);
   const visible = !t.oculto && !(o && o.oculto) && !enSigilo(t);
-  const publicas = (nombre, rep) => !visible || !rep.length ? [] : [`Terminó el turno de ${nombre}:`, ...rep.filter(l => !/^HP total/.test(l) || t.tipo !== 'creep')];
+  const titulo = inicio ? `Empieza el turno de ${nombreDe(t)}:` : `Terminó el turno de ${nombreDe(t)}:`;
+  const publicas = rep => {
+    const l = rep.filter(x => !/^No2 recargados/.test(x) && (t.tipo !== 'creep' || !/^HP total/.test(x)));
+    return !visible || !l.length ? [] : [titulo, ...l];
+  };
+  const numero = Math.round(num(mantenimientoNumero));
   try{
     if(t.tipo === 'creep'){
-      if(!soyGM) return;
+      if(!soyGM) return [];
       await acCargarPiezas();
       let r = null, nombre = '';
-      await modificarCreep(t.fichaId, crudo => { const sc = CreepCalculo.normalizar(crudo); r = CreepAcciones.finTurno(sc, clave); nombre = sc.nombre; return r; });
-      if(r && r.rep.length && typeof historialReporteMantenimiento === 'function') historialReporteMantenimiento(`${nombre} · fin de su turno`, r.rep);
+      await modificarCreep(t.fichaId, crudo => { const sc = CreepCalculo.normalizar(crudo); nombre = sc.nombre; r = inicio ? CreepAcciones.inicioTurno(sc, clave, numero) : CreepAcciones.finTurno(sc, clave, numero); return r; });
+      if(r && r.rep.length && typeof historialReporteMantenimiento === 'function') historialReporteMantenimiento(`${nombre} · ${inicio ? 'empieza' : 'termina'} su turno`, r.rep);
       if(typeof ac !== 'undefined' && ac && !ac.host.hidden) acDibujar();
-      return r ? publicas(nombreDe(t), r.rep) : [];
+      return r ? publicas(r.rep) : [];
     }
     const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
+    const conTurno = invConTurno(fichaId);
     let r = null;
     await editarPersonajeMapa(fichaId, S => {
-      r = FichaMantenimiento.finTurno(S, {fijarHp: v => mantFijarHp(S, v)}, clave, invId || '');
+      const ui = {fijarHp: v => mantFijarHp(S, v)};
+      r = inicio ? FichaMantenimiento.inicioTurno(S, ui, clave, invId || '', conTurno, numero) : FichaMantenimiento.finTurno(S, ui, clave, invId || '', conTurno, numero);
       return !!r;
     });
-    if(r && r.rep.length) FichaMantenimiento.publicarReporte(`Fin de su turno`, r.rep, r.nombre);
-    return r ? publicas(nombreDe(t), r.rep) : [];
+    if(r && r.rep.length) FichaMantenimiento.publicarReporte(inicio ? 'Empieza su turno' : 'Termina su turno', r.rep, r.nombre);
+    if(r && r.avisos && r.avisos.length) FichaMantenimiento.publicarRecordatorios(r.avisos, r.nombre);
+    return r ? publicas(r.rep) : [];
   }catch(err){
-    console.error('No se pudo aplicar el fin del turno:', err);
-    toast('No se pudieron pasar los estados del fin del turno — mirá la consola');
+    console.error(`No se pudo aplicar el ${inicio ? 'inicio' : 'fin'} del turno:`, err);
+    toast(`No se pudo ${inicio ? 'empezar' : 'terminar'} el turno de ${nombreDe(t)} — mirá la consola`);
     return [];
   }
+}
+const inicioDeTurno = (tokenId, clave) => turnoDeToken(tokenId, clave, true);
+const finDeTurno = (tokenId, clave) => turnoDeToken(tokenId, clave, false);
+
+/* Una invocación nueva (dueño, 2026-10-06): si hay orden de turnos, entra al final y con «Mareo de invocación» (su primer turno no hace nada).
+   Lo hace la pantalla del GM al ver aparecer el token. */
+async function invocacionAlOrden(tokenId){
+  const t = tokens.get(tokenId);
+  if(!soyGM || !t || !iniciativa.orden.length || iniciativa.orden.some(o => o.id === tokenId)) return;
+  if(!String(t.fichaId || '').includes(SEP_INVOCACION)) return;
+  const ok = await guardarIniciativa({orden: [...iniciativa.orden.map(o => o.oculto ? {id: o.id, valor: num(o.valor), oculto: true} : {id: o.id, valor: num(o.valor)}), {id: tokenId, valor: 0}]});
+  if(!ok) return;
+  const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
+  try{
+    await editarPersonajeMapa(fichaId, S => {
+      const inv = (S.invocaciones || []).find(x => x && x.id === invId);
+      if(!inv) return false;
+      const pre = estadosPresetFicha().find(p => p.nombre === 'Mareo de invocación');
+      if(!pre) return false;
+      inv.estados = inv.estados || [];
+      Combatiente.agregarEstado(inv.estados, SelectorEstados.estadoInvocacion(pre, idEstadoNuevo()));
+      return true;
+    });
+  }catch(err){ console.error('No se pudo marear a la invocación nueva:', err); }
+  momentoAbrir({tipo: 'turno', icono: '✨', titulo: `${nombreDe(t)} entra al orden de turnos`, estado: 'listo',
+    datos: {lineas: ['Al final del orden, con Mareo de invocación: su primer turno no hace nada.']}});
 }
 
 function renderIniciativa(){

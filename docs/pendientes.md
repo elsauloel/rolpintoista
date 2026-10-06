@@ -242,6 +242,8 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] El pool de **habilidades de clase** (`skills-clase.js`): 62 skills, casi todas todavía "(Sin auditar)".
 
 ## 6. Repaso de buffs y debuffs (en curso, 2026-09-21)
+- [ ] **Herramienta de «pasa el tiempo»** (dueño, 2026-10-06, P161 — hay que pensarla bien antes de construirla): fuera de combate, sin
+  orden de turnos, algo que haga correr el tiempo (regenerar SP, bajar cooldowns, terminar estados, descansos). Hoy lo hace el ⟳ Mantenimiento.
 - [ ] **Revisar Pajaritos, Stun y los estados fuertes para darlos por 1 turno** (dueño, 2026-10-06): con los estados por turno propio (P161),
   «1 turno» dura exactamente un turno del afectado; se pueden ofrecer por 1 turno con menos impacto y más seguido (más matices). Revisar también
   el texto del Stun («contá un turno de más», que con el turno propio ya no hace falta en combate) y sus turnos por defecto.

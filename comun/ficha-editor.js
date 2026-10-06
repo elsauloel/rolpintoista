@@ -196,7 +196,7 @@ const FichaEditor = (() => {
   }
   // Ponerle un estado al personaje o a una invocación: inmunidades, acumulación (Armadura rota, Veneno, Sangrado, Escarcha) y
   // renovación de uno igual son la regla común (comun/combatiente.js, agregarEstado). Devuelve el resultado.
-  function agregarEstadoConAviso(lista, nuevo, quien, toast){
+  function agregarEstadoConAviso(lista, nuevo, quien, toast, o){
     const r = Combatiente.agregarEstado(lista, nuevo);
     const q = quien ? quien + ': ' : '';
     if(!r.ok){ toast(`🛡 ${q}inmune ahora mismo (${r.motivo}) — ${nuevo.nombre} no se pudo aplicar`); return r; }
@@ -205,7 +205,10 @@ const FichaEditor = (() => {
     const txt = r.que === 'acumulado'
       ? (e.esEscarcha ? `${e.nombre} ×${e.stacks} (−${e.stacks} No2 máx.)` : e.esSangrado ? `${e.nombre}: +1 al daño por turno (${fmt(Math.abs(num(e.hpturno)) * num(e.stacks))} ahora)` : `${e.nombre} ×${e.stacks}`)
       : r.que === 'renovado' ? `${e.nombre} renovado (ya lo tenía)` : `${e.nombre} activado`;
-    toast(q + txt);
+    // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161) — si quien llama sabe poner la vida.
+    const dis = o && o.alDisparar ? Combatiente.dispararAlAplicar(r, lista, {hp: 'hpturno', resFuego: num(o.resFuego)}) : {hp: 0};
+    if(dis.hp) o.alDisparar(dis.hp);
+    toast(q + txt + (dis.hp ? ` · ya ${dis.hp < 0 ? 'sacó' : 'curó'} ${fmt(Math.abs(dis.hp))} HP` : ''));
     return r;
   }
   // Resumen de una ejecución paso a paso, en una línea (para el editor y la tarjeta).
@@ -1003,7 +1006,8 @@ const FichaEditor = (() => {
       // Un estado nuevo desde el formulario completo: la misma regla que el "+ Estado" (inmunidades, acumular o renovar).
       if(key === 'efectos' && !id){
         cerrar();
-        agregarEstadoConAviso(P.efectos, draft, '', toast);
+        agregarEstadoConAviso(P.efectos, draft, '', toast, {resFuego: FichaCalculo.calcular(P).final.resfuego,
+          alDisparar: hp => { FichaAcciones.fijarHp(P, num(P.hp) + hp); FichaAcciones.revisarAnkh(P); FichaAcciones.revisarMuerte(P); }});
         ctx.alCambiar(['efectos']);
         return;
       }

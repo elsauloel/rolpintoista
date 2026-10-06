@@ -778,7 +778,10 @@ const CreepEditor = (() => {
         if(!r.ok){ aviso = `${sc.nombre}: inmune ahora mismo (${r.motivo}) — ${nombre} no se pudo aplicar`; return; }
         if(r.que === 'yaLoTiene'){ aviso = `${sc.nombre}: ${nombre} ya lo tiene, no se acumula`; return; }
         if(K.modsAfectanHp(r.estado.mods)) K.actualizarHpMaxPorCon(sc);
-        aviso = `${sc.nombre}: ${textoEstadoAgregado(r, 'hpTurno')}`;
+        // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).
+        const dis = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: K.resElemental(sc, 'fuego')});
+        if(dis.hp) sc.hp = Math.max(0, Math.min((parseFloat(sc.hpMax) || 0) > 0 ? parseFloat(sc.hpMax) : Infinity, (parseFloat(sc.hp) || 0) + dis.hp));
+        aviso = `${sc.nombre}: ${textoEstadoAgregado(r, 'hpTurno')}${dis.hp ? ` · ya ${dis.hp < 0 ? 'sacó' : 'curó'} ${Math.abs(dis.hp)} HP` : ''}`;
       });
       if(aviso) toast(aviso);
     }

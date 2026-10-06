@@ -736,10 +736,18 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   usan desde Atacar (dueño: «se tratan como un ataque»), el cartel «¿Qué ataque es?» solo ofrece el **ataque normal** con sus reglas (1 No2 + 1 por
   uso + su SP). ¿Una varita puede ir de oportunidad (cuando un rival sale de tu alcance) o de contraataque (tras ganar Parry y Bloqueo)? ¿Con qué
   costo, y solo las que apuntan a un rival? Mientras tanto, no aparecen (la mesa lo puede hacer a mano).
-- **P161. Turno continuo: ¿opción completa o intermedia?** (2026-10-06, para el grupo). **Mientras tanto, decidido por el dueño: la
-  intermedia**, ya programada: con el orden de turnos del mapa, los estados de cada uno corren al **terminar su turno** (▶ Siguiente del GM);
-  lo que se dispara (veneno, sangrado, regeneración) se dispara justo antes de que baje el contador; un estado que te ponen en tu propio turno
-  empieza a contar en el próximo. **Nitros y SP siguen en el ⟳ Mantenimiento de la ronda** (y los cooldowns, por ahora, también). Sin orden de
-  turnos, todo sigue en el Mantenimiento. Cada pase de turno se anuncia en la Crónica («Empieza el turno de…» y lo que pasó al terminar el
-  anterior) y en la Mesa. La completa sumaría Nitros, SP (y cooldowns) en el turno de cada uno. Pregunta subida a 🛠 Herramientas de diseño.
-  Después: revisar Pajaritos, Stun y los estados fuertes para darlos por 1 turno (más matices, más frecuentes).
+- ✅ **P161. Turno continuo: ¿opción completa o intermedia?** (2026-10-06). **Decidida por el dueño el mismo día: el turno completo**, para
+  probarlo (en Herramientas de diseño quedó como comunicado, no como pregunta). Con el orden de turnos del mapa, cada uno tiene su reloj: **al
+  empezar su turno** recarga No2 y SP, bajan sus cooldowns (y la espera de sus varitas), corren las pasivas que curan y la cuenta de muerte, y
+  **se dispara** lo que se dispara (veneno, sangrado, regeneración, el escudo); **al terminarlo** baja el contador de sus estados. **Lo que se
+  dispara pega también apenas te lo ponen** (dueño: «aunque te apliquen un antídoto, por lo menos una vez va a haber tenido efecto»): cada
+  estado pega una vez por vuelta, así uno de N turnos pega N veces. **El ⟳ Mantenimiento sigue** fuera de combate y para quien no está en el
+  orden; con orden de turnos lo pasa solo el **cambio de ronda** (la línea de la lista de turnos: formas que vencen, zonas, fuego, trampas) y a
+  quien tuvo turno propio no le toca nada. **Las rondas se siguen contando.** Una **invocación nueva** entra al final del orden con **Mareo de
+  invocación** (su primer turno no hace nada). Cada pase de turno se cuenta en la Crónica y en la Mesa. Después: revisar Pajaritos, Stun y los
+  estados fuertes por 1 turno (`pendientes.md` §6) y pensar la herramienta de «pasa el tiempo» (fuera de combate).
+- **P162. Un estado que te ponen durante tu propio turno, ¿cuenta ese fin de turno?** (2026-10-06, el dueño lo sigue pensando). **Mientras
+  tanto: sí** — la regla limpia y pareja: el contador baja al terminar el turno del afectado, aunque se lo hayan puesto en ese mismo turno (un
+  Stun de 1 turno puesto en tu turno se va al terminarlo; el veneno igual ya pegó al aplicarse). Consecuencia de diseño: lo que se activa en
+  tu propio turno (sobre todo las **trampas**: Pajaritos, Stun) nunca dura menos de 2 turnos. La alternativa: que empiece a contar en el
+  próximo (la marca `pasoTurno` de cada estado ya lo permitiría).

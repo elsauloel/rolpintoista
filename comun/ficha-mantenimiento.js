@@ -20,108 +20,101 @@ const FichaMantenimiento = (() => {
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   const MAX_SEGUIDOS = 10;
 
-  function aplicar(S, ui){
-    const c = FichaCalculo.calcular(S);
-    const log = [];
-    let hpDelta = 0;
-    // Reporte para la Mesa (2026-09-24): lo que le pasó a este personaje en el pase de turno, en texto llano y con el antes y el
-    // después, para que todos vean si el veneno bajó, si la regeneración curó, etc.
-    const rep = [];
-    const hpAntes = num(S.hp);
-    // Con orden de turnos, los estados corren en su turno (finTurno, abajo); acá solo si no tuvo un fin de turno en esta ronda o la anterior.
-    const turnoAntes = num(S.turno || 1);
-    const estadosAca = Combatiente.estadosEnMantenimiento(S.finTurnoEn, turnoAntes);
-
-    // SP Regen: AL PRINCIPIO del Mantenimiento (2026-09-24), con los números de antes de que venza o cambie ningún estado.
-    // Por defecto es la mitad del Especial, redondeada hacia abajo (fórmula base del stat), más lo que sumen habilidades, equipo o estados.
-    // Recupera SP sin pasar del máximo (si ya estaba por encima, no se toca).
+  // SP Regen: lo que recupera (sin pasar del máximo). Por defecto la mitad del Especial, más lo que sumen habilidades, equipo o estados.
+  function regenerarSp(S, c, rep){
     const spRegen = Math.max(0, Number.isNaN(c.final.spregen) ? 0 : Math.floor(c.final.spregen));
     const spRecuperado = Math.min(spRegen, Math.max(0, num(S.spGastado)));
-    if(spRecuperado){
-      S.spGastado = num(S.spGastado) - spRecuperado;
-      rep.push(`SP: +${fmt(spRecuperado)} (SP Regen)`);
-    }
-
-    // Lo que hacen los estados en el pase de turno (escudo, daño/cura con inmunidades, stacks, turnos): regla común de
-    // personajes, invocaciones y creeps (comun/combatiente.js). La vida se aplica más abajo, con fijarHp (tope, Ankh, muerte).
-    const turnoEst = estadosAca ? Combatiente.pasarTurnoEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(c.final.resfuego)})
-      : {hp: 0, eventos: [], terminados: [], quedan: S.efectos || []};
-    if(!estadosAca && (S.efectos || []).length) rep.push('Estados: corren al terminar su turno (orden de turnos)');
-    hpDelta += turnoEst.hp;
-    Combatiente.reporteTurno(turnoEst.eventos).forEach(l => { rep.push(l); log.push(esc(l)); });
-
-    // Pasivas de regeneración: recuperan HP en cada Mantenimiento (por compra).
+    if(spRecuperado){ S.spGastado = num(S.spGastado) - spRecuperado; rep.push(`SP: +${fmt(spRecuperado)} (SP Regen)`); }
+    return {spRegen, spRecuperado};
+  }
+  // Pasivas de regeneración: recuperan HP en cada turno (por compra).
+  function regenPasivas(S, log, rep){
+    let hp = 0;
     (S.pasivas || []).forEach(p => {
-      const hp = num(p.regenHp) * FichaCalculo.pasivaCompras(p);
-      if(hp > 0 && num(S.hp) > 0){
-        hpDelta += hp;
-        log.push(`<b>${esc(p.nombre)}</b> <span class="heal">+${fmt(hp)} HP</span>`);
-        rep.push(`${p.nombre} (pasiva): +${fmt(hp)} HP`);
-      }
+      const x = num(p.regenHp) * FichaCalculo.pasivaCompras(p);
+      if(x > 0 && num(S.hp) > 0){ hp += x; log.push(`<b>${esc(p.nombre)}</b> <span class="heal">+${fmt(x)} HP</span>`); rep.push(`${p.nombre} (pasiva): +${fmt(x)} HP`); }
     });
-
-    if(hpDelta){
-      // Pasa por fijarHp para que el veneno que te deja en 0 active el Ankh
-      // antes de que se descuenten los turnos de muerte, más abajo.
-      ui.fijarHp(num(S.hp) + hpDelta);
-      if(num(S.hp) !== hpAntes) rep.push(`HP total: ${fmt(hpAntes)} → ${fmt(num(S.hp))}`);
-      else rep.push(`HP total: sigue en ${fmt(hpAntes)}`);
+    return hp;
+  }
+  // La vida por fijarHp (para que el veneno que te deja en 0 active el Ankh antes de contar los turnos de muerte) y el reporte.
+  function aplicarVida(S, ui, hpDelta, hpAntes, rep){
+    if(!hpDelta) return;
+    ui.fijarHp(num(S.hp) + hpDelta);
+    rep.push(num(S.hp) !== hpAntes ? `HP total: ${fmt(hpAntes)} → ${fmt(num(S.hp))}` : `HP total: sigue en ${fmt(hpAntes)}`);
+  }
+  // Inconsciente: un turno menos para morir.
+  function contarMuerte(S, ui, log, rep){
+    if(!(S.muerto && S.muerto.activo && !S.muerto.definitivo && num(S.hp) <= 0)) return;
+    S.muerto.turnos = Math.max(0, num(S.muerto.turnos) - 1);
+    if(S.muerto.turnos === 0){
+      S.muerto.definitivo = true;
+      log.push(`<span class="gone">TE HAS MORIDO BIEN MUERTO Y YA NO HAY VUELTA ATR&Aacute;S</span>`);
+      rep.push('Murió: ya no hay vuelta atrás');
+    }else{
+      log.push(`Inconsciente: morís en <b>${fmt(S.muerto.turnos)}</b> turno(s)`);
+      rep.push(`Inconsciente: muere en ${fmt(S.muerto.turnos)} turno${S.muerto.turnos === 1 ? '' : 's'}`);
     }
-
-    if(S.muerto && S.muerto.activo && !S.muerto.definitivo && num(S.hp) <= 0){
-      S.muerto.turnos = Math.max(0, num(S.muerto.turnos) - 1);
-      if(S.muerto.turnos === 0){
-        S.muerto.definitivo = true;
-        log.push(`<span class="gone">TE HAS MORIDO BIEN MUERTO Y YA NO HAY VUELTA ATR&Aacute;S</span>`);
-        rep.push('Murió: ya no hay vuelta atrás');
-      }else{
-        log.push(`Inconsciente: morís en <b>${fmt(S.muerto.turnos)}</b> turno(s)`);
-        rep.push(`Inconsciente: muere en ${fmt(S.muerto.turnos)} turno${S.muerto.turnos === 1 ? '' : 's'}`);
-      }
-      if(ui.muerte) ui.muerte();
+    if(ui.muerte) ui.muerte();
+  }
+  const camposInv = inv => ({hp: 'hpturno', stacks: 'stacksturno', resFuego: num(InvCalculo.statValor(inv, 'resfuego'))});
+  // Lo de una invocación al empezar su vuelta: No2, ataques, cooldowns, lo que se dispara y la cuenta para dormirse. → líneas.
+  function invInicio(inv){
+    InvCalculo.migrar(inv);
+    if(inv.activa === false) return [];
+    inv.nitros = InvCalculo.nitrosMax(inv);
+    inv.ataquesTurno = 0;
+    inv.golpeTurno = 0;   // la Defensa contra el primer golpe vuelve a valer
+    inv.habilidades.forEach(h => { if(num(h.cdActual) > 0) h.cdActual = Math.max(0, num(h.cdActual) - 1); });
+    const d = Combatiente.dispararEstados(inv.estados, camposInv(inv));
+    const rep = Combatiente.reporteTurno(d.eventos);
+    if(d.hp){ const antes = num(inv.hp); inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, antes + d.hp)); rep.push(`HP total: ${fmt(antes)} → ${fmt(inv.hp)}`); }
+    if(num(inv.cooldown) > 0){
+      inv.cooldownActual = Math.max(0, num(inv.cooldownActual) - 1);
+      if(inv.cooldownActual === 0){ inv.activa = false; rep.push('Se duerme: llegó su cooldown a 0'); }
     }
+    return rep;
+  }
+  function invFin(inv){
+    const k = Combatiente.contarEstados(inv.estados, camposInv(inv));
+    inv.estados = k.quedan;
+    return Combatiente.reporteTurno(k.eventos);
+  }
 
+  /* ⟳ Mantenimiento de la ronda (fuera de combate, o para quien no está en el orden de turnos): un pase de turno sobre el personaje `S`.
+     Con turno propio reciente (en combate) no hace nada —ni toca la ficha: así no pisa lo que escribió su turno—: lo hace su turno
+     (inicioTurno / finTurno). `numero` = el número de ese Mantenimiento (sin él, se aplica siempre, como antes). */
+  function aplicar(S, ui, numero){
+    const turnoAntes = num(S.turno || 1);
+    if(numero !== undefined && !Combatiente.estadosEnMantenimiento(S.finTurnoEn, numero))
+      return {rep: [], avisos: [], spRegen: 0, spRecuperado: 0, enTurno: true};
+    const c = FichaCalculo.calcular(S);
+    const log = [], rep = [];
+    const hpAntes = num(S.hp);
+    // SP Regen AL PRINCIPIO, con los números de antes de que venza o cambie ningún estado.
+    const {spRegen, spRecuperado} = regenerarSp(S, c, rep);
+    // Lo que hacen los estados (escudo, daño/cura con inmunidades, stacks, turnos): la regla común de comun/combatiente.js.
+    const turnoEst = Combatiente.pasarTurnoEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(c.final.resfuego)});
+    Combatiente.reporteTurno(turnoEst.eventos).forEach(l => { rep.push(l); log.push(esc(l)); });
+    const hpDelta = turnoEst.hp + regenPasivas(S, log, rep);
+    aplicarVida(S, ui, hpDelta, hpAntes, rep);
+    contarMuerte(S, ui, log, rep);
     // Los estados que se terminaron se sacan por identidad (fijarHp pudo tocar la lista, por ejemplo el Ankh).
-    if(turnoEst.terminados.length){
-      const fin = new Set(turnoEst.terminados);
-      S.efectos = S.efectos.filter(e => !fin.has(e));
-    }
-
-    S.turno = (S.turno || 1) + 1;
+    if(turnoEst.terminados.length){ const finS = new Set(turnoEst.terminados); S.efectos = S.efectos.filter(e => !finS.has(e)); }
+    S.turno = turnoAntes + 1;
     if(ui.limpiarParry) ui.limpiarParry();
-    // Nitros se recargan al máximo y el primer ataque vuelve a costar la
-    // mitad (el SP ya se regeneró al principio del Mantenimiento, ver arriba).
+    // Nitros al máximo y el primer ataque vuelve a costar la mitad (el SP ya se regeneró al principio).
     S.nitros = FichaBotonera.nitrosMaximo(S);
     S.ataquesTurno = 0;
     S.ataquesArma = {};
-
     let invocacionesVencidas = 0;
     (S.invocaciones || []).forEach(inv => {
-      InvCalculo.migrar(inv);
-      if(inv.activa === false) return; // ya dormida, no se sigue procesando
-      // Nitros se recargan al máximo, igual que el propio personaje.
-      inv.nitros = InvCalculo.nitrosMax(inv);
-      inv.ataquesTurno = 0;
-      inv.golpeTurno = 0;   // la Defensa contra el primer golpe vuelve a valer (2026-10-06)
-      inv.habilidades.forEach(h => { if(num(h.cdActual) > 0) h.cdActual = Math.max(0, num(h.cdActual) - 1); });
-      // Estados alterados de la invocación: la MISMA regla que el personaje y los creeps (comun/combatiente.js).
-      const turnoInv = Combatiente.estadosEnMantenimiento(inv.finTurnoEn, turnoAntes)
-        ? Combatiente.pasarTurnoEstados(inv.estados, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(InvCalculo.statValor(inv, 'resfuego'))})
-        : {hp: 0, eventos: [], terminados: [], quedan: inv.estados || []};
-      if(turnoInv.hp) inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, num(inv.hp) + turnoInv.hp));
-      inv.estados = turnoInv.quedan;
-      if(num(inv.cooldown) > 0){
-        inv.cooldownActual = Math.max(0, num(inv.cooldownActual) - 1);
-        if(inv.cooldownActual === 0){
-          inv.activa = false;
-          invocacionesVencidas++;
-        }
-      }
+      if(inv.activa === false) return;
+      if(numero !== undefined && !Combatiente.estadosEnMantenimiento(inv.finTurnoEn, numero)) return;   // tiene turno propio en el orden: lo hace su turno
+      const r1 = invInicio(inv);
+      invFin(inv);
+      if(r1.includes('Se duerme: llegó su cooldown a 0')) invocacionesVencidas++;
     });
-    if(invocacionesVencidas){
-      log.push(`${invocacionesVencidas} invocación(es) quedaron dormidas al llegar el cooldown a 0.`);
-    }
-
+    if(invocacionesVencidas) log.push(`${invocacionesVencidas} invocación(es) quedaron dormidas al llegar el cooldown a 0.`);
     log.unshift(`<b style="color:var(--brass)">Turno ${S.turno}</b>`);
     log.push(`Nitros recargados a ${fmt(num(S.nitros))}.` + (spRegen ? ` SP ${spRecuperado ? `<span class="heal">+${fmt(spRecuperado)}</span>` : '+0'} (SP Regen ${fmt(spRegen)}${spRegen && !spRecuperado ? ', ya estaba lleno' : ''}).` : ''));
     S.log = log;
@@ -129,34 +122,52 @@ const FichaMantenimiento = (() => {
     return {rep, avisos, spRegen, spRecuperado};
   }
 
-  /* El fin del turno de un personaje (o de una de sus invocaciones, `invId`) en el orden de turnos (2026-10-06): sus estados corren (lo que
-     se dispara, antes de bajar el contador), salvo los que le pusieron durante este mismo turno. `clave` = «mapa:paso» del turno que terminó:
-     si ya se aplicó (otra pantalla, doble clic), no hace nada → null. Si no → {rep, nombre}. ui = {fijarHp(v)}. */
-  function finTurno(S, ui, clave, invId){
-    const turno = num(S.turno || 1);
-    const saltar = e => !!clave && e.pasoTurno === clave;
+  /* El TURNO PROPIO de un personaje (o de una invocación suya, `invId`) en el orden de turnos (2026-10-06, P161, turno completo).
+     `clave` = «mapa:paso:…» de ese turno: si ya se aplicó (otra pantalla, doble clic), no hace nada → null. `conTurno` = ids de sus
+     invocaciones que tienen turno propio en el orden; las demás van con el personaje. `numero` = el Mantenimiento en curso (para que el ⟳
+     de la ronda sepa que ya lo atiende su turno). ui = {fijarHp(v), muerte?(), limpiarParry?()}.
+     inicioTurno → {rep, nombre, avisos}: SP Regen, lo que se dispara, pasivas, vida, turnos de muerte, No2 al máximo, ataques a 0.
+     finTurno → {rep, nombre}: baja el contador de sus estados. */
+  function inicioTurno(S, ui, clave, invId, conTurno, numero){
+    const turno = num(numero), sin = new Set(conTurno || []);
+    if(invId){
+      const inv = (S.invocaciones || []).find(i => i && i.id === invId);
+      if(!inv || inv.inicioTurnoClave === clave) return null;
+      inv.inicioTurnoClave = clave; inv.finTurnoEn = turno;
+      return {rep: invInicio(inv), nombre: inv.nombre || 'Invocación', avisos: []};
+    }
+    if(S.inicioTurnoClave === clave) return null;
+    S.inicioTurnoClave = clave; S.finTurnoEn = turno;
+    const c = FichaCalculo.calcular(S);
+    const log = [], rep = [], hpAntes = num(S.hp);
+    regenerarSp(S, c, rep);
+    const d = Combatiente.dispararEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(c.final.resfuego)});
+    rep.push(...Combatiente.reporteTurno(d.eventos));
+    aplicarVida(S, ui, d.hp + regenPasivas(S, log, rep), hpAntes, rep);
+    contarMuerte(S, ui, log, rep);
+    if(ui.limpiarParry) ui.limpiarParry();
+    S.nitros = FichaBotonera.nitrosMaximo(S);
+    S.ataquesTurno = 0;
+    S.ataquesArma = {};
+    rep.push(`No2 recargados a ${fmt(num(S.nitros))}`);
+    (S.invocaciones || []).forEach(inv => { if(inv && inv.activa !== false && !sin.has(inv.id)){ inv.finTurnoEn = turno; invInicio(inv).forEach(l => rep.push(`${inv.nombre}: ${l}`)); } });
+    return {rep, nombre: ((S.meta && S.meta.nombre) || '').trim(), avisos: (S.efectos || []).filter(e => e.popup && e.activo !== false)};
+  }
+  function finTurno(S, ui, clave, invId, conTurno, numero){
+    const turno = num(numero), sin = new Set(conTurno || []);
     if(invId){
       const inv = (S.invocaciones || []).find(i => i && i.id === invId);
       if(!inv || inv.finTurnoClave === clave) return null;
-      InvCalculo.migrar(inv);
       inv.finTurnoClave = clave; inv.finTurnoEn = turno;
-      const t = Combatiente.pasarTurnoEstados(inv.estados, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(InvCalculo.statValor(inv, 'resfuego')), saltar});
-      const rep = Combatiente.reporteTurno(t.eventos);
-      if(t.hp){ const antes = num(inv.hp); inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, antes + t.hp)); rep.push(`HP total: ${fmt(antes)} → ${fmt(inv.hp)}`); }
-      inv.estados = t.quedan;
-      return {rep, nombre: inv.nombre || 'Invocación'};
+      return {rep: invFin(inv), nombre: inv.nombre || 'Invocación'};
     }
     if(S.finTurnoClave === clave) return null;
     S.finTurnoClave = clave; S.finTurnoEn = turno;
     const c = FichaCalculo.calcular(S);
-    const t = Combatiente.pasarTurnoEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(c.final.resfuego), saltar});
-    const rep = Combatiente.reporteTurno(t.eventos);
-    if(t.hp){
-      const antes = num(S.hp);
-      ui.fijarHp(antes + t.hp);
-      rep.push(num(S.hp) !== antes ? `HP total: ${fmt(antes)} → ${fmt(num(S.hp))}` : `HP total: sigue en ${fmt(antes)}`);
-    }
-    if(t.terminados.length){ const fin = new Set(t.terminados); S.efectos = S.efectos.filter(e => !fin.has(e)); }
+    const k = Combatiente.contarEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(c.final.resfuego)});
+    const rep = Combatiente.reporteTurno(k.eventos);
+    if(k.terminados.length){ const finS = new Set(k.terminados); S.efectos = S.efectos.filter(e => !finS.has(e)); }
+    (S.invocaciones || []).forEach(inv => { if(inv && inv.activa !== false && !sin.has(inv.id)){ inv.finTurnoEn = turno; invFin(inv).forEach(l => rep.push(`${inv.nombre}: ${l}`)); } });
     return {rep, nombre: ((S.meta && S.meta.nombre) || '').trim()};
   }
 
@@ -195,5 +206,5 @@ const FichaMantenimiento = (() => {
     });
   }
 
-  return {MAX_SEGUIDOS, aplicar, finTurno, reclamar, publicarReporte, publicarRecordatorios};
+  return {MAX_SEGUIDOS, aplicar, inicioTurno, finTurno, reclamar, publicarReporte, publicarRecordatorios};
 })();

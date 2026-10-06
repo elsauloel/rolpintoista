@@ -80,9 +80,13 @@ const InvHabilidades = (() => {
     if(!r.ok) return `${d.nombre}: no le hizo efecto (${r.motivo})`;
     if(r.que === 'yaLoTiene') return `${d.nombre}: ya lo tenía`;
     const e = r.estado;
+    // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).
+    const dis = Combatiente.dispararAlAplicar(r, inv.estados, {hp: 'hpturno', resFuego: num(I().statValor(inv, 'resfuego'))});
+    const ya = dis.hp ? ` · ya ${dis.hp < 0 ? 'le sacó' : 'le curó'} ${fmt(Math.abs(dis.hp))} HP` : '';
+    if(dis.hp) inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, num(inv.hp) + dis.hp));
     if(I().modsAfectanHp(e.mods || [])) I().actualizarHpMaxPorCon(inv);
     if(r.que === 'acumulado') return `${e.nombre} ×${fmt(num(e.stacks))}`;
-    return `${e.nombre}${r.que === 'renovado' ? ' renovado' : ''}${e.permanente ? ' (no vence)' : e.turnos ? ` (${fmt(e.turnos)} turno${e.turnos === 1 ? '' : 's'})` : ''}${e.escudoMagico ? `, 🛡${fmt(e.escudoMagico)}` : ''}`;
+    return `${e.nombre}${r.que === 'renovado' ? ' renovado' : ''}${e.permanente ? ' (no vence)' : e.turnos ? ` (${fmt(e.turnos)} turno${e.turnos === 1 ? '' : 's'})` : ''}${e.escudoMagico ? `, 🛡${fmt(e.escudoMagico)}` : ''}${ya}`;
   }
   // La zona persistente (4f): tira una vez su stat (si la Ejecución dice qué tira) y le manda al mapa el mensaje de siempre
   // (comun/combatiente.js, zonaDeHab, a nombre de «fichaId~invId»). false = no se pudo (sin el mapa abierto).

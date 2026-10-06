@@ -88,7 +88,12 @@ const FichaHabilidades = (() => {
     if(n(nuevo.escudoMagico) > 0) nuevo.escudoMagicoActual = n(nuevo.escudoMagico);
     const r = Combatiente.agregarEstado(S.efectos, nuevo);
     if(!r.ok) return {ok: false, motivo: r.motivo, nombre};
-    return {ok: true, estado: r.estado};
+    // Lo que se dispara (regeneración, veneno…) pega apenas se lo pone (2026-10-06, P161).
+    let c = null;
+    try{ c = FichaCalculo.calcular(S); }catch(e){}   // (un personaje a medio armar)
+    const dis = Combatiente.dispararAlAplicar(r, S.efectos, {hp: 'hpturno', resFuego: c ? n(c.final.resfuego) : 0});
+    if(dis.hp){ const hm = c && !Number.isNaN(c.final.hpmax) ? n(c.final.hpmax) : 0; S.hp = Math.max(0, Math.min(hm > 0 ? hm : Infinity, n(S.hp) + dis.hp)); }
+    return {ok: true, estado: r.estado, disparo: dis};
   }
 
   return {parseCostoSp, spVariable, nitrosVariable, nitrosAtaque, habCostoVariable,

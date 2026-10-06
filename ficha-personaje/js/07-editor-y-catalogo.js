@@ -419,7 +419,7 @@ function activarEfectoPreset(preset){
   const {nombre, ...resto} = preset;
   const draft = Object.assign(FichaEditor.borrador(null), structuredClone(resto));
   draft.nombre = nombre;
-  agregarEstadoConAviso(S.efectos, draft, '');
+  agregarEstadoConAviso(S.efectos, draft, '', undefined, {resFuego: compute().final.resfuego, alDisparar: hp => fijarHp(num(S.hp) + hp)});   // lo que se dispara pega ya (P161)
   renderList('efectos');
   refresh();
 }

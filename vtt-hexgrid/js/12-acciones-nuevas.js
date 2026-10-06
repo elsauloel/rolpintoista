@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002c', '../comun/creep-botonera.js?v=20261006a', '../comun/creep-acciones.js?v=20261006t', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261005mn'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002c', '../comun/creep-botonera.js?v=20261006a', '../comun/creep-acciones.js?v=20261006c', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261005mn'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -94,7 +94,7 @@ async function mantenimientoCreeps(numero){
     for(const doc of snap.docs){
       for(let i = 0; i < veces; i++){
         let r = null, nombre = '';
-        try{ await modificarCreep(doc.id, crudo => { const sc = CreepCalculo.normalizar(crudo); r = CreepAcciones.mantenimiento(sc); nombre = sc.nombre; return r; }); }
+        try{ await modificarCreep(doc.id, crudo => { const sc = CreepCalculo.normalizar(crudo); r = CreepAcciones.mantenimiento(sc, numero); nombre = sc.nombre; return r; }); }
         catch(err){ r = null; console.error(`Mantenimiento: no se pudo pasar el turno del creep ${doc.id}`, err); }   // un creep a medio borrar, etc.
         if(!r) continue;
         enCooldown += r.enCooldown; hpAplicado += r.hpAplicado; vencidos += r.vencidos;
@@ -549,7 +549,7 @@ function cerrarAccionesNuevas(){
    El ✎ Editar del Ver de una habilidad se lo pedía a GM Tools escondido. Ahora es el editor común (comun/creep-editor.js: el mismo paso
    a paso, con la trampa y la Ejecución ✨), adentro del recuadro de las Acciones nuevas; guarda con modificarCreep (acCambiarCreep). Los
    estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
-const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261004r', '../comun/asistente-duelo-hab.js?v=20261005fp'];
+const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261006c', '../comun/asistente-duelo-hab.js?v=20261005fp'];
 // Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
 const ACE_BASE = ['../comun/creeps-base.js?v=20261005fm', '../comun/skills-creep-base.js?v=20260927a'];
 async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }

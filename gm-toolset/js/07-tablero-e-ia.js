@@ -490,7 +490,7 @@ function mantenimiento(){
   let vencidos = 0;
   // El pase de turno de cada creep: la regla vive en comun/creep-acciones.js (2026-10-02, A2b: la usa también el mapa).
   creepsReales().forEach(sc => {
-    const r = CreepAcciones.mantenimiento(sc);
+    const r = CreepAcciones.mantenimiento(sc, typeof gmMantenimientoSenal === 'number' ? gmMantenimientoSenal : undefined);   // en combate lo hace su turno (P161)
     enCooldown += r.enCooldown;
     hpAplicado += r.hpAplicado;
     vencidos += r.vencidos;

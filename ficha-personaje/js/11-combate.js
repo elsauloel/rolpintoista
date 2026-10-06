@@ -449,11 +449,12 @@ function confirmarCostoVariable(){
 // El pase de turno (2026-10-02, hoja de ruta A2): la regla vive en comun/ficha-mantenimiento.js (la usa también el mapa, que
 // hace el Mantenimiento de sus personajes sin cargar la ficha); acá queda lo que se ve.
 function mantenimiento(){
-  const {rep, avisos} = FichaMantenimiento.aplicar(S, {
+  const {rep, avisos, enTurno} = FichaMantenimiento.aplicar(S, {
     fijarHp: v => fijarHp(v),
     muerte: () => renderOverlayMuerte(),
     limpiarParry: () => { parryArmaPendiente = null; parryPendienteInv.clear(); },
-  });
+  }, typeof mantenimientoSenal === 'number' ? mantenimientoSenal : undefined);
+  if(enTurno) return;   // en combate lo hace su turno propio (P161)
   mesaPublicarReporte(`Turno ${S.turno}`, rep);
 
   renderTurno();

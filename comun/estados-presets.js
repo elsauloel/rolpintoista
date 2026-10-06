@@ -96,6 +96,9 @@ const ESTADOS_PRESET = [
   {nombre:'Sigilo', polaridad:'buff', turnos:0, permanente:true,
     detalle:'Oculto: sus rivales no lo ven en el mapa. Se rompe si entra en el cono de detección de un rival o si hace una acción hostil (un ataque o una skill individual sobre un rival). Cada paso dentro de la zona de alerta de un rival pide una tirada de detección (en principio su Destreza contra el Especial del que vigila).'},
   // Marcado (2026-10-05, Varita del rastreador y Varita de la luz): se resiste con Res.Esp (lo tira quien la usa: PdG.Esp contra Res.Esp).
+  // Mareo de invocación (2026-10-06, dueño): una invocación nueva entra al final del orden de turnos y su primer turno no hace nada.
+  {nombre:'Mareo de invocación', polaridad:'debuff', turnos:1, forzarNitros:0,
+    detalle:'Recién invocada: en su primer turno no puede hacer nada (sin No2). ⚙ Automatizado: se lo pone el mapa al sumarla al orden de turnos.'},
   // Inamovible (2026-10-06, dueño: «el buff tiene que existir; la armadura simplemente te lo aplica»): la chance de no moverse, en 100 %.
   {nombre:'Inamovible', polaridad:'buff', turnos:2, mods:[{stat:'inamovible', val:100}],
     detalle:'No lo pueden empujar ni atraer (ganchos, muros que empujan, portales). ⚙ Automatizado: el mapa no lo mueve.'},

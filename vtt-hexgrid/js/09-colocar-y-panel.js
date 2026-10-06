@@ -116,7 +116,9 @@ async function borrarToken(id){
 function escucharTokens(){
   escucharTokens.listo = false;
   cortarTokensListener = coleccionTokens().onSnapshot(snap => {
+    const nuevosInv = [];
     snap.docChanges().forEach(ch => {
+      if(ch.type === 'added' && escucharTokens.listo && soyGM) nuevosInv.push(ch.doc.id);   // una invocación nueva entra al orden de turnos (P161)
       if(ch.type === 'removed'){
         tokens.delete(ch.doc.id); visibles.delete(ch.doc.id);
         if(seleccion === ch.doc.id) seleccion = null;
@@ -152,6 +154,7 @@ function escucharTokens(){
       });
     });
     renderIniciativa();
+    nuevosInv.forEach(id => { if(typeof invocacionAlOrden === 'function') invocacionAlOrden(id); });
     actualizarCabecera();   // el personaje principal es el de su token en este mapa
     const primeraVez = !escucharTokens.listo;
     escucharTokens.listo = true;

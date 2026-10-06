@@ -795,8 +795,13 @@ const FichaAcciones = (() => {
     const r = Combatiente.agregarEstado(S.efectos, draft);
     if(!r.ok){ ui.toast(`🛡 ${quien}Inmune ahora mismo (${r.motivo}) — ${draft.nombre} no te afectó`); return; }
     if(r.que === 'yaLoTiene'){ ui.toast(`${quien}${draft.nombre}: ya lo tenías, no se acumula`); return; }
-    ui.cambio(['efectos', 'refresh']);
-    ui.toast(`🎯 ${quien}recibiste ${draft.nombre}${r.que === 'renovado' ? ' (se renovó el que tenías)' : r.que === 'acumulado' ? ` (×${r.estado.stacks})` : ''}`);
+    // Lo que se dispara (veneno, regeneración…) pega apenas te lo ponen (2026-10-06, P161).
+    let resF = 0;
+    try{ resF = num(FichaCalculo.calcular(S).final.resfuego); }catch(e){}   // (un personaje a medio armar)
+    const dis = Combatiente.dispararAlAplicar(r, S.efectos, {hp: 'hpturno', resFuego: resF});
+    if(dis.hp){ try{ fijarHp(S, num(S.hp) + dis.hp); revisarAnkh(S); revisarMuerte(S); }catch(e){ S.hp = Math.max(0, num(S.hp) + dis.hp); } }
+    ui.cambio(['efectos', 'refresh', ...(dis.hp ? ['vitals'] : [])]);
+    ui.toast(`🎯 ${quien}recibiste ${draft.nombre}${r.que === 'renovado' ? ' (se renovó el que tenías)' : r.que === 'acumulado' ? ` (×${r.estado.stacks})` : ''}${dis.hp ? ` · ya ${dis.hp < 0 ? 'te sacó' : 'te curó'} ${fmt(Math.abs(dis.hp))} HP` : ''}`);
   }
   // Aplica un efecto del cuadro de Ejecución directo sobre el propio personaje (`fichaId`), sin esperar al GM.
   function dueloAplicarEfectoPropio(S, fichaId, d, ef, ui){

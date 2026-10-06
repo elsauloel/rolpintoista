@@ -69,7 +69,11 @@ const EstadosAplicar = (() => {
     sc.estados = Array.isArray(sc.estados) ? sc.estados : [];
     // Inmunidades, acumulación y renovación: la regla común de comun/combatiente.js (agregarEstado).
     const r = Combatiente.agregarEstado(sc.estados, componer(spec), sc);
-    return r.ok ? {ok: true, estado: r.estado, que: r.que} : {ok: false, motivo: r.motivo};
+    if(!r.ok) return {ok: false, motivo: r.motivo};
+    // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).
+    const d = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: typeof CreepCalculo !== 'undefined' ? CreepCalculo.resElemental(sc, 'fuego') : 0});
+    if(d.hp){ const tope = parseFloat(sc.hpMax) > 0 ? parseFloat(sc.hpMax) : Infinity; sc.hp = Math.max(0, Math.min(tope, (parseFloat(sc.hp) || 0) + d.hp)); }
+    return {ok: true, estado: r.estado, que: r.que, disparo: d};
   }
 
   // Deja el aviso para que la ficha del dueño lo aplique (campanas/<id>/estados).

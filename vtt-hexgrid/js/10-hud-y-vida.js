@@ -1144,7 +1144,10 @@ async function abrirEstadoNuevo(t){
     if(!r.ok){ toast(`🛡 ${quien}: inmune ahora mismo (${r.motivo}) — ${nuevo.nombre} no se pudo aplicar`); return guardar; }
     if(r.que === 'yaLoTiene'){ toast(`${quien}: ${nuevo.nombre} ya lo tiene, no se acumula`); return guardar; }
     if(inv && InvCalculo.modsAfectanHp(r.estado.mods)) InvCalculo.actualizarHpMaxPorCon(inv);
-    toast(`${quien}: ${SelectorEstados.textoAgregado(r, 'hpturno')}`);
+    // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).
+    const dis = Combatiente.dispararAlAplicar(r, lista, {hp: 'hpturno', resFuego: num(inv ? InvCalculo.statValor(inv, 'resfuego') : FichaCalculo.calcular(S).final.resfuego)});
+    if(dis.hp){ if(inv) inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, num(inv.hp) + dis.hp)); else mantFijarHp(S, num(S.hp) + dis.hp); }
+    toast(`${quien}: ${SelectorEstados.textoAgregado(r, 'hpturno')}${dis.hp ? ` · ya ${dis.hp < 0 ? 'sacó' : 'curó'} ${fmt(Math.abs(dis.hp))} HP` : ''}`);
     return true;
   });
 }
@@ -1168,12 +1171,15 @@ async function abrirEstadoNuevoCreep(t){
       nombre = sc.nombre;
       r = Combatiente.agregarEstado(sc.estados, SelectorEstados.estadoCreep(elegido.preset, idEstadoNuevo(), CreepAcciones.FLAGS_ESTADO), {jefe: sc.jefe});
       if(r.ok && CreepCalculo.modsAfectanHp(r.estado.mods)) CreepCalculo.actualizarHpMaxPorCon(sc);
+      // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).
+      const dis = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: CreepCalculo.resElemental(sc, 'fuego')});
+      if(dis.hp){ sc.hp = Math.max(0, Math.min(num(sc.hpMax) || Infinity, num(sc.hp) + dis.hp)); r.disparo = dis; }
     });
   }catch(err){ console.error('No se pudo poner el estado al creep:', err); toast('No se pudo poner el estado — mirá la consola'); return; }
   if(!r) return;
   if(!r.ok){ toast(`${nombre}: inmune ahora mismo (${r.motivo}) — ${elegido.preset.nombre} no se pudo aplicar`); return; }
   if(r.que === 'yaLoTiene'){ toast(`${nombre}: ${elegido.preset.nombre} ya lo tiene, no se acumula`); return; }
-  toast(`${nombre}: ${SelectorEstados.textoAgregado(r, 'hpTurno')}`);
+  toast(`${nombre}: ${SelectorEstados.textoAgregado(r, 'hpTurno')}${r.disparo ? ` · ya ${r.disparo.hp < 0 ? 'sacó' : 'curó'} ${fmt(Math.abs(r.disparo.hp))} HP` : ''}`);
 }
 
 // ⚙ de un estado: abre su editor en la ficha o en gm-tools (se busca por

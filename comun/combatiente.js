@@ -99,36 +99,53 @@ const Combatiente = (() => {
      terminados, eventos}: `hp` es cuánto cambia la vida (lo aplica cada herramienta, con su tope y su muerte), `quedan` la
      lista sin los que se terminaron. `campos` = nombres del daño por turno y de los stacks por turno en esa herramienta
      ({hp:'hpturno', stacks:'stacksturno'} en la ficha; {hp:'hpTurno', stacks:'stacksTurno'} en los creeps). */
-  /* Los estados por TURNO PROPIO (2026-10-06, dueño, «opción intermedia»): con el orden de turnos del mapa, los estados de cada uno corren al
-     TERMINAR SU turno (▶ Siguiente); lo que se dispara (veneno, sangrado, regeneración) se dispara justo antes de que baje el contador. Un estado
-     que le ponen durante su propio turno empieza a contar en el próximo (`campos.saltar`: los que llevan `pasoTurno` de ese mismo turno).
-     Nitros y SP siguen en el ⟳ Mantenimiento de la ronda. Sin orden de turnos (narrativo), los estados siguen corriendo en el Mantenimiento:
-     `estadosEnMantenimiento(finTurnoEn, turno)` → false si tuvo un fin de turno en esta ronda o la anterior (su turno lo atiende). */
-  const estadosEnMantenimiento = (finTurnoEn, turno) => finTurnoEn === undefined || finTurnoEn === null || n(finTurnoEn) < n(turno) - 1;
-  // La marca del turno en curso que lleva cada estado nuevo (la pone el mapa: «mapa:paso»; sin orden de turnos, nada).
+  /* El TURNO PROPIO (2026-10-06, dueño, P161 — «turno completo»): con el orden de turnos del mapa, cada uno tiene su propio reloj.
+     · AL EMPEZAR su turno: recarga No2 y SP, bajan sus cooldowns y se DISPARA lo que se dispara (veneno, sangrado, regeneración, el escudo
+       que se recarga) — `dispararEstados`.
+     · AL TERMINAR su turno: baja el contador de sus estados (turnos y stacks) — `contarEstados`.
+     · Lo que se dispara pega también APENAS TE LO PONEN (`dispararAlAplicar`, dueño: «aunque te apliquen un antídoto, por lo menos una vez va
+       a haber tenido efecto»); cada estado se dispara una vez por vuelta (`disparado`, que se apaga al contar): uno de N turnos pega N veces.
+     · El contador baja al terminar el turno del afectado aunque se lo hayan puesto en ese mismo turno (dueño: «una regla clara, limpia y
+       homogénea»; las trampas se diseñan con eso en cuenta — P162).
+     El ⟳ Mantenimiento de la ronda sigue para fuera de combate y para quien no está en el orden de turnos (y el mapa lo pasa solo al cambiar de
+     ronda, por lo que es de la ronda): `estadosEnMantenimiento(turnoEn, numero)` → false si tuvo un turno propio durante el Mantenimiento
+     anterior (`turnoEn` = el número de Mantenimiento de ese turno): su turno ya lo atiende todo. Sin orden de turnos, `pasarTurnoEstados`
+     hace las dos cosas juntas, como siempre (si ya se disparó al aplicarse, solo cuenta). */
+  const estadosEnMantenimiento = (turnoEn, turno) => turnoEn === undefined || turnoEn === null || n(turnoEn) < n(turno) - 1;
+  // La marca del turno en curso que lleva cada estado nuevo (la pone el mapa: «mapa:paso»; sin orden de turnos, nada). Hoy solo informa.
   let marcaTurno = null;
   function fijarMarcaTurno(fn){ marcaTurno = typeof fn === 'function' ? fn : null; }
-  function pasarTurnoEstados(estados, campos){
+  function dispararEstados(estados, campos){
     const lista = estados || [], c = campos || {hp: 'hpTurno', stacks: 'stacksTurno'};
     const resFuego = Math.max(0, n(c.resFuego));   // la Quemadura (2026-10-04): la Res. fuego le resta a cada turno
-    const act = activos(lista);
+    const act = activos(c.todos || lista);   // las inmunidades miran todos sus estados (al aplicarse, se dispara uno solo)
     const invulnerable = act.some(e => e.invulnerable), sangrePura = act.some(e => e.sangrePura), coagulacion = act.some(e => e.coagulacionExtrema);
-    const eventos = [], fin = new Set();
+    const eventos = [];
     let hp = 0;
     lista.forEach(e => {
-      if(!e || e.activo === false) return;
-      if(c.saltar && c.saltar(e)) return;   // se lo pusieron durante este mismo turno: empieza a contar en el próximo
+      if(!e || e.activo === false || e.disparado) return;
+      e.disparado = true;
       if(n(e.escudoMagico) > 0 && !e.excedenteVida){
         const antes = n(e.escudoMagicoActual ?? e.escudoMagico);
         if(antes < n(e.escudoMagico)) eventos.push({tipo: 'escudo', nombre: e.nombre, de: antes, a: n(e.escudoMagico)});
         e.escudoMagicoActual = n(e.escudoMagico);
       }
-      const hayStacks = e.stacks !== undefined && e.stacks !== null && e.stacks !== '';
       const stacks = Math.max(1, n(e.stacks) || 1);
       let d = n(e[c.hp]) * stacks;
       if(d < 0 && e.esQuemadura && resFuego){ const antes = d; d = Math.min(0, d + resFuego); eventos.push({tipo: 'resfuego', nombre: e.nombre, de: -antes, a: -d, res: resFuego}); }
       if(d < 0 && (invulnerable || (e.esVeneno && sangrePura) || (e.esSangrado && coagulacion))){ eventos.push({tipo: 'inmune', nombre: e.nombre}); d = 0; }
       if(d){ hp += d; eventos.push({tipo: 'hp', nombre: e.nombre, hp: d, stacks}); }
+    });
+    return {hp, eventos};
+  }
+  function contarEstados(estados, campos){
+    const lista = estados || [], c = campos || {hp: 'hpTurno', stacks: 'stacksTurno'};
+    const eventos = [], fin = new Set();
+    lista.forEach(e => {
+      if(!e || e.activo === false) return;
+      e.disparado = false;   // en la vuelta que viene se vuelve a disparar
+      const hayStacks = e.stacks !== undefined && e.stacks !== null && e.stacks !== '';
+      const stacks = Math.max(1, n(e.stacks) || 1);
       const ds = n(e[c.stacks]);
       if(ds){
         e.stacks = Math.max(0, stacks + ds);
@@ -144,7 +161,17 @@ const Combatiente = (() => {
         }else if(!fin.has(e)){ fin.add(e); eventos.push({tipo: 'fin', nombre: e.nombre}); }
       }
     });
-    return {hp, quedan: lista.filter(e => !fin.has(e)), terminados: lista.filter(e => fin.has(e)), eventos};
+    return {quedan: lista.filter(e => !fin.has(e)), terminados: lista.filter(e => fin.has(e)), eventos};
+  }
+  // El pase de turno de siempre (⟳ Mantenimiento, sin orden de turnos): dispara (lo que no se disparó al aplicarse) y cuenta.
+  function pasarTurnoEstados(estados, campos){
+    const d = dispararEstados(estados, campos), k = contarEstados(estados, campos);
+    return {hp: d.hp, quedan: k.quedan, terminados: k.terminados, eventos: [...d.eventos, ...k.eventos]};
+  }
+  // Recién puesto (r = lo que devolvió agregarEstado): si es nuevo o se renovó, se dispara ya. → {hp, eventos}; la vida la aplica quien lo puso.
+  function dispararAlAplicar(r, estados, campos){
+    if(!r || !r.ok || !r.estado || (r.que !== 'nuevo' && r.que !== 'renovado')) return {hp: 0, eventos: []};
+    return dispararEstados([r.estado], {...(campos || {}), todos: estados});
   }
   // El reporte en texto llano (Mesa del personaje, 📜 Historial del GM), un renglón por cosa que pasó.
   const fmtN = x => Number.isInteger(x) ? String(x) : String(Math.round(x * 100) / 100);
@@ -800,7 +827,7 @@ const Combatiente = (() => {
     const st = AHORRO_ESPECIAL[tipo];
     return st && typeof valorDe === 'function' ? Math.max(0, Math.round(n(valorDe(st)))) : 0;
   }
-  return {pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+  return {pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

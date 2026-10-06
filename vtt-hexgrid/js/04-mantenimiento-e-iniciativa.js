@@ -430,7 +430,7 @@ function renderIniciativa(){
   if(!visibles.length){
     lista.innerHTML = `<div id="iniciativa-vacio">${soyGM ? 'Sin orden todavía: tocá "Traer tokens" y cargá las tiradas.' : 'El GM todavía no armó el orden.'}</div>`;
   }else{
-    lista.innerHTML = visibles.map(({o, i}) => {
+    const filaIni = ({o, i}, ya) => {
       const t = tokens.get(o.id);
       const nombre = t ? nombreDe(t) : '(token borrado)';
       const v = t ? vinculo(t) : null;
@@ -444,7 +444,7 @@ function renderIniciativa(){
       // siendo solo del GM.
       const puede = puedeEditarIniciativa(t);
       const fuera = iniciativaFueraDeJuego(o.id);
-      return `<div class="ini-fila${i === iniciativa.turno ? ' activo' : ''}${fuera ? ' fuera' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}${fuera ? ' — caído/derrotado: fuera del orden de turnos hasta que se recupere' : ''}">
+      return `<div class="ini-fila${i === iniciativa.turno ? ' activo' : ''}${fuera ? ' fuera' : ''}${ya ? ' ya' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}${fuera ? ' — caído/derrotado: fuera del orden de turnos hasta que se recupere' : ''}">
         <span class="ini-ficha" style="border-color:${esc(color)}">${mini ? `<img src="${esc(mini)}" alt="">` : esc(inicial(nombre))}</span>
         <span class="ini-nombre">${fuera ? '💀 ' : ''}${oculto ? '🙈 ' : ''}${t && enSigilo(t) ? '🥷 ' : ''}${esc(nombre)}</span>` +
         (puede
@@ -453,7 +453,13 @@ function renderIniciativa(){
         (soyGM ? `<button type="button" class="ini-quitar" data-ini-subir="${esc(o.id)}" title="Subir un lugar en el orden"${i === 0 ? ' disabled' : ''}>▲</button><button type="button" class="ini-quitar" data-ini-bajar="${esc(o.id)}" title="Bajar un lugar en el orden"${i === iniciativa.orden.length - 1 ? ' disabled' : ''}>▼</button>` : '') +
         (soyGM ? `<button type="button" class="ini-quitar" data-ini-ocultar="${esc(o.id)}" title="${o.oculto ? 'Mostrarlo a los jugadores en la lista' : 'Ocultarlo a los jugadores en la lista'}">${o.oculto ? '🙈' : '👁'}</button><button type="button" class="ini-quitar" data-ini-quitar="${esc(o.id)}" title="Sacar de la lista">✕</button>` : '') +
       '</div>';
-    }).join('');
+    };
+    // La lista gira con el turno (dueño, 2026-10-06: «una línea para saber cuándo se da la vuelta completa»): arriba el que actúa, después los
+    // que faltan en esta ronda, la línea «↻ Ronda N+1» y abajo, apagados, los que ya jugaron (vuelven a jugar en la ronda siguiente).
+    const faltan = visibles.filter(x => x.i >= iniciativa.turno), jugaron = visibles.filter(x => x.i < iniciativa.turno);
+    lista.innerHTML = faltan.map(x => filaIni(x, false)).join('') +
+      `<div class="ini-ronda" title="Acá termina la ronda: los de abajo ya jugaron y vuelven a jugar en la ronda siguiente">↻ Ronda ${fmt(iniciativa.ronda + 1)}</div>` +
+      jugaron.map(x => filaIni(x, true)).join('');
   }
   $('#iniciativa-pie').innerHTML = soyGM
     ? '<button type="button" class="btn" id="ini-traer" title="Poner en la lista todos los tokens del mapa">Traer tokens</button>' +

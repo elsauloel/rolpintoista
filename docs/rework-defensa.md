@@ -1083,3 +1083,6 @@ equiparla); **Armadura del escolta a mano** (se resuelve fácil en la mesa). 15 
 - Calculadora: `guardian` 2 · `escolta` 1,5 · Sigilo negativo devuelve 0,5 por punto · resistencia elemental negativa 0,25 por punto · el estado
   al equipar «Inamovible» no se cobra aparte (va con `inamovible 100`, la chance de siempre en 100 %).
 - Para Raro, caras: Placas templadas y Remaches reforzados.
+
+**Idea para los pies (dueño, 2026-10-06):** Inamovible (el estado nuevo: no te pueden empujar ni atraer) también es un buen efecto para unas
+botas — tenerlo en cuenta al rehacer los pies de Buena calidad (hoy los pies dan la chance de Inamovible en %).

@@ -242,6 +242,9 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] El pool de **habilidades de clase** (`skills-clase.js`): 62 skills, casi todas todavía "(Sin auditar)".
 
 ## 6. Repaso de buffs y debuffs (en curso, 2026-09-21)
+- [ ] **Revisar Pajaritos, Stun y los estados fuertes para darlos por 1 turno** (dueño, 2026-10-06): con los estados por turno propio (P161),
+  «1 turno» dura exactamente un turno del afectado; se pueden ofrecer por 1 turno con menos impacto y más seguido (más matices). Revisar también
+  el texto del Stun («contá un turno de más», que con el turno propio ya no hace falta en combate) y sus turnos por defecto.
 > **Regla de redondeo (2026-09-22):** salvo que se diga lo contrario, los **debuffs redondean hacia abajo** y los **buffs redondean hacia arriba**. Ya cumplen esto: Cansado, Exhausto, Pajaritos, Lisiado (todos `floor`). Tenerlo en cuenta al repasar los buffs que faltan y al sumar las habilidades de clase.
 - [x] **Veneno**: se acumula (suma stacks, turnos = stacks, sin tope); Veneno severo aparte y no se acumula.
 - [ ] **Mecánica "cura estados" en consumibles y habilidades — a propósito recién después de terminar todo el repaso** (decidido 2026-09-22): una vez repasados todos los debuffs y buffs, agruparlos por familia (venenos, controles físicos tipo Lisiado/Rengo, etc.) y ahí sí crear ítems curativos específicos por grupo — idea del usuario: el Antídoto cura **todos** los tipos de veneno (Veneno + Veneno severo), un vendaje cura Lisiado + Rengo. Hoy sacar cualquier estado sigue siendo a mano.

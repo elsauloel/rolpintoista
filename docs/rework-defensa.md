@@ -1212,3 +1212,12 @@ casillero del turno al doble, como Lento: `lentoRecargo`, js/04).
 | Calzas de piel de carpincho · 1 · 85 | Vida +10 · Res. hielo +2 · Res. ácido +1 |
 | Calzas de bordado rúnico · 0 · 85 | Res.Esp +2 · Res.Mt +2 |
 | Grebas del carnero · 2 · 85 | Embestida +2 · Defensa +1 · Res.CC +1 |
+
+**✅ Piernas Buena calidad: cargadas (2026-10-06).** El dueño aprobó la v2 con dos cambios de valor: **Sigilo 1,5 por punto** («el sigilo tiene mucho
+potencial de romper con críticos», por la espalda) y **Carga 1,5 por punto**. Con eso: Calzas de sombra Sigilo +2, Pantalón de estibador Carga +2,
+Bombacha de cuatrero Retirada limpia 50 % · Sigilo +1 · Res. hielo +1, Calzas de cuero de ciervo pesan 1. 19 piernas a 85 (reemplazan a las 12
+viejas). **Ajuste de las 14 piezas ya aprobadas con Sigilo** (una sola regla para todo el catálogo; aprobado por el dueño): Alpargatas del ladrón de
+gallinas (Retirada → Percepción +1, 50), Pantuflas de fieltro y Calzas de lana negra (sin Res. hielo), Botas de suela de goma, Polainas de ratero,
+Calzas de contrabandista y Calzas de ladrón (pesan 2), Ropas de sombra y Ropas de sombra finas (sin Percepción), Capucha de emboscada y Guantes de
+carterista (pesan 1), Pasamontañas de tejido basto (Percepción +1), Pantuflas del fantasma (sin Percepción, pesan 1), Capucha de la hermandad (sin
+Defensa). Los tres **Anillos de Alforja sin Fondo** quedan pasados con la Carga a 1,5: se ajustan al llegar a los anillos.

@@ -29,7 +29,7 @@ COSTO = {
     # Cinturón y mochila (dueño, 2026-10-04/05): la ranura de cinturón baja a 0,5; la exclusiva (solo pociones, pergaminos, trampas o el Ankh) es
     # el 75 % de una común; la de mochila, 0,25 (una mochila tiene muchas).
     'capcinturon': 0.5, 'capmochila': 0.25,
-    'crgmax': 1,   # Carga (dueño, 2026-10-06): 1 por punto — las armas también pesan (su peso son los dados) y pasado de peso saca la penalidad de la Evasión
+    'crgmax': 1.5,   # Carga (dueño, 2026-10-06): 1,5 por punto — las armas también pesan (su peso son los dados) y pasado de peso saca la penalidad de la Evasión
     'ranurapocion': 0.375, 'ranurapergamino': 0.375, 'ranuratrampa': 0.375, 'ranuraankh': 0.375,
     'boticario': 0.2,          # Mano de boticario: +1 a lo que cura una poción (dueño, 2026-10-06: +5 = 1 punto, como Vida +5; Común +3, Buena +5)
     'vainas': 1, 'correas': 1,  # cada arma (o escudo) a mano, que se equipa sin No2
@@ -48,7 +48,7 @@ COSTO = {
     # Resistencia elemental (a construir): situacional, pesa poco.
     'resfuego': 0.5, 'reshielo': 0.5, 'resrayo': 0.5, 'restoxico': 0.5, 'resacido': 0.5,
     'pasosgratis': 3,   # el primer casillero del turno gratis (dueño, 2026-10-04): el 75 % de +1 No2 (4) — no es un No2, pero sigue siendo relevante
-    'sigilo': 1,   # Sigilo +N (2026-10-04): mejora la tirada del que se esconde contra la Percepción de quien lo busca
+    'sigilo': 1.5,   # Sigilo +N: la tirada del que se esconde contra la Percepción de quien lo busca (1,5 desde 2026-10-06, dueño: «mucho potencial de romper con críticos», por la espalda)
     # Mecánicas de las piernas (dueño, 2026-10-04): Evasión +1 (2) ≈ contra oportunidad +2 ≈ contra contraataque +3 — la oportunidad pasa más seguido.
     'evaopor': 1, 'evacontra': 2 / 3,
     # Retirada limpia (en %, ver costo_retirada): 33 % = 1, 50 % = 1,5, siempre = 4 (desde Rara).

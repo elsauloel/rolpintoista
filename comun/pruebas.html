@@ -1603,6 +1603,15 @@ prueba('Stun (2026-10-06): no le toca los No2; si lo atacan, su Evasión es 1 si
   const r = Combatiente.tirarStat(12, es, 'eva'), r2 = Combatiente.tirarStat(12, viejo, 'eva'), parry = Combatiente.tirarStat(12, es, 'parry');
   igual([stun.forzarNitros, stun.stun, r.total, r.rolls.length, r2.total, parry.rolls.length > 0, Combatiente.stuneado([]), barrera.turnos], [undefined, true, 1, 0, 1, true, false, 2]);
 });
+prueba('piernas de Buena calidad (2026-10-06): 19 piezas; el resumen del personaje publica Embestida y Primer paso doble; las Grebas del carnero llevan Embestida +2', () => {
+  const bc = CATALOGO_BASE.filter(i => i.tipoItem === 'piernas' && i.tier === 'Buena Calidad' && !i.soloBotin);
+  const carnero = bc.find(i => i.nombre === 'Grebas del carnero'), placas = bc.find(i => i.nombre === 'Grebas de placas');
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, hp: 10,
+    inventario: [{...structuredClone(carnero), id: 'c1', equipado: true}]}).S);
+  const S2 = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, hp: 10,
+    inventario: [{...structuredClone(placas), id: 'p1', equipado: true}]}).S);
+  igual([bc.length, FichaResumen.resumen(S).embestida, FichaResumen.resumen(S2).pasodoble, bc.every(i => i.precioCompra === 85)], [19, 2, 1, true]);
+});
 prueba('Una cura no levanta a un caído (2026-10-06): curaQueEntra, una Regeneración recién puesta y la del turno no suben de 0; el daño sigue entrando', () => {
   const reg = {nombre: 'Regeneración', activo: true, polaridad: 'buff', turnos: 3, hpTurno: 2};
   const caido = [], vivo = [];

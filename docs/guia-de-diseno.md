@@ -189,3 +189,7 @@ Pedido del dueño (log «A desarrollar»): cuánto se puede acumular de Resisten
 | **T10** | **9** | cabeza 2 · blanda 0 · rígida 1 · manos 2 · piernas 1 · pies 1 · escudo 1 · anillos 1 |
 | **T12** | **8** | cabeza 2 · blanda 0 · rígida 1 · manos 2 · piernas 1 · pies 1 · escudo 0 · anillos 1 |
 **Lectura:** cada punto de Resistencia le saca un d20 al crítico del atacante (nivel N − R). Un personaje armado al máximo con las mejores piezas es prácticamente inmune a los críticos de Tipo 4 y 6 (un arma de Tipo 4 con nivel 5 se queda sin dados), pero con Tipo 10 y 12 aguanta poco. Es un techo teórico: las mejores piezas son Legendarias y pesan mucho (el Peso equipado limita). A decidir: ¿ponemos un tope general (por ejemplo +6 por Tipo) para que nadie sea inmune?
+
+- **Sigilo y Carga valen 1,5 por punto** (dueño, 2026-10-06). El Sigilo abre los ataques por la espalda (PdG y Crítico potente): mucho potencial de
+  romper con críticos. La Carga anula la contra del peso y deja llevar armas más pesadas (más dados) sin sobrepeso. Lo «ruidoso» (Sigilo negativo)
+  sigue devolviendo poco (0,5 por punto): al que lleva placas casi no le importa.

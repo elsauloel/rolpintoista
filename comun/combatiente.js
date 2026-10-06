@@ -130,7 +130,7 @@ const Combatiente = (() => {
     lista.forEach(e => {
       if(!e || e.activo === false || e.disparado) return;
       e.disparado = true;
-      if(n(e.escudoMagico) > 0 && !e.excedenteVida){
+      if(n(e.escudoMagico) > 0 && !e.excedenteVida && !e.sinRecarga){   // la Cáscara protectora (anillo) no se recarga
         const antes = n(e.escudoMagicoActual ?? e.escudoMagico);
         if(antes < n(e.escudoMagico)) eventos.push({tipo: 'escudo', nombre: e.nombre, de: antes, a: n(e.escudoMagico)});
         e.escudoMagicoActual = n(e.escudoMagico);
@@ -266,6 +266,9 @@ const Combatiente = (() => {
     const tokenId = d && d.defensor && d.defensor.tokenId;
     const movio = !!tokenId && typeof window !== 'undefined' && typeof window.mapaSeMovio === 'function' && window.mapaSeMovio(tokenId);
     if(movio){ const v = n(valorDe('pasosbaile')); if(v){ val += v; partes.push(`${fmtN(v)} Pasos de baile`); } }
+    // Paso fantasma (anillo, 2026-10-06): si en esta ronda se movió 3 casilleros o más (lo sabe el mapa: window.mapaCasillerosRonda).
+    const casilleros = !!tokenId && typeof window !== 'undefined' && typeof window.mapaCasillerosRonda === 'function' ? n(window.mapaCasillerosRonda(tokenId)) : 0;
+    if(casilleros >= 3){ const v = n(valorDe('pasofantasma')); if(v){ val += v; partes.push(`${fmtN(v)} Paso fantasma`); } }
     return {val, txt: partes.join(' · ')};
   }
   /* Las mecánicas «con chance» de las piezas (dueño, 2026-10-04): Retirada limpia, Inamovible, Recuperarse rápido, Reflejos de mangosta. El stat

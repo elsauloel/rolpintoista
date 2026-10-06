@@ -986,8 +986,12 @@ function trazoEn(x, y){
 /* Embestida (piernas, 2026-10-06): el último recorrido de cada token en este turno (de Mantenimiento a Mantenimiento), para ver si llegó al rival en
    línea recta (js/13, embestidaDe). Solo en esta pantalla: la que mueve al token es la que después lo hace atacar. */
 const embestidaRutas = new Map();   // tokenId → {clave: 'id@mantenimiento', celdas}
+// Paso fantasma (anillo, 2026-10-06): cuántos casilleros se movió cada token en esta ronda (de Mantenimiento a Mantenimiento).
+const casillerosRonda = new Map();
+window.mapaCasillerosRonda = id => { const r = casillerosRonda.get(id); return r && r.clave === `${id}@${Math.round(num(mantenimientoNumero))}` ? r.n : 0; };
 async function moverToken(id, col, fila, celdas, levita){
   if(celdas && celdas.length > 1) embestidaRutas.set(id, {clave: `${id}@${Math.round(num(mantenimientoNumero))}`, celdas: celdas.map(c => ({col: c.col, fila: c.fila}))});
+  if(celdas && celdas.length > 1){ const k = `${id}@${Math.round(num(mantenimientoNumero))}`; const r = casillerosRonda.get(id); casillerosRonda.set(id, {clave: k, n: (r && r.clave === k ? r.n : 0) + celdas.length - 1}); }
   const t = tokens.get(id);
   if(!t) return;
   giroLibre.clear();   // moverse es una acción: cierra los giros gratis de antes (el de este se abre al guardar)

@@ -77,6 +77,11 @@ COSTO = {
     'embestida': 1, 'pasodoble': -2,
     # Cinturón de Buena calidad (dueño, 2026-10-06): Bolsillo de emergencia (se toma sola una poción al bajar del 25 %, una vez por combate) 1,5.
     'emergencia': 1.5,
+    # Anillos Comunes (dueño, 2026-10-06): efectos chicos que se disparan en un momento. Cáscara 1/3 por punto (Escudo 3 = 1); Primera sangre 0,375 por
+    # punto (+2 = 0,75); Calma, Foco, Pulso quieto y Paso fantasma 1; Cambiante 0,5 (una resistencia elemental a elección); Armadura indestructible 0,75;
+    # los de atributo (una vez por combate, +N a una tirada) 0,25 por punto (+2 = 0,5).
+    'cascara': 1 / 3, 'primerasangre': 0.375, 'calma': 1, 'foco': 1, 'pulso': 1, 'pasofantasma': 1, 'cambiante': 0.5, 'absorbearmadura': 0.75,
+    'impulsofue': 0.25, 'impulsodes': 0.25, 'impulsoesp': 0.25, 'impulsocon': 0.25,
 }
 def costo_retirada(pct):
     return 4 if pct >= 100 else pct * 0.03

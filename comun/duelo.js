@@ -403,6 +403,9 @@ const Duelo = (() => {
     if(cfg.pdgCompartido) inicial.pdg = limpiarTiro(cfg.pdgCompartido);
     // Embestida (piernas, 2026-10-06): el mapa la calcula (`cfg.embestida`, PdG) y se suma al PdG al guardarlo, como por la espalda.
     if(_num(cfg.embestida) > 0 && !hab) inicial.ataque.embestida = Math.min(10, Math.round(_num(cfg.embestida)));
+    // Anillos (2026-10-06): Pulso quieto / Foco (`quieto`, al PdG o al PdG.Esp de quien ataca) y Primera sangre (`primeraSangre`, al daño si pega).
+    if(_num(cfg.quieto) > 0) inicial.ataque.quieto = Math.min(10, Math.round(_num(cfg.quieto)));
+    if(_num(cfg.primeraSangre) > 0 && !hab) inicial.ataque.primeraSangre = Math.min(10, Math.round(_num(cfg.primeraSangre)));
     if(cfg.espalda && !hab){
       inicial.ataque.porLaEspalda = true;
       const be = limpiarEspalda(cfg.ataque.espalda);
@@ -439,6 +442,8 @@ const Duelo = (() => {
     if(d.ataque && d.ataque.sinParry) t.push('no se puede parrear');
     if(d.ataque && d.ataque.porLaEspalda) t.push(`🗡 por la espalda${d.ataque.espalda ? ': ' + espaldaTxt(d.ataque.espalda) : ''}`);
     if(d.ataque && _num(d.ataque.embestida) > 0) t.push(`🐂 embestida: +${_fmt(d.ataque.embestida)} PdG`);
+    if(d.ataque && _num(d.ataque.quieto) > 0) t.push(`💍 ${d.hab ? 'foco' : 'pulso quieto'}: +${_fmt(d.ataque.quieto)} ${d.hab ? 'PdG.Esp' : 'PdG'}`);
+    if(d.ataque && _num(d.ataque.primeraSangre) > 0) t.push(`💍 primera sangre: +${_fmt(d.ataque.primeraSangre)} de daño si pega`);
     return t.join(' · ');
   };
   const escRe = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -702,6 +707,8 @@ const Duelo = (() => {
       if(be && be.pdg) m.pdg = {...tiro, total: tiro.total + be.pdg, mod: tiro.mod + be.pdg, formula: `${tiro.formula} +${be.pdg} espalda`.slice(0, 60)};
       const emb = campo === 'pdg' && m.ataque ? _num(m.ataque.embestida) : 0;   // la Embestida de las piernas
       if(emb > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + emb, mod: p0.mod + emb, formula: `${p0.formula} +${emb} embestida`.slice(0, 60)}; }
+      const qto = campo === 'pdg' && m.ataque ? _num(m.ataque.quieto) : 0;   // Pulso quieto / Foco (anillos)
+      if(qto > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + qto, mod: p0.mod + qto, formula: `${p0.formula} +${qto} quieto`.slice(0, 60)}; }
       if(campo === 'eva' && defensa) m.defensa = defensa;
       if(extra && (campo === 'pdg' || campo === 'eva')) m.critDatos = {...(m.critDatos || {}), ...extra};   // Crítico frecuente/potente del atacante; Resistencia a crítico del defensor
       anuncio = avanzar(m) || '';
@@ -923,6 +930,8 @@ const Duelo = (() => {
       m.dano = {crudo: Math.max(0, Math.round(_num(r.total))), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod), reclamado: '', aplicado: false};
       const be = m.ataque && m.ataque.espalda;   // por la espalda: el daño fijo del arma o la habilidad
       if(be && be.fijo) m.dano = {...m.dano, crudo: m.dano.crudo + be.fijo, mod: m.dano.mod + be.fijo, formula: `${m.dano.formula} +${be.fijo} espalda`.slice(0, 60)};
+      const ps = m.ataque ? _num(m.ataque.primeraSangre) : 0;   // Primera sangre (anillo): el daño de su primer ataque del combate
+      if(ps > 0) m.dano = {...m.dano, crudo: m.dano.crudo + ps, mod: m.dano.mod + ps, formula: `${m.dano.formula} +${ps} primera sangre`.slice(0, 60)};
       const critGolpe = !!(m.crit && m.crit.critico);
       let crudos = m.hab ? m.hab.efectos : efectos;
       if(!m.hab){

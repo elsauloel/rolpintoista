@@ -1376,3 +1376,13 @@ si el stat entero no entra, vale una vez por combate, en un momento puntual o en
 
 **Respuestas del dueño a las lluvias de anillos (2026-10-06, primera tanda):** **Moneda en el dedo** (una Moneda Re-Roll por combate): le gusta,
 **desde Buena calidad y caro**. **Anillo de canalización** (la primera habilidad del turno cuesta 1 SP menos): **Buena calidad**. Sigue leyendo.
+
+**✅ Anillos Comunes: cargados (2026-10-06).** Con las respuestas del dueño a las dos lluvias: 29 anillos Comunes (reemplazan a los 25 viejos; los dos
+de rango quedan como estaban), a precio doble. Salieron Sello, Alforja sin Fondo y Reflejo arcano; Piernas de Viento = Levitar 2; Paso fantasma por
+ronda; Cambiante +1; los de atributo como la Polilla; Armadura indestructible absorbe la primera Armadura rota del combate; Boticario +3. Para calidades
+más altas (anotado): **Buena** — Canalización (la primera habilidad del turno, 1 SP menos), Antídoto / Superlinfocitos / Vigor (Veneno, Sangrado,
+Cansado y Exhausto 1 turno menos), Anillos gemelos; **Raro** — Moneda en el dedo (una Moneda Re-Roll por combate, cara), Ojo del Verdugo (Crítico
+frecuente +1 en el primer ataque del combate), Vigilia (Iniciativa +2); más arriba — Inmutabilidad, Mente certera, Pólvora Mansa, los combinados.
+Mecánicas nuevas (iguales para personajes y creeps): `cascara`, `primerasangre`, `calma`, `foco`, `pulso`, `pasofantasma`, `cambiante`,
+`absorbearmadura`, `impulsofue/des/esp/con` — el duelo (js/13 `quietoDe`/`primeraSangreDe`, `comun/duelo.js`), el motor (`evaExtraDuelo`,
+`finTurno`, el escudo `sinRecarga`) y el vigía del combate del mapa (`vtt-hexgrid/js/25-anillos.js`).

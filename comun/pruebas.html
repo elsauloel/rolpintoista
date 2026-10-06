@@ -1603,6 +1603,28 @@ prueba('Stun (2026-10-06): no le toca los No2; si lo atacan, su Evasión es 1 si
   const r = Combatiente.tirarStat(12, es, 'eva'), r2 = Combatiente.tirarStat(12, viejo, 'eva'), parry = Combatiente.tirarStat(12, es, 'parry');
   igual([stun.forzarNitros, stun.stun, r.total, r.rolls.length, r2.total, parry.rolls.length > 0, Combatiente.stuneado([]), barrera.turnos], [undefined, true, 1, 0, 1, true, false, 2]);
 });
+prueba('anillos Comunes (2026-10-06): 29 nuevos + 2 de rango; Paso fantasma suma Evasión con 3 casilleros en la ronda; la Cáscara no se recarga; la Calma devuelve No2 si no atacó', () => {
+  const com = CATALOGO_BASE.filter(i => i.tipoItem === 'anillos' && i.tier === 'Común');
+  const antes = window.mapaCasillerosRonda;
+  window.mapaCasillerosRonda = id => id === 'lejos' ? 3 : 1;
+  const val = st => ({pasofantasma: 1})[st] || 0;
+  const d = tokenId => ({defensor: {tokenId}, ataque: {tipo: 'normal'}});
+  const pf = [Combatiente.evaExtraDuelo(d('lejos'), val).val, Combatiente.evaExtraDuelo(d('cerca'), val).val];
+  window.mapaCasillerosRonda = antes;
+  const est = [{nombre: 'Cáscara protectora', activo: true, escudoMagico: 3, escudoMagicoActual: 1, sinRecarga: true}];
+  Combatiente.dispararEstados(est, {hp: 'hpturno', stacks: 'stacksturno'});
+  const calma = CATALOGO_BASE.find(i => i.nombre === 'Anillo de la calma');
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, hp: 10,
+    inventario: [{...structuredClone(calma), id: 'a1', equipado: true}]}).S);
+  S.nitros = 2; S.ataquesTurno = 0;
+  FichaMantenimiento.finTurno(S, {fijarHp: v => FichaAcciones.fijarHp(S, v)}, 'm:5', '', [], 1);
+  const conCalma = S.nitros;
+  const S2 = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, hp: 10,
+    inventario: [{...structuredClone(calma), id: 'a1', equipado: true}]}).S);
+  S2.nitros = 2; S2.ataquesTurno = 1;
+  FichaMantenimiento.finTurno(S2, {fijarHp: v => FichaAcciones.fijarHp(S2, v)}, 'm:5', '', [], 1);
+  igual([com.length, pf, est[0].escudoMagicoActual, conCalma, S2.nitros], [31, [1, 0], 1, 3, 2]);
+});
 prueba('mochilas de Buena calidad (2026-10-06): 10 piezas, todas a 70 y con un efecto propio (ranuras o una mecánica de mochila)', () => {
   const bc = CATALOGO_BASE.filter(i => i.tipoItem === 'mochila' && i.tier === 'Buena Calidad' && !i.soloBotin);
   const propio = ['capmochila', 'bolsilloext', 'correas', 'morral', 'alforja'];

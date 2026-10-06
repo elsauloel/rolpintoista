@@ -99,7 +99,10 @@ const FichaResumen = (() => {
       venenista: n(c.final.venenista),
       guardian: n(c.final.guardian),
       levitar: n(c.final.levitar), suelagruesa: n(c.final.suelagruesa), embestida: n(c.final.embestida), pasodoble: n(c.final.pasodoble),   // piernas (2026-10-06)
-      emergencia: n(c.final.emergencia), emergenciaUsada: !!S.emergenciaUsada,   // Bolsillo de emergencia (cinturón, 2026-10-06): el mapa lo mira   // pies (2026-10-06): el mapa los mira al moverse y al aplicar daño del piso   // Coraza del guardián (2026-10-06): el mapa se la suma a la Defensa de los aliados al lado
+      emergencia: n(c.final.emergencia), emergenciaUsada: !!S.emergenciaUsada,
+      ...Object.fromEntries(['cascara', 'primerasangre', 'foco', 'pulso', 'pasofantasma', 'cambiante', 'absorbearmadura', 'impulsofue', 'impulsodes', 'impulsoesp', 'impulsocon']
+        .map(k => [k, n(c.final[k])]).filter(([, v]) => v)),   // anillos Comunes (2026-10-06): el mapa los mira (js/13, js/25)
+      anillosDados: !!S.anillosDados, absorbeUsada: !!S.absorbeUsada,   // Bolsillo de emergencia (cinturón, 2026-10-06): el mapa lo mira   // pies (2026-10-06): el mapa los mira al moverse y al aplicar daño del piso   // Coraza del guardián (2026-10-06): el mapa se la suma a la Defensa de los aliados al lado
       defprimer: n(c.final.defprimer), defdist: n(c.final.defdist),   // torso blando (2026-10-06): el mapa los suma a la Defensa al aplicar el daño   // Guantes del envenenador (2026-10-05): el mapa le suma esos stacks a los venenos que pone en el duelo
       pasosGratis: n(c.final.pasosgratis),
       retirada: n(c.final.retirada),   // Retirada limpia (%): el mapa la tira al alejarse de un rival (js/17)
@@ -133,7 +136,7 @@ const FichaResumen = (() => {
           turnos: num(e.turnos),
           permanente: !!e.permanente, ...(e.invulnerable ? {invulnerable: true} : {}),
           ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
-          ...(e.derivado ? {derivado: true} : {}), ...(e.confusion ? {confusion: true} : {}),   // la Confusión: el mapa la tira (js/20)
+          ...(e.derivado ? {derivado: true} : {}), ...(e.confusion ? {confusion: true} : {}), ...(e.anillo ? {anillo: true} : {}), ...(e.impulso ? {impulso: e.impulso, impulsoVal: num(e.impulsoVal)} : {}),   // la Confusión: el mapa la tira (js/20)
           ...(e.lento ? {lento: true} : {}),   // Lento: el primer casillero del turno cuesta el doble (el mapa, js/04)
           polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
           // Para el globito del mapa al pasar el mouse por el estado.

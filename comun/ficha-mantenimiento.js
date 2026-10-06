@@ -181,6 +181,12 @@ const FichaMantenimiento = (() => {
     const rep = Combatiente.reporteTurno(k.eventos);
     if(k.terminados.length){ const finS = new Set(k.terminados); S.efectos = S.efectos.filter(e => !finS.has(e)); }
     (S.invocaciones || []).forEach(inv => { if(inv && inv.activa !== false && !sin.has(inv.id)){ inv.finTurnoEn = turno; invFin(inv).forEach(l => rep.push(`${inv.nombre}: ${l}`)); } });
+    // Calma (anillo, 2026-10-06): si no atacó en su turno, al terminarlo recupera No2 (sin pasar del máximo).
+    const calma = num(c.final.calma);
+    if(calma > 0 && !num(S.ataquesTurno)){
+      const max = FichaBotonera.nitrosMaximo(S), antes = num(S.nitros);
+      if(antes < max){ S.nitros = Math.min(max, antes + calma); rep.push(`Calma: no atacó, +${fmt(S.nitros - antes)} No2`); }
+    }
     return {rep, nombre: ((S.meta && S.meta.nombre) || '').trim()};
   }
 

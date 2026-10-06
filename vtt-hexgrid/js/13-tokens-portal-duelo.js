@@ -478,9 +478,12 @@ function dueloElegirObjetivoMapa(msg){
       let espalda = false, embestida = 0;
       try{ espalda = porLaEspalda(mio, t); }catch(err){ console.error('No se pudo ver si es por la espalda:', err); }   // nunca traba el ataque
       try{ if(!(ataque && ataque.hab)) embestida = embestidaDe(mio, t); }catch(err){ console.error('No se pudo ver la embestida:', err); }
+      let quieto = 0, primeraSangre = 0;
+      try{ quieto = quietoDe(mio, ataque); primeraSangre = primeraSangreDe(mio, ataque); }catch(err){ console.error('No se pudieron ver los anillos del ataque:', err); }
       if(ataque && ataque.hab && ataque.hab.reparte){ dueloMisiles(yo, ataque, t, mio); return; }   // Varita de misiles: de a uno
       if(embestida) embestidaUsadas.add(`${mio.id}@${Math.round(num(mantenimientoNumero))}`);
-      Duelo.crear({yo, ataque, espalda, embestida}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
+      if(primeraSangre) primeraSangreUsadas.add(mio.id);
+      Duelo.crear({yo, ataque, espalda, embestida, quieto, primeraSangre}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
     }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : ''}</span>`, true, cancelado);
     dueloAvisoObjetivo(yo.nombre, msg.conSuelto, alSuelto, ataque && ataque.hab ? ataque.hab.nombre : '');
@@ -710,6 +713,20 @@ function conoDeArea(c){ return new Set(zonasSigilo({col: c.col, fila: c.fila, ro
    (o más) fueron en línea recta, en la misma dirección, y el rival está en la casilla siguiente de esa línea (le llegó de frente). Una vez por
    turno. → el PdG extra (0 si no corresponde). */
 const embestidaUsadas = new Set();
+/* Anillos Comunes (2026-10-06): **Pulso quieto** (PdG) y **Foco** (PdG.Esp, en una habilidad que tira PdG.Esp): si quien ataca no se movió en este
+   turno. **Primera sangre**: daño extra en su primer ataque del combate (se gasta al atacar; se libera al volver a narrativo, js/25). */
+function quietoDe(atq, ataque){
+  if(!atq || !atq.id || seMovioEsteTurno(atq.id)) return 0;
+  const hab = ataque && ataque.hab;
+  if(!hab) return Math.max(0, Math.round(statPiesDe(atq, 'pulso')));
+  const tira = hab.tira && (hab.tira.stat || hab.tira);
+  return tira === 'pdgmg' ? Math.max(0, Math.round(statPiesDe(atq, 'foco'))) : 0;
+}
+const primeraSangreUsadas = new Set();
+function primeraSangreDe(atq, ataque){
+  if(!atq || !atq.id || (ataque && ataque.hab) || primeraSangreUsadas.has(atq.id) || modoMapa !== 'combate') return 0;
+  return Math.max(0, Math.round(statPiesDe(atq, 'primerasangre')));
+}
 function embestidaDe(atq, def){
   if(!atq || !def || !atq.id) return 0;
   const n = Math.max(0, Math.round(statPiesDe(atq, 'embestida')));

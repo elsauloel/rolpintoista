@@ -466,7 +466,10 @@ const CreepAcciones = (() => {
     const k = Combatiente.contarEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno'});
     sc.estados = k.quedan;
     if(k.terminados.some(es => C().modsAfectanHp(es.mods))) C().actualizarHpMaxPorCon(sc);
-    return {rep: Combatiente.reporteTurno(k.eventos), vencidos: k.terminados.length};
+    const rep = Combatiente.reporteTurno(k.eventos);
+    const calma = num(C().modTotal(sc, 'calma'));   // Calma (anillo, 2026-10-06): si no atacó en su turno, recupera No2
+    if(calma > 0 && !num(sc.ataquesTurno)){ const max = C().nitrosMax(sc), antes = num(sc.nitros); if(antes < max){ sc.nitros = Math.min(max, antes + calma); rep.push(`Calma: no atacó, +${sc.nitros - antes} No2`); } }
+    return {rep, vencidos: k.terminados.length};
   }
   // ⟳ Mantenimiento de la ronda (fuera de combate, o si no está en el orden de turnos). Con turno propio reciente no hace nada (lo hace su turno).
   function mantenimiento(sc, numero){   // `numero` = el de ese Mantenimiento (sin él, se aplica siempre, como antes)

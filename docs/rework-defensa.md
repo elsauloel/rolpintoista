@@ -1221,3 +1221,28 @@ gallinas (Retirada → Percepción +1, 50), Pantuflas de fieltro y Calzas de lan
 Calzas de contrabandista y Calzas de ladrón (pesan 2), Ropas de sombra y Ropas de sombra finas (sin Percepción), Capucha de emboscada y Guantes de
 carterista (pesan 1), Pasamontañas de tejido basto (Percepción +1), Pantuflas del fantasma (sin Percepción, pesan 1), Capucha de la hermandad (sin
 Defensa). Los tres **Anillos de Alforja sin Fondo** quedan pasados con la Carga a 1,5: se ajustan al llegar a los anillos.
+
+## Cinturón, Buena calidad — propuesta v1 (2026-10-06, ⬜ a revisar por el dueño)
+Lo que hay: 4 cinturones de Buena calidad (Utilidad y Aprendiz de boticario: Ranuras +3; Batalla: Defensa +1 · Ranuras +1, por debajo de su bolsa;
+Guardia de puerta: Defensa +2 · Ranuras +2, pasado). Bolsa 1,5 (hasta 1,65); cada punto de peso devuelve 0,5. Con lo decidido el 2026-10-04: las
+ranuras son la razón de ser del cinturón; Saque rápido, Mano de boticario, Portapergaminos, Vaina, Pasamanos, ranuras exclusivas; Defensa poca
+(+1 por calidad: hasta +2 en Buena). ⚙ = ya existe · 🔧 = mecánica nueva.
+
+| Cinturón · pesa · precio | Qué hace |
+|---|---|
+| Cinturón de utilidad · 0 · 50 | Ranuras de cinturón +3 |
+| Cinturón de batalla · 1 · 50 | Defensa +1 · Ranuras +2 |
+| Cinturón de guardia de puerta · 1 · 50 | Defensa +2 |
+| Faja de luchador · 1 · 50 | Defensa +1 · Res.CC +1 |
+| Cinturón de aprendiz de boticario · 0 · 50 | Mano de boticario +5 (cada poción cura 5 más) · Ranuras +1 |
+| Portafrascos de sanador · 0 · 50 | 4 ranuras solo para pociones |
+| Cinto de prestidigitador · 0 · 50 | Saque rápido 50 % (el primer consumible del turno sacado del cinturón no cuesta No2) · Ranuras +1 |
+| Faja de mandadero ligero · 0 · 50 | Pasamanos (pasarle a un aliado al lado algo del cinturón no cuesta No2) · Saque rápido 33 % |
+| Tahalí de esgrimista · 0 · 50 | Vaina +1 (un arma envainada se equipa o se guarda sin No2) · Ranuras +1 |
+| Cartuchera de trampero experto · 0 · 50 | 4 ranuras solo para trampas |
+| Cinto portapergaminos de escriba · 0 · 50 | Portapergaminos 4 (una ranura aparte donde entran 4 pergaminos) |
+| Cinto de peregrino · 0 · 45 | 1 ranura solo para el Ankh · Ranuras +2 |
+| Faja de cargador · 0 · 50 | Carga +1 (el cinturón reparte el peso) |
+| Faja de tela ignífuga · 0 · 50 | Res. fuego +2 · Ranuras +1 |
+| 🔧 Bolsillo de emergencia · 0 · 50 | Al bajar del 25 % de la vida, se toma sola una poción de curación del cinturón, una vez por combate (como el Ankh) |
+| 🔧 Bolsa del carroñero · 0 · 50 | +2 despojos cuando despojás un creep · Ranuras +1 |

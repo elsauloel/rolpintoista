@@ -65,8 +65,9 @@ const FichaMantenimiento = (() => {
     inv.ataquesTurno = 0;
     inv.golpeTurno = 0;   // la Defensa contra el primer golpe vuelve a valer
     inv.habilidades.forEach(h => { if(num(h.cdActual) > 0) h.cdActual = Math.max(0, num(h.cdActual) - 1); });
+    const v = Combatiente.vencerAlEmpezar(inv.estados); inv.estados = v.quedan;   // Titilando se va al empezar su turno
     const d = Combatiente.dispararEstados(inv.estados, camposInv(inv));
-    const rep = Combatiente.reporteTurno(d.eventos);
+    const rep = Combatiente.reporteTurno([...v.eventos, ...d.eventos]);
     if(d.hp){ const antes = num(inv.hp); inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, antes + d.hp)); rep.push(`HP total: ${fmt(antes)} → ${fmt(inv.hp)}`); }
     if(num(inv.cooldown) > 0){
       inv.cooldownActual = Math.max(0, num(inv.cooldownActual) - 1);
@@ -148,8 +149,9 @@ const FichaMantenimiento = (() => {
       if(m){ S.spGastado = num(S.spGastado) - m; rep.push(`SP: +${fmt(m)} (Meditar: no se movió)`); }
     }
     if(Number.isFinite(paso)) S.inicioPaso = paso;
+    const v = Combatiente.vencerAlEmpezar(S.efectos); S.efectos = v.quedan;   // Titilando se va al empezar su turno
     const d = Combatiente.dispararEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(c.final.resfuego)});
-    rep.push(...Combatiente.reporteTurno(d.eventos));
+    rep.push(...Combatiente.reporteTurno([...v.eventos, ...d.eventos]));
     aplicarVida(S, ui, d.hp + regenPasivas(S, log, rep), hpAntes, rep);
     contarMuerte(S, ui, log, rep);
     if(ui.limpiarParry) ui.limpiarParry();

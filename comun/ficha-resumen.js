@@ -130,7 +130,7 @@ const FichaResumen = (() => {
         .map(e => ({
           nombre: String(e.nombre).slice(0, 60),
           turnos: num(e.turnos),
-          permanente: !!e.permanente,
+          permanente: !!e.permanente, ...(e.invulnerable ? {invulnerable: true} : {}),
           ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
           ...(e.derivado ? {derivado: true} : {}), ...(e.confusion ? {confusion: true} : {}),   // la Confusión: el mapa la tira (js/20)
           ...(e.lento ? {lento: true} : {}),   // Lento: el primer casillero del turno cuesta el doble (el mapa, js/04)
@@ -167,7 +167,7 @@ const FichaResumen = (() => {
             .map(e => ({
               nombre: String(e.nombre).slice(0, 60),
               turnos: num(e.turnos),
-              permanente: !!e.permanente,
+              permanente: !!e.permanente, ...(e.invulnerable ? {invulnerable: true} : {}),
               ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
               polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '', ...(e.confusion ? {confusion: true} : {}), ...(e.lento ? {lento: true} : {}),
               detalle: String(e.detalle || '').slice(0, 300),

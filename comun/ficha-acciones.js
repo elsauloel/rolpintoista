@@ -105,7 +105,14 @@ const FichaAcciones = (() => {
     const cc = FichaCalculo.calcular(S);
     const hpmaxAnkh = Number.isNaN(cc.final.hpmax) ? 0 : cc.final.hpmax;
     S.hp = Math.max(1, Math.floor(hpmaxAnkh * 0.25));
+    ponerTitilando(S);
     return it.nombre;
+  }
+  // Titilando (2026-10-06): quien vuelve de estar caído titila, invulnerable, hasta que empieza su próximo turno.
+  function ponerTitilando(S){
+    if(typeof estadosPresetFicha !== 'function') return;
+    const e = Combatiente.estadoTitilando(estadosPresetFicha());
+    if(e){ S.efectos = S.efectos || []; Combatiente.agregarEstado(S.efectos, e); }
   }
   // Toda baja de HP pasa por acá: nunca baja de 0 ni pasa del máximo. Devuelve el HP que quedó.
   function fijarHp(S, valor){
@@ -144,6 +151,7 @@ const FichaAcciones = (() => {
     if(num(S.hp) > 0){
       if(S.muerto.activo){
         S.muerto = {activo:false, turnos:5, definitivo:false};
+        ponerTitilando(S);
         return {vivo: true, revivio: true};
       }
       return {vivo: true, revivio: false};

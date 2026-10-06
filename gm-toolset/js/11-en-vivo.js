@@ -96,7 +96,7 @@ function creepPublico(sc, orden){
         .map(es => ({
           nombre: String(es.nombre).slice(0, 60),
           turnos: num(es.turnos),
-          permanente: !!es.permanente,
+          permanente: !!es.permanente, ...(es.invulnerable ? {invulnerable: true} : {}),
           ...((es.escudoMagicoActual !== undefined || num(es.escudoMagico) > 0) ? {escudo: num(es.escudoMagicoActual ?? es.escudoMagico), ...(es.excedenteVida ? {excedente: true, ...(es.excedenteTope ? {tope: num(es.excedenteTope)} : {})} : {escudoMax: num(es.escudoMagico)})} : {}), ...(es.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(es.stacks) || 1)} : {}),
           polaridad: es.polaridad === 'buff' || es.polaridad === 'debuff' ? es.polaridad : '',
           // Para el globito del mapa al pasar el mouse por el estado.

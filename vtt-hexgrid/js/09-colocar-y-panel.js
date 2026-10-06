@@ -607,7 +607,7 @@ async function modificarCreep(creepId, cambiar){
       'resumen.estados': (Array.isArray(sc.estados) ? sc.estados : [])
         .filter(e => e && e.activo !== false && e.nombre).slice(0, 30)
         .map(e => ({
-          nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
+          nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...(e.invulnerable ? {invulnerable: true} : {}), ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
           polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
         })),
       firma: hashGm(json) + '-' + parteImagen,

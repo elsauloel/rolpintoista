@@ -75,7 +75,11 @@ const ESTADOS_PRESET = [
   {nombre:'Sentado', polaridad:'debuff', permanente:true, turnos:0, sentado:true, esCC:true,
     detalle:'Está en el piso: su Evasión se parte a la mitad (al resultado de la tirada, redondeado hacia abajo), no puede atacar y no puede hacer dodge roll (✋ a mano). No vence solo: levantarse cuesta 1 No2 (botón Levantarse de la Botonera o de las Acciones del creep).'},
   {nombre:'Invulnerable', polaridad:'buff', turnos:3, invulnerable:true,
-    detalle:'No recibe daño de ninguna fuente (golpes, veneno, sangrado, etc.) y no se le puede aplicar ningún debuff.'},
+    detalle:'No recibe daño de ninguna fuente (golpes, veneno, sangrado, etc.) y no se le puede aplicar ningún debuff. En el mapa, su token titila.'},
+  // Titilando (dueño, 2026-10-06: «como en el Contra, cuando te morís y resucitás»): quien vuelve de estar caído titila y es invulnerable hasta que
+  // empieza su próximo turno (`alEmpezarTurno`: se va al empezar su turno; sin orden de turnos, en el próximo Mantenimiento, con su turno 1).
+  {nombre:'Titilando', polaridad:'buff', turnos:1, invulnerable:true, titilando:true, alEmpezarTurno:true,
+    detalle:'Recién revivido: titila y es invulnerable (no recibe daño ni debuffs) hasta que empieza su próximo turno. ⚙ Automatizado: lo pone el mapa al volver de estar caído (Ankh, ✚ Revivir, una cura, un hechizo) y se va solo al empezar su turno (sin orden de turnos, en el próximo Mantenimiento).'},
   {nombre:'Inmunidad a CC', polaridad:'buff', turnos:2, inmunidadCC:true,
     detalle:'Inmune a los controles: Stun, Exhausto, Inmovilizado, Rengo, Lisiado y Pajaritos (no se le pueden aplicar mientras dure). Veneno y Sangrado no cuentan como control.'},
   {nombre:'Espinas', polaridad:'buff', turnos:3, espinas:true,

@@ -1603,6 +1603,27 @@ prueba('Stun (2026-10-06): no le toca los No2; si lo atacan, su Evasión es 1 si
   const r = Combatiente.tirarStat(12, es, 'eva'), r2 = Combatiente.tirarStat(12, viejo, 'eva'), parry = Combatiente.tirarStat(12, es, 'parry');
   igual([stun.forzarNitros, stun.stun, r.total, r.rolls.length, r2.total, parry.rolls.length > 0, Combatiente.stuneado([]), barrera.turnos], [undefined, true, 1, 0, 1, true, false, 2]);
 });
+prueba('Titilando (2026-10-06): revivir lo pone (✚ Revivir y Ankh), es invulnerable, titila y se va al empezar su próximo turno (personaje y creep)', () => {
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, hp: 0}).S);
+  S.muerto = {activo: true, turnos: 5, definitivo: false};
+  const rv = FichaAcciones.revivir(S, 3);
+  const tiene = () => (S.efectos || []).some(e => e.nombre === 'Titilando');
+  const tras = tiene(), titila = Combatiente.titila(S.efectos);
+  const golpe = Combatiente.dispararEstados([{nombre: 'Veneno', activo: true, hpturno: -2}], {hp: 'hpturno', stacks: 'stacksturno', todos: S.efectos}).hp;
+  const ui = {fijarHp: v => FichaAcciones.fijarHp(S, v)};
+  FichaMantenimiento.inicioTurno(S, ui, 'm:3', '', [], 1);
+  const despues = tiene();
+  const S2 = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, hp: 0,
+    cinturon: [{id: 'a', nombre: 'Ankh de Reencarnación', consumible: true, unidades: 1}]}).S);
+  FichaAcciones.revisarAnkh(S2);
+  const sc = creepPrueba({estados: []});
+  Combatiente.agregarEstado(sc.estados, Combatiente.estadoTitilando(estadosPresetCreep()));
+  const creepAntes = Combatiente.titila(sc.estados);
+  CreepAcciones.inicioTurno(sc, 'm:4', 1);
+  igual([rv.revivio, tras, titila, golpe, despues, (S2.efectos || []).some(e => e.nombre === 'Titilando'), creepAntes, Combatiente.titila(sc.estados),
+    Combatiente.titila([{nombre: 'Invulnerable', activo: true, invulnerable: true}]), Combatiente.titila([{nombre: 'Veneno', activo: true}])],
+    [true, true, true, 0, false, true, true, false, true, false]);
+});
 prueba('pies de Buena calidad: levantarse gratis (Botas de jinete) y Meditar (+1 SP si no se movió desde el turno anterior)', () => {
   const sc = creepPrueba({nitros: 0, estados: [{nombre: 'Sentado', activo: true, sentado: true}], equipo: [{nombre: 'Botas de jinete', tipoItem: 'pies', mods: [{stat: 'levantarse', val: 1}]}]});
   const lev = CreepAcciones.levantarse(sc);

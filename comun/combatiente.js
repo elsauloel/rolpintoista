@@ -168,6 +168,20 @@ const Combatiente = (() => {
     });
     return {quedan: lista.filter(e => !fin.has(e)), terminados: lista.filter(e => fin.has(e)), eventos};
   }
+  // Lo que se va AL EMPEZAR el turno del afectado (`alEmpezarTurno`, ej. Titilando, 2026-10-06): lo sacan las funciones de inicio de turno antes
+  // de disparar. → {quedan, eventos}. (Sin orden de turnos, el ⟳ lo cuenta como cualquier otro: dura hasta el próximo Mantenimiento.)
+  function vencerAlEmpezar(estados){
+    const lista = estados || [], fin = lista.filter(e => e && e.activo !== false && e.alEmpezarTurno);
+    return {quedan: lista.filter(e => !fin.includes(e)), eventos: fin.map(e => ({tipo: 'fin', nombre: e.nombre}))};
+  }
+  // Titilando (2026-10-06): un estado listo para agregar a quien vuelve de estar caído. `presets` = la lista en la forma de esa herramienta
+  // (estadosPresetFicha / estadosPresetCreep). Se agrega con agregarEstado (si ya lo tenía, se renueva).
+  function estadoTitilando(presets){
+    const pre = (presets || []).find(p => p && p.titilando);
+    return pre ? {id: 'tit' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), activo: true, ...structuredClone(pre)} : null;
+  }
+  // ¿Titila? Cualquier estado activo que da invulnerabilidad (dueño: «asociar la animación de titilar a la invulnerabilidad en general»).
+  const titila = estados => (estados || []).some(e => e && e.activo !== false && (e.invulnerable || e.titilando || /^(invulnerable|titilando)$/i.test(String(e.nombre || '').trim())));
   // El pase de turno de siempre (⟳ Mantenimiento, sin orden de turnos): dispara (lo que no se disparó al aplicarse) y cuenta.
   function pasarTurnoEstados(estados, campos){
     const d = dispararEstados(estados, campos), k = contarEstados(estados, campos);
@@ -856,7 +870,7 @@ const Combatiente = (() => {
     const st = AHORRO_ESPECIAL[tipo];
     return st && typeof valorDe === 'function' ? Math.max(0, Math.round(n(valorDe(st)))) : 0;
   }
-  return {pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+  return {vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

@@ -1413,3 +1413,5 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   👁 ocultar, 🛡 equipo y **↩**). Otro clic derecho sobre el mismo vuelve; ⋯ / ↩ pasan de uno al otro. `hudNivel` / `hudPonerNivel` (js/10;
   va en la firma del HUD), el clic derecho en js/06 (después de todo lo que el clic derecho cancela; afuera de un token, el ping de siempre).
   Seleccionar otro token (por cualquier camino) vuelve a lo del combate.
+
+- **Titilando** (2026-10-06, `js/22-titilando.js`): cada segundo, cada pantalla mira la vida de lo que maneja (`bnManejo`: sus personajes e invocaciones; el GM, los creeps); si pasa de 0 a más de 0 y no tiene ya Titilando, se lo pone (`editarPersonajeMapa` / `modificarCreep`) y lo cuenta en la Crónica («✨ juan vuelve a la vida»). La primera vez solo anota la vida. `tokenTitila(t)` (cualquier estado invulnerable) hace que el token prenda y apague en el dibujo (js/05).

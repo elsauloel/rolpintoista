@@ -1086,3 +1086,35 @@ equiparla); **Armadura del escolta a mano** (se resuelve fácil en la mesa). 15 
 
 **Idea para los pies (dueño, 2026-10-06):** Inamovible (el estado nuevo: no te pueden empujar ni atraer) también es un buen efecto para unas
 botas — tenerlo en cuenta al rehacer los pies de Buena calidad (hoy los pies dan la chance de Inamovible en %).
+
+## Pies, Buena calidad — lluvia de mecánicas (2026-10-06, para que el dueño filtre)
+Lo que hay: 14 pies de Buena calidad viejos, casi todos «Defensa 3–7 + Tipo 6/8» y tres con **Movimiento** (+1 y hasta +3: vale 4 puntos por +1,
+imposible en una bolsa de 2,5). Se reemplazan. Identidad: **apoyo y reflejos**. Bolsa 2,5 (hasta 2,75); cada punto de peso devuelve 0,5.
+**Tope de Defensa propuesto: 2** (como cabeza y manos). **Recuperarse rápido, un solo slot: los pies** (del escaneo: hoy cabeza 50 % + pies 50 % =
+100 %) — la Cofia del veterano (cabeza) cambiaría su Recuperarse por otra cosa. Las chances «siempre» (100 %) solo en una pieza cada una.
+⚙ = ya existe · 🔧 = mecánica nueva o de la lista que quedó afuera en Común · 🧙 = caster.
+
+| Pie · pesa · precio | Qué hace |
+|---|---|
+| Borceguíes de punta de acero · 2 · 70 | Defensa +2 · Tipo 4 +1 · Res. fuego +1 |
+| Sabatones de acero templado · 3 · 70 | Defensa +2 · Tipo 4 +1 · Res.CC +1 · Vida +5 · Res. ácido +1 · Iniciativa −1 |
+| Botas de marcha reforzadas · 1 · 70 | Defensa +2 · Vida +5 |
+| Soquetes de paso ligero · 0 · 70 | Evasión +1 · Percepción +1 |
+| Botines del duelista · 0 · 70 | Evasión contra contraataque +3 · Res. ácido +1 |
+| Botas de mensajero · 1 · 70 | Evasión contra oportunidad +2 · Percepción +1 · Res. fuego +1 |
+| Zapatillas de velocista · 0 · 70 | Iniciativa +1 · Evasión contra oportunidad +1 |
+| Zapatos de milonguero · 0 · 75 | Pasos de baile +1 · Evasión contra contraataque +1 · Percepción +1 |
+| **Bono grande:** Botas de ancla · 3 · 70 | **Inamovible siempre** (el estado, al equiparlas) · Defensa +2 · Res. ácido +1 |
+| **Bono grande:** Botas de potro de doma · 1 · 70 | **Recuperarse rápido siempre** (Inmovilizado, Rengo, Sentado y Lento, 1 turno menos) · Defensa +1 |
+| **Bono grande:** Sandalias de mangosta · 0 · 70 | **Reflejos de mangosta siempre** (dodge roll ante cada trampa que pisás) |
+| Pantuflas del fantasma · 0 · 70 | Sigilo +2 · Percepción +1 |
+| Botas de rastreador · 0 · 70 | Pisada atenta · Percepción +3 |
+| Botas del desertor · 1 · 70 | Retirada limpia 50 % · Defensa +1 · Percepción +1 |
+| 🔧 Botas de jinete · 1 · 70 | Levantarse (de Sentado) cuesta 1 No2 menos (gratis) · Defensa +1 · Res.CC +1 |
+| 🔧🧙 Zapatillas de levitación · 0 · 70 | El terreno lento (arena movediza, brea) te cuesta lo normal · Res. ácido +1 · Res. tóxico +1 · Res. fuego +1 |
+| 🔧 Suelas de cuero de dragón · 2 · 70 | Lo que pisás (zonas y trampas del piso) te hace 2 menos de daño · Res. fuego +2 · Res. ácido +1 |
+| 🔧🧙 Babuchas del meditador · 0 · 70 | Si no te moviste en tu turno anterior, al empezar el tuyo recuperás 1 SP · Res.Mt +2 · Percepción +1 |
+| 🧙 Sandalias del peregrino · 0 · 70 | Res.Esp +2 · Res.Mt +1 |
+
+Costos nuevos propuestos: Levantarse rápido 1 · Paso seguro 1 · Suela gruesa 1 por −1 · Meditar 1 (es un SP Regen +1 con condición; ojo: el SP Regen
+vive solo en la cabeza — este es más chico porque pide quedarse quieto).

@@ -192,7 +192,10 @@ $('#btn-mantenimiento').onclick = async () => {
    lo ven. Se muestra solo en modo combate, flotante sobre el mapa y
    plegable, como el "Turn Order" de Roll20. */
 
-let iniciativa = {orden: [], turno: 0, ronda: 1};
+let iniciativa = {orden: [], turno: 0, ronda: 1, paso: 0, termino: null};
+// Turno propio (2026-10-06): cada ▶ Siguiente sube `paso` y deja en `termino` de quién fue el turno que terminó; los estados nuevos llevan la
+// marca «mapa:paso» del turno en curso (Combatiente.agregarEstado), así uno que te ponen en tu propio turno no se descuenta al terminarlo.
+Combatiente.fijarMarcaTurno(() => iniciativa.orden.length ? `${mapaMostrado}:${iniciativa.paso}` : null);
 let iniciativaPlegada = false;
 try{ iniciativaPlegada = localStorage.getItem('mapa-iniciativa-plegada') === '1'; }catch(e){}
 
@@ -218,6 +221,8 @@ function escucharIniciativa(){
       orden: (Array.isArray(d.orden) ? d.orden : []).map(o => ({id: String(o.id || ''), valor: num(o.valor), oculto: o.oculto === true})).filter(o => o.id),
       turno: Math.max(0, Math.round(num(d.turno))),
       ronda: Math.max(1, Math.round(num(d.ronda)) || 1),
+      paso: Math.max(0, Math.round(num(d.paso))),
+      termino: d.termino && d.termino.id ? {id: String(d.termino.id), paso: Math.round(num(d.termino.paso))} : null,
     };
     const cambioTurno = iniciativa.turno !== antesTurno || iniciativa.ronda !== antesRonda;
     if(cambioTurno) giroLibre.clear();   // avanzó el turno: acción de otro
@@ -240,6 +245,8 @@ async function guardarIniciativa(cambios){
     orden: iniciativa.orden.map(o => o.oculto ? {id: o.id, valor: num(o.valor), oculto: true} : {id: o.id, valor: num(o.valor)}),
     turno: iniciativa.turno,
     ronda: iniciativa.ronda,
+    paso: iniciativa.paso,
+    ...(iniciativa.termino ? {termino: iniciativa.termino} : {}),
     ...cambios,
     actualizado: firebase.firestore.FieldValue.serverTimestamp(),
   };
@@ -342,17 +349,60 @@ function iniciativaFueraDeJuego(id){
   if(t.tipo !== 'pj') return false;
   return !!r && (!!r.muerto || (r.hp !== undefined && num(r.hpMax) > 0 && num(r.hp) <= 0));
 }
-function iniciativaSiguiente(){
+async function iniciativaSiguiente(){
   const n = iniciativa.orden.length;
   if(!n) return;
+  const termina = iniciativa.orden[iniciativa.turno], pasoFin = iniciativa.paso, mapaFin = mapaMostrado;
   let i = iniciativa.turno, ronda = iniciativa.ronda;
   for(let paso = 0; paso < n; paso++){
     i++;
     if(i >= n){ i = 0; ronda++; }
     if(!iniciativaFueraDeJuego(iniciativa.orden[i].id)) break;   // salta a los caídos (si caen todos, avanza normal)
   }
-  if(ronda !== iniciativa.ronda) guardarIniciativa({turno: i, ronda});
-  else guardarIniciativa({turno: i});
+  const fin = termina ? {termino: {id: termina.id, paso: pasoFin}} : {};
+  const nuevaRonda = ronda !== iniciativa.ronda;
+  const ok = await guardarIniciativa({turno: i, paso: pasoFin + 1, ...fin, ...(nuevaRonda ? {ronda} : {})});
+  if(!ok) return;
+  const lineas = termina ? await finDeTurno(termina.id, `${mapaFin}:${pasoFin}`) : [];
+  // La Crónica, para todos (dueño, 2026-10-06): «Empieza el turno de Fulano» y lo que pasó al terminar el anterior.
+  const sig = iniciativa.orden[i] || {id: ''}, tSig = tokens.get(sig.id);
+  const publico = (o, t) => !!t && !t.oculto && !(o && o.oculto) && !enSigilo(t);
+  const nomSig = publico(sig, tSig) ? nombreDe(tSig) : '';
+  momentoAbrir({tipo: 'turno', icono: '▶', titulo: `${nuevaRonda ? `Ronda ${ronda} · ` : ''}${nomSig ? `Empieza el turno de ${nomSig}` : 'Pasa el turno'}`,
+    estado: 'listo', datos: {lineas: lineas.length ? lineas : [nomSig ? `Le toca a ${nomSig}.` : 'Sigue el orden de turnos.']}});
+}
+/* El fin del turno de un token (2026-10-06, turno propio): lo aplica la pantalla que tocó ▶ Siguiente (el GM), para que no dependa de que
+   el jugador esté conectado. Personaje e invocación: sus estados por editarPersonajeMapa (js/11); creep: modificarCreep. El reporte va a la
+   Mesa (personajes e invocaciones) o al 📜 Historial (creeps, como su Mantenimiento). Si ya se aplicó (misma clave), no hace nada. */
+async function finDeTurno(tokenId, clave){   // → las líneas públicas para la Crónica
+  const t = tokens.get(tokenId);
+  if(!t || !t.fichaId) return [];
+  const o = iniciativa.orden.find(x => x.id === tokenId);
+  const visible = !t.oculto && !(o && o.oculto) && !enSigilo(t);
+  const publicas = (nombre, rep) => !visible || !rep.length ? [] : [`Terminó el turno de ${nombre}:`, ...rep.filter(l => !/^HP total/.test(l) || t.tipo !== 'creep')];
+  try{
+    if(t.tipo === 'creep'){
+      if(!soyGM) return;
+      await acCargarPiezas();
+      let r = null, nombre = '';
+      await modificarCreep(t.fichaId, crudo => { const sc = CreepCalculo.normalizar(crudo); r = CreepAcciones.finTurno(sc, clave); nombre = sc.nombre; return r; });
+      if(r && r.rep.length && typeof historialReporteMantenimiento === 'function') historialReporteMantenimiento(`${nombre} · fin de su turno`, r.rep);
+      if(typeof ac !== 'undefined' && ac && !ac.host.hidden) acDibujar();
+      return r ? publicas(nombreDe(t), r.rep) : [];
+    }
+    const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
+    let r = null;
+    await editarPersonajeMapa(fichaId, S => {
+      r = FichaMantenimiento.finTurno(S, {fijarHp: v => mantFijarHp(S, v)}, clave, invId || '');
+      return !!r;
+    });
+    if(r && r.rep.length) FichaMantenimiento.publicarReporte(`Fin de su turno`, r.rep, r.nombre);
+    return r ? publicas(nombreDe(t), r.rep) : [];
+  }catch(err){
+    console.error('No se pudo aplicar el fin del turno:', err);
+    toast('No se pudieron pasar los estados del fin del turno — mirá la consola');
+    return [];
+  }
 }
 
 function renderIniciativa(){

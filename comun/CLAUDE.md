@@ -1306,3 +1306,11 @@ versión parecida en más de una, es candidato a juntar.
   momento (`tipo: 'guardian'`, `datos.chico`): la Crónica para todos y un toast para quien maneja al protegido (`momentoRecibido`, js/16).
   **Inamovible** es un preset (buff, `inamovible 100`); la Armadura del inamovible lo pone al equiparla y trae el mismo bono. `escolta`: solo un
   recordatorio (✋ a mano).
+- **Estados por turno propio** (2026-10-06, dueño, P161 «opción intermedia»): con el orden de turnos del mapa, `▶ Siguiente` (GM) sube `paso` y
+  deja `termino: {id, paso}` en el documento de la iniciativa; la pantalla que lo tocó aplica el fin de ese turno (`finDeTurno`, js/04):
+  `FichaMantenimiento.finTurno(S, ui, clave, invId?)` o `CreepAcciones.finTurno(sc, clave)` — los estados corren (lo que se dispara, antes de bajar
+  el contador) salvo los que llevan `pasoTurno === clave` (se los pusieron en ese mismo turno: `Combatiente.agregarEstado` los marca con
+  `fijarMarcaTurno`, que pone el mapa). El ⟳ Mantenimiento sigue con Nitros, SP y cooldowns, y corre los estados solo si no hubo un fin de turno
+  en esta ronda o la anterior (`Combatiente.estadosEnMantenimiento(finTurnoEn, turno)`; los creeps llevan `mantTurno`). Cada pase de turno abre
+  un momento `tipo: 'turno'` en la Crónica («Empieza el turno de…» + lo que pasó; sin la vida de los creeps, sin nombrar ocultos ni en sigilo).
+

@@ -28,6 +28,9 @@ const FichaMantenimiento = (() => {
     // después, para que todos vean si el veneno bajó, si la regeneración curó, etc.
     const rep = [];
     const hpAntes = num(S.hp);
+    // Con orden de turnos, los estados corren en su turno (finTurno, abajo); acá solo si no tuvo un fin de turno en esta ronda o la anterior.
+    const turnoAntes = num(S.turno || 1);
+    const estadosAca = Combatiente.estadosEnMantenimiento(S.finTurnoEn, turnoAntes);
 
     // SP Regen: AL PRINCIPIO del Mantenimiento (2026-09-24), con los números de antes de que venza o cambie ningún estado.
     // Por defecto es la mitad del Especial, redondeada hacia abajo (fórmula base del stat), más lo que sumen habilidades, equipo o estados.
@@ -41,7 +44,9 @@ const FichaMantenimiento = (() => {
 
     // Lo que hacen los estados en el pase de turno (escudo, daño/cura con inmunidades, stacks, turnos): regla común de
     // personajes, invocaciones y creeps (comun/combatiente.js). La vida se aplica más abajo, con fijarHp (tope, Ankh, muerte).
-    const turnoEst = Combatiente.pasarTurnoEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(c.final.resfuego)});
+    const turnoEst = estadosAca ? Combatiente.pasarTurnoEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(c.final.resfuego)})
+      : {hp: 0, eventos: [], terminados: [], quedan: S.efectos || []};
+    if(!estadosAca && (S.efectos || []).length) rep.push('Estados: corren al terminar su turno (orden de turnos)');
     hpDelta += turnoEst.hp;
     Combatiente.reporteTurno(turnoEst.eventos).forEach(l => { rep.push(l); log.push(esc(l)); });
 
@@ -100,7 +105,9 @@ const FichaMantenimiento = (() => {
       inv.golpeTurno = 0;   // la Defensa contra el primer golpe vuelve a valer (2026-10-06)
       inv.habilidades.forEach(h => { if(num(h.cdActual) > 0) h.cdActual = Math.max(0, num(h.cdActual) - 1); });
       // Estados alterados de la invocación: la MISMA regla que el personaje y los creeps (comun/combatiente.js).
-      const turnoInv = Combatiente.pasarTurnoEstados(inv.estados, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(InvCalculo.statValor(inv, 'resfuego'))});
+      const turnoInv = Combatiente.estadosEnMantenimiento(inv.finTurnoEn, turnoAntes)
+        ? Combatiente.pasarTurnoEstados(inv.estados, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(InvCalculo.statValor(inv, 'resfuego'))})
+        : {hp: 0, eventos: [], terminados: [], quedan: inv.estados || []};
       if(turnoInv.hp) inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, num(inv.hp) + turnoInv.hp));
       inv.estados = turnoInv.quedan;
       if(num(inv.cooldown) > 0){
@@ -120,6 +127,37 @@ const FichaMantenimiento = (() => {
     S.log = log;
     const avisos = (S.efectos || []).filter(e => e.popup && e.activo !== false);
     return {rep, avisos, spRegen, spRecuperado};
+  }
+
+  /* El fin del turno de un personaje (o de una de sus invocaciones, `invId`) en el orden de turnos (2026-10-06): sus estados corren (lo que
+     se dispara, antes de bajar el contador), salvo los que le pusieron durante este mismo turno. `clave` = «mapa:paso» del turno que terminó:
+     si ya se aplicó (otra pantalla, doble clic), no hace nada → null. Si no → {rep, nombre}. ui = {fijarHp(v)}. */
+  function finTurno(S, ui, clave, invId){
+    const turno = num(S.turno || 1);
+    const saltar = e => !!clave && e.pasoTurno === clave;
+    if(invId){
+      const inv = (S.invocaciones || []).find(i => i && i.id === invId);
+      if(!inv || inv.finTurnoClave === clave) return null;
+      InvCalculo.migrar(inv);
+      inv.finTurnoClave = clave; inv.finTurnoEn = turno;
+      const t = Combatiente.pasarTurnoEstados(inv.estados, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(InvCalculo.statValor(inv, 'resfuego')), saltar});
+      const rep = Combatiente.reporteTurno(t.eventos);
+      if(t.hp){ const antes = num(inv.hp); inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, antes + t.hp)); rep.push(`HP total: ${fmt(antes)} → ${fmt(inv.hp)}`); }
+      inv.estados = t.quedan;
+      return {rep, nombre: inv.nombre || 'Invocación'};
+    }
+    if(S.finTurnoClave === clave) return null;
+    S.finTurnoClave = clave; S.finTurnoEn = turno;
+    const c = FichaCalculo.calcular(S);
+    const t = Combatiente.pasarTurnoEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(c.final.resfuego), saltar});
+    const rep = Combatiente.reporteTurno(t.eventos);
+    if(t.hp){
+      const antes = num(S.hp);
+      ui.fijarHp(antes + t.hp);
+      rep.push(num(S.hp) !== antes ? `HP total: ${fmt(antes)} → ${fmt(num(S.hp))}` : `HP total: sigue en ${fmt(antes)}`);
+    }
+    if(t.terminados.length){ const fin = new Set(t.terminados); S.efectos = S.efectos.filter(e => !fin.has(e)); }
+    return {rep, nombre: ((S.meta && S.meta.nombre) || '').trim()};
   }
 
   // Cuántos turnos le toca aplicar a esta pantalla (la toma en una transacción: si hay varias, solo una los aplica).
@@ -157,5 +195,5 @@ const FichaMantenimiento = (() => {
     });
   }
 
-  return {MAX_SEGUIDOS, aplicar, reclamar, publicarReporte, publicarRecordatorios};
+  return {MAX_SEGUIDOS, aplicar, finTurno, reclamar, publicarReporte, publicarRecordatorios};
 })();

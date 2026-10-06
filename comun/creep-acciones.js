@@ -454,8 +454,13 @@ const CreepAcciones = (() => {
         enCooldown++;
       }
     });
-    // Lo que hacen los estados en el pase de turno: la regla común de personajes, invocaciones y creeps (comun/combatiente.js).
-    const turnoEst = Combatiente.pasarTurnoEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno', resFuego: C().resElemental(sc, 'fuego')});
+    // Lo que hacen los estados en el pase de turno: la regla común de personajes, invocaciones y creeps (comun/combatiente.js). Con orden de
+    // turnos corren al terminar su turno (finTurno, abajo); acá solo si no tuvo un fin de turno en esta ronda o la anterior (2026-10-06).
+    const mt = num(sc.mantTurno);
+    const estadosAca = Combatiente.estadosEnMantenimiento(sc.finTurnoEn, mt);
+    sc.mantTurno = mt + 1;
+    const turnoEst = estadosAca ? Combatiente.pasarTurnoEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno', resFuego: C().resElemental(sc, 'fuego')})
+      : {hp: 0, eventos: [], terminados: [], quedan: sc.estados || []};
     if(turnoEst.hp){ sc.hp = Math.max(0, Math.min(num(sc.hpMax), num(sc.hp) + turnoEst.hp)); }
     const hpAplicado = turnoEst.eventos.filter(ev => ev.tipo === 'hp').length;
     rep.push(...Combatiente.reporteTurno(turnoEst.eventos));
@@ -465,6 +470,18 @@ const CreepAcciones = (() => {
     // Se recargan después de los estados: un Stun que venció ya no los topea.
     sc.nitros = C().nitrosMax(sc);
     return {rep, enCooldown, hpAplicado, vencidos};
+  }
+  // El fin del turno de un creep en el orden de turnos (2026-10-06): sus estados corren (salvo los que le pusieron en este mismo turno).
+  // `clave` = «mapa:paso» del turno que terminó; si ya se aplicó → null. Si no → {rep, hpAplicado, vencidos}.
+  function finTurno(sc, clave){
+    if(sc.finTurnoClave === clave) return null;
+    sc.finTurnoClave = clave; sc.finTurnoEn = num(sc.mantTurno);
+    const t = Combatiente.pasarTurnoEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno', resFuego: C().resElemental(sc, 'fuego'), saltar: e => !!clave && e.pasoTurno === clave});
+    const rep = Combatiente.reporteTurno(t.eventos);
+    if(t.hp){ const antes = num(sc.hp); sc.hp = Math.max(0, Math.min(num(sc.hpMax), antes + t.hp)); rep.push(`HP total: ${antes} → ${sc.hp}`); }
+    sc.estados = t.quedan;
+    if(t.terminados.some(es => C().modsAfectanHp(es.mods))) C().actualizarHpMaxPorCon(sc);
+    return {rep, hpAplicado: t.eventos.filter(ev => ev.tipo === 'hp').length, vencidos: t.terminados.length};
   }
   async function reclamarMantenimiento(db, ref, objetivo, marca){
     return db.runTransaction(async tx => {
@@ -476,7 +493,7 @@ const CreepAcciones = (() => {
     });
   }
 
-  return {ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
+  return {ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, finTurno, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
     tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, tiradaSoltarse, aplicarSoltarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
     costoAtaqueDe, faltanNitros, preguntaSinNitros, alertaSinNitros,
     FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,

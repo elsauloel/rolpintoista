@@ -736,3 +736,10 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   usan desde Atacar (dueño: «se tratan como un ataque»), el cartel «¿Qué ataque es?» solo ofrece el **ataque normal** con sus reglas (1 No2 + 1 por
   uso + su SP). ¿Una varita puede ir de oportunidad (cuando un rival sale de tu alcance) o de contraataque (tras ganar Parry y Bloqueo)? ¿Con qué
   costo, y solo las que apuntan a un rival? Mientras tanto, no aparecen (la mesa lo puede hacer a mano).
+- **P161. Turno continuo: ¿opción completa o intermedia?** (2026-10-06, para el grupo). **Mientras tanto, decidido por el dueño: la
+  intermedia**, ya programada: con el orden de turnos del mapa, los estados de cada uno corren al **terminar su turno** (▶ Siguiente del GM);
+  lo que se dispara (veneno, sangrado, regeneración) se dispara justo antes de que baje el contador; un estado que te ponen en tu propio turno
+  empieza a contar en el próximo. **Nitros y SP siguen en el ⟳ Mantenimiento de la ronda** (y los cooldowns, por ahora, también). Sin orden de
+  turnos, todo sigue en el Mantenimiento. Cada pase de turno se anuncia en la Crónica («Empieza el turno de…» y lo que pasó al terminar el
+  anterior) y en la Mesa. La completa sumaría Nitros, SP (y cooldowns) en el turno de cada uno. Pregunta subida a 🛠 Herramientas de diseño.
+  Después: revisar Pajaritos, Stun y los estados fuertes para darlos por 1 turno (más matices, más frecuentes).

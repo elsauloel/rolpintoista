@@ -1603,7 +1603,7 @@ prueba('Stun (2026-10-06): no le toca los No2; si lo atacan, su Evasión es 1 si
   const r = Combatiente.tirarStat(12, es, 'eva'), r2 = Combatiente.tirarStat(12, viejo, 'eva'), parry = Combatiente.tirarStat(12, es, 'parry');
   igual([stun.forzarNitros, stun.stun, r.total, r.rolls.length, r2.total, parry.rolls.length > 0, Combatiente.stuneado([]), barrera.turnos], [undefined, true, 1, 0, 1, true, false, 2]);
 });
-prueba('anillos Comunes (2026-10-06): 29 nuevos + 2 de rango; Paso fantasma suma Evasión con 3 casilleros en la ronda; la Cáscara no se recarga; la Calma devuelve No2 si no atacó', () => {
+prueba('anillos Comunes (2026-10-06): los 29 nuevos son los únicos anillos (los de rango y los de calidades altas, afuera); Paso fantasma suma Evasión con 3 casilleros en la ronda; la Cáscara no se recarga; la Calma devuelve No2 si no atacó', () => {
   const com = CATALOGO_BASE.filter(i => i.tipoItem === 'anillos' && i.tier === 'Común');
   const antes = window.mapaCasillerosRonda;
   window.mapaCasillerosRonda = id => id === 'lejos' ? 3 : 1;
@@ -1623,7 +1623,7 @@ prueba('anillos Comunes (2026-10-06): 29 nuevos + 2 de rango; Paso fantasma suma
     inventario: [{...structuredClone(calma), id: 'a1', equipado: true}]}).S);
   S2.nitros = 2; S2.ataquesTurno = 1;
   FichaMantenimiento.finTurno(S2, {fijarHp: v => FichaAcciones.fijarHp(S2, v)}, 'm:5', '', [], 1);
-  igual([com.length, pf, est[0].escudoMagicoActual, conCalma, S2.nitros], [31, [1, 0], 1, 3, 2]);
+  igual([com.length, CATALOGO_BASE.filter(i => i.tipoItem === 'anillos').length, pf, est[0].escudoMagicoActual, conCalma, S2.nitros], [29, 29, [1, 0], 1, 3, 2]);
 });
 prueba('mochilas de Buena calidad (2026-10-06): 10 piezas, todas a 70 y con un efecto propio (ranuras o una mecánica de mochila)', () => {
   const bc = CATALOGO_BASE.filter(i => i.tipoItem === 'mochila' && i.tier === 'Buena Calidad' && !i.soloBotin);
@@ -2636,10 +2636,10 @@ grupo('Efecto especial (Ef.Esp)');
 prueba('personaje: sale del Especial, también en una ficha vieja sin la fórmula; el anillo y la pasiva lo suben', () => {
   const vieja = FichaGuardado.normalizar({attrs: {con: 2, fue: 2, agl: 2, des: 2, esp: 5}, formulas: {dmg: 'fue'}}).S;
   igual([vieja.formulas.dmgesp, FichaCalculo.calcular(vieja).final.dmgesp, FichaCalculo.STAT_LABEL.dmgesp], ['esp', 5, 'Ef.Esp']);
-  const anillo = CATALOGO_BASE.find(i => i.id === 'new-anillo-de-furia-arcana-mayor');
+  const anillo = CATALOGO_BASE.find(i => i.nombre === 'Anillo de Furia Arcana');   // el Común (Ef.Esp +1; los de calidades altas se reinventan)
   const pasiva = PASIVAS_BASE.find(p => p.poolId === 'potencia-especial');
   const S = fichaBotonera({inventario: [{...anillo, id: 'an', equipado: true}], pasivas: [{...pasiva, id: 'p1'}]});
-  igual(FichaCalculo.calcular(S).final.dmgesp, S.attrs.esp + 2 + 1);
+  igual(FichaCalculo.calcular(S).final.dmgesp, S.attrs.esp + 1 + 1);
 });
 prueba('creep e invocación: Ef.Esp sale del Especial; los consumibles de Furia Arcana lo suben', () => {
   igual(CreepCalculo.statValor(creepPrueba({esp: 4}), 'dmgesp'), 4);

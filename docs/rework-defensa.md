@@ -1388,3 +1388,10 @@ Mecánicas nuevas (iguales para personajes y creeps): `cascara`, `primerasangre`
 `finTurno`, el escudo `sinRecarga`) y el vigía del combate del mapa (`vtt-hexgrid/js/25-anillos.js`).
 
 **Anillos al triple** (dueño, 2026-10-06: «me siguen pareciendo muy baratos… por el mismo efecto en otro equipo, que el anillo cueste el triple»): `PRECIO_ANILLO_MULT = 3`. Comunes: 105 los de un punto, 90 los de 0,75, 75 el Boticario, 60 los de 0,5.
+
+**Anillos: vuelta al doble y limpieza (dueño, 2026-10-07).** El triple se probó y se volvió al doble (`PRECIO_ANILLO_MULT = 2`). Se eliminaron los
+anillos de rango y todos los de calidades altas: quedan solo los 29 Comunes; desde acá se va subiendo de calidad. **Auditoría de los 29** (pedido del
+dueño: «no auditaste los anillos preexistentes»): todos usan stats que existen y funcionan, salvo la **Reserva Ampliada**, que daba «Bonos máximos +1»,
+un stat viejo que el juego convierte en SP máximo → ahora dice **SP máximo +1** (0,75 → 60). Res.Mt sí se usa (trampas, zonas y habilidades la piden
+como resistencia). Quedan con stats viejos (bonos / mov / accionesmax, que se convierten solos al cargar) 16 consumibles —Pociones y Pergaminos de
+Reserva Ampliada, Piernas de Viento e Ímpetu— y el Cinturón del explorador (Raro): para cuando se revisen los consumibles y los cinturones Raros.

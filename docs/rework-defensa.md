@@ -843,3 +843,55 @@ construidas** (personajes, invocaciones y creeps): PdG con una familia de armas 
 contraataque más baratos (`oporahorro`, `contraahorro`), Soltarse (`soltarse`), trampas mejor escondidas (`trampaoculta`), el primer conjuro
 (`ahorroespsp`; un creep espera menos) y el envenenador (`venenista`: el mapa del GM le suma esos stacks a los venenos del duelo; los de zonas y
 trampas, a mano). Costos en la calculadora: familia/distancia 1, rebajas de No2 2, soltarse 0,25, trampas 0,125, primer conjuro 0,75, envenenador 2.
+
+## Torso blando, Buena calidad — lluvia de mecánicas (2026-10-06, para que el dueño filtre)
+Lo que hay: 18 Buena calidad viejas, casi todas «Defensa +3 a +5 con Tipo 4/6/8» y varias repetidas (tres cotas de escamas iguales, tres cotas de
+malla iguales): se reemplazan. Identidad del torso: **la Defensa principal y la vida**; las blandas además **Evasión, Iniciativa, sigilo y
+utilidad** (las rígidas se quedan con la Defensa alta y el Tipo 6). Bolsa del torso: Común 4 · **Buena 7** · Rara 10. **Tope de Defensa propuesto:
+blandas Buena 4** (Común 3), rígidas Buena 6. La Armadura mágica sigue siendo de Raro para arriba.
+⚙ = ya existe · 🔧 = mecánica nueva chica · ✋ = a mano · 🧙 = caster.
+
+**Defensa y aguante (lo de siempre, mejorado)**
+
+| Armadura | Qué hace |
+|---|---|
+| Gambesón de doble capa ⚙ | Defensa +4 · Res.CC +1 · Res. crítico Tipo 4 +1. |
+| Peto de cuero de oficial ⚙ | Defensa +3 · Vida +10. |
+| Jubón de cuero tachonado ⚙ | Defensa +3 · Res. crítico Tipo 4 +2. |
+| 🔧 Acolchado de esgrimista | Defensa +2 · el primer golpe que recibís en el turno resta 2 más de Defensa. |
+| 🔧 Chaleco de kevlar | Defensa +2 · Defensa +2 más contra armas a distancia (la campaña es de piratas espaciales). |
+
+**Moverse y llegar primero (lo propio de las blandas)**
+
+| Armadura | Qué hace |
+|---|---|
+| Casaca de duelista ⚙ | Defensa +2 · Evasión +1 · PdG en contraataque +1. |
+| Chaqueta del corredor ⚙ | Defensa +2 · Iniciativa +1 · Evasión contra oportunidad +2. |
+| Capa del torero ⚙ | Defensa +2 · Evasión contra oportunidad +2 · Evasión contra contraataque +2. |
+| Ropas de sombra finas ⚙ | Defensa +2 · Sigilo +2 · Evasión +1. |
+| 🔧 Traje de camuflaje | Defensa +2 · Sigilo +3 si no te moviste en el turno. |
+
+**Espinas (pasaron de los guantes a las armaduras)**
+
+| Armadura | Qué hace |
+|---|---|
+| Pieles erizadas del berserker ⚙ | Defensa +3 · Espinas al equiparla (el que te pega cuerpo a cuerpo recibe 1/4 de su golpe). |
+| Abrigo de púas de puercoespín ⚙ | Defensa +2 · Espinas · Res.CC +1. |
+
+**Para casters (lo decidido: pagar con vida y +SP máximo viven acá)**
+
+| Armadura | Qué hace |
+|---|---|
+| 🧙🔧 Túnica de sangre | Con un arma especial, elegís cada vez si pagás el SP con SP o con vida (1 HP por SP) · Defensa +1 · Res.Esp +1. |
+| 🧙 Túnica del archivista | SP máximo +3 · Defensa +2 · Res.Mt +2. |
+| 🧙 Túnica de sanador ⚙ | Defensa +2 · Regeneración al equiparla (+1 HP por turno). |
+
+**Utilidad (lo que se lleva encima)**
+
+| Armadura | Qué hace |
+|---|---|
+| Túnica de maestre mayor ⚙ | Defensa +2 · +3 ranuras de cinturón · Res.Esp +1. |
+| Delantal de boticario de oficio ⚙ | Defensa +2 · cada poción cura 1 más · +1 ranura. |
+| Capa del explorador ⚙ | Defensa +2 · Visión +2 · Percepción +2 · Res. hielo +2. |
+| Abrigo de piel de oso ⚙ | Defensa +3 · Vida +5 · Res. hielo +2. |
+| ✋ Abrigo de bolsillos ocultos | Defensa +2 · lo que guardás en un bolsillo no lo encuentra quien te revisa (a mano). |

@@ -405,9 +405,10 @@ function publicarTiradaInv(t){
 }
 // Atacar con una invocación: igual que el personaje, primero se elige el token al que ataca (duelo, comun/duelo.js).
 // Primero «¿Qué ataque es?» (normal / oportunidad / contraataque, 2026-10-03: igual que personajes y creeps), en el mismo cartel del personaje.
-function invAtacar(invId){
+function invAtacar(invId, otro){   // Atacar = ataque normal; `otro`: el menú, a mano (dueño, 2026-10-06)
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
+  if(!otro){ invAtacarCon(invId, 'normal'); return; }
   $('#tipo-ataque-lista').innerHTML = InvAcciones.menuTipoAtaque(inv, 'data-invtipoataque');
   $('#scrim-tipo-ataque').classList.add('open');
 }

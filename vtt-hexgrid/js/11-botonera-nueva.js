@@ -112,7 +112,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261005i6', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261005i1', '../comun/ficha-mantenimiento.js?v=20261006t', '../comun/ficha-calculo.js?v=20261006r', '../comun/ficha-combate.js?v=20261005mn', '../comun/skills-clase.js?v=20261005t1', '../comun/ficha-habilidades.js?v=20261004p1',
-  '../comun/catalogo.js?v=20261006r', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261004ja', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261005fj', '../comun/ficha-resumen.js?v=20261006r', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261004so', '../comun/inv-acciones.js?v=20261005mn', '../comun/inv-duelo.js?v=20261005mn', '../comun/ficha-acciones.js?v=20261006t1', '../comun/inv-habilidades.js?v=20261004na', '../comun/inv-lupa.js?v=20261001a',
+  '../comun/catalogo.js?v=20261006r', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261004ja', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261006a', '../comun/ficha-resumen.js?v=20261006r', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261006a', '../comun/inv-acciones.js?v=20261005mn', '../comun/inv-duelo.js?v=20261005mn', '../comun/ficha-acciones.js?v=20261006t1', '../comun/inv-habilidades.js?v=20261004na', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20260930b', '../comun/ficha-duelo.js?v=20261005i1', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261005f6'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -265,7 +265,7 @@ function bnInvAca(b){
     bn.raiz.querySelector('#bn-verinv').classList.add('open');
     return true;
   }
-  const d = b.dataset, ref = d.invtirarstat || d.invatacar || d.invdanio || d.ejecutarhabinv || d.danohabinv || d.invlevantarse || d.invsoltarse;
+  const d = b.dataset, ref = d.invtirarstat || d.invatacar || d.invotroataque || d.invdanio || d.ejecutarhabinv || d.danohabinv || d.invlevantarse || d.invsoltarse;
   if(!ref || !bnPuedeGuardar()) return false;
   const inv = (bn.S.invocaciones || []).find(x => x && x.id === ref.split(':')[0]);
   if(!inv){ toast('Esa invocación ya no está'); return true; }
@@ -328,7 +328,8 @@ function bnInvAca(b){
     }});
     return true;
   }
-  bnInvPreguntarTipo(inv.id);
+  if(d.invotroataque) bnInvPreguntarTipo(inv.id);   // el menú, a mano
+  else bnInvAtacar(inv.id, 'normal');   // Atacar = ataque normal (2026-10-06)
   return true;
 }
 // Lo que el mapa hace después de ejecutar una habilidad de la invocación (comun/inv-habilidades.js): como la ficha, publica a su
@@ -592,9 +593,12 @@ var bnSobrepeso = null;
    ficha), después el objetivo con un clic en el token (dueloElegirObjetivoMapa, el mismo de siempre) y el duelo; "Sin objetivo"
    hace el ataque suelto acá (FichaAcciones.atacarConArma / ataqueEspecialConArma). Las tiradas que pide el duelo las sigue
    haciendo la ficha escondida (paso 4c). */
-function bnPreguntarTipoAtaque(arma){
+// Atacar es siempre un ataque normal (dueño, 2026-10-06: la oportunidad la ofrece el mapa cuando un rival se aleja, y el contraataque el duelo
+// después de ganar el Parry y el Bloqueo); el menú queda para «↪ Oportunidad o contraataque, a mano» (`otro`).
+function bnPreguntarTipoAtaque(arma, otro){
   // ✨ Un arma especial tiene su propio recorrido (dueño, 2026-10-05): sin «¿Qué ataque es?» (no tiene oportunidad ni contraataque, P160), directo a sus reglas.
   if(arma && arma.especial){ FichaAcciones.usarArmaEspecial(bn.S, arma.id, false, bnHabUi()); return; }
+  if(!otro){ bnAtacar('normal', arma ? arma.id : ''); return; }
   const S = bn.S, costoNormal = FichaCombate.costoAtaque(S, arma), primero = FichaCombate.ataquesConArma(S, arma) === 0, especial = FichaCombate.costoAtaqueEspecial(arma, 'contra', S), especialOpor = FichaCombate.costoAtaqueEspecial(arma, 'oportunidad', S);
   const id = arma ? arma.id : '';
   bn.raiz.querySelector('#bn-tipo-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: arma ? arma.nombre : 'Sin arma', normal: costoNormal, primero, especial, especialOpor, attr: 'data-bn-tipo', ref: id, primeroTxt: 'primer ataque con esta arma (Tipo ÷ 2)', siguienteTxt: 'Tipo completo (ya atacaste con esta arma este turno)'});   // el menú común
@@ -614,11 +618,11 @@ function bnAtacar(tipo, armaId){
 }
 function bnCombateAca(b){
   const a = b.dataset.botoneraaccion;
-  if(!['esquivar', 'parry', 'bloqueo', 'fuerzagolpe', 'danio', 'atacar'].includes(a) || !bnPuedeGuardar()) return false;
+  if(!['esquivar', 'parry', 'bloqueo', 'fuerzagolpe', 'danio', 'atacar', 'otroataque'].includes(a) || !bnPuedeGuardar()) return false;
   const S = bn.S, ui = bnCombateUi();
-  if(a === 'atacar'){
+  if(a === 'atacar' || a === 'otroataque'){
     if(b.dataset.arma === undefined) return false;   // (la Botonera siempre lo trae con su arma; si no, que lo haga la ficha)
-    bnPreguntarTipoAtaque(S.inventario.find(x => x.id === b.dataset.arma) || null);
+    bnPreguntarTipoAtaque(S.inventario.find(x => x.id === b.dataset.arma) || null, a === 'otroataque');
   }
   else if(a === 'esquivar') FichaAcciones.tirarValorStat(S, 'Evasión', FichaCalculo.calcular(S).final.eva, 'eva', undefined, undefined, undefined, ui);
   else if(a === 'danio'){

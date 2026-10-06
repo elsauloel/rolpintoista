@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002c', '../comun/creep-botonera.js?v=20261005fn', '../comun/creep-acciones.js?v=20261006t', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261005mn'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261002c', '../comun/creep-botonera.js?v=20261006a', '../comun/creep-acciones.js?v=20261006t', '../comun/confirmar-turno.js?v=20260930b', '../comun/creep-duelo.js?v=20261005mn'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -193,7 +193,8 @@ function acAccionAca(b){
     });
     return true;
   }
-  if(d.atacarcreep){ acPreguntarTipoAtaque(sc); return true; }
+  if(d.atacarcreep){ acAtacar('normal'); return true; }   // Atacar = ataque normal (dueño, 2026-10-06)
+  if(d.otroataquecreep){ acPreguntarTipoAtaque(sc); return true; }   // la oportunidad o el contraataque, a mano
   // El cinturón (2026-10-04): usar, sacar y cargar consumibles.
   if(d.cinConsumir){ acConsumir(sc, d.cinConsumir.split(':')[1]); return true; }
   if(d.cinQuitar){ acCambiar(c => CreepAcciones.quitarDelCinturon(c, d.cinQuitar.split(':')[1])).then(x => { if(x) toast(x.aviso); }); return true; }

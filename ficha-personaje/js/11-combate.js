@@ -144,12 +144,16 @@ const combateUi = {
 const costoAtaqueEspecial = FichaCombate.costoAtaqueEspecial;
 const NOMBRE_ATAQUE_ESPECIAL = FichaAcciones.NOMBRE_ATAQUE_ESPECIAL;
 function ataqueEspecialConArma(arma, tipo, forzar){ FichaAcciones.ataqueEspecialConArma(S, arma, tipo, forzar, combateUi); }   // comun/ficha-acciones.js
-function preguntarTipoAtaque(arma){
+// Atacar es siempre un ataque normal (dueño, 2026-10-06: la oportunidad la ofrece el mapa cuando un rival se aleja, y el contraataque el duelo
+// después de ganar el Parry y el Bloqueo); el menú «¿Qué ataque es?» queda para el botón «↪ Oportunidad o contraataque, a mano» (`otro`).
+function preguntarTipoAtaque(arma, otro){
   // ✨ Un arma especial tiene su propio recorrido (dueño, 2026-10-05): sin «¿Qué ataque es?» (no tiene oportunidad ni contraataque, P160), directo a sus reglas.
   if(arma && arma.especial){ FichaAcciones.usarArmaEspecial(S, arma.id, false, habUi); return; }
   const costoNormal = costoAtaqueNitros(arma), primero = ataquesConArma(arma) === 0, especial = costoAtaqueEspecial(arma, 'contra', S), especialOpor = costoAtaqueEspecial(arma, 'oportunidad', S);
   const id = arma ? arma.id : '';
   $('#tipo-ataque-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: arma ? arma.nombre : 'Sin arma', normal: costoNormal, primero, especial, especialOpor, attr: 'data-tipoataque', ref: id, primeroTxt: 'primer ataque con esta arma (Tipo ÷ 2)', siguienteTxt: 'Tipo completo (ya atacaste con esta arma este turno)'});   // el menú común
+  const normal = !otro && $('#tipo-ataque-lista').querySelector('[data-tipoataque^="normal:"]');
+  if(normal){ normal.click(); return; }
   $('#scrim-tipo-ataque').classList.add('open');
 }
 $('#tipo-ataque-x').onclick = () => $('#scrim-tipo-ataque').classList.remove('open');

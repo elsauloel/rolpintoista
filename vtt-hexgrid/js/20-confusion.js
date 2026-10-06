@@ -14,8 +14,8 @@ let confusionNumeros = null;        // [{id, n}] los números sobre los candidat
 let confusionPase = '';             // el token al que se le deja pasar la próxima acción (el «Seguir» después de tirar)
 // Los botones que son una acción (atacar, una habilidad, un consumible, levantarse, soltarse, sigilo); las defensas y las tiradas sueltas, no.
 const CONFUSION_BOTONES = ['ejecutar', 'consume', 'levantarse', 'soltarse', 'sigilo', 'invatacar', 'ejecutarhabinv', 'invlevantarse', 'invsoltarse',
-  'atacarcreep', 'levantarcreep', 'soltarcreep'];
-const confusionEsAccion = b => !!b && (b.dataset.botoneraaccion === 'atacar' || CONFUSION_BOTONES.some(k => k in b.dataset));
+  'atacarcreep', 'levantarcreep', 'soltarcreep', 'invotroataque', 'otroataquecreep'];
+const confusionEsAccion = b => !!b && (b.dataset.botoneraaccion === 'atacar' || b.dataset.botoneraaccion === 'otroataque' || CONFUSION_BOTONES.some(k => k in b.dataset));
 // Vuelve a apretar el botón (si la ventana se redibujó, el mismo botón de nuevo, por sus datos).
 function confusionReclic(raiz, b, tokenId){
   let x = b && b.isConnected ? b : null;

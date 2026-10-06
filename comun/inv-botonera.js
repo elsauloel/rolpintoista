@@ -54,6 +54,9 @@ const InvBotonera = (() => {
       <button type="button" class="botonera-tile${num(inv.nitros) < costoLev ? ' bt-sin-nitros' : ''}" data-invlevantarse="${inv.id}" title="Cuesta ${fmt(costoLev)} No2 y saca el estado Sentado"><span class="bt-label">🧍 Levantarse · ${fmt(costoLev)} No2</span></button>` : '')
       + (sSol ? `
       <button type="button" class="botonera-tile${num(inv.nitros) < sSol.no2 ? ' bt-sin-nitros' : ''}" data-invsoltarse="${inv.id}" title="${esc(`${soltableInv.nombre}: tira ${sSol.etq} contra ${sSol.dif}; si llega, se suelta. Cuesta ${sSol.no2} No2 aunque no lo logre`)}"><span class="bt-label">${esc(Combatiente.textoSoltarse(soltableInv))}</span></button>` : '');
+    // Atacar es siempre un ataque normal (dueño, 2026-10-06): la oportunidad y el contraataque los ofrece el mapa solo; esto, a mano.
+    const tileOtro = `
+      <button type="button" class="botonera-tile" data-invotroataque="${inv.id}" title="A mano, por si el mapa no lo detectó: el ataque de oportunidad se ofrece solo cuando un rival se aleja, y el contraataque después de ganar el Parry y el Bloqueo. Atacar es siempre un ataque normal." style="opacity:.75;min-height:0"><span class="bt-label">↪ Oportunidad o contraataque, a mano</span></button>`;
     const tilesCombate = tilesExtra + combate.map(c => {
       const mt = c.stat ? ModTirada.tile(inv.estados, c.stat) : {clase: '', html: '', titulo: ''};
       return `
@@ -61,7 +64,7 @@ const InvBotonera = (() => {
         ${lupaBotonHtml(c.clave)}${ModTirada.ayuda(c.stat)}
         <span class="bt-label">${esc(c.nombre)}</span><span class="bt-value bt-value-formula">🎲${c.dado?` ${esc(c.dado)}`:''}</span>${mt.html}
       </button>`;
-    }).join('');
+    }).join('') + tileOtro;
 
     const filasHab = inv.habilidades.map(h => {
       const bloqueo = I.bloqueoHab(inv, h);

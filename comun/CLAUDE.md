@@ -1313,4 +1313,8 @@ versión parecida en más de una, es candidato a juntar.
   `fijarMarcaTurno`, que pone el mapa). El ⟳ Mantenimiento sigue con Nitros, SP y cooldowns, y corre los estados solo si no hubo un fin de turno
   en esta ronda o la anterior (`Combatiente.estadosEnMantenimiento(finTurnoEn, turno)`; los creeps llevan `mantTurno`). Cada pase de turno abre
   un momento `tipo: 'turno'` en la Crónica («Empieza el turno de…» + lo que pasó; sin la vida de los creeps, sin nombrar ocultos ni en sigilo).
+- **Atacar = ataque normal** (2026-10-06, dueño): el botón Atacar ya no pregunta «¿Qué ataque es?» — va directo al ataque normal (personaje,
+  invocación y creep; ficha, GM Tools y mapa). La oportunidad la ofrece el mapa cuando un rival se aleja (js/17) y el contraataque el duelo después
+  de ganar el Parry y el Bloqueo. El menú de siempre queda en un botón chico de cada Botonera, «↪ Oportunidad o contraataque, a mano»
+  (`data-botoneraaccion="otroataque"`, `data-otroataquecreep`, `data-invotroataque`), por si el mapa no lo detectó (narrativo, mover libre, la ficha suelta).
 

@@ -192,10 +192,10 @@ document.addEventListener('click', e => {
     publicarTiradaCreep(CreepAcciones.tiradaStat(S.creeps.find(s=>s.id===scId), statId));   // comun/creep-acciones.js (paso 4 etapa 4c)
     return;
   }
-  if(b.dataset.atacarcreep){
-    const sc = S.creeps.find(s=>s.id===b.dataset.atacarcreep);
+  if(b.dataset.atacarcreep || b.dataset.otroataquecreep){
+    const sc = S.creeps.find(s=>s.id===(b.dataset.atacarcreep || b.dataset.otroataquecreep));
     if(!sc) return;
-    preguntarTipoAtaqueCreep(sc);
+    preguntarTipoAtaqueCreep(sc, !!b.dataset.otroataquecreep);   // Atacar = ataque normal; el otro botón, el menú (dueño, 2026-10-06)
     return;
   }
   if(b.dataset.soltarcreep){   // trampas de Atrapar (2026-10-03): la tirada una vez, después cobra y, si salió, saca el estado

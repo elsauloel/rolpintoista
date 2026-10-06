@@ -81,6 +81,8 @@ const CreepBotonera = (() => {
           : {stat:'bloqueo', nombre:'Bloqueo · tras el Parry', dado: fc.bloqueo, sinNitros: true, lupa:'stat|bloqueo', motivo:`${Combatiente.BLOQUEO_SOLO_TRAS_PARRY} · con ${defCreep.nombre} tiraría esto`, attr:`data-bloqueocreep="${sc.id}"`}] : []),
       {nombre:'Fuerza del golpe', dado: fc.fuerza, motivo:`Sin costo · su Fuerza + el Peso de su arma (${fmt(pesoArma(sc))}) es el dado: su tirada contra el Bloqueo del defensor`, attr:`data-fuerzacreep="${sc.id}"`},
     ];
+    // Atacar es siempre un ataque normal (dueño, 2026-10-06): la oportunidad y el contraataque los ofrece el mapa solo; esto, a mano.
+    combate.push({nombre: '↪ Oportunidad o contraataque, a mano', dado: '', soloTexto: true, motivo: 'A mano, por si el mapa no lo detectó: el ataque de oportunidad se ofrece solo cuando un rival se aleja, y el contraataque después de ganar el Parry y el Bloqueo. Atacar es siempre un ataque normal.', attr: `data-otroataquecreep="${sc.id}"`});
     // ✨ Sus armas especiales (2026-10-05): un «Atacar» más cada una, con su costo (No2) y su espera (el SP de un creep, ver CreepAcciones).
     if(typeof CreepAcciones !== 'undefined' && CreepAcciones.especialesCreep) CreepAcciones.especialesCreep(sc).forEach(it => {
       const c = CreepAcciones.costoEspecialCreep(sc, it), e = it.especial || {}, sinNitros = num(sc.nitros) < c.no2;

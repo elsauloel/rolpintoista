@@ -314,6 +314,10 @@ const FichaBotonera = (() => {
           <button type="button" class="botonera-tile" data-botoneraaccion="danio" data-arma="${arma ? arma.id : ''}" title="Daño${arma ? ` · ${esc(arma.nombre)}` : ''}" ${arma ? '' : 'disabled'}>
             ${arma ? lupaBotonHtml(`danio:${arma.id}`) : ''}
             <span class="bt-label">Daño${nombre || ' Arma'}</span><span class="bt-value bt-value-formula">🎲 ${esc(arma ? FichaCombate.armaDanoTxt(arma, c.final.dmg) : 'sin arma equipada')}</span>
+          </button>
+          ${/* Atacar es siempre un ataque normal (dueño, 2026-10-06): la oportunidad y el contraataque los ofrece el mapa solo; esto, a mano. */ ''}
+          <button type="button" class="botonera-tile" data-botoneraaccion="otroataque" data-arma="${arma ? arma.id : ''}" title="A mano, por si el mapa no lo detectó: el ataque de oportunidad se ofrece solo cuando un rival se aleja, y el contraataque después de ganar el Parry y el Bloqueo. Atacar es siempre un ataque normal." style="opacity:.75;min-height:0">
+            <span class="bt-label">↪ Oportunidad o contraataque, a mano${nombre}</span>
           </button>`;
           }).join('')}
           ${especiales.map(i => {

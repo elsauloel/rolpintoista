@@ -216,9 +216,10 @@ document.addEventListener('click', async e => {
   }
   if(b.dataset.botoneraaccion){
     // Atacar y Daño de la Botonera vienen con su arma (uno por arma).
-    if(b.dataset.arma !== undefined && ['atacar', 'danio'].includes(b.dataset.botoneraaccion)){
+    if(b.dataset.arma !== undefined && ['atacar', 'danio', 'otroataque'].includes(b.dataset.botoneraaccion)){
       const arma = S.inventario.find(x => x.id === b.dataset.arma) || null;
       if(b.dataset.botoneraaccion === 'atacar') preguntarTipoAtaque(arma);
+      else if(b.dataset.botoneraaccion === 'otroataque') preguntarTipoAtaque(arma, true);
       else if(arma) tirarDanoDeArma(arma);
       return;
     }
@@ -520,6 +521,7 @@ document.addEventListener('click', async e => {
     return;
   }
   if(b.dataset.invatacar){ invAtacar(b.dataset.invatacar); return; }
+  if(b.dataset.invotroataque){ invAtacar(b.dataset.invotroataque, true); return; }
   if(b.dataset.invdanio){ invDanio(b.dataset.invdanio); return; }
   if(b.dataset.invlevantarse){ invLevantarse(b.dataset.invlevantarse); return; }
   if(b.dataset.invsoltarse){ invSoltarse(b.dataset.invsoltarse); return; }

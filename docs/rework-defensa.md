@@ -1307,3 +1307,9 @@ Excepcional 70, Legendario 85.
 | Cazador (PdG +1 · Rango +1), Estudioso (PdG.Esp +1 · Res.Esp +1), Sobreviviente (Vida +15) | Legendario (el Sobreviviente repite a Vitalidad: sale o se funde) |
 | Corredor (Iniciativa +1 · Evasión +1) | No entra (3,5): sale o pierde un bono |
 | Pólvora Mansa (Res. crítico Tipo 12 +1 · Res.Mt +1) y Blindaje (Tipo 4, 6, 8 y 10 +1) | No entran (5,5 y 10): Pólvora Mansa como excepción legendaria (el Tipo 12 casi no se resiste); Blindaje queda en Tipo 4 +1 · Tipo 6 +1 (Legendario) |
+
+**Decisión del dueño sobre los anillos (2026-10-06):** (1) **los de rango quedan afuera hasta resolver los rangos** (Alcance Extendido, Extensión
+del Conjuro y el Cazador: sin tocar); (2) **los anillos cuestan el doble en oro por su efecto** («de forma completamente arbitraria»):
+`PRECIO_ANILLO_MULT = 2` y `precio_item` en la calculadora; aplicado a los otros 78 (de 1.200–11.000 a 40–1.220); (3) los efectos y su peso por
+calidad se reimaginan después (la propuesta por familia de arriba queda como punto de partida). Ojo para entonces: el Leprechaun (Afortunado siempre)
+y el Policromático quedaron a 120 porque la calculadora cobra 2 por cualquier estado al equipar: hay que valuarlos de verdad.

@@ -321,7 +321,7 @@ function rayoCadena(idInicial, dano){
   }
   return cadena;
 }
-// Aplica los saltos que este cliente puede (creeps si es el GM, sus propios personajes) y avisa en la Mesa lo demás para hacerlo a mano.
+// Aplica los saltos que este cliente puede (el GM, todos; un jugador, los suyos) y avisa en la Mesa lo demás para hacerlo a mano.
 async function rayoCadenaAplicar(cadena){
   const saltos = cadena.slice(1);
   if(!saltos.length) return;
@@ -331,7 +331,11 @@ async function rayoCadenaAplicar(cadena){
     let ok = false;
     try{
       if(s.t.tipo === 'creep' && s.t.fichaId && soyGM){ await danioCreep(s.t, String(s.dano), true); ok = true; }
-      else if(s.t.tipo === 'pj' && s.t.fichaId && !String(s.t.fichaId).includes(SEP_INVOCACION) && puedoMover(s.t)){ await danioPj(s.t, String(s.dano), true); ok = true; }
+      // Personajes e invocaciones: el GM también (como el daño del duelo, que su mapa aplica a cualquiera); antes solo los propios (2026-10-05).
+      else if(s.t.tipo === 'pj' && s.t.fichaId && (soyGM || puedoMover(s.t))){
+        if(String(s.t.fichaId).includes(SEP_INVOCACION)) await danioInv(s.t, String(s.dano), true); else await danioPj(s.t, String(s.dano), true);
+        ok = true;
+      }
     }catch(err){ console.error('No se pudo aplicar el salto del rayo:', err); }
     (ok ? hechos : manual).push(`${nombre}: ${s.dano}`);
   }

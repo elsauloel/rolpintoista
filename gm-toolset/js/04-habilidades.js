@@ -117,9 +117,12 @@ function textoBusquedaDeGM(item){
 function equipoItemHtml(item, idx){
   const esArma = String(item.tipoItem).startsWith('arma_');
   const esCons = item.tipoItem === 'consumibles';
-  const statTxt = esArma
+  const esp = item.especial;   // ✨ una varita: su hechizo, no un daño físico (decía «Daño 1d0»)
+  const statTxt = esp
+    ? `✨ ${esp.dano ? `${esc(esp.dano)}${esp.sumaEspecial === true ? ' + Ef.Esp' : num(esp.sumaEspecial) ? ' + ½ Ef.Esp' : ''}` : 'sin daño'} · ${num(esp.no2 ?? 1)} No2 · espera ${CreepAcciones.ESPERA_POR_SP(num(esp.sp))}`
+    : esArma
     ? `Daño ${Math.max(1,item.peso)}d${item.tipoDado}${item.danoFijo?` +${item.danoFijo}`:''}`
-    : (esCons ? (item.curahp ? `Cura ${fmt(item.curahp)} HP` : 'Consumible') : `Defensa +${item.def}`);
+    : (esCons ? (item.curahp ? `Cura ${fmt(item.curahp)} HP` : 'Consumible') : item.orbe ? '🔮 Orbe (al usar una varita)' : `Defensa +${item.def}`);
   const tierColor = TIER_COLOR[item.tier] || TIER_COLOR['Común'];
   const modsHtml = modsResumenHtmlGM(item.mods);
   return `<div class="cat-row cat-card">

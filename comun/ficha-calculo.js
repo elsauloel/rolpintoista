@@ -109,6 +109,10 @@ const FichaCalculo = (() => {
     {id:'trampaoculta', label:'Trampas mejor escondidas', full:'Suma a la dificultad para detectar las trampas que colocás'},
     {id:'ahorroespsp', label:'Primer conjuro', full:'SP de menos que cuesta el primer uso de un arma especial en el turno'},
     {id:'venenista', label:'Envenenador', full:'Stacks de más en los venenos que ponés: cada stack es un turno más y 1 de daño más por turno'},
+    // Torso blando de Buena calidad (2026-10-06, dueño).
+    {id:'defprimer', label:'Defensa contra el primer golpe', full:'Defensa extra contra el primer golpe que recibís en cada turno'},
+    {id:'defdist', label:'Defensa contra armas a distancia', full:'Defensa extra contra los golpes de armas a distancia'},
+    {id:'pagarhp', label:'Pagar con vida', full:'Con un arma especial, elegís cada vez si pagás el SP con SP o con vida (1 HP por SP)'},
     {id:'retirada', label:'Retirada limpia (%)', full:'Chance (en %) de alejarte de un rival sin darle ataque de oportunidad: 33 = 5–6 en d6, 50 = 4–6, 100 = siempre'},
     // Resistencias elementales (2026-10-04, dueño): cada una se resta al daño de su elemento (además de la Armadura mágica). Situacionales: pesan poco.
     {id:'resfuego', label:'Res. fuego', full:'Resistencia al fuego: se resta a todo daño de fuego'},

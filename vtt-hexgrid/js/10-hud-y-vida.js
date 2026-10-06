@@ -143,11 +143,17 @@ function golpeTexto(nombre, golpe, r, previo, nuevo){
 // que ignora la Defensa (dueloAplicarDano); todo lo demás (críticos, trampas,
 // fuego, Rayo en cadena) sigue ignorando la Defensa entera, sin cambios.
 // restaExtra (2026-10-04): lo que se resta además (la resistencia al elemento del daño), con o sin Defensa.
-async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra){
+/* La Defensa extra de una pieza (torso blando, 2026-10-06): contra el primer golpe que recibe en el turno (`defprimer`; la marca vive en lo que vacía
+   el Mantenimiento) y contra armas a distancia (`defdist`, con `o.distancia`). Solo cuando la Defensa cuenta (no en un crítico ni en lo que la ignora). */
+const defExtra = (ignoraDef, primero, valor, o) => ignoraDef ? 0 : (primero ? Math.max(0, num(valor('defprimer'))) : 0) + (o && o.distancia ? Math.max(0, num(valor('defdist'))) : 0);
+async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const golpe = leerGolpe(texto);
   if(golpe === null) throw new Error(ERROR_TIPEO);
   const res = await modificarCreep(t.fichaId, sc => {
-    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : creepDefensaMapa(sc)) + num(restaExtra || 0), sc.estados);
+    const primero = !num((sc.usosEspecial || {})._golpe);
+    sc.usosEspecial = {...(sc.usosEspecial || {}), _golpe: 1};   // (se vacía en su Mantenimiento)
+    const extra = defExtra(ignoraDef, primero, st => CreepCalculo.modTotal(sc, st), o);
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : creepDefensaMapa(sc) + extra) + num(restaExtra || 0), sc.estados);
     const previo = num(sc.hp);
     sc.hp = Math.max(0, previo - r.recibido);
     return {r, previo, nuevo: sc.hp};
@@ -156,7 +162,7 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra){
   return res;
 }
 
-async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra){
+async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const golpe = leerGolpe(texto);
   if(golpe === null) throw new Error(ERROR_TIPEO);
   const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}`));
@@ -168,7 +174,10 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra){
     const datos = JSON.parse(parte.data().json || '{}');
     const rs = ficha.data().resumen || {};
     if(rs.def === undefined) throw new Error('SIN_DEF');
-    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : num(rs.def)) + num(restaExtra || 0), datos.efectos);
+    const primero = !num((datos.ataquesArma || {})._golpe);
+    datos.ataquesArma = {...(datos.ataquesArma || {}), _golpe: 1};   // (el Mantenimiento la vacía)
+    const extra = defExtra(ignoraDef, primero, st => rs[st], o);
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : num(rs.def) + extra) + num(restaExtra || 0), datos.efectos);
     const previo = num(datos.hp);
     datos.hp = Math.max(0, previo - r.recibido);
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
@@ -189,7 +198,7 @@ async function invDeToken(t){
   return (JSON.parse(parte.data().json || '{}').invocaciones || []).find(i => i && i.id === invId) || null;
 }
 const defensasDeInv = inv => { const x = InvCalculo.migrar(structuredClone(inv)); return {def: InvCalculo.defensaEfectiva(x), armadmg: Math.max(0, num(InvCalculo.statValor(x, 'armadmg')))}; };
-async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra){
+async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const golpe = leerGolpe(texto);
   if(golpe === null) throw new Error(ERROR_TIPEO);
   const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
@@ -203,7 +212,10 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra){
     const inv = (datos.invocaciones || []).find(i => i && i.id === invId);
     if(!inv) throw new Error('La invocación ya no existe');
     if(!Array.isArray(inv.estados)) inv.estados = [];
-    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : defensasDeInv(inv).def) + num(restaExtra || 0), inv.estados);
+    const primero = !num(inv.golpeTurno);
+    inv.golpeTurno = 1;   // (el Mantenimiento la vacía)
+    const extra = defExtra(ignoraDef, primero, st => FichaResumen.invModTotal(inv, st), o);
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : defensasDeInv(inv).def + extra) + num(restaExtra || 0), inv.estados);
     const previo = num(inv.hp);
     inv.hp = Math.max(0, previo - r.recibido);
     const rs = ficha.data().resumen || {};

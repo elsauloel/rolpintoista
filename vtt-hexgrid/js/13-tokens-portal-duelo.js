@@ -932,8 +932,9 @@ async function dueloAplicarDano(d){
     catch(err){ console.error('No se pudo pedir el desgaste del ítem:', err); }
   }
   try{
-    const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando, resEl)
-      : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando, resEl) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando, resEl);
+    const oD = {distancia: !!(d.ataque && d.ataque.rango)};   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
+    const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD)
+      : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD);
     const espinas = res.r.invulnerable ? null : await dueloEspinas(d, golpe);   // el daño inflictido (con el multiplicador del crítico), antes de la Defensa
     // Daño mágico del arma (rayo / hielo): aparte, después del golpe — ignora la Defensa (resta la Armadura mágica) y no se multiplica.
     let magico = null;

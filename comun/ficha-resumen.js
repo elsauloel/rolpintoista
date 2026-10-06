@@ -96,7 +96,8 @@ const FichaResumen = (() => {
       rangocasteo: n(c.final.rangocasteo),   // Rango de casteo (de Especial): visualizador de rango mágico (🔮)
       luz: n(c.final.luz), veoculto: n(c.final.veoculto),   // luz que lleva encima y radio en el que ve lo oculto: el mapa los lee (farol, bengala, yelmo del ojo que todo lo ve)
       vision: n(c.final.vision),
-      venenista: n(c.final.venenista),   // Guantes del envenenador (2026-10-05): el mapa le suma esos stacks a los venenos que pone en el duelo
+      venenista: n(c.final.venenista),
+      defprimer: n(c.final.defprimer), defdist: n(c.final.defdist),   // torso blando (2026-10-06): el mapa los suma a la Defensa al aplicar el daño   // Guantes del envenenador (2026-10-05): el mapa le suma esos stacks a los venenos que pone en el duelo
       pasosGratis: n(c.final.pasosgratis),
       retirada: n(c.final.retirada),   // Retirada limpia (%): el mapa la tira al alejarse de un rival (js/17)
       // Los pies (2026-10-04): el mapa las tira (js/08, js/19, js/21); Pasos de baile la lee el duelo.

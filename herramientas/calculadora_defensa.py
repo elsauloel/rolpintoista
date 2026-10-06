@@ -58,6 +58,10 @@ COSTO = {
     # oportunidad o el contraataque (el 50 % de una rebaja de No2 a secas: 2 por No2); soltarse y trampas escondidas, muy circunstanciales.
     'pdgt4': 1, 'pdgt6': 1, 'pdgt8': 1, 'pdgt10': 1, 'pdgdist': 1, 'oporahorro': 2, 'contraahorro': 2,
     'soltarse': 0.25, 'trampaoculta': 0.125, 'ahorroespsp': 0.75, 'venenista': 2,
+    # Torso blando de Buena calidad (dueño, 2026-10-06): +SP máximo 0,75 por punto (vale para casters); Defensa contra el primer golpe del turno
+    # 0,75 por punto (casi siempre cuenta, pero una vez); contra armas a distancia 0,5 por punto (la mitad: solo un tipo de ataque); pagar el SP de
+    # un arma especial con vida, 2.
+    'sp': 0.75, 'defprimer': 0.75, 'defdist': 0.5, 'pagarhp': 2,
     'spregen': 2,   # SP Regen +1 (dueño, 2026-10-05): como la Evasión — rinde todos los turnos; vive solo en la cabeza (escasez controlada)
     'inamovible': 0, 'recuperarse': 0, 'reflejos': 0,
 }

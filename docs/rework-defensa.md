@@ -893,6 +893,14 @@ blandas Buena 4** (Común 3), rígidas Buena 6. La Armadura mágica sigue siendo
 | Delantal de boticario de oficio ⚙ | Defensa +2 · cada poción cura 1 más · +1 ranura. |
 | Capa del explorador ⚙ | Defensa +2 · Visión +2 · Percepción +2 · Res. hielo +2. |
 | Abrigo de piel de oso ⚙ | Defensa +3 · Vida +5 · Res. hielo +2. |
-| ✋ Abrigo de bolsillos ocultos | Defensa +2 · lo que guardás en un bolsillo no lo encuentra quien te revisa (a mano). |
 
-**Filtro del dueño, torso blando (2026-10-06, en curso):** se quita el Traje de camuflaje.
+**Filtro del dueño, torso blando (2026-10-06):** se quitan el Traje de camuflaje y el Abrigo de bolsillos ocultos; «resto ok» (con el tope de Defensa 4).
+
+**Torso blando Buena calidad: cargado (2026-10-06).** 18 armaduras (reemplazan a las 10 viejas que no eran «solo botín»; 3 conservan nombre, id
+y narrativa). Las «solo botín» de los creeps (Pieles del berserker, Cota del cazarrecompensas…) no se tocaron. Tope de Defensa 4. Costos nuevos en
+la calculadora: SP máximo 0,75 · Defensa contra el primer golpe 0,75 · contra armas a distancia 0,5 · pagar con vida 2. **Mecánicas nuevas:**
+`defprimer` (el mapa la suma al primer golpe de cada turno; la marca vive en lo que vacía el Mantenimiento), `defdist` (el duelo avisa si el
+golpe es de un arma a distancia) y `pagarhp` (Túnica de sangre: «¿con SP o con vida?» al usar un arma especial). Espinas y Regeneración, como
+estado al equipar. Precios 170–200 (bolsa 7).
+**Pendiente:** el equipo de los creeps base (`EQUIPO_CREEP` en `comun/creeps-base.js`) es una copia de los valores de cuando se generó: regenerarlo
+con `herramientas/generar_equipo_creeps.py` cuando el catálogo defensivo de Buena calidad esté completo (hoy siguen con las piezas viejas).

@@ -97,6 +97,7 @@ const FichaMantenimiento = (() => {
       // Nitros se recargan al máximo, igual que el propio personaje.
       inv.nitros = InvCalculo.nitrosMax(inv);
       inv.ataquesTurno = 0;
+      inv.golpeTurno = 0;   // la Defensa contra el primer golpe vuelve a valer (2026-10-06)
       inv.habilidades.forEach(h => { if(num(h.cdActual) > 0) h.cdActual = Math.max(0, num(h.cdActual) - 1); });
       // Estados alterados de la invocación: la MISMA regla que el personaje y los creeps (comun/combatiente.js).
       const turnoInv = Combatiente.pasarTurnoEstados(inv.estados, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(InvCalculo.statValor(inv, 'resfuego'))});

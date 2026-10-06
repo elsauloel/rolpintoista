@@ -619,17 +619,30 @@ const FichaAcciones = (() => {
     const it = habDeArmaEspecial(S, item), c = costoEspecial(S, item);
     const confirmar = ui.confirmar || (t => typeof confirm === 'function' && confirm(t));
     let no2 = c.no2, sp = c.sp;
+    // Túnica de sangre (2026-10-06): con «pagar con vida», cada vez se elige si el SP sale de la vida (1 HP por SP). La elección viaja como
+    // sinSp === 'vida' (si hay que confirmar los No2 y se vuelve a llamar, no se pregunta ni se cobra dos veces); la vida se cobra al pagar.
+    let conVida = sinSp === 'vida';
+    if(!conVida && sp > 0 && !sinSp && num(FichaCalculo.calcular(S).final.pagarhp) > 0){
+      conVida = !!(await confirmar(`${it.nombre}: ¿pagás los ${fmt(sp)} SP con vida (${fmt(sp)} HP)?\n\nAceptar: con vida · Cancelar: con SP`));
+      if(conVida) sinSp = 'vida';
+    }
+    const hpVida = conVida ? sp : 0;
+    if(conVida) sp = 0;
     if(sp > spDisponible(S) && !sinSp){
       if(!(await confirmar(`Te falta SP: ${it.nombre} cuesta ${fmt(sp)} SP y tenés ${fmt(spDisponible(S))}. ¿La pagás con No2? (${fmt(no2 + sp)} No2 en vez de ${fmt(no2)} No2 + ${fmt(sp)} SP)`))) return;
       return usarArmaEspecial(S, itemId, forzar, ui, true);
     }
-    if(sinSp){ no2 += sp; sp = 0; }
+    if(sinSp === true){ no2 += sp; sp = 0; }
     if(no2 > num(S.nitros) && !forzar){
       ui.avisarSinNitros(no2, `usar ${it.nombre}`, () => usarArmaEspecial(S, itemId, true, ui, sinSp));
       return;
     }
     S.nitros = num(S.nitros) - (forzar && no2 > num(S.nitros) ? gastoNitrosForzado(S, no2, `usó ${it.nombre}`) : no2);
     S.spGastado = num(S.spGastado) + sp;
+    if(hpVida){   // la Túnica de sangre: el SP, con vida
+      if(ui.fijarHp) ui.fijarHp(num(S.hp) - hpVida); else S.hp = Math.max(0, num(S.hp) - hpVida);
+      ui.mesaHabilidad(it.nombre, `🩸 pagó ${fmt(hpVida)} SP con vida (−${fmt(hpVida)} HP).`);
+    }
     S.ataquesArma = {...(S.ataquesArma || {}), [claveEsp(item)]: c.usos + 1};
     const doble = orbesAlUsar(S, item, it, ui);   // los orbes de la otra mano (resguardo, salvaje)
     if(doble) it.tiradaExtra = String(it.tiradaExtra || '').replace(/(\d+)d(\d+)/g, (m, n, k) => `${2 * num(n)}d${k}`);
@@ -644,7 +657,7 @@ const FichaAcciones = (() => {
     ui.terminar(it, null, 0, 0);
     aManoAlUsar(it.nombre, item.especial, ui);
     ui.cambio(['nitros', 'vitals', 'habilidades', 'efectos']);
-    ui.toast(`${it.nombre}: −${fmt(no2)} No2${sp ? ` · −${fmt(sp)} SP` : ''}${sinSp ? ' (sin SP: pagado con No2)' : ''}`);
+    ui.toast(`${it.nombre}: −${fmt(no2)} No2${sp ? ` · −${fmt(sp)} SP` : ''}${hpVida ? ` · −${fmt(hpVida)} HP (con vida)` : sinSp === true ? ' (sin SP: pagado con No2)' : ''}`);
   }
 
   // El costo X ya elegido en el cartel (sp y nitros): valida, cobra y sigue como Ejecutar. Devuelve true si se ejecutó.

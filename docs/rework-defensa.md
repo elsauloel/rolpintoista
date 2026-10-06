@@ -1246,3 +1246,8 @@ ranuras son la razón de ser del cinturón; Saque rápido, Mano de boticario, Po
 | Faja de tela ignífuga · 0 · 50 | Res. fuego +2 · Ranuras +1 |
 | 🔧 Bolsillo de emergencia · 0 · 50 | Al bajar del 25 % de la vida, se toma sola una poción de curación del cinturón, una vez por combate (como el Ankh) |
 | 🔧 Bolsa del carroñero · 0 · 50 | +2 despojos cuando despojás un creep · Ranuras +1 |
+
+**Respuestas del dueño a la v1 (2026-10-06):** salen el **Cinturón de guardia de puerta** y la **Faja de luchador** («no deben existir»: un cinturón
+no puede ser solo Defensa o solo resistencias; lo suyo son las ranuras y sus mecánicas). La **Bolsa del carroñero** está mal planteada: uno no
+despoja un creep, convierte un objeto en despojos (un cuarto de su precio; hoy lo hace solo el cierre del botín con lo que nadie tomó, y se
+reparte) → propuesta: sacarla, o cambiarla por algo de la venta en la tienda (a decidir).

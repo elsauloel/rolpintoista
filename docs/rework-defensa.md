@@ -1373,3 +1373,6 @@ si el stat entero no entra, vale una vez por combate, en un momento puntual o en
 | 🔧 Sangre limpia / Superlinfocitos / Vigor | El Veneno / el Sangrado / Cansado y Exhausto te duran 1 turno menos (≈ 0,75) |
 | 🔧 Armadura indestructible | Una vez por combate, la pieza que se iba a gastar no se gasta (≈ 0,75) |
 | — Inmutabilidad, Mente certera, Pólvora Mansa, Pies Veloces, los combinados | No tienen versión Común razonable: quedan para calidades más altas |
+
+**Respuestas del dueño a las lluvias de anillos (2026-10-06, primera tanda):** **Moneda en el dedo** (una Moneda Re-Roll por combate): le gusta,
+**desde Buena calidad y caro**. **Anillo de canalización** (la primera habilidad del turno cuesta 1 SP menos): **Buena calidad**. Sigue leyendo.

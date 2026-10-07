@@ -1634,6 +1634,7 @@ levanta a un caído). Peso 1 por cada +1 (como Vida +5).
 | Cabeza Buena ✅ (2026-10-07) | 21 / 11 (antes 25 / 0) | 13 / 8 / 2 de 25 · res. 🔥2 ☠3 |
 | Manos Buena ✅ (2026-10-07) | 15 / 6 (antes 17 / 0) | 13 / 5 / 2 de 32 · res. 🔥2 ⚡3 |
 | Piernas Buena ✅ (2026-10-07) | 13 / 6 (antes 13 / 0) | 10 / 4 / 2 de 22 · res. 🔥1 ❄3 |
+| Pies Buena ✅ (2026-10-07) | 12 / 6 (antes 11 / 0) | 8 / 5 / 1 de 22 · res. ☠3 🧪3 |
 
 **Fuego de más (dueño, 2026-10-07, «lo vemos al final»):** el fuego entra en tres slots (cabeza, manos, piernas), como el hielo (torso,
 piernas, escudo); los demás, en dos. En Común quedó 🔥14 contra ❄8 ⚡6 ☠6 🧪8 (la cabeza sola, 🔥6). Propuesta para el final de la revisión:
@@ -1723,3 +1724,10 @@ afuera, lampalagua adentro). Nuevas: Guanteletes del herrero rúnico (Defensa +1
 Piernas Buena: Calzas de bordado rúnico (Res.Mt +2 → Def. especial +1); Polainas tachonadas de taller híbridas 1/1. Nuevas: Grebas de bronce con
 runas (Defensa +1 · Def. especial +2 · Res.CC +1; hacen juego con la coraza y el yelmo de bronce con runas) y Chiripá bordado del payador (Def.
 especial +2 · Res.Mt +2; sin resistencias, para no sumar más fuego).
+
+Pies Buena: Babuchas del meditador (Res.Mt +2 → Def. especial +1); Sandalias del peregrino (Res.Esp +2 → Res.Esp +1 · Def. especial +1);
+Zapatillas de levitación (seda con runas: Resistente ×6 → ×2 + Def. especial +1, durabilidad 9 → 5). Nuevas: Botas de piel de yacaré (Defensa +1
+· Def. especial +1 · Res. ácido +1 · Res. tóxico +1) y Alpargatas del santero (Def. especial +2 · Res.Mt +1).
+
+**Ningún escudo de metal da Res. eléctrica (dueño, 2026-10-07, por color: el metal conduce).** Se cambió el material, no los números: Escudo del
+templo (cobre) → Escudo de algarrobo del templo (Común); Escudo de bronce del monasterio → Escudo de lenga del monasterio (Buena).

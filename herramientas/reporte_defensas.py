@@ -11,7 +11,7 @@ Uso:
   python reporte_defensas.py Común           # una calidad
   python reporte_defensas.py Común cabeza    # una calidad y un slot
 """
-import sys, pathlib, collections
+import re, sys, pathlib, collections
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from catalogo_comun import leer_catalogo
 import calculadora_defensa as cd
@@ -23,6 +23,8 @@ PERMITIDAS = {'cabeza': {'resfuego', 'restoxico'}, 'torso': {'reshielo', 'resaci
               'piernas': {'resfuego', 'reshielo'}, 'pies': {'restoxico', 'resacido'}, 'escudo': {'reshielo', 'resrayo'},
               'escudo a 2 manos': {'reshielo', 'resrayo'}, 'cinturón': set(), 'mochila': set(),
               'orbe': {'resfuego', 'reshielo', 'resrayo', 'restoxico', 'resacido'}}   # los orbes, cualquiera: el comodín para balancear (dueño, 2026-10-07)
+# Ningún escudo de metal da Res. eléctrica (dueño, 2026-10-07, por color: el metal conduce). Se detecta por el nombre y la descripción.
+METAL = re.compile(r'\b(hierro|acero|bronce|cobre|metal|chapa|lat[oó]n|plomo|esta[ñn]o)\b', re.I)
 TOPE_RES = {'Común': 1, 'Buena Calidad': 2}
 TIERS = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario']
 
@@ -50,6 +52,8 @@ def reporte(tier=None, slot=None):
         for st, _ in ELEM:
             v = max(0, mod(it, st)); f[st] += v
             if v and s in PERMITIDAS and st not in PERMITIDAS[s]: FUERA.append(f'{it["nombre"]} ({it.get("tier")}, {s}): {st[3:]} no va en este slot')
+            if v and st == 'resrayo' and s.startswith('escudo') and METAL.search(it['nombre'] + ' ' + it.get('descripcionNarrativa', '')):
+                FUERA.append(f'{it["nombre"]} ({it.get("tier")}): escudo de metal con Res. eléctrica (el metal conduce)')
             if v > TOPE_RES.get(it.get('tier'), 99): FUERA.append(f'{it["nombre"]} ({it.get("tier")}): {st[3:]} +{v} pasa el tope de su calidad')
     return filas
 FUERA = []

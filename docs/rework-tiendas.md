@@ -107,3 +107,21 @@ receta del Bazar como cualquier pieza (con su calidad); «Inicio de partida» se
 4. ¿Recetas por parte del cuerpo con esos cupos y garantías?
 5. ¿Escasez por etiqueta con esos topes?
 6. ¿Stock limitado (Buena y Rara, 1 unidad)?
+
+## Respuestas del dueño a la v1 (2026-10-06)
+«En líneas generales estoy de acuerdo.» 1 ✅ el bazar es el Bazar arcano · 2 ✅ armas a distancia y consumibles sin revisar quedan publicados por
+ahora · 3 ✅ nivel de la zona + la tabla · 4 ✅ recetas, **pero sin garantizar todos los slots defensivos: garantizar una VARIEDAD de partes**
+(«por ejemplo 3 distintas en un pueblito, pero nunca sabés cuáles») · 5 ✅ escasez por etiqueta · 6 ✅ stock limitado · simulador ✅.
+Observaciones:
+- **Reposición**: si se compra una pieza limitada, la tienda la reemplaza por otra de la misma calidad («que todos tengan chance de llegar a alguna»).
+- **«Toca toca, la suerte es loca»**: le gustaba que siempre pudiera salir algo Raro o Excepcional en cualquier slot, con un % bajo. Mantenerlo.
+- **¿En qué contexto aparecen Excepcional y Legendario?** (pregunta abierta).
+
+### Cómo se incorpora (v2, etapa 1 en construcción)
+- **Variedad garantizada**: partes defensivas distintas (de torso, escudo, cabeza, manos, piernas, pies, cinturón, mochila) por tamaño: ambulante 2 ·
+  pueblito 3 · aldea 5 · ciudad 7 · capital 8; en el Herrero, familias de armas distintas (T4/T6/T8/T10): 2 · 3 · 4 · 4 · 4. Al azar cuáles.
+- **Golpe de suerte**: cada lugar, después de tirar su calidad, tiene 4 % de subir un escalón y 0,5 % de subir dos, sin importar el techo del
+  tamaño (si en esa parte no hay nada publicado de esa calidad, cae a la más cercana). Es la única vía de Excepcional y Legendario en tienda.
+- **Reposición (etapa 2, propuesta)**: el comprado se reemplaza por otro de la misma calidad **y la misma parte** (la tienda conserva su forma),
+  con una **reserva** de reposiciones por tamaño (ambulante 1 · pueblito 2 · aldea 4 · ciudad 6 · capital 10): comprar y revender a mitad de precio
+  no se convierte en un sorteo infinito.

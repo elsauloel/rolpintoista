@@ -1797,6 +1797,16 @@ que sume el Ef.Esp del personaje choca con la Defensa especial.** Dueño: «eso 
   que se ve (Res. eléctrica, ⚡ Relámpago en cadena). Falta: las trampas especiales sin elemento (la Runa arcana) todavía no restan la Defensa
   especial; los nombres de habilidades de creeps con «rayo» (algunos son relámpagos) quedan para el rework de creeps.
 
+**Más del dueño (2026-10-07):**
+- **Tipos de daño especial: arcano y los elementos** (fuego, hielo, eléctrico, tóxico; el ácido no se nombró: a confirmar). **El arcano no tiene
+  resistencia elemental**: el arcano directo es casi True Damage; el arcano que suma Ef.Esp sí resta la Defensa especial. El **arcano directo
+  tiene menos barreras que el elemental directo** (que choca con su Res.): un poco más valioso.
+- **Las habilidades ya cargadas («los scripts») no son referencia**: se diseñaron mucho antes; se usan a ojo del GM hasta que pasen por el filtro
+  de diseño.
+- **Escudo especial y Excedente de vida → «Vida extra»** (los dos).
+- **Orden:** 1) la calculadora · 2) el catálogo defensivo (por material) · 3) las armas especiales, con paridad según la proporción y
+  disponibilidad del catálogo defensivo · 4) el Bazar.
+
 **Lo que ya existe y sirve:** el stat `armadmg` («Armadura mágica»: un número fijo que se resta al daño de casteo, para personajes, creeps e
 invocaciones, ya restado en el mapa) — hoy ningún ítem del catálogo lo da. Propuesta: **es la misma pieza con otro nombre**, Defensa especial,
 y deja de ser escasa.

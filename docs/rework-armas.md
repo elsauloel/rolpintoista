@@ -1925,8 +1925,10 @@ Con la calculadora recalibrada (varitas directas con dado fijo, báculos con ¼ 
   de lava, el fuego que deja la Bola de fuego y el Campo de estática, del **piso**.
 - **Aceite y arena movediza como las trampas** (dueño: «si entra, en Común; si no, en Buena»): el aceite ya está (Varita del aceite, Común, 1 SP);
   la **Varita de arena movediza** entra en Común: flor de 2 turnos como la trampa (Inmovilizado al entrar; salir cuesta No2), 2 SP, 65 DDE.
-- **A confirmar:** Ráfaga helada (propuesta: 1d4, 17 % de Escarcha y empuja 1, 3 SP, 110 DDE) · Portal de un solo portal (propuesta: 2 SP) ·
-  Sanguijuela que drena vida (1d6, te curás la mitad; 2 SP) · Cosecha con +2 de vida (3 SP, 100 DDE).
+- **Segunda vuelta (dueño, 2026-10-07):** **Ráfaga helada** sin Escarcha y empuja 2: frente de 3×3, 1d4 de hielo, empuja 2 (4 SP, 130 DDE) ·
+  **Sanguijuela** ✅ drena vida: 1d6 y te curás la mitad (2 SP, 80 DDE) · **Cosecha**: la marca dura **3 turnos**; si muere marcado, 2 SP y 2 de
+  vida (3 SP, 120 DDE) · **Campo de estática: 1 turno** (3 SP, 90 DDE) · **Portal** de un solo portal: a confirmar la distancia (y 2 SP) ·
+  **Arena movediza**: «flor de radio 2 es muy grande» → aclarar (la propuesta era la flor chica, radio 1).
 
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 

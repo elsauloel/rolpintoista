@@ -216,13 +216,13 @@ BUENA = [
     {'nombre': 'Varita de la flor de chispas: flor, 1d4 de rayo y 10 % Parálisis a cada uno', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'efectos': {'Parálisis': .10}, 'directo': True},
     {'nombre': 'Varita láser larga: rayo en línea de 6, 1d8 al primero y 1 menos a cada uno de los siguientes', 'clase': 'arcano', 'dado': '1d7', 'forma': 'linea4', 'directo': True},
     {'nombre': 'Varita de la bola de fuego mayor: flor grande (radio 2), 1d4 de fuego; el fuego queda 1 turno', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor2', 'terreno': ('Daño 1', 1), 'directo': True},
-    {'nombre': 'Varita de la ráfaga helada: frente de 3×3, 1d2 de hielo, empuja 2', 'clase': 'elemental', 'dado': '1d2', 'forma': 'flor1', 'efectos': {'Empuje': 1.67}, 'directo': True},
+    {'nombre': 'Varita de la ráfaga helada: frente de 3×3, 1d4 de hielo, empuja 2', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'efectos': {'Empuje': 1.67}, 'directo': True},
     {'nombre': 'Varita de la lluvia de cascotes: flor física T10, 1d6 + 3 − Defensa a cada uno (critica), 25 % Sentado', 'clase': 'fisico', 'dado': '1d6', 'fuerza': 3, 'forma': 'flor1', 'efectos': {'Sentado': .25}},
     {'nombre': 'Varita de la ponzoña: PdG.Esp contra Res.Esp; 1d4 tóxico y Veneno', 'clase': 'toxico', 'dado': '1d4', 'efectos': {'Envenenar': 1.0}, 'esquive': 'resesp', 'directo': True},
     {'nombre': 'Varita del chorro de lava: camino libre de 4 (cada casilla pegada a la anterior; la primera a 1/3 de tu Rango de casteo), 1d4 de fuego a todos; arde 2 turnos', 'clase': 'elemental', 'dado': '1d4', 'forma': 'linea4', 'terreno': ('Daño 1d4', 2), 'directo': True},
     {'nombre': 'Varita inestable: 2d6 arcano; si sale algún 1 (31 %), te hacés 2d4', 'clase': 'arcano', 'dado': '2d6', 'sp': 2, 'efectos': {'Daño 1': -0.31 * 5}, 'directo': True},   # dueño, 2026-10-07: 2 SP con el riesgo de 2d4
     # — terreno y espacio —
-    {'nombre': 'Varita del campo de estática: aparece bajo los pies (flor, no se esquiva) y pega 1d4 eléctrico y 10 % Parálisis a cada uno; queda 2 turnos: 1d4 eléctrico y 10 % Parálisis por cada paso adentro (del piso)', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'esquive': 'no', 'efectos': {'Parálisis': .10}, 'terreno': ('Estática', 2), 'directo': True},   # dueño, 2026-10-07: «muy leve» → no se esquiva y pega al aparecer
+    {'nombre': 'Varita del campo de estática: aparece bajo los pies (flor, no se esquiva) y pega 1d4 eléctrico y 10 % Parálisis a cada uno; queda 1 turno: 1d4 eléctrico y 10 % Parálisis por cada paso adentro (del piso)', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'esquive': 'no', 'efectos': {'Parálisis': .10}, 'terreno': ('Estática', 1), 'directo': True},   # dueño: 1 turno (3 SP)   # dueño, 2026-10-07: «muy leve» → no se esquiva y pega al aparecer
     {'nombre': 'Varita del muro de fuego: línea de 3, 3 turnos, 1d4 de fuego al entrar o seguir (piso y aire)', 'clase': 'elemental', 'terreno': ('Daño 1d4', 3), 'forma': 'linea', 'directo': True},
     {'nombre': 'Varita del muro: muro de 3 casillas en línea, 3 turnos', 'clase': 'arcano', 'terreno': ('Muro', 3), 'forma': 'linea', 'sp': 2},   # dueño: 2 SP
     {'nombre': 'Varita del vendaval: cono que empuja 2 a todos; apaga el fuego y despeja la niebla que toca', 'clase': 'arcano', 'forma': 'cono', 'efectos': {'Empuje': 1.67}},
@@ -236,8 +236,8 @@ BUENA = [
     {'nombre': 'Varita de raíces: brotan en su casilla, 1d4, 33 % Inmovilizado', 'clase': 'arcano', 'dado': '1d4', 'efectos': {'Inmovilizado': 1 / 3}, 'esquive': 'dodge', 'directo': True},
     {'nombre': 'Varita de la grieta: 1d6 y −2 Defensa 2 turnos', 'clase': 'arcano', 'dado': '1d6', 'efectos': {'-2 Def': 2}, 'directo': True},
     # Maleficio (−1 a la Res. crítico de un tipo a elección, 2 turnos, no acumulable): EN ESPERA hasta los grupos de buffs y debuffs (dueño, 2026-10-07)
-    {'nombre': 'Varita sanguijuela: 1d6 y le sacás 1 SP (lo recuperás vos)', 'clase': 'arcano', 'dado': '1d6', 'efectos': {'Drena SP': 1}, 'directo': True},
-    {'nombre': 'Varita de la cosecha: 1d6 y lo marca 2 turnos; si muere marcado, recuperás 2 SP', 'clase': 'arcano', 'dado': '1d6', 'efectos': {'Marca': 2, 'SP de vuelta': .5}, 'directo': True},
+    {'nombre': 'Varita sanguijuela: 1d6 y te curás la mitad de lo que hizo (para arriba)', 'clase': 'arcano', 'dado': '1d6', 'efectos': {'Cura': 1.75}, 'directo': True},   # dueño: drena vida, no SP (los creeps no usan SP)
+    {'nombre': 'Varita de la cosecha: 1d6 y lo marca 3 turnos; si muere marcado, recuperás 2 SP y 2 de vida', 'clase': 'arcano', 'dado': '1d6', 'efectos': {'Marca': 3, 'SP de vuelta': .5, 'Cura': 1}, 'directo': True},   # dueño: +2 de vida y 3 turnos
     # — apoyo —
     {'nombre': 'Varita de cura mayor: 2d8 a un aliado', 'clase': 'arcano', 'efectos': {'Cura': 9}},
     # Varita del escudo: sacada (dueño, 2026-10-07: la Vida extra se acumula y a fines prácticos es poco más que una cura)

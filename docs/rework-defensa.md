@@ -1477,7 +1477,7 @@ aliado) y Absorción (+1 SP el primer golpe mágico, el segundo no). Parada fác
 **Buena calidad queda completa** salvo los anillos (para el final). Falta rehacer el equipo de los creeps con las piezas nuevas
 (`herramientas/generar_equipo_creeps.py`) y medir la acumulación con el equipo completo.
 
-## Res. crítico Tipo 8 en Buena calidad — propuesta (2026-10-07, ⬜ a revisar por el dueño)
+## Res. crítico Tipo 8 en Buena calidad (2026-10-07, ✅ aprobada y cargada)
 Dueño: «sumemos piezas de Tipo 8 en Buena calidad» (hoy hay 4 entre 923 publicados y casi nunca salen en una tienda; la tienda igual limita cuántas
 juntas). Tipo 8 vale 3 puntos: entra +1 por pieza. Calculadora: todas en su bolsa.
 

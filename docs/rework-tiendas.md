@@ -162,3 +162,6 @@ el cartel del GM muestra vendidas y repuestas. **Reglas nuevas de Firestore** (`
   de 9 piezas en `rework-defensa.md`, ⬜ a revisar.
 - **Crítico propio de las armas**: ✅ hecho — no cuenta para la escasez **solo en las armas de Tipo 4** (28 armas); el de las armas de otros Tipos y el
   de todo lo que no es arma, sí (21 ítems). La Iniciativa de las armas sigue contando.
+- **✅ Las 9 piezas de Tipo 8 cargadas** (13 en total). Chance de que una tienda traiga al menos una (nivel 1 / 3 / 5), simulada: Herrero ambulante
+  11/16/15 % · pueblito 21/45/60 % · aldea 31/61/78 % · ciudad 51/79/88 % · capital 71/97/100 %; Ramos ambulante 5/10/18 % · pueblito 9/37/47 % ·
+  aldea 22/55/62 % · ciudad 36/67/80 % · capital 55/88/94 %. En nivel 1 sale menos porque son de Buena calidad (y solo una Común).

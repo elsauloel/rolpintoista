@@ -1762,6 +1762,12 @@ Ojo con las «firmas» de ahorro (primer uso −1 SP, el No2 que no sube): qued�
     «1d6 de rayo», ⚡ Rayo en cadena) — a decidir cómo se renombra.
     **Dueño (2026-10-07): «relámpago va a ser igual que un proyectil»** (Evasión, sin dodge). El nombre del elemento queda pendiente (propuesta:
     «eléctrico» en lo que se ve; los ids internos no cambian).
+  - **Decidido (dueño, 2026-10-07):** el elemento pasa a llamarse **«eléctrico»** en lo que se ve (Res. eléctrica, 1d6 eléctrico, ⚡ Relámpago en
+    cadena; los ids internos, `rayo`/`resrayo`, no cambian) · **lo que se esquiva con dodge vale ×1,15** (en la calculadora: `ESQUIVE`; el terreno
+    que queda no se multiplica) · **Báculo de aprendiz 1d4 + 1, 2 SP, 60 DDE, peso 1** · **precio mínimo de Buena: 80 DDE** · **Ceguera**: 1 turno,
+    solo ves a 1 casilla y −2 PdG · **Desarme**: el arma cae en tu casilla y levantarla cuesta 1 No2. Con el dodge, en las Comunes suben 1 SP el
+    Soplo de fuego, la Bola de fuego, el Granizo y la Lluvia ácida; el Destello pasa a 20 % de Pajaritos para seguir en 4 SP; el Láser y la
+    Ventisca siguen en 4 SP (más caros en DDE).
 
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 

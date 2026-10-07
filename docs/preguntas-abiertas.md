@@ -813,3 +813,6 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
 - ✅ **P170. Dos Vida extra (ex Escudo especial / Excedente de vida) a la vez** (dueño, 2026-10-07): **se suman**, cada una aparte con su
   duración (antes la nueva reemplazaba a la anterior, P137). Un drenaje solo agrega lo que falta para su tope. La Vida extra es neta: solo se
   renueva la que el efecto marca con `recarga`.
+- ⬜ **P171. Equipo que se repara solo (la piel de troll)** (nota del dueño, 2026-10-07, mirando el Chaleco de piel de troll del torso Común:
+  «se cierra sola cuando se raja»). Le encanta como diseño. Falta definir **en qué contexto y con qué frecuencia** se repara (durabilidad y/o
+  Armadura rota): si se regenerara cada turno, anularía por completo el Rompe armadura.

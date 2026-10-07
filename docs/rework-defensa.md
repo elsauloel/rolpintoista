@@ -1635,6 +1635,7 @@ levanta a un caído). Peso 1 por cada +1 (como Vida +5).
 | Manos Buena ✅ (2026-10-07) | 15 / 6 (antes 17 / 0) | 13 / 5 / 2 de 32 · res. 🔥2 ⚡3 |
 | Piernas Buena ✅ (2026-10-07) | 13 / 6 (antes 13 / 0) | 10 / 4 / 2 de 22 · res. 🔥1 ❄3 |
 | Pies Buena ✅ (2026-10-07) | 12 / 6 (antes 11 / 0) | 8 / 5 / 1 de 22 · res. ☠3 🧪3 |
+| Escudos Buena ✅ (2026-10-07) | 43 / 11 (antes 45 / 0) | 24 / 7 / 4 de 28 (sin orbes; con el de obsidiana) · res. ❄7 ⚡6 |
 
 **Fuego de más (dueño, 2026-10-07, «lo vemos al final»):** el fuego entra en tres slots (cabeza, manos, piernas), como el hielo (torso,
 piernas, escudo); los demás, en dos. En Común quedó 🔥14 contra ❄8 ⚡6 ☠6 🧪8 (la cabeza sola, 🔥6). Propuesta para el final de la revisión:
@@ -1731,3 +1732,25 @@ Zapatillas de levitación (seda con runas: Resistente ×6 → ×2 + Def. especia
 
 **Ningún escudo de metal da Res. eléctrica (dueño, 2026-10-07, por color: el metal conduce).** Se cambió el material, no los números: Escudo del
 templo (cobre) → Escudo de algarrobo del templo (Común); Escudo de bronce del monasterio → Escudo de lenga del monasterio (Buena).
+
+Escudos Buena: Escudo de lenga del monasterio (rezos, híbrido 1/1), Escudo de corteza (ombú, 2/1), Escudo espejado (Defensa → Def. especial),
+Escudo con farol de bronce → **Escudo fluorescente de bronce** (sin farol en combate, como el de Común; híbrido 1/1); Rodela del sereno: el
+farolito pasa a borde pintado con pintura que brilla (mismos números). Nuevos: Escudo de bronce con runas (Defensa +2 · Def. especial +2 · Res.
+hielo +1; completa el juego de bronce con runas) y Escudo de totora trenzada (Def. especial +3 · Bloqueo +1 · Res. eléctrica +2).
+
+**Espejo, la pareja de las Espinas (dueño, 2026-10-07: «por cada ítem que ofrece espinas que devuelve daño físico, exista un ítem que devuelva
+daño especial»).** Estado nuevo: cada ataque de daño especial que recibe (habilidad o arma especial que ignora la Defensa, y el daño elemental de un
+arma) le devuelve al que lo tiró 1/4, para arriba, antes de la Defensa especial, directo a la vida; a cualquier distancia, también en un área
+(cada objetivo devuelve lo suyo); las zonas que quedan y los saltos del rayo no. Las Espinas pasan a devolver solo el daño físico. Cuesta lo mismo
+que las Espinas en la calculadora. Cada pieza espejo invierte la Defensa y la Def. especial de su pareja, con el mismo precio:
+
+| Con Espinas | Su espejo |
+|---|---|
+| Escudo de pinchos (Def +2 · Bloqueo +1) | Escudo de obsidiana (Def. especial +2 · Bloqueo +1) |
+| Coraza de pinchos (Def +5 · T4 · Vida +10 · Sigilo −2) | Coraza de escamas de obsidiana (Def. especial +5 · T4 · Vida +10 · Sigilo −2) |
+| Pieles erizadas del berserker (2 / 1 · Vida +10 · Res.CC +1) | Poncho de espejitos (1 / 2 · Vida +10 · Res.CC +1) |
+| Abrigo de púas de puercoespín gigante (1 / 2 · Res.CC · T4 · Vida +5) | Capa de escamas de pez espejo (2 / 1 · Res.CC · T4 · Vida +5) |
+| Pergamino y Poción de Espinas (Raro) | Pergamino y Poción de Espejo (Raro) |
+
+Probado en el mapa (2026-10-07, «Claude · pruebas»): juan le tiró la Varita arcana al Escarabajo de cobre con Espejo → 2 de daño, y juan recibió 1
+devuelto (30 → 29), en el duelo y en la Mesa. Los consumibles de Espinas ahora llevan su preset (antes decían «a mano»).

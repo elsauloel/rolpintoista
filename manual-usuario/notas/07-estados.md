@@ -486,7 +486,8 @@ Parientes más limitados:
 
 - **Blindado:** inmune a [[Golpe crítico|golpes críticos]]. **A mano**: la herramienta solo recuerda que está activo y cuántos turnos dura; el que lleva la mesa anula el crítico.
 
-- **Espinas:** devuelven al atacante **1/4 (25 %) del daño crudo** de cada golpe **cuerpo a cuerpo** (antes de Defensa y escudos, redondeado hacia arriba, como daño directo). **A mano**, igual que Blindado.
+- **Espinas:** devuelven al atacante **1/4 (25 %) del daño crudo** de cada golpe **cuerpo a cuerpo** (antes de Defensa y escudos, redondeado hacia arriba, directo a la vida). Solo el daño físico. ⚙ El duelo lo aplica solo.
+- **Espejo** (la pareja de las Espinas, 2026-10-07): devuelve al que lo tiró **1/4 del daño especial** que recibís (varita, báculo, habilidad o el daño elemental de un arma), **a cualquier distancia** y también en un área; antes de la Defensa especial, redondeado hacia arriba, directo a la vida. Las zonas que quedan en el piso y los saltos del rayo no cuentan. ⚙ El duelo lo aplica solo.
 
 - **Inmunidad a CC:** inmune a los estados de control: [[Stun]], Exhausto, [[Inmovilizado]], Rengo, Lisiado y Pajaritos (Veneno y Sangrado no cuentan como control).
 

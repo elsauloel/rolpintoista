@@ -1137,6 +1137,19 @@ function venenistaDe(lado){
   if(ri) return Math.max(0, Math.round(num(ri.venenista)));
   return statPjDe(t, 'venenista');
 }
+/* Una cura que no pasa desapercibida (2026-10-07, dueño: «que tenga su momento: "fulano te curó X", con ACEPTAR; y para el resto, en la
+   Crónica»). La cura ya entró; a quien la recibió (el dueño del personaje) le aparece el Aviso al centro, y los demás la ven en la Crónica.
+   De un creep no se cuenta la vida que le queda (es del GM). */
+function dueloCuraMomento(d, t, n, r){
+  const quien = d.atacante && d.atacante.nombre ? d.atacante.nombre : 'Alguien', a = t.oculto ? 'alguien' : nombreDe(t);
+  const pj = t.tipo === 'pj', mismo = d.atacante && d.atacante.tokenId === d.defensor.tokenId;
+  const titulo = mismo ? `${quien} se curó` : `${quien} curó a ${a}`;
+  const resultado = r.caido ? `No lo levanta: ${a} está caído (hace falta revivirlo)` : `+${fmt(n)} de vida${pj ? ` (${fmt(r.previo)} → ${fmt(r.nuevo)})` : ''}`;
+  momentoAbrir({tipo: 'cura', icono: '💚', titulo, resultado, estado: 'listo',
+    datos: pj && t.duenoUid ? {paraUid: t.duenoUid, aviso: !mismo, boton: '💚 Aceptar',
+      veredicto: r.caido ? {tono: 'neutro', grande: 'Caído', chico: 'Una cura no levanta a un caído: hace falta revivirlo'}
+        : {tono: 'bueno', grande: `+${fmt(n)}`, chico: mismo ? `te curaste ${fmt(n)} de vida (${fmt(r.previo)} → ${fmt(r.nuevo)})` : `${quien} te curó ${fmt(n)} de vida (${fmt(r.previo)} → ${fmt(r.nuevo)})`}} : {}});
+}
 async function dueloAplicarEfecto(d, ef){
   const spec = Duelo.specDeEfecto(ef);
   if(!spec) return {manual: true, nota: 'a mano'};
@@ -1158,7 +1171,11 @@ async function dueloAplicarEfecto(d, ef){
     return {nota: `le llegó a su ficha: −${n} No2${spec.no2Sentado ? ' (en 0, Sentado)' : ''}`};
   }
   if(spec.cura){
-    try{ const r = await dueloCurar(t, spec.cura); return {nota: r.caido ? Combatiente.CAIDO_TXT : `+${spec.cura} HP (${fmt(r.previo)} → ${fmt(r.nuevo)})`}; }
+    try{
+      const r = await dueloCurar(t, spec.cura);
+      dueloCuraMomento(d, t, spec.cura, r);
+      return {nota: r.caido ? Combatiente.CAIDO_TXT : `+${spec.cura} HP (${fmt(r.previo)} → ${fmt(r.nuevo)})`};
+    }
     catch(err){ console.error('No se pudo aplicar la cura del duelo:', err); return {manual: true, nota: 'no se pudo curar solo: aplicalo a mano'}; }
   }
   // Guantes del envenenador (2026-10-05): los venenos que pone quien atacó llevan esos stacks de más (un turno más y 1 de daño más por turno).

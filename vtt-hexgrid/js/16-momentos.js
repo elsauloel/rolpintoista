@@ -294,5 +294,6 @@ function momentoAvisoCentro(id, d){
   const dt = d.datos || {};
   AvisoCombate.mostrar({icono: d.icono || '•', titulo: d.titulo || '', pasos: Array.isArray(dt.pasos) ? dt.pasos : [],
     texto: Array.isArray(dt.pasos) && dt.pasos.length ? '' : (d.resultado || ''), veredicto: dt.veredicto || null, aMano: dt.aMano || '',
+    ...(dt.boton ? {boton: String(dt.boton).slice(0, 30)} : {}),   // ej. «💚 Aceptar» de una cura (2026-10-07)
     alCerrar: () => { avisoCentro = null; }});
 }

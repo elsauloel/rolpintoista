@@ -1626,6 +1626,7 @@ levanta a un caído). Peso 1 por cada +1 (como Vida +5).
 | Cabeza Común ✅ (2026-10-07) | 10 / 13 (antes 15 / 0) | 10 / 12 / 2 de 29 |
 | Manos Común ✅ (2026-10-07) | 11 / 7 (antes 15 / 0) | 11 / 7 / 1 de 34 |
 | Piernas Común ✅ (2026-10-07) | 11 / 10 (antes 17 / 0) | 11 / 10 / 2 de 30 |
+| Pies Común ✅ (2026-10-07) | 13 / 10 (antes 18 / 0) | 13 / 10 / 1 de 32 |
 
 **Cómo se revisa cada slot y tier (dueño, 2026-10-07):** (1) convertir por material (tabla para el OK del dueño); (2) **la Defensa especial
 puede reemplazar los rellenos** (lo que se puso para completar puntos: durabilidad, resistencias sueltas…), para darles más espacio; (3) el
@@ -1650,6 +1651,12 @@ Res.Mt +1) y Guantes de piel de sapo cururú (Def. especial +1 · Res. tóxico +
 Piernas Común: tela a Defensa especial (lienzo, jean, lana tosca, mameluco, malambo), Pantalón de gamuza del fugitivo (gamuza «de dudosa
 procedencia») y Rodilleras de hueso; híbrido: Grebas de anillas cosidas (la Res. crítico Tipo 4 pasa a Def. especial). Nuevas: Rodilleras de
 caparazón de tatú carreta (Def +1 · Def. especial +1) y Calzas de lana de vicuña (Def. especial +1 · Res.Mt +1).
+
+Pies Común: tela a Defensa especial (Alpargatas de yute, Zapatillas de lona, Zapatillas de bailarina), Botines de cuero de chupacabras (ex de
+cuero fino), Botas de suela de goma (la goma aísla), Botas de cuero de potro salvaje (ex de potro); híbrido: Botas de caña alta de estanciero
+(espuelas de plata; la Res.CC pasa a Def. especial). Nuevas (pedido del dueño: dos más de Def. especial): Escarpines de piel de cururú (Def. esp
++1 · Res. tóxico +1), Botas de pantanero (Def +1 · Res. tóxico +1 · Res. ácido +1), Mocasines de piel de ciervo blanco (Def. esp +1 ·
+Percepción +1), Babuchas bordadas del adivino (Def. esp +1 · Res.Mt +1).
 
 ### Resistencias elementales por slot (dueño, 2026-10-07)
 Cada slot solo puede dar dos elementos; así se acota cuánto se acumula por calidad (tope por pieza: Común +1, Buena +2). Lo chequea

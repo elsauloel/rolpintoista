@@ -34,6 +34,10 @@ const ItemsSubidos = (() => {
      Solicitudes de eliminar (`e.datos.baja`, ver solicitarBaja): no son ítems — no entran a `nuevos`. Una vez auditadas
      (aprobadas por el dueño) sacan del catálogo al ítem que señalan (de fábrica o subido), sin borrar nada: alcanza con
      descartar la solicitud desde datos/auditoria.html para que el ítem vuelva. */
+  /* `archivo: true` (dueño, 2026-10-06: «dejar publicado solo lo que estuvimos reworkeando»): el ítem de fábrica queda en comun/catalogo.js como
+     referencia (el editor lo muestra), pero no se publica: mezclar lo saca, y con él la tienda, el catálogo de la ficha y el de GM Tools. Una
+     corrección subida desde el juego lo vuelve a publicar. */
+  const publicado = i => !!i && !i.archivo;
   function mezclar(lista, subidas, base){
     const activas = (subidas || []).filter(e => e && e.datos && !e.datos.baja);
     const eliminados = new Set((subidas || []).filter(e => e && e.datos && e.datos.baja && e.auditado).map(e => e.datos.itemId));
@@ -42,7 +46,8 @@ const ItemsSubidos = (() => {
     const out = (lista || [])
       .map(i => nuevos.has(i.id) ? clon(nuevos.get(i.id)) : (i._bib && fabrica.has(i.id) ? clon(fabrica.get(i.id)) : i))
       .filter(i => !i._bib || nuevos.has(i.id))
-      .filter(i => !eliminados.has(i.id));
+      .filter(i => !eliminados.has(i.id))
+      .filter(i => !i.archivo || nuevos.has(i.id));   // archivo (2026-10-06): lo de la versión anterior no se publica (queda en el catálogo como referencia)
     nuevos.forEach((it, id) => { if(!out.some(x => x.id === id) && !eliminados.has(id)) out.push(clon(it)); });
     return out;
   }
@@ -105,5 +110,5 @@ const ItemsSubidos = (() => {
     return [b.auditado ? '' : '🔶 sin auditar', b.version > 1 ? 'v' + b.version : '', b.autor ? 'subido por ' + b.autor : 'subido'].filter(Boolean).join(' · ');
   }
 
-  return {itemDeEntrada, mezclar, cargar, basadoEn, etiqueta, solicitarBaja};
+  return {publicado, itemDeEntrada, mezclar, cargar, basadoEn, etiqueta, solicitarBaja};
 })();

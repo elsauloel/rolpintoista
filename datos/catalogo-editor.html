@@ -167,6 +167,7 @@ header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   <input type="text" class="buscar" id="f-buscar" placeholder="Buscar por nombre…">
   <select id="f-tipo"></select>
   <select id="f-tier"><option value="">Todos los tiers</option></select>
+  <select id="f-pub" title="Lo archivado queda acá como referencia, pero el juego no lo publica (ni la tienda, ni el catálogo de la ficha, ni GM Tools)"><option value="">Publicados y archivados</option><option value="pub">Solo publicados</option><option value="arch">Solo archivados (versión anterior)</option></select>
   <span class="hint" id="f-conteo"></span>
 </div>
 
@@ -216,7 +217,7 @@ header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 <script src="../comun/elegir-trampa.js?v=20261004q"></script>
 <script src="../comun/asistente-duelo-hab.js?v=20261005fp"></script>   <!-- la Ejecución ✨ de un arma especial (asistente de ítems) -->
 <script src="../comun/asistente-item.js?v=20261007g"></script>
-<script src="../comun/catalogo.js?v=20261007g"></script>
+<script src="../comun/catalogo.js?v=20261007h"></script>
 <script>
 /* =========================================================
    Editor de catálogo — edita el catálogo de FÁBRICA: comun/catalogo.js (CATALOGO_BASE), la única copia que usan la ficha,
@@ -301,7 +302,7 @@ function slug(s){
 }
 
 let CATALOGO = [];
-let filtro = {texto: '', tipo: '', tier: ''};
+let filtro = {texto: '', tipo: '', tier: '', pub: ''};
 let editing = null; // draft en edición, o null
 
 function toast(msg){
@@ -345,6 +346,8 @@ function itemsFiltrados(){
   return CATALOGO.filter(it => {
     if(filtro.tipo && it.tipoItem !== filtro.tipo) return false;
     if(filtro.tier && it.tier !== filtro.tier) return false;
+    if(filtro.pub === 'pub' && it.archivo) return false;
+    if(filtro.pub === 'arch' && !it.archivo) return false;
     if(texto && !textoBusquedaDe(it).includes(texto)) return false;
     return true;
   });
@@ -386,7 +389,8 @@ function renderLista(){
     delGrupo.sort((a, b) => (grupo === 'Consumibles' ? (b.legacy ? 1 : 0) - (a.legacy ? 1 : 0) : 0) || a.nombre.localeCompare(b.nombre, 'es'));
     html += `<div class="grupo-head">${grupo} · ${delGrupo.length}</div><div class="grid">`;
     html += delGrupo.map(it => `
-      <div class="card">
+      <div class="card"${it.archivo ? ' style="opacity:.55"' : ''}>
+        ${it.archivo ? `<div class="hint" style="font-weight:700;margin-bottom:4px">📦 Archivado (versión anterior): el juego no lo publica</div>` : ''}
         <div class="card-top">
           ${it.imagen ? `<img src="${it.imagen}" alt="">` : `<div class="sinfoto">·</div>`}
           <div class="cinfo">
@@ -439,6 +443,7 @@ function verItem(id){
     if(item.equipoEstadoHpTurno) L.push(linea('HP/turno del estado', num(item.equipoEstadoHpTurno)));
   }
   if(item.legacy) L.push(linea('Legacy', 'Sí'));
+  L.push(linea('Publicado en el juego', item.archivo ? 'No — 📦 archivado (versión anterior, queda como referencia)' : 'Sí'));
 
   $('#ver-titulo').textContent = item.nombre || 'Ítem';
   $('#ver-body').innerHTML = `
@@ -584,6 +589,7 @@ function drawEditor(){
         </div>
       </div>
       <label class="chk"><input type="checkbox" data-c="legacy" ${d.legacy ? 'checked' : ''}> Legacy (cuenta para el piso de ítems clásicos del Alquimista)</label>
+      <label class="chk"><input type="checkbox" data-c="archivo" ${d.archivo ? 'checked' : ''}> 📦 Archivado: queda acá como referencia, pero el juego no lo publica (tienda, ficha, GM Tools)</label>
     </div>`;
 
   if(esArma){
@@ -753,6 +759,7 @@ document.addEventListener('keydown', e => {
 $('#f-buscar').addEventListener('input', e => { filtro.texto = e.target.value; renderLista(); });
 $('#f-tipo').addEventListener('change', e => { filtro.tipo = e.target.value; renderLista(); });
 $('#f-tier').addEventListener('change', e => { filtro.tier = e.target.value; renderLista(); });
+$('#f-pub').addEventListener('change', e => { filtro.pub = e.target.value; renderLista(); });
 
 /* ---------- Carga / guardado local ---------- */
 // Los Tipos de arma pasaron de 2/4/6/8/10 a 4/6/8/10/12. Un catálogo con

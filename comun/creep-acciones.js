@@ -227,7 +227,7 @@ const CreepAcciones = (() => {
     }catch(err){ console.error('No se pudo colocar la trampa:', err); return {ok: false, aviso: 'No se pudo colocar la trampa'}; }
   }
   // Los consumibles del catálogo para el desplegable del cinturón: [{id, nombre, tier}], por nombre. `cat`: la lista del catálogo.
-  const consumiblesDe = cat => (cat || []).filter(it => it && it.tipoItem === 'consumibles' && !it.trofeo)
+  const consumiblesDe = cat => (cat || []).filter(it => it && it.tipoItem === 'consumibles' && !it.trofeo && !it.archivo)
     .map(it => ({id: it.id, nombre: it.nombre, tier: it.tier || ''})).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
   function faltanNitrosConsumir(sc){ return num(sc.nitros) < costoConsumir(); }
   // Usar un consumible del cinturón: → {error} | {aviso, tiradas: [{origen, r}], trampa} (trampa: el ítem, para que la pantalla la coloque).

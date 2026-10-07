@@ -59,7 +59,7 @@ const COLORES = ['#C4485A','#D07B3A','#8FB84F','#4FA88C','#9B7BD4','#6FA8D8'];
 // usa GM Tools para el equipo de los creeps: sin id, la Defensa separada de los otros bonos (`def`), sin los campos que un
 // creep no usa. Misma forma que escribía antes herramientas/catalogo_comun.py (item_gm).
 function itemParaCreep(it){ return CreepCalculo.itemParaCreep(it); }   // comun/creep-calculo.js
-const CATALOGO_EQUIPO = CATALOGO_BASE.filter(it => it.tipoItem).map(itemParaCreep);
+const CATALOGO_EQUIPO = CATALOGO_BASE.filter(it => it.tipoItem && !it.archivo).map(itemParaCreep);   // sin lo archivado (2026-10-06)
 // Lo subido por el grupo (comun/items-subidos.js), sumado a CATALOGO_EQUIPO en su lugar (se rearma entero desde la fábrica).
 let itemsSubidosGM = [];
 function cargarItemsSubidosGM(){

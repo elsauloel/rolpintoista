@@ -1628,6 +1628,8 @@ levanta a un caído). Peso 1 por cada +1 (como Vida +5).
 | Piernas Común ✅ (2026-10-07) | 11 / 10 (antes 17 / 0) | 11 / 10 / 2 de 30 |
 | Pies Común ✅ (2026-10-07) | 13 / 10 (antes 18 / 0) | 13 / 10 / 1 de 32 |
 | Escudos Común ✅ (2026-10-07) | 30 / 9 (antes 34 / 0) | 21 / 8 / 4 de 29 (sin orbes) |
+| Orbes Común y Buena ✅ (2026-10-07) | Común 0 / 4 · Buena 0 / 8 | todos con Def. especial; resistencias: Común ⚡1 ☠1 · Buena 🔥3 ☠2 |
+| **Total Común ✅** | **136 / 81** (antes 185 / 0) | 90 / 68 / 16 de 243 · res. 🔥14 ❄8 ⚡6 ☠6 🧪8 (antes 🔥12 ❄6 ⚡5 ☠4 🧪8) |
 
 **Cómo se revisa cada slot y tier (dueño, 2026-10-07):** (1) convertir por material (tabla para el OK del dueño); (2) **la Defensa especial
 puede reemplazar los rellenos** (lo que se puso para completar puntos: durabilidad, resistencias sueltas…), para darles más espacio; (3) el

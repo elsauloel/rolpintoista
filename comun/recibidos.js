@@ -62,6 +62,7 @@ const Recibidos = (() => {
       ui.toast(`${origen ? origen + ' → ' : ''}${inv.nombre}: ${sp.estado} ${e.turnos > 0 ? `queda en ${e.turnos} turno${e.turnos === 1 ? '' : 's'}` : 'se terminó'}`);
       return {inv};
     }
+    if(sp.nombre === 'Revivir'){ ui.toast(`${origen ? origen + ' → ' : ''}${inv.nombre}: revivir una invocación va a mano`); return {}; }
     if(sp.nombre === 'Pierde No2'){   // Sonic Boom (2026-10-02): a una invocación
       const n = Math.max(0, Math.round(num(sp.stacks))), antes = num(inv.nitros);
       inv.nitros = Math.max(0, antes - n);

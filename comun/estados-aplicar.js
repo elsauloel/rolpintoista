@@ -37,6 +37,7 @@ const EstadosAplicar = (() => {
     // ver BUFFS. Un valor explícito manda sobre el del preset (se resuelve en `componer`).
     if(s.escudoMagico) out.escudoMagico = Math.max(0, Math.round(Number(s.escudoMagico) || 0));
     if(s.sentadoEnCero) out.sentadoEnCero = true;
+    if(s.pct) out.pct = Math.max(1, Math.min(100, Math.round(Number(s.pct) || 0)));   // «Revivir» (el consumible Revive): con qué % de la vida
     if(s.estado) out.estado = String(s.estado).slice(0, 40);   // «Acortar estado» (Recuperarse rápido, 2026-10-04): a cuál le saca turnos   // «Pierde No2» (Sonic Boom): si llega a 0, queda Sentado
     if(s.soltar && Combatiente.soltarNorm(s.soltar)) out.soltar = Combatiente.soltarNorm(s.soltar);   // cómo se suelta (trampas de Atrapar)
     return out;

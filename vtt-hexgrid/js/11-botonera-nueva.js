@@ -112,7 +112,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261006t', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261005i1', '../comun/ficha-mantenimiento.js?v=20261007a', '../comun/ficha-calculo.js?v=20261007a', '../comun/ficha-combate.js?v=20261005mn', '../comun/skills-clase.js?v=20261006i', '../comun/ficha-habilidades.js?v=20261006q',
-  '../comun/catalogo.js?v=20261007e', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261004ja', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261006s', '../comun/ficha-resumen.js?v=20261007a', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261006s', '../comun/inv-acciones.js?v=20261006j', '../comun/inv-duelo.js?v=20261006i', '../comun/ficha-acciones.js?v=20261006q', '../comun/inv-habilidades.js?v=20261006q', '../comun/inv-lupa.js?v=20261001a',
+  '../comun/catalogo.js?v=20261007f', '../comun/items-subidos.js?v=20260930a', '../comun/ficha-guardado.js?v=20261004ja', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261006s', '../comun/ficha-resumen.js?v=20261007a', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261006s', '../comun/inv-acciones.js?v=20261006j', '../comun/inv-duelo.js?v=20261006i', '../comun/ficha-acciones.js?v=20261007f', '../comun/inv-habilidades.js?v=20261006q', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20261006e', '../comun/ficha-duelo.js?v=20261006i', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261005f6'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -553,6 +553,9 @@ const BN_ACCIONES = {
     efecto: it => FichaAcciones.efectoDeConsumo(S, it, ui.presets, t => toast(t)),
     tirarExtra: it => FichaAcciones.tiradasDeItem(S, it).forEach(t => { if(t.error) toast(t.error); else bnPublicar(t.origen, t.r); }),
     colocarTrampa: it => FichaAcciones.colocarTrampaDeItem(bn.fichaId, it, ui),   // la trampa consumible, junto al token
+    // ✚ Revive (2026-10-06, js/22): elegir al aliado caído antes de gastarlo, y revivirlo.
+    elegirCaido: it => elegirCaidoParaRevivir({fichaId: bn.fichaId, bando: 'pj', rango: num(it.revive.rango) || 5, pct: num(it.revive.pct) || 50, item: it.nombre}),
+    revivir: (c, pct, it) => revivirElegido(c, pct, `${(S.meta && S.meta.nombre) || 'Un aliado'} (${it.nombre})`),
   }),
 };
 /* Etapa 3c, paso 4a: las tiradas de combate sueltas (Esquivar, Parry, Bloqueo, Fuerza del golpe, Daño) — comun/ficha-acciones.js.

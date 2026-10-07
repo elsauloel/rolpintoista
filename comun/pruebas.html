@@ -1677,6 +1677,19 @@ prueba('Titilando (2026-10-06): revivir lo pone (✚ Revivir y Ankh), es invulne
     Combatiente.titila([{nombre: 'Invulnerable', activo: true, invulnerable: true}]), Combatiente.titila([{nombre: 'Veneno', activo: true}])],
     [true, true, true, 0, false, true, true, false, true, false]);
 });
+prueba('Revive (2026-10-06): el aviso «Revivir» levanta a un inconsciente con el % de su vida y Titilando; no a uno en pie ni a uno muerto del todo', () => {
+  const nuevo = (hp, muerto) => { const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, hp}).S); S.muerto = muerto; return S; };
+  const ui = {presets: estadosPresetFicha(), cambio: () => {}, toast: () => {}};
+  const spec = EstadosAplicar.limpiarSpec({nombre: 'Revivir', pct: 50});
+  const A = nuevo(0, {activo: true, turnos: 2, definitivo: false}), max = FichaCalculo.calcular(A).final.hpmax;
+  FichaAcciones.aplicarEstadoRecibido(A, spec, 'Juan (Revive)', ui);
+  const B = nuevo(4, {activo: false, turnos: 5, definitivo: false});
+  FichaAcciones.aplicarEstadoRecibido(B, spec, '', ui);
+  const C = nuevo(0, {activo: false, turnos: 0, definitivo: true});
+  FichaAcciones.aplicarEstadoRecibido(C, spec, '', ui);
+  igual([spec.pct, A.hp, A.muerto.activo, (A.efectos || []).some(e => e.nombre === 'Titilando'), B.hp, C.hp, (C.efectos || []).length],
+    [50, Math.max(1, Math.floor(max / 2)), false, true, 4, 0, 0]);
+});
 prueba('pies de Buena calidad: levantarse gratis (Botas de jinete) y Meditar (+1 SP si no se movió desde el turno anterior)', () => {
   const sc = creepPrueba({nitros: 0, estados: [{nombre: 'Sentado', activo: true, sentado: true}], equipo: [{nombre: 'Botas de jinete', tipoItem: 'pies', mods: [{stat: 'levantarse', val: 1}]}]});
   const lev = CreepAcciones.levantarse(sc);

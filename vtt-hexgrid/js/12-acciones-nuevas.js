@@ -152,9 +152,17 @@ async function acConsumir(sc, itemId){
     toast(t.aviso);
     if(!t.ok) return;
   }
+  // ✚ Revive (2026-10-06, js/22): a otro creep caído a 5 casillas o menos; se elige antes de gastarlo.
+  const pctRevive = it.revive ? Math.max(1, Math.min(100, num(it.revive.pct) || 50)) : 0;
+  const revive = it.revive ? await elegirCaidoParaRevivir({fichaId: ac.creepId, bando: 'creep', rango: num(it.revive.rango) || 5, pct: pctRevive, item: it.nombre}) : null;
+  if(it.revive && !revive) return;
   let res = null;
   const x = await acCambiar(c => { res = CreepAcciones.consumir(c, itemId, estadosPresetCreep(), forzar); return res; });
   if(!x || !res) return;
+  if(revive){
+    try{ await revivirElegido(revive, pctRevive, sc.nombre); res.aviso += ` · ✚ revivió a ${revive.nombre}`; if(res.anuncio){ res.anuncio.resultado = [res.anuncio.resultado, `✚ revive a ${revive.nombre}`].filter(Boolean).join(' · '); res.anuncio.texto += ` · ✚ revive a ${revive.nombre}`; } }
+    catch(e){ console.error(e); toast(`No se pudo revivir a ${revive.nombre}: ${e.message}`); }
+  }
   (res.tiradas || []).forEach(t => acPublicar(sc, t));
   const tok = [...tokens.values()].find(x => x.tipo === 'creep' && x.fichaId === ac.creepId);
   if(res.anuncio) anunciarConsumo(res.anuncio, !tok || tok.oculto || enSigilo(tok));   // js/21: Mesa y Crónica (un creep escondido, no)

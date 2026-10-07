@@ -250,6 +250,14 @@ const FichaAcciones = (() => {
         }
         gastoNitros = gastoNitrosForzado(S, costoNitros, `consumió ${it.nombre}`);
       }
+      // Revive (2026-10-06, dueño: «hagámoslo»): con el mapa, se elige al aliado caído antes de gastarlo (si no se elige, no se gasta).
+      let revive = null;
+      if(it.revive && ui.elegirCaido){
+        if(consumiendoTrampa.has(id)) return;
+        consumiendoTrampa.add(id);
+        try{ revive = await ui.elegirCaido(it); }finally{ consumiendoTrampa.delete(id); }
+        if(!revive) return;
+      }
       // Trampa consumible (2026-09-25): al usarla se coloca sola junto a tu token; si no se puede, no se gasta.
       if(it.trampaDatos){
         if(consumiendoTrampa.has(id)) return;
@@ -291,6 +299,14 @@ const FichaAcciones = (() => {
       ui.tirarExtra(it);
       const spRestaurado = restaurarSpDeConsumo(S, it);
       const reparados = it.nombre === 'Oleo reparador' ? repararArmadura(S) : 0;
+      let reviveTxt = '';
+      if(it.revive){
+        const pct = Math.max(1, Math.min(100, num(it.revive.pct) || 50));
+        if(revive){
+          try{ await ui.revivir(revive, pct, it); reviveTxt = `✚ revive a ${revive.nombre} (${pct} % de su vida)`; }
+          catch(e){ console.error(e); reviveTxt = `✚ no se pudo revivir a ${revive.nombre}: aplicalo a mano (✚ Revivir en su ficha)`; }
+        } else reviveTxt = `✚ ✋ a mano: revivilo con ✚ Revivir en su ficha (${pct} % de su vida); desde el mapa se elige solo`;
+      }
       ui.cambio([key, ...(efecto || reparados ? ['efectos'] : []), 'vitals', 'nitros']);
       const partes = [];
       if(it.curahp) partes.push(`${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp) + boticario)} HP${boticario ? ` (+${fmt(boticario)} de Mano de boticario)` : ''}`);
@@ -299,10 +315,11 @@ const FichaAcciones = (() => {
       if(cargaMax > 1) partes.push(gastoUnidad ? 'última carga usada' : `carga ${carga}/${cargaMax}`);
       if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
       if(reparados) partes.push(reparados > 1 ? 'armadura reparada por completo' : 'armadura reparada');
+      if(reviveTxt) partes.push(reviveTxt);
       ui.toast(`${it.nombre}: ${partes.join(' · ')}`);
       // El anuncio (dueño, 2026-10-05: «se anuncia en el log y en la crónica»): una línea en la Mesa y, en el mapa, la Crónica para los demás.
       const quien = (S.meta && S.meta.nombre) || 'Alguien';
-      const publicas = [...(it.curahp ? [`${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`] : []), ...(efecto ? [efecto.nombre] : [])];
+      const publicas = [...(it.curahp ? [`${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`] : []), ...(efecto ? [efecto.nombre] : []), ...(revive ? [`✚ revive a ${revive.nombre}`] : [])];
       const resultado = [publicas.join(' · '), sac.saque ? sac.saque.txt : ''].filter(Boolean).join(' · ');
       const anuncio = {titulo: `${quien} usó ${it.nombre}`, resultado, texto: `🧪 ${quien} usó ${it.nombre}${resultado ? ': ' + resultado : ''}`, item: it.nombre, saqueSalio: !!(sac.saque && sac.saque.sale)};
       if(ui.anunciar) ui.anunciar(anuncio);
@@ -767,6 +784,18 @@ const FichaAcciones = (() => {
       return;
     }
     if(spec.nombre === 'Armadura rota'){ rompeArmaduraAlAzar(S, Math.max(1, num(spec.stacks) || 1), ui); return; }
+    // «Revivir» (2026-10-06, el consumible Revive que usa un aliado): si sigue inconsciente (no muerto del todo), vuelve con `pct` % de la
+    // vida máxima y Titilando. Si ya se levantó o ya murió, no hace nada (y lo dice).
+    if(spec.nombre === 'Revivir'){
+      const quien = origen ? origen + ': ' : '';
+      if(S.muerto && S.muerto.definitivo){ ui.toast(`${quien}llegó tarde, ya estabas muerto`); return; }
+      if(num(S.hp) > 0){ ui.toast(`${quien}ya estabas en pie`); return; }
+      const {val} = hpRevivir(S, 'pct', num(spec.pct) || 50);
+      revivir(S, val);
+      ui.cambio(['vitals', 'efectos', 'refresh']);
+      ui.toast(`✚ ${quien}te revivió con ${fmt(val)} de vida (titilás hasta que empiece tu turno)`);
+      return;
+    }
     // «Pierde SP» (2026-10-04, Succión arcana): gasta `stacks` SP (sin pasar de lo que tiene).
     if(spec.nombre === 'Pierde SP'){
       const max = num(FichaCalculo.calcular(S).final.sp), antes = Math.max(0, max - num(S.spGastado));

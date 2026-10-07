@@ -173,10 +173,10 @@ function trampaMeToca(id, dt){
 }
 
 /* La Descarga que salta (2026-10-04, dueño): cuando a una víctima se le terminó de resolver, la descarga salta al enemigo más cercano (del
-   mismo bando que la víctima) a `rango` casillas o menos, con la mitad del daño (para arriba), una sola vez por enemigo. Cada salto es un
+   mismo bando que la víctima) a `rango` casillas o menos, con la mitad del daño (para abajo, dueño 2026-10-07: con 1 ya no salta), una sola vez por enemigo. Cada salto es un
    momento propio: todas las pantallas ven el rayo en el mapa y, después, a quien lo recibe le aparece el Anuncio para resistir la Parálisis. */
 async function trampaSaltar(dt){
-  const c = dt.cadena, n = Math.ceil(num(dt.danoTirado) / 2), de = tokens.get(dt.tokenId);
+  const c = dt.cadena, n = Math.floor(num(dt.danoTirado) / 2), de = tokens.get(dt.tokenId);
   if(!c || n < 1 || !de) return;
   const golpeados = new Set(c.golpeados || []), lado = x => x.tipo === 'creep' ? 'creep' : 'pj';
   const cand = [...tokens.entries()].filter(([id, x]) => !golpeados.has(id) && x.fichaId && !x.oculto && lado(x) === lado(de) && distanciaHex(x, de) <= (num(c.rango) || 3))

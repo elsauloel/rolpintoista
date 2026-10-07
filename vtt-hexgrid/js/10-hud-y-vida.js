@@ -318,7 +318,7 @@ function hudHpHtml(t, d){
     <div class="hud-hp-expl">${danio
       ? (def === null
         ? 'No conozco su Defensa todavía (la ficha la publica al guardarse). Usá <b>2 · HP directo</b>.'
-        : hpRayo ? '<b>⚡ Rayo</b>: daño mágico <b>directo a la vida</b> (no se resta la Defensa) y <b>salta</b> a otros del mismo bando hasta 3 casillas de distancia, una vez por objetivo, con la mitad del daño en cada salto.'
+        : hpRayo ? '<b>⚡ Rayo</b>: daño mágico <b>directo a la vida</b> (no se resta la Defensa) y <b>salta</b> a otros del mismo bando hasta 3 casillas de distancia, una vez por objetivo, con la mitad del daño en cada salto (hacia abajo: con 1 ya no salta).'
         : hpCritMult > 1 ? `<b>Crítico (×${hpCritMult})</b>: el daño se multiplica y <b>NO se resta la Defensa</b> (${fmt(def)}); lo que pasa baja su HP.`
         : `Escribí el <b>daño del golpe</b>. Se le resta la Defensa (<b>${fmt(def)}</b>) y lo que pasa baja su HP.`)
       : 'Cambia el HP <b>sin tener en cuenta la Defensa</b>. Un número lo fija; +5 cura y −3 baja directo.'}</div>
@@ -370,7 +370,8 @@ function hudHpPrevia(t, d, texto){
 
 /* ---------- Rayo en cadena (2026-09-25, regla del dueño, P118) ----------
    El rayo salta a otros personajes: hasta 3 casillas de distancia del último golpeado, UNA sola vez por objetivo, y cada salto hace la MITAD del
-   daño del anterior (redondeado hacia arriba). Salta a los del mismo bando que el primer golpeado (los rivales de quien lanza el rayo: si golpeó a un
+   daño del anterior, redondeada hacia abajo (dueño, 2026-10-07: «salta tantas veces como le permita el número»: 8 → 4 → 2 → 1; el salto que
+   llega con 1 es el último). Salta a los del mismo bando que el primer golpeado (los rivales de quien lanza el rayo: si golpeó a un
    creep, salta a creeps; si a un personaje, a personajes) y siempre al más cercano. Daño mágico: directo a la vida. */
 const RAYO_SALTO_MAX = 3;
 function rayoCadena(idInicial, dano){
@@ -386,8 +387,8 @@ function rayoCadena(idInicial, dano){
       const dist = distanciaHex({col: actual.col, fila: actual.fila}, {col: x.col, fila: x.fila});
       if(dist <= RAYO_SALTO_MAX && dist < mejorDist){ mejor = {id, x}; mejorDist = dist; }
     });
-    if(!mejor) break;
-    d = Math.ceil(d / 2);
+    if(!mejor || d <= 1) break;
+    d = Math.floor(d / 2);
     usados.add(mejor.id);
     cadena.push({id: mejor.id, t: mejor.x, dano: d});
     actual = mejor.x;
@@ -412,7 +413,7 @@ async function rayoCadenaAplicar(cadena){
     }catch(err){ console.error('No se pudo aplicar el salto del rayo:', err); }
     (ok ? hechos : manual).push(`${nombre}: ${s.dano}`);
   }
-  alertaRojaAnonima('⚡ Rayo en cadena', `Saltó a ${saltos.length} más (la mitad del daño en cada salto, redondeado hacia arriba). ${hechos.length ? 'Aplicado solo: ' + hechos.join(' · ') + '. ' : ''}${manual.length ? 'Aplicalo a mano: ' + manual.join(' · ') + ' (directo a la vida).' : ''}`);
+  alertaRojaAnonima('⚡ Rayo en cadena', `Saltó a ${saltos.length} más (la mitad del daño en cada salto, redondeada hacia abajo). ${hechos.length ? 'Aplicado solo: ' + hechos.join(' · ') + '. ' : ''}${manual.length ? 'Aplicalo a mano: ' + manual.join(' · ') + ' (directo a la vida).' : ''}`);
 }
 
 async function hudHpAplicar(t, texto){

@@ -1679,6 +1679,11 @@ Ojo con las «firmas» de ahorro (primer uso −1 SP, el No2 que no sube): qued�
   - **Báculo de sangre ✅: cada uso cuesta el 10 % de tu vida máxima** (propuesta de Claude: redondeado hacia abajo, como los debuffs; mínimo 1).
   - **Báculo guardián:** el Parry gratis no cierra (los magos van a tener Destreza y Fuerza bajas para parriar) → **+1 Parry y +1 Bloqueo**
     mientras lo tenés en las manos.
+  - **Lo que quedaba (dueño, 2026-10-07: «vamos con lo que proponés»):** tope de **4 SP en las dos calidades** (Buena compra un tiro de hasta
+    11,5) · **el rayo redondea hacia abajo, en todo el rayo** (✅ hecho: `rayoCadena` js/10 y la Descarga, js/19) · **Bola de fuego mayor** (flor
+    grande, 1d4, fuego 1 turno; 4 SP) · **Ráfaga helada A** (frente 3×3, 1d4, empuja 2; 4 SP) · **Lluvia de cascotes 1d6** (2 SP, 85 DDE) ·
+    **Inestable: con algún 1 (31 %) te hacés 1d4** · **Báculo de sangre: el 10 % de la vida máxima, redondeado hacia arriba** (corrige lo de arriba).
+  - **P169 (Ef.Esp):** el dueño: el tope «terminaría siendo lo mismo que +3, +5 fijo». Sigue abierta (ver P169).
 
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 

@@ -1395,3 +1395,8 @@ dueño: «no auditaste los anillos preexistentes»): todos usan stats que existe
 un stat viejo que el juego convierte en SP máximo → ahora dice **SP máximo +1** (0,75 → 60). Res.Mt sí se usa (trampas, zonas y habilidades la piden
 como resistencia). Quedan con stats viejos (bonos / mov / accionesmax, que se convierten solos al cargar) 16 consumibles —Pociones y Pergaminos de
 Reserva Ampliada, Piernas de Viento e Ímpetu— y el Cinturón del explorador (Raro): para cuando se revisen los consumibles y los cinturones Raros.
+
+**Orden (dueño, 2026-10-06):** «Los anillos vamos a dejarlos para después de terminar con el resto de slots.» Quedan los 29 Comunes cargados;
+los de Buena calidad para arriba se diseñan cuando estén todos los demás slots. Lo que falta de **Buena calidad** a esta fecha: **escudos**
+(7 de una mano y 1 pavés, todavía las piezas viejas) y **orbes** (hoy solo hay 3 Comunes). Después, el equipo de los creeps
+(`herramientas/generar_equipo_creeps.py`) y el escaneo de acumulación con las piezas nuevas.

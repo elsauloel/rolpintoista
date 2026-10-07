@@ -1850,6 +1850,10 @@ invocado suman Ef.Esp (½ o entero) y los frena la Defensa especial. **Respuesta
   Dato que cambia la cuenta: con el reparto del asistente de personaje (33 puntos en nivel 1), un **mago arranca con Especial 13** (Ef.Esp 13,
   SP 39), un guerrero con Fuerza 10; el Ef.Esp «típico» de 4 que usaba la calculadora era para un no-mago. La Defensa especial promedio de un
   equipo Común es ~2–3 (la Defensa, ~4).
+- **Decidido (dueño):** Chorro de ácido **1d4 directo + Armadura rota segura (3 SP, 85 DDE)** · Lluvia ácida **flor 1d4 + 50 % de Armadura rota
+  (4 SP, 110 DDE)**. Opciones para el Ef.Esp en las armas: a) plus fijo por calidad frenado por la Defensa especial · b) una fracción del
+  Ef.Esp · c) solo los báculos suman · **d) daño directo (lo sumó el dueño): saltea la Defensa especial pero es fácilmente mesurable**. Antes
+  de decidir: **una simulación en el mapa, mago contra guerrero, cada uno con un equipo Común balanceado, no maxeado**.
 
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 

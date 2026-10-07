@@ -1400,3 +1400,63 @@ Reserva Ampliada, Piernas de Viento e Ímpetu— y el Cinturón del explorador (
 los de Buena calidad para arriba se diseñan cuando estén todos los demás slots. Lo que falta de **Buena calidad** a esta fecha: **escudos**
 (7 de una mano y 1 pavés, todavía las piezas viejas) y **orbes** (hoy solo hay 3 Comunes). Después, el equipo de los creeps
 (`herramientas/generar_equipo_creeps.py`) y el escaneo de acumulación con las piezas nuevas.
+
+## Escudos, Buena calidad — lluvia de mecánicas y propuesta v1 (2026-10-06, ⬜ a revisar por el dueño)
+Lo que hay: 7 escudos de una mano y 1 pavés de Buena calidad viejos, todos pasados de su bolsa (8 a 14 puntos contra 5: Defensa 6–10). Se
+reemplazan. Identidad (2026-10-04): **Defensa, Bloqueo, Parry, T8/T10**, resistencia elemental, luz, durabilidad y desventajas; nada del cuerpo
+(Res.CC, Res.Esp, Res.Mt) ni el contraataque (va con el arma). Bolsa 5 (hasta 5,5); cada punto de peso por encima del primero cuesta 0,25.
+**Tope de Defensa propuesto: 3** (Común 2). Aparece el **Tipo 10** en los pesados. ⚙ = ya existe · 🔧 = mecánica nueva · 🧙 = orbe (caster).
+
+**Con lo que ya existe:**
+
+| Escudo · pesa · precio | Qué hace |
+|---|---|
+| Escudo de acero laminado · 3 · 150 | Defensa +2 · Tipo 8 +1 |
+| Escudo de escamas · 3 · 150 | Defensa +1 · Tipo 4 +1 · Tipo 6 +1 · Bloqueo +1 |
+| Escudo abollado del veterano · 4 · 150 | Defensa +3 · Bloqueo +1 · Resistente ×3 |
+| Escudo romano · 5 · 150 | Defensa +3 · Bloqueo +2 · Tipo 4 +1 · Iniciativa −1 |
+| Escudo triangular · 3 · 150 | Defensa +2 · Tipo 4 +1 · Bloqueo +1 · Parry +1 |
+| Escudo grande · 5 · 135 | Defensa +2 · **Tipo 10 +1** · Evasión −1 |
+| Escudo de puerta de fortín · 6 · 130 | Defensa +3 · Bloqueo +3 · Tipo 4 +1 · Evasión −1 · Iniciativa −1 |
+| Escudo de corteza · 3 · 150 | Defensa +3 · Bloqueo +2 · Tipo 4 +1 · Frágil ×4 |
+| Broquel de hierro · 2 · 140 | Defensa +1 · Parry +2 · Tipo 6 +1 |
+| **Bono grande:** Guardamano de duelista · 1 · 120 | **Parry +3** · Tipo 4 +1 · Res. ácido +1 |
+| Escudo de la guardia · 3 · 150 | Guardián +1 (los aliados al lado tuyo, +1 Defensa) · Defensa +2 · Bloqueo +1 |
+| Mantelete de asedio · 4 · 130 | Defensa contra armas a distancia +4 · Defensa +1 · Bloqueo +1 |
+| Escudo de pinchos · 3 · 150 | Espinas mientras lo llevás · Defensa +2 · Bloqueo +1 |
+| Escudo de caparazón · 2 · 140 | Cáscara 3 (Escudo especial 3 al empezar cada combate) · Defensa +2 · Bloqueo +1 · Res. hielo +2 |
+| Escudo espejado · 2 · 130 | Ve lo oculto +2 · Luz +2 · Defensa +1 · Res. rayo +2 |
+| Escudo con farol de bronce · 2 · 130 | Luz +4 · Defensa +2 · Bloqueo +1 · Res. fuego +1 |
+| Rodela del sereno · 1 · 135 | Percepción +2 · Luz +2 · Visión +1 · Defensa +1 · Bloqueo +1 · Res. hielo +2 |
+| Escudo de piel de salamandra · 2 · 140 | Defensa +2 · Bloqueo +1 · Res. fuego +2 · Res. ácido +2 |
+| Escudo de bronce del monasterio · 2 · 140 | Defensa +2 · Bloqueo +1 · Res. tóxico +2 · Res. hielo +2 |
+
+**Con mecánicas nuevas (🔧, a programar si las aprobás):**
+
+| Escudo · pesa · precio | Qué hace |
+|---|---|
+| 🔧 Escudo de embestida · 3 · 135 | **Golpe de escudo**: atacar con el escudo (1d4 + Dmg, contundente Tipo 10, Demora 25 %) · Defensa +2 · Bloqueo +1 |
+| 🔧 Broquel de parada rápida · 1 · 135 | **Parada fácil**: tu primer Parry de cada turno no cuesta No2 · Parry +1 · Defensa +1 · Tipo 4 +1 |
+| 🔧 Escudo de la falange · 3 · 150 | **Muro de escudos**: Defensa +1 si tenés al lado un aliado con escudo · Defensa +2 · Bloqueo +1 · Tipo 4 +1 |
+| 🔧 Escudo de contención · 4 · 140 | **Bloqueo firme**: Bloqueo +2 contra el primer golpe del turno · Defensa +2 · Bloqueo +1 |
+| 🔧 Escudo de rebote · 3 · 135 | **Empujón**: si tu Bloqueo frena todo el daño de un golpe cuerpo a cuerpo, el atacante queda con Demora · Defensa +2 · Bloqueo +1 |
+
+Costos nuevos propuestos: Golpe de escudo 1,5 · Parada fácil 2 (una rebaja de No2: solo en escudos) · Muro de escudos 1 · Bloqueo firme 0,75 por
+punto (como la Defensa contra el primer golpe) · Empujón 1,5.
+
+**Orbes de Buena calidad (🧙; hoy hay 3 Comunes):** sin Defensa; no parrean.
+
+| Orbe · pesa · precio | Qué hace |
+|---|---|
+| Orbe de resguardo mayor · 1 · 120 | Una vez por turno, al usar una varita o un báculo, Escudo especial 3 hasta tu próximo turno · Luz +1 |
+| Orbe de luz mayor · 1 · 130 | Luz +3 · Visión +2 · Ve lo oculto +2 · Percepción +2 |
+| **Bono grande:** Orbe del foco · 1 · 115 | **PdG.Esp +2** · Luz +1 |
+| Orbe de eco · 1 · 135 | Ef.Esp +2 · SP máximo +2 · Res.Mt +2 · Luz +2 |
+| **Bono grande:** Orbe de la reserva · 1 · 130 | **SP máximo +6** · Luz +1 |
+| 🔧 Orbe salvaje domado · 1 · 100 | Al usar una varita, 1d6: con 1 no pasa nada; con 5 o 6, el efecto sale doble |
+| 🔧 Orbe del custodio · 1 · 120 | Al usar una varita, un aliado al lado tuyo recibe Escudo especial 2 hasta su próximo turno (una vez por turno) |
+| 🔧 Orbe de absorción · 1 · 120 | Cuando te entra daño mágico o elemental, recuperás 1 SP (una vez por turno) · Luz +1 |
+
+**Preguntas:** (1) ¿Tope de Defensa 3? (2) ¿Parry +3 en un bono grande, o tope +2 por pieza como la Evasión? (3) ¿Los escudos a dos manos
+(pavés) siguen afuera? Hoy hay uno viejo de Buena calidad; en Común se sacaron porque no hay mecánica de pelear sin arma. (4) ¿Qué 🔧 se programan?
+(5) Guardián: ya está en la Coraza del guardián (torso); si los dos están puestos vale el mayor, no se suman.

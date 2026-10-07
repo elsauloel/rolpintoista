@@ -17,6 +17,12 @@ from catalogo_comun import leer_catalogo
 import calculadora_defensa as cd
 
 ELEM = [('resfuego', '🔥'), ('reshielo', '❄'), ('resrayo', '⚡'), ('restoxico', '☠'), ('resacido', '🧪')]
+# Qué resistencias elementales puede dar cada slot (dueño, 2026-10-07): acota cuánto se acumula por calidad (tope por pieza: Común +1, Buena +2).
+# Cinturón, mochila y orbes: ninguna. Anillos: pendiente (cuando se hagan los anillos).
+PERMITIDAS = {'cabeza': {'resfuego', 'restoxico'}, 'torso': {'reshielo', 'resacido'}, 'manos': {'resfuego', 'resrayo'},
+              'piernas': {'resfuego', 'reshielo'}, 'pies': {'restoxico', 'resacido'}, 'escudo': {'reshielo', 'resrayo'},
+              'escudo a 2 manos': {'reshielo', 'resrayo'}, 'cinturón': set(), 'mochila': set(), 'orbe': set()}
+TOPE_RES = {'Común': 1, 'Buena Calidad': 2}
 TIERS = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario']
 
 
@@ -41,8 +47,11 @@ def reporte(tier=None, slot=None):
         f['piezas'] += 1; f['def'] += d; f['esp'] += e
         f['con_def'] += d > 0; f['con_esp'] += e > 0; f['hibridas'] += d > 0 and e > 0
         for st, _ in ELEM:
-            f[st] += max(0, mod(it, st))
+            v = max(0, mod(it, st)); f[st] += v
+            if v and s in PERMITIDAS and st not in PERMITIDAS[s]: FUERA.append(f'{it["nombre"]} ({it.get("tier")}, {s}): {st[3:]} no va en este slot')
+            if v > TOPE_RES.get(it.get('tier'), 99): FUERA.append(f'{it["nombre"]} ({it.get("tier")}): {st[3:]} +{v} pasa el tope de su calidad')
     return filas
+FUERA = []
 
 
 def linea(k, f):
@@ -62,3 +71,5 @@ if __name__ == '__main__':
         tot[k[0]].update(filas[k])
     for t, f in tot.items():
         print(linea((t, 'TOTAL'), f))
+    print('Resistencias fuera de regla:' if FUERA else 'Resistencias: todas en su slot y dentro del tope.')
+    for x in FUERA: print('  ⚠', x)

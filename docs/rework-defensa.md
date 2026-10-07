@@ -1625,6 +1625,7 @@ levanta a un caído). Peso 1 por cada +1 (como Vida +5).
 | Torso Común ✅ (2026-10-07) | 60 / 28 (antes 85 / 0) | 23 / 18 / 6 de 35 |
 | Cabeza Común ✅ (2026-10-07) | 10 / 13 (antes 15 / 0) | 10 / 12 / 2 de 29 |
 | Manos Común ✅ (2026-10-07) | 11 / 7 (antes 15 / 0) | 11 / 7 / 1 de 34 |
+| Piernas Común ✅ (2026-10-07) | 11 / 10 (antes 17 / 0) | 11 / 10 / 2 de 30 |
 
 **Cómo se revisa cada slot y tier (dueño, 2026-10-07):** (1) convertir por material (tabla para el OK del dueño); (2) **la Defensa especial
 puede reemplazar los rellenos** (lo que se puso para completar puntos: durabilidad, resistencias sueltas…), para darles más espacio; (3) el
@@ -1645,3 +1646,29 @@ del clan (ex Coraza del clan) y el nuevo Chaleco de piel de troll (Regeneración
 Manos Común: tela (Vendas de mano, Guantes de tela acolchada), Guantes de goma (aíslan) y Guante de cetrero (cuero «de grifo») a Defensa
 especial; híbrido parejo: Guanteletes de cuero tachonado (dejan la Res. crítico Tipo 4). Nuevas: Guantes de seda del copista (Def. especial +1 ·
 Res.Mt +1) y Guantes de piel de sapo cururú (Def. especial +1 · Res. tóxico +1).
+
+Piernas Común: tela a Defensa especial (lienzo, jean, lana tosca, mameluco, malambo), Pantalón de gamuza del fugitivo (gamuza «de dudosa
+procedencia») y Rodilleras de hueso; híbrido: Grebas de anillas cosidas (la Res. crítico Tipo 4 pasa a Def. especial). Nuevas: Rodilleras de
+caparazón de tatú carreta (Def +1 · Def. especial +1) y Calzas de lana de vicuña (Def. especial +1 · Res.Mt +1).
+
+### Resistencias elementales por slot (dueño, 2026-10-07)
+Cada slot solo puede dar dos elementos; así se acota cuánto se acumula por calidad (tope por pieza: Común +1, Buena +2). Lo chequea
+`herramientas/reporte_defensas.py` («fuera de regla»).
+
+| Slot | Resistencias que puede dar |
+|---|---|
+| Cabeza | Fuego · Tóxico |
+| Torso | Hielo · Ácido |
+| Manos | Fuego · Eléctrica |
+| Piernas | Fuego · Hielo |
+| Pies | Tóxico · Ácido |
+| Escudo | Hielo · Eléctrica |
+| Cinturón, mochila, orbes | Ninguna (tampoco Defensa especial: lo que perdieron pasó a ranuras) |
+| Anillos | Pendiente |
+
+Máximo con todo el equipo: fuego y hielo +3 en Común / +6 en Buena; eléctrica, tóxico y ácido +2 / +4 (el ácido, difícil de resistir: es la
+herramienta contra los que tienen mucha armadura). Las 22 resistencias que estaban fuera de su slot se cambiaron por una permitida del mismo
+valor (sin tocar durabilidad), con nombre o descripción retocados donde la resistencia era su identidad: Delantal y Botas de curtidor (ex de
+herrero), Mitones del alquimista, Guantes de pescador de anguilas, Guantes de piel de lagarto overo (ex sapo cururú), Gorro de piel de
+salamandra (ex yeti), Escudo de escamas de lagarto, Escudo de cuero de lobo marino (ex salamandra), Suelas de cuero de dragón del pantano.
+Cinturones y mochilas: Correa con bolsitas (Ranuras +2), Faja del fogonero (ex ignífuga, Ranuras +3), Mochila de cuero curtido (Ranuras +10).

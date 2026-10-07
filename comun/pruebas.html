@@ -2400,10 +2400,10 @@ prueba('catálogo (dueño, 2026-10-05): cada cinturón y cada mochila Común tie
   const sin = L.filter(i => !(i.mods || []).some(m => PROPIOS.includes(m.stat))).map(i => i.nombre);
   igual([L.filter(i => i.tipoItem === 'cinturon').length, L.filter(i => i.tipoItem === 'mochila').length, sin], [12, 10, []]);
 });
-prueba('catálogo: las piernas Común (28) — ninguna pasa de Defensa 1, y las mecánicas nuevas están', () => {
+prueba('catálogo: las piernas Común (30, con las 2 de Defensa especial del 2026-10-07) — ninguna pasa de Defensa 1, y las mecánicas nuevas están', () => {
   const L = CATALOGO_BASE.filter(i => i.tipoItem === 'piernas' && i.tier === 'Común');
   const stats = new Set(L.flatMap(i => (i.mods || []).map(m => m.stat)));
-  igual([L.length, L.every(i => (i.mods || []).every(m => m.stat !== 'def' || m.val <= 1)), ['evaopor', 'evacontra', 'retirada', 'pasosgratis', 'sigilo'].every(x => stats.has(x))], [28, true, true]);
+  igual([L.length, L.every(i => (i.mods || []).every(m => m.stat !== 'def' || m.val <= 1)), ['evaopor', 'evacontra', 'retirada', 'pasosgratis', 'sigilo', 'armadmg'].every(x => stats.has(x))], [30, true, true]);
 });
 prueba('durabilidad: Resistente ×N suma N y Frágil ×N resta N a la total (no por Peso); con Frágil puede bajar de 3, nunca de 1', () => {
   const d = (peso, x, extra) => Combatiente.durMax({tipoItem: 'escudo_1m', peso, ...(x ? {durExtra: x} : {}), ...(extra || {})});

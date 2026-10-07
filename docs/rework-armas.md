@@ -1667,6 +1667,11 @@ Ojo con las «firmas» de ahorro (primer uso −1 SP, el No2 que no sube): qued�
 - **B31 Báculo de sangre:** le encanta el concepto, pero «¿qué impide que lo agarre un tanque y rompa todo?» (tiene mucha vida para pagar).
 - **B32 Guardián:** no se entendió → explicar.
 - **Báculos que suman Ef.Esp (P169):** «son complejos, porque escalan por nivel, pero su resistencia y evasión no». Para ajustar.
+- **B33 Inestable:** le gusta; preguntó la chance. Doble 1 en 2d6 = 1 en 36 (2,8 %), y con doble 1 el daño es 2: el riesgo no pesa.
+  Propuestas: con doble 1 estalla y te hace 12 (el máximo) · o con algún 1 (31 %) te hacés 1d4.
+- **B34 De cargas:** «podría ser, habría que verlo en práctica».
+- **B35 Gemela:** le gusta.
+- **El resto de la lluvia (B1–B35 sin comentario): ✅ en principio** (dueño, 2026-10-07).
 
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 

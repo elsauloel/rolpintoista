@@ -267,8 +267,8 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   enteros (efecto, calidad y precio), no solo el stat. (El Cinturón del explorador, Raro, también lo tiene: se ignora, los Raros se rehacen.)
   **Avance (2026-10-06):** las 8 de «Bonos» pasaron a SP (dueño: «vamos a reemplazar las de bonos por SP»): Poción de SP (mitad del SP
   máximo), Poción de SP grande (todo el SP) y las Pociones / Pergaminos de Reserva Ampliada (SP máximo +1/+2/+3). La tienda las tiene de stock
-  fijo como «Poción de SP». Las **Raciones** (y Raciones Fancy) **salieron del catálogo** hasta definir sus reglas (ver abajo). **Revive** se
-  automatiza (como ✚ Revivir). El valor de cura de las pociones quedó como pregunta (P167). Faltan Piernas de Viento, Ímpetu y el resto.
+  fijo como «Poción de SP». Las **Raciones** (y Raciones Fancy) **salieron del catálogo** hasta definir sus reglas (ver abajo). **Revive** ✅ se
+  automatizó (probado en vivo: elegís al aliado caído a 5 casillas, vuelve con el 50 % y Titilando; sin nadie a tiro no se gasta). El valor de cura de las pociones quedó como pregunta (P167). Faltan Piernas de Viento, Ímpetu y el resto.
 - [ ] **Reglas de las raciones** (dueño, 2026-10-06: «las vamos a quitar del catálogo hasta que definamos las reglas de las raciones»). Las
   viejas daban «+1 / +2 Wellness» a mano (Raciones, Común, 2 unidades, $10; Raciones Fancy, Buena, 5 unidades, $30). Cuando se definan
   (¿comer entre combates?, ¿qué recupera?, ¿viajes largos?), vuelven al catálogo y al stock fijo de la tienda.

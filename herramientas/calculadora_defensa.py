@@ -25,7 +25,7 @@ COSTO = {
     'vision': 0.5, 'percepcion': 0.5, 'veoculto': 1,
     'luz': 0.25,   # Luz portada (dueño, 2026-10-05): muy circunstancial (solo pesa en lo oscuro) → la mitad que la Visión
     'hpmax': 0.2, 'nitros': 4, 'mov': 4,                                              # +5 vida = 1 · No2 lo más valioso (−1 Mov = −1 No2)
-    'armadmg': 3,   # Armadura mágica: escasa, cara y rara — resta TODO daño mágico, arcano y elemental (dueño, 2026-10-04)
+    'armadmg': 1,   # Defensa especial (ex Armadura mágica; dueño, 2026-10-07, P169): se equipa como la Defensa y cuesta lo mismo (antes 3: escasa)
     # Cinturón y mochila (dueño, 2026-10-04/05): la ranura de cinturón baja a 0,5; la exclusiva (solo pociones, pergaminos, trampas o el Ankh) es
     # el 75 % de una común; la de mochila, 0,25 (una mochila tiene muchas).
     'capcinturon': 0.5, 'capmochila': 0.25,

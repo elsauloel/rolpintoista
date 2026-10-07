@@ -1088,6 +1088,8 @@ const Duelo = (() => {
         : dn.invulnerable ? `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: Invulnerable, el golpe no hizo nada`
         : crit ? `💥 ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.golpe} de daño (×${m.crit.mult}) derecho a la vida (${dn.hpAntes} → ${dn.hpDespues} HP)`
         : dn.mitad ? `⚠ ${m.atacante.nombre} → ${m.defensor.nombre}: pasó la mitad: ${dn.recibido} de daño (${dn.hpAntes} → ${dn.hpDespues} HP)`
+        // El daño especial (ignora la Defensa): lo que lo frena va en `freno` (Defensa especial, Res. elemental) — no se repite como «Defensa» (2026-10-07).
+        : dn.ignoraDef ? `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.crudo}${dn.freno ? ` − ${dn.freno}` : ''} = ${dn.recibido} de daño, directo a la vida (${dn.hpAntes} → ${dn.hpDespues} HP)`
         : `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.crudo} − Defensa ${dn.defensa}${dn.freno ? ` − ${dn.freno}` : ''} = ${dn.recibido} de daño (${dn.hpAntes} → ${dn.hpDespues} HP)`;
     });
     anunciarMesa(anuncio);

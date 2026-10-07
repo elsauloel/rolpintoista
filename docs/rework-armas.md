@@ -1839,6 +1839,18 @@ y deja de ser escasa.
 - El catálogo defensivo (409 piezas con Defensa) se revisa para repartir la Defensa especial; las armas especiales Comunes y Buenas se
   rehacen con la regla nueva.
 
+### Armas especiales Comunes con las reglas nuevas (2026-10-07, en revisión)
+Propuesta de Claude: los proyectiles chicos, daño directo (ignoran la Defensa especial, sin Ef.Esp); áreas, zonas, báculos y lo físico
+invocado suman Ef.Esp (½ o entero) y los frena la Defensa especial. **Respuestas del dueño:**
+- **Chorro de ácido**: subir el daño a 1d4 (subiendo el SP o con la Armadura rota a %). **Lluvia ácida**: 1d2 de daño es muy poco
+  satisfactorio (salvo alguna excepción) → 1d4.
+- **Báculo de aprendiz**: arcano (lo frena la Defensa especial; no hay resistencia arcana).
+- **El turno de una zona** (el fuego de la bola): tiene que contar el **turno de quien la tiró**, no la ronda (P172).
+- **Las áreas que suman Ef.Esp**: «no sé si al agregarles la defensa especial, sumándole el Ef.Esp, se balancea; hay que pensarlo bien».
+  Dato que cambia la cuenta: con el reparto del asistente de personaje (33 puntos en nivel 1), un **mago arranca con Especial 13** (Ef.Esp 13,
+  SP 39), un guerrero con Fuerza 10; el Ef.Esp «típico» de 4 que usaba la calculadora era para un no-mago. La Defensa especial promedio de un
+  equipo Común es ~2–3 (la Defensa, ~4).
+
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 
 Ruta del dueño (2026-10-05): **slot por slot**, empezando por **Cabeza**: primero lo Común pensado para casters, después el tier **Buena calidad de

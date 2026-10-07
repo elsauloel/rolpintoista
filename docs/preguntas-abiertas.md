@@ -816,3 +816,6 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
 - ⬜ **P171. Equipo que se repara solo (la piel de troll)** (nota del dueño, 2026-10-07, mirando el Chaleco de piel de troll del torso Común:
   «se cierra sola cuando se raja»). Le encanta como diseño. Falta definir **en qué contexto y con qué frecuencia** se repara (durabilidad y/o
   Armadura rota): si se regenerara cada turno, anularía por completo el Rompe armadura.
+- ⬜ **P172. La duración de una zona cuenta los turnos de quien la tiró** (dueño, 2026-10-07, con el fuego que deja la Bola de fuego): hoy una
+  zona vence por Mantenimientos (la ronda). Propuesta: con orden de turnos, una zona de N turnos se va al empezar el N-ésimo turno siguiente de
+  quien la tiró (así el fuego de 1 turno quema a todos los que actúan antes de que el mago vuelva a jugar); sin orden de turnos, como hoy.

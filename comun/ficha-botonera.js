@@ -244,7 +244,7 @@ const FichaBotonera = (() => {
     if(modoMapa === 'narrativo') html += socialesHtml;
 
     // Los que ya tienen su propio botón en la caja de Combate (PdG, Dmg, Eva, Parry, Bloqueo) no hace falta repetirlos acá; la
-    // Armadura mágica (no se tira) va con la Defensa, en los valores de Combate (2026-10-02).
+    // Defensa especial (no se tira) va con la Defensa, en los valores de Combate (2026-10-02).
     // Los 5 principales (Con, Fue, Agi, Des, Esp) van siempre, igual que en el contenedor de Atributos.
     const STATS_REDUNDANTES_COMBATE = ['pdg', 'eva', 'parry', 'bloqueo', 'armadmg'];
     const statsRollables = [
@@ -359,7 +359,7 @@ const FichaBotonera = (() => {
               ${lupaBotonHtml('defensa:def')}
               <span class="bt-label">Defensa</span><span class="bt-value">${Number.isNaN(c.final.def) ? '?' : fmt(c.final.def)}</span>
             </div>
-            <div class="botonera-tile bt-info" title="Armadura mágica: se resta al daño de casteo que ignora la Defensa (no se tira)">
+            <div class="botonera-tile bt-info" title="Defensa especial: se resta al daño de casteo que ignora la Defensa (no se tira)">
               ${lupaBotonHtml('defensa:armadmg')}
               <span class="bt-label">Armad. mágica</span><span class="bt-value">${Number.isNaN(c.final.armadmg) ? '?' : fmt(c.final.armadmg || 0)}</span>
             </div>

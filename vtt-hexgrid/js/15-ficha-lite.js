@@ -9,7 +9,7 @@
    Se cierra con F, Esc, ✕ o un clic afuera. Los botones abren las ventanas de siempre (Stats, Equipo y mochila, Tienda, Botín en la
    ficha del marco; Botonera, Acciones, Ver) o la ficha completa / GM Tools en otra pestaña. */
 var fl = null;   // {host, raiz, clave, tipo: 'pj'|'inv'|'creep', fichaId, invId, creepId, sesion, fichaIdSesion, S, tienda}
-const FL_PIEZA = '../comun/ficha-lite.js?v=20261004ja';
+const FL_PIEZA = '../comun/ficha-lite.js?v=20261007q';
 const flAbierta = () => !!(fl && fl.host.style.display !== 'none');
 
 function flCrear(){

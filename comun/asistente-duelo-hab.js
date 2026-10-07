@@ -73,7 +73,7 @@ const AsistenteDueloHab = (() => {
   const ALCANCES = [['auto', 'Automático (los hechizos usan su Rango de casteo)'], ['casteo', 'Rango de casteo'], ['rango', 'Rango (el de las armas a distancia)'], ['adyacente', 'Cuerpo a cuerpo (casilleros de al lado)'], ['fijo', 'Un número de casilleros'], ['ilimitado', 'Sin límite (no resalta nada)']];
   const BONOS = [['pdg', 'PdG'], ['dmg', 'Daño'], ['eva', 'Evasión'], ['def', 'Defensa'], ['nitros', 'No2'], ['resmg', 'Res.Esp'], ['resm', 'Res.Mt'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo']];
   const BONOS_LABEL = Object.fromEntries(BONOS);
-  const TIPOS = [['arcano', 'Arcano (mágico)'], ['fuego', 'Fuego (mágico)'], ['hielo', 'Hielo (mágico)'], ['rayo', 'Rayo (mágico)'], ['toxico', 'Tóxico (veneno, gas)'], ['fisico', 'Físico (respeta la Defensa)']];
+  const TIPOS = [['arcano', 'Arcano (mágico)'], ['fuego', 'Fuego (mágico)'], ['hielo', 'Hielo (mágico)'], ['rayo', 'Eléctrico (mágico)'], ['toxico', 'Tóxico (veneno, gas)'], ['fisico', 'Físico (respeta la Defensa)']];
   const STAT_TXT = Object.fromEntries([...TIRA, ...CONTRA]);
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 
@@ -148,6 +148,9 @@ const AsistenteDueloHab = (() => {
       // elemento, es cómo se narra la habilidad — una "ráfaga de hielo" ignora, una "aguja de hielo" física no).
       // Arranca según el tipo elegido (mágico = sí, físico = no) y se puede destildar a mano para la excepción.
       ignoraDano: (ini && ini.ignoraDano !== undefined) ? !!ini.ignoraDano : ((ini && ini.tipoDano) || 'arcano') !== 'fisico',
+      // Cómo lo frena la Defensa especial (dueño, 2026-10-07, P169): '' = la resta (lo normal) · 'directo' = la ignora (proyectiles chicos) ·
+      // 'true' = True Damage: ignora toda defensa y la Res. elemental (muy controlado).
+      frenoEsp: ini && ini.trueDamage ? 'true' : ini && ini.danoDirecto ? 'directo' : '',
       efectos: ini && Array.isArray(ini.efectos) ? ini.efectos.map(e => ({...e})) : [],
       alcance: (ini && ini.alcance) || 'auto', alcanceN: (ini && ini.alcanceN) || 3,
       radio: (ini && (ini.radio || ini.largo)) || 2,   // también el largo de la línea recta
@@ -375,6 +378,7 @@ const AsistenteDueloHab = (() => {
       if(st.dano){
         h += `<div class="fila"><span>Tipo:</span><select data-tipodano>${TIPOS.map(([v, t]) => `<option value="${v}"${st.tipoDano === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
           <label class="op"><input type="checkbox" data-ignoradano ${st.ignoraDano ? 'checked' : ''}> Ignora la Defensa (va derecho a la vida y no critica)</label>
+          ${st.tipoDano !== 'fisico' && st.ignoraDano ? `<div class="fila"><span>La Defensa especial:</span><select data-frenoesp>${[['', 'la frena (lo normal; siempre, si suma el Ef.Esp)'], ['directo', 'daño directo: no la frena (proyectiles chicos)'], ['true', 'True Damage: no lo frena nada, ni la Res. elemental']].map(([v, t]) => `<option value="${v}"${st.frenoEsp === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>` : ''}
           <p class="nota">Arranca marcado o no según el tipo (mágico = sí, físico = no), pero es independiente: lo que decide no es el elemento, es cómo se narra la habilidad — una "ráfaga de hielo" (energía) ignora la Defensa; una "aguja de hielo" (un objeto físico arrojado) no, aunque las dos sean "Hielo". Destildá acá para esa excepción.</p>`;
         if(cfg.costoVariable && !dif){
           h += `<div class="fila" style="margin-top:8px"><span>Además, por cada punto de X (tu costo en ${cfg.costoVariable === 'sp' ? 'SP' : 'Nitros'}):</span><span>+</span><input type="number" style="width:70px" data-danoporx value="${esc(st.danoFijoPorX)}"><span>de daño fijo</span></div>
@@ -518,7 +522,7 @@ const AsistenteDueloHab = (() => {
         filas.push(sinOp() ? '<b>Sin tirada</b>: se aplica directo'
           : st.tiraModo === 'custom' ? `<b>Tirada custom</b>: ${esc(st.tiraFormula) || '(sin fórmula)'}${st.tiraEtiqueta ? ' · ' + esc(st.tiraEtiqueta) : ''} contra ${contraTxt}`
           : `<b>Tirada</b>: ${STAT_TXT[st.tira] || st.tira} contra ${contraTxt}`);
-        if(st.dano) filas.push(`<b>Daño</b>: ${st.danoDif && st.objetivo !== 'uno mismo' ? 'la diferencia entre las tiradas, ' : st.danoArma && st.objetivo !== 'zona' && st.objetivo !== 'uno mismo' ? 'el de tu arma, ' : ''}${st.drena && st.objetivo !== 'zona' ? `drena (se cura lo que hace${st.drenaTope ? `, hasta +${st.drenaTope} % de su máximo` : ''}), ` : ''}tipo ${st.tipoDano}${st.ignoraDano ? ', ignora la Defensa' : ''}${cfg.costoVariable && st.danoFijoPorX ? `, +${st.danoFijoPorX} por X` : ''}${st.objetivo === 'zona' && st.danoExtra ? `; si entra, tira ${esc(st.danoExtra)}` : ''}`);
+        if(st.dano) filas.push(`<b>Daño</b>: ${st.danoDif && st.objetivo !== 'uno mismo' ? 'la diferencia entre las tiradas, ' : st.danoArma && st.objetivo !== 'zona' && st.objetivo !== 'uno mismo' ? 'el de tu arma, ' : ''}${st.drena && st.objetivo !== 'zona' ? `drena (se cura lo que hace${st.drenaTope ? `, hasta +${st.drenaTope} % de su máximo` : ''}), ` : ''}tipo ${st.tipoDano}${st.ignoraDano ? ', ignora la Defensa' : ''}${st.tipoDano !== 'fisico' && st.ignoraDano ? (st.frenoEsp === 'true' ? ', True Damage (no lo frena nada)' : st.frenoEsp === 'directo' ? ', daño directo (no lo frena la Defensa especial)' : ', lo frena la Defensa especial') : ''}${cfg.costoVariable && st.danoFijoPorX ? `, +${st.danoFijoPorX} por X` : ''}${st.objetivo === 'zona' && st.danoExtra ? `; si entra, tira ${esc(st.danoExtra)}` : ''}`);
         if(st.efectoLibreOn && st.efectoLibre.trim()){ const t = st.efectoLibre.trim(); filas.push(`<b>Efecto a mano</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
       }
       if(st.modo !== 'flash' && st.objetivo !== 'zona'){
@@ -599,7 +603,8 @@ const AsistenteDueloHab = (() => {
       q('[data-drenatope]', e => { st.drenaTope = Math.max(0, Number(e.target.value) || 0); });
       q('[data-danoextra]', e => { st.danoExtra = e.target.value.trim(); });
       q('[data-tipodano]', e => { st.tipoDano = e.target.value; st.ignoraDano = st.tipoDano !== 'fisico'; dibujar(); });
-      q('[data-ignoradano]', e => { st.ignoraDano = e.target.checked; });
+      q('[data-ignoradano]', e => { st.ignoraDano = e.target.checked; dibujar(); });
+      q('[data-frenoesp]', e => { st.frenoEsp = e.target.value; });
       q('[data-danoporx]', e => { st.danoFijoPorX = Number(e.target.value) || 0; });
       q('[data-efectolibre-on]', e => { st.efectoLibreOn = e.target.checked; dibujar(); });
       q('[data-efectolibre]', e => { st.efectoLibre = e.target.value; });
@@ -697,7 +702,9 @@ const AsistenteDueloHab = (() => {
           if(!st.contraOtro.trim()){ alert('Escribí con qué se resiste (o elegí «Nadie» si no hay nada que resista).'); return false; }
           out.contraOtro = st.contraOtro.trim();
         }
-        if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; out.ignoraDano = st.ignoraDano; if(cfg.costoVariable && st.danoFijoPorX && !st.danoDif) out.danoFijoPorX = st.danoFijoPorX; }
+        if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; out.ignoraDano = st.ignoraDano;
+          if(st.tipoDano !== 'fisico' && st.ignoraDano && st.frenoEsp === 'directo') out.danoDirecto = true;
+          if(st.tipoDano !== 'fisico' && st.ignoraDano && st.frenoEsp === 'true') out.trueDamage = true; if(cfg.costoVariable && st.danoFijoPorX && !st.danoDif) out.danoFijoPorX = st.danoFijoPorX; }
         if(st.dano && st.objetivo !== 'zona' && st.objetivo !== 'uno mismo' && st.danoDif){
           if(!hayTira || !out.contra.length){ alert('El daño «la diferencia» necesita una tirada (paso Tirada) y algo con qué resistirla (paso Resistencia).'); return false; }
           out.danoDiferencia = true;

@@ -82,7 +82,7 @@ const FichaResumen = (() => {
       hpMax: n(c.final.hpmax),
       ini: n(c.final.ini),   // Iniciativa: el mapa la usa para el botón "Tirar iniciativa" de la lista de turnos
       def: n(c.final.def),   // Defensa total: el mapa la resta al daño que se le asigna al token
-      armadmg: n(c.final.armadmg),   // Armadura mágica (Paso 3 del casteo): el mapa la resta al daño de casteo que ignora la Defensa
+      armadmg: n(c.final.armadmg),   // Defensa especial (Paso 3 del casteo): el mapa la resta al daño de casteo que ignora la Defensa
       muerto: {activo: !!(S.muerto && S.muerto.activo), turnos: num(S.muerto && S.muerto.turnos), definitivo: !!(S.muerto && S.muerto.definitivo)},   // el mapa tiñe de rojo la pantalla de su jugador y le da el botón Revivir
       esp: n(c.final.esp),   // Especial
       resmg: n(c.final.resmg),   // Res.Esp (2026-09-28): el mapa la usa para tirar sola la resistencia de una zona persistente, sin que la ficha esté abierta

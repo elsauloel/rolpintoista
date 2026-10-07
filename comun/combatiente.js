@@ -707,7 +707,9 @@ const Combatiente = (() => {
       contra: (c.contra || []).map(s => ({modo: s, stat: s, etq: etq(s)})),
       // Daño «la diferencia» (2026-10-02, Drenar Vida): no se tira, es lo que quien la usa le ganó a la resistencia. «Drena»: quien la
       // usa se cura lo que hizo de daño, y puede pasar su vida máxima hasta `drenaTope` % (como Excedente de vida).
-      dano: c.dano && (formula || c.danoDiferencia) ? {formula: c.danoDiferencia ? '' : formula, tipo, ignoraDef: c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico',
+      // Daño directo (ignora la Defensa especial: proyectiles chicos) y True Damage (ignora toda defensa y la Res. elemental): dueño, 2026-10-07.
+      dano: c.dano && (formula || c.danoDiferencia) ? {formula: c.danoDiferencia ? '' : formula, tipo, ignoraDef: c.trueDamage ? true : c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico',
+        ...(c.trueDamage ? {trueDamage: true} : c.danoDirecto && tipo !== 'fisico' ? {directo: true} : {}),
         ...(c.danoDiferencia ? {diferencia: true} : {}), ...(c.drena ? {drena: true, drenaTope: Math.max(0, nf(c.drenaTope))} : {})} : null,
       efectos: (c.efectos || []).map(efectoDeEjecucion),
       ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: nf(c.radio)} : {}),
@@ -741,7 +743,7 @@ const Combatiente = (() => {
      `o.resistValor`: la tirada de «tira», hecha UNA vez y reusada contra cada uno que entra o sigue adentro. */
   // Daño «la diferencia» (2026-10-02, Pedos Tóxicos): `zonaDanoDif` = cada uno que no resiste recibe la tirada de quien la creó
   // menos la suya; `zonaTiraExtra` (ej. '1d20') + `zonaNota`: si el daño entra, se tira y se publica con ese texto (a mano).
-  const TIPO_DANO_NOMBRE = {arcano: 'arcano', fuego: 'de fuego', hielo: 'de hielo', rayo: 'de rayo', toxico: 'tóxico', fisico: 'físico'};
+  const TIPO_DANO_NOMBRE = {arcano: 'arcano', fuego: 'de fuego', hielo: 'de hielo', rayo: 'eléctrico', toxico: 'tóxico', fisico: 'físico'};
   function zonaDeHab(h, c, o){
     o = o || {};
     const dif = !!(c.dano && c.danoDiferencia);
@@ -854,10 +856,10 @@ const Combatiente = (() => {
     return v;
   }
 
-  /* Elementos (2026-10-04, dueño): el daño de un elemento se frena con la resistencia a ese elemento (Res. fuego…) y con la Armadura mágica
+  /* Elementos (2026-10-04, dueño): el daño de un elemento se frena con la resistencia a ese elemento (Res. fuego…) y con la Defensa especial
      (que resta TODO daño mágico, arcano o elemental). `elementoDe(texto)` reconoce el elemento en el tipo de un daño ('Fuego', 'de fuego',
      'tóxico'…) → 'fuego' | 'hielo' | 'rayo' | 'toxico' | 'acido' | ''. */
-  const ELEMENTOS = {fuego: {etq: 'Res. fuego', icono: '🔥'}, hielo: {etq: 'Res. hielo', icono: '❄'}, rayo: {etq: 'Res. rayo', icono: '⚡'},
+  const ELEMENTOS = {fuego: {etq: 'Res. fuego', icono: '🔥'}, hielo: {etq: 'Res. hielo', icono: '❄'}, rayo: {etq: 'Res. eléctrica', icono: '⚡'},   // «eléctrico» en lo que se ve (dueño, 2026-10-07: «rayo» es un haz); el id sigue `rayo`
     toxico: {etq: 'Res. tóxico', icono: '☠'}, acido: {etq: 'Res. ácido', icono: '🧪'}};
   /* Las cinco resistencias elementales en la Botonera y en Equipo y mochila (dueño, 2026-10-06: debajo de las resistencias a crítico), igual para
      personajes, invocaciones y creeps. `valorDe(el)` → el número; `lupa(el)` → el botón 🔍 (o ''). Mismas clases que la fila de crítico. */
@@ -869,7 +871,7 @@ const Combatiente = (() => {
     }).join('');
     return `<div class="botonera-crit"><div class="botonera-crit-t">Resistencias elementales</div><div class="botonera-crit-grid">${tiles}</div></div>`;
   }
-  // «Res. rayo 2» o, si es negativa, «Res. rayo −2 (vulnerable)»: lo que se muestra al restarla del daño (2026-10-06).
+  // «Res. eléctrica 2» o, si es negativa, «Res. eléctrica −2 (vulnerable)»: lo que se muestra al restarla del daño (2026-10-06).
   const resElementalTxt = (el, res) => `${ELEMENTOS[el] ? ELEMENTOS[el].etq : 'Res. ' + el} ${res < 0 ? '−' + (-res) + ' (vulnerable)' : res}`;
   function elementoDe(texto){
     const t = String(texto || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -881,9 +883,9 @@ const Combatiente = (() => {
     return '';
   }
   const esMagicoTipo = texto => !!elementoDe(texto) || /arcan|magic/i.test(String(texto || ''));
-  // El daño tóxico (lo que se respira, los venenos) no es mágico: no lo frena la Armadura mágica, solo la Res. tóxico (y se resiste con
-  // Res.Esp, la de la Constitución). Dueño, 2026-10-05.
-  const frenaArmaduraMagica = el => el !== 'toxico';
+  // La Defensa especial (ex Defensa especial; dueño, 2026-10-07, P169) frena TODO el daño especial, también el tóxico (antes, 2026-10-05, el
+  // tóxico no). Lo que no frena: el daño directo (proyectiles chicos) y el True Damage — eso lo decide quien aplica el daño, no el elemento.
+  const frenaArmaduraMagica = () => true;
 
   /* ✋ La parte a mano de un arma especial (2026-10-05, dueño: «siempre que un efecto o mecánica sea demasiado complejo de automatizar se debe
      poder agregar una tirada o texto que lo explique, para que se resuelva manual»). `especial.aMano = {texto, tirada?, etiqueta?}`: al usarla, el

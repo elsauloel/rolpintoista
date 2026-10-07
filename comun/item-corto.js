@@ -49,8 +49,8 @@ const ItemCorto = (() => {
     const f = [];
     const tam = Math.max(0, num(t.tamano));
     f.push(['Forma', t.tipo === 'linea' ? `Línea de ${Math.max(1, tam)}` : tam ? `Flor de radio ${tam} (${casillas(tam)} casillas)` : 'Una casilla']);
-    const ELEM = {fuego: 'de fuego', hielo: 'de hielo', rayo: 'de rayo', toxico: 'tóxico', acido: 'de ácido'};
-    if(t.dano) f.push(['Daño', `${t.dano}${ELEM[t.elemento] ? ' ' + ELEM[t.elemento] : ''} · ${t.ignoraDef ? 'directo a la vida' : 'contempla la armadura'}${ELEM[t.elemento] ? ' (lo frena su resistencia y la Armadura mágica)' : ''}`]);
+    const ELEM = {fuego: 'de fuego', hielo: 'de hielo', rayo: 'eléctrico', toxico: 'tóxico', acido: 'de ácido'};
+    if(t.dano) f.push(['Daño', `${t.dano}${ELEM[t.elemento] ? ' ' + ELEM[t.elemento] : ''} · ${t.ignoraDef ? 'directo a la vida' : 'contempla la armadura'}${ELEM[t.elemento] ? ' (lo frena su resistencia y la Defensa especial)' : ''}`]);
     // El efecto: lo que aplica el mapa solo (el estado) y lo que queda a mano (efectoManual).
     if(t.estado){
       const sinFin = {Sentado: 'hasta que se pare', Sangrado: 'hasta que lo curen'}[t.estado];
@@ -109,7 +109,10 @@ const ItemCorto = (() => {
     const pct = pctEf(e);
     let n = nombreEf(e);
     if(n === 'Rompe armadura' && num(e.stacks) > 1) n = `Armadura rota ${num(e.stacks) === 2 ? 'doble' : '×' + num(e.stacks)}`;   // 2 stacks por golpe (Raras del Tipo 8)
-    if(e.danoMagico) return `+${e.dado} de ${String(e.nombre || 'magia').toLowerCase()}`;
+    if(e.danoMagico){   // «eléctrico» y «tóxico» son adjetivos: «+1d4 eléctrico» (el rayo, en lo que se ve, es eléctrico: dueño, 2026-10-07)
+      const n = String(e.nombre || 'magia').toLowerCase();
+      return /^(rayo|el[eé]ctric|t[oó]xic)/.test(n) ? `+${e.dado} ${/^t/.test(n) ? 'tóxico' : 'eléctrico'}` : `+${e.dado} de ${n}`;
+    }
     if(n === 'Drena vida') return `${e.soloCritico ? 'Si es crítico: drena otro' : 'Drena vida'} ${num(e.drenaPct) > 0 ? num(e.drenaPct) : 50} %`;
     if(e.soloCritico) return `Si es crítico: ${n}${num(e.stacks) > 0 && /^(Veneno|Sangrado)$/.test(n) ? ` ${num(e.stacks)} stacks` : ''}${pct < 100 ? ` ${pctTxt(e)}` : ''}${num(e.turnos) > 0 ? ` · ${num(e.turnos)} turnos` : ''}`;
     const st = num(e.stacks) > 0 && /^(Veneno|Sangrado)$/.test(n) ? ` ${num(e.stacks)} stacks` : '';
@@ -195,7 +198,7 @@ const ItemCorto = (() => {
     if(it.oporGratis) L.push('Oportunidad sin No2: el ataque de oportunidad con esta arma no cuesta Nitros. ⚙ Automatizado.');
     if(num(it.ahorroNitros)) L.push(`Primer ataque −${num(it.ahorroNitros)} No2: el primer ataque normal del turno con esta arma cuesta ${num(it.ahorroNitros)} No2 menos. ⚙ Automatizado.`);
     if(num(it.critD20)) L.push(`+${num(it.critD20)} d20 en el crítico: cuando el golpe es crítico se tira${num(it.critD20) === 1 ? ' un d20' : 'n ' + num(it.critD20) + ' d20'} más para el multiplicador (más chance de ×3, ×4 y de supercrítico). ⚙ Automatizado.`);
-    if(efs.some(e => e.danoMagico)) L.push('Daño mágico (rayo, hielo…): se tira aparte cuando el golpe pega; ignora la Defensa (solo resta la Armadura mágica) y queda afuera del multiplicador del crítico. ⚙ Automatizado.');
+    if(efs.some(e => e.danoMagico)) L.push('Daño mágico (rayo, hielo…): se tira aparte cuando el golpe pega; ignora la Defensa (solo resta la Defensa especial) y queda afuera del multiplicador del crítico. ⚙ Automatizado.');
     if(efs.some(e => e.soloCritico)) L.push('⚡ Si es crítico (Critical Matters): ese efecto solo entra si el golpe fue crítico; si no, ni aparece.');
     if(efs.some(e => pctEf(e) < 100 && !e.soloCritico)) L.push('Los porcentajes se tiran en el duelo, después del daño (50 % = una moneda, 33 % = un d6 que sale con 5 o 6, 25 % = un d4, 75 % = un d4 que falla solo con 1). Lisiado, Veneno y Sangrado necesitan que el golpe haga daño.');
     if(efs.some(e => e.seguroCritico)) L.push('Seguro si es crítico: con un golpe crítico, el efecto entra sin tirar.');

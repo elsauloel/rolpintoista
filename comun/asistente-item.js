@@ -72,7 +72,7 @@ const AsistenteItem = (() => {
   const GRUPO_TITULO = {arma: 'Armas', defensa: 'Defensa', accesorio: 'Accesorios', otro: 'Otros', consumible: 'Consumibles'};
   const RAPIDOS = {
     arma: [['pdg', 'PdG'], ['crit', 'Crít. frecuente'], ['critpot', 'Crít. potente'], ['pdgcontra', 'PdG en contraataque'], ['pdgopor', 'PdG en oportunidad'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['dmg', 'Dmg']],
-    defensa: [['eva', 'Evasión'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['hpmax', 'HP máx.'], ['mov', 'Movimiento'], ['armadmg', 'Armadura mágica']],
+    defensa: [['eva', 'Evasión'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo'], ['hpmax', 'HP máx.'], ['mov', 'Movimiento'], ['armadmg', 'Defensa especial']],
     accesorio: [['con', 'Con'], ['fue', 'Fue'], ['agl', 'Agi'], ['des', 'Des'], ['esp', 'Esp'], ['capcinturon', 'Ranuras de cinturón'], ['capmochila', 'Ranuras de mochila']],
     otro: [['con', 'Con'], ['fue', 'Fue'], ['agl', 'Agi'], ['des', 'Des'], ['esp', 'Esp']],
   };
@@ -129,7 +129,7 @@ const AsistenteItem = (() => {
     L.push(`Objetivo: ${ob}${tam}${du.conVista ? ' (todos los rivales que ve)' : ''}`);
     const tira = du.tiraFormula ? `${du.tiraEtiqueta || 'Tirada'} (${du.tiraFormula})` : statTxt(du.tira);
     if(tira) L.push(`Tira ${tira}${(du.contra || []).length ? ` contra ${du.contra.map(statTxt).join(' o ')}` : du.contraOtro ? ` contra ${du.contraOtro} (a mano)` : ', sin resistencia'}`);
-    if(du.dano) L.push(`Daño ${du.tipoDano || 'arcano'}${du.danoDiferencia ? ': la diferencia de las tiradas' : ''}${du.ignoraDano === false ? ' (la Defensa lo frena)' : ''}`);
+    if(du.dano) L.push(`Daño ${du.tipoDano || 'arcano'}${du.danoDiferencia ? ': la diferencia de las tiradas' : ''}${du.ignoraDano === false ? ' (la Defensa lo frena)' : du.trueDamage ? ' (True Damage: no lo frena nada)' : du.danoDirecto ? ' (daño directo: no lo frena la Defensa especial)' : ' (lo frena la Defensa especial)'}`);
     if((du.efectos || []).length) L.push('Efectos: ' + du.efectos.map(efectoTxt).join(', '));
     if(du.cadena) L.push(`Salta a ${du.cadena.saltos} más (a ${du.cadena.rango} casillas)`);
     if(du.reparte) L.push(`${du.reparte.total || 2} misiles de ${du.reparte.cada}, de a uno`);
@@ -545,7 +545,7 @@ const AsistenteItem = (() => {
           <input class="aa-ancho" data-aa-golpe="${i}" data-campo="detalle" value="${e(ef.detalle || '')}" placeholder="qué hace (opcional): ej. Veneno de 4 stacks">
           ${x.caras > 1 && !ef.soloCritico ? `<label class="aa-ancho" style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-aa-golpe="${i}" data-campo="seguroCritico" ${ef.seguroCritico ? 'checked' : ''} style="width:auto"> Si el golpe es crítico, entra seguro (sin tirar)</label>` : ''}
           <label class="aa-ancho" style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-aa-golpe="${i}" data-campo="soloCritico" ${ef.soloCritico ? 'checked' : ''} style="width:auto"> ⚡ Solo si el golpe es crítico (Critical Matters)</label>
-          ${ef.dado ? `<label class="aa-ancho" style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-aa-golpe="${i}" data-campo="danoMagico" ${ef.danoMagico ? 'checked' : ''} style="width:auto"> La tirada extra es daño mágico (ignora la Defensa, resta la Armadura mágica y no se multiplica con el crítico)</label>` : ''}
+          ${ef.dado ? `<label class="aa-ancho" style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-aa-golpe="${i}" data-campo="danoMagico" ${ef.danoMagico ? 'checked' : ''} style="width:auto"> La tirada extra es daño mágico (ignora la Defensa, resta la Defensa especial y no se multiplica con el crítico)</label>` : ''}
           ${/^drena(r)?\s+vida$/i.test(String(ef.nombre || '').trim()) ? `<label class="aa-ancho" style="display:flex;gap:6px;align-items:center;font-size:12.5px">Drena el <input data-aa-golpe="${i}" data-campo="drenaPct" type="number" min="1" max="100" step="5" value="${e(ef.drenaPct || 50)}" style="max-width:70px"> % de la vida que le saca de verdad (lo que frena la armadura no cuenta)</label>` : ''}
           <div class="aa-regla">${eg && x.nombre ? e(eg.reglaTxt(x)) + (x.seguroCritico && x.caras > 1 ? ' Con un crítico, entra seguro.' : '') + (x.dado ? ` Si entra, se tira además ${e(x.dado)}.` : '') : ''}</div>
         </div>`;

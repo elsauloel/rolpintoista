@@ -936,6 +936,8 @@ async function dueloAplicarDano(d){
   const dn = d.dano, t = tokens.get(d.defensor.tokenId);
   const critReal = d.resultado === 'pego' && d.crit && d.crit.critico;   // un crítico siempre ignora la Defensa, aunque el d20 no multiplique (×1)
   const magico = !!(d.hab && d.hab.dano && d.hab.dano.ignoraDef && d.resultado === 'pego');   // el daño mágico de una habilidad ignora la Defensa y no critica
+  // Daño directo (proyectiles chicos): ignora también la Defensa especial. True Damage: ignora toda defensa y la Res. elemental (dueño, 2026-10-07).
+  const trueDmg = !!(magico && d.hab.dano.trueDamage), directo = !!(magico && d.hab.dano.directo);
   const crit = critReal || magico;
   const habMagica = magico;   // (adentro del try, «magico» es otra cosa: el daño mágico del arma)
   // La pelea cercana (2026-10-05): pierde 1 por cada casillero de distancia después del primero (al lado, entero).
@@ -946,7 +948,7 @@ async function dueloAplicarDano(d){
   if(!t) return {...base, manual: true, motivoManual: 'el token ya no está en el mapa'};
   const esInv = t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION);
   let def = 0, armadmg = 0, invLeida = null;
-  if(esInv){   // 4e: su Defensa y su Armadura mágica, de sus datos (comun/inv-calculo.js, que se carga si hace falta)
+  if(esInv){   // 4e: su Defensa y su Defensa especial, de sus datos (comun/inv-calculo.js, que se carga si hace falta)
     try{
       await bnCargarPiezas();
       const inv = await invDeToken(t);
@@ -957,13 +959,13 @@ async function dueloAplicarDano(d){
   }
   else if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); def = sc ? creepDefensaMapa(sc) : 0; armadmg = sc ? creepArmadmgMapa(sc) : 0; }
   else{ const f = fichasPub.get(t.fichaId); def = f && f.resumen && f.resumen.def !== undefined ? num(f.resumen.def) : 0; armadmg = f && f.resumen ? num(f.resumen.armadmg || 0) : 0; }
-  // Un crítico real ignora la Defensa entera (0); el daño de casteo que la ignora (Paso 1) resta la Armadura mágica (Paso 3) en vez de nada.
+  // Un crítico real ignora la Defensa entera (0); el daño de casteo que la ignora (Paso 1) resta la Defensa especial (Paso 3) en vez de nada.
   // El elemento del daño de la habilidad (2026-10-04): se resta además la resistencia de quien lo recibe a ese elemento (Res. fuego…).
   const elDano = d.hab && d.hab.dano ? Combatiente.elementoDe(d.hab.dano.tipo) : '';
-  const frenaAm = magico && Combatiente.frenaArmaduraMagica(elDano);   // lo tóxico no lo frena la Armadura mágica (2026-10-05)
+  const frenaAm = magico && !directo && !trueDmg && Combatiente.frenaArmaduraMagica(elDano);   // la Defensa especial frena todo el daño especial (también el tóxico, 2026-10-07)
   const restaIgnorando = frenaAm ? armadmg : 0;
-  const resEl = elDano ? (await resistenciasDe(t, elDano, invLeida)).res : 0;
-  const freno = [...(menosDist ? [`la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Armadura mágica ${armadmg}`] : []), ...(resEl ? [Combatiente.resElementalTxt(elDano, resEl)] : [])].join(' − ');
+  const resEl = elDano && !trueDmg ? (await resistenciasDe(t, elDano, invLeida)).res : 0;
+  const freno = [...(menosDist ? [`la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Defensa especial ${armadmg}`] : []), ...(resEl ? [Combatiente.resElementalTxt(elDano, resEl)] : [])].join(' − ');
   let aplicar = golpe, ignoraDef = crit;
   if(base.mitad){ aplicar = Math.ceil(Math.max(0, golpe - def) / 2); ignoraDef = true; }
   // Bloqueo perdido (mitad del daño): el arma o escudo con el que bloqueó pierde 1 punto de durabilidad (solo personajes: los creeps y las invocaciones no llevan).
@@ -977,7 +979,7 @@ async function dueloAplicarDano(d){
     const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD)
       : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD);
     const espinas = res.r.invulnerable ? null : await dueloEspinas(d, golpe);   // el daño inflictido (con el multiplicador del crítico), antes de la Defensa
-    // Daño mágico del arma (rayo / hielo): aparte, después del golpe — ignora la Defensa (resta la Armadura mágica) y no se multiplica.
+    // Daño mágico del arma (rayo / hielo): aparte, después del golpe — ignora la Defensa (resta la Defensa especial) y no se multiplica.
     let magico = null;
     if(dn.magico && num(dn.magico.total) > 0 && !res.r.invulnerable){
       const rm = esInv ? await danioInv(t, String(num(dn.magico.total)), true, armadmg, 0, {magico: true})

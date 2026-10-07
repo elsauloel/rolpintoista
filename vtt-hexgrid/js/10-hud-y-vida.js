@@ -108,7 +108,7 @@ let hpModo = 'danio';   // 'danio' | 'directo' (vuelve a 'danio' cada vez que se
 
 function creepDefensaMapa(sc){ return CreepCalculo.defensaEfectiva(sc); }   // comun/creep-calculo.js
 
-// Armadura mágica (Paso 3 de las reglas de casteo, docs/reglas-casteo.md):
+// Defensa especial (Paso 3 de las reglas de casteo, docs/reglas-casteo.md):
 // stat general y fijo, sin atributo (base a mano, sc.armadmg, 0 por
 // defecto). A diferencia de Defensa, sus bonos de equipo NO se hornean en
 // la base al equipar (gm-tools los deja en it.mods): se suman acá en vivo,
@@ -151,7 +151,7 @@ function golpeTexto(nombre, golpe, r, previo, nuevo){
 
 // ignoraDef: daño directo (un crítico, una trampa que ignora la Defensa, casteo…):
 // no se le resta la Defensa. restaIgnorando (opcional, Paso 3 del casteo): en vez
-// de nada, se le resta ESTO (la Armadura mágica) — solo lo usa el daño de casteo
+// de nada, se le resta ESTO (la Defensa especial) — solo lo usa el daño de casteo
 // que ignora la Defensa (dueloAplicarDano); todo lo demás (críticos, trampas,
 // fuego, Rayo en cadena) sigue ignorando la Defensa entera, sin cambios.
 // restaExtra (2026-10-04): lo que se resta además (la resistencia al elemento del daño), con o sin Defensa.
@@ -288,7 +288,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   return res;
 }
 
-/* La resistencia de un token a un elemento y su Armadura mágica (2026-10-04), para restarlas al daño mágico o elemental: personaje (su resumen),
+/* La resistencia de un token a un elemento y su Defensa especial (2026-10-04), para restarlas al daño mágico o elemental: personaje (su resumen),
    creep (su parte privada, solo el GM), invocación (sus datos). → {res, armadmg}; con `inv` ya leída, sin volver a leerla. */
 async function resistenciasDe(t, el, inv){
   if(!t) return {res: 0, armadmg: 0};
@@ -318,7 +318,7 @@ function hudHpHtml(t, d){
     <div class="hud-hp-expl">${danio
       ? (def === null
         ? 'No conozco su Defensa todavía (la ficha la publica al guardarse). Usá <b>2 · HP directo</b>.'
-        : hpRayo ? '<b>⚡ Rayo</b>: daño mágico <b>directo a la vida</b> (no se resta la Defensa) y <b>salta</b> a otros del mismo bando hasta 3 casillas de distancia, una vez por objetivo, con la mitad del daño en cada salto (hacia abajo: con 1 ya no salta).'
+        : hpRayo ? '<b>⚡ Relámpago</b>: daño eléctrico <b>directo a la vida</b> (no se resta la Defensa) y <b>salta</b> a otros del mismo bando hasta 3 casillas de distancia, una vez por objetivo, con la mitad del daño en cada salto (hacia abajo: con 1 ya no salta).'
         : hpCritMult > 1 ? `<b>Crítico (×${hpCritMult})</b>: el daño se multiplica y <b>NO se resta la Defensa</b> (${fmt(def)}); lo que pasa baja su HP.`
         : `Escribí el <b>daño del golpe</b>. Se le resta la Defensa (<b>${fmt(def)}</b>) y lo que pasa baja su HP.`)
       : 'Cambia el HP <b>sin tener en cuenta la Defensa</b>. Un número lo fija; +5 cura y −3 baja directo.'}</div>
@@ -326,7 +326,7 @@ function hudHpHtml(t, d){
       ${[[1, 'Normal', 'Sin crítico'], [2, '×2', 'Doble daño'], [3, '×3', 'Triple daño'], [4, '×4', 'Cuádruple daño']].map(([k, r, t2]) => `<button type="button" class="hud-mini${hpCritMult === k ? ' activo' : ''}" data-hud-critmult="${k}" title="${t2}">${r}</button>`).join('')}
       ${typeof Critico !== 'undefined' ? '<button type="button" class="hud-mini calc" data-hud-critcalc="1" title="Calculadora de crítico: PdG, Evasión, d20…">🎯</button>' : ''}
     </div>` : ''}
-    ${danio ? `<div class="hud-crit-fila"><button type="button" class="hud-mini${hpRayo ? ' activo' : ''}" data-hud-rayo="1" title="Rayo: daño mágico directo a la vida (no se resta la Defensa) que salta a otros del mismo bando hasta 3 casillas de distancia, una sola vez por objetivo, con la mitad del daño en cada salto (redondeado hacia arriba)">⚡ Rayo en cadena</button></div>` : ''}
+    ${danio ? `<div class="hud-crit-fila"><button type="button" class="hud-mini${hpRayo ? ' activo' : ''}" data-hud-rayo="1" title="Relámpago: daño eléctrico directo a la vida (no se resta la Defensa) que salta a otros del mismo bando hasta 3 casillas de distancia, una sola vez por objetivo, con la mitad del daño en cada salto (redondeado hacia arriba)">⚡ Relámpago en cadena</button></div>` : ''}
     <input class="hud-hp-in" data-hud-hp-in inputmode="decimal" autocomplete="off" placeholder="${danio ? 'daño del golpe' : 'valor, +5 o −3'}">
     <div class="hud-hp-prev" data-hud-hp-prev></div>
     <div class="hud-hp-pie">Enter aplica · Esc cierra</div>
@@ -413,7 +413,7 @@ async function rayoCadenaAplicar(cadena){
     }catch(err){ console.error('No se pudo aplicar el salto del rayo:', err); }
     (ok ? hechos : manual).push(`${nombre}: ${s.dano}`);
   }
-  alertaRojaAnonima('⚡ Rayo en cadena', `Saltó a ${saltos.length} más (la mitad del daño en cada salto, redondeada hacia abajo). ${hechos.length ? 'Aplicado solo: ' + hechos.join(' · ') + '. ' : ''}${manual.length ? 'Aplicalo a mano: ' + manual.join(' · ') + ' (directo a la vida).' : ''}`);
+  alertaRojaAnonima('⚡ Relámpago en cadena', `Saltó a ${saltos.length} más (la mitad del daño en cada salto, redondeada hacia abajo). ${hechos.length ? 'Aplicado solo: ' + hechos.join(' · ') + '. ' : ''}${manual.length ? 'Aplicalo a mano: ' + manual.join(' · ') + ' (directo a la vida).' : ''}`);
 }
 
 async function hudHpAplicar(t, texto){

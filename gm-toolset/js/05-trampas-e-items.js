@@ -159,7 +159,7 @@ function cfgItemGM(){
     elegirEstado: () => elegirEstadoDuelo(),   // el «+ Estado» de la Ejecución ✨ de un arma especial
     stats: [...CREEP_DERIVED_STATS.map(s => ({id: s.id, label: s.label})),
       ...['tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5'].map(id => ({id, label: `Res. crítico ${STAT_LABEL_GM[id]}`})),
-      {id: 'armadmg', label: 'Armadura mágica'},
+      {id: 'armadmg', label: 'Defensa especial'},
       ...Object.entries(Combatiente.ELEMENTOS).map(([el, x]) => ({id: 'res' + el, label: x.etq}))],
     ejemplos: (tipoItem, t) => CATALOGO_EQUIPO.filter(it => String(it.tipoItem || '').startsWith('arma_') && num(it.tipoDado) === t).map(it => it.nombre),
   };

@@ -1,6 +1,6 @@
 /* =========================================================
    CREEP-CALCULO — las reglas de un creep, fuera de GM Tools (paso 4, etapa 4a de docs/plan-paso4-etapa4.md, 2026-10-01)
-   Lo que antes vivía en gm-toolset/js/01 y js/02 (creepStatValor, creepModTotal, Defensa, Armadura mágica, críticos, No2
+   Lo que antes vivía en gm-toolset/js/01 y js/02 (creepStatValor, creepModTotal, Defensa, Defensa especial, críticos, No2
    máximo, costos de atacar / Parry / habilidades, Bloqueo, Fuerza del golpe, daño del arma, normalizarCreep y sus
    migraciones, los textos de "de dónde sale"), copiado tal cual: todo recibe el creep (`sc`). Así calculan igual GM Tools y
    el mapa (que tenía copias parciales: creepModTotalMapa, creepDefensaMapa, zonaStatCreep…). No toca pantalla ni Firebase.
@@ -139,7 +139,7 @@ const CreepCalculo = (() => {
     v -= rota;
     return Math.max(0, v);
   }
-  // Armadura mágica (Paso 3 de las reglas de casteo, docs/reglas-casteo.md):
+  // Defensa especial (Paso 3 de las reglas de casteo, docs/reglas-casteo.md):
   // stat general, fijo, que NO sale de ningún atributo (base a mano, 0 por
   // defecto) — solo la dan ítems Raros o mejores, vía sus bonos genéricos
   // (no tiene un campo propio como "def" en las piezas de armadura). Protege
@@ -510,7 +510,7 @@ const CreepCalculo = (() => {
     // Los que dan las piezas defensivas (2026-10-06: en GM Tools se veían con su nombre interno, «oporahorro +1»).
     dmg:'Dmg', bloqueo:'Bloqueo', pdgopor:'PdG en oportunidad', pdgcontra:'PdG en contraataque', pdgmg:'PdG.Esp', dmgesp:'Ef.Esp',
     percepcion:'Percepción', vision:'Visión', luz:'Luz', sigilo:'Sigilo', spregen:'SP Regen', boticario:'Mano de boticario',
-    resfuego:'Res. fuego', reshielo:'Res. hielo', resrayo:'Res. rayo', restoxico:'Res. tóxico', resacido:'Res. ácido', armadmg:'Armadura mágica',
+    resfuego:'Res. fuego', reshielo:'Res. hielo', resrayo:'Res. eléctrica', restoxico:'Res. tóxico', resacido:'Res. ácido', armadmg:'Defensa especial',
     pisadaatenta:'Pisada atenta', recuperarse:'Recuperarse rápido (%)', capcinturon:'Ranuras de cinturón', inamovible:'Inamovible (%)', guardian:'Guardián', escolta:'Escolta (a mano)', levantarse:'Levantarse rápido', levitar:'Levitar', suelagruesa:'Suela gruesa', meditar:'Meditar',
     pdgt4:'PdG con punzantes', pdgt6:'PdG con cortantes', pdgt8:'PdG con hachas', pdgt10:'PdG con contundentes', pdgdist:'PdG a distancia',
     oporahorro:'Oportunidad: No2 de menos', contraahorro:'Contraataque: No2 de menos', soltarse:'Soltarse', trampaoculta:'Trampas mejor escondidas',

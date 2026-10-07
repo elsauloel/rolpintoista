@@ -512,13 +512,13 @@ async function zonaResolverBanner(){
     if(el.zonaDanoDif){ monto = diferencia; if(monto > 0 && el.zonaDano){ const r = tirarDados(el.zonaDano); if(r) monto += r.total; } }   // la diferencia (+ lo que se le suma: el 1d4 del miasma, si la diferencia entró)
     else{ const r = tirarDados(el.zonaDano); if(r) monto = r.total; }
     const tipoTxt = el.zonaDanoTipo ? ` ${el.zonaDanoTipo}` : '';
-    // Una zona de HABILIDAD cuyo daño ignora la Defensa es daño de casteo: le resta la Armadura mágica de quien lo recibe, como en el
+    // Una zona de HABILIDAD cuyo daño ignora la Defensa es daño de casteo: le resta la Defensa especial de quien lo recibe, como en el
     // duelo (dueloAplicarDano). Lo confirmó el dueño para el tóxico (P142, 2026-10-02). Las zonas del GM y de trampas, no.
-    // Resistencia elemental (2026-10-04): el daño de un elemento resta la resistencia a ese elemento, y como es daño mágico también la Armadura mágica.
+    // Resistencia elemental (2026-10-04): el daño de un elemento resta la resistencia a ese elemento, y como es daño mágico también la Defensa especial.
     let elZ = Combatiente.elementoDe(el.zonaDanoTipo || '');
     if(!elZ && el.trampa){ try{ elZ = (JSON.parse(el.trampaEstado || '{}') || {}).elemento || ''; }catch(err){} }   // la zona que dejó una trampa: el elemento de la trampa
     const rz = await resistenciasDe(t, elZ);
-    const armadmg = el.zonaIgnoraDef && (el.zonaCasteadorRef || elZ) && Combatiente.frenaArmaduraMagica(elZ) ? rz.armadmg : 0;   // lo tóxico, no (2026-10-05)
+    const armadmg = el.zonaIgnoraDef && (el.zonaCasteadorRef || elZ) && Combatiente.frenaArmaduraMagica(elZ) ? rz.armadmg : 0;   // la Defensa especial: todo el daño especial, también el tóxico (2026-10-07)
     const resEl = (elZ ? rz.res : 0) + (tocaElPiso(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0);   // + Suela gruesa (pies, 2026-10-06): lo que pisás hace menos — solo lo del piso (2026-10-07)
     if(monto > 0){
       try{
@@ -526,9 +526,9 @@ async function zonaResolverBanner(){
         const oZ = {magico: !!(elZ || (el.zonaIgnoraDef && el.zonaCasteadorRef))};   // el Orbe de absorción (js/26)
         if(t.tipo === 'creep') res = await danioCreep(t, String(monto), !!el.zonaIgnoraDef, armadmg, resEl, oZ);
         else if(puedoMover(t)) res = await (String(t.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(t, String(monto), !!el.zonaIgnoraDef, armadmg, resEl, oZ);
-        const freno = [...(armadmg > 0 ? [`${armadmg} de Armadura mágica`] : []), ...(resEl ? [Combatiente.resElementalTxt(elZ, resEl)] : [])];
+        const freno = [...(armadmg > 0 ? [`${armadmg} de Defensa especial`] : []), ...(resEl ? [Combatiente.resElementalTxt(elZ, resEl)] : [])];
         partes.push(`${monto} de daño${tipoTxt}${freno.length ? ` (− ${freno.join(' − ')})` : ''}`);
-        danoHecho = res && res.r ? num(res.r.recibido) : monto;   // lo que llegó a la vida (escudos y Armadura mágica ya restados)
+        danoHecho = res && res.r ? num(res.r.recibido) : monto;   // lo que llegó a la vida (escudos y Defensa especial ya restados)
       }catch(err){ console.error('No se pudo aplicar el daño de la zona:', err); partes.push(`${monto} de daño${tipoTxt} (aplicalo a mano)`); danoHecho = monto; }
     }else if(monto === 0) partes.push('sin daño');
   }

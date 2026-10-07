@@ -492,6 +492,7 @@ const Duelo = (() => {
     const contra = (Array.isArray(h.contra) ? h.contra : []).slice(0, 4)
       .map(c => ({modo: txtCorto(c.modo || c.stat, 20), stat: txtCorto(c.stat || c.modo, 20), etq: txtCorto(c.etq || c.stat || c.modo, 30)})).filter(c => c.stat);
     const dano = h.dano && (String(h.dano.formula || '').trim() || h.dano.diferencia) ? {formula: txtCorto(h.dano.formula, 40), tipo: txtCorto(h.dano.tipo || 'arcano', 20), ignoraDef: h.dano.ignoraDef !== false,
+      ...(h.dano.trueDamage ? {trueDamage: true} : h.dano.directo ? {directo: true} : {}),   // dueño, 2026-10-07 (P169)
       ...(h.dano.diferencia ? {diferencia: true} : {}), ...(h.dano.drena ? {drena: true, drenaTope: Math.max(0, Math.round(_num(h.dano.drenaTope)))} : {})} : null;
     const efectos = limpiarEfectos(h.efectos);
     const objetivo = ['enemigo', 'aliado', 'uno mismo', 'area', 'onda', 'cono', 'linea'].includes(h.objetivo) ? h.objetivo : 'enemigo';
@@ -946,7 +947,7 @@ const Duelo = (() => {
         // sacó de verdad al defensor (lo que frena la armadura no cuenta). No es un estado sobre el golpeado: lo aplica el mapa con el daño.
         const drenas = crudos.filter(esDrenaEf);
         if(drenas.length){ m.dano.drenaPct = Math.min(100, drenas.reduce((a, e) => a + (_num(e.drenaPct) > 0 ? _num(e.drenaPct) : 50), 0)); crudos = crudos.filter(e => !esDrenaEf(e)); }
-        // Daño mágico de un arma (2026-10-03, rayo / hielo): se tira acá, ignora la Defensa (resta la Armadura mágica) y queda AFUERA del
+        // Daño mágico de un arma (2026-10-03, rayo / hielo): se tira acá, ignora la Defensa (resta la Defensa especial) y queda AFUERA del
         // multiplicador del crítico (regla del dueño). Lo aplica el mapa junto con el daño.
         const magicos = crudos.filter(e => e && e.danoMagico && e.dado);
         if(magicos.length && typeof tirarDados === 'function'){

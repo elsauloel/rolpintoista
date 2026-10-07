@@ -145,7 +145,7 @@ const CreepBotonera = (() => {
               ${lupaBotonHtml(`${sc.id}|defensa|def`)}
               <span class="bt-label">Defensa</span><span class="bt-value">${fmt(defensaEfectiva(sc))}</span>
             </div>
-            <div class="botonera-tile bt-info" title="Armadura mágica: se resta al daño de casteo que ignora la Defensa (no se tira)">
+            <div class="botonera-tile bt-info" title="Defensa especial: se resta al daño de casteo que ignora la Defensa (no se tira)">
               ${lupaBotonHtml(`${sc.id}|defensa|armadmg`)}
               <span class="bt-label">Armad. mágica</span><span class="bt-value">${fmt(armadmgEfectiva(sc))}</span>
             </div>

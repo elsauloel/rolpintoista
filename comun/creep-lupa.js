@@ -42,11 +42,11 @@ const CreepLupa = (() => {
     const sinCosto = lupaSeccion('Costo', lupaFila('Esta tirada', 'sin costo'));
     if(tipo === 'stat') return {titulo: `${sc.nombre} · ${K.STAT_LOOKUP[ref].label}`, html: stat(sc, ref) + sinCosto};
     if(tipo === 'defensa'){
-      // Defensa, Armadura mágica y resistencia a crítico: de dónde sale cada número (equipo, base a mano, armadura rota).
+      // Defensa, Defensa especial y resistencia a crítico: de dónde sale cada número (equipo, base a mano, armadura rota).
       const esDef = ref === 'def', esArmadmg = ref === 'armadmg';
       const i = (esDef || esArmadmg) ? 0 : num(String(ref).replace('tipo', '')) - 1;
       const texto = esDef ? K.defensaOrigenTxt(sc) : esArmadmg ? K.armadmgOrigenTxt(sc) : K.critOrigenTxt(sc, i);
-      const titulo = esDef ? 'Defensa' : esArmadmg ? 'Armadura mágica' : 'Res. a crítico Tipo ' + (4 + 2 * i);
+      const titulo = esDef ? 'Defensa' : esArmadmg ? 'Defensa especial' : 'Res. a crítico Tipo ' + (4 + 2 * i);
       const nota = esArmadmg ? 'No se tira: se resta al daño de casteo que ignora la Defensa (Paso 3 del casteo).' : 'No se tira: se resta al daño (Defensa) o baja la chance de un crítico.';
       return {titulo: `${sc.nombre} · ${titulo}`, html: lupaSeccion('De dónde sale', texto.split('\n').map(l => lupaNota(esc(l))).join('')) + lupaNota(nota)};
     }
@@ -188,7 +188,7 @@ const CreepLupa = (() => {
       ${seccion('Daño y defensa', `<div class="vc-cajas vc-2">
         ${caja('Daño', K.ataqueTxt(sc), K.ataqueOrigenTxt(sc))}
         ${caja('Defensa', fmt(K.defensaEfectiva(sc)), K.defensaOrigenTxt(sc))}
-        ${K.armadmgEfectiva(sc) ? caja('Armadura mágica', fmt(K.armadmgEfectiva(sc)), K.armadmgOrigenTxt(sc)) : ''}
+        ${K.armadmgEfectiva(sc) ? caja('Defensa especial', fmt(K.armadmgEfectiva(sc)), K.armadmgOrigenTxt(sc)) : ''}
       </div>
       ${crits ? `<div class="vc-cajas vc-5">${crits}</div>` : ''}`)}
       ${seccion('Habilidades', habsHtml !== undefined ? habsHtml : (habilidades ? `<div class="vc-chips">${habilidades}</div>` : '<div class="hint">Sin habilidades.</div>'))}

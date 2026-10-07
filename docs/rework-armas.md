@@ -1783,6 +1783,20 @@ que sume el Ef.Esp del personaje choca con la Defensa especial.** Dueño: «eso 
 - **El Ef.Esp siempre choca con la Defensa especial** («el equivalente a la Fuerza, pero en magia»): un daño que suma el Ef.Esp nunca es directo.
 - Todo el resto del daño especial se frena con la Defensa especial.
 
+**Respuestas del dueño (2026-10-07):**
+- **Reparto por material** ✅ para probar: el **metal**, Defensa física; la **tela**, Defensa especial; el **cuero**, intermedio entre las dos;
+  y puede haber piezas como el **«metal con runas»**. Lo que importa al final es el **equilibrio de disponibilidad**: el **Bazar** (arcano) sirve
+  para ajustarla.
+- **Daño directo**: ignora la Defensa especial, **no** la Res. elemental ✅. **True Damage**: ignora todo, también la Res. elemental.
+- El **Escudo especial** (la vida de más que se gasta primero) sí frena el True Damage, pero **cambia de nombre** a algo que diga que es vida de
+  más (a elegir).
+- Proyectiles chicos = daño directo ✅. **Las áreas chocan con la Defensa especial: hay que subirles el daño.**
+- Defensa especial = la Armadura mágica renombrada y sin escasez ✅ · el tóxico también choca ✅ · las zonas y trampas especiales también ✅.
+- **Hecho en el motor (2026-10-07):** el nombre (Def. especial; id `armadmg`), el tóxico frenado, el daño directo y el True Damage en la
+  Ejecución (`danoDirecto`, `trueDamage`; se eligen en el paso Daño del asistente) y aplicados en el mapa (js/13), el elemento «eléctrico» en lo
+  que se ve (Res. eléctrica, ⚡ Relámpago en cadena). Falta: las trampas especiales sin elemento (la Runa arcana) todavía no restan la Defensa
+  especial; los nombres de habilidades de creeps con «rayo» (algunos son relámpagos) quedan para el rework de creeps.
+
 **Lo que ya existe y sirve:** el stat `armadmg` («Armadura mágica»: un número fijo que se resta al daño de casteo, para personajes, creeps e
 invocaciones, ya restado en el mapa) — hoy ningún ítem del catálogo lo da. Propuesta: **es la misma pieza con otro nombre**, Defensa especial,
 y deja de ser escasa.

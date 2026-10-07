@@ -49,12 +49,13 @@ const FichaCalculo = (() => {
   ];
   const EXTRA = [
     {id:'def', label:'Defensa', full:'Defensa'},
-    // Armadura mágica (Paso 3 de las reglas de casteo, docs/reglas-casteo.md):
+    // Defensa especial (Paso 3 de las reglas de casteo, docs/reglas-casteo.md):
     // stat general, fijo, que NO sale de ningún atributo (arranca en 0) — solo
     // lo dan ítems Raros o mejores. Protege el daño de casteo que "ignora la
     // Defensa" (Paso 1); no tiene nada que ver con el Escudo especial (HP
     // temporal) ni con la skill del Mago "Armadura arcana".
-    {id:'armadmg', label:'Armadura mágica', full:'Armadura mágica: se resta al daño de casteo que ignora la Defensa. No sale de ningún atributo — solo la dan ítems raros o mejores.'},
+    // Defensa especial (2026-10-07, dueño, P169): es la ex Defensa especial, renombrada y sin escasez — se equipa como la Defensa.
+    {id:'armadmg', label:'Def. especial', full:'Defensa especial: se resta al daño especial (arcano, eléctrico, fuego, hielo, tóxico, ácido), como la Defensa al físico. No la frena: el daño directo (proyectiles chicos) ni el True Damage. No sale de ningún atributo: la da el equipo.'},
     // Los ids tipo1..tipo5 quedaron de antes de correr la escala +2 (eran
     // Tipo 2..10): no se renombran para no tocar los mods ya guardados.
     {id:'tipo1', label:'Tipo 4', full:'Resistencia a crítico — armas Tipo 4 (d4)'},
@@ -126,7 +127,7 @@ const FichaCalculo = (() => {
     {id:'foco', label:'Foco', full:'PdG.Esp extra si no te moviste en este turno'},
     {id:'pulso', label:'Pulso quieto', full:'PdG extra si no te moviste antes de atacar en este turno'},
     {id:'pasofantasma', label:'Paso fantasma', full:'Evasión extra si en esta ronda te moviste 3 casilleros o más'},
-    {id:'cambiante', label:'Cambiante', full:'Al empezar el combate elegís Res. fuego, hielo o rayo: suma esta cantidad'},
+    {id:'cambiante', label:'Cambiante', full:'Al empezar el combate elegís Res. fuego, hielo o eléctrica: suma esta cantidad'},
     {id:'absorbearmadura', label:'Armadura indestructible', full:'La primera Armadura rota de cada combate se absorbe'},
     {id:'impulsofue', label:'Fuerza del Toro', full:'Una vez por combate, +N a tu última tirada de Fuerza (como la Polilla)'},
     {id:'impulsodes', label:'Manos Ligeras', full:'Una vez por combate, +N a tu última tirada de Destreza (como la Polilla)'},
@@ -144,10 +145,10 @@ const FichaCalculo = (() => {
     {id:'defdist', label:'Defensa contra armas a distancia', full:'Defensa extra contra los golpes de armas a distancia'},
     {id:'pagarhp', label:'Pagar con vida', full:'Con un arma especial, elegís cada vez si pagás el SP con SP o con vida (1 HP por SP)'},
     {id:'retirada', label:'Retirada limpia (%)', full:'Chance (en %) de alejarte de un rival sin darle ataque de oportunidad: 33 = 5–6 en d6, 50 = 4–6, 100 = siempre'},
-    // Resistencias elementales (2026-10-04, dueño): cada una se resta al daño de su elemento (además de la Armadura mágica). Situacionales: pesan poco.
+    // Resistencias elementales (2026-10-04, dueño): cada una se resta al daño de su elemento (además de la Defensa especial). Situacionales: pesan poco.
     {id:'resfuego', label:'Res. fuego', full:'Resistencia al fuego: se resta a todo daño de fuego'},
     {id:'reshielo', label:'Res. hielo', full:'Resistencia al hielo: se resta a todo daño de hielo'},
-    {id:'resrayo', label:'Res. rayo', full:'Resistencia al rayo: se resta a todo daño de rayo'},
+    {id:'resrayo', label:'Res. eléctrica', full:'Resistencia eléctrica: se resta a todo daño eléctrico'},
     {id:'restoxico', label:'Res. tóxico', full:'Resistencia a lo tóxico: se resta a todo daño tóxico'},
     {id:'resacido', label:'Res. ácido', full:'Resistencia al ácido: se resta a todo daño de ácido'},
   ];

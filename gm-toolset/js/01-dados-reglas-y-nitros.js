@@ -215,7 +215,7 @@ function creepModTotal(sc, statId){ return CreepCalculo.modTotal(sc, statId); }
 function creepEstadosArmadura(sc){ return CreepCalculo.estadosArmadura(sc); }
 function creepAporteArmadura(sc, statId){ return CreepCalculo.aporteArmadura(sc, statId); }
 function creepDefensaEfectiva(sc){ return CreepCalculo.defensaEfectiva(sc); }
-// Armadura mágica (Paso 3 de las reglas de casteo, docs/reglas-casteo.md):
+// Defensa especial (Paso 3 de las reglas de casteo, docs/reglas-casteo.md):
 // stat general, fijo, que NO sale de ningún atributo (base a mano, 0 por
 // defecto) — solo la dan ítems Raros o mejores, vía sus bonos genéricos
 // (no tiene un campo propio como "def" en las piezas de armadura). Protege

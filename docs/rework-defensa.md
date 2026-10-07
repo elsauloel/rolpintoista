@@ -1629,6 +1629,7 @@ levanta a un caído). Peso 1 por cada +1 (como Vida +5).
 | Pies Común ✅ (2026-10-07) | 13 / 10 (antes 18 / 0) | 13 / 10 / 1 de 32 |
 | Escudos Común ✅ (2026-10-07) | 30 / 9 (antes 34 / 0) | 21 / 8 / 4 de 29 (sin orbes) |
 | Orbes Común y Buena ✅ (2026-10-07) | Común 0 / 4 · Buena 0 / 8 | todos con Def. especial; resistencias: Común ⚡1 ☠1 · Buena 🔥3 ☠2 |
+| Torso Buena ✅ (2026-10-07) | 95 / 47 (antes 131 / 0) | 26 / 22 / 7 de 41 · res. ❄2 🧪3 |
 | **Total Común ✅** | **136 / 81** (antes 185 / 0) | 90 / 68 / 16 de 243 · res. 🔥14 ❄8 ⚡6 ☠6 🧪8 (antes 🔥12 ❄6 ⚡5 ☠4 🧪8) |
 
 **Cómo se revisa cada slot y tier (dueño, 2026-10-07):** (1) convertir por material (tabla para el OK del dueño); (2) **la Defensa especial
@@ -1696,3 +1697,8 @@ magia y a lo esotérico, pero puede ser un farol que da visibilidad, la cabeza r
 como ofrenda a la Pachamama… cualquier cosa. Puede dar **cualquier resistencia elemental** (el comodín para balancear lo que falte en otros
 slots) y va a ser **una gran herramienta para balancear el equipo en general**. Se rediseña por completo, con una lluvia de ideas. Los orbes
 Comunes propuestos (Defensa especial en el de luz y el salvaje; nuevos: de cuarzo opaco y de humo atrapado) quedan en espera.
+
+Torso Buena: tela a Defensa especial (Gambesón acolchado de doble capa 4, Chaqueta del acróbata 3, las túnicas, capas y chaquetas 2, Túnica del
+pozo sin fondo y Gambesón del veterano 1); híbridos: Coraza consagrada y Coraza rúnica (metal con oraciones y runas, 2/2), Jubón de cuero
+tachonado 2/2, Abrigo de púas de puercoespín gigante 1/2, Delantal de boticario 2/1, Pieles erizadas del berserker 2/1. Nuevas: Manto de seda
+de araña lunar (Def. especial +5 · Evasión +1 · Res. ácido +1) y Coraza de bronce con runas (Def +3 · Def. especial +3 · Res.CC +1 · Vida +10).

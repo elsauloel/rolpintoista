@@ -1330,15 +1330,17 @@ async function publicarShop(){
     const lote = fbDb.batch();
     lote.set(refTienda('publicada'), {json, actualizado: ts, abierta: tiendaFb.abierta === true});
     lote.set(refTienda('stock'), {version: stockVersion, items: tiendaActual.items.slice(), reposiciones: 0, reserva: G.reservaDe(tiendaActual.tamano), vendidos: 0, actualizado: ts});
+    let sinStock = false;
     try{ await lote.commit(); }
     catch(err){   // sin las reglas nuevas: se publica como antes, sin stock
       console.error('No se pudo publicar el stock (¿reglas sin publicar?):', err);
       await refTienda('publicada').set({json: JSON.stringify(tiendaParaGuardar()), actualizado: ts, abierta: tiendaFb.abierta === true});
-      toast('Ojo: faltan publicar las reglas de la tienda — se publicó sin piezas únicas');
+      sinStock = true;
     }
     clearTimeout(tiendaFb.timer);
     await guardarBorrador();
-    toast(tiendaFb.abierta ? 'Tienda publicada ✓ — los jugadores la ven abierta' : 'Tienda publicada ✓ — sigue CERRADA: abrila cuando quieras que entren');
+    toast((tiendaFb.abierta ? 'Tienda publicada ✓ — los jugadores la ven abierta' : 'Tienda publicada ✓ — sigue CERRADA: abrila cuando quieras que entren')
+      + (sinStock ? ' · ⚠ SIN piezas únicas: faltan publicar las reglas de la tienda (tienda/stock)' : ''));
   }catch(err){
     console.error('Error publicando la tienda:', err);
     toast('No se pudo publicar — revisá la consola');

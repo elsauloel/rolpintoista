@@ -431,3 +431,9 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [x] **Menú del token en dos niveles** (idea del dueño, 2026-10-06; ✅ hecho y probado el mismo día; al final, solo con el botón ⋯ / ↩ — el clic derecho sigue siendo ping y cancelar): clic izquierdo = solo lo inmediato del combate (HP, SP, No2,
   ◎ Estados y quizás ⚡ Acciones/Botonera); clic derecho = todos los demás (🪪 tarjeta, 📜 ficha, ⚙ ajustes, 🦶 mover libre, 👁 ocultar, 🛡
   equipo). Ojo: hoy el clic derecho sobre el mapa cancela (elegir objetivo, colocar, cerrar la Botonera); sobre un token se podría usar igual.
+- [ ] **⏳ Pasar de día** (dueño, 2026-10-07): una acción del GM desde el mapa que marca el paso de un día — otro pulso de renovación, aparte del
+  turno y del combate: ítems que se renuevan solos cada día (una poción que se rellena, un casco con un efecto especial una vez al día), y quizás
+  reponer la reserva de las tiendas. Retoma la vieja idea de «pasa el tiempo». A diseñar.
+- [ ] **🔧 Reparación** (dueño, 2026-10-07: «el próximo paso, definirlo bien: el menú, la lógica, el talento de reparar»): el herrero repara lo de
+  herrero y el bazar lo del bazar. Ver `rework-tiendas.md`.
+- [ ] **Lista de los efectos escasos de las tiendas** (dueño, 2026-10-07): preparar el listado en detalle (cuáles y por qué) para que lo revise.

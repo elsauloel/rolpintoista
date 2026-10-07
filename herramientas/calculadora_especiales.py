@@ -220,8 +220,8 @@ BUENA = [
     {'nombre': 'Varita del chorro de lava: camino libre de 4 (cada casilla pegada a la anterior; la primera a 1/3 de tu Rango de casteo), 1d4 de fuego a todos; arde 2 turnos', 'clase': 'elemental', 'dado': '1d4', 'forma': 'linea4', 'terreno': ('Daño 1d4', 2), 'directo': True},
     {'nombre': 'Varita inestable: 2d6 arcano; si sale algún 1 (31 %), te hacés 1d4', 'clase': 'arcano', 'dado': '2d6', 'sp': 3, 'directo': True},   # el riesgo la abarata un SP (dueño)
     # — terreno y espacio —
-    {'nombre': 'Varita del campo de estática: flor 2 turnos, 1d4 de rayo por cada paso adentro', 'clase': 'elemental', 'terreno': ('Daño 1d4 paso', 2), 'forma': 'flor1'},
-    {'nombre': 'Varita del muro de fuego: línea de 3, 3 turnos, 1d4 de fuego al entrar o seguir (piso y aire)', 'clase': 'elemental', 'terreno': ('Daño 1d4', 3), 'forma': 'linea'},
+    {'nombre': 'Varita del campo de estática: flor 2 turnos, 1d4 de rayo por cada paso adentro', 'clase': 'elemental', 'terreno': ('Daño 1d4 paso', 2), 'forma': 'flor1', 'directo': True},
+    {'nombre': 'Varita del muro de fuego: línea de 3, 3 turnos, 1d4 de fuego al entrar o seguir (piso y aire)', 'clase': 'elemental', 'terreno': ('Daño 1d4', 3), 'forma': 'linea', 'directo': True},
     {'nombre': 'Varita del muro: muro de 3 casillas en línea, 3 turnos', 'clase': 'arcano', 'terreno': ('Muro', 3), 'forma': 'linea'},
     {'nombre': 'Varita del vendaval: cono que empuja 2 a todos; apaga el fuego y despeja la niebla que toca', 'clase': 'arcano', 'forma': 'cono', 'efectos': {'Empuje': 1.67}},
     {'nombre': 'Varita del blink: te teletransportás hasta 3 casillas (o llevás a un aliado que ves); una vez por turno', 'clase': 'arcano', 'efectos': {'Blink': 1}},
@@ -241,11 +241,11 @@ BUENA = [
     {'nombre': 'Varita del escudo: Escudo especial 3 a un aliado', 'clase': 'arcano', 'efectos': {'Escudo': 3}},
     {'nombre': 'Varita de la purga: le saca un estado malo a un aliado', 'clase': 'arcano', 'efectos': {'Quita estado': 1}},
     # — báculos (dos manos; daño fijo) —
-    {'nombre': 'Báculo de brasas: 1d6 + 3 de fuego, 25 % Quemadura', 'clase': 'elemental', 'dado': '1d6', 'fijo': 3, 'efectos': {'Prende fuego': .25}},
-    {'nombre': 'Báculo de escarcha: 1d6 + 3 de hielo, 25 % Escarcha', 'clase': 'elemental', 'dado': '1d6', 'fijo': 3, 'efectos': {'Escarcha': .25}},
-    {'nombre': 'Báculo del sabio: 1d6 + 3 arcano', 'clase': 'arcano', 'dado': '1d6', 'fijo': 3},
-    {'nombre': 'Báculo de sangre: 1d6 + 3 arcano; cada uso, el 10 % de tu vida máxima (para arriba) en vez de SP', 'clase': 'arcano', 'dado': '1d6', 'fijo': 3, 'sp': 0},
-    {'nombre': 'Báculo guardián: 1d4 + 2 arcano; en las manos, +1 Parry y +1 Bloqueo', 'clase': 'arcano', 'dado': '1d4', 'fijo': 2, 'extraPts': 2},
+    {'nombre': 'Báculo de brasas: 1d6 + ¼ Ef.Esp de fuego, 25 % Quemadura', 'clase': 'elemental', 'dado': '1d6', 'sumaEspecial': 0.25, 'efectos': {'Prende fuego': .25}},
+    {'nombre': 'Báculo de escarcha: 1d6 + ¼ Ef.Esp de hielo, 25 % Escarcha', 'clase': 'elemental', 'dado': '1d6', 'sumaEspecial': 0.25, 'efectos': {'Escarcha': .25}},
+    {'nombre': 'Báculo del sabio: 1d6 + ¼ Ef.Esp arcano', 'clase': 'arcano', 'dado': '1d6', 'sumaEspecial': 0.25},
+    {'nombre': 'Báculo de sangre: 1d6 + ¼ Ef.Esp arcano; cada uso, el 10 % de tu vida máxima (para arriba) en vez de SP', 'clase': 'arcano', 'dado': '1d6', 'sumaEspecial': 0.25, 'sp': 0},
+    {'nombre': 'Báculo guardián: 1d4 + ¼ Ef.Esp arcano; en las manos, +1 Parry y +1 Bloqueo', 'clase': 'arcano', 'dado': '1d4', 'sumaEspecial': 0.25, 'extraPts': 2},
     # — otras vueltas —
     {'nombre': 'Varita de cargas (fuego): la Bola de fuego Común, 3 cargas por combate sin SP', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'terreno': ('Daño 1', 1), 'sp': 0, 'cargas': 3, 'directo': True},
     {'nombre': 'Varita gemela: Aceite o Bola de fuego (cada uso, el SP del que elegís)', 'gemela': ('Aceite', 'Bola de fuego')},

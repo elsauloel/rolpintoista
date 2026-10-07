@@ -1905,7 +1905,9 @@ calibrada: el báculo cobra el ¼ del Ef.Esp de un mago de nivel 1, +3; la escal
 las varitas con daño, directas (también áreas y zonas); los físicos invocados con + 3 fijo; el Miasma con 1d4 y **50 % de Veneno** (sin «la
 diferencia»). **Regla de diseño: un efecto de firma por elemento** — fuego → Quemadura, hielo → Escarcha, eléctrico → Parálisis, tóxico →
 Veneno, ácido → Armadura rota, arcano → ninguno (su gracia: no hay resistencia arcana). **Pendiente:** un báculo que sume un % de su Especial
-en un efecto de área (dueño: «no descartarlo, con un estudio y balance previo»); la cura con dados (Varita de cura 1d10, sigue en 5); P172.
+en un efecto de área (dueño: «no descartarlo, con un estudio y balance previo»). **Hechos (2026-10-07):** la cura con dados (Varita de cura
+1d10; la Ejecución acepta «1d10» y lo tira al usarla), P172 (las zonas duran los turnos de quien las tiró) y **↻ Actualizar desde el catálogo**
+(en el editor de un ítem del inventario: las copias viejas toman la versión nueva y conservan lo suyo).
 
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 

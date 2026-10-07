@@ -264,8 +264,8 @@ function fuegoCeldas(){
 async function fuegoAplicarA(t, dano, cuando){
   let hecho = false;
   try{
-    if(t.tipo === 'creep' && t.fichaId && soyGM){ await danioCreep(t, String(dano), true); hecho = true; }
-    else if(t.tipo === 'pj' && t.fichaId && !String(t.fichaId).includes(SEP_INVOCACION) && puedoMover(t)){ await danioPj(t, String(dano), true); hecho = true; }
+    if(t.tipo === 'creep' && t.fichaId && soyGM){ await danioCreep(t, String(dano), true, 0, 0, {magico: true}); hecho = true; }
+    else if(t.tipo === 'pj' && t.fichaId && !String(t.fichaId).includes(SEP_INVOCACION) && puedoMover(t)){ await danioPj(t, String(dano), true, 0, 0, {magico: true}); hecho = true; }
   }catch(err){ console.error('No se pudo aplicar el daño de fuego:', err); }
   return hecho;
 }
@@ -504,8 +504,9 @@ async function zonaResolverBanner(){
     if(monto > 0){
       try{
         let res = null;
-        if(t.tipo === 'creep') res = await danioCreep(t, String(monto), !!el.zonaIgnoraDef, armadmg, resEl);
-        else if(puedoMover(t)) res = await (String(t.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(t, String(monto), !!el.zonaIgnoraDef, armadmg, resEl);
+        const oZ = {magico: !!(elZ || (el.zonaIgnoraDef && el.zonaCasteadorRef))};   // el Orbe de absorción (js/26)
+        if(t.tipo === 'creep') res = await danioCreep(t, String(monto), !!el.zonaIgnoraDef, armadmg, resEl, oZ);
+        else if(puedoMover(t)) res = await (String(t.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(t, String(monto), !!el.zonaIgnoraDef, armadmg, resEl, oZ);
         const freno = [...(armadmg > 0 ? [`${armadmg} de Armadura mágica`] : []), ...(resEl ? [Combatiente.resElementalTxt(elZ, resEl)] : [])];
         partes.push(`${monto} de daño${tipoTxt}${freno.length ? ` (− ${freno.join(' − ')})` : ''}`);
         danoHecho = res && res.r ? num(res.r.recibido) : monto;   // lo que llegó a la vida (escudos y Armadura mágica ya restados)

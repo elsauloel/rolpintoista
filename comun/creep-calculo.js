@@ -522,7 +522,7 @@ const CreepCalculo = (() => {
   function magiaDeItem(it){
     const o = {};
     if(it && it.especial) o.especial = structuredClone(it.especial);
-    if(it && it.orbe){ o.orbe = true; if(it.orbeResguardo) o.orbeResguardo = it.orbeResguardo; if(it.orbeSalvaje) o.orbeSalvaje = true; }
+    if(it && it.orbe){ o.orbe = true; if(it.orbeResguardo) o.orbeResguardo = it.orbeResguardo; if(it.orbeSalvaje) o.orbeSalvaje = it.orbeSalvaje === 'domado' ? 'domado' : true; if(it.orbeCustodio) o.orbeCustodio = it.orbeCustodio; }   // (la absorción: solo personajes, que tienen SP)
     return o;
   }
   // ¿Va en el equipo del creep (y no como su arma)? Todo lo que no es arma, y las armas especiales (2026-10-05: una varita no le cambia el arma).

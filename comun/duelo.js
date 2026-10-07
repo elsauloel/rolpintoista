@@ -59,6 +59,10 @@ const Duelo = (() => {
   let opciones = {};         // id → opciones de defensa del defensor (las pide al iframe o a los hooks)
   let opcionesPedidas = new Set();
   let aplicando = new Set();
+  // Un golpe BLOQUEADO (anulado) que esta pantalla vio resolverse (no los que ya estaban al entrar): cfgEscuchar.bloqueado(d), solo el GM
+  // (2026-10-06, el Empujón de los escudos). La primera tanda del listener se marca sin avisar.
+  const bloqueadoAvisado = new Set();
+  let bloqueadoPrimera = true;
   let grupoAvisado = new Set();   // ids de sub-duelos de área ya avisados a cfgEscuchar.grupoResuelto (no avisar dos veces)
   let dodgeActivos = new Set();   // ids de duelos con fase 'dodge' ya avisados a cfgEscuchar.dodgeEmpieza (para saber cuándo avisar dodgeTermina)
   const retener = on => { window.DUELO_RETENER = !!on; if(on) setTimeout(() => { window.DUELO_RETENER = false; }, 20000); };   // la Mesa no publica la tirada mientras está prendido   // duelos cuyo daño está aplicando esta pestaña (GM)
@@ -2184,6 +2188,14 @@ const Duelo = (() => {
           try{ cfgEscuchar.grupoResuelto(d); }catch(err){ console.error('Duelo: grupoResuelto', err); }
         });
       }
+      if(cfgEscuchar.bloqueado && soyGM()){
+        listaDuelos.forEach(d => {
+          if(d.estado !== 'resuelto' || d.resultado !== 'bloqueado' || bloqueadoAvisado.has(d.id)) return;
+          bloqueadoAvisado.add(d.id);
+          if(!bloqueadoPrimera) try{ cfgEscuchar.bloqueado(d); }catch(err){ console.error('Duelo: bloqueado', err); }
+        });
+      }
+      bloqueadoPrimera = false;
       // Fase 'dodge' de un hechizo de área (pedido del dueño, 2026-09-27): avisa cuando un duelo ENTRA y cuando SALE
       // de la fase (se resolvió, moviéndose o declinando) — el mapa usa esto para minimizar/reabrir el cuadro solo y
       // mostrar un cartel de "no me quiero mover" mientras le toca decidir a quien defiende (o al GM).

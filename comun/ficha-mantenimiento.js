@@ -65,6 +65,7 @@ const FichaMantenimiento = (() => {
     inv.nitros = Combatiente.recargarNo2(InvCalculo.nitrosMax(inv), inv.nitros);
     inv.ataquesTurno = 0;
     inv.golpeTurno = 0;   // la Defensa contra el primer golpe vuelve a valer
+    inv.parryTurno = 0;   // y la Parada fácil (escudos de Buena calidad, 2026-10-06)
     inv.habilidades.forEach(h => { if(num(h.cdActual) > 0) h.cdActual = Math.max(0, num(h.cdActual) - 1); });
     const v = Combatiente.vencerAlEmpezar(inv.estados); inv.estados = v.quedan;   // Titilando se va al empezar su turno
     const d = Combatiente.dispararEstados(inv.estados, camposInv(inv));

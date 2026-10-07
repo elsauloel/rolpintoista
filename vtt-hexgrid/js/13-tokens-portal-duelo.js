@@ -935,6 +935,7 @@ async function dueloAplicarDano(d){
   const critReal = d.resultado === 'pego' && d.crit && d.crit.critico;   // un crítico siempre ignora la Defensa, aunque el d20 no multiplique (×1)
   const magico = !!(d.hab && d.hab.dano && d.hab.dano.ignoraDef && d.resultado === 'pego');   // el daño mágico de una habilidad ignora la Defensa y no critica
   const crit = critReal || magico;
+  const habMagica = magico;   // (adentro del try, «magico» es otra cosa: el daño mágico del arma)
   // La pelea cercana (2026-10-05): pierde 1 por cada casillero de distancia después del primero (al lado, entero).
   const ta0 = d.atacante && tokens.get(d.atacante.tokenId);
   const menosDist = d.hab && d.hab.menosDistancia && ta0 && t ? Math.max(0, distanciaHex(ta0, t) - 1) : 0;
@@ -970,15 +971,15 @@ async function dueloAplicarDano(d){
     catch(err){ console.error('No se pudo pedir el desgaste del ítem:', err); }
   }
   try{
-    const oD = {distancia: !!(d.ataque && d.ataque.rango)};   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
+    const oD = {distancia: !!(d.ataque && d.ataque.rango), magico: !!(habMagica || elDano)};   // magico: el Orbe de absorción (js/26)   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
     const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD)
       : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD);
     const espinas = res.r.invulnerable ? null : await dueloEspinas(d, golpe);   // el daño inflictido (con el multiplicador del crítico), antes de la Defensa
     // Daño mágico del arma (rayo / hielo): aparte, después del golpe — ignora la Defensa (resta la Armadura mágica) y no se multiplica.
     let magico = null;
     if(dn.magico && num(dn.magico.total) > 0 && !res.r.invulnerable){
-      const rm = esInv ? await danioInv(t, String(num(dn.magico.total)), true, armadmg)
-        : t.tipo === 'creep' ? await danioCreep(t, String(num(dn.magico.total)), true, armadmg) : await danioPj(t, String(num(dn.magico.total)), true, armadmg);
+      const rm = esInv ? await danioInv(t, String(num(dn.magico.total)), true, armadmg, 0, {magico: true})
+        : t.tipo === 'creep' ? await danioCreep(t, String(num(dn.magico.total)), true, armadmg, 0, {magico: true}) : await danioPj(t, String(num(dn.magico.total)), true, armadmg, 0, {magico: true});
       magico = {...dn.magico, recibido: num(rm.r.recibido), hpAntes: num(rm.previo), hpDespues: num(rm.nuevo)};
     }
     const perdio = Math.max(0, num(res.previo) - num(res.nuevo));

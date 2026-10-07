@@ -191,10 +191,11 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const golpe = leerGolpe(texto);
   if(golpe === null) throw new Error(ERROR_TIPEO);
   const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
+  const muro = ignoraDef ? null : muroDe(t);   // Muro de escudos (js/26): un aliado con escudo al lado
   const res = await modificarCreep(t.fichaId, sc => {
     const primero = !num((sc.usosEspecial || {})._golpe);
     sc.usosEspecial = {...(sc.usosEspecial || {}), _golpe: 1};   // (se vacía en su Mantenimiento)
-    const extra = defExtra(ignoraDef, primero, st => CreepCalculo.modTotal(sc, st), o) + (guarda ? guarda.val : 0);
+    const extra = defExtra(ignoraDef, primero, st => CreepCalculo.modTotal(sc, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0);
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : creepDefensaMapa(sc) + extra) + num(restaExtra || 0), sc.estados);
     const previo = num(sc.hp);
     sc.hp = Math.max(0, previo - r.recibido);
@@ -202,6 +203,7 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   });
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
   if(guarda && golpe > 0) guardianAviso(t, guarda);
+  if(muro && golpe > 0) muroAviso(t, muro);
   return res;
 }
 
@@ -209,6 +211,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const golpe = leerGolpe(texto);
   if(golpe === null) throw new Error(ERROR_TIPEO);
   const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
+  const muro = ignoraDef ? null : muroDe(t);   // Muro de escudos (js/26): un aliado con escudo al lado
   const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}`));
   const parteRef = base.collection('partes').doc('general');
   const ts = firebase.firestore.FieldValue.serverTimestamp();
@@ -220,16 +223,25 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     if(rs.def === undefined) throw new Error('SIN_DEF');
     const primero = !num((datos.ataquesArma || {})._golpe);
     datos.ataquesArma = {...(datos.ataquesArma || {}), _golpe: 1};   // (el Mantenimiento la vacía)
-    const extra = defExtra(ignoraDef, primero, st => rs[st], o) + (guarda ? guarda.val : 0);
+    const extra = defExtra(ignoraDef, primero, st => rs[st], o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0);
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : num(rs.def) + extra) + num(restaExtra || 0), datos.efectos);
     const previo = num(datos.hp);
     datos.hp = Math.max(0, previo - r.recibido);
+    // Orbe de absorción (js/26): el daño mágico o elemental que llegó a la vida devuelve SP, una vez por turno.
+    let absorbe = 0;
+    if(o && o.magico && r.recibido > 0 && num(rs.orbeAbsorcion) > 0 && !num(datos.ataquesArma._absorbe)){
+      absorbe = Math.min(num(rs.orbeAbsorcion), Math.max(0, num(datos.spGastado)));
+      datos.ataquesArma._absorbe = 1;
+      datos.spGastado = num(datos.spGastado) - absorbe;
+    }
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
-    tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp});
-    return {r, previo, nuevo: datos.hp};
+    tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp, ...(absorbe ? {'resumen.sp': num(rs.sp) + absorbe} : {})});
+    return {r, previo, nuevo: datos.hp, absorbe};
   });
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
   if(guarda && golpe > 0) guardianAviso(t, guarda);
+  if(muro && golpe > 0) muroAviso(t, muro);
+  if(res.absorbe) mesaLinea(`🔮 Orbe de absorción: ${nombreDe(t)} recupera ${res.absorbe} SP del daño mágico`);
   return res;
 }
 
@@ -247,6 +259,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const golpe = leerGolpe(texto);
   if(golpe === null) throw new Error(ERROR_TIPEO);
   const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
+  const muro = ignoraDef ? null : muroDe(t);   // Muro de escudos (js/26): un aliado con escudo al lado
   const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
   const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
   const parteRef = base.collection('partes').doc('invocaciones');
@@ -260,7 +273,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     if(!Array.isArray(inv.estados)) inv.estados = [];
     const primero = !num(inv.golpeTurno);
     inv.golpeTurno = 1;   // (el Mantenimiento la vacía)
-    const extra = defExtra(ignoraDef, primero, st => FichaResumen.invModTotal(inv, st), o) + (guarda ? guarda.val : 0);
+    const extra = defExtra(ignoraDef, primero, st => FichaResumen.invModTotal(inv, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0);
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : defensasDeInv(inv).def + extra) + num(restaExtra || 0), inv.estados);
     const previo = num(inv.hp);
     inv.hp = Math.max(0, previo - r.recibido);
@@ -271,6 +284,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   });
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
   if(guarda && golpe > 0) guardianAviso(t, guarda);
+  if(muro && golpe > 0) muroAviso(t, muro);
   return res;
 }
 
@@ -389,10 +403,10 @@ async function rayoCadenaAplicar(cadena){
     const nombre = s.t.oculto ? 'Alguien' : nombreDe(s.t);
     let ok = false;
     try{
-      if(s.t.tipo === 'creep' && s.t.fichaId && soyGM){ await danioCreep(s.t, String(s.dano), true); ok = true; }
+      if(s.t.tipo === 'creep' && s.t.fichaId && soyGM){ await danioCreep(s.t, String(s.dano), true, 0, 0, {magico: true}); ok = true; }
       // Personajes e invocaciones: el GM también (como el daño del duelo, que su mapa aplica a cualquiera); antes solo los propios (2026-10-05).
       else if(s.t.tipo === 'pj' && s.t.fichaId && (soyGM || puedoMover(s.t))){
-        if(String(s.t.fichaId).includes(SEP_INVOCACION)) await danioInv(s.t, String(s.dano), true); else await danioPj(s.t, String(s.dano), true);
+        if(String(s.t.fichaId).includes(SEP_INVOCACION)) await danioInv(s.t, String(s.dano), true, 0, 0, {magico: true}); else await danioPj(s.t, String(s.dano), true, 0, 0, {magico: true});
         ok = true;
       }
     }catch(err){ console.error('No se pudo aplicar el salto del rayo:', err); }

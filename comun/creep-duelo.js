@@ -149,13 +149,14 @@ const CreepDuelo = (() => {
         if(!sc) return [];
         // «Cuánto tirarías» antes de elegir (2026-09-27, pedido del dueño).
         const fx = (v, statId) => { const f = formulaParaValor(v); if(!f) return fmt(num(v)); const mit = statId ? Combatiente.mitadesDeTirada(sc.estados, statId) : 0; return f.formula + ' ÷2'.repeat(mit); };
-        const c = C().costoParry(sc);
+        const gratis = Combatiente.parryGratis(st => C().modTotal(sc, st), num((sc.usosEspecial || {})._parry));   // Parada fácil (2026-10-06)
+        const c = gratis ? 0 : C().costoParry(sc);
         const ee = evaEsp(sc, d);
         const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${fx(C().statValor(sc, 'eva') + ee.val, 'eva')}${ee.val ? ` (con ${ee.txt})` : ''}`]}];
         // Parry solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30; un arma natural no alcanza, por ahora).
         const def = C().defensa(sc);
         if(Combatiente.stuneado(sc.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
-        if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === sc.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}`, costo: c, motivoNo: '',
+        if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === sc.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, motivoNo: '',
           info: [`Parry 🎲 ${fx(C().statValor(sc, 'parry'), 'parry')}`, `si gana, Bloqueo 🎲 ${fx(C().bloqueoValor(sc))}`, ...(c > num(sc.nitros) ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
         return ops;
       },
@@ -180,7 +181,8 @@ const CreepDuelo = (() => {
       },
       bloquear: d => {
         const sc = deLado(d.defensor);
-        if(sc) ui.publicar(sc, A().tirada(`${sc.nombre} · Bloqueo`, C().bloqueoValor(sc), sc, 'bloqueo'));
+        const firme = sc ? A().bloqueoFirmeCreep(sc) : 0;   // Bloqueo firme (2026-10-06)
+        if(sc) ui.publicar(sc, A().tirada(`${sc.nombre} · Bloqueo${firme ? ` (+${fmt(firme)} Bloqueo firme)` : ''}`, C().bloqueoValor(sc) + firme, sc, 'bloqueo'));
       },
       armaContra: d => {
         const sc = deLado(d.defensor);

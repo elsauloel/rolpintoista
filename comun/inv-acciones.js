@@ -33,15 +33,18 @@ const InvAcciones = (() => {
       parry = 'sacar';
     }
     if(statId === 'parry'){
-      const costo = Combatiente.costoParry();   // el Parry siempre cuesta 1 No2
+      const gratis = Combatiente.parryGratis(st => I().modTotal(inv, st), num(inv.parryTurno));   // Parada fácil (2026-10-06)
+      const costo = gratis ? 0 : Combatiente.costoParry();   // el Parry siempre cuesta 1 No2
+      inv.parryTurno = 1;   // (se vacía al empezar su turno)
       inv.nitros = num(inv.nitros) - costo;   // sin No2 queda en negativo: se descuenta en su próxima recarga (2026-10-06)
       Combatiente.avisarDeudaNo2({nombre: inv.nombre, accion: 'Parry', costo, quedan: num(inv.nitros)});
       parry = 'poner';   // si gana el Parry, sigue el Bloqueo
       cambio = true;
-      aviso = `${inv.nombre}: Parry −${fmt(costo)} No2 · quedan ${fmt(inv.nitros)}`;
+      aviso = `${inv.nombre}: Parry ${gratis ? 'gratis (Parada fácil)' : `−${fmt(costo)} No2`} · quedan ${fmt(inv.nitros)}`;
     }
-    const valor = statId === 'bloqueo' ? I().bloqueoValor(inv) : I().statValor(inv, statId);
-    return {tirada: tirada(inv, etq(statId), valor, statId), parry, aviso, cambio};
+    const firme = statId === 'bloqueo' ? Combatiente.bloqueoFirme(st => I().modTotal(inv, st), num(inv.golpeTurno)) : 0;   // Bloqueo firme (2026-10-06)
+    const valor = statId === 'bloqueo' ? I().bloqueoValor(inv) + firme : I().statValor(inv, statId);
+    return {tirada: tirada(inv, etq(statId) + (firme ? ` (+${fmt(firme)} Bloqueo firme)` : ''), valor, statId), parry, aviso, cambio};
   }
   // El daño de su arma; mods: lo que suma un ataque con arreglos (dados y fijo). Los efectos al golpear los publica cada pantalla.
   function dano(inv, mods){

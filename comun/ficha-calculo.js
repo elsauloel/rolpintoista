@@ -135,6 +135,11 @@ const FichaCalculo = (() => {
     {id:'pasodoble', label:'Primer paso doble', full:'El primer casillero que te movés en cada turno cuesta el doble (como Lento): la contra de las piernas pesadas'},
     {id:'guardian', label:'Guardián', full:'Los aliados que están al lado tuyo tienen +N Defensa (el mapa la suma sola al aplicarles el daño; no se acumula con otro guardián)'},
     {id:'escolta', label:'Escolta (a mano)', full:'Una vez por turno podés recibir vos el golpe dirigido a un aliado al lado (1 No2). Se resuelve a mano'},
+    // Escudos de Buena calidad (2026-10-06): el mapa y el duelo los aplican solos.
+    {id:'paradafacil', label:'Parada fácil', full:'Tu primer Parry de cada turno no cuesta No2'},
+    {id:'bloqueofirme', label:'Bloqueo firme', full:'Bloqueo +N contra el primer golpe que recibís en cada turno'},
+    {id:'muroescudos', label:'Muro de escudos', full:'Defensa +N si tenés al lado un aliado con escudo (el mapa la suma sola al aplicarte el daño)'},
+    {id:'empujon', label:'Empujón', full:'Si tu Bloqueo frena todo el daño de un golpe cuerpo a cuerpo, el atacante queda con Demora (baja 1 lugar en el orden de turnos)'},
     {id:'defprimer', label:'Defensa contra el primer golpe', full:'Defensa extra contra el primer golpe que recibís en cada turno'},
     {id:'defdist', label:'Defensa contra armas a distancia', full:'Defensa extra contra los golpes de armas a distancia'},
     {id:'pagarhp', label:'Pagar con vida', full:'Con un arma especial, elegís cada vez si pagás el SP con SP o con vida (1 HP por SP)'},

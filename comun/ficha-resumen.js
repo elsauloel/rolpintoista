@@ -98,6 +98,11 @@ const FichaResumen = (() => {
       vision: n(c.final.vision),
       venenista: n(c.final.venenista),
       guardian: n(c.final.guardian),
+      // Escudos de Buena calidad (2026-10-06): el mapa los mira al aplicar el daño (Muro de escudos: ¿hay un aliado con escudo al lado?), al
+      // terminar un duelo bloqueado (Empujón) y al recibir daño mágico (el Orbe de absorción).
+      conEscudo: (S.inventario || []).some(i => i && i.equipado && Combatiente.esEscudo(i) && !FichaCalculo.itemRoto(i)),
+      muroescudos: n(c.final.muroescudos), empujon: n(c.final.empujon),
+      orbeAbsorcion: (S.inventario || []).filter(i => i && i.equipado && i.orbe && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.orbeAbsorcion)), 0),
       levitar: n(c.final.levitar), suelagruesa: n(c.final.suelagruesa), embestida: n(c.final.embestida), pasodoble: n(c.final.pasodoble),   // piernas (2026-10-06)
       emergencia: n(c.final.emergencia), emergenciaUsada: !!S.emergenciaUsada,
       ...Object.fromEntries(['cascara', 'primerasangre', 'foco', 'pulso', 'pasofantasma', 'cambiante', 'absorbearmadura', 'impulsofue', 'impulsodes', 'impulsoesp', 'impulsocon']
@@ -161,6 +166,7 @@ const FichaResumen = (() => {
           inamovible: num(invModTotal(inv, 'inamovible')), recuperarse: num(invModTotal(inv, 'recuperarse')), reflejos: num(invModTotal(inv, 'reflejos')),
           venenista: num(invModTotal(inv, 'venenista')),   // Guantes del envenenador (2026-10-05)
           guardian: num(invModTotal(inv, 'guardian')),
+          conEscudo: (inv.equipo || []).some(i => Combatiente.esEscudo(i)), muroescudos: num(invModTotal(inv, 'muroescudos')), empujon: num(invModTotal(inv, 'empujon')),   // escudos (2026-10-06)
           levitar: num(invModTotal(inv, 'levitar')), suelagruesa: num(invModTotal(inv, 'suelagruesa')), embestida: num(invModTotal(inv, 'embestida')), pasodoble: num(invModTotal(inv, 'pasodoble')),   // Coraza del guardián (2026-10-06)
           pisadaAtenta: num(invModTotal(inv, 'pisadaatenta')) > 0, ...(typeof InvCalculo !== 'undefined' ? {percepcion: num(InvCalculo.statValor(inv, 'percepcion'))} : {}),
           activa: inv.activa !== false,

@@ -77,6 +77,10 @@ COSTO = {
     'embestida': 1, 'pasodoble': -2,
     # Cinturón de Buena calidad (dueño, 2026-10-06): Bolsillo de emergencia (se toma sola una poción al bajar del 25 %, una vez por combate) 1,5.
     'emergencia': 1.5,
+    # Escudos de Buena calidad (dueño, 2026-10-06): Parada fácil (el primer Parry del turno sin No2; una rebaja de No2, solo en escudos) 2;
+    # Bloqueo firme 0,75 por punto (como la Defensa contra el primer golpe); Muro de escudos 1 por punto (pide un aliado con escudo al lado);
+    # Empujón 1,5 (un golpe bloqueado deja al atacante con Demora).
+    'paradafacil': 2, 'bloqueofirme': 0.75, 'muroescudos': 1, 'empujon': 1.5,
     # Anillos Comunes (dueño, 2026-10-06): efectos chicos que se disparan en un momento. Cáscara 1/3 por punto (Escudo 3 = 1); Primera sangre 0,375 por
     # punto (+2 = 0,75); Calma, Foco, Pulso quieto y Paso fantasma 1; Cambiante 0,5 (una resistencia elemental a elección); Armadura indestructible 0,75;
     # los de atributo (una vez por combate, +N a una tirada) 0,25 por punto (+2 = 0,5).

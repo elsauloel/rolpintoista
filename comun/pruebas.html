@@ -1677,6 +1677,30 @@ prueba('Titilando (2026-10-06): revivir lo pone (✚ Revivir y Ankh), es invulne
     Combatiente.titila([{nombre: 'Invulnerable', activo: true, invulnerable: true}]), Combatiente.titila([{nombre: 'Veneno', activo: true}])],
     [true, true, true, 0, false, true, true, false, true, false]);
 });
+prueba('escudos de Buena calidad (2026-10-06): Parada fácil (el primer Parry del turno gratis), Bloqueo firme (+N antes del primer golpe) y el orbe domado — personaje, creep e invocación', () => {
+  const escudo = (extra) => ({id: 'e', nombre: 'Broquel', tipoItem: 'escudo_1m', peso: 1, equipado: true, mods: [{stat: 'paradafacil', val: 1}, {stat: 'bloqueofirme', val: 2}], ...(extra || {})});
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, hp: 10, inventario: [escudo()]}).S);
+  S.nitros = 3;
+  const tiradas = [];
+  const ui = {cambio: () => {}, toast: () => {}, setParry: () => {}, registrarTirada: (o, r) => tiradas.push(o), preguntarSobrepeso: () => {}};
+  const arma = S.inventario[0];
+  FichaAcciones.parryConArma(S, arma, false, ui);
+  const tras1 = S.nitros;
+  FichaAcciones.parryConArma(S, arma, false, ui);
+  FichaAcciones.bloqueoConArma(S, arma, ui);
+  S.ataquesArma._golpe = 1;
+  FichaAcciones.bloqueoConArma(S, arma, ui);
+  const sc = creepPrueba({nitros: 3, equipo: [{nombre: 'Broquel', tipoItem: 'escudo_1m', peso: 1, mods: [{stat: 'paradafacil', val: 1}, {stat: 'bloqueofirme', val: 2}]}]});
+  CreepAcciones.pagarParry(sc); const c1 = sc.nitros; CreepAcciones.pagarParry(sc);
+  const bc = CreepAcciones.bloqueo(sc, true).origen;
+  const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, armaNombre: 'Colmillo', armaTipo: 8, armaPeso: 2, nitros: 3,
+    equipo: [{nombre: 'Broquel', tipoItem: 'escudo_1m', peso: 1, mods: [{stat: 'paradafacil', val: 1}]}]});
+  InvAcciones.tirarStat(inv, 'parry', {}); const i1 = inv.nitros; InvAcciones.tirarStat(inv, 'parry', {});
+  const sal = d => Combatiente.orbeSalvaje({orbeSalvaje: true}, d), dom = d => Combatiente.orbeSalvaje({orbeSalvaje: 'domado'}, d);
+  igual([tras1, S.nitros, tiradas.filter(o => /Bloqueo firme/.test(o)).length, c1, sc.nitros, /\+2 Bloqueo firme/.test(bc), i1, inv.nitros,
+    sal(1).dano, sal(6).doble, sal(5).doble, dom(1).dano, dom(5).doble, Combatiente.esEscudo({tipoItem: 'escudo_1m'}), Combatiente.esEscudo({tipoItem: 'escudo_1m', orbe: true})],
+    [3, 2, 1, 3, 2, true, 3, 2, 1, true, false, 0, true, true, false]);
+});
 prueba('Revive (2026-10-06): el aviso «Revivir» levanta a un inconsciente con el % de su vida y Titilando; no a uno en pie ni a uno muerto del todo', () => {
   const nuevo = (hp, muerto) => { const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, hp}).S); S.muerto = muerto; return S; };
   const ui = {presets: estadosPresetFicha(), cambio: () => {}, toast: () => {}};

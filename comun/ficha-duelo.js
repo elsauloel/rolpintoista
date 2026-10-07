@@ -185,9 +185,10 @@ const FichaDuelo = (() => {
              {modo: 'evasion', itemId: 'penal', etiqueta: `🏃 Evasión · con penalidad −${fmt(sobre)}`, motivoNo: '', info: [`Evasión 🎲 ${fx(evaV, 'eva', S.efectos)} −${fmt(sobre)}${evaInfo}`, 'no gastás No2']}]
           : [{modo: 'evasion', itemId: '', etiqueta: '🏃 Evasión', motivoNo: '', info: [`Evasión 🎲 ${fx(evaV, 'eva', S.efectos)}${evaInfo}`]}];
         // Sin arma ni escudo equipado no se puede parriar (regla del dueño, 2026-09-28).
+        const gratis = Combatiente.parryGratis(st => c.final[st], num((S.ataquesArma || {})._parry));   // Parada fácil (2026-10-06)
         armasYEscudosParaParry().forEach(a => {
-          const costo = Combatiente.costoParry();
-          ops.push({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, etiqueta: `${String(a.item.tipoItem).startsWith('escudo') ? '🛡' : '🗡'} Parry · ${a.item.nombre}`, costo, motivoNo: '',
+          const costo = gratis ? 0 : Combatiente.costoParry();
+          ops.push({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, etiqueta: `${String(a.item.tipoItem).startsWith('escudo') ? '🛡' : '🗡'} Parry · ${a.item.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo, motivoNo: '',
             info: [`Parry 🎲 ${fx(statParaArma('parry', a.item), 'parry', S.efectos)}`, `si ganás, Bloqueo 🎲 ${fx(FichaCombate.bloqueoValor(S, a.item))}`, ...(costo > num(S.nitros) ? ['⚠ sin No2: quedás en negativo (se descuenta al recargar)'] : [])]});
         });
         // Stun (2026-10-06): no puede hacer nada; si lo atacan, su Evasión es 1 (sin Parry ni pagar el sobrepeso).

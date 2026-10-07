@@ -360,7 +360,11 @@ const FichaAcciones = (() => {
   }
   // Parry: siempre 1 No2 (Combatiente.costoParry); queda esperando su Bloqueo con esa misma arma o escudo.
   function parryConArma(S, arma, forzar, ui){
-    const costo = Combatiente.costoParry();
+    // Parada fácil (escudos de Buena calidad, 2026-10-06): el primer Parry del turno, gratis. La marca se vacía al empezar su turno.
+    const fin = FichaCalculo.calcular(S).final;
+    const gratis = Combatiente.parryGratis(st => fin[st], num((S.ataquesArma || {})._parry));
+    const costo = gratis ? 0 : Combatiente.costoParry();
+    S.ataquesArma = {...(S.ataquesArma || {}), _parry: 1};
     const con = arma ? ' con ' + arma.nombre : '';
     // Una defensa: sin No2 se hace igual y queda en negativo; la deuda se descuenta en la próxima recarga (dueño, 2026-10-06).
     S.nitros = num(S.nitros) - costo;
@@ -368,12 +372,15 @@ const FichaAcciones = (() => {
     Combatiente.avisarDeudaNo2({nombre: ((S.meta && S.meta.nombre) || '').trim(), accion: `Parry${con}`, costo, quedan: num(S.nitros)});
     ui.setParry(arma ? arma.id : null);   // queda esperando su Bloqueo (si ganás el Parry)
     tirarValorStat(S, arma ? `Parry · ${arma.nombre}` : 'Parry', FichaCombate.statParaArma(S, 'parry', arma), 'parry', undefined, undefined, undefined, ui);
-    ui.toast(`Parry${con}: −${fmt(costo)} No2 · te quedan ${fmt(num(S.nitros))}${arma ? ' · si lo ganás, tirá el Bloqueo' : ''}`);
+    ui.toast(`Parry${con}: ${gratis ? 'gratis (Parada fácil)' : `−${fmt(costo)} No2`} · te quedan ${fmt(num(S.nitros))}${arma ? ' · si lo ganás, tirá el Bloqueo' : ''}`);
     ui.cambio(['refresh', 'botonera']);
   }
   // Bloqueo: tu Bloqueo (de Fuerza) MÁS el peso del arma o escudo; esa suma es el dado.
+  // Bloqueo firme (escudos de Buena calidad, 2026-10-06): +N contra el primer golpe que recibe en el turno (la marca `_golpe` la pone el daño).
   function bloqueoConArma(S, arma, ui){
-    tirarValorStat(S, arma ? `Bloqueo · ${arma.nombre}` : 'Bloqueo', FichaCombate.bloqueoValor(S, arma), 'bloqueo', undefined, undefined, undefined, ui);
+    const fin = FichaCalculo.calcular(S).final;
+    const firme = Combatiente.bloqueoFirme(st => fin[st], num((S.ataquesArma || {})._golpe));
+    tirarValorStat(S, `${arma ? `Bloqueo · ${arma.nombre}` : 'Bloqueo'}${firme ? ` (+${fmt(firme)} Bloqueo firme)` : ''}`, FichaCombate.bloqueoValor(S, arma) + firme, 'bloqueo', undefined, undefined, undefined, ui);
   }
   // Fuerza del golpe: tu Fuerza + el peso de tu arma; esa suma es el dado (contra el Bloqueo del defensor). Sin costo.
   function fuerzaGolpeValorConArma(S, arma){
@@ -618,11 +625,17 @@ const FichaAcciones = (() => {
         const r = Combatiente.agregarEstado(S.efectos, estadoDeSpec({nombre: 'Escudo especial', turnos: 1, escudoMagico: num(o.orbeResguardo)}, ui.presets || []));
         ui.mesaHabilidad(o.nombre, r.ok ? `Escudo especial ${fmt(num(o.orbeResguardo))} hasta tu próximo turno.` : `No entra el Escudo especial (${r.motivo || 'bloqueado'}).`);
       }
-      if(o.orbeSalvaje){
-        const d = 1 + Math.floor(Math.random() * 6);
-        if(d === 1 && ui.fijarHp) ui.fijarHp(num(S.hp) - 1);
-        if(d === 6) doble = true;
-        ui.mesaHabilidad(o.nombre, `1d6 → ${d}: ${d === 1 ? 'te hace 1 de daño' : d === 6 ? (String(it.tiradaExtra || '').match(/\d+d\d+/) ? '¡el efecto sale doble! (los dados del daño, ×2)' : '¡el efecto sale doble! ✋ A mano: qué es el doble lo decide la mesa') : 'nada'}.`);
+      if(o.orbeSalvaje){   // salvaje (Común) o domado (Buena calidad): Combatiente.orbeSalvaje
+        const d = 1 + Math.floor(Math.random() * 6), x = Combatiente.orbeSalvaje(o, d);
+        if(x.dano && ui.fijarHp) ui.fijarHp(num(S.hp) - x.dano);
+        if(x.doble) doble = true;
+        ui.mesaHabilidad(o.nombre, `1d6 → ${d}: ${x.dano ? 'te hace 1 de daño' : x.doble ? (String(it.tiradaExtra || '').match(/\d+d\d+/) ? '¡el efecto sale doble! (los dados del daño, ×2)' : '¡el efecto sale doble! ✋ A mano: qué es el doble lo decide la mesa') : 'nada'}.`);
+      }
+      // Orbe del custodio (Buena calidad, 2026-10-06): un aliado al lado recibe Escudo especial N, una vez por turno (el mapa lo elige).
+      if(num(o.orbeCustodio) > 0 && !num((S.ataquesArma || {})[k + ':c'])){
+        S.ataquesArma = {...(S.ataquesArma || {}), [k + ':c']: 1};
+        if(ui.custodio) ui.custodio(o);
+        else ui.mesaHabilidad(o.nombre, `✋ A mano: un aliado al lado tuyo recibe Escudo especial ${fmt(num(o.orbeCustodio))} hasta su próximo turno.`);
       }
     });
     return doble;

@@ -465,8 +465,9 @@ async function trampaPasoDano(id, dt){
       const suela = Math.max(0, statPiesDe(x, 'suelagruesa'));   // Suela gruesa (pies, 2026-10-06): lo que pisás hace menos
       if(suela){ rr.res = num(rr.res) + suela; freno = [freno, `Suela gruesa ${suela}`].filter(Boolean).join(' − '); }
       restaFreno = num(arm) + num(rr.res);
-      if(x.tipo === 'creep'){ if(soyGM) res = await danioCreep(x, String(monto), dt.ignoraDef, arm, rr.res); }
-      else res = await (String(x.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(x, String(monto), dt.ignoraDef, arm, rr.res);
+      const oT = {magico: !!dt.elemento};   // el Orbe de absorción (js/26)
+      if(x.tipo === 'creep'){ if(soyGM) res = await danioCreep(x, String(monto), dt.ignoraDef, arm, rr.res, oT); }
+      else res = await (String(x.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(x, String(monto), dt.ignoraDef, arm, rr.res, oT);
     }catch(err){ console.error('No se pudo aplicar el daño de la trampa:', err); }
   }
   let texto = dt.danoFijo ? `${r.total} de descarga` : `${r.formula} = ${r.total}${dt.evita === 'mitad' ? ` → la mitad: ${monto}` : ''}`;

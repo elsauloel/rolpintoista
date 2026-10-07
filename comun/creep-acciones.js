@@ -31,11 +31,14 @@ const CreepAcciones = (() => {
   const parry = sc => tirada(`${sc.nombre} · Parry`, C().statValor(sc, 'parry'), sc, 'parry');
   const fuerzaGolpe = sc => tirada(`${sc.nombre} · Fuerza del golpe`, C().fuerzaGolpeValor(sc));
   // El Bloqueo solo después de un Parry (regla del dueño, 2026-09-30), con el arma o el escudo con que para.
+  // Bloqueo firme (escudos de Buena calidad, 2026-10-06): +N contra el primer golpe que recibe en el turno (la marca `_golpe` la pone el daño).
+  const bloqueoFirmeCreep = sc => Combatiente.bloqueoFirme(st => C().modTotal(sc, st), num((sc.usosEspecial || {})._golpe));
   function bloqueo(sc, parryPendiente){
     const def = C().defensa(sc);
     if(!def) return {error: `${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`};
     if(!parryPendiente) return {error: `${sc.nombre}: ${Combatiente.BLOQUEO_SOLO_TRAS_PARRY}`};
-    return tirada(`${sc.nombre} · Bloqueo · ${def.nombre}`, C().bloqueoValor(sc), sc, 'bloqueo');
+    const firme = bloqueoFirmeCreep(sc);
+    return tirada(`${sc.nombre} · Bloqueo · ${def.nombre}${firme ? ` (+${fmt(firme)} Bloqueo firme)` : ''}`, C().bloqueoValor(sc) + firme, sc, 'bloqueo');
   }
   // El daño de su arma (los efectos al golpear los publica cada pantalla después, con comun/efectos-golpe.js).
   function dano(sc){
@@ -71,10 +74,12 @@ const CreepAcciones = (() => {
   // Pagar el Parry (siempre 1 No2, solo con un arma de verdad o un escudo). Después: la tirada (parry) y anotar el Parry pendiente.
   function pagarParry(sc){
     if(!C().defensa(sc)) return {error: `${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`};
-    const costo = C().costoParry(sc);
+    const gratis = Combatiente.parryGratis(st => C().modTotal(sc, st), num((sc.usosEspecial || {})._parry));   // Parada fácil (2026-10-06)
+    const costo = gratis ? 0 : C().costoParry(sc);
+    sc.usosEspecial = {...(sc.usosEspecial || {}), _parry: 1};   // (se vacía al empezar su turno)
     sc.nitros = num(sc.nitros) - costo;   // sin No2 queda en negativo: se descuenta en su próxima recarga (2026-10-06)
     const deuda = sc.nitros < 0 ? {nombre: sc.nombre, accion: 'Parry', costo, quedan: sc.nitros} : null;
-    return {aviso: `${sc.nombre}: Parry −${fmt(costo)} No2 · quedan ${fmt(sc.nitros)} · si lo gana, tirá el Bloqueo`, deuda};
+    return {aviso: `${sc.nombre}: Parry ${gratis ? 'gratis (Parada fácil)' : `−${fmt(costo)} No2`} · quedan ${fmt(sc.nitros)} · si lo gana, tirá el Bloqueo`, deuda};
   }
 
   /* ---------- Atacar (menú de Atacar del creep, 2026-09-26) ----------
@@ -421,11 +426,17 @@ const CreepAcciones = (() => {
         const r = EstadosAplicar.aplicarACreep(sc, {nombre: 'Escudo especial', turnos: 1, escudoMagico: num(o.orbeResguardo)});
         avisos.push(`${o.nombre}: ${r.ok ? `Escudo especial ${fmt(num(o.orbeResguardo))} hasta su próximo turno` : `no entra el Escudo especial (${r.motivo || 'bloqueado'})`}`);
       }
-      if(o.orbeSalvaje){
-        const d = 1 + Math.floor(Math.random() * 6);
-        if(d === 1) sc.hp = Math.max(0, num(sc.hp) - 1);
-        if(d === 6) p.doble = true;
-        avisos.push(`${o.nombre}: 1d6 → ${d}: ${d === 1 ? 'le hace 1 de daño' : d === 6 ? (/\d+d\d+/.test(h.tiradaExtra) ? '¡el efecto sale doble! (los dados del daño, ×2)' : '¡el efecto sale doble! ✋ A mano: qué es el doble lo decide la mesa') : 'nada'}`);
+      if(o.orbeSalvaje){   // salvaje (Común) o domado (Buena calidad): Combatiente.orbeSalvaje
+        const d = 1 + Math.floor(Math.random() * 6), x = Combatiente.orbeSalvaje(o, d);
+        if(x.dano) sc.hp = Math.max(0, num(sc.hp) - x.dano);
+        if(x.doble) p.doble = true;
+        avisos.push(`${o.nombre}: 1d6 → ${d}: ${x.dano ? 'le hace 1 de daño' : x.doble ? (/\d+d\d+/.test(h.tiradaExtra) ? '¡el efecto sale doble! (los dados del daño, ×2)' : '¡el efecto sale doble! ✋ A mano: qué es el doble lo decide la mesa') : 'nada'}`);
+      }
+      // Orbe del custodio (Buena calidad, 2026-10-06): un aliado al lado recibe Escudo especial N (el mapa lo elige; en GM Tools, a mano).
+      if(num(o.orbeCustodio) > 0 && !num(sc.usosEspecial[k + ':c'])){
+        sc.usosEspecial[k + ':c'] = 1;
+        p.custodio = [...(p.custodio || []), {n: num(o.orbeCustodio), orbe: o.nombre}];
+        avisos.push(`${o.nombre}: un aliado al lado recibe Escudo especial ${fmt(num(o.orbeCustodio))} hasta su próximo turno`);
       }
     });
     p.hab = h; p.avisosOrbe = avisos; p.espera = c.espera;
@@ -502,7 +513,7 @@ const CreepAcciones = (() => {
     });
   }
 
-  return {ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, inicioTurno, finTurno, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
+  return {bloqueoFirmeCreep, ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, inicioTurno, finTurno, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
     tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, tiradaSoltarse, aplicarSoltarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
     costoAtaqueDe, faltanNitros, preguntaSinNitros, alertaSinNitros,
     FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,

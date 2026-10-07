@@ -415,6 +415,19 @@ const Combatiente = (() => {
 
   // El Parry cuesta siempre 1 No2, con cualquier arma o escudo (2026-09-26, dueño). Sin arma ni escudo no se puede (P121).
   function costoParry(){ return 1; }
+  /* Escudos de Buena calidad (2026-10-06, dueño: «programá todas las mecánicas nuevas»). Parada fácil: el primer Parry de cada turno no cuesta
+     No2 (`paradafacil`; la marca del turno la lleva cada uno). Bloqueo firme: +N al Bloqueo contra el primer golpe que recibe en el turno
+     (`bloqueofirme`; la marca es la misma de la Defensa contra el primer golpe). valorDe(stat) → el valor de ese stat de quien se defiende. */
+  function parryGratis(valorDe, usado){ return !usado && n(valorDe('paradafacil')) > 0; }
+  function bloqueoFirme(valorDe, yaRecibio){ return yaRecibio ? 0 : Math.max(0, Math.round(n(valorDe('bloqueofirme')))); }
+  // Un escudo de verdad (para el Muro de escudos): un ítem de la ranura de escudo que no es un orbe.
+  const esEscudo = it => !!it && /^escudo/.test(String(it.tipoItem || '')) && !it.orbe;
+  // El orbe salvaje al usar una varita, con el d6 ya tirado: el Común, con 1 te hace 1 de daño y con 6 sale doble; el domado (Buena calidad,
+  // `orbeSalvaje: 'domado'`), con 1 no pasa nada y con 5 o 6 sale doble.
+  function orbeSalvaje(o, d){
+    const domado = !!o && o.orbeSalvaje === 'domado';
+    return {domado, dano: !domado && d === 1 ? 1 : 0, doble: domado ? d >= 5 : d === 6};
+  }
   /* No2 en negativo por defenderse (2026-10-06, dueño, a probar): las defensas que cuestan No2 (Parry, la Evasión que paga el sobrepeso, el
      dodge roll) se pueden hacer sin No2: quedás en negativo y esa deuda se descuenta en la próxima recarga (`recargarNo2`). Solo las defensas;
      todo lo demás sigue sin poder pasar de 0. Se avisa muy claro: a quien la hace, un cartel; a los demás, la Crónica (`avisarDeudaNo2`, que
@@ -896,7 +909,7 @@ const Combatiente = (() => {
     const st = AHORRO_ESPECIAL[tipo];
     return st && typeof valorDe === 'function' ? Math.max(0, Math.round(n(valorDe(st)))) : 0;
   }
-  return {emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY,
+  return {emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

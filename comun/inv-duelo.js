@@ -140,13 +140,14 @@ const InvDuelo = (() => {
       opcionesDefensa: d => {
         const inv = ui.inv(d.defensor);
         const fx = (v, statId, estados) => { const f = formulaParaValor(v); if(!f) return fmt(num(v)); const mit = statId ? Combatiente.mitadesDeTirada(estados, statId) : 0; return f.formula + ' ÷2'.repeat(mit); };
-        const c = Combatiente.costoParry();
+        const gratis = Combatiente.parryGratis(st => I().modTotal(inv, st), num(inv.parryTurno));   // Parada fácil (2026-10-06)
+        const c = gratis ? 0 : Combatiente.costoParry();
         const ee = evaEsp(inv, d);
         const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${fx(I().statValor(inv, 'eva') + ee.val, 'eva', inv.estados)}${ee.val ? ` (con ${ee.txt})` : ''}`]}];
         // Parry solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30; un arma natural no alcanza, por ahora).
         const def = I().defensa(inv);
         if(Combatiente.stuneado(inv.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
-        if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === inv.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}`, costo: c, motivoNo: '',
+        if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === inv.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, motivoNo: '',
           info: [`Parry 🎲 ${fx(I().statValor(inv, 'parry'), 'parry', inv.estados)}`, `si ganás, Bloqueo 🎲 ${fx(I().bloqueoValor(inv))}`, ...(c > num(inv.nitros) ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
         return ops;
       },

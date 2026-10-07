@@ -153,6 +153,11 @@ hay trabajo reciente o en curso de otra conversación (ver
   sección).
 
 ### vendor-generator.html
+- **Rework del generador (2026-10-06, `../docs/rework-tiendas.md`)**: la regla vive en `../comun/generador-tiendas.js`; acá solo la pantalla.
+  Controles: tamaño, **tipo** (Ramos generales / Bazar arcano —clave `alquimista`— / Herrero) y **nivel de la zona**; **🧪 Simular 200**
+  (`simularTiendas`). `generarTienda(tamano, tipo, nivel)` y «🎲 Otro» (`rerollItem` → `GeneradorTiendas.otro`) usan la pieza común; Regenerar
+  conserva toda la configuración. Lo que sigue de esta sección sobre `REPARTO_POR_CATEGORIA`, el piso de legacy, «Inicio de partida», los ítems
+  mágicos y el tope de rareza quedó viejo (se sacó).
 - **Barra superior unificada** (`../comun/barra.js`): `#tienda-identidad`
   ("🏪 Generador de tiendas · Partida · Usuario · GM") reemplaza al
   "Rol Pintoísta" fijo de antes. A la derecha, links a 🗺 Mapa y ⚔ GM

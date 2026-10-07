@@ -125,3 +125,13 @@ Observaciones:
 - **Reposición (etapa 2, propuesta)**: el comprado se reemplaza por otro de la misma calidad **y la misma parte** (la tienda conserva su forma),
   con una **reserva** de reposiciones por tamaño (ambulante 1 · pueblito 2 · aldea 4 · ciudad 6 · capital 10): comprar y revender a mitad de precio
   no se convierte en un sorteo infinito.
+
+### ✅ Etapa 1 hecha (2026-10-06)
+`comun/generador-tiendas.js` (`GeneradorTiendas`: `generar`, `otro`, `simular`, más las tablas `TAMANOS`, `TIPOS`, `CALIDAD_POR_NIVEL`, `SUERTE`,
+`ETIQUETAS`) y el generador usándolo: perilla **Nivel de la zona**, tipos Herrero / Ramos generales / Bazar arcano (salió «Inicio de partida»: una
+tienda guardada con ese tipo se toma como Ramos), **🧪 Simular 200** (promedio, mínimo y máximo por parte, por calidad —y en qué % de las tiendas
+aparece cada una— y por efecto escaso), «🎲 Otro» por la misma parte con la calidad del nivel y la escasez, y **Regenerar conserva toda la
+configuración**. El Herrero sale con «repara» prendido. Se sacaron el sorteo viejo por rubro, el piso de «legacy» del Bazar y la tirada aparte de
+anillos. Probado en vivo («Claude · pruebas», capturas al dueño) y con una prueba automática.
+**Etapa 2 (pendiente):** stock limitado (Buena y Rara, 1 unidad) con reposición de la misma calidad y parte y una reserva por tamaño; pide una regla de
+Firestore nueva para que la compra de un jugador descuente el stock.

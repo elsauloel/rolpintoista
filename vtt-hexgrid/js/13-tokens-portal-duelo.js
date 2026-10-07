@@ -213,8 +213,10 @@ async function crearElementoZona(centro, cfg){
   if(cfg.danoTipo) datos.zonaDanoTipo = String(cfg.danoTipo).slice(0, 20);
   if(cfg.tiraExtra && (datos.zonaDano || datos.zonaDanoDif)) datos.zonaTiraExtra = String(cfg.tiraExtra).slice(0, 12);
   if(cfg.nota) datos.zonaNota = String(cfg.nota).slice(0, 200);
+  if(['piso', 'ambos'].includes(cfg.altura)) datos.zonaAltura = cfg.altura;   // del aire es lo de siempre (2026-10-07)
   try{
-    await coleccionElementos().add(datos);
+    try{ await coleccionElementos().add(datos); }
+    catch(e){ if(e.code !== 'permission-denied' || !datos.zonaAltura) throw e; delete datos.zonaAltura; await coleccionElementos().add(datos); toast('Ojo: faltan publicar las reglas (zonaAltura): la zona quedó como «del aire»'); }
     toast(`🌫 ${cfg.nombre || 'Zona'} colocada: dura ${n} turno${n === 1 ? '' : 's'}`);
     return true;
   }catch(err){
@@ -251,7 +253,7 @@ function zonaPersistenteDeHabilidad(msg){
     estado: msg.zonaEstado, resistStat: msg.resistStat, resistValor: msg.resistValor, enMantenimiento: true, cadaPaso: false,
     casteadorRef: msg.fichaId, casteadorTipo: msg.casteadorTipo,
     danoDif: msg.zonaDanoDif, danoTipo: msg.zonaDanoTipo, tiraExtra: msg.zonaTiraExtra, nota: msg.zonaNota,
-    tiraStat: msg.tiraStat, tiraValor: msg.tiraValor,
+    tiraStat: msg.tiraStat, tiraValor: msg.tiraValor, altura: msg.zonaAltura,
   }), `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': marcá el centro' : 'Elegí el centro de la zona'}</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true);
 }
 // 🪤 Trampa de una habilidad ✨ automática (2026-09-30, pedido del dueño): quien la usa elige la casilla con un clic (antes quedaba
@@ -341,7 +343,7 @@ function abrirAsistenteZonaNueva(){
       const radio = Math.max(1, Math.min(6, Math.round(num(r.radio)) || 1));
       elegirDestino(h => crearElementoZona(h, {
         radio, turnos: r.turnos, nombre: r.nombre, color: r.color, alfa: r.alfa, amiga: r.amiga, dano: r.dano, ignoraDef: r.ignoraDef,
-        estado: r.estado, resistStat: r.resistStat, resistValor: r.resistValor, enMantenimiento: r.enMantenimiento, cadaPaso: r.cadaPaso,
+        estado: r.estado, resistStat: r.resistStat, resistValor: r.resistValor, enMantenimiento: r.enMantenimiento, cadaPaso: r.cadaPaso, altura: r.altura,
         casteadorRef: '', casteadorTipo: soyGM ? 'creep' : 'pj',
       }), `<b>🌫 ${esc(r.nombre)}: marcá el centro</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true);
     },
@@ -760,7 +762,7 @@ function dueloZonaQueda(hab, centro, radio, yo){
     radio, turnos: z.turnos || 1, nombre: `${hab.nombre}${z.nombre ? ': ' + z.nombre : ''}`.slice(0, 40), color: z.color || '', amiga: true,
     dano: z.dano || '', ignoraDef: true, danoTipo: z.tipoDano || '', estado: z.estado || null,
     ...(z.contra ? {resistStat: z.contra, tiraStat: z.tira || 'dmgesp', tiraValor: num(z.tiraValor)} : {}),
-    enMantenimiento: true, cadaPaso: false, casteadorRef: String(yo.ref || ''), casteadorTipo: yo.tipo === 'creep' ? 'creep' : 'pj',
+    enMantenimiento: true, cadaPaso: false, casteadorRef: String(yo.ref || ''), casteadorTipo: yo.tipo === 'creep' ? 'creep' : 'pj', altura: z.altura,
   }).catch(err => console.error('No se pudo dejar la zona del área:', err));
 }
 function dueloElegirAreaMapa(msg){

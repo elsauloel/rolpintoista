@@ -2646,6 +2646,17 @@ prueba('una trampa vieja {radio: 2} pasa a la forma única con tamaño 2', () =>
 });
 prueba('una habilidad lleva su modo de ejecución al subirla', () => igual(Plantillas.limpiar('skills', {id: 'h', nombre: 'H', detalle: '', nitrosCosto: 1, modo: 'auto'}).modo, 'auto'));
 
+prueba('del piso, del aire o ambos (2026-10-07): la trampa guarda dónde está su efecto (plantilla, JSON del mapa, asistente) y el catálogo lo trae', () => {
+  const j = JSON.parse(TokensAuto.estadoJson(null, null, null, null, '', 0, {altura: 'piso'}) || '{}');
+  const mal = TokensAuto.estadoJson(null, null, null, null, '', 0, {altura: 'cielo'});
+  const pl = Plantillas.trampaDesde({nombre: 'Brea', altura: 'piso'});
+  const at = AsistenteTrampa.aTrampa({nombre: 'Gas', altura: 'aire', forma: 'flor', radio: 1});
+  const ini = AsistenteTrampa.inicialDe({nombre: 'Púas'});
+  const cat = n => ((CATALOGO_BASE.find(i => i.nombre === n) || {}).trampaDatos || {}).altura;
+  igual([j.altura, mal, pl.altura, at.altura, ini.altura, cat('Brea pegajosa'), cat('Nube de veneno'), cat('Mina napalm'), cat('Dardos envenenados')],
+    ['piso', '', 'piso', 'aire', 'piso', 'piso', 'aire', 'ambos', 'aire']);
+});
+
 /* ---------- Generador de tiendas (comun/generador-tiendas.js, 2026-10-06) ---------- */
 prueba('generador de tiendas: variedad de partes defensivas por tamaño, familias del Herrero, sin archivados ni solo botín, escasez y calidades por nivel', () => {
   const G = GeneradorTiendas, cat = CATALOGO_BASE, porId = new Map(cat.map(i => [i.id, i]));

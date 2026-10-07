@@ -185,6 +185,7 @@ const AsistenteDueloHab = (() => {
       // o sigue adentro en el Mantenimiento — igual que ya hacen los hechizos de área entre sí.
       zonaTurnos: (ini && ini.zonaTurnos) || 3,
       zonaAmiga: !!(ini && ini.zonaAmiga),
+      zonaAltura: (ini && ['piso', 'aire', 'ambos'].includes(ini.zonaAltura)) ? ini.zonaAltura : 'aire',   // dónde está la zona (2026-10-07)
       zonaEstadoNombre: (ini && ini.zonaEstado && ini.zonaEstado.nombre) || '',
       zonaEstadoTurnos: (ini && ini.zonaEstado && ini.zonaEstado.turnos) ?? 2,
       zonaEstadoStacks: (ini && ini.zonaEstado && ini.zonaEstado.stacks) || '',
@@ -286,6 +287,10 @@ const AsistenteDueloHab = (() => {
           <div class="fila"><input type="number" min="1" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros de radio</span></div>
           <div class="fila"><input type="number" min="1" style="width:70px" data-zonaturnos value="${esc(st.zonaTurnos)}"><span>turnos que dura</span></div>
           <label class="op"><input type="checkbox" data-zonaamiga ${st.zonaAmiga ? 'checked' : ''}> También afecta a tus aliados (no solo a los rivales)</label>
+          <div style="margin-top:12px"><h4 style="margin:0 0 6px">¿Dónde está?</h4><select data-zonaaltura style="max-width:100%">
+            <option value="aire"${st.zonaAltura === 'aire' ? ' selected' : ''}>☁️ Del aire: ocupa el espacio (gas, nube, humo, explosión) — alcanza aunque levites</option>
+            <option value="piso"${st.zonaAltura === 'piso' ? ' selected' : ''}>🟫 Del piso: está en el suelo (púas, brea, aceite, brasas) — levitando se cruza sin tocarla</option>
+            <option value="ambos"${st.zonaAltura === 'ambos' ? ' selected' : ''}>🔥 Ambos (fuego, escarcha): alcanza aunque levites; las Suelas le restan</option></select></div>
           <div style="margin-top:12px"><h4 style="margin:0 0 6px">¿Deja un estado en quien corresponda?</h4>
             <select data-zonaestado><option value="">— ninguno (solo el daño del paso «Daño», si tiene) —</option>${nombresEstado().map(n => `<option value="${esc(n)}"${st.zonaEstadoNombre === n ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select></div>`;
         if(st.zonaEstadoNombre){
@@ -573,6 +578,7 @@ const AsistenteDueloHab = (() => {
       q('[data-radio]', e => { st.radio = Math.max(0, Math.round(Number(e.target.value) || 0)); });
       q('[data-zonaturnos]', e => { st.zonaTurnos = Math.max(1, Math.round(Number(e.target.value) || 1)); });
       q('[data-zonaamiga]', e => { st.zonaAmiga = e.target.checked; });
+      q('[data-zonaaltura]', e => { st.zonaAltura = e.target.value; });
       q('[data-zonaestado]', e => { st.zonaEstadoNombre = e.target.value; dibujar(); });
       q('[data-zonaestadoturnos]', e => { st.zonaEstadoTurnos = Math.max(0, Math.round(Number(e.target.value) || 0)); });
       q('[data-zonaestadostacks]', e => { st.zonaEstadoStacks = Math.max(0, Math.round(Number(e.target.value) || 0)); });
@@ -716,6 +722,7 @@ const AsistenteDueloHab = (() => {
         if(st.objetivo === 'zona'){
           out.zonaTurnos = st.zonaTurnos;
           if(st.zonaAmiga) out.zonaAmiga = true;
+          if(st.zonaAltura && st.zonaAltura !== 'aire') out.zonaAltura = st.zonaAltura;
           if(st.zonaEstadoNombre){
             const esVenenoZona = ['Veneno', 'Veneno severo'].includes(st.zonaEstadoNombre);
             // Veneno sin stacks a mano: no se manda `turnos` — si no, EstadosAplicar.componer lo toma igual y el

@@ -67,6 +67,7 @@ const AsistenteZona = (() => {
       aplicaEstado: false, estado: '', estadoTurnos: 0, estadoStacks: 0,
       seResiste: false, resistStat: 'resmg', resistValor: 12,
       enMantenimiento: true, cadaPaso: false,
+      altura: 'aire',   // dónde está (2026-10-07): 'aire' | 'piso' | 'ambos' — Levitar salva de lo del piso; las Suelas restan a lo que toca el piso
       amiga: false,
       nombre: '', color: colores[0], alfa: 40,
     };
@@ -152,6 +153,12 @@ const AsistenteZona = (() => {
           <p class="az-ayuda">Con "cada paso", cruzarla de largo también cuenta, no solo terminar el movimiento adentro (las púas: cada casillero que pisás, aunque sigas de largo).</p>
           <button type="button" class="az-op${!est.cadaPaso ? ' on' : ''}" data-paso="0"><span class="ico">📍</span><span><b>Alcanza con entrar</b><small>Se chequea cuando termina de moverse adentro (nube de veneno, gas).</small></span></button>
           <button type="button" class="az-op${est.cadaPaso ? ' on' : ''}" data-paso="1"><span class="ico">🦶</span><span><b>Cada paso caminado adentro</b><small>Se chequea aunque solo la esté cruzando, sin quedarse (púas, brasas).</small></span></button>
+          <div class="az-preg" style="margin-top:14px">¿Dónde está?</div>
+          <p class="az-ayuda">Levitar salva de lo que está en el piso (mientras levita; al terminar su turno toca el suelo). Las Suelas restan al daño de lo que toca el piso.</p>
+          <select id="az-altura" style="max-width:100%">
+            <option value="aire"${est.altura === 'aire' ? ' selected' : ''}>☁️ Del aire: ocupa el espacio (gas, nube, humo, explosión) — alcanza aunque levites</option>
+            <option value="piso"${est.altura === 'piso' ? ' selected' : ''}>🟫 Del piso: está en el suelo (púas, brea, aceite, brasas) — levitando se cruza sin tocarla</option>
+            <option value="ambos"${est.altura === 'ambos' ? ' selected' : ''}>🔥 Ambos (fuego, escarcha): alcanza aunque levites; las Suelas le restan</option></select>
           <div class="az-preg" style="margin-top:14px">¿Afecta también a los aliados?</div>
           <label class="az-sin"><input type="checkbox" id="az-amiga"${est.amiga ? ' checked' : ''}> Sí, a cualquiera que corresponda, no solo a los rivales</label>`;
       }
@@ -188,7 +195,7 @@ const AsistenteZona = (() => {
       dano: danoTxt(), tipoDano: est.tipoDano, ignoraDef: est.haceDano ? est.ignoraDef : false,
       estado: estadoResultado(),
       resistStat: est.seResiste ? est.resistStat : '', resistValor: est.seResiste ? est.resistValor : null,
-      enMantenimiento: est.enMantenimiento, cadaPaso: est.cadaPaso, amiga: est.amiga,
+      enMantenimiento: est.enMantenimiento, cadaPaso: est.cadaPaso, amiga: est.amiga, altura: est.altura,
     });
 
     // Terminar (el «✓» del último paso): todo completo → el resultado (la ventana se cierra sola); si falta algo, avisa y sigue abierta.
@@ -231,6 +238,7 @@ const AsistenteZona = (() => {
       else if(t.id === 'az-seresiste'){ est.seResiste = t.checked; est.error = ''; dibujar(); }
       else if(t.id === 'az-resiststat') est.resistStat = t.value;
       else if(t.id === 'az-amiga') est.amiga = t.checked;
+      else if(t.id === 'az-altura') est.altura = t.value;
     };
     const inicial = JSON.stringify(est);
     api = PasoAPaso.abrir({

@@ -334,6 +334,7 @@ function escucharElementos(){
         zonaResueltos: Array.isArray(d.zonaResueltos) ? d.zonaResueltos.filter(x => typeof x === 'string') : [],
         zonaEnMantenimiento: d.zonaEnMantenimiento !== false,
         zonaCadaPaso: d.zonaCadaPaso === true,
+        zonaAltura: ['piso', 'aire', 'ambos'].includes(d.zonaAltura) ? d.zonaAltura : '',   // dónde está su efecto (2026-10-07, js/08 alturaDe)
         zonaDanoDif: d.zonaDanoDif === true,   // el daño es la diferencia entre las tiradas (2026-10-02)
         zonaDanoTipo: typeof d.zonaDanoTipo === 'string' ? d.zonaDanoTipo : '',
         zonaTiraExtra: typeof d.zonaTiraExtra === 'string' ? d.zonaTiraExtra : '',
@@ -1023,12 +1024,12 @@ async function moverToken(id, col, fila, celdas, levita){
     percepcionPublicarAvisos(id);
     abrirGiroLibre(id, celdas);
     fuegoEntrada(id, pisadas);
-    zonaRevisarEntrada(id, celdas);   // las zonas sí (una nube no se saltea levitando; falta distinguir las del piso)
+    zonaRevisarEntrada(id, celdas, num(levita));   // las zonas del piso no tocan lo levitado; las del aire, sí (2026-10-07)
   }catch(err){
     // Reglas de Firestore sin publicar todavía (no conocen "ruta"): se mueve
     // igual, solo que los demás no ven la estela.
     if(err.code === 'permission-denied' && ruta.length > 2){
-      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); percepcionPublicarAvisos(id); abrirGiroLibre(id, celdas); fuegoEntrada(id, pisadas); zonaRevisarEntrada(id, celdas); return; }catch(e){ err = e; }
+      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); percepcionPublicarAvisos(id); abrirGiroLibre(id, celdas); fuegoEntrada(id, pisadas); zonaRevisarEntrada(id, celdas, num(levita)); return; }catch(e){ err = e; }
     }
     sigiloAvisosPendientes.delete(id);
     percepcionAvisosPendientes.delete(id);

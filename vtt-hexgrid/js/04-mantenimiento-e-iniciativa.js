@@ -813,6 +813,7 @@ const levitarUsar = (id, n) => { if(n > 0){ const k = pasosGratisClave(id); levi
 async function levitarAterrizar(tokenId){
   const t = tokens.get(tokenId);
   if(!t || !(statPiesDe(t, 'levitar') > 0) || typeof trampaResolver !== 'function') return;
+  if(typeof zonaRevisarToken === 'function') zonaRevisarToken(t, false, false, true);   // las zonas del piso donde quedó parado (2026-10-07)
   let pisada = null;
   elementos.forEach((el, id) => { if(!pisada && el.trampa && !el.disparada && trampaDispara(t, el) && celdasDeElemento(el).some(c => c.col === t.col && c.fila === t.fila)) pisada = {id, el}; });
   if(!pisada) return;

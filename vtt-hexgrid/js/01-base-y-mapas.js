@@ -260,6 +260,7 @@ let elemTrampaTeleport = false, elemTrampaDestino = '';   // trampa de teleport:
 // y queda puesta zonaTurnos turnos. La resistencia de la zona es aparte de "se evita" de la trampa (esa sigue
 // siendo a mano); acá sí es automática, con una dificultad fija (no hay quien tire, como en el asistente de zonas).
 let elemTrampaDejaZona = false, elemTrampaZonaTurnos = 3, elemTrampaZonaEnMant = true, elemTrampaZonaCadaPaso = false;
+let elemTrampaAltura = 'piso';   // dónde está el efecto de la trampa que se arma (2026-10-07: Levitar y las Suelas)
 let elemTrampaZonaResistStat = '', elemTrampaZonaResistValor = 12;
 let elemTrampaDetectar = 8;   // dificultad para detectarla con Percepción aumentada (P145; trampa común: 8)
 let elemTrampaBibOrigen = null;   // de qué trampa de la biblioteca salió la que se está armando (para ⬆ Subir y el aviso 🔔)

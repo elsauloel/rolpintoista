@@ -560,7 +560,7 @@ function cerrarAccionesNuevas(){
    El ✎ Editar del Ver de una habilidad se lo pedía a GM Tools escondido. Ahora es el editor común (comun/creep-editor.js: el mismo paso
    a paso, con la trampa y la Ejecución ✨), adentro del recuadro de las Acciones nuevas; guarda con modificarCreep (acCambiarCreep). Los
    estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
-const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261006q', '../comun/asistente-duelo-hab.js?v=20261005fp'];
+const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261006q', '../comun/asistente-duelo-hab.js?v=20261007o'];
 // Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
 const ACE_BASE = ['../comun/creeps-base.js?v=20261006l', '../comun/skills-creep-base.js?v=20260927a'];
 async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }

@@ -437,3 +437,10 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **🔧 Reparación** (dueño, 2026-10-07: «el próximo paso, definirlo bien: el menú, la lógica, el talento de reparar»): el herrero repara lo de
   herrero y el bazar lo del bazar. Ver `rework-tiendas.md`.
 - [ ] **Lista de los efectos escasos de las tiendas** (dueño, 2026-10-07): preparar el listado en detalle (cuáles y por qué) para que lo revise.
+  **✅ Hecho (2026-10-07, dueño):** «del piso», «del aire» o «ambos» (el fuego y la escarcha pueden ser cualquiera). Zonas: `zonaAltura` (asistente de
+  zonas, Ejecución de habilidades; regla nueva de Firestore — sin pegarla, la zona queda «del aire» y avisa); trampas: `altura` en el JSON de
+  trampaEstado (asistente de trampas; las 39 del catálogo ya la traen: cepos, púas, brea, aceite, runas… del piso; gases, explosivas, dardos, descarga…
+  del aire; Mina napalm, Géiser, escarcha, Tumba de hielo, ambos). Levitar: lo del piso no lo toca mientras levita (los casilleros levitados de su
+  turno); si termina el movimiento levitando sobre una zona del piso, recién le afecta al terminar su turno (`levitarAterrizar`). Las Suelas restan solo a
+  lo que toca el piso (zonas y daño de trampas). Lo que se dispara «con cada paso» y no «en cada Mantenimiento» (miguelitos) ya existía. Los dardos son un
+  proyectil: «del aire», no tiene nada que ver con Levitar. Varitas: la fogata y la bola de fuego dejan «ambos»; el aceite y el suelo de la ventisca, «del piso».

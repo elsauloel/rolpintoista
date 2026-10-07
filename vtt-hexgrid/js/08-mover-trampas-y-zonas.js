@@ -364,13 +364,28 @@ function zonaMostrarSiguiente(){
   zonaBanner = {elId, tokenId, el, t, resultado: null};
   renderZonaBanner();
 }
+/* Del piso, del aire o ambos (2026-10-07, dueño): dónde está el efecto de una zona o una trampa. Levitar salva solo de lo del piso (mientras levita:
+   los primeros casilleros de su turno; al terminarlo toca el piso, `levitarAterrizar`); las Suelas restan solo a lo que toca el piso (piso o ambos).
+   `zonaAltura` en la zona (asistente de zonas, Ejecución); en una trampa, `altura` adentro del JSON de trampaEstado. Sin marca: una zona es del
+   aire (como siempre), el daño directo de una trampa es del piso (se pisa), el terreno incendiado es del piso. */
+function alturaDe(el){
+  if(!el) return 'aire';
+  if(['piso', 'aire', 'ambos'].includes(el.zonaAltura)) return el.zonaAltura;
+  try{ const a = (JSON.parse(el.trampaEstado || '{}') || {}).altura; if(['piso', 'aire', 'ambos'].includes(a)) return a; }catch(err){}
+  if(el.fuego) return 'piso';
+  return el.trampa && !el.zona ? 'piso' : 'aire';
+}
+const tocaElPiso = el => alturaDe(el) !== 'aire';
 // `desdeMantenimiento`: las zonas con zonaEnMantenimiento === false (las púas: "no mientras estás parado") no se
-// chequean acá — solo al caminar (ver zonaRevisarEntrada).
-function zonaRevisarToken(t, desdeMantenimiento){
+// chequean acá — solo al caminar (ver zonaRevisarEntrada). `flotando`: terminó el movimiento levitando (las del piso, todavía no);
+// `soloPiso`: al aterrizar, solo las del piso (las del aire ya las vio al moverse).
+function zonaRevisarToken(t, desdeMantenimiento, flotando, soloPiso){
   if(!t || !zonaEsMia(t)) return;
   elementos.forEach(el => {
     if(!el.zona || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;
     if(desdeMantenimiento && el.zonaEnMantenimiento === false) return;
+    if(flotando && alturaDe(el) === 'piso') return;
+    if(soloPiso && alturaDe(el) !== 'piso') return;
     if(!celdasDeElemento(el).some(c => c.col === t.col && c.fila === t.fila)) return;
     zonaEncolar(el, t);
   });
@@ -378,16 +393,20 @@ function zonaRevisarToken(t, desdeMantenimiento){
 // Al soltar un movimiento: para la mayoría de las zonas alcanza con mirar dónde terminó. Las de zonaCadaPaso
 // (púas: se disparan aunque solo se las cruce, sin quedarse) además cuentan cualquier casillero cruzado que sea
 // suyo y venga de uno que no lo era — mismo conteo que ya usa 🔥, una sola vez por movimiento (no por casillero).
-function zonaRevisarEntrada(id, celdas){
+// `levita`: cuántos casilleros del camino fueron levitando (los primeros): ahí lo del piso no lo toca.
+function zonaRevisarEntrada(id, celdas, levita){
   const t = tokens.get(id);
   if(!t || !zonaEsMia(t)) return;
+  const lev = Math.max(0, Math.round(num(levita)));
+  const alAire = (el, i) => i <= lev && alturaDe(el) === 'piso';   // ese casillero lo cruzó levitando
   if(celdas && celdas.length > 1){
     elementos.forEach(el => {
       if(!el.zona || !(el.zonaCadaPaso || el.trampa) || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;   // la de una trampa: al entrar, aunque solo la cruce
       const cs = celdasDeElemento(el);
       const enCelda = c => cs.some(x => x.col === c.col && x.fila === c.fila);
       for(let i = 1; i < celdas.length; i++){
-        if(enCelda(celdas[i]) && !enCelda(celdas[i - 1])){ zonaEncolar(el, t); break; }
+        if(alAire(el, i)) continue;
+        if(enCelda(celdas[i]) && (!enCelda(celdas[i - 1]) || alAire(el, i - 1))){ zonaEncolar(el, t); break; }
       }
     });
   }
@@ -398,11 +417,11 @@ function zonaRevisarEntrada(id, celdas){
     let spec = null; try{ spec = JSON.parse(el.zonaEstado); }catch(err){}
     if(!spec || !spec.renuevaPaso || !spec.nombre) return;
     const cs = celdasDeElemento(el), enCelda = c => cs.some(x => x.col === c.col && x.fila === c.fila);
-    if(!celdas.slice(1).some(enCelda)) return;
+    if(!celdas.slice(1).some((c, k) => enCelda(c) && !alAire(el, k + 1))) return;
     if(!confusionEstadosDe(t).some(e => e && e.activo !== false && e.nombre === spec.nombre)) return;
     zonaRenovarEstado(t, spec, el);
   });
-  zonaRevisarToken(t, false);
+  zonaRevisarToken(t, false, !!(celdas && celdas.length > 1 && lev >= celdas.length - 1));   // si todo el camino fue levitando, lo del piso todavía no
 }
 async function zonaRenovarEstado(t, spec, el){
   const nombre = el.zonaNombre || 'la zona';
@@ -500,7 +519,7 @@ async function zonaResolverBanner(){
     if(!elZ && el.trampa){ try{ elZ = (JSON.parse(el.trampaEstado || '{}') || {}).elemento || ''; }catch(err){} }   // la zona que dejó una trampa: el elemento de la trampa
     const rz = await resistenciasDe(t, elZ);
     const armadmg = el.zonaIgnoraDef && (el.zonaCasteadorRef || elZ) && Combatiente.frenaArmaduraMagica(elZ) ? rz.armadmg : 0;   // lo tóxico, no (2026-10-05)
-    const resEl = (elZ ? rz.res : 0) + Math.max(0, statPiesDe(t, 'suelagruesa'));   // + Suela gruesa (pies, 2026-10-06): lo que pisás hace menos
+    const resEl = (elZ ? rz.res : 0) + (tocaElPiso(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0);   // + Suela gruesa (pies, 2026-10-06): lo que pisás hace menos — solo lo del piso (2026-10-07)
     if(monto > 0){
       try{
         let res = null;
@@ -602,7 +621,7 @@ async function trampaAplicarEfectos(t, el, celdaPisada, esquive, idT){
   const muro = trampaMuroDe(el);
   const comun = {
     nombreT: el.trampaNombre || 'una trampa', salva, dano: trampaDanoValido(el.trampaDano) ? el.trampaDano.trim() : '', ignoraDef: !!el.trampaIgnoraDef,
-    specJson: spec && spec.nombre ? el.trampaEstado : '', elemento: (spec && spec.elemento) || '', pierdeSp: (spec && spec.pierdeSp) || '', cadena: (spec && spec.cadena) || null, portal: (spec && spec.portal) || null, requiereDano: !!(spec && spec.requiereDano), duenoTrampa: el.duenoUid || '',
+    specJson: spec && spec.nombre ? el.trampaEstado : '', elemento: (spec && spec.elemento) || '', altura: alturaDe(el), pierdeSp: (spec && spec.pierdeSp) || '', cadena: (spec && spec.cadena) || null, portal: (spec && spec.portal) || null, requiereDano: !!(spec && spec.requiereDano), duenoTrampa: el.duenoUid || '',
     aMano: (String(el.trampaDetalle || '').match(/[^.]*\(a mano\)\./g) || []).map(x => x.trim()).join(' '),   // lo que el texto dice que va a mano
     celdas: celdasDeElemento(el).flatMap(c => [c.col, c.fila]),   // dónde está la trampa (el dodge roll de Reflejos de mangosta: ¿quedó afuera?)
   };
@@ -711,7 +730,7 @@ async function trampaResolver(){
         zonaResueltos: trampaAfectados(t, p.el, celda0, esquive).map(x => `${x === t ? p.tokenId : zonaIdDe(x)}@${Math.round(num(mantenimientoNumero))}`),   // ya la sufrieron al detonar
         turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n,
         zonaEnMantenimiento: p.el.zonaEnMantenimiento !== false, zonaCadaPaso: !!p.el.zonaCadaPaso,
-      };
+      };   // (la altura sigue en su trampaEstado: alturaDe la lee de ahí)
       if(p.el.fuegoAmigo) cambios.zonaAmiga = true;
       let ej = {}; try{ ej = JSON.parse(p.el.trampaEstado || '{}') || {}; }catch(err){}
       const danoZ = trampaDanoValido(ej.danoZona) ? ej.danoZona : p.el.trampaDano;   // la Mina napalm: el piso quema menos que la explosión

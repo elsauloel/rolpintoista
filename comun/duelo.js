@@ -501,6 +501,7 @@ const Duelo = (() => {
       ...(h.zonaQueda ? {zonaQueda: {turnos: Math.min(6, Math.max(1, Math.round(_num(h.zonaQueda.turnos)) || 1)), nombre: txtCorto(h.zonaQueda.nombre || '', 40),
         ...(h.zonaQueda.dano ? {dano: txtCorto(h.zonaQueda.dano, 12)} : {}), ...(h.zonaQueda.tipoDano ? {tipoDano: txtCorto(h.zonaQueda.tipoDano, 20)} : {}),
         ...(h.zonaQueda.estado ? {estado: {nombre: txtCorto(h.zonaQueda.estado.nombre || '', 40), ...(h.zonaQueda.estado.turnos ? {turnos: _num(h.zonaQueda.estado.turnos)} : {})}} : {}),
+        ...(['piso', 'ambos'].includes(h.zonaQueda.altura) ? {altura: h.zonaQueda.altura} : {}),   // dónde está lo que deja (2026-10-07)
         ...(h.zonaQueda.contra ? {contra: txtCorto(h.zonaQueda.contra, 12)} : {}), ...(h.zonaQueda.tira ? {tira: txtCorto(h.zonaQueda.tira, 12), tiraValor: _num(h.zonaQueda.tiraValor)} : {}),
         ...(h.zonaQueda.color ? {color: txtCorto(h.zonaQueda.color, 7)} : {})}} : {}),   // lo que deja en el suelo (bola de fuego, ventisca)
       ...(h.menosDistancia ? {menosDistancia: true} : {}),   // −1 por casillero después del primero (pelea cercana)

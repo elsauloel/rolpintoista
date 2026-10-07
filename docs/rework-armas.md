@@ -1656,6 +1656,17 @@ Ojo con las «firmas» de ahorro (primer uso −1 SP, el No2 que no sube): qued�
   salto que llega con 1 es el último. Con el ejemplo del dueño, el redondeo va hacia abajo (hoy el rayo redondea hacia arriba, P118: a confirmar).
 - **B6 y B7:** el dueño preguntó qué quería decir «se pasa» (= el tiro pasa el tope de Buena: es nivel Raro). Versiones recortadas, abajo.
 - **B8 Alud → «Lluvia de cascotes»:** le gusta el concepto; faltan los números.
+- **Idea nueva del dueño — Chorro de lava:** un chorro que pega a todos los que toca en su recorrido y deja el terreno encendido. Tiene un
+  largo máximo en casillas, pero la forma es libre: elegís la primera casilla y cada una de las siguientes tiene que estar al lado de la
+  anterior, en la dirección que quieras, hasta llegar al largo. Borrador de Claude: camino de 4, 1d4 de fuego a cada uno (dodge roll, con
+  fuego amigo) y el camino queda ardiendo 2 turnos (1d4 de fuego, del piso): 9,2 · 3 SP con el escalón · 110 DDE. A programar: el objetivo
+  «camino libre» (como las 3 casillas de las espinas, pero pegadas una a otra).
+- **B14 Parpadeo → «Blink»** (le gusta más en inglés y es un término conocido).
+- **B25 Cura mayor: 2d8** en vez de 8 (9 de promedio · 3 SP con el escalón · 110 DDE). Ojo: hoy la cura de una Ejecución es un número fijo
+  (por eso la Varita de cura Común quedó en 5): hay que sumar la cura con dados al motor (vale también para las habilidades).
+- **B31 Báculo de sangre:** le encanta el concepto, pero «¿qué impide que lo agarre un tanque y rompa todo?» (tiene mucha vida para pagar).
+- **B32 Guardián:** no se entendió → explicar.
+- **Báculos que suman Ef.Esp (P169):** «son complejos, porque escalan por nivel, pero su resistencia y evasión no». Para ajustar.
 
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 

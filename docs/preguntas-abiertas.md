@@ -787,3 +787,7 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   Común. Opciones: (a) la escala de SP corre un escalón en Buena (más efecto por el mismo SP); (b) la escala igual y Buena trae formas y
   efectos nuevos; (c) las dos (propuesta de Claude).
   **Dueño (2026-10-07): (c), «probemos por acá»** (a probar).
+- ⬜ **P169. El daño mágico que suma Ef.Esp escala con el nivel** (dueño, 2026-10-07, mirando los báculos de Buena). El Ef.Esp de quien
+  ataca sube con el nivel, pero la Res.Esp y la Evasión de quien recibe no suben igual: un báculo que suma el Ef.Esp (o la mitad) se vuelve
+  cada vez más fuerte. Lo mismo vale para lo físico invocado (púa, canto rodado, granizo), aunque ahí frena la Defensa. Opciones en
+  `docs/rework-armas.md` (Armas especiales de Buena calidad).

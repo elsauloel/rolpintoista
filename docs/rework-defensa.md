@@ -1676,7 +1676,8 @@ Cada slot solo puede dar dos elementos; así se acota cuánto se acumula por cal
 | Piernas | Fuego · Hielo |
 | Pies | Tóxico · Ácido |
 | Escudo | Hielo · Eléctrica |
-| Cinturón, mochila, orbes | Ninguna (tampoco Defensa especial: lo que perdieron pasó a ranuras) |
+| Cinturón, mochila | Ninguna (tampoco Defensa especial: lo que perdieron pasó a ranuras) |
+| Orbes | **Cualquiera** (dueño, 2026-10-07): el comodín para balancear los elementos que falten en otros slots |
 | Anillos | Pendiente |
 
 **Las resistencias elementales no son obligatorias** (dueño, 2026-10-07): la mayoría de las piezas no dan ninguna; el mapa solo dice cuáles
@@ -1686,3 +1687,10 @@ valor (sin tocar durabilidad), con nombre o descripción retocados donde la resi
 herrero), Mitones del alquimista, Guantes de pescador de anguilas, Guantes de piel de lagarto overo (ex sapo cururú), Gorro de piel de
 salamandra (ex yeti), Escudo de escamas de lagarto, Escudo de cuero de lobo marino (ex salamandra), Suelas de cuero de dragón del pantano.
 Cinturones y mochilas: Correa con bolsitas (Ranuras +2), Faja del fogonero (ex ignífuga, Ranuras +3), Mochila de cuero curtido (Ranuras +10).
+
+### La otra mano: de «orbe» a cualquier objeto de mano (dueño, 2026-10-07, en diseño)
+Los orbes pasan a ser un caso de algo más amplio: **un objeto que va en la otra mano, con absoluta libertad de diseño**. Lo más vinculado a la
+magia y a lo esotérico, pero puede ser un farol que da visibilidad, la cabeza reducida de un jíbaro con efectos de brujería, un feto de llama
+como ofrenda a la Pachamama… cualquier cosa. Puede dar **cualquier resistencia elemental** (el comodín para balancear lo que falte en otros
+slots) y va a ser **una gran herramienta para balancear el equipo en general**. Se rediseña por completo, con una lluvia de ideas. Los orbes
+Comunes propuestos (Defensa especial en el de luz y el salvaje; nuevos: de cuarzo opaco y de humo atrapado) quedan en espera.

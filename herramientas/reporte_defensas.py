@@ -18,10 +18,11 @@ import calculadora_defensa as cd
 
 ELEM = [('resfuego', '🔥'), ('reshielo', '❄'), ('resrayo', '⚡'), ('restoxico', '☠'), ('resacido', '🧪')]
 # Qué resistencias elementales puede dar cada slot (dueño, 2026-10-07): acota cuánto se acumula por calidad (tope por pieza: Común +1, Buena +2).
-# Cinturón, mochila y orbes: ninguna. Anillos: pendiente (cuando se hagan los anillos).
+# Cinturón y mochila: ninguna. Orbes: cualquiera. Anillos: pendiente (cuando se hagan los anillos).
 PERMITIDAS = {'cabeza': {'resfuego', 'restoxico'}, 'torso': {'reshielo', 'resacido'}, 'manos': {'resfuego', 'resrayo'},
               'piernas': {'resfuego', 'reshielo'}, 'pies': {'restoxico', 'resacido'}, 'escudo': {'reshielo', 'resrayo'},
-              'escudo a 2 manos': {'reshielo', 'resrayo'}, 'cinturón': set(), 'mochila': set(), 'orbe': set()}
+              'escudo a 2 manos': {'reshielo', 'resrayo'}, 'cinturón': set(), 'mochila': set(),
+              'orbe': {'resfuego', 'reshielo', 'resrayo', 'restoxico', 'resacido'}}   # los orbes, cualquiera: el comodín para balancear (dueño, 2026-10-07)
 TOPE_RES = {'Común': 1, 'Buena Calidad': 2}
 TIERS = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario']
 

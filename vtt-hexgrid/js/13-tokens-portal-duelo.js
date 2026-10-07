@@ -214,9 +214,15 @@ async function crearElementoZona(centro, cfg){
   if(cfg.tiraExtra && (datos.zonaDano || datos.zonaDanoDif)) datos.zonaTiraExtra = String(cfg.tiraExtra).slice(0, 12);
   if(cfg.nota) datos.zonaNota = String(cfg.nota).slice(0, 200);
   if(['piso', 'ambos'].includes(cfg.altura)) datos.zonaAltura = cfg.altura;   // del aire es lo de siempre (2026-10-07)
+  if(cfg.directo && (datos.zonaDano || datos.zonaDanoDif)) datos.zonaDirecto = true;   // daño directo: no lo frena la Defensa especial (2026-10-07)
   try{
     try{ await coleccionElementos().add(datos); }
-    catch(e){ if(e.code !== 'permission-denied' || !datos.zonaAltura) throw e; delete datos.zonaAltura; await coleccionElementos().add(datos); toast('Ojo: faltan publicar las reglas (zonaAltura): la zona quedó como «del aire»'); }
+    catch(e){
+      if(e.code !== 'permission-denied' || !(datos.zonaAltura || datos.zonaDirecto)) throw e;
+      const sinReglas = [datos.zonaAltura ? 'zonaAltura: quedó «del aire»' : '', datos.zonaDirecto ? 'zonaDirecto: la frena la Defensa especial' : ''].filter(Boolean).join(' · ');
+      delete datos.zonaAltura; delete datos.zonaDirecto; await coleccionElementos().add(datos);
+      toast(`Ojo: faltan publicar las reglas (${sinReglas})`);
+    }
     toast(`🌫 ${cfg.nombre || 'Zona'} colocada: dura ${n} turno${n === 1 ? '' : 's'}`);
     return true;
   }catch(err){
@@ -253,7 +259,7 @@ function zonaPersistenteDeHabilidad(msg){
     estado: msg.zonaEstado, resistStat: msg.resistStat, resistValor: msg.resistValor, enMantenimiento: true, cadaPaso: false,
     casteadorRef: msg.fichaId, casteadorTipo: msg.casteadorTipo,
     danoDif: msg.zonaDanoDif, danoTipo: msg.zonaDanoTipo, tiraExtra: msg.zonaTiraExtra, nota: msg.zonaNota,
-    tiraStat: msg.tiraStat, tiraValor: msg.tiraValor, altura: msg.zonaAltura,
+    tiraStat: msg.tiraStat, tiraValor: msg.tiraValor, altura: msg.zonaAltura, directo: !!msg.zonaDirecto,
   }), `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': marcá el centro' : 'Elegí el centro de la zona'}</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true);
 }
 // 🪤 Trampa de una habilidad ✨ automática (2026-09-30, pedido del dueño): quien la usa elige la casilla con un clic (antes quedaba
@@ -763,6 +769,7 @@ function dueloZonaQueda(hab, centro, radio, yo){
     dano: z.dano || '', ignoraDef: true, danoTipo: z.tipoDano || '', estado: z.estado || null,
     ...(z.contra ? {resistStat: z.contra, tiraStat: z.tira || 'dmgesp', tiraValor: num(z.tiraValor)} : {}),
     enMantenimiento: true, cadaPaso: false, casteadorRef: String(yo.ref || ''), casteadorTipo: yo.tipo === 'creep' ? 'creep' : 'pj', altura: z.altura,
+    directo: !!(hab.dano && (hab.dano.directo || hab.dano.trueDamage)),   // lo que deja una varita de daño directo, también directo (2026-10-07)
   }).catch(err => console.error('No se pudo dejar la zona del área:', err));
 }
 function dueloElegirAreaMapa(msg){

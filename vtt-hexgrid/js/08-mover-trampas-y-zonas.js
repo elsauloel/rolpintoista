@@ -518,7 +518,7 @@ async function zonaResolverBanner(){
     let elZ = Combatiente.elementoDe(el.zonaDanoTipo || '');
     if(!elZ && el.trampa){ try{ elZ = (JSON.parse(el.trampaEstado || '{}') || {}).elemento || ''; }catch(err){} }   // la zona que dejó una trampa: el elemento de la trampa
     const rz = await resistenciasDe(t, elZ);
-    const armadmg = el.zonaIgnoraDef && (el.zonaCasteadorRef || elZ) && Combatiente.frenaArmaduraMagica(elZ) ? rz.armadmg : 0;   // la Defensa especial: todo el daño especial, también el tóxico (2026-10-07)
+    const armadmg = el.zonaIgnoraDef && !el.zonaDirecto && (el.zonaCasteadorRef || elZ) && Combatiente.frenaArmaduraMagica(elZ) ? rz.armadmg : 0;   // la directa (varitas) no la resta   // la Defensa especial: todo el daño especial, también el tóxico (2026-10-07)
     const resEl = (elZ ? rz.res : 0) + (tocaElPiso(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0);   // + Suela gruesa (pies, 2026-10-06): lo que pisás hace menos — solo lo del piso (2026-10-07)
     if(monto > 0){
       try{
@@ -543,6 +543,13 @@ async function zonaResolverBanner(){
   }
   if(el.zonaEstado && !resistio){
     let spec = null; try{ spec = JSON.parse(el.zonaEstado); }catch(err){}
+    // Un estado con chance (2026-10-07, Varita de miasma: 50 % de Veneno): se tira a la vista; si no sale, no entra.
+    const ch = spec && spec.nombre ? Combatiente.chanceDado(num(spec.pct)) : null;
+    if(ch){
+      const r = tirarDados('1d' + ch.caras), sale = !!r && r.total > ch.caras - ch.exitos;
+      try{ mesaPublicar(`${quienTxt} · ${spec.nombre} ${Combatiente.chanceTexto(num(spec.pct))}`, {formula: '1d' + ch.caras, rolls: r ? r.rolls : [], mod: 0, total: r ? r.total : 0}); }catch(err){}
+      if(!sale){ partes.push(`${spec.nombre}: no salió (${Combatiente.chanceTexto(num(spec.pct))})`); spec = null; }
+    }
     if(spec && spec.nombre){
       try{
         if(t.tipo === 'creep'){ await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec)); }

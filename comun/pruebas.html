@@ -2309,7 +2309,7 @@ prueba('✨ armas especiales (2026-10-05): la varita arma su tiro como una Ejecu
   const hab = Combatiente.habEjecucion(h2, h2.duelo, {stat: () => 5, etq: x => x});
   igual([h.duelo.objetivo, h.tiradaExtra, h2.tiradaExtra, c0, c2, FichaAcciones.armasEspeciales(S).map(i => i.id), FichaCombate.armasYEscudosParaParry(S).length,
     hab.dano.ignoraDef, hab.efectos[0].nombre, hab.efectos[0].caras],
-    ['enemigo', '1d4', '2d4' + (ef > 0 ? '+' + Math.floor(ef) : ''), {no2: 1, sp: 1, usos: 0}, {no2: 3, sp: 1, usos: 2}, ['v1', 'v2'], 0, false, 'Escarcha', 3]);
+    ['enemigo', '1d6', '2d4+3', {no2: 1, sp: 1, usos: 0}, {no2: 3, sp: 1, usos: 2}, ['v1', 'v2'], 0, false, 'Escarcha', 3]);
 });
 prueba('✨ varita de chispa eléctrica (2026-10-05): su Ejecución lleva la cadena del rayo (2 saltos, a 3 casillas)', () => {
   const S = FichaGuardado.normalizar({}).S, v = {...structuredClone(CATALOGO_BASE.find(i => i.id === 'esp-varita-de-chispa-electrica')), id: 'r', equipado: true};
@@ -2350,15 +2350,15 @@ prueba('✨ armas especiales, tercera tanda (2026-10-05): lo que queda en el sue
   const hEj = it => { const h = FichaAcciones.habDeArmaEspecial(S, it); return Combatiente.habEjecucion(h, h.duelo, {stat: s => s === 'dmgesp' ? 6 : 5, etq: x => x}); };
   const bola = hEj(cat('esp-varita-de-la-bola-de-fuego')), ven = Duelo.limpiarHab(hEj(cat('esp-varita-de-la-ventisca'))), est = Duelo.limpiarHab(hEj(cat('esp-varita-de-la-pua-de-hielo')));
   const pel = Duelo.limpiarHab(hEj(cat('esp-varita-de-la-pelea-cercana'))), gan = Duelo.limpiarHab(hEj(cat('esp-varita-del-gancho'))), mis = Duelo.limpiarHab(hEj(cat('esp-varita-de-misiles')));
-  const mia = Combatiente.zonaDeHab({nombre: 'Miasma'}, cat('esp-varita-de-miasma').especial.duelo, {fichaId: 'f', tipo: 'pj'});
+  const miaIt = cat('esp-varita-de-miasma'), mia = Combatiente.zonaDeHab(FichaAcciones.habDeArmaEspecial(S, miaIt), miaIt.especial.duelo, {fichaId: 'f', tipo: 'pj'});   // 2026-10-07: 1d4 directo y 50 % de Veneno (sin «la diferencia»)
   // El orbe de resguardo: Vida extra 2, una sola vez por turno
   const S2 = FichaGuardado.normalizar({}).S; S2.nitros = 10; S2.inventario = [cat('esp-varita-arcana'), cat('esp-orbe-de-resguardo')];
   const ui = {toast: () => {}, cambio: () => {}, presets: estadosPresetFicha(), avisarSinNitros: () => {}, colocarTrampa: () => {}, terminar: () => {}, mesaHabilidad: () => {}, fijarHp: () => {}};
   FichaAcciones.usarArmaEspecial(S2, S2.inventario[0].id, false, ui); FichaAcciones.usarArmaEspecial(S2, S2.inventario[0].id, false, ui);
   const esc = S2.efectos.filter(e => e.nombre === 'Vida extra');
-  igual([bola.zonaQueda.dano, ven.zonaQueda.estado.nombre, ven.zonaQueda.contra, ven.zonaQueda.tiraValor, est.critTipo, pel.menosDistancia, gan.atrae, mis.reparte, [mia.zonaDano, mia.zonaDanoDif, mia.zonaTiraExtra],
+  igual([bola.zonaQueda.dano, ven.zonaQueda.estado.nombre, ven.zonaQueda.contra, ven.zonaQueda.tiraValor, est.critTipo, pel.menosDistancia, gan.atrae, mis.reparte, [mia.zonaDano, mia.zonaDanoDif, mia.zonaDirecto, mia.zonaEstado && mia.zonaEstado.pct],
     esc.length, esc[0] && esc[0].escudoMagico, esc[0] && esc[0].turnos],
-    ['1d4', 'Sentado', 'rescc', 6, 4, true, {casillas: 2, contra: 'fue', tiraValor: 6}, {cada: '1d4', total: 2}, ['1d4', true, ''], 1, 2, 1]);
+    ['1d4', 'Sentado', 'rescc', 6, 4, true, {casillas: 2, contra: 'fue', tiraValor: 6}, {cada: '1d4', total: 2}, ['1d4', false, true, 50], 1, 2, 1]);
 });
 prueba('efectos con 33 % (dueño, 2026-10-05: «tirar d3 es feo»): se tiran con d6 y salen con 5 o 6 — en el duelo y en las armas', () => {
   const g = EfectosGolpe.normalizar({nombre: 'Escarcha', caras: 3, exitos: 1});

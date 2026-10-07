@@ -1900,6 +1900,13 @@ solo ⅓ (14 de 42); sin ese SP, paga con No2. Ahí el SP sí frena:
 | Báculo 1d4 + ¼ Ef.Esp · 1 / 2 / 3 SP | 72 · 56 % / 56 · 43 % / 28 · 23 % |
 | Báculo 1d6 + ¼ Ef.Esp · 2 / 3 / 4 SP | 78 · 65 % / 53 · 40 % / 39 · 30 % |
 
+**Decidido (dueño, 2026-10-07):** la referencia Común es **varita 1d6 directo a 1 SP** y **báculo 1d4 + ¼ Ef.Esp a 2 SP** (calculadora
+calibrada: el báculo cobra el ¼ del Ef.Esp de un mago de nivel 1, +3; la escala da 1 SP hasta 5). Las 30 Comunes rehechas y cargadas: todas
+las varitas con daño, directas (también áreas y zonas); los físicos invocados con + 3 fijo; el Miasma con 1d4 y **50 % de Veneno** (sin «la
+diferencia»). **Regla de diseño: un efecto de firma por elemento** — fuego → Quemadura, hielo → Escarcha, eléctrico → Parálisis, tóxico →
+Veneno, ácido → Armadura rota, arcano → ninguno (su gracia: no hay resistencia arcana). **Pendiente:** un báculo que sume un % de su Especial
+en un efecto de área (dueño: «no descartarlo, con un estudio y balance previo»); la cura con dados (Varita de cura 1d10, sigue en 5); P172.
+
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 
 Ruta del dueño (2026-10-05): **slot por slot**, empezando por **Cabeza**: primero lo Común pensado para casters, después el tier **Buena calidad de

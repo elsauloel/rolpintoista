@@ -758,6 +758,7 @@ const Combatiente = (() => {
       radio: Math.max(1, nf(c.radio) || 1), zonaTurnos: Math.max(1, nf(c.zonaTurnos) || 3), zonaAmiga: !!c.zonaAmiga, zonaAltura: c.zonaAltura || '',
       zonaEstado: c.zonaEstado || null, zonaDano: c.dano && !dif ? formulaDanoHab(h, c, o.X) : (dif && c.danoSuma ? String(c.danoSuma) : ''),   // con «la diferencia», `danoSuma` se le suma (miasma: + 1d4)
       zonaIgnoraDef: c.dano ? (c.ignoraDano !== undefined ? !!c.ignoraDano : (c.tipoDano || 'arcano') !== 'fisico') : false,
+      zonaDirecto: !!(c.dano && (c.danoDirecto || c.trueDamage) && (c.tipoDano || 'arcano') !== 'fisico'),   // daño directo: no lo frena la Defensa especial (2026-10-07)
       zonaDanoDif: dif, zonaDanoTipo: c.dano ? (TIPO_DANO_NOMBRE[c.tipoDano || 'arcano'] || '') : '',
       zonaTiraExtra: c.dano && c.danoExtra ? String(c.danoExtra) : '', zonaNota: c.efectoLibre ? (o.X === undefined || o.X === null ? String(c.efectoLibre) : sustituirX(String(c.efectoLibre), o.X)) : '',
       resistStat: (c.contra && c.contra[0]) || '', resistValor: o.resistValor === undefined ? null : o.resistValor,

@@ -1630,6 +1630,7 @@ levanta a un caído). Peso 1 por cada +1 (como Vida +5).
 | Escudos Común ✅ (2026-10-07) | 30 / 9 (antes 34 / 0) | 21 / 8 / 4 de 29 (sin orbes) |
 | Orbes Común y Buena ✅ (2026-10-07) | Común 0 / 4 · Buena 0 / 8 | todos con Def. especial; resistencias: Común ⚡1 ☠1 · Buena 🔥3 ☠2 |
 | Torso Buena ✅ (2026-10-07) | 95 / 47 (antes 131 / 0) | 26 / 22 / 7 de 41 · res. ❄2 🧪3 |
+| Cabeza Buena ✅ (2026-10-07) | 21 / 11 (antes 25 / 0) | 13 / 8 / 2 de 25 · res. 🔥2 ☠3 |
 | **Total Común ✅** | **136 / 81** (antes 185 / 0) | 90 / 68 / 16 de 243 · res. 🔥14 ❄8 ⚡6 ☠6 🧪8 (antes 🔥12 ❄6 ⚡5 ☠4 🧪8) |
 
 **Cómo se revisa cada slot y tier (dueño, 2026-10-07):** (1) convertir por material (tabla para el OK del dueño); (2) **la Defensa especial
@@ -1702,3 +1703,8 @@ Torso Buena: tela a Defensa especial (Gambesón acolchado de doble capa 4, Chaqu
 pozo sin fondo y Gambesón del veterano 1); híbridos: Coraza consagrada y Coraza rúnica (metal con oraciones y runas, 2/2), Jubón de cuero
 tachonado 2/2, Abrigo de púas de puercoespín gigante 1/2, Delantal de boticario 2/1, Pieles erizadas del berserker 2/1. Nuevas: Manto de seda
 de araña lunar (Def. especial +5 · Evasión +1 · Res. ácido +1) y Coraza de bronce con runas (Def +3 · Def. especial +3 · Res.CC +1 · Vida +10).
+
+Cabeza Buena: tela y lana a Defensa especial (Capucha acolchada de sastre 2, Cofia del veterano 1), Gorro de piel de zorro 1 (piel), Turbante de
+tela reforzada híbrido 1/1 con Res. fuego +1 (por Campo de visión +3 → +2); relleno a Defensa especial: Corona de laureles dorada (Res.Mt +4 → +2) y
+Sombrero humectante bordado (Res.Mt +2 → Def. especial +1); Casco de minero reforzado Res. tóxico +1 (por Percepción +1). Nuevas: Yelmo de bronce
+con runas (Defensa +1 · Def. especial +2 · Res. fuego +1 · Res.Esp +1) y Sombrero de la curandera (Def. especial +2 · Res. tóxico +2 · Res.Mt +1).

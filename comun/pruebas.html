@@ -512,11 +512,11 @@ prueba('Invulnerable activo bloquea un debuff del consumo (y lo dice)', () => {
   const r = FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Veneno', efectoHpTurno: -2}, presetsDePrueba);
   igual([r.ok, r.motivo], [false, 'inmune']);
 });
-prueba('el escudo y los stacks propios del ítem pisan a los del preset; reaplicar renueva (P132)', () => {
+prueba('el escudo y los stacks propios del ítem pisan a los del preset; otra Vida extra se suma aparte (2026-10-07; antes renovaba, P132)', () => {
   const S = {catalogo: [], efectos: []};
   FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Vida extra', efectoEscudo: 6, efectoTurnos: 2}, presetsDePrueba);
   const r2 = FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Vida extra', efectoEscudo: 9, efectoTurnos: 2}, presetsDePrueba);
-  igual([S.efectos.length, r2.estado.escudoMagico, r2.estado.escudoMagicoActual], [1, 9, 9]);
+  igual([S.efectos.length, r2.estado.escudoMagico, r2.estado.escudoMagicoActual, S.efectos.map(e => e.escudoMagicoActual)], [2, 9, 9, [6, 9]]);
 });
 prueba('el catálogo completado después manda sobre la copia que ya tenía el ítem (configEfectoDe)', () => {
   const S = {catalogo: [{nombre: 'Poción vieja', efectoNombre: 'Regeneración', efectoHpTurno: 3}], efectos: []};
@@ -1364,7 +1364,7 @@ prueba('P137: «no vence» lo decide la habilidad si lo marca, si no el estado (
   const r3 = FichaHabilidades.aplicarEfectoDeConsumo(S, {nombre: 'Capa', efectoNombre: 'Sigilo'}, estadosPresetFicha());
   igual([r1.estado.permanente, r2.estado.permanente, r3.estado.permanente], [true, false, true]);
 });
-prueba('P137: la Vida extra que da una habilidad reemplaza al que había, también en los creeps', () => {
+prueba('la Vida extra que da una habilidad se suma a la que había (2026-10-07; antes reemplazaba, P137), también en los creeps', () => {
   const h = {id: 'd', nombre: 'Drenar', efectoNombre: 'Vida extra', efectoEscudo: 3};
   const sc = creepPrueba({habilidades: [h]});
   CreepAcciones.efectoDeHab(sc, Object.assign({}, h, {efectoEscudo: 5}), estadosPresetCreep());
@@ -1373,7 +1373,7 @@ prueba('P137: la Vida extra que da una habilidad reemplaza al que había, tambi�
   FichaHabilidades.aplicarEfectoDeConsumo(S, Object.assign({}, h, {efectoEscudo: 5}), estadosPresetFicha());
   const rf = FichaHabilidades.aplicarEfectoDeConsumo(S, h, estadosPresetFicha());
   const exc = l => l.filter(e => e.nombre === 'Vida extra').map(e => [e.escudoMagico, e.escudoMagicoActual]);
-  igual([exc(sc.estados), exc(S.efectos), !!r.estado, !!rf.ok], [[[3, 3]], [[3, 3]], true, true]);
+  igual([exc(sc.estados), exc(S.efectos), !!r.estado, !!rf.ok], [[[5, 5], [3, 3]], [[5, 5], [3, 3]], true, true]);
 });
 
 prueba('invocación: la Defensa suma los estados que la cambian (como un creep) y Armadura rota resta una sola vez', () => {

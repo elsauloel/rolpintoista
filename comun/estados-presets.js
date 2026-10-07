@@ -86,7 +86,7 @@ const ESTADOS_PRESET = [
     detalle:'Mientras dure, cada ataque cuerpo a cuerpo que recibe le devuelve al atacante 1/4 (25 %) del daño del golpe (con el crítico, antes de la Defensa), redondeado hacia arriba, directo a la vida. ⚙ Automatizado en el duelo; ✋ a mano fuera de él.'},
   // Vida extra (dueño, 2026-10-07): el ex Escudo especial y el ex Excedente de vida son lo mismo — vida de más, NETA (lo que se gasta no
   // vuelve), salvo que el efecto diga que se renueva (`recarga: true`). Absorbe el daño de cualquier fuente, también el True Damage. Sin turnos,
-  // dura hasta gastarse; con turnos, vence. Si llega otra, reemplaza a la que había (P137).
+  // dura hasta gastarse; con turnos, vence. Si llega otra, se suma: cada una aparte, con su duración (dueño, 2026-10-07; antes reemplazaba, P137).
   {nombre:'Vida extra', alias:['Escudo especial', 'Escudo mágico', 'Excedente de vida'], polaridad:'buff', permanente:true, turnos:0, escudoMagico:5, excedenteVida:true,
     detalle:'Vida de más: se gasta antes que la vida y absorbe el daño de cualquier fuente, también el True Damage. Es neta: lo que se gasta no vuelve (salvo que el efecto diga que se renueva). Sin turnos dura hasta gastarse; si el efecto le pone turnos, vence. Se sube o baja a mano desde el chip.'},
   // Barrera (dueño, 2026-10-06): 2 turnos — con el turno propio, la de 1 turno que uno se pone en su turno se iba antes de que lo atacaran.

@@ -810,3 +810,6 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   **Corrección (dueño, 2026-10-07):** **True Damage** = ignora toda defensa (física, especial, cualquier armadura), muy controlado. **Daño
   directo** = daño especial que ignora la Defensa especial, para los proyectiles chicos («como un crítico que ignora armadura, sin
   multiplicador»). El Ef.Esp siempre choca con la Defensa especial.
+- ✅ **P170. Dos Vida extra (ex Escudo especial / Excedente de vida) a la vez** (dueño, 2026-10-07): **se suman**, cada una aparte con su
+  duración (antes la nueva reemplazaba a la anterior, P137). Un drenaje solo agrega lo que falta para su tope. La Vida extra es neta: solo se
+  renueva la que el efecto marca con `recarga`.

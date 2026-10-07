@@ -559,6 +559,13 @@ const Combatiente = (() => {
     if(veneno) return {ok: true, que: nuevo.permanente ? 'yaLoTiene' : 'acumulado', estado: veneno};
     const sangrado = acumularSangrado(estados, nuevo);
     if(sangrado) return {ok: true, que: 'acumulado', estado: sangrado};
+    // Vida extra (dueño, 2026-10-07: «quiero que se sumen»): otra Vida extra no reemplaza a la que había — se suma, cada una con su duración
+    // (queda aparte en la lista; el daño se come primero la que vence antes). Antes (P137) reemplazaba.
+    if(nuevo.excedenteVida && n(nuevo.escudoMagico) > 0 && estados.some(e => e && e.excedenteVida && e.nombre === nuevo.nombre && e.activo !== false)){
+      if(nuevo.escudoMagicoActual === undefined) nuevo.escudoMagicoActual = n(nuevo.escudoMagico);
+      estados.push(nuevo);
+      return {ok: true, que: 'nuevo', sumado: true, estado: nuevo};
+    }
     const igual = estados.find(e => e && e.nombre === nuevo.nombre && !e.origenItem && !e.derivado);
     if(igual){
       const id = igual.id;

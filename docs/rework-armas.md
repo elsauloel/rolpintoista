@@ -1837,6 +1837,11 @@ las dos puede salir en cualquiera, con un criterio: si está más cargado a una,
 
 (El daño físico, también el físico invocado, lo frena la Defensa.) Las áreas suelen alcanzar **1 o 2** rivales; 3 es raro (dueño).
 
+**Varitas y báculos (dueño, 2026-10-07):** las **varitas no crecen con el nivel** (dado fijo, **daño directo**, también en área: terminan
+siendo útiles para los que no son magos; el PdG.Esp igual limita a todos, y está bien). Los **báculos son para los magos**: daño especial
+«común», que suma Ef.Esp y lo frena la Defensa especial (½ a un objetivo, ¼ en área: propuesta). En la calculadora: las 25 varitas con daño
+pasan a directo; la flor cuenta 1,5 objetivos (antes 1,75).
+
 **Lo que ya existe y sirve:** el stat `armadmg` («Armadura mágica»: un número fijo que se resta al daño de casteo, para personajes, creeps e
 invocaciones, ya restado en el mapa) — hoy ningún ítem del catálogo lo da. Propuesta: **es la misma pieza con otro nombre**, Defensa especial,
 y deja de ser escasa.

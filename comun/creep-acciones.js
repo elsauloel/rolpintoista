@@ -467,6 +467,8 @@ const CreepAcciones = (() => {
     const v = Combatiente.vencerAlEmpezar(sc.estados); sc.estados = v.quedan;   // Titilando se va al empezar su turno
     const d = Combatiente.dispararEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno', resFuego: C().resElemental(sc, 'fuego')});
     const rep = Combatiente.reporteTurno([...v.eventos, ...d.eventos]);
+    const rg = Math.max(0, Math.floor(num(C().modTotal(sc, 'hpregen'))));   // Regeneración de vida del equipo (2026-10-07)
+    if(rg > 0 && num(sc.hp) > 0){ d.hp += rg; rep.push(`Regeneración de vida: +${rg} HP`); }
     const dh = Combatiente.curaQueEntra(sc.hp, d.hp);
     if(d.hp && !dh) rep.push('Caído: la cura de este turno no lo levanta');
     if(dh){ const antes = num(sc.hp); sc.hp = Math.max(0, Math.min(num(sc.hpMax), antes + dh)); rep.push(`HP total: ${antes} → ${sc.hp}`); }

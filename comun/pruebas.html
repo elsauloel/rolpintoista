@@ -1130,6 +1130,16 @@ prueba('el Ankh a mano revive con el 25 % del HP máximo y gasta una unidad', ()
 grupo('Reglas de un creep (paso 4, etapa 4)');
 const creepPrueba = extra => CreepCalculo.normalizar(Object.assign({nombre: 'Orco', con: 4, fue: 5, agl: 3, des: 4, esp: 2, hp: 20, hpMax: 20,
   armaNombre: 'Hacha', armaTipo: 8, armaPeso: 2, armaFijo: 1, defensa: 3, equipo: [], estados: [], habilidades: [], escalaTipos: 2}, extra || {}));
+prueba('Regeneración de vida del equipo (2026-10-07, piel de troll): cura al empezar el turno, en personajes y creeps; no levanta a un caído', () => {
+  const chal = {id: 't', nombre: 'Chaleco de piel de troll', tipoItem: 'armadura_blanda', equipado: true, mods: [{stat: 'hpregen', val: 2}]};
+  const sc = creepPrueba({equipo: [chal]}); sc.hp = 10;
+  CreepAcciones.inicioTurno(sc, 'r1', 1);
+  const caido = creepPrueba({equipo: [chal]}); caido.hp = 0;
+  CreepAcciones.inicioTurno(caido, 'r1', 1);
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, hp: 10, nitros: 0, efectos: [], inventario: [chal]}).S);
+  FichaMantenimiento.inicioTurno(S, {fijarHp: v => FichaAcciones.fijarHp(S, v)}, 'k1', '', [], 5);
+  igual([sc.hp, caido.hp, S.hp, FichaCalculo.calcular(S).final.hpregen], [12, 0, 12, 2]);
+});
 prueba('los stats suman lo que sube el atributo y lo que apunta al stat; el jefe tiene +1 Res.Esp', () => {
   const sc = creepPrueba({equipo: [{nombre: 'Yelmo', tipoItem: 'cabeza', mods: [{stat: 'con', val: 1}, {stat: 'resmg', val: 2}]}]});
   igual([CreepCalculo.statValor(sc, 'resmg'), CreepCalculo.statValor(creepPrueba({jefe: true}), 'resmg'), CreepCalculo.statValor(sc, 'pdg')], [7, 5, 4]);

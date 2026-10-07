@@ -34,6 +34,9 @@ const FichaMantenimiento = (() => {
       const x = num(p.regenHp) * FichaCalculo.pasivaCompras(p);
       if(x > 0 && num(S.hp) > 0){ hp += x; log.push(`<b>${esc(p.nombre)}</b> <span class="heal">+${fmt(x)} HP</span>`); rep.push(`${p.nombre} (pasiva): +${fmt(x)} HP`); }
     });
+    // La Regeneración de vida del equipo (2026-10-07, la piel de troll).
+    const eq = Math.max(0, Math.floor(num(FichaCalculo.calcular(S).final.hpregen)));
+    if(eq > 0 && num(S.hp) > 0){ hp += eq; log.push(`<b>Regeneración de vida</b> <span class="heal">+${fmt(eq)} HP</span>`); rep.push(`Regeneración de vida (equipo): +${fmt(eq)} HP`); }
     return hp;
   }
   // La vida por fijarHp (para que el veneno que te deja en 0 active el Ankh antes de contar los turnos de muerte) y el reporte.
@@ -70,6 +73,8 @@ const FichaMantenimiento = (() => {
     const v = Combatiente.vencerAlEmpezar(inv.estados); inv.estados = v.quedan;   // Titilando se va al empezar su turno
     const d = Combatiente.dispararEstados(inv.estados, camposInv(inv));
     const rep = Combatiente.reporteTurno([...v.eventos, ...d.eventos]);
+    const rg = Math.max(0, Math.floor(num(InvCalculo.statValor(inv, 'hpregen'))));   // Regeneración de vida (2026-10-07)
+    if(rg > 0 && num(inv.hp) > 0){ d.hp += rg; rep.push(`Regeneración de vida: +${fmt(rg)} HP`); }
     const dhInv = Combatiente.curaQueEntra(inv.hp, d.hp);
     if(d.hp && !dhInv) rep.push('Caída: la cura de este turno no la levanta');
     if(dhInv){ const antes = num(inv.hp); inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, antes + dhInv)); rep.push(`HP total: ${fmt(antes)} → ${fmt(inv.hp)}`); }

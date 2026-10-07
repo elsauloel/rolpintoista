@@ -55,6 +55,8 @@ const FichaCalculo = (() => {
     // Defensa" (Paso 1); no tiene nada que ver con la Vida extra (HP
     // temporal) ni con la skill del Mago "Armadura arcana".
     // Defensa especial (2026-10-07, dueño, P169): es la ex Defensa especial, renombrada y sin escasez — se equipa como la Defensa.
+    // Regeneración de vida (2026-10-07, dueño: la piel de troll): la vida que recupera al empezar cada turno, igual para personajes, creeps e invocaciones.
+    {id:'hpregen', label:'Regen. vida', full:'Regeneración de vida: recuperás esta vida al empezar cada turno (sin pasar del máximo; no levanta a un caído)'},
     {id:'armadmg', label:'Def. especial', full:'Defensa especial: se resta al daño especial (arcano, eléctrico, fuego, hielo, tóxico, ácido), como la Defensa al físico. No la frena: el daño directo (proyectiles chicos) ni el True Damage. No sale de ningún atributo: la da el equipo.'},
     // Los ids tipo1..tipo5 quedaron de antes de correr la escala +2 (eran
     // Tipo 2..10): no se renombran para no tocar los mods ya guardados.

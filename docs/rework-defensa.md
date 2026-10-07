@@ -1612,3 +1612,19 @@ durabilidad (Resistente)**, con variantes según la parte (pies livianos → Lev
 usan como relleno Res.CC, Res.Mt ni ranuras de cinturón** («no quiero que se vayan de mambo»). 53 piezas cambiadas, todas con el mismo valor en la
 calculadora (mismo precio): 33 resistencias de relleno se sacaron y 21 de tema bajaron de +2 a +1 (esas, siempre con durabilidad). Máximo equipable de
 fuego: Común 12 → 7, hasta Buena 14 → 11 (hielo 10 → 5 / 8, ácido 10 → 6 / 9, rayo y tóxico 7 → 4 / 5). Piezas Comunes con alguna: 19 % → 14 %.
+
+## Defensa especial en el catálogo defensivo (2026-10-07, ver `docs/rework-armas.md` «Defensa especial»)
+Conversión: cada pieza conserva sus puntos y su precio (la Defensa especial cuesta lo mismo que la Defensa). Metal → Defensa · tela →
+Defensa especial · cuero: unas Defensa, otras especial (cuero de bicho raro o de dudosa procedencia) y otras las dos · metal con runas → las
+dos. Se hace slot por slot, tier por tier, mirando el balance.
+**Regeneración de vida** (`hpregen`, stat nuevo, 2026-10-07): recupera N de vida al empezar cada turno (personajes, creeps e invocaciones; no
+levanta a un caído). Peso 1 por cada +1 (como Vida +5).
+
+| Slot · tier | Defensa / Defensa especial (suma de todas las piezas) | Piezas con Def / con Def. especial / híbridas |
+|---|---|---|
+| Torso Común ✅ (2026-10-07) | 60 / 28 (antes 85 / 0) | 23 / 18 / 6 de 35 |
+
+Torso Común: 9 de tela a Defensa especial; cuero raro: Peto de escamas de pez gigante, Jubón de piel de lobizón (ex Armadura de cuero blando),
+Chaleco de piel de oso lechuza (ex Chaleco de cazador); híbridos: Armadura de cuero tachonado (ex Armadura con tachas, cargada a la Defensa),
+Campera de cuero con tachas y Casaca curtida de salteador (parejas), Peto de cuero de lampalagua (ex Peto de cuero curtido), Pechera pintada
+del clan (ex Coraza del clan) y el nuevo Chaleco de piel de troll (Regeneración de vida +1; cargadas a la especial).

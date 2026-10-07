@@ -777,3 +777,8 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
 - ✅ **P166. Una cura no levanta a un caído** (dueño, 2026-10-06): con la vida en 0, una poción, la cura de una habilidad o la regeneración
   del turno no suben la vida (el daño sí sigue entrando). Para levantarlo hace falta un efecto que diga «revivir» (✚ Revivir, Ankh), que
   además lo deja Titilando. Salida a mano: el círculo de vida del token avisa y deja cambiarla igual (lo decide la mesa).
+- ⬜ **P167. ¿Cuánto cura una poción?** (dueño, 2026-10-06: «dejalo planteado como pregunta»; también en Herramientas de diseño → Preguntas).
+  Los valores vienen de la escala vieja: Poción de HP (Común, $25) cura 25; la grande, 3 cargas de 25 (Raro, $80); la mayor, 100 (Raro, $100);
+  la mayor grande, 3 × 100 (Excepcional). Hoy la vida de un personaje liviano ronda 25–35: una poción Común lo llena casi entero y la mayor
+  sobra de lejos. Opciones: (a) números más chicos (Común 8–10, Buena 15, Rara 25…); (b) un porcentaje de la vida máxima, como la Poción de
+  SP (Común 30 %, Buena 50 %, Rara 100 %); (c) dados (2d6, 4d6…), que suman azar. Se suma la Mano de boticario (+N por poción).

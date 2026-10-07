@@ -1684,6 +1684,23 @@ Ojo con las «firmas» de ahorro (primer uso −1 SP, el No2 que no sube): qued�
     grande, 1d4, fuego 1 turno; 4 SP) · **Ráfaga helada A** (frente 3×3, 1d4, empuja 2; 4 SP) · **Lluvia de cascotes 1d6** (2 SP, 85 DDE) ·
     **Inestable: con algún 1 (31 %) te hacés 1d4** · **Báculo de sangre: el 10 % de la vida máxima, redondeado hacia arriba** (corrige lo de arriba).
   - **P169 (Ef.Esp):** el dueño: el tope «terminaría siendo lo mismo que +3, +5 fijo». Sigue abierta (ver P169).
+  - **P169, el dilema de fondo (2026-10-07):** cómo se defiende uno del daño mágico frente al físico.
+
+    | Capa | Físico | Mágico (hoy) |
+    |---|---|---|
+    | Que no te pegue | Evasión · Parry (Des) · Bloqueo (Fue; pasa la mitad) | Evasión (PdG.Esp contra Evasión) · Res.Esp en los que no se esquivan · dodge roll en las áreas |
+    | Bajar el daño | Defensa: todas las piezas del equipo, sube con la calidad | Armadura mágica: solo desde Raro (casi nadie) · Res. elemental: +1/+2 y solo en piezas de tema |
+    | Lo que crece con el nivel | El Dmg (Fue) del que pega · la Defensa del que recibe (por equipo) | El Ef.Esp del que pega (si el arma lo suma) · nada del que recibe |
+    | Crítico | Sí (ignora la Defensa) | No (salvo lo físico invocado) |
+
+    Opciones para la defensa (el daño ya va «+N fijo por calidad, nunca más que tu Ef.Esp»):
+    - **D. Armadura mágica desde Buena, escasa** (propuesta): la defensa mágica la da el equipo, como la Defensa; las dos crecen con la calidad
+      del equipo, no con el nivel. Sin tiradas nuevas.
+    - **C. Salvación con Res.Esp:** al recibir daño mágico, Res.Esp (Con) contra el Ef.Esp de quien lo tira; si gana, recibe la mitad (como el
+      Bloqueo). Crece con el nivel de los dos lados, pero suma una tirada a cada golpe.
+    - **F. Escudos y orbes paran proyectiles mágicos:** el Bloqueo también contra lo mágico que se esquiva (no contra áreas ni contra lo que no
+      se esquiva).
+    Lo físico invocado (púa, canto rodado, granizo, cascotes) queda como un arma: suma el Ef.Esp y lo frena la Defensa (simétrico con la Fuerza).
 
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 

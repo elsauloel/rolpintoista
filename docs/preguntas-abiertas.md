@@ -794,3 +794,10 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   **Dueño (2026-10-07):** el tope por calidad «terminaría siendo lo mismo que ponerle +3, +5, que sea un daño fijo». Claude: casi —para un
   mago, sí—; la diferencia está en quien tiene poco Especial (un guerrero con un báculo suma menos), que es justo el freno del tanque con el
   báculo de sangre. Dicho de otra forma: «+3 fijo, pero nunca más que tu Ef.Esp». A decidir: eso o el fijo a secas.
+  **Dueño (2026-10-07, segunda vuelta):** como el Especial da el SP y todos usan SP, casi nadie va a tener Ef.Esp bajo: el tope es, en la
+  práctica, un fijo («+3 fijo, nunca más que tu Ef.Esp: me parece bien, pero terminemos de pensar el dilema»). **La clave: qué salvación y qué
+  defensa tiene el daño mágico frente al físico** («es clave en el sistema de juego»). Hoy: lo físico se frena con Evasión, Parry o Bloqueo para
+  no recibirlo y con la Defensa (todo el equipo, sube con la calidad) para bajarlo; lo mágico solo con Evasión (o Res.Esp en los que no se
+  esquivan; dodge roll en las áreas) y casi nada para bajarlo (Armadura mágica solo desde Raro; Res. elemental chica y de tema). Propuesta de
+  Claude: el daño lo marca el arma (fijo por calidad, con tope en tu Ef.Esp) y la defensa la marca el equipo (Armadura mágica escasa desde
+  Buena); opciones en `docs/rework-armas.md`.

@@ -1492,3 +1492,15 @@ juntas). Tipo 8 vale 3 puntos: entra +1 por pieza. Calculadora: todas en su bols
 | Quijotes de hierro · 2 · 85 | Res. crítico Tipo 8 +1 · Defensa +1 |
 | Guanteletes de placas · 2 · 70 | Res. crítico Tipo 8 +1 · Res. ácido +1 |
 | Escarpes de hierro · 2 · 70 | Res. crítico Tipo 8 +1 · Res. fuego +1 |
+
+**Dos Comunes con Tipo 8 (dueño, 2026-10-07: «sumar las dos con la estrellita»), cargadas:** Escudo de chapa remachada (pesa 1 · 85: Tipo 8 +1) y Peto
+de hierro viejo (rígido, pesa 3 · 110: Tipo 8 +1 · Defensa +2 · Res. fuego +1). Excepción consciente a la curva (en niveles 1–2 no hay Tipo 8), como el
+Disco de arado. 15 piezas con Tipo 8 en total.
+
+## Resistencias elementales en niveles bajos — análisis (2026-10-07, pedido del dueño: «lo veo muy frecuentemente en todos lados, se puede ir de mambo»)
+- **El 19 % de las piezas defensivas** (Común y Buena) trae alguna resistencia elemental; fuego es la más común (17 Comunes, 32 hasta Buena).
+- **Máximo equipable eligiendo a propósito** (lo mejor de cada parte, dos anillos): Común — fuego 12 · hielo 10 · ácido 10 · rayo 7 · tóxico 7; hasta
+  Buena — fuego 14 · hielo 10 · ácido 10 · rayo 8 · tóxico 8.
+- **Con un equipo al azar** (una pieza por parte): promedio menos de 1 por elemento; ≥ 2 en fuego el 24–26 % de las veces, ≥ 4 el 2–3 %.
+- **El daño elemental de nivel bajo es chico**: varitas Comunes 1d2–1d6 (+ Ef.Esp), trampas 2d6. Contra eso, cada +2 pesa muchísimo: 2 de Res. fuego
+  ya le saca la mitad a una varita de fuego, y 6 lo vuelve inmune. El riesgo no es el equipo al azar sino **juntarlas a propósito**.

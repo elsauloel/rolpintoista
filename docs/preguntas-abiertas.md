@@ -787,7 +787,7 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   Común. Opciones: (a) la escala de SP corre un escalón en Buena (más efecto por el mismo SP); (b) la escala igual y Buena trae formas y
   efectos nuevos; (c) las dos (propuesta de Claude).
   **Dueño (2026-10-07): (c), «probemos por acá»** (a probar).
-- ⬜ **P169. El daño mágico que suma Ef.Esp escala con el nivel** (dueño, 2026-10-07, mirando los báculos de Buena). El Ef.Esp de quien
+- ✅ **P169. El daño mágico que suma Ef.Esp escala con el nivel** (dueño, 2026-10-07, mirando los báculos de Buena). El Ef.Esp de quien
   ataca sube con el nivel, pero la Res.Esp y la Evasión de quien recibe no suben igual: un báculo que suma el Ef.Esp (o la mitad) se vuelve
   cada vez más fuerte. Lo mismo vale para lo físico invocado (púa, canto rodado, granizo), aunque ahí frena la Defensa. Opciones en
   `docs/rework-armas.md` (Armas especiales de Buena calidad).
@@ -802,3 +802,8 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   Claude: el daño lo marca el arma (fijo por calidad, con tope en tu Ef.Esp) y la defensa la marca el equipo (Armadura mágica escasa desde
   Buena); opciones en `docs/rework-armas.md`.
   **Provisorio (dueño, 2026-10-07):** hasta resolverlo con el grupo, ninguna arma especial suma el Ef.Esp: daño fijo (dados o neto).
+  **✅ Resuelta (dueño con el grupo, 2026-10-07): existe la Defensa especial.** Hay Defensa física y **Defensa especial**; la especial se
+  equipa como cualquier otra (todo el catálogo defensivo hay que revisarlo para sumarla). Algunos efectos especiales llevan el tag **True
+  Damage**: ignoran la Defensa especial — para los proyectiles chicos. **Todo daño que sume el Ef.Esp del personaje sí choca con la Defensa
+  especial.** Con esto vuelve el Ef.Esp al daño (como la Fuerza contra la Defensa). Plan y preguntas: \`docs/rework-armas.md\`
+  («Defensa especial»).

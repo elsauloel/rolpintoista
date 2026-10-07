@@ -1769,6 +1769,24 @@ Ojo con las «firmas» de ahorro (primer uso −1 SP, el No2 que no sube): qued�
     Soplo de fuego, la Bola de fuego, el Granizo y la Lluvia ácida; el Destello pasa a 20 % de Pajaritos para seguir en 4 SP; el Láser y la
     Ventisca siguen en 4 SP (más caros en DDE).
 
+### Defensa especial y True Damage (dueño con el grupo, 2026-10-07 — resuelve P169)
+
+**La regla:** hay **Defensa física** (la Defensa de siempre) y **Defensa especial**. La especial **se equipa como cualquier otra** (piezas del
+equipo). Algunos efectos especiales llevan el tag **True Damage**: ignoran la Defensa especial — **para los proyectiles chicos**. **Todo daño
+que sume el Ef.Esp del personaje choca con la Defensa especial.** Dueño: «eso te permite reimaginar todo».
+
+**Lo que ya existe y sirve:** el stat \`armadmg\` («Armadura mágica»: un número fijo que se resta al daño de casteo, para personajes, creeps e
+invocaciones, ya restado en el mapa) — hoy ningún ítem del catálogo lo da. Propuesta: **es la misma pieza con otro nombre**, Defensa especial,
+y deja de ser escasa.
+
+**Consecuencias (propuesta de Claude):**
+- El Ef.Esp **vuelve al daño** de los báculos y de lo que lo sume (como la Fuerza en un arma física: no se cobra, porque lo frena la Defensa especial).
+- La calculadora de especiales deja de cobrar «directo a la vida» (arcano ×1,5, elemental ×1,4, tóxico ×1,25): lo que frena la Defensa especial
+  vale como lo físico (×1); el **True Damage** sí lleva el recargo (no lo frena nada).
+- La calculadora de defensa: la Defensa especial cuesta **lo mismo que la Defensa** (hoy la Armadura mágica cuesta 3 por punto, por escasa).
+- El catálogo defensivo (409 piezas con Defensa) se revisa para repartir la Defensa especial; las armas especiales Comunes y Buenas se
+  rehacen con la regla nueva.
+
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 
 Ruta del dueño (2026-10-05): **slot por slot**, empezando por **Cabeza**: primero lo Común pensado para casters, después el tier **Buena calidad de

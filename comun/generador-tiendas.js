@@ -74,8 +74,11 @@ const GeneradorTiendas = (() => {
     'Rebaja de No2': it => algunMod(it, ['pasosgratis', 'paradafacil', 'saquerapido', 'oporahorro', 'contraahorro', 'ahorroespsp', 'levantarse', 'pasamanos']) || !!it.oporGratis || num(it.ahorroNitros) > 0,
     'Chances': it => algunMod(it, ['retirada', 'reflejos', 'recuperarse', 'inamovible']),
     'Casteo': it => algunMod(it, ['pdgmg', 'dmgesp', 'spregen', 'rangocasteo']),
-    'Crítico': it => algunMod(it, ['crit', 'critpot']) || num(it.critD20) > 0,
+    // El Crítico propio de un arma de Tipo 4 no cuenta (dueño, 2026-10-07: es su identidad — el jugador de Destreza con armas de Tipo bajo vive
+    // del crítico); el de las armas de otros Tipos y el de todo lo que no es arma, sí.
+    'Crítico': it => !esArmaT4(it) && (algunMod(it, ['crit', 'critpot']) || num(it.critD20) > 0),
   };
+  function esArmaT4(it){ const p = parteDe(it); return (p === 'arma' || p === 'distancia') && num(it.tipoDado) === 4; }
   const etiquetasDe = it => Object.keys(ETIQUETAS).filter(k => ETIQUETAS[k](it));
   const publicable = it => !!it && !it.archivo && !it.soloBotin && TIERS.includes(it.tier);
   const familiaDe = it => num(it.tipoDado);

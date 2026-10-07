@@ -1476,3 +1476,19 @@ Probado en vivo («Claude · pruebas»): Muro + Guardián (15 de daño − Defen
 aliado) y Absorción (+1 SP el primer golpe mágico, el segundo no). Parada fácil y Bloqueo firme, con pruebas automáticas (`comun/pruebas.html`).
 **Buena calidad queda completa** salvo los anillos (para el final). Falta rehacer el equipo de los creeps con las piezas nuevas
 (`herramientas/generar_equipo_creeps.py`) y medir la acumulación con el equipo completo.
+
+## Res. crítico Tipo 8 en Buena calidad — propuesta (2026-10-07, ⬜ a revisar por el dueño)
+Dueño: «sumemos piezas de Tipo 8 en Buena calidad» (hoy hay 4 entre 923 publicados y casi nunca salen en una tienda; la tienda igual limita cuántas
+juntas). Tipo 8 vale 3 puntos: entra +1 por pieza. Calculadora: todas en su bolsa.
+
+| Pieza · pesa · precio | Qué hace |
+|---|---|
+| Escudo de cuero de búfalo · 2 · 140 | Res. crítico Tipo 8 +1 · Defensa +1 · Bloqueo +1 |
+| Rodela de hierro forjado · 3 · 150 | Res. crítico Tipo 8 +1 · Defensa +2 |
+| Coraza de láminas (rígida) · 3 · 200 | Res. crítico Tipo 8 +1 · Defensa +4 · Res.CC +1 · Vida +5 |
+| Brigantina remachada (rígida) · 2 · 200 | Res. crítico Tipo 8 +1 · Defensa +3 · Tipo 4 +1 · Res. fuego +1 · Vida +5 |
+| Jubón de cuero de búfalo (blanda) · 1 · 200 | Res. crítico Tipo 8 +1 · Defensa +2 · Vida +10 · Res.CC +1 |
+| Capacete de hierro · 2 · 100 | Res. crítico Tipo 8 +1 · Defensa +1 · Res.Mt +1 |
+| Quijotes de hierro · 2 · 85 | Res. crítico Tipo 8 +1 · Defensa +1 |
+| Guanteletes de placas · 2 · 70 | Res. crítico Tipo 8 +1 · Res. ácido +1 |
+| Escarpes de hierro · 2 · 70 | Res. crítico Tipo 8 +1 · Res. fuego +1 |

@@ -154,3 +154,11 @@ antes, no se compra y sale del carrito; si no, la saca y pone otra de **la misma
 (`GeneradorTiendas.otro({reponer})`), mientras quede **reserva** (ambulante 3 · pueblito 6 · aldea 10 · ciudad 16 · capital 28; una personalizada, 10).
 Sin reserva, no vuelve. La Mesa lo cuenta («X compró Y · llegó a la tienda: Z»); la tienda se actualiza sola para todos (`FichaTienda.escucharStock`);
 el cartel del GM muestra vendidas y repuestas. **Reglas nuevas de Firestore** (`tienda/stock`): hasta pegarlas, el GM publica sin piezas únicas (avisa).
+
+## Escasez: respuestas del dueño (2026-10-07)
+- **Piso de resistencia a crítico** (forzar que la tienda traiga una pieza con Tipo 8 o 10/12): «no me cierra, lo voy a pensar». ⬜
+- **Más piezas de Buena calidad con Tipo 8**: sí («aunque haya abundancia y variedad, la tienda va a filtrar que no aparezcan demasiadas»). Hoy hay 4 con
+  Tipo 8 y 3 con Tipo 10/12 entre 923 publicados: por eso una tienda casi nunca los trae (un Herrero de pueblito, 8 % → 20 % según el nivel). Propuesta
+  de 9 piezas en `rework-defensa.md`, ⬜ a revisar.
+- **Crítico propio de las armas**: ✅ hecho — no cuenta para la escasez **solo en las armas de Tipo 4** (28 armas); el de las armas de otros Tipos y el
+  de todo lo que no es arma, sí (21 ítems). La Iniciativa de las armas sigue contando.

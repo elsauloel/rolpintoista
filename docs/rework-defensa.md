@@ -1623,6 +1623,18 @@ levanta a un caído). Peso 1 por cada +1 (como Vida +5).
 | Slot · tier | Defensa / Defensa especial (suma de todas las piezas) | Piezas con Def / con Def. especial / híbridas |
 |---|---|---|
 | Torso Común ✅ (2026-10-07) | 60 / 28 (antes 85 / 0) | 23 / 18 / 6 de 35 |
+| Cabeza Común ✅ (2026-10-07) | 10 / 13 (antes 15 / 0) | 10 / 12 / 2 de 29 |
+
+**Cómo se revisa cada slot y tier (dueño, 2026-10-07):** (1) convertir por material (tabla para el OK del dueño); (2) **la Defensa especial
+puede reemplazar los rellenos** (lo que se puso para completar puntos: durabilidad, resistencias sueltas…), para darles más espacio; (3) el
+**reporte** al final de cada slot y tier: Defensa, Defensa especial y **resistencia elemental** por elemento (`herramientas/reporte_defensas.py`),
+para llevar la cuenta y controlar el diseño — la resistencia elemental va a tener más lugar cuando se rehagan las armas elementales; (4)
+**diseñar un par de piezas nuevas** enfocadas en la Defensa y la Defensa especial, para sumar diversidad.
+
+Cabeza Común: 6 de tela a Defensa especial; Vincha de cuero de mula ánima (ex Vincha de cuero crudo: Res.Mt +2 → Defensa especial +1);
+híbridos parejos: Casco de bombero (cuero y bronce; deja Resistente ×2) y Cofia de anillas sueltas (anillas sobre tela). Nuevas: Capucha
+bordada con hilo de plata (Def. especial +2), Antifaz de plumas de lechuza (Def. especial +1 · Visión +2), Gorro de piel de yeti (Def. especial
++1 · Res. hielo +1 · Res.Mt +1).
 
 Torso Común: 9 de tela a Defensa especial; cuero raro: Peto de escamas de pez gigante, Jubón de piel de lobizón (ex Armadura de cuero blando),
 Chaleco de piel de oso lechuza (ex Chaleco de cazador); híbridos: Armadura de cuero tachonado (ex Armadura con tachas, cargada a la Defensa),

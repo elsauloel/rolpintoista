@@ -1649,6 +1649,14 @@ debilitar (−Defensa, −Res.Esp, −Evasión, maldición, disipar: «como secu
 Ojo con las «firmas» de ahorro (primer uso −1 SP, el No2 que no sube): quedó decidido que el ahorro en varitas es escasez del **Cinturón**
 (desde Buena); por eso no se proponen en las armas.
 
+**Primeras respuestas del dueño (2026-10-07):**
+- **P168 → (c), a probar:** Buena trae lo nuevo y paga con la escala de SP corrida un escalón. Propuesta de Claude para el tope: el mismo de
+  4 SP que en Común, pero en Buena esos 4 SP compran un tiro de hasta 11,5 (en Común, hasta 9,5). Lo que pasa de 11,5 es nivel Raro.
+- **B3 Relámpago:** el rayo salta **tantas veces como le dé el número**, mientras haya objetivos: con 8, 8 → 4 → 2 → 1 (tres saltos). El
+  salto que llega con 1 es el último. Con el ejemplo del dueño, el redondeo va hacia abajo (hoy el rayo redondea hacia arriba, P118: a confirmar).
+- **B6 y B7:** el dueño preguntó qué quería decir «se pasa» (= el tiro pasa el tope de Buena: es nivel Raro). Versiones recortadas, abajo.
+- **B8 Alud → «Lluvia de cascotes»:** le gusta el concepto; faltan los números.
+
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 
 Ruta del dueño (2026-10-05): **slot por slot**, empezando por **Cabeza**: primero lo Común pensado para casters, después el tier **Buena calidad de

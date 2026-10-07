@@ -2288,6 +2288,23 @@ prueba('♻ convertir en despojos (dueño, 2026-10-05): un cuarto del precio, pa
   const a = Intercambio._aDespojos(S, 'b'), b = Intercambio._aDespojos(S, 'p', 2), c = Intercambio._aDespojos(S, 'e'), d = Intercambio._aDespojos(S, 'r');
   igual([a.n, b.n, S.loot.normal, S.inventario.map(i => i.id + ':' + (i.unidades || 1)), !!c.error, !!d.error], [9, 13, 22, ['p:2', 'e:1', 'r:1'], true, true]);
 });
+prueba('↻ actualizar desde el catálogo (2026-10-07): una copia vieja se reconoce por catId o por el nombre y toma lo del catálogo, pero conserva lo suyo', () => {
+  const cat = structuredClone(CATALOGO_BASE.find(i => i.id === 'esp-varita-arcana'));
+  const vieja = {...structuredClone(cat), id: 'v1', equipado: true, aMano: true, especial: {...cat.especial, dano: '1d4', sp: 1, duelo: {...cat.especial.duelo, danoDirecto: undefined}}, detalle: 'vieja'};
+  delete vieja.especial.duelo.danoDirecto;
+  const S = {inventario: [vieja, {...structuredClone(cat), id: 'v2'}], catalogo: [cat]};
+  const ed = FichaEditor.crear(document.createElement('div'), {S: () => S, confirmar: () => true, alCambiar: () => {}, toast: () => {}});
+  const antes = [!!ed.difiereDelCatalogo(S.inventario[0]), !!ed.difiereDelCatalogo(S.inventario[1])];
+  const ok = ed.actualizarDesdeCatalogo('inventario', 'v1'), n = S.inventario[0];
+  igual([antes, ok, n.id, n.equipado, n.aMano, n.especial.dano, n.especial.duelo.danoDirecto, n.catId, !!ed.difiereDelCatalogo(n)], [[true, false], true, 'v1', true, true, '1d6', true, 'esp-varita-arcana', false]);
+});
+prueba('cura con dados (2026-10-07): «1d10» se tira al armar la Ejecución y queda un número; un número queda igual; la Varita de cura cura 1d10', () => {
+  const h = c => Combatiente.habEjecucion({nombre: 'Cura'}, {objetivo: 'aliado', efectos: [c]}, {});
+  const vs = Array.from({length: 40}, () => h({cura: '1d10'}).efectos[0].cura), fijo = h({cura: 5}).efectos[0];
+  const cat = CATALOGO_BASE.find(i => i.id === 'esp-varita-de-cura').especial.duelo.efectos[0].cura;
+  igual([vs.every(v => Number.isInteger(v) && v >= 1 && v <= 10), new Set(vs).size > 3, fijo.cura, /Cura 1d10: /.test(h({cura: '1d10'}).efectos[0].detalle), cat, !!Combatiente.ES_FORMULA_CURA.test('2d8+1')],
+    [true, true, 5, true, '1d10', true]);
+});
 prueba('Defensa especial (dueño, 2026-10-07, P169): frena todo el daño especial, también el tóxico; el directo y el True Damage viajan en el duelo', () => {
   const frena = ['toxico', 'fuego', 'hielo', 'rayo', 'acido', ''].map(Combatiente.frenaArmaduraMagica);
   const h = (c) => Combatiente.habEjecucion({nombre: 'X', tiradaExtra: '1d4'}, {objetivo: 'enemigo', dano: true, tipoDano: 'arcano', ...c}, {});

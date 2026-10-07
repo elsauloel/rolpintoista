@@ -68,6 +68,8 @@
    vacío = no aplica). Solo guarda el dato — quien ejecuta la habilidad (`ficha-personaje/ficha.html`,
    `comun/confirmar-turno.js`) es quien pregunta «¿es tu turno?» y cobra el SP que corresponda, antes de nada más. */
 const AsistenteDueloHab = (() => {
+  // La cura: un número (5) o dados (1d10, 2d8+1), que se tiran al usarla (2026-10-07, Combatiente.curaTirada).
+  const curaValida = v => typeof v === 'string' ? /^\s*\d*d\d+(\s*[+-]\s*\d+)?\s*$/i.test(v) || Number(v) > 0 : Number(v) > 0;
   const TIRA = [['pdgmg', 'PdG.Esp (magia u otros efectos del Especial)'], ['dmgesp', 'Ef.Esp (efecto especial: la potencia de un efecto del Especial, no si pega)'],['pdg', 'PdG (probabilidad de golpe)'], ['fue', 'Fuerza'], ['con', 'Constitución'], ['agl', 'Agilidad'], ['des', 'Destreza'], ['esp', 'Especial']];
   const CONTRA = [['eva', 'Evasión (esquivar un proyectil)'], ['parry', 'Parry (bloquear con un arma o escudo — solo si el objetivo tiene uno equipado)'], ['resmg', 'Res.Esp (resistir magia u otros efectos del Especial)'], ['resm', 'Res.Mt (resistir la mente)'], ['con', 'Constitución'], ['fue', 'Fuerza'], ['esp', 'Especial'], ['des', 'Destreza'], ['agl', 'Agilidad']];
   const ALCANCES = [['auto', 'Automático (los hechizos usan su Rango de casteo)'], ['casteo', 'Rango de casteo'], ['rango', 'Rango (el de las armas a distancia)'], ['adyacente', 'Cuerpo a cuerpo (casilleros de al lado)'], ['fijo', 'Un número de casilleros'], ['ilimitado', 'Sin límite (no resalta nada)']];
@@ -440,7 +442,7 @@ const AsistenteDueloHab = (() => {
             <label class="op" style="padding:0"><input type="checkbox" data-ef-no2sent="${clave(i)}" ${e.no2Sentado ? 'checked' : ''}> si llega a 0, queda Sentado</label>
             <button type="button" class="rojo" data-ef-x="${clave(i)}">Quitar</button></div>`
         : e.cura !== undefined
-        ? `<div class="fila"><span>💚 Cura</span><input type="number" min="1" style="width:80px" data-ef-cura="${clave(i)}" value="${esc(e.cura)}"><span>HP</span><button type="button" class="rojo" data-ef-x="${clave(i)}">Quitar</button></div>`
+        ? `<div class="fila"><span>💚 Cura</span><input type="text" style="width:80px" placeholder="5 o 1d10" title="Un número o dados (1d10, 2d8+1): los dados se tiran al usarla" data-ef-cura="${clave(i)}" value="${esc(e.cura)}"><span>HP</span><button type="button" class="rojo" data-ef-x="${clave(i)}">Quitar</button></div>`
         : e.origen === 'preset' ? filaEstadoPresetHtml(e, clave(i)) : filaEstadoManualHtml(e, clave(i))).join('');
     }
     function cuerpoEfectos(){
@@ -526,7 +528,7 @@ const AsistenteDueloHab = (() => {
         if(st.efectoLibreOn && st.efectoLibre.trim()){ const t = st.efectoLibre.trim(); filas.push(`<b>Efecto a mano</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
       }
       if(st.modo !== 'flash' && st.objetivo !== 'zona'){
-        const efTxtDe = lista => lista.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(e => e.no2 !== undefined ? `⚡ pierde ${e.no2}${e.no2Dif ? ' + la diferencia' : ''} No2${e.no2Sentado ? ' (en 0, Sentado)' : ''}` : e.cura !== undefined ? `💚 ${e.cura} HP` : `◎ ${e.nombre} (${e.permanente ? 'no vence' : (e.turnos ?? 2) + 't'})${e.escudo ? ` · 🛡${e.escudo}` : ''}`).join(', ');
+        const efTxtDe = lista => lista.filter(e => e.cura !== undefined ? curaValida(e.cura) : e.nombre).map(e => e.no2 !== undefined ? `⚡ pierde ${e.no2}${e.no2Dif ? ' + la diferencia' : ''} No2${e.no2Sentado ? ' (en 0, Sentado)' : ''}` : e.cura !== undefined ? `💚 ${e.cura} HP` : `◎ ${e.nombre} (${e.permanente ? 'no vence' : (e.turnos ?? 2) + 't'})${e.escudo ? ` · 🛡${e.escudo}` : ''}`).join(', ');
         filas.push(`<b>Efectos</b>: ${efTxtDe(st.efectos) || 'ninguno'}`);
         if(st.efectosNotaOn && st.efectosNota.trim()){ const t = st.efectosNota.trim(); filas.push(`<b>Efecto personalizado</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
         if(st.modo === 'arma' && st.critMatters){
@@ -630,7 +632,7 @@ const AsistenteDueloHab = (() => {
       f.querySelectorAll('[data-ef-turnos]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efTurnos); if(String(i.value).trim() === '') delete arr[idx].turnos; else arr[idx].turnos = Math.max(0, Math.round(Number(i.value) || 0)); });
       f.querySelectorAll('[data-ef-prob]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efProb); const [c, x] = i.value.split('/').map(Number); if(c > 1){ arr[idx].caras = c; arr[idx].exitos = x; } else { delete arr[idx].caras; delete arr[idx].exitos; } });
       f.querySelectorAll('[data-ef-escudo]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efEscudo); arr[idx].escudo = Math.max(0, Math.round(Number(i.value) || 0)); });
-      f.querySelectorAll('[data-ef-cura]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efCura); arr[idx].cura = Math.max(1, Math.round(Number(i.value) || 1)); });
+      f.querySelectorAll('[data-ef-cura]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efCura); const v = String(i.value || '').trim().toLowerCase(); arr[idx].cura = /d/.test(v) && curaValida(v) ? v.replace(/\s+/g, '') : Math.max(1, Math.round(Number(v) || 1)); });
       f.querySelectorAll('[data-ef-no2]').forEach(i => i.onchange = () => { const {arr, i: idx} = efRef(i.dataset.efNo2); arr[idx].no2 = Math.max(0, Math.round(Number(i.value) || 0)); });
       f.querySelectorAll('[data-ef-no2dif]').forEach(c => c.onchange = () => { const {arr, i: idx} = efRef(c.dataset.efNo2dif); arr[idx].no2Dif = c.checked; });
       f.querySelectorAll('[data-ef-no2sent]').forEach(c => c.onchange = () => { const {arr, i: idx} = efRef(c.dataset.efNo2sent); arr[idx].no2Sentado = c.checked; });
@@ -674,7 +676,7 @@ const AsistenteDueloHab = (() => {
           if(!st.flashEn.size){ alert('Marcá al menos una tirada donde vale el Flash.'); return false; }
           cerrar(); cfg.alGuardar({duelo: {modo: 'flash', flash: {en: [...st.flashEn], bono: st.flashBono}}, costo: costoResultado()}); return;
         }
-        const efs = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(mapEfectoOut);
+        const efs = st.efectos.filter(e => e.cura !== undefined ? curaValida(e.cura) : e.nombre).map(mapEfectoOut);
         if(st.modo === 'arma'){
           const o2 = {modo: 'arma', objetivo: 'enemigo', x: st.x, arma: {...st.arma}, efectos: efs};
           if(st.efectosNotaOn && st.efectosNota.trim()) o2.efectosNota = st.efectosNota.trim();
@@ -682,7 +684,7 @@ const AsistenteDueloHab = (() => {
           // ⚡ Critical Matters: solo se manda si está tildado Y tiene algo cargado (si se destilda, o se deja
           // vacío, `critico` no viaja — mismo criterio que efectosNota).
           if(st.critMatters){
-            const efsCrit = st.efectosCritico.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(mapEfectoOut);
+            const efsCrit = st.efectosCritico.filter(e => e.cura !== undefined ? curaValida(e.cura) : e.nombre).map(mapEfectoOut);
             const critico = {};
             if(efsCrit.length) critico.efectos = efsCrit;
             if(st.efectosNotaCriticoOn && st.efectosNotaCritico.trim()) critico.efectosNota = st.efectosNotaCritico.trim();
@@ -739,7 +741,7 @@ const AsistenteDueloHab = (() => {
           }
         }
         if(st.alcance !== 'auto'){ out.alcance = st.alcance; if(st.alcance === 'fijo') out.alcanceN = st.alcanceN; }
-        out.efectos = st.efectos.filter(e => e.cura !== undefined ? e.cura > 0 : e.nombre).map(mapEfectoOut);
+        out.efectos = st.efectos.filter(e => e.cura !== undefined ? curaValida(e.cura) : e.nombre).map(mapEfectoOut);
         // Lo que este asistente todavía no edita (2026-10-05, armas especiales: salta en cadena, misiles, deja una zona, atrae, niebla, luz…)
         // se conserva tal cual: ajustar otra cosa no lo borra.
         if(ini) CONSERVA.forEach(k => { if(ini[k] !== undefined && out[k] === undefined) out[k] = structuredClone(ini[k]); });

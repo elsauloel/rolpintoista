@@ -1039,6 +1039,34 @@ const FichaEditor = (() => {
       ctx.alCambiar([key]);
     }
 
+    /* ---------- ↻ Actualizar desde el catálogo (2026-10-07, pedido del dueño) ----------
+       Lo que un personaje compró es una copia: si después cambia el ítem del catálogo (las armas especiales rehechas), la copia sigue vieja.
+       Se reconoce por `catId` (lo deja la tienda desde hoy) o, si no, por el nombre (y la calidad, si hay más de uno). Se pisa todo menos lo
+       propio de esa copia: su id, si está equipado, las unidades, la carga, la mano y si está a mano. → el ítem del catálogo o null. */
+    const PROPIO_DE_LA_COPIA = ['id', 'equipado', 'unidades', 'cargaActual', 'activo', 'manoPreferida', 'aMano', 'dur', 'reservado', 'reservadoPara'];
+    function delCatalogo(it){
+      const cat = (S().catalogo || []).filter(c => c && !c.archivo);
+      if(it.catId){ const x = cat.find(c => c.id === it.catId); if(x) return x; }
+      const mismos = cat.filter(c => c.nombre === it.nombre);
+      return mismos.find(c => c.tier === it.tier) || mismos[0] || null;
+    }
+    const sinLoPropio = o => { const c = structuredClone(o || {}); PROPIO_DE_LA_COPIA.concat(['catId', 'precioCompra']).forEach(k => delete c[k]); return JSON.stringify(c, Object.keys(c).sort()); };
+    function difiereDelCatalogo(it){ const c = it && !it.consumible ? delCatalogo(it) : null; return c && sinLoPropio(c) !== sinLoPropio(it) ? c : null; }
+    function actualizarDesdeCatalogo(key, id){
+      const Q = S(), i = Q[key].findIndex(x => x.id === id), it = Q[key][i], c = it ? difiereDelCatalogo(it) : null;
+      if(!c) return false;
+      if(!confirmar(`¿Actualizar «${it.nombre}» con la versión del catálogo?
+
+Ahora: ${it.detalle || '—'}
+
+Catálogo: ${c.detalle || '—'}`)) return false;
+      const nuevo = structuredClone(c);
+      PROPIO_DE_LA_COPIA.forEach(k => { if(it[k] !== undefined) nuevo[k] = it[k]; else delete nuevo[k]; });
+      nuevo.catId = c.id;
+      Q[key][i] = nuevo;
+      return true;
+    }
+
     /* ---------- Ítems: asistente paso a paso (comun/asistente-item.js) ----------
        Crear o editar cualquier ítem de inventario o del catálogo (menos consumibles) va por el asistente compartido, con los
        números de este personaje. El resumen deja volver al formulario común. */
@@ -1074,6 +1102,10 @@ const FichaEditor = (() => {
         textoGuardar: original ? 'Guardar' : 'Crear',
         botones: [
           ...(enInventario ? [{texto: '⬆ Subir al catálogo', accion: d => subirAlCatalogo(S(), AsistenteItem.fusionar(base, d), 'inventario', {toast, alSubir: ctx.alSubirCatalogo})}] : []),
+          ...(enInventario && original && difiereDelCatalogo(original) ? [{texto: '↻ Actualizar desde el catálogo', accion: () => {
+            if(!actualizarDesdeCatalogo(key, id)) return;
+            AsistenteItem.cerrar(); ctx.alCambiar([key]); toast(`↻ ${original.nombre}: actualizado con la versión del catálogo`);
+          }}] : []),
           ...(original ? [{texto: 'Eliminar', accion: () => {
             if(!confirmar(`¿Eliminar "${original.nombre}"? No se puede deshacer.`)) return;
             const Q = S();
@@ -1097,7 +1129,7 @@ const FichaEditor = (() => {
       });
     }
 
-    return {abrir, cerrar, dibujar, irAPaso, abrirAsistenteItem, aplicarTipoItem,
+    return {abrir, cerrar, dibujar, irAPaso, abrirAsistenteItem, aplicarTipoItem, difiereDelCatalogo, actualizarDesdeCatalogo,
       get estado(){ return editing; }, set estado(v){ editing = v; }};
   }
 

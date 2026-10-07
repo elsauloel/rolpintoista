@@ -263,6 +263,7 @@ const FichaTienda = (() => {
     if(item.consumible){ agregarConsumible(S, item, cantidad); return; }
     for(let i=0; i<cantidad; i++){
       const nuevo = structuredClone(item);
+      nuevo.catId = item.id;   // de qué ítem del catálogo salió (↻ Actualizar desde el catálogo, 2026-10-07)
       nuevo.id = uid();
       nuevo.equipado = false;
       nuevo.unidades = 1;

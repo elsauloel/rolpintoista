@@ -1629,9 +1629,15 @@ levanta a un caído). Peso 1 por cada +1 (como Vida +5).
 | Pies Común ✅ (2026-10-07) | 13 / 10 (antes 18 / 0) | 13 / 10 / 1 de 32 |
 | Escudos Común ✅ (2026-10-07) | 30 / 9 (antes 34 / 0) | 21 / 8 / 4 de 29 (sin orbes) |
 | Orbes Común y Buena ✅ (2026-10-07) | Común 0 / 4 · Buena 0 / 8 | todos con Def. especial; resistencias: Común ⚡1 ☠1 · Buena 🔥3 ☠2 |
+| **Total Común ✅** | **136 / 81** (antes 185 / 0) | 90 / 68 / 16 de 243 · res. 🔥14 ❄8 ⚡6 ☠6 🧪8 (antes 🔥12 ❄6 ⚡5 ☠4 🧪8) |
 | Torso Buena ✅ (2026-10-07) | 95 / 47 (antes 131 / 0) | 26 / 22 / 7 de 41 · res. ❄2 🧪3 |
 | Cabeza Buena ✅ (2026-10-07) | 21 / 11 (antes 25 / 0) | 13 / 8 / 2 de 25 · res. 🔥2 ☠3 |
-| **Total Común ✅** | **136 / 81** (antes 185 / 0) | 90 / 68 / 16 de 243 · res. 🔥14 ❄8 ⚡6 ☠6 🧪8 (antes 🔥12 ❄6 ⚡5 ☠4 🧪8) |
+| Manos Buena ✅ (2026-10-07) | 15 / 6 (antes 17 / 0) | 13 / 5 / 2 de 32 · res. 🔥2 ⚡3 |
+
+**Fuego de más (dueño, 2026-10-07, «lo vemos al final»):** el fuego entra en tres slots (cabeza, manos, piernas), como el hielo (torso,
+piernas, escudo); los demás, en dos. En Común quedó 🔥14 contra ❄8 ⚡6 ☠6 🧪8 (la cabeza sola, 🔥6). Propuesta para el final de la revisión:
+dejar el mapa de slots y bajar la cantidad (en la cabeza Común, 3 de las 6 a tóxico; tope orientativo: el fuego, a lo sumo un 50 % arriba de los
+demás), o sacar el fuego de las piernas y poner eléctrica. Se decide con el reporte completo de todos los tiers.
 
 **Cómo se revisa cada slot y tier (dueño, 2026-10-07):** (1) convertir por material (tabla para el OK del dueño); (2) **la Defensa especial
 puede reemplazar los rellenos** (lo que se puso para completar puntos: durabilidad, resistencias sueltas…), para darles más espacio; (3) el
@@ -1708,3 +1714,7 @@ Cabeza Buena: tela y lana a Defensa especial (Capucha acolchada de sastre 2, Cof
 tela reforzada híbrido 1/1 con Res. fuego +1 (por Campo de visión +3 → +2); relleno a Defensa especial: Corona de laureles dorada (Res.Mt +4 → +2) y
 Sombrero humectante bordado (Res.Mt +2 → Def. especial +1); Casco de minero reforzado Res. tóxico +1 (por Percepción +1). Nuevas: Yelmo de bronce
 con runas (Defensa +1 · Def. especial +2 · Res. fuego +1 · Res.Esp +1) y Sombrero de la curandera (Def. especial +2 · Res. tóxico +2 · Res.Mt +1).
+
+Manos Buena: cuero a Defensa especial: Guantes de boticario de oficio y Guantes de escapista (1); Guantes de cuero reforzado híbrido 1/1 (vaca
+afuera, lampalagua adentro). Nuevas: Guanteletes del herrero rúnico (Defensa +1 · Def. especial +1 · Res. fuego +2) y Guantes del pararrayos
+(Def. especial +2 · Res. eléctrica +1).

@@ -1701,6 +1701,12 @@ Ojo con las «firmas» de ahorro (primer uso −1 SP, el No2 que no sube): qued�
     - **F. Escudos y orbes paran proyectiles mágicos:** el Bloqueo también contra lo mágico que se esquiva (no contra áreas ni contra lo que no
       se esquiva).
     Lo físico invocado (púa, canto rodado, granizo, cascotes) queda como un arma: suma el Ef.Esp y lo frena la Defensa (simétrico con la Fuerza).
+  - **Decisión provisoria del dueño (2026-10-07), hasta resolver P169 con el grupo: ninguna arma especial suma el Ef.Esp.** Todas tienen un daño
+    fijo, en dados o en valores netos, para controlar exacto el costo y el daño y avanzar con el catálogo; cuando se destrabe, se suman ítems.
+    Aplicado a la calculadora (`fijo`; en lo físico invocado, `fuerza`: hace de la Fuerza del arma física y no se cobra, porque la frena la
+    Defensa). Cambios en las Comunes (propuesta): Báculo de aprendiz 1d4 + ½ Ef.Esp → **1d4 + 2** (mismo valor) · Púa de hielo, Canto rodado y
+    Granizo: + Ef.Esp → **+ 3** · Miasma: la diferencia + 1d4 → **1d4 + 1** (sigue la tirada Ef.Esp contra Res.Esp para resistirla: eso es una
+    salvación, no un bono de daño; igual que el Aceite, el Gancho y la Runa) · Cura **1d10**. Tabla de Buena: `BUENA` en la calculadora.
 
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 

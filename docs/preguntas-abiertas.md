@@ -801,3 +801,4 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   esquivan; dodge roll en las áreas) y casi nada para bajarlo (Armadura mágica solo desde Raro; Res. elemental chica y de tema). Propuesta de
   Claude: el daño lo marca el arma (fijo por calidad, con tope en tu Ef.Esp) y la defensa la marca el equipo (Armadura mágica escasa desde
   Buena); opciones en `docs/rework-armas.md`.
+  **Provisorio (dueño, 2026-10-07):** hasta resolverlo con el grupo, ninguna arma especial suma el Ef.Esp: daño fijo (dados o neto).

@@ -1672,6 +1672,13 @@ Ojo con las «firmas» de ahorro (primer uso −1 SP, el No2 que no sube): qued�
 - **B34 De cargas:** «podría ser, habría que verlo en práctica».
 - **B35 Gemela:** le gusta.
 - **El resto de la lluvia (B1–B35 sin comentario): ✅ en principio** (dueño, 2026-10-07).
+- **Decisiones (dueño, 2026-10-07):**
+  - **Chorro de lava ✅** como el borrador (camino de 4, 1d4 de fuego, arde 2 turnos en el piso; 3 SP, 110 DDE). **La primera casilla, dentro de
+    1/3 de tu Rango de casteo** (propuesta de Claude: redondeado hacia arriba —es un buff—, mínimo 1 = pegada a vos).
+  - **Varita de cura Común: 1d10** (en vez de 5 fija; mismo SP). Junto con la Cura mayor 2d8, hace falta la **cura con dados** en el motor.
+  - **Báculo de sangre ✅: cada uso cuesta el 10 % de tu vida máxima** (propuesta de Claude: redondeado hacia abajo, como los debuffs; mínimo 1).
+  - **Báculo guardián:** el Parry gratis no cierra (los magos van a tener Destreza y Fuerza bajas para parriar) → **+1 Parry y +1 Bloqueo**
+    mientras lo tenés en las manos.
 
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 

@@ -1760,6 +1760,8 @@ Ojo con las «firmas» de ahorro (primer uso −1 SP, el No2 que no sube): qued�
     proyectil).** → La Varita del relámpago (Buena) y la Chispa eléctrica (Común) van por Evasión: el Relámpago queda en 4 SP y 120 DDE. El Láser
     y el Láser largo son rayos (dodge). Choca con el nombre del elemento: hoy el daño eléctrico se llama «rayo» en todo el sistema (Res. rayo,
     «1d6 de rayo», ⚡ Rayo en cadena) — a decidir cómo se renombra.
+    **Dueño (2026-10-07): «relámpago va a ser igual que un proyectil»** (Evasión, sin dodge). El nombre del elemento queda pendiente (propuesta:
+    «eléctrico» en lo que se ve; los ids internos no cambian).
 
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 

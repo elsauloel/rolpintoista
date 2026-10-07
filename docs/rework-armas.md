@@ -1870,6 +1870,25 @@ invocado suman Ef.Esp (½ o entero) y los frena la Defensa especial. **Respuesta
   Ef.Esp · c) solo los báculos suman · **d) daño directo (lo sumó el dueño): saltea la Defensa especial pero es fácilmente mesurable**. Antes
   de decidir: **una simulación en el mapa, mago contra guerrero, cada uno con un equipo Común balanceado, no maxeado**.
 
+### Simulación mago contra guerrero (2026-10-07, 1000 peleas por opción, en el mapa de «Claude · pruebas» con el código del juego)
+Mago nivel 1 (Esp 14: 30 de vida, 42 SP, 5 No2, PdG.Esp 14; Pechera pintada del clan, Capucha de lana del culto, Guantes de seda del copista,
+Calzas de lana de vicuña, Babuchas del adivino, Orbe salvaje → Defensa 1 · Def. especial 7). Guerrero nivel 1 (Fue 10: 45 de vida, 4 No2,
+PdG 6, Eva 4; Hacha; Peto de hierro, Bacinete, Guantes de cuero grueso, Grebas de cuero, Botas de estanciero → Defensa 7 · Def. especial 1).
+El mago tira 2 veces por turno (No2 1 + 2); el guerrero, un hachazo por turno (4 No2), con crítico a 20 y Armadura rota 50 %. Sin moverse
+después del primer turno, sin Parry ni habilidades. «Pegados» = el guerrero arranca al lado.
+
+| Arma del mago | Gana el mago: a 4 casillas · pegados — daño del mago por turno |
+|---|---|
+| Báculo 1d6 + ½ Ef.Esp (1 o 3 SP) | 98 % · 92 % — 16 |
+| Báculo 1d6 + ¼ Ef.Esp (1 o 2 SP) | 84 % · 71 % — 10 |
+| Báculo 1d4 + ¼ Ef.Esp (1 SP) | 66 % · 58 % — 8 |
+| Varita 1d8 + 2 fijo, frenada (3 SP) | 85 % · 75 % — 12 |
+| Varita 1d8 directo (3 SP) | 75 % · 60 % — 10 |
+| Varita arcana 1d4 directo (1 SP) | 27 % · 22 % — 5,5 |
+
+Hallazgos: el ½ Ef.Esp es demasiado (aunque cueste 3 SP); **el SP casi no frena en una pelea** (dura 3 a 5 turnos y al mago le sobran 15
+a 36 de 42): el freno real es el No2 (2 usos por turno contra 1 hachazo); el guerrero con Agilidad 4 solo pega una vez por turno.
+
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 
 Ruta del dueño (2026-10-05): **slot por slot**, empezando por **Cabeza**: primero lo Común pensado para casters, después el tier **Buena calidad de

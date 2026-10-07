@@ -871,21 +871,23 @@ function actualizarMuerteMapa(){
 // Crítico: todo el daño × el multiplicador, derecho a la vida. Sin crítico: daño − Defensa. «Pasa la mitad»: (daño − Defensa) ÷ 2, redondeado para arriba.
 /* Espinas (2026-09-27, regla del dueño): si el defensor tiene el estado Espinas y lo golpean cuerpo a cuerpo, el atacante recibe 1/4 (para arriba) del daño INFLIGIDO
    (el daño del golpe con el multiplicador del crítico, ANTES de restar la Defensa: lo resista o no la armadura), directo a la vida. Solo si el golpe hizo daño (no si el defensor era
-   Invulnerable). Lo aplica el mapa del GM, como el resto del daño del duelo. */
-async function dueloEspinas(d, golpe){
+   Invulnerable). Lo aplica el mapa del GM, como el resto del daño del duelo. Desde el 2026-10-07 solo el daño físico: el especial lo devuelve el Espejo.
+   Espejo (dueño, 2026-10-07): el mismo 1/4 del daño ESPECIAL que recibe (el de una habilidad o arma especial que ignora la Defensa, y el daño elemental
+   de un arma), antes de la Defensa especial, a cualquier distancia — también en un área (cada objetivo con Espejo devuelve lo suyo). */
+async function dueloTieneEstado(d, flag, nombre){
+  const td = tokens.get(d.defensor.tokenId);
+  if(!td) return false;
+  const con = l => (l || []).some(e => e && e.activo !== false && (e[flag] || e.nombre === nombre));
+  if(td.tipo === 'creep'){ const sc = creepPrivadoDe(td.fichaId); return !!(sc && con(sc.estados)); }
+  // Una invocación (2026-10-02, paso 4 etapa 4e): sus estados, de la parte `invocaciones` de su dueño.
+  if(String(td.fichaId).includes(SEP_INVOCACION)){ const inv = await invDeToken(td); return !!(inv && con(inv.estados)); }
+  const f = fichasPub.get(td.fichaId);
+  return !!(f && f.resumen && con(f.resumen.estados));
+}
+async function dueloDevolverDano(d, base, flag, nombre){
+  const monto = Math.ceil(num(base) / 4);
   try{
-    if(d.ataque && d.ataque.rango) return null;
-    if(!(d.resultado === 'pego' || d.resultado === 'mitad') || !(num(golpe) > 0)) return null;
-    const td = tokens.get(d.defensor.tokenId);
-    if(!td) return null;
-    let tiene = false;
-    const conEspinas = l => (l || []).some(e => e && e.activo !== false && (e.espinas || e.nombre === 'Espinas'));
-    if(td.tipo === 'creep'){ const sc = creepPrivadoDe(td.fichaId); tiene = !!(sc && conEspinas(sc.estados)); }
-    // Una invocación (2026-10-02, paso 4 etapa 4e): sus estados, de la parte `invocaciones` de su dueño.
-    else if(String(td.fichaId).includes(SEP_INVOCACION)){ const inv = await invDeToken(td); tiene = !!(inv && conEspinas(inv.estados)); }
-    else{ const f = fichasPub.get(td.fichaId); tiene = !!(f && f.resumen && (f.resumen.estados || []).some(e => e && e.nombre === 'Espinas')); }
-    if(!tiene) return null;
-    const monto = Math.ceil(num(golpe) / 4);
+    if(!(await dueloTieneEstado(d, flag, nombre))) return null;
     const ta = tokens.get(d.atacante.tokenId);
     const quien = d.atacante.nombre;
     if(!ta) return {quien, monto, manual: true, motivo: 'el token del atacante ya no está en el mapa'};
@@ -894,9 +896,18 @@ async function dueloEspinas(d, golpe){
       : ta.tipo === 'creep' ? await danioCreep(ta, String(monto), true) : await danioPj(ta, String(monto), true);
     return {quien, monto, recibido: num(res.r.recibido), hpAntes: num(res.previo), hpDespues: num(res.nuevo)};
   }catch(err){
-    console.error('No se pudo aplicar las Espinas:', err);
-    return {quien: d.atacante.nombre, monto: Math.ceil(num(golpe) / 4), manual: true, motivo: 'falló la escritura'};
+    console.error(`No se pudo aplicar ${nombre === 'Espejo' ? 'el Espejo' : 'las Espinas'}:`, err);
+    return {quien: d.atacante.nombre, monto, manual: true, motivo: 'falló la escritura'};
   }
+}
+async function dueloEspinas(d, golpe, especial){
+  if(especial || (d.ataque && d.ataque.rango)) return null;
+  if(!(d.resultado === 'pego' || d.resultado === 'mitad') || !(num(golpe) > 0)) return null;
+  return dueloDevolverDano(d, golpe, 'espinas', 'Espinas');
+}
+async function dueloEspejo(d, especial){
+  if(!(num(especial) > 0)) return null;
+  return dueloDevolverDano(d, especial, 'espejo', 'Espejo');
 }
 
 /* Drena (2026-10-02, Drenar Vida): quien usó la habilidad se cura lo que el objetivo perdió de verdad (`monto`); lo que pasa de su vida
@@ -989,7 +1000,7 @@ async function dueloAplicarDano(d){
     const oD = {distancia: !!(d.ataque && d.ataque.rango), magico: !!(habMagica || elDano)};   // magico: el Orbe de absorción (js/26)   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
     const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD)
       : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD);
-    const espinas = res.r.invulnerable ? null : await dueloEspinas(d, golpe);   // el daño inflictido (con el multiplicador del crítico), antes de la Defensa
+    const espinas = res.r.invulnerable ? null : await dueloEspinas(d, golpe, habMagica);   // el daño inflictido (con el multiplicador del crítico), antes de la Defensa; solo el físico
     // Daño mágico del arma (rayo / hielo): aparte, después del golpe — ignora la Defensa (resta la Defensa especial) y no se multiplica.
     let magico = null;
     if(dn.magico && num(dn.magico.total) > 0 && !res.r.invulnerable){
@@ -997,6 +1008,8 @@ async function dueloAplicarDano(d){
         : t.tipo === 'creep' ? await danioCreep(t, String(num(dn.magico.total)), true, armadmg, 0, {magico: true}) : await danioPj(t, String(num(dn.magico.total)), true, armadmg, 0, {magico: true});
       magico = {...dn.magico, recibido: num(rm.r.recibido), hpAntes: num(rm.previo), hpDespues: num(rm.nuevo)};
     }
+    // El Espejo: 1/4 de todo el daño especial que le tiraron (el de la habilidad y el elemental del arma), antes de la Defensa especial.
+    const espejo = res.r.invulnerable ? null : await dueloEspejo(d, (habMagica ? golpe : 0) + (magico ? num(dn.magico.total) : 0));
     const perdio = Math.max(0, num(res.previo) - num(res.nuevo));
     // Habilidad que drena: todo lo que perdió. Arma que drena (2026-10-03): su % de lo que perdió de verdad (curar redondea para arriba).
     const drena = d.hab && d.hab.dano && d.hab.dano.drena ? await dueloDrenar(d, perdio)
@@ -1004,7 +1017,7 @@ async function dueloAplicarDano(d){
     // Rayo en cadena (2026-10-05): el golpe de una habilidad o arma especial de rayo salta (la misma regla de ⚡ Rayo en cadena del token).
     if(d.hab && d.hab.cadena && golpe > 0 && !res.r.invulnerable) await dueloCadena(d, golpe).catch(err => console.error('No se pudo hacer saltar el rayo:', err));
     if(d.hab && d.hab.atrae && !res.r.invulnerable) await dueloAtraer(d).catch(err => console.error('No se pudo atraer al objetivo:', err));   // el gancho
-    return {...base, desgaste, defensa: crit ? restaIgnorando : def, ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {})};
+    return {...base, desgaste, defensa: crit ? restaIgnorando : def, ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);
     return {...base, defensa: def, manual: true, golpe: base.mitad ? aplicar : golpe, motivoManual: err && err.message === 'SIN_DEF' ? 'la ficha todavía no publicó su Defensa' : 'falló la escritura'};

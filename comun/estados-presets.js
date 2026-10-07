@@ -84,6 +84,9 @@ const ESTADOS_PRESET = [
     detalle:'Inmune a los controles: Stun, Exhausto, Inmovilizado, Rengo, Lisiado y Pajaritos (no se le pueden aplicar mientras dure). Veneno y Sangrado no cuentan como control.'},
   {nombre:'Espinas', polaridad:'buff', turnos:3, espinas:true,
     detalle:'Mientras dure, cada ataque cuerpo a cuerpo que recibe le devuelve al atacante 1/4 (25 %) del daño del golpe (con el crítico, antes de la Defensa), redondeado hacia arriba, directo a la vida. ⚙ Automatizado en el duelo; ✋ a mano fuera de él.'},
+  // Espejo (dueño, 2026-10-07): el espejo de las Espinas para el daño especial — a cualquier distancia (la magia se tira de lejos).
+  {nombre:'Espejo', polaridad:'buff', turnos:3, espejo:true,
+    detalle:'Mientras dure, cada ataque de daño especial que recibe (varita, báculo, habilidad, o el daño elemental de un arma; a cualquier distancia, también en un área) le devuelve al que lo tiró 1/4 (25 %) de ese daño (antes de la Defensa especial), redondeado hacia arriba, directo a la vida. Las zonas que quedan en el piso y los saltos del rayo no cuentan. ⚙ Automatizado en el duelo; ✋ a mano fuera de él.'},
   // Vida extra (dueño, 2026-10-07): el ex Escudo especial y el ex Excedente de vida son lo mismo — vida de más, NETA (lo que se gasta no
   // vuelve), salvo que el efecto diga que se renueva (`recarga: true`). Absorbe el daño de cualquier fuente, también el True Damage. Sin turnos,
   // dura hasta gastarse; con turnos, vence. Si llega otra, se suma: cada una aparte, con su duración (dueño, 2026-10-07; antes reemplazaba, P137).

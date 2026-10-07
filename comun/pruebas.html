@@ -1742,6 +1742,20 @@ prueba('pies de Buena calidad: levantarse gratis (Botas de jinete) y Meditar (+1
   igual([lev.error, sc.estados.length, sc.nitros, sp1 - sp2 >= 1, S.spGastado === sp2 - (sp2 - S.spGastado), Combatiente.costoLevantarse(st => st === 'levantarse' ? 1 : 0), Combatiente.costoLevantarse(null)],
     [undefined, 0, 0, true, true, 0, 1]);
 });
+prueba('Espejo (2026-10-07): la pareja de las Espinas — preset, consumible con su marca, el resumen la publica, un creep la lleva y cada pieza con Espinas tiene su espejo', () => {
+  const poc = CATALOGO_BASE.find(i => i.nombre === 'Poción de Espejo'), pocE = CATALOGO_BASE.find(i => i.nombre === 'Poción de Espinas');
+  const S = {catalogo: [], efectos: []};
+  const r = FichaHabilidades.aplicarEfectoDeConsumo(S, poc, presetsDePrueba);
+  const r2 = FichaHabilidades.aplicarEfectoDeConsumo(S, pocE, presetsDePrueba);
+  const e = FichaResumen.resumen(fichaBotonera({efectos: [r.estado, r2.estado]})).estados;
+  const sc = creepPrueba({habilidades: [{id: 'a', nombre: 'Piel de espejo', efectoNombre: 'Espejo', efectoTurnos: 2}]});
+  const rc = CreepAcciones.efectoDeHab(sc, sc.habilidades[0], estadosPresetCreep());
+  const con = n => CATALOGO_BASE.filter(i => !i.archivo && i.equipoEstadoPreset === n);
+  const precios = l => l.map(i => i.precioCompra).sort((a, b) => a - b).join(',');
+  igual([r.estado.nombre, r.estado.turnos, !!r.estado.espejo, !!r2.estado.espinas, e.map(x => [x.nombre, !!x.espejo, !!x.espinas]), !!rc.estado.espejo,
+    con('Espejo').length, precios(con('Espejo')) === precios(con('Espinas'))],
+    ['Espejo (poción)', 3, true, true, [['Espejo (poción)', true, false], ['Espinas (poción)', false, true]], true, 4, true]);
+});
 prueba('torso rígido: el estado Inamovible (100 %), el guardián en el resumen y una resistencia elemental negativa (vulnerable)', () => {
   const S = {catalogo: [], efectos: []};
   const r = FichaHabilidades.aplicarEfectoDeConsumo(S, {nombre: 'Prueba', efectoNombre: 'Inamovible'}, estadosPresetFicha());

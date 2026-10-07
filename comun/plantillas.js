@@ -122,7 +122,7 @@ const Plantillas = (() => {
   /* ---- Estado alterado propio ("Mis presets") ---- en la forma de comun/estados-presets.js (hpTurno/stacksTurno). */
   const MARCAS_ESTADO = ['esCC', 'esVeneno', 'esSangrado', 'esQuemadura', 'mitadPdgEva', 'lisiado', 'paralisis', 'silencio', 'confusion', 'esEscarcha', 'inmovilizado',
     'rengo', 'lento', 'cansado', 'exhausto', 'hypeado', 'sentado', 'invulnerable', 'inmunidadCC', 'sangrePura', 'coagulacionExtrema',
-    'afortunado', 'blindado', 'espinas', 'armaduraRota', 'excedenteVida', 'marcado'];
+    'afortunado', 'blindado', 'espinas', 'espejo', 'armaduraRota', 'excedenteVida', 'marcado'];
   function estado(e){
     const out = {nombre: String(e.nombre || 'Estado'), polaridad: e.polaridad || 'otro', detalle: String(e.detalle || '')};
     const n = v => Number(v) || 0;

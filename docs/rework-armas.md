@@ -1814,6 +1814,15 @@ igual), neto; solo se renueva el que el efecto marca con `recarga`. **Si llega o
 calculadora aprobados** (dueño, 2026-10-07): físico invocado ×1 · especial ×1 · elemental directo ×1,3 · arcano directo ×1,4 · True Damage ×1,5;
 la Defensa especial cuesta lo mismo que la Defensa.
 
+**Catálogo defensivo con Defensa especial (dueño, 2026-10-07):** ✅ la conversión: cada pieza conserva sus puntos y su precio; **metal** →
+Defensa · **tela** (túnicas, amuletos, orbes) → Defensa especial · **cuero**: no todas mitad y mitad — **unas dan Defensa, otras Defensa
+especial y otras las dos**, con color narrativo: «cuero» a secas da Defensa; la **piel o el cuero de un animal raro** (críptidos, bichos
+mitológicos o extraños: el oso lechuza, el narval, el lobizón…; sin ser dragones, porque son de calidad baja) da Defensa especial · el
+**«metal con runas» siempre da las dos**. Después hay que asegurar que haya disponibilidad de las dos en todos los tiers: se ve **slot por
+slot, tier por tier**, con el balance de cuánto queda de cada cosa.
+**En las tiendas (al final, con todo auditado):** el **herrero** muestra lo que da Defensa, el **Bazar** lo que da Defensa especial; lo que da
+las dos puede salir en cualquiera, con un criterio: si está más cargado a una, sale en esa tienda; si está balanceado, en cualquiera de las dos.
+
 **Lo que ya existe y sirve:** el stat `armadmg` («Armadura mágica»: un número fijo que se resta al daño de casteo, para personajes, creeps e
 invocaciones, ya restado en el mapa) — hoy ningún ítem del catálogo lo da. Propuesta: **es la misma pieza con otro nombre**, Defensa especial,
 y deja de ser escasa.

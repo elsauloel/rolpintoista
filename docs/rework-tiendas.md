@@ -165,3 +165,7 @@ el cartel del GM muestra vendidas y repuestas. **Reglas nuevas de Firestore** (`
 - **✅ Las 9 piezas de Tipo 8 cargadas** (13 en total). Chance de que una tienda traiga al menos una (nivel 1 / 3 / 5), simulada: Herrero ambulante
   11/16/15 % · pueblito 21/45/60 % · aldea 31/61/78 % · ciudad 51/79/88 % · capital 71/97/100 %; Ramos ambulante 5/10/18 % · pueblito 9/37/47 % ·
   aldea 22/55/62 % · ciudad 36/67/80 % · capital 55/88/94 %. En nivel 1 sale menos porque son de Buena calidad (y solo una Común).
+
+## Defensa y Defensa especial en las tiendas (dueño, 2026-10-07, para cuando el catálogo defensivo esté auditado)
+El **herrero** muestra lo que da Defensa; el **Bazar**, lo que da Defensa especial. Lo que da las dos puede salir en cualquiera de las dos
+tiendas: si está más cargado a una, sale en esa; si está balanceado, en cualquiera. Ver `docs/rework-armas.md` («Defensa especial»).

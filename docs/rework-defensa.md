@@ -1606,3 +1606,9 @@ Común | pies | Zuecos de boticario | tóxico | 1 | tema |  | 33
 Común | pies | Zuecos de boticario | ácido | 1 | tema |  | 33
 Común | pies | Sandalias de baqueano | ácido | 1 | tema |  | 33
 ```
+
+**✅ Resistencias elementales: tope y relleno aplicados (2026-10-07).** Dueño: tope **+1 en Común, +2 en Buena**; el relleno se reemplaza **casi siempre por
+durabilidad (Resistente)**, con variantes según la parte (pies livianos → Levitar, cabeza → Luz o Campo de visión, torso → Vida, mochila → ranuras); **no se
+usan como relleno Res.CC, Res.Mt ni ranuras de cinturón** («no quiero que se vayan de mambo»). 53 piezas cambiadas, todas con el mismo valor en la
+calculadora (mismo precio): 33 resistencias de relleno se sacaron y 21 de tema bajaron de +2 a +1 (esas, siempre con durabilidad). Máximo equipable de
+fuego: Común 12 → 7, hasta Buena 14 → 11 (hielo 10 → 5 / 8, ácido 10 → 6 / 9, rayo y tóxico 7 → 4 / 5). Piezas Comunes con alguna: 19 % → 14 %.

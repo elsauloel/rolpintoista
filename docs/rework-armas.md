@@ -1889,6 +1889,17 @@ después del primer turno, sin Parry ni habilidades. «Pegados» = el guerrero a
 Hallazgos: el ½ Ef.Esp es demasiado (aunque cueste 3 SP); **el SP casi no frena en una pelea** (dura 3 a 5 turnos y al mago le sobran 15
 a 36 de 42): el freno real es el No2 (2 usos por turno contra 1 hachazo); el guerrero con Agilidad 4 solo pega una vez por turno.
 
+**Segunda vuelta (dueño: «el mago va a usar su SP en sus propios skills, probablemente mucho más que en las armas; las armas son un accesorio
+casi secundario» · «quizás valga la pena subirle el costo de SP a las armas»):** el mago guarda ⅔ de su SP para habilidades y gasta en armas
+solo ⅓ (14 de 42); sin ese SP, paga con No2. Ahí el SP sí frena:
+
+| Arma del mago | Gana el mago: a 4 casillas · pegados |
+|---|---|
+| Varita 1d8 directo · 2 / 3 / 4 SP | 54 · 41 % / 32 · 22 % / 23 · 18 % |
+| Varita 1d6 directo · 2 / 3 SP | 25 · 19 % / 12 · 10 % |
+| Báculo 1d4 + ¼ Ef.Esp · 1 / 2 / 3 SP | 72 · 56 % / 56 · 43 % / 28 · 23 % |
+| Báculo 1d6 + ¼ Ef.Esp · 2 / 3 / 4 SP | 78 · 65 % / 53 · 40 % / 39 · 30 % |
+
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 
 Ruta del dueño (2026-10-05): **slot por slot**, empezando por **Cabeza**: primero lo Común pensado para casters, después el tier **Buena calidad de

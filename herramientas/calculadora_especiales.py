@@ -44,7 +44,10 @@ def mult_dano(a):
     return MULT_DANO.get(clase, 1.0)
 # Sumar el Especial (báculos y lo que lo diga): con la Defensa especial (2026-10-07) el Ef.Esp es la Fuerza de la magia — no se cobra, como la
 # Fuerza del arma física, porque la Defensa especial lo compensa. Un daño que suma el Ef.Esp nunca es directo.
-EF_ESP_REF = 4   # el Ef.Esp de un personaje típico (para mostrar cuánto pega, no para cobrarlo)
+EF_ESP_REF = 4   # el Ef.Esp de alguien que no es mago (para mostrar cuánto pega)
+# El Ef.Esp de un MAGO de nivel 1 (reparto del asistente: Especial 14). Los báculos lo suman y SÍ se cobra (2026-10-07, calibrado con la
+# simulación mago contra guerrero en el mapa: con ½ el mago ganaba el 92-98 %; con ¼, el 40-55 %, que es lo buscado). ¼ de 14 = +3.
+EF_ESP_MAGO = 14
 # La forma: cuántos objetivos alcanza en promedio (un área, además, le cuesta No2 al que la esquiva con dodge roll).
 FORMA = {'frente3x5': 1.75, 'trampa': 0.75, 'linea4': 1.3, 'uno': 1.0, 'cadena': 1.4, 'linea': 1.2, 'cono': 1.3, 'flor1': 1.5, 'flor2': 2.0}   # un área suele alcanzar 1 o 2 rivales; 3 es raro (dueño, 2026-10-07)
 # Efectos: los mismos pesos de las armas físicas (PESO_EFECTO), más los de control que las armas físicas no tienen (en No2 o turnos que le hace perder).
@@ -78,7 +81,7 @@ COSTO_BASE, COSTO_SUBE = 1, 1   # varitas (dueño, 2026-10-05, cuarta vuelta): e
 # efecto: se parte de 1d4 por 1 SP y lo más fuerte cuesta más SP (no más No2). El SP es la reserva del combate: las caras dan una ráfaga y se apagan.
 # (Descartadas: 2-3-4 sin SP; 1 No2 + 1 SP con el No2 que sube — tiros chicos; una vez por turno — sin ritmo.)
 # Escala del SP según la fuerza del tiro (valor por uso): hasta 4,5 → 1 SP · hasta 6 → 2 · hasta 7,5 → 3 · más → 4 (Común llega a 3).
-ESCALA_SP = [(4.5, 1), (6.0, 2), (7.5, 3), (9.5, 4), (11.5, 5), (99, 6)]   # Común llega a 4 (propuesta, 2026-10-05)
+ESCALA_SP = [(5.0, 1), (6.0, 2), (7.5, 3), (9.5, 4), (11.5, 5), (99, 6)]   # Común llega a 4. Hasta 5 → 1 SP (2026-10-07: la varita base, 1d6 directo, cuesta 1 SP según la simulación)
 def precio_de(valor):
     return CA.redondo(CA.PRECIO_A * math.exp(CA.PRECIO_B * valor))   # la curva de las armas físicas (Común: 40 a 120 DDE)
 
@@ -125,7 +128,8 @@ def valor_uso(a):
     # `fijo`: un número fijo que suma el arma (2026-10-07, dueño: hasta resolver P169, ninguna arma especial suma el Ef.Esp; el daño es fijo, en
     # dados o en valores netos). En lo físico invocado (`fuerza`), el fijo hace de la Fuerza del arma física: no se cobra, porque lo frena la Defensa.
     assert not (a.get('sumaEspecial') and (a.get('directo') or a.get('true'))), 'un daño que suma el Ef.Esp nunca es directo: ' + a.get('nombre', '')
-    d['daño'] = (dado_prom(a.get('dado')) + a.get('fijo', 0)) * mult_dano(a) * a.get('golpes', 1)   # el Ef.Esp (sumaEspecial) no se cobra
+    esp = math.floor(EF_ESP_MAGO * float(a['sumaEspecial'])) if a.get('sumaEspecial') else 0   # el ¼ del Ef.Esp de un mago (+3), cobrado
+    d['daño'] = (dado_prom(a.get('dado')) + a.get('fijo', 0) + esp) * mult_dano(a) * a.get('golpes', 1)
     ef = 0.0
     for nombre, prob in (a.get('efectos') or {}).items():
         ef += peso_efecto(nombre) * prob
@@ -164,21 +168,21 @@ def referencia():
 # leve o en área (dueño). Báculos: suman Especial (en Común, la mitad) y cuestan SP. Orbes: van en la otra mano, no atacan (valor aparte).
 POOL = [
     # — daño —
-    {'nombre': 'Varita arcana: 1d4 directo (el piso)', 'clase': 'arcano', 'dado': '1d4', 'directo': True},
+    {'nombre': 'Varita arcana: 1d6 directo (la base, 2026-10-07: 1d4 quedaba muy flojo en la simulación)', 'clase': 'arcano', 'dado': '1d6', 'directo': True},
     {'nombre': 'Varita arcana mayor: 1d8 directo', 'clase': 'arcano', 'dado': '1d8', 'directo': True},
     {'nombre': 'Varita de misiles: 2 misiles de 1d4, a uno o a dos rivales', 'clase': 'arcano', 'dado': '1d4', 'golpes': 2, 'sp': 2, 'directo': True},
     {'nombre': 'Varita de chispa eléctrica: 1d6 de rayo, salta 2 veces (la mitad cada salto), 10 % Parálisis al primero', 'clase': 'elemental', 'dado': '1d6', 'forma': 'cadena', 'efectos': {'Parálisis': 0.10}, 'directo': True},
     {'nombre': 'Varita láser: 1d6 arcano a todos en una línea recta de 4 (atraviesa)', 'clase': 'arcano', 'dado': '1d6', 'forma': 'linea4', 'directo': True},
-    {'nombre': 'Varita de la fogata: 1d4 de fuego en flor; deja la flor incendiada 2 turnos', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'terreno': ('Daño 1', 2), 'esquive': 'no'},
+    {'nombre': 'Varita de la fogata: 1d4 de fuego en flor; deja la flor incendiada 2 turnos', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'terreno': ('Daño 1', 2), 'esquive': 'no', 'directo': True},
     {'nombre': 'Varita del soplo de fuego: cono de 2, 1d4 de fuego, 25 % quemar', 'clase': 'elemental', 'dado': '1d4', 'forma': 'cono', 'efectos': {'Prende fuego': 0.25}, 'sp': 1, 'directo': True},
     {'nombre': 'Varita de la bola de fuego: estalla en flor, 1d4 de fuego y deja fuego 1 turno', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'terreno': ('Daño 1', 1), 'sp': 2, 'directo': True},
     {'nombre': 'Varita de la púa de hielo: lanza de hielo física T4, 2d4 + 3 − Defensa (critica), 33 % Escarcha', 'clase': 'fisico', 'dado': '2d4', 'fuerza': 3, 'efectos': {'Escarcha': 1 / 3}},
     {'nombre': 'Varita del canto rodado: piedrazo físico T10 (contundente), 1d10 + 3 − Defensa (critica), 25 % Demora', 'clase': 'fisico', 'dado': '1d10', 'fuerza': 3, 'efectos': {'Demora': 0.25}},
     {'nombre': 'Varita de granizo: flor física T4, 1d4 + 3 − Defensa a cada uno, 25 % Escarcha', 'clase': 'fisico', 'dado': '1d4', 'fuerza': 3, 'forma': 'flor1', 'efectos': {'Escarcha': 0.25}},
-    {'nombre': 'Varita de lluvia ácida: flor, 1d2 de ácido, 50 % Armadura rota', 'clase': 'elemental', 'dado': '1d2', 'forma': 'flor1', 'efectos': {'Rompe armadura': 0.5}, 'sp': 2, 'directo': True},
-    {'nombre': 'Varita de miasma: nube tóxica de 1 turno en flor; Ef.Esp contra Res.Esp, el que no resiste recibe 1d4 + 1', 'clase': 'toxico', 'dado': '1d4', 'fijo': 1, 'forma': 'flor1', 'esquive': 'no'},
+    {'nombre': 'Varita de lluvia ácida: flor, 1d4 de ácido, 50 % Armadura rota', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'efectos': {'Rompe armadura': 0.5}, 'sp': 2, 'directo': True},
+    {'nombre': 'Varita de miasma: nube tóxica de 1 turno en flor; Ef.Esp contra Res.Esp, el que no resiste recibe 1d4 + 1', 'clase': 'toxico', 'dado': '1d4', 'fijo': 1, 'forma': 'flor1', 'esquive': 'no', 'directo': True},
     {'nombre': 'Varita de la pelea cercana: 1d10 arcano, −1 por cada casillero de distancia después del primero (al lado, entero)', 'clase': 'arcano', 'dado': '1d10', 'efectos': {'Daño 1': -2.0}, 'directo': True},
-    {'nombre': 'Varita del chorro de ácido: proyectil (se esquiva con Evasión); si pega, Armadura rota segura y 1d2 de ácido', 'clase': 'elemental', 'dado': '1d2', 'efectos': {'Rompe armadura': 1.0}, 'directo': True},
+    {'nombre': 'Varita del chorro de ácido: proyectil (se esquiva con Evasión); si pega, Armadura rota segura y 1d4 de ácido', 'clase': 'elemental', 'dado': '1d4', 'efectos': {'Rompe armadura': 1.0}, 'directo': True},
     # — daño leve con control —
     {'nombre': 'Varita del destello: flor, 1d4, 20 % Pajaritos', 'clase': 'arcano', 'dado': '1d4', 'forma': 'flor1', 'efectos': {'Pajaritos': 0.20}, 'directo': True},   # 25 % → 20 % con el dodge (2026-10-07), para seguir en 4 SP
     {'nombre': 'Varita del susurro: 1d6 arcano (no se esquiva: PdG.Esp contra Res.Esp), 25 % Silencio', 'clase': 'arcano', 'dado': '1d6', 'efectos': {'Silencio': 0.25}, 'directo': True},
@@ -197,7 +201,7 @@ POOL = [
     {'nombre': 'Varita del portal: trampa de portal oculta, lleva a quien la pisa a la casilla que marcaste (a 4 o menos; Res.Esp contra 7)', 'clase': 'arcano', 'efectos': {'Portal': 1.0}, 'forma': 'trampa'},
     {'nombre': 'Varita de cura: 1d10 a un aliado', 'clase': 'arcano', 'efectos': {'Cura': 5.5}, 'sp': 1},
     # — báculos (suman Especial; también una vez por turno) —
-    {'nombre': 'Báculo de aprendiz (1 mano, peso 1): 1d6 + ½ Ef.Esp (daño especial: lo frena la Defensa especial)', 'clase': 'arcano', 'dado': '1d6', 'sumaEspecial': 0.5},   # dueño 2026-10-07: «me parece caro»
+    {'nombre': 'Báculo de aprendiz (1 mano, peso 1): 1d4 + ¼ Ef.Esp (daño especial: lo frena la Defensa especial)', 'clase': 'arcano', 'dado': '1d4', 'sumaEspecial': 0.25},   # dueño 2026-10-07: «me parece caro»
 ]
 # Buena calidad (2026-10-07, dueño: opción (c) de P168: lo nuevo, y la escala de SP corrida un escalón; tope: 4 SP = un tiro de hasta 11,5).
 # Daño fijo (en dados o neto): ninguna suma el Ef.Esp hasta resolver P169. `sp`: SP fijo puesto a mano (con su porqué).

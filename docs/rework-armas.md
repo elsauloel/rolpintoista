@@ -1820,6 +1820,10 @@ especial y otras las dos**, con color narrativo: «cuero» a secas da Defensa; l
 mitológicos o extraños: el oso lechuza, el narval, el lobizón…; sin ser dragones, porque son de calidad baja) da Defensa especial · el
 **«metal con runas» siempre da las dos**. Después hay que asegurar que haya disponibilidad de las dos en todos los tiers: se ve **slot por
 slot, tier por tier**, con el balance de cuánto queda de cada cosa.
+**Torso Común, primera vuelta (dueño, 2026-10-07):** «coraza» suena a metal (la Coraza del clan necesita otro nombre) · el cuero que da Defensa
+especial no tiene que ser solo de críptidos: también «cuero protegido, cuero especial, misterioso, de dudosa procedencia» · **la piel de troll,
+con regeneración de vida como efecto habitual** (stat nuevo: hay que ponerle peso) · el **cuero tachonado es claramente híbrido** · más
+**híbridos**: unos cargados a la Defensa, otros a la especial y otros parejos.
 **En las tiendas (al final, con todo auditado):** el **herrero** muestra lo que da Defensa, el **Bazar** lo que da Defensa especial; lo que da
 las dos puede salir en cualquiera, con un criterio: si está más cargado a una, sale en esa tienda; si está balanceado, en cualquiera de las dos.
 

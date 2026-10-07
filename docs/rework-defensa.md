@@ -1624,6 +1624,7 @@ levanta a un caído). Peso 1 por cada +1 (como Vida +5).
 |---|---|---|
 | Torso Común ✅ (2026-10-07) | 60 / 28 (antes 85 / 0) | 23 / 18 / 6 de 35 |
 | Cabeza Común ✅ (2026-10-07) | 10 / 13 (antes 15 / 0) | 10 / 12 / 2 de 29 |
+| Manos Común ✅ (2026-10-07) | 11 / 7 (antes 15 / 0) | 11 / 7 / 1 de 34 |
 
 **Cómo se revisa cada slot y tier (dueño, 2026-10-07):** (1) convertir por material (tabla para el OK del dueño); (2) **la Defensa especial
 puede reemplazar los rellenos** (lo que se puso para completar puntos: durabilidad, resistencias sueltas…), para darles más espacio; (3) el
@@ -1640,3 +1641,7 @@ Torso Común: 9 de tela a Defensa especial; cuero raro: Peto de escamas de pez g
 Chaleco de piel de oso lechuza (ex Chaleco de cazador); híbridos: Armadura de cuero tachonado (ex Armadura con tachas, cargada a la Defensa),
 Campera de cuero con tachas y Casaca curtida de salteador (parejas), Peto de cuero de lampalagua (ex Peto de cuero curtido), Pechera pintada
 del clan (ex Coraza del clan) y el nuevo Chaleco de piel de troll (Regeneración de vida +1; cargadas a la especial).
+
+Manos Común: tela (Vendas de mano, Guantes de tela acolchada), Guantes de goma (aíslan) y Guante de cetrero (cuero «de grifo») a Defensa
+especial; híbrido parejo: Guanteletes de cuero tachonado (dejan la Res. crítico Tipo 4). Nuevas: Guantes de seda del copista (Def. especial +1 ·
+Res.Mt +1) y Guantes de piel de sapo cururú (Def. especial +1 · Res. tóxico +1).

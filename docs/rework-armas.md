@@ -1707,6 +1707,55 @@ Ojo con las «firmas» de ahorro (primer uso −1 SP, el No2 que no sube): qued�
     Defensa). Cambios en las Comunes (propuesta): Báculo de aprendiz 1d4 + ½ Ef.Esp → **1d4 + 2** (mismo valor) · Púa de hielo, Canto rodado y
     Granizo: + Ef.Esp → **+ 3** · Miasma: la diferencia + 1d4 → **1d4 + 1** (sigue la tirada Ef.Esp contra Res.Esp para resistirla: eso es una
     salvación, no un bono de daño; igual que el Aceite, el Gancho y la Runa) · Cura **1d10**. Tabla de Buena: `BUENA` en la calculadora.
+  - **Lista de Buena con el detalle de cada una (2026-10-07, pedido del dueño: «es un rayo, un proyectil? un rayo se esquiva con dodge (más
+    caro), un proyectil con evasión»).** Tres formas de evitarlo: **proyectil** (PdG.Esp contra Evasión; si ganás, no te pasa nada) · **rayo y
+    área** (PdG.Esp contra Evasión, y si ganás tenés que **salir** con el dodge roll, pagando el movimiento; si quedás adentro, te pega) ·
+    **no se esquiva** (PdG.Esp contra Res.Esp: venenos, maldiciones). Propuesta: lo que se esquiva con dodge vale **×1,15** (borrador). Lo que
+    se coloca (zonas, muros, portales) no se esquiva al tirarlo: se evita no pisándolo. Varitas: 1 mano, peso 1. Báculos: 2 manos, peso 2.
+
+    | Arma | Detalle · SP · DDE |
+    |---|---|
+    | Arcana superior | Proyectil (Evasión). 2d6 arcano, directo a la vida. · 4 · 140 |
+    | Misiles mayores | 3 proyectiles, cada uno con su Evasión; los repartís entre 1, 2 o 3 rivales. 1d4 arcano cada uno. · 4 · 160 |
+    | Relámpago | Rayo (dodge). 1d8 de rayo; si pega, salta según el número (8 → 4 → 2 → 1) al más cercano a 3 o menos; 15 % Parálisis al primero. · 4 · 160 |
+    | Flor de chispas | Área: flor (dodge). 1d4 de rayo y 10 % Parálisis a cada uno. · 3 · 95 |
+    | Láser largo | Rayo en línea de 6 (dodge; con fuego amigo). 1d8 al primero y 1 menos a cada uno de los siguientes. · 4 · 140 |
+    | Bola de fuego mayor | Área: flor grande, radio 2 (dodge). 1d4 de fuego a cada uno; el fuego queda 1 turno en el suelo. · 4 · 160 |
+    | Ráfaga helada | Área: frente de 3×3 (dodge). 1d2 de hielo y empuja 2 a cada uno. · 3 · 120 |
+    | Lluvia de cascotes | Área: flor (dodge). Física, Tipo 10: 1d6 + 3 − Defensa a cada uno (critica); 25 % Sentado. · 3 · 100 |
+    | Ponzoña | No se esquiva (PdG.Esp contra Res.Esp). 1d4 tóxico y Veneno. · 1 · 60 |
+    | Chorro de lava | Camino libre de 4 (dodge; con fuego amigo): cada casilla pegada a la anterior, la primera a 1/3 de tu Rango de casteo. 1d4 de fuego a todos; el camino arde 2 turnos en el piso. · 4 · 140 |
+    | Inestable | Proyectil (Evasión). 2d6 arcano; si sale algún 1 (31 %), te hacés 1d4. · 3 · 140 |
+    | Campo de estática | Zona: flor, 2 turnos. 1d4 de rayo cada vez que alguien da un paso adentro. · 1 · 50 |
+    | Muro de fuego | Zona: línea de 3, 3 turnos (piso y aire). 1d4 de fuego al entrar o quedarse. · 1 · 65 |
+    | Muro | Colocás 3 casillas en línea, 3 turnos: tapan el paso y la vista. · 1 · 65 |
+    | Vendaval | Área: cono (dodge: quien lo esquiva no se mueve). Empuja 2 a todos; apaga el fuego y despeja la niebla que toca. · 1 · 55 |
+    | Blink | A vos o a un aliado que ves; no se esquiva. Teletransporte hasta 3 casillas; una vez por turno. · 3 · 95 |
+    | Portal doble | Colocás dos portales a la vista, 2 turnos: se entra por uno y se sale por el otro; solo tu bando. · 1 · 60 |
+    | Luz flotante | Colocás una luz de radio 2 en una casilla, 3 turnos: ilumina y revela lo oculto. · 1 · 70 |
+    | Eclipse | Proyectil (Evasión). 1d6 arcano y 25 % Ceguera (estado nuevo). · 1 · 70 |
+    | Embrollo | Proyectil (Evasión). 1d4 arcano y 25 % Confusión. · 1 · 55 |
+    | Manotazo | Proyectil (Evasión). 1d6 arcano y 33 % Desarme (estado nuevo). · 2 · 70 |
+    | Raíces | Brotan en su casilla (dodge). 1d4 y 33 % Inmovilizado. · 1 · 65 |
+    | Grieta | Proyectil (Evasión). 1d6 arcano y −2 Defensa por 2 turnos. · 3 · 120 |
+    | Maleficio | No se esquiva (PdG.Esp contra Res.Esp). 1d4 arcano y −1 a su Res. crítico por 2 turnos. · 2 · 80 |
+    | Sanguijuela | Proyectil (Evasión). 1d6 arcano; le sacás 1 SP y lo recuperás vos. · 2 · 80 |
+    | Cosecha | Proyectil (Evasión). 1d6 arcano y lo marca 2 turnos; si muere marcado, recuperás 2 SP. · 3 · 90 |
+    | Cura mayor | A un aliado dentro del alcance. Cura 2d8. · 3 · 110 |
+    | Escudo | A un aliado. Escudo especial 3 hasta su próximo turno. · 1 · 40 |
+    | Purga | A un aliado. Le saca un estado malo (Veneno, Quemadura, Escarcha…). · 1 · 45 |
+    | Báculo de brasas | Proyectil (Evasión). 1d6 + 3 de fuego, 25 % Quemadura. · 4 · 130 |
+    | Báculo de escarcha | Proyectil (Evasión). 1d6 + 3 de hielo, 25 % Escarcha. · 4 · 130 |
+    | Báculo del sabio | Proyectil (Evasión). 1d6 + 3 arcano. · 4 · 130 |
+    | Báculo de sangre | Proyectil (Evasión). 1d6 + 3 arcano; cada uso, el 10 % de tu vida máxima (para arriba) en vez de SP. · — · 130 |
+    | Báculo guardián | Proyectil (Evasión). 1d4 + 2 arcano; en las manos, +1 Parry y +1 Bloqueo. · 2 · 130 |
+    | Varita de cargas | La Bola de fuego Común (área, dodge), 3 usos por combate sin SP. · — · 140 |
+    | Varita gemela | Aceite (zona) o Bola de fuego (área, dodge); cada uso, el SP del que elegís. · 1 o 3 · 120 |
+
+    Cambios por el dodge ×1,15 (propuesta): el **Láser largo** pasa a 1d8 que baja (antes contado entero), la **Ráfaga helada** a 1d2 (con 1d4 y
+    empuja 2 pasaba el tope). En las **Comunes**, el dodge subiría 1 SP a: Chispa eléctrica (si es rayo), Soplo de fuego, Bola de fuego,
+    Granizo, Lluvia ácida, Destello y Ventisca. **Báculo de aprendiz** (dueño: «me parece caro»): hoy 1 mano, peso 2, proyectil, 1d4 + 2 arcano a
+    3 SP (lo arcano directo vale ×1,5) → propuesta **1d4 + 1, 2 SP, 60 DDE**, y peso 1.
 
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 

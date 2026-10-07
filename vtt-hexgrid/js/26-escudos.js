@@ -3,7 +3,7 @@
    escudo equipado (un orbe no cuenta). Lo suma el daño (js/10, junto al Guardián) solo cuando la Defensa cuenta; la Crónica lo cuenta.
    Empujón (`empujon`): un golpe cuerpo a cuerpo de un arma que el defensor BLOQUEÓ (anulado) deja al atacante con Demora (dueloDemora, js/13).
    Lo hace la pantalla del GM al ver resolverse el duelo (Duelo.escuchar → `bloqueado`).
-   Orbe del custodio (`orbeCustodio` en el orbe): al usar una varita, un aliado al lado recibe Escudo especial N hasta su próximo turno (una vez
+   Orbe del custodio (`orbeCustodio` en el orbe): al usar una varita, un aliado al lado recibe Vida extra N hasta su próximo turno (una vez
    por turno). Si hay varios al lado, se elige en un cartel.
    Orbe de absorción (`orbeAbsorcion`): el daño mágico o elemental que llega a la vida le devuelve N SP, una vez por turno (personajes; js/10). */
 
@@ -53,23 +53,23 @@ async function dueloEmpujon(d){
 // Orbe del custodio: o = {fichaId, tipo: 'pj' | 'creep', n, orbe, quien}.
 async function orbeCustodioMapa(o){
   const origen = [...tokens.values()].find(t => t && t.fichaId === o.fichaId && bandoDe(t) === o.tipo);
-  if(!origen){ mesaLinea(`🔮 ${o.orbe}: el token no está en este mapa — el Escudo especial ${o.n} para un aliado al lado, a mano`); return; }
+  if(!origen){ mesaLinea(`🔮 ${o.orbe}: el token no está en este mapa — la Vida extra ${o.n} para un aliado al lado, a mano`); return; }
   const lista = aliadosAlLado(origen);
   if(!lista.length){ mesaLinea(`🔮 ${o.orbe}: no hay ningún aliado al lado de ${nombreDe(origen)} para cubrir`); return; }
   const el = lista.length === 1 ? lista[0] : await new Promise(res => {
     let listo = false;
     const fin = x => { if(listo) return; listo = true; AvisoCombate.cerrar(); res(x); };
-    AvisoCombate.mostrar({icono: '🔮', titulo: `${o.orbe}: ¿a quién cubrís?`, texto: `Escudo especial ${o.n} hasta su próximo turno, a un aliado al lado.`,
+    AvisoCombate.mostrar({icono: '🔮', titulo: `${o.orbe}: ¿a quién cubrís?`, texto: `Vida extra ${o.n} hasta su próximo turno, a un aliado al lado.`,
       botones: [...lista.map(a => ({texto: nombreDe(a.t), alClic: () => fin(a)})), {texto: 'A nadie', sec: true, alClic: () => fin(null)}], alCerrar: () => fin(null)});
   });
   if(!el) return;
-  const spec = {nombre: 'Escudo especial', turnos: 1, escudoMagico: o.n};
+  const spec = {nombre: 'Vida extra', turnos: 1, escudoMagico: o.n};
   try{
     if(el.t.tipo === 'creep') await modificarCreep(el.t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
     else{
       const f = fichasPub.get(String(el.t.fichaId).split(SEP_INVOCACION)[0]);
       await EstadosAplicar.encolarPj({fichaId: el.t.fichaId, duenoUid: (f && f.duenoUid) || el.t.duenoUid, spec, origen: `${o.quien || ''} (${o.orbe})`.trim()});
     }
-    mesaLinea(`🔮 ${o.orbe}: ${nombreDe(el.t)} recibe Escudo especial ${o.n} hasta su próximo turno`);
-  }catch(err){ console.error('Orbe del custodio:', err); toast(`${o.orbe}: no se pudo dar el Escudo especial — a mano`); }
+    mesaLinea(`🔮 ${o.orbe}: ${nombreDe(el.t)} recibe Vida extra ${o.n} hasta su próximo turno`);
+  }catch(err){ console.error('Orbe del custodio:', err); toast(`${o.orbe}: no se pudo dar la Vida extra — a mano`); }
 }

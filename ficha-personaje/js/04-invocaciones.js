@@ -1033,7 +1033,7 @@ const LISTS = {
   }
 };
 
-// Escudo especial / Excedente de vida: cambiar el valor a mano (número, +N/−N o «max N»): comun/combatiente.js.
+// Vida extra / Vida extra: cambiar el valor a mano (número, +N/−N o «max N»): comun/combatiente.js.
 function escudoParsear(txt, actual, max){ return Combatiente.escudoParsear(txt, actual, max); }
 
 // Estados que vienen de una pasiva (2026-09-24, pedido del dueño): hoy solo la regeneración (`regenHp`). No se guardan: se arman

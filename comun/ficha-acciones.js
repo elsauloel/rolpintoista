@@ -612,7 +612,7 @@ const FichaAcciones = (() => {
     return {costo: costoEspecialTxt(S, it), que: t.length <= 200 ? t : t.slice(0, 200).replace(/[\s,;:(]+\S*$/, '') + '…'};   // corta en una palabra, nunca a la mitad
   };
   const costoEspecialTxt = (S, it) => { const c = costoEspecial(S, it); return `${fmt(c.no2)} No2${c.sp ? ` + ${fmt(c.sp)} SP` : ''}${c.usos ? ` (uso ${c.usos + 1} del turno)` : ''}`; };
-  /* Los orbes equipados (2026-10-05) al usar un arma especial: el de resguardo te pone Escudo especial 2 hasta tu próximo turno (una vez por turno: el
+  /* Los orbes equipados (2026-10-05) al usar un arma especial: el de resguardo te pone Vida extra 2 hasta tu próximo turno (una vez por turno: el
      conteo vive en S.ataquesArma, que vacía el Mantenimiento); el salvaje tira 1d6: con 1 te hace 1 de daño, con 6 el efecto sale doble (los dados del
      daño ×2; si el arma no hace daño, el doble lo decide la mesa). Todo a la vista en la Mesa. Devuelve true si sale doble. */
   function orbesAlUsar(S, item, it, ui){
@@ -622,8 +622,8 @@ const FichaAcciones = (() => {
       if(o.orbeResguardo && !num((S.ataquesArma || {})[k])){
         S.ataquesArma = {...(S.ataquesArma || {}), [k]: 1};
         S.efectos = Array.isArray(S.efectos) ? S.efectos : [];
-        const r = Combatiente.agregarEstado(S.efectos, estadoDeSpec({nombre: 'Escudo especial', turnos: 1, escudoMagico: num(o.orbeResguardo)}, ui.presets || []));
-        ui.mesaHabilidad(o.nombre, r.ok ? `Escudo especial ${fmt(num(o.orbeResguardo))} hasta tu próximo turno.` : `No entra el Escudo especial (${r.motivo || 'bloqueado'}).`);
+        const r = Combatiente.agregarEstado(S.efectos, estadoDeSpec({nombre: 'Vida extra', turnos: 1, escudoMagico: num(o.orbeResguardo)}, ui.presets || []));
+        ui.mesaHabilidad(o.nombre, r.ok ? `Vida extra ${fmt(num(o.orbeResguardo))} hasta tu próximo turno.` : `No entra la Vida extra (${r.motivo || 'bloqueado'}).`);
       }
       if(o.orbeSalvaje){   // salvaje (Común) o domado (Buena calidad): Combatiente.orbeSalvaje
         const d = 1 + Math.floor(Math.random() * 6), x = Combatiente.orbeSalvaje(o, d);
@@ -631,11 +631,11 @@ const FichaAcciones = (() => {
         if(x.doble) doble = true;
         ui.mesaHabilidad(o.nombre, `1d6 → ${d}: ${x.dano ? 'te hace 1 de daño' : x.doble ? (String(it.tiradaExtra || '').match(/\d+d\d+/) ? '¡el efecto sale doble! (los dados del daño, ×2)' : '¡el efecto sale doble! ✋ A mano: qué es el doble lo decide la mesa') : 'nada'}.`);
       }
-      // Orbe del custodio (Buena calidad, 2026-10-06): un aliado al lado recibe Escudo especial N, una vez por turno (el mapa lo elige).
+      // Orbe del custodio (Buena calidad, 2026-10-06): un aliado al lado recibe Vida extra N, una vez por turno (el mapa lo elige).
       if(num(o.orbeCustodio) > 0 && !num((S.ataquesArma || {})[k + ':c'])){
         S.ataquesArma = {...(S.ataquesArma || {}), [k + ':c']: 1};
         if(ui.custodio) ui.custodio(o);
-        else ui.mesaHabilidad(o.nombre, `✋ A mano: un aliado al lado tuyo recibe Escudo especial ${fmt(num(o.orbeCustodio))} hasta su próximo turno.`);
+        else ui.mesaHabilidad(o.nombre, `✋ A mano: un aliado al lado tuyo recibe Vida extra ${fmt(num(o.orbeCustodio))} hasta su próximo turno.`);
       }
     });
     return doble;

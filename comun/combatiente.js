@@ -94,7 +94,7 @@ const Combatiente = (() => {
   }
   /* ---------- Pase de turno de los estados (paso 2, 2026-09-30) ----------
      Lo que le hacen los estados a quien los tiene en cada Mantenimiento — igual para personaje, invocación y creep:
-       · Escudo especial: se recarga entero (el Excedente de vida no: es un valor neto).
+       · Vida extra: es neta (2026-10-07); solo se renueva entera la que el efecto marca con `recarga`.
        · Daño o cura por turno × stacks. El daño no hace efecto con Invulnerable, ni el de Veneno con Sangre pura, ni el de
          Sangrado con Coagulación extrema.
        · Stacks por turno (suben o bajan); en 0 stacks, el estado se termina.
@@ -130,7 +130,7 @@ const Combatiente = (() => {
     lista.forEach(e => {
       if(!e || e.activo === false || e.disparado) return;
       e.disparado = true;
-      if(n(e.escudoMagico) > 0 && !e.excedenteVida && !e.sinRecarga){   // la Cáscara protectora (anillo) no se recarga
+      if(n(e.escudoMagico) > 0 && (e.recarga || (!e.excedenteVida && !e.sinRecarga))){   // la Vida extra es neta (2026-10-07): solo se renueva si el efecto lo dice (`recarga`)
         const antes = n(e.escudoMagicoActual ?? e.escudoMagico);
         if(antes < n(e.escudoMagico)) eventos.push({tipo: 'escudo', nombre: e.nombre, de: antes, a: n(e.escudoMagico)});
         e.escudoMagicoActual = n(e.escudoMagico);
@@ -208,7 +208,7 @@ const Combatiente = (() => {
   const fmtN = x => Number.isInteger(x) ? String(x) : String(Math.round(x * 100) / 100);
   function reporteTurno(eventos){
     return (eventos || []).map(ev => {
-      if(ev.tipo === 'escudo') return `${ev.nombre}: escudo especial ${fmtN(ev.de)} → ${fmtN(ev.a)}`;
+      if(ev.tipo === 'escudo') return `${ev.nombre}: vida extra ${fmtN(ev.de)} → ${fmtN(ev.a)}`;
       if(ev.tipo === 'inmune') return `${ev.nombre}: no le hizo efecto (inmunidad)`;
       if(ev.tipo === 'resfuego') return `${ev.nombre}: Res. fuego ${fmtN(ev.res)} le saca ${fmtN(ev.de - ev.a)} (de ${fmtN(ev.de)} a ${fmtN(ev.a)})`;
       if(ev.tipo === 'hp') return `${ev.nombre}: ${ev.hp > 0 ? '+' : '−'}${fmtN(Math.abs(ev.hp))} HP${ev.stacks > 1 ? ` (${fmtN(ev.stacks)} stacks)` : ''}`;
@@ -479,9 +479,9 @@ const Combatiente = (() => {
     return `${max} (${nota})`;
   }
 
-  /* ---------- Escudo especial y Excedente de vida: cambiar el valor a mano (2026-09-24, dueño) ----------
+  /* ---------- Vida extra y Vida extra: cambiar el valor a mano (2026-09-24, dueño) ----------
      El texto puede ser un número (valor nuevo), +N / −N (sumar o restar) o «max N» (cambia el máximo). `max === null` =
-     excedente de vida (valor neto, sin tope ni «max N»). Devuelve {max, actual} o null si el texto no se entiende. */
+     vida extra (valor neto, sin tope ni «max N»). Devuelve {max, actual} o null si el texto no se entiende. */
   function escudoParsear(txt, actual, max){
     const t = String(txt || '').trim().replace(',', '.').replace('−', '-');
     if(!t) return null;
@@ -706,7 +706,7 @@ const Combatiente = (() => {
       tira: c.tiraFormula ? {formula: sx(c.tiraFormula), etq: c.tiraEtiqueta || 'Tirada'} : (stat ? {stat, etq: etq(stat), bono: nf(h.tiradaBono)} : null),
       contra: (c.contra || []).map(s => ({modo: s, stat: s, etq: etq(s)})),
       // Daño «la diferencia» (2026-10-02, Drenar Vida): no se tira, es lo que quien la usa le ganó a la resistencia. «Drena»: quien la
-      // usa se cura lo que hizo de daño, y puede pasar su vida máxima hasta `drenaTope` % (como Excedente de vida).
+      // usa se cura lo que hizo de daño, y puede pasar su vida máxima hasta `drenaTope` % (como Vida extra).
       // Daño directo (ignora la Defensa especial: proyectiles chicos) y True Damage (ignora toda defensa y la Res. elemental): dueño, 2026-10-07.
       dano: c.dano && (formula || c.danoDiferencia) ? {formula: c.danoDiferencia ? '' : formula, tipo, ignoraDef: c.trueDamage ? true : c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico',
         ...(c.trueDamage ? {trueDamage: true} : c.danoDirecto && tipo !== 'fisico' ? {directo: true} : {}),

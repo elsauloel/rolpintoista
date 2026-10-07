@@ -1,6 +1,6 @@
 /* =========================================================
    PRESETS DE ESTADOS ALTERADOS (compartido: ficha, gm-tools, mapa, auditoría de skills)
-   La lista ÚNICA de estados estándar del juego (Veneno, Sangrado, Stun, Escudo especial…). Antes vivía copiada tres
+   La lista ÚNICA de estados estándar del juego (Veneno, Sangrado, Stun, Vida extra…). Antes vivía copiada tres
    veces —`EFECTOS_PRESET` en ficha.html, `ESTADOS_PRESET_GM` en gm-tools.html y `DEBUFFS`/`BUFFS` en
    estados-aplicar.js— y las copias se habían ido separando (Sangrado, Afortunado, textos viejos de Inmovilizado y
    Rengo, Barrera que faltaba en gm-tools). Se juntaron el 2026-09-29 (paso 0d de `docs/plan-subida-unificada.md`).
@@ -84,13 +84,14 @@ const ESTADOS_PRESET = [
     detalle:'Inmune a los controles: Stun, Exhausto, Inmovilizado, Rengo, Lisiado y Pajaritos (no se le pueden aplicar mientras dure). Veneno y Sangrado no cuentan como control.'},
   {nombre:'Espinas', polaridad:'buff', turnos:3, espinas:true,
     detalle:'Mientras dure, cada ataque cuerpo a cuerpo que recibe le devuelve al atacante 1/4 (25 %) del daño del golpe (con el crítico, antes de la Defensa), redondeado hacia arriba, directo a la vida. ⚙ Automatizado en el duelo; ✋ a mano fuera de él.'},
-  {nombre:'Escudo especial', alias:['Escudo mágico'], polaridad:'buff', turnos:3, escudoMagico:10,
-    detalle:'Funciona como una barra de HP secundaria: absorbe todo el daño que fuera a recibir de cualquier fuente —incluso daño verdadero (true damage)— antes de que le toquen el HP, y se recarga entera al empezar cada uno de sus turnos mientras el estado siga activo.'},
+  // Vida extra (dueño, 2026-10-07): el ex Escudo especial y el ex Excedente de vida son lo mismo — vida de más, NETA (lo que se gasta no
+  // vuelve), salvo que el efecto diga que se renueva (`recarga: true`). Absorbe el daño de cualquier fuente, también el True Damage. Sin turnos,
+  // dura hasta gastarse; con turnos, vence. Si llega otra, reemplaza a la que había (P137).
+  {nombre:'Vida extra', alias:['Escudo especial', 'Escudo mágico', 'Excedente de vida'], polaridad:'buff', permanente:true, turnos:0, escudoMagico:5, excedenteVida:true,
+    detalle:'Vida de más: se gasta antes que la vida y absorbe el daño de cualquier fuente, también el True Damage. Es neta: lo que se gasta no vuelve (salvo que el efecto diga que se renueva). Sin turnos dura hasta gastarse; si el efecto le pone turnos, vence. Se sube o baja a mano desde el chip.'},
   // Barrera (dueño, 2026-10-06): 2 turnos — con el turno propio, la de 1 turno que uno se pone en su turno se iba antes de que lo atacaran.
   {nombre:'Barrera', polaridad:'buff', turnos:2, escudoMagico:8,
     detalle:'Blindaje del Tanque: absorbe daño de la próxima fuente de daño, como una barra de HP secundaria (🛡). Si la fuente hace más, el resto entra normal. Dura 2 turnos de quien la tiene (si se la pone en su turno, lo cubre hasta el final del siguiente).'},
-  {nombre:'Excedente de vida', polaridad:'buff', permanente:true, turnos:0, escudoMagico:5, excedenteVida:true,
-    detalle:'HP extra por encima de su máximo (por ejemplo, lo que drena de más). Es un valor neto: sin tope y sin recarga; absorbe el daño antes que la vida y se sube o baja a mano desde el chip. Por defecto no vence por turnos, pero se le pueden poner turnos.'},
   {nombre:'Afortunado', polaridad:'buff', turnos:3, afortunado:true,
     detalle:'Toda tirada de PdG, Parry o Evasión se hace dos veces y se queda con la mejor.'},
   {nombre:'Sangre pura', polaridad:'buff', turnos:3, sangrePura:true,

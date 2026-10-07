@@ -144,7 +144,7 @@ const CreepCalculo = (() => {
   // defecto) — solo la dan ítems Raros o mejores, vía sus bonos genéricos
   // (no tiene un campo propio como "def" en las piezas de armadura). Protege
   // el daño de casteo que "ignora la Defensa" (Paso 1); no tiene nada que ver
-  // con Escudo especial ni con la habilidad "Armadura arcana" del Mago.
+  // con Vida extra ni con la habilidad "Armadura arcana" del Mago.
   // Resistencia elemental de un creep (2026-10-04): la base que le pone el GM (sc.resfuego…) + lo que dan su equipo y sus estados.
   function resElemental(sc, el){
     const id = 'res' + el;

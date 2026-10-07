@@ -37,7 +37,7 @@ const FichaEditor = (() => {
     curaspPct:'% de SP al consumir (0-100, redondea hacia arriba)',
     cargaMax:'Cargas por unidad (usos antes de gastar 1 de la cantidad)', cargaActual:'Cargas restantes (de la unidad actual)',
     forzarNitros:'Forzar Nitros máx. a (vacío = no forzar; el más bajo activo gana)', mitadPdgEva:'PdG y Evasión a la mitad (redondeado abajo)',
-    escudoMagico:'Escudo especial — HP de una barra secundaria que absorbe daño antes que el HP real; se recarga entera en cada Mantenimiento mientras el estado siga activo (dejalo en 0 si no aplica)',
+    escudoMagico:'Vida extra — vida de más que se gasta antes que la vida; es neta: lo que se gasta no vuelve (dejalo en 0 si no aplica)',
     armaduraRota:'Armadura rota: -1 Defensa por cada acumulación (stack)',
     tiradaExtra:'Tirada de efecto: fórmula de dados, botón 🎲 (opcional, ej. 2d6+3)',
     tiradaStat:'Tirada al ejecutar: stat (opcional)'};

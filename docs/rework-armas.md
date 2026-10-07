@@ -1807,6 +1807,11 @@ que sume el Ef.Esp del personaje choca con la Defensa especial.** Dueño: «eso 
 - **Orden:** 1) la calculadora · 2) el catálogo defensivo (por material) · 3) las armas especiales, con paridad según la proporción y
   disponibilidad del catálogo defensivo · 4) el Bazar.
 
+**Respuestas (dueño, 2026-10-07):** el **ácido queda como quinto elemento** («quiero que tenga cierta presencia: va a ser una gran herramienta
+para controlar personajes con mucha armadura») · **la Vida extra es neta**, con la posibilidad de que se renueve en efectos específicos de
+habilidad u objeto. **Hecho:** el Escudo especial y el Excedente de vida son un solo estado, «Vida extra» (los nombres viejos se encuentran
+igual), neto; solo se renueva el que el efecto marca con `recarga`. Si llega otra Vida extra, reemplaza a la que había (P137).
+
 **Lo que ya existe y sirve:** el stat `armadmg` («Armadura mágica»: un número fijo que se resta al daño de casteo, para personajes, creeps e
 invocaciones, ya restado en el mapa) — hoy ningún ítem del catálogo lo da. Propuesta: **es la misma pieza con otro nombre**, Defensa especial,
 y deja de ser escasa.

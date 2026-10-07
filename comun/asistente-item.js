@@ -475,12 +475,12 @@ const AsistenteItem = (() => {
 
     if(paso.id === 'orbe'){
       titulo('¿Qué hace el orbe?', 'Un orbe actúa <b>cada vez que se usa una varita o un báculo</b> con él en la otra mano. Los bonos que dé mientras se lleva (luz, visión…) van en el paso siguiente.');
-      h += campo('🛡 Resguardo: Escudo especial', `<input data-aa-orbe1="orbeResguardo" type="number" step="1" min="0" value="${Math.round(n(d.orbeResguardo)) || 0}" style="max-width:110px">`,
-        'Una vez por turno, al usar una varita: Escudo especial de este valor hasta tu próximo turno. 0 = no.');
+      h += campo('🛡 Resguardo: Vida extra', `<input data-aa-orbe1="orbeResguardo" type="number" step="1" min="0" value="${Math.round(n(d.orbeResguardo)) || 0}" style="max-width:110px">`,
+        'Una vez por turno, al usar una varita: Vida extra de este valor hasta tu próximo turno. 0 = no.');
       h += campo('🎲 Salvaje', `<select data-aa-orbe1="orbeSalvaje" style="max-width:360px"><option value="">no</option><option value="si"${d.orbeSalvaje === true ? ' selected' : ''}>salvaje: con 1 te hace 1 de daño; con 6, el efecto sale doble</option><option value="domado"${d.orbeSalvaje === 'domado' ? ' selected' : ''}>domado: con 1 no pasa nada; con 5 o 6, el efecto sale doble</option></select>`,
         'Al usar una varita se tira 1d6.');
-      h += campo('🛡 Custodio: Escudo especial a un aliado', `<input data-aa-orbe1="orbeCustodio" type="number" step="1" min="0" value="${Math.round(n(d.orbeCustodio)) || 0}" style="max-width:110px">`,
-        'Una vez por turno, al usar una varita: un aliado al lado tuyo recibe Escudo especial de este valor hasta su próximo turno. 0 = no.');
+      h += campo('🛡 Custodio: Vida extra a un aliado', `<input data-aa-orbe1="orbeCustodio" type="number" step="1" min="0" value="${Math.round(n(d.orbeCustodio)) || 0}" style="max-width:110px">`,
+        'Una vez por turno, al usar una varita: un aliado al lado tuyo recibe Vida extra de este valor hasta su próximo turno. 0 = no.');
       h += campo('💧 Absorción: SP que devuelve', `<input data-aa-orbe1="orbeAbsorcion" type="number" step="1" min="0" value="${Math.round(n(d.orbeAbsorcion)) || 0}" style="max-width:110px">`,
         'Cuando te entra daño mágico o elemental, recuperás estos SP (una vez por turno). 0 = no.');
       h += efecto(`<span id="aa-orbe">${orbeHtml(d)}</span>`);
@@ -618,7 +618,7 @@ const AsistenteItem = (() => {
           + fila('Qué hace ✨', d.especial.duelo ? e(ejecucionLineas(d.especial.duelo).join(' · ')) : 'sin Ejecución')
           + (d.especial.trampaColocar ? fila('Trampa', e(trampaTxt(d.especial.trampaColocar))) : '')
           + (aManoTxt(d.especial) ? fila('✋ A mano', e(aManoTxt(d.especial))) : '') : ''}
-        ${esOrbe(d) ? fila('Clase', '🔮 orbe') + fila('Al usar una varita', e([n(d.orbeResguardo) ? `Escudo especial ${Math.round(n(d.orbeResguardo))} (1 vez por turno)` : '', d.orbeSalvaje ? (d.orbeSalvaje === 'domado' ? '1d6 domado' : '1d6 salvaje') : '', n(d.orbeCustodio) ? `Escudo especial ${Math.round(n(d.orbeCustodio))} a un aliado al lado` : ''].filter(Boolean).join(' · ') || 'nada'))
+        ${esOrbe(d) ? fila('Clase', '🔮 orbe') + fila('Al usar una varita', e([n(d.orbeResguardo) ? `Vida extra ${Math.round(n(d.orbeResguardo))} (1 vez por turno)` : '', d.orbeSalvaje ? (d.orbeSalvaje === 'domado' ? '1d6 domado' : '1d6 salvaje') : '', n(d.orbeCustodio) ? `Vida extra ${Math.round(n(d.orbeCustodio))} a un aliado al lado` : ''].filter(Boolean).join(' · ') || 'nada'))
           + (n(d.orbeAbsorcion) ? fila('Absorción', e(`+${Math.round(n(d.orbeAbsorcion))} SP al recibir daño mágico o elemental (1 vez por turno)`)) : '') : ''}
         ${g === 'arma' && !esEspecial(d) ? fila('Tipo', e(`Tipo ${tipo} · ${TIPOS[tipo].nombre}`)) + fila('Distancia', d.armaDeRango ? 'a distancia (no suma Dmg)' : 'cuerpo a cuerpo')
           + fila('Daño', e(danoTxt(d))) + fila('Atacar', `${primer(tipo)} No2 el primero, ${tipo} los siguientes`)
@@ -641,7 +641,7 @@ const AsistenteItem = (() => {
     return {h, ayuda};
   }
 
-  const orbeHtml = d => n(d.orbeResguardo) || d.orbeSalvaje || n(d.orbeCustodio) || n(d.orbeAbsorcion) ? `⚙ Automatizado: ${[n(d.orbeResguardo) ? `Escudo especial ${Math.round(n(d.orbeResguardo))}, una vez por turno` : '', d.orbeSalvaje ? `la tirada de 1d6 y los dados del daño ×2 con ${d.orbeSalvaje === 'domado' ? 'un 5 o un 6' : 'un 6'} (el doble de un arma sin daño, a mano)` : '', n(d.orbeCustodio) ? `el Escudo especial ${Math.round(n(d.orbeCustodio))} al aliado (si hay varios al lado, se elige)` : '', n(d.orbeAbsorcion) ? `los ${Math.round(n(d.orbeAbsorcion))} SP del daño mágico o elemental` : ''].filter(Boolean).join('; ')}.` : 'Sin efecto al usar una varita: solo sus bonos (si tiene).';
+  const orbeHtml = d => n(d.orbeResguardo) || d.orbeSalvaje || n(d.orbeCustodio) || n(d.orbeAbsorcion) ? `⚙ Automatizado: ${[n(d.orbeResguardo) ? `Vida extra ${Math.round(n(d.orbeResguardo))}, una vez por turno` : '', d.orbeSalvaje ? `la tirada de 1d6 y los dados del daño ×2 con ${d.orbeSalvaje === 'domado' ? 'un 5 o un 6' : 'un 6'} (el doble de un arma sin daño, a mano)` : '', n(d.orbeCustodio) ? `la Vida extra ${Math.round(n(d.orbeCustodio))} al aliado (si hay varios al lado, se elige)` : '', n(d.orbeAbsorcion) ? `los ${Math.round(n(d.orbeAbsorcion))} SP del daño mágico o elemental` : ''].filter(Boolean).join('; ')}.` : 'Sin efecto al usar una varita: solo sus bonos (si tiene).';
   const aManoTxt = es => { const a = es && es.aMano; return a ? [String(a.texto || '').trim(), String(a.tirada || '').trim() ? `tira ${String(a.tirada).trim()}` : ''].filter(Boolean).join(' · ') : ''; };
   const tiradaValida = t => { const x = String(t || '').replace(/\s+/g, ''); return !x || (typeof parseDados === 'function' ? !!parseDados(x) : /^\d*d\d+([+-]\d+)?$/i.test(x)); };
   function amanoHtml(){

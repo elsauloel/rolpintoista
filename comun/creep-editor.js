@@ -606,7 +606,7 @@ const CreepEditor = (() => {
         <div class="mini-f"><label>HP por turno (por stack)</label><input type="number" data-ec="hpturno" value="0"></div>
         <div class="mini-f"><label>Stacks</label><input type="number" data-ec="stacks" min="1" value="1"></div>
         <div class="mini-f"><label>Stacks por turno</label><input type="number" data-ec="stacksturno" value="0"></div>
-        <div class="mini-f"><label>Escudo especial (HP secundario, se recarga cada Mantenimiento)</label><input type="number" data-ec="escudomagico" min="0" value="0"></div>
+        <div class="mini-f"><label>Vida extra de base (se renueva cada Mantenimiento)</label><input type="number" data-ec="escudomagico" min="0" value="0"></div>
       </div>
     </div>
     <div class="ec-paso" data-ec-paso="numeros">

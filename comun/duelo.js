@@ -460,7 +460,7 @@ const Duelo = (() => {
     if(_num(s.hp)) o.hp = _num(s.hp);
     if(s.polaridad === 'buff' || s.polaridad === 'debuff') o.polaridad = s.polaridad;
     if(_num(s.stacks)) o.stacks = Math.max(1, Math.round(_num(s.stacks)));
-    // Escudo (2026-09-28, pedido del dueño): un efecto de la habilidad puede dar un escudo especial (Blindaje,
+    // Escudo (2026-09-28, pedido del dueño): un efecto de la habilidad puede dar una vida extra (Blindaje,
     // Barrera…) en vez de (o además de) un debuff — ver EstadosAplicar.BUFFS y el paso «Efectos» del 🎯.
     if(_num(s.escudoMagico)) o.escudoMagico = Math.max(0, Math.round(_num(s.escudoMagico)));
     return o;
@@ -992,7 +992,7 @@ const Duelo = (() => {
       else L.push(`Daño: ${dn.crudo} − Defensa ${dn.defensa}${dn.freno ? ` − ${dn.freno}` : ''} = ${dn.recibido} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
     }
     if(dn && dn.magico) L.push(`Daño de ${dn.magico.tipo}: ${dn.magico.total} (${dn.magico.formula}; ignora la Defensa, sin multiplicar)${dn.magico.recibido !== undefined ? ` → recibió ${dn.magico.recibido}` : ''}${dn.magico.hpDespues !== undefined ? ` (${dn.magico.hpAntes} → ${dn.magico.hpDespues} HP)` : ''}`);
-    if(dn && dn.drena) L.push(`Drena: ${dn.drena.quien || d.atacante.nombre} se cura ${dn.drena.monto}${dn.drena.manual ? ` (a mano${dn.drena.motivo ? ': ' + dn.drena.motivo : ''})` : `${dn.drena.hpAntes !== undefined && dn.drena.hpAntes !== null ? ` (${dn.drena.hpAntes} → ${dn.drena.hpDespues} HP)` : ''}${_num(dn.drena.excedente) ? ` · Excedente de vida ${dn.drena.excedente}` : ''}${dn.drena.nota ? ' · ' + dn.drena.nota : ''}`}`);
+    if(dn && dn.drena) L.push(`Drena: ${dn.drena.quien || d.atacante.nombre} se cura ${dn.drena.monto}${dn.drena.manual ? ` (a mano${dn.drena.motivo ? ': ' + dn.drena.motivo : ''})` : `${dn.drena.hpAntes !== undefined && dn.drena.hpAntes !== null ? ` (${dn.drena.hpAntes} → ${dn.drena.hpDespues} HP)` : ''}${_num(dn.drena.excedente) ? ` · Vida extra ${dn.drena.excedente}` : ''}${dn.drena.nota ? ' · ' + dn.drena.nota : ''}`}`);
     if(dn && dn.espinas) L.push(`Espinas: ${dn.espinas.quien || d.atacante.nombre} recibe ${dn.espinas.monto} de daño devuelto${dn.espinas.manual ? ' (a mano)' : dn.espinas.hpAntes !== undefined && dn.espinas.hpAntes !== null ? ` (${dn.espinas.hpAntes} → ${dn.espinas.hpDespues} HP)` : ''}`);
     if(d.resultado === 'mitad') L.push(`Durabilidad: ${d.defensa && d.defensa.itemNombre ? d.defensa.itemNombre : 'el objeto que bloqueó'} pierde 1 punto`);
     (d.efectos || []).forEach(ef => {
@@ -1544,7 +1544,7 @@ const Duelo = (() => {
         const vida = dn.hpAntes !== undefined && dn.hpAntes !== null && dn.hpDespues !== undefined && dn.hpDespues !== null
           ? `<div class="duelo-mini">${_esc(d.defensor.nombre)}: <b>${_fmt(dn.hpAntes)}</b> → <b>${_fmt(dn.hpDespues)}</b> HP${_num(dn.absorbido) ? ` · el escudo absorbió ${_fmt(dn.absorbido)}` : ''}</div>` : '';
         const esp = dn.espinas ? `<div class="duelo-mini" style="color:#8fe3a9">🌵 Espinas: ${_esc(dn.espinas.quien || d.atacante.nombre)} recibe <b>${_fmt(dn.espinas.monto)}</b> de daño devuelto (1/4 del daño del golpe, directo a la vida)${dn.espinas.manual ? ' — <b>aplicalo a mano</b>' + (dn.espinas.motivo ? ' (' + _esc(dn.espinas.motivo) + ')' : '') : (dn.espinas.hpAntes !== undefined && dn.espinas.hpAntes !== null ? ` · ${_fmt(dn.espinas.hpAntes)} → ${_fmt(dn.espinas.hpDespues)} HP` : '')}</div>` : '';
-        const dr = dn.drena ? `<div class="duelo-mini" style="color:#8fe3a9">🩸 Drena: ${_esc(dn.drena.quien || d.atacante.nombre)} se cura <b>${_fmt(dn.drena.monto)}</b>${dn.drena.manual ? ' — <b>aplicalo a mano</b>' + (dn.drena.motivo ? ' (' + _esc(dn.drena.motivo) + ')' : '') : `${dn.drena.hpAntes !== undefined && dn.drena.hpAntes !== null ? ` · ${_fmt(dn.drena.hpAntes)} → ${_fmt(dn.drena.hpDespues)} HP` : ''}${_num(dn.drena.excedente) ? ` · Excedente de vida ${_fmt(dn.drena.excedente)}` : ''}${dn.drena.nota ? ' · ' + _esc(dn.drena.nota) : ''}`}</div>` : '';
+        const dr = dn.drena ? `<div class="duelo-mini" style="color:#8fe3a9">🩸 Drena: ${_esc(dn.drena.quien || d.atacante.nombre)} se cura <b>${_fmt(dn.drena.monto)}</b>${dn.drena.manual ? ' — <b>aplicalo a mano</b>' + (dn.drena.motivo ? ' (' + _esc(dn.drena.motivo) + ')' : '') : `${dn.drena.hpAntes !== undefined && dn.drena.hpAntes !== null ? ` · ${_fmt(dn.drena.hpAntes)} → ${_fmt(dn.drena.hpDespues)} HP` : ''}${_num(dn.drena.excedente) ? ` · Vida extra ${_fmt(dn.drena.excedente)}` : ''}${dn.drena.nota ? ' · ' + _esc(dn.drena.nota) : ''}`}</div>` : '';
         const mg = dn.magico ? `<div class="duelo-mini" style="color:#9cc7ff">⚡ Daño de ${_esc(dn.magico.tipo)}: <b>${_fmt(dn.magico.total)}</b> (${_esc(dn.magico.formula || '')}) · ignora la Defensa, sin multiplicar${dn.magico.recibido !== undefined ? ` · recibió <b>${_fmt(dn.magico.recibido)}</b>` : ''}${dn.magico.hpDespues !== undefined ? ` · ${_fmt(dn.magico.hpAntes)} → ${_fmt(dn.magico.hpDespues)} HP` : ''}</div>` : '';
         cuerpo = tiro + `<div class="duelo-danobox${dn.ignoraDef ? ' crit' : ''}">${grande}</div>${vida}${mg}${esp}${dr}`;
       }

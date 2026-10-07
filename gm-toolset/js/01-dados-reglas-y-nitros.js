@@ -220,7 +220,7 @@ function creepDefensaEfectiva(sc){ return CreepCalculo.defensaEfectiva(sc); }
 // defecto) — solo la dan ítems Raros o mejores, vía sus bonos genéricos
 // (no tiene un campo propio como "def" en las piezas de armadura). Protege
 // el daño de casteo que "ignora la Defensa" (Paso 1); no tiene nada que ver
-// con Escudo especial ni con la habilidad "Armadura arcana" del Mago.
+// con Vida extra ni con la habilidad "Armadura arcana" del Mago.
 function creepArmadmgEfectiva(sc){ return CreepCalculo.armadmgEfectiva(sc); }
 function armadmgOrigenTxt(sc){ return CreepCalculo.armadmgOrigenTxt(sc); }
 function creepCritEfectivo(sc, i){ return CreepCalculo.critEfectivo(sc, i); }
@@ -366,7 +366,7 @@ function aplicarDanioCreep(input){
   let recibido = Math.max(0, golpe - defensa);
 
   const capas = activos.filter(e => (e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) && num(e.escudoMagicoActual ?? e.escudoMagico) > 0)
-    .sort((a, b) => (a.excedenteVida ? 1 : 0) - (b.excedenteVida ? 1 : 0));   // primero los escudos, al final el excedente de vida
+    .sort((a, b) => (a.excedenteVida ? 1 : 0) - (b.excedenteVida ? 1 : 0));   // primero los escudos, al final la vida extra
   let absorbido = 0;
   const detalleAbs = [];
   capas.forEach(c => {

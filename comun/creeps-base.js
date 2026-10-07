@@ -44,8 +44,8 @@
   const tr = (nombre, detalle, no2, codigo) => ({nombre, detalle, no2, trampa: codigo});
   const ts = (nombre, detalle, no2) => ({nombre, detalle, no2, colocar: true});   // trampa sin daño (alarma, red…)   // trampa: {T} en la descripción = su daño según el nivel
   const mecEtiquetas = (...sps) => { const t = []; sps.forEach(x => { if(x.trampa || /trampa/i.test(x.detalle)) t.push('trampas'); if(x.efecto && x.efecto.nombre === 'Sigilo') t.push('sigilo'); }); return [...new Set(t)]; };
-  const dx = (nombre, detalle, no2, dano, k) => ({nombre, detalle, no2, dano, efecto: {nombre: 'Excedente de vida', polaridad: 'buff', turnos: 0, excK: k}});   // tira daño y gana k × nivel de Excedente de vida
-  const ex = (nombre, detalle, no2, k) => ({nombre, detalle, no2, efecto: {nombre: 'Excedente de vida', polaridad: 'buff', turnos: 0, excK: k}});                 // gana k × nivel de Excedente de vida (HP sobre el máximo, sin tope ni recarga)
+  const dx = (nombre, detalle, no2, dano, k) => ({nombre, detalle, no2, dano, efecto: {nombre: 'Vida extra', polaridad: 'buff', turnos: 0, excK: k}});   // tira daño y gana k × nivel de Vida extra
+  const ex = (nombre, detalle, no2, k) => ({nombre, detalle, no2, efecto: {nombre: 'Vida extra', polaridad: 'buff', turnos: 0, excK: k}});                 // gana k × nivel de Vida extra (HP sobre el máximo, sin tope ni recarga)
   const dc = (nombre, detalle, no2, dano, k) => ({nombre, detalle, no2, dano, cura: k});   // tira daño y se cura k × nivel                  // cura k × nivel
 
   function danoTxt(d, n){ return d === 'L' ? `1d6+${n}` : d === 'M' ? `2d6+${n}` : `3d6+${n + 1}`; }
@@ -121,7 +121,7 @@
       const m = Object.keys(mods).map(k => `${mods[k] > 0 ? '+' : ''}${mods[k]} ${MOD_TXT[k] || k}`).join(', ');
       const dur = ef.turnos ? ` durante ${ef.turnos} turno${ef.turnos === 1 ? '' : 's'}` : ' hasta que se lo saquen';
       const hp = ef.hp ? `; ${ef.hp > 0 ? 'recupera' : 'pierde'} ${Math.abs(ef.hp)} HP por turno` : '';
-      if(ef.excK) auto.push(`gana ${ef.excK * n} HP de Excedente de vida (HP sobre el máximo, sin tope ni recarga; se acumula)`);
+      if(ef.excK) auto.push(`gana ${ef.excK * n} HP de Vida extra (HP sobre el máximo, sin tope ni recarga; se acumula)`);
       else auto.push(ef.nombre ? `queda con el estado ${ef.nombre}${m ? ' (' + m + ')' : ''}${dur}${hp}` : `se aplica a sí mismo ${m}${dur}`);
     }
     if(sp.trampa !== undefined || sp.colocar){
@@ -160,7 +160,7 @@
     if(sp.efecto){
       h.efectoNombre = sp.efecto.nombre || sp.nombre; h.efectoTurnos = sp.efecto.turnos; h.efectoStacks = 1; h.efectoPolaridad = sp.efecto.polaridad || 'buff';
       if(sp.efecto.hp) h.efectoHpTurno = sp.efecto.hp;
-      if(sp.efecto.excK) h.efectoEscudo = sp.efecto.excK * n;   // Excedente de vida: HP que suma (se acumula con el que ya tenga)
+      if(sp.efecto.excK) h.efectoEscudo = sp.efecto.excK * n;   // Vida extra: HP que suma (se acumula con el que ya tenga)
       h.efectoDetalle = sinEtiqueta(textoHab(sp, n));
       h.efectoMods = Object.keys(sp.efecto.mods || {}).map(stat => ({stat, val: sp.efecto.mods[stat]}));
     }
@@ -859,7 +859,7 @@
 
   /* ================= TRIBUS Y CLANES (2026-09-21): más variedad de kobolds, goblins y hombres cabra =================
      Cada uno con un rol distinto y mecánicas del juego distintas: sigilo, trampas (con y sin daño), estados propios
-     (Espinas, Regeneración, Blindado, Escudo especial, Inmunidad a CC, Hypeado, Afortunado) y estados sobre otros que se
+     (Espinas, Regeneración, Blindado, Vida extra, Inmunidad a CC, Hypeado, Afortunado) y estados sobre otros que se
      aplican solos (Veneno, Quemado, Rengo, Cegado, Pajaritos, Inmovilizado, Stun, Armadura rota, Maldito…). */
   // Un ataque o habilidad que además deja un estado sobre el objetivo (se aplica solo al usarla, o al pisar la trampa).
   const ap = (sp, estado) => ({...sp, aplica: estado});
@@ -915,7 +915,7 @@
     'Manda con un látigo y con un chillido que se oye en toda la galería.', KB);
   cr('minas', 4, 'Kobold devoto del dragón', 'apoyo', 'humanoide', 'Cetro de escama',
     bu('Escamas de fe', 'Reza a su dragón: +3 Res.Esp hasta el final de su turno.', 1, {resmg: 3}, 1),
-    [es('Bendición escamosa', 'Una barrera mágica en forma de escamas absorbe daño de cualquier fuente.', 3, 'Escudo especial', 'buff', 3), 5],
+    [es('Bendición escamosa', 'Una barrera mágica en forma de escamas absorbe daño de cualquier fuente.', 3, 'Vida extra', 'buff', 3), 5],
     'Reza tan fuerte que a veces le contestan.', KB);
 
   cr('minas', 5, 'Kobold guardia real', 'tanque', 'humanoide', 'Alabarda de cobre',
@@ -1433,7 +1433,7 @@
   const NM = ['no-muerto', 'cripta'];
   const MIEDO3 = () => tercera(ap(ta('Chillido del hambre', 'Un alarido que hiela: el objetivo queda con Miedo 2 turnos (−2 PdG y −2 Daño; no puede acercarse a quien lo asustó, a mano).', 2), A('Miedo', 2)), 4);
   const PESTE3 = () => tercera(ta('Aura de pestilencia', 'Un hedor que enferma: los enemigos adyacentes al empezar su turno pierden 1 No2 (a mano, lo aplica el GM).', 1), 4);
-  const COSECHA3 = () => tercera(dx('Cosecha de almas', 'Arranca un jirón de alma: daño y gana Excedente de vida.', 3, 'M', 1), 5);
+  const COSECHA3 = () => tercera(dx('Cosecha de almas', 'Arranca un jirón de alma: daño y gana Vida extra.', 3, 'M', 1), 5);
   Object.assign(TROFEOS, {'Esqueleto corredor': 'Tibia veloz', 'Zombi de la cripta': 'Dedo hinchado', 'Sabueso espectral': 'Colmillo de niebla', 'Ghoul devorador': 'Garra de ghoul',
     'Armadura vacía': 'Guantelete oxidado', 'Caballero de la cripta': 'Escudo de huesos', 'Acólito de huesos': 'Cuenco de huesos', 'Nigromante aprendiz': 'Libro de ceniza',
     'Arquero esquelético': 'Cuerda de tendón', 'Cazador de almas': 'Flecha de alma', 'Sepulturero': 'Pala de sepulcro', 'Plañidera': 'Velo de lágrimas',
@@ -1445,7 +1445,7 @@
     'Camina hasta que se le acaba el cuerpo, no las ganas.', NM);
   cr('cripta', 4, 'Ghoul devorador', 'brutal', 'no-muerto', 'Garras de ghoul',
     ap(at('Zarpazo desgarrador', 'Garras que abren la carne: el objetivo queda Sangrando.', 'M'), A('Sangrado')),
-    [dx('Devorar', 'Muerde y se alimenta: daño y gana Excedente de vida.', 2, 'H', 1), 4],
+    [dx('Devorar', 'Muerde y se alimenta: daño y gana Vida extra.', 2, 'H', 1), 4],
     'Siempre tiene hambre, y siempre se sirve primero.', NM); MIEDO3();
   // --- Asalto ---
   cr('cripta', 1, 'Esqueleto corredor', 'rapido', 'no-muerto', 'Costillar afilado',
@@ -1463,7 +1463,7 @@
     'No hay nadie adentro, pero alguien sigue mandando.', NM);
   cr('cripta', 5, 'Caballero de la cripta', 'tanque', 'no-muerto', 'Mandoble sepulcral',
     at('Tajo sepulcral', 'Un tajo que huele a tierra vieja.', 'H'),
-    [ex('Coraza de huesos', 'Los huesos de los caídos lo cubren: gana Excedente de vida.', 2, 4), 5],
+    [ex('Coraza de huesos', 'Los huesos de los caídos lo cubren: gana Vida extra.', 2, 4), 5],
     'Jura lealtad a un rey que se pudrió hace siglos.', NM); PESTE3();
   // --- Mágicos ---
   cr('cripta', 2, 'Acólito de huesos', 'mago', 'no-muerto', 'Vara de fémur',
@@ -1472,7 +1472,7 @@
     'Reza a dioses que ya no responden.', NM);
   cr('cripta', 4, 'Nigromante aprendiz', 'mago', 'no-muerto', 'Bastón de ceniza',
     zo('Bola de ceniza', 'Una bola de ceniza fría que quema por dentro.', 2, 'M'),
-    [dx('Absorber vida', 'Chupa la vida del objetivo: daño y gana Excedente de vida.', 3, 'M', 2), 4],
+    [dx('Absorber vida', 'Chupa la vida del objetivo: daño y gana Vida extra.', 3, 'M', 2), 4],
     'Todavía practica con lo que le queda de vivo.', NM); MIEDO3();
   // --- Rango ---
   cr('cripta', 1, 'Arquero esquelético', 'rango', 'no-muerto', 'Arco de tendón',
@@ -1490,7 +1490,7 @@
     'Llora por todos, incluso por quien la mató.', NM);
   cr('cripta', 3, 'Sepulturero', 'apoyo', 'no-muerto', 'Pala de sepulcro',
     at('Palazo', 'Un golpe seco con la pala.', 'M'),
-    [ex('Tierra fresca', 'Se cubre de tierra de tumba: gana Excedente de vida.', 2, 3), 4],
+    [ex('Tierra fresca', 'Se cubre de tierra de tumba: gana Vida extra.', 2, 3), 4],
     'Entierra a quien sea, incluso a los que todavía se mueven.', NM); PESTE3();
   // --- Debuffers ---
   cr('cripta', 1, 'Alma en pena', 'debuffer', 'no-muerto', 'Toque helado',

@@ -7,7 +7,7 @@
    - `encolarPj({fichaId, duenoUid, spec, origen})`: para un personaje NO se escribe en su ficha desde afuera: se deja un
      aviso en campanas/<id>/estados y la ficha del dueño lo aplica sola, una vez (mismo mecanismo que las recompensas).
    spec = {nombre, turnos?, mods?: [{stat, val}], hp?, detalle?, polaridad?}. Si el nombre es el de un preset de
-   `comun/estados-presets.js` (Veneno, Sangrado, Stun, Escudo especial…) se usa ese preset con sus marcas; si no, es
+   `comun/estados-presets.js` (Veneno, Sangrado, Stun, Vida extra…) se usa ese preset con sus marcas; si no, es
    un estado propio con lo que traiga la spec.
    Aplicar sobre el rival sigue pasando por una decisión del GM (elegir a quién le pegó) o por una trampa que alguien pisó.
    ========================================================= */
@@ -15,7 +15,7 @@ const EstadosAplicar = (() => {
   const id = () => Math.random().toString(36).slice(2, 9);
   // Los presets salen de la lista única de `comun/estados-presets.js` (se carga antes que este archivo), en la forma
   // de un creep. DEBUFFS son los que se le ponen a un rival (habilidades de creep, trampas, zonas); BUFFS, los que se da
-  // uno mismo o a un aliado desde el paso «Efectos» de la Ejecución (Escudo especial, Barrera, Invulnerable…).
+  // uno mismo o a un aliado desde el paso «Efectos» de la Ejecución (Vida extra, Barrera, Invulnerable…).
   // `escudoMagico` es el mismo campo que entiende el resto del juego (HUD del mapa, chip de la ficha): una barra
   // secundaria que absorbe daño antes que el HP real.
   const TODOS = typeof estadosPresetCreep === 'function' ? estadosPresetCreep() : [];
@@ -33,7 +33,7 @@ const EstadosAplicar = (() => {
     if(s.polaridad) out.polaridad = s.polaridad;
     if(s.item) out.item = String(s.item).slice(0, 64);   // el ítem al que se le da el desgaste (nombre: 'Desgaste')
     if(s.stacks) out.stacks = Math.max(1, Math.min(20, Math.round(Number(s.stacks) || 1)));
-    // Escudo especial (2026-09-28): HP de una barra secundaria que absorbe daño antes que el HP real —
+    // Vida extra (2026-09-28): HP de una barra secundaria que absorbe daño antes que el HP real —
     // ver BUFFS. Un valor explícito manda sobre el del preset (se resuelve en `componer`).
     if(s.escudoMagico) out.escudoMagico = Math.max(0, Math.round(Number(s.escudoMagico) || 0));
     if(s.sentadoEnCero) out.sentadoEnCero = true;

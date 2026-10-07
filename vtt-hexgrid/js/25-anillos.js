@@ -1,7 +1,7 @@
 // js/25-anillos.js — los anillos Comunes con efecto de combate (2026-10-06, dueño). Va después del arranque: solo define funciones y un reloj.
 /* Lo que pasa al empezar y al terminar un combate (el mapa pasa a modo combate / vuelve a narrativo), para lo que maneja cada pantalla (sus
    personajes; el GM, los creeps):
-   · Al empezar: **Cáscara protectora** (`cascara` N: un Escudo especial de N que no se recarga y dura el combate), **Cambiante** (`cambiante` N:
+   · Al empezar: **Cáscara protectora** (`cascara` N: una Vida extra de N que no se recarga y dura el combate), **Cambiante** (`cambiante` N:
      se elige en un cartel Res. fuego, hielo o rayo +N) y los anillos de atributo (**Fuerza del Toro**, **Manos Ligeras**, **Clarividencia**, **Piel de
      Roble**: `impulsofue/des/esp/con`, un estado con un botón como el de la Polilla — +2 a tu última tirada de ese atributo, una vez por combate).
      Se marca `anillosDados` (en la ficha o el creep) para no repetirlo.
@@ -62,7 +62,7 @@ async function anillosEmpezar(id, t, d){
       obj.anillosDados = true;
       const c = d.v('cascara');
       if(c > 0){ lista.push({id: anillosId(), nombre: 'Cáscara protectora', polaridad: 'buff', activo: true, permanente: true, anillo: true, sinRecarga: true,
-        escudoMagico: c, escudoMagicoActual: c, detalle: `Escudo especial de ${c} que no se recarga: dura hasta que termine el combate.`}); lineas.push(`Cáscara protectora: Escudo especial ${c}`); }
+        escudoMagico: c, escudoMagicoActual: c, detalle: `Vida extra de ${c} que no se recarga: dura hasta que termine el combate.`}); lineas.push(`Cáscara protectora: Vida extra ${c}`); }
       if(el){ const e = Combatiente.ELEMENTOS[el]; lista.push({id: anillosId(), nombre: `Cambiante (${e.etq.replace('Res. ', '')})`, polaridad: 'buff', activo: true, permanente: true, anillo: true,
         mods: [{stat: 'res' + el, val: n}], detalle: `${e.etq} +${n} durante este combate.`}); lineas.push(`Cambiante: ${e.etq} +${n}`); }
       Object.entries(ANILLO_ATRIB).forEach(([st, a]) => {

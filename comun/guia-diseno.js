@@ -44,7 +44,7 @@ const GuiaDiseno = (() => {
     {id: 'tanque', ico: '🛡️', n: 'Tanque', resumen: 'Aguanta el daño, protege y controla el espacio.',
       idea: 'El Tanque absorbe: escudos, curación propia, resistencias temporales y espinas. También empuja o derriba (Sentado) y obliga a los enemigos a mirarlo.',
       m: [
-        {n: 'Escudos y absorción', d: 'Una barra de HP extra que absorbe el próximo daño (Barrera / Escudo especial).', ej: 'Blindaje', e: 'auto'},
+        {n: 'Escudos y absorción', d: 'Una barra de HP extra que absorbe el próximo daño (Barrera / Vida extra).', ej: 'Blindaje', e: 'auto'},
         {n: 'Devolver daño', d: 'Estado que hace daño a quien lo golpea cuerpo a cuerpo.', ej: 'Aura de espinas', e: 'auto'},
         {n: 'Curación propia', d: 'Curarse un número fijo pagando SP y No2.', ej: 'Recuperación', e: 'auto'},
         {n: 'Control con el cuerpo', d: 'Ondas y embestidas que empujan o dejan Sentado al rival.', ej: 'Shockwave, Sonic Boom, Takle', e: 'auto'},
@@ -88,7 +88,7 @@ const GuiaDiseno = (() => {
         {n: 'Maldiciones de tiradas', d: 'Bajar todas las tiradas del rival o cansarlo por unos turnos.', ej: 'Maldición debilitante, extenuante, tormentosa', e: 'mano'},
         {n: 'Controlar decisiones', d: 'Obligar a repetir una tirada o hacer que el rival actúe al azar.', ej: 'Enyetar, Confusión', e: 'mano'},
         {n: 'Venenos y áreas', d: 'Aplicar stacks de Veneno, sobre uno o en un área.', ej: 'Veneno, Nube tóxica', e: 'auto'},
-        {n: 'Sangre y vida', d: 'Gastar HP propio para dañar, drenar la vida del rival o transferirla. Drenar puede dejarte con más HP que tu máximo: para eso está el estado Excedente de vida.', ej: 'Drenar vida, Balas de sangre, Transfusión', e: 'auto'},
+        {n: 'Sangre y vida', d: 'Gastar HP propio para dañar, drenar la vida del rival o transferirla. Drenar puede dejarte con más HP que tu máximo: para eso está el estado Vida extra.', ej: 'Drenar vida, Balas de sangre, Transfusión', e: 'auto'},
       ]},
   ];
 
@@ -124,7 +124,7 @@ const GuiaDiseno = (() => {
     {n: 'Derribar', d: 'El objetivo cae al suelo (queda Sentado: Evasión a la mitad, no ataca hasta levantarse).', e: 'mano', casa: [], comp: ['contundente', 'hacha', 'explosivo'], peso: 2},
     {n: 'Explosión', d: 'El golpe estalla en flor de radio 1 o 2 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar). Es la razón de ser del Tipo 12: muy raro y circunstancial.', e: 'falta', casa: ['explosivo'], comp: [], peso: 6},
     {n: 'Prende fuego', d: 'Daño de fuego por turnos (elemental: va directo a la vida).', e: 'mano', casa: [], comp: ['explosivo', 'rango'], peso: 3},
-    {n: 'Drena vida', d: 'Te cura parte del daño que hacés (puede dejarte con Excedente de vida).', e: 'mano', casa: [], comp: ['cortante', 'punzante'], peso: 4},
+    {n: 'Drena vida', d: 'Te cura parte del daño que hacés (puede dejarte con Vida extra).', e: 'mano', casa: [], comp: ['cortante', 'punzante'], peso: 4},
   ];
   const ESTADOS = [
     ['Veneno', 'debuff', 'Pierde 1 HP por stack cada turno.'], ['Sangrado', 'debuff', 'Pierde HP por turno; se acumula.'],
@@ -135,8 +135,8 @@ const GuiaDiseno = (() => {
     ['Escarcha', 'debuff', '−1 a los No2 máximos.'], ['Sentado', 'debuff', 'Evasión a la mitad; no ataca.'],
     ['Regeneración', 'buff', 'Recupera HP por turno.'], ['Hypeado', 'buff', 'Bonos por emoción (ver el manual).'],
     ['Invulnerable', 'buff', 'Los golpes no hacen nada.'], ['Inmunidad a CC', 'buff', 'Ignora los controles.'],
-    ['Espinas', 'buff', 'Daña a quien lo golpea.'], ['Barrera / Escudo especial', 'buff', 'Barra de HP extra que se recarga.'],
-    ['Excedente de vida', 'buff', 'HP sobre el máximo, sin tope ni recarga.'], ['Afortunado', 'buff', 'Tira dos veces y elige la mejor.'],
+    ['Espinas', 'buff', 'Daña a quien lo golpea.'], ['Barrera / Vida extra', 'buff', 'Barra de HP extra que se recarga.'],
+    ['Vida extra', 'buff', 'HP sobre el máximo, sin tope ni recarga.'], ['Afortunado', 'buff', 'Tira dos veces y elige la mejor.'],
     ['Sangre pura', 'buff', 'Inmunidad a ciertos estados de sangre.'], ['Coagulación extrema', 'buff', 'Resiste el Sangrado.'],
     ['Blindado', 'buff', 'Defensa extra por un tiempo.'], ['Sigilo', 'buff', 'No te ven; te delata el cono de un rival.'],
   ];

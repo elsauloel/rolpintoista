@@ -179,7 +179,7 @@ prueba('Invulnerable bloquea un debuff', () => {
 });
 prueba('un jefe es inmune a Stun', () => igual(EstadosAplicar.aplicarACreep({estados: [], jefe: true}, {nombre: 'Stun'}).motivo, 'Protección de jefe'));
 prueba('estado propio con escudo queda como buff', () => igual(EstadosAplicar.componer({nombre: 'Blindaje improvisado', escudoMagico: 6}).polaridad, 'buff'));
-prueba('texto de un estado con turnos y escudo', () => igual(EstadosAplicar.texto({nombre: 'Escudo especial', turnos: 1, escudoMagico: 8}), 'Escudo especial (1 turno, 🛡8)'));
+prueba('texto de un estado con turnos y escudo', () => igual(EstadosAplicar.texto({nombre: 'Vida extra', turnos: 1, escudoMagico: 8}), 'Vida extra (1 turno, 🛡8)'));
 prueba('texto de un Veneno con stacks: ×3, sin los turnos del preset', () => igual(EstadosAplicar.texto({nombre: 'Veneno', stacks: 3}), 'Veneno ×3'));
 prueba('texto de un estado con bonos: con el nombre del stat que ve la mesa', () => igual(EstadosAplicar.texto({nombre: 'Piel resistente', turnos: 2, mods: [{stat: 'def', val: 5}, {stat: 'tipo1', val: 1}]}), 'Piel resistente (2 turnos, +5 ' + FichaCalculo.STAT_LABEL.def + ', +1 ' + FichaCalculo.STAT_LABEL.tipo1 + ')'));
 
@@ -203,7 +203,7 @@ prueba('el cartel de mitades coincide con la cuenta (Parálisis no aparece si ya
 prueba('escudo: número, +N, −N y «max N»', () => igual([
   Combatiente.escudoParsear('5', 8, 10), Combatiente.escudoParsear('+4', 8, 10), Combatiente.escudoParsear('−3', 8, 10), Combatiente.escudoParsear('max 6', 8, 10)],
   [{max: 10, actual: 5}, {max: 10, actual: 10}, {max: 10, actual: 5}, {max: 6, actual: 6}]));
-prueba('excedente de vida: sin tope ni «max»', () => igual([Combatiente.escudoParsear('+30', 5, null), Combatiente.escudoParsear('max 3', 5, null)], [{max: null, actual: 35}, null]));
+prueba('vida extra: sin tope ni «max»', () => igual([Combatiente.escudoParsear('+30', 5, null), Combatiente.escudoParsear('max 3', 5, null)], [{max: null, actual: 35}, null]));
 prueba('Veneno se acumula sumando stacks; Veneno severo no', () => {
   const l = [E({nombre: 'Veneno', esVeneno: true, stacks: 2, turnos: 2})];
   Combatiente.acumularVeneno(l, {nombre: 'Veneno', esVeneno: true, stacks: 3});
@@ -342,10 +342,12 @@ prueba('Invulnerable, Sangre pura y Coagulación frenan el daño por turno (no l
   const r = Combatiente.pasarTurnoEstados([E({nombre: 'Veneno', esVeneno: true, hpturno: -2, turnos: 2}), E({nombre: 'Sangre pura', sangrePura: true, permanente: true}), E({nombre: 'Regeneración', hpturno: 2, turnos: 2})], campF);
   igual(r.hp, 2);
 });
-prueba('el escudo especial se recarga; el Excedente de vida no', () => {
-  const es = [E({nombre: 'Escudo especial', escudoMagico: 8, escudoMagicoActual: 3, turnos: 2}), E({nombre: 'Excedente', escudoMagico: 5, escudoMagicoActual: 1, excedenteVida: true, permanente: true})];
+prueba('Vida extra (2026-10-07): es neta; solo se renueva la que el efecto marca con «recarga»; el preset viejo se encuentra por su nombre', () => {
+  const es = [E({nombre: 'Vida extra', escudoMagico: 8, escudoMagicoActual: 3, turnos: 2, excedenteVida: true, recarga: true}), E({nombre: 'Vida extra', escudoMagico: 5, escudoMagicoActual: 1, excedenteVida: true, permanente: true})];
   Combatiente.pasarTurnoEstados(es, campF);
-  igual([es[0].escudoMagicoActual, es[1].escudoMagicoActual], [8, 1]);
+  const p = n => estadosPresetFicha().find(x => x.nombre === n || (x.alias || []).includes(n));
+  igual([es[0].escudoMagicoActual, es[1].escudoMagicoActual, p('Escudo especial').nombre, p('Excedente de vida').nombre, p('Vida extra').excedenteVida],
+    [8, 1, 'Vida extra', 'Vida extra', true]);
 });
 prueba('vence al llegar a 0 turnos; el permanente sigue; el pausado no hace nada', () => {
   const r = Combatiente.pasarTurnoEstados([E({nombre: 'A', turnos: 1}), E({nombre: 'B', permanente: true}), {nombre: 'C', activo: false, turnos: 1, hpturno: -5}], campF);
@@ -387,7 +389,7 @@ prueba('la Ejecución: tirada personalizada, daño por X y textos a mano, igual 
     [{formula: '3d4', etq: 'Drenaje'}, '1d6+6', 'Drenás 3', 'RESMT', 'Xd4', '1d6', 'Drenás X', 'Nota']);
 });
 prueba('la Ejecución: efectos (estado, bono, escudo, cura); ataque con arma y Flash no son dirigidas', () => {
-  const r = Combatiente.habEjecucion({nombre: 'Blindaje'}, {objetivo: 'uno mismo', efectos: [{nombre: 'Escudo especial', escudo: 8, turnos: 1}, {nombre: 'Furia', stat: 'pdg', val: 2}, {cura: 5}]});
+  const r = Combatiente.habEjecucion({nombre: 'Blindaje'}, {objetivo: 'uno mismo', efectos: [{nombre: 'Vida extra', escudo: 8, turnos: 1}, {nombre: 'Furia', stat: 'pdg', val: 2}, {cura: 5}]});
   igual([r.alcance, r.tira, r.efectos[0].spec.escudoMagico, r.efectos[0].spec.polaridad, r.efectos[1].spec.mods, r.efectos[2].nombre, r.efectos[2].spec, r.efectos[2].cura,
     Combatiente.habEjecucion({}, {modo: 'arma'}), Combatiente.habEjecucion({}, {modo: 'flash'}), Combatiente.habEjecucion({}, null)],
     [0, null, 8, 'buff', [{stat: 'pdg', val: 2}], 'Curación', null, 5, null, null, null]);
@@ -512,8 +514,8 @@ prueba('Invulnerable activo bloquea un debuff del consumo (y lo dice)', () => {
 });
 prueba('el escudo y los stacks propios del ítem pisan a los del preset; reaplicar renueva (P132)', () => {
   const S = {catalogo: [], efectos: []};
-  FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Escudo especial', efectoEscudo: 6, efectoTurnos: 2}, presetsDePrueba);
-  const r2 = FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Escudo especial', efectoEscudo: 9, efectoTurnos: 2}, presetsDePrueba);
+  FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Vida extra', efectoEscudo: 6, efectoTurnos: 2}, presetsDePrueba);
+  const r2 = FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Vida extra', efectoEscudo: 9, efectoTurnos: 2}, presetsDePrueba);
   igual([S.efectos.length, r2.estado.escudoMagico, r2.estado.escudoMagicoActual], [1, 9, 9]);
 });
 prueba('el catálogo completado después manda sobre la copia que ya tenía el ítem (configEfectoDe)', () => {
@@ -727,8 +729,8 @@ prueba('la regeneración de una pasiva aparece como estado derivado; inactivos n
   const r = FichaResumen.resumen(S);
   igual(r.estados.map(e => [e.nombre, !!e.derivado]), [['Sangre de troll', true]]);
 });
-prueba('escudo con máximo, excedente de vida con tope y Armadura rota con sus stacks', () => {
-  const S = fichaBotonera({efectos: [{id: 'a', nombre: 'Escudo especial', escudoMagico: 8, escudoMagicoActual: 5}, {id: 'b', nombre: 'Excedente de vida', excedenteVida: true, escudoMagicoActual: 3, excedenteTope: 9}, {id: 'c', nombre: 'Armadura rota', armaduraRota: true, stacks: 2}]});
+prueba('escudo con máximo, vida extra con tope y Armadura rota con sus stacks', () => {
+  const S = fichaBotonera({efectos: [{id: 'a', nombre: 'Vida extra', escudoMagico: 8, escudoMagicoActual: 5}, {id: 'b', nombre: 'Vida extra', excedenteVida: true, escudoMagicoActual: 3, excedenteTope: 9}, {id: 'c', nombre: 'Armadura rota', armaduraRota: true, stacks: 2}]});
   const e = FichaResumen.resumen(S).estados;
   igual([e[0].escudo, e[0].escudoMax, e[1].excedente, e[1].tope, e[1].escudoMax, e[2].stacks], [5, 8, true, 9, undefined, 2]);
 });
@@ -1362,15 +1364,15 @@ prueba('P137: «no vence» lo decide la habilidad si lo marca, si no el estado (
   const r3 = FichaHabilidades.aplicarEfectoDeConsumo(S, {nombre: 'Capa', efectoNombre: 'Sigilo'}, estadosPresetFicha());
   igual([r1.estado.permanente, r2.estado.permanente, r3.estado.permanente], [true, false, true]);
 });
-prueba('P137: el Excedente de vida que da una habilidad reemplaza al que había, también en los creeps', () => {
-  const h = {id: 'd', nombre: 'Drenar', efectoNombre: 'Excedente de vida', efectoEscudo: 3};
+prueba('P137: la Vida extra que da una habilidad reemplaza al que había, también en los creeps', () => {
+  const h = {id: 'd', nombre: 'Drenar', efectoNombre: 'Vida extra', efectoEscudo: 3};
   const sc = creepPrueba({habilidades: [h]});
   CreepAcciones.efectoDeHab(sc, Object.assign({}, h, {efectoEscudo: 5}), estadosPresetCreep());
   const r = CreepAcciones.efectoDeHab(sc, h, estadosPresetCreep());
   const S = {catalogo: [], efectos: []};
   FichaHabilidades.aplicarEfectoDeConsumo(S, Object.assign({}, h, {efectoEscudo: 5}), estadosPresetFicha());
   const rf = FichaHabilidades.aplicarEfectoDeConsumo(S, h, estadosPresetFicha());
-  const exc = l => l.filter(e => e.nombre === 'Excedente de vida').map(e => [e.escudoMagico, e.escudoMagicoActual]);
+  const exc = l => l.filter(e => e.nombre === 'Vida extra').map(e => [e.escudoMagico, e.escudoMagicoActual]);
   igual([exc(sc.estados), exc(S.efectos), !!r.estado, !!rf.ok], [[[3, 3]], [[3, 3]], true, true]);
 });
 
@@ -2339,11 +2341,11 @@ prueba('✨ armas especiales, tercera tanda (2026-10-05): lo que queda en el sue
   const bola = hEj(cat('esp-varita-de-la-bola-de-fuego')), ven = Duelo.limpiarHab(hEj(cat('esp-varita-de-la-ventisca'))), est = Duelo.limpiarHab(hEj(cat('esp-varita-de-la-pua-de-hielo')));
   const pel = Duelo.limpiarHab(hEj(cat('esp-varita-de-la-pelea-cercana'))), gan = Duelo.limpiarHab(hEj(cat('esp-varita-del-gancho'))), mis = Duelo.limpiarHab(hEj(cat('esp-varita-de-misiles')));
   const mia = Combatiente.zonaDeHab({nombre: 'Miasma'}, cat('esp-varita-de-miasma').especial.duelo, {fichaId: 'f', tipo: 'pj'});
-  // El orbe de resguardo: Escudo especial 2, una sola vez por turno
+  // El orbe de resguardo: Vida extra 2, una sola vez por turno
   const S2 = FichaGuardado.normalizar({}).S; S2.nitros = 10; S2.inventario = [cat('esp-varita-arcana'), cat('esp-orbe-de-resguardo')];
   const ui = {toast: () => {}, cambio: () => {}, presets: estadosPresetFicha(), avisarSinNitros: () => {}, colocarTrampa: () => {}, terminar: () => {}, mesaHabilidad: () => {}, fijarHp: () => {}};
   FichaAcciones.usarArmaEspecial(S2, S2.inventario[0].id, false, ui); FichaAcciones.usarArmaEspecial(S2, S2.inventario[0].id, false, ui);
-  const esc = S2.efectos.filter(e => e.nombre === 'Escudo especial');
+  const esc = S2.efectos.filter(e => e.nombre === 'Vida extra');
   igual([bola.zonaQueda.dano, ven.zonaQueda.estado.nombre, ven.zonaQueda.contra, ven.zonaQueda.tiraValor, est.critTipo, pel.menosDistancia, gan.atrae, mis.reparte, [mia.zonaDano, mia.zonaDanoDif, mia.zonaTiraExtra],
     esc.length, esc[0] && esc[0].escudoMagico, esc[0] && esc[0].turnos],
     ['1d4', 'Sentado', 'rescc', 6, 4, true, {casillas: 2, contra: 'fue', tiraValor: 6}, {cada: '1d4', total: 2}, ['1d4', true, ''], 1, 2, 1]);
@@ -2365,7 +2367,7 @@ prueba('✨ armas especiales de un creep (2026-10-05): No2 como un personaje, el
   const h = CreepAcciones.habDeEspecialCreep(sc, varita);
   const p1 = CreepAcciones.usarEspecialCreep(sc, varita.id, ESTADOS_PRESET);
   const p2 = CreepAcciones.usarEspecialCreep(sc, varita.id, ESTADOS_PRESET);   // en espera: no se puede
-  const escudo = sc.estados.find(e => e.nombre === 'Escudo especial');
+  const escudo = sc.estados.find(e => e.nombre === 'Vida extra');
   const r = CreepAcciones.mantenimiento(sc), espera1 = (sc.esperaEspecial || {})[varita.id];
   CreepAcciones.mantenimiento(sc);
   igual([h.tiradaExtra, h.duelo.objetivo, !!p1.error, sc.nitros < 6, /espera/.test(p2.error || ''), !!escudo, espera1, (sc.esperaEspecial || {})[varita.id], JSON.stringify(varita) === antes, CreepAcciones.ESPERA_POR_SP(1), CreepAcciones.ESPERA_POR_SP(4)],

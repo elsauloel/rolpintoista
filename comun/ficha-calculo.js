@@ -52,7 +52,7 @@ const FichaCalculo = (() => {
     // Defensa especial (Paso 3 de las reglas de casteo, docs/reglas-casteo.md):
     // stat general, fijo, que NO sale de ningún atributo (arranca en 0) — solo
     // lo dan ítems Raros o mejores. Protege el daño de casteo que "ignora la
-    // Defensa" (Paso 1); no tiene nada que ver con el Escudo especial (HP
+    // Defensa" (Paso 1); no tiene nada que ver con la Vida extra (HP
     // temporal) ni con la skill del Mago "Armadura arcana".
     // Defensa especial (2026-10-07, dueño, P169): es la ex Defensa especial, renombrada y sin escasez — se equipa como la Defensa.
     {id:'armadmg', label:'Def. especial', full:'Defensa especial: se resta al daño especial (arcano, eléctrico, fuego, hielo, tóxico, ácido), como la Defensa al físico. No la frena: el daño directo (proyectiles chicos) ni el True Damage. No sale de ningún atributo: la da el equipo.'},
@@ -121,7 +121,7 @@ const FichaCalculo = (() => {
     // Piernas de Buena calidad (2026-10-06, dueño).
     {id:'embestida', label:'Embestida', full:'PdG extra en tu primer ataque del turno si llegaste al rival con tus últimos 2 pasos (o más) en línea recta hacia él'},
     // Anillos Comunes (2026-10-06, dueño).
-    {id:'cascara', label:'Cáscara protectora', full:'Al empezar cada combate, un Escudo especial de esta cantidad que no se recarga'},
+    {id:'cascara', label:'Cáscara protectora', full:'Al empezar cada combate, una Vida extra de esta cantidad que no se recarga'},
     {id:'primerasangre', label:'Primera sangre', full:'Daño extra en tu primer ataque del combate, si pega'},
     {id:'calma', label:'Calma', full:'Si no atacaste en tu turno, al terminarlo recuperás esta cantidad de No2'},
     {id:'foco', label:'Foco', full:'PdG.Esp extra si no te moviste en este turno'},

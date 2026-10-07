@@ -170,14 +170,14 @@ const CreepAcciones = (() => {
     const polaridad = h.efectoPolaridad || (preset ? preset.polaridad : 'otro');
     const detalle = h.efectoDetalle || '';
     const mods = structuredClone(h.efectoMods || []);
-    // Con un preset conocido (Invulnerable, Espinas, Escudo especial, Sigilo…) el estado lleva todas sus marcas, no solo las categorías.
+    // Con un preset conocido (Invulnerable, Espinas, Vida extra, Sigilo…) el estado lleva todas sus marcas, no solo las categorías.
     const categorias = preset ? {esCC:preset.esCC, esVeneno:preset.esVeneno, esSangrado:preset.esSangrado, esQuemadura:preset.esQuemadura,
       stacksTurno: preset.stacksTurno ?? 0, permanente: !!preset.permanente, escudoMagico: preset.escudoMagico ?? 0, forzarNitros: preset.forzarNitros ?? ''} : {};
     if(preset) FLAGS_ESTADO.forEach(f => { categorias[f] = !!preset[f]; });
     // P137 (2026-10-01): "no vence" lo decide la habilidad si lo marca (como en personajes e invocaciones); si no, el estado.
     const nuevo = {id: uid(), nombre, hpTurno, stacks, turnos, polaridad, detalle, mods, ...categorias, permanente: Combatiente.efectoPermanente(h, preset)};
-    if(num(h.efectoEscudo) > 0){   // la habilidad da HP de escudo o de Excedente de vida (Absorber vida, Coraza de huesos…)
-      // P137: el Excedente de vida nuevo reemplaza al que tenía (antes se sumaba), igual que en personajes e invocaciones.
+    if(num(h.efectoEscudo) > 0){   // la habilidad da HP de escudo o de Vida extra (Absorber vida, Coraza de huesos…)
+      // P137: la Vida extra nuevo reemplaza al que tenía (antes se sumaba), igual que en personajes e invocaciones.
       nuevo.escudoMagico = num(h.efectoEscudo); nuevo.escudoMagicoActual = num(h.efectoEscudo);
     }
     // Ponerlo: la regla común (comun/combatiente.js, agregarEstado) — inmunidades (con la de jefe), Veneno que se acumula y,
@@ -390,7 +390,7 @@ const CreepAcciones = (() => {
      La misma habilidad que arma la ficha con una varita equipada (su Ejecución ✨, su daño + Ef.Esp, su trampa), mandada por el camino de las
      habilidades del creep (ejecutarHab / terminarHab). Los No2 igual que un personaje: 1 el primer uso del turno + 1 por cada uso más. Los creeps no
      tienen SP: el SP de la varita se paga con ESPERA (dueño: «adaptar, medio a ojo, SP en CD»; provisorio hasta pasar los creeps a SP, ver la hoja de
-     ruta): ESPERA_POR_SP. Los orbes de la otra mano también valen (resguardo: Escudo especial; salvaje: 1d6). */
+     ruta): ESPERA_POR_SP. Los orbes de la otra mano también valen (resguardo: Vida extra; salvaje: 1d6). */
   const ESPERA_POR_SP = sp => sp <= 0 ? 0 : sp <= 2 ? 1 : 2;   // SP 1–2 → 1 turno de espera; SP 3 o más → 2
   const especialesCreep = sc => (sc.equipo || []).filter(it => it && it.especial);
   function costoEspecialCreep(sc, it){
@@ -423,8 +423,8 @@ const CreepAcciones = (() => {
       const k = 'orbe:' + o.id;
       if(o.orbeResguardo && !num(sc.usosEspecial[k])){
         sc.usosEspecial[k] = 1;
-        const r = EstadosAplicar.aplicarACreep(sc, {nombre: 'Escudo especial', turnos: 1, escudoMagico: num(o.orbeResguardo)});
-        avisos.push(`${o.nombre}: ${r.ok ? `Escudo especial ${fmt(num(o.orbeResguardo))} hasta su próximo turno` : `no entra el Escudo especial (${r.motivo || 'bloqueado'})`}`);
+        const r = EstadosAplicar.aplicarACreep(sc, {nombre: 'Vida extra', turnos: 1, escudoMagico: num(o.orbeResguardo)});
+        avisos.push(`${o.nombre}: ${r.ok ? `Vida extra ${fmt(num(o.orbeResguardo))} hasta su próximo turno` : `no entra la Vida extra (${r.motivo || 'bloqueado'})`}`);
       }
       if(o.orbeSalvaje){   // salvaje (Común) o domado (Buena calidad): Combatiente.orbeSalvaje
         const d = 1 + Math.floor(Math.random() * 6), x = Combatiente.orbeSalvaje(o, d);
@@ -432,11 +432,11 @@ const CreepAcciones = (() => {
         if(x.doble) p.doble = true;
         avisos.push(`${o.nombre}: 1d6 → ${d}: ${x.dano ? 'le hace 1 de daño' : x.doble ? (/\d+d\d+/.test(h.tiradaExtra) ? '¡el efecto sale doble! (los dados del daño, ×2)' : '¡el efecto sale doble! ✋ A mano: qué es el doble lo decide la mesa') : 'nada'}`);
       }
-      // Orbe del custodio (Buena calidad, 2026-10-06): un aliado al lado recibe Escudo especial N (el mapa lo elige; en GM Tools, a mano).
+      // Orbe del custodio (Buena calidad, 2026-10-06): un aliado al lado recibe Vida extra N (el mapa lo elige; en GM Tools, a mano).
       if(num(o.orbeCustodio) > 0 && !num(sc.usosEspecial[k + ':c'])){
         sc.usosEspecial[k + ':c'] = 1;
         p.custodio = [...(p.custodio || []), {n: num(o.orbeCustodio), orbe: o.nombre}];
-        avisos.push(`${o.nombre}: un aliado al lado recibe Escudo especial ${fmt(num(o.orbeCustodio))} hasta su próximo turno`);
+        avisos.push(`${o.nombre}: un aliado al lado recibe Vida extra ${fmt(num(o.orbeCustodio))} hasta su próximo turno`);
       }
     });
     p.hab = h; p.avisosOrbe = avisos; p.espera = c.espera;

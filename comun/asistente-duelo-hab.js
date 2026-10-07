@@ -386,7 +386,7 @@ const AsistenteDueloHab = (() => {
         }
         if(!esZona){
           h += `<label class="op" style="margin-top:10px"><input type="checkbox" data-drena ${st.drena ? 'checked' : ''}> Drena: quien la usa se cura lo que hizo de daño</label>`;
-          if(st.drena) h += `<div class="fila"><span>Puede pasar su vida máxima hasta</span><input type="number" min="0" style="width:70px" data-drenatope value="${esc(st.drenaTope)}"><span>% (lo de más queda como Excedente de vida; 0 = no pasa el máximo)</span></div>
+          if(st.drena) h += `<div class="fila"><span>Puede pasar su vida máxima hasta</span><input type="number" min="0" style="width:70px" data-drenatope value="${esc(st.drenaTope)}"><span>% (lo de más queda como Vida extra; 0 = no pasa el máximo)</span></div>
             <p class="nota">Se cura lo que el objetivo perdió de verdad (si un escudo lo absorbió o era Invulnerable, drena menos o nada).</p>`;
         }
         if(esZona){
@@ -396,7 +396,7 @@ const AsistenteDueloHab = (() => {
       }
       h += `<div class="fila" style="margin-top:14px"><label class="op" style="padding:0"><input type="checkbox" data-efectolibre-on ${st.efectoLibreOn ? 'checked' : ''}> Tiene un efecto que no se puede automatizar del todo</label></div>`;
       if(st.efectoLibreOn){
-        h += `<textarea data-efectolibre rows="3" style="width:100%;box-sizing:border-box;padding:8px;font-size:14px" placeholder="ej. Drenás una cantidad de HP igual a la diferencia entre tu tirada y su resistencia; sumátela a tu vida (Excedente de vida si pasa tu máximo).">${esc(st.efectoLibre)}</textarea>
+        h += `<textarea data-efectolibre rows="3" style="width:100%;box-sizing:border-box;padding:8px;font-size:14px" placeholder="ej. Drenás una cantidad de HP igual a la diferencia entre tu tirada y su resistencia; sumátela a tu vida (Vida extra si pasa tu máximo).">${esc(st.efectoLibre)}</textarea>
           <p class="nota" style="margin-top:6px">${st.objetivo === 'zona'
             ? 'En una zona, este texto sale en la Mesa y en el cartelito cuando el daño entra (junto a la tirada de arriba, si hay), para que se resuelva a mano.'
             : 'Este texto se muestra en el cuadro junto al resultado (con la diferencia entre las dos tiradas, si la hubo), para que quien juega lo resuelva a mano.'}</p>`;
@@ -429,7 +429,7 @@ const AsistenteDueloHab = (() => {
     function filaEstadoManualHtml(e, i){
       return `<div class="fila"><span>◎ Estado</span><input type="text" list="adh-estados" data-ef-nombre="${i}" value="${esc(e.nombre)}" placeholder="nombre (elegí uno o escribí el tuyo)" style="width:200px"><span>durante</span><input type="number" min="0" style="width:64px" data-ef-turnos="${i}" value="${esc(e.turnos ?? '')}" placeholder="—" title="Vacío: lo que dure el estado"><span>turnos</span><button type="button" class="rojo" data-ef-x="${i}">Quitar</button></div>
           <div class="fila" style="margin-left:22px"><span class="nota" style="margin:0">y da (opcional):</span><select data-ef-stat="${i}"><option value="">— ningún bono —</option>${BONOS.map(([v, t]) => `<option value="${v}"${e.stat === v ? ' selected' : ''}>${t}</option>`).join('')}</select><input type="number" style="width:64px" data-ef-val="${i}" value="${esc(e.val ?? 1)}"><span class="nota" style="margin:0">(negativo = resta)</span></div>
-          <div class="fila" style="margin-left:22px"><span class="nota" style="margin:0">o un escudo de (opcional):</span><input type="number" min="0" style="width:64px" data-ef-escudo="${i}" placeholder="0" value="${esc(e.escudo || '')}"><span class="nota" style="margin:0">HP (absorbe daño antes que la vida — Escudo especial/Barrera)</span></div>` + probHtml(e, i);
+          <div class="fila" style="margin-left:22px"><span class="nota" style="margin:0">o un escudo de (opcional):</span><input type="number" min="0" style="width:64px" data-ef-escudo="${i}" placeholder="0" value="${esc(e.escudo || '')}"><span class="nota" style="margin:0">HP (absorbe daño antes que la vida — Vida extra/Barrera)</span></div>` + probHtml(e, i);
     }
     // Filas de una lista de efectos (◎ Estado / 💚 Cura). `clave(i)` arma la clave que llevan los data-attribute
     // (ver efRef) — así la misma función sirve para `st.efectos` (clave = i) y `st.efectosCritico` (clave = 'c'+i).
@@ -620,7 +620,7 @@ const AsistenteDueloHab = (() => {
         const {arr, i: idx} = efRef(i.dataset.efNombre);
         const ef = arr[idx];
         ef.nombre = i.value.trim();
-        // Al elegir un preset con escudo (Escudo especial/Barrera) y no haber tocado nada todavía, precarga sus
+        // Al elegir un preset con escudo (Vida extra/Barrera) y no haber tocado nada todavía, precarga sus
         // valores de siempre — se pueden cambiar igual, es solo para no arrancar de cero (2026-09-28).
         const preset = BUFF_PRESETS.find(p => p.nombre === ef.nombre);
         if(preset && preset.escudoMagico && !ef.escudo && !ef.stat){ ef.escudo = preset.escudoMagico; ef.turnos = preset.turnos; dibujar(); }

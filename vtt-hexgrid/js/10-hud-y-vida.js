@@ -124,7 +124,7 @@ function resolverGolpe(golpe, defensa, efectos){
   let recibido = Math.max(0, golpe - defensa);
   let absorbido = 0;
   const capas = activos.filter(e => (e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) && num(e.escudoMagicoActual ?? e.escudoMagico) > 0)
-    .sort((a, b) => (a.excedenteVida ? 1 : 0) - (b.excedenteVida ? 1 : 0));   // primero los escudos, al final el excedente de vida
+    .sort((a, b) => (a.excedenteVida ? 1 : 0) - (b.excedenteVida ? 1 : 0));   // primero los escudos, al final la vida extra
   capas.forEach(c => {
     if(recibido <= 0) return;
     const actual = num(c.escudoMagicoActual ?? c.escudoMagico), tomado = Math.min(recibido, actual);
@@ -142,7 +142,7 @@ function leerGolpe(texto){
 
 function golpeTexto(nombre, golpe, r, previo, nuevo){
   const extra = [];
-  if(r.absorbido) extra.push(`Escudo especial absorbió ${fmt(r.absorbido)}`);
+  if(r.absorbido) extra.push(`Vida extra absorbió ${fmt(r.absorbido)}`);
   const suf = extra.length ? ` · ${extra.join(' · ')}` : '';
   if(r.invulnerable) return `${nombre}: Invulnerable, el golpe de ${fmt(golpe)} no hizo nada`;
   if(r.recibido <= 0 && !r.absorbido) return `${nombre}: golpe de ${fmt(golpe)} · Defensa ${fmt(r.defensa)} lo frenó entero`;
@@ -465,7 +465,7 @@ function hudEstadosHtml(t, estados, puede){
       (e.escudo !== undefined && (puede || t.tipo !== 'creep')
         ? (puede && !e.derivado
           ? `<button type="button" class="hud-mini" data-hud-escudo="${i}:-1" title="Un punto menos">−</button><button type="button" class="hud-mini" data-hud-escudo="${i}:set" title="Escribir el valor (número, +N, -N${e.excedente ? '' : '; «max N» cambia el máximo'})">${e.excedente ? '❤+' + fmt(num(e.escudo)) + (e.tope ? '/' + fmt(num(e.tope)) : '') : '🛡' + fmt(num(e.escudo)) + '/' + fmt(num(e.escudoMax))}</button><button type="button" class="hud-mini" data-hud-escudo="${i}:1" title="Uno más">+</button>`
-          : `<span class="turnos" title="${e.excedente ? 'Excedente de vida' : 'Escudo actual / máximo'}">${e.excedente ? '❤+' + fmt(num(e.escudo)) + (e.tope ? '/' + fmt(num(e.tope)) : '') : '🛡' + fmt(num(e.escudo)) + '/' + fmt(num(e.escudoMax))}</span>`) : '') +
+          : `<span class="turnos" title="${e.excedente ? 'Vida extra' : 'Escudo actual / máximo'}">${e.excedente ? '❤+' + fmt(num(e.escudo)) + (e.tope ? '/' + fmt(num(e.tope)) : '') : '🛡' + fmt(num(e.escudo)) + '/' + fmt(num(e.escudoMax))}</span>`) : '') +
       (puede && !e.permanente && !e.derivado ? `<button type="button" class="hud-mini" data-hud-turnos="${i}:-1" title="Un turno menos">−</button>
         <button type="button" class="hud-mini" data-hud-turnos="${i}:1" title="Un turno más">+</button>` : '') +
       (puede && !e.derivado ? `<button type="button" class="hud-mini peligro" data-hud-quitar="${i}" title="Sacar este estado">✕</button>` : '') +
@@ -1124,7 +1124,7 @@ function abrirFichaDeToken(t){
    con sus preguntas, los "Mis presets" del personaje y "Crear estado nuevo (paso a paso)" — y lo aplica con la regla común
    (Combatiente.agregarEstado: inmunidades, acumular, renovar). Un personaje o una invocación se guardan con editarPersonajeMapa (js/11);
    un creep, con modificarCreep. Antes abría la ficha o GM Tools escondidas en el marco. */
-const SE_PIEZAS = ['../comun/estado-preguntas.js?v=20261004q', '../comun/asistente-estado.js?v=20261004p1', '../comun/selector-estados.js?v=20261004r'];
+const SE_PIEZAS = ['../comun/estado-preguntas.js?v=20261007r', '../comun/asistente-estado.js?v=20261004p1', '../comun/selector-estados.js?v=20261004r'];
 const idEstadoNuevo = () => Math.random().toString(36).slice(2, 9);
 // Los stats que ofrece el asistente de estados y sus nombres, como en GM Tools (un creep) y en la ficha (un personaje o invocación).
 const SE_STATS_CREEP = {def: ['Def', 'Defensa'], dmg: ['Dmg', 'Daño'], pdg: ['PdG', 'Probabilidad de golpe'], eva: ['Eva', 'Evasión'], parry: ['Parry', 'Parry'],
@@ -1237,7 +1237,7 @@ function abrirEditarEstado(t, nombre){
 }
 
 // Estados alterados desde el HUD: sacar uno o cambiarle los turnos.
-// Escudo especial / Excedente de vida: el texto puede ser un número, +N / -N o «max N» (comun/combatiente.js, igual que ficha y gm-tools).
+// Vida extra / Vida extra: el texto puede ser un número, +N / -N o «max N» (comun/combatiente.js, igual que ficha y gm-tools).
 function escudoParsear(txt, actual, max){ return Combatiente.escudoParsear(txt, actual, max); }
 async function hudEstadoCambiar(t, indice, accion, delta){
   const v = vinculo(t);

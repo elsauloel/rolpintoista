@@ -56,7 +56,7 @@ async function estadosRevisar(){
     estadosAplicando = false;
   }
 }
-// Un preset se encuentra por su nombre o por un nombre viejo (alias): "Escudo especial" pasó a llamarse "Escudo especial" (2026-09-24).
+// Un preset se encuentra por su nombre o por un nombre viejo (alias): "Vida extra" pasó a llamarse "Vida extra" (2026-09-24).
 // comun/ficha-habilidades.js (paso 5, nivel B, área 3).
 const presetPorNombre = FichaHabilidades.presetPorNombre;
 // Un estado armado a partir de lo que manda una habilidad o una trampa ({nombre, turnos, mods, hp, stacks, escudoMagico…}):

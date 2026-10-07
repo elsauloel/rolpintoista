@@ -441,7 +441,7 @@ const editorEstadoCreep = CreepEditor.crearEstado(document.body, {
 // esId vacío = un estado nuevo; inicial = lo del asistente de estados ("formulario completo").
 function abrirEditorEstadoCreep(scId, esId, inicial){ editorEstadoCreep.abrir(scId, esId, inicial); }
 
-// Escudo especial / Excedente de vida: cambiar el valor a mano (número, +N/−N o «max N»): comun/combatiente.js.
+// Vida extra / Vida extra: cambiar el valor a mano (número, +N/−N o «max N»): comun/combatiente.js.
 function escudoParsear(txt, actual, max){ return Combatiente.escudoParsear(txt, actual, max); }
 
 function estadoHtml(scId, es){

@@ -891,7 +891,7 @@ async function dueloEspinas(d, golpe){
 }
 
 /* Drena (2026-10-02, Drenar Vida): quien usó la habilidad se cura lo que el objetivo perdió de verdad (`monto`); lo que pasa de su vida
-   máxima queda como Excedente de vida, hasta `drenaTope` % del máximo (sumado al que ya tenía). A un personaje, la vida en su parte
+   máxima queda como Vida extra, hasta `drenaTope` % del máximo (sumado al que ya tenía). A un personaje, la vida en su parte
    `general` (como dueloCurar) y el Excedente por su cola de estados (comun/recibidos.js); a un creep, todo en sus datos; a una invocación,
    la vida (el excedente, a mano). */
 async function dueloDrenar(d, monto){
@@ -900,8 +900,8 @@ async function dueloDrenar(d, monto){
   if(!monto) return {quien, monto: 0, nota: 'no hizo daño: no drena nada'};
   const ta = tokens.get(d.atacante.tokenId);
   if(!ta) return {quien, monto, manual: true, motivo: 'el token de quien la usó ya no está en el mapa'};
-  const pct = Math.max(0, num(d.hab && d.hab.dano ? d.hab.dano.drenaTope : 0));   // el Excedente de vida: solo las habilidades que lo dicen (un arma, no)
-  const excedenteDe = estados => { const e = (estados || []).find(x => x && (x.excedenteVida || x.excedente || x.nombre === 'Excedente de vida')); return e ? num(e.escudoMagicoActual ?? e.escudo ?? e.escudoMagico) : 0; };
+  const pct = Math.max(0, num(d.hab && d.hab.dano ? d.hab.dano.drenaTope : 0));   // la Vida extra: solo las habilidades que lo dicen (un arma, no)
+  const excedenteDe = estados => { const e = (estados || []).find(x => x && (x.excedenteVida || x.excedente || x.nombre === 'Excedente de vida' || x.nombre === 'Vida extra')); return e ? num(e.escudoMagicoActual ?? e.escudo ?? e.escudoMagico) : 0; };
   try{
     if(ta.tipo === 'creep'){
       const r = await modificarCreep(ta.fichaId, sc => {
@@ -909,7 +909,7 @@ async function dueloDrenar(d, monto){
         sc.hp = Math.min(max, previo + monto);
         const sobra = monto - (sc.hp - previo), tope = Math.floor(max * pct / 100), antes = excedenteDe(sc.estados);
         const exc = sobra > 0 && tope > antes ? Math.min(tope, antes + sobra) : 0;
-        if(exc) EstadosAplicar.aplicarACreep(sc, {nombre: 'Excedente de vida', escudoMagico: exc});
+        if(exc) EstadosAplicar.aplicarACreep(sc, {nombre: 'Vida extra', escudoMagico: exc});
         return {previo, nuevo: sc.hp, exc};
       });
       return {quien, monto, hpAntes: r.previo, hpDespues: r.nuevo, ...(r.exc ? {excedente: r.exc} : {})};
@@ -924,7 +924,7 @@ async function dueloDrenar(d, monto){
     const f = fichasPub.get(ta.fichaId), rs = (f && f.resumen) || {};
     const max = num(rs.hpMax) > 0 ? num(rs.hpMax) : num(r.nuevo), tope = Math.floor(max * pct / 100), antes = excedenteDe(rs.estados);
     const exc = sobra > 0 && tope > antes ? Math.min(tope, antes + sobra) : 0;
-    if(exc) await EstadosAplicar.encolarPj({fichaId: ta.fichaId, duenoUid: ta.duenoUid, spec: {nombre: 'Excedente de vida', escudoMagico: exc}, origen: `${quien} · ${d.hab ? d.hab.nombre : (d.ataque.armaNombre || 'su arma')}`});
+    if(exc) await EstadosAplicar.encolarPj({fichaId: ta.fichaId, duenoUid: ta.duenoUid, spec: {nombre: 'Vida extra', escudoMagico: exc}, origen: `${quien} · ${d.hab ? d.hab.nombre : (d.ataque.armaNombre || 'su arma')}`});
     return {quien, monto, hpAntes: num(r.previo), hpDespues: num(r.nuevo), ...(exc ? {excedente: exc} : {})};
   }catch(err){
     console.error('No se pudo aplicar el drenaje:', err);

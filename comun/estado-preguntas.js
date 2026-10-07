@@ -27,8 +27,8 @@ const EstadoPreguntas = (() => {
       qs.push({clave: 'hp', etiqueta: hp > 0 ? 'HP que cura' : 'Daño (HP)', min: 1,
         texto: hp > 0 ? '¿Cuánto HP cura por turno?' : (p.esVeneno && num(p.stacks) > 1 ? '¿Cuánto daño (HP) hace por turno, por cada stack?' : '¿Cuánto daño (HP) hace por turno?')});
     }
-    if(num(p.escudoMagico) > 0) qs.push(p.excedenteVida ? {clave: 'escudo', etiqueta: 'Excedente', min: 1, texto: '¿Cuántos HP de excedente de vida tiene?'} : {clave: 'escudo', etiqueta: 'HP del escudo', min: 1, texto: '¿Cuántos HP tiene el escudo?'});
-    // El excedente de vida es un valor neto sin tope por defecto (2026-09-27, pedido del dueño): al activarlo se
+    if(num(p.escudoMagico) > 0) qs.push(p.excedenteVida ? {clave: 'escudo', etiqueta: 'Excedente', min: 1, texto: '¿Cuántos HP de vida extra tiene?'} : {clave: 'escudo', etiqueta: 'HP del escudo', min: 1, texto: '¿Cuántos HP tiene el escudo?'});
+    // La vida extra es un valor neto sin tope por defecto (2026-09-27, pedido del dueño): al activarlo se
     // pregunta si esta vez tiene uno (ej. Drenar vida: "hasta 50% del máximo") — se guarda como recordatorio en
     // `excedenteTope`, nada lo hace cumplir solo.
     if(p.excedenteVida) qs.push({clave: 'tope', etiqueta: 'Tope', min: 1, sinLimite: true, sinLimiteInicial: true,

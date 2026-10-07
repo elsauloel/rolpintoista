@@ -1756,6 +1756,10 @@ Ojo con las «firmas» de ahorro (primer uso −1 SP, el No2 que no sube): qued�
     empuja 2 pasaba el tope). En las **Comunes**, el dodge subiría 1 SP a: Chispa eléctrica (si es rayo), Soplo de fuego, Bola de fuego,
     Granizo, Lluvia ácida, Destello y Ventisca. **Báculo de aprendiz** (dueño: «me parece caro»): hoy 1 mano, peso 2, proyectil, 1d4 + 2 arcano a
     3 SP (lo arcano directo vale ×1,5) → propuesta **1d4 + 1, 2 SP, 60 DDE**, y peso 1.
+  - **Vocabulario (dueño, 2026-10-07): «rayo» = beam (un haz: se esquiva con dodge) y «relámpago» = lightning (se esquiva con Evasión, como un
+    proyectil).** → La Varita del relámpago (Buena) y la Chispa eléctrica (Común) van por Evasión: el Relámpago queda en 4 SP y 120 DDE. El Láser
+    y el Láser largo son rayos (dodge). Choca con el nombre del elemento: hoy el daño eléctrico se llama «rayo» en todo el sistema (Res. rayo,
+    «1d6 de rayo», ⚡ Rayo en cadena) — a decidir cómo se renombra.
 
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 

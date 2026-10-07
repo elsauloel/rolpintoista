@@ -288,9 +288,16 @@ service cloud.firestore {
       // actualizado}. borrador = la que el GM está armando, solo la ve él.
       // publicada = la que los jugadores abren con el botón Vendedor de la
       // ficha. Solo el GM escribe.
+      // stock (2026-10-07, piezas únicas): {version, items, reposiciones, reserva, vendidos, actualizado}. Lo arma el GM al publicar; al
+      // comprar, cualquier miembro descuenta (y repone) con una transacción: solo items, reposiciones, vendidos y actualizado, sin pasar la reserva.
       match /tienda/{doc} {
-        allow read: if (doc == 'publicada' && esMiembro(c)) || esGM(c);
-        allow write: if esGM(c) && doc in ['borrador', 'publicada'];
+        allow read: if (doc in ['publicada', 'stock'] && esMiembro(c)) || esGM(c);
+        allow write: if esGM(c) && doc in ['borrador', 'publicada', 'stock'];
+        allow update: if doc == 'stock' && esMiembro(c)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['items', 'reposiciones', 'vendidos', 'actualizado'])
+          && request.resource.data.items is list && request.resource.data.items.size() <= 200
+          && request.resource.data.reposiciones is int && request.resource.data.reposiciones <= resource.data.reserva
+          && request.resource.data.vendidos is int && request.resource.data.vendidos >= resource.data.vendidos;
       }
 
       // Ajustes de la partida (2026-10-02): partida = {ddeInicial, actualizado} — con cuántos DDE arranca un personaje nuevo

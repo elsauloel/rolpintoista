@@ -13,17 +13,18 @@ const GeneradorTiendas = (() => {
 
   // Calidad por nivel de la zona: % de Común, Buena y Rara (dueño, 2026-10-06 ✅).
   const CALIDAD_POR_NIVEL = {1: [85, 15, 0], 2: [65, 33, 2], 3: [40, 55, 5], 4: [25, 60, 15], 5: [15, 45, 40]};
-  // Golpe de suerte («toca toca, la suerte es loca», dueño): después de tirar la calidad, subir un escalón o dos. Ignora el techo del tamaño.
+  // Golpe de suerte («toca toca, la suerte es loca», dueño): después de tirar la calidad, subir un escalón o dos. En cualquier tamaño.
   const SUERTE = {uno: 0.04, dos: 0.005};
 
-  /* Tamaños: ítems (sin el stock fijo), variedad de partes defensivas y de familias de armas garantizadas, tope por etiqueta de escasez (0,5 =
-     cada etiqueta, 0 o 1 al azar), techo de calidad (índice: 1 = Buena) y escalones de nivel de más (la ciudad y la capital tienen algo mejor). */
+  /* Tamaños: ítems (sin el stock fijo), variedad de partes defensivas y de familias de armas garantizadas y tope por etiqueta de escasez (0,5 =
+     cada etiqueta, 0 o 1 al azar) y la reserva de reposiciones (cuántas veces repone lo que se compra, 2026-10-07). La calidad NO depende del tamaño, solo del nivel (dueño, 2026-10-07: «variables independientes»: un pueblito
+     puede tener cosas buenas, pero pocas). */
   const TAMANOS = {
-    ambulante: {label: 'Vendedor ambulante', min: 8, max: 12, variedad: 2, familias: 2, tope: 0.5, techo: 1, nivelExtra: 0},
-    pueblito: {label: 'Pueblito', min: 15, max: 20, variedad: 3, familias: 3, tope: 1, techo: 1, nivelExtra: 0},
-    aldea: {label: 'Aldea', min: 25, max: 35, variedad: 5, familias: 4, tope: 2, techo: null, nivelExtra: 0},
-    ciudad: {label: 'Ciudad', min: 40, max: 60, variedad: 7, familias: 4, tope: 3, techo: null, nivelExtra: 1},
-    capital: {label: 'Capital', min: 70, max: 100, variedad: 8, familias: 4, tope: 4, techo: null, nivelExtra: 1},
+    ambulante: {label: 'Vendedor ambulante', min: 8, max: 12, variedad: 2, familias: 2, tope: 0.5, reserva: 3},
+    pueblito: {label: 'Pueblito', min: 15, max: 20, variedad: 3, familias: 3, tope: 1, reserva: 6},
+    aldea: {label: 'Aldea', min: 25, max: 35, variedad: 5, familias: 4, tope: 2, reserva: 10},
+    ciudad: {label: 'Ciudad', min: 40, max: 60, variedad: 7, familias: 4, tope: 3, reserva: 16},
+    capital: {label: 'Capital', min: 70, max: 100, variedad: 8, familias: 4, tope: 4, reserva: 28},
   };
 
   // Las partes (en qué parte de la receta cae cada ítem).
@@ -88,16 +89,15 @@ const GeneradorTiendas = (() => {
     for(const [k, p] of e){ r -= p; if(r <= 0) return k; }
     return e.length ? e[e.length - 1][0] : null;
   }
-  // La calidad de un lugar: la tabla del nivel (con el techo del tamaño) y el golpe de suerte. → índice en TIERS.
-  function tirarCalidad(R, nivel, tam){
+  // La calidad de un lugar: la tabla del nivel y el golpe de suerte. → índice en TIERS.
+  function tirarCalidad(R, nivel){
     const base = (CALIDAD_POR_NIVEL[nivel] || CALIDAD_POR_NIVEL[1]).slice();
-    if(tam.techo !== null && tam.techo !== undefined) for(let i = tam.techo + 1; i < base.length; i++){ base[tam.techo] += base[i]; base[i] = 0; }
     let i = num(ponderado(R, Object.fromEntries(base.map((p, k) => [k, p]))));
     const s = R();
     if(s < SUERTE.dos) i += 2; else if(s < SUERTE.dos + SUERTE.uno) i += 1;
     return Math.min(TIERS.length - 1, i);
   }
-  const nivelEfectivo = (nivel, tam) => Math.max(1, Math.min(5, Math.round(num(nivel) || 1) + num(tam.nivelExtra)));
+  const nivelDe = nivel => Math.max(1, Math.min(5, Math.round(num(nivel) || 1)));
 
   // Los candidatos de una parte para este tipo (publicables, con el filtro del tipo; si el filtro deja la parte vacía, sin filtro).
   function candidatosDe(catalogo, tipo, parte){
@@ -134,7 +134,7 @@ const GeneradorTiendas = (() => {
     const R = azarDe(o), cat = (o && o.catalogo) || [];
     const tipoK = tipoDe(o.tipo), tipo = TIPOS[tipoK];
     const tamK = TAMANOS[o.tamano] ? o.tamano : 'pueblito', tam = TAMANOS[tamK];
-    const nivel = Math.max(1, Math.min(5, Math.round(num(o.nivel) || 1))), nivelEf = nivelEfectivo(nivel, tam);
+    const nivel = nivelDe(o.nivel);
     const porId = new Map(cat.map(it => [it.id, it]));
     const usados = new Set();
     const garantizados = (tipo.fijos || [])
@@ -162,7 +162,7 @@ const GeneradorTiendas = (() => {
       for(let intento = 0; intento < 4 && !item; intento++){
         if(intento) parte = ponderado(R, tipo.receta);   // la parte se agotó: otra de la receta
         cand[parte] = cand[parte] || candidatosDe(cat, tipo, parte);
-        item = elegir(R, cand[parte], tirarCalidad(R, nivelEf, tam), usados, esc.cabe, intento ? 0 : lugar.familia);
+        item = elegir(R, cand[parte], tirarCalidad(R, nivel), usados, esc.cabe, intento ? 0 : lugar.familia);
       }
       lugar.id = item ? item.id : null;
       if(!item) return;
@@ -171,19 +171,27 @@ const GeneradorTiendas = (() => {
     return {tipo: tipoK, tamano: tamK, nivel, items: [...garantizados, ...elegidos].map(it => it.id), garantizados: garantizados.map(it => it.id), plan, escasez: esc.conteo};
   }
 
-  /* otro({tienda, id, catalogo, azar}) → el ítem que reemplaza al `id` en la tienda (la misma parte, una calidad nueva con el nivel de la tienda,
-     respetando la escasez con el resto), o null. */
+  /* otro({tienda, id, catalogo, azar, reponer}) → el ítem que reemplaza al `id` en la tienda, o null. Sin `reponer` («🎲 Otro» del GM): la misma
+     parte, una calidad nueva con el nivel de la tienda. Con `reponer` (alguien lo compró, 2026-10-07, dueño: «un casco por otro, un arma de
+     Tipo 6 por otra de Tipo 6»): la misma parte, la misma familia (el Tipo de un arma; blando o rígido en el torso) y la misma calidad. Las dos
+     respetan la escasez con el resto de la tienda y no repiten lo que ya está. */
+  const familiaRepo = it => parteDe(it) === 'arma' || parteDe(it) === 'distancia' ? 'T' + num(it.tipoDado) : parteDe(it) === 'torso' ? it.tipoItem : '';
   function otro(o){
     const R = azarDe(o), cat = o.catalogo || [], t = o.tienda || {};
-    const viejo = cat.find(it => it.id === o.id);
+    const viejo = o.viejo || cat.find(it => it.id === o.id);
     if(!viejo) return null;
     const tipo = TIPOS[tipoDe(t.categoria || t.tipo)], tam = TAMANOS[t.tamano] || TAMANOS.pueblito;
-    const usados = new Set(t.items || []);
+    const usados = new Set([...(t.items || []), viejo.id]);
     const esc = escasez(R, tam);
-    (t.items || []).forEach(id => { const it = cat.find(x => x.id === id); if(it && id !== o.id) esc.sumar(it); });
-    const nivelEf = nivelEfectivo(t.nivel || 2, tam);
-    const tierIdx = t.tamano === 'personalizada' ? Math.max(0, TIERS.indexOf(viejo.tier)) : tirarCalidad(R, nivelEf, tam);
-    return elegir(R, candidatosDe(cat, tipo, parteDe(viejo)), tierIdx, usados, esc.cabe, 0);
+    (t.items || []).forEach(id => { const it = cat.find(x => x.id === id); if(it && id !== viejo.id) esc.sumar(it); });
+    let cands = candidatosDe(cat, tipo, parteDe(viejo));
+    if(o.reponer){
+      const fam = familiaRepo(viejo);
+      cands = cands.filter(it => it.tier === viejo.tier && familiaRepo(it) === fam);
+      return elegir(R, cands, TIERS.indexOf(viejo.tier), usados, esc.cabe, 0);
+    }
+    const tierIdx = t.tamano === 'personalizada' ? Math.max(0, TIERS.indexOf(viejo.tier)) : tirarCalidad(R, nivelDe(t.nivel || 2));
+    return elegir(R, cands, tierIdx, usados, esc.cabe, 0);
   }
 
   /* simular({tipo, tamano, nivel, catalogo, veces}) → promedios y peores casos de `veces` tiendas: por parte, por calidad, por etiqueta,
@@ -210,6 +218,9 @@ const GeneradorTiendas = (() => {
       conTier: Object.fromEntries(TIERS.map(t => [t, Math.round(100 * (acc.conTier[t] || 0) / veces)]))};
   }
 
-  return {TIERS, CALIDAD_POR_NIVEL, SUERTE, TAMANOS, TIPOS, PARTE_LABEL, DEFENSIVAS, ETIQUETAS, parteDe, etiquetasDe, esDeCaster, publicable, tipoDe,
-    tirarCalidad, nivelEfectivo, generar, otro, simular};
+  // Cuántas veces repone una tienda publicada lo que le compran (una personalizada, como una aldea).
+  const reservaDe = tamano => (TAMANOS[tamano] || TAMANOS.aldea).reserva;
+
+  return {reservaDe, TIERS, CALIDAD_POR_NIVEL, SUERTE, TAMANOS, TIPOS, PARTE_LABEL, DEFENSIVAS, ETIQUETAS, parteDe, etiquetasDe, esDeCaster, publicable, tipoDe,
+    tirarCalidad, nivelDe, generar, otro, simular};
 })();

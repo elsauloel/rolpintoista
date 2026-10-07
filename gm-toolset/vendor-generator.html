@@ -406,7 +406,7 @@ input[type=checkbox]{width:auto}
 <script src="../comun/capas.js?v=20261005f9"></script>   <!-- la última ventana que se abre queda arriba -->
 <script src="../comun/efectos-golpe.js"></script>
 <script src="../comun/catalogo.js?v=20261007h"></script>
-<script src="../comun/generador-tiendas.js?v=20261007i"></script>   <!-- la regla de cómo se arma una tienda (2026-10-06) -->
+<script src="../comun/generador-tiendas.js?v=20261007j"></script>   <!-- la regla de cómo se arma una tienda (2026-10-06) -->
 <script src="../comun/items-subidos.js?v=20261007h"></script>
 <script src="../comun/plantillas.js?v=20261005f1"></script>
 <script src="../comun/item-corto.js?v=20261006l"></script>
@@ -1160,11 +1160,11 @@ function crearTiendaPersonalizada(){
 
 function actualizarHint(){
   const tipo = G.TIPOS[G.tipoDe($('#f-categoria').value)], cfg = TAMANOS[$('#f-tamano').value], nivel = Number($('#f-nivel').value) || 1;
-  const nivelEf = G.nivelEfectivo(nivel, cfg), cal = G.CALIDAD_POR_NIVEL[nivelEf];
+  const cal = G.CALIDAD_POR_NIVEL[G.nivelDe(nivel)];
   const fijos = (tipo.fijos || []).length ? ' más el stock fijo (Poción de HP y de SP; Revive desde la aldea)' : '';
   $('#hint-tamano').textContent = `${cfg.label}: entre ${cfg.min} y ${cfg.max} ítems${fijos}; al menos ${cfg.variedad} partes defensivas distintas` +
-    (tipo.familias ? ` y ${cfg.familias} familias de armas` : '') + `. Nivel ${nivel}${nivelEf !== nivel ? ` (sortea como ${nivelEf})` : ''}: ` +
-    `Común ${cal[0]} % · Buena ${cal[1]} % · Rara ${cal[2]} %${cfg.techo !== null && cfg.techo !== undefined ? ' (hasta Buena en este tamaño)' : ''}, más un golpe de suerte ` +
+    (tipo.familias ? ` y ${cfg.familias} familias de armas` : '') + `. Nivel ${nivel}: ` +
+    `Común ${cal[0]} % · Buena ${cal[1]} % · Rara ${cal[2]} %, más un golpe de suerte ` +
     `(${Math.round(G.SUERTE.uno * 100)} % un escalón, ${G.SUERTE.dos * 100} % dos). Efectos escasos: hasta ${cfg.tope === 0.5 ? '0 o 1' : cfg.tope} de cada uno.`;
 }
 
@@ -1300,11 +1300,20 @@ function renderPublicacion(){
   const cuando = tiendaFb.publicadaCuando
     ? ` · ${tiendaFb.publicadaCuando.toLocaleString('es-AR', {day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit'})}`
     : '';
-  const alDia = tiendaActual && JSON.stringify(tiendaParaGuardar()) === tiendaFb.publicadaJson;
+  const sinStock = j => { try{ const o = JSON.parse(j); delete o.stockVersion; return JSON.stringify(o); }catch(e){ return j; } };
+  const alDia = tiendaActual && JSON.stringify(tiendaParaGuardar()) === sinStock(tiendaFb.publicadaJson);
+  const sk = tiendaStock && pub && pub.stockVersion && tiendaStock.version === pub.stockVersion
+    ? ` · 🏷 vendidas ${fmt(num(tiendaStock.vendidos))} · repuestas ${fmt(num(tiendaStock.reposiciones))}/${fmt(num(tiendaStock.reserva))}` : '';
   caja.classList.add(alDia ? 'al-dia' : 'pendiente');
   $('#publicacion-texto').innerHTML =
-    `${tiendaFb.abierta ? '🟢 <b>Abierta</b>' : '🔴 <b>Cerrada</b> (los jugadores no pueden entrar)'} · <b>${esc(nombre)}</b> (${fmt(cantidad)} ítems${esc(cuando)})` +
+    `${tiendaFb.abierta ? '🟢 <b>Abierta</b>' : '🔴 <b>Cerrada</b> (los jugadores no pueden entrar)'} · <b>${esc(nombre)}</b> (${fmt(cantidad)} ítems${esc(cuando)})${sk}` +
     (tiendaActual ? (alDia ? ' · ✓ igual a la que estás armando' : ' · <b>lo que estás armando tiene cambios sin publicar</b>') : '');
+}
+
+// El stock de la tienda publicada (piezas únicas, 2026-10-07): qué se vendió y cuánto repuso. Lo escucha el GM para verlo en el cartel.
+let tiendaStock = null;
+function escucharStockGM(){
+  try{ refTienda('stock').onSnapshot(s => { tiendaStock = s.exists ? s.data() : null; renderPublicacion(); }, err => console.error('No se pudo escuchar el stock:', err)); }catch(e){}
 }
 
 async function publicarShop(){
@@ -1314,8 +1323,19 @@ async function publicarShop(){
   const btn = $('#btn-publicar');
   btn.disabled = true;
   try{
-    const json = JSON.stringify(tiendaParaGuardar());
-    await refTienda('publicada').set({json, actualizado: firebase.firestore.FieldValue.serverTimestamp(), abierta: tiendaFb.abierta === true});
+    // Piezas únicas (2026-10-07): cada publicación arranca su stock (lo que se compra se repone mientras quede reserva).
+    const stockVersion = String(Date.now());
+    const json = JSON.stringify({...tiendaParaGuardar(), stockVersion});
+    const ts = firebase.firestore.FieldValue.serverTimestamp();
+    const lote = fbDb.batch();
+    lote.set(refTienda('publicada'), {json, actualizado: ts, abierta: tiendaFb.abierta === true});
+    lote.set(refTienda('stock'), {version: stockVersion, items: tiendaActual.items.slice(), reposiciones: 0, reserva: G.reservaDe(tiendaActual.tamano), vendidos: 0, actualizado: ts});
+    try{ await lote.commit(); }
+    catch(err){   // sin las reglas nuevas: se publica como antes, sin stock
+      console.error('No se pudo publicar el stock (¿reglas sin publicar?):', err);
+      await refTienda('publicada').set({json: JSON.stringify(tiendaParaGuardar()), actualizado: ts, abierta: tiendaFb.abierta === true});
+      toast('Ojo: faltan publicar las reglas de la tienda — se publicó sin piezas únicas');
+    }
     clearTimeout(tiendaFb.timer);
     await guardarBorrador();
     toast(tiendaFb.abierta ? 'Tienda publicada ✓ — los jugadores la ven abierta' : 'Tienda publicada ✓ — sigue CERRADA: abrila cuando quieras que entren');
@@ -1559,6 +1579,7 @@ async function iniciarTiendaEnVivo(){
   renderPublicacion();
   programarBorrador();
   escucharGuardadas();
+  escucharStockGM();
 
   refTienda('publicada').onSnapshot(snap => {
     const d = snap.exists ? snap.data() : null;

@@ -630,7 +630,7 @@ prueba('el botín: se lista lo que nadie tomó y la ventana muestra lo de cada j
 });
 
 grupo('Tienda (A5)');
-prueba('la tienda: precio con ajuste, solo lo del vendedor, comprar del carrito, vender con ajuste y reparar con el herrero', () => {
+prueba('la tienda: precio con ajuste, solo lo del vendedor, comprar del carrito, vender con ajuste y reparar con el herrero', async () => {
   const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, meta: {nombre: 'Prueba', dde: 500}, loot: {normal: 2},
     inventario: [{id: 'casco', nombre: 'Casco gastado', tipoItem: 'cabeza', peso: 2, precioCompra: 10, equipado: false, dur: 3}]}).S);
   const arma = CATALOGO_BASE.find(i => i.tipoItem === 'arma_1m' && num(i.precioCompra) >= 4 && num(i.precioCompra) <= 200 && !i.consumible);   // una que se pueda comprar con 500
@@ -639,7 +639,7 @@ prueba('la tienda: precio con ajuste, solo lo del vendedor, comprar del carrito,
   const precio = FichaTienda.precioDeCompra(st, arma), vis = FichaTienda.visibles(S, st).map(i => i.id);
   const avisos = [], ui = {toast: t => avisos.push(t), cambio: () => {}};
   FichaTienda.agregarAlCarrito(S, st, arma.id, 1, ui);
-  FichaTienda.comprar(S, st, ui);
+  await FichaTienda.comprar(S, st, ui);   // (2026-10-07: espera la transacción del stock; sin stock publicado, compra como siempre)
   const tras = num(S.meta.dde), compro = S.inventario.some(i => i.nombre === arma.nombre);
   st.venderSel = {despojos: 2};
   FichaTienda.vender(S, st, ui);
@@ -2667,6 +2667,23 @@ prueba('generador de tiendas: variedad de partes defensivas por tamaño, familia
     s1.tier['Común'].prom > s1.tier['Buena Calidad'].prom, s5.tier['Raro'].prom > s1.tier['Raro'].prom, !!otro && G.parteDe(otro) === 'arma' && otro.id !== 'cat-espada-larga',
     G.tipoDe('bazar'), G.tipoDe('inicio'), G.parteDe({tipoItem: 'armadura_blanda'})],
     [true, true, true, 4, 0, 0, true, true, true, 'alquimista', 'ramos', 'torso']);
+});
+
+prueba('reposición (2026-10-07): lo comprado se repone con otro de la misma parte, familia y calidad; la calidad sale solo del nivel', () => {
+  const G = GeneradorTiendas, cat = CATALOGO_BASE.filter(G.publicable);
+  let malas = 0, sinRepo = 0;
+  for(let n = 0; n < 40; n++){
+    const r = G.generar({tipo: 'herrero', tamano: 'aldea', nivel: 3, catalogo: cat});
+    r.items.forEach(id => {
+      const viejo = cat.find(i => i.id === id), nuevo = G.otro({tienda: {categoria: 'herrero', tamano: 'aldea', nivel: 3, items: r.items}, viejo, catalogo: cat, reponer: true});
+      if(!nuevo){ sinRepo++; return; }
+      const fam = it => G.parteDe(it) === 'arma' || G.parteDe(it) === 'distancia' ? it.tipoDado : G.parteDe(it) === 'torso' ? it.tipoItem : '';
+      if(nuevo.tier !== viejo.tier || G.parteDe(nuevo) !== G.parteDe(viejo) || fam(nuevo) !== fam(viejo) || r.items.includes(nuevo.id)) malas++;
+    });
+  }
+  const amb = G.simular({tipo: 'ramos', tamano: 'ambulante', nivel: 4, catalogo: cat, veces: 60}), cap = G.simular({tipo: 'ramos', tamano: 'capital', nivel: 4, catalogo: cat, veces: 30});
+  const pct = s => s.tier['Buena Calidad'].prom / s.items.prom;
+  igual([malas, sinRepo < 40 * 30 * 0.2, Math.abs(pct(amb) - pct(cap)) < 0.15, G.reservaDe('pueblito'), G.reservaDe('personalizada')], [0, true, true, 6, 10]);
 });
 
 /* ---------- Catálogo e ítems subidos (comun/catalogo.js, comun/items-subidos.js) ---------- */

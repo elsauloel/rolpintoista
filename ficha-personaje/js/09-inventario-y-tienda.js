@@ -279,6 +279,7 @@ async function abrirVendedor(){
   const btn = $('#btn-vendedor');
   btn.disabled = true;
   try{
+    await FichaTienda.leerStock();   // piezas únicas: lo que queda (2026-10-07)
     const tienda = tiendaDesdeDoc(await fbDb.doc(fbRutaCampana('tienda/publicada')).get());
     if(!tienda || !tienda.abierta){ toast('Tienda cerrada'); return; }
 
@@ -300,8 +301,16 @@ async function abrirVendedor(){
 
 // Mientras el jugador está en la tienda, los cambios del GM (publicar otra
 // o cerrarla) le llegan solos. Se deja de escuchar al salir de la tienda.
+let tiendaStockEscucha = null;
 function escucharTienda(){
   if(tiendaEscucha) return;
+  // Piezas únicas (2026-10-07): cuando alguien compra, la tienda cambia para todos (lo comprado sale y llega su reposición).
+  if(!tiendaStockEscucha) tiendaStockEscucha = FichaTienda.escucharStock(() => {
+    if(!tiendaCargada) return;
+    FichaTienda.conStock(tiendaCargada);
+    carritoCatalogo = carritoCatalogo.filter(e => tiendaCargada.items.includes(e.catId));
+    renderCatalogoModal();
+  });
   let primera = true;
   tiendaEscucha = fbDb.doc(fbRutaCampana('tienda/publicada')).onSnapshot(snap => {
     if(primera){ primera = false; return; }  // es la misma que se acaba de abrir
@@ -327,6 +336,7 @@ function escucharTienda(){
 
 function dejarDeEscucharTienda(){
   if(tiendaEscucha){ tiendaEscucha(); tiendaEscucha = null; }
+  if(tiendaStockEscucha){ tiendaStockEscucha(); tiendaStockEscucha = null; }
 }
 
 let itemAleatorioActual = null;
@@ -390,8 +400,9 @@ function quitarDelCarrito(catId){
   FichaTienda.quitarDelCarrito(tiendaSt, catId);
   renderCarritoCatalogo();
 }
-function comprarCarrito(){
-  FichaTienda.comprar(S, tiendaSt, tiendaUi);
+async function comprarCarrito(){
+  await FichaTienda.comprar(S, tiendaSt, tiendaUi);   // con piezas únicas, espera la transacción del stock
+  renderCatalogoModal();
   renderCarritoCatalogo();
   $('#catalogo-dde').textContent = fmt(num(S.meta.dde));
 }

@@ -135,3 +135,22 @@ configuración**. El Herrero sale con «repara» prendido. Se sacaron el sorteo 
 anillos. Probado en vivo («Claude · pruebas», capturas al dueño) y con una prueba automática.
 **Etapa 2 (pendiente):** stock limitado (Buena y Rara, 1 unidad) con reposición de la misma calidad y parte y una reserva por tamaño; pide una regla de
 Firestore nueva para que la compra de un jugador descuente el stock.
+
+## Respuestas del dueño a la etapa 1 (2026-10-07)
+- **La calidad depende solo del nivel** («variables independientes: un pueblito o un ambulante puede tener productos de buena calidad, pero pocos»).
+  Hecho: se sacaron el techo del tamaño y el escalón de más de la ciudad y la capital.
+- **La lista de efectos sensibles se revisa en detalle más adelante** (cuáles y por qué): ⬜ pendiente, para preparar.
+- **Reposición para todo el catálogo y todas las tiendas** (no solo Buena y Rara): «comprar un ítem y que se reemplace por otro del mismo tipo y
+  calidad, un casco por otro, un arma de Tipo 6 por otra de Tipo 6; puede generar alguna disputa entre jugadores, pero le suma sabor».
+- **Reparación por tipo de tienda** (el herrero repara lo de herrero; el bazar, lo del bazar): **es el próximo paso, a definir bien** (menú, lógica,
+  el talento de reparar). No se tocó.
+- **«Pasar de día»** (nueva, la maneja el GM desde el mapa): otro pulso de renovación — ítems que se renuevan cada día (una poción que se rellena,
+  un casco con un efecto una vez al día). ⬜ a diseñar (también puede reponer la reserva de las tiendas).
+
+### ✅ Etapa 2: piezas únicas y reposición (2026-10-07)
+Cada pieza de una tienda publicada es **única** (menos el stock fijo). Al publicar, el GM escribe `campanas/<id>/tienda/stock` = {version, items,
+reposiciones, reserva, vendidos} (y la tienda lleva `stockVersion`). Al comprar, `FichaTienda.comprar` hace una transacción: si alguien se la llevó
+antes, no se compra y sale del carrito; si no, la saca y pone otra de **la misma parte, familia (Tipo del arma; blando o rígido en el torso) y calidad**
+(`GeneradorTiendas.otro({reponer})`), mientras quede **reserva** (ambulante 3 · pueblito 6 · aldea 10 · ciudad 16 · capital 28; una personalizada, 10).
+Sin reserva, no vuelve. La Mesa lo cuenta («X compró Y · llegó a la tienda: Z»); la tienda se actualiza sola para todos (`FichaTienda.escucharStock`);
+el cartel del GM muestra vendidas y repuestas. **Reglas nuevas de Firestore** (`tienda/stock`): hasta pegarlas, el GM publica sin piezas únicas (avisa).

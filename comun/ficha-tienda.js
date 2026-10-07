@@ -198,7 +198,8 @@ const FichaTienda = (() => {
     const pct = Number(t.ajustePrecio) || 0;
     const extra = pct ? ` · ${pct < 0 ? '-' : '+'}${Math.abs(pct)}%` : '';
     const pv = Number(t.ajusteVenta) || 0;
-    return `Tienda · ${t.tamanoLabel || 'vendedor'}${extra}${pv ? ` · venta ${pv < 0 ? '-' : '+'}${Math.abs(pv)}%` : ''}`;
+    const sk = conStockActivo(st) && t.stock ? ` · piezas únicas: lo que se compra se repone (quedan ${Math.max(0, t.stock.reserva - t.stock.reposiciones)} reposiciones)` : '';
+    return `Tienda · ${t.tamanoLabel || 'vendedor'}${extra}${pv ? ` · venta ${pv < 0 ? '-' : '+'}${Math.abs(pv)}%` : ''}${sk}`;
   }
   const opcionesOrden = st => Object.entries(ordenes(st)).map(([k,v]) => `<option value="${k}">${esc(v.label)}</option>`).join('');
   const etiquetaOrden = st => st.ordenDesc ? '↓ Mayor a menor' : '↑ Menor a mayor';
@@ -226,6 +227,10 @@ const FichaTienda = (() => {
     if(!item) return;
     cantidad = Math.max(1, num(cantidad) || 1);
     const existente = st.carrito.find(e=>e.catId===id);
+    if(limitado(st, id)){   // pieza única (2026-10-07): una sola por tienda
+      if(existente){ ui.toast(`De ${item.nombre} hay uno solo: ya está en tu carrito`); return; }
+      cantidad = 1;
+    }
     if(existente) existente.cantidad += cantidad;
     else st.carrito.push({catId:id, cantidad});
     ui.toast(`${item.nombre} ×${cantidad} agregado al carrito`);
@@ -275,17 +280,88 @@ const FichaTienda = (() => {
     ui.cambio(['inventario']);
     ui.toast(`${item.nombre} ×${cantidad} agregado a la mochila (gratis)`);
   }
-  function comprar(S, st, ui){
+  async function comprar(S, st, ui){
     if(!st.carrito.length) return;
     let total = 0;
     st.carrito.forEach(ent => { const item = itemCatalogo(S, st, ent.catId); if(item) total += precioDeCompra(st, item) * ent.cantidad; });
     if(total > num(S.meta.dde)){ ui.toast(`No te alcanzan los DDE — necesitás ${fmt(total)} y tenés ${fmt(num(S.meta.dde))}`); return; }
+    // Piezas únicas: antes de cobrar, se sacan del stock (y se reponen) con una transacción; si alguien se las llevó, no se compra nada.
+    const res = await reservarStock(S, st);
+    if(res.faltan && res.faltan.length){
+      st.carrito = st.carrito.filter(e => !res.faltan.includes(e.catId));
+      ui.toast(`Se te adelantaron: ${res.faltan.map(id => (itemCatalogo(S, st, id) || {}).nombre || id).join(', ')} ya no está. Salió de tu carrito; revisá y volvé a comprar.`);
+      ui.cambio([]);
+      return;
+    }
+    if(res.error) ui.toast(res.error);
     S.meta.dde = num(S.meta.dde) - total;
     st.carrito.forEach(ent => { const item = itemCatalogo(S, st, ent.catId); if(item) crearItems(S, item, ent.cantidad); });
     const cantidadItems = st.carrito.length;
     st.carrito = [];
     ui.cambio(['inventario', 'meta']);
-    ui.toast(`Compra realizada · ${cantidadItems} tipo(s) de ítem · -${fmt(total)} DDE`);
+    ui.toast(`Compra realizada · ${cantidadItems} tipo(s) de ítem · -${fmt(total)} DDE` + (res.repuestos && res.repuestos.length ? ` · en su lugar llegó: ${res.repuestos.map(r => r[1]).join(', ')}` : ''));
+    if(res.vendidos && res.vendidos.length && typeof mesaLinea === 'function'){
+      const quien = ((S.meta && S.meta.nombre) || 'Alguien').trim();
+      mesaLinea(`🏪 ${quien} compró ${res.vendidos.join(', ')}` + (res.repuestos.length ? ` · llegó a la tienda: ${res.repuestos.map(r => r[1]).join(', ')}` : '') + (res.agotados.length ? ` · ya no hay reposición: ${res.agotados.join(', ')} no vuelve` : ''), 'recordatorio');
+    }
+  }
+
+  /* ---------- Piezas únicas y reposición (2026-10-07, dueño: «comprar un ítem y que automáticamente se reemplace por otro del mismo tipo y
+     calidad, para todo el catálogo y todas las tiendas»; docs/rework-tiendas.md) ----------
+     Cada pieza de una tienda publicada es única, salvo el stock fijo (las pociones de siempre). Lo que hay ahora vive en `tienda/stock`
+     ({version, items, reposiciones, reserva, vendidos}), que el GM escribe al publicar (`version` = `stockVersion` de la tienda). Al comprar,
+     una transacción saca la pieza y pone otra de la misma parte, familia y calidad (`GeneradorTiendas.otro` con `reponer`), mientras quede
+     reserva; sin reserva, la pieza no vuelve. Sin el documento (o sin las reglas publicadas), la tienda funciona como antes: sin límite. */
+  let stockCache = null;
+  const conStockActivo = st => !!(st.tienda && st.tienda.stockVersion && stockCache && stockCache.version === st.tienda.stockVersion);
+  const limitado = (st, id) => conStockActivo(st) && !(st.tienda.garantizados || []).includes(id);
+  // La tienda con lo que queda en stock (si el stock es de esta publicación).
+  function conStock(t){
+    if(t && t.stockVersion && stockCache && stockCache.version === t.stockVersion && Array.isArray(stockCache.items)){
+      t.items = stockCache.items.slice();
+      t.stock = {reposiciones: num(stockCache.reposiciones), reserva: num(stockCache.reserva), vendidos: num(stockCache.vendidos)};
+    }
+    return t;
+  }
+  const refStock = () => fbDb.doc(fbRutaCampana('tienda/stock'));
+  async function leerStock(){
+    try{ const s = await refStock().get(); stockCache = s.exists ? s.data() : null; }catch(e){ stockCache = null; }
+    return stockCache;
+  }
+  // Escucha el stock: cada vez que alguien compra, alCambiar() (la pantalla aplica conStock y redibuja). Devuelve cómo dejar de escuchar.
+  function escucharStock(alCambiar){
+    try{ return refStock().onSnapshot(s => { stockCache = s.exists ? s.data() : null; alCambiar(stockCache); }, err => console.error('No se pudo escuchar el stock de la tienda:', err)); }
+    catch(e){ return () => {}; }
+  }
+  async function reservarStock(S, st){
+    const ids = st.carrito.map(e => e.catId).filter(id => limitado(st, id));
+    if(!ids.length || typeof fbDb === 'undefined') return {vendidos: [], repuestos: [], agotados: []};
+    try{
+      return await fbDb.runTransaction(async tx => {
+        const d = await tx.get(refStock());
+        if(!d.exists || d.data().version !== st.tienda.stockVersion) return {vendidos: [], repuestos: [], agotados: []};
+        const x = d.data(), items = (x.items || []).slice();
+        const faltan = ids.filter(id => !items.includes(id));
+        if(faltan.length) return {faltan};
+        let rep = num(x.reposiciones);
+        const vendidos = [], repuestos = [], agotados = [];
+        ids.forEach(id => {
+          const viejo = itemCatalogo(S, st, id), i = items.indexOf(id);
+          vendidos.push(viejo ? viejo.nombre : id);
+          const nuevo = rep < num(x.reserva) && typeof GeneradorTiendas !== 'undefined'
+            ? GeneradorTiendas.otro({tienda: {...st.tienda, items}, viejo, catalogo: S.catalogo || [], reponer: true}) : null;
+          if(nuevo){ items[i] = nuevo.id; rep++; repuestos.push([viejo ? viejo.nombre : id, nuevo.nombre]); }
+          else{ items.splice(i, 1); agotados.push(viejo ? viejo.nombre : id); }
+        });
+        tx.update(refStock(), {items, reposiciones: rep, vendidos: num(x.vendidos) + ids.length, actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+        stockCache = {...x, items, reposiciones: rep, vendidos: num(x.vendidos) + ids.length};
+        if(st.tienda) conStock(st.tienda);
+        return {vendidos, repuestos, agotados};
+      });
+    }catch(err){
+      console.error('No se pudo descontar el stock de la tienda:', err);
+      return {vendidos: [], repuestos: [], agotados: [], error: 'No se pudo descontar el stock (¿faltan publicar las reglas de la tienda?): la compra sale igual, sin reposición.'};
+    }
   }
   // Un ítem al azar entre los que pasan los filtros activos.
   function aleatorio(S, st){
@@ -424,12 +500,12 @@ const FichaTienda = (() => {
     });
     if(!(t && Array.isArray(t.items) && t.items.length)) return null;
     t.abierta = snap.data().abierta === true;   // el GM decide cuándo está accesible
-    return t;
+    return conStock(t);   // lo que queda en stock (piezas únicas, 2026-10-07)
   }
 
   return {GRUPO_COMPRA_MAP, GRUPO_COMPRA_LABEL, GRUPO_COMPRA_ORDEN, grupoCompraDe, TIERS_ORDEN, TIERS_OCULTOS, STACK_MAX, stackMaxDe, nueva,
     precioDeCompra, precioVenta, precioHtml, normalizarBusqueda, textoBusqueda, itemCatalogo, danoDe, ordenes, ordenar, conStockYLegacyPrimero,
     visibles, rowHtml, catalogoHtml, badge, opcionesOrden, etiquetaOrden, carrito, agregarAlCarrito, quitarDelCarrito, agregarConsumible,
     crearItems, agregarGratis, comprar, aleatorio, ajusteVenta, precioVentaTienda, vendibles, totalVenta, venderHtml, venderCambio, vender,
-    precioReparacion, costoReparar: costoDe, RECARGO_ROTO, aReparar, repararHtml, reparar, desdeDoc};
+    precioReparacion, costoReparar: costoDe, RECARGO_ROTO, aReparar, repararHtml, reparar, desdeDoc, conStock, leerStock, escucharStock, limitado};
 })();

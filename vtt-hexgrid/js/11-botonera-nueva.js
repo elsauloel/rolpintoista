@@ -111,7 +111,7 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261006t', '../comun/ficha-botin.js?v=20261002a', '../comun/ficha-tienda.js?v=20261005i1', '../comun/ficha-mantenimiento.js?v=20261007g', '../comun/ficha-calculo.js?v=20261007g', '../comun/ficha-combate.js?v=20261005mn', '../comun/skills-clase.js?v=20261006i', '../comun/ficha-habilidades.js?v=20261006q',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261006t', '../comun/ficha-botin.js?v=20261002a', '../comun/generador-tiendas.js?v=20261007j', '../comun/ficha-tienda.js?v=20261007j', '../comun/ficha-mantenimiento.js?v=20261007g', '../comun/ficha-calculo.js?v=20261007g', '../comun/ficha-combate.js?v=20261005mn', '../comun/skills-clase.js?v=20261006i', '../comun/ficha-habilidades.js?v=20261006q',
   '../comun/catalogo.js?v=20261007h', '../comun/items-subidos.js?v=20261007h', '../comun/ficha-guardado.js?v=20261004ja', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261006s', '../comun/ficha-resumen.js?v=20261007g', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261006s', '../comun/inv-acciones.js?v=20261007g', '../comun/inv-duelo.js?v=20261007g', '../comun/ficha-acciones.js?v=20261007g', '../comun/inv-habilidades.js?v=20261006q', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20261006e', '../comun/ficha-duelo.js?v=20261007g', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261005f6'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
@@ -1711,7 +1711,7 @@ let bnTiendaEscucha = null;
 async function abrirTiendaMapa(fichaId){
   try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo abrir la tienda'); return; }
   let tienda = null;
-  try{ tienda = FichaTienda.desdeDoc(await fbDb.doc(fbRutaCampana('tienda/publicada')).get()); }
+  try{ await FichaTienda.leerStock(); tienda = FichaTienda.desdeDoc(await fbDb.doc(fbRutaCampana('tienda/publicada')).get()); }   // con lo que queda en stock (2026-10-07)
   catch(err){ console.error('No se pudo mirar la tienda:', err); toast('No se pudo abrir la tienda'); return; }
   if(!tienda || !tienda.abierta){ toast('Tienda cerrada'); return; }
   const yaVisible = bn && bn.host && !bn.host.hidden && bn.fichaId === fichaId && !bn.invId;
@@ -1728,8 +1728,16 @@ async function abrirTiendaMapa(fichaId){
   toast(`${tienda.nombre || 'Tienda'} · ${fmt(FichaTienda.visibles(bn.S, bnTiendaSt).length)} ítems`);
   bnTiendaEscuchar();
 }
+let bnTiendaStockEscucha = null;
 function bnTiendaEscuchar(){
   if(bnTiendaEscucha) return;
+  // Piezas únicas (2026-10-07): cuando alguien compra, lo comprado sale y llega su reposición.
+  if(!bnTiendaStockEscucha) bnTiendaStockEscucha = FichaTienda.escucharStock(() => {
+    if(!bnTiendaSt.tienda) return;
+    FichaTienda.conStock(bnTiendaSt.tienda);
+    bnTiendaSt.carrito = bnTiendaSt.carrito.filter(e => bnTiendaSt.tienda.items.includes(e.catId));
+    bnTiendaDibujar();
+  });
   let primera = true;
   bnTiendaEscucha = fbDb.doc(fbRutaCampana('tienda/publicada')).onSnapshot(snap => {
     if(primera){ primera = false; return; }   // es la misma que se acaba de abrir
@@ -1744,7 +1752,10 @@ function bnTiendaEscuchar(){
     toast('El GM cambió la tienda' + (quitados ? ` · ${fmt(quitados)} ítem(s) salieron del carrito` : ''));
   }, err => console.error('No se pudo escuchar la tienda:', err));
 }
-function bnTiendaDejar(){ if(bnTiendaEscucha){ bnTiendaEscucha(); bnTiendaEscucha = null; } }
+function bnTiendaDejar(){
+  if(bnTiendaEscucha){ bnTiendaEscucha(); bnTiendaEscucha = null; }
+  if(bnTiendaStockEscucha){ bnTiendaStockEscucha(); bnTiendaStockEscucha = null; }
+}
 function bnTiendaDibujar(){
   if(!bn || !bn.S || !bn.raiz.querySelector('#bn-tienda').classList.contains('open')) return;
   const r = bn.raiz, st = bnTiendaSt, t = st.tienda;
@@ -1793,7 +1804,7 @@ function bnTiendaClic(b){
   if(a === 'orden-dir'){ st.ordenDesc = !st.ordenDesc; bnTiendaDibujar(); return true; }
   if(a === 'limpiar'){ r.querySelectorAll('[data-bn-tf]').forEach(el => { if(el.dataset.bnTf !== 'orden') el.value = ''; }); bnTiendaDibujar(); return true; }
   if(a === 'vaciar'){ st.carrito = []; bnTiendaDibujar(); return true; }
-  if(a === 'comprar'){ if(puede()) FichaTienda.comprar(bn.S, st, ui(FichaGuardado.partes(bn.S))); bnTiendaDibujar(); return true; }
+  if(a === 'comprar'){ if(puede()) FichaTienda.comprar(bn.S, st, ui(FichaGuardado.partes(bn.S))).then(() => bnTiendaDibujar()); else bnTiendaDibujar(); return true; }
   if(a === 'aleatorio'){
     const it = FichaTienda.aleatorio(bn.S, st);
     if(!it){ toast('No hay ítems que coincidan con los filtros activos'); return true; }

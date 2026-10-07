@@ -1627,6 +1627,7 @@ levanta a un caído). Peso 1 por cada +1 (como Vida +5).
 | Manos Común ✅ (2026-10-07) | 11 / 7 (antes 15 / 0) | 11 / 7 / 1 de 34 |
 | Piernas Común ✅ (2026-10-07) | 11 / 10 (antes 17 / 0) | 11 / 10 / 2 de 30 |
 | Pies Común ✅ (2026-10-07) | 13 / 10 (antes 18 / 0) | 13 / 10 / 1 de 32 |
+| Escudos Común ✅ (2026-10-07) | 30 / 9 (antes 34 / 0) | 21 / 8 / 4 de 29 (sin orbes) |
 
 **Cómo se revisa cada slot y tier (dueño, 2026-10-07):** (1) convertir por material (tabla para el OK del dueño); (2) **la Defensa especial
 puede reemplazar los rellenos** (lo que se puso para completar puntos: durabilidad, resistencias sueltas…), para darles más espacio; (3) el
@@ -1658,6 +1659,11 @@ cuero fino), Botas de suela de goma (la goma aísla), Botas de cuero de potro sa
 +1 · Res. tóxico +1), Botas de pantanero (Def +1 · Res. tóxico +1 · Res. ácido +1), Mocasines de piel de ciervo blanco (Def. esp +1 ·
 Percepción +1), Babuchas bordadas del adivino (Def. esp +1 · Res.Mt +1).
 
+Escudos Común (el slot más físico: la otra mano del mago es el orbe): Tapa de goma, Escudo del templo y Escudo fluorescente (ex Escudo con
+farol: «no me cierra un escudo con un farol colgado en combate») a Def. especial; híbridos: Escudo de madera forrado en lienzo (ex Escudo de
+madera), Rodela tachonada (Tipo 6 → Tipo 4 + Def. especial), Escudo de escamas de lagarto. Nuevos: Escudo de corteza de ombú (Def. especial +2 ·
+Res. hielo +1) y Escudo de caparazón de tortuga gigante (Def +1 · Def. especial +1 · Bloqueo +1).
+
 ### Resistencias elementales por slot (dueño, 2026-10-07)
 Cada slot solo puede dar dos elementos; así se acota cuánto se acumula por calidad (tope por pieza: Común +1, Buena +2). Lo chequea
 `herramientas/reporte_defensas.py` («fuera de regla»).
@@ -1673,7 +1679,8 @@ Cada slot solo puede dar dos elementos; así se acota cuánto se acumula por cal
 | Cinturón, mochila, orbes | Ninguna (tampoco Defensa especial: lo que perdieron pasó a ranuras) |
 | Anillos | Pendiente |
 
-Máximo con todo el equipo: fuego y hielo +3 en Común / +6 en Buena; eléctrica, tóxico y ácido +2 / +4 (el ácido, difícil de resistir: es la
+**Las resistencias elementales no son obligatorias** (dueño, 2026-10-07): la mayoría de las piezas no dan ninguna; el mapa solo dice cuáles
+puede dar cada slot. Máximo con todo el equipo: fuego y hielo +3 en Común / +6 en Buena; eléctrica, tóxico y ácido +2 / +4 (el ácido, difícil de resistir: es la
 herramienta contra los que tienen mucha armadura). Las 22 resistencias que estaban fuera de su slot se cambiaron por una permitida del mismo
 valor (sin tocar durabilidad), con nombre o descripción retocados donde la resistencia era su identidad: Delantal y Botas de curtidor (ex de
 herrero), Mitones del alquimista, Guantes de pescador de anguilas, Guantes de piel de lagarto overo (ex sapo cururú), Gorro de piel de

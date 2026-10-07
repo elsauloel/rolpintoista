@@ -192,7 +192,9 @@ async function crearElementoZona(centro, cfg){
     color: /^#[0-9a-fA-F]{6}$/.test(cfg.color || '') ? cfg.color : (cfg.estado || /t[oó]xic/i.test(cfg.danoTipo || '') ? '#4C9A2A' : '#D9531E'),   // lo tóxico, verde (no el naranja del fuego)
     alfa: Number.isFinite(cfg.alfa) ? cfg.alfa : 40, solido: false, invisible: false,
     imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true,
-    turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n,
+    // P172 (dueño, 2026-10-07): con orden de turnos, la zona de alguien dura SUS turnos (zonasDelQueLaTiro, js/07): se va al empezar su N-ésimo
+    // turno siguiente. El vencimiento por Mantenimiento queda una ronda más tarde, de respaldo (si quien la tiró ya no juega).
+    turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n + (cfg.casteadorRef && iniciativa.orden.length ? 1 : 0),
     zona: true, zonaNombre: String(cfg.nombre || 'Zona').slice(0, 40),
     zonaCasteadorRef: String(cfg.casteadorRef || '').slice(0, 64), zonaCasteadorTipo: cfg.casteadorTipo === 'creep' ? 'creep' : 'pj',
     zonaResueltos: [], zonaEnMantenimiento: cfg.enMantenimiento !== false, zonaCadaPaso: !!cfg.cadaPaso,

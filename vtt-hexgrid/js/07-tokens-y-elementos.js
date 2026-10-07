@@ -390,6 +390,27 @@ function zonaEsperaSuFin(el, id){
   return [...tokens.entries()].some(([tid, t]) => celdas.some(c => c.col === t.col && c.fila === t.fila) && zonaAplicaA(el, t) && zonaLeFalta(el, t)
     && !(el.zonaResueltos || []).includes(tid + '@fin'));
 }
+/* P172 (dueño, 2026-10-07): una zona que tiró alguien dura los turnos DE ÉL, no la ronda. Al empezar el turno de un token (▶ Siguiente, js/04), a
+   sus zonas les queda un turno menos; con 0, se van (el fuego de 1 turno de la Bola de fuego quema a todos los que juegan antes de que el mago
+   vuelva a jugar). Sin orden de turnos siguen venciendo por Mantenimiento, como siempre. Lo hace el GM. → líneas para la Crónica. */
+async function zonasDelQueLaTiro(tokenId){
+  const t = tokens.get(tokenId);
+  if(!soyGM || !t || !t.fichaId) return [];
+  const tipo = t.tipo === 'creep' ? 'creep' : 'pj', lineas = [];
+  for(const [id, el] of elementos){
+    if(!el.zona || !el.zonaCasteadorRef || el.zonaCasteadorRef !== String(t.fichaId) || (el.zonaCasteadorTipo || 'pj') !== tipo || elementosVencidosBorrando.has(id)) continue;
+    const quedan = Math.round(num(el.turnos)) - 1;
+    try{
+      if(quedan <= 0){
+        elementosVencidosBorrando.add(id);
+        await borrarElemento(id);
+        setTimeout(() => elementosVencidosBorrando.delete(id), 5000);
+        lineas.push(`Se fue ${el.zonaNombre || 'la zona'} (terminaron sus turnos).`);
+      }else await coleccionElementos().doc(id).update({turnos: quedan});
+    }catch(err){ console.error('No se pudo descontar el turno de la zona:', err); }
+  }
+  return lineas;
+}
 function elementosVencidosBarrer(){
   if(!soyGM || mantenimientoNumero === null) return;
   elementos.forEach((el, id) => {

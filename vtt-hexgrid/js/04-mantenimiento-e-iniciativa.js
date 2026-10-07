@@ -390,8 +390,9 @@ async function iniciativaSiguiente(){
     lineas.push(...ini2, ...fin2);
   }
   if(nuevaRonda) await pasarMantenimiento(`Ronda ${ronda}`);   // lo que es de la ronda (P161)
+  const lineasZonas = sig.id ? await zonasDelQueLaTiro(sig.id) : [];   // P172: sus zonas, un turno menos (js/07)
   const lineasInicio = sig.id ? await inicioDeTurno(sig.id, `${mapaFin}:${pasoFin + 1}`) : [];
-  const todas = [...lineas, ...lineasInicio];
+  const todas = [...lineas, ...lineasZonas, ...lineasInicio];
   if(todas.length) momentoActualizar(await tarjeta, {'datos.lineas': todas.slice(0, 14)});
 }
 // Las invocaciones de un personaje que tienen turno propio (su token está en el orden): las demás van con el personaje.

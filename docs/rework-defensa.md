@@ -1633,6 +1633,7 @@ levanta a un caído). Peso 1 por cada +1 (como Vida +5).
 | Torso Buena ✅ (2026-10-07) | 95 / 47 (antes 131 / 0) | 26 / 22 / 7 de 41 · res. ❄2 🧪3 |
 | Cabeza Buena ✅ (2026-10-07) | 21 / 11 (antes 25 / 0) | 13 / 8 / 2 de 25 · res. 🔥2 ☠3 |
 | Manos Buena ✅ (2026-10-07) | 15 / 6 (antes 17 / 0) | 13 / 5 / 2 de 32 · res. 🔥2 ⚡3 |
+| Piernas Buena ✅ (2026-10-07) | 13 / 6 (antes 13 / 0) | 10 / 4 / 2 de 22 · res. 🔥1 ❄3 |
 
 **Fuego de más (dueño, 2026-10-07, «lo vemos al final»):** el fuego entra en tres slots (cabeza, manos, piernas), como el hielo (torso,
 piernas, escudo); los demás, en dos. En Común quedó 🔥14 contra ❄8 ⚡6 ☠6 🧪8 (la cabeza sola, 🔥6). Propuesta para el final de la revisión:
@@ -1718,3 +1719,7 @@ con runas (Defensa +1 · Def. especial +2 · Res. fuego +1 · Res.Esp +1) y Somb
 Manos Buena: cuero a Defensa especial: Guantes de boticario de oficio y Guantes de escapista (1); Guantes de cuero reforzado híbrido 1/1 (vaca
 afuera, lampalagua adentro). Nuevas: Guanteletes del herrero rúnico (Defensa +1 · Def. especial +1 · Res. fuego +2) y Guantes del pararrayos
 (Def. especial +2 · Res. eléctrica +1).
+
+Piernas Buena: Calzas de bordado rúnico (Res.Mt +2 → Def. especial +1); Polainas tachonadas de taller híbridas 1/1. Nuevas: Grebas de bronce con
+runas (Defensa +1 · Def. especial +2 · Res.CC +1; hacen juego con la coraza y el yelmo de bronce con runas) y Chiripá bordado del payador (Def.
+especial +2 · Res.Mt +2; sin resistencias, para no sumar más fuego).

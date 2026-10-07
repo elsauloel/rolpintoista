@@ -782,3 +782,7 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   la mayor grande, 3 × 100 (Excepcional). Hoy la vida de un personaje liviano ronda 25–35: una poción Común lo llena casi entero y la mayor
   sobra de lejos. Opciones: (a) números más chicos (Común 8–10, Buena 15, Rara 25…); (b) un porcentaje de la vida máxima, como la Poción de
   SP (Común 30 %, Buena 50 %, Rara 100 %); (c) dados (2d6, 4d6…), que suman azar. Se suma la Mano de boticario (+N por poción).
+- ⬜ **P168. ¿Qué hace «Buena calidad» en una varita?** (2026-10-07, repaso de las armas especiales de Buena: ver «Armas especiales de Buena
+  calidad» en `docs/rework-armas.md`). El SP sube con la fuerza del tiro, así que «lo mismo, más grande» rinde igual o menos por turno que la
+  Común. Opciones: (a) la escala de SP corre un escalón en Buena (más efecto por el mismo SP); (b) la escala igual y Buena trae formas y
+  efectos nuevos; (c) las dos (propuesta de Claude).

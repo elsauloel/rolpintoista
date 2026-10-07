@@ -1546,6 +1546,109 @@ lluvia ácida 21 y báculo de sangre 19,5), 3 orbes.
   Tipo 10, con el mismo crítico de las armas y la Resistencia a crítico del defensor) y los **orbes** (resguardo: Escudo especial 2, una vez por turno;
   salvaje: 1d6, con 1 te hace 1, con 6 los dados del daño ×2). **Solo queda a mano** el «doble» del orbe salvaje con un arma sin daño (lo decide la mesa).
 
+### Armas especiales de Buena calidad — repaso y lluvia de ideas (2026-10-07, ⬜ para que el dueño filtre)
+
+Dueño (2026-10-07): «pasemos al diseño de las armas especiales de buena calidad, empezando por un repaso de lo que ya tenemos y lluvia de ideas
+para lo que se viene». Números: `herramientas/calculadora_especiales.py` (las ideas de abajo, corridas con las mismas tasas; los pesos de
+Ceguera, Desarme, −Defensa, maldición, drenar SP, parpadeo y quitar un estado son borradores nuevos).
+
+**Repaso — lo que hay (Común: 30 armas + 3 orbes; Buena: solo los 8 orbes, hechos con los escudos).** Entre paréntesis, el SP por uso.
+
+| Familia | Lo que hay |
+|---|---|
+| Daño directo | Arcana 1d4 (1) · Arcana mayor 1d8 (3) · Misiles 2×1d4 (3) · Pelea cercana 1d10 −1 por casilla (3) · Báculo de aprendiz 1d4 + ½ Ef.Esp (3) |
+| Elementales | Chispa eléctrica, cadena (3) · Soplo de fuego, cono (3) · Bola de fuego, flor + fuego 1 turno (3) · Fogata, flor 2 turnos (4) · Ventisca, flor + suelo resbaladizo (4) |
+| Físico invocado | Púa de hielo T4 (2) · Canto rodado T10 (3) · Granizo, flor T4 (2) |
+| Ácido y tóxico | Lluvia ácida, flor (3) · Chorro de ácido (3) · Miasma, nube (4) |
+| Daño con control | Láser, línea de 4 (4) · Destello, Pajaritos (4) · Susurro, Silencio (2) · Gancho, atrae 2 (2) · Rastreador, Marca (3) |
+| Terreno y colocar | Aceite (2) · Telaraña (2) · Espinas (2) · Runa (2) · Niebla (2) · Pilares (1) · Portal (1) |
+| Apoyo | Luz (1) · Cura 5 (2) |
+| Orbes Comunes | Luz · Resguardo (Escudo especial 2) · Salvaje |
+| Orbes de Buena (hechos) | Resguardo mayor · Luz mayor · Foco (PdG.Esp +2) · Eco · Reserva (SP +6) · Salvaje domado · Custodio · Absorción |
+| Anotadas para Buena | Ráfaga helada (frente 3×5: 13,3 por tiro, 6 SP, se pasa) · Báculo de brasas (4) · Báculo de sangre (paga con vida) |
+
+**Lo que muestra la calculadora — antes de diseñar (P168).** Como el SP sube con la fuerza del tiro, en un combate de 4 turnos el mago rinde
+parecido con cualquier varita (las Comunes: 14,5 por turno en promedio; el que no es mago, 7,7), y las de tiro grande rinden un poco *menos*
+(se queda antes sin SP). Lo que sí ganan las grandes es **ráfaga**: más efecto por cada No2. Si Buena fuera solo «lo mismo, más grande», con la
+escala de SP de hoy la varita Buena rendiría igual o menos que la Común (las ideas de abajo, con la escala de hoy: 13,5 el mago, 7,1 el que no
+es mago). Opciones:
+- **(a) Más por el mismo SP:** en Buena, la escala corre un escalón (lo que en Común costaría 3 SP, en Buena cuesta 2). Es lo que hace la
+  calidad en las armas físicas (más daño por el mismo No2). Con las ideas de abajo: el mago 16,2 por turno (+12 %), el que no es mago 10,2 (+32 %).
+- **(b) Lo que no entra en Común:** la escala igual y Buena trae formas y efectos nuevos (áreas más grandes, dos efectos juntos, mejor control,
+  movimiento, báculos de dos manos). La calidad se nota en la variedad, no en la eficiencia.
+- **(c) Las dos** (propuesta de Claude): Buena trae lo nuevo de (b) **y** paga con la escala corrida de (a). Así ninguna Buena rinde menos que
+  su versión Común y el que no es mago (el objetivo: «darle algo para hacer a quien no pelea») es el que más gana.
+
+**Ideas del filtro que todavía no se usaron:** 16 línea con daño que baja · 17 flor de chispas · 28 daño a quien se mueve en un área ·
+30 Lento · 32 Inmovilizado · 38 Ceguera · 41 Confusión y 42 Desarme como secundarios · 45 parpadeo (propio y de un aliado, costoso) · 46 portal
+para aliados · 51 muro · 76 luz flotante · 90 viento · K báculos híbridos defensivos · L riesgo (menú acotado) · 108 marca que devuelve SP si
+muere marcado. Sin respuesta todavía: E 53–61 (escudo, quitar un estado, +PdG/+Evasión, Apuro, devolver SP, pasar vida, dar Sigilo) y F
+debilitar (−Defensa, −Res.Esp, −Evasión, maldición, disipar: «como secundario de un daño moderado»).
+
+**Lluvia de ideas para Buena** (tiro · SP con la escala de hoy · SP con el escalón corrido de (a)):
+
+*Daño, más grande o mejor repartido*
+| Idea | Qué hace |
+|---|---|
+| B1 Varita arcana superior | 2d6 arcano directo. 10,5 · 5 SP · 4 SP |
+| B2 Misiles mayores | 3 misiles de 1d4, repartidos como quieras. 11,2 · 5 · 4 |
+| B3 Varita del relámpago | 1d8 de rayo, salta 2 veces, 15 % Parálisis al primero. 9,7 · 5 · 4 |
+| B4 Flor de chispas (idea 17) | Flor, 1d4 de rayo a cada uno, 10 % Parálisis a cada uno. 6,8 · 3 · 2 (¿o Común?) |
+| B5 Láser largo (idea 16) | Línea de 6 que atraviesa; 1d8 al primero y 1 menos a cada uno de los siguientes. ~10 · 5 · 4 |
+| B6 Bola de fuego mayor | Flor de radio 2, 1d6 de fuego, 25 % Quemadura. 14,4 · 6 · 5: se pasa; o flor común con 1d6 y el fuego 2 turnos |
+| B7 Ráfaga helada recortada | Frente de 3×3 (en vez de 3×5), 1d4 de hielo, empuja 2, 25 % Escarcha. 11,6 · 6 · 5: sigue pasada; o sin daño |
+| B8 Varita del alud | Flor de piedras, físico T10: 1d6 + Ef.Esp − Defensa, 25 % Sentado. 7,4 · 3 · 2 |
+| B9 Varita de la ponzoña | 1d4 tóxico y Veneno seguro si no resiste (Res.Esp). 5,1 · 2 · 1 |
+
+*Terreno y espacio*
+| Idea | Qué hace |
+|---|---|
+| B10 Campo de estática (idea 28) | Flor 2 turnos: 1d4 de rayo cada vez que alguien da un paso adentro (como los miguelitos). 3,9 · 1 · 1 |
+| B11 Muro de fuego | Línea de 3, 3 turnos, 1d4 de fuego al entrar o seguir (del piso y del aire). 5,4 · 2 · 1 |
+| B12 Varita del muro (idea 51) | Muro de 3 casillas en línea, 3 turnos (los pilares, en grande). 5,4 · 2 · 1 |
+| B13 Varita del vendaval (idea 90) | Cono: empuja 2 a todos; apaga el fuego y despeja la niebla que toca. 3,8 · 1 · 1 |
+| B14 Varita del parpadeo (idea 45) | Te teletransportás hasta 3 casillas, o llevás a un aliado que ves. Costosa: una vez por turno. 4,0 · 1 · 1 (subir a mano) |
+| B15 Portal doble (idea 46) | Dos portales a la vista por 2 turnos: entrás por uno, salís por el otro; solo los de tu bando. ~5 · 2 · 1 |
+| B16 Luz flotante (idea 76) | Una luz de radio 2 que queda en una casilla 3 turnos y revela lo oculto. ~4 · 1 · 1 |
+
+*Daño leve con control o debilitar (los secundarios del filtro)*
+| Idea | Qué hace |
+|---|---|
+| B17 Varita del eclipse (38) | 1d6, 25 % Ceguera (estado nuevo a definir). 6,0 · 2 · 1 |
+| B18 Varita del embrollo (41) | 1d4, 25 % Confusión. 4,6 · 2 · 1 |
+| B19 Varita del manotazo (42) | 1d6, 33 % Desarme (estado nuevo: suelta el arma). 6,2 · 3 · 2 |
+| B20 Varita de raíces (32) | 1d4, 33 % Inmovilizado (Res.CC). 4,9 · 2 · 1 |
+| B21 Varita de la grieta (63) | 1d6 y −2 Defensa 2 turnos: abre al rival para el guerrero. 9,2 · 4 · 3 |
+| B22 Varita del maleficio (67) | 1d4 y, 2 turnos, se le critica más fácil. 6,8 · 3 · 2 |
+| B23 Varita sanguijuela (69) | 1d6 y le saca 1 SP (muy moderado). 6,8 · 3 · 2 |
+| B24 Varita de la cosecha (108) | 1d6 y lo marca 2 turnos; si muere marcado, recuperás 2 SP. 7,8 · 4 · 3 |
+
+*Apoyo*
+| Idea | Qué hace |
+|---|---|
+| B25 Varita de cura mayor | Cura 8 a un aliado (o 5 a los aliados en una flor). 8,0 · 4 · 3 |
+| B26 Varita del escudo (53) | Escudo especial 3 a un aliado. 2,4 · 1 · 1 |
+| B27 Varita de la purga (55) | Le saca un estado malo a un aliado (Veneno, Quemadura, Escarcha…). 3,0 · 1 · 1 |
+
+*Báculos (dos manos, suman el Especial: Buena es su lugar natural)*
+| Idea | Qué hace |
+|---|---|
+| B28 Báculo de brasas | 1d6 de fuego + ½ Ef.Esp, 25 % Quemadura. 8,6 · 4 · 3 |
+| B29 Báculo de escarcha | 1d6 de hielo + ½ Ef.Esp, 25 % Escarcha. 8,3 · 4 · 3 |
+| B30 Báculo del sabio | 1d6 arcano + el Ef.Esp entero. 11,2 · 5 · 4 |
+| B31 Báculo de sangre | 1d6 + el Ef.Esp entero; cada uso se paga con vida (2 o 3) en vez de SP |
+| B32 Báculo guardián (K) | 1d4 + ½ Ef.Esp, y con el báculo en las manos +1 Bloqueo o un Parry gratis por turno (como los escudos de Buena) |
+
+*Riesgo y otras vueltas*
+| Idea | Qué hace |
+|---|---|
+| B33 Varita inestable (L) | 2d6 arcano por menos SP (3), pero con doble 1 te lo hacés vos. |
+| B34 Varita de cargas | 3 cargas por combate que no usan SP (cualquiera la usa); se recargan al descansar. Para el que no es mago. |
+| B35 Varita gemela | Dos efectos Comunes en una (p. ej. Aceite + Bola de fuego): elegís cuál al usarla. |
+
+Ojo con las «firmas» de ahorro (primer uso −1 SP, el No2 que no sube): quedó decidido que el ahorro en varitas es escasez del **Cinturón**
+(desde Buena); por eso no se proponen en las armas.
+
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 
 Ruta del dueño (2026-10-05): **slot por slot**, empezando por **Cabeza**: primero lo Común pensado para casters, después el tier **Buena calidad de

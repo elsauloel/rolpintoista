@@ -1460,3 +1460,19 @@ punto (como la Defensa contra el primer golpe) · Empujón 1,5.
 **Preguntas:** (1) ¿Tope de Defensa 3? (2) ¿Parry +3 en un bono grande, o tope +2 por pieza como la Evasión? (3) ¿Los escudos a dos manos
 (pavés) siguen afuera? Hoy hay uno viejo de Buena calidad; en Común se sacaron porque no hay mecánica de pelear sin arma. (4) ¿Qué 🔧 se programan?
 (5) Guardián: ya está en la Coraza del guardián (torso); si los dos están puestos vale el mayor, no se suman.
+
+**✅ Escudos y orbes de Buena calidad: cargados (2026-10-06).** Respuestas del dueño: tope de Defensa **3** ✓; tope de **Parry 3** por pieza (el
+Guardamano de duelista queda con +3); afuera el **golpe de escudo** (Escudo de embestida) y el **pavés** (a dos manos); el **Muro de escudos da +2**
+(el Escudo de la falange pierde el Tipo 4 para entrar en la bolsa); dos guardianes no se suman (vale el mayor). 23 escudos y 8 orbes reemplazan a los 7
+escudos viejos y al pavés (los que siguen conservan nombre, id y narrativa). Mecánicas nuevas, iguales para personajes, invocaciones y creeps:
+- **Parada fácil** (`paradafacil`, 2): el primer Parry del turno sin No2 (`Combatiente.parryGratis`; marca `_parry` en `ataquesArma` / `usosEspecial`, `inv.parryTurno`).
+- **Bloqueo firme** (`bloqueofirme`, 0,75 por punto): +N al Bloqueo antes del primer golpe del turno (`Combatiente.bloqueoFirme`; la marca `_golpe` del daño).
+- **Muro de escudos** (`muroescudos`, 1 por punto): Defensa +N con un aliado con escudo al lado (`muroDe`, `vtt-hexgrid/js/26-escudos.js`; la Crónica lo cuenta).
+- **Empujón** (`empujon`, 1,5): un golpe cuerpo a cuerpo bloqueado deja al atacante con Demora (el GM, `Duelo.escuchar` → `bloqueado` → `dueloEmpujon`).
+- **Orbes:** domado (`orbeSalvaje: 'domado'`: con 1 nada, con 5–6 doble; `Combatiente.orbeSalvaje`), del custodio (`orbeCustodio`: Escudo especial a un aliado al
+  lado, una vez por turno; si hay varios, se elige) y de absorción (`orbeAbsorcion`: el daño mágico o elemental devuelve SP una vez por turno; solo personajes,
+  que tienen SP). El asistente de ítems los pregunta en el paso del orbe.
+Probado en vivo («Claude · pruebas»): Muro + Guardián (15 de daño − Defensa 4 − 1 − 2 = 8), Empujón (baja 1 lugar; a distancia no), Custodio (Escudo especial 2 al
+aliado) y Absorción (+1 SP el primer golpe mágico, el segundo no). Parada fácil y Bloqueo firme, con pruebas automáticas (`comun/pruebas.html`).
+**Buena calidad queda completa** salvo los anillos (para el final). Falta rehacer el equipo de los creeps con las piezas nuevas
+(`herramientas/generar_equipo_creeps.py`) y medir la acumulación con el equipo completo.

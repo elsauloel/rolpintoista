@@ -1504,3 +1504,105 @@ Disco de arado. 15 piezas con Tipo 8 en total.
 - **Con un equipo al azar** (una pieza por parte): promedio menos de 1 por elemento; ≥ 2 en fuego el 24–26 % de las veces, ≥ 4 el 2–3 %.
 - **El daño elemental de nivel bajo es chico**: varitas Comunes 1d2–1d6 (+ Ef.Esp), trampas 2d6. Contra eso, cada +2 pesa muchísimo: 2 de Res. fuego
   ya le saca la mitad a una varita de fuego, y 6 lo vuelve inmune. El riesgo no es el equipo al azar sino **juntarlas a propósito**.
+
+### Respuesta del dueño (2026-10-07) y escaneo de «relleno»
+Dueño: **tope por pieza (+1 en Común, +2 en Buena)** y **escanear en cuántos ítems la resistencia elemental es relleno** (no es el tema de la pieza)
+para reemplazarla por otros rellenos; el genérico que le gusta: **más durabilidad (Resistente)**. Escaneo (tema = el nombre o la narrativa nombran
+el elemento —fuego, ignífugo, salamandra, lana, goma, boticario…— o la resistencia es la mitad o más de los puntos de la pieza): 92 resistencias en 77
+piezas → **42 de relleno** (2 además se pasan del tope) · **19 de tema que se pasan del tope** (Comunes con +2) · 31 de tema que quedan como están.
+Ninguna arma trae resistencias elementales; tampoco nada Raro o mejor publicado. Lista completa (tier | parte | pieza | elemento | valor | clase):
+
+```
+Buena Calidad | armadura_blanda | Jubón de cuero tachonado | fuego | 2 | RELLENO |  | 13
+Buena Calidad | armadura_blanda | Delantal de boticario | fuego | 2 | RELLENO |  | 13
+Buena Calidad | armadura_blanda | Capa del explorador | hielo | 2 | RELLENO |  | 13
+Buena Calidad | armadura_rigida | Brigantina remachada | fuego | 1 | RELLENO |  | 7
+Buena Calidad | cabeza | Turbante de tela reforzada | fuego | 2 | RELLENO |  | 33
+Buena Calidad | cabeza | Turbante de tela reforzada | tóxico | 1 | RELLENO |  | 17
+Buena Calidad | cabeza | Antiparras del buscador | ácido | 1 | RELLENO |  | 14
+Buena Calidad | escudo_1m | Guardamano de duelista | ácido | 1 | RELLENO |  | 11
+Buena Calidad | escudo_1m | Escudo de caparazón | hielo | 2 | RELLENO |  | 19
+Buena Calidad | escudo_1m | Escudo espejado | rayo | 2 | RELLENO |  | 21
+Buena Calidad | escudo_1m | Escudo con farol de bronce | fuego | 1 | RELLENO |  | 11
+Buena Calidad | manos | Guantes lastrados | fuego | 1 | RELLENO |  | 20
+Buena Calidad | manos | Guanteletes de bloqueo | ácido | 1 | RELLENO |  | 20
+Buena Calidad | manos | Manoplas de cota | hielo | 1 | RELLENO |  | 20
+Buena Calidad | manos | Guantes del envenenador | tóxico | 1 | RELLENO |  | 20
+Buena Calidad | manos | Guanteletes de placas | ácido | 1 | RELLENO |  | 20
+Buena Calidad | piernas | Polainas tachonadas de taller | fuego | 1 | RELLENO |  | 17
+Buena Calidad | piernas | Bombacha de cuatrero | hielo | 1 | RELLENO |  | 17
+Buena Calidad | pies | Borceguíes de punta de acero | fuego | 1 | RELLENO |  | 20
+Buena Calidad | pies | Botines del duelista | ácido | 1 | RELLENO |  | 20
+Buena Calidad | pies | Botas de mensajero | fuego | 1 | RELLENO |  | 20
+Buena Calidad | pies | Botas de ancla | ácido | 1 | RELLENO |  | 18
+Buena Calidad | pies | Zapatillas de levitación | fuego | 1 | RELLENO |  | 18
+Buena Calidad | pies | Zapatillas de levitación | tóxico | 1 | RELLENO |  | 18
+Buena Calidad | pies | Zapatillas de levitación | ácido | 1 | RELLENO |  | 18
+Buena Calidad | pies | Escarpes de hierro | fuego | 1 | RELLENO |  | 20
+Común | armadura_rigida | Armadura de hojalata | fuego | 1 | RELLENO |  | 12
+Común | armadura_rigida | Peto de escamas de pez gigante | hielo | 2 | RELLENO | SE PASA | 25
+Común | armadura_rigida | Peto de escamas de pez gigante | ácido | 2 | RELLENO | SE PASA | 25
+Común | armadura_rigida | Puerta de auto ajustada con alambre | fuego | 1 | RELLENO |  | 12
+Común | armadura_rigida | Puerta de auto ajustada con alambre | rayo | 1 | RELLENO |  | 12
+Común | armadura_rigida | Peto de hierro viejo | fuego | 1 | RELLENO |  | 12
+Común | cabeza | Turbante del desierto | fuego | 1 | RELLENO |  | 25
+Común | cabeza | Turbante del desierto | tóxico | 1 | RELLENO |  | 25
+Común | cabeza | Casco de cuero endurecido | fuego | 1 | RELLENO |  | 25
+Común | manos | Mitones de abuela | hielo | 1 | RELLENO |  | 33
+Común | mochila | Mochila encerada | ácido | 1 | RELLENO |  | 33
+Común | piernas | Mameluco de mecánico | ácido | 1 | RELLENO |  | 33
+Común | piernas | Grebas de hojalata | fuego | 1 | RELLENO |  | 33
+Común | pies | Borceguíes de recluta | hielo | 1 | RELLENO |  | 33
+Común | pies | Tobilleras de vendaje | hielo | 1 | RELLENO |  | 33
+Común | pies | Sandalias de rastreador | fuego | 1 | RELLENO |  | 33
+Buena Calidad | armadura_blanda | Delantal de boticario | ácido | 2 | tema |  | 13
+Buena Calidad | armadura_blanda | Abrigo de piel de oso | hielo | 2 | tema |  | 14
+Buena Calidad | cinturon | Faja de tela ignífuga | fuego | 2 | tema |  | 67
+Buena Calidad | escudo_1m | Rodela del sereno | hielo | 2 | tema |  | 20
+Buena Calidad | escudo_1m | Escudo de piel de salamandra | fuego | 2 | tema |  | 19
+Buena Calidad | escudo_1m | Escudo de piel de salamandra | ácido | 2 | tema |  | 19
+Buena Calidad | escudo_1m | Escudo de bronce del monasterio | hielo | 2 | tema |  | 19
+Buena Calidad | escudo_1m | Escudo de bronce del monasterio | tóxico | 2 | tema |  | 19
+Buena Calidad | manos | Guantes de goma reforzados | rayo | 2 | tema |  | 40
+Buena Calidad | mochila | Mochila de cuero curtido | fuego | 1 | tema |  | 20
+Buena Calidad | mochila | Mochila de cuero curtido | ácido | 1 | tema |  | 20
+Buena Calidad | piernas | Calzas de chasqui | hielo | 1 | tema |  | 17
+Buena Calidad | piernas | Calzas de piel de carpincho | hielo | 2 | tema |  | 33
+Buena Calidad | piernas | Calzas de piel de carpincho | ácido | 1 | tema |  | 17
+Buena Calidad | pies | Sabatones de acero templado | ácido | 1 | tema |  | 20
+Buena Calidad | pies | Suelas de cuero de dragón | fuego | 2 | tema |  | 40
+Buena Calidad | pies | Suelas de cuero de dragón | ácido | 1 | tema |  | 20
+Común | armadura_blanda | Peto de cuero curtido | ácido | 1 | tema |  | 12
+Común | armadura_blanda | Capa de viajero | hielo | 2 | tema | SE PASA | 29
+Común | armadura_blanda | Delantal de herrero | fuego | 2 | tema | SE PASA | 29
+Común | armadura_rigida | Armadura con tachas | ácido | 2 | tema | SE PASA | 25
+Común | cabeza | Gafas de aviador | ácido | 1 | tema |  | 25
+Común | cabeza | Pañuelo mojado | tóxico | 2 | tema | SE PASA | 50
+Común | cabeza | Olla de cocina | fuego | 2 | tema | SE PASA | 50
+Común | cabeza | Gorro acolchado | hielo | 2 | tema | SE PASA | 50
+Común | cabeza | Casco de bombero | fuego | 2 | tema | SE PASA | 67
+Común | cabeza | Casco de moto vintage pintado a mano | rayo | 2 | tema | SE PASA | 50
+Común | cinturon | Correa con bolsitas | fuego | 1 | tema |  | 50
+Común | escudo_1m | Escudo de cuero mojado | fuego | 2 | tema | SE PASA | 31
+Común | escudo_1m | Escudo de piel de oso | hielo | 2 | tema | SE PASA | 31
+Común | escudo_1m | Escudo de cuero de lagarto | ácido | 2 | tema | SE PASA | 31
+Común | escudo_1m | Tapa de goma | rayo | 2 | tema | SE PASA | 50
+Común | escudo_1m | Escudo del templo | rayo | 2 | tema | SE PASA | 31
+Común | escudo_1m | Escudo del templo | tóxico | 2 | tema | SE PASA | 31
+Común | manos | Guantes de herrero | fuego | 2 | tema | SE PASA | 67
+Común | manos | Guantes de goma | rayo | 1 | tema |  | 33
+Común | manos | Manoplas de trabajo de fragua | fuego | 1 | tema |  | 33
+Común | manos | Mitones del boticario | ácido | 2 | tema | SE PASA | 67
+Común | manos | Guantes de pescador | hielo | 1 | tema |  | 40
+Común | piernas | Calzas de lana tosca | hielo | 1 | tema |  | 33
+Común | piernas | Polainas de cuero remendado | hielo | 2 | tema | SE PASA | 67
+Común | piernas | Mameluco de mecánico | fuego | 1 | tema |  | 33
+Común | piernas | Bombacha de gaucho | fuego | 1 | tema |  | 33
+Común | piernas | Grebas de anillas cosidas | ácido | 1 | tema |  | 33
+Común | piernas | Rodilleras de hueso | tóxico | 2 | tema | SE PASA | 67
+Común | pies | Botas de lluvia de goma | rayo | 1 | tema |  | 33
+Común | pies | Botas de herrero | fuego | 2 | tema | SE PASA | 67
+Común | pies | Zuecos de boticario | tóxico | 1 | tema |  | 33
+Común | pies | Zuecos de boticario | ácido | 1 | tema |  | 33
+Común | pies | Sandalias de baqueano | ácido | 1 | tema |  | 33
+```

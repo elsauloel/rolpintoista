@@ -805,5 +805,8 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   **✅ Resuelta (dueño con el grupo, 2026-10-07): existe la Defensa especial.** Hay Defensa física y **Defensa especial**; la especial se
   equipa como cualquier otra (todo el catálogo defensivo hay que revisarlo para sumarla). Algunos efectos especiales llevan el tag **True
   Damage**: ignoran la Defensa especial — para los proyectiles chicos. **Todo daño que sume el Ef.Esp del personaje sí choca con la Defensa
-  especial.** Con esto vuelve el Ef.Esp al daño (como la Fuerza contra la Defensa). Plan y preguntas: \`docs/rework-armas.md\`
+  especial.** Con esto vuelve el Ef.Esp al daño (como la Fuerza contra la Defensa). Plan y preguntas: `docs/rework-armas.md`
   («Defensa especial»).
+  **Corrección (dueño, 2026-10-07):** **True Damage** = ignora toda defensa (física, especial, cualquier armadura), muy controlado. **Daño
+  directo** = daño especial que ignora la Defensa especial, para los proyectiles chicos («como un crítico que ignora armadura, sin
+  multiplicador»). El Ef.Esp siempre choca con la Defensa especial.

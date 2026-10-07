@@ -1775,7 +1775,15 @@ Ojo con las «firmas» de ahorro (primer uso −1 SP, el No2 que no sube): qued�
 equipo). Algunos efectos especiales llevan el tag **True Damage**: ignoran la Defensa especial — **para los proyectiles chicos**. **Todo daño
 que sume el Ef.Esp del personaje choca con la Defensa especial.** Dueño: «eso te permite reimaginar todo».
 
-**Lo que ya existe y sirve:** el stat \`armadmg\` («Armadura mágica»: un número fijo que se resta al daño de casteo, para personajes, creeps e
+**Corrección del dueño (2026-10-07, mismo día): dos cosas distintas.**
+- **True Damage**: ignora **toda** defensa (la física, la especial, cualquier armadura). Es una herramienta que tiene que existir, pero **muy
+  controlada**.
+- **Daño directo**: daño especial que **ignora la Defensa especial**, para los **proyectiles chicos**. Le da identidad al daño mágico de las
+  armas: es «como un crítico que ignora la armadura, pero sin multiplicador».
+- **El Ef.Esp siempre choca con la Defensa especial** («el equivalente a la Fuerza, pero en magia»): un daño que suma el Ef.Esp nunca es directo.
+- Todo el resto del daño especial se frena con la Defensa especial.
+
+**Lo que ya existe y sirve:** el stat `armadmg` («Armadura mágica»: un número fijo que se resta al daño de casteo, para personajes, creeps e
 invocaciones, ya restado en el mapa) — hoy ningún ítem del catálogo lo da. Propuesta: **es la misma pieza con otro nombre**, Defensa especial,
 y deja de ser escasa.
 

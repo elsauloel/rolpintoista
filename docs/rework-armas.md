@@ -1917,8 +1917,8 @@ Con la calculadora recalibrada (varitas directas con dado fijo, báculos con ¼ 
 - **Varita del escudo: sacada** (la Vida extra se acumula y a fines prácticos es poco más que una cura). Quedan 35.
 - **Relámpago: 15 % de Parálisis a cada uno** (no solo al primero; mismo costo: la calculadora ya lo contaba así).
 - **Inestable: 2 SP, y con algún 1 te hacés 2d4** (en vez de 1d4).
-- **Campo de estática:** «muy leve» → **no se esquiva: aparece bajo los pies** (flor) y **al aparecer pega 1d4 eléctrico** a cada uno; queda 2
-  turnos con 1d4 eléctrico y 10 % de Parálisis por cada paso adentro (del piso). 3 SP, 120 DDE.
+- **Campo de estática:** «muy leve» → **no se esquiva: aparece bajo los pies** (flor) y **al aparecer pega 1d4 eléctrico y 10 % de Parálisis** a cada uno; queda 2
+  turnos con 1d4 eléctrico y 10 % de Parálisis por cada paso adentro (del piso). Con el 10 % al aparecer (dueño) pasa a 4 SP y 130 DDE (con 1 turno, 3 SP y 90: a confirmar).
 - **Muro: 2 SP** · **Luz flotante: 2 turnos** · **Purga: 3 SP**.
 - **Maleficio: en espera** (P173, los grupos de buffs y debuffs): −1 a la Res. crítico de un tipo a elección, 2 turnos, no acumulable.
 - **Piso, aire o ambos** (ya estaba definido, js/08 `alturaDe`): el Muro de fuego es de **ambos** (llamas en el piso y en el aire); el Chorro

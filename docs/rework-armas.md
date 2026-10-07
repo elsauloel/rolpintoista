@@ -1827,6 +1827,16 @@ con regeneración de vida como efecto habitual** (stat nuevo: hay que ponerle pe
 **En las tiendas (al final, con todo auditado):** el **herrero** muestra lo que da Defensa, el **Bazar** lo que da Defensa especial; lo que da
 las dos puede salir en cualquiera, con un criterio: si está más cargado a una, sale en esa tienda; si está balanceado, en cualquiera de las dos.
 
+**Las tres clases de daño especial, definición ajustada (dueño, 2026-10-07):**
+
+| Clase | Qué lo frena |
+|---|---|
+| **Daño especial** (lo normal) | La Defensa especial y, si es elemental, su resistencia. Puede sumar Ef.Esp (una parte, según la forma). |
+| **Daño directo** | Ignora la Defensa especial; **sí** lo frena la resistencia de su elemento. El arcano directo no tiene resistencia: solo lo para la Vida extra. Nunca suma Ef.Esp. Para los proyectiles chicos. |
+| **True Damage** | Nada: ni la Defensa, ni la Defensa especial, ni la resistencia elemental. Solo la Vida extra. Muy controlado. |
+
+(El daño físico, también el físico invocado, lo frena la Defensa.) Las áreas suelen alcanzar **1 o 2** rivales; 3 es raro (dueño).
+
 **Lo que ya existe y sirve:** el stat `armadmg` («Armadura mágica»: un número fijo que se resta al daño de casteo, para personajes, creeps e
 invocaciones, ya restado en el mapa) — hoy ningún ítem del catálogo lo da. Propuesta: **es la misma pieza con otro nombre**, Defensa especial,
 y deja de ser escasa.

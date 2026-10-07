@@ -59,7 +59,8 @@ PESO_EXTRA = {'Silencio': 3.0, 'Atraer': 1.5, 'Marca': 1.0, 'Luz': 1.0, 'Muro': 
               'Ceguera': 3.0, 'Confusión': 3.5, 'Desarme': 3.0, '-2 Def': 2.0, 'Maldición': 1.5, 'Drena SP': 1.5, 'Quita estado': 3.0,
               'Daño 1d4 paso': 2.5, 'SP de vuelta': 1.0, 'Luz flotante': 2.5,
               'Blink': 8.0,    # el dueño: «debe ser costoso» → 3 SP en Buena
-              'Portal doble': 5.0}   # Portal (2026-10-05, dueño): «cuenta como hacerle perder un No2» = la Demora de las armas físicas (4)
+              'Portal doble': 5.0,
+              'Estática': 2.5 + 0.4}   # el campo de estática: 1d4 por paso y 10 % de Parálisis (2026-10-07)   # Portal (2026-10-05, dueño): «cuenta como hacerle perder un No2» = la Demora de las armas físicas (4)
 # Un terreno (zona) vale su efecto por cada turno que dura, pero solo si alguien lo pisa: × TERRENO por turno.
 TERRENO = 0.6
 # El tamaño de la zona sí cuenta, pero poco: una flor tapa más que una casilla (más chances de que alguien la pise o la use).
@@ -200,6 +201,7 @@ POOL = [
     {'nombre': 'Varita de la luz: radio 3 hasta el final del turno; revela sigilo y trampas, y al que revela lo deja marcado 3 turnos', 'clase': 'arcano', 'efectos': {'Luz': 1.5, 'Revela': 1.0, 'Marca': 3.0 * 0.3}},
     {'nombre': 'Varita del portal: trampa de portal oculta, lleva a quien la pisa a la casilla que marcaste (a 4 o menos; Res.Esp contra 7)', 'clase': 'arcano', 'efectos': {'Portal': 1.0}, 'forma': 'trampa'},
     {'nombre': 'Varita de cura: 1d10 a un aliado', 'clase': 'arcano', 'efectos': {'Cura': 5.5}, 'sp': 1},
+    {'nombre': 'Varita de arena movediza: flor de arena movediza 2 turnos, como la trampa (Inmovilizado al entrar; salir cuesta No2)', 'clase': 'arcano', 'terreno': ('Inmovilizado', 2), 'forma': 'flor1'},   # dueño, 2026-10-07: «aceite y arena movediza, como las trampas» (el aceite ya está)
     # — báculos (suman Especial; también una vez por turno) —
     {'nombre': 'Báculo de aprendiz (1 mano, peso 1): 1d4 + ¼ Ef.Esp (daño especial: lo frena la Defensa especial)', 'clase': 'arcano', 'dado': '1d4', 'sumaEspecial': 0.25},   # dueño 2026-10-07: «me parece caro»
 ]
@@ -208,9 +210,9 @@ POOL = [
 TOPE_BUENA = 11.5
 BUENA = [
     # — daño —
-    {'nombre': 'Varita arcana superior: 2d6 arcano directo', 'clase': 'arcano', 'dado': '2d6', 'directo': True},
-    {'nombre': 'Varita de los misiles mayores: 3 misiles de 1d4, repartidos como quieras', 'clase': 'arcano', 'dado': '1d4', 'golpes': 3, 'directo': True},
-    {'nombre': 'Varita del relámpago: 1d8 de rayo, salta según el número (8 → 4 → 2 → 1), 15 % Parálisis al primero', 'clase': 'elemental', 'dado': '1d8', 'forma': 'cadena', 'efectos': {'Parálisis': .15}, 'directo': True},
+    {'nombre': 'Varita arcana superior: 2d4 arcano directo', 'clase': 'arcano', 'dado': '2d4', 'directo': True},   # 2d6 a 4 SP rendía poco (dueño, 2026-10-07)
+    {'nombre': 'Varita de los misiles mayores: 3 misiles de 1d4, repartidos como quieras', 'clase': 'arcano', 'dado': '1d4', 'golpes': 3, 'sp': 3, 'directo': True},   # cada misil se esquiva aparte: un SP menos
+    {'nombre': 'Varita del relámpago: 1d8 eléctrico, salta según el número (8 → 4 → 2 → 1), 15 % Parálisis a cada uno', 'clase': 'elemental', 'dado': '1d8', 'forma': 'cadena', 'efectos': {'Parálisis': .15}, 'directo': True},
     {'nombre': 'Varita de la flor de chispas: flor, 1d4 de rayo y 10 % Parálisis a cada uno', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'efectos': {'Parálisis': .10}, 'directo': True},
     {'nombre': 'Varita láser larga: rayo en línea de 6, 1d8 al primero y 1 menos a cada uno de los siguientes', 'clase': 'arcano', 'dado': '1d7', 'forma': 'linea4', 'directo': True},
     {'nombre': 'Varita de la bola de fuego mayor: flor grande (radio 2), 1d4 de fuego; el fuego queda 1 turno', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor2', 'terreno': ('Daño 1', 1), 'directo': True},
@@ -218,33 +220,34 @@ BUENA = [
     {'nombre': 'Varita de la lluvia de cascotes: flor física T10, 1d6 + 3 − Defensa a cada uno (critica), 25 % Sentado', 'clase': 'fisico', 'dado': '1d6', 'fuerza': 3, 'forma': 'flor1', 'efectos': {'Sentado': .25}},
     {'nombre': 'Varita de la ponzoña: PdG.Esp contra Res.Esp; 1d4 tóxico y Veneno', 'clase': 'toxico', 'dado': '1d4', 'efectos': {'Envenenar': 1.0}, 'esquive': 'resesp', 'directo': True},
     {'nombre': 'Varita del chorro de lava: camino libre de 4 (cada casilla pegada a la anterior; la primera a 1/3 de tu Rango de casteo), 1d4 de fuego a todos; arde 2 turnos', 'clase': 'elemental', 'dado': '1d4', 'forma': 'linea4', 'terreno': ('Daño 1d4', 2), 'directo': True},
-    {'nombre': 'Varita inestable: 2d6 arcano; si sale algún 1 (31 %), te hacés 1d4', 'clase': 'arcano', 'dado': '2d6', 'sp': 3, 'directo': True},   # el riesgo la abarata un SP (dueño)
+    {'nombre': 'Varita inestable: 2d6 arcano; si sale algún 1 (31 %), te hacés 2d4', 'clase': 'arcano', 'dado': '2d6', 'sp': 2, 'efectos': {'Daño 1': -0.31 * 5}, 'directo': True},   # dueño, 2026-10-07: 2 SP con el riesgo de 2d4
     # — terreno y espacio —
-    {'nombre': 'Varita del campo de estática: flor 2 turnos, 1d4 de rayo por cada paso adentro', 'clase': 'elemental', 'terreno': ('Daño 1d4 paso', 2), 'forma': 'flor1', 'directo': True},
+    {'nombre': 'Varita del campo de estática: aparece bajo los pies (flor, no se esquiva) y pega 1d4 eléctrico a cada uno; queda 2 turnos: 1d4 eléctrico y 10 % Parálisis por cada paso adentro (del piso)', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'esquive': 'no', 'terreno': ('Estática', 2), 'directo': True},   # dueño, 2026-10-07: «muy leve» → no se esquiva y pega al aparecer
     {'nombre': 'Varita del muro de fuego: línea de 3, 3 turnos, 1d4 de fuego al entrar o seguir (piso y aire)', 'clase': 'elemental', 'terreno': ('Daño 1d4', 3), 'forma': 'linea', 'directo': True},
-    {'nombre': 'Varita del muro: muro de 3 casillas en línea, 3 turnos', 'clase': 'arcano', 'terreno': ('Muro', 3), 'forma': 'linea'},
+    {'nombre': 'Varita del muro: muro de 3 casillas en línea, 3 turnos', 'clase': 'arcano', 'terreno': ('Muro', 3), 'forma': 'linea', 'sp': 2},   # dueño: 2 SP
     {'nombre': 'Varita del vendaval: cono que empuja 2 a todos; apaga el fuego y despeja la niebla que toca', 'clase': 'arcano', 'forma': 'cono', 'efectos': {'Empuje': 1.67}},
     {'nombre': 'Varita del blink: te teletransportás hasta 3 casillas (o llevás a un aliado que ves); una vez por turno', 'clase': 'arcano', 'efectos': {'Blink': 1}},
     {'nombre': 'Varita del portal doble: dos portales a la vista por 2 turnos, solo para tu bando', 'clase': 'arcano', 'efectos': {'Portal doble': 1}},
-    {'nombre': 'Varita de la luz flotante: luz de radio 2 en una casilla, 3 turnos, revela lo oculto', 'clase': 'arcano', 'terreno': ('Luz flotante', 3), 'forma': 'flor1'},
+    {'nombre': 'Varita de la luz flotante: luz de radio 2 en una casilla, 2 turnos, revela lo oculto', 'clase': 'arcano', 'terreno': ('Luz flotante', 2), 'forma': 'flor1'},   # dueño: 2 turnos
     # — daño leve con control o debilitar —
     {'nombre': 'Varita del eclipse: 1d6, 25 % Ceguera (estado nuevo)', 'clase': 'arcano', 'dado': '1d6', 'efectos': {'Ceguera': .25}, 'directo': True},
     {'nombre': 'Varita del embrollo: 1d4, 25 % Confusión', 'clase': 'arcano', 'dado': '1d4', 'efectos': {'Confusión': .25}, 'directo': True},
     {'nombre': 'Varita del manotazo: 1d6, 33 % Desarme (estado nuevo)', 'clase': 'arcano', 'dado': '1d6', 'efectos': {'Desarme': 1 / 3}, 'directo': True},
     {'nombre': 'Varita de raíces: brotan en su casilla, 1d4, 33 % Inmovilizado', 'clase': 'arcano', 'dado': '1d4', 'efectos': {'Inmovilizado': 1 / 3}, 'esquive': 'dodge', 'directo': True},
     {'nombre': 'Varita de la grieta: 1d6 y −2 Defensa 2 turnos', 'clase': 'arcano', 'dado': '1d6', 'efectos': {'-2 Def': 2}, 'directo': True},
-    {'nombre': 'Varita del maleficio: 1d4 y −1 a su Res. crítico 2 turnos (se le critica más fácil)', 'clase': 'arcano', 'dado': '1d4', 'efectos': {'Maldición': 2}, 'esquive': 'resesp', 'directo': True},
+    # Maleficio (−1 a la Res. crítico de un tipo a elección, 2 turnos, no acumulable): EN ESPERA hasta los grupos de buffs y debuffs (dueño, 2026-10-07)
     {'nombre': 'Varita sanguijuela: 1d6 y le sacás 1 SP (lo recuperás vos)', 'clase': 'arcano', 'dado': '1d6', 'efectos': {'Drena SP': 1}, 'directo': True},
     {'nombre': 'Varita de la cosecha: 1d6 y lo marca 2 turnos; si muere marcado, recuperás 2 SP', 'clase': 'arcano', 'dado': '1d6', 'efectos': {'Marca': 2, 'SP de vuelta': .5}, 'directo': True},
     # — apoyo —
     {'nombre': 'Varita de cura mayor: 2d8 a un aliado', 'clase': 'arcano', 'efectos': {'Cura': 9}},
-    {'nombre': 'Varita del escudo: Escudo especial 3 a un aliado', 'clase': 'arcano', 'efectos': {'Escudo': 3}},
-    {'nombre': 'Varita de la purga: le saca un estado malo a un aliado', 'clase': 'arcano', 'efectos': {'Quita estado': 1}},
-    # — báculos (dos manos; daño fijo) —
+    # Varita del escudo: sacada (dueño, 2026-10-07: la Vida extra se acumula y a fines prácticos es poco más que una cura)
+    {'nombre': 'Varita de la purga: le saca un estado malo a un aliado', 'clase': 'arcano', 'efectos': {'Quita estado': 1}, 'sp': 3},   # dueño: 3 SP
+    # — báculos (dos manos; suman ¼ del Ef.Esp, daño especial: lo frena la Defensa especial) — 2026-10-07: el del sabio y el de sangre, 1d8
+    # (con 1d6 + ¼ rendían apenas +1 sobre el de aprendiz Común al mismo SP; los de brasas y escarcha se quedan en 1d6: su efecto de firma es el plus)
     {'nombre': 'Báculo de brasas: 1d6 + ¼ Ef.Esp de fuego, 25 % Quemadura', 'clase': 'elemental', 'dado': '1d6', 'sumaEspecial': 0.25, 'efectos': {'Prende fuego': .25}},
     {'nombre': 'Báculo de escarcha: 1d6 + ¼ Ef.Esp de hielo, 25 % Escarcha', 'clase': 'elemental', 'dado': '1d6', 'sumaEspecial': 0.25, 'efectos': {'Escarcha': .25}},
-    {'nombre': 'Báculo del sabio: 1d6 + ¼ Ef.Esp arcano', 'clase': 'arcano', 'dado': '1d6', 'sumaEspecial': 0.25},
-    {'nombre': 'Báculo de sangre: 1d6 + ¼ Ef.Esp arcano; cada uso, el 10 % de tu vida máxima (para arriba) en vez de SP', 'clase': 'arcano', 'dado': '1d6', 'sumaEspecial': 0.25, 'sp': 0},
+    {'nombre': 'Báculo del sabio: 1d8 + ¼ Ef.Esp arcano', 'clase': 'arcano', 'dado': '1d8', 'sumaEspecial': 0.25},
+    {'nombre': 'Báculo de sangre: 1d8 + ¼ Ef.Esp arcano; cada uso, el 10 % de tu vida máxima (para arriba) en vez de SP', 'clase': 'arcano', 'dado': '1d8', 'sumaEspecial': 0.25, 'sp': 0},
     {'nombre': 'Báculo guardián: 1d4 + ¼ Ef.Esp arcano; en las manos, +1 Parry y +1 Bloqueo', 'clase': 'arcano', 'dado': '1d4', 'sumaEspecial': 0.25, 'extraPts': 2},
     # — otras vueltas —
     {'nombre': 'Varita de cargas (fuego): la Bola de fuego Común, 3 cargas por combate sin SP', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'terreno': ('Daño 1', 1), 'sp': 0, 'cargas': 3, 'directo': True},

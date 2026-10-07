@@ -1909,6 +1909,25 @@ en un efecto de área (dueño: «no descartarlo, con un estudio y balance previo
 1d10; la Ejecución acepta «1d10» y lo tira al usarla), P172 (las zonas duran los turnos de quien las tiró) y **↻ Actualizar desde el catálogo**
 (en el editor de un ítem del inventario: las copias viejas toman la versión nueva y conservan lo suyo).
 
+### Armas especiales de Buena con las reglas nuevas (2026-10-07, cerrando la lista)
+Con la calculadora recalibrada (varitas directas con dado fijo, báculos con ¼ del Ef.Esp, escala de Buena corrida un escalón, mínimo 80 DDE).
+**Decidido (dueño, 2026-10-07):**
+- **Báculo del sabio y Báculo de sangre: 1d8 + ¼ Ef.Esp** (2 SP; con 1d6 rendían +1 sobre el de aprendiz Común). Brasas y escarcha, 1d6 + ¼ y su efecto.
+- **Arcana superior: 2d4 a 2 SP** (2d6 a 4 SP rendía poco) · **Misiles mayores: 3 SP** (cada misil se esquiva aparte).
+- **Varita del escudo: sacada** (la Vida extra se acumula y a fines prácticos es poco más que una cura). Quedan 35.
+- **Relámpago: 15 % de Parálisis a cada uno** (no solo al primero; mismo costo: la calculadora ya lo contaba así).
+- **Inestable: 2 SP, y con algún 1 te hacés 2d4** (en vez de 1d4).
+- **Campo de estática:** «muy leve» → **no se esquiva: aparece bajo los pies** (flor) y **al aparecer pega 1d4 eléctrico** a cada uno; queda 2
+  turnos con 1d4 eléctrico y 10 % de Parálisis por cada paso adentro (del piso). 3 SP, 120 DDE.
+- **Muro: 2 SP** · **Luz flotante: 2 turnos** · **Purga: 3 SP**.
+- **Maleficio: en espera** (P173, los grupos de buffs y debuffs): −1 a la Res. crítico de un tipo a elección, 2 turnos, no acumulable.
+- **Piso, aire o ambos** (ya estaba definido, js/08 `alturaDe`): el Muro de fuego es de **ambos** (llamas en el piso y en el aire); el Chorro
+  de lava, el fuego que deja la Bola de fuego y el Campo de estática, del **piso**.
+- **Aceite y arena movediza como las trampas** (dueño: «si entra, en Común; si no, en Buena»): el aceite ya está (Varita del aceite, Común, 1 SP);
+  la **Varita de arena movediza** entra en Común: flor de 2 turnos como la trampa (Inmovilizado al entrar; salir cuesta No2), 2 SP, 65 DDE.
+- **A confirmar:** Ráfaga helada (propuesta: 1d4, 17 % de Escarcha y empuja 1, 3 SP, 110 DDE) · Portal de un solo portal (propuesta: 2 SP) ·
+  Sanguijuela que drena vida (1d6, te curás la mitad; 2 SP) · Cosecha con +2 de vida (3 SP, 100 DDE).
+
 ## Defensivos para casters (fase 3b, arranca 2026-10-05)
 
 Ruta del dueño (2026-10-05): **slot por slot**, empezando por **Cabeza**: primero lo Común pensado para casters, después el tier **Buena calidad de

@@ -169,3 +169,16 @@ el cartel del GM muestra vendidas y repuestas. **Reglas nuevas de Firestore** (`
 ## Defensa y Defensa especial en las tiendas (dueño, 2026-10-07, para cuando el catálogo defensivo esté auditado)
 El **herrero** muestra lo que da Defensa; el **Bazar**, lo que da Defensa especial. Lo que da las dos puede salir en cualquiera de las dos
 tiendas: si está más cargado a una, sale en esa; si está balanceado, en cualquiera. Ver `docs/rework-armas.md` («Defensa especial»).
+
+## Identidad de las tiendas (P179, dueño 2026-10-08: «Ramos generales quedó medio borrosa y redundante»)
+**Propuesta (a decidir):** en vez de quitarla, reconvertirla. Tres tiendas, una por estilo de juego y por material:
+- **Herrero** — metal. Armas cuerpo a cuerpo (todas las familias), escudos, torso rígido, cascos, guanteletes; lo que da **Defensa**. Para Fuerza y
+  Constitución (Warrior, Tanque). Repara lo de metal. Sin mochilas, cinturones ni armas a distancia.
+- **Talabartería / Cazador** (lo que hoy es Ramos) — cuero, madera y cuerda. Armas a distancia, armas livianas (Tipo 4 y 6: cuchillos, dagas,
+  hachitas), torso blando, botas, piernas, guantes de cuero, capuchas, cinturones, mochilas, **trampas** y lo de explorar (bengalas, sogas, pociones
+  básicas). Lo de **Evasión, Sigilo, Percepción**. Para Destreza y Agilidad (Asalto, Shooter). Repara cuero y madera.
+- **Bazar arcano** — sin cambios: consumibles, varitas y báculos, orbes, anillos, piezas de caster; lo que da **Defensa especial**. Para el Especial
+  (Mago, Support, Debuffer). Repara lo mágico.
+Receta tentativa (partes de 100): Herrero — armas 38, escudos 14, torso rígido 18, cabeza 12, manos 10, piernas 4, pies 4. Talabartería — a distancia
+22, armas livianas 12, torso blando 14, piernas 8, pies 8, manos 6, cabeza 4, cinturón 8, mochila 8, trampas 14, consumibles básicos 6 (stock fijo:
+Poción de HP). Bazar — igual que hoy. Una tienda guardada como «ramos» pasa a ser la nueva.

@@ -604,6 +604,9 @@ $('#btn-acercar').onclick = () => zoomEn(anchoPx / 2, altoPx / 2, 1.25);
 $('#btn-alejar').onclick = () => zoomEn(anchoPx / 2, altoPx / 2, 0.8);
 $('#btn-centrar').onclick = centrarEnMios;
 
+// ¿Se está escribiendo en un campo? También adentro de un recuadro aislado (la Botonera nueva, las Acciones): ahí `e.target` es el recuadro,
+// no el campo (2026-10-08: el buscador de la tienda perdía letras, que el mapa tomaba como atajos).
+const escribiendoEnCampo = (e, sel) => { const el = (e.composedPath && e.composedPath()[0]) || e.target; return !!(el && el.closest && el.closest(sel || 'input,select,textarea,[contenteditable]')); };
 document.addEventListener('keydown', e => {
   // Con la Botonera o las Acciones abiertas, el teclado es de esa ventana:
   // Escape se le pasa (cierra la de más arriba) y el mapa no hace nada más.
@@ -629,7 +632,7 @@ document.addEventListener('keydown', e => {
     return;
   }
   // Ctrl+Z: deshace el último movimiento o giro propio (no mientras se escribe en un campo).
-  if((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && !(e.target.closest && e.target.closest('input,select,textarea,[contenteditable]'))){
+  if((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && !escribiendoEnCampo(e)){
     e.preventDefault();
     deshacerUltimoMovimiento();
     return;
@@ -640,7 +643,7 @@ document.addEventListener('keydown', e => {
     abrirBitacoraFlotante(!bitacoraFlotanteAbierta);
     return;
   }
-  if(e.target.closest && e.target.closest('input,select,textarea')) return;
+  if(escribiendoEnCampo(e, 'input,select,textarea')) return;
   // L: prende o apaga el Lápiz.
   if((e.key === 'l' || e.key === 'L') && !e.ctrlKey && !e.altKey && !e.metaKey && fbMiembro){
     e.preventDefault();

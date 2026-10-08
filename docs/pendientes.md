@@ -280,6 +280,12 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] Las **24 trampas base** y su daño.
 - [ ] El pool de **habilidades de clase** (`skills-clase.js`): 62 skills, casi todas todavía "(Sin auditar)".
 
+- [ ] **Ocultar la calidad de los ítems a los jugadores** (dueño, 2026-10-07): el GM la ve; los jugadores no, «para no condicionar cuántos
+  equipos hay comunes, cuántos de buena calidad: que juzguen de acuerdo a lo que sientan y lo que les venga bien». La calidad aparece hoy en la
+  ficha (inventario, editor, botín, intercambio), la tienda y el catálogo (`.tier` en ~16 archivos de comun/). Pendiente de hacer.
+- [ ] **Varita del desarme («Expelliarmus», dueño, 2026-10-07)**: PdG.Esp contra Res.Esp; si acierta, el arma del rival vuela 2 casillas en
+  una dirección al azar (1d6) y queda Desarmado hasta ir a buscarla; una vez por turno. A definir con el dueño (nombre, calidad, costo, y una
+  parte del pedido que se cortó). Necesita marcar en el mapa dónde quedó el arma.
 ## 6. Repaso de buffs y debuffs (en curso, 2026-09-21)
 - [ ] **Desarrollar los grupos de buffs y debuffs** (dueño, 2026-10-07, P173): qué se apila y qué no, por familia. Lo espera la Varita del
   maleficio (Buena) y cualquier efecto que dé un bono al crítico turno a turno.

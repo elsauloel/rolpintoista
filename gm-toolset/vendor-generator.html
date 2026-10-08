@@ -172,6 +172,11 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .secciones-elegir{display:flex;gap:10px;flex-wrap:wrap;align-items:center;min-height:34px}
 .secciones-elegir label{display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap;text-transform:none;letter-spacing:0;font-size:13px}
 .secciones-elegir input{width:auto;margin:0}
+.preview-secs{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 4px;border-bottom:1px solid var(--line)}
+.preview-sec{padding:8px 16px;border:1px solid var(--line);border-bottom:none;border-radius:8px 8px 0 0;background:rgba(255,255,255,.03);color:inherit;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.preview-sec:hover{background:rgba(255,255,255,.07)}
+.preview-sec.on{background:rgba(201,133,69,.22);border-color:var(--copper);color:#fff}
+.preview-sec b{font-family:"Space Mono",monospace;font-size:11px;font-weight:400;opacity:.75;margin-left:4px}
 .iconbtn{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);padding:5px 10px;border-radius:var(--r)}
 .iconbtn:hover{border-color:var(--copper);color:var(--paper)}
 .modal footer{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;padding:12px 15px;border-top:1px solid var(--line);flex:none}   /* flex-wrap (2026-10-08): si los botones no entran, bajan de renglón en vez de salirse de la ventana */
@@ -338,6 +343,7 @@ input[type=checkbox]{width:auto}
       <button type="button" class="btn" id="btn-agregar-items">+ Agregar ítems</button>
       <button type="button" class="btn" id="btn-item-nuevo">+ Crear ítem nuevo</button>
     </div>
+    <div class="preview-secs" id="preview-secciones"></div>   <!-- las pestañas de la tienda, como las ve el jugador (P179) -->
     <div id="preview-lista"></div>
   </div>
 
@@ -346,7 +352,7 @@ input[type=checkbox]{width:auto}
 <div class="scrim" id="scrim-agregar">
   <div class="modal">
     <header>
-      <h3>Agregar ítems a la tienda</h3>
+      <h3 id="agregar-titulo">Agregar ítems a la tienda</h3>
       <button class="iconbtn" id="agregar-x">Cerrar</button>
     </header>
     <!-- El filtro (comun/filtro-catalogo.js, 2026-10-08): el mismo de la tienda del jugador, con «Efecto escaso» y «De dónde sale». -->
@@ -774,13 +780,24 @@ function verItem(id){
   $('#scrim-ver').classList.add('open');
 }
 
+let seccionVista = '';   // la pestaña que mira el GM en la vista previa ('' = todas)
 function renderPreview(){
   if(!tiendaActual){ $('#panel-preview').style.display = 'none'; return; }
   $('#tienda-nombre').value = tiendaActual.nombre || '';
   const garantizados = new Set(tiendaActual.garantizados);
   const items = tiendaActual.items.map(id => CATALOGO.find(it => it.id === id)).filter(Boolean);
   const textoBusqueda = ($('#preview-buscar').value || '').trim().toLowerCase();
-  const visibles = textoBusqueda ? items.filter(it => it.nombre.toLowerCase().includes(textoBusqueda)) : items;
+  // Las pestañas (dueño, 2026-10-08: «el GM también debe poder ver las pestañas por separado, para visualizar y editar mejor cada una»):
+  // «Todas» y una por sección, con cuántos tiene. Con una sección abierta, la lista y «+ Agregar ítems» son de esa sección.
+  const nSec = {};
+  items.forEach(it => { const k = G.seccionDe(it); nSec[k] = (nSec[k] || 0) + 1; });
+  const abiertas = G.seccionesDe(tiendaActual);
+  const pestanas = G.SECCIONES_ORDEN.filter(k => nSec[k] || abiertas.includes(k));
+  if(seccionVista && !pestanas.includes(seccionVista)) seccionVista = '';
+  $('#preview-secciones').innerHTML = `<button type="button" class="preview-sec${seccionVista ? '' : ' on'}" data-preview-sec="">Todas<b>${fmt(items.length)}</b></button>` +
+    pestanas.map(k => `<button type="button" class="preview-sec${seccionVista === k ? ' on' : ''}" data-preview-sec="${k}" title="${esc(G.SECCIONES[k].detalle)}">${G.SECCIONES[k].icono} ${esc(G.SECCIONES[k].label)}<b>${fmt(nSec[k] || 0)}</b></button>`).join('');
+  const deVista = seccionVista ? items.filter(it => G.seccionDe(it) === seccionVista) : items;
+  const visibles = textoBusqueda ? deVista.filter(it => it.nombre.toLowerCase().includes(textoBusqueda)) : deVista;
 
   const porTier = {};
   items.forEach(it => porTier[it.tier] = (porTier[it.tier] || 0) + 1);
@@ -797,6 +814,14 @@ function renderPreview(){
   let html = '';
   if(!visibles.length){
     html = `<div class="hint">Ningún ítem de la tienda coincide con "${esc(textoBusqueda)}".</div>`;
+  }else if(ordenActual === 'categoria' && seccionVista){
+    // Una sola sección: por rubro, como lo agrupa la tienda.
+    RUBRO_ORDEN.forEach(rubro => {
+      const delRubro = conLegacyPrimero(ordenarItems(visibles.filter(it => rubroDe(it) === rubro)), garantizados);
+      if(!delRubro.length) return;
+      html += `<div class="cat-grouphead">${RUBRO_LABEL[rubro]} · ${fmt(delRubro.length)}</div>`;
+      html += `<div class="cat-grid">${delRubro.map(it => itemCardHtml(it, garantizados.has(it.id))).join('')}</div>`;
+    });
   }else if(ordenActual === 'categoria'){
     // Por sección (P179): lo que el jugador va a ver en cada pestaña.
     G.SECCIONES_ORDEN.forEach(k => {
@@ -1036,7 +1061,7 @@ function abrirItemNuevo(inicial){
 let agregarFiltro = null;
 function filtroAgregar(){
   if(!agregarFiltro) agregarFiltro = FiltroCatalogo.crear($('#agregar-filtros'), {
-    base: () => { if(!tiendaActual) return []; const en = new Set(tiendaActual.items); return CATALOGO.filter(it => !en.has(it.id)); },
+    base: () => { if(!tiendaActual) return []; const en = new Set(tiendaActual.items); return CATALOGO.filter(it => !en.has(it.id) && (!seccionVista || G.seccionDe(it) === seccionVista)); },   // con una pestaña abierta, lo de esa sección
     precio: it => precioAjustado(it), statLabel: st => STAT_LABEL[st] || st, etiquetas: true, origen: true, clave: 'agregar',
     alCambiar: () => renderAgregarLista()});
   return agregarFiltro;
@@ -1072,6 +1097,7 @@ function renderAgregarLista(){
 
 function abrirAgregar(){
   if(!tiendaActual){ toast('Primero generá una tienda'); return; }
+  $('#agregar-titulo').textContent = seccionVista ? `Agregar ítems a ${G.SECCIONES[seccionVista].icono} ${G.SECCIONES[seccionVista].label}` : 'Agregar ítems a la tienda';   // la pestaña que mira el GM
   filtroAgregar().limpiar();
   renderAgregarLista();
   $('#scrim-agregar').classList.add('open');
@@ -1648,6 +1674,7 @@ $('#tienda-nombre').addEventListener('input', e => {
 $('#agregar-x').addEventListener('click', () => $('#scrim-agregar').classList.remove('open'));
 $('#scrim-agregar').addEventListener('mousedown', e => { if(e.target.id === 'scrim-agregar') $('#scrim-agregar').classList.remove('open'); });
 $('#preview-buscar').addEventListener('input', renderPreview);
+$('#preview-secciones').addEventListener('click', e => { const b = e.target.closest('[data-preview-sec]'); if(!b) return; seccionVista = b.dataset.previewSec; renderPreview(); });
 $('#f-ajuste').addEventListener('change', e => aplicarAjuste(e.target.value));
 $('#f-ajuste-venta').addEventListener('change', e => aplicarAjusteVenta(e.target.value));
 $('#f-gratis').addEventListener('change', e => { if(!tiendaActual) return; tiendaActual.agregarGratis = e.target.checked; tiendaCambio(); });

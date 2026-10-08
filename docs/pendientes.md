@@ -289,6 +289,9 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   o un objeto», borde gris), igual que una persona de la historia. Para que salga redondo hace falta separar un tipo **Objeto** en el panel de
   colocar (js/09) y dibujarlo redondo como el arma en el piso (js/27).
 ## 6. Repaso de buffs y debuffs (en curso, 2026-09-21)
+- [ ] **Definir qué es control (CC)** (dueño, 2026-10-08): hace falta para la Inmunidad a CC (hoy: Stun, Exhausto, Inmovilizado, Rengo, Lisiado,
+  Pajaritos y los que tienen `esCC`). Va con la clasificación de buffs y debuffs de abajo; Sangre pura y Coagulación entran ahí.
+- [ ] **Revisar la duración de la Parálisis** (dueño, 2026-10-08): PdG, Parry y Evasión a la mitad; ¿2 turnos o 1? (docs/estados-turnos.md).
 - [ ] **Desarrollar los grupos de buffs y debuffs** (dueño, 2026-10-07, P173): qué se apila y qué no, por familia. Lo espera la Varita del
   maleficio (Buena) y cualquier efecto que dé un bono al crítico turno a turno.
 - [ ] **Zonas del piso y zonas en el aire** (dueño, 2026-10-06): distinguir los efectos persistentes que están en el piso (brea, ácido, púas,

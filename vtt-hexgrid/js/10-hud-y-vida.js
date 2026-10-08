@@ -1165,7 +1165,7 @@ function abrirFichaDeToken(t){
    con sus preguntas, los "Mis presets" del personaje y "Crear estado nuevo (paso a paso)" — y lo aplica con la regla común
    (Combatiente.agregarEstado: inmunidades, acumular, renovar). Un personaje o una invocación se guardan con editarPersonajeMapa (js/11);
    un creep, con modificarCreep. Antes abría la ficha o GM Tools escondidas en el marco. */
-const SE_PIEZAS = ['../comun/estado-preguntas.js?v=20261007r', '../comun/asistente-estado.js?v=20261004p1', '../comun/buscar-estados.js?v=20261008a', '../comun/selector-estados.js?v=20261008m'];
+const SE_PIEZAS = ['../comun/estado-preguntas.js?v=20261007r', '../comun/asistente-estado.js?v=20261008p', '../comun/buscar-estados.js?v=20261008p', '../comun/selector-estados.js?v=20261008m'];
 const idEstadoNuevo = () => Math.random().toString(36).slice(2, 9);
 // Los stats que ofrece el asistente de estados y sus nombres, como en GM Tools (un creep) y en la ficha (un personaje o invocación).
 const SE_STATS_CREEP = {def: ['Def', 'Defensa'], dmg: ['Dmg', 'Daño'], pdg: ['PdG', 'Probabilidad de golpe'], eva: ['Eva', 'Evasión'], parry: ['Parry', 'Parry'],

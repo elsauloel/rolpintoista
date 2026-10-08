@@ -137,7 +137,7 @@ const GuiaDiseno = (() => {
     ['Invulnerable', 'buff', 'Los golpes no hacen nada.'], ['Inmunidad a CC', 'buff', 'Ignora los controles.'],
     ['Espinas', 'buff', 'Daña a quien lo golpea cuerpo a cuerpo (1/4 del golpe).'], ['Espejo', 'buff', 'Devuelve 1/4 del daño especial que recibe, a cualquier distancia (la pareja de las Espinas).'], ['Barrera / Vida extra', 'buff', 'Barra de HP extra que se recarga.'],
     ['Vida extra', 'buff', 'HP sobre el máximo, sin tope ni recarga.'], ['Afortunado', 'buff', 'Tira dos veces y elige la mejor.'],
-    ['Sangre pura', 'buff', 'Inmunidad a ciertos estados de sangre.'], ['Coagulación extrema', 'buff', 'Resiste el Sangrado.'],
+    ['Sangre pura', 'buff', 'Inmunidad a ciertos estados de sangre.'], ['Coagulación', 'buff', 'Resiste el Sangrado.'],
     ['Blindado', 'buff', 'Defensa extra por un tiempo.'], ['Sigilo', 'buff', 'No te ven; te delata el cono de un rival.'],
   ];
   const MAPA = [

@@ -75,6 +75,7 @@ function rayoMomento(id, d){
   if(Date.now() - t > 20000 || typeof rayoSaltoEfecto !== 'function') return;
   d.datos.saltos.forEach((s, i) => setTimeout(() => rayoSaltoEfecto(s.desde, s.hacia), i * 450));
 }
+const caosHechos = new Set();
 function momentoRecibido(id, d){
   if(d.tipo === 'rayo' && d.datos && Array.isArray(d.datos.saltos)) rayoMomento(id, d);
   if(d.tipo === 'confusion') confusionMomento(d);   // la tirada de Confusión del turno (js/20)
@@ -83,6 +84,11 @@ function momentoRecibido(id, d){
   if(d.tipo === 'trampa' && d.datos && d.datos.fase){ trampaMomento(id, d); return; }
   // El pedido de detección al GM (P145): la pantalla del GM tira la Destreza del oculto.
   if(d.tipo === 'sigilo-pedido' && d.estado === 'esperandoGM' && soyGM) deteccionGMAbrir(id, d);
+  // La Varita del caos que usó un jugador sobre un creep (o con un arma que vuela): la aplica la pantalla del GM (js/13 caosAplicar).
+  if(d.tipo === 'caos' && d.estado === 'esperandoGM' && soyGM && d.datos && d.datos.caos && !caosHechos.has(id)){
+    caosHechos.add(id);
+    caosAplicar(d.datos.caos.tokenId, d.datos.caos.spec, d.titulo || 'Varita del caos').then(nota => momentoActualizar(id, {estado: 'listo', resultado: String(d.resultado || '').replace(' (lo aplica el GM)', '') + nota}));
+  }
   // Quien está esperando la respuesta en su cartelito.
   if(percepcionBanner && percepcionBanner.momentoId === id && d.estado === 'listo' && !percepcionBanner.resultado) percepcionRespuesta(d);
   // Si otra pantalla del GM ya lo resolvió, esta cierra su cartelito.

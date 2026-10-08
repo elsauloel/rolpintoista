@@ -180,9 +180,11 @@ const Combatiente = (() => {
   const pocionEmergencia = cinturon => (cinturon || []).filter(i => i && n(i.curahp) > 0 && n(i.unidades) > 0).sort((a, b) => n(b.curahp) - n(a.curahp))[0] || null;
   // Titilando (2026-10-06): un estado listo para agregar a quien vuelve de estar caído. `presets` = la lista en la forma de esa herramienta
   // (estadosPresetFicha / estadosPresetCreep). Se agrega con agregarEstado (si ya lo tenía, se renueva).
+  // (2026-10-08, dueño: Titilando = Invulnerable): el revivido queda Invulnerable hasta que empieza su próximo turno (y por ser invulnerable, titila).
   function estadoTitilando(presets){
-    const pre = (presets || []).find(p => p && p.titilando);
-    return pre ? {id: 'tit' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), activo: true, ...structuredClone(pre)} : null;
+    const pre = (presets || []).find(p => p && p.invulnerable && !p.soloSistema);
+    return pre ? {id: 'tit' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), activo: true, ...structuredClone(pre), turnos: 1, permanente: false,
+      alEmpezarTurno: true, titilando: true, detalle: 'Recién revivido: invulnerable (no recibe daño ni debuffs) hasta que empieza su próximo turno. En el mapa, titila.'} : null;
   }
   // ¿Titila? Cualquier estado activo que da invulnerabilidad (dueño: «asociar la animación de titilar a la invulnerabilidad en general»).
   const titila = estados => (estados || []).some(e => e && e.activo !== false && (e.invulnerable || e.titilando || /^(invulnerable|titilando)$/i.test(String(e.nombre || '').trim())));
@@ -633,7 +635,7 @@ const Combatiente = (() => {
     if(act.some(e => e.invulnerable)) return 'Invulnerable';
     if(est.esCC && act.some(e => e.inmunidadCC)) return 'Inmunidad a CC';
     if(est.esVeneno && act.some(e => e.sangrePura)) return 'Sangre pura';
-    if(est.esSangrado && act.some(e => e.coagulacionExtrema)) return 'Coagulación extrema';
+    if(est.esSangrado && act.some(e => e.coagulacionExtrema)) return 'Coagulación';
     return false;
   }
 
@@ -991,13 +993,14 @@ const Combatiente = (() => {
   const CAOS_ESTADOS = {
     buff: [{nombre: 'Regeneración', turnos: 3, hp: 2}, {nombre: 'Hypeado', turnos: 2}, {nombre: 'Crítico frecuente', turnos: 2}, {nombre: 'Crítico potente', turnos: 2},
       {nombre: 'Invulnerable', turnos: 1}, {nombre: 'Inmunidad a CC', turnos: 2}, {nombre: 'Espinas', turnos: 3}, {nombre: 'Espejo', turnos: 3},
-      {nombre: 'Vida extra', turnos: 3, escudoMagico: 5}, {nombre: 'Barrera', turnos: 2, escudoMagico: 8}, {nombre: 'Afortunado', turnos: 2},
-      {nombre: 'Sangre pura', turnos: 3}, {nombre: 'Coagulación extrema', turnos: 3}, {nombre: 'Blindado', turnos: 2}, {nombre: 'Inamovible', turnos: 2}],
+      {nombre: 'Vida extra', turnos: 3, escudoMagico: 10}, {nombre: 'Barrera', turnos: 2, escudoMagico: 8}, {nombre: 'Afortunado', turnos: 2},
+      {nombre: 'Sangre pura', turnos: 3}, {nombre: 'Coagulación', turnos: 3}, {nombre: 'Blindado', turnos: 2}, {nombre: 'Inamovible', turnos: 2}],
     debuff: [{nombre: 'Veneno', stacks: 4}, {nombre: 'Sangrado', turnos: 2}, {nombre: 'Quemadura', turnos: 3}, {nombre: 'Escarcha', turnos: 2},
-      {nombre: 'Armadura rota', turnos: 3}, {nombre: 'Pajaritos', turnos: 2}, {nombre: 'Cansado', turnos: 2}, {nombre: 'Exhausto', turnos: 1},
+      {nombre: 'Armadura rota'}, {nombre: 'Pajaritos', turnos: 2}, {nombre: 'Cansado', turnos: 2}, {nombre: 'Exhausto', turnos: 1},
       {nombre: 'Stun', turnos: 1}, {nombre: 'Confusión', turnos: 2}, {nombre: 'Lisiado', turnos: 2}, {nombre: 'Inmovilizado', turnos: 1},
       {nombre: 'Rengo', turnos: 2}, {nombre: 'Lento', turnos: 2}, {nombre: 'Miedo', turnos: 2}, {nombre: 'Provocado', turnos: 1},
-      {nombre: 'Parálisis', turnos: 2}, {nombre: 'Silencio', turnos: 1}, {nombre: 'Ceguera', turnos: 1}, {nombre: 'Marcado', turnos: 2}, {nombre: 'Sentado'}],
+      {nombre: 'Parálisis', turnos: 2}, {nombre: 'Silencio', turnos: 1}, {nombre: 'Ceguera', turnos: 1}, {nombre: 'Marcado', turnos: 2}, {nombre: 'Sentado'},
+      {nombre: 'Desarmado', vuela: 2}],   // como la Expelliarmus: el arma vuela 2 casillas a un lado al azar
   };
   /* El d10 del caos: `caos = {exito, contra, propio}` (la Común 6/3/1). Con 1…exito sale lo que se quiere (a un aliado un buff, a un rival un
      debuff); después, contra (lo contrario, al mismo objetivo); el resto, un debuff a quien la usó. → {que: 'buff'|'debuff', a: 'objetivo'|'propio', bien}. */

@@ -198,16 +198,39 @@ function caosDeHabilidad(msg){
     const spec = Combatiente.caosEstado(res.que);
     const dest = res.a === 'propio' ? mio : t;
     try{ mesaPublicar(`${nombreDe(mio)} · ${nom} (${nombreDe(t)})`, {formula: '1d10', rolls: r ? r.rolls : [], mod: 0, total: r ? r.total : 0}); }catch(err){}
+    // Provocado (dueño, 2026-10-08): si salió bien, contra quién lo elige quien usó la varita; si salió mal, el bando contrario (✋).
+    if(spec.nombre === 'Provocado'){
+      if(res.bien){
+        const contra = await new Promise(ok => elegirDestino(hh => ok([...tokens.values()].find(x => x.col === hh.col && x.fila === hh.fila) || null),
+          `<b>🎲 ${esc(nom)}: ${esc(nombreDe(dest))} queda Provocado — ¿contra quién?</b> <span>clic sobre a quién tiene que atacar · Esc: contra vos</span>`, true, () => ok(mio)));
+        spec.detalle = `Provocado: si ataca, tiene que atacar a ${nombreDe(contra || mio)} (✋ lo respeta su jugador o el GM).`;
+      }else spec.detalle = 'Provocado: contra quién lo elige el bando contrario (✋ a mano).';
+    }
     const dueTurnos = spec.turnos ? `${spec.turnos} turno${spec.turnos === 1 ? '' : 's'}` : spec.stacks ? `${spec.stacks} stacks` : 'hasta que se le pase';
-    let nota = '';
-    try{
-      if(dest.tipo === 'creep') await modificarCreep(dest.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
-      else await EstadosAplicar.encolarPj({fichaId: dest.fichaId, duenoUid: dest.duenoUid, spec, origen: nom});
-    }catch(err){ console.error('No se pudo aplicar el estado del caos:', err); nota = ' ✋ Aplicalo a mano.'; }
-    const que = res.bien ? 'salió lo que buscabas' : res.a === 'propio' ? 'se te dio vuelta' : 'salió al revés';
-    momentoAbrir({tipo: 'caos', icono: '🎲', titulo: `${nom}: ${que}`, estado: 'listo',
-      resultado: `1d10 → ${r ? r.total : '?'} (${aliado ? 'a un aliado' : 'a un rival'}): ${nombreDe(dest)} recibe ${spec.nombre} (${dueTurnos}).${nota}`});
+    const titulo = `${nom}: ${res.bien ? 'salió lo que buscabas' : res.a === 'propio' ? 'se te dio vuelta' : 'salió al revés'}`;
+    const texto = `1d10 → ${r ? r.total : '?'} (${aliado ? 'a un aliado' : 'a un rival'}): ${nombreDe(dest)} recibe ${spec.nombre} (${dueTurnos}).${spec.nombre === 'Provocado' ? ' ' + spec.detalle : ''}`;
+    // Un creep, o el arma que vuela (Desarmado), lo aplica la pantalla del GM: si no soy el GM, se lo pido con el momento.
+    const destId = [...tokens.entries()].find(([, x]) => x === dest)[0];
+    if(!soyGM && (dest.tipo === 'creep' || spec.vuela)){
+      momentoAbrir({tipo: 'caos', icono: '🎲', titulo, resultado: texto + ' (lo aplica el GM)', estado: 'esperandoGM', datos: {caos: {tokenId: destId, spec}}});
+      return;
+    }
+    const nota = await caosAplicar(destId, spec, nom);
+    momentoAbrir({tipo: 'caos', icono: '🎲', titulo, estado: 'listo', resultado: texto + nota});
   }, `<b>🎲 ${esc(nom)}: ¿a quién?</b> <span>clic sobre un aliado (un buff al azar) o un rival (un debuff al azar) · Esc o clic derecho cancelan</span>`, true);
+}
+// Le pone a ese token el estado del caos (y, si es Desarmado, el arma vuela). → una nota para el resultado ('' si salió bien).
+async function caosAplicar(tokenId, spec, origen){
+  const dest = tokens.get(tokenId);
+  if(!dest) return ' ✋ Ya no está en el mapa: aplicalo a mano.';
+  let nota = '';
+  try{
+    const limpio = {...spec}; delete limpio.vuela;
+    if(dest.tipo === 'creep') await modificarCreep(dest.fichaId, sc => EstadosAplicar.aplicarACreep(sc, limpio));
+    else await EstadosAplicar.encolarPj({fichaId: dest.fichaId, duenoUid: dest.duenoUid, spec: limpio, origen});
+    if(spec.vuela && typeof armaSoltar === 'function'){ const s = await armaSoltar(dest, num(spec.vuela)); if(s && s.nota) nota = ` (${s.nota})`; }
+  }catch(err){ console.error('No se pudo aplicar el estado del caos:', err); nota = ' ✋ Aplicalo a mano.'; }
+  return nota;
 }
 async function portalesCrear(puntos, turnos, nombre, de){
   const n = Math.max(1, Math.round(num(turnos)) || 3), vence = Math.round(num(mantenimientoNumero)) + n + (de && colocadorEnOrden(de) ? 1 : 0);

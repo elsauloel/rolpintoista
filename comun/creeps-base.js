@@ -957,7 +957,7 @@
 
   cr('bosque', 4, 'Goblin quiebrahuesos', 'brutal', 'humanoide', 'Maza de tronco',
     ap(at('Mazazo', 'Un mazazo brutal: daño y la armadura del objetivo queda Rota.', 'H'), A('Armadura rota')),
-    [es('Piel de sapo', 'Su piel gruesa cierra las heridas solas: inmune al sangrado.', 1, 'Coagulación extrema', 'buff', 3), 4],
+    [es('Piel de sapo', 'Su piel gruesa cierra las heridas solas: inmune al sangrado.', 1, 'Coagulación', 'buff', 3), 4],
     'Le encanta el sonido que hacen las armaduras al romperse.', TG);
   cr('bosque', 4, 'Goblin sembrador de zarzas', 'rapido', 'humanoide', 'Hoz de mano',
     at('Hozazo', 'Un tajo rápido con la hoz.', 'M'),

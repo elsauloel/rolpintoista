@@ -380,7 +380,7 @@
   H('Escudo arcano', 'T', 'ga', 'tg', 4, eS('Una barrera de energía absorbe daño de cualquier fuente.', 2, 'Vida extra', 'buff', 3));
   H('Suerte del bribón', 'B', 'hdb', 'e', 4, eS('Todas sus tiradas de PdG, Parry y Evasión se hacen dos veces y queda la mejor.', 2, 'Afortunado', 'buff', 2));
   H('Sangre inmune', 'T', 'mpc', 't', 4, eS('Ningún veneno le hace efecto.', 1, 'Sangre pura', 'buff', 3));
-  H('Coagulación rápida', 'T', 'bhd', 't', 4, eS('Sus heridas cierran al instante: inmune al sangrado.', 1, 'Coagulación extrema', 'buff', 3));
+  H('Coagulación rápida', 'T', 'bhd', 't', 4, eS('Sus heridas cierran al instante: inmune al sangrado.', 1, 'Coagulación', 'buff', 3));
   H('Coraza blindada', 'T', 'cd', 't', 4, eS('Ningún golpe crítico lo atraviesa.', 2, 'Blindado', 'buff', 3));
   H('Regeneración rápida', 'C', 'bpm', 'tm', 5, eS('Sus heridas se cierran solas: recupera vida cada turno.', 2, 'Regeneración', 'buff', 3, {hp: 3}));
   H('Adrenalina', 'B', 'hdb', 'me', 3, eS('Un torrente de energía: +1 No2 máximo.', 1, 'Hypeado', 'buff', 3));

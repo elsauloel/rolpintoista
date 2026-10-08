@@ -80,12 +80,10 @@ const ESTADOS_PRESET = [
   // Ceguera (dueño, 2026-10-07, la Varita del eclipse): 1 turno, solo ve a 1 casilla y −2 PdG.
   {nombre:'Ceguera', polaridad:'debuff', turnos:1, ceguera:true, mods:[{stat:'pdg', val:-2}],
     detalle:'Ciego: solo ve a 1 casilla alrededor y tiene −2 PdG. ⚙ Automatizado: el −2 y, en el mapa, lo que ve un personaje (1 casilla, ni su propia luz).'},
-  {nombre:'Invulnerable', polaridad:'buff', turnos:3, invulnerable:true,
+  // Invulnerable = Titilando (2026-10-08, dueño: «son lo mismo»): siempre que alguien es invulnerable, titila. Al revivir se pone Invulnerable
+  // hasta su próximo turno (Combatiente.estadoTitilando); `Titilando` queda como otro nombre de lo mismo (los estados ya puestos).
+  {nombre:'Invulnerable', alias:['Titilando'], polaridad:'buff', turnos:3, invulnerable:true,
     detalle:'No recibe daño de ninguna fuente (golpes, veneno, sangrado, etc.) y no se le puede aplicar ningún debuff. En el mapa, su token titila.'},
-  // Titilando (dueño, 2026-10-06: «como en el Contra, cuando te morís y resucitás»): quien vuelve de estar caído titila y es invulnerable hasta que
-  // empieza su próximo turno (`alEmpezarTurno`: se va al empezar su turno; sin orden de turnos, en el próximo Mantenimiento, con su turno 1).
-  {nombre:'Titilando', polaridad:'buff', turnos:1, invulnerable:true, titilando:true, alEmpezarTurno:true,
-    detalle:'Recién revivido: titila y es invulnerable (no recibe daño ni debuffs) hasta que empieza su próximo turno. ⚙ Automatizado: lo ponen los efectos que reviven (✚ Revivir, el Ankh) y se va solo al empezar su turno (sin orden de turnos, en el próximo Mantenimiento). Una cura normal no levanta a un caído.'},
   {nombre:'Inmunidad a CC', polaridad:'buff', turnos:2, inmunidadCC:true,
     detalle:'Inmune a los controles: Stun, Exhausto, Inmovilizado, Rengo, Lisiado y Pajaritos (no se le pueden aplicar mientras dure). Veneno y Sangrado no cuentan como control.'},
   {nombre:'Espinas', polaridad:'buff', turnos:3, espinas:true,
@@ -105,7 +103,8 @@ const ESTADOS_PRESET = [
     detalle:'Toda tirada de PdG, Parry o Evasión se hace dos veces y se queda con la mejor.'},
   {nombre:'Sangre pura', polaridad:'buff', turnos:3, sangrePura:true,
     detalle:'Inmune a todo tipo de Veneno: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},
-  {nombre:'Coagulación extrema', polaridad:'buff', turnos:3, coagulacionExtrema:true,
+  // Coagulación (2026-10-08, dueño: antes «Coagulación extrema»; la marca interna sigue siendo coagulacionExtrema).
+  {nombre:'Coagulación', alias:['Coagulación extrema'], polaridad:'buff', turnos:3, coagulacionExtrema:true,
     detalle:'Inmune a Sangrado: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},
   {nombre:'Blindado', polaridad:'buff', turnos:3, blindado:true,
     detalle:'✋ A mano: inmune a golpes críticos. Cuando le pegan con un crítico, la mesa lo anula (no le hace daño). El estado solo recuerda que está activo y cuántos turnos dura.'},

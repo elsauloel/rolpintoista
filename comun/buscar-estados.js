@@ -20,11 +20,11 @@ const BuscarEstados = (() => {
     'Lisiado': 'control cc mitad', 'Parálisis': 'control cc paralizado', 'Sentado': 'control derribado suelo caido',
     'Confusión': 'control confundido', 'Miedo': 'control asustado', 'Provocado': 'taunt control', 'Silencio': 'control sin habilidades mudo',
     'Desarmado': 'control arma suelta', 'Ceguera': 'control ciego vista', 'Cansado': 'no2 nitros fatiga', 'Exhausto': 'no2 nitros fatiga',
-    'Hypeado': 'no2 nitros buff', 'Invulnerable': 'inmune inmunidad sin daño', 'Inmunidad a CC': 'inmune inmunidad control cc',
-    'Titilando': 'inmune invulnerable revivido', 'Espinas': 'devuelve refleja daño', 'Espejo': 'devuelve refleja daño especial',
+    'Hypeado': 'no2 nitros buff', 'Invulnerable': 'inmune inmunidad sin daño titilando titila revivido', 'Inmunidad a CC': 'inmune inmunidad control cc',
+    'Espinas': 'devuelve refleja daño', 'Espejo': 'devuelve refleja daño especial',
     'Vida extra': 'escudo shield absorbe excedente hp', 'Barrera': 'escudo shield absorbe', 'Blindado': 'defensa escudo armadura',
     'Afortunado': 'suerte ventaja dos veces', 'Sigilo': 'oculto invisible stealth esconderse', 'Marcado': 'visible brillo revelado',
-    'Crítico frecuente': 'crit critico', 'Crítico potente': 'crit critico', 'Sangre pura': 'inmune veneno', 'Coagulación extrema': 'inmune sangrado',
+    'Crítico frecuente': 'crit critico', 'Crítico potente': 'crit critico', 'Sangre pura': 'inmune veneno', 'Coagulación': 'inmune sangrado coagulacion extrema',
     'Inamovible': 'empujon empuje no se mueve', 'Mareo de invocación': 'invocacion espera',
   };
   const CSS = `.be-caja{display:flex;gap:8px;align-items:center;margin:2px 0 10px}

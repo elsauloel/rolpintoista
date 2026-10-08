@@ -54,7 +54,7 @@ resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (
 
 | Arma | Qué hace · SP · DDE |
 |---|---|
-| Varita del desarme («Expelliarmus») | PdG.Esp contra Res.Esp; si acierta, el arma del rival vuela 2 casillas en una dirección al azar (1d6) y queda Desarmado. Se puede usar como Flash; una vez por turno; cuesta 2 No2 y 2 SP; cara. · 2 · ? |
+| Varita Expelliarmus (nombre del dueño, como en Harry Potter) | PdG.Esp contra Res.Esp; si acierta, el arma del rival vuela 2 casillas en una dirección al azar (1d6) y queda Desarmado (el arma, 🗡 redonda en el mapa, la levanta cualquiera que esté al lado). Se puede usar como Flash; una vez por turno; cuesta 2 No2 y 2 SP; cara. Calidad a confirmar (propuesta: Raro, 300 DDE). · 2 · ? |
 
 ## ⏸ En espera
 

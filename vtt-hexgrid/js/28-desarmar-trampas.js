@@ -8,6 +8,10 @@
      trampa, sin No2; la que no desarma, se rompe.
    Sacar del mapa una trampa ajena necesita la regla de Firestore (cualquiera de la partida puede borrar una trampa). */
 const DESARMAR_TRAMPA_NO2 = 1;
+// En combate, fallar (detectarla o desarmarla) es perder la oportunidad con esa trampa (dueño, 2026-10-08: «ya está, perdiste»): 'tokenId:trampaId'.
+// No se le vuelve a pedir Percepción por ella ni se le ofrece desarmarla, tampoco al terminar el combate; al terminar el combate se vacía.
+const trampaIntentoPerdido = new Set();
+const trampaPerdio = (tokenId, trampaId) => { if(modoMapa === 'combate') trampaIntentoPerdido.add(tokenId + ':' + trampaId); };
 const desarmarDif = el => Math.max(1, Math.round(num(el && el.trampaDetectar)) || 8);
 // La tirada del talento de ese personaje ('' si no lo tiene). Las invocaciones no tienen talentos.
 function tokenDesarmaTrampas(t){
@@ -49,6 +53,7 @@ async function desarmarIntentar(tokenId, trampaId, o){
     try{ await editarPersonajeMapa(t.fichaId, S => { Recibidos.devolverTrampas(S, [JSON.stringify(trampaComoItem(el))]); return true; }); }
     catch(err){ console.error('No se pudo guardar la trampa desarmada:', err); return {ok: false, texto: 'Se desarmó, pero no se pudo guardar en la mochila: sumala a mano.'}; }
   }
+  if(!ok && !o.rompe) trampaPerdio(tokenId, trampaId);
   if(ok || o.rompe){
     try{ await coleccionElementos().doc(trampaId).delete(); }
     catch(err){ console.error('No se pudo sacar la trampa del mapa:', err); return {ok, texto: `${r.total} contra ${dif}: ${ok ? `desarmaste ${nomT} (está en tu mochila)` : `${nomT} se rompió`}, pero no se pudo sacar del mapa (¿faltan pegar las reglas?): borrala a mano.`}; }
@@ -80,7 +85,7 @@ async function desarmarAlTerminar(){
     if(modoMapa === 'combate') return;   // empezó otro combate mientras tanto
     for(const [tokenId, t] of tokens){
       if(!tokenDesarmaTrampas(t) || typeof bnManejo !== 'function' || !bnManejo(t.fichaId)) continue;
-      const quedan = [...elementos.entries()].filter(([, el]) => el.trampa && !el.disparada && trampaDispara(t, el)).map(([id]) => id);
+      const quedan = [...elementos.entries()].filter(([id, el]) => el.trampa && !el.disparada && trampaDispara(t, el) && !trampaIntentoPerdido.has(tokenId + ':' + id)).map(([id]) => id);
       if(!quedan.length) continue;
       const nombre = nombreDe(t);
       const si = await AvisoCombate.preguntar(`Quedaron ${quedan.length === 1 ? 'una trampa' : `${quedan.length} trampas`} sin activarse. ${nombre} puede intentar desarmarlas: una tirada por trampa; la que no desarma, se rompe.`,
@@ -92,5 +97,5 @@ async function desarmarAlTerminar(){
       momentoAbrir({tipo: 'desarmar', icono: '🪤', titulo: `${nombre} desarma las trampas que quedaron`, estado: 'listo', datos: {lineas}});
     }
   }catch(err){ console.error('Desarmar trampas al terminar el combate:', err); }
-  finally{ desarmarFinEnCurso = false; }
+  finally{ desarmarFinEnCurso = false; trampaIntentoPerdido.clear(); }
 }

@@ -240,7 +240,8 @@ function trampasEvaluarRuta(tokId, t, ruta, levita){   // `levita`: los primeros
       const vec = vecinosDeCasilla(ruta[i]).map(v => nbPack(v.col, v.fila));
       const aca = nbPack(ruta[i].col, ruta[i].fila);
       // Solo las que todavía no ve (ni descubierta por su equipo, ni vista por este navegador), y una vez por casillero.
-      const cerca = trampas.find(x => !x.portal && !x.el.descubierta && !trampasVistas.has(x.id) && !trampasAvisadas.has(tokId + ':' + x.id + ':' + aca) && vec.some(k => x.set.has(k)));
+      const cerca = trampas.find(x => !x.portal && !x.el.descubierta && !trampasVistas.has(x.id) && !trampasAvisadas.has(tokId + ':' + x.id + ':' + aca) && vec.some(k => x.set.has(k))
+        && !(typeof trampaIntentoPerdido !== 'undefined' && trampaIntentoPerdido.has(tokId + ':' + x.id)));   // en combate, ya falló con esta (2026-10-08)
       if(cerca) return {indice: i, tipo: 'cerca', id: cerca.id, el: cerca.el};
     }
   }

@@ -249,6 +249,7 @@ async function percepcionResolverBanner(){
     momentoActualizar(mid, {estado: 'listo', resultado: `…y encuentra una trampa${el.trampaNombre ? `: «${el.trampaNombre}»` : ''}.`});
   }else{
     pb.resultado = 'Mmm... Puede que estés flasheando.';   // texto del dueño (2026-10-02); la tirada ya está en la Mesa
+    if(typeof trampaPerdio === 'function') trampaPerdio(pb.tokenId, pb.trampaId);   // en combate, con esta trampa ya no hay otro intento (2026-10-08)
     momentoActualizar(mid, {estado: 'listo', resultado: 'Mmm... puede que esté flasheando.'});
   }
   renderPercepcionBanner();

@@ -1949,7 +1949,7 @@ Con la calculadora recalibrada (varitas directas con dado fijo, báculos con ¼ 
   de arena de una casilla: `soltar.difStat`, `lento: 2`, deja 2 turnos de arena) y Varita de arena movediza (zona con `zonaEstado` Inmovilizado +
   `soltar` contra el Ef.Esp de quien la tira + `lento`; el mapa frena también en esas zonas, `lentoEn`). La Varita del portal Común (la trampa)
   pasa a llamarse Varita de la trampa portal. **Manotazo sacado** (lo cubre la Expelliarmus), **Purga arranca en 2 No2**, **Luz flotante
-  descartada**, **Expelliarmus Rara confirmada**. Tokens redondos: **solo los objetos** (dueño).
+  se queda** (2026-10-08, el dueño se había confundido; falta definir «revela lo oculto»), **Expelliarmus Rara confirmada**. Tokens redondos: **solo los objetos** (dueño).
   Probadas en el mapa (2026-10-08): el portal aliado (el segundo a 4 o menos; se cierran al empezar el turno de quien los abrió), la arena
   movediza (atrapa con Res.CC contra el Ef.Esp, «🔓 Soltarse · Fuerza contra 15», salir cuesta 2 No2) y la trampa de arena (Inmovilizado y
   Soltarse contra el Ef.Esp). Dos arreglos de paso: **el bando de una trampa sale de quién la puso** (`trampaEsDelGM`, js/07: si el GM maneja a

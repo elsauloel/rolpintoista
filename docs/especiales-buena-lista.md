@@ -40,6 +40,7 @@ resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (
 | Varita del vendaval | Cono: empuja 2 a todos; apaga el fuego y despeja la niebla que toca. · 1 · 80 |
 | Varita inestable | 2d6 arcano directo; si sale algún 1, te hacés 2d4. · 2 · 100 |
 | Varita del blink | Te teletransportás (o a un aliado que ves) hasta 3 casillas; una vez por turno. · 3 · 95 |
+| Varita de la luz flotante | Luz de radio 2 en una casilla, 2 turnos. **Se queda** (dueño, 2026-10-08: no era para sacarla); a definir qué pasa con «revela lo oculto» (no le cierra que sea permanente). · 1 · 80 |
 | Báculo de sangre | 1d8 arcano + ¼ de tu Ef.Esp; cada uso cuesta el 10 % de tu vida máxima (para arriba) en vez de SP. · — · 90 |
 | Varita de cargas | La Bola de fuego Común, 3 usos por combate sin SP. · — · 120 |
 | Varita gemela | Aceite o Bola de fuego: elegís al usarla (el SP del que elegís). · 1 o 2 · 95 |
@@ -61,7 +62,6 @@ resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (
 | Varita del maleficio | −1 a la Res. crítico de un tipo a elección, 2 turnos, no acumulable: espera los grupos de buffs y debuffs (P173). |
 | Varita del escudo | Sacada: la Vida extra se acumula y era poco más que una cura. |
 | Varita del manotazo | Sacada (dueño, 2026-10-07): la Expelliarmus ya desarma. |
-| Varita de la luz flotante | Descartada (dueño, 2026-10-07): revelar lo oculto como efecto permanente no cierra. |
 
 En Común ✅ cargadas (2026-10-07): **Varita del portal aliado** (dos portales a 4 o menos uno del otro, solo tu bando, hasta tu próximo
 turno, 2 SP, 55), **Varita de la trampa de arena** (una casilla oculta, 1 SP, 40) y **Varita de arena movediza** (flor a la vista, 2 turnos,

@@ -302,6 +302,9 @@ const FichaAcciones = (() => {
         else if(num(it.curahp) > 0) ui.toast(`${it.nombre}: ${Combatiente.CAIDO_TXT}`);
       }
       const efecto = ui.efecto(it);
+      // Cura estados por grupo (P180): Vendas, Antídoto, Té de tilo, Sales aromáticas, Ungüento de la Turca, Mate cebado; el Cura Plus, todos.
+      const curados = Combatiente.curaDeItem(it).length ? Combatiente.curarEstados(S.efectos, Combatiente.curaDeItem(it)) : null;
+      if(curados && curados.sacados.length) S.efectos = curados.quedan;
       ui.tirarExtra(it);
       const spRestaurado = restaurarSpDeConsumo(S, it);
       const reparados = it.nombre === 'Oleo reparador' ? repararArmadura(S) : 0;
@@ -313,7 +316,8 @@ const FichaAcciones = (() => {
           catch(e){ console.error(e); reviveTxt = `✚ no se pudo revivir a ${revive.nombre}: aplicalo a mano (✚ Revivir en su ficha)`; }
         } else reviveTxt = `✚ ✋ a mano: revivilo con ✚ Revivir en su ficha (${pct} % de su vida); desde el mapa se elige solo`;
       }
-      ui.cambio([key, ...(efecto || reparados ? ['efectos'] : []), 'vitals', 'nitros']);
+      const curadosTxt = curados ? (curados.sacados.length ? `🩹 se le fue: ${curados.sacados.join(', ')}` : '🩹 no tenía nada que curar') : '';
+      ui.cambio([key, ...(efecto || reparados || (curados && curados.sacados.length) ? ['efectos'] : []), 'vitals', 'nitros']);
       const partes = [];
       if(it.curahp) partes.push(`${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp) + boticario)} HP${boticario ? ` (+${fmt(boticario)} de Mano de boticario)` : ''}`);
       if(spRestaurado) partes.push(`+${fmt(spRestaurado)} SP`);
@@ -322,10 +326,11 @@ const FichaAcciones = (() => {
       if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
       if(reparados) partes.push(reparados > 1 ? 'armadura reparada por completo' : 'armadura reparada');
       if(reviveTxt) partes.push(reviveTxt);
+      if(curadosTxt) partes.push(curadosTxt);
       ui.toast(`${it.nombre}: ${partes.join(' · ')}`);
       // El anuncio (dueño, 2026-10-05: «se anuncia en el log y en la crónica»): una línea en la Mesa y, en el mapa, la Crónica para los demás.
       const quien = (S.meta && S.meta.nombre) || 'Alguien';
-      const publicas = [...(it.curahp ? [`${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`] : []), ...(efecto ? [efecto.nombre] : []), ...(revive ? [`✚ revive a ${revive.nombre}`] : [])];
+      const publicas = [...(it.curahp ? [`${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`] : []), ...(efecto ? [efecto.nombre] : []), ...(revive ? [`✚ revive a ${revive.nombre}`] : []), ...(curados && curados.sacados.length ? [`🩹 se le fue ${curados.sacados.join(', ')}`] : [])];
       const resultado = [publicas.join(' · '), sac.saque ? sac.saque.txt : ''].filter(Boolean).join(' · ');
       const anuncio = {titulo: `${quien} usó ${it.nombre}`, resultado, texto: `🧪 ${quien} usó ${it.nombre}${resultado ? ': ' + resultado : ''}`, item: it.nombre, saqueSalio: !!(sac.saque && sac.saque.sale)};
       if(ui.anunciar) ui.anunciar(anuncio);

@@ -675,6 +675,18 @@ prueba('la tienda: precio con ajuste, solo lo del vendedor, comprar del carrito,
      500 - Math.max(1, Math.round(num(arma.precioCompra) * 1.5)) + 1, 500 - Math.max(1, Math.round(num(arma.precioCompra) * 1.5)) + 1 - 2, 4, true, undefined, true]);   // 2 despojos a la mitad = +1; reparar 1 punto a 2 DDE
 });
 
+grupo('Curar estados por grupo (P180)');
+prueba('cada estado en su grupo; un consumible saca los de su grupo y deja el resto; el Cura Plus, todos; las copias viejas se reconocen por el nombre', () => {
+  const C = Combatiente, cat = n => CATALOGO_BASE.find(i => i.nombre === n);
+  const est = ['Sangrado', 'Veneno severo', 'Confusión', 'Stun', 'Escarcha', 'Cansado', 'Armadura rota', 'Bendición'].map(nombre => ({nombre}));
+  const quedan = (it) => C.curarEstados(est, C.curaDeItem(it)).quedan.map(e => e.nombre);
+  igual([C.grupoCuraDe('Lisiado'), C.grupoCuraDe('veneno'), C.grupoCuraDe('Veneno tóxico'), C.grupoCuraDe('Ceguera'), C.grupoCuraDe('Lento'), C.grupoCuraDe('Armadura rota'), C.grupoCuraDe('Sentado'),
+    quedan(cat('Vendas')).length, quedan(cat('Antídoto')).includes('Veneno severo'), quedan(cat('Cura Plus')), quedan({nombre: 'Vendas'}).includes('Sangrado'), quedan({nombre: 'Poción de HP'}).length,
+    ['Té de tilo', 'Sales aromáticas', 'Ungüento de la Turca', 'Mate cebado'].every(n => cat(n) && cat(n).tier === 'Común' && cat(n).legacy && GeneradorTiendas.clasicos(CATALOGO_BASE).includes(cat(n))),
+    cat('Cura Plus').precioCompra],
+    ['heridas', 'venenos', 'venenos', 'mente', 'fatiga', '', '', 7, false, ['Armadura rota', 'Bendición'], false, 8, true, 120]);
+});
+
 grupo('Filtro del catálogo (2026-10-08)');
 prueba('el filtro: qué es, una o dos manos, calidad, búsqueda con todas las palabras, precio desde–hasta, Tipo, elemento y que suba', () => {
   const L = [

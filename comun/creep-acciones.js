@@ -268,6 +268,9 @@ const CreepAcciones = (() => {
     const ef = efectoDeHab(sc, it, presets);
     if(ef.estado){ if(C().modsAfectanHp(ef.estado.mods)) C().actualizarHpMaxPorCon(sc); partes.push(`${ef.estado.nombre}${ef.estado.permanente ? '' : ` (${fmt(ef.estado.turnos)} turnos)`}`); }
     if(ef.aviso) partes.push(ef.aviso);
+    // Cura estados por grupo (P180).
+    const curados = Combatiente.curaDeItem(it).length ? Combatiente.curarEstados(sc.estados, Combatiente.curaDeItem(it)) : null;
+    if(curados){ if(curados.sacados.length){ sc.estados = curados.quedan; partes.push(`🩹 se le fue: ${curados.sacados.join(', ')}`); } else partes.push('🩹 no tenía nada que curar'); }
     const tiradas = [];
     const stat = it.tiradaStat;
     const ATRIB = {fue: 'Fuerza', con: 'Constitución', agl: 'Agilidad', des: 'Destreza', esp: 'Especial'};
@@ -276,7 +279,7 @@ const CreepAcciones = (() => {
     if(formula){ const r = tirarDados(formula); if(r) tiradas.push({origen: `${sc.nombre} · ${it.nombre}`, r}); }
     partes.push(`−${fmt(pagado)} No2${pagado < costo ? ' (no le alcanzaban)' : saque && saque.sale ? ' (Saque rápido)' : ''}`);
     // El anuncio para la Mesa y la Crónica: sin la vida del creep (es privada), con el estado que le dejó y el Saque rápido.
-    const publico = [ef.estado ? ef.estado.nombre : '', saque ? saque.txt : ''].filter(Boolean).join(' · ');
+    const publico = [ef.estado ? ef.estado.nombre : '', curados && curados.sacados.length ? `🩹 se le fue ${curados.sacados.join(', ')}` : '', saque ? saque.txt : ''].filter(Boolean).join(' · ');
     const anuncio = {titulo: `${sc.nombre} usó ${it.nombre}`, resultado: publico, texto: `🧪 ${sc.nombre} usó ${it.nombre}${publico ? ': ' + publico : ''}`, item: it.nombre, saqueSalio: !!(saque && saque.sale)};
     return {aviso: `${sc.nombre} usó ${it.nombre}: ${partes.join(' · ')}`, anuncio, tiradas: tiradas.filter(t => t && !t.error), forzado: pagado < costo ? {costo, tenia: pagado} : null,
       trampa: it.trampaDatos ? structuredClone(it) : null};

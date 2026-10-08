@@ -1391,3 +1391,7 @@ versión parecida en más de una, es candidato a juntar.
   `generar({secciones, tamano, nivel, catalogo})`. `FichaTienda.secciones(S, st)`, `seccionActual`, `seccionesHtml` (las pestañas, con su CSS) y
   `elegirSeccion(st, k)`; `st.seccion` = la pestaña abierta (`base` filtra por ella). El filtro (`filtro-catalogo.js`) suma el desplegable
   **Resistencia a crítico** (`rescrit`: tipo1…tipo5 = contra Tipo 4…12; ya no aparecen en «Que suba», donde «Tipo 4» se confundía con un arma).
+- **Curar estados por grupo** (P180, dueño 2026-10-08): `Combatiente.GRUPOS_CURA` (heridas, venenos, mente, aturdimiento, elementales, fatiga, con sus
+  estados), `grupoCuraDe(nombre)`, `curaDeItem(item)` (lo que cura: `item.curaEstados`, `['todo']` = todos; las copias viejas de Vendas, Antídoto y Cura Plus
+  se reconocen por el nombre), `curarEstados(estados, grupos)` → `{quedan, sacados}` y `textoCura`. Lo aplican `FichaAcciones.consumir` (personaje, ficha y
+  mapa) y `CreepAcciones.consumir`. **Un estado nuevo que se pueda curar con un consumible: sumarlo a su grupo en `GRUPOS_CURA`.**

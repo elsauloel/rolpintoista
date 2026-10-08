@@ -1082,7 +1082,47 @@ const Combatiente = (() => {
     return h;
   }
 
-  return {costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  /* Curar estados por grupo (P180, dueño 2026-10-08: «crear un ítem para cada debuff es un pésimo diseño: agruparlos conceptualmente… para tener
+     consumibles útiles y que la única salida no sea el Cura Plus, y que el Cura Plus además sea caro»). Un consumible con `curaEstados: ['heridas']`
+     saca, al usarlo, los estados de ese grupo; `['todo']` (el Cura Plus) saca los de todos los grupos. Lo que no está en ningún grupo no se cura con
+     un consumible: tiene su propia salida (Armadura rota se repara, Desarmado se levanta el arma, Sentado se levanta, Inmovilizado se suelta;
+     Silencio, Marcado y Mareo de invocación se esperan). Un estado nuevo que se pueda curar: sumarlo a su grupo acá. */
+  const GRUPOS_CURA = {
+    heridas: {label: 'Heridas', estados: ['Sangrado', 'Lisiado', 'Rengo']},
+    venenos: {label: 'Venenos', estados: ['Veneno', 'Veneno severo'], patron: /veneno|toxic/},   // cualquier veneno, también los que vengan
+    mente: {label: 'Mente e ilusiones', estados: ['Confusión', 'Miedo', 'Provocado', 'Ceguera']},
+    aturdimiento: {label: 'Aturdimiento', estados: ['Pajaritos', 'Stun']},
+    elementales: {label: 'Elementales', estados: ['Quemadura', 'Escarcha', 'Parálisis']},
+    fatiga: {label: 'Fatiga', estados: ['Cansado', 'Exhausto', 'Lento']},
+  };
+  const normEstado = t => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  // El grupo de un estado (por su nombre), o ''.
+  function grupoCuraDe(nombre){
+    const n = normEstado(nombre);
+    if(!n) return '';
+    for(const [k, g] of Object.entries(GRUPOS_CURA)){
+      if(g.estados.some(e => { const x = normEstado(e); return n === x || n.startsWith(x + ' '); }) || (g.patron && g.patron.test(n))) return k;
+    }
+    return '';
+  }
+  // Qué cura un ítem: la lista de grupos (['todo'] = todos), o [] si no cura estados.
+  // (Una copia vieja de Vendas, Antídoto o Cura Plus en una mochila no trae `curaEstados`: se la reconoce por el nombre.)
+  const CURA_POR_NOMBRE = {'vendas': ['heridas'], 'antidoto': ['venenos'], 'cura plus': ['todo']};
+  function curaDeItem(it){
+    if(!it) return [];
+    const lista = Array.isArray(it.curaEstados) ? it.curaEstados : (CURA_POR_NOMBRE[normEstado(it.nombre)] || []);
+    return lista.includes('todo') ? Object.keys(GRUPOS_CURA) : lista.filter(k => GRUPOS_CURA[k]);
+  }
+  // Saca de la lista los estados de esos grupos. → {quedan, sacados: [nombres]}. No toca los buffs ni lo que no está en un grupo.
+  function curarEstados(estados, grupos){
+    const g = new Set(grupos || []), quedan = [], sacados = [];
+    (estados || []).forEach(e => { const k = e && grupoCuraDe(e.nombre); if(k && g.has(k)) sacados.push(e.nombre); else quedan.push(e); });
+    return {quedan, sacados};
+  }
+  // El texto de lo que cura un ítem: «Heridas (Sangrado, Lisiado, Rengo)».
+  const textoCura = grupos => grupos.map(k => `${GRUPOS_CURA[k].label} (${GRUPOS_CURA[k].estados.join(', ')})`).join(' · ');
+
+  return {GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

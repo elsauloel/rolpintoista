@@ -863,8 +863,12 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   dónde buscar y no está todo mezclado). El GM tilda qué secciones abre (por defecto las tres; el tamaño es el total y se reparte); sin pestaña
   «Todo», pero si lo que se busca está en otra pestaña, se avisa. Un solo carrito. La reparación sigue siendo un solo botón que repara todo; se
   separa por sección cuando se defina si existe el «loot mágico».
-- ⏳ **P180. Consumibles que curan estados, por grupo** (dueño, 2026-10-08: «crear un ítem para cada debuff es un pésimo diseño; agruparlos
+- ✅ **P180. Consumibles que curan estados, por grupo** (dueño, 2026-10-08: «crear un ítem para cada debuff es un pésimo diseño; agruparlos
   conceptualmente: lisiado y sangrado, todo tipo de venenos, confusión, miedo e ilusiones… para tener consumibles útiles y que la única salida no sea
   el Cura Plus, y que el Cura Plus además sea caro»). Retoma el pendiente del 2026-09-22 («cura estados» por familia) y se cruza con P173 (grupos
   de buffs y debuffs). Propuesta en la conversación del 2026-10-08: Heridas (Vendas), Venenos (Antídoto), Mente (Té de tilo), Aturdimiento
   (Sales aromáticas), Elementales (Ungüento), Fatiga (Mate cebado); lo que no se cura con un consumible queda afuera; Cura Plus = todo, caro.
+  **Decidido y hecho (dueño, 2026-10-08):** los seis grupos como se propusieron (Ceguera en Mente, Lento en Fatiga) y sus curas, Comunes, «legacy»
+  (en toda tienda) y a 25 DDE: Vendas (heridas: + Rengo), Antídoto (venenos), Té de tilo (mente), Sales aromáticas (aturdimiento), **Ungüento de la
+  Turca** (elementales, nombre del dueño) y Mate cebado (fatiga). El **Cura Plus** cura todos los grupos, Buena calidad, 120 DDE. Automático al usarlos
+  (`Combatiente.GRUPOS_CURA`, `grupoCuraDe`, `curaDeItem`, `curarEstados`; el ítem lleva `curaEstados`).

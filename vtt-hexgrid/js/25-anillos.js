@@ -130,7 +130,7 @@ setInterval(() => {
   });
   if(modo !== anillosModo){
     if(modo !== 'combate') primeraSangreUsadas.clear();
-    if(anillosModo === 'combate' && modo !== 'combate') autoRepararAlTerminar();   // la piel de troll (2026-10-08)
+    if(anillosModo === 'combate' && modo !== 'combate'){ autoRepararAlTerminar(); if(typeof desarmarAlTerminar === 'function') desarmarAlTerminar(); }   // la piel de troll y Desarmar trampas (2026-10-08)
     anillosModo = modo;
   }
 }, 1000);

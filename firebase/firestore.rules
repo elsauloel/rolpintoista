@@ -787,7 +787,9 @@ service cloud.firestore {
         allow delete: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true
             // El viento que despeja (2026-10-08, Varita del vendaval): la niebla y el fuego los puede sacar cualquiera.
-            || resource.data.get('niebla', false) == true || resource.data.get('fuego', false) == true || resource.data.get('zonaDanoTipo', '') in ['de fuego', 'fuego']);
+            || resource.data.get('niebla', false) == true || resource.data.get('fuego', false) == true || resource.data.get('zonaDanoTipo', '') in ['de fuego', 'fuego']
+            // Desarmar trampas (talento, 2026-10-08): cualquiera de la partida saca del mapa una trampa (la desarma o se rompe).
+            || resource.data.get('trampa', false) == true);
       }
 
       // Mapas guardados además del de siempre (que sigue en mapa/* y
@@ -900,7 +902,8 @@ service cloud.firestore {
               && request.resource.data.celdas is list && request.resource.data.celdas.size() < resource.data.celdas.size()));
           allow delete: if esMiembro(c)
             && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true
-              || resource.data.get('niebla', false) == true || resource.data.get('fuego', false) == true || resource.data.get('zonaDanoTipo', '') in ['de fuego', 'fuego']);
+              || resource.data.get('niebla', false) == true || resource.data.get('fuego', false) == true || resource.data.get('zonaDanoTipo', '') in ['de fuego', 'fuego']
+              || resource.data.get('trampa', false) == true);
         }
       }
     }

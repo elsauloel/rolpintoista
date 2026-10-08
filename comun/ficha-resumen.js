@@ -69,6 +69,13 @@ const FichaResumen = (() => {
   /* ---------- El resumen (js/12, fichaResumen) ----------
      o: {control: {uid} | null (🎮 si el GM tiene el control), miniaturaInv(imagen) (la miniatura de una invocación; la
      ficha la calcula aparte y devuelve '' mientras tanto)}. */
+  // La tirada del talento «Desarmar trampas» ('' si no lo tiene): el dado del talento (nivel × 2 caras) + la Inteligencia sin invertir (2026-10-08).
+  function desarmaTrampasDe(S){
+    const it = (S.sociales || []).find(x => x && /desarm\w*\s+(de\s+)?trampa/i.test(String(x.nombre || '')));
+    if(!it) return '';
+    const caras = Math.max(2, FichaBotonera.dadoCarasSocial(it)), inte = Math.round(num(FichaBotonera.inteligenciaBudget(S).resto));   // sin puntos todavía: 1d2
+    return `1d${caras}${inte ? (inte > 0 ? '+' : '') + inte : ''}`;
+  }
   function resumen(S, o){
     o = o || {};
     const c = FichaCalculo.calcular(S);
@@ -111,7 +118,9 @@ const FichaResumen = (() => {
       pasosGratis: n(c.final.pasosgratis),
       retirada: n(c.final.retirada),   // Retirada limpia (%): el mapa la tira al alejarse de un rival (js/17)
       // Los pies (2026-10-04): el mapa las tira (js/08, js/19, js/21); Pasos de baile la lee el duelo.
-      pisadaAtenta: n(c.final.pisadaatenta) > 0, inamovible: n(c.final.inamovible), recuperarse: n(c.final.recuperarse), reflejos: n(c.final.reflejos),   // los primeros casilleros de cada turno, gratis (el mapa los descuenta del costo de moverse)   // Campo de visión (base 6 + ítems, pasivas y estados): el mapa lo suma a la luz de la escena para el radio de cada token
+      // Desarmar trampas (talento, 2026-10-08): detecta trampas como Pisada atenta y el mapa le ofrece desarmarlas con la tirada del talento.
+      desarmaTrampas: desarmaTrampasDe(S),
+      pisadaAtenta: n(c.final.pisadaatenta) > 0 || !!desarmaTrampasDe(S), inamovible: n(c.final.inamovible), recuperarse: n(c.final.recuperarse), reflejos: n(c.final.reflejos),   // los primeros casilleros de cada turno, gratis (el mapa los descuenta del costo de moverse)   // Campo de visión (base 6 + ítems, pasivas y estados): el mapa lo suma a la luz de la escena para el radio de cada token
       // Crítico (2026-09-25): el mapa arma con esto la Calculadora de crítico sin que haya que escribirlo (equipo, habilidades y estados ya sumados).
       // Crítico frecuente y potente DE ESA ARMA (la misma de armaTipo): lo de la otra arma equipada no cuenta.
       ...(() => { const a = (S.inventario || []).find(i => i.equipado && /^arma/.test(i.tipoItem || '') && [4, 6, 8, 10, 12].includes(num(i.tipoDado))); return {crit: n(statParaArma('crit', a || null)), critpot: n(statParaArma('critpot', a || null))}; })(),

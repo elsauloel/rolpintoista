@@ -1632,6 +1632,13 @@ prueba('luces (2026-10-08): el farol Común ilumina 1 turno y marca 2 (no revela
          beng.consumible, beng.zonaUso.zonaLuz, beng.zonaUso.zonaEstado.turnos, estelar.zonaUso.zonaEstado.revela, estelar.tier, !!mareo.soloSistema, !!EstadosAplicar.presetPorNombre ? !!EstadosAplicar.presetPorNombre('Mareo de invocación') : true],
     [1, 1, 2, false, 1, 2, 3, true, 2, true, true, 2, true, 'Buena Calidad', true, true]);
 });
+prueba('Desarmar trampas (talento, 2026-10-08): el resumen publica la tirada del talento y prende la detección de trampas', () => {
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}}).S);
+  const sin = FichaResumen.resumen(S, {});
+  S.sociales = [...(S.sociales || []), {id: 'dt', nombre: 'Desarmar trampas', puntosInt: 2}];
+  const con = FichaResumen.resumen(S, {});
+  igual([sin.desarmaTrampas, /^1d4/.test(con.desarmaTrampas), con.pisadaAtenta], ['', true, true]);
+});
 prueba('Duelo: cada botón dice qué dado tira y trae su 🔍 (dueño, 2026-10-08): personaje, creep y las opciones de defensa', () => {
   const S = FichaGuardado.normalizar({}).S;
   const h = FichaDuelo.hooks(() => S, {soy: () => true});

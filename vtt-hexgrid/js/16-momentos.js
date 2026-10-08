@@ -200,8 +200,11 @@ function renderPercepcionBanner(){
   const t = tokens.get(percepcionBanner.tokenId);
   const quien = t ? nombreDe(t) : '';
   if(percepcionBanner.resultado){
+    const cerrar = () => { percepcionBanner = null; renderPercepcionBanner(); };
     AvisoCombate.cartel('percepcion', {icono: '🔎', titulo: `${quien}: Percepción`, texto: percepcionBanner.resultado,
-      botones: [{texto: 'Listo', id: 'percepcion-banner-ok', alClic: () => { percepcionBanner = null; renderPercepcionBanner(); }}]});
+      botones: percepcionBanner.desarmar
+        ? [{texto: `🪤 Desarmarla${modoMapa === 'combate' ? ' (1 No2)' : ''}`, id: 'percepcion-banner-desarmar', alClic: desarmarDesdeBanner}, {texto: 'Dejarla', sec: true, alClic: cerrar}]
+        : [{texto: 'Listo', id: 'percepcion-banner-ok', alClic: cerrar}]});
   }else if(percepcionBanner.esperando){
     AvisoCombate.cartel('percepcion', {icono: '🔎', titulo: `${quien}: Percepción ${percepcionBanner.total}`, texto: 'Esperando qué pasa…'});
   }else{
@@ -241,6 +244,8 @@ async function percepcionResolverBanner(){
     try{ await coleccionElementos().doc(pb.trampaId).update({descubierta: true}); }   // y para todo su equipo
     catch(err){ console.error('No se pudo marcar la trampa como descubierta (¿faltan publicar las reglas?):', err); }
     pb.resultado = `encontraste algo: ${el.trampaNombre ? `«${el.trampaNombre}», ` : ''}una trampa (${r.total} contra ${dif}).`;
+    // Desarmar trampas (talento, 2026-10-08, js/28): si es de un rival, ofrece desarmarla.
+    if(typeof tokenDesarmaTrampas === 'function' && tokenDesarmaTrampas(t) && trampaDispara(t, el)){ pb.desarmar = pb.trampaId; pb.resultado += ' ¿Querés desarmarla?'; }
     momentoActualizar(mid, {estado: 'listo', resultado: `…y encuentra una trampa${el.trampaNombre ? `: «${el.trampaNombre}»` : ''}.`});
   }else{
     pb.resultado = 'Mmm... Puede que estés flasheando.';   // texto del dueño (2026-10-02); la tirada ya está en la Mesa

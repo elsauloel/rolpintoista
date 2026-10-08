@@ -248,6 +248,7 @@ decisión relajada nueva se agrega acá al tomarla).
 | Los dados se tiran en el navegador de cada uno | Un servidor que tire (o que verifique las tiradas); hoy cualquiera podría publicar el resultado que quiera |
 | Cualquier cuenta ve todas las partidas y se une con un clic | Partidas privadas: invitación, código o aprobación del GM |
 | "Sacar" a alguien no le impide volver a unirse | Lista de bloqueados o partida cerrada a nuevos jugadores |
+| Cualquiera de la partida puede sacar del mapa una trampa (Desarmar trampas, 2026-10-08) | Que solo la saque quien la desarmó de verdad (una tirada verificada) o el GM |
 | El GM puede borrar las fichas de los jugadores (lo usa "Borrar la partida") | Limitarlo a ese caso, o que las fichas no se borren sin el dueño |
 | El dueño del proyecto de Firebase ve todo desde la consola (incluido lo oculto: vida de creeps, sigilo, tiradas secretas) | Separar el rol de administrador del de GM |
 | Plan Spark gratis, sin límites por usuario (partidas, tiradas, escrituras) | Plan pago y topes/controles contra abuso |

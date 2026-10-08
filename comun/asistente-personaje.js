@@ -33,7 +33,7 @@ const AsistentePersonaje = (() => {
   const CLASE_TXT = {warrior: 'Pega fuerte cuerpo a cuerpo.', asalto: 'Rápido: entra, golpea y sale.', tanque: 'Aguanta y protege al grupo.',
     mago: 'Hechizos con el Especial (gasta SP).', shooter: 'Pega a distancia.', support: 'Cura, protege y ayuda.', debuffer: 'Maldiciones y estados sobre los rivales.'};
   const TALENTOS_SUGERIDOS = ['Persuadir', 'Mentir', 'Intimidar', 'Regatear', 'Seducir', 'Investigar', 'Leer intenciones', 'Historia', 'Saber arcano',
-    'Medicina', 'Supervivencia', 'Rastrear', 'Tecnología', 'Actuar'];
+    'Medicina', 'Supervivencia', 'Rastrear', 'Tecnología', 'Actuar', 'Desarmar trampas'];   // Desarmar trampas: detecta y desarma trampas en el mapa (2026-10-08)
 
   let cssPuesto = false;
   function estilos(){

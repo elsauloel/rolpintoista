@@ -682,10 +682,17 @@ function escucharAreas(){
 }
 
 // El GM crea el sub-duelo del objetivo que le toca ahora a esta área (o cierra el grupo si ya no queda ninguno).
+// `areaSubDueloCreando` (2026-10-08): el área recién lanzada llega dos veces casi juntas (la escritura propia y la confirmada por el servidor) y
+// las dos veían que faltaba el primer sub-duelo → se creaba dos veces y uno quedaba colgado, esperando (el dueño lo vio en su ficha con «Tirar a
+// mano»). Cada «área:objetivo» se crea una sola vez por pantalla.
+const areaSubDueloCreando = new Set();
 async function areaCrearSiguienteSubDuelo(areaId, a){
   const idx = num(a.indice), objetivos = a.objetivos || [];
   if(idx >= objetivos.length){ coleccionAreas().doc(areaId).update({estado: 'terminado'}).catch(err => console.error('No se pudo cerrar el área:', err)); return; }
   if((a.duelos || [])[idx]) return;   // ya se creó (o dos pestañas del GM coinciden: riesgo chico y aceptado)
+  const clave = `${areaId}:${idx}`;
+  if(areaSubDueloCreando.has(clave)) return;
+  areaSubDueloCreando.add(clave);
   const tokenId = objetivos[idx], t = tokens.get(tokenId);
   if(!t){   // el objetivo ya no está en el mapa: se lo saltea
     const siguiente = idx + 1;
@@ -699,7 +706,7 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
     // precargado — este sub-duelo solo le pide la Evasión a ESTE objetivo, contra esa misma tirada.
     dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: a.hab, alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: Math.max(objetivos.length, num(a.hab && a.hab.reparte && a.hab.reparte.total))}, pdgCompartido: a.pdgCompartido || null},
       {id: tokenId, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, a.casteador.tokenId, '');
-  }catch(err){ console.error('No se pudo crear el sub-duelo del área:', err); return; }
+  }catch(err){ console.error('No se pudo crear el sub-duelo del área:', err); areaSubDueloCreando.delete(clave); return; }   // (que se pueda reintentar)
   try{
     const doc = await coleccionAreas().doc(areaId).get();
     if(!doc.exists) return;

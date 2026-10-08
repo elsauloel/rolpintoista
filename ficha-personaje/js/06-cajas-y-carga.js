@@ -217,7 +217,7 @@ document.addEventListener('click', async e => {
   if(b.dataset.botoneraaccion){
     // Atacar y Daño de la Botonera vienen con su arma (uno por arma).
     if(b.dataset.arma !== undefined && ['atacar', 'danio', 'otroataque'].includes(b.dataset.botoneraaccion)){
-      const arma = S.inventario.find(x => x.id === b.dataset.arma) || null;
+      const arma = S.inventario.find(x => x.id === b.dataset.arma) || FichaAcciones.armasEspeciales(S).find(x => x.id === b.dataset.arma) || null;   // (un modo de una varita: en las armas especiales)
       if(b.dataset.botoneraaccion === 'atacar') preguntarTipoAtaque(arma);
       else if(b.dataset.botoneraaccion === 'otroataque') preguntarTipoAtaque(arma, true);
       else if(arma) tirarDanoDeArma(arma);

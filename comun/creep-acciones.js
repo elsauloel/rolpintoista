@@ -395,11 +395,15 @@ const CreepAcciones = (() => {
      tienen SP: el SP de la varita se paga con ESPERA (dueño: «adaptar, medio a ojo, SP en CD»; provisorio hasta pasar los creeps a SP, ver la hoja de
      ruta): ESPERA_POR_SP. Los orbes de la otra mano también valen (resguardo: Vida extra; salvaje: 1d6). */
   const ESPERA_POR_SP = sp => sp <= 0 ? 0 : sp <= 2 ? 1 : 2;   // SP 1–2 → 1 turno de espera; SP 3 o más → 2
-  const especialesCreep = sc => (sc.equipo || []).filter(it => it && it.especial);
+  const especialesCreep = sc => Combatiente.especialesConModos((sc.equipo || []).filter(it => it && it.especial));   // (los modos de una varita, 2026-10-08)
+  const claveEspCreep = it => it._modoDe || it.id;
   function costoEspecialCreep(sc, it){
-    const e = (it && it.especial) || {}, usos = num((sc.usosEspecial || {})[it.id]);
+    const k = claveEspCreep(it), e = (it && it.especial) || {}, usos = num((sc.usosEspecial || {})[k]);
     const ahorro = usos ? 0 : Math.max(0, Math.round(num(C().modTotal(sc, 'ahorroespsp'))));   // primer conjuro: el SP de menos baja la espera
-    return {no2: Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1)), espera: ESPERA_POR_SP(Math.max(0, num(e.sp) - ahorro)), usos, enEspera: num((sc.esperaEspecial || {})[it.id])};
+    // Las cargas (2026-10-08): mientras le queden, no hay espera (el SP de un creep).
+    const cargas = Math.max(0, Math.round(num(e.cargas))), conCarga = cargas > 0 && num((sc.cargasEsp || {})[k]) < cargas;
+    return {no2: Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1)), espera: conCarga ? 0 : ESPERA_POR_SP(Math.max(0, num(e.sp) - ahorro)), usos, enEspera: num((sc.esperaEspecial || {})[k]),
+      ...(cargas ? {cargas, cargaUsadas: num((sc.cargasEsp || {})[k])} : {})};
   }
   function habDeEspecialCreep(sc, it){
     const e = it.especial || {}, dano = String(e.dano || '').trim();
@@ -417,8 +421,10 @@ const CreepAcciones = (() => {
     const h = habDeEspecialCreep(sc, it);
     const p = ejecutarHab(sc, h, presets);
     if(p.error) return p;
-    sc.esperaEspecial = {...(sc.esperaEspecial || {}), [it.id]: c.espera};   // en el creep: la varita queda igual (si la saquean, vuelve a costar SP)
-    sc.usosEspecial = {...(sc.usosEspecial || {}), [it.id]: c.usos + 1};
+    const kEsp = claveEspCreep(it);
+    sc.esperaEspecial = {...(sc.esperaEspecial || {}), [kEsp]: c.espera};   // en el creep: la varita queda igual (si la saquean, vuelve a costar SP)
+    sc.usosEspecial = {...(sc.usosEspecial || {}), [kEsp]: c.usos + 1};
+    if(c.cargas && c.cargaUsadas < c.cargas) sc.cargasEsp = {...(sc.cargasEsp || {}), [kEsp]: c.cargaUsadas + 1};   // una carga menos
     // El báculo de sangre (2026-10-08): el % de su vida máxima en vez de SP (y sin espera).
     const vida = num(it.especial.spVidaPct) > 0 ? Math.max(1, Math.ceil(num(sc.hpMax) * num(it.especial.spVidaPct) / 100)) : 0;
     if(vida) sc.hp = Math.max(0, num(sc.hp) - vida);

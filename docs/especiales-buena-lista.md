@@ -3,7 +3,7 @@
 Todas son de una mano (peso 1), salvo los báculos (dos manos, peso 2). «Directo» = ignora la Defensa especial (lo frena solo la
 resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (el No2 sube 1 por cada uso más en el turno).
 
-## ✅ Cargadas (34)
+## ✅ Cargadas (36)
 
 | Arma | Qué hace · SP · DDE |
 |---|---|
@@ -41,13 +41,12 @@ resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (
 | Varita de la ráfaga helada | Cono al frente: 1d4 de hielo directo y empuja 2. · 4 · 130 |
 | Varita del vendaval | Cono: empuja 2 a todos (no se resiste); apaga el fuego y despeja la niebla que toca. · 1 · 80 |
 | Varita del blink | Vos (o un aliado que ves) saltás hasta 3 casillas; una vez por turno. · 3 · 95 |
+| Varita de cargas | La Bola de fuego Común con 3 cargas por combate sin SP (se llenan al terminar el combate); sin cargas, paga su SP. · — · 120 |
+| Varita gemela | Aceite o Bola de fuego (la Común): una casilla por modo en la Botonera, cada una con su SP; los usos del turno cuentan juntos. · 1 o 3 · 95 |
 
 ## 🔧 Decididas, falta programar algo para cargarlas
 
-| Arma | Qué hace · SP · DDE |
-|---|---|
-| Varita de cargas | La Bola de fuego Común, 3 usos por combate sin SP. · — · 120 |
-| Varita gemela | Aceite o Bola de fuego: elegís al usarla (el SP del que elegís). · 1 o 2 · 95 |
+Ninguna (2026-10-08: cargadas todas las Buenas decididas).
 
 ## ✅ Rara
 

@@ -1955,6 +1955,15 @@ Con la calculadora recalibrada (varitas directas con dado fijo, báculos con ¼ 
   Soltarse contra el Ef.Esp). Dos arreglos de paso: **el bando de una trampa sale de quién la puso** (`trampaEsDelGM`, js/07: si el GM maneja a
   un personaje con 🎮, su trampa es de jugador) y **las reglas de los elementos** (`elementoCambioValido`): el GM o el dueño no podían convertir
   en zona una trampa con muchos campos porque Firebase cortaba por la cantidad de cuentas por pedido (hay que pegarlas).
+- **Buenas 🔧, todas cargadas (2026-10-08, «sigamos con el punto 1»), en 4 tandas.** Mecánicas nuevas, todas para cualquier habilidad o arma
+  especial: `difMas` en la salvación de una trampa (portal Buena: Ef.Esp + 2) · `spVidaPct` (el báculo de sangre: % de la vida máxima en vez de
+  SP) · `riesgo` (la inestable: si sale un 1 en el daño, 2d4 a quien la usa) · zonas `zonaInmediata` (afectan enseguida a los que ya están
+  adentro: «aparece bajo los pies»), `zonaLuz` (ilumina y deja ver lo oculto mientras dura), `zonaCadaPaso` y `zonaEnMantenimiento` desde una
+  habilidad, y la forma `linea` / `camino` (se marcan las casillas) · pilares en `linea` (el muro) · el efecto **Empujón** (`empuja`) · `menosPorOrden`
+  (el láser largo) · `despeja` (el vendaval borra niebla y fuego) · `blink` · `cargas` por combate · `modos` (la gemela: una casilla por modo).
+  **Decisiones mías a confirmar:** el chorro de lava quema también a los aliados («a todos»); el vendaval empuja sin tirada («a todos»); la
+  ráfaga helada usa el cono de siempre (no un 3×3 exacto); la luz flotante marca sin tirada (cada rival que toca); sin cargas, la de cargas se puede
+  usar pagando su SP. Reglas nuevas de Firestore (hay que pegarlas): zonaInmediata, zonaLuz, borrar niebla y fuego, y `elementoCambioValido`.
 - **«Siempre los turnos contando al caster»** (dueño, 2026-10-07): como las zonas (P172), **las trampas que coloca alguien y la zona que dejan
   al dispararse** duran los turnos de quien las puso. ✅ Hecho: la trampa recuerda quién la puso (`de` en su trampaEstado, comun/tokens-auto.js);
   el mapa le descuenta un turno al empezar cada turno de esa persona (js/07 `zonasDelQueLaTiro`) y, mientras esté en el orden de turnos, no la

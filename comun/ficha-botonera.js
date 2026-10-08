@@ -342,7 +342,7 @@ const FichaBotonera = (() => {
             <span class="bt-label">${e.flash ? '⚡' : '✨'} Atacar · ${esc(e.nombre || i.nombre)}</span><span class="bt-value bt-value-formula">${e.dano ? `🎲 ${esc(e.dano)}${esc(tipo)}` : '✨ sin daño'}</span>
             <span class="bt-mod">${esc(costo)}</span>
           </button>
-          <button type="button" class="botonera-tile" data-view="inventario:${i.id}" title="Qué hace ${esc(i.nombre)}">
+          <button type="button" class="botonera-tile" data-view="inventario:${i._modoDe || i.id}" title="Qué hace ${esc(i.nombre)}">
             <span class="bt-label">Qué hace · ${esc(e.nombre || i.nombre)}</span><span class="bt-value" style="font-size:11px;line-height:1.3;white-space:normal">${esc(FichaAcciones.ataqueEspecialMenu(S, i).que)}</span>
           </button>`;
           }).join('')}

@@ -591,13 +591,17 @@ const FichaAcciones = (() => {
      efectos con caras/éxitos, radio…), trampaColocar?}. Usarla arma una habilidad con eso y sigue el mismo camino de una ✨ (cuadro del duelo,
      área, cono, zona, trampa). Costo (dueño): 1 No2 el primer uso del turno y +1 por cada uso más de ESA arma (el conteo es el de los ataques de
      cada arma, `S.ataquesArma['esp:<id>']`, que se vacía en el Mantenimiento), más su SP; sin SP, cada SP se paga con 1 No2 más. */
-  const claveEsp = it => 'esp:' + it.id;
-  const armasEspeciales = S => (S.inventario || []).filter(i => i && i.equipado && i.especial && !FichaCalculo.itemRoto(i));
+  const claveEsp = it => 'esp:' + (it._modoDe || it.id);   // (los modos de una varita cuentan juntos)
+  const armasEspeciales = S => Combatiente.especialesConModos((S.inventario || []).filter(i => i && i.equipado && i.especial && !FichaCalculo.itemRoto(i)));
+  // Las cargas (2026-10-08, Varita de cargas): `especial.cargas` usos por combate sin SP (se vuelven a llenar al terminar el combate, js/25 del mapa).
+  const cargasUsadas = (S, it) => num((S.cargasEsp || {})[it._modoDe || it.id]);
   const usosEspecial = (S, it) => num((S.ataquesArma || {})[claveEsp(it)]);
   function costoEspecial(S, it){
     const e = it.especial || {}, usos = usosEspecial(S, it);
     const ahorro = usos ? 0 : Math.max(0, Math.round(num(FichaCalculo.calcular(S).final.ahorroespsp)));   // Mitones del primer conjuro (2026-10-05)
-    return {no2: Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1)), sp: Math.max(0, num(e.sp) - ahorro), usos, vida: vidaPorUso(S, e)};
+    const cargas = Math.max(0, Math.round(num(e.cargas))), conCarga = cargas > 0 && cargasUsadas(S, it) < cargas;
+    return {no2: Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1)), sp: conCarga ? 0 : Math.max(0, num(e.sp) - ahorro), usos, vida: vidaPorUso(S, e),
+      ...(cargas ? {cargas, cargaUsadas: cargasUsadas(S, it)} : {})};
   }
   // El báculo de sangre (2026-10-08): cada uso cuesta `spVidaPct` % de tu vida máxima (para arriba) en vez de SP.
   const vidaPorUso = (S, e) => num(e && e.spVidaPct) > 0 ? Math.max(1, Math.ceil(num(FichaCalculo.calcular(S).final.hpmax) * num(e.spVidaPct) / 100)) : 0;
@@ -616,7 +620,7 @@ const FichaAcciones = (() => {
     const t = String(it.detalle || '').split(' ⚙')[0].split(' ✋')[0].trim();
     return {costo: costoEspecialTxt(S, it), que: t.length <= 200 ? t : t.slice(0, 200).replace(/[\s,;:(]+\S*$/, '') + '…'};   // corta en una palabra, nunca a la mitad
   };
-  const costoEspecialTxt = (S, it) => { const c = costoEspecial(S, it); return `${fmt(c.no2)} No2${c.sp ? ` + ${fmt(c.sp)} SP` : ''}${c.vida ? ` + ${fmt(c.vida)} HP` : ''}${c.usos ? ` (uso ${c.usos + 1} del turno)` : ''}`; };
+  const costoEspecialTxt = (S, it) => { const c = costoEspecial(S, it); return `${fmt(c.no2)} No2${c.sp ? ` + ${fmt(c.sp)} SP` : ''}${c.vida ? ` + ${fmt(c.vida)} HP` : ''}${c.usos ? ` (uso ${c.usos + 1} del turno)` : ''}${c.cargas ? (c.cargaUsadas < c.cargas ? ` · carga ${c.cargaUsadas + 1} de ${c.cargas}` : ' · sin cargas') : ''}`; };
   /* Los orbes equipados (2026-10-05) al usar un arma especial: el de resguardo te pone Vida extra 2 hasta tu próximo turno (una vez por turno: el
      conteo vive en S.ataquesArma, que vacía el Mantenimiento); el salvaje tira 1d6: con 1 te hace 1 de daño, con 6 el efecto sale doble (los dados del
      daño ×2; si el arma no hace daño, el doble lo decide la mesa). Todo a la vista en la Mesa. Devuelve true si sale doble. */
@@ -671,6 +675,9 @@ const FichaAcciones = (() => {
       if(!p) return;
       spFijo = num(p.sp);
     }
+    // Sin cargas (la Varita de cargas): avisa y deja seguir, pagando su SP.
+    if(c.cargas && c.cargaUsadas >= c.cargas && spFijo === undefined && !sinSp && !forzar
+      && !(await confirmar(`${it.nombre}: ya usaste las ${c.cargas} cargas de este combate. ¿Usarla igual pagando su SP (${fmt(c.sp)})?`))) return;
     let no2 = c.no2, sp = spFijo !== undefined ? spFijo : c.sp;
     // Túnica de sangre (2026-10-06): con «pagar con vida», cada vez se elige si el SP sale de la vida (1 HP por SP). La elección viaja como
     // sinSp === 'vida' (si hay que confirmar los No2 y se vuelve a llamar, no se pregunta ni se cobra dos veces); la vida se cobra al pagar.
@@ -698,6 +705,7 @@ const FichaAcciones = (() => {
       ui.mesaHabilidad(it.nombre, c.vida > 0 ? `🩸 cuesta vida: −${fmt(hpVida)} HP (el ${fmt(num(e.spVidaPct))} % de su vida máxima).` : `🩸 pagó ${fmt(hpVida)} SP con vida (−${fmt(hpVida)} HP).`);
     }
     S.ataquesArma = {...(S.ataquesArma || {}), [claveEsp(item)]: c.usos + 1};
+    if(c.cargas && c.cargaUsadas < c.cargas) S.cargasEsp = {...(S.cargasEsp || {}), [item._modoDe || item.id]: c.cargaUsadas + 1};   // una carga menos
     const doble = orbesAlUsar(S, item, it, ui);   // los orbes de la otra mano (resguardo, salvaje)
     if(doble) it.tiradaExtra = String(it.tiradaExtra || '').replace(/(\d+)d(\d+)/g, (m, n, k) => `${2 * num(n)}d${k}`);
     // Lo que el arma le pone a quien la usa (2026-10-05, Varita de la luz: luz y «ve lo oculto» hasta el final del turno).

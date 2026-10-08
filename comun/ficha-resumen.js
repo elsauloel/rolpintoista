@@ -106,7 +106,7 @@ const FichaResumen = (() => {
       emergencia: n(c.final.emergencia), emergenciaUsada: !!S.emergenciaUsada,
       ...Object.fromEntries(['cascara', 'primerasangre', 'foco', 'pulso', 'pasofantasma', 'cambiante', 'absorbearmadura', 'impulsofue', 'impulsodes', 'impulsoesp', 'impulsocon']
         .map(k => [k, n(c.final[k])]).filter(([, v]) => v)),   // anillos Comunes (2026-10-06): el mapa los mira (js/13, js/25)
-      anillosDados: !!S.anillosDados, absorbeUsada: !!S.absorbeUsada,   // Bolsillo de emergencia (cinturón, 2026-10-06): el mapa lo mira   // pies (2026-10-06): el mapa los mira al moverse y al aplicar daño del piso   // Coraza del guardián (2026-10-06): el mapa se la suma a la Defensa de los aliados al lado
+      anillosDados: !!S.anillosDados, absorbeUsada: !!S.absorbeUsada, cargasUsadas: !!(S.cargasEsp && Object.keys(S.cargasEsp).length),   // (las cargas de una varita, 2026-10-08: el mapa las vuelve a llenar al terminar el combate)   // Bolsillo de emergencia (cinturón, 2026-10-06): el mapa lo mira   // pies (2026-10-06): el mapa los mira al moverse y al aplicar daño del piso   // Coraza del guardián (2026-10-06): el mapa se la suma a la Defensa de los aliados al lado
       defprimer: n(c.final.defprimer), defdist: n(c.final.defdist),   // torso blando (2026-10-06): el mapa los suma a la Defensa al aplicar el daño   // Guantes del envenenador (2026-10-05): el mapa le suma esos stacks a los venenos que pone en el duelo
       pasosGratis: n(c.final.pasosgratis),
       retirada: n(c.final.retirada),   // Retirada limpia (%): el mapa la tira al alejarse de un rival (js/17)

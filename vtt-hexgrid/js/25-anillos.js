@@ -23,13 +23,13 @@ function anillosDatos(t){
     if(!sc) return null;
     const v = st => Math.max(0, num(CreepCalculo.modTotal(sc, st)));
     const rota = (sc.estados || []).filter(e => e && e.activo !== false && e.armaduraRota).reduce((a, e) => a + Math.max(1, num(e.stacks) || 1), 0);
-    return {creep: true, v, dados: !!sc.anillosDados, absorbe: !!sc.absorbeUsada, rota, conAnillo: (sc.estados || []).some(e => e && e.anillo)};
+    return {creep: true, v, dados: !!sc.anillosDados, absorbe: !!sc.absorbeUsada, rota, conAnillo: (sc.estados || []).some(e => e && e.anillo), cargas: !!(sc.cargasEsp && Object.keys(sc.cargasEsp).length)};
   }
   if(typeof bnManejo !== 'function' || !bnManejo(t.fichaId)) return null;
   const r = (fichasPub.get(t.fichaId) || {}).resumen || {};
   const v = st => Math.max(0, num(r[st]));
   const rota = (r.estados || []).filter(e => e && e.armaduraRota).reduce((a, e) => a + Math.max(1, num(e.stacks) || 1), 0);
-  return {creep: false, v, dados: !!r.anillosDados, absorbe: !!r.absorbeUsada, rota, conAnillo: (r.estados || []).some(e => e && e.anillo)};
+  return {creep: false, v, dados: !!r.anillosDados, absorbe: !!r.absorbeUsada, rota, conAnillo: (r.estados || []).some(e => e && e.anillo), cargas: !!r.cargasUsadas};
 }
 const anillosTiene = d => d && (d.v('cascara') > 0 || d.v('cambiante') > 0 || Object.keys(ANILLO_ATRIB).some(k => d.v(k) > 0));
 // Cambia los datos del token (personaje o creep) con `fn(lista de estados, objeto)` → bool (hubo cambio).
@@ -80,10 +80,12 @@ async function anillosTerminar(id, t){
   anillosTrabajando.add(id);
   try{
     await anillosCambiar(t, (lista, obj) => {
-      const hay = lista.some(e => e && e.anillo) || obj.anillosDados || obj.absorbeUsada || obj.primeraSangreUsada;
+      const cargas = !!(obj.cargasEsp && Object.keys(obj.cargasEsp).length);
+      const hay = lista.some(e => e && e.anillo) || obj.anillosDados || obj.absorbeUsada || obj.primeraSangreUsada || cargas;
       if(!hay) return false;
       for(let i = lista.length - 1; i >= 0; i--) if(lista[i] && lista[i].anillo) lista.splice(i, 1);
       obj.anillosDados = false; obj.absorbeUsada = false; obj.primeraSangreUsada = false;
+      if(cargas) obj.cargasEsp = {};   // las varitas de cargas se vuelven a llenar
       return true;
     });
   }catch(err){ console.error('Anillos al terminar el combate:', err); }
@@ -120,7 +122,7 @@ setInterval(() => {
     const antes = anillosRota.get(id);
     anillosRota.set(id, d.rota);
     if(modo !== 'combate'){
-      if(d.dados || d.absorbe || d.conAnillo) anillosTerminar(id, t);
+      if(d.dados || d.absorbe || d.conAnillo || d.cargas) anillosTerminar(id, t);   // (y las cargas de las varitas, 2026-10-08)
       return;
     }
     if(!d.dados && anillosTiene(d)) anillosEmpezar(id, t, d);

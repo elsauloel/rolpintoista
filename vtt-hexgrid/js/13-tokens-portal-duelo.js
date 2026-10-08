@@ -1250,6 +1250,15 @@ async function dueloCadena(d, golpe){
    pierde, lo trae hasta `casillas` hacia quien la usó, por casillas libres (Inamovible: su chance de no moverse). Todo a la vista en la Crónica. */
 /* El empujón (2026-10-08, ráfaga helada y vendaval): lejos de quien lo tira, hasta `n` casillas libres (lo frena un Sólido o un token). Inamovible
    (su %) no se mueve. Va a la Crónica. */
+/* El aviso del daño de colisión (dueño, 2026-10-08): al centro, a quien maneja a cada uno de los que chocan (un personaje contra un pilar: a quien lo
+   maneja; dos personajes: a los dos; un creep: al GM). El resto lo ve en la Crónica. Cuánto daño hace, ✋ a mano mientras se define (P178). */
+function avisoColision(t, contra){
+  const uidDe = x => x.tipo === 'creep' ? ((fbPartida && fbPartida.gmUid) || '') : (x.duenoUid || '');
+  const uids = [...new Set([t, ...(contra ? [contra] : [])].map(uidDe).filter(Boolean))];
+  const texto = `${nombreDe(t)} salió despedido y chocó contra ${contra ? nombreDe(contra) : 'algo sólido (un pilar, una pared)'}. ✋ El daño de colisión se resuelve a mano: todavía está a definir cuánto${contra ? ' y a quién' : ''}.`;
+  momentoAbrir({tipo: 'colision', icono: '💥', titulo: `Choque: ${nombreDe(t)}${contra ? ' contra ' + nombreDe(contra) : ''}`, resultado: texto, estado: 'listo',
+    datos: {paraUids: uids, aviso: true, boton: 'Entendido', pasos: [{titulo: 'Daño de colisión', texto}]}});
+}
 async function dueloEmpujar(d, n){
   const t = tokens.get(d.defensor.tokenId), ta = d.atacante && tokens.get(d.atacante.tokenId);
   if(!t) return {manual: true, nota: 'el token ya no está: empujalo a mano'};
@@ -1264,11 +1273,15 @@ async function dueloEmpujar(d, n){
     if(!sig) break;
     c = sig; pasos++;
   }
-  if(!pasos){ momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: 'No hay lugar para empujarlo: choca y queda donde está. ✋ Daño de colisión a mano (a definir).', estado: 'listo'}); return {nota: 'chocó sin moverse (✋ daño de colisión a mano)'}; }
+  // Contra qué chocó (2026-10-08, dueño: el aviso del daño de colisión, a todos los involucrados): el token que tapa el paso o algo sólido.
+  const contraQue = () => { const sig = vecinosDeCasilla(c).filter(v => distanciaHex(v, ta) > distanciaHex(c, ta)); return [...tokens.values()].find(y => y !== t && sig.some(v => v.col === y.col && v.fila === y.fila)) || null; };
+  if(!pasos){ const contra = contraQue(); momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: `No hay lugar para empujarlo: choca${contra ? ` contra ${nombreDe(contra)}` : ''} y queda donde está. ✋ Daño de colisión a mano (a definir).`, estado: 'listo'}); avisoColision(t, contra); return {nota: 'chocó sin moverse (✋ daño de colisión a mano)'}; }
   try{ await coleccionTokens().doc(d.defensor.tokenId).update({col: c.col, fila: c.fila, ruta: firebase.firestore.FieldValue.delete()}); }
   catch(err){ console.error('No se pudo empujar:', err); return {manual: true, nota: `empujalo ${pasos} casillas a mano`}; }
   // Si chocó antes de recorrer todo (un Sólido, un token o el borde): daño de colisión, ✋ a mano mientras se define (dueño, 2026-10-08, P178).
-  const choco = pasos < n ? ` Chocó contra algo: ✋ daño de colisión a mano (a definir).` : '';
+  const contra = pasos < n ? contraQue() : null;
+  const choco = pasos < n ? ` Chocó contra ${contra ? nombreDe(contra) : 'algo sólido'}: ✋ daño de colisión a mano (a definir).` : '';
+  if(pasos < n) avisoColision(t, contra);
   momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: `Sale despedido ${pasos} casillero${pasos === 1 ? '' : 's'} lejos de ${d.atacante.nombre || 'quien lo tiró'}.${choco}`, estado: 'listo'});
   return {nota: `lo empujó ${pasos} casillero${pasos === 1 ? '' : 's'}${choco ? ' y chocó (✋ daño de colisión a mano)' : ''}`};
 }

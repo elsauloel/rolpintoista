@@ -234,7 +234,7 @@ async function usarPolillaMapa(){
   if(dueloPolilla){
     try{ await hudEstadoCambiar(t, idx, 'quitar'); }catch(err){ console.error('No se pudo sacar el estado de la Polilla mística:', err); }
     const p = dueloPolilla;
-    const texto = `${nombreDe(t)} usó la Polilla mística en su ${p.etq}: ${fmt(p.antes)} → ${fmt(p.ahora)}${p.contra !== null ? ` contra ${fmt(p.contra)}` : ''}. El duelo contra ${otro.nombre || 'el otro'} se volvió a resolver con el número nuevo.`;
+    const texto = `${nombreDe(t)} usó la Polilla mística en su ${p.etq}: ${fmt(p.antes)} → ${fmt(p.ahora)}${p.contra !== null ? ` contra ${fmt(p.contra)}` : ''}. ${p.empate ? ` Quedó empatado: quien usa la Polilla pierde los empates, así que gana ${otro.nombre || 'el otro'}.` : ` El duelo contra ${otro.nombre || 'el otro'} se volvió a resolver con el número nuevo.`}`;
     try{ await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: nombreDe(t), origen: `🦋 ${nombreDe(t)} usó la Polilla mística`,
       formula: `+2 a su ${p.etq} del duelo: ${fmt(p.antes)} → ${fmt(p.ahora)}`, rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()}); }
     catch(err){ console.error('No se pudo avisar el uso de la Polilla mística:', err); }

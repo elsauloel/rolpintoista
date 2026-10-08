@@ -1386,11 +1386,19 @@ const Duelo = (() => {
       if(campo === 'fuerza' || campo === 'bloqueo'){ m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'bloqueo'; }
       else{ m.contacto = null; m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'contacto'; if(m.hab) m.efectos = null; }
       m.estado = 'esperando';
-      anuncio = avanzar(m) || '';
+      // Si con el +n queda empatado, pierde quien usó la Polilla (dueño, 2026-10-08): no hay desempate.
+      const par = campo === 'fuerza' || campo === 'bloqueo' ? 'bloqueo' : 'contacto';
+      const pa = par === 'contacto' ? m.pdg : m.fuerza, pb = par === 'contacto' ? m.eva : m.bloqueo;
+      if(pa && pb && resolverPar(pa, pb).empate){
+        const gana = lado === 'atacante' ? 'defensor' : 'atacante';
+        cerrarPar(m, par, {gana, dif: 0, desempate: 'polilla'});
+        anuncio = `⚖ Empate (${_num(pa.total)} a ${_num(pb.total)}) después de la Polilla: gana ${gana === 'atacante' ? m.atacante.nombre : m.defensor.nombre} (quien usa la Polilla pierde los empates)`;
+      }
+      else anuncio = avanzar(m) || '';
       const upd = cambiosDe(m);
       if(m.resumido) upd.resumido = false;   // el resumen final se vuelve a publicar cuando termine
       tx.update(ref, upd);
-      res = {campo, etq: etqCampo(m, campo), antes: _num(t0.total), ahora: m[campo].total, contra: m[otro] ? _num(m[otro].total) : null,
+      res = {campo, etq: etqCampo(m, campo), antes: _num(t0.total), ahora: m[campo].total, contra: m[otro] ? _num(m[otro].total) : null, empate: /quien usa la Polilla/.test(anuncio),
         resultado: m.estado === 'empate' ? 'empate' : (m.resultado || (m.contacto && m.contacto.gana) || '')};
     });
     if(anuncio) anunciarMesa(anuncio);
@@ -1509,6 +1517,7 @@ const Duelo = (() => {
       const [na, nb, ta, tb] = nombresPar(d, par);
       const ganador = info.gana === 'atacante' ? d.atacante.nombre : d.defensor.nombre;
       if(info.desempate === 'mas1') motivos.push(`Se resolvió el empate (${_esc(par === 'contacto' ? 'contacto' : 'Bloqueo')}): gana ${_esc(ganador)} porque la otra tirada llevaba un «+» fijo y ella no.`);
+      else if(info.desempate === 'polilla') motivos.push(`Empate después de la 🦋 Polilla mística: gana ${_esc(ganador)} (quien usa la Polilla pierde los empates).`);
       else if(info.moneda) motivos.push(`Se resolvió el empate (${par === 'contacto' ? 'contacto' : 'Bloqueo'}) con par o impar: ${_esc(info.moneda.quien === 'atacante' ? d.atacante.nombre : d.defensor.nombre)} eligió ${info.moneda.eleccion}, salió ${info.moneda.resultado} (${info.moneda.resultado % 2 === 0 ? 'par' : 'impar'}) → gana ${_esc(ganador)}.`);
     });
     const mot = motivos.map(t => `<div class="duelo-motivo">⚖ ${t}</div>`).join('');

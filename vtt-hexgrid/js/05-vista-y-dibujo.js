@@ -466,8 +466,10 @@ function dibujar(){
     }
     }   // fin de lo que no es Colisión
     if(id !== ID_BORRADOR && el.venceMant !== null && el.venceMant !== undefined && mantenimientoNumero !== null && celdas.length){
-      // Contador de turnos que le quedan a la forma (se elimina sola al llegar a 0).
-      const quedan = Math.max(0, el.venceMant - mantenimientoNumero);
+      // Contador de turnos que le quedan a la forma (se elimina sola al llegar a 0). Si cuenta los turnos de quien la puso (zonas, P172, y trampas,
+      // 2026-10-07), esos; si no, los Mantenimientos.
+      const porTurnos = Math.round(num(el.turnos)) > 0 && colocadorEnOrden(colocadorDe(el));
+      const quedan = porTurnos ? Math.round(num(el.turnos)) : Math.max(0, el.venceMant - mantenimientoNumero);
       const cm = celdas[Math.floor(celdas.length / 2)], pm = hexCentro(cm.col, cm.fila);
       ctx.save();
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';

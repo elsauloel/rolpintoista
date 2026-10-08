@@ -2979,6 +2979,13 @@ prueba('tienda con secciones (P179): cada ítem sabe su sección; se reparte ent
     [0, 4, 0, 0, 'talabarteria', 'herreria', 'talabarteria', 'herreria', 'bazar', 'herreria', 'talabarteria', 'bazar', 'herreria', 'talabarteria',
      'talabarteria', 'bazar', 'talabarteria', 'bazar']);
 });
+prueba('los clásicos (legacy hasta Raro) van en toda tienda, de cualquier tamaño y con cualquier sección', () => {
+  const G = GeneradorTiendas, cat = CATALOGO_BASE.filter(G.publicable), cl = G.clasicos(CATALOGO_BASE).map(i => i.id);
+  const faltan = [['ambulante', ['herreria']], ['pueblito', ['talabarteria']], ['capital', ['bazar']]].map(([t, s]) => {
+    const r = G.generar({tamano: t, secciones: s, nivel: 1, catalogo: cat}); return cl.filter(id => !r.garantizados.includes(id)).length; });
+  igual([cl.length >= 12, ['cat-moneda-reroll', 'cat-polilla', 'cat-ankh', 'cat-revive', 'cat-pocion-hp', 'cat-pocion-bonos'].every(id => cl.includes(id)), faltan,
+    G.clasicos(CATALOGO_BASE).some(i => i.tier === 'Excepcional')], [true, true, [0, 0, 0], false]);
+});
 
 prueba('reposición (2026-10-07): lo comprado se repone con otro de la misma parte, familia y calidad; la calidad sale solo del nivel', () => {
   const G = GeneradorTiendas, cat = CATALOGO_BASE.filter(G.publicable);

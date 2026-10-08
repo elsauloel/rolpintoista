@@ -193,3 +193,10 @@ la sección sale del ítem, la tienda publicada no guarda nada nuevo (sin reglas
 secciones en el generador (antes «Tipo de tienda»); una tienda guardada con el tipo viejo se toma así: Herrero → Herrería, Bazar → Bazar, Ramos →
 las tres. El jugador ve una pestaña por sección con algo (`FichaTienda.seccionesHtml`, `st.seccion`), un solo carrito, y «🔎 También hay en…» si
 lo que busca está en otra. **Reparación**: un solo botón por ahora; se separa cuando se defina el «loot mágico» (⬜).
+
+### ✅ Los clásicos, en toda tienda (dueño, 2026-10-08)
+«Cualquier tienda debía garantizar ciertos ítems esenciales… algunos son simplemente un clásico de nuestro juego (como la moneda y la polilla)».
+Todo lo marcado `legacy` en el catálogo hasta Raro (hoy 15: pociones de HP, SP y Regeneración con sus versiones grandes/mayores, Antídoto,
+Vendas, Cura Plus, Revive, Moneda Re-Roll, Polilla mística, Ankh) va en **toda** tienda, de cualquier tamaño y con las secciones que sean:
+es el stock fijo (fuera del total, no se agota) y se ve en la pestaña del Bazar. `GeneradorTiendas.clasicos(catalogo)`. Para sumar o sacar un
+clásico: la marca `legacy` del ítem en el editor del catálogo. Reemplaza al stock fijo de antes (Poción de HP, de SP y Revive desde la aldea).

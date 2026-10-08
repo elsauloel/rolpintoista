@@ -53,16 +53,20 @@ const GeneradorTiendas = (() => {
   /* Las secciones (P179, dueño 2026-10-08: «una tienda tres habitaciones: una más de guerra pesada, una más talabartería y otra de bazar
      arcano… para que los personajes que tienen un estilo claro sepan dónde tienen que ir a buscar»). El jugador entra a una sola tienda y ve
      una pestaña por sección. Cada RECETA = peso de cada parte (partes de 100); `familias`: los Tipos de arma garantizados; `minimos`: lugares
-     que siempre van; `fijos`: el stock fijo (fuera del total; `desde` = el tamaño mínimo). */
-  const ORDEN_TAMANO = ['ambulante', 'pueblito', 'aldea', 'ciudad', 'capital'];
-  const FIJOS = [{id: 'cat-pocion-hp'}, {id: 'cat-pocion-bonos'}, {id: 'cat-revive', desde: 'aldea'}];
+     que siempre van. */
+  /* Los clásicos (dueño, 2026-10-08: «cualquier tienda debía garantizar ciertos ítems esenciales… algunos son simplemente un clásico de nuestro
+     juego, como la moneda y la polilla»): todo lo marcado `legacy` en el catálogo (pociones de HP, SP y Regeneración, Antídoto, Vendas, Cura Plus,
+     Revive, Moneda Re-Roll, Polilla mística, Ankh) hasta Raro, en TODA tienda, de cualquier tamaño y con las secciones que sean. Es el stock fijo:
+     fuera del total, no se agota (no son piezas únicas) y va en la pestaña del Bazar (son consumibles). Para sumar o sacar un clásico: la marca
+     `legacy` del ítem (el editor del catálogo). */
+  const clasicos = catalogo => catalogo.filter(it => it && it.legacy && !it.archivo && !it.soloBotin && TIERS.indexOf(it.tier) >= 0 && TIERS.indexOf(it.tier) <= 2);
   const SECCIONES = {
     herreria: {label: 'Herrería', icono: '⚒', detalle: 'guerra pesada: armas de Tipo 8 o más, escudos, armadura rígida, cascos y guanteletes',
-      receta: {arma: 40, escudo: 14, torso: 16, cabeza: 12, manos: 10, piernas: 4, pies: 4}, familias: [8, 10], fijos: []},
+      receta: {arma: 40, escudo: 14, torso: 16, cabeza: 12, manos: 10, piernas: 4, pies: 4}, familias: [8, 10]},
     talabarteria: {label: 'Talabartería', icono: '🧵', detalle: 'cuero, madera y cuerda: armas a distancia y livianas (Tipo 4 y 6), cuero, botas, cinturones, mochilas y trampas',
-      receta: {distancia: 22, arma: 14, torso: 12, cabeza: 6, manos: 6, piernas: 8, pies: 8, cinturon: 8, mochila: 8, trampa: 8}, familias: [4, 6], fijos: []},
+      receta: {distancia: 22, arma: 14, torso: 12, cabeza: 6, manos: 6, piernas: 8, pies: 8, cinturon: 8, mochila: 8, trampa: 8}, familias: [4, 6]},
     bazar: {label: 'Bazar arcano', icono: '✨', detalle: 'lo mágico: consumibles, varitas y báculos, orbes, anillos y piezas de caster',
-      receta: {consumible: 40, especial: 20, orbe: 8, anillo: 13, torso: 6, cabeza: 5, manos: 4, cinturon: 4}, minimos: {especial: 2}, fijos: FIJOS},
+      receta: {consumible: 40, especial: 20, orbe: 8, anillo: 13, torso: 6, cabeza: 5, manos: 4, cinturon: 4}, minimos: {especial: 2}},
   };
   const SECCIONES_ORDEN = ['herreria', 'talabarteria', 'bazar'];
   // Lo que suma Destreza/Agilidad (la Talabartería) y lo que suma Fuerza/Constitución (la Herrería), para las piezas que podrían ir en las dos.
@@ -182,11 +186,8 @@ const GeneradorTiendas = (() => {
     const secs = seccionesDe(o);
     const tamK = TAMANOS[o.tamano] ? o.tamano : 'pueblito', tam = TAMANOS[tamK];
     const nivel = nivelDe(o.nivel);
-    const porId = new Map(cat.map(it => [it.id, it]));
     const usados = new Set();
-    const garantizados = secs.flatMap(k => SECCIONES[k].fijos || [])
-      .filter(f => !f.desde || ORDEN_TAMANO.indexOf(tamK) >= ORDEN_TAMANO.indexOf(f.desde))
-      .map(f => porId.get(f.id)).filter(it => it && !it.archivo);
+    const garantizados = clasicos(cat);   // los clásicos, siempre
     garantizados.forEach(it => usados.add(it.id));
     const total = entero(R, tam.min, tam.max);
     // Partes iguales; lo que sobra, al azar.
@@ -274,6 +275,6 @@ const GeneradorTiendas = (() => {
   // Cuántas veces repone una tienda publicada lo que le compran (una personalizada, como una aldea).
   const reservaDe = tamano => (TAMANOS[tamano] || TAMANOS.aldea).reserva;
 
-  return {reservaDe, TIERS, CALIDAD_POR_NIVEL, SUERTE, TAMANOS, SECCIONES, SECCIONES_ORDEN, seccionDe, seccionesDe, PARTE_LABEL, DEFENSIVAS, ETIQUETAS, parteDe, etiquetasDe, esDeCaster, publicable,
+  return {reservaDe, clasicos, TIERS, CALIDAD_POR_NIVEL, SUERTE, TAMANOS, SECCIONES, SECCIONES_ORDEN, seccionDe, seccionesDe, PARTE_LABEL, DEFENSIVAS, ETIQUETAS, parteDe, etiquetasDe, esDeCaster, publicable,
     tirarCalidad, nivelDe, generar, otro, simular};
 })();

@@ -1013,7 +1013,8 @@ const Combatiente = (() => {
      a un rival, un debuff. 20: sale bien y quien la usa elige cuál; exito…19: sale bien, al azar; 2…exito−1: sale al revés (al mismo objetivo), al
      azar; 1: sale al revés y elige cuál el bando contrario. → {que: 'buff'|'debuff', a: 'objetivo', bien, elige: 'propio'|'rival'|''}. */
   function caosResultado(d20, aliado, caos){
-    const ex = Math.min(19, Math.max(2, n(caos && caos.exito) || 10)), d = n(d20);
+    // Una copia vieja de la varita (la del d10: {exito: 6, contra, propio}) se juega como la Común nueva.
+    const ex = caos && caos.contra !== undefined ? 10 : Math.min(19, Math.max(2, n(caos && caos.exito) || 10)), d = n(d20);
     const bien = d >= 20 || (d > 1 && d >= ex);
     // 'rival' = el bando contrario a quien la usa: si la usa un jugador, el GM; si la usa un creep, los jugadores (dueño, 2026-10-08).
     return {que: aliado === bien ? 'buff' : 'debuff', a: 'objetivo', bien, elige: d >= 20 ? 'propio' : d <= 1 ? 'rival' : ''};

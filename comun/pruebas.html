@@ -1661,11 +1661,11 @@ prueba('Varita del caos (2026-10-08, segunda vuelta): el d20: 20 bien y elige qu
   const c = {exito: 10}, b = {exito: 8}, R = Combatiente.caosResultado, cat = id => CATALOGO_BASE.find(x => x.id === id);
   const nombres = [...Combatiente.CAOS_ESTADOS.buff, ...Combatiente.CAOS_ESTADOS.debuff].map(e => e.nombre);
   const faltan = nombres.filter(n => !ESTADOS_PRESET.some(p => p.nombre === n));
-  igual([R(20, true, c), R(10, true, c), R(9, true, c), R(1, true, c), R(20, false, c), R(1, false, c), R(8, true, b), R(7, true, b), faltan, Combatiente.caosEstado('buff', () => 0).nombre,
+  igual([R(20, true, c), R(10, true, c), R(9, true, c), R(1, true, c), R(20, false, c), R(1, false, c), R(8, true, b), R(7, true, b), R(7, true, {exito: 6, contra: 3, propio: 1}).bien, faltan, Combatiente.caosEstado('buff', () => 0).nombre,
          nombres.includes('Sigilo'), cat('esp-varita-del-caos').especial.caos, cat('esp-buena-varita-del-caos').especial.caos],
     [{que: 'buff', a: 'objetivo', bien: true, elige: 'propio'}, {que: 'buff', a: 'objetivo', bien: true, elige: ''}, {que: 'debuff', a: 'objetivo', bien: false, elige: ''},
      {que: 'debuff', a: 'objetivo', bien: false, elige: 'rival'}, {que: 'debuff', a: 'objetivo', bien: true, elige: 'propio'}, {que: 'buff', a: 'objetivo', bien: false, elige: 'rival'},
-     {que: 'buff', a: 'objetivo', bien: true, elige: ''}, {que: 'debuff', a: 'objetivo', bien: false, elige: ''}, [], 'Regeneración', true, {exito: 10}, {exito: 8}]);
+     {que: 'buff', a: 'objetivo', bien: true, elige: ''}, {que: 'debuff', a: 'objetivo', bien: false, elige: ''}, false, [], 'Regeneración', true, {exito: 10}, {exito: 8}]);
 });
 prueba('proyectiles (2026-10-08): lo que puede hacer crítico tira PdG (no PdG.Esp); la inestable: 1d4 por cada 1 (porCada)', () => {
   const cat = id => CATALOGO_BASE.find(x => x.id === id);

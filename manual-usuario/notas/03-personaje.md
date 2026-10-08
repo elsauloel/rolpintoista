@@ -47,7 +47,7 @@ Todo personaje tiene **cinco atributos**. Son el "esqueleto" del personaje: de c
 |---|---|---|
 | [[Fuerza]] | FUE | [[Daño y Tipo de arma\|Daño]], [[Bloqueo]], [[Carga máxima]] |
 | [[Constitución]] | CON | [[HP]] máximo, [[Resistencias\|Res. Mágica y Res. CC]] |
-| [[Especial]] | ESP | [[SP]], PdG.Esp, Ef.Esp, Res. Mental, Rango de casteo |
+| [[Especial]] | ESP | [[SP]], PdG.Esp, Ef.Esp, Res. Mental |
 | [[Destreza]] | DES | [[Atacar\|PdG]], [[Golpe crítico\|Crítico frecuente y potente]], [[Parry]], [[Ataques a distancia\|Rango]] |
 | [[Agilidad]] | AGL | [[Evasión]], [[Iniciativa]], [[Nitros (No2)]] |
 
@@ -99,7 +99,6 @@ El atributo de lo **mágico y lo extraño** (antes "Inteligencia"). De él salen
 - **PdG.Esp:** la "probabilidad de golpe" de los hechizos, en paralelo al PdG físico.
 - **Ef.Esp (Efecto especial):** la potencia de los efectos del Especial —daño u otros—, en paralelo al Dmg de la Fuerza. Se usa en habilidades puntuales (por ejemplo, una que tira Ef.Esp contra la Res.Esp de cada uno) y en las trampas mágicas que coloca una habilidad (su dificultad para detectarlas). Lo suben los Anillos, Pociones y Pergaminos de Furia Arcana y la pasiva Potencia especial.
 - **Res. Mental** ([[Resistencias]]).
-- **Rango de casteo:** hasta dónde llegan tus hechizos.
 
 > [!warning] No confundir con SP
 > **Especial** es el atributo (ESP). **SP** (*Special Power*) es el recurso que se gasta. Siempre se escribe "SP", nunca "Esp".
@@ -115,7 +114,7 @@ La precisión y la técnica. De ella salen:
 - **PdG (Probabilidad de Golpe):** lo que tirás para conectar un [[Atacar|ataque]].
 - **[[Golpe crítico|Crítico frecuente y potente]]:** mejoran el crítico (parten de 0: los suman el equipo, las habilidades y los estados).
 - **[[Parry]]:** la alternativa a la [[Evasión]] para defenderte con tu arma.
-- **Rng (Rango):** hasta dónde llegan tus [[Ataques a distancia]].
+- **Rng (Rango):** hasta dónde llegan tus [[Ataques a distancia]] y también tus hechizos, varitas y báculos: el rango lo da siempre la Destreza (desde el 2026-10-07 no hay un Rango de casteo aparte).
 - **[[Percepción]]:** lo que tirás para notar algo (trampas, alguien en [[Sigilo]]).
 
 +++
@@ -156,7 +155,7 @@ De cada [[Atributos|atributo]] se desprenden varios **stats derivados**. Todos s
 | Parry | Destreza | [[Parry]] |
 | Rng | Destreza | [[Ataques a distancia]] |
 | SP | [[Especial]] × 3 | [[SP]] |
-| PdG.Esp · Ef.Esp · Res.Mt · Rango de casteo | Especial | Hechizos |
+| PdG.Esp · Ef.Esp · Res.Mt | Especial | Hechizos |
 
 ## Stats sin atributo "padre"
 - **[[Defensa]] (Def):** viene del equipo, de habilidades o de efectos. Resta al daño físico.

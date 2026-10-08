@@ -60,7 +60,7 @@ const GuiaDiseno = (() => {
         {n: 'Defensa mágica', d: 'Una armadura que reduce el daño recibido.', ej: 'Armadura arcana', e: 'mano'},
         {n: 'Control', d: 'Mover objetos o dominar la voluntad de otro (tirada enfrentada).', ej: 'Telekinesis, Control Mental', e: 'mano'},
         {n: 'De contacto', d: 'Hechizos que piden tocar al objetivo.', ej: 'Toque mágico', e: 'mano'},
-        {n: 'Portales y teleport', d: 'Invocar dos puntos de teletransporte dentro del rango de casteo, por unos turnos, que solo usan los aliados.', ej: 'Invocar portal', e: 'auto'},
+        {n: 'Portales y teleport', d: 'Invocar dos puntos de teletransporte dentro de tu Rango, por unos turnos, que solo usan los aliados.', ej: 'Invocar portal', e: 'auto'},
       ]},
     {id: 'shooter', ico: '🏹', n: 'Shooter', resumen: 'Ataque a distancia: apuntar, cadencia, críticos y varios blancos.',
       idea: 'El Shooter prepara el disparo (apuntar, enfocar), dispara seguido (cadencia y repetición) y busca críticos o atravesar varios objetivos.',

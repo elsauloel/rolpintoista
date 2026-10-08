@@ -44,7 +44,7 @@ const GeneradorTiendas = (() => {
   const mod = (it, st) => (it.mods || []).filter(m => m && m.stat === st).reduce((a, m) => a + num(m.val), 0);
   const algunMod = (it, lista) => lista.some(st => mod(it, st) > 0);
   // Piezas de caster (las que van al Bazar): las que suben lo del Especial y la magia.
-  const CASTER = ['sp', 'spregen', 'resmg', 'pdgmg', 'dmgesp', 'rangocasteo', 'armadmg', 'ahorroespsp', 'pagarhp', 'meditar', 'resm'];
+  const CASTER = ['sp', 'spregen', 'resmg', 'pdgmg', 'dmgesp', 'armadmg', 'ahorroespsp', 'pagarhp', 'meditar', 'resm'];
   const esDeCaster = it => algunMod(it, CASTER);
   // Cinturones de alquimia (también del Bazar): pociones, pergaminos, boticario, saque rápido.
   const esDeAlquimia = it => algunMod(it, ['ranurapocion', 'ranurapergamino', 'portapergaminos', 'boticario', 'saquerapido']);
@@ -73,7 +73,7 @@ const GeneradorTiendas = (() => {
     'Percepción': it => algunMod(it, ['percepcion', 'veoculto']),
     'Rebaja de No2': it => algunMod(it, ['pasosgratis', 'paradafacil', 'saquerapido', 'oporahorro', 'contraahorro', 'ahorroespsp', 'levantarse', 'pasamanos']) || !!it.oporGratis || num(it.ahorroNitros) > 0,
     'Chances': it => algunMod(it, ['retirada', 'reflejos', 'recuperarse', 'inamovible']),
-    'Casteo': it => algunMod(it, ['pdgmg', 'dmgesp', 'spregen', 'rangocasteo']),
+    'Casteo': it => algunMod(it, ['pdgmg', 'dmgesp', 'spregen']),
     // El Crítico propio de un arma de Tipo 4 no cuenta (dueño, 2026-10-07: es su identidad — el jugador de Destreza con armas de Tipo bajo vive
     // del crítico); el de las armas de otros Tipos y el de todo lo que no es arma, sí.
     'Crítico': it => !esArmaT4(it) && (algunMod(it, ['crit', 'critpot']) || num(it.critD20) > 0),

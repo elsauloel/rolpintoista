@@ -825,4 +825,10 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   mucho; dejémoslo para cuando tenga desarrollados los grupos de buffs y debuffs». El dueño va a desarrollar los grupos (qué buffs y debuffs se
   apilan entre sí y cuáles no, por familia). Mientras tanto, la **Varita del maleficio** (−1 a la Res. crítico de un tipo a elección, 2 turnos,
   no acumulable) queda en espera, fuera de la primera tanda de Buena.
+- ✅ **P174. El rango lo da la Destreza, siempre** (dueño, 2026-10-07): «no existe el rango mágico por Especial». **Hecho:** se fue el Rango de
+  casteo (`rangocasteo`) de la ficha, los creeps, las invocaciones y el mapa (el botón 🔮 y la tecla T); las varitas, los báculos y las
+  habilidades usan el **Rango** (`rng`, de la Destreza): `Combatiente.alcanceHab` (una habilidad vieja con alcance «casteo» usa el Rango). Lo
+  que daba +Rango de casteo: **los consumibles se eliminaron** (pergaminos y pociones de Extensión del Conjuro) y **los equipables pasan a
+  +Rango** (9 piezas Raras o mejores, archivadas, y sus copias en el equipo de los creeps; la pasiva Largo alcance arcano, +1 Rango). Una copia
+  vieja con «+Rango de casteo» en un inventario suma al Rango.
 

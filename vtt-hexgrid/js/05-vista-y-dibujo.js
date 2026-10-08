@@ -734,13 +734,12 @@ function dibujar(){
     ctx.strokeStyle = colorConAlfa(aura.color, 0.5); ctx.lineWidth = 2 / z; ctx.stroke();
   });
 
-  // 📏🔮 Visualizador de rango: el área alrededor de tu propio token (nada de esto se guarda ni lo ven los demás).
-  if(rangoActivo || rangoMagicoActivo){
+  // 📏 Visualizador de rango: el área alrededor del token seleccionado (nada de esto se guarda ni lo ven los demás).
+  if(rangoActivo){
     const mt = seleccion ? tokens.get(seleccion) : null;   // el rango es del token seleccionado
     const rr = mt && rangoDeToken(mt);
     if(mt && rr){
-      if(rangoActivo && rr.rng > 0) dibujarRangoConVision({col: mt.col, fila: mt.fila}, Math.max(0, Math.round(rr.rng)), '#4FA8D8', z);
-      if(rangoMagicoActivo && rr.casteo > 0) dibujarRangoConVision({col: mt.col, fila: mt.fila}, Math.max(0, Math.round(rr.casteo)), '#9B7BD4', z);
+      if(rr.rng > 0) dibujarRangoConVision({col: mt.col, fila: mt.fila}, Math.max(0, Math.round(rr.rng)), '#4FA8D8', z);
     }
   }
 

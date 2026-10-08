@@ -669,17 +669,17 @@ const Combatiente = (() => {
     if(o.hp !== undefined && nf(h && h.hpCosto) > 0 && nf(o.hp) <= nf(h.hpCosto)) return 'Sin vida';
     return '';
   }
-  // Hasta dónde llega (casilleros; 0 = sin límite, no resalta). `stat(id)` da el Rango ('rng') o el Rango de casteo
-  // ('rangocasteo') de quien la usa. En automático, los hechizos (PdG.Mg) usan el Rango de casteo y el resto no resalta.
+  // Hasta dónde llega (casilleros; 0 = sin límite, no resalta). `stat(id)` da el Rango ('rng') de quien la usa. En automático, lo especial
+  // (PdG.Esp, Ef.Esp) usa el Rango y el resto no resalta. El rango lo da la Destreza, siempre (dueño, 2026-10-07): ya no hay Rango de casteo
+  // del Especial; una habilidad vieja con alcance 'casteo' usa el Rango.
   function alcanceHab(c, statTira, stat){
     const modo = c && c.alcance !== undefined ? c.alcance : 'auto';
     const v = id => { const x = Number(stat ? stat(id) : 0); return Number.isFinite(x) ? Math.max(0, Math.round(x)) : 0; };
-    if(modo === 'casteo') return v('rangocasteo');
-    if(modo === 'rango') return v('rng');
+    if(modo === 'casteo' || modo === 'rango') return v('rng');
     if(modo === 'adyacente') return 1;
     if(modo === 'ilimitado') return 0;
     if(modo === 'fijo') return Math.max(0, Math.round(nf(c.alcanceN)));
-    return statTira === 'pdgmg' || statTira === 'dmgesp' ? v('rangocasteo') : 0;   // Ef.Esp (2026-10-02): también del Especial
+    return statTira === 'pdgmg' || statTira === 'dmgesp' ? v('rng') : 0;
   }
   /* La cura con dados (2026-10-07, dueño: Varita de cura 1d10, cura mayor 2d8): `cura` puede ser un número o una fórmula («1d10», «2d8+1»);
      la fórmula se tira acá, una vez, al armar la Ejecución (el resto del camino —duelo, ficha, mapa, creeps— sigue recibiendo un número).

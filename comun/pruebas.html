@@ -375,10 +375,18 @@ prueba('¿se puede usar? cooldown, No2 y vida (tiene que sobrar); manual nunca s
   [Combatiente.bloqueoHab({cdActual: 2}, {nitros: 9, costo: 1}), Combatiente.bloqueoHab({}, {nitros: 1, costo: 2}), Combatiente.bloqueoHab({hpCosto: 5}, {nitros: 9, costo: 1, hp: 5}),
    Combatiente.bloqueoHab({hpCosto: 5}, {nitros: 9, costo: 1, hp: 6}), Combatiente.bloqueoHab({cdActual: 2}, {modo: 'manual'})],
   ['Cooldown · 2 turno(s)', 'Sin No2', 'Sin vida', '', '']));
-prueba('alcance: casteo, rango, adyacente, fijo; en automático los hechizos usan el Rango de casteo', () => {
+prueba('alcance: rango, adyacente, fijo; en automático lo especial usa el Rango (Destreza, 2026-10-07: ya no hay Rango de casteo; una vieja con «casteo» usa el Rango)', () => {
   const st = s => ({rangocasteo: 4.4, rng: 6}[s]);
   igual([Combatiente.alcanceHab({alcance: 'casteo'}, '', st), Combatiente.alcanceHab({alcance: 'rango'}, '', st), Combatiente.alcanceHab({alcance: 'adyacente'}, '', st),
-    Combatiente.alcanceHab({alcance: 'fijo', alcanceN: 3}, '', st), Combatiente.alcanceHab({}, 'pdgmg', st), Combatiente.alcanceHab({}, 'pdg', st)], [4, 6, 1, 3, 4, 0]);
+    Combatiente.alcanceHab({alcance: 'fijo', alcanceN: 3}, '', st), Combatiente.alcanceHab({}, 'pdgmg', st), Combatiente.alcanceHab({}, 'pdg', st)], [6, 6, 1, 3, 6, 0]);
+});
+prueba('el Rango lo da la Destreza: sin Rango de casteo en la ficha ni en los creeps; un «+Rango de casteo» viejo suma al Rango', () => {
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 3, agl: 3, des: 5, esp: 9},
+    inventario: [{id: 'c', nombre: 'Capuz viejo', tipoItem: 'cabeza', equipado: true, mods: [{stat: 'rangocasteo', val: 2}]}]}).S);
+  const c = FichaCalculo.calcular(S);
+  const sc = CreepCalculo.normalizar({nombre: 'Brujo', des: 4, esp: 8, equipo: [{nombre: 'Diadema', tipoItem: 'cabeza', mods: [{stat: 'rangocasteo', val: 1}]}]});
+  igual([c.final.rng, c.final.rangocasteo, FichaResumen.resumen(S).rangocasteo, CreepCalculo.modTotal(sc, 'rng'), CreepCalculo.DERIVED_STATS.some(d => d.id === 'rangocasteo')],
+    [7, undefined, undefined, 1, false]);
 });
 prueba('X: se cambia en fórmulas («1dX», «X+2») y textos, sin tocar otras palabras', () => igual(
   [Combatiente.sustituirX('1dX+X', 3), Combatiente.sustituirX('Xd6', 2), Combatiente.sustituirX('excedente de X', 4)], ['1d3+3', '2d6', 'excedente de 4']));

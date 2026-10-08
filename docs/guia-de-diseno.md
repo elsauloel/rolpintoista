@@ -92,7 +92,7 @@ Afortunado, Sangre pura, Coagulación extrema, Blindado, Sigilo.
 **Sobre el mapa**: formas y terreno (con turnos y Colisión), trampas (con daño, estado, fuego amigo del efecto y **teleport**), sigilo (cono y zona de alerta), niebla y visión, auras, ping.
 **Sobre la iniciativa** (por construir): bajar al fondo, subir N lugares o al primero, con o sin duración.
 **Sobre la niebla y la visibilidad** (por construir): modificar el radio de visión, ver a través de Sólidos, destapar/tapar niebla, ceguera, detectar lo oculto.
-**Recursos y números**: HP, SP, No2 (Nitros), Defensa y resistencias a crítico, Movimiento, Rango y Rango de casteo, Crg.Max (Sobrepeso), Iniciativa.
+**Recursos y números**: HP, SP, No2 (Nitros), Defensa y resistencias a crítico, Movimiento, Rango (de la Destreza: también el de lo especial; el Rango de casteo se fue el 2026-10-07), Crg.Max (Sobrepeso), Iniciativa.
 **Reglas de tirada**: ventaja (Afortunado), mitades (Pajaritos, Lisiado), Bloqueo / Parry / Esquivar, redondeo (buffs hacia arriba, debuffs hacia abajo).
 
 ## 3. Cómo usar esta guía al diseñar
@@ -123,7 +123,7 @@ Dos estados nuevos, para que todas las skills los apliquen igual: **Crítico fre
 | Headshot (existente) | Shooter | SP 4 | **frecuente ×1 + potente ×1**, +5 de daño, falla si no es crítico |
 | Degollar (existente) | Asalto | SP 7 | **frecuente ×1 + potente ×1**, +7 de daño (con su costo de quedar expuesto) |
 | Golpe brutal | Warrior | SP 3 · ataque | Ataque con **potente ×1**; a cambio, −2 a tu Evasión hasta tu próximo turno |
-| Marca del cazador | Support | SP 3 · No2 1 | Un aliado en tu rango de casteo recibe **frecuente ×1** durante 2 turnos |
+| Marca del cazador | Support | SP 3 · No2 1 | Un aliado en tu Rango recibe **frecuente ×1** durante 2 turnos |
 | Punto débil | Debuffer | SP 3 (Esp / Res.M) | El objetivo pierde **1 punto de Resistencia a crítico** (todos los Tipos) durante 2 turnos |
 | Temple (o Piel resistente, existente) | Tanque | SP 2 | +1 de Resistencia a crítico a todos los Tipos durante 2 turnos |
 Y del lado del equipo: **el mundo del crítico es de las armas de Tipo 4 y 6** (punzantes y cortantes): **ambas juegan con las dos herramientas (frecuente y potente), con distinto acento** (invertido por el dueño el 2026-09-25): las de **Tipo 6** acentúan el crítico **frecuente** y las de **Tipo 4** el **potente** (no es exclusivo: pueden aparecer en otras armas), con el peso de cada una en el precio (P112). Las pesadas (Tipo 8 o más) se identifican por otros efectos (Rompe armadura, Knockdown…).

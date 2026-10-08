@@ -165,12 +165,11 @@ function zonasSigilo(t){
 // 👓 Lentes (grupo flotante del mapa): un menú que prende el modo lentes y deja elegir qué conos y
 // zonas se ven — todos, solo aliados, rivales o NPC, o solo los de los tokens que se marquen.
 // Apagado, el mapa funciona exactamente igual que siempre.
-/* ---------- 📏🔮 Visualizador de rango ----------
-   Muestra, alrededor de tu propio token, el área de tu Rango (Destreza) o tu Rango de casteo (Especial) — los mismos
-   números que publica la ficha en resumen.rng/resumen.rangocasteo (comun de ambos: solo tu personaje, no invocaciones
-   ni creeps). Modo local, no se sincroniza con nadie más; se apaga tocando el botón de vuelta, con Esc o cambiando
+/* ---------- 📏 Visualizador de rango ----------
+   Muestra, alrededor del token, el área de su Rango (Destreza; también el de lo especial: el Rango de casteo del Especial se fue el
+   2026-10-07) — el número que publica la ficha en resumen.rng. Modo local, no se sincroniza con nadie más; se apaga tocando el botón de vuelta, con Esc o cambiando
    de token seleccionado. */
-let rangoActivo = false, rangoMagicoActivo = false;
+let rangoActivo = false;
 function miTokenPrincipal(){
   if(!fbUsuario) return null;
   for(const t of tokens.values()){
@@ -235,12 +234,11 @@ async function usarPolillaMapa(){
   renderPolillaBoton();
 }
 function renderBotonesRango(){
-  const b1 = $('#btn-rango'), b2 = $('#btn-rango-magico');
+  const b1 = $('#btn-rango');
   if(b1) b1.classList.toggle('activo', rangoActivo);
-  if(b2) b2.classList.toggle('activo', rangoMagicoActivo);
 }
-// Rango (Destreza) y Rango de casteo (Especial) de un token: los de un personaje salen de su ficha (resumen.rng/rangocasteo);
-// los de un creep, solo para el GM, de su Destreza y Especial más lo que los sube. null = no se sabe (invocación, todavía sin leer…).
+// El Rango (Destreza) de un token: el de un personaje sale de su ficha (resumen.rng); el de un creep, solo para el GM, de su Destreza
+// más lo que la sube y lo que suma al Rango. null = no se sabe (invocación, todavía sin leer…).
 // Calculadora de crítico (comun/critico.js): los tokens con sus datos de crítico, para elegir quién ataca y quién defiende y que se complete solo.
 // Personajes: lo que publica su ficha (resumen.crit, critpot, armaTipo, rescrit, def); creeps (solo el GM): su parte privada.
 function criticoFuentes(){
@@ -268,29 +266,27 @@ function rangoDeToken(t){
   if(t.tipo === 'creep'){
     const sc = creepPrivadoDe(t.fichaId);
     if(!sc) return null;
-    return {rng: num(sc.des) + creepModTotalMapa(sc, 'des') + creepModTotalMapa(sc, 'rng'), casteo: num(sc.esp) + creepModTotalMapa(sc, 'esp') + creepModTotalMapa(sc, 'rangocasteo')};
+    return {rng: num(sc.des) + creepModTotalMapa(sc, 'des') + creepModTotalMapa(sc, 'rng')};
   }
   if(t.fichaId.includes(SEP_INVOCACION)) return null;
   const f = fichasPub.get(t.fichaId);
-  return f && f.resumen ? {rng: num(f.resumen.rng), casteo: num(f.resumen.rangocasteo)} : null;
+  return f && f.resumen ? {rng: num(f.resumen.rng)} : null;
 }
-// R / Shift+R (o los botones 📏 🔮): muestran el rango del TOKEN SELECCIONADO (2026-09-24, cambio pedido por el dueño: antes
+// R (o el botón 📏): muestra el rango del TOKEN SELECCIONADO (2026-09-24, cambio pedido por el dueño: antes
 // buscaba "tu" personaje y al GM no le mostraba nada). Sin token seleccionado avisa "Seleccioná un token". Prendido, sigue a
 // la selección: si elegís otro token, muestra el de ese.
-function alternarRango(magico){
-  const activo = magico ? rangoMagicoActivo : rangoActivo;
-  if(!activo){
+function alternarRango(){
+  if(!rangoActivo){
     const t = seleccion ? tokens.get(seleccion) : null;
     if(!t){ toast('Seleccioná un token para ver su rango'); return; }
     const r = rangoDeToken(t);
-    if(!r || !((magico ? r.casteo : r.rng) > 0)){ toast(`${nombreDe(t)} no tiene ${magico ? 'rango de casteo' : 'rango'} para mostrar`); return; }
+    if(!r || !(r.rng > 0)){ toast(`${nombreDe(t)} no tiene rango para mostrar`); return; }
   }
-  if(magico) rangoMagicoActivo = !rangoMagicoActivo; else rangoActivo = !rangoActivo;
+  rangoActivo = !rangoActivo;
   renderBotonesRango();
   pedirDibujo();
 }
-$('#btn-rango').onclick = () => alternarRango(false);
-$('#btn-rango-magico').onclick = () => alternarRango(true);
+$('#btn-rango').onclick = () => alternarRango();
 $('#btn-reroll').onclick = () => {
   const fid = fichaPrincipalId();
   if(!fid){ toast('Necesitás un personaje para usar la Moneda Re-Roll'); return; }

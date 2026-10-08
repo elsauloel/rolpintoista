@@ -92,8 +92,7 @@ const FichaResumen = (() => {
       sigilo: n(c.final.sigilo),   // Sigilo (2026-10-04): el mapa lo tira cuando lo intentan descubrir
       // Resistencias elementales (2026-10-04): el mapa las resta al daño de su elemento.
       resfuego: n(c.final.resfuego), reshielo: n(c.final.reshielo), resrayo: n(c.final.resrayo), restoxico: n(c.final.restoxico), resacido: n(c.final.resacido),
-      rng: n(c.final.rng),               // Rango (de Destreza): el mapa lo usa para el visualizador de rango (📏)
-      rangocasteo: n(c.final.rangocasteo),   // Rango de casteo (de Especial): visualizador de rango mágico (🔮)
+      rng: n(c.final.rng),               // Rango (de Destreza): el visualizador de rango (📏) y el alcance de todo, también de la magia (2026-10-07)
       luz: n(c.final.luz), veoculto: n(c.final.veoculto),   // luz que lleva encima y radio en el que ve lo oculto: el mapa los lee (farol, bengala, yelmo del ojo que todo lo ve)
       vision: n(c.final.vision),
       venenista: n(c.final.venenista),

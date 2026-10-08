@@ -385,7 +385,7 @@ const AsistenteItem = (() => {
           : 'Ocupa <b>una mano</b>: la otra queda libre para un escudo o una segunda arma. Con dos armas, cada una paga su propio primer ataque del turno y el PdG de cada una solo cuenta cuando se ataca con ella.');
       if(p && p.manosUsadas !== undefined) h += `<div class="aa-nota">Manos ocupadas hoy: ${f(n(p.manosUsadas))} de 2.</div>`;
       if(cfg.conMano && !dos) h += campoMano(d);
-      if(esEspecial(d)) return {h: h + efecto('Un arma especial no tiene distancia propia: hasta dónde llega lo dice su Ejecución ✨ (el Rango de casteo, una línea, un área…).'), ayuda};
+      if(esEspecial(d)) return {h: h + efecto('Un arma especial no tiene distancia propia: hasta dónde llega lo dice su Ejecución ✨ (tu Rango, una línea, un área…).'), ayuda};
       h += campo('Distancia', `<div class="aa-opciones">${op('rango', '0', !d.armaDeRango, 'Cuerpo a cuerpo')}${op('rango', '1', !!d.armaDeRango, 'A distancia')}</div>`);
       h += efecto(d.armaDeRango
         ? `Es <b>de rango</b> (arco, pistola, lanzallamas…): tiene su propia mecánica — el daño <b>no suma el Dmg</b>, es solo el del arma. No confundir con el <b>Alcance</b> de las armas cuerpo a cuerpo: son dos cosas distintas.`

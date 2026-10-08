@@ -42,7 +42,7 @@ COSTO = {
     # Ofensivo en una pieza defensiva: con la escala de la calculadora de armas (se marca aparte).
     # PdG en una pieza defensiva (dueño, 2026-10-04, por ahora solo en guantes): espejo de la Evasión; contraataque y oportunidad, situacionales.
     'pdgcontra': 1, 'pdgopor': 0.75,
-    'pdg': 2, 'dmg': 1, 'crit': 3, 'critpot': 1.2, 'rng': 0.75, 'rangocasteo': 0.5, 'pdgmg': 2, 'dmgesp': 1,
+    'pdg': 2, 'dmg': 1, 'crit': 3, 'critpot': 1.2, 'rng': 0.75, 'pdgmg': 2, 'dmgesp': 1,
     # Atributos: suben varios stats a la vez (Agilidad = Evasión + Iniciativa + No2).
     'fue': 2.5, 'con': 3, 'agl': 8, 'des': 3, 'esp': 3,
     'bonos': 1, 'accionesmax': 4,
@@ -102,7 +102,7 @@ def costo_chance(stat, pct):
     a, b, c = COSTO_CHANCE[stat]
     return c if pct >= 100 else b if pct >= 50 else a
 COSTO_DEFECTO = 1
-OFENSIVOS = {'pdg', 'dmg', 'crit', 'critpot', 'rng', 'pdgmg', 'dmgesp', 'rangocasteo', 'accionesmax'}
+OFENSIVOS = {'pdg', 'dmg', 'crit', 'critpot', 'rng', 'pdgmg', 'dmgesp', 'accionesmax'}
 COSTO_ESTADO_EQUIPO = 2          # un estado que se pone al equipar (Espinas, Regeneración…): a revisar caso por caso
 # Estados al equipar cuyo efecto ya se cobra en un bono de la pieza (2026-10-06): Inamovible va con «inamovible 100» (la chance, siempre).
 COSTO_ESTADO_EQUIPO_NOMBRE = {'Inamovible': 0}

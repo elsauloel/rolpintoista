@@ -307,7 +307,7 @@ let accionesCreepId = null;
 // Los 5 atributos base (entradas con attr apuntando a sí mismas) más los
 // stats secundarios derivados de un PJ (Res.Esp/Res.CC de Con, Dmg/
 // Potencia de Fue, Eva/Ini/Mov de Agl, Rango/PdG/Crítico/Parry/Percepción
-// de Des, PdG.Esp/Res.M/Rango de casteo de Especial), sin agregar una grilla a la ficha
+// de Des, PdG.Esp/Res.M de Especial), sin agregar una grilla a la ficha
 // del creep — se tiran desde acá, en Acciones. El set completo se usa
 // también para cálculos internos (formulasCombateCreep, danoTxt, etc.);
 // CREEP_STATS_TIRADA_IDS más abajo recorta cuáles se muestran como botón.

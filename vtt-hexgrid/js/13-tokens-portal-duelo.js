@@ -124,23 +124,23 @@ function cerrarBotonera(){
 // Una habilidad con zona (Sonic Boom: 'cono') le pide al mapa que la dibuje: el MISMO cono de 16 casillas de la detección del
 // sigilo, delante del token, como un trazo por casilleros temporal (lo ven todos y se borra solo a los 3 segundos).
 /* ---------- Invocar portal (Mago, 2026-09-25) ----------
-   La habilidad le avisa al mapa (`portal-habilidad`): se piden DOS clics (dentro del rango de casteo del token, en casillas transitables a pie)
+   La habilidad le avisa al mapa (`portal-habilidad`): se piden DOS clics (dentro del Rango del token, en casillas transitables a pie)
    y se crean dos elementos `portal` que se apuntan entre sí (`portalDestino`), con turnos (se van solos al vencer). Solo los ALIADOS los usan. */
 async function portalDeHabilidad(msg){
   const t = [...tokens.values()].find(x => x.fichaId === msg.fichaId);
   if(!t){ toast(`${msg.nombre || 'Invocar portal'}: tu personaje no tiene token en el mapa, no se pueden colocar los portales`); return; }
-  const rg = rangoDeToken(t), alcance = rg ? Math.floor(num(rg.casteo)) : 0;
-  if(alcance < 1){ toast('Tu rango de casteo es 0: los portales no alcanzan a ningún punto (abrí la ficha una vez para que se publique)'); return; }
+  const rg = rangoDeToken(t), alcance = rg ? Math.floor(num(rg.rng)) : 0;   // el Rango (Destreza): ya no hay Rango de casteo (2026-10-07)
+  if(alcance < 1){ toast('Tu Rango es 0: los portales no alcanzan a ningún punto (abrí la ficha una vez para que se publique)'); return; }
   if(!$('#botonera-capa').hidden) escapeABotonera();
   const puntos = [];
   const pedir = () => elegirDestino(h => {
     const yo = {col: t.col, fila: t.fila};
-    if(distanciaHex(h, yo) > alcance){ toast(`Ese punto queda a más de ${alcance} casilleros (tu rango de casteo)`); pedir(); return; }
+    if(distanciaHex(h, yo) > alcance){ toast(`Ese punto queda a más de ${alcance} casilleros (tu Rango)`); pedir(); return; }
     if(puntos.some(p => p.col === h.col && p.fila === h.fila)){ toast('Elegí otra casilla: los dos portales no pueden estar en el mismo punto'); pedir(); return; }
     puntos.push(h);
     if(puntos.length < 2){ toast('Primer portal marcado: elegí el segundo'); pedir(); return; }
     portalesCrear(puntos, msg.turnos, msg.nombre);
-  }, `<b>🌀 ${esc(msg.nombre || 'Invocar portal')}: elegí el portal ${puntos.length + 1} de 2</b> <span>clic en una casilla transitable a pie dentro de tu rango de casteo (${alcance}) · Esc o clic derecho cancelan</span>`);
+  }, `<b>🌀 ${esc(msg.nombre || 'Invocar portal')}: elegí el portal ${puntos.length + 1} de 2</b> <span>clic en una casilla transitable a pie dentro de tu Rango (${alcance}) · Esc o clic derecho cancelan</span>`);
   pedir();
 }
 async function portalesCrear(puntos, turnos, nombre){
@@ -268,7 +268,7 @@ function zonaPersistenteDeHabilidad(msg){
 // sola al lado del token). El anuncio (sin la ubicación) ya lo publicó la ficha; la trampa la ve solo su bando (trampaDeMiBando).
 // Las que dejan varias (2026-10-05, Varita de espinas: «3 casillas donde quieras»): un clic por cada una; Esc termina antes. Los pilares
 // (Varita de los pilares) no son trampas: cada clic levanta un Sólido de 1 casilla con turnos. El portal con destino fijo (Varita del portal):
-// primero la casilla que lo dispara y después adónde lleva. Si la casilla queda fuera del Rango de casteo de quien la usa, avisa y deja seguir.
+// primero la casilla que lo dispara y después adónde lleva. Si la casilla queda fuera del Rango de quien la usa, avisa y deja seguir.
 function trampaDeHabilidad(msg){
   const t = msg.trampa || {}, cant = Math.max(1, Math.min(6, Math.round(num(t.cant)) || 1));
   const pilar = !!t.pilar, portal = t.portal && t.portal.fijo ? Math.max(1, Math.round(num(t.portal.rango)) || 4) : 0;
@@ -295,11 +295,11 @@ function trampaDeHabilidad(msg){
   };
   otra(0);
 }
-// Si la casilla elegida queda fuera del Rango de casteo de quien la usa: avisa (la mesa decide), no bloquea.
+// Si la casilla elegida queda fuera del Rango de quien la usa: avisa (la mesa decide), no bloquea.
 function trampaAvisarAlcance(msg, h){
   const mio = [...tokens.values()].find(x => x.fichaId === msg.fichaId && x.tipo === (msg.tipoToken || 'pj'));
   const rr = mio && typeof rangoDeToken === 'function' ? rangoDeToken(mio) : null;
-  if(rr && rr.casteo > 0 && distanciaHex(mio, h) > rr.casteo) toast(`⚠ Esa casilla queda a ${distanciaHex(mio, h)}: fuera de tu Rango de casteo (${fmt(rr.casteo)})`);
+  if(rr && rr.rng > 0 && distanciaHex(mio, h) > rr.rng) toast(`⚠ Esa casilla queda a ${distanciaHex(mio, h)}: fuera de tu Rango (${fmt(rr.rng)})`);
 }
 // Un pilar de piedra (Varita de los pilares): Sólido de 1 casilla, visible para todos, que se va solo a los `turnos` turnos. → false si no hay lugar.
 async function levantarPilar(h, t){
@@ -417,7 +417,7 @@ function dueloAvisoObjetivo(nombre, conSuelto, alSuelto, hab){
 }
 /* Alcance del ataque o de la habilidad (2026-09-27, pedido del dueño): NO restringe a quién se puede apuntar; mientras se elige el objetivo, los tokens que están a
    tu alcance (casilleros desde tu token) «laten» con un brillo dorado. `ataque.alcance` lo calcula la página de quien actúa: cuerpo a cuerpo = 1 (más el Alcance del arma),
-   armas de rango = su Rango, hechizos = Rango de casteo. Sin alcance (0) no se resalta nada. */
+   armas de rango y lo especial = el Rango (Destreza). Sin alcance (0) no se resalta nada. */
 let objetivosResaltados = null;
 // ¿"t" es rival de quien castea (yo)? Mismo criterio que ya usaban los hechizos de área (dueloElegirAreaMapa,
 // 2026-09-27): los personajes atacan creeps y los creeps atacan personajes — no depende de quién mira el mapa.

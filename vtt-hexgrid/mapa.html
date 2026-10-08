@@ -36,7 +36,6 @@
       <kbd>F</kbd><span>Terreno y Formas (prender / apagar)</span>
       <kbd>M</kbd><span>Mover libre del token seleccionado (otra <kbd>M</kbd> lo apaga)</span>
       <kbd>R</kbd><span>📏 Ver el Rango del token seleccionado (otra <kbd>R</kbd> lo apaga)</span>
-      <kbd>T</kbd><span>🔮 Ver el Rango de casteo del token seleccionado (también <kbd>Shift</kbd> + <kbd>R</kbd>)</span>
       <kbd>C</kbd><span>Centrar el mapa en tu token (o en el token seleccionado)</span>
       <kbd>B</kbd><span>Abrir la Botonera de tu personaje (jugadores); otra <kbd>B</kbd> la cierra</span>
       <kbd>E</kbd><span>Estados alterados del token seleccionado (abrir / cerrar)</span>
@@ -78,8 +77,7 @@
           <div id="lentes-control" hidden style="margin-top:8px;padding-top:8px;border-top:1px solid var(--line, #39435c)"></div>
         </div>
       </div>
-      <button type="button" class="btn btn-cuadrado" id="btn-rango" title="Rango (Destreza) del token seleccionado. Apretá de vuelta para apagarlo. (R)">📏</button>
-      <button type="button" class="btn btn-cuadrado" id="btn-rango-magico" title="Rango de casteo (Especial) del token seleccionado. Apretá de vuelta para apagarlo. (T, o Shift + R)">🔮</button>
+      <button type="button" class="btn btn-cuadrado" id="btn-rango" title="Rango (Destreza) del token seleccionado: hasta dónde llegan sus armas a distancia y lo especial. Apretá de vuelta para apagarlo. (R)">📏</button>
       <button type="button" class="btn btn-cuadrado" id="btn-reroll" hidden title="Moneda Re-Roll: volver a hacer cualquiera de tus últimas tiradas, sin costo de No2, mientras tengas una moneda equipada (cinturón o mochila)">🪙</button>
       <div class="desplegable" id="ojo-caja" hidden>
         <button type="button" class="btn btn-cuadrado" id="btn-ojo-menu" aria-expanded="false" title="Niebla de guerra y ojo del GM">👁</button>
@@ -232,8 +230,8 @@
 <script src="../comun/tokens-auto.js?v=20261007o"></script>
 <script src="../comun/creeps-mapas.js?v=20261002c"></script>
 <script src="../comun/asistente-mapa.js?v=20261002a"></script>
-<script src="../comun/combatiente.js?v=20261007ad"></script>
-<script src="../comun/creep-calculo.js?v=20261007t"></script>
+<script src="../comun/combatiente.js?v=20261007am"></script>
+<script src="../comun/creep-calculo.js?v=20261007am"></script>
 <script src="../comun/modificadores-tirada.js?v=20260930c"></script>
 <script src="../comun/estados-presets.js?v=20261007ak"></script>
 <script src="../comun/estados-aplicar.js?v=20261007r"></script>
@@ -244,26 +242,26 @@
 <script src="../comun/asistente-trampa.js?v=20261007o"></script>
 <script src="../comun/elegir-trampa.js?v=20261004q"></script>
 <script src="../comun/asistente-zona.js?v=20261007q"></script>
-<script src="../comun/guia-diseno.js?v=20261007al"></script>
+<script src="../comun/guia-diseno.js?v=20261007am"></script>
 <script src="../comun/critico.js?v=20260930a"></script>
 <script src="../comun/duelo.js?v=20261007ak"></script>
 <script src="../comun/aviso-combate.js?v=20261004c3"></script>
 <script src="../comun/mensajes-mapa.js?v=20261002inv"></script>
 <script src="js/01-base-y-mapas.js?v=20261007o"></script>
-<script src="js/02-modo-niebla-sigilo.js?v=20261007o"></script>
+<script src="js/02-modo-niebla-sigilo.js?v=20261007am"></script>
 <script src="js/03-asistente-trampa.js?v=20261005fd"></script>
 <script src="js/04-mantenimiento-e-iniciativa.js?v=20261007ac"></script>
-<script src="js/05-vista-y-dibujo.js?v=20261006q"></script>
-<script src="js/06-mouse.js?v=20261006p"></script>
+<script src="js/05-vista-y-dibujo.js?v=20261007am"></script>
+<script src="js/06-mouse.js?v=20261007am"></script>
 <script src="js/07-tokens-y-elementos.js?v=20261007ac"></script>
 <script src="js/08-mover-trampas-y-zonas.js?v=20261007aa"></script>
 <script src="js/09-colocar-y-panel.js?v=20261006q"></script>
 <script src="js/10-hud-y-vida.js?v=20261007r"></script>
-<script src="js/11-botonera-nueva.js?v=20261007ak"></script>
-<script src="js/12-acciones-nuevas.js?v=20261007ak"></script>
-<script src="js/13-tokens-portal-duelo.js?v=20261007ak"></script>
+<script src="js/11-botonera-nueva.js?v=20261007am"></script>
+<script src="js/12-acciones-nuevas.js?v=20261007am"></script>
+<script src="js/13-tokens-portal-duelo.js?v=20261007am"></script>
 <script src="js/14-herramientas-y-arranque.js?v=20261007g"></script>
-<script src="js/15-ficha-lite.js?v=20261007ak"></script>
+<script src="js/15-ficha-lite.js?v=20261007am"></script>
 <script src="js/16-momentos.js?v=20261007ae"></script>
 <script src="js/17-oportunidad.js?v=20261005mn"></script>
 <script src="js/18-ventanas-gm.js?v=20261004ga"></script>

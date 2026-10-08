@@ -933,7 +933,7 @@ const FichaAcciones = (() => {
   // Habilidad con zona en el mapa (zonaMapa: 'cono'/'flor') o Invocar portal (portalMapa): se le avisa al mapa.
   function avisarZonaAlMapa(S, h, ui){
     if(!h || !ui.enMapa() || !ui.yo().ref) return;
-    // Invocar portal: le pide al mapa que deje elegir los dos puntos (dentro del rango de casteo) y cree los portales.
+    // Invocar portal: le pide al mapa que deje elegir los dos puntos (dentro del Rango) y cree los portales.
     if(h.portalMapa){
       try{ ui.alMapa('portal-habilidad', {fichaId: ui.yo().ref, turnos: Math.max(1, num(h.portalMapa.turnos) || 3), nombre: h.nombre}); }
       catch(err){ console.error('No se pudo avisar el portal al mapa:', err); }

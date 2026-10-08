@@ -87,7 +87,7 @@ const STAT_FULL_GM = {
   tipo1:'Resistencia a crítico Tipo 4', tipo2:'Resistencia a crítico Tipo 6', tipo3:'Resistencia a crítico Tipo 8',
   tipo4:'Resistencia a crítico Tipo 10', tipo5:'Resistencia a crítico Tipo 12',
   pdg:'Probabilidad de golpe', eva:'Evasión', ini:'Iniciativa', mov:'Movimiento', parry:'Parry', crit:'Crítico frecuente (baja el rango del crítico)', critpot:'Crítico potente (baja los umbrales del d20)',
-  bonos:'Bonos', rangocasteo:'Rango de casteo', accionesmax:'Acciones máximas', nitros:'Nitros',
+  bonos:'Bonos', rangocasteo:'Rango', accionesmax:'Acciones máximas', nitros:'Nitros',
   resm:'Resistencia mental', resmg:'Resistencia especial', rescc:'Resistencia a CC',
   con:'Constitución', fue:'Fuerza', agl:'Agilidad', des:'Destreza', esp:'Especial',
 };

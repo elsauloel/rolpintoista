@@ -111,11 +111,12 @@ const CreepCalculo = (() => {
   // Fuerza afecten al creep de verdad y no solo la Res. a crítico.
   function modTotal(sc, statId){
     let total = 0;
-    fuentesEquipo(sc).forEach(it => (it.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val); }));
+    // Un «+Rango de casteo» viejo suma al Rango (2026-10-07: el rango lo da la Destreza, siempre).
+    fuentesEquipo(sc).forEach(it => (it.mods||[]).forEach(m => { if(m.stat === statId || (statId === 'rng' && m.stat === 'rangocasteo')) total += num(m.val); }));
     (sc.estados||[]).forEach(es => {
       if(es.activo === false) return;
       const stacks = Math.max(1, num(es.stacks)||1);
-      (es.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val) * stacks; });
+      (es.mods||[]).forEach(m => { if(m.stat === statId || (statId === 'rng' && m.stat === 'rangocasteo')) total += num(m.val) * stacks; });
     });
     return total;
   }
@@ -164,14 +165,14 @@ const CreepCalculo = (() => {
     fue: [['dmg', 'Dmg'], ['bloqueo', 'Bloqueo']],
     agl: [['eva', 'Eva'], ['ini', 'Iniciativa']],
     des: [['rng', 'Rng'], ['pdg', 'PdG'], ['crit', 'Crít.Frec.'], ['critpot', 'Crít.Pot.'], ['parry', 'Parry'], ['percepcion', 'Percep.'], ['sigilo', 'Sigilo']],
-    esp: [['pdgmg', 'PdG.Esp'], ['dmgesp', 'Ef.Esp'], ['resm', 'Res.Mt'], ['rangocasteo', 'Rango Cast.']],
+    esp: [['pdgmg', 'PdG.Esp'], ['dmgesp', 'Ef.Esp'], ['resm', 'Res.Mt']],   // (el Rango de casteo se fue, 2026-10-07: el rango es de la Destreza)
   };
   const ATTR_NOMBRE = {con:'Constitución', fue:'Fuerza', agl:'Agilidad', des:'Destreza', esp:'Especial'};
 
   // Los 5 atributos base (entradas con attr apuntando a sí mismas) más los
   // stats secundarios derivados de un PJ (Res.Esp/Res.CC de Con, Dmg/
   // Potencia de Fue, Eva/Ini/Mov de Agl, Rango/PdG/Crítico/Parry/Percepción
-  // de Des, PdG.Esp/Res.M/Rango de casteo de Especial). STATS_TIRADA_IDS
+  // de Des, PdG.Esp/Res.M de Especial). STATS_TIRADA_IDS
   // recorta cuáles se muestran como botón en las Acciones.
   const DERIVED_STATS = [
     {id:'con', label:'Con', attr:'con'}, {id:'fue', label:'Fue', attr:'fue'},
@@ -180,7 +181,7 @@ const CreepCalculo = (() => {
     {id:'dmg', label:'Dmg', attr:'fue'}, {id:'bloqueo', label:'Bloqueo', attr:'fue'},
     {id:'eva', label:'Eva', attr:'agl'}, {id:'ini', label:'Iniciativa', attr:'agl'}, {id:'mov', label:'Mov', attr:'agl'},
     {id:'rng', label:'Rango', attr:'des'}, {id:'pdg', label:'PdG', attr:'des'}, {id:'crit', label:'Crítico frecuente', attr:'des'}, {id:'critpot', label:'Crítico potente', attr:'des'}, {id:'parry', label:'Parry', attr:'des'}, {id:'percepcion', label:'Percepción', attr:'des'}, {id:'sigilo', label:'Sigilo', attr:'des'},
-    {id:'pdgmg', label:'PdG.Esp', attr:'esp'}, {id:'dmgesp', label:'Ef.Esp', attr:'esp'}, {id:'resm', label:'Res.Mt', attr:'esp'}, {id:'rangocasteo', label:'Rango de casteo', attr:'esp'},
+    {id:'pdgmg', label:'PdG.Esp', attr:'esp'}, {id:'dmgesp', label:'Ef.Esp', attr:'esp'}, {id:'resm', label:'Res.Mt', attr:'esp'},
   ];
   // Mismo criterio que STATS_CON_TIRADA_IDS/STATS_REDUNDANTES_COMBATE en la
   // Botonera de la ficha: los 5 atributos base + los secundarios que no
@@ -504,7 +505,7 @@ const CreepCalculo = (() => {
   const STAT_LABEL = {
     tipo1:'Tipo 4', tipo2:'Tipo 6', tipo3:'Tipo 8', tipo4:'Tipo 10', tipo5:'Tipo 12',
     pdg:'PdG', eva:'Eva', ini:'Iniciativa', mov:'Mov', parry:'Parry', crit:'Crítico frecuente', critpot:'Crítico potente',
-    bonos:'Bonos', rangocasteo:'Rango Cast.', accionesmax:'Acciones máx.', nitros:'No2',
+    bonos:'Bonos', rangocasteo:'Rango', accionesmax:'Acciones máx.', nitros:'No2',
     resm:'Res.Mt', resmg:'Res.Esp', rescc:'Res.CC',
     con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp',
     // Los que dan las piezas defensivas (2026-10-06: en GM Tools se veían con su nombre interno, «oporahorro +1»).

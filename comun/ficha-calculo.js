@@ -44,8 +44,8 @@ const FichaCalculo = (() => {
       {id:'dmgesp', label:'Ef.Esp', full:'Efecto especial: la potencia de los efectos del Especial (daño u otros), para habilidades y trampas mágicas'},
       {id:'resm', label:'Res.Mt', full:'Resistencia mental'},
       {id:'sp', label:'SP', full:'Special Power'},
-      {id:'spregen', label:'SP Regen', full:'Regeneración de SP por turno'},
-      {id:'rangocasteo', label:'Rango Cast.', full:'Rango de casteo'}]},
+      {id:'spregen', label:'SP Regen', full:'Regeneración de SP por turno'}]},
+    // (El Rango de casteo se fue, 2026-10-07, dueño: «el rango lo da Destreza, siempre; no existe el rango mágico por Especial».)
   ];
   const EXTRA = [
     {id:'def', label:'Defensa', full:'Defensa'},
@@ -194,7 +194,8 @@ const FichaCalculo = (() => {
     // tipo: de dónde viene (lo muestra la 🔍); itemId: para el PdG propio de cada arma.
     const push = (m, origen, tipo, itemId) => {
       if(!m || !m.stat) return;
-      (out[m.stat] = out[m.stat] || []).push({val:num(m.val), origen, tipo, itemId});
+      const stat = m.stat === 'rangocasteo' ? 'rng' : m.stat;   // una copia vieja con «+Rango de casteo» suma al Rango (2026-10-07)
+      (out[stat] = out[stat] || []).push({val:num(m.val), origen, tipo, itemId});
     };
     (S.inventario || []).filter(i=>i.equipado).forEach(i => {
       if(itemRoto(i)) return;   // roto: ocupa el lugar pero no da ningún efecto

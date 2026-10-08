@@ -72,7 +72,7 @@ const AsistenteDueloHab = (() => {
   const curaValida = v => typeof v === 'string' ? /^\s*\d*d\d+(\s*[+-]\s*\d+)?\s*$/i.test(v) || Number(v) > 0 : Number(v) > 0;
   const TIRA = [['pdgmg', 'PdG.Esp (magia u otros efectos del Especial)'], ['dmgesp', 'Ef.Esp (efecto especial: la potencia de un efecto del Especial, no si pega)'],['pdg', 'PdG (probabilidad de golpe)'], ['fue', 'Fuerza'], ['con', 'Constitución'], ['agl', 'Agilidad'], ['des', 'Destreza'], ['esp', 'Especial']];
   const CONTRA = [['eva', 'Evasión (esquivar un proyectil)'], ['parry', 'Parry (bloquear con un arma o escudo — solo si el objetivo tiene uno equipado)'], ['resmg', 'Res.Esp (resistir magia u otros efectos del Especial)'], ['resm', 'Res.Mt (resistir la mente)'], ['con', 'Constitución'], ['fue', 'Fuerza'], ['esp', 'Especial'], ['des', 'Destreza'], ['agl', 'Agilidad']];
-  const ALCANCES = [['auto', 'Automático (los hechizos usan su Rango de casteo)'], ['casteo', 'Rango de casteo'], ['rango', 'Rango (el de las armas a distancia)'], ['adyacente', 'Cuerpo a cuerpo (casilleros de al lado)'], ['fijo', 'Un número de casilleros'], ['ilimitado', 'Sin límite (no resalta nada)']];
+  const ALCANCES = [['auto', 'Automático (lo especial usa tu Rango, el de la Destreza)'], ['rango', 'Rango (el de la Destreza: armas a distancia y lo especial)'], ['adyacente', 'Cuerpo a cuerpo (casilleros de al lado)'], ['fijo', 'Un número de casilleros'], ['ilimitado', 'Sin límite (no resalta nada)']];
   const BONOS = [['pdg', 'PdG'], ['dmg', 'Daño'], ['eva', 'Evasión'], ['def', 'Defensa'], ['nitros', 'No2'], ['resmg', 'Res.Esp'], ['resm', 'Res.Mt'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo']];
   const BONOS_LABEL = Object.fromEntries(BONOS);
   const TIPOS = [['arcano', 'Arcano (mágico)'], ['fuego', 'Fuego (mágico)'], ['hielo', 'Hielo (mágico)'], ['rayo', 'Eléctrico (mágico)'], ['toxico', 'Tóxico (veneno, gas)'], ['fisico', 'Físico (respeta la Defensa)']];
@@ -154,7 +154,8 @@ const AsistenteDueloHab = (() => {
       // 'true' = True Damage: ignora toda defensa y la Res. elemental (muy controlado).
       frenoEsp: ini && ini.trueDamage ? 'true' : ini && ini.danoDirecto ? 'directo' : '',
       efectos: ini && Array.isArray(ini.efectos) ? ini.efectos.map(e => ({...e})) : [],
-      alcance: (ini && ini.alcance) || 'auto', alcanceN: (ini && ini.alcanceN) || 3,
+      // (una habilidad vieja con alcance 'casteo' pasa a 'rango': el Rango de casteo se fue, 2026-10-07)
+      alcance: (ini && ini.alcance === 'casteo' ? 'rango' : ini && ini.alcance) || 'auto', alcanceN: (ini && ini.alcanceN) || 3,
       radio: (ini && (ini.radio || ini.largo)) || 2,   // también el largo de la línea recta
       ondaDodge: !!(ini && ini.ondaDodge),   // la onda deja dodge roll a quien gana (2026-10-02, Daño en área)   // hechizo de área (Paso 4/7 del casteo): radio del área, en casilleros
       modo: (ini && ini.modo) || 'hab', x: (ini && ini.x) || 'nitros',

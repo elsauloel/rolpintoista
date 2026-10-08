@@ -669,17 +669,11 @@ document.addEventListener('keydown', e => {
     else toast('Elegí primero un token tuyo para moverlo libre');
     return;
   }
-  // R: 📏 Rango (Destreza); Shift+R: 🔮 Rango de casteo (Especial). Locales, no se sincronizan con nadie más.
+  // R: 📏 Rango (Destreza; también el de lo especial desde el 2026-10-07). Local, no se sincroniza con nadie más.
   // (Ctrl+R queda afuera a propósito: el navegador lo usa para recargar la página y no se puede pisar del todo.)
   if((e.key === 'r' || e.key === 'R') && !e.ctrlKey && !e.altKey && !e.metaKey){
     e.preventDefault();
-    alternarRango(e.shiftKey);
-    return;
-  }
-  // T (2026-09-24): 🔮 Rango de casteo, sin Shift (Shift+R con Ctrl a mano se confunde con recargar la página).
-  if((e.key === 't' || e.key === 'T') && !e.ctrlKey && !e.altKey && !e.metaKey && fbMiembro){
-    e.preventDefault();
-    alternarRango(true);
+    alternarRango();
     return;
   }
   // C (2026-09-24): centra el mapa en el token seleccionado (un creep, si el GM tiene uno seleccionado); sin selección, en tu token

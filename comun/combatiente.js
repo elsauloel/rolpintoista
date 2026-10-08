@@ -716,7 +716,8 @@ const Combatiente = (() => {
     // Con probabilidad (2026-10-05, armas especiales): `caras`/`exitos` como los efectos de un arma (33 % = 5 o 6 en d6: el duelo tira un d3 como d6); sin eso, entra siempre.
     const caras = Math.max(1, Math.round(nf(e.caras)) || 1);
     return {nombre: e.nombre || (e.cura ? 'Curación' : ''), caras, exitos: Math.min(caras, Math.max(1, Math.round(nf(e.exitos)) || 1)),
-      ...(nf(e.vuela) > 0 ? {vuela: Math.round(nf(e.vuela))} : {}),   // el arma vuela N casillas (el Desarmado de la Varita del desarme, 2026-10-07)
+      ...(nf(e.vuela) > 0 ? {vuela: Math.round(nf(e.vuela))} : {}),
+      ...(nf(e.empuja) > 0 ? {empuja: Math.round(nf(e.empuja))} : {}),   // lo empuja N casillas, lejos de quien la usa (2026-10-08, ráfaga helada, vendaval)   // el arma vuela N casillas (el Desarmado de la Varita del desarme, 2026-10-07)
       spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: nf(e.val)}] : e.mods,
         polaridad: e.stat ? (nf(e.val) >= 0 ? 'buff' : 'debuff') : (e.escudo ? 'buff' : undefined), hp: e.hp, stacks: e.stacks, escudoMagico: e.escudo},
       ...(() => { const t = curaTirada(e.cura); return t ? {cura: t.cura, detalle: `${e.detalle ? e.detalle + ' ' : ''}Cura ${t.formula}: ${t.rolls.length ? '[' + t.rolls.join(', ') + '] = ' : ''}${t.cura}.`.slice(0, 200)} : {cura: nf(e.cura), detalle: e.detalle || ''}; })()};
@@ -756,6 +757,8 @@ const Combatiente = (() => {
       // crítico de lo físico invocado (Tipo de su familia: estaca 4, canto rodado 10).
       ...(c.zonaQueda ? {zonaQueda: {...c.zonaQueda, ...(c.zonaQueda.tira && o.stat ? {tiraValor: Math.round(nf(o.stat(c.zonaQueda.tira)))} : {})}} : {}),
       ...(c.menosDistancia ? {menosDistancia: true} : {}),
+      ...(c.menosPorOrden ? {menosPorOrden: true} : {}),   // −1 a cada uno de los siguientes en la línea (2026-10-08, láser largo)
+      ...(c.despeja ? {despeja: true} : {}),   // apaga el fuego y despeja la niebla que toca (2026-10-08, vendaval)
       // El riesgo (2026-10-08, Varita inestable): si en los dados del daño sale `si` (un 1), quien la usa se hace `dano`.
       ...(c.riesgo ? {riesgo: {si: Math.max(1, Math.round(nf(c.riesgo.si)) || 1), dano: String(c.riesgo.dano || '2d4')}} : {}),
       ...(c.fuegoAmigo ? {fuegoAmigo: true} : {}),   // un área que también agarra a los aliados (2026-10-07, Bola de fuego mayor)

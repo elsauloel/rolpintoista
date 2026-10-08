@@ -3,7 +3,7 @@
 Todas son de una mano (peso 1), salvo los báculos (dos manos, peso 2). «Directo» = ignora la Defensa especial (lo frena solo la
 resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (el No2 sube 1 por cada uso más en el turno).
 
-## ✅ Cargadas (30)
+## ✅ Cargadas (34)
 
 | Arma | Qué hace · SP · DDE |
 |---|---|
@@ -37,15 +37,15 @@ resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (
 | Varita del muro de fuego | Línea de 3, 3 turnos, piso y aire: 1d4 de fuego al entrar o quedarse. · 1 · 80 |
 | Varita del muro | 3 casillas de piedra en línea, 3 turnos: tapan el paso y la vista. · 2 · 80 |
 | Varita del chorro de lava | Camino libre de 4 (la primera a ⅓ de tu Rango): 1d4 de fuego enseguida a todos (aliados incluidos); arde 2 turnos. · 3 · 110 |
+| Varita láser larga | Línea de 6 (con fuego amigo): 1d8 arcano directo al primero y 1 menos a cada uno de los siguientes. · 3 · 100 |
+| Varita de la ráfaga helada | Cono al frente: 1d4 de hielo directo y empuja 2. · 4 · 130 |
+| Varita del vendaval | Cono: empuja 2 a todos (no se resiste); apaga el fuego y despeja la niebla que toca. · 1 · 80 |
+| Varita del blink | Vos (o un aliado que ves) saltás hasta 3 casillas; una vez por turno. · 3 · 95 |
 
 ## 🔧 Decididas, falta programar algo para cargarlas
 
 | Arma | Qué hace · SP · DDE |
 |---|---|
-| Varita láser larga | Rayo en línea de 6 (con fuego amigo): 1d8 arcano al primero y 1 menos a cada uno de los siguientes. · 3 · 100 |
-| Varita de la ráfaga helada | Frente de 3×3: 1d4 de hielo y empuja 2. · 4 · 130 |
-| Varita del vendaval | Cono: empuja 2 a todos; apaga el fuego y despeja la niebla que toca. · 1 · 80 |
-| Varita del blink | Te teletransportás (o a un aliado que ves) hasta 3 casillas; una vez por turno. · 3 · 95 |
 | Varita de cargas | La Bola de fuego Común, 3 usos por combate sin SP. · — · 120 |
 | Varita gemela | Aceite o Bola de fuego: elegís al usarla (el SP del que elegís). · 1 o 2 · 95 |
 

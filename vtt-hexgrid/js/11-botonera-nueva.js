@@ -112,7 +112,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261006t', '../comun/ficha-botin.js?v=20261002a', '../comun/generador-tiendas.js?v=20261007am', '../comun/ficha-tienda.js?v=20261007ad', '../comun/ficha-mantenimiento.js?v=20261007t', '../comun/ficha-calculo.js?v=20261007am', '../comun/ficha-combate.js?v=20261005mn', '../comun/skills-clase.js?v=20261007am', '../comun/ficha-habilidades.js?v=20261007ar',
-  '../comun/catalogo.js?v=20261008c', '../comun/items-subidos.js?v=20261007h', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261007ax', '../comun/ficha-resumen.js?v=20261007ar', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261007ar', '../comun/inv-duelo.js?v=20261007g', '../comun/ficha-acciones.js?v=20261008b', '../comun/inv-habilidades.js?v=20261006q', '../comun/inv-lupa.js?v=20261001a',
+  '../comun/catalogo.js?v=20261008e', '../comun/items-subidos.js?v=20261007h', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261007ax', '../comun/ficha-resumen.js?v=20261007ar', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261007ar', '../comun/inv-duelo.js?v=20261007g', '../comun/ficha-acciones.js?v=20261008e', '../comun/inv-habilidades.js?v=20261006q', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20261006e', '../comun/ficha-duelo.js?v=20261007g', '../comun/lupa.js?v=20261001a', '../comun/ficha-lupa.js?v=20261005f6'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -647,6 +647,7 @@ function bnAlMapa(tipo, msg){
   if(tipo !== 'zona-habilidad' && bn) bn.host.hidden = true;
   if(tipo === 'zona-habilidad') zonaDeHabilidad(msg);
   else if(tipo === 'portal-habilidad') portalDeHabilidad(msg);
+  else if(tipo === 'blink-habilidad') blinkDeHabilidad(msg);
   else if(tipo === 'zona-persistente-habilidad') zonaPersistenteDeHabilidad(msg);
   else if(tipo === 'trampa-habilidad') trampaDeHabilidad(msg);
   else if(tipo === 'invocacion-habilidad') invocacionDeHabilidad(msg);

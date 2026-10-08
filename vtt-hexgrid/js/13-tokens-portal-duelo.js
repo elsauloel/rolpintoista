@@ -147,6 +147,37 @@ async function portalDeHabilidad(msg){
 }
 // `de` = {ref, tipo} de quien los abre (2026-10-07): con orden de turnos, duran SUS turnos (zonasDelQueLaTiro, js/07), como las zonas; el
 // Mantenimiento los vence una ronda más tarde, de respaldo.
+/* El blink (2026-10-08, Varita del blink): quien la usa, o un aliado que ve (nada sólido en el medio), salta hasta `distancia` casillas a una casilla
+   libre. Primero se elige a quién (clic sobre el token) y después adónde. Mover el token de otro jugador lo deja hacer el GM o su dueño: si no se
+   puede, avisa (✋ a mano). */
+function blinkDeHabilidad(msg){
+  const yo = [...tokens.entries()].find(([, x]) => x.fichaId === msg.fichaId && x.tipo === 'pj');
+  if(!yo){ toast(`${msg.nombre || 'Blink'}: tu personaje no tiene token en el mapa`); return; }
+  const dist = Math.max(1, Math.round(num(msg.distancia)) || 3), nom = msg.nombre ? esc(msg.nombre) + ': ' : '';
+  if(!$('#botonera-capa').hidden) escapeABotonera();
+  const adonde = (id, t) => elegirDestino(async h => {
+    if(distanciaHex(h, t) > dist){ toast(`Tiene que ser a ${dist} casillas o menos`); adonde(id, t); return; }
+    if(elementoSolidoEn(h.col, h.fila) || [...tokens.values()].some(x => x !== t && x.col === h.col && x.fila === h.fila)){ toast('Esa casilla no está libre: elegí otra'); adonde(id, t); return; }
+    const desde = {col: t.col, fila: t.fila};
+    try{
+      await coleccionTokens().doc(id).update({col: h.col, fila: h.fila, ruta: firebase.firestore.FieldValue.delete()});
+      momentoAbrir({tipo: 'blink', icono: '✨', titulo: `${msg.nombre || 'Blink'}: ${nombreDe(t)} salta`, resultado: `De donde estaba aparece ${distanciaHex(desde, h)} casilla${distanciaHex(desde, h) === 1 ? '' : 's'} más allá, en un parpadeo.`, estado: 'listo'});
+    }catch(err){
+      console.error('No se pudo hacer el blink:', err);
+      toast(err && err.code === 'permission-denied' ? `No podés mover a ${nombreDe(t)}: que lo mueva su jugador o el GM (✋ a mano)` : 'No se pudo hacer el blink — revisá la consola');
+    }
+  }, `<b>✨ ${nom}¿adónde salta ${esc(nombreDe(t))}?</b> <span>clic en una casilla libre a ${dist} o menos · Esc o clic derecho cancelan</span>`, true);
+  elegirDestino(h => {
+    const e = [...tokens.entries()].find(([, x]) => x.col === h.col && x.fila === h.fila && !x.oculto);
+    if(!e){ toast('Ahí no hay nadie: hacé clic sobre vos o sobre un aliado'); blinkDeHabilidad(msg); return; }
+    const [id, t] = e;
+    if(id !== yo[0]){
+      if(t.tipo === 'creep'){ toast('El blink es para vos o para un aliado'); blinkDeHabilidad(msg); return; }
+      if(solidosSet().size && !lineaLibre(yo[1], t, solidosSet())){ toast(`No ves a ${nombreDe(t)}: hay algo sólido en el medio`); blinkDeHabilidad(msg); return; }
+    }
+    adonde(id, t);
+  }, `<b>✨ ${nom}¿a quién?</b> <span>clic sobre vos o sobre un aliado que ves · Esc o clic derecho cancelan</span>`, true);
+}
 async function portalesCrear(puntos, turnos, nombre, de){
   const n = Math.max(1, Math.round(num(turnos)) || 3), vence = Math.round(num(mantenimientoNumero)) + n + (de && colocadorEnOrden(de) ? 1 : 0);
   try{
@@ -441,6 +472,7 @@ window.addEventListener('message', e => {
   if(e.data.tipo === 'botonera-cerrada' || e.data.tipo === 'acciones-cerrada') cerrarBotonera();
   if(e.data.tipo === 'zona-habilidad') zonaDeHabilidad(e.data);
   if(e.data.tipo === 'portal-habilidad') portalDeHabilidad(e.data);
+  if(e.data.tipo === 'blink-habilidad') blinkDeHabilidad(e.data);
   if(e.data.tipo === 'zona-persistente-habilidad') zonaPersistenteDeHabilidad(e.data);
   if(e.data.tipo === 'trampa-habilidad') trampaDeHabilidad(e.data);
   if(e.data.tipo === 'invocacion-habilidad') invocacionDeHabilidad(e.data);
@@ -849,10 +881,12 @@ function dueloElegirAreaMapa(msg){
     const casteador = {ref: String(yo.ref || ''), tipo: yo.tipo, nombre: String(yo.nombre || '').slice(0, 40), uid: (mio && mio.duenoUid) || fbUsuario.uid, tokenId: mio ? mio.id : ''};
     const enCono = h.cono ? conoDeArea(h) : h.linea ? new Set(h.linea) : null;   // el cono (Sonic Boom) o la línea (Varita láser): sus casillas
     if(hab.zonaQueda) dueloZonaQueda(hab, h, Math.max(1, radio), yo);   // lo que deja en el suelo (bola de fuego, ventisca)
+    if(hab.despeja) despejarEn(enCono || new Set(celdasFlor(Math.max(1, radio)).map(o => { const c0 = hexACubo(h); return nbPack(cuboACol(c0.q + o.dq, c0.r + o.dr), cuboAFila(c0.q + o.dq, c0.r + o.dr)); })), hab.nombre);   // el vendaval
     const objetivos = todos
       .filter(t => !t.oculto && !propio(t) && (enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio))
       .filter(t => hab.fuegoAmigo || h.linea || dueloEsRival(yo, t))   // (la línea tiene fuego amigo: dueño, 2026-10-05)
       .filter(t => !hab.conVista || lineaLibre(h, t, solidosSet()))   // la luz (Varita de la luz): todos los rivales que alcanza a ver, en sigilo o no (dueño, 2026-10-05)
+      .sort((a, b) => h.linea ? distanciaHex(h, a) - distanciaHex(h, b) : 0)   // en la línea, del más cercano al más lejano (el láser largo pierde 1 por cada uno)
       .map(t => t.id);
     if(!objetivos.length){ toast(hab.conVista ? `💡 ${hab.nombre || 'La luz'}: no había ningún rival a su alcance` : 'No hay nadie adentro del área'); return; }
     try{
@@ -1026,7 +1060,8 @@ async function dueloAplicarDano(d){
   const habMagica = magico;   // (adentro del try, «magico» es otra cosa: el daño mágico del arma)
   // La pelea cercana (2026-10-05): pierde 1 por cada casillero de distancia después del primero (al lado, entero).
   const ta0 = d.atacante && tokens.get(d.atacante.tokenId);
-  const menosDist = d.hab && d.hab.menosDistancia && ta0 && t ? Math.max(0, distanciaHex(ta0, t) - 1) : 0;
+  const menosDist = (d.hab && d.hab.menosDistancia && ta0 && t ? Math.max(0, distanciaHex(ta0, t) - 1) : 0)
+    + (d.hab && d.hab.menosPorOrden && d.grupo ? Math.max(0, Math.round(num(d.grupo.indice)) - 1) : 0);   // el láser largo: −1 a cada uno de los siguientes en la línea
   const mult = critReal ? d.crit.mult : 1, crudo = Math.max(0, num(dn.crudo) - menosDist), golpe = crudo * mult;
   const base = {crudo, mult, golpe, ignoraDef: crit, mitad: d.resultado === 'mitad'};
   if(!t) return {...base, manual: true, motivoManual: 'el token ya no está en el mapa'};
@@ -1116,6 +1151,40 @@ async function dueloCadena(d, golpe){
 
 /* El gancho (2026-10-05, Varita del gancho): si pegó, el objetivo tira su Fuerza contra el Ef.Esp de quien la usó (el valor de cuando la usó); si
    pierde, lo trae hasta `casillas` hacia quien la usó, por casillas libres (Inamovible: su chance de no moverse). Todo a la vista en la Crónica. */
+/* El empujón (2026-10-08, ráfaga helada y vendaval): lejos de quien lo tira, hasta `n` casillas libres (lo frena un Sólido o un token). Inamovible
+   (su %) no se mueve. Va a la Crónica. */
+async function dueloEmpujar(d, n){
+  const t = tokens.get(d.defensor.tokenId), ta = d.atacante && tokens.get(d.atacante.tokenId);
+  if(!t) return {manual: true, nota: 'el token ya no está: empujalo a mano'};
+  if(!ta) return {manual: true, nota: `empujalo ${n} casillas a mano`};
+  const nom = nombreDe(t), titulo = `${d.hab ? d.hab.nombre : 'Empujón'}: empuja a ${nom}`;
+  const im = chanceDe(t, 'inamovible');
+  if(im && Math.random() * 100 < im){ momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: `Es Inamovible (${im} %): no se mueve.`, estado: 'listo'}); return {nota: 'Inamovible: no se movió'}; }
+  let c = {col: t.col, fila: t.fila}, pasos = 0;
+  const ocupada = x => elementoSolidoEn(x.col, x.fila) || [...tokens.values()].some(y => y !== t && y.col === x.col && y.fila === x.fila);
+  for(let i = 0; i < n; i++){
+    const sig = vecinosDeCasilla(c).filter(v => !ocupada(v) && distanciaHex(v, ta) > distanciaHex(c, ta)).sort((p, q) => distanciaHex(q, ta) - distanciaHex(p, ta))[0];
+    if(!sig) break;
+    c = sig; pasos++;
+  }
+  if(!pasos){ momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: 'No hay lugar para empujarlo: queda donde está.', estado: 'listo'}); return {nota: 'no había lugar para empujarlo'}; }
+  try{ await coleccionTokens().doc(d.defensor.tokenId).update({col: c.col, fila: c.fila, ruta: firebase.firestore.FieldValue.delete()}); }
+  catch(err){ console.error('No se pudo empujar:', err); return {manual: true, nota: `empujalo ${pasos} casillas a mano`}; }
+  momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: `Sale despedido ${pasos} casillero${pasos === 1 ? '' : 's'} lejos de ${d.atacante.nombre || 'quien lo tiró'}.`, estado: 'listo'});
+  return {nota: `lo empujó ${pasos} casillero${pasos === 1 ? '' : 's'}`};
+}
+// El viento que despeja (2026-10-08, vendaval): borra la niebla y el fuego (terreno incendiado o zona de fuego) que tocan esas casillas.
+async function despejarEn(celdas, nombre){
+  const ids = [];
+  elementos.forEach((el, id) => {
+    const fuego = el.fuego || (el.zona && /fuego/i.test(el.zonaDanoTipo || ''));
+    if((el.niebla || fuego) && celdasDeElemento(el).some(c => celdas.has(nbPack(c.col, c.fila)))) ids.push(id);
+  });
+  if(!ids.length) return;
+  let ok = 0;
+  for(const id of ids){ try{ await borrarElemento(id); ok++; }catch(err){ console.error('No se pudo despejar:', err); } }
+  toast(ok === ids.length ? `💨 ${nombre || 'El viento'}: despejó ${ok} (niebla o fuego)` : `💨 ${nombre || 'El viento'}: despejó ${ok} de ${ids.length} — lo demás, a mano (faltan pegar las reglas)`);
+}
 // El riesgo (2026-10-08, Varita inestable): salió el número en los dados del daño → quien la usó se hace su daño (directo, sin Defensa).
 async function dueloRiesgo(d){
   const ta = d.atacante && tokens.get(d.atacante.tokenId), rg = d.hab.riesgo;
@@ -1255,6 +1324,7 @@ function dueloCuraMomento(d, t, n, r){
 }
 // El Desarmado (2026-10-07) deja el arma en el piso (js/27); con `vuela`, lejos (la Varita del desarme).
 async function dueloAplicarEfecto(d, ef){
+  if(num(ef && ef.empuja) > 0) return dueloEmpujar(d, num(ef.empuja));   // el empujón no es un estado (2026-10-08)
   const r = await dueloAplicarEfectoBase(d, ef);
   try{
     const spec = Duelo.specDeEfecto(ef);

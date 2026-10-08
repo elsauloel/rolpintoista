@@ -472,6 +472,7 @@ const Duelo = (() => {
       ...(e.no2 !== undefined ? {no2: Math.max(0, Math.round(_num(e.no2))), no2Dif: !!e.no2Dif, no2Sentado: !!e.no2Sentado} : {}),
       ...(e.purga ? {purga: true} : {}),   // la purga (2026-10-07)
       ...(_num(e.vuela) > 0 ? {vuela: Math.min(6, Math.round(_num(e.vuela)))} : {}),   // el arma vuela N casillas (la Varita del desarme)
+      ...(_num(e.empuja) > 0 ? {empuja: Math.min(6, Math.round(_num(e.empuja)))} : {}),   // lo empuja N casillas (2026-10-08)
     })).filter(e => e.nombre);
   }
   // Grupo de un hechizo de área (Paso 4/7 del casteo): ata este sub-duelo a la cascada de `campanas/<id>/areas/<grupoId>`
@@ -509,6 +510,7 @@ const Duelo = (() => {
         ...(h.zonaQueda.color ? {color: txtCorto(h.zonaQueda.color, 7)} : {})}} : {}),   // lo que deja en el suelo (bola de fuego, ventisca)
       ...(h.menosDistancia ? {menosDistancia: true} : {}),   // −1 por casillero después del primero (pelea cercana)
       ...(h.reparte ? {reparte: {cada: txtCorto(h.reparte.cada || '1d4', 12), total: Math.min(6, Math.max(2, Math.round(_num(h.reparte.total)) || 2))}} : {}),   // misiles de a uno (Varita de misiles)
+      ...(h.menosPorOrden ? {menosPorOrden: true} : {}), ...(h.despeja ? {despeja: true} : {}),   // el láser largo · el vendaval
       ...(h.riesgo ? {riesgo: {si: Math.min(20, Math.max(1, Math.round(_num(h.riesgo.si)) || 1)), dano: txtCorto(h.riesgo.dano || '2d4', 12)}} : {}),   // la inestable
       ...(h.atrae ? {atrae: {casillas: Math.min(6, Math.max(1, Math.round(_num(h.atrae.casillas)) || 2)), contra: txtCorto(h.atrae.contra || 'fue', 12), tiraValor: _num(h.atrae.tiraValor)}} : {}),   // el gancho
       ...(_num(h.critTipo) ? {critTipo: Math.min(12, Math.max(1, Math.round(_num(h.critTipo))))} : {}),   // lo físico invocado critica como su Tipo
@@ -816,6 +818,7 @@ const Duelo = (() => {
       if(e.no2 !== undefined){ o.no2 = Math.max(0, Math.round(_num(e.no2))); o.no2Dif = !!e.no2Dif; o.no2Sentado = !!e.no2Sentado; }
       if(e.purga) o.purga = true;   // la purga (2026-10-07)
       if(_num(e.vuela) > 0) o.vuela = Math.min(6, Math.round(_num(e.vuela)));   // el arma vuela N casillas (la Expelliarmus, 2026-10-07)
+      if(_num(e.empuja) > 0) o.empuja = Math.min(6, Math.round(_num(e.empuja)));   // lo empuja N casillas (2026-10-08)
       if(e.seguroCritico && caras > 1) o.seguroCritico = true;
       if(e.soloCritico) o.soloCritico = true;
       o.requiereDano = requiereDanoDe(e);

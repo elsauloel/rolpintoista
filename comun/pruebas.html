@@ -1562,13 +1562,13 @@ prueba('guantes de Buena calidad: el primer conjuro (−1 SP, solo el primer uso
   const t = Combatiente.trampaDeHab({nombre: 'Cepo', trampaColocar: {nombre: 'Cepo'}}, st => st === 'des' ? 5 : st === 'trampaoculta' ? 2 : 0);
   igual([primero, segundo, esp, t.detectar], [2, 3, 1, 7]);
 });
-prueba('armas especiales de Buena (2026-10-07): 30 (primera tanda, grupo 1 sin el Manotazo y las tandas 1 y 2 del 2026-10-08), con su SP; la Bola de fuego mayor agarra aliados, la Sanguijuela drena la mitad, el báculo suma ¼ del Ef.Esp', () => {
+prueba('armas especiales de Buena (2026-10-07): 34 (primera tanda, grupo 1 sin el Manotazo y las tandas 1 a 3 del 2026-10-08), con su SP; la Bola de fuego mayor agarra aliados, la Sanguijuela drena la mitad, el báculo suma ¼ del Ef.Esp', () => {
   const buenas = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-buena-'));
   const sc = creepPrueba({esp: 12});
   const plan = id => { const it = {...structuredClone(CATALOGO_BASE.find(x => x.id === id)), id: 'x'}; const h = CreepAcciones.habDeEspecialCreep(sc, it); return {h, e: Combatiente.habEjecucion(h, h.duelo, {})}; };
   const bola = plan('esp-buena-varita-de-la-bola-de-fuego-mayor').e, sang = plan('esp-buena-varita-sanguijuela').e, sabio = plan('esp-buena-baculo-del-sabio').h;
   igual([buenas.length, buenas.every(i => i.especial && /Cuesta \d No2/.test(i.detalle) && (i.especial.sp >= 1 || i.especial.spVidaPct > 0)), !!bola.fuegoAmigo, bola.radio, sang.dano.drenaPct, sang.dano.directo, /^1d8\+\d+$/.test(sabio.tiradaExtra)],
-    [30, true, true, 2, 50, true, true]);
+    [34, true, true, 2, 50, true, true]);
 });
 prueba('Buenas, tanda 1 (2026-10-08): trampa portal + 2, báculo de sangre (10 % de la vida), inestable (riesgo), luz flotante (zona inmediata y luz)', () => {
   const cat = id => ({...structuredClone(CATALOGO_BASE.find(x => x.id === id)), id: 'x', equipado: true});
@@ -1588,6 +1588,15 @@ prueba('Buenas, tanda 2 (2026-10-08): campo de estática (inmediata, por paso), 
   const pilares = Combatiente.trampaDeHab({nombre: 'M', trampaColocar: cat('esp-buena-varita-del-muro').especial.trampaColocar});
   igual([campo.zonaInmediata, campo.zonaCadaPaso, campo.zonaEnMantenimiento, campo.zonaDano, campo.zonaDanoTipo, muro.zonaForma, muro.zonaLargo, muro.zonaAltura, lava.zonaForma, lava.zonaLargo, lava.zonaAmiga, pilares.linea, pilares.pilar],
     [true, true, false, '1d4', 'eléctrico', 'linea', 3, 'ambos', 'camino', 4, true, 3, true]);
+});
+prueba('Buenas, tanda 3 (2026-10-08): el empujón viaja hasta el duelo, el láser largo pierde 1 por orden, el vendaval despeja, el blink va al mapa', () => {
+  const cat = id => ({...structuredClone(CATALOGO_BASE.find(x => x.id === id)), id: 'x', equipado: true});
+  const plan = id => { const it = cat(id); return Combatiente.habEjecucion({nombre: it.nombre}, it.especial.duelo, {stat: () => 5, etq: x => x}); };
+  const rafaga = Duelo.limpiarHab(plan('esp-buena-varita-de-la-rafaga-helada')), laser = Duelo.limpiarHab(plan('esp-buena-varita-laser-larga')), viento = Duelo.limpiarHab(plan('esp-buena-varita-del-vendaval'));
+  const S = FichaGuardado.normalizar({}).S; S.inventario = [cat('esp-buena-varita-del-blink')];
+  const h = FichaAcciones.habDeArmaEspecial(S, S.inventario[0]);
+  igual([rafaga.efectos[0].empuja, rafaga.objetivo, laser.menosPorOrden, laser.largo, viento.despeja, viento.efectos[0].empuja, h.blink.distancia, S.inventario[0].especial.unaVezPorTurno],
+    [2, 'cono', true, 6, true, 2, 3, true]);
 });
 prueba('varitas Comunes de arena y portal (2026-10-07): la trampa se suelta contra tu Ef.Esp y frena al salir; la zona igual; el portal aliado va al mapa', () => {
   const sc = creepPrueba({esp: 9});

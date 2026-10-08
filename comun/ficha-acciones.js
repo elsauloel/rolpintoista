@@ -609,7 +609,7 @@ const FichaAcciones = (() => {
     return {id: claveEsp(it), deItem: it.id, nombre: e.nombre || it.nombre, detalle: it.detalle || '', modo: 'auto',
       duelo: e.duelo ? structuredClone(e.duelo) : null, tiradaStat: (e.duelo && e.duelo.tira) || 'pdgmg',
       tiradaExtra: dano ? dano + (suma > 0 ? `+${suma}` : '') : '', ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {}),
-      ...(e.portalMapa ? {portalMapa: structuredClone(e.portalMapa)} : {})};   // los portales (2026-10-07, Varita del portal aliado)
+      ...(e.portalMapa ? {portalMapa: structuredClone(e.portalMapa)} : {}), ...(e.blink ? {blink: structuredClone(e.blink)} : {})};   // (el blink, 2026-10-08)   // los portales (2026-10-07, Varita del portal aliado)
   }
   // El «Qué hace» de un arma especial en la Botonera: su costo ahora y lo que hace (sin las notas de automatización).
   const ataqueEspecialMenu = (S, it) => {
@@ -708,7 +708,7 @@ const FichaAcciones = (() => {
         polaridad: 'buff', detalle: '', mods: [], ...structuredClone(propio)});
     }
     ui.colocarTrampa(it);
-    if(it.portalMapa && ui.enMapa) avisarZonaAlMapa(S, it, ui);   // los portales: se eligen los dos puntos en el mapa
+    if((it.portalMapa || it.blink) && ui.enMapa) avisarZonaAlMapa(S, it, ui);   // los portales y el blink: se eligen los puntos en el mapa
     ui.terminar(it, null, 0, 0);
     aManoAlUsar(it.nombre, item.especial, ui);
     ui.cambio(['nitros', 'vitals', 'habilidades', 'efectos']);
@@ -918,7 +918,7 @@ const FichaAcciones = (() => {
     if(FichaBotonera.modoHab(it) !== 'auto'){ anunciarHabilidad(S, it, ui); tirarPrimeraDeHab(S, it, ui); return; }
     if(!FichaBotonera.dueloDe(it)){
       if(it.trampaColocar) return;   // una trampa sola: el anuncio y la casilla ya los maneja colocarTrampa
-      if(it.portalMapa){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // los portales: se anuncian y los puntos se eligen en el mapa
+      if(it.portalMapa || it.blink){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // los portales y el blink: se anuncian y los puntos se eligen en el mapa
       if(it.invoca && it.invoca.invId){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // solo invoca: se anuncia (la invocación ya la hizo invocarConHab)
       ui.toast(`${it.nombre}: todavía no tiene armada la ejecución paso a paso (✨) — se ejecutó como semiautomática`); anunciarHabilidad(S, it, ui); tirarPrimeraDeHab(S, it, ui); return;
     }
@@ -956,6 +956,12 @@ const FichaAcciones = (() => {
       // `distancia` (2026-10-07, Varita del portal aliado): el segundo, a esa distancia o menos del primero. Los turnos son los de quien los abre.
       try{ ui.alMapa('portal-habilidad', {fichaId: ui.yo().ref, casteadorTipo: 'pj', turnos: Math.max(1, num(h.portalMapa.turnos) || 3), distancia: Math.max(0, num(h.portalMapa.distancia) || 0), nombre: h.nombre}); }
       catch(err){ console.error('No se pudo avisar el portal al mapa:', err); }
+      return;
+    }
+    // El blink (2026-10-08): quien la usa (o un aliado que ve) salta hasta `distancia` casillas.
+    if(h.blink){
+      try{ ui.alMapa('blink-habilidad', {fichaId: ui.yo().ref, casteadorTipo: 'pj', distancia: Math.max(1, num(h.blink.distancia) || 3), nombre: h.nombre}); }
+      catch(err){ console.error('No se pudo avisar el blink al mapa:', err); }
       return;
     }
     if(!h.zonaMapa) return;

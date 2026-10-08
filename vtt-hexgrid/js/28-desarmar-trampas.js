@@ -54,12 +54,33 @@ async function desarmarIntentar(tokenId, trampaId, o){
     catch(err){ console.error('No se pudo guardar la trampa desarmada:', err); return {ok: false, texto: 'Se desarmó, pero no se pudo guardar en la mochila: sumala a mano.'}; }
   }
   if(!ok && !o.rompe) trampaPerdio(tokenId, trampaId);
+  // Fallar el desarme (dueño, 2026-10-08): 70 % se rompe, 30 % se dispara (sobre quien la desarmaba). Se tira 1d10: 1–7 se rompe, 8–10 se dispara.
+  if(!ok && !o.rompe){
+    const d = tirarDados('1d10');
+    try{ mesaPublicar(`${nombre} · ¿qué pasa con ${el.trampaNombre || 'la trampa'}? (1–7 se rompe, 8–10 se dispara)`, {...d, quien: nombre, ficha: t.fichaId}); }catch(err){}
+    if(d && d.total >= 8){
+      trampaPendiente = {tokenId, tipo: 'pisa', id: trampaId, el, celda: {col: t.col, fila: t.fila}, desde: null};
+      setTimeout(() => { trampaResolver().catch(err => console.error('No se pudo disparar la trampa:', err)); }, 600);
+      return {ok: false, texto: `${r.total} contra ${dif}: no pudiste, y ${d.total} en 1d10: ¡${nomT} se dispara!`};
+    }
+    o = {...o, rompe: true, rompeTxt: `${r.total} contra ${dif}: no pudiste, y ${d ? d.total : '?'} en 1d10: ${nomT} se rompió.`};
+  }
   if(ok || o.rompe){
     try{ await coleccionElementos().doc(trampaId).delete(); }
     catch(err){ console.error('No se pudo sacar la trampa del mapa:', err); return {ok, texto: `${r.total} contra ${dif}: ${ok ? `desarmaste ${nomT} (está en tu mochila)` : `${nomT} se rompió`}, pero no se pudo sacar del mapa (¿faltan pegar las reglas?): borrala a mano.`}; }
   }
+  if(o.rompeTxt) return {ok, texto: o.rompeTxt};
   return {ok, texto: ok ? `${r.total} contra ${dif}: desarmaste ${nomT} y te la guardaste en la mochila.`
     : o.rompe ? `${r.total} contra ${dif}: ${nomT} se rompió al intentar desarmarla.` : `${r.total} contra ${dif}: no pudiste; ${nomT} sigue armada.`};
+}
+// Al terminar el combate: la Percepción de quien busca contra la dificultad de esa trampa (la misma tirada de «Algo está fuera de lugar»). → {ok, texto}.
+async function desarmarDetectar(tokenId, el){
+  const t = tokens.get(tokenId), f = t && fichasPub.get(t.fichaId), nombre = t ? nombreDe(t) : '';
+  const r = f && f.resumen ? FichaBotonera.tiradaPercepcionValor(num(f.resumen.percepcion), tokenPercepcionAumentada(t)) : null;
+  if(!r) return {ok: false, texto: `${nombre}: sin Percepción para tirar (abrí su ficha una vez para que la publique).`};
+  try{ mesaPublicar(`${nombre} · Percepción (busca trampas)`, {...r, quien: nombre, ficha: t.fichaId}); }catch(err){}
+  const dif = desarmarDif(el), nomT = el.trampaNombre ? `«${el.trampaNombre}»` : 'una trampa';
+  return r.total >= dif ? {ok: true, texto: `Percepción ${r.total} contra ${dif}: encontró ${nomT}.`} : {ok: false, texto: `Percepción ${r.total} contra ${dif}: no encontró nada ahí.`};
 }
 // Desde el cartel de «Algo está fuera de lugar» (js/16), después de encontrarla: en combate, 1 No2.
 async function desarmarDesdeBanner(){
@@ -88,11 +109,19 @@ async function desarmarAlTerminar(){
       const quedan = [...elementos.entries()].filter(([id, el]) => el.trampa && !el.disparada && trampaDispara(t, el) && !trampaIntentoPerdido.has(tokenId + ':' + id)).map(([id]) => id);
       if(!quedan.length) continue;
       const nombre = nombreDe(t);
-      const si = await AvisoCombate.preguntar(`Quedaron ${quedan.length === 1 ? 'una trampa' : `${quedan.length} trampas`} sin activarse. ${nombre} puede intentar desarmarlas: una tirada por trampa; la que no desarma, se rompe.`,
-        {icono: '🪤', titulo: 'Trampas sin activarse', si: 'Sí, desarmarlas', no: 'Dejarlas'});
+      // Primero hay que encontrarlas (dueño, 2026-10-08): Percepción contra su dificultad; la que encuentra, intenta desarmarla (la que no desarma, se rompe).
+      const si = await AvisoCombate.preguntar(`Puede que hayan quedado trampas sin activarse. ¿${nombre} quiere buscarlas? Tira Percepción por cada una; la que encuentra, intenta desarmarla (si no la desarma, se rompe).`,
+        {icono: '🪤', titulo: '¿Querés detectarlas?', si: 'Sí, buscarlas', no: 'Dejarlas'});
       if(!si) continue;
       const lineas = [];
-      for(const id of quedan){ const res = await desarmarIntentar(tokenId, id, {rompe: true}); lineas.push(res.texto); }
+      for(const id of quedan){
+        const el = elementos.get(id);
+        if(!el) continue;
+        const det = await desarmarDetectar(tokenId, el);
+        if(!det.ok){ lineas.push(det.texto); continue; }
+        const res = await desarmarIntentar(tokenId, id, {rompe: true});
+        lineas.push(`${det.texto} ${res.texto}`);
+      }
       AvisoCombate.mostrar({icono: '🪤', titulo: `${nombre}: trampas desarmadas`, pasos: lineas.map((l, i) => ({titulo: `Trampa ${i + 1}`, texto: l}))});
       momentoAbrir({tipo: 'desarmar', icono: '🪤', titulo: `${nombre} desarma las trampas que quedaron`, estado: 'listo', datos: {lineas}});
     }

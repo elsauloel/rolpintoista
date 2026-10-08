@@ -1436,6 +1436,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   elemento; también las mágicas); si no, sigue ahí. Al terminar el combate (cuando se cierra el botín), `desarmarAlTerminar` le pregunta a quien
   maneja un personaje con el talento por las trampas rivales que quedaron: una tirada por trampa, sin No2; la que no desarma, se rompe.
   En combate, **fallar es perder** (dueño): si falla la Percepción o el desarme con una trampa, no vuelve a intentarlo con esa (`trampaIntentoPerdido`),
-  tampoco al terminar el combate. ¿Fallar el desarme la detona? Pregunta abierta en Herramientas de diseño.
+  tampoco al terminar el combate. **Fallar el desarme en combate** (dueño, 2026-10-08): 1d10, 1–7 se rompe, 8–10 se dispara sobre quien la desarmaba.
+  Al terminar el combate se pregunta «¿Querés detectarlas?»: Percepción por cada trampa (`desarmarDetectar`) y, la que encuentra, el desarme.
+  **Lo propio sin usar → despojos** (2026-10-08): la Polilla activa (`polillaAlTerminar`, js/25) y las trampas propias (`Recibidos.trampasADespojos`).
   **Regla nueva** (cualquiera de la partida borra un elemento `trampa`): hay que pegarla.
 

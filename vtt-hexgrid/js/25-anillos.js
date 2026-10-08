@@ -130,7 +130,7 @@ setInterval(() => {
   });
   if(modo !== anillosModo){
     if(modo !== 'combate') primeraSangreUsadas.clear();
-    if(anillosModo === 'combate' && modo !== 'combate'){ autoRepararAlTerminar(); if(typeof desarmarAlTerminar === 'function') desarmarAlTerminar(); }   // la piel de troll y Desarmar trampas (2026-10-08)
+    if(anillosModo === 'combate' && modo !== 'combate'){ autoRepararAlTerminar(); polillaAlTerminar(); if(typeof desarmarAlTerminar === 'function') desarmarAlTerminar(); }   // la piel de troll, la Polilla y Desarmar trampas (2026-10-08)
     anillosModo = modo;
   }
 }, 1000);
@@ -138,6 +138,26 @@ setInterval(() => {
 /* Equipo que se repara solo (dueño, 2026-10-08, P171: la piel de troll): un ítem con `autoRepara` N recupera N puntos de durabilidad al terminar
    cada combate (no saca la Armadura rota). Por turno sería casi indestructible; quizás más adelante, un pulso intermedio. Lo hace la pantalla que
    maneja a cada personaje, al ver que el mapa sale del modo combate. */
+// La Polilla mística que no se usó (dueño, 2026-10-08): al terminar el combate se va y deja su valor en despojos (un cuarto de su precio).
+async function polillaAlTerminar(){
+  for(const [, t] of tokens){
+    if(!t || t.tipo !== 'pj' || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) continue;
+    if(typeof bnManejo !== 'function' || !bnManejo(t.fichaId)) continue;
+    let n = 0;
+    try{
+      await editarPersonajeMapa(t.fichaId, S => {
+        const i = (S.efectos || []).findIndex(e => e && e.activo !== false && /^Polilla revoloteando/i.test(String(e.nombre || '')));
+        if(i < 0) return false;
+        S.efectos.splice(i, 1);
+        const item = typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(x => x.efectoNombre === 'Polilla revoloteando') : null;
+        n = Math.ceil(num(item ? item.precioCompra : 50) / 4);
+        S.loot = S.loot || {}; S.loot.normal = num(S.loot.normal) + n;
+        return true;
+      });
+    }catch(err){ console.error('No se pudo convertir la Polilla en despojos:', err); }
+    if(n) momentoAbrir({tipo: 'polilla', icono: '🦋', titulo: `${nombreDe(t)}: la Polilla que no usó se va`, estado: 'listo', resultado: `Terminó el combate: +${fmt(n)} despojos.`});
+  }
+}
 async function autoRepararAlTerminar(){
   for(const [, t] of tokens){
     if(!t || t.tipo !== 'pj' || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) continue;

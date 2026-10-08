@@ -115,19 +115,28 @@ const Recibidos = (() => {
     if(num(r.xp) > 0) subio = aplicarExp(S, num(S.meta.exp) + num(r.xp));
     if(num(r.dde) > 0) S.meta.dde = Math.round((num(S.meta.dde) + num(r.dde)) * 100) / 100;
     if(num(r.despojos) > 0) S.loot.normal = num(S.loot.normal) + num(r.despojos);
-    if(Array.isArray(r.devolver) && r.devolver.length) vueltas = devolverTrampas(S, r.devolver);
+    if(Array.isArray(r.devolver) && r.devolver.length) vueltas = trampasADespojos(S, r.devolver);
     const partes = [];
     if(num(r.xp) > 0) partes.push(`+${fmt(num(r.xp))} XP`);
     if(num(r.dde) > 0) partes.push(`+${fmt(num(r.dde))} DDE`);
     if(num(r.despojos) > 0) partes.push(`+${fmt(num(r.despojos))} despojos`);
     return {partes, subio, vueltas};
   }
-  // "🪤 2 trampas sin disparar se desarmaron y volvieron a tu mochila"
+  // Las trampas propias que no se usaron en el combate (dueño, 2026-10-08): no vuelven a la mochila, se convierten en su valor en despojos
+  // (un cuarto del precio de compra, para arriba, como ♻ Convertir en despojos). → {total, despojos}.
+  function trampasADespojos(S, items){
+    let total = 0, despojos = 0;
+    items.forEach(js => { let it = null; try{ it = JSON.parse(js); }catch(e){} if(!it) return; total++; despojos += Math.ceil(num(it.precioCompra) / 4); });
+    if(despojos > 0){ S.loot = S.loot || {}; S.loot.normal = num(S.loot.normal) + despojos; }
+    return {total, despojos};
+  }
+  // "🪤 2 trampas sin usar → +14 despojos" (antes: «volvieron a tu mochila»)
   function textoVueltas(v){
     if(!v || !v.total) return '';
+    if(v.despojos !== undefined) return `🪤 ${v.total} trampa${v.total === 1 ? '' : 's'} sin usar → +${fmt(v.despojos)} despojos`;
     const uno = v.total === 1;
     return `🪤 ${v.total} trampa${uno ? '' : 's'} sin disparar ${uno ? 'se desarmó' : 'se desarmaron'} y volvió${uno ? '' : 'eron'} ${v.aCinturon ? (v.aMochila ? 'a tu mochila y al cinturón' : 'a tu cinturón') : 'a tu mochila'}`;
   }
 
-  return {escuchar, deFicha, tomar, spec, estado, aplicarExp, expParaNivel, devolverTrampas, recompensa, textoVueltas};
+  return {escuchar, deFicha, tomar, spec, estado, aplicarExp, expParaNivel, devolverTrampas, trampasADespojos, recompensa, textoVueltas};
 })();

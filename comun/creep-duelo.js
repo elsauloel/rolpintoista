@@ -66,8 +66,41 @@ const CreepDuelo = (() => {
     const deLado = lado => lado ? ui.creep(lado.ref) : null;
     // Evasión contra oportunidad / contra contraataque (2026-10-04): lo que suma a la Evasión contra el ataque de este duelo.
     const evaEsp = (sc, d) => sc ? Combatiente.evaExtraDuelo(d, st => num(C().modTotal(sc, st))) : {val: 0, txt: ''};
+    // La fórmula del daño del arma del creep (la del gancho `dano` y la que muestra el botón).
+    function formulaDano(sc, d){
+      let formula = C().danoTxt(sc, C().statValor(sc, 'dmg'));
+      const m = d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null;   // lo que le suma la habilidad: dados del Tipo del arma y daño fijo
+      if(m){
+        if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${num(sc.armaTipo) || 8}`;
+        if(num(m.fijo)) formula += ` ${num(m.fijo) > 0 ? '+' : '-'} ${fmt(Math.abs(num(m.fijo)))}`;
+      }
+      return formula;
+    }
+    const formulaDe = t => t && t.r ? t.r.formula : '';
     return {
       soy: lado => ui.soy(lado),
+      // Qué dado tira cada botón del duelo y su 🔍 (2026-10-08, ver «vista» en comun/duelo.js). Las tiradas se arman sin publicarse.
+      vista: (d, campo, modo) => {
+        const sc = deLado((campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor);
+        if(!sc) return null;
+        const L = clave => { try{ return typeof CreepLupa !== 'undefined' && typeof lupaFila === 'function' ? CreepLupa.contenido(sc, `${sc.id || ''}|${clave}`) : {titulo: '', html: ''}; }catch(err){ return {titulo: '', html: ''}; } };
+        if(campo === 'pdg' && d.hab){
+          const t = d.hab.tira || {};
+          if(t.formula) return {formula: t.formula, titulo: t.etq || '', html: ''};
+          return t.stat ? {formula: formulaDe(A().tirada('', habStat(sc, t.stat) + num(t.bono), sc, t.stat)), ...L('stat|' + t.stat)} : null;
+        }
+        if(campo === 'contra') return modo ? {formula: formulaDe(A().tirada('', habStat(sc, modo), sc, modo)), ...L('stat|' + modo)} : null;
+        if(campo === 'eva') return {formula: formulaDe(A().tirada('', C().statValor(sc, 'eva') + evaEsp(sc, d).val, sc, 'eva')), ...L('stat|eva')};
+        if(campo === 'parry') return {formula: formulaDe(A().tirada('', C().statValor(sc, 'parry'), sc, 'parry')), ...L('stat|parry')};
+        if(campo === 'pdg'){
+          const t = d.ataque.tipo === 'habilidad-arma' ? pdgDeArreglos(sc, d.ataque) : A().tiradaAtaque(sc, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo);
+          return {formula: formulaDe(t), ...L('atacar|')};
+        }
+        if(campo === 'fuerza') return {formula: formulaDe(A().tirada('', C().fuerzaGolpeValor(sc))), ...L('stat|fue'), titulo: `${sc.nombre} · Fuerza del golpe`};
+        if(campo === 'bloqueo') return {formula: formulaDe(A().tirada('', C().bloqueoValor(sc) + A().bloqueoFirmeCreep(sc), sc, 'bloqueo')), ...L('stat|bloqueo'), titulo: `${sc.nombre} · Bloqueo`};
+        if(campo === 'dano') return {formula: formulaDano(sc, d), ...L('danio|')};
+        return null;
+      },
       // El daño de una habilidad dirigida (duelo.js, tirarDanoHab) se publica a nombre del creep (2026-10-05: en el mapa no había cómo y se quedaba callado).
       registrarTirada: (origen, r, d) => { const sc = d ? deLado(d.atacante) : null; if(sc) ui.publicar(sc, {origen, r}); else ui.toast('No se encontró el creep para tirar el daño'); },
       atacar: d => {
@@ -96,13 +129,7 @@ const CreepDuelo = (() => {
       dano: d => {
         const sc = deLado(d.atacante);
         if(!sc) return;
-        let formula = C().danoTxt(sc, C().statValor(sc, 'dmg'));
-        const m = d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null;   // lo que le suma la habilidad: dados del Tipo del arma y daño fijo
-        if(m){
-          if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${num(sc.armaTipo) || 8}`;
-          if(num(m.fijo)) formula += ` ${num(m.fijo) > 0 ? '+' : '-'} ${fmt(Math.abs(num(m.fijo)))}`;
-        }
-        const r = tirarDados(formula);
+        const r = tirarDados(formulaDano(sc, d));
         if(r) ui.publicar(sc, {origen: `${sc.nombre} · Daño`, r});
       },
       // ⚡ Flash (P135): las reacciones del creep que sirven para esta tirada del duelo (se marcan antes de tirar) y su uso.

@@ -52,6 +52,8 @@ const MensajesMapa = (() => {
     'duelo-contra':     {de: 'mapa', a: 'marco', que: 'armar el contraataque tras un Bloqueo'},
     'duelo-flash':      {de: 'mapa', a: 'marco', que: '¿qué ⚡ Flash tenés para esta tirada? (lo contesta duelo-flash-res)'},
     'duelo-flash-res':  {de: 'marco', a: 'mapa', que: 'los Flash disponibles'},
+    'duelo-vista':      {de: 'mapa', a: 'marco', que: '¿qué dado tirás en esta tirada y de dónde sale? (lo contesta duelo-vista-res)'},
+    'duelo-vista-res':  {de: 'marco', a: 'mapa', que: 'la fórmula y el 🔍 de una tirada del duelo'},
     'duelo-reroll-info': {de: 'mapa', a: 'marco', que: '¿tenés una Moneda Re-Roll? (lo contesta duelo-reroll-info-res)'},
     'duelo-reroll-info-res': {de: 'marco', a: 'mapa', que: 'si hay moneda y dónde'},
     'duelo-reroll':     {de: 'mapa', a: 'marco', que: 'usar la moneda en una tirada del duelo'},

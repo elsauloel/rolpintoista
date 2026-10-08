@@ -36,12 +36,17 @@ function cerrarLupa(){
   if(p) p.remove();
 }
 
+// Proveedores de contenido por prefijo de clave (2026-10-08): una pieza común que arma su propio desglose (el duelo: «duelo|…») no
+// depende del lupaContenido de cada página.
+const lupaProveedores = {};
+function lupaRegistrar(prefijo, fn){ lupaProveedores[prefijo] = fn; }
 function abrirLupa(el){
   const clave = el.dataset.lupa;
   const abierta = document.getElementById('lupa-pop');
   if(abierta && abierta.dataset.clave === clave){ cerrarLupa(); return; }
   cerrarLupa();
-  const {titulo, html} = lupaContenido(clave);
+  const prov = Object.keys(lupaProveedores).find(p => clave.startsWith(p));
+  const {titulo, html} = prov ? lupaProveedores[prov](clave) : lupaContenido(clave);
   const p = document.createElement('div');
   p.id = 'lupa-pop';
   p.dataset.clave = clave;

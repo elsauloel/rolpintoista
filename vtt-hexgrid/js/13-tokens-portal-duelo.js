@@ -567,6 +567,7 @@ window.addEventListener('message', e => {
   if(e.data.tipo === 'invocacion-habilidad') invocacionDeHabilidad(e.data);
   if(e.data.tipo === 'duelo-elegir-objetivo') dueloElegirObjetivoMapa(e.data);
   if(e.data.tipo === 'duelo-reroll-info-res') Duelo.recibirRerollInfo(e.data.id, e.data.lado, e.data.info);   // ¿tiene una moneda de re-roll quien tira?
+  if(e.data.tipo === 'duelo-vista-res') Duelo.recibirVista(e.data.id, e.data.campo, e.data.vista);   // el dado y el 🔍 de un botón del duelo
   if(e.data.tipo === 'duelo-flash-res') Duelo.recibirFlash(e.data.id, e.data.campo, e.data.opciones);   // los Flash que tiene quien va a tirar
   if(e.data.tipo === 'duelo-opciones-res') Duelo.recibirOpciones(e.data.id, e.data.opciones);   // las opciones de defensa que calculó la ficha del defensor
   // La ficha o GM Tools (en el marco) abrió o cerró algo: comun/embebido.js lo avisa solo (paso 4, 2026-09-30). Abierto: se
@@ -1345,11 +1346,11 @@ function dueloOpcionesLocal(d){
   const sc = creepPrivadoDe(ref);
   if(!sc) return motivo('no encuentro los datos de ese creep');
   window.DUELO_MOTIVO = '';
-  if(d.hab) return Duelo.opcionesHab(d, {puedeParry: () => !!defensaCreepMapa(sc)});   // habilidad dirigida: lo que puede tirar el creep contra ella
-  // Con las Acciones nuevas cargadas, las mismas opciones que GM Tools (comun/creep-duelo.js: con los dados que tiraría y la Evasión contra
+  // Con las Acciones nuevas cargadas, las mismas opciones que GM Tools (comun/creep-duelo.js: con los dados que tiraría, su 🔍 y la Evasión contra
   // oportunidad / contraataque, 2026-10-04); si no, la versión corta de abajo.
   const hk = typeof acHooksDuelo === 'function' ? acHooksDuelo(d.defensor) : null;
-  if(hk && hk.opcionesDefensa){ const o = hk.opcionesDefensa(d) || []; return d.ataque && d.ataque.sinParry ? o.filter(x => x.modo !== 'parry') : o; }
+  if(d.hab) return Duelo.conVistas(d, Duelo.opcionesHab(d, hk || {puedeParry: () => !!defensaCreepMapa(sc)}), hk);   // habilidad dirigida: lo que puede tirar el creep contra ella
+  if(hk && hk.opcionesDefensa){ const o = hk.opcionesDefensa(d) || []; return Duelo.conVistas(d, d.ataque && d.ataque.sinParry ? o.filter(x => x.modo !== 'parry') : o, hk); }
   // Parry solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30, comun/combatiente.js; la misma que GM Tools).
   const def = defensaCreepMapa(sc), c = Combatiente.costoParry();
   if(Combatiente.stuneado(sc.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1'}];   // Stun (2026-10-06)

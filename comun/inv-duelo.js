@@ -72,6 +72,31 @@ const InvDuelo = (() => {
     const ladoDe = (d, campo) => (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
     return {
       soy: lado => ui.soy(lado),
+      // Qué dado tira cada botón del duelo y su 🔍 (2026-10-08, ver «vista» en comun/duelo.js). Las tiradas se arman sin publicarse.
+      vista: (d, campo, modo) => {
+        const inv = ui.inv((campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor);
+        if(!inv) return null;
+        const L = clave => { try{ return typeof InvLupa !== 'undefined' && typeof lupaFila === 'function' ? InvLupa.contenido(inv, `inv:${inv.id}:${clave}`) : {titulo: '', html: ''}; }catch(err){ return {titulo: '', html: ''}; } };
+        const F = (valor, st) => { const t = A().tirada(inv, '', valor, st); return t && t.r ? t.r.formula : fmt(num(valor)); };
+        if(campo === 'pdg' && d.hab){
+          const t = d.hab.tira || {};
+          if(t.formula) return {formula: t.formula, titulo: t.etq || '', html: ''};
+          return t.stat ? {formula: F(num(I().statValor(inv, t.stat)) + num(t.bono), t.stat), ...L('stat:' + t.stat)} : null;
+        }
+        if(campo === 'contra') return modo ? {formula: F(num(I().statValor(inv, modo)), modo), ...L('stat:' + modo)} : null;
+        if(campo === 'eva') return {formula: F(I().statValor(inv, 'eva') + evaEsp(inv, d).val, 'eva'), ...L('stat:eva')};
+        if(campo === 'parry') return {formula: F(I().statValor(inv, 'parry'), 'parry'), ...L('stat:parry')};
+        if(campo === 'pdg'){
+          const t = d.ataque.tipo === 'habilidad-arma'
+            ? A().tirada(inv, 'PdG', I().statValor(inv, 'pdg') + num(d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: num(inv.armaTipo), armaDeRango: !!inv.armaDeRango}), 'pdg')
+            : A().tiradaAtaque(inv, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo);
+          return {formula: t && t.r ? t.r.formula : '', ...L('atacar:')};
+        }
+        if(campo === 'fuerza') return {formula: F(I().statValor(inv, 'fue') + I().pesoArma(inv), 'fue'), ...L('stat:fue'), titulo: `${inv.nombre} · Fuerza del golpe`};
+        if(campo === 'bloqueo') return {formula: F(I().bloqueoValor(inv), 'bloqueo'), ...L('stat:bloqueo'), titulo: `${inv.nombre} · Bloqueo`};
+        if(campo === 'dano'){ const t = A().dano(inv, d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null); return {formula: t && t.r ? t.r.formula : '', ...L('danio:')}; }
+        return null;
+      },
       registrarTirada: (origen, r) => ui.registrar(origen, r),   // el daño de una habilidad dirigida (duelo.js, tirarDanoHab)
       controlDe: lado => ui.controlDe ? ui.controlDe(lado) : '',
       // El ataque de siempre (paga los No2 y tira el PdG); con arreglos, los No2 ya los cobró la habilidad.

@@ -75,8 +75,54 @@ const FichaDuelo = (() => {
     const statParaArma = (statId, arma) => FichaCombate.statParaArma(getS(), statId, arma);
     // Evasión contra oportunidad / contra contraataque (2026-10-04): lo que suma a la Evasión contra el ataque de este duelo.
     const evaEsp = d => { const c = compute(); return Combatiente.evaExtraDuelo(d, st => num(c.final[st])); };
+    // La fórmula del daño del ataque (la que tira el gancho `dano` y la que muestra el botón).
+    function formulaDano(d, arma){
+      let formula = arma ? FichaCombate.armaDanoTxt(arma, compute().final.dmg) : FichaCombate.danoSinArmaTxt(compute().final.dmg);
+      const m = d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null;   // lo que le suma la habilidad: dados del Tipo del arma y daño fijo
+      if(m){
+        if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${FichaCombate.tipoAtaque(arma)}`;
+        if(num(m.fijo)) formula += ` ${num(m.fijo) > 0 ? '+' : '−'} ${fmt(Math.abs(num(m.fijo)))}`.replace('−', '-');
+      }
+      return formula;
+    }
     return {
       soy: lado => ui.soy(lado),
+      // Qué dado tira cada botón del duelo y su 🔍 (2026-10-08, ver «vista» en comun/duelo.js). Sin tirar nada: la misma cuenta que el gancho.
+      vista: (d, campo, modo) => {
+        const S = getS(), c = compute();
+        const L = clave => { try{ return typeof FichaLupa !== 'undefined' && typeof lupaFila === 'function' ? FichaLupa.contenido(S, clave) : {titulo: '', html: ''}; }catch(err){ return {titulo: '', html: ''}; } };
+        const f = (valor, st) => { const r = Combatiente.tirarStat(valor, S.efectos, st); return r ? r.formula : fmt(num(valor)); };
+        const arma = armaDelInv(d.ataque && d.ataque.armaId);
+        if(campo === 'pdg' && d.hab){
+          const t = d.hab.tira || {};
+          if(t.formula) return {formula: t.formula, titulo: t.etq || '', html: ''};
+          return t.stat ? {formula: f(num(c.final[t.stat]) + num(t.bono), t.stat), ...L('stat:' + t.stat)} : null;
+        }
+        if(campo === 'contra') return modo ? {formula: f(num(c.final[modo]), modo), ...L('stat:' + modo)} : null;
+        if(campo === 'eva') return {formula: f(num(c.final.eva) + evaEsp(d).val, 'eva'), ...L('stat:eva')};
+        if(campo === 'parry'){ const it = modo ? S.inventario.find(x => x.id === modo) : null; return {formula: f(statParaArma('parry', it), 'parry'), ...L('stat:parry')}; }
+        if(campo === 'pdg'){
+          const tipo = d.ataque.tipo;
+          const extra = tipo === 'habilidad-arma' ? num(d.ataque.mods && d.ataque.mods.pdg) : tipo === 'contra' ? statParaArma('pdgcontra', arma) : tipo === 'oportunidad' ? statParaArma('pdgopor', arma) : 0;
+          return {formula: f(FichaCombate.pdgParaArma(S, arma).valor + (Number.isNaN(extra) ? 0 : extra), 'pdg'), ...L('atacar:' + (arma ? arma.id : ''))};
+        }
+        if(campo === 'fuerza'){
+          const l = L('stat:fue');
+          return {formula: f(FichaAcciones.fuerzaGolpeValorConArma(S, arma), 'fue'), titulo: 'Fuerza del golpe',
+            html: l.html + (arma && typeof lupaSeccion === 'function' ? lupaSeccion('Más el peso del arma', lupaFila(esc(arma.nombre), '+' + fmt(num(arma.peso)))) : '')};
+        }
+        if(campo === 'bloqueo'){
+          const it = (d.defensa && d.defensa.itemId ? S.inventario.find(x => x.id === d.defensa.itemId) : null) || ((armasYEscudosParaParry()[0] || {}).item) || null;
+          if(!it) return null;
+          const firme = Combatiente.bloqueoFirme(st => c.final[st], num((S.ataquesArma || {})._golpe));
+          return {formula: f(FichaCombate.bloqueoValor(S, it) + firme, 'bloqueo'), ...L('stat:bloqueo'), titulo: `Bloqueo · ${it.nombre}`};
+        }
+        if(campo === 'dano'){
+          const a = arma || (FichaCombate.armasEquipadasConDano(S)[0] || {}).item || null;
+          return {formula: formulaDano(d, a), ...(a ? L('danio:' + a.id) : {titulo: 'Daño sin arma', html: ''})};
+        }
+        return null;
+      },
       controlDe: lado => ui.controlDe ? ui.controlDe(lado) : '',
       registrarTirada: (origen, r) => ui.registrarTirada(origen, r),
       // El ataque de siempre (paga los No2 y tira el PdG).
@@ -114,12 +160,7 @@ const FichaDuelo = (() => {
         const S = getS();
         const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : (FichaCombate.armasEquipadasConDano(S)[0] || {}).item || null;
         // Sin arma: el daño sin arma (provisorio, P150) — antes avisaba y el duelo quedaba esperando.
-        let formula = arma ? FichaCombate.armaDanoTxt(arma, compute().final.dmg) : FichaCombate.danoSinArmaTxt(compute().final.dmg);
-        const m = d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null;   // lo que le suma la habilidad: dados del Tipo del arma y daño fijo
-        if(m){
-          if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${FichaCombate.tipoAtaque(arma)}`;
-          if(num(m.fijo)) formula += ` ${num(m.fijo) > 0 ? '+' : '−'} ${fmt(Math.abs(num(m.fijo)))}`.replace('−', '-');
-        }
+        const formula = formulaDano(d, arma);
         const r = tirarDados(formula);
         if(r) ui.registrarTirada(`Daño · ${arma ? arma.nombre : 'sin arma'}`, r);
       },

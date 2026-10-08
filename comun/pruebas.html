@@ -1632,6 +1632,16 @@ prueba('luces (2026-10-08): el farol Común ilumina 1 turno y marca 2 (no revela
          beng.consumible, beng.zonaUso.zonaLuz, beng.zonaUso.zonaEstado.turnos, estelar.zonaUso.zonaEstado.revela, estelar.tier, !!mareo.soloSistema, !!EstadosAplicar.presetPorNombre ? !!EstadosAplicar.presetPorNombre('Mareo de invocación') : true],
     [1, 1, 2, false, 1, 2, 3, true, 2, true, true, 2, true, 'Buena Calidad', true, true]);
 });
+prueba('Duelo: cada botón dice qué dado tira y trae su 🔍 (dueño, 2026-10-08): personaje, creep y las opciones de defensa', () => {
+  const S = FichaGuardado.normalizar({}).S;
+  const h = FichaDuelo.hooks(() => S, {soy: () => true});
+  const d = {id: 'x', ataque: {tipo: 'normal', armaId: ''}, atacante: {ref: 'c'}, defensor: {ref: 'c'}};
+  const v = h.vista(d, 'pdg'), e = h.vista(d, 'eva'), dn = h.vista(d, 'dano'), hab = h.vista({...d, hab: {tira: {formula: '2d6', etq: 'X'}}}, 'pdg');
+  const sc = creepPrueba({esp: 12}), hc = CreepDuelo.hooks({creep: () => sc, soy: () => true}), vc = hc.vista(d, 'pdg'), vb = hc.vista(d, 'bloqueo');
+  const ops = Duelo.conVistas(d, [{modo: 'evasion', etiqueta: 'Evasión'}], h);
+  igual([/\dd\d/.test(v.formula), /\dd\d/.test(e.formula), !!dn.formula, hab.formula, /\dd\d/.test(vc.formula), !!vb && 'formula' in vb, !!ops[0].lupa, !!v.html],
+    [true, true, true, '2d6', true, true, true, true]);
+});
 prueba('Parálisis recarga 1 No2 menos; Desarmado no afecta a un arma natural (dueño, 2026-10-08)', () => {
   const par = [{nombre: 'Parálisis', paralisis: true, activo: true}], des = ESTADOS_PRESET.find(p => p.nombre === 'Desarmado');
   igual([Combatiente.recargarNo2(5, 2, par), Combatiente.recargarNo2(5, -2, par), Combatiente.recargarNo2(0, 0, par), Combatiente.recargarNo2(5, 2, []), Combatiente.recargarNo2(5, 2),

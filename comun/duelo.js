@@ -161,6 +161,9 @@ const Duelo = (() => {
 .duelo-danosub.rojo{font-size:26px;font-weight:900;letter-spacing:.12em;color:#ff4d4d}
 #duelo-fondo [data-dano-tirar],#duelo-fondo [data-critico]{background:#2d6cdf;color:#fff;border:2px solid #8db3ff;border-radius:12px;padding:14px 28px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(45,108,223,.5)}
 #duelo-fondo [data-dano-tirar]:hover,#duelo-fondo [data-critico]:hover{background:#3b7bf0}
+#duelo-fondo .bt-lupa.duelo-lupa{display:inline-flex;position:static;width:auto;height:auto;margin-left:8px;padding:2px 6px;vertical-align:middle;font-size:12px;opacity:.85;border:1px solid rgba(255,255,255,.45);border-radius:6px}
+#duelo-fondo .bt-lupa.duelo-lupa:hover{opacity:1;background:rgba(255,255,255,.15)}
+#lupa-pop{z-index:100050}
 #duelo-fondo [data-dano-tirar]:disabled,#duelo-fondo [data-critico]:disabled{opacity:.5;cursor:default}
 .duelo-crit-titulo{text-align:center;font-size:30px;font-weight:900;letter-spacing:.04em;padding:10px 0 4px}
 .duelo-crit-titulo.no{color:#9aa4bd}
@@ -542,7 +545,7 @@ const Duelo = (() => {
     const hk = h || hooks();
     return ((d.hab && d.hab.contra) || [])
       .filter(c => c.stat !== 'parry' || !hk || !hk.puedeParry || hk.puedeParry(d))
-      .map(c => ({modo: c.modo, itemId: '', itemNombre: '', etiqueta: `🛡 ${c.etq}`, costo: 0, motivoNo: '',
+      .map(c => ({modo: c.modo, stat: c.stat || '', itemId: '', itemNombre: '', etiqueta: `🛡 ${c.etq}`, costo: 0, motivoNo: '',
         info: hk && hk.habValor ? [`${c.etq} 🎲 ${hk.habValor(d, 'defensor', c.stat) || '—'}`] : []}));
   }
   // Pasa a lo que sigue cuando quien usa la habilidad ganó la contienda (o no había): daño, efectos o fin.
@@ -1217,6 +1220,53 @@ const Duelo = (() => {
      Una habilidad Flash (`duelo.modo === 'flash'`, `duelo.flash = {en: ['pdg','eva','parry','bloqueo','fuerza','dano'], bono}`) se puede usar ANTES de una tirada del duelo (regla de Flash:
      se declara antes de tirar, nunca después de ver el resultado; no cuesta No2, solo los SP de la habilidad). En cada caja de tirada, quien tira ve un botón por cada Flash que le sirve;
      lo marca y, al tirar, la página del dueño cobra los SP (`flashUsar`) y el bono se suma a esa tirada (queda en su fórmula: «+2 ⚡»). Una vez por tirada. */
+  /* ---------- Qué dado tira cada botón, y su 🔍 (2026-10-08, dueño: «que se diga qué dado va a ser, ej. "Tirar PdG · 1d10", con la lupita
+     para ver el detalle de origen; lo mismo para cada tirada») ----------
+     La página de quien tira contesta con el gancho `vista(d, campo, modo)` → {formula, titulo, html} (html: el desglose del 🔍, armado con los
+     ladrillos de comun/lupa.js). campo: 'pdg' | 'fuerza' | 'bloqueo' | 'dano'; para las opciones de defensa, 'eva' | 'parry' | 'contra' (el stat
+     con que se resiste una habilidad, en `modo`). Sin el gancho, el botón queda como siempre. */
+  let vistas = {};        // 'duelo:campo' → {formula, titulo, html} | null (no hay)
+  let vistasPedidas = new Set();
+  let lupaDueloLista = false;
+  const ladoDeCampo = (d, campo) => (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
+  function pedirVista(d, campo){
+    const k = d.id + ':' + campo;
+    if(vistasPedidas.has(k)) return;
+    vistasPedidas.add(k);
+    enviar(ladoDeCampo(d, campo), {tipo: 'duelo-vista', id: d.id, campo});
+    setTimeout(() => { if(vistas[k] === undefined) vistas[k] = null; }, 6000);
+  }
+  function recibirVista(id, campo, v){
+    vistas[id + ':' + campo] = v && typeof v === 'object' ? v : null;
+    if(actual && actual.id === id && actual.dato) dibujar();
+  }
+  function lupaDuelo(k, v){
+    if(!v || !v.html || typeof lupaBotonHtml !== 'function') return '';
+    if(!lupaDueloLista && typeof lupaRegistrar === 'function'){
+      lupaDueloLista = true;
+      lupaRegistrar('duelo|', clave => { const x = vistas[clave.slice(6)]; return x ? {titulo: x.titulo || 'De dónde sale', html: x.html || ''} : {titulo: '', html: ''}; });
+    }
+    return lupaBotonHtml('duelo|' + k, 'duelo-lupa');
+  }
+  // Lo que se suma al texto del botón: « · 1d10» y el 🔍.
+  function vistaBoton(d, campo){
+    const k = d.id + ':' + campo;
+    if(vistas[k] === undefined){ pedirVista(d, campo); return ''; }
+    const v = vistas[k];
+    return v ? `${v.formula ? ` · ${_esc(v.formula)}` : ''}${lupaDuelo(k, v)}` : '';
+  }
+  // Las opciones de defensa con su 🔍 (y, en una habilidad, el dado que tiraría con cada stat).
+  function conVistas(d, ops, h){
+    if(!Array.isArray(ops) || !h || typeof h.vista !== 'function') return ops;
+    return ops.map(o => {
+      let v = null;
+      try{ v = d.hab ? h.vista(d, 'contra', o.stat) : h.vista(d, o.modo === 'evasion' ? 'eva' : o.modo, o.itemId); }catch(err){ console.error('Duelo: vista', err); }
+      if(!v) return o;
+      const r = {...o, lupa: {titulo: v.titulo || '', html: v.html || ''}};
+      if(d.hab && v.formula) r.info = [`${String(o.etiqueta || '').replace(/^🛡 /, '')} 🎲 ${v.formula}`];
+      return r;
+    });
+  }
   let flashOps = {};      // 'duelo:campo' → opciones que calculó la página del que tira ([] = ninguna)
   let flashSel = {};      // 'duelo:campo' → habId marcado
   let flashPedidas = new Set();
@@ -1366,10 +1416,10 @@ const Duelo = (() => {
         }
         else if(!ops){ setTimeout(() => { if(actual && actual.id === d.id && actual.dato && !opciones[d.id]) dibujar(); }, 2000);   // vuelve a mirar hasta que lleguen
           cuerpo = '<div class="espera">cargando tus opciones de defensa… <span class="det">(la primera vez puede tardar unos segundos)</span></div>'; }
-        else cuerpo = `<div class="det">Elegí cómo te defendés (antes de ver el PdG):</div><div class="duelo-opc">${ops.map((o, i) => `<button type="button" data-def="${i}"${o.motivoNo ? ' disabled' : ''}>${_esc(o.etiqueta)}${ayudaDefensa(o.modo === 'evasion' ? 'eva' : o.modo)}${o.costo ? `<small>${_fmt(o.costo)} No2</small>` : ''}${(o.info || []).map(t => `<small class="duelo-info">${_esc(t)}</small>`).join('')}${o.motivoNo ? `<small>${_esc(o.motivoNo)}</small>` : ''}</button>`).join('')}</div>`;
+        else cuerpo = `<div class="det">Elegí cómo te defendés (antes de ver el PdG):</div><div class="duelo-opc">${ops.map((o, i) => `<button type="button" data-def="${i}"${o.motivoNo ? ' disabled' : ''}>${_esc(o.etiqueta)}${ayudaDefensa(o.modo === 'evasion' ? 'eva' : o.modo)}${o.lupa ? lupaDuelo(d.id + ':op' + i, (vistas[d.id + ':op' + i] = o.lupa)) : ''}${o.costo ? `<small>${_fmt(o.costo)} No2</small>` : ''}${(o.info || []).map(t => `<small class="duelo-info">${_esc(t)}</small>`).join('')}${o.motivoNo ? `<small>${_esc(o.motivoNo)}</small>` : ''}</button>`).join('')}</div>`;
       }else{
         const txt = campo === 'pdg' ? (d.hab ? `🎲 Tirar ${_esc(etqTira(d))}` : '🎲 Pagar y tirar PdG') : campo === 'fuerza' ? '🎲 Tirar Fuerza del golpe' : `🎲 Tirar Bloqueo${d.defensa && d.defensa.itemNombre ? ' · ' + _esc(d.defensa.itemNombre) : ''}`;
-        cuerpo = `<button type="button" data-tirar="${campo}">${txt}${campo === 'bloqueo' ? ayudaDefensa('bloqueo') : ''}</button>${campo === 'pdg' && !d.hab ? '<div class="det">descuenta los No2 del ataque</div>' : ''}`;
+        cuerpo = `<button type="button" data-tirar="${campo}">${txt}${d.hab && campo === 'pdg' && d.hab.tira && d.hab.tira.formula ? ` · ${_esc(d.hab.tira.formula)}` : vistaBoton(d, campo)}${campo === 'bloqueo' ? ayudaDefensa('bloqueo') : ''}</button>${campo === 'pdg' && !d.hab ? '<div class="det">descuenta los No2 del ataque</div>' : ''}`;
       }
       cuerpo += flashHtml(d, campo);
     }else if(puedoAMano(lado)){
@@ -1533,7 +1583,7 @@ const Duelo = (() => {
     let cuerpo;
     if(!dn){
       const soyAtq = esMio(d.atacante) && (cfgEscuchar.relay || (hooks() && hooks().soy && hooks().soy(d.atacante)));
-      if(soyAtq) cuerpo = `<div style="text-align:center"><button type="button" data-dano-tirar>🎲 Tirar el daño${arma}</button>${flashHtml(d, 'dano')}<div class="duelo-nota" style="margin-top:6px">${crit ? `Es crítico: todo el daño se multiplica ×${mult} y va derecho a la vida (no se resta la Defensa).` : d.resultado === 'mitad' ? 'Pasa la mitad: (daño − Defensa) ÷ 2, redondeado para arriba.' : (d.hab && d.hab.dano && d.hab.dano.ignoraDef ? `Daño ${_esc(d.hab.dano.tipo)}: ignora la Defensa, no critica y va derecho a la vida.` : 'Se le resta la Defensa del defensor.')}</div></div>`;
+      if(soyAtq) cuerpo = `<div style="text-align:center"><button type="button" data-dano-tirar>🎲 Tirar el daño${arma}${d.hab ? (d.hab.dano && d.hab.dano.formula ? ` · ${_esc(d.hab.dano.formula)}` : '') : vistaBoton(d, 'dano')}</button>${flashHtml(d, 'dano')}<div class="duelo-nota" style="margin-top:6px">${crit ? `Es crítico: todo el daño se multiplica ×${mult} y va derecho a la vida (no se resta la Defensa).` : d.resultado === 'mitad' ? 'Pasa la mitad: (daño − Defensa) ÷ 2, redondeado para arriba.' : (d.hab && d.hab.dano && d.hab.dano.ignoraDef ? `Daño ${_esc(d.hab.dano.tipo)}: ignora la Defensa, no critica y va derecho a la vida.` : 'Se le resta la Defensa del defensor.')}</div></div>`;
       else if(puedoAMano(d.atacante)) cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>
         <div class="duelo-man"><input type="number" min="1" data-manual="dano" placeholder="daño" value="${_esc(manual.dano || '')}"><button type="button" class="sec" data-tirarpor="dano">🎲 Tirar a mano</button></div>`;
       else cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>`;
@@ -1893,7 +1943,7 @@ const Duelo = (() => {
       if(!doc.exists) return;
       const d = {id: m.id, ...doc.data()};
       if(m.tipo === 'duelo-opciones'){
-        const ops = (h.soy && h.soy(d.defensor)) ? (d.hab ? opcionesHab(d, h) : ((h.opcionesDefensa ? h.opcionesDefensa(d) : []) || []).filter(o => !(d.ataque && d.ataque.sinParry && o.modo === 'parry'))) : null;   // null = este personaje/creep no es el mío
+        const ops = conVistas(d, (h.soy && h.soy(d.defensor)) ? (d.hab ? opcionesHab(d, h) : ((h.opcionesDefensa ? h.opcionesDefensa(d) : []) || []).filter(o => !(d.ataque && d.ataque.sinParry && o.modo === 'parry'))) : null, h);   // null = este personaje/creep no es el mío
         if(enIframe()) window.parent.postMessage({tipo: 'duelo-opciones-res', id: d.id, opciones: ops}, location.origin);
         else recibirOpciones(d.id, ops);
         return;
@@ -1909,6 +1959,14 @@ const Duelo = (() => {
         const lado = (m.campo === 'pdg' || m.campo === 'fuerza' || m.campo === 'critico') ? d.atacante : d.defensor;
         if(!(h.soy && h.soy(lado) && h.rerollUsar) || !puedeReabrir(d, m.campo)){ _toast('Esa tirada ya no se puede repetir'); return; }
         await h.rerollUsar(d, m.campo);
+        return;
+      }
+      if(m.tipo === 'duelo-vista'){   // ¿qué dado tirás en esta tirada, y de dónde sale? (2026-10-08)
+        const lado = ladoDeCampo(d, m.campo);
+        let v = null;
+        try{ v = (h.soy && h.soy(lado) && typeof h.vista === 'function') ? (h.vista(d, m.campo) || null) : null; }catch(err){ console.error('Duelo: vista', err); }
+        if(enIframe()) window.parent.postMessage({tipo: 'duelo-vista-res', id: d.id, campo: m.campo, vista: v}, location.origin);
+        else recibirVista(d.id, m.campo, v);
         return;
       }
       if(m.tipo === 'duelo-flash'){   // ¿qué Flash tengo para esta tirada?
@@ -2281,5 +2339,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

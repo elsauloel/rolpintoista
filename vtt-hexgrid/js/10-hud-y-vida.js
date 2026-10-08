@@ -219,7 +219,8 @@ async function cosechaSiMuere(t, res){
     const ct = [...tokens.values()].find(x => x.fichaId && nombreDe(x) === quien);
     if(!ct){ mesaLinea(`🌾 Cosecha: ${nombreDe(t)} cayó marcado; ${quien} recupera 2 SP y 2 de vida (a mano: su token no está en el mapa)`); return; }
     const esInv = ct.tipo === 'pj' && String(ct.fichaId).includes(SEP_INVOCACION);
-    if(esInv) await dueloCurarInv(ct, 2); else await dueloCurar(ct, 2);
+    const rc = esInv ? await dueloCurarInv(ct, 2) : await dueloCurar(ct, 2);
+    const vida = Math.max(0, num(rc && rc.nuevo) - num(rc && rc.previo));
     let sp = '';
     if(ct.tipo === 'pj' && !esInv){
       const base = fbDb.doc(fbRutaCampana(`fichas/${ct.fichaId}`)), parteRef = base.collection('partes').doc('general');
@@ -234,9 +235,9 @@ async function cosechaSiMuere(t, res){
         tx.update(base, {'resumen.sp': num(rs.sp) + n});
         return n;
       });
-      sp = vuelve ? ` y ${vuelve} SP` : ' (ya tenía el SP lleno)';
+      sp = vuelve ? `${vida ? ' y' : ''} ${vuelve} SP` : '';
     }
-    mesaLinea(`🌾 Cosecha: ${nombreDe(t)} cayó marcado; ${quien} recupera 2 de vida${sp}`);
+    mesaLinea(`🌾 Cosecha: ${nombreDe(t)} cayó marcado; ${quien} recupera ${vida ? vida + ' de vida' : ''}${sp}${!vida && !sp ? 'nada (ya estaba lleno)' : ''}`);
   }catch(err){ console.error('No se pudo aplicar la cosecha:', err); }
 }
 

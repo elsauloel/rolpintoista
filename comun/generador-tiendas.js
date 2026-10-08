@@ -35,7 +35,7 @@ const GeneradorTiendas = (() => {
      usen a la ligera. Su calidad pesa poco (el precio ya filtra): a nivel bajo salen más los de calidad baja, pero puede salir cualquiera hasta Raro.
      Los clásicos (legacy) no son de la góndola: van siempre. */
   const UNIDADES_GONDOLA = 3;
-  const LUZ_COMUN = /antorcha|bengala|cohete|farol|l[aá]mpara de minero|vela de|p[oó]lvora|soga|cuerda|garfio/i;
+  const LUZ_COMUN = /antorcha|bengala|cohete|farol|l[aá]mpara de minero|vela de|p[oó]lvora|soga|cuerda|garfio|humo|ganz[uú]a|yesca/i;
   const gastable = it => !!it && it.tipoItem === 'consumibles' && !it.legacy && !it.trofeo && publicable(it) && TIERS.indexOf(it.tier) <= 2;
   // En qué góndola va un gastable: trampas y luces de todos los días, la Talabartería; pociones, pergaminos y lo mágico, el Bazar.
   const gondolaDe = it => it.trampaDatos || LUZ_COMUN.test(String(it.nombre || '')) ? 'talabarteria' : 'bazar';

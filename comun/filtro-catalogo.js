@@ -154,8 +154,8 @@ const FiltroCatalogo = (() => {
   function grupoDe(it){
     const p = parteDe(it);
     if(p === 'trampa') return 'trampa';
+    if(it.legacy && (p === 'consumible' || p === 'otro')) return 'clasico';   // (las herramientas de siempre: cuerda, garfio, ganzúas)
     if(p !== 'consumible') return p;
-    if(it.legacy) return 'clasico';
     const c = typeof Combatiente !== 'undefined' && Combatiente.categoriaConsumible ? Combatiente.categoriaConsumible(it) : '';
     return c === 'pergamino' ? 'pergamino' : c === 'pocion' ? 'pocion' : 'utileria';
   }

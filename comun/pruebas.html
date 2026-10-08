@@ -687,6 +687,16 @@ prueba('cada estado en su grupo; un consumible saca los de su grupo y deja el re
     ['heridas', 'venenos', 'venenos', 'mente', 'fatiga', '', '', 7, false, ['Armadura rota', 'Bendición'], false, 8, true, 120]);
 });
 
+prueba('utilería (2026-10-08): cuerda, garfio y ganzúas son clásicos de la Talabartería; la bomba de humo, de su góndola; las ganzúas suman +2 a Desarmar trampas', () => {
+  const G = GeneradorTiendas, cat = n => CATALOGO_BASE.find(i => i.nombre === n), cl = G.clasicos(CATALOGO_BASE);
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, sociales: [{id: 'd', nombre: 'Desarmar trampas', puntosInt: 0, nivelExtra: 0}]}).S);
+  const sin = FichaResumen.desarmaTrampasDe ? FichaResumen.desarmaTrampasDe(S) : FichaResumen.resumen(S).desarmaTrampas;
+  S.inventario.push({...cat('Ganzúas'), id: 'g1'});
+  const con = FichaResumen.desarmaTrampasDe ? FichaResumen.desarmaTrampasDe(S) : FichaResumen.resumen(S).desarmaTrampas;
+  igual([['Cuerda (por metro)', 'Garfio', 'Ganzúas'].every(n => cl.includes(cat(n)) && G.seccionDe(cat(n)) === 'talabarteria'), G.gastable(cat('Bomba de humo')), G.seccionDe(cat('Bomba de humo')),
+    !!cat('Bomba de humo').zonaUso.niebla, cat('Cuerda (por metro)').precioCompra, cat('Garfio').precioCompra, (parseInt((con.match(/[+-]\d+$/) || ['0'])[0]) - parseInt((sin.match(/[+-]\d+$/) || ['0'])[0])) === 2], [true, true, 'talabarteria', true, 1, 20, true]);
+});
+
 grupo('Filtro del catálogo (2026-10-08)');
 prueba('el filtro: qué es, una o dos manos, calidad, búsqueda con todas las palabras, precio desde–hasta, Tipo, elemento y que suba', () => {
   const L = [
@@ -2979,7 +2989,7 @@ prueba('tienda con secciones (P179): cada ítem sabe su sección; se reparte ent
     if(secs.size < 3) sinAlguna++;
     familias = Math.min(familias, new Set(its.filter(i => G.parteDe(i) === 'arma').map(i => i.tipoDado)).size);
     const b = G.generar({secciones: ['bazar'], tamano: 'pueblito', nivel: 2, catalogo: cat});
-    soloBazar += b.items.filter(id => G.seccionDe(porId.get(id)) !== 'bazar').length;
+    soloBazar += b.items.filter(id => !b.garantizados.includes(id) && G.seccionDe(porId.get(id)) !== 'bazar').length;   // (los clásicos van en toda tienda)
     const viejo = its.find(i => G.parteDe(i) === 'cabeza');
     if(viejo){ const nuevo = G.otro({tienda: {tamano: 'aldea', nivel: 3, items: r.items}, viejo, catalogo: cat, reponer: true}); if(nuevo && G.seccionDe(nuevo) !== G.seccionDe(viejo)) otraSec++; }
   }

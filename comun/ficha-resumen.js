@@ -73,8 +73,11 @@ const FichaResumen = (() => {
   function desarmaTrampasDe(S){
     const it = (S.sociales || []).find(x => x && /desarm\w*\s+(de\s+)?trampa/i.test(String(x.nombre || '')));
     if(!it) return '';
-    const caras = Math.max(2, FichaBotonera.dadoCarasSocial(it)), inte = Math.round(num(FichaBotonera.inteligenciaBudget(S).resto));   // sin puntos todavía: 1d2
-    return `1d${caras}${inte ? (inte > 0 ? '+' : '') + inte : ''}`;
+    const caras = Math.max(2, FichaBotonera.dadoCarasSocial(it));   // sin puntos todavía: 1d2
+    // + las Ganzúas que lleve (2026-10-08, dueño: «me encantan»): `bonoDesarmar` del mejor ítem en la mochila o el cinturón.
+    const ganzua = Math.max(0, ...[...(S.inventario || []), ...(S.cinturon || [])].map(x => num(x && x.bonoDesarmar)));
+    const extra = Math.round(num(FichaBotonera.inteligenciaBudget(S).resto)) + ganzua;
+    return `1d${caras}${extra ? (extra > 0 ? '+' : '') + extra : ''}`;
   }
   function resumen(S, o){
     o = o || {};

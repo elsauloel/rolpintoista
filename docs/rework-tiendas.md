@@ -215,3 +215,7 @@ equipo ya no tienen consumibles. La Talabartería garantiza una mochila y un cin
 ### ⬜ Ideas para «Luces y utilería» (dueño, 2026-10-08: «imaginemos cuerda, yesca y pedernal… ¿qué más?»; todavía no se carga nada)
 Lista de ideas propuesta en la conversación del 2026-10-08 (fuego, cuerda, terreno y cobertura, sigilo y engaño, oficio, señales). Se elige y
 diseña cuando el dueño lo retome, junto con la revisión de los consumibles.
+- ✅ Cargados (dueño, 2026-10-08): **Cuerda (por metro)** — 1 DDE el metro, se junta en un rollo, aguanta hasta Constitución 10 (✋ a mano); **Garfio** —
+  20 DDE, se usa con la cuerda que lleves, no en combate (✋ a mano); **Ganzúas** — 10 DDE, +2 a Desarmar trampas mientras las llevás (⚙) y abrir cerraduras
+  (✋); los tres, clásicos de la Talabartería (siempre hay). **Bomba de humo** — 25 DDE, gastable de la góndola de la Talabartería: una flor de niebla de 7
+  casillas por 2 turnos (⚙, desde el mapa). El resto de la lista sigue en espera.

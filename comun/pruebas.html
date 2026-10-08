@@ -1649,6 +1649,7 @@ prueba('Parálisis recarga 1 No2 menos; Desarmado no afecta a un arma natural (d
   igual([Combatiente.recargarNo2(5, 2, par), Combatiente.recargarNo2(5, -2, par), Combatiente.recargarNo2(0, 0, par), Combatiente.recargarNo2(5, 2, []), Combatiente.recargarNo2(5, 2),
     Combatiente.inmunidad([], des, {armaNatural: true}), Combatiente.inmunidad([], des, {armaNatural: false}), Combatiente.caosEstado('debuff', () => 0.9999, ['Desarmado']).nombre !== 'Desarmado'],
     [4, 2, 0, 5, 5, 'Arma natural', false, true]);
+  igual([ESTADOS_PRESET.find(p => p.nombre === 'Parálisis').turnos, Combatiente.CAOS_ESTADOS.debuff.find(e => e.nombre === 'Parálisis').turnos], [1, 1]);   // 1 turno (dueño, 2026-10-08)
 });
 prueba('Áreas por diámetro (dueño, 2026-10-08): el texto dice el diámetro y las casillas; las varitas que iluminan, una flor de 7 (diámetro 3)', () => {
   const cat = id => CATALOGO_BASE.find(x => x.id === id);

@@ -11,7 +11,7 @@ la trampa o la zona que deja en el piso cuentan los turnos de quien la puso. **C
 alguien es invulnerable, titila; al revivir queda Invulnerable hasta su próximo turno); Armadura rota del caos, **permanente** (−1 de armadura); el
 **Provocado** del caos: si salió bien, contra quién lo elige quien usó la varita; si salió mal, el bando contrario; **Desarmado** como la Expelliarmus
 (el arma vuela 2 casillas a un lado al azar). **Pendientes**: definir qué es control (CC) para la Inmunidad a CC, y los grupos de buffs (Sangre pura,
-Coagulación); revisar si la Parálisis (PdG, Parry y Evasión a la mitad) queda en 2 turnos o 1.
+Coagulación). La Parálisis dura **1 turno** (dueño, 2026-10-08) y recarga 1 No2 menos.
 
 ## Buffs
 
@@ -56,7 +56,7 @@ Coagulación); revisar si la Parálisis (PdG, Parry y Evasión a la mitad) queda
 | Lento | 2 turnos · caos |
 | Miedo | 2 turnos · caos |
 | Provocado | 1 turno · caos: si salió bien, contra quién lo elige quien usó la varita; si salió mal, el bando contrario. Ira dirigida (dueño, 2026-10-08): su turno es para atacar o usar una habilidad hostil contra ese objetivo, no para curarse u otra cosa |
-| Parálisis | 2 turnos (PdG, Parry y Evasión a la mitad) · caos · ⏸ ¿2 o 1? |
+| Parálisis | **1 turno** (dueño, 2026-10-08): PdG, Parry y Evasión a la mitad, y recarga 1 No2 menos · caos |
 | Silencio | 1 turno · caos |
 | Ceguera | 1 turno · caos |
 | Marcado | 2 turnos · caos |

@@ -1028,7 +1028,7 @@ const Combatiente = (() => {
       {nombre: 'Armadura rota'}, {nombre: 'Pajaritos', turnos: 2}, {nombre: 'Cansado', turnos: 2}, {nombre: 'Exhausto', turnos: 1},
       {nombre: 'Stun', turnos: 1}, {nombre: 'Confusión', turnos: 2}, {nombre: 'Lisiado', turnos: 2}, {nombre: 'Inmovilizado', turnos: 1},
       {nombre: 'Rengo', turnos: 2}, {nombre: 'Lento', turnos: 2}, {nombre: 'Miedo', turnos: 2}, {nombre: 'Provocado', turnos: 1},
-      {nombre: 'Parálisis', turnos: 2}, {nombre: 'Silencio', turnos: 1}, {nombre: 'Ceguera', turnos: 1}, {nombre: 'Marcado', turnos: 2}, {nombre: 'Sentado'},
+      {nombre: 'Parálisis', turnos: 1}, {nombre: 'Silencio', turnos: 1}, {nombre: 'Ceguera', turnos: 1}, {nombre: 'Marcado', turnos: 2}, {nombre: 'Sentado'},
       {nombre: 'Desarmado', vuela: 2}],   // como la Expelliarmus: el arma vuela 2 casillas a un lado al azar
   };
   /* El d20 del caos (dueño, 2026-10-08, segunda vuelta): `caos = {exito}` (la Común 10, la Buena 8). Lo que se quiere es, a un aliado, un buff;

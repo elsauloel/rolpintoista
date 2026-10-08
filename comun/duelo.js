@@ -813,6 +813,8 @@ const Duelo = (() => {
       if(e.spec && e.spec.nombre) o.spec = e.spec;
       if(_num(e.cura) > 0) o.cura = Math.round(_num(e.cura));
       if(e.no2 !== undefined){ o.no2 = Math.max(0, Math.round(_num(e.no2))); o.no2Dif = !!e.no2Dif; o.no2Sentado = !!e.no2Sentado; }
+      if(e.purga) o.purga = true;   // la purga (2026-10-07)
+      if(_num(e.vuela) > 0) o.vuela = Math.min(6, Math.round(_num(e.vuela)));   // el arma vuela N casillas (la Expelliarmus, 2026-10-07)
       if(e.seguroCritico && caras > 1) o.seguroCritico = true;
       if(e.soloCritico) o.soloCritico = true;
       o.requiereDano = requiereDanoDe(e);

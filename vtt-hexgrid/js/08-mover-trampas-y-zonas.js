@@ -742,7 +742,7 @@ async function trampaResolver(){
       let ej = {}; try{ ej = JSON.parse(p.el.trampaEstado || '{}') || {}; }catch(err){}
       const danoZ = trampaDanoValido(ej.danoZona) ? ej.danoZona : p.el.trampaDano;   // la Mina napalm: el piso quema menos que la explosión
       if(trampaDanoValido(danoZ)){ cambios.zonaDano = danoZ; if(p.el.trampaIgnoraDef) cambios.zonaIgnoraDef = true; }
-      if(p.el.trampaEstado){ try{ const e = JSON.parse(p.el.trampaEstado); delete e.salva; delete e.muro; if(e.nombre) cambios.zonaEstado = JSON.stringify(e); }catch(err){} }   // sin la salvación (es del disparo)
+      if(p.el.trampaEstado){ try{ const e = JSON.parse(p.el.trampaEstado); delete e.salva; delete e.muro; delete e.de; if(e.nombre) cambios.zonaEstado = JSON.stringify(e); }catch(err){} }   // sin la salvación (es del disparo)
       if(p.el.zonaResistStat && Number.isFinite(p.el.zonaResistValor)){ cambios.zonaResistStat = p.el.zonaResistStat; cambios.zonaResistValor = p.el.zonaResistValor; }
       // La nube ocupa la superficie del efecto (2026-10-04, dueño): si es una flor, la flor alrededor del centro (aunque se dispare en menos casillas).
       const ef = trampaEfectoDe(p.el), forma = {};

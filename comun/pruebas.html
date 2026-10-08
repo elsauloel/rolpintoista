@@ -386,6 +386,12 @@ prueba('la trampa que coloca una habilidad: la salvación contra el Ef.Esp de qu
   const t = Combatiente.trampaDeHab(h, id => ({dmgesp: 9, des: 4}[id] || 0)), sinValor = Combatiente.trampaDeHab(h);
   igual([t.salvacion.stat, t.salvacion.dif, t.detectar, sinValor.salvacion.dif], ['resmg', 9, 9, 7]);
 });
+prueba('una trampa recuerda quién la puso (`de`, para contar sus turnos, 2026-10-07); si no entra en el tope, lo demás manda', () => {
+  const j = JSON.parse(TokensAuto.estadoJson({nombre: 'Inmovilizado', turnos: 1}, null, null, null, '', 0, {de: 'abc123|pj'}));
+  const malo = JSON.parse(TokensAuto.estadoJson({nombre: 'Inmovilizado'}, null, null, null, '', 0, {de: 'abc|gm'}));
+  const largo = TokensAuto.estadoJson({nombre: 'X'.repeat(270)}, null, null, null, '', 0, {de: 'abc123|creep'});
+  igual([j.de, j.nombre, malo.de, JSON.parse(largo).de, largo.length <= 300], ['abc123|pj', 'Inmovilizado', undefined, undefined, true]);
+});
 prueba('el Rango lo da la Destreza: sin Rango de casteo en la ficha ni en los creeps; un «+Rango de casteo» viejo suma al Rango', () => {
   const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 3, agl: 3, des: 5, esp: 9},
     inventario: [{id: 'c', nombre: 'Capuz viejo', tipoItem: 'cabeza', equipado: true, mods: [{stat: 'rangocasteo', val: 2}]}]}).S);

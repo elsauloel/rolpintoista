@@ -821,6 +821,8 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   quien la tiró (así el fuego de 1 turno quema a todos los que actúan antes de que el mago vuelva a jugar); sin orden de turnos, como hoy.
   **Hecho (2026-10-07, «sigamos»):** con orden de turnos, al empezar el turno de alguien sus zonas pierden un turno y con 0 se van (js/07
   `zonasDelQueLaTiro`, desde ▶ Siguiente); el vencimiento por Mantenimiento queda una ronda más tarde, de respaldo. Sin orden de turnos, como antes.
+  **Ampliado (dueño, 2026-10-07: «siempre los turnos contando al caster»):** también las trampas que coloca alguien y la zona que dejan al
+  dispararse (la trampa guarda quién la puso; mientras esa persona esté en el orden de turnos, no las vence el Mantenimiento).
 - 🔲 **P173. Grupos de buffs y debuffs** (dueño, 2026-10-07, con el Maleficio de Buena): «tener un crit plus cada turno me sigue pareciendo
   mucho; dejémoslo para cuando tenga desarrollados los grupos de buffs y debuffs». El dueño va a desarrollar los grupos (qué buffs y debuffs se
   apilan entre sí y cuáles no, por familia). Mientras tanto, la **Varita del maleficio** (−1 a la Res. crítico de un tipo a elección, 2 turnos,

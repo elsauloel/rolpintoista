@@ -1932,6 +1932,22 @@ Con la calculadora recalibrada (varitas directas con dado fijo, báculos con ¼ 
 - **Trampa portal (dueño, 2026-10-07): Res.Esp contra el Ef.Esp de quien la coloca** (antes contra 7). ✅ Hecho en la Varita del portal Común: la
   trampa que coloca una habilidad puede llevar `salvacion.difStat` / `soltar.difStat` y la dificultad sale de ese stat al colocarla
   (`Combatiente.trampaDeHab`, como la de detectarla).
+- **Trampa o terreno directo, portales y arena movediza (dueño, 2026-10-07):** dos varitas de cada una, en Común y en Buena. La trampa: oculta,
+  sorpresa, no se esquiva, dura más, la pisa el rival (se puede detectar). El terreno: a la vista, inmediato, encima del rival, con tirada.
+  | Varita | Qué hace · SP · DDE |
+  |---|---|
+  | Trampa portal (Común) | Oculta: al que la pisa lo lleva hasta 4 casillas; Res.Esp contra tu Ef.Esp ✅ · 1 · 45 |
+  | Trampa portal (Buena) | Hasta 6 casillas; Res.Esp contra tu Ef.Esp + 2 (propuesta) · 1 · 80 |
+  | Portal para aliados (Común) | A la vista, solo tu bando, hasta 4 casillas, hasta tu próximo turno · 2 · 55 |
+  | Portal para aliados (Buena) | Hasta 6 casillas, 2 turnos · 2 · 80 |
+  | Trampa de arena (Común) | Una casilla oculta: Inmovilizado 1 turno; 🔓 Soltarse con Fuerza contra tu Ef.Esp (1 No2), y si falla se hunde +1 turno; salir cuesta 2 No2 por paso · 1 · 40 |
+  | Trampa de arena (Buena) | Flor oculta, **2 turnos** (dueño), la misma dinámica · **2** · 80 |
+  | Arena movediza (Común) | Flor a la vista, 2 turnos; al entrar, Res.CC contra tu Ef.Esp; la misma dinámica · 2 · 65 |
+  | Arena movediza (Buena) | Aparece bajo los pies (no se esquiva), Res.CC, 2 turnos, la misma dinámica · 3 · 110 |
+- **«Siempre los turnos contando al caster»** (dueño, 2026-10-07): como las zonas (P172), **las trampas que coloca alguien y la zona que dejan
+  al dispararse** duran los turnos de quien las puso. ✅ Hecho: la trampa recuerda quién la puso (`de` en su trampaEstado, comun/tokens-auto.js);
+  el mapa le descuenta un turno al empezar cada turno de esa persona (js/07 `zonasDelQueLaTiro`) y, mientras esté en el orden de turnos, no la
+  vence el Mantenimiento.
 - **El rango lo da la Destreza, siempre** (dueño, 2026-10-07, P174): donde esta hoja dice «Rango de casteo» (la primera casilla del Chorro
   de lava, a 1/3), ahora es **tu Rango**.
 

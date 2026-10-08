@@ -60,7 +60,12 @@ const TokensAuto = (() => {
     const o = {...(estado && estado.nombre ? estado : {}), ...(sv ? {salva: sv} : {}), ...(mu ? {muro: mu} : {}), ...(ef ? {efecto: ef} : {}), ...(elem ? {elemento: elem} : {}), ...(le ? {lento: le} : {}),
       ...(ps ? {pierdeSp: ps} : {}), ...(dz ? {danoZona: dz} : {}), ...(ca ? {cadena: ca} : {}), ...(po ? {portal: po} : {}), ...(rd ? {requiereDano: true} : {}), ...(rp ? {renuevaPaso: true} : {}), ...(al ? {altura: al} : {})};
     const j = Object.keys(o).length ? JSON.stringify(o) : '';
-    return j.length <= 300 ? j : '';
+    if(j.length > 300) return '';
+    // Quién la colocó (2026-10-07, dueño: «siempre los turnos contando al caster»): `de` = "ref|tipo"; el mapa le descuenta los turnos al
+    // empezar los de esa persona (js/07 zonasDelQueLaTiro). Solo si entra en el tope: lo demás manda.
+    const de = extra && extra.de && /^[^|]{1,64}\|(pj|creep)$/.test(String(extra.de)) ? String(extra.de) : '';
+    if(de){ const j2 = JSON.stringify({...o, de}); if(j2.length <= 300) return j2; }
+    return j;
   }
 
   // El mapa que el GM está mirando en este navegador (si eligió uno que ya no existe, el publicado).
@@ -154,7 +159,7 @@ const TokensAuto = (() => {
         forma: linea ? 'linea' : 'flor', radio: linea ? 0 : Plantillas.radioDeTrampa(t), largo: linea ? t.tamano : 0, cant: t.cant,
         estado: t.estado ? {nombre: t.estado, ...(t.estadoTurnos ? {turnos: t.estadoTurnos} : {}), ...(t.estadoMods ? {mods: t.estadoMods} : {}), ...(t.estadoStacks ? {stacks: t.estadoStacks} : {}), ...(t.estadoHp ? {hp: t.estadoHp} : {}), ...(t.soltar ? {soltar: t.soltar} : {})} : null,
         salvacion: t.salvacion || null, muro: t.muro || null, efecto: t.efecto || null, elemento: t.elemento || '', lento: t.lento || 0,
-        extraJson: {pierdeSp: t.pierdeSp || '', danoZona: t.danoZona || '', cadena: t.cadena || null, portal: t.portal || null, requiereDano: !!t.requiereDano, renuevaPaso: !!t.renuevaPaso, altura: t.altura || ''},
+        extraJson: {pierdeSp: t.pierdeSp || '', danoZona: t.danoZona || '', cadena: t.cadena || null, portal: t.portal || null, requiereDano: !!t.requiereDano, renuevaPaso: !!t.renuevaPaso, altura: t.altura || '', de: o.fichaId ? `${o.fichaId}|${o.tipoToken === 'pj' ? 'pj' : 'creep'}` : ''},
         dejaZona: t.dejaZona ? t : null, turnos: Math.max(0, Math.round(Number(t.turnos) || 0)), detectar: t.detectar};
     }
     const mapaId = o.mapaId || await mapaQueMiraElGM();

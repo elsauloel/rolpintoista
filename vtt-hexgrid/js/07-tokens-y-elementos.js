@@ -393,19 +393,34 @@ function zonaEsperaSuFin(el, id){
 /* P172 (dueño, 2026-10-07): una zona que tiró alguien dura los turnos DE ÉL, no la ronda. Al empezar el turno de un token (▶ Siguiente, js/04), a
    sus zonas les queda un turno menos; con 0, se van (el fuego de 1 turno de la Bola de fuego quema a todos los que juegan antes de que el mago
    vuelva a jugar). Sin orden de turnos siguen venciendo por Mantenimiento, como siempre. Lo hace el GM. → líneas para la Crónica. */
+// Quién la puso, para contar sus turnos: la zona de una habilidad (zonaCasteadorRef) o una trampa que colocó alguien, y la zona que deja al
+// dispararse (`de` adentro de su trampaEstado, comun/tokens-auto.js; 2026-10-07, dueño: «siempre los turnos contando al caster»).
+function colocadorDe(el){
+  if(el.zona && el.zonaCasteadorRef) return {ref: el.zonaCasteadorRef, tipo: el.zonaCasteadorTipo === 'creep' ? 'creep' : 'pj'};
+  try{
+    const de = (JSON.parse(el.trampaEstado || '{}') || {}).de;
+    if(typeof de === 'string' && de.includes('|')){ const [ref, tipo] = de.split('|'); return {ref, tipo: tipo === 'creep' ? 'creep' : 'pj'}; }
+  }catch(err){}
+  return null;
+}
+// ¿Quien la puso está en el orden de turnos? Entonces su duración la cuentan sus turnos, no los Mantenimientos.
+function colocadorEnOrden(c){
+  return !!(c && iniciativa.orden.some(o => { const t = tokens.get(o.id); return t && String(t.fichaId) === c.ref && (t.tipo === 'creep' ? 'creep' : 'pj') === c.tipo; }));
+}
 async function zonasDelQueLaTiro(tokenId){
   const t = tokens.get(tokenId);
   if(!soyGM || !t || !t.fichaId) return [];
   const tipo = t.tipo === 'creep' ? 'creep' : 'pj', lineas = [];
   for(const [id, el] of elementos){
-    if(!el.zona || !el.zonaCasteadorRef || el.zonaCasteadorRef !== String(t.fichaId) || (el.zonaCasteadorTipo || 'pj') !== tipo || elementosVencidosBorrando.has(id)) continue;
+    const c = (el.zona || el.trampa) && Math.round(num(el.turnos)) > 0 ? colocadorDe(el) : null;
+    if(!c || c.ref !== String(t.fichaId) || c.tipo !== tipo || elementosVencidosBorrando.has(id)) continue;
     const quedan = Math.round(num(el.turnos)) - 1;
     try{
       if(quedan <= 0){
         elementosVencidosBorrando.add(id);
         await borrarElemento(id);
         setTimeout(() => elementosVencidosBorrando.delete(id), 5000);
-        lineas.push(`Se fue ${el.zonaNombre || 'la zona'} (terminaron sus turnos).`);
+        lineas.push(`Se fue ${el.zonaNombre || el.trampaNombre || 'la zona'} (terminaron sus turnos).`);
       }else await coleccionElementos().doc(id).update({turnos: quedan});
     }catch(err){ console.error('No se pudo descontar el turno de la zona:', err); }
   }
@@ -416,6 +431,7 @@ function elementosVencidosBarrer(){
   elementos.forEach((el, id) => {
     if(el.venceMant === null || el.venceMant === undefined || mantenimientoNumero < el.venceMant || elementosVencidosBorrando.has(id)) return;
     if(zonaEsperaSuFin(el, id)) return;   // su último Mantenimiento: primero hace efecto
+    if((el.trampa || (el.zona && !el.zonaCasteadorRef)) && colocadorEnOrden(colocadorDe(el))) return;   // una trampa (o la zona que dejó) cuenta los turnos de quien la puso
     elementosVencidosBorrando.add(id);
     borrarElemento(id).finally(() => setTimeout(() => elementosVencidosBorrando.delete(id), 5000));
   });

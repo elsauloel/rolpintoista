@@ -183,16 +183,16 @@ function blinkDeHabilidad(msg){
    el resto hasta 2: al revés, al azar; 1: al revés y elige cuál el bando contrario (el GM: si no es esta pantalla, se le pide con el momento).
    Los estados y sus turnos: Combatiente.CAOS_ESTADOS (docs/estados-turnos.md). Fuera del Rango: avisa y deja seguir. */
 // Elegir el estado del caos de una lista (los de esa polaridad). → Promise del estado; cerrar sin elegir = uno al azar.
-function caosElegir(pol, titulo, texto){
-  const lista = Combatiente.CAOS_ESTADOS[pol] || [];
+function caosElegir(pol, titulo, texto, excluir){
+  const lista = (Combatiente.CAOS_ESTADOS[pol] || []).filter(s => !(excluir || []).includes(s.nombre));
   const dur = s => s.turnos ? `${s.turnos} turno${s.turnos === 1 ? '' : 's'}` : s.stacks ? `${s.stacks} stacks` : s.vuela ? 'el arma vuela 2 casillas' : 'hasta que se le pase';
   return new Promise(ok => {
     let listo = false;
     const fin = s => { if(listo) return; listo = true; ok(structuredClone(s)); AvisoCombate.cerrar(); };
     AvisoCombate.mostrar({icono: '🎲', titulo, texto, grilla: true,
-      botones: [...lista.map(s => ({texto: s.nombre, detalle: dur(s) + (s.escudoMagico ? ` · ${s.escudoMagico} de escudo` : s.hp ? ` · +${s.hp} HP por turno` : ''), alClic: () => fin(s)})),
-        {texto: '🎲 Al azar', sec: true, alClic: () => fin(Combatiente.caosEstado(pol))}],
-      alCerrar: () => { if(!listo){ listo = true; ok(Combatiente.caosEstado(pol)); } }});
+      botones: [...lista.map(s => ({texto: s.nombre, detalle: dur(s) + (s.escudoMagico ? ` · ${s.escudoMagico} de escudo` : s.hp ? ` · +${s.hp} HP por turno` : '') + (s.vuela ? ' (no a un arma natural)' : ''), alClic: () => fin(s)})),
+        {texto: '🎲 Al azar', sec: true, alClic: () => fin(Combatiente.caosEstado(pol, null, excluir))}],
+      alCerrar: () => { if(!listo){ listo = true; ok(Combatiente.caosEstado(pol, null, excluir)); } }});
   });
 }
 function caosDeHabilidad(msg){
@@ -249,10 +249,17 @@ async function caosAplicar(tokenId, spec, origen){
   if(!dest) return ' ✋ Ya no está en el mapa: aplicalo a mano.';
   let nota = '';
   try{
-    const limpio = {...spec}; delete limpio.vuela;
+    let limpio = {...spec}; delete limpio.vuela;
+    // Desarmado no afecta a un arma natural (dueño, 2026-10-08): en el caos, sale otro debuff en su lugar.
+    const natural = dest.tipo === 'creep' ? !!(creepPrivadoDe(dest.fichaId) || {}).armaNatural : String(dest.fichaId).includes(SEP_INVOCACION) ? !!((await invDeToken(dest)) || {}).armaNatural : false;
+    if(natural && Combatiente.esDesarmado(limpio)){
+      spec = Combatiente.caosEstado('debuff', null, ['Desarmado']);
+      limpio = {...spec};
+      nota = ` (su arma es natural, no se le cae: le tocó ${spec.nombre} en su lugar)`;
+    }
     if(dest.tipo === 'creep') await modificarCreep(dest.fichaId, sc => EstadosAplicar.aplicarACreep(sc, limpio));
     else await EstadosAplicar.encolarPj({fichaId: dest.fichaId, duenoUid: dest.duenoUid, spec: limpio, origen});
-    if(spec.vuela && typeof armaSoltar === 'function'){ const s = await armaSoltar(dest, num(spec.vuela)); if(s && s.nota) nota = ` (${s.nota})`; }
+    if(spec.vuela && typeof armaSoltar === 'function'){ const s = await armaSoltar(dest, num(spec.vuela)); if(s && s.nota) nota += ` (${s.nota})`; }
   }catch(err){ console.error('No se pudo aplicar el estado del caos:', err); nota = ' ✋ Aplicalo a mano.'; }
   return nota;
 }
@@ -1260,16 +1267,32 @@ async function dueloEmpujar(d, n){
   return {nota: `lo empujó ${pasos} casillero${pasos === 1 ? '' : 's'}`};
 }
 // El viento que despeja (2026-10-08, vendaval): borra la niebla y el fuego (terreno incendiado o zona de fuego) que tocan esas casillas.
+// (dueño, 2026-10-08): despeja SOLO las casillas que toca — una niebla o un fuego de varias casillas pierde esas y el resto queda (pasa a forma
+// libre); si no le queda ninguna, se borra. Lo puede hacer cualquiera (reglas: «El viento que despeja»).
 async function despejarEn(celdas, nombre){
-  const ids = [];
+  const tareas = [];
   elementos.forEach((el, id) => {
     const fuego = el.fuego || (el.zona && /fuego/i.test(el.zonaDanoTipo || ''));
-    if((el.niebla || fuego) && celdasDeElemento(el).some(c => celdas.has(nbPack(c.col, c.fila)))) ids.push(id);
+    if(!el.niebla && !fuego) return;
+    const todas = celdasDeElemento(el);
+    const quedan = todas.filter(c => !celdas.has(nbPack(c.col, c.fila)));
+    if(quedan.length < todas.length) tareas.push({id, quedan, origen: el.origen, sacadas: todas.length - quedan.length});
   });
-  if(!ids.length) return;
-  let ok = 0;
-  for(const id of ids){ try{ await borrarElemento(id); ok++; }catch(err){ console.error('No se pudo despejar:', err); } }
-  toast(ok === ids.length ? `💨 ${nombre || 'El viento'}: despejó ${ok} (niebla o fuego)` : `💨 ${nombre || 'El viento'}: despejó ${ok} de ${ids.length} — lo demás, a mano (faltan pegar las reglas)`);
+  if(!tareas.length) return;
+  let ok = 0, casillas = 0;
+  for(const t of tareas){
+    try{
+      const ref = coleccionElementos().doc(t.id);
+      if(!t.quedan.length) await ref.delete();
+      else{
+        const c0 = hexACubo(t.origen);
+        await ref.update({tipo: 'libre', rotacion: 0, celdas: t.quedan.flatMap(c => { const k = hexACubo(c); return [k.q - c0.q, k.r - c0.r]; })});
+      }
+      ok++; casillas += t.sacadas;
+    }catch(err){ console.error('No se pudo despejar:', err); }
+  }
+  toast(ok === tareas.length ? `💨 ${nombre || 'El viento'}: despejó ${casillas} casilla${casillas === 1 ? '' : 's'} de niebla o fuego`
+    : `💨 ${nombre || 'El viento'}: despejó ${ok} de ${tareas.length} — lo demás, a mano (faltan pegar las reglas)`);
 }
 // El riesgo (2026-10-08, Varita inestable): salió el número en los dados del daño → quien la usó se hace su daño (directo, sin Defensa).
 async function dueloRiesgo(d){

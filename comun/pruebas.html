@@ -1596,8 +1596,8 @@ prueba('Buenas, tanda 3 (2026-10-08): el empujón viaja hasta el duelo, el láse
   const rafaga = Duelo.limpiarHab(plan('esp-buena-varita-de-la-rafaga-helada')), laser = Duelo.limpiarHab(plan('esp-buena-varita-laser-larga')), viento = Duelo.limpiarHab(plan('esp-buena-varita-del-vendaval'));
   const S = FichaGuardado.normalizar({}).S; S.inventario = [cat('esp-buena-varita-del-blink')];
   const h = FichaAcciones.habDeArmaEspecial(S, S.inventario[0]);
-  igual([rafaga.efectos[0].empuja, rafaga.objetivo, laser.menosPorOrden, laser.largo, viento.despeja, viento.efectos[0].empuja, h.blink.distancia, S.inventario[0].especial.unaVezPorTurno],
-    [2, 'cono', true, 6, true, 2, 3, true]);
+  igual([rafaga.efectos[0].empuja, rafaga.objetivo, laser.menosPorOrden, laser.largo, viento.despeja, viento.efectos[0].empuja, viento.contra.map(c => c.stat), h.blink.distancia, S.inventario[0].especial.unaVezPorTurno],
+    [2, 'cono', true, 6, true, 2, ['resmg'], 3, true]);
 });
 prueba('Buenas, tanda 4 (2026-10-08): la gemela da una casilla por modo (con su SP y los usos juntos); la de cargas no cobra SP mientras le queden', () => {
   const cat = id => ({...structuredClone(CATALOGO_BASE.find(x => x.id === id)), equipado: true});
@@ -1631,6 +1631,12 @@ prueba('luces (2026-10-08): el farol Común ilumina 1 turno y marca 2 (no revela
   igual([farol.radio, farol.zonaTurnos, farol.zonaEstado.turnos, !!farol.zonaEstado.revela, flot.radio, flot.zonaTurnos, flot.zonaEstado.turnos, flot.zonaEstado.revela, cat('esp-buena-varita-de-la-luz-flotante').especial.sp,
          beng.consumible, beng.zonaUso.zonaLuz, beng.zonaUso.zonaEstado.turnos, estelar.zonaUso.zonaEstado.revela, estelar.tier, !!mareo.soloSistema, !!EstadosAplicar.presetPorNombre ? !!EstadosAplicar.presetPorNombre('Mareo de invocación') : true],
     [1, 1, 2, false, 1, 2, 3, true, 2, true, true, 2, true, 'Buena Calidad', true, true]);
+});
+prueba('Parálisis recarga 1 No2 menos; Desarmado no afecta a un arma natural (dueño, 2026-10-08)', () => {
+  const par = [{nombre: 'Parálisis', paralisis: true, activo: true}], des = ESTADOS_PRESET.find(p => p.nombre === 'Desarmado');
+  igual([Combatiente.recargarNo2(5, 2, par), Combatiente.recargarNo2(5, -2, par), Combatiente.recargarNo2(0, 0, par), Combatiente.recargarNo2(5, 2, []), Combatiente.recargarNo2(5, 2),
+    Combatiente.inmunidad([], des, {armaNatural: true}), Combatiente.inmunidad([], des, {armaNatural: false}), Combatiente.caosEstado('debuff', () => 0.9999, ['Desarmado']).nombre !== 'Desarmado'],
+    [4, 2, 0, 5, 5, 'Arma natural', false, true]);
 });
 prueba('Áreas por diámetro (dueño, 2026-10-08): el texto dice el diámetro y las casillas; las varitas que iluminan, una flor de 7 (diámetro 3)', () => {
   const cat = id => CATALOGO_BASE.find(x => x.id === id);

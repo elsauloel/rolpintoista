@@ -96,7 +96,14 @@ function momentoRecibido(id, d){
         momentoActualizar(id, {estado: 'listo', resultado: `1d20 → 1: ${c.nombre || 'el objetivo'} recibe ${spec.nombre} (lo eligió el GM).${nota}`});
       });
     }
-    else caosAplicar(c.tokenId, c.spec, d.titulo || 'Varita del caos').then(nota => momentoActualizar(id, {estado: 'listo', resultado: String(d.resultado || '').replace(' (lo aplica el GM)', '') + nota}));
+    // Lo demás (un creep, o el arma que vuela): el anuncio al GM, con «Aplicar» (dueño, 2026-10-08).
+    else{
+      const aplicar = () => caosAplicar(c.tokenId, c.spec, d.titulo || 'Varita del caos').then(nota => momentoActualizar(id, {estado: 'listo', resultado: String(d.resultado || '').replace(' (lo aplica el GM)', '') + nota}));
+      AvisoCombate.mostrar({icono: '🎲', titulo: d.titulo || 'Varita del caos', texto: String(d.resultado || '').replace(' (lo aplica el GM)', ''),
+        botones: [{texto: '✔ Aplicar', alClic: () => { AvisoCombate.cerrar(); aplicar(); }},
+          {texto: 'No aplicar', sec: true, alClic: () => { AvisoCombate.cerrar(); momentoActualizar(id, {estado: 'listo', resultado: String(d.resultado || '').replace(' (lo aplica el GM)', '') + ' (el GM no lo aplicó)'}); }}],
+        alCerrar: () => { caosHechos.delete(id); }});   // cerrado sin decidir: vuelve a aparecer con el próximo aviso
+    }
   }
   // Quien está esperando la respuesta en su cartelito.
   if(percepcionBanner && percepcionBanner.momentoId === id && d.estado === 'listo' && !percepcionBanner.resultado) percepcionRespuesta(d);

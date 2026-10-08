@@ -450,7 +450,12 @@ const Combatiente = (() => {
      usa `window.avisoDeudaNo2` si la pantalla lo define —el mapa—; si no, un toast). */
   // Levantarse de Sentado (1 No2) menos lo de «Levantarse rápido» (botas de jinete, 2026-10-06).
   const costoLevantarse = valorDe => Math.max(0, 1 - n(valorDe ? valorDe('levantarse') : 0));
-  const recargarNo2 = (max, actual) => n(actual) < 0 ? n(max) + n(actual) : n(max);
+  // `estados` (2026-10-08, dueño): con Parálisis recarga 1 No2 menos.
+  const paralizado = estados => activos(estados).some(e => e.paralisis);
+  function recargarNo2(max, actual, estados){
+    const base = n(actual) < 0 ? n(max) + n(actual) : n(max);
+    return paralizado(estados) ? Math.min(base, Math.max(base - 1, Math.min(0, base))) : base;
+  }
   function avisarDeudaNo2(o){
     if(!o || n(o.quedan) >= 0) return;
     try{ if(typeof window !== 'undefined' && typeof window.avisoDeudaNo2 === 'function'){ window.avisoDeudaNo2(o); return; } }catch(e){}
@@ -631,6 +636,7 @@ const Combatiente = (() => {
     if(est && esSigilo(est) && marcadoEn(estados)) return 'Marcado';
     if(!est || est.polaridad !== 'debuff') return false;
     if(o && o.jefe && est.nombre === 'Stun') return 'Protección de jefe';
+    if(o && o.armaNatural && esDesarmado(est)) return 'Arma natural';   // (dueño, 2026-10-08): no se le cae — su arma es parte del cuerpo
     const act = activos(estados);
     if(act.some(e => e.invulnerable)) return 'Invulnerable';
     if(est.esCC && act.some(e => e.inmunidadCC)) return 'Inmunidad a CC';
@@ -1009,9 +1015,11 @@ const Combatiente = (() => {
   function caosResultado(d20, aliado, caos){
     const ex = Math.min(19, Math.max(2, n(caos && caos.exito) || 10)), d = n(d20);
     const bien = d >= 20 || (d > 1 && d >= ex);
+    // 'rival' = el bando contrario a quien la usa: si la usa un jugador, el GM; si la usa un creep, los jugadores (dueño, 2026-10-08).
     return {que: aliado === bien ? 'buff' : 'debuff', a: 'objetivo', bien, elige: d >= 20 ? 'propio' : d <= 1 ? 'rival' : ''};
   }
-  const caosEstado = (pol, azar) => { const l = CAOS_ESTADOS[pol] || []; return structuredClone(l[Math.floor((azar || Math.random)() * l.length)] || l[0]); };
+  // `excluir`: nombres que no pueden salir (el Desarmado contra un arma natural).
+  const caosEstado = (pol, azar, excluir) => { const l = (CAOS_ESTADOS[pol] || []).filter(e => !(excluir || []).includes(e.nombre)); return structuredClone(l[Math.floor((azar || Math.random)() * l.length)] || l[0]); };
   const AHORRO_ESPECIAL = {oportunidad: 'oporahorro', contra: 'contraahorro', contraataque: 'contraahorro'};
   function ahorroEspecial(tipo, valorDe){
     const st = AHORRO_ESPECIAL[tipo];

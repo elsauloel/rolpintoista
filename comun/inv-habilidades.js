@@ -76,7 +76,7 @@ const InvHabilidades = (() => {
   // Pone un estado en la invocación con la regla común (inmunidades, acumulación y renovación). Devuelve el texto para la Mesa.
   function ponerEstado(inv, d){
     inv.estados = inv.estados || [];
-    const r = Combatiente.agregarEstado(inv.estados, d);
+    const r = Combatiente.agregarEstado(inv.estados, d, {armaNatural: !!inv.armaNatural});
     if(!r.ok) return `${d.nombre}: no le hizo efecto (${r.motivo})`;
     if(r.que === 'yaLoTiene') return `${d.nombre}: ya lo tenía`;
     const e = r.estado;

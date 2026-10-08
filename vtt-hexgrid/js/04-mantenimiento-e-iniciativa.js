@@ -418,7 +418,7 @@ async function turnoDeToken(tokenId, clave, inicio){
       if(!soyGM) return [];
       await acCargarPiezas();
       let r = null, nombre = '';
-      await modificarCreep(t.fichaId, crudo => { const sc = CreepCalculo.normalizar(crudo); nombre = sc.nombre; r = inicio ? CreepAcciones.inicioTurno(sc, clave, numero) : CreepAcciones.finTurno(sc, clave, numero); return r; });
+      await modificarCreep(t.fichaId, crudo => { const sc = CreepCalculo.normalizar(crudo); nombre = sc.nombre; r = inicio ? CreepAcciones.inicioTurno(sc, clave, numero) : CreepAcciones.finTurno(sc, clave, numero); if(inicio && r) provocadoAvisar(t, sc.estados); return r; });
       if(r && r.rep.length && typeof historialReporteMantenimiento === 'function') historialReporteMantenimiento(`${nombre} · ${inicio ? 'empieza' : 'termina'} su turno`, r.rep);
       if(typeof ac !== 'undefined' && ac && !ac.host.hidden) acDibujar();
       return r ? publicas(r.rep) : [];
@@ -429,6 +429,7 @@ async function turnoDeToken(tokenId, clave, inicio){
     await editarPersonajeMapa(fichaId, S => {
       const ui = {fijarHp: v => mantFijarHp(S, v)};
       r = inicio ? FichaMantenimiento.inicioTurno(S, ui, clave, invId || '', conTurno, numero) : FichaMantenimiento.finTurno(S, ui, clave, invId || '', conTurno, numero);
+      if(inicio && r) provocadoAvisar(t, invId ? ((S.invocaciones || []).find(x => x && x.id === invId) || {}).estados : S.efectos);
       return !!r;
     });
     if(r && r.rep.length) FichaMantenimiento.publicarReporte(inicio ? 'Empieza su turno' : 'Termina su turno', r.rep, r.nombre);
@@ -439,6 +440,22 @@ async function turnoDeToken(tokenId, clave, inicio){
     toast(`No se pudo ${inicio ? 'empezar' : 'terminar'} el turno de ${nombreDe(t)} — mirá la consola`);
     return [];
   }
+}
+/* Provocado (dueño, 2026-10-08): el efecto es a mano, pero al empezar el turno de alguien provocado, a quien lo maneja le aparece el anuncio
+   «Estás Provocado» con qué significa y «Aceptar»; al resto, en la Crónica. Una vez por turno (el aviso se arma al empezar). */
+const provocadoAvisados = new Set();
+function provocadoAvisar(t, estados){
+  const e = (estados || []).find(x => x && x.activo !== false && /^Provocado/i.test(String(x.nombre || '')));
+  if(!e) return;
+  const clave = `${t.fichaId}:${Math.round(num(iniciativa.paso))}`;
+  if(provocadoAvisados.has(clave)) return;
+  provocadoAvisados.add(clave);
+  const contra = String(e.detalle || '').match(/tiene que atacar a ([^(.]+)/);
+  const texto = contra ? `Si atacás, tenés que atacar a ${contra[1].trim()}, si podés llegar.` : 'Si atacás, tenés que elegir como objetivo a quien te provocó, si podés llegar.';
+  setTimeout(() => momentoAbrir({tipo: 'provocado', icono: '😤', titulo: `${nombreDe(t)} está Provocado`, estado: 'listo',
+    resultado: `${texto} Podés usar habilidades que no sean atacar.${e.turnos ? ` Le queda${num(e.turnos) === 1 ? '' : 'n'} ${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}.` : ''}`,
+    datos: {paraUid: t.tipo === 'creep' ? fbUsuario.uid : (t.duenoUid || ''), aviso: true, boton: 'Aceptar',
+      pasos: [{titulo: 'Estás Provocado', texto: `${texto} No te impide usar habilidades que no sean atacar. ✋ Lo respeta quien juega (no lo frena el mapa).`}]}}), 600);
 }
 const inicioDeTurno = (tokenId, clave) => turnoDeToken(tokenId, clave, true);
 const finDeTurno = (tokenId, clave) => turnoDeToken(tokenId, clave, false);

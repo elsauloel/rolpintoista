@@ -485,7 +485,7 @@ const CreepAcciones = (() => {
     const dh = Combatiente.curaQueEntra(sc.hp, d.hp);
     if(d.hp && !dh) rep.push('Caído: la cura de este turno no lo levanta');
     if(dh){ const antes = num(sc.hp); sc.hp = Math.max(0, Math.min(num(sc.hpMax), antes + dh)); rep.push(`HP total: ${antes} → ${sc.hp}`); }
-    sc.nitros = Combatiente.recargarNo2(C().nitrosMax(sc), sc.nitros);
+    sc.nitros = Combatiente.recargarNo2(C().nitrosMax(sc), sc.nitros, sc.estados);
     return {rep, enCooldown, hpAplicado: d.eventos.filter(ev => ev.tipo === 'hp').length};
   }
   function finCreep(sc){
@@ -503,7 +503,7 @@ const CreepAcciones = (() => {
     // Lo que se dispara va antes de recargar No2 (un Stun que vence ya no los topea): dispara, cuenta y recién ahí No2.
     const deuda = Math.min(0, num(sc.nitros));
     const a = inicioCreep(sc), b = finCreep(sc);
-    sc.nitros = Combatiente.recargarNo2(C().nitrosMax(sc), deuda);
+    sc.nitros = Combatiente.recargarNo2(C().nitrosMax(sc), deuda, sc.estados);
     return {rep: [...a.rep, ...b.rep], enCooldown: a.enCooldown, hpAplicado: a.hpAplicado, vencidos: b.vencidos};
   }
   // El turno propio de un creep en el orden de turnos (2026-10-06, P161). `clave` = «mapa:paso:…»; si ya se aplicó → null. `numero` = el

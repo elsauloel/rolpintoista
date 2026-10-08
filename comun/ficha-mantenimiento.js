@@ -65,7 +65,7 @@ const FichaMantenimiento = (() => {
   function invInicio(inv){
     InvCalculo.migrar(inv);
     if(inv.activa === false) return [];
-    inv.nitros = Combatiente.recargarNo2(InvCalculo.nitrosMax(inv), inv.nitros);
+    inv.nitros = Combatiente.recargarNo2(InvCalculo.nitrosMax(inv), inv.nitros, inv.estados);
     inv.ataquesTurno = 0;
     inv.golpeTurno = 0;   // la Defensa contra el primer golpe vuelve a valer
     inv.parryTurno = 0;   // y la Parada fácil (escudos de Buena calidad, 2026-10-06)
@@ -113,7 +113,7 @@ const FichaMantenimiento = (() => {
     S.turno = turnoAntes + 1;
     if(ui.limpiarParry) ui.limpiarParry();
     // Nitros al máximo y el primer ataque vuelve a costar la mitad (el SP ya se regeneró al principio).
-    S.nitros = Combatiente.recargarNo2(FichaBotonera.nitrosMaximo(S), S.nitros);   // la deuda de una defensa sin No2 se descuenta acá
+    S.nitros = Combatiente.recargarNo2(FichaBotonera.nitrosMaximo(S), S.nitros, S.efectos);   // la deuda de una defensa sin No2 se descuenta acá (y la Parálisis, 1 menos)
     S.ataquesTurno = 0;
     S.ataquesArma = {};
     let invocacionesVencidas = 0;
@@ -165,7 +165,7 @@ const FichaMantenimiento = (() => {
     contarMuerte(S, ui, log, rep);
     if(ui.limpiarParry) ui.limpiarParry();
     const deudaAntes = num(S.nitros);
-    S.nitros = Combatiente.recargarNo2(FichaBotonera.nitrosMaximo(S), S.nitros);   // la deuda de una defensa sin No2 se descuenta acá
+    S.nitros = Combatiente.recargarNo2(FichaBotonera.nitrosMaximo(S), S.nitros, S.efectos);   // la deuda de una defensa sin No2 se descuenta acá (y la Parálisis, 1 menos)
     S.ataquesTurno = 0;
     S.ataquesArma = {};
     rep.push(`No2 recargados a ${fmt(num(S.nitros))}${num(S.nitros) < FichaBotonera.nitrosMaximo(S) && deudaAntes < 0 ? ` (se descontó la deuda de ${fmt(-deudaAntes)})` : ''}`);

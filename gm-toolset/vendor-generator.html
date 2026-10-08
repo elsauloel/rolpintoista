@@ -168,6 +168,9 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .modal .filtros{display:flex;flex-wrap:wrap;gap:8px;padding:12px 15px;border-bottom:1px solid var(--line-soft);flex:none}
 .modal .filtros input{flex:2 1 220px}
 .modal .filtros select{flex:1 1 150px;width:auto}
+.modal .filtros.agregar-mas{background:rgba(255,255,255,.02)}
+.modal .filtros.agregar-mas input[type=number]{flex:1 1 110px;width:auto}
+.agregar-cuenta{padding:6px 15px 0;font-size:12px;color:var(--muted)}
 .iconbtn{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);padding:5px 10px;border-radius:var(--r)}
 .iconbtn:hover{border-color:var(--copper);color:var(--paper)}
 .modal footer{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;padding:12px 15px;border-top:1px solid var(--line);flex:none}   /* flex-wrap (2026-10-08): si los botones no entran, bajan de renglón en vez de salirse de la ventana */
@@ -345,17 +348,12 @@ input[type=checkbox]{width:auto}
       <h3>Agregar ítems a la tienda</h3>
       <button class="iconbtn" id="agregar-x">Cerrar</button>
     </header>
+    <!-- Los filtros (2026-10-08, pedido del dueño: «un filtro mucho más completo»). Los de «Más filtros» se arman en abrirAgregar. -->
     <div class="filtros">
-      <input type="text" id="agregar-buscar" placeholder="Buscar por nombre…">
-      <select id="agregar-rubro">
-        <option value="">Todos los rubros</option>
-        <option value="armas">Armas</option>
-        <option value="escudos">Escudos</option>
-        <option value="defensivos">Defensa</option>
-        <option value="consumibles">Consumibles</option>
-      </select>
+      <input type="search" id="agregar-buscar" placeholder="Buscar por nombre o por lo que hace…">
+      <select id="agregar-parte" title="Qué parte del cuerpo o qué tipo de ítem"><option value="">Todas las partes</option></select>
       <select id="agregar-tier">
-        <option value="">Todos los tiers</option>
+        <option value="">Todas las calidades</option>
         <option value="Común">Común</option>
         <option value="Buena Calidad">Buena calidad</option>
         <option value="Raro">Raro</option>
@@ -363,7 +361,29 @@ input[type=checkbox]{width:auto}
         <option value="Legendario">Legendario</option>
         <option value="A definir">A definir</option>
       </select>
+      <select id="agregar-orden" title="Orden de la lista">
+        <option value="categoria">Orden: categoría</option>
+        <option value="nombre">Orden: nombre</option>
+        <option value="precio">Orden: precio ↑</option>
+        <option value="precio-">Orden: precio ↓</option>
+        <option value="rareza">Orden: calidad</option>
+        <option value="peso">Orden: peso</option>
+      </select>
+      <button type="button" class="iconbtn" id="agregar-mas" aria-expanded="false">Más filtros ▾</button>
     </div>
+    <div class="filtros agregar-mas" id="agregar-mas-panel" hidden>
+      <select id="agregar-tipo" title="El Tipo de un arma"><option value="">Arma: cualquier Tipo</option><option value="4">Tipo 4</option><option value="6">Tipo 6</option><option value="8">Tipo 8</option><option value="10">Tipo 10</option><option value="12">Tipo 12</option></select>
+      <select id="agregar-manos" title="Armas: a una o a dos manos"><option value="">Una o dos manos</option><option value="1">A una mano</option><option value="2">A dos manos</option></select>
+      <select id="agregar-elemento" title="El daño que hace"><option value="">Daño: cualquiera</option><option value="fisico">Físico</option><option value="arcano">Arcano</option><option value="fuego">De fuego</option><option value="hielo">De hielo</option><option value="rayo">Eléctrico</option><option value="toxico">Tóxico</option></select>
+      <select id="agregar-bono" title="Que el ítem suba este stat"><option value="">Que suba: cualquier cosa</option></select>
+      <select id="agregar-etiqueta" title="Los efectos escasos (los que la tienda generada reparte con cuidado)"><option value="">Efecto escaso: cualquiera</option></select>
+      <select id="agregar-origen"><option value="">De fábrica y del grupo</option><option value="fabrica">Solo de fábrica</option><option value="grupo">Solo subidos por el grupo</option></select>
+      <input type="number" id="agregar-precio-min" min="0" placeholder="Precio desde" title="Precio de lista desde (DDE)">
+      <input type="number" id="agregar-precio-max" min="0" placeholder="Precio hasta" title="Precio de lista hasta (DDE)">
+      <input type="number" id="agregar-peso-max" min="0" placeholder="Peso hasta" title="Peso máximo">
+      <button type="button" class="iconbtn" id="agregar-limpiar">Limpiar filtros</button>
+    </div>
+    <div class="agregar-cuenta" id="agregar-cuenta"></div>
     <div class="body" id="agregar-lista"></div>
   </div>
 </div>
@@ -1041,21 +1061,63 @@ function abrirItemNuevo(inicial){
   });
 }
 
+// ---------- Agregar ítems: los filtros (2026-10-08, pedido del dueño: «un filtro mucho más completo»)
+const sinAcentos = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+// El daño que hace un ítem: físico (un arma común), el de una varita (y sus modos), el mágico de un arma (Eléctrico, Hielo…) y el de una trampa.
+function elementosDeItem(it){
+  const s = new Set();
+  const add = t => { const el = Combatiente.elementoDe(t); if(el) s.add(el); else if(/arcan/i.test(t || '')) s.add('arcano'); else if(/f[ií]sic/i.test(t || '')) s.add('fisico'); };
+  const e = it.especial || {};
+  [e, ...(e.modos || [])].forEach(x => { if(x && x.duelo && x.duelo.tipoDano) add(x.duelo.tipoDano); });
+  (it.efectosGolpe || []).forEach(g => { if(g && g.danoMagico) add(g.nombre); });
+  if(it.trampaDatos && it.trampaDatos.elemento) add(it.trampaDatos.elemento);
+  if(ES_ARMA(it.tipoItem) && !it.especial) s.add('fisico');
+  return s;
+}
+const busqCache = new WeakMap();   // el texto de búsqueda de cada ítem (sin tocar el ítem: se guarda en la tienda)
+const subeStat = (it, st) => (it.mods || []).some(m => m && m.stat === st && num(m.val) > 0);
+function filtrosAgregar(){
+  const v = id => ($('#' + id) || {}).value || '';
+  return {texto: sinAcentos(v('agregar-buscar')).split(/\s+/).filter(Boolean), parte: v('agregar-parte'), tier: v('agregar-tier'), tipo: v('agregar-tipo'),
+    manos: v('agregar-manos'), elemento: v('agregar-elemento'), bono: v('agregar-bono'), etiqueta: v('agregar-etiqueta'), origen: v('agregar-origen'),
+    pMin: v('agregar-precio-min'), pMax: v('agregar-precio-max'), pesoMax: v('agregar-peso-max'), orden: v('agregar-orden') || 'categoria'};
+}
+function pasaFiltrosAgregar(it, f){
+  if(f.parte && G.parteDe(it) !== f.parte) return false;
+  if(f.tier && it.tier !== f.tier) return false;
+  if(f.tipo && num(it.tipoDado) !== num(f.tipo)) return false;
+  if(f.manos && !(ES_ARMA(it.tipoItem) && String(it.tipoItem).includes(f.manos + 'm'))) return false;
+  if(f.elemento && !elementosDeItem(it).has(f.elemento)) return false;
+  if(f.bono && !subeStat(it, f.bono)) return false;
+  if(f.etiqueta && !G.etiquetasDe(it).includes(f.etiqueta)) return false;
+  if(f.origen === 'fabrica' && it._bib) return false;
+  if(f.origen === 'grupo' && !it._bib) return false;
+  const precio = precioAjustado(it);
+  if(f.pMin !== '' && precio < num(f.pMin)) return false;
+  if(f.pMax !== '' && precio > num(f.pMax)) return false;
+  if(f.pesoMax !== '' && num(it.peso) > num(f.pesoMax)) return false;
+  if(f.texto.length){
+    let hay = busqCache.get(it);
+    if(hay === undefined){ hay = sinAcentos(`${it.nombre} ${it.detalle || ''} ${it.descripcionNarrativa || ''} ${it.efectoNombre || ''}`); busqCache.set(it, hay); }
+    if(!f.texto.every(p => hay.includes(p))) return false;
+  }
+  return true;
+}
+function ordenarAgregar(items, orden){
+  const desc = orden.endsWith('-'), def = ORDENES[orden.replace(/-$/, '')] || ORDENES.categoria;
+  const l = items.slice().sort((a, b) => def.cmp(a, b) || a.nombre.localeCompare(b.nombre, 'es'));
+  return desc ? l.reverse() : l;
+}
 function renderAgregarLista(){
   if(!tiendaActual) return;
   const enTienda = new Set(tiendaActual.items);
-  const texto = ($('#agregar-buscar').value || '').trim().toLowerCase();
-  const rubro = $('#agregar-rubro').value;
-  const tier = $('#agregar-tier').value;
-
-  // En una tienda con tope de rareza (inicio de partida), agregar a mano
-  // tampoco puede saltárselo — si no, "🎲 Otro" y regenerar lo respetan
-  // pero un Legendario agregado a propósito se quedaría igual.
-  let candidatos = CATALOGO.filter(it => !enTienda.has(it.id));
-  if(rubro) candidatos = candidatos.filter(it => rubroDe(it) === rubro);
-  if(tier) candidatos = candidatos.filter(it => it.tier === tier);
-  if(texto) candidatos = candidatos.filter(it => it.nombre.toLowerCase().includes(texto));
-  candidatos = ordenarItems(candidatos);
+  const f = filtrosAgregar();
+  const todos = CATALOGO.filter(it => !enTienda.has(it.id));
+  const candidatos = ordenarAgregar(todos.filter(it => pasaFiltrosAgregar(it, f)), f.orden);
+  const activos = ['parte', 'tier', 'tipo', 'manos', 'elemento', 'bono', 'etiqueta', 'origen', 'pMin', 'pMax', 'pesoMax'].filter(k => f[k] !== '').length + (f.texto.length ? 1 : 0);
+  $('#agregar-cuenta').textContent = `${fmt(candidatos.length)} de ${fmt(todos.length)} ítems${activos ? ` · ${activos} filtro${activos === 1 ? '' : 's'}` : ''}`;
+  const masActivos = ['tipo', 'manos', 'elemento', 'bono', 'etiqueta', 'origen', 'pMin', 'pMax', 'pesoMax'].filter(k => f[k] !== '').length;
+  $('#agregar-mas').textContent = `Más filtros${masActivos ? ` (${masActivos})` : ''} ${$('#agregar-mas-panel').hidden ? '▾' : '▴'}`;
 
   if(!candidatos.length){
     $('#agregar-lista').innerHTML = `<div class="hint">No quedan ítems del catálogo que coincidan${enTienda.size ? ' y no estén ya en la tienda' : ''}.</div>`;
@@ -1079,13 +1141,27 @@ function renderAgregarLista(){
   }).join('');
 }
 
+// Las opciones que salen del catálogo: las partes, los stats que algún ítem sube y los efectos escasos.
+function llenarFiltrosAgregar(){
+  const partes = [...new Set(CATALOGO.map(it => G.parteDe(it)))].filter(p => G.PARTE_LABEL[p]);
+  const ordenP = Object.keys(G.PARTE_LABEL);
+  $('#agregar-parte').innerHTML = '<option value="">Todas las partes</option>' + partes.sort((a, b) => ordenP.indexOf(a) - ordenP.indexOf(b)).map(p => `<option value="${p}">${esc(G.PARTE_LABEL[p])}</option>`).join('');
+  const stats = [...new Set(CATALOGO.flatMap(it => (it.mods || []).filter(m => m && m.stat && num(m.val) > 0).map(m => m.stat)))];
+  $('#agregar-bono').innerHTML = '<option value="">Que suba: cualquier cosa</option>' + stats.map(st => ({st, l: STAT_LABEL[st] || st})).sort((a, b) => a.l.localeCompare(b.l, 'es')).map(({st, l}) => `<option value="${esc(st)}">${esc(l)}</option>`).join('');
+  $('#agregar-etiqueta').innerHTML = '<option value="">Efecto escaso: cualquiera</option>' + Object.keys(G.ETIQUETAS).map(k => `<option value="${esc(k)}">${esc(k)}</option>`).join('');
+}
+function limpiarFiltrosAgregar(){
+  ['agregar-buscar', 'agregar-parte', 'agregar-tier', 'agregar-tipo', 'agregar-manos', 'agregar-elemento', 'agregar-bono', 'agregar-etiqueta', 'agregar-origen',
+    'agregar-precio-min', 'agregar-precio-max', 'agregar-peso-max'].forEach(id => { const e = $('#' + id); if(e) e.value = ''; });
+  $('#agregar-orden').value = 'categoria';
+}
 function abrirAgregar(){
   if(!tiendaActual){ toast('Primero generá una tienda'); return; }
-  $('#agregar-buscar').value = '';
-  $('#agregar-rubro').value = '';
-  $('#agregar-tier').value = '';
+  llenarFiltrosAgregar();
+  limpiarFiltrosAgregar();
   renderAgregarLista();
   $('#scrim-agregar').classList.add('open');
+  setTimeout(() => { try{ $('#agregar-buscar').focus(); }catch(e){} }, 30);
 }
 
 function ajusteVentaActual(){
@@ -1654,10 +1730,12 @@ $('#tienda-nombre').addEventListener('input', e => {
 });
 $('#agregar-x').addEventListener('click', () => $('#scrim-agregar').classList.remove('open'));
 $('#scrim-agregar').addEventListener('mousedown', e => { if(e.target.id === 'scrim-agregar') $('#scrim-agregar').classList.remove('open'); });
-$('#agregar-buscar').addEventListener('input', renderAgregarLista);
+// Cualquier filtro de «Agregar ítems» redibuja la lista (2026-10-08).
+$('#scrim-agregar').addEventListener('input', e => { if(e.target.closest('.filtros')) renderAgregarLista(); });
+$('#scrim-agregar').addEventListener('change', e => { if(e.target.closest('.filtros')) renderAgregarLista(); });
+$('#agregar-mas').addEventListener('click', () => { const p = $('#agregar-mas-panel'); p.hidden = !p.hidden; $('#agregar-mas').setAttribute('aria-expanded', String(!p.hidden)); renderAgregarLista(); });
+$('#agregar-limpiar').addEventListener('click', () => { limpiarFiltrosAgregar(); renderAgregarLista(); });
 $('#preview-buscar').addEventListener('input', renderPreview);
-$('#agregar-rubro').addEventListener('change', renderAgregarLista);
-$('#agregar-tier').addEventListener('change', renderAgregarLista);
 $('#f-ajuste').addEventListener('change', e => aplicarAjuste(e.target.value));
 $('#f-ajuste-venta').addEventListener('change', e => aplicarAjusteVenta(e.target.value));
 $('#f-gratis').addEventListener('change', e => { if(!tiendaActual) return; tiendaActual.agregarGratis = e.target.checked; tiendaCambio(); });

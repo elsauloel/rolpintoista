@@ -111,7 +111,7 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261006t', '../comun/ficha-botin.js?v=20261002a', '../comun/generador-tiendas.js?v=20261007am', '../comun/ficha-tienda.js?v=20261007ad', '../comun/ficha-mantenimiento.js?v=20261008y', '../comun/ficha-calculo.js?v=20261007am', '../comun/ficha-combate.js?v=20261005mn', '../comun/skills-clase.js?v=20261008x', '../comun/ficha-habilidades.js?v=20261007ar',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261006t', '../comun/ficha-botin.js?v=20261002a', '../comun/generador-tiendas.js?v=20261007am', '../comun/filtro-catalogo.js?v=20261008zo', '../comun/ficha-tienda.js?v=20261008zo', '../comun/ficha-mantenimiento.js?v=20261008y', '../comun/ficha-calculo.js?v=20261007am', '../comun/ficha-combate.js?v=20261005mn', '../comun/skills-clase.js?v=20261008x', '../comun/ficha-habilidades.js?v=20261007ar',
   '../comun/catalogo.js?v=20261008zf', '../comun/items-subidos.js?v=20261007h', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261008g', '../comun/ficha-resumen.js?v=20261008zk', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261007ar', '../comun/inv-duelo.js?v=20261008z', '../comun/ficha-acciones.js?v=20261008n', '../comun/inv-habilidades.js?v=20261008s', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20261006e', '../comun/ficha-duelo.js?v=20261008zb', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261005f6'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
@@ -173,7 +173,7 @@ function bnCargarPiezas(){
     bnCargando = cargarPiezas(BN_PIEZAS)
       // Lo que subió el grupo al catálogo (como la ficha): un consumible viejo busca ahí el estado que deja.
       .then(() => ItemsSubidos.cargar().then(l => { bnItemsSubidos = l || []; }))
-      .then(() => fetch('../ficha-personaje/ficha.css?v=20261005cols').then(r => r.text()))
+      .then(() => fetch('../ficha-personaje/ficha.css?v=20261008zo').then(r => r.text()))
       .then(css => { bnCss = css.replace(/:root\b/g, ':host'); })
       .catch(err => { bnCargando = null; throw err; });
   }
@@ -883,18 +883,7 @@ function bnCrear(){
         </div>
       </header>
       <div class="carrito-bar">
-        <div class="catalogo-filtro-fila">
-          <div class="catalogo-filtro-grupo"><label class="catalogo-filtro-label">Categoría</label>
-            <select data-bn-tf="cat"><option value="">Todas</option><option value="armas">Armas</option><option value="escudos">Escudos</option><option value="defensa">Defensa</option><option value="consumibles">Consumibles</option><option value="otros">Otros</option></select></div>
-          <div class="catalogo-filtro-grupo"><label class="catalogo-filtro-label">Slot</label>
-            <select data-bn-tf="slot"><option value="">Todos</option><option value="mano">Mano (una mano)</option><option value="escudo">Escudo</option><option value="armadura">Armadura</option><option value="cabeza">Cabeza</option><option value="manos">Manos</option><option value="piernas">Piernas</option><option value="pies">Pies</option><option value="otro">Otro</option></select></div>
-          <div class="catalogo-filtro-grupo"><label class="catalogo-filtro-label">Tier</label>
-            <select data-bn-tf="tier"><option value="">Todos</option><option value="Común">Común</option><option value="Buena Calidad">Buena calidad</option><option value="Raro">Raro</option><option value="Excepcional">Excepcional</option><option value="Legendario">Legendario</option><option value="A definir">A definir</option></select></div>
-          <div class="catalogo-filtro-grupo"><label class="catalogo-filtro-label">Ordenar</label><select data-bn-tf="orden"></select></div>
-          <button type="button" class="btn ghost" data-bn-ti="orden-dir" id="bn-tienda-orden-dir" title="Invertir el orden">↑ Menor a mayor</button>
-          <button type="button" class="btn ghost" data-bn-ti="limpiar">Limpiar filtros</button>
-          <input type="text" data-bn-tf="buscar" placeholder="Buscar por nombre, efecto, modificador…">
-        </div>
+        <div class="catalogo-filtros" id="bn-tienda-filtros"></div>   <!-- comun/filtro-catalogo.js (2026-10-08) -->
         <div class="carrito-lista" id="bn-carrito-lista"></div>
         <div class="carrito-footer">
           <span>Total: <b id="bn-carrito-total">0</b> DDE</span>
@@ -1056,12 +1045,9 @@ function bnCrear(){
   });
   ['bn-vender', 'bn-reparar', 'bn-aleatorio'].forEach(id => raiz.querySelector('#' + id).addEventListener('mousedown', e => { if(e.target.id === id) e.target.classList.remove('open'); }));
   // Los filtros de la tienda y las cantidades de vender (A5).
-  raiz.addEventListener('input', e => { const t = e.composedPath()[0]; if(t && t.dataset && t.dataset.bnTf === 'buscar') bnTiendaDibujar(); });
   raiz.addEventListener('change', e => {
     const t = e.composedPath()[0];
     if(!t || !t.dataset) return;
-    if(t.dataset.bnTf === 'orden'){ bnTiendaSt.orden = t.value; bnTiendaDibujar(); return; }
-    if(t.dataset.bnTf){ bnTiendaDibujar(); return; }
     if(t.dataset.venderChk !== undefined || t.dataset.venderCant !== undefined){
       FichaTienda.venderCambio(bnTiendaSt, t);
       raiz.querySelector('#bn-vender-total').innerHTML = `Vas a cobrar: <b>${fmt(FichaTienda.totalVenta(bn.S, bnTiendaSt))} DDE</b>`;
@@ -1716,11 +1702,18 @@ function bnStatsCerrar(){
    la Botonera nueva, con comun/ficha-tienda.js (la misma regla y la misma ventana que la ficha): el catálogo del vendedor con sus
    filtros y orden, el carrito y Comprar, Vender, Reparación (si es herrero), el ítem al azar, Ver y Comparar. Mientras está abierta,
    los cambios del GM (otra tienda, cerrarla) llegan solos. */
-const bnTiendaSt = {tienda: null, carrito: [], venderSel: {}, orden: 'categoria', ordenDesc: false, verCompleto: false};   // como FichaTienda.nueva()
-Object.defineProperty(bnTiendaSt, 'filtros', {get(){   // los filtros se leen en vivo de los campos de la ventana
-  const v = k => { const el = bn && bn.raiz.querySelector(`[data-bn-tf="${k}"]`); return el ? el.value : ''; };
-  return {cat: v('cat'), slot: v('slot'), tier: v('tier'), buscar: v('buscar')};
-}});
+const bnTiendaSt = {tienda: null, carrito: [], venderSel: {}, verCompleto: false};   // como FichaTienda.nueva()
+// El filtro (comun/filtro-catalogo.js, 2026-10-08): búsqueda, chips con cuántos quedan, «🟢 Lugar libre», orden y «Más filtros». Se arma la primera vez.
+let bnTiendaFiltro = null, bnTiendaFiltroCont = null;
+Object.defineProperty(bnTiendaSt, 'filtro', {get(){ return bnTiendaFiltro ? bnTiendaFiltro.f : FiltroCatalogo.vacio(); }});
+function bnFiltroTienda(){
+  const cont = bn && bn.raiz.querySelector('#bn-tienda-filtros');
+  if(!cont) return null;
+  if(!bnTiendaFiltro || bnTiendaFiltroCont !== cont) bnTiendaFiltroCont = cont, bnTiendaFiltro = FiltroCatalogo.crear(cont, {
+    base: () => bn && bn.S ? FichaTienda.base(bn.S, bnTiendaSt) : [], precio: it => FichaTienda.precioDeCompra(bnTiendaSt, it),
+    libre: it => bn && bn.S ? FichaTienda.libre(bn.S, it) : null, clave: 'tienda', alCambiar: () => bnTiendaDibujar()});
+  return bnTiendaFiltro;
+}
 let bnTiendaEscucha = null;
 async function abrirTiendaMapa(fichaId){
   try{ await bnCargarPiezas(); }catch(err){ console.error(err); toast('No se pudo abrir la tienda'); return; }
@@ -1734,10 +1727,8 @@ async function abrirTiendaMapa(fichaId){
   bn.soloTienda = !yaVisible;
   if(!(await bnSesionLista(fichaId))){ toast('No se pudo leer el personaje'); return; }
   Object.assign(bnTiendaSt, {tienda, carrito: [], venderSel: {}, verCompleto: false});
-  bn.raiz.querySelectorAll('[data-bn-tf]').forEach(el => { if(el.dataset.bnTf !== 'orden') el.value = ''; });
-  const sel = bn.raiz.querySelector('[data-bn-tf="orden"]');
-  if(!sel.dataset.listo){ sel.innerHTML = FichaTienda.opcionesOrden(bnTiendaSt); sel.dataset.listo = '1'; }
   bn.raiz.querySelector('#bn-tienda').classList.add('open');
+  const fc0 = bnFiltroTienda(); if(fc0) fc0.limpiar();
   bnTiendaDibujar();
   toast(`${tienda.nombre || 'Tienda'} · ${fmt(FichaTienda.visibles(bn.S, bnTiendaSt).length)} ítems`);
   bnTiendaEscuchar();
@@ -1776,9 +1767,8 @@ function bnTiendaDibujar(){
   r.querySelector('#bn-tienda-titulo').textContent = `🏪 ${(t && t.nombre) || 'Tienda'}`;   // (2026-10-08: el título, más claro)
   r.querySelector('#bn-tienda-badge').textContent = FichaTienda.badge(st);
   r.querySelector('#bn-tienda-reparar').style.display = t && t.herrero ? '' : 'none';   // solo las tiendas con herrero reparan
-  // Lo Excepcional y lo Legendario solo se filtran con una tienda que lo ofrezca (la tienda siempre está, acá).
-  r.querySelector('[data-bn-tf="orden"]').value = st.orden;
-  r.querySelector('#bn-tienda-orden-dir').textContent = FichaTienda.etiquetaOrden(st);
+  const fc = bnFiltroTienda();
+  if(fc) fc.actualizar();   // lo que vende pudo cambiar (el GM cambió la tienda, se compró una pieza única)
   r.querySelector('#bn-tienda-cuerpo').innerHTML = FichaTienda.catalogoHtml(bn.S, st, {gestion: false});
   r.querySelector('#bn-tienda-dde').textContent = fmt(num(bn.S.meta.dde));
   if(typeof Intercambio !== 'undefined') Intercambio.pintarBotonBaul(r.querySelector('[data-bn-ti="baul"]'));   // en combate, apagado y lo dice
@@ -1815,8 +1805,6 @@ function bnTiendaClic(b){
   const a = b.dataset.bnTi;
   if(a === 'cerrar'){ bnTiendaCerrar(); return true; }
   if(a === 'baul'){ Intercambio.abrirBaul(bn.fichaId); return true; }   // 📦 el baúl común (comun/intercambio.js)
-  if(a === 'orden-dir'){ st.ordenDesc = !st.ordenDesc; bnTiendaDibujar(); return true; }
-  if(a === 'limpiar'){ r.querySelectorAll('[data-bn-tf]').forEach(el => { if(el.dataset.bnTf !== 'orden') el.value = ''; }); bnTiendaDibujar(); return true; }
   if(a === 'vaciar'){ st.carrito = []; bnTiendaDibujar(); return true; }
   if(a === 'comprar'){ if(puede()) FichaTienda.comprar(bn.S, st, ui(FichaGuardado.partes(bn.S))).then(() => bnTiendaDibujar()); else bnTiendaDibujar(); return true; }
   if(a === 'aleatorio'){

@@ -377,7 +377,7 @@ const editorFicha = FichaEditor.crear(document.body, {
   alCambiar: keys => {
     keys.forEach(k => {
       if(k === 'inventario') renderInventario();
-      else if(k === 'catalogo'){ $('#catalogo-buscar').value = ''; renderCatalogoModal(); $('#scrim-catalogo').classList.add('open'); }
+      else if(k === 'catalogo'){ limpiarFiltrosCatalogo(); renderCatalogoModal(); $('#scrim-catalogo').classList.add('open'); }
       else renderList(k);
     });
     refresh();

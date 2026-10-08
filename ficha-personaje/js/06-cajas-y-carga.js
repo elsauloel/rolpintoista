@@ -266,7 +266,7 @@ document.addEventListener('click', async e => {
   }
   if(b.id === 'chooser-fabricante'){
     $('#scrim-chooser').classList.remove('open');
-    $('#catalogo-buscar').value = '';
+    limpiarFiltrosCatalogo();
     renderCatalogoModal();
     $('#scrim-catalogo').classList.add('open');
     return;

@@ -4,10 +4,11 @@
    Lo que antes vivía en la ficha (js/01 los grupos de compra, js/07 la fila de un ítem y su precio, js/09 el catálogo, el carrito, la
    compra, vender y reparar), copiado tal cual con el personaje (`S`) y el estado de la tienda en pantalla (`st`) como parámetros.
    st = {tienda (la publicada, desdeDoc; null = el catálogo general), carrito [{catId, cantidad}], venderSel {clave: cantidad},
-         orden, ordenDesc, verCompleto, filtros {cat, slot, tier, buscar}, extraItem(id) (opcional: otro lugar donde buscar un ítem,
+         verCompleto, filtro (el estado de comun/filtro-catalogo.js: búsqueda, filtros, orden), extraItem(id) (opcional: otro lugar donde buscar un ítem,
          p. ej. el botín)} — nueva() arma uno vacío; la ficha usa uno con getters sobre sus variables de siempre.
    Lo que cambia al personaje avisa con ui = {toast, cambio(partes)}.
-   Necesita comun/ficha-calculo.js, ficha-combate.js, ficha-equipo.js, ficha-guardado.js e items-subidos.js (etiqueta de lo subido).
+   Necesita comun/ficha-calculo.js, ficha-combate.js, ficha-equipo.js, ficha-guardado.js, items-subidos.js (etiqueta de lo subido),
+   generador-tiendas.js y filtro-catalogo.js (los filtros).
    ========================================================= */
 const FichaTienda = (() => {
   const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
@@ -37,7 +38,7 @@ const FichaTienda = (() => {
   const stackMaxDe = it => (it && it.pilaInfinita) ? Infinity : STACK_MAX;
 
   function nueva(){
-    return {tienda: null, carrito: [], venderSel: {}, orden: 'categoria', ordenDesc: false, verCompleto: false, filtros: {cat: '', slot: '', tier: '', buscar: ''}};
+    return {tienda: null, carrito: [], venderSel: {}, verCompleto: false, filtro: FiltroCatalogo.vacio()};
   }
 
   /* ---------- Precios y búsqueda ---------- */
@@ -70,37 +71,20 @@ const FichaTienda = (() => {
       || null;
   }
 
-  /* ---------- Lo que se ve del catálogo ---------- */
-  // Daño máximo posible del arma; lo que no es arma da 0 y queda al final del orden por daño.
-  function danoDe(item){
-    if(!FichaCombate.esArma(item.tipoItem)) return 0;
-    const dados = Math.max(1, num(item.peso) || 1) + Math.max(0, num(item.danoAmplificado));
-    return dados * (num(item.tipoDado) || 8) + num(item.danoFijo);
-  }
-  function ordenes(st){
-    return {
-      categoria: {label:'Categoría', cmp:(a,b) => TIERS_ORDEN.indexOf(a.tier) - TIERS_ORDEN.indexOf(b.tier)},
-      nombre:    {label:'Nombre',    cmp:(a,b) => a.nombre.localeCompare(b.nombre, 'es')},
-      precio:    {label:'Precio',    cmp:(a,b) => precioDeCompra(st, a) - precioDeCompra(st, b)},
-      peso:      {label:'Peso',      cmp:(a,b) => num(a.peso) - num(b.peso)},
-      rareza:    {label:'Rareza',    cmp:(a,b) => TIERS_ORDEN.indexOf(a.tier) - TIERS_ORDEN.indexOf(b.tier)},
-      dano:      {label:'Daño',     valor: danoDe},
-      defensa:   {label:'Defensa',  valor: i => E().defValor(i)},
-    };
-  }
-  function ordenar(st, items){
-    const ords = ordenes(st), def = ords[st.orden] || ords.categoria;
-    const porNombre = (a, b) => a.nombre.localeCompare(b.nombre, 'es');
-    // Criterio con valor propio (daño, defensa): lo que no aplica queda al final siempre.
-    if(def.valor){
-      const con = items.filter(i => def.valor(i) > 0);
-      const sin = items.filter(i => def.valor(i) <= 0).sort(porNombre);
-      con.sort((a, b) => def.valor(a) - def.valor(b) || porNombre(a, b));
-      if(st.ordenDesc) con.reverse();
-      return [...con, ...sin];
-    }
-    const orden = items.slice().sort((a,b) => def.cmp(a,b) || porNombre(a,b));
-    return st.ordenDesc ? orden.reverse() : orden;
+  /* ---------- Lo que se ve del catálogo ----------
+     Los filtros y el orden son los de comun/filtro-catalogo.js (2026-10-08: una sola pieza para todos lados). `st.filtro` es su estado
+     ({buscar, parte, manos, tier, libre, …, orden, desc}); cada pantalla dibuja el filtro con FiltroCatalogo.crear sobre ese mismo objeto. */
+  const danoDe = item => FiltroCatalogo.danoDe(item);
+  // ¿Tiene libre el lugar del cuerpo donde va? (null: no va en el cuerpo — consumibles, otros). El chip «🟢 Lugar libre».
+  function libre(S, item){ const r = E().slotOcupado(S, item); return r ? !r.ocupado : null; }
+  const ctxFiltro = (S, st) => ({precio: it => precioDeCompra(st, it), libre: it => libre(S, it)});
+  // Lo que se puede llegar a ver, antes de los filtros: lo de la tienda, o el catálogo (sin lo que el jugador no compra suelto).
+  function base(S, st){
+    if(st.tienda && !st.verCompleto) return st.tienda.items.map(id => itemCatalogo(S, st, id)).filter(Boolean);
+    let b = S.catalogo || [];
+    // En el catálogo abierto solo se llega hasta Raro; de los consumibles, solo los esenciales; nada de lo que sale solo de botín.
+    if(!st.tienda && !st.verCompleto) b = b.filter(item => !TIERS_OCULTOS.includes(item.tier) && (!item.consumible || item.legacy) && !item.soloBotin);
+    return b;
   }
   // Dentro de "consumibles": primero el stock fijo de la tienda, después los legacy, después el resto.
   function conStockYLegacyPrimero(st, items){
@@ -111,24 +95,10 @@ const FichaTienda = (() => {
       return rango(a) - rango(b);
     });
   }
-  // Los ítems que pasan los filtros activos (categoría, slot, tier, búsqueda).
+  // Los ítems que pasan los filtros activos, ya ordenados.
   function visibles(S, st){
-    const f = st.filtros || {};
-    const busqueda = normalizarBusqueda(f.buscar || '');
-    // Con una tienda cargada, el catálogo se recorta a lo que ese vendedor ofrece.
-    let base = S.catalogo || [];
-    if(st.tienda && !st.verCompleto) base = st.tienda.items.map(id => itemCatalogo(S, st, id)).filter(Boolean);
-    // En el catálogo abierto solo se llega hasta Raro; de los consumibles, solo los esenciales; nada de lo que sale solo de botín.
-    if(!st.tienda && !st.verCompleto){
-      base = base.filter(item => !TIERS_OCULTOS.includes(item.tier));
-      base = base.filter(item => !item.consumible || item.legacy);
-      base = base.filter(item => !item.soloBotin);
-    }
-    let out = f.cat ? base.filter(item => grupoCompraDe(item.tipoItem) === f.cat) : base;
-    if(f.slot) out = out.filter(item => C().slotDe(item.tipoItem) === f.slot);
-    if(f.tier) out = out.filter(item => item.tier === f.tier);
-    if(busqueda) out = out.filter(item => textoBusqueda(item).includes(busqueda));
-    return out;
+    const f = st.filtro || FiltroCatalogo.vacio(), ctx = ctxFiltro(S, st);
+    return FiltroCatalogo.ordenar(base(S, st).filter(item => FiltroCatalogo.pasa(item, f, ctx)), f, ctx);
   }
   // La fila de un ítem. gestion: los botones de Editar/Eliminar del catálogo propio de la ficha.
   function rowHtml(S, st, item, o){
@@ -167,29 +137,18 @@ const FichaTienda = (() => {
   </div>`;
   }
   function catalogoHtml(S, st, o){
+    const f = st.filtro || FiltroCatalogo.vacio();
     const vis = visibles(S, st);
-    const grupos = {};
-    vis.forEach(item => { const g = grupoCompraDe(item.tipoItem); (grupos[g] = grupos[g] || []).push(item); });
     const fila = item => rowHtml(S, st, item, o);
-    let html;
-    if(st.orden === 'categoria'){
-      const claves = GRUPO_COMPRA_ORDEN.filter(g => grupos[g] && grupos[g].length);
-      html = claves.map(g => `
-      <div class="cat-grouphead">${esc(GRUPO_COMPRA_LABEL[g])}</div>
-      <div class="cat-grid">${conStockYLegacyPrimero(st, ordenar(st, grupos[g])).map(fila).join('')}</div>
-    `).join('');
-    }else{
-      const orden = conStockYLegacyPrimero(st, ordenar(st, vis));
-      html = orden.length
-        ? `<div class="cat-grouphead">${esc(ordenes(st)[st.orden].label)} · ${fmt(orden.length)}</div>
-         <div class="cat-grid">${orden.map(fila).join('')}</div>`
-        : '';
-    }
-    const textoBusq = String((st.filtros && st.filtros.buscar) || '').trim();
+    // Agrupado por qué es (con el orden «Por tipo»); con otro orden, una sola lista.
+    const html = FiltroCatalogo.agrupar(vis, f).map(g => `
+      <div class="cat-grouphead">${esc(g.label)} · ${fmt(g.items.length)}</div>
+      <div class="cat-grid">${conStockYLegacyPrimero(st, g.items).map(fila).join('')}</div>`).join('');
+    if(vis.length) return html;
     let vacioMsg = 'El catálogo está vacío. Tocá "+ Ítem al catálogo" para cargar el primero.';
-    if(st.tienda) vacioMsg = textoBusq ? `El vendedor no tiene nada que coincida con "${esc(textoBusq)}".` : 'El vendedor no tiene nada en esta categoría.';
-    else if((S.catalogo || []).length) vacioMsg = textoBusq ? `No hay ítems que coincidan con "${esc(textoBusq)}".` : 'No hay ítems en esta categoría.';
-    return html || `<div class="hint">${vacioMsg}</div>`;
+    if(FiltroCatalogo.cuantos(f)) vacioMsg = `${st.tienda ? 'El vendedor no tiene nada' : 'No hay ítems'} con esos filtros. Probá sacar alguno (✕ Limpiar todo).`;
+    else if(st.tienda) vacioMsg = 'El vendedor no tiene nada para vender.';
+    return `<div class="hint">${vacioMsg}</div>`;
   }
   // El cartelito de la tienda (tamaño, ajuste de precio y de venta), o '' sin tienda.
   function badge(st){
@@ -201,8 +160,6 @@ const FichaTienda = (() => {
     const sk = conStockActivo(st) && t.stock ? ` · piezas únicas: lo que se compra se repone (quedan ${Math.max(0, t.stock.reserva - t.stock.reposiciones)} reposiciones)` : '';
     return `Tienda · ${t.tamanoLabel || 'vendedor'}${extra}${pv ? ` · venta ${pv < 0 ? '-' : '+'}${Math.abs(pv)}%` : ''}${sk}`;
   }
-  const opcionesOrden = st => Object.entries(ordenes(st)).map(([k,v]) => `<option value="${k}">${esc(v.label)}</option>`).join('');
-  const etiquetaOrden = st => st.ordenDesc ? '↓ Mayor a menor' : '↑ Menor a mayor';
 
   /* ---------- Carrito y compra ---------- */
   function carrito(S, st){
@@ -505,8 +462,8 @@ const FichaTienda = (() => {
   }
 
   return {GRUPO_COMPRA_MAP, GRUPO_COMPRA_LABEL, GRUPO_COMPRA_ORDEN, grupoCompraDe, TIERS_ORDEN, TIERS_OCULTOS, STACK_MAX, stackMaxDe, nueva,
-    precioDeCompra, precioVenta, precioHtml, normalizarBusqueda, textoBusqueda, itemCatalogo, danoDe, ordenes, ordenar, conStockYLegacyPrimero,
-    visibles, rowHtml, catalogoHtml, badge, opcionesOrden, etiquetaOrden, carrito, agregarAlCarrito, quitarDelCarrito, agregarConsumible,
+    precioDeCompra, precioVenta, precioHtml, normalizarBusqueda, textoBusqueda, itemCatalogo, danoDe, libre, ctxFiltro, base, conStockYLegacyPrimero,
+    visibles, rowHtml, catalogoHtml, badge, carrito, agregarAlCarrito, quitarDelCarrito, agregarConsumible,
     crearItems, agregarGratis, comprar, aleatorio, ajusteVenta, precioVentaTienda, vendibles, totalVenta, venderHtml, venderCambio, vender,
     precioReparacion, costoReparar: costoDe, RECARGO_ROTO, aReparar, repararHtml, reparar, desdeDoc, conStock, leerStock, escucharStock, limitado};
 })();

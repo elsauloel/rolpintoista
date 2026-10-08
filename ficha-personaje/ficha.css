@@ -490,13 +490,7 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 }
 
 .carrito-bar{border-bottom:1px solid var(--line);background:rgba(201,133,69,.06);padding:9px 16px}
-.catalogo-filtro-fila{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:9px;padding-bottom:9px;border-bottom:1px dashed var(--line-soft)}
-.catalogo-filtro-label{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);flex:none}
-.catalogo-filtro-grupo{display:flex;align-items:center;gap:6px;flex:1 1 180px;min-width:160px}
-.catalogo-filtro-grupo select{width:auto;flex:1;min-width:0}
-.catalogo-filtro-fila #catalogo-buscar{flex:1 1 100%;min-width:0}
-.catalogo-filtro-fila #catalogo-limpiar-filtros{flex:none}
-#catalogo-filtro{width:auto;min-width:160px;font-family:"Space Mono",monospace;font-size:12px}
+.catalogo-filtros{margin-bottom:9px;padding-bottom:9px;border-bottom:1px dashed var(--line-soft)}   /* comun/filtro-catalogo.js trae su propio CSS */
 .carrito-lista{display:flex;flex-direction:column;gap:4px;max-height:110px;overflow-y:auto}
 .carrito-vacio{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted)}
 .carrito-item{display:flex;align-items:center;gap:8px;font-size:12px}

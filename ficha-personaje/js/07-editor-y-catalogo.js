@@ -201,8 +201,6 @@ document.addEventListener('click', e => {
   if(tipo && tipo.closest('#tipoitem-body')){ cerrarTipoItem(tipo.dataset.tipoitem); return; }
 });
 $('#tienda-salir').onclick = () => salirDeLaTienda();
-$('#catalogo-orden').addEventListener('change', e => { catalogoOrden = e.target.value; renderCatalogoModal(); });
-$('#catalogo-orden-dir').addEventListener('click', () => { catalogoOrdenDesc = !catalogoOrdenDesc; renderCatalogoModal(); });
 
 $('#personajes-nuevo').onclick = () => {
   $('#scrim-personajes').classList.remove('open');

@@ -86,6 +86,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-botin.js"></script>
 <script src="trampas-base.js"></script>
 <script src="item-corto.js"></script>
+<script src="filtro-catalogo.js"></script>
 <script src="ficha-tienda.js"></script>
 <script src="intercambio.js"></script>
 <script src="ficha-stats.js"></script>
@@ -672,6 +673,35 @@ prueba('la tienda: precio con ajuste, solo lo del vendedor, comprar del carrito,
   igual([precio, vis, tras, compro, st.carrito.length, num(S.loot.normal), antesRep, num(S.meta.dde), FichaCalculo.durActual(casco), faltan > 0, FichaTienda.reparar(S, st, [{it: casco, pts: 1}], true, ui), avisos.includes('No se puede reparar durante el combate')],
     [Math.max(1, Math.round(num(arma.precioCompra) * 1.5)), [arma.id], 500 - Math.max(1, Math.round(num(arma.precioCompra) * 1.5)), true, 0, 0,
      500 - Math.max(1, Math.round(num(arma.precioCompra) * 1.5)) + 1, 500 - Math.max(1, Math.round(num(arma.precioCompra) * 1.5)) + 1 - 2, 4, true, undefined, true]);   // 2 despojos a la mitad = +1; reparar 1 punto a 2 DDE
+});
+
+grupo('Filtro del catálogo (2026-10-08)');
+prueba('el filtro: qué es, una o dos manos, calidad, búsqueda con todas las palabras, precio desde–hasta, Tipo, elemento y que suba', () => {
+  const L = [
+    {id: 'a', nombre: 'Hacha leñera', tipoItem: 'arma_1m', tipoDado: 8, peso: 2, tier: 'Común', precioCompra: 40, mods: [{stat: 'pdg', val: 1}]},
+    {id: 'b', nombre: 'Mandoble', tipoItem: 'arma_2m', tipoDado: 10, peso: 3, tier: 'Raro', precioCompra: 300},
+    {id: 'c', nombre: 'Casco de hierro', tipoItem: 'cabeza', tier: 'Común', precioCompra: 30, mods: [{stat: 'def', val: 2}]},
+    {id: 'd', nombre: 'Poción de veneno', tipoItem: 'consumibles', consumible: true, tier: 'Común', precioCompra: 10},
+    {id: 'e', nombre: 'Daga eléctrica', tipoItem: 'arma_1m', tipoDado: 4, peso: 1, tier: 'Buena Calidad', precioCompra: 120, efectosGolpe: [{nombre: 'Eléctrico', danoMagico: true}]},
+  ];
+  const ids = f => FiltroCatalogo.ordenar(L.filter(it => FiltroCatalogo.pasa(it, Object.assign(FiltroCatalogo.vacio(), f), {})), Object.assign(FiltroCatalogo.vacio(), f), {}).map(i => i.id);
+  igual([ids({parte: 'arma', orden: 'nombre'}), ids({manos: '2'}), ids({tier: 'Común', orden: 'precio'}), ids({buscar: 'hacha lenera'}), ids({buscar: 'hacha casco'}),
+    ids({pMin: '30', pMax: '120', orden: 'precio'}), ids({tipo: '4'}), ids({elemento: 'rayo'}), ids({elemento: 'fisico', orden: 'nombre'}), ids({bono: 'def'}),
+    ids({orden: 'dano', desc: true}), FiltroCatalogo.cuantos(Object.assign(FiltroCatalogo.vacio(), {tier: 'Raro', pMax: '5'}))],
+    [['e', 'a', 'b'], ['b'], ['d', 'c', 'a'], ['a'], [], ['c', 'a', 'e'], ['e'], ['e'], ['e', 'a', 'b'], ['c'], ['b', 'a', 'e', 'c', 'd'], 2]);
+});
+prueba('el filtro de la tienda: «Lugar libre» deja solo lo que se puede equipar sin sacarse nada', () => {
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4},
+    inventario: [{id: 'yelmo', nombre: 'Yelmo', tipoItem: 'cabeza', equipado: true}]}).S);
+  const st = FichaTienda.nueva();
+  st.tienda = {items: [], itemsDatos: [
+    {id: 'c1', nombre: 'Casco nuevo', tipoItem: 'cabeza', precioCompra: 10, tier: 'Común'},
+    {id: 'p1', nombre: 'Botas', tipoItem: 'pies', precioCompra: 10, tier: 'Común'},
+    {id: 'x1', nombre: 'Poción', tipoItem: 'consumibles', consumible: true, precioCompra: 10, tier: 'Común'}]};
+  st.tienda.items = st.tienda.itemsDatos.map(i => i.id);
+  const todos = FichaTienda.visibles(S, st).map(i => i.id);
+  st.filtro.libre = true;
+  igual([todos.length, FichaTienda.visibles(S, st).map(i => i.id)], [3, ['p1']]);
 });
 
 grupo('📊 Stats (A6a)');

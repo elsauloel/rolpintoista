@@ -593,17 +593,7 @@ $('#nivelsocial-x').onclick = () => { nivelSocialId = null; $('#scrim-nivel-soci
 $('#scrim-nivel-social').addEventListener('mousedown', e => { if(e.target.id==='scrim-nivel-social'){ nivelSocialId = null; $('#scrim-nivel-social').classList.remove('open'); } });
 $('#scrim-chooser').addEventListener('mousedown', e => { if(e.target.id==='scrim-chooser') $('#scrim-chooser').classList.remove('open'); });
 $('#scrim-catalogo').addEventListener('mousedown', e => { if(e.target.id==='scrim-catalogo') $('#scrim-catalogo').classList.remove('open'); });
-$('#catalogo-filtro').addEventListener('change', renderCatalogoModal);
-$('#catalogo-filtro-slot').addEventListener('change', renderCatalogoModal);
-$('#catalogo-filtro-tier').addEventListener('change', renderCatalogoModal);
-$('#catalogo-buscar').addEventListener('input', renderCatalogoModal);
-$('#catalogo-limpiar-filtros').addEventListener('click', () => {
-  $('#catalogo-filtro').value = '';
-  $('#catalogo-filtro-slot').value = '';
-  $('#catalogo-filtro-tier').value = '';
-  $('#catalogo-buscar').value = '';
-  renderCatalogoModal();
-});
+// Los filtros del catálogo se manejan solos (comun/filtro-catalogo.js, `filtroCatalogo()` en js/09).
 $('#catalogo-item-aleatorio').addEventListener('click', elegirItemAleatorio);
 $('#catalogo-ver-completo').addEventListener('click', () => {
   verCatalogoCompleto = !verCatalogoCompleto;

@@ -88,24 +88,19 @@ function renderComparar(){
 let carritoCatalogo = [];
 
 // La tienda vive en comun/ficha-tienda.js (hoja de ruta A5, 2026-10-02: el mapa usa lo mismo); acá, la ventana de la ficha. El
-// estado de la tienda en pantalla son las variables de siempre (tiendaCargada, carritoCatalogo, venderSel, catalogoOrden…), que la
+// estado de la tienda en pantalla son las variables de siempre (tiendaCargada, carritoCatalogo, venderSel…), que la
 // pieza común lee y escribe a través de `tiendaSt`.
 const normalizarBusqueda = FichaTienda.normalizarBusqueda;
 const TIERS_ORDEN = FichaTienda.TIERS_ORDEN;
 const danoDe = item => FichaTienda.danoDe(item);
-let catalogoOrden = 'categoria';
-let catalogoOrdenDesc = false;
-function ordenarCatalogo(items){ return FichaTienda.ordenar(tiendaSt, items); }
 function conStockYLegacyPrimero(items){ return FichaTienda.conStockYLegacyPrimero(tiendaSt, items); }
-function renderCatalogoOrdenControles(){
-  const sel = $('#catalogo-orden');
-  if(sel && !sel.dataset.listo){
-    sel.innerHTML = FichaTienda.opcionesOrden(tiendaSt);
-    sel.dataset.listo = '1';
-  }
-  if(sel) sel.value = catalogoOrden;
-  const b = $('#catalogo-orden-dir');
-  if(b) b.textContent = FichaTienda.etiquetaOrden(tiendaSt);
+// El filtro del catálogo y la tienda (comun/filtro-catalogo.js, 2026-10-08): búsqueda, chips, orden y «Más filtros». Se arma la primera vez.
+let catalogoFiltro = null;
+function filtroCatalogo(){
+  if(!catalogoFiltro && $('#catalogo-filtros')) catalogoFiltro = FiltroCatalogo.crear($('#catalogo-filtros'), {
+    base: () => FichaTienda.base(S, tiendaSt), precio: it => FichaTienda.precioDeCompra(tiendaSt, it), libre: it => FichaTienda.libre(S, it),
+    clave: 'tienda', alCambiar: () => renderCatalogoModal()});
+  return catalogoFiltro;
 }
 // Rarezas que no se ofrecen en el catálogo general del jugador.
 const TIERS_OCULTOS = FichaTienda.TIERS_OCULTOS;
@@ -125,11 +120,8 @@ const tiendaSt = {
   get tienda(){ return tiendaCargada; }, set tienda(v){ tiendaCargada = v; },
   get carrito(){ return carritoCatalogo; }, set carrito(v){ carritoCatalogo = v; },
   get venderSel(){ return venderSel; }, set venderSel(v){ venderSel = v; },
-  get orden(){ return catalogoOrden; }, set orden(v){ catalogoOrden = v; },
-  get ordenDesc(){ return catalogoOrdenDesc; }, set ordenDesc(v){ catalogoOrdenDesc = v; },
   get verCompleto(){ return verCatalogoCompleto; }, set verCompleto(v){ verCatalogoCompleto = v; },
-  get filtros(){ return {cat: $('#catalogo-filtro') ? $('#catalogo-filtro').value : '', slot: $('#catalogo-filtro-slot') ? $('#catalogo-filtro-slot').value : '',
-    tier: $('#catalogo-filtro-tier') ? $('#catalogo-filtro-tier').value : '', buscar: $('#catalogo-buscar') ? $('#catalogo-buscar').value : ''}; },
+  get filtro(){ const c = filtroCatalogo(); return c ? c.f : FiltroCatalogo.vacio(); },
   extraItem: id => botinItemPorId(id),   // un ítem del botín (Comparar desde "Botín")
 };
 // Lo que cambia al personaje en la tienda (comprar, agregar gratis, vender, reparar): se redibuja como siempre.
@@ -174,12 +166,7 @@ function renderCabeceraTienda(){
   }
 }
 
-function limpiarFiltrosCatalogo(){
-  $('#catalogo-filtro').value = '';
-  $('#catalogo-filtro-slot').value = '';
-  $('#catalogo-filtro-tier').value = '';
-  $('#catalogo-buscar').value = '';
-}
+function limpiarFiltrosCatalogo(){ const c = filtroCatalogo(); if(c) c.limpiar(); }
 
 // El vendedor puede tener un descuento o recargo para toda la tienda. Se
 // aplica al vuelo sobre el precio de catálogo: nada reescribe S.catalogo,
@@ -353,21 +340,11 @@ function elegirItemAleatorio(){
   $('#scrim-item-aleatorio').classList.add('open');
 }
 
-function ajustarFiltroTier(){
-  const sel = $('#catalogo-filtro-tier');
-  if(!sel) return;
-  [...sel.options].forEach(o => {
-    if(!TIERS_OCULTOS.includes(o.value)) return;
-    o.hidden = !tiendaCargada;
-    if(o.hidden && sel.value === o.value) sel.value = '';
-  });
-}
-
 function renderCatalogoModal(){
-  ajustarFiltroTier();
   if(!Array.isArray(S.catalogo)) S.catalogo = structuredClone(DEFAULT.catalogo);
+  const fc = filtroCatalogo();
+  if(fc) fc.actualizar();   // lo que hay para filtrar pudo cambiar (otra tienda, 👁 ver todo, el catálogo)
   const html = FichaTienda.catalogoHtml(S, tiendaSt);
-  renderCatalogoOrdenControles();
   $('#catalogo-body').innerHTML = html;
   renderCabeceraTienda();
   $('#catalogo-dde').textContent = fmt(num(S.meta.dde));

@@ -128,9 +128,38 @@ setInterval(() => {
     if(!d.dados && anillosTiene(d)) anillosEmpezar(id, t, d);
     if(d.v('absorbearmadura') > 0 && !d.absorbe && antes !== undefined && d.rota > antes) anillosAbsorber(id, t, antes);
   });
-  if(modo !== anillosModo){ if(modo !== 'combate') primeraSangreUsadas.clear(); anillosModo = modo; }
+  if(modo !== anillosModo){
+    if(modo !== 'combate') primeraSangreUsadas.clear();
+    if(anillosModo === 'combate' && modo !== 'combate') autoRepararAlTerminar();   // la piel de troll (2026-10-08)
+    anillosModo = modo;
+  }
 }, 1000);
 
+/* Equipo que se repara solo (dueño, 2026-10-08, P171: la piel de troll): un ítem con `autoRepara` N recupera N puntos de durabilidad al terminar
+   cada combate (no saca la Armadura rota). Por turno sería casi indestructible; quizás más adelante, un pulso intermedio. Lo hace la pantalla que
+   maneja a cada personaje, al ver que el mapa sale del modo combate. */
+async function autoRepararAlTerminar(){
+  for(const [, t] of tokens){
+    if(!t || t.tipo !== 'pj' || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) continue;
+    if(typeof bnManejo !== 'function' || !bnManejo(t.fichaId)) continue;
+    const lineas = [];
+    try{
+      await editarPersonajeMapa(t.fichaId, S => {
+        lineas.length = 0;
+        (S.inventario || []).forEach(it => {
+          const n = Math.round(num(it && it.autoRepara));
+          if(!it || !it.equipado || n <= 0 || !FichaCalculo.durableItem(it)) return;
+          const max = FichaCalculo.durMax(it), antes = FichaCalculo.durActual(it);
+          if(antes >= max) return;
+          it.dur = Math.min(max, antes + n);
+          lineas.push(`${it.nombre}: se reparó sola, durabilidad ${antes} → ${it.dur}`);
+        });
+        return lineas.length > 0;
+      });
+    }catch(err){ console.error('No se pudo reparar el equipo al terminar el combate:', err); }
+    if(lineas.length) momentoAbrir({tipo: 'reparacion', icono: '🧵', titulo: `${t.oculto ? 'Alguien' : nombreDe(t)}: su equipo se repara solo`, estado: 'listo', datos: {lineas}});
+  }
+}
 /* El botón de los anillos de atributo (como la Polilla mística, js/02): con un estado `impulso` activo en tu personaje, un botón abajo a la izquierda
    suma su +N a tu última tirada; si esa tirada no es de ese atributo (ni de algo que sale de él), pregunta antes (lo decide la mesa). Se gasta. */
 function impulsoActivo(){

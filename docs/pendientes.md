@@ -301,7 +301,7 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [x] **Revisar la duración de la Parálisis** (dueño, 2026-10-08): **1 turno** (hecho: el preset y el caos).
 - [ ] **Desarrollar los grupos de buffs y debuffs** (dueño, 2026-10-07, P173): qué se apila y qué no, por familia. Lo espera la Varita del
   maleficio (Buena) y cualquier efecto que dé un bono al crítico turno a turno.
-- [ ] **Zonas del piso y zonas en el aire** (dueño, 2026-10-06): distinguir los efectos persistentes que están en el piso (brea, ácido, púas,
+- [x] **Zonas del piso y zonas en el aire** (dueño, 2026-10-06; **hecho el 2026-10-07**: `zonaAltura` piso / aire / ambos en el asistente de zonas, la Ejecución y las trampas; el fuego puede ser cualquiera de los tres según sea brasas o llamaradas — confirmado por el dueño 2026-10-08): distinguir los efectos persistentes que están en el piso (brea, ácido, púas,
   fuego del terreno) de los que ocupan un área (una nube tóxica, niebla). Hace falta para **Levitar** (hoy saltea trampas, terreno lento y el
   terreno incendiado, pero ninguna zona: una nube no se esquiva levitando) y para las **Suelas de cuero de dragón** (hoy restan a todas las zonas;
   deberían ser solo las del piso). Probable: una marca «del piso» en la zona (asistente de zonas, Ejecución de habilidades y trampas que dejan zona).

@@ -126,17 +126,33 @@ function levantadoElegir(S, it, quien){
   const manos = (S.inventario || []).filter(i => i && i.equipado && FichaCombate.esMano(i.tipoItem));
   const libre = !FichaEquipo.slotOcupado(S, it).ocupado;
   return new Promise(res => {
-    let listo = false;
+    let listo = false, comparando = false;
     const fin = v => { if(listo) return; listo = true; AvisoCombate.cerrar(); res(v); };
     const extra = Combatiente.COSTO_LEVANTAR_ARMA;
-    const botones = libre ? [{texto: '✋ Equiparlo', detalle: 'lo tenés en la mano enseguida', alClic: () => fin({destino: 'mano', soltar: []})}]
-      : (/2m$/.test(it.tipoItem) ? [{texto: `🔁 Reemplazar lo que tenés en las manos (+${fmt(extra)} No2)`, detalle: manos.map(m => m.nombre).join(' y ') + ' → a la mochila', alClic: () => fin({destino: 'mano', soltar: manos})}]
-        : manos.map(m => ({texto: `🔁 Reemplazar ${m.nombre} (+${fmt(extra)} No2)`, detalle: `${m.nombre} → a la mochila`, alClic: () => fin({destino: 'mano', soltar: [m]})})));
-    botones.push({texto: '🎒 A la mochila', sec: true, alClic: () => fin({destino: 'mochila', soltar: []})});
-    AvisoCombate.mostrar({clave: 'levantar', icono: '🗡️', titulo: `${quien} levanta ${it.nombre}`,
-      pasos: [{titulo: libre ? 'Tenés una mano libre' : 'Tenés las manos ocupadas', texto: libre ? '¿Lo equipás o lo guardás?' : `¿Lo cambiás por lo que tenés en la mano (cuesta ${fmt(extra)} No2 más) o lo guardás?`}],
-      botones, alCerrar: () => fin({destino: 'mochila', soltar: []})});
+    const dibujar = () => {
+      const botones = libre ? [{texto: '✋ Equiparlo', detalle: 'lo tenés en la mano enseguida', alClic: () => fin({destino: 'mano', soltar: []})}]
+        : (/2m$/.test(it.tipoItem) ? [{texto: `🔁 Reemplazar lo que tenés en las manos (+${fmt(extra)} No2)`, detalle: manos.map(m => m.nombre).join(' y ') + ' → a la mochila', alClic: () => fin({destino: 'mano', soltar: manos})}]
+          : manos.map(m => ({texto: `🔁 Reemplazar ${m.nombre} (+${fmt(extra)} No2)`, detalle: `${m.nombre} → a la mochila`, alClic: () => fin({destino: 'mano', soltar: [m]})})));
+      // Comparar con lo que tiene en la mano (dueño, 2026-10-08): en el mismo cartel, cada número antes → después.
+      if(manos.length && !comparando) botones.push({texto: '⚖ Comparar con lo que tenés en la mano', sec: true, alClic: () => { comparando = true; dibujar(); }});
+      botones.push({texto: '🎒 A la mochila', sec: true, alClic: () => fin({destino: 'mochila', soltar: []})});
+      const pasos = [{titulo: libre ? 'Tenés una mano libre' : 'Tenés las manos ocupadas', texto: libre ? '¿Lo equipás o lo guardás?' : `¿Lo cambiás por lo que tenés en la mano (cuesta ${fmt(extra)} No2 más) o lo guardás?`}];
+      if(comparando) manos.forEach(m => pasos.push({titulo: `${it.nombre} contra ${m.nombre}`, texto: compararTexto(it, m)}));
+      AvisoCombate.mostrar({clave: 'levantar', icono: '🗡️', titulo: `${quien} levanta ${it.nombre}`, pasos, botones, alCerrar: () => fin({destino: 'mochila', soltar: []})});
+    };
+    dibujar();
   });
+}
+// «Daño promedio 4,5 → 5,5 (+1) · PdG 0 → 1 (+1)…»: lo nuevo contra lo que tiene en la mano (los números de FichaEquipo.statsComparables).
+function compararTexto(nuevo, viejo){
+  const a = FichaEquipo.statsComparables(viejo), b = FichaEquipo.statsComparables(nuevo);
+  const claves = [...new Set([...Object.keys(a), ...Object.keys(b)])];
+  if(!claves.length) return 'Ninguno de los dos tiene números para comparar.';
+  const etq = k => (FichaEquipo.STAT_COMPARABLE_LABEL || {})[k] || (FichaCalculo.STAT_LABEL || {})[k] || k;
+  return claves.map(k => {
+    const x = num(a[k]), y = num(b[k]), d = Math.round((y - x) * 10) / 10;
+    return `${etq(k)}: ${fmt(x)} → ${fmt(y)}${d ? ` (${d > 0 ? '+' : ''}${fmt(d)})` : ' (igual)'}`;
+  }).join(' · ');
 }
 async function bnLevantarArma(elId){
   if(!bn || !bn.S || !bnPuedeGuardar()) return;

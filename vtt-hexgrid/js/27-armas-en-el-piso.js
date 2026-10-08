@@ -40,6 +40,7 @@ async function armaSoltar(t, vuela){
     const c = t.tipo === 'creep' ? creepPrivadoDe(t.fichaId) : await invDeToken(t);
     if(!c) return {manual: true, nota: 'no se pudo leer su arma: ponela en el piso a mano'};
     if(c.armaNatural || !String(c.armaNombre || '').trim()) return {nota: 'su arma es natural: no se le cae'};
+    if(armaPropiaEnElPiso(t)) return {nota: 'su arma ya estaba en el piso'};   // (un creep no la pierde de sus datos: que no suelte otra copia)
     item = armaComoItem(c, quien);
   }else{
     const p = await fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}/partes/inventario`)).get();

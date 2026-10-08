@@ -146,13 +146,26 @@ const FiltroCatalogo = (() => {
     return f.desc ? l.reverse() : l;
   }
   // Agrupado por qué es (con «Por tipo»); con otro orden, un solo grupo.
+  /* Los consumibles, en separadores (dueño, 2026-10-08: «en el bazar, un separador entre el stock fijo, los pergaminos y las pociones especiales;
+     en la góndola de la talabartería, entre trampas y otros consumibles»): los clásicos (lo legacy, siempre), pergaminos, pociones especiales,
+     luces y utilería, trampas. */
+  const SUBGRUPOS = [['clasico', '⭐', 'Clásicos (siempre hay)'], ['pergamino', '📜', 'Pergaminos'], ['pocion', '⚗', 'Pociones especiales'],
+    ['utileria', '🔦', 'Luces y utilería'], ['trampa', '🪤', 'Trampas']];
+  function grupoDe(it){
+    const p = parteDe(it);
+    if(p === 'trampa') return 'trampa';
+    if(p !== 'consumible') return p;
+    if(it.legacy) return 'clasico';
+    const c = typeof Combatiente !== 'undefined' && Combatiente.categoriaConsumible ? Combatiente.categoriaConsumible(it) : '';
+    return c === 'pergamino' ? 'pergamino' : c === 'pocion' ? 'pocion' : 'utileria';
+  }
   function agrupar(lista, f){
     if((f.orden || 'categoria') !== 'categoria') return [{clave: '', label: ORDENES[f.orden] || '', items: lista}];
     const grupos = new Map();
-    lista.forEach(it => { const p = parteDe(it); if(!grupos.has(p)) grupos.set(p, []); grupos.get(p).push(it); });
-    const orden = PARTES.map(p => p[0]);
-    return [...grupos.keys()].sort((a, b) => orden.indexOf(a) - orden.indexOf(b))
-      .map(p => ({clave: p, label: `${(PARTES.find(x => x[0] === p) || [, ''])[1]} ${PARTE_ETQ[p] || p}`.trim(), items: grupos.get(p)}));
+    lista.forEach(it => { const p = grupoDe(it); if(!grupos.has(p)) grupos.set(p, []); grupos.get(p).push(it); });
+    const orden = [...PARTES.map(p => p[0]).filter(p => p !== 'consumible' && p !== 'trampa'), ...SUBGRUPOS.map(g => g[0])];
+    const etq = k => { const sg = SUBGRUPOS.find(g => g[0] === k); if(sg) return `${sg[1]} ${sg[2]}`; return `${(PARTES.find(x => x[0] === k) || [, ''])[1]} ${PARTE_ETQ[k] || k}`.trim(); };
+    return [...grupos.keys()].sort((a, b) => orden.indexOf(a) - orden.indexOf(b)).map(k => ({clave: k, label: etq(k), items: grupos.get(k)}));
   }
 
   const CSS = `

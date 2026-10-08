@@ -402,7 +402,7 @@ input[type=checkbox]{width:auto}
 <script src="../comun/efectos-golpe.js"></script>
 <script src="../comun/catalogo.js?v=20261008zy"></script>
 <script src="../comun/generador-tiendas.js?v=20261008zz"></script>   <!-- la regla de cómo se arma una tienda (2026-10-06) -->
-<script src="../comun/filtro-catalogo.js?v=20261008zu"></script>   <!-- el filtro del catálogo, uno para todos lados (2026-10-08) -->
+<script src="../comun/filtro-catalogo.js?v=20261008zz2"></script>   <!-- el filtro del catálogo, uno para todos lados (2026-10-08) -->
 <script src="../comun/items-subidos.js?v=20261007h"></script>
 <script src="../comun/plantillas.js?v=20261007ar"></script>
 <script src="../comun/item-corto.js?v=20261008zz1"></script>
@@ -816,12 +816,10 @@ function renderPreview(){
   if(!visibles.length){
     html = `<div class="hint">Ningún ítem de la tienda coincide con "${esc(textoBusqueda)}".</div>`;
   }else if(ordenActual === 'categoria' && seccionVista){
-    // Una sola sección: por rubro, como lo agrupa la tienda.
-    RUBRO_ORDEN.forEach(rubro => {
-      const delRubro = conLegacyPrimero(ordenarItems(visibles.filter(it => rubroDe(it) === rubro)), garantizados);
-      if(!delRubro.length) return;
-      html += `<div class="cat-grouphead">${RUBRO_LABEL[rubro]} · ${fmt(delRubro.length)}</div>`;
-      html += `<div class="cat-grid">${delRubro.map(it => itemCardHtml(it, garantizados.has(it.id))).join('')}</div>`;
+    // Una sola sección: con los mismos separadores que ve el jugador (qué es; los consumibles, en clásicos, pergaminos, pociones, utilería, trampas).
+    FiltroCatalogo.agrupar(ordenarItems(visibles), {orden: 'categoria'}).forEach(g => {
+      html += `<div class="cat-grouphead">${esc(g.label)} · ${fmt(g.items.length)}</div>`;
+      html += `<div class="cat-grid">${g.items.map(it => itemCardHtml(it, garantizados.has(it.id))).join('')}</div>`;
     });
   }else if(ordenActual === 'categoria'){
     // Por sección (P179): lo que el jugador va a ver en cada pestaña.

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="gm-tools.css?v=20261002bot">
+<link rel="stylesheet" href="gm-tools.css?v=20261008a">
 <script src="../comun/embebido.js?v=20260930b"></script>
 <script src="../comun/mensajes-mapa.js?v=20261008e"></script>
 <script>
@@ -205,7 +205,7 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
   <div class="modal">
     <header><h3 id="veritem-titulo">Ítem</h3><button class="iconbtn" id="veritem-x">Cerrar</button></header>
     <div class="body" id="veritem-body"></div>
-    <footer style="display:flex;justify-content:flex-end;gap:8px;padding:12px 15px;border-top:1px solid var(--line)">
+    <footer style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;padding:12px 15px;border-top:1px solid var(--line)">
       <button class="btn del" id="veritem-baja" style="display:none" title="Pedile al dueño que lo saque del catálogo, con una justificación">🗑 Solicitar eliminar</button>
       <button class="btn primary" id="veritem-editar" title="Editá una copia y subila al catálogo compartido (no cambia este ítem)">✎ Editar y subir</button>
     </footer>

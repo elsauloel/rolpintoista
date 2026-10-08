@@ -53,6 +53,8 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .btn.primary{background:var(--copper);border-color:var(--copper);color:#180F08;font-weight:700}
 .btn.primary:hover{background:var(--brass)}
 .btn.ghost{color:var(--muted)}
+.btn.del{color:var(--danger);border-color:rgba(212,87,78,.4)}   /* Solicitar eliminar (2026-10-08: como en la ficha y GM Tools) */
+.btn.del:hover{border-color:var(--danger);background:rgba(212,87,78,.12)}
 .btn.publicar{background:#2E6B57;border-color:#2E6B57;color:#EAF3E6;font-weight:700}
 .btn.publicar:hover{background:#3A8770;border-color:#3A8770}
 
@@ -168,7 +170,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .modal .filtros select{flex:1 1 150px;width:auto}
 .iconbtn{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);padding:5px 10px;border-radius:var(--r)}
 .iconbtn:hover{border-color:var(--copper);color:var(--paper)}
-.modal footer{display:flex;gap:8px;justify-content:flex-end;padding:12px 15px;border-top:1px solid var(--line);flex:none}
+.modal footer{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;padding:12px 15px;border-top:1px solid var(--line);flex:none}   /* flex-wrap (2026-10-08): si los botones no entran, bajan de renglón en vez de salirse de la ventana */
 
 /* Formulario de "Crear ítem nuevo" — mismo patrón que datos/catalogo-editor.html. */
 .f{display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
@@ -387,7 +389,7 @@ input[type=checkbox]{width:auto}
       <button class="iconbtn" id="ver-x">Cerrar</button>
     </header>
     <div class="body" id="ver-body"></div>
-    <footer style="display:flex;justify-content:flex-end;gap:9px;padding:12px 15px;border-top:1px solid var(--line)">
+    <footer style="display:flex;flex-wrap:wrap;justify-content:flex-end;gap:9px;padding:12px 15px;border-top:1px solid var(--line)">
       <button class="btn del" id="ver-baja" title="Pedile al dueño que lo saque del catálogo, con una justificación">🗑 Solicitar eliminar</button>
       <button class="btn ghost" id="ver-editar" title="Editá una copia y subila al catálogo compartido (no cambia la tienda)">✎ Editar y subir</button>
       <button class="btn primary" id="ver-toggle">Agregar a la tienda</button>

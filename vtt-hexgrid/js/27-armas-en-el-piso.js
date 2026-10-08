@@ -97,18 +97,22 @@ async function armaTomar(elId, t){
   it = {...it, nombre: it.nombre || el.armaNombre || 'Arma', id: `arma-${Date.now().toString(36)}`, equipado: false};
   return {it, propia: !!t && el.armaDe === armaRefDe(t)};
 }
-// El ícono y el nombre (los dibuja js/05, con el resto de los elementos).
+// Se dibuja como una ficha REDONDA (dueño, 2026-10-07: lo que no es un personaje ni una criatura va redondo, para distinguirlo de los tokens
+// hexagonales), con el 🗡 adentro y el nombre del arma debajo (los dibuja js/05, con el resto de los elementos).
 function armaDibujar(el, z){
-  const p = hexCentro(el.origen.col, el.origen.fila);
+  const p = hexCentro(el.origen.col, el.origen.fila), R = HEX * 0.62;
   ctx.save();
+  ctx.beginPath(); ctx.arc(p.x, p.y, R, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(28,24,26,.92)'; ctx.fill();
+  ctx.lineWidth = 3 / z; ctx.strokeStyle = '#C9C9C9'; ctx.stroke();
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.font = `700 ${24 / z}px system-ui, sans-serif`;
-  ctx.fillText('🗡', p.x, p.y);
+  ctx.font = `700 ${R * 1.05}px system-ui, sans-serif`;
+  ctx.fillText('🗡', p.x, p.y + R * 0.04);
   const txt = String(el.armaNombre || 'Arma');
   ctx.font = `700 ${11 / z}px "Space Mono", monospace`;
-  const w = ctx.measureText(txt).width + 8 / z, h = 15 / z;
-  ctx.fillStyle = 'rgba(15,12,14,.85)'; ctx.fillRect(p.x - w / 2, p.y + 14 / z, w, h);
-  ctx.fillStyle = '#EDE3D2'; ctx.fillText(txt, p.x, p.y + 14 / z + h / 2);
+  const w = ctx.measureText(txt).width + 8 / z, h = 15 / z, y = p.y + R + 3 / z;
+  ctx.fillStyle = 'rgba(15,12,14,.85)'; ctx.fillRect(p.x - w / 2, y, w, h);
+  ctx.fillStyle = '#EDE3D2'; ctx.fillText(txt, p.x, y + h / 2);
   ctx.restore();
 }
 

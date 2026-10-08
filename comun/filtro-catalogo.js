@@ -11,6 +11,7 @@
    cfg = {base() → los ítems entre los que se filtra (lo que vende la tienda, el catálogo…), precio(it)? (el de la tienda, con su ajuste),
           libre(it)? → true / false / null (¿tiene libre el lugar del cuerpo donde va? null = no va en el cuerpo; sin esta función no hay chip),
           statLabel(st)?, etiquetas? (true: el filtro «Efecto escaso», para el GM), origen? (true: «de fábrica / del grupo»),
+          calidad? (false: sin los chips de calidad ni el orden por calidad — los jugadores no ven la calidad, dueño 2026-10-08),
           ordenes? (claves de ORDENES a ofrecer), inicial? (valores de arranque), clave? (para recordar «Más filtros» abierto y el orden),
           alCambiar()}
    El que filtra también sirve suelto: FiltroCatalogo.pasa(it, f, ctx), ordenar(lista, f, ctx), agrupar(lista, f). */
@@ -76,7 +77,7 @@ const FiltroCatalogo = (() => {
     let t = textoCache.get(it);
     if(t !== undefined) return t;
     const partes = [it.nombre, it.detalle, it.descripcionNarrativa, it.efectoNombre, it.efectoDetalle, it.equipoEstadoNombre, it.equipoEstadoDetalle,
-      it.equipoEstadoPreset, it.tier, PARTE_ETQ[parteDe(it)], ...golpesDe(it), it.especial && it.especial.nombre];
+      it.equipoEstadoPreset, PARTE_ETQ[parteDe(it)], ...golpesDe(it), it.especial && it.especial.nombre];
     if(typeof FichaEquipo !== 'undefined' && FichaEquipo.CATEGORIA_LABEL) partes.push(FichaEquipo.CATEGORIA_LABEL[it.tipoItem]);
     [...(it.mods || []), ...(it.efectoMods || [])].forEach(m => { if(m && m.stat){ partes.push((statLabel || statLabelDe)(m.stat)); if(typeof FichaCalculo !== 'undefined' && FichaCalculo.STAT_FULL) partes.push(FichaCalculo.STAT_FULL[m.stat]); } });
     t = sinAcentos(partes.filter(Boolean).join(' '));
@@ -198,7 +199,8 @@ const FiltroCatalogo = (() => {
     const recordar = () => { try{ if(cfg.clave) localStorage.setItem('filtro-' + cfg.clave, JSON.stringify({mas: masAbierto, orden: f.orden, desc: f.desc})); }catch(e){} };
     const g0 = guardado();
     if(g0){ masAbierto = !!g0.mas; if(g0.orden && ORDENES[g0.orden]) f.orden = g0.orden; f.desc = !!g0.desc; }
-    const ordenes = (cfg.ordenes || Object.keys(ORDENES)).filter(k => ORDENES[k]);
+    const conCalidad = cfg.calidad !== false;
+    const ordenes = (cfg.ordenes || Object.keys(ORDENES)).filter(k => ORDENES[k] && (conCalidad || k !== 'rareza'));
     if(!ordenes.includes(f.orden)) f.orden = ordenes[0];
     const base = () => { try{ return (cfg.base ? cfg.base() : []) || []; }catch(e){ console.error(e); return []; } };
     const q = s => cont.querySelector(s);
@@ -269,13 +271,13 @@ const FiltroCatalogo = (() => {
       const ct = conteo(items, 'tier', it => it.tier || '');
       const tiers = TIERS.filter(t => ct.c.get(t) || f.tier === t);
       const cm = conteo(items, 'manos', manosDe);
-      let fila2 = `<span class="fc-etq">Calidad</span>` + tiers.map(t => chip('tier', t, `<span class="fc-punto"></span>${esc(TIER_ETQ[t] || t)}`, ct.c.get(t) || 0,
+      let fila2 = !conCalidad ? '' : `<span class="fc-etq">Calidad</span>` + tiers.map(t => chip('tier', t, `<span class="fc-punto"></span>${esc(TIER_ETQ[t] || t)}`, ct.c.get(t) || 0,
         {clase: 'tier', color: TIER_COLOR[t]})).join('');
-      if(cm.c.get('1') || cm.c.get('2') || f.manos) fila2 += `<span class="fc-sep"></span><span class="fc-etq">Empuñadura</span>`
+      if(cm.c.get('1') || cm.c.get('2') || f.manos) fila2 += `${fila2 ? '<span class="fc-sep"></span>' : ''}<span class="fc-etq">Empuñadura</span>`
         + chip('manos', '1', '✋ Una mano', cm.c.get('1') || 0, {titulo: 'Armas y escudos de una mano'}) + chip('manos', '2', '🙌 Dos manos', cm.c.get('2') || 0, {titulo: 'Armas y escudos de dos manos'});
       if(cfg.libre){
         const cl = conteo(items, 'libre', it => cfg.libre(it) === true ? 'si' : '');
-        fila2 += `<span class="fc-sep"></span>` + chip('libre', 'si', '🟢 Lugar libre', cl.c.get('si') || 0,
+        fila2 += (fila2 ? `<span class="fc-sep"></span>` : '') + chip('libre', 'si', '🟢 Lugar libre', cl.c.get('si') || 0,
           {clase: 'libre', titulo: 'Solo lo que te podés equipar sin sacarte nada: el lugar del cuerpo donde va lo tenés libre'});
       }
       q('[data-fc-zona="fila2"]').innerHTML = fila2;

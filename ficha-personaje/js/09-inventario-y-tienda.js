@@ -99,7 +99,7 @@ let catalogoFiltro = null;
 function filtroCatalogo(){
   if(!catalogoFiltro && $('#catalogo-filtros')) catalogoFiltro = FiltroCatalogo.crear($('#catalogo-filtros'), {
     base: () => FichaTienda.base(S, tiendaSt), precio: it => FichaTienda.precioDeCompra(tiendaSt, it), libre: it => FichaTienda.libre(S, it),
-    clave: 'tienda', alCambiar: () => renderCatalogoModal()});
+    calidad: false, clave: 'tienda', alCambiar: () => renderCatalogoModal()});   // los jugadores no ven la calidad (dueño, 2026-10-08)
   return catalogoFiltro;
 }
 // Rarezas que no se ofrecen en el catálogo general del jugador.

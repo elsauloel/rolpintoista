@@ -458,7 +458,7 @@ function trampasGuardadasHtml(){
 // Estado automático de una trampa (2026-09-24): los debuffs de EstadosAplicar con duración (Escarcha, Pajaritos, Rengo, Stun…).
 // Al pisarla se aplica solo a quien la activa (y a los de adentro si es de área), con los turnos que se elijan al colocarla.
 function trampaEstadoPresets(){
-  return (typeof EstadosAplicar !== 'undefined' ? EstadosAplicar.DEBUFFS : []).filter(p => !p.permanente && num(p.turnos) > 0 && !p.esVeneno);
+  return (typeof EstadosAplicar !== 'undefined' ? EstadosAplicar.DEBUFFS : []).filter(p => !p.permanente && num(p.turnos) > 0 && !p.esVeneno && !p.soloSistema);
 }
 function trampaEstadoTurnosPreset(nombre){
   const p = trampaEstadoPresets().find(x => x.nombre === nombre);

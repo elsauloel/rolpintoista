@@ -396,7 +396,7 @@ function abrirPresetsEfecto(destino){
   // botón "Estado personalizado" del header, que sí abre el editor.
   let html = (presetDestino === 'directo' || presetDestino === 'inv') ? '' : `<button type="button" class="preset-blanco" data-preset="">— Empezar en blanco —</button>`;
   ['buff','debuff','otro'].forEach(pol => {
-    const del = EFECTOS_PRESET.map((p,i) => ({p,i})).filter(({p}) => (p.polaridad || 'otro') === pol);
+    const del = EFECTOS_PRESET.map((p,i) => ({p,i})).filter(({p}) => (p.polaridad || 'otro') === pol && !p.soloSistema);
     if(!del.length) return;
     html += `<div class="preset-grupo">${POLARIDAD_EFECTO_LABEL[pol]} · ${fmt(del.length)}</div>`;
     html += `<div class="preset-grid">${del.map(({p,i}) => presetBtnHtml(p, `std:${i}`, pol)).join('')}</div>`;
@@ -500,7 +500,7 @@ function aplicarPresetEfecto(valor){
 
 function optgroupsEfectosPresetHtml(){
   return ['buff','debuff','otro'].map(pol => {
-    const opts = EFECTOS_PRESET.map((p,i) => ({p,i})).filter(({p}) => (p.polaridad||'otro') === pol);
+    const opts = EFECTOS_PRESET.map((p,i) => ({p,i})).filter(({p}) => (p.polaridad||'otro') === pol && !p.soloSistema);
     if(!opts.length) return '';
     return `<optgroup label="${POLARIDAD_EFECTO_LABEL[pol]}">${opts.map(({p,i}) => `<option value="std:${i}">${esc(p.nombre)}</option>`).join('')}</optgroup>`;
   }).join('');

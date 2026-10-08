@@ -77,7 +77,7 @@ const SelectorEstados = (() => {
     return new Promise(resolve => {
       let html = '';
       ['buff', 'debuff', 'otro'].forEach(pol => {
-        const del = presets.map((p, i) => ({p, i})).filter(({p}) => (p.polaridad || 'otro') === pol);
+        const del = presets.map((p, i) => ({p, i})).filter(({p}) => (p.polaridad || 'otro') === pol && !p.soloSistema);   // (sin los «solo del sistema», 2026-10-08)
         if(!del.length) return;
         html += `<div class="se-grupo">${POLARIDAD[pol]} · ${fmt(del.length)}</div><div class="se-grid">${del.map(({p, i}) => tarjeta(p, `std:${i}`, pol, cfg)).join('')}</div>`;
       });

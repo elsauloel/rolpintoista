@@ -755,7 +755,7 @@ const AsistenteDueloHab = (() => {
     // se puede escribir otro a mano si no hay lista.
     const BUFF_PRESETS = (typeof EstadosAplicar !== 'undefined' && EstadosAplicar.BUFFS) || [];
     function nombresEstado(){
-      const debuffs = (typeof EstadosAplicar !== 'undefined' && EstadosAplicar.DEBUFFS) ? EstadosAplicar.DEBUFFS.map(p => p.nombre) : [];
+      const debuffs = (typeof EstadosAplicar !== 'undefined' && EstadosAplicar.DEBUFFS) ? EstadosAplicar.DEBUFFS.filter(p => !p.soloSistema).map(p => p.nombre) : [];
       return [...debuffs, ...BUFF_PRESETS.map(p => p.nombre)];
     }
     // Un efecto de la lista `st.efectos`, listo para guardar en `duelo.efectos` — mismo shape tanto si vino del

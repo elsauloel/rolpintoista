@@ -461,17 +461,20 @@ function celdasVisionDe(t, ignorarSolidos){
 /* Las luces del piso (2026-10-08, Varita de la luz flotante): una zona con `zonaLuz` ilumina sus casillas para todos (se las ve desde lejos si nada
    tapa la vista) y, mientras dura, deja ver lo oculto que tiene adentro (trampas escondidas, creeps en sigilo). Al apagarse vuelve a quedar oculto:
    no se «descubre» para siempre. */
-let luzPisoCache = {firma: null, set: new Set()};
-function luzPisoSet(){
+// Solo la que lo dice (`revela` en su zonaEstado, 2026-10-08: la luz flotante sí, la del farol Común no) deja ver lo oculto; todas iluminan.
+let luzPisoCache = {firma: null, set: new Set(), revela: new Set()};
+const luzRevela = el => { try{ return !!(JSON.parse(el.zonaEstado || '{}') || {}).revela; }catch(e){ return false; } };
+function luzPisoCalcular(){
   let f = '';
   elementos.forEach((el, id) => { if(el.zona && el.zonaLuz) f += `${id}:${el.origen.col},${el.origen.fila};`; });
-  if(f === luzPisoCache.firma) return luzPisoCache.set;
-  const set = new Set();
-  elementos.forEach(el => { if(el.zona && el.zonaLuz) celdasDeElemento(el).forEach(c => set.add(nbPack(c.col, c.fila))); });
-  luzPisoCache = {firma: f, set};
-  return set;
+  if(f === luzPisoCache.firma) return luzPisoCache;
+  const set = new Set(), revela = new Set();
+  elementos.forEach(el => { if(el.zona && el.zonaLuz){ const r = luzRevela(el); celdasDeElemento(el).forEach(c => { set.add(nbPack(c.col, c.fila)); if(r) revela.add(nbPack(c.col, c.fila)); }); } });
+  luzPisoCache = {firma: f, set, revela};
+  return luzPisoCache;
 }
-const iluminadaPorLuz = el => { const s = luzPisoSet(); return !!s.size && celdasDeElemento(el).some(c => s.has(nbPack(c.col, c.fila))); };
+const luzPisoSet = () => luzPisoCalcular().set, luzReveladas = () => luzPisoCalcular().revela;
+const iluminadaPorLuz = el => { const s = luzReveladas(); return !!s.size && celdasDeElemento(el).some(c => s.has(nbPack(c.col, c.fila))); };
 // Lo oculto que ven los personajes con «Ve lo oculto» (radio) dentro de su campo de visión: creeps en sigilo y trampas escondidas.
 let revelaFirma = '', reveladas = new Set();
 function revelarActualizar(){
@@ -490,7 +493,7 @@ function revelarActualizar(){
     if(el.trampa && !el.disparada && !trampasVistas.has(id) && celdasDeElemento(el).some(c => reveladas.has(nbPack(c.col, c.fila)))) descubrirTrampa(id);
   });
 }
-const reveladaCasilla = t => reveladas.has(nbPack(t.col, t.fila)) || luzPisoSet().has(nbPack(t.col, t.fila));   // (o la alumbra una luz del piso)
+const reveladaCasilla = t => reveladas.has(nbPack(t.col, t.fila)) || luzReveladas().has(nbPack(t.col, t.fila));   // (o la alumbra una luz del piso que revela)
 
 // ¿Este token descubre niebla? Los personajes sí; sus invocaciones también,
 // mientras estén invocadas y vivas.

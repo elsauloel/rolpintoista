@@ -293,7 +293,7 @@ const ESTADOS_PRESET_GM = estadosPresetCreep();
 const POLARIDAD_ESTADO_LABEL = {buff:'Buffs', debuff:'Debuffs', otro:'Otros'};
 function optgroupsEstadosPresetHtml(){
   return ['buff','debuff','otro'].map(pol => {
-    const opts = ESTADOS_PRESET_GM.map((p,i) => ({p,i})).filter(({p}) => (p.polaridad||'otro') === pol);
+    const opts = ESTADOS_PRESET_GM.map((p,i) => ({p,i})).filter(({p}) => (p.polaridad||'otro') === pol && !p.soloSistema);
     if(!opts.length) return '';
     return `<optgroup label="${POLARIDAD_ESTADO_LABEL[pol]}">${opts.map(({p,i}) => `<option value="std:${i}">${esc(p.nombre)}</option>`).join('')}</optgroup>`;
   }).join('');
@@ -350,7 +350,7 @@ function abrirPresetsEstadoCreep(scId){
   const propios = S.estadosPersonalizados || [];
   let html = '';
   ['buff','debuff','otro'].forEach(pol => {
-    const del = ESTADOS_PRESET_GM.map((p,i) => ({p,i})).filter(({p}) => (p.polaridad || 'otro') === pol);
+    const del = ESTADOS_PRESET_GM.map((p,i) => ({p,i})).filter(({p}) => (p.polaridad || 'otro') === pol && !p.soloSistema);
     if(!del.length) return;
     html += `<div class="preset-grupo">${POLARIDAD_ESTADO_LABEL[pol]} · ${fmt(del.length)}</div>`;
     html += `<div class="preset-grid">${del.map(({p,i}) => presetBtnHtmlCreep(p, `std:${i}`, pol)).join('')}</div>`;
@@ -375,7 +375,7 @@ function elegirEstadoDuelo(){
     const propios = S.estadosPersonalizados || [];
     let html = `<button type="button" class="preset-blanco" data-presetcreep="">— Empezar en blanco —</button>`;
     ['buff','debuff','otro'].forEach(pol => {
-      const del = ESTADOS_PRESET_GM.map((p,i) => ({p,i})).filter(({p}) => (p.polaridad || 'otro') === pol);
+      const del = ESTADOS_PRESET_GM.map((p,i) => ({p,i})).filter(({p}) => (p.polaridad || 'otro') === pol && !p.soloSistema);
       if(!del.length) return;
       html += `<div class="preset-grupo">${POLARIDAD_ESTADO_LABEL[pol]} · ${fmt(del.length)}</div>`;
       html += `<div class="preset-grid">${del.map(({p,i}) => presetBtnHtmlCreep(p, `std:${i}`, pol)).join('')}</div>`;

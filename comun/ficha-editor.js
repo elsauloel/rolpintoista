@@ -317,7 +317,7 @@ const FichaEditor = (() => {
   const TRAMPA_DANO_RE = /^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i;
   // Estados que puede dejar una trampa (los debuffs con duración de EstadosAplicar).
   function trampaEstadosLista(){
-    return EstadosAplicar.DEBUFFS.filter(p => !p.permanente && Number(p.turnos) > 0 && !p.esVeneno).map(p => ({nombre: p.nombre, detalle: p.detalle || '', turnos: Number(p.turnos), permanente: false}));
+    return EstadosAplicar.DEBUFFS.filter(p => !p.permanente && Number(p.turnos) > 0 && !p.esVeneno && !p.soloSistema).map(p => ({nombre: p.nombre, detalle: p.detalle || '', turnos: Number(p.turnos), permanente: false}));
   }
 
   function crear(donde, ctx){

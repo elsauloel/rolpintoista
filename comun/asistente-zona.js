@@ -72,7 +72,7 @@ const AsistenteZona = (() => {
       nombre: '', color: colores[0], alfa: 40,
     };
     const PASOS = ['tamano', 'dano', 'estado', 'resistencia', 'disparo', 'nombre', 'resumen'];
-    const nombresEstado = () => (typeof EstadosAplicar !== 'undefined' && EstadosAplicar.DEBUFFS) ? EstadosAplicar.DEBUFFS.map(p => p.nombre) : [];
+    const nombresEstado = () => (typeof EstadosAplicar !== 'undefined' && EstadosAplicar.DEBUFFS) ? EstadosAplicar.DEBUFFS.filter(p => !p.soloSistema).map(p => p.nombre) : [];
     const presetEstado = () => (typeof EstadosAplicar !== 'undefined' && EstadosAplicar.DEBUFFS) ? EstadosAplicar.DEBUFFS.find(p => p.nombre === est.estado) : null;
     const esVeneno = () => ['Veneno', 'Veneno severo'].includes(est.estado);
     const danoTxt = () => est.haceDano ? `${Math.max(1, est.dados)}d${est.caras}${est.fijo ? (est.fijo > 0 ? '+' : '') + est.fijo : ''}` : '';

@@ -266,7 +266,7 @@ const CreepEditor = (() => {
     }
     // Menú paso a paso de trampas (comun/asistente-trampa.js, 2026-09-25): «Ajustar todo».
     function abrirAsistenteTrampa(){
-      const lista = EstadosAplicar.DEBUFFS.filter(p => !p.permanente && num(p.turnos) > 0 && !p.esVeneno).map(p => ({nombre: p.nombre, detalle: p.detalle || '', turnos: num(p.turnos), permanente: false}));
+      const lista = EstadosAplicar.DEBUFFS.filter(p => !p.permanente && num(p.turnos) > 0 && !p.esVeneno && !p.soloSistema).map(p => ({nombre: p.nombre, detalle: p.detalle || '', turnos: num(p.turnos), permanente: false}));
       AsistenteTrampa.abrir({
         contexto: 'habilidad', editando: false, estados: lista, inicial: AsistenteTrampa.inicialDe(trampa || {}),
         alTerminar: res => { trampa = AsistenteTrampa.aTrampa(res); $h('trampa-on').checked = true; trampaRender(); },

@@ -1622,6 +1622,16 @@ prueba('buscador de estados (2026-10-08): por nombre sin acentos, por palabra cl
   cont.remove();
   igual([...r, grupos, vacio, !!cont.querySelector('.be-caja input')], [['Regeneración'], ['Vida extra', 'Barrera'], ['Parálisis'], ['Regeneración', 'Veneno'], ['Parálisis'], [], [false, false], true, true]);
 });
+prueba('luces (2026-10-08): el farol Común ilumina 1 turno y marca 2 (no revela); la luz flotante 2 turnos, revela y marca 3 (2 SP); las bengalas, lo mismo como consumibles; el Mareo de invocación fuera de los menús', () => {
+  const cat = id => CATALOGO_BASE.find(x => x.id === id);
+  const z = d => Combatiente.zonaDeHab({nombre: 'L'}, d, {fichaId: 'f', tipo: 'pj'});
+  const farol = z(cat('esp-varita-del-farol').especial.duelo), flot = z(cat('esp-buena-varita-de-la-luz-flotante').especial.duelo);
+  const beng = cat('nuevo-bengala'), estelar = cat('nuevo-bengala-estelar');
+  const mareo = ESTADOS_PRESET.find(p => p.nombre === 'Mareo de invocación');
+  igual([farol.radio, farol.zonaTurnos, farol.zonaEstado.turnos, !!farol.zonaEstado.revela, flot.radio, flot.zonaTurnos, flot.zonaEstado.turnos, flot.zonaEstado.revela, cat('esp-buena-varita-de-la-luz-flotante').especial.sp,
+         beng.consumible, beng.zonaUso.zonaLuz, beng.zonaUso.zonaEstado.turnos, estelar.zonaUso.zonaEstado.revela, estelar.tier, !!mareo.soloSistema, !!EstadosAplicar.presetPorNombre ? !!EstadosAplicar.presetPorNombre('Mareo de invocación') : true],
+    [1, 1, 2, false, 2, 2, 3, true, 2, true, true, 2, true, 'Buena Calidad', true, true]);
+});
 prueba('varitas Comunes de arena y portal (2026-10-07): la trampa se suelta contra tu Ef.Esp y frena al salir; la zona igual; el portal aliado va al mapa', () => {
   const sc = creepPrueba({esp: 9});
   const it = id => ({...structuredClone(CATALOGO_BASE.find(x => x.id === id)), id: 'x'});
@@ -2529,11 +2539,11 @@ prueba('✨ armas especiales de un creep (2026-10-05): No2 como un personaje, el
   igual([h.tiradaExtra, h.duelo.objetivo, !!p1.error, sc.nitros < 6, /espera/.test(p2.error || ''), !!escudo, espera1, (sc.esperaEspecial || {})[varita.id], JSON.stringify(varita) === antes, CreepAcciones.ESPERA_POR_SP(1), CreepAcciones.ESPERA_POR_SP(4)],
     ['1d4', 'enemigo', false, true, true, true, 1, undefined, true, 1, 2]);
 });
-prueba('✨ armas especiales Comunes (2026-10-05): 33 armas y 3 orbes; cada una automatiza algo o aclara lo que queda a mano', () => {
+prueba('✨ armas especiales Comunes (2026-10-05): 34 armas y 3 orbes; cada una automatiza algo o aclara lo que queda a mano', () => {
   const L = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-') && i.tier === 'Común');   // (las de Buena y Raro, en sus pruebas)
   const armas = L.filter(i => i.especial), orbes = L.filter(i => i.orbe);
   const sinNada = armas.filter(i => !i.especial.duelo && !i.especial.trampaColocar && !i.especial.portalMapa && !/✋/.test(i.detalle)).map(i => i.nombre);
-  igual([armas.length, orbes.length, L.every(i => i.tier === 'Común' && i.ranuras === 1), sinNada, armas.every(i => /No2/.test(i.detalle))], [33, 3, true, [], true]);
+  igual([armas.length, orbes.length, L.every(i => i.tier === 'Común' && i.ranuras === 1), sinNada, armas.every(i => /No2/.test(i.detalle))], [34, 3, true, [], true]);
 });
 prueba('mochila (dueño, 2026-10-05, P158): todo ítem ocupa al menos 1 ranura (una pila, 1), salvo que diga lo contrario; el catálogo, todo en 1', () => {
   const R = FichaEquipo.ranuras;

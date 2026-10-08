@@ -61,10 +61,10 @@ const GeneradorTiendas = (() => {
      `legacy` del ítem (el editor del catálogo). */
   const clasicos = catalogo => catalogo.filter(it => it && it.legacy && !it.archivo && !it.soloBotin && TIERS.indexOf(it.tier) >= 0 && TIERS.indexOf(it.tier) <= 2);
   const SECCIONES = {
-    herreria: {label: 'Herrería', icono: '⚒', detalle: 'guerra pesada: armas de Tipo 8 o más, escudos, armadura rígida, cascos y guanteletes',
-      receta: {arma: 40, escudo: 14, torso: 16, cabeza: 12, manos: 10, piernas: 4, pies: 4}, familias: [8, 10]},
-    talabarteria: {label: 'Talabartería', icono: '🧵', detalle: 'cuero, madera y cuerda: armas a distancia y livianas (Tipo 4 y 6), cuero, botas, cinturones, mochilas y trampas',
-      receta: {distancia: 22, arma: 14, torso: 12, cabeza: 6, manos: 6, piernas: 8, pies: 8, cinturon: 8, mochila: 8, trampa: 8}, familias: [4, 6]},
+    herreria: {label: 'Herrería', icono: '⚒', detalle: 'guerra pesada: armas de Tipo 6 o más, escudos, armadura rígida, cascos y guanteletes',
+      receta: {arma: 40, escudo: 14, torso: 16, cabeza: 12, manos: 10, piernas: 4, pies: 4}, familias: [6, 8, 10]},
+    talabarteria: {label: 'Talabartería', icono: '🧵', detalle: 'cuero, madera y cuerda: armas a distancia y livianas (Tipo 4), cuero, botas, cinturones, mochilas y trampas',
+      receta: {distancia: 22, arma: 14, torso: 12, cabeza: 6, manos: 6, piernas: 8, pies: 8, cinturon: 8, mochila: 8, trampa: 8}, familias: [4]},
     bazar: {label: 'Bazar arcano', icono: '✨', detalle: 'lo mágico: consumibles, varitas y báculos, orbes, anillos y piezas de caster',
       receta: {consumible: 40, especial: 20, orbe: 8, anillo: 13, torso: 6, cabeza: 5, manos: 4, cinturon: 4}, minimos: {especial: 2}},
   };
@@ -76,9 +76,10 @@ const GeneradorTiendas = (() => {
     'tipo5', 'paradafacil', 'escolta', 'embestida', 'critpot', 'contraahorro'];
   const suma = (it, lista) => lista.reduce((a, st) => a + Math.max(0, mod(it, st)), 0);
   /* A qué sección va un ítem (siempre la misma: así la tienda publicada no guarda nada nuevo y lo que se repone cae en la misma pestaña).
-     Lo mágico al Bazar; trampas, armas a distancia, mochilas y lo suelto a la Talabartería; las armas, por su Tipo (4 y 6 livianas, 8 o más
-     pesadas); los escudos a la Herrería; las armaduras, por lo que más dan (Defensa especial → Bazar, como dijo el dueño el 2026-10-07; el torso
-     rígido a la Herrería y el blando a la Talabartería; el resto, Fuerza contra Destreza). */
+     Lo mágico al Bazar; trampas, armas a distancia, mochilas y lo suelto a la Talabartería; las armas, por su Tipo (Tipo 4 livianas → Talabartería;
+     6 o más → Herrería, dueño 2026-10-08); los escudos a la Herrería; las armaduras, por lo que más dan (Defensa especial → Bazar, como dijo el
+     dueño el 2026-10-07; las que dan las dos defensas por igual → Talabartería, dueño 2026-10-08; el torso rígido a la Herrería y el blando a la
+     Talabartería; el resto, Fuerza contra Destreza). */
   const seccionCache = new WeakMap();
   function seccionDe(it){
     if(!it || typeof it !== 'object') return 'talabarteria';
@@ -90,11 +91,12 @@ const GeneradorTiendas = (() => {
     const p = parteDe(it);
     if(p === 'especial' || p === 'orbe' || p === 'anillo' || p === 'consumible') return 'bazar';
     if(p === 'trampa' || p === 'distancia' || p === 'mochila' || p === 'otro') return 'talabarteria';
-    if(p === 'arma') return num(it.tipoDado) <= 6 ? 'talabarteria' : 'herreria';
+    if(p === 'arma') return num(it.tipoDado) <= 4 ? 'talabarteria' : 'herreria';
     if(p === 'escudo') return 'herreria';
     if(p === 'cinturon') return esDeAlquimia(it) || esDeCaster(it) ? 'bazar' : 'talabarteria';
     const def = mod(it, 'def'), esp = mod(it, 'armadmg');
     if(esp > def || (def <= 0 && esDeCaster(it))) return 'bazar';
+    if(def > 0 && esp === def) return 'talabarteria';   // las dos defensas por igual
     if(p === 'torso') return it.tipoItem === 'armadura_rigida' ? 'herreria' : 'talabarteria';
     const fue = suma(it, DE_FUERZA), des = suma(it, DE_DESTREZA);
     return des > fue ? 'talabarteria' : fue > 0 ? 'herreria' : 'talabarteria';

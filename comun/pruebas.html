@@ -2953,7 +2953,7 @@ prueba('generador de tiendas: variedad de partes defensivas por tamaño, familia
   igual([minVar.ambulante >= 2, minVar.pueblito >= 3, minVar.aldea >= 5, familiasMin, archivados, pasados,
     s1.tier['Común'].prom > s1.tier['Buena Calidad'].prom, s5.tier['Raro'].prom > s1.tier['Raro'].prom, !!otro && G.parteDe(otro) === 'arma' && otro.id !== 'cat-espada-larga',
     G.seccionesDe({tipo: 'alquimista'}), G.seccionesDe({tipo: 'inicio'}), G.seccionesDe({secciones: ['bazar', 'herreria', 'x']}), G.parteDe({tipoItem: 'armadura_blanda'})],
-    [true, true, true, 2, 0, 0, true, true, true, ['bazar'], ['herreria', 'talabarteria', 'bazar'], ['herreria', 'bazar'], 'torso']);
+    [true, true, true, 3, 0, 0, true, true, true, ['bazar'], ['herreria', 'talabarteria', 'bazar'], ['herreria', 'bazar'], 'torso']);
 });
 
 prueba('tienda con secciones (P179): cada ítem sabe su sección; se reparte entre las abiertas; lo que se repone queda en la misma sección', () => {
@@ -2971,12 +2971,12 @@ prueba('tienda con secciones (P179): cada ítem sabe su sección; se reparte ent
     if(viejo){ const nuevo = G.otro({tienda: {tamano: 'aldea', nivel: 3, items: r.items}, viejo, catalogo: cat, reponer: true}); if(nuevo && G.seccionDe(nuevo) !== G.seccionDe(viejo)) otraSec++; }
   }
   igual([sinAlguna, familias, soloBazar, otraSec,
-    sec({tipoItem: 'arma_1m', tipoDado: 4}), sec({tipoItem: 'arma_2m', tipoDado: 10}), sec({tipoItem: 'arma_1m', tipoDado: 8, armaDeRango: true}),
+    sec({tipoItem: 'arma_1m', tipoDado: 4}), sec({tipoItem: 'arma_1m', tipoDado: 6}), sec({tipoItem: 'arma_2m', tipoDado: 10}), sec({tipoItem: 'arma_1m', tipoDado: 8, armaDeRango: true}),
     sec({tipoItem: 'escudo_1m'}), sec({tipoItem: 'escudo_1m', orbe: true}), sec({tipoItem: 'armadura_rigida', mods: [{stat: 'def', val: 2}]}),
     sec({tipoItem: 'armadura_blanda', mods: [{stat: 'def', val: 1}]}), sec({tipoItem: 'armadura_blanda', mods: [{stat: 'armadmg', val: 2}]}),
-    sec({tipoItem: 'cabeza', mods: [{stat: 'def', val: 1}]}), sec({tipoItem: 'pies', mods: [{stat: 'eva', val: 1}]}), sec({tipoItem: 'mochila'}),
+    sec({tipoItem: 'cabeza', mods: [{stat: 'def', val: 1}]}), sec({tipoItem: 'armadura_rigida', mods: [{stat: 'def', val: 1}, {stat: 'armadmg', val: 1}]}), sec({tipoItem: 'pies', mods: [{stat: 'eva', val: 1}]}), sec({tipoItem: 'mochila'}),
     sec({tipoItem: 'consumibles', consumible: true}), sec({tipoItem: 'consumibles', consumible: true, trampaDatos: {}}), sec({tipoItem: 'anillos'})],
-    [0, 4, 0, 0, 'talabarteria', 'herreria', 'talabarteria', 'herreria', 'bazar', 'herreria', 'talabarteria', 'bazar', 'herreria', 'talabarteria',
+    [0, 4, 0, 0, 'talabarteria', 'herreria', 'herreria', 'talabarteria', 'herreria', 'bazar', 'herreria', 'talabarteria', 'bazar', 'herreria', 'talabarteria', 'talabarteria',
      'talabarteria', 'bazar', 'talabarteria', 'bazar']);
 });
 prueba('los clásicos (legacy hasta Raro) van en toda tienda, de cualquier tamaño y con cualquier sección', () => {
@@ -2999,9 +2999,11 @@ prueba('reposición (2026-10-07): lo comprado se repone con otro de la misma par
       if(nuevo.tier !== viejo.tier || G.parteDe(nuevo) !== G.parteDe(viejo) || fam(nuevo) !== fam(viejo) || r.items.includes(nuevo.id)) malas++;
     });
   }
-  const amb = G.simular({tipo: 'ramos', tamano: 'ambulante', nivel: 4, catalogo: cat, veces: 60}), cap = G.simular({tipo: 'ramos', tamano: 'capital', nivel: 4, catalogo: cat, veces: 30});
-  const pct = s => s.tier['Buena Calidad'].prom / s.items.prom;
-  igual([malas, sinRepo < 40 * 30 * 0.2, Math.abs(pct(amb) - pct(cap)) < 0.15, G.reservaDe('pueblito'), G.reservaDe('personalizada')], [0, true, true, 6, 10]);
+  // La proporción de Buena en lo sorteado (sin los clásicos fijos) no depende del tamaño.
+  const porId = new Map(cat.map(i => [i.id, i]));
+  const pct = (tam, veces) => { let b = 0, t = 0; for(let n = 0; n < veces; n++){ const r = G.generar({tamano: tam, nivel: 4, catalogo: cat}), g = new Set(r.garantizados);
+    r.items.filter(id => !g.has(id)).forEach(id => { t++; if(porId.get(id).tier === 'Buena Calidad') b++; }); } return b / t; };
+  igual([malas, sinRepo < 40 * 30 * 0.2, Math.abs(pct('ambulante', 60) - pct('capital', 30)) < 0.15, G.reservaDe('pueblito'), G.reservaDe('personalizada')], [0, true, true, 6, 10]);
 });
 
 /* ---------- Catálogo e ítems subidos (comun/catalogo.js, comun/items-subidos.js) ---------- */

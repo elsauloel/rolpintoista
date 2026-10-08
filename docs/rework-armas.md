@@ -1950,6 +1950,11 @@ Con la calculadora recalibrada (varitas directas con dado fijo, báculos con ¼ 
   `soltar` contra el Ef.Esp de quien la tira + `lento`; el mapa frena también en esas zonas, `lentoEn`). La Varita del portal Común (la trampa)
   pasa a llamarse Varita de la trampa portal. **Manotazo sacado** (lo cubre la Expelliarmus), **Purga arranca en 2 No2**, **Luz flotante
   descartada**, **Expelliarmus Rara confirmada**. Tokens redondos: **solo los objetos** (dueño).
+  Probadas en el mapa (2026-10-08): el portal aliado (el segundo a 4 o menos; se cierran al empezar el turno de quien los abrió), la arena
+  movediza (atrapa con Res.CC contra el Ef.Esp, «🔓 Soltarse · Fuerza contra 15», salir cuesta 2 No2) y la trampa de arena (Inmovilizado y
+  Soltarse contra el Ef.Esp). Dos arreglos de paso: **el bando de una trampa sale de quién la puso** (`trampaEsDelGM`, js/07: si el GM maneja a
+  un personaje con 🎮, su trampa es de jugador) y **las reglas de los elementos** (`elementoCambioValido`): el GM o el dueño no podían convertir
+  en zona una trampa con muchos campos porque Firebase cortaba por la cantidad de cuentas por pedido (hay que pegarlas).
 - **«Siempre los turnos contando al caster»** (dueño, 2026-10-07): como las zonas (P172), **las trampas que coloca alguien y la zona que dejan
   al dispararse** duran los turnos de quien las puso. ✅ Hecho: la trampa recuerda quién la puso (`de` en su trampaEstado, comun/tokens-auto.js);
   el mapa le descuenta un turno al empezar cada turno de esa persona (js/07 `zonasDelQueLaTiro`) y, mientras esté en el orden de turnos, no la

@@ -1090,7 +1090,7 @@ Catálogo: ${c.detalle || '—'}`)) return false;
         stats: FichaCalculo.MOD_TARGETS.map(x => ({id: x.id, label: x.label})),
         portador: () => portador(S(), base.id),
         ejemplos: (tipoItem, t) => (S().catalogo || []).filter(it => ES_ARMA(it.tipoItem) && num(it.tipoDado) === t).map(it => it.nombre),
-        tiers: Object.keys(FichaEquipo.TIER_COLOR),
+        tiers: FichaEquipo.veCalidad() ? Object.keys(FichaEquipo.TIER_COLOR) : null,   // los jugadores no eligen ni ven la calidad
         conImagen: true,
         imagenADatos: file => imagenADatos(file, 480, 0.85),
         conEstadoEquipar: true,

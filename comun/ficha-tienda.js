@@ -59,7 +59,7 @@ const FichaTienda = (() => {
   const normalizarBusqueda = s => (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
   // Texto completo del ítem para la búsqueda: nombre, detalle, tier, categoría/slot y todos los mods en su forma legible.
   function textoBusqueda(item){
-    const partes = [item.nombre, item.detalle, item.tier, E().CATEGORIA_LABEL[item.tipoItem], C().SLOT_LABEL[C().slotDe(item.tipoItem)]];
+    const partes = [item.nombre, item.detalle, E().CATEGORIA_LABEL[item.tipoItem], C().SLOT_LABEL[C().slotDe(item.tipoItem)]];
     (item.mods || []).forEach(m => { partes.push(C().STAT_LABEL[m.stat] || m.stat, C().STAT_FULL[m.stat]); });
     return normalizarBusqueda(partes.filter(Boolean).join(' '));
   }
@@ -77,7 +77,7 @@ const FichaTienda = (() => {
   const danoDe = item => FiltroCatalogo.danoDe(item);
   // ¿Tiene libre el lugar del cuerpo donde va? (null: no va en el cuerpo — consumibles, otros). El chip «🟢 Lugar libre».
   function libre(S, item){ const r = E().slotOcupado(S, item); return r ? !r.ocupado : null; }
-  const ctxFiltro = (S, st) => ({precio: it => precioDeCompra(st, it), libre: it => libre(S, it)});
+  const ctxFiltro = (S, st) => ({precio: it => precioDeCompra(st, it), libre: it => libre(S, it), sinCalidad: !E().veCalidad()});
   // Lo que se puede llegar a ver, antes de los filtros: lo de la tienda, o el catálogo (sin lo que el jugador no compra suelto).
   function base(S, st){
     if(st.tienda && !st.verCompleto) return st.tienda.items.map(id => itemCatalogo(S, st, id)).filter(Boolean);
@@ -114,7 +114,7 @@ const FichaTienda = (() => {
     <div class="cat-info">
       <div class="cat-card-titulo">
         <div class="cat-nombre">${esc(item.nombre)}${item._bib && typeof ItemsSubidos !== 'undefined' ? ` <span class="hint" style="font-weight:600;${item._bib.auditado ? '' : 'color:#e0a040'}" title="Lo subió alguien del grupo${item._bib.auditado ? '' : ' y todavía no lo revisó el dueño (se puede usar igual)'}">${esc(ItemsSubidos.etiqueta(item))}</span>` : ''}</div>
-        ${item.tier ? `<div class="cat-tier-badge" style="color:${tierColor};border-color:${tierColor};background:${tierColor}22">${esc(item.tier)}</div>` : ''}
+        ${item.tier && E().veCalidad() ? `<div class="cat-tier-badge" style="color:${tierColor};border-color:${tierColor};background:${tierColor}22">${esc(item.tier)}</div>` : ''}
       </div>
       <div class="cat-meta">${precioHtml(st, item)} · Peso ${fmt(num(item.peso))}${statTxt ? ` · ${esc(statTxt)}` : ''}${item.consumible?` · consumible${item.curahp?` (${num(item.curahp)>0?'+':''}${fmt(num(item.curahp))} HP)`:''}`:''}</div>
       ${catLabel ? `<div class="cat-tipo">${esc(catLabel)}</div>` : ''}

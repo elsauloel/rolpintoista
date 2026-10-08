@@ -23,6 +23,9 @@ const FichaEquipo = (() => {
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const TIPOS_IDS = ['tipo1','tipo2','tipo3','tipo4','tipo5'];
   const TIER_COLOR = {'Común':'#9A867E', 'Buena Calidad':'#A8C256', 'Raro':'#5B8DBE', 'Excepcional':'#E0A458', 'Legendario':'#9B7BD4', 'A definir':'#D4574E'};
+  // ¿Esta pantalla muestra la calidad de los ítems? Solo el GM (dueño, 2026-10-07/08: «que los jugadores no vean la calidad: que juzguen de
+  // acuerdo a lo que sientan y lo que les venga bien»). La usan la tienda, el filtro, la mochila, el botín, el intercambio y los editores.
+  const veCalidad = () => !!(typeof fbMiembro !== 'undefined' && fbMiembro && fbMiembro.gm);
   const SLOT_DEFS = [
     {id:'cabeza', label:'Cabeza', cats:['cabeza'], max:1},
     {id:'torso_blanda', label:'Armadura blanda', cats:['armadura_blanda'], max:1},
@@ -278,7 +281,7 @@ const FichaEquipo = (() => {
     return [d ? `Daño ${d}` : '', df ? `Def ${df > 0 ? '+' : ''}${fmt(df)}` : '', `Peso ${fmt(num(it.peso))}`].filter(Boolean).join(' · ');
   }
   function filaHtml(it, boton){
-    const tierColor = TIER_COLOR[it.tier] || '';
+    const tierColor = veCalidad() ? (TIER_COLOR[it.tier] || '') : '';   // el color del nombre delataba la calidad
     return `<div class="equipo-fila">
     ${thumb(it)}
     <div class="equipo-info">
@@ -404,6 +407,6 @@ const FichaEquipo = (() => {
   `};
   }
 
-  return {SLOT_DEFS, TIER_COLOR, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, alCinturon, textoAlCinturon, aManoCap, aManoEntra, alternarAMano, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
+  return {SLOT_DEFS, TIER_COLOR, veCalidad, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, alCinturon, textoAlCinturon, aManoCap, aManoEntra, alternarAMano, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
     modTags, thumb, statTxt, html, slotLlenoHtml, compararHtml};
 })();

@@ -133,8 +133,10 @@ const FiltroCatalogo = (() => {
       if(f.desc) con.reverse();
       return [...con, ...sin];
     }
-    const cmp = {categoria: (a, b) => parteIdx(a) - parteIdx(b) || tierIdx(a) - tierIdx(b), nombre: () => 0, precio: (a, b) => precio(a) - precio(b),
-      rareza: (a, b) => tierIdx(a) - tierIdx(b), peso: (a, b) => num(a.peso) - num(b.peso)}[o] || (() => 0);
+    // Sin calidad (los jugadores), ni el orden la delata: «Por tipo» va por nombre adentro de cada tipo.
+    const porTier = ctx.sinCalidad ? () => 0 : (a, b) => tierIdx(a) - tierIdx(b);
+    const cmp = {categoria: (a, b) => parteIdx(a) - parteIdx(b) || porTier(a, b), nombre: () => 0, precio: (a, b) => precio(a) - precio(b),
+      rareza: porTier, peso: (a, b) => num(a.peso) - num(b.peso)}[o] || (() => 0);
     const l = lista.slice().sort((a, b) => cmp(a, b) || porNombre(a, b));
     return f.desc ? l.reverse() : l;
   }
@@ -192,7 +194,7 @@ const FiltroCatalogo = (() => {
 
   function crear(cont, cfg){
     cfg = cfg || {};
-    const ctx = {precio: cfg.precio, libre: cfg.libre, statLabel: cfg.statLabel};
+    const ctx = {precio: cfg.precio, libre: cfg.libre, statLabel: cfg.statLabel, sinCalidad: cfg.calidad === false};
     const f = Object.assign(vacio(), cfg.inicial || {});
     let masAbierto = false;
     const guardado = () => { try{ return cfg.clave ? JSON.parse(localStorage.getItem('filtro-' + cfg.clave) || 'null') : null; }catch(e){ return null; } };

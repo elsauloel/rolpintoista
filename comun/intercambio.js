@@ -483,7 +483,8 @@ const Intercambio = (() => {
     document.body.appendChild(cartel);
   }
   function textoItem(it){
-    const partes = [it.tier, it.tipoItem && typeof FichaEquipo !== 'undefined' && FichaEquipo.CATEGORIA_LABEL ? FichaEquipo.CATEGORIA_LABEL[it.tipoItem] : '', it.detalle].filter(Boolean);
+    const veCal = typeof FichaEquipo !== 'undefined' && FichaEquipo.veCalidad && FichaEquipo.veCalidad();   // la calidad, solo el GM
+    const partes = [veCal ? it.tier : '', it.tipoItem && typeof FichaEquipo !== 'undefined' && FichaEquipo.CATEGORIA_LABEL ? FichaEquipo.CATEGORIA_LABEL[it.tipoItem] : '', it.detalle].filter(Boolean);
     return partes.join(' · ').slice(0, 300);
   }
 

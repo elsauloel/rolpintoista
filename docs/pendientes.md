@@ -299,9 +299,11 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] Las **24 trampas base** y su daño.
 - [ ] El pool de **habilidades de clase** (`skills-clase.js`): 62 skills, casi todas todavía "(Sin auditar)".
 
-- [ ] **Ocultar la calidad de los ítems a los jugadores** (dueño, 2026-10-07): el GM la ve; los jugadores no, «para no condicionar cuántos
-  equipos hay comunes, cuántos de buena calidad: que juzguen de acuerdo a lo que sientan y lo que les venga bien». La calidad aparece hoy en la
-  ficha (inventario, editor, botín, intercambio), la tienda y el catálogo (`.tier` en ~16 archivos de comun/). Pendiente de hacer.
+- [x] **Ocultar la calidad de los ítems a los jugadores** (dueño, 2026-10-07; hecho el 2026-10-08): el GM la ve; los jugadores no, «para no condicionar cuántos
+  equipos hay comunes, cuántos de buena calidad: que juzguen de acuerdo a lo que sientan y lo que les venga bien». `FichaEquipo.veCalidad()` (¿es el GM?)
+  decide: la etiqueta de calidad de la tienda y el catálogo, el color del nombre en la mochila, el texto del botín y del intercambio, el campo «Tier» del
+  asistente de ítems y el «Rareza» de «Editar y subir», y el filtro (sin chips ni orden por calidad, y la búsqueda no la mira). Las pantallas del GM (GM
+  Tools, generador de tiendas, editor del catálogo) la siguen mostrando.
 - [x] **Varita Expelliarmus** (dueño, 2026-10-07): cargada, Rara, 300 DDE, con Flash, una vez por turno y 2 No2 + 2 SP; el arma en el piso (js/27).
 - [ ] **Flash y «una vez por turno» de las armas especiales en creeps e invocaciones** (hoy solo en la ficha / la Botonera de un personaje).
 - [ ] **Tokens de objeto redondos** (dueño, 2026-10-07: «solo los objetos», no los creeps): hoy un cofre o un barril se pone como NPC («Un NPC

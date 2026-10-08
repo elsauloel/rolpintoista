@@ -1383,3 +1383,6 @@ versión parecida en más de una, es candidato a juntar.
   (anda en el recuadro aislado del mapa). Suelto: `pasa(it, f, ctx)`, `ordenar(lista, f, ctx)`, `agrupar(lista, f)`, `vacio()`, `cuantos(f)`. Lo usan
   `ficha-tienda.js` (`st.filtro` = su estado; `FichaTienda.base`, `libre`, `ctxFiltro`), la ficha, el mapa, el generador de tiendas, GM Tools y el editor del
   catálogo. Necesita `generador-tiendas.js` antes. **Un filtro nuevo del catálogo va acá, no en una pantalla.**
+- **La calidad de los ítems, solo para el GM** (2026-10-08, dueño): `FichaEquipo.veCalidad()` (= `fbMiembro.gm`). Todo lo que un jugador ve de un ítem
+  (tienda, catálogo, mochila, botín, intercambio, asistente de ítems, «Editar y subir», el filtro) muestra la calidad solo si da true. **Un lugar nuevo que
+  muestre `it.tier` a un jugador: pasarlo por ahí.**

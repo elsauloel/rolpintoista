@@ -36,7 +36,7 @@ const FichaBotin = (() => {
 
   function textoItem(item){
     const partes = [];
-    if(item.tier) partes.push(item.tier);
+    if(item.tier && E().veCalidad()) partes.push(item.tier);   // la calidad, solo el GM
     if(E().CATEGORIA_LABEL[item.tipoItem]) partes.push(E().CATEGORIA_LABEL[item.tipoItem]);
     const dano = FichaCombate.esArma(item.tipoItem) ? FichaCombate.armaDanoTxt(item) : '';
     if(dano) partes.push('Daño ' + dano);

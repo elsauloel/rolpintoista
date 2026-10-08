@@ -21,6 +21,8 @@ const EditarItem = (() => {
   const e = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
   const avisar = m => (typeof toast === 'function' ? toast(m) : alert(m));
   const TIERS = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
+  // La calidad solo la ve el GM (dueño, 2026-10-08); en las pantallas sin partida (el editor del catálogo) se ve.
+  const veCalidad = () => typeof fbMiembro === 'undefined' || !fbMiembro || !!fbMiembro.gm;
   const SOLO_ARMA = ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'efectosGolpe'];
   // Lo que es de la copia (quién la tiene, cómo está puesta) y no del ítem.
   const DE_LA_COPIA = ['id', 'imagen', 'equipado', 'cargaActual', '_bib', 'bibOrigen', 'bibIgnorada', 'manoPreferida', 'compras',
@@ -145,7 +147,7 @@ const EditarItem = (() => {
       titulo: `Editar y subir: ${d.nombre || 'ítem'}`,
       draft: d,
       stats: statsCon(cfg.stats, d),
-      tiers: cfg.tiers || TIERS,
+      tiers: veCalidad() ? (cfg.tiers || TIERS) : null,   // los jugadores no ven la calidad (queda la del ítem)
       conNarrativa: true, conPrecio: true, conRanuras: true, conEstadoEquipar: true,
       textoGuardar: '⬆ Subir al catálogo',
       onConsumible: x => formularioSimple({...d, ...x, tipoItem: 'consumibles', consumible: true}, datos => subir(conId(datos), opSubir)),
@@ -166,7 +168,7 @@ const EditarItem = (() => {
     ventana(`Editar y subir: ${d.nombre || 'ítem'}`,
       `<label>Nombre</label><input data-ei-c="nombre" value="${e(d.nombre)}">
        <div class="ei-fila">
-         <div><label>Rareza</label><select data-ei-c="tier">${tiers.map(t => `<option ${t === d.tier ? 'selected' : ''}>${e(t)}</option>`).join('')}</select></div>
+         ${veCalidad() ? `<div><label>Rareza</label><select data-ei-c="tier">${tiers.map(t => `<option ${t === d.tier ? 'selected' : ''}>${e(t)}</option>`).join('')}</select></div>` : ''}
          <div><label>Precio</label><input type="number" data-ei-c="precioCompra" value="${e(n(d.precioCompra))}"></div>
          ${esCons ? `<div><label>Unidades</label><input type="number" data-ei-c="unidades" value="${e(n(d.unidades) || 1)}"></div>` : `<div><label>Peso</label><input type="number" data-ei-c="peso" value="${e(n(d.peso))}"></div>`}
        </div>

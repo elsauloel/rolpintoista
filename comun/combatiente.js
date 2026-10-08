@@ -1056,8 +1056,9 @@ const Combatiente = (() => {
     if(o.ataque === 'habilidad-arma') return {no2: 0, lineas: ['Los No2 de este ataque ya los cobró la habilidad.']};
     const l = [`Tipo del arma: ${t}`];
     if(o.ataque === 'oportunidad' || o.ataque === 'contra') l.push(`${o.ataque === 'contra' ? 'Contraataque' : 'Ataque de oportunidad'}: lo de un primer ataque (Tipo ÷ 2${t % 2 ? ', para arriba' : ''} = ${mitad}); no cuenta como ataque del turno`);
-    else if(n(o.hechos) > 0) l.push(`Ya atacó ${n(o.hechos) === 1 ? 'una vez' : `${Math.round(n(o.hechos))} veces`} este turno: Tipo completo = ${t}`);
-    else l.push(`Primer ataque del turno: Tipo ÷ 2${t % 2 ? ', para arriba' : ''} = ${mitad}`);
+    // `porArma`: un personaje cuenta el primer ataque por arma (cada arma tiene el suyo a mitad de precio).
+    else if(n(o.hechos) > 0) l.push(`Ya atacó ${n(o.hechos) === 1 ? 'una vez' : `${Math.round(n(o.hechos))} veces`} ${o.porArma ? 'con esta arma' : ''} este turno: Tipo completo = ${t}`.replace('  ', ' '));
+    else l.push(`Primer ataque ${o.porArma ? 'con esta arma' : 'del turno'}: Tipo ÷ 2${t % 2 ? ', para arriba' : ''} = ${mitad}`);
     const base = o.ataque === 'oportunidad' || o.ataque === 'contra' ? mitad : n(o.hechos) > 0 ? t : mitad;
     if(costo !== base) l.push(`${costo < base ? 'Ahorro' : 'Recargo'} (arma, equipo o estados): ${costo < base ? '−' : '+'}${Math.abs(base - costo)}`);
     l.push(`Cuesta ${costo} No2 · tiene ${Math.round(n(o.tiene))}${costo > n(o.tiene) ? ' (no le alcanzan: pregunta y deja seguir)' : ''}`);

@@ -5,7 +5,7 @@ Pedido del dueño: «fijate vos cuántos turnos lo harías y armame una lista; y
 provoca una trampa, **el estado cuenta los turnos de quien la pisó, desde que se le aplica** (un Stun de 1 turno le dura su próximo turno entero);
 la trampa o la zona que deja en el piso cuentan los turnos de quien la puso. **Caos** = entra en el sorteo de la Varita del caos.
 
-**Cuándo baja el contador (P177, dueño, 2026-10-08):** al EMPEZAR el turno de quien lo tiene, antes de que pegue; si se lo pusieron fuera de su turno, ese primer inicio no descuenta (le toca el turno entero). Uno de N turnos dura N rondas completas desde que se aplica.
+**Cuándo baja el contador (P177, dueño, 2026-10-08):** al EMPEZAR el turno de quien lo tiene, antes de que pegue; si se lo pusieron fuera de su turno, ese primer inicio no descuenta (le toca el turno entero). Uno de N turnos dura N rondas completas desde que se aplica. Ejemplo (confirmado por el dueño, 2026-10-08): un Veneno de 4 stacks puesto en el turno del enemigo pega −4 en el acto; al empezar tu primer turno no hace nada (no descuenta y ya pegó); después, al empezar cada turno, baja un stack y pega (−3, −2, −1); en el siguiente llega a 0 y se termina sin pegar. Total 10, uno por ronda.
 
 **Correcciones del dueño (2026-10-08)**: Vida extra 10; «Coagulación extrema» pasa a llamarse **Coagulación**; **Titilando = Invulnerable** (siempre que
 alguien es invulnerable, titila; al revivir queda Invulnerable hasta su próximo turno); Armadura rota del caos, **permanente** (−1 de armadura); el

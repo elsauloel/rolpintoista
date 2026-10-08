@@ -1964,6 +1964,12 @@ Con la calculadora recalibrada (varitas directas con dado fijo, báculos con ¼ 
   **Decisiones mías a confirmar:** el chorro de lava quema también a los aliados («a todos»); el vendaval empuja sin tirada («a todos»); la
   ráfaga helada usa el cono de siempre (no un 3×3 exacto); la luz flotante marca sin tirada (cada rival que toca); sin cargas, la de cargas se puede
   usar pagando su SP. Reglas nuevas de Firestore (hay que pegarlas): zonaInmediata, zonaLuz, borrar niebla y fuego, y `elementoCambioValido`.
+- **Regla (dueño, 2026-10-08): los proyectiles físicos que se invocan con magia y pueden hacer crítico** (la púa de hielo, el canto rodado, la
+  lluvia de cascotes: los que tienen `critTipo`) **se tiran con PdG** (golpe común), no con PdG.Esp; todo lo demás, PdG.Esp. El motor lo aplica
+  solo (`Combatiente.habEjecucion`), también a cualquier habilidad con `critTipo`. **Varita inestable Común** (1d8 arcano directo; 1d4 a vos
+  si sale el 1) y la Buena pasa a **1d4 por cada 1** que salga (`riesgo.porCada`). **Varita del caos** (Común, 6/3/1) y la lista de turnos de
+  cada estado en `docs/estados-turnos.md` (propuesta a corregir). **Luces**: Varita del farol (Común) y luz flotante (Buena, 2 SP, revela);
+  bengalas consumibles (Bengala y Bengala estelar).
 - **«Siempre los turnos contando al caster»** (dueño, 2026-10-07): como las zonas (P172), **las trampas que coloca alguien y la zona que dejan
   al dispararse** duran los turnos de quien las puso. ✅ Hecho: la trampa recuerda quién la puso (`de` en su trampaEstado, comun/tokens-auto.js);
   el mapa le descuenta un turno al empezar cada turno de esa persona (js/07 `zonasDelQueLaTiro`) y, mientras esté en el orden de turnos, no la

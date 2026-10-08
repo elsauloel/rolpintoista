@@ -1227,10 +1227,13 @@ async function despejarEn(celdas, nombre){
 // El riesgo (2026-10-08, Varita inestable): salió el número en los dados del daño → quien la usó se hace su daño (directo, sin Defensa).
 async function dueloRiesgo(d){
   const ta = d.atacante && tokens.get(d.atacante.tokenId), rg = d.hab.riesgo;
-  const r = tirarDados(rg.dano || '2d4');
+  // `porCada` (2026-10-08, dueño): el daño por cada dado que salió en ese número (1d4 por cada 1).
+  const veces = rg.porCada ? ((d.dano && d.dano.rolls) || []).map(num).filter(x => x === num(rg.si)).length : 1;
+  const formula = veces > 1 ? String(rg.dano || '1d4').replace(/^(\d*)d/, (m, k) => `${(num(k) || 1) * veces}d`) : (rg.dano || '2d4');
+  const r = tirarDados(formula);
   if(!r) return;
-  try{ mesaPublicar(`${d.atacante.nombre || 'Quien la usó'} · ${d.hab.nombre}: se le va de las manos`, {formula: r.formula || rg.dano, rolls: r.rolls, mod: r.mod, total: r.total}); }catch(err){}
-  let txt = `Salió un ${rg.si} en los dados: ${rg.dano} → ${r.total} de daño a quien la usó.`;
+  try{ mesaPublicar(`${d.atacante.nombre || 'Quien la usó'} · ${d.hab.nombre}: se le va de las manos`, {formula: r.formula || formula, rolls: r.rolls, mod: r.mod, total: r.total}); }catch(err){}
+  let txt = `Salió ${veces > 1 ? `${veces} veces el ${rg.si}` : `un ${rg.si}`} en los dados: ${formula} → ${r.total} de daño a quien la usó.`;
   if(ta){
     const esInv = ta.tipo === 'pj' && String(ta.fichaId).includes(SEP_INVOCACION);
     const res = esInv ? await danioInv(ta, String(r.total), true, 0, 0) : ta.tipo === 'creep' ? await danioCreep(ta, String(r.total), true, 0, 0) : await danioPj(ta, String(r.total), true, 0, 0);

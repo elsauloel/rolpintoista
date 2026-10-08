@@ -732,7 +732,10 @@ const Combatiente = (() => {
     o = o || {};
     const etq = o.etq || (s => s), conX = o.X !== undefined && o.X !== null, X = nf(o.X);
     const sx = t => conX ? sustituirX(t, X) : t;
-    const stat = c.tira !== undefined ? c.tira : (h.tiradaStat || '');
+    // Regla (dueño, 2026-10-08): lo que se invoca con magia y puede hacer crítico (`critTipo`: la púa de hielo, el canto rodado) tira PdG, como un
+    // golpe común (Destreza); todo lo demás, PdG.Esp.
+    const stat0 = c.tira !== undefined ? c.tira : (h.tiradaStat || '');
+    const stat = nf(c.critTipo) > 0 && stat0 === 'pdgmg' ? 'pdg' : stat0;
     const tipo = c.tipoDano || 'arcano';
     // «El daño de tu arma» (2026-10-02, Daño en área): la fórmula del arma de quien la usa (`o.armaDano`, la que tira «Daño»).
     const formula = c.danoArma ? formulaDanoHab({tiradaExtra: o.armaDano || ''}, c, o.X) : formulaDanoHab(h, c, o.X);
@@ -760,7 +763,7 @@ const Combatiente = (() => {
       ...(c.menosPorOrden ? {menosPorOrden: true} : {}),   // −1 a cada uno de los siguientes en la línea (2026-10-08, láser largo)
       ...(c.despeja ? {despeja: true} : {}),   // apaga el fuego y despeja la niebla que toca (2026-10-08, vendaval)
       // El riesgo (2026-10-08, Varita inestable): si en los dados del daño sale `si` (un 1), quien la usa se hace `dano`.
-      ...(c.riesgo ? {riesgo: {si: Math.max(1, Math.round(nf(c.riesgo.si)) || 1), dano: String(c.riesgo.dano || '2d4')}} : {}),
+      ...(c.riesgo ? {riesgo: {si: Math.max(1, Math.round(nf(c.riesgo.si)) || 1), dano: String(c.riesgo.dano || '2d4'), ...(c.riesgo.porCada ? {porCada: true} : {})}} : {}),
       ...(c.fuegoAmigo ? {fuegoAmigo: true} : {}),   // un área que también agarra a los aliados (2026-10-07, Bola de fuego mayor)
       ...(c.atrae ? {atrae: {casillas: Math.max(1, Math.round(nf(c.atrae.casillas)) || 2), contra: c.atrae.contra || 'fue', ...(o.stat ? {tiraValor: Math.round(nf(o.stat(c.atrae.tira || 'dmgesp')))} : {})}} : {}),
       ...(c.reparte ? {reparte: {cada: String(c.reparte.cada || '1d4'), total: Math.max(2, Math.round(nf(c.reparte.total)) || 2)}} : {}),

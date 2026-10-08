@@ -259,6 +259,7 @@ decisión relajada nueva se agrega acá al tomarla).
 | **Fórmulas de stats evaluadas como código (2026-09-30, anotado en el paso 5)**: cada ficha puede editar las fórmulas de sus stats y se evalúan como código (`FichaCalculo.evalFormula`) en el navegador de quien abre la ficha — hoy el dueño y quien la mira; con la etapa 3 del paso 4, también el mapa. Entre amigos no es un problema | Limitar las fórmulas a números, atributos y operaciones (un evaluador propio en vez de `new Function`) |
 | **🎮 Tomar el control (2026-09-30)**: el GM toma el control de la ficha de un jugador sin pedirle permiso (lo avisa en la Mesa y el jugador queda en solo lectura hasta que se la devuelve) | Pedirle al jugador que acepte (o que pueda recuperarlo cuando quiera), y que las reglas de Firebase respeten la marca de control |
 | **Orden de turnos**: cualquier miembro puede reescribir el `orden` entero de `mapa/iniciativa` (no solo el valor de su propia fila) — las reglas no pueden revisar un elemento suelto de una lista | Partir `orden` en un documento por token, para que las reglas sí puedan limitar cada uno a su dueño |
+| **Niebla y fuego del mapa (2026-10-08, Varita del vendaval)**: cualquier miembro puede borrar un elemento de niebla o de fuego (las reglas no saben si lo tocó el viento) | Que el borrado lo haga quien tiene permiso (el GM o un servidor), a pedido del que tiró el vendaval |
 
 ## Pendientes chicos
 

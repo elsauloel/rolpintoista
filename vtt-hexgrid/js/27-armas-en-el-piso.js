@@ -106,8 +106,9 @@ function armaDibujar(el, z){
   ctx.fillStyle = 'rgba(28,24,26,.92)'; ctx.fill();
   ctx.lineWidth = 3 / z; ctx.strokeStyle = '#C9C9C9'; ctx.stroke();
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  ctx.font = `700 ${R * 1.05}px system-ui, sans-serif`;
-  ctx.fillText('🗡', p.x, p.y + R * 0.04);
+  ctx.font = `700 ${R * 1.05}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", system-ui, sans-serif`;
+  ctx.fillStyle = '#EDE3D2';   // (si el 🗡 sale en blanco y negro, que se vea claro sobre el fondo oscuro)
+  ctx.fillText('🗡️', p.x, p.y + R * 0.06);
   const txt = String(el.armaNombre || 'Arma');
   ctx.font = `700 ${11 / z}px "Space Mono", monospace`;
   const w = ctx.measureText(txt).width + 8 / z, h = 15 / z, y = p.y + R + 3 / z;

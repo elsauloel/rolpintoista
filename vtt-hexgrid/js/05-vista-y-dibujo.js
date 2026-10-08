@@ -344,6 +344,7 @@ function dibujar(){
   }
   listaElementos.forEach(([id, el]) => {
     if(!puedeVerElemento(el)) return;  // invisible: solo el GM y su creador
+    if(el.arma){ if(typeof armaDibujar === 'function') armaDibujar(el, z); return; }   // 🗡 el arma en el piso: solo su ficha redonda (js/27)
     const celdas = celdasDeElemento(el);
     const esColision = !!el.colision;   // su relleno y su contorno ya se dibujaron arriba, todos juntos
     if(!esColision){
@@ -464,7 +465,6 @@ function dibujar(){
       ctx.fillText('🌀', pP.x, pP.y);
       ctx.restore();
     }
-    if(el.arma && typeof armaDibujar === 'function') armaDibujar(el, z);   // 🗡 el arma en el piso (js/27)
     }   // fin de lo que no es Colisión
     if(id !== ID_BORRADOR && el.venceMant !== null && el.venceMant !== undefined && mantenimientoNumero !== null && celdas.length){
       // Contador de turnos que le quedan a la forma (se elimina sola al llegar a 0). Si cuenta los turnos de quien la puso (zonas, P172, y trampas,

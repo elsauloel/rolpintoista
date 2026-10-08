@@ -152,6 +152,8 @@ function renderCabeceraTienda(){
   if($('#tienda-vender')) $('#tienda-vender').style.display = 'none';
   if($('#tienda-baul')) $('#tienda-baul').style.display = 'none';
   if($('#tienda-reparar')) $('#tienda-reparar').style.display = 'none';
+  // El título dice dónde estás (2026-10-08, dueño: «que el título de la tienda se vea más claro»): el nombre de la tienda, o el catálogo.
+  if($('#catalogo-titulo')) $('#catalogo-titulo').textContent = tiendaCargada && !verCatalogoCompleto ? `🏪 ${tiendaCargada.nombre || 'Tienda'}` : '📖 Catálogo del fabricante';
   if(tiendaCargada){
     badge.textContent = FichaTienda.badge(tiendaSt);
     if($('#tienda-vender')) $('#tienda-vender').style.display = '';

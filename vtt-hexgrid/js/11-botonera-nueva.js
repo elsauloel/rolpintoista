@@ -1773,7 +1773,7 @@ function bnTiendaDejar(){
 function bnTiendaDibujar(){
   if(!bn || !bn.S || !bn.raiz.querySelector('#bn-tienda').classList.contains('open')) return;
   const r = bn.raiz, st = bnTiendaSt, t = st.tienda;
-  r.querySelector('#bn-tienda-titulo').textContent = (t && t.nombre) || 'Tienda';
+  r.querySelector('#bn-tienda-titulo').textContent = `🏪 ${(t && t.nombre) || 'Tienda'}`;   // (2026-10-08: el título, más claro)
   r.querySelector('#bn-tienda-badge').textContent = FichaTienda.badge(st);
   r.querySelector('#bn-tienda-reparar').style.display = t && t.herrero ? '' : 'none';   // solo las tiendas con herrero reparan
   // Lo Excepcional y lo Legendario solo se filtran con una tienda que lo ofrezca (la tienda siempre está, acá).

@@ -277,7 +277,7 @@ input[type=checkbox]{width:auto}
       </div>
       <button class="btn primary" id="btn-generar" title="Arma una tienda nueva, sin nombre propio">Generar tienda</button>
       <button class="btn" id="btn-regenerar" disabled title="Vuelve a sortear todo el stock de la tienda abierta, sin cambiarle el nombre ni sacarla de la lista de guardadas">Regenerar</button>
-      <button class="btn publicar" id="btn-publicar" disabled>Publicar tienda</button>
+      <button class="btn publicar" id="btn-publicar" disabled title="La publica y la abre: los jugadores ya pueden entrar (el interruptor la cierra un rato)">Publicar y abrir tienda</button>
       <button class="btn ghost" id="btn-personalizada">+ Tienda personalizada</button>
       <button class="btn ghost" id="btn-simular" title="Genera 200 tiendas con este tipo, tamaño y nivel y muestra qué sale en promedio y en el peor caso">🧪 Simular 200</button>
     </div>
@@ -1411,18 +1411,20 @@ async function publicarShop(){
     const json = JSON.stringify({...tiendaParaGuardar(), stockVersion});
     const ts = firebase.firestore.FieldValue.serverTimestamp();
     const lote = fbDb.batch();
-    lote.set(refTienda('publicada'), {json, actualizado: ts, abierta: tiendaFb.abierta === true});
+    // Publicar = abrir (dueño, 2026-10-08: «tienda publicada = tienda abierta»): al publicar queda abierta; el interruptor la cierra un rato.
+    lote.set(refTienda('publicada'), {json, actualizado: ts, abierta: true});
     lote.set(refTienda('stock'), {version: stockVersion, items: tiendaActual.items.slice(), reposiciones: 0, reserva: G.reservaDe(tiendaActual.tamano), vendidos: 0, actualizado: ts});
     let sinStock = false;
     try{ await lote.commit(); }
     catch(err){   // sin las reglas nuevas: se publica como antes, sin stock
       console.error('No se pudo publicar el stock (¿reglas sin publicar?):', err);
-      await refTienda('publicada').set({json: JSON.stringify(tiendaParaGuardar()), actualizado: ts, abierta: tiendaFb.abierta === true});
+      await refTienda('publicada').set({json: JSON.stringify(tiendaParaGuardar()), actualizado: ts, abierta: true});
       sinStock = true;
     }
     clearTimeout(tiendaFb.timer);
     await guardarBorrador();
-    toast((tiendaFb.abierta ? 'Tienda publicada ✓ — los jugadores la ven abierta' : 'Tienda publicada ✓ — sigue CERRADA: abrila cuando quieras que entren')
+    avisarMesaTienda('🏪 La tienda está abierta');
+    toast('Tienda publicada y abierta ✓ — los jugadores ya pueden entrar'
       + (sinStock ? ' · ⚠ SIN piezas únicas: faltan publicar las reglas de la tienda (tienda/stock)' : ''));
   }catch(err){
     console.error('Error publicando la tienda:', err);

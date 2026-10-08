@@ -60,7 +60,7 @@ const ESTADOS_PRESET = [
   {nombre:'Miedo', polaridad:'debuff', turnos:2, esCC:true, mods:[{stat:'pdg', val:-2}, {stat:'dmg', val:-2}],
     detalle:'Miedo: −2 PdG y −2 Daño mientras dure, y no puede acercarse voluntariamente a quien lo asustó (✋ a mano: el jugador o el GM lo respeta; si termina su turno más cerca de la fuente pierde 1 No2). Es un control (lo reducen la resistencia a CC y la Inmunidad a CC).'},
   {nombre:'Provocado', polaridad:'debuff', turnos:2, esCC:true,
-    detalle:'Provocado (Taunt): mientras dure, si ataca, tiene que elegir como objetivo a quien lo provocó, si puede llegar a él (✋ a mano: lo respeta el jugador o el GM). No le impide usar habilidades que no sean atacar. Es un control (lo reducen la resistencia a CC y la Inmunidad a CC).'},
+    detalle:'Provocado (Taunt): ira dirigida. Mientras dure, su turno es para ir contra quien lo provocó: atacarlo o usar contra él una habilidad hostil (si no llega, acercarse). No se cura, no se protege ni hace otra cosa en lugar de eso (✋ a mano: lo respeta el jugador o el GM). Es un control (lo reducen la resistencia a CC y la Inmunidad a CC).'},
   {nombre:'Escarcha', polaridad:'debuff', turnos:2, stacks:1, esEscarcha:true, mods:[{stat:'nitros', val:-1}],
     detalle:'Escarcha (acumulable): se le congela el impulso, −1 a sus No2 máximos por cada stack mientras dure. Cada nueva aplicación suma un stack (×2, ×3…) y renueva la duración. Fuego y hielo se cancelan entre sí (a mano). La duración la elige quien lo coloca.'},
   {nombre:'Parálisis', polaridad:'debuff', turnos:2, paralisis:true, esCC:true,

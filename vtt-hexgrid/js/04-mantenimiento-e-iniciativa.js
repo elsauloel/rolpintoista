@@ -450,12 +450,14 @@ function provocadoAvisar(t, estados){
   const clave = `${t.fichaId}:${Math.round(num(iniciativa.paso))}`;
   if(provocadoAvisados.has(clave)) return;
   provocadoAvisados.add(clave);
-  const contra = String(e.detalle || '').match(/tiene que atacar a ([^(.]+)/);
-  const texto = contra ? `Si atacás, tenés que atacar a ${contra[1].trim()}, si podés llegar.` : 'Si atacás, tenés que elegir como objetivo a quien te provocó, si podés llegar.';
+  // Ira dirigida (dueño, 2026-10-08): el turno es para ir contra quien lo provocó — atacarlo o una habilidad hostil —, no para curarse u otra cosa.
+  const contra = String(e.detalle || '').match(/(?:ira dirigida contra|tiene que atacar a) ([^(.:]+)/);
+  const quien = contra ? contra[1].trim() : 'quien te provocó';
+  const texto = `Ira dirigida contra ${quien}. Este turno tenés que ir contra ese objetivo: atacarlo o usarle una habilidad hostil (si no llegás, acercate). No podés curarte, protegerte ni hacer otra cosa en lugar de eso.`;
   setTimeout(() => momentoAbrir({tipo: 'provocado', icono: '😤', titulo: `${nombreDe(t)} está Provocado`, estado: 'listo',
-    resultado: `${texto} Podés usar habilidades que no sean atacar.${e.turnos ? ` Le queda${num(e.turnos) === 1 ? '' : 'n'} ${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}.` : ''}`,
+    resultado: `${texto}${e.turnos ? ` Le queda${num(e.turnos) === 1 ? '' : 'n'} ${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}.` : ''}`,
     datos: {paraUid: t.tipo === 'creep' ? fbUsuario.uid : (t.duenoUid || ''), aviso: true, boton: 'Aceptar',
-      pasos: [{titulo: 'Estás Provocado', texto: `${texto} No te impide usar habilidades que no sean atacar. ✋ Lo respeta quien juega (no lo frena el mapa).`}]}}), 600);
+      pasos: [{titulo: 'Estás Provocado', texto: `${texto} ✋ Lo respeta quien juega (no lo frena el mapa).`}]}}), 600);
 }
 const inicioDeTurno = (tokenId, clave) => turnoDeToken(tokenId, clave, true);
 const finDeTurno = (tokenId, clave) => turnoDeToken(tokenId, clave, false);

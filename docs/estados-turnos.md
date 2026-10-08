@@ -53,7 +53,7 @@ Coagulación); revisar si la Parálisis (PdG, Parry y Evasión a la mitad) queda
 | Rengo | 2 turnos · caos |
 | Lento | 2 turnos · caos |
 | Miedo | 2 turnos · caos |
-| Provocado | 1 turno · caos: si salió bien, contra quién lo elige quien usó la varita; si salió mal, el bando contrario |
+| Provocado | 1 turno · caos: si salió bien, contra quién lo elige quien usó la varita; si salió mal, el bando contrario. Ira dirigida (dueño, 2026-10-08): su turno es para atacar o usar una habilidad hostil contra ese objetivo, no para curarse u otra cosa |
 | Parálisis | 2 turnos (PdG, Parry y Evasión a la mitad) · caos · ⏸ ¿2 o 1? |
 | Silencio | 1 turno · caos |
 | Ceguera | 1 turno · caos |

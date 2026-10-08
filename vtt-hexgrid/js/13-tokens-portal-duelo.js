@@ -230,8 +230,8 @@ function caosDeHabilidad(msg){
     if(spec.nombre === 'Provocado'){
       if(res.bien){
         const contra = await new Promise(ok => elegirDestino(hh => ok([...tokens.values()].find(x => x.col === hh.col && x.fila === hh.fila) || null),
-          `<b>🎲 ${esc(nom)}: ${esc(nombreDe(dest))} queda Provocado — ¿contra quién?</b> <span>clic sobre a quién tiene que atacar · Esc: contra vos</span>`, true, () => ok(mio)));
-        spec.detalle = `Provocado: si ataca, tiene que atacar a ${nombreDe(contra || mio)} (✋ lo respeta su jugador o el GM).`;
+          `<b>🎲 ${esc(nom)}: ${esc(nombreDe(dest))} queda Provocado — ¿contra quién?</b> <span>clic sobre contra quién tiene que ir · Esc: contra vos</span>`, true, () => ok(mio)));
+        spec.detalle = `Provocado: ira dirigida contra ${nombreDe(contra || mio)}: su turno es para atacarlo o usar contra él una habilidad hostil (si no llega, acercarse); no se cura ni hace otra cosa en lugar de eso (✋ lo respeta su jugador o el GM).`;
       }else spec.detalle = 'Provocado: contra quién lo elige el bando contrario (✋ a mano).';
     }
     const dueTurnos = caosDurTxt(spec);

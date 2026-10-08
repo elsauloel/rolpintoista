@@ -56,9 +56,9 @@
   // La descripción queda lista para usar: qué hace, qué está automatizado (con los números) y qué se resuelve a mano.
   // {T} en la descripción = el daño de la trampa según el nivel.
   const textoHab = (sp, n) => sp.detalle.replace(/\{T\}/g, sp.trampa ? danoTxt(sp.trampa, n) : '');
-  // Opciones de la trampa que coloca la habilidad, deducidas de la descripción: área "flor de 1" y cuántas pone.
+  // Opciones de la trampa que coloca la habilidad, deducidas de la descripción: área "flor de diámetro 3 (7 casillas)" y cuántas pone.
   const opcionesTrampa = sp => ({
-    radio: /flor de 1/i.test(sp.detalle) ? 1 : 0,
+    radio: /flor de diámetro 3/i.test(sp.detalle) ? 1 : 0,
     cant: /3 minas|3 trampas/i.test(sp.detalle) ? 3 : /dos trampas|2 trampas/i.test(sp.detalle) ? 2 : 1,
   });
   /* Estados que la habilidad (o la trampa) deja sobre OTRO, con el nombre de la habilidad como clave.
@@ -126,7 +126,7 @@
     }
     if(sp.trampa !== undefined || sp.colocar){
       const o = opcionesTrampa(sp);
-      auto.push(`al usarla, coloca sola ${o.cant > 1 ? o.cant + ' trampas ocultas' : 'la trampa oculta'} al lado de su token en el mapa que ve el GM${o.radio ? ' (área: flor de ' + o.radio + ')' : ''}${sp.trampa ? `; cuando alguien la pisa, el mapa tira ${danoTxt(sp.trampa, n)} y se lo aplica solo` : ''}; los jugadores no la ven hasta que se dispara y la habilidad no se anuncia en la Mesa`);
+      auto.push(`al usarla, coloca sola ${o.cant > 1 ? o.cant + ' trampas ocultas' : 'la trampa oculta'} al lado de su token en el mapa que ve el GM${o.radio ? ' (área: flor de diámetro ' + (2 * o.radio + 1) + ')' : ''}${sp.trampa ? `; cuando alguien la pisa, el mapa tira ${danoTxt(sp.trampa, n)} y se lo aplica solo` : ''}; los jugadores no la ven hasta que se dispara y la habilidad no se anuncia en la Mesa`);
     }
     const ap = aplicaDe(sp);
     if(ap){
@@ -281,7 +281,7 @@
     'Un trabajador que ya no recuerda por qué sigue picando.');
   cr('minas', 1, 'Luciérnaga de gas', 'rango', 'bestia', 'Chispa de metano',
     at('Chispa', 'Chispazo de gas a distancia.', 'L'),
-    [ta('Nube de metano', 'Gas en flor de 1: los que lo respiran quedan Pajaritos hasta el final de su turno (a mano).', 2), 4],
+    [ta('Nube de metano', 'Gas en flor de diámetro 3 (7 casillas): los que lo respiran quedan Pajaritos hasta el final de su turno (a mano).', 2), 4],
     'Insecto que flota entre los túneles y vuelve el aire inflamable.');
 
   cr('minas', 2, 'Topo excavador', 'rapido', 'bestia', 'Garras de excavación',
@@ -290,7 +290,7 @@
     'Sale del suelo cuando menos se lo espera.');
   cr('minas', 2, 'Kobold dinamitero', 'rango', 'humanoide', 'Cartucho de dinamita',
     at('Cartucho', 'Lanza un cartucho de dinamita.', 'M'),
-    [tr('Cartucho enterrado', 'Entierra un cartucho con mecha en una casilla: al pisarlo explota en flor de 1 con {T}.', 3, 'H'), 5],
+    [tr('Cartucho enterrado', 'Entierra un cartucho con mecha en una casilla: al pisarlo explota en flor de diámetro 3 (7 casillas) con {T}.', 3, 'H'), 5],
     'Pequeño, cobarde y con demasiada dinamita.');
   cr('minas', 2, 'Escarabajo de cobre', 'tanque', 'bestia', 'Mandíbulas de cobre',
     bu('Caparazón', '+3 Defensa hasta el final de su turno.', 1, {def: 3}, 1),
@@ -312,7 +312,7 @@
 
   cr('minas', 4, 'Gusano de roca', 'brutal', 'bestia', 'Boca de piedra',
     at('Embestida perforante', 'Ignora 2 de Defensa del objetivo (a mano).', 'M'),
-    [zo('Temblor', 'Sacude el suelo: daño en flor de 2 y los golpeados quedan Sentados (a mano).', 3, 'H'), 5],
+    [zo('Temblor', 'Sacude el suelo: daño en flor de diámetro 5 (19 casillas) y los golpeados quedan Sentados (a mano).', 3, 'H'), 5],
     'Devora roca y todo lo que hay adentro.');
   cr('minas', 4, 'Zapador demente', 'rango', 'humanoide', 'Detonador',
     at('Granada', 'Granada de mano.', 'M'),
@@ -325,7 +325,7 @@
 
   cr('minas', 5, 'Coloso de mineral', 'tanque', 'constructo', 'Martillo de mineral',
     at('Martillazo', 'Golpe demoledor; rompe armadura (aplicar Armadura rota a mano).', 'H'),
-    [zo('Derrumbe', 'Provoca un derrumbe en flor de 2: daño enorme y los golpeados quedan Sentados (a mano).', 3, 'H'), 6],
+    [zo('Derrumbe', 'Provoca un derrumbe en flor de diámetro 5 (19 casillas): daño enorme y los golpeados quedan Sentados (a mano).', 3, 'H'), 6],
     'Mineral vivo del tamaño de una casa: el jefe de la mina.');
   cr('minas', 5, 'Devorador de vetas', 'rapido', 'bestia', 'Dientes de diamante',
     at('Mordida de diamante', 'Ignora parte de la armadura (a mano).', 'H'),
@@ -356,20 +356,20 @@
     'Enorme, terco y siempre de mal humor.');
   cr('bosque', 2, 'Arquero silvano', 'rango', 'humanoide', 'Arco largo',
     at('Flecha certera', 'Daño de rango, +2 al PdG (a mano).', 'M'),
-    [zo('Lluvia de flechas', 'Daño en flor de 1 a distancia.', 3, 'H'), 5],
+    [zo('Lluvia de flechas', 'Daño en flor de diámetro 3 (7 casillas) a distancia.', 3, 'H'), 5],
     'Guardián de los senderos que nadie vio nunca.');
   cr('bosque', 2, 'Sapo venenoso', 'rapido', 'bestia', 'Lengua pegajosa',
     at('Lengüetazo', 'Ataque a distancia corta; el objetivo queda Envenenado (a mano).', 'M'),
-    [ta('Nube de esporas ponzoñosas', 'Veneno en flor de 1: los afectados reciben Veneno (1 de daño por turno) durante 3 turnos (a mano).', 2), 4],
+    [ta('Nube de esporas ponzoñosas', 'Veneno en flor de diámetro 3 (7 casillas): los afectados reciben Veneno (1 de daño por turno) durante 3 turnos (a mano).', 2), 4],
     'Colorido, gordo y letal al tacto.');
 
   cr('bosque', 3, 'Ent joven', 'tanque', 'planta', 'Puño de tronco',
     bu('Corteza', '+4 Defensa 2 turnos.', 1, {def: 4}, 2),
-    [zo('Raíces estranguladoras', 'Raíces en flor de 1: daño e Inmovilizados si fallan Fuerza (a mano).', 3, 'H'), 5],
+    [zo('Raíces estranguladoras', 'Raíces en flor de diámetro 3 (7 casillas): daño e Inmovilizados si fallan Fuerza (a mano).', 3, 'H'), 5],
     'Un árbol que se cansó de estar quieto.');
   cr('bosque', 3, 'Bruja del pantano', 'mago', 'humanoide', 'Bastón de espinos',
     at('Maldición de moho', 'Daño mágico; el objetivo queda Pajaritos 1 turno si falla Res.Mt (a mano).', 'M'),
-    [zo('Caldero burbujeante', 'Niebla en flor de 2: daño y Envenenado (a mano).', 3, 'H'), 5],
+    [zo('Caldero burbujeante', 'Niebla en flor de diámetro 5 (19 casillas): daño y Envenenado (a mano).', 3, 'H'), 5],
     'Vive en una choza que camina sobre patas de pollo (quizás).');
   cr('bosque', 3, 'Oso pardo furioso', 'brutal', 'bestia', 'Zarpas',
     at('Zarpazo doble', 'Dos ataques seguidos con la mitad del daño cada uno (a mano).', 'M'),
@@ -378,7 +378,7 @@
 
   cr('bosque', 4, 'Druida corrupto', 'apoyo', 'humanoide', 'Vara podrida',
     cu('Savia oscura', 'Se cura con savia corrompida (y a un aliado adyacente, a mano).', 1, 4),
-    [zo('Plaga de langostas', 'Enjambre en flor de 2: daño y −2 al PdG hasta su siguiente turno (a mano).', 3, 'H'), 5],
+    [zo('Plaga de langostas', 'Enjambre en flor de diámetro 5 (19 casillas): daño y −2 al PdG hasta su siguiente turno (a mano).', 3, 'H'), 5],
     'Protegía el bosque hasta que el bosque le respondió.');
   cr('bosque', 4, 'Cazador espectral', 'rango', 'no-muerto', 'Ballesta fantasma',
     at('Virote espectral', 'Ignora obstáculos livianos; daño de rango.', 'M'),
@@ -391,7 +391,7 @@
 
   cr('bosque', 5, 'Ent ancestral', 'tanque', 'planta', 'Rama ancestral',
     bu('Corteza milenaria', '+6 Defensa y +3 Res.Esp 2 turnos.', 1, {def: 6, resmg: 3}, 2),
-    [zo('Marea de raíces', 'El suelo se llena de raíces en flor de 3: daño enorme e Inmovilizados (a mano).', 3, 'H'), 6],
+    [zo('Marea de raíces', 'El suelo se llena de raíces en flor de diámetro 7 (37 casillas): daño enorme e Inmovilizados (a mano).', 3, 'H'), 6],
     'El árbol más viejo del bosque, y no está contento.');
   cr('bosque', 5, 'Hidra de zarzas', 'brutal', 'bestia', 'Cabezas de espinas',
     at('Mordiscos múltiples', 'Ataca con tres cabezas: tirá el daño 3 veces (a mano).', 'H'),
@@ -399,7 +399,7 @@
     'Cada cabeza cortada se convierte en dos enredaderas.');
   cr('bosque', 5, 'Reina de las hadas oscuras', 'mago', 'humanoide', 'Cetro de escarcha',
     at('Encanto helado', 'Daño mágico; el objetivo pierde 1 No2 (a mano).', 'H'),
-    [zo('Baile de las sombras', 'Ilusión en flor de 2: los golpeados atacan a un aliado si fallan Res.Mt (a mano).', 3, 'H'), 6],
+    [zo('Baile de las sombras', 'Ilusión en flor de diámetro 5 (19 casillas): los golpeados atacan a un aliado si fallan Res.Mt (a mano).', 3, 'H'), 6],
     'Belleza cruel: el bosque baila cuando ella lo ordena.');
 
   /* ---- Tribu de goblins del bosque (2 por nivel; etiquetas 'goblin' y 'tribu goblin') ---- */
@@ -418,7 +418,7 @@
     'Puntería tramposa y una bolsa llena de guijarros.', TG);
   cr('bosque', 2, 'Goblin tamborilero', 'apoyo', 'humanoide', 'Palillos de hueso',
     bu('Ritmo de guerra', '+2 No2 para él hasta el final del turno (y los goblins cercanos, a mano).', 1, {nitros: 2}, 1),
-    [zo('Tambor ensordecedor', 'Onda de sonido en flor de 1: daño y Pajaritos hasta el final de su turno (a mano).', 3, 'M'), 4],
+    [zo('Tambor ensordecedor', 'Onda de sonido en flor de diámetro 3 (7 casillas): daño y Pajaritos hasta el final de su turno (a mano).', 3, 'M'), 4],
     'Marca el paso de la tribu con un tambor de tronco hueco.', TG);
   cr('bosque', 3, 'Goblin jinete de lobo', 'rapido', 'humanoide', 'Lanza corta',
     at('Carga montada', 'Se mueve 4 casillas en línea recta y ataca con +3 de daño.', 'M'),
@@ -434,7 +434,7 @@
     'Sobrevivió a tres jefes de tribu y por eso manda.', TG);
   cr('bosque', 4, 'Goblin lanzabombas', 'rango', 'humanoide', 'Tarro de savia explosiva',
     at('Bomba de savia', 'Bomba pegajosa; el objetivo pierde 1 No2 (a mano).', 'M'),
-    [zo('Bomba de esporas', 'Explosión en flor de 2: daño y Envenenados (a mano).', 3, 'H'), 5],
+    [zo('Bomba de esporas', 'Explosión en flor de diámetro 5 (19 casillas): daño y Envenenados (a mano).', 3, 'H'), 5],
     'Inventor de la tribu: casi siempre falla, casi siempre estalla.', TG);
   cr('bosque', 5, 'Rey de la tribu goblin', 'brutal', 'humanoide', 'Cetro de huesos',
     at('Golpe del rey', 'Golpe demoledor.', 'H'),
@@ -442,7 +442,7 @@
     'Gobierna cientos de goblins desde un trono de raíces y calaveras.', TG);
   cr('bosque', 5, 'Chamán ancestral goblin', 'mago', 'humanoide', 'Hongo viejo',
     at('Rayo del hongo viejo', 'Daño mágico.', 'H'),
-    [zo('Ritual del hongo', 'Hongos en flor de 3: daño enorme y alucinaciones (Pajaritos) (a mano).', 3, 'H'), 6],
+    [zo('Ritual del hongo', 'Hongos en flor de diámetro 7 (37 casillas): daño enorme y alucinaciones (Pajaritos) (a mano).', 3, 'H'), 6],
     'El goblin más viejo del bosque y el que más sabe.', TG);
 
   /* ================= MONTAÑAS ================= */
@@ -456,12 +456,12 @@
     'Espera a los viajeros en el paso y cobra peaje.');
   cr('montañas', 1, 'Águila de risco', 'rango', 'bestia', 'Garras',
     at('Picado', 'Ataca desde el aire; +2 al PdG si viene de altura (a mano).', 'L'),
-    [ta('Chillido ensordecedor', 'Chillido en flor de 1: los golpeados quedan Pajaritos 1 turno (a mano).', 2), 4],
+    [ta('Chillido ensordecedor', 'Chillido en flor de diámetro 3 (7 casillas): los golpeados quedan Pajaritos 1 turno (a mano).', 2), 4],
     'Vigila los desfiladeros desde las corrientes de aire.');
 
   cr('montañas', 2, 'Yeti joven', 'brutal', 'bestia', 'Puños de hielo',
     at('Puñetazo helado', 'Ralentiza: el objetivo pierde 1 No2 (a mano).', 'M'),
-    [zo('Avalancha', 'Arroja nieve en flor de 1: daño y Sentados si fallan Fuerza (a mano).', 3, 'H'), 5],
+    [zo('Avalancha', 'Arroja nieve en flor de diámetro 3 (7 casillas): daño y Sentados si fallan Fuerza (a mano).', 3, 'H'), 5],
     'Todavía no sabe cuánta fuerza tiene.');
   cr('montañas', 2, 'Ballestero de ruta', 'rango', 'humanoide', 'Ballesta pesada',
     at('Virote pesado', 'Daño de rango.', 'M'),
@@ -500,7 +500,7 @@
 
   cr('montañas', 5, 'Gigante de escarcha', 'brutal', 'humanoide', 'Garrote helado',
     at('Puñetazo glacial', 'Congela: el objetivo pierde 2 No2 (a mano).', 'H'),
-    [zo('Tormenta de hielo', 'Hielo en flor de 3: daño y los golpeados quedan Sentados (a mano).', 3, 'H'), 6],
+    [zo('Tormenta de hielo', 'Hielo en flor de diámetro 7 (37 casillas): daño y los golpeados quedan Sentados (a mano).', 3, 'H'), 6],
     'Reina sobre el glaciar más alto de la cordillera.');
   cr('montañas', 5, 'Dragón de ceniza joven', 'mago', 'bestia', 'Aliento de ceniza',
     at('Mordisco ardiente', 'Daño de fuego.', 'H'),
@@ -508,7 +508,7 @@
     'Joven, orgulloso y con una cueva que defender.');
   cr('montañas', 5, 'Titán de granito', 'tanque', 'constructo', 'Puños de titán',
     bu('Piel de granito', '+6 Defensa y +4 Res.Esp 2 turnos.', 1, {def: 6, resmg: 4}, 2),
-    [zo('Terremoto', 'Sacude la montaña: daño en flor de 3 y los golpeados caen Sentados (a mano).', 3, 'H'), 6],
+    [zo('Terremoto', 'Sacude la montaña: daño en flor de diámetro 7 (37 casillas) y los golpeados caen Sentados (a mano).', 3, 'H'), 6],
     'La montaña misma, harta de que la escalen.');
 
   /* ================= TEMPLO ANTIGUO (influencia alienígena) ================= */
@@ -518,16 +518,16 @@
     'Sirvió al templo tanto tiempo que ya no es del todo humano.');
   cr('templo', 1, 'Enjambre de esporas', 'rango', 'alienígena', 'Esporas',
     at('Nube de esporas', 'Daño de rango sobre un objetivo.', 'L'),
-    [zo('Floración', 'Explota en flor de 1: daño y alucinaciones (Pajaritos) 1 turno (a mano).', 2, 'M'), 4],
+    [zo('Floración', 'Explota en flor de diámetro 3 (7 casillas): daño y alucinaciones (Pajaritos) 1 turno (a mano).', 2, 'M'), 4],
     'Una colonia de hongos de origen desconocido.');
   cr('templo', 1, 'Ídolo parpadeante', 'tanque', 'constructo', 'Golpe del ídolo',
     bu('Parpadeo', '+3 Evasión y +2 Defensa hasta su siguiente turno.', 1, {eva: 3, def: 2}, 1),
-    [zo('Pulso de vacío', 'Onda alienígena: daño en flor de 1.', 3, 'M'), 4],
+    [zo('Pulso de vacío', 'Onda alienígena: daño en flor de diámetro 3 (7 casillas).', 3, 'M'), 4],
     'Una estatua que aparece y desaparece entre las columnas.');
 
   cr('templo', 2, 'Sacerdote susurrante', 'mago', 'humanoide', 'Bastón de antena',
     at('Dardo mental', 'Daño mágico que ignora armadura (a mano).', 'M'),
-    [zo('Coro de susurros', 'Susurros en flor de 2: los golpeados tiran Res.Mt o quedan Pajaritos (a mano).', 3, 'H'), 5],
+    [zo('Coro de susurros', 'Susurros en flor de diámetro 5 (19 casillas): los golpeados tiran Res.Mt o quedan Pajaritos (a mano).', 3, 'H'), 5],
     'Escucha una voz en las paredes y la repite en voz alta.');
   cr('templo', 2, 'Cría rasgadora', 'rapido', 'alienígena', 'Garras quitinosas',
     at('Rasgadura', 'Sangrado (aplicar a mano).', 'M'),
@@ -540,7 +540,7 @@
 
   cr('templo', 3, 'Pulpo de vacío', 'brutal', 'alienígena', 'Tentáculos',
     at('Tentáculo atrapador', 'Agarra: Inmovilizado si falla Fuerza (a mano).', 'M'),
-    [zo('Nube de tinta cósmica', 'Tinta en flor de 2: daño y los golpeados no ven más allá de 1 casilla durante 2 turnos (a mano).', 3, 'H'), 5],
+    [zo('Nube de tinta cósmica', 'Tinta en flor de diámetro 5 (19 casillas): daño y los golpeados no ven más allá de 1 casilla durante 2 turnos (a mano).', 3, 'H'), 5],
     'Flota en una cámara inundada de algo que no es agua.');
   cr('templo', 3, 'Cultista de la Antena', 'apoyo', 'humanoide', 'Bastón-antena',
     bu('Sintonía', '+2 al daño para él (y sus aliados, a mano) hasta el final del turno.', 1, {dmg: 2}, 1),
@@ -557,11 +557,11 @@
     'Se alimenta de recuerdos; empieza por los más queridos.');
   cr('templo', 4, 'Golem de meteorito', 'tanque', 'constructo', 'Puños de meteorito',
     bu('Coraza estelar', '+5 Defensa y +5 Res.Esp 2 turnos.', 1, {def: 5, resmg: 5}, 2),
-    [zo('Impacto de meteorito', 'Cae desde el cielo en flor de 2: daño enorme.', 3, 'H'), 6],
+    [zo('Impacto de meteorito', 'Cae desde el cielo en flor de diámetro 5 (19 casillas): daño enorme.', 3, 'H'), 6],
     'Una roca caída del cielo que se puso de pie.');
   cr('templo', 4, 'Heraldo estelar', 'apoyo', 'alienígena', 'Báculo de luz',
     bu('Halo de luz', '+3 Evasión y +1 No2 hasta su siguiente turno.', 1, {eva: 3, nitros: 1}, 1),
-    [zo('Nova estelar', 'Explosión de luz en flor de 2: daño y ciega (−3 al PdG) 1 turno (a mano).', 3, 'H'), 5],
+    [zo('Nova estelar', 'Explosión de luz en flor de diámetro 5 (19 casillas): daño y ciega (−3 al PdG) 1 turno (a mano).', 3, 'H'), 5],
     'Anuncia con luz lo que viene detrás de él.');
 
   cr('templo', 5, 'Avatar de la Estrella Negra', 'mago', 'alienígena', 'Toque del vacío',
@@ -583,14 +583,14 @@
   // Minas
   cr('minas', 1, 'Hongo de galería', 'debuffer', 'planta', 'Sombrero venenoso',
     ta('Esporas ciegas', 'Esporas en la cara: el objetivo tira con -1 a la PdG hasta el final de su próximo turno si falla Res.Mt (a mano).', 1),
-    [ta('Moho pegajoso', 'Deja el suelo pegajoso en flor de 1: los que lo pisen quedan Rengos 2 turnos (a mano).', 2), 3],
+    [ta('Moho pegajoso', 'Deja el suelo pegajoso en flor de diámetro 3 (7 casillas): los que lo pisen quedan Rengos 2 turnos (a mano).', 2), 3],
     'Crece donde hay humedad y hace toser a todos los que pasan.');
   cr('minas', 2, 'Kobold maldiciente', 'debuffer', 'humanoide', 'Pico de juguete',
     ta('Maldición del pico roto', 'Especial contra Res.Mt: el objetivo queda Lisiado 2 turnos (a mano).', 1),
     [ta('Mal de mina', 'Especial contra Res.Mt: el objetivo queda Cansado (pierde un tercio de sus No2 máx.) 2 turnos (a mano).', 2), 4],
     'Susurra insultos en un idioma que no existe, y funcionan.');
   cr('minas', 3, 'Nube de sílice', 'debuffer', 'elemental', 'Tormenta de polvo',
-    ta('Polvo en los ojos', 'Nube en flor de 1: los afectados quedan Pajaritos hasta el final de su próximo turno (a mano).', 1),
+    ta('Polvo en los ojos', 'Nube en flor de diámetro 3 (7 casillas): los afectados quedan Pajaritos hasta el final de su próximo turno (a mano).', 1),
     [zo('Silicosis', 'Aire irrespirable: daño y 3 stacks de Veneno al objetivo (a mano).', 2, 'M'), 4],
     'Polvo que aprendió a odiar a los pulmones.');
   cr('minas', 4, 'Chamán de las galerías', 'debuffer', 'humanoide', 'Cetro de hueso de rata',
@@ -598,7 +598,7 @@
     [ta('Derrumbe mental', 'Especial contra Res.Mt: Confusión 2 turnos; antes de actuar, el objetivo tira 1d4 (1 el chamán elige el objetivo, 2 pierde la acción, 3 al azar, 4 normal) (a mano).', 3), 5],
     'Dice que la montaña le habla, y a veces acierta.');
   cr('minas', 5, 'Reina de las esporas', 'debuffer', 'planta', 'Corona de micelio',
-    ta('Esporas alucinógenas', 'Nube en flor de 2: Confusión a los afectados 2 turnos (a mano, 1d4 por acción).', 2),
+    ta('Esporas alucinógenas', 'Nube en flor de diámetro 5 (19 casillas): Confusión a los afectados 2 turnos (a mano, 1d4 por acción).', 2),
     [zo('Micelio hambriento', 'Raíces en el suelo: el objetivo queda Inmovilizado 1 turno y recibe 3 stacks de Veneno (a mano).', 3, 'H'), 6],
     'Cuarenta hectáreas de hongo que decidieron ser una sola persona.');
   // Bosque
@@ -612,7 +612,7 @@
     'Diminuta, brillante y con memoria eterna para los agravios.');
   cr('bosque', 3, 'Bruja de los pantanos', 'debuffer', 'humanoide', 'Cucharón de caldero',
     ta('Maldición extenuante', 'Especial contra Res.Mt: todas las acciones del objetivo cuestan +1 No2 durante 1 turno (a mano).', 2),
-    [zo('Niebla venenosa', 'Nube en flor de 2: daño y 3 stacks de Veneno a quien esté adentro en el Mantenimiento (a mano).', 3, 'M'), 5],
+    [zo('Niebla venenosa', 'Nube en flor de diámetro 5 (19 casillas): daño y 3 stacks de Veneno a quien esté adentro en el Mantenimiento (a mano).', 3, 'M'), 5],
     'Vive en un caldero más grande que su casa.');
   cr('bosque', 4, 'Enredadera parasitaria', 'debuffer', 'planta', 'Zarcillos',
     ta('Zarcillos', 'Atrapa a un objetivo a hasta 3 casillas: Inmovilizado 2 turnos si falla Fuerza (a mano).', 2),
@@ -633,11 +633,11 @@
     'Un frío que camina.');
   cr('montañas', 3, 'Arpía cantora', 'debuffer', 'bestia', 'Garras de arpía',
     ta('Canto confuso', 'Especial contra Res.Mt: Confusión 1 turno; antes de actuar, el objetivo tira 1d4 (1 la arpía elige el objetivo, 2 pierde la acción, 3 al azar, 4 normal) (a mano).', 2),
-    [ta('Chillido', 'Grito en flor de 1: los afectados quedan Pajaritos hasta el final de su próximo turno (a mano).', 2), 4],
+    [ta('Chillido', 'Grito en flor de diámetro 3 (7 casillas): los afectados quedan Pajaritos hasta el final de su próximo turno (a mano).', 2), 4],
     'Su voz es preciosa, y ese es el problema.');
   cr('montañas', 4, 'Bruja de la nevada', 'debuffer', 'humanoide', 'Bastón de carámbano',
     ta('Maldición debilitante', 'Especial contra Res.Mt: -1 a todas las tiradas del objetivo 2 turnos, acumulable (a mano).', 2),
-    [zo('Tormenta de hielo', 'Granizo en flor de 2: daño y los golpeados quedan Inmovilizados 1 turno si fallan Fuerza (a mano).', 3, 'H'), 5],
+    [zo('Tormenta de hielo', 'Granizo en flor de diámetro 5 (19 casillas): daño y los golpeados quedan Inmovilizados 1 turno si fallan Fuerza (a mano).', 3, 'H'), 5],
     'Camina sobre la nieve sin dejar huellas.');
   cr('montañas', 5, 'Wendigo del paso', 'debuffer', 'no-muerto', 'Garras de hambre',
     ta('Hambre helada', 'Especial contra Res.Mt: el objetivo queda Exhausto (1 No2 máx.) 2 turnos (a mano).', 3),
@@ -685,7 +685,7 @@
     'Silencioso, paciente y con un pésimo sentido del humor.');
   hu('bandidos', 4, 'Envenenador de la banda', 'debuffer', 'Daga de la viuda verde', 'Chaleco de escamas del envenenador',
     at('Daga envenenada', 'Daño y 2 stacks de Veneno al objetivo (a mano).', 'M'),
-    [zo('Frasco de gas', 'Lanza un frasco en flor de 1: daño; los afectados quedan Pajaritos 1 turno si fallan Res.Mt (a mano).', 3, 'M'), 5],
+    [zo('Frasco de gas', 'Lanza un frasco en flor de diámetro 3 (7 casillas): daño; los afectados quedan Pajaritos 1 turno si fallan Res.Mt (a mano).', 3, 'M'), 5],
     'Sabe de venenos más que de modales.');
   hu('bandidos', 5, 'Jefe de la banda', 'brutal', 'Espada del Jefe de los Mil Caminos', 'Gambesón de mando del jefe bandido',
     at('Tajo del jefe', 'Golpe pesado.', 'H'),
@@ -702,7 +702,7 @@
     'Pelea por su clan y por la última cerveza.');
   hu('bárbaros', 3, 'Chamán de la tormenta', 'mago', 'Bastón del trueno', 'Túnica de nubarrón',
     at('Chispa de tormenta', 'Daño mágico eléctrico.', 'M'),
-    [zo('Rayo del cielo', 'Un rayo cae en flor de 1: daño; los golpeados quedan Pajaritos 1 turno si fallan Res.Mt (a mano).', 3, 'H'), 5],
+    [zo('Rayo del cielo', 'Un rayo cae en flor de diámetro 3 (7 casillas): daño; los golpeados quedan Pajaritos 1 turno si fallan Res.Mt (a mano).', 3, 'H'), 5],
     'Habla con las nubes, y las nubes contestan.');
   hu('bárbaros', 4, 'Berserker', 'brutal', 'Hacha de la furia roja', 'Pieles del berserker',
     at('Hachazo salvaje', 'Golpe descontrolado.', 'H'),
@@ -744,7 +744,7 @@
     'Navega por estrellas que no figuran en ningún mapa.');
   hu('piratas espaciales', 3, 'Artillero de cubierta', 'rango', 'Arcabuz de cubierta', 'Casco de artillero pintado a mano',
     at('Disparo de mosquete', 'Daño de rango.', 'M'),
-    [zo('Andanada de cañón', 'Cañonazo en flor de 1: daño a todos los adyacentes al punto (a mano elegir el punto).', 3, 'H'), 5],
+    [zo('Andanada de cañón', 'Cañonazo en flor de diámetro 3 (7 casillas): daño a todos los adyacentes al punto (a mano elegir el punto).', 3, 'H'), 5],
     'Ama los cañones y sospecha de todo lo que no explota.');
   hu('piratas espaciales', 4, 'Contramaestre', 'brutal', 'Cimitarra del contramaestre', 'Cota de malla de contramaestre',
     at('Latigazo de cabo', 'Golpe con el cabo; el objetivo pierde 1 No2 (a mano).', 'M'),
@@ -752,7 +752,7 @@
     'Sin él la nave se iría a pique en una hora.');
   hu('piratas espaciales', 5, 'Capitán pirata', 'brutal', 'Espada bastarda del Espectro', 'Gambesón del capitán del Espectro',
     at('Estocada del capitán', 'Golpe de espada bastarda.', 'H'),
-    [zo('Cañonazo del Espectro', 'Ordena disparar los cañones de su nave: daño en flor de 2 (a mano elegir el punto).', 3, 'H'), 6],
+    [zo('Cañonazo del Espectro', 'Ordena disparar los cañones de su nave: daño en flor de diámetro 5 (19 casillas) (a mano elegir el punto).', 3, 'H'), 6],
     'Su nave es rápida, su fama es larga y su paciencia es corta.');
   // Cultistas
   hu('cultistas', 1, 'Acólito de capucha', 'apoyo', 'Estileto', null,
@@ -809,7 +809,7 @@
     'Caza de noche y no deja huellas.');
   cr('minas', 3, 'Kobold artificiero', 'rango', 'humanoide', 'Ballesta de bolsillo',
     at('Virote con mecha', 'Un virote con un cartucho atado.', 'M'),
-    [tr('Mina de mecha', 'Entierra una mina con mecha lenta: al pisarla explota con {T} en flor de 1.', 3, 'H'), 5],
+    [tr('Mina de mecha', 'Entierra una mina con mecha lenta: al pisarla explota con {T} en flor de diámetro 3 (7 casillas).', 3, 'H'), 5],
     'El mejor amigo de los derrumbes.');
   cr('montañas', 3, 'Cazador de las cumbres', 'rapido', 'humanoide', 'Lanza corta',
     at('Lanzazo', 'Una estocada rápida.', 'M'),
@@ -821,7 +821,7 @@
     'Se mueve sin hacer ruido entre las ruinas.');
   cr('templo', 4, 'Guardián de sellos', 'mago', 'humanoide', 'Bastón de runas',
     at('Chispa del sello', 'Un chispazo rúnico.', 'M'),
-    [tr('Sello explosivo', 'Graba un sello en el piso: al pisarlo explota en flor de 1 con {T} mágico.', 3, 'H'), 5],
+    [tr('Sello explosivo', 'Graba un sello en el piso: al pisarlo explota en flor de diámetro 3 (7 casillas) con {T} mágico.', 3, 'H'), 5],
     'Protege lo que nadie quiere ya.');
 
   hu('bandidos', 2, 'Trampero de caminos', 'rapido', 'Daga', 'Casaca curtida de salteador',
@@ -846,11 +846,11 @@
     'Cuelga campanitas de cada cuerda.');
   hu('piratas espaciales', 3, 'Minador de cubierta', 'rango', 'Arcabuz de cubierta', 'Casco de artillero pintado a mano',
     at('Tiro de arcabuz', 'Un disparo a distancia.', 'M'),
-    [tr('Mina magnética', 'Pega una mina al piso de la cubierta: explota en flor de 1 con {T} a quien la pise.', 3, 'H'), 5],
+    [tr('Mina magnética', 'Pega una mina al piso de la cubierta: explota en flor de diámetro 3 (7 casillas) con {T} a quien la pise.', 3, 'H'), 5],
     'Llena la nave enemiga de sorpresas.');
   hu('cultistas', 3, 'Guardián de runas', 'mago', 'Báculo del inquisidor', 'Pasamontañas de inquisidor',
     at('Chispa ritual', 'Un chispazo.', 'M'),
-    [tr('Runa explosiva', 'Graba una runa en el piso: explota en flor de 1 con {T} mágico.', 3, 'H'), 5],
+    [tr('Runa explosiva', 'Graba una runa en el piso: explota en flor de diámetro 3 (7 casillas) con {T} mágico.', 3, 'H'), 5],
     'Sus runas esperan pacientes.');
   hu('mercenarios', 3, 'Trampero a sueldo', 'rango', 'Arco del rastreador', 'Grebas del rastreador',
     at('Flecha de trampero', 'Una flecha a distancia.', 'M'),
@@ -902,7 +902,7 @@
     'Se pegó cristales por todos lados y ahora nadie se le acerca.', KB);
   cr('minas', 3, 'Kobold hechicero de la llama', 'mago', 'humanoide', 'Vara de escamas',
     at('Llamarada', 'Fuego mágico a distancia.', 'M'),
-    [ap(zo('Bola de fuego draconiana', 'Explosión en flor de 1: daño y los golpeados quedan Quemados 2 turnos.', 3, 'H'), A('Quemado', 2, {}, -2)), 5],
+    [ap(zo('Bola de fuego draconiana', 'Explosión en flor de diámetro 3 (7 casillas): daño y los golpeados quedan Quemados 2 turnos.', 3, 'H'), A('Quemado', 2, {}, -2)), 5],
     'Jura descender de un dragón y nadie se lo discute.', KB);
 
   cr('minas', 4, 'Kobold tejedor de redes', 'rango', 'humanoide', 'Red con plomos',
@@ -948,7 +948,7 @@
 
   cr('bosque', 3, 'Goblin apicultor', 'debuffer', 'humanoide', 'Panal en honda',
     at('Panal lanzado', 'Lanza un panal enojado.', 'M'),
-    [ap(zo('Enjambre', 'Nube de avispas en flor de 1: daño y los afectados quedan Pajaritos hasta el final de su próximo turno.', 3, 'M'), A('Pajaritos', 1)), 4],
+    [ap(zo('Enjambre', 'Nube de avispas en flor de diámetro 3 (7 casillas): daño y los afectados quedan Pajaritos hasta el final de su próximo turno.', 3, 'M'), A('Pajaritos', 1)), 4],
     'Las avispas lo quieren; a los demás, no.', TG);
   cr('bosque', 3, 'Goblin arquero de copa', 'rango', 'humanoide', 'Arco de rama',
     at('Flecha desde la copa', 'Una flecha larga desde lo alto.', 'M'),
@@ -970,7 +970,7 @@
     'Protege al rey con una armadura que fue de su abuelo.', TG);
   cr('bosque', 5, 'Goblin bruja del pantano', 'debuffer', 'humanoide', 'Cucharón de caldero',
     at('Rayo pantanoso', 'Un rayo verde de barro.', 'H'),
-    [ap(zo('Maldición del pantano', 'Niebla verde en flor de 2: daño y los afectados quedan Malditos (-2 Res.Esp, -1 Defensa) 3 turnos.', 3, 'H'), A('Maldito', 3, {resmg: -2, def: -1})), 6],
+    [ap(zo('Maldición del pantano', 'Niebla verde en flor de diámetro 5 (19 casillas): daño y los afectados quedan Malditos (-2 Res.Esp, -1 Defensa) 3 turnos.', 3, 'H'), A('Maldito', 3, {resmg: -2, def: -1})), 6],
     'Cocina maldiciones con lo que encuentra en el fondo del pantano.', TG);
 
   /* ---- Hombres cabra de las montañas (raza nueva: 14, de nivel 1 a 5; etiquetas 'hombre cabra' y 'clan cabruno') ---- */
@@ -1011,7 +1011,7 @@
     'Golpea el metal igual que a los invitados.', HC);
   cr('montañas', 3, 'Hombre cabra chamán del viento', 'mago', 'humanoide', 'Bastón con cuernos',
     at('Ráfaga cortante', 'Viento afilado como una cuchilla.', 'M'),
-    [zo('Vendaval', 'Viento huracanado en flor de 2: daño y empuja 2 casillas a los golpeados (a mano).', 3, 'H'), 5],
+    [zo('Vendaval', 'Viento huracanado en flor de diámetro 5 (19 casillas): daño y empuja 2 casillas a los golpeados (a mano).', 3, 'H'), 5],
     'Habla con el viento y a veces el viento le hace caso.', HC);
 
   cr('montañas', 4, 'Hombre cabra ariete', 'tanque', 'humanoide', 'Casco de hierro con cuernos',
@@ -1029,7 +1029,7 @@
 
   cr('montañas', 5, 'Patriarca cabruno', 'brutal', 'humanoide', 'Cetro de cuernos',
     at('Cornada del patriarca', 'Un golpe demoledor.', 'H'),
-    [zo('Alud', 'Hace caer un alud en flor de 3: daño enorme y los golpeados quedan Sentados (a mano).', 3, 'H'), 6],
+    [zo('Alud', 'Hace caer un alud en flor de diámetro 7 (37 casillas): daño enorme y los golpeados quedan Sentados (a mano).', 3, 'H'), 6],
     'El más viejo, el más terco y el que decide todo en el clan.', HC);
   cr('montañas', 5, 'Hombre cabra oráculo de las cumbres', 'debuffer', 'humanoide', 'Bastón de tormenta',
     at('Rayo de tormenta', 'Un rayo desde las nubes.', 'H'),
@@ -1037,7 +1037,7 @@
     'Sus profecías casi siempre acaban mal, para el que las escucha.', HC);
   cr('montañas', 5, 'Hombre cabra francotirador', 'rango', 'humanoide', 'Arco de cuerno de carnero',
     at('Flecha certera', 'Un disparo perfecto.', 'H'),
-    [tr('Alud en el paso', 'Deja una carga de rocas lista en el sendero: al pisarla se desata un alud en flor de 1 con {T}.', 4, 'H'), 6],
+    [tr('Alud en el paso', 'Deja una carga de rocas lista en el sendero: al pisarla se desata un alud en flor de diámetro 3 (7 casillas) con {T}.', 4, 'H'), 6],
     'Nunca falla; a veces solo avisa.', HC);
 
   /* ================= AMPLIACIÓN DE FACCIONES (2026-09-26, pedido del dueño): goblins del bosque, kobolds y una colmena de insectos =================
@@ -1059,7 +1059,7 @@
     'Cura cualquier cosa, menos el olor.', TG);
   cr('bosque', 1, 'Goblin aprendiz de brujo', 'mago', 'humanoide', 'Varita de rama',
     at('Chispa', 'Un destello de magia torpe.', 'L'),
-    [zo('Chispazo descontrolado', 'Un estallido en flor de 1: daño a los de adentro (algún goblin también, a mano).', 2, 'M'), 4],
+    [zo('Chispazo descontrolado', 'Un estallido en flor de diámetro 3 (7 casillas): daño a los de adentro (algún goblin también, a mano).', 2, 'M'), 4],
     'Todavía no sabe qué hace la mitad de sus hechizos.', TG);
   cr('bosque', 2, 'Goblin adivino de huesos', 'mago', 'humanoide', 'Bastón de huesos',
     at('Rayo de huesos', 'Una descarga de energía verde.', 'M'),
@@ -1109,7 +1109,7 @@
     'Nadie sabe qué les dice; todos vuelven distintos.', KB);
   cr('minas', 1, 'Kobold aprendiz de dragón', 'mago', 'humanoide', 'Vara de escamas chica',
     at('Chispa de dragón', 'Un chispazo de fuego mágico.', 'L'),
-    [zo('Bocanada de humo', 'Una nube de humo caliente en flor de 1: daño a los de adentro.', 2, 'M'), 4],
+    [zo('Bocanada de humo', 'Una nube de humo caliente en flor de diámetro 3 (7 casillas): daño a los de adentro.', 2, 'M'), 4],
     'Todavía tose más humo del que escupe.', KB);
   cr('minas', 2, 'Kobold del cristal resonante', 'mago', 'humanoide', 'Cristal que vibra',
     at('Rayo de cristal', 'Un rayo de luz que sale del cristal.', 'M'),
@@ -1117,7 +1117,7 @@
     'Vive cerca del cristal más grande de la mina y se le nota.', KB);
   cr('minas', 4, 'Kobold ígneo de las profundidades', 'mago', 'humanoide', 'Bastón de lava',
     at('Chorro de lava', 'Lava mágica a distancia.', 'M'),
-    [ap(zo('Erupción', 'Una erupción en flor de 1: daño y los golpeados quedan Quemados 2 turnos.', 3, 'H'), A('Quemado', 2, {}, -2)), 5],
+    [ap(zo('Erupción', 'Una erupción en flor de diámetro 3 (7 casillas): daño y los golpeados quedan Quemados 2 turnos.', 3, 'H'), A('Quemado', 2, {}, -2)), 5],
     'Bajó tanto que salió del otro lado, hecho de fuego.', KB);
 
   /* ---- Kobolds de las cumbres (kobolds de montaña, +14): al menos dos de cada rol ---- */
@@ -1148,7 +1148,7 @@
     'Blanco sobre blanco, hasta que pincha.', KM);
   cr('montañas', 1, 'Kobold hondero de riscos', 'rango', 'humanoide', 'Honda de cuero',
     at('Piedra lanzada', 'Una piedra bien puesta.', 'L'),
-    [ap(zo('Lluvia de piedras', 'Hace caer piedras en flor de 1: daño y los golpeados quedan Pajaritos hasta el final de su próximo turno.', 2, 'M'), A('Pajaritos', 1)), 4],
+    [ap(zo('Lluvia de piedras', 'Hace caer piedras en flor de diámetro 3 (7 casillas): daño y los golpeados quedan Pajaritos hasta el final de su próximo turno.', 2, 'M'), A('Pajaritos', 1)), 4],
     'Siempre tiene una piedra más.', KM);
   cr('montañas', 4, 'Kobold arquero del viento', 'rango', 'humanoide', 'Arco de cuerno',
     at('Flecha con viento', 'Una flecha que aprovecha la ráfaga.', 'M'),
@@ -1172,11 +1172,11 @@
     'Amarra el viento en nudos y lo suelta cuando le conviene.', KM);
   cr('montañas', 3, 'Kobold chamán de la tormenta', 'mago', 'humanoide', 'Vara de cobre',
     at('Rayito', 'Un rayo chico desde la vara.', 'M'),
-    [ap(zo('Trueno', 'Un trueno en flor de 1: daño y los golpeados quedan Pajaritos hasta el final de su próximo turno.', 3, 'H'), A('Pajaritos', 1)), 5],
+    [ap(zo('Trueno', 'Un trueno en flor de diámetro 3 (7 casillas): daño y los golpeados quedan Pajaritos hasta el final de su próximo turno.', 3, 'H'), A('Pajaritos', 1)), 5],
     'Cuando truena, siempre está cerca.', KM);
   cr('montañas', 5, 'Kobold vidente del hielo', 'mago', 'humanoide', 'Esfera de cristal helado',
     at('Rayo de escarcha', 'Un rayo helado desde la esfera.', 'H'),
-    [ap(zo('Congelar el aire', 'Congela el aire en flor de 2: daño y los golpeados quedan con Escarcha (-1 No2) 1 turno.', 3, 'H'), A('Escarcha', 1, {nitros: -1})), 6],
+    [ap(zo('Congelar el aire', 'Congela el aire en flor de diámetro 5 (19 casillas): daño y los golpeados quedan con Escarcha (-1 No2) 1 turno.', 3, 'H'), A('Escarcha', 1, {nitros: -1})), 6],
     'Ve el futuro congelado y por eso nunca cambia.', KM);
 
   /* ---- Colmena: un universo de insectos y bichos (30): cuatro o cinco de cada rol, de nivel 1 a 5 ---- */
@@ -1238,7 +1238,7 @@
     'No caza por hambre, sino para el nido.', IN);
   cr('bosque', 5, 'Avispón gigante', 'rapido', 'bestia', 'Aguijón de avispón',
     ap(at('Aguijonazo feroz', 'Un aguijonazo enorme: daño y el objetivo queda Envenenado.', 'H'), A('Veneno')),
-    [ap(zo('Enjambre de avispones', 'Llama a su nido: nube en flor de 1 con daño y los golpeados quedan Pajaritos hasta el final de su próximo turno.', 3, 'H'), A('Pajaritos', 1)), 5],
+    [ap(zo('Enjambre de avispones', 'Llama a su nido: nube en flor de diámetro 3 (7 casillas) con daño y los golpeados quedan Pajaritos hasta el final de su próximo turno.', 3, 'H'), A('Pajaritos', 1)), 5],
     'Un solo avispón; todo un enjambre de problemas.', IN);
   // rango
   cr('bosque', 1, 'Hormiga escupidora', 'rango', 'bestia', 'Ácido fórmico',
@@ -1251,7 +1251,7 @@
     'Sabe que el aguijón solo se usa una vez, y lo aprovecha.', IN);
   cr('bosque', 3, 'Escarabajo bombardero', 'rango', 'bestia', 'Gas caliente',
     at('Bomba de gas', 'Un chorro de gas hirviente.', 'M'),
-    [ap(zo('Descarga explosiva', 'Un estallido de gas caliente en flor de 1: daño y los golpeados quedan Quemados 2 turnos.', 3, 'M'), A('Quemado', 2, {}, -2)), 4],
+    [ap(zo('Descarga explosiva', 'Un estallido de gas caliente en flor de diámetro 3 (7 casillas): daño y los golpeados quedan Quemados 2 turnos.', 3, 'M'), A('Quemado', 2, {}, -2)), 4],
     'Combina dos químicos en el abdomen y dispara.', IN);
   cr('bosque', 4, 'Escorpión de cola larga', 'rango', 'bestia', 'Aguijón de cola',
     ap(at('Cola arrojada', 'Lanza el aguijón de la cola: daño y el objetivo queda Envenenado.', 'M'), A('Veneno')),
@@ -1264,11 +1264,11 @@
     'De noche, encandila; de día, se duerme.', IN);
   cr('bosque', 3, 'Polilla de polvo hipnótico', 'mago', 'bestia', 'Polvo de alas',
     at('Polvo de alas', 'Una nube de polvo que raspa.', 'M'),
-    [ap(zo('Polvo hipnótico', 'Sacude las alas: daño en flor de 1 y los golpeados quedan Stun 1 turno.', 3, 'M'), A('Stun', 1)), 5],
+    [ap(zo('Polvo hipnótico', 'Sacude las alas: daño en flor de diámetro 3 (7 casillas) y los golpeados quedan Stun 1 turno.', 3, 'M'), A('Stun', 1)), 5],
     'Sus alas tienen dibujos que mareaban antes de que cayera el polvo.', IN);
   cr('bosque', 4, 'Cigarra de tormenta', 'mago', 'bestia', 'Timbal de cigarra',
     at('Chillido eléctrico', 'Un chillido que descarga electricidad.', 'M'),
-    [ap(zo('Descarga en el timbal', 'Un chillido en flor de 2: daño y los golpeados quedan con Descarga (-1 No2) 1 turno.', 3, 'H'), A('Descarga', 1, {nitros: -1})), 5],
+    [ap(zo('Descarga en el timbal', 'Un chillido en flor de diámetro 5 (19 casillas): daño y los golpeados quedan con Descarga (-1 No2) 1 turno.', 3, 'H'), A('Descarga', 1, {nitros: -1})), 5],
     'Canta antes de la tormenta y la tormenta obedece.', IN);
   cr('bosque', 5, 'Mantis oracular', 'mago', 'bestia', 'Garras de mantis',
     at('Rayo del oráculo', 'Un rayo azul desde los ojos.', 'H'),
@@ -1354,11 +1354,11 @@
     'Un brasero que aprendió a caminar y a molestar.', EF); RASTRO();
   cr('fuego', 3, 'Mago de ceniza', 'mago', 'elemental', 'Bastón de carbón',
     at('Bola de brasas', 'Un proyectil de brasas.', 'M'),
-    [ap(zo('Bola de fuego', 'Explosión en flor de 1: daño y los golpeados quedan Quemados 2 turnos; deja terreno incendiado (a mano).', 3, 'H'), A('Quemado', 2, {}, -2)), 5],
+    [ap(zo('Bola de fuego', 'Explosión en flor de diámetro 3 (7 casillas): daño y los golpeados quedan Quemados 2 turnos; deja terreno incendiado (a mano).', 3, 'H'), A('Quemado', 2, {}, -2)), 5],
     'Sus hechizos huelen a chamusquina.', EF); RASTRO();
   cr('fuego', 4, 'Arquero de magma', 'rango', 'elemental', 'Arco de lava',
     at('Flecha de magma', 'Una flecha de roca fundida.', 'M'),
-    [ap(zo('Lluvia de fuego', 'Flechas ardientes en flor de 2: daño y los golpeados quedan Quemados 2 turnos.', 3, 'H'), A('Quemado', 2, {}, -2)), 5],
+    [ap(zo('Lluvia de fuego', 'Flechas ardientes en flor de diámetro 5 (19 casillas): daño y los golpeados quedan Quemados 2 turnos.', 3, 'H'), A('Quemado', 2, {}, -2)), 5],
     'Dispara desde el borde del cráter y no falla.', EF); RASTRO();
   cr('fuego', 5, 'Fénix menor', 'apoyo', 'elemental', 'Pico de brasa',
     cu('Renacer parcial', 'Se cura con su propio fuego.', 1, 5),

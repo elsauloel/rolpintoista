@@ -593,8 +593,8 @@ function hudAjustesHtml(t, d){
       '</div>') +
     seccion('Aura',
       '<div class="hud-rejilla">' +
-        '<label for="hud-aura-radio">Radio</label>' +
-        `<input id="hud-aura-radio" type="number" min="0" max="30" step="1" inputmode="numeric" value="${Math.round(num(aura.radio))}" data-hud-aura="radio" title="Casilleros enteros: 1 = su casilla y las 6 de alrededor; 0 = sin aura">` +
+        '<label for="hud-aura-radio">Anillos</label>' +
+        `<input id="hud-aura-radio" type="number" min="0" max="30" step="1" inputmode="numeric" value="${Math.round(num(aura.radio))}" data-hud-aura="radio" title="1 = su casilla y las 6 de alrededor (diámetro 3); 2 = 19 casillas (diámetro 5); 0 = sin aura">` +
         '<label for="hud-aura-color">Color</label>' +
         `<input id="hud-aura-color" type="color" value="${/^#[0-9a-fA-F]{6}$/.test(aura.color || '') ? aura.color : '#E0A458'}" data-hud-aura="color">` +
         '<label for="hud-aura-forma">Forma</label>' +
@@ -607,7 +607,7 @@ function hudAjustesHtml(t, d){
         (aura.radio ? '<button type="button" class="hud-mini peligro" data-hud-aura-no="1">Quitar</button>' : '') +
         '<button type="button" class="hud-mini" data-hud-aura-ok="1">Guardar aura</button>' +
       '</div>' +
-      '<p class="hud-ayuda">Radio en casilleros (1 = su casilla y las 6 de alrededor). La ven todos.</p>') +
+      '<p class="hud-ayuda">Anillos alrededor del token: 1 = su casilla y las 6 de alrededor (diámetro 3), 2 = 19 casillas (diámetro 5). La ven todos.</p>') +
     imagenHtml +
     editarHtml +
     '</div>';

@@ -116,7 +116,7 @@ function renderHerramientaFlotante(){
         <option value="destapar"${nieblaModo === 'destapar' ? ' selected' : ''}>Destapar</option>
         <option value="tapar"${nieblaModo === 'tapar' ? ' selected' : ''}>Tapar</option>
       </select>
-      <label class="etiqueta">Radio: ${nieblaPincelRadio} (1 casilla + ${nieblaPincelRadio} anillo${nieblaPincelRadio === 1 ? '' : 's'})</label>
+      <label class="etiqueta">Tamaño: ${Combatiente.areaTxt(nieblaPincelRadio)}</label>
       <input type="range" id="niebla-radio" min="0" max="5" step="1" value="${nieblaPincelRadio}">
       <p class="tk-lapiz-ayuda">Arrastrá sobre el mapa para ${nieblaModo === 'destapar' ? 'destapar' : 'volver a tapar'} zonas. ${nieblaActiva ? '' : 'La niebla está apagada: prendela con el botón de la cabecera.'}</p>
       <div class="fila"><button type="button" class="btn peligro" id="niebla-reiniciar">Reiniciar (tapar todo)</button></div>`;
@@ -154,7 +154,7 @@ function renderHerramientaFlotante(){
       <button type="button" class="btn primary" id="trampa-asistente" style="margin-top:6px;width:100%" title="Nombre, superficie, daño, estado y más, paso a paso">🪄 ${elemTrampaNombre ? 'Cambiar' : 'Armar'} la trampa paso a paso</button>
       <button type="button" class="btn" id="trampa-guardar" style="margin-top:6px;width:100%" title="Dejarla guardada para colocarla de nuevo cuando quieras">💾 Guardar como recurrente</button>
       ${trampasGuardadasHtml()}` : ''}
-      <p class="tk-lapiz-ayuda">${elemTipo === 'flor' ? `Clic para elegir el centro y arrastrá hasta el tamaño que quieras (radio hasta ${TAMANO_ELEMENTO_MAX}); un clic solo deja una casilla.` : elemTipo === 'linea' ? 'Clic y arrastrá: la línea llega hasta donde sueltes, en la dirección más cercana.' : 'Clic y arrastrá para pintar los casilleros.'}${esTrampa ? '' : ` ${elemSolido ? 'Sólido — bloquea ese casillero y cualquier ruta que lo cruce.' : 'Transitable — no bloquea el paso.'}${soyGM ? ' Invisible: solo vos y quien lo creó ven el contorno (punteado violeta); con Sólido sirve para marcar zonas intransitables ya dibujadas en el fondo, sin que se note un dibujo de más.' : ''}`}</p>
+      <p class="tk-lapiz-ayuda">${elemTipo === 'flor' ? `Clic para elegir el centro y arrastrá hasta el tamaño que quieras (diámetro hasta ${2 * TAMANO_ELEMENTO_MAX + 1}); un clic solo deja una casilla.` : elemTipo === 'linea' ? 'Clic y arrastrá: la línea llega hasta donde sueltes, en la dirección más cercana.' : 'Clic y arrastrá para pintar los casilleros.'}${esTrampa ? '' : ` ${elemSolido ? 'Sólido — bloquea ese casillero y cualquier ruta que lo cruce.' : 'Transitable — no bloquea el paso.'}${soyGM ? ' Invisible: solo vos y quien lo creó ven el contorno (punteado violeta); con Sólido sirve para marcar zonas intransitables ya dibujadas en el fondo, sin que se note un dibujo de más.' : ''}`}</p>
       ${borradorElemento ? `<div class="nt-pista" style="color:var(--paper);border-top:1px solid var(--line);padding-top:8px;margin-top:8px">
         Borrador: ajustá lo de arriba y mirá cómo queda en el mapa. Hacé clic en otro lado (o Enter) para crearlo; Esc o clic derecho lo descartan.</div>
         <div class="fila"><button type="button" class="btn primary" id="borrador-crear">✔ Crear</button><button type="button" class="btn" id="borrador-descartar">Descartar</button></div>` : ''}`;
@@ -368,7 +368,7 @@ $('#herramienta-flotante').addEventListener('input', e => {
   if(e.target.id === 'niebla-radio'){
     nieblaPincelRadio = Math.max(0, Math.min(5, num(e.target.value)));
     const et = e.target.previousElementSibling;
-    if(et) et.textContent = `Radio: ${nieblaPincelRadio} (1 casilla + ${nieblaPincelRadio} anillo${nieblaPincelRadio === 1 ? '' : 's'})`;
+    if(et) et.textContent = `Tamaño: ${Combatiente.areaTxt(nieblaPincelRadio)}`;
   }
   if(e.target.id === 'elem-alfa-slider'){
     elemAlfa = num(e.target.value);

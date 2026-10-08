@@ -112,7 +112,7 @@ const AsistenteZona = (() => {
       if(id === 'tamano'){
         return `<div class="az-preg">¿Qué tamaño tiene?</div>
           <p class="az-ayuda">Por ahora el asistente arma zonas redondas (flor): un centro y los casilleros alrededor. Al terminar vas a marcar el centro con un clic en el mapa.</p>
-          <div class="az-fila"><label style="flex:1.4">Radio (1 = los adyacentes)</label><input type="number" id="az-radio" min="1" max="6" value="${esc(est.radio)}" style="width:90px"></div>
+          <div class="az-fila"><label style="flex:1.4">Tamaño</label><select id="az-radio">${Combatiente.diametroOpciones(est.radio, {min: 1})}</select></div>
           <div class="az-preg" style="margin-top:14px">¿Cuántos turnos dura?</div>
           <p class="az-ayuda">Cada ⟳ Mantenimiento del GM cuenta un turno; al llegar a este número, se borra sola.</p>
           <div class="az-fila"><label style="flex:1.4">Turnos</label><input type="number" id="az-turnos" min="1" max="99" value="${esc(est.turnos)}" style="width:90px"></div>`;
@@ -172,7 +172,7 @@ const AsistenteZona = (() => {
       }
       const fr = frases();
       return `<div class="az-preg">Así queda tu zona</div>
-        <div class="az-resumen">🌫 <b>${esc(est.nombre.trim())}</b> · radio ${est.radio} · dura ${est.turnos} turno${est.turnos === 1 ? '' : 's'}
+        <div class="az-resumen">🌫 <b>${esc(est.nombre.trim())}</b> · ${Combatiente.areaTxt(est.radio)} · dura ${est.turnos} turno${est.turnos === 1 ? '' : 's'}
           <ul>${fr.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>
         <p class="az-ayuda">Al confirmar te queda lista: <b>hacé clic en el mapa</b> para marcar el centro.</p>`;
     }

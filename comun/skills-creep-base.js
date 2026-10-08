@@ -94,13 +94,13 @@
   /* ================= DAÑO A DISTANCIA / MÁGICO ================= */
   H('Disparo certero', 'D', 'hd', 'r', 2, aT('Un tiro apuntado con calma.', 'M'));
   H('Tiro rápido', 'D', 'hd', 'r', 2, aT('Dispara sin apuntar demasiado.', 'L'));
-  H('Lluvia de flechas', 'DA', 'hd', 'r', 4, zO('Dispara al cielo y las flechas caen en flor de 1 (a mano).', 3, 'M'));
+  H('Lluvia de flechas', 'DA', 'hd', 'r', 4, zO('Dispara al cielo y las flechas caen en flor de diámetro 3 (7 casillas) (a mano).', 3, 'M'));
   H('Tiro a la cabeza', 'D', 'hd', 'r', 5, zO('Un solo tiro perfecto, lento de preparar.', 3, 'H'));
   H('Escupitajo ácido', 'DX', 'ba', 'r', 3, zO('Escupe ácido: el objetivo pierde 1 punto de Defensa 2 turnos (a mano).', 2, 'L'));
   H('Proyectil', 'D', '*', 'r', 2, aT('Lanza lo que tenga a mano.', 'L'));
   H('Lanzar piedra', 'D', 'bcd', 'r', 2, aT('Arroja una roca enorme.', 'M'));
   H('Chispa', 'D', 'eag', 'rg', 2, aT('Una chispa de energía pura.', 'L'));
-  H('Bola de fuego', 'DA', 'ega', 'g', 4, zO('Una explosión en flor de 1 (a mano).', 3, 'M'));
+  H('Bola de fuego', 'DA', 'ega', 'g', 4, zO('Una explosión en flor de diámetro 3 (7 casillas) (a mano).', 3, 'M'));
   H('Rayo', 'D', 'ega', 'g', 3, zO('Un rayo que atraviesa la armadura.', 3, 'M'));
   H('Misil arcano', 'D', 'hdga', 'g', 2, aT('Un proyectil mágico que no falla.', 'M'));
   H('Descarga eléctrica', 'DK', 'ea', 'g', 3, zO('Una descarga que deja al objetivo sin aliento: pierde 1 No2 (a mano).', 2, 'M'));
@@ -171,7 +171,7 @@
   H('Orden de ataque', 'B', 'hd', 'a', 3, tA('Un aliado puede atacar sin gastar No2 este turno (a mano).', 2));
   H('Formación', 'BT', 'hdc', 'a', 4, tA('Los aliados adyacentes ganan +2 de Defensa 3 turnos (a mano).', 2));
   H('Canto revitalizante', 'C', 'ad', 'a', 4, tA('Los aliados cercanos recuperan 1d6 de vida (a mano).', 3));
-  H('Polen sanador', 'C', 'p', 'a', 4, tA('Esparce polen curativo: los aliados en flor de 1 recuperan 1d6 (a mano).', 3));
+  H('Polen sanador', 'C', 'p', 'a', 4, tA('Esparce polen curativo: los aliados en flor de diámetro 3 (7 casillas) recuperan 1d6 (a mano).', 3));
   H('Compartir fuerza', 'BC', 'a', 'a', 4, tA('Cede parte de su vitalidad: un aliado recupera 2d6 de vida y el creep pierde 1d6 (a mano).', 2));
   H('Redoble de tambores', 'B', 'd', 'a', 3, tA('Un ritmo de guerra: los aliados cercanos ganan +1 No2 este turno (a mano).', 2));
   H('Señal de retirada', 'M', 'hd', 'a', 3, tA('Ordena replegarse: los aliados cercanos se mueven 2 casilleros gratis (a mano).', 2));
@@ -195,7 +195,7 @@
   H('Desarmar', 'XK', 'hd', 'mx', 4, tA('Golpea la mano del objetivo: suelta el arma y tarda 1 No2 en recogerla (a mano).', 2));
   H('Hacer tropezar', 'XK', '*', 'ex', 2, tA('Le mete el pie: el objetivo cae al piso si falla Agilidad (a mano).', 1));
   H('Tela de araña', 'XK', 'b', 'x', 4, tA('Lanza tela pegajosa: el objetivo queda Inmovilizado 1 turno si falla Fuerza (a mano).', 2));
-  H('Nube de esporas', 'XA', 'p', 'x', 4, tA('Suelta esporas en flor de 1: quienes las respiran pierden 1 de Daño 2 turnos (a mano).', 2));
+  H('Nube de esporas', 'XA', 'p', 'x', 4, tA('Suelta esporas en flor de diámetro 3 (7 casillas): quienes las respiran pierden 1 de Daño 2 turnos (a mano).', 2));
   H('Rugido aturdidor', 'XK', 'b', 'x', 4, tA('Un rugido ensordecedor: los adyacentes quedan Pajaritos hasta el final de su turno (a mano).', 3));
   H('Hechizo de lentitud', 'X', 'dega', 'gx', 3, tA('Los pies del objetivo pesan: pierde 1 No2 por turno 2 turnos (a mano).', 2));
   H('Quemadura', 'X', 'e', 'gx', 3, tA('El objetivo arde: pierde 1d4 de vida por turno 2 turnos (a mano).', 2));
@@ -224,7 +224,7 @@
   H('Onda de choque', 'AK', 'ce', 'g', 5, zO('Una onda que empuja a los adyacentes un casillero (a mano).', 4, 'M'));
   H('Grito atronador', 'AK', 'bd', 'x', 5, zO('Un grito que aturde a los adyacentes: pierden 1 No2 (a mano).', 3, 'L'));
   H('Pared de fuego', 'KA', 'e', 'g', 5, tA('Crea una línea de fuego de 3 casilleros que quema a quien la cruce (a mano).', 3));
-  H('Terreno difícil', 'K', 'pe', 'x', 4, tA('Convierte una flor de 1 en terreno que cuesta doble moverse (a mano).', 2));
+  H('Terreno difícil', 'K', 'pe', 'x', 4, tA('Convierte una flor de diámetro 3 (7 casillas) en terreno que cuesta doble moverse (a mano).', 2));
   H('Silenciar', 'K', 'ha', 'gx', 4, tA('El objetivo no puede usar habilidades 1 turno si falla Res.Mt (a mano).', 3));
   H('Hipnosis', 'K', 'ma', 'gx', 5, tA('El objetivo queda con la mirada perdida y no se mueve 1 turno si falla Res.Mt (a mano).', 3));
 
@@ -236,7 +236,7 @@
   H('Brotes', 'I', 'p', 'a', 5, tA('Brotan 2 plantas pequeñas que estorban a los enemigos (a mano).', 3));
   H('Invocar espíritu', 'I', 'ema', 'g', 6, tA('Llama a un espíritu menor que pelea 3 turnos (a mano).', 3));
   H('Clon de sombra', 'I', 'ha', 'e', 5, tA('Crea una copia ilusoria que distrae: el primer ataque contra el creep falla (a mano).', 3));
-  H('Barril explosivo', 'I', 'hd', 'r', 4, tA('Coloca un barril que explota si lo golpean, en flor de 1 (a mano).', 2));
+  H('Barril explosivo', 'I', 'hd', 'r', 4, tA('Coloca un barril que explota si lo golpean, en flor de diámetro 3 (7 casillas) (a mano).', 2));
 
   /* ================= MIXTAS: DAÑO + CURA / DAÑO + EFECTO ================= */
   H('Mordisco vampírico', 'DC', 'bm', 'me', 3, dC('Muerde y se cura con la sangre.', 2, 'M', 2));
@@ -258,11 +258,11 @@
   H('Ráfaga', 'D', 'hdc', 'r', 4, zO('Un chorro de disparos.', 3, 'H'));
   H('Golpe sísmico', 'DA', 'ce', 'mt', 5, zO('Golpea el suelo y hace temblar a los adyacentes (a mano).', 4, 'H'));
   H('Mirada petrificante', 'K', 'ba', 'gx', 6, tA('Si el objetivo falla Res.Mt queda inmóvil 1 turno (a mano).', 3));
-  H('Explosión final', 'DA', 'cea', 'g', 6, zO('Se hace estallar: daño en flor de 1 (a mano) y el creep queda inconsciente.', 4, 'H'));
+  H('Explosión final', 'DA', 'cea', 'g', 6, zO('Se hace estallar: daño en flor de diámetro 3 (7 casillas) (a mano) y el creep queda inconsciente.', 4, 'H'));
 
   /* ================= EXTRAS PARA TRIBUS Y BOSS ================= */
-  H('Lluvia de piedras', 'DA', 'ce', 'rg', 5, zO('Piedras del techo caen en flor de 1 (a mano).', 3, 'M'));
-  H('Tormenta de arena', 'XA', 'e', 'x', 5, tA('Una nube de arena en flor de 2: todos los de adentro pierden 2 de Evasión 2 turnos (a mano).', 3));
+  H('Lluvia de piedras', 'DA', 'ce', 'rg', 5, zO('Piedras del techo caen en flor de diámetro 3 (7 casillas) (a mano).', 3, 'M'));
+  H('Tormenta de arena', 'XA', 'e', 'x', 5, tA('Una nube de arena en flor de diámetro 5 (19 casillas): todos los de adentro pierden 2 de Evasión 2 turnos (a mano).', 3));
   H('Niebla', 'B', 'ea', 'e', 4, bU('Se cubre de niebla: +3 de Evasión 3 turnos.', 2, {eva: 3}, 3));
   H('Reflejo de espejo', 'T', 'ca', 'tg', 4, bU('Refleja lo mágico: +5 Res.Esp 2 turnos.', 2, {resmg: 5}, 2));
   H('Hambre insaciable', 'B', 'bm', 'm', 4, bU('Cuanto más pelea más quiere: +2 de Daño y +1 No2 3 turnos.', 2, {dmg: 2, nitros: 1}, 3));
@@ -287,7 +287,7 @@
   H('Sentido sísmico', 'X', 'bce', 'x', 4, tA('Siente las pisadas en el suelo: los personajes en sigilo que se muevan a 4 casilleros pierden el sigilo (a mano).', 2), 'sigilo,percepción');
   H('Polvo revelador', 'X', 'hdea', 'x', 3, tA('Arroja polvo: si el objetivo está en sigilo lo pierde y queda con −2 de Evasión 2 turnos (a mano).', 2), 'sigilo');
   H('Chillido delator', 'X', 'b', 'x', 3, tA('Un chillido que delata: un personaje en sigilo dentro de 3 casilleros pierde el sigilo (a mano).', 1), 'sigilo');
-  H('Luz reveladora', 'X', 'eag', 'gx', 4, tA('Un destello ilumina una flor de 2: cualquiera en sigilo dentro pierde el sigilo (a mano).', 3), 'sigilo,niebla y visión');
+  H('Luz reveladora', 'X', 'eag', 'gx', 4, tA('Un destello ilumina una flor de diámetro 5 (19 casillas): cualquiera en sigilo dentro pierde el sigilo (a mano).', 3), 'sigilo,niebla y visión');
   H('Vigilar en todas direcciones', 'B', 'bdca', 'r', 4, tA('Sin punto ciego 3 turnos: nadie puede aprovechar su espalda (a mano).', 2), 'orientación,percepción');
   H('Ojos en la nuca', 'B', 'hd', 'et', 3, tA('Este turno no cuenta el punto ciego: no se puede atacar desde atrás con ventaja (a mano).', 1), 'orientación');
   H('Sigilo compartido', 'B', 'hdb', 'a', 5, tA('Esconde a un aliado cercano: pasa a estar en sigilo (a mano).', 3), 'sigilo');
@@ -303,22 +303,22 @@
   H('Trampa de púas', 'D', 'hdb', 'ex', 3, tR('Deja una trampa oculta de púas en una casilla: daño {T} a quien la pise.', 2, 'M'), 'trampas,terreno');
   H('Cepo', 'DK', 'hd', 'ex', 3, tR('Deja un cepo en una casilla: daño {T} y el que lo pise queda Inmovilizado (a mano).', 2, 'L'), 'trampas,terreno');
   H('Foso oculto', 'D', 'hdb', 'ex', 4, tR('Cava un foso tapado en una casilla: daño {T} de caída.', 3, 'H'), 'trampas,terreno');
-  H('Mina de contacto', 'DA', 'hdc', 'rx', 4, tR('Entierra una mina: explota en una flor de 1 con daño {T}.', 3, 'H'), 'trampas,terreno');
+  H('Mina de contacto', 'DA', 'hdc', 'rx', 4, tR('Entierra una mina: explota en una flor de diámetro 3 (7 casillas) con daño {T}.', 3, 'H'), 'trampas,terreno');
   H('Campo minado', 'DA', 'hdc', 'rx', 6, tR('Siembra 3 minas en casillas cercanas: cada una hace {T} a quien la pise.', 4, 'M'), 'trampas,terreno');
   H('Trampa de veneno', 'DX', 'hdb', 'x', 3, tR('Una trampa con dardos envenenados: daño {T} y el que la pise queda Envenenado (a mano).', 2, 'L'), 'trampas,terreno');
-  H('Trampa de fuego', 'DA', 'hde', 'gx', 4, tR('Un pozo de brea y chispa: daño {T} en flor de 1 y deja el suelo ardiendo (a mano).', 3, 'M'), 'trampas,terreno');
+  H('Trampa de fuego', 'DA', 'hde', 'gx', 4, tR('Un pozo de brea y chispa: daño {T} en flor de diámetro 3 (7 casillas) y deja el suelo ardiendo (a mano).', 3, 'M'), 'trampas,terreno');
   H('Trampa de hielo', 'DK', 'e', 'gx', 4, tR('Una placa de hielo: daño {T} y el que la pise pierde 1 No2 en su próximo turno (a mano).', 2, 'L'), 'trampas,terreno');
   H('Trampa de red', 'K', 'hdb', 'x', 3, tS('Una red escondida: quien la pisa queda Inmovilizado 1 turno (a mano); sin daño.', 2), 'trampas,terreno');
   H('Alambre tenso', 'DK', 'hd', 'ex', 3, tR('Un alambre tenso en una casilla: daño {T} y quien lo cruza cae al piso (a mano).', 2, 'L'), 'trampas,terreno');
   H('Trampa de alarma', 'X', 'hdb', 'ax', 2, tS('Deja una alarma en una casilla: al pisarla suena en la Mesa y los creeps cercanos se ponen en guardia (a mano). Es una trampa sin daño.', 1), 'trampas,terreno');
   H('Trampa sonora', 'DK', 'hdc', 'x', 3, tR('Un petardo enorme: daño {T} y los adyacentes quedan Pajaritos hasta el final de su turno (a mano).', 2, 'L'), 'trampas,terreno');
-  H('Trampa de runas', 'DA', 'hdma', 'g', 5, tR('Grava una runa en el piso: explota en flor de 1 con daño mágico {T}.', 3, 'H'), 'trampas,terreno');
+  H('Trampa de runas', 'DA', 'hdma', 'g', 5, tR('Grava una runa en el piso: explota en flor de diámetro 3 (7 casillas) con daño mágico {T}.', 3, 'H'), 'trampas,terreno');
   H('Cepo de alma', 'DX', 'ma', 'gx', 5, tR('Un cepo espectral: daño {T} y el que lo pise pierde 2 No2 en su próximo turno (a mano).', 3, 'M'), 'trampas,terreno');
   H('Trampa de ácido', 'DX', 'ba', 'x', 4, tR('Un charco de ácido tapado: daño {T} y el que lo pise pierde 1 de Defensa 3 turnos (a mano).', 3, 'M'), 'trampas,terreno');
   H('Zarzal traicionero', 'DK', 'p', 'x', 3, tR('Un matorral de espinas escondido: daño {T} y queda Rengo (a mano).', 2, 'L'), 'trampas,terreno');
   H('Telaraña oculta', 'K', 'b', 'x', 3, tS('Hilos casi invisibles: quien los toca queda Inmovilizado 1 turno (a mano), sin daño.', 2), 'trampas,terreno');
   H('Descarga oculta', 'DK', 'ca', 'x', 4, tR('Una placa eléctrica: daño {T} y el que la pise pierde 1 No2 (a mano).', 3, 'M'), 'trampas,terreno');
-  H('Trampa de humo', 'X', 'hd', 'ex', 3, tS('Un frasco que al pisarlo suelta humo en flor de 1: los de adentro pierden 2 de Evasión y no ven (a mano). Trampa sin daño.', 2), 'trampas,niebla y visión');
+  H('Trampa de humo', 'X', 'hd', 'ex', 3, tS('Un frasco que al pisarlo suelta humo en flor de diámetro 3 (7 casillas): los de adentro pierden 2 de Evasión y no ven (a mano). Trampa sin daño.', 2), 'trampas,niebla y visión');
   H('Cebo', 'X', 'hdb', 'x', 3, tS('Deja un cebo (comida, oro brillante): los personajes deben pasar una tirada de Res.Mt o irán hacia él (a mano). Es una trampa sin daño.', 2), 'trampas');
   H('Trampa doble', 'DK', 'hd', 'x', 5, tR('Dos trampas juntas en casillas vecinas: daño {T} cada una.', 4, 'M'), 'trampas,terreno');
   H('Cazador de trampas', 'B', 'hdb', 'ex', 3, tA('Detecta trampas: el GM revela las trampas armadas en 4 casilleros alrededor del creep (a mano).', 1), 'trampas,percepción');
@@ -331,27 +331,27 @@
   H('Muro de tierra', 'K', 'e', 'gt', 4, tA('Levanta una línea de 3 casilleros de muro Sólido: bloquea el paso y la vista (Terreno y Formas, Sólido, a mano).', 3), 'terreno y formas,terreno');
   H('Muro de hielo', 'K', 'e', 'g', 5, tA('Una pared de hielo Sólido de 3 casilleros; dura 3 turnos, después se borra (a mano).', 3), 'terreno y formas,terreno');
   H('Barricada', 'KT', 'hd', 'ta', 4, tA('Arma una barricada Sólida de 2 casilleros que frena el paso (a mano).', 2), 'terreno y formas,terreno');
-  H('Cortina de humo', 'X', 'hd', 'ex', 3, tA('Suelta humo en flor de 1 (elemento transitable, color gris): los de adentro no se ven desde afuera (a mano).', 2), 'terreno y formas,niebla y visión,terreno');
-  H('Charco de brea', 'K', 'ba', 'x', 3, tA('Un charco pegajoso en flor de 1: cada casillero que se pise cuesta 1 No2 más (a mano, Terreno y Formas).', 2), 'terreno y formas,terreno');
-  H('Zona en llamas', 'DA', 'e', 'g', 4, tA('Prende fuego una flor de 1 (elemento naranja): quien termine el turno adentro recibe 1d6 (a mano).', 3), 'terreno y formas,terreno');
-  H('Hielo resbaloso', 'K', 'e', 'gx', 3, tA('Congela una flor de 1: quien la cruce se resbala y pierde 1 No2 (a mano).', 2), 'terreno y formas,terreno');
-  H('Pantano', 'K', 'pb', 'x', 4, tA('Convierte una flor de 2 en barro: costo doble de movimiento (a mano).', 3), 'terreno y formas,terreno');
-  H('Maleza alta', 'B', 'p', 'e', 3, tA('Hace crecer maleza en una flor de 1: quien esté adentro puede esconderse (sigilo) más fácil (a mano).', 2), 'terreno y formas,sigilo,terreno');
+  H('Cortina de humo', 'X', 'hd', 'ex', 3, tA('Suelta humo en flor de diámetro 3 (7 casillas) (elemento transitable, color gris): los de adentro no se ven desde afuera (a mano).', 2), 'terreno y formas,niebla y visión,terreno');
+  H('Charco de brea', 'K', 'ba', 'x', 3, tA('Un charco pegajoso en flor de diámetro 3 (7 casillas): cada casillero que se pise cuesta 1 No2 más (a mano, Terreno y Formas).', 2), 'terreno y formas,terreno');
+  H('Zona en llamas', 'DA', 'e', 'g', 4, tA('Prende fuego una flor de diámetro 3 (7 casillas) (elemento naranja): quien termine el turno adentro recibe 1d6 (a mano).', 3), 'terreno y formas,terreno');
+  H('Hielo resbaloso', 'K', 'e', 'gx', 3, tA('Congela una flor de diámetro 3 (7 casillas): quien la cruce se resbala y pierde 1 No2 (a mano).', 2), 'terreno y formas,terreno');
+  H('Pantano', 'K', 'pb', 'x', 4, tA('Convierte una flor de diámetro 5 (19 casillas) en barro: costo doble de movimiento (a mano).', 3), 'terreno y formas,terreno');
+  H('Maleza alta', 'B', 'p', 'e', 3, tA('Hace crecer maleza en una flor de diámetro 3 (7 casillas): quien esté adentro puede esconderse (sigilo) más fácil (a mano).', 2), 'terreno y formas,sigilo,terreno');
   H('Grieta en el suelo', 'K', 'ce', 'gt', 5, tA('Abre una grieta de 3 casilleros en línea, terreno Sólido que se tiene que rodear (a mano).', 3), 'terreno y formas,terreno');
-  H('Zona sagrada', 'BC', 'hdea', 'a', 5, tA('Consagra una flor de 1: los aliados adentro recuperan 1d4 HP por turno mientras estén ahí (a mano).', 3), 'terreno y formas,terreno');
-  H('Nube tóxica', 'DX', 'bpa', 'x', 4, tA('Una nube en flor de 1: quien esté adentro al final de su turno queda Envenenado (a mano).', 3), 'terreno y formas,terreno');
-  H('Tormenta de arena en zona', 'X', 'e', 'x', 5, tA('Arena en flor de 2: los de adentro pierden 2 de Evasión y su visión se reduce a 1 casillero (a mano).', 3), 'terreno y formas,niebla y visión,terreno');
-  H('Círculo de protección', 'T', 'hdm', 'at', 5, tA('Un círculo en flor de 1: los aliados adentro ganan +2 de Defensa mientras se queden (a mano).', 3), 'terreno y formas,terreno');
+  H('Zona sagrada', 'BC', 'hdea', 'a', 5, tA('Consagra una flor de diámetro 3 (7 casillas): los aliados adentro recuperan 1d4 HP por turno mientras estén ahí (a mano).', 3), 'terreno y formas,terreno');
+  H('Nube tóxica', 'DX', 'bpa', 'x', 4, tA('Una nube en flor de diámetro 3 (7 casillas): quien esté adentro al final de su turno queda Envenenado (a mano).', 3), 'terreno y formas,terreno');
+  H('Tormenta de arena en zona', 'X', 'e', 'x', 5, tA('Arena en flor de diámetro 5 (19 casillas): los de adentro pierden 2 de Evasión y su visión se reduce a 1 casillero (a mano).', 3), 'terreno y formas,niebla y visión,terreno');
+  H('Círculo de protección', 'T', 'hdm', 'at', 5, tA('Un círculo en flor de diámetro 3 (7 casillas): los aliados adentro ganan +2 de Defensa mientras se queden (a mano).', 3), 'terreno y formas,terreno');
   H('Árbol caído', 'K', 'p', 'tx', 4, tA('Derriba un árbol en línea de 3 casilleros: elemento Sólido que bloquea el paso (a mano).', 3), 'terreno y formas,terreno');
   H('Marea de lodo', 'K', 'e', 'gx', 5, tA('Una ola de lodo: empuja a los de una línea de 3 casilleros un casillero (a mano) y deja barro.', 3), 'terreno y formas,terreno');
 
   /* ================= NIEBLA Y VISIÓN ================= */
-  H('Manto de oscuridad', 'X', 'am', 'gx', 5, tA('Oscurece una flor de 2 alrededor del creep: el GM tapa a mano esa zona con la herramienta 🌫 Niebla y los jugadores no ven lo de adentro.', 3), 'niebla y visión,terreno');
+  H('Manto de oscuridad', 'X', 'am', 'gx', 5, tA('Oscurece una flor de diámetro 5 (19 casillas) alrededor del creep: el GM tapa a mano esa zona con la herramienta 🌫 Niebla y los jugadores no ven lo de adentro.', 3), 'niebla y visión,terreno');
   H('Destello cegador', 'XK', 'ea', 'gx', 4, tA('Un fogonazo: los que lo miran pierden 3 de Evasión y su visión 2 turnos (a mano).', 2), 'niebla y visión');
   H('Visión nocturna', 'B', 'bdm', 'r', 3, bU('Ve en la oscuridad: +2 de Daño y ignora la penalización de la niebla 3 turnos (a mano lo segundo).', 1, {dmg: 2}, 3), 'niebla y visión');
-  H('Ojo lejano', 'B', 'ag', 'g', 4, tA('Ve lo que hay a 6 casilleros: el GM destapa a mano una flor de 2 con la herramienta 🌫 Niebla para el creep (a mano).', 2), 'niebla y visión,percepción');
+  H('Ojo lejano', 'B', 'ag', 'g', 4, tA('Ve lo que hay a 6 casilleros: el GM destapa a mano una flor de diámetro 5 (19 casillas) con la herramienta 🌫 Niebla para el creep (a mano).', 2), 'niebla y visión,percepción');
   H('Niebla de guerra propia', 'X', 'ea', 'gx', 6, tA('Una bruma que cubre 4 casilleros: los jugadores pierden la visión compartida 2 turnos (a mano, tapando con 🌫 Niebla).', 4), 'niebla y visión,terreno');
-  H('Exploración', 'B', 'bhd', 'e', 3, bU('Se adelanta a explorar: +2 No2 este turno (a mano: el GM destapa un radio de 3 a su alrededor).', 1, {nitros: 2}, 1), 'niebla y visión,percepción');
+  H('Exploración', 'B', 'bhd', 'e', 3, bU('Se adelanta a explorar: +2 No2 este turno (a mano: el GM destapa un área de diámetro 7 a su alrededor).', 1, {nitros: 2}, 1), 'niebla y visión,percepción');
 
   /* ================= INICIATIVA ================= */
   H('Adelantarse', 'B', 'hdb', 'e', 4, tA('Se adelanta al enemigo: sube 5 puntos su iniciativa en el orden de turnos (a mano, valor editable).', 1), 'iniciativa');
@@ -363,15 +363,15 @@
 
   /* ================= AURAS ================= */
   // El token tiene aura visual (⚙ del HUD: radio, forma y color); el efecto sobre otros queda a mano.
-  H('Aura de miedo', 'XA', 'mba', 'x', 4, tA('Aura de radio 2 (⚙ del token, color violeta): los personajes adentro pierden 1 de Daño mientras estén en el aura (a mano).', 2), 'aura,zona o área');
-  H('Aura de veneno', 'XA', 'pb', 'x', 4, tA('Aura de radio 1 (⚙ del token, color verde): quien termina el turno adentro pierde 1 HP (a mano).', 2), 'aura,zona o área');
-  H('Aura sanadora', 'CA', 'pea', 'a', 4, tA('Aura de radio 2 (⚙ del token, color verde claro): los aliados adentro recuperan 1d4 HP por turno (a mano).', 3), 'aura,zona o área');
-  H('Aura de calor', 'DA', 'e', 'mg', 4, tA('Aura de radio 1 (⚙ del token, color naranja): quien termina el turno adentro recibe 1d4 (a mano).', 2), 'aura,zona o área');
-  H('Aura gélida', 'XA', 'em', 'x', 4, tA('Aura de radio 1 (⚙ del token, color celeste): los de adentro pierden 1 No2 por turno (a mano).', 2), 'aura,zona o área');
-  H('Aura de mando', 'BA', 'hd', 'a', 4, tA('Aura de radio 2 (⚙ del token, color dorado): los aliados adentro ganan +1 de Daño (a mano).', 2), 'aura,zona o área,jefe');
-  H('Aura de protección', 'TA', 'hdc', 'at', 4, tA('Aura de radio 1 (⚙ del token, color azul): los aliados adentro ganan +2 de Defensa (a mano).', 2), 'aura,zona o área');
-  H('Aura de silencio', 'XA', 'ma', 'gx', 5, tA('Aura de radio 2 (⚙ del token, color gris): en el aura no se puede usar sigilo (a mano).', 3), 'aura,sigilo,zona o área');
-  H('Aura de corrupción', 'XA', 'ma', 'gx', 5, tA('Aura de radio 1 (⚙ del token, color púrpura): los de adentro pierden 2 Res.Esp (a mano).', 3), 'aura,zona o área');
+  H('Aura de miedo', 'XA', 'mba', 'x', 4, tA('Aura de diámetro 5, 19 casillas (⚙ del token, color violeta): los personajes adentro pierden 1 de Daño mientras estén en el aura (a mano).', 2), 'aura,zona o área');
+  H('Aura de veneno', 'XA', 'pb', 'x', 4, tA('Aura de diámetro 3, 7 casillas (⚙ del token, color verde): quien termina el turno adentro pierde 1 HP (a mano).', 2), 'aura,zona o área');
+  H('Aura sanadora', 'CA', 'pea', 'a', 4, tA('Aura de diámetro 5, 19 casillas (⚙ del token, color verde claro): los aliados adentro recuperan 1d4 HP por turno (a mano).', 3), 'aura,zona o área');
+  H('Aura de calor', 'DA', 'e', 'mg', 4, tA('Aura de diámetro 3, 7 casillas (⚙ del token, color naranja): quien termina el turno adentro recibe 1d4 (a mano).', 2), 'aura,zona o área');
+  H('Aura gélida', 'XA', 'em', 'x', 4, tA('Aura de diámetro 3, 7 casillas (⚙ del token, color celeste): los de adentro pierden 1 No2 por turno (a mano).', 2), 'aura,zona o área');
+  H('Aura de mando', 'BA', 'hd', 'a', 4, tA('Aura de diámetro 5, 19 casillas (⚙ del token, color dorado): los aliados adentro ganan +1 de Daño (a mano).', 2), 'aura,zona o área,jefe');
+  H('Aura de protección', 'TA', 'hdc', 'at', 4, tA('Aura de diámetro 3, 7 casillas (⚙ del token, color azul): los aliados adentro ganan +2 de Defensa (a mano).', 2), 'aura,zona o área');
+  H('Aura de silencio', 'XA', 'ma', 'gx', 5, tA('Aura de diámetro 5, 19 casillas (⚙ del token, color gris): en el aura no se puede usar sigilo (a mano).', 3), 'aura,sigilo,zona o área');
+  H('Aura de corrupción', 'XA', 'ma', 'gx', 5, tA('Aura de diámetro 3, 7 casillas (⚙ del token, color púrpura): los de adentro pierden 2 Res.Esp (a mano).', 3), 'aura,zona o área');
 
   /* ================= ESTADOS ALTERADOS SOBRE SÍ MISMO (todo automatizado) ================= */
   H('Inmunidad total', 'T', 'ce', 't', 6, eS('Nada lo daña ni lo debilita un momento.', 3, 'Invulnerable', 'buff', 1), 'jefe');

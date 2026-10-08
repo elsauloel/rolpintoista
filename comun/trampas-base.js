@@ -110,17 +110,17 @@
 
   // ---- Veneno y gases ----
   tr('Nube de veneno', 3, ['veneno', 'área', 'mecánica'], 'flor', 2, '#4C9A2A', '',
-    'Gas venenoso en flor de 2: 2 stacks de Veneno (1 de daño por stack por turno) a todos los de adentro (a mano). Res.CC contra 12 lo evita.');
+    'Gas venenoso en flor de diámetro 5 (19 casillas): 2 stacks de Veneno (1 de daño por stack por turno) a todos los de adentro (a mano). Res.CC contra 12 lo evita.');
   tr('Gas somnífero', 2, ['veneno', 'control', 'área'], 'flor', 2, '#8FBC8F', '',
-    'Nube adormecedora en flor de 2: Exhausto (1 No2 como mucho) 2 turnos (a mano). Res.CC contra 10 lo evita.');
+    'Nube adormecedora en flor de diámetro 5 (19 casillas): Exhausto (1 No2 como mucho) 2 turnos (a mano). Res.CC contra 10 lo evita.');
   tr('Bomba de esporas', 4, ['veneno', 'explosiva', 'área'], 'flor', 3, '#A0522D', '2d6',
-    'Estalla en flor de 3: 2d6 de daño (automático) y 3 stacks de Veneno (a mano). Res.CC contra 14 evita el veneno.', true, true);
+    'Estalla en flor de diámetro 7 (37 casillas): 2d6 de daño (automático) y 3 stacks de Veneno (a mano). Res.CC contra 14 evita el veneno.', true, true);
 
   // ---- Explosivas ----
   tr('Mina explosiva', 3, ['explosiva', 'daño', 'área'], 'flor', 2, '#D9531E', '3d6',
-    'Estalla en flor de 2: 3d6 de daño explosivo (automático) a todos los de adentro. Evasión contra 12 reduce el daño a la mitad (a mano).', true, true);
+    'Estalla en flor de diámetro 5 (19 casillas): 3d6 de daño explosivo (automático) a todos los de adentro. Evasión contra 12 reduce el daño a la mitad (a mano).', true, true);
   tr('Barril de pólvora', 4, ['explosiva', 'daño', 'área'], 'flor', 3, '#7A3B1C', '4d6',
-    'Explota en flor de 3: 4d6 de daño explosivo (automático) y Pajaritos hasta el final de su turno (a mano). Evasión contra 14: mitad.', true, true);
+    'Explota en flor de diámetro 7 (37 casillas): 4d6 de daño explosivo (automático) y Pajaritos hasta el final de su turno (a mano). Evasión contra 14: mitad.', true, true);
   tr('Llamarada', 2, ['daño', 'fuego'], 'flor', 1, '#E25822', '2d6',
     '2d6 de daño de fuego (automático) y quemadura: 1 de daño por turno durante 3 turnos (a mano). Evasión contra 10 evita la quemadura.', false, true);
 

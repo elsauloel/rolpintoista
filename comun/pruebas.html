@@ -1580,7 +1580,7 @@ prueba('Buenas, tanda 1 (2026-10-08): trampa portal + 2, báculo de sangre (10 %
   const luz = cat('esp-buena-varita-de-la-luz-flotante'), z = Combatiente.zonaDeHab({nombre: 'Luz'}, luz.especial.duelo, {fichaId: 'f', tipo: 'pj'});
   igual([portal.salvacion.dif, portal.portal.rango, c.sp, c.vida === Math.ceil(hpmax / 10), /HP/.test(FichaAcciones.costoEspecialTxt(S, S.inventario[0])), hab.riesgo,
          z.zonaInmediata, z.zonaLuz, z.zonaEstado.nombre, z.radio],
-    [11, 6, 0, true, true, {si: 1, dano: '1d4', porCada: true}, true, true, 'Marcado', 2]);
+    [11, 6, 0, true, true, {si: 1, dano: '1d4', porCada: true}, true, true, 'Marcado', 1]);
 });
 prueba('Buenas, tanda 2 (2026-10-08): campo de estática (inmediata, por paso), muro de fuego en línea, chorro de lava en camino, muro de pilares en línea', () => {
   const cat = id => CATALOGO_BASE.find(x => x.id === id);
@@ -1630,7 +1630,16 @@ prueba('luces (2026-10-08): el farol Común ilumina 1 turno y marca 2 (no revela
   const mareo = ESTADOS_PRESET.find(p => p.nombre === 'Mareo de invocación');
   igual([farol.radio, farol.zonaTurnos, farol.zonaEstado.turnos, !!farol.zonaEstado.revela, flot.radio, flot.zonaTurnos, flot.zonaEstado.turnos, flot.zonaEstado.revela, cat('esp-buena-varita-de-la-luz-flotante').especial.sp,
          beng.consumible, beng.zonaUso.zonaLuz, beng.zonaUso.zonaEstado.turnos, estelar.zonaUso.zonaEstado.revela, estelar.tier, !!mareo.soloSistema, !!EstadosAplicar.presetPorNombre ? !!EstadosAplicar.presetPorNombre('Mareo de invocación') : true],
-    [1, 1, 2, false, 2, 2, 3, true, 2, true, true, 2, true, 'Buena Calidad', true, true]);
+    [1, 1, 2, false, 1, 2, 3, true, 2, true, true, 2, true, 'Buena Calidad', true, true]);
+});
+prueba('Áreas por diámetro (dueño, 2026-10-08): el texto dice el diámetro y las casillas; las varitas que iluminan, una flor de 7 (diámetro 3)', () => {
+  const cat = id => CATALOGO_BASE.find(x => x.id === id);
+  const luces = ['esp-varita-de-la-luz', 'esp-varita-del-farol', 'esp-buena-varita-de-la-luz-flotante'].map(id => cat(id).especial.duelo.radio)
+    .concat(['nuevo-bengala', 'nuevo-bengala-estelar'].map(id => cat(id).zonaUso.radio), cat('esp-varita-de-la-luz').especial.estadoPropio.mods.map(m => m.val));
+  const opc = Combatiente.diametroOpciones(1, {min: 1, max: 2});
+  igual([Combatiente.areaTxt(0), Combatiente.areaTxt(1), Combatiente.areaTxt(2), Combatiente.diametro(3), luces, /value="1" selected>Diámetro 3 · 7 casillas/.test(opc), (opc.match(/<option/g) || []).length,
+         CATALOGO_BASE.some(i => /radio \d/.test(`${i.detalle || ''} ${i.efectoDetalle || ''}`))],
+    ['una casilla (diámetro 1)', 'diámetro 3 (7 casillas)', 'diámetro 5 (19 casillas)', 7, [1, 1, 1, 1, 1, 1, 1], true, 2, false]);
 });
 prueba('Varita del caos (2026-10-08): el d10 (6/3/1): a un aliado buff, al revés debuff, con 10 debuff a quien la usa; a un rival al revés; los estados del sorteo existen', () => {
   const c = {exito: 6, contra: 3, propio: 1}, R = Combatiente.caosResultado;
@@ -2507,7 +2516,7 @@ prueba('✨ varitas del mapa (2026-10-05): la luz va solo a los que están en si
   const tp = Plantillas.trampa(pil.especial.trampaColocar);
   igual([hl.objetivo, hl.radio, hl.conVista, lim.conVista, hl.contra.map(c => c.stat), hl.efectos[0].nombre, luz.especial.estadoPropio.mods.map(m => m.stat),
     z.tipo, z.niebla, tp.pilar, tp.cant, por.especial.trampaColocar.portal, hr.contra.map(c => c.stat), CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-varita') && /✋ A mano por ahora/.test(i.detalle)).map(i => i.nombre)],
-    ['onda', 3, true, true, ['resmg'], 'Marcado', ['luz', 'veoculto'], 'zona-persistente-habilidad', true, true, 2, {rango: 4, fijo: true}, ['resmg'], []]);
+    ['onda', 1, true, true, ['resmg'], 'Marcado', ['luz', 'veoculto'], 'zona-persistente-habilidad', true, true, 2, {rango: 4, fijo: true}, ['resmg'], []]);
 });
 prueba('✨ armas especiales (dueño, 2026-10-05): se usan desde Atacar, como un ataque más (sin caja aparte, y sin el Atacar a mano limpia si lleva una); su Atacar va directo a sus reglas (sin oportunidad ni contraataque)', () => {
   const S = fichaBotonera(), v = {...structuredClone(CATALOGO_BASE.find(i => i.id === 'esp-varita-del-rastreador')), id: 'vr', equipado: true};

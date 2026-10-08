@@ -171,7 +171,7 @@ const AsistenteTrampa = (() => {
           <p class="at-ayuda">Esta trampa no se dibuja: la habilidad la coloca sola, <b>oculta y al lado de tu token</b> cada vez que la usás (una línea sale hacia afuera del token).</p>
           ${FORMAS.filter(f => f.id !== 'libre').map(f => `<button type="button" class="at-op${(linea ? 'linea' : 'flor') === f.id ? ' on' : ''}" data-forma="${f.id}"><span class="ico">${f.icono}</span><span><b>${f.texto}</b></span></button>`).join('')}
           ${linea ? `<div class="at-fila"><label style="flex:1.4">Largo (casillas)</label><input type="number" id="at-largo" min="1" max="20" value="${esc(est.largo)}" style="width:90px"></div>`
-            : `<div class="at-fila"><label style="flex:1.4">Tamaño (radio)</label><input type="number" id="at-radio" min="0" max="6" value="${esc(est.radio)}" style="width:90px"></div>
+            : `<div class="at-fila"><label style="flex:1.4">Tamaño</label><select id="at-radio">${Combatiente.diametroOpciones(est.radio, {min: 0})}</select></div>
           <p class="at-ayuda">0 = una sola casilla · 1 = una flor de 1 (7 casillas) · 2 = una flor de 2…</p>`}
           <div class="at-fila"><label style="flex:1.4">Cuántas por vez</label><input type="number" id="at-cant" min="1" max="6" value="${esc(est.cant)}" style="width:90px"></div>
           <p class="at-ayuda">Cuántas trampas deja de una vez cada vez que se ejecuta la habilidad (1 a 6).</p>
@@ -273,7 +273,7 @@ const AsistenteTrampa = (() => {
       }
       const fr = frases();
       return `<div class="at-preg">Así queda tu trampa</div>
-        <div class="at-resumen">🪤 <b>${esc(est.nombre.trim())}</b> · ${est.amiga ? '🔥 daña también a aliados en el área' : '🎯 efecto solo a rivales'}${editando ? '' : deHab ? (est.forma === 'linea' ? ' · línea de ' + est.largo : ' · radio ' + est.radio) + ' × ' + est.cant : ' · ' + esc((FORMAS.find(f => f.id === est.forma) || {}).texto || '')}
+        <div class="at-resumen">🪤 <b>${esc(est.nombre.trim())}</b> · ${est.amiga ? '🔥 daña también a aliados en el área' : '🎯 efecto solo a rivales'}${editando ? '' : deHab ? (est.forma === 'linea' ? ' · línea de ' + est.largo : ' · ' + Combatiente.areaTxt(est.radio)) + ' × ' + est.cant : ' · ' + esc((FORMAS.find(f => f.id === est.forma) || {}).texto || '')}
           <ul>${fr.map(x => `<li>${esc(x)}</li>`).join('')}<li>${est.dura ? `Se elimina sola tras ${est.turnos} turno${est.turnos === 1 ? '' : 's'}` : 'Queda hasta que alguien la borre'}</li></ul>
           ${est.descripcion.trim() ? `<div style="margin-top:8px;color:#B7A79E;font-size:13px">“${esc(est.descripcion.trim())}”</div>` : ''}</div>
         <p class="at-ayuda">${editando ? 'Al confirmar se guardan los cambios en la trampa.' : deHab ? 'Al confirmar se guarda en la habilidad; se coloca sola cada vez que la ejecutes.' : 'Al confirmar te queda la trampa lista: <b>hacé clic en el mapa y arrastrá</b> para dibujarla donde quieras.'}</p>
@@ -414,7 +414,7 @@ const AsistenteTrampa = (() => {
     if(t.dano) p.push(`${t.dano} de daño ${t.ignoraDef ? '(directo a la vida)' : '(contempla la armadura)'}`);
     if(t.estado) p.push(`deja ${t.estado}${num(t.estadoStacks) > 0 ? ' ×' + t.estadoStacks : ''}${num(t.estadoTurnos) > 0 ? ' ' + t.estadoTurnos + ' turnos' : ''}`);
     if(!p.length) p.push('solo avisa cuando se activa');
-    p.push(t.tipo === 'linea' ? `línea de ${t.tamano}` : `radio ${Math.max(0, num(t.tamano))}`);
+    p.push(t.tipo === 'linea' ? `línea de ${t.tamano}` : Combatiente.areaTxt(t.tamano));
     if((t.cant || 1) > 1) p.push(`×${t.cant}`);
     if(t.dejaZona) p.push(`deja zona ${t.zonaTurnos || 3} turnos`);
     if(num(t.turnos) > 0) p.push(`dura ${t.turnos} turnos`);

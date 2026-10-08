@@ -125,7 +125,7 @@ const AsistenteItem = (() => {
     if(!du) return [];
     const L = [];
     const ob = du.objetivo === 'zona' && du.niebla ? 'una nube de niebla' : (OBJETIVO_TXT[du.objetivo] || du.objetivo || 'a un rival');
-    const tam = du.objetivo === 'linea' ? ` de ${du.largo || du.radio || 4}` : (du.radio !== undefined && ['area', 'onda', 'zona'].includes(du.objetivo)) ? ` de radio ${du.radio}` : '';
+    const tam = du.objetivo === 'linea' ? ` de ${du.largo || du.radio || 4}` : (du.radio !== undefined && ['area', 'onda', 'zona'].includes(du.objetivo)) ? ` de diámetro ${Combatiente.diametro(du.radio)}` : '';
     L.push(`Objetivo: ${ob}${tam}${du.conVista ? ' (todos los rivales que ve)' : ''}`);
     const tira = du.tiraFormula ? `${du.tiraEtiqueta || 'Tirada'} (${du.tiraFormula})` : statTxt(du.tira);
     if(tira) L.push(`Tira ${tira}${(du.contra || []).length ? ` contra ${du.contra.map(statTxt).join(' o ')}` : du.contraOtro ? ` contra ${du.contraOtro} (a mano)` : ', sin resistencia'}`);

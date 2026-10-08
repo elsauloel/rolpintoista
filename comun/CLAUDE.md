@@ -1362,3 +1362,8 @@ versión parecida en más de una, es candidato a juntar.
   «regen», «escudo», «dot», «control», «cc»…); con varias palabras, tienen que estar todas; los grupos vacíos se esconden. Lo usan la ficha
   (`#presets-body`), GM Tools (`#presets-creep-body`) y `selector-estados.js` (el mapa). **Un estado nuevo con un nombre que no dice lo que hace:
   sumarle sus palabras clave en `PALABRAS`.**
+- **Áreas por diámetro** (2026-10-08, dueño: «radio 1» se entendía como una sola casilla): todo lo que se lee dice el **diámetro** y las casillas
+  («diámetro 3 (7 casillas)»); adentro se sigue guardando el `radio` (anillos alrededor del centro). `Combatiente.areaTxt(radio)`,
+  `diametro(radio)`, `casillasArea(radio)` y `diametroOpciones(radio, {min, max})` (las opciones de un `<select>` de tamaño: valor = radio, texto =
+  diámetro; lo usan la Ejecución ✨, el asistente de zonas, el de trampas y «Elegir trampa»). Un texto nuevo de un área: «flor de diámetro 3 (7
+  casillas)», nunca «radio N» ni «flor de N». **Las varitas y bengalas que iluminan, siempre una flor de 7 (diámetro 3).**

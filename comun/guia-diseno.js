@@ -122,7 +122,7 @@ const GuiaDiseno = (() => {
     {n: 'Sangrado', d: 'Pierde HP por turno; reaplicarlo suma +1 de daño por turno.', e: 'auto', casa: ['cortante'], comp: ['punzante', 'hacha'], peso: 3},
     {n: 'Envenenar', d: 'Veneno: pierde 1 HP por stack cada turno.', e: 'auto', casa: [], comp: ['hacha', 'cortante', 'punzante', 'rango'], peso: 3},
     {n: 'Derribar', d: 'El objetivo cae al suelo (queda Sentado: Evasión a la mitad, no ataca hasta levantarse).', e: 'mano', casa: [], comp: ['contundente', 'hacha', 'explosivo'], peso: 2},
-    {n: 'Explosión', d: 'El golpe estalla en flor de radio 1 o 2 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar). Es la razón de ser del Tipo 12: muy raro y circunstancial.', e: 'falta', casa: ['explosivo'], comp: [], peso: 6},
+    {n: 'Explosión', d: 'El golpe estalla en una flor de diámetro 3 o 5 alrededor del objetivo y alcanza a todos, aliados incluidos (daño del área a confirmar). Es la razón de ser del Tipo 12: muy raro y circunstancial.', e: 'falta', casa: ['explosivo'], comp: [], peso: 6},
     {n: 'Prende fuego', d: 'Daño de fuego por turnos (elemental: va directo a la vida).', e: 'mano', casa: [], comp: ['explosivo', 'rango'], peso: 3},
     {n: 'Drena vida', d: 'Te cura parte del daño que hacés (puede dejarte con Vida extra).', e: 'mano', casa: [], comp: ['cortante', 'punzante'], peso: 4},
   ];

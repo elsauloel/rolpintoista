@@ -48,7 +48,7 @@ const ItemCorto = (() => {
     const t = t0 && typeof Plantillas !== 'undefined' && Plantillas.trampaDesde ? (Plantillas.trampaDesde(t0) || t0) : (t0 || {});
     const f = [];
     const tam = Math.max(0, num(t.tamano));
-    f.push(['Forma', t.tipo === 'linea' ? `Línea de ${Math.max(1, tam)}` : tam ? `Flor de radio ${tam} (${casillas(tam)} casillas)` : 'Una casilla']);
+    f.push(['Forma', t.tipo === 'linea' ? `Línea de ${Math.max(1, tam)}` : tam ? `Flor de diámetro ${2 * tam + 1} (${casillas(tam)} casillas)` : 'Una casilla']);
     const ELEM = {fuego: 'de fuego', hielo: 'de hielo', rayo: 'eléctrico', toxico: 'tóxico', acido: 'de ácido'};
     if(t.dano) f.push(['Daño', `${t.dano}${ELEM[t.elemento] ? ' ' + ELEM[t.elemento] : ''} · ${t.ignoraDef ? 'directo a la vida' : 'contempla la armadura'}${ELEM[t.elemento] ? ' (lo frena su resistencia y la Defensa especial)' : ''}`]);
     // El efecto: lo que aplica el mapa solo (el estado) y lo que queda a mano (efectoManual).

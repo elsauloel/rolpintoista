@@ -279,18 +279,18 @@ const AsistenteDueloHab = (() => {
         h += `<p class="nota" style="margin-top:10px">No hay que marcar nada: al ejecutarla, todo rival dentro del <b>cono al frente de tu token</b> (el mismo de 16 casillas de la detección, hacia donde mirás; lo que tapa un Sólido no entra) entra en la cascada, uno detrás del otro. Vos tirás una sola vez y cada uno se resiste por separado. Sin dodge roll. No te afecta a vos.</p>`;
       }
       if(st.objetivo === 'onda'){
-        h += `<p class="nota" style="margin-top:10px">No hay que marcar nada: al ejecutarla, todo rival dentro de este radio <b>alrededor de tu token</b> entra en la cascada, uno detrás del otro. Vos tirás una sola vez y cada uno se resiste por separado. No te afecta a vos.</p>
-          <div class="fila"><input type="number" min="1" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros de radio (1 = los adyacentes)</span></div>
+        h += `<p class="nota" style="margin-top:10px">No hay que marcar nada: al ejecutarla, todo rival dentro de esta área <b>alrededor de tu token</b> entra en la cascada, uno detrás del otro. Vos tirás una sola vez y cada uno se resiste por separado. No te afecta a vos.</p>
+          <div class="fila"><select data-radio>${Combatiente.diametroOpciones(st.radio, {min: 1})}</select><span>alrededor de tu token (diámetro 3 = los de al lado)</span></div>
           <label class="op" style="margin-top:8px"><input type="checkbox" data-ondadodge ${st.ondaDodge ? 'checked' : ''}> Quien gana su tirada tiene derecho a un dodge roll (salir de la onda moviéndose, como en un área)</label>
-          <p class="nota">${st.ondaDodge ? 'Si gana, puede moverse para salir del radio: si sale, la esquiva; si se queda adentro, le pega igual.' : 'Sin tildar: quien gana su tirada no recibe nada (como Shockwave).'}</p>`;
+          <p class="nota">${st.ondaDodge ? 'Si gana, puede moverse para salir del área: si sale, la esquiva; si se queda adentro, le pega igual.' : 'Sin tildar: quien gana su tirada no recibe nada (como Shockwave).'}</p>`;
       }
       if(st.objetivo === 'area'){
-        h += `<p class="nota" style="margin-top:10px">Marcás el centro en el mapa al ejecutarla; todo rival adentro de este radio entra en la cascada, uno detrás del otro (Paso 4 del casteo: primero tira Evasión contra tu tirada; si la gana, tiene derecho a un dodge roll).</p>
-          <div class="fila"><input type="number" min="0" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros de radio</span></div>`;
+        h += `<p class="nota" style="margin-top:10px">Marcás el centro en el mapa al ejecutarla; todo rival adentro de esta área entra en la cascada, uno detrás del otro (Paso 4 del casteo: primero tira Evasión contra tu tirada; si la gana, tiene derecho a un dodge roll).</p>
+          <div class="fila"><select data-radio>${Combatiente.diametroOpciones(st.radio, {min: 0})}</select><span>tamaño del área</span></div>`;
       }
       if(st.objetivo === 'zona'){
         h += `<p class="nota" style="margin-top:10px">Marcás el centro en el mapa al ejecutarla, como el área — pero <b>queda puesta varios turnos</b>: no se resuelve todo de una. Cualquier rival que entre, o que siga adentro en cada Mantenimiento, se chequea por separado; si esta habilidad tiene una tirada (paso «Tirada»), la tirás una sola vez al lanzarla y esa misma tirada se reusa contra la resistencia de cada uno (paso «Resistencia»). A quien pierde (o entra sin nada que resistir) se le puede aplicar un estado y/o el daño del paso «Daño».</p>
-          <div class="fila"><input type="number" min="1" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros de radio</span></div>
+          <div class="fila"><select data-radio>${Combatiente.diametroOpciones(st.radio, {min: 1})}</select><span>tamaño de la zona</span></div>
           <div class="fila"><input type="number" min="1" style="width:70px" data-zonaturnos value="${esc(st.zonaTurnos)}"><span>turnos que dura</span></div>
           <label class="op"><input type="checkbox" data-zonaamiga ${st.zonaAmiga ? 'checked' : ''}> También afecta a tus aliados (no solo a los rivales)</label>
           <div style="margin-top:12px"><h4 style="margin:0 0 6px">¿Dónde está?</h4><select data-zonaaltura style="max-width:100%">
@@ -513,7 +513,7 @@ const AsistenteDueloHab = (() => {
         filas.push(`<b>Ataque con arma</b>: ${partes.join(', ') || 'sin arreglos'} · X en ${st.x === 'sp' ? 'SP' : 'Nitros'}`);
         if(st.alcance !== 'auto') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
       }else{
-        filas.push(`<b>Objetivo</b>: ${st.objetivo === 'linea' ? `línea recta de ${st.radio} casilleros` : st.objetivo === 'cono' ? 'cono al frente de quien la usa' : st.objetivo === 'onda' ? 'onda alrededor de quien la usa' : st.objetivo === 'zona' ? `zona persistente, ${st.zonaTurnos} turnos` : st.objetivo}${['area', 'onda', 'zona'].includes(st.objetivo) ? ` (radio ${st.radio})` : ''}`);
+        filas.push(`<b>Objetivo</b>: ${st.objetivo === 'linea' ? `línea recta de ${st.radio} casilleros` : st.objetivo === 'cono' ? 'cono al frente de quien la usa' : st.objetivo === 'onda' ? 'onda alrededor de quien la usa' : st.objetivo === 'zona' ? `zona persistente, ${st.zonaTurnos} turnos` : st.objetivo}${['area', 'onda', 'zona'].includes(st.objetivo) ? ` (${Combatiente.areaTxt(st.radio)})` : ''}`);
         if(st.objetivo === 'zona'){
           filas.push(`<b>Alcanza</b>: ${st.zonaAmiga ? 'rivales y aliados' : 'solo rivales'}`);
           if(st.zonaEstadoNombre) filas.push(`<b>Deja</b>: ${esc(st.zonaEstadoNombre)}${['Veneno', 'Veneno severo'].includes(st.zonaEstadoNombre) && st.zonaEstadoStacks ? ` ×${st.zonaEstadoStacks}` : ''} (${st.zonaEstadoTurnos}t)`);

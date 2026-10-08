@@ -146,7 +146,7 @@ const ElegirTrampa = (() => {
             <button type="button" class="et-op${!linea ? ' on' : ''}" data-et-forma="flor"><b>⬡ Redonda (flor)</b><small>Una casilla y las que la rodean.</small></button>
             <button type="button" class="et-op${linea ? ' on' : ''}" data-et-forma="linea"><b>➖ Línea</b><small>Una fila de casillas hacia afuera del token: un pasillo, un cable.</small></button></div>
           ${linea ? `<div class="et-fila"><label>Largo (casillas)</label><input type="number" min="1" max="20" data-et="largo" value="${st.largo}"></div>`
-            : `<div class="et-fila"><label>Tamaño (radio)</label><input type="number" min="0" max="6" data-et="radio" value="${st.radio}"><span class="pap-nota" style="margin:0">0 = una sola casilla · 1 = una flor de 1 (7 casillas)…</span></div>`}
+            : `<div class="et-fila"><label>Tamaño</label><select data-et="radio">${Combatiente.diametroOpciones(st.radio, {min: 0})}</select></div>`}
           <div class="et-fila"><label>¿Cuántas deja cada vez que la usás?</label><input type="number" min="1" max="6" data-et="cant" value="${st.cant}"></div>
           <p class="pap-nota">La habilidad la coloca oculta, al lado de quien la usa.</p>`;
       }

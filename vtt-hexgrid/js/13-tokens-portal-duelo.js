@@ -349,7 +349,7 @@ async function crearNiebla(centro, radio, msg){
 function zonaPersistenteDeHabilidad(msg){
   const radio = Math.max(1, Math.round(num(msg.radio) || 1));
   if(msg.niebla){
-    elegirDestino(h => crearNiebla(h, radio, msg), `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': ' : ''}marcá el centro de la niebla</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true);
+    elegirDestino(h => crearNiebla(h, radio, msg), `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': ' : ''}marcá el centro de la niebla</b> <span>clic en el mapa (${Combatiente.areaTxt(radio)}) · Esc o clic derecho cancelan</span>`, true);
     return;
   }
   const cfg = {
@@ -367,7 +367,7 @@ function zonaPersistenteDeHabilidad(msg){
     elegirCamino(msg.nombre, msg.zonaLargo, t, celdas => crearElementoZona(celdas[0], {...cfg, celdas}));
     return;
   }
-  elegirDestino(h => crearElementoZona(h, cfg), `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': marcá el centro' : 'Elegí el centro de la zona'}</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true);
+  elegirDestino(h => crearElementoZona(h, cfg), `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': marcá el centro' : 'Elegí el centro de la zona'}</b> <span>clic en el mapa (${Combatiente.areaTxt(radio)}) · Esc o clic derecho cancelan</span>`, true);
 }
 /* Casillas en línea recta (2026-10-08: el muro de fuego, el muro): el primer clic es donde empieza y el segundo, hacia dónde sigue (el lado más
    cercano a ese clic). Se corta antes de un Sólido. `fin(celdas)` con las casillas [{col, fila}]. */
@@ -500,7 +500,7 @@ function abrirAsistenteZonaNueva(){
         radio, turnos: r.turnos, nombre: r.nombre, color: r.color, alfa: r.alfa, amiga: r.amiga, dano: r.dano, ignoraDef: r.ignoraDef,
         estado: r.estado, resistStat: r.resistStat, resistValor: r.resistValor, enMantenimiento: r.enMantenimiento, cadaPaso: r.cadaPaso, altura: r.altura,
         casteadorRef: '', casteadorTipo: soyGM ? 'creep' : 'pj',
-      }), `<b>🌫 ${esc(r.nombre)}: marcá el centro</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true);
+      }), `<b>🌫 ${esc(r.nombre)}: marcá el centro</b> <span>clic en el mapa (${Combatiente.areaTxt(radio)}) · Esc o clic derecho cancelan</span>`, true);
     },
   });
 }
@@ -993,7 +993,7 @@ function dueloElegirAreaMapa(msg){
     lanzar({col: mio.col, fila: mio.fila});
     return;
   }
-  elegirDestino(lanzar, `<b>🌀 ${hab && hab.nombre ? esc(hab.nombre) + ': marcá el centro del área' : 'Elegí el centro del área'}</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true, cancelado);
+  elegirDestino(lanzar, `<b>🌀 ${hab && hab.nombre ? esc(hab.nombre) + ': marcá el centro del área' : 'Elegí el centro del área'}</b> <span>clic en el mapa (${Combatiente.areaTxt(radio)}) · Esc o clic derecho cancelan</span>`, true, cancelado);
 }
 
 /* ---------- Muerte de un jugador en el mapa (2026-09-26, pedido del dueño) ----------

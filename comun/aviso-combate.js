@@ -126,5 +126,32 @@ const AvisoCombate = (() => {
     acomodarCarteles();
     return el;
   }
-  return {mostrar, cerrar, abierto: () => !!abierto, abiertoClave: () => abierto ? abierto.clave : null, cartel};
+  /* Una pregunta de sí o no con la estética del duelo, en vez del cartel del navegador («elsauloel.github.io dice…»; dueño, 2026-10-08: «se siente
+     raro, ¿se podría integrar?»). preguntar(texto, {titulo, icono, si, no}) → Promise<boolean>. Va arriba de todo (también del cuadro del duelo) y no
+     cierra otro aviso que esté abierto; Esc, ✕ o clic afuera = no; Enter = sí. */
+  function preguntar(texto, o){
+    o = o || {};
+    if(typeof Duelo !== 'undefined' && Duelo.estilos) Duelo.estilos();
+    estilosPropios();
+    return new Promise(ok => {
+      const f = document.createElement('div');
+      f.className = 'aviso-combate-fondo aviso-pregunta';
+      f.style.zIndex = '100020';
+      f.innerHTML = `<div class="duelo-caja" role="dialog" aria-modal="true" style="max-width:520px">
+        <div class="duelo-cab"><span>${e(o.icono || '❓')} ${e(o.titulo || '¿Seguir igual?')}</span><div class="bt"><button type="button" data-p="no" title="Cancelar">✕</button></div></div>
+        <div class="duelo-cuerpo"><div class="duelo-paso"><p style="white-space:pre-line">${e(texto)}</p></div>
+          <div class="duelo-pie"><button type="button" data-p="si">${e(o.si || 'Sí, igual')}</button><button type="button" class="sec" data-p="no">${e(o.no || 'Cancelar')}</button></div></div>
+      </div>`;
+      const tecla = ev => {
+        if(ev.key === 'Escape'){ ev.stopImmediatePropagation(); ev.preventDefault(); fin(false); }
+        else if(ev.key === 'Enter'){ ev.stopImmediatePropagation(); ev.preventDefault(); fin(true); }
+      };
+      const fin = v => { document.removeEventListener('keydown', tecla, true); f.remove(); ok(v); };
+      f.onclick = ev => { const b = ev.target.closest('[data-p]'); if(b) fin(b.dataset.p === 'si'); else if(ev.target === f) fin(false); };
+      document.addEventListener('keydown', tecla, true);
+      document.body.appendChild(f);
+      const b = f.querySelector('[data-p="si"]'); if(b) b.focus();
+    });
+  }
+  return {mostrar, cerrar, abierto: () => !!abierto, abiertoClave: () => abierto ? abierto.clave : null, cartel, preguntar};
 })();

@@ -90,7 +90,7 @@ async function armaSoltar(t, vuela){
 async function armaTomar(elId, t){
   const el = elementos.get(elId);
   if(!el || !el.arma){ toast('Esa arma ya no está en el piso'); return null; }
-  if(t && el.origen && distanciaHex(t, el.origen) > 1 && !confirm(`${el.armaNombre || 'El arma'} está a ${distanciaHex(t, el.origen)} casillas: hay que estar al lado. ¿Levantarla igual?`)) return null;
+  if(t && el.origen && distanciaHex(t, el.origen) > 1 && !(await AvisoCombate.preguntar(`${el.armaNombre || 'El arma'} está a ${distanciaHex(t, el.origen)} casillas: hay que estar al lado. ¿Levantarla igual?`, {icono: '🗡', titulo: 'Levantar el arma', si: 'Sí, levantarla'}))) return null;
   try{ await coleccionElementos().doc(elId).delete(); }
   catch(err){ console.error('No se pudo levantar el arma:', err); toast('No se pudo levantar el arma (¿faltan las reglas nuevas de Firebase?)'); return null; }
   let it = {};

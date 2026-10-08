@@ -155,6 +155,13 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 11. [ ] **Rework de armas no mágicas** elemento por elemento y el crítico nuevo en ficha y mapa (§8).
 12. [ ] **Preguntas para la mesa**: P143 (la tirada de la zona) y P144 (la armadura mágica), esperan la opinión del grupo.
 
+- [ ] **Los carteles del navegador («elsauloel.github.io dice…») → el cartel del juego** (dueño, 2026-10-08: «se siente raro, ¿se podría integrar?»).
+  La pieza ya está: `AvisoCombate.preguntar(texto, {titulo, icono, si, no})` → Promise (comun/aviso-combate.js). Ya pasados (el mapa): atacar a un
+  aliado, «¿atacar igual?» Sentado / sin No2 de creeps e invocaciones, consumible de creep sin No2, subirle la vida a un caído, levantar un arma lejos,
+  el Impulso de los anillos. **Faltan**: los que pasan por `ui.confirmar` de forma sincrónica (FichaAcciones: Sentado y Silencio del personaje, el
+  ataque sin No2; InvDuelo; los Silencio de creeps/invocaciones; `CombateFin`) — hay que volver async esas funciones —, los de borrar/administrar del
+  mapa (borrar mapa, sacar token, vaciar turnos, bitácora, trampa guardada, tomar el control), `intercambio.js`, y los de la ficha y GM Tools.
+
 ## 1. Casteo con SP — **proceso paso a paso en [`proceso-casteo.md`](proceso-casteo.md)** (reglas en [`reglas-casteo.md`](reglas-casteo.md), decisiones en P97)
 > **Los 5 pasos de decisión, el Paso 6 y el Paso 7 (en su mayoría) están cerrados (2026-09-27).** Retomar por el
 > primer paso sin ✅ de `proceso-casteo.md` (hoy: **paso 8**, auditoría de contenido). Lo de abajo es solo un resumen.

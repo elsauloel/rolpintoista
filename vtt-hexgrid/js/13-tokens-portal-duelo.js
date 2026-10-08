@@ -664,7 +664,7 @@ function dueloElegirObjetivoMapa(msg){
       let t = cand[0];
       if(esValido && !esValido(t)){
         const msg = objetivoTipo === 'aliado' ? `${nombreDe(t)} es un rival, no un aliado. ¿Igual apuntarle con esta habilidad pensada para aliados?` : `${nombreDe(t)} es un aliado, no un rival. ¿Igual atacarlo?`;
-        if(!confirm(msg)){ pedir(); return; }
+        if(!(await AvisoCombate.preguntar(msg, {icono: '⚔', titulo: objetivoTipo === 'aliado' ? 'Apuntarle a un rival' : 'Atacar a un aliado', si: objetivoTipo === 'aliado' ? 'Sí, apuntarle' : 'Sí, atacarlo', no: 'Elegir otro'}))){ pedir(); return; }
       }
       dueloAvisoObjetivoOcultar();
       try{ t = await dueloVincularSiFalta(t); }catch(err){ console.error('No se pudo vincular el token al creep:', err); }

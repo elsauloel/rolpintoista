@@ -1043,7 +1043,7 @@ async function hudAplicar(clave, texto){
   if(clave === 'hp' && antes !== null && antes !== undefined && num(antes) <= 0){
     const nuevo = leerValorVital(texto, num(antes));
     if(nuevo !== null && nuevo > 0){
-      if(!window.confirm(`${nombreDe(t)} ${Combatiente.CAIDO_TXT}: para eso está ✚ Revivir (o un Ankh).\n\n¿Cambiarle la vida igual, a mano? (Lo decide la mesa.)`)){ hudEditando = ''; pedirDibujo(); return; }
+      if(!(await AvisoCombate.preguntar(`${nombreDe(t)} ${Combatiente.CAIDO_TXT}: para eso está ✚ Revivir (o un Ankh).\n\n¿Cambiarle la vida igual, a mano? (Lo decide la mesa.)`, {icono: '💔', titulo: 'Está caído', si: 'Sí, cambiarla'}))){ hudEditando = ''; pedirDibujo(); return; }
       levantar = true;
     }
   }

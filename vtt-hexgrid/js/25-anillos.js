@@ -166,7 +166,7 @@ async function usarImpulso(){
   if(!a) return;
   if(!mesaMiUltima){ toast('Todavía no hiciste ninguna tirada para sumarle el bono'); return; }
   const n = Math.max(1, num(a.e.impulsoVal) || 2), origen = mesaMiUltima.origen, nuevo = num(mesaMiUltima.total) + n;
-  if(!impulsoEsDelAtributo(origen, a.e.impulso) && !window.confirm(`«${origen}» no parece una tirada de ${FichaCalculo.STAT_LABEL[a.e.impulso] || a.e.impulso}. ¿Sumarle el +${n} igual? (Lo decide la mesa.)`)) return;
+  if(!impulsoEsDelAtributo(origen, a.e.impulso) && !(await AvisoCombate.preguntar(`«${origen}» no parece una tirada de ${FichaCalculo.STAT_LABEL[a.e.impulso] || a.e.impulso}. ¿Sumarle el +${n} igual? (Lo decide la mesa.)`, {icono: '💍', titulo: 'Impulso', si: 'Sí, sumarlo'}))) return;
   try{ await hudEstadoCambiar(a.t, a.i, 'quitar'); }catch(err){ console.error('No se pudo gastar el anillo:', err); return; }
   try{
     await fbDb.collection(fbRutaCampana('tiradas')).add({

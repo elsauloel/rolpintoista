@@ -380,14 +380,14 @@ function bnInvPreguntarTipo(invId){
 function bnInvAtacar(invId, tipo){
   tipo = tipo || 'normal';
   const buscar = () => (bn && bn.S && (bn.S.invocaciones || []).find(x => x && x.id === invId)) || null;
-  const hacer = () => {
+  const hacer = async () => {
     const inv = buscar();
     if(!inv) return;
     const qs = Combatiente.preguntaSentado(inv.estados, inv.nombre);   // Sentado no puede atacar: avisa y deja seguir
-    if(qs && !confirm(qs)) return;
+    if(qs && !(await AvisoCombate.preguntar(qs, {icono: '⚔', titulo: 'Atacar igual', si: 'Sí, atacar'}))) return;
     // Sin No2 suficientes: «¿Atacar igual?» (B-7, como los creeps): gasta los que tenga y deja la línea roja.
     const forzar = InvAcciones.faltanNitros(inv, tipo);
-    if(forzar && !confirm(InvAcciones.preguntaSinNitros(inv, tipo))) return;
+    if(forzar && !(await AvisoCombate.preguntar(InvAcciones.preguntaSinNitros(inv, tipo), {icono: '⚠', titulo: 'Sin No2', si: 'Sí, atacar'}))) return;
     const ui = bnUi(FichaGuardado.partes(bn.S));
     const p = InvAcciones.pagarAtaque(inv, forzar, tipo);
     if(p.error){ toast(p.error); return; }

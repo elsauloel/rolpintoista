@@ -144,7 +144,7 @@ async function acConsumir(sc, itemId){
   if(!it) return;
   let forzar = false;
   if(CreepAcciones.faltanNitrosConsumir(sc)){
-    if(!confirm(`${sc.nombre} no tiene los No2 para usar ${it.nombre} (cuesta ${CreepAcciones.costoConsumir()}). ¿Usarlo igual? Gasta los que tenga.`)) return;
+    if(!(await AvisoCombate.preguntar(`${sc.nombre} no tiene los No2 para usar ${it.nombre} (cuesta ${CreepAcciones.costoConsumir()}). ¿Usarlo igual? Gasta los que tenga.`, {icono: '⚠', titulo: 'Sin No2', si: 'Sí, usarlo'}))) return;
     forzar = true;
   }
   if(it.trampaDatos){
@@ -271,11 +271,11 @@ function acAtacar(tipo){
   const sc = acCreep();
   if(!sc) return;
   const id = ac.creepId;
-  const hacer = () => {
+  const hacer = async () => {
     const qs = Combatiente.preguntaSentado(sc.estados, sc.nombre);   // Sentado no puede atacar (cualquier ataque)
-    if(qs && !confirm(qs)) return;
+    if(qs && !(await AvisoCombate.preguntar(qs, {icono: '⚔', titulo: 'Atacar igual', si: 'Sí, atacar'}))) return;
     const forzar = CreepAcciones.faltanNitros(sc, tipo);   // sin No2: avisar y dejar seguir (2026-10-02)
-    if(forzar && !confirm(CreepAcciones.preguntaSinNitros(sc, tipo))) return;
+    if(forzar && !(await AvisoCombate.preguntar(CreepAcciones.preguntaSinNitros(sc, tipo), {icono: '⚠', titulo: 'Sin No2', si: 'Sí, atacar'}))) return;
     acCambiar(c => CreepAcciones.pagarAtaque(c, tipo, forzar)).then(x => {
       if(!x) return;
       CreepAcciones.alertaSinNitros(sc, tipo, x.forzado);

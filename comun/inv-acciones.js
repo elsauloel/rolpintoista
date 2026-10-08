@@ -112,13 +112,15 @@ const InvAcciones = (() => {
      por igual». Levantarse cuesta lo mismo que a un personaje (FichaCalculo.IT2.nitrosLevantarse). Soltarse: primero la tirada (una sola
      vez), después aplicarla (cobra y, si salió, saca el estado). → {error} / {aviso}; tiradaSoltarse → {s, r, ok, est, origen} o null. */
   function levantarse(inv){
-    const est = (inv.estados || []).find(e => e && e.activo !== false && e.sentado);
-    if(!est) return null;
-    const costo = Math.max(0, num(FichaCalculo.IT2.nitrosLevantarse) - num(I().modTotal(inv, 'levantarse')));   // Levantarse rápido (2026-10-06)
-    if(num(inv.nitros) < costo) return {error: `${inv.nombre}: no le alcanzan los No2 — levantarse cuesta ${costo}`};
+    // Primero el cuerpo (Sentado); si no, el arma (Desarmado, 2026-10-07: 1 No2).
+    const lv = Combatiente.levantable(inv.estados);
+    if(!lv) return null;
+    const est = lv.est;
+    const costo = lv.arma ? Combatiente.COSTO_LEVANTAR_ARMA : Math.max(0, num(FichaCalculo.IT2.nitrosLevantarse) - num(I().modTotal(inv, 'levantarse')));   // Levantarse rápido (2026-10-06)
+    if(num(inv.nitros) < costo) return {error: `${inv.nombre}: no le alcanzan los No2 — ${lv.arma ? 'levantar el arma' : 'levantarse'} cuesta ${costo}`};
     inv.nitros = num(inv.nitros) - costo;
     inv.estados = inv.estados.filter(e => e !== est);
-    return {aviso: `${inv.nombre} se levantó${costo ? ` · −${fmt(costo)} No2` : ''}`};
+    return {aviso: `${inv.nombre} ${lv.arma ? 'levantó el arma' : 'se levantó'}${costo ? ` · −${fmt(costo)} No2` : ''}`};
   }
   function tiradaSoltarse(inv){
     const est = Combatiente.estadoSoltable(inv.estados);

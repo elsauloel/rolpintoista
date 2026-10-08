@@ -61,17 +61,19 @@ const FichaAcciones = (() => {
   /* ---------- Sentado: levantarse cuesta 1 No2 (js/02) ----------
      El estado Sentado no vence solo; el botón "Levantarse" de la Botonera lo saca y cobra IT2.nitrosLevantarse. */
   function levantarse(S, forzar, ui){
-    const actual = FichaBotonera.efectoSentado(S);
-    if(!actual) return;
-    const costo = Math.max(0, num(IT2().nitrosLevantarse) - num(FichaCalculo.calcular(S).final.levantarse));   // Levantarse rápido (2026-10-06)
+    // Primero el cuerpo (Sentado); si no, el arma (Desarmado, 2026-10-07: 1 No2).
+    const lv = Combatiente.levantable(S.efectos);
+    if(!lv) return;
+    const actual = lv.est;
+    const costo = lv.arma ? Combatiente.COSTO_LEVANTAR_ARMA : Math.max(0, num(IT2().nitrosLevantarse) - num(FichaCalculo.calcular(S).final.levantarse));   // Levantarse rápido (2026-10-06)
     if(num(S.nitros) < costo && !forzar){
-      ui.avisarSinNitros(costo, 'levantarte', () => levantarse(S, true, ui));
+      ui.avisarSinNitros(costo, lv.arma ? 'levantar el arma' : 'levantarte', () => levantarse(S, true, ui));
       return;
     }
-    S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, 'se levantó') : costo);
+    S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, lv.arma ? 'levantó el arma' : 'se levantó') : costo);
     S.efectos = S.efectos.filter(e => e !== actual);
     ui.cambio(['efectos', 'nitros']);
-    ui.toast(`Te levantaste${costo ? ` · -${fmt(costo)} No2` : ''}`);
+    ui.toast(`${lv.arma ? 'Levantaste el arma' : 'Te levantaste'}${costo ? ` · -${fmt(costo)} No2` : ''}`);
   }
 
   /* ---------- Soltarse (2026-10-03): el estado que dejó una trampa de Atrapar dice qué tirar y cuánto cuesta (Combatiente.soltarNorm) ----------

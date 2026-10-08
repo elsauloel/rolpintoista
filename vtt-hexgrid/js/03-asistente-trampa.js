@@ -405,6 +405,12 @@ function statPjDe(t, campo){
   return r && Number.isFinite(r[campo]) && r[campo] > 0 ? Math.min(30, Math.round(r[campo])) : 0;
 }
 const luzPortadaDe = t => statPjDe(t, 'luz'), veOcultoDe = t => statPjDe(t, 'veoculto');
+// Ceguera (2026-10-07, la Varita del eclipse): un personaje ciego ve solo la casilla de alrededor, para todos lados, y ni su propia luz.
+function ciegoDe(t){
+  if(!t || t.tipo !== 'pj') return false;
+  const v = vinculo(t), r = v && v.resumen;
+  return !!(r && (r.estados || []).some(e => e && (e.ceguera || String(e.nombre || '').trim() === 'Ceguera')));
+}
 const offsetsDisco = [];   // flor completa de radio R (la luz que se lleva encima ilumina para todos lados, sin punto ciego)
 function celdasDisco(R){
   if(offsetsDisco[R]) return offsetsDisco[R];
@@ -429,15 +435,15 @@ function celdasVisionDe(t, ignorarSolidos){
   // La niebla de una varita (2026-10-05): desde afuera tapa como un Sólido; desde adentro se ve a 1.
   const nb = nieblaSet(), enNiebla = nb.has(nbPack(t.col, t.fila));
   const solidos = nb.size && !enNiebla ? new Set([...solidos0, ...nb]) : solidos0;
-  const res = [];
-  offsetsVision(k, enNiebla ? 1 : radioVisionDe(t)).forEach(o => {
+  const res = [], ciego = ciegoDe(t);
+  (ciego ? celdasDisco(1) : offsetsVision(k, enNiebla ? 1 : radioVisionDe(t))).forEach(o => {
     const col = cuboACol(c0.q + o.dq, c0.r + o.dr), fila = cuboAFila(c0.q + o.dq, c0.r + o.dr);
     // Los elementos Sólidos tapan la vista: no se ve lo que queda detrás.
     if(solidos.size && !lineaLibre(origen, {col, fila}, solidos)) return;
     res.push(nbPack(col, fila));
   });
   // Luz portada: un disco completo alrededor (sin punto ciego), también tapado por los Sólidos.
-  const luz = luzPortadaDe(t);
+  const luz = ciego ? 0 : luzPortadaDe(t);
   if(luz > 0){
     const vistas = new Set(res);
     celdasDisco(enNiebla ? Math.min(1, luz) : luz).forEach(o => {

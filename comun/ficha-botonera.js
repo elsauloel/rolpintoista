@@ -47,6 +47,7 @@ const FichaBotonera = (() => {
   const tieneSigilo = S => S.habilidades.some(h => String(h.nombre || '').trim().toLowerCase() === 'sigilo');
   const efectoSigilo = S => S.efectos.find(e => e.activo !== false && String(e.nombre || '').trim().toLowerCase() === 'sigilo');
   const efectoSentado = S => S.efectos.find(e => e.activo !== false && e.sentado);
+  const efectoDesarmado = S => S.efectos.find(Combatiente.esDesarmado);   // (2026-10-07: el arma en el piso)
 
   /* ---------- Habilidades ---------- */
   function statsConTirada(){ return FichaCalculo.STAT_LIST.filter(s => STATS_CON_TIRADA_IDS.includes(s.id)); }
@@ -277,6 +278,11 @@ const FichaBotonera = (() => {
       const falta = num(S.nitros) < Math.max(0, num(IT2().nitrosLevantarse) - num(c.final.levantarse));
       html += `<div class="botonera-caja" style="margin-bottom:8px"><button class="ejecutar-btn${falta ? ' sin-recursos' : ''}" data-levantarse="1" style="width:100%" ${falta ? 'aria-disabled="true" title="No te alcanzan los Nitros"' : ''}>🧍 Levantarse · ${fmt(num(IT2().nitrosLevantarse))} No2</button></div>`;
     }
+    // Desarmado (2026-10-07): levantar el arma cuesta 1 No2 (el mismo botón; primero te levantás si estás Sentado).
+    else if(efectoDesarmado(S)){
+      const falta = num(S.nitros) < Combatiente.COSTO_LEVANTAR_ARMA;
+      html += `<div class="botonera-caja" style="margin-bottom:8px"><button class="ejecutar-btn${falta ? ' sin-recursos' : ''}" data-levantarse="1" style="width:100%" ${falta ? 'aria-disabled="true" title="No te alcanzan los Nitros"' : ''}>🗡 Levantar el arma · ${fmt(Combatiente.COSTO_LEVANTAR_ARMA)} No2</button></div>`;
+    }
 
     // Soltarse (2026-10-03): un estado que dejó una trampa de Atrapar; el botón dice qué tira y cuánto cuesta.
     const soltable = Combatiente.estadoSoltable(S.efectos);
@@ -454,7 +460,7 @@ const FichaBotonera = (() => {
   }
 
   return {STATS_CON_TIRADA_IDS, TIPOS_IDS, PERCEPCION_DADO_SUBE, html, tiradaStat, tiradaPercepcion, tiradaPercepcionValor,
-    spMaximo, nitrosMaximo, tienePercepcionAumentada, tieneSigilo, efectoSigilo, efectoSentado,
+    spMaximo, nitrosMaximo, tienePercepcionAumentada, tieneSigilo, efectoSigilo, efectoSentado, efectoDesarmado,
     statsConTirada, habStatTirable, habTieneSegundaTirada, botonSegundaHab, dueloDe, modoHab, habAutomatizada,
     armasParaHabilidad, costoAtaqueMinimo, costoAtaqueHabTxt, costoNitrosHab, sinNitrosPara, costoHabilidadTxt,
     costoParryTxt, costoConsumirNitros, consumeButton,

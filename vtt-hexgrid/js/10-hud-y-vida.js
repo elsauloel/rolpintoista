@@ -204,7 +204,40 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
   if(guarda && golpe > 0) guardianAviso(t, guarda);
   if(muro && golpe > 0) muroAviso(t, muro);
+  await cosechaSiMuere(t, res);
   return res;
+}
+
+/* La cosecha (2026-10-07, Varita de la cosecha): si alguien cae con la marca «Cosecha de X», X recupera 2 SP y 2 de vida (un creep, solo la
+   vida: no usa SP). Lo hace el mapa del GM, como el resto del daño. */
+async function cosechaSiMuere(t, res){
+  try{
+    if(!soyGM || !res || !(num(res.previo) > 0) || num(res.nuevo) > 0) return;
+    const marca = (((vinculo(t) || {}).resumen || {}).estados || []).find(e => e && e.activo !== false && /^Cosecha de /.test(String(e.nombre || '')));
+    if(!marca) return;
+    const quien = String(marca.nombre).replace(/^Cosecha de /, '').trim();
+    const ct = [...tokens.values()].find(x => x.fichaId && nombreDe(x) === quien);
+    if(!ct){ mesaLinea(`🌾 Cosecha: ${nombreDe(t)} cayó marcado; ${quien} recupera 2 SP y 2 de vida (a mano: su token no está en el mapa)`); return; }
+    const esInv = ct.tipo === 'pj' && String(ct.fichaId).includes(SEP_INVOCACION);
+    if(esInv) await dueloCurarInv(ct, 2); else await dueloCurar(ct, 2);
+    let sp = '';
+    if(ct.tipo === 'pj' && !esInv){
+      const base = fbDb.doc(fbRutaCampana(`fichas/${ct.fichaId}`)), parteRef = base.collection('partes').doc('general');
+      const vuelve = await fbDb.runTransaction(async tx => {
+        const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
+        if(!parte.exists || !ficha.exists) return 0;
+        const datos = JSON.parse(parte.data().json || '{}'), rs = ficha.data().resumen || {};
+        const n = Math.min(2, Math.max(0, num(datos.spGastado)));
+        if(!n) return 0;
+        datos.spGastado = num(datos.spGastado) - n;
+        tx.set(parteRef, {json: JSON.stringify(datos), actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+        tx.update(base, {'resumen.sp': num(rs.sp) + n});
+        return n;
+      });
+      sp = vuelve ? ` y ${vuelve} SP` : ' (ya tenía el SP lleno)';
+    }
+    mesaLinea(`🌾 Cosecha: ${nombreDe(t)} cayó marcado; ${quien} recupera 2 de vida${sp}`);
+  }catch(err){ console.error('No se pudo aplicar la cosecha:', err); }
 }
 
 async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
@@ -242,6 +275,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   if(guarda && golpe > 0) guardianAviso(t, guarda);
   if(muro && golpe > 0) muroAviso(t, muro);
   if(res.absorbe) mesaLinea(`🔮 Orbe de absorción: ${nombreDe(t)} recupera ${res.absorbe} SP del daño mágico`);
+  await cosechaSiMuere(t, res);
   return res;
 }
 
@@ -285,6 +319,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
   if(guarda && golpe > 0) guardianAviso(t, guarda);
   if(muro && golpe > 0) muroAviso(t, muro);
+  await cosechaSiMuere(t, res);
   return res;
 }
 

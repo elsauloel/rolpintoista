@@ -74,6 +74,12 @@ const ESTADOS_PRESET = [
     detalle:'Silenciado: no puede usar habilidades que cuestan SP mientras dure. ⚙ Automatizado: al ejecutar una habilidad con costo en SP, avisa (y deja seguir si la mesa lo decide).'},
   {nombre:'Sentado', polaridad:'debuff', permanente:true, turnos:0, sentado:true, esCC:true,
     detalle:'Está en el piso: su Evasión se parte a la mitad (al resultado de la tirada, redondeado hacia abajo), no puede atacar y no puede hacer dodge roll (✋ a mano). No vence solo: levantarse cuesta 1 No2 (botón Levantarse de la Botonera o de las Acciones del creep).'},
+  // Desarmado (dueño, 2026-10-07, la Varita del manotazo): el arma cae en su casilla y levantarla cuesta 1 No2. Como Sentado: no vence solo.
+  {nombre:'Desarmado', alias:['Desarme'], polaridad:'debuff', permanente:true, turnos:0, desarmado:true, esCC:true,
+    detalle:'Se le cayó el arma: no puede atacar con ella hasta levantarla, que cuesta 1 No2 (el botón «Levantar el arma» de la Botonera). ⚙ Automatizado: al atacar, avisa (y deja seguir si la mesa lo decide). ✋ A mano: el arma quedó en la casilla donde estaba; para levantarla hay que estar ahí.'},
+  // Ceguera (dueño, 2026-10-07, la Varita del eclipse): 1 turno, solo ve a 1 casilla y −2 PdG.
+  {nombre:'Ceguera', polaridad:'debuff', turnos:1, ceguera:true, mods:[{stat:'pdg', val:-2}],
+    detalle:'Ciego: solo ve a 1 casilla alrededor y tiene −2 PdG. ⚙ Automatizado: el −2 y, en el mapa, lo que ve un personaje (1 casilla, ni su propia luz).'},
   {nombre:'Invulnerable', polaridad:'buff', turnos:3, invulnerable:true,
     detalle:'No recibe daño de ninguna fuente (golpes, veneno, sangrado, etc.) y no se le puede aplicar ningún debuff. En el mapa, su token titila.'},
   // Titilando (dueño, 2026-10-06: «como en el Contra, cuando te morís y resucitás»): quien vuelve de estar caído titila y es invulnerable hasta que

@@ -96,6 +96,11 @@ const CreepBotonera = (() => {
       const sinNitrosLev = num(sc.nitros) < 1;
       combate.push({nombre:'🧍 Levantarse · 1 No2', dado:'', soloTexto:true, sinNitros: sinNitrosLev, motivo: `${sinNitrosLev ? 'Sin No2 · ' : ''}Cuesta 1 No2 y saca el estado Sentado`, attr:`data-levantarcreep="${sc.id}"`});
     }
+    // Desarmado (2026-10-07): levantar el arma, 1 No2 (el mismo botón; primero se levanta si está Sentado).
+    else if((sc.estados || []).some(Combatiente.esDesarmado)){
+      const sinNitrosArma = num(sc.nitros) < Combatiente.COSTO_LEVANTAR_ARMA;
+      combate.push({nombre:`🗡 Levantar el arma · ${fmt(Combatiente.COSTO_LEVANTAR_ARMA)} No2`, dado:'', soloTexto:true, sinNitros: sinNitrosArma, motivo: `${sinNitrosArma ? 'Sin No2 · ' : ''}Cuesta 1 No2 y saca el estado Desarmado`, attr:`data-levantarcreep="${sc.id}"`});
+    }
     // Soltarse (2026-10-03): el estado que dejó una trampa de Atrapar dice qué tira y cuánto cuesta.
     const soltableCreep = Combatiente.estadoSoltable(sc.estados);
     if(soltableCreep){

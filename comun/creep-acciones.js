@@ -49,11 +49,14 @@ const CreepAcciones = (() => {
   /* ---------- Lo que cambia al creep ---------- */
   // Levantarse (Sentado): cuesta 1 No2 y saca el estado.
   function levantarse(sc){
-    const costo = Combatiente.costoLevantarse(st => C().modTotal(sc, st));   // Levantarse rápido (2026-10-06)
-    if(num(sc.nitros) < costo) return {error: `${sc.nombre}: no le alcanzan los No2 — levantarse cuesta ${costo}`};
+    // Primero el cuerpo (Sentado); si no, el arma (Desarmado, 2026-10-07: 1 No2).
+    const lv = Combatiente.levantable(sc.estados);
+    if(!lv) return {error: `${sc.nombre}: no tiene nada que levantar`};
+    const costo = lv.arma ? Combatiente.COSTO_LEVANTAR_ARMA : Combatiente.costoLevantarse(st => C().modTotal(sc, st));   // Levantarse rápido (2026-10-06)
+    if(num(sc.nitros) < costo) return {error: `${sc.nombre}: no le alcanzan los No2 — ${lv.arma ? 'levantar el arma' : 'levantarse'} cuesta ${costo}`};
     sc.nitros = num(sc.nitros) - costo;
-    sc.estados = (sc.estados || []).filter(e => !(e.activo !== false && e.sentado));
-    return {aviso: `${sc.nombre} se levantó${costo ? ` · −${fmt(costo)} No2 · quedan ${fmt(sc.nitros)}` : ' (gratis)'}`};
+    sc.estados = (sc.estados || []).filter(e => e !== lv.est);
+    return {aviso: `${sc.nombre} ${lv.arma ? 'levantó el arma' : 'se levantó'}${costo ? ` · −${fmt(costo)} No2 · quedan ${fmt(sc.nitros)}` : ' (gratis)'}`};
   }
   // Soltarse (2026-10-03): primero la tirada (afuera de cualquier transacción: se tira una sola vez) y después aplicarla (cobra y, si salió,
   // saca el estado). tiradaSoltarse → {s, r, ok, estId, origen} o null; aplicarSoltarse → {error} o {aviso}.
@@ -141,7 +144,7 @@ const CreepAcciones = (() => {
      acá (los resuelve cada pantalla antes). */
   const uid = () => Math.random().toString(36).slice(2,9);
   const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp'};
-  const FLAGS_ESTADO = ['armaduraRota','silencio','confusion','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','lento','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','espejo','esCC','esVeneno','esSangrado','stun'];
+  const FLAGS_ESTADO = ['armaduraRota','silencio','confusion','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','lento','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','espejo','desarmado','ceguera','esCC','esVeneno','esSangrado','stun'];
   const habEtq = stat => (C().STAT_LOOKUP[stat] && C().STAT_LOOKUP[stat].label) || ATTR_LABELS[stat] || stat;
   // La Ejecución de un creep: la misma regla que personajes e invocaciones (comun/combatiente.js, habEjecucion). Sin costo variable.
   function habEjecucion(sc, h){

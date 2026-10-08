@@ -470,6 +470,7 @@ const Duelo = (() => {
       nombre: txtCorto(e.nombre, 40), caras: Math.max(1, Math.round(_num(e.caras)) || 1), exitos: Math.max(1, Math.round(_num(e.exitos)) || 1), dado: txtCorto(e.dado, 20),
       detalle: txtCorto(e.detalle, 200), stacks: Math.max(0, Math.round(_num(e.stacks))), spec: limpiarSpec(e.spec), cura: Math.max(0, Math.round(_num(e.cura))),
       ...(e.no2 !== undefined ? {no2: Math.max(0, Math.round(_num(e.no2))), no2Dif: !!e.no2Dif, no2Sentado: !!e.no2Sentado} : {}),
+      ...(e.purga ? {purga: true} : {}),   // la purga (2026-10-07)
     })).filter(e => e.nombre);
   }
   // Grupo de un hechizo de área (Paso 4/7 del casteo): ata este sub-duelo a la cascada de `campanas/<id>/areas/<grupoId>`
@@ -510,7 +511,7 @@ const Duelo = (() => {
       ...(h.atrae ? {atrae: {casillas: Math.min(6, Math.max(1, Math.round(_num(h.atrae.casillas)) || 2)), contra: txtCorto(h.atrae.contra || 'fue', 12), tiraValor: _num(h.atrae.tiraValor)}} : {}),   // el gancho
       ...(_num(h.critTipo) ? {critTipo: Math.min(12, Math.max(1, Math.round(_num(h.critTipo))))} : {}),   // lo físico invocado critica como su Tipo
       ...(objetivo === 'linea' ? {largo: Math.min(12, Math.max(1, Math.round(_num(h.largo)) || 4))} : {}),
-      ...(h.cadena ? {cadena: {saltos: Math.min(6, Math.max(1, Math.round(_num(h.cadena.saltos)) || 2)), rango: Math.min(6, Math.max(1, Math.round(_num(h.cadena.rango)) || 3))}} : {}),   // rayo en cadena (2026-10-05)
+      ...(h.cadena ? {cadena: {saltos: Math.min(6, Math.max(1, Math.round(_num(h.cadena.saltos)) || 2)), rango: Math.min(6, Math.max(1, Math.round(_num(h.cadena.rango)) || 3)), ...(h.cadena.efectos ? {efectos: true} : {})}} : {}),   // rayo en cadena (2026-10-05)
       ...(h.efectoLibre ? {efectoLibre: txtCorto(h.efectoLibre, 200)} : {}),
       ...(h.efectosNota ? {efectosNota: txtCorto(h.efectosNota, 200)} : {}),
       // «Otro»: se resiste con algo que no está en la lista de stats — texto libre para que la mesa lo
@@ -766,6 +767,7 @@ const Duelo = (() => {
     if(ef.spec && ef.spec.nombre) return ef.spec;   // habilidades: el estado ya viene armado
     if(_num(ef.cura) > 0) return {nombre: 'Curación', cura: Math.round(_num(ef.cura))};   // habilidades: cura sobre el objetivo
     if(ef.no2 !== undefined) return {nombre: 'Pierde No2', no2: Math.max(0, Math.round(_num(ef.no2))), no2Dif: !!ef.no2Dif, no2Sentado: !!ef.no2Sentado};   // Sonic Boom
+    if(ef.purga) return {nombre: 'Purga', purga: true};   // la purga (2026-10-07): el mapa saca el estado malo más reciente
     const n = String(ef.nombre || '').trim().toLowerCase();
     const st = Math.max(0, Math.round(_num(ef.stacks)));
     const tu = Math.max(0, Math.round(_num(ef.turnos)));   // turnos puestos en el efecto del arma (ej. Sangrado 2 turnos); 0 = los del estado

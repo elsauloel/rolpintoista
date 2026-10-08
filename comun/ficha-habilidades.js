@@ -40,7 +40,7 @@ const FichaHabilidades = (() => {
   // (afortunado, inmunidades, etc.) — un ítem puede pedir "activate igual que este preset" sin copiarle el nombre
   // (equipoEstadoPreset), para poder mostrar un nombre propio sin perder la mecánica real del preset.
   const FLAGS_ESPECIALES = ['esCC', 'esVeneno', 'esSangrado', 'esQuemadura', 'afortunado', 'invulnerable',
-    'inmunidadCC', 'sangrePura', 'coagulacionExtrema', 'blindado', 'espinas', 'espejo', 'mitadPdgEva',
+    'inmunidadCC', 'sangrePura', 'coagulacionExtrema', 'blindado', 'espinas', 'espejo', 'desarmado', 'ceguera', 'mitadPdgEva',
     'lisiado', 'paralisis', 'silencio', 'confusion', 'esEscarcha', 'inmovilizado', 'rengo', 'lento', 'cansado', 'exhausto', 'hypeado', 'sentado',
     'armaduraRota', 'escudoMagico', 'excedenteVida', 'forzarNitros', 'stun'];
   function flagsDePreset(presets, nombrePreset){

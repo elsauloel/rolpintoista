@@ -1034,8 +1034,20 @@ async function dueloCadena(d, golpe){
   if(cadena.length < 2) return;
   // El rayo saltando se ve en TODAS las pantallas (2026-10-05, dueño): va en un momento de la Crónica (rayoMomento, js/16), no solo acá.
   const saltos = cadena.slice(1).map((s, i) => ({desde: cadena[i].id, hacia: s.id}));
+  // Los efectos del golpe también a cada uno al que salta (`cadena.efectos`, el Relámpago, 2026-10-07): cada uno tira su chance, como en el golpe.
+  const extra = [];
+  if(c.efectos){
+    for(const s of cadena.slice(1)){
+      for(const ef of (d.efectos || []).filter(e => e && !e.cura && Duelo.specDeEfecto(e))){
+        const caras = Math.max(1, Math.round(num(ef.caras)) || 1), exitos = Math.max(1, Math.round(num(ef.exitos)) || 1);
+        if(Math.floor(Math.random() * caras) >= exitos) continue;
+        try{ const r = await dueloAplicarEfecto({...d, defensor: {...d.defensor, tokenId: s.id, nombre: nombreDe(s.t)}}, ef); extra.push(`${s.t.oculto ? 'Alguien' : nombreDe(s.t)}: ${ef.nombre}${r && r.manual ? ' (a mano)' : ''}`); }
+        catch(err){ console.error('No se pudo aplicar el efecto del salto:', err); extra.push(`${nombreDe(s.t)}: ${ef.nombre} (a mano)`); }
+      }
+    }
+  }
   momentoAbrir({tipo: 'rayo', icono: '⚡', titulo: `${d.hab.nombre}: el rayo salta`, estado: 'listo', datos: {saltos},
-    resultado: cadena.slice(1).map(s => `${s.t.oculto ? 'Alguien' : nombreDe(s.t)} (${s.dano})`).join(' → ')});
+    resultado: cadena.slice(1).map(s => `${s.t.oculto ? 'Alguien' : nombreDe(s.t)} (${s.dano})`).join(' → ') + (extra.length ? ` · ${extra.join(' · ')}` : '')});
   await rayoCadenaAplicar(cadena);
 }
 
@@ -1170,6 +1182,23 @@ async function dueloAplicarEfecto(d, ef){
   const t = tokens.get(d.defensor.tokenId);
   if(!t) return {manual: true, nota: 'el token ya no está: aplicalo a mano'};
   if(spec.nombre === 'Demora') return dueloDemora(d.defensor.tokenId);
+  // La purga (2026-10-07, Varita de la purga): el estado malo más reciente (el último de la lista; no los que salen solos del equipo o las pasivas).
+  if(spec.purga){
+    const lista = ((vinculo(t) || {}).resumen || {}).estados || [];
+    let idx = -1;
+    for(let i = lista.length - 1; i >= 0; i--){ const e = lista[i]; if(e && e.polaridad === 'debuff' && !e.derivado && e.activo !== false){ idx = i; break; } }
+    if(idx < 0) return {nota: 'no tenía ningún estado malo'};
+    const nom = lista[idx].nombre;
+    try{ await hudEstadoCambiar(t, idx, 'quitar'); return {nota: `le sacó ${nom}`}; }
+    catch(err){ console.error('No se pudo aplicar la purga:', err); return {manual: true, nota: `sacale ${nom} a mano`}; }
+  }
+  // La cosecha (2026-10-07, Varita de la cosecha): la marca lleva el nombre de quien la puso («Cosecha de juan»); si muere marcado, ese
+  // recupera 2 SP y 2 de vida (js/10 cosechaSiMuere).
+  if(spec.nombre === 'Cosecha'){
+    spec.nombre = `Cosecha de ${String(d.atacante.nombre || 'alguien').slice(0, 28)}`; spec.polaridad = 'debuff';
+    if(!(num(spec.turnos) > 0)) spec.turnos = 3;
+    spec.detalle = `Marcado: si muere con esta marca, ${d.atacante.nombre || 'quien lo marcó'} recupera 2 SP y 2 de vida.`;
+  }
   // «Pierde No2» (2026-10-02, Sonic Boom): cuántos = el número + la diferencia entre las tiradas; en 0, Sentado si corresponde.
   if(spec.nombre === 'Pierde No2'){
     const n = Math.max(0, Math.round(num(spec.no2))) + (spec.no2Dif ? Math.abs(Math.round(num(d.contacto && d.contacto.dif))) : 0);

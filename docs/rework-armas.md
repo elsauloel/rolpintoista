@@ -1954,6 +1954,11 @@ Con la calculadora recalibrada (varitas directas con dado fijo, báculos con ¼ 
   manos). El fuego que deja la Bola de fuego Común pasa a ser del piso. **Quedan para las tandas siguientes:** Relámpago (la Parálisis a cada
   salto), Muro de fuego (zona en línea), Láser largo, Ráfaga helada, Chorro de lava, Campo de estática, Inestable, Muro, Vendaval, Blink, Portales,
   Luz flotante, Eclipse, Manotazo, Cosecha, Purga, Báculo de sangre, De cargas, Gemela, las trampas portal y de arena de Buena y las de arena Comunes.
+- **Grupo 1 de Buena cargado (2026-10-07):** Relámpago (la Parálisis, 15 %, a cada uno que toca: `cadena.efectos`), Eclipse (estado nuevo
+  **Ceguera**: 1 turno, −2 PdG y, en el mapa, un personaje ciego ve solo 1 casilla, ni su luz), Manotazo (estado nuevo **Desarmado**: no puede
+  atacar con su arma —avisa y deja seguir, como Sentado— y «🗡 Levantar el arma» cuesta 1 No2 en la Botonera de personajes, creeps e
+  invocaciones; ✋ el arma queda en su casilla), Purga (le saca el estado malo más reciente al aliado) y Cosecha (la marca «Cosecha de X»
+  dura 3 turnos; si cae marcado, X recupera 2 SP y 2 de vida).
 - **El rango lo da la Destreza, siempre** (dueño, 2026-10-07, P174): donde esta hoja dice «Rango de casteo» (la primera casilla del Chorro
   de lava, a 1/3), ahora es **tu Rango**.
 

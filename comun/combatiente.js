@@ -357,8 +357,22 @@ const Combatiente = (() => {
   const cuestaSp = h => !!h && (String(h.costo || '').trim().toUpperCase() === 'X' || n(h.costo) > 0);
   const preguntaSilencio = (estados, h, nombre) => !(estados || []).some(e => e && e.activo !== false && e.silencio) || !cuestaSp(h) ? ''
     : `${nombre ? nombre + ' está' : 'Estás'} en Silencio: no ${nombre ? 'puede' : 'podés'} usar habilidades que cuestan SP. ¿Usar ${(h && h.nombre) || 'la habilidad'} igual?`;
-  const preguntaSentado = (estados, nombre) => !(estados || []).some(e => e && e.activo !== false && e.sentado) ? ''
-    : nombre ? `${nombre} está Sentado y no puede atacar. ¿Atacar igual?` : 'Estás Sentado: no podés atacar. ¿Atacar igual?';
+  // Desarmado (2026-10-07): tampoco puede atacar con su arma hasta levantarla (la misma pregunta, en el mismo lugar).
+  const esDesarmado = e => !!e && e.activo !== false && (e.desarmado || /^desarm(ado|e)$/i.test(String(e.nombre || '').trim()));
+  const preguntaSentado = (estados, nombre) => (estados || []).some(e => e && e.activo !== false && e.sentado)
+    ? (nombre ? `${nombre} está Sentado y no puede atacar. ¿Atacar igual?` : 'Estás Sentado: no podés atacar. ¿Atacar igual?')
+    : (estados || []).some(esDesarmado) ? (nombre ? `${nombre} está Desarmado: se le cayó el arma (levantarla cuesta 1 No2). ¿Atacar igual?` : 'Estás Desarmado: se te cayó el arma (levantarla cuesta 1 No2). ¿Atacar igual?')
+    : '';
+  // Lo que se «levanta» pagando No2 (2026-10-07): primero el cuerpo (Sentado, 1 No2 menos Levantarse rápido), después el arma (Desarmado, 1 No2).
+  // → {est, arma} o null.
+  function levantable(estados){
+    const act = (estados || []).filter(e => e && e.activo !== false);
+    const s = act.find(e => e.sentado);
+    if(s) return {est: s, arma: false};
+    const d = act.find(esDesarmado);
+    return d ? {est: d, arma: true} : null;
+  }
+  const COSTO_LEVANTAR_ARMA = 1;
   /* «Ignora N de Resistencia a crítico» de un arma (2026-10-03, pedido del dueño): el campo `ignoraResistCrit` del arma (también el viejo
      efecto al golpear «Ignora N de Res. crítico», que no se aplicaba solo). El duelo se lo resta a la Resistencia del defensor antes de
      calcular el crítico (lo pide al atacante con statsCritico). `arma` = {ignoraResistCrit, efectosGolpe} (un creep o una invocación: sus
@@ -695,6 +709,8 @@ const Combatiente = (() => {
   // Un efecto de la Ejecución, en la forma que usa el cuadro del duelo (y el estado que pone, `spec`).
   function efectoDeEjecucion(e){
     // «Pierde No2» (2026-10-02, Sonic Boom): el objetivo pierde `no2` (+ la diferencia entre las tiradas) No2; en 0, Sentado.
+    // La purga (2026-10-07, Varita de la purga): le saca el estado malo más reciente (el mapa elige cuál: js/13 dueloAplicarEfecto).
+    if(e && e.purga) return {nombre: 'Purga', caras: 1, exitos: 1, spec: null, purga: true, detalle: 'Le saca el estado malo más reciente.'};
     if(e && e.no2 !== undefined) return {nombre: 'Pierde No2', caras: 1, exitos: 1, spec: null, no2: Math.max(0, Math.round(nf(e.no2))), no2Dif: !!e.no2Dif, no2Sentado: !!e.no2Sentado,
       detalle: `Pierde ${nf(e.no2)}${e.no2Dif ? ' + la diferencia' : ''} No2${e.no2Sentado ? '; si se queda sin No2, queda Sentado' : ''}.`};
     // Con probabilidad (2026-10-05, armas especiales): `caras`/`exitos` como los efectos de un arma (33 % = 5 o 6 en d6: el duelo tira un d3 como d6); sin eso, entra siempre.
@@ -745,7 +761,7 @@ const Combatiente = (() => {
       ...(nf(c.critTipo) ? {critTipo: Math.round(nf(c.critTipo))} : {}),   // la luz (2026-10-05, Varita de la luz): solo los rivales en sigilo que alcanza
       // Rayo en cadena (2026-10-05, Varita de chispa eléctrica): si el golpe entra, salta `saltos` veces al más cercano del mismo bando a
       // `rango` casillas o menos, la mitad cada salto (P118: la misma regla de ⚡ Rayo en cadena del token y de la trampa Descarga).
-      ...(c.cadena ? {cadena: {saltos: Math.max(1, Math.round(nf(c.cadena.saltos)) || 2), rango: Math.max(1, Math.round(nf(c.cadena.rango)) || 3)}} : {}),
+      ...(c.cadena ? {cadena: {saltos: Math.max(1, Math.round(nf(c.cadena.saltos)) || 2), rango: Math.max(1, Math.round(nf(c.cadena.rango)) || 3), ...(c.cadena.efectos ? {efectos: true} : {})}} : {}),   // efectos: también a los que salta (2026-10-07)
       ...(c.efectoLibre ? {efectoLibre: sx(c.efectoLibre)} : {}),
       ...(c.efectosNota ? {efectosNota: sx(c.efectosNota)} : {}),
       ...(c.contraOtro ? {contraOtro: c.contraOtro} : {}),
@@ -938,7 +954,7 @@ const Combatiente = (() => {
     const st = AHORRO_ESPECIAL[tipo];
     return st && typeof valorDe === 'function' ? Math.max(0, Math.round(n(valorDe(st)))) : 0;
   }
-  return {curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

@@ -1562,13 +1562,27 @@ prueba('guantes de Buena calidad: el primer conjuro (−1 SP, solo el primer uso
   const t = Combatiente.trampaDeHab({nombre: 'Cepo', trampaColocar: {nombre: 'Cepo'}}, st => st === 'des' ? 5 : st === 'trampaoculta' ? 2 : 0);
   igual([primero, segundo, esp, t.detectar], [2, 3, 1, 7]);
 });
-prueba('armas especiales de Buena, primera tanda (2026-10-07): 15, con su SP; la Bola de fuego mayor agarra aliados, la Sanguijuela drena la mitad, el báculo suma ¼ del Ef.Esp', () => {
+prueba('armas especiales de Buena (2026-10-07): 20 (primera tanda y grupo 1), con su SP; la Bola de fuego mayor agarra aliados, la Sanguijuela drena la mitad, el báculo suma ¼ del Ef.Esp', () => {
   const buenas = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-buena-'));
   const sc = creepPrueba({esp: 12});
   const plan = id => { const it = {...structuredClone(CATALOGO_BASE.find(x => x.id === id)), id: 'x'}; const h = CreepAcciones.habDeEspecialCreep(sc, it); return {h, e: Combatiente.habEjecucion(h, h.duelo, {})}; };
   const bola = plan('esp-buena-varita-de-la-bola-de-fuego-mayor').e, sang = plan('esp-buena-varita-sanguijuela').e, sabio = plan('esp-buena-baculo-del-sabio').h;
   igual([buenas.length, buenas.every(i => i.especial && i.especial.sp >= 1 && /Cuesta 1 No2/.test(i.detalle)), !!bola.fuegoAmigo, bola.radio, sang.dano.drenaPct, sang.dano.directo, /^1d8\+\d+$/.test(sabio.tiradaExtra)],
-    [15, true, true, 2, 50, true, true]);
+    [20, true, true, 2, 50, true, true]);
+});
+prueba('grupo 1 de Buena (2026-10-07): Desarmado (no ataca, levantar el arma 1 No2), Ceguera (−2 PdG), la purga y la cadena con efectos a todos', () => {
+  const sc = creepPrueba({nitros: 3, habilidades: [{id: 'm', nombre: 'Manotazo', efectoNombre: 'Desarmado'}, {id: 'c', nombre: 'Eclipse', efectoNombre: 'Ceguera'}]});
+  CreepAcciones.efectoDeHab(sc, sc.habilidades[0], estadosPresetCreep());
+  const q = Combatiente.preguntaSentado(sc.estados, sc.nombre), lv = Combatiente.levantable(sc.estados);
+  const r = CreepAcciones.levantarse(sc);
+  EstadosAplicar.aplicarACreep(sc, {nombre: 'Ceguera'});   // como la pone el duelo (la varita): con el −2 del preset
+  const ceg = sc.estados.find(e => e.nombre === 'Ceguera');
+  const sent = Combatiente.levantable([{nombre: 'Sentado', sentado: true, activo: true}, {nombre: 'Desarmado', desarmado: true, activo: true}]);
+  const purga = Combatiente.habEjecucion({nombre: 'Purga'}, CATALOGO_BASE.find(i => i.nombre === 'Varita de la purga').especial.duelo, {});
+  const rel = Combatiente.habEjecucion({nombre: 'Relámpago'}, CATALOGO_BASE.find(i => i.nombre === 'Varita del relámpago').especial.duelo, {});
+  igual([/Desarmado/.test(q), lv.arma, r.aviso && /levantó el arma/.test(r.aviso), sc.nitros, Combatiente.levantable(sc.estados), !!ceg.ceguera, ceg.mods[0].val, sent.arma,
+    purga.efectos[0].purga, Duelo.specDeEfecto(Duelo.limpiarHab({nombre: 'P', efectos: purga.efectos}).efectos[0]).purga, rel.cadena.efectos, rel.cadena.saltos],
+    [true, true, true, 2, null, true, -2, false, true, true, true, 3]);
 });
 prueba('torso blando: la Túnica de sangre paga el SP de un arma especial con vida (y no dos veces); el resumen lleva la Defensa extra', async () => {
   const {S} = FichaGuardado.normalizar({}, {mezclarCatalogo: false});

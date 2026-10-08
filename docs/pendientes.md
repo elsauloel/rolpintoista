@@ -164,7 +164,8 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 
 - [x] **El filtro del catálogo, una sola pieza para todos lados** (dueño, 2026-10-08: «hay que ponerle onda, no era muy claro»; hecho el mismo
   día): `comun/filtro-catalogo.js` (`FiltroCatalogo`). Buscador (todas las palabras: nombre, efecto, bonos), chips con cuántos quedan (qué es /
-  dónde va —la clasificación de `GeneradorTiendas.parteDe`—, calidad, una o dos manos, **🟢 Lugar libre** en la tienda del jugador), orden y
+  dónde va —la clasificación de `GeneradorTiendas.parteDe`—, calidad (solo el GM: los jugadores no la ven, `calidad: false`), una o dos manos,
+  **🟢 Lugar libre** en la tienda del jugador), orden y
   «⚙ Más filtros» (Tipo de arma, daño/elemento, que suba, efecto al golpear, **precio desde–hasta**, peso; el GM además «Efecto escaso» y «De
   dónde sale»); «23 de 410 ítems · ✕ Limpiar todo». Lo usan la tienda de la ficha y la del mapa, el «Agregar ítems» del generador de tiendas,
   «Equipar del fabricante» de GM Tools y el editor del catálogo. De paso: el mapa tomaba como atajos las letras escritas en un campo de la

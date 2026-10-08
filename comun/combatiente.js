@@ -994,7 +994,8 @@ const Combatiente = (() => {
     buff: [{nombre: 'Regeneración', turnos: 3, hp: 2}, {nombre: 'Hypeado', turnos: 2}, {nombre: 'Crítico frecuente', turnos: 2}, {nombre: 'Crítico potente', turnos: 2},
       {nombre: 'Invulnerable', turnos: 1}, {nombre: 'Inmunidad a CC', turnos: 2}, {nombre: 'Espinas', turnos: 3}, {nombre: 'Espejo', turnos: 3},
       {nombre: 'Vida extra', turnos: 3, escudoMagico: 10}, {nombre: 'Barrera', turnos: 2, escudoMagico: 8}, {nombre: 'Afortunado', turnos: 2},
-      {nombre: 'Sangre pura', turnos: 3}, {nombre: 'Coagulación', turnos: 3}, {nombre: 'Blindado', turnos: 2}, {nombre: 'Inamovible', turnos: 2}],
+      {nombre: 'Sangre pura', turnos: 3}, {nombre: 'Coagulación', turnos: 3}, {nombre: 'Blindado', turnos: 2}, {nombre: 'Inamovible', turnos: 2},
+      {nombre: 'Sigilo'}],   // (dueño, 2026-10-08: el Sigilo también entra; dura hasta que lo descubran)
     debuff: [{nombre: 'Veneno', stacks: 4}, {nombre: 'Sangrado', turnos: 2}, {nombre: 'Quemadura', turnos: 3}, {nombre: 'Escarcha', turnos: 2},
       {nombre: 'Armadura rota'}, {nombre: 'Pajaritos', turnos: 2}, {nombre: 'Cansado', turnos: 2}, {nombre: 'Exhausto', turnos: 1},
       {nombre: 'Stun', turnos: 1}, {nombre: 'Confusión', turnos: 2}, {nombre: 'Lisiado', turnos: 2}, {nombre: 'Inmovilizado', turnos: 1},
@@ -1002,13 +1003,13 @@ const Combatiente = (() => {
       {nombre: 'Parálisis', turnos: 2}, {nombre: 'Silencio', turnos: 1}, {nombre: 'Ceguera', turnos: 1}, {nombre: 'Marcado', turnos: 2}, {nombre: 'Sentado'},
       {nombre: 'Desarmado', vuela: 2}],   // como la Expelliarmus: el arma vuela 2 casillas a un lado al azar
   };
-  /* El d10 del caos: `caos = {exito, contra, propio}` (la Común 6/3/1). Con 1…exito sale lo que se quiere (a un aliado un buff, a un rival un
-     debuff); después, contra (lo contrario, al mismo objetivo); el resto, un debuff a quien la usó. → {que: 'buff'|'debuff', a: 'objetivo'|'propio', bien}. */
-  function caosResultado(d10, aliado, caos){
-    const ex = n(caos && caos.exito) || 6, co = n(caos && caos.contra) || 3, d = n(d10);
-    if(d <= ex) return {que: aliado ? 'buff' : 'debuff', a: 'objetivo', bien: true};
-    if(d <= ex + co) return {que: aliado ? 'debuff' : 'buff', a: 'objetivo', bien: false};
-    return {que: 'debuff', a: 'propio', bien: false};
+  /* El d20 del caos (dueño, 2026-10-08, segunda vuelta): `caos = {exito}` (la Común 10, la Buena 8). Lo que se quiere es, a un aliado, un buff;
+     a un rival, un debuff. 20: sale bien y quien la usa elige cuál; exito…19: sale bien, al azar; 2…exito−1: sale al revés (al mismo objetivo), al
+     azar; 1: sale al revés y elige cuál el bando contrario. → {que: 'buff'|'debuff', a: 'objetivo', bien, elige: 'propio'|'rival'|''}. */
+  function caosResultado(d20, aliado, caos){
+    const ex = Math.min(19, Math.max(2, n(caos && caos.exito) || 10)), d = n(d20);
+    const bien = d >= 20 || (d > 1 && d >= ex);
+    return {que: aliado === bien ? 'buff' : 'debuff', a: 'objetivo', bien, elige: d >= 20 ? 'propio' : d <= 1 ? 'rival' : ''};
   }
   const caosEstado = (pol, azar) => { const l = CAOS_ESTADOS[pol] || []; return structuredClone(l[Math.floor((azar || Math.random)() * l.length)] || l[0]); };
   const AHORRO_ESPECIAL = {oportunidad: 'oporahorro', contra: 'contraahorro', contraataque: 'contraahorro'};

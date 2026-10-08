@@ -87,7 +87,16 @@ function momentoRecibido(id, d){
   // La Varita del caos que usó un jugador sobre un creep (o con un arma que vuela): la aplica la pantalla del GM (js/13 caosAplicar).
   if(d.tipo === 'caos' && d.estado === 'esperandoGM' && soyGM && d.datos && d.datos.caos && !caosHechos.has(id)){
     caosHechos.add(id);
-    caosAplicar(d.datos.caos.tokenId, d.datos.caos.spec, d.titulo || 'Varita del caos').then(nota => momentoActualizar(id, {estado: 'listo', resultado: String(d.resultado || '').replace(' (lo aplica el GM)', '') + nota}));
+    const c = d.datos.caos;
+    // Salió 1: elige el GM (el bando contrario) cuál, y lo aplica.
+    if(c.elegir){
+      caosElegir(c.elegir, d.titulo || 'Varita del caos', `${c.nombre || 'El objetivo'} recibe ${c.elegir === 'buff' ? 'un buff' : 'un debuff'}: como bando contrario, elegí cuál.`).then(async spec => {
+        if(spec.nombre === 'Provocado') spec.detalle = 'Provocado: contra quién lo elige el bando contrario (✋ a mano).';
+        const nota = await caosAplicar(c.tokenId, spec, d.titulo || 'Varita del caos');
+        momentoActualizar(id, {estado: 'listo', resultado: `1d20 → 1: ${c.nombre || 'el objetivo'} recibe ${spec.nombre} (lo eligió el GM).${nota}`});
+      });
+    }
+    else caosAplicar(c.tokenId, c.spec, d.titulo || 'Varita del caos').then(nota => momentoActualizar(id, {estado: 'listo', resultado: String(d.resultado || '').replace(' (lo aplica el GM)', '') + nota}));
   }
   // Quien está esperando la respuesta en su cartelito.
   if(percepcionBanner && percepcionBanner.momentoId === id && d.estado === 'listo' && !percepcionBanner.resultado) percepcionRespuesta(d);

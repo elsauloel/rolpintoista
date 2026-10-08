@@ -1563,13 +1563,13 @@ prueba('guantes de Buena calidad: el primer conjuro (−1 SP, solo el primer uso
   const t = Combatiente.trampaDeHab({nombre: 'Cepo', trampaColocar: {nombre: 'Cepo'}}, st => st === 'des' ? 5 : st === 'trampaoculta' ? 2 : 0);
   igual([primero, segundo, esp, t.detectar], [2, 3, 1, 7]);
 });
-prueba('armas especiales de Buena (2026-10-07): 36 (primera tanda, grupo 1 sin el Manotazo y las tandas 1 a 4 del 2026-10-08), con su SP; la Bola de fuego mayor agarra aliados, la Sanguijuela drena la mitad, el báculo suma ¼ del Ef.Esp', () => {
+prueba('armas especiales de Buena (2026-10-07): 37 (primera tanda, la Varita del caos Buena, grupo 1 sin el Manotazo y las tandas 1 a 4 del 2026-10-08), con su SP; la Bola de fuego mayor agarra aliados, la Sanguijuela drena la mitad, el báculo suma ¼ del Ef.Esp', () => {
   const buenas = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-buena-'));
   const sc = creepPrueba({esp: 12});
   const plan = id => { const it = {...structuredClone(CATALOGO_BASE.find(x => x.id === id)), id: 'x'}; const h = CreepAcciones.habDeEspecialCreep(sc, it); return {h, e: Combatiente.habEjecucion(h, h.duelo, {})}; };
   const bola = plan('esp-buena-varita-de-la-bola-de-fuego-mayor').e, sang = plan('esp-buena-varita-sanguijuela').e, sabio = plan('esp-buena-baculo-del-sabio').h;
   igual([buenas.length, buenas.every(i => i.especial && /Cuesta \d No2/.test(i.detalle) && (i.especial.sp >= 1 || i.especial.spVidaPct > 0 || (i.especial.modos || []).length > 1)), !!bola.fuegoAmigo, bola.radio, sang.dano.drenaPct, sang.dano.directo, /^1d8\+\d+$/.test(sabio.tiradaExtra)],
-    [36, true, true, 2, 50, true, true]);
+    [37, true, true, 2, 50, true, true]);
 });
 prueba('Buenas, tanda 1 (2026-10-08): trampa portal + 2, báculo de sangre (10 % de la vida), inestable (riesgo), luz flotante (zona inmediata y luz)', () => {
   const cat = id => ({...structuredClone(CATALOGO_BASE.find(x => x.id === id)), id: 'x', equipado: true});
@@ -1641,13 +1641,15 @@ prueba('Áreas por diámetro (dueño, 2026-10-08): el texto dice el diámetro y 
          CATALOGO_BASE.some(i => /radio \d/.test(`${i.detalle || ''} ${i.efectoDetalle || ''}`))],
     ['una casilla (diámetro 1)', 'diámetro 3 (7 casillas)', 'diámetro 5 (19 casillas)', 7, [1, 1, 1, 1, 1, 1, 1], true, 2, false]);
 });
-prueba('Varita del caos (2026-10-08): el d10 (6/3/1): a un aliado buff, al revés debuff, con 10 debuff a quien la usa; a un rival al revés; los estados del sorteo existen', () => {
-  const c = {exito: 6, contra: 3, propio: 1}, R = Combatiente.caosResultado;
+prueba('Varita del caos (2026-10-08, segunda vuelta): el d20: 20 bien y elige quien la usa; Común 10–19 / Buena 8–19 bien al azar; 2 para arriba al revés; 1 al revés y elige el contrario; los estados del sorteo existen (con Sigilo)', () => {
+  const c = {exito: 10}, b = {exito: 8}, R = Combatiente.caosResultado, cat = id => CATALOGO_BASE.find(x => x.id === id);
   const nombres = [...Combatiente.CAOS_ESTADOS.buff, ...Combatiente.CAOS_ESTADOS.debuff].map(e => e.nombre);
   const faltan = nombres.filter(n => !ESTADOS_PRESET.some(p => p.nombre === n));
-  igual([R(1, true, c), R(6, true, c), R(7, true, c), R(10, true, c), R(3, false, c), R(9, false, c), faltan, Combatiente.caosEstado('buff', () => 0).nombre],
-    [{que: 'buff', a: 'objetivo', bien: true}, {que: 'buff', a: 'objetivo', bien: true}, {que: 'debuff', a: 'objetivo', bien: false}, {que: 'debuff', a: 'propio', bien: false},
-     {que: 'debuff', a: 'objetivo', bien: true}, {que: 'buff', a: 'objetivo', bien: false}, [], 'Regeneración']);
+  igual([R(20, true, c), R(10, true, c), R(9, true, c), R(1, true, c), R(20, false, c), R(1, false, c), R(8, true, b), R(7, true, b), faltan, Combatiente.caosEstado('buff', () => 0).nombre,
+         nombres.includes('Sigilo'), cat('esp-varita-del-caos').especial.caos, cat('esp-buena-varita-del-caos').especial.caos],
+    [{que: 'buff', a: 'objetivo', bien: true, elige: 'propio'}, {que: 'buff', a: 'objetivo', bien: true, elige: ''}, {que: 'debuff', a: 'objetivo', bien: false, elige: ''},
+     {que: 'debuff', a: 'objetivo', bien: false, elige: 'rival'}, {que: 'debuff', a: 'objetivo', bien: true, elige: 'propio'}, {que: 'buff', a: 'objetivo', bien: false, elige: 'rival'},
+     {que: 'buff', a: 'objetivo', bien: true, elige: ''}, {que: 'debuff', a: 'objetivo', bien: false, elige: ''}, [], 'Regeneración', true, {exito: 10}, {exito: 8}]);
 });
 prueba('proyectiles (2026-10-08): lo que puede hacer crítico tira PdG (no PdG.Esp); la inestable: 1d4 por cada 1 (porCada)', () => {
   const cat = id => CATALOGO_BASE.find(x => x.id === id);

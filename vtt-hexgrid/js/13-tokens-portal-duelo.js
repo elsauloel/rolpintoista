@@ -178,9 +178,23 @@ function blinkDeHabilidad(msg){
     adonde(id, t);
   }, `<b>✨ ${nom}¿a quién?</b> <span>clic sobre vos o sobre un aliado que ves · Esc o clic derecho cancelan</span>`, true);
 }
-/* La Varita del caos (2026-10-08, dueño): se elige a alguien (aliado, rival o uno mismo) y se tira 1d10. Con 1…exito (la Común, 6 = 60 %) sale lo
-   que se quiere: a un aliado un buff al azar, a un rival un debuff al azar; después (3 = 30 %) lo contrario, al mismo; el resto (10 %), un debuff
-   a quien la usó. Los estados y sus turnos: Combatiente.CAOS_ESTADOS (docs/estados-turnos.md). Fuera del Rango: avisa y deja seguir. */
+/* La Varita del caos (2026-10-08, dueño, segunda vuelta): se elige a alguien (aliado, rival o uno mismo) y se tira 1d20 (Combatiente.caosResultado):
+   lo que se quiere es un buff a un aliado o un debuff a un rival. 20: sale bien y quien la usa elige cuál; Común 10–19 / Buena 8–19: bien, al azar;
+   el resto hasta 2: al revés, al azar; 1: al revés y elige cuál el bando contrario (el GM: si no es esta pantalla, se le pide con el momento).
+   Los estados y sus turnos: Combatiente.CAOS_ESTADOS (docs/estados-turnos.md). Fuera del Rango: avisa y deja seguir. */
+// Elegir el estado del caos de una lista (los de esa polaridad). → Promise del estado; cerrar sin elegir = uno al azar.
+function caosElegir(pol, titulo, texto){
+  const lista = Combatiente.CAOS_ESTADOS[pol] || [];
+  const dur = s => s.turnos ? `${s.turnos} turno${s.turnos === 1 ? '' : 's'}` : s.stacks ? `${s.stacks} stacks` : s.vuela ? 'el arma vuela 2 casillas' : 'hasta que se le pase';
+  return new Promise(ok => {
+    let listo = false;
+    const fin = s => { if(listo) return; listo = true; ok(structuredClone(s)); AvisoCombate.cerrar(); };
+    AvisoCombate.mostrar({icono: '🎲', titulo, texto, grilla: true,
+      botones: [...lista.map(s => ({texto: s.nombre, detalle: dur(s) + (s.escudoMagico ? ` · ${s.escudoMagico} de escudo` : s.hp ? ` · +${s.hp} HP por turno` : ''), alClic: () => fin(s)})),
+        {texto: '🎲 Al azar', sec: true, alClic: () => fin(Combatiente.caosEstado(pol))}],
+      alCerrar: () => { if(!listo){ listo = true; ok(Combatiente.caosEstado(pol)); } }});
+  });
+}
 function caosDeHabilidad(msg){
   const yo = [...tokens.entries()].find(([, x]) => x.fichaId === msg.fichaId && x.tipo === 'pj');
   if(!yo){ toast(`${msg.nombre || 'Varita del caos'}: tu personaje no tiene token en el mapa`); return; }
@@ -193,11 +207,22 @@ function caosDeHabilidad(msg){
     const rg = typeof rangoDeToken === 'function' ? rangoDeToken(mio) : null;
     if(rg && num(rg.rng) > 0 && distanciaHex(mio, t) > num(rg.rng)) toast(`⚠ ${nombreDe(t)} está a ${distanciaHex(mio, t)}: fuera de tu Rango (${fmt(num(rg.rng))})`);
     const aliado = t === mio || !dueloEsRival({ref: msg.fichaId, tipo: 'pj'}, t);
-    const r = tirarDados('1d10');
+    const r = tirarDados('1d20');
     const res = Combatiente.caosResultado(r ? r.total : 1, aliado, msg.caos);
-    const spec = Combatiente.caosEstado(res.que);
-    const dest = res.a === 'propio' ? mio : t;
-    try{ mesaPublicar(`${nombreDe(mio)} · ${nom} (${nombreDe(t)})`, {formula: '1d10', rolls: r ? r.rolls : [], mod: 0, total: r ? r.total : 0}); }catch(err){}
+    const dest = t;
+    try{ mesaPublicar(`${nombreDe(mio)} · ${nom} (${nombreDe(t)})`, {formula: '1d20', rolls: r ? r.rolls : [], mod: 0, total: r ? r.total : 0}); }catch(err){}
+    const destId = [...tokens.entries()].find(([, x]) => x === dest)[0];
+    const polTxt = res.que === 'buff' ? 'un buff' : 'un debuff';
+    // 1: elige el bando contrario (el GM). Si esta pantalla no es la del GM, se lo pide con el momento y él elige y lo aplica.
+    if(res.elige === 'rival' && !soyGM){
+      momentoAbrir({tipo: 'caos', icono: '🎲', titulo: `${nom}: salió 1, se dio vuelta`, estado: 'esperandoGM',
+        resultado: `1d20 → 1 (${aliado ? 'a un aliado' : 'a un rival'}): ${nombreDe(dest)} recibe ${polTxt} que elige el bando contrario (el GM está eligiendo…)`,
+        datos: {caos: {tokenId: destId, elegir: res.que, nombre: nombreDe(dest)}}});
+      return;
+    }
+    const spec = res.elige === 'propio' ? await caosElegir(res.que, `${nom}: ¡20! Elegís vos`, `${nombreDe(dest)} recibe ${polTxt}: elegí cuál.`)
+      : res.elige === 'rival' ? await caosElegir(res.que, `${nom}: salió 1 — elige el bando contrario`, `${nombreDe(dest)} recibe ${polTxt}: como bando contrario, elegí cuál.`)
+      : Combatiente.caosEstado(res.que);
     // Provocado (dueño, 2026-10-08): si salió bien, contra quién lo elige quien usó la varita; si salió mal, el bando contrario (✋).
     if(spec.nombre === 'Provocado'){
       if(res.bien){
@@ -207,17 +232,16 @@ function caosDeHabilidad(msg){
       }else spec.detalle = 'Provocado: contra quién lo elige el bando contrario (✋ a mano).';
     }
     const dueTurnos = spec.turnos ? `${spec.turnos} turno${spec.turnos === 1 ? '' : 's'}` : spec.stacks ? `${spec.stacks} stacks` : 'hasta que se le pase';
-    const titulo = `${nom}: ${res.bien ? 'salió lo que buscabas' : res.a === 'propio' ? 'se te dio vuelta' : 'salió al revés'}`;
-    const texto = `1d10 → ${r ? r.total : '?'} (${aliado ? 'a un aliado' : 'a un rival'}): ${nombreDe(dest)} recibe ${spec.nombre} (${dueTurnos}).${spec.nombre === 'Provocado' ? ' ' + spec.detalle : ''}`;
+    const titulo = `${nom}: ${res.elige === 'propio' ? '¡20! elegiste vos' : res.elige === 'rival' ? 'salió 1, eligió el bando contrario' : res.bien ? 'salió lo que buscabas' : 'salió al revés'}`;
+    const texto = `1d20 → ${r ? r.total : '?'} (${aliado ? 'a un aliado' : 'a un rival'}): ${nombreDe(dest)} recibe ${spec.nombre} (${dueTurnos}).${spec.nombre === 'Provocado' ? ' ' + spec.detalle : ''}`;
     // Un creep, o el arma que vuela (Desarmado), lo aplica la pantalla del GM: si no soy el GM, se lo pido con el momento.
-    const destId = [...tokens.entries()].find(([, x]) => x === dest)[0];
     if(!soyGM && (dest.tipo === 'creep' || spec.vuela)){
       momentoAbrir({tipo: 'caos', icono: '🎲', titulo, resultado: texto + ' (lo aplica el GM)', estado: 'esperandoGM', datos: {caos: {tokenId: destId, spec}}});
       return;
     }
     const nota = await caosAplicar(destId, spec, nom);
     momentoAbrir({tipo: 'caos', icono: '🎲', titulo, estado: 'listo', resultado: texto + nota});
-  }, `<b>🎲 ${esc(nom)}: ¿a quién?</b> <span>clic sobre un aliado (un buff al azar) o un rival (un debuff al azar) · Esc o clic derecho cancelan</span>`, true);
+  }, `<b>🎲 ${esc(nom)}: ¿a quién?</b> <span>clic sobre un aliado (un buff) o un rival (un debuff) · Esc o clic derecho cancelan</span>`, true);
 }
 // Le pone a ese token el estado del caos (y, si es Desarmado, el arma vuela). → una nota para el resultado ('' si salió bien).
 async function caosAplicar(tokenId, spec, origen){

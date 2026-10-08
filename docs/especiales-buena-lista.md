@@ -65,3 +65,5 @@ Ninguna (2026-10-08: cargadas todas las Buenas decididas).
 En Común ✅ cargadas (2026-10-07): **Varita del portal aliado** (dos portales a 4 o menos uno del otro, solo tu bando, hasta tu próximo
 turno, 2 SP, 55), **Varita de la trampa de arena** (una casilla oculta, 1 SP, 40) y **Varita de arena movediza** (flor a la vista, 2 turnos,
 2 SP, 65). La Varita del portal (la trampa) pasa a llamarse **Varita de la trampa portal**.
+
+**Varita del caos (Buena)** ✅ cargada (2026-10-08): como la Común pero con el d20 corrido — 20 elegís vos, 8 a 19 sale bien al azar (60 %), 2 a 7 al revés al azar (30 %), 1 al revés y elige el bando contrario. 1 SP, 90. La Común quedó con 10 a 19 bien (50 %) y 2 a 9 al revés (40 %).

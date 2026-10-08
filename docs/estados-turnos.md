@@ -1,7 +1,7 @@
 # Cuántos turnos dura cada estado (propuesta, 2026-10-08)
 
 Pedido del dueño: «fijate vos cuántos turnos lo harías y armame una lista; yo después te corrijo». Sirve para la **Varita del caos**
-(un buff o un debuff al azar) y como duración por defecto de cada estado. Los turnos son siempre los de quien lo provoca (el caster); si lo
+(un buff o un debuff: desde el 2026-10-08 se tira 1d20 — 20 elige quien la usa, 1 elige el bando contrario) y como duración por defecto de cada estado. Los turnos son siempre los de quien lo provoca (el caster); si lo
 provoca una trampa, **el estado cuenta los turnos de quien la pisó, desde que se le aplica** (un Stun de 1 turno le dura su próximo turno entero);
 la trampa o la zona que deja en el piso cuentan los turnos de quien la puso. **Caos** = entra en el sorteo de la Varita del caos.
 
@@ -30,7 +30,7 @@ Coagulación); revisar si la Parálisis (PdG, Parry y Evasión a la mitad) queda
 | Coagulación (antes «extrema») | 3 turnos · caos |
 | Blindado | 2 turnos · caos |
 | Inamovible | 2 turnos · caos |
-| Sigilo | Hasta que lo descubran (como siempre) · no entra en el caos: depende de dónde está parado |
+| Sigilo | Hasta que lo descubran (como siempre) · caos (dueño, 2026-10-08: también entra) |
 | Invulnerable al revivir | Hasta su próximo turno · titila (es lo mismo que Invulnerable) |
 
 ## Debuffs

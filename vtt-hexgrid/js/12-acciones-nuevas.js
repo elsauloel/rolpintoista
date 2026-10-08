@@ -465,6 +465,7 @@ function acCrear(){
   host.hidden = true;
   document.body.appendChild(host);
   const raiz = host.attachShadow({mode: 'open'});
+  ventanasAlFrente(host, raiz);   // (js/11)
   raiz.innerHTML = `<style id="ac-css"></style><div id="ac-contenido"></div>
     <div class="scrim" id="ac-objetivo"><div class="modal" style="max-width:440px">
       <header><h3 id="ac-obj-titulo">🎯 ¿A quién le pegó?</h3></header>

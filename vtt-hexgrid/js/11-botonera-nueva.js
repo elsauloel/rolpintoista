@@ -823,12 +823,19 @@ function bnSinNitros(costo, accion, continuar){
   bnAbrirCartel('bn-sin-nitros');
 }
 function bnCerrarSinNitros(){ bnSinNitrosSeguir = null; if(bn) bn.raiz.querySelector('#bn-sin-nitros').classList.remove('open'); }
+// Mientras haya una ventana abierta adentro del recuadro (una .scrim.open), el recuadro va sin desenfoque (mapa.css, .con-ventana): así la
+// ventana se ve al frente, con todo el ancho de la pantalla. También para las Acciones de un creep (js/12).
+function ventanasAlFrente(host, raiz){
+  const mirar = () => host.classList.toggle('con-ventana', !!raiz.querySelector('.scrim.open'));
+  new MutationObserver(mirar).observe(raiz, {subtree: true, attributes: true, attributeFilter: ['class']});
+}
 function bnCrear(){
   const host = document.createElement('div');
   host.id = 'botonera-nueva';
   host.hidden = true;
   document.body.appendChild(host);
   const raiz = host.attachShadow({mode: 'open'});
+  ventanasAlFrente(host, raiz);
   raiz.innerHTML = `<style id="bn-css"></style><div id="bn-contenido"></div>
     <div class="scrim" id="bn-equipo"><div class="modal" style="max-width:1400px;width:96vw">
       <header><h3>🛡 Equipo y mochila</h3><button class="iconbtn" data-bn-eq="cerrar">Cerrar</button></header>

@@ -1395,3 +1395,6 @@ versión parecida en más de una, es candidato a juntar.
   estados), `grupoCuraDe(nombre)`, `curaDeItem(item)` (lo que cura: `item.curaEstados`, `['todo']` = todos; las copias viejas de Vendas, Antídoto y Cura Plus
   se reconocen por el nombre), `curarEstados(estados, grupos)` → `{quedan, sacados}` y `textoCura`. Lo aplican `FichaAcciones.consumir` (personaje, ficha y
   mapa) y `CreepAcciones.consumir`. **Un estado nuevo que se pueda curar con un consumible: sumarlo a su grupo en `GRUPOS_CURA`.**
+- **La góndola de gastables** (P181, dueño 2026-10-08): `GeneradorTiendas.gastable`, `gondolaDe`, `UNIDADES_GONDOLA` (3); `generar` devuelve `gondola`;
+  `TAMANOS[t].min/max` son ahora por sección y `TAMANOS[t].gondola` las variedades de cada góndola. La tienda del jugador (`FichaTienda`) muestra «🧺 quedan
+  N» y descuenta las unidades al comprar (`tienda/stock.gondola`). Drops de los creeps más frecuentes (`CombateFin.dropChance` / `dropSegundo`).

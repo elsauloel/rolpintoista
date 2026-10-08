@@ -17,16 +17,28 @@ const GeneradorTiendas = (() => {
   // Golpe de suerte («toca toca, la suerte es loca», dueño): después de tirar la calidad, subir un escalón o dos. En cualquier tamaño.
   const SUERTE = {uno: 0.04, dos: 0.005};
 
-  /* Tamaños: ítems (sin el stock fijo), variedad de partes defensivas y de familias de armas garantizadas y tope por etiqueta de escasez (0,5 =
-     cada etiqueta, 0 o 1 al azar) y la reserva de reposiciones (cuántas veces repone lo que se compra, 2026-10-07). La calidad NO depende del tamaño, solo del nivel (dueño, 2026-10-07: «variables independientes»: un pueblito
-     puede tener cosas buenas, pero pocas). */
+  /* Tamaños (P181, dueño 2026-10-08: «cada pestaña tiene que mostrar más cantidad de ítems, para ofrecer una variedad más consolidada»): `min`–`max` =
+     las piezas de EQUIPO de cada sección abierta (antes era el total de la tienda, repartido); `gondola` = cuántos gastables distintos trae la
+     góndola de cada sección (99 = todos); variedad de partes defensivas y de familias de armas garantizadas por sección; tope por etiqueta de
+     escasez (0,5 = cada etiqueta, 0 o 1 al azar) y la reserva de reposiciones de las piezas únicas. La calidad del equipo NO depende del tamaño,
+     solo del nivel (dueño, 2026-10-07: «variables independientes»). */
   const TAMANOS = {
-    ambulante: {label: 'Vendedor ambulante', min: 8, max: 12, variedad: 2, familias: 2, tope: 0.5, reserva: 3},
-    pueblito: {label: 'Pueblito', min: 15, max: 20, variedad: 3, familias: 3, tope: 1, reserva: 6},
-    aldea: {label: 'Aldea', min: 25, max: 35, variedad: 5, familias: 4, tope: 2, reserva: 10},
-    ciudad: {label: 'Ciudad', min: 40, max: 60, variedad: 7, familias: 4, tope: 3, reserva: 16},
-    capital: {label: 'Capital', min: 70, max: 100, variedad: 8, familias: 4, tope: 4, reserva: 28},
+    ambulante: {label: 'Vendedor ambulante', min: 5, max: 7, gondola: {talabarteria: 3, bazar: 4}, variedad: 2, familias: 2, tope: 0.5, reserva: 3},
+    pueblito: {label: 'Pueblito', min: 8, max: 10, gondola: {talabarteria: 5, bazar: 6}, variedad: 3, familias: 3, tope: 1, reserva: 6},
+    aldea: {label: 'Aldea', min: 12, max: 15, gondola: {talabarteria: 8, bazar: 10}, variedad: 5, familias: 4, tope: 2, reserva: 10},
+    ciudad: {label: 'Ciudad', min: 18, max: 22, gondola: {talabarteria: 12, bazar: 15}, variedad: 7, familias: 4, tope: 3, reserva: 16},
+    capital: {label: 'Capital', min: 26, max: 32, gondola: {talabarteria: 99, bazar: 20}, variedad: 8, familias: 4, tope: 4, reserva: 28},
   };
+  const ORDEN_TAMANO = ['ambulante', 'pueblito', 'aldea', 'ciudad', 'capital'];
+  /* La góndola (P181, dueño 2026-10-08): los GASTABLES —trampas, pociones que no curan, pergaminos, luces— no compiten con el equipo: van en una
+     góndola aparte de su sección, con muchas variedades, 3 unidades de cada uno (`UNIDADES_GONDOLA`; se reponen al volver a publicar), para que se
+     usen a la ligera. Su calidad pesa poco (el precio ya filtra): a nivel bajo salen más los de calidad baja, pero puede salir cualquiera hasta Raro.
+     Los clásicos (legacy) no son de la góndola: van siempre. */
+  const UNIDADES_GONDOLA = 3;
+  const LUZ_COMUN = /antorcha|bengala|cohete|farol|l[aá]mpara de minero|vela de|p[oó]lvora|soga|cuerda|garfio/i;
+  const gastable = it => !!it && it.tipoItem === 'consumibles' && !it.legacy && !it.trofeo && publicable(it) && TIERS.indexOf(it.tier) <= 2;
+  // En qué góndola va un gastable: trampas y luces de todos los días, la Talabartería; pociones, pergaminos y lo mágico, el Bazar.
+  const gondolaDe = it => it.trampaDatos || LUZ_COMUN.test(String(it.nombre || '')) ? 'talabarteria' : 'bazar';
 
   // Las partes (en qué parte de la receta cae cada ítem).
   const PARTE_LABEL = {arma: 'Armas', distancia: 'Armas a distancia', especial: 'Varitas y báculos', torso: 'Torso', escudo: 'Escudos', orbe: 'Orbes',
@@ -64,9 +76,10 @@ const GeneradorTiendas = (() => {
     herreria: {label: 'Herrería', icono: '⚒', detalle: 'guerra pesada: armas de Tipo 6 o más, escudos, armadura rígida, cascos y guanteletes',
       receta: {arma: 40, escudo: 14, torso: 16, cabeza: 12, manos: 10, piernas: 4, pies: 4}, familias: [6, 8, 10]},
     talabarteria: {label: 'Talabartería', icono: '🧵', detalle: 'cuero, madera y cuerda: armas a distancia y livianas (Tipo 4), cuero, botas, cinturones, mochilas y trampas',
-      receta: {distancia: 22, arma: 14, torso: 12, cabeza: 6, manos: 6, piernas: 8, pies: 8, cinturon: 8, mochila: 8, trampa: 8}, familias: [4]},
+      receta: {distancia: 24, arma: 16, torso: 13, cabeza: 6, manos: 6, piernas: 9, pies: 9, cinturon: 9, mochila: 8}, familias: [4],
+      minimos: {mochila: 1, cinturon: 1}, minimosDesde: 'pueblito'},   // siempre una mochila y un cinturón, desde pueblito (dueño, 2026-10-08)
     bazar: {label: 'Bazar arcano', icono: '✨', detalle: 'lo mágico: consumibles, varitas y báculos, orbes, anillos y piezas de caster',
-      receta: {consumible: 40, especial: 20, orbe: 8, anillo: 13, torso: 6, cabeza: 5, manos: 4, cinturon: 4}, minimos: {especial: 2}},
+      receta: {especial: 34, orbe: 13, anillo: 22, torso: 10, cabeza: 8, manos: 7, cinturon: 6}, minimos: {especial: 2}},
   };
   const SECCIONES_ORDEN = ['herreria', 'talabarteria', 'bazar'];
   // Lo que suma Destreza/Agilidad (la Talabartería) y lo que suma Fuerza/Constitución (la Herrería), para las piezas que podrían ir en las dos.
@@ -89,7 +102,8 @@ const GeneradorTiendas = (() => {
   }
   function seccionCalc(it){
     const p = parteDe(it);
-    if(p === 'especial' || p === 'orbe' || p === 'anillo' || p === 'consumible') return 'bazar';
+    if(p === 'consumible') return gondolaDe(it);   // los consumibles, en la pestaña de su góndola (los clásicos, el Bazar)
+    if(p === 'especial' || p === 'orbe' || p === 'anillo') return 'bazar';
     if(p === 'trampa' || p === 'distancia' || p === 'mochila' || p === 'otro') return 'talabarteria';
     if(p === 'arma') return num(it.tipoDado) <= 4 ? 'talabarteria' : 'herreria';
     if(p === 'escudo') return 'herreria';
@@ -155,7 +169,7 @@ const GeneradorTiendas = (() => {
     let m = candCache.get(catalogo);
     if(!m){ m = new Map(); candCache.set(catalogo, m); }
     const k = secK + '|' + parte + '|' + catalogo.length;   // (con el largo: si se le suma un ítem, se rearma)
-    if(!m.has(k)) m.set(k, catalogo.filter(it => publicable(it) && parteDe(it) === parte && seccionDe(it) === secK));
+    if(!m.has(k)) m.set(k, catalogo.filter(it => publicable(it) && !it.legacy && parteDe(it) === parte && seccionDe(it) === secK));   // (los clásicos van aparte, siempre)
     return m.get(k);
   }
   // Elige un ítem de la parte con la calidad pedida (o la más cercana: a igual distancia, la de abajo), sin repetir y respetando la escasez.
@@ -191,16 +205,11 @@ const GeneradorTiendas = (() => {
     const usados = new Set();
     const garantizados = clasicos(cat);   // los clásicos, siempre
     garantizados.forEach(it => usados.add(it.id));
-    const total = entero(R, tam.min, tam.max);
-    // Partes iguales; lo que sobra, al azar.
-    const cuota = secs.map(() => Math.floor(total / secs.length));
-    const sobra = total - cuota.reduce((a, b) => a + b, 0);
-    for(let i = 0; i < sobra; i++) cuota[Math.floor(R() * secs.length)]++;
-    const variedad = Math.max(1, Math.round(tam.variedad / secs.length));
+    const variedad = tam.variedad;
     const esc = escasez(R, tam);
     const plan = [], elegidos = [];
-    secs.forEach((k, si) => {
-      const sec = SECCIONES[k], receta = sec.receta, planS = [];
+    secs.forEach(k => {
+      const sec = SECCIONES[k], receta = sec.receta, planS = [], cuota = entero(R, tam.min, tam.max);
       // Primero lo garantizado (variedad de partes, familias, mínimos) y después el resto por peso.
       const defs = DEFENSIVAS.filter(p => num(receta[p]) > 0);
       const pesosDef = Object.fromEntries(defs.map(p => [p, receta[p]]));
@@ -210,8 +219,9 @@ const GeneradorTiendas = (() => {
         for(let i = fams.length - 1; i > 0; i--){ const j = Math.floor(R() * (i + 1)); [fams[i], fams[j]] = [fams[j], fams[i]]; }
         fams.slice(0, Math.min(fams.length, tam.familias)).forEach(f => planS.push({seccion: k, parte: 'arma', familia: f}));
       }
-      Object.entries(sec.minimos || {}).forEach(([p, n]) => { for(let i = 0; i < n; i++) planS.push({seccion: k, parte: p}); });
-      while(planS.length < cuota[si]) planS.push({seccion: k, parte: ponderado(R, receta)});
+      if(!sec.minimosDesde || ORDEN_TAMANO.indexOf(tamK) >= ORDEN_TAMANO.indexOf(sec.minimosDesde))
+        Object.entries(sec.minimos || {}).forEach(([p, n]) => { if(!planS.some(l => l.parte === p)) for(let i = 0; i < n; i++) planS.push({seccion: k, parte: p}); });
+      while(planS.length < cuota) planS.push({seccion: k, parte: ponderado(R, receta)});
       planS.forEach(lugar => {
         let parte = lugar.parte, item = null;
         for(let intento = 0; intento < 4 && !item; intento++){
@@ -224,7 +234,22 @@ const GeneradorTiendas = (() => {
         usados.add(item.id); esc.sumar(item); elegidos.push(item);
       });
     });
-    return {secciones: secs, tamano: tamK, nivel, items: [...garantizados, ...elegidos].map(it => it.id), garantizados: garantizados.map(it => it.id), plan, escasez: esc.conteo};
+    // La góndola de cada sección: N gastables distintos, al azar pesando la calidad con el nivel (sin excluir ninguna hasta Raro).
+    const gondola = [];
+    const tabla = CALIDAD_POR_NIVEL[nivel] || CALIDAD_POR_NIVEL[1];
+    secs.forEach(k => {
+      let n = num((tam.gondola || {})[k]);
+      const pool = cat.filter(it => gastable(it) && gondolaDe(it) === k && !usados.has(it.id));
+      while(n-- > 0 && pool.length){
+        const pesos = pool.map(it => num(tabla[TIERS.indexOf(it.tier)]) + 10);
+        let r = R() * pesos.reduce((a, b) => a + b, 0), i = 0;
+        while(i < pool.length - 1 && (r -= pesos[i]) > 0) i++;
+        const it = pool.splice(i, 1)[0];
+        usados.add(it.id); gondola.push(it);
+      }
+    });
+    return {secciones: secs, tamano: tamK, nivel, items: [...garantizados, ...elegidos, ...gondola].map(it => it.id), garantizados: garantizados.map(it => it.id),
+      gondola: gondola.map(it => it.id), plan, escasez: esc.conteo};
   }
 
   /* otro({tienda, id, catalogo, azar, reponer}) → el ítem que reemplaza al `id` en la tienda, o null. Sin `reponer` («🎲 Otro» del GM): la misma
@@ -277,6 +302,6 @@ const GeneradorTiendas = (() => {
   // Cuántas veces repone una tienda publicada lo que le compran (una personalizada, como una aldea).
   const reservaDe = tamano => (TAMANOS[tamano] || TAMANOS.aldea).reserva;
 
-  return {reservaDe, clasicos, TIERS, CALIDAD_POR_NIVEL, SUERTE, TAMANOS, SECCIONES, SECCIONES_ORDEN, seccionDe, seccionesDe, PARTE_LABEL, DEFENSIVAS, ETIQUETAS, parteDe, etiquetasDe, esDeCaster, publicable,
+  return {reservaDe, clasicos, gastable, gondolaDe, UNIDADES_GONDOLA, TIERS, CALIDAD_POR_NIVEL, SUERTE, TAMANOS, SECCIONES, SECCIONES_ORDEN, seccionDe, seccionesDe, PARTE_LABEL, DEFENSIVAS, ETIQUETAS, parteDe, etiquetasDe, esDeCaster, publicable,
     tirarCalidad, nivelDe, generar, otro, simular};
 })();

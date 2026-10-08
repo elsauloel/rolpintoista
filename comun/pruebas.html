@@ -1229,7 +1229,7 @@ prueba('recompensas de un creep: oro sugerido por tipo y nivel (jefe ×2), trofe
     CreepCalculo.trofeo(humano), CreepCalculo.dropsResumen(creepPrueba({oroBase: 10, equipo: [{nombre: 'Yelmo'}]})), CreepCalculo.tipoDe(creepPrueba({tipoCriatura: 'otros', tipoCriaturaOtro: ' Gólem '}))],
     [40, 40, 0, 'Colmillos de Lobo', 50, 13, null, 'Hacha (arma equipable) · Yelmo (equipo) · 10 DDE de oro (±20% al final del combate)', 'gólem']);
 });
-prueba('drop de consumibles (comun/combate-fin.js): humano 30 %, humanoide 20 %, el resto 0; jefe ×2 y +1 nivel; mejores tiers con el nivel; se tira una vez', () => {
+prueba('drop de consumibles (comun/combate-fin.js, P181): humano 60 %, humanoide 45 %, el resto 15 %; un jefe, uno seguro + chance de otro y +1 nivel; mejores tiers con el nivel; se tira una vez', () => {
   const ch = t => CombateFin.dropChance({tipoCriatura: t});
   const t1 = CombateFin.dropTabla(1), t5 = CombateFin.dropTabla(5), t9 = CombateFin.dropTabla(9);
   const suma = t => Math.round(t.reduce((a, x) => a + x, 0));
@@ -1237,13 +1237,14 @@ prueba('drop de consumibles (comun/combate-fin.js): humano 30 %, humanoide 20 %,
   const rep = CombateFin.nuevo(), humano = {id: 'h', tipoCriatura: 'humano', nivel: 3, jefe: true, nombre: 'Bandido'};
   const orig = Math.random; let items1, items2;
   try{ Math.random = () => 0.01; items1 = CombateFin.dropDeCreep(rep, cat, humano); Math.random = () => 0.99; items2 = CombateFin.dropDeCreep(rep, cat, humano); }finally{ Math.random = orig; }
-  const bestia = CombateFin.dropDeCreep(CombateFin.nuevo(), cat, {id: 'b', tipoCriatura: 'bestia', nivel: 5});
+  let bestia, bestia2;
+  try{ Math.random = () => 0.99; bestia = CombateFin.dropDeCreep(CombateFin.nuevo(), cat, {id: 'b', tipoCriatura: 'bestia', nivel: 5}); Math.random = () => 0.05; bestia2 = CombateFin.dropDeCreep(CombateFin.nuevo(), cat, {id: 'b', tipoCriatura: 'bestia', nivel: 5}); }finally{ Math.random = orig; }
   const tpl = items1[0] && items1[0].template;
   const full = tpl && CATALOGO_BASE.find(i => i.nombre === tpl.nombre);
   igual([ch('humano'), ch('humanoide'), ch('bestia'), CombateFin.dropChance({tipoCriatura: 'humano', jefe: true}), suma(t1), suma(t9), t5[0] < t1[0], t5[2] > t1[2], t9[0] >= 9.9,
-    CombateFin.dropTier(1, 0), CombateFin.dropTier(1, 0.999), items1.length, items2.length && items2[0].nombre === items1[0].nombre, bestia.length,
+    CombateFin.dropTier(1, 0), CombateFin.dropTier(1, 0.999), items1.length, items2.length && items2[0].nombre === items1[0].nombre, bestia.length, bestia2.length, CombateFin.dropSegundo(humano),
     !!(tpl && tpl.consumible && tpl.tipoItem === 'consumibles' && !tpl.id), !!(full && JSON.stringify(full.trampaDatos || full.efectoNombre || full.curahp || '') === JSON.stringify(tpl.trampaDatos || tpl.efectoNombre || tpl.curahp || ''))],
-    [0.3, 0.2, 0, 0.6, 100, 100, true, true, true, 'Común', 'Excepcional', 1, true, 0, true, true]);
+    [0.6, 0.45, 0.15, 1, 100, 100, true, true, true, 'Común', 'Excepcional', 2, true, 0, 1, 0.6, true, true]);
 });
 prueba('fin del combate (comun/combate-fin.js): XP por creep (escapado 20%), quién cobra, inconsciente 25%, extras y despojos', () => {
   const rep = CombateFin.nuevo();
@@ -2730,7 +2731,7 @@ prueba('💰 botín estimado de un mapa: el oro de cada creep + lo que suelta a 
   const b = e.filas.find(f => f.nombre === 'Bandido'), l = e.filas.find(f => f.nombre === 'Lobo');
   igual([e.filas.length, b.oro, b.items.length, b.items[0].venta === b.items[0].compra / 2, b.drop.chance, b.drop.venta > 0, l.items.map(i => i.trofeo), l.items[0].venta, l.drop.chance,
     Math.round(e.total) === Math.round(b.total + l.total), Math.round(b.total) === Math.round(b.oro + b.venta + b.drop.venta), /~\d+ DDE/.test(CombateFin.estimadoHtml(e, 'Mapa'))],
-    [2, 20, 1, true, 0.3, true, [true], 15, 0, true, true, true]);
+    [2, 20, 1, true, 0.6, true, [true], 15, 0.15, true, true, true]);
 });
 prueba('arena movediza: si falla al soltarse, se hunde más (+1 turno), en personajes y creeps; el botón lo dice', () => {
   const soltar = {stat: 'fue', dif: 99, no2: 1, hunde: 1};
@@ -2990,6 +2991,22 @@ prueba('tienda con secciones (P179): cada ítem sabe su sección; se reparte ent
     sec({tipoItem: 'consumibles', consumible: true}), sec({tipoItem: 'consumibles', consumible: true, trampaDatos: {}}), sec({tipoItem: 'anillos'})],
     [0, 4, 0, 0, 'talabarteria', 'herreria', 'herreria', 'talabarteria', 'herreria', 'bazar', 'herreria', 'talabarteria', 'bazar', 'herreria', 'talabarteria', 'talabarteria',
      'talabarteria', 'bazar', 'talabarteria', 'bazar']);
+});
+prueba('la góndola (P181): gastables aparte del equipo, N variedades por sección y tamaño; mochila y cinturón seguros en la Talabartería desde pueblito', () => {
+  const G = GeneradorTiendas, cat = CATALOGO_BASE.filter(G.publicable), porId = new Map(cat.map(i => [i.id, i]));
+  let malas = 0, sinMochila = 0, sinCinturon = 0, cuantas = 9e9, consumiblesEnEquipo = 0;
+  for(let n = 0; n < 25; n++){
+    const r = G.generar({tamano: 'pueblito', nivel: 1, catalogo: cat}), g = new Set(r.gondola), fijos = new Set(r.garantizados);
+    cuantas = Math.min(cuantas, r.gondola.length);
+    r.gondola.forEach(id => { const it = porId.get(id); if(!G.gastable(it) || G.seccionDe(it) !== G.gondolaDe(it)) malas++; });
+    const equipo = r.items.filter(id => !g.has(id) && !fijos.has(id)).map(id => porId.get(id));
+    consumiblesEnEquipo += equipo.filter(i => i.tipoItem === 'consumibles').length;
+    const tala = equipo.filter(i => G.seccionDe(i) === 'talabarteria');
+    if(!tala.some(i => G.parteDe(i) === 'mochila')) sinMochila++;
+    if(!tala.some(i => G.parteDe(i) === 'cinturon')) sinCinturon++;
+  }
+  igual([malas, consumiblesEnEquipo, sinMochila, sinCinturon, cuantas, G.gondolaDe({nombre: 'Bengala de mano'}), G.gondolaDe({nombre: 'Poción de fuerza'}), G.gondolaDe({nombre: 'Púas', trampaDatos: {}}),
+    G.gastable(CATALOGO_BASE.find(i => i.nombre === 'Vendas'))], [0, 0, 0, 0, 11, 'talabarteria', 'bazar', 'talabarteria', false]);
 });
 prueba('los clásicos (legacy hasta Raro) van en toda tienda, de cualquier tamaño y con cualquier sección', () => {
   const G = GeneradorTiendas, cat = CATALOGO_BASE.filter(G.publicable), cl = G.clasicos(CATALOGO_BASE).map(i => i.id);

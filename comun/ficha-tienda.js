@@ -149,6 +149,7 @@ const FichaTienda = (() => {
     const tierColor = E().TIER_COLOR[item.tier] || E().TIER_COLOR['Común'];
     const catLabel = E().CATEGORIA_LABEL[item.tipoItem];
     const slotInfo = E().slotOcupado(S, item);
+    const quedan = unidadesGondola(st, item.id);   // la góndola: cuántos quedan (null = sin límite)
     return `<div class="cat-row cat-card" data-catid="${item.id}">
     ${E().thumb(item)}
     <div class="cat-info">
@@ -165,9 +166,10 @@ const FichaTienda = (() => {
       ${ItemCorto.grillaHtml(item)}
     </div>
     <div class="cat-actions">
-      <input type="number" class="cat-qty" data-catqty="${item.id}" value="1" min="1">
+      ${quedan !== null ? `<span class="hint" title="Gastable de la góndola: se repone cuando el GM vuelve a publicar la tienda">🧺 ${quedan ? `quedan ${fmt(quedan)}` : 'agotado'}</span>` : ''}
+      <input type="number" class="cat-qty" data-catqty="${item.id}" value="1" min="1"${quedan !== null ? ` max="${Math.max(1, quedan)}"` : ''}${quedan === 0 ? ' disabled' : ''}>
       ${st.tienda && st.tienda.agregarGratis ? `<button class="cat-btn add" data-catalogoadd="${item.id}" title="El GM permitió agregar ítems gratis en esta tienda">Agregar a mochila (gratis)</button>` : ''}
-      <button class="cat-btn buy" data-catalogocarrito="${item.id}">+ Carrito</button>
+      <button class="cat-btn buy" data-catalogocarrito="${item.id}"${quedan === 0 ? ' disabled' : ''}>+ Carrito</button>
     </div>
     <div class="cat-manage">
       <button data-view="catalogo:${item.id}">Ver</button>
@@ -236,6 +238,12 @@ const FichaTienda = (() => {
     if(limitado(st, id)){   // pieza única (2026-10-07): una sola por tienda
       if(existente){ ui.toast(`De ${item.nombre} hay uno solo: ya está en tu carrito`); return; }
       cantidad = 1;
+    }
+    const quedan = unidadesGondola(st, id);   // la góndola: no más de lo que queda
+    if(quedan !== null){
+      const yaLleva = existente ? existente.cantidad : 0;
+      if(yaLleva >= quedan){ ui.toast(quedan ? `De ${item.nombre} quedan ${fmt(quedan)}: ya los tenés en el carrito` : `${item.nombre}: agotado`); return; }
+      cantidad = Math.min(cantidad, quedan - yaLleva);
     }
     if(existente) existente.cantidad += cantidad;
     else st.carrito.push({catId:id, cantidad});
@@ -321,7 +329,14 @@ const FichaTienda = (() => {
      reserva; sin reserva, la pieza no vuelve. Sin el documento (o sin las reglas publicadas), la tienda funciona como antes: sin límite. */
   let stockCache = null;
   const conStockActivo = st => !!(st.tienda && st.tienda.stockVersion && stockCache && stockCache.version === st.tienda.stockVersion);
-  const limitado = (st, id) => conStockActivo(st) && !(st.tienda.garantizados || []).includes(id);
+  const limitado = (st, id) => conStockActivo(st) && !(st.tienda.garantizados || []).includes(id) && !enGondola(st, id);
+  /* La góndola (P181, dueño 2026-10-08): los gastables no son piezas únicas; vienen de a 3 (`stock.gondola = {id: unidades}`) y se reponen al
+     volver a publicar. Sin el stock (o sin las reglas), sin límite. */
+  const enGondola = (st, id) => !!(st.tienda && (st.tienda.gondola || []).includes(id));
+  function unidadesGondola(st, id){
+    if(!enGondola(st, id) || !conStockActivo(st) || !stockCache.gondola || stockCache.gondola[id] === undefined) return null;
+    return Math.max(0, num(stockCache.gondola[id]));
+  }
   // La tienda con lo que queda en stock (si el stock es de esta publicación).
   function conStock(t){
     if(t && t.stockVersion && stockCache && stockCache.version === t.stockVersion && Array.isArray(stockCache.items)){
@@ -342,14 +357,18 @@ const FichaTienda = (() => {
   }
   async function reservarStock(S, st){
     const ids = st.carrito.map(e => e.catId).filter(id => limitado(st, id));
-    if(!ids.length || typeof fbDb === 'undefined') return {vendidos: [], repuestos: [], agotados: []};
+    const deGondola = st.carrito.filter(e => unidadesGondola(st, e.catId) !== null);
+    if((!ids.length && !deGondola.length) || typeof fbDb === 'undefined') return {vendidos: [], repuestos: [], agotados: []};
     try{
       return await fbDb.runTransaction(async tx => {
         const d = await tx.get(refStock());
         if(!d.exists || d.data().version !== st.tienda.stockVersion) return {vendidos: [], repuestos: [], agotados: []};
         const x = d.data(), items = (x.items || []).slice();
         const faltan = ids.filter(id => !items.includes(id));
+        const gond = {...(x.gondola || {})};
+        deGondola.forEach(e => { if(num(gond[e.catId]) < e.cantidad) faltan.push(e.catId); });
         if(faltan.length) return {faltan};
+        deGondola.forEach(e => { gond[e.catId] = num(gond[e.catId]) - e.cantidad; });
         let rep = num(x.reposiciones);
         const vendidos = [], repuestos = [], agotados = [];
         ids.forEach(id => {
@@ -360,8 +379,8 @@ const FichaTienda = (() => {
           if(nuevo){ items[i] = nuevo.id; rep++; repuestos.push([viejo ? viejo.nombre : id, nuevo.nombre]); }
           else{ items.splice(i, 1); agotados.push(viejo ? viejo.nombre : id); }
         });
-        tx.update(refStock(), {items, reposiciones: rep, vendidos: num(x.vendidos) + ids.length, actualizado: firebase.firestore.FieldValue.serverTimestamp()});
-        stockCache = {...x, items, reposiciones: rep, vendidos: num(x.vendidos) + ids.length};
+        tx.update(refStock(), {items, reposiciones: rep, vendidos: num(x.vendidos) + ids.length, ...(deGondola.length ? {gondola: gond} : {}), actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+        stockCache = {...x, items, reposiciones: rep, vendidos: num(x.vendidos) + ids.length, gondola: gond};
         if(st.tienda) conStock(st.tienda);
         return {vendidos, repuestos, agotados};
       });

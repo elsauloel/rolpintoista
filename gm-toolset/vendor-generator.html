@@ -401,7 +401,7 @@ input[type=checkbox]{width:auto}
 <script src="../comun/capas.js?v=20261005f9"></script>   <!-- la última ventana que se abre queda arriba -->
 <script src="../comun/efectos-golpe.js"></script>
 <script src="../comun/catalogo.js?v=20261008zy"></script>
-<script src="../comun/generador-tiendas.js?v=20261008zx"></script>   <!-- la regla de cómo se arma una tienda (2026-10-06) -->
+<script src="../comun/generador-tiendas.js?v=20261008zz"></script>   <!-- la regla de cómo se arma una tienda (2026-10-06) -->
 <script src="../comun/filtro-catalogo.js?v=20261008zu"></script>   <!-- el filtro del catálogo, uno para todos lados (2026-10-08) -->
 <script src="../comun/items-subidos.js?v=20261007h"></script>
 <script src="../comun/plantillas.js?v=20261007ar"></script>
@@ -593,6 +593,7 @@ function generarTienda(tamano, secciones, nivel){
     ajustePrecio: 0,
     ...(r.secciones.includes('herreria') ? {herrero: true} : {}),   // con Herrería, repara (se puede apagar)
     garantizados: r.garantizados,
+    gondola: r.gondola,   // los gastables de la góndola (P181): 3 de cada uno al publicar
     items: r.items,
   };
 }
@@ -719,7 +720,7 @@ function itemCardHtml(item, esGarantizado){
     ${modsHtml ? `<div class="cat-mods">${modsHtml}</div>` : ''}
     ${ItemCorto.grillaHtml(item)}
     <div class="cat-card-pie">
-      ${esGarantizado ? '<span class="cat-garantizado">Stock fijo</span>' : '<span></span>'}
+      ${esGarantizado ? '<span class="cat-garantizado">Clásico · siempre</span>' : (tiendaActual.gondola || []).includes(item.id) ? `<span class="cat-garantizado" title="Gastable de la góndola: ${G.UNIDADES_GONDOLA} unidades al publicar">🧺 Góndola ×${G.UNIDADES_GONDOLA}</span>` : '<span></span>'}
       <span class="acciones">
         ${esGarantizado ? '' : `<button type="button" class="iconbtn" data-reroll="${esc(item.id)}" title="Cambiar este ítem por otro del mismo rubro, sorteado con las rarezas de la tienda">🎲 Otro</button>`}
         <button type="button" class="iconbtn" data-ver="${esc(item.id)}">Ver</button>
@@ -846,6 +847,7 @@ function quitarItem(id){
   tiendaActual.items = tiendaActual.items.filter(x => x !== id);
   // Si sacan un consumible del stock fijo se respeta: es la tienda del GM.
   tiendaActual.garantizados = (tiendaActual.garantizados || []).filter(x => x !== id);
+  tiendaActual.gondola = (tiendaActual.gondola || []).filter(x => x !== id);
   tiendaCambio();
   renderAgregarLista();
   toast(`${item ? item.nombre : 'Ítem'} fuera de la tienda`);
@@ -856,6 +858,7 @@ function agregarItem(id){
   if(tiendaActual.items.includes(id)){ toast('Ese ítem ya está en la tienda'); return; }
   const item = CATALOGO.find(it => it.id === id);
   tiendaActual.items.push(id);
+  if(item && G.gastable(item)){ tiendaActual.gondola = tiendaActual.gondola || []; tiendaActual.gondola.push(id); }   // un gastable va a la góndola
   tiendaCambio();
   renderAgregarLista();
   toast(`${item ? item.nombre : 'Ítem'} agregado`);
@@ -873,6 +876,7 @@ function rerollItem(id){
   const nuevo = G.otro({tienda: tiendaActual, id, catalogo: CATALOGO});   // la misma parte, otra calidad con el nivel de la tienda, con la escasez
   if(!nuevo){ toast(`No queda otro ítem de ${G.PARTE_LABEL[G.parteDe(viejo)] || 'esa parte'} para cambiar`); return; }
   tiendaActual.items[idx] = nuevo.id;
+  if((tiendaActual.gondola || []).includes(id)) tiendaActual.gondola = tiendaActual.gondola.map(x => x === id ? nuevo.id : x);
   tiendaCambio();
   renderAgregarLista();
   toast(`${viejo.nombre} → ${nuevo.nombre} (${nuevo.tier})`);
@@ -1181,7 +1185,7 @@ function actualizarHint(){
   const cal = G.CALIDAD_POR_NIVEL[G.nivelDe(nivel)];
   const fijos = ` más los ${G.clasicos(CATALOGO).length} clásicos, que van siempre (pociones, Antídoto, Vendas, Revive, Moneda Re-Roll, Polilla, Ankh…: lo marcado «legacy» hasta Raro)`;
   $('#hint-tamano').textContent = (secs.length ? `${seccionesLabel(secs)}. ` : '⚠ Tildá al menos una sección. ') +
-    `${cfg.label}: entre ${cfg.min} y ${cfg.max} ítems en total, repartidos entre las secciones${fijos}. Nivel ${nivel}: ` +
+    `${cfg.label}: entre ${cfg.min} y ${cfg.max} piezas de equipo por sección; góndola de gastables: Talabartería ${cfg.gondola.talabarteria >= 99 ? 'todos' : cfg.gondola.talabarteria}, Bazar ${cfg.gondola.bazar} (${G.UNIDADES_GONDOLA} de cada uno)${fijos}. Nivel ${nivel}: ` +
     `Común ${cal[0]} % · Buena ${cal[1]} % · Rara ${cal[2]} %, más un golpe de suerte ` +
     `(${Math.round(G.SUERTE.uno * 100)} % un escalón, ${G.SUERTE.dos * 100} % dos). Efectos escasos: hasta ${cfg.tope === 0.5 ? '0 o 1' : cfg.tope} de cada uno.`;
 }
@@ -1348,7 +1352,8 @@ async function publicarShop(){
     const lote = fbDb.batch();
     // Publicar = abrir (dueño, 2026-10-08: «tienda publicada = tienda abierta»): al publicar queda abierta; el interruptor la cierra un rato.
     lote.set(refTienda('publicada'), {json, actualizado: ts, abierta: true});
-    lote.set(refTienda('stock'), {version: stockVersion, items: tiendaActual.items.slice(), reposiciones: 0, reserva: G.reservaDe(tiendaActual.tamano), vendidos: 0, actualizado: ts});
+    const gondola = Object.fromEntries((tiendaActual.gondola || []).filter(id => tiendaActual.items.includes(id)).map(id => [id, G.UNIDADES_GONDOLA]));   // la góndola, llena (P181)
+    lote.set(refTienda('stock'), {version: stockVersion, items: tiendaActual.items.slice(), reposiciones: 0, reserva: G.reservaDe(tiendaActual.tamano), vendidos: 0, gondola, actualizado: ts});
     let sinStock = false;
     try{ await lote.commit(); }
     catch(err){   // sin las reglas nuevas: se publica como antes, sin stock

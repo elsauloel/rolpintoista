@@ -132,18 +132,19 @@ const CombateFin = (() => {
     return out;
   }
   /* --- El consumible que suelta un creep (2026-10-03, pedido del dueño) ---
-     Solo humanos (30 %) y humanoides (20 %); el resto, nada. Un jefe: el doble de chance (tope 90 %) y la tabla de tiers como si tuviera un
-     nivel más. Si suelta, se tira el tier —a más nivel, mejores tiers— y sale un consumible al azar de ese tier (trampas incluidas). Se tira
+     Más seguido desde el 2026-10-08 (P181, dueño: «frecuentes en los drops, para que la gente las use a la ligera y se divierta con la
+     variedad»): humanos 60 %, humanoides 45 %, el resto 15 %. Un jefe suelta uno seguro y tiene la chance de su tipo de soltar un segundo, con la
+     tabla de tiers como si tuviera un nivel más (la calidad de un consumible pesa acá, en los drops, más que en la tienda: dueño, 2026-10-08). Si suelta, se tira el tier —a más nivel, mejores tiers— y sale un consumible al azar de ese tier (trampas incluidas). Se tira
      UNA sola vez por creep, como el oro (`rep.drops`): reabrir el reporte no lo cambia. Los números, acá abajo, en un solo lugar. */
-  const DROP_CHANCE = {humano: 0.30, humanoide: 0.20};
+  const DROP_CHANCE = {humano: 0.60, humanoide: 0.45}, DROP_OTROS = 0.15;
   const DROP_TIERS = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
   const DROP_BASE = [50, 35, 12, 3, 0];           // % en nivel 1
   const DROP_POR_NIVEL = [-6, 2, 2.5, 1, 0.5];    // lo que se mueve por cada nivel de más (Común nunca baja de DROP_COMUN_MIN)
   const DROP_COMUN_MIN = 10;
-  function dropChance(sc){
-    const p = DROP_CHANCE[K.tipoDe(sc)] || 0;
-    return sc.jefe ? Math.min(0.9, p * 2) : p;
-  }
+  const dropBase = sc => DROP_CHANCE[K.tipoDe(sc)] ?? DROP_OTROS;
+  // La chance del primero (un jefe: seguro) y la del segundo (solo un jefe: la de su tipo).
+  const dropChance = sc => sc.jefe ? 1 : dropBase(sc);
+  const dropSegundo = sc => sc.jefe ? dropBase(sc) : 0;
   // La tabla de tiers de un nivel: % por tier (suma 100).
   function dropTabla(nivel){
     const n = Math.max(0, Math.round(num(nivel) || 1) - 1);
@@ -177,17 +178,19 @@ const CombateFin = (() => {
   function dropDeCreep(rep, cat, sc){
     rep.drops = rep.drops || {};
     if(rep.drops[sc.id] === undefined){
-      let nombre = '';
-      if(Math.random() < dropChance(sc)){
-        const c = dropElegir(cat, dropTier(num(sc.nivel) + (sc.jefe ? 1 : 0)));
-        if(c) nombre = c.nombre;
-      }
-      rep.drops[sc.id] = nombre;
+      const nombres = [], nivel = num(sc.nivel) + (sc.jefe ? 1 : 0);
+      [dropChance(sc), dropSegundo(sc)].forEach(p => {
+        if(p > 0 && Math.random() < p){ const c = dropElegir(cat, dropTier(nivel)); if(c) nombres.push(c.nombre); }
+      });
+      rep.drops[sc.id] = nombres;
     }
-    const c = rep.drops[sc.id] ? cat.find(i => i.nombre === rep.drops[sc.id] && i.tipoItem === 'consumibles') : null;
-    if(!c) return [];
-    const t = plantillaConsumible(c);
-    return [{clave: `${sc.id}:drop`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: K.nombreLimpio(sc), drop: true}];
+    const lista = [].concat(rep.drops[sc.id] || []).filter(Boolean);   // (uno viejo guardaba un solo nombre)
+    return lista.map((n, i) => {
+      const c = cat.find(x => x.nombre === n && x.tipoItem === 'consumibles');
+      if(!c) return null;
+      const t = plantillaConsumible(c);
+      return {clave: `${sc.id}:drop${i ? i + 1 : ''}`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: K.nombreLimpio(sc), drop: true};
+    }).filter(Boolean);
   }
   function itemsExtra(rep){
     return rep.extras.map((e, i) => ({clave: `extra:${i}`, nombre: e.nombre, precioCompra: e.precioCompra, origen: 'Botín extra',
@@ -479,7 +482,7 @@ const CombateFin = (() => {
      humanos y humanoides como valor esperado (chance × lo que vale en promedio un consumible de cada tier). Es una guía para el GM. */
   const ventaDe = p => Math.round(num(p) / 2 * 100) / 100;
   function dropEsperado(cat, sc){
-    const chance = dropChance(sc);
+    const chance = dropChance(sc) + dropSegundo(sc);   // cuántos suelta en promedio
     if(!chance) return {chance: 0, venta: 0};
     const tabla = dropTabla(num(sc.nivel) + (sc.jefe ? 1 : 0));
     const cons = cat.filter(i => i.tipoItem === 'consumibles' && num(i.precioCompra) > 0);
@@ -520,7 +523,7 @@ const CombateFin = (() => {
     </div>`;
   }
 
-  return {estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_TIERS, dropChance, dropTabla, dropTier, dropDeCreep, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
+  return {estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
     plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, calcularReparto,
     itemsPublicables, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

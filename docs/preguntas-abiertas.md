@@ -872,9 +872,14 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   (en toda tienda) y a 25 DDE: Vendas (heridas: + Rengo), Antídoto (venenos), Té de tilo (mente), Sales aromáticas (aturdimiento), **Ungüento de la
   Turca** (elementales, nombre del dueño) y Mate cebado (fatiga). El **Cura Plus** cura todos los grupos, Buena calidad, 120 DDE. Automático al usarlos
   (`Combatiente.GRUPOS_CURA`, `grupoCuraDe`, `curaDeItem`, `curarEstados`; el ítem lleva `curaEstados`).
-- ⏳ **P181. Disponibilidad y variedad de cada sección de la tienda** (dueño, 2026-10-08: «¿cuánta disponibilidad tiene que haber? … en la
+- ✅ **P181. Disponibilidad y variedad de cada sección de la tienda** (dueño, 2026-10-08: «¿cuánta disponibilidad tiene que haber? … en la
   talabartería tiene que haber muchas trampas. Trampas, pociones que no son de curación y pergaminos: los jugadores no gastan plata en eso hasta
   que están sobrados… amplia disponibilidad, para fomentar el uso; y frecuentes en los drops de los creeps… definir un porqué a la disponibilidad
   y la variedad de cada tipo»). Hoy una capital trae ~2 trampas, 3 pociones y 1 pergamino (los gastables compiten con el equipo y casi no son
   Comunes). Propuesta del 2026-10-08: equipo (piezas únicas, pocas) y **góndola de gastables** aparte (muchas variedades, no se agotan) por sección;
   drops de gastables más frecuentes. Ver la conversación.
+  **Decidido y hecho (dueño, 2026-10-08):** se separan equipo y **góndola de gastables** (trampas, pociones que no curan, pergaminos, luces: no compiten
+  con el equipo, 3 unidades de cada uno, se reponen al volver a publicar); la calidad de un consumible pesa más en los drops que en la tienda (el
+  precio ya filtra; a nivel bajo salen más los de calidad baja). Más ítems por pestaña: el tamaño pasa a ser por sección. La Talabartería trae siempre
+  una mochila y un cinturón desde pueblito. Drops: humanos 60 %, humanoides 45 %, el resto 15 %; un jefe, uno seguro y chance de otro. Todos los
+  consumibles se van a revisar más adelante (los diseñó a ojo); las clasificaciones ya quedan armadas.

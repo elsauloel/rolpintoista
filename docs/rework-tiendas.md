@@ -200,3 +200,14 @@ Todo lo marcado `legacy` en el catálogo hasta Raro (hoy 15: pociones de HP, SP 
 Vendas, Cura Plus, Revive, Moneda Re-Roll, Polilla mística, Ankh) va en **toda** tienda, de cualquier tamaño y con las secciones que sean:
 es el stock fijo (fuera del total, no se agota) y se ve en la pestaña del Bazar. `GeneradorTiendas.clasicos(catalogo)`. Para sumar o sacar un
 clásico: la marca `legacy` del ítem en el editor del catálogo. Reemplaza al stock fijo de antes (Poción de HP, de SP y Revive desde la aldea).
+
+### ✅ Disponibilidad: equipo y góndola de gastables (P181, dueño 2026-10-08)
+Medido antes: una capital de nivel 2 traía ~2 trampas, 3 pociones y 1 pergamino (los gastables competían con el equipo y casi no son Comunes).
+Ahora `GeneradorTiendas.TAMANOS` lleva, **por sección**, `min`–`max` piezas de equipo (ambulante 5–7, pueblito 8–10, aldea 12–15, ciudad 18–22,
+capital 26–32) y `gondola` (Talabartería / Bazar: 3/4, 5/6, 8/10, 12/15, todas/20). **Góndola**: `gastable(it)` (consumible no clásico, hasta Raro)
+y `gondolaDe(it)` (trampas y luces de todos los días → Talabartería; pociones, pergaminos y lo mágico → Bazar); se eligen al azar pesando la calidad
+con la tabla del nivel + 10 (sale cualquiera, más las bajas a nivel bajo). La tienda guarda `gondola: [ids]`; al publicar, `tienda/stock.gondola =
+{id: 3}` (`UNIDADES_GONDOLA`) y quien compra descuenta en la misma transacción (regla nueva: hay que pegarla; sin ella, sin límite). Las recetas de
+equipo ya no tienen consumibles. La Talabartería garantiza una mochila y un cinturón desde pueblito (`minimos` + `minimosDesde`). **Drops**
+(`comun/combate-fin.js`): humanos 60 %, humanoides 45 %, el resto 15 %; un jefe, uno seguro + la chance de su tipo de un segundo (`dropSegundo`).
+⬜ Más adelante: «Pasar de día» para reponer la góndola sin republicar; la revisión de todos los consumibles.

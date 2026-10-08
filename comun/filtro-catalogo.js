@@ -292,7 +292,8 @@ const FiltroCatalogo = (() => {
       q('[data-fc-zona="fila2"]').innerHTML = fila2;
       // Más filtros: Tipo de arma, daño, origen
       const cTipo = conteo(items, 'tipo', it => esArma(it) && !it.especial ? num(it.tipoDado) : '');
-      q('[data-fc-zona="tipo"]').innerHTML = TIPOS_ARMA.map(t => chip('tipo', t, `Tipo ${t}`, cTipo.c.get(String(t)) || 0)).join('');
+      q('[data-fc-zona="tipo"]').innerHTML = TIPOS_ARMA.filter(t => cTipo.c.get(String(t)) || String(f.tipo) === String(t)).map(t => chip('tipo', t, `Tipo ${t}`, cTipo.c.get(String(t)) || 0)).join('')
+        || '<span class="fc-etq">—</span>';   // solo los Tipos que hay
       const cEl = conteo(items, 'elemento', it => [...elementosDe(it)]);
       q('[data-fc-zona="elemento"]').innerHTML = ELEMENTOS.filter(([e]) => cEl.c.get(e) || f.elemento === e).map(([e, ic, l]) => chip('elemento', e, `${ic} ${l}`, cEl.c.get(e) || 0)).join('')
         || '<span class="fc-etq">—</span>';

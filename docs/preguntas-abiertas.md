@@ -834,3 +834,12 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   +Rango** (9 piezas Raras o mejores, archivadas, y sus copias en el equipo de los creeps; la pasiva Largo alcance arcano, +1 Rango). Una copia
   vieja con «+Rango de casteo» en un inventario suma al Rango.
 
+
+- ⏳ **P175. Varita del vendaval: el empuje ahora se resiste (Res.Esp) — ¿qué le damos a cambio?** (dueño, 2026-10-08). Ya quedó: PdG.Esp contra
+  Res.Esp para el empuje; despejar niebla y fuego no se resiste y solo saca las casillas que toca. Opciones: bajarle el precio (80 → 65), sumarle daño
+  directo (1d4 arcano) o un % de Escarcha (se pisa con la Ráfaga helada, que es la de hielo). Propuesta: precio 65 y sin daño (es una de utilidad).
+- ⏳ **P176. Varita inestable: afinar el riesgo** (dueño, 2026-10-08, «cómo era antes, afinemos»). Antes (Buena): 2d6 y, si salía algún 1, 2d4 a vos
+  (≈30 % de las veces, ≈1,5 de daño propio en promedio). Ahora: 1d4 por cada 1 (≈0,8 en promedio). Común: 1d8 y 1d4 con el 1 (≈0,3).
+- ⏳ **P177. ¿Los turnos de un estado se descuentan al EMPEZAR el turno (antes de que pegue) en vez de al terminarlo?** (dueño, 2026-10-08, «ayudame a
+  pensarlo»). Hoy: lo que «sucede» (veneno, regeneración) pega al empezar el turno de quien lo tiene; el contador baja al terminar su turno. Ver la
+  respuesta del 2026-10-08 en la conversación (y `docs/estados-turnos.md`).

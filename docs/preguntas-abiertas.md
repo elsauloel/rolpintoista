@@ -872,3 +872,9 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   (en toda tienda) y a 25 DDE: Vendas (heridas: + Rengo), Antídoto (venenos), Té de tilo (mente), Sales aromáticas (aturdimiento), **Ungüento de la
   Turca** (elementales, nombre del dueño) y Mate cebado (fatiga). El **Cura Plus** cura todos los grupos, Buena calidad, 120 DDE. Automático al usarlos
   (`Combatiente.GRUPOS_CURA`, `grupoCuraDe`, `curaDeItem`, `curarEstados`; el ítem lleva `curaEstados`).
+- ⏳ **P181. Disponibilidad y variedad de cada sección de la tienda** (dueño, 2026-10-08: «¿cuánta disponibilidad tiene que haber? … en la
+  talabartería tiene que haber muchas trampas. Trampas, pociones que no son de curación y pergaminos: los jugadores no gastan plata en eso hasta
+  que están sobrados… amplia disponibilidad, para fomentar el uso; y frecuentes en los drops de los creeps… definir un porqué a la disponibilidad
+  y la variedad de cada tipo»). Hoy una capital trae ~2 trampas, 3 pociones y 1 pergamino (los gastables compiten con el equipo y casi no son
+  Comunes). Propuesta del 2026-10-08: equipo (piezas únicas, pocas) y **góndola de gastables** aparte (muchas variedades, no se agotan) por sección;
+  drops de gastables más frecuentes. Ver la conversación.

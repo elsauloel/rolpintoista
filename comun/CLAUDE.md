@@ -1376,3 +1376,10 @@ versión parecida en más de una, es candidato a juntar.
   después dispara) en el inicio del turno propio de personajes, invocaciones y creeps; `terminarTurnoEstados(estados)` en el fin (solo saca la marca
   `recien`). `agregarEstado` marca `recien` todo lo que pone, renueva o acumula: si fue fuera de su turno, el primer inicio no descuenta. El ⟳
   Mantenimiento de la ronda sigue con `pasarTurnoEstados` (`invInicio/invFin(inv, true)`, `inicioCreep/finCreep(sc, true)`).
+- **`filtro-catalogo.js`** (`FiltroCatalogo`, 2026-10-08, pedido del dueño: «ponerle onda» + rango de precio + «slots libres») — **el filtro del catálogo, uno para
+  todos lados**: `crear(contenedor, cfg)` dibuja buscador, chips con cuántos quedan (qué es —`GeneradorTiendas.parteDe`—, calidad, una/dos manos, «🟢 Lugar libre»
+  si `cfg.libre(it)`), orden y «⚙ Más filtros» (Tipo, daño/elemento, que suba, efecto al golpear, precio desde–hasta con `cfg.precio`, peso; `cfg.etiquetas` →
+  «Efecto escaso», `cfg.origen` → «De dónde sale») y devuelve `{f, filtrar(), agrupar(lista), actualizar(), limpiar(), activos(), dibujar()}`; trae su propio CSS
+  (anda en el recuadro aislado del mapa). Suelto: `pasa(it, f, ctx)`, `ordenar(lista, f, ctx)`, `agrupar(lista, f)`, `vacio()`, `cuantos(f)`. Lo usan
+  `ficha-tienda.js` (`st.filtro` = su estado; `FichaTienda.base`, `libre`, `ctxFiltro`), la ficha, el mapa, el generador de tiendas, GM Tools y el editor del
+  catálogo. Necesita `generador-tiendas.js` antes. **Un filtro nuevo del catálogo va acá, no en una pantalla.**

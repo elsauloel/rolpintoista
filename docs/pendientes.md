@@ -162,11 +162,16 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   ataque sin No2; InvDuelo; los Silencio de creeps/invocaciones; `CombateFin`) — hay que volver async esas funciones —, los de borrar/administrar del
   mapa (borrar mapa, sacar token, vaciar turnos, bitácora, trampa guardada, tomar el control), `intercambio.js`, y los de la ficha y GM Tools.
 
-- [ ] **El filtro del catálogo, una sola pieza para todos lados** (dueño, 2026-10-08: «hay que ponerle onda, no era muy claro»; se hace en la
-  compu junto con el catálogo y la tienda). Hoy la ficha filtra por categoría, slot (sin «dos manos»), calidad y búsqueda; el «Agregar ítem» de la
-  tienda tiene uno mucho más completo. Propuesta: una pieza común (ficha, Botonera del mapa, editor del catálogo, tienda) con parte del cuerpo
-  (una mano / dos manos separadas), calidad, búsqueda, orden y «Más filtros»: Tipo de arma, elemento, qué bono da, efecto al golpear, **rango de
-  precio (desde–hasta, pedido del dueño)** y peso; contador «23 de 410 ítems» y limpiar todo.
+- [x] **El filtro del catálogo, una sola pieza para todos lados** (dueño, 2026-10-08: «hay que ponerle onda, no era muy claro»; hecho el mismo
+  día): `comun/filtro-catalogo.js` (`FiltroCatalogo`). Buscador (todas las palabras: nombre, efecto, bonos), chips con cuántos quedan (qué es /
+  dónde va —la clasificación de `GeneradorTiendas.parteDe`—, calidad, una o dos manos, **🟢 Lugar libre** en la tienda del jugador), orden y
+  «⚙ Más filtros» (Tipo de arma, daño/elemento, que suba, efecto al golpear, **precio desde–hasta**, peso; el GM además «Efecto escaso» y «De
+  dónde sale»); «23 de 410 ítems · ✕ Limpiar todo». Lo usan la tienda de la ficha y la del mapa, el «Agregar ítems» del generador de tiendas,
+  «Equipar del fabricante» de GM Tools y el editor del catálogo. De paso: el mapa tomaba como atajos las letras escritas en un campo de la
+  Botonera nueva (el buscador perdía letras) — arreglado (`escribiendoEnCampo`, js/06).
+  - [ ] **«Lugar libre»**: hoy = lo que te podés equipar sin sacarte nada (el lugar del cuerpo libre). Si el dueño quería también «entra en la
+    mochila / el cinturón», sumarlo como otro chip. (A confirmar.)
+  - [ ] El buscador de la vista previa de la tienda del generador (`#preview-buscar`, solo por nombre) podría usar la misma pieza.
 
 ## 1. Casteo con SP — **proceso paso a paso en [`proceso-casteo.md`](proceso-casteo.md)** (reglas en [`reglas-casteo.md`](reglas-casteo.md), decisiones en P97)
 > **Los 5 pasos de decisión, el Paso 6 y el Paso 7 (en su mayoría) están cerrados (2026-09-27).** Retomar por el

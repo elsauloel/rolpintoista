@@ -1,6 +1,6 @@
-/* ---------- 🗡 El arma en el piso (2026-10-07, dueño) ----------
+/* ---------- 🗡️ El arma en el piso (2026-10-07, dueño) ----------
    Cuando a alguien lo desarman (Varita del manotazo; la Varita del desarme la hace volar 2 casillas en una dirección al azar), su arma
-   queda en el mapa como un elemento `arma: true`, con el ícono 🗡 y su nombre, que ven todos. La puede levantar CUALQUIERA que esté
+   queda en el mapa como un elemento `arma: true`, con el ícono 🗡️ y su nombre, que ven todos. La puede levantar CUALQUIERA que esté
    encima o al lado, por 1 No2, desde su Botonera: el que estaba Desarmado vuelve a tener un arma en la mano (la suya o la que levantó);
    el que no, se la guarda en la mochila. Un creep o una invocación no pierde su arma de verdad (no es un ítem): queda Desarmado, y su
    arma, hecha ítem, queda en el piso por si otro la levanta (si la levanta él mismo, vuelve a tenerla).
@@ -98,7 +98,7 @@ async function armaTomar(elId, t){
   return {it, propia: !!t && el.armaDe === armaRefDe(t)};
 }
 // Se dibuja como una ficha REDONDA (dueño, 2026-10-07: lo que no es un personaje ni una criatura va redondo, para distinguirlo de los tokens
-// hexagonales), con el 🗡 adentro y el nombre del arma debajo (los dibuja js/05, con el resto de los elementos).
+// hexagonales), con el 🗡️ adentro y el nombre del arma debajo (los dibuja js/05, con el resto de los elementos).
 function armaDibujar(el, z){
   const p = hexCentro(el.origen.col, el.origen.fila), R = HEX * 0.62;
   ctx.save();
@@ -107,7 +107,7 @@ function armaDibujar(el, z){
   ctx.lineWidth = 3 / z; ctx.strokeStyle = '#C9C9C9'; ctx.stroke();
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.font = `700 ${R * 1.05}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", system-ui, sans-serif`;
-  ctx.fillStyle = '#EDE3D2';   // (si el 🗡 sale en blanco y negro, que se vea claro sobre el fondo oscuro)
+  ctx.fillStyle = '#EDE3D2';   // (si el 🗡️ sale en blanco y negro, que se vea claro sobre el fondo oscuro)
   ctx.fillText('🗡️', p.x, p.y + R * 0.06);
   const txt = String(el.armaNombre || 'Arma');
   ctx.font = `700 ${11 / z}px "Space Mono", monospace`;
@@ -135,7 +135,7 @@ async function bnLevantarArma(elId){
     S.inventario = [...(S.inventario || []), x.it];
     ui.cambio();
     const quien = ((S.meta && S.meta.nombre) || 'Alguien').trim();
-    mesaLinea(`🗡 ${quien} levantó ${x.it.nombre}${des ? ' y la tiene en la mano' : ' (a la mochila)'}`);
+    mesaLinea(`🗡️ ${quien} levantó ${x.it.nombre}${des ? ' y la tiene en la mano' : ' (a la mochila)'}`);
   };
   if(num(S.nitros) < costo) bnSinNitros(costo, 'levantar el arma', () => seguir(true)); else seguir(false);
 }
@@ -153,7 +153,7 @@ async function bnInvLevantarArma(invId, elId){
   if(des) inv.estados = inv.estados.filter(e => e !== des);
   if(!x.propia) inv.equipo = [...(inv.equipo || []), x.it];   // la suya ya la tenía (sus datos); la de otro, al equipo
   ui.cambio();
-  mesaLinea(`🗡 ${inv.nombre} levantó ${x.it.nombre}`);
+  mesaLinea(`🗡️ ${inv.nombre} levantó ${x.it.nombre}`);
 }
 async function acLevantarArma(elId){
   const sc0 = typeof acCreep === 'function' ? acCreep() : null;
@@ -168,5 +168,5 @@ async function acLevantarArma(elId){
     if(!x.propia) c.equipo = [...(c.equipo || []), x.it];
     return {aviso: ''};
   });
-  mesaLinea(`🗡 ${sc0.nombre} levantó ${x.it.nombre}`);
+  mesaLinea(`🗡️ ${sc0.nombre} levantó ${x.it.nombre}`);
 }

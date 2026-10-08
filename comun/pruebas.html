@@ -1562,6 +1562,14 @@ prueba('guantes de Buena calidad: el primer conjuro (−1 SP, solo el primer uso
   const t = Combatiente.trampaDeHab({nombre: 'Cepo', trampaColocar: {nombre: 'Cepo'}}, st => st === 'des' ? 5 : st === 'trampaoculta' ? 2 : 0);
   igual([primero, segundo, esp, t.detectar], [2, 3, 1, 7]);
 });
+prueba('armas especiales de Buena, primera tanda (2026-10-07): 15, con su SP; la Bola de fuego mayor agarra aliados, la Sanguijuela drena la mitad, el báculo suma ¼ del Ef.Esp', () => {
+  const buenas = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-buena-'));
+  const sc = creepPrueba({esp: 12});
+  const plan = id => { const it = {...structuredClone(CATALOGO_BASE.find(x => x.id === id)), id: 'x'}; const h = CreepAcciones.habDeEspecialCreep(sc, it); return {h, e: Combatiente.habEjecucion(h, h.duelo, {})}; };
+  const bola = plan('esp-buena-varita-de-la-bola-de-fuego-mayor').e, sang = plan('esp-buena-varita-sanguijuela').e, sabio = plan('esp-buena-baculo-del-sabio').h;
+  igual([buenas.length, buenas.every(i => i.especial && i.especial.sp >= 1 && /Cuesta 1 No2/.test(i.detalle)), !!bola.fuegoAmigo, bola.radio, sang.dano.drenaPct, sang.dano.directo, /^1d8\+\d+$/.test(sabio.tiradaExtra)],
+    [15, true, true, 2, 50, true, true]);
+});
 prueba('torso blando: la Túnica de sangre paga el SP de un arma especial con vida (y no dos veces); el resumen lleva la Defensa extra', async () => {
   const {S} = FichaGuardado.normalizar({}, {mezclarCatalogo: false});
   const varita = {...structuredClone(CATALOGO_BASE.find(x => x.id === 'esp-varita-de-chispa-electrica')), id: 'v1', equipado: true};
@@ -2435,7 +2443,7 @@ prueba('✨ armas especiales de un creep (2026-10-05): No2 como un personaje, el
     ['1d4', 'enemigo', false, true, true, true, 1, undefined, true, 1, 2]);
 });
 prueba('✨ armas especiales Comunes (2026-10-05): 30 armas y 3 orbes; cada una automatiza algo o aclara lo que queda a mano', () => {
-  const L = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-'));
+  const L = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-') && !String(i.id).startsWith('esp-buena-'));   // (las de Buena, en su prueba)
   const armas = L.filter(i => i.especial), orbes = L.filter(i => i.orbe);
   const sinNada = armas.filter(i => !i.especial.duelo && !i.especial.trampaColocar && !/✋/.test(i.detalle)).map(i => i.nombre);
   igual([armas.length, orbes.length, L.every(i => i.tier === 'Común' && i.ranuras === 1), sinNada, armas.every(i => /No2/.test(i.detalle))], [30, 3, true, [], true]);

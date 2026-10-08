@@ -493,7 +493,7 @@ const Duelo = (() => {
       .map(c => ({modo: txtCorto(c.modo || c.stat, 20), stat: txtCorto(c.stat || c.modo, 20), etq: txtCorto(c.etq || c.stat || c.modo, 30)})).filter(c => c.stat);
     const dano = h.dano && (String(h.dano.formula || '').trim() || h.dano.diferencia) ? {formula: txtCorto(h.dano.formula, 40), tipo: txtCorto(h.dano.tipo || 'arcano', 20), ignoraDef: h.dano.ignoraDef !== false,
       ...(h.dano.trueDamage ? {trueDamage: true} : h.dano.directo ? {directo: true} : {}),   // dueño, 2026-10-07 (P169)
-      ...(h.dano.diferencia ? {diferencia: true} : {}), ...(h.dano.drena ? {drena: true, drenaTope: Math.max(0, Math.round(_num(h.dano.drenaTope)))} : {})} : null;
+      ...(h.dano.diferencia ? {diferencia: true} : {}), ...(h.dano.drena ? {drena: true, drenaTope: Math.max(0, Math.round(_num(h.dano.drenaTope))), ...(_num(h.dano.drenaPct) > 0 && _num(h.dano.drenaPct) < 100 ? {drenaPct: Math.round(_num(h.dano.drenaPct))} : {})} : {})} : null;
     const efectos = limpiarEfectos(h.efectos);
     const objetivo = ['enemigo', 'aliado', 'uno mismo', 'area', 'onda', 'cono', 'linea'].includes(h.objetivo) ? h.objetivo : 'enemigo';
     return {nombre: txtCorto(h.nombre, 60), objetivo, tira: t, contra, dano, efectos, sinOposicion: !(t && contra.length),

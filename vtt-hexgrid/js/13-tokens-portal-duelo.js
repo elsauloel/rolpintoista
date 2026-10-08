@@ -1012,7 +1012,8 @@ async function dueloAplicarDano(d){
     const espejo = res.r.invulnerable ? null : await dueloEspejo(d, (habMagica ? golpe : 0) + (magico ? num(dn.magico.total) : 0));
     const perdio = Math.max(0, num(res.previo) - num(res.nuevo));
     // Habilidad que drena: todo lo que perdió. Arma que drena (2026-10-03): su % de lo que perdió de verdad (curar redondea para arriba).
-    const drena = d.hab && d.hab.dano && d.hab.dano.drena ? await dueloDrenar(d, perdio)
+    // Una habilidad que drena: lo que perdió, o su % (`drenaPct`, la Sanguijuela: la mitad, para arriba).
+    const drena = d.hab && d.hab.dano && d.hab.dano.drena ? await dueloDrenar(d, num(d.hab.dano.drenaPct) > 0 ? Math.ceil(perdio * num(d.hab.dano.drenaPct) / 100) : perdio)
       : !d.hab && num(dn.drenaPct) > 0 ? await dueloDrenar(d, Math.ceil(perdio * num(dn.drenaPct) / 100)) : null;
     // Rayo en cadena (2026-10-05): el golpe de una habilidad o arma especial de rayo salta (la misma regla de ⚡ Rayo en cadena del token).
     if(d.hab && d.hab.cadena && golpe > 0 && !res.r.invulnerable) await dueloCadena(d, golpe).catch(err => console.error('No se pudo hacer saltar el rayo:', err));

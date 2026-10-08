@@ -728,7 +728,7 @@ const Combatiente = (() => {
       // Daño directo (ignora la Defensa especial: proyectiles chicos) y True Damage (ignora toda defensa y la Res. elemental): dueño, 2026-10-07.
       dano: c.dano && (formula || c.danoDiferencia) ? {formula: c.danoDiferencia ? '' : formula, tipo, ignoraDef: c.trueDamage ? true : c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico',
         ...(c.trueDamage ? {trueDamage: true} : c.danoDirecto && tipo !== 'fisico' ? {directo: true} : {}),
-        ...(c.danoDiferencia ? {diferencia: true} : {}), ...(c.drena ? {drena: true, drenaTope: Math.max(0, nf(c.drenaTope))} : {})} : null,
+        ...(c.danoDiferencia ? {diferencia: true} : {}), ...(c.drena ? {drena: true, drenaTope: Math.max(0, nf(c.drenaTope)), ...(nf(c.drenaPct) > 0 && nf(c.drenaPct) < 100 ? {drenaPct: Math.round(nf(c.drenaPct))} : {})} : {})} : null,   // drenaPct: cura solo ese % (2026-10-07, la Sanguijuela)
       efectos: (c.efectos || []).map(efectoDeEjecucion),
       ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: nf(c.radio)} : {}),
       ...(c.objetivo === 'linea' ? {largo: Math.max(1, Math.round(nf(c.largo)) || 4)} : {}),   // línea recta desde quien la usa (2026-10-05, Varita láser)
@@ -739,6 +739,7 @@ const Combatiente = (() => {
       // crítico de lo físico invocado (Tipo de su familia: estaca 4, canto rodado 10).
       ...(c.zonaQueda ? {zonaQueda: {...c.zonaQueda, ...(c.zonaQueda.tira && o.stat ? {tiraValor: Math.round(nf(o.stat(c.zonaQueda.tira)))} : {})}} : {}),
       ...(c.menosDistancia ? {menosDistancia: true} : {}),
+      ...(c.fuegoAmigo ? {fuegoAmigo: true} : {}),   // un área que también agarra a los aliados (2026-10-07, Bola de fuego mayor)
       ...(c.atrae ? {atrae: {casillas: Math.max(1, Math.round(nf(c.atrae.casillas)) || 2), contra: c.atrae.contra || 'fue', ...(o.stat ? {tiraValor: Math.round(nf(o.stat(c.atrae.tira || 'dmgesp')))} : {})}} : {}),
       ...(c.reparte ? {reparte: {cada: String(c.reparte.cada || '1d4'), total: Math.max(2, Math.round(nf(c.reparte.total)) || 2)}} : {}),
       ...(nf(c.critTipo) ? {critTipo: Math.round(nf(c.critTipo))} : {}),   // la luz (2026-10-05, Varita de la luz): solo los rivales en sigilo que alcanza

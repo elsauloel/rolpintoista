@@ -1948,6 +1948,12 @@ Con la calculadora recalibrada (varitas directas con dado fijo, báculos con ¼ 
   al dispararse** duran los turnos de quien las puso. ✅ Hecho: la trampa recuerda quién la puso (`de` en su trampaEstado, comun/tokens-auto.js);
   el mapa le descuenta un turno al empezar cada turno de esa persona (js/07 `zonasDelQueLaTiro`) y, mientras esté en el orden de turnos, no la
   vence el Mantenimiento.
+- **Primera tanda de Buena cargada (2026-10-07, «cargalas»):** Arcana superior, Misiles mayores, Flor de chispas, Bola de fuego mayor (con fuego
+  amigo: `fuegoAmigo` llega al área), Lluvia de cascotes, Ponzoña, Embrollo, Raíces (área de una casilla: dodge), Grieta (−2 Defensa 2 turnos),
+  Sanguijuela (drena la mitad: `drenaPct` nuevo en la Ejecución), Cura mayor (2d8) y los báculos de brasas, escarcha, del sabio y guardián (a dos
+  manos). El fuego que deja la Bola de fuego Común pasa a ser del piso. **Quedan para las tandas siguientes:** Relámpago (la Parálisis a cada
+  salto), Muro de fuego (zona en línea), Láser largo, Ráfaga helada, Chorro de lava, Campo de estática, Inestable, Muro, Vendaval, Blink, Portales,
+  Luz flotante, Eclipse, Manotazo, Cosecha, Purga, Báculo de sangre, De cargas, Gemela, las trampas portal y de arena de Buena y las de arena Comunes.
 - **El rango lo da la Destreza, siempre** (dueño, 2026-10-07, P174): donde esta hoja dice «Rango de casteo» (la primera casilla del Chorro
   de lava, a 1/3), ahora es **tu Rango**.
 

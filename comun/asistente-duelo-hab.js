@@ -133,7 +133,7 @@ const AsistenteDueloHab = (() => {
       dano: !!(ini && ini.dano), tipoDano: (ini && ini.tipoDano) || 'arcano',
       danoDif: !!(ini && ini.danoDiferencia), danoExtra: (ini && ini.danoExtra) || '',
       danoArma: !!(ini && ini.danoArma),   // el daño del arma de quien la usa (2026-10-02, Daño en área): dirigida, área u onda   // la diferencia: zona y dirigida; la tirada extra: solo zona (2026-10-02)
-      drena: !!(ini && ini.drena), drenaTope: ini && ini.drenaTope !== undefined ? Number(ini.drenaTope) || 0 : 50,   // drena (2026-10-02, Drenar Vida): no en una zona
+      drena: !!(ini && ini.drena), drenaTope: ini && ini.drenaTope !== undefined ? Number(ini.drenaTope) || 0 : 50, drenaPct: ini && Number(ini.drenaPct) > 0 ? Number(ini.drenaPct) : 100,   // drena (2026-10-02, Drenar Vida): no en una zona
       // Efecto que no se puede automatizar del todo (2026-09-27, pedido del dueño): texto libre que se muestra
       // en el cuadro del duelo junto al resultado, para lo que hay que resolver a mano (ej. "drenás la diferencia").
       efectoLibreOn: !!(ini && ini.efectoLibre), efectoLibre: (ini && ini.efectoLibre) || '',
@@ -389,6 +389,7 @@ const AsistenteDueloHab = (() => {
         }
         if(!esZona){
           h += `<label class="op" style="margin-top:10px"><input type="checkbox" data-drena ${st.drena ? 'checked' : ''}> Drena: quien la usa se cura lo que hizo de daño</label>`;
+          if(st.drena) h += `<div class="fila"><span>Se cura el</span><input type="number" min="1" max="100" style="width:70px" data-drenapct value="${esc(st.drenaPct)}"><span>% de lo que hizo (para arriba)</span></div>`;
           if(st.drena) h += `<div class="fila"><span>Puede pasar su vida máxima hasta</span><input type="number" min="0" style="width:70px" data-drenatope value="${esc(st.drenaTope)}"><span>% (lo de más queda como Vida extra; 0 = no pasa el máximo)</span></div>
             <p class="nota">Se cura lo que el objetivo perdió de verdad (si un escudo lo absorbió o era Invulnerable, drena menos o nada).</p>`;
         }
@@ -604,6 +605,7 @@ const AsistenteDueloHab = (() => {
       q('[data-drena]', e => { st.drena = e.target.checked; dibujar(); });
       q('[data-ondadodge]', e => { st.ondaDodge = e.target.checked; dibujar(); });
       q('[data-drenatope]', e => { st.drenaTope = Math.max(0, Number(e.target.value) || 0); });
+      q('[data-drenapct]', e => { st.drenaPct = Math.max(1, Math.min(100, Math.round(Number(e.target.value) || 100))); });
       q('[data-danoextra]', e => { st.danoExtra = e.target.value.trim(); });
       q('[data-tipodano]', e => { st.tipoDano = e.target.value; st.ignoraDano = st.tipoDano !== 'fisico'; dibujar(); });
       q('[data-ignoradano]', e => { st.ignoraDano = e.target.checked; dibujar(); });
@@ -713,7 +715,7 @@ const AsistenteDueloHab = (() => {
           out.danoDiferencia = true;
         }
         if(st.dano && st.danoArma && !st.danoDif && st.objetivo !== 'zona' && st.objetivo !== 'uno mismo') out.danoArma = true;
-        if(st.dano && st.objetivo !== 'zona' && st.drena){ out.drena = true; out.drenaTope = Math.max(0, Math.round(Number(st.drenaTope) || 0)); }
+        if(st.dano && st.objetivo !== 'zona' && st.drena){ out.drena = true; out.drenaTope = Math.max(0, Math.round(Number(st.drenaTope) || 0)); if(st.drenaPct < 100) out.drenaPct = st.drenaPct; }
         if(st.objetivo === 'zona' && st.dano){
           if(st.danoDif){
             if(!hayTira || st.tiraModo === 'custom' || !out.contra.length){ alert('El daño «la diferencia» necesita que quien la usa tire un stat (paso Tirada) y algo con qué resistirla (paso Resistencia).'); return false; }

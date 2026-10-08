@@ -107,7 +107,8 @@ const Combatiente = (() => {
   /* El TURNO PROPIO (2026-10-06, dueño, P161 — «turno completo»): con el orden de turnos del mapa, cada uno tiene su propio reloj.
      · AL EMPEZAR su turno: recarga No2 y SP, bajan sus cooldowns y se DISPARA lo que se dispara (veneno, sangrado, regeneración, el escudo
        que se recarga) — `dispararEstados`.
-     · AL TERMINAR su turno: baja el contador de sus estados (turnos y stacks) — `contarEstados`.
+     · AL TERMINAR su turno: hasta el 2026-10-08 bajaba el contador. Desde P177 (dueño) el contador baja AL EMPEZAR, antes de disparar
+       (`empezarTurnoEstados`), y el fin solo le saca lo «recién» a lo que se puso en ese turno (`terminarTurnoEstados`).
      · Lo que se dispara pega también APENAS TE LO PONEN (`dispararAlAplicar`, dueño: «aunque te apliquen un antídoto, por lo menos una vez va
        a haber tenido efecto»); cada estado se dispara una vez por vuelta (`disparado`, que se apaga al contar): uno de N turnos pega N veces.
      · El contador baja al terminar el turno del afectado aunque se lo hayan puesto en ese mismo turno (dueño: «una regla clara, limpia y
@@ -143,11 +144,13 @@ const Combatiente = (() => {
     });
     return {hp, eventos};
   }
-  function contarEstados(estados, campos){
+  // `o.alEmpezar` (P177, 2026-10-08): lo cuenta el inicio del turno — un estado `recien` (puesto fuera de su turno) no descuenta esta vez.
+  function contarEstados(estados, campos, o){
     const lista = estados || [], c = campos || {hp: 'hpTurno', stacks: 'stacksTurno'};
     const eventos = [], fin = new Set();
     lista.forEach(e => {
       if(!e || e.activo === false) return;
+      if(e.recien){ delete e.recien; if(o && o.alEmpezar) return; }
       e.disparado = false;   // en la vuelta que viene se vuelve a disparar
       const hayStacks = e.stacks !== undefined && e.stacks !== null && e.stacks !== '';
       const stacks = Math.max(1, n(e.stacks) || 1);
@@ -188,6 +191,19 @@ const Combatiente = (() => {
   }
   // ¿Titila? Cualquier estado activo que da invulnerabilidad (dueño: «asociar la animación de titilar a la invulnerabilidad en general»).
   const titila = estados => (estados || []).some(e => e && e.activo !== false && (e.invulnerable || e.titilando || /^(invulnerable|titilando)$/i.test(String(e.nombre || '').trim())));
+  /* P177 (dueño, 2026-10-08): los turnos de un estado bajan AL EMPEZAR el turno de quien lo tiene, antes de que pegue — así uno de N turnos dura
+     N rondas completas desde que se aplica. Lo recién puesto lleva `recien` (agregarEstado): si se lo pusieron en su propio turno, el fin de ese
+     turno se lo saca (terminarTurnoEstados) y su próximo inicio ya descuenta; si se lo pusieron fuera de su turno, su próximo inicio no descuenta
+     (le toca el turno entero) y el siguiente sí. Al empezar: cuenta y después dispara lo que sigue (veneno, regeneración…). */
+  function empezarTurnoEstados(estados, campos){
+    const k = contarEstados(estados, campos, {alEmpezar: true});
+    const d = dispararEstados(k.quedan, {...(campos || {}), todos: k.quedan});
+    return {hp: d.hp, quedan: k.quedan, terminados: k.terminados, eventos: [...k.eventos, ...d.eventos]};
+  }
+  function terminarTurnoEstados(estados){
+    (estados || []).forEach(e => { if(e && e.recien) delete e.recien; });
+    return {hp: 0, quedan: estados || [], terminados: [], eventos: []};
+  }
   // El pase de turno de siempre (⟳ Mantenimiento, sin orden de turnos): dispara (lo que no se disparó al aplicarse) y cuenta.
   function pasarTurnoEstados(estados, campos){
     const d = dispararEstados(estados, campos), k = contarEstados(estados, campos);
@@ -564,7 +580,13 @@ const Combatiente = (() => {
        5. Si no, se agrega.
      Modifica la lista y devuelve {ok, que: 'bloqueado'|'acumulado'|'yaLoTiene'|'renovado'|'nuevo', estado, motivo?}.
      `o.jefe`: el que lo recibe es un creep jefe. */
+  // Lo que se pone (o se renueva o se acumula) queda `recien`: su primer inicio de turno no le descuenta si se lo pusieron fuera de su turno (P177).
   function agregarEstado(estados, nuevo, o){
+    const r = agregarEstado0(estados, nuevo, o);
+    if(r && r.ok && r.estado && r.que !== 'yaLoTiene' && !r.estado.origenItem && !r.estado.derivado) r.estado.recien = true;
+    return r;
+  }
+  function agregarEstado0(estados, nuevo, o){
     if(!Array.isArray(estados) || !nuevo) return {ok: false, que: 'nada'};
     if(marcaTurno && nuevo.pasoTurno === undefined){ const m = marcaTurno(); if(m) nuevo.pasoTurno = m; }   // en qué turno se lo pusieron (turno propio)
     if(nuevo.activo !== false){
@@ -1043,7 +1065,7 @@ const Combatiente = (() => {
     return h;
   }
 
-  return {diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

@@ -1372,3 +1372,7 @@ versión parecida en más de una, es candidato a juntar.
   las opciones de defensa 'eva' | 'parry' | 'contra'). El botón dice «🎲 Tirar PdG · 1d6+1» con un 🔍 (`lupaRegistrar('duelo|', …)` en `lupa.js`: el
   desglose de la página + «Esta tirada»); `Duelo.conVistas(d, ops, h)` les pone el 🔍 a las opciones de defensa. Lo tienen `FichaDuelo`, `CreepDuelo`
   e `InvDuelo` (la fórmula sale de las mismas tiradas, sin publicarlas). `lupa.js` acepta proveedores por prefijo: `lupaRegistrar(prefijo, fn)`.
+- **El contador de los estados baja al EMPEZAR el turno** (P177, dueño, 2026-10-08): `Combatiente.empezarTurnoEstados(estados, campos)` (cuenta y
+  después dispara) en el inicio del turno propio de personajes, invocaciones y creeps; `terminarTurnoEstados(estados)` en el fin (solo saca la marca
+  `recien`). `agregarEstado` marca `recien` todo lo que pone, renueva o acumula: si fue fuera de su turno, el primer inicio no descuenta. El ⟳
+  Mantenimiento de la ronda sigue con `pasarTurnoEstados` (`invInicio/invFin(inv, true)`, `inicioCreep/finCreep(sc, true)`).

@@ -470,7 +470,8 @@ const CreepAcciones = (() => {
     return h;
   }
   // Lo de un creep al empezar su vuelta: ataques, armas especiales y su espera, Saque rápido, cooldowns, lo que se dispara y No2 al máximo.
-  function inicioCreep(sc){
+  // `mant` = el ⟳ Mantenimiento de la ronda: solo dispara (el fin cuenta), como antes. Sin él, el turno propio (P177: cuenta y dispara).
+  function inicioCreep(sc, mant){
     sc.ataquesTurno = 0;
     sc.usosEspecial = {};   // el No2 de las armas especiales vuelve a 1 (y los orbes, a su uso por turno); también la marca del primer golpe
     Object.keys(sc.esperaEspecial || {}).forEach(k => { sc.esperaEspecial[k] = Math.max(0, num(sc.esperaEspecial[k]) - 1); if(!sc.esperaEspecial[k]) delete sc.esperaEspecial[k]; });   // la espera de sus varitas
@@ -478,7 +479,9 @@ const CreepAcciones = (() => {
     let enCooldown = 0;
     (sc.habilidades || []).forEach(h => { if(num(h.cdActual) > 0){ h.cdActual = Math.max(0, num(h.cdActual) - 1); enCooldown++; } });
     const v = Combatiente.vencerAlEmpezar(sc.estados); sc.estados = v.quedan;   // Titilando se va al empezar su turno
-    const d = Combatiente.dispararEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno', resFuego: C().resElemental(sc, 'fuego')});
+    const d = mant ? Combatiente.dispararEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno', resFuego: C().resElemental(sc, 'fuego')})
+      : Combatiente.empezarTurnoEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno', resFuego: C().resElemental(sc, 'fuego')});
+    if(d.terminados && d.terminados.length){ sc.estados = d.quedan; if(d.terminados.some(es => C().modsAfectanHp(es.mods))) C().actualizarHpMaxPorCon(sc); }
     const rep = Combatiente.reporteTurno([...v.eventos, ...d.eventos]);
     const rg = Math.max(0, Math.floor(num(C().modTotal(sc, 'hpregen'))));   // Regeneración de vida del equipo (2026-10-07)
     if(rg > 0 && num(sc.hp) > 0){ d.hp += rg; rep.push(`Regeneración de vida: +${rg} HP`); }
@@ -488,8 +491,8 @@ const CreepAcciones = (() => {
     sc.nitros = Combatiente.recargarNo2(C().nitrosMax(sc), sc.nitros, sc.estados);
     return {rep, enCooldown, hpAplicado: d.eventos.filter(ev => ev.tipo === 'hp').length};
   }
-  function finCreep(sc){
-    const k = Combatiente.contarEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno'});
+  function finCreep(sc, mant){
+    const k = mant ? Combatiente.contarEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno'}) : Combatiente.terminarTurnoEstados(sc.estados);
     sc.estados = k.quedan;
     if(k.terminados.some(es => C().modsAfectanHp(es.mods))) C().actualizarHpMaxPorCon(sc);
     const rep = Combatiente.reporteTurno(k.eventos);
@@ -502,7 +505,7 @@ const CreepAcciones = (() => {
     if(numero !== undefined && !Combatiente.estadosEnMantenimiento(sc.finTurnoEn, numero)) return {rep: [], enCooldown: 0, hpAplicado: 0, vencidos: 0, enTurno: true};
     // Lo que se dispara va antes de recargar No2 (un Stun que vence ya no los topea): dispara, cuenta y recién ahí No2.
     const deuda = Math.min(0, num(sc.nitros));
-    const a = inicioCreep(sc), b = finCreep(sc);
+    const a = inicioCreep(sc, true), b = finCreep(sc, true);
     sc.nitros = Combatiente.recargarNo2(C().nitrosMax(sc), deuda, sc.estados);
     return {rep: [...a.rep, ...b.rep], enCooldown: a.enCooldown, hpAplicado: a.hpAplicado, vencidos: b.vencidos};
   }

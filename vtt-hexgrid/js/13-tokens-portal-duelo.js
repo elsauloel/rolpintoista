@@ -1264,11 +1264,13 @@ async function dueloEmpujar(d, n){
     if(!sig) break;
     c = sig; pasos++;
   }
-  if(!pasos){ momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: 'No hay lugar para empujarlo: queda donde está.', estado: 'listo'}); return {nota: 'no había lugar para empujarlo'}; }
+  if(!pasos){ momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: 'No hay lugar para empujarlo: choca y queda donde está. ✋ Daño de colisión a mano (a definir).', estado: 'listo'}); return {nota: 'chocó sin moverse (✋ daño de colisión a mano)'}; }
   try{ await coleccionTokens().doc(d.defensor.tokenId).update({col: c.col, fila: c.fila, ruta: firebase.firestore.FieldValue.delete()}); }
   catch(err){ console.error('No se pudo empujar:', err); return {manual: true, nota: `empujalo ${pasos} casillas a mano`}; }
-  momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: `Sale despedido ${pasos} casillero${pasos === 1 ? '' : 's'} lejos de ${d.atacante.nombre || 'quien lo tiró'}.`, estado: 'listo'});
-  return {nota: `lo empujó ${pasos} casillero${pasos === 1 ? '' : 's'}`};
+  // Si chocó antes de recorrer todo (un Sólido, un token o el borde): daño de colisión, ✋ a mano mientras se define (dueño, 2026-10-08, P178).
+  const choco = pasos < n ? ` Chocó contra algo: ✋ daño de colisión a mano (a definir).` : '';
+  momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: `Sale despedido ${pasos} casillero${pasos === 1 ? '' : 's'} lejos de ${d.atacante.nombre || 'quien lo tiró'}.${choco}`, estado: 'listo'});
+  return {nota: `lo empujó ${pasos} casillero${pasos === 1 ? '' : 's'}${choco ? ' y chocó (✋ daño de colisión a mano)' : ''}`};
 }
 // El viento que despeja (2026-10-08, vendaval): borra la niebla y el fuego (terreno incendiado o zona de fuego) que tocan esas casillas.
 // (dueño, 2026-10-08): despeja SOLO las casillas que toca — una niebla o un fuego de varias casillas pierde esas y el resto queda (pasa a forma

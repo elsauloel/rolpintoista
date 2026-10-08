@@ -1580,7 +1580,7 @@ prueba('Buenas, tanda 1 (2026-10-08): trampa portal + 2, báculo de sangre (10 %
   const luz = cat('esp-buena-varita-de-la-luz-flotante'), z = Combatiente.zonaDeHab({nombre: 'Luz'}, luz.especial.duelo, {fichaId: 'f', tipo: 'pj'});
   igual([portal.salvacion.dif, portal.portal.rango, c.sp, c.vida === Math.ceil(hpmax / 10), /HP/.test(FichaAcciones.costoEspecialTxt(S, S.inventario[0])), hab.riesgo,
          z.zonaInmediata, z.zonaLuz, z.zonaEstado.nombre, z.radio],
-    [11, 6, 0, true, true, {si: 1, dano: '1d4', porCada: true}, true, true, 'Marcado', 1]);
+    [11, 6, 0, true, true, {si: 1, dano: '1d6', porCada: true}, true, true, 'Marcado', 1]);
 });
 prueba('Buenas, tanda 2 (2026-10-08): campo de estática (inmediata, por paso), muro de fuego en línea, chorro de lava en camino, muro de pilares en línea', () => {
   const cat = id => CATALOGO_BASE.find(x => x.id === id);
@@ -1667,13 +1667,13 @@ prueba('Varita del caos (2026-10-08, segunda vuelta): el d20: 20 bien y elige qu
      {que: 'debuff', a: 'objetivo', bien: false, elige: 'rival'}, {que: 'debuff', a: 'objetivo', bien: true, elige: 'propio'}, {que: 'buff', a: 'objetivo', bien: false, elige: 'rival'},
      {que: 'buff', a: 'objetivo', bien: true, elige: ''}, {que: 'debuff', a: 'objetivo', bien: false, elige: ''}, false, [], 'Regeneración', true, {exito: 10}, {exito: 8}]);
 });
-prueba('proyectiles (2026-10-08): lo que puede hacer crítico tira PdG (no PdG.Esp); la inestable: 1d4 por cada 1 (porCada)', () => {
+prueba('proyectiles (2026-10-08): lo que puede hacer crítico tira PdG (no PdG.Esp); la inestable: 1d6 por cada 1 (porCada)', () => {
   const cat = id => CATALOGO_BASE.find(x => x.id === id);
   const plan = id => Combatiente.habEjecucion({nombre: 'X', tiradaStat: 'pdgmg'}, cat(id).especial.duelo, {stat: () => 5, etq: x => x});
   const pua = plan('esp-varita-de-la-pua-de-hielo'), forzada = Combatiente.habEjecucion({nombre: 'Y'}, {objetivo: 'enemigo', tira: 'pdgmg', contra: ['eva'], dano: true, critTipo: 8}, {stat: () => 5, etq: x => x});
   const arcana = plan('esp-varita-arcana'), ines = plan('esp-varita-inestable'), inesB = plan('esp-buena-varita-inestable');
   igual([pua.tira.stat, forzada.tira.stat, arcana.tira.stat, ines.riesgo, inesB.riesgo, cat('esp-varita-inestable').especial.dano],
-    ['pdg', 'pdg', 'pdgmg', {si: 1, dano: '1d4', porCada: true}, {si: 1, dano: '1d4', porCada: true}, '1d8']);
+    ['pdg', 'pdg', 'pdgmg', {si: 1, dano: '1d6', porCada: true}, {si: 1, dano: '1d6', porCada: true}, '1d8']);
 });
 prueba('varitas Comunes de arena y portal (2026-10-07): la trampa se suelta contra tu Ef.Esp y frena al salir; la zona igual; el portal aliado va al mapa', () => {
   const sc = creepPrueba({esp: 9});
@@ -1726,7 +1726,7 @@ prueba('torso blando: la Túnica de sangre paga el SP de un arma especial con vi
 });
 /* ---------- Turno propio (2026-10-06, dueño, P161: turno completo) ---------- */
 grupo('Turno propio');
-prueba('el veneno pega al ponerlo, después al empezar cada turno, y el contador baja al terminarlo (N turnos = N veces)', () => {
+prueba('el veneno pega al ponerlo y después al empezar cada turno; el contador baja al EMPEZAR (P177): puesto fuera de su turno, su primer inicio no descuenta (N turnos = N veces)', () => {
   const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, hp: 10, nitros: 0, efectos: []}).S);
   const ui = {fijarHp: v => FichaAcciones.fijarHp(S, v)};
   const r = Combatiente.agregarEstado(S.efectos, {id: 'v', nombre: 'Veneno', hpturno: -1, stacks: 2, stacksturno: -1, esVeneno: true, turnos: 2, activo: true});
@@ -1740,7 +1740,13 @@ prueba('el veneno pega al ponerlo, después al empezar cada turno, y el contador
   FichaMantenimiento.inicioTurno(S, ui, 'k2', '', [], 6);
   const hp3 = S.hp;
   FichaMantenimiento.finTurno(S, ui, 'k2', '', [], 6);
-  igual([d.hp, hp1, hp2, no2 > 0, otra, hp3, S.efectos.length, S.finTurnoEn, i1.rep.some(l => /Veneno/.test(l))], [-2, 8, 8, true, null, 7, 0, 6, false]);
+  const quedan2 = S.efectos.length;
+  FichaMantenimiento.inicioTurno(S, ui, 'k3', '', [], 7);
+  // Puesto en su propio turno: el fin de ese turno le saca lo «recién» y el inicio siguiente ya descuenta.
+  const r2 = Combatiente.agregarEstado(S.efectos, {id: 'p', nombre: 'Pajaritos', turnos: 1, activo: true});
+  FichaMantenimiento.finTurno(S, ui, 'k3', '', [], 7);
+  FichaMantenimiento.inicioTurno(S, ui, 'k4', '', [], 8);
+  igual([d.hp, hp1, hp2, no2 > 0, otra, hp3, quedan2, S.efectos.length, S.hp, S.finTurnoEn, i1.rep.some(l => /Veneno/.test(l)), r2.ok], [-2, 8, 8, true, null, 7, 1, 0, 7, 8, false, true]);
 });
 prueba('con turno propio, el ⟳ Mantenimiento de la ronda no toca nada; sin turnos en el Mantenimiento anterior, vuelve', () => {
   const base = () => FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, hp: 10, nitros: 0, turno: 4,
@@ -1754,7 +1760,7 @@ prueba('con turno propio, el ⟳ Mantenimiento de la ronda no toca nada; sin tur
   FichaMantenimiento.aplicar(S3, ui(S3), 8);
   igual([r1.enTurno, S1.hp, S1.nitros, S1.turno, S2.hp, S2.efectos[0].turnos, S3.hp], [true, 10, 0, 4, 8, 2, 8]);
 });
-prueba('creeps: el turno propio (dispara al empezar, cuenta al terminar) y el Mantenimiento que no los toca; lo ya disparado no vuelve a pegar', () => {
+prueba('creeps: el turno propio (al empezar cuenta y después dispara, P177) y el Mantenimiento que no los toca; lo ya disparado no vuelve a pegar', () => {
   const sc = creepPrueba({nitros: 0, estados: [{id: 'v', nombre: 'Veneno', hpTurno: -1, stacks: 2, stacksTurno: -1, turnos: 2, activo: true}]});
   const a = CreepAcciones.inicioTurno(sc, 'c1', 3);
   const hpA = sc.hp, no2 = sc.nitros;
@@ -1762,7 +1768,7 @@ prueba('creeps: el turno propio (dispara al empezar, cuenta al terminar) y el Ma
   const m = CreepAcciones.mantenimiento(sc, 4);
   const lista = [{id: 'r', nombre: 'Regeneración', hpturno: 2, turnos: 2, activo: true, disparado: true}];
   const p = Combatiente.pasarTurnoEstados(lista, {hp: 'hpturno', stacks: 'stacksturno'});
-  igual([a.hpAplicado, hpA, no2 > 0, sc.estados[0].stacks, b.vencidos, m.enTurno, p.hp, lista[0].turnos, lista[0].disparado], [1, 18, true, 1, 0, true, 0, 1, false]);
+  igual([a.hpAplicado, hpA, no2 > 0, sc.estados[0].stacks, b.vencidos, m.enTurno, p.hp, lista[0].turnos, lista[0].disparado], [1, 19, true, 1, 0, true, 0, 1, false]);
 });
 
 prueba('con el turno sabido, el Flash no pregunta: en turno ajeno cobra el doble y avisa; en el propio, lo normal', async () => {

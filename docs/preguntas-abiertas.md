@@ -835,11 +835,16 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   vieja con «+Rango de casteo» en un inventario suma al Rango.
 
 
-- ⏳ **P175. Varita del vendaval: el empuje ahora se resiste (Res.Esp) — ¿qué le damos a cambio?** (dueño, 2026-10-08). Ya quedó: PdG.Esp contra
+- ✅ **P175. Varita del vendaval: el empuje ahora se resiste (Res.Esp) — ¿qué le damos a cambio?** (dueño, 2026-10-08). Ya quedó: PdG.Esp contra
   Res.Esp para el empuje; despejar niebla y fuego no se resiste y solo saca las casillas que toca. Opciones: bajarle el precio (80 → 65), sumarle daño
-  directo (1d4 arcano) o un % de Escarcha (se pisa con la Ráfaga helada, que es la de hielo). Propuesta: precio 65 y sin daño (es una de utilidad).
-- ⏳ **P176. Varita inestable: afinar el riesgo** (dueño, 2026-10-08, «cómo era antes, afinemos»). Antes (Buena): 2d6 y, si salía algún 1, 2d4 a vos
-  (≈30 % de las veces, ≈1,5 de daño propio en promedio). Ahora: 1d4 por cada 1 (≈0,8 en promedio). Común: 1d8 y 1d4 con el 1 (≈0,3).
-- ⏳ **P177. ¿Los turnos de un estado se descuentan al EMPEZAR el turno (antes de que pegue) en vez de al terminarlo?** (dueño, 2026-10-08, «ayudame a
+  directo (1d4 arcano) o un % de Escarcha (se pisa con la Ráfaga helada, que es la de hielo). Propuesta: precio 65 y sin daño (es una de utilidad). **Decidido (dueño, 2026-10-08): 65 DDE, sin daño, y tiene fuego amigo** (empuja también a los aliados del cono). Hecho.
+- ✅ **P176. Varita inestable: afinar el riesgo** (dueño, 2026-10-08, «cómo era antes, afinemos»). Antes (Buena): 2d6 y, si salía algún 1, 2d4 a vos
+  (≈30 % de las veces, ≈1,5 de daño propio en promedio). Ahora: 1d4 por cada 1 (≈0,8 en promedio). Común: 1d8 y 1d4 con el 1 (≈0,3). **Decidido (dueño, 2026-10-08): Buena 2d6 y 1d6 por cada 1; Común 1d8 y 1d6 con el 1.** Hecho.
+- ✅ **P177. ¿Los turnos de un estado se descuentan al EMPEZAR el turno (antes de que pegue) en vez de al terminarlo?** (dueño, 2026-10-08, «ayudame a
   pensarlo»). Hoy: lo que «sucede» (veneno, regeneración) pega al empezar el turno de quien lo tiene; el contador baja al terminar su turno. Ver la
-  respuesta del 2026-10-08 en la conversación (y `docs/estados-turnos.md`).
+  respuesta del 2026-10-08 en la conversación (y `docs/estados-turnos.md`). **Decidido y hecho (dueño, 2026-10-08):** el contador baja al EMPEZAR
+  el turno de quien lo tiene, antes de que pegue; lo puesto fuera de su turno no descuenta en su primer inicio (le toca el turno entero). Así uno de N
+  turnos dura N rondas completas desde que se aplica. El ⟳ Mantenimiento de la ronda (sin orden de turnos) sigue como antes. `Combatiente.empezarTurnoEstados`
+  / `terminarTurnoEstados`, la marca `recien` que pone `agregarEstado`.
+- ⏳ **P178. Daño de colisión** (dueño, 2026-10-08, vendaval): si un empujón choca contra algo (un Sólido, un token, el borde) antes de recorrer todo, hay
+  daño de colisión — a definir cuánto y a quién (¿también a aquello contra lo que choca?). Hoy el mapa lo avisa en la Crónica: «✋ daño de colisión a mano».

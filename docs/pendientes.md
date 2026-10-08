@@ -240,7 +240,7 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   `hoja-de-ruta-rework-catalogo.md` (ej.: Sombrero humectante, +1 a la regeneración de SP).
 - [ ] **Solicitar un ítem** (dueño, 2026-10-05, para más adelante): un jugador entra a la ficha de otro, mira su mochila y aprieta «🙋 Solicitar»
   en un ítem; al dueño le llega el pedido y lo acepta o no (si acepta, es una oferta de las de 🤝, con su reserva). Se puede armar sobre los paquetes de
-  `comun/intercambio.js` (como el pedido de la Alforja compartida, pero contestado a mano). Fuera de combate; en combate, ¿solo al lado y con No2?
+  `comun/intercambio.js` (como el pedido de la Alforja compartida, pero contestado a mano). **Dueño (2026-10-08): igual que dar** — fuera de combate, a cualquiera; en combate, con un aliado al lado aparece «🙋 Pedirle un ítem», que muestra su inventario; al otro le aparece «Fulanito te está pidiendo un ítem» (acepta o no), y se cobra como dar.
 - [x] **♻ Convertir en despojos** (dueño, 2026-10-05): hecho — cualquier ítem de la mochila, en cualquier momento; un cuarto del precio de compra (como el
   botín que nadie toma); en combate 1 No2; línea en la Mesa (`Intercambio.botonDespojos`, `comun/intercambio.js`).
 - [ ] **Baúles móviles** (dueño, 2026-10-05, a futuro): por una quest u otro hallazgo, un baúl que sigue al grupo por el bosque o las cuevas

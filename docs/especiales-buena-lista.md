@@ -40,7 +40,7 @@ resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (
 | Varita del vendaval | Cono: empuja 2 a todos; apaga el fuego y despeja la niebla que toca. · 1 · 80 |
 | Varita inestable | 2d6 arcano directo; si sale algún 1, te hacés 2d4. · 2 · 100 |
 | Varita del blink | Te teletransportás (o a un aliado que ves) hasta 3 casillas; una vez por turno. · 3 · 95 |
-| Varita de la luz flotante | Luz de radio 2 en una casilla, 2 turnos. **Se queda** (dueño, 2026-10-08: no era para sacarla); a definir qué pasa con «revela lo oculto» (no le cierra que sea permanente). · 1 · 80 |
+| Varita de la luz flotante | Luz de radio 2 en una casilla, 2 turnos; lo oculto que está adentro se ve **solo mientras dura la luz** (al apagarse, vuelve a quedar oculto). Dueño, 2026-10-08. · 1 · 80 |
 | Báculo de sangre | 1d8 arcano + ¼ de tu Ef.Esp; cada uso cuesta el 10 % de tu vida máxima (para arriba) en vez de SP. · — · 90 |
 | Varita de cargas | La Bola de fuego Común, 3 usos por combate sin SP. · — · 120 |
 | Varita gemela | Aceite o Bola de fuego: elegís al usarla (el SP del que elegís). · 1 o 2 · 95 |

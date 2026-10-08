@@ -424,13 +424,9 @@ function dibujar(){
       ctx.strokeStyle = disp ? 'rgba(232,90,80,1)' : 'rgba(255,200,60,1)';
       ctx.lineWidth = 3.5 / z; ctx.stroke();
       ctx.setLineDash([]);
-      const pT = hexCentro(celdas[0].col, celdas[0].fila);
-      ctx.save();
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.font = `700 ${18 / z}px system-ui, sans-serif`;
-      ctx.fillStyle = disp ? '#FF6A60' : '#FFC46B';
-      ctx.fillText(disp ? '✖' : '⚠', pT.x, pT.y);
-      ctx.restore();
+      // Su ficha redonda con un cepo (dueño, 2026-10-08), como el arma en el piso: la ve quien ve la trampa.
+      const cT = typeof trampaCentro === 'function' ? trampaCentro(el) : celdas[0];
+      trampaFichaDibujar(hexCentro(cT.col, cT.fila), z, disp);
       const dst = destinoParsear(el.trampaDestino) || portalFijoDe(el);   // también el portal de la Varita del portal
       if(dst){   // trampa de teleport: se marca el destino (lo ve quien ve la trampa)
         const pD = hexCentro(dst.col, dst.fila);
@@ -1159,3 +1155,36 @@ function tokenEn(x, y){
   return null;
 }
 
+
+// 🪤 La ficha redonda de una trampa (dueño, 2026-10-08: «un token redondo con una trampa de osos»), como la del arma en el piso: un cepo abierto
+// visto un poco de costado — el aro de las mandíbulas con los dientes para arriba, el plato al medio y los resortes a los costados.
+// Armada: borde dorado; disparada: roja, con una ✖ encima.
+function trampaFichaDibujar(p, z, disp){
+  const R = HEX * 0.62, r = R * 0.6, cy = r * 0.2, ry = r * 0.45, metal = disp ? '#C79C97' : '#DAD5CD';
+  ctx.save();
+  ctx.beginPath(); ctx.arc(p.x, p.y, R, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(28,24,26,.92)'; ctx.fill();
+  ctx.lineWidth = 3 / z; ctx.strokeStyle = disp ? '#E85A50' : '#FFC83C'; ctx.stroke();
+  ctx.translate(p.x, p.y);
+  ctx.fillStyle = metal; ctx.strokeStyle = metal; ctx.lineJoin = 'round';
+  const dientes = desde => { for(let i = 1; i <= 4; i++){   // los dientes de una mandíbula, para arriba
+    const a = desde + i * Math.PI / 5, x = Math.cos(a) * r, y = cy + Math.sin(a) * ry, w = r * 0.13;
+    ctx.beginPath(); ctx.moveTo(x - w, y); ctx.lineTo(x, y - r * 0.42); ctx.lineTo(x + w, y); ctx.closePath(); ctx.fill();
+  } };
+  dientes(Math.PI);   // la de atrás
+  ctx.lineWidth = r * 0.11;
+  [-1, 1].forEach(s => {   // los resortes: una barra con dos vueltas
+    ctx.beginPath(); ctx.moveTo(s * r, cy); ctx.lineTo(s * r * 1.5, cy); ctx.stroke();
+    [1.2, 1.38].forEach(k => { ctx.beginPath(); ctx.ellipse(s * r * k, cy, r * 0.06, r * 0.15, 0, 0, Math.PI * 2); ctx.stroke(); });
+  });
+  ctx.lineWidth = r * 0.14;
+  ctx.beginPath(); ctx.ellipse(0, cy, r, ry, 0, 0, Math.PI * 2); ctx.stroke();   // el aro
+  ctx.beginPath(); ctx.ellipse(0, cy, r * 0.3, ry * 0.32, 0, 0, Math.PI * 2); ctx.fillStyle = '#8F8A84'; ctx.fill();   // el plato
+  ctx.lineWidth = r * 0.06; ctx.stroke(); ctx.fillStyle = metal;
+  dientes(0);   // la de adelante
+  if(disp){
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = `700 ${R * 0.9}px system-ui, sans-serif`;
+    ctx.fillStyle = 'rgba(255,106,96,.95)'; ctx.fillText('✖', 0, R * 0.04);
+  }
+  ctx.restore();
+}

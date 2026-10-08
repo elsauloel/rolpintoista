@@ -1441,3 +1441,4 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   **Lo propio sin usar → despojos** (2026-10-08): la Polilla activa (`polillaAlTerminar`, js/25) y las trampas propias (`Recibidos.trampasADespojos`).
   **Regla nueva** (cualquiera de la partida borra un elemento `trampa`): hay que pegarla.
 
+- **🪤 La ficha redonda de una trampa** (2026-10-08, dueño; `trampaFichaDibujar` en `js/05-vista-y-dibujo.js`): quien ve la trampa (`puedeVerElemento`: su equipo, la descubierta, el GM, una luz) la ve además con una ficha redonda en su centro (`trampaCentro`) con un cepo de oso dibujado a mano (no hay emoji de cepo): borde dorado armada, roja con ✖ disparada. Reemplaza el ⚠ / ✖ que había. La superficie dorada y la flor celeste siguen igual.

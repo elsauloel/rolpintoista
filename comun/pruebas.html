@@ -381,7 +381,7 @@ prueba('alcance: rango, adyacente, fijo; en automático lo especial usa el Rango
     Combatiente.alcanceHab({alcance: 'fijo', alcanceN: 3}, '', st), Combatiente.alcanceHab({}, 'pdgmg', st), Combatiente.alcanceHab({}, 'pdg', st)], [6, 6, 1, 3, 6, 0]);
 });
 prueba('la trampa que coloca una habilidad: la salvación contra el Ef.Esp de quien la coloca (Varita del portal, 2026-10-07)', () => {
-  const v = CATALOGO_BASE.find(i => i.nombre === 'Varita del portal');
+  const v = CATALOGO_BASE.find(i => i.id === 'esp-varita-del-portal');   // (la Varita de la trampa portal)
   const h = {nombre: v.nombre, trampaColocar: v.especial.trampaColocar};
   const t = Combatiente.trampaDeHab(h, id => ({dmgesp: 9, des: 4}[id] || 0)), sinValor = Combatiente.trampaDeHab(h);
   igual([t.salvacion.stat, t.salvacion.dif, t.detectar, sinValor.salvacion.dif], ['resmg', 9, 9, 7]);
@@ -1562,13 +1562,25 @@ prueba('guantes de Buena calidad: el primer conjuro (−1 SP, solo el primer uso
   const t = Combatiente.trampaDeHab({nombre: 'Cepo', trampaColocar: {nombre: 'Cepo'}}, st => st === 'des' ? 5 : st === 'trampaoculta' ? 2 : 0);
   igual([primero, segundo, esp, t.detectar], [2, 3, 1, 7]);
 });
-prueba('armas especiales de Buena (2026-10-07): 20 (primera tanda y grupo 1), con su SP; la Bola de fuego mayor agarra aliados, la Sanguijuela drena la mitad, el báculo suma ¼ del Ef.Esp', () => {
+prueba('armas especiales de Buena (2026-10-07): 19 (primera tanda y grupo 1, sin el Manotazo), con su SP; la Bola de fuego mayor agarra aliados, la Sanguijuela drena la mitad, el báculo suma ¼ del Ef.Esp', () => {
   const buenas = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-buena-'));
   const sc = creepPrueba({esp: 12});
   const plan = id => { const it = {...structuredClone(CATALOGO_BASE.find(x => x.id === id)), id: 'x'}; const h = CreepAcciones.habDeEspecialCreep(sc, it); return {h, e: Combatiente.habEjecucion(h, h.duelo, {})}; };
   const bola = plan('esp-buena-varita-de-la-bola-de-fuego-mayor').e, sang = plan('esp-buena-varita-sanguijuela').e, sabio = plan('esp-buena-baculo-del-sabio').h;
-  igual([buenas.length, buenas.every(i => i.especial && i.especial.sp >= 1 && /Cuesta 1 No2/.test(i.detalle)), !!bola.fuegoAmigo, bola.radio, sang.dano.drenaPct, sang.dano.directo, /^1d8\+\d+$/.test(sabio.tiradaExtra)],
-    [20, true, true, 2, 50, true, true]);
+  igual([buenas.length, buenas.every(i => i.especial && i.especial.sp >= 1 && /Cuesta \d No2/.test(i.detalle)), !!bola.fuegoAmigo, bola.radio, sang.dano.drenaPct, sang.dano.directo, /^1d8\+\d+$/.test(sabio.tiradaExtra)],
+    [19, true, true, 2, 50, true, true]);
+});
+prueba('varitas Comunes de arena y portal (2026-10-07): la trampa se suelta contra tu Ef.Esp y frena al salir; la zona igual; el portal aliado va al mapa', () => {
+  const sc = creepPrueba({esp: 9});
+  const it = id => ({...structuredClone(CATALOGO_BASE.find(x => x.id === id)), id: 'x'});
+  const trampa = Combatiente.trampaDeHab(CreepAcciones.habDeEspecialCreep(sc, it('esp-varita-de-la-trampa-de-arena')), st => st === 'dmgesp' ? 9 : 0);
+  const ar = it('esp-varita-de-arena-movediza'), z = Combatiente.zonaDeHab({nombre: 'Arena'}, ar.especial.duelo, {fichaId: 'f', tipo: 'pj', tiraValor: 9});
+  const S = FichaGuardado.normalizar({}).S; S.inventario = [{...it('esp-varita-del-portal-aliado'), equipado: true}];
+  const h = FichaAcciones.habDeArmaEspecial(S, S.inventario[0]);
+  const purga = CATALOGO_BASE.find(x => x.id === 'esp-buena-varita-de-la-purga');
+  igual([trampa.soltar.dif, trampa.lento, trampa.dejaZona, z.zonaEstado.nombre, z.zonaEstado.soltar.dif, z.zonaEstado.lento, z.zonaColor, h.portalMapa.distancia, h.portalMapa.turnos,
+         purga.especial.no2, !!CATALOGO_BASE.find(x => x.id === 'esp-buena-varita-del-manotazo')],
+    [9, 2, true, 'Inmovilizado', 9, 2, '#C2A060', 4, 1, 2, false]);
 });
 prueba('grupo 1 de Buena (2026-10-07): Desarmado (no ataca, levantar el arma 1 No2), Ceguera (−2 PdG), la purga y la cadena con efectos a todos', () => {
   const sc = creepPrueba({nitros: 3, habilidades: [{id: 'm', nombre: 'Manotazo', efectoNombre: 'Desarmado'}, {id: 'c', nombre: 'Eclipse', efectoNombre: 'Ceguera'}]});
@@ -2465,11 +2477,11 @@ prueba('✨ armas especiales de un creep (2026-10-05): No2 como un personaje, el
   igual([h.tiradaExtra, h.duelo.objetivo, !!p1.error, sc.nitros < 6, /espera/.test(p2.error || ''), !!escudo, espera1, (sc.esperaEspecial || {})[varita.id], JSON.stringify(varita) === antes, CreepAcciones.ESPERA_POR_SP(1), CreepAcciones.ESPERA_POR_SP(4)],
     ['1d4', 'enemigo', false, true, true, true, 1, undefined, true, 1, 2]);
 });
-prueba('✨ armas especiales Comunes (2026-10-05): 30 armas y 3 orbes; cada una automatiza algo o aclara lo que queda a mano', () => {
+prueba('✨ armas especiales Comunes (2026-10-05): 33 armas y 3 orbes; cada una automatiza algo o aclara lo que queda a mano', () => {
   const L = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-') && i.tier === 'Común');   // (las de Buena y Raro, en sus pruebas)
   const armas = L.filter(i => i.especial), orbes = L.filter(i => i.orbe);
-  const sinNada = armas.filter(i => !i.especial.duelo && !i.especial.trampaColocar && !/✋/.test(i.detalle)).map(i => i.nombre);
-  igual([armas.length, orbes.length, L.every(i => i.tier === 'Común' && i.ranuras === 1), sinNada, armas.every(i => /No2/.test(i.detalle))], [30, 3, true, [], true]);
+  const sinNada = armas.filter(i => !i.especial.duelo && !i.especial.trampaColocar && !i.especial.portalMapa && !/✋/.test(i.detalle)).map(i => i.nombre);
+  igual([armas.length, orbes.length, L.every(i => i.tier === 'Común' && i.ranuras === 1), sinNada, armas.every(i => /No2/.test(i.detalle))], [33, 3, true, [], true]);
 });
 prueba('mochila (dueño, 2026-10-05, P158): todo ítem ocupa al menos 1 ranura (una pila, 1), salvo que diga lo contrario; el catálogo, todo en 1', () => {
   const R = FichaEquipo.ranuras;

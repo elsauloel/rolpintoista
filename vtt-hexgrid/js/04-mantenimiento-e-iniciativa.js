@@ -707,11 +707,13 @@ $('#modo-switch').onclick = async () => {
 // una vez, o abrí gm-tools).
 /* Terreno lento (2026-10-04, dueño: arena movediza): una trampa ya disparada con `lento: N` adentro del JSON de trampaEstado hace que cada
    paso que SALE de una de sus casillas cueste N No2 (o lo de siempre, si es más: Rengo). → el costo acumulado de cada paso de la ruta. */
+// También una zona con `lento` en su zonaEstado (2026-10-07, Varita de arena movediza).
 function lentoEn(col, fila){
   let n = 0;
   elementos.forEach(el => {
-    if(!el.trampa || !el.disparada || !el.trampaEstado) return;
-    let e = null; try{ e = JSON.parse(el.trampaEstado); }catch(x){}
+    const json = el.trampa && el.disparada && el.trampaEstado ? el.trampaEstado : el.zona && el.zonaEstado ? el.zonaEstado : '';
+    if(!json) return;
+    let e = null; try{ e = JSON.parse(json); }catch(x){}
     if(!e || !(num(e.lento) > 0)) return;
     if(celdasDeElemento(el).some(c => c.col === col && c.fila === fila)) n = Math.max(n, num(e.lento));
   });

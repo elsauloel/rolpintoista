@@ -1944,6 +1944,12 @@ Con la calculadora recalibrada (varitas directas con dado fijo, báculos con ¼ 
   | Trampa de arena (Buena) | Flor oculta, **2 turnos** (dueño), la misma dinámica · **2** · 80 |
   | Arena movediza (Común) | Flor a la vista, 2 turnos; al entrar, Res.CC contra tu Ef.Esp; la misma dinámica · 2 · 65 |
   | Arena movediza (Buena) | Aparece bajo los pies (no se esquiva), Res.CC, 2 turnos, la misma dinámica · 3 · 110 |
+- **Comunes de portal y arena cargadas (2026-10-07, «carguemos esto»):** Varita del portal aliado (`especial.portalMapa {turnos:1, distancia:4}`:
+  el segundo portal a 4 o menos del primero; los portales recuerdan quién los abrió y duran sus turnos), Varita de la trampa de arena (la trampa
+  de arena de una casilla: `soltar.difStat`, `lento: 2`, deja 2 turnos de arena) y Varita de arena movediza (zona con `zonaEstado` Inmovilizado +
+  `soltar` contra el Ef.Esp de quien la tira + `lento`; el mapa frena también en esas zonas, `lentoEn`). La Varita del portal Común (la trampa)
+  pasa a llamarse Varita de la trampa portal. **Manotazo sacado** (lo cubre la Expelliarmus), **Purga arranca en 2 No2**, **Luz flotante
+  descartada**, **Expelliarmus Rara confirmada**. Tokens redondos: **solo los objetos** (dueño).
 - **«Siempre los turnos contando al caster»** (dueño, 2026-10-07): como las zonas (P172), **las trampas que coloca alguien y la zona que dejan
   al dispararse** duran los turnos de quien las puso. ✅ Hecho: la trampa recuerda quién la puso (`de` en su trampaEstado, comun/tokens-auto.js);
   el mapa le descuenta un turno al empezar cada turno de esa persona (js/07 `zonasDelQueLaTiro`) y, mientras esté en el orden de turnos, no la

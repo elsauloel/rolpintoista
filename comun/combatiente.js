@@ -785,7 +785,7 @@ const Combatiente = (() => {
     const dif = !!(c.dano && c.danoDiferencia);
     return {tipo: 'zona-persistente-habilidad', fichaId: o.fichaId, casteadorTipo: o.tipo, nombre: h.nombre,
       radio: Math.max(1, nf(c.radio) || 1), zonaTurnos: Math.max(1, nf(c.zonaTurnos) || 3), zonaAmiga: !!c.zonaAmiga, zonaAltura: c.zonaAltura || '',
-      zonaEstado: c.zonaEstado || null, zonaDano: c.dano && !dif ? formulaDanoHab(h, c, o.X) : (dif && c.danoSuma ? String(c.danoSuma) : ''),   // con «la diferencia», `danoSuma` se le suma (miasma: + 1d4)
+      zonaEstado: zonaEstadoDe(c, o), zonaDano: c.dano && !dif ? formulaDanoHab(h, c, o.X) : (dif && c.danoSuma ? String(c.danoSuma) : ''),   // con «la diferencia», `danoSuma` se le suma (miasma: + 1d4)
       zonaIgnoraDef: c.dano ? (c.ignoraDano !== undefined ? !!c.ignoraDano : (c.tipoDano || 'arcano') !== 'fisico') : false,
       zonaDirecto: !!(c.dano && (c.danoDirecto || c.trueDamage) && (c.tipoDano || 'arcano') !== 'fisico'),   // daño directo: no lo frena la Defensa especial (2026-10-07)
       zonaDanoDif: dif, zonaDanoTipo: c.dano ? (TIPO_DANO_NOMBRE[c.tipoDano || 'arcano'] || '') : '',
@@ -794,7 +794,15 @@ const Combatiente = (() => {
       // La tirada de la zona (2026-10-02, P143): el stat de quien la crea y su VALOR en ese momento; el mapa lo tira cada vez que la zona
       // afecta a alguien (antes se tiraba una sola vez al ejecutar: `resistValor`, que sigue valiendo para las zonas viejas).
       tiraStat: c.tira || '', tiraValor: Number.isFinite(o.tiraValor) ? Math.round(o.tiraValor) : null,
-      ...(c.niebla ? {niebla: true} : {})};   // la niebla (2026-10-05, Varita de niebla): tapa la vista, no hace nada más
+      ...(c.niebla ? {niebla: true} : {}),   // la niebla (2026-10-05, Varita de niebla): tapa la vista, no hace nada más
+      ...(/^#[0-9a-fA-F]{6}$/.test(c.zonaColor || '') ? {zonaColor: c.zonaColor} : {})};
+  }
+  // El estado que deja la zona. Si se suelta contra un stat de quien la tira (2026-10-07, Varita de arena movediza: Fuerza contra tu Ef.Esp) y es el
+  // mismo stat que tira la zona, la dificultad es ese valor al crearla.
+  function zonaEstadoDe(c, o){
+    const e = c.zonaEstado || null;
+    if(!e || !e.soltar || !e.soltar.difStat || e.soltar.difStat !== c.tira || !Number.isFinite(o.tiraValor)) return e;
+    return {...e, soltar: {...e.soltar, dif: Math.max(1, Math.round(o.tiraValor))}};
   }
   // La trampa que coloca una habilidad, lista para el mapa: si no trae nombre propio, lleva el de la habilidad.
   // `valorDe(statId)` (2026-10-02, P145): el valor de un stat de quien la coloca — la dificultad para detectarla sale de su Destreza (trampas

@@ -134,25 +134,30 @@ async function portalDeHabilidad(msg){
   if(!$('#botonera-capa').hidden) escapeABotonera();
   const puntos = [];
   const pedir = () => elegirDestino(h => {
-    const yo = {col: t.col, fila: t.fila};
-    if(distanciaHex(h, yo) > alcance){ toast(`Ese punto queda a más de ${alcance} casilleros (tu Rango)`); pedir(); return; }
+    const yo = {col: t.col, fila: t.fila}, dist = Math.round(num(msg.distancia));
+    // Con `distancia` (2026-10-07, Varita del portal aliado): el primero, dentro del Rango; el segundo, a esa distancia o menos del primero.
+    if(dist > 0 && puntos.length){ if(distanciaHex(h, puntos[0]) > dist){ toast(`El segundo portal tiene que estar a ${dist} casillas o menos del primero`); pedir(); return; } }
+    else if(distanciaHex(h, yo) > alcance){ toast(`Ese punto queda a más de ${alcance} casilleros (tu Rango)`); pedir(); return; }
     if(puntos.some(p => p.col === h.col && p.fila === h.fila)){ toast('Elegí otra casilla: los dos portales no pueden estar en el mismo punto'); pedir(); return; }
     puntos.push(h);
     if(puntos.length < 2){ toast('Primer portal marcado: elegí el segundo'); pedir(); return; }
-    portalesCrear(puntos, msg.turnos, msg.nombre);
-  }, `<b>🌀 ${esc(msg.nombre || 'Invocar portal')}: elegí el portal ${puntos.length + 1} de 2</b> <span>clic en una casilla transitable a pie dentro de tu Rango (${alcance}) · Esc o clic derecho cancelan</span>`);
+    portalesCrear(puntos, msg.turnos, msg.nombre, msg.casteadorTipo ? {ref: msg.fichaId, tipo: msg.casteadorTipo} : null);
+  }, `<b>🌀 ${esc(msg.nombre || 'Invocar portal')}: elegí el portal ${puntos.length + 1} de 2</b> <span>clic en una casilla transitable a pie ${puntos.length && num(msg.distancia) > 0 ? `a ${Math.round(num(msg.distancia))} o menos del primero` : `dentro de tu Rango (${alcance})`} · Esc o clic derecho cancelan</span>`);
   pedir();
 }
-async function portalesCrear(puntos, turnos, nombre){
-  const n = Math.max(1, Math.round(num(turnos)) || 3), vence = Math.round(num(mantenimientoNumero)) + n;
+// `de` = {ref, tipo} de quien los abre (2026-10-07): con orden de turnos, duran SUS turnos (zonasDelQueLaTiro, js/07), como las zonas; el
+// Mantenimiento los vence una ronda más tarde, de respaldo.
+async function portalesCrear(puntos, turnos, nombre, de){
+  const n = Math.max(1, Math.round(num(turnos)) || 3), vence = Math.round(num(mantenimientoNumero)) + n + (de && iniciativa.orden.length ? 1 : 0);
   try{
     await Promise.all(puntos.map((p, i) => coleccionElementos().add({
       tipo: 'flor', origen: {col: p.col, fila: p.fila}, celdas: [0, 0], rotacion: 0, color: '#9B5FD0', alfa: 45, solido: false, invisible: false,
       imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true, turnos: n, venceMant: vence,
       portal: true, portalDestino: puntos[1 - i].col + ',' + puntos[1 - i].fila,
+      ...(de && de.ref ? {zonaCasteadorRef: String(de.ref).slice(0, 64), zonaCasteadorTipo: de.tipo === 'creep' ? 'creep' : 'pj'} : {}),
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     })));
-    toast(`🌀 ${nombre || 'Portales'} listos: duran ${n} turno${n === 1 ? '' : 's'} y solo los usan tus aliados`);
+    toast(`🌀 ${nombre || 'Portales'} listos: ${de && n === 1 ? 'duran hasta tu próximo turno' : `duran ${n} turno${n === 1 ? '' : 's'}`} y solo los usan tus aliados`);
   }catch(err){
     console.error('No se pudieron crear los portales:', err);
     toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudieron crear los portales');
@@ -261,7 +266,7 @@ function zonaPersistenteDeHabilidad(msg){
     estado: msg.zonaEstado, resistStat: msg.resistStat, resistValor: msg.resistValor, enMantenimiento: true, cadaPaso: false,
     casteadorRef: msg.fichaId, casteadorTipo: msg.casteadorTipo,
     danoDif: msg.zonaDanoDif, danoTipo: msg.zonaDanoTipo, tiraExtra: msg.zonaTiraExtra, nota: msg.zonaNota,
-    tiraStat: msg.tiraStat, tiraValor: msg.tiraValor, altura: msg.zonaAltura, directo: !!msg.zonaDirecto,
+    tiraStat: msg.tiraStat, tiraValor: msg.tiraValor, altura: msg.zonaAltura, directo: !!msg.zonaDirecto, color: msg.zonaColor,
   }), `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': marcá el centro' : 'Elegí el centro de la zona'}</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true);
 }
 // 🪤 Trampa de una habilidad ✨ automática (2026-09-30, pedido del dueño): quien la usa elige la casilla con un clic (antes quedaba

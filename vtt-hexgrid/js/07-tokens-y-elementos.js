@@ -401,7 +401,7 @@ function zonaEsperaSuFin(el, id){
 // Quién la puso, para contar sus turnos: la zona de una habilidad (zonaCasteadorRef) o una trampa que colocó alguien, y la zona que deja al
 // dispararse (`de` adentro de su trampaEstado, comun/tokens-auto.js; 2026-10-07, dueño: «siempre los turnos contando al caster»).
 function colocadorDe(el){
-  if(el.zona && el.zonaCasteadorRef) return {ref: el.zonaCasteadorRef, tipo: el.zonaCasteadorTipo === 'creep' ? 'creep' : 'pj'};
+  if((el.zona || el.portal) && el.zonaCasteadorRef) return {ref: el.zonaCasteadorRef, tipo: el.zonaCasteadorTipo === 'creep' ? 'creep' : 'pj'};   // (los portales, 2026-10-07)
   try{
     const de = (JSON.parse(el.trampaEstado || '{}') || {}).de;
     if(typeof de === 'string' && de.includes('|')){ const [ref, tipo] = de.split('|'); return {ref, tipo: tipo === 'creep' ? 'creep' : 'pj'}; }
@@ -417,7 +417,7 @@ async function zonasDelQueLaTiro(tokenId){
   if(!soyGM || !t || !t.fichaId) return [];
   const tipo = t.tipo === 'creep' ? 'creep' : 'pj', lineas = [];
   for(const [id, el] of elementos){
-    const c = (el.zona || el.trampa) && Math.round(num(el.turnos)) > 0 ? colocadorDe(el) : null;
+    const c = (el.zona || el.trampa || el.portal) && Math.round(num(el.turnos)) > 0 ? colocadorDe(el) : null;
     if(!c || c.ref !== String(t.fichaId) || c.tipo !== tipo || elementosVencidosBorrando.has(id)) continue;
     const quedan = Math.round(num(el.turnos)) - 1;
     try{
@@ -425,7 +425,7 @@ async function zonasDelQueLaTiro(tokenId){
         elementosVencidosBorrando.add(id);
         await borrarElemento(id);
         setTimeout(() => elementosVencidosBorrando.delete(id), 5000);
-        lineas.push(`Se fue ${el.zonaNombre || el.trampaNombre || 'la zona'} (terminaron sus turnos).`);
+        lineas.push(el.portal ? 'Se cerró un portal (terminaron sus turnos).' : `Se fue ${el.zonaNombre || el.trampaNombre || 'la zona'} (terminaron sus turnos).`);
       }else await coleccionElementos().doc(id).update({turnos: quedan});
     }catch(err){ console.error('No se pudo descontar el turno de la zona:', err); }
   }

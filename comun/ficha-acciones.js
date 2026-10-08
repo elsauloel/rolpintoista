@@ -606,7 +606,8 @@ const FichaAcciones = (() => {
     const dano = String(e.dano || '').trim();
     return {id: claveEsp(it), deItem: it.id, nombre: e.nombre || it.nombre, detalle: it.detalle || '', modo: 'auto',
       duelo: e.duelo ? structuredClone(e.duelo) : null, tiradaStat: (e.duelo && e.duelo.tira) || 'pdgmg',
-      tiradaExtra: dano ? dano + (suma > 0 ? `+${suma}` : '') : '', ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {})};
+      tiradaExtra: dano ? dano + (suma > 0 ? `+${suma}` : '') : '', ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {}),
+      ...(e.portalMapa ? {portalMapa: structuredClone(e.portalMapa)} : {})};   // los portales (2026-10-07, Varita del portal aliado)
   }
   // El «Qué hace» de un arma especial en la Botonera: su costo ahora y lo que hace (sin las notas de automatización).
   const ataqueEspecialMenu = (S, it) => {
@@ -704,6 +705,7 @@ const FichaAcciones = (() => {
         polaridad: 'buff', detalle: '', mods: [], ...structuredClone(propio)});
     }
     ui.colocarTrampa(it);
+    if(it.portalMapa && ui.enMapa) avisarZonaAlMapa(S, it, ui);   // los portales: se eligen los dos puntos en el mapa
     ui.terminar(it, null, 0, 0);
     aManoAlUsar(it.nombre, item.especial, ui);
     ui.cambio(['nitros', 'vitals', 'habilidades', 'efectos']);
@@ -947,7 +949,8 @@ const FichaAcciones = (() => {
     if(!h || !ui.enMapa() || !ui.yo().ref) return;
     // Invocar portal: le pide al mapa que deje elegir los dos puntos (dentro del Rango) y cree los portales.
     if(h.portalMapa){
-      try{ ui.alMapa('portal-habilidad', {fichaId: ui.yo().ref, turnos: Math.max(1, num(h.portalMapa.turnos) || 3), nombre: h.nombre}); }
+      // `distancia` (2026-10-07, Varita del portal aliado): el segundo, a esa distancia o menos del primero. Los turnos son los de quien los abre.
+      try{ ui.alMapa('portal-habilidad', {fichaId: ui.yo().ref, casteadorTipo: 'pj', turnos: Math.max(1, num(h.portalMapa.turnos) || 3), distancia: Math.max(0, num(h.portalMapa.distancia) || 0), nombre: h.nombre}); }
       catch(err){ console.error('No se pudo avisar el portal al mapa:', err); }
       return;
     }

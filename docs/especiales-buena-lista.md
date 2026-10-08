@@ -3,7 +3,7 @@
 Todas son de una mano (peso 1), salvo los báculos (dos manos, peso 2). «Directo» = ignora la Defensa especial (lo frena solo la
 resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (el No2 sube 1 por cada uso más en el turno).
 
-## ✅ Cargadas (20)
+## ✅ Cargadas (19)
 
 | Arma | Qué hace · SP · DDE |
 |---|---|
@@ -18,11 +18,10 @@ resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (
 | Varita de raíces | En la casilla que elijas: 1d4 arcano directo y 33 % de Inmovilizado. Dodge roll. · 1 · 80 |
 | Varita de la grieta | 1d6 arcano directo y −2 Defensa por 2 turnos. · 3 · 110 |
 | Varita del eclipse | 1d6 arcano directo y 25 % de **Ceguera** (1 turno: ve solo 1 casilla y −2 PdG). · 1 · 80 |
-| Varita del manotazo | 1d6 arcano directo y 33 % de **Desarme** (se le cae el arma; levantarla, 1 No2). · 1 · 80 |
 | Varita sanguijuela | 1d6 arcano directo y te curás la mitad de lo que hizo. · 2 · 80 |
 | Varita de la cosecha | 1d6 arcano directo y lo marca 3 turnos; si muere marcado, recuperás 2 SP y 2 de vida. · 3 · 120 |
 | Varita de cura mayor | Cura 2d8 a un aliado. · 3 · 110 |
-| Varita de la purga | A un aliado: le saca el estado malo más reciente. · 3 · 80 |
+| Varita de la purga | A un aliado: le saca el estado malo más reciente. Arranca en **2 No2** (dueño). · 3 · 80 |
 | Báculo de brasas | 1d6 de fuego + ¼ de tu Ef.Esp; 25 % de Quemadura. · 2 · 85 |
 | Báculo de escarcha | 1d6 de hielo + ¼ de tu Ef.Esp; 25 % de Escarcha. · 2 · 85 |
 | Báculo del sabio | 1d8 arcano + ¼ de tu Ef.Esp. · 2 · 90 |
@@ -41,7 +40,6 @@ resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (
 | Varita del vendaval | Cono: empuja 2 a todos; apaga el fuego y despeja la niebla que toca. · 1 · 80 |
 | Varita inestable | 2d6 arcano directo; si sale algún 1, te hacés 2d4. · 2 · 100 |
 | Varita del blink | Te teletransportás (o a un aliado que ves) hasta 3 casillas; una vez por turno. · 3 · 95 |
-| Varita de la luz flotante | Luz de radio 2 en una casilla, 2 turnos; revela lo oculto. · 1 · 80 |
 | Báculo de sangre | 1d8 arcano + ¼ de tu Ef.Esp; cada uso cuesta el 10 % de tu vida máxima (para arriba) en vez de SP. · — · 90 |
 | Varita de cargas | La Bola de fuego Común, 3 usos por combate sin SP. · — · 120 |
 | Varita gemela | Aceite o Bola de fuego: elegís al usarla (el SP del que elegís). · 1 o 2 · 95 |
@@ -50,7 +48,7 @@ resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (
 | Trampa de arena | Flor oculta, 2 turnos: Inmovilizado; Soltarse con Fuerza contra tu Ef.Esp (si falla, +1 turno); salir cuesta 2 No2 por paso. · 2 · 80 |
 | Arena movediza | Aparece bajo los pies (no se esquiva), Res.CC contra tu Ef.Esp, 2 turnos, la misma dinámica. · 3 · 110 |
 
-## 🆕 Nueva (a definir)
+## ✅ Rara
 
 | Arma | Qué hace · SP · DDE |
 |---|---|
@@ -62,6 +60,9 @@ resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (
 |---|---|
 | Varita del maleficio | −1 a la Res. crítico de un tipo a elección, 2 turnos, no acumulable: espera los grupos de buffs y debuffs (P173). |
 | Varita del escudo | Sacada: la Vida extra se acumula y era poco más que una cura. |
+| Varita del manotazo | Sacada (dueño, 2026-10-07): la Expelliarmus ya desarma. |
+| Varita de la luz flotante | Descartada (dueño, 2026-10-07): revelar lo oculto como efecto permanente no cierra. |
 
-En Común quedan por cargar: Portal para aliados (hasta 4, hasta tu próximo turno, 2 SP), Trampa de arena (una casilla oculta, 1 SP) y
-Arena movediza (flor a la vista, 2 turnos, 2 SP).
+En Común ✅ cargadas (2026-10-07): **Varita del portal aliado** (dos portales a 4 o menos uno del otro, solo tu bando, hasta tu próximo
+turno, 2 SP, 55), **Varita de la trampa de arena** (una casilla oculta, 1 SP, 40) y **Varita de arena movediza** (flor a la vista, 2 turnos,
+2 SP, 65). La Varita del portal (la trampa) pasa a llamarse **Varita de la trampa portal**.

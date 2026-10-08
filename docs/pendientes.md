@@ -283,10 +283,11 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Ocultar la calidad de los ítems a los jugadores** (dueño, 2026-10-07): el GM la ve; los jugadores no, «para no condicionar cuántos
   equipos hay comunes, cuántos de buena calidad: que juzguen de acuerdo a lo que sientan y lo que les venga bien». La calidad aparece hoy en la
   ficha (inventario, editor, botín, intercambio), la tienda y el catálogo (`.tier` en ~16 archivos de comun/). Pendiente de hacer.
-- [ ] **Varita Expelliarmus** (dueño, 2026-10-07: «que se llame Expelliarmus, como en Harry Potter»): PdG.Esp contra Res.Esp; si acierta, el
-  arma del rival vuela 2 casillas en una dirección al azar (1d6) y queda Desarmado; se puede usar como Flash; una vez por turno; 2 No2 + 2 SP;
-  cara. Falta: la calidad (propuesta Raro, 300 DDE) y programar el costo de 2 No2, el «una vez por turno» y el Flash en las armas especiales.
-  El arma en el piso ya está (js/27; falta pegar las reglas).
+- [x] **Varita Expelliarmus** (dueño, 2026-10-07): cargada, Rara, 300 DDE, con Flash, una vez por turno y 2 No2 + 2 SP; el arma en el piso (js/27).
+- [ ] **Flash y «una vez por turno» de las armas especiales en creeps e invocaciones** (hoy solo en la ficha / la Botonera de un personaje).
+- [ ] **Tokens de objeto redondos** (dueño, 2026-10-07: «solo los objetos», no los creeps): hoy un cofre o un barril se pone como NPC («Un NPC
+  o un objeto», borde gris), igual que una persona de la historia. Para que salga redondo hace falta separar un tipo **Objeto** en el panel de
+  colocar (js/09) y dibujarlo redondo como el arma en el piso (js/27).
 ## 6. Repaso de buffs y debuffs (en curso, 2026-09-21)
 - [ ] **Desarrollar los grupos de buffs y debuffs** (dueño, 2026-10-07, P173): qué se apila y qué no, por familia. Lo espera la Varita del
   maleficio (Buena) y cualquier efecto que dé un bono al crítico turno a turno.

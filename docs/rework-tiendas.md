@@ -182,3 +182,14 @@ tiendas: si está más cargado a una, sale en esa; si está balanceado, en cualq
 Receta tentativa (partes de 100): Herrero — armas 38, escudos 14, torso rígido 18, cabeza 12, manos 10, piernas 4, pies 4. Talabartería — a distancia
 22, armas livianas 12, torso blando 14, piernas 8, pies 8, manos 6, cabeza 4, cinturón 8, mochila 8, trampas 14, consumibles básicos 6 (stock fijo:
 Poción de HP). Bazar — igual que hoy. Una tienda guardada como «ramos» pasa a ser la nueva.
+
+### ✅ Decidido (dueño, 2026-10-08): una tienda, tres secciones
+No se quita Ramos ni se reparten en tiendas separadas: **una tienda con tres pestañas** (⚒ Herrería, 🧵 Talabartería, ✨ Bazar arcano) que abren a
+la vez. `GeneradorTiendas.SECCIONES` (recetas de arriba), `seccionDe(item)` (cada ítem sabe su sección: lo mágico al Bazar; trampas, armas a
+distancia, mochilas y lo suelto a la Talabartería; las armas de Tipo 4–6 a la Talabartería y de 8 o más a la Herrería; escudos a la Herrería;
+las armaduras por lo que más dan: Def. especial → Bazar, torso rígido → Herrería y blando → Talabartería, el resto Fuerza contra Destreza) y
+`generar({secciones})` (el total del tamaño se reparte entre las abiertas; la escasez es de toda la tienda; el stock fijo va con el Bazar). Como
+la sección sale del ítem, la tienda publicada no guarda nada nuevo (sin reglas nuevas) y lo que se repone cae en la misma pestaña. El GM tilda las
+secciones en el generador (antes «Tipo de tienda»); una tienda guardada con el tipo viejo se toma así: Herrero → Herrería, Bazar → Bazar, Ramos →
+las tres. El jugador ve una pestaña por sección con algo (`FichaTienda.seccionesHtml`, `st.seccion`), un solo carrito, y «🔎 También hay en…» si
+lo que busca está en otra. **Reparación**: un solo botón por ahora; se separa cuando se defina el «loot mágico» (⬜).

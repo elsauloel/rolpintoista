@@ -33,6 +33,9 @@ const FiltroCatalogo = (() => {
   const ELEMENTOS = [['fisico', '🗡', 'Físico'], ['arcano', '✨', 'Arcano'], ['fuego', '🔥', 'Fuego'], ['hielo', '❄', 'Hielo'], ['rayo', '⚡', 'Eléctrico'],
     ['toxico', '☠', 'Tóxico'], ['acido', '🧪', 'Ácido']];
   const TIPOS_ARMA = [4, 6, 8, 10, 12];
+  // La resistencia a crítico de cada Tipo (stats tipo1…tipo5): su propio desplegable, para que «Tipo 4» no se confunda con un arma (dueño, 2026-10-08).
+  const RES_CRIT = [['tipo1', 4], ['tipo2', 6], ['tipo3', 8], ['tipo4', 10], ['tipo5', 12]];
+  const esResCrit = st => RES_CRIT.some(([k]) => k === st);
   const ORDENES = {categoria: 'Por tipo', nombre: 'Nombre', precio: 'Precio', rareza: 'Calidad', peso: 'Peso', dano: 'Daño', defensa: 'Defensa'};
 
   const parteDe = it => { const g = G(); return g ? g.parteDe(it) : 'otro'; };
@@ -79,16 +82,17 @@ const FiltroCatalogo = (() => {
     const partes = [it.nombre, it.detalle, it.descripcionNarrativa, it.efectoNombre, it.efectoDetalle, it.equipoEstadoNombre, it.equipoEstadoDetalle,
       it.equipoEstadoPreset, PARTE_ETQ[parteDe(it)], ...golpesDe(it), it.especial && it.especial.nombre];
     if(typeof FichaEquipo !== 'undefined' && FichaEquipo.CATEGORIA_LABEL) partes.push(FichaEquipo.CATEGORIA_LABEL[it.tipoItem]);
-    [...(it.mods || []), ...(it.efectoMods || [])].forEach(m => { if(m && m.stat){ partes.push((statLabel || statLabelDe)(m.stat)); if(typeof FichaCalculo !== 'undefined' && FichaCalculo.STAT_FULL) partes.push(FichaCalculo.STAT_FULL[m.stat]); } });
+    if(esArma(it) && !it.especial && num(it.tipoDado)) partes.push(`Tipo ${num(it.tipoDado)}`);
+    [...(it.mods || []), ...(it.efectoMods || [])].forEach(m => { if(m && m.stat){ const rc = RES_CRIT.find(([k]) => k === m.stat); partes.push(rc ? `Res. crítico Tipo ${rc[1]}` : (statLabel || statLabelDe)(m.stat)); if(typeof FichaCalculo !== 'undefined' && FichaCalculo.STAT_FULL) partes.push(FichaCalculo.STAT_FULL[m.stat]); } });
     t = sinAcentos(partes.filter(Boolean).join(' '));
     textoCache.set(it, t);
     return t;
   }
 
-  const vacio = () => ({buscar: '', parte: '', manos: '', tier: '', libre: false, tipo: '', elemento: '', bono: '', golpe: '', etiqueta: '', origen: '',
+  const vacio = () => ({buscar: '', parte: '', manos: '', tier: '', libre: false, tipo: '', elemento: '', bono: '', rescrit: '', golpe: '', etiqueta: '', origen: '',
     pMin: '', pMax: '', pesoMax: '', orden: 'categoria', desc: false});
-  const CLAVES_FILTRO = ['buscar', 'parte', 'manos', 'tier', 'libre', 'tipo', 'elemento', 'bono', 'golpe', 'etiqueta', 'origen', 'pMin', 'pMax', 'pesoMax'];
-  const CLAVES_MAS = ['tipo', 'elemento', 'bono', 'golpe', 'etiqueta', 'origen', 'pMin', 'pMax', 'pesoMax'];
+  const CLAVES_FILTRO = ['buscar', 'parte', 'manos', 'tier', 'libre', 'tipo', 'elemento', 'bono', 'rescrit', 'golpe', 'etiqueta', 'origen', 'pMin', 'pMax', 'pesoMax'];
+  const CLAVES_MAS = ['tipo', 'elemento', 'bono', 'rescrit', 'golpe', 'etiqueta', 'origen', 'pMin', 'pMax', 'pesoMax'];
   const activo = (f, k) => k === 'libre' ? !!f.libre : String(f[k] ?? '').trim() !== '';
   const cuantos = f => CLAVES_FILTRO.filter(k => activo(f, k)).length;   // cuántos filtros hay puestos
 
@@ -103,6 +107,7 @@ const FiltroCatalogo = (() => {
     if(mira('tipo') && !(esArma(it) && !it.especial && num(it.tipoDado) === num(f.tipo))) return false;
     if(mira('elemento') && !elementosDe(it).has(f.elemento)) return false;
     if(mira('bono') && !subeStat(it, f.bono)) return false;
+    if(mira('rescrit') && !subeStat(it, f.rescrit)) return false;
     if(mira('golpe') && !golpesDe(it).some(n => sinAcentos(n) === sinAcentos(f.golpe))) return false;
     if(mira('etiqueta') && !etiquetasDe(it).includes(f.etiqueta)) return false;
     if(mira('origen') && (f.origen === 'grupo') !== !!it._bib) return false;
@@ -220,6 +225,7 @@ const FiltroCatalogo = (() => {
         <div class="fc-campo"><span class="fc-etq">Tipo de arma</span><div class="fc-fila" data-fc-zona="tipo"></div></div>
         <div class="fc-campo"><span class="fc-etq">Daño</span><div class="fc-fila" data-fc-zona="elemento"></div></div>
         <div class="fc-campo"><span class="fc-etq">Que suba</span><select data-fc="bono"></select></div>
+        <div class="fc-campo"><span class="fc-etq">Resistencia a crítico</span><select data-fc="rescrit"></select></div>
         <div class="fc-campo"><span class="fc-etq">Efecto al golpear</span><select data-fc="golpe"></select></div>
         ${cfg.etiquetas ? `<div class="fc-campo"><span class="fc-etq">Efecto escaso</span><select data-fc="etiqueta"></select></div>` : ''}
         ${cfg.origen ? `<div class="fc-campo"><span class="fc-etq">De dónde sale</span><div class="fc-fila" data-fc-zona="origen"></div></div>` : ''}
@@ -242,7 +248,8 @@ const FiltroCatalogo = (() => {
         el.value = f[k] || '';
       };
       const stats = [...new Set(items.flatMap(it => (it.mods || []).filter(m => m && m.stat && num(m.val) > 0).map(m => m.stat)))];
-      sel('bono', 'Cualquier cosa', stats.map(st => [st, (cfg.statLabel || statLabelDe)(st)]).sort((a, b) => a[1].localeCompare(b[1], 'es')));
+      sel('bono', 'Cualquier cosa', stats.filter(st => !esResCrit(st)).map(st => [st, (cfg.statLabel || statLabelDe)(st)]).sort((a, b) => a[1].localeCompare(b[1], 'es')));
+      sel('rescrit', 'Cualquiera', RES_CRIT.filter(([k]) => stats.includes(k)).map(([k, t]) => [k, `Contra Tipo ${t}`]));
       const golpes = new Map();
       items.forEach(it => golpesDe(it).forEach(n => { const k = sinAcentos(n); if(!golpes.has(k)) golpes.set(k, n); }));
       sel('golpe', 'Cualquiera', [...golpes.values()].sort((a, b) => a.localeCompare(b, 'es')).map(n => [n, n]));
@@ -340,7 +347,7 @@ const FiltroCatalogo = (() => {
       if(!el) return;
       const k = el.dataset.fc;
       if(k === 'orden'){ f.orden = el.value; recordar(); cambio(); return; }
-      if(k === 'bono' || k === 'golpe' || k === 'etiqueta'){ f[k] = el.value; cambio(); }
+      if(k === 'bono' || k === 'rescrit' || k === 'golpe' || k === 'etiqueta'){ f[k] = el.value; cambio(); }
     });
 
     function activos(){ return cuantos(f); }

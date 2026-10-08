@@ -121,6 +121,7 @@ const tiendaSt = {
   get carrito(){ return carritoCatalogo; }, set carrito(v){ carritoCatalogo = v; },
   get venderSel(){ return venderSel; }, set venderSel(v){ venderSel = v; },
   get verCompleto(){ return verCatalogoCompleto; }, set verCompleto(v){ verCatalogoCompleto = v; },
+  seccion: '',   // la pestaña abierta de la tienda (P179)
   get filtro(){ const c = filtroCatalogo(); return c ? c.f : FiltroCatalogo.vacio(); },
   extraItem: id => botinItemPorId(id),   // un ítem del botín (Comparar desde "Botín")
 };
@@ -274,11 +275,12 @@ async function abrirVendedor(){
 
     tiendaCargada = tienda;
     verCatalogoCompleto = false;
+    tiendaSt.seccion = '';   // arranca en la primera pestaña (P179)
     if($('#catalogo-ver-completo')) $('#catalogo-ver-completo').classList.remove('activo');
     limpiarFiltrosCatalogo();
     renderCatalogoModal();
     $('#scrim-catalogo').classList.add('open');
-    toast(`${tienda.nombre || 'Tienda'} · ${fmt(catalogoVisibles().length)} ítems`);
+    toast(`${tienda.nombre || 'Tienda'} · ${fmt(tienda.items.length)} ítems`);
     escucharTienda();
   }catch(err){
     console.error('Error trayendo la tienda:', err);
@@ -342,8 +344,9 @@ function elegirItemAleatorio(){
 
 function renderCatalogoModal(){
   if(!Array.isArray(S.catalogo)) S.catalogo = structuredClone(DEFAULT.catalogo);
+  if($('#catalogo-secciones')) $('#catalogo-secciones').innerHTML = FichaTienda.seccionesHtml(S, tiendaSt);   // las pestañas (antes que el filtro: deciden qué hay)
   const fc = filtroCatalogo();
-  if(fc) fc.actualizar();   // lo que hay para filtrar pudo cambiar (otra tienda, 👁 ver todo, el catálogo)
+  if(fc) fc.actualizar();   // lo que hay para filtrar pudo cambiar (otra tienda, otra pestaña, 👁 ver todo, el catálogo)
   const html = FichaTienda.catalogoHtml(S, tiendaSt);
   $('#catalogo-body').innerHTML = html;
   renderCabeceraTienda();

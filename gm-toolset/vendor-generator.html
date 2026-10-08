@@ -169,6 +169,9 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .modal .filtros input{flex:2 1 220px}
 .modal .filtros select{flex:1 1 150px;width:auto}
 .agregar-filtros{padding:10px 15px;border-bottom:1px solid var(--line)}
+.secciones-elegir{display:flex;gap:10px;flex-wrap:wrap;align-items:center;min-height:34px}
+.secciones-elegir label{display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap;text-transform:none;letter-spacing:0;font-size:13px}
+.secciones-elegir input{width:auto;margin:0}
 .iconbtn{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);padding:5px 10px;border-radius:var(--r)}
 .iconbtn:hover{border-color:var(--copper);color:var(--paper)}
 .modal footer{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;padding:12px 15px;border-top:1px solid var(--line);flex:none}   /* flex-wrap (2026-10-08): si los botones no entran, bajan de renglón en vez de salirse de la ventana */
@@ -260,12 +263,12 @@ input[type=checkbox]{width:auto}
         </select>
       </div>
       <div class="campo">
-        <label for="f-categoria">Tipo de tienda</label>
-        <select id="f-categoria">
-          <option value="ramos" selected>Ramos generales</option>
-          <option value="alquimista">Bazar arcano</option>
-          <option value="herrero">Herrero</option>
-        </select>
+        <label>Secciones <span class="hint" title="Una tienda, tres habitaciones (P179): el jugador ve una pestaña por sección. Tildá las que abre este lugar.">?</span></label>
+        <div class="secciones-elegir" id="f-secciones">
+          <label title="Guerra pesada: armas de Tipo 8 o más, escudos, armadura rígida, cascos y guanteletes"><input type="checkbox" data-seccion="herreria" checked> ⚒ Herrería</label>
+          <label title="Cuero, madera y cuerda: armas a distancia y livianas (Tipo 4 y 6), cuero, botas, cinturones, mochilas y trampas"><input type="checkbox" data-seccion="talabarteria" checked> 🧵 Talabartería</label>
+          <label title="Lo mágico: consumibles, varitas y báculos, orbes, anillos y piezas de caster"><input type="checkbox" data-seccion="bazar" checked> ✨ Bazar arcano</label>
+        </div>
       </div>
       <div class="campo" style="flex:0 1 200px">
         <label for="f-nivel">Nivel de la zona</label>
@@ -392,8 +395,8 @@ input[type=checkbox]{width:auto}
 <script src="../comun/capas.js?v=20261005f9"></script>   <!-- la última ventana que se abre queda arriba -->
 <script src="../comun/efectos-golpe.js"></script>
 <script src="../comun/catalogo.js?v=20261008zf"></script>
-<script src="../comun/generador-tiendas.js?v=20261007am"></script>   <!-- la regla de cómo se arma una tienda (2026-10-06) -->
-<script src="../comun/filtro-catalogo.js?v=20261008zs"></script>   <!-- el filtro del catálogo, uno para todos lados (2026-10-08) -->
+<script src="../comun/generador-tiendas.js?v=20261008zt"></script>   <!-- la regla de cómo se arma una tienda (2026-10-06) -->
+<script src="../comun/filtro-catalogo.js?v=20261008zt"></script>   <!-- el filtro del catálogo, uno para todos lados (2026-10-08) -->
 <script src="../comun/items-subidos.js?v=20261007h"></script>
 <script src="../comun/plantillas.js?v=20261007ar"></script>
 <script src="../comun/item-corto.js?v=20261008q"></script>
@@ -501,19 +504,13 @@ const TIERS = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
    recetas por tipo, variedad garantizada, escasez y golpe de suerte. Acá, solo la pantalla. */
 const G = GeneradorTiendas;
 const TAMANOS = G.TAMANOS;
-const CATEGORIA_TIENDA_LABEL = {ramos: 'Ramos generales', alquimista: 'Bazar arcano', herrero: 'Herrero'};
-
-// Nombre por defecto sugerido según tamaño y rubro — el usuario lo puede
-// pisar a mano después, esto solo evita arrancar con el campo vacío.
-function nombreAutoTienda(tamano, categoria){
-  const tamanoLabel = (TAMANOS[tamano] || {}).label || '';
-  if(categoria === 'ramos'){
-    if(tamano === 'ambulante') return 'Vendedor ambulante';
-    return `Tienda de ${tamanoLabel.toLowerCase()}`;
-  }
-  const catLabel = CATEGORIA_TIENDA_LABEL[categoria] || categoria;
-  if(tamano === 'ambulante') return `${catLabel} ambulante`;
-  return `${catLabel} de ${tamanoLabel.toLowerCase()}`;
+// Las secciones que abre (P179): las tres = «Tienda de pueblito»; una sola = «Herrería de pueblito».
+const seccionesLabel = secs => (secs || []).map(k => G.SECCIONES[k] ? `${G.SECCIONES[k].icono} ${G.SECCIONES[k].label}` : '').filter(Boolean).join(' · ');
+const seccionesElegidas = () => [...document.querySelectorAll('#f-secciones [data-seccion]')].filter(c => c.checked).map(c => c.dataset.seccion);
+function nombreAutoTienda(tamano, secs){
+  const tamanoLabel = ((TAMANOS[tamano] || {}).label || '').toLowerCase();
+  if(secs && secs.length === 1 && G.SECCIONES[secs[0]]) return tamano === 'ambulante' ? `${G.SECCIONES[secs[0]].label} ambulante` : `${G.SECCIONES[secs[0]].label} de ${tamanoLabel}`;
+  return tamano === 'ambulante' ? 'Vendedor ambulante' : `Tienda de ${tamanoLabel}`;
 }
 
 // ES_ARMA sale de CATEGORIAS, arriba, junto con el catálogo.
@@ -577,18 +574,18 @@ function danoDe(item){
 
 function entero(min, max){ return min + Math.floor(Math.random() * (max - min + 1)); }
 
-function generarTienda(tamano, categoria, nivel){
-  const r = G.generar({tipo: categoria, tamano, nivel, catalogo: CATALOGO});
+function generarTienda(tamano, secciones, nivel){
+  const r = G.generar({secciones, tamano, nivel, catalogo: CATALOGO});
   return {
     tamano: r.tamano,
     tamanoLabel: TAMANOS[r.tamano].label,
-    categoria: r.tipo,
-    categoriaLabel: CATEGORIA_TIENDA_LABEL[r.tipo],
+    secciones: r.secciones,
+    categoriaLabel: seccionesLabel(r.secciones),
     nivel: r.nivel,
-    nombre: nombreAutoTienda(r.tamano, r.tipo),
+    nombre: nombreAutoTienda(r.tamano, r.secciones),
     generado: new Date().toISOString(),
     ajustePrecio: 0,
-    ...(r.tipo === 'herrero' ? {herrero: true} : {}),   // el Herrero repara (se puede apagar)
+    ...(r.secciones.includes('herreria') ? {herrero: true} : {}),   // con Herrería, repara (se puede apagar)
     garantizados: r.garantizados,
     items: r.items,
   };
@@ -596,15 +593,16 @@ function generarTienda(tamano, categoria, nivel){
 
 /* 🧪 Simulador (2026-10-06): 200 tiendas con el tipo, tamaño y nivel elegidos → promedio y peor caso por parte, calidad y efecto escaso. */
 function simularTiendas(){
-  const tipo = $('#f-categoria').value, tamano = $('#f-tamano').value, nivel = Number($('#f-nivel').value) || 1;
-  const r = G.simular({tipo, tamano, nivel, catalogo: CATALOGO, veces: 200});
+  const secciones = seccionesElegidas(), tamano = $('#f-tamano').value, nivel = Number($('#f-nivel').value) || 1;
+  if(!secciones.length){ toast('Tildá al menos una sección'); return; }
+  const r = G.simular({secciones, tamano, nivel, catalogo: CATALOGO, veces: 200});
   const fila = (k, v, extra) => `<tr><td>${esc(k)}</td><td style="text-align:right">${fmt(v.prom)}</td><td style="text-align:right">${fmt(v.min)}–${fmt(v.max)}</td>${extra !== undefined ? `<td style="text-align:right">${extra}</td>` : '<td></td>'}</tr>`;
   const tabla = (titulo, filas) => `<table style="border-collapse:collapse;font-size:12.5px;min-width:260px"><thead><tr><th style="text-align:left">${titulo}</th><th>Promedio</th><th>Mín–máx</th><th></th></tr></thead><tbody>${filas}</tbody></table>`;
   const partes = Object.entries(r.parte).filter(([, v]) => v.max > 0).map(([k, v]) => fila(G.PARTE_LABEL[k] || k, v)).join('');
   const tiers = TIERS.map(t => fila(t, r.tier[t], `en el ${r.conTier[t]} % de las tiendas`)).join('');
   const etiq = Object.entries(r.etiqueta).filter(([, v]) => v.max > 0).map(([k, v]) => fila(k, v)).join('');
   $('#simulacion').style.display = '';
-  $('#simulacion').innerHTML = `<div class="hint" style="margin-bottom:6px"><b>${r.veces} tiendas</b> · ${esc(CATEGORIA_TIENDA_LABEL[G.tipoDe(tipo)])} · ${esc(TAMANOS[tamano].label)} · nivel ${nivel}:
+  $('#simulacion').innerHTML = `<div class="hint" style="margin-bottom:6px"><b>${r.veces} tiendas</b> · ${esc(seccionesLabel(secciones))} · ${esc(TAMANOS[tamano].label)} · nivel ${nivel}:
       ${fmt(r.items.prom)} ítems (${fmt(r.items.min)}–${fmt(r.items.max)}, con el stock fijo) · partes defensivas distintas ${fmt(r.defDistintas.min)}–${fmt(r.defDistintas.max)}
       <button class="btn ghost" id="btn-simular-cerrar" style="padding:2px 8px;margin-left:8px">✕</button></div>
     <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start">${tabla('Parte', partes)}${tabla('Calidad', tiers)}${tabla('Efecto escaso', etiq || '<tr><td colspan="4">ninguno</td></tr>')}</div>`;
@@ -800,11 +798,12 @@ function renderPreview(){
   if(!visibles.length){
     html = `<div class="hint">Ningún ítem de la tienda coincide con "${esc(textoBusqueda)}".</div>`;
   }else if(ordenActual === 'categoria'){
-    RUBRO_ORDEN.forEach(rubro => {
-      const delRubro = conLegacyPrimero(ordenarItems(visibles.filter(it => rubroDe(it) === rubro)), garantizados);
-      if(!delRubro.length) return;
-      html += `<div class="cat-grouphead">${RUBRO_LABEL[rubro]} · ${fmt(delRubro.length)}</div>`;
-      html += `<div class="cat-grid">${delRubro.map(it => itemCardHtml(it, garantizados.has(it.id))).join('')}</div>`;
+    // Por sección (P179): lo que el jugador va a ver en cada pestaña.
+    G.SECCIONES_ORDEN.forEach(k => {
+      const delSec = conLegacyPrimero(ordenarItems(visibles.filter(it => G.seccionDe(it) === k)), garantizados);
+      if(!delSec.length) return;
+      html += `<div class="cat-grouphead" style="font-size:12px">${G.SECCIONES[k].icono} ${esc(G.SECCIONES[k].label)} · ${fmt(delSec.length)}</div>`;
+      html += `<div class="cat-grid">${delSec.map(it => itemCardHtml(it, garantizados.has(it.id))).join('')}</div>`;
     });
   }else{
     const orden = conLegacyPrimero(ordenarItems(visibles), garantizados);
@@ -1118,9 +1117,10 @@ function marcarAjuste(){
 function generar(nueva){
   if(nueva && !confirmarDejarTienda()) return;
   const clave = $('#f-tamano').value;
-  const categoria = $('#f-categoria').value;
+  const secciones = seccionesElegidas();
+  if(!secciones.length){ toast('Tildá al menos una sección'); return; }
   const previa = tiendaActual;
-  tiendaActual = generarTienda(clave, categoria, Number($('#f-nivel').value) || 1);
+  tiendaActual = generarTienda(clave, secciones, Number($('#f-nivel').value) || 1);
   if(previa && !nueva){   // Regenerar: conserva toda la configuración de la tienda (2026-10-06: antes se perdían venta, herrero, reparación y agregar gratis)
     ['ajustePrecio', 'ajusteVenta', 'herrero', 'precioReparacion', 'agregarGratis', 'guardadaId'].forEach(k => { if(previa[k] !== undefined) tiendaActual[k] = previa[k]; });
     if(previa.nombrePersonalizado){ tiendaActual.nombre = previa.nombre; tiendaActual.nombrePersonalizado = true; }
@@ -1151,11 +1151,11 @@ function crearTiendaPersonalizada(){
 }
 
 function actualizarHint(){
-  const tipo = G.TIPOS[G.tipoDe($('#f-categoria').value)], cfg = TAMANOS[$('#f-tamano').value], nivel = Number($('#f-nivel').value) || 1;
+  const secs = seccionesElegidas(), cfg = TAMANOS[$('#f-tamano').value], nivel = Number($('#f-nivel').value) || 1;
   const cal = G.CALIDAD_POR_NIVEL[G.nivelDe(nivel)];
-  const fijos = (tipo.fijos || []).length ? ' más el stock fijo (Poción de HP y de SP; Revive desde la aldea)' : '';
-  $('#hint-tamano').textContent = `${cfg.label}: entre ${cfg.min} y ${cfg.max} ítems${fijos}; al menos ${cfg.variedad} partes defensivas distintas` +
-    (tipo.familias ? ` y ${cfg.familias} familias de armas` : '') + `. Nivel ${nivel}: ` +
+  const fijos = secs.includes('bazar') ? ' más el stock fijo del Bazar (Poción de HP y de SP; Revive desde la aldea)' : '';
+  $('#hint-tamano').textContent = (secs.length ? `${seccionesLabel(secs)}. ` : '⚠ Tildá al menos una sección. ') +
+    `${cfg.label}: entre ${cfg.min} y ${cfg.max} ítems en total, repartidos entre las secciones${fijos}. Nivel ${nivel}: ` +
     `Común ${cal[0]} % · Buena ${cal[1]} % · Rara ${cal[2]} %, más un golpe de suerte ` +
     `(${Math.round(G.SUERTE.uno * 100)} % un escalón, ${G.SUERTE.dos * 100} % dos). Efectos escasos: hasta ${cfg.tope === 0.5 ? '0 o 1' : cfg.tope} de cada uno.`;
 }
@@ -1532,7 +1532,7 @@ function escucharGuardadas(){
 function sincronizarControles(){
   if(!tiendaActual) return;
   if(TAMANOS[tiendaActual.tamano]) $('#f-tamano').value = tiendaActual.tamano;
-  if(tiendaActual.categoria && tiendaActual.categoria !== 'personalizada') $('#f-categoria').value = G.tipoDe(tiendaActual.categoria);
+  if(tiendaActual.tamano !== 'personalizada'){ const secs = G.seccionesDe(tiendaActual); document.querySelectorAll('#f-secciones [data-seccion]').forEach(c => { c.checked = secs.includes(c.dataset.seccion); }); }
   if(tiendaActual.nivel) $('#f-nivel').value = String(tiendaActual.nivel);
   marcarAjuste();
   actualizarHint();
@@ -1590,7 +1590,7 @@ async function iniciarTiendaEnVivo(){
 /* ---------- Eventos ---------- */
 
 $('#f-tamano').addEventListener('change', actualizarHint);
-$('#f-categoria').addEventListener('change', actualizarHint);
+$('#f-secciones').addEventListener('change', actualizarHint);
 $('#f-nivel').addEventListener('change', actualizarHint);
 $('#btn-simular').addEventListener('click', simularTiendas);
 $('#btn-generar').addEventListener('click', () => generar(true));

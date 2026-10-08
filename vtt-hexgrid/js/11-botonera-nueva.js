@@ -111,7 +111,7 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261008zs', '../comun/ficha-botin.js?v=20261008zs', '../comun/generador-tiendas.js?v=20261007am', '../comun/filtro-catalogo.js?v=20261008zs', '../comun/ficha-tienda.js?v=20261008zs', '../comun/ficha-mantenimiento.js?v=20261008y', '../comun/ficha-calculo.js?v=20261007am', '../comun/ficha-combate.js?v=20261005mn', '../comun/skills-clase.js?v=20261008x', '../comun/ficha-habilidades.js?v=20261007ar',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261008zs', '../comun/ficha-botin.js?v=20261008zs', '../comun/generador-tiendas.js?v=20261008zt', '../comun/filtro-catalogo.js?v=20261008zt', '../comun/ficha-tienda.js?v=20261008zt', '../comun/ficha-mantenimiento.js?v=20261008y', '../comun/ficha-calculo.js?v=20261007am', '../comun/ficha-combate.js?v=20261005mn', '../comun/skills-clase.js?v=20261008x', '../comun/ficha-habilidades.js?v=20261007ar',
   '../comun/catalogo.js?v=20261008zf', '../comun/items-subidos.js?v=20261007h', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261008g', '../comun/ficha-resumen.js?v=20261008zk', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261007ar', '../comun/inv-duelo.js?v=20261008z', '../comun/ficha-acciones.js?v=20261008n', '../comun/inv-habilidades.js?v=20261008s', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20261006e', '../comun/ficha-duelo.js?v=20261008zb', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261005f6'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
@@ -883,6 +883,7 @@ function bnCrear(){
         </div>
       </header>
       <div class="carrito-bar">
+        <div id="bn-tienda-secciones"></div>   <!-- las pestañas: Herrería, Talabartería, Bazar arcano (P179) -->
         <div class="catalogo-filtros" id="bn-tienda-filtros"></div>   <!-- comun/filtro-catalogo.js (2026-10-08) -->
         <div class="carrito-lista" id="bn-carrito-lista"></div>
         <div class="carrito-footer">
@@ -1702,7 +1703,7 @@ function bnStatsCerrar(){
    la Botonera nueva, con comun/ficha-tienda.js (la misma regla y la misma ventana que la ficha): el catálogo del vendedor con sus
    filtros y orden, el carrito y Comprar, Vender, Reparación (si es herrero), el ítem al azar, Ver y Comparar. Mientras está abierta,
    los cambios del GM (otra tienda, cerrarla) llegan solos. */
-const bnTiendaSt = {tienda: null, carrito: [], venderSel: {}, verCompleto: false};   // como FichaTienda.nueva()
+const bnTiendaSt = {tienda: null, carrito: [], venderSel: {}, verCompleto: false, seccion: ''};   // como FichaTienda.nueva()
 // El filtro (comun/filtro-catalogo.js, 2026-10-08): búsqueda, chips con cuántos quedan, «🟢 Lugar libre», orden y «Más filtros». Se arma la primera vez.
 let bnTiendaFiltro = null, bnTiendaFiltroCont = null;
 Object.defineProperty(bnTiendaSt, 'filtro', {get(){ return bnTiendaFiltro ? bnTiendaFiltro.f : FiltroCatalogo.vacio(); }});
@@ -1726,11 +1727,11 @@ async function abrirTiendaMapa(fichaId){
   if(!bn) return;
   bn.soloTienda = !yaVisible;
   if(!(await bnSesionLista(fichaId))){ toast('No se pudo leer el personaje'); return; }
-  Object.assign(bnTiendaSt, {tienda, carrito: [], venderSel: {}, verCompleto: false});
+  Object.assign(bnTiendaSt, {tienda, carrito: [], venderSel: {}, verCompleto: false, seccion: ''});
   bn.raiz.querySelector('#bn-tienda').classList.add('open');
   const fc0 = bnFiltroTienda(); if(fc0) fc0.limpiar();
   bnTiendaDibujar();
-  toast(`${tienda.nombre || 'Tienda'} · ${fmt(FichaTienda.visibles(bn.S, bnTiendaSt).length)} ítems`);
+  toast(`${tienda.nombre || 'Tienda'} · ${fmt(tienda.items.length)} ítems`);
   bnTiendaEscuchar();
 }
 let bnTiendaStockEscucha = null;
@@ -1767,6 +1768,7 @@ function bnTiendaDibujar(){
   r.querySelector('#bn-tienda-titulo').textContent = `🏪 ${(t && t.nombre) || 'Tienda'}`;   // (2026-10-08: el título, más claro)
   r.querySelector('#bn-tienda-badge').textContent = FichaTienda.badge(st);
   r.querySelector('#bn-tienda-reparar').style.display = t && t.herrero ? '' : 'none';   // solo las tiendas con herrero reparan
+  r.querySelector('#bn-tienda-secciones').innerHTML = FichaTienda.seccionesHtml(bn.S, st);   // las pestañas (antes que el filtro: deciden qué hay)
   const fc = bnFiltroTienda();
   if(fc) fc.actualizar();   // lo que vende pudo cambiar (el GM cambió la tienda, se compró una pieza única)
   r.querySelector('#bn-tienda-cuerpo').innerHTML = FichaTienda.catalogoHtml(bn.S, st, {gestion: false});
@@ -1805,6 +1807,7 @@ function bnTiendaClic(b){
   const a = b.dataset.bnTi;
   if(a === 'cerrar'){ bnTiendaCerrar(); return true; }
   if(a === 'baul'){ Intercambio.abrirBaul(bn.fichaId); return true; }   // 📦 el baúl común (comun/intercambio.js)
+  if(b.dataset.tiendaSeccion){ FichaTienda.elegirSeccion(st, b.dataset.tiendaSeccion); bnTiendaDibujar(); return true; }   // una pestaña (P179)
   if(a === 'vaciar'){ st.carrito = []; bnTiendaDibujar(); return true; }
   if(a === 'comprar'){ if(puede()) FichaTienda.comprar(bn.S, st, ui(FichaGuardado.partes(bn.S))).then(() => bnTiendaDibujar()); else bnTiendaDibujar(); return true; }
   if(a === 'aleatorio'){

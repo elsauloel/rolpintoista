@@ -852,9 +852,14 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   / `terminarTurnoEstados`, la marca `recien` que pone `agregarEstado`.
 - ⏳ **P178. Daño de colisión** (dueño, 2026-10-08, vendaval): si un empujón choca contra algo (un Sólido, un token, el borde) antes de recorrer todo, hay
   daño de colisión — a definir cuánto y a quién (¿también a aquello contra lo que choca?). Hoy el mapa lo avisa en la Crónica: «✋ daño de colisión a mano».
-- ⏳ **P179. Identidad de las tiendas: ¿qué hacemos con Ramos generales?** (dueño, 2026-10-08: «quedó medio borrosa y redundante… quizás quitarla o
+- ✅ **P179. Identidad de las tiendas: ¿qué hacemos con Ramos generales?** (dueño, 2026-10-08: «quedó medio borrosa y redundante… quizás quitarla o
   buscarle una vuelta»). Hoy: Herrero (armas cuerpo a cuerpo, escudos, armaduras), Bazar arcano (consumibles, varitas, orbes, anillos, piezas de caster)
   y Ramos (un poco de todo + trampas, mochilas, cinturones y consumibles básicos). Propuesta: reconvertirla en la tienda del **cazador / talabartero**
   (cuero, madera y cuerda: armas a distancia, armaduras blandas, botas, piernas, cinturones, mochilas, trampas y lo de explorar), así las tres quedan
   ligadas a los tres estilos: Herrero = metal y Defensa (Fuerza/Constitución), Cazador = Destreza/Agilidad (distancia, sigilo, trampas), Bazar = Especial.
   También ordena la reparación por tipo de tienda. Detalle en `docs/rework-tiendas.md` («Identidad de las tiendas»).
+  **Decidido y hecho (dueño, 2026-10-08): una tienda, tres «habitaciones»** — ⚒ Herrería (guerra pesada), 🧵 Talabartería (cuero, madera y
+  cuerda) y ✨ Bazar arcano, que abren a la vez como pestañas de la misma tienda («ir a más de una tienda es burocratizar»; así cada estilo sabe
+  dónde buscar y no está todo mezclado). El GM tilda qué secciones abre (por defecto las tres; el tamaño es el total y se reparte); sin pestaña
+  «Todo», pero si lo que se busca está en otra pestaña, se avisa. Un solo carrito. La reparación sigue siendo un solo botón que repara todo; se
+  separa por sección cuando se defina si existe el «loot mágico».

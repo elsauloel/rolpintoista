@@ -154,7 +154,7 @@ hay trabajo reciente o en curso de otra conversación (ver
 
 ### vendor-generator.html
 - **Rework del generador (2026-10-06, `../docs/rework-tiendas.md`)**: la regla vive en `../comun/generador-tiendas.js`; acá solo la pantalla.
-  Controles: tamaño, **tipo** (Ramos generales / Bazar arcano —clave `alquimista`— / Herrero) y **nivel de la zona**; **🧪 Simular 200**
+  Controles: tamaño, **secciones** (desde 2026-10-08, P179: ⚒ Herrería / 🧵 Talabartería / ✨ Bazar arcano, casillas `#f-secciones`; antes «tipo») y **nivel de la zona**; **🧪 Simular 200**
   (`simularTiendas`). `generarTienda(tamano, tipo, nivel)` y «🎲 Otro» (`rerollItem` → `GeneradorTiendas.otro`) usan la pieza común; Regenerar
   conserva toda la configuración. Lo que sigue de esta sección sobre `REPARTO_POR_CATEGORIA`, el piso de legacy, «Inicio de partida», los ítems
   mágicos y el tope de rareza quedó viejo (se sacó).

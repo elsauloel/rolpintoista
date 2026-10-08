@@ -699,9 +699,11 @@ prueba('el filtro de la tienda: «Lugar libre» deja solo lo que se puede equipa
     {id: 'p1', nombre: 'Botas', tipoItem: 'pies', precioCompra: 10, tier: 'Común'},
     {id: 'x1', nombre: 'Poción', tipoItem: 'consumibles', consumible: true, precioCompra: 10, tier: 'Común'}]};
   st.tienda.items = st.tienda.itemsDatos.map(i => i.id);
-  const todos = FichaTienda.visibles(S, st).map(i => i.id);
+  const secs = FichaTienda.secciones(S, st).map(x => [x.k, x.n]), todos = FichaTienda.visibles(S, st).map(i => i.id);   // la primera pestaña: la Talabartería
   st.filtro.libre = true;
-  igual([todos.length, FichaTienda.visibles(S, st).map(i => i.id)], [3, ['p1']]);
+  const libres = FichaTienda.visibles(S, st).map(i => i.id);
+  FichaTienda.elegirSeccion(st, 'bazar');
+  igual([secs, todos, libres, FichaTienda.visibles(S, st).map(i => i.id)], [[['talabarteria', 2], ['bazar', 1]], ['c1', 'p1'], ['p1'], []]);
 });
 
 grupo('📊 Stats (A6a)');
@@ -2932,7 +2934,7 @@ prueba('del piso, del aire o ambos (2026-10-07): la trampa guarda dónde está s
 });
 
 /* ---------- Generador de tiendas (comun/generador-tiendas.js, 2026-10-06) ---------- */
-prueba('generador de tiendas: variedad de partes defensivas por tamaño, familias del Herrero, sin archivados ni solo botín, escasez y calidades por nivel', () => {
+prueba('generador de tiendas: variedad de partes defensivas por tamaño, familias de la Herrería, sin archivados ni solo botín, escasez y calidades por nivel', () => {
   const G = GeneradorTiendas, cat = CATALOGO_BASE, porId = new Map(cat.map(i => [i.id, i]));
   let minVar = {ambulante: 9, pueblito: 9, aldea: 9}, archivados = 0, pasados = 0, familiasMin = 9, raroNivel1 = 0, comunNivel5 = 0;
   for(let n = 0; n < 60; n++){
@@ -2950,8 +2952,32 @@ prueba('generador de tiendas: variedad de partes defensivas por tamaño, familia
   const otro = G.otro({tienda: {categoria: 'herrero', tamano: 'aldea', nivel: 2, items: ['cat-espada-larga']}, id: 'cat-espada-larga', catalogo: cat});
   igual([minVar.ambulante >= 2, minVar.pueblito >= 3, minVar.aldea >= 5, familiasMin, archivados, pasados,
     s1.tier['Común'].prom > s1.tier['Buena Calidad'].prom, s5.tier['Raro'].prom > s1.tier['Raro'].prom, !!otro && G.parteDe(otro) === 'arma' && otro.id !== 'cat-espada-larga',
-    G.tipoDe('bazar'), G.tipoDe('inicio'), G.parteDe({tipoItem: 'armadura_blanda'})],
-    [true, true, true, 4, 0, 0, true, true, true, 'alquimista', 'ramos', 'torso']);
+    G.seccionesDe({tipo: 'alquimista'}), G.seccionesDe({tipo: 'inicio'}), G.seccionesDe({secciones: ['bazar', 'herreria', 'x']}), G.parteDe({tipoItem: 'armadura_blanda'})],
+    [true, true, true, 2, 0, 0, true, true, true, ['bazar'], ['herreria', 'talabarteria', 'bazar'], ['herreria', 'bazar'], 'torso']);
+});
+
+prueba('tienda con secciones (P179): cada ítem sabe su sección; se reparte entre las abiertas; lo que se repone queda en la misma sección', () => {
+  const G = GeneradorTiendas, cat = CATALOGO_BASE.filter(G.publicable), porId = new Map(cat.map(i => [i.id, i]));
+  const sec = (o) => G.seccionDe(Object.assign({mods: []}, o));
+  let fuera = 0, sinAlguna = 0, familias = 9, soloBazar = 0, otraSec = 0;
+  for(let n = 0; n < 30; n++){
+    const r = G.generar({tamano: 'aldea', nivel: 3, catalogo: cat});
+    const its = r.items.map(id => porId.get(id)), secs = new Set(its.map(G.seccionDe));
+    if(secs.size < 3) sinAlguna++;
+    familias = Math.min(familias, new Set(its.filter(i => G.parteDe(i) === 'arma').map(i => i.tipoDado)).size);
+    const b = G.generar({secciones: ['bazar'], tamano: 'pueblito', nivel: 2, catalogo: cat});
+    soloBazar += b.items.filter(id => G.seccionDe(porId.get(id)) !== 'bazar').length;
+    const viejo = its.find(i => G.parteDe(i) === 'cabeza');
+    if(viejo){ const nuevo = G.otro({tienda: {tamano: 'aldea', nivel: 3, items: r.items}, viejo, catalogo: cat, reponer: true}); if(nuevo && G.seccionDe(nuevo) !== G.seccionDe(viejo)) otraSec++; }
+  }
+  igual([sinAlguna, familias, soloBazar, otraSec,
+    sec({tipoItem: 'arma_1m', tipoDado: 4}), sec({tipoItem: 'arma_2m', tipoDado: 10}), sec({tipoItem: 'arma_1m', tipoDado: 8, armaDeRango: true}),
+    sec({tipoItem: 'escudo_1m'}), sec({tipoItem: 'escudo_1m', orbe: true}), sec({tipoItem: 'armadura_rigida', mods: [{stat: 'def', val: 2}]}),
+    sec({tipoItem: 'armadura_blanda', mods: [{stat: 'def', val: 1}]}), sec({tipoItem: 'armadura_blanda', mods: [{stat: 'armadmg', val: 2}]}),
+    sec({tipoItem: 'cabeza', mods: [{stat: 'def', val: 1}]}), sec({tipoItem: 'pies', mods: [{stat: 'eva', val: 1}]}), sec({tipoItem: 'mochila'}),
+    sec({tipoItem: 'consumibles', consumible: true}), sec({tipoItem: 'consumibles', consumible: true, trampaDatos: {}}), sec({tipoItem: 'anillos'})],
+    [0, 4, 0, 0, 'talabarteria', 'herreria', 'talabarteria', 'herreria', 'bazar', 'herreria', 'talabarteria', 'bazar', 'herreria', 'talabarteria',
+     'talabarteria', 'bazar', 'talabarteria', 'bazar']);
 });
 
 prueba('reposición (2026-10-07): lo comprado se repone con otro de la misma parte, familia y calidad; la calidad sale solo del nivel', () => {

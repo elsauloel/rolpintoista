@@ -594,6 +594,8 @@ $('#scrim-nivel-social').addEventListener('mousedown', e => { if(e.target.id==='
 $('#scrim-chooser').addEventListener('mousedown', e => { if(e.target.id==='scrim-chooser') $('#scrim-chooser').classList.remove('open'); });
 $('#scrim-catalogo').addEventListener('mousedown', e => { if(e.target.id==='scrim-catalogo') $('#scrim-catalogo').classList.remove('open'); });
 // Los filtros del catálogo se manejan solos (comun/filtro-catalogo.js, `filtroCatalogo()` en js/09).
+// Las pestañas de la tienda (P179) y el «También hay en…» de la búsqueda.
+$('#scrim-catalogo').addEventListener('click', e => { const b = e.target.closest('[data-tienda-seccion]'); if(!b) return; FichaTienda.elegirSeccion(tiendaSt, b.dataset.tiendaSeccion); renderCatalogoModal(); });
 $('#catalogo-item-aleatorio').addEventListener('click', elegirItemAleatorio);
 $('#catalogo-ver-completo').addEventListener('click', () => {
   verCatalogoCompleto = !verCatalogoCompleto;

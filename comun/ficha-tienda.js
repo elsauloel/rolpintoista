@@ -38,7 +38,7 @@ const FichaTienda = (() => {
   const stackMaxDe = it => (it && it.pilaInfinita) ? Infinity : STACK_MAX;
 
   function nueva(){
-    return {tienda: null, carrito: [], venderSel: {}, verCompleto: false, filtro: FiltroCatalogo.vacio()};
+    return {tienda: null, carrito: [], venderSel: {}, verCompleto: false, filtro: FiltroCatalogo.vacio(), seccion: ''};
   }
 
   /* ---------- Precios y búsqueda ---------- */
@@ -79,8 +79,48 @@ const FichaTienda = (() => {
   function libre(S, item){ const r = E().slotOcupado(S, item); return r ? !r.ocupado : null; }
   const ctxFiltro = (S, st) => ({precio: it => precioDeCompra(st, it), libre: it => libre(S, it), sinCalidad: !E().veCalidad()});
   // Lo que se puede llegar a ver, antes de los filtros: lo de la tienda, o el catálogo (sin lo que el jugador no compra suelto).
+  /* ---------- Las secciones de la tienda (P179, dueño 2026-10-08: «una tienda, tres habitaciones») ----------
+     ⚒ Herrería, 🧵 Talabartería y ✨ Bazar arcano: una pestaña por cada una que tenga algo (cada ítem sabe a cuál va,
+     GeneradorTiendas.seccionDe). `st.seccion` = la pestaña abierta; el carrito es uno solo para las tres. Sin tienda (el catálogo), no hay. */
+  const G = () => (typeof GeneradorTiendas !== 'undefined' && GeneradorTiendas.seccionDe ? GeneradorTiendas : null);
+  const todoTienda = (S, st) => st.tienda.items.map(id => itemCatalogo(S, st, id)).filter(Boolean);
+  function secciones(S, st){
+    if(!st.tienda || st.verCompleto || !G()) return [];
+    const n = {};
+    todoTienda(S, st).forEach(it => { const k = G().seccionDe(it); n[k] = (n[k] || 0) + 1; });
+    return G().SECCIONES_ORDEN.filter(k => n[k]).map(k => ({k, n: n[k], ...G().SECCIONES[k]}));
+  }
+  // La pestaña abierta (si no hay o ya no tiene nada, la primera que tenga).
+  function seccionActual(S, st){
+    const secs = secciones(S, st);
+    if(!secs.length) return '';
+    if(!secs.some(x => x.k === st.seccion)) st.seccion = secs[0].k;
+    return st.seccion;
+  }
+  const SECCIONES_CSS = `<style>
+    .tienda-secs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 9px}
+    .tienda-sec{display:flex;align-items:center;gap:7px;padding:8px 16px;border:1px solid var(--line,#3B2E34);border-radius:8px 8px 0 0;border-bottom-width:3px;
+      background:rgba(255,255,255,.03);color:inherit;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+    .tienda-sec:hover{background:rgba(255,255,255,.07)}
+    .tienda-sec.on{background:rgba(201,133,69,.22);border-color:var(--copper,#C98545);color:#fff}
+    .tienda-sec b{font-family:"Space Mono",monospace;font-size:11px;font-weight:400;opacity:.75}
+    .tienda-sec-otra{margin:8px 0;padding:8px 12px;border:1px dashed var(--line,#3B2E34);border-radius:8px;font-size:13px}
+    .tienda-sec-otra button{margin-left:6px;background:none;border:1px solid var(--copper,#C98545);border-radius:999px;color:inherit;padding:2px 10px;cursor:pointer;font:inherit;font-size:12px}
+  </style>`;
+  // Las pestañas (o '' si no hay tienda, o si tiene una sola sección).
+  function seccionesHtml(S, st){
+    const secs = secciones(S, st), act = seccionActual(S, st);
+    if(secs.length < 2 && !(secs.length === 1 && st.tienda && st.tienda.secciones)) return '';
+    return SECCIONES_CSS + `<div class="tienda-secs">${secs.map(x => `<button type="button" class="tienda-sec${x.k === act ? ' on' : ''}" data-tienda-seccion="${x.k}"
+      title="${esc(x.detalle || '')}">${x.icono} ${esc(x.label)} <b>${fmt(x.n)}</b></button>`).join('')}</div>`;
+  }
+  // Cambiar de pestaña: el filtro de «qué es» de una no sirve en la otra, se saca (la búsqueda y lo demás quedan).
+  function elegirSeccion(st, k){ st.seccion = k; if(st.filtro) st.filtro.parte = ''; }
   function base(S, st){
-    if(st.tienda && !st.verCompleto) return st.tienda.items.map(id => itemCatalogo(S, st, id)).filter(Boolean);
+    if(st.tienda && !st.verCompleto){
+      const todo = todoTienda(S, st), act = seccionActual(S, st);
+      return act ? todo.filter(it => G().seccionDe(it) === act) : todo;
+    }
     let b = S.catalogo || [];
     // En el catálogo abierto solo se llega hasta Raro; de los consumibles, solo los esenciales; nada de lo que sale solo de botín.
     if(!st.tienda && !st.verCompleto) b = b.filter(item => !TIERS_OCULTOS.includes(item.tier) && (!item.consumible || item.legacy) && !item.soloBotin);
@@ -144,7 +184,16 @@ const FichaTienda = (() => {
     const html = FiltroCatalogo.agrupar(vis, f).map(g => `
       <div class="cat-grouphead">${esc(g.label)} · ${fmt(g.items.length)}</div>
       <div class="cat-grid">${conStockYLegacyPrimero(st, g.items).map(fila).join('')}</div>`).join('');
-    if(vis.length) return html;
+    // Lo que busca está en otra pestaña: avisarlo (dueño, 2026-10-08: sin pestaña «Todo», pero que no se pierda nada).
+    let otras = '';
+    if(st.tienda && !st.verCompleto && String(f.buscar || '').trim()){
+      const act = seccionActual(S, st), ctx = ctxFiltro(S, st), n = {};
+      todoTienda(S, st).forEach(it => { const k = G() ? G().seccionDe(it) : ''; if(k && k !== act && FiltroCatalogo.pasa(it, {...f, parte: ''}, ctx)) n[k] = (n[k] || 0) + 1; });
+      const ks = Object.keys(n);
+      if(ks.length) otras = SECCIONES_CSS + `<div class="tienda-sec-otra">🔎 También hay en ${ks.map(k => `<button type="button" data-tienda-seccion="${k}">${G().SECCIONES[k].icono} ${esc(G().SECCIONES[k].label)} · ${fmt(n[k])}</button>`).join(' ')}</div>`;
+    }
+    if(vis.length) return otras + html;
+    if(otras) return otras;
     let vacioMsg = 'El catálogo está vacío. Tocá "+ Ítem al catálogo" para cargar el primero.';
     if(FiltroCatalogo.cuantos(f)) vacioMsg = `${st.tienda ? 'El vendedor no tiene nada' : 'No hay ítems'} con esos filtros. Probá sacar alguno (✕ Limpiar todo).`;
     else if(st.tienda) vacioMsg = 'El vendedor no tiene nada para vender.';
@@ -463,7 +512,7 @@ const FichaTienda = (() => {
 
   return {GRUPO_COMPRA_MAP, GRUPO_COMPRA_LABEL, GRUPO_COMPRA_ORDEN, grupoCompraDe, TIERS_ORDEN, TIERS_OCULTOS, STACK_MAX, stackMaxDe, nueva,
     precioDeCompra, precioVenta, precioHtml, normalizarBusqueda, textoBusqueda, itemCatalogo, danoDe, libre, ctxFiltro, base, conStockYLegacyPrimero,
-    visibles, rowHtml, catalogoHtml, badge, carrito, agregarAlCarrito, quitarDelCarrito, agregarConsumible,
+    visibles, rowHtml, catalogoHtml, badge, carrito, secciones, seccionActual, seccionesHtml, elegirSeccion, agregarAlCarrito, quitarDelCarrito, agregarConsumible,
     crearItems, agregarGratis, comprar, aleatorio, ajusteVenta, precioVentaTienda, vendibles, totalVenta, venderHtml, venderCambio, vender,
     precioReparacion, costoReparar: costoDe, RECARGO_ROTO, aReparar, repararHtml, reparar, desdeDoc, conStock, leerStock, escucharStock, limitado};
 })();

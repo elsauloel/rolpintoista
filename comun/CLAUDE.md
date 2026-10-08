@@ -1386,3 +1386,8 @@ versión parecida en más de una, es candidato a juntar.
 - **La calidad de los ítems, solo para el GM** (2026-10-08, dueño): `FichaEquipo.veCalidad()` (= `fbMiembro.gm`). Todo lo que un jugador ve de un ítem
   (tienda, catálogo, mochila, botín, intercambio, asistente de ítems, «Editar y subir», el filtro) muestra la calidad solo si da true. **Un lugar nuevo que
   muestre `it.tier` a un jugador: pasarlo por ahí.**
+- **Tienda con tres secciones** (P179, dueño 2026-10-08): `GeneradorTiendas.SECCIONES` / `SECCIONES_ORDEN` (⚒ Herrería, 🧵 Talabartería, ✨ Bazar
+  arcano), `seccionDe(item)` (a qué pestaña va cada ítem; con caché) y `seccionesDe(o)` (las que abre una tienda: `secciones`, o su tipo viejo);
+  `generar({secciones, tamano, nivel, catalogo})`. `FichaTienda.secciones(S, st)`, `seccionActual`, `seccionesHtml` (las pestañas, con su CSS) y
+  `elegirSeccion(st, k)`; `st.seccion` = la pestaña abierta (`base` filtra por ella). El filtro (`filtro-catalogo.js`) suma el desplegable
+  **Resistencia a crítico** (`rescrit`: tipo1…tipo5 = contra Tipo 4…12; ya no aparecen en «Que suba», donde «Tipo 4» se confundía con un arma).

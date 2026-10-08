@@ -3,7 +3,8 @@
    simulador) y las pruebas.
 
    Dos perillas: el TAMAÑO (cuánto, cuánta variedad, cuánta escasez) y el NIVEL de la zona (qué calidades: Común ↔ niveles 1–2, Buena ↔ 3–4,
-   Rara ↔ 5). Cada TIPO de tienda (Herrero, Ramos generales, Bazar arcano) es una RECETA de partes del cuerpo con su peso. Se garantiza una
+   Rara ↔ 5). Una tienda tiene hasta tres SECCIONES (P179, dueño 2026-10-08: «una tienda, tres habitaciones»): ⚒ Herrería, 🧵 Talabartería
+   y ✨ Bazar arcano; cada una es una RECETA de partes del cuerpo con su peso, y cada ítem sabe solo a qué sección va (`seccionDe`). Se garantiza una
    VARIEDAD de partes defensivas (al azar cuáles) y, en el Herrero, de familias de armas. Cada lugar tira su calidad con la tabla del nivel y
    tiene un GOLPE DE SUERTE (subir uno o dos escalones, la única vía de Excepcional y Legendario). La ESCASEZ limita, por tamaño, cuántos ítems
    con cada efecto sensible (Iniciativa, Evasión, Sigilo, rebajas de No2…) puede tener una tienda. Lo archivado y lo «solo botín» no sale. */
@@ -49,19 +50,58 @@ const GeneradorTiendas = (() => {
   // Cinturones de alquimia (también del Bazar): pociones, pergaminos, boticario, saque rápido.
   const esDeAlquimia = it => algunMod(it, ['ranurapocion', 'ranurapergamino', 'portapergaminos', 'boticario', 'saquerapido']);
 
-  /* Recetas (peso de cada parte, en partes de 100). `filtro`: qué ítems de esa parte acepta este tipo. `minimos`: lugares que siempre van.
-     `fijos`: el stock fijo (fuera del total; `desde` = el tamaño mínimo). La clave del Bazar sigue siendo 'alquimista' (tiendas guardadas). */
+  /* Las secciones (P179, dueño 2026-10-08: «una tienda tres habitaciones: una más de guerra pesada, una más talabartería y otra de bazar
+     arcano… para que los personajes que tienen un estilo claro sepan dónde tienen que ir a buscar»). El jugador entra a una sola tienda y ve
+     una pestaña por sección. Cada RECETA = peso de cada parte (partes de 100); `familias`: los Tipos de arma garantizados; `minimos`: lugares
+     que siempre van; `fijos`: el stock fijo (fuera del total; `desde` = el tamaño mínimo). */
   const ORDEN_TAMANO = ['ambulante', 'pueblito', 'aldea', 'ciudad', 'capital'];
   const FIJOS = [{id: 'cat-pocion-hp'}, {id: 'cat-pocion-bonos'}, {id: 'cat-revive', desde: 'aldea'}];
-  const TIPOS = {
-    herrero: {label: 'Herrero', receta: {arma: 30, distancia: 8, torso: 16, escudo: 12, cabeza: 8, manos: 8, piernas: 6, pies: 6, cinturon: 3, mochila: 3},
-      familias: true, fijos: []},
-    ramos: {label: 'Ramos generales', receta: {arma: 15, distancia: 6, torso: 8, escudo: 5, cabeza: 6, manos: 6, piernas: 6, pies: 6, cinturon: 8, mochila: 8,
-      trampa: 10, consumible: 16}, filtro: {consumible: it => !!it.legacy}, fijos: FIJOS},   // los consumibles de siempre
-    alquimista: {label: 'Bazar arcano', receta: {consumible: 40, especial: 20, orbe: 8, anillo: 13, torso: 6, cabeza: 5, manos: 4, cinturon: 4},
-      filtro: {torso: esDeCaster, cabeza: esDeCaster, manos: esDeCaster, cinturon: esDeAlquimia}, minimos: {especial: 2}, fijos: FIJOS},
+  const SECCIONES = {
+    herreria: {label: 'Herrería', icono: '⚒', detalle: 'guerra pesada: armas de Tipo 8 o más, escudos, armadura rígida, cascos y guanteletes',
+      receta: {arma: 40, escudo: 14, torso: 16, cabeza: 12, manos: 10, piernas: 4, pies: 4}, familias: [8, 10], fijos: []},
+    talabarteria: {label: 'Talabartería', icono: '🧵', detalle: 'cuero, madera y cuerda: armas a distancia y livianas (Tipo 4 y 6), cuero, botas, cinturones, mochilas y trampas',
+      receta: {distancia: 22, arma: 14, torso: 12, cabeza: 6, manos: 6, piernas: 8, pies: 8, cinturon: 8, mochila: 8, trampa: 8}, familias: [4, 6], fijos: []},
+    bazar: {label: 'Bazar arcano', icono: '✨', detalle: 'lo mágico: consumibles, varitas y báculos, orbes, anillos y piezas de caster',
+      receta: {consumible: 40, especial: 20, orbe: 8, anillo: 13, torso: 6, cabeza: 5, manos: 4, cinturon: 4}, minimos: {especial: 2}, fijos: FIJOS},
   };
-  const tipoDe = t => t === 'bazar' ? 'alquimista' : TIPOS[t] ? t : 'ramos';   // 'inicio' (viejo) = Ramos generales
+  const SECCIONES_ORDEN = ['herreria', 'talabarteria', 'bazar'];
+  // Lo que suma Destreza/Agilidad (la Talabartería) y lo que suma Fuerza/Constitución (la Herrería), para las piezas que podrían ir en las dos.
+  const DE_DESTREZA = ['eva', 'sigilo', 'percepcion', 'veoculto', 'ini', 'des', 'agl', 'pasosgratis', 'rng', 'pdgdist', 'pdgt4', 'pdgt6', 'retirada', 'reflejos',
+    'levitar', 'pasodoble', 'trampaoculta', 'soltarse', 'crit', 'oporahorro', 'saquerapido'];
+  const DE_FUERZA = ['def', 'fue', 'con', 'bloqueo', 'parry', 'hp', 'hpmax', 'pdgt8', 'pdgt10', 'inamovible', 'guardian', 'dmg', 'tipo1', 'tipo2', 'tipo3', 'tipo4',
+    'tipo5', 'paradafacil', 'escolta', 'embestida', 'critpot', 'contraahorro'];
+  const suma = (it, lista) => lista.reduce((a, st) => a + Math.max(0, mod(it, st)), 0);
+  /* A qué sección va un ítem (siempre la misma: así la tienda publicada no guarda nada nuevo y lo que se repone cae en la misma pestaña).
+     Lo mágico al Bazar; trampas, armas a distancia, mochilas y lo suelto a la Talabartería; las armas, por su Tipo (4 y 6 livianas, 8 o más
+     pesadas); los escudos a la Herrería; las armaduras, por lo que más dan (Defensa especial → Bazar, como dijo el dueño el 2026-10-07; el torso
+     rígido a la Herrería y el blando a la Talabartería; el resto, Fuerza contra Destreza). */
+  const seccionCache = new WeakMap();
+  function seccionDe(it){
+    if(!it || typeof it !== 'object') return 'talabarteria';
+    let r = seccionCache.get(it);
+    if(!r){ r = seccionCalc(it); seccionCache.set(it, r); }
+    return r;
+  }
+  function seccionCalc(it){
+    const p = parteDe(it);
+    if(p === 'especial' || p === 'orbe' || p === 'anillo' || p === 'consumible') return 'bazar';
+    if(p === 'trampa' || p === 'distancia' || p === 'mochila' || p === 'otro') return 'talabarteria';
+    if(p === 'arma') return num(it.tipoDado) <= 6 ? 'talabarteria' : 'herreria';
+    if(p === 'escudo') return 'herreria';
+    if(p === 'cinturon') return esDeAlquimia(it) || esDeCaster(it) ? 'bazar' : 'talabarteria';
+    const def = mod(it, 'def'), esp = mod(it, 'armadmg');
+    if(esp > def || (def <= 0 && esDeCaster(it))) return 'bazar';
+    if(p === 'torso') return it.tipoItem === 'armadura_rigida' ? 'herreria' : 'talabarteria';
+    const fue = suma(it, DE_FUERZA), des = suma(it, DE_DESTREZA);
+    return des > fue ? 'talabarteria' : fue > 0 ? 'herreria' : 'talabarteria';
+  }
+  // Qué secciones abre una tienda: las que eligió el GM (`secciones`), o las de su tipo viejo (Herrero → Herrería, Bazar → Bazar, Ramos → las tres).
+  function seccionesDe(o){
+    const lista = o && Array.isArray(o.secciones) ? o.secciones.filter(s => SECCIONES[s]) : [];
+    if(lista.length) return SECCIONES_ORDEN.filter(s => lista.includes(s));
+    const t = String((o && (o.tipo || o.categoria)) || '');
+    return t === 'herrero' ? ['herreria'] : t === 'alquimista' || t === 'bazar' ? ['bazar'] : SECCIONES_ORDEN.slice();
+  }
 
   /* Escasez: las etiquetas de los efectos sensibles (se calculan de los bonos; no hay que cargar nada a mano). */
   const ETIQUETAS = {
@@ -102,12 +142,15 @@ const GeneradorTiendas = (() => {
   }
   const nivelDe = nivel => Math.max(1, Math.min(5, Math.round(num(nivel) || 1)));
 
-  // Los candidatos de una parte para este tipo (publicables, con el filtro del tipo; si el filtro deja la parte vacía, sin filtro).
-  function candidatosDe(catalogo, tipo, parte){
-    const deParte = catalogo.filter(it => publicable(it) && parteDe(it) === parte);
-    const f = tipo.filtro && tipo.filtro[parte];
-    const filtrados = f ? deParte.filter(f) : deParte;
-    return filtrados.length ? filtrados : deParte;
+  // Los candidatos de una parte en esta sección (publicables y de esa sección).
+  // (memo: el mismo catálogo, la misma sección y la misma parte dan la misma lista; se arma una vez por catálogo)
+  const candCache = new WeakMap();
+  function candidatosDe(catalogo, secK, parte){
+    let m = candCache.get(catalogo);
+    if(!m){ m = new Map(); candCache.set(catalogo, m); }
+    const k = secK + '|' + parte + '|' + catalogo.length;   // (con el largo: si se le suma un ítem, se rearma)
+    if(!m.has(k)) m.set(k, catalogo.filter(it => publicable(it) && parteDe(it) === parte && seccionDe(it) === secK));
+    return m.get(k);
   }
   // Elige un ítem de la parte con la calidad pedida (o la más cercana: a igual distancia, la de abajo), sin repetir y respetando la escasez.
   function elegir(R, candidatos, tierIdx, usados, cabe, familia){
@@ -131,47 +174,54 @@ const GeneradorTiendas = (() => {
     };
   }
 
-  /* generar({tipo, tamano, nivel, catalogo, azar}) → {tipo, tamano, nivel, items: [ids], garantizados: [ids], plan: [{parte, id|null}]}.
-     El stock fijo va primero y fuera del total. */
+  /* generar({secciones, tamano, nivel, catalogo, azar}) → {secciones, tamano, nivel, items: [ids], garantizados: [ids], plan: [{seccion, parte, id|null}]}.
+     (`tipo` viejo también sirve: Herrero, Bazar o Ramos.) El total del tamaño se reparte entre las secciones abiertas; la variedad de partes
+     defensivas, también. La escasez es de toda la tienda. El stock fijo va primero y fuera del total. */
   function generar(o){
     const R = azarDe(o), cat = (o && o.catalogo) || [];
-    const tipoK = tipoDe(o.tipo), tipo = TIPOS[tipoK];
+    const secs = seccionesDe(o);
     const tamK = TAMANOS[o.tamano] ? o.tamano : 'pueblito', tam = TAMANOS[tamK];
     const nivel = nivelDe(o.nivel);
     const porId = new Map(cat.map(it => [it.id, it]));
     const usados = new Set();
-    const garantizados = (tipo.fijos || [])
+    const garantizados = secs.flatMap(k => SECCIONES[k].fijos || [])
       .filter(f => !f.desde || ORDEN_TAMANO.indexOf(tamK) >= ORDEN_TAMANO.indexOf(f.desde))
       .map(f => porId.get(f.id)).filter(it => it && !it.archivo);
     garantizados.forEach(it => usados.add(it.id));
     const total = entero(R, tam.min, tam.max);
-    // El plan: primero lo garantizado (variedad de partes, familias, mínimos) y después el resto por peso.
-    const plan = [];
-    const defs = DEFENSIVAS.filter(p => num(tipo.receta[p]) > 0);
-    const pesosDef = Object.fromEntries(defs.map(p => [p, tipo.receta[p]]));
-    for(let i = 0; i < Math.min(tam.variedad, defs.length); i++){ const p = ponderado(R, pesosDef); plan.push({parte: p}); delete pesosDef[p]; }
-    if(tipo.familias){
-      const fams = [4, 6, 8, 10];
-      for(let i = fams.length - 1; i > 0; i--){ const j = Math.floor(R() * (i + 1)); [fams[i], fams[j]] = [fams[j], fams[i]]; }
-      fams.slice(0, tam.familias).forEach(f => plan.push({parte: 'arma', familia: f}));
-    }
-    Object.entries(tipo.minimos || {}).forEach(([p, n]) => { for(let i = 0; i < n; i++) plan.push({parte: p}); });
-    while(plan.length < total) plan.push({parte: ponderado(R, tipo.receta)});
+    // Partes iguales; lo que sobra, al azar.
+    const cuota = secs.map(() => Math.floor(total / secs.length));
+    const sobra = total - cuota.reduce((a, b) => a + b, 0);
+    for(let i = 0; i < sobra; i++) cuota[Math.floor(R() * secs.length)]++;
+    const variedad = Math.max(1, Math.round(tam.variedad / secs.length));
     const esc = escasez(R, tam);
-    const cand = {};
-    const elegidos = [];
-    plan.slice(0, Math.max(total, plan.length)).forEach(lugar => {
-      let parte = lugar.parte, item = null;
-      for(let intento = 0; intento < 4 && !item; intento++){
-        if(intento) parte = ponderado(R, tipo.receta);   // la parte se agotó: otra de la receta
-        cand[parte] = cand[parte] || candidatosDe(cat, tipo, parte);
-        item = elegir(R, cand[parte], tirarCalidad(R, nivel), usados, esc.cabe, intento ? 0 : lugar.familia);
+    const plan = [], elegidos = [];
+    secs.forEach((k, si) => {
+      const sec = SECCIONES[k], receta = sec.receta, planS = [];
+      // Primero lo garantizado (variedad de partes, familias, mínimos) y después el resto por peso.
+      const defs = DEFENSIVAS.filter(p => num(receta[p]) > 0);
+      const pesosDef = Object.fromEntries(defs.map(p => [p, receta[p]]));
+      for(let i = 0; i < Math.min(variedad, defs.length); i++){ const p = ponderado(R, pesosDef); planS.push({seccion: k, parte: p}); delete pesosDef[p]; }
+      if(sec.familias){
+        const fams = sec.familias.slice();
+        for(let i = fams.length - 1; i > 0; i--){ const j = Math.floor(R() * (i + 1)); [fams[i], fams[j]] = [fams[j], fams[i]]; }
+        fams.slice(0, Math.min(fams.length, tam.familias)).forEach(f => planS.push({seccion: k, parte: 'arma', familia: f}));
       }
-      lugar.id = item ? item.id : null;
-      if(!item) return;
-      usados.add(item.id); esc.sumar(item); elegidos.push(item);
+      Object.entries(sec.minimos || {}).forEach(([p, n]) => { for(let i = 0; i < n; i++) planS.push({seccion: k, parte: p}); });
+      while(planS.length < cuota[si]) planS.push({seccion: k, parte: ponderado(R, receta)});
+      planS.forEach(lugar => {
+        let parte = lugar.parte, item = null;
+        for(let intento = 0; intento < 4 && !item; intento++){
+          if(intento) parte = ponderado(R, receta);   // la parte se agotó (o no tiene nada de esta sección): otra de la receta
+          item = elegir(R, candidatosDe(cat, k, parte), tirarCalidad(R, nivel), usados, esc.cabe, intento ? 0 : lugar.familia);
+        }
+        lugar.id = item ? item.id : null;
+        plan.push(lugar);
+        if(!item) return;
+        usados.add(item.id); esc.sumar(item); elegidos.push(item);
+      });
     });
-    return {tipo: tipoK, tamano: tamK, nivel, items: [...garantizados, ...elegidos].map(it => it.id), garantizados: garantizados.map(it => it.id), plan, escasez: esc.conteo};
+    return {secciones: secs, tamano: tamK, nivel, items: [...garantizados, ...elegidos].map(it => it.id), garantizados: garantizados.map(it => it.id), plan, escasez: esc.conteo};
   }
 
   /* otro({tienda, id, catalogo, azar, reponer}) → el ítem que reemplaza al `id` en la tienda, o null. Sin `reponer` («🎲 Otro» del GM): la misma
@@ -183,11 +233,11 @@ const GeneradorTiendas = (() => {
     const R = azarDe(o), cat = o.catalogo || [], t = o.tienda || {};
     const viejo = o.viejo || cat.find(it => it.id === o.id);
     if(!viejo) return null;
-    const tipo = TIPOS[tipoDe(t.categoria || t.tipo)], tam = TAMANOS[t.tamano] || TAMANOS.pueblito;
+    const tam = TAMANOS[t.tamano] || TAMANOS.pueblito;
     const usados = new Set([...(t.items || []), viejo.id]);
     const esc = escasez(R, tam);
     (t.items || []).forEach(id => { const it = cat.find(x => x.id === id); if(it && id !== viejo.id) esc.sumar(it); });
-    let cands = candidatosDe(cat, tipo, parteDe(viejo));
+    let cands = candidatosDe(cat, seccionDe(viejo), parteDe(viejo));   // de la misma sección (la misma pestaña)
     if(o.reponer){
       const fam = familiaRepo(viejo);
       cands = cands.filter(it => it.tier === viejo.tier && familiaRepo(it) === fam);
@@ -224,6 +274,6 @@ const GeneradorTiendas = (() => {
   // Cuántas veces repone una tienda publicada lo que le compran (una personalizada, como una aldea).
   const reservaDe = tamano => (TAMANOS[tamano] || TAMANOS.aldea).reserva;
 
-  return {reservaDe, TIERS, CALIDAD_POR_NIVEL, SUERTE, TAMANOS, TIPOS, PARTE_LABEL, DEFENSIVAS, ETIQUETAS, parteDe, etiquetasDe, esDeCaster, publicable, tipoDe,
+  return {reservaDe, TIERS, CALIDAD_POR_NIVEL, SUERTE, TAMANOS, SECCIONES, SECCIONES_ORDEN, seccionDe, seccionesDe, PARTE_LABEL, DEFENSIVAS, ETIQUETAS, parteDe, etiquetasDe, esDeCaster, publicable,
     tirarCalidad, nivelDe, generar, otro, simular};
 })();

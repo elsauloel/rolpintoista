@@ -1584,6 +1584,15 @@ prueba('grupo 1 de Buena (2026-10-07): Desarmado (no ataca, levantar el arma 1 N
     purga.efectos[0].purga, Duelo.specDeEfecto(Duelo.limpiarHab({nombre: 'P', efectos: purga.efectos}).efectos[0]).purga, rel.cadena.efectos, rel.cadena.saltos],
     [true, true, true, 2, null, true, -2, false, true, true, true, 3]);
 });
+prueba('el arma en el piso (2026-10-07): las Botoneras ofrecen levantarla al lado; con su arma en el piso, Desarmado no se levanta sin ir', () => {
+  const cerca = {armasCerca: [{id: 'el1', nombre: 'Hacha', propia: true}]};
+  const S = fichaBotonera({efectos: [{id: 'd', nombre: 'Desarmado', desarmado: true, activo: true}]});
+  const hPj = FichaBotonera.html(S, cerca).html, hPj2 = FichaBotonera.html(S, {armaEnElPiso: true}).html, hPj3 = FichaBotonera.html(S, {}).html;
+  const sc = creepPrueba({nitros: 3, estados: [{nombre: 'Desarmado', desarmado: true, activo: true}]});
+  const hCr = CreepBotonera.html(sc, cerca).html, hCr2 = CreepBotonera.html(sc, {armaEnElPiso: true}).html;
+  igual([/data-levantararma="el1"/.test(hPj), /Hacha \(la tuya\)/.test(hPj), /Levantar el arma/.test(hPj2), /Levantar el arma/.test(hPj3),
+    /data-levantararmacreep="el1"/.test(hCr), /Levantar el arma/.test(hCr2)], [true, true, false, true, true, false]);
+});
 prueba('torso blando: la Túnica de sangre paga el SP de un arma especial con vida (y no dos veces); el resumen lleva la Defensa extra', async () => {
   const {S} = FichaGuardado.normalizar({}, {mezclarCatalogo: false});
   const varita = {...structuredClone(CATALOGO_BASE.find(x => x.id === 'esp-varita-de-chispa-electrica')), id: 'v1', equipado: true};

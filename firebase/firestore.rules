@@ -564,7 +564,7 @@ service cloud.firestore {
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid', 'col', 'fila', 'ruta', 'rotacion', 'oculto']))
           );
         allow delete: if esMiembro(c)
-          && (resource.data.duenoUid == request.auth.uid || esGM(c));
+          && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true);
       }
 
       // Lápiz del mapa (vtt-hexgrid/mapa.html, caja de herramientas):
@@ -633,7 +633,7 @@ service cloud.firestore {
       // solo lo puede prender o apagar el GM (al crear o después, desde ⚙️);
       // sirve con o sin Sólido. alfa 0 se permite (solo se ve el contorno).
       function elementoValido(d) {
-        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'niebla', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'usoEn', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant', 'trampaItem', 'trampaFicha', 'zona', 'zonaNombre', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaAmiga', 'zonaResistStat', 'zonaResistValor', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaDanoDif', 'zonaDanoTipo', 'zonaTiraExtra', 'zonaNota', 'zonaTiraStat', 'zonaTiraValor', 'trampaDetectar', 'descubierta', 'trampaDejaZona', 'zonaTurnos', 'zonaAltura', 'zonaDirecto'])
+        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'niebla', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'usoEn', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant', 'trampaItem', 'trampaFicha', 'zona', 'zonaNombre', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaAmiga', 'zonaResistStat', 'zonaResistValor', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaDanoDif', 'zonaDanoTipo', 'zonaTiraExtra', 'zonaNota', 'zonaTiraStat', 'zonaTiraValor', 'trampaDetectar', 'descubierta', 'trampaDejaZona', 'zonaTurnos', 'zonaAltura', 'zonaDirecto', 'arma', 'armaNombre', 'armaDe', 'armaItem'])
           && d.tipo in ['flor', 'linea', 'libre']
           && d.origen is map && d.origen.col is int && d.origen.fila is int
           && d.celdas is list && d.celdas.size() >= 2 && d.celdas.size() <= 6000 && d.celdas.size() % 2 == 0
@@ -650,6 +650,11 @@ service cloud.firestore {
           && (!('imgDY' in d) || (d.imgDY is number && d.imgDY >= -10000 && d.imgDY <= 10000))
           && (!('fijado' in d) || d.fijado is bool)
           // Trampa: solo su dueño (y el GM) la ve hasta que se dispara.
+          // El arma en el piso (2026-10-07: la Varita del manotazo y la del desarme): la levanta cualquiera (ver delete).
+          && (!('arma' in d) || d.arma is bool)
+          && (!('armaNombre' in d) || (d.armaNombre is string && d.armaNombre.size() <= 60))
+          && (!('armaDe' in d) || (d.armaDe is string && d.armaDe.size() <= 100))
+          && (!('armaItem' in d) || (d.armaItem is string && d.armaItem.size() <= 6000))
           && (!('trampa' in d) || d.trampa is bool)
           && (!('trampaNombre' in d) || (d.trampaNombre is string && d.trampaNombre.size() <= 40))
           && (!('trampaDetalle' in d) || (d.trampaDetalle is string && d.trampaDetalle.size() <= 600))
@@ -742,7 +747,7 @@ service cloud.firestore {
             && request.resource.data.origen is map && request.resource.data.rotacion is int
             && request.resource.data.zona == true));
         allow delete: if esMiembro(c)
-          && (resource.data.duenoUid == request.auth.uid || esGM(c));
+          && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true);
       }
 
       // Mapas guardados además del de siempre (que sigue en mapa/* y
@@ -791,7 +796,7 @@ service cloud.firestore {
                 && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid', 'col', 'fila', 'ruta', 'rotacion', 'oculto']))
             );
           allow delete: if esMiembro(c)
-            && (resource.data.duenoUid == request.auth.uid || esGM(c));
+            && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true);
         }
         match /trazos/{id} {
           allow read: if esMiembro(c);
@@ -847,7 +852,7 @@ service cloud.firestore {
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['zona', 'zonaNombre', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'turnos', 'venceMant', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaAmiga', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaResistStat', 'zonaResistValor'])
               && request.resource.data.zona == true));
           allow delete: if esMiembro(c)
-            && (resource.data.duenoUid == request.auth.uid || esGM(c));
+            && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true);
         }
       }
     }

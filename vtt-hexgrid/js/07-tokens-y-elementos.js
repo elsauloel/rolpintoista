@@ -313,6 +313,10 @@ function escucharElementos(){
         trampaDestino: typeof d.trampaDestino === 'string' ? d.trampaDestino : '',   // trampa de teleport ("col,fila")
         trampaDetectar: Number.isFinite(d.trampaDetectar) ? d.trampaDetectar : 8,   // dificultad para detectarla (P145; sin el dato, 8)
         descubierta: d.descubierta === true,   // la descubrió alguien con Percepción aumentada: la ve todo su equipo (P145)
+        arma: d.arma === true,   // el arma en el piso (2026-10-07, js/27)
+        armaNombre: typeof d.armaNombre === 'string' ? d.armaNombre : '',
+        armaDe: typeof d.armaDe === 'string' ? d.armaDe : '',
+        armaItem: typeof d.armaItem === 'string' ? d.armaItem : '',
         portal: d.portal === true,   // Invocar portal (Mago)
         portalDestino: typeof d.portalDestino === 'string' ? d.portalDestino : '',
         usoEn: Number.isFinite(d.usoEn) ? d.usoEn : 0,   // último uso de un portal (hora local de quien lo usó): dispara los pulsos en todas las pantallas
@@ -358,6 +362,7 @@ function escucharElementos(){
     });
     pedirDibujo();
     elementosVencidosBarrer();
+    try{ if(typeof bn !== 'undefined' && bn && bn.S) bnDibujar(); if(typeof ac !== 'undefined' && ac) acDibujar(); }catch(err){}   // el 🗡 de un arma en el piso (js/27)
   }, err => console.error('Error escuchando los elementos del mapa:', err));
 }
 

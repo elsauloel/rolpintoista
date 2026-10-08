@@ -97,10 +97,16 @@ const CreepBotonera = (() => {
       combate.push({nombre:'🧍 Levantarse · 1 No2', dado:'', soloTexto:true, sinNitros: sinNitrosLev, motivo: `${sinNitrosLev ? 'Sin No2 · ' : ''}Cuesta 1 No2 y saca el estado Sentado`, attr:`data-levantarcreep="${sc.id}"`});
     }
     // Desarmado (2026-10-07): levantar el arma, 1 No2 (el mismo botón; primero se levanta si está Sentado).
-    else if((sc.estados || []).some(Combatiente.esDesarmado)){
+    else if((sc.estados || []).some(Combatiente.esDesarmado) && !o.armaEnElPiso){   // (si su arma está en el piso del mapa, se levanta desde ahí)
       const sinNitrosArma = num(sc.nitros) < Combatiente.COSTO_LEVANTAR_ARMA;
       combate.push({nombre:`🗡 Levantar el arma · ${fmt(Combatiente.COSTO_LEVANTAR_ARMA)} No2`, dado:'', soloTexto:true, sinNitros: sinNitrosArma, motivo: `${sinNitrosArma ? 'Sin No2 · ' : ''}Cuesta 1 No2 y saca el estado Desarmado`, attr:`data-levantarcreep="${sc.id}"`});
     }
+    // Las armas en el piso al lado (el mapa las pasa, 2026-10-07): las levanta cualquiera, 1 No2 cada una.
+    (o.armasCerca || []).forEach(a => {
+      const sinArma = num(sc.nitros) < Combatiente.COSTO_LEVANTAR_ARMA;
+      combate.push({nombre:`🗡 Levantar ${a.nombre}${a.propia ? ' (la suya)' : ''} · ${fmt(Combatiente.COSTO_LEVANTAR_ARMA)} No2`, dado:'', soloTexto:true, sinNitros: sinArma,
+        motivo: `${sinArma ? 'Sin No2 · ' : ''}Cuesta 1 No2. Si es la suya, vuelve a tenerla; si no, se la queda`, attr:`data-levantararmacreep="${a.id}"`});
+    });
     // Soltarse (2026-10-03): el estado que dejó una trampa de Atrapar dice qué tira y cuánto cuesta.
     const soltableCreep = Combatiente.estadoSoltable(sc.estados);
     if(soltableCreep){

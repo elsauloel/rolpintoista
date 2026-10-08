@@ -1176,7 +1176,21 @@ function dueloCuraMomento(d, t, n, r){
       veredicto: r.caido ? {tono: 'neutro', grande: 'Caído', chico: 'Una cura no levanta a un caído: hace falta revivirlo'}
         : {tono: 'bueno', grande: `+${fmt(n)}`, chico: mismo ? `te curaste ${fmt(n)} de vida (${fmt(r.previo)} → ${fmt(r.nuevo)})` : `${quien} te curó ${fmt(n)} de vida (${fmt(r.previo)} → ${fmt(r.nuevo)})`}} : {}});
 }
+// El Desarmado (2026-10-07) deja el arma en el piso (js/27); con `vuela`, lejos (la Varita del desarme).
 async function dueloAplicarEfecto(d, ef){
+  const r = await dueloAplicarEfectoBase(d, ef);
+  try{
+    const spec = Duelo.specDeEfecto(ef);
+    const t = tokens.get(d.defensor.tokenId);
+    if(t && spec && /^desarm(ado|e)$/i.test(String(spec.nombre || '').trim()) && r && !r.manual && !/inmune|no entr/i.test(String(r.nota || '')) && typeof armaSoltar === 'function'){
+      const s = await armaSoltar(t, num(ef.vuela));
+      r.nota = [r.nota, s.nota].filter(Boolean).join(' · ');
+      if(s.manual) r.manual = true;
+    }
+  }catch(err){ console.error('No se pudo dejar el arma en el piso:', err); }
+  return r;
+}
+async function dueloAplicarEfectoBase(d, ef){
   const spec = Duelo.specDeEfecto(ef);
   if(!spec) return {manual: true, nota: 'a mano'};
   const t = tokens.get(d.defensor.tokenId);

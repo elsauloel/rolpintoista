@@ -278,12 +278,18 @@ const FichaBotonera = (() => {
       const falta = num(S.nitros) < Math.max(0, num(IT2().nitrosLevantarse) - num(c.final.levantarse));
       html += `<div class="botonera-caja" style="margin-bottom:8px"><button class="ejecutar-btn${falta ? ' sin-recursos' : ''}" data-levantarse="1" style="width:100%" ${falta ? 'aria-disabled="true" title="No te alcanzan los Nitros"' : ''}>🧍 Levantarse · ${fmt(num(IT2().nitrosLevantarse))} No2</button></div>`;
     }
-    // Desarmado (2026-10-07): levantar el arma cuesta 1 No2 (el mismo botón; primero te levantás si estás Sentado).
-    else if(efectoDesarmado(S)){
+    // Desarmado (2026-10-07): levantar el arma cuesta 1 No2 (el mismo botón; primero te levantás si estás Sentado). Si su arma está
+    // en el piso del mapa, se levanta desde ahí (estando al lado): este botón no aparece.
+    else if(efectoDesarmado(S) && !o.armaEnElPiso){
       const falta = num(S.nitros) < Combatiente.COSTO_LEVANTAR_ARMA;
       html += `<div class="botonera-caja" style="margin-bottom:8px"><button class="ejecutar-btn${falta ? ' sin-recursos' : ''}" data-levantarse="1" style="width:100%" ${falta ? 'aria-disabled="true" title="No te alcanzan los Nitros"' : ''}>🗡 Levantar el arma · ${fmt(Combatiente.COSTO_LEVANTAR_ARMA)} No2</button></div>`;
     }
 
+    // Las armas en el piso al lado (el mapa las pasa, 2026-10-07): las levanta cualquiera, 1 No2 cada una.
+    (o.armasCerca || []).forEach(a => {
+      const falta = num(S.nitros) < Combatiente.COSTO_LEVANTAR_ARMA;
+      html += `<div class="botonera-caja" style="margin-bottom:8px"><button class="ejecutar-btn${falta ? ' sin-recursos' : ''}" data-levantararma="${esc(a.id)}" style="width:100%">🗡 Levantar ${esc(a.nombre)}${a.propia ? ' (la tuya)' : ''} · ${fmt(Combatiente.COSTO_LEVANTAR_ARMA)} No2</button></div>`;
+    });
     // Soltarse (2026-10-03): un estado que dejó una trampa de Atrapar; el botón dice qué tira y cuánto cuesta.
     const soltable = Combatiente.estadoSoltable(S.efectos);
     if(soltable){

@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261007q', '../comun/creep-botonera.js?v=20261007ar', '../comun/creep-acciones.js?v=20261007ar', '../comun/confirmar-turno.js?v=20261006e', '../comun/creep-duelo.js?v=20261007g'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261001a', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261007q', '../comun/creep-botonera.js?v=20261007at', '../comun/creep-acciones.js?v=20261007ar', '../comun/confirmar-turno.js?v=20261006e', '../comun/creep-duelo.js?v=20261007g'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -39,7 +39,7 @@ function acDibujar(){
   // El catálogo para cargarle consumibles al cinturón (2026-10-04): llega con las piezas de la Botonera nueva.
   const consumibles = typeof CATALOGO_BASE !== 'undefined' ? CreepAcciones.consumiblesDe(CATALOGO_BASE) : null;
   if(!consumibles && typeof bnCargarPiezas === 'function' && !ac.cargandoCatalogo){ ac.cargandoCatalogo = true; bnCargarPiezas().then(() => acDibujar()).catch(() => {}); }
-  const r = CreepBotonera.html(sc, {parryPendiente: acParry.has(ac.creepId), consumibles, cinSel: ac.cinSel});
+  const r = CreepBotonera.html(sc, {parryPendiente: acParry.has(ac.creepId), consumibles, cinSel: ac.cinSel, ...(typeof armasOpciones === 'function' ? armasOpciones(tokenDeCreep(ac.creepId)) : {})});
   const scroll = ac.host.scrollTop;
   cuerpo.innerHTML = `<div class="modal acciones-modal">
     <header>
@@ -173,6 +173,7 @@ function acAccionAca(b){
   const d = b.dataset, sc = acCreep();
   if(!sc) return false;
   if(d.verhabaccion){ acVerHab(sc, d.verhabaccion); return true; }
+  if(d.levantararmacreep){ acLevantarArma(d.levantararmacreep); return true; }   // 🗡 un arma en el piso (js/27)
   if(d.tirarstatcreep){ acPublicar(sc, CreepAcciones.tiradaStat(sc, d.tirarstatcreep.split(':')[1])); return true; }
   if(d.esquivarcreep){ acPublicar(sc, CreepAcciones.esquivar(sc)); return true; }
   if(d.fuerzacreep){ acPublicar(sc, CreepAcciones.fuerzaGolpe(sc)); return true; }

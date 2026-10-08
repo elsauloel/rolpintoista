@@ -48,8 +48,11 @@ const InvBotonera = (() => {
           : {stat:'bloqueo', nombre:'Bloqueo · tras el Parry', dado: f(I.bloqueoValor(inv)), sinNitros: true, clave:`inv:${inv.id}:stat:bloqueo`, motivo: `${Combatiente.BLOQUEO_SOLO_TRAS_PARRY} · con ${defInv.nombre} tiraría esto`, attr:`data-invtirarstat="${inv.id}:bloqueo"`}] : []),
     ];
     // Levantarse y Soltarse (2026-10-03): las mismas que un personaje y un creep, con lo que tira y cuesta escrito en el botón.
-    const lvInv = Combatiente.levantable(inv.estados), sentadaInv = !!lvInv, armaInv = !!(lvInv && lvInv.arma), soltableInv = Combatiente.estadoSoltable(inv.estados);   // (o Desarmado, 2026-10-07)
+    const lv0 = Combatiente.levantable(inv.estados), lvInv = lv0 && lv0.arma && o.armaEnElPiso ? null : lv0, sentadaInv = !!lvInv, armaInv = !!(lvInv && lvInv.arma), soltableInv = Combatiente.estadoSoltable(inv.estados);   // (o Desarmado, 2026-10-07)
     const costoLev = armaInv ? Combatiente.COSTO_LEVANTAR_ARMA : Math.max(0, num(FichaCalculo.IT2.nitrosLevantarse) - num(I.modTotal(inv, 'levantarse'))), sSol = soltableInv && Combatiente.soltarNorm(soltableInv.soltar);
+    // Las armas en el piso al lado (el mapa las pasa, 2026-10-07): las levanta cualquiera, 1 No2 cada una.
+    const tilesArmas = (o.armasCerca || []).map(a => `
+      <button type="button" class="botonera-tile${num(inv.nitros) < Combatiente.COSTO_LEVANTAR_ARMA ? ' bt-sin-nitros' : ''}" data-invlevantararma="${inv.id}:${a.id}" title="Cuesta 1 No2. Si es la suya, vuelve a tenerla; si no, se la queda"><span class="bt-label">🗡 Levantar ${esc(a.nombre)}${a.propia ? ' (la suya)' : ''} · ${fmt(Combatiente.COSTO_LEVANTAR_ARMA)} No2</span></button>`).join('');
     const tilesExtra = (sentadaInv ? `
       <button type="button" class="botonera-tile${num(inv.nitros) < costoLev ? ' bt-sin-nitros' : ''}" data-invlevantarse="${inv.id}" title="Cuesta ${fmt(costoLev)} No2 y saca el estado ${armaInv ? 'Desarmado' : 'Sentado'}"><span class="bt-label">${armaInv ? '🗡 Levantar el arma' : '🧍 Levantarse'} · ${fmt(costoLev)} No2</span></button>` : '')
       + (sSol ? `
@@ -57,7 +60,7 @@ const InvBotonera = (() => {
     // Atacar es siempre un ataque normal (dueño, 2026-10-06): la oportunidad y el contraataque los ofrece el mapa solo; esto, a mano.
     const tileOtro = `
       <button type="button" class="botonera-tile" data-invotroataque="${inv.id}" title="A mano, por si el mapa no lo detectó: el ataque de oportunidad se ofrece solo cuando un rival se aleja, y el contraataque después de ganar el Parry y el Bloqueo. Atacar es siempre un ataque normal." style="opacity:.75;min-height:0"><span class="bt-label">↪ Oportunidad o contraataque, a mano</span></button>`;
-    const tilesCombate = tilesExtra + combate.map(c => {
+    const tilesCombate = tilesExtra + tilesArmas + combate.map(c => {
       const mt = c.stat ? ModTirada.tile(inv.estados, c.stat) : {clase: '', html: '', titulo: ''};
       return `
       <button type="button" class="botonera-tile${c.sinNitros?' bt-sin-nitros':''}${mt.clase}" ${c.attr} title="${esc(c.motivo + mt.titulo)}">

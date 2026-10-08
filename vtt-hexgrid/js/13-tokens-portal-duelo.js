@@ -1084,7 +1084,7 @@ async function dueloAplicarDano(d){
   const frenaAm = magico && !directo && !trueDmg && Combatiente.frenaArmaduraMagica(elDano);   // la Defensa especial frena todo el daño especial (también el tóxico, 2026-10-07)
   const restaIgnorando = frenaAm ? armadmg : 0;
   const resEl = elDano && !trueDmg ? (await resistenciasDe(t, elDano, invLeida)).res : 0;
-  const freno = [...(menosDist ? [`la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Defensa especial ${armadmg}`] : []), ...(resEl ? [Combatiente.resElementalTxt(elDano, resEl)] : [])].join(' − ');
+  const freno = [...(menosDist ? [d.hab && d.hab.menosPorOrden ? `${menosDist} por los que tocó antes en la línea` : `la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Defensa especial ${armadmg}`] : []), ...(resEl ? [Combatiente.resElementalTxt(elDano, resEl)] : [])].join(' − ');
   let aplicar = golpe, ignoraDef = crit;
   if(base.mitad){ aplicar = Math.ceil(Math.max(0, golpe - def) / 2); ignoraDef = true; }
   // Bloqueo perdido (mitad del daño): el arma o escudo con el que bloqueó pierde 1 punto de durabilidad (solo personajes: los creeps y las invocaciones no llevan).

@@ -129,6 +129,7 @@ const SelectorEstados = (() => {
         EstadoPreguntas.pedir(p, cfg).then(armado => { if(armado) terminar({preset: armado, guardar: false}); else fondo.hidden = false; });
       });
       document.body.appendChild(fondo);
+      if(typeof BuscarEstados !== 'undefined') BuscarEstados.conectar(fondo.querySelector('.se-cuerpo'));   // el buscador (2026-10-08)
     });
   }
 

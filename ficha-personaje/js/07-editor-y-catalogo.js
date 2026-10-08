@@ -406,6 +406,7 @@ function abrirPresetsEfecto(destino){
     html += `<div class="preset-grid">${propios.map((p,i) => presetBtnHtml(p, `custom:${i}`, 'propio')).join('')}</div>`;
   }
   $('#presets-body').innerHTML = html;
+  if(typeof BuscarEstados !== 'undefined') BuscarEstados.conectar($('#presets-body'));   // el buscador (2026-10-08)
   $('#presets-personalizado').style.display = (presetDestino === 'directo' || presetDestino === 'inv') ? '' : 'none';
   $('#presets-titulo').textContent = presetDestino === 'inv' ? `Estado para ${(S.invocaciones.find(x=>x.id===presetInvId)||{}).nombre||'la invocación'}` : 'Estado alterado';
   $('#scrim-presets').classList.add('open');

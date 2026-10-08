@@ -359,7 +359,7 @@ function abrirPresetsEstadoCreep(scId){
     html += `<div class="preset-grupo">Mis presets · ${fmt(propios.length)}</div>`;
     html += `<div class="preset-grid">${propios.map((p,i) => presetBtnHtmlCreep(p, `custom:${i}`, 'propio')).join('')}</div>`;
   }
-  $('#presets-creep-body').innerHTML = html;
+  $('#presets-creep-body').innerHTML = html; if(typeof BuscarEstados !== 'undefined') BuscarEstados.conectar($('#presets-creep-body'));   // el buscador (2026-10-08)
   $('#presets-creep-personalizado').style.display = '';
   $('#scrim-presets-creep').classList.add('open');
 }
@@ -384,7 +384,7 @@ function elegirEstadoDuelo(){
       html += `<div class="preset-grupo">Mis presets · ${fmt(propios.length)}</div>`;
       html += `<div class="preset-grid">${propios.map((p,i) => presetBtnHtmlCreep(p, `custom:${i}`, 'propio')).join('')}</div>`;
     }
-    $('#presets-creep-body').innerHTML = html;
+    $('#presets-creep-body').innerHTML = html; if(typeof BuscarEstados !== 'undefined') BuscarEstados.conectar($('#presets-creep-body'));   // el buscador (2026-10-08)
     $('#presets-creep-personalizado').style.display = 'none';
     $('#scrim-presets-creep').classList.add('open');
     $('#scrim-presets-creep').style.zIndex = 99600;   // encima del cuadro de Ejecución (z-index 99500)

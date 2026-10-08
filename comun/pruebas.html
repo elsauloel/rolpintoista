@@ -105,6 +105,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="pasivas.js"></script>
 <script src="skills-clase.js"></script>
 <script src="asistente-personaje.js"></script>
+<script src="buscar-estados.js"></script>
 <script>
 /* ---------- Mini corredor de pruebas ---------- */
 const resultados = [];
@@ -1607,6 +1608,19 @@ prueba('Buenas, tanda 4 (2026-10-08): la gemela da una casilla por modo (con su 
   const sc = creepPrueba({equipo: [{...cat('esp-buena-varita-gemela'), id: 'g'}]}), ec = CreepAcciones.especialesCreep(sc);
   igual([esp.map(x => x.id), ac.especial.nombre, antes, FichaAcciones.costoEspecial(S, bo).no2, FichaAcciones.costoEspecial(S, ca).sp, /sin cargas/.test(FichaAcciones.costoEspecialTxt(S, ca)), ec.map(x => x.id)],
     [['g~0', 'g~1', 'c'], 'Varita gemela: Aceite', [1, 3, 0], 2, 3, true, ['g~0', 'g~1']]);
+});
+prueba('buscador de estados (2026-10-08): por nombre sin acentos, por palabra clave (regen, escudo) y por lo que dice; esconde los grupos vacíos', () => {
+  const cont = document.createElement('div');
+  const card = (n, det) => `<div class="preset-card"><span class="preset-nombre">${n}</span><span class="preset-detalle">${det}</span></div>`;
+  cont.innerHTML = `<div class="preset-grupo">Buffs</div><div class="preset-grid">${card('Regeneración', 'Cura HP cada turno.')}${card('Vida extra', 'HP de una barra aparte.')}${card('Barrera', 'Absorbe golpes.')}</div>`
+    + `<div class="preset-grupo">Debuffs</div><div class="preset-grid">${card('Veneno', 'Pierde HP por stack cada turno.')}${card('Parálisis', 'Mitad de Evasión.')}</div>`;
+  document.body.appendChild(cont); BuscarEstados.conectar(cont);
+  const ven = q => { BuscarEstados.filtrar(cont, q); return [...cont.querySelectorAll('.preset-card')].filter(e => e.style.display !== 'none').map(e => e.querySelector('.preset-nombre').textContent); };
+  const r = [ven('regen'), ven('escudo'), ven('paralisis'), ven('por turno'), ven('control'), ven('zzz')];
+  const grupos = [...cont.querySelectorAll('.preset-grupo')].map(g => g.style.display !== 'none');
+  const vacio = !cont.querySelector('.be-vacio').hidden;
+  cont.remove();
+  igual([...r, grupos, vacio, !!cont.querySelector('.be-caja input')], [['Regeneración'], ['Vida extra', 'Barrera'], ['Parálisis'], ['Regeneración', 'Veneno'], ['Parálisis'], [], [false, false], true, true]);
 });
 prueba('varitas Comunes de arena y portal (2026-10-07): la trampa se suelta contra tu Ef.Esp y frena al salir; la zona igual; el portal aliado va al mapa', () => {
   const sc = creepPrueba({esp: 9});

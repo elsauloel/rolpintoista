@@ -16,7 +16,8 @@ const AvisoCombate = (() => {
     if(document.getElementById('aviso-combate-css')) return;
     const s = document.createElement('style');
     s.id = 'aviso-combate-css';
-    s.textContent = `.aviso-combate-fondo{position:fixed;inset:0;z-index:98500;background:rgba(6,8,14,.62);display:flex;align-items:center;justify-content:center;padding:12px}
+    // z-index 99100 (2026-10-08): por encima del cuadro del duelo (99000) — un anuncio que llega con el duelo abierto (la Polilla) se tiene que ver.
+    s.textContent = `.aviso-combate-fondo{position:fixed;inset:0;z-index:99100;background:rgba(6,8,14,.62);display:flex;align-items:center;justify-content:center;padding:12px}
       .aviso-combate-fondo .duelo-caja{width:min(560px,100%)}
       .aviso-combate-fondo .duelo-paso p{margin:0;line-height:1.4}
       .aviso-combate-fondo .duelo-veredicto .grande{font-size:34px}

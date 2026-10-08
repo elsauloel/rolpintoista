@@ -182,10 +182,13 @@ function blinkDeHabilidad(msg){
    lo que se quiere es un buff a un aliado o un debuff a un rival. 20: sale bien y quien la usa elige cuál; Común 10–19 / Buena 8–19: bien, al azar;
    el resto hasta 2: al revés, al azar; 1: al revés y elige cuál el bando contrario (el GM: si no es esta pantalla, se le pide con el momento).
    Los estados y sus turnos: Combatiente.CAOS_ESTADOS (docs/estados-turnos.md). Fuera del Rango: avisa y deja seguir. */
+// Cuánto dura un estado del sorteo, en palabras.
+const CAOS_DUR_SIN_TURNOS = {'Armadura rota': 'permanente (−1 de armadura)', 'Sentado': 'hasta que se levante', 'Sigilo': 'hasta que lo descubran', 'Desarmado': 'el arma vuela 2 casillas; hasta que la levante'};
+const caosDurTxt = s => s.turnos ? `${s.turnos} turno${s.turnos === 1 ? '' : 's'}` : s.stacks ? `${s.stacks} stacks` : CAOS_DUR_SIN_TURNOS[s.nombre] || 'hasta que se le pase';
 // Elegir el estado del caos de una lista (los de esa polaridad). → Promise del estado; cerrar sin elegir = uno al azar.
 function caosElegir(pol, titulo, texto, excluir){
   const lista = (Combatiente.CAOS_ESTADOS[pol] || []).filter(s => !(excluir || []).includes(s.nombre));
-  const dur = s => s.turnos ? `${s.turnos} turno${s.turnos === 1 ? '' : 's'}` : s.stacks ? `${s.stacks} stacks` : s.vuela ? 'el arma vuela 2 casillas' : 'hasta que se le pase';
+  const dur = caosDurTxt;
   return new Promise(ok => {
     let listo = false;
     const fin = s => { if(listo) return; listo = true; ok(structuredClone(s)); AvisoCombate.cerrar(); };
@@ -231,7 +234,7 @@ function caosDeHabilidad(msg){
         spec.detalle = `Provocado: si ataca, tiene que atacar a ${nombreDe(contra || mio)} (✋ lo respeta su jugador o el GM).`;
       }else spec.detalle = 'Provocado: contra quién lo elige el bando contrario (✋ a mano).';
     }
-    const dueTurnos = spec.turnos ? `${spec.turnos} turno${spec.turnos === 1 ? '' : 's'}` : spec.stacks ? `${spec.stacks} stacks` : 'hasta que se le pase';
+    const dueTurnos = caosDurTxt(spec);
     const titulo = `${nom}: ${res.elige === 'propio' ? '¡20! elegiste vos' : res.elige === 'rival' ? 'salió 1, eligió el bando contrario' : res.bien ? 'salió lo que buscabas' : 'salió al revés'}`;
     const texto = `1d20 → ${r ? r.total : '?'} (${aliado ? 'a un aliado' : 'a un rival'}): ${nombreDe(dest)} recibe ${spec.nombre} (${dueTurnos}).${spec.nombre === 'Provocado' ? ' ' + spec.detalle : ''}`;
     // Un creep, o el arma que vuela (Desarmado), lo aplica la pantalla del GM: si no soy el GM, se lo pido con el momento.

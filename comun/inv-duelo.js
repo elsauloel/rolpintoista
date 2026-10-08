@@ -90,7 +90,9 @@ const InvDuelo = (() => {
           const t = d.ataque.tipo === 'habilidad-arma'
             ? A().tirada(inv, 'PdG', I().statValor(inv, 'pdg') + num(d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: num(inv.armaTipo), armaDeRango: !!inv.armaDeRango}), 'pdg')
             : A().tiradaAtaque(inv, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo);
-          return {formula: t && t.r ? t.r.formula : '', ...L('atacar:')};
+          const tipo = d.ataque.tipo;
+          return {formula: t && t.r ? t.r.formula : '', ...L('atacar:'), costo: Combatiente.costoAtaqueLineas({tipoArma: num(inv.armaTipo) || 8, hechos: num(inv.ataquesTurno),
+            costo: tipo === 'habilidad-arma' ? 0 : A().costoAtaqueDe(inv, tipo === 'normal' ? undefined : tipo), tiene: num(inv.nitros), ataque: tipo})};
         }
         if(campo === 'fuerza') return {formula: F(I().statValor(inv, 'fue') + I().pesoArma(inv), 'fue'), ...L('stat:fue'), titulo: `${inv.nombre} · Fuerza del golpe`};
         if(campo === 'bloqueo') return {formula: F(I().bloqueoValor(inv), 'bloqueo'), ...L('stat:bloqueo'), titulo: `${inv.nombre} · Bloqueo`};

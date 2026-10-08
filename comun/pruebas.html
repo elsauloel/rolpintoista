@@ -1639,8 +1639,10 @@ prueba('Duelo: cada botón dice qué dado tira y trae su 🔍 (dueño, 2026-10-0
   const v = h.vista(d, 'pdg'), e = h.vista(d, 'eva'), dn = h.vista(d, 'dano'), hab = h.vista({...d, hab: {tira: {formula: '2d6', etq: 'X'}}}, 'pdg');
   const sc = creepPrueba({esp: 12}), hc = CreepDuelo.hooks({creep: () => sc, soy: () => true}), vc = hc.vista(d, 'pdg'), vb = hc.vista(d, 'bloqueo');
   const ops = Duelo.conVistas(d, [{modo: 'evasion', etiqueta: 'Evasión'}], h);
-  igual([/\dd\d/.test(v.formula), /\dd\d/.test(e.formula), !!dn.formula, hab.formula, /\dd\d/.test(vc.formula), !!vb && 'formula' in vb, !!ops[0].lupa, !!v.html],
-    [true, true, true, '2d6', true, true, true, true]);
+  const cl = Combatiente.costoAtaqueLineas({tipoArma: 8, hechos: 0, costo: 4, tiene: 3, ataque: 'normal'}), c2 = Combatiente.costoAtaqueLineas({tipoArma: 6, hechos: 1, costo: 6, tiene: 9, ataque: 'normal'});
+  igual([/\dd\d/.test(v.formula), /\dd\d/.test(e.formula), !!dn.formula, hab.formula, /\dd\d/.test(vc.formula), !!vb && 'formula' in vb, !!ops[0].lupa, !!v.html,
+    v.costo && v.costo.no2 >= 0, vc.costo && vc.costo.no2 >= 0, cl.no2, cl.lineas.some(x => /no le alcanzan/.test(x)), c2.lineas[1], Combatiente.costoAtaqueLineas({ataque: 'habilidad-arma'}).no2],
+    [true, true, true, '2d6', true, true, true, true, true, true, 4, true, 'Ya atacó una vez este turno: Tipo completo = 6', 0]);
 });
 prueba('Parálisis recarga 1 No2 menos; Desarmado no afecta a un arma natural (dueño, 2026-10-08)', () => {
   const par = [{nombre: 'Parálisis', paralisis: true, activo: true}], des = ESTADOS_PRESET.find(p => p.nombre === 'Desarmado');

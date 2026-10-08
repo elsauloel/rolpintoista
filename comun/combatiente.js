@@ -1048,6 +1048,22 @@ const Combatiente = (() => {
     const st = AHORRO_ESPECIAL[tipo];
     return st && typeof valorDe === 'function' ? Math.max(0, Math.round(n(valorDe(st)))) : 0;
   }
+  /* Cuánto No2 cuesta el ataque de un duelo y por qué (2026-10-08, dueño: «que diga cuántos nitros va a descontar, con el ? que explique de dónde
+     sale»). o = {tipoArma, hechos (ataques ya hechos con esa arma / en el turno), costo, tiene (No2 que tiene), ataque: 'normal'|'oportunidad'|'contra'|
+     'habilidad-arma'} → {no2, lineas}. Lo usan los ganchos `vista` de personajes, creeps e invocaciones. */
+  function costoAtaqueLineas(o){
+    const t = Math.round(n(o.tipoArma)) || 8, costo = Math.max(0, Math.round(n(o.costo))), mitad = Math.ceil(t / 2);
+    if(o.ataque === 'habilidad-arma') return {no2: 0, lineas: ['Los No2 de este ataque ya los cobró la habilidad.']};
+    const l = [`Tipo del arma: ${t}`];
+    if(o.ataque === 'oportunidad' || o.ataque === 'contra') l.push(`${o.ataque === 'contra' ? 'Contraataque' : 'Ataque de oportunidad'}: lo de un primer ataque (Tipo ÷ 2${t % 2 ? ', para arriba' : ''} = ${mitad}); no cuenta como ataque del turno`);
+    else if(n(o.hechos) > 0) l.push(`Ya atacó ${n(o.hechos) === 1 ? 'una vez' : `${Math.round(n(o.hechos))} veces`} este turno: Tipo completo = ${t}`);
+    else l.push(`Primer ataque del turno: Tipo ÷ 2${t % 2 ? ', para arriba' : ''} = ${mitad}`);
+    const base = o.ataque === 'oportunidad' || o.ataque === 'contra' ? mitad : n(o.hechos) > 0 ? t : mitad;
+    if(costo !== base) l.push(`${costo < base ? 'Ahorro' : 'Recargo'} (arma, equipo o estados): ${costo < base ? '−' : '+'}${Math.abs(base - costo)}`);
+    l.push(`Cuesta ${costo} No2 · tiene ${Math.round(n(o.tiene))}${costo > n(o.tiene) ? ' (no le alcanzan: pregunta y deja seguir)' : ''}`);
+    return {no2: costo, lineas: l};
+  }
+
   // Áreas por diámetro (dueño, 2026-10-08: «radio 1» se entendía como una sola casilla). Adentro se sigue guardando el radio (los anillos
   // alrededor del centro: 0 = una casilla, 1 = la flor de 7, 2 = 19…); lo que se lee dice el diámetro y cuántas casillas son.
   const diametro = radio => 2 * Math.max(0, Math.round(nf(radio))) + 1;
@@ -1065,7 +1081,7 @@ const Combatiente = (() => {
     return h;
   }
 
-  return {diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

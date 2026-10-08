@@ -94,7 +94,8 @@ const CreepDuelo = (() => {
         if(campo === 'parry') return {formula: formulaDe(A().tirada('', C().statValor(sc, 'parry'), sc, 'parry')), ...L('stat|parry')};
         if(campo === 'pdg'){
           const t = d.ataque.tipo === 'habilidad-arma' ? pdgDeArreglos(sc, d.ataque) : A().tiradaAtaque(sc, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo);
-          return {formula: formulaDe(t), ...L('atacar|')};
+          const tipo = d.ataque.tipo, costo = tipo === 'oportunidad' ? C().costoOportunidad(sc) : tipo === 'contra' ? C().costoContraataque(sc) : C().costoAtaque(sc);
+          return {formula: formulaDe(t), ...L('atacar|'), costo: Combatiente.costoAtaqueLineas({tipoArma: num(sc.armaTipo) || 8, hechos: num(sc.ataquesTurno), costo, tiene: num(sc.nitros), ataque: tipo})};
         }
         if(campo === 'fuerza') return {formula: formulaDe(A().tirada('', C().fuerzaGolpeValor(sc))), ...L('stat|fue'), titulo: `${sc.nombre} · Fuerza del golpe`};
         if(campo === 'bloqueo') return {formula: formulaDe(A().tirada('', C().bloqueoValor(sc) + A().bloqueoFirmeCreep(sc), sc, 'bloqueo')), ...L('stat|bloqueo'), titulo: `${sc.nombre} · Bloqueo`};

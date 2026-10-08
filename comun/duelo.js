@@ -164,6 +164,9 @@ const Duelo = (() => {
 #duelo-fondo .bt-lupa.duelo-lupa{display:inline-flex;position:static;width:auto;height:auto;margin-left:8px;padding:2px 7px;vertical-align:middle;font-size:14px;opacity:1;filter:none;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.5);border-radius:6px}
 #duelo-fondo .bt-lupa.duelo-lupa:hover{background:rgba(255,255,255,.2)}
 #lupa-pop{z-index:100050}
+#duelo-fondo .duelo-costo-ayuda{position:relative;display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:4px;border-radius:50%;border:1px solid currentColor;font:700 10px/1 "Space Mono",monospace;cursor:help;vertical-align:middle;opacity:.8}
+#duelo-fondo .duelo-costo-ayuda:hover,#duelo-fondo .duelo-costo-ayuda:focus{opacity:1;outline:none;background:rgba(255,255,255,.12)}
+#duelo-fondo .duelo-costo-ayuda:hover::after,#duelo-fondo .duelo-costo-ayuda:focus::after{content:attr(data-txt);position:absolute;left:50%;top:22px;transform:translateX(-50%);z-index:5;width:max-content;max-width:300px;white-space:pre-line;text-align:left;background:#1d1712;color:#EDE3D6;border:1px solid #E0A458;border-radius:6px;padding:8px 10px;font:12.5px/1.45 system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.5)}
 #duelo-fondo [data-dano-tirar]:disabled,#duelo-fondo [data-critico]:disabled{opacity:.5;cursor:default}
 .duelo-crit-titulo{text-align:center;font-size:30px;font-weight:900;letter-spacing:.04em;padding:10px 0 4px}
 .duelo-crit-titulo.no{color:#9aa4bd}
@@ -1256,6 +1259,13 @@ const Duelo = (() => {
     }
     return lupaBotonHtml('duelo|' + k, 'duelo-lupa');
   }
+  // «descuenta 2 No2» con un «?» que al pasar el mouse dice de dónde sale (2026-10-08, dueño). Sin el dato de la página, el texto de siempre.
+  function costoAtaqueHtml(d){
+    const v = vistas[d.id + ':pdg'], c = v && v.costo;
+    if(!c) return '<div class="det">descuenta los No2 del ataque</div>';
+    if(!c.no2) return `<div class="det">${_esc((c.lineas || [])[0] || 'no descuenta No2')}</div>`;
+    return `<div class="det">descuenta <b>${_fmt(c.no2)} No2</b> <span class="duelo-costo-ayuda" tabindex="0" data-txt="${_esc((c.lineas || []).join('\n'))}">?</span></div>`;
+  }
   // Lo que se suma al texto del botón: « · 1d10» y el 🔍.
   function vistaBoton(d, campo){
     const k = d.id + ':' + campo;
@@ -1427,7 +1437,7 @@ const Duelo = (() => {
         else cuerpo = `<div class="det">Elegí cómo te defendés (antes de ver el PdG):</div><div class="duelo-opc">${ops.map((o, i) => `<button type="button" data-def="${i}"${o.motivoNo ? ' disabled' : ''}>${_esc(o.etiqueta)}${ayudaDefensa(o.modo === 'evasion' ? 'eva' : o.modo)}${o.lupa ? lupaDuelo(d.id + ':op' + i, (vistas[d.id + ':op' + i] = o.lupa)) : ''}${o.costo ? `<small>${_fmt(o.costo)} No2</small>` : ''}${(o.info || []).map(t => `<small class="duelo-info">${_esc(t)}</small>`).join('')}${o.motivoNo ? `<small>${_esc(o.motivoNo)}</small>` : ''}</button>`).join('')}</div>`;
       }else{
         const txt = campo === 'pdg' ? (d.hab ? `🎲 Tirar ${_esc(etqTira(d))}` : '🎲 Pagar y tirar PdG') : campo === 'fuerza' ? '🎲 Tirar Fuerza del golpe' : `🎲 Tirar Bloqueo${d.defensa && d.defensa.itemNombre ? ' · ' + _esc(d.defensa.itemNombre) : ''}`;
-        cuerpo = `<button type="button" data-tirar="${campo}">${txt}${d.hab && campo === 'pdg' && d.hab.tira && d.hab.tira.formula ? ` · ${_esc(d.hab.tira.formula)}` : vistaBoton(d, campo)}${campo === 'bloqueo' ? ayudaDefensa('bloqueo') : ''}</button>${campo === 'pdg' && !d.hab ? '<div class="det">descuenta los No2 del ataque</div>' : ''}`;
+        cuerpo = `<button type="button" data-tirar="${campo}">${txt}${d.hab && campo === 'pdg' && d.hab.tira && d.hab.tira.formula ? ` · ${_esc(d.hab.tira.formula)}` : vistaBoton(d, campo)}${campo === 'bloqueo' ? ayudaDefensa('bloqueo') : ''}</button>${campo === 'pdg' && !d.hab ? costoAtaqueHtml(d) : ''}`;
       }
       cuerpo += flashHtml(d, campo);
     }else if(puedoAMano(lado)){

@@ -178,6 +178,37 @@ function blinkDeHabilidad(msg){
     adonde(id, t);
   }, `<b>✨ ${nom}¿a quién?</b> <span>clic sobre vos o sobre un aliado que ves · Esc o clic derecho cancelan</span>`, true);
 }
+/* La Varita del caos (2026-10-08, dueño): se elige a alguien (aliado, rival o uno mismo) y se tira 1d10. Con 1…exito (la Común, 6 = 60 %) sale lo
+   que se quiere: a un aliado un buff al azar, a un rival un debuff al azar; después (3 = 30 %) lo contrario, al mismo; el resto (10 %), un debuff
+   a quien la usó. Los estados y sus turnos: Combatiente.CAOS_ESTADOS (docs/estados-turnos.md). Fuera del Rango: avisa y deja seguir. */
+function caosDeHabilidad(msg){
+  const yo = [...tokens.entries()].find(([, x]) => x.fichaId === msg.fichaId && x.tipo === 'pj');
+  if(!yo){ toast(`${msg.nombre || 'Varita del caos'}: tu personaje no tiene token en el mapa`); return; }
+  if(!$('#botonera-capa').hidden) escapeABotonera();
+  const nom = msg.nombre || 'Varita del caos';
+  elegirDestino(async h => {
+    const e = [...tokens.entries()].find(([, x]) => x.col === h.col && x.fila === h.fila && (!x.oculto || soyGM));
+    if(!e){ toast('Ahí no hay nadie: hacé clic sobre alguien'); caosDeHabilidad(msg); return; }
+    const [, t] = e, mio = yo[1];
+    const rg = typeof rangoDeToken === 'function' ? rangoDeToken(mio) : null;
+    if(rg && num(rg.rng) > 0 && distanciaHex(mio, t) > num(rg.rng)) toast(`⚠ ${nombreDe(t)} está a ${distanciaHex(mio, t)}: fuera de tu Rango (${fmt(num(rg.rng))})`);
+    const aliado = t === mio || !dueloEsRival({ref: msg.fichaId, tipo: 'pj'}, t);
+    const r = tirarDados('1d10');
+    const res = Combatiente.caosResultado(r ? r.total : 1, aliado, msg.caos);
+    const spec = Combatiente.caosEstado(res.que);
+    const dest = res.a === 'propio' ? mio : t;
+    try{ mesaPublicar(`${nombreDe(mio)} · ${nom} (${nombreDe(t)})`, {formula: '1d10', rolls: r ? r.rolls : [], mod: 0, total: r ? r.total : 0}); }catch(err){}
+    const dueTurnos = spec.turnos ? `${spec.turnos} turno${spec.turnos === 1 ? '' : 's'}` : spec.stacks ? `${spec.stacks} stacks` : 'hasta que se le pase';
+    let nota = '';
+    try{
+      if(dest.tipo === 'creep') await modificarCreep(dest.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
+      else await EstadosAplicar.encolarPj({fichaId: dest.fichaId, duenoUid: dest.duenoUid, spec, origen: nom});
+    }catch(err){ console.error('No se pudo aplicar el estado del caos:', err); nota = ' ✋ Aplicalo a mano.'; }
+    const que = res.bien ? 'salió lo que buscabas' : res.a === 'propio' ? 'se te dio vuelta' : 'salió al revés';
+    momentoAbrir({tipo: 'caos', icono: '🎲', titulo: `${nom}: ${que}`, estado: 'listo',
+      resultado: `1d10 → ${r ? r.total : '?'} (${aliado ? 'a un aliado' : 'a un rival'}): ${nombreDe(dest)} recibe ${spec.nombre} (${dueTurnos}).${nota}`});
+  }, `<b>🎲 ${esc(nom)}: ¿a quién?</b> <span>clic sobre un aliado (un buff al azar) o un rival (un debuff al azar) · Esc o clic derecho cancelan</span>`, true);
+}
 async function portalesCrear(puntos, turnos, nombre, de){
   const n = Math.max(1, Math.round(num(turnos)) || 3), vence = Math.round(num(mantenimientoNumero)) + n + (de && colocadorEnOrden(de) ? 1 : 0);
   try{
@@ -473,6 +504,7 @@ window.addEventListener('message', e => {
   if(e.data.tipo === 'zona-habilidad') zonaDeHabilidad(e.data);
   if(e.data.tipo === 'portal-habilidad') portalDeHabilidad(e.data);
   if(e.data.tipo === 'blink-habilidad') blinkDeHabilidad(e.data);
+  if(e.data.tipo === 'caos-habilidad') caosDeHabilidad(e.data);
   if(e.data.tipo === 'zona-persistente-habilidad') zonaPersistenteDeHabilidad(e.data);
   if(e.data.tipo === 'trampa-habilidad') trampaDeHabilidad(e.data);
   if(e.data.tipo === 'invocacion-habilidad') invocacionDeHabilidad(e.data);

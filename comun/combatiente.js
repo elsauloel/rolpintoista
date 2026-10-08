@@ -983,12 +983,34 @@ const Combatiente = (() => {
     });
     return out;
   }
+  /* El caos (2026-10-08, Varita del caos): los estados que puede sortear y cuánto duran (docs/estados-turnos.md, la propuesta que corrige el
+     dueño: si cambia ahí, cambia acá). `spec` lista para EstadosAplicar (turnos de quien la usa; cantidades fijas donde el preset pregunta). */
+  const CAOS_ESTADOS = {
+    buff: [{nombre: 'Regeneración', turnos: 3, hp: 2}, {nombre: 'Hypeado', turnos: 2}, {nombre: 'Crítico frecuente', turnos: 2}, {nombre: 'Crítico potente', turnos: 2},
+      {nombre: 'Invulnerable', turnos: 1}, {nombre: 'Inmunidad a CC', turnos: 2}, {nombre: 'Espinas', turnos: 3}, {nombre: 'Espejo', turnos: 3},
+      {nombre: 'Vida extra', turnos: 3, escudoMagico: 5}, {nombre: 'Barrera', turnos: 2, escudoMagico: 8}, {nombre: 'Afortunado', turnos: 2},
+      {nombre: 'Sangre pura', turnos: 3}, {nombre: 'Coagulación extrema', turnos: 3}, {nombre: 'Blindado', turnos: 2}, {nombre: 'Inamovible', turnos: 2}],
+    debuff: [{nombre: 'Veneno', stacks: 4}, {nombre: 'Sangrado', turnos: 2}, {nombre: 'Quemadura', turnos: 3}, {nombre: 'Escarcha', turnos: 2},
+      {nombre: 'Armadura rota', turnos: 3}, {nombre: 'Pajaritos', turnos: 2}, {nombre: 'Cansado', turnos: 2}, {nombre: 'Exhausto', turnos: 1},
+      {nombre: 'Stun', turnos: 1}, {nombre: 'Confusión', turnos: 2}, {nombre: 'Lisiado', turnos: 2}, {nombre: 'Inmovilizado', turnos: 1},
+      {nombre: 'Rengo', turnos: 2}, {nombre: 'Lento', turnos: 2}, {nombre: 'Miedo', turnos: 2}, {nombre: 'Provocado', turnos: 1},
+      {nombre: 'Parálisis', turnos: 2}, {nombre: 'Silencio', turnos: 1}, {nombre: 'Ceguera', turnos: 1}, {nombre: 'Marcado', turnos: 2}, {nombre: 'Sentado'}],
+  };
+  /* El d10 del caos: `caos = {exito, contra, propio}` (la Común 6/3/1). Con 1…exito sale lo que se quiere (a un aliado un buff, a un rival un
+     debuff); después, contra (lo contrario, al mismo objetivo); el resto, un debuff a quien la usó. → {que: 'buff'|'debuff', a: 'objetivo'|'propio', bien}. */
+  function caosResultado(d10, aliado, caos){
+    const ex = n(caos && caos.exito) || 6, co = n(caos && caos.contra) || 3, d = n(d10);
+    if(d <= ex) return {que: aliado ? 'buff' : 'debuff', a: 'objetivo', bien: true};
+    if(d <= ex + co) return {que: aliado ? 'debuff' : 'buff', a: 'objetivo', bien: false};
+    return {que: 'debuff', a: 'propio', bien: false};
+  }
+  const caosEstado = (pol, azar) => { const l = CAOS_ESTADOS[pol] || []; return structuredClone(l[Math.floor((azar || Math.random)() * l.length)] || l[0]); };
   const AHORRO_ESPECIAL = {oportunidad: 'oporahorro', contra: 'contraahorro', contraataque: 'contraahorro'};
   function ahorroEspecial(tipo, valorDe){
     const st = AHORRO_ESPECIAL[tipo];
     return st && typeof valorDe === 'function' ? Math.max(0, Math.round(n(valorDe(st)))) : 0;
   }
-  return {especialesConModos, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

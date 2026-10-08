@@ -380,6 +380,12 @@ prueba('alcance: rango, adyacente, fijo; en automático lo especial usa el Rango
   igual([Combatiente.alcanceHab({alcance: 'casteo'}, '', st), Combatiente.alcanceHab({alcance: 'rango'}, '', st), Combatiente.alcanceHab({alcance: 'adyacente'}, '', st),
     Combatiente.alcanceHab({alcance: 'fijo', alcanceN: 3}, '', st), Combatiente.alcanceHab({}, 'pdgmg', st), Combatiente.alcanceHab({}, 'pdg', st)], [6, 6, 1, 3, 6, 0]);
 });
+prueba('la trampa que coloca una habilidad: la salvación contra el Ef.Esp de quien la coloca (Varita del portal, 2026-10-07)', () => {
+  const v = CATALOGO_BASE.find(i => i.nombre === 'Varita del portal');
+  const h = {nombre: v.nombre, trampaColocar: v.especial.trampaColocar};
+  const t = Combatiente.trampaDeHab(h, id => ({dmgesp: 9, des: 4}[id] || 0)), sinValor = Combatiente.trampaDeHab(h);
+  igual([t.salvacion.stat, t.salvacion.dif, t.detectar, sinValor.salvacion.dif], ['resmg', 9, 9, 7]);
+});
 prueba('el Rango lo da la Destreza: sin Rango de casteo en la ficha ni en los creeps; un «+Rango de casteo» viejo suma al Rango', () => {
   const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 3, agl: 3, des: 5, esp: 9},
     inventario: [{id: 'c', nombre: 'Capuz viejo', tipoItem: 'cabeza', equipado: true, mods: [{stat: 'rangocasteo', val: 2}]}]}).S);

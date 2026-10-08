@@ -1929,6 +1929,9 @@ Con la calculadora recalibrada (varitas directas con dado fijo, báculos con ¼ 
   **Sanguijuela** ✅ drena vida: 1d6 y te curás la mitad (2 SP, 80 DDE) · **Cosecha**: la marca dura **3 turnos**; si muere marcado, 2 SP y 2 de
   vida (3 SP, 120 DDE) · **Campo de estática: 1 turno** (3 SP, 90 DDE) · **Portal** de un solo portal: a confirmar la distancia (y 2 SP) ·
   **Arena movediza**: «flor de radio 2 es muy grande» → aclarar (la propuesta era la flor chica, radio 1).
+- **Trampa portal (dueño, 2026-10-07): Res.Esp contra el Ef.Esp de quien la coloca** (antes contra 7). ✅ Hecho en la Varita del portal Común: la
+  trampa que coloca una habilidad puede llevar `salvacion.difStat` / `soltar.difStat` y la dificultad sale de ese stat al colocarla
+  (`Combatiente.trampaDeHab`, como la de detectarla).
 - **El rango lo da la Destreza, siempre** (dueño, 2026-10-07, P174): donde esta hoja dice «Rango de casteo» (la primera casilla del Chorro
   de lava, a 1/3), ahora es **tu Rango**.
 

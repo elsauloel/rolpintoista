@@ -789,6 +789,13 @@ const Combatiente = (() => {
       const v = Number(valorDe(t.detectarStat === 'dmgesp' ? 'dmgesp' : 'des'));
       const oculta = Math.max(0, Math.round(n(valorDe('trampaoculta'))));   // Guantes de trampero (2026-10-05): tus trampas, más difíciles de ver
       if(Number.isFinite(v)) out.detectar = Math.max(1, Math.round(v)) + oculta;
+      // La tirada para evitarla o para soltarse, contra un stat de quien la coloca (dueño, 2026-10-07: la trampa portal, Res.Esp contra tu
+      // Ef.Esp): `salvacion.difStat` / `soltar.difStat`. Sin `valorDe`, queda la dificultad fija que traiga (`dif`).
+      ['salvacion', 'soltar'].forEach(k => {
+        if(!t[k] || !t[k].difStat) return;
+        const d = Number(valorDe(t[k].difStat));
+        if(Number.isFinite(d)) out[k] = {...t[k], dif: Math.max(1, Math.round(d))};
+      });
     }
     return out;
   }

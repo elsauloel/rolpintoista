@@ -3,7 +3,7 @@
 Todas son de una mano (peso 1), salvo los báculos (dos manos, peso 2). «Directo» = ignora la Defensa especial (lo frena solo la
 resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (el No2 sube 1 por cada uso más en el turno).
 
-## ✅ Cargadas (19)
+## ✅ Cargadas (25)
 
 | Arma | Qué hace · SP · DDE |
 |---|---|
@@ -26,6 +26,12 @@ resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (
 | Báculo de escarcha | 1d6 de hielo + ¼ de tu Ef.Esp; 25 % de Escarcha. · 2 · 85 |
 | Báculo del sabio | 1d8 arcano + ¼ de tu Ef.Esp. · 2 · 90 |
 | Báculo guardián | 1d4 arcano + ¼ de tu Ef.Esp; en las manos, Parry +1 y Bloqueo +1. · 1 · 115 |
+| Varita del portal aliado mayor | Dos portales a 6 o menos uno del otro, solo tu bando, 2 turnos. · 2 · 80 |
+| Varita de la trampa portal mayor | Oculta: lleva hasta 6 casillas; Res.Esp contra tu Ef.Esp + 2. · 1 · 80 |
+| Varita de la trampa de arena mayor | Flor oculta: Inmovilizado a todos los que están encima; Soltarse con Fuerza contra tu Ef.Esp; arena 2 turnos. · 2 · 80 |
+| Báculo de sangre | 1d8 arcano + ¼ de tu Ef.Esp; cada uso cuesta el 10 % de tu vida máxima en vez de SP. · — · 90 |
+| Varita inestable | 2d6 arcano directo; si sale algún 1 en el daño, te hacés 2d4. · 2 · 100 |
+| Varita de la luz flotante | Luz de radio 2, 2 turnos: ilumina y deja ver lo oculto mientras dura; cada rival que toca queda Marcado 3 turnos. · 1 · 80 |
 
 ## 🔧 Decididas, falta programar algo para cargarlas
 
@@ -38,15 +44,9 @@ resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (
 | Varita del muro de fuego | Línea de 3, 3 turnos, en el piso y en el aire: 1d4 de fuego al entrar o quedarse. · 1 · 80 |
 | Varita del muro | 3 casillas en línea, 3 turnos: tapan el paso y la vista. · 2 · 80 |
 | Varita del vendaval | Cono: empuja 2 a todos; apaga el fuego y despeja la niebla que toca. · 1 · 80 |
-| Varita inestable | 2d6 arcano directo; si sale algún 1, te hacés 2d4. · 2 · 100 |
 | Varita del blink | Te teletransportás (o a un aliado que ves) hasta 3 casillas; una vez por turno. · 3 · 95 |
-| Varita de la luz flotante | Luz de radio 2 en una casilla, 2 turnos; lo oculto que está adentro se ve **solo mientras dura la luz** (al apagarse, vuelve a quedar oculto). Dueño, 2026-10-08. · 1 · 80 |
-| Báculo de sangre | 1d8 arcano + ¼ de tu Ef.Esp; cada uso cuesta el 10 % de tu vida máxima (para arriba) en vez de SP. · — · 90 |
 | Varita de cargas | La Bola de fuego Común, 3 usos por combate sin SP. · — · 120 |
 | Varita gemela | Aceite o Bola de fuego: elegís al usarla (el SP del que elegís). · 1 o 2 · 95 |
-| Trampa portal | Oculta: al que la pisa lo lleva hasta 6 casillas; Res.Esp contra tu Ef.Esp + 2. · 1 · 80 |
-| Portal (para aliados) | A la vista, solo tu bando, hasta 6 casillas, 2 turnos. · 2 · 80 |
-| Trampa de arena | Flor oculta, 2 turnos: Inmovilizado; Soltarse con Fuerza contra tu Ef.Esp (si falla, +1 turno); salir cuesta 2 No2 por paso. · 2 · 80 |
 | Arena movediza | Aparece bajo los pies (no se esquiva), Res.CC contra tu Ef.Esp, 2 turnos, la misma dinámica. · 3 · 110 |
 
 ## ✅ Rara

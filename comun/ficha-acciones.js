@@ -597,8 +597,10 @@ const FichaAcciones = (() => {
   function costoEspecial(S, it){
     const e = it.especial || {}, usos = usosEspecial(S, it);
     const ahorro = usos ? 0 : Math.max(0, Math.round(num(FichaCalculo.calcular(S).final.ahorroespsp)));   // Mitones del primer conjuro (2026-10-05)
-    return {no2: Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1)), sp: Math.max(0, num(e.sp) - ahorro), usos};
+    return {no2: Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1)), sp: Math.max(0, num(e.sp) - ahorro), usos, vida: vidaPorUso(S, e)};
   }
+  // El báculo de sangre (2026-10-08): cada uso cuesta `spVidaPct` % de tu vida máxima (para arriba) en vez de SP.
+  const vidaPorUso = (S, e) => num(e && e.spVidaPct) > 0 ? Math.max(1, Math.ceil(num(FichaCalculo.calcular(S).final.hpmax) * num(e.spVidaPct) / 100)) : 0;
   const spDisponible = S => Math.max(0, num(FichaCalculo.calcular(S).final.sp) - num(S.spGastado));
   function habDeArmaEspecial(S, it){
     const e = it.especial || {}, f = FichaCalculo.calcular(S).final;
@@ -614,7 +616,7 @@ const FichaAcciones = (() => {
     const t = String(it.detalle || '').split(' ⚙')[0].split(' ✋')[0].trim();
     return {costo: costoEspecialTxt(S, it), que: t.length <= 200 ? t : t.slice(0, 200).replace(/[\s,;:(]+\S*$/, '') + '…'};   // corta en una palabra, nunca a la mitad
   };
-  const costoEspecialTxt = (S, it) => { const c = costoEspecial(S, it); return `${fmt(c.no2)} No2${c.sp ? ` + ${fmt(c.sp)} SP` : ''}${c.usos ? ` (uso ${c.usos + 1} del turno)` : ''}`; };
+  const costoEspecialTxt = (S, it) => { const c = costoEspecial(S, it); return `${fmt(c.no2)} No2${c.sp ? ` + ${fmt(c.sp)} SP` : ''}${c.vida ? ` + ${fmt(c.vida)} HP` : ''}${c.usos ? ` (uso ${c.usos + 1} del turno)` : ''}`; };
   /* Los orbes equipados (2026-10-05) al usar un arma especial: el de resguardo te pone Vida extra 2 hasta tu próximo turno (una vez por turno: el
      conteo vive en S.ataquesArma, que vacía el Mantenimiento); el salvaje tira 1d6: con 1 te hace 1 de daño, con 6 el efecto sale doble (los dados del
      daño ×2; si el arma no hace daño, el doble lo decide la mesa). Todo a la vista en la Mesa. Devuelve true si sale doble. */
@@ -677,8 +679,9 @@ const FichaAcciones = (() => {
       conVida = !!(await confirmar(`${it.nombre}: ¿pagás los ${fmt(sp)} SP con vida (${fmt(sp)} HP)?\n\nAceptar: con vida · Cancelar: con SP`));
       if(conVida) sinSp = 'vida';
     }
-    const hpVida = conVida ? sp : 0;
+    let hpVida = conVida ? sp : 0;
     if(conVida) sp = 0;
+    if(c.vida > 0){ hpVida = c.vida; sp = 0; }   // el báculo de sangre: vida en vez de SP
     if(sp > spDisponible(S) && !sinSp){
       if(!(await confirmar(`Te falta SP: ${it.nombre} cuesta ${fmt(sp)} SP y tenés ${fmt(spDisponible(S))}. ¿La pagás con No2? (${fmt(no2 + sp)} No2 en vez de ${fmt(no2)} No2 + ${fmt(sp)} SP)`))) return;
       return usarArmaEspecial(S, itemId, forzar, ui, true, spFijo);
@@ -692,7 +695,7 @@ const FichaAcciones = (() => {
     S.spGastado = num(S.spGastado) + sp;
     if(hpVida){   // la Túnica de sangre: el SP, con vida
       if(ui.fijarHp) ui.fijarHp(num(S.hp) - hpVida); else S.hp = Math.max(0, num(S.hp) - hpVida);
-      ui.mesaHabilidad(it.nombre, `🩸 pagó ${fmt(hpVida)} SP con vida (−${fmt(hpVida)} HP).`);
+      ui.mesaHabilidad(it.nombre, c.vida > 0 ? `🩸 cuesta vida: −${fmt(hpVida)} HP (el ${fmt(num(e.spVidaPct))} % de su vida máxima).` : `🩸 pagó ${fmt(hpVida)} SP con vida (−${fmt(hpVida)} HP).`);
     }
     S.ataquesArma = {...(S.ataquesArma || {}), [claveEsp(item)]: c.usos + 1};
     const doble = orbesAlUsar(S, item, it, ui);   // los orbes de la otra mano (resguardo, salvaje)

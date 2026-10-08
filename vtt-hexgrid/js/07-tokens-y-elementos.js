@@ -220,7 +220,7 @@ function trampaDeMiBando(el){
 function puedeVerElemento(el){
   // Una trampa sin disparar solo la ve su bando (los jugadores las de los jugadores; el GM las suyas) y quien la descubrió;
   // disparada, todos. El GM no ve dónde están las de los jugadores (antes sí).
-  if(el.trampa && !el.disparada && !el.descubierta && !trampaDeMiBando(el) && !(el.id && trampasVistas.has(el.id))) return false;   // descubierta (P145): la ve todo el equipo
+  if(el.trampa && !el.disparada && !el.descubierta && !trampaDeMiBando(el) && !(el.id && trampasVistas.has(el.id)) && !iluminadaPorLuz(el)) return false;   // una luz (js/03) la deja ver mientras dura   // descubierta (P145): la ve todo el equipo
   return !el.invisible || puedeManipularElemento(el);
 }
 // Las casillas que ocupa de verdad ahora mismo (origen + cada offset, ya
@@ -277,6 +277,7 @@ function cajaCeldas(celdas){
   return {minX, minY, w: maxX - minX, h: maxY - minY};
 }
 
+const zonasInmediatasVistas = new Set();
 function escucharElementos(){
   cortarElementosListener = coleccionElementos().onSnapshot(snap => {
     snap.docChanges().forEach(ch => {
@@ -345,6 +346,7 @@ function escucharElementos(){
         zonaResueltos: Array.isArray(d.zonaResueltos) ? d.zonaResueltos.filter(x => typeof x === 'string') : [],
         zonaEnMantenimiento: d.zonaEnMantenimiento !== false,
         zonaCadaPaso: d.zonaCadaPaso === true,
+        zonaInmediata: d.zonaInmediata === true, zonaLuz: d.zonaLuz === true,   // (2026-10-08) enseguida a los de adentro · una luz (js/03)
         zonaAltura: ['piso', 'aire', 'ambos'].includes(d.zonaAltura) ? d.zonaAltura : '',   // dónde está su efecto (2026-10-07, js/08 alturaDe)
         zonaDanoDif: d.zonaDanoDif === true,   // el daño es la diferencia entre las tiradas (2026-10-02)
         zonaDanoTipo: typeof d.zonaDanoTipo === 'string' ? d.zonaDanoTipo : '',
@@ -361,6 +363,13 @@ function escucharElementos(){
       // Trampa de teleport que se acaba de disparar: pulsos de luz violeta en el punto donde saltó y azul en el destino (2026-09-25).
       if(ch.type === 'modified' && previoElem && !previoElem.disparada && d.disparada === true && typeof d.trampaDestino === 'string' && destinoParsear(d.trampaDestino)){
         teleportEfecto(elementos.get(ch.doc.id));
+      }
+      // Una zona que «aparece bajo los pies» (2026-10-08): recién puesta, afecta enseguida a los que ya están adentro (js/08). Recién puesta = la
+      // escritura propia que todavía no llegó al servidor, o creada hace menos de un minuto (no al cargar el mapa).
+      if(d.zona === true && d.zonaInmediata === true && !zonasInmediatasVistas.has(ch.doc.id)){
+        const ms = d.creado && typeof d.creado.toMillis === 'function' ? d.creado.toMillis() : null;
+        if(ms === null ? ch.doc.metadata.hasPendingWrites : Date.now() - ms < 60000){ zonasInmediatasVistas.add(ch.doc.id); setTimeout(() => zonaInmediataRevisar(ch.doc.id), 400); }
+        else if(ms !== null) zonasInmediatasVistas.add(ch.doc.id);
       }
       // Portal usado por un aliado: los mismos pulsos (violeta donde entró, azul donde salió) en todas las pantallas.
       if(ch.type === 'modified' && previoElem && d.portal === true && Number.isFinite(d.usoEn) && d.usoEn !== previoElem.usoEn && destinoParsear(d.portalDestino)){

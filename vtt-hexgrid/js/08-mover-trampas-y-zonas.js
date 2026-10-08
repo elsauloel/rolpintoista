@@ -440,6 +440,18 @@ async function zonaRenovarEstado(t, spec, el){
   }catch(err){ console.error('No se pudo renovar el estado de la zona:', err); }
 }
 function zonaRevisarMantenimiento(){ tokens.forEach(t => zonaRevisarToken(t, true)); }
+// Una zona recién puesta que «aparece bajo los pies» (2026-10-08, campo de estática, arena movediza Buena, luz flotante): cada pantalla revisa sus
+// tokens que ya están adentro, como si acabaran de entrar.
+function zonaInmediataRevisar(elId){
+  const el = elementos.get(elId);
+  if(!el || !el.zona) return;
+  const cs = celdasDeElemento(el);
+  tokens.forEach(t => {
+    if(!zonaEsMia(t) || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;
+    if(!cs.some(c => c.col === t.col && c.fila === t.fila)) return;
+    zonaEncolar(el, t);
+  });
+}
 function renderZonaBanner(){
   // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
   if(!zonaBanner){ AvisoCombate.cartel('zona', null); return; }

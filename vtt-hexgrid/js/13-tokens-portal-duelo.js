@@ -222,12 +222,16 @@ async function crearElementoZona(centro, cfg){
   if(cfg.nota) datos.zonaNota = String(cfg.nota).slice(0, 200);
   if(['piso', 'ambos'].includes(cfg.altura)) datos.zonaAltura = cfg.altura;   // del aire es lo de siempre (2026-10-07)
   if(cfg.directo && (datos.zonaDano || datos.zonaDanoDif)) datos.zonaDirecto = true;   // daño directo: no lo frena la Defensa especial (2026-10-07)
+  // (2026-10-08) afecta enseguida a los que ya están adentro (js/08 zonaInmediataRevisar) · es una luz (js/03: ilumina y deja ver lo oculto).
+  if(cfg.inmediata) datos.zonaInmediata = true;
+  if(cfg.luz) datos.zonaLuz = true;
   try{
     try{ await coleccionElementos().add(datos); }
     catch(e){
-      if(e.code !== 'permission-denied' || !(datos.zonaAltura || datos.zonaDirecto)) throw e;
-      const sinReglas = [datos.zonaAltura ? 'zonaAltura: quedó «del aire»' : '', datos.zonaDirecto ? 'zonaDirecto: la frena la Defensa especial' : ''].filter(Boolean).join(' · ');
-      delete datos.zonaAltura; delete datos.zonaDirecto; await coleccionElementos().add(datos);
+      if(e.code !== 'permission-denied' || !(datos.zonaAltura || datos.zonaDirecto || datos.zonaInmediata || datos.zonaLuz)) throw e;
+      const sinReglas = [datos.zonaAltura ? 'zonaAltura: quedó «del aire»' : '', datos.zonaDirecto ? 'zonaDirecto: la frena la Defensa especial' : '',
+        datos.zonaInmediata ? 'zonaInmediata: afecta al entrar, no enseguida' : '', datos.zonaLuz ? 'zonaLuz: no ilumina' : ''].filter(Boolean).join(' · ');
+      delete datos.zonaAltura; delete datos.zonaDirecto; delete datos.zonaInmediata; delete datos.zonaLuz; await coleccionElementos().add(datos);
       toast(`Ojo: faltan publicar las reglas (${sinReglas})`);
     }
     toast(`🌫 ${cfg.nombre || 'Zona'} colocada: dura ${n} turno${n === 1 ? '' : 's'}`);
@@ -267,6 +271,7 @@ function zonaPersistenteDeHabilidad(msg){
     casteadorRef: msg.fichaId, casteadorTipo: msg.casteadorTipo,
     danoDif: msg.zonaDanoDif, danoTipo: msg.zonaDanoTipo, tiraExtra: msg.zonaTiraExtra, nota: msg.zonaNota,
     tiraStat: msg.tiraStat, tiraValor: msg.tiraValor, altura: msg.zonaAltura, directo: !!msg.zonaDirecto, color: msg.zonaColor,
+    cadaPaso: !!msg.zonaCadaPaso, inmediata: !!msg.zonaInmediata, luz: !!msg.zonaLuz,
   }), `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': marcá el centro' : 'Elegí el centro de la zona'}</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true);
 }
 // 🪤 Trampa de una habilidad ✨ automática (2026-09-30, pedido del dueño): quien la usa elige la casilla con un clic (antes quedaba
@@ -1023,6 +1028,7 @@ async function dueloAplicarDano(d){
     // Rayo en cadena (2026-10-05): el golpe de una habilidad o arma especial de rayo salta (la misma regla de ⚡ Rayo en cadena del token).
     if(d.hab && d.hab.cadena && golpe > 0 && !res.r.invulnerable) await dueloCadena(d, golpe).catch(err => console.error('No se pudo hacer saltar el rayo:', err));
     if(d.hab && d.hab.atrae && !res.r.invulnerable) await dueloAtraer(d).catch(err => console.error('No se pudo atraer al objetivo:', err));   // el gancho
+    if(d.hab && d.hab.riesgo && (dn.rolls || []).map(num).includes(num(d.hab.riesgo.si))) await dueloRiesgo(d).catch(err => console.error('No se pudo aplicar el riesgo:', err));   // la inestable
     return {...base, desgaste, defensa: crit ? restaIgnorando : def, ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);
@@ -1058,6 +1064,20 @@ async function dueloCadena(d, golpe){
 
 /* El gancho (2026-10-05, Varita del gancho): si pegó, el objetivo tira su Fuerza contra el Ef.Esp de quien la usó (el valor de cuando la usó); si
    pierde, lo trae hasta `casillas` hacia quien la usó, por casillas libres (Inamovible: su chance de no moverse). Todo a la vista en la Crónica. */
+// El riesgo (2026-10-08, Varita inestable): salió el número en los dados del daño → quien la usó se hace su daño (directo, sin Defensa).
+async function dueloRiesgo(d){
+  const ta = d.atacante && tokens.get(d.atacante.tokenId), rg = d.hab.riesgo;
+  const r = tirarDados(rg.dano || '2d4');
+  if(!r) return;
+  try{ mesaPublicar(`${d.atacante.nombre || 'Quien la usó'} · ${d.hab.nombre}: se le va de las manos`, {formula: r.formula || rg.dano, rolls: r.rolls, mod: r.mod, total: r.total}); }catch(err){}
+  let txt = `Salió un ${rg.si} en los dados: ${rg.dano} → ${r.total} de daño a quien la usó.`;
+  if(ta){
+    const esInv = ta.tipo === 'pj' && String(ta.fichaId).includes(SEP_INVOCACION);
+    const res = esInv ? await danioInv(ta, String(r.total), true, 0, 0) : ta.tipo === 'creep' ? await danioCreep(ta, String(r.total), true, 0, 0) : await danioPj(ta, String(r.total), true, 0, 0);
+    txt += ` Vida ${fmt(num(res.previo))} → ${fmt(num(res.nuevo))}.`;
+  }else txt += ' ✋ A mano (su token no está en el mapa).';
+  momentoAbrir({tipo: 'riesgo', icono: '💥', titulo: `${d.hab.nombre}: le explota en la mano a ${d.atacante.nombre || 'quien la usó'}`, resultado: txt, estado: 'listo'});
+}
 async function dueloAtraer(d){
   const t = tokens.get(d.defensor.tokenId), ta = tokens.get(d.atacante.tokenId), a = d.hab.atrae;
   if(!t || !ta) return;

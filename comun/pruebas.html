@@ -1562,13 +1562,24 @@ prueba('guantes de Buena calidad: el primer conjuro (−1 SP, solo el primer uso
   const t = Combatiente.trampaDeHab({nombre: 'Cepo', trampaColocar: {nombre: 'Cepo'}}, st => st === 'des' ? 5 : st === 'trampaoculta' ? 2 : 0);
   igual([primero, segundo, esp, t.detectar], [2, 3, 1, 7]);
 });
-prueba('armas especiales de Buena (2026-10-07): 19 (primera tanda y grupo 1, sin el Manotazo), con su SP; la Bola de fuego mayor agarra aliados, la Sanguijuela drena la mitad, el báculo suma ¼ del Ef.Esp', () => {
+prueba('armas especiales de Buena (2026-10-07): 25 (primera tanda, grupo 1 sin el Manotazo y la tanda 1 del 2026-10-08), con su SP; la Bola de fuego mayor agarra aliados, la Sanguijuela drena la mitad, el báculo suma ¼ del Ef.Esp', () => {
   const buenas = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-buena-'));
   const sc = creepPrueba({esp: 12});
   const plan = id => { const it = {...structuredClone(CATALOGO_BASE.find(x => x.id === id)), id: 'x'}; const h = CreepAcciones.habDeEspecialCreep(sc, it); return {h, e: Combatiente.habEjecucion(h, h.duelo, {})}; };
   const bola = plan('esp-buena-varita-de-la-bola-de-fuego-mayor').e, sang = plan('esp-buena-varita-sanguijuela').e, sabio = plan('esp-buena-baculo-del-sabio').h;
-  igual([buenas.length, buenas.every(i => i.especial && i.especial.sp >= 1 && /Cuesta \d No2/.test(i.detalle)), !!bola.fuegoAmigo, bola.radio, sang.dano.drenaPct, sang.dano.directo, /^1d8\+\d+$/.test(sabio.tiradaExtra)],
-    [19, true, true, 2, 50, true, true]);
+  igual([buenas.length, buenas.every(i => i.especial && /Cuesta \d No2/.test(i.detalle) && (i.especial.sp >= 1 || i.especial.spVidaPct > 0)), !!bola.fuegoAmigo, bola.radio, sang.dano.drenaPct, sang.dano.directo, /^1d8\+\d+$/.test(sabio.tiradaExtra)],
+    [25, true, true, 2, 50, true, true]);
+});
+prueba('Buenas, tanda 1 (2026-10-08): trampa portal + 2, báculo de sangre (10 % de la vida), inestable (riesgo), luz flotante (zona inmediata y luz)', () => {
+  const cat = id => ({...structuredClone(CATALOGO_BASE.find(x => x.id === id)), id: 'x', equipado: true});
+  const portal = Combatiente.trampaDeHab({nombre: 'P', trampaColocar: cat('esp-buena-varita-de-la-trampa-portal').especial.trampaColocar}, st => st === 'dmgesp' ? 9 : 0);
+  const S = FichaGuardado.normalizar({}).S; S.inventario = [cat('esp-buena-baculo-de-sangre')];
+  const hpmax = FichaCalculo.calcular(S).final.hpmax, c = FichaAcciones.costoEspecial(S, S.inventario[0]);
+  const ines = cat('esp-buena-varita-inestable'), hab = Combatiente.habEjecucion({nombre: 'I'}, ines.especial.duelo, {stat: () => 5, etq: x => x});
+  const luz = cat('esp-buena-varita-de-la-luz-flotante'), z = Combatiente.zonaDeHab({nombre: 'Luz'}, luz.especial.duelo, {fichaId: 'f', tipo: 'pj'});
+  igual([portal.salvacion.dif, portal.portal.rango, c.sp, c.vida === Math.ceil(hpmax / 10), /HP/.test(FichaAcciones.costoEspecialTxt(S, S.inventario[0])), hab.riesgo,
+         z.zonaInmediata, z.zonaLuz, z.zonaEstado.nombre, z.radio],
+    [11, 6, 0, true, true, {si: 1, dano: '2d4'}, true, true, 'Marcado', 2]);
 });
 prueba('varitas Comunes de arena y portal (2026-10-07): la trampa se suelta contra tu Ef.Esp y frena al salir; la zona igual; el portal aliado va al mapa', () => {
   const sc = creepPrueba({esp: 9});
@@ -2403,7 +2414,7 @@ prueba('✨ armas especiales (2026-10-05): la varita arma su tiro como una Ejecu
   const hab = Combatiente.habEjecucion(h2, h2.duelo, {stat: () => 5, etq: x => x});
   igual([h.duelo.objetivo, h.tiradaExtra, h2.tiradaExtra, c0, c2, FichaAcciones.armasEspeciales(S).map(i => i.id), FichaCombate.armasYEscudosParaParry(S).length,
     hab.dano.ignoraDef, hab.efectos[0].nombre, hab.efectos[0].caras],
-    ['enemigo', '1d6', '2d4+3', {no2: 1, sp: 1, usos: 0}, {no2: 3, sp: 1, usos: 2}, ['v1', 'v2'], 0, false, 'Escarcha', 3]);
+    ['enemigo', '1d6', '2d4+3', {no2: 1, sp: 1, usos: 0, vida: 0}, {no2: 3, sp: 1, usos: 2, vida: 0}, ['v1', 'v2'], 0, false, 'Escarcha', 3]);
 });
 prueba('✨ varita de chispa eléctrica (2026-10-05): su Ejecución lleva la cadena del rayo (2 saltos, a 3 casillas)', () => {
   const S = FichaGuardado.normalizar({}).S, v = {...structuredClone(CATALOGO_BASE.find(i => i.id === 'esp-varita-de-chispa-electrica')), id: 'r', equipado: true};

@@ -419,6 +419,9 @@ const CreepAcciones = (() => {
     if(p.error) return p;
     sc.esperaEspecial = {...(sc.esperaEspecial || {}), [it.id]: c.espera};   // en el creep: la varita queda igual (si la saquean, vuelve a costar SP)
     sc.usosEspecial = {...(sc.usosEspecial || {}), [it.id]: c.usos + 1};
+    // El báculo de sangre (2026-10-08): el % de su vida máxima en vez de SP (y sin espera).
+    const vida = num(it.especial.spVidaPct) > 0 ? Math.max(1, Math.ceil(num(sc.hpMax) * num(it.especial.spVidaPct) / 100)) : 0;
+    if(vida) sc.hp = Math.max(0, num(sc.hp) - vida);
     const propio = it.especial.estadoPropio;   // lo que se pone quien la usa (la luz)
     if(propio && propio.nombre) EstadosAplicar.aplicarACreep(sc, structuredClone(propio));
     const avisos = [];
@@ -442,6 +445,7 @@ const CreepAcciones = (() => {
         avisos.push(`${o.nombre}: un aliado al lado recibe Vida extra ${fmt(num(o.orbeCustodio))} hasta su próximo turno`);
       }
     });
+    if(vida) avisos.push(`🩸 cuesta vida: −${fmt(vida)} HP (el ${fmt(num(it.especial.spVidaPct))} % de su vida máxima)`);
     p.hab = h; p.avisosOrbe = avisos; p.espera = c.espera;
     // ✋ La parte a mano: el texto y, si hay, su tirada ya hecha (la publica cada pantalla con acPublicar / su Mesa).
     const am = Combatiente.aManoEspecial(it.especial);

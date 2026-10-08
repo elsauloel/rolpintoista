@@ -756,6 +756,8 @@ const Combatiente = (() => {
       // crítico de lo físico invocado (Tipo de su familia: estaca 4, canto rodado 10).
       ...(c.zonaQueda ? {zonaQueda: {...c.zonaQueda, ...(c.zonaQueda.tira && o.stat ? {tiraValor: Math.round(nf(o.stat(c.zonaQueda.tira)))} : {})}} : {}),
       ...(c.menosDistancia ? {menosDistancia: true} : {}),
+      // El riesgo (2026-10-08, Varita inestable): si en los dados del daño sale `si` (un 1), quien la usa se hace `dano`.
+      ...(c.riesgo ? {riesgo: {si: Math.max(1, Math.round(nf(c.riesgo.si)) || 1), dano: String(c.riesgo.dano || '2d4')}} : {}),
       ...(c.fuegoAmigo ? {fuegoAmigo: true} : {}),   // un área que también agarra a los aliados (2026-10-07, Bola de fuego mayor)
       ...(c.atrae ? {atrae: {casillas: Math.max(1, Math.round(nf(c.atrae.casillas)) || 2), contra: c.atrae.contra || 'fue', ...(o.stat ? {tiraValor: Math.round(nf(o.stat(c.atrae.tira || 'dmgesp')))} : {})}} : {}),
       ...(c.reparte ? {reparte: {cada: String(c.reparte.cada || '1d4'), total: Math.max(2, Math.round(nf(c.reparte.total)) || 2)}} : {}),
@@ -795,7 +797,10 @@ const Combatiente = (() => {
       // afecta a alguien (antes se tiraba una sola vez al ejecutar: `resistValor`, que sigue valiendo para las zonas viejas).
       tiraStat: c.tira || '', tiraValor: Number.isFinite(o.tiraValor) ? Math.round(o.tiraValor) : null,
       ...(c.niebla ? {niebla: true} : {}),   // la niebla (2026-10-05, Varita de niebla): tapa la vista, no hace nada más
-      ...(/^#[0-9a-fA-F]{6}$/.test(c.zonaColor || '') ? {zonaColor: c.zonaColor} : {})};
+      ...(/^#[0-9a-fA-F]{6}$/.test(c.zonaColor || '') ? {zonaColor: c.zonaColor} : {}),
+      // (2026-10-08) cada paso adentro la dispara (campo de estática); afecta enseguida a los que ya están adentro («aparece bajo los pies»);
+      // es una luz (luz flotante: ilumina y deja ver lo oculto mientras dura).
+      ...(c.zonaCadaPaso ? {zonaCadaPaso: true} : {}), ...(c.zonaInmediata ? {zonaInmediata: true} : {}), ...(c.zonaLuz ? {zonaLuz: true} : {})};
   }
   // El estado que deja la zona. Si se suelta contra un stat de quien la tira (2026-10-07, Varita de arena movediza: Fuerza contra tu Ef.Esp) y es el
   // mismo stat que tira la zona, la dificultad es ese valor al crearla.
@@ -820,7 +825,7 @@ const Combatiente = (() => {
       ['salvacion', 'soltar'].forEach(k => {
         if(!t[k] || !t[k].difStat) return;
         const d = Number(valorDe(t[k].difStat));
-        if(Number.isFinite(d)) out[k] = {...t[k], dif: Math.max(1, Math.round(d))};
+        if(Number.isFinite(d)) out[k] = {...t[k], dif: Math.max(1, Math.round(d) + Math.round(n(t[k].difMas)))};   // `difMas`: + N (la trampa portal Buena: tu Ef.Esp + 2)
       });
     }
     return out;

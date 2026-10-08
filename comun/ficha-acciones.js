@@ -915,6 +915,7 @@ const FichaAcciones = (() => {
     if(FichaBotonera.modoHab(it) !== 'auto'){ anunciarHabilidad(S, it, ui); tirarPrimeraDeHab(S, it, ui); return; }
     if(!FichaBotonera.dueloDe(it)){
       if(it.trampaColocar) return;   // una trampa sola: el anuncio y la casilla ya los maneja colocarTrampa
+      if(it.portalMapa){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // los portales: se anuncian y los puntos se eligen en el mapa
       if(it.invoca && it.invoca.invId){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // solo invoca: se anuncia (la invocación ya la hizo invocarConHab)
       ui.toast(`${it.nombre}: todavía no tiene armada la ejecución paso a paso (✨) — se ejecutó como semiautomática`); anunciarHabilidad(S, it, ui); tirarPrimeraDeHab(S, it, ui); return;
     }

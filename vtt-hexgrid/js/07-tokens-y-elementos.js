@@ -205,9 +205,16 @@ function descubrirTrampa(id){
 }
 // ¿La trampa es de mi bando? (2026-09-30, regla del dueño: el GM se entera de que un jugador colocó una trampa —por el anuncio
 // en la Mesa— pero NO de dónde.) Las del GM son del bando de los creeps; las de cualquier jugador, del bando de los jugadores.
-function trampaDeMiBando(el){
+// ¿La trampa es del GM (la pisan los personajes) o de los jugadores (la pisan los creeps)? Manda quién la puso (`de` en su trampaEstado,
+// 2026-10-08: el GM que maneja a un personaje con 🎮 pone trampas de jugador); si no lo dice, quién la creó.
+function trampaEsDelGM(el){
+  const c = colocadorDe(el);
+  if(c) return c.tipo === 'creep';
   const dueno = miembros.get(el.duenoUid);
-  const deGM = !!(dueno && dueno.gm);
+  return !!(dueno && dueno.gm);
+}
+function trampaDeMiBando(el){
+  const deGM = trampaEsDelGM(el);
   return soyGM ? deGM : !deGM;
 }
 function puedeVerElemento(el){
@@ -425,7 +432,8 @@ async function zonasDelQueLaTiro(tokenId){
         elementosVencidosBorrando.add(id);
         await borrarElemento(id);
         setTimeout(() => elementosVencidosBorrando.delete(id), 5000);
-        lineas.push(el.portal ? 'Se cerró un portal (terminaron sus turnos).' : `Se fue ${el.zonaNombre || el.trampaNombre || 'la zona'} (terminaron sus turnos).`);
+        const txt = el.portal ? 'Se cerraron los portales (terminaron sus turnos).' : `Se fue ${el.zonaNombre || el.trampaNombre || 'la zona'} (terminaron sus turnos).`;
+        if(!lineas.includes(txt)) lineas.push(txt);   // (los dos portales, una sola línea)
       }else await coleccionElementos().doc(id).update({turnos: quedan});
     }catch(err){ console.error('No se pudo descontar el turno de la zona:', err); }
   }

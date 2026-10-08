@@ -148,7 +148,7 @@ async function portalDeHabilidad(msg){
 // `de` = {ref, tipo} de quien los abre (2026-10-07): con orden de turnos, duran SUS turnos (zonasDelQueLaTiro, js/07), como las zonas; el
 // Mantenimiento los vence una ronda más tarde, de respaldo.
 async function portalesCrear(puntos, turnos, nombre, de){
-  const n = Math.max(1, Math.round(num(turnos)) || 3), vence = Math.round(num(mantenimientoNumero)) + n + (de && iniciativa.orden.length ? 1 : 0);
+  const n = Math.max(1, Math.round(num(turnos)) || 3), vence = Math.round(num(mantenimientoNumero)) + n + (de && colocadorEnOrden(de) ? 1 : 0);
   try{
     await Promise.all(puntos.map((p, i) => coleccionElementos().add({
       tipo: 'flor', origen: {col: p.col, fila: p.fila}, celdas: [0, 0], rotacion: 0, color: '#9B5FD0', alfa: 45, solido: false, invisible: false,

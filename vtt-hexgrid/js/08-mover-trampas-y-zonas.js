@@ -206,8 +206,7 @@ const trampasAvisadas = new Set();   // 'token:trampa:casillero' que ya pidieron
 // es del EFECTO: si es de área y tiene fuego amigo (lo físico y explosivo), alcanza a todos los de adentro, aliados incluidos; si no
 // (lo mágico), solo a los rivales (`trampaAfectados`).
 function trampaDispara(t, el){
-  const dueno = miembros.get(el.duenoUid);
-  return dueno && dueno.gm ? t.tipo === 'pj' : t.tipo === 'creep';
+  return trampaEsDelGM(el) ? t.tipo === 'pj' : t.tipo === 'creep';   // (js/07: manda quién la puso)
 }
 function tokenPercepcionAumentada(t){
   const v = vinculo(t), r = v && v.resumen;
@@ -731,9 +730,8 @@ async function trampaResolver(){
     // (regla nueva de Firestore: cualquiera puede completarla, ya viene pre-armada por quien puso la trampa).
     if(p.el.trampaDejaZona){
       const n = Math.max(1, Math.round(num(p.el.zonaTurnos)) || 3);
-      const dueno = miembros.get(p.el.duenoUid);
       const cambios = {
-        zona: true, zonaNombre: p.el.trampaNombre || 'Trampa', zonaCasteadorRef: '', zonaCasteadorTipo: (dueno && dueno.gm) ? 'creep' : 'pj',
+        zona: true, zonaNombre: p.el.trampaNombre || 'Trampa', zonaCasteadorRef: '', zonaCasteadorTipo: trampaEsDelGM(p.el) ? 'creep' : 'pj',
         zonaResueltos: trampaAfectados(t, p.el, celda0, esquive).map(x => `${x === t ? p.tokenId : zonaIdDe(x)}@${Math.round(num(mantenimientoNumero))}`),   // ya la sufrieron al detonar
         turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n,
         zonaEnMantenimiento: p.el.zonaEnMantenimiento !== false, zonaCadaPaso: !!p.el.zonaCadaPaso,

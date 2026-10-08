@@ -201,7 +201,7 @@ async function crearElementoZona(centro, cfg){
     imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true,
     // P172 (dueño, 2026-10-07): con orden de turnos, la zona de alguien dura SUS turnos (zonasDelQueLaTiro, js/07): se va al empezar su N-ésimo
     // turno siguiente. El vencimiento por Mantenimiento queda una ronda más tarde, de respaldo (si quien la tiró ya no juega).
-    turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n + (cfg.casteadorRef && iniciativa.orden.length ? 1 : 0),
+    turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n + (cfg.casteadorRef && colocadorEnOrden({ref: String(cfg.casteadorRef), tipo: cfg.casteadorTipo === 'creep' ? 'creep' : 'pj'}) ? 1 : 0),
     zona: true, zonaNombre: String(cfg.nombre || 'Zona').slice(0, 40),
     zonaCasteadorRef: String(cfg.casteadorRef || '').slice(0, 64), zonaCasteadorTipo: cfg.casteadorTipo === 'creep' ? 'creep' : 'pj',
     zonaResueltos: [], zonaEnMantenimiento: cfg.enMantenimiento !== false, zonaCadaPaso: !!cfg.cadaPaso,

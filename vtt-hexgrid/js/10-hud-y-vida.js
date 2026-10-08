@@ -661,6 +661,11 @@ function elementoQueEs(e){
     if(t.length <= 480){ const p = t.lastIndexOf('. '); return p > 40 ? t.slice(0, p + 1) : t; }   // una trampa vieja, guardada cortada: hasta la última frase entera
     const c = t.slice(0, 480); return c.slice(0, Math.max(c.lastIndexOf('. ') + 1, 200)) + ' …'; };
   const det = txt => txt ? `<div class="que-hace">${esc(corto(txt))}</div>` : '';
+  // 🗡 El arma en el piso (2026-10-07, js/27): su nombre, de quién era y cómo se levanta (el cartel de arriba a la derecha, como un token).
+  if(e.arma){
+    const [ref, tipo] = String(e.armaDe || '').split('|'), t = [...tokens.values()].find(x => x.fichaId === ref && (x.tipo === 'creep' ? 'creep' : 'pj') === tipo);
+    return `<b>🗡️ ${esc(e.armaNombre || 'Arma')}</b>${t ? ` <span>(se le cayó a ${esc(nombreDe(t))})</span>` : ''}<div class="que-hace">En el piso: la levanta cualquiera que esté encima o al lado, por 1 No2, desde su Botonera.</div>`;
+  }
   if(e.zona){
     const t = num(e.turnos) > 0 && mantenimientoNumero !== null ? Math.max(0, num(e.venceMant) - Math.round(num(mantenimientoNumero))) : 0;
     return `<b>🌫 ZONA · ${esc(e.zonaNombre || 'Efecto persistente')}</b> <span>${de}</span>${t ? ` · <span>quedan ${t} turno${t === 1 ? '' : 's'}</span>` : ''}` +

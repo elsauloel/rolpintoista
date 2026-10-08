@@ -653,12 +653,22 @@ const FichaAcciones = (() => {
       ui.registrarTirada(`${nombre} · ${am.etiqueta}`, r);
     }else if(am.texto) ui.mesaHabilidad(nombre, '✋ A mano: ' + am.texto);
   }
-  async function usarArmaEspecial(S, itemId, forzar, ui, sinSp){
+  // `spFijo`: el SP ya decidido (⚡ Flash en turno ajeno: el doble), para no volver a preguntar al pagar con No2 o sin No2.
+  async function usarArmaEspecial(S, itemId, forzar, ui, sinSp, spFijo){
     const item = armasEspeciales(S).find(x => x.id === itemId);
     if(!item){ ui.toast('Esa arma especial no está equipada'); return; }
-    const it = habDeArmaEspecial(S, item), c = costoEspecial(S, item);
+    const it = habDeArmaEspecial(S, item), c = costoEspecial(S, item), e = item.especial || {};
     const confirmar = ui.confirmar || (t => typeof confirm === 'function' && confirm(t));
-    let no2 = c.no2, sp = c.sp;
+    // Una vez por turno (2026-10-07, la Expelliarmus): avisa y deja seguir (lo decide la mesa).
+    if(e.unaVezPorTurno && c.usos > 0 && spFijo === undefined && !sinSp && !forzar
+      && !(await confirmar(`${it.nombre} se usa una vez por turno, y ya la usaste en este. ¿Usarla igual?`))) return;
+    // ⚡ Flash (2026-10-07, la Expelliarmus): se puede usar en turno ajeno, y ahí el SP cuesta el doble (la regla de siempre del Flash).
+    if(e.flash && spFijo === undefined && !sinSp && !forzar && typeof ConfirmarTurno !== 'undefined'){
+      const p = await ConfirmarTurno.flash(`⚡ ${it.nombre}`, {sp: c.sp}, {ident: {nombre: ((S.meta && S.meta.nombre) || '').trim(), ref: ui.yo ? (ui.yo() || {}).ref : ''}});
+      if(!p) return;
+      spFijo = num(p.sp);
+    }
+    let no2 = c.no2, sp = spFijo !== undefined ? spFijo : c.sp;
     // Túnica de sangre (2026-10-06): con «pagar con vida», cada vez se elige si el SP sale de la vida (1 HP por SP). La elección viaja como
     // sinSp === 'vida' (si hay que confirmar los No2 y se vuelve a llamar, no se pregunta ni se cobra dos veces); la vida se cobra al pagar.
     let conVida = sinSp === 'vida';
@@ -670,11 +680,11 @@ const FichaAcciones = (() => {
     if(conVida) sp = 0;
     if(sp > spDisponible(S) && !sinSp){
       if(!(await confirmar(`Te falta SP: ${it.nombre} cuesta ${fmt(sp)} SP y tenés ${fmt(spDisponible(S))}. ¿La pagás con No2? (${fmt(no2 + sp)} No2 en vez de ${fmt(no2)} No2 + ${fmt(sp)} SP)`))) return;
-      return usarArmaEspecial(S, itemId, forzar, ui, true);
+      return usarArmaEspecial(S, itemId, forzar, ui, true, spFijo);
     }
     if(sinSp === true){ no2 += sp; sp = 0; }
     if(no2 > num(S.nitros) && !forzar){
-      ui.avisarSinNitros(no2, `usar ${it.nombre}`, () => usarArmaEspecial(S, itemId, true, ui, sinSp));
+      ui.avisarSinNitros(no2, `usar ${it.nombre}`, () => usarArmaEspecial(S, itemId, true, ui, sinSp, spFijo));
       return;
     }
     S.nitros = num(S.nitros) - (forzar && no2 > num(S.nitros) ? gastoNitrosForzado(S, no2, `usó ${it.nombre}`) : no2);

@@ -338,8 +338,8 @@ const FichaBotonera = (() => {
             const e = i.especial || {}, costo = FichaAcciones.costoEspecialTxt(S, i), falta = FichaAcciones.costoEspecial(S, i).no2 > num(S.nitros);
             const tipo = e.duelo && e.duelo.tipoDano ? ` ${e.duelo.tipoDano}` : '';
             return `
-          <button type="button" class="botonera-tile${falta ? ' bt-sin-nitros' : ''}" data-botoneraaccion="atacar" data-arma="${i.id}" title="Atacar con ${esc(i.nombre)} (arma especial) · ${esc(costo)}">
-            <span class="bt-label">✨ Atacar · ${esc(e.nombre || i.nombre)}</span><span class="bt-value bt-value-formula">${e.dano ? `🎲 ${esc(e.dano)}${esc(tipo)}` : '✨ sin daño'}</span>
+          <button type="button" class="botonera-tile${falta ? ' bt-sin-nitros' : ''}${e.flash ? ' bt-flash' : ''}" data-botoneraaccion="atacar" data-arma="${i.id}" title="Atacar con ${esc(i.nombre)} (arma especial) · ${esc(costo)}${e.flash ? ' · ⚡ Flash: se puede usar en turno ajeno (el SP cuesta el doble)' : ''}${e.unaVezPorTurno ? ' · una vez por turno' : ''}">
+            <span class="bt-label">${e.flash ? '⚡' : '✨'} Atacar · ${esc(e.nombre || i.nombre)}</span><span class="bt-value bt-value-formula">${e.dano ? `🎲 ${esc(e.dano)}${esc(tipo)}` : '✨ sin daño'}</span>
             <span class="bt-mod">${esc(costo)}</span>
           </button>
           <button type="button" class="botonera-tile" data-view="inventario:${i.id}" title="Qué hace ${esc(i.nombre)}">

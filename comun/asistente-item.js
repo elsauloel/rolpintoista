@@ -442,7 +442,7 @@ const AsistenteItem = (() => {
         'El tipo (arcano, fuego, hielo…) y a quién le pega se eligen en el paso siguiente, «Qué hace ✨».');
       const suma = es.sumaEspecial === true ? 'si' : n(es.sumaEspecial) === 0.5 ? 'mitad' : 'no';
       h += campo('¿Suma el Ef.Esp de quien la usa?', `<div class="aa-opciones">${op('sumaesp', 'no', suma === 'no', 'No')}${op('sumaesp', 'si', suma === 'si', 'Sí, entero')}${op('sumaesp', 'mitad', suma === 'mitad', 'La mitad')}</div>`);
-      h += campo('Peso', num('peso', d.peso, 'step="1" min="1" style="max-width:120px"'), 'Una varita pesa 1; un báculo, 2.');
+      h += campo('Peso', num('peso', d.peso, 'step="1" min="1" style="max-width:120px"'), 'Una varita suele pesar 1 y un báculo 2, pero no es una regla: puede haber báculos más pesados (o de una mano) si el ítem lo justifica.');
       if(q.ctx !== 'creep') h += efecto(`<span id="aa-carga">${cargaHtml()}</span>`);
       h += durCampo();
     }

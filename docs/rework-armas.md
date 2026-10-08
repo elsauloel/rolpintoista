@@ -1959,6 +1959,14 @@ Con la calculadora recalibrada (varitas directas con dado fijo, báculos con ¼ 
   atacar con su arma —avisa y deja seguir, como Sentado— y «🗡 Levantar el arma» cuesta 1 No2 en la Botonera de personajes, creeps e
   invocaciones; ✋ el arma queda en su casilla), Purga (le saca el estado malo más reciente al aliado) y Cosecha (la marca «Cosecha de X»
   dura 3 turnos; si cae marcado, X recupera 2 SP y 2 de vida).
+- **Reglas sueltas de las armas especiales (dueño, 2026-10-07):** «la variedad de efectos es tanta que podemos liberar un poco esas reglas, que
+  al final del día eran arbitrarias». **Los báculos no pesan siempre 2 ni son siempre de dos manos**: puede haber más pesados, y alguno de una
+  mano (con su contexto y su porqué). **Una varita o un báculo puede costar más No2 en el primer uso** (`especial.no2`, por ejemplo 2 como la
+  Expelliarmus) y sube de a 1 desde ahí (`especial.sube`). Nuevos en el motor (personajes): `especial.flash` (⚡ se usa en turno ajeno sin el aviso
+  de fuera de turno, y ahí el SP cuesta el doble) y `especial.unaVezPorTurno` (avisa y deja seguir). En creeps e invocaciones, todavía no.
+- **Expelliarmus (Raro, 300 DDE, nombre del dueño):** PdG.Esp contra Res.Esp; si no resiste, el arma vuela 2 casillas al azar y queda
+  Desarmado; ⚡ Flash; una vez por turno; 2 No2 + 2 SP. ✅ Cargada.
+- **El arma en el piso:** ficha redonda con el 🗡️; su nombre, en el cartel de arriba a la derecha al seleccionarla (como un token).
 - **El rango lo da la Destreza, siempre** (dueño, 2026-10-07, P174): donde esta hoja dice «Rango de casteo» (la primera casilla del Chorro
   de lava, a 1/3), ahora es **tu Rango**.
 

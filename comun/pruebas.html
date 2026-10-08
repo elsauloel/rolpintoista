@@ -2466,7 +2466,7 @@ prueba('✨ armas especiales de un creep (2026-10-05): No2 como un personaje, el
     ['1d4', 'enemigo', false, true, true, true, 1, undefined, true, 1, 2]);
 });
 prueba('✨ armas especiales Comunes (2026-10-05): 30 armas y 3 orbes; cada una automatiza algo o aclara lo que queda a mano', () => {
-  const L = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-') && !String(i.id).startsWith('esp-buena-'));   // (las de Buena, en su prueba)
+  const L = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-') && i.tier === 'Común');   // (las de Buena y Raro, en sus pruebas)
   const armas = L.filter(i => i.especial), orbes = L.filter(i => i.orbe);
   const sinNada = armas.filter(i => !i.especial.duelo && !i.especial.trampaColocar && !/✋/.test(i.detalle)).map(i => i.nombre);
   igual([armas.length, orbes.length, L.every(i => i.tier === 'Común' && i.ranuras === 1), sinNada, armas.every(i => /No2/.test(i.detalle))], [30, 3, true, [], true]);

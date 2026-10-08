@@ -98,7 +98,8 @@ async function armaTomar(elId, t){
   return {it, propia: !!t && el.armaDe === armaRefDe(t)};
 }
 // Se dibuja como una ficha REDONDA (dueño, 2026-10-07: lo que no es un personaje ni una criatura va redondo, para distinguirlo de los tokens
-// hexagonales), con el 🗡️ adentro y el nombre del arma debajo (los dibuja js/05, con el resto de los elementos).
+// hexagonales), con el 🗡️ adentro; su nombre sale en el cartel de arriba a la derecha al seleccionarla, como el de un token (js/10
+// elementoQueEs). La dibuja js/05, con el resto de los elementos.
 function armaDibujar(el, z){
   const p = hexCentro(el.origen.col, el.origen.fila), R = HEX * 0.62;
   ctx.save();
@@ -109,11 +110,6 @@ function armaDibujar(el, z){
   ctx.font = `700 ${R * 1.05}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", system-ui, sans-serif`;
   ctx.fillStyle = '#EDE3D2';   // (si el 🗡️ sale en blanco y negro, que se vea claro sobre el fondo oscuro)
   ctx.fillText('🗡️', p.x, p.y + R * 0.06);
-  const txt = String(el.armaNombre || 'Arma');
-  ctx.font = `700 ${11 / z}px "Space Mono", monospace`;
-  const w = ctx.measureText(txt).width + 8 / z, h = 15 / z, y = p.y + R + 3 / z;
-  ctx.fillStyle = 'rgba(15,12,14,.85)'; ctx.fillRect(p.x - w / 2, y, w, h);
-  ctx.fillStyle = '#EDE3D2'; ctx.fillText(txt, p.x, y + h / 2);
   ctx.restore();
 }
 

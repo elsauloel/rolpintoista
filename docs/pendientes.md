@@ -447,6 +447,7 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **🔔 versión nueva en ítems ya comprados** (2026-09-29, paso 5 de `docs/plan-subida-unificada.md`): una corrección de
   un ítem del catálogo cambia el catálogo, pero no las copias que ya están en una mochila. Falta guardar de dónde salió
   cada ítem al comprarlo (`bibOrigen`) y mostrar el aviso (cartel `Biblioteca.avisoVersion`).
+  **Dueño (2026-10-08): se deja como está** mientras el catálogo es work in progress (las copias de la mochila conservan lo que hacían al comprarse); se ve en la revisión final del catálogo.
 - [ ] **Plan de consolidación** (2026-09-30, propuesta del asistente a pedido del dueño): un solo motor de reglas (personaje, invocación y creep) y la ficha, GM Tools y el mapa como ventanas; pasos 0 a 6 en `docs/plan-consolidacion.md`. **En curso** (2026-09-30): paso 0 hecho (`comun/pruebas.html`, `docs/pruebas-de-humo.md`); sigue el paso 1.
 - [x] **Menú del token en dos niveles** (idea del dueño, 2026-10-06; ✅ hecho y probado el mismo día; al final, solo con el botón ⋯ / ↩ — el clic derecho sigue siendo ping y cancelar): clic izquierdo = solo lo inmediato del combate (HP, SP, No2,
   ◎ Estados y quizás ⚡ Acciones/Botonera); clic derecho = todos los demás (🪪 tarjeta, 📜 ficha, ⚙ ajustes, 🦶 mover libre, 👁 ocultar, 🛡

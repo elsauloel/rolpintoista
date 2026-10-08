@@ -217,19 +217,6 @@ $('#veritem-baja').onclick = async () => {
 $('#scrim-ver-item').addEventListener('mousedown', e => { if(e.target.id==='scrim-ver-item') $('#scrim-ver-item').classList.remove('open'); });
 $('#equipar-creep-x').onclick = () => { equipandoCreepId = null; $('#scrim-equipar-creep').classList.remove('open'); };
 $('#scrim-equipar-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-equipar-creep'){ equipandoCreepId = null; $('#scrim-equipar-creep').classList.remove('open'); } });
-$('#equipar-creep-filtro').addEventListener('change', renderEquiparCreepLista);
-$('#equipar-creep-filtro-slot').addEventListener('change', renderEquiparCreepLista);
-$('#equipar-creep-filtro-tier').addEventListener('change', renderEquiparCreepLista);
-$('#equipar-creep-buscar').addEventListener('input', renderEquiparCreepLista);
-$('#equipar-creep-limpiar').addEventListener('click', () => {
-  $('#equipar-creep-filtro').value = '';
-  $('#equipar-creep-filtro-slot').value = '';
-  $('#equipar-creep-filtro-tier').value = '';
-  $('#equipar-creep-buscar').value = '';
-  renderEquiparCreepLista();
-});
-$('#equipar-creep-orden').addEventListener('change', e => { equipoOrden = e.target.value; renderEquiparCreepLista(); });
-$('#equipar-creep-orden-dir').addEventListener('click', () => { equipoOrdenDesc = !equipoOrdenDesc; renderEquiparCreepLista(); });
 $('#tablero-x').addEventListener('click', tableroCerrar);
 $('#historial-x').addEventListener('click', () => $('#scrim-historial').classList.remove('open'));
 $('#scrim-historial').addEventListener('mousedown', e => { if(e.target.id === 'scrim-historial') $('#scrim-historial').classList.remove('open'); });

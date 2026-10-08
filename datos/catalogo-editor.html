@@ -67,7 +67,7 @@ header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:14px 22px;border-bottom:1px solid var(--line-soft)
 }
 .barra input,.barra select{width:auto}
-.barra .buscar{flex:1;min-width:180px}
+.barra-filtro{padding:12px 22px;border-bottom:1px solid var(--line-soft)}
 
 .wrap{padding:18px 22px 60px}
 .grupo-head{
@@ -164,12 +164,9 @@ header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 </div>
 
 <div class="barra">
-  <input type="text" class="buscar" id="f-buscar" placeholder="Buscar por nombre…">
-  <select id="f-tipo"></select>
-  <select id="f-tier"><option value="">Todos los tiers</option></select>
   <select id="f-pub" title="Lo archivado queda acá como referencia, pero el juego no lo publica (ni la tienda, ni el catálogo de la ficha, ni GM Tools)"><option value="">Publicados y archivados</option><option value="pub">Solo publicados</option><option value="arch">Solo archivados (versión anterior)</option></select>
-  <span class="hint" id="f-conteo"></span>
 </div>
+<div class="barra-filtro" id="f-filtros"></div>   <!-- comun/filtro-catalogo.js (2026-10-08): el mismo filtro de la tienda y GM Tools -->
 
 <div class="wrap" id="lista"></div>
 
@@ -217,6 +214,8 @@ header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 <script src="../comun/elegir-trampa.js?v=20261008q"></script>
 <script src="../comun/asistente-duelo-hab.js?v=20261008q"></script>   <!-- la Ejecución ✨ de un arma especial (asistente de ítems) -->
 <script src="../comun/asistente-item.js?v=20261008q"></script>
+<script src="../comun/generador-tiendas.js?v=20261007am"></script>   <!-- qué es cada ítem (parteDe), para el filtro -->
+<script src="../comun/filtro-catalogo.js?v=20261008zq"></script>
 <script src="../comun/catalogo.js?v=20261008zf"></script>
 <script>
 /* =========================================================
@@ -302,7 +301,7 @@ function slug(s){
 }
 
 let CATALOGO = [];
-let filtro = {texto: '', tipo: '', tier: '', pub: ''};
+let filtro = {pub: ''};   // publicados / archivados; el resto lo filtra comun/filtro-catalogo.js
 let editing = null; // draft en edición, o null
 
 function toast(msg){
@@ -319,48 +318,12 @@ function estado(msg, clase){
 }
 
 /* ---------- Filtros ---------- */
+// El filtro (comun/filtro-catalogo.js, 2026-10-08): búsqueda, chips, orden y «Más filtros», sobre lo publicado / archivado según #f-pub.
+let filtroEditor = null;
 function poblarFiltros(){
-  $('#f-tipo').innerHTML = `<option value="">Todas las categorías</option>` +
-    CATEGORIAS.filter(c => c.id).map(c => `<option value="${c.id}">${esc(c.label)}</option>`).join('');
-  $('#f-tier').innerHTML = `<option value="">Todos los tiers</option>` +
-    TIERS.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('');
+  filtroEditor = FiltroCatalogo.crear($('#f-filtros'), {base: () => CATALOGO.filter(it => filtro.pub === 'pub' ? !it.archivo : filtro.pub === 'arch' ? !!it.archivo : true),
+    statLabel: st => STAT_LABEL[st] || st, etiquetas: true, clave: 'editor', alCambiar: () => renderLista()});
 }
-
-const normalizarBusqueda = s => (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
-
-// Busca por nombre, Detalle, descripción narrativa, tier/categoría,
-// nombre y detalle del efecto/estado (consumible o al equipar), y los
-// stats de los modificadores — no solo el nombre del ítem.
-function textoBusquedaDe(it){
-  const partes = [
-    it.nombre, it.detalle, it.descripcionNarrativa, it.tier, CATEGORIA_LABEL[it.tipoItem],
-    it.efectoNombre, it.efectoDetalle, it.equipoEstadoNombre, it.equipoEstadoDetalle, it.equipoEstadoPreset,
-  ];
-  (it.mods || []).forEach(m => partes.push(STAT_LABEL[m.stat] || m.stat));
-  (it.efectoMods || []).forEach(m => partes.push(STAT_LABEL[m.stat] || m.stat));
-  return normalizarBusqueda(partes.filter(Boolean).join(' '));
-}
-
-function itemsFiltrados(){
-  const texto = normalizarBusqueda(filtro.texto);
-  return CATALOGO.filter(it => {
-    if(filtro.tipo && it.tipoItem !== filtro.tipo) return false;
-    if(filtro.tier && it.tier !== filtro.tier) return false;
-    if(filtro.pub === 'pub' && it.archivo) return false;
-    if(filtro.pub === 'arch' && !it.archivo) return false;
-    if(texto && !textoBusquedaDe(it).includes(texto)) return false;
-    return true;
-  });
-}
-
-function grupoDe(it){
-  if(it.tipoItem === 'consumibles') return 'Consumibles';
-  if(esArmaTipo(it.tipoItem)) return 'Armas';
-  if(it.tipoItem === 'escudo_1m' || it.tipoItem === 'escudo_2m') return 'Escudos';
-  if((it.tipoItem || '').startsWith('armadura') || ['manos','piernas','cabeza','pies'].includes(it.tipoItem)) return 'Defensivos';
-  return 'Otros';
-}
-const ORDEN_GRUPO = ['Consumibles', 'Armas', 'Escudos', 'Defensivos', 'Otros'];
 
 function metaTxt(it){
   const partes = [`Peso ${num(it.peso)}`, `${num(it.precioCompra)} DDE`];
@@ -373,21 +336,18 @@ function metaTxt(it){
 }
 
 function renderLista(){
-  const items = itemsFiltrados();
-  $('#f-conteo').textContent = `${items.length} de ${CATALOGO.length} ítems`;
+  if(!filtroEditor) return;
+  filtroEditor.actualizar();   // lo que hay cambia al editar, guardar o cambiar «Publicados / archivados»
+  const items = filtroEditor.filtrar();
   if(!items.length){
-    $('#lista').innerHTML = `<div class="vacio">No hay ítems que coincidan con el filtro.</div>`;
+    $('#lista').innerHTML = `<div class="vacio">No hay ítems con esos filtros. Probá sacar alguno (✕ Limpiar todo).</div>`;
     return;
   }
   let html = '';
-  ORDEN_GRUPO.forEach(grupo => {
-    const delGrupo = items.filter(it => grupoDe(it) === grupo);
-    if(!delGrupo.length) return;
-    // Entre los consumibles, los legacy ("los de siempre") van primero;
-    // acá no hay concepto de stock fijo, eso es propio de una tienda
-    // generada. El resto de los grupos queda alfabético como siempre.
-    delGrupo.sort((a, b) => (grupo === 'Consumibles' ? (b.legacy ? 1 : 0) - (a.legacy ? 1 : 0) : 0) || a.nombre.localeCompare(b.nombre, 'es'));
-    html += `<div class="grupo-head">${grupo} · ${delGrupo.length}</div><div class="grid">`;
+  filtroEditor.agrupar(items).forEach(g => {
+    // Entre los consumibles, los legacy ("los de siempre") van primero (el sort es estable: lo demás queda en el orden elegido).
+    const delGrupo = g.items.slice().sort((a, b) => a.tipoItem === 'consumibles' && b.tipoItem === 'consumibles' ? (b.legacy ? 1 : 0) - (a.legacy ? 1 : 0) : 0);
+    html += `<div class="grupo-head">${esc(g.label)} · ${delGrupo.length}</div><div class="grid">`;
     html += delGrupo.map(it => `
       <div class="card"${it.archivo ? ' style="opacity:.55"' : ''}>
         ${it.archivo ? `<div class="hint" style="font-weight:700;margin-bottom:4px">📦 Archivado (versión anterior): el juego no lo publica</div>` : ''}
@@ -756,9 +716,6 @@ document.addEventListener('keydown', e => {
 });
 
 /* ---------- Filtros: eventos ---------- */
-$('#f-buscar').addEventListener('input', e => { filtro.texto = e.target.value; renderLista(); });
-$('#f-tipo').addEventListener('change', e => { filtro.tipo = e.target.value; renderLista(); });
-$('#f-tier').addEventListener('change', e => { filtro.tier = e.target.value; renderLista(); });
 $('#f-pub').addEventListener('change', e => { filtro.pub = e.target.value; renderLista(); });
 
 /* ---------- Carga / guardado local ---------- */

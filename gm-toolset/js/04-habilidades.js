@@ -79,8 +79,6 @@ const gmHabUi = {
 
 let equipandoCreepId = null;
 
-const normalizarBusqueda = s => (s || '').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
-
 const TIER_COLOR = {'Común':'#9A867E', 'Buena Calidad':'#A8C256', 'Raro':'#5B8DBE', 'Excepcional':'#E0A458', 'Legendario':'#9B7BD4', 'A definir':'#D4574E'};
 const STAT_LABEL_GM = CreepCalculo.STAT_LABEL;   // comun/creep-calculo.js
 const STAT_FULL_GM = {
@@ -92,7 +90,6 @@ const STAT_FULL_GM = {
   con:'Constitución', fue:'Fuerza', agl:'Agilidad', des:'Destreza', esp:'Especial',
 };
 const SLOT_MAP_GM = CreepCalculo.SLOT_MAP;   // comun/creep-calculo.js
-function slotDeGM(tipoItem){ return CreepCalculo.slotDe(tipoItem); }
 
 function modsResumenHtmlGM(mods){
   const list = (mods || []).filter(m => m.stat && m.stat !== 'def');
@@ -106,13 +103,6 @@ function modsResumenHtmlGM(mods){
   }).join(' · ');
 }
 
-// Texto completo del ítem para la búsqueda (nombre, detalle, tier, categoría,
-// mods en forma corta y completa) — igual criterio que en ficha.html.
-function textoBusquedaDeGM(item){
-  const partes = [item.nombre, item.detalle, item.tier, TIPOITEM_LABEL_GM[item.tipoItem] || item.tipoItem];
-  (item.mods || []).forEach(m => { partes.push(STAT_LABEL_GM[m.stat] || m.stat, STAT_FULL_GM[m.stat]); });
-  return normalizarBusqueda(partes.filter(Boolean).join(' '));
-}
 
 function equipoItemHtml(item, idx){
   const esArma = String(item.tipoItem).startsWith('arma_');
@@ -168,65 +158,16 @@ function verItemDatos(item){
   $('#scrim-ver-item').classList.add('open');
 }
 
-// Igual criterio que catalogoVisibles() en ficha.html: "aleatorio" tiene
-// que respetar los filtros activos ahora mismo, no todo el catálogo.
-function equiparCreepVisibles(){
-  const filtro = $('#equipar-creep-filtro') ? $('#equipar-creep-filtro').value : '';
-  const filtroSlot = $('#equipar-creep-filtro-slot') ? $('#equipar-creep-filtro-slot').value : '';
-  const filtroTier = $('#equipar-creep-filtro-tier') ? $('#equipar-creep-filtro-tier').value : '';
-  const busqueda = normalizarBusqueda($('#equipar-creep-buscar') ? $('#equipar-creep-buscar').value : '');
-  let visibles = CATALOGO_EQUIPO.map((it, idx) => ({it, idx}));
-  if(filtro === 'armas') visibles = visibles.filter(({it}) => it.tipoItem.startsWith('arma_'));
-  if(filtro === 'escudos') visibles = visibles.filter(({it}) => it.tipoItem.startsWith('escudo'));
-  if(filtro === 'defensa') visibles = visibles.filter(({it}) => !it.tipoItem.startsWith('arma_') && !it.tipoItem.startsWith('escudo') && it.tipoItem !== 'consumibles' && it.tipoItem !== 'anillos');
-  if(filtro === 'accesorios') visibles = visibles.filter(({it}) => it.tipoItem === 'anillos');
-  if(filtro === 'consumibles') visibles = visibles.filter(({it}) => it.tipoItem === 'consumibles');
-  if(filtroSlot) visibles = visibles.filter(({it}) => slotDeGM(it.tipoItem) === filtroSlot);
-  if(filtroTier) visibles = visibles.filter(({it}) => it.tier === filtroTier);
-  if(busqueda) visibles = visibles.filter(({it}) => textoBusquedaDeGM(it).includes(busqueda));
-  return visibles;
+// El filtro (comun/filtro-catalogo.js, 2026-10-08): el mismo de la tienda, con «De dónde sale». Devuelve pares {it, idx}: el idx en
+// CATALOGO_EQUIPO lo necesita el botón Equipar. El ítem al azar respeta los filtros activos.
+let equipoFiltro = null;
+function filtroEquipo(){
+  if(!equipoFiltro) equipoFiltro = FiltroCatalogo.crear($('#equipar-creep-filtros'), {base: () => CATALOGO_EQUIPO, origen: true, clave: 'equipo-creep',
+    alCambiar: () => renderEquiparCreepLista()});
+  return equipoFiltro;
 }
-
-const TIERS_ORDEN_GM = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
-
-// Daño máximo posible del arma. Lo que no es arma da 0 y queda al final
-// del orden por daño (ver ordenarEquipo).
-function danoDeGM(it){
-  if(!it.tipoItem.startsWith('arma_')) return 0;
-  return Math.max(1, num(it.peso) || 1) * (num(it.tipoDado) || 8) + num(it.danoFijo);
-}
-
-const ORDENES_GM = {
-  categoria: {label:'Categoría', cmp:(a,b) => TIERS_ORDEN_GM.indexOf(a.tier) - TIERS_ORDEN_GM.indexOf(b.tier)},
-  nombre:    {label:'Nombre',    cmp:(a,b) => a.nombre.localeCompare(b.nombre, 'es')},
-  precio:    {label:'Precio',    cmp:(a,b) => num(a.precioCompra) - num(b.precioCompra)},
-  peso:      {label:'Peso',      cmp:(a,b) => num(a.peso) - num(b.peso)},
-  rareza:    {label:'Rareza',    cmp:(a,b) => TIERS_ORDEN_GM.indexOf(a.tier) - TIERS_ORDEN_GM.indexOf(b.tier)},
-  dano:      {label:'Daño',     valor: danoDeGM},
-  defensa:   {label:'Defensa',  valor: it => num(it.def)},
-};
-
-let equipoOrden = 'categoria';
-let equipoOrdenDesc = false;
-
-// Recibe y devuelve pares {it, idx}: el idx es el índice en
-// CATALOGO_EQUIPO y lo necesita el botón Equipar, así que ordenar no
-// puede perderlo.
-function ordenarEquipo(pares){
-  const def = ORDENES_GM[equipoOrden] || ORDENES_GM.categoria;
-  const porNombre = (a, b) => a.it.nombre.localeCompare(b.it.nombre, 'es');
-  // Criterio con valor propio (daño, defensa): lo que no aplica queda al
-  // final siempre, no mezclado entre los que sí tienen.
-  if(def.valor){
-    const con = pares.filter(p => def.valor(p.it) > 0);
-    const sin = pares.filter(p => def.valor(p.it) <= 0).sort(porNombre);
-    con.sort((a, b) => def.valor(a.it) - def.valor(b.it) || porNombre(a, b));
-    if(equipoOrdenDesc) con.reverse();
-    return [...con, ...sin];
-  }
-  const orden = pares.slice().sort((a,b) => def.cmp(a.it, b.it) || porNombre(a, b));
-  return equipoOrdenDesc ? orden.reverse() : orden;
-}
+function conIndice(items){ const idx = new Map(CATALOGO_EQUIPO.map((it, i) => [it, i])); return items.map(it => ({it, idx: idx.get(it)})); }
+function equiparCreepVisibles(){ return conIndice(filtroEquipo().filtrar()); }
 
 // Entre los consumibles, los legacy ("los de siempre") van primero, sea
 // cual sea el criterio de orden elegido. Acá no hay concepto de stock
@@ -240,17 +181,6 @@ function conLegacyPrimeroGM(pares){
   });
 }
 
-function renderEquipoOrdenControles(){
-  const sel = $('#equipar-creep-orden');
-  if(sel && !sel.dataset.listo){
-    sel.innerHTML = Object.entries(ORDENES_GM).map(([k,v]) => `<option value="${k}">${esc(v.label)}</option>`).join('');
-    sel.dataset.listo = '1';
-  }
-  if(sel) sel.value = equipoOrden;
-  const b = $('#equipar-creep-orden-dir');
-  if(b) b.textContent = equipoOrdenDesc ? '↓ Mayor a menor' : '↑ Menor a mayor';
-}
-
 function elegirItemAleatorioGM(){
   const visibles = equiparCreepVisibles();
   if(!visibles.length){ toast('No hay ítems que coincidan con los filtros activos'); return; }
@@ -260,34 +190,16 @@ function elegirItemAleatorioGM(){
 }
 
 function renderEquiparCreepLista(){
-  const visibles = equiparCreepVisibles();
-  let html = '';
-  if(equipoOrden === 'categoria'){
-    const armas = ordenarEquipo(visibles.filter(({it}) => it.tipoItem.startsWith('arma_')));
-    const escudos = ordenarEquipo(visibles.filter(({it}) => it.tipoItem.startsWith('escudo')));
-    const defensa = ordenarEquipo(visibles.filter(({it}) => !it.tipoItem.startsWith('arma_') && !it.tipoItem.startsWith('escudo') && it.tipoItem !== 'consumibles'));
-    const consumibles = conLegacyPrimeroGM(ordenarEquipo(visibles.filter(({it}) => it.tipoItem === 'consumibles')));
-    if(armas.length) html += `<div class="cat-grouphead">Armas</div><div class="cat-grid">${armas.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
-    if(escudos.length) html += `<div class="cat-grouphead">Escudos (suman a Defensa)</div><div class="cat-grid">${escudos.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
-    if(defensa.length) html += `<div class="cat-grouphead">Defensa</div><div class="cat-grid">${defensa.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
-    if(consumibles.length) html += `<div class="cat-grouphead">Consumibles</div><div class="cat-grid">${consumibles.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
-  }else{
-    const orden = conLegacyPrimeroGM(ordenarEquipo(visibles));
-    if(orden.length){
-      html += `<div class="cat-grouphead">${esc(ORDENES_GM[equipoOrden].label)} · ${fmt(orden.length)}</div>`;
-      html += `<div class="cat-grid">${orden.map(({it,idx}) => equipoItemHtml(it, idx)).join('')}</div>`;
-    }
-  }
-  renderEquipoOrdenControles();
-  $('#equipar-creep-lista').innerHTML = html || `<div class="hint">No hay ítems que coincidan con la búsqueda.</div>`;
+  const fe = filtroEquipo();
+  fe.actualizar();
+  const html = fe.agrupar(fe.filtrar()).map(g => `<div class="cat-grouphead">${esc(g.label)} · ${fmt(g.items.length)}</div>
+    <div class="cat-grid">${conLegacyPrimeroGM(conIndice(g.items)).map(({it, idx}) => equipoItemHtml(it, idx)).join('')}</div>`).join('');
+  $('#equipar-creep-lista').innerHTML = html || `<div class="hint">No hay ítems con esos filtros. Probá sacar alguno (✕ Limpiar todo).</div>`;
 }
 
 function abrirEquiparCreep(scId){
   equipandoCreepId = scId;
-  $('#equipar-creep-filtro').value = '';
-  $('#equipar-creep-filtro-slot').value = '';
-  $('#equipar-creep-filtro-tier').value = '';
-  $('#equipar-creep-buscar').value = '';
+  filtroEquipo().limpiar();
   renderEquiparCreepLista();
   $('#scrim-equipar-creep').classList.add('open');
 }

@@ -75,10 +75,10 @@ const FiltroCatalogo = (() => {
   function textoDe(it, statLabel){
     let t = textoCache.get(it);
     if(t !== undefined) return t;
-    const partes = [it.nombre, it.detalle, it.descripcionNarrativa, it.efectoNombre, it.efectoDetalle, it.tier, PARTE_ETQ[parteDe(it)], ...golpesDe(it),
-      it.especial && it.especial.nombre];
+    const partes = [it.nombre, it.detalle, it.descripcionNarrativa, it.efectoNombre, it.efectoDetalle, it.equipoEstadoNombre, it.equipoEstadoDetalle,
+      it.equipoEstadoPreset, it.tier, PARTE_ETQ[parteDe(it)], ...golpesDe(it), it.especial && it.especial.nombre];
     if(typeof FichaEquipo !== 'undefined' && FichaEquipo.CATEGORIA_LABEL) partes.push(FichaEquipo.CATEGORIA_LABEL[it.tipoItem]);
-    (it.mods || []).forEach(m => { if(m && m.stat){ partes.push((statLabel || statLabelDe)(m.stat)); if(typeof FichaCalculo !== 'undefined' && FichaCalculo.STAT_FULL) partes.push(FichaCalculo.STAT_FULL[m.stat]); } });
+    [...(it.mods || []), ...(it.efectoMods || [])].forEach(m => { if(m && m.stat){ partes.push((statLabel || statLabelDe)(m.stat)); if(typeof FichaCalculo !== 'undefined' && FichaCalculo.STAT_FULL) partes.push(FichaCalculo.STAT_FULL[m.stat]); } });
     t = sinAcentos(partes.filter(Boolean).join(' '));
     textoCache.set(it, t);
     return t;

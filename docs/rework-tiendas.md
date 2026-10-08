@@ -211,3 +211,7 @@ con la tabla del nivel + 10 (sale cualquiera, más las bajas a nivel bajo). La t
 equipo ya no tienen consumibles. La Talabartería garantiza una mochila y un cinturón desde pueblito (`minimos` + `minimosDesde`). **Drops**
 (`comun/combate-fin.js`): humanos 60 %, humanoides 45 %, el resto 15 %; un jefe, uno seguro + la chance de su tipo de un segundo (`dropSegundo`).
 ⬜ Más adelante: «Pasar de día» para reponer la góndola sin republicar; la revisión de todos los consumibles.
+
+### ⬜ Ideas para «Luces y utilería» (dueño, 2026-10-08: «imaginemos cuerda, yesca y pedernal… ¿qué más?»; todavía no se carga nada)
+Lista de ideas propuesta en la conversación del 2026-10-08 (fuego, cuerda, terreno y cobertura, sigilo y engaño, oficio, señales). Se elige y
+diseña cuando el dueño lo retome, junto con la revisión de los consumibles.

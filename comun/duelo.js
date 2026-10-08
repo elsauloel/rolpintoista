@@ -161,8 +161,8 @@ const Duelo = (() => {
 .duelo-danosub.rojo{font-size:26px;font-weight:900;letter-spacing:.12em;color:#ff4d4d}
 #duelo-fondo [data-dano-tirar],#duelo-fondo [data-critico]{background:#2d6cdf;color:#fff;border:2px solid #8db3ff;border-radius:12px;padding:14px 28px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(45,108,223,.5)}
 #duelo-fondo [data-dano-tirar]:hover,#duelo-fondo [data-critico]:hover{background:#3b7bf0}
-#duelo-fondo .bt-lupa.duelo-lupa{display:inline-flex;position:static;width:auto;height:auto;margin-left:8px;padding:2px 6px;vertical-align:middle;font-size:12px;opacity:.85;border:1px solid rgba(255,255,255,.45);border-radius:6px}
-#duelo-fondo .bt-lupa.duelo-lupa:hover{opacity:1;background:rgba(255,255,255,.15)}
+#duelo-fondo .bt-lupa.duelo-lupa{display:inline-flex;position:static;width:auto;height:auto;margin-left:8px;padding:2px 7px;vertical-align:middle;font-size:14px;opacity:1;filter:none;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.5);border-radius:6px}
+#duelo-fondo .bt-lupa.duelo-lupa:hover{background:rgba(255,255,255,.2)}
 #lupa-pop{z-index:100050}
 #duelo-fondo [data-dano-tirar]:disabled,#duelo-fondo [data-critico]:disabled{opacity:.5;cursor:default}
 .duelo-crit-titulo{text-align:center;font-size:30px;font-weight:900;letter-spacing:.04em;padding:10px 0 4px}
@@ -1244,7 +1244,15 @@ const Duelo = (() => {
     if(!v || !v.html || typeof lupaBotonHtml !== 'function') return '';
     if(!lupaDueloLista && typeof lupaRegistrar === 'function'){
       lupaDueloLista = true;
-      lupaRegistrar('duelo|', clave => { const x = vistas[clave.slice(6)]; return x ? {titulo: x.titulo || 'De dónde sale', html: x.html || ''} : {titulo: '', html: ''}; });
+      // Al desglose de la página se le suma «Esta tirada»: los dados que se tiran de verdad (con los bonos del duelo y las mitades).
+      lupaRegistrar('duelo|', clave => {
+        const x = vistas[clave.slice(6)];
+        if(!x) return {titulo: '', html: ''};
+        const f = String(x.formula || '');
+        const esta = f && typeof lupaSeccion === 'function' ? lupaSeccion('Esta tirada', lupaFila('Se tira', _esc(f))
+          + (f.includes('÷2') ? lupaNota('÷2: un estado (Pajaritos, Lisiado, Parálisis o Sentado) parte el resultado a la mitad, para abajo.') : '')) : '';
+        return {titulo: x.titulo || 'De dónde sale', html: (x.html || '') + esta};
+      });
     }
     return lupaBotonHtml('duelo|' + k, 'duelo-lupa');
   }
@@ -1262,7 +1270,7 @@ const Duelo = (() => {
       let v = null;
       try{ v = d.hab ? h.vista(d, 'contra', o.stat) : h.vista(d, o.modo === 'evasion' ? 'eva' : o.modo, o.itemId); }catch(err){ console.error('Duelo: vista', err); }
       if(!v) return o;
-      const r = {...o, lupa: {titulo: v.titulo || '', html: v.html || ''}};
+      const r = {...o, lupa: {titulo: v.titulo || '', html: v.html || '', formula: v.formula || ''}};
       if(d.hab && v.formula) r.info = [`${String(o.etiqueta || '').replace(/^🛡 /, '')} 🎲 ${v.formula}`];
       return r;
     });

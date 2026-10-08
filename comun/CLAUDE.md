@@ -1367,3 +1367,8 @@ versión parecida en más de una, es candidato a juntar.
   `diametro(radio)`, `casillasArea(radio)` y `diametroOpciones(radio, {min, max})` (las opciones de un `<select>` de tamaño: valor = radio, texto =
   diámetro; lo usan la Ejecución ✨, el asistente de zonas, el de trampas y «Elegir trampa»). Un texto nuevo de un área: «flor de diámetro 3 (7
   casillas)», nunca «radio N» ni «flor de N». **Las varitas y bengalas que iluminan, siempre una flor de 7 (diámetro 3).**
+- **Duelo: el dado de cada botón y su 🔍** (2026-10-08, dueño): `duelo.js` le pide a la página de quien tira el gancho opcional
+  `vista(d, campo, modo)` → `{formula, titulo, html}` (mensaje `duelo-vista` / `duelo-vista-res`; campo 'pdg' | 'fuerza' | 'bloqueo' | 'dano', y para
+  las opciones de defensa 'eva' | 'parry' | 'contra'). El botón dice «🎲 Tirar PdG · 1d6+1» con un 🔍 (`lupaRegistrar('duelo|', …)` en `lupa.js`: el
+  desglose de la página + «Esta tirada»); `Duelo.conVistas(d, ops, h)` les pone el 🔍 a las opciones de defensa. Lo tienen `FichaDuelo`, `CreepDuelo`
+  e `InvDuelo` (la fórmula sale de las mismas tiradas, sin publicarlas). `lupa.js` acepta proveedores por prefijo: `lupaRegistrar(prefijo, fn)`.

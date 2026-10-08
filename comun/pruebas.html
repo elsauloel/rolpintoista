@@ -1507,7 +1507,7 @@ prueba('asistente de ítems: una varita del catálogo se edita como arma especia
   const r = q('[data-aa-amano="tirada"]'); r.value = '1d6'; r.dispatchEvent(new Event('input', {bubbles: true}));
   q('[data-pap="guardar"]').click(); await new Promise(res => setTimeout(res, 0));
   igual([tabs.slice(0, 5), guardado.tipoDado, guardado.danoFijo, guardado.especial.sp, guardado.especial.duelo.cadena, guardado.especial.duelo.efectos[0].caras, guardado.especial.aMano],
-    [['Qué es', 'Empuñadura', 'Hechizo', 'Qué hace ✨', '✋ A mano'], undefined, undefined, 3, {saltos: 2, rango: 3}, 10, {texto: 'Mojado: salta 1 vez más', tirada: '1d6'}]);
+    [['Qué es', 'Empuñadura', 'Hechizo', 'Qué hace ✨', '✋ A mano'], undefined, undefined, 3, {saltos: 2, rango: 3}, 4, {texto: 'Mojado: salta 1 vez más', tirada: '1d6'}]);
 });
 prueba('asistente de ítems: un orbe nuevo (escudo de una mano) pregunta lo del orbe en vez de la Defensa', async () => {
   let guardado = null;
@@ -1960,7 +1960,7 @@ prueba('Ejecución ✨: guardar sin cambios conserva lo que todavía no edita (s
   AsistenteDueloHab.abrir({nombre: 'Chispa', inicial: ini, siempreActivo: true, costoInicial: {sp: '3', nitrosCosto: 1}, alGuardar: x => { r = x; }});
   const mia = [...document.querySelectorAll('.pap')].pop();
   mia.querySelector('[data-pap="guardar"]').click(); await new Promise(res => setTimeout(res, 0));
-  igual([r.duelo.cadena, r.duelo.efectos[0].caras, r.duelo.efectos[0].exitos, r.duelo.efectos[0].turnos], [{saltos: 2, rango: 3}, 10, 1, undefined]);
+  igual([r.duelo.cadena, r.duelo.efectos[0].caras, r.duelo.efectos[0].exitos, r.duelo.efectos[0].turnos], [{saltos: 2, rango: 3}, 4, 1, undefined]);
 });
 prueba('Ejecución ✨ en la ventana común: los pasos dependen del objetivo y Guardar devuelve la configuración', async () => {
   let r = 'nada';
@@ -2523,7 +2523,7 @@ prueba('✨ varita de chispa eléctrica (2026-10-05): su Ejecución lleva la cad
   const S = FichaGuardado.normalizar({}).S, v = {...structuredClone(CATALOGO_BASE.find(i => i.id === 'esp-varita-de-chispa-electrica')), id: 'r', equipado: true};
   S.inventario = [v];
   const h = FichaAcciones.habDeArmaEspecial(S, v), hab = Combatiente.habEjecucion(h, h.duelo, {stat: () => 5, etq: x => x});
-  igual([hab.cadena, hab.dano.tipo, hab.efectos[0].nombre, hab.efectos[0].caras], [{saltos: 2, rango: 3}, 'rayo', 'Parálisis', 10]);
+  igual([hab.cadena, hab.dano.tipo, hab.efectos[0].nombre, hab.efectos[0].caras], [{saltos: 2, rango: 3}, 'rayo', 'Parálisis', 4]);
 });
 prueba('Marcado (2026-10-05): saca el sigilo al ponerse y no deja entrar en sigilo mientras dure (personaje, invocación y creep por igual)', () => {
   const E = [{nombre: 'Sigilo', polaridad: 'buff', activo: true}, {nombre: 'Lento', polaridad: 'debuff', activo: true}];

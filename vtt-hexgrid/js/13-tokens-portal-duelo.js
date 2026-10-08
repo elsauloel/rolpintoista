@@ -193,7 +193,9 @@ async function crearElementoZona(centro, cfg){
   const n = Math.max(1, Math.round(num(cfg.turnos)) || 3);
   const datos = {
     // Las casillas se guardan planas [dq1, dr1, …], como guardarElemento (con los {dq, dr} sueltos Firestore la rechazaba).
-    tipo: 'flor', origen: {col: centro.col, fila: centro.fila}, celdas: celdasFlor(radio).flatMap(c => [c.dq, c.dr]), rotacion: 0,
+    // Con `cfg.celdas` (una línea o un camino, 2026-10-08): justo esas casillas, como una forma libre.
+    tipo: cfg.celdas ? 'libre' : 'flor', origen: {col: centro.col, fila: centro.fila}, rotacion: 0,
+    celdas: cfg.celdas ? (() => { const c0 = hexACubo(centro); return cfg.celdas.flatMap(c => { const k = hexACubo(c); return [k.q - c0.q, k.r - c0.r]; }); })() : celdasFlor(radio).flatMap(c => [c.dq, c.dr]),
     color: /^#[0-9a-fA-F]{6}$/.test(cfg.color || '') ? cfg.color : (cfg.estado || /t[oó]xic/i.test(cfg.danoTipo || '') ? '#4C9A2A' : '#D9531E'),   // lo tóxico, verde (no el naranja del fuego)
     alfa: Number.isFinite(cfg.alfa) ? cfg.alfa : 40, solido: false, invisible: false,
     imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true,
@@ -265,14 +267,55 @@ function zonaPersistenteDeHabilidad(msg){
     elegirDestino(h => crearNiebla(h, radio, msg), `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': ' : ''}marcá el centro de la niebla</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true);
     return;
   }
-  elegirDestino(h => crearElementoZona(h, {
+  const cfg = {
     radio, turnos: msg.zonaTurnos, nombre: msg.nombre, amiga: msg.zonaAmiga, dano: msg.zonaDano, ignoraDef: msg.zonaIgnoraDef,
-    estado: msg.zonaEstado, resistStat: msg.resistStat, resistValor: msg.resistValor, enMantenimiento: true, cadaPaso: false,
+    estado: msg.zonaEstado, resistStat: msg.resistStat, resistValor: msg.resistValor, enMantenimiento: msg.zonaEnMantenimiento !== false,
     casteadorRef: msg.fichaId, casteadorTipo: msg.casteadorTipo,
     danoDif: msg.zonaDanoDif, danoTipo: msg.zonaDanoTipo, tiraExtra: msg.zonaTiraExtra, nota: msg.zonaNota,
     tiraStat: msg.tiraStat, tiraValor: msg.tiraValor, altura: msg.zonaAltura, directo: !!msg.zonaDirecto, color: msg.zonaColor,
     cadaPaso: !!msg.zonaCadaPaso, inmediata: !!msg.zonaInmediata, luz: !!msg.zonaLuz,
-  }), `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': marcá el centro' : 'Elegí el centro de la zona'}</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true);
+  };
+  // Una línea o un camino (2026-10-08): las casillas se marcan con clics y la zona ocupa justo esas.
+  if(msg.zonaForma === 'linea'){ elegirCeldasEnLinea(msg.nombre, msg.zonaLargo, celdas => crearElementoZona(celdas[0], {...cfg, celdas}), '🔥'); return; }
+  if(msg.zonaForma === 'camino'){
+    const t = [...tokens.values()].find(x => x.fichaId === msg.fichaId && (x.tipo === 'creep') === (msg.casteadorTipo === 'creep'));
+    elegirCamino(msg.nombre, msg.zonaLargo, t, celdas => crearElementoZona(celdas[0], {...cfg, celdas}));
+    return;
+  }
+  elegirDestino(h => crearElementoZona(h, cfg), `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': marcá el centro' : 'Elegí el centro de la zona'}</b> <span>clic en el mapa (radio ${radio}) · Esc o clic derecho cancelan</span>`, true);
+}
+/* Casillas en línea recta (2026-10-08: el muro de fuego, el muro): el primer clic es donde empieza y el segundo, hacia dónde sigue (el lado más
+   cercano a ese clic). Se corta antes de un Sólido. `fin(celdas)` con las casillas [{col, fila}]. */
+function elegirCeldasEnLinea(nombre, largo, fin, icono){
+  const n = Math.max(2, Math.min(8, Math.round(num(largo)) || 3)), nom = nombre ? esc(nombre) + ': ' : '';
+  elegirDestino(h => {
+    elegirDestino(h2 => {
+      const vec = vecinosDeCasilla(h).map((v, i) => ({v, i})).sort((a, b) => distanciaHex(a.v, h2) - distanciaHex(b.v, h2))[0];
+      const [dq, dr] = VECINO_LADO[vec.i], c0 = hexACubo(h), celdas = [];
+      for(let k = 0; k < n; k++){
+        const c = {col: cuboACol(c0.q + dq * k, c0.r + dr * k), fila: cuboAFila(c0.q + dq * k, c0.r + dr * k)};
+        if(k && elementoSolidoEn(c.col, c.fila)) break;
+        celdas.push(c);
+      }
+      fin(celdas);
+    }, `<b>${icono || '➡'} ${nom}¿hacia dónde sigue?</b> <span>clic hacia ese lado (${n} casillas en línea) · Esc o clic derecho cancelan</span>`, true);
+  }, `<b>${icono || '➡'} ${nom}marcá dónde empieza</b> <span>clic en una casilla · después, hacia dónde sigue · Esc o clic derecho cancelan</span>`, true);
+}
+/* Un camino libre (2026-10-08, el chorro de lava): casilla por casilla, cada una pegada a la anterior y sin Sólidos; la primera, a ⅓ de tu Rango o
+   menos (si no, avisa y deja seguir). Esc o clic derecho: termina con las que ya marcaste. */
+function elegirCamino(nombre, largo, t, fin){
+  const n = Math.max(2, Math.min(8, Math.round(num(largo)) || 4)), nom = nombre ? esc(nombre) + ': ' : '', celdas = [];
+  const rg = t && typeof rangoDeToken === 'function' ? rangoDeToken(t) : null, max = rg ? Math.max(1, Math.ceil(num(rg.rng) / 3)) : 0;
+  const terminar = () => { if(celdas.length) fin(celdas.slice()); };
+  const pedir = () => elegirDestino(h => {
+    if(elementoSolidoEn(h.col, h.fila)){ toast('Ahí hay algo sólido: el camino no pasa'); pedir(); return; }
+    if(celdas.some(c => c.col === h.col && c.fila === h.fila)){ toast('Esa casilla ya está en el camino'); pedir(); return; }
+    if(celdas.length && distanciaHex(celdas[celdas.length - 1], h) !== 1){ toast('Tiene que estar pegada a la anterior'); pedir(); return; }
+    if(!celdas.length && t && max && distanciaHex(t, h) > max) toast(`⚠ Empieza a ${distanciaHex(t, h)}: más lejos que ⅓ de tu Rango (${max})`);
+    celdas.push(h);
+    if(celdas.length < n) pedir(); else fin(celdas.slice());
+  }, `<b>🌋 ${nom}${celdas.length ? `casilla ${celdas.length + 1} de ${n}` : 'marcá dónde empieza'}</b> <span>${celdas.length ? 'pegada a la anterior' : `a ${max || '⅓ de tu Rango'} o menos`} · Esc o clic derecho: ${celdas.length ? 'termina acá' : 'cancela'}</span>`, true, celdas.length ? terminar : null);
+  pedir();
 }
 // 🪤 Trampa de una habilidad ✨ automática (2026-09-30, pedido del dueño): quien la usa elige la casilla con un clic (antes quedaba
 // sola al lado del token). El anuncio (sin la ubicación) ya lo publicó la ficha; la trampa la ve solo su bando (trampaDeMiBando).
@@ -282,6 +325,15 @@ function zonaPersistenteDeHabilidad(msg){
 function trampaDeHabilidad(msg){
   const t = msg.trampa || {}, cant = Math.max(1, Math.min(6, Math.round(num(t.cant)) || 1));
   const pilar = !!t.pilar, portal = t.portal && t.portal.fijo ? Math.max(1, Math.round(num(t.portal.rango)) || 4) : 0;
+  // El muro (2026-10-08): `linea` pilares en línea recta (inicio y hacia dónde sigue); los que caen en una casilla ocupada no salen.
+  if(pilar && Math.round(num(t.linea)) > 1){
+    elegirCeldasEnLinea(msg.nombre, t.linea, async celdas => {
+      let puestos = 0;
+      for(const c of celdas){ try{ if(await levantarPilar(c, t)) puestos++; }catch(err){ console.error('No se pudo levantar el pilar:', err); } }
+      toast(`🧱 ${msg.nombre}: ${puestos} de ${celdas.length} casilla${celdas.length === 1 ? '' : 's'} en línea`);
+    }, '🧱');
+    return;
+  }
   const nom = msg.nombre ? esc(msg.nombre) + ': ' : '';
   let puestas = 0;
   const fin = () => { if(cant > 1 && puestas) toast(pilar ? `🧱 ${msg.nombre}: ${puestas} pilar${puestas === 1 ? '' : 'es'}` : `🪤 ${msg.nombre}: ${puestas} trampa${puestas === 1 ? '' : 's'} colocada${puestas === 1 ? '' : 's'}`); };

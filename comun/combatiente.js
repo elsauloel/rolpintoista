@@ -800,7 +800,11 @@ const Combatiente = (() => {
       ...(/^#[0-9a-fA-F]{6}$/.test(c.zonaColor || '') ? {zonaColor: c.zonaColor} : {}),
       // (2026-10-08) cada paso adentro la dispara (campo de estática); afecta enseguida a los que ya están adentro («aparece bajo los pies»);
       // es una luz (luz flotante: ilumina y deja ver lo oculto mientras dura).
-      ...(c.zonaCadaPaso ? {zonaCadaPaso: true} : {}), ...(c.zonaInmediata ? {zonaInmediata: true} : {}), ...(c.zonaLuz ? {zonaLuz: true} : {})};
+      ...(c.zonaCadaPaso ? {zonaCadaPaso: true} : {}), ...(c.zonaInmediata ? {zonaInmediata: true} : {}), ...(c.zonaLuz ? {zonaLuz: true} : {}),
+      ...(c.zonaEnMantenimiento === false ? {zonaEnMantenimiento: false} : {}),   // solo al pisarla (el campo de estática), no por quedarse
+      // La forma (2026-10-08): 'linea' (muro de fuego: inicio y hacia dónde sigue) o 'camino' (chorro de lava: casilla por casilla, cada una pegada
+      // a la anterior, la primera a ⅓ de tu Rango), de `zonaLargo` casillas. Sin forma: la flor de siempre.
+      ...(['linea', 'camino'].includes(c.zonaForma) ? {zonaForma: c.zonaForma, zonaLargo: Math.max(2, Math.min(8, Math.round(nf(c.zonaLargo)) || 3))} : {})};
   }
   // El estado que deja la zona. Si se suelta contra un stat de quien la tira (2026-10-07, Varita de arena movediza: Fuerza contra tu Ef.Esp) y es el
   // mismo stat que tira la zona, la dificultad es ese valor al crearla.

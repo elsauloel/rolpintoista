@@ -3,7 +3,7 @@
 Todas son de una mano (peso 1), salvo los báculos (dos manos, peso 2). «Directo» = ignora la Defensa especial (lo frena solo la
 resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (el No2 sube 1 por cada uso más en el turno).
 
-## ✅ Cargadas (25)
+## ✅ Cargadas (30)
 
 | Arma | Qué hace · SP · DDE |
 |---|---|
@@ -32,6 +32,11 @@ resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (
 | Báculo de sangre | 1d8 arcano + ¼ de tu Ef.Esp; cada uso cuesta el 10 % de tu vida máxima en vez de SP. · — · 90 |
 | Varita inestable | 2d6 arcano directo; si sale algún 1 en el daño, te hacés 2d4. · 2 · 100 |
 | Varita de la luz flotante | Luz de radio 2, 2 turnos: ilumina y deja ver lo oculto mientras dura; cada rival que toca queda Marcado 3 turnos. · 1 · 80 |
+| Varita del campo de estática | Aparece bajo los pies (no se esquiva): 1d4 eléctrico directo y 10 % de Parálisis a cada rival; queda 1 turno: otra vez por cada paso. · 3 · 90 |
+| Varita de arena movediza mayor | Aparece bajo los pies: Res.CC contra tu Ef.Esp enseguida; Inmovilizado, Soltarse, salir cuesta 2 No2; 2 turnos. · 3 · 110 |
+| Varita del muro de fuego | Línea de 3, 3 turnos, piso y aire: 1d4 de fuego al entrar o quedarse. · 1 · 80 |
+| Varita del muro | 3 casillas de piedra en línea, 3 turnos: tapan el paso y la vista. · 2 · 80 |
+| Varita del chorro de lava | Camino libre de 4 (la primera a ⅓ de tu Rango): 1d4 de fuego enseguida a todos (aliados incluidos); arde 2 turnos. · 3 · 110 |
 
 ## 🔧 Decididas, falta programar algo para cargarlas
 
@@ -39,15 +44,10 @@ resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (
 |---|---|
 | Varita láser larga | Rayo en línea de 6 (con fuego amigo): 1d8 arcano al primero y 1 menos a cada uno de los siguientes. · 3 · 100 |
 | Varita de la ráfaga helada | Frente de 3×3: 1d4 de hielo y empuja 2. · 4 · 130 |
-| Varita del chorro de lava | Camino libre de 4 (cada casilla pegada a la anterior; la primera a 1/3 de tu Rango): 1d4 de fuego a todos; arde 2 turnos en el piso. · 3 · 110 |
-| Varita del campo de estática | Aparece bajo los pies (no se esquiva): 1d4 eléctrico y 10 % de Parálisis a cada uno; queda 1 turno en el piso (1d4 y 10 % por cada paso). · 3 · 90 |
-| Varita del muro de fuego | Línea de 3, 3 turnos, en el piso y en el aire: 1d4 de fuego al entrar o quedarse. · 1 · 80 |
-| Varita del muro | 3 casillas en línea, 3 turnos: tapan el paso y la vista. · 2 · 80 |
 | Varita del vendaval | Cono: empuja 2 a todos; apaga el fuego y despeja la niebla que toca. · 1 · 80 |
 | Varita del blink | Te teletransportás (o a un aliado que ves) hasta 3 casillas; una vez por turno. · 3 · 95 |
 | Varita de cargas | La Bola de fuego Común, 3 usos por combate sin SP. · — · 120 |
 | Varita gemela | Aceite o Bola de fuego: elegís al usarla (el SP del que elegís). · 1 o 2 · 95 |
-| Arena movediza | Aparece bajo los pies (no se esquiva), Res.CC contra tu Ef.Esp, 2 turnos, la misma dinámica. · 3 · 110 |
 
 ## ✅ Rara
 

@@ -575,6 +575,12 @@ function num(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
 
 function armaDanoTxt(i){
   if(!ES_ARMA(i.tipoItem)) return '';
+  // Un arma especial (varita, báculo) hace el daño de su hechizo, no el de un arma física (2026-10-08: decía «1d8» en todas).
+  if(i.especial){
+    const e = i.especial, modos = Array.isArray(e.modos) ? e.modos : [e];
+    const d = [...new Set(modos.map(m => String(m.dano || '').trim()).filter(Boolean))];
+    return d.length ? d.join(' o ') + (e.sumaEspecial ? ' + Ef.Esp' : '') : '';
+  }
   const dados = Math.max(1, num(i.peso) || 1) + Math.max(0, num(i.danoAmplificado));
   const tipo = num(i.tipoDado) || 8;
   const fijo = num(i.danoFijo);

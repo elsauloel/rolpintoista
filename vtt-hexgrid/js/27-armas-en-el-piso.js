@@ -119,22 +119,52 @@ const tokenDePj = fichaId => [...tokens.values()].find(x => x.tipo === 'pj' && x
 const tokenDeCreep = id => [...tokens.values()].find(x => x.tipo === 'creep' && x.fichaId === id) || null;
 // Lo que la Botonera de ese token necesita saber: las armas al lado y si la suya está en el piso.
 function armasOpciones(t){ return t ? {armasCerca: armasCercaDe(t), armaEnElPiso: armaPropiaEnElPiso(t)} : {}; }
+/* Lo que se levanta y va en la mano (arma, escudo, orbe; 2026-10-08, dueño): con la mano libre se elige «Equiparlo» o «A la mochila»; con las
+   manos ocupadas, «Reemplazar …» (lo que tenía va a la mochila) por 1 No2 más, o «A la mochila». Cerrar el cartel = a la mochila.
+   → {destino: 'mano' | 'mochila', soltar: [ítems que dejan la mano]}. */
+function levantadoElegir(S, it, quien){
+  const manos = (S.inventario || []).filter(i => i && i.equipado && FichaCombate.esMano(i.tipoItem));
+  const libre = !FichaEquipo.slotOcupado(S, it).ocupado;
+  return new Promise(res => {
+    let listo = false;
+    const fin = v => { if(listo) return; listo = true; AvisoCombate.cerrar(); res(v); };
+    const extra = Combatiente.COSTO_LEVANTAR_ARMA;
+    const botones = libre ? [{texto: '✋ Equiparlo', detalle: 'lo tenés en la mano enseguida', alClic: () => fin({destino: 'mano', soltar: []})}]
+      : (/2m$/.test(it.tipoItem) ? [{texto: `🔁 Reemplazar lo que tenés en las manos (+${fmt(extra)} No2)`, detalle: manos.map(m => m.nombre).join(' y ') + ' → a la mochila', alClic: () => fin({destino: 'mano', soltar: manos})}]
+        : manos.map(m => ({texto: `🔁 Reemplazar ${m.nombre} (+${fmt(extra)} No2)`, detalle: `${m.nombre} → a la mochila`, alClic: () => fin({destino: 'mano', soltar: [m]})})));
+    botones.push({texto: '🎒 A la mochila', sec: true, alClic: () => fin({destino: 'mochila', soltar: []})});
+    AvisoCombate.mostrar({clave: 'levantar', icono: '🗡️', titulo: `${quien} levanta ${it.nombre}`,
+      pasos: [{titulo: libre ? 'Tenés una mano libre' : 'Tenés las manos ocupadas', texto: libre ? '¿Lo equipás o lo guardás?' : `¿Lo cambiás por lo que tenés en la mano (cuesta ${fmt(extra)} No2 más) o lo guardás?`}],
+      botones, alCerrar: () => fin({destino: 'mochila', soltar: []})});
+  });
+}
 async function bnLevantarArma(elId){
   if(!bn || !bn.S || !bnPuedeGuardar()) return;
   const S = bn.S, t = tokenDePj(bn.fichaId), costo = Combatiente.COSTO_LEVANTAR_ARMA;
-  const seguir = async forzar => {
+  const quien = ((S.meta && S.meta.nombre) || 'Alguien').trim();
+  const cobrar = (n, que) => { S.nitros = num(S.nitros) - (n > num(S.nitros) ? FichaAcciones.gastoNitrosForzado(S, n, que) : n); };
+  const seguir = async () => {
     const x = await armaTomar(elId, t);
     if(!x) return;
-    const ui = bnUi(FichaGuardado.partes(S));
-    S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? FichaAcciones.gastoNitrosForzado(S, costo, 'levantó un arma') : costo);
+    cobrar(costo, 'levantó un arma');
     const des = (S.efectos || []).find(Combatiente.esDesarmado);
-    if(des){ S.efectos = S.efectos.filter(e => e !== des); x.it.equipado = true; }   // vuelve a tener un arma en la mano
+    if(des) S.efectos = S.efectos.filter(e => e !== des);
+    // Desarmado y con la mano libre: vuelve a tenerla en la mano, sin preguntar. Si no, se elige (si va en la mano).
+    let r = {destino: 'mochila', soltar: []};
+    if(FichaCombate.esMano(x.it.tipoItem)){
+      r = des && !FichaEquipo.slotOcupado(S, x.it).ocupado ? {destino: 'mano', soltar: []} : await levantadoElegir(S, x.it, quien);
+    }
+    if(r.soltar.length){
+      cobrar(costo, 'cambió lo que tenía en la mano');
+      const ids = new Set(r.soltar.map(i => i.id));
+      S.inventario = (S.inventario || []).map(i => ids.has(i.id) ? {...i, equipado: false} : i);
+    }
+    x.it.equipado = r.destino === 'mano';
     S.inventario = [...(S.inventario || []), x.it];
-    ui.cambio();
-    const quien = ((S.meta && S.meta.nombre) || 'Alguien').trim();
-    mesaLinea(`🗡️ ${quien} levantó ${x.it.nombre}${des ? ' y la tiene en la mano' : ' (a la mochila)'}`);
+    bnUi(FichaGuardado.partes(S)).cambio();
+    mesaLinea(`🗡️ ${quien} levantó ${x.it.nombre}${r.destino === 'mano' ? ' y lo tiene en la mano' : ' (a la mochila)'}${r.soltar.length ? ` · guardó ${r.soltar.map(i => i.nombre).join(' y ')} (+${fmt(costo)} No2)` : ''}`);
   };
-  if(num(S.nitros) < costo) bnSinNitros(costo, 'levantar el arma', () => seguir(true)); else seguir(false);
+  if(num(S.nitros) < costo) bnSinNitros(costo, 'levantar el arma', () => seguir()); else seguir();
 }
 async function bnInvLevantarArma(invId, elId){
   if(!bn || !bn.S || !bnPuedeGuardar()) return;

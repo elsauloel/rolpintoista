@@ -162,6 +162,12 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   ataque sin No2; InvDuelo; los Silencio de creeps/invocaciones; `CombateFin`) — hay que volver async esas funciones —, los de borrar/administrar del
   mapa (borrar mapa, sacar token, vaciar turnos, bitácora, trampa guardada, tomar el control), `intercambio.js`, y los de la ficha y GM Tools.
 
+- [ ] **El filtro del catálogo, una sola pieza para todos lados** (dueño, 2026-10-08: «hay que ponerle onda, no era muy claro»; se hace en la
+  compu junto con el catálogo y la tienda). Hoy la ficha filtra por categoría, slot (sin «dos manos»), calidad y búsqueda; el «Agregar ítem» de la
+  tienda tiene uno mucho más completo. Propuesta: una pieza común (ficha, Botonera del mapa, editor del catálogo, tienda) con parte del cuerpo
+  (una mano / dos manos separadas), calidad, búsqueda, orden y «Más filtros»: Tipo de arma, elemento, qué bono da, efecto al golpear, **rango de
+  precio (desde–hasta, pedido del dueño)** y peso; contador «23 de 410 ítems» y limpiar todo.
+
 ## 1. Casteo con SP — **proceso paso a paso en [`proceso-casteo.md`](proceso-casteo.md)** (reglas en [`reglas-casteo.md`](reglas-casteo.md), decisiones en P97)
 > **Los 5 pasos de decisión, el Paso 6 y el Paso 7 (en su mayoría) están cerrados (2026-09-27).** Retomar por el
 > primer paso sin ✅ de `proceso-casteo.md` (hoy: **paso 8**, auditoría de contenido). Lo de abajo es solo un resumen.

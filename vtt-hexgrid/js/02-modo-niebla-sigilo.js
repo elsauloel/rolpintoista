@@ -217,6 +217,33 @@ async function usarPolillaMapa(){
   const idx = polillaIndice();
   const t = miTokenPrincipal();
   if(idx < 0 || !t) return;
+  // En un duelo (dueño, 2026-10-08): el +2 va a tu última tirada del duelo y el duelo se vuelve a resolver — puede dar vuelta el resultado.
+  let dueloPolilla = null, otro = null;
+  try{
+    const miId = ([...tokens.entries()].find(([, x]) => x === t) || [])[0];
+    const q = await fbDb.collection(fbRutaCampana('duelos')).orderBy('creado', 'desc').limit(6).get();
+    const doc = q.docs.find(x => { const d = x.data(); return miId && ((d.atacante && d.atacante.tokenId === miId) || (d.defensor && d.defensor.tokenId === miId)); });
+    const d = doc && doc.data();
+    if(d && d.creado && d.creado.toMillis && Date.now() - d.creado.toMillis() < 10 * 60 * 1000 && d.estado !== 'cancelado'){
+      const lado = d.atacante.tokenId === miId ? 'atacante' : 'defensor';
+      otro = lado === 'atacante' ? d.defensor : d.atacante;
+      dueloPolilla = await Duelo.sumarATirada(doc.id, lado, 2, '🦋');
+    }
+  }catch(err){ console.error('No se pudo ver el duelo de la Polilla:', err); }
+  const uidOtro = otro ? (otro.tipo === 'creep' ? ((fbPartida && fbPartida.gmUid) || otro.uid) : otro.uid) : '';
+  if(dueloPolilla){
+    try{ await hudEstadoCambiar(t, idx, 'quitar'); }catch(err){ console.error('No se pudo sacar el estado de la Polilla mística:', err); }
+    const p = dueloPolilla;
+    const texto = `${nombreDe(t)} usó la Polilla mística en su ${p.etq}: ${fmt(p.antes)} → ${fmt(p.ahora)}${p.contra !== null ? ` contra ${fmt(p.contra)}` : ''}. El duelo contra ${otro.nombre || 'el otro'} se volvió a resolver con el número nuevo.`;
+    try{ await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: nombreDe(t), origen: `🦋 ${nombreDe(t)} usó la Polilla mística`,
+      formula: `+2 a su ${p.etq} del duelo: ${fmt(p.antes)} → ${fmt(p.ahora)}`, rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()}); }
+    catch(err){ console.error('No se pudo avisar el uso de la Polilla mística:', err); }
+    momentoAbrir({tipo: 'polilla', icono: '🦋', titulo: `${nombreDe(t)} usó la Polilla mística`, resultado: texto, estado: 'listo',
+      datos: {paraUids: [fbUsuario.uid, uidOtro].filter(Boolean), aviso: true, boton: 'Entendido', pasos: [{titulo: '🦋 Polilla mística', texto}]}});
+    mesaMiUltima = null;
+    renderPolillaBoton();
+    return;
+  }
   if(!mesaMiUltima){ toast('Todavía no hiciste ninguna tirada para sumarle el +2'); return; }
   const origen = mesaMiUltima.origen, nuevoTotal = num(mesaMiUltima.total) + 2;
   try{ await hudEstadoCambiar(t, idx, 'quitar'); }   // la polilla se gasta
@@ -229,19 +256,10 @@ async function usarPolillaMapa(){
       cuando: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){ console.error('No se pudo avisar el uso de la Polilla mística:', err); }
-  // El anuncio (dueño, 2026-10-08): al centro para quien la usó y, si esa tirada era de un duelo reciente, también para el otro del duelo; el
-  // resto lo ve en la Crónica. (El duelo no se corrige solo: el +2 se suma a mano.)
-  let otro = null;
-  try{
-    const miId = ([...tokens.entries()].find(([, x]) => x === t) || [])[0];
-    const q = await fbDb.collection(fbRutaCampana('duelos')).orderBy('creado', 'desc').limit(6).get();
-    const d = q.docs.map(x => x.data()).find(x => miId && ((x.atacante && x.atacante.tokenId === miId) || (x.defensor && x.defensor.tokenId === miId)));
-    if(d && d.creado && d.creado.toMillis && Date.now() - d.creado.toMillis() < 10 * 60 * 1000) otro = d.atacante.tokenId === miId ? d.defensor : d.atacante;
-  }catch(err){ console.error('No se pudo ver el duelo de la Polilla:', err); }
-  const texto = `${nombreDe(t)} usó la Polilla mística en «${origen}»: +2, el resultado final es ${fmt(nuevoTotal)}.${otro ? ` ✋ En el duelo contra ${otro.nombre || 'el otro'}, el +2 se suma a mano.` : ''}`;
+  // El anuncio (dueño, 2026-10-08): al centro para quien la usó (y para el otro, si había un duelo que ya no se puede reabrir); el resto, Crónica.
+  const texto = `${nombreDe(t)} usó la Polilla mística en «${origen}»: +2, el resultado final es ${fmt(nuevoTotal)}.${otro ? ` ✋ El duelo contra ${otro.nombre || 'el otro'} ya siguió (daño, crítico o efectos): si cambia algo, a mano.` : ''}`;
   momentoAbrir({tipo: 'polilla', icono: '🦋', titulo: `${nombreDe(t)} usó la Polilla mística`, resultado: texto, estado: 'listo',
-    datos: {paraUids: [fbUsuario.uid, otro ? (otro.tipo === 'creep' ? ((fbPartida && fbPartida.gmUid) || otro.uid) : otro.uid) : ''].filter(Boolean), aviso: true, boton: 'Entendido',
-      pasos: [{titulo: '🦋 Polilla mística', texto}]}});
+    datos: {paraUids: [fbUsuario.uid, uidOtro].filter(Boolean), aviso: true, boton: 'Entendido', pasos: [{titulo: '🦋 Polilla mística', texto}]}});
   mesaMiUltima = null;   // hace falta una tirada nueva para la próxima
   renderPolillaBoton();
 }

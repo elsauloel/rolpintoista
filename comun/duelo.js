@@ -1366,6 +1366,36 @@ const Duelo = (() => {
     if(ok) anunciarMesa(anuncio);
     return ok;
   }
+  /* 🦋 Polilla mística dentro del duelo (dueño, 2026-10-08: «yo saco 7, el rival 8, perdí; uso la polilla: 9 contra 8, se tiene que revertir el
+     resultado»): le suma +n a la última tirada que hizo ese lado (la Fuerza del golpe o el Bloqueo si ya se llegó ahí; si no, el PdG o la defensa)
+     y vuelve a resolver ese paso con el número nuevo — puede dar vuelta quién ganó. Vale mientras el paso se pueda reabrir (como la Moneda: antes
+     de los d20 del crítico, del daño y de aplicar efectos). lado: 'atacante' | 'defensor'. → {campo, etq, antes, ahora, contra, resultado} o null. */
+  const campoPolilla = (m, lado) => (lado === 'atacante' ? ['fuerza', 'pdg'] : ['bloqueo', 'eva']).find(c => m && m[c] && puedeReabrir({...m, rerollUsado: null}, c)) || null;
+  async function sumarATirada(id, lado, n, marca){
+    const ref = col().doc(id);
+    let res = null, anuncio = '';
+    await fbDb.runTransaction(async tx => {
+      res = null; anuncio = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      const campo = campoPolilla(m, lado);
+      if(!campo) return;
+      const t0 = m[campo], otro = {pdg: 'eva', eva: 'pdg', fuerza: 'bloqueo', bloqueo: 'fuerza'}[campo];
+      m[campo] = {...t0, total: _num(t0.total) + n, mod: _num(t0.mod) + n, formula: `${t0.formula || ''} +${n}${marca ? ' ' + marca : ''}`.slice(0, 60)};
+      if(campo === 'fuerza' || campo === 'bloqueo'){ m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'bloqueo'; }
+      else{ m.contacto = null; m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'contacto'; if(m.hab) m.efectos = null; }
+      m.estado = 'esperando';
+      anuncio = avanzar(m) || '';
+      const upd = cambiosDe(m);
+      if(m.resumido) upd.resumido = false;   // el resumen final se vuelve a publicar cuando termine
+      tx.update(ref, upd);
+      res = {campo, etq: etqCampo(m, campo), antes: _num(t0.total), ahora: m[campo].total, contra: m[otro] ? _num(m[otro].total) : null,
+        resultado: m.estado === 'empate' ? 'empate' : (m.resultado || (m.contacto && m.contacto.gana) || '')};
+    });
+    if(anuncio) anunciarMesa(anuncio);
+    return res;
+  }
   let rerollInfo = {}, rerollPedidas = new Set();
   function ladoMio(d){ return puedoTirarYo(d.atacante) ? 'atacante' : puedoTirarYo(d.defensor) ? 'defensor' : ''; }
   function pedirRerollInfo(d, lado){
@@ -2357,5 +2387,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

@@ -1398,3 +1398,6 @@ versión parecida en más de una, es candidato a juntar.
 - **La góndola de gastables** (P181, dueño 2026-10-08): `GeneradorTiendas.gastable`, `gondolaDe`, `UNIDADES_GONDOLA` (3); `generar` devuelve `gondola`;
   `TAMANOS[t].min/max` son ahora por sección y `TAMANOS[t].gondola` las variedades de cada góndola. La tienda del jugador (`FichaTienda`) muestra «🧺 quedan
   N» y descuenta las unidades al comprar (`tienda/stock.gondola`). Drops de los creeps más frecuentes (`CombateFin.dropChance` / `dropSegundo`).
+- **Cómo se ve una trampa** (dueño, 2026-10-08: «al verla tenés que entender que es una trampa y más o menos cómo funciona»): `ItemCorto.trampaHtml` lleva el
+  distintivo «🪤 Trampa · se coloca en el mapa · la dispara un rival al pisarla» y `trampaFilas` separa **Se dispara** (la superficie que se pisa: `tipo`/`tamano`)
+  de **Alcanza** (el efecto: `efecto.area` pisador / trampa / flor con su `radio` y `centro`, y si está en el piso o en el aire). Antes era una sola fila «Forma».

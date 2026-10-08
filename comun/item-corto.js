@@ -22,7 +22,9 @@ const ItemCorto = (() => {
 .ic-hace{font-size:12.5px;line-height:1.45;color:var(--paper,#EDE3D2);margin-top:4px}
 .ic-tecnico{margin-top:10px;border:1px dashed var(--line,#3B2E34);border-radius:4px;padding:8px 10px;font-size:12.5px;line-height:1.5;color:var(--muted,#9A867E)}
 .ic-tecnico > b{display:block;font-family:"Space Mono",monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;color:var(--muted,#9A867E)}
-.ic-tecnico p{margin:0 0 4px}`;
+.ic-tecnico p{margin:0 0 4px}
+.ic-trampa{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin-top:5px;padding:2px 9px;border:1px solid #C9A227;border-radius:999px;background:rgba(201,162,39,.16);color:#F0D27A;font-family:"Space Mono",monospace;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.ic-trampa span{font-family:inherit;font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted,#9A867E);font-size:11px}`;
   let cssPuesto = false;
   function estilos(){
     if(cssPuesto || typeof document === 'undefined') return;
@@ -48,7 +50,15 @@ const ItemCorto = (() => {
     const t = t0 && typeof Plantillas !== 'undefined' && Plantillas.trampaDesde ? (Plantillas.trampaDesde(t0) || t0) : (t0 || {});
     const f = [];
     const tam = Math.max(0, num(t.tamano));
-    f.push(['Forma', t.tipo === 'linea' ? `Línea de ${Math.max(1, tam)}` : tam ? `Flor de diámetro ${2 * tam + 1} (${casillas(tam)} casillas)` : 'Una casilla']);
+    // Cómo funciona (dueño, 2026-10-08: «al verla tenés que entender que es una trampa y más o menos cómo funciona»): dónde se dispara (la
+    // superficie que se pisa) y a quién alcanza (el efecto), por separado.
+    const sup = t.tipo === 'linea' ? Math.max(1, tam) : casillas(tam);
+    f.push(['Se dispara', t.tipo === 'linea' ? `cuando un rival pisa cualquiera de sus ${sup} casillas en línea`
+      : tam ? `cuando un rival pisa cualquiera de sus ${sup} casillas (flor de diámetro ${2 * tam + 1})` : 'cuando un rival pisa su casilla (una sola)']);
+    const ef = t.efecto || {}, area = ef.area || (sup > 1 ? 'trampa' : 'pisador'), r = Math.max(1, num(ef.radio) || 1);
+    const ALTURA = {piso: ' (en el piso)', aire: ' (en el aire)', ambos: ' (en el piso y en el aire)'};
+    f.push(['Alcanza', (area === 'flor' ? `una flor de diámetro ${2 * r + 1} (${casillas(r)} casillas) alrededor ${ef.centro === 'trampa' ? 'del centro de la trampa' : 'de donde la pisan'}`
+      : area === 'trampa' ? (sup > 1 ? `a todos los que estén sobre sus ${sup} casillas` : 'a quien la pisa') : 'solo a quien la pisa') + (ALTURA[t.altura] || '')]);
     const ELEM = {fuego: 'de fuego', hielo: 'de hielo', rayo: 'eléctrico', toxico: 'tóxico', acido: 'de ácido'};
     if(t.dano) f.push(['Daño', `${t.dano}${ELEM[t.elemento] ? ' ' + ELEM[t.elemento] : ''} · ${t.ignoraDef ? 'directo a la vida' : 'contempla la armadura'}${ELEM[t.elemento] ? ' (lo frena su resistencia y la Defensa especial)' : ''}`]);
     // El efecto: lo que aplica el mapa solo (el estado) y lo que queda a mano (efectoManual).
@@ -84,7 +94,9 @@ const ItemCorto = (() => {
     estilos();
     return `<div class="ic-filas">${filas.map(([e, v, nota]) => `<span class="ic-e">${esc(e)}</span><span class="ic-v">${esc(v)}${nota ? ` <span class="ic-mano">(${esc(nota)})</span>` : ''}</span>`).join('')}</div>`;
   }
-  const trampaHtml = t => filasHtml(trampaFilas(t));
+  // El distintivo de una trampa (dueño, 2026-10-08: «tiene que ser visiblemente claro cuando un ítem es trampa»).
+  const TRAMPA_BADGE = '<div class="ic-trampa">🪤 Trampa <span>se coloca en el mapa · la dispara un rival al pisarla</span></div>';
+  const trampaHtml = t => TRAMPA_BADGE + filasHtml(trampaFilas(t));
 
   /* ---------- Armas (regla del dueño, 2026-10-03: como las trampas) ----------
      En la grilla, lo esencial —Tipo, dados, daño, bonos, efectos— dando por sabidas las reglas (`armaEsencial`: la línea que se usa como

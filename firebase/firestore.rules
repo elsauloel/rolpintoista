@@ -547,7 +547,9 @@ service cloud.firestore {
       // campo) y sacar cualquier token. fichaId (opcional): la ficha (pj) o
       // el creep al que está vinculado.
       function tokenValido(d) {
-        return d.keys().hasOnly(['nombre', 'color', 'tipo', 'duenoUid', 'col', 'fila', 'creado', 'fichaId', 'ruta', 'aura', 'barras', 'imagen', 'rotacion', 'oculto'])
+        return d.keys().hasOnly(['nombre', 'color', 'tipo', 'duenoUid', 'col', 'fila', 'creado', 'fichaId', 'ruta', 'aura', 'barras', 'imagen', 'rotacion', 'oculto', 'revelado'])
+          // 🎭 Los jugadores ya vieron a este creep (2026-10-09, lo pone el mapa del GM): desde ahí su lugar en el orden de turnos no desaparece.
+          && (!('revelado' in d) || d.revelado is bool)
           && (!('fichaId' in d) || (d.fichaId is string && d.fichaId.size() <= 64))
           // Ruta del último movimiento, [col, fila, col, fila…], para la estela.
           && (!('ruta' in d) || (d.ruta is list && d.ruta.size() <= 200))

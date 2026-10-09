@@ -89,7 +89,7 @@
 - **Daño de colisión CON vs CON** — Hay terreno de Colisión en el mapa, pero **no** el daño mutuo entre dos cuerpos (Con vs Con) ni «chocarse te hace tu Constitución en dado».
 - **Auditar las trampas de skills de creep (ignoraDef)** — El mecanismo existe (`ignoraDef` en el paso Trampa), pero **no se auditó ninguna** de las 27 trampas de skills: falta el criterio caso por caso.
 - **«Prisa» en pasivas** — No hay una pasiva «Prisa» (hoy el equivalente es el estado Hypeado).
-- **«Acción incierta» en el log** — No hay ninguna skill que publique «realizó una acción incierta».
+- ~~**«Acción incierta» en el log**~~ — ✅ hecho el 2026-10-09 (`vtt-hexgrid/js/29-accion-incierta.js`): colocar trampas y lo que hace un creep conocido que no se ve; además, los creeps sin revelar no existen para los jugadores.
 - **Armadura rota asignada a un ítem** — La Armadura rota es un estado del personaje; no queda atada al ítem que se desequipa.
 - **Traer mi token al mapa desde el PJ** — No encontré el botón «traer mi token» en la ficha.
 - **Ungüento de la turca** — No encontré nada.

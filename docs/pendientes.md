@@ -206,6 +206,9 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] Pegar `firebase/firestore.rules` en la consola (**Desarrollar y realizar pruebas** → Ctrl+A → pegar → Publicar) y verificar que quedó (buscar `estados` y `botin`).
 - [ ] Grupos de creeps, **tokens automáticos** (creeps y jugadores), **Finalizar combate y Botín desde el mapa**, botón **🎭** del borde izquierdo y **grupos vinculados a mapas**.
 - [ ] Reporte de fin de combate → recompensas en la ficha → **botín**: 🙋 Reclamar, ⚔ Disputar (✊ piedra, papel o tijera), ↩ Soltar, Comparar, **Despojar** (lo reclamado llega a la mochila al cerrar el botín; 2026-10-08).
+- [ ] **🎭 Acción incierta** (2026-10-09, `vtt-hexgrid/js/29-accion-incierta.js`): pegar las reglas (`revelado` en los tokens); con niebla y un creep
+  escondido: no aparece en el orden de turnos hasta que lo ven, después no desaparece; lo que hace escondido sale como «acción incierta»; colocar una
+  trampa (personaje y creep) se anuncia así al rival.
 - [ ] **✊ Piedra, papel o tijera** (2026-10-08, `comun/ppt.js`): pegar las reglas nuevas (`ppt` y `botin`); el ✊ del mapa contra un jugador y contra el GM, el empate (otra ronda), rendirse, ocultar y volver con el botoncito de abajo, la línea de la Mesa y la Crónica.
 - [ ] **Trampas automáticas** (se colocan solas, ocultas, con daño) y **estados sobre otros** ("¿A quién le pegó?", la ficha aplica el aviso; trampas con estado).
 - [ ] **Protección de jefe** (inmune a Stun, +1 Res.Esp).

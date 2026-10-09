@@ -1450,3 +1450,14 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   jugadores y GM: elegís contra quién (otro jugador o el GM) y para qué. A los dos les aparecen las tres manos en triángulo y el resultado
   cuando eligieron los dos; la Mesa y la Crónica lo cuentan. `PPT.iniciar()` en `arrancarEnVivo` (js/14). El botín usa lo mismo para disputar
   un ítem: ver `comun/CLAUDE.md` (ficha-botin.js). En js/11, los clics del botín: `data-botin-tomar` (reclamar), `-disputar`, `-soltar`, `-ppt`.
+
+- **🎭 Acción incierta y creeps sin revelar** (2026-10-09, idea de Pablo del 30/9; `js/29-accion-incierta.js`). Para los jugadores: un creep que
+  todavía no vieron no existe (ni en el orden de turnos ni en la Mesa ni en el «Empieza el turno de…»); cuando lo ven por primera vez, el mapa
+  del GM le pone `revelado: true` al token (`inciertaRevisar`, cada 1,5 s, solo en el mapa publicado; `visibleParaJugadores(t)` = la unión de
+  lo que ven los personajes) y desde ahí su lugar en el orden no desaparece aunque se esconda (sin el 🥷 para los jugadores). Ocultarlo con el
+  👁 del HUD le saca la marca. **La Mesa**: `mesaFiltrar(docs)` (lo llama `comun/mesa.js` antes de dibujar) decide una vez por línea
+  (sessionStorage) — lo de un creep que no se ve: «🎭 X está realizando una acción incierta» si ya lo conocen, si no nada; moverse no se
+  anuncia. **Colocar una trampa** deja una línea `incierta-pj` / `incierta-creep` (`TokensAuto.colocarTrampas`): su bando ve el detalle, el
+  rival «acción incierta» si quien la puso está a la vista (un creep conocido, aunque no se vea). El consumo de un creep escondido va a la
+  Mesa con su nombre (`anunciarConsumo(a, oculto, quien)`, js/21) para que el filtro decida. Regla nueva: `revelado` en `tokenValido`.
+  Limitación: la ficha suelta y GM Tools no filtran (solo el mapa sabe qué ve cada uno).

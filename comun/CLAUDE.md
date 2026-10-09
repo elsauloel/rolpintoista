@@ -950,6 +950,11 @@ versión parecida en más de una, es candidato a juntar.
   (el cobro de equipar en combate); y el dibujo: `html(S, {lupa})`, `slotLlenoHtml(S, it)`, `compararHtml(S, item, equipadoId,
   {precioHtml})`. `ui = {toast, avisarSinNitros, modoCombate(), alPagar?(), slotLleno(it), cambio(partes, o)}`. Lo usan la ficha (sus
   nombres de siempre son atajos) y el mapa (`abrirEquipoMapa`). Necesita ficha-calculo, ficha-combate y ficha-acciones.
+- **🎭 Acción incierta en la Mesa** (2026-10-09): `mesa.js` pasa los documentos por `mesaFiltrar(docs)` si la página lo define (el mapa,
+  `vtt-hexgrid/js/29-accion-incierta.js`) y dibuja las líneas `desde: 'incierta' | 'incierta-pj' | 'incierta-creep'` en violeta;
+  `mesaRefiltrar()` vuelve a pasar lo último; `mesaLinea(texto, desde, quien)` acepta de quién es. `TokensAuto.colocarTrampas` anuncia cada
+  trampa colocada (`incierta-pj` / `incierta-creep`, con `ficha`); `FichaAcciones` ya no anuncia el detalle de una trampa (✨ o consumible).
+  `TiradasPropias` deja afuera esas líneas.
 - **`ppt.js`** (`PPT`, 2026-10-08, pedido del dueño) — **✊ piedra, papel o tijera**: entre dos de la partida (un jugador contra otro o contra el
   GM), «para muchas situaciones» y para disputar un ítem del botín. `retar()` (contra quién y para qué), `elegir(id, jugada)` (transacción: la
   segunda jugada resuelve; empate = otra ronda; si es por el botín, el ítem queda a nombre del ganador en la misma transacción), `rendirse(id)`,

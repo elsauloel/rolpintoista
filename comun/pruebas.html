@@ -1142,12 +1142,12 @@ prueba('Invocar portal y una zona de habilidad se le avisan al mapa; sin mapa no
   FichaAcciones.avisarZonaAlMapa(S, portal, uiMapa(sin, false));
   igual([con, sin], [['alMapa portal-habilidad', 'alMapa zona-habilidad'], []]);
 });
-prueba('una ✨ con trampa se anuncia y le pide la casilla al mapa', async () => {
+prueba('una ✨ con trampa le pide la casilla al mapa (el anuncio lo hace TokensAuto al colocarla: 🎭 acción incierta para el rival)', async () => {
   const h = {id: 't', nombre: 'Lazo', modo: 'auto', detalle: 'atrapa', trampaColocar: {nombre: 'Lazo', dano: '2d6', tipo: 'flor', tamano: 0, cant: 1}};
   const reg = [], viejo = TokensAuto.colocarTrampas;
   TokensAuto.colocarTrampas = async () => ({colocadas: 1});
   try{ await FichaAcciones.colocarTrampaDeHab(fichaBotonera({}), h, uiMapa(reg, true)); }finally{ TokensAuto.colocarTrampas = viejo; }
-  igual(reg, ['mesa Lazo', 'alMapa trampa-habilidad']);
+  igual(reg, ['alMapa trampa-habilidad']);
 });
 prueba('una zona persistente no tira al lanzarla: manda al mapa el stat y su valor (la zona tira en cada exposición, P143)', () => {
   const h = {id: 'z', nombre: 'Niebla', modo: 'auto', duelo: {objetivo: 'zona', tira: 'esp', radio: 2, zonaTurnos: 3, efectos: [{nombre: 'Lisiado'}]}};

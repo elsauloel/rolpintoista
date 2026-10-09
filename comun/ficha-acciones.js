@@ -333,7 +333,8 @@ const FichaAcciones = (() => {
       const publicas = [...(it.curahp ? [`${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`] : []), ...(efecto ? [efecto.nombre] : []), ...(revive ? [`✚ revive a ${revive.nombre}`] : []), ...(curados && curados.sacados.length ? [`🩹 se le fue ${curados.sacados.join(', ')}`] : [])];
       const resultado = [publicas.join(' · '), sac.saque ? sac.saque.txt : ''].filter(Boolean).join(' · ');
       const anuncio = {titulo: `${quien} usó ${it.nombre}`, resultado, texto: `🧪 ${quien} usó ${it.nombre}${resultado ? ': ' + resultado : ''}`, item: it.nombre, saqueSalio: !!(sac.saque && sac.saque.sale)};
-      if(ui.anunciar) ui.anunciar(anuncio);
+      if(it.trampaDatos){}   // una trampa: ya la anunció TokensAuto (🎭 acción incierta para el rival, 2026-10-09)
+      else if(ui.anunciar) ui.anunciar(anuncio);
       else{ if(typeof mesaLinea === 'function') mesaLinea(anuncio.texto); if(anuncio.saqueSalio) ui.toast(`⚡ Saque rápido: sacar ${it.nombre} del cinturón no te costó No2`); }
     }
   }
@@ -1000,7 +1001,8 @@ const FichaAcciones = (() => {
     // ✨ Automática (2026-09-30): se anuncia (sin la ubicación) y se elige la casilla en el mapa. Sin el mapa abierto (ficha suelta),
     // queda al lado del token como siempre.
     if(FichaBotonera.modoHab(h) === 'auto' && ui.enMapa()){
-      ui.mesaHabilidad(h.nombre, `${h.detalle || ''}${h.detalle ? ' — ' : ''}${t.pilar ? '🧱 levanta pilares de piedra' : `🪤 colocó una trampa${t.nombre ? ` («${String(t.nombre).trim()}»)` : ''}`}.`);
+      // La trampa la anuncia TokensAuto al colocarla (🎭 acción incierta para el rival, 2026-10-09); los pilares se ven, se anuncian acá.
+      if(t.pilar) ui.mesaHabilidad(h.nombre, `${h.detalle || ''}${h.detalle ? ' — ' : ''}🧱 levanta pilares de piedra.`);
       try{ ui.alMapa('trampa-habilidad', {fichaId: ui.yo().ref, tipoToken: 'pj', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h, valorDe)}); }
       catch(err){ console.error('No se pudo avisar la trampa al mapa:', err); }
       return;

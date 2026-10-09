@@ -38,10 +38,11 @@ function mesaEstado(texto){
 // para que sea una sola línea en la Mesa y no dos.
 let mesaTextoPendiente = '';
 // Una línea de texto en la Mesa, sin dados (2026-10-05): los anuncios del sistema (usar un consumible, el Saque rápido, la Retirada…).
-async function mesaLinea(texto, desde){
+// quien (opcional, 2026-10-09): de quién es (un creep: el mapa de cada jugador decide si la ve, ver mesaFiltrar).
+async function mesaLinea(texto, desde, quien){
   if(typeof fbDb === 'undefined' || !fbDb || !fbUsuario || !fbMiembro) return;
   try{
-    await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '', origen: String(texto || '').slice(0, 400),
+    await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: String(quien || '').slice(0, 60), origen: String(texto || '').slice(0, 400),
       formula: '', rolls: [], mod: 0, total: 0, desde: desde || 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
   }catch(err){ console.error('No se pudo anotar en la Mesa:', err); }
 }
@@ -196,7 +197,7 @@ function mesaPonerTurno(n){
 
 // Líneas del sistema: no son una tirada real (ni la propia ni la de nadie), así que no cuentan
 // como "la última tirada" para el resaltado verde ni para mesaMiUltima (Polilla mística).
-const MESA_DESDE_SISTEMA = ["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm", "alerta", "alerta-roja", "recompensa", "reporte"];
+const MESA_DESDE_SISTEMA = ["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm", "alerta", "alerta-roja", "recompensa", "reporte", "incierta", "incierta-pj", "incierta-creep"];
 
 function mesaRender(docs){
   mesaAlertaEstilos();
@@ -243,6 +244,16 @@ function mesaRender(docs){
       div.className = 'mesa-tirada mesa-sistema mesa-alerta' + (nueva ? ' nueva' : '');
       div.innerHTML = `<span class="mesa-quien">👁 ${esc(t.origen)}</span>${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
       if(nueva){ setTimeout(() => div.classList.remove('nueva'), 1500); mesaAlertaOjo(); }
+      cuerpo.appendChild(div);
+      return;
+    }
+    // 🎭 Acción incierta (2026-10-09, vtt-hexgrid/js/29): lo que hace alguien que no se ve (o el detalle para su bando, ej. una trampa).
+    if(String(t.desde || '').startsWith('incierta')){
+      const div = document.createElement('div');
+      div.className = 'mesa-tirada mesa-sistema mesa-incierta' + (nueva ? ' nueva' : '');
+      div.style.cssText = 'border-left:3px solid #8A5CC2;background:rgba(138,92,194,.10)';
+      div.innerHTML = `<span class="mesa-quien">${esc(t.origen)}</span>${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
+      if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
       cuerpo.appendChild(div);
       return;
     }
@@ -314,7 +325,11 @@ function mesaRender(docs){
 
 /* Primero los dados, después el resultado (dueño, 2026-09-26, para todo el juego): cuando llega una tirada que se va a animar en 3D, la Mesa lanza los dados
    enseguida pero NO muestra la línea hasta que quedan quietos (máximo 7 segundos; sin espera si las animaciones están apagadas o la pestaña está oculta). */
+let mesaUltimoSnap = null;
 function mesaProcesar(snap){
+  mesaUltimoSnap = snap;
+  // 🎭 El mapa filtra lo que cada uno no tiene que ver (vtt-hexgrid/js/29: creeps sin revelar, acciones inciertas).
+  if(typeof mesaFiltrar === 'function') snap = {docs: mesaFiltrar(snap.docs)};
   const docs = snap.docs;
   const primeraVez = mesaIdsVistos === null;
   const puedeEsperar = !primeraVez && typeof dadosAnimarTirada === 'function' && typeof dadosAnimara === 'function';
@@ -341,6 +356,9 @@ function mesaProcesar(snap){
   tMax = setTimeout(fin, 7000);
   lanzar();   // se lanzan DESPUÉS de escuchar los eventos, así no se pierde el «empezaron»
 }
+
+// Volver a pasar lo último por el filtro (el mapa, cuando llegan los tokens).
+function mesaRefiltrar(){ if(mesaUltimoSnap && !mesaRetenida) mesaProcesar(mesaUltimoSnap); }
 
 function mesaEscuchar(){
   $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">Cargando tiradas…</div>';

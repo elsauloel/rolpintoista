@@ -110,10 +110,11 @@ setInterval(recuperarseRevisar, 1500);
 /* ---------- Usar un consumible: el anuncio (dueño, 2026-10-05: «se anuncia en el log y en la crónica») ----------
    Una línea en la Mesa y una tarjeta en la Crónica para los demás (quien lo usó ya lo vio en su pantalla). Con Saque rápido que salió, a quien
    lo usó le aparece el aviso al centro. `oculto`: un token escondido (oculto o en sigilo) no se anuncia (solo el aviso a quien lo usó). */
-function anunciarConsumo(a, oculto){
+// quien (un creep, 2026-10-09): la Mesa lleva su nombre, así el mapa de cada jugador decide si lo ve (js/29); escondido, sin la Crónica.
+function anunciarConsumo(a, oculto, quien){
   if(!oculto){
-    mesaLinea(a.texto);
+    mesaLinea(a.texto, '', quien);
     momentoAbrir({tipo: 'consumo', icono: '🧪', titulo: a.titulo, resultado: a.resultado || '', estado: 'listo', datos: {centro: true}});
-  }
+  }else if(quien) mesaLinea(a.texto, '', quien);
   if(a.saqueSalio) AvisoCombate.mostrar({icono: '⚡', titulo: 'Saque rápido', texto: `Sacar ${a.item} del cinturón no te costó No2.`});
 }

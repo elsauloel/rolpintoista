@@ -165,7 +165,9 @@ async function acConsumir(sc, itemId){
   }
   (res.tiradas || []).forEach(t => acPublicar(sc, t));
   const tok = [...tokens.values()].find(x => x.tipo === 'creep' && x.fichaId === ac.creepId);
-  if(res.anuncio) anunciarConsumo(res.anuncio, !tok || tok.oculto || enSigilo(tok));   // js/21: Mesa y Crónica (un creep escondido, no)
+  // js/21: Mesa y Crónica. Un creep que los jugadores no ven: solo la Mesa, con su nombre (js/29 decide: «acción incierta» o nada). Una trampa
+  // ya la anunció TokensAuto.
+  if(res.anuncio && !it.trampaDatos) anunciarConsumo(res.anuncio, !tok || !visibleParaJugadores(tok), sc.nombre);
   if(res.forzado) mesaLinea(`⚠ ${sc.nombre} usó ${it.nombre} sin los No2 (cuesta ${res.forzado.costo}, tenía ${res.forzado.tenia})`, 'alerta-roja');
   toast(res.aviso);
 }

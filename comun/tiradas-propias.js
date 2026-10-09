@@ -17,7 +17,7 @@ const TiradasPropias = (() => {
   // `nombre`: el del personaje, para rearmar el origen de lo que tiró una de sus invocaciones ("Lobo · PdG").
   function escuchar(db, ruta, fichaId, nombre, alCambiar){
     return db.collection(ruta).where('ficha', '==', fichaId).onSnapshot(snap => {
-      const lista = snap.docs.map(d => {
+      const lista = snap.docs.filter(d => !String((d.data() || {}).desde || '').startsWith('incierta')).map(d => {   // (la línea de una trampa no es una tirada)
         const x = d.data() || {};
         const quien = String(x.quien || ''), origen = String(x.origen || '');
         return {clave: d.id, docId: d.id, origen: quien && nombre && quien !== nombre ? `${quien} · ${origen}` : origen,

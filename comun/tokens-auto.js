@@ -214,7 +214,22 @@ const TokensAuto = (() => {
     }); return lote; };
     try{ await armar(600).commit(); }
     catch(err){ if(String(o.detalle || '').length <= 200) throw err; await armar(200).commit(); }
+    anunciarIncierta(o, mio, elegidas.length);
     return {colocadas: elegidas.length, mapaId};
+  }
+  // 🎭 Acción incierta (2026-10-09, idea de Pablo: «colocar trampas se anuncia en el log para el equipo rival»): una línea en la Mesa con el
+  // detalle; su bando la ve entera y el rival solo «X está realizando una acción incierta», si lo ve (decide el mapa de cada uno, js/29).
+  function anunciarIncierta(o, mio, n){
+    const tok = mio ? mio.data() : null;
+    const quien = String((tok && tok.nombre) || '').slice(0, 60);
+    if(!quien || !fbUsuario) return;
+    const nombre = String(o.nombre || 'Trampa').slice(0, 40);
+    fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: (typeof fbMiembro !== 'undefined' && fbMiembro && fbMiembro.nombre) || '', quien,
+      origen: `🪤 ${quien} colocó ${n > 1 ? n + ' trampas' : 'una trampa'} («${nombre}»)`, formula: '', rolls: [], mod: 0, total: 0,
+      desde: (o.tipoToken || 'creep') === 'pj' ? 'incierta-pj' : 'incierta-creep', ficha: String(o.fichaId || '').slice(0, 80),
+      cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    }).catch(err => console.error('No se pudo anunciar la trampa en la Mesa:', err));
   }
 
   /* ---------- Trampas consumibles sin disparar (2026-09-26, pedido del dueño) ----------

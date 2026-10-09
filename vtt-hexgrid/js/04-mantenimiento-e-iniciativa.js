@@ -378,7 +378,8 @@ async function iniciativaSiguiente(){
   // después se le suman lo que pasó al terminar el anterior y al empezar el suyo.
   const sig = iniciativa.orden[i] || {id: ''};
   const tSig = tokens.get(sig.id);
-  const publico = (o, t) => !!t && !t.oculto && !(o && o.oculto) && !enSigilo(t);
+  // A quién se nombra (2026-10-09): un creep, si los jugadores ya lo conocen (js/29); un personaje, si no está en sigilo.
+  const publico = (o, t) => !!t && !t.oculto && !(o && o.oculto) && (t.tipo === 'creep' ? creepConocido(t) : !enSigilo(t));
   const nomSig = publico(sig, tSig) ? nombreDe(tSig) : '';
   const tarjeta = momentoAbrir({tipo: 'turno', icono: '▶', titulo: `${nuevaRonda ? `Ronda ${ronda} · ` : ''}${nomSig ? `Empieza el turno de ${nomSig}` : 'Pasa el turno'}`,
     estado: 'listo', datos: {lineas: [nomSig ? `Le toca a ${nomSig}.` : 'Sigue el orden de turnos.']}});
@@ -543,6 +544,8 @@ function renderIniciativa(){
     const t = tokens.get(o.id);
     // Quien está en sigilo tampoco aparece para el bando rival (jugadores: los creeps; GM: los
     // personajes, salvo con su 👁): desaparece solo mientras dure el sigilo.
+    // 🎭 (2026-10-09, js/29) Para los jugadores, un creep que todavía no vieron no existe; el que ya vieron no desaparece aunque se esconda.
+    if(t && !soyGM && t.tipo === 'creep') return !(o.oculto || t.oculto) && creepConocido(t);
     if(t && ocultoPorSigiloParaMi(t)) return false;
     return soyGM || !(o.oculto || (t && t.oculto));   // oculto por el GM en la lista, o token oculto
   });
@@ -565,7 +568,7 @@ function renderIniciativa(){
       const fuera = iniciativaFueraDeJuego(o.id);
       return `<div class="ini-fila${i === iniciativa.turno ? ' activo' : ''}${fuera ? ' fuera' : ''}${ya ? ' ya' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}${fuera ? ' — caído/derrotado: fuera del orden de turnos hasta que se recupere' : ''}">
         <span class="ini-ficha" style="border-color:${esc(color)}">${mini ? `<img src="${esc(mini)}" alt="">` : esc(inicial(nombre))}</span>
-        <span class="ini-nombre">${fuera ? '💀 ' : ''}${oculto ? '🙈 ' : ''}${t && enSigilo(t) ? '🥷 ' : ''}${esc(nombre)}</span>` +
+        <span class="ini-nombre">${fuera ? '💀 ' : ''}${oculto ? '🙈 ' : ''}${t && enSigilo(t) && (soyGM || t.tipo !== 'creep') ? '🥷 ' : ''}${esc(nombre)}</span>` +
         (puede
           ? `<input class="ini-valor" type="number" step="1" value="${fmt(num(o.valor))}" data-ini-valor="${esc(o.id)}" title="Iniciativa">`
           : `<span class="ini-valor">${fmt(num(o.valor))}</span>`) +

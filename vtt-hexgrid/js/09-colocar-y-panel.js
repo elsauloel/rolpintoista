@@ -151,6 +151,7 @@ function escucharTokens(){
         imagen: typeof d.imagen === 'string' ? d.imagen : '',
         rotacion: (((Math.round(num(d.rotacion) / 60) * 60) % 360) + 360) % 360,
         oculto: d.oculto === true,
+        revelado: d.revelado === true,   // 🎭 los jugadores ya vieron a este creep (js/29)
       });
     });
     renderIniciativa();

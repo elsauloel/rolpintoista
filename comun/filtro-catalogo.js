@@ -27,9 +27,9 @@ const FiltroCatalogo = (() => {
   const TIER_COLOR = {'Común': '#9A867E', 'Buena Calidad': '#A8C256', 'Raro': '#5B8DBE', 'Excepcional': '#E0A458', 'Legendario': '#9B7BD4', 'A definir': '#D4574E'};
   // Qué es / dónde va: en el orden en que se muestran, con su ícono.
   const PARTES = [['arma', '⚔'], ['distancia', '🏹'], ['especial', '✨'], ['escudo', '🛡'], ['orbe', '🔮'], ['torso', '🦺'], ['cabeza', '🪖'], ['manos', '🧤'],
-    ['piernas', '👖'], ['pies', '🥾'], ['cinturon', '🎗'], ['mochila', '🎒'], ['anillo', '💍'], ['consumible', '🧪'], ['trampa', '🪤'], ['otro', '📦']];
+    ['piernas', '👖'], ['pies', '🥾'], ['cinturon', '🎗'], ['mochila', '🎒'], ['carcaj', '🏹'], ['anillo', '💍'], ['consumible', '🧪'], ['trampa', '🪤'], ['otro', '📦']];
   const PARTE_ETQ = {arma: 'Armas', distancia: 'A distancia', especial: 'Varitas y báculos', escudo: 'Escudos', orbe: 'Orbes', torso: 'Torso', cabeza: 'Cabeza',
-    manos: 'Manos', piernas: 'Piernas', pies: 'Pies', cinturon: 'Cinturón', mochila: 'Mochila', anillo: 'Anillos', consumible: 'Consumibles', trampa: 'Trampas', otro: 'Otros'};
+    manos: 'Manos', piernas: 'Piernas', pies: 'Pies', cinturon: 'Cinturón', mochila: 'Mochila', carcaj: 'Carcajes', anillo: 'Anillos', consumible: 'Consumibles', trampa: 'Trampas', otro: 'Otros'};
   const ELEMENTOS = [['fisico', '🗡', 'Físico'], ['arcano', '✨', 'Arcano'], ['fuego', '🔥', 'Fuego'], ['hielo', '❄', 'Hielo'], ['rayo', '⚡', 'Eléctrico'],
     ['toxico', '☠', 'Tóxico'], ['acido', '🧪', 'Ácido']];
   const TIPOS_ARMA = [4, 6, 8, 10, 12];

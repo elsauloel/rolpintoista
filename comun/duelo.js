@@ -62,6 +62,9 @@ const Duelo = (() => {
   // Un golpe BLOQUEADO (anulado) que esta pantalla vio resolverse (no los que ya estaban al entrar): cfgEscuchar.bloqueado(d), solo el GM
   // (2026-10-06, el Empujón de los escudos). La primera tanda del listener se marca sin avisar.
   const bloqueadoAvisado = new Set();
+  // 🏹 Una flecha especial que erró (2026-10-09): cfgEscuchar.flechaErrada(d), en la pantalla de quien disparó (no los que ya estaban al entrar).
+  const flechaAvisada = new Set();
+  let flechaPrimera = true;
   let bloqueadoPrimera = true;
   let grupoAvisado = new Set();   // ids de sub-duelos de área ya avisados a cfgEscuchar.grupoResuelto (no avisar dos veces)
   let dodgeActivos = new Set();   // ids de duelos con fase 'dodge' ya avisados a cfgEscuchar.dodgeEmpieza (para saber cuándo avisar dodgeTermina)
@@ -390,6 +393,17 @@ const Duelo = (() => {
     o.motivo = txtCorto(t.motivo || 'el tiro', 60);
     return o;
   };
+  // Los efectos de una flecha: como los de un arma (con daño mágico, «solo si es crítico» y un estado armado en `spec`).
+  const limpiarEfectosFlecha = lista => (Array.isArray(lista) ? lista : []).filter(e => e && e.nombre).slice(0, 6).map(e => {
+    const o = {nombre: txtCorto(e.nombre, 40), caras: Math.max(1, Math.round(_num(e.caras)) || 1), exitos: Math.max(1, Math.round(_num(e.exitos)) || 1), dado: txtCorto(e.dado, 20), detalle: txtCorto(e.detalle, 200)};
+    if(_num(e.stacks) > 0) o.stacks = Math.round(_num(e.stacks));
+    if(_num(e.turnos) > 0) o.turnos = Math.round(_num(e.turnos));
+    if(e.danoMagico) o.danoMagico = true;
+    if(e.soloCritico) o.soloCritico = true;
+    const sp = e.spec && e.spec.nombre ? limpiarSpec(e.spec) : null;
+    if(sp) o.spec = sp;
+    return o;
+  });
   const tiroTxt = t => [t.pdg ? `${t.pdg > 0 ? '+' : '−'}${_fmt(Math.abs(t.pdg))} PdG` : '', t.crit ? `Crítico frecuente +${_fmt(t.crit)}` : '', t.critpot ? `Crítico potente +${_fmt(t.critpot)}` : '',
     t.fijo ? `+${_fmt(t.fijo)} de daño` : '', t.ignora ? `ignora ${_fmt(t.ignora)} de Resistencia a crítico` : ''].filter(Boolean).join(', ');
   // tokDef = un token del mapa ({id, nombre, tipo, fichaId, duenoUid}); miTokenId = el token del atacante (o ''); contraDe = id del duelo que se contraataca.
@@ -430,6 +444,10 @@ const Duelo = (() => {
     // (PdG, Crítico frecuente / potente, daño fijo, ignora Resistencia) y el tiro alto (PdG −2). `motivo` es lo que se lee («distancia ideal»).
     const tiro = cfg.tiro && !hab ? limpiarTiroBono(cfg.tiro) : null;
     if(tiro) inicial.ataque.tiro = tiro;
+    // 🏹 La flecha especial del disparo (2026-10-09): sus efectos al golpear (siempre, sin %) se suman a los del arco al tirar el daño, y su
+    // Perfora (ignora N de Defensa) lo aplica el mapa con el daño. Sus bonos de PdG / crítico ya vienen en `tiro`.
+    if(cfg.flecha && !hab && cfg.flecha.nombre) inicial.ataque.flecha = {nombre: txtCorto(cfg.flecha.nombre, 60), efectos: limpiarEfectosFlecha(cfg.flecha.efectos),
+      ...(_num(cfg.flecha.perfora) > 0 ? {perfora: Math.min(5, Math.round(_num(cfg.flecha.perfora)))} : {})};
     if(cfg.espalda && !hab){
       inicial.ataque.porLaEspalda = true;
       const be = limpiarEspalda(cfg.ataque.espalda);
@@ -469,6 +487,7 @@ const Duelo = (() => {
     if(d.ataque && _num(d.ataque.quieto) > 0) t.push(`💍 ${d.hab ? 'foco' : 'pulso quieto'}: +${_fmt(d.ataque.quieto)} ${d.hab ? 'PdG.Esp' : 'PdG'}`);
     if(d.ataque && _num(d.ataque.primeraSangre) > 0) t.push(`💍 primera sangre: +${_fmt(d.ataque.primeraSangre)} de daño si pega`);
     if(d.ataque && d.ataque.tiro) t.push(`🏹 ${d.ataque.tiro.motivo}: ${tiroTxt(d.ataque.tiro)}`);
+    if(d.ataque && d.ataque.flecha) t.push(`🏹 ${d.ataque.flecha.nombre}${(d.ataque.flecha.efectos || []).length ? ': ' + d.ataque.flecha.efectos.map(e => e.danoMagico ? `+${e.dado} de ${String(e.nombre).toLowerCase()}` : e.nombre).join(', ') : ''}${d.ataque.flecha.perfora ? ` · perfora ${d.ataque.flecha.perfora}` : ''}`);
     return t.join(' · ');
   };
   const escRe = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -975,6 +994,7 @@ const Duelo = (() => {
       if(tf > 0) m.dano = {...m.dano, crudo: m.dano.crudo + tf, mod: m.dano.mod + tf, formula: `${m.dano.formula} +${tf} ${m.ataque.tiro.motivo}`.slice(0, 60)};
       const critGolpe = !!(m.crit && m.crit.critico);
       let crudos = m.hab ? m.hab.efectos : efectos;
+      if(!m.hab && m.ataque && m.ataque.flecha && Array.isArray(m.ataque.flecha.efectos)) crudos = [...(Array.isArray(crudos) ? crudos : []), ...m.ataque.flecha.efectos];   // 🏹 la flecha especial
       if(!m.hab){
         // ⚡ Critical Matters de un arma (2026-10-03): el efecto con `soloCritico` entra solo si el golpe fue crítico.
         crudos = (Array.isArray(crudos) ? crudos : []).filter(e => !(e && e.soloCritico) || critGolpe);
@@ -2348,6 +2368,14 @@ const Duelo = (() => {
         });
       }
       bloqueadoPrimera = false;
+      if(cfgEscuchar.flechaErrada){
+        listaDuelos.forEach(d => {
+          if(d.estado !== 'resuelto' || !d.ataque || !d.ataque.flecha || !['fallo', 'bloqueado'].includes(d.resultado) || flechaAvisada.has(d.id)) return;
+          flechaAvisada.add(d.id);
+          if(!flechaPrimera && esMio(d.atacante)) try{ cfgEscuchar.flechaErrada(d); }catch(err){ console.error('Duelo: flechaErrada', err); }
+        });
+      }
+      flechaPrimera = false;
       // Fase 'dodge' de un hechizo de área (pedido del dueño, 2026-09-27): avisa cuando un duelo ENTRA y cuando SALE
       // de la fase (se resolvió, moviéndose o declinando) — el mapa usa esto para minimizar/reabrir el cuadro solo y
       // mostrar un cartel de "no me quiero mover" mientras le toca decidir a quien defiende (o al GM).

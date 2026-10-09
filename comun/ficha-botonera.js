@@ -413,8 +413,8 @@ const FichaBotonera = (() => {
     </div>
   </div>`;
 
-    const consumiblesCinturon = S.cinturon.filter(i => i.consumible);
-    const consumiblesMochila = S.inventario.filter(i => i.consumible);
+    const consumiblesCinturon = S.cinturon.filter(i => i.consumible && !i.flecha);
+    const consumiblesMochila = S.inventario.filter(i => i.consumible && !i.flecha);   // las flechas especiales se disparan desde el carcaj (2026-10-09)
     const filaConsumible = (i, key) => `<div class="cat-row bot-fila">
     <div class="bot-fila-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
     <div class="bot-fila-btns">

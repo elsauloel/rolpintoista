@@ -110,7 +110,7 @@ function armaDibujar(el, z){
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.font = `700 ${R * 1.05}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", system-ui, sans-serif`;
   ctx.fillStyle = '#EDE3D2';   // (si el 🗡️ sale en blanco y negro, que se vea claro sobre el fondo oscuro)
-  ctx.fillText('🗡️', p.x, p.y + R * 0.06);
+  ctx.fillText(/"flecha"\s*:/.test(String(el.armaItem || '')) ? '🏹' : '🗡️', p.x, p.y + R * 0.06);   // una flecha especial que erró (js/33)
   ctx.restore();
 }
 

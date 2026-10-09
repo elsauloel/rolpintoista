@@ -1481,3 +1481,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   alto (PdG −2)» si el arma lo tiene, el objetivo está a 4+ y solo tapan tokens; «Disparar igual (lo decide la mesa)», con línea roja en la Mesa; o
   «Elegir otro». Los objetivos en la **distancia ideal** del arma brillan con un anillo celeste (`objetivosIdeal`, `tiroResaltarIdeal`) y el bono
   viaja al duelo en `cfg.tiro`. Los resaltes se rehacen cada vez que se vuelve a elegir (`resaltar()` en `dueloElegirObjetivoMapa`).
+
+- **🏹 Flechas especiales** (2026-10-09, dueño): atacar con un arco con flechas en el carcaj abre «¿Qué flecha?» (`bnElegirFlecha`, js/11); la
+  elegida va en `ataque.flecha` y se gasta (con su No2) justo antes de crear el duelo (`msg.alDisparar` → `bnDispararFlecha`). **Si erra**
+  (`js/33-flechas.js`, hook `flechaErrada` del duelo, en la pantalla de quien disparó): **queda en el piso siempre**, en la casilla más lejana de su
+  alcance siguiendo la línea del disparo; si choca contra un Sólido o la Colisión en el camino, moneda: 1 se rompe, 2 cae justo antes. Queda como un
+  elemento `arma` (se levanta como un arma, js/27; se dibuja con 🏹). La Perfora de la flecha la resta `dueloAplicarDano` (js/13).

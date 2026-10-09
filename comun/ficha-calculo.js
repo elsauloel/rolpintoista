@@ -167,9 +167,9 @@ const FichaCalculo = (() => {
     escudo_1m:'escudo', escudo_2m:'escudo',
     armadura_blanda:'armadura', armadura_rigida:'armadura',
     cabeza:'cabeza', manos:'manos', piernas:'piernas', pies:'pies',
-    cinturon:'cinturon', mochila:'mochila',
+    cinturon:'cinturon', mochila:'mochila', carcaj:'carcaj',
   };
-  const SLOT_LABEL = {mano:'Mano (una mano)', escudo:'Escudo', armadura:'Armadura', cabeza:'Cabeza', manos:'Manos', piernas:'Piernas', pies:'Pies', cinturon:'Cinturón', mochila:'Mochila', otro:'Otro'};
+  const SLOT_LABEL = {mano:'Mano (una mano)', escudo:'Escudo', armadura:'Armadura', cabeza:'Cabeza', manos:'Manos', piernas:'Piernas', pies:'Pies', cinturon:'Cinturón', mochila:'Mochila', carcaj:'Carcaj', otro:'Otro'};
   function slotDe(tipoItem){ return SLOT_MAP[tipoItem] || 'otro'; }
 
   /* ---------- Durabilidad (docs/durabilidad.md; cuánta tiene cada ítem: comun/combatiente.js) ---------- */

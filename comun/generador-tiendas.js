@@ -38,11 +38,11 @@ const GeneradorTiendas = (() => {
   const LUZ_COMUN = /antorcha|bengala|cohete|farol|l[aá]mpara de minero|vela de|p[oó]lvora|soga|cuerda|garfio|humo|ganz[uú]a|yesca/i;
   const gastable = it => !!it && it.tipoItem === 'consumibles' && !it.legacy && !it.trofeo && publicable(it) && TIERS.indexOf(it.tier) <= 2;
   // En qué góndola va un gastable: trampas y luces de todos los días, la Talabartería; pociones, pergaminos y lo mágico, el Bazar.
-  const gondolaDe = it => it.trampaDatos || LUZ_COMUN.test(String(it.nombre || '')) ? 'talabarteria' : 'bazar';
+  const gondolaDe = it => it.trampaDatos || it.flecha || LUZ_COMUN.test(String(it.nombre || '')) ? 'talabarteria' : 'bazar';   // 🏹 las flechas especiales, en la Talabartería (2026-10-09)
 
   // Las partes (en qué parte de la receta cae cada ítem).
   const PARTE_LABEL = {arma: 'Armas', distancia: 'Armas a distancia', especial: 'Varitas y báculos', torso: 'Torso', escudo: 'Escudos', orbe: 'Orbes',
-    cabeza: 'Cabeza', manos: 'Manos', piernas: 'Piernas', pies: 'Pies', cinturon: 'Cinturón', mochila: 'Mochila', anillo: 'Anillos',
+    cabeza: 'Cabeza', manos: 'Manos', piernas: 'Piernas', pies: 'Pies', cinturon: 'Cinturón', mochila: 'Mochila', carcaj: 'Carcajes', anillo: 'Anillos',
     trampa: 'Trampas', consumible: 'Consumibles'};
   const DEFENSIVAS = ['torso', 'escudo', 'cabeza', 'manos', 'piernas', 'pies', 'cinturon', 'mochila'];
   function parteDe(it){
@@ -52,7 +52,7 @@ const GeneradorTiendas = (() => {
     if(t.startsWith('arma')) return it.especial ? 'especial' : it.armaDeRango ? 'distancia' : 'arma';
     if(t.startsWith('escudo')) return it.orbe ? 'orbe' : 'escudo';
     if(t === 'anillos') return 'anillo';
-    return ['cabeza', 'manos', 'piernas', 'pies', 'cinturon', 'mochila'].includes(t) ? t : 'otro';
+    return ['cabeza', 'manos', 'piernas', 'pies', 'cinturon', 'mochila', 'carcaj'].includes(t) ? t : 'otro';
   }
   const mod = (it, st) => (it.mods || []).filter(m => m && m.stat === st).reduce((a, m) => a + num(m.val), 0);
   const algunMod = (it, lista) => lista.some(st => mod(it, st) > 0);
@@ -76,7 +76,7 @@ const GeneradorTiendas = (() => {
     herreria: {label: 'Herrería', icono: '⚒', detalle: 'guerra pesada: armas de Tipo 6 o más, escudos, armadura rígida, cascos y guanteletes',
       receta: {arma: 40, escudo: 14, torso: 16, cabeza: 12, manos: 10, piernas: 4, pies: 4}, familias: [6, 8, 10]},
     talabarteria: {label: 'Talabartería', icono: '🧵', detalle: 'cuero, madera y cuerda: armas a distancia y livianas (Tipo 4), cuero, botas, cinturones, mochilas y trampas',
-      receta: {distancia: 24, arma: 16, torso: 13, cabeza: 6, manos: 6, piernas: 9, pies: 9, cinturon: 9, mochila: 8}, familias: [4],
+      receta: {distancia: 24, arma: 16, torso: 13, cabeza: 6, manos: 6, piernas: 9, pies: 9, cinturon: 9, mochila: 8, carcaj: 5}, familias: [4],
       minimos: {mochila: 1, cinturon: 1}, minimosDesde: 'pueblito'},   // siempre una mochila y un cinturón, desde pueblito (dueño, 2026-10-08)
     bazar: {label: 'Bazar arcano', icono: '✨', detalle: 'lo mágico: consumibles, varitas y báculos, orbes, anillos y piezas de caster',
       receta: {especial: 34, orbe: 13, anillo: 22, torso: 10, cabeza: 8, manos: 7, cinturon: 6}, minimos: {especial: 2}},
@@ -104,7 +104,7 @@ const GeneradorTiendas = (() => {
     const p = parteDe(it);
     if(p === 'consumible') return gondolaDe(it);   // los consumibles, en la pestaña de su góndola (los clásicos, el Bazar)
     if(p === 'especial' || p === 'orbe' || p === 'anillo') return 'bazar';
-    if(p === 'trampa' || p === 'distancia' || p === 'mochila' || p === 'otro') return 'talabarteria';
+    if(p === 'trampa' || p === 'distancia' || p === 'mochila' || p === 'carcaj' || p === 'otro') return 'talabarteria';
     if(p === 'arma') return num(it.tipoDado) <= 4 ? 'talabarteria' : 'herreria';
     if(p === 'escudo') return 'herreria';
     if(p === 'cinturon') return esDeAlquimia(it) || esDeCaster(it) ? 'bazar' : 'talabarteria';

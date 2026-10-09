@@ -359,6 +359,8 @@ document.addEventListener('click', async e => {
     return;
   }
   if(b.dataset.amano){ FichaEquipo.alternarAMano(S, b.dataset.amano, equipoUi); return; }   // vaina o correa (2026-10-05)
+  if(b.dataset.alcarcaj){ FichaEquipo.alCarcaj(S, b.dataset.alcarcaj, equipoUi); return; }   // 🏹 las flechas especiales (2026-10-09)
+  if(b.dataset.delcarcaj){ FichaEquipo.delCarcaj(S, b.dataset.delcarcaj, equipoUi); return; }
   if(b.dataset.toggle){
     const id = b.dataset.toggle;
     // Equipar / sacar un ítem de la mochila: comun/ficha-equipo.js (hoja de ruta A4; el mapa usa la misma regla).

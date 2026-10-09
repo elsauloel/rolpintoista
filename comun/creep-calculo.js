@@ -87,7 +87,7 @@ const CreepCalculo = (() => {
     escudo_1m:'escudo', escudo_2m:'escudo',
     armadura_blanda:'armadura', armadura_rigida:'armadura',
     cabeza:'cabeza', manos:'manos', piernas:'piernas', pies:'pies',
-    cinturon:'cinturon', mochila:'mochila',
+    cinturon:'cinturon', mochila:'mochila', carcaj:'carcaj',
   };
   function slotDe(tipoItem){ return SLOT_MAP[tipoItem] || 'otro'; }
 

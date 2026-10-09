@@ -175,6 +175,8 @@ const CombateFin = (() => {
     delete t.id; delete t.imagen; delete t._bib; delete t.equipado;
     return {...t, tipoItem: 'consumibles', consumible: true, unidades: 1, precioCompra: num(t.precioCompra), estimado: false};
   }
+  // 🏹 Todo creep que pelea con arco deja SIEMPRE una flecha especial (dueño, 2026-10-09), del tier que le toque por su nivel.
+  const peleaConArco = sc => !!(sc && sc.armaDeRango && (Combatiente.esArco(Combatiente.armaDeCombatiente(sc)) || /\barco\b/i.test(String(sc.armaNombre || ''))));
   function dropDeCreep(rep, cat, sc){
     rep.drops = rep.drops || {};
     if(rep.drops[sc.id] === undefined){
@@ -182,6 +184,7 @@ const CombateFin = (() => {
       [dropChance(sc), dropSegundo(sc)].forEach(p => {
         if(p > 0 && Math.random() < p){ const c = dropElegir(cat, dropTier(nivel)); if(c) nombres.push(c.nombre); }
       });
+      if(peleaConArco(sc)){ const f = dropElegir(cat.filter(i => i.flecha), dropTier(nivel)); if(f) nombres.push(f.nombre); }   // 🏹 siempre una flecha especial
       rep.drops[sc.id] = nombres;
     }
     const lista = [].concat(rep.drops[sc.id] || []).filter(Boolean);   // (uno viejo guardaba un solo nombre)

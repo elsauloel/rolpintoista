@@ -112,3 +112,16 @@
 
 **De la primera tanda (anteriores):** flecha que marca ✔, de hielo ✔, relámpago ✔, daño híbrido desde Rara ✔, que derriba ✔, Veneno severo ✔,
 Drena vida ✔, Resistente ✔, Matabestias / matagente ⚙, contra lo que levita ⚙, efecto solo en la distancia ideal ⚙, comba (P185).
+
+## Decidido y programado (2026-10-09)
+- **Carcaj**: pieza aparte, **viene con todo arco (10 lugares)**; se compran mejores (de cazador 15, de saque rápido 10 que no cobra el No2 de la
+  primera flecha especial del turno, de la guardia 20 con PdG a distancia +1). Pasar flechas de la mochila al carcaj: gratis fuera de combate.
+- **Las flechas compradas no trabajan con %** (dueño: «es muy decepcionante gastar plata, tiempo, espacio en el carcaj para que el dado falle»): sus
+  efectos son **siempre** que pegan; lo fuerte se paga con **No2 extra** (0 lo leve, 1 un estado o daño elemental, 2 control fuerte, 3 el Stun) y oro.
+- **Si erra, queda en el suelo siempre** (en la casilla más lejana del alcance, siguiendo la línea), salvo que choque contra algo con colisión: ahí
+  50 % de romperse.
+- **Todo creep que pelea con arco deja siempre una flecha especial** como botín.
+- **Perfora N** (ignora N de Defensa): programado para las flechas (la Perforante 1, la de acero templado 2).
+- Las 21 flechas cargadas: Balanceada, Perforante, Marcadora, Silbadora, De caza, De punta roma (Comunes); De aguja, Envenenada, De fuego, De
+  escarcha, Relámpago, De ácido, Cegadora, De arpón (Buenas); Del rastreador, De acero templado, De fuego vivo, De hielo negro, Aulladora,
+  Silenciadora, De tormenta (Raras).

@@ -700,7 +700,19 @@ function dueloElegirObjetivoMapa(msg){
       if(ataque && ataque.hab && ataque.hab.reparte){ dueloMisiles(yo, ataque, t, mio); return; }   // Varita de misiles: de a uno
       if(embestida) embestidaUsadas.add(`${mio.id}@${Math.round(num(mantenimientoNumero))}`);
       if(primeraSangre) primeraSangreUsadas.add(mio.id);
-      Duelo.crear({yo, ataque, espalda, embestida, quieto, primeraSangre, tiro}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
+      let flecha = null;   // 🏹 la flecha especial (js/11): sus bonos van al tiro; sus efectos y su Perfora, al duelo. Se gasta acá (al disparar).
+      if(ataque && ataque.flecha && !ataque.hab){
+        const fl = ataque.flecha, b = fl.flecha || {};
+        const extra = {pdg: num(b.pdg), crit: num(b.crit), critpot: num(b.critpot), ignora: num(b.ignora)};
+        if(Object.values(extra).some(v => v)){
+          tiro = tiro || {motivo: ''};
+          Object.keys(extra).forEach(k => { if(extra[k]) tiro[k] = num(tiro[k]) + extra[k]; });
+          tiro.motivo = tiro.motivo ? `${tiro.motivo} y ${fl.nombre}` : fl.nombre;
+        }
+        flecha = {nombre: fl.nombre, efectos: b.efectosGolpe || [], perfora: num(b.perfora)};
+        if(msg.alDisparar){ try{ msg.alDisparar(); }catch(err){ console.error('No se pudo gastar la flecha:', err); } }
+      }
+      Duelo.crear({yo, ataque, espalda, embestida, quieto, primeraSangre, tiro, flecha}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
     }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + (minimo ? `de ${minimo} a ` : '') + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : conArco ? ` · 🏹 el arco necesita ${Combatiente.ARCO_LIBRES} casilleros libres en el medio` : ''}${mioTiro ? ' · la línea muestra si el tiro pasa' : ''}${nIdeal ? ' · 💠 en celeste, tu distancia ideal (' + esc(Combatiente.idealTxt(ataque.ideal)) + ')' : ''}</span>`, true, cancelado);
     dueloAvisoObjetivo(yo.nombre, msg.conSuelto, alSuelto, ataque && ataque.hab ? ataque.hab.nombre : '');
@@ -1204,9 +1216,12 @@ async function dueloAplicarDano(d){
   const frenaAm = magico && !directo && !trueDmg && Combatiente.frenaArmaduraMagica(elDano);   // la Defensa especial frena todo el daño especial (también el tóxico, 2026-10-07)
   const restaIgnorando = frenaAm ? armadmg : 0;
   const resEl = elDano && !trueDmg ? (await resistenciasDe(t, elDano, invLeida)).res : 0;
-  const freno = [...(menosDist ? [d.hab && d.hab.menosPorOrden ? `${menosDist} por los que tocó antes en la línea` : `la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Defensa especial ${armadmg}`] : []), ...(resEl ? [Combatiente.resElementalTxt(elDano, resEl)] : [])].join(' − ');
-  let aplicar = golpe, ignoraDef = crit;
-  if(base.mitad){ aplicar = Math.ceil(Math.max(0, golpe - def) / 2); ignoraDef = true; }
+  let freno = [...(menosDist ? [d.hab && d.hab.menosPorOrden ? `${menosDist} por los que tocó antes en la línea` : `la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Defensa especial ${armadmg}`] : []), ...(resEl ? [Combatiente.resElementalTxt(elDano, resEl)] : [])].join(' − ');
+  // 🏹 Perfora N (la flecha, 2026-10-09): ignora N puntos de Defensa (no toda). Con crítico no hace falta: el crítico ya la ignora entera.
+  const perfora = !crit && d.ataque && d.ataque.flecha ? Math.min(num(d.ataque.flecha.perfora), def) : 0;
+  let aplicar = golpe + perfora, ignoraDef = crit;   // sumar lo que perfora (hasta la Defensa) es lo mismo que restarle eso a la Defensa
+  if(base.mitad){ aplicar = Math.ceil(Math.max(0, golpe - (def - perfora)) / 2); ignoraDef = true; }
+  if(perfora) freno = [freno, `perfora ${perfora}`].filter(Boolean).join(' − ');
   // Bloqueo perdido (mitad del daño): el arma o escudo con el que bloqueó pierde 1 punto de durabilidad (solo personajes: los creeps y las invocaciones no llevan).
   let desgaste = '';
   if(base.mitad && t.tipo === 'pj' && d.defensa && d.defensa.itemId){

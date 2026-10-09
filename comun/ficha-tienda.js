@@ -273,8 +273,18 @@ const FichaTienda = (() => {
       restante -= enEsteStack;
     }
   }
+  // 🏹 Todo arco viene con un carcaj de 10 lugares (dueño, 2026-10-09): si el personaje no tiene ninguno, se suma el Carcaj de cuero del catálogo.
+  const CARCAJ_DEL_ARCO = 'carcaj-de-cuero';
+  function carcajConElArco(S, item){
+    if(!(typeof Combatiente !== 'undefined' && Combatiente.esArco(item))) return;
+    if((S.inventario || []).some(x => x.tipoItem === 'carcaj')) return;
+    const cat = (S.catalogo || []).find(x => x.id === CARCAJ_DEL_ARCO) || (typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(x => x.id === CARCAJ_DEL_ARCO) : null);
+    if(!cat) return;
+    S.inventario.push({...structuredClone(cat), catId: cat.id, id: uid(), equipado: false, unidades: 1, ranuras: cat.ranuras ?? 1, flechas: []});
+  }
   function crearItems(S, item, cantidad){
     if(item.consumible){ agregarConsumible(S, item, cantidad); return; }
+    carcajConElArco(S, item);
     for(let i=0; i<cantidad; i++){
       const nuevo = structuredClone(item);
       nuevo.catId = item.id;   // de qué ítem del catálogo salió (↻ Actualizar desde el catálogo, 2026-10-07)

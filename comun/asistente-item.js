@@ -64,6 +64,7 @@ const AsistenteItem = (() => {
     {id: 'piernas', label: 'Piernas', grupo: 'defensa'},
     {id: 'pies', label: 'Pies', grupo: 'defensa'},
     {id: 'cinturon', label: 'Cinturón', grupo: 'accesorio'},
+    {id: 'carcaj', label: 'Carcaj (flechas especiales)', grupo: 'accesorio'},
     {id: 'mochila', label: 'Mochila', grupo: 'accesorio'},
     {id: 'anillos', label: 'Anillo', grupo: 'accesorio'},
     {id: 'otros', label: 'Otro', grupo: 'otro'},

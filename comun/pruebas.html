@@ -549,6 +549,23 @@ prueba('el tiro alto: todos los arcos lo tienen salvo «sin tiro alto»; otra ar
     Combatiente.ataqueDeArma({armaDeRango: true, arco: true}).tiroAlto, Combatiente.ataqueDeArma({armaDeRango: true, arco: true, sinTiroAlto: true}).tiroAlto],
     [true, false, false, true, false, true, false, true, undefined]);
 });
+prueba('el carcaj: viene con el arco, guarda las flechas especiales y las gasta; una flecha no se «consume» (2026-10-09)', () => {
+  const S = fichaDePrueba({inventario: []});
+  const arco = CATALOGO_BASE.find(i => i.id === 'new-arco-corto'), flecha = CATALOGO_BASE.find(i => i.id === 'flecha-de-fuego');
+  FichaTienda.crearItems(S, arco, 1);
+  const car = S.inventario.find(i => i.tipoItem === 'carcaj');
+  FichaTienda.crearItems(S, arco, 1);   // un segundo arco no trae otro carcaj
+  car.equipado = true;
+  FichaTienda.crearItems(S, flecha, 3);
+  const enMochila = S.inventario.find(i => i.flecha);
+  const ui = {toast: () => {}, cambio: () => {}, modoCombate: () => false, avisarSinNitros: () => {}};
+  FichaEquipo.alCarcaj(S, enMochila.id, ui);
+  const dentro = FichaEquipo.flechasDelCarcaj(S), unidadesAntes = dentro[0].unidades;
+  const gastada = FichaEquipo.gastarFlecha(S, dentro[0].id);
+  igual([car && car.nombre, car && car.capFlechas, S.inventario.filter(i => i.tipoItem === 'carcaj').length, dentro.length, unidadesAntes, gastada.nombre,
+    FichaEquipo.carcajUsado(car), S.inventario.some(i => i.flecha), FichaEquipo.carcajDe(S) === car, GeneradorTiendas.seccionDe(flecha), GeneradorTiendas.seccionDe(car)],
+    ['Carcaj de cuero', 10, 1, 1, 3, 'Flecha de fuego', 2, false, true, 'talabarteria', 'talabarteria']);
+});
 prueba('con un arco no se parrea; contra un disparo, Parry solo con escudo (2026-10-09)', () => {
   const S = fichaArmada();
   const arco = {id: 'arco1', nombre: 'Arco', tipoItem: 'arma_2m', peso: 1, tipoDado: 4, armaDeRango: true, arco: true, equipado: true};

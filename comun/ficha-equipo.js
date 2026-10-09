@@ -37,6 +37,7 @@ const FichaEquipo = (() => {
     {id:'piernas', label:'Piernas', cats:['piernas'], max:1},
     {id:'cinturon', label:'Cinturón', cats:['cinturon'], max:1},
     {id:'mochila', label:'Mochila', cats:['mochila'], max:1},   // un solo cinturón y una sola mochila puestos (2026-09-25)
+    {id:'carcaj', label:'Carcaj', cats:['carcaj'], max:1},   // 🏹 las flechas especiales (2026-10-09)
   ];
   const STAT_COMPARABLE_LABEL = {def:'Defensa', danoprom:'Daño prom.'};
   const L = () => FichaCalculo.STAT_LABEL, F = () => FichaCalculo.STAT_FULL;
@@ -56,6 +57,7 @@ const FichaEquipo = (() => {
     {id:'pies', label:'Pies', defensivo:true},
     {id:'cinturon', label:'Cinturón', defensivo:true},
     {id:'mochila', label:'Mochila', defensivo:true},
+    {id:'carcaj', label:'Carcaj'},
     {id:'anillos', label:'Anillos'},
     {id:'otros', label:'Otros'},
     {id:'consumibles', label:'Consumibles'},
@@ -207,11 +209,76 @@ const FichaEquipo = (() => {
     if(costo > num(S.nitros)) ui.avisarSinNitros(costo, infinitivo, () => pagar(true));
     else pagar(false);
   }
+  /* 🏹 El carcaj (2026-10-09, dueño; docs/ideas-arcos-flechas.md): una pieza propia del equipo (`tipoItem: 'carcaj'`, `capFlechas`, de fábrica 10)
+     que guarda las flechas especiales adentro (`carcaj.flechas` = pilas de ítems con `flecha`). Las flechas comunes son ilimitadas. Se disparan solo
+     desde el carcaj equipado; pasarlas de la mochila al carcaj (o al revés) es gratis fuera de combate y cuesta como equipar en combate. */
+  const esFlecha = it => !!(it && it.flecha);
+  const carcajDe = S => (S.inventario || []).find(i => i.tipoItem === 'carcaj' && i.equipado) || null;
+  const capCarcaj = c => c ? Math.max(1, Math.round(num(c.capFlechas)) || 10) : 0;
+  const carcajUsado = c => c ? (c.flechas || []).reduce((a, f) => a + Math.max(0, num(f.unidades) || 1), 0) : 0;
+  const flechasDelCarcaj = S => { const c = carcajDe(S); return c ? (c.flechas || []).filter(f => num(f.unidades) > 0) : []; };
+  const nuevoId = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  function alCarcaj(S, id, ui){
+    const it = (S.inventario || []).find(x => x.id === id), c = carcajDe(S);
+    if(!it || !esFlecha(it)) return false;
+    if(!c){ ui.toast('Equipá un carcaj para llevar flechas especiales (viene uno con cada arco)'); return true; }
+    const libre = capCarcaj(c) - carcajUsado(c), tiene = Math.max(1, num(it.unidades) || 1), mover = Math.min(libre, tiene);
+    if(mover <= 0){ ui.toast(`${c.nombre} está lleno (${fmt(carcajUsado(c))} / ${fmt(capCarcaj(c))})`); return true; }
+    conCosto(S, 1, `pasar ${it.nombre} al carcaj`, `pasó ${it.nombre} al carcaj`, () => {
+      c.flechas = c.flechas || [];
+      const pila = c.flechas.find(f => f.nombre === it.nombre);
+      if(pila) pila.unidades = num(pila.unidades) + mover;
+      else{ const f = structuredClone(it); f.id = nuevoId('fl-'); f.unidades = mover; delete f.equipado; c.flechas.push(f); }
+      it.unidades = tiene - mover;
+      if(num(it.unidades) <= 0) S.inventario = S.inventario.filter(x => x !== it);
+      ui.cambio(['inventario']);
+      ui.toast(`${fmt(mover)} ${it.nombre} al carcaj${mover < tiene ? ` (no entran más: ${fmt(tiene - mover)} quedan en la mochila)` : ''}`);
+    }, ui);
+    return true;
+  }
+  function delCarcaj(S, flechaId, ui){
+    const c = carcajDe(S), f = c && (c.flechas || []).find(x => x.id === flechaId);
+    if(!f) return false;
+    conCosto(S, 1, `sacar ${f.nombre} del carcaj`, `sacó ${f.nombre} del carcaj`, () => {
+      c.flechas = c.flechas.filter(x => x !== f);
+      const pila = (S.inventario || []).find(x => esFlecha(x) && x.nombre === f.nombre && !x.equipado);
+      if(pila) pila.unidades = num(pila.unidades) + num(f.unidades);
+      else S.inventario = [...(S.inventario || []), {...structuredClone(f), id: nuevoId('it-')}];
+      ui.cambio(['inventario']);
+      ui.toast(`${fmt(num(f.unidades))} ${f.nombre} a la mochila`);
+    }, ui);
+    return true;
+  }
+  // Gasta una flecha del carcaj (al dispararla). Devuelve la flecha (una copia, con unidades 1) o null.
+  function gastarFlecha(S, flechaId){
+    const c = carcajDe(S), f = c && (c.flechas || []).find(x => x.id === flechaId);
+    if(!f || num(f.unidades) <= 0) return null;
+    f.unidades = num(f.unidades) - 1;
+    if(f.unidades <= 0) c.flechas = c.flechas.filter(x => x !== f);
+    return {...structuredClone(f), unidades: 1};
+  }
+  // El texto de lo que hace una flecha (su detalle sin el encabezado «Flecha especial…:»).
+  const flechaTxt = f => String((f && f.detalle) || '').replace(/^Flecha especial[^:]*:\s*/, '').replace(/\.$/, '');
+  // El carcaj en «Equipo y mochila»: sus flechas (→ Mochila) y las de la mochila (→ Carcaj).
+  function carcajHtml(S){
+    const c = carcajDe(S), sueltas = (S.inventario || []).filter(i => esFlecha(i) && !i.equipado);
+    if(!c && !sueltas.length) return '';
+    const fila = (f, boton) => `<div class="equipo-fila">${thumb(f)}<div class="equipo-info"><div class="iname">${esc(f.nombre)} <span class="hint">×${fmt(num(f.unidades) || 1)}</span></div><div class="hint">${esc(flechaTxt(f))}</div></div>${boton}</div>`;
+    const dentro = c ? ((c.flechas || []).length ? c.flechas.map(f => fila(f, `<button type="button" class="mini" data-delcarcaj="${f.id}" title="Pasarlas a la mochila">→ Mochila</button>`)).join('')
+        : '<div class="hint equipo-vacio">Vacío. Las flechas comunes no se gastan; las especiales se compran en la Talabartería.</div>')
+      : '<div class="hint equipo-vacio">Equipá un carcaj para disparar flechas especiales (viene uno con cada arco).</div>';
+    const fuera = sueltas.length ? `<div class="hint" style="margin:6px 0 2px">Flechas especiales en la mochila:</div>` + sueltas.map(f => fila(f, `<button type="button" class="mini on" data-alcarcaj="${f.id}" title="Pasarlas al carcaj"${c ? '' : ' disabled'}>→ Carcaj</button>`)).join('') : '';
+    return `<div class="equipo-slot" style="margin-top:10px">
+      <div class="equipo-slot-cab"><span>🏹 ${c ? esc(c.nombre) : 'Flechas especiales'}</span>${c ? `<span class="hint">${fmt(carcajUsado(c))} / ${fmt(capCarcaj(c))}</span>` : ''}</div>
+      ${dentro}${fuera}
+    </div>`;
+  }
   function equipar(S, id, ui){
     const it = (S.inventario || []).find(x => x.id === id);
     if(!it) return false;
     if(it.enMesa || it.reservado){ ui.toast(`Está ofrecido a ${it.reservadoPara || 'otro personaje'}: cancelá la oferta primero (🤝)`); return true; }   // 🤝 comun/intercambio.js
     if(!it.equipado && it.trofeo){ ui.toast('Un trofeo no se equipa: se vende en una tienda o se convierte en despojos'); return true; }
+    if(!it.equipado && esFlecha(it)) return alCarcaj(S, id, ui);   // una flecha especial va al carcaj, no al cinturón
     if(!it.equipado && it.tipoItem === 'consumibles'){
       // Al cinturón, las unidades que entren (1 ranura = 1 unidad; lleno, no entra nada más).
       const r = alCinturon(S, it);
@@ -347,7 +414,7 @@ const FichaEquipo = (() => {
     </div>
   </div>`;
     return resumen + pesoEq + `<div class="equipo-cols">
-    <div><h4 class="equipo-tit">Equipado</h4>${izq}</div>
+    <div><h4 class="equipo-tit">Equipado</h4>${izq}${carcajHtml(S)}</div>
     <div><h4 class="equipo-tit">Mochila${typeof Intercambio !== 'undefined' ? ` <button type="button" class="mini" data-ix-abrir-dar="" title="Pasarle a otro personaje un ítem (también pociones y trofeos), DDE o despojos, o convertir un ítem en despojos (♻)">🤝 Pasar · ♻</button>` : ''}</h4>${der || '<div class="hint">No hay nada equipable en la mochila.</div>'}</div>
   </div>`;
   }
@@ -407,6 +474,6 @@ const FichaEquipo = (() => {
   `};
   }
 
-  return {SLOT_DEFS, TIER_COLOR, veCalidad, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, alCinturon, textoAlCinturon, aManoCap, aManoEntra, alternarAMano, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
+  return {SLOT_DEFS, TIER_COLOR, veCalidad, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, BASE_CINTURON, esFlecha, carcajDe, capCarcaj, carcajUsado, flechasDelCarcaj, alCarcaj, delCarcaj, gastarFlecha, flechaTxt, carcajHtml, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, alCinturon, textoAlCinturon, aManoCap, aManoEntra, alternarAMano, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
     modTags, thumb, statTxt, html, slotLlenoHtml, compararHtml};
 })();

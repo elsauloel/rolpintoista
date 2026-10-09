@@ -1754,3 +1754,14 @@ que las Espinas en la calculadora. Cada pieza espejo invierte la Defensa y la De
 
 Probado en el mapa (2026-10-07, «Claude · pruebas»): juan le tiró la Varita arcana al Escarabajo de cobre con Espejo → 2 de daño, y juan recibió 1
 devuelto (30 → 29), en el duelo y en la Mesa. Los consumibles de Espinas ahora llevan su preset (antes decían «a mano»).
+
+## 2026-10-09 · Resistencia a crítico: escalera de slots y Tipo 8/10 desde Común-Buena (dueño)
+- **Slots por Tipo (escalera):** Tipo 4 → 6 (cabeza, torso rígido o blando, manos, piernas, pies, escudo) · Tipo 6 → 4 (torso rígido, manos, piernas,
+  escudo) · Tipo 8 → 3 (torso rígido, piernas, escudo) · Tipo 10 → 2 (cabeza, escudo) · Tipo 12 → 1 (cinturón o anillo, Legendario).
+- **La escasez la dan el slot, el precio y el generador de tiendas, no la calidad** (dueño: «el salto de Buena a Raro va a ser muy alto; acumular
+  escaseces las haría demasiado escasas»). Tipo 8 y Tipo 10 existen desde Buena (+1); en Común puede haber alguna de Tipo 8 (quedan las 3 que hay) y
+  un casco de solo Tipo 10 si los números dan (muy pesado).
+- **Visión negativa: 0,25 por punto** en la calculadora (1 de peso = −2 de Visión).
+- **Corregidas 5 piezas fuera de su slot:** Yelmo de hierro (sin Tipo 6: Def +3), Jubón de cuero de búfalo (sin Tipo 8: Def +4, Tipo 4 +1), Capacete de
+  hierro (sin Tipo 8: Def +3, Tipo 4 +1), Guanteletes de placas (Tipo 6 +1 y Parry +1 en vez de Tipo 8), Escarpes de hierro (Tipo 4 +1, Res.CC +1, Def +1
+  en vez de Tipo 8). Mismo precio.

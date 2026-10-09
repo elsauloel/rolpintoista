@@ -94,7 +94,8 @@ def costo_retirada(pct):
 COSTO_CHANCE = {'inamovible': (0.5, 0.75, 1.5), 'recuperarse': (0.5, 1, 2), 'reflejos': (1, 1.5, 2.5), 'saquerapido': (0.75, 1, 2)}
 # Contrapesos baratos (dueño, 2026-10-06): «ruidosa» (Sigilo negativo) devuelve 0,5 por punto — al que lleva placas casi no le importa el sigilo — y
 # una resistencia elemental negativa («conductora»: recibe más daño de ese elemento) devuelve 0,25 por punto: tiene poco valor.
-NEGATIVO_BARATO = {'sigilo': 0.5, 'resfuego': 0.25, 'reshielo': 0.25, 'resrayo': 0.25, 'restoxico': 0.25, 'resacido': 0.25}
+# Visión negativa (dueño, 2026-10-09): 0,25 por punto — 1 de peso (0,5) equivale a −2 de Visión.
+NEGATIVO_BARATO = {'sigilo': 0.5, 'vision': 0.25, 'resfuego': 0.25, 'reshielo': 0.25, 'resrayo': 0.25, 'restoxico': 0.25, 'resacido': 0.25}
 def costo_especial(stat, v):
     if v < 0 and stat in NEGATIVO_BARATO: return v * NEGATIVO_BARATO[stat]
     return None

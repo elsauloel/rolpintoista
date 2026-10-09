@@ -141,3 +141,14 @@ No2). **No se puede pegar con el arco.** La distancia mínima de ballestas y pó
   un rasgo que puede traer un escudo puntual.
 - **Los tokens que están en el medio (aliados o rivales) también tapan el disparo**, igual que los obstáculos.
 - **Tirar por encima / tiro con comba:** no es de base; es una **variable de diseño** (un rasgo de un arco o una habilidad, como la del Shooter).
+
+## 2026-10-09 · Idea del dueño: el «sweet spot» de cada arco
+- **Por defecto, los arcos no tienen penalidad a la Evasión.** En cambio, **cada arco tiene su sweet spot**: una distancia (o dos, o más) donde tiene
+  ventaja: **+PdG** (o el rival −Evasión: para pegar y para el crítico es lo mismo, cuenta la diferencia). Ej.: «a 7 u 8 casilleros, +2 PdG».
+- Propuesta de Claude para debatir: se expresa como **+PdG** (es tu tirada; no toca la Evasión mínima de 1 ni el Stun); el sweet spot va **dentro
+  de tu Rango y nunca a menos de 3** (la distancia mínima); el mapa lo **muestra al apuntar** (un anillo de otro color, con quién cae adentro) y lo
+  **suma solo** al crear el duelo (como la Embestida). Variables de diseño por arco: dónde está (corto 3–4, largo 7–8), cuán ancho (1, 2 o 3
+  casilleros) y cuánto da (+1 a +3); la calidad sube el ancho o el bono.
+- Balance (a medir): si el arquero tira desde su sweet spot más o menos la mitad de las veces, un +2 equivale en promedio a un +1 fijo, pero lo tiene
+  que ganar ubicándose (gasta No2 en moverse) y el rival lo puede sacar de ahí acercándose o tapando la línea. Con el arco Tipo 4 (rango de
+  crítico 4), +2 de diferencia es medio nivel de crítico más en promedio.

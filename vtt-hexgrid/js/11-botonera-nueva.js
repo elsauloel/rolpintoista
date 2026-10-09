@@ -112,7 +112,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261009r', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261009r', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261009r', '../comun/ficha-mantenimiento.js?v=20261008y', '../comun/ficha-calculo.js?v=20261009r', '../comun/ficha-combate.js?v=20261009n', '../comun/skills-clase.js?v=20261008x', '../comun/ficha-habilidades.js?v=20261007ar',
-  '../comun/catalogo.js?v=20261009s', '../comun/items-subidos.js?v=20261007h', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261009r', '../comun/ficha-resumen.js?v=20261009m', '../comun/inv-calculo.js?v=20261009n', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261007ar', '../comun/inv-duelo.js?v=20261009n', '../comun/ficha-acciones.js?v=20261009r', '../comun/inv-habilidades.js?v=20261008s', '../comun/inv-lupa.js?v=20261009k',
+  '../comun/catalogo.js?v=20261009t', '../comun/items-subidos.js?v=20261007h', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261009r', '../comun/ficha-resumen.js?v=20261009m', '../comun/inv-calculo.js?v=20261009n', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261007ar', '../comun/inv-duelo.js?v=20261009n', '../comun/ficha-acciones.js?v=20261009r', '../comun/inv-habilidades.js?v=20261008s', '../comun/inv-lupa.js?v=20261009k',
   '../comun/confirmar-turno.js?v=20261006e', '../comun/ficha-duelo.js?v=20261009n', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261009k'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -612,9 +612,9 @@ function bnPreguntarTipoAtaque(arma, otro){
   bn.raiz.querySelector('#bn-tipo-ataque').classList.add('open');
 }
 /* 🏹 ¿Qué flecha? (2026-10-09, dueño; docs/ideas-arcos-flechas.md): atacar con un arco con flechas especiales en el carcaj pregunta cuál (la común
-   no se gasta). La flecha se gasta y cobra su No2 al disparar (cuando se crea el duelo); sus efectos son siempre (sin %). Con el Carcaj de saque
-   rápido, cada flecha especial que cuesta No2 tira una moneda: 2 = ese disparo no cobra su No2 (dueño, 2026-10-09: una vez por turno anulaba
-   la penalización). */
+   no se gasta). La flecha se gasta y cobra su No2 al disparar (cuando se crea el duelo); sus efectos son siempre (sin %). Un carcaj veloz
+   (`saqueRapido` = N, dueño 2026-10-09): las primeras N flechas especiales del turno que cuestan No2 tiran una moneda; 2 = ese disparo no lo cobra
+   (Buena 1, Rara 2, Excepcional 3: rara vez se dispara más de 2 o 3 veces por turno, así que la primera es la que más vale). */
 function bnElegirFlecha(arma, flechas, alElegir){
   const no2 = f => Math.max(0, num(f.flecha && f.flecha.no2));
   AvisoCombate.mostrar({icono: '🏹', titulo: `¿Qué flecha? · ${arma ? arma.nombre : 'arco'}`, texto: 'Las flechas comunes no se gastan. Una especial se gasta al dispararla, pegue o no, y su efecto entra siempre que pegue.',
@@ -627,7 +627,9 @@ function bnDispararFlecha(flechaId){
   if(!f){ toast('Esa flecha ya no está en el carcaj: va una común'); return true; }
   const antes = FichaGuardado.partes(S);
   let costo = Math.max(0, num(f.flecha && f.flecha.no2));
-  if(costo && c.saqueRapido){   // 🎲 la moneda del saque rápido, a la vista (nunca en silencio)
+  S.ataquesArma = S.ataquesArma || {};   // (se vacía al empezar el turno)
+  if(costo && num(c.saqueRapido) > num(S.ataquesArma._saqueFlecha)){   // 🎲 la moneda del carcaj veloz, a la vista (nunca en silencio)
+    S.ataquesArma._saqueFlecha = num(S.ataquesArma._saqueFlecha) + 1;
     const moneda = 1 + Math.floor(Math.random() * 2), quien = ((S.meta && S.meta.nombre) || 'Alguien').trim();
     mesaLinea(`🏹 ${quien} sacó ${f.nombre} del ${c.nombre}: moneda ${moneda} → ${moneda === 2 ? 'no cobra su No2' : `cobra +${fmt(costo)} No2`}`, 'recordatorio');
     if(moneda === 2) costo = 0;

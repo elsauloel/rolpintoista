@@ -172,3 +172,9 @@ Agi 4, Des 6, HP 45, Def 8, Res T4 2 / T6 1, espada 1d6+1. Arquero Fue 3, Agi 8,
   (4,3 / 6,3).
 - **Lectura:** con la Defensa que resta entera, el daño chico no entra, y la Resistencia a Tipo 4 (la más abundante) apaga el crítico del Tipo 4. No
   es solo de los arcos: el mismo arquero con una espada tampoco le hace daño al guerrero. A decidir antes de probar en el mapa.
+
+## 2026-10-09 · Arcos Tipo 4 y Tipo 6 (dueño, cambia «todos los arcos son Tipo 4»)
+- **El Tipo es el dado:** un arco que tira d6 es Tipo 6; no se separa el Tipo del dado («si no, un poco que se rompe»). Para acercarse a un d6 sin
+  romper la paridad, un arco Tipo 4 puede llevar daño fijo (1d4+1 ≈ 1d6). Más dados: sí; d8: no, por ahora.
+- Quedan dos familias: **Tipo 4, el arco liviano** (juega al crítico) y **Tipo 6, el arco largo** (más parejo). La escalera por calidad, medida con
+  `herramientas/balance_combate.py`, está en [`balance-combate.md`](balance-combate.md) (paso 3).

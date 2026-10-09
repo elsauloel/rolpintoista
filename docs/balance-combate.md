@@ -57,23 +57,29 @@ entre 35 % y 50 % del Warrior** se lee como su rol (aguantar, no pegar), no como
 general (ignorar resistencia, perforar Defensa, Crítico frecuente) se pasa de largo a nivel 1 y se queda corta a nivel 5: los saltos del crítico son
 grandes. **Lo que crece con la calidad tiene que ser el arco mismo.** El dueño habilitó más dados y d6 (no d8, por ahora; 2026-10-09).
 
-**La escalera del arco (decidida por Claude, con el aval del dueño para afinar):** el arco **sigue siendo Tipo 4 para el crítico** (y para la
-resistencia), pero sus dados pueden ser d4 o d6. Rinde, contra un blanco medio, lo que se indica respecto del mejor cuerpo a cuerpo de la misma
-clase (Shooter); cada calidad tiene un arco «flojo» y uno «bueno» para diseñar en el medio:
+**El Tipo es el dado (dueño, 2026-10-09):** «no quiero disociar el tipo y las caras del dado: un arco que tira dados de 6 es Tipo 6, y que se
+balancee en ese aspecto». Para acercarse a un d6 sin romper la paridad, un arco Tipo 4 puede llevar **daño fijo** (1d4+1 ≈ 1d6). Se descartó la
+primera propuesta (Tipo 4 para el crítico con dados d6). **Quedan dos familias de arco:**
+- **Tipo 4 — el arco liviano** (corto, de caza): juega al crítico; contra la resistencia a Tipo 4, la más abundante. Crece con dados y daño fijo.
+- **Tipo 6 — el arco largo** (de tejo, de guerra): pega más parejo; contra la resistencia a Tipo 6, menos frecuente.
 
-| Calidad | Arco flojo | Arco bueno |
+**La escalera del arco** (`balance_combate.py --arco-tipo T --arco-dados N --arco-fijo F`; contra un blanco medio, lo que rinde el arco del Shooter
+respecto de su mejor cuerpo a cuerpo). Cada calidad tiene un arco «flojo» y uno «bueno» para diseñar en el medio; todos suman además la mitad de la
+Fuerza (redondeada para arriba):
+
+| Calidad | Tipo 4 (liviano) | Tipo 6 (largo) |
 |---|---|---|
-| Común | 1d4 → 53 % | 2d4 → 110 % |
-| Buena | 2d6 + PdG +1 → 52 % | 2d6 + PdG +2 → 102 % |
-| Rara | 3d6 + PdG +3 → 68 % | 3d6 + Crítico frecuente +1 → 90 % |
+| Común (nivel 1) | 1d4+1 → 74 % · 1d4+2 → 91 % · 2d4 → 106 % | 1d6 → 77 % · 1d6+1 → 103 % |
+| Buena (nivel 3) | 3d4+1 → 53 % · 2d4+4 → 70 % · 3d4+2 → 91 % | 2d6+2 → 51 % · 3d6 → 93 % |
+| Rara (nivel 5) | 4d4+2 → 72 % · 2d4+2 con Crít. frecuente +1 y PdG +2 → 103 % | 3d6+2 → 69 % · 3d6+3 → 89 % · 4d6 → 105 % |
 
-Más la mitad de la Fuerza (redondeada para arriba), como estaba decidido. Excepcional y Legendario quedan fuera de lo que mide la herramienta (nivel
-5 como techo): se diseñan siguiendo la misma línea (d6, más PdG / Crítico frecuente). Contra un blanco pesado el arco sigue rindiendo poco: es
-Tipo 4, su blanco es lo liviano y lo medio (M3). Alternativa medida y no elegida: solo Crítico frecuente + PdG con 1–2 d4 (Buena Crít. frec. +1 →
-83 %; Rara Crít. frec. +1 y PdG +2 → 69 %): funciona, pero los saltos del crítico la hacen más frágil de diseñar.
+Lo que **no** alcanza: 1d4 pelado (54 % a nivel 1, 0 desde nivel 3), cualquier arco de 1–2 dados desde nivel 3, y el Tipo 4 a nivel 5 solo con
+dados y daño fijo hasta 3d4+4 (48 %). Lo que **se pasa**: 2d4+2 o 2d6 a nivel 1 (~150–200 %), 3d6+1 a nivel 3 (124 %). Excepcional y Legendario
+quedan fuera de lo que mide la herramienta (nivel 5 como techo): se siguen con la misma línea (más dados, daño fijo, PdG, Crítico frecuente; sin d8
+por ahora). Contra un blanco pesado el arco sigue rindiendo poco: su blanco es lo liviano y lo medio (M3).
 
-**Paso 4 (sigue):** programar el arco — el Tipo del crítico separado del dado (`tipoCrit` 4 con dados d6), la mitad de la Fuerza, la distancia
-mínima (2 casilleros libres), sin pegar con el arco ni ataque de oportunidad — y pasar los arcos del catálogo a la escalera; después, probar en el mapa.
+**Paso 4 (sigue):** programar el arco — la mitad de la Fuerza, la distancia mínima (2 casilleros libres), sin pegar con el arco ni ataque de
+oportunidad — y pasar los arcos del catálogo a la escalera (precio con `calculadora_armas.py`); después, probar en el mapa.
 
 ## Tabla base completa (paso 1)
 

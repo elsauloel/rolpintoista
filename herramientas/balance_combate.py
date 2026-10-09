@@ -70,7 +70,9 @@ DADOS_NIVEL = {1: 1, 3: 1.5, 5: 2}
 FAMILIAS = ['Daga T4', 'Espada T6', 'Hacha T8', 'Maza T10', 'Arco T4']
 def arma(fam, nivel, o):
     t = int(fam.split('T')[-1])
-    return dict(tipo=t, dados=DADOS_NIVEL[nivel] if fam != 'Arco T4' else o.arco_dados, rango=fam.startswith('Arco'))
+    if fam == 'Arco T4':   # el arco: Tipo 4 o 6 (el dado es el Tipo; dueño, 2026-10-09), con sus dados y su daño fijo (palancas)
+        return dict(tipo=o.arco_tipo, dados=o.arco_dados, rango=True, fijo=o.arco_fijo)
+    return dict(tipo=t, dados=DADOS_NIVEL[nivel], rango=False, fijo=0)
 
 def golpe(at, a, d, o):
     p, e = tirar(at['des']) + (o.arco_pdg if a['rango'] else 0), max(1, tirar(d['eva']))
@@ -79,8 +81,7 @@ def golpe(at, a, d, o):
     n = (math.floor(n) + (1 if random.random() < n - math.floor(n) else 0)) if n != int(n) else int(n)   # 1.5 = mitad 1 y mitad 2; 2.5 = mitad 2 y mitad 3
     fue = at['fue'] * (o.arco_fuerza if a['rango'] else 1)
     if o.sutileza and a['tipo'] == 4: fue = max(fue, at['des'] * o.sutileza)   # las armas livianas suman Destreza (palanca)
-    caras = o.arco_caras if a['rango'] else a['tipo']   # el arco es Tipo 4 para el crítico, pero sus dados pueden ser d6 (palanca)
-    dano = sum(random.randint(1, caras) for _ in range(n)) + math.ceil(fue)
+    dano = sum(random.randint(1, a['tipo']) for _ in range(n)) + math.ceil(fue) + a['fijo']
     frec = o.crit_frec + (o.crit_frec_t4 if a['tipo'] == 4 else 0) + (o.arco_frec if a['rango'] else 0)
     res = max(0, d['res'].get(a['tipo'], 0) - (o.arco_ignora_res if a['rango'] else 0))
     niveles = (p - e) // max(2, a['tipo'] - frec) - res
@@ -130,7 +131,8 @@ def main():
     ap.add_argument('--costo-div', type=float, default=2, help='palanca: el primer ataque cuesta Tipo ÷ esto (hoy 2)')
     ap.add_argument('--costo-div2', type=float, default=1, help='palanca: los siguientes cuestan Tipo ÷ esto (hoy 1)')
     ap.add_argument('--arco-ignora-res', type=int, default=0, help='palanca del arco: la flecha ignora esto de Resistencia a crítico Tipo 4')
-    ap.add_argument('--arco-caras', type=int, default=4, help='palanca del arco: caras de sus dados (4 o 6; el crítico sigue siendo Tipo 4)')
+    ap.add_argument('--arco-tipo', type=int, default=4, help='palanca del arco: su Tipo (4 o 6; tira dados de ese Tipo)')
+    ap.add_argument('--arco-fijo', type=int, default=0, help='palanca del arco: daño fijo del arco')
     ap.add_argument('--arco-pdg', type=int, default=0, help='palanca del arco: PdG +N del arco (mod que ya existe)')
     ap.add_argument('--arco-frec', type=int, default=0, help='palanca del arco: Crítico frecuente que traen los arcos')
     ap.add_argument('--arco-perfora', type=float, default=0.0, help='palanca del arco: la flecha ignora esta fracción de la Defensa')

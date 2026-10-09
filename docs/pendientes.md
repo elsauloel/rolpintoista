@@ -230,6 +230,21 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   arma, cómo se arma una pieza defensiva, cómo se gestiona la escasez (tiendas, drops, oro, reparar), las curvas por nivel — para que lo lean,
   opinen y ajusten: el dueño lo decide solo ahora para poder avanzar, pero la decisión final es de la mesa. Fuentes: `rework-armas.md`,
   `rework-defensa.md`, `rework-trampas.md`, `guia-de-diseno.md` (y su espejo `comun/guia-diseno.js`). Cada decisión, con su porqué.
+- [ ] **Abrir el desarrollo a los colegas, cada uno con su Claude** (dueño, 2026-10-09, para más adelante: «si Arturo me dice "che, quiero
+  meterle mano y hacer análisis", volvemos a esto»; el pedido va a ser «configurame el proyecto para que esto pueda suceder»). Lo charlado:
+  - **Ya está:** el repositorio (`elsauloel/rolpintoista`) es público —cualquiera lee el código, las hojas de ruta y los razonamientos de `docs/`—
+    y los datos de juego (Firebase) ya se usan con la cuenta de cada uno desde el sitio.
+  - **Lo que necesita cada colega:** cuenta de GitHub sumada como colaborador (Settings → Collaborators) para poder subir; su propia cuenta de
+    Claude con Claude Code (desde el navegador en claude.ai/code conectando GitHub, sin instalar nada, o la app de escritorio con el repo bajado).
+    Su Claude lee solo los `CLAUDE.md` y los documentos: arranca con el mismo contexto. Firebase: nada más para jugar y probar; solo quien vaya a
+    pegar las reglas de permisos necesita ser miembro del proyecto en la consola.
+  - **Lo que hay que hacer ese día:** (1) pasar al repositorio (un `CLAUDE.md` o `docs/`) las reglas de trabajo que hoy viven solo en la memoria
+    local del Claude del dueño (≈50 notas: subir apenas queda probado, partidas de prueba, protocolo de pruebas en el mapa, nombres de armas,
+    áreas por diámetro, etc.); las personales (cómo explicarle al dueño) quedan privadas. (2) Una guía corta «cómo sumarte al proyecto con tu
+    Claude». (3) Una forma de trabajar sin pisarse: cada push a `nueva-version` se publica solo en 1–2 minutos → cada uno en su rama y a
+    `nueva-version` solo lo probado y acordado. (4) Quién decide: hoy los documentos dicen «decidido por el dueño»; anotar quién decidió qué y
+    pasar las reglas nuevas por Herramientas de diseño o `preguntas-abiertas.md` antes de cambiarlas (la creación es del grupo, ver la esencia
+    en `CLAUDE.md`).
 - [ ] **Manual** (`manual-usuario/notas`): grupos y tokens automáticos, botín, Despojar, Finalizar combate en el mapa, trampas automáticas, estados sobre otros, protección de jefe, botón 🎭 y grupos ↔ mapas, y una nota de casteo cuando estén las reglas.
 
 ## 4. Diseño pendiente

@@ -288,12 +288,16 @@ línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar
   DEF/mods/detalle) y los estados alterados (de solo lectura, sin los
   botones de editar de ◎), más la Nota narrativa si tiene una. Todo de
   solo lectura, pensado para que un jugador la abra desde el mapa sin
-  preguntarle al GM. No hace falta ningún cambio de reglas: el documento
-  del creep ya se lee entero con `esMiembro` (`equipoNombres`/`notas` se
-  arman client-side en `escucharVinculables`, filtrando `equipo` a solo
-  `nombre`); la imagen en detalle sigue siendo la `miniatura` pública de
-  96 px — la imagen original de mayor resolución sigue siendo del GM
-  (`creeps/<id>/privado/imagen`), a propósito.
+  preguntarle al GM. **Corregido 2026-10-09** (siempre decía «Sin equipo.»
+  y nunca mostraba la nota: la ficha del creep es privada del GM y el
+  documento público no traía esos datos): ahora GM Tools (`creepPublico`)
+  y el mapa (`modificarCreep`) publican `armaNombre`, `armaNatural`,
+  `equipoNombres` y `notas` con `CreepCalculo.tarjetaPublica` (solo
+  nombres); `escucharVinculables` los lee y la tarjeta muestra **el arma
+  primero** (🗡, también la natural, marcada «natural») y después el
+  equipo. Los creeps guardados antes se republican solos la próxima vez
+  que el GM abre GM Tools. La imagen es `tarjeta` (400 px) o la
+  `miniatura`; la original sigue siendo del GM (`privado/imagen`).
 - **"+ Token" abre una ventana propia** (`#nuevo-token-capa`/
   `#nuevo-token-ventana`, centrada con el fondo oscurecido; antes se armaba
   en la barra lateral, decidido 2026-09-19), ordenada por campos (tipo,

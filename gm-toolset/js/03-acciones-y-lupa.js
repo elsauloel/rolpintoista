@@ -186,7 +186,7 @@ function cardHtml(sc){
 
       <div>
         <div class="sect-label">Notas</div>
-        <textarea class="notas" data-f="notas" data-id="${sc.id}" style="margin-top:4px" placeholder="Lo que haga falta recordar de este creep.">${esc(sc.notas)}</textarea>
+        <textarea class="notas" data-f="notas" data-id="${sc.id}" style="margin-top:4px" placeholder="Cómo es, qué se sabe de él… La ven los jugadores en la 🪪 tarjeta del mapa." title="La ven los jugadores en la 🪪 tarjeta del creep en el mapa">${esc(sc.notas)}</textarea>
       </div>
 
     </div>

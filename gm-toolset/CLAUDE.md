@@ -456,6 +456,11 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   Reserva), GM Tools pregunta si crear su token oculto en ese mapa (`ofrecerTokenEnMapa`, js/09). Al revés, en el mapa, Ctrl+C / Ctrl+V de un token de creep
   ofrece duplicar su ficha (ver `vtt-hexgrid/CLAUDE.md`).
 
+- **La 🪪 del mapa: arma, equipo y nota en lo público** (2026-10-09, bug: la tarjeta siempre decía «Sin equipo.»): `creepPublico` (js/11) suma
+  `CreepCalculo.tarjetaPublica(sc)` — el nombre del arma (con `armaNatural`), los nombres del equipo y la nota, nada de defensa ni bonos. Al
+  entrar, los creeps cuyo documento público no tiene `equipoNombres` se vuelven a publicar solos. **La nota del creep la ven los jugadores**
+  (los dos campos de nota lo dicen).
+
 - **🔎 Escanear grupo** (2026-10-09, pedido del dueño: escaneo + IA): botón en la cabecera (`abrirEscaneo`, al final de js/07). Lee todas las fichas con el motor
   común (carga recién ahí ficha-calculo, ficha-guardado, ficha-combate y `comun/escaneo-grupo.js`) y muestra la lectura rápida (puntos débiles y fortalezas)
   y tablas: resistencia a crítico por Tipo, elementales, defensas, atributos, ataque, armas y tipos de daño (rojo lo más bajo, verde lo más alto; se

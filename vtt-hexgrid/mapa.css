@@ -574,6 +574,8 @@ aside{
 /* Tarjeta del creep (🪪): equipo en chips de solo lectura y nota con saltos de línea. */
 #hud .hud-tarjeta-equipo{display:flex;flex-wrap:wrap;gap:5px}
 #hud .hud-tarjeta-equipo span{border:1px solid var(--line);border-radius:var(--r);padding:2px 7px;font-size:11.5px;color:var(--paper);background:rgba(255,255,255,.03)}
+#hud .hud-tarjeta-equipo span.arma{border-color:var(--copper);font-weight:600}
+#hud .hud-tarjeta-equipo span.arma i{font-weight:400;color:var(--muted)}
 #hud .hud-tarjeta-nota{margin:0;white-space:pre-wrap;color:var(--paper);line-height:1.4}
 #hud .hud-mini:hover{border-color:var(--copper)}
 #hud .hud-mini.peligro:hover{border-color:var(--danger);color:var(--danger)}

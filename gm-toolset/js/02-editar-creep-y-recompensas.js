@@ -208,7 +208,7 @@ function htmlPasoAsistCreep(p){
       + campo('¿Es un jefe?', `<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-rec="jefe" data-id="${sc.id}"${sc.jefe ? ' checked' : ''}> Sí: deja el doble de oro y de trofeo, es inmune a Stun y tiene +1 Res.Esp (protección de jefe)</label>`)
       + campo('Imagen (opcional)', `<button type="button" class="pap-boton" data-ac-img="1">${sc.imagen ? 'Cambiar imagen' : '+ Elegir imagen'}</button>
           <input type="file" data-imginput="${sc.id}" accept="image/*" hidden>`)
-      + campo('Nota (opcional)', `<textarea rows="3" data-ac-campo="notas" maxlength="600">${esc(sc.notas || '')}</textarea>`);
+      + campo('Nota (opcional)', `<textarea rows="3" data-ac-campo="notas" maxlength="600">${esc(sc.notas || '')}</textarea>`, 'La ven los jugadores en la 🪪 tarjeta del creep en el mapa (junto con los nombres de su arma y su equipo).');
   }
   if(p === 1){
     const b = attrBudgetCreep(sc);

@@ -262,13 +262,13 @@ function escucharVinculables(){
         if(!o.miniatura) miniaturaDesdeRetrato(ch.doc.id);
         else if(!miniaturasLocales.has(ch.doc.id) && !miniaturasInvalidas.has(ch.doc.id)) verificarMiniatura(ch.doc.id, o.miniatura);
       }
-      // Tarjeta del creep (🪪, ver hudTarjetaHtml): solo el nombre de cada
-      // ítem de equipo (sin def/mods/detalle) y la nota narrativa — ya son
-      // datos públicos (la ficha del creep se lee entera con `esMiembro`),
-      // acá solo se decide qué mostrar en el mapa.
+      // Tarjeta del creep (🪪, ver hudTarjetaHtml): el nombre del arma y de cada pieza de equipo (sin def/mods/detalle) y la nota.
+      // La ficha del creep es privada del GM: esto lo publican aparte GM Tools y modificarCreep (CreepCalculo.tarjetaPublica).
       if(coleccion === 'creeps'){
         o.notas = String(d.notas || '').trim();
-        o.equipoNombres = Array.isArray(d.equipo) ? d.equipo.map(it => String((it && it.nombre) || '').trim()).filter(Boolean) : [];
+        o.armaNombre = String(d.armaNombre || '').trim();
+        o.armaNatural = d.armaNatural === true;
+        o.equipoNombres = Array.isArray(d.equipoNombres) ? d.equipoNombres.map(n => String(n || '').trim()).filter(Boolean) : [];
       }
       mapa.set(ch.doc.id, o);
     });
@@ -605,6 +605,7 @@ async function modificarCreep(creepId, cambiar){
       'resumen.hpPct': hpMax > 0 ? Math.round(Math.max(0, Math.min(1, sc.hp / hpMax)) * 100) : 0,
       'resumen.muerto': sc.hp <= 0,
       'resumen.opor': CreepCalculo.oportunidadPosible(sc),   // ataque de oportunidad (2026-10-02)
+      ...CreepCalculo.tarjetaPublica(sc),   // la 🪪: nombres del arma y del equipo, y la nota (lo mismo que publica GM Tools)
       'resumen.estados': (Array.isArray(sc.estados) ? sc.estados : [])
         .filter(e => e && e.activo !== false && e.nombre).slice(0, 30)
         .map(e => ({

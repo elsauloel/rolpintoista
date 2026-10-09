@@ -163,7 +163,9 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   auditado). Tipos nuevos en las reglas: `estados` e `items`. `propuestas_*` queda para lo mandado con el camino
   viejo y como respaldo si las reglas nuevas no están publicadas. **Reglas nuevas: hay que pegarlas.**
 - `campanas/{id}/creeps/{creepId}` — `{nombre, orden, color, mapa, resumen: {hpPct,
-  muerto, estados[]}, miniatura, firma, actualizado}`. `mapa` (2026-10-02): el id del mapa
+  muerto, estados[]}, armaNombre, armaNatural, equipoNombres[], notas, miniatura, tarjeta, firma, actualizado}`.
+  `armaNombre`/`armaNatural`/`equipoNombres`/`notas` (2026-10-09): lo que muestra la 🪪 tarjeta del creep en el mapa —
+  solo nombres, sin defensa ni bonos (`CreepCalculo.tarjetaPublica`; lo escriben GM Tools y `modificarCreep` del mapa). `mapa` (2026-10-02): el id del mapa
   donde está el creep, '' = la Reserva (`comun/creeps-mapas.js`; reemplaza a `grupo` y a `gm/gruposMapas`, que se borran al convertir). De la vida solo se
   publica el porcentaje (`hpPct`, 0–100): los jugadores ven la barra sin
   números. Lo público de

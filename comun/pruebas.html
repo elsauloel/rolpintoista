@@ -1256,6 +1256,12 @@ prueba('Defensa con bonos de estados y Armadura rota; daño del arma con Fuerza 
   const sc = creepPrueba({estados: [{nombre: 'Piel', activo: true, mods: [{stat: 'def', val: 2}]}, {nombre: 'Armadura rota', activo: true, armaduraRota: true, stacks: 2}]});
   igual([CreepCalculo.defensaEfectiva(sc), CreepCalculo.ataqueTxt(sc), CreepCalculo.ataqueTxt(creepPrueba({armaDeRango: true}))], [3, '2d8 + 6', '2d8 + 1']);
 });
+prueba('la 🪪 pública: solo los nombres del arma (también la natural) y del equipo, y la nota (2026-10-09)', () => {
+  const sc = creepPrueba({notas: '  Huele a pantano.  ', equipo: [{nombre: 'Yelmo', tipoItem: 'cabeza', def: 2, mods: [{stat: 'con', val: 1}]}, {nombre: ''}]});
+  const nat = CreepCalculo.tarjetaPublica(creepPrueba({armaNombre: 'Garras', armaNatural: true}));
+  igual([CreepCalculo.tarjetaPublica(sc), nat.armaNombre, nat.armaNatural, nat.equipoNombres],
+    [{armaNombre: 'Hacha', armaNatural: false, equipoNombres: ['Yelmo'], notas: 'Huele a pantano.'}, 'Garras', true, []]);
+});
 prueba('Parry y Bloqueo: con su arma o un escudo; un arma natural sola no alcanza', () => {
   const nat = creepPrueba({armaNatural: true}), conEscudo = creepPrueba({armaNatural: true, equipo: [{nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 3}]});
   igual([!!CreepCalculo.defensa(creepPrueba()), CreepCalculo.defensa(nat), CreepCalculo.defensa(conEscudo).nombre, CreepCalculo.bloqueoValor(conEscudo)], [true, null, 'Rodela', 8]);

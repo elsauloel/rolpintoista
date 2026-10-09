@@ -76,7 +76,7 @@ function creepFichaJson(sc){
   return JSON.stringify({...sc, imagen: ''});
 }
 
-// Lo que ven los jugadores de cada creep (sin habilidades, equipo ni stats).
+// Lo que ven los jugadores de cada creep (sin habilidades ni stats; del arma y el equipo, solo los nombres para la 🪪).
 // De la vida solo se publica el porcentaje: los números quedan para el GM.
 function creepPublico(sc, orden){
   const hp = num(sc.hp);
@@ -86,6 +86,7 @@ function creepPublico(sc, orden){
     orden,
     color: String(sc.color || ''),
     mapa: String(sc.mapa || '').slice(0, 80),   // en qué mapa está (comun/creeps-mapas.js): el mapa lo usa para "Traer los creeps de este mapa"
+    ...CreepCalculo.tarjetaPublica(sc),   // la 🪪 del mapa: nombres del arma y del equipo, y la nota (2026-10-09)
     resumen: {
       hpPct: hpMax > 0 ? Math.round(Math.max(0, Math.min(1, hp / hpMax)) * 100) : 0,
       muerto: hp <= 0,
@@ -300,6 +301,8 @@ async function gmProcesarSnapshot(snap){
         // todos): se vuelven a publicar solos con solo el porcentaje.
         const r = docs[i].data().resumen;
         if(!r || r.hpPct === undefined || r.hp !== undefined) gmVivo.ultimo[sc.id].publico = '';
+        // Los guardados antes de que la 🪪 tuviera arma, equipo y nota en lo público (2026-10-09): se vuelven a publicar solos.
+        if(docs[i].data().equipoNombres === undefined) gmVivo.ultimo[sc.id].publico = '';
       });
       toast(`${creeps.length} creep(s) cargados de la mesa`);
       gmTarjetasFaltantes(docs, creeps);

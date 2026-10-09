@@ -38,6 +38,8 @@ function hudDatos(t){
     def: t.tipo === 'creep' ? (sc ? creepDefensaMapa(sc) : null) : (r.def === undefined ? null : num(r.def)),
     estados: (v && v.resumen && v.resumen.estados) || [],
     notas: (v && v.notas) || '',
+    armaNombre: (v && v.armaNombre) || '',
+    armaNatural: !!(v && v.armaNatural),
     equipoNombres: (v && v.equipoNombres) || [],
   };
 }
@@ -521,8 +523,12 @@ function hudTarjetaHtml(t, d){
   const img = mini
     ? `<img src="${esc(mini)}" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--r);border:1px solid var(--line);display:block;margin-bottom:10px">`
     : '';
-  const equipo = (d.equipoNombres && d.equipoNombres.length)
-    ? `<div class="hud-tarjeta-equipo">${d.equipoNombres.map(n => `<span>${esc(n)}</span>`).join('')}</div>`
+  // El arma primero (también la natural, marcada), después cada pieza de equipo (2026-10-09).
+  const arma = d.armaNombre
+    ? `<span class="arma" title="${d.armaNatural ? 'Arma natural: es parte de su cuerpo' : 'Su arma'}">🗡 ${esc(d.armaNombre)}${d.armaNatural ? ' <i>(natural)</i>' : ''}</span>`
+    : '';
+  const equipo = (arma || (d.equipoNombres && d.equipoNombres.length))
+    ? `<div class="hud-tarjeta-equipo">${arma}${(d.equipoNombres || []).map(n => `<span>${esc(n)}</span>`).join('')}</div>`
     : '<span style="color:var(--muted)">Sin equipo.</span>';
   const estados = d.estados.length
     ? d.estados.map(e => {

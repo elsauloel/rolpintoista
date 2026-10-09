@@ -406,6 +406,18 @@ const CreepCalculo = (() => {
     const n = sc.nitros === null || sc.nitros === undefined ? nitrosMax(sc) : num(sc.nitros);
     return !(num(sc.hp) <= 0) && n >= costoOportunidad(sc);
   }
+  // Lo que muestra la 🪪 tarjeta del creep en el mapa a cualquier jugador (2026-10-09): solo NOMBRES — el arma (también la natural,
+  // marcada) y cada pieza de equipo, sin defensa, bonos ni detalle — y la nota. Lo publican GM Tools (creepPublico) y el mapa al
+  // cambiar un creep (modificarCreep), en el documento público del creep; el resto de la ficha sigue siendo privada del GM.
+  function tarjetaPublica(sc){
+    const nom = x => String(x || '').trim().slice(0, 60);
+    return {
+      armaNombre: nom(sc.armaNombre),
+      armaNatural: sc.armaNatural === true,
+      equipoNombres: (Array.isArray(sc.equipo) ? sc.equipo : []).map(it => nom(it && it.nombre)).filter(Boolean).slice(0, 30),
+      notas: String(sc.notas || '').trim().slice(0, 600),
+    };
+  }
   // Alcance de su arma, en casilleros: un arma de rango usa su Rango; una de cuerpo a cuerpo, 1 + lo que le sume a Rango.
   function alcance(sc){
     if(sc.armaDeRango){ const v = statValor(sc, 'rng'); return Number.isNaN(v) ? 0 : Math.max(1, Math.round(v)); }
@@ -592,5 +604,5 @@ const CreepCalculo = (() => {
     statValor, estadoActivo, aportesMod, origenesMod, conSigno, statOrigenTxt, armadmgOrigenTxt, ataqueTxt, ataqueOrigenTxt,
     defensaOrigenTxt, critOrigenTxt, armaduraOrigenTxt, modsAfectanHp, actualizarHpMaxPorCon, nitrosMax, actualizarNo2PorAgl,
     costoAtaque, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor,
-    fuerzaGolpeValor, costoContraataque, costoOportunidad, oportunidadPosible, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
+    fuerzaGolpeValor, costoContraataque, costoOportunidad, oportunidadPosible, tarjetaPublica, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
 })();

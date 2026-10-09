@@ -925,7 +925,9 @@ versión parecida en más de una, es candidato a juntar.
   (atacar, contraataque, Parry, habilidades), con qué para (`defensa`), Bloqueo, Fuerza del golpe, daño del arma, modo y bloqueo de
   una habilidad, los textos de "de dónde sale", `normalizar` (y sus migraciones) y las tablas de stats. Todo recibe el creep
   (`sc`). GM Tools lo usa con sus nombres de siempre (`creepStatValor`…); el mapa lo carga siempre (antes tenía copias
-  parciales). **Una regla de creep nueva o corregida va acá.** Necesita `combatiente.js`.
+  parciales). **Una regla de creep nueva o corregida va acá.** Necesita `combatiente.js`. `tarjetaPublica(sc)` (2026-10-09): lo que va al
+  documento público para la 🪪 del mapa (`armaNombre`, `armaNatural`, `equipoNombres`, `notas`; solo nombres) — lo usan `creepPublico` de GM
+  Tools y `modificarCreep` del mapa.
 - **`creep-botonera.js`** (`CreepBotonera`, 2026-10-01, paso 4 etapa 4b) — **el dibujo de las Acciones de un creep**:
   `html(sc, {parryPendiente, lupa})` → `{titulo, badge, html}` y sus ayudantes (`formulasCombate`, `botonSegundaHab`, `botonHabTxt`,
   `cdControlesHtml`). Lo usan GM Tools (`renderAccionesCreep`) y el mapa (⚗ Acciones nuevas). Necesita `creep-calculo.js`,

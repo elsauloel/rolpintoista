@@ -955,6 +955,7 @@ versión parecida en más de una, es candidato a juntar.
   `mesaRefiltrar()` vuelve a pasar lo último; `mesaLinea(texto, desde, quien)` acepta de quién es. `TokensAuto.colocarTrampas` anuncia cada
   trampa colocada (`incierta-pj` / `incierta-creep`, con `ficha`); `FichaAcciones` ya no anuncia el detalle de una trampa (✨ o consumible).
   `TiradasPropias` deja afuera esas líneas.
+- **`escaneo-grupo.js`** (`EscaneoGrupo`, 2026-10-09) — **🔎 el escaneo del grupo** para el GM: `perfil(S, id)` (un personaje con el motor de la ficha: atributos, defensas, resistencia a crítico por Tipo, elementales, ataque, armas y tipos de daño), `lectura(perfiles)` (puntos débiles y fortalezas en palabras), `html(perfiles)` y `textoParaIA(perfiles, notas)` + `IA_SISTEMA` (para pedirle creeps a la IA). Lo usa GM Tools (🔎 Escanear grupo). Necesita ficha-calculo, ficha-combate y combatiente.
 - **`ppt.js`** (`PPT`, 2026-10-08, pedido del dueño) — **✊ piedra, papel o tijera**: entre dos de la partida (un jugador contra otro o contra el
   GM), «para muchas situaciones» y para disputar un ítem del botín. `retar()` (contra quién y para qué), `elegir(id, jugada)` (transacción: la
   segunda jugada resuelve; empate = otra ronda; si es por el botín, el ítem queda a nombre del ganador en la misma transacción), `rendirse(id)`,

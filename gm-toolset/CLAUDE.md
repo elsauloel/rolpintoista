@@ -455,3 +455,9 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
 - **¿Crear su token?** (2026-10-09, pedido del dueño): al crear (de cero, paso a paso, biblioteca, IA) o duplicar un creep que queda en un mapa (no en la
   Reserva), GM Tools pregunta si crear su token oculto en ese mapa (`ofrecerTokenEnMapa`, js/09). Al revés, en el mapa, Ctrl+C / Ctrl+V de un token de creep
   ofrece duplicar su ficha (ver `vtt-hexgrid/CLAUDE.md`).
+
+- **🔎 Escanear grupo** (2026-10-09, pedido del dueño: escaneo + IA): botón en la cabecera (`abrirEscaneo`, al final de js/07). Lee todas las fichas con el motor
+  común (carga recién ahí ficha-calculo, ficha-guardado, ficha-combate y `comun/escaneo-grupo.js`) y muestra la lectura rápida (puntos débiles y fortalezas)
+  y tablas: resistencia a crítico por Tipo, elementales, defensas, atributos, ataque, armas y tipos de daño (rojo lo más bajo, verde lo más alto; se
+  destilda a quien no va). **🤖 Proponer creeps**: le pasa ese escaneo a la IA de «+ Creep con IA» (misma clave y modelo de OpenRouter) y muestra su
+  propuesta en texto. No escribe nada en la partida.

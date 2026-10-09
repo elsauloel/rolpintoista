@@ -85,6 +85,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-equipo.js"></script>
 <script src="ficha-botin.js"></script>
 <script src="ppt.js"></script>
+<script src="escaneo-grupo.js"></script>
 <script src="trampas-base.js"></script>
 <script src="item-corto.js"></script>
 <script src="filtro-catalogo.js"></script>
@@ -666,6 +667,16 @@ prueba('reclamar y disputar (2026-10-08): cada ítem muestra Reclamar, Soltar (e
   igual([lista.length, html.includes('data-botin-tomar="l"'), html.includes('data-botin-soltar="m"'), html.includes('data-botin-disputar="o"'), html.includes('lo reclamó <b>Beto</b>'),
     html.includes('✊ en disputa'), html.includes('data-botin-disputar="d"'), html.includes('reclamaste <b>1</b>')],
     [4, true, true, true, true, true, false, true]);
+});
+prueba('🔎 escaneo del grupo (comun/escaneo-grupo.js): el perfil sale del motor de la ficha, la lectura marca lo flojo y el texto para la IA lleva todo', () => {
+  const S1 = FichaGuardado.completar(FichaGuardado.normalizar({escalaTipos: 2, meta: {nombre: 'Ana', nivel: 2}, attrs: {con: 4, fue: 8, agl: 6, des: 5, esp: 3},
+    inventario: [{id: 'h', nombre: 'Hacha', tipoItem: 'arma_1m', equipado: true, tipoDado: 8, peso: 1, efectosGolpe: [{nombre: 'Sangrado'}]}]}).S);
+  const S2 = FichaGuardado.completar(FichaGuardado.normalizar({meta: {nombre: 'Beto', nivel: 2}, attrs: {con: 5, fue: 3, agl: 5, des: 4, esp: 9}}).S);
+  const ps = [EscaneoGrupo.perfil(S1, 'a'), EscaneoGrupo.perfil(S2, 'b')];
+  const l = EscaneoGrupo.lectura(ps), html = EscaneoGrupo.html(ps), ia = EscaneoGrupo.textoParaIA(ps, 'minas, nivel 2');
+  igual([ps[0].attrs.fue, ps[0].armas.length && ps[0].armas[0].tipo, ps[0].danos.T8, ps[1].armas.length, l.debiles.some(t => /no resiste críticos/.test(t)), l.debiles.some(t => /Nadie resiste el daño 🔥 fuego/.test(t)),
+    l.fuertes.some(t => /Beto: lo más alto es Esp 9/.test(t)), html.includes('Resistencia a crítico'), ia.includes('Pedido del GM: minas, nivel 2'), ia.includes('Hacha Tipo 8')],
+    [8, 8, 1, 0, true, true, true, true, true, true]);
 });
 prueba('✊ piedra, papel o tijera (comun/ppt.js): quién gana, el documento nuevo y de qué lado juega cada uno', () => {
   const R = PPT.resultado;

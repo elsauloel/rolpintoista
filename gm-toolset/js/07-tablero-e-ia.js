@@ -544,3 +544,106 @@ function reiniciarCombate(){
   toast('Combate reiniciado · Turno 0 · No2 recargados · niebla restablecida');
 }
 
+
+/* =========================================================
+   🔎 ESCANEAR EL GRUPO (2026-10-09, pedido del dueño: «antes de crear un combate, un escaneo del party … y con una IA para tareas puntuales»)
+   Los números los saca el programa con el mismo motor de la ficha (comun/escaneo-grupo.js, cargado recién al abrir, con ficha-calculo,
+   ficha-guardado y ficha-combate); la IA (la misma clave y modelo de OpenRouter que «+ Creep con IA») solo propone un equipo de creeps con ese
+   escaneo. No escribe nada en la partida.
+   ========================================================= */
+const ESCANEO_PIEZAS = ['../comun/ficha-calculo.js?v=20261007am', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-combate.js?v=20261005mn', '../comun/escaneo-grupo.js?v=20261009d'];
+let escaneo = {perfiles: [], fuera: new Set(), cargando: false};
+function escaneoCargarScript(src){
+  return new Promise((ok, mal) => {
+    if([...document.scripts].some(s => s.src && s.src.includes(src.split('?')[0].replace('../', '')))){ ok(); return; }
+    const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => mal(new Error('No se pudo cargar ' + src));
+    document.head.appendChild(s);
+  });
+}
+function escaneoVentana(){
+  let f = document.getElementById('scrim-escaneo');
+  if(f) return f;
+  f = document.createElement('div');
+  f.className = 'scrim'; f.id = 'scrim-escaneo';
+  f.innerHTML = `<div class="modal" style="max-width:1000px;width:calc(100vw - 40px)">
+    <header><h3>🔎 Escanear el grupo</h3><button class="iconbtn" data-esc="cerrar">Cerrar</button></header>
+    <div style="padding:12px 16px;max-height:calc(100vh - 140px);overflow:auto">
+      <div class="hint" style="margin-bottom:6px">Los números salen de las fichas, con el mismo cálculo que ve cada jugador (equipo, pasivas y estados de ahora). En rojo lo más bajo del grupo y en verde lo más alto. Destildá a quien no va a estar en el combate.</div>
+      <div id="escaneo-quienes" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px"></div>
+      <div id="escaneo-cuerpo"><div class="hint">Leyendo las fichas…</div></div>
+      <div class="eg-sec" style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 0 4px">🤖 Pedirle a la IA un equipo de creeps para este grupo</div>
+      <textarea id="escaneo-notas" style="min-height:54px;width:100%" placeholder="Opcional: escenario, nivel, tono… ej. «minas abandonadas, nivel 3, que sea difícil pero ganable»"></textarea>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+        <span class="hint" style="flex:1">Usa la misma clave y modelo de «+ Creep con IA» (OpenRouter). La IA solo propone: vos decidís y armás los creeps.</span>
+        <button class="btn primary" data-esc="ia">🤖 Proponer creeps</button>
+      </div>
+      <div id="escaneo-ia" style="white-space:pre-wrap;margin-top:10px;font-size:13px;line-height:1.5"></div>
+    </div></div>`;
+  document.body.appendChild(f);
+  f.addEventListener('click', e => {
+    if(e.target === f || e.target.closest('[data-esc="cerrar"]')){ f.classList.remove('open'); return; }
+    if(e.target.closest('[data-esc="ia"]')){ escaneoPedirIA(); return; }
+  });
+  f.addEventListener('change', e => {
+    const c = e.target.closest('[data-esc-quien]');
+    if(!c) return;
+    if(c.checked) escaneo.fuera.delete(c.dataset.escQuien); else escaneo.fuera.add(c.dataset.escQuien);
+    escaneoDibujar();
+  });
+  return f;
+}
+const escaneoElegidos = () => escaneo.perfiles.filter(p => !escaneo.fuera.has(p.id));
+function escaneoDibujar(){
+  const f = escaneoVentana();
+  f.querySelector('#escaneo-quienes').innerHTML = escaneo.perfiles.map(p => `<label style="display:inline-flex;gap:5px;align-items:center;cursor:pointer"><input type="checkbox" data-esc-quien="${esc(p.id)}"${escaneo.fuera.has(p.id) ? '' : ' checked'}> ${esc(p.nombre)} <span class="hint">nv ${fmt(p.nivel)}</span></label>`).join('');
+  f.querySelector('#escaneo-cuerpo').innerHTML = EscaneoGrupo.html(escaneoElegidos());
+}
+async function abrirEscaneo(){
+  if(!fbDb || !fbMiembro || !fbMiembro.gm){ toast('El escaneo es del GM, con la partida abierta'); return; }
+  const f = escaneoVentana();
+  f.classList.add('open');
+  if(escaneo.cargando) return;
+  escaneo.cargando = true;
+  f.querySelector('#escaneo-cuerpo').innerHTML = '<div class="hint">Leyendo las fichas…</div>';
+  try{
+    for(const src of ESCANEO_PIEZAS) await escaneoCargarScript(src);
+    const snap = await fbDb.collection(fbRutaCampana('fichas')).get();
+    const perfiles = [];
+    for(const d of snap.docs){
+      try{
+        const r = await FichaGuardado.cargar(fbDb, fbRutaCampana('fichas/' + d.id));
+        if(r && r.S) perfiles.push(EscaneoGrupo.perfil(r.S, d.id));
+      }catch(err){ console.error('No se pudo leer la ficha ' + d.id + ':', err); }
+    }
+    escaneo.perfiles = perfiles.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+    escaneoDibujar();
+  }catch(err){
+    console.error('No se pudo escanear el grupo:', err);
+    f.querySelector('#escaneo-cuerpo').innerHTML = '<div class="hint">No se pudo leer el grupo — mirá la consola.</div>';
+  }finally{ escaneo.cargando = false; }
+}
+async function escaneoPedirIA(){
+  const ps = escaneoElegidos();
+  if(!ps.length){ toast('Elegí al menos un personaje'); return; }
+  const key = orKey(false);
+  if(!key){ toast('Sin clave de OpenRouter no se puede (pegala en «+ Creep con IA»)'); return; }
+  const f = escaneoVentana(), caja = f.querySelector('#escaneo-ia'), btn = f.querySelector('[data-esc="ia"]');
+  const modelo = localStorage.getItem('openrouter-modelo') || OR_MODELS[0].id;
+  btn.disabled = true; btn.textContent = 'Pensando…';
+  caja.textContent = '🤖 La IA está mirando el escaneo…';
+  try{
+    const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST', headers: {'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json'},
+      body: JSON.stringify({model: modelo, messages: [{role: 'system', content: EscaneoGrupo.IA_SISTEMA}, {role: 'user', content: EscaneoGrupo.textoParaIA(ps, f.querySelector('#escaneo-notas').value.trim())}]}),
+    });
+    if(resp.status === 401){ localStorage.removeItem('openrouter-key'); caja.textContent = 'La clave de OpenRouter no sirve o venció: volvé a pegarla en «+ Creep con IA».'; return; }
+    if(!resp.ok) throw new Error(`OpenRouter respondió ${resp.status}: ${await resp.text()}`);
+    const data = await resp.json();
+    const texto = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+    caja.textContent = texto ? String(texto).trim() : 'La IA no devolvió nada: probá de nuevo o con otro modelo.';
+  }catch(err){
+    console.error('No se pudo pedir la propuesta a la IA:', err);
+    caja.textContent = 'No se pudo hablar con la IA — mirá la consola.';
+  }finally{ btn.disabled = false; btn.textContent = '🤖 Proponer creeps'; }
+}
+if(document.getElementById('btn-escaneo')) document.getElementById('btn-escaneo').onclick = abrirEscaneo;

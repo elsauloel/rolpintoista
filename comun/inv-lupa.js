@@ -52,12 +52,12 @@ const InvLupa = (() => {
       if(num(inv.armaAmplificado) > 0) h += lupaFila('Daño amplificado (dados extra)', lupaSigno(num(inv.armaAmplificado)));
       h += lupaFila('Tipo (caras del dado)', `d${fmt(num(inv.armaTipo) || 8)}`);
       if(num(inv.armaFijo)) h += lupaFila('Daño fijo del arma', lupaSigno(num(inv.armaFijo)));
-      h += inv.armaDeRango
-        ? lupaFila('Dmg <span class="lupa-gris">(arma de rango: no suma)</span>', '–', 'lupa-tachado')
-        : lupaFila('Dmg (de Fuerza)', lupaSigno(dmg));
+      h += !inv.armaDeRango ? lupaFila('Dmg (de Fuerza)', lupaSigno(dmg))   // un arco suma la mitad (Combatiente.dmgDelArma); otra de rango, nada
+        : Combatiente.esArco(inv) ? lupaFila('Dmg <span class="lupa-gris">(arco: la mitad, para arriba)</span>', lupaSigno(Combatiente.dmgDelArma(inv, dmg)))
+        : lupaFila('Dmg <span class="lupa-gris">(arma de rango: no suma)</span>', '–', 'lupa-tachado');
       h += lupaFila('Daño', esc(I.danoTxt(inv, dmg)), 'lupa-total');
       let out = lupaSeccion('De dónde sale', h);
-      if(!inv.armaDeRango) out += stat(inv, 'dmg', {sinTirada: true}).replace('De dónde sale', 'Dmg (de Fuerza)');
+      if(!inv.armaDeRango || Combatiente.esArco(inv)) out += stat(inv, 'dmg', {sinTirada: true}).replace('De dónde sale', 'Dmg (de Fuerza)');
       return {titulo: `${inv.nombre} · Daño${inv.armaNombre ? ` (${inv.armaNombre})` : ''}`, html: out + sinCosto};
     }
     if(tipo === 'hab'){

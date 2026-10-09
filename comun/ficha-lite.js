@@ -66,7 +66,7 @@ const FichaLite = (() => {
     else if(def) partes.push(`Defensa ${signo(def)}`);
     if(dos) partes.push('a dos manos');
     const lineas = [];
-    if(esArma) lineas.push({txt: `Daño ${FichaCombate.armaDanoTxt(i, dmg)}${i.armaDeRango ? ' (de rango: no suma Dmg)' : ''}`});
+    if(esArma) lineas.push({txt: `Daño ${FichaCombate.armaDanoTxt(i, dmg)}${i.armaDeRango ? ` (${Combatiente.dmgDelArmaTxt(i)})` : ''}`});
     if(num(i.peso)) lineas.push({txt: `Peso ${fmt(num(i.peso))}`});
     const mt = modsTxt(i.mods);
     if(mt) lineas.push({txt: mt});
@@ -147,7 +147,7 @@ const FichaLite = (() => {
   };
   function manoGuardada(o, danoTxt){
     if(!o.armaNombre) return {nombre: '', detalle: 'sin arma', lineas: []};
-    const lineas = [{txt: `Daño ${danoTxt}${o.armaDeRango ? ' (de rango: no suma Dmg)' : ''}`}];
+    const lineas = [{txt: `Daño ${danoTxt}${o.armaDeRango ? ` (${Combatiente.dmgDelArmaTxt(o)})` : ''}`}];
     if(num(o.armaPeso)) lineas.push({txt: `Peso ${fmt(num(o.armaPeso))}`});
     const mt = modsTxt(o.armaMods);
     if(mt) lineas.push({txt: mt});

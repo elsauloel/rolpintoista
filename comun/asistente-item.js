@@ -387,9 +387,12 @@ const AsistenteItem = (() => {
       if(cfg.conMano && !dos) h += campoMano(d);
       if(esEspecial(d)) return {h: h + efecto('Un arma especial no tiene distancia propia: hasta dónde llega lo dice su Ejecución ✨ (tu Rango, una línea, un área…).'), ayuda};
       h += campo('Distancia', `<div class="aa-opciones">${op('rango', '0', !d.armaDeRango, 'Cuerpo a cuerpo')}${op('rango', '1', !!d.armaDeRango, 'A distancia')}</div>`);
-      h += efecto(d.armaDeRango
-        ? `Es <b>de rango</b> (arco, pistola, lanzallamas…): tiene su propia mecánica — el daño <b>no suma el Dmg</b>, es solo el del arma. No confundir con el <b>Alcance</b> de las armas cuerpo a cuerpo: son dos cosas distintas.`
-        : `Es <b>cuerpo a cuerpo</b>: al tirar daño se suma el <b>Dmg</b> ${e(q.de)}${p ? ` (hoy ${f(n(p.dmg))})` : ''}.`);
+      if(d.armaDeRango) h += campo('¿Es un arco?', `<div class="aa-opciones">${op('arco', '1', !!d.arco, '🏹 Arco')}${op('arco', '0', !d.arco, 'Otra (ballesta, pistola, lanzallamas…)')}</div>`);
+      h += efecto(!d.armaDeRango
+        ? `Es <b>cuerpo a cuerpo</b>: al tirar daño se suma el <b>Dmg</b> ${e(q.de)}${p ? ` (hoy ${f(n(p.dmg))})` : ''}.`
+        : d.arco
+        ? `Es un <b>arco</b> (2026-10-09): el daño suma <b>la mitad del Dmg</b> ${e(q.de)}, redondeada para arriba${p ? ` (hoy +${f(Math.ceil(n(p.dmg) / 2))})` : ''}. Dispara con al menos 2 casilleros libres entre el arquero y el objetivo, y con el arco no se pega cuerpo a cuerpo. Su Tipo es su dado: un arco de d4 es Tipo 4, uno de d6, Tipo 6 (para acercarse a un d6 sin cambiar el Tipo, daño fijo: 1d4+1).`
+        : `Es <b>de rango</b> (ballesta, pistola, lanzallamas…): tiene su propia mecánica — el daño <b>no suma el Dmg</b>, es solo el del arma. No confundir con el <b>Alcance</b> de las armas cuerpo a cuerpo: son dos cosas distintas.`);
       // Mismo mod ('rng'), pero se explica distinto: en un arma de rango es su
       // propia distancia de disparo; en una cuerpo a cuerpo es el Alcance
       // (deja pegar a más de un casillero sin dejar de sumar el Dmg).
@@ -620,7 +623,7 @@ const AsistenteItem = (() => {
           + (aManoTxt(d.especial) ? fila('✋ A mano', e(aManoTxt(d.especial))) : '') : ''}
         ${esOrbe(d) ? fila('Clase', '🔮 orbe') + fila('Al usar una varita', e([n(d.orbeResguardo) ? `Vida extra ${Math.round(n(d.orbeResguardo))} (1 vez por turno)` : '', d.orbeSalvaje ? (d.orbeSalvaje === 'domado' ? '1d6 domado' : '1d6 salvaje') : '', n(d.orbeCustodio) ? `Vida extra ${Math.round(n(d.orbeCustodio))} a un aliado al lado` : ''].filter(Boolean).join(' · ') || 'nada'))
           + (n(d.orbeAbsorcion) ? fila('Absorción', e(`+${Math.round(n(d.orbeAbsorcion))} SP al recibir daño mágico o elemental (1 vez por turno)`)) : '') : ''}
-        ${g === 'arma' && !esEspecial(d) ? fila('Tipo', e(`Tipo ${tipo} · ${TIPOS[tipo].nombre}`)) + fila('Distancia', d.armaDeRango ? 'a distancia (no suma Dmg)' : 'cuerpo a cuerpo')
+        ${g === 'arma' && !esEspecial(d) ? fila('Tipo', e(`Tipo ${tipo} · ${TIPOS[tipo].nombre}`)) + fila('Distancia', d.armaDeRango ? (d.arco ? 'arco (suma la mitad del Dmg)' : 'a distancia (no suma Dmg)') : 'cuerpo a cuerpo')
           + fila('Daño', e(danoTxt(d))) + fila('Atacar', `${primer(tipo)} No2 el primero, ${tipo} los siguientes`)
           + (modVal(d, 'rng') ? fila(d.armaDeRango ? 'Rango' : 'Alcance', `+${f(modVal(d, 'rng'))}`) : '')
           + (n(d.ignoraResistCrit) > 0 ? fila('Ignora', `${f(n(d.ignoraResistCrit))} de Resistencia a crítico`) : '')
@@ -702,7 +705,8 @@ const AsistenteItem = (() => {
     const min = dados + fijo, max = dados * caras + fijo;
     const prom = Math.round((dados * (caras + 1) / 2 + fijo) * 10) / 10;
     let t = `Tira <b>${e(danoTxt(d))}</b>: entre ${f(min)} y ${f(max)}, ${f(prom)} en promedio.`;
-    if(d.armaDeRango) t += ' Es de rango: no suma Dmg.';
+    if(d.armaDeRango && d.arco) t += p ? ` Con la mitad del Dmg ${e(q.de)} (+${f(Math.ceil(n(p.dmg) / 2))}): entre ${f(min + Math.ceil(n(p.dmg) / 2))} y ${f(max + Math.ceil(n(p.dmg) / 2))}.` : ' Es un arco: al tirar se le suma la mitad del Dmg de quien lo use.';
+    else if(d.armaDeRango) t += ' Es de rango: no suma Dmg.';
     else if(p) t += ` Con el Dmg ${e(q.de)} (${f(n(p.dmg))}): entre ${f(min + n(p.dmg))} y ${f(max + n(p.dmg))}.`;
     else t += ' Al tirar se le suma el Dmg de quien la use.';
     return t;
@@ -770,6 +774,7 @@ const AsistenteItem = (() => {
     else if(ds.aaTipo) d.tipoDado = n(ds.aaTipo);
     else if(ds.aaManos) d.tipoItem = ds.aaManos;
     else if(ds.aaRango) d.armaDeRango = ds.aaRango === '1';
+    else if(ds.aaArco) d.arco = ds.aaArco === '1';
     else if(ds.aaEquipado) d.equipado = ds.aaEquipado === '1';
     else if(ds.aaModadd !== undefined) d.mods.push({stat: ds.aaModadd, val: ds.aaModadd ? 1 : 0});
     else if(ds.aaModrm !== undefined) d.mods.splice(n(ds.aaModrm), 1);
@@ -861,7 +866,7 @@ const AsistenteItem = (() => {
       const am = es.aMano || {}, amT = String(am.texto || '').trim(), amR = String(am.tirada || '').replace(/\s+/g, ''), amE = String(am.etiqueta || '').trim();
       if(amT || amR) es.aMano = {...(amT ? {texto: amT} : {}), ...(amR ? {tirada: amR} : {}), ...(amE ? {etiqueta: amE} : {})}; else delete es.aMano;
       d.peso = Math.max(1, n(d.peso) || 1);
-      ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', ...(typeof Combatiente !== 'undefined' ? Combatiente.RASGOS_ARMA : ['ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20'])].forEach(k => delete d[k]);
+      ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', ...(typeof Combatiente !== 'undefined' ? Combatiente.RASGOS_ARMA : ['ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco'])].forEach(k => delete d[k]);
       if(!(d.efectosGolpe || []).length) delete d.efectosGolpe;
       d.mods = d.mods.filter(m => m.stat !== 'rng');
     }else if(grupoDe(d.tipoItem) === 'arma'){
@@ -874,6 +879,7 @@ const AsistenteItem = (() => {
       if(n(d.ignoraResistCrit) > 0) d.ignoraResistCrit = Math.round(n(d.ignoraResistCrit)); else delete d.ignoraResistCrit;
       ['ahorroNitros', 'critD20'].forEach(k => { if(n(d[k]) > 0) d[k] = Math.round(n(d[k])); else delete d[k]; });
       ['sinParry', 'oporGratis'].forEach(k => { if(d[k]) d[k] = true; else delete d[k]; });
+      if(d.armaDeRango && d.arco) d.arco = true; else delete d.arco;
     }else{
       // Lo que es solo de armas no viaja en el resto.
       delete d.especial;
@@ -883,7 +889,7 @@ const AsistenteItem = (() => {
         if(d.orbeSalvaje) d.orbeSalvaje = d.orbeSalvaje === 'domado' ? 'domado' : true; else delete d.orbeSalvaje;
       }
       else { delete d.orbe; delete d.orbeResguardo; delete d.orbeSalvaje; delete d.orbeCustodio; delete d.orbeAbsorcion; }
-      delete d.efectosGolpe; delete d.tipoDado; delete d.danoFijo; delete d.danoAmplificado; delete d.armaDeRango; delete d.espalda; delete d.ignoraResistCrit; delete d.sinParry; delete d.oporGratis; delete d.ahorroNitros; delete d.critD20;
+      delete d.efectosGolpe; delete d.tipoDado; delete d.danoFijo; delete d.danoAmplificado; delete d.armaDeRango; delete d.espalda; delete d.ignoraResistCrit; delete d.sinParry; delete d.oporGratis; delete d.ahorroNitros; delete d.critD20; delete d.arco;
     }
     // Durabilidad: solo se guarda si no es la de siempre (3 por Peso) y el ítem la tiene.
     // Una pieza vieja con durPorPeso: se pasa a Resistente / Frágil conservando su durabilidad.
@@ -910,7 +916,7 @@ const AsistenteItem = (() => {
      con `{...base, ...d}` a una varita le quedaba el Tipo 8 de fábrica (y con él, daño físico y Parry), y a un arma que dejó de ser especial, su
      hechizo. Todas las pantallas guardan con esto. */
   const CONTROLADOS = ['especial', 'orbe', 'orbeResguardo', 'orbeSalvaje', 'orbeCustodio', 'orbeAbsorcion', 'tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', 'efectosGolpe',
-    'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'durExtra', 'durPorPeso'];
+    'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'durExtra', 'durPorPeso'];
   function fusionar(base, d){
     const o = {...(base || {}), ...(d || {})};
     CONTROLADOS.forEach(k => { if(!(k in (d || {}))) delete o[k]; });

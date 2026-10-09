@@ -513,6 +513,15 @@ prueba('alcance y daño de un arma', () => {
   igual([FichaCombate.alcanceDeArma(S, S.inventario[0]), FichaCombate.armaDanoTxt(S.inventario[0], 3), FichaCombate.armaDanoTxt({tipoItem: 'arma_2m', peso: 3, tipoDado: 10, armaDeRango: true}, 3), FichaCombate.armaDanoTxt(S.inventario[1])],
     [1, '2d8 + 3', '3d10', '']);
 });
+prueba('el arco suma la mitad del Dmg (para arriba); otra de rango, nada; cuerpo a cuerpo, entero — personaje, creep e invocación (2026-10-09)', () => {
+  const arco = {tipoItem: 'arma_2m', peso: 1, tipoDado: 4, danoFijo: 1, armaDeRango: true, arco: true};
+  const creep = {armaPeso: 2, armaTipo: 6, armaFijo: 0, armaDeRango: true, armaRasgos: Combatiente.rasgosDeItem(arco)};
+  const inv = {armaPeso: 1, armaTipo: 4, armaFijo: 0, armaDeRango: true, armaRasgos: {arco: true}};
+  igual([Combatiente.dmgDelArma({}, 5), Combatiente.dmgDelArma(arco, 5), Combatiente.dmgDelArma(arco, 4), Combatiente.dmgDelArma({armaDeRango: true}, 5),
+    Combatiente.dmgDelArma({armaDeRango: false, arco: true}, 5), FichaCombate.armaDanoTxt(arco, 5), CreepCalculo.danoTxt(creep, 3), InvCalculo.danoTxt(inv, 6),
+    Combatiente.dmgDelArmaTxt(arco), Combatiente.dmgDelArmaTxt({armaDeRango: true}), Combatiente.dmgDelArmaTxt({})],
+    [5, 3, 2, 0, 5, '1d4 + 4', '2d6 + 2', '1d4 + 3', 'arco: suma la mitad del Dmg', 'de rango: no suma Dmg', '']);
+});
 
 /* ---------- Habilidades y consumibles (comun/ficha-habilidades.js, paso 5 nivel B área 3) ---------- */
 grupo('Habilidades y consumibles (paso 5)');

@@ -36,13 +36,13 @@ const FichaCombate = (() => {
     }
     return mapa;
   }
-  // El daño de un arma ("2d8 + 3"): dados = Peso (+ amplificado), caras = Tipo, fijo = el del arma + el `extra` (Dmg) si no es de rango.
+  // El daño de un arma ("2d8 + 3"): dados = Peso (+ amplificado), caras = Tipo, fijo = el del arma + lo que suma del `extra` (Dmg): Combatiente.dmgDelArma.
   function armaDanoTxt(i, extra){
     if(!esArma(i.tipoItem)) return '';
     if(i.especial && !num(i.tipoDado)) return '';   // una varita (arma especial sin Tipo) no tiene daño físico (2026-10-05)
     const dados = Math.max(1, num(i.peso) || 1) + Math.max(0, num(i.danoAmplificado));
     const tipo = num(i.tipoDado) || 8;
-    const fijo = num(i.danoFijo) + (i.armaDeRango ? 0 : num(extra));
+    const fijo = num(i.danoFijo) + Combatiente.dmgDelArma(i, num(extra));   // cuerpo a cuerpo el Dmg entero; un arco, la mitad; otra de rango, nada
     return `${dados}d${tipo}${fijo ? ` + ${fmt(fijo)}` : ''}`;
   }
   // Con qué puede atacar (armas con daño, no rotas), por mano.

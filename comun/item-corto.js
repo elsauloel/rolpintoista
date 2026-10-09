@@ -139,7 +139,7 @@ const ItemCorto = (() => {
     const peso = Math.max(1, num(it.peso) || 1), amp = Math.max(0, num(it.danoAmplificado)), tipo = num(it.tipoDado) || 8;
     const p = [`Tipo ${tipo}`];
     if(it.tipoItem === 'arma_2m') p.push('2 manos');
-    if(it.armaDeRango) p.push('a distancia');
+    if(it.armaDeRango) p.push(Combatiente.esArco(it) ? 'arco' : 'a distancia');
     p.push(`${peso} dado${peso === 1 ? '' : 's'}${amp ? ` + ${amp} amplificado${amp === 1 ? '' : 's'}` : ''}`);
     if(num(it.danoFijo)) p.push(`${num(it.danoFijo) > 0 ? '+' : ''}${num(it.danoFijo)} de daño`);
     (it.mods || []).forEach(m => { if(m && m.stat && num(m.val) && m.stat !== 'def') p.push(`${BONO[m.stat] || m.stat} ${num(m.val) > 0 ? '+' : ''}${num(m.val)}`); });
@@ -200,6 +200,9 @@ const ItemCorto = (() => {
     if(num(it.danoAmplificado)) L.push('Daño amplificado: dados de daño de más que no pesan.');
     if(num(it.danoFijo)) L.push('Daño fijo: se suma al resultado de los dados en cada golpe.');
     if(it.tipoItem === 'arma_2m') L.push('A dos manos: ocupa las dos manos.');
+    if(it.armaDeRango) L.push(Combatiente.esArco(it)
+      ? 'Arco: suma la mitad de tu Dmg (Fuerza), redondeada para arriba. ⚙ Automatizado. Dispara con al menos 2 casilleros libres entre vos y el objetivo, y con el arco no se pega cuerpo a cuerpo ni se hacen ataques de oportunidad: si te encaran, alejate o cambiá de arma. ✋ A mano por ahora.'
+      : 'A distancia: el daño es solo el del arma, no suma tu Dmg. ⚙ Automatizado.');
     const vistos = new Set();
     (it.mods || []).forEach(m => { if(m && MECANICA[m.stat] && !vistos.has(m.stat)){ vistos.add(m.stat); L.push(MECANICA[m.stat]); } });
     if(num(it.ignoraResistCrit) || (it.efectosGolpe || []).some(e => /^ignora\s+\d+\s+de\s+res/i.test(String((e && e.nombre) || '').trim())))

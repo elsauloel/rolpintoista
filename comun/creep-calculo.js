@@ -95,7 +95,7 @@ const CreepCalculo = (() => {
   function danoTxt(sc, extra){
     const dados = Math.max(1, num(sc.armaPeso)||1) + Math.max(0, num(sc.armaAmplificado));
     const tipo = num(sc.armaTipo)||8;
-    const fijo = num(sc.armaFijo) + (sc.armaDeRango ? 0 : num(extra));
+    const fijo = num(sc.armaFijo) + Combatiente.dmgDelArma(sc, num(extra));   // cuerpo a cuerpo el Dmg entero; un arco, la mitad; otra de rango, nada
     return `${dados}d${tipo}${fijo?` + ${fmt(fijo)}`:''}`;
   }
 

@@ -108,7 +108,7 @@ const InvCalculo = (() => {
   function danoTxt(inv, extra){
     const dados = Math.max(1, num(inv.armaPeso)||1) + Math.max(0, num(inv.armaAmplificado));
     const tipo = num(inv.armaTipo)||8;
-    const fijo = num(inv.armaFijo) + (inv.armaDeRango ? 0 : num(extra));
+    const fijo = num(inv.armaFijo) + Combatiente.dmgDelArma(inv, num(extra));   // cuerpo a cuerpo el Dmg entero; un arco, la mitad; otra de rango, nada
     return `${dados}d${tipo}${fijo?` + ${fmt(fijo)}`:''}`;
   }
   function ataqueTxt(inv){

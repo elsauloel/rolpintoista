@@ -1421,3 +1421,9 @@ versión parecida en más de una, es candidato a juntar.
 - **Cómo se ve una trampa** (dueño, 2026-10-08: «al verla tenés que entender que es una trampa y más o menos cómo funciona»): `ItemCorto.trampaHtml` lleva el
   distintivo «🪤 Trampa · se coloca en el mapa · la dispara un rival al pisarla» y `trampaFilas` separa **Se dispara** (la superficie que se pisa: `tipo`/`tamano`)
   de **Alcanza** (el efecto: `efecto.area` pisador / trampa / flor con su `radio` y `centro`, y si está en el piso o en el aire). Antes era una sola fila «Forma».
+- **🏹 El arco suma la mitad del Dmg** (2026-10-09, dueño; `../docs/rework-armas-rango.md`, `../docs/balance-combate.md`): rasgo de arma `arco`
+  (en `Combatiente.RASGOS_ARMA`: un ítem lo lleva suelto, un creep o una invocación en `armaRasgos`). `Combatiente.dmgDelArma(arma, dmg)` = cuánto
+  del Dmg suma el daño (cuerpo a cuerpo entero; arco la mitad, para arriba; otra de rango nada), `esArco(arma)` y `dmgDelArmaTxt(arma)`. Lo usan
+  las tres cuentas de daño (`FichaCombate.armaDanoTxt`, `CreepCalculo.danoTxt`, `InvCalculo.danoTxt`), sus 🔍, la ficha lite e `ItemCorto`; el
+  asistente de ítems pregunta «¿Es un arco?» cuando el arma es a distancia. El Tipo es el dado (un arco de d6 es Tipo 6). Falta automatizar la
+  distancia mínima (2 casilleros libres) y que con el arco no se pegue cuerpo a cuerpo ni se hagan ataques de oportunidad.

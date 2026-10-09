@@ -26,6 +26,7 @@
 
 - [ ] **🏹 Apuntar con un arma de rango** (cuando se construya; pedido del dueño 2026-10-09): al atacar se ve tu Rango, los objetivos posibles, los que
   no (fuera de Rango o tapados por un obstáculo aunque se vean por la visión de un aliado) y los obstáculos que los tapan. Ver docs/rework-armas-rango.md.
+- [ ] **🏹 El arco suma la mitad del Dmg** (2026-10-09; anda en las pruebas automáticas, todavía ningún arco del catálogo lo trae): con un arco  marcado «🏹 Arco» (asistente de ítems), el botón Daño de la Botonera dice «1d4 + mitad del Dmg» y el duelo tira eso; su 🔍 muestra la mitad. Lo  mismo con un creep y una invocación que lleven ese arco.
 
 ## Probado
 

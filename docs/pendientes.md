@@ -483,3 +483,5 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   turno); si termina el movimiento levitando sobre una zona del piso, recién le afecta al terminar su turno (`levitarAterrizar`). Las Suelas restan solo a
   lo que toca el piso (zonas y daño de trampas). Lo que se dispara «con cada paso» y no «en cada Mantenimiento» (miguelitos) ya existía. Los dardos son un
   proyectil: «del aire», no tiene nada que ver con Levitar. Varitas: la fogata y la bola de fuego dejan «ambos»; el aceite y el suelo de la ventisca, «del piso».
+- [ ] **Escudo de antebrazo (estilo Shiryu)** (idea del dueño, 2026-10-09, para más adelante): un escudo atado al antebrazo que deja la mano libre.
+  Es un bono grande y puntual de escudo (permitiría, por ejemplo, arco y escudo); no entra en el cálculo base de los arcos.

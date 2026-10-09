@@ -152,3 +152,23 @@ No2). **No se puede pegar con el arco.** La distancia mínima de ballestas y pó
 - Balance (a medir): si el arquero tira desde su sweet spot más o menos la mitad de las veces, un +2 equivale en promedio a un +1 fijo, pero lo tiene
   que ganar ubicándose (gasta No2 en moverse) y el rival lo puede sacar de ahí acercándose o tapando la línea. Con el arco Tipo 4 (rango de
   crítico 4), +2 de diferencia es medio nivel de crítico más en promedio.
+
+## 2026-10-09 · Base de los arcos, consolidada para probar (dueño)
+- **Sin penalidad a la Evasión** por defecto (distorsiona el balance): un arma a distancia común y silvestre, hasta charlarlo con el grupo.
+- **El sweet spot no es la regla:** queda como **bono / mecánica a testear** en algunos arcos (puede romper el juego).
+- **Dados: 1 o 2 dados de Tipo 4 en cualquier calidad** (lore: una flecha no se hace más pesada); la calidad se paga con lo demás, si los puntos dan.
+- **El Arco de guerra** (suma la Fuerza entera) es una idea para un arco de calidad alta; no define la base.
+- Orden: cerrar y probar los arcos (números y mapa) → después hondas, cerbatanas y efectos permitidos.
+
+## 2026-10-09 · Números: arquero contra guerrero (simulación con las reglas del juego)
+Reparto sugerido de atributos (33 + 3 por nivel), Defensas de la curva por nivel, crítico y Defensa como en el duelo. Nivel 1: Guerrero Fue 10,
+Agi 4, Des 6, HP 45, Def 8, Res T4 2 / T6 1, espada 1d6+1. Arquero Fue 3, Agi 8, Des 11, HP 30, Def 4, Res T4 1, arco Nd4 + 2 (mitad de Fuerza).
+- **La espada del guerrero al arquero:** acierta ~38 % (Des 6 contra Eva 8) y hace ~4 por golpe, un golpe por turno.
+- **El arco al guerrero pesado (Def 8): acierta ~89 %, pero no le hace daño.** 1d4+2 nunca pasa la Defensa 8; 2d4+2, ~0,2 por flecha. El crítico no
+  aparece: con rango 4 y Res T4 2 hace falta ganar por 12, y el PdG del arquero llega como mucho a 11.
+- Contra un rival medio (Def 6, Res T4 1): ~0,9 (1d4) a ~2,2 (2d4) por flecha. A nivel 5 (Def 10–14, Res T4 2–3), casi cero en todos los casos.
+- **Palancas medidas (daño por flecha, contra el guerrero pesado / un rival medio, nivel 1, arco 2d4+2):** como hoy 0,2 / 2,2 · la flecha **ignora
+  la mitad de la Defensa** 2,7 / 4,2 · **Crítico frecuente +2** 5,4 / 7,5 · las dos 6,8 / 8,5. A nivel 5 solo el Crítico frecuente se sostiene
+  (4,3 / 6,3).
+- **Lectura:** con la Defensa que resta entera, el daño chico no entra, y la Resistencia a Tipo 4 (la más abundante) apaga el crítico del Tipo 4. No
+  es solo de los arcos: el mismo arquero con una espada tampoco le hace daño al guerrero. A decidir antes de probar en el mapa.

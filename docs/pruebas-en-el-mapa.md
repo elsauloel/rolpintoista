@@ -29,11 +29,19 @@
 - [ ] **🏹 El arco suma la mitad del Dmg** (2026-10-09; anda en las pruebas automáticas, todavía ningún arco del catálogo lo trae): con un arco  marcado «🏹 Arco» (asistente de ítems), el botón Daño de la Botonera dice «1d4 + mitad del Dmg» y el duelo tira eso; su 🔍 muestra la mitad. Lo  mismo con un creep y una invocación que lleven ese arco.
 - [ ] **🏹 Distancia mínima del arco y sin oportunidad** (2026-10-09, P183): al atacar con un arco brillan solo los objetivos a 3 casilleros o más; elegir uno a 1 o 2 pregunta «Muy cerca para el arco · Disparar igual / Elegir otro» y, si sigue, deja una línea roja en la Mesa. Un rival que solo tiene un arco no frena a quien se le aleja y la Mesa dice «tiene un arco, que no sirve de oportunidad»; con arco y otra arma, la oportunidad no ofrece el arco.
 - [ ] **🏹 Parry y disparos, lo que falta** (2026-10-09; el creep ya probado, ver «Probado»): atacado un **personaje** o una **invocación** con un arco, el Parry se ofrece solo con escudo; quien tiene un arco en las manos no ofrece Parry con él.
-- [ ] **🏹 Levantar la flecha del piso** (2026-10-09): juan camina hasta la Flecha de fuego que quedó en el piso (🏹 en un círculo) y la levanta (1 No2): ¿vuelve al carcaj o a la mochila?
-- [ ] **🏹 Flecha que pega** (2026-10-09): un disparo con flecha especial que entra suma sus efectos (siempre, sin %) y su Perfora le resta Defensa al daño.
+- [ ] **🏹 Perfora y la flecha envenenada** (2026-10-09): un disparo con la Perforante o la Envenenada que pega resta 1 de Defensa («perfora 1» en el
+  duelo) y el Veneno ×3 de la envenenada entra aunque la armadura pare todo.
 - [ ] **🏹 Línea de tiro, tiro alto y distancia ideal** (2026-10-09): al atacar con un arma de rango se ve la línea al mouse (verde / ámbar «roza» / roja «tapado»); elegir un objetivo tapado por un token pregunta «Tiro alto (PdG −2)» (si el arma lo tiene y está a 4+), «Disparar igual» o «Elegir otro»; un obstáculo Sólido no permite tiro alto; con distancia ideal, los objetivos en la franja brillan en celeste y el duelo suma el bono (y lo muestra en la Mesa).
 
 ## Probado
+
+- ✅ **🏹 Flechas eléctricas y levantar una flecha** (2026-10-09): juan a la Bruja (con Stun, para que pegue). **Relámpago**: el duelo dice
+  «Flecha relámpago: Parálisis», pegó, Parálisis 1 turno aplicada al blanco y saltó al Coloso de mineral (a 2 casillas): 1d2 = 2 → paralizado
+  (quedó en su lista de estados); el carcaj bajó 2 → 1. **Tormenta** (crítico ×3): el físico se multiplicó (21) y el eléctrico no (7, «ignora la
+  Defensa, sin multiplicar»); saltó 7 → 3 al Coloso → 1 al Escarabajo de cobre y ahí se cortó; Parálisis 50 % (1d2: 1) y 25 % (1d4: 2), ninguna
+  entró; la Crónica y la Mesa lo cuentan. **Arreglado probando**: el cartel «No te alcanzan los Nitros» al pagar el PdG quedaba tapado por el
+  duelo (ahora una ventana que se abre en la Botonera queda encima; verificado). **Levantar**: juan al lado de la Flecha de fuego del piso →
+  «🗡️ Levantar Flecha de fuego · 1 No2» → sin No2 pregunta y deja seguir → salió del piso y fue **al carcaj** (1 → 2), con su línea en la Mesa.
 
 - ✅ **🏹 Flecha especial, parada con escudo** (2026-10-09): juan dispara el Arco corto a la Bruja con «¿Qué flecha?» → Flecha de fuego (se
   gasta del carcaj, 2 → 1, y cobra su No2); el duelo muestra la flecha y sus efectos. La Bruja elige Parry con el Escudo de la falange (la opción

@@ -571,6 +571,13 @@ prueba('la flecha envenenada perfora 1 y su veneno entra aunque la armadura pare
   const ef = EfectosGolpe.lista(f.flecha.efectosGolpe)[0];
   igual([f.flecha.perfora, ef.nombre, ef.stacks, ef.requiereDano, 'requiereDano' in EfectosGolpe.lista(fuego.flecha.efectosGolpe)[1]], [1, 'Envenenar', 3, false, false]);
 });
+prueba('las flechas eléctricas saltan y paralizan; la de escarcha deja Escarcha 1 turno (2026-10-09)', () => {
+  const f = id => CATALOGO_BASE.find(i => i.id === id).flecha;
+  const rel = f('flecha-relampago'), tor = f('flecha-de-tormenta'), esc = f('flecha-de-escarcha');
+  const specs = fl => EfectosGolpe.lista(fl.efectosGolpe).map(e => e.nombre);
+  igual([specs(rel), rel.salto, rel.no2, specs(tor), tor.salto, tor.no2, esc.efectosGolpe.find(e => e.spec).spec.turnos],
+    [['Parálisis'], {saltos: 1, dano: false, paralisis: [50]}, 1, ['Rayo', 'Parálisis'], {saltos: 3, dano: true, paralisis: [50, 25]}, 3, 1]);
+});
 prueba('con un arco no se parrea; contra un disparo, Parry solo con escudo (2026-10-09)', () => {
   const S = fichaArmada();
   const arco = {id: 'arco1', nombre: 'Arco', tipoItem: 'arma_2m', peso: 1, tipoDado: 4, armaDeRango: true, arco: true, equipado: true};

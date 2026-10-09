@@ -61,3 +61,42 @@ async function flechaErrada(d){
     mesaLinea(`🏹 La ${fl.nombre} de ${quien} erró y quedó entera en el piso, al final de su alcance (ponela a mano)`, 'recordatorio');
   }
 }
+
+/* ⚡ LA FLECHA QUE SALTA (2026-10-09, dueño): la relámpago y la de tormenta. Cuando el disparo pega, salta al más cercano del mismo bando que el
+   golpeado (a 3 casillas o menos, una vez por objetivo: la regla del Rayo en cadena, js/10). `salto = {saltos, dano, paralisis: [%…]}`: con
+   `dano`, el daño eléctrico de la flecha salta a la mitad cada vez (redondeada para abajo; quien recibe 1 es el último) y va directo a la vida;
+   sin `dano`, salta sin daño. Cada salto tira su % de Parálisis (1 turno): `paralisis[0]` el primero que alcanza, `paralisis[1]` el segundo.
+   Lo aplica la pantalla que aplica el daño del duelo (el GM); se ve en todas (momento «rayo») y queda en la Mesa. */
+async function flechaSalto(d, totalMag){
+  const fl = d.ataque.flecha, s = fl.salto || {}, id = d.defensor && d.defensor.tokenId;
+  if(!id || !tokens.get(id)) return;
+  const n = Math.max(1, Math.round(num(s.saltos)) || 1);
+  const conDano = !!s.dano && num(totalMag) > 1;
+  const cadena = (conDano ? rayoCadena(id, num(totalMag)) : rayoCadena(id, Math.pow(2, n + 1)).map(c => ({...c, dano: 0}))).slice(0, 1 + n);
+  if(cadena.length < 2){ mesaLinea(`⚡ La ${fl.nombre} de ${d.atacante.nombre} no tuvo a quién saltar (nadie a 3 casillas o menos)`, 'recordatorio'); return; }
+  const partes = [];
+  for(let i = 1; i < cadena.length; i++){
+    const c = cadena[i], nom = c.t.oculto ? 'Alguien' : nombreDe(c.t);
+    let txt = nom + (c.dano ? ` (${c.dano} de daño eléctrico)` : '');
+    const pct = num((s.paralisis || [])[i - 1]);
+    if(pct > 0){
+      const dd = Combatiente.chanceDado(pct) || {caras: 1, exitos: 1};
+      const sale = 1 + Math.floor(Math.random() * dd.caras), entra = sale > dd.caras - dd.exitos;
+      txt += ` · Parálisis ${pct} % (1d${dd.caras}: ${sale}) → ${entra ? 'paralizado 1 turno' : 'no'}`;
+      if(entra){
+        try{
+          const r = await dueloAplicarEfecto({...d, defensor: {...d.defensor, tokenId: c.id, nombre: nombreDe(c.t), tipo: c.t.tipo, ref: c.t.fichaId}},
+            {nombre: 'Parálisis', caras: 1, exitos: 1, dado: '', detalle: 'Parálisis 1 turno (el salto de la flecha).', spec: {nombre: 'Parálisis', turnos: 1}});
+          if(r && r.manual) txt += ' (aplicala a mano)';
+          else if(r && /no entró/.test(String(r.nota || ''))) txt += ` (${r.nota})`;
+        }catch(err){ console.error('No se pudo paralizar en el salto:', err); txt += ' (aplicala a mano)'; }
+      }
+    }
+    partes.push(txt);
+  }
+  const saltos = cadena.slice(1).map((c, i) => ({desde: cadena[i].id, hacia: c.id}));
+  const resultado = partes.join(' → ');
+  momentoAbrir({tipo: 'rayo', icono: '⚡', titulo: `${fl.nombre}: salta`, estado: 'listo', datos: {saltos}, resultado});
+  mesaLinea(`⚡ La ${fl.nombre} de ${d.atacante.nombre} saltó: ${resultado}`, 'recordatorio');
+  if(conDano) await rayoCadenaAplicar(cadena);
+}

@@ -710,7 +710,7 @@ function dueloElegirObjetivoMapa(msg){
           Object.keys(extra).forEach(k => { if(extra[k]) tiro[k] = num(tiro[k]) + extra[k]; });
           tiro.motivo = tiro.motivo ? `${tiro.motivo} y ${fl.nombre}` : fl.nombre;
         }
-        flecha = {nombre: fl.nombre, efectos: b.efectosGolpe || [], perfora: num(b.perfora)};
+        flecha = {nombre: fl.nombre, efectos: b.efectosGolpe || [], perfora: num(b.perfora), ...(b.salto ? {salto: b.salto} : {})};
         if(msg.alDisparar){ try{ msg.alDisparar(); }catch(err){ console.error('No se pudo gastar la flecha:', err); } }
       }
       Duelo.crear({yo, ataque, espalda, embestida, quieto, primeraSangre, tiro, flecha}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
@@ -1257,6 +1257,8 @@ async function dueloAplicarDano(d){
       : !d.hab && num(dn.drenaPct) > 0 ? await dueloDrenar(d, Math.ceil(perdio * num(dn.drenaPct) / 100)) : null;
     // Rayo en cadena (2026-10-05): el golpe de una habilidad o arma especial de rayo salta (la misma regla de ⚡ Rayo en cadena del token).
     if(d.hab && d.hab.cadena && golpe > 0 && !res.r.invulnerable) await dueloCadena(d, golpe).catch(err => console.error('No se pudo hacer saltar el rayo:', err));
+    // ⚡ La flecha que salta (relámpago, tormenta: js/33): pase o no el daño, salta igual (el golpe entró).
+    if(!d.hab && d.ataque && d.ataque.flecha && d.ataque.flecha.salto && !res.r.invulnerable) await flechaSalto(d, dn.magico ? num(dn.magico.total) : 0).catch(err => console.error('No se pudo hacer saltar la flecha:', err));
     if(d.hab && d.hab.atrae && !res.r.invulnerable) await dueloAtraer(d).catch(err => console.error('No se pudo atraer al objetivo:', err));   // el gancho
     if(d.hab && d.hab.riesgo && (dn.rolls || []).map(num).includes(num(d.hab.riesgo.si))) await dueloRiesgo(d).catch(err => console.error('No se pudo aplicar el riesgo:', err));   // la inestable
     return {...base, desgaste, defensa: crit ? restaIgnorando : def, ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {})};

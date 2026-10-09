@@ -448,7 +448,10 @@ const Duelo = (() => {
     // 🏹 La flecha especial del disparo (2026-10-09): sus efectos al golpear (siempre, sin %) se suman a los del arco al tirar el daño, y su
     // Perfora (ignora N de Defensa) lo aplica el mapa con el daño. Sus bonos de PdG / crítico ya vienen en `tiro`.
     if(cfg.flecha && !hab && cfg.flecha.nombre) inicial.ataque.flecha = {nombre: txtCorto(cfg.flecha.nombre, 60), efectos: limpiarEfectosFlecha(cfg.flecha.efectos),
-      ...(_num(cfg.flecha.perfora) > 0 ? {perfora: Math.min(5, Math.round(_num(cfg.flecha.perfora)))} : {})};
+      ...(_num(cfg.flecha.perfora) > 0 ? {perfora: Math.min(5, Math.round(_num(cfg.flecha.perfora)))} : {}),
+      // ⚡ El salto (relámpago, tormenta): a cuántos más salta, si lleva el daño eléctrico (la mitad cada vez) y el % de Parálisis de cada salto.
+      ...(cfg.flecha.salto ? {salto: {saltos: Math.min(4, Math.max(1, Math.round(_num(cfg.flecha.salto.saltos)) || 1)), dano: !!cfg.flecha.salto.dano,
+        paralisis: (Array.isArray(cfg.flecha.salto.paralisis) ? cfg.flecha.salto.paralisis : []).slice(0, 4).map(v => Math.min(100, Math.max(0, Math.round(_num(v)))))}} : {})};
     if(cfg.espalda && !hab){
       inicial.ataque.porLaEspalda = true;
       const be = limpiarEspalda(cfg.ataque.espalda);

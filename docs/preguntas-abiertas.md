@@ -883,3 +883,8 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   precio ya filtra; a nivel bajo salen más los de calidad baja). Más ítems por pestaña: el tamaño pasa a ser por sección. La Talabartería trae siempre
   una mochila y un cinturón desde pueblito. Drops: humanos 60 %, humanoides 45 %, el resto 15 %; un jefe, uno seguro y chance de otro. Todos los
   consumibles se van a revisar más adelante (los diseñó a ojo); las clasificaciones ya quedan armadas.
+- ❓ **P182. ¿La Moneda Re-Roll cuesta No2? — 2026-10-09, abierta para la mesa** (dueño: «teníamos un hueco legal ahí»). Hoy la moneda se usa en
+  cualquier momento **sin pagar No2**, esté en el **cinturón o en la mochila** (cualquier otro consumible cuesta 1 No2 desde el cinturón y 2 desde la
+  mochila), y después se tira la moneda: par se conserva, impar se rompe. **Por ahora queda así, como excepción al uso de No2** (dueño). Para
+  debatir con el grupo: ¿debería costar como un consumible (1 cinturón / 2 mochila)? ¿Solo desde el cinturón? ¿Una por turno o por combate?
+  También anotada en Herramientas de diseño → Preguntas.

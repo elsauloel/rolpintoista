@@ -586,7 +586,8 @@ window.addEventListener('message', e => {
    Atacar desde la Botonera/Acciones le pide al mapa que elija el objetivo con un CLIC sobre el token (reutiliza elegirDestino: se toca la casilla
    del token). El duelo se crea y su cuadro se abre solo para todos. Cada uno tira desde su iframe: el mapa se lo pide sin mostrarlo. */
 // Cartel flotante (donde salen los avisos) mientras hay que elegir el objetivo: se ve hasta que se elige, se cancela o se toca «Sin objetivo».
-function dueloAvisoObjetivo(nombre, conSuelto, alSuelto, hab){
+// `extra` (2026-10-09, el disparo): una segunda línea con lo que brilla y la distancia ideal (antes quedaba en el cartel escondido de abajo).
+function dueloAvisoObjetivo(nombre, conSuelto, alSuelto, hab, extra){
   let el = $('#duelo-objetivo');
   if(!el){
     el = document.createElement('div');
@@ -595,7 +596,7 @@ function dueloAvisoObjetivo(nombre, conSuelto, alSuelto, hab){
     document.body.appendChild(el);
   }
   el.hidden = false;
-  el.innerHTML = `<span>${hab ? '✨' : '⚔'} <b>${esc(nombre || 'Atacar')}</b>: ${hab ? 'elegí el objetivo de <b>' + esc(hab) + '</b>' : 'elegí a quién atacás'} — <b>clic sobre el token</b> <span style="opacity:.75">(Esc o clic derecho cancelan)</span></span>${conSuelto ? '<button type="button" class="btn" data-duelo-suelto>Sin objetivo · tirada suelta</button>' : ''}`;
+  el.innerHTML = `<span>${hab ? '✨' : '⚔'} <b>${esc(nombre || 'Atacar')}</b>: ${hab ? 'elegí el objetivo de <b>' + esc(hab) + '</b>' : 'elegí a quién atacás'} — <b>clic sobre el token</b> <span style="opacity:.75">(Esc o clic derecho cancelan)</span>${extra ? `<br><span style="opacity:.85;font-size:12px">${extra}</span>` : ''}</span>${conSuelto ? '<button type="button" class="btn" data-duelo-suelto>Sin objetivo · tirada suelta</button>' : ''}`;
   const b = el.querySelector('[data-duelo-suelto]');
   if(b) b.onclick = alSuelto;
 }
@@ -715,7 +716,9 @@ function dueloElegirObjetivoMapa(msg){
       Duelo.crear({yo, ataque, espalda, embestida, quieto, primeraSangre, tiro, flecha}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
     }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + (minimo ? `de ${minimo} a ` : '') + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : conArco ? ` · 🏹 el arco necesita ${Combatiente.ARCO_LIBRES} casilleros libres en el medio` : ''}${mioTiro ? ' · la línea muestra si el tiro pasa' : ''}${nIdeal ? ' · 💠 en celeste, tu distancia ideal (' + esc(Combatiente.idealTxt(ataque.ideal)) + ')' : ''}</span>`, true, cancelado);
-    dueloAvisoObjetivo(yo.nombre, msg.conSuelto, alSuelto, ataque && ataque.hab ? ataque.hab.nombre : '');
+    const extraTiro = mioTiro ? [nEnAlcance ? `✨ brillan los que están a tu alcance (${minimo ? `de ${minimo} a ` : ''}${Math.round(num(ataque.alcance))} casilleros)` : '', 'la línea muestra si el tiro pasa',
+      nIdeal ? `💠 en celeste, tu distancia ideal: ${esc(Combatiente.idealTxt(ataque.ideal).replace(/^Distancia ideal /, ''))}` : ''].filter(Boolean).join(' · ') : '';
+    dueloAvisoObjetivo(yo.nombre, msg.conSuelto, alSuelto, ataque && ataque.hab ? ataque.hab.nombre : '', extraTiro);
   };
   pedir();
 }

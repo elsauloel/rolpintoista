@@ -1461,3 +1461,6 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   rival «acción incierta» si quien la puso está a la vista (un creep conocido, aunque no se vea). El consumo de un creep escondido va a la
   Mesa con su nombre (`anunciarConsumo(a, oculto, quien)`, js/21) para que el filtro decida. Regla nueva: `revelado` en `tokenValido`.
   Limitación: la ficha suelta y GM Tools no filtran (solo el mapa sabe qué ve cada uno).
+- **👆 Estados al pasar el mouse** (2026-10-09, pedido del dueño; `js/30-hover-estados.js`): con el mouse quieto un momento (350 ms) sobre un token que
+  se ve, un cartelito al lado del puntero lista sus estados (nombre en su color, turnos, escudo y stacks, descripción corta). Mismos datos que el
+  resumen público (el escudo de un creep, solo el GM). Se esconde al arrastrar, hacer clic, usar la rueda o salir del mapa.

@@ -54,7 +54,11 @@ def atributos(clase, nivel): return repartir(33 + 3 * (nivel - 1), PESOS[clase])
 CURVA = {1: (4, 10, {4: 2, 6: 1}), 3: (6, 14, {4: 3, 6: 2, 8: 1}), 5: (8, 18, {4: 4, 6: 3, 8: 2, 10: 1, 12: 1})}
 def blancos(nivel, o):
     dmin, dmax, rmax = CURVA[nivel]
-    rmax = {t: (math.floor(r * o.res_t4) if t == 4 else r) for t, r in rmax.items()}
+    mult = dict((int(k), float(v)) for k, v in (x.split('=') for x in o.res.split(',') if x)) if o.res else {}
+    if o.res_t4 != 1.0: mult[4] = o.res_t4
+    rmax = {t: math.floor(r * mult.get(t, 1) + 1e-9) for t, r in rmax.items()}
+    for t, v in mult.items():   # un Tipo que no estaba en la curva y ahora se multiplica (ej. 10 a nivel 3): se agrega si da 1 o más
+        if t not in rmax and v > 1: pass
     return {
         'liviano': dict(eva=atributos('Asalto', nivel)['agl'], defensa=dmin, res={4: math.ceil(rmax.get(4, 0) / 2)}),
         'medio': dict(eva=atributos('Warrior', nivel)['agl'], defensa=round((dmin + dmax) / 2), res={t: max(0, r - 1) for t, r in rmax.items()}),
@@ -69,38 +73,42 @@ def arma(fam, nivel, o):
     return dict(tipo=t, dados=DADOS_NIVEL[nivel] if fam != 'Arco T4' else o.arco_dados, rango=fam.startswith('Arco'))
 
 def golpe(at, a, d, o):
-    p, e = tirar(at['des']), max(1, tirar(d['eva']))
+    p, e = tirar(at['des']) + (o.arco_pdg if a['rango'] else 0), max(1, tirar(d['eva']))
     if p < e or (p == e and random.random() < .5): return 0
     n = a['dados']
-    n = (1 if random.random() < .5 else 2) if n == 1.5 else int(n)
+    n = (math.floor(n) + (1 if random.random() < n - math.floor(n) else 0)) if n != int(n) else int(n)   # 1.5 = mitad 1 y mitad 2; 2.5 = mitad 2 y mitad 3
     fue = at['fue'] * (o.arco_fuerza if a['rango'] else 1)
     if o.sutileza and a['tipo'] == 4: fue = max(fue, at['des'] * o.sutileza)   # las armas livianas suman Destreza (palanca)
-    dano = sum(random.randint(1, a['tipo']) for _ in range(n)) + math.ceil(fue)
-    niveles = (p - e) // max(2, a['tipo'] - o.crit_frec) - d['res'].get(a['tipo'], 0)
+    caras = o.arco_caras if a['rango'] else a['tipo']   # el arco es Tipo 4 para el crítico, pero sus dados pueden ser d6 (palanca)
+    dano = sum(random.randint(1, caras) for _ in range(n)) + math.ceil(fue)
+    frec = o.crit_frec + (o.crit_frec_t4 if a['tipo'] == 4 else 0) + (o.arco_frec if a['rango'] else 0)
+    res = max(0, d['res'].get(a['tipo'], 0) - (o.arco_ignora_res if a['rango'] else 0))
+    niveles = (p - e) // max(2, a['tipo'] - frec) - res
     if niveles > 0:
         r = [random.randint(1, 20) for _ in range(niveles)]
         v = r.count(20); b = max(r)
         return dano * (4 * v if v >= 2 else 4 if b >= 20 else 3 if b >= 17 else 2 if b >= 7 else 1)
-    defensa = d['defensa'] * (1 - (o.perfora if a['tipo'] == 4 else 0))
+    defensa = d['defensa'] * o.def_mult * (1 - (o.perfora if a['tipo'] == 4 else 0)) * (1 - (o.arco_perfora if a['rango'] else 0))
     return max(0, dano - math.ceil(defensa))
 
-def ataques_por_turno(no2, tipo):
+def ataques_por_turno(no2, tipo, o=None):
     n, gasto = 0, 0
     while True:
-        c = math.ceil(tipo / 2) if n == 0 else tipo
+        div1, div2 = (o.costo_div, o.costo_div2) if o else (2, 1)
+        c = math.ceil(tipo / div1) if n == 0 else math.ceil(tipo / div2)
         if gasto + c > no2: return n
         gasto += c; n += 1
 
 def tabla(nivel, blanco, o, N):
     d = blancos(nivel, o)[blanco]
     filas = {}
-    for clase in PESOS:
+    for clase in (o.clases.split(',') if o.clases else PESOS):
         at = atributos(clase, nivel)
         fila = {}
         for fam in FAMILIAS:
             a = arma(fam, nivel, o)
             por = sum(golpe(at, a, d, o) for _ in range(N)) / N
-            k = ataques_por_turno(at['agl'], a['tipo'])
+            k = ataques_por_turno(at['agl'], a['tipo'], o)
             fila[fam] = None if k == 0 else por * k   # None: no le alcanzan los No2 para un ataque con esa arma
         filas[clase] = fila
     return d, filas
@@ -116,8 +124,21 @@ def main():
     ap.add_argument('--crit-frec', type=int, default=0, help='palanca: Crítico frecuente que traen todas las armas')
     ap.add_argument('--sutileza', type=float, default=0.0, help='palanca: las armas Tipo 4 suman Destreza × esto si es más que su Fuerza')
     ap.add_argument('--niveles', default='1,3,5')
+    ap.add_argument('--res', default='', help='palanca: multiplicador de la resistencia por Tipo, ej. "4=0.5,10=1.5"')
+    ap.add_argument('--crit-frec-t4', type=int, default=0, help='palanca: Crítico frecuente que traen las armas Tipo 4 (dagas, arcos)')
+    ap.add_argument('--def-mult', type=float, default=1.0, help='palanca: cuánto de la Defensa se resta sin crítico (0.5 = la mitad)')
+    ap.add_argument('--costo-div', type=float, default=2, help='palanca: el primer ataque cuesta Tipo ÷ esto (hoy 2)')
+    ap.add_argument('--costo-div2', type=float, default=1, help='palanca: los siguientes cuestan Tipo ÷ esto (hoy 1)')
+    ap.add_argument('--arco-ignora-res', type=int, default=0, help='palanca del arco: la flecha ignora esto de Resistencia a crítico Tipo 4')
+    ap.add_argument('--arco-caras', type=int, default=4, help='palanca del arco: caras de sus dados (4 o 6; el crítico sigue siendo Tipo 4)')
+    ap.add_argument('--arco-pdg', type=int, default=0, help='palanca del arco: PdG +N del arco (mod que ya existe)')
+    ap.add_argument('--arco-frec', type=int, default=0, help='palanca del arco: Crítico frecuente que traen los arcos')
+    ap.add_argument('--arco-perfora', type=float, default=0.0, help='palanca del arco: la flecha ignora esta fracción de la Defensa')
+    ap.add_argument('--clases', default='', help='solo estas clases, separadas por coma')
+    ap.add_argument('--metas', action='store_true', help='en vez de las tablas, el resumen de las metas del paso 2')
     ap.add_argument('--blancos', default='liviano,medio,pesado')
     o = ap.parse_args()
+    if o.metas: return metas(o)
     for nivel in map(int, o.niveles.split(',')):
         for blanco in o.blancos.split(','):
             d, filas = tabla(nivel, blanco, o, o.n)
@@ -129,6 +150,31 @@ def main():
             for clase, fila in filas.items():
                 mejor = max(vals(fila))
                 print(f"| {clase} | " + ' | '.join('—' if v is None else f"{v:.1f}" for v in fila.values()) + f" | {100 * mejor / mejor_w:.0f} % |")
+
+COMBATE = ['Warrior', 'Tanque', 'Asalto', 'Shooter']
+def metas(o):
+    """M1: las 4 clases de combate contra el blanco medio, entre 60 % y 140 % del Warrior. M2: contra el pesado, al menos 30 %.
+    M4: el arco del Shooter, al menos 60 % de su mejor cuerpo a cuerpo (contra el medio). M5: combinaciones sin No2 para atacar.
+    M3: cuántas familias son la mejor de alguna clase de combate contra algún blanco (de 5)."""
+    o.clases = ','.join(COMBATE)
+    print('| Nivel | M1 (medio 60–140 % del Warrior: Tanque · Asalto · Shooter) | M2 (pesado ≥30 %) | M4 arco/cuerpo a cuerpo (Shooter, medio) | M5 sin No2 | M3 familias que ganan |')
+    print('|---|---|---|---|---|---|')
+    for nivel in map(int, o.niveles.split(',')):
+        res = {b: tabla(nivel, b, o, o.n)[1] for b in ('liviano', 'medio', 'pesado')}
+        mejor = lambda f, sin=None: max([v for k, v in f.items() if v is not None and k != sin] or [0])
+        w = {b: mejor(res[b]['Warrior']) or 1 for b in res}
+        m1 = [c for c in COMBATE if 0.6 <= mejor(res['medio'][c]) / w['medio'] <= 1.4]
+        m2 = [c for c in COMBATE if mejor(res['pesado'][c]) / w['pesado'] >= 0.3]
+        sh = res['medio']['Shooter']
+        m4 = (sh['Arco T4'] or 0) / (mejor(sh, 'Arco T4') or 1)
+        m5 = sum(1 for b in res for c in COMBATE for v in res[b][c].values() if v is None) // 3
+        ganan = set()
+        for b in res:
+            for c in COMBATE:
+                f = {k: v for k, v in res[b][c].items() if v is not None}
+                if f: ganan.add(max(f, key=f.get))
+        ratios = ' · '.join(c[:3] + ' ' + format(mejor(res['medio'][c]) / w['medio'], '.0%') for c in COMBATE[1:])
+        print(f"| {nivel} | {len(m1)}/4 ({ratios}) | {len(m2)}/4 | {m4:.0%} | {m5} | {len(ganan)}/5 ({', '.join(sorted(ganan))}) |")
 
 if __name__ == '__main__':
     main()

@@ -33,6 +33,48 @@ Los magos, supports y debuffers pegan con hechizos: acá solo se ve su golpe fí
 - **M4.** El arco rinde al menos el 60–75 % del mejor cuerpo a cuerpo de la misma clase (el rango ya es una ventaja).
 - **M5.** Toda clase puede hacer al menos un ataque por turno con cualquier arma de su nivel (o se decide a propósito que las armas pesadas piden Agilidad).
 
+**Decidido (dueño, 2026-10-09):** M5 **es a propósito** — «si querés usar un arma Tipo 10, sí o sí te tenés que poner mínimo Agilidad 5; si no,
+vas a tener que usar armas de otro tipo». El reparto de atributos condiciona el equipo, y eso es parte del juego: no se toca el costo de atacar.
+El dueño delega el afinado en el criterio de Claude («voy a empezar a confiar en tu criterio para ver cómo afinamos»). Con eso, el **Tanque
+entre 35 % y 50 % del Warrior** se lee como su rol (aguantar, no pegar), no como una falla.
+
+## Paso 3 — Las palancas, de a una (2026-10-09)
+
+`py balance_combate.py --metas` (resumen de las metas; la columna M1 muestra Tanque · Asalto · Shooter contra el Warrior, blanco medio).
+
+| Palanca | Qué pasa | Veredicto |
+|---|---|---|
+| Base | Tan 34–51 % · Asa 79–146 % · Sho 74–95 %; el arco rinde 84 % a nivel 1 y **0 %** a nivel 3 y 5 | El único problema real es el arco |
+| Bajar la resistencia a Tipo 4 a la mitad (`--res 4=0.5`) | Asalto y Shooter pasan a **2 a 4,5 veces** el Warrior | **Descartada.** La abundancia de resistencia baja es justo lo que frena a las clases rápidas (la sospecha del dueño no se confirmó) |
+| El primer ataque cuesta Tipo ÷ 3 (`--costo-div 3`) | Arregla M5 | **Descartada:** M5 es a propósito |
+| Las armas Tipo 4 ignoran media Defensa (`--perfora 0.5`) | Asalto sube a 173–219 %; el arco, 15 % a nivel 5 | Descartada |
+| Crítico frecuente en todo el Tipo 4 (`--crit-frec-t4 2`) | Asalto y Shooter a 270–300 % | Descartada |
+| Las armas Tipo 4 suman Destreza (`--sutileza 1`) | Shooter a 250–390 % | Descartada |
+| La Defensa resta la mitad (`--def-mult 0.5`) | Asalto a 185 %; el arco, 9 % a nivel 5 | Descartada |
+| **Palancas solo del arco** | Lo que toque al arco no desarma lo demás | **Por acá** |
+
+**Por qué el arco se cae desde nivel 3:** la Defensa y la resistencia a Tipo 4 crecen con el nivel y el arco no (1–2 d4 en toda calidad). Una regla
+general (ignorar resistencia, perforar Defensa, Crítico frecuente) se pasa de largo a nivel 1 y se queda corta a nivel 5: los saltos del crítico son
+grandes. **Lo que crece con la calidad tiene que ser el arco mismo.** El dueño habilitó más dados y d6 (no d8, por ahora; 2026-10-09).
+
+**La escalera del arco (decidida por Claude, con el aval del dueño para afinar):** el arco **sigue siendo Tipo 4 para el crítico** (y para la
+resistencia), pero sus dados pueden ser d4 o d6. Rinde, contra un blanco medio, lo que se indica respecto del mejor cuerpo a cuerpo de la misma
+clase (Shooter); cada calidad tiene un arco «flojo» y uno «bueno» para diseñar en el medio:
+
+| Calidad | Arco flojo | Arco bueno |
+|---|---|---|
+| Común | 1d4 → 53 % | 2d4 → 110 % |
+| Buena | 2d6 + PdG +1 → 52 % | 2d6 + PdG +2 → 102 % |
+| Rara | 3d6 + PdG +3 → 68 % | 3d6 + Crítico frecuente +1 → 90 % |
+
+Más la mitad de la Fuerza (redondeada para arriba), como estaba decidido. Excepcional y Legendario quedan fuera de lo que mide la herramienta (nivel
+5 como techo): se diseñan siguiendo la misma línea (d6, más PdG / Crítico frecuente). Contra un blanco pesado el arco sigue rindiendo poco: es
+Tipo 4, su blanco es lo liviano y lo medio (M3). Alternativa medida y no elegida: solo Crítico frecuente + PdG con 1–2 d4 (Buena Crít. frec. +1 →
+83 %; Rara Crít. frec. +1 y PdG +2 → 69 %): funciona, pero los saltos del crítico la hacen más frágil de diseñar.
+
+**Paso 4 (sigue):** programar el arco — el Tipo del crítico separado del dado (`tipoCrit` 4 con dados d6), la mitad de la Fuerza, la distancia
+mínima (2 casilleros libres), sin pegar con el arco ni ataque de oportunidad — y pasar los arcos del catálogo a la escalera; después, probar en el mapa.
+
 ## Tabla base completa (paso 1)
 
 ## Nivel 1 · contra un blanco liviano (Defensa 4, Evasión 10, Res {4: 1})

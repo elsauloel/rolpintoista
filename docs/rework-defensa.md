@@ -1770,3 +1770,8 @@ devuelto (30 → 29), en el duelo y en la Mesa. Los consumibles de Espinas ahora
   desde Raro). **Cargadas 7 piezas nuevas:** Olla Essen heredada de la abuela y Yelmo de herrero con nasal (cascos Comunes, solo Tipo 10, muy
   pesados), Morrión de hierro y Casco de fundición (cascos Buena, Tipo 10), Rodela de roble herrada y Tapa de aljibe (escudos Buena, Tipo 10),
   Coraza de hierro batido (torso rígido Buena, Tipo 8). Esperan: Canilleras de hierro forjado (piernas, Tipo 8) y el cambio del Disco de arado.
+- **Tipo 8 por calidad (decidido, dueño 2026-10-09):** Común → solo escudo · Buena → escudo y torso rígido · Raro en adelante → también piernas.
+  Aplicado: Peto de hierro viejo cambia el Tipo 8 por Tipo 6 +1 y Defensa +1 (Común, mismo precio); Disco de arado: Tipo 8 +1 · Bloqueo +1 ·
+  Iniciativa −1 ($80, para diferenciarlo del Escudo de chapa remachada); las tres grebas de Buena cambian su Tipo 8 por Tipo 6 (Grebas de acero
+  templado Def +2 · T6 +1; Grebas de placas Def +3 · T6 +1 · Evasión +1, con su paso doble; Quijotes de hierro Def +1 · T6 +1 · Res.CC +1). Las
+  Canilleras de hierro forjado (piernas Buena, Tipo 8) no se cargan.

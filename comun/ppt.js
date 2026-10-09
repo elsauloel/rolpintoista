@@ -90,7 +90,7 @@ const PPT = (() => {
       return;
     }
     if(fin && fin.error) aviso(fin.error);
-    if(fin && fin.gano) anunciar(fin.d, fin.gano, fin.ultima, '');
+    if(fin && fin.gano) setTimeout(() => anunciar(fin.d, fin.gano, fin.ultima, ''), 3800);   // después de que se revelan las manos: si no, la Mesa adelanta el resultado
     dibujar();
   }
 
@@ -198,7 +198,12 @@ const PPT = (() => {
       });
       primera = false;
       dibujar();
-    }, err => console.error('Error escuchando piedra, papel o tijera:', err));
+    }, err => {
+      // Si falla (p. ej. la página se abrió antes de pegar las reglas), vuelve a intentar en un rato: si no, quedaba muerto hasta recargar.
+      console.error('Error escuchando piedra, papel o tijera (se reintenta en 30 s):', err);
+      escucha = null; primera = true;
+      setTimeout(iniciar, 30000);
+    });
     if(typeof fbMiembro !== 'undefined' && fbMiembro && fbMiembro.gm) barrerViejos();
   }
   // El GM borra los de más de un día al entrar.

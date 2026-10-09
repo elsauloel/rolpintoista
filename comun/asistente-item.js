@@ -400,7 +400,9 @@ const AsistenteItem = (() => {
         h += campo('Rango del disparo (+ Rango)', `<input data-aa-mod1="rng" type="number" step="1" value="${modVal(d, 'rng')}" style="max-width:120px">`,
           `Hasta dónde llega el disparo, además de lo que ya da la Destreza.${p && p.rango !== undefined ? ` Hoy el Rango ${e(q.de)} es ${f(n(p.rango))}.` : ''}`);
         // Tiro alto y distancia ideal (2026-10-09, dueño): mecánicas de diseño de las armas de rango (las usa el mapa al apuntar).
-        h += `<div class="aa-campo"><label>Tiro alto</label><label style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-aa-firma="tiroAlto" ${d.tiroAlto ? 'checked' : ''} style="width:auto"> Puede tirar por encima de los tokens del medio (no de los Sólidos): el objetivo a 4 o más y PdG −2</label></div>`;
+        h += d.arco   // el tiro alto: todos los arcos lo tienen; quitárselo es una debilidad que lo abarata (2026-10-09)
+          ? `<div class="aa-campo"><label>Tiro alto</label><label style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-aa-firma="sinTiroAlto" ${d.sinTiroAlto ? 'checked' : ''} style="width:auto"> Sin tiro alto (debilidad: este arco no puede tirar por encima de los tokens; lo abarata)</label><div class="aa-nota" style="margin:2px 0 0">Todos los arcos pueden tirar por encima de los tokens del medio (no de los Sólidos), con el objetivo a 4 o más y PdG −2.</div></div>`
+          : `<div class="aa-campo"><label>Tiro alto</label><label style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-aa-firma="tiroAlto" ${d.tiroAlto ? 'checked' : ''} style="width:auto"> Puede tirar por encima de los tokens del medio (no de los Sólidos): el objetivo a 4 o más y PdG −2</label></div>`;
         const id = d.ideal || {}, opD = (v, t) => `<option value="${v}"${(id.donde || '') === v ? ' selected' : ''}>${t}</option>`;
         const nIdeal = (k, txt, extra = '') => campo(txt, `<input data-aa-ideal="${k}" type="number" step="1" value="${n(id[k]) || 0}" style="max-width:90px" ${extra}>`);
         h += `<div class="aa-campo"><label>Distancia ideal (opcional)</label><select data-aa-ideal="donde">${opD('', 'No tiene')}${opD('cerca', 'Cerca (justo después de la distancia mínima)')}${opD('medio', 'A media distancia (la mitad de su alcance)')}${opD('lejos', 'Lejos (las últimas casillas de su alcance)')}${opD('franja', 'Una franja fija (de… a…)')}</select>
@@ -637,7 +639,7 @@ const AsistenteItem = (() => {
         ${g === 'arma' && !esEspecial(d) ? fila('Tipo', e(`Tipo ${tipo} · ${TIPOS[tipo].nombre}`)) + fila('Distancia', d.armaDeRango ? (d.arco ? 'arco (suma la mitad del Dmg)' : 'a distancia (no suma Dmg)') : 'cuerpo a cuerpo')
           + fila('Daño', e(danoTxt(d))) + fila('Atacar', `${primer(tipo)} No2 el primero, ${tipo} los siguientes`)
           + (modVal(d, 'rng') ? fila(d.armaDeRango ? 'Rango' : 'Alcance', `+${f(modVal(d, 'rng'))}`) : '')
-          + (d.armaDeRango && d.tiroAlto ? fila('Tiro alto', 'por encima de los tokens (objetivo a 4+, PdG −2)') : '')
+          + (d.armaDeRango && typeof Combatiente !== 'undefined' && Combatiente.tieneTiroAlto(d) ? fila('Tiro alto', 'por encima de los tokens (objetivo a 4+, PdG −2)') : d.arco && d.sinTiroAlto ? fila('Tiro alto', 'no (debilidad)') : '')
           + (d.armaDeRango && d.ideal && d.ideal.donde && typeof Combatiente !== 'undefined' ? fila('Distancia ideal', e(Combatiente.idealTxt(d.ideal))) : '')
           + (n(d.ignoraResistCrit) > 0 ? fila('Ignora', `${f(n(d.ignoraResistCrit))} de Resistencia a crítico`) : '')
           + ([d.sinParry ? 'no se puede parrear' : '', d.oporGratis ? 'oportunidad sin No2' : '', n(d.ahorroNitros) ? `primer ataque −${f(n(d.ahorroNitros))} No2` : '', n(d.critD20) ? `+${f(n(d.critD20))} d20 en el crítico` : ''].filter(Boolean).length
@@ -881,7 +883,7 @@ const AsistenteItem = (() => {
       const am = es.aMano || {}, amT = String(am.texto || '').trim(), amR = String(am.tirada || '').replace(/\s+/g, ''), amE = String(am.etiqueta || '').trim();
       if(amT || amR) es.aMano = {...(amT ? {texto: amT} : {}), ...(amR ? {tirada: amR} : {}), ...(amE ? {etiqueta: amE} : {})}; else delete es.aMano;
       d.peso = Math.max(1, n(d.peso) || 1);
-      ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', ...(typeof Combatiente !== 'undefined' ? Combatiente.RASGOS_ARMA : ['ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto'])].forEach(k => delete d[k]);
+      ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', ...(typeof Combatiente !== 'undefined' ? Combatiente.RASGOS_ARMA : ['ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto'])].forEach(k => delete d[k]);
       if(!(d.efectosGolpe || []).length) delete d.efectosGolpe;
       d.mods = d.mods.filter(m => m.stat !== 'rng');
     }else if(grupoDe(d.tipoItem) === 'arma'){
@@ -895,7 +897,8 @@ const AsistenteItem = (() => {
       ['ahorroNitros', 'critD20'].forEach(k => { if(n(d[k]) > 0) d[k] = Math.round(n(d[k])); else delete d[k]; });
       ['sinParry', 'oporGratis'].forEach(k => { if(d[k]) d[k] = true; else delete d[k]; });
       if(d.armaDeRango && d.arco){ d.arco = true; d.tipoItem = 'arma_2m'; } else delete d.arco;   // un arco: siempre a dos manos
-      if(d.armaDeRango && d.tiroAlto) d.tiroAlto = true; else delete d.tiroAlto;
+      if(d.armaDeRango && !d.arco && d.tiroAlto) d.tiroAlto = true; else delete d.tiroAlto;   // en un arco viene solo
+      if(d.armaDeRango && d.arco && d.sinTiroAlto) d.sinTiroAlto = true; else delete d.sinTiroAlto;
       if(d.armaDeRango && d.ideal && d.ideal.donde){   // la distancia ideal: solo lo que tiene valor
         const id = {donde: d.ideal.donde};
         (d.ideal.donde === 'franja' ? ['desde', 'hasta'] : ['ancho']).concat(['pdg', 'crit', 'critpot', 'fijo', 'ignora']).forEach(k => { const v = Math.round(n(d.ideal[k])); if(v) id[k] = v; });
@@ -910,7 +913,7 @@ const AsistenteItem = (() => {
         if(d.orbeSalvaje) d.orbeSalvaje = d.orbeSalvaje === 'domado' ? 'domado' : true; else delete d.orbeSalvaje;
       }
       else { delete d.orbe; delete d.orbeResguardo; delete d.orbeSalvaje; delete d.orbeCustodio; delete d.orbeAbsorcion; }
-      delete d.efectosGolpe; delete d.tipoDado; delete d.danoFijo; delete d.danoAmplificado; delete d.armaDeRango; delete d.espalda; delete d.ignoraResistCrit; delete d.sinParry; delete d.oporGratis; delete d.ahorroNitros; delete d.critD20; delete d.arco; delete d.ideal; delete d.tiroAlto;
+      delete d.efectosGolpe; delete d.tipoDado; delete d.danoFijo; delete d.danoAmplificado; delete d.armaDeRango; delete d.espalda; delete d.ignoraResistCrit; delete d.sinParry; delete d.oporGratis; delete d.ahorroNitros; delete d.critD20; delete d.arco; delete d.ideal; delete d.tiroAlto; delete d.sinTiroAlto;
     }
     // Durabilidad: solo se guarda si no es la de siempre (3 por Peso) y el ítem la tiene.
     // Una pieza vieja con durPorPeso: se pasa a Resistente / Frágil conservando su durabilidad.
@@ -937,7 +940,7 @@ const AsistenteItem = (() => {
      con `{...base, ...d}` a una varita le quedaba el Tipo 8 de fábrica (y con él, daño físico y Parry), y a un arma que dejó de ser especial, su
      hechizo. Todas las pantallas guardan con esto. */
   const CONTROLADOS = ['especial', 'orbe', 'orbeResguardo', 'orbeSalvaje', 'orbeCustodio', 'orbeAbsorcion', 'tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', 'efectosGolpe',
-    'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'durExtra', 'durPorPeso'];
+    'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'durExtra', 'durPorPeso'];
   function fusionar(base, d){
     const o = {...(base || {}), ...(d || {})};
     CONTROLADOS.forEach(k => { if(!(k in (d || {}))) delete o[k]; });

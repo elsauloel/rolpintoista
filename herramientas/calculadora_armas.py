@@ -168,7 +168,11 @@ def puntaje(arma):
                  + min(float(id_.get('critpot') or 0), 6) * PESO_CRIT * PESO_CRITPOT + float(id_.get('fijo') or 0) * factor_plano(tipo)
                  + float(id_.get('ignora') or 0) * PESO_CRIT * FACTOR_CRIT.get(tipo, 1.0))
             d['distancia ideal'] = v * fac
-        if arma.get('tiroAlto'):
+        # El tiro alto: todos los arcos lo traen de base (ya está en el daño de la escalera); un arco SIN tiro alto se abarata. Otra arma de rango
+        # que lo traiga, lo paga.
+        if arma.get('arco') and arma.get('sinTiroAlto'):
+            d['sin tiro alto'] = -TIRO_ALTO_PC
+        elif not arma.get('arco') and arma.get('tiroAlto'):
             d['tiro alto'] = TIRO_ALTO_PC
     firma = (2.0 if arma.get('sinParry') else 0) + (2.0 if arma.get('oporGratis') else 0) + 3.0 * float(arma.get('ahorroNitros') or 0) + 3.0 * float(arma.get('critD20') or 0)
     if firma: d['firma'] = firma   # mecánicas de firma (2026-10-03): sin Parry 2 · oportunidad sin No2 2 · −1 No2 en el primero 3 · +1 d20 en el crítico 3
@@ -200,7 +204,7 @@ def extras(arma):
     n += 1 if arma.get('espalda') else 0
     n += 1 if float(arma.get('durPorPeso') or 0) > 3 or round(float(arma.get('durExtra') or 0)) else 0
     n += sum(1 for k in ('sinParry', 'oporGratis', 'ahorroNitros', 'critD20') if arma.get(k))
-    n += 1 if arma.get('armaDeRango') and arma.get('tiroAlto') else 0
+    n += 1 if arma.get('armaDeRango') and not arma.get('arco') and arma.get('tiroAlto') else 0
     n += 1 if arma.get('armaDeRango') and (arma.get('ideal') or {}).get('donde') else 0
     return n
 

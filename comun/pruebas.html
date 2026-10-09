@@ -542,6 +542,13 @@ prueba('la distancia ideal de un arma de rango: dónde está y qué da (2026-10-
      {motivo: 'distancia ideal', pdg: 1}, null, {motivo: 'distancia ideal', crit: 1}, {motivo: 'distancia ideal', critpot: 2}, {motivo: 'distancia ideal', fijo: 2},
      true, true, 'Distancia ideal lejos (franja de 2): Crítico frecuente +1']);
 });
+prueba('el tiro alto: todos los arcos lo tienen salvo «sin tiro alto»; otra arma de rango, solo si lo trae (2026-10-09)', () => {
+  igual([Combatiente.tieneTiroAlto({armaDeRango: true, arco: true}), Combatiente.tieneTiroAlto({armaDeRango: true, arco: true, sinTiroAlto: true}),
+    Combatiente.tieneTiroAlto({armaDeRango: true}), Combatiente.tieneTiroAlto({armaDeRango: true, tiroAlto: true}), Combatiente.tieneTiroAlto({arco: true}),
+    Combatiente.tieneTiroAlto(Combatiente.armaDeCombatiente({armaDeRango: true, armaRasgos: {arco: true}})), Combatiente.tieneTiroAlto(Combatiente.armaDeCombatiente({armaDeRango: true, armaRasgos: {arco: true, sinTiroAlto: true}})),
+    Combatiente.ataqueDeArma({armaDeRango: true, arco: true}).tiroAlto, Combatiente.ataqueDeArma({armaDeRango: true, arco: true, sinTiroAlto: true}).tiroAlto],
+    [true, false, false, true, false, true, false, true, undefined]);
+});
 prueba('con un arco no se parrea; contra un disparo, Parry solo con escudo (2026-10-09)', () => {
   const S = fichaArmada();
   const arco = {id: 'arco1', nombre: 'Arco', tipoItem: 'arma_2m', peso: 1, tipoDado: 4, armaDeRango: true, arco: true, equipado: true};

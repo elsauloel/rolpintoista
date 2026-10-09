@@ -148,7 +148,8 @@ const ItemCorto = (() => {
     (it.efectosGolpe || []).forEach(e => { if(e && e.nombre && !/^ignora\s+\d+\s+de\s+res/i.test(String(e.nombre).trim())) p.push(efectoCorto(e)); });
     if(it.sinParry) p.push('No se puede parrear');
     if(it.oporGratis) p.push('Oportunidad sin No2');
-    if(it.armaDeRango && it.tiroAlto) p.push('Tiro alto');
+    if(it.armaDeRango && Combatiente.esArco(it) && it.sinTiroAlto) p.push('Sin tiro alto');
+    else if(it.armaDeRango && !Combatiente.esArco(it) && it.tiroAlto) p.push('Tiro alto');
     if(it.armaDeRango && it.ideal && it.ideal.donde) p.push(Combatiente.idealTxt(it.ideal));
     if(num(it.ahorroNitros)) p.push(`Primer ataque −${num(it.ahorroNitros)} No2`);
     if(num(it.critD20)) p.push(`+${num(it.critD20)} d20 en el crítico`);
@@ -203,7 +204,8 @@ const ItemCorto = (() => {
     if(num(it.danoFijo)) L.push('Daño fijo: se suma al resultado de los dados en cada golpe.');
     if(it.tipoItem === 'arma_2m') L.push('A dos manos: ocupa las dos manos.');
     if(it.armaDeRango) L.push('Línea de tiro: la tapan los obstáculos Sólidos y cualquier token que esté en el medio, aliado o rival. Si el disparo está tapado o la línea roza una casilla ocupada, el mapa avisa y lo decide la mesa. ⚙ Automatizado (al apuntar se ve la línea).');
-    if(it.armaDeRango && it.tiroAlto) L.push(`Tiro alto: puede disparar por encima de los tokens que tapan la línea (no de los Sólidos), con el objetivo a ${Combatiente.TIRO_ALTO_MIN} casilleros o más y PdG ${Combatiente.TIRO_ALTO_PDG} en ese disparo. ⚙ Automatizado: el mapa lo ofrece cuando la línea está tapada por tokens.`);
+    if(Combatiente.esArco(it) && it.sinTiroAlto) L.push('Sin tiro alto: a diferencia del resto de los arcos, este no puede tirar por encima de los tokens que tapan la línea.');
+    if(Combatiente.tieneTiroAlto(it)) L.push(`Tiro alto: puede disparar por encima de los tokens que tapan la línea (no de los Sólidos), con el objetivo a ${Combatiente.TIRO_ALTO_MIN} casilleros o más y PdG ${Combatiente.TIRO_ALTO_PDG} en ese disparo. ⚙ Automatizado: el mapa lo ofrece cuando la línea está tapada por tokens.`);
     if(it.armaDeRango && it.ideal && it.ideal.donde) L.push(`${Combatiente.idealTxt(it.ideal)}. Si el objetivo está en esa franja, el disparo suma eso; «a media distancia» y «lejos» se miden con tu alcance. Ubicarte cuesta No2. ⚙ Automatizado: al apuntar, los objetivos en tu distancia ideal brillan en celeste y el duelo suma el bono.`);
     if(it.armaDeRango) L.push(Combatiente.esArco(it)
       ? 'Arco: suma la mitad de tu Dmg (Fuerza), redondeada para arriba. Dispara con al menos 2 casilleros libres entre vos y el objetivo (en el mapa brillan los que están a tiro; si elegís uno más cerca, avisa y lo decide la mesa), y con el arco no se pega cuerpo a cuerpo ni se hacen ataques de oportunidad: si te encaran, alejate o cambiá de arma. ⚙ Automatizado.'

@@ -1436,4 +1436,5 @@ versión parecida en más de una, es candidato a juntar.
   `idealTxt`); los dos están en `RASGOS_ARMA` y `ataqueDeArma` los lleva. El duelo acepta `cfg.tiro = {pdg, crit, critpot, fijo, ignora, motivo}`
   (`ataque.tiro`): lo suma al PdG al guardarlo (puede ser negativo), al crítico, a la resistencia ignorada y al daño, y lo muestra («🏹 distancia
   ideal: …»). El asistente de ítems los pregunta en un arma a distancia; `ItemCorto` los muestra y explica; `calculadora_armas.py` les pone precio.
-  La comba quedó como idea abierta (P185).
+  **El tiro alto es de todos los arcos** (`Combatiente.tieneTiroAlto(arma)`): un arco sin él lleva `sinTiroAlto` (debilidad, lo abarata); otra
+  arma de rango, solo con `tiroAlto`. La comba quedó para después (P185: falta definir cuán curva es).

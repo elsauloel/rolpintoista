@@ -9,7 +9,7 @@ todas por igual, y cualquier otra nota de workflow que no encaje en el
 
 ## Estado actual
 
-[`preguntas-abiertas.md`](preguntas-abiertas.md) junta todas las preguntas
+[`pruebas-en-el-mapa.md`](pruebas-en-el-mapa.md) es la lista viva de **pruebas pendientes en el mapa** (protocolo del dueño, 2026-10-09: si no se puede probar en el mapa, no se prueba por detrás: se anota ahí). [`preguntas-abiertas.md`](preguntas-abiertas.md) junta todas las preguntas
 de diseño sin decidir (regla general: toda pregunta abierta se anota ahí).
 [`rework-armas.md`](rework-armas.md) es la hoja de trabajo del rework de armas (preguntas en orden con propuestas y respuestas). [`rework-armas-revision.md`](rework-armas-revision.md) es la hoja para marcar qué armas del catálogo actual se conservan, reajustan o descartan (P11). [`rework-tiendas.md`](rework-tiendas.md) es la hoja de trabajo del rework del generador de tiendas (y del archivado del catálogo viejo, 2026-10-06). [`hoja-de-ruta-rework-catalogo.md`](hoja-de-ruta-rework-catalogo.md) es la hoja de ruta del rework del catálogo (fases, lo decidido y lo pendiente). [`talismanes.md`](talismanes.md) junta las ideas para los talismanes (lo que va en la otra mano; en espera hasta que el dueño diga «sigamos con los talismanes»). [`guia-de-diseno.md`](guia-de-diseno.md) es la guía de campos de juego y mecánicas por familia de arma / elemento (borrador vivo, para diseñar skills y equipos). [`herramientas-de-diseno.md`](herramientas-de-diseno.md) lista los tipos de efecto y conceptos a tener a mano para el rework de skills y equipos (niebla y visibilidad, efectos sobre la iniciativa, "equipo" incluye armas).
 [`plan-sistema-nuevo.md`](plan-sistema-nuevo.md) tiene las decisiones y el estado del

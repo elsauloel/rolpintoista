@@ -39,6 +39,8 @@
 > en el catálogo y las tiendas (solo lo que hacen en la grilla; «Detalles técnicos» en Ver). Reportes: [`docs/reporte-estructural-2026-10-02.md`](docs/reporte-estructural-2026-10-02.md),
 > [`docs/reporte-a6-2026-10-02.md`](docs/reporte-a6-2026-10-02.md), [`docs/reporte-b7-b8-2026-10-02.md`](docs/reporte-b7-b8-2026-10-02.md).
 >
+> **Pruebas pendientes en el mapa → [`docs/pruebas-en-el-mapa.md`](docs/pruebas-en-el-mapa.md)** (protocolo del dueño, 2026-10-09): lo que hay que ver en el mapa, si no se puede (Chrome desconectado, falta una cuenta), no se prueba «por detrás»: se anota ahí y se prueba apenas se pueda, con capturas.
+>
 > **Tareas pendientes → [`docs/pendientes.md`](docs/pendientes.md)** (lista viva para ir tachando; las decisiones de diseño
 > siguen en `preguntas-abiertas.md`). Al terminar o descubrir una tarea, actualizarla ahí.
 >

@@ -125,3 +125,12 @@ comba, la skill del Shooter)?
 
 **Decidido (dueño):** con un enemigo encima, el arquero **se aleja** (y se come el ataque de oportunidad) **o cambia de arma** (en combate cuesta
 No2). **No se puede pegar con el arco.** La distancia mínima de ballestas y pólvora se evalúa cuando les toque; ahora, solo arcos.
+
+## 2026-10-09 · Decidido para arrancar (dueño)
+
+- **Daño del arco: los dados del arco + la mitad de tu Fuerza, redondeada para arriba.** Se descartó el tope (Tensión): encasillaba a los arcos y daba
+  casi igual quién los agarrara. Con la mitad, importa quién lo usa y el arco pega siempre menos que el arma cuerpo a cuerpo de esa misma persona.
+- **Costo en No2: como cualquier arma** (Tipo 4: 2 el primer ataque del turno, 4 los siguientes), para arrancar.
+- **Evasión −X contra flechas**: esquivar una flecha es más difícil. El arco pega menos de base pero juega más al crítico. **Cuánto, es la duda.**
+- Orden de trabajo: primero la mecánica; los efectos permitidos van al final (sirven para balancear los puntos al diseñar cada arco).
+- El texto para compartir con el grupo está en la conversación del 2026-10-09 (resumen de esta hoja).

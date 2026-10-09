@@ -28,6 +28,7 @@
   no (fuera de Rango o tapados por un obstáculo aunque se vean por la visión de un aliado) y los obstáculos que los tapan. Ver docs/rework-armas-rango.md.
 - [ ] **🏹 El arco suma la mitad del Dmg** (2026-10-09; anda en las pruebas automáticas, todavía ningún arco del catálogo lo trae): con un arco  marcado «🏹 Arco» (asistente de ítems), el botón Daño de la Botonera dice «1d4 + mitad del Dmg» y el duelo tira eso; su 🔍 muestra la mitad. Lo  mismo con un creep y una invocación que lleven ese arco.
 - [ ] **🏹 Distancia mínima del arco y sin oportunidad** (2026-10-09, P183): al atacar con un arco brillan solo los objetivos a 3 casilleros o más; elegir uno a 1 o 2 pregunta «Muy cerca para el arco · Disparar igual / Elegir otro» y, si sigue, deja una línea roja en la Mesa. Un rival que solo tiene un arco no frena a quien se le aleja y la Mesa dice «tiene un arco, que no sirve de oportunidad»; con arco y otra arma, la oportunidad no ofrece el arco.
+- [ ] **🏹 Parry y disparos** (2026-10-09): atacado con un arco (o cualquier arma de rango), «Elegí cómo te defendés» ofrece Parry solo con escudo y dice «🏹 Es un disparo: solo se para con un escudo»; quien tiene un arco en las manos no ofrece Parry con él (personaje, creep, invocación).
 
 ## Probado
 

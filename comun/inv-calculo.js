@@ -90,9 +90,11 @@ const InvCalculo = (() => {
   function pesoArma(inv){ return Math.max(1, num(inv.armaPeso) || 1); }
   // Con qué para la invocación (Parry y Bloqueo): su arma si no es natural, si no un escudo de su equipo; null = no puede
   // (regla del dueño 2026-09-30, comun/combatiente.js — la misma que personajes y creeps). El Bloqueo suma el peso de eso.
-  function defensa(inv){
+  // o.soloEscudo: contra un disparo, solo un escudo (2026-10-09). Con un arco no se parrea.
+  function defensa(inv, o){
     if(!inv) return null;
     return Combatiente.armaParaDefensa({arma: inv.armaNombre ? {nombre: inv.armaNombre, peso: pesoArma(inv)} : null, natural: inv.armaNatural === true,
+      arco: Combatiente.esArco(Combatiente.armaDeCombatiente(inv)), soloEscudo: !!(o && o.soloEscudo),
       escudos: (inv.equipo || []).filter(it => slotDe(it.tipoItem) === 'escudo').map(it => ({nombre: it.nombre, peso: num(it.peso)}))});
   }
   function bloqueoValor(inv){ const d = defensa(inv); return statValor(inv, 'bloqueo') + (d ? num(d.peso) : 0); }

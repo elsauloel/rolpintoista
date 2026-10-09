@@ -173,6 +173,16 @@ Agi 4, Des 6, HP 45, Def 8, Res T4 2 / T6 1, espada 1d6+1. Arquero Fue 3, Agi 8,
 - **Lectura:** con la Defensa que resta entera, el daño chico no entra, y la Resistencia a Tipo 4 (la más abundante) apaga el crítico del Tipo 4. No
   es solo de los arcos: el mismo arquero con una espada tampoco le hace daño al guerrero. A decidir antes de probar en el mapa.
 
+## 2026-10-09 · Parry, dos manos y lo que quedó para más adelante (dueño)
+- **Con un arco no se parrea** (programado: `Combatiente.sirveParaParry`, `armaParaDefensa` con `arco`). **Un disparo** (flecha, virote, bala:
+  cualquier ataque con un arma de rango) **solo se para con un escudo** (programado: `Combatiente.contraDisparo`; el duelo lo aclara).
+- **El arco es siempre a dos manos** (el asistente de ítems lo pone solo). Con el arco en las manos no hay otra arma; tener otra y «sostener» el
+  arco sin usarlo («blandirlo o sostenerlo») **no se programa**: casi no va a pasar, queda para más adelante.
+- **Más peso para pagar otros efectos** (idea del dueño para la lluvia de ideas): ojo, el Peso es la cantidad de dados, así que un arco más
+  pesado tira más dados. Para cargar más sin cambiar el daño haría falta separar el peso de los dados (hoy no se puede: los dados = Peso +
+  amplificados). Si se quiere usar, se decide al diseñar los arcos.
+- **El arco y el sigilo**: ver P184 (disparar rompe el sigilo, solo el primero es sorpresa, la Evasión 1 solo de cerca).
+
 ## 2026-10-09 · Arcos Tipo 4 y Tipo 6 (dueño, cambia «todos los arcos son Tipo 4»)
 - **El Tipo es el dado:** un arco que tira d6 es Tipo 6; no se separa el Tipo del dado («si no, un poco que se rompe»). Para acercarse a un d6 sin
   romper la paridad, un arco Tipo 4 puede llevar daño fijo (1d4+1 ≈ 1d6). Más dados: sí; d8: no, por ahora.

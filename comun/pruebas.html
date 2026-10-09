@@ -532,6 +532,18 @@ prueba('el arco: distancia mínima (2 casilleros libres) y sin ataque de oportun
     CreepCalculo.oportunidadPosible(creepArco), CreepCalculo.oportunidadPosible(creepEspada)],
     [2, true, true, false, false, false, true, true, true, true, undefined, false, true]);
 });
+prueba('con un arco no se parrea; contra un disparo, Parry solo con escudo (2026-10-09)', () => {
+  const S = fichaArmada();
+  const arco = {id: 'arco1', nombre: 'Arco', tipoItem: 'arma_2m', peso: 1, tipoDado: 4, armaDeRango: true, arco: true, equipado: true};
+  S.inventario = [arco];
+  const escudo = {tipoItem: 'escudo_1m', nombre: 'Rodela'}, espada = {tipoItem: 'arma_1m', nombre: 'Espada'};
+  const creepEsc = {armaNombre: 'Espada', armaTipo: 6, equipo: [{nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 2}]};
+  const creepArco = {armaNombre: 'Arco', armaTipo: 4, armaDeRango: true, armaRasgos: {arco: true}, equipo: []};
+  igual([FichaCombate.armasYEscudosParaParry(S).length, Combatiente.contraDisparo({ataque: {tipo: 'normal', rango: true}}), Combatiente.contraDisparo({ataque: {tipo: 'habilidad', rango: true}}),
+    Combatiente.sirveParaParry(espada, false), Combatiente.sirveParaParry(espada, true), Combatiente.sirveParaParry(escudo, true), Combatiente.sirveParaParry(arco, false),
+    (CreepCalculo.defensa(creepEsc) || {}).nombre, (CreepCalculo.defensa(creepEsc, {soloEscudo: true}) || {}).nombre, CreepCalculo.defensa(creepArco)],
+    [0, true, false, true, false, true, false, 'Espada', 'Rodela', null]);
+});
 
 /* ---------- Habilidades y consumibles (comun/ficha-habilidades.js, paso 5 nivel B área 3) ---------- */
 grupo('Habilidades y consumibles (paso 5)');

@@ -388,9 +388,11 @@ const CreepCalculo = (() => {
   function costoParry(sc){ return Combatiente.costoParry(); }   // siempre 1 No2, sin importar el arma (comun/combatiente.js)
   // Con qué para el creep (Parry y Bloqueo): su arma si no es natural, si no un escudo de su equipo; null = no puede
   // (regla del dueño 2026-09-30, comun/combatiente.js). El Bloqueo suma el peso de eso.
-  function defensa(sc){
+  // o.soloEscudo: contra un disparo, solo un escudo (2026-10-09). Con un arco no se parrea.
+  function defensa(sc, o){
     if(!sc) return null;
     return Combatiente.armaParaDefensa({arma: sc.armaNombre ? {nombre: sc.armaNombre, peso: pesoArma(sc)} : null, natural: sc.armaNatural,
+      arco: Combatiente.esArco(Combatiente.armaDeCombatiente(sc)), soloEscudo: !!(o && o.soloEscudo),
       escudos: (sc.equipo || []).filter(it => slotDe(it.tipoItem) === 'escudo').map(it => ({nombre: it.nombre, peso: num(it.peso)}))});
   }
   function bloqueoValor(sc){ const d = defensa(sc); return statValor(sc, 'bloqueo') + (d ? num(d.peso) : 0); }

@@ -899,3 +899,6 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   ¿disparar rompe el sigilo (o lo rompe después del primer tiro)? ¿El primer disparo desde el sigilo vale como «sorpresa» y los siguientes no?
   ¿La Evasión 1 vale a cualquier distancia o solo cerca? ¿Hace falta una tirada de sigilo al disparar? Ver P183 (distancia mínima) y
   [`rework-armas-rango.md`](rework-armas-rango.md).
+  **Decidido en parte (dueño, 2026-10-09; sin programar todavía, «después evaluamos cómo funciona el resto»):** **disparar rompe el sigilo**;
+  **solo el primer disparo cuenta como sorpresa**; **la Evasión 1 vale solo de cerca**. Idea para después: el arco hace ruido y, si se dispara
+  desde el sigilo, hay que tirar para que no te escuchen (y se complica con las armas de fuego). Sigue abierto el resto.

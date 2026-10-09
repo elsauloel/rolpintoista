@@ -774,7 +774,7 @@ const AsistenteItem = (() => {
     else if(ds.aaTipo) d.tipoDado = n(ds.aaTipo);
     else if(ds.aaManos) d.tipoItem = ds.aaManos;
     else if(ds.aaRango) d.armaDeRango = ds.aaRango === '1';
-    else if(ds.aaArco) d.arco = ds.aaArco === '1';
+    else if(ds.aaArco){ d.arco = ds.aaArco === '1'; if(d.arco) d.tipoItem = 'arma_2m'; }   // un arco es siempre a dos manos (2026-10-09)
     else if(ds.aaEquipado) d.equipado = ds.aaEquipado === '1';
     else if(ds.aaModadd !== undefined) d.mods.push({stat: ds.aaModadd, val: ds.aaModadd ? 1 : 0});
     else if(ds.aaModrm !== undefined) d.mods.splice(n(ds.aaModrm), 1);
@@ -879,7 +879,7 @@ const AsistenteItem = (() => {
       if(n(d.ignoraResistCrit) > 0) d.ignoraResistCrit = Math.round(n(d.ignoraResistCrit)); else delete d.ignoraResistCrit;
       ['ahorroNitros', 'critD20'].forEach(k => { if(n(d[k]) > 0) d[k] = Math.round(n(d[k])); else delete d[k]; });
       ['sinParry', 'oporGratis'].forEach(k => { if(d[k]) d[k] = true; else delete d[k]; });
-      if(d.armaDeRango && d.arco) d.arco = true; else delete d.arco;
+      if(d.armaDeRango && d.arco){ d.arco = true; d.tipoItem = 'arma_2m'; } else delete d.arco;   // un arco: siempre a dos manos
     }else{
       // Lo que es solo de armas no viaja en el resto.
       delete d.especial;

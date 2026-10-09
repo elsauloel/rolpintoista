@@ -258,7 +258,12 @@ const FichaEquipo = (() => {
     return {...structuredClone(f), unidades: 1};
   }
   // El texto de lo que hace una flecha (su detalle sin el encabezado «Flecha especial…:»).
-  const flechaTxt = f => String((f && f.detalle) || '').replace(/^Flecha especial[^:]*:\s*/, '').replace(/\.$/, '');
+  // Lo que hace + su No2 (una sola vez: el detalle del catálogo ya lo trae, se saca y se arma de `flecha.no2`).
+  const flechaTxt = f => {
+    const t = String((f && f.detalle) || '').replace(/^Flecha especial[^:]*:\s*/, '').replace(/\.$/, '').replace(/\s*·\s*\+\d+ No2 al dispararla/, '');
+    const n = num(f && f.flecha && f.flecha.no2);
+    return t + (n ? ` · +${fmt(n)} No2 al dispararla` : '');
+  };
   // El carcaj en «Equipo y mochila»: sus flechas (→ Mochila) y las de la mochila (→ Carcaj).
   function carcajHtml(S){
     const c = carcajDe(S), sueltas = (S.inventario || []).filter(i => esFlecha(i) && !i.equipado);

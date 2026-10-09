@@ -28,10 +28,18 @@
   no (fuera de Rango o tapados por un obstáculo aunque se vean por la visión de un aliado) y los obstáculos que los tapan. Ver docs/rework-armas-rango.md.
 - [ ] **🏹 El arco suma la mitad del Dmg** (2026-10-09; anda en las pruebas automáticas, todavía ningún arco del catálogo lo trae): con un arco  marcado «🏹 Arco» (asistente de ítems), el botón Daño de la Botonera dice «1d4 + mitad del Dmg» y el duelo tira eso; su 🔍 muestra la mitad. Lo  mismo con un creep y una invocación que lleven ese arco.
 - [ ] **🏹 Distancia mínima del arco y sin oportunidad** (2026-10-09, P183): al atacar con un arco brillan solo los objetivos a 3 casilleros o más; elegir uno a 1 o 2 pregunta «Muy cerca para el arco · Disparar igual / Elegir otro» y, si sigue, deja una línea roja en la Mesa. Un rival que solo tiene un arco no frena a quien se le aleja y la Mesa dice «tiene un arco, que no sirve de oportunidad»; con arco y otra arma, la oportunidad no ofrece el arco.
-- [ ] **🏹 Parry y disparos** (2026-10-09): atacado con un arco (o cualquier arma de rango), «Elegí cómo te defendés» ofrece Parry solo con escudo y dice «🏹 Es un disparo: se esquiva igual; para pararlo, solo un escudo»; quien tiene un arco en las manos no ofrece Parry con él (personaje, creep, invocación).
+- [ ] **🏹 Parry y disparos, lo que falta** (2026-10-09; el creep ya probado, ver «Probado»): atacado un **personaje** o una **invocación** con un arco, el Parry se ofrece solo con escudo; quien tiene un arco en las manos no ofrece Parry con él.
+- [ ] **🏹 Levantar la flecha del piso** (2026-10-09): juan camina hasta la Flecha de fuego que quedó en el piso (🏹 en un círculo) y la levanta (1 No2): ¿vuelve al carcaj o a la mochila?
+- [ ] **🏹 Flecha que pega** (2026-10-09): un disparo con flecha especial que entra suma sus efectos (siempre, sin %) y su Perfora le resta Defensa al daño.
 - [ ] **🏹 Línea de tiro, tiro alto y distancia ideal** (2026-10-09): al atacar con un arma de rango se ve la línea al mouse (verde / ámbar «roza» / roja «tapado»); elegir un objetivo tapado por un token pregunta «Tiro alto (PdG −2)» (si el arma lo tiene y está a 4+), «Disparar igual» o «Elegir otro»; un obstáculo Sólido no permite tiro alto; con distancia ideal, los objetivos en la franja brillan en celeste y el duelo suma el bono (y lo muestra en la Mesa).
 
 ## Probado
+
+- ✅ **🏹 Flecha especial, parada con escudo** (2026-10-09): juan dispara el Arco corto a la Bruja con «¿Qué flecha?» → Flecha de fuego (se
+  gasta del carcaj, 2 → 1, y cobra su No2); el duelo muestra la flecha y sus efectos. La Bruja elige Parry con el Escudo de la falange (la opción
+  dice «si gana, el disparo queda parado (sin Bloqueo)»), gana 4 contra 2: «🛡 ¡PARADO!», sin tirada de Bloqueo y **sin ofrecer contraataque**
+  (corregido el mismo día, pedido del dueño). La flecha quedó en el piso a 15 casillas (el alcance del arco) siguiendo la línea, con su línea en la
+  Mesa. Se sacó la nota «Es un disparo: se esquiva igual…» de la Evasión (dueño: no hace falta explicarlo).
 
 - ✅ **✊ Piedra, papel o tijera** (2026-10-09): juan (mapa) contra el GM (GM Tools): desafío con motivo, empate y ronda 2, papel contra tijera →
   «Perdiste» / el ganador en verde, la línea en la Mesa. Arreglado en el momento: el escucha no reintentaba si la pantalla se abrió antes de pegar

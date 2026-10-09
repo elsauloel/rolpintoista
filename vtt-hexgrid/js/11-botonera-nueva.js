@@ -111,7 +111,7 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261009r', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261009r', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261009r', '../comun/ficha-mantenimiento.js?v=20261008y', '../comun/ficha-calculo.js?v=20261009r', '../comun/ficha-combate.js?v=20261009n', '../comun/skills-clase.js?v=20261008x', '../comun/ficha-habilidades.js?v=20261007ar',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261009z', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261009r', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261009r', '../comun/ficha-mantenimiento.js?v=20261008y', '../comun/ficha-calculo.js?v=20261009r', '../comun/ficha-combate.js?v=20261009n', '../comun/skills-clase.js?v=20261008x', '../comun/ficha-habilidades.js?v=20261007ar',
   '../comun/catalogo.js?v=20261009t', '../comun/items-subidos.js?v=20261007h', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261009r', '../comun/ficha-resumen.js?v=20261009m', '../comun/inv-calculo.js?v=20261009n', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261009x', '../comun/inv-duelo.js?v=20261009y', '../comun/ficha-acciones.js?v=20261009r', '../comun/inv-habilidades.js?v=20261008s', '../comun/inv-lupa.js?v=20261009k',
   '../comun/confirmar-turno.js?v=20261006e', '../comun/ficha-duelo.js?v=20261009y', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261009k'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
@@ -617,10 +617,9 @@ function bnPreguntarTipoAtaque(arma, otro){
    (`saqueRapido` = N, dueño 2026-10-09): las primeras N flechas especiales del turno que cuestan No2 tiran una moneda; 2 = ese disparo no lo cobra
    (Buena 1, Rara 2, Excepcional 3: rara vez se dispara más de 2 o 3 veces por turno, así que la primera es la que más vale). */
 function bnElegirFlecha(arma, flechas, alElegir){
-  const no2 = f => Math.max(0, num(f.flecha && f.flecha.no2));
   AvisoCombate.mostrar({icono: '🏹', titulo: `¿Qué flecha? · ${arma ? arma.nombre : 'arco'}`, texto: 'Las flechas comunes no se gastan. Una especial se gasta al dispararla, pegue o no, y su efecto entra siempre que pegue.',
     botones: [{texto: '🏹 Flecha común', detalle: 'sin costo extra', alClic: () => { AvisoCombate.cerrar(); alElegir(''); }},
-      ...flechas.map(f => ({texto: `${f.nombre} ×${fmt(num(f.unidades) || 1)}`, detalle: `${FichaEquipo.flechaTxt(f)}${no2(f) ? ` · +${fmt(no2(f))} No2` : ''}`, alClic: () => { AvisoCombate.cerrar(); alElegir(f.id); }}))],
+      ...flechas.map(f => ({texto: `${f.nombre} ×${fmt(num(f.unidades) || 1)}`, detalle: FichaEquipo.flechaTxt(f), alClic: () => { AvisoCombate.cerrar(); alElegir(f.id); }}))],
     grilla: flechas.length > 3});
 }
 function bnDispararFlecha(flechaId){

@@ -24,6 +24,9 @@
   mapa del GM.
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 
+- [ ] **🏹 Apuntar con un arma de rango** (cuando se construya; pedido del dueño 2026-10-09): al atacar se ve tu Rango, los objetivos posibles, los que
+  no (fuera de Rango o tapados por un obstáculo aunque se vean por la visión de un aliado) y los obstáculos que los tapan. Ver docs/rework-armas-rango.md.
+
 ## Probado
 
 - ✅ **✊ Piedra, papel o tijera** (2026-10-09): juan (mapa) contra el GM (GM Tools): desafío con motivo, empate y ronda 2, papel contra tijera →

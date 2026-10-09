@@ -94,3 +94,18 @@ suma 7 con cualquier arco, también con uno Común) y al Shooter le da casi nada
 
 **Pendiente:** la balanza «persona con arco contra persona con arma» (daño esperado por turno contra Defensas típicas, cuánto se expone cada uno,
 cuánto cuesta en No2 acercarse) y los números del escudo y la Evasión contra proyectiles.
+
+## 2026-10-09 · Los obstáculos tapan los disparos (decidido)
+
+**Decidido (dueño):** los obstáculos del mapa **interceptan los proyectiles**. La línea de tiro sale **del tirador**, no de lo que ve el grupo: aunque
+el jugador vea al objetivo por la visión de un aliado, si hay un obstáculo en el medio el personaje **no** puede dispararle.
+
+**Cómo se tiene que ver al atacar con un arco (pedido del dueño, a probar en el mapa):** tu Rango; los objetivos posibles, bien marcados; los que
+no se pueden, marcados aparte (fuera de Rango, o tapados por un obstáculo, aunque se vean); y los obstáculos que los tapan.
+
+**Lo que ya existe y sirve de base:** el visualizador de Rango (📏, tecla R) ya recorta el área con la línea de visión (`dibujarRangoConVision`,
+`lineaLibre` + `solidosSet()`: los Sólidos y la Colisión tapan); al elegir objetivo, el mapa hace brillar a los que están a tu alcance
+(`dueloResaltarObjetivos`), pero hoy **no mira los obstáculos ni bloquea** a uno que esté fuera de Rango.
+
+**Abierto:** ¿los otros tokens (aliados o rivales en el medio) también tapan, o solo los obstáculos? ¿Algo deja disparar por encima (tiro con
+comba, la skill del Shooter)?

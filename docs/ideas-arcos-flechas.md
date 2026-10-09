@@ -1,0 +1,114 @@
+# Ideas para arcos, flechas y el carcaj (lluvia de ideas, 2026-10-09)
+
+> Guardada a pedido del dueño («guardala porque es espectacular la lista, se abrió todo un universo de diseño con las flechas»). Para podar
+> después: el dueño dice cuáles van. Marcas: ✔ ya existe en el juego · ⚙ hay que programar algo chico · 🔧 hay que programar una pieza nueva.
+> Lo ya decidido y programado de los arcos: [`rework-armas-rango.md`](rework-armas-rango.md) y [`balance-combate.md`](balance-combate.md).
+
+## Lo que eligió el dueño de entrada: flechas especiales y el carcaj (a desarrollar)
+
+- **Las flechas comunes son ilimitadas**; las **especiales** se compran en la **Talabartería** (y salen de botín), cada una con su calidad, su
+  valor en oro y su efecto. «Abre todo un universo de posibilidades.»
+- **Todo arco que se compra viene con un carcaj con lugar para 10 flechas especiales.**
+- **Propuesta de Claude (falta la confirmación del dueño; respondió «Esto también», sin el resto):**
+  1. El carcaj es **una pieza aparte** (su lugar en el equipo, como el cinturón), que viene gratis con el arco; en la Talabartería, **carcajes
+     mejores** (de 15, de saque rápido, con bolsillo protegido…). Las flechas de la mochila no se disparan: se pasan al carcaj (fuera de combate
+     gratis; en combate, como sacar del cinturón).
+  2. Elegir la flecha **no cuesta No2** (sacarla es parte del disparo); un carcaj barato podría cobrar 1 como debilidad.
+  3. La flecha **se pierde siempre**, pegue o no.
+  4. Al atacar con un arco: **«¿Qué flecha?»** (la común o una del carcaj, con lo que hace cada una); su efecto va al duelo (el bono del tiro,
+     efectos al golpear, daño elemental).
+  5. Precio: la calculadora, como una fracción del efecto (es de un solo uso).
+  6. Tandas: (1) el tipo «flecha» y el carcaj (lugar, el que viene con el arco, pasar de la mochila, la Talabartería); (2) «¿Qué flecha?» y su
+     efecto en el duelo (personajes, creeps, invocaciones); (3) el catálogo de flechas y sus precios; después, las que hacen algo en el mapa.
+- **Qué pueden hacer las flechas:** efecto al golpear (sangrado, veneno, marcado, cascabel, derribar, silbadora, clavar); daño elemental aparte
+  (fuego, hielo, rayo, ácido: el daño híbrido; más fuerte cuanto más calidad); precisión o crítico (punta de aguja que perfora, balanceada +PdG, de
+  caza +crítico); en el mapa (humo, luz, soga, señuelo).
+
+## Perfora N (ignora N de Defensa) — dueño, 2026-10-09, a diseñar
+
+- Un arma que **ignora 1, 2 o 3 puntos de Defensa** (no toda). «Tiene que ser un efecto bueno.» **Su casa: las punzantes** (en muchas), en
+  **alguna cortante**, en **algunas flechas** y es **la marca distintiva de los virotes de ballesta**.
+- **La casa de diseño de la ballesta va a ser Rompe armadura** (anotarlo para cuando se diseñen las ballestas).
+- Medida (criterio de Claude, a confirmar con la herramienta): un punto de Perfora vale como mucho +1 de daño fijo, y un poco menos (solo sirve
+  en un golpe sin crítico que llega a la armadura; el crítico ya ignora la Defensa entera). Propuesta: **0,8 de lo que vale +1 de daño fijo por
+  punto** en `calculadora_armas.py`; en el duelo, se resta de la Defensa al guardar el daño (como `--perfora` de `balance_combate.py`).
+
+## La lista completa (para podar)
+
+**Efectos al golpear**
+1. ✔ Sangrado doble (2 stacks por flecha).
+2. ✔ Sangrado seguro si es crítico.
+3. ✔ Veneno que se acumula fuerte (×3, ×4) a cambio de poco daño.
+4. ✔ Pajaritos (la flecha que pega en el casco).
+5. ✔ Rompe armadura (punta de acero; raro en un arco, de calidad alta).
+6. ✔ Rengo (flecha a la pierna).
+7. ✔ Quemadura (daño por turno), distinta de Prende fuego (terreno incendiado).
+8. ⚙ Cegar: −Visión o −PdG un turno.
+9. ⚙ Silenciar: sin habilidades con SP un turno.
+10. ⚙ Desarmar: chance de que suelte el arma (ya existe en varitas).
+11. ⚙ Miedo: en su turno tiene que alejarse del arquero, o pierde No2.
+
+**Elementales y daño híbrido (desde Rara)**
+12. ✔ Fuego, hielo, rayo, tóxico o ácido como dado aparte que ignora la Defensa.
+13. ⚙ Ácido que además deja Armadura rota.
+14. ⚙ Rayo que salta con crítico (rayo en cadena).
+15. ⚙ Hielo que congela con crítico (Inmovilizado 1 turno).
+16. ⚙ Fuego que se contagia (Quemadura a los de al lado).
+
+**Posición y distancia**
+17. ✔ Distancia ideal con un efecto distinto por franja.
+18. ⚙ Tirador quieto: +PdG si no se movió.
+19. ⚙ Tiro en movimiento / disparo gratis al terminar de moverse (arco de jinete).
+20. ⚙ Disparo de retirada: un paso atrás gratis después de disparar.
+21. ⚙ Altura: +PdG desde un elemento alto (cuando haya alturas).
+22. ⚙ Contra el que está quieto: +PdG si el objetivo no se movió.
+23. 🔧 Más allá del alcance, con −PdG por casillero.
+
+**Crítico**
+24. ✔ Ojo de halcón: +1 d20 en el crítico.
+25. ✔ Ignora Resistencia a crítico (puntas perforantes).
+26. ⚙ Crítico que no gasta: si sale crítico, ese disparo no cuesta No2.
+27. ⚙ Crítico que marca.
+28. ⚙ Primer disparo del combate: Crítico frecuente +2.
+
+**Ritmo y No2**
+29. ✔ Primer disparo del turno −1 No2.
+30. ⚙ Tiro rápido: todos los siguientes −1 No2.
+31. 🔧 Apuntar: gastar No2 antes de disparar para sumar PdG (¿firma de todos los arcos?).
+32. 🔧 Disparo doble: dos flechas con la mitad de los dados.
+33. 🔧 Ráfaga: tres flechas con −2 PdG cada una.
+
+**Táctica y control**
+34. ✔ Silbadora (Demora).
+35. ⚙ Flecha que clava: Inmovilizado; más fuerte contra una pared.
+36. ⚙ Empuje 1 casillero.
+37. 🔧 Flecha que atraviesa: sigue al siguiente de la línea.
+38. 🔧 Garfio: atrae al objetivo o lleva al arquero.
+39. ⚙ Fuego de cobertura: el aliado cubierto suma +1 Evasión hasta el próximo turno del arquero.
+40. ⚙ Tiro de aviso: el rival elige entre alejarse o perder No2.
+
+**Sigilo, trampas e invocaciones (para el Cazador)**
+41. ⚙ Disparo silencioso: tirada para no ser escuchado (P184).
+42. ⚙ Detonador: disparar a una trampa propia la dispara a distancia.
+43. ⚙ Flecha con cascabel: no puede entrar en sigilo por 3 turnos.
+44. ⚙ Vínculo con la invocación: +PdG o +daño si tu invocación está al lado del objetivo.
+45. ⚙ Señuelo: un ruido en una casilla; los creeps cercanos giran hacia ahí.
+
+**Utilidad fuera del golpe**
+46. ✔ Mira: +Visión o +Percepción.
+47. ⚙ Flecha de luz: ilumina una flor de 7 y revela lo oculto.
+48. ⚙ Flecha de humo: nube que tapa la vista.
+49. ⚙ Flecha con soga (narrativo, ✋ a mano).
+50. 🔧 Flechas especiales como consumible del carcaj (elegido por el dueño: ver arriba).
+
+**Debilidades (para abaratar)**
+51. ✔ Sin tiro alto.
+52. ✔ Frágil.
+53. ⚙ Lento de tensar: el primer disparo del turno +1 No2.
+54. ⚙ Ruidoso: rompe el sigilo siempre, sin tirada.
+55. ⚙ Pesado: −1 Evasión equipado (ya se puede con un bono negativo).
+56. ⚙ Corto alcance: Rango −1.
+57. ⚙ Impreciso de lejos: −PdG fuera de la distancia ideal.
+
+**De la primera tanda (anteriores):** flecha que marca ✔, de hielo ✔, relámpago ✔, daño híbrido desde Rara ✔, que derriba ✔, Veneno severo ✔,
+Drena vida ✔, Resistente ✔, Matabestias / matagente ⚙, contra lo que levita ⚙, efecto solo en la distancia ideal ⚙, comba (P185).

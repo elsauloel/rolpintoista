@@ -109,3 +109,20 @@ no se pueden, marcados aparte (fuera de Rango, o tapados por un obstáculo, aunq
 
 **Abierto:** ¿los otros tokens (aliados o rivales en el medio) también tapan, o solo los obstáculos? ¿Algo deja disparar por encima (tiro con
 comba, la skill del Shooter)?
+
+## 2026-10-09 · Arcos: críticos, dos manos y distancia mínima (dueño)
+
+- **Todos los arcos son Tipo 4.** El que optimice el arco va a cargar Destreza y jugar al **crítico**: el Tipo 4 es el de rango de crítico más chico
+  (más niveles de crítico por cada punto que le sacás a la defensa). Contrapeso natural: **la Resistencia a crítico Tipo 4 es la más frecuente**
+  en las armaduras. Y el crítico multiplica **todo** el daño (también lo que suma la Tensión) y **no resta la Defensa**: el arco pega poco de base
+  y mucho cuando critea.
+- **La palanca de balance: la penalidad a la Evasión contra proyectiles.** Cada punto que se le resta a la Evasión del objetivo es un punto más de
+  diferencia para el crítico (con rango 2, cada 2 puntos = un nivel más). Por eso conviene arrancar chico (por ejemplo −1) y medirlo.
+- **Siempre a dos manos:** no hay escudo, orbe ni nada en la otra mano (sin Parry de escudo contra proyectiles para el arquero). El **peso** del arco
+  depende del arco, de su calidad, su tamaño y su Tensión.
+- **Distancia mínima:** el arco no ataca cuerpo a cuerpo; tiene que haber **al menos 2 casilleros libres entre el arquero y el objetivo** (el
+  objetivo a 3 casilleros o más).
+
+**Abierto:** ¿qué puede hacer el arquero con un enemigo encima? ¿Alejarse (y comerse el ataque de oportunidad), cambiar de arma (en combate cuesta
+No2) o pegar con el arco como un golpe sin arma (Tipo 4, sin Fuerza)? ¿La distancia mínima vale también para las ballestas y la pólvora, o solo
+para los arcos?

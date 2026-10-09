@@ -134,3 +134,10 @@ No2). **No se puede pegar con el arco.** La distancia mínima de ballestas y pó
 - **Evasión −X contra flechas**: esquivar una flecha es más difícil. El arco pega menos de base pero juega más al crítico. **Cuánto, es la duda.**
 - Orden de trabajo: primero la mecánica; los efectos permitidos van al final (sirven para balancear los puntos al diseñar cada arco).
 - El texto para compartir con el grupo está en la conversación del 2026-10-09 (resumen de esta hoja).
+
+## 2026-10-09 · Escudo contra flechas y lo que tapa el disparo (dueño)
+
+- **Escudo:** de base **no** tiene bonus para parar proyectiles (para con su Parry normal). Un bonus contra proyectiles es una **variable de diseño**:
+  un rasgo que puede traer un escudo puntual.
+- **Los tokens que están en el medio (aliados o rivales) también tapan el disparo**, igual que los obstáculos.
+- **Tirar por encima / tiro con comba:** no es de base; es una **variable de diseño** (un rasgo de un arco o una habilidad, como la del Shooter).

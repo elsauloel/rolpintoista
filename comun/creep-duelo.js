@@ -42,13 +42,14 @@ const CreepDuelo = (() => {
 
   // Atacar en el duelo: normal, de oportunidad o contraataque (cobra y tira el PdG). El normal pregunta si está Sentado. Sin No2
   // suficientes pregunta «¿Atacar igual?» (2026-10-02: antes se rechazaba y el aviso quedaba en GM Tools, escondido en el mapa).
-  function atacarCon(ui, ref, tipo){
+  // `ui.confirmar` puede devolver una promesa (el mapa: el cartel del juego, nunca un confirm() nativo, que congela la pestaña).
+  async function atacarCon(ui, ref, tipo){
     const sc = ui.creep(ref);
     if(!sc) return;
     const qs = Combatiente.preguntaSentado(sc.estados, sc.nombre);   // Sentado no puede atacar (cualquier ataque): avisa y deja seguir
-    if(qs && !ui.confirmar(qs)) return;
+    if(qs && !(await ui.confirmar(qs))) return;
     const forzar = A().faltanNitros(sc, tipo);
-    if(forzar && !ui.confirmar(A().preguntaSinNitros(sc, tipo))) return;
+    if(forzar && !(await ui.confirmar(A().preguntaSinNitros(sc, tipo)))) return;
     return ui.cambiar(ref, c => A().pagarAtaque(c, tipo, forzar)).then(x => {
       if(!x) return;
       A().alertaSinNitros(sc, tipo, x.forzado);
@@ -186,7 +187,7 @@ const CreepDuelo = (() => {
         if(disparo) ops[0].info.push('🏹 Es un disparo: se esquiva igual; para pararlo, solo un escudo (con un arma no se para)');
         if(Combatiente.stuneado(sc.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
         if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === sc.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, motivoNo: '',
-          info: [`Parry 🎲 ${fx(C().statValor(sc, 'parry'), 'parry')}`, `si gana, Bloqueo 🎲 ${fx(C().bloqueoValor(sc))}`, ...(c > num(sc.nitros) ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
+          info: [`Parry 🎲 ${fx(C().statValor(sc, 'parry'), 'parry')}`, disparo ? 'si gana, el disparo queda parado (sin Bloqueo)' : `si gana, Bloqueo 🎲 ${fx(C().bloqueoValor(sc))}`, ...(c > num(sc.nitros) ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
         return ops;
       },
       defender: (d, modo) => {

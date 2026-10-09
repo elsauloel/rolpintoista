@@ -93,7 +93,7 @@ const InvAcciones = (() => {
     return {forzado, aviso: `${inv.nombre}: -${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · ${primero ? 'primer ataque del turno' : 'ataque extra'}`};
   }
   function alertaSinNitros(inv, forzado, tipo){
-    if(!forzado || typeof fbDb === 'undefined' || !fbDb || typeof fbUsuario === 'undefined' || !fbUsuario || !fbMiembro) return;
+    if(!forzado || typeof fbDb === 'undefined' || !fbDb || typeof fbUsuario === 'undefined' || !fbUsuario || typeof fbMiembro === 'undefined' || !fbMiembro) return;
     fbDb.collection(fbRutaCampana('tiradas')).add({
       uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
       origen: `⚠ ${inv.nombre} ${especial(tipo) ? 'hizo un ' + NOMBRE_ESPECIAL[tipo].toLowerCase() : 'atacó'} sin No2 suficientes`, formula: `Costaba ${fmt(forzado.costo)} No2 y tenía ${fmt(forzado.tenia)}`,

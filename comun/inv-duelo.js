@@ -53,11 +53,12 @@ const InvDuelo = (() => {
     // El ataque suelto (sin arreglos): cobra, cierra el Parry pendiente y tira el PdG: invAtacarSuelto.
     // Sin No2 suficientes pregunta «¿Atacar igual?» (B-7, 2026-10-02: antes se rechazaba): gasta los que tenga y deja la línea roja.
     // tipo: 'normal', 'oportunidad' o 'contra' (los dos últimos, como los creeps: lo de un primer ataque y el PdG especial de su arma).
-    function atacarSuelto(inv, tipo){
+    // `ui.confirmar` puede devolver una promesa (el mapa: el cartel del juego; un confirm() nativo congela la pestaña).
+    async function atacarSuelto(inv, tipo){
       const qs = Combatiente.preguntaSentado(inv.estados, inv.nombre);   // Sentado no puede atacar: avisa y deja seguir
-      if(qs && !(ui.confirmar || (t => confirm(t)))(qs)) return;
+      if(qs && !(await (ui.confirmar || (t => confirm(t)))(qs))) return;
       const forzar = A().faltanNitros(inv, tipo);
-      if(forzar && !(ui.confirmar || (t => confirm(t)))(A().preguntaSinNitros(inv, tipo))) return;
+      if(forzar && !(await (ui.confirmar || (t => confirm(t)))(A().preguntaSinNitros(inv, tipo)))) return;
       let p;
       ui.cambiar(() => {
         p = A().pagarAtaque(inv, forzar, tipo);
@@ -106,7 +107,7 @@ const InvDuelo = (() => {
         const inv = ui.inv(d.atacante);
         if(!inv) return;
         if(d.ataque.tipo === 'habilidad-arma') publicar(A().tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + num(d.ataque && d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: num(inv.armaTipo), armaDeRango: !!inv.armaDeRango}), 'pdg'));
-        else atacarSuelto(inv, d.ataque.tipo);
+        else return atacarSuelto(inv, d.ataque.tipo);
       },
       // Las invocaciones siguen las mismas reglas que los creeps.
       statsCritico: d => {
@@ -176,7 +177,7 @@ const InvDuelo = (() => {
         if(disparo) ops[0].info.push('🏹 Es un disparo: se esquiva igual; para pararlo, solo un escudo (con un arma no se para)');
         if(Combatiente.stuneado(inv.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
         if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === inv.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, motivoNo: '',
-          info: [`Parry 🎲 ${fx(I().statValor(inv, 'parry'), 'parry', inv.estados)}`, `si ganás, Bloqueo 🎲 ${fx(I().bloqueoValor(inv))}`, ...(c > num(inv.nitros) ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
+          info: [`Parry 🎲 ${fx(I().statValor(inv, 'parry'), 'parry', inv.estados)}`, disparo ? 'si gana, el disparo queda parado (sin Bloqueo)' : `si ganás, Bloqueo 🎲 ${fx(I().bloqueoValor(inv))}`, ...(c > num(inv.nitros) ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
         return ops;
       },
       defender: (d, modo) => {

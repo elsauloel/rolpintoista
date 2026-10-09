@@ -112,8 +112,8 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261009r', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261009r', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261009r', '../comun/ficha-mantenimiento.js?v=20261008y', '../comun/ficha-calculo.js?v=20261009r', '../comun/ficha-combate.js?v=20261009n', '../comun/skills-clase.js?v=20261008x', '../comun/ficha-habilidades.js?v=20261007ar',
-  '../comun/catalogo.js?v=20261009t', '../comun/items-subidos.js?v=20261007h', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261009r', '../comun/ficha-resumen.js?v=20261009m', '../comun/inv-calculo.js?v=20261009n', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261007ar', '../comun/inv-duelo.js?v=20261009v', '../comun/ficha-acciones.js?v=20261009r', '../comun/inv-habilidades.js?v=20261008s', '../comun/inv-lupa.js?v=20261009k',
-  '../comun/confirmar-turno.js?v=20261006e', '../comun/ficha-duelo.js?v=20261009v', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261009k'];
+  '../comun/catalogo.js?v=20261009t', '../comun/items-subidos.js?v=20261007h', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261009r', '../comun/ficha-resumen.js?v=20261009m', '../comun/inv-calculo.js?v=20261009n', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261009x', '../comun/inv-duelo.js?v=20261009x', '../comun/ficha-acciones.js?v=20261009r', '../comun/inv-habilidades.js?v=20261008s', '../comun/inv-lupa.js?v=20261009k',
+  '../comun/confirmar-turno.js?v=20261006e', '../comun/ficha-duelo.js?v=20261009x', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261009k'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
    anterior"): en la ficha las columnas se juntan recién con la PANTALLA angosta (@media), pero en el mapa la pantalla es ancha y el panel
@@ -538,6 +538,7 @@ function bnHooksDueloInvYa(lado){
     inv: l => bnInvDeLado(l),
     registrar: (origen, r) => bnRegistrarInv(origen, r),
     toast: t => toast(t),
+    confirmar: t => AvisoCombate.preguntar(t, {icono: '⚔', titulo: '¿Atacar igual?', si: 'Atacar igual', no: 'No'}),   // el cartel del juego, no un confirm() nativo
     cambiar: fn => { const u = bnUi(FichaGuardado.partes(bn.S)); if(fn() !== false) u.cambio(); },
     parry: bn.invParry,
     soy: l => !!bnInvDeLado(l),

@@ -120,7 +120,7 @@ const CreepAcciones = (() => {
   }
   // La línea roja de la Mesa (la misma que la de un personaje: FichaAcciones.gastoNitrosForzado).
   function alertaSinNitros(sc, tipo, forzado){
-    if(!forzado || typeof fbDb === 'undefined' || !fbDb || typeof fbUsuario === 'undefined' || !fbUsuario || !fbMiembro) return;
+    if(!forzado || typeof fbDb === 'undefined' || !fbDb || typeof fbUsuario === 'undefined' || !fbUsuario || typeof fbMiembro === 'undefined' || !fbMiembro) return;
     const hizo = tipo === 'normal' ? 'atacó' : `hizo un ${(NOMBRE_ESPECIAL[tipo] || 'Contraataque').toLowerCase()}`;
     fbDb.collection(fbRutaCampana('tiradas')).add({
       uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',

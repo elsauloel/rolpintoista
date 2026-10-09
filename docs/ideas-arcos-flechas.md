@@ -29,6 +29,9 @@
 - Un arma que **ignora 1, 2 o 3 puntos de Defensa** (no toda). «Tiene que ser un efecto bueno.» **Su casa: las punzantes** (en muchas), en
   **alguna cortante**, en **algunas flechas** y es **la marca distintiva de los virotes de ballesta**.
 - **La casa de diseño de la ballesta va a ser Rompe armadura** (anotarlo para cuando se diseñen las ballestas).
+- **Perfora N como bono de las armas chicas y medianas (Tipo 4 y 6)** (dueño, 2026-10-09, a desarrollar): «hay que tener cuidado de combinarla con
+  los efectos que solo se activan cuando pasa el daño» (Veneno, Sangrado, Lisiado…): perforar hace que el daño entre más seguido, así que la
+  combinación es fuerte. En la calculadora: **la combinación vale más que la suma de las partes** (un recargo de sinergia aparte del de combo).
 - Medida (criterio de Claude, a confirmar con la herramienta): un punto de Perfora vale como mucho +1 de daño fijo, y un poco menos (solo sirve
   en un golpe sin crítico que llega a la armadura; el crítico ya ignora la Defensa entera). Propuesta: **0,8 de lo que vale +1 de daño fijo por
   punto** en `calculadora_armas.py`; en el duelo, se resta de la Defensa al guardar el daño (como `--perfora` de `balance_combate.py`).

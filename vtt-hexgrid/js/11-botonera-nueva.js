@@ -111,7 +111,7 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261008zs', '../comun/ficha-botin.js?v=20261008zs', '../comun/generador-tiendas.js?v=20261008zz3', '../comun/filtro-catalogo.js?v=20261008zz3', '../comun/ficha-tienda.js?v=20261008zz', '../comun/ficha-mantenimiento.js?v=20261008y', '../comun/ficha-calculo.js?v=20261007am', '../comun/ficha-combate.js?v=20261005mn', '../comun/skills-clase.js?v=20261008x', '../comun/ficha-habilidades.js?v=20261007ar',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261001a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261008zs', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261008zz3', '../comun/filtro-catalogo.js?v=20261008zz3', '../comun/ficha-tienda.js?v=20261008zz', '../comun/ficha-mantenimiento.js?v=20261008y', '../comun/ficha-calculo.js?v=20261007am', '../comun/ficha-combate.js?v=20261005mn', '../comun/skills-clase.js?v=20261008x', '../comun/ficha-habilidades.js?v=20261007ar',
   '../comun/catalogo.js?v=20261008zz3', '../comun/items-subidos.js?v=20261007h', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261008g', '../comun/ficha-resumen.js?v=20261008zz3', '../comun/inv-calculo.js?v=20261003fi', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261007ar', '../comun/inv-duelo.js?v=20261008z', '../comun/ficha-acciones.js?v=20261008zy', '../comun/inv-habilidades.js?v=20261008s', '../comun/inv-lupa.js?v=20261001a',
   '../comun/confirmar-turno.js?v=20261006e', '../comun/ficha-duelo.js?v=20261008zb', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261005f6'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
@@ -1444,12 +1444,12 @@ function bnEquipoClic(b){
     if(bnComparando) r.querySelector('#bn-comparar').classList.add('open');
     return true;
   }
-  // El botín (A5): sumar a la mochila, comparar, ver, ir a la mochila.
-  if(b.dataset.botinTomar){
-    const entrada = bnBotinLoot.find(x => x.docId === b.dataset.botinTomar), antes = FichaGuardado.partes(bn.S);
-    FichaBotin.tomar(bn.S, entrada, {toast: t => toast(t), puede: () => bnPuedeGuardar(), cambio: () => { bnUi(antes).cambio(); bnBotinDibujar(); }});
-    return true;
-  }
+  // El botín (A5; reclamar y disputar, 2026-10-08): reclamar, disputar, soltar, volver al juego, comparar, ver, ir a la mochila.
+  const botinUi = {toast: t => toast(t), puede: () => bnPuedeGuardar(), fichaId: bn.fichaId};
+  if(b.dataset.botinTomar){ FichaBotin.tomar(bn.S, bnBotinLoot.find(x => x.docId === b.dataset.botinTomar), botinUi); return true; }
+  if(b.dataset.botinDisputar){ FichaBotin.disputar(bn.S, bnBotinLoot.find(x => x.docId === b.dataset.botinDisputar), botinUi); return true; }
+  if(b.dataset.botinSoltar){ FichaBotin.soltar(bn.S, bnBotinLoot.find(x => x.docId === b.dataset.botinSoltar), botinUi); return true; }
+  if(b.dataset.botinPpt){ PPT.mostrar(b.dataset.botinPpt); return true; }
   if(b.dataset.botinComparar){
     const entrada = bnBotinLoot.find(x => x.item.id === b.dataset.botinComparar);
     if(!entrada) return true;

@@ -109,18 +109,43 @@ const Recibidos = (() => {
     });
     return {total: aMochila + aCinturon, aMochila, aCinturon};
   }
+  // Lo reclamado del botín (2026-10-08, reclamar y disputar): cada plantilla, a la mochila (los trofeos iguales se apilan; si no entra, se suma
+  // igual: mejor de más que perdido). → los nombres.
+  function itemsDelBotin(S, lista){
+    const nombres = [];
+    S.inventario = S.inventario || [];
+    lista.forEach(js => {
+      let it = null;
+      try{ it = JSON.parse(js); }catch(e){}
+      if(!it) return;
+      const igual = it.trofeo ? S.inventario.find(i => i.trofeo && i.nombre === it.nombre) : null;
+      if(igual) igual.unidades = num(igual.unidades) + 1;
+      else{
+        const nuevo = structuredClone(it);
+        nuevo.id = uid();
+        nuevo.equipado = false;
+        nuevo.unidades = 1;
+        nuevo.ranuras = it.ranuras ?? 1;
+        S.inventario.push(nuevo);
+      }
+      nombres.push(it.nombre || '?');
+    });
+    return nombres;
+  }
   function recompensa(S, d){
     const r = d.data() || {};
-    let subio = false, vueltas = null;
+    let subio = false, vueltas = null, items = [];
     if(num(r.xp) > 0) subio = aplicarExp(S, num(S.meta.exp) + num(r.xp));
     if(num(r.dde) > 0) S.meta.dde = Math.round((num(S.meta.dde) + num(r.dde)) * 100) / 100;
     if(num(r.despojos) > 0) S.loot.normal = num(S.loot.normal) + num(r.despojos);
     if(Array.isArray(r.devolver) && r.devolver.length) vueltas = trampasADespojos(S, r.devolver);
+    if(Array.isArray(r.items) && r.items.length) items = itemsDelBotin(S, r.items);
     const partes = [];
     if(num(r.xp) > 0) partes.push(`+${fmt(num(r.xp))} XP`);
     if(num(r.dde) > 0) partes.push(`+${fmt(num(r.dde))} DDE`);
     if(num(r.despojos) > 0) partes.push(`+${fmt(num(r.despojos))} despojos`);
-    return {partes, subio, vueltas};
+    if(items.length) partes.push(`🎁 ${items.join(', ')} → mochila`);
+    return {partes, subio, vueltas, items};
   }
   // Las trampas propias que no se usaron en el combate (dueño, 2026-10-08): no vuelven a la mochila, se convierten en su valor en despojos
   // (un cuarto del precio de compra, para arriba, como ♻ Convertir en despojos). → {total, despojos}.
@@ -138,5 +163,5 @@ const Recibidos = (() => {
     return `🪤 ${v.total} trampa${uno ? '' : 's'} sin disparar ${uno ? 'se desarmó' : 'se desarmaron'} y volvió${uno ? '' : 'eron'} ${v.aCinturon ? (v.aMochila ? 'a tu mochila y al cinturón' : 'a tu cinturón') : 'a tu mochila'}`;
   }
 
-  return {escuchar, deFicha, tomar, spec, estado, aplicarExp, expParaNivel, devolverTrampas, trampasADespojos, recompensa, textoVueltas};
+  return {escuchar, deFicha, tomar, spec, estado, aplicarExp, expParaNivel, devolverTrampas, trampasADespojos, itemsDelBotin, recompensa, textoVueltas};
 })();

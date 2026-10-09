@@ -385,6 +385,7 @@ function gmAlEntrar(){
   $('#gm-identidad').textContent = '⚔ GM Tools · ' + barraTexto();
   mesaEscuchar();
   mesaHistorialAlEntrar();
+  if(typeof PPT !== 'undefined') PPT.iniciar();   // ✊ piedra, papel o tijera (adentro del mapa no: lo muestra el mapa)
   gmVivo.activo = fbMiembro.gm === true;
   gmEstadoAlDia();
   if(gmVivo.activo) cargarCreepsSubidos();   // avisos 🔔 de versión nueva en las tarjetas

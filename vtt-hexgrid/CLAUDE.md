@@ -1445,3 +1445,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
 - **Atajos de teclado y campos de la Botonera nueva** (2026-10-08): adentro de un recuadro aislado `e.target` es el recuadro, no el campo, así que el mapa tomaba
   como atajos las letras escritas en el buscador de la tienda. `escribiendoEnCampo(e, sel)` (js/06) mira `e.composedPath()[0]`. Un atajo nuevo de teclado: chequearlo
   con eso.
+
+- **✊ Piedra, papel o tijera** (2026-10-08, pedido del dueño; `comun/ppt.js`): botón `#btn-ppt` arriba a la derecha (junto a 📏 y 🪙), para
+  jugadores y GM: elegís contra quién (otro jugador o el GM) y para qué. A los dos les aparecen las tres manos en triángulo y el resultado
+  cuando eligieron los dos; la Mesa y la Crónica lo cuentan. `PPT.iniciar()` en `arrancarEnVivo` (js/14). El botín usa lo mismo para disputar
+  un ítem: ver `comun/CLAUDE.md` (ficha-botin.js). En js/11, los clics del botín: `data-botin-tomar` (reclamar), `-disputar`, `-soltar`, `-ppt`.

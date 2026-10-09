@@ -798,6 +798,7 @@ function arrancarEnVivo(){
   escucharVinculables();
   escucharMantenimiento();
   recibidosEscuchar();   // los estados y las recompensas que les llegan a mis personajes (B-8)
+  PPT.iniciar();   // ✊ piedra, papel o tijera: los juegos donde juego yo (comun/ppt.js)
   // Estos dos disparan cambiarMapaMostrado (y con eso, fondo/modo/
   // iniciativa/tokens del mapa que corresponda).
   escucharMapas();

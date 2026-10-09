@@ -84,6 +84,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="selector-estados.js"></script>
 <script src="ficha-equipo.js"></script>
 <script src="ficha-botin.js"></script>
+<script src="ppt.js"></script>
 <script src="trampas-base.js"></script>
 <script src="item-corto.js"></script>
 <script src="filtro-catalogo.js"></script>
@@ -641,7 +642,7 @@ prueba('equipar: slot lleno pide reemplazar, un consumible pasa al cinturón, un
     ['a3', true, true, true, true, false, 0, false, true]);   // casco −1 No2 (3 → 2), reemplazar −2 (2 → 0)
 });
 
-prueba('el botín: se lista lo que nadie tomó y la ventana muestra lo de cada jugador, la mochila y «Sumar a la mochila»', () => {
+prueba('el botín: se lista (sin lo tomado a la vieja) y la ventana muestra lo de cada jugador, la mochila y «Reclamar»', () => {
   const snap = {docs: [
     {id: 'b1', data: () => ({nombre: 'Hacha vieja', json: JSON.stringify({nombre: 'Hacha vieja', tipoItem: 'arma_1m', peso: 1, tipoDado: 6}), despojos: 3, origen: 'Orco'})},
     {id: 'b2', data: () => ({nombre: 'Colmillo', json: JSON.stringify({nombre: 'Colmillo', trofeo: true}), tomadoPor: 'otro'})}]};
@@ -651,6 +652,27 @@ prueba('el botín: se lista lo que nadie tomó y la ventana muestra lo de cada j
   const html = FichaBotin.html(S, {combate, loot: lista, puede: true, fichaId: 'f1'});
   igual([lista.length, lista[0].item.id, lista[0].despojos, html.includes('+20</b> XP'), html.includes('(vos)'), html.includes('data-botin-tomar="b1"'), html.includes('data-botin-comparar'), /disabled/.test(FichaBotin.html(S, {combate, loot: lista, puede: false}))],
     [1, 'botin-b1', 3, true, true, true, true, true]);
+});
+prueba('reclamar y disputar (2026-10-08): cada ítem muestra Reclamar, Soltar (el tuyo), Disputar (el de otro) o «en disputa»', () => {
+  const js = n => JSON.stringify({nombre: n, tipoItem: 'arma_1m', peso: 1});
+  const snap = {docs: [
+    {id: 'l', data: () => ({nombre: 'Libre', json: js('Libre'), tomadoPor: ''})},
+    {id: 'm', data: () => ({nombre: 'Mío', json: js('Mío'), tomadoPor: 'yo', tomadoNombre: 'Silvia', tomadoFicha: 'f1'})},
+    {id: 'o', data: () => ({nombre: 'Ajeno', json: js('Ajeno'), tomadoPor: 'u2', tomadoNombre: 'Beto', tomadoFicha: 'f2'})},
+    {id: 'd', data: () => ({nombre: 'Peleado', json: js('Peleado'), tomadoPor: 'u2', tomadoNombre: 'Beto', tomadoFicha: 'f2', disputa: 'p9'})}]};
+  const lista = FichaBotin.loot(snap);
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, caps: {mochila: 10}}).S);
+  const html = FichaBotin.html(S, {combate: {numero: 1, estado: 'publicado', jugadores: []}, loot: lista, puede: true, fichaId: 'f1'});
+  igual([lista.length, html.includes('data-botin-tomar="l"'), html.includes('data-botin-soltar="m"'), html.includes('data-botin-disputar="o"'), html.includes('lo reclamó <b>Beto</b>'),
+    html.includes('✊ en disputa'), html.includes('data-botin-disputar="d"'), html.includes('reclamaste <b>1</b>')],
+    [4, true, true, true, true, true, false, true]);
+});
+prueba('✊ piedra, papel o tijera (comun/ppt.js): quién gana, el documento nuevo y de qué lado juega cada uno', () => {
+  const R = PPT.resultado;
+  const d = PPT.docNuevo({a: {uid: 'u1', nombre: 'Ana', ficha: 'f1'}, b: {uid: 'u2', nombre: 'Beto'}, motivo: {tipo: 'botin', botinId: 'b7', item: 'Espada'}});
+  igual([R('piedra', 'tijera'), R('tijera', 'papel'), R('papel', 'piedra'), R('tijera', 'piedra'), R('piedra', 'papel'), R('papel', 'tijera'), R('papel', 'papel'),
+    d.uids, d.estado, d.ronda, d.jugadas, d.motivo, d.b.ficha, PPT.ladoDe(d, 'u2'), PPT.ladoDe(d, 'x'), PPT.docNuevo({a: {uid: 'u1'}, b: {uid: 'u2'}, motivo: {texto: 'la puerta'}}).motivo],
+    ['a', 'a', 'a', 'b', 'b', 'b', 'empate', ['u1', 'u2'], 'jugando', 1, {a: '', b: ''}, {tipo: 'botin', botinId: 'b7', item: 'Espada'}, '', 'b', '', {tipo: 'libre', texto: 'la puerta'}]);
 });
 
 grupo('Tienda (A5)');
@@ -2876,6 +2898,13 @@ prueba('recompensas recibidas (B-8): XP con subida de nivel, DDE, despojos y una
   const r = Recibidos.recompensa(S, {data: () => ({fichaId: 'F', xp: 230, dde: 12.5, despojos: 3, devolver: [trampa]})});
   igual([r.subio, S.meta.nivel, S.meta.exp, S.meta.dde, S.loot.normal, r.partes, S.inventario.filter(i => i.nombre === 'Trampa de oso').length, Recibidos.textoVueltas(r.vueltas)],
     [true, 3, 20, 17.5, 13, ['+230 XP', '+12.5 DDE', '+3 despojos'], 0, '🪤 1 trampa sin usar → +8 despojos']);
+});
+prueba('lo reclamado del botín llega a la mochila al cerrarlo (2026-10-08): los trofeos iguales se apilan', () => {
+  const S = FichaGuardado.normalizar({meta: {nombre: 'Tita'}, inventario: [{id: 't', nombre: 'Colmillo', trofeo: true, unidades: 1}]}).S;
+  const r = Recibidos.recompensa(S, {data: () => ({fichaId: 'F', items: [JSON.stringify({nombre: 'Hacha', tipoItem: 'arma_1m'}), JSON.stringify({nombre: 'Colmillo', trofeo: true})]})});
+  const hacha = S.inventario.find(i => i.nombre === 'Hacha');
+  igual([r.partes, !!hacha && hacha.equipado === false && hacha.unidades === 1 && !!hacha.id, S.inventario.find(i => i.id === 't').unidades, S.inventario.length],
+    [['🎁 Hacha, Colmillo → mochila'], true, 2, 2]);
 });
 prueba('el duelo de una invocación: defensa con Parry (cobra y deja el Bloqueo), crítico y contraataque', () => {
   const inv = InvCalculo.migrar({id: 'i', nombre: 'Lobo', con: 2, fue: 3, agl: 4, des: 2, esp: 1, armaNombre: 'Colmillo', armaTipo: 8, armaPeso: 2, nitros: 3, crit: [0, 1, 2, 3, 4]});

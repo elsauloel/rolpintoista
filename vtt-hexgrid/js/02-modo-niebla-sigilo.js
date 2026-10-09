@@ -317,6 +317,7 @@ function alternarRango(){
   pedirDibujo();
 }
 $('#btn-rango').onclick = () => alternarRango();
+$('#btn-ppt').onclick = () => PPT.retar();   // ✊ piedra, papel o tijera (comun/ppt.js, 2026-10-08)
 $('#btn-reroll').onclick = () => {
   const fid = fichaPrincipalId();
   if(!fid){ toast('Necesitás un personaje para usar la Moneda Re-Roll'); return; }

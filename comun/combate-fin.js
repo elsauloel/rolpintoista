@@ -397,9 +397,11 @@ const CombateFin = (() => {
   }
 
   /* ---------- Botín pendiente (GM): lo que los jugadores no tomaron → "Despojar" ----------
-     campanas/<id>/botin/*: un doc por ítem ({nombre, json, despojos, tomadoPor, tomadoNombre}).
+     campanas/<id>/botin/*: un doc por ítem ({nombre, json, despojos, tomadoPor, tomadoNombre, tomadoFicha, disputa}).
      Despojar suma los despojos de lo que quedó, los reparte entre los jugadores elegidos (hacia arriba) como
-     recompensas (la ficha las aplica sola) y borra el botín. */
+     recompensas (la ficha las aplica sola) y borra el botín. Lo reclamado (con tomadoFicha: 2026-10-08, reclamar y disputar) va en la
+     recompensa de ese personaje (`items`, la plantilla de cada uno) y llega a su mochila; una disputa abierta se corta y el ítem queda
+     para quien lo reclamó. */
   function nuevoBotin(){ return {docs: [], jugadores: null, incluidos: new Set(), ocupado: false}; }
   async function jugadoresBotin(){
     const fichas = await fbDb.collection(fbRutaCampana('fichas')).get();
@@ -408,6 +410,7 @@ const CombateFin = (() => {
   function botinVista(st){
     const libres = st.docs.filter(d => !d.tomadoPor);
     const tomados = st.docs.filter(d => d.tomadoPor);
+    const enDisputa = tomados.filter(d => d.disputa).length;
     const total = libres.reduce((a, d) => a + num(d.despojos), 0);
     const jug = st.jugadores;
     const n = jug ? jug.filter(j => st.incluidos.has(j.id)).length : 0;
@@ -415,11 +418,11 @@ const CombateFin = (() => {
     const html = `
     <div class="reporte-seccion-titulo">Sin tomar (${libres.length})</div>
     <div class="reporte-loot-items">${libres.length ? libres.map(d => `<span class="reporte-loot-item">${esc(d.nombre)} <span class="reporte-loot-precio">${fmt(num(d.despojos))} despojos</span> <button type="button" class="iconbtn" data-botin-ver="${esc(d.id)}" style="padding:2px 8px;font-size:11px">Ver</button></span>`).join('') : '<span class="hint">No queda nada sin tomar.</span>'}</div>
-    ${tomados.length ? `<div class="reporte-seccion-titulo" style="margin-top:12px">Ya tomados (${tomados.length})</div>
-      <div class="reporte-loot-items">${tomados.map(d => `<span class="reporte-loot-item" style="opacity:.7">${esc(d.nombre)} → ${esc(d.tomadoNombre || '?')} <button type="button" class="iconbtn" data-botin-ver="${esc(d.id)}" style="padding:2px 8px;font-size:11px">Ver</button></span>`).join('')}</div>` : ''}
+    ${tomados.length ? `<div class="reporte-seccion-titulo" style="margin-top:12px">Reclamados (${tomados.length})${enDisputa ? ` · ✊ ${enDisputa} en disputa` : ''}</div>
+      <div class="reporte-loot-items">${tomados.map(d => `<span class="reporte-loot-item" style="opacity:.7">${esc(d.nombre)} → ${esc(d.tomadoNombre || '?')}${d.disputa ? ' ✊' : ''} <button type="button" class="iconbtn" data-botin-ver="${esc(d.id)}" style="padding:2px 8px;font-size:11px">Ver</button></span>`).join('')}</div>` : ''}
     <div class="reporte-seccion-titulo" style="margin-top:14px">Despojar: ${fmt(total)} despojos${n ? ` → ${fmt(cada)} c/u (hacia arriba)` : ''}</div>
     ${jug === null ? '<div class="hint">Cargando personajes…</div>' : jug.map(j => `<label class="reporte-fila" style="cursor:pointer;gap:8px;align-items:center"><input type="checkbox" data-botin-jug="${esc(j.id)}"${st.incluidos.has(j.id) ? ' checked' : ''}><span class="reporte-nombre">${esc(j.nombre)}</span></label>`).join('')}
-    <div class="hint" style="margin-top:6px">Cerrar esta ventana <b>no despoja</b>: el botín sigue abierto y la volvés a abrir con 🎁 Despojos. Cuando todos hayan elegido, apretá el botón de abajo: lo que nadie tomó se convierte en despojos y se reparte, <b>recién ahí se cargan en las fichas la experiencia y el oro</b> de la batalla, y el botín se cierra del todo.</div>`;
+    <div class="hint" style="margin-top:6px">Cerrar esta ventana <b>no despoja</b>: el botín sigue abierto y la volvés a abrir con 🎁 Despojos. Cuando todos hayan elegido, apretá el botón de abajo: lo que nadie tomó se convierte en despojos y se reparte, <b>recién ahí se cargan en las fichas la experiencia, el oro y lo reclamado</b> (a la mochila de quien lo tiene), y el botín se cierra del todo.${enDisputa ? ' Una disputa que no terminó se corta: el ítem queda para quien lo reclamó primero.' : ''}</div>`;
     return {html, boton: libres.length ? '🏁 Despojar lo que nadie tomó y repartir XP y oro' : '🏁 Cerrar botín y repartir XP y oro'};
   }
   function botinCambio(st, t){
@@ -437,30 +440,42 @@ const CombateFin = (() => {
   async function despojar(st, {combateActual, confirmar, alEmpezar}){
     if(st.ocupado) return null;
     const libres = st.docs.filter(d => !d.tomadoPor);
+    if(!st.jugadores){ try{ st.jugadores = await jugadoresBotin(); }catch(err){ console.error(err); } }   // (el dueño de cada personaje, para lo reclamado)
+    const reclamados = st.docs.filter(d => d.tomadoPor && d.tomadoFicha);   // (sin tomadoFicha: tomado a la vieja, ya está en una mochila)
+    const porFicha = new Map();
+    reclamados.forEach(d => { if(!porFicha.has(d.tomadoFicha)) porFicha.set(d.tomadoFicha, []); porFicha.get(d.tomadoFicha).push(d); });
+    const disputas = st.docs.filter(d => d.disputa).map(d => d.disputa);
     const elegidos = (st.jugadores || []).filter(j => st.incluidos.has(j.id));
     const cobran = (combateActual && Array.isArray(combateActual.jugadores)) ? combateActual.jugadores : [];
     const total = libres.reduce((a, d) => a + num(d.despojos), 0);
     const cada = elegidos.length ? Math.ceil(total / elegidos.length) : 0;
     const lineasPago = cobran.map(c => `${c.nombre}: +${fmt(num(c.xp))} XP, +${fmt(num(c.dde))} DDE`).join('\n');
-    if(!(await confirmar(`¿Cerrar el botín?\n\n· ${libres.length ? `Lo que nadie tomó (${libres.length} ítem/s) se convierte en ${total} despojos: ${cada} para cada uno de ${elegidos.length} personaje(s).` : 'No queda nada sin tomar.'}\n· Se cargan en las fichas la experiencia y el oro de la batalla:\n${lineasPago || '(nada)'}`))) return null;
+    const lineasItems = reclamados.length ? `\n· Lo reclamado (${reclamados.length} ítem/s) va a la mochila de quien lo tiene${disputas.length ? ` (${disputas.length} en disputa: se corta y queda para quien lo reclamó primero)` : ''}.` : '';
+    if(!(await confirmar(`¿Cerrar el botín?\n\n· ${libres.length ? `Lo que nadie tomó (${libres.length} ítem/s) se convierte en ${total} despojos: ${cada} para cada uno de ${elegidos.length} personaje(s).` : 'No queda nada sin tomar.'}${lineasItems}\n· Se cargan en las fichas la experiencia y el oro de la batalla:\n${lineasPago || '(nada)'}`))) return null;
     st.ocupado = true;
     if(alEmpezar) alEmpezar();
     try{
       const ts = firebase.firestore.FieldValue.serverTimestamp();
       const batch = fbDb.batch();
       // Un solo pago por personaje: la XP y el DDE de la batalla + su parte de los despojos. La ficha del dueño lo aplica sola.
-      const ids = [...new Set([...cobran.map(c => c.fichaId), ...elegidos.map(j => j.id)])];
+      const ids = [...new Set([...cobran.map(c => c.fichaId), ...elegidos.map(j => j.id), ...porFicha.keys()])];
       ids.forEach(id => {
         const c = cobran.find(x => x.fichaId === id), e = elegidos.find(x => x.id === id), f = (st.jugadores || []).find(x => x.id === id);
         const xp = c ? num(c.xp) : 0, dde = c ? num(c.dde) : 0, desp = e ? cada : 0;
+        const items = (porFicha.get(id) || []).map(d => String(d.json || '')).filter(Boolean);
         const duenoUid = (c && c.duenoUid) || (f && f.duenoUid) || '';
-        if(!duenoUid || !(xp > 0 || dde > 0 || desp > 0)) return;
-        batch.set(fbDb.collection(fbRutaCampana('recompensas')).doc(), {fichaId: id, duenoUid, nombre: String((c && c.nombre) || (f && f.nombre) || '').slice(0, 60), xp, dde, despojos: desp, estado: (c && c.estado) || 'despojos', aplicada: false, creado: ts});
+        if(!duenoUid || !(xp > 0 || dde > 0 || desp > 0 || items.length)) return;
+        batch.set(fbDb.collection(fbRutaCampana('recompensas')).doc(), {fichaId: id, duenoUid, nombre: String((c && c.nombre) || (f && f.nombre) || '').slice(0, 60), xp, dde, despojos: desp, ...(items.length ? {items} : {}), estado: (c && c.estado) || 'despojos', aplicada: false, creado: ts});
       });
       st.docs.forEach(d => batch.delete(fbDb.collection(fbRutaCampana('botin')).doc(d.id)));
       batch.set(fbDb.doc(fbRutaCampana('combate/actual')), {estado: 'cerrado', cerrado: ts}, {merge: true});   // se inhabilitan los botones 🎁 y se cierra la ventana de los jugadores
       await batch.commit();
-      await lineaVerde('🏁 Botín cerrado', `${libres.length ? `${libres.length} ítem(s) sin tomar → ${fmt(total)} despojos: +${fmt(cada)} c/u a ${elegidos.map(j => j.nombre).join(', ')} · ` : ''}XP y oro cargados en las fichas`);
+      // Las disputas que no terminaron se cortan (el ítem quedó para quien lo reclamó).
+      for(const id of disputas){
+        try{ await fbDb.collection(fbRutaCampana('ppt')).doc(id).update({estado: 'cancelado', actualizado: ts}); }catch(err){ console.error('No se pudo cortar la disputa:', err); }
+      }
+      const repartoItems = reclamados.length ? `${reclamados.map(d => `${d.nombre} → ${d.tomadoNombre || '?'}`).join(', ')} · ` : '';
+      await lineaVerde('🏁 Botín cerrado', `${libres.length ? `${libres.length} ítem(s) sin tomar → ${fmt(total)} despojos: +${fmt(cada)} c/u a ${elegidos.map(j => j.nombre).join(', ')} · ` : ''}${repartoItems}XP y oro cargados en las fichas`);
       let des = {total: 0, vuelven: 0, rotas: []};
       try{ des = await TokensAuto.desarmarTrampasConsumibles() || des; }catch(err){ console.error('No se pudieron desarmar las trampas consumibles:', err); }
       // Regla del dueño (2026-10-03): al desarmarla, cada trampa tiene 50 % de romperse; las que aguantan vuelven a la mochila de su dueño.

@@ -950,6 +950,18 @@ versión parecida en más de una, es candidato a juntar.
   (el cobro de equipar en combate); y el dibujo: `html(S, {lupa})`, `slotLlenoHtml(S, it)`, `compararHtml(S, item, equipadoId,
   {precioHtml})`. `ui = {toast, avisarSinNitros, modoCombate(), alPagar?(), slotLleno(it), cambio(partes, o)}`. Lo usan la ficha (sus
   nombres de siempre son atajos) y el mapa (`abrirEquipoMapa`). Necesita ficha-calculo, ficha-combate y ficha-acciones.
+- **`ppt.js`** (`PPT`, 2026-10-08, pedido del dueño) — **✊ piedra, papel o tijera**: entre dos de la partida (un jugador contra otro o contra el
+  GM), «para muchas situaciones» y para disputar un ítem del botín. `retar()` (contra quién y para qué), `elegir(id, jugada)` (transacción: la
+  segunda jugada resuelve; empate = otra ronda; si es por el botín, el ítem queda a nombre del ganador en la misma transacción), `rendirse(id)`,
+  `ref()`/`docNuevo({a, b, motivo})` (para crearlo dentro de otra transacción), `resultado(a, b)`, `mostrar(id)`, `juega(id)` e `iniciar()`
+  (escucha los juegos del usuario y muestra la ventana: las tres manos en triángulo, «Esperando a…», el resultado cuando eligieron los dos;
+  — oculta, queda un botoncito abajo). El resultado va a la Mesa y a la Crónica del mapa (`momentoAbrir`, si está). La cargan el mapa (botón ✊
+  arriba a la derecha), la ficha y GM Tools; adentro de un marco del mapa no se inicia. Colección `ppt` (reglas nuevas).
+- **`ficha-botin.js`, reclamar y disputar** (2026-10-08, pedido del dueño): «Sumar a la mochila» pasó a **🙋 Reclamar** (`tomar`: el ítem queda
+  a tu nombre, `tomadoFicha` = el personaje; no toca la mochila), **⚔ Disputar** (`disputar`: crea el piedra, papel o tijera con quien lo reclamó)
+  y **↩ Soltar** (`soltar`). Al cerrar el botín, `CombateFin.despojar` manda lo reclamado en la recompensa de cada personaje (`items`) y
+  `Recibidos.recompensa` lo suma a la mochila (`itemsDelBotin`: los trofeos iguales se apilan; si no entra, se suma igual). Una disputa abierta
+  se corta y el ítem queda para quien lo reclamó.
 - **`ficha-botin.js`** (`FichaBotin`, 2026-10-02, hoja de ruta A5) — **el botín del combate visto por un jugador**: `loot(snap)` (lo que
   nadie tomó), `textoItem`, `html(S, {combate, loot, puede, fichaId})` (la ventana «Batalla terminada») y `tomar(S, entrada, ui)` («Sumar a
   la mochila», con su transacción y la línea en la Mesa). Lo usan la ficha y el mapa (`abrirBotinMapa`).

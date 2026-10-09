@@ -255,6 +255,7 @@ async function fbAlEntrar(){
   combateEscuchar();
   botinLootEscuchar();
   intercambioIniciar();   // 🤝 ofrecer a otro personaje y 📦 el baúl común (comun/intercambio.js)
+  if(typeof PPT !== 'undefined') PPT.iniciar();   // ✊ piedra, papel o tijera (adentro del mapa no: lo muestra el mapa)
   cargarSkillsSubidas().then(() => renderList('habilidades')).catch(() => {});   // avisos de 🔔 versión nueva
   cargarPasivasSubidas();
   cargarItemsSubidos();   // ítems que subió el grupo (catálogo compartido, paso 5)

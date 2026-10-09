@@ -324,15 +324,42 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['aplicada']);
       }
 
-      // Botín de un combate: un documento por ítem, con su plantilla en `json`. Lo crea y borra el GM; cualquier
-      // miembro puede tomarlo (poner su uid en `tomadoPor` mientras esté vacío; el primero se lo lleva).
+      // Botín de un combate: un documento por ítem, con su plantilla en `json`. Lo crea y borra el GM (y lo puede tocar).
+      // Reclamar y disputar (2026-10-08, comun/ficha-botin.js): cualquier miembro reclama lo libre (su uid en `tomadoPor`, el personaje
+      // en `tomadoFicha`) o suelta lo suyo; disputa lo que reclamó otro (abre un piedra, papel o tijera en `ppt` en la misma transacción
+      // y lo anota en `disputa`); y quien juega esa disputa la cierra cuando terminó (el ítem queda a nombre del ganador).
       match /botin/{id} {
         allow read: if esMiembro(c);
         allow create, delete: if esGM(c);
-        allow update: if esMiembro(c)
-          && resource.data.tomadoPor == ''
-          && request.resource.data.tomadoPor == request.auth.uid
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tomadoPor', 'tomadoNombre']);
+        allow update: if esGM(c) || (esMiembro(c) && (
+          (resource.data.get('disputa', '') == ''
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tomadoPor', 'tomadoNombre', 'tomadoFicha'])
+            && ((resource.data.tomadoPor == '' && request.resource.data.tomadoPor == request.auth.uid)
+              || (resource.data.tomadoPor == request.auth.uid && request.resource.data.tomadoPor == '')))
+          || (resource.data.tomadoPor != '' && resource.data.get('disputa', '') == ''
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['disputa'])
+            && request.resource.data.disputa is string && request.resource.data.disputa != ''
+            && getAfter(/databases/$(database)/documents/campanas/$(c)/ppt/$(request.resource.data.disputa)).data.uids.hasAll([request.auth.uid, resource.data.tomadoPor]))
+          || (resource.data.get('disputa', '') != '' && request.resource.data.get('disputa', '') == ''
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tomadoPor', 'tomadoNombre', 'tomadoFicha', 'disputa'])
+            && request.auth.uid in getAfter(/databases/$(database)/documents/campanas/$(c)/ppt/$(resource.data.disputa)).data.uids
+            && getAfter(/databases/$(database)/documents/campanas/$(c)/ppt/$(resource.data.disputa)).data.estado != 'jugando')
+        ));
+      }
+
+      // ✊ Piedra, papel o tijera (2026-10-08, comun/ppt.js): un juego entre dos de la partida ({a, b, uids, motivo, jugadas, ronda,
+      // estado, ganador, ultima…}). Lo ven todos; lo empieza uno de los dos; lo juegan los dos (y el GM lo puede cortar); lo borran ellos o el GM.
+      // Relajado (ver «Antes de abrirlo al público»): las jugadas viajan en el documento.
+      match /ppt/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.uids is list && request.resource.data.uids.size() == 2
+          && request.auth.uid in request.resource.data.uids
+          && request.resource.data.uids[0] != request.resource.data.uids[1]
+          && request.resource.data.estado == 'jugando';
+        allow update: if esMiembro(c) && (request.auth.uid in resource.data.uids || esGM(c))
+          && request.resource.data.uids == resource.data.uids;
+        allow delete: if esGM(c) || (esMiembro(c) && request.auth.uid in resource.data.uids);
       }
 
       // Mesa común (2026-09-25, RETIRADA el 2026-10-05: la reemplazan paquetes y el baúl). Queda solo para leer y limpiar lo viejo:

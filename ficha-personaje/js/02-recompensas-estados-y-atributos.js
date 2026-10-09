@@ -23,7 +23,7 @@ async function recompensasRevisar(){
       renderExp();
       $('#f-dde').value = fmt(S.meta.dde);
       $('#f-loot-normal').value = S.loot.normal;
-      if(r.vueltas){ renderInventario(); renderList('cinturon'); }
+      if(r.vueltas || (r.items && r.items.length)){ renderInventario(); renderList('cinturon'); }
       refresh();
       if(r.partes.length) toast(`🎁 ${r.partes.join(' · ')}`);
       const vueltas = Recibidos.textoVueltas(r.vueltas);

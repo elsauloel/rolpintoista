@@ -115,22 +115,28 @@ function botinLootRender(){
   const btn = $('#btn-botin-loot');
   if(btn){
     btn.disabled = !combatePublicado();   // solo con el botín publicado
-    $('#botin-loot-n').textContent = combatePublicado() && botinLoot.length ? `(${botinLoot.length})` : '';
+    const libres = botinLoot.filter(b => !b.tomadoPor).length;
+    $('#botin-loot-n').textContent = combatePublicado() && libres ? `(${libres})` : '';
   }
   if($('#scrim-botin-loot').classList.contains('open')) botinLootCuerpo();
 }
-// La ventana y «Sumar a la mochila»: comun/ficha-botin.js (A5, 2026-10-02; el mapa usa lo mismo).
+// La ventana, «Reclamar», «Disputar» y «Soltar»: comun/ficha-botin.js (A5, 2026-10-02; el mapa usa lo mismo; reclamar y disputar, 2026-10-08).
 function botinLootCuerpo(){
   $('#botin-loot-body').innerHTML = FichaBotin.html(S, {combate: combateActual, loot: botinLoot, puede: botinPuedeTomar(), fichaId: fichaVivo && fichaVivo.id});
 }
-function botinTomar(docId){
-  return FichaBotin.tomar(S, botinLoot.find(x => x.docId === docId), {toast: t => toast(t), puede: botinPuedeTomar, cambio: () => { renderInventario(); refresh(); }});
-}
+const botinUi = () => ({toast: t => toast(t), puede: botinPuedeTomar, fichaId: fichaVivo && fichaVivo.id});
+function botinTomar(docId){ return FichaBotin.tomar(S, botinLoot.find(x => x.docId === docId), botinUi()); }
 $('#btn-botin-loot').onclick = () => { botinLootCuerpo(); $('#scrim-botin-loot').classList.add('open'); };
 $('#botin-loot-x').onclick = () => $('#scrim-botin-loot').classList.remove('open');
 $('#botin-loot-body').addEventListener('click', e => {
   const t = e.target.closest('[data-botin-tomar]');
   if(t){ botinTomar(t.dataset.botinTomar); return; }
+  const dp = e.target.closest('[data-botin-disputar]');
+  if(dp){ FichaBotin.disputar(S, botinLoot.find(x => x.docId === dp.dataset.botinDisputar), botinUi()); return; }
+  const so = e.target.closest('[data-botin-soltar]');
+  if(so){ FichaBotin.soltar(S, botinLoot.find(x => x.docId === so.dataset.botinSoltar), botinUi()); return; }
+  const pj = e.target.closest('[data-botin-ppt]');
+  if(pj){ if(typeof PPT !== 'undefined') PPT.mostrar(pj.dataset.botinPpt); return; }
   const c = e.target.closest('[data-botin-comparar]');
   if(c){ abrirComparar(c.dataset.botinComparar); return; }
   if(e.target.closest('#botin-loot-mochila')){ $('#scrim-botin-loot').classList.remove('open'); renderEquipo(); $('#scrim-equipo').classList.add('open'); }

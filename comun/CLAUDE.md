@@ -1430,3 +1430,10 @@ versión parecida en más de una, es candidato a juntar.
   `ataqueDeArma` lleva `arco` (el mapa, al elegir el objetivo: brillan solo los que están a 3+ y uno más cerca avisa y deja seguir —lo decide
   la mesa, con línea en la Mesa—); `armaDeCombatiente` ahora trae `armaDeRango`. Sin oportunidad con el arco: `FichaResumen` publica `sinOpor`
   (personaje solo con arcos; invocación con arco), `CreepCalculo.oportunidadPosible` da false y el mapa no frena ni ofrece el arco (js/17).
+- **🏹 Línea de tiro, tiro alto y distancia ideal** (2026-10-09, dueño; `../docs/rework-armas-rango.md`): rasgos de un arma de rango `tiroAlto`
+  (por encima de los tokens, no de los Sólidos; `Combatiente.TIRO_ALTO_MIN` 4, `TIRO_ALTO_PDG` −2) e `ideal = {donde: 'cerca' | 'medio' | 'lejos' |
+  'franja', ancho, desde, hasta, pdg, crit, critpot, fijo, ignora}` (`Combatiente.franjaIdeal(ideal, alcance)`, `bonoIdeal(arma, distancia, alcance)`,
+  `idealTxt`); los dos están en `RASGOS_ARMA` y `ataqueDeArma` los lleva. El duelo acepta `cfg.tiro = {pdg, crit, critpot, fijo, ignora, motivo}`
+  (`ataque.tiro`): lo suma al PdG al guardarlo (puede ser negativo), al crítico, a la resistencia ignorada y al daño, y lo muestra («🏹 distancia
+  ideal: …»). El asistente de ítems los pregunta en un arma a distancia; `ItemCorto` los muestra y explica; `calculadora_armas.py` les pone precio.
+  La comba quedó como idea abierta (P185).

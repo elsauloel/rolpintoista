@@ -47,6 +47,8 @@ SOBREPRECIO = 1.5
 # del Dmg y su crítico choca con la resistencia más abundante). Su daño se cobra a este factor: así la escalera medida con balance_combate.py
 # (Común 1d4+1…2d4 / 1d6…1d6+1, Buena 3d4+1…3d4+2 / 2d6+2…3d6, Rara 4d4+2 / 3d6+2…4d6) cae en su calidad y deja lugar para bonos.
 DESCUENTO_ARCO = 0.7
+TIRO_ALTO_PC = 1.5            # el tiro alto (por encima de los tokens, PdG −2)
+IDEAL_FACTOR = {1: 0.35, 2: 0.5, 3: 0.65}   # la distancia ideal: qué fracción de sus bonos fijos vale, según el ancho de la franja
 # El valor de los bonos depende del Tipo del arma (dicho por el dueño): un bono plano (Dmg, daño fijo) rinde más en un arma barata en Nitros que en una cara:
 # se normaliza al costo en Nitros del primer ataque (Tipo ÷ 2): factor = 4 / ceil(Tipo / 2) (Tipo 8 = 1). El crítico mejorado rinde más en Tipo bajo (calculado con la regla del crítico).
 # Dos stats "de casa" por familia (P16, propuesta a confirmar); fuera de casa el bono cuesta ×1,25. Dmg, daño fijo y crítico valen para todas las familias (su valor ya depende del Tipo).
@@ -155,6 +157,19 @@ def puntaje(arma):
     if es:   # por la espalda: vale como sus bonos, pero es situacional (solo en sigilo y por atrás)
         d['por la espalda'] = ESPALDA_FACTOR * (float(es.get('pdg') or 0) * TASA_STAT['pdg'] + float(es.get('fijo') or 0) * factor_plano(tipo)
                                                  + min(float(es.get('critpot') or 0), 6) * PESO_CRIT * PESO_CRITPOT)
+    # Arcos (2026-10-09): el tiro alto vale TIRO_ALTO_PC; la distancia ideal, lo que valdrían sus bonos fijos × IDEAL_FACTOR según el ancho de la franja
+    # (situacional: hay que ubicarse, y eso cuesta No2). Una franja fija vale como su ancho.
+    if arma.get('armaDeRango'):
+        id_ = arma.get('ideal') or {}
+        if id_.get('donde'):
+            ancho = (int(id_.get('hasta') or 0) - int(id_.get('desde') or 0) + 1) if id_['donde'] == 'franja' else int(id_.get('ancho') or 2)
+            fac = IDEAL_FACTOR.get(max(1, min(3, ancho)), 0.5)
+            v = (float(id_.get('pdg') or 0) * TASA_STAT['pdg'] + min(float(id_.get('crit') or 0), max(0, tipo - 2)) * PESO_CRIT * FACTOR_CRIT.get(tipo, 1.0)
+                 + min(float(id_.get('critpot') or 0), 6) * PESO_CRIT * PESO_CRITPOT + float(id_.get('fijo') or 0) * factor_plano(tipo)
+                 + float(id_.get('ignora') or 0) * PESO_CRIT * FACTOR_CRIT.get(tipo, 1.0))
+            d['distancia ideal'] = v * fac
+        if arma.get('tiroAlto'):
+            d['tiro alto'] = TIRO_ALTO_PC
     firma = (2.0 if arma.get('sinParry') else 0) + (2.0 if arma.get('oporGratis') else 0) + 3.0 * float(arma.get('ahorroNitros') or 0) + 3.0 * float(arma.get('critD20') or 0)
     if firma: d['firma'] = firma   # mecánicas de firma (2026-10-03): sin Parry 2 · oportunidad sin No2 2 · −1 No2 en el primero 3 · +1 d20 en el crítico 3
     dx = round(float(arma.get('durExtra') or 0)) + ((float(arma['durPorPeso']) - 3) * peso if float(arma.get('durPorPeso') or 0) > 3 else 0)
@@ -185,6 +200,8 @@ def extras(arma):
     n += 1 if arma.get('espalda') else 0
     n += 1 if float(arma.get('durPorPeso') or 0) > 3 or round(float(arma.get('durExtra') or 0)) else 0
     n += sum(1 for k in ('sinParry', 'oporGratis', 'ahorroNitros', 'critD20') if arma.get(k))
+    n += 1 if arma.get('armaDeRango') and arma.get('tiroAlto') else 0
+    n += 1 if arma.get('armaDeRango') and (arma.get('ideal') or {}).get('donde') else 0
     return n
 
 

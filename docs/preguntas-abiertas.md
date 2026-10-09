@@ -902,3 +902,8 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   **Decidido en parte (dueño, 2026-10-09; sin programar todavía, «después evaluamos cómo funciona el resto»):** **disparar rompe el sigilo**;
   **solo el primer disparo cuenta como sorpresa**; **la Evasión 1 vale solo de cerca**. Idea para después: el arco hace ruido y, si se dispara
   desde el sigilo, hay que tirar para que no te escuchen (y se complica con las armas de fuego). Sigue abierto el resto.
+- ❓ **P185. La comba (tiro curvo) — 2026-10-09, para pensar** (dueño: «no le veo tanta diferencia [con el tiro alto]… lo pensaría»). Propuesta: la
+  flecha dobla y rodea un obstáculo **Sólido** (alguien detrás de una columna), algo que el tiro alto no hace (pasa por encima de los tokens, no de
+  los muros); regla posible: «la línea puede quebrarse una vez» (vale si hay una casilla intermedia que ve al objetivo y que se ve desde el
+  arquero), desde Raro, con PdG −1. **No se programa** hasta que el dueño decida. Lo ya decidido y programado: la línea de tiro, el tiro alto y la
+  distancia ideal (ver [`rework-armas-rango.md`](rework-armas-rango.md)).

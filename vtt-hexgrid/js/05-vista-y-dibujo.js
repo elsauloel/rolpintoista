@@ -763,6 +763,12 @@ function dibujar(){
     // Hexágono del token: mismo tamaño y orientación que la casilla de la
     // grilla (fijo — no rota con el frente), para que calce con el mapa.
     const puntos = verticesHex(x, y, rad);
+    if(typeof objetivosIdeal !== 'undefined' && objetivosIdeal && objetivosIdeal.has(d.id)){   // la distancia ideal del arma (js/32): un anillo celeste por fuera
+      const pulso = 0.5 + 0.5 * Math.sin(performance.now() / 300);
+      ctx.save(); trazarPuntos(verticesHex(x, y, rad * (1.30 + 0.10 * pulso)));
+      ctx.strokeStyle = `rgba(90,210,255,${0.6 + 0.4 * pulso})`; ctx.lineWidth = (3 + 2 * pulso) / z; ctx.shadowColor = 'rgba(90,210,255,.9)'; ctx.shadowBlur = 14 / z; ctx.stroke();
+      ctx.restore(); animando = true;
+    }
     if(objetivosResaltados && objetivosResaltados.has(d.id)){   // al elegir un objetivo: los que están a tu alcance laten
       const pulso = 0.5 + 0.5 * Math.sin(performance.now() / 230);
       ctx.save();
@@ -1111,6 +1117,7 @@ function dibujar(){
   });
 
   if(typeof lineaPreview !== 'undefined' && lineaPreview) dibujarLineaPreview(z);   // la línea recta que se está apuntando
+  if(typeof tiroPreview !== 'undefined' && tiroPreview) dibujarTiroPreview(z);   // la línea de tiro de un disparo (js/32)
   if(dibujarEfectosTeleport()) animando = true;
   if(typeof dibujarEfectosRayo === 'function' && dibujarEfectosRayo()) animando = true;   // la Descarga que salta (js/19)
   if(typeof dibujarConfusionNumeros === 'function') dibujarConfusionNumeros();   // el objetivo al azar de la Confusión (js/20)

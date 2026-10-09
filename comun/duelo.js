@@ -382,6 +382,16 @@ const Duelo = (() => {
     return (o.pdg || o.fijo || o.critpot) ? o : null;
   }
   const espaldaTxt = e => [e.pdg ? `+${e.pdg} PdG` : '', e.fijo ? `+${e.fijo} de daño` : '', e.critpot ? `+${e.critpot} Crítico potente` : ''].filter(Boolean).join(', ');
+  const limpiarTiroBono = t => {
+    const c = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(_num(v))));
+    const o = {pdg: c(t.pdg, -6, 10), crit: c(t.crit, 0, 5), critpot: c(t.critpot, 0, 6), fijo: c(t.fijo, 0, 10), ignora: c(t.ignora, 0, 5)};
+    Object.keys(o).forEach(k => { if(!o[k]) delete o[k]; });
+    if(!Object.keys(o).length) return null;
+    o.motivo = txtCorto(t.motivo || 'el tiro', 60);
+    return o;
+  };
+  const tiroTxt = t => [t.pdg ? `${t.pdg > 0 ? '+' : '−'}${_fmt(Math.abs(t.pdg))} PdG` : '', t.crit ? `Crítico frecuente +${_fmt(t.crit)}` : '', t.critpot ? `Crítico potente +${_fmt(t.critpot)}` : '',
+    t.fijo ? `+${_fmt(t.fijo)} de daño` : '', t.ignora ? `ignora ${_fmt(t.ignora)} de Resistencia a crítico` : ''].filter(Boolean).join(', ');
   // tokDef = un token del mapa ({id, nombre, tipo, fichaId, duenoUid}); miTokenId = el token del atacante (o ''); contraDe = id del duelo que se contraataca.
   async function crear(cfg, tokDef, miTokenId, contraDe){
     const hab = limpiarHab(cfg.ataque.hab);
@@ -416,6 +426,10 @@ const Duelo = (() => {
     // Anillos (2026-10-06): Pulso quieto / Foco (`quieto`, al PdG o al PdG.Esp de quien ataca) y Primera sangre (`primeraSangre`, al daño si pega).
     if(_num(cfg.quieto) > 0) inicial.ataque.quieto = Math.min(10, Math.round(_num(cfg.quieto)));
     if(_num(cfg.primeraSangre) > 0 && !hab) inicial.ataque.primeraSangre = Math.min(10, Math.round(_num(cfg.primeraSangre)));
+    // El bono del tiro (2026-10-09, arcos; docs/rework-armas-rango.md): lo calcula el mapa al elegir el objetivo — la distancia ideal del arco
+    // (PdG, Crítico frecuente / potente, daño fijo, ignora Resistencia) y el tiro alto (PdG −2). `motivo` es lo que se lee («distancia ideal»).
+    const tiro = cfg.tiro && !hab ? limpiarTiroBono(cfg.tiro) : null;
+    if(tiro) inicial.ataque.tiro = tiro;
     if(cfg.espalda && !hab){
       inicial.ataque.porLaEspalda = true;
       const be = limpiarEspalda(cfg.ataque.espalda);
@@ -454,6 +468,7 @@ const Duelo = (() => {
     if(d.ataque && _num(d.ataque.embestida) > 0) t.push(`🐂 embestida: +${_fmt(d.ataque.embestida)} PdG`);
     if(d.ataque && _num(d.ataque.quieto) > 0) t.push(`💍 ${d.hab ? 'foco' : 'pulso quieto'}: +${_fmt(d.ataque.quieto)} ${d.hab ? 'PdG.Esp' : 'PdG'}`);
     if(d.ataque && _num(d.ataque.primeraSangre) > 0) t.push(`💍 primera sangre: +${_fmt(d.ataque.primeraSangre)} de daño si pega`);
+    if(d.ataque && d.ataque.tiro) t.push(`🏹 ${d.ataque.tiro.motivo}: ${tiroTxt(d.ataque.tiro)}`);
     return t.join(' · ');
   };
   const escRe = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -615,14 +630,15 @@ const Duelo = (() => {
     // "Ignora Resistencia a crítico" (2026-09-27, pedido del dueño): una habilidad tipo "ataque con mi arma, con
     // arreglos" (Golpe brutal y similares, duelo.arma.ignoraResistCrit) le resta puntos a la Resistencia del
     // defensor antes de calcular el crítico — a la vista en la cuenta y en los cuadraditos, como cualquier otra.
-    const ignora = _num(m.ataque && m.ataque.mods && m.ataque.mods.ignoraResistCrit) + _num(dd.ignora);   // + lo que ignora el arma (statsCritico)
+    const tb = (m.ataque && m.ataque.tiro) || {};   // el bono del tiro (distancia ideal del arco)
+    const ignora = _num(m.ataque && m.ataque.mods && m.ataque.mods.ignoraResistCrit) + _num(dd.ignora) + _num(tb.ignora);   // + lo que ignora el arma (statsCritico)
     const resistencia = Math.max(0, _num(dd.resistencia) - ignora);
     // Crítico frecuente/potente "solo esta tirada" (2026-09-29, pedido del dueño — Lisiar: el bono no puede
     // quedar como un estado de al menos 1 turno, que podría alcanzar a un ataque posterior). A diferencia de
     // un Efecto sobre uno mismo (que sí deja un estado real), esto se suma acá nomás, para ESTE golpe: no
     // escribe nada en la ficha ni en S.efectos.
-    const frecuente = _num(dd.frecuente) + _num(m.ataque && m.ataque.mods && m.ataque.mods.critBono);
-    const potente = _num(dd.potente) + _num(m.ataque && m.ataque.mods && m.ataque.mods.critpotBono) + _num(m.ataque && m.ataque.espalda && m.ataque.espalda.critpot);   // + por la espalda
+    const frecuente = _num(dd.frecuente) + _num(m.ataque && m.ataque.mods && m.ataque.mods.critBono) + _num(tb.crit);
+    const potente = _num(dd.potente) + _num(m.ataque && m.ataque.mods && m.ataque.mods.critpotBono) + _num(tb.critpot) + _num(m.ataque && m.ataque.espalda && m.ataque.espalda.critpot);   // + por la espalda
     let e = null;
     if(typeof Critico !== 'undefined' && m.pdg && m.eva){
       e = Critico.evaluar({pdg: m.pdg.total, eva: m.eva.total, tipo: m.ataque.tipoDado, frecuente, potente, resistencia});
@@ -726,6 +742,8 @@ const Duelo = (() => {
       if(emb > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + emb, mod: p0.mod + emb, formula: `${p0.formula} +${emb} embestida`.slice(0, 60)}; }
       const qto = campo === 'pdg' && m.ataque ? _num(m.ataque.quieto) : 0;   // Pulso quieto / Foco (anillos)
       if(qto > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + qto, mod: p0.mod + qto, formula: `${p0.formula} +${qto} quieto`.slice(0, 60)}; }
+      const tpd = campo === 'pdg' && m.ataque && m.ataque.tiro ? _num(m.ataque.tiro.pdg) : 0;   // el bono del tiro: distancia ideal (+) o tiro alto (−2)
+      if(tpd){ const p0 = m.pdg; m.pdg = {...p0, total: Math.max(0, p0.total + tpd), mod: p0.mod + tpd, formula: `${p0.formula} ${tpd > 0 ? '+' : '−'}${Math.abs(tpd)} ${m.ataque.tiro.motivo}`.slice(0, 60)}; }
       if(campo === 'eva' && defensa) m.defensa = defensa;
       if(extra && (campo === 'pdg' || campo === 'eva')) m.critDatos = {...(m.critDatos || {}), ...extra};   // Crítico frecuente/potente del atacante; Resistencia a crítico del defensor
       anuncio = avanzar(m) || '';
@@ -953,6 +971,8 @@ const Duelo = (() => {
       if(be && be.fijo) m.dano = {...m.dano, crudo: m.dano.crudo + be.fijo, mod: m.dano.mod + be.fijo, formula: `${m.dano.formula} +${be.fijo} espalda`.slice(0, 60)};
       const ps = m.ataque ? _num(m.ataque.primeraSangre) : 0;   // Primera sangre (anillo): el daño de su primer ataque del combate
       if(ps > 0) m.dano = {...m.dano, crudo: m.dano.crudo + ps, mod: m.dano.mod + ps, formula: `${m.dano.formula} +${ps} primera sangre`.slice(0, 60)};
+      const tf = m.ataque && m.ataque.tiro ? _num(m.ataque.tiro.fijo) : 0;   // el bono del tiro: daño fijo de la distancia ideal
+      if(tf > 0) m.dano = {...m.dano, crudo: m.dano.crudo + tf, mod: m.dano.mod + tf, formula: `${m.dano.formula} +${tf} ${m.ataque.tiro.motivo}`.slice(0, 60)};
       const critGolpe = !!(m.crit && m.crit.critico);
       let crudos = m.hab ? m.hab.efectos : efectos;
       if(!m.hab){
@@ -1776,6 +1796,7 @@ const Duelo = (() => {
       ...(ignoraResistCrit ? [`${_esc(nombreHab)} ignora ${_fmt(ignoraResistCrit)} de Resistencia a crítico del defensor.`] : []),
       ...(critBono ? [`${_esc(nombreHab)} suma +${_fmt(critBono)} a tu Crítico frecuente, solo en esta tirada.`] : []),
       ...(critpotBono ? [`${_esc(nombreHab)} suma +${_fmt(critpotBono)} a tu Crítico potente, solo en esta tirada.`] : []),
+      ...(d.ataque && d.ataque.tiro && (d.ataque.tiro.crit || d.ataque.tiro.critpot || d.ataque.tiro.ignora) ? [`🏹 ${_esc(d.ataque.tiro.motivo)}: ${_esc(tiroTxt(d.ataque.tiro))}.`] : []),
       ...(_num(d.critDatos && d.critDatos.ignora) ? [`${_esc(d.ataque.armaNombre || 'El arma')} ignora ${_fmt(d.critDatos.ignora)} de Resistencia a crítico del defensor.`] : []),
       ...(_num(c.d20extra) ? [`${_esc(d.ataque.armaNombre || 'El arma')} tira ${_fmt(c.d20extra)} d20 más en el crítico.`] : []),
       ...(_num(d.ataque && d.ataque.espalda && d.ataque.espalda.critpot) ? [`Por la espalda: +${_fmt(d.ataque.espalda.critpot)} a tu Crítico potente.`] : []),

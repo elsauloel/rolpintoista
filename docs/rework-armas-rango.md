@@ -188,3 +188,12 @@ Agi 4, Des 6, HP 45, Def 8, Res T4 2 / T6 1, espada 1d6+1. Arquero Fue 3, Agi 8,
   romper la paridad, un arco Tipo 4 puede llevar daño fijo (1d4+1 ≈ 1d6). Más dados: sí; d8: no, por ahora.
 - Quedan dos familias: **Tipo 4, el arco liviano** (juega al crítico) y **Tipo 6, el arco largo** (más parejo). La escalera por calidad, medida con
   `herramientas/balance_combate.py`, está en [`balance-combate.md`](balance-combate.md) (paso 3).
+
+## 2026-10-09 · Línea de tiro, tiro alto y distancia ideal (dueño; programado)
+- **Línea de tiro** (todas las armas de rango): al apuntar se dibuja una línea recta; la tapan los obstáculos Sólidos y **cualquier token, aliados
+  incluidos**. Si algo la tapa o la línea apenas **roza** una casilla ocupada, aparece el aviso y **lo decide la mesa**.
+- **Tiro alto**: mecánica de algunos arcos — por encima de los tokens (no de los muros), con el objetivo a 4 o más y **PdG −2**. «Probemos.»
+- **Distancia ideal (sweet spot)**: variable de diseño de cada arco — **dónde** (cerca, a media distancia, lejos, o una franja fija; con su ancho) y
+  **qué da** (PdG, Crítico frecuente, Crítico potente, daño fijo, ignorar Resistencia; «se pueden habilitar infinidad de efectos»). El balance:
+  ubicarse cuesta No2 y el rival se puede mover.
+- **Comba** (doblar alrededor de un obstáculo): el dueño la piensa — P185, sin programar.

@@ -624,7 +624,7 @@ function dueloResaltarObjetivos(propio, alcance, esValido, minimo = 0){
   pedirDibujo();
   return set.size;
 }
-function dueloAvisoObjetivoOcultar(){ const el = $('#duelo-objetivo'); if(el) el.hidden = true; if(objetivosResaltados){ objetivosResaltados = null; pedirDibujo(); } }
+function dueloAvisoObjetivoOcultar(){ const el = $('#duelo-objetivo'); if(el) el.hidden = true; if(objetivosResaltados){ objetivosResaltados = null; pedirDibujo(); } if(typeof tiroTerminar === 'function') tiroTerminar(); }
 
 function dueloElegirObjetivoMapa(msg){
   const yo = msg.yo, ataque = msg.ataque;
@@ -651,7 +651,14 @@ function dueloElegirObjetivoMapa(msg){
   const esValido = objetivoTipo === 'aliado' ? t => !dueloEsRival(yo, t) : objetivoTipo === 'enemigo' ? t => dueloEsRival(yo, t) : null;
   const conArco = !!(ataque && ataque.arco && !ataque.hab);   // el arco: el objetivo, con al menos 2 casilleros libres en el medio (P183)
   const minimo = conArco ? Combatiente.ARCO_LIBRES + 1 : 0;
-  const nEnAlcance = dueloResaltarObjetivos(propio, ataque && ataque.alcance, esValido, minimo);
+  // Un disparo (arma de rango): la línea de tiro se dibuja hasta el mouse y brillan en celeste los que están en la distancia ideal (js/32).
+  const mioTiro = ataque && ataque.rango && !ataque.hab ? [...tokens.entries()].map(([id, t]) => ({...t, id})).find(propio) : null;
+  let nEnAlcance = 0, nIdeal = 0;
+  const resaltar = () => {   // también al volver a elegir (después de «Elegir otro»)
+    nEnAlcance = dueloResaltarObjetivos(propio, ataque && ataque.alcance, esValido, minimo);
+    nIdeal = mioTiro ? tiroResaltarIdeal(mioTiro, ataque, esValido) : 0;
+    if(mioTiro) tiroPreview = {desde: {col: mioTiro.col, fila: mioTiro.fila}, mioId: mioTiro.id, ataque};
+  };
   // msg.alSuelto / msg.alCancelar: cuando el ataque sale de la Botonera nueva (el mapa mismo, paso 3c-4b) y no del marco.
   const cancelado = () => { dueloAvisoObjetivoOcultar(); if(msg.alCancelar){ msg.alCancelar(); return; } try{ MensajesMapa.alMarco($('#botonera-marco'), 'duelo-cancelado'); }catch(e){} };
   const alSuelto = () => {
@@ -661,6 +668,7 @@ function dueloElegirObjetivoMapa(msg){
     try{ MensajesMapa.alMarco($('#botonera-marco'), 'duelo-suelto'); }catch(e){}
   };
   const pedir = () => {
+    resaltar();
     elegirDestino(async h => {
       const todos = [...tokens.entries()].map(([id, t]) => ({...t, id}));   // los tokens del mapa no traen su id adentro: es la clave del Map
       const cand = todos.filter(t => t.col === h.col && t.fila === h.fila && !propio(t) && (!t.oculto || soyGM) && !tapadoPorNiebla(t));   // la niebla: no se apunta adentro
@@ -679,6 +687,11 @@ function dueloElegirObjetivoMapa(msg){
         if(!si){ pedir(); return; }
         mesaLinea(`🏹 ${yo.nombre || 'Alguien'} disparó el arco a ${nombreDe(t)}, que estaba demasiado cerca (lo decidió la mesa)`, 'alerta-roja');
       }
+      let tiro = null;   // la línea de tiro, el tiro alto y la distancia ideal (js/32): avisa y deja seguir
+      if(mio && ataque && ataque.rango && !ataque.hab){
+        try{ const rt = await tiroRevisar(mio, t, ataque, yo); if(!rt.seguir){ pedir(); return; } tiro = rt.tiro; }
+        catch(err){ console.error('No se pudo revisar la línea de tiro:', err); }   // nunca traba el ataque
+      }
       let espalda = false, embestida = 0;
       try{ espalda = porLaEspalda(mio, t); }catch(err){ console.error('No se pudo ver si es por la espalda:', err); }   // nunca traba el ataque
       try{ if(!(ataque && ataque.hab)) embestida = embestidaDe(mio, t); }catch(err){ console.error('No se pudo ver la embestida:', err); }
@@ -687,9 +700,9 @@ function dueloElegirObjetivoMapa(msg){
       if(ataque && ataque.hab && ataque.hab.reparte){ dueloMisiles(yo, ataque, t, mio); return; }   // Varita de misiles: de a uno
       if(embestida) embestidaUsadas.add(`${mio.id}@${Math.round(num(mantenimientoNumero))}`);
       if(primeraSangre) primeraSangreUsadas.add(mio.id);
-      Duelo.crear({yo, ataque, espalda, embestida, quieto, primeraSangre}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
+      Duelo.crear({yo, ataque, espalda, embestida, quieto, primeraSangre, tiro}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
-    }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + (minimo ? `de ${minimo} a ` : '') + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : conArco ? ` · 🏹 el arco necesita ${Combatiente.ARCO_LIBRES} casilleros libres en el medio` : ''}</span>`, true, cancelado);
+    }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + (minimo ? `de ${minimo} a ` : '') + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : conArco ? ` · 🏹 el arco necesita ${Combatiente.ARCO_LIBRES} casilleros libres en el medio` : ''}${mioTiro ? ' · la línea muestra si el tiro pasa' : ''}${nIdeal ? ' · 💠 en celeste, tu distancia ideal (' + esc(Combatiente.idealTxt(ataque.ideal)) + ')' : ''}</span>`, true, cancelado);
     dueloAvisoObjetivo(yo.nombre, msg.conSuelto, alSuelto, ataque && ataque.hab ? ataque.hab.nombre : '');
   };
   pedir();

@@ -399,6 +399,17 @@ const AsistenteItem = (() => {
       if(d.armaDeRango){
         h += campo('Rango del disparo (+ Rango)', `<input data-aa-mod1="rng" type="number" step="1" value="${modVal(d, 'rng')}" style="max-width:120px">`,
           `Hasta dónde llega el disparo, además de lo que ya da la Destreza.${p && p.rango !== undefined ? ` Hoy el Rango ${e(q.de)} es ${f(n(p.rango))}.` : ''}`);
+        // Tiro alto y distancia ideal (2026-10-09, dueño): mecánicas de diseño de las armas de rango (las usa el mapa al apuntar).
+        h += `<div class="aa-campo"><label>Tiro alto</label><label style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-aa-firma="tiroAlto" ${d.tiroAlto ? 'checked' : ''} style="width:auto"> Puede tirar por encima de los tokens del medio (no de los Sólidos): el objetivo a 4 o más y PdG −2</label></div>`;
+        const id = d.ideal || {}, opD = (v, t) => `<option value="${v}"${(id.donde || '') === v ? ' selected' : ''}>${t}</option>`;
+        const nIdeal = (k, txt, extra = '') => campo(txt, `<input data-aa-ideal="${k}" type="number" step="1" value="${n(id[k]) || 0}" style="max-width:90px" ${extra}>`);
+        h += `<div class="aa-campo"><label>Distancia ideal (opcional)</label><select data-aa-ideal="donde">${opD('', 'No tiene')}${opD('cerca', 'Cerca (justo después de la distancia mínima)')}${opD('medio', 'A media distancia (la mitad de su alcance)')}${opD('lejos', 'Lejos (las últimas casillas de su alcance)')}${opD('franja', 'Una franja fija (de… a…)')}</select>
+          <div class="aa-nota" style="margin:2px 0 0">Cuando el objetivo está en esa franja, el disparo suma lo de abajo. «Medio» y «lejos» se miden con el alcance de quien la usa. Ubicarse cuesta No2: ese es el balance.</div></div>`;
+        if(id.donde){
+          h += `<div class="aa-fila">${id.donde === 'franja' ? nIdeal('desde', 'Desde (casilleros)', 'min="1"') + nIdeal('hasta', 'Hasta', 'min="1"') : nIdeal('ancho', 'Ancho de la franja', 'min="1" max="5"')}</div>`;
+          h += `<div class="aa-fila">${nIdeal('pdg', 'PdG +')}${nIdeal('crit', 'Crítico frecuente +', 'min="0"')}${nIdeal('critpot', 'Crítico potente +', 'min="0"')}${nIdeal('fijo', 'Daño fijo +', 'min="0"')}${nIdeal('ignora', 'Ignora Res. crítico', 'min="0"')}</div>`;
+          h += `<div class="aa-nota" id="aa-ideal">${e(typeof Combatiente !== 'undefined' ? Combatiente.idealTxt(d.ideal) : '')}</div>`;
+        }
       }else{
         h += campo('Alcance', `<input data-aa-mod1="rng" type="number" step="1" value="${modVal(d, 'rng')}" style="max-width:120px">`,
           `Sin esto, un arma cuerpo a cuerpo solo golpea al casillero de al lado. Cada +1 la deja atacar un casillero más lejos <b>sin dejar de ser cuerpo a cuerpo</b> (sigue sumando el Dmg) — una lanza o un látigo suelen dar +1.${p && p.rango !== undefined ? ` Hoy el Rango ${e(q.de)} es ${f(n(p.rango))}.` : ''}`);
@@ -626,6 +637,8 @@ const AsistenteItem = (() => {
         ${g === 'arma' && !esEspecial(d) ? fila('Tipo', e(`Tipo ${tipo} · ${TIPOS[tipo].nombre}`)) + fila('Distancia', d.armaDeRango ? (d.arco ? 'arco (suma la mitad del Dmg)' : 'a distancia (no suma Dmg)') : 'cuerpo a cuerpo')
           + fila('Daño', e(danoTxt(d))) + fila('Atacar', `${primer(tipo)} No2 el primero, ${tipo} los siguientes`)
           + (modVal(d, 'rng') ? fila(d.armaDeRango ? 'Rango' : 'Alcance', `+${f(modVal(d, 'rng'))}`) : '')
+          + (d.armaDeRango && d.tiroAlto ? fila('Tiro alto', 'por encima de los tokens (objetivo a 4+, PdG −2)') : '')
+          + (d.armaDeRango && d.ideal && d.ideal.donde && typeof Combatiente !== 'undefined' ? fila('Distancia ideal', e(Combatiente.idealTxt(d.ideal))) : '')
           + (n(d.ignoraResistCrit) > 0 ? fila('Ignora', `${f(n(d.ignoraResistCrit))} de Resistencia a crítico`) : '')
           + ([d.sinParry ? 'no se puede parrear' : '', d.oporGratis ? 'oportunidad sin No2' : '', n(d.ahorroNitros) ? `primer ataque −${f(n(d.ahorroNitros))} No2` : '', n(d.critD20) ? `+${f(n(d.critD20))} d20 en el crítico` : ''].filter(Boolean).length
             ? fila('Firma', e([d.sinParry ? 'no se puede parrear' : '', d.oporGratis ? 'oportunidad sin No2' : '', n(d.ahorroNitros) ? `primer ataque −${f(n(d.ahorroNitros))} No2` : '', n(d.critD20) ? `+${f(n(d.critD20))} d20 en el crítico` : ''].filter(Boolean).join(' · '))) : '')
@@ -815,6 +828,7 @@ const AsistenteItem = (() => {
     if(t.dataset.aaAmano && d.especial){ d.especial.aMano = {...(d.especial.aMano || {}), [t.dataset.aaAmano]: t.value}; poner('aa-amano', amanoHtml()); poner('aa-amano-ok', tiradaValida(d.especial.aMano.tirada) ? '' : 'La tirada tiene que ser una fórmula de dados (ej. 1d6, 2d4+1).'); }
     if(t.dataset.aaOrbe1){ const k = t.dataset.aaOrbe1; if(k === 'orbeSalvaje'){ if(t.value === 'domado') d.orbeSalvaje = 'domado'; else if(t.value) d.orbeSalvaje = true; else delete d.orbeSalvaje; } else d[k] = Math.max(0, Math.round(n(t.value))); poner('aa-orbe', orbeHtml(d)); }
     if(t.dataset.aaFirma){ if(t.checked) d[t.dataset.aaFirma] = true; else delete d[t.dataset.aaFirma]; }
+    if(t.dataset.aaIdeal && t.dataset.aaIdeal !== 'donde'){ d.ideal = {...(d.ideal || {}), [t.dataset.aaIdeal]: Math.round(n(t.value))}; poner('aa-ideal', e(typeof Combatiente !== 'undefined' ? Combatiente.idealTxt(d.ideal) : '')); }
     if(t.dataset.aaEsp) d.espalda = {...(d.espalda || {}), [t.dataset.aaEsp]: Math.max(0, Math.round(n(t.value)))};
     if(t.dataset.aaModstat !== undefined) d.mods[n(t.dataset.aaModstat)].stat = t.value;
     if(t.dataset.aaModval !== undefined) d.mods[n(t.dataset.aaModval)].val = n(t.value);
@@ -836,6 +850,7 @@ const AsistenteItem = (() => {
     const t = ev.target;
     alEscribir(ev);
     if(t.dataset.aaDestino){ st.destino = t.value; dibujar(); return; }
+    if(t.dataset.aaIdeal === 'donde'){ const d = st.d; if(t.value) d.ideal = {ancho: 2, ...(d.ideal || {}), donde: t.value}; else delete d.ideal; dibujar(); return; }   // cambian los campos de la distancia ideal
     // La regla de cada efecto y la lista de resistencias dependen de lo elegido.
     if((t.dataset.aaGolpe !== undefined && (t.dataset.campo === 'prob' || t.dataset.campo === 'seguroCritico' || t.dataset.campo === 'soloCritico' || t.dataset.campo === 'danoMagico' || t.dataset.campo === 'nombre' || t.dataset.campo === 'dado')) || (t.dataset.aaMod1 && CRIT_IDS.includes(t.dataset.aaMod1))){
       setTimeout(() => { if(st) dibujar(); }, 0);
@@ -866,7 +881,7 @@ const AsistenteItem = (() => {
       const am = es.aMano || {}, amT = String(am.texto || '').trim(), amR = String(am.tirada || '').replace(/\s+/g, ''), amE = String(am.etiqueta || '').trim();
       if(amT || amR) es.aMano = {...(amT ? {texto: amT} : {}), ...(amR ? {tirada: amR} : {}), ...(amE ? {etiqueta: amE} : {})}; else delete es.aMano;
       d.peso = Math.max(1, n(d.peso) || 1);
-      ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', ...(typeof Combatiente !== 'undefined' ? Combatiente.RASGOS_ARMA : ['ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco'])].forEach(k => delete d[k]);
+      ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', ...(typeof Combatiente !== 'undefined' ? Combatiente.RASGOS_ARMA : ['ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto'])].forEach(k => delete d[k]);
       if(!(d.efectosGolpe || []).length) delete d.efectosGolpe;
       d.mods = d.mods.filter(m => m.stat !== 'rng');
     }else if(grupoDe(d.tipoItem) === 'arma'){
@@ -880,6 +895,12 @@ const AsistenteItem = (() => {
       ['ahorroNitros', 'critD20'].forEach(k => { if(n(d[k]) > 0) d[k] = Math.round(n(d[k])); else delete d[k]; });
       ['sinParry', 'oporGratis'].forEach(k => { if(d[k]) d[k] = true; else delete d[k]; });
       if(d.armaDeRango && d.arco){ d.arco = true; d.tipoItem = 'arma_2m'; } else delete d.arco;   // un arco: siempre a dos manos
+      if(d.armaDeRango && d.tiroAlto) d.tiroAlto = true; else delete d.tiroAlto;
+      if(d.armaDeRango && d.ideal && d.ideal.donde){   // la distancia ideal: solo lo que tiene valor
+        const id = {donde: d.ideal.donde};
+        (d.ideal.donde === 'franja' ? ['desde', 'hasta'] : ['ancho']).concat(['pdg', 'crit', 'critpot', 'fijo', 'ignora']).forEach(k => { const v = Math.round(n(d.ideal[k])); if(v) id[k] = v; });
+        d.ideal = id;
+      }else delete d.ideal;
     }else{
       // Lo que es solo de armas no viaja en el resto.
       delete d.especial;
@@ -889,7 +910,7 @@ const AsistenteItem = (() => {
         if(d.orbeSalvaje) d.orbeSalvaje = d.orbeSalvaje === 'domado' ? 'domado' : true; else delete d.orbeSalvaje;
       }
       else { delete d.orbe; delete d.orbeResguardo; delete d.orbeSalvaje; delete d.orbeCustodio; delete d.orbeAbsorcion; }
-      delete d.efectosGolpe; delete d.tipoDado; delete d.danoFijo; delete d.danoAmplificado; delete d.armaDeRango; delete d.espalda; delete d.ignoraResistCrit; delete d.sinParry; delete d.oporGratis; delete d.ahorroNitros; delete d.critD20; delete d.arco;
+      delete d.efectosGolpe; delete d.tipoDado; delete d.danoFijo; delete d.danoAmplificado; delete d.armaDeRango; delete d.espalda; delete d.ignoraResistCrit; delete d.sinParry; delete d.oporGratis; delete d.ahorroNitros; delete d.critD20; delete d.arco; delete d.ideal; delete d.tiroAlto;
     }
     // Durabilidad: solo se guarda si no es la de siempre (3 por Peso) y el ítem la tiene.
     // Una pieza vieja con durPorPeso: se pasa a Resistente / Frágil conservando su durabilidad.
@@ -916,7 +937,7 @@ const AsistenteItem = (() => {
      con `{...base, ...d}` a una varita le quedaba el Tipo 8 de fábrica (y con él, daño físico y Parry), y a un arma que dejó de ser especial, su
      hechizo. Todas las pantallas guardan con esto. */
   const CONTROLADOS = ['especial', 'orbe', 'orbeResguardo', 'orbeSalvaje', 'orbeCustodio', 'orbeAbsorcion', 'tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', 'efectosGolpe',
-    'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'durExtra', 'durPorPeso'];
+    'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'durExtra', 'durPorPeso'];
   function fusionar(base, d){
     const o = {...(base || {}), ...(d || {})};
     CONTROLADOS.forEach(k => { if(!(k in (d || {}))) delete o[k]; });

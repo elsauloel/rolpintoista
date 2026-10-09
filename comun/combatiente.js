@@ -400,7 +400,7 @@ const Combatiente = (() => {
      ahorroNitros N (el primer ataque del turno con ella cuesta N menos) · critD20 N (N d20 más al tirar el crítico). Un ítem los lleva sueltos; un
      creep o una invocación, en `armaRasgos` (los campos viejos armaEspalda / armaIgnoraResistCrit también cuentan).
      arco (2026-10-09, dueño; docs/rework-armas-rango.md): el arma de rango es un arco — suma la mitad del Dmg (ver dmgDelArma). */
-  const RASGOS_ARMA = ['espalda', 'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco'];
+  const RASGOS_ARMA = ['espalda', 'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto'];
   /* Cuánto del Dmg (la Fuerza) suma el daño de un arma (2026-10-09, dueño): cuerpo a cuerpo, entero; un arco, la mitad redondeada para arriba;
      cualquier otra de rango (ballesta, pólvora), nada. `arma` = {armaDeRango, arco} (un ítem; de un creep o una invocación: armaDeRango y
      armaRasgos.arco). */
@@ -432,8 +432,41 @@ const Combatiente = (() => {
     if(arma && arma.espalda) o.espalda = arma.espalda;
     if(arma && arma.sinParry) o.sinParry = true;
     if(esArco(arma)) o.arco = true;   // el mapa pide la distancia mínima del arco al elegir el objetivo (no viaja al duelo)
+    if(arma && arma.armaDeRango && arma.ideal) o.ideal = arma.ideal;   // la distancia ideal y el tiro alto: los usa el mapa al apuntar
+    if(arma && arma.armaDeRango && arma.tiroAlto) o.tiroAlto = true;
     return o;
   }
+  /* La distancia ideal de un arma de rango (sweet spot, 2026-10-09, dueño): `ideal = {donde: 'cerca' | 'medio' | 'lejos' | 'franja', ancho,
+     desde, hasta, pdg, crit, critpot, fijo, ignora}`. «Cerca» = justo después de la distancia mínima; «medio» = la mitad del alcance; «lejos» = las
+     últimas casillas del alcance (se mueven con el Rango de quien la usa); «franja» = de `desde` a `hasta`. El objetivo adentro → el bono del tiro.
+     Ubicarse cuesta No2: es el balance (dueño). */
+  const IDEAL_DONDE = {cerca: 'cerca', medio: 'a media distancia', lejos: 'lejos', franja: 'en una franja fija'};
+  function franjaIdeal(ideal, alcance){
+    if(!ideal) return null;
+    const min = ARCO_LIBRES + 1, ancho = Math.max(1, Math.round(n(ideal.ancho) || 2)), al = Math.max(min, Math.round(n(alcance)));
+    if(ideal.donde === 'franja') return {desde: Math.max(1, Math.round(n(ideal.desde))), hasta: Math.max(Math.round(n(ideal.desde)), Math.round(n(ideal.hasta)))};
+    if(ideal.donde === 'lejos') return {desde: Math.max(min, al - ancho + 1), hasta: al};
+    if(ideal.donde === 'medio'){ const c = Math.round((min + al) / 2), d = Math.max(min, c - Math.floor((ancho - 1) / 2)); return {desde: d, hasta: d + ancho - 1}; }
+    return {desde: min, hasta: min + ancho - 1};   // cerca
+  }
+  const BONOS_IDEAL = ['pdg', 'crit', 'critpot', 'fijo', 'ignora'];
+  // El bono del tiro si el objetivo está en la distancia ideal (o null): {pdg, crit, critpot, fijo, ignora, motivo}.
+  function bonoIdeal(arma, distancia, alcance){
+    const id = arma && arma.ideal, f = franjaIdeal(id, alcance), d = n(distancia);
+    if(!f || d < f.desde || d > f.hasta) return null;
+    const o = {motivo: 'distancia ideal'};
+    BONOS_IDEAL.forEach(k => { if(n(id[k])) o[k] = Math.round(n(id[k])); });
+    return Object.keys(o).length > 1 ? o : null;
+  }
+  function idealTxt(ideal){
+    if(!ideal) return '';
+    const b = [n(ideal.pdg) ? `PdG +${n(ideal.pdg)}` : '', n(ideal.crit) ? `Crítico frecuente +${n(ideal.crit)}` : '', n(ideal.critpot) ? `Crítico potente +${n(ideal.critpot)}` : '',
+      n(ideal.fijo) ? `+${n(ideal.fijo)} de daño` : '', n(ideal.ignora) ? `ignora ${n(ideal.ignora)} de Res. crítico` : ''].filter(Boolean).join(', ');
+    const donde = ideal.donde === 'franja' ? `de ${n(ideal.desde)} a ${n(ideal.hasta)} casilleros` : `${IDEAL_DONDE[ideal.donde] || 'cerca'} (franja de ${Math.max(1, Math.round(n(ideal.ancho) || 2))})`;
+    return `Distancia ideal ${donde}: ${b || 'sin bono'}`;
+  }
+  // El tiro alto (2026-10-09, dueño): pasa por encima de los tokens del medio (no de los Sólidos), con el objetivo a TIRO_ALTO_MIN o más y PdG −2.
+  const TIRO_ALTO_MIN = 4, TIRO_ALTO_PDG = -2;
   /* El arco y la distancia (2026-10-09, dueño; P183 abierta para la mesa): con el arco hacen falta al menos ARCO_LIBRES casilleros libres entre
      el arquero y el objetivo (el objetivo a ARCO_LIBRES + 1 o más), no se pega cuerpo a cuerpo y no se hacen ataques de oportunidad. */
   const ARCO_LIBRES = 2;
@@ -1146,7 +1179,7 @@ const Combatiente = (() => {
   // El texto de lo que cura un ítem: «Heridas (Sangrado, Lisiado, Rengo)».
   const textoCura = grupos => grupos.map(k => `${GRUPOS_CURA[k].label} (${GRUPOS_CURA[k].estados.join(', ')})`).join(' · ');
 
-  return {GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

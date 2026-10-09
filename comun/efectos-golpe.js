@@ -43,7 +43,8 @@ const EfectosGolpe = (() => {
       ...(ef && ef.seguroCritico ? {seguroCritico: true} : {}),   // con porcentaje, pero si el golpe es crítico entra seguro (2026-10-03)
       ...(ef && ef.soloCritico ? {soloCritico: true} : {}),       // ⚡ Critical Matters: solo si el golpe es crítico (2026-10-03)
       ...(ef && ef.permanente ? {permanente: true} : {}),         // Sangrado de arma permanente (si no: 2 turnos)
-      ...(ef && ef.danoMagico ? {danoMagico: true} : {}),         // la tirada extra es daño mágico (rayo, hielo): ignora la Defensa, no se multiplica
+      ...(ef && ef.danoMagico ? {danoMagico: true} : {}),
+      ...(ef && typeof ef.requiereDano === 'boolean' ? {requiereDano: ef.requiereDano} : {}),   // si lo dice el efecto: entra o no aunque la armadura pare el golpe (la flecha envenenada, 2026-10-09)         // la tirada extra es daño mágico (rayo, hielo): ignora la Defensa, no se multiplica
       ...(n(ef && ef.drenaPct) > 0 ? {drenaPct: Math.round(n(ef.drenaPct))} : {}),   // Drena vida: % de la vida que le saca de verdad
     };
   }

@@ -566,6 +566,11 @@ prueba('el carcaj: viene con el arco, guarda las flechas especiales y las gasta;
     FichaEquipo.carcajUsado(car), S.inventario.some(i => i.flecha), FichaEquipo.carcajDe(S) === car, GeneradorTiendas.seccionDe(flecha), GeneradorTiendas.seccionDe(car)],
     ['Carcaj de cuero', 10, 1, 1, 3, 'Flecha de fuego', 2, false, true, 'talabarteria', 'talabarteria']);
 });
+prueba('la flecha envenenada perfora 1 y su veneno entra aunque la armadura pare el golpe (2026-10-09)', () => {
+  const f = CATALOGO_BASE.find(i => i.id === 'flecha-envenenada'), fuego = CATALOGO_BASE.find(i => i.id === 'flecha-de-fuego');
+  const ef = EfectosGolpe.lista(f.flecha.efectosGolpe)[0];
+  igual([f.flecha.perfora, ef.nombre, ef.stacks, ef.requiereDano, 'requiereDano' in EfectosGolpe.lista(fuego.flecha.efectosGolpe)[1]], [1, 'Envenenar', 3, false, false]);
+});
 prueba('con un arco no se parrea; contra un disparo, Parry solo con escudo (2026-10-09)', () => {
   const S = fichaArmada();
   const arco = {id: 'arco1', nombre: 'Arco', tipoItem: 'arma_2m', peso: 1, tipoDado: 4, armaDeRango: true, arco: true, equipado: true};

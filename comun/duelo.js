@@ -400,6 +400,7 @@ const Duelo = (() => {
     if(_num(e.turnos) > 0) o.turnos = Math.round(_num(e.turnos));
     if(e.danoMagico) o.danoMagico = true;
     if(e.soloCritico) o.soloCritico = true;
+    if(typeof e.requiereDano === 'boolean') o.requiereDano = e.requiereDano;   // la envenenada: su veneno entra aunque la armadura pare el golpe
     const sp = e.spec && e.spec.nombre ? limpiarSpec(e.spec) : null;
     if(sp) o.spec = sp;
     return o;

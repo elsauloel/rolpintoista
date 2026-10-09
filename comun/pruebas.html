@@ -674,7 +674,7 @@ prueba('🔎 escaneo del grupo (comun/escaneo-grupo.js): el perfil sale del moto
   const S2 = FichaGuardado.completar(FichaGuardado.normalizar({meta: {nombre: 'Beto', nivel: 2}, attrs: {con: 5, fue: 3, agl: 5, des: 4, esp: 9}}).S);
   const ps = [EscaneoGrupo.perfil(S1, 'a'), EscaneoGrupo.perfil(S2, 'b')];
   const l = EscaneoGrupo.lectura(ps), html = EscaneoGrupo.html(ps), ia = EscaneoGrupo.textoParaIA(ps, 'minas, nivel 2');
-  igual([ps[0].attrs.fue, ps[0].armas.length && ps[0].armas[0].tipo, ps[0].danos.T8, ps[1].armas.length, l.debiles.some(t => /no resiste críticos/.test(t)), l.debiles.some(t => /Nadie resiste el daño 🔥 fuego/.test(t)),
+  igual([ps[0].attrs.fue, ps[0].armas.length && ps[0].armas[0].tipo, ps[0].danos.T8, ps[1].armas.length, l.debiles.some(t => /ninguna resistencia a crítico|no resiste críticos/.test(t)), l.debiles.some(t => /Nadie resiste el daño 🔥 fuego/.test(t)),
     l.fuertes.some(t => /Beto: lo más alto es Esp 9/.test(t)), html.includes('Resistencia a crítico'), ia.includes('Pedido del GM: minas, nivel 2'), ia.includes('Hacha Tipo 8')],
     [8, 8, 1, 0, true, true, true, true, true, true]);
 });

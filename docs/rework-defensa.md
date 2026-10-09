@@ -1765,3 +1765,8 @@ devuelto (30 → 29), en el duelo y en la Mesa. Los consumibles de Espinas ahora
 - **Corregidas 5 piezas fuera de su slot:** Yelmo de hierro (sin Tipo 6: Def +3), Jubón de cuero de búfalo (sin Tipo 8: Def +4, Tipo 4 +1), Capacete de
   hierro (sin Tipo 8: Def +3, Tipo 4 +1), Guanteletes de placas (Tipo 6 +1 y Parry +1 en vez de Tipo 8), Escarpes de hierro (Tipo 4 +1, Res.CC +1, Def +1
   en vez de Tipo 8). Mismo precio.
+- **Slots por calidad (dueño, 2026-10-09, idea nueva):** la calidad abre slots. Tipo 10 en Común **solo en el casco**; desde Buena, también el escudo.
+  Tipo 8 en Común en un solo slot y desde Buena en un segundo (cuál, a decidir: propuesta escudo en Común; escudo y torso rígido en Buena; piernas
+  desde Raro). **Cargadas 7 piezas nuevas:** Olla Essen heredada de la abuela y Yelmo de herrero con nasal (cascos Comunes, solo Tipo 10, muy
+  pesados), Morrión de hierro y Casco de fundición (cascos Buena, Tipo 10), Rodela de roble herrada y Tapa de aljibe (escudos Buena, Tipo 10),
+  Coraza de hierro batido (torso rígido Buena, Tipo 8). Esperan: Canilleras de hierro forjado (piernas, Tipo 8) y el cambio del Disco de arado.

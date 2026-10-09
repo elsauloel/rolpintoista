@@ -42,7 +42,9 @@ def tirar(v):
     return sum(random.randint(1, d) for d in f[0]) + f[1] if f else 0
 
 PESOS = {'Warrior': [.26, .30, .14, .16, .14], 'Tanque': [.36, .26, .10, .12, .16], 'Asalto': [.16, .18, .30, .24, .12],
-         'Shooter': [.18, .10, .24, .32, .16], 'Mago': [.20, .08, .16, .16, .40], 'Support': [.24, .10, .16, .14, .36], 'Debuffer': [.22, .08, .18, .14, .38]}
+         'Shooter': [.18, .10, .24, .32, .16], 'Mago': [.20, .08, .16, .16, .40], 'Support': [.24, .10, .16, .14, .36], 'Debuffer': [.22, .08, .18, .14, .38],
+         # «Mono-Destreza» (2026-10-09, la ballesta): casi todo a Destreza; lo demás en el mínimo. Solo entra con --ballesta.
+         'MonoDes': [.12, .02, .12, .62, .12]}
 def repartir(total, pesos, m=3):   # Combatiente.repartirAtributos
     v = [max(m, math.floor(total * p)) for p in pesos]
     resto = total - sum(v); orden = sorted(range(5), key=lambda i: -pesos[i]); k = 0
@@ -68,7 +70,11 @@ def blancos(nivel, o):
 # Armas típicas del catálogo por calidad (mediana de dados: Común 1, Buena 1–2, Rara 2; daño fijo ~0). Nivel 1 → Común, 3 → Buena, 5 → Rara.
 DADOS_NIVEL = {1: 1, 3: 1.5, 5: 2}
 FAMILIAS = ['Daga T4', 'Espada T6', 'Hacha T8', 'Maza T10', 'Arco T4']
+# La ballesta (2026-10-09, «la varita física»): no suma Fuerza; dados del Tipo + daño fijo alto. Con --ballesta entra como una familia más.
+BAL_FIJO = {1: 3, 3: 4, 5: 5}
 def arma(fam, nivel, o):
+    if fam.startswith('Ballesta'):
+        return dict(tipo=o.bal_tipo, dados=o.bal_dados if o.bal_dados else DADOS_NIVEL[nivel], rango=True, fijo=(o.bal_fijo if o.bal_fijo is not None else BAL_FIJO[nivel]), ballesta=True)
     t = int(fam.split('T')[-1])
     if fam == 'Arco T4':   # el arco: Tipo 4 o 6 (el dado es el Tipo; dueño, 2026-10-09), con sus dados y su daño fijo (palancas)
         return dict(tipo=o.arco_tipo, dados=o.arco_dados, rango=True, fijo=o.arco_fijo)
@@ -79,7 +85,7 @@ def golpe(at, a, d, o):
     if p < e or (p == e and random.random() < .5): return 0
     n = a['dados']
     n = (math.floor(n) + (1 if random.random() < n - math.floor(n) else 0)) if n != int(n) else int(n)   # 1.5 = mitad 1 y mitad 2; 2.5 = mitad 2 y mitad 3
-    fue = at['fue'] * (o.arco_fuerza if a['rango'] else 1)
+    fue = 0 if a.get('ballesta') else at['fue'] * (o.arco_fuerza if a['rango'] else 1)
     if o.sutileza and a['tipo'] == 4: fue = max(fue, at['des'] * o.sutileza)   # las armas livianas suman Destreza (palanca)
     dano = sum(random.randint(1, a['tipo']) for _ in range(n)) + math.ceil(fue) + a['fijo']
     frec = o.crit_frec + (o.crit_frec_t4 if a['tipo'] == 4 else 0) + (o.arco_frec if a['rango'] else 0)
@@ -100,16 +106,20 @@ def ataques_por_turno(no2, tipo, o=None):
         if gasto + c > no2: return n
         gasto += c; n += 1
 
+def recargas(no2):   # la ballesta como varita: 1 No2 el primer disparo del turno, +1 por cada uno más (1, 2, 3…)
+    k, gasto = 0, 0
+    while gasto + k + 1 <= no2: gasto += k + 1; k += 1
+    return k
 def tabla(nivel, blanco, o, N):
     d = blancos(nivel, o)[blanco]
     filas = {}
-    for clase in (o.clases.split(',') if o.clases else PESOS):
+    for clase in (o.clases.split(',') if o.clases else [c for c in PESOS if c != 'MonoDes' or o.ballesta]):
         at = atributos(clase, nivel)
         fila = {}
-        for fam in FAMILIAS:
+        for fam in FAMILIAS + ([f'Ballesta T{o.bal_tipo}'] if o.ballesta else []):
             a = arma(fam, nivel, o)
             por = sum(golpe(at, a, d, o) for _ in range(N)) / N
-            k = ataques_por_turno(at['agl'], a['tipo'], o)
+            k = ataques_por_turno(at['agl'], a['tipo'], o) if not (a.get('ballesta') and o.bal_costo == 'varita') else recargas(at['agl'])
             fila[fam] = None if k == 0 else por * k   # None: no le alcanzan los No2 para un ataque con esa arma
         filas[clase] = fila
     return d, filas
@@ -136,6 +146,11 @@ def main():
     ap.add_argument('--arco-pdg', type=int, default=0, help='palanca del arco: PdG +N del arco (mod que ya existe)')
     ap.add_argument('--arco-frec', type=int, default=0, help='palanca del arco: Crítico frecuente que traen los arcos')
     ap.add_argument('--arco-perfora', type=float, default=0.0, help='palanca del arco: la flecha ignora esta fracción de la Defensa')
+    ap.add_argument('--ballesta', action='store_true', help='suma la ballesta (familia) y el personaje «MonoDes» (casi todo a Destreza)')
+    ap.add_argument('--bal-tipo', type=int, default=6, help='Tipo de la ballesta (sus dados y su crítico)')
+    ap.add_argument('--bal-dados', type=float, default=0, help='dados de la ballesta (0 = los de la calidad del nivel)')
+    ap.add_argument('--bal-fijo', type=int, default=None, help='daño fijo de la ballesta (por defecto 3 / 4 / 5 por nivel)')
+    ap.add_argument('--bal-costo', default='arma', help="cómo cobra el disparo: 'arma' (Tipo ÷ 2 y después el Tipo) o 'varita' (1, 2, 3…)")
     ap.add_argument('--clases', default='', help='solo estas clases, separadas por coma')
     ap.add_argument('--metas', action='store_true', help='en vez de las tablas, el resumen de las metas del paso 2')
     ap.add_argument('--blancos', default='liviano,medio,pesado')

@@ -221,3 +221,23 @@ herramienta lo que hoy no mide: Crítico potente, Parry y Bloqueo, efectos al go
 | Mago | 0.0 | 0.0 | 0.0 | 0.3 | 0.0 | 5 % |
 | Support | 0.0 | 0.0 | 0.0 | 0.4 | 0.0 | 7 % |
 | Debuffer | 0.0 | 0.0 | 0.0 | 0.2 | 0.0 | 4 % |
+
+## La ballesta y el «mono-Destreza» (2026-10-09, primera medición)
+
+`balance_combate.py --ballesta` suma la ballesta (no suma Fuerza; dados del Tipo + daño fijo 3/4/5 por nivel; `--bal-tipo`, `--bal-costo arma|varita`)
+y el personaje **MonoDes** (casi todo a Destreza: nivel 1 = Des 21, Agl 3, Con 3). Contra el blanco medio, en % del Warrior:
+
+| | Shooter con ballesta T6 | Shooter, su mejor otra arma | MonoDes con ballesta T6 | MonoDes, su mejor otra arma |
+|---|---|---|---|---|
+| Nivel 1 (cobra como arma) | 94 % | 98 % | 198 % | 207 % |
+| Nivel 3 (cobra como arma) | 25 % | 89 % | 136 % | 261 % |
+| Nivel 5 (cobra como arma) | 13 % | 72 % | 67 % | 223 % |
+| Nivel 1 (cobra como varita: 1, 2, 3…) | 291 % | 95 % | 391 % | 202 % |
+
+**Lectura:**
+1. **El problema del mono-Destreza no es de la ballesta: es general.** Con cualquier arma, volcarse todo a Destreza duplica al Warrior (críticos
+   contra la Evasión baja). La ballesta casi no le suma a eso. El freno tiene que ser general (o aceptarse por lo expuesto que queda: Con 3 = 15 de
+   vida, Agl 3 = 3 No2 y Evasión baja) — **falta medir la exposición** (el daño que recibe).
+2. **Cobrar como varita (1, 2, 3…) dispara la ballesta** (2–4 veces más): es mucho más barato que el Tipo. Descartado; cobra como cualquier arma.
+3. **Con el costo de arma, la ballesta se cae desde nivel 3** para un tirador normal (25 % / 13 %): sin Fuerza, su daño fijo no pasa la Defensa.
+   Su identidad tiene que traer con qué pasar la armadura: **los virotes con Perfora** y **Rompe armadura** en la ballesta (lo decidido).

@@ -142,7 +142,7 @@ const ItemCorto = (() => {
     if(it.armaDeRango) p.push(Combatiente.esArco(it) ? 'arco' : 'a distancia');
     p.push(`${peso} dado${peso === 1 ? '' : 's'}${amp ? ` + ${amp} amplificado${amp === 1 ? '' : 's'}` : ''}`);
     if(num(it.danoFijo)) p.push(`${num(it.danoFijo) > 0 ? '+' : ''}${num(it.danoFijo)} de daño`);
-    (it.mods || []).forEach(m => { if(m && m.stat && num(m.val) && m.stat !== 'def') p.push(`${BONO[m.stat] || m.stat} ${num(m.val) > 0 ? '+' : ''}${num(m.val)}`); });
+    (it.mods || []).forEach(m => { if(m && m.stat && num(m.val) && m.stat !== 'def') p.push(`${m.stat === 'rng' && it.armaDeRango ? 'Rango' : (BONO[m.stat] || m.stat)} ${num(m.val) > 0 ? '+' : ''}${num(m.val)}`); });   // en un arma de rango, «Rango» (no Alcance)
     const ign = num(it.ignoraResistCrit) + (it.efectosGolpe || []).reduce((a, e) => { const m = /^ignora\s+(\d+)\s+de\s+res/i.exec(String((e && e.nombre) || '').trim()); return a + (m ? num(m[1]) : 0); }, 0);
     if(ign) p.push(`Ignora ${ign} de Res. crítico`);
     (it.efectosGolpe || []).forEach(e => { if(e && e.nombre && !/^ignora\s+\d+\s+de\s+res/i.test(String(e.nombre).trim())) p.push(efectoCorto(e)); });
@@ -211,7 +211,7 @@ const ItemCorto = (() => {
       ? 'Arco: suma la mitad de tu Dmg (Fuerza), redondeada para arriba. Dispara con al menos 2 casilleros libres entre vos y el objetivo (en el mapa brillan los que están a tiro; si elegís uno más cerca, avisa y lo decide la mesa), y con el arco no se pega cuerpo a cuerpo ni se hacen ataques de oportunidad: si te encaran, alejate o cambiá de arma. ⚙ Automatizado.'
       : 'A distancia: el daño es solo el del arma, no suma tu Dmg. ⚙ Automatizado.');
     const vistos = new Set();
-    (it.mods || []).forEach(m => { if(m && MECANICA[m.stat] && !vistos.has(m.stat)){ vistos.add(m.stat); L.push(MECANICA[m.stat]); } });
+    (it.mods || []).forEach(m => { if(m && MECANICA[m.stat] && !vistos.has(m.stat)){ vistos.add(m.stat); L.push(m.stat === 'rng' && it.armaDeRango ? 'Rango: lo que el arma le suma al alcance de quien la usa (su Rango, de la Destreza): hasta dónde llega el disparo.' : MECANICA[m.stat]); } });
     if(num(it.ignoraResistCrit) || (it.efectosGolpe || []).some(e => /^ignora\s+\d+\s+de\s+res/i.test(String((e && e.nombre) || '').trim())))
       L.push('Ignora N de Resistencia a crítico: al calcular el crítico, el defensor cuenta N puntos menos de Resistencia a crítico contra este golpe: es más fácil que salga crítico y se tiran más d20. ⚙ El duelo lo resta solo y lo muestra en la cuenta.');
     const efs = (it.efectosGolpe || []).filter(e => e && e.nombre && !/^ignora\s+\d+\s+de\s+res/i.test(String(e.nombre).trim()));

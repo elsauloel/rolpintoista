@@ -43,6 +43,10 @@ ALCANCE_EXTRA = 1.0       # PC de cada punto de Alcance siguiente
 UMBRAL_TIER = [('Común', 0), ('Buena Calidad', 7.5), ('Raro', 11), ('Excepcional', 17), ('Legendario', 26)]
 BANDA_PRECIO = {'Común': (20, 80), 'Buena Calidad': (80, 160), 'Raro': (150, 350), 'Excepcional': (400, 900), 'Legendario': (1000, 2000)}
 SOBREPRECIO = 1.5
+# Arcos (2026-10-09, docs/balance-combate.md): un arco necesita más dados que un arma cuerpo a cuerpo para rendir lo mismo (suma solo la mitad
+# del Dmg y su crítico choca con la resistencia más abundante). Su daño se cobra a este factor: así la escalera medida con balance_combate.py
+# (Común 1d4+1…2d4 / 1d6…1d6+1, Buena 3d4+1…3d4+2 / 2d6+2…3d6, Rara 4d4+2 / 3d6+2…4d6) cae en su calidad y deja lugar para bonos.
+DESCUENTO_ARCO = 0.7
 # El valor de los bonos depende del Tipo del arma (dicho por el dueño): un bono plano (Dmg, daño fijo) rinde más en un arma barata en Nitros que en una cara:
 # se normaliza al costo en Nitros del primer ataque (Tipo ÷ 2): factor = 4 / ceil(Tipo / 2) (Tipo 8 = 1). El crítico mejorado rinde más en Tipo bajo (calculado con la regla del crítico).
 # Dos stats "de casa" por familia (P16, propuesta a confirmar); fuera de casa el bono cuesta ×1,25. Dmg, daño fijo y crítico valen para todas las familias (su valor ya depende del Tipo).
@@ -96,6 +100,7 @@ def puntaje(arma):
     tipo, peso, fijo = int(arma.get('tipoDado') or 0), int(arma.get('peso') or 1), float(arma.get('danoFijo') or 0)
     amp = int(arma.get('danoAmplificado') or 0)   # los dados amplificados también pegan (no pesan)
     d = {'daño': (peso + amp) * (tipo + 1) / 2 + fijo * factor_plano(tipo)}
+    if arma.get('armaDeRango') and arma.get('arco'): d['daño'] *= DESCUENTO_ARCO
     fam = familia(arma)
     bonos = crit = 0.0
     for m in arma.get('mods') or []:

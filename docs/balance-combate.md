@@ -91,6 +91,28 @@ efectos al golpear.
 **Paso 4 (sigue):** programar el arco — la mitad de la Fuerza (✅ 2026-10-09, `Combatiente.dmgDelArma`), la distancia mínima (2 casilleros libres),
 sin pegar con el arco ni ataque de oportunidad — y pasar los arcos del catálogo a la escalera (precio con `calculadora_armas.py`); después, probar en el mapa.
 
+## El presupuesto de un arco (2026-10-09, para la lluvia de ideas)
+
+La calculadora de armas (`herramientas/calculadora_armas.py`) le pone puntos (PC) a todo lo que trae un arma; cada calidad es una banda de puntos:
+**Común hasta 7,5 · Buena 7,5–11 · Rara 11–17 · Excepcional 17–26 · Legendaria 26+**. Al pasar la escalera por la calculadora apareció que cobraba
+los dados del arco como los de una espada (el Bueno caía en Raro): **un arco necesita más dados para rendir lo mismo** (mitad de la Fuerza, crítico
+contra la resistencia más común), así que su daño se cobra ×0,7 (`DESCUENTO_ARCO`). Con eso cada arco de la escalera cae en su calidad:
+
+| Calidad | Lo que usa el daño | Lo que queda libre para bonos |
+|---|---|---|
+| Común (hasta 7,5) | 4,5 (1d6) a 6,6 (1d4+2) | 1 a 3 puntos |
+| Buena (7,5–11) | 9,5 (3d4+1, 2d6+2) a 10,9 (3d4+2) | casi nada con el más fuerte; ~1,5 con el más flojo |
+| Rara (11–17) | 12,8 (3d6+2) a 13,7 (3d6+3) | 3 a 4 puntos |
+
+**Lo que cuesta cada cosa en un arco** (puntos): Crítico frecuente +1 → 5,25 en Tipo 4 / 3 en Tipo 6 · Crítico potente +1 → 1,2 · PdG +1 → 3,5 ·
+Rango +1 → 0,75 · +1 daño fijo → 1,4 (T4) / 0,9 (T6) · +1 dado → 1,75 (T4) / 2,45 (T6) · Veneno 50 % → 1,25 · Sangrado 50 % → 1,5 · Lisiado 25 % →
+1,1 · Prende fuego 33 % → 1,5 · Iniciativa +1 → 0,6 · cada punto de Peso de más → −0,2.
+
+**Cómo se diseña la diversidad:** se parte de un arco de la escalera y se cambia daño por otra cosa dentro de la banda. Un arco «de precisión» baja
+dados y suma Crítico (frecuente o potente) o PdG; uno «venenoso» baja daño y suma Veneno; uno «largo» suma Rango; uno «pesado» suma Peso y un dado.
+El total de puntos manda la calidad y el precio (`precio_libre`). Lo de diseño sin número (sweet spot, tiro con comba) se agrega aparte, con criterio.
+**El juego admite cierto desbalance** (dueño, 2026-10-09): el GM lo afina en lo puntual; el número busca que nada se rompa feo.
+
 ## Más adelante — «Probemos romper el juego» (dueño, 2026-10-09)
 
 Cuando terminemos con los arcos y el catálogo esté más o menos consolidado: la prueba de perillas en serio, con números, tablas y comparaciones, y

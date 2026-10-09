@@ -887,4 +887,4 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   cualquier momento **sin pagar No2**, esté en el **cinturón o en la mochila** (cualquier otro consumible cuesta 1 No2 desde el cinturón y 2 desde la
   mochila), y después se tira la moneda: par se conserva, impar se rompe. **Por ahora queda así, como excepción al uso de No2** (dueño). Para
   debatir con el grupo: ¿debería costar como un consumible (1 cinturón / 2 mochila)? ¿Solo desde el cinturón? ¿Una por turno o por combate?
-  También anotada en Herramientas de diseño → Preguntas.
+  Va también a Herramientas de diseño → Preguntas (para los colegas).

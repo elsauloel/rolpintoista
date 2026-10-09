@@ -55,3 +55,42 @@
 5. ¿Hondas como arcos y cerbatanas como varitas de efecto?
 6. Disparar con un enemigo pegado (en contacto): ¿se puede?, ¿con penalidad?, ¿le da un ataque de oportunidad?
 7. ¿Lo que se interpone (sólidos, otros tokens) tapa el disparo? ¿Cobertura?
+
+## 2026-10-09 · Arcos: los topes (Tensión) y el Parry
+
+**Decidido (dueño):**
+- **Arcos con tope**: suman la Fuerza hasta un tope del arco. El tope tiene que quedar como **un equivalente de la Fuerza promedio** de ese nivel.
+- **Parry contra flechas: solo con escudo**, nunca con un arma. **A distancia no hay contraataque.**
+- **Ideas a balancear (dueño):** con escudo, quizás un bonus para parar un proyectil; con la Evasión común, quizás alguna dificultad.
+
+**Datos para pensar el tope** (reparto sugerido de atributos por rol, 33 puntos a nivel 1 y +3 por nivel; `Combatiente.PESOS_ROL`):
+- Fuerza a nivel 1: Warrior ~10 · Tanque ~9 · Asalto ~6 · Shooter, Mago, Support y Debuffer ~3. Promedio de las siete clases: ~5.
+- Por nivel, el Warrior suma ~0,9 de Fuerza y el Shooter ~0,3: a nivel 5, Warrior ~14, Shooter ~4–5; promedio ~7.
+- Un golpe cuerpo a cuerpo suma **toda** la Fuerza (Dmg = Fuerza): un Warrior nivel 1 con una espada Común (1d6 + 1) pega 1d6 + 11 (≈ 14,5).
+- Un arco hoy no suma nada: el Arco corto (1d6) pega ≈ 3,5, y contra una Defensa de 4 casi no entra.
+
+**Propuesta: Tensión por calidad ≈ Fuerza promedio de esa franja de nivel** (la calidad sigue al nivel en las tiendas):
+Común 4 · Buena 5 · Raro 6 · Excepcional 7 · Legendario 8. El arco suma **tu Fuerza, hasta su Tensión**.
+
+Qué pasa con cada uno (nivel 1, Arco corto 1d6, Tensión 4):
+- **Shooter (Fuerza 3):** 1d6 + 3 ≈ 6,5. Suma toda su Fuerza: el tope no lo toca.
+- **Asalto (Fuerza 6):** 1d6 + 4 ≈ 7,5. Pierde 2 puntos contra el cuerpo a cuerpo.
+- **Warrior (Fuerza 10):** 1d6 + 4 ≈ 7,5. Pierde 6: con espada pega ≈ 14,5.
+
+**Ventajas del tope (Tensión):**
+- El arco nunca pega como un hacha: el que tiene mucha Fuerza sigue rindiendo más cuerpo a cuerpo (el rango tiene su precio, como pediste).
+- Es un número **del ítem**: crece con la calidad, se puede vender un «arco de guerra» de Tensión alta, y se calcula en la calculadora del catálogo.
+- El que no es fuerte (el Shooter) no pierde nada: su arco rinde igual en sus manos que en las de un Warrior hasta el tope.
+- Contra la Defensa: sumar algo fijo hace que la flecha entre (hoy un 1d6 suelto contra Defensa 4 casi no hace nada).
+
+**Desventajas:**
+- Un número más en cada arco (otra cosa que explicar).
+- El Warrior con arco «desperdicia» Fuerza (es a propósito, pero puede sentirse raro).
+- **Ojo:** como el Shooter tiene poca Fuerza, sumar Fuerza beneficia más a los fuertes que al tirador. Si el arco tiene que ser el arma del Shooter,
+  su daño tiene que venir también de otro lado (dados del arco, Destreza, habilidades).
+
+**Comparación con la mitad de la Fuerza** (la otra opción): sin número nuevo, pero crece sin límite con el personaje (un Warrior nivel 5 con Fuerza 14
+suma 7 con cualquier arco, también con uno Común) y al Shooter le da casi nada (Fuerza 3 → +2).
+
+**Pendiente:** la balanza «persona con arco contra persona con arma» (daño esperado por turno contra Defensas típicas, cuánto se expone cada uno,
+cuánto cuesta en No2 acercarse) y los números del escudo y la Evasión contra proyectiles.

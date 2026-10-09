@@ -695,6 +695,7 @@ body.con-ruta .toast{bottom:auto;top:74px}
    necesite»): sin el desenfoque, porque un backdrop-filter encierra a las ventanas fijas de adentro en el recuadro (quedaban en la franja de la
    Botonera). La marca la pone ventanasAlFrente (js/11). */
 #botonera-nueva.con-ventana, #acciones-nuevas.con-ventana{backdrop-filter:none}
+#botonera-nueva.encima, #acciones-nuevas.encima{z-index:99050}   /* una ventana recién abierta adentro: por encima del duelo (99000), debajo de la 🔍 */
 /* Un cartel de la ficha o de GM Tools durante un duelo (¿es tu turno?, No2, sobrepeso…) tiene que verse ENCIMA del cuadro del
    duelo (#duelo-fondo, z-index 99000): antes quedaba tapado y la tirada se quedaba en «Tirando…» (encontrado 2026-09-30). */
 #botonera-capa.sobre-duelo{z-index:99500}

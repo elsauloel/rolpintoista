@@ -863,8 +863,16 @@ function bnSinNitros(costo, accion, continuar){
 function bnCerrarSinNitros(){ bnSinNitrosSeguir = null; if(bn) bn.raiz.querySelector('#bn-sin-nitros').classList.remove('open'); }
 // Mientras haya una ventana abierta adentro del recuadro (una .scrim.open), el recuadro va sin desenfoque (mapa.css, .con-ventana): así la
 // ventana se ve al frente, con todo el ancho de la pantalla. También para las Acciones de un creep (js/12).
+// Una ventana o un cartel que se ABRE adentro del recuadro lo pone por encima del cuadro del duelo (`encima`) hasta que se cierran todas
+// (2026-10-09: «No te alcanzan los Nitros» al pagar el PdG del duelo quedaba tapado por el duelo y el botón parecía no hacer nada).
 function ventanasAlFrente(host, raiz){
-  const mirar = () => host.classList.toggle('con-ventana', !!raiz.querySelector('.scrim.open'));
+  let antes = 0;
+  const mirar = () => {
+    const n = raiz.querySelectorAll('.scrim.open').length;
+    host.classList.toggle('con-ventana', n > 0);
+    if(n > antes) host.classList.add('encima'); else if(!n) host.classList.remove('encima');
+    antes = n;
+  };
   new MutationObserver(mirar).observe(raiz, {subtree: true, attributes: true, attributeFilter: ['class']});
 }
 function bnCrear(){

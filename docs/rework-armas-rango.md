@@ -199,3 +199,7 @@ Agi 4, Des 6, HP 45, Def 8, Res T4 2 / T6 1, espada 1d6+1. Arquero Fue 3, Agi 8,
   **qué da** (PdG, Crítico frecuente, Crítico potente, daño fijo, ignorar Resistencia; «se pueden habilitar infinidad de efectos»). El balance:
   ubicarse cuesta No2 y el rival se puede mover.
 - **Comba** (doblar alrededor de un obstáculo): el dueño la piensa — P185, sin programar.
+- **Parar un disparo con escudo no lleva tirada de Bloqueo** (dueño, 2026-10-09): parar con escudo es como esquivar, pero cuesta el No2 del Parry;
+  si el Parry gana, el disparo queda parado (programado en `comun/duelo.js`: resultado «bloqueado», sin fase de Bloqueo ni contraataque).
+- **Lo próximo, después de ultimar los arcos: las ballestas** (dueño: «gran parte del terreno está preparado… tenemos los mecanismos para hacer
+  testeos de balance»). Su casa de diseño: Rompe armadura; los virotes, Perfora.

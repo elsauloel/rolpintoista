@@ -632,7 +632,9 @@ const Duelo = (() => {
     }
     if(par === 'contacto'){
       m.contacto = info;
-      if(m.defensa && m.defensa.modo === 'parry' && r.gana === 'defensor'){ m.fase = 'bloqueo'; }   // el Parry paró el PdG: sigue el Bloqueo
+      // Un disparo parado con escudo (dueño, 2026-10-09): no hay Bloqueo — parar con escudo es como esquivar (cuesta el No2 del Parry): queda parado.
+      if(m.defensa && m.defensa.modo === 'parry' && r.gana === 'defensor' && typeof Combatiente !== 'undefined' && Combatiente.contraDisparo(m)){ m.resultado = 'bloqueado'; m.fase = 'fin'; m.estado = 'resuelto'; }
+      else if(m.defensa && m.defensa.modo === 'parry' && r.gana === 'defensor'){ m.fase = 'bloqueo'; }   // el Parry paró el PdG: sigue el Bloqueo
       else if(r.gana === 'atacante'){ m.resultado = 'pego'; entrarCritico(m); }   // el golpe pega: ¿es crítico?
       else{ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; }
     }else{

@@ -133,6 +133,8 @@ function filaSocialBotonera(i){ return FichaBotonera.filaSocialBotonera(S, i, lu
 function renderBotonera(){
   // El dibujo de la Botonera: comun/ficha-botonera.js (paso 4, etapa 3b), el mismo que usa el mapa.
   const r = FichaBotonera.html(S, {modoMapa, parryArmaPendiente});
+  const rr = $('#botonera-reroll');   // 🪙 apagado y tachado sin Moneda Re-Roll (2026-10-09, dueño)
+  if(rr) rr.classList.toggle('sin-moneda', !FichaDuelo.monedaReroll(S));
   $('#botonera-badge-nitros').textContent = r.nitros;
   $('#botonera-badge-sp').textContent = r.sp;
   $('#botonera-badge-def').textContent = r.def;

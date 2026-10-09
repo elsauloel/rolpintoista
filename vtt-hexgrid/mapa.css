@@ -719,3 +719,6 @@ body.con-ruta .toast{bottom:auto;top:74px}
 .pap .tn-resumen{display:flex;gap:14px;align-items:center;font-size:15px;line-height:1.5}
 .pap .tn-punto{width:56px;height:56px;border-radius:50%;flex:none;overflow:hidden;border:2px solid var(--pap-linea)}
 .pap .tn-punto img{width:100%;height:100%;object-fit:cover}
+/* 🪙 Sin Moneda Re-Roll (2026-10-09, dueño): el botón gris y tachado con una línea roja; tocarlo avisa. */
+.sin-moneda{position:relative;filter:grayscale(1);opacity:.55}
+.sin-moneda::after{content:'';position:absolute;left:12%;right:12%;top:50%;height:2px;margin-top:-1px;background:#D8524B;transform:rotate(-40deg);border-radius:2px;pointer-events:none}

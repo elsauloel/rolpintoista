@@ -318,9 +318,25 @@ function alternarRango(){
 }
 $('#btn-rango').onclick = () => alternarRango();
 $('#btn-ppt').onclick = () => PPT.retar();   // ✊ piedra, papel o tijera (comun/ppt.js, 2026-10-08)
+// 🪙 Apagado (gris y tachado) si el personaje no tiene una Moneda Re-Roll (2026-10-09, dueño). Lo dice el resumen público de su ficha
+// (`resumen.moneda`); una ficha que todavía no lo publicó (sin el dato) queda encendida, como antes.
+function rerollTieneMoneda(){
+  const f = fichasPub.get(fichaPrincipalId());
+  return !f || !f.resumen || f.resumen.moneda !== false;
+}
+function renderRerollBoton(){
+  const b = $('#btn-reroll');
+  if(!b || b.hidden) return;
+  const tiene = rerollTieneMoneda();
+  b.classList.toggle('sin-moneda', !tiene);
+  b.title = tiene ? 'Moneda Re-Roll: volver a hacer cualquiera de tus últimas tiradas, sin costo de No2, mientras tengas una moneda equipada (cinturón o mochila)'
+    : 'Moneda Re-Roll: no tenés ninguna (hace falta una en el cinturón o la mochila)';
+}
+setInterval(renderRerollBoton, 1500);
 $('#btn-reroll').onclick = () => {
   const fid = fichaPrincipalId();
   if(!fid){ toast('Necesitás un personaje para usar la Moneda Re-Roll'); return; }
+  if(!rerollTieneMoneda()){ toast('🪙 No tenés una Moneda Re-Roll: hace falta una en el cinturón o la mochila'); return; }
   abrirRerollMapa(fid);   // el mapa (js/11, A6a)
 };
 

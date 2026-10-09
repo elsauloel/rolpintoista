@@ -1193,3 +1193,6 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .modo-hab-btn{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;white-space:normal;padding:10px 12px;line-height:1.4}
 .modo-hab-btn span{font-size:12.5px;color:var(--muted);font-weight:400}
 .modo-hab-btn.activa span{color:inherit}
+/* 🪙 Sin Moneda Re-Roll (2026-10-09, dueño): el botón gris y tachado con una línea roja; tocarlo avisa. */
+.sin-moneda{position:relative;filter:grayscale(1);opacity:.55}
+.sin-moneda::after{content:'';position:absolute;left:12%;right:12%;top:50%;height:2px;margin-top:-1px;background:#D8524B;transform:rotate(-40deg);border-radius:2px;pointer-events:none}

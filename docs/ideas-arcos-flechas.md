@@ -130,6 +130,6 @@ Drena vida ✔, Resistente ✔, Matabestias / matagente ⚙, contra lo que levit
   escarcha, Relámpago, De ácido, Cegadora, De arpón (Buenas); Del rastreador, De acero templado, De fuego vivo, De hielo negro, Aulladora,
   Silenciadora, De tormenta (Raras).
 - **Las flechas elementales son siempre híbridas** (dueño, 2026-10-09; descartadas las puramente especiales porque se pisan con las varitas): el
-  daño del arco (físico: resta la Defensa, critea) + un daño elemental aparte, directo (ignora la Defensa, no se multiplica con el crítico, resta
-  la Defensa especial y la resistencia a ese elemento) + el efecto que les da identidad. En revisión con el dueño: qué efecto de identidad lleva
+  daño del arco (físico: resta la Defensa, critea) + un daño elemental aparte, directo (no resta la Defensa ni la Defensa especial, solo la
+  resistencia a ese elemento; no se multiplica con el crítico) + el efecto que les da identidad. En revisión con el dueño: qué efecto de identidad lleva
   cada elemento (rayo: el salto de su daño elemental y Parálisis; hielo: Escarcha corta, garantizada aunque la armadura pare el golpe).

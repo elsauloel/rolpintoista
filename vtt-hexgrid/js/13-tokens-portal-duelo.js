@@ -1236,15 +1236,16 @@ async function dueloAplicarDano(d){
     const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD)
       : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD);
     const espinas = res.r.invulnerable ? null : await dueloEspinas(d, golpe, habMagica);   // el daño inflictido (con el multiplicador del crítico), antes de la Defensa; solo el físico
-    // Daño mágico del arma (rayo / hielo): aparte, después del golpe — ignora la Defensa (resta la Defensa especial) y no se multiplica.
+    // Daño elemental del arma o de la flecha (el daño híbrido): aparte, después del golpe — es DIRECTO (dueño, 2026-10-09): no resta la Defensa
+    // ni la Defensa especial, solo la resistencia a su elemento; y no se multiplica con el crítico.
     let magico = null;
     if(dn.magico && num(dn.magico.total) > 0 && !res.r.invulnerable){
       // Su elemento (2026-10-09, dueño: la flecha de fuego es daño físico + un daño directo de fuego): resta además la resistencia a ese
       // elemento (Res. fuego…), como el daño de una habilidad. Con dos elementos juntos («Fuego y Hielo») no se resta ninguna.
       const elMag = String(dn.magico.tipo || '').includes(' y ') ? '' : Combatiente.elementoDe(dn.magico.tipo);
       const resMag = elMag ? (await resistenciasDe(t, elMag, invLeida)).res : 0;
-      const rm = esInv ? await danioInv(t, String(num(dn.magico.total)), true, armadmg, resMag, {magico: true})
-        : t.tipo === 'creep' ? await danioCreep(t, String(num(dn.magico.total)), true, armadmg, resMag, {magico: true}) : await danioPj(t, String(num(dn.magico.total)), true, armadmg, resMag, {magico: true});
+      const rm = esInv ? await danioInv(t, String(num(dn.magico.total)), true, 0, resMag, {magico: true})
+        : t.tipo === 'creep' ? await danioCreep(t, String(num(dn.magico.total)), true, 0, resMag, {magico: true}) : await danioPj(t, String(num(dn.magico.total)), true, 0, resMag, {magico: true});
       magico = {...dn.magico, recibido: num(rm.r.recibido), hpAntes: num(rm.previo), hpDespues: num(rm.nuevo), ...(resMag ? {resEl: Combatiente.resElementalTxt(elMag, resMag)} : {})};
     }
     // El Espejo: 1/4 de todo el daño especial que le tiraron (el de la habilidad y el elemental del arma), antes de la Defensa especial.

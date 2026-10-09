@@ -565,6 +565,7 @@ lienzo.addEventListener('pointermove', e => { const p = posEvento(e); punteroMun
 function copiarElementoSeleccionado(){
   const el = elementoSeleccionado ? elementos.get(elementoSeleccionado) : null;
   if(!el){ return; }
+  if(typeof portapapelesToken !== 'undefined') portapapelesToken = null;   // lo último que se copió es lo que se pega (js/31)
   if(el.colision){ toast('La Colisión del mapa no se copia: se pinta con su herramienta'); return; }
   if(el.portal){ toast('Los portales no se copian: se invocan con su habilidad'); return; }
   const celdas = [];

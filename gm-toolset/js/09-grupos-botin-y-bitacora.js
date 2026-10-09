@@ -50,6 +50,25 @@ function mapasGMEscuchar(){
     renderAll();
   }, err => console.error('Error escuchando la lista de mapas:', err));
 }
+// ¿Crear su token? (2026-10-09, pedido del dueño: «si ya están en un mapa y no está creado el token, al agregarlo que pregunte»). Se llama al
+// crear, duplicar o agregar un creep: si quedó en un mapa (no en la Reserva), pregunta y lo pone oculto en ese mapa (TokensAuto.crear se
+// saltea los que ya tienen token ahí). Espera un momento para que el creep se dibuje (y se guarde) antes de preguntar.
+function ofrecerTokenEnMapa(sc){
+  if(!sc || !fbDb || !fbMiembro || !fbMiembro.gm || MODO_ACCIONES) return;
+  const mapaId = mapaDeCreepGM(sc);
+  if(!mapaId || mapaId === CreepsMapas.RESERVA) return;
+  setTimeout(async () => {
+    if(!S.creeps.includes(sc) || sc._borrador || sc._creando) return;
+    if(!confirm(`¿Querés crear el token de ${nombreLimpioCreep(sc)} en el mapa «${nombreDeMapaGM(mapaId)}»?\n\nQueda oculto a los jugadores hasta que lo muestres.`)) return;
+    try{
+      const r = await TokensAuto.crear([{nombre: nombreLimpioCreep(sc), color: sc.color, tipo: 'creep', fichaId: sc.id, oculto: true}], {mapaId});
+      toast(r.creados ? `🎯 Token de ${nombreLimpioCreep(sc)} en «${nombreDeMapaGM(mapaId)}», oculto a los jugadores` : `${nombreLimpioCreep(sc)} ya tenía su token en ese mapa`);
+    }catch(err){
+      console.error('No se pudo crear el token:', err);
+      toast('No se pudo crear el token — mirá la consola');
+    }
+  }, 400);
+}
 async function crearTokensDelMapa(){
   if(!fbDb || !fbMiembro || !fbMiembro.gm){ toast('Sin conexión con la partida como GM'); return; }
   const mapaId = pestanaMapa, lista = creepsReales().filter(sc => mapaDeCreepGM(sc) === mapaId);

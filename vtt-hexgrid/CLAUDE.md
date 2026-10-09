@@ -1464,3 +1464,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
 - **👆 Estados al pasar el mouse** (2026-10-09, pedido del dueño; `js/30-hover-estados.js`): con el mouse quieto un momento (350 ms) sobre un token que
   se ve, un cartelito al lado del puntero lista sus estados (nombre en su color, turnos, escudo y stacks, descripción corta). Mismos datos que el
   resumen público (el escudo de un creep, solo el GM). Se esconde al arrastrar, hacer clic, usar la rueda o salir del mapa.
+- **📋 Copiar y pegar un token** (2026-10-09, pedido del dueño; `js/31-copiar-token.js`, solo el GM): Ctrl+C con un token seleccionado, Ctrl+V lo pega donde
+  está el mouse. Un creep pregunta «¿Querés crear su ficha?»: sí → `duplicarCreepDesdeMapa` crea un creep nuevo «… (copia)» con lo mismo que guarda GM
+  Tools (lo público con su firma, la ficha privada y la imagen; GM Tools lo levanta solo) y el token queda vinculado; «Solo el token» → un token sin
+  ficha (NPC). Un personaje se pega sin vincular. Del lado de GM Tools, al crear, duplicar o agregar un creep que queda en un mapa pregunta si
+  crear su token (`ofrecerTokenEnMapa`, gm-toolset/js/09).

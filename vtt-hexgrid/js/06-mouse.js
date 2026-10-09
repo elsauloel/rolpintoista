@@ -737,6 +737,18 @@ document.addEventListener('keydown', e => {
     copiarElementoSeleccionado();
     return;
   }
+  // Un token (2026-10-09, pedido del dueño, solo el GM): Ctrl+C lo copia; Ctrl+V lo pega donde está el mouse (js/31: un creep pregunta si
+  // también se duplica su ficha).
+  if((e.key === 'c' || e.key === 'C') && (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && soyGM && seleccion && !elementoSeleccionado){
+    e.preventDefault();
+    copiarTokenSeleccionado();
+    return;
+  }
+  if((e.key === 'v' || e.key === 'V') && (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && soyGM && portapapelesToken){
+    e.preventDefault();
+    pegarToken();
+    return;
+  }
   if((e.key === 'v' || e.key === 'V') && (e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && fbMiembro && portapapelesElemento){
     e.preventDefault();
     pegarElemento();

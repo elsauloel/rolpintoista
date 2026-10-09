@@ -174,7 +174,7 @@ function abrirAsistenteCreep(scId){
     confirmarCancelar: () => asist && !asist.nuevo && JSON.stringify(creepAsist()) !== JSON.stringify(asist.copia) ? '¿Descartar los cambios de este creep?'
       : asist && asist.nuevo ? '¿Cancelar? El creep que estás armando se descarta.' : '',
     alClic: e => clicAsistCreep(e), alInput: e => inputAsistCreep(e), alCambio: e => { const t = e.target; if(t.dataset && t.dataset.acRol !== undefined) asist.rol = t.value; },
-    alCrear: () => { const sc = creepAsist(); if(sc){ delete sc._creando; toast(`${nombreLimpioCreep(sc)} creado`); } terminarAsistCreep(); },
+    alCrear: () => { const sc = creepAsist(); if(sc){ delete sc._creando; toast(`${nombreLimpioCreep(sc)} creado`); } terminarAsistCreep(); if(sc) ofrecerTokenEnMapa(sc); },
     alGuardar: () => { const sc = creepAsist(); if(sc) toast(`${nombreLimpioCreep(sc)} guardado`); terminarAsistCreep(); },
     alCancelar: () => {
       if(asist.nuevo) S.creeps = S.creeps.filter(s => s.id !== asist.id);   // el creep no se llegó a terminar

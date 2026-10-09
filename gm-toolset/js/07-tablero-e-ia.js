@@ -468,8 +468,10 @@ async function generarCreepIA(promptUsuario){
     if(!texto) throw new Error('Respuesta vacía del modelo');
     const obj = JSON.parse(texto);
     const creep = creepDesdeIA(obj);
+    if(!creep.mapa && typeof mapaParaNuevo === 'function') creep.mapa = mapaParaNuevo();
     S.creeps.push(creep);
     renderAll();
+    ofrecerTokenEnMapa(creep);   // ¿su token en el mapa? (js/09)
     $('#scrim-ia').classList.remove('open');
     toast(`Creep generado: ${creep.nombre} ✓ — revisalo antes de usarlo`);
   }catch(err){

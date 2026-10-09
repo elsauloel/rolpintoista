@@ -451,3 +451,7 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
 - **Tanda 6 del paso a paso** (2026-10-02): **＋ Mapa nuevo** (`pedirMapaNuevo(marcado)`, js/09) con `comun/asistente-mapa.js` (los creeps marcados se
   mudan con `moverCreepAMapa`; desde «Mover a… ＋ mapa nuevo» el creep arranca marcado) y el editor de **estados de creep** en la ventana común
   (`CreepEditor.crearEstado(document.body, …)`, sin `#scrim-estado-creep`).
+
+- **¿Crear su token?** (2026-10-09, pedido del dueño): al crear (de cero, paso a paso, biblioteca, IA) o duplicar un creep que queda en un mapa (no en la
+  Reserva), GM Tools pregunta si crear su token oculto en ese mapa (`ofrecerTokenEnMapa`, js/09). Al revés, en el mapa, Ctrl+C / Ctrl+V de un token de creep
+  ofrece duplicar su ficha (ver `vtt-hexgrid/CLAUDE.md`).

@@ -168,6 +168,7 @@ function agregarCreepDeBiblioteca(datos, meta){
   S.creeps.push(sc);
   renderAll();
   toast(`${sc.nombre} agregado a la mesa`);
+  if(typeof ofrecerTokenEnMapa === 'function') ofrecerTokenEnMapa(sc);   // ¿su token en el mapa? (js/09)
 }
 
 function fileToDataURL(file, maxDim=480, quality=0.85){

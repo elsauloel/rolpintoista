@@ -99,7 +99,7 @@ document.addEventListener('click', e => {
       textoAsistente: '🧭 Crear paso a paso',
       alAsistente: () => abrirAsistenteCreep(null),
       base: typeof CREEPS_BASE !== 'undefined' ? CREEPS_BASE : [],
-      alCrearDeCero: () => { const nuevo = nuevoCreep(); nuevo.mapa = mapaParaNuevo(); S.creeps.push(nuevo); renderAll(); },
+      alCrearDeCero: () => { const nuevo = nuevoCreep(); nuevo.mapa = mapaParaNuevo(); S.creeps.push(nuevo); renderAll(); ofrecerTokenEnMapa(nuevo); },
       alElegir: agregarCreepDeBiblioteca,
       alVer: verCreepDeBiblioteca,
       grupos: CREEPS_GRUPOS,
@@ -143,6 +143,7 @@ document.addEventListener('click', e => {
     S.creeps.splice(idx + 1, 0, copia);
     renderAll();
     toast(`${copia.nombre} creado`);
+    ofrecerTokenEnMapa(copia);   // ¿su token en el mapa? (js/09)
     return;
   }
   if(b.dataset.edithab){

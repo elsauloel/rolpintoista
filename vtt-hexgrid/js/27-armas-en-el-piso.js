@@ -177,8 +177,15 @@ async function bnLevantarArma(elId){
     }
     x.it.equipado = r.destino === 'mano';
     S.inventario = [...(S.inventario || []), x.it];
+    // 🏹 Una flecha especial va derecho al carcaj si hay lugar (sin más costo que levantarla); si no, a la mochila.
+    let alCarcaj = false;
+    if(x.it.flecha && FichaEquipo.carcajDe(S)){
+      const antes = FichaEquipo.flechasDelCarcaj(S).reduce((a, f) => a + num(f.unidades || 1), 0);
+      FichaEquipo.alCarcaj(S, x.it.id, {toast: () => {}, cambio: () => {}, modoCombate: () => false, avisarSinNitros: () => {}});
+      alCarcaj = FichaEquipo.flechasDelCarcaj(S).reduce((a, f) => a + num(f.unidades || 1), 0) > antes;
+    }
     bnUi(FichaGuardado.partes(S)).cambio();
-    mesaLinea(`🗡️ ${quien} levantó ${x.it.nombre}${r.destino === 'mano' ? ' y lo tiene en la mano' : ' (a la mochila)'}${r.soltar.length ? ` · guardó ${r.soltar.map(i => i.nombre).join(' y ')} (+${fmt(costo)} No2)` : ''}`);
+    mesaLinea(`${x.it.flecha ? '🏹' : '🗡️'} ${quien} levantó ${x.it.nombre}${r.destino === 'mano' ? ' y lo tiene en la mano' : alCarcaj ? ' (al carcaj)' : ' (a la mochila)'}${r.soltar.length ? ` · guardó ${r.soltar.map(i => i.nombre).join(' y ')} (+${fmt(costo)} No2)` : ''}`);
   };
   if(num(S.nitros) < costo) bnSinNitros(costo, 'levantar el arma', () => seguir()); else seguir();
 }

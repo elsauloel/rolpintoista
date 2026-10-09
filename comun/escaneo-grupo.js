@@ -56,15 +56,20 @@ const EscaneoGrupo = (() => {
     // Resistencia a crítico por Tipo: la más baja del grupo.
     const crit = TIPOS.map((t, i) => ({t, min: Math.min(...ps.map(p => p.rescrit[i])), prom: prom(ps.map(p => p.rescrit[i]))}));
     const sinRes = crit.filter(c => c.min <= 0).map(c => 'Tipo ' + c.t);
-    if(sinRes.length) debiles.push(`Alguien no resiste críticos de ${sinRes.join(', ')}${sinRes.length === TIPOS.length ? ' (ningún Tipo)' : ''}.`);
+    if(sinRes.length === TIPOS.length) debiles.push('Alguien no tiene ninguna resistencia a crítico: cualquier arma le puede critear de lleno.');
+    else if(sinRes.length) debiles.push(`Alguien no resiste críticos de ${sinRes.join(', ')}.`);
     const peor = crit.slice().sort((a, b) => a.prom - b.prom)[0];
     debiles.push(`Donde menos resisten críticos, en promedio: armas Tipo ${peor.t} (${fmt(peor.prom)}).`);
     // Elementales.
+    const nadie = [], vulnerables = [];
     ELEM.forEach(el => {
       const vals = ps.map(p => p.elem[el]);
-      if(vals.every(x => x <= 0)) debiles.push(`Nadie resiste el daño ${ELEM_TXT[el]}${vals.some(x => x < 0) ? ' (y alguno es vulnerable)' : ''}.`);
+      if(vals.every(x => x <= 0)) nadie.push(ELEM_TXT[el]);
+      if(vals.some(x => x < 0)) vulnerables.push(`${ELEM_TXT[el]} (${ps.filter(p => p.elem[el] < 0).map(p => p.nombre).join(', ')})`);
       else if(vals.every(x => x >= 2)) fuertes.push(`Todos resisten el ${ELEM_TXT[el]} (mínimo ${fmt(Math.min(...vals))}).`);
     });
+    if(nadie.length) debiles.push(`Nadie resiste el daño ${nadie.join(', ')}.`);
+    if(vulnerables.length) debiles.push(`Vulnerables (resistencia negativa): ${vulnerables.join(', ')}.`);
     // Defensas.
     const def = ps.map(p => p.defensas.def), am = ps.map(p => p.defensas.armadmg);
     if(Math.max(...am) <= 0) debiles.push('Nadie tiene Armadura mágica: el daño mágico les entra entero.');

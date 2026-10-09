@@ -78,8 +78,26 @@ dados y daño fijo hasta 3d4+4 (48 %). Lo que **se pasa**: 2d4+2 o 2d6 a nivel 1
 quedan fuera de lo que mide la herramienta (nivel 5 como techo): se siguen con la misma línea (más dados, daño fijo, PdG, Crítico frecuente; sin d8
 por ahora). Contra un blanco pesado el arco sigue rindiendo poco: su blanco es lo liviano y lo medio (M3).
 
-**Paso 4 (sigue):** programar el arco — la mitad de la Fuerza, la distancia mínima (2 casilleros libres), sin pegar con el arco ni ataque de
-oportunidad — y pasar los arcos del catálogo a la escalera (precio con `calculadora_armas.py`); después, probar en el mapa.
+**Crítico en los arcos (medido, 2026-10-09):** se puede, pero es caro. En Tipo 4, Crítico frecuente +1 vale más que +2 de daño fijo (Común:
+1d4 con Crít. frec. +1 → 137 %, contra 1d4+2 → 91 %; Buena: 2d4+1 con Crít. frec. +1 → 123 %). La escalera es el **presupuesto** del arco: si trae
+crítico, resigna dados o daño fijo. Lo mismo vale para todo el Tipo 4 (Crít. frec. +1 en todas: Asalto 152 % a nivel 1, dentro a nivel 3 y 5), y el
+catálogo ya lo cumple: ninguna de las 28 Tipo 4 Comunes trae Crítico frecuente (solo potente), aparece desde Buena.
+
+**Qué mide el %:** el daño por turno del arco del Shooter ÷ el de su mejor arma cuerpo a cuerpo de la misma calidad, contra el blanco medio (100 % =
+pega lo mismo). Lo de las clases (Tan/Asa/Sho) es esa clase con su mejor arma ÷ el Warrior con la suya. La herramienta tiene en cuenta el crítico
+completo (niveles, resistencia, d20, supercrítico, sin Defensa); **todavía no** el Crítico potente, el Parry y el Bloqueo del defensor ni los
+efectos al golpear.
+
+**Paso 4 (sigue):** programar el arco — la mitad de la Fuerza (✅ 2026-10-09, `Combatiente.dmgDelArma`), la distancia mínima (2 casilleros libres),
+sin pegar con el arco ni ataque de oportunidad — y pasar los arcos del catálogo a la escalera (precio con `calculadora_armas.py`); después, probar en el mapa.
+
+## Más adelante — «Probemos romper el juego» (dueño, 2026-10-09)
+
+Cuando terminemos con los arcos y el catálogo esté más o menos consolidado: la prueba de perillas en serio, con números, tablas y comparaciones, y
+**personajes peleando entre sí** con distintas armas y armaduras. «Buscar la falla, no para emparcharla, sino para tratar de balancearla.» Son
+demasiadas variables: antes de probar, fijar **un criterio y un orden** (qué se mide primero, contra qué metas) y recién ahí los testeos. Mientras
+tanto, el dueño prefiere **seguir avanzando aunque quede flojo o con alguna falla antes que quedarse trabado**. Para entonces, sumar a la
+herramienta lo que hoy no mide: Crítico potente, Parry y Bloqueo, efectos al golpear, y duelos completos (con movimiento, como `duelo_arco.py`).
 
 ## Tabla base completa (paso 1)
 

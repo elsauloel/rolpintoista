@@ -225,6 +225,7 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Hechizo de área en cascada** (Paso 7b del casteo): armar una habilidad de prueba con objetivo "A un área", castearla contra 2-3 objetivos y ver que la cascada, el círculo compartido y la fase `dodge` anden con varias pantallas abiertas a la vez.
 
 ## 3. Documentación
+- [ ] **«Probemos romper el juego»** (dueño, 2026-10-09, para cuando terminen los arcos y el catálogo esté más o menos consolidado): prueba de perillas  con números, tablas, comparaciones y personajes peleando entre sí con distintas armas y armaduras, para encontrar las fallas y balancearlas (no  emparcharlas). Antes, fijar un criterio y un orden. Ver [`balance-combate.md`](balance-combate.md), «Más adelante».
 - [ ] **Manual de diseño del catálogo, para los colegas** (pedido del dueño, 2026-10-04; se hace **al final** del rework de armas, defensa y
   trampas): todo el criterio de diseño y gestión de ítems compilado para compartir con el grupo — por qué cada mecánica está en cada tipo de
   arma, cómo se arma una pieza defensiva, cómo se gestiona la escasez (tiendas, drops, oro, reparar), las curvas por nivel — para que lo lean,

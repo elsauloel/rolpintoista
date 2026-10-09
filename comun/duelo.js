@@ -1564,6 +1564,7 @@ const Duelo = (() => {
     });
     const mot = motivos.map(t => `<div class="duelo-motivo">⚖ ${t}</div>`).join('');
     const item = d.defensa && d.defensa.itemNombre ? d.defensa.itemNombre : 'el objeto con el que bloqueó';
+    const disparoParado = d.resultado === 'bloqueado' && !d.bloq && typeof Combatiente !== 'undefined' && Combatiente.contraDisparo(d);
     // Efecto que la skill no puede automatizar del todo (2026-09-27, pedido del dueño — "Pasos personalizados"
     // del 🎯): texto libre + la diferencia entre las dos tiradas, si hubo contienda, para resolverlo a mano.
     const efectoLibre = d.hab && d.hab.efectoLibre
@@ -1580,6 +1581,8 @@ const Duelo = (() => {
       caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">⚔ ¡PEGÓ!</div><div class="chico">${porParry ? 'El Parry no alcanzó: el golpe entra completo' : 'El golpe entra completo'}</div>${mot}</div>`;
     }else if(d.resultado === 'fallo'){
       caja = `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🛡 FALLÓ</div><div class="chico">${_esc(d.defensor.nombre)} lo esquivó</div>${mot}</div>`;
+    }else if(d.resultado === 'bloqueado' && disparoParado){
+      caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🛡 ¡PARADO!</div><div class="chico">${_esc(d.defensor.nombre)} paró el disparo con el escudo: queda anulado</div>${mot}</div>`;
     }else if(d.resultado === 'bloqueado'){
       caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🛡 ¡BLOQUEADO!</div><div class="chico">El golpe queda anulado</div>${mot}</div>`;
     }else if(d.resultado === 'mitad'){
@@ -1589,8 +1592,9 @@ const Duelo = (() => {
     // Contraataque (regla del dueño, 2026-10-01, P139): solo después de un Parry Y un Bloqueo exitosos — eso es «bloqueado». El paso
     // siguiente es una pregunta, Sí o No: con Sí se abre un duelo nuevo con los papeles al revés (quien defendía ataca). `contra`:
     // el id de ese duelo, 'no' si decidió no contraatacar, vacío mientras decide.
+    // Un disparo parado con escudo no da contraataque (dueño, 2026-10-09): no hubo Bloqueo y el tirador está lejos.
     let contra = '';
-    if(d.resultado === 'bloqueado' && !d.contra){
+    if(d.resultado === 'bloqueado' && !d.contra && !disparoParado){
       const propio = esMio(d.defensor);
       if(propio || soyGM()) contra = `<div class="duelo-contra"><div class="duelo-nota" style="margin-bottom:8px">⚔ ${propio ? 'Ganaste' : _esc(d.defensor.nombre) + ' ganó'} el Parry y el Bloqueo: <b>¿${propio ? 'contraatacás' : 'contraataca'} a ${_esc(d.atacante.nombre)}?</b><br><span style="opacity:.8">Cuesta lo de un primer ataque con su arma y se abre un duelo nuevo con los papeles al revés.</span></div>`
         + `<button type="button" data-contra>Sí, contraatacar${propio ? '' : ' (por ' + _esc(d.defensor.nombre) + ')'}</button> <button type="button" class="sec" data-contra-no>No</button></div>`;

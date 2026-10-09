@@ -1478,7 +1478,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   recta desde quien dispara hasta el mouse (verde libre, ámbar roza, roja tapada, con la distancia), con las casillas que la tapan marcadas
   (`tiroPreview`, `dibujarTiroPreview`). La tapan los Sólidos y cualquier token que se vea, aliado o rival (`lineaDeTiro`); la línea se mira corrida
   apenas a cada lado: si un lado está libre y el otro no, «roza». Al elegir un objetivo tapado o rozado (`tiroRevisar`), el Anuncio pregunta: «Tiro
-  alto (PdG −2)» si el arma lo tiene, el objetivo está a 4+ y solo tapan tokens; «Disparar igual (lo decide la mesa)», con línea roja en la Mesa; o
+  alto (PdG −2)» si el arma lo tiene, el objetivo está a 4+ y solo tapan tokens; «Ignorar obstáculo» (lo decide la mesa), con línea roja en la Mesa; o
   «Elegir otro». Los objetivos en la **distancia ideal** del arma brillan con un anillo celeste (`objetivosIdeal`, `tiroResaltarIdeal`) y el bono
   viaja al duelo en `cfg.tiro`. Los resaltes se rehacen cada vez que se vuelve a elegir (`resaltar()` en `dueloElegirObjetivoMapa`).
 

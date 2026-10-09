@@ -112,7 +112,7 @@ async function tiroRevisar(mio, t, ataque, yo){
         : `Entre vos y ${nombreDe(t)} está ${tapa}: los tokens y los obstáculos tapan el disparo.`,
       opciones: [
         ...(puedeAlto ? [{valor: 'alto', texto: `🏹 Tiro alto, por encima (PdG ${Combatiente.TIRO_ALTO_PDG})`, detalle: 'tu arma lo permite: pasa por encima de los tokens'}] : []),
-        {valor: 'igual', texto: lt.estado === 'roza' ? 'Pasa: disparar' : 'Disparar igual (lo decide la mesa)', sec: puedeAlto},
+        {valor: 'igual', texto: 'Ignorar obstáculo', detalle: 'lo decide la mesa', sec: puedeAlto},   // (dueño, 2026-10-09: «que diga ignorar obstáculo»)
         {valor: 'otro', texto: 'Elegir otro', sec: true},
       ]});
     if(r === 'otro') return {seguir: false, tiro: null};

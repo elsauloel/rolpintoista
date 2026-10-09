@@ -114,8 +114,8 @@
 Drena vida ✔, Resistente ✔, Matabestias / matagente ⚙, contra lo que levita ⚙, efecto solo en la distancia ideal ⚙, comba (P185).
 
 ## Decidido y programado (2026-10-09)
-- **Carcaj**: pieza aparte, **viene con todo arco (10 lugares)**; se compran mejores (de cazador 15, de saque rápido 10 que no cobra el No2 de la
-  primera flecha especial del turno, de la guardia 20 con PdG a distancia +1). Pasar flechas de la mochila al carcaj: gratis fuera de combate.
+- **Carcaj**: pieza aparte, **viene con todo arco (10 lugares)**; se compran mejores (de cazador 15, de saque rápido 10 —cada flecha especial que cuesta No2 tira una
+  moneda: 2 = no cobra su No2 (dueño: una vez por turno anulaba la penalización)—, de la guardia 20 con PdG a distancia +1). Pasar flechas de la mochila al carcaj: gratis fuera de combate.
 - **Las flechas compradas no trabajan con %** (dueño: «es muy decepcionante gastar plata, tiempo, espacio en el carcaj para que el dado falle»): sus
   efectos son **siempre** que pegan; lo fuerte se paga con **No2 extra** (0 lo leve, 1 un estado o daño elemental, 2 control fuerte, 3 el Stun) y oro.
 - **Si erra, queda en el suelo siempre** (en la casilla más lejana del alcance, siguiendo la línea), salvo que choque contra algo con colisión: ahí

@@ -1446,7 +1446,7 @@ versión parecida en más de una, es candidato a juntar.
   (gratis fuera de combate; en combate como equipar), `gastarFlecha`, `flechaTxt` y `carcajHtml` (en «Equipo y mochila»). **Todo arco viene con el
   Carcaj de cuero (10)** si no tenía ninguno (`FichaTienda.crearItems`). Una flecha no se «consume» (`FichaAcciones.consumir` la rechaza; la
   Botonera no la lista). Al disparar con un arco desde el mapa: «¿Qué flecha?» (js/11 `bnElegirFlecha`), se gasta y cobra su No2 al crear el duelo
-  (`bnDispararFlecha`; el Carcaj de saque rápido no cobra la primera del turno), sus bonos van al `tiro` y sus efectos y su Perfora al duelo
+  (`bnDispararFlecha`; con el Carcaj de saque rápido, cada flecha que cuesta No2 tira una moneda: 2 = gratis), sus bonos van al `tiro` y sus efectos y su Perfora al duelo
   (`cfg.flecha` → `ataque.flecha`: `guardarDano` suma los efectos; el mapa resta la Perfora de la Defensa). Si erra: hook `flechaErrada` del duelo
   (vtt-hexgrid/js/33). Los creeps con arco dejan siempre una flecha especial (`CombateFin`, `peleaConArco`). **Falta:** elegir flecha en la ficha
   suelta, en las Acciones de un creep y en las invocaciones.

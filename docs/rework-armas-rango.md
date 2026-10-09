@@ -123,6 +123,5 @@ comba, la skill del Shooter)?
 - **Distancia mínima:** el arco no ataca cuerpo a cuerpo; tiene que haber **al menos 2 casilleros libres entre el arquero y el objetivo** (el
   objetivo a 3 casilleros o más).
 
-**Abierto:** ¿qué puede hacer el arquero con un enemigo encima? ¿Alejarse (y comerse el ataque de oportunidad), cambiar de arma (en combate cuesta
-No2) o pegar con el arco como un golpe sin arma (Tipo 4, sin Fuerza)? ¿La distancia mínima vale también para las ballestas y la pólvora, o solo
-para los arcos?
+**Decidido (dueño):** con un enemigo encima, el arquero **se aleja** (y se come el ataque de oportunidad) **o cambia de arma** (en combate cuesta
+No2). **No se puede pegar con el arco.** La distancia mínima de ballestas y pólvora se evalúa cuando les toque; ahora, solo arcos.

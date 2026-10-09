@@ -893,3 +893,9 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   hacen ataques de oportunidad. Para debatir con el grupo: ¿se puede disparar más cerca, **con desventaja**? Por ejemplo, **cara a cara** (adyacente)
   el rival tiene un **ataque de oportunidad** («hay algo en tensar el arco que lleva tiempo»); y a **2 o 3 casilleros**, ¿alguna desventaja extra?
   Ver [`rework-armas-rango.md`](rework-armas-rango.md). Va también a Herramientas de diseño → Preguntas (para los colegas).
+- ❓ **P184. El arco y el sigilo — 2026-10-09, para afinar más adelante** (dueño: «el dilema eterno… un dilema filosófico previo a
+  Aristóteles»). Regla de hoy: quien es atacado por alguien **en sigilo** tira **1 de Evasión**. Con el arco eso arma un francotirador: dispara
+  escondido desde lejos, sin riesgo, y la Evasión de 1 le da muchos niveles de crítico (el Tipo 4 es el de rango más chico). Para debatir:
+  ¿disparar rompe el sigilo (o lo rompe después del primer tiro)? ¿El primer disparo desde el sigilo vale como «sorpresa» y los siguientes no?
+  ¿La Evasión 1 vale a cualquier distancia o solo cerca? ¿Hace falta una tirada de sigilo al disparar? Ver P183 (distancia mínima) y
+  [`rework-armas-rango.md`](rework-armas-rango.md).

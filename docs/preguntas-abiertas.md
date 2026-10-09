@@ -888,3 +888,8 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   mochila), y después se tira la moneda: par se conserva, impar se rompe. **Por ahora queda así, como excepción al uso de No2** (dueño). Para
   debatir con el grupo: ¿debería costar como un consumible (1 cinturón / 2 mochila)? ¿Solo desde el cinturón? ¿Una por turno o por combate?
   Va también a Herramientas de diseño → Preguntas (para los colegas).
+- ❓ **P183. La distancia mínima del arco — 2026-10-09, abierta para la mesa** (dueño: «lo podemos dejar como discutible»). **Por ahora**: con el
+  arco hacen falta **al menos 2 casilleros libres** entre el arquero y el objetivo (objetivo a 3 o más), con el arco no se pega cuerpo a cuerpo ni se
+  hacen ataques de oportunidad. Para debatir con el grupo: ¿se puede disparar más cerca, **con desventaja**? Por ejemplo, **cara a cara** (adyacente)
+  el rival tiene un **ataque de oportunidad** («hay algo en tensar el arco que lleva tiempo»); y a **2 o 3 casilleros**, ¿alguna desventaja extra?
+  Ver [`rework-armas-rango.md`](rework-armas-rango.md). Va también a Herramientas de diseño → Preguntas (para los colegas).

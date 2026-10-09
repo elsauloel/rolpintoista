@@ -522,6 +522,16 @@ prueba('el arco suma la mitad del Dmg (para arriba); otra de rango, nada; cuerpo
     Combatiente.dmgDelArmaTxt(arco), Combatiente.dmgDelArmaTxt({armaDeRango: true}), Combatiente.dmgDelArmaTxt({})],
     [5, 3, 2, 0, 5, '1d4 + 4', '2d6 + 2', '1d4 + 3', 'arco: suma la mitad del Dmg', 'de rango: no suma Dmg', '']);
 });
+prueba('el arco: distancia mínima (2 casilleros libres) y sin ataque de oportunidad, para el ítem y el arma de un creep (2026-10-09, P183)', () => {
+  const arco = {armaDeRango: true, arco: true}, ballesta = {armaDeRango: true}, espada = {};
+  const creepArco = {armaTipo: 4, armaDeRango: true, armaRasgos: {arco: true}, nitros: 9, hp: 10};
+  const creepEspada = {armaTipo: 6, nitros: 9, hp: 10};
+  igual([Combatiente.ARCO_LIBRES, Combatiente.arcoMuyCerca(arco, 1), Combatiente.arcoMuyCerca(arco, 2), Combatiente.arcoMuyCerca(arco, 3), Combatiente.arcoMuyCerca(ballesta, 1),
+    Combatiente.sirveDeOportunidad(arco), Combatiente.sirveDeOportunidad(ballesta), Combatiente.sirveDeOportunidad(espada),
+    Combatiente.ataqueDeArma(arco).arco, Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(creepArco)).arco, Combatiente.ataqueDeArma(espada).arco,
+    CreepCalculo.oportunidadPosible(creepArco), CreepCalculo.oportunidadPosible(creepEspada)],
+    [2, true, true, false, false, false, true, true, true, true, undefined, false, true]);
+});
 
 /* ---------- Habilidades y consumibles (comun/ficha-habilidades.js, paso 5 nivel B área 3) ---------- */
 grupo('Habilidades y consumibles (paso 5)');

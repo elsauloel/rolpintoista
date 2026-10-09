@@ -459,7 +459,8 @@ function oportunidadEvaluarRuta(t, ruta){
 async function oportunidadPublicarAvisos(t, salidos){
   if(!salidos || !salidos.length || !fbDb || !fbUsuario || !fbMiembro) return;
   for(const {r} of salidos){
-    const texto = `${nombreDe(t)} se alejó de ${nombreDe(r)}: no hay ataque de oportunidad (${nombreDe(r)} no tiene No2 suficientes)`;
+    const rs = (vinculo(r) || {}).resumen || {};
+    const texto = `${nombreDe(t)} se alejó de ${nombreDe(r)}: no hay ataque de oportunidad (${nombreDe(r)} ${rs.sinOpor ? 'tiene un arco, que no sirve de oportunidad' : r.tipo === 'creep' ? 'no puede aprovecharlo' : 'no tiene No2 suficientes'})`;
     try{
       await fbDb.collection(fbRutaCampana('tiradas')).add({
         uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',

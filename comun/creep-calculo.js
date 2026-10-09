@@ -404,7 +404,7 @@ const CreepCalculo = (() => {
   function costoOportunidad(sc){ return Math.max(0, Combatiente.costoEspecial(num(sc.armaTipo) || 8, Combatiente.armaDeCombatiente(sc), 'oportunidad') - Combatiente.ahorroEspecial('oportunidad', st => modTotal(sc, st))); }
   function oportunidadPosible(sc){
     const n = sc.nitros === null || sc.nitros === undefined ? nitrosMax(sc) : num(sc.nitros);
-    return !(num(sc.hp) <= 0) && n >= costoOportunidad(sc);
+    return !(num(sc.hp) <= 0) && n >= costoOportunidad(sc) && Combatiente.sirveDeOportunidad(Combatiente.armaDeCombatiente(sc));   // con un arco, no (2026-10-09)
   }
   // Lo que muestra la 🪪 tarjeta del creep en el mapa a cualquier jugador (2026-10-09): solo NOMBRES — el arma (también la natural,
   // marcada) y cada pieza de equipo, sin defensa, bonos ni detalle — y la nota. Lo publican GM Tools (creepPublico) y el mapa al

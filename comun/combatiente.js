@@ -424,15 +424,21 @@ const Combatiente = (() => {
     const r = {...(x.armaRasgos || {})};
     if(x.armaEspalda && !r.espalda) r.espalda = x.armaEspalda;
     if(n(x.armaIgnoraResistCrit) && !r.ignoraResistCrit) r.ignoraResistCrit = n(x.armaIgnoraResistCrit);
-    return {nombre: x.armaNombre || '', tipoDado: n(x.armaTipo) || 8, efectosGolpe: x.armaEfectos || [], ...r};
+    return {nombre: x.armaNombre || '', tipoDado: n(x.armaTipo) || 8, armaDeRango: !!x.armaDeRango, efectosGolpe: x.armaEfectos || [], ...r};
   }
   // Lo que el ataque lleva al duelo por su arma: el bono por la espalda y «no se puede parrear».
   function ataqueDeArma(arma){
     const o = {};
     if(arma && arma.espalda) o.espalda = arma.espalda;
     if(arma && arma.sinParry) o.sinParry = true;
+    if(esArco(arma)) o.arco = true;   // el mapa pide la distancia mínima del arco al elegir el objetivo (no viaja al duelo)
     return o;
   }
+  /* El arco y la distancia (2026-10-09, dueño; P183 abierta para la mesa): con el arco hacen falta al menos ARCO_LIBRES casilleros libres entre
+     el arquero y el objetivo (el objetivo a ARCO_LIBRES + 1 o más), no se pega cuerpo a cuerpo y no se hacen ataques de oportunidad. */
+  const ARCO_LIBRES = 2;
+  const arcoMuyCerca = (arma, distancia) => esArco(arma) && n(distancia) <= ARCO_LIBRES;
+  const sirveDeOportunidad = arma => !esArco(arma);
   // Costos con los rasgos: el primer ataque del turno con el arma (ahorroNitros) y el ataque de oportunidad (oporGratis).
   const costoConAhorro = (costo, arma, previos) => Math.max(0, costo - (n(previos) === 0 ? n(arma && arma.ahorroNitros) : 0));
   const costoEspecial = (tipoDado, arma, tipo) => tipo === 'oportunidad' && arma && arma.oporGratis ? 0 : costoPrimerAtaque(tipoDado);
@@ -1134,7 +1140,7 @@ const Combatiente = (() => {
   // El texto de lo que cura un ítem: «Heridas (Sangrado, Lisiado, Rengo)».
   const textoCura = grupos => grupos.map(k => `${GRUPOS_CURA[k].label} (${GRUPOS_CURA[k].estados.join(', ')})`).join(' · ');
 
-  return {GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, esArco, dmgDelArma, dmgDelArmaTxt, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, esArco, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

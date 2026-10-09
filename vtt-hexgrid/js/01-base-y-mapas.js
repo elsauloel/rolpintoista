@@ -551,7 +551,7 @@ function vinculo(t){
     invocacion: true,
     resumen: {
       hp: inv.hp, hpMax: inv.hpMax, muerto: num(inv.hp) <= 0, dormida: inv.activa === false,
-      nitros: inv.nitros, nitrosMax: inv.nitrosMax, oporCosto: inv.oporCosto,
+      nitros: inv.nitros, nitrosMax: inv.nitrosMax, oporCosto: inv.oporCosto, sinOpor: inv.sinOpor === true,
       estados: Array.isArray(inv.estados) ? inv.estados : [],
     },
   };

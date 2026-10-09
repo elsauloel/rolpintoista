@@ -139,8 +139,9 @@ const FichaResumen = (() => {
       nitros: S.nitros === null || S.nitros === undefined ? n(c.final.nitros) : num(S.nitros),
       nitrosMax: n(c.final.nitros),
       // Lo menos que le cuesta un ataque de oportunidad con alguna de sus manos (2026-10-02): el mapa frena a un rival que se aleja solo si
-      // nitros ≥ esto. Sin armas con daño, a mano limpia.
-      oporCosto: (() => { const armas = FichaCombate.armasEquipadasConDano(S).map(x => x.item); return Math.min(...(armas.length ? armas : [null]).map(a => FichaCombate.costoAtaqueEspecial(a, 'oportunidad', S))); })(),
+      // nitros ≥ esto. Sin armas con daño, a mano limpia. Con el arco no hay oportunidad (2026-10-09): si solo tiene arcos, `sinOpor`.
+      oporCosto: (() => { const armas = FichaCombate.armasEquipadasConDano(S).map(x => x.item).filter(Combatiente.sirveDeOportunidad); return Math.min(...(armas.length ? armas : [null]).map(a => FichaCombate.costoAtaqueEspecial(a, 'oportunidad', S))); })(),
+      sinOpor: (() => { const armas = FichaCombate.armasEquipadasConDano(S).map(x => x.item); return armas.length > 0 && !armas.some(Combatiente.sirveDeOportunidad); })(),
       costoMover: IT2().inmovilizadoBloqueaMover && estadoActivo(S, 'inmovilizado') ? 0 : costoMoverCasillero(S),
       muerto: !!(S.muerto && S.muerto.activo),
       muertoDef: !!(S.muerto && S.muerto.definitivo),   // muerto de verdad (el GM lo usa al repartir la experiencia)
@@ -174,6 +175,7 @@ const FichaResumen = (() => {
           nitros: num(inv.nitros),
           nitrosMax: invNitrosMax(inv),
           oporCosto: Math.max(0, Combatiente.costoEspecial(num(inv.armaTipo) || 8, Combatiente.armaDeCombatiente(inv), 'oportunidad') - Combatiente.ahorroEspecial('oportunidad', st => invModTotal(inv, st))),   // ataque de oportunidad (2026-10-02)
+          sinOpor: !Combatiente.sirveDeOportunidad(Combatiente.armaDeCombatiente(inv)),   // con un arco no hay oportunidad (2026-10-09)
           // Las reglas del mapa, iguales para todos (dueño, 2026-10-04): moverse cuesta No2 (Rengo el doble, Inmovilizado no se mueve), los Pasos
           // gratis, las chances de las piezas (Retirada limpia, Inamovible, Recuperarse rápido, Reflejos de mangosta) y Pisada atenta con su Percepción.
           costoMover: invCostoMover(inv), pasosGratis: num(invModTotal(inv, 'pasosgratis')), retirada: num(invModTotal(inv, 'retirada')),

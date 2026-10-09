@@ -33,6 +33,7 @@ const rutaTokenId = t => { for(const [id, x] of tokens) if(x === t) return id; r
 function oporPuede(r){
   const v = vinculo(r), rs = v && v.resumen;
   if(!rs) return true;
+  if(rs.sinOpor) return false;   // solo tiene un arco: con el arco no hay oportunidad (2026-10-09)
   if(r.tipo === 'creep') return rs.opor !== false;
   if(rs.oporCosto === undefined || rs.nitros === undefined || rs.nitros === null) return true;
   return num(rs.nitros) >= num(rs.oporCosto);
@@ -209,7 +210,7 @@ async function oporArmasDe(r){
     if(!sc) return [];
     const costo = CreepCalculo.costoOportunidad(sc);
     const n = sc.nitros === null || sc.nitros === undefined ? CreepCalculo.nitrosMax(sc) : num(sc.nitros);
-    if(n < costo) return [];
+    if(n < costo || !Combatiente.sirveDeOportunidad(Combatiente.armaDeCombatiente(sc))) return [];   // con un arco no hay oportunidad
     return [{nombre: sc.armaNombre || 'su arma', costo, yo: {ref: r.fichaId, tipo: 'creep', nombre}, detalle: oporDetalle(CreepCalculo.ataqueTxt(sc), sc, Combatiente.armaDeCombatiente(sc)),
       ataque: {tipo: 'oportunidad', armaId: '', armaNombre: sc.armaNombre || '', tipoDado: num(sc.armaTipo) || 8, rango: !!sc.armaDeRango, alcance: CreepCalculo.alcance(sc), ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(sc))}}];
   }
@@ -228,7 +229,8 @@ async function oporArmasDe(r){
   }
   const calc = FichaCalculo.calcular(S);
   const disponibles = S.nitros === null || S.nitros === undefined ? num(calc.final.nitros) : num(S.nitros);
-  const lista = FichaCombate.armasEquipadasConDano(S).map(x => x.item);
+  const todas = FichaCombate.armasEquipadasConDano(S).map(x => x.item), lista = todas.filter(Combatiente.sirveDeOportunidad);   // el arco no sirve de oportunidad
+  if(todas.length && !lista.length) return [];   // solo un arco: tampoco a mano limpia (tiene las dos manos ocupadas)
   return (lista.length ? lista : [null]).map(arma => ({arma, costo: FichaCombate.costoAtaqueEspecial(arma, 'oportunidad', S)}))
     .filter(x => x.costo <= disponibles)
     .map(({arma, costo}) => ({nombre: arma ? arma.nombre : 'sin arma', costo, yo: {ref: fichaId, tipo: 'pj', nombre},

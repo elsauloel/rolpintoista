@@ -1425,5 +1425,8 @@ versión parecida en más de una, es candidato a juntar.
   (en `Combatiente.RASGOS_ARMA`: un ítem lo lleva suelto, un creep o una invocación en `armaRasgos`). `Combatiente.dmgDelArma(arma, dmg)` = cuánto
   del Dmg suma el daño (cuerpo a cuerpo entero; arco la mitad, para arriba; otra de rango nada), `esArco(arma)` y `dmgDelArmaTxt(arma)`. Lo usan
   las tres cuentas de daño (`FichaCombate.armaDanoTxt`, `CreepCalculo.danoTxt`, `InvCalculo.danoTxt`), sus 🔍, la ficha lite e `ItemCorto`; el
-  asistente de ítems pregunta «¿Es un arco?» cuando el arma es a distancia. El Tipo es el dado (un arco de d6 es Tipo 6). Falta automatizar la
-  distancia mínima (2 casilleros libres) y que con el arco no se pegue cuerpo a cuerpo ni se hagan ataques de oportunidad.
+  asistente de ítems pregunta «¿Es un arco?» cuando el arma es a distancia. El Tipo es el dado (un arco de d6 es Tipo 6). **Distancia mínima y
+  oportunidad** (P183, abierta para la mesa): `Combatiente.ARCO_LIBRES` (2), `arcoMuyCerca(arma, distancia)`, `sirveDeOportunidad(arma)`;
+  `ataqueDeArma` lleva `arco` (el mapa, al elegir el objetivo: brillan solo los que están a 3+ y uno más cerca avisa y deja seguir —lo decide
+  la mesa, con línea en la Mesa—); `armaDeCombatiente` ahora trae `armaDeRango`. Sin oportunidad con el arco: `FichaResumen` publica `sinOpor`
+  (personaje solo con arcos; invocación con arco), `CreepCalculo.oportunidadPosible` da false y el mapa no frena ni ofrece el arco (js/17).

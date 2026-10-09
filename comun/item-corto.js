@@ -201,7 +201,7 @@ const ItemCorto = (() => {
     if(num(it.danoFijo)) L.push('Daño fijo: se suma al resultado de los dados en cada golpe.');
     if(it.tipoItem === 'arma_2m') L.push('A dos manos: ocupa las dos manos.');
     if(it.armaDeRango) L.push(Combatiente.esArco(it)
-      ? 'Arco: suma la mitad de tu Dmg (Fuerza), redondeada para arriba. ⚙ Automatizado. Dispara con al menos 2 casilleros libres entre vos y el objetivo, y con el arco no se pega cuerpo a cuerpo ni se hacen ataques de oportunidad: si te encaran, alejate o cambiá de arma. ✋ A mano por ahora.'
+      ? 'Arco: suma la mitad de tu Dmg (Fuerza), redondeada para arriba. Dispara con al menos 2 casilleros libres entre vos y el objetivo (en el mapa brillan los que están a tiro; si elegís uno más cerca, avisa y lo decide la mesa), y con el arco no se pega cuerpo a cuerpo ni se hacen ataques de oportunidad: si te encaran, alejate o cambiá de arma. ⚙ Automatizado.'
       : 'A distancia: el daño es solo el del arma, no suma tu Dmg. ⚙ Automatizado.');
     const vistos = new Set();
     (it.mods || []).forEach(m => { if(m && MECANICA[m.stat] && !vistos.has(m.stat)){ vistos.add(m.stat); L.push(MECANICA[m.stat]); } });

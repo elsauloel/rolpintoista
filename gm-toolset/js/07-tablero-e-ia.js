@@ -551,7 +551,7 @@ function reiniciarCombate(){
    ficha-guardado y ficha-combate); la IA (la misma clave y modelo de OpenRouter que «+ Creep con IA») solo propone un equipo de creeps con ese
    escaneo. No escribe nada en la partida.
    ========================================================= */
-const ESCANEO_PIEZAS = ['../comun/ficha-calculo.js?v=20261007am', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-combate.js?v=20261005mn', '../comun/escaneo-grupo.js?v=20261009e'];
+const ESCANEO_PIEZAS = ['../comun/ficha-calculo.js?v=20261007am', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-combate.js?v=20261009k', '../comun/escaneo-grupo.js?v=20261009e'];
 let escaneo = {perfiles: [], fuera: new Set(), cargando: false};
 function escaneoCargarScript(src){
   return new Promise((ok, mal) => {

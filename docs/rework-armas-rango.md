@@ -350,7 +350,7 @@ calculadora cobra la ballesta como el arco (×0,7; Recarga 3 ×0,9) y su casa es
 | Buena | envenenado | Perfora 2 + Veneno ×3 | 1 | 45 |
 | Buena | incendiario · de escarcha · de ácido · relámpago | Los mismos que las flechas | 1 | 40–45 |
 | Rara | de acero templado | Perfora 3 · PdG +1 | 1 | 80 |
-| Rara | de punta de diamante | Perfora 5 (casi toda la Defensa) | 2 | 120 |
+| Rara | de punta de diamante | Perfora 5 (pasan siempre 5 de daño) | 2 | 120 |
 | Rara | de fuego vivo · de hielo negro · de tormenta | Los mismos que las flechas | 2–3 | 100–150 |
 
 **Quedan para una tanda con mapa** (necesitan código nuevo): llega cargada, apuntada, a quemarropa, atraviesa escudos, la ballesta de muralla y

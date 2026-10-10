@@ -438,6 +438,7 @@ const AsistenteItem = (() => {
       h += `<div class="aa-campo"><label>Mecánicas de firma (opcional)</label>
         ${chk('sinParry', 'No se puede parrear (el defensor solo puede esquivar)')}
         ${chk('oporGratis', 'El ataque de oportunidad con esta arma no cuesta No2')}
+        ${d.armaDeRango && !d.arco ? chk('cargada', 'Llega cargada: el primer disparo del turno es gratis si no disparó con ella el turno anterior') + chk('atraviesaEscudos', 'Atraviesa escudos: si lo paran con un escudo, el escudo se abolla (1 stack de Armadura rota)') + campo('Apuntada: +PdG si no se movió en el turno', `<input data-aa-c="apuntada" type="number" step="1" min="0" max="5" value="${n(d.apuntada) || 0}" style="max-width:110px">`) : ''}
         <div class="aa-fila">${campo('Primer ataque del turno: No2 de menos', `<input data-aa-c="ahorroNitros" type="number" step="1" min="0" value="${n(d.ahorroNitros) || 0}" style="max-width:110px">`)}
         ${campo('d20 de más en el crítico', `<input data-aa-c="critD20" type="number" step="1" min="0" value="${n(d.critD20) || 0}" style="max-width:110px">`)}</div></div>`;
       h += `<div class="aa-fila">${campo('Ignora Resistencia a crítico', `<input data-aa-c="ignoraResistCrit" type="number" step="1" min="0" value="${n(d.ignoraResistCrit) || 0}" style="max-width:110px">`,
@@ -814,7 +815,7 @@ const AsistenteItem = (() => {
 
   // «+2 PdG, +1 de daño» (el bono por la espalda de un arma).
   const espaldaTxt = es => es ? [n(es.pdg) ? `+${f(n(es.pdg))} PdG` : '', n(es.fijo) ? `+${f(n(es.fijo))} de daño` : '', n(es.critpot) ? `+${f(n(es.critpot))} Crítico potente` : ''].filter(Boolean).join(', ') : '';
-  const NUMERICOS = ['peso', 'danoFijo', 'danoAmplificado', 'ignoraResistCrit', 'perfora', 'ahorroNitros', 'critD20', 'precioCompra', 'ranuras', 'equipoEstadoHpTurno', 'durExtra', 'durPorPeso'];
+  const NUMERICOS = ['peso', 'danoFijo', 'danoAmplificado', 'ignoraResistCrit', 'perfora', 'apuntada', 'ahorroNitros', 'critD20', 'precioCompra', 'ranuras', 'equipoEstadoHpTurno', 'durExtra', 'durPorPeso'];
   function alEscribir(ev){
     if(!st) return;
     const t = ev.target, d = st.d;
@@ -891,7 +892,7 @@ const AsistenteItem = (() => {
       const am = es.aMano || {}, amT = String(am.texto || '').trim(), amR = String(am.tirada || '').replace(/\s+/g, ''), amE = String(am.etiqueta || '').trim();
       if(amT || amR) es.aMano = {...(amT ? {texto: amT} : {}), ...(amR ? {tirada: amR} : {}), ...(amE ? {etiqueta: amE} : {})}; else delete es.aMano;
       d.peso = Math.max(1, n(d.peso) || 1);
-      ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', ...(typeof Combatiente !== 'undefined' ? Combatiente.RASGOS_ARMA : ['ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga', 'perfora'])].forEach(k => delete d[k]);
+      ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', ...(typeof Combatiente !== 'undefined' ? Combatiente.RASGOS_ARMA : ['ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga', 'perfora', 'apuntada', 'cargada', 'atraviesaEscudos'])].forEach(k => delete d[k]);
       if(!(d.efectosGolpe || []).length) delete d.efectosGolpe;
       d.mods = d.mods.filter(m => m.stat !== 'rng');
     }else if(grupoDe(d.tipoItem) === 'arma'){
@@ -905,6 +906,8 @@ const AsistenteItem = (() => {
       if(n(d.perfora) > 0) d.perfora = Math.min(5, Math.round(n(d.perfora))); else delete d.perfora;   // Perfora N (2026-10-10)
       ['ahorroNitros', 'critD20'].forEach(k => { if(n(d[k]) > 0) d[k] = Math.round(n(d[k])); else delete d[k]; });
       ['sinParry', 'oporGratis'].forEach(k => { if(d[k]) d[k] = true; else delete d[k]; });
+      ['cargada', 'atraviesaEscudos'].forEach(k => { if(d.armaDeRango && !d.arco && d[k]) d[k] = true; else delete d[k]; });   // rasgos de ballesta (2026-10-10)
+      if(d.armaDeRango && !d.arco && n(d.apuntada) > 0) d.apuntada = Math.min(5, Math.round(n(d.apuntada))); else delete d.apuntada;
       if(d.armaDeRango && d.arco){ d.arco = true; d.tipoItem = 'arma_2m'; } else delete d.arco;   // un arco: siempre a dos manos
       if(d.armaDeRango && !d.arco && d.tiroAlto) d.tiroAlto = true; else delete d.tiroAlto;   // en un arco viene solo
       if(d.armaDeRango && d.arco && d.sinTiroAlto) d.sinTiroAlto = true; else delete d.sinTiroAlto;
@@ -950,7 +953,7 @@ const AsistenteItem = (() => {
      con `{...base, ...d}` a una varita le quedaba el Tipo 8 de fábrica (y con él, daño físico y Parry), y a un arma que dejó de ser especial, su
      hechizo. Todas las pantallas guardan con esto. */
   const CONTROLADOS = ['especial', 'orbe', 'orbeResguardo', 'orbeSalvaje', 'orbeCustodio', 'orbeAbsorcion', 'tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', 'efectosGolpe',
-    'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga', 'perfora', 'durExtra', 'durPorPeso'];
+    'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga', 'perfora', 'apuntada', 'cargada', 'atraviesaEscudos', 'durExtra', 'durPorPeso'];
   function fusionar(base, d){
     const o = {...(base || {}), ...(d || {})};
     CONTROLADOS.forEach(k => { if(!(k in (d || {}))) delete o[k]; });

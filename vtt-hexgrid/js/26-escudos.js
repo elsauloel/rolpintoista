@@ -39,6 +39,14 @@ function muroAviso(t, m){
     estado: 'listo', datos: {...(t.tipo !== 'creep' && t.duenoUid ? {paraUid: t.duenoUid} : {}), chico: true, aviso: true}});
 }
 
+/* 🛡 Atraviesa escudos (2026-10-10, ballestas): si un disparo con ese rasgo lo paran con un escudo, el escudo se abolla: 1 stack de Armadura rota al
+   que lo paró. Lo hace el GM al ver el duelo «bloqueado» (el mismo gancho que el Empujón). */
+async function dueloAtraviesaEscudo(d){
+  if(!d || d.hab || !d.ataque || !d.ataque.atraviesaEscudos || d.bloq || !Combatiente.contraDisparo(d)) return;
+  const quien = d.defensor.nombre || 'el defensor';
+  const r = await dueloAplicarEfecto(d, {nombre: 'Rompe armadura', caras: 1, exitos: 1, dado: '', detalle: 'El escudo se abolla: 1 stack de Armadura rota.'});
+  mesaLinea(`🛡 ${d.ataque.armaNombre || 'El disparo'} atraviesa escudos: ${quien} lo paró, pero el escudo se abolló${r && r.nota ? ` — ${r.nota}` : ' (1 stack de Armadura rota)'}`);
+}
 // Empujón: el GM, al ver un duelo bloqueado (ver arriba).
 async function dueloEmpujon(d){
   if(!d || d.hab || !d.ataque || d.ataque.rango || !d.defensor || !d.atacante) return;

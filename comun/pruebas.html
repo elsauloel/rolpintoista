@@ -554,6 +554,15 @@ prueba('Perfora N del arma (2026-10-10): viaja en el ataque, la copia el creep y
     Combatiente.sirveParaParry(bal, false), Combatiente.armaParaDefensa({arma: {nombre: 'Ballesta', peso: 2}, arco: true, escudos: []})],   // con una ballesta no se parrea (2026-10-10)
     [3, 5, undefined, 3, 2, true, false, false, true, 'virote', false, null]);
 });
+prueba('rasgos de ballesta (2026-10-10): llega cargada (gratis si no disparó el turno anterior), apuntada y atraviesa escudos viajan al ataque', () => {
+  const tranq = CATALOGO_BASE.find(i => i.id === 'bal-de-tranquera'), guerra = CATALOGO_BASE.find(i => i.id === 'bal-de-guerra'), asedio = CATALOGO_BASE.find(i => i.id === 'bal-de-asedio');
+  const S0 = {ataquesArma: {}}, S1 = {ataquesArma: {[tranq.id]: 1}}, S2 = {ataquesArma: {}, descargadas: {[tranq.id]: true}};
+  const creep = {nombre: 'B', armaTipo: 6, armaDeRango: true, armaRasgos: {recarga: 2, cargada: true}, ataquesTurno: 0};
+  igual([FichaCombate.costoAtaque(S0, tranq), FichaCombate.costoAtaque(S1, tranq), FichaCombate.costoAtaque(S2, tranq),
+    CreepCalculo.costoAtaque(creep), CreepCalculo.costoAtaque({...creep, descargada: true}),
+    Combatiente.ataqueDeArma(guerra).apuntada, Combatiente.ataqueDeArma(asedio).atraviesaEscudos, !!Combatiente.ataqueDeArma(tranq).apuntada],
+    [0, 6, 3, 0, 2, 2, true, false]);
+});
 prueba('la distancia ideal de un arma de rango: dónde está y qué da (2026-10-09)', () => {
   const arco = (ideal) => ({armaDeRango: true, arco: true, ideal});
   const cerca = arco({donde: 'cerca', ancho: 2, pdg: 1}), lejos = arco({donde: 'lejos', ancho: 2, crit: 1}), medio = arco({donde: 'medio', ancho: 1, critpot: 2}), fija = arco({donde: 'franja', desde: 5, hasta: 6, fijo: 2});

@@ -155,7 +155,10 @@ const ItemCorto = (() => {
     if(it.sinParry) p.push('No se puede parrear');
     if(it.oporGratis) p.push('Oportunidad sin No2');
     if(Combatiente.recargaDe && Combatiente.recargaDe(it)) p.push(`Recarga ${Combatiente.recargaDe(it)}`);
-    if(num(it.perfora) > 0) p.push(`Perfora ${Math.round(num(it.perfora))}`);   // ignora N de Defensa (2026-10-10; el globo lo explica)   // la ballesta (2026-10-10): el globo del glosario explica cuánto cuesta
+    if(num(it.perfora) > 0) p.push(`Perfora ${Math.round(num(it.perfora))}`);   // ignora N de Defensa (2026-10-10; el globo lo explica)
+    if(it.armaDeRango && num(it.apuntada) > 0) p.push(`Apuntada +${Math.round(num(it.apuntada))}`);   // rasgos de ballesta (2026-10-10)
+    if(it.armaDeRango && it.cargada) p.push('Llega cargada');
+    if(it.armaDeRango && it.atraviesaEscudos) p.push('Atraviesa escudos');   // la ballesta (2026-10-10): el globo del glosario explica cuánto cuesta
     if(it.armaDeRango && Combatiente.esArco(it) && it.sinTiroAlto) p.push('Sin tiro alto');
     else if(it.armaDeRango && !Combatiente.esArco(it) && it.tiroAlto) p.push('Tiro alto');
     if(it.armaDeRango && it.ideal && it.ideal.donde) p.push(Combatiente.idealTxt(it.ideal));

@@ -187,6 +187,9 @@ def puntaje(arma):
         elif not arma.get('arco') and arma.get('tiroAlto'):
             d['tiro alto'] = TIRO_ALTO_PC
     firma = (2.0 if arma.get('sinParry') else 0) + (2.0 if arma.get('oporGratis') else 0) + 3.0 * float(arma.get('ahorroNitros') or 0) + 3.0 * float(arma.get('critD20') or 0)
+    # Rasgos de ballesta (2026-10-10): llega cargada ~ un disparo gratis cada dos turnos (3); apuntada: PdG que pide no moverse (la mitad de un PdG,
+    # 1,75 por punto); atraviesa escudos: situacional (solo contra quien para con escudo, 1,5).
+    firma += (3.0 if arma.get('cargada') else 0) + 1.75 * float(arma.get('apuntada') or 0) + (1.5 if arma.get('atraviesaEscudos') else 0)
     if firma: d['firma'] = firma   # mecánicas de firma (2026-10-03): sin Parry 2 · oportunidad sin No2 2 · −1 No2 en el primero 3 · +1 d20 en el crítico 3
     dx = round(float(arma.get('durExtra') or 0)) + ((float(arma['durPorPeso']) - 3) * peso if float(arma.get('durPorPeso') or 0) > 3 else 0)
     if dx:   # Resistente ×N / Frágil ×N (2026-10-04: durabilidad total de más o de menos; antes, por punto de Peso)
@@ -217,6 +220,7 @@ def extras(arma):
     n += 1 if float(arma.get('durPorPeso') or 0) > 3 or round(float(arma.get('durExtra') or 0)) else 0
     n += sum(1 for k in ('sinParry', 'oporGratis', 'ahorroNitros', 'critD20') if arma.get(k))
     n += 1 if float(arma.get('perfora') or 0) > 0 else 0
+    n += sum(1 for k in ('cargada', 'apuntada', 'atraviesaEscudos') if arma.get(k))
     n += 1 if arma.get('armaDeRango') and not arma.get('arco') and arma.get('tiroAlto') else 0
     n += 1 if arma.get('armaDeRango') and (arma.get('ideal') or {}).get('donde') else 0
     return n

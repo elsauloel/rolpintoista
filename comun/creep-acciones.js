@@ -482,6 +482,7 @@ const CreepAcciones = (() => {
   // Lo de un creep al empezar su vuelta: ataques, armas especiales y su espera, Saque rápido, cooldowns, lo que se dispara y No2 al máximo.
   // `mant` = el ⟳ Mantenimiento de la ronda: solo dispara (el fin cuenta), como antes. Sin él, el turno propio (P177: cuenta y dispara).
   function inicioCreep(sc, mant){
+    sc.descargada = num(sc.ataquesTurno) > 0;   // llega cargada (2026-10-10): si disparó este turno, el próximo no es gratis
     sc.ataquesTurno = 0;
     sc.usosEspecial = {};   // el No2 de las armas especiales vuelve a 1 (y los orbes, a su uso por turno); también la marca del primer golpe
     Object.keys(sc.esperaEspecial || {}).forEach(k => { sc.esperaEspecial[k] = Math.max(0, num(sc.esperaEspecial[k]) - 1); if(!sc.esperaEspecial[k]) delete sc.esperaEspecial[k]; });   // la espera de sus varitas

@@ -63,9 +63,12 @@ const FichaMantenimiento = (() => {
   const camposInv = inv => ({hp: 'hpturno', stacks: 'stacksturno', resFuego: num(InvCalculo.statValor(inv, 'resfuego'))});
   // Lo de una invocación al empezar su vuelta: No2, ataques, cooldowns, lo que se dispara y la cuenta para dormirse. → líneas.
   // `mant` = el ⟳ Mantenimiento de la ronda (sin orden de turnos): solo dispara y el fin cuenta, como antes. Sin él, el turno propio (P177).
+  // Las armas con las que disparó este turno (llega cargada, 2026-10-10): el próximo turno su primer disparo no es gratis.
+  const descargadasDe = S => Object.fromEntries(Object.entries(S.ataquesArma || {}).filter(([k, v]) => num(v) > 0 && k !== 'sin-arma').map(([k]) => [k, true]));
   function invInicio(inv, mant){
     InvCalculo.migrar(inv);
     if(inv.activa === false) return [];
+    inv.descargada = num(inv.ataquesTurno) > 0;
     inv.nitros = Combatiente.recargarNo2(InvCalculo.nitrosMax(inv), inv.nitros, inv.estados);
     inv.ataquesTurno = 0;
     inv.golpeTurno = 0;   // la Defensa contra el primer golpe vuelve a valer
@@ -116,6 +119,7 @@ const FichaMantenimiento = (() => {
     if(ui.limpiarParry) ui.limpiarParry();
     // Nitros al máximo y el primer ataque vuelve a costar la mitad (el SP ya se regeneró al principio).
     S.nitros = Combatiente.recargarNo2(FichaBotonera.nitrosMaximo(S), S.nitros, S.efectos);   // la deuda de una defensa sin No2 se descuenta acá (y la Parálisis, 1 menos)
+    S.descargadas = descargadasDe(S);   // las que dispararon este turno no llegan cargadas al siguiente (2026-10-10)
     S.ataquesTurno = 0;
     S.ataquesArma = {};
     let invocacionesVencidas = 0;
@@ -170,6 +174,7 @@ const FichaMantenimiento = (() => {
     if(ui.limpiarParry) ui.limpiarParry();
     const deudaAntes = num(S.nitros);
     S.nitros = Combatiente.recargarNo2(FichaBotonera.nitrosMaximo(S), S.nitros, S.efectos);   // la deuda de una defensa sin No2 se descuenta acá (y la Parálisis, 1 menos)
+    S.descargadas = descargadasDe(S);
     S.ataquesTurno = 0;
     S.ataquesArma = {};
     rep.push(`No2 recargados a ${fmt(num(S.nitros))}${num(S.nitros) < FichaBotonera.nitrosMaximo(S) && deudaAntes < 0 ? ` (se descontó la deuda de ${fmt(-deudaAntes)})` : ''}`);

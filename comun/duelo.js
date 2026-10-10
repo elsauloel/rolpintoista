@@ -394,6 +394,11 @@ const Duelo = (() => {
     return o;
   };
   // Los efectos de una flecha: como los de un arma (con daño mágico, «solo si es crítico» y un estado armado en `spec`).
+  // El daño elemental en palabras (2026-10-09, dueño: «2d4 eléctrico», que no se confunda con el rayo): «eléctrico» y «tóxico» son adjetivos.
+  const esAdjMag = n => /^(rayo|el[eé]ctric|t[oó]xic)/i.test(String(n || ''));
+  const adjMag = n => /^t/i.test(String(n || '')) ? 'tóxico' : 'eléctrico';
+  const magCorto = e => esAdjMag(e.nombre) ? `+${e.dado} ${adjMag(e.nombre)}` : `+${e.dado} de ${String(e.nombre).toLowerCase()}`;
+  const magTitulo = tipo => esAdjMag(tipo) && !/ y /.test(String(tipo)) ? `Daño ${adjMag(tipo)}` : `Daño de ${tipo}`;
   const limpiarEfectosFlecha = lista => (Array.isArray(lista) ? lista : []).filter(e => e && e.nombre).slice(0, 6).map(e => {
     const o = {nombre: txtCorto(e.nombre, 40), caras: Math.max(1, Math.round(_num(e.caras)) || 1), exitos: Math.max(1, Math.round(_num(e.exitos)) || 1), dado: txtCorto(e.dado, 20), detalle: txtCorto(e.detalle, 200)};
     if(_num(e.stacks) > 0) o.stacks = Math.round(_num(e.stacks));
@@ -491,7 +496,7 @@ const Duelo = (() => {
     if(d.ataque && _num(d.ataque.quieto) > 0) t.push(`💍 ${d.hab ? 'foco' : 'pulso quieto'}: +${_fmt(d.ataque.quieto)} ${d.hab ? 'PdG.Esp' : 'PdG'}`);
     if(d.ataque && _num(d.ataque.primeraSangre) > 0) t.push(`💍 primera sangre: +${_fmt(d.ataque.primeraSangre)} de daño si pega`);
     if(d.ataque && d.ataque.tiro) t.push(`🏹 ${d.ataque.tiro.motivo}: ${tiroTxt(d.ataque.tiro)}`);
-    if(d.ataque && d.ataque.flecha) t.push(`🏹 ${d.ataque.flecha.nombre}${(d.ataque.flecha.efectos || []).length ? ': ' + d.ataque.flecha.efectos.map(e => e.danoMagico ? `+${e.dado} de ${String(e.nombre).toLowerCase()}` : e.nombre).join(', ') : ''}${d.ataque.flecha.perfora ? ` · perfora ${d.ataque.flecha.perfora}` : ''}`);
+    if(d.ataque && d.ataque.flecha) t.push(`🏹 ${d.ataque.flecha.nombre}${(d.ataque.flecha.efectos || []).length ? ': ' + d.ataque.flecha.efectos.map(e => e.danoMagico ? magCorto(e) : e.nombre).join(', ') : ''}${d.ataque.flecha.perfora ? ` · perfora ${d.ataque.flecha.perfora}` : ''}`);
     return t.join(' · ');
   };
   const escRe = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -1052,7 +1057,7 @@ const Duelo = (() => {
       else if(dn.mitad) L.push(`Daño: pasó la mitad → ${dn.recibido} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
       else L.push(`Daño: ${dn.crudo} − Defensa ${dn.defensa}${dn.freno ? ` − ${dn.freno}` : ''} = ${dn.recibido} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
     }
-    if(dn && dn.magico) L.push(`Daño de ${dn.magico.tipo}: ${dn.magico.total} (${dn.magico.formula}; ignora la Defensa, sin multiplicar${dn.magico.resEl ? `; − ${dn.magico.resEl}` : ''})${dn.magico.recibido !== undefined ? ` → recibió ${dn.magico.recibido}` : ''}${dn.magico.hpDespues !== undefined ? ` (${dn.magico.hpAntes} → ${dn.magico.hpDespues} HP)` : ''}`);
+    if(dn && dn.magico) L.push(`${magTitulo(dn.magico.tipo)}: ${dn.magico.total} (${dn.magico.formula}; ignora la Defensa, sin multiplicar${dn.magico.resEl ? `; − ${dn.magico.resEl}` : ''})${dn.magico.recibido !== undefined ? ` → recibió ${dn.magico.recibido}` : ''}${dn.magico.hpDespues !== undefined ? ` (${dn.magico.hpAntes} → ${dn.magico.hpDespues} HP)` : ''}`);
     if(dn && dn.drena) L.push(`Drena: ${dn.drena.quien || d.atacante.nombre} se cura ${dn.drena.monto}${dn.drena.manual ? ` (a mano${dn.drena.motivo ? ': ' + dn.drena.motivo : ''})` : `${dn.drena.hpAntes !== undefined && dn.drena.hpAntes !== null ? ` (${dn.drena.hpAntes} → ${dn.drena.hpDespues} HP)` : ''}${_num(dn.drena.excedente) ? ` · Vida extra ${dn.drena.excedente}` : ''}${dn.drena.nota ? ' · ' + dn.drena.nota : ''}`}`);
     if(dn && dn.espinas) L.push(`Espinas: ${dn.espinas.quien || d.atacante.nombre} recibe ${dn.espinas.monto} de daño devuelto${dn.espinas.manual ? ' (a mano)' : dn.espinas.hpAntes !== undefined && dn.espinas.hpAntes !== null ? ` (${dn.espinas.hpAntes} → ${dn.espinas.hpDespues} HP)` : ''}`);
     if(dn && dn.espejo) L.push(`Espejo: ${dn.espejo.quien || d.atacante.nombre} recibe ${dn.espejo.monto} de daño especial devuelto${dn.espejo.manual ? ' (a mano)' : dn.espejo.hpAntes !== undefined && dn.espejo.hpAntes !== null ? ` (${dn.espejo.hpAntes} → ${dn.espejo.hpDespues} HP)` : ''}`);
@@ -1715,7 +1720,7 @@ const Duelo = (() => {
         const esp = dn.espinas ? `<div class="duelo-mini" style="color:#8fe3a9">🌵 Espinas: ${_esc(dn.espinas.quien || d.atacante.nombre)} recibe <b>${_fmt(dn.espinas.monto)}</b> de daño devuelto (1/4 del daño del golpe, directo a la vida)${dn.espinas.manual ? ' — <b>aplicalo a mano</b>' + (dn.espinas.motivo ? ' (' + _esc(dn.espinas.motivo) + ')' : '') : (dn.espinas.hpAntes !== undefined && dn.espinas.hpAntes !== null ? ` · ${_fmt(dn.espinas.hpAntes)} → ${_fmt(dn.espinas.hpDespues)} HP` : '')}</div>` : '';
         const ej = dn.espejo ? `<div class="duelo-mini" style="color:#c9b8ff">🪞 Espejo: ${_esc(dn.espejo.quien || d.atacante.nombre)} recibe <b>${_fmt(dn.espejo.monto)}</b> de daño devuelto (1/4 del daño especial, directo a la vida)${dn.espejo.manual ? ' — <b>aplicalo a mano</b>' + (dn.espejo.motivo ? ' (' + _esc(dn.espejo.motivo) + ')' : '') : (dn.espejo.hpAntes !== undefined && dn.espejo.hpAntes !== null ? ` · ${_fmt(dn.espejo.hpAntes)} → ${_fmt(dn.espejo.hpDespues)} HP` : '')}</div>` : '';
         const dr = dn.drena ? `<div class="duelo-mini" style="color:#8fe3a9">🩸 Drena: ${_esc(dn.drena.quien || d.atacante.nombre)} se cura <b>${_fmt(dn.drena.monto)}</b>${dn.drena.manual ? ' — <b>aplicalo a mano</b>' + (dn.drena.motivo ? ' (' + _esc(dn.drena.motivo) + ')' : '') : `${dn.drena.hpAntes !== undefined && dn.drena.hpAntes !== null ? ` · ${_fmt(dn.drena.hpAntes)} → ${_fmt(dn.drena.hpDespues)} HP` : ''}${_num(dn.drena.excedente) ? ` · Vida extra ${_fmt(dn.drena.excedente)}` : ''}${dn.drena.nota ? ' · ' + _esc(dn.drena.nota) : ''}`}</div>` : '';
-        const mg = dn.magico ? `<div class="duelo-mini" style="color:#9cc7ff">⚡ Daño de ${_esc(dn.magico.tipo)}: <b>${_fmt(dn.magico.total)}</b> (${_esc(dn.magico.formula || '')}) · ignora la Defensa, sin multiplicar${dn.magico.resEl ? ` · − ${_esc(dn.magico.resEl)}` : ''}${dn.magico.recibido !== undefined ? ` · recibió <b>${_fmt(dn.magico.recibido)}</b>` : ''}${dn.magico.hpDespues !== undefined ? ` · ${_fmt(dn.magico.hpAntes)} → ${_fmt(dn.magico.hpDespues)} HP` : ''}</div>` : '';
+        const mg = dn.magico ? `<div class="duelo-mini" style="color:#9cc7ff">⚡ ${_esc(magTitulo(dn.magico.tipo))}: <b>${_fmt(dn.magico.total)}</b> (${_esc(dn.magico.formula || '')}) · ignora la Defensa, sin multiplicar${dn.magico.resEl ? ` · − ${_esc(dn.magico.resEl)}` : ''}${dn.magico.recibido !== undefined ? ` · recibió <b>${_fmt(dn.magico.recibido)}</b>` : ''}${dn.magico.hpDespues !== undefined ? ` · ${_fmt(dn.magico.hpAntes)} → ${_fmt(dn.magico.hpDespues)} HP` : ''}</div>` : '';
         cuerpo = tiro + `<div class="duelo-danobox${dn.ignoraDef ? ' crit' : ''}">${grande}</div>${vida}${mg}${esp}${ej}${dr}`;
       }
     }
@@ -2240,7 +2245,7 @@ const Duelo = (() => {
       const n = dn.recibido !== undefined && dn.recibido !== null ? dn.recibido : dn.golpe;
       P.push({clave: 'dano', txt: dn.invulnerable ? `${d.defensor.nombre} es Invulnerable: no le hace nada`
         : dn.manual ? `Daño ${_num(dn.golpe)} (se aplica a mano)` : `${d.defensor.nombre} recibe ${_num(n)} de daño`});
-      if(dn.magico && dn.magico.recibido !== undefined) P.push({clave: 'magico', txt: `…y ${_num(dn.magico.recibido)} de ${dn.magico.tipo}`});
+      if(dn.magico && dn.magico.recibido !== undefined) P.push({clave: 'magico', txt: `…y ${_num(dn.magico.recibido)} de ${magTitulo(dn.magico.tipo).replace(/^Daño /, 'daño ')}`});
       if(dn.drena && !dn.drena.manual) P.push({clave: 'drena', txt: `${dn.drena.quien || d.atacante.nombre} se cura ${_num(dn.drena.monto)}`});
       if(dn.espinas) P.push({clave: 'espinas', txt: `Espinas: ${dn.espinas.quien || d.atacante.nombre} recibe ${_num(dn.espinas.monto)}`});
       if(dn.espejo) P.push({clave: 'espejo', txt: `Espejo: ${dn.espejo.quien || d.atacante.nombre} recibe ${_num(dn.espejo.monto)}`});

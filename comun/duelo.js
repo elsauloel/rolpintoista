@@ -398,8 +398,8 @@ const Duelo = (() => {
   const esAdjMag = n => /^(rayo|el[eé]ctric|t[oó]xic)/i.test(String(n || ''));
   const adjMag = n => /^t/i.test(String(n || '')) ? 'tóxico' : 'eléctrico';
   const magCorto = e => esAdjMag(e.nombre) ? `+${e.dado} ${adjMag(e.nombre)}` : `+${e.dado} de ${String(e.nombre).toLowerCase()}`;
-  // «Defensa 3 (4 − perfora 1)»: la Perfora le resta a la Defensa, no al daño.
-  const defTxt = dn => _num(dn.perfora) ? `Defensa ${_num(dn.defensa)} (${_num(dn.defensa) + _num(dn.perfora)} − perfora ${_num(dn.perfora)})` : `Defensa ${_num(dn.defensa)}`;
+  // La Perfora (2026-10-10): N puntos del golpe pasan siempre. Si mandó, «14 − Defensa 16 (pasan 1 por la Perfora) = 1».
+  const defTxt = dn => _num(dn.perfora) ? `Defensa ${_num(dn.defensa)} (pasa${_num(dn.perfora) > 1 ? 'n' : ''} ${_num(dn.perfora)} por la Perfora)` : `Defensa ${_num(dn.defensa)}`;
   const magTitulo = tipo => esAdjMag(tipo) && !/ y /.test(String(tipo)) ? `Daño ${adjMag(tipo)}` : `Daño de ${tipo}`;
   const limpiarEfectosFlecha = lista => (Array.isArray(lista) ? lista : []).filter(e => e && e.nombre).slice(0, 6).map(e => {
     const o = {nombre: txtCorto(e.nombre, 40), caras: Math.max(1, Math.round(_num(e.caras)) || 1), exitos: Math.max(1, Math.round(_num(e.exitos)) || 1), dado: txtCorto(e.dado, 20), detalle: txtCorto(e.detalle, 200)};
@@ -456,7 +456,7 @@ const Duelo = (() => {
     const tiro = cfg.tiro && !hab ? limpiarTiroBono(cfg.tiro) : null;
     if(tiro) inicial.ataque.tiro = tiro;
     // 🏹 La flecha especial del disparo (2026-10-09): sus efectos al golpear (siempre, sin %) se suman a los del arco al tirar el daño, y su
-    // Perfora (ignora N de Defensa) lo aplica el mapa con el daño. Sus bonos de PdG / crítico ya vienen en `tiro`.
+    // Perfora (N puntos del golpe pasan siempre la Defensa) lo aplica el mapa con el daño. Sus bonos de PdG / crítico ya vienen en `tiro`.
     if(cfg.flecha && !hab && cfg.flecha.nombre) inicial.ataque.flecha = {nombre: txtCorto(cfg.flecha.nombre, 60), efectos: limpiarEfectosFlecha(cfg.flecha.efectos),
       ...(_num(cfg.flecha.perfora) > 0 ? {perfora: Math.min(5, Math.round(_num(cfg.flecha.perfora)))} : {}),
       // Lo que hace en el mapa (2026-10-10, virotes): humo, luz, explota (el dado de fuego), clava (contra una pared detrás), rebota (si falla).

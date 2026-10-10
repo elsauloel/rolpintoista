@@ -2229,6 +2229,12 @@ prueba('Ejecución ✨: «el daño de tu arma» y la onda con dodge roll (Daño 
   igual([armaUi, dodgeUi, c && [c.danoArma, c.ondaDodge, c.tipoDano], h.dano, h.dodge, Duelo.limpiarHab(h).dodge, sinArma.dano, !!(pj.dano && pj.dano.formula === FichaCombate.armaDanoTxt(S.inventario[0], FichaCalculo.calcular(S).final.dmg))],
     [true, true, [true, true, 'fisico'], {formula: '1d8 + 3', tipo: 'fisico', ignoraDef: false}, true, true, null, true]);
 });
+prueba('Perfora N = N puntos del golpe pasan siempre la Defensa, el resto va contra ella (dueño, 2026-10-10)', () => {
+  const P = Combatiente.perforaPasa;
+  // 14 contra Defensa 16 con Perfora 1 → pasa 1 · 20 contra 10 con Perfora 2 → la Defensa deja pasar 10, la Perfora no manda
+  // 5 contra 4 con Perfora 3 → pasan 3 (más que el 1 que dejaba la Defensa) · un golpe de 1 con Perfora 3 → 1 · sin Perfora → 0
+  igual([P(14, 16, 1), P(20, 10, 2), P(5, 4, 3), P(1, 10, 3), P(14, 16, 0), P(0, 5, 2), /pasan siempre/.test((Glosario.def('Perfora') || {}).texto || '')], [1, 0, 3, 1, 0, 0, true]);
+});
 prueba('Toque mágico (2026-10-10): 3d6 + el Ef.Esp, al lado, solo Evasión (sin Parry); la mitad también se puede', () => {
   const tq = CLASES_SKILLS.find(x => x.id === 'mago').habilidades.find(x => x.id === 'mago-toque-magico');
   const st = v => s => s === 'dmgesp' ? v : 6;

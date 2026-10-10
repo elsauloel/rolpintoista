@@ -33,8 +33,9 @@
 
 - [ ] **🏹 Apuntar con un arma de rango** (cuando se construya; pedido del dueño 2026-10-09): al atacar se ve tu Rango, los objetivos posibles, los que
   no (fuera de Rango o tapados por un obstáculo aunque se vean por la visión de un aliado) y los obstáculos que los tapan. Ver docs/rework-armas-rango.md.
-- [ ] **🏹 El texto de la Perfora** (2026-10-09): un disparo con la Perforante que pega sin crítico dice «6 − Defensa 3 (4 − perfora 1) = 3»
-  (la cuenta ya se probó; el texto se corrigió después y falta verlo).
+- [ ] **🏹 La Perfora nueva** (2026-10-10, regla del dueño: N puntos del golpe pasan siempre la Defensa): un golpe con Perfora que NO pasa la
+  Defensa (ej. Tajear contra el Coloso: 14 contra 16) tiene que hacer N de daño y decir «14 − Defensa 16 (pasa 1 por la Perfora) = 1»; uno que
+  sí la pasa, la cuenta de siempre, sin Perfora. Y el Sangrado de Tajear entra con ese punto.
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no
   repite eso. Mirar si sobra o falta algún término, y si algún texto del globo conviene reescribirlo.

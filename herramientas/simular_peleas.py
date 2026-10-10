@@ -184,7 +184,7 @@ def ataque(a, d, k):
             golpe = dano * (4 * v if v >= 2 else 4 if bmax >= 20 else 3 if bmax >= 17 else 2 if bmax >= 7 else 1)
             return golpe + efectos_al_golpear(a, d, golpe)
     perf = min(5, int(it.get('perfora') or 0))
-    golpe = max(0, dano - max(0, d.defensa_ef() - perf))
+    golpe = max(dano - d.defensa_ef(), min(perf, dano), 0)   # Perfora N: N puntos pasan siempre la Defensa (dueño, 2026-10-10)
     golpe = math.ceil(golpe / 2) if amedias else golpe
     return golpe + efectos_al_golpear(a, d, golpe)
 

@@ -229,6 +229,11 @@ arco largo «bueno» de la escalera (1d6+1 / 3d6 / 3d6+3, más la mitad de su Fu
 **Escalera propuesta (Tipo 6, cobro «lenta»):** Común 1d6+1 · Buena 2d6+4 a 2d6+6 · Rara 2d6+7 a 2d6+9. **El daño fijo tiene que crecer con la
 calidad** al ritmo de la Defensa (≈ +3 cada dos niveles): es lo que reemplaza a la Fuerza.
 
+> **Cambió la regla (dueño, 2026-10-10):** «un punto de daño ignora la armadura, no es que te baja la armadura». Perfora N = **N puntos del
+> golpe pasan siempre la Defensa**; el resto va contra ella. O sea: el daño nunca es menos de N, pero contra poca armadura no suma nada. Lo de
+> abajo (medido con la regla vieja, que le restaba N a la Defensa) ya no vale: falta volver a medir lo que vale la Perfora en la calculadora
+> (`PERFORA_VALOR`) y revisar las armas, virotes y flechas que la llevan.
+
 **Perfora en los virotes:** contra la armadura, cada punto de Perfora rinde **igual que +1 de daño fijo** (medido: fijo 4 + Perfora 2 = fijo 6),
 pero **no se multiplica en el crítico**. Sirve para darle a la ballesta lo «anti-armadura» sin inflar el crítico; en la calculadora se cobra un
 poco menos que el daño fijo (la propuesta de 0,8 se sostiene).

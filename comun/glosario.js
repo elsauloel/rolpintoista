@@ -29,7 +29,7 @@ const Glosario = (() => {
     {titulo: 'Sin tiro alto', re: 'Sin tiro alto', texto: 'Sin tiro alto: a diferencia del resto de los arcos, este no puede tirar por encima de los tokens que tapan la línea.'},
     {titulo: 'Distancia ideal', re: 'Distancia ideal', texto: 'Distancia ideal: si el objetivo está en esa franja, el disparo suma el bono que dice. «Media distancia» y «lejos» se miden con tu alcance. ⚙ Al apuntar, los objetivos en esa franja brillan en celeste.'},
     {titulo: 'Línea de tiro', re: 'Línea de tiro', texto: 'Línea de tiro: la tapan los Sólidos y cualquier token en el medio, aliado o rival. Si está tapada o roza, el mapa avisa y lo decide la mesa.'},
-    {titulo: 'Perfora', re: 'Perfora \\d+|perfora \\d+|Perfora', texto: 'Perfora N: el golpe ignora N puntos de la Defensa de quien lo recibe (no toda). Con un crítico no hace falta: el crítico ya ignora la Defensa entera.'},
+    {titulo: 'Perfora', re: 'Perfora \\d+|perfora \\d+|Perfora', texto: 'Perfora N: N puntos del golpe pasan siempre, aunque la Defensa de quien lo recibe frene el resto. El daño nunca es menos de N (ni más que el golpe). Con un crítico no hace falta: el crítico ya ignora la Defensa entera.'},
     {titulo: 'Crítico frecuente', texto: 'Crítico frecuente: achica el rango del crítico (críticos más seguidos). El rango no baja de 2: en un Tipo 4 sirve hasta +2.'},
     {titulo: 'Crítico potente', texto: 'Crítico potente: hace más fuerte el crítico (baja lo que hay que sacar en el d20 para ×2, ×3 y ×4), no lo hace más seguido.'},
     {titulo: 'PdG en oportunidad', texto: 'PdG en oportunidad: solo se suma en un ataque de oportunidad (cuando un rival se aleja de tu lado).'},

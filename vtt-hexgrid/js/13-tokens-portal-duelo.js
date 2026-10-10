@@ -1231,10 +1231,13 @@ async function dueloAplicarDano(d){
   const restaIgnorando = frenaAm ? armadmg : 0;
   const resEl = elDano && !trueDmg ? (await resistenciasDe(t, elDano, invLeida)).res : 0;
   let freno = [...(menosDist ? [d.hab && d.hab.menosPorOrden ? `${menosDist} por los que tocó antes en la línea` : `la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Defensa especial ${armadmg}`] : []), ...(resEl ? [Combatiente.resElementalTxt(elDano, resEl)] : [])].join(' − ');
-  // 🏹 Perfora N (la flecha, 2026-10-09; el arma, 2026-10-10): ignora N puntos de Defensa (no toda). Con crítico no hace falta: el crítico ya la ignora entera.
-  const perfora = !crit && d.ataque ? Math.min(num(d.ataque.flecha && d.ataque.flecha.perfora) + num(d.ataque.perfora), def) : 0;
-  let aplicar = golpe + perfora, ignoraDef = crit;   // sumar lo que perfora (hasta la Defensa) es lo mismo que restarle eso a la Defensa
-  if(base.mitad){ aplicar = Math.ceil(Math.max(0, golpe - (def - perfora)) / 2); ignoraDef = true; }
+  // 🏹 Perfora N (regla del dueño, 2026-10-10): N puntos del golpe pasan SIEMPRE, sin que los frene la Defensa; el resto va contra la Defensa como
+  // siempre. O sea: recibe lo que pase la Defensa, pero nunca menos de N (ni más que el golpe). Con crítico no hace falta: ya ignora la Defensa entera.
+  // (Antes, hasta el 2026-10-10, le restaba N a la Defensa: contra un tanque casi no servía.)
+  const perfN = !crit && d.ataque ? Math.min(num(d.ataque.flecha && d.ataque.flecha.perfora) + num(d.ataque.perfora), golpe) : 0;
+  const perfora = Combatiente.perforaPasa(golpe, def, perfN);   // solo cuenta si la Defensa frenaría más que eso
+  let aplicar = perfora || golpe, ignoraDef = crit || perfora > 0;
+  if(base.mitad){ aplicar = Math.ceil(Math.max(0, golpe - def, perfN) / 2); ignoraDef = true; }
   // Bloqueo perdido (mitad del daño): el arma o escudo con el que bloqueó pierde 1 punto de durabilidad (solo personajes: los creeps y las invocaciones no llevan).
   let desgaste = '';
   if(base.mitad && t.tipo === 'pj' && d.defensa && d.defensa.itemId){
@@ -1273,8 +1276,8 @@ async function dueloAplicarDano(d){
     if(!d.hab && d.ataque && d.ataque.flecha && (d.ataque.flecha.humo || d.ataque.flecha.luz || d.ataque.flecha.explota || d.ataque.flecha.clava)) await flechaAlPegar(d, !!res.r.invulnerable).catch(err => console.error('No se pudo aplicar el virote en el mapa:', err));
     if(d.hab && d.hab.atrae && !res.r.invulnerable) await dueloAtraer(d).catch(err => console.error('No se pudo atraer al objetivo:', err));   // el gancho
     if(d.hab && d.hab.riesgo && (dn.rolls || []).map(num).includes(num(d.hab.riesgo.si))) await dueloRiesgo(d).catch(err => console.error('No se pudo aplicar el riesgo:', err));   // la inestable
-    // La Perfora le resta a la Defensa (no al daño): se informa la Defensa que contó y cuánto perforó (2026-10-09: «6 − Defensa 4 − perfora 1» confundía).
-    return {...base, desgaste, defensa: crit ? restaIgnorando : def - perfora, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {})};
+    // `perfora`: solo si la Perfora mandó (pasaron esos N, la Defensa frenaba más): el duelo lo cuenta así.
+    return {...base, desgaste, defensa: crit ? restaIgnorando : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);
     return {...base, defensa: def, manual: true, golpe: base.mitad ? aplicar : golpe, motivoManual: err && err.message === 'SIN_DEF' ? 'la ficha todavía no publicó su Defensa' : 'falló la escritura'};

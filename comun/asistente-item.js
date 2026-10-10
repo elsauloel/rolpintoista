@@ -649,7 +649,7 @@ const AsistenteItem = (() => {
           + (d.armaDeRango && typeof Combatiente !== 'undefined' && Combatiente.tieneTiroAlto(d) ? fila('Tiro alto', 'por encima de los tokens (objetivo a 4+, PdG −2)') : d.arco && d.sinTiroAlto ? fila('Tiro alto', 'no (debilidad)') : '')
           + (d.armaDeRango && d.ideal && d.ideal.donde && typeof Combatiente !== 'undefined' ? fila('Distancia ideal', e(Combatiente.idealTxt(d.ideal))) : '')
           + (n(d.ignoraResistCrit) > 0 ? fila('Ignora', `${f(n(d.ignoraResistCrit))} de Resistencia a crítico`) : '')
-          + (n(d.perfora) > 0 ? fila('Perfora', `${f(n(d.perfora))} (ignora ${f(n(d.perfora))} de Defensa)`) : '')
+          + (n(d.perfora) > 0 ? fila('Perfora', `${f(n(d.perfora))} (pasa${n(d.perfora) > 1 ? 'n' : ''} siempre ${f(n(d.perfora))} de daño, aunque la Defensa frene el resto)`) : '')
           + ([d.sinParry ? 'no se puede parrear' : '', d.oporGratis ? 'oportunidad sin No2' : '', n(d.ahorroNitros) ? `primer ataque −${f(n(d.ahorroNitros))} No2` : '', n(d.critD20) ? `+${f(n(d.critD20))} d20 en el crítico` : ''].filter(Boolean).length
             ? fila('Firma', e([d.sinParry ? 'no se puede parrear' : '', d.oporGratis ? 'oportunidad sin No2' : '', n(d.ahorroNitros) ? `primer ataque −${f(n(d.ahorroNitros))} No2` : '', n(d.critD20) ? `+${f(n(d.critD20))} d20 en el crítico` : ''].filter(Boolean).join(' · '))) : '')
           + (!d.armaDeRango && espaldaTxt(d.espalda) ? fila('Por la espalda', e(espaldaTxt(d.espalda) + ' (en sigilo)')) : '')

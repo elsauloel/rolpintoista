@@ -1459,3 +1459,7 @@ versión parecida en más de una, es candidato a juntar.
   generador de tiendas, editor del catálogo, mapa). **«Detalles técnicos» de un arma ya no repite lo que explica un globo**: queda el Peso, el
   Alcance/Rango, la línea de tiro, cómo se tiran los efectos y la durabilidad, en una lista corta. **Un término nuevo**: sumarlo en `MECANICAS`, o
   darle `full` a su stat o `detalle` a su estado.
+- **`flotantes.js`** (`Flotantes`, 2026-10-09, pedido del dueño) — **los botones del rincón de abajo a la izquierda**: `moneda({mostrar, sub, alClic})`
+  dibuja (o saca) el de la 🪙 Moneda Re-Roll —con brillo de moneda, mientras tengas una: un recordatorio— y `apilar()` acomoda la 🦋 Polilla, el 💍
+  anillo de impulso y la moneda uno arriba del otro (cada pantalla lo llama después de dibujar o sacar uno). Lo usan el mapa (js/02, js/25; la moneda
+  con `resumen.moneda` de su personaje) y la ficha suelta (js/03, `renderMonedaFlotante`; adentro del mapa no, la pone el mapa).

@@ -241,3 +241,9 @@ y el personaje **MonoDes** (casi todo a Destreza: nivel 1 = Des 21, Agl 3, Con 3
 2. **Cobrar como varita (1, 2, 3…) dispara la ballesta** (2–4 veces más): es mucho más barato que el Tipo. Descartado; cobra como cualquier arma.
 3. **Con el costo de arma, la ballesta se cae desde nivel 3** para un tirador normal (25 % / 13 %): sin Fuerza, su daño fijo no pasa la Defensa.
    Su identidad tiene que traer con qué pasar la armadura: **los virotes con Perfora** y **Rompe armadura** en la ballesta (lo decidido).
+
+**Mono-Destreza con la ballesta «lenta» y su exposición (2026-10-10, medido):** con la ballesta de la escalera nueva (1d6+1 / 2d6+6 / 2d6+9, cobro
+2, 4, 6…) el MonoDes hace **un solo disparo por turno** (Agilidad 3–5) y rinde **menos que con su arma cuerpo a cuerpo** (nivel 3: 11,3 contra
+13,2; nivel 5: 8,9 contra 17,5): la ballesta no le suma al problema, el cobro «lento» lo frena. **Exposición** (el Warrior con su mejor arma, contra
+armadura liviana): el MonoDes cae en **~2 turnos** (vida 15–25, Evasión 3–5) y el Shooter en **6–8**. Dueño: en la práctica no va a existir (necesita
+Agilidad para atacar, Constitución para no morir y Espíritu para el SP de sus habilidades); si alguien lo arma, lo paga con la vida.

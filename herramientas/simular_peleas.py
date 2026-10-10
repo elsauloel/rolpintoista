@@ -17,6 +17,8 @@ Lo que NO mide (se aclara en el informe): las habilidades, los consumibles, el t
 
 Uso:  py simular_peleas.py            → escribe docs/balance-peleas.md
       py simular_peleas.py --n 300    (peleas por cruce; por defecto 400)
+      Por defecto (dueño, 2026-10-10): armaduras con PIEZAS REALES del catálogo y niveles 1 y 3 (Común y Buena). --curva usa la curva de
+      Defensa máxima (lo de antes); --niveles 1,3,5 suma la Rara; --salida otro.md escribe en otro archivo.
 """
 import sys, math, random, argparse, pathlib, statistics, collections
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
@@ -53,7 +55,7 @@ def pool(fam, nivel, manos=None):
     return p or [i for i in CAT if familia(i) == fam and i.get('tier') == t]
 
 NIVELES = (1, 3, 5)
-ARMADURA_REAL = False   # --armadura-real: piezas del catálogo en vez de la curva de Defensa máxima (2026-10-10)
+ARMADURA_REAL = True   # piezas reales del catálogo (dueño, 2026-10-10: «a partir de ahora, con el inventario real, no con las curvas»); --curva vuelve a la curva
 CAT_DEF = [i for i in leer_catalogo() if not i.get('archivo')]
 def def_de(i, stat='def'): return sum(float(m.get('val') or 0) for m in i.get('mods') or [] if m.get('stat') == stat)
 def pieza(slot, tier, peso):
@@ -320,13 +322,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--n', type=int, default=400)
     ap.add_argument('--sin-efectos', action='store_true', help='sin los efectos al golpear (como la primera vuelta)')
-    ap.add_argument('--armadura-real', action='store_true', help='armaduras armadas con piezas del catálogo (no la curva de Defensa máxima)')
-    ap.add_argument('--niveles', default='1,3,5', help='niveles a simular (1 = Común, 3 = Buena, 5 = Rara)')
+    ap.add_argument('--curva', action='store_true', help='usar la curva de Defensa máxima en vez de las piezas reales del catálogo (lo de antes)')
+    ap.add_argument('--niveles', default='1,3', help='niveles a simular (1 = Común, 3 = Buena, 5 = Rara)')
     ap.add_argument('--salida', default='docs/balance-peleas.md', help='dónde escribir el informe')
     o = ap.parse_args()
     global EFECTOS, ARMADURA_REAL, NIVELES
     EFECTOS = not o.sin_efectos
-    ARMADURA_REAL = o.armadura_real
+    ARMADURA_REAL = not o.curva
     NIVELES = tuple(int(x) for x in o.niveles.split(','))
     random.seed(10)
     L = []

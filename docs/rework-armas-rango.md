@@ -359,3 +359,11 @@ Raros) en `comun/catalogo.js`; las 6 ballestas viejas quedaron archivadas. Gener
 Demora, Prende fuego, Rengo, eléctrico; rasgos: una mano, Recarga 1/2/3, Ignora Res. crítico, oportunidad sin No2, primer disparo −1 No2,
 Crítico frecuente, PdG, y **a quemarropa** (la distancia ideal en una franja de 1–2 casillas, que ya existía). Lista y textos: ver el catálogo
 (`bal-` y `virote-`).
+
+## 2026-10-10 · El Rango como bono (Comunes, dueño)
+**Decidido:** el +N de Rango de un arma de rango es **un bono** (cuenta para la calidad: 0,75 por +1; de +1 a +5 en Común) y **mucho menos
+frecuente**: «la mayoría de los personajes que se enfocan en esas armas ya tienen Destreza suficiente» → **~1/3** de los arcos y ballestas lo traen.
+**Hecho en Común:** arcos con Rango, 2 de 7 (cazador de pájaros +5, rastreador +3); ballestas, 3 de 8 (de cazador +3, de estribo +3, del
+baqueano +4). A las que lo perdieron, otro bono o un efecto más seguido (Arco corto +1 de daño, de pastor Crítico potente +1, de liebrero
+Iniciativa +2, de tiro ligero PdG +1; ballesta de mano Iniciativa +2, del matrero Veneno 33 %, dentado Sangrado 33 %, quemarropa +4 pegado,
+calderero Rompe armadura 33 %); el Arco de rama quedó pelado y más barato. Las de Buena para arriba, todavía como estaban.

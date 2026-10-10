@@ -18,6 +18,16 @@ const Flotantes = (() => {
 .flot-arriba small{display:none!important}
 #polilla-flotante.flot-arriba{--flot-glow:rgba(190,130,255,.75)}
 #moneda-flotante.flot-arriba, #impulso-flotante.flot-arriba{--flot-glow:rgba(255,205,90,.75)}
+/* La Polilla (2026-10-10, dueño: «buscale un equivalente a la moneda: algo animado sutil, brillo latente, chispas»): aletea cada tanto y unas
+   chispitas violetas titilan alrededor. */
+#polilla-flotante.flot-arriba{overflow:visible}
+#polilla-flotante.flot-arriba .polilla-ala{display:inline-block;animation:polilla-aleteo 3.2s ease-in-out infinite}
+#polilla-flotante.flot-arriba::before, #polilla-flotante.flot-arriba::after{content:"";position:absolute;width:4px;height:4px;border-radius:50%;
+  background:#e7d2ff;box-shadow:0 0 6px 2px rgba(200,150,255,.9);pointer-events:none;opacity:0}
+#polilla-flotante.flot-arriba::before{top:3px;right:4px;animation:polilla-chispa 2.6s ease-in-out infinite}
+#polilla-flotante.flot-arriba::after{bottom:4px;left:5px;animation:polilla-chispa 2.6s ease-in-out 1.3s infinite}
+@keyframes polilla-aleteo{0%,62%,100%{transform:scaleX(1)}68%{transform:scaleX(.45)}74%{transform:scaleX(1)}80%{transform:scaleX(.55)}86%{transform:scaleX(1)}}
+@keyframes polilla-chispa{0%,100%{opacity:0;transform:scale(.4) translateY(0)}35%{opacity:1;transform:scale(1) translateY(-2px)}60%{opacity:0;transform:scale(.6) translateY(-5px)}}
 @keyframes flot-latido{0%{box-shadow:0 2px 8px rgba(0,0,0,.5),0 0 3px var(--flot-glow)}100%{box-shadow:0 2px 8px rgba(0,0,0,.5),0 0 13px var(--flot-glow)}}`;
   // Lo que explica el mouse (dueño: «al hacer hover te explica: tenés una moneda / tenés una polilla activa»).
   const TITULO = {'polilla-flotante': 'Tenés una Polilla mística activa', 'moneda-flotante': 'Tenés una Moneda Re-Roll',
@@ -29,7 +39,8 @@ const Flotantes = (() => {
     const div = b.querySelector('div');
     if(!div || div.dataset.soloIcono) return;
     const cara = div.querySelector('.moneda-cara');
-    const icono = cara ? cara.outerHTML : ([...String(div.textContent || '').trim()][0] || '•');
+    const primero = [...String(div.textContent || '').trim()][0] || '•';
+    const icono = cara ? cara.outerHTML : b.id === 'polilla-flotante' ? `<span class="polilla-ala">${primero}</span>` : primero;   // la mariposa aletea
     div.dataset.soloIcono = '1';
     div.innerHTML = icono;
   }

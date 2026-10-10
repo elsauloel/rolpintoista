@@ -8,7 +8,8 @@ import simular_peleas as S
 ARM_ORIG, ATAQUE_ORIG = S.armadura, S.ataque
 EXTRA_PERF = {1: 1, 3: 2, 5: 3}
 
-def con_palancas(perf_familias=False, def_mult=1.0, dano_min=0.0):
+PERF_SIN_TOPE = {1: 2, 3: 4, 5: 6}
+def con_palancas(perf_familias=False, def_mult=1.0, dano_min=0.0, perf_sin_tope=False, min_por_dado=False):
     def armadura(nivel, peso):
         a = ARM_ORIG(nivel, peso)
         if peso != 'liviana' and def_mult != 1.0: a = dict(a, defensa=round(a['defensa'] * def_mult))
@@ -17,7 +18,16 @@ def con_palancas(perf_familias=False, def_mult=1.0, dano_min=0.0):
         it = a.arma
         if perf_familias and a.fam in ('Daga', 'Ballesta'):
             a.arma = dict(it, perfora=int(it.get('perfora') or 0) + EXTRA_PERF[a.nivel])
+        guardo_def = d.defensa
+        if perf_sin_tope and a.fam in ('Daga', 'Ballesta'): d.defensa = max(0, d.defensa - PERF_SIN_TOPE[a.nivel])   # Perfora por calidad, sin tope
         try:
+            if min_por_dado:
+                g = ATAQUE_ORIG(a, d, k)
+                if g == 0:
+                    guardo = d.defensa; d.defensa = 0
+                    g2 = ATAQUE_ORIG(a, d, k); d.defensa = guardo
+                    return min(g2, int(a.arma.get('peso') or 1) + int(a.arma.get('danoAmplificado') or 0)) if g2 else 0   # al menos 1 por dado
+                return g
             if dano_min:
                 # el golpe que entra pasa al menos esa fracción de su daño (sin Defensa): se simula comparando con la Defensa en 0
                 guardo = d.defensa
@@ -31,6 +41,7 @@ def con_palancas(perf_familias=False, def_mult=1.0, dano_min=0.0):
             return ATAQUE_ORIG(a, d, k)
         finally:
             a.arma = it
+            d.defensa = guardo_def
     S.armadura, S.ataque = armadura, ataque
 
 CRUCES = [(('Shooter', 'arco'), ('Warrior', 'hacha 2 manos')), (('Shooter', 'ballesta'), ('Warrior', 'hacha 2 manos')), (('Asalto', 'daga'), ('Warrior', 'hacha 2 manos')),
@@ -38,7 +49,10 @@ CRUCES = [(('Shooter', 'arco'), ('Warrior', 'hacha 2 manos')), (('Shooter', 'bal
           (('Warrior', 'hacha 2 manos'), ('Tanque', 'espada y escudo'))]
 PALANCAS = [('Como hoy', {}), ('Perfora +1/+2/+3 (por calidad) en dagas y ballestas', {'perf_familias': True}),
             ('Armadura media y pesada al 75 %', {'def_mult': 0.75}), ('Un golpe que entra pasa al menos ¼ de su daño', {'dano_min': 0.25}),
-            ('Perfora por calidad + armadura al 75 %', {'perf_familias': True, 'def_mult': 0.75})]
+            ('Perfora por calidad + armadura al 75 %', {'perf_familias': True, 'def_mult': 0.75}),
+            ('Perfora por calidad SIN tope (+2/+4/+6) en dagas y ballestas', {'perf_sin_tope': True}),
+            ('Daño mínimo: 1 por dado si el golpe entra', {'min_por_dado': True}),
+            ('Perfora sin tope + 1 por dado (la propuesta)', {'perf_sin_tope': True, 'min_por_dado': True})]
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--n', type=int, default=200); o = ap.parse_args()

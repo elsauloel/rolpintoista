@@ -31,10 +31,16 @@ Ver la tabla «Palancas probadas» al final. En corto:
   vuelta demasiado: el asalto con daga le gana al tanque el 99 % a nivel 5.
 - **Perfora por calidad + armadura al 75 %:** lo más parejo contra el guerrero, pero se pasa (asalto 86–94 %) y el tanque sigue fuerte contra el arco.
 
-**Propuesta para decidir (P186):** el problema de fondo es que **la Defensa sube más rápido que el daño de quien no suma Fuerza**. Dos caminos que
-se pueden combinar: (a) **Perfora que crece con la calidad** en las familias que no suman Fuerza (ballestas, dagas, quizás arcos), sin tope 5; y
-(b) **un daño mínimo más chico** (por ejemplo, el golpe que entra pasa al menos 1 punto por dado, o ⅛) para que la armadura pesada frene mucho pero
-no del todo. Antes de tocar nada conviene medir (a) sin tope y (b) más chico con la misma herramienta, y mirar las resistencias a Tipo 4.
+**Medido después (las tres filas de abajo de la tabla):**
+- **Perfora por calidad sin tope (+2 / +4 / +6) en dagas y ballestas:** contra armadura media se pasa (ballesta 91–100 %, daga 78–96 %) y contra el
+  tanque casi no cambia (8–22 %).
+- **Daño mínimo de 1 por dado** (si el golpe entra y la armadura lo frena todo, pasa 1 punto por cada dado del arma): **es la que mejor acomoda.**
+  El tanque deja de ser intocable (ballesta 84–93 %, arco 64–69 % desde nivel 3) sin tocar al guerrero contra el tanque (37–63 %, como hoy), y
+  contra armadura media sube al rango sin pasarse (arco 34–40 %, ballesta 48–96 %). Lo que se pasa: el asalto con daga contra el tanque a nivel 5 (88 %).
+- **Las dos juntas:** se pasan contra armadura media.
+
+**Propuesta para decidir (P186):** probar primero **el daño mínimo de 1 por dado** (una regla chica, fácil de explicar: «la armadura nunca para
+todo: cada dado que entra deja al menos 1») y después ajustar fino con la Perfora de cada arma, sin cambio general de la Perfora.
 
 
 ## 1 vs 1 · nivel 1 (Común) · cada clase con su mejor arma
@@ -187,3 +193,6 @@ Ninguna está aplicada: es lo que pasaría con cada una. % de victorias de la fi
 | Armadura media y pesada al 75 % | 100 % / 26 % / 43 % | 100 % / 98 % / 65 % | 76 % / 52 % / 60 % | 0 % / 0 % / 2 % | 0 % / 22 % / 0 % | 8 % / 13 % / 0 % | 68 % / 56 % / 64 % |
 | Un golpe que entra pasa al menos ¼ de su daño | 100 % / 47 % / 33 % | 100 % / 91 % / 62 % | 51 % / 46 % / 78 % | 68 % / 83 % / 64 % | 28 % / 94 % / 91 % | 86 % / 70 % / 99 % | 55 % / 42 % / 62 % |
 | Perfora por calidad + armadura al 75 % | 100 % / 26 % / 43 % | 100 % / 100 % / 95 % | 90 % / 86 % / 94 % | 0 % / 0 % / 3 % | 0 % / 55 % / 24 % | 28 % / 56 % / 30 % | 73 % / 62 % / 64 % |
+| Perfora por calidad SIN tope (+2/+4/+6) en dagas y ballestas | 100 % / 11 % / 9 % | 100 % / 100 % / 91 % | 78 % / 83 % / 96 % | 0 % / 0 % / 0 % | 0 % / 22 % / 18 % | 10 % / 13 % / 8 % | 58 % / 36 % / 49 % |
+| Daño mínimo: 1 por dado si el golpe entra | 100 % / 40 % / 34 % | 100 % / 96 % / 48 % | 44 % / 28 % / 49 % | 42 % / 69 % / 64 % | 10 % / 93 % / 84 % | 32 % / 30 % / 88 % | 63 % / 37 % / 44 % |
+| Perfora sin tope + 1 por dado (la propuesta) | 100 % / 40 % / 34 % | 100 % / 98 % / 92 % | 79 % / 78 % / 97 % | 42 % / 69 % / 60 % | 11 % / 96 % / 86 % | 47 % / 30 % / 82 % | 64 % / 29 % / 48 % |

@@ -937,3 +937,9 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   contra el tanque; tanto o más que Perfora 2). La «abundancia» venía de la curva máxima del simulador. Lo que sí aparece: **la armadura media
   real protege poco y el guerrero queda muy flojo** (ver [`balance-peleas-armadura-real.md`](balance-peleas-armadura-real.md)). Revisar antes
   de sacar Resistencia a crítico de la armadura.
+- ❓ **P190. La armadura media — 2026-10-10** ([`diagnostico-armadura-media.md`](diagnostico-armadura-media.md)). No existe una armadura media: las
+  piezas son o muy defensivas (el torso rígido) o utilitarias (Defensa 0); la mitad o dos tercios de cabeza, manos, piernas y pies no dan
+  Defensa; el presupuesto se va en Defensa especial y resistencias elementales; ir pesado casi no tiene contras. El guerrero con piezas «medias»
+  pierde casi todo (14–16 %) y con las más defensivas le gana al asalto y al tirador (76–81 %). Soluciones posibles: A tres pesos por parte
+  (liviana / media / pesada), B contras reales para lo pesado, C Defensa más barata en las partes chicas, D encarecer o enrarecer la Defensa
+  especial y las resistencias, E bono de conjunto, F posturas del guerrero. Recomendación: A + B + D, medido antes en el simulador. **Decide el dueño.**

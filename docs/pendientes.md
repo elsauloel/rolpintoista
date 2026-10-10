@@ -7,6 +7,9 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **⏸ Pausar la partida (2026-10-10, lo próximo después de Envenenar arma y el óleo):** el GM pausa la partida al terminar una sesión.
+>   Hasta la próxima, los jugadores pueden entrar y tocar su ficha (cambios, compras…), pero **no explorar el mapa**. Todo lo que hagan los
+>   jugadores durante la pausa queda en un **log**; al despausar, el GM ve el mensaje con todo lo que pasó y elige **borrar el log o guardarlo**.
 > - [ ] **Decisiones del estudio de peleas, para cuando sigamos avanzando** ([`balance-peleas.md`](balance-peleas.md)):
 >   - **P186 — la armadura pesada:** el tanque con escudo es casi intocable para el arco y la daga. **El daño mínimo se descartó** (dueño: «un
 >     parche poco sofisticado»): **debate más a fondo**, y contar con **las habilidades del asalto y del mago** (mejorar el crítico, etc.).

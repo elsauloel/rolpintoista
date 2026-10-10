@@ -7,6 +7,10 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **🧪 Más ítems con la mecánica de cargas (2026-10-10, dueño; también en 🛠 Herramientas de diseño → A desarrollar):** la mecánica
+>   ya existe (estado con `cargas` y `golpe`, `Combatiente.gastarCarga`). Empezar por los óleos del Bazar — propuesta esperando el OK del dueño:
+>   Óleo venenoso (Común, 1 carga, +2 y Veneno ×3, 35) y Óleo venenoso concentrado (Buena, 2 cargas, +3 y Veneno ×3, 75) —; después otros
+>   (fuego, sangrado, piedras de afilar…).
 > - [ ] **⏸ Pausar la partida (2026-10-10, lo próximo después de Envenenar arma y el óleo):** el GM pausa la partida al terminar una sesión.
 >   Hasta la próxima, los jugadores pueden entrar y tocar su ficha (cambios, compras…), pero **no explorar el mapa**. Todo lo que hagan los
 >   jugadores durante la pausa queda en un **log**; al despausar, el GM ve el mensaje con todo lo que pasó y elige **borrar el log o guardarlo**.

@@ -378,12 +378,12 @@ const Biblioteca = (() => {
         st.opts.alElegir(structuredClone(ent.datos), {tipo: tipoAct, id: ent.id, version: ent.version || 1, reemplaza: ent.reemplaza || ''});
         document.getElementById('scrim-biblioteca').classList.remove('open');
       }else if(acc === 'rechazar'){
-        if(!confirm(`¿Rechazar la propuesta "${ent.nombre}"? Se borra.`)) return;
+        if(!(await Confirmar.preguntar(`¿Rechazar la propuesta "${ent.nombre}"? Se borra.`, {titulo: 'Rechazar propuesta', si: 'Rechazar', peligro: true}))) return;
         await fbDb.collection(coleccion).doc(ent.id).delete();
         st.propuestas = lista.filter(x => x !== ent);
         pintar();
       }else if(acc === 'borrar'){
-        if(!confirm(`¿Borrar "${ent.nombre}" de la biblioteca? No se puede deshacer.`)) return;
+        if(!(await Confirmar.preguntar(`¿Borrar "${ent.nombre}" de la biblioteca? No se puede deshacer.`, {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return;
         await fbDb.collection(coleccion).doc(ent.id).delete();
         await cargar(tipoAct, true);   // relee: si era la corrección de uno de fábrica, el original vuelve a aparecer
         pintar();

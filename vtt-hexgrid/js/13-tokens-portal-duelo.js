@@ -34,7 +34,7 @@ async function creepLlegoAlMapa(creepId){
 async function traerTokensDeJugadores(){
   const fichas = [...fichasPub.entries()].filter(([id]) => !String(id).includes(SEP_INVOCACION));
   if(!fichas.length){ toast('Todavía no hay personajes en la partida'); return; }
-  if(!confirm(`Se crean los tokens (visibles) de estos personajes, en fila, en el centro de lo que ves. Los que ya tienen token en este mapa se saltean:\n\n${fichas.map(([, f]) => f.nombre).join(', ')}`)) return;
+  if(!(await Confirmar.preguntar(`Se crean los tokens (visibles) de estos personajes, en fila, en el centro de lo que ves. Los que ya tienen token en este mapa se saltean:\n\n${fichas.map(([, f]) => f.nombre).join(', ')}`, {titulo: 'Traer jugadores', si: 'Crear tokens'}))) return;
   try{
     const items = fichas.map(([id, f], i) => ({nombre: f.nombre, color: COLORES[i % COLORES.length], tipo: 'pj', fichaId: id, duenoUid: f.duenoUid, oculto: false}));
     const r = await TokensAuto.crear(items, {mapaId: mapaMostrado, centro: centroDeLaVista()});

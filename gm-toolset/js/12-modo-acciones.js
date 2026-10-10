@@ -32,7 +32,7 @@ const gmDueloUi = {
   },
   publicar: (sc, t) => publicarTiradaCreep(t),
   toast: t => toast(t),
-  confirmar: t => confirm(t),
+  confirmar: (t, o) => Confirmar.preguntar(t, o),
   soy: lado => !!(lado && lado.tipo === 'creep' && gmVivo.activo && S.creeps.some(c => c.id === lado.ref)),
   borrarParry: ref => parryPendienteCreep.delete(ref),
 };

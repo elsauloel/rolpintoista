@@ -117,7 +117,7 @@ function renderListaPersonajes(){
 async function borrarPersonajeGM(id, nombre, boton){
   const aviso = `Esto borra a ${nombre} de la partida, para todos, y no se puede deshacer.\n\n` +
                 `Si el jugador lo quiere conservar, avisale antes (podés bajar un respaldo con "💾 Respaldo partida" desde gm-tools).\n\n¿Seguís?`;
-  if(!confirm(aviso)) return;
+  if(!(await Confirmar.preguntar(aviso, {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return;
   const escrito = prompt(`Para confirmar el borrado, escribí el nombre tal cual: ${nombre}`);
   if(escrito === null) return;
   if(escrito.trim().toLowerCase() !== nombre.trim().toLowerCase()){
@@ -640,7 +640,7 @@ function conectarIniciativa(){
   const siguiente = $('#ini-siguiente');
   if(siguiente) siguiente.onclick = iniciativaSiguiente;
   const limpiar = $('#ini-limpiar');
-  if(limpiar) limpiar.onclick = () => { if(confirm('¿Vaciar el orden de turnos?')) guardarIniciativa({orden: [], turno: 0, ronda: 1}); };
+  if(limpiar) limpiar.onclick = async () => { if(await Confirmar.preguntar('¿Vaciar el orden de turnos?', {titulo: 'Vaciar turnos', si: 'Vaciar', peligro: true})) guardarIniciativa({orden: [], turno: 0, ronda: 1}); };
 }
 
 /* El orden de turnos flota sobre el mapa y se arrastra desde la cabecera (mismo

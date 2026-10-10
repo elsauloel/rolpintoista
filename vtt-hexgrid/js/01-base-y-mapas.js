@@ -450,7 +450,7 @@ async function publicarMapa(id){
 async function borrarMapa(id){
   if(id === MAPA_PRINCIPAL){ toast('El primer mapa no se puede borrar'); return; }
   const nombre = nombreMapa(id);
-  if(!confirm(`¿Borrar el mapa "${nombre}" con todo lo que tiene (tokens y dibujos)? No se puede deshacer.`)) return;
+  if(!(await Confirmar.preguntar(`¿Borrar el mapa "${nombre}" con todo lo que tiene (tokens y dibujos)? No se puede deshacer.`, {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return;
   const escrito = prompt(`Para confirmar, escribí el nombre tal cual: ${nombre}`);
   if(escrito === null) return;
   if(escrito.trim().toLowerCase() !== nombre.trim().toLowerCase()){ toast('El nombre no coincide — no se borró nada'); return; }

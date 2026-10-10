@@ -395,6 +395,7 @@ input[type=checkbox]{width:auto}
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
+<script src="../comun/confirmar.js?v=20261010a"></script>
 <script src="../comun/sesion.js"></script>
 <script src="../comun/barra.js?v=20261002a"></script>
 <script src="../comun/menu-sitio.js"></script>
@@ -403,13 +404,13 @@ input[type=checkbox]{width:auto}
 <script src="../comun/catalogo.js?v=20261009z9"></script>
 <script src="../comun/generador-tiendas.js?v=20261009r"></script>   <!-- la regla de cómo se arma una tienda (2026-10-06) -->
 <script src="../comun/filtro-catalogo.js?v=20261009r"></script>   <!-- el filtro del catálogo, uno para todos lados (2026-10-08) -->
-<script src="../comun/items-subidos.js?v=20261007h"></script>
+<script src="../comun/items-subidos.js?v=20261010a"></script>
 <script src="../comun/plantillas.js?v=20261007ar"></script>
 <script src="../comun/glosario.js?v=20261009zb"></script>
 <script src="../comun/item-corto.js?v=20261009zc"></script>
-<script src="../comun/biblioteca.js?v=20261002k"></script>
+<script src="../comun/biblioteca.js?v=20261010a"></script>
 <script src="../comun/combatiente.js?v=20261009p"></script>
-<script src="../comun/paso-a-paso.js?v=20261002g"></script>
+<script src="../comun/paso-a-paso.js?v=20261010a"></script>
 <script src="../comun/estado-preguntas.js?v=20261009zl"></script>
 <script src="../comun/estados-presets.js?v=20261008zd"></script>
 <script src="../comun/estados-aplicar.js?v=20261007r"></script>
@@ -1144,8 +1145,8 @@ function marcarAjuste(){
 // en la lista de guardadas. Si no, "Regenerar": se vuelve a sortear el
 // stock de la tienda abierta, que conserva su nombre, su ajuste de precios
 // y su lugar en la lista (queda con cambios sin guardar).
-function generar(nueva){
-  if(nueva && !confirmarDejarTienda()) return;
+async function generar(nueva){
+  if(nueva && !(await confirmarDejarTienda())) return;
   const clave = $('#f-tamano').value;
   const secciones = seccionesElegidas();
   if(!secciones.length){ toast('Tildá al menos una sección'); return; }
@@ -1162,8 +1163,8 @@ function generar(nueva){
 
 // Arranca vacía: el usuario la arma ítem por ítem con "+ Agregar ítems",
 // en vez de sortearla.
-function crearTiendaPersonalizada(){
-  if(!confirmarDejarTienda()) return;
+async function crearTiendaPersonalizada(){
+  if(!(await confirmarDejarTienda())) return;
   tiendaActual = {
     tamano: 'personalizada',
     tamanoLabel: 'Tienda personalizada',
@@ -1399,7 +1400,7 @@ async function alternarTienda(){
 
 async function cerrarTienda(){
   if(!puedeGuardar() || !tiendaFb.publicadaJson) return;
-  if(!confirm('¿Retirar la tienda? Se borra la publicada: los jugadores dejan de verla. Lo que estás armando acá no se borra. (Para cerrarla un rato sin borrarla, usá el interruptor Abierta/Cerrada.)')) return;
+  if(!(await Confirmar.preguntar('¿Retirar la tienda? Se borra la publicada: los jugadores dejan de verla. Lo que estás armando acá no se borra. (Para cerrarla un rato sin borrarla, usá el interruptor Abierta/Cerrada.)', {titulo: 'Retirar tienda', icono: '🏪', si: 'Retirar', peligro: true}))) return;
   try{
     await refTienda('publicada').delete();
     toast('Tienda retirada');
@@ -1435,9 +1436,9 @@ function hayCambiosSinGuardar(){
 }
 
 // Antes de reemplazar la tienda abierta por otra.
-function confirmarDejarTienda(){
+async function confirmarDejarTienda(){
   if(!hayCambiosSinGuardar()) return true;
-  return confirm(`"${tiendaGuardadaAbierta().nombre}" tiene cambios sin guardar. Si seguís, la tienda guardada queda como estaba. ¿Seguir?`);
+  return Confirmar.preguntar(`"${tiendaGuardadaAbierta().nombre}" tiene cambios sin guardar. Si seguís, la tienda guardada queda como estaba. ¿Seguir?`, {titulo: 'Cambios sin guardar', icono: '🏪', si: 'Seguir'});
 }
 
 async function guardarTiendaEnLista(){
@@ -1452,7 +1453,7 @@ async function guardarTiendaEnLista(){
   if(!nombre){ toast('Poné un nombre para guardar la tienda'); return; }
   const mismoNombre = tiendasGuardadas.find(t => t.id !== id && normalizarNombre(t.nombre) === normalizarNombre(nombre));
   if(mismoNombre){
-    if(!confirm(`Ya hay una tienda guardada que se llama "${mismoNombre.nombre}". ¿Reemplazarla por esta?`)) return;
+    if(!(await Confirmar.preguntar(`Ya hay una tienda guardada que se llama "${mismoNombre.nombre}". ¿Reemplazarla por esta?`, {titulo: 'Reemplazar tienda', icono: '🏪', si: 'Reemplazar', peligro: true}))) return;
     id = mismoNombre.id;
   }
   const col = fbDb.collection(fbRutaCampana('tiendas'));
@@ -1474,9 +1475,9 @@ async function guardarTiendaEnLista(){
   }
 }
 
-function abrirTiendaGuardada(id){
+async function abrirTiendaGuardada(id){
   const g = tiendasGuardadas.find(t => t.id === id);
-  if(!g || !confirmarDejarTienda()) return;
+  if(!g || !(await confirmarDejarTienda())) return;
   const t = tiendaDesdeJson(g.json);
   if(!t){ toast('Esa tienda guardada está dañada y no se puede abrir'); return; }
   t.guardadaId = id;
@@ -1492,7 +1493,7 @@ function abrirTiendaGuardada(id){
 async function borrarTiendaGuardada(id){
   const g = tiendasGuardadas.find(t => t.id === id);
   if(!g) return;
-  if(!confirm(`¿Borrar "${g.nombre}" de las tiendas guardadas? No se puede deshacer. Si los jugadores la tienen abierta, la siguen viendo hasta que cierres o cambies la tienda publicada.`)) return;
+  if(!(await Confirmar.preguntar(`¿Borrar "${g.nombre}" de las tiendas guardadas? No se puede deshacer. Si los jugadores la tienen abierta, la siguen viendo hasta que cierres o cambies la tienda publicada.`, {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return;
   try{
     await fbDb.doc(fbRutaCampana(`tiendas/${id}`)).delete();
     if(tiendaActual && tiendaActual.guardadaId === id) delete tiendaActual.guardadaId;

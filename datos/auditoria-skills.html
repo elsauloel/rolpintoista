@@ -116,12 +116,13 @@ main{max-width:1000px;margin:0 auto;padding:14px 16px 60px}
   </div>
 </div>
 
+<script src="../comun/confirmar.js?v=20261010a"></script>
 <script src="../comun/skills-clase.js?v=20261008x"></script>
 <script src="../comun/plantillas.js?v=20261007ar"></script>
 <script src="../comun/combatiente.js?v=20261009p"></script>
 <script src="../comun/estados-presets.js?v=20261008zd"></script>
 <script src="../comun/estados-aplicar.js?v=20261007r"></script>
-<script src="../comun/paso-a-paso.js?v=20261002g"></script>
+<script src="../comun/paso-a-paso.js?v=20261010a"></script>
 <script src="../comun/asistente-duelo-hab.js?v=20261008q"></script>
 <script>
 window.esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
@@ -317,8 +318,8 @@ function abrirEditor(h, contexto){
   $('#editor-titulo').textContent = `Editar · ${h.nombre || '(sin nombre)'}`;
   renderEditor(h);
   $('#editor-fondo').hidden = false;
-  $('#editor-borrar').onclick = () => {
-    if(!confirm(`¿Borrar «${h.nombre}»? No se puede deshacer (salvo que no hayas guardado en el proyecto todavía).`)) return;
+  $('#editor-borrar').onclick = async () => {
+    if(!await Confirmar.preguntar(`¿Borrar «${h.nombre}»? No se puede deshacer (salvo que no hayas guardado en el proyecto todavía).`, {titulo: 'Borrar', si: 'Borrar', peligro: true})) return;
     const lista = listaDe(contexto);
     const idx = lista.indexOf(h);
     if(idx >= 0) lista.splice(idx, 1);
@@ -462,7 +463,7 @@ function renderEditor(h){
   enganchoMods();
   q('#btn-ejecucion').onclick = () => abrirEjecucion(h);
   const btnQuitar = q('#btn-quitar-ejecucion');
-  if(btnQuitar) btnQuitar.onclick = () => { if(confirm('¿Quitar la Ejecución configurada? Vuelve al sistema simple.')){ delete h.duelo; autosave(); renderEditor(h); } };
+  if(btnQuitar) btnQuitar.onclick = async () => { if(await Confirmar.preguntar('¿Quitar la Ejecución configurada? Vuelve al sistema simple.', {titulo: 'Quitar Ejecución', si: 'Quitar', peligro: true})){ delete h.duelo; autosave(); renderEditor(h); } };
 }
 
 function spVariableTxt(costo){ return /x/i.test(String(costo || '')); }
@@ -533,7 +534,7 @@ async function subir(t){
   const cabecera = actual.slice(0, pos);
   // Si el archivo cambió desde que se abrió esta página (otra conversación o alguien más guardó), guardar pisaría eso.
   if(cuerpoAlCargar !== null && actual.slice(pos) !== cuerpoAlCargar
-    && !confirm('comun/skills-clase.js cambió desde que abriste esta página (alguien más guardó). Si seguís, se pisa lo que cambió.\n\nMejor: ⬇ Descargar tu trabajo, recargar la página y volver a aplicarlo.\n\n¿Guardar igual?')) throw new Error('cancelado: el archivo había cambiado');
+    && !await Confirmar.preguntar('comun/skills-clase.js cambió desde que abriste esta página (alguien más guardó). Si seguís, se pisa lo que cambió.\n\nMejor: ⬇ Descargar tu trabajo, recargar la página y volver a aplicarlo.\n\n¿Guardar igual?', {titulo: 'El archivo cambió', si: 'Guardar igual', peligro: true})) throw new Error('cancelado: el archivo había cambiado');
   const cuerpo = serializarSkills(datos);
   const r = await fetch(url, {method: 'PUT', headers: cab, body: JSON.stringify({message: 'Auditoría de skills: guardado desde la herramienta', content: b64(cabecera + cuerpo), branch: GH_BRANCH, sha: info.sha})});
   if(r.ok) cuerpoAlCargar = cuerpo;

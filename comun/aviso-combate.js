@@ -132,6 +132,7 @@ const AvisoCombate = (() => {
      cierra otro aviso que esté abierto; Esc, ✕ o clic afuera = no; Enter = sí. */
   function preguntar(texto, o){
     o = o || {};
+    if(typeof Confirmar !== 'undefined') return Confirmar.preguntar(texto, {titulo: '¿Seguir igual?', si: 'Sí, igual', ...o});   // la pieza común (comun/confirmar.js, 2026-10-09)
     if(typeof Duelo !== 'undefined' && Duelo.estilos) Duelo.estilos();
     estilosPropios();
     return new Promise(ok => {

@@ -529,8 +529,8 @@ async function nieblaReiniciarDesdeGM(){
 // publicado (los jugadores no ven nada tapado, ni ella ni sus creeps
 // quedan al descubierto por el reinicio, hasta que alguien vuelva a
 // moverse).
-function reiniciarCombate(){
-  if(!confirm('¿Reiniciar el combate? El contador vuelve a cero.')) return;
+async function reiniciarCombate(){
+  if(!(await Confirmar.preguntar('¿Reiniciar el combate? El contador vuelve a cero.', {titulo: 'Reiniciar combate', icono: '↺', si: 'Reiniciar'}))) return;
   S.turno = 0;
   parryPendienteCreep.clear();
   S.creeps.forEach(sc => {

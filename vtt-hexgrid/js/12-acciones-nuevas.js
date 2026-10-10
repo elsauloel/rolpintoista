@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261009k', '../comun/creep-botonera.js?v=20261007aw', '../comun/creep-acciones.js?v=20261009x', '../comun/confirmar-turno.js?v=20261006e', '../comun/creep-duelo.js?v=20261009y'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261009k', '../comun/creep-botonera.js?v=20261007aw', '../comun/creep-acciones.js?v=20261010a', '../comun/confirmar-turno.js?v=20261006e', '../comun/creep-duelo.js?v=20261009y'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -421,15 +421,16 @@ function acUsarEspecial(sc, itemId){
     acDibujar();
   });
 }
-function acEjecutarHab(sc, habId){
+async function acEjecutarHab(sc, habId){
   const h = (sc.habilidades || []).find(x => x.id === habId);
   if(!h) return;
   const modo = CreepCalculo.modoHab(h);
   if(modo === 'manual'){ acMesaHabilidad(sc, h); toast(`${h.nombre || 'Habilidad'} anunciada`); return; }   // 📣 solo el texto
   if(modo === 'auto' && Combatiente.tipoEjecucion(h.duelo) === 'flash'){ acFlashFuera(sc, h); return; }   // ⚡ sin No2, cooldown según el turno
+  if(!(await CreepAcciones.confirmarSilencio(sc, h))){ toast(`${sc.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`); return; }   // el cartel del juego, antes de cobrar
   const id = sc.id;
   acCambiar(c => {
-    const p = CreepAcciones.ejecutarHab(c, (c.habilidades || []).find(x => x.id === habId), estadosPresetCreep());
+    const p = CreepAcciones.ejecutarHab(c, (c.habilidades || []).find(x => x.id === habId), estadosPresetCreep(), true);
     if(!p.error) p.creep = c;   // el creep ya cambiado (con el estado propio, si lo hubo), para lo que sigue
     return p;
   }).then(p => {
@@ -564,7 +565,7 @@ function cerrarAccionesNuevas(){
    El ✎ Editar del Ver de una habilidad se lo pedía a GM Tools escondido. Ahora es el editor común (comun/creep-editor.js: el mismo paso
    a paso, con la trampa y la Ejecución ✨), adentro del recuadro de las Acciones nuevas; guarda con modificarCreep (acCambiarCreep). Los
    estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
-const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261008q', '../comun/asistente-duelo-hab.js?v=20261008q'];
+const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261010a', '../comun/asistente-duelo-hab.js?v=20261008q'];
 // Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
 const ACE_BASE = ['../comun/creeps-base.js?v=20261008q', '../comun/skills-creep-base.js?v=20261008q'];
 async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }

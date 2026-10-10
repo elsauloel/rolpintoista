@@ -107,10 +107,16 @@ const InvHabilidades = (() => {
   /* ---------- Ejecutar (antes invEjecutarHab) ----------
      ejecutar(inv, h, presets, dueloDisponible) → {modo: 'manual'} (📣: solo anunciar), {modo: 'flash'} (⚡: usarFlashFuera), {error}
      (no se puede usar ahora) o el plan {costo, costoHp, curaHp, efectoTxt, falta, esArma, sobreSi, hab, aplicadoDirecto, hDuelo}
-     después de cobrar. terminar(inv, h, p, ui) hace lo que sigue. */
-  function ejecutar(inv, h, presets, dueloDisponible){
+     después de cobrar. terminar(inv, h, p, ui) hace lo que sigue.
+     Silencio (2026-10-04): avisa y deja seguir. La pregunta la hace quien llama ANTES, con confirmarSilencio (el cartel del juego, no el
+     confirm() nativo; async) y pasa `silencioOk` = true si dijo que sí; sin eso, en Silencio no la usa. Así ejecutar sigue siendo sincrónica. */
+  async function confirmarSilencio(inv, h){
+    const sil = Combatiente.preguntaSilencio(inv.estados, h, inv.nombre);
+    return !sil || !!(await Confirmar.preguntar(sil, {titulo: 'Silencio', icono: '🤐', si: 'Usarla igual'}));
+  }
+  function ejecutar(inv, h, presets, dueloDisponible, silencioOk){
     const sil = Combatiente.preguntaSilencio(inv.estados, h, inv.nombre);   // Silencio (2026-10-04): avisa y deja seguir
-    if(sil && !(typeof confirm === 'function' && confirm(sil))) return {error: `${inv.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`};
+    if(sil && !silencioOk) return {error: `${inv.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`};
     const modo = FichaBotonera.modoHab(h);
     if(modo === 'manual') return {modo: 'manual'};
     if(modo === 'auto' && Combatiente.tipoEjecucion(h.duelo) === 'flash') return {modo: 'flash'};   // ⚡ su propia regla de costo (P136)
@@ -176,5 +182,5 @@ const InvHabilidades = (() => {
   }
 
   return {tira, anunciar, tiradaPrimera, tiradaSegunda, alcanceHab, habEjecucion, ataqueDeHab, tiradaPdgArreglos, lanzarAtaque,
-    usarFlashFuera, ponerEstado, aplicarSpec, zona, ejecutar, terminar};
+    usarFlashFuera, ponerEstado, aplicarSpec, zona, confirmarSilencio, ejecutar, terminar};
 })();

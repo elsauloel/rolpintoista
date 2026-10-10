@@ -62,7 +62,7 @@ const ItemsSubidos = (() => {
     if(typeof fbDb === 'undefined' || typeof fbUsuario === 'undefined' || !fbUsuario){ avisar('Entrá primero a una partida para usar la biblioteca.'); return false; }
     if(!item || !item.id || !item.nombre) return false;
     const duenoEmail = typeof BIBLIOTECA_DUENO_EMAIL !== 'undefined' ? BIBLIOTECA_DUENO_EMAIL : 'el dueño del proyecto';
-    if(!confirm(`¿Solicitar eliminar "${item.nombre}" del catálogo? No se borra al instante: lo tiene que aprobar ${duenoEmail}.`)) return false;
+    if(!(await Confirmar.preguntar(`¿Solicitar eliminar "${item.nombre}" del catálogo? No se borra al instante: lo tiene que aprobar ${duenoEmail}.`, {titulo: 'Solicitar eliminar', si: 'Solicitar', peligro: true}))) return false;
     const motivo = (prompt('¿Por qué debería eliminarse? (obligatorio)') || '').trim();
     if(!motivo){ avisar('Hace falta escribir el motivo.'); return false; }
     const dueno = typeof BIBLIOTECA_DUENO_EMAIL !== 'undefined' && fbUsuario.email === BIBLIOTECA_DUENO_EMAIL && fbUsuario.emailVerified;

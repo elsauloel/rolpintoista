@@ -155,9 +155,10 @@ const PasoAPaso = (() => {
       const k = abiertos.indexOf(control);
       if(k >= 0) abiertos.splice(k, 1);
     }
-    function cancelar(){
+    async function cancelar(){
       const pregunta = typeof o.confirmarCancelar === 'function' ? o.confirmarCancelar(api) : o.confirmarCancelar !== undefined ? o.confirmarCancelar : (o.crear ? '¿Cancelar? Lo que estás armando se descarta.' : '');
-      if(pregunta && !confirm(pregunta)) return;
+      // El cartel del juego (comun/confirmar.js), no el confirm() nativo.
+      if(pregunta && !(await Confirmar.preguntar(pregunta, {titulo: 'Cancelar', si: 'Descartar', no: 'Volver', peligro: true}))) return;
       if(o.alCancelar) o.alCancelar(api);
       cerrar();
     }

@@ -688,7 +688,7 @@ async function nieblaGuardarPincel(){
   }catch(err){ console.error('No se pudo guardar el pincel de niebla:', err); toast('No se pudo guardar la niebla'); }
 }
 async function nieblaReiniciar(){
-  if(!soyGM || !confirm('¿Volver a tapar todo lo descubierto de este mapa?')) return;
+  if(!soyGM || !(await Confirmar.preguntar('¿Volver a tapar todo lo descubierto de este mapa?', {titulo: 'Restablecer niebla', si: 'Tapar todo', peligro: true}))) return;
   try{
     await fbDb.doc(fbRutaCampana(rutaMapaEstado('niebla'))).set({descubiertas: []}, {merge: true});
   }catch(err){ console.error('No se pudo reiniciar la niebla:', err); toast('No se pudo reiniciar la niebla'); }

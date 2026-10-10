@@ -164,6 +164,7 @@ body.arrastrando-body{user-select:none;-webkit-user-select:none;cursor:grabbing}
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
+<script src="../comun/confirmar.js?v=20261010a"></script>
 <script src="../comun/sesion.js"></script>
 <script src="../comun/menu-sitio.js"></script>
 <script>
@@ -358,7 +359,7 @@ async function crear(tipo, texto, padreId){
   }
 }
 
-document.addEventListener('click', e => {
+document.addEventListener('click', async e => {
   const b = e.target.closest('button');
   if(!b) return;
   if(b.id === 'btn-changelog'){
@@ -436,7 +437,7 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.dataset.borrar){
-    if(!confirm('¿Borrar esto? No se puede deshacer.')) return;
+    if(!await Confirmar.preguntar('¿Borrar esto? No se puede deshacer.', {titulo: 'Borrar', si: 'Borrar', peligro: true})) return;
     fbDb.collection('preguntas_diseno').doc(b.dataset.borrar).delete().catch(err => console.error(err));
     return;
   }

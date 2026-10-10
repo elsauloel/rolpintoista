@@ -183,7 +183,7 @@ async function bitacoraGuardarEdicion(id){
 
 async function bitacoraBorrarPagina(id){
   const p = bitacoraPaginas.find(x => x.id === id);
-  if(!confirm(`¿Borrar la página "${p ? p.nombre : ''}" con todo lo que tiene, para toda la mesa?`)) return;
+  if(!(await Confirmar.preguntar(`¿Borrar la página "${p ? p.nombre : ''}" con todo lo que tiene, para toda la mesa?`, {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return;
   try{
     const entradas = await fbDb.collection(fbRutaCampana(`bitacora/${id}/entradas`)).get();
     const lote = fbDb.batch();
@@ -218,7 +218,7 @@ $('#bitacora-tabs').addEventListener('change', e => {
 $('#bitacora-tabs').addEventListener('keydown', e => {
   if(e.key === 'Enter' && e.target.matches('[data-bit-nombre]')){ e.preventDefault(); e.target.blur(); }
 });
-$('#bitacora-entradas').addEventListener('click', e => {
+$('#bitacora-entradas').addEventListener('click', async e => {
   const editar = e.target.closest('[data-bit-editar]');
   if(editar){
     bitacoraEditando = editar.dataset.bitEditar;
@@ -232,7 +232,7 @@ $('#bitacora-entradas').addEventListener('click', e => {
   if(e.target.closest('[data-bit-cancelar]')){ bitacoraEditando = ''; bitacoraRender(); return; }
   const borrar = e.target.closest('[data-bit-borrar]');
   if(borrar){
-    if(!confirm('¿Borrar esta entrada de la bitácora, para toda la mesa?')) return;
+    if(!(await Confirmar.preguntar('¿Borrar esta entrada de la bitácora, para toda la mesa?', {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return;
     fbDb.doc(fbRutaCampana(`bitacora/${bitacoraActiva}/entradas/${borrar.dataset.bitBorrar}`)).delete()
       .catch(err => { console.error('No se pudo borrar la entrada:', err); toast('No se pudo borrar (solo su autor o el GM)'); });
   }

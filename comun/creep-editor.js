@@ -639,7 +639,7 @@ const CreepEditor = (() => {
     const $e = n => { for(const b of todos){ const x = b.querySelector(`[data-ec="${n}"]`); if(x) return x; } return null; };
     let pap = null;   // la ventana abierta (comun/paso-a-paso.js)
     const toast = m => ctx.toast(m);
-    const confirmar = t => (ctx.confirmar || (x => confirm(x)))(t);
+    const confirmar = (t, o) => (ctx.confirmar || ((x, y) => Confirmar.preguntar(x, y)))(t, o);   // el cartel del juego, no el confirm() nativo (puede ser una promesa: siempre con await)
     const FLAGS = CreepAcciones.FLAGS_ESTADO;
     const conPresets = typeof ctx.personalizados === 'function' && typeof ctx.guardarPresets === 'function';
     const personalizados = () => conPresets ? (ctx.personalizados() || []) : [];
@@ -786,7 +786,7 @@ const CreepEditor = (() => {
       if(aviso) toast(aviso);
     }
 
-    function clic(ev){
+    async function clic(ev){
       const t = ev.composedPath ? ev.composedPath()[0] : ev.target;
       if(!t || !t.closest || !ed) return;
       const rm = t.closest('[data-ecmodrm]');
@@ -809,7 +809,7 @@ const CreepEditor = (() => {
       }
       else if(a === 'borrarpreset' && conPresets){
         const nombre = $e('nombre').value.trim();
-        if(!confirmar(`¿Borrar el preset "${nombre}"?\n\nEsto no borra el estado activo, solo el preset guardado para reutilizar.`)) return;
+        if(!(await confirmar(`¿Borrar el preset "${nombre}"?\n\nEsto no borra el estado activo, solo el preset guardado para reutilizar.`, {titulo: 'Borrar preset', si: 'Borrar', peligro: true}))) return;
         ctx.guardarPresets(personalizados().filter(p => p.nombre !== nombre));
         toast('Preset borrado');
         botonesPreset();

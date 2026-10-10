@@ -54,7 +54,7 @@ document.addEventListener('input', e => {
   }
 });
 
-document.addEventListener('click', e => {
+document.addEventListener('click', async e => {
   const b = e.target.closest('button');
   // Tocar en cualquier otro lado esconde los botones del estado abierto.
   if(estadoChipAbierto && !(b && (b.dataset.toggleestado || b.dataset.turnoestado || b.dataset.stackestado))) cerrarChipEstado(b);
@@ -125,7 +125,7 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.dataset.del){
-    if(!confirm('¿Borrar este creep? No se puede deshacer.')) return;
+    if(!(await Confirmar.preguntar('¿Borrar este creep? No se puede deshacer.', {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return;
     const idBorrado = b.dataset.del;
     S.creeps = S.creeps.filter(s=>s.id!==idBorrado);
     renderAll();
@@ -218,7 +218,7 @@ document.addEventListener('click', e => {
     (async () => {
       let forzar = false;
       if(CreepAcciones.faltanNitrosConsumir(sc)){
-        if(!confirm(`${sc.nombre} no tiene los No2 para usar ${it.nombre} (cuesta ${CreepAcciones.costoConsumir()}). ¿Usarlo igual? Gasta los que tenga.`)) return;
+        if(!(await Confirmar.preguntar(`${sc.nombre} no tiene los No2 para usar ${it.nombre} (cuesta ${CreepAcciones.costoConsumir()}). ¿Usarlo igual? Gasta los que tenga.`, {titulo: 'Sin No2', icono: '⚡', si: 'Usarlo igual'}))) return;
         forzar = true;
       }
       if(it.trampaDatos){ const t = await CreepAcciones.colocarTrampaDeItem(sc.id, it); toast(t.aviso); if(!t.ok) return; }
@@ -458,7 +458,8 @@ document.addEventListener('click', e => {
     if(modo === 'auto' && Combatiente.tipoEjecucion(h.duelo) === 'flash'){ usarFlashFueraDelDueloCreep(sc, h); return; }   // ⚡ sin No2, cooldown según el turno
     // Lo que cambia al creep (cobrar, cura y estado del sistema anterior, el atajo «solo sobre sí») y lo que pasa después (Mesa,
     // duelo, trampa, zona, a quién le pegó, el aviso): comun/creep-acciones.js (paso 4 etapa 4c, tanda 5), con gmHabUi (js/04).
-    const p = CreepAcciones.ejecutarHab(sc, h, ESTADOS_PRESET_GM);
+    if(!(await CreepAcciones.confirmarSilencio(sc, h))){ toast(`${sc.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`); return; }   // el cartel del juego, antes de cobrar
+    const p = CreepAcciones.ejecutarHab(sc, h, ESTADOS_PRESET_GM, true);
     if(p.error){ toast(p.error); return; }
     if(p.aviso) toast(p.aviso);
     renderAll();
@@ -508,7 +509,7 @@ document.addEventListener('click', e => {
     return;
   }
   if(b.id === 'btn-load'){
-    if(gmVivo.listo && !confirm('Cargar un respaldo reemplaza TODOS los creeps de la mesa por los del archivo (los que no estén en el archivo se borran).\n\n¿Seguís?')) return;
+    if(gmVivo.listo && !(await Confirmar.preguntar('Cargar un respaldo reemplaza TODOS los creeps de la mesa por los del archivo (los que no estén en el archivo se borran).\n\n¿Seguís?', {titulo: 'Cargar respaldo', icono: '📂', si: 'Cargar', peligro: true}))) return;
     $('#file-input').click();
     return;
   }

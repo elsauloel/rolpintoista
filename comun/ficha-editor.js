@@ -173,7 +173,7 @@ const FichaEditor = (() => {
      `ctx`:
        S()                     el personaje.
        toast(msg)              un aviso.
-       confirmar(texto)        ¿seguro? (por defecto, confirm).
+       confirmar(texto, o)     ¿seguro? (por defecto, el cartel del juego: Confirmar.preguntar; bool o promesa, se espera con await).
        alCambiar(keys)         se guardó/borró algo de esas listas: redibujar y guardar.
        elegirTipoItem(actual)  → Promise<id de categoría | null>  (la grilla: tipoItemHtml).
        elegirEstadoItem()      → Promise<{nombre, armado, estandar, detalle} | null>  (estado al usar/consumir).
@@ -324,7 +324,7 @@ const FichaEditor = (() => {
     const lugar = () => { const r = donde && donde.getRootNode ? donde.getRootNode() : document; return r instanceof ShadowRoot ? r : document.body; };
     const S = () => ctx.S();
     const toast = m => ctx.toast(m);
-    const confirmar = t => (ctx.confirmar || (x => confirm(x)))(t);
+    const confirmar = (t, o) => (ctx.confirmar || ((x, y) => Confirmar.preguntar(x, y)))(t, o);   // el cartel del juego, no el confirm() nativo (puede ser una promesa: siempre con await)
     let editing = null;
     // Una habilidad se edita en la ventana común paso a paso (editing.pap, comun/paso-a-paso.js); el resto, en la ventana del editor.
     const q = sel => editing && editing.pap ? editing.pap.raiz.querySelector(sel) : null;
@@ -901,7 +901,7 @@ const FichaEditor = (() => {
         toast('No se pudo cargar esa imagen');
       }
     }
-    function clic(e){
+    async function clic(e){
       if(!editing) return;
       const t = e.composedPath ? e.composedPath()[0] : e.target;
       const el = t && t.closest ? t : null;
@@ -974,7 +974,7 @@ const FichaEditor = (() => {
         dibujar();
       }
       if(a === 'efecto-preset-borrar'){
-        if(!confirmar(`¿Borrar el preset "${editing.draft.nombre}"?\n\nEsto no borra el estado activo, solo el preset guardado para reutilizar.`)) return;
+        if(!(await confirmar(`¿Borrar el preset "${editing.draft.nombre}"?\n\nEsto no borra el estado activo, solo el preset guardado para reutilizar.`, {titulo: 'Borrar preset', si: 'Borrar', peligro: true}))) return;
         const P = S();
         P.efectosPersonalizados = (P.efectosPersonalizados || []).filter(p => p.nombre !== editing.draft.nombre);
         toast('Preset borrado');
@@ -1028,12 +1028,12 @@ const FichaEditor = (() => {
       cerrar();
       ctx.alCambiar([key]);
     }
-    function eliminar(){
+    async function eliminar(){
       if(!editing) return;
       const P = S();
       const {key, id} = editing;
       const it = P[key].find(x=>x.id===id);
-      if(it && !confirmar(`¿Eliminar "${it.nombre}"? No se puede deshacer.`)) return;
+      if(it && !(await confirmar(`¿Eliminar "${it.nombre}"? No se puede deshacer.`, {titulo: 'Eliminar', si: 'Eliminar', peligro: true}))) return;
       P[key] = P[key].filter(x=>x.id!==id);
       cerrar();
       ctx.alCambiar([key]);
@@ -1052,14 +1052,14 @@ const FichaEditor = (() => {
     }
     const sinLoPropio = o => { const c = structuredClone(o || {}); PROPIO_DE_LA_COPIA.concat(['catId', 'precioCompra']).forEach(k => delete c[k]); return JSON.stringify(c, Object.keys(c).sort()); };
     function difiereDelCatalogo(it){ const c = it && !it.consumible ? delCatalogo(it) : null; return c && sinLoPropio(c) !== sinLoPropio(it) ? c : null; }
-    function actualizarDesdeCatalogo(key, id){
+    async function actualizarDesdeCatalogo(key, id){
       const Q = S(), i = Q[key].findIndex(x => x.id === id), it = Q[key][i], c = it ? difiereDelCatalogo(it) : null;
       if(!c) return false;
-      if(!confirmar(`¿Actualizar «${it.nombre}» con la versión del catálogo?
+      if(!(await confirmar(`¿Actualizar «${it.nombre}» con la versión del catálogo?
 
 Ahora: ${it.detalle || '—'}
 
-Catálogo: ${c.detalle || '—'}`)) return false;
+Catálogo: ${c.detalle || '—'}`, {titulo: 'Actualizar desde el catálogo', si: 'Actualizar'}))) return false;
       const nuevo = structuredClone(c);
       PROPIO_DE_LA_COPIA.forEach(k => { if(it[k] !== undefined) nuevo[k] = it[k]; else delete nuevo[k]; });
       nuevo.catId = c.id;
@@ -1102,12 +1102,12 @@ Catálogo: ${c.detalle || '—'}`)) return false;
         textoGuardar: original ? 'Guardar' : 'Crear',
         botones: [
           ...(enInventario ? [{texto: '⬆ Subir al catálogo', accion: d => subirAlCatalogo(S(), AsistenteItem.fusionar(base, d), 'inventario', {toast, alSubir: ctx.alSubirCatalogo})}] : []),
-          ...(enInventario && original && difiereDelCatalogo(original) ? [{texto: '↻ Actualizar desde el catálogo', accion: () => {
-            if(!actualizarDesdeCatalogo(key, id)) return;
+          ...(enInventario && original && difiereDelCatalogo(original) ? [{texto: '↻ Actualizar desde el catálogo', accion: async () => {
+            if(!(await actualizarDesdeCatalogo(key, id))) return;
             AsistenteItem.cerrar(); ctx.alCambiar([key]); toast(`↻ ${original.nombre}: actualizado con la versión del catálogo`);
           }}] : []),
-          ...(original ? [{texto: 'Eliminar', accion: () => {
-            if(!confirmar(`¿Eliminar "${original.nombre}"? No se puede deshacer.`)) return;
+          ...(original ? [{texto: 'Eliminar', accion: async () => {
+            if(!(await confirmar(`¿Eliminar "${original.nombre}"? No se puede deshacer.`, {titulo: 'Eliminar', si: 'Eliminar', peligro: true}))) return;
             const Q = S();
             Q[key] = Q[key].filter(x => x.id !== id);
             AsistenteItem.cerrar();

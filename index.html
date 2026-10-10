@@ -319,10 +319,11 @@ select option{background:var(--panel)}
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
+<script src="comun/confirmar.js?v=20261010a"></script>
 <script src="comun/sesion.js"></script>
 <script src="comun/respaldo.js"></script>
 <script src="comun/menu-sitio.js"></script>
-<script src="comun/paso-a-paso.js?v=20261002g"></script>
+<script src="comun/paso-a-paso.js?v=20261010a"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
@@ -725,7 +726,7 @@ $('#traspaso-no').onclick = async () => {
 async function ofrecerGM(uid, boton){
   const m = gestion.miembros.find(x => x.uid === uid);
   if(!m) return;
-  if(!confirm(`¿Asignar a ${m.nombre} como Game Master?\n\nLe llega una notificación la próxima vez que entre a la partida. Hasta que la acepte, seguís siendo el GM; cuando la acepte, pasás a ser jugador.`)) return;
+  if(!await Confirmar.preguntar(`¿Asignar a ${m.nombre} como Game Master?\n\nLe llega una notificación la próxima vez que entre a la partida. Hasta que la acepte, seguís siendo el GM; cuando la acepte, pasás a ser jugador.`, {titulo: 'Asignar GM', si: 'Asignar'})) return;
   $('#gestion-error').textContent = '';
   boton.disabled = true;
   try{
@@ -827,7 +828,7 @@ function renderGestion(){
 async function sacarJugador(uid, boton){
   const m = gestion.miembros.find(x => x.uid === uid);
   if(!m) return;
-  if(!confirm(`¿Sacar a ${m.nombre} de la partida?\n\nSus personajes quedan y los podés pasar a otro jugador. Puede volver a unirse; si lo hace con la misma cuenta, sus personajes vuelven a ser suyos.`)) return;
+  if(!await Confirmar.preguntar(`¿Sacar a ${m.nombre} de la partida?\n\nSus personajes quedan y los podés pasar a otro jugador. Puede volver a unirse; si lo hace con la misma cuenta, sus personajes vuelven a ser suyos.`, {titulo: 'Sacar jugador', si: 'Sacar', peligro: true})) return;
   $('#gestion-error').textContent = '';
   boton.disabled = true;
   try{
@@ -846,7 +847,7 @@ async function pasarPersonaje(select){
   const f = gestion.fichas.find(x => x.id === select.dataset.ficha);
   const nuevo = gestion.miembros.find(x => x.uid === select.value);
   if(!f || !nuevo){ renderGestion(); return; }
-  if(!confirm(`¿Pasarle ${f.nombre || 'este personaje'} a ${nuevo.nombre}?\n\nVa a poder editar la ficha y mover sus tokens en el mapa.`)){ renderGestion(); return; }
+  if(!await Confirmar.preguntar(`¿Pasarle ${f.nombre || 'este personaje'} a ${nuevo.nombre}?\n\nVa a poder editar la ficha y mover sus tokens en el mapa.`, {titulo: 'Pasar personaje', si: 'Pasar'})){ renderGestion(); return; }
   $('#gestion-error').textContent = '';
   select.disabled = true;
   try{
@@ -874,7 +875,7 @@ async function borrarPersonajeGM(id, boton){
   const nombre = f.nombre || 'Sin nombre';
   const aviso = `Esto borra a ${nombre} de la partida, para todos, y no se puede deshacer.\n\n` +
                 `Si el jugador lo quiere conservar, avisale antes de borrarlo (podés bajar un respaldo de toda la partida desde gm-tools, "💾 Respaldo partida").\n\n¿Seguís?`;
-  if(!confirm(aviso)) return;
+  if(!await Confirmar.preguntar(aviso, {titulo: 'Borrar', si: 'Borrar', peligro: true})) return;
   const escrito = prompt(`Para confirmar el borrado, escribí el nombre tal cual: ${nombre}`);
   if(escrito === null) return;
   if(escrito.trim().toLowerCase() !== nombre.trim().toLowerCase()){
@@ -999,7 +1000,7 @@ async function borrarDocumentos(refs){
 }
 
 $('#btn-borrar-definitivo').onclick = async () => {
-  if(!confirm(`Última confirmación: ¿borrar "${fbPartida.nombre}" para siempre?`)) return;
+  if(!await Confirmar.preguntar(`Última confirmación: ¿borrar "${fbPartida.nombre}" para siempre?`, {titulo: 'Borrar', si: 'Borrar', peligro: true})) return;
   const base = fbDb.doc(fbRutaCampana());
   const estado = t => { $('#borrar-estado').textContent = t; };
   const botones = ['#btn-borrar-definitivo', '#btn-borrar-cancelar', '#btn-respaldo'];
@@ -1035,7 +1036,7 @@ $('#btn-borrar-definitivo').onclick = async () => {
 /* ---------- Irse de la partida (jugador) ---------- */
 
 $('#btn-irme').onclick = async () => {
-  if(!confirm(`¿Irte de "${fbPartida.nombre}"?\n\nTus personajes quedan en la partida. Si volvés a unirte con esta cuenta, siguen siendo tuyos.`)) return;
+  if(!await Confirmar.preguntar(`¿Irte de "${fbPartida.nombre}"?\n\nTus personajes quedan en la partida. Si volvés a unirte con esta cuenta, siguen siendo tuyos.`, {titulo: 'Irte de la partida', si: 'Irme', peligro: true})) return;
   $('#irme-error').textContent = '';
   $('#btn-irme').disabled = true;
   try{

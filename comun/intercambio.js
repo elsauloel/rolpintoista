@@ -131,16 +131,21 @@ const Intercambio = (() => {
   const costoCombate = (S, key) => key === 'cinturon' ? (num(finalDe(S).pasamanos) > 0 ? 0 : 1) : 2;
   const COSTO_ALFORJA = 1;
   // Paga `costo` No2: si no alcanzan, pregunta (se puede igual, con la línea roja de la Mesa). → false si no quiso.
-  function pagarNitros(S, costo, hizo, sinPreguntar){
-    if(!(costo > 0)) return true;
+  // La pregunta es el cartel del juego (no el confirm() nativo), así que es async; cobrarNitros es el cobro solo, sin preguntar.
+  async function pagarNitros(S, costo, hizo, sinPreguntar){
+    if(costo > 0 && num(S.nitros) < costo && !sinPreguntar && !(await preguntarNitros(S, costo))) return false;
+    cobrarNitros(S, costo, hizo);
+    return true;
+  }
+  const preguntarNitros = (S, costo) => Confirmar.preguntar(`Cuesta ${fmt(costo)} No2 y tenés ${fmt(num(S.nitros))}. ¿Hacerlo igual?`, {titulo: 'Sin No2', si: 'Hacerlo igual'});
+  function cobrarNitros(S, costo, hizo){
+    if(!(costo > 0)) return;
     if(num(S.nitros) < costo){
-      if(!sinPreguntar && !window.confirm(`Cuesta ${fmt(costo)} No2 y tenés ${fmt(num(S.nitros))}. ¿Hacerlo igual?`)) return false;
       const pagado = typeof FichaAcciones !== 'undefined' && FichaAcciones.gastoNitrosForzado ? FichaAcciones.gastoNitrosForzado(S, costo, hizo) : num(S.nitros);
       S.nitros = Math.max(0, num(S.nitros) - pagado);
-      return true;
+      return;
     }
     S.nitros = num(S.nitros) - costo;
-    return true;
   }
 
   /* ---------- Ofrecer, aceptar, rechazar, cancelar ---------- */
@@ -163,7 +168,7 @@ const Intercambio = (() => {
       const combate = !!(host && host.enCombate());
       const costo = combate ? costoCombate(S, f.key) : 0;
       const antes = num(S.nitros);
-      if(combate && !pagarNitros(S, costo, `le pasó ${f.it.nombre} a ${base.paraNombre}`)) return 'cancelado';
+      if(combate && !(await pagarNitros(S, costo, `le pasó ${f.it.nombre} a ${base.paraNombre}`))) return 'cancelado';
       const pagado = antes - num(S.nitros);
       try{ await ref.set({...base, tipo: 'item', nombre: String(f.it.nombre || '').slice(0, 80), json, cantidad: f.it.consumible ? k : 1}); }
       catch(err){ S.nitros = antes; throw err; }
@@ -314,7 +319,7 @@ const Intercambio = (() => {
     const n = despojosDeItem(it, k);
     const combate = !!(host && host.enCombate());
     const antes = num(S.nitros);
-    if(combate && !pagarNitros(S, COSTO_DESPOJOS, `convirtió ${it.nombre} en despojos`)) return {error: 'cancelado'};
+    if(combate) cobrarNitros(S, COSTO_DESPOJOS, `convirtió ${it.nombre} en despojos`);   // si no alcanzaban, ya se preguntó en convertir (el cartel es async)
     if(k >= total) S.inventario = S.inventario.filter(x => x !== it); else it.unidades = total - k;
     S.loot = S.loot || {};
     S.loot.normal = num(S.loot.normal) + n;
@@ -336,7 +341,8 @@ const Intercambio = (() => {
       if(!k) return;
     }
     const n = despojosDeItem(it0, k);
-    if(!window.confirm(`¿Convertir ${it0.nombre}${k > 1 ? ' ×' + fmt(k) : ''} en ${fmt(n)} despojos?${host.enCombate() ? ` En combate cuesta ${fmt(COSTO_DESPOJOS)} No2.` : ''} No se puede deshacer.`)) return;
+    if(!(await Confirmar.preguntar(`¿Convertir ${it0.nombre}${k > 1 ? ' ×' + fmt(k) : ''} en ${fmt(n)} despojos?${host.enCombate() ? ` En combate cuesta ${fmt(COSTO_DESPOJOS)} No2.` : ''} No se puede deshacer.`, {titulo: 'Convertir en despojos', icono: '♻', si: 'Convertir', peligro: true}))) return;
+    if(host.enCombate() && num(S0.nitros) < COSTO_DESPOJOS && !(await preguntarNitros(S0, COSTO_DESPOJOS))) return;   // sin No2: avisa y deja seguir (antes adentro de aDespojos)
     let res = null;
     await hacer(fichaId, async S => { res = aDespojos(S, itemId, k); return !res.error; });
     if(res && res.error){ if(res.error !== 'cancelado') host.toast(res.error); return; }
@@ -351,7 +357,7 @@ const Intercambio = (() => {
      pedirAlforja: quien saca deja el pedido. pedidos(fichaId): la pantalla del dueño de la alforja lo entrega sola (saca la unidad y la manda en
      el json) o lo rechaza; la de quien lo pidió lo recibe, paga y lo anuncia. */
   async function pedirAlforja(S, miFicha, aliado, it){
-    if(num(S.nitros) < COSTO_ALFORJA && !window.confirm(`Cuesta ${fmt(COSTO_ALFORJA)} No2 y tenés ${fmt(num(S.nitros))}. ¿Hacerlo igual?`)) return 'cancelado';
+    if(num(S.nitros) < COSTO_ALFORJA && !(await preguntarNitros(S, COSTO_ALFORJA))) return 'cancelado';
     await col('paquetes').add({tipo: 'pedido', nombre: String(it.nombre || '').slice(0, 80), json: '', itemId: it.id, cantidad: 1, despojo: '', despojoNombre: '',
       deFicha: aliado.id, deNombre: String(aliado.nombre || '').slice(0, 60), paraFicha: miFicha, paraNombre: nombreDe(S), creadoPor: fbUsuario.uid,
       uids: [...new Set([fbUsuario.uid, aliado.duenoUid || '', (fichas.find(f => f.id === miFicha) || {}).duenoUid || ''].filter(Boolean))],
@@ -394,7 +400,7 @@ const Intercambio = (() => {
           catch(err){ console.error('No se pudo cerrar el pedido:', err); continue; }
           if(!ok) continue;
           if(p.estado !== 'aceptado'){ host.toast(`🎒 ${p.nombre}: ya no está en la alforja de ${p.deNombre}`); continue; }
-          pagarNitros(S, COSTO_ALFORJA, `sacó ${p.nombre} de la alforja de ${p.deNombre}`, true);
+          cobrarNitros(S, COSTO_ALFORJA, `sacó ${p.nombre} de la alforja de ${p.deNombre}`);
           const donde = recibir(S, p) || '';
           host.toast(`🎒 ${p.nombre} → ${p.paraNombre}${donde}`);
           if(typeof mesaLinea === 'function') mesaLinea(`🎒 ${p.paraNombre} sacó ${p.nombre} de la alforja de ${p.deNombre} (−${fmt(COSTO_ALFORJA)} No2)`);

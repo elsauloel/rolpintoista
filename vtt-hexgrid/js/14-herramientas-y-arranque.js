@@ -203,7 +203,7 @@ $('#toolkit-lista').addEventListener('click', e => {
   renderToolkit();
   if(elemTrampa && !elemTrampaNombre.trim()) abrirAsistenteTrampaPanel();   // igual que antes al tildar la casilla
 });
-$('#herramienta-flotante').addEventListener('click', e => {
+$('#herramienta-flotante').addEventListener('click', async e => {
   // Trampas recurrentes: guardar la que se está armando, cargar una guardada o borrarla.
   if(e.target.closest('#trampa-guardar')){
     const nombre = elemTrampaNombre.trim();
@@ -246,7 +246,7 @@ $('#herramienta-flotante').addEventListener('click', e => {
   const tgBorrar = e.target.closest('[data-tg-borrar]');
   if(tgBorrar){
     const g = trampasGuardadas[num(tgBorrar.dataset.tgBorrar)];
-    if(g && confirm(`¿Borrar la trampa guardada "${g.nombre}"?`)){
+    if(g && (await Confirmar.preguntar(`¿Borrar la trampa guardada "${g.nombre}"?`, {titulo: 'Borrar', si: 'Borrar', peligro: true}))){
       trampasGuardadas.splice(num(tgBorrar.dataset.tgBorrar), 1);
       guardarTrampasGuardadas();
       renderHerramientaFlotante();
@@ -588,7 +588,7 @@ async function bitacoraGuardarEdicion(id){
 
 async function bitacoraBorrarPagina(id){
   const p = bitacoraPaginas.find(x => x.id === id);
-  if(!confirm(`¿Borrar la página "${p ? p.nombre : ''}" con todo lo que tiene, para toda la mesa?`)) return;
+  if(!(await Confirmar.preguntar(`¿Borrar la página "${p ? p.nombre : ''}" con todo lo que tiene, para toda la mesa?`, {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return;
   try{
     const entradas = await fbDb.collection(fbRutaCampana(`bitacora/${id}/entradas`)).get();
     const lote = fbDb.batch();
@@ -625,7 +625,7 @@ $('#bitacora-tabs').addEventListener('change', e => {
 $('#bitacora-tabs').addEventListener('keydown', e => {
   if(e.key === 'Enter' && e.target.matches('[data-bit-nombre]')){ e.preventDefault(); e.target.blur(); }
 });
-$('#bitacora-entradas').addEventListener('click', e => {
+$('#bitacora-entradas').addEventListener('click', async e => {
   const editar = e.target.closest('[data-bit-editar]');
   if(editar){
     bitacoraEditando = editar.dataset.bitEditar;
@@ -639,7 +639,7 @@ $('#bitacora-entradas').addEventListener('click', e => {
   if(e.target.closest('[data-bit-cancelar]')){ bitacoraEditando = ''; bitacoraRender(); return; }
   const borrar = e.target.closest('[data-bit-borrar]');
   if(borrar){
-    if(!confirm('¿Borrar esta entrada de la bitácora, para toda la mesa?')) return;
+    if(!(await Confirmar.preguntar('¿Borrar esta entrada de la bitácora, para toda la mesa?', {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return;
     fbDb.doc(fbRutaCampana(`bitacora/${bitacoraActiva}/entradas/${borrar.dataset.bitBorrar}`)).delete()
       .catch(err => { console.error('No se pudo borrar la entrada:', err); toast('No se pudo borrar (solo su autor o el GM)'); });
   }

@@ -372,7 +372,7 @@ document.addEventListener('keydown', e => { if(e.key==='Escape'){ closeModal(); 
 const editorFicha = FichaEditor.crear(document.body, {
   S: () => S,
   toast: m => toast(m),
-  confirmar: t => confirm(t),
+  confirmar: (t, o) => Confirmar.preguntar(t, o),
   // Se guardó o se borró algo de esas listas: se redibuja (y el guardado en vivo lo sube solo).
   alCambiar: keys => {
     keys.forEach(k => {

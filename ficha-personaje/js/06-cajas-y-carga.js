@@ -200,7 +200,7 @@ document.addEventListener('click', async e => {
     return;
   }
   if(b.id === 'portrait-view-del'){
-    if(!confirm('¿Eliminar la foto del personaje?')) return;
+    if(!(await Confirmar.preguntar('¿Eliminar la foto del personaje?', {titulo: 'Eliminar foto', si: 'Eliminar', peligro: true}))) return;
     S.meta.imagen = '';
     S.meta.miniatura = '';
     renderPortrait();
@@ -289,7 +289,7 @@ document.addEventListener('click', async e => {
     return;
   }
   if(b.dataset.catalogodel){
-    if(!confirm('¿Eliminar este ítem del catálogo? No afecta a lo que ya tengas en tu mochila.')) return;
+    if(!(await Confirmar.preguntar('¿Eliminar este ítem del catálogo? No afecta a lo que ya tengas en tu mochila.', {titulo: 'Eliminar', si: 'Eliminar', peligro: true}))) return;
     S.catalogo = S.catalogo.filter(x=>x.id!==b.dataset.catalogodel);
     renderCatalogoModal();
     return;
@@ -430,7 +430,7 @@ document.addEventListener('click', async e => {
     const it = S[key].find(x=>x.id===id);
     if(!it) return;
     if(it.reservado){ toast(`Está ofrecido a ${it.reservadoPara || 'otro personaje'}: cancelá la oferta primero (🤝)`); return; }
-    if(!confirm(`¿Eliminar "${it.nombre}"? No se puede deshacer.`)) return;
+    if(!(await Confirmar.preguntar(`¿Eliminar "${it.nombre}"? No se puede deshacer.`, {titulo: 'Eliminar', si: 'Eliminar', peligro: true}))) return;
     S[key] = S[key].filter(x=>x.id!==id);
     if(key === 'inventario') renderInventario(); else renderList(key);
     refresh();
@@ -461,7 +461,7 @@ document.addEventListener('click', async e => {
     return;
   }
   if(b.dataset.rminv){
-    if(!confirm('¿Eliminar esta invocación del todo? No se puede deshacer.')) return;
+    if(!(await Confirmar.preguntar('¿Eliminar esta invocación del todo? No se puede deshacer.', {titulo: 'Eliminar invocación', si: 'Eliminar', peligro: true}))) return;
     S.invocaciones = S.invocaciones.filter(x=>x.id!==b.dataset.rminv);
     renderInvocaciones();
     return;
@@ -507,7 +507,7 @@ document.addEventListener('click', async e => {
   if(b.dataset.rmhabinv){
     const [invId, habId] = b.dataset.rmhabinv.split(':');
     const inv = S.invocaciones.find(x=>x.id===invId);
-    if(inv && confirm('¿Eliminar esta habilidad?')){ inv.habilidades = inv.habilidades.filter(h=>h.id!==habId); renderInvocaciones(); }
+    if(inv && await Confirmar.preguntar('¿Eliminar esta habilidad?', {titulo: 'Eliminar habilidad', si: 'Eliminar', peligro: true})){ inv.habilidades = inv.habilidades.filter(h=>h.id!==habId); renderInvocaciones(); }
     return;
   }
   if(b.dataset.addestadoinv){ abrirPresetsEfectoInv(b.dataset.addestadoinv); return; }
@@ -555,7 +555,7 @@ document.addEventListener('click', async e => {
   if(b.dataset.consume){ FichaAcciones.consumir(S, b.dataset.consume, false, consumoUi); return; }   // comun/ficha-acciones.js
 });
 
-function cargarArchivoLocal(){
+async function cargarArchivoLocal(){
   if(fbMiembro && fbMiembro.gm){ toast(GM_SIN_PERSONAJES); return; }
   if(fichaVivo && fichaVivo.soloLectura){ toast('Este personaje no es tuyo: no podés cargarle un archivo'); return; }
   const aviso = fichaVivo
@@ -563,7 +563,7 @@ function cargarArchivoLocal(){
     : (fbMiembro
       ? 'El archivo se va a cargar como un personaje nuevo tuyo en la mesa.\n\n¿Seguís?'
       : 'Cargar una ficha reemplaza todo lo que tengas puesto ahora. Como no entraste a la mesa, no se guarda en ningún lado.\n\n¿Seguís?');
-  if(!confirm(aviso)) return;
+  if(!(await Confirmar.preguntar(aviso, {titulo: 'Cargar archivo', si: 'Seguir'}))) return;
   $('#file-input').click();
 }
 // Deja elegir qué parte de `fuente` (File recién subido, o el retrato ya

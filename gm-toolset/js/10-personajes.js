@@ -121,7 +121,7 @@ async function preguntarBorrarTokensDeCreep(creepId){
   try{
     const tokens = await CreepsMapas.tokensDeCreep(creepId);   // en todos los mapas (comun/creeps-mapas.js)
     if(!tokens.length) return;
-    if(!confirm(`Ese creep tiene ${tokens.length} token${tokens.length === 1 ? '' : 's'} en el mapa (contando todos los mapas guardados).\n\n¿Borrar también ${tokens.length === 1 ? 'ese token' : 'esos tokens'}?\nSi elegís "Cancelar", quedan en el mapa como tokens sin vincular.`)) return;
+    if(!(await Confirmar.preguntar(`Ese creep tiene ${tokens.length} token${tokens.length === 1 ? '' : 's'} en el mapa (contando todos los mapas guardados).\n\n¿Borrar también ${tokens.length === 1 ? 'ese token' : 'esos tokens'}?\nSi elegís "Cancelar", quedan en el mapa como tokens sin vincular.`, {titulo: 'Borrar tokens', si: 'Borrar tokens', peligro: true}))) return;
     const lote = fbDb.batch();
     tokens.forEach(d => lote.delete(d.ref));
     await lote.commit();
@@ -135,7 +135,7 @@ async function preguntarBorrarTokensDeCreep(creepId){
 async function borrarPersonajeGM(id, nombre, boton){
   const aviso = `Esto borra a ${nombre} de la partida, para todos, y no se puede deshacer.\n\n` +
                 `Si el jugador lo quiere conservar, avisale antes (podés bajar un respaldo con "💾 Respaldo partida").\n\n¿Seguís?`;
-  if(!confirm(aviso)) return;
+  if(!(await Confirmar.preguntar(aviso, {titulo: 'Borrar personaje', si: 'Borrar', peligro: true}))) return;
   const escrito = prompt(`Para confirmar el borrado, escribí el nombre tal cual: ${nombre}`);
   if(escrito === null) return;
   if(escrito.trim().toLowerCase() !== nombre.trim().toLowerCase()){

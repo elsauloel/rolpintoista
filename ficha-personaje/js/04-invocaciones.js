@@ -427,15 +427,15 @@ function invAtacarCon(invId, tipo){
       ataque: InvAcciones.ataqueDuelo(inv, tipo), suelto: () => invAtacarSuelto(invId, tipo)});
   }else invAtacarSuelto(invId, tipo);
 }
-function invAtacarSuelto(invId, tipo){
+async function invAtacarSuelto(invId, tipo){
   tipo = tipo || 'normal';
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
   const qs = Combatiente.preguntaSentado(inv.estados, inv.nombre);   // Sentado no puede atacar: avisa y deja seguir
-  if(qs && !confirm(qs)) return;
+  if(qs && !(await Confirmar.preguntar(qs, {titulo: 'Sentado', si: 'Atacar igual'}))) return;
   // Sin No2 suficientes: «¿Atacar igual?» (B-7, como los creeps): gasta los que tenga y deja la línea roja.
   const forzar = InvAcciones.faltanNitros(inv, tipo);
-  if(forzar && !confirm(InvAcciones.preguntaSinNitros(inv, tipo))) return;
+  if(forzar && !(await Confirmar.preguntar(InvAcciones.preguntaSinNitros(inv, tipo), {titulo: 'Sin No2', si: 'Atacar igual'}))) return;
   const p = InvAcciones.pagarAtaque(inv, forzar, tipo);   // comun/inv-acciones.js
   if(p.error){ toast(p.error); return; }
   InvAcciones.alertaSinNitros(inv, p.forzado, tipo);
@@ -567,11 +567,12 @@ const invHabUi = {
   colocarTrampa: (inv, h) => FichaAcciones.colocarTrampaDeHab(S, h, {yo: () => ({ref: invHabUi.ref(inv)}), enMapa: invHabUi.enMapa, valorStat: st => InvCalculo.statValor(inv, st),
     alMapa: (tipo, msg) => MensajesMapa.alMapa(tipo, msg), mesaHabilidad: (nombre, detalle) => mesaPublicarHabilidadInv(inv, nombre, detalle), toast: t => toast(t)}),
 };
-function invEjecutarHab(invId, habId){
+async function invEjecutarHab(invId, habId){
   const inv = S.invocaciones.find(x => x.id === invId);
   const h = inv && inv.habilidades.find(x => x.id === habId);
   if(!inv || !h) return;
-  const p = InvHabilidades.ejecutar(inv, h, EFECTOS_PRESET, invDueloDisponible());   // comun/inv-habilidades.js
+  if(!(await InvHabilidades.confirmarSilencio(inv, h))){ toast(`${inv.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`); return; }   // el cartel del juego
+  const p = InvHabilidades.ejecutar(inv, h, EFECTOS_PRESET, invDueloDisponible(), true);   // comun/inv-habilidades.js   // comun/inv-habilidades.js
   if(p.modo === 'manual'){ mesaPublicarHabilidadInv(inv, h.nombre, h.detalle || h.efectoDetalle || ''); toast(`${h.nombre || 'Habilidad'} anunciada`); return; }
   if(p.modo === 'flash'){ usarFlashFueraDelDueloInv(inv, h); return; }
   if(p.error){ toast(p.error); return; }

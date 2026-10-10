@@ -59,7 +59,7 @@ function ofrecerTokenEnMapa(sc){
   if(!mapaId || mapaId === CreepsMapas.RESERVA) return;
   setTimeout(async () => {
     if(!S.creeps.includes(sc) || sc._borrador || sc._creando) return;
-    if(!confirm(`¿Querés crear el token de ${nombreLimpioCreep(sc)} en el mapa «${nombreDeMapaGM(mapaId)}»?\n\nQueda oculto a los jugadores hasta que lo muestres.`)) return;
+    if(!(await Confirmar.preguntar(`¿Querés crear el token de ${nombreLimpioCreep(sc)} en el mapa «${nombreDeMapaGM(mapaId)}»?\n\nQueda oculto a los jugadores hasta que lo muestres.`, {titulo: 'Crear token', icono: '🎯', si: 'Crear token'}))) return;
     try{
       const r = await TokensAuto.crear([{nombre: nombreLimpioCreep(sc), color: sc.color, tipo: 'creep', fichaId: sc.id, oculto: true}], {mapaId});
       toast(r.creados ? `🎯 Token de ${nombreLimpioCreep(sc)} en «${nombreDeMapaGM(mapaId)}», oculto a los jugadores` : `${nombreLimpioCreep(sc)} ya tenía su token en ese mapa`);
@@ -216,7 +216,7 @@ $('#botin-gm-cuerpo').addEventListener('click', e => {
   if(b){ const it = CombateFin.botinItem(botinGM, b.dataset.botinVer); if(it) verItemDatos(it); }
 });
 async function despojarBotin(){
-  const res = await CombateFin.despojar(botinGM, {combateActual, confirmar: texto => confirm(texto), alEmpezar: renderBotinGM});
+  const res = await CombateFin.despojar(botinGM, {combateActual, confirmar: texto => Confirmar.preguntar(texto), alEmpezar: renderBotinGM});
   if(!res) return;
   if(res.error){ toast(res.error); renderBotinGM(); return; }
   toast(res.mensaje);
@@ -391,7 +391,7 @@ async function gbitGuardarEdicion(id){
 }
 async function gbitBorrarPagina(id){
   const p = gbit.paginas.find(x => x.id === id);
-  if(!confirm(`¿Borrar la página "${p ? p.nombre : ''}" con todo lo que tiene?`)) return;
+  if(!(await Confirmar.preguntar(`¿Borrar la página "${p ? p.nombre : ''}" con todo lo que tiene?`, {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return;
   try{
     const entradas = await fbDb.collection(fbRutaCampana(`gmBitacora/${id}/entradas`)).get();
     const lote = fbDb.batch();
@@ -433,7 +433,7 @@ $('#gbit-tabs').addEventListener('change', e => {
 $('#gbit-tabs').addEventListener('keydown', e => {
   if(e.key === 'Enter' && e.target.matches('[data-gbit-nombre]')){ e.preventDefault(); e.target.blur(); }
 });
-$('#gbit-entradas').addEventListener('click', e => {
+$('#gbit-entradas').addEventListener('click', async e => {
   const editar = e.target.closest('[data-gbit-editar]');
   if(editar){
     gbit.editando = editar.dataset.gbitEditar;
@@ -447,7 +447,7 @@ $('#gbit-entradas').addEventListener('click', e => {
   if(e.target.closest('[data-gbit-cancelar]')){ gbit.editando = ''; gbitRender(); return; }
   const borrar = e.target.closest('[data-gbit-borrar]');
   if(borrar){
-    if(!confirm('¿Borrar esta entrada de la bitácora del GM?')) return;
+    if(!(await Confirmar.preguntar('¿Borrar esta entrada de la bitácora del GM?', {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return;
     fbDb.doc(fbRutaCampana(`gmBitacora/${gbit.activa}/entradas/${borrar.dataset.gbitBorrar}`)).delete()
       .catch(err => { console.error('No se pudo borrar la entrada del GM:', err); toast('No se pudo borrar'); });
   }

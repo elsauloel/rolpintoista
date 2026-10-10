@@ -164,7 +164,7 @@ async function menuDibujar(){
     if(guia) guia.onclick = () => { menuCerrar(); GuiaDiseno.abrir(); };
     const salir = p.querySelector('#menu-sitio-salir');
     if(salir) salir.onclick = async () => {
-      if(!confirm('¿Cerrar sesión en este navegador?')) return;
+      if(!(await Confirmar.preguntar('¿Cerrar sesión en este navegador?', {titulo: 'Cerrar sesión', si: 'Cerrar sesión'}))) return;
       await firebase.auth().signOut();
       location.href = menuUrl('index.html');
     };

@@ -202,11 +202,12 @@ header .acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 
 <div class="toast" id="toast"></div>
 
+<script src="../comun/confirmar.js?v=20261010a"></script>
 <script src="../comun/efectos-golpe.js"></script>
 <script src="../comun/glosario.js?v=20261009zb"></script>
 <script src="../comun/item-corto.js?v=20261009zc"></script>
 <script src="../comun/combatiente.js?v=20261009p"></script>
-<script src="../comun/paso-a-paso.js?v=20261002g"></script>
+<script src="../comun/paso-a-paso.js?v=20261010a"></script>
 <script src="../comun/estado-preguntas.js?v=20261009zl"></script>
 <script src="../comun/estados-presets.js?v=20261008zd"></script>
 <script src="../comun/estados-aplicar.js?v=20261007r"></script>
@@ -467,8 +468,8 @@ function abrirAsistente(id, inicial){
     conPresetEstado: true,
     ejemplos: (tipoItem, t) => CATALOGO.filter(it => esArmaTipo(it.tipoItem) && num(it.tipoDado) === t && it.id !== id).map(it => it.nombre),
     textoGuardar: 'Guardar ítem',
-    botones: original ? [{texto: 'Borrar ítem', accion: () => {
-      if(!confirm(`¿Borrar "${original.nombre}" del catálogo?`)) return;
+    botones: original ? [{texto: 'Borrar ítem', accion: async () => {
+      if(!await Confirmar.preguntar(`¿Borrar "${original.nombre}" del catálogo?`, {titulo: 'Borrar', si: 'Borrar', peligro: true})) return;
       CATALOGO = CATALOGO.filter(x => x.id !== id);
       AsistenteItem.cerrar();
       renderLista();
@@ -695,10 +696,10 @@ function guardarItemActual(){
   toast('Ítem guardado (acordate de bajar/subir el JSON para persistirlo)');
 }
 
-function borrarItemActual(){
+async function borrarItemActual(){
   if(!editing || !editing.id) return;
   const it = CATALOGO.find(x => x.id === editing.id);
-  if(!confirm(`¿Borrar "${it ? it.nombre : editing.id}" del catálogo?`)) return;
+  if(!await Confirmar.preguntar(`¿Borrar "${it ? it.nombre : editing.id}" del catálogo?`, {titulo: 'Borrar', si: 'Borrar', peligro: true})) return;
   CATALOGO = CATALOGO.filter(x => x.id !== editing.id);
   cerrarEditor();
   renderLista();
@@ -739,10 +740,10 @@ function correrTiposCatalogo(items){
   });
 }
 
-function aplicarDatos(datos, origen){
+async function aplicarDatos(datos, origen){
   CATALOGO = Array.isArray(datos) ? datos : [];
   if(catalogoEscalaVieja(CATALOGO)){
-    if(confirm('Este catálogo usa la escala vieja de Tipos de arma (2, 4, 6, 8, 10).\n\n¿Pasarlo a la nueva (4, 6, 8, 10, 12)? Suma 2 al Tipo de cada arma y a los números de "resistencia a críticos tipo N" en los textos.\n\nSi elegís Cancelar, queda como está.')){
+    if(await Confirmar.preguntar('Este catálogo usa la escala vieja de Tipos de arma (2, 4, 6, 8, 10).\n\n¿Pasarlo a la nueva (4, 6, 8, 10, 12)? Suma 2 al Tipo de cada arma y a los números de "resistencia a críticos tipo N" en los textos.\n\nSi elegís Cancelar, queda como está.', {titulo: 'Escala vieja de Tipos', si: 'Pasar a la nueva'})){
       correrTiposCatalogo(CATALOGO);
       origen += ' · pasado a la escala nueva de Tipos';
     }
@@ -767,7 +768,7 @@ $('#input-archivo').onchange = async e => {
   if(!file) return;
   try{
     const datos = JSON.parse(await file.text());
-    aplicarDatos(datos, `Cargado desde ${file.name}`);
+    await aplicarDatos(datos, `Cargado desde ${file.name}`);
   }catch(err){
     toast('Ese archivo no es un JSON válido');
   }
@@ -868,7 +869,7 @@ async function traerUltimaVersion(silencioso){
     if(r.falta){ if(!silencioso) estado('No encontré comun/catalogo.js en GitHub.', 'err'); return; }
     if(r.limite){ if(!silencioso) estado('GitHub cortó las consultas por un rato — probá de nuevo en unos minutos.', 'err'); return; }
     textoRemoto = r.texto;
-    aplicarDatos(leerCatalogoJs(r.texto), 'Última versión traída de GitHub ✓');
+    await aplicarDatos(leerCatalogoJs(r.texto), 'Última versión traída de GitHub ✓');
   }catch(err){
     console.error('Error trayendo el catálogo:', err);
     estado('No se pudo traer la última versión — ¿tenés internet?', 'err');
@@ -887,7 +888,7 @@ $('#btn-subir').onclick = async () => {
     const actual = r.texto || null;
     // Alguien (otra persona u otra conversación) lo cambió desde que se trajo: se avisa antes de pisarlo.
     if(textoRemoto !== null && actual !== null && actual.replace(/\r\n/g, '\n') !== textoRemoto.replace(/\r\n/g, '\n')
-      && !confirm('comun/catalogo.js cambió en GitHub desde que lo abriste (lo guardó otra persona u otra conversación).\n\nSi guardás ahora, se pisan esos cambios con lo que tenés acá. ¿Guardar igual?\n\n(Cancelar y tocar "⬇ Traer última versión" trae lo nuevo, pero pierde lo que editaste acá sin guardar.)')){
+      && !await Confirmar.preguntar('comun/catalogo.js cambió en GitHub desde que lo abriste (lo guardó otra persona u otra conversación).\n\nSi guardás ahora, se pisan esos cambios con lo que tenés acá. ¿Guardar igual?\n\n(Cancelar y tocar "⬇ Traer última versión" trae lo nuevo, pero pierde lo que editaste acá sin guardar.)', {titulo: 'El archivo cambió', si: 'Guardar igual', peligro: true})){
       return;
     }
     const texto = escribirCatalogoJs(CATALOGO, actual || textoRemoto);
@@ -914,9 +915,12 @@ $('#btn-token').onclick = async () => {
 /* ---------- Arranque ---------- */
 poblarFiltros();
 // Primero la copia que trae el sitio (se ve al instante, sin GitHub); después la última de GitHub.
-if(typeof CATALOGO_BASE !== 'undefined') aplicarDatos(structuredClone(CATALOGO_BASE), 'Copia de fábrica del sitio');
-else renderLista();
-traerUltimaVersion(true);
+// (En orden: si la copia del sitio pregunta por la escala vieja, la de GitHub espera a la respuesta.)
+(async () => {
+  if(typeof CATALOGO_BASE !== 'undefined') await aplicarDatos(structuredClone(CATALOGO_BASE), 'Copia de fábrica del sitio');
+  else renderLista();
+  traerUltimaVersion(true);
+})();
 </script>
 </body>
 </html>

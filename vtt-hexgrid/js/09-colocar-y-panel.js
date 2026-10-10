@@ -104,7 +104,7 @@ async function editarToken(id, cambios){
 async function borrarToken(id){
   const t = tokens.get(id);
   if(!puedoBorrar(t)) return;
-  if(!confirm(`¿Sacar el token "${t.nombre}" del mapa?`)) return;
+  if(!(await Confirmar.preguntar(`¿Sacar el token "${t.nombre}" del mapa?`, {titulo: 'Sacar token', si: 'Sacar', peligro: true}))) return;
   try{
     await coleccionTokens().doc(id).delete();
   }catch(err){
@@ -878,7 +878,7 @@ function renderMapasMenu(forzar){
   $('#mapa-nuevo').onclick = crearMapa;
   $('#fondo-cargar').onclick = () => $('#fondo-archivo').click();
   if($('#fondo-quitar')) $('#fondo-quitar').onclick = async () => {
-    if(!confirm('¿Quitar la imagen de fondo del mapa?')) return;
+    if(!(await Confirmar.preguntar('¿Quitar la imagen de fondo del mapa?', {titulo: 'Quitar fondo', si: 'Quitar', peligro: true}))) return;
     try{
       const lote = fbDb.batch();
       lote.delete(fbDb.doc(fbRutaCampana(rutaMapaEstado('fondo'))));

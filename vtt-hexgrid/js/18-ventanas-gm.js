@@ -159,7 +159,7 @@ function vgFinDibujar(){
 async function vgPublicar(){
   if(!vgRep) return;
   const res = await CombateFin.publicar(vgRep, {creeps: vgCreeps, cat: vgCatalogo(), combateActual: combateMapa,
-    confirmar: texto => confirm(texto), alEmpezar: vgFinDibujar});
+    confirmar: texto => Confirmar.preguntar(texto), alEmpezar: vgFinDibujar});
   if(!res) return;
   if(res.error){ toast(res.error); vgFinDibujar(); return; }
   // No se vuelven a contar en el próximo reporte (GM Tools, abierto en otra pestaña, se entera por la firma).
@@ -206,7 +206,7 @@ function vgBotinDibujar(){
 }
 async function vgDespojar(){
   if(!vgBotin) return;
-  const res = await CombateFin.despojar(vgBotin, {combateActual: combateMapa, confirmar: texto => confirm(texto), alEmpezar: vgBotinDibujar});
+  const res = await CombateFin.despojar(vgBotin, {combateActual: combateMapa, confirmar: texto => Confirmar.preguntar(texto), alEmpezar: vgBotinDibujar});
   if(!res) return;
   if(res.error){ toast(res.error); vgBotinDibujar(); return; }
   toast(res.mensaje);

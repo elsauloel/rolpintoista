@@ -127,8 +127,8 @@ function abrirCatalogoArmasNaturales(scId){
     tipo: 'armas_naturales', titulo: `Arma natural para ${sc.nombre || 'el creep'}`,
     base: typeof ARMAS_NATURALES_BASE !== 'undefined' ? ARMAS_NATURALES_BASE : [],
     subtitulo: e => ` · ${e.etiquetas.includes('pesada') ? 'pesada' : e.etiquetas.includes('ligera') ? 'ligera' : 'media'} · ${e.etiquetas.includes('a distancia') ? 'a distancia' : 'cuerpo a cuerpo'}`,
-    alElegir: datos => {
-      if(sc.armaNombre && !confirm(`${sc.nombre || 'El creep'} ya tiene "${sc.armaNombre}". ¿Reemplazarla por ${datos.nombre}?`)) return;
+    alElegir: async datos => {
+      if(sc.armaNombre && !(await Confirmar.preguntar(`${sc.nombre || 'El creep'} ya tiene "${sc.armaNombre}". ¿Reemplazarla por ${datos.nombre}?`, {titulo: 'Reemplazar arma', icono: '🐾', si: 'Reemplazar'}))) return;
       Object.assign(sc, armarArmaNatural(datos, sc.nivel));
       renderAll();
       toast(`${datos.nombre} equipada (arma natural, nivel ${sc.nivel || 1})`);

@@ -1463,3 +1463,10 @@ versión parecida en más de una, es candidato a juntar.
   dibuja (o saca) el de la 🪙 Moneda Re-Roll —con brillo de moneda, mientras tengas una: un recordatorio— y `apilar()` acomoda la 🦋 Polilla, el 💍
   anillo de impulso y la moneda uno arriba del otro (cada pantalla lo llama después de dibujar o sacar uno). Lo usan el mapa (js/02, js/25; la moneda
   con `resumen.moneda` de su personaje) y la ficha suelta (js/03, `renderMonedaFlotante`; adentro del mapa no, la pone el mapa).
+- **`confirmar.js`** (`Confirmar`, 2026-10-10, pedido del dueño) — **el cartel del juego para preguntar sí o no**, en vez del `confirm()` del
+  navegador (que además congelaba la pestaña con la extensión de Chrome): `Confirmar.preguntar(texto, {titulo, icono, si, no, peligro})` →
+  `Promise<boolean>` (Esc / ✕ / clic afuera = no; Enter = sí). Trae su propio estilo y va arriba de todo. Lo cargan todas las páginas; **no se usa
+  más `confirm()` en ningún lado** (salvo `gestor.html`, legado). Quien lo llama es `async` y hace `await`; los `ctx.confirmar`/`ui.confirmar` que
+  se inyectan a las piezas comunes son `(t, o) => Confirmar.preguntar(t, o)` y las piezas los esperan con `await`. Excepción: `CreepAcciones.ejecutarHab`
+  e `InvHabilidades.ejecutar` siguen sincrónicas (corren en una transacción): el Silencio se pregunta antes con `confirmarSilencio(...)` y se les
+  pasa `silencioOk = true`. `AvisoCombate.preguntar` delega en este.

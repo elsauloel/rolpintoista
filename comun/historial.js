@@ -282,7 +282,7 @@ function histArmarBoton(){
   panel.querySelector('#hp-cerrar').onclick = () => histCerrar(panel, boton);
   const bBorrar = panel.querySelector('#hp-borrar');
   if(bBorrar) bBorrar.onclick = async e => {
-    if(!confirm('¿Borrar todo el historial?\n\nSe borra para siempre.')) return;
+    if(!(await Confirmar.preguntar('¿Borrar todo el historial?\n\nSe borra para siempre.', {titulo: 'Borrar historial', si: 'Borrar', peligro: true}))) return;
     e.target.disabled = true;
     try{ await histBorrar(null); }
     catch(err){ console.error('No se pudo borrar el historial:', err); if(typeof toast === 'function') toast('No se pudo borrar el historial'); }

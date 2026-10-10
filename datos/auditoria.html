@@ -108,10 +108,11 @@ ins{background:rgba(168,194,86,.26);color:#D6EE9C;text-decoration:none;border-ra
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
+<script src="../comun/confirmar.js?v=20261010a"></script>
 <script src="../comun/sesion.js"></script>
 <script src="../comun/menu-sitio.js"></script>
 <script src="../comun/plantillas.js?v=20261007ar"></script>
-<script src="../comun/biblioteca.js?v=20261002k"></script>
+<script src="../comun/biblioteca.js?v=20261010a"></script>
 <script src="../comun/catalogo.js?v=20261009z9"></script>
 <script src="../comun/skills-clase.js?v=20261008x"></script>
 <script src="../comun/pasivas.js?v=20261007am"></script>
@@ -385,12 +386,12 @@ document.addEventListener('click', async ev => {
     }
     if(acc === 'auditar'){ await Biblioteca.auditar(e.tipo, e.id); e.auditado = true; toast(`"${e.nombre}" quedó auditado`); return render(); }
     if(acc === 'descartar'){
-      if(!confirm(`¿Descartar "${e.nombre}"? Se borra de la biblioteca para todos (las copias que ya estén en fichas o creeps no se tocan). No se puede deshacer.`)) return;
+      if(!await Confirmar.preguntar(`¿Descartar "${e.nombre}"? Se borra de la biblioteca para todos (las copias que ya estén en fichas o creeps no se tocan). No se puede deshacer.`, {titulo: 'Descartar', si: 'Descartar', peligro: true})) return;
       await Biblioteca.descartar(e.tipo, e.id); toast(`"${e.nombre}" descartado`); return cargar();
     }
     if(acc === 'aprobar'){ await Biblioteca.aprobarPropuesta(v.tipo, v); toast(`"${v.nombre}" pasó a la biblioteca`); return cargar(); }
     if(acc === 'rechazar'){
-      if(!confirm(`¿Rechazar la propuesta "${v.nombre}"? Se borra.`)) return;
+      if(!await Confirmar.preguntar(`¿Rechazar la propuesta "${v.nombre}"? Se borra.`, {titulo: 'Rechazar propuesta', si: 'Rechazar', peligro: true})) return;
       await Biblioteca.rechazarPropuesta(v.tipo, v.id); toast(`Propuesta "${v.nombre}" rechazada`); return cargar();
     }
   }catch(err){

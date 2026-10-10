@@ -64,7 +64,7 @@ function mesaHistorialAlEntrar(){
     b.hidden = false;
     b.onclick = async e => {
       e.stopPropagation();
-      if(!confirm('¿Borrar todo el historial de tiradas de la Mesa?\n\nSe borra para todos y no se puede deshacer. Si querés guardarlo, bajá antes el respaldo 💾.')) return;
+      if(!(await Confirmar.preguntar('¿Borrar todo el historial de tiradas de la Mesa?\n\nSe borra para todos y no se puede deshacer. Si querés guardarlo, bajá antes el respaldo 💾.', {titulo: 'Borrar historial de la Mesa', si: 'Borrar', peligro: true}))) return;
       b.disabled = true;
       try{
         const n = await mesaBorrarTiradas(null);

@@ -294,7 +294,7 @@ const PPT = (() => {
     }
     f.innerHTML = `<div class="ppt-caja">${cabHtml(d)}${cuerpo}</div>`;
   }
-  function clic(e){
+  async function clic(e){
     const f = document.getElementById('ppt-fondo');
     const id = f && f.dataset.id;
     const b = e.target.closest('button');
@@ -312,7 +312,7 @@ const PPT = (() => {
       dibujar();
     }else if(q === 'rendirse'){
       const d = juegos.get(id);
-      if(d && confirm(`¿Rendirte? Gana ${d[otro(ladoDe(d, yo()))].nombre}.`)) rendirse(id);
+      if(d && await Confirmar.preguntar(`¿Rendirte? Gana ${d[otro(ladoDe(d, yo()))].nombre}.`, {titulo: 'Rendirse', icono: '✊', si: 'Rendirme', peligro: true})) rendirse(id);
     }
   }
 

@@ -448,9 +448,12 @@ const FichaAcciones = (() => {
      Lo que hace el ataque suelto (sin objetivo) o el que el duelo le pide al atacante: cobrar los No2 y tirar el PdG.
      Ataque normal: el primero del turno con esa arma cuesta Tipo ÷ 2, los siguientes el Tipo completo (cuenta como ataque).
      Ataque de oportunidad y Contraataque (regla a prueba, P139): SIEMPRE Tipo ÷ 2 y NO suman al conteo de ataques. */
-  const confirmarSentado = (S, ui) => { const q = Combatiente.preguntaSentado(S.efectos); return !q || (ui.confirmar || (t => confirm(t)))(q); };
-  function atacarConArma(S, arma, forzar, ui){
-    if(!forzar && !confirmarSentado(S, ui)) return;   // Sentado no puede atacar: avisa y deja seguir
+  // Sentado: el cartel del juego (no el confirm() nativo). Devuelve true si no hay nada que preguntar, o lo que diga ui.confirmar (bool o
+  // promesa). Solo se espera (await) si es una promesa: así, sin pregunta, el ataque sigue en el mismo momento que antes.
+  const confirmarSentado = (S, ui) => { const q = Combatiente.preguntaSentado(S.efectos); return !q || (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: 'Sentado', si: 'Atacar igual'})))(q); };
+  const esperarSiHace = x => x && typeof x.then === 'function' ? x : null;
+  async function atacarConArma(S, arma, forzar, ui){
+    if(!forzar){ const ok = confirmarSentado(S, ui), p = esperarSiHace(ok); if(!(p ? await p : ok)) return; }   // Sentado no puede atacar: avisa y deja seguir
     ui.setParry(null);
     const costo = FichaCombate.costoAtaque(S, arma);
     if(costo > num(S.nitros) && !forzar){
@@ -466,10 +469,10 @@ const FichaAcciones = (() => {
     ui.toast(`${arma ? arma.nombre : 'Sin arma ⚠ (Tipo provisorio)'}: -${fmt(costo)} No2 · ${primero ? 'primer ataque con esta arma' : `ataque ${FichaCombate.ataquesConArma(S, arma)} con esta arma`}${impar ? ' · ⚠ Tipo impar, redondeo provisorio' : ''}`);
   }
   const NOMBRE_ATAQUE_ESPECIAL = {oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
-  function ataqueEspecialConArma(S, arma, tipo, forzar, ui){
+  async function ataqueEspecialConArma(S, arma, tipo, forzar, ui){
     const costo = FichaCombate.costoAtaqueEspecial(arma, tipo, S), nombre = NOMBRE_ATAQUE_ESPECIAL[tipo] || 'Ataque';
     const con = arma ? ' con ' + arma.nombre : '';
-    if(!forzar && !confirmarSentado(S, ui)) return;
+    if(!forzar){ const ok = confirmarSentado(S, ui), p = esperarSiHace(ok); if(!(p ? await p : ok)) return; }
     if(costo > num(S.nitros) && !forzar){
       ui.avisarSinNitros(costo, `hacer un ${nombre.toLowerCase()}${con}`, () => ataqueEspecialConArma(S, arma, tipo, true, ui));
       return;
@@ -546,7 +549,7 @@ const FichaAcciones = (() => {
     }
     // Silencio (2026-10-04): avisa y deja seguir.
     const sil = Combatiente.preguntaSilencio(S.efectos, it);
-    if(sil && !(ui.confirmar || (txt => typeof confirm === 'function' && confirm(txt)))(sil)) return;
+    if(sil && !(await (ui.confirmar || (txt => Confirmar.preguntar(txt, {titulo: 'Silencio', icono: '🤐', si: 'Usarla igual'})))(sil))) return;
     if(Combatiente.tipoEjecucion(FichaBotonera.dueloDe(it)) === 'flash'){ ui.flashFuera(it); return; }   // ⚡ su propia regla de costo (P136)
     // Costo en vida: hace falta que sobre vida después de pagarlo.
     if(num(it.hpCosto) > 0 && num(S.hp) <= num(it.hpCosto)){
@@ -676,7 +679,7 @@ const FichaAcciones = (() => {
     const item = armasEspeciales(S).find(x => x.id === itemId);
     if(!item){ ui.toast('Esa arma especial no está equipada'); return; }
     const it = habDeArmaEspecial(S, item), c = costoEspecial(S, item), e = item.especial || {};
-    const confirmar = ui.confirmar || (t => typeof confirm === 'function' && confirm(t));
+    const confirmar = ui.confirmar || (t => Confirmar.preguntar(t, {titulo: it.nombre}));   // el cartel del juego, no el confirm() nativo
     // Una vez por turno (2026-10-07, la Expelliarmus): avisa y deja seguir (lo decide la mesa).
     if(e.unaVezPorTurno && c.usos > 0 && spFijo === undefined && !sinSp && !forzar
       && !(await confirmar(`${it.nombre} se usa una vez por turno, y ya la usaste en este. ¿Usarla igual?`))) return;

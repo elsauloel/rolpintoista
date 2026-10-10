@@ -193,7 +193,7 @@ function fichaAvisarMesaControl(texto){
 async function fichaTomarControl(){
   const f = fichaVivo;
   if(!f || !fbMiembro.gm || !f.cargada || fichaControloYo(f)) return;
-  if(!confirm(`¿Tomar el control de ${fichaNombre()}?\n\nLo vas a usar como si fueras su jugador (Botonera, duelos, habilidades, token, Mantenimiento). Su jugador queda en solo lectura hasta que se lo devuelvas, y la Mesa avisa.`)) return;
+  if(!(await Confirmar.preguntar(`¿Tomar el control de ${fichaNombre()}?\n\nLo vas a usar como si fueras su jugador (Botonera, duelos, habilidades, token, Mantenimiento). Su jugador queda en solo lectura hasta que se lo devuelvas, y la Mesa avisa.`, {titulo: 'Tomar el control', si: 'Tomar el control'}))) return;
   const base = fbDb.doc(fbRutaCampana(`fichas/${f.id}`));
   const control = {uid: fbUsuario.uid, nombre: fbMiembro.nombre || 'GM', desde: Date.now()};
   try{
@@ -483,7 +483,7 @@ function abrirPersonajeNuevo(){
     habilidad: (claseId, habId) => habDeClase(claseId, habId),
     // Una habilidad propia (custom), con el mismo paso a paso de la ficha (comun/ficha-editor.js) pero sobre el personaje que se está armando.
     editarHabilidad: (draft, id, alCambiar) => FichaEditor.crear(document.body, {
-      S: () => draft, toast: m => toast(m), confirmar: t => confirm(t), alCambiar: () => alCambiar(),
+      S: () => draft, toast: m => toast(m), confirmar: (t, o) => Confirmar.preguntar(t, o), alCambiar: () => alCambiar(),
       elegirTipoItem: actual => elegirTipoItemFicha(actual), elegirEstadoItem: () => elegirEstadoItemFicha(), elegirEstadoDuelo: () => elegirEstadoDuelo(),
       alSubirCatalogo: () => {},
     }).abrir('habilidades', id || null),
@@ -508,7 +508,7 @@ function abrirPersonajeNuevo(){
 async function crearPersonajeNuevo(datos, o){
   if(!fbDb || !fbMiembro){ toast('Sin conexión con la partida: no se pueden crear personajes'); return; }
   if(fbMiembro.gm){ toast(GM_SIN_PERSONAJES); return; }
-  if(!datos && !confirm('¿Crear un personaje nuevo, en blanco, en la mesa?\n\nEl personaje que tenés abierto queda guardado como está.')) return;
+  if(!datos && !(await Confirmar.preguntar('¿Crear un personaje nuevo, en blanco, en la mesa?\n\nEl personaje que tenés abierto queda guardado como está.', {titulo: 'Personaje nuevo', si: 'Crear'}))) return;
   await fichaSoltar();
   if(datos) aplicarFicha(datos); else fichaNueva();
   try{
@@ -640,7 +640,7 @@ async function abrirPersonajes(){
 async function borrarPersonaje(id, nombre){
   const aviso = `Esto borra a ${nombre} de la mesa, para todos, y no se puede deshacer.\n\n` +
                 `Si querés conservarlo, antes abrilo y bajá una copia con 💾 Guardar copia.\n\n¿Seguís?`;
-  if(!confirm(aviso)) return;
+  if(!(await Confirmar.preguntar(aviso, {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return;
   const escrito = prompt(`Para confirmar el borrado, escribí el nombre tal cual: ${nombre}`);
   if(escrito === null) return;
   if(escrito.trim().toLowerCase() !== nombre.trim().toLowerCase()){

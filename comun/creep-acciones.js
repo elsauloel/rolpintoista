@@ -299,10 +299,17 @@ const CreepAcciones = (() => {
     });
     return {hechos, nota: [hab.efectoLibre || '', hab.efectosNota || ''].filter(Boolean).join(' ')};
   }
+  // Silencio (2026-10-04): avisa y deja seguir. La pregunta la hace quien llama ANTES de ejecutarHab, con el cartel del juego (no el
+  // confirm() nativo): ejecutarHab corre adentro de una transacción en el mapa y no puede esperar. true = sigue (o no había nada que preguntar).
+  async function confirmarSilencio(sc, h){
+    const sil = Combatiente.preguntaSilencio(sc.estados, h, sc.nombre);
+    return !sil || !!(await Confirmar.preguntar(sil, {titulo: 'Silencio', icono: '🤐', si: 'Usarla igual'}));
+  }
   // Lo que cambia al ejecutar una 💰 o ✨ (no manual ni Flash): {error} o el plan para terminarHab.
-  function ejecutarHab(sc, h, presets){
+  // `silencioOk`: ya se preguntó con confirmarSilencio y dijo que sí; sin eso, en Silencio no la usa.
+  function ejecutarHab(sc, h, presets, silencioOk){
     const sil = Combatiente.preguntaSilencio(sc.estados, h, sc.nombre);   // Silencio (2026-10-04): avisa y deja seguir
-    if(sil && !(typeof confirm === 'function' && confirm(sil))) return {error: `${sc.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`};
+    if(sil && !silencioOk) return {error: `${sc.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`};
     const modo = C().modoHab(h);
     const bloqueo = C().bloqueoHab(sc, h);
     if(bloqueo) return {error: `${sc.nombre}: ${h.nombre || 'Habilidad'} no se puede usar — ${bloqueo}`};
@@ -416,13 +423,13 @@ const CreepAcciones = (() => {
       ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {}), nitrosCosto: costoEspecialCreep(sc, it).no2, cd: 0};
   }
   // Cobra y arma el plan (lo mismo que ejecutarHab, con la espera y los orbes). {error} o el plan, con `hab` (la habilidad de la varita).
-  function usarEspecialCreep(sc, itemId, presets){
+  function usarEspecialCreep(sc, itemId, presets, silencioOk){
     const it = especialesCreep(sc).find(x => x.id === itemId);
     if(!it) return {error: `${sc.nombre}: esa arma especial ya no está en su equipo`};
     const c = costoEspecialCreep(sc, it);
     if(c.enEspera > 0) return {error: `${sc.nombre}: ${it.nombre} está en espera ${fmt(c.enEspera)} turno${c.enEspera === 1 ? '' : 's'} (un creep paga el SP con espera)`};
     const h = habDeEspecialCreep(sc, it);
-    const p = ejecutarHab(sc, h, presets);
+    const p = ejecutarHab(sc, h, presets, silencioOk);
     if(p.error) return p;
     const kEsp = claveEspCreep(it);
     sc.esperaEspecial = {...(sc.esperaEspecial || {}), [kEsp]: c.espera};   // en el creep: la varita queda igual (si la saquean, vuelve a costar SP)
@@ -537,6 +544,6 @@ const CreepAcciones = (() => {
   return {bloqueoFirmeCreep, ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, inicioTurno, finTurno, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
     tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, tiradaSoltarse, aplicarSoltarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
     costoAtaqueDe, faltanNitros, preguntaSinNitros, alertaSinNitros,
-    FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,
+    FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, confirmarSilencio, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,
     zonaDeHab, cdMod};
 })();

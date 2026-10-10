@@ -74,7 +74,7 @@ function abrirReporteFinalizar(){
 
 async function publicarRecompensas(){
   const res = await CombateFin.publicar(combateRep, {creeps: S.creeps, cat: CATALOGO_EQUIPO, combateActual,
-    confirmar: texto => confirm(texto), alEmpezar: renderReporteCombate});
+    confirmar: texto => Confirmar.preguntar(texto), alEmpezar: renderReporteCombate});
   if(!res) return;
   if(res.error){ toast(res.error); renderReporteCombate(); return; }
   const items = res.items;

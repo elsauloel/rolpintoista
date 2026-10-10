@@ -627,10 +627,10 @@ $('#view-baja-btn').onclick = async () => {
   if(ok){ $('#scrim-view').classList.remove('open'); cargarItemsSubidos(); }
 };
 
-$('#btn-limpiar-estados').onclick = () => {
+$('#btn-limpiar-estados').onclick = async () => {
   const cuantos = (S.efectos || []).length;
   if(!cuantos){ toast('No hay estados para limpiar'); return; }
-  if(!confirm(`¿Sacar los ${cuantos} estado(s) alterado(s)?`)) return;
+  if(!(await Confirmar.preguntar(`¿Sacar los ${cuantos} estado(s) alterado(s)?`, {titulo: 'Limpiar estados', si: 'Sacar', peligro: true}))) return;
   S.efectos = [];
   renderList('efectos');
   refresh();
@@ -639,12 +639,12 @@ $('#btn-limpiar-estados').onclick = () => {
 
 /* La venta de ítems ya no existe fuera de la tienda: se hace desde "Vender" en el Vendedor (ver abrirVender). */
 
-$('#view-del-btn').onclick = () => {
+$('#view-del-btn').onclick = async () => {
   if(!viewing) return;
   const {key, id} = viewing;
   const it = (S[key] || []).find(x => x.id === id);
   if(!it) return;
-  if(!confirm(`¿Borrar "${it.nombre || 'esto'}"?`)) return;
+  if(!(await Confirmar.preguntar(`¿Borrar "${it.nombre || 'esto'}"?`, {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return;
   S[key] = S[key].filter(x => x.id !== id);
   $('#scrim-view').classList.remove('open');
   viewing = null;

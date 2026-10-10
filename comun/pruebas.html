@@ -87,6 +87,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ppt.js"></script>
 <script src="escaneo-grupo.js"></script>
 <script src="trampas-base.js"></script>
+<script src="confirmar.js"></script>
 <script src="glosario.js"></script>
 <script src="item-corto.js"></script>
 <script src="filtro-catalogo.js"></script>
@@ -2229,7 +2230,6 @@ prueba('duelo minimizado (P151): un texto por paso, sin la vida que le queda; el
 prueba('paso a paso: al crear, «✔ Crear» solo en el último paso; Cancelar pregunta y descarta; los pasos pueden depender de lo elegido', async () => {
   const hechos = [];
   let conExtra = false;
-  const orig = window.confirm; window.confirm = () => true;
   const api = PasoAPaso.abrir({titulo: 'Crear cosa', crear: true,
     pasos: () => [{id: 'a', nombre: 'Uno', html: () => '<button data-extra="1">x</button>'}, ...(conExtra ? [{id: 'x', nombre: 'Extra'}] : []), {id: 'z', nombre: 'Resumen'}],
     alClic: e => { if(e.target.dataset.extra){ conExtra = true; api.redibujar(); } },
@@ -2242,9 +2242,20 @@ prueba('paso a paso: al crear, «✔ Crear» solo en el último paso; Cancelar p
   api.raiz.querySelector('[data-pap="crear"]').click(); await new Promise(res => setTimeout(res, 0));
   r.push(api.abierto());
   api.raiz.querySelector('[data-pap="cancelar"]').click();
-  window.confirm = orig;
+  await new Promise(res => setTimeout(res, 0));
+  document.querySelector('.cfj-fondo [data-cfj="si"]').click();   // el cartel del juego (comun/confirmar.js), no el confirm() nativo
+  await new Promise(res => setTimeout(res, 0));
   r.push(hechos, api.abierto());
   igual(r, [false, 2, 3, true, true, ['crear', 'cancelar'], false]);
+});
+prueba('cartel de confirmar (2026-10-10): Sí → true, Cancelar / Esc → false; lleva el título y el botón pedidos', async () => {
+  const a = Confirmar.preguntar('¿Borrar X?', {titulo: 'Borrar', si: 'Borrar', peligro: true});
+  const f = document.querySelector('.cfj-fondo'), cab = f.querySelector('.cfj-cab').textContent, si = f.querySelector('[data-cfj="si"]');
+  const r = [/Borrar/.test(cab), si.textContent, si.classList.contains('peligro')];
+  si.click(); r.push(await a);
+  const b = Confirmar.preguntar('¿Seguro?'); document.querySelector('.cfj-fondo .sec').click(); r.push(await b);
+  const c = Confirmar.preguntar('¿Seguro?'); document.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape'})); r.push(await c, !!document.querySelector('.cfj-fondo'));
+  igual(r, [true, 'Borrar', true, true, false, false, false]);
 });
 /* Tanda 5: los asistentes de estados, trampas y zonas, y las cantidades de un estado, en la ventana común. */
 // La última ventana abierta (otras pruebas pueden tener la suya) y atajos para tocarla.
@@ -2660,14 +2671,14 @@ prueba('♻ convertir en despojos (dueño, 2026-10-05): un cuarto del precio, pa
   const a = Intercambio._aDespojos(S, 'b'), b = Intercambio._aDespojos(S, 'p', 2), c = Intercambio._aDespojos(S, 'e'), d = Intercambio._aDespojos(S, 'r');
   igual([a.n, b.n, S.loot.normal, S.inventario.map(i => i.id + ':' + (i.unidades || 1)), !!c.error, !!d.error], [9, 13, 22, ['p:2', 'e:1', 'r:1'], true, true]);
 });
-prueba('↻ actualizar desde el catálogo (2026-10-07): una copia vieja se reconoce por catId o por el nombre y toma lo del catálogo, pero conserva lo suyo', () => {
+prueba('↻ actualizar desde el catálogo (2026-10-07): una copia vieja se reconoce por catId o por el nombre y toma lo del catálogo, pero conserva lo suyo', async () => {
   const cat = structuredClone(CATALOGO_BASE.find(i => i.id === 'esp-varita-arcana'));
   const vieja = {...structuredClone(cat), id: 'v1', equipado: true, aMano: true, especial: {...cat.especial, dano: '1d4', sp: 1, duelo: {...cat.especial.duelo, danoDirecto: undefined}}, detalle: 'vieja'};
   delete vieja.especial.duelo.danoDirecto;
   const S = {inventario: [vieja, {...structuredClone(cat), id: 'v2'}], catalogo: [cat]};
   const ed = FichaEditor.crear(document.createElement('div'), {S: () => S, confirmar: () => true, alCambiar: () => {}, toast: () => {}});
   const antes = [!!ed.difiereDelCatalogo(S.inventario[0]), !!ed.difiereDelCatalogo(S.inventario[1])];
-  const ok = ed.actualizarDesdeCatalogo('inventario', 'v1'), n = S.inventario[0];
+  const ok = await ed.actualizarDesdeCatalogo('inventario', 'v1'), n = S.inventario[0];
   igual([antes, ok, n.id, n.equipado, n.aMano, n.especial.dano, n.especial.duelo.danoDirecto, n.catId, !!ed.difiereDelCatalogo(n)], [[true, false], true, 'v1', true, true, '1d6', true, 'esp-varita-arcana', false]);
 });
 prueba('cura con dados (2026-10-07): «1d10» se tira al armar la Ejecución y queda un número; un número queda igual; la Varita de cura cura 1d10', () => {

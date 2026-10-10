@@ -7,7 +7,7 @@
    hooks(ui) → los ganchos (cada uno busca su invocación con ui.inv(lado)). ui = {
      inv(lado) → la invocación (el objeto vivo, se cambia en el lugar) o null,
      registrar(origen, r) → publica una tirada (la ficha: registrarTirada; el mapa: a la Mesa y 'tirada-registrada'),
-     toast(t), confirmar?(texto) → bool (por defecto, confirm), cambiar(fn) → hace fn (que cambia la invocación; si devuelve false no cambió nada) y lo guarda/dibuja,
+     toast(t), confirmar?(texto) → bool o promesa (por defecto, el cartel del juego: Confirmar.preguntar), cambiar(fn) → hace fn (que cambia la invocación; si devuelve false no cambió nada) y lo guarda/dibuja,
      parry → el Set de invocaciones con un Parry esperando su Bloqueo, soy(lado), controlDe(lado) }.
    pagarFlash(inv, h, ui) (async) y costoFlash(h): el ⚡ Flash de una invocación (como un creep: cooldown y vida).
    Necesita comun/inv-calculo.js, inv-acciones.js, combatiente.js, efectos-golpe.js, confirmar-turno.js y tiradas.js.
@@ -56,9 +56,9 @@ const InvDuelo = (() => {
     // `ui.confirmar` puede devolver una promesa (el mapa: el cartel del juego; un confirm() nativo congela la pestaña).
     async function atacarSuelto(inv, tipo){
       const qs = Combatiente.preguntaSentado(inv.estados, inv.nombre);   // Sentado no puede atacar: avisa y deja seguir
-      if(qs && !(await (ui.confirmar || (t => confirm(t)))(qs))) return;
+      if(qs && !(await (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: 'Sentado', si: 'Atacar igual'})))(qs))) return;
       const forzar = A().faltanNitros(inv, tipo);
-      if(forzar && !(await (ui.confirmar || (t => confirm(t)))(A().preguntaSinNitros(inv, tipo)))) return;
+      if(forzar && !(await (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: 'Sin No2', si: 'Atacar igual'})))(A().preguntaSinNitros(inv, tipo)))) return;
       let p;
       ui.cambiar(() => {
         p = A().pagarAtaque(inv, forzar, tipo);

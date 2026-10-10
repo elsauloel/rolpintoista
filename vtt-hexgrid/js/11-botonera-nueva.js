@@ -112,7 +112,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261009z', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261009r', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261009r', '../comun/ficha-mantenimiento.js?v=20261008y', '../comun/ficha-calculo.js?v=20261009r', '../comun/ficha-combate.js?v=20261009n', '../comun/skills-clase.js?v=20261008x', '../comun/ficha-habilidades.js?v=20261007ar',
-  '../comun/catalogo.js?v=20261009z9', '../comun/items-subidos.js?v=20261007h', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261009r', '../comun/ficha-resumen.js?v=20261009m', '../comun/inv-calculo.js?v=20261009n', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261009x', '../comun/inv-duelo.js?v=20261009y', '../comun/ficha-acciones.js?v=20261009r', '../comun/inv-habilidades.js?v=20261008s', '../comun/inv-lupa.js?v=20261009k',
+  '../comun/catalogo.js?v=20261009z9', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261009r', '../comun/ficha-resumen.js?v=20261009m', '../comun/inv-calculo.js?v=20261009n', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261009x', '../comun/inv-duelo.js?v=20261010a', '../comun/ficha-acciones.js?v=20261010a', '../comun/inv-habilidades.js?v=20261010a', '../comun/inv-lupa.js?v=20261009k',
   '../comun/confirmar-turno.js?v=20261006e', '../comun/ficha-duelo.js?v=20261009y', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261009k'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -305,12 +305,16 @@ function bnInvAca(b){
     const h = (inv.habilidades || []).find(x => x && x.id === (d.danohabinv || d.ejecutarhabinv).split(':')[1]);
     if(!h) return true;
     if(d.danohabinv){ bnPublicarInv(inv, InvHabilidades.tiradaSegunda(inv, h)); return true; }
-    const ui = bnInvHabUi();   // antes de cobrar: así guarda solo lo que cambió
-    const p = InvHabilidades.ejecutar(inv, h, estadosPresetFicha(), ui.dueloDisponible());
-    if(p.modo === 'manual'){ ui.mesaHabilidad(inv, h.nombre, h.detalle || h.efectoDetalle || ''); toast(`${h.nombre || 'Habilidad'} anunciada`); return true; }
-    if(p.modo === 'flash'){ InvHabilidades.usarFlashFuera(inv, h, ui); return true; }
-    if(p.error){ toast(p.error); return true; }
-    InvHabilidades.terminar(inv, h, p, ui);
+    // En Silencio, primero el cartel del juego (async); lo demás sigue igual cuando contesta.
+    (async () => {
+      if(!(await InvHabilidades.confirmarSilencio(inv, h))){ toast(`${inv.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`); return; }
+      const ui = bnInvHabUi();   // antes de cobrar: así guarda solo lo que cambió
+      const p = InvHabilidades.ejecutar(inv, h, estadosPresetFicha(), ui.dueloDisponible(), true);
+      if(p.modo === 'manual'){ ui.mesaHabilidad(inv, h.nombre, h.detalle || h.efectoDetalle || ''); toast(`${h.nombre || 'Habilidad'} anunciada`); return; }
+      if(p.modo === 'flash'){ InvHabilidades.usarFlashFuera(inv, h, ui); return; }
+      if(p.error){ toast(p.error); return; }
+      InvHabilidades.terminar(inv, h, p, ui);
+    })();
     return true;
   }
   if(d.invdanio){
@@ -832,7 +836,7 @@ function bnVer(key, id){
   r.querySelector('[data-bn-ver="borrar"]').style.display = puede ? '' : 'none';
   r.querySelector('#bn-ver').classList.add('open');
 }
-function bnVerAccion(accion){
+async function bnVerAccion(accion){
   const r = bn.raiz, v = bnViendo;
   r.querySelector('#bn-ver').classList.remove('open');
   bnViendo = null;
@@ -840,7 +844,7 @@ function bnVerAccion(accion){
   if(accion === 'editar'){ bnEditar(v.key, v.id); return; }   // el editor común (A6b)
   if(accion === 'borrar' && bnPuedeGuardar()){
     const it = (bn.S[v.key] || []).find(x => x.id === v.id);
-    if(!it || !confirm(`¿Borrar "${it.nombre || 'esto'}"?`)) return;
+    if(!it || !(await Confirmar.preguntar(`¿Borrar "${it.nombre || 'esto'}"?`, {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return;
     const ui = bnUi(FichaGuardado.partes(bn.S));
     bn.S[v.key] = bn.S[v.key].filter(x => x.id !== v.id);
     ui.cambio();
@@ -1593,7 +1597,7 @@ function bnRerollDibujar(){
    (comun/ficha-editor.js: el mismo formulario, el paso a paso de las habilidades, el asistente de ítems, la trampa y la Ejecución ✨),
    adentro del recuadro de la Botonera nueva (#bn-editor). Guardar pasa por bnUi (las partes que cambiaron y el resumen). Los estados de
    la lista (para "estado al usar" y para la Ejecución) se eligen con el selector común (comun/selector-estados.js). */
-const ED_PIEZAS = ['../comun/ficha-editor.js?v=20261008zs', '../comun/asistente-item.js?v=20261009r', '../comun/asistente-duelo-hab.js?v=20261008q'];
+const ED_PIEZAS = ['../comun/ficha-editor.js?v=20261010a', '../comun/asistente-item.js?v=20261009r', '../comun/asistente-duelo-hab.js?v=20261008q'];
 let bnTipoItemResolver = null;
 // op.comoGM: el GM sin el control (el ⚙ de un estado del HUD, como hacía la ficha con "Editar como GM"). → true si se abrió.
 async function bnEditar(key, id, op = {}){
@@ -1643,7 +1647,7 @@ function bnCrearEditor(){
   return FichaEditor.crear(bn.raiz, {
     S: () => bn.S,
     toast: m => toast(m),
-    confirmar: t => confirm(t),
+    confirmar: (t, o) => Confirmar.preguntar(t, o),
     // Se guardó o se borró algo: se guarda (solo lo que cambió) y se redibuja lo que esté abierto.
     alCambiar: () => {
       bnUi(bn.editorAntes || FichaGuardado.partes(bn.S), bn.editorComoGM).cambio();

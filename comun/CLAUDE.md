@@ -367,6 +367,9 @@ versión parecida en más de una, es candidato a juntar.
   ni ninguna ficha — vive solo dentro de la cuenta de ese golpe. Mismas limitaciones que `ignoraResistCrit`: solo
   modo `'arma'`, sin conectar del lado de gm-tools todavía.
 
+- **Daño de una habilidad + el Efecto especial** (2026-10-10, Toque mágico): `duelo.danoSumaEsp` (true = el Ef.Esp entero, 0.5 = la mitad, para abajo),
+  como `sumaEspecial` de las varitas; lo suma `Combatiente.habEjecucion` con `o.stat('dmgesp')`. En la Ejecución, paso Daño, «Suma tu Efecto especial». La
+  Perfora de un ataque con habilidad: `duelo.arma.perfora` (Tajear), se suma a la del arma.
 - **Critical Matters reemplaza al mismo efecto** (2026-10-10, Tajear): `Duelo.efectosDeHabilidad(d)` — si el golpe fue crítico, un efecto de
   `ataque.critico.efectos` con el mismo nombre que uno de `ataque.efectos` lo reemplaza (Tajear: Sangrado 3 → 5; Lisiar: Lesión −1 → −2); lo que
   no se repite se suma. `Combatiente.ataqueConArreglos` lleva los `stacks` de un efecto (Sangrado de N).

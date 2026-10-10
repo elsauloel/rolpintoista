@@ -2229,6 +2229,14 @@ prueba('Ejecución ✨: «el daño de tu arma» y la onda con dodge roll (Daño 
   igual([armaUi, dodgeUi, c && [c.danoArma, c.ondaDodge, c.tipoDano], h.dano, h.dodge, Duelo.limpiarHab(h).dodge, sinArma.dano, !!(pj.dano && pj.dano.formula === FichaCombate.armaDanoTxt(S.inventario[0], FichaCalculo.calcular(S).final.dmg))],
     [true, true, [true, true, 'fisico'], {formula: '1d8 + 3', tipo: 'fisico', ignoraDef: false}, true, true, null, true]);
 });
+prueba('Toque mágico (2026-10-10): 3d6 + el Ef.Esp, al lado, solo Evasión (sin Parry); la mitad también se puede', () => {
+  const tq = CLASES_SKILLS.find(x => x.id === 'mago').habilidades.find(x => x.id === 'mago-toque-magico');
+  const st = v => s => s === 'dmgesp' ? v : 6;
+  const h14 = Combatiente.habEjecucion(tq, tq.duelo, {stat: st(14), etq: s => s}), h7 = Combatiente.habEjecucion(tq, tq.duelo, {stat: st(7), etq: s => s});
+  const sinEsp = Combatiente.habEjecucion(tq, {...tq.duelo, danoSumaEsp: undefined}, {stat: st(14), etq: s => s}), mitad = Combatiente.habEjecucion(tq, {...tq.duelo, danoSumaEsp: 0.5}, {stat: st(7), etq: s => s});
+  igual([tq.costo, tq.nitrosCosto, h14.dano.formula, h7.dano.formula, mitad.dano.formula, sinEsp.dano.formula, h14.alcance, h14.contra.map(c => c.stat), h14.dano.ignoraDef, !!h14.dano.directo],
+    ['3', 4, '3d6+14', '3d6+7', '3d6+3', '3d6', 1, ['eva'], true, false]);
+});
 prueba('Tajear (2026-10-10): Sangrado 3 por 3 turnos; con crítico, el de ⚡ Critical Matters (Sangrado 5) REEMPLAZA al de siempre', () => {
   const taj = CLASES_SKILLS.find(x => x.id === 'asalto').habilidades.find(x => x.id === 'asalto-tajear');
   const atq = Combatiente.ataqueConArreglos(taj, taj.duelo, {arma: {id: 'd', nombre: 'Daga', tipoDado: 4}, X: 0});

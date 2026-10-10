@@ -864,7 +864,10 @@ const Combatiente = (() => {
     const stat = nf(c.critTipo) > 0 && stat0 === 'pdgmg' ? 'pdg' : stat0;
     const tipo = c.tipoDano || 'arcano';
     // «El daño de tu arma» (2026-10-02, Daño en área): la fórmula del arma de quien la usa (`o.armaDano`, la que tira «Daño»).
-    const formula = c.danoArma ? formulaDanoHab({tiradaExtra: o.armaDano || ''}, c, o.X) : formulaDanoHab(h, c, o.X);
+    const formula0 = c.danoArma ? formulaDanoHab({tiradaExtra: o.armaDano || ''}, c, o.X) : formulaDanoHab(h, c, o.X);
+    // + el Efecto especial (Ef.Esp) de quien la usa, entero (`danoSumaEsp: true`) o la mitad (0.5), para abajo (2026-10-10, Toque mágico).
+    const sumaEsp = c.danoSumaEsp && o.stat ? Math.floor(nf(o.stat('dmgesp')) * (c.danoSumaEsp === true ? 1 : nf(c.danoSumaEsp))) : 0;
+    const formula = formula0 && sumaEsp > 0 ? `${formula0}+${sumaEsp}` : formula0;
     return {
       nombre: h.nombre, objetivo: c.objetivo || 'enemigo',
       alcance: c.objetivo === 'uno mismo' || c.objetivo === 'area' || c.objetivo === 'onda' || c.objetivo === 'cono' || c.objetivo === 'linea' ? 0 : alcanceHab(c, stat, o.stat),

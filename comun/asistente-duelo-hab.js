@@ -146,6 +146,7 @@ const AsistenteDueloHab = (() => {
       // (ej. Rayo Mágico "amplifica el daño en el doble de X" → danoFijoPorX: 2). Solo tiene sentido si la
       // habilidad ya tiene costo en SP o No2 marcado como "X" (cfg.costoVariable la avisa).
       danoFijoPorX: (ini && ini.danoFijoPorX) || 0,
+      danoSumaEsp: ini && ini.danoSumaEsp === true ? 'si' : ini && Number(ini.danoSumaEsp) === 0.5 ? 'mitad' : '',   // + el Ef.Esp de quien la usa (2026-10-10)
       // Independiente del tipo (2026-09-27, Paso 1 de las reglas de casteo: lo que ignora la armadura no es el
       // elemento, es cómo se narra la habilidad — una "ráfaga de hielo" ignora, una "aguja de hielo" física no).
       // Arranca según el tipo elegido (mágico = sí, físico = no) y se puede destildar a mano para la excepción.
@@ -385,6 +386,7 @@ const AsistenteDueloHab = (() => {
           <label class="op"><input type="checkbox" data-ignoradano ${st.ignoraDano ? 'checked' : ''}> Ignora la Defensa (va derecho a la vida y no critica)</label>
           ${st.tipoDano !== 'fisico' && st.ignoraDano ? `<div class="fila"><span>La Defensa especial:</span><select data-frenoesp>${[['', 'la frena (lo normal; siempre, si suma el Ef.Esp)'], ['directo', 'daño directo: no la frena (proyectiles chicos)'], ['true', 'True Damage: no lo frena nada, ni la Res. elemental']].map(([v, t]) => `<option value="${v}"${st.frenoEsp === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>` : ''}
           <p class="nota">Arranca marcado o no según el tipo (mágico = sí, físico = no), pero es independiente: lo que decide no es el elemento, es cómo se narra la habilidad — una "ráfaga de hielo" (energía) ignora la Defensa; una "aguja de hielo" (un objeto físico arrojado) no, aunque las dos sean "Hielo". Destildá acá para esa excepción.</p>`;
+        if(!dif && !conArma) h += `<div class="fila" style="margin-top:8px"><span>Suma tu Efecto especial (Ef.Esp):</span><select data-danosumaesp>${[['', 'no'], ['mitad', 'la mitad (para abajo)'], ['si', 'entero']].map(([v, t]) => `<option value="${v}"${st.danoSumaEsp === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>`;
         if(cfg.costoVariable && !dif){
           h += `<div class="fila" style="margin-top:8px"><span>Además, por cada punto de X (tu costo en ${cfg.costoVariable === 'sp' ? 'SP' : 'Nitros'}):</span><span>+</span><input type="number" style="width:70px" data-danoporx value="${esc(st.danoFijoPorX)}"><span>de daño fijo</span></div>
             <p class="nota">Ej. "amplifica el daño en el doble de X" → poné 2: con X = 3 suma +6 al tirar. Vacío o 0 = la fórmula no cambia con X.</p>`;
@@ -614,6 +616,7 @@ const AsistenteDueloHab = (() => {
       q('[data-ignoradano]', e => { st.ignoraDano = e.target.checked; dibujar(); });
       q('[data-frenoesp]', e => { st.frenoEsp = e.target.value; });
       q('[data-danoporx]', e => { st.danoFijoPorX = Number(e.target.value) || 0; });
+      q('[data-danosumaesp]', e => { st.danoSumaEsp = e.target.value; });
       q('[data-efectolibre-on]', e => { st.efectoLibreOn = e.target.checked; dibujar(); });
       q('[data-efectolibre]', e => { st.efectoLibre = e.target.value; });
       q('[data-efectosnota-on]', e => { st.efectosNotaOn = e.target.checked; dibujar(); });
@@ -712,7 +715,8 @@ const AsistenteDueloHab = (() => {
         }
         if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; out.ignoraDano = st.ignoraDano;
           if(st.tipoDano !== 'fisico' && st.ignoraDano && st.frenoEsp === 'directo') out.danoDirecto = true;
-          if(st.tipoDano !== 'fisico' && st.ignoraDano && st.frenoEsp === 'true') out.trueDamage = true; if(cfg.costoVariable && st.danoFijoPorX && !st.danoDif) out.danoFijoPorX = st.danoFijoPorX; }
+          if(st.tipoDano !== 'fisico' && st.ignoraDano && st.frenoEsp === 'true') out.trueDamage = true; if(cfg.costoVariable && st.danoFijoPorX && !st.danoDif) out.danoFijoPorX = st.danoFijoPorX;
+          if(st.danoSumaEsp && !st.danoDif && !st.danoArma) out.danoSumaEsp = st.danoSumaEsp === 'si' ? true : 0.5; }
         if(st.dano && st.objetivo !== 'zona' && st.objetivo !== 'uno mismo' && st.danoDif){
           if(!hayTira || !out.contra.length){ alert('El daño «la diferencia» necesita una tirada (paso Tirada) y algo con qué resistirla (paso Resistencia).'); return false; }
           out.danoDiferencia = true;

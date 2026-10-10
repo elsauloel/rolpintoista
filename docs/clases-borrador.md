@@ -199,9 +199,12 @@ Salvo Carga Elemental, todas son **Hechizo (PG: Esp · Daño: Esp)**.
    2026-10-10 con el dueño: «tipo 3» no existía → 2d4; costo del original;
    solo rivales; dodge roll como un área, no «ganar = esquivar». Antes:
    «daño en área tipo 3, cono de 3 al frente».)*
-6. **Toque mágico** [3] — NO2: (4). Requiere un toque físico con la mano o
-   el arma, usando PG contra Evasión. No se puede bloquear. A distancia
-   melé, hace 3d T6 + ESP de daño mágico.
+6. ✅ **Toque mágico** — **No2:** 4. **SP:** 3. Hechizo de contacto (al lado,
+   con la mano o el arma). PdG contra Evasión: no se puede parrear ni
+   bloquear. 3d6 + el Efecto especial de daño arcano (no es directo:
+   ignora la Defensa, lo frena la Defensa especial). *(Auditada 2026-10-10 con
+   el dueño: se probó la mitad del Esp; quedó el original, porque la Defensa
+   especial lo frena.)*
 7. **Carga Elemental** [X] — Modifica un skill de daño mágico para que
    tenga propiedades elementales. Cada nivel en este skill otorga nuevos
    elementos. X es la mitad del coste del skill. Elementos: **Fuego** +50%

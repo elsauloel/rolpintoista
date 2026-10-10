@@ -7,8 +7,8 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
-> - [ ] **Estudio de peleas, segunda vuelta** ([`balance-peleas.md`](balance-peleas.md), `herramientas/simular_peleas.py`): **simulador listo
->   (2026-10-10, probado con pocas peleas); programado para correr hoy a las 10:05** (pedido del dueño). Antes, dejarlo listo: (a) **los efectos al golpear modelados como en el juego** (veneno y veneno severo, sangrado, quemadura,
+> - [x] (2026-10-10, corrido a las 10:05) **Estudio de peleas, segunda vuelta** ([`balance-peleas.md`](balance-peleas.md)): conclusiones arriba
+>   del informe. Quedan para decidir: P186 (armadura pesada), varitas Raras para el mago, la hacha a dos manos del guerrero. Antes, dejarlo listo: (a) **los efectos al golpear modelados como en el juego** (veneno y veneno severo, sangrado, quemadura,
 >   rompe armadura, lisiado, pajaritos, derribar → sentado, aturdir → stun, rengo, drena vida, daño elemental extra; con los presets de
 >   `comun/estados-presets.js`) y **una estimación de cuánto daño suma cada efecto** (por aplicación, y cada arma con y sin efectos: «¿cuánto suma
 >   una daga que envenena al 25 %?»); (b) **las armas especiales y los magos**: un arquetipo Mago con varitas del catálogo real (su SP = Esp × 3 y

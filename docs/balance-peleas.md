@@ -4,77 +4,77 @@
 
 **Qué mide:** vida (Constitución × 5), Defensa y resistencias a crítico de la curva por nivel (Shooter y Asalto con armadura liviana, Warrior media, Tanque pesada), escudo (+Defensa, Parry contra disparos, Bloqueo), iniciativa, No2 por turno (Agilidad), costo de atacar (la ballesta con su Recarga), Evasión o Parry → Bloqueo (el defensor elige Parry si su Destreza es mayor que su Agilidad y guarda 1 No2 para eso), crítico completo, Perfora, la Fuerza que suma cada familia y la distancia (arrancan a 6 casilleros; el cuerpo a cuerpo se acerca a 1 No2 por casillero; el arco no dispara pegado y se aleja comiéndose el ataque de oportunidad).
 
-**Qué NO mide:** efectos al golpear (veneno, sangrado, lisiado, rompe armadura…), habilidades y SP, consumibles, terreno y línea de tiro, hechizos (Mago, Support y Debuffer no entran), y la inteligencia táctica de un jugador real. Los números son una guía, no un veredicto.
+**Segunda vuelta:** con **los efectos al golpear** modelados como en el juego (veneno, veneno severo, sangrado, quemadura, rompe armadura, lisiado, pajaritos, derribar → sentado, aturdir → stun, rengo, drena vida, daño elemental extra) y con **el Mago con varitas** (SP = Especial × 3 y su recarga; el costo que sube por uso; el daño directo ignora la Defensa y el especial lo frena la Defensa especial, que el simulador supone 0 en armadura liviana, ¼ de la Defensa en la media y ⅓ en la pesada). A nivel 5 el mago usa varitas Buenas: no hay Raras en el catálogo.
 
-## Lo que se ve (resumen para el dueño)
+**Qué NO mide:** habilidades, consumibles, terreno y línea de tiro, Support y Debuffer, y la inteligencia táctica de un jugador real. Los números son una guía, no un veredicto.
 
-1. **La armadura pesada vuelve al Tanque casi intocable para cualquiera sin mucha Fuerza.** Con su Defensa de la curva (11 / 15 / 20 con el
-   escudo, nivel 1 / 3 / 5), el tirador con arco o ballesta y el asalto con daga le ganan **0 %** en todos los niveles: casi ningún golpe le hace
-   daño (diagnóstico: 0–3 % de los ataques pasan la armadura). Solo le pega quien suma toda la Fuerza (el guerrero), y apenas.
-2. **Las armas de rango se caen desde nivel 3 contra armadura media o pesada.** A nivel 1 el tirador le gana al guerrero el 100 % (lo
-   kitea: tiene más Agilidad y el guerrero no lo alcanza), pero a nivel 3 cae al 5–37 % y a nivel 5 al 9–25 %: el arco hace ~1,7 de daño por
-   disparo contra Defensa 13. **La ballesta rinde mejor que el arco** (36 % contra 10 % a nivel 3), pero su Perfora no alcanza contra la
-   curva de Defensa, que sube más rápido.
-3. **El guerrero y el tanque dominan; el asalto queda atrás**, y **la daga es la peor arma del asalto** (21–38 %): con la espada o la maza le va
-   mejor. Las armas livianas (Tipo 4) chocan con la Resistencia a Tipo 4, la más común.
-4. **Espada y escudo es la mejor opción del guerrero y del tanque** (65–80 %): el escudo suma Defensa y deja parar disparos.
-5. **Un nivel de equipo arriba gana casi siempre** (84–100 %). Es esperable, pero muestra lo empinada que es la curva.
-6. **Mono-Destreza no rompe nada**: sigue lo medido antes (no entró en estas peleas).
+## Lo que se ve (segunda vuelta, 2026-10-10 — resumen para el dueño)
 
-## Qué palanca lo arreglaría (probadas en el simulador, ninguna aplicada)
+Corrida con el catálogo de hoy (las dagas y espadas con Perfora, las ballestas nuevas, el Rango como bono en las Comunes), los efectos al
+golpear modelados y el Mago con varitas. Lo de la primera vuelta que sigue valiendo se repite acá.
 
-Ver la tabla «Palancas probadas» al final. En corto:
-- **Perfora por calidad en dagas y ballestas (+1 / +2 / +3):** arregla el rango y el asalto **contra armadura media** (ballesta 98 % / 67 %, daga
-  56–66 % contra el guerrero) pero **no contra el tanque** (sigue en 0 %: la Perfora tiene tope 5 y la Defensa pesada llega a 20).
-- **Armadura media y pesada al 75 %:** ayuda a todos un poco; el tanque sigue casi intocable para el rango.
-- **Un golpe que entra pasa al menos ¼ de su daño (un «daño mínimo»):** es la única que hace pelear contra el tanque (64–99 %), pero lo da
-  vuelta demasiado: el asalto con daga le gana al tanque el 99 % a nivel 5.
-- **Perfora por calidad + armadura al 75 %:** lo más parejo contra el guerrero, pero se pasa (asalto 86–94 %) y el tanque sigue fuerte contra el arco.
+1. **Cuánto suman los efectos al golpear** (tabla «Cuánto suman», abajo). Cada vez que entran: **Sangrado ~6 de daño**, **Veneno ~5**, **Veneno
+   severo ~10** (dura toda la pelea), **Prende fuego ~3**, **Drena vida ~0,3 de cura**. Repartido entre todos los ataques de un arma que lo trae
+   (con su % y los que fallan): **~0,5 a 0,7 de daño por ataque**, que para un arma liviana (1–3 de daño por ataque contra armadura media) es **un
+   20–40 % más**. O sea: la daga que envenena al 25 % suma bastante menos que eso; una al 50 % o «siempre», bastante más. Los de control (lisiado,
+   derribar, rompe armadura…) no se ven en daño: su peso está en «con y sin efectos».
+2. **Con y sin efectos, por clase:** el que más gana es **el asalto con daga** (nivel 5: 54 % con efectos contra 40 % sin). Al **guerrero con
+   hacha** le va peor con efectos (los efectos de los demás lo castigan: tiene poca Evasión). El resto casi no cambia.
+3. **Los magos con varita son fuertes** (le ganan al guerrero 70–100 % y al tanque 81–97 %: el daño directo ignora la armadura) y **pierden
+   contra el asalto** (15–30 %: Evasión alta, los persigue). Van de 72 % a nivel 1 a **46 % a nivel 5**, porque **no hay varitas Raras** en el catálogo
+   (usan Buenas). Con una daga, el mago no hace nada (0–4 %).
+4. **La Perfora cambió las cosas:** la **ballesta** pasó a ser la mejor arma del tirador (53–55 % desde nivel 3; el arco, 16–34 %) y contra el
+   guerrero gana 70 % / 55 % (antes 37 % / 17 %); contra el tanque ya pega algo (24–28 %, antes 0). El **asalto con daga** subió a 52–56 %.
+5. **El tanque con escudo sigue casi intocable para el arco y la daga** (0–8 %): la armadura pesada (P186) sigue siendo el problema de fondo. El
+   mago es lo único que lo baja seguido.
+6. **Espada y escudo sigue siendo lo mejor para guerrero y tanque**; la hacha a dos manos del guerrero quedó floja (20–43 %). La maza del tanque
+   no sirve (le pide Agilidad 5, a propósito).
+7. **En parejas, «tanque + mago» es lo más fuerte** (gana casi todo a nivel 1 y 3); a nivel 5 se empareja.
+8. **Un nivel de equipo arriba gana casi siempre** (92–100 %), salvo el mago (66–86 %: sus varitas no mejoran).
 
-**Medido después (las tres filas de abajo de la tabla):**
-- **Perfora por calidad sin tope (+2 / +4 / +6) en dagas y ballestas:** contra armadura media se pasa (ballesta 91–100 %, daga 78–96 %) y contra el
-  tanque casi no cambia (8–22 %).
-- **Daño mínimo de 1 por dado** (si el golpe entra y la armadura lo frena todo, pasa 1 punto por cada dado del arma): **es la que mejor acomoda.**
-  El tanque deja de ser intocable (ballesta 84–93 %, arco 64–69 % desde nivel 3) sin tocar al guerrero contra el tanque (37–63 %, como hoy), y
-  contra armadura media sube al rango sin pasarse (arco 34–40 %, ballesta 48–96 %). Lo que se pasa: el asalto con daga contra el tanque a nivel 5 (88 %).
-- **Las dos juntas:** se pasan contra armadura media.
+**Palancas** (tabla al final; ninguna aplicada): con el catálogo nuevo, **el daño mínimo de 1 por dado** sigue siendo la que mejor acomoda al
+tanque (el arco le gana 42–66 %, la ballesta 54–92 %) sin tocar al guerrero contra el tanque. Las de Perfora se pasan contra armadura media
+(daga y ballesta 80–100 % contra el guerrero).
 
-**Propuesta para decidir (P186):** probar primero **el daño mínimo de 1 por dado** (una regla chica, fácil de explicar: «la armadura nunca para
-todo: cada dado que entra deja al menos 1») y después ajustar fino con la Perfora de cada arma, sin cambio general de la Perfora.
+**Para decidir:** P186 (armadura pesada: el daño mínimo de 1 por dado); faltan **varitas Raras** (o que las varitas escalen) para que el mago no se
+caiga a nivel 5; y la **hacha a dos manos** del guerrero rinde menos que espada y escudo.
 
 
 ## 1 vs 1 · nivel 1 (Común) · cada clase con su mejor arma
 
 Cada celda: % de peleas que gana la clase de la fila contra la de la columna (turnos promedio).
 
-| | Warrior (hacha 2 manos) | Tanque (espada y escudo) | Asalto (daga) | Shooter (arco) |
-|---|---|---|---|---|
-| **Warrior** | — | 66 % (17.7) | 66 % (9.0) | 0 % (14.8) |
-| **Tanque** | 34 % (17.8) | — | 89 % (23.6) | 67 % (28.7) |
-| **Asalto** | 34 % (9.2) | 1 % (24.0) | — | 79 % (5.5) |
-| **Shooter** | 100 % (13.9) | 0 % (28.4) | 18 % (5.6) | — |
+| | Warrior (hacha 2 manos) | Tanque (espada y escudo) | Asalto (daga) | Mago (varita) | Shooter (arco) |
+|---|---|---|---|---|---|
+| **Warrior** | — | 45 % (16.0) | 41 % (8.5) | 0 % (6.8) | 0 % (13.2) |
+| **Tanque** | 61 % (15.4) | — | 78 % (23.6) | 2 % (8.9) | 67 % (27.2) |
+| **Asalto** | 62 % (8.6) | 5 % (23.4) | — | 76 % (4.0) | 84 % (5.2) |
+| **Mago** | 100 % (6.8) | 97 % (8.9) | 26 % (3.9) | — | 67 % (4.9) |
+| **Shooter** | 100 % (13.0) | 0 % (27.6) | 20 % (5.2) | 30 % (4.8) | — |
 
 ## 1 vs 1 · nivel 3 (Buena Calidad) · cada clase con su mejor arma
 
 Cada celda: % de peleas que gana la clase de la fila contra la de la columna (turnos promedio).
 
-| | Warrior (hacha 2 manos) | Tanque (espada y escudo) | Asalto (daga) | Shooter (arco) |
-|---|---|---|---|---|
-| **Warrior** | — | 33 % (19.6) | 80 % (10.6) | 93 % (12.0) |
-| **Tanque** | 65 % (19.9) | — | 96 % (18.2) | 72 % (28.5) |
-| **Asalto** | 21 % (10.0) | 0 % (18.4) | — | 79 % (4.6) |
-| **Shooter** | 5 % (11.5) | 0 % (28.6) | 25 % (4.5) | — |
+| | Warrior (hacha 2 manos) | Tanque (espada y escudo) | Asalto (daga) | Mago (varita) | Shooter (arco) |
+|---|---|---|---|---|---|
+| **Warrior** | — | 18 % (15.8) | 46 % (9.7) | 22 % (5.3) | 86 % (11.6) |
+| **Tanque** | 80 % (16.0) | — | 95 % (17.1) | 13 % (6.9) | 84 % (24.1) |
+| **Asalto** | 53 % (9.7) | 2 % (17.7) | — | 73 % (3.4) | 85 % (3.7) |
+| **Mago** | 78 % (5.2) | 86 % (6.9) | 30 % (3.4) | — | 60 % (3.8) |
+| **Shooter** | 13 % (11.0) | 2 % (24.3) | 18 % (3.9) | 43 % (3.6) | — |
 
 ## 1 vs 1 · nivel 5 (Raro) · cada clase con su mejor arma
 
 Cada celda: % de peleas que gana la clase de la fila contra la de la columna (turnos promedio).
 
-| | Warrior (hacha 2 manos) | Tanque (espada y escudo) | Asalto (daga) | Shooter (arco) |
-|---|---|---|---|---|
-| **Warrior** | — | 44 % (22.6) | 86 % (15.2) | 84 % (8.5) |
-| **Tanque** | 48 % (22.2) | — | 46 % (34.0) | 96 % (19.3) |
-| **Asalto** | 13 % (15.0) | 0 % (33.4) | — | 46 % (3.8) |
-| **Shooter** | 11 % (8.3) | 0 % (19.2) | 52 % (3.8) | — |
+| | Warrior (hacha 2 manos) | Tanque (espada y escudo) | Asalto (daga) | Mago (varita) | Shooter (arco) |
+|---|---|---|---|---|---|
+| **Warrior** | — | 38 % (14.8) | 34 % (10.6) | 35 % (5.2) | 73 % (7.4) |
+| **Tanque** | 66 % (15.6) | — | 56 % (28.7) | 18 % (7.7) | 98 % (16.3) |
+| **Asalto** | 62 % (11.6) | 6 % (29.5) | — | 84 % (3.2) | 69 % (3.3) |
+| **Mago** | 70 % (5.3) | 81 % (7.6) | 15 % (3.1) | — | 22 % (2.7) |
+| **Shooter** | 26 % (7.4) | 0 % (16.0) | 36 % (3.3) | 82 % (2.6) | — |
 
 ## 1 vs 1 · ¿qué juego de armas le conviene a cada clase?
 
@@ -82,21 +82,23 @@ Cada celda: % de peleas que gana la clase de la fila contra la de la columna (tu
 
 | Clase · juego | Nivel 1 | Nivel 3 | Nivel 5 |
 |---|---|---|---|
-| Warrior · hacha 2 manos ★ | 46 % | 72 % | 69 % |
-| Warrior · espada y escudo | 70 % | 75 % | 66 % |
-| Warrior · arco | 14 % | 47 % | 47 % |
-| Warrior · ballesta | 1 % | 24 % | 31 % |
-| Tanque · maza y escudo | 24 % | 24 % | 30 % |
-| Tanque · espada y escudo ★ | 65 % | 80 % | 66 % |
-| Tanque · ballesta de mano y escudo | 0 % | 26 % | 8 % |
-| Asalto · daga ★ | 38 % | 30 % | 21 % |
-| Asalto · espada | 61 % | 38 % | 33 % |
-| Asalto · maza 2 manos | 44 % | 24 % | 46 % |
-| Asalto · arco | 26 % | 39 % | 36 % |
-| Shooter · arco ★ | 38 % | 10 % | 23 % |
-| Shooter · ballesta | 37 % | 36 % | 25 % |
-| Shooter · daga | 3 % | 0 % | 5 % |
-| Shooter · hacha 2 manos | 8 % | 6 % | 7 % |
+| Warrior · hacha 2 manos ★ | 20 % | 43 % | 43 % |
+| Warrior · espada y escudo | 57 % | 61 % | 57 % |
+| Warrior · arco | 12 % | 26 % | 25 % |
+| Warrior · ballesta | 2 % | 16 % | 24 % |
+| Tanque · maza y escudo | 17 % | 19 % | 22 % |
+| Tanque · espada y escudo ★ | 49 % | 70 % | 58 % |
+| Tanque · ballesta de mano y escudo | 0 % | 20 % | 7 % |
+| Asalto · daga ★ | 56 % | 52 % | 54 % |
+| Asalto · espada | 66 % | 55 % | 62 % |
+| Asalto · maza 2 manos | 45 % | 27 % | 51 % |
+| Asalto · arco | 35 % | 41 % | 51 % |
+| Mago · varita ★ | 72 % | 61 % | 46 % |
+| Mago · daga | 2 % | 4 % | 0 % |
+| Shooter · arco ★ | 36 % | 16 % | 34 % |
+| Shooter · ballesta | 38 % | 55 % | 53 % |
+| Shooter · daga | 11 % | 3 % | 19 % |
+| Shooter · hacha 2 manos | 12 % | 9 % | 14 % |
 
 ## Diferencia de nivel · la misma clase y arma, un nivel de equipo arriba
 
@@ -104,10 +106,11 @@ Cada celda: % de peleas que gana la clase de la fila contra la de la columna (tu
 
 | Clase | Nivel 3 contra nivel 1 | Nivel 5 contra nivel 3 |
 |---|---|---|
-| Warrior | 99 % | 100 % |
-| Tanque | 100 % | 84 % |
-| Asalto | 100 % | 100 % |
-| Shooter | 100 % | 94 % |
+| Warrior | 100 % | 100 % |
+| Tanque | 100 % | 92 % |
+| Asalto | 99 % | 99 % |
+| Mago | 86 % | 66 % |
+| Shooter | 100 % | 96 % |
 
 ## 2 vs 2 · parejas
 
@@ -116,33 +119,39 @@ Cada celda: % de peleas que gana la clase de la fila contra la de la columna (tu
 
 ### Nivel 1
 
-| | Warrior + Shooter | Tanque + Shooter (ballesta) | Warrior + Tanque | Asalto + Asalto | Shooter + Shooter |
-|---|---|---|---|---|---|
-| **Warrior + Shooter** | — | 0 % (17.5) | 1 % (37.3) | 66 % (10.1) | 39 % (11.8) |
-| **Tanque + Shooter (ballesta)** | 100 % (17.3) | — | 7 % (39.4) | 61 % (28.4) | 98 % (17.7) |
-| **Warrior + Tanque** | 35 % (37.3) | 0 % (39.4) | — | 66 % (27.2) | 27 % (37.4) |
-| **Asalto + Asalto** | 35 % (10.0) | 3 % (31.3) | 2 % (26.1) | — | 87 % (7.0) |
-| **Shooter + Shooter** | 70 % (12.0) | 0 % (16.9) | 0 % (37.8) | 11 % (6.6) | — |
+| | Warrior + Shooter | Tanque + Shooter (ballesta) | Warrior + Tanque | Asalto + Asalto | Shooter + Shooter | Warrior + Mago | Tanque + Mago |
+|---|---|---|---|---|---|---|---|
+| **Warrior + Shooter** | — | 0 % (15.5) | 0 % (37.1) | 35 % (9.7) | 32 % (11.2) | 20 % (8.8) | 0 % (11.0) |
+| **Tanque + Shooter (ballesta)** | 100 % (15.6) | — | 48 % (33.5) | 57 % (28.2) | 97 % (15.4) | 28 % (10.9) | 0 % (13.4) |
+| **Warrior + Tanque** | 42 % (36.3) | 3 % (32.8) | — | 55 % (28.7) | 21 % (36.9) | 0 % (12.7) | 0 % (12.8) |
+| **Asalto + Asalto** | 68 % (9.5) | 14 % (27.1) | 12 % (27.8) | — | 89 % (6.6) | 74 % (7.5) | 11 % (25.5) |
+| **Shooter + Shooter** | 68 % (11.0) | 2 % (16.3) | 8 % (36.3) | 11 % (6.5) | — | 42 % (8.9) | 0 % (11.4) |
+| **Warrior + Mago** | 80 % (9.0) | 62 % (11.1) | 100 % (12.5) | 24 % (7.6) | 58 % (8.6) | — | 37 % (8.9) |
+| **Tanque + Mago** | 100 % (10.9) | 96 % (13.6) | 100 % (12.6) | 56 % (27.0) | 96 % (10.9) | 63 % (8.9) | — |
 
 ### Nivel 3
 
-| | Warrior + Shooter | Tanque + Shooter (ballesta) | Warrior + Tanque | Asalto + Asalto | Shooter + Shooter |
-|---|---|---|---|---|---|
-| **Warrior + Shooter** | — | 14 % (17.6) | 0 % (22.6) | 84 % (8.3) | 82 % (12.4) |
-| **Tanque + Shooter (ballesta)** | 90 % (16.9) | — | 11 % (39.0) | 88 % (19.7) | 90 % (11.4) |
-| **Warrior + Tanque** | 96 % (22.1) | 1 % (39.4) | — | 90 % (19.3) | 10 % (37.7) |
-| **Asalto + Asalto** | 13 % (8.7) | 0 % (19.1) | 0 % (19.9) | — | 48 % (5.4) |
-| **Shooter + Shooter** | 14 % (12.5) | 0 % (10.4) | 0 % (39.2) | 50 % (5.2) | — |
+| | Warrior + Shooter | Tanque + Shooter (ballesta) | Warrior + Tanque | Asalto + Asalto | Shooter + Shooter | Warrior + Mago | Tanque + Mago |
+|---|---|---|---|---|---|---|---|
+| **Warrior + Shooter** | — | 2 % (13.3) | 0 % (20.4) | 46 % (7.3) | 74 % (11.0) | 19 % (9.2) | 0 % (8.9) |
+| **Tanque + Shooter (ballesta)** | 96 % (13.8) | — | 48 % (32.3) | 86 % (19.5) | 91 % (10.2) | 28 % (9.6) | 6 % (11.4) |
+| **Warrior + Tanque** | 98 % (20.6) | 4 % (31.9) | — | 84 % (21.8) | 8 % (35.2) | 42 % (10.7) | 1 % (10.5) |
+| **Asalto + Asalto** | 50 % (7.3) | 6 % (18.4) | 8 % (23.5) | — | 70 % (4.6) | 77 % (9.2) | 8 % (25.5) |
+| **Shooter + Shooter** | 18 % (10.0) | 4 % (10.9) | 20 % (35.1) | 34 % (4.7) | — | 16 % (9.3) | 4 % (11.8) |
+| **Warrior + Mago** | 82 % (9.5) | 68 % (9.8) | 67 % (10.8) | 19 % (8.8) | 79 % (8.7) | — | 35 % (7.3) |
+| **Tanque + Mago** | 99 % (8.9) | 92 % (11.6) | 100 % (10.5) | 72 % (25.2) | 90 % (10.6) | 55 % (7.2) | — |
 
 ### Nivel 5
 
-| | Warrior + Shooter | Tanque + Shooter (ballesta) | Warrior + Tanque | Asalto + Asalto | Shooter + Shooter |
-|---|---|---|---|---|---|
-| **Warrior + Shooter** | — | 20 % (19.8) | 13 % (24.9) | 96 % (8.2) | 82 % (8.5) |
-| **Tanque + Shooter (ballesta)** | 72 % (19.7) | — | 0 % (39.4) | 47 % (27.4) | 78 % (14.5) |
-| **Warrior + Tanque** | 66 % (24.7) | 7 % (38.9) | — | 64 % (28.9) | 57 % (29.3) |
-| **Asalto + Asalto** | 2 % (8.2) | 0 % (27.4) | 0 % (27.2) | — | 35 % (4.7) |
-| **Shooter + Shooter** | 18 % (9.6) | 0 % (14.9) | 0 % (30.8) | 69 % (4.6) | — |
+| | Warrior + Shooter | Tanque + Shooter (ballesta) | Warrior + Tanque | Asalto + Asalto | Shooter + Shooter | Warrior + Mago | Tanque + Mago |
+|---|---|---|---|---|---|---|---|
+| **Warrior + Shooter** | — | 16 % (13.2) | 16 % (22.8) | 48 % (6.1) | 68 % (7.3) | 40 % (7.1) | 14 % (13.8) |
+| **Tanque + Shooter (ballesta)** | 88 % (13.5) | — | 50 % (29.6) | 48 % (25.3) | 74 % (14.3) | 50 % (9.7) | 19 % (14.6) |
+| **Warrior + Tanque** | 74 % (21.9) | 16 % (29.9) | — | 23 % (33.7) | 34 % (26.7) | 12 % (10.6) | 4 % (13.7) |
+| **Asalto + Asalto** | 44 % (6.6) | 7 % (26.3) | 6 % (35.0) | — | 53 % (4.3) | 85 % (8.9) | 13 % (33.1) |
+| **Shooter + Shooter** | 29 % (7.2) | 9 % (13.6) | 22 % (27.1) | 42 % (4.2) | — | 52 % (8.4) | 16 % (19.9) |
+| **Warrior + Mago** | 57 % (7.1) | 55 % (10.0) | 84 % (10.4) | 8 % (8.5) | 44 % (8.6) | — | 41 % (8.1) |
+| **Tanque + Mago** | 80 % (13.3) | 70 % (15.3) | 91 % (14.4) | 18 % (34.0) | 46 % (22.5) | 50 % (8.1) | — |
 
 ## Familias de armas contra la misma vara (un Warrior con hacha a 2 manos)
 
@@ -153,34 +162,63 @@ Cada celda: % de peleas que gana la clase de la fila contra la de la columna (tu
 
 | Arma | Nivel 1 | Nivel 3 | Nivel 5 |
 |---|---|---|---|
-| Daga | 4 % | 0 % | 0 % |
-| Espada | 16 % | 0 % | 0 % |
-| Hacha | 7 % | 0 % | 0 % |
-| Maza | 1 % | 0 % | 2 % |
-| Arco | 100 % | 6 % | 14 % |
-| Ballesta | 100 % | 38 % | 12 % |
+| Daga | 10 % | 0 % | 0 % |
+| Espada | 22 % | 0 % | 1 % |
+| Hacha | 4 % | 0 % | 0 % |
+| Maza | 2 % | 0 % | 1 % |
+| Arco | 99 % | 10 % | 30 % |
+| Ballesta | 100 % | 70 % | 55 % |
 
 **Asalto**
 
 | Arma | Nivel 1 | Nivel 3 | Nivel 5 |
 |---|---|---|---|
-| Daga | 30 % | 22 % | 19 % |
-| Espada | 71 % | 36 % | 36 % |
-| Hacha | 28 % | 46 % | 78 % |
-| Maza | 32 % | 18 % | 55 % |
-| Arco | 18 % | 60 % | 67 % |
-| Ballesta | 67 % | 19 % | 39 % |
+| Daga | 62 % | 42 % | 56 % |
+| Espada | 80 % | 55 % | 64 % |
+| Hacha | 26 % | 44 % | 82 % |
+| Maza | 45 % | 28 % | 70 % |
+| Arco | 32 % | 56 % | 64 % |
+| Ballesta | 82 % | 40 % | 67 % |
 
 **Warrior**
 
 | Arma | Nivel 1 | Nivel 3 | Nivel 5 |
 |---|---|---|---|
-| Daga | 24 % | 32 % | 3 % |
-| Espada | 50 % | 45 % | 20 % |
-| Hacha | 46 % | 52 % | 50 % |
-| Maza | 0 % | 53 % | 60 % |
-| Arco | 56 % | 47 % | 28 % |
-| Ballesta | 0 % | 10 % | 3 % |
+| Daga | 44 % | 60 % | 40 % |
+| Espada | 64 % | 63 % | 50 % |
+| Hacha | 48 % | 54 % | 48 % |
+| Maza | 0 % | 68 % | 60 % |
+| Arco | 54 % | 60 % | 41 % |
+| Ballesta | 7 % | 20 % | 12 % |
+
+## Cuánto suman los efectos al golpear
+
+Juntado en todas las peleas de arriba. «Por aplicación»: el daño que hizo cada vez que entró (en el momento o por turno, hasta que venció o terminó la pelea; Drena vida: lo que curó). «Por ataque»: ese daño repartido entre todos los ataques hechos con armas que lo traen (cuenta la probabilidad y los que fallan): **es lo que suma, en promedio, tener ese efecto en el arma**. Los de control (lisiado, pajaritos, sentado, stun, rengo, rompe armadura) no hacen daño propio: su valor se ve en la tabla de abajo.
+
+| Efecto | Veces que entró | Daño por aplicación | Daño por ataque |
+|---|---|---|---|
+| Sangrado | 56114 | 6.2 | 0.61 |
+| Envenenar | 45707 | 4.7 | 0.52 |
+| Prende fuego | 18762 | 2.6 | 0.71 |
+| Veneno severo | 1448 | 10.4 | 0.55 |
+| Drena vida | 37955 | 0.3 | 0.20 |
+| Rompe armadura | 65320 | 0.0 | 0.00 |
+| Lisiado | 152047 | 0.0 | 0.00 |
+| Rengo | 9676 | 0.0 | 0.00 |
+| Derribar | 30028 | 0.0 | 0.00 |
+| Demora | 15465 | 0.0 | 0.00 |
+| Pajaritos | 4285 | 0.0 | 0.00 |
+| Aturdir | 442 | 0.0 | 0.00 |
+
+**Cada clase con su mejor arma, con y sin los efectos** (% de victorias promedio contra las otras clases; nivel 1 / 3 / 5).
+
+| Clase · arma | Con efectos | Sin efectos |
+|---|---|---|
+| Warrior · hacha 2 manos | 24 % / 44 % / 42 % | 26 % / 53 % / 57 % |
+| Tanque · espada y escudo | 50 % / 67 % / 57 % | 49 % / 63 % / 51 % |
+| Asalto · daga | 53 % / 51 % / 54 % | 52 % / 48 % / 40 % |
+| Mago · varita | 77 % / 64 % / 45 % | 76 % / 63 % / 50 % |
+| Shooter · arco | 37 % / 15 % / 34 % | 36 % / 11 % / 34 % |
 
 ## Palancas probadas (2026-10-10)
 
@@ -188,11 +226,11 @@ Ninguna está aplicada: es lo que pasaría con cada una. % de victorias de la fi
 
 | Palanca | Shooter (arco) vs Warrior | Shooter (ballesta) vs Warrior | Asalto (daga) vs Warrior | Shooter (arco) vs Tanque | Shooter (ballesta) vs Tanque | Asalto (daga) vs Tanque | Warrior (hacha 2 manos) vs Tanque |
 |---|---|---|---|---|---|---|---|
-| Como hoy | 100 % / 11 % / 9 % | 100 % / 37 % / 17 % | 34 % / 18 % / 19 % | 0 % / 0 % / 0 % | 0 % / 2 % / 0 % | 2 % / 0 % / 0 % | 64 % / 35 % / 51 % |
-| Perfora +1/+2/+3 (por calidad) en dagas y ballestas | 100 % / 11 % / 9 % | 100 % / 98 % / 67 % | 60 % / 56 % / 66 % | 0 % / 0 % / 0 % | 0 % / 2 % / 0 % | 5 % / 0 % / 0 % | 62 % / 34 % / 40 % |
-| Armadura media y pesada al 75 % | 100 % / 26 % / 43 % | 100 % / 98 % / 65 % | 76 % / 52 % / 60 % | 0 % / 0 % / 2 % | 0 % / 22 % / 0 % | 8 % / 13 % / 0 % | 68 % / 56 % / 64 % |
-| Un golpe que entra pasa al menos ¼ de su daño | 100 % / 47 % / 33 % | 100 % / 91 % / 62 % | 51 % / 46 % / 78 % | 68 % / 83 % / 64 % | 28 % / 94 % / 91 % | 86 % / 70 % / 99 % | 55 % / 42 % / 62 % |
-| Perfora por calidad + armadura al 75 % | 100 % / 26 % / 43 % | 100 % / 100 % / 95 % | 90 % / 86 % / 94 % | 0 % / 0 % / 3 % | 0 % / 55 % / 24 % | 28 % / 56 % / 30 % | 73 % / 62 % / 64 % |
-| Perfora por calidad SIN tope (+2/+4/+6) en dagas y ballestas | 100 % / 11 % / 9 % | 100 % / 100 % / 91 % | 78 % / 83 % / 96 % | 0 % / 0 % / 0 % | 0 % / 22 % / 18 % | 10 % / 13 % / 8 % | 58 % / 36 % / 49 % |
-| Daño mínimo: 1 por dado si el golpe entra | 100 % / 40 % / 34 % | 100 % / 96 % / 48 % | 44 % / 28 % / 49 % | 42 % / 69 % / 64 % | 10 % / 93 % / 84 % | 32 % / 30 % / 88 % | 63 % / 37 % / 44 % |
-| Perfora sin tope + 1 por dado (la propuesta) | 100 % / 40 % / 34 % | 100 % / 98 % / 92 % | 79 % / 78 % / 97 % | 42 % / 69 % / 60 % | 11 % / 96 % / 86 % | 47 % / 30 % / 82 % | 64 % / 29 % / 48 % |
+| Como hoy | 100 % / 14 % / 23 % | 100 % / 69 % / 60 % | 57 % / 52 % / 56 % | 0 % / 1 % / 0 % | 8 % / 28 % / 24 % | 4 % / 3 % / 8 % | 42 % / 18 % / 36 % |
+| Perfora +1/+2/+3 (por calidad) en dagas y ballestas | 100 % / 14 % / 23 % | 100 % / 92 % / 86 % | 80 % / 80 % / 84 % | 0 % / 0 % / 0 % | 6 % / 20 % / 22 % | 14 % / 15 % / 14 % | 36 % / 18 % / 30 % |
+| Armadura media y pesada al 75 % | 100 % / 29 % / 54 % | 100 % / 92 % / 90 % | 88 % / 84 % / 90 % | 0 % / 6 % / 10 % | 10 % / 48 % / 35 % | 30 % / 36 % / 23 % | 54 % / 34 % / 55 % |
+| Un golpe que entra pasa al menos ¼ de su daño | 100 % / 47 % / 54 % | 100 % / 89 % / 83 % | 69 % / 66 % / 91 % | 66 % / 78 % / 60 % | 66 % / 94 % / 92 % | 78 % / 70 % / 96 % | 34 % / 26 % / 36 % |
+| Perfora por calidad + armadura al 75 % | 100 % / 29 % / 54 % | 100 % / 96 % / 98 % | 94 % / 94 % / 96 % | 0 % / 10 % / 9 % | 8 % / 65 % / 60 % | 57 % / 72 % / 71 % | 57 % / 41 % / 44 % |
+| Perfora por calidad SIN tope (+2/+4/+6) en dagas y ballestas | 100 % / 14 % / 23 % | 100 % / 94 % / 98 % | 90 % / 91 % / 100 % | 0 % / 0 % / 0 % | 10 % / 53 % / 56 % | 32 % / 34 % / 60 % | 49 % / 15 % / 38 % |
+| Daño mínimo: 1 por dado si el golpe entra | 100 % / 57 % / 52 % | 100 % / 90 % / 80 % | 62 % / 66 % / 86 % | 42 % / 66 % / 60 % | 54 % / 92 % / 78 % | 50 % / 46 % / 88 % | 42 % / 19 % / 34 % |
+| Perfora sin tope + 1 por dado (la propuesta) | 100 % / 57 % / 52 % | 100 % / 96 % / 97 % | 92 % / 89 % / 98 % | 44 % / 70 % / 58 % | 52 % / 90 % / 85 % | 57 % / 55 % / 88 % | 32 % / 16 % / 29 % |

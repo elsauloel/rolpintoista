@@ -28,6 +28,8 @@
 >   las combinaciones de bonos en defensas (`herramientas/calculadora_defensa.py`), con el mismo criterio.
 > - [x] (2026-10-10, dueño) **Parry: solo con armas cuerpo a cuerpo** (o escudo): ninguna de rango (arco, ballesta, pólvora), ninguna varita ni
 >   orbe; los báculos sí (son a dos manos: el Báculo de aprendiz pasó a dos manos).
+> - [ ] **🔍 Revisión de cerca de ballestas y arcos, sobre todo ballestas** (dueño, 2026-10-10): hacerla juntos **cuando el dueño diga «tengo
+>   tiempo y estoy en la compu»**. Una por una, calidad por calidad: números, nombres, rasgos, el Rango como bono (falta Buena para arriba) y los virotes.
 > - [ ] **📏 «Calcular trayectoria» con la R** (dueño, 2026-10-10): que el botón de Rango (R) también permita ver la **línea de tiro** sin ir a
 >   «Atacar», y **elegir el punto de partida y el de llegada** (evaluar cómo sería el tiro desde otro casillero, no solo desde donde está parado).
 >   Reusar `lineaDeTiro` (js/32) y el dibujo de la línea del apuntado.

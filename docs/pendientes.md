@@ -7,6 +7,13 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **Decisiones del estudio de peleas, para cuando sigamos avanzando** ([`balance-peleas.md`](balance-peleas.md)):
+>   - **P186 — la armadura pesada:** el tanque con escudo es casi intocable para el arco y la daga. Propuesta medida: **daño mínimo de 1 por
+>     dado** (si el golpe entra y la armadura lo frena todo, pasa 1 por cada dado del arma).
+>   - **P187 — varitas Raras:** no hay varitas de calidad Rara; el mago se cae a nivel 5 (de 72 % a 46 %). Crear varitas Raras (y más) o que las
+>     varitas escalen con el Especial.
+>   - **P188 — la hacha a dos manos del guerrero:** rinde menos que espada y escudo (20–43 % contra 57–61 %). Revisar el valor de las armas a
+>     dos manos frente al escudo.
 > - [x] (2026-10-10, corrido a las 10:05) **Estudio de peleas, segunda vuelta** ([`balance-peleas.md`](balance-peleas.md)): conclusiones arriba
 >   del informe. Quedan para decidir: P186 (armadura pesada), varitas Raras para el mago, la hacha a dos manos del guerrero. Antes, dejarlo listo: (a) **los efectos al golpear modelados como en el juego** (veneno y veneno severo, sangrado, quemadura,
 >   rompe armadura, lisiado, pajaritos, derribar → sentado, aturdir → stun, rengo, drena vida, daño elemental extra; con los presets de

@@ -16,7 +16,8 @@
 >     dos manos** (falta definir cómo y rehacer el catálogo).
 >   - **P190 — la armadura media** ([`diagnostico-armadura-media.md`](diagnostico-armadura-media.md)): no existe; el guerrero depende de ir
 >     pesado. Elegido A + B + D; medido: la contra que funciona es **−2 PdG con la pesada completa** (+ habilidad del tanque que lo compense).
->     Falta el OK del dueño y después la tabla por parte del cuerpo (Común, luego Buena).
+>     **En pausa (2026-10-10):** al dueño la propuesta le parece enroscada; quizás alcanza con las habilidades y la disponibilidad
+>     de equipo del GM. Se retoma cuando tenga más tiempo para pensar.
 >   - **Dirección del dueño (2026-10-10): «la clave es Ignora N de Resistencia a crítico».** Pasos: (1) quizás **sacar la Resistencia a crítico
 >     de algunas partes de la armadura** (menos abundancia); (2) **rework de las Tipo 4 con esa identidad** (Ignora Res. crítico como su rasgo,
 >     junto al Crítico frecuente); (3) **las Tipo 6 con presencia de esa característica** (menos frecuente, como la Perfora). Medir cada paso con

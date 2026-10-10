@@ -100,3 +100,6 @@ Lectura:
 **Recomendación de Claude:** B′ (−2 PdG con la pesada completa) + que el tanque lo compense con una habilidad propia (F). Si el dueño lo
 aprueba, el paso siguiente es una tabla por parte del cuerpo para Común (y después Buena) con los tres pesos, para su OK antes de tocar el
 catálogo.
+
+> **En pausa (dueño, 2026-10-10):** la idea de pesos con una contra que se acumula le parece enroscada. Si el desbalance no es desmedido,
+> lo regulan las habilidades y el equipo que el GM pone a disposición. Se retoma cuando tenga tiempo para pensarlo.

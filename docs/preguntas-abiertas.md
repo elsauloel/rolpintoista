@@ -944,4 +944,5 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   (liviana / media / pesada), B contras reales para lo pesado, C Defensa más barata en las partes chicas, D encarecer o enrarecer la Defensa
   especial y las resistencias, E bono de conjunto, F posturas del guerrero. El dueño eligió **A + B + D** (2026-10-10). Medido con kits de prueba: −4 Evasión no alcanza (lo pesado sigue dominando); **−2 PdG con la
   pesada completa sí** (la media pasa a ser la mejor del guerrero), pero el tanque queda sin poder cerrar peleas (empata casi todo); −1 PdG se queda
-  corto. Recomendación: −2 PdG + una habilidad del tanque que lo compense (F). **Decide el dueño** antes de armar la tabla por parte del cuerpo.
+  corto. Recomendación: −2 PdG + una habilidad del tanque que lo compense (F). **En pausa (dueño, 2026-10-10):** los pesos con contra que se acumula le parecen enroscados; si el desbalance no es desmedido,
+  se regula con las habilidades y con el equipo que el GM pone a disposición. Se retoma cuando tenga tiempo para pensarlo.

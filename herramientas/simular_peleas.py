@@ -52,6 +52,25 @@ def pool(fam, nivel, manos=None):
     p = [i for i in CAT if familia(i) == fam and i.get('tier') == t and (manos is None or i['tipoItem'] == manos)]
     return p or [i for i in CAT if familia(i) == fam and i.get('tier') == t]
 
+NIVELES = (1, 3, 5)
+ARMADURA_REAL = False   # --armadura-real: piezas del catálogo en vez de la curva de Defensa máxima (2026-10-10)
+CAT_DEF = [i for i in leer_catalogo() if not i.get('archivo')]
+def def_de(i, stat='def'): return sum(float(m.get('val') or 0) for m in i.get('mods') or [] if m.get('stat') == stat)
+def pieza(slot, tier, peso):
+    """Una pieza del catálogo para esa parte y calidad, elegida según el rol: pesada = el tercio con más Defensa, media = el del medio,
+    liviana = la mitad con menos."""
+    xs = sorted([i for i in CAT_DEF if i.get('tipoItem') == slot and i.get('tier') == tier], key=lambda i: def_de(i))
+    if not xs: return None
+    n = len(xs)
+    tramo = xs[2 * n // 3:] if peso == 'pesada' else xs[n // 3: 2 * n // 3]   # la media y la liviana, del tercio del medio (la liviana, con torso blando)
+    return random.choice(tramo or xs)
+def armadura_real(nivel, peso, escudo):
+    tier = TIER_NIVEL[nivel]
+    torso = 'armadura_blanda' if peso == 'liviana' else 'armadura_rigida'
+    piezas = [pieza(s, tier, peso) for s in ('cabeza', torso, 'manos', 'piernas', 'pies')] + ([pieza('escudo_1m', tier, 'media')] if escudo else [])
+    piezas = [p for p in piezas if p]
+    res = {tp: int(sum(def_de(p, k) for p in piezas)) for k, tp in (('tipo1', 4), ('tipo2', 6), ('tipo3', 8), ('tipo4', 10), ('tipo5', 12))}
+    return dict(defensa=int(sum(def_de(p) for p in piezas)), res={k: v for k, v in res.items() if v}, def_esp=int(sum(def_de(p, 'armadmg') for p in piezas)))
 # Armadura por rol (la curva de calculadora_defensa: liviano / medio / pesado).
 def armadura(nivel, peso):
     dmin, dmax, rmax = B.CURVA[nivel]
@@ -83,9 +102,13 @@ class Luchador:
         self.arma = random.choice(pool(fam, nivel, manos))
         self.fam = fam
         self.escudo = ESCUDO[nivel] if escudo else None
-        arm = armadura(nivel, ARQ[clase]['armadura'])
-        self.defensa = arm['defensa'] + (self.escudo['defensa'] if self.escudo else 0)
-        self.res = arm['res']
+        if ARMADURA_REAL:   # piezas reales del catálogo (el escudo, una pieza más)
+            arm = armadura_real(nivel, ARQ[clase]['armadura'], bool(escudo))
+            self.defensa, self.res = arm['defensa'], arm['res']
+        else:
+            arm = armadura(nivel, ARQ[clase]['armadura'])
+            self.defensa = arm['defensa'] + (self.escudo['defensa'] if self.escudo else 0)
+            self.res = arm['res']
         self.hp_max = self.hp = at['con'] * 5
         self.rango = self.arma.get('armaDeRango')
         self.arco = bool(self.arma.get('arco'))
@@ -99,7 +122,7 @@ class Luchador:
             self.rango, self.arco, self.recarga = True, False, 0
             self.alcance = max(1, at['des'])
             self.sp_max = self.sp = at['esp'] * 3
-        self.def_esp = round(self.defensa * DEF_ESPECIAL[ARQ[clase]['armadura']])
+        self.def_esp = arm['def_esp'] if ARMADURA_REAL else round(self.defensa * DEF_ESPECIAL[ARQ[clase]['armadura']])
     vivo = property(lambda s: s.hp > 0)
     def defensa_ef(self): return max(0, self.defensa - self.est['rota'])
     def tipo(self): return int(self.arma.get('tipoDado') or 6)
@@ -297,9 +320,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--n', type=int, default=400)
     ap.add_argument('--sin-efectos', action='store_true', help='sin los efectos al golpear (como la primera vuelta)')
+    ap.add_argument('--armadura-real', action='store_true', help='armaduras armadas con piezas del catálogo (no la curva de Defensa máxima)')
+    ap.add_argument('--niveles', default='1,3,5', help='niveles a simular (1 = Común, 3 = Buena, 5 = Rara)')
+    ap.add_argument('--salida', default='docs/balance-peleas.md', help='dónde escribir el informe')
     o = ap.parse_args()
-    global EFECTOS
+    global EFECTOS, ARMADURA_REAL, NIVELES
     EFECTOS = not o.sin_efectos
+    ARMADURA_REAL = o.armadura_real
+    NIVELES = tuple(int(x) for x in o.niveles.split(','))
     random.seed(10)
     L = []
     L.append('# Balance — peleas simuladas entre arquetipos (2026-10-10)\n')
@@ -322,7 +350,7 @@ def main():
 
     # 1) 1 vs 1 con la mejor arma de cada clase, por nivel.
     clases = list(ARQ)
-    for nivel in (1, 3, 5):
+    for nivel in NIVELES:
         L.append(f'\n## 1 vs 1 · nivel {nivel} ({TIER_NIVEL[nivel]}) · cada clase con su mejor arma\n')
         L.append('Cada celda: % de peleas que gana la clase de la fila contra la de la columna (turnos promedio).\n')
         L.append('| | ' + ' | '.join(f'{c} ({MEJOR[c]})' for c in clases) + ' |')
@@ -339,12 +367,12 @@ def main():
     # 2) Cada clase con cada uno de sus juegos de armas contra los demás (con su mejor arma), por nivel: el % de victorias promedio.
     L.append('\n## 1 vs 1 · ¿qué juego de armas le conviene a cada clase?\n')
     L.append('% de victorias promedio de la clase con ese juego contra las otras tres clases (cada una con su mejor arma).\n')
-    L.append('| Clase · juego | Nivel 1 | Nivel 3 | Nivel 5 |')
-    L.append('|---|---|---|---|')
+    L.append('| Clase · juego | ' + ' | '.join(f'Nivel {n}' for n in NIVELES) + ' |')
+    L.append('|' + '---|' * (len(NIVELES) + 1))
     for a in clases:
         for juego in ARQ[a]['juegos']:
             cel = []
-            for nivel in (1, 3, 5):
+            for nivel in NIVELES:
                 vs = [cruce([(a, juego)], [(b, MEJOR[b])], nivel, o.n // 2)['A'] for b in clases if b != a]
                 cel.append(pct(statistics.mean(vs)))
             L.append(f"| {a} · {juego}{' ★' if juego == MEJOR[a] else ''} | " + ' | '.join(cel) + ' |')
@@ -362,7 +390,7 @@ def main():
             if pelea(A, Bq)[0] == 'A': g += 1
         return g / n
     for c in clases:
-        L.append(f'| {c} | {pct(cruce_niveles(c, 3, 1, o.n // 2))} | {pct(cruce_niveles(c, 5, 3, o.n // 2))} |')
+        L.append(f'| {c} | {pct(cruce_niveles(c, 3, 1, o.n // 2))} | ' + (pct(cruce_niveles(c, 5, 3, o.n // 2)) if 5 in NIVELES else '—') + ' |')
 
     # 4) 2 vs 2: parejas típicas.
     L.append('\n## 2 vs 2 · parejas\n')
@@ -377,7 +405,7 @@ def main():
         'Tanque + Mago': [('Tanque', MEJOR['Tanque']), ('Mago', 'varita')],
     }
     nombres = list(PAREJAS)
-    for nivel in (1, 3, 5):
+    for nivel in NIVELES:
         L.append(f'\n### Nivel {nivel}\n')
         L.append('| | ' + ' | '.join(nombres) + ' |')
         L.append('|' + '---|' * (len(nombres) + 1))
@@ -396,11 +424,11 @@ def main():
     fams = [('Daga', 'arma_1m', False), ('Espada', 'arma_1m', False), ('Hacha', 'arma_2m', False), ('Maza', 'arma_2m', False), ('Arco', None, False), ('Ballesta', 'arma_2m', False)]
     for c in ('Shooter', 'Asalto', 'Warrior'):
         L.append(f'\n**{c}**\n')
-        L.append('| Arma | Nivel 1 | Nivel 3 | Nivel 5 |')
-        L.append('|---|---|---|---|')
+        L.append('| Arma | ' + ' | '.join(f'Nivel {n}' for n in NIVELES) + ' |')
+        L.append('|' + '---|' * (len(NIVELES) + 1))
         for fam in fams:
             ARQ[c]['juegos']['_prueba'] = fam
-            cel = [pct(cruce([(c, '_prueba')], [('Warrior', 'hacha 2 manos')], nivel, o.n // 2)['A']) for nivel in (1, 3, 5)]
+            cel = [pct(cruce([(c, '_prueba')], [('Warrior', 'hacha 2 manos')], nivel, o.n // 2)['A']) for nivel in NIVELES]
             del ARQ[c]['juegos']['_prueba']
             L.append(f'| {fam[0]} | ' + ' | '.join(cel) + ' |')
     print('familias listo', flush=True)
@@ -419,19 +447,19 @@ def main():
             por_ap = dano / veces if veces else 0
             por_at = dano / ATAQUES_CON[nombre] if ATAQUES_CON[nombre] else 0
             L.append(f'| {nombre} | {veces} | {por_ap:.1f} | {por_at:.2f} |')
-        L.append('\n**Cada clase con su mejor arma, con y sin los efectos** (% de victorias promedio contra las otras clases; nivel 1 / 3 / 5).\n')
+        L.append('\n**Cada clase con su mejor arma, con y sin los efectos** (% de victorias promedio contra las otras clases; nivel ' + ' / '.join(map(str, NIVELES)) + ').\n')
         L.append('| Clase · arma | Con efectos | Sin efectos |')
         L.append('|---|---|---|')
         for a in clases:
             fila = []
             for ef in (True, False):
                 EFECTOS = ef
-                fila.append(' / '.join(pct(statistics.mean([cruce([(a, MEJOR[a])], [(b, MEJOR[b])], nivel, o.n // 4)['A'] for b in clases if b != a])) for nivel in (1, 3, 5)))
+                fila.append(' / '.join(pct(statistics.mean([cruce([(a, MEJOR[a])], [(b, MEJOR[b])], nivel, o.n // 4)['A'] for b in clases if b != a])) for nivel in NIVELES))
             EFECTOS = True
             L.append(f'| {a} · {MEJOR[a]} | ' + ' | '.join(fila) + ' |')
         print('efectos listo', flush=True)
 
-    salida = RAIZ / 'docs' / 'balance-peleas.md'
+    salida = RAIZ / o.salida
     salida.write_text('\n'.join(L) + '\n', encoding='utf-8')
     print('escrito', salida)
 

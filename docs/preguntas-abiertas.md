@@ -932,3 +932,8 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   Buena 0/26, Rara 5/22, Excepcional 4/20; T6 Buena 1/33, Rara 1/33; T8+ ninguna. **Propuesta (dueño: «una frecuencia similar»):** T4 Común ~12 %
   e Ignora 1, Buena ~18 % e Ignora 1, Rara/Excepcional Ignora 1–2; T6 1–2 por calidad con Ignora 1. **Ojo:** el simulador de peleas usa la curva de
   Defensa máxima (Res. T4 2–3 en armadura media), más que el catálogo real (~1): antes de reworkear, medir con armaduras armadas del catálogo.
+  **Corrección (2026-10-10, peleas con armaduras reales del catálogo, Común y Buena):** con las piezas reales, el guerrero de armadura media
+  tiene Res. T4 ~0,7–0,9 (no 1–2) y **el Crítico frecuente sí rinde** (daga nivel 3: 7,3 → 9,3 de daño por ataque contra el guerrero; 1,6 → 3,0
+  contra el tanque; tanto o más que Perfora 2). La «abundancia» venía de la curva máxima del simulador. Lo que sí aparece: **la armadura media
+  real protege poco y el guerrero queda muy flojo** (ver [`balance-peleas-armadura-real.md`](balance-peleas-armadura-real.md)). Revisar antes
+  de sacar Resistencia a crítico de la armadura.

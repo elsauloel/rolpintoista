@@ -17,8 +17,8 @@
 
 - [ ] **🏹 Apuntar con un arma de rango** (cuando se construya; pedido del dueño 2026-10-09): al atacar se ve tu Rango, los objetivos posibles, los que
   no (fuera de Rango o tapados por un obstáculo aunque se vean por la visión de un aliado) y los obstáculos que los tapan. Ver docs/rework-armas-rango.md.
-- [ ] **🏹 Perfora sin crítico** (2026-10-09): un disparo con la Perforante o la Envenenada que pega SIN crítico muestra «perfora 1» en el daño (con
-  crítico no hace falta: la Defensa ya se ignora entera).
+- [ ] **🏹 El texto de la Perfora** (2026-10-09): un disparo con la Perforante que pega sin crítico dice «6 − Defensa 3 (4 − perfora 1) = 3»
+  (la cuenta ya se probó; el texto se corrigió después y falta verlo).
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no
   repite eso. Mirar si sobra o falta algún término, y si algún texto del globo conviene reescribirlo.
@@ -39,7 +39,9 @@
   (6 filas contra 7 del GM) ni su tirada en la Mesa; al acercarse a juan, el mapa del GM la marcó «revelado» sola; vuelta a la niebla, sigue en el
   orden del jugador y su tirada le llega como «🎭 … está realizando una acción incierta». Y usando una Trampa de oso de su cinturón: el GM ve «🎭 … colocó una trampa («Trampa de oso»)» y el jugador solo «acción incierta». **Glosario**: en el «Ver» del Arco corto y de la Varita de
   chispa eléctrica, los términos marcados y el globo al pasar el mouse (Parálisis); «Detalles técnicos» en lista corta. **Perfora sin crítico**:
-  tres intentos, un fallo y dos críticos: sigue pendiente.
+  juan con la Perforante, PdG 3 contra Evasión 1: 6 de daño contra Defensa 4 → recibió 3 (la Perfora le restó 1 a la Defensa). El texto decía
+  «6 − Defensa 4 − perfora 1», como si la Perfora frenara el daño: **corregido** a «Defensa 3 (4 − perfora 1)» (falta verlo: los intentos siguientes
+  salieron crítico o fallo).
 - ✅ **Línea de tiro, tiro alto, distancia ideal y distancia mínima** (2026-10-09, probado antes y anotado ahora): la línea al mouse (verde/roja, con
   la distancia), los tokens tapan, el cartel de «tapado» con «Elegir otro», el tiro alto con PdG −2 («1d6 −2 tiro alto»), los resaltes de la
   distancia mínima y de la distancia ideal, el daño del arco 2d6+3.

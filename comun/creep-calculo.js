@@ -392,7 +392,7 @@ const CreepCalculo = (() => {
   function defensa(sc, o){
     if(!sc) return null;
     return Combatiente.armaParaDefensa({arma: sc.armaNombre ? {nombre: sc.armaNombre, peso: pesoArma(sc)} : null, natural: sc.armaNatural,
-      arco: Combatiente.esArco(Combatiente.armaDeCombatiente(sc)), soloEscudo: !!(o && o.soloEscudo),
+      arco: !!sc.armaDeRango, soloEscudo: !!(o && o.soloEscudo),
       escudos: (sc.equipo || []).filter(it => slotDe(it.tipoItem) === 'escudo').map(it => ({nombre: it.nombre, peso: num(it.peso)}))});
   }
   function bloqueoValor(sc){ const d = defensa(sc); return statValor(sc, 'bloqueo') + (d ? num(d.peso) : 0); }

@@ -57,7 +57,7 @@ const FichaCombate = (() => {
   function armasYEscudosParaParry(S){
     const manos = asignarManos(S);
     return (S.inventario || [])
-      .filter(i => i.equipado && !FichaCalculo.itemRoto(i) && esMano(i.tipoItem) && !((i.especial || i.orbe) && !armaDanoTxt(i)) && !Combatiente.esArco(i))   // una varita o un orbe no parrean (2026-10-05); un arco tampoco (2026-10-09)
+      .filter(i => i.equipado && !FichaCalculo.itemRoto(i) && esMano(i.tipoItem) && !i.orbe && !(i.especial && i.tipoItem !== 'arma_2m') && !i.armaDeRango)   // una varita o un orbe no parrean (2026-10-05; toda varita, 2026-10-10; un báculo a dos manos sí); un arma de rango tampoco (arco 2026-10-09, toda 2026-10-10)
       .map(i => ({item: i, mano: manos.get(i.id) || null}))
       .sort((a, b) => (a.mano || 99) - (b.mano || 99));
   }

@@ -550,8 +550,9 @@ prueba('Perfora N del arma (2026-10-10): viaja en el ataque, la copia el creep y
   const arco = {armaDeRango: true, arco: true};
   igual([Combatiente.ataqueDeArma(bal).perfora, Combatiente.ataqueDeArma({perfora: 9}).perfora, Combatiente.ataqueDeArma({}).perfora, Combatiente.rasgosDeItem(bal).perfora,
     Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente({armaDeRango: true, armaRasgos: {perfora: 2}})).perfora,
-    Combatiente.sirveLaMunicion(bal, vir), Combatiente.sirveLaMunicion(bal, fl), Combatiente.sirveLaMunicion(arco, vir), Combatiente.sirveLaMunicion(arco, fl), Combatiente.municionDe(bal)],
-    [3, 5, undefined, 3, 2, true, false, false, true, 'virote']);
+    Combatiente.sirveLaMunicion(bal, vir), Combatiente.sirveLaMunicion(bal, fl), Combatiente.sirveLaMunicion(arco, vir), Combatiente.sirveLaMunicion(arco, fl), Combatiente.municionDe(bal),
+    Combatiente.sirveParaParry(bal, false), Combatiente.armaParaDefensa({arma: {nombre: 'Ballesta', peso: 2}, arco: true, escudos: []})],   // con una ballesta no se parrea (2026-10-10)
+    [3, 5, undefined, 3, 2, true, false, false, true, 'virote', false, null]);
 });
 prueba('la distancia ideal de un arma de rango: dónde está y qué da (2026-10-09)', () => {
   const arco = (ideal) => ({armaDeRango: true, arco: true, ideal});

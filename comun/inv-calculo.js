@@ -94,7 +94,7 @@ const InvCalculo = (() => {
   function defensa(inv, o){
     if(!inv) return null;
     return Combatiente.armaParaDefensa({arma: inv.armaNombre ? {nombre: inv.armaNombre, peso: pesoArma(inv)} : null, natural: inv.armaNatural === true,
-      arco: Combatiente.esArco(Combatiente.armaDeCombatiente(inv)), soloEscudo: !!(o && o.soloEscudo),
+      arco: !!inv.armaDeRango, soloEscudo: !!(o && o.soloEscudo),
       escudos: (inv.equipo || []).filter(it => slotDe(it.tipoItem) === 'escudo').map(it => ({nombre: it.nombre, peso: num(it.peso)}))});
   }
   function bloqueoValor(inv){ const d = defensa(inv); return statValor(inv, 'bloqueo') + (d ? num(d.peso) : 0); }

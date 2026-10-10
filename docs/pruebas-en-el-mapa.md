@@ -10,17 +10,9 @@
 
 ## Pendientes
 
-- [ ] **🔮 Armadura arcana** (2026-10-10): ponérsela, que un rival le pegue (el Anuncio dice «la Armadura arcana absorbió N» y la vida baja
-  la mitad), y que al vencerse (2 turnos propios, o el ⟳ Mantenimiento sin orden de turnos) explote: la Mesa «💥 … explota: N de daño arcano
-  directo», la cascada con PdG.Esp contra la Evasión de cada rival al lado y el dodge roll. El daño que se aplica desde la ficha suelta no absorbe.
 - [ ] **⏸ La pausa de la partida** (2026-10-10, necesita las reglas nuevas pegadas): el GM pausa desde el mapa o GM Tools → el jugador ve el
   cartel, el mapa congelado (no se puede tocar ni abrir la Botonera) y su ficha anda; compra o equipa algo → al reanudar, el GM ve esas líneas y
   elige borrar o guardar el registro.
-- [ ] **✨ Toque mágico (Mago) con un golpe que entra** (2026-10-10): probado en el mapa que solo deja elegir al que está al lado, que el
-  defensor solo tiene Evasión (sin Parry) y que el daño queda «3d6+14» arcano (Ef.Esp 14 de juan), sin «directo». Falta verlo pegar: el
-  daño aplicado, restando la Defensa especial del objetivo y no su Defensa.
-- [ ] **🌀 Ráfaga arcana: ganar la Evasión y quedarse adentro del cono** (2026-10-10): salir del cono ✅ probado (la Bruja esquivó). Falta el
-  caso contrario: gana la Evasión, no sale (o declina) → le pega igual.
 - [ ] **🏹 Virotes con mapa** (2026-10-10, sin probar): de **humo** (nube de diámetro 3, 2 turnos, donde pega o cae), de **luz** (bengala de
   diámetro 3, 3 turnos), **explosivo** (1d6 de fuego a todos en la flor de 7 del blanco; si falla, queda para el GM), de **clavo** (contra una
   pared detrás: Inmovilizado 1 turno) y de **rebote** (si falla, un disparo gratis con PdG −2 contra el que está pegado al blanco).
@@ -40,9 +32,22 @@
 
 ## Probado
 
+- [x] **🔮 Armadura arcana** (2026-10-10, prueba completa en el mapa, juan contra el Coloso y la Bruja): un golpe de 8 → «la Armadura arcana
+  absorbió 4», juan 10 → 6. Al vencerse (al empezar su turno) la Mesa dice «💥 … explota: 4 de daño arcano directo» y sale la cascada: el
+  Coloso 56 → 52 (empate desempatado a par o impar), la Bruja 21 → 17 (su Defensa especial 3 no resta: es directo). **Bug encontrado y
+  arreglado**: el daño que aplica el mapa a un personaje buscaba los estados en la parte equivocada de la ficha, así que a un personaje no le
+  valían ni los escudos, ni Invulnerable, ni la absorción (`danioPj`, js/10). Queda: la vista previa del «Recibe daño» no muestra lo absorbido.
+- [x] **✨ Toque mágico pegando** (2026-10-10): solo el que está al lado, el defensor solo con Evasión; pegó 22, menos la Defensa especial 3
+  del objetivo = 19 (no su Defensa).
+- [x] **🌀 Ráfaga arcana: ganar la Evasión y quedarse adentro** (2026-10-10): el Coloso (con +20 de Evasión de prueba) ganó 7 contra 4 → el
+  cartel del dodge roll → «✋ No me quiero mover» → la Mesa «no logró salir del área de Ráfaga arcana: efecto completo» → juan tiró el daño:
+  3 directo a la vida, 52 → 49. Salir del cono ya estaba probado (la Bruja esquivó).
+- [x] **🧴 Óleo venenoso** (2026-10-10): consumirlo pone el estado con su carga; el «Arma envenenada» sin cargas que quedaba se fue; el
+  ataque sumó +2 y Veneno ×3 (fue crítico: 26 de daño).
 - [x] **🧪 Envenenar arma y las cargas** (2026-10-10, en el mapa): juan la ejecuta (2 SP, la Mesa dice «→ Arma envenenada»), ataca al Coloso
   con la ballesta: el botón del daño dice «2d6 + 4 + 3», el paso de efectos trae «Envenenar · entra siempre» → «Aplicado · Veneno ×3», y en su
-  ficha queda **1 carga**. Falta ver la segunda carga gastarse y el estado irse al ataque siguiente (lo cubre `comun/pruebas.html`).
+  ficha queda **1 carga**; el segundo ataque gasta la otra (0). **Bug encontrado y arreglado**: cancelar el cartel de «sin No2» gastaba la carga
+  igual; ahora se gasta recién cuando el ataque se pagó. Queda: un estado con 0 cargas se ve hasta el ataque siguiente.
 - [x] **⚔ Tajear y la Perfora nueva** (2026-10-10, en el mapa, «Claude · pruebas»): juan contra el Coloso (Defensa 16): «11 − Defensa 16
   (pasa 1 por la Perfora) = 1», el Coloso 31 → 30, el Sangrado ×3 (3 turnos) entra con «Aplicar» y su primer tick lo deja en 27. Antes se vio
   el +1 al Crítico frecuente solo en esa tirada y el aviso sin No2.

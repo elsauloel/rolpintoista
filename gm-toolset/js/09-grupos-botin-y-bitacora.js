@@ -65,7 +65,7 @@ function estimadoCajaHtml(lista){
   const dato = (icono, titulo, valor, nota, fuerte) => `<div style="flex:1 1 150px;min-width:140px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:${fuerte ? 'rgba(224,184,74,.12)' : 'rgba(255,255,255,.03)'}">
       <div class="hint" style="font-size:11.5px">${icono} ${titulo}</div><div style="font-size:19px;font-weight:800${fuerte ? ';color:#ffd76a' : ''}">${valor}</div>${nota ? `<div class="hint" style="font-size:11.5px">${nota}</div>` : ''}</div>`;
   return `<div id="estimado-caja" style="margin:0 0 12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(26,20,24,.5)">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><b>🏁 Si derrotan a todos</b> <span class="hint">(${est.filas.length} creep${est.filas.length === 1 ? '' : 's'} de «${esc(nombreDeMapaGM(pestanaMapa))}»)</span>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><b>🏁 Si derrotan a todos</b> <span class="hint">(${est.filas.length} creep${est.filas.length === 1 ? '' : 's'} de «${esc(nombreDeMapaGM(pestanaMapa))}»${lista.length > est.filas.length ? ` · ${lista.length - est.filas.length} ya repartido${lista.length - est.filas.length === 1 ? '' : 's'}, no se cuentan` : ''})</span>
       <button type="button" class="btn ghost" data-mapa-estimado="1" style="margin-left:auto;padding:3px 10px;font-size:12px" title="El detalle creep por creep: qué suelta cada uno y cuánto vale">Ver detalle</button></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       ${dato('⭐', 'Experiencia', `${r(est.xp)} XP`, n ? `~${r(Math.ceil(est.xp / n))} c/u entre ${n}` : '')}

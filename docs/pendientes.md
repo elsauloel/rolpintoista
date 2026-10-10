@@ -14,8 +14,10 @@
 >     varitas escalen con el Especial.
 >   - **P188 — la hacha a dos manos del guerrero:** rinde menos que espada y escudo (20–43 % contra 57–61 %). **Dueño: darle más valor a lo de
 >     dos manos** (falta definir cómo y rehacer el catálogo).
->   - **Dato:** las dagas con Crítico frecuente rinden **peor** que sin él (22 % contra 59 % ante el guerrero a nivel 3): sobrevaluado frente a la
->     Perfora; entra en la revisión de sinergias.
+>   - **Dato (corregido, misma daga aislada):** el Crítico frecuente **casi no suma** contra armadura (2,1 → 2,1 de daño por ataque ante el
+>     guerrero a nivel 3) y la Perfora 2 sí (2,1 → 3,5). Causa: **la abundancia de Resistencia a crítico** (guerrero nivel 3: Res. T4 2 → hace
+>     falta ganar por 9–12 para un nivel de crítico). Sinergia a valorar: **Crítico frecuente + Ignora Res. crítico** (juntos rinden); y las
+>     habilidades del asalto. Bajar la Res. T4 en general ya se probó y dispara al asalto y al tirador: con cuidado.
 > - [x] (2026-10-10, corrido a las 10:05) **Estudio de peleas, segunda vuelta** ([`balance-peleas.md`](balance-peleas.md)): conclusiones arriba
 >   del informe. Quedan para decidir: P186 (armadura pesada), varitas Raras para el mago, la hacha a dos manos del guerrero. Antes, dejarlo listo: (a) **los efectos al golpear modelados como en el juego** (veneno y veneno severo, sangrado, quemadura,
 >   rompe armadura, lisiado, pajaritos, derribar → sentado, aturdir → stun, rengo, drena vida, daño elemental extra; con los presets de

@@ -12,6 +12,13 @@
 
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 
+- [ ] **🏹 Ballestas: Recarga, «¿Qué virote?» y Perfora del arma** (2026-10-10; no se pudo probar: la pestaña de Chrome estaba oculta, la compu
+  bloqueada). Con juan, comprar o equipar una **Ballesta de guardia** (Recarga 2, Perfora 3) y tener un **Virote perforante** en el carcaj:
+  (1) el menú de ataque dice «Recarga 2 (común): 2, 4, 6… No2» y el primer disparo cobra 2, el segundo 4; (2) la ventana dice «¿Qué virote?» y
+  ofrece solo virotes (no las flechas); (3) un golpe sin crítico resta la Defensa menos la Perfora del arma + la del virote (3 + 2 = 5) y el texto
+  lo dice; (4) disparar con el rival pegado está permitido; (5) comprar una ballesta trae el carcaj si no tenía; (6) el globo de «Recarga» y de
+  «Perfora» en el texto del ítem.
+
 - [ ] **🏹 Apuntar con un arma de rango** (cuando se construya; pedido del dueño 2026-10-09): al atacar se ve tu Rango, los objetivos posibles, los que
   no (fuera de Rango o tapados por un obstáculo aunque se vean por la visión de un aliado) y los obstáculos que los tapan. Ver docs/rework-armas-rango.md.
 - [ ] **🏹 El texto de la Perfora** (2026-10-09): un disparo con la Perforante que pega sin crítico dice «6 − Defensa 3 (4 − perfora 1) = 3»

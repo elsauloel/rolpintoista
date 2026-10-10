@@ -24,25 +24,25 @@ const EstadoPreguntas = (() => {
     const hp = num(p[cfg.hp]);
     // Veneno (regla del dueño, 2026-09-25): el daño por stack es SIEMPRE 1 HP, así que no se pregunta: solo cuántos stacks (y los turnos).
     if(hp && !p.esVeneno){
-      qs.push({clave: 'hp', etiqueta: hp > 0 ? 'HP que cura' : 'Daño (HP)', min: 1,
+      qs.push({clave: 'hp', etiqueta: hp > 0 ? 'HP que cura' : 'Daño (HP)', min: 1, inicial: (p.esSangrado || p.esQuemadura) && num(p.stacks) > 0 ? num(p.stacks) : Math.abs(hp),
         texto: hp > 0 ? '¿Cuánto HP cura por turno?' : (p.esVeneno && num(p.stacks) > 1 ? '¿Cuánto daño (HP) hace por turno, por cada stack?' : '¿Cuánto daño (HP) hace por turno?')});
     }
-    if(num(p.escudoMagico) > 0) qs.push(p.excedenteVida ? {clave: 'escudo', etiqueta: 'Excedente', min: 1, texto: '¿Cuántos HP de vida extra tiene?'} : {clave: 'escudo', etiqueta: 'HP del escudo', min: 1, texto: '¿Cuántos HP tiene el escudo?'});
+    if(num(p.escudoMagico) > 0) qs.push(p.excedenteVida ? {clave: 'escudo', etiqueta: 'Excedente', min: 1, inicial: num(p.escudoMagico), texto: '¿Cuántos HP de vida extra tiene?'} : {clave: 'escudo', etiqueta: 'HP del escudo', min: 1, inicial: num(p.escudoMagico), texto: '¿Cuántos HP tiene el escudo?'});
     // La vida extra es un valor neto sin tope por defecto (2026-09-27, pedido del dueño): al activarlo se
     // pregunta si esta vez tiene uno (ej. Drenar vida: "hasta 50% del máximo") — se guarda como recordatorio en
     // `excedenteTope`, nada lo hace cumplir solo.
     if(p.excedenteVida) qs.push({clave: 'tope', etiqueta: 'Tope', min: 1, sinLimite: true, sinLimiteInicial: true,
       sinLimiteTexto: 'Sin tope (se puede acumular lo que sea)', texto: '¿Tiene un tope máximo de excedente?'});
     // Sangrado no: sus stacks SON el daño (N de daño = N stacks de 1 HP), ya salen de la pregunta de HP.
-    if(num(p.stacks) > 1 && !p.esSangrado && !p.esQuemadura) qs.push({clave: 'stacks', etiqueta: 'Stacks', min: 1, texto: '¿Cuántos stacks?'});
+    if(num(p.stacks) > 1 && !p.esSangrado && !p.esQuemadura) qs.push({clave: 'stacks', etiqueta: 'Stacks', min: 1, inicial: num(p.stacks), texto: '¿Cuántos stacks?'});
     if(!p.armaduraRota){   // Armadura rota resta 1 por acumulación: es la regla, no una cantidad a elegir
       (p.mods || []).forEach((m, i) => {
         if(!m || !m.stat) return;
         const v = num(m.val), nombre = cfg.statLabel(m.stat);
-        qs.push({clave: 'mod' + i, etiqueta: nombre, min: 1, texto: v < 0 ? `¿Cuánto resta a ${nombre}?` : `¿Cuánto suma a ${nombre}?`});
+        qs.push({clave: 'mod' + i, etiqueta: nombre, min: 1, inicial: Math.abs(v) || undefined, texto: v < 0 ? `¿Cuánto resta a ${nombre}?` : `¿Cuánto suma a ${nombre}?`});
       });
     }
-    qs.push({clave: 'turnos', etiqueta: 'Turnos', min: 1, turnos: true, sinLimiteInicial: !!p.permanente, texto: '¿Cuántos turnos dura?'});
+    qs.push({clave: 'turnos', etiqueta: 'Turnos', min: 1, turnos: true, sinLimiteInicial: !!p.permanente, inicial: num(p.turnos) > 0 ? num(p.turnos) : undefined, texto: '¿Cuántos turnos dura?'});
     return qs;
   }
 
@@ -96,7 +96,8 @@ const EstadoPreguntas = (() => {
     return new Promise(resolver => {
       // Lo escrito en cada pregunta (texto crudo) y si está marcado "sin límite"; se valida al pasar de paso y al terminar.
       const crudo = {}, sin = {};
-      qs.forEach(q => { sin[q.clave] = !!((q.turnos || q.sinLimite) && q.sinLimiteInicial); crudo[q.clave] = ''; });
+      // Cada pregunta arranca con el valor del preset (2026-10-09: «Afortunado arranca en 3 turnos»), y se cambia igual.
+      qs.forEach(q => { sin[q.clave] = !!((q.turnos || q.sinLimite) && q.sinLimiteInicial); crudo[q.clave] = q.inicial !== undefined && q.inicial !== null && q.inicial !== '' ? String(q.inicial) : ''; });
       // Se resuelve una sola vez: con lo armado (Listo) o null (Cancelar, Escape). El aviso 'ep-cerrado' sale después de que la ventana
       // se cerró (la Botonera/Acciones del mapa se fijan si quedó algo abierto).
       let resuelta = false;

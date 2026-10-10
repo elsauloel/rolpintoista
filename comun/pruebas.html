@@ -2310,9 +2310,11 @@ prueba('cantidades de un estado en la ventana común: una pregunta por paso, val
   const p1 = EstadoPreguntas.pedir({nombre: 'Escudo', escudoMagico: 5, turnos: 2}, {});
   const v = papUltima();
   const tabs = v.tabs();
-  v.clic('[data-pap="sig"]');
+  const pre = v.q('#ep-valor').value;   // arranca con el valor del preset (2026-10-09)
+  v.escribir('#ep-valor', ''); v.clic('[data-pap="sig"]');
   const aviso = v.q('.pap-aviso').textContent;
   v.escribir('#ep-valor', '7'); v.clic('[data-pap="sig"]');
+  const preTurnos = v.q('#ep-valor').value;
   v.marcar('#ep-sin', true);
   const bloqueado = v.q('#ep-valor').disabled;
   v.clic('[data-pap="crear"]');
@@ -2320,8 +2322,8 @@ prueba('cantidades de un estado en la ventana común: una pregunta por paso, val
   const p2 = EstadoPreguntas.pedir({nombre: 'Escudo', escudoMagico: 5, turnos: 2}, {});
   papUltima().clic('[data-pap="cancelar"]');
   const nada = await p2;
-  igual([tabs, aviso, bloqueado, armado.escudoMagico, armado.permanente, armado.turnos, nada, v.mia.isConnected],
-    [['HP del escudo', 'Turnos'], 'HP del escudo: Escribí un número.', true, 7, true, 0, null, false]);
+  igual([tabs, pre, aviso, preTurnos, bloqueado, armado.escudoMagico, armado.permanente, armado.turnos, nada, v.mia.isConnected],
+    [['HP del escudo', 'Turnos'], '5', 'HP del escudo: Escribí un número.', '2', true, 7, true, 0, null, false]);
 });
 prueba('mapa nuevo en la ventana común: sin nombre no avanza; los creeps se agrupan por dónde están y ✔ Crear devuelve los marcados', async () => {
   let res = null;

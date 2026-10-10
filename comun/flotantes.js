@@ -1,23 +1,58 @@
 /* =========================================================
-   FLOTANTES — los botones del rincón de abajo a la izquierda (2026-10-09, pedido del dueño): la 🦋 Polilla mística, el 💍 anillo de impulso y
-   la 🪙 Moneda Re-Roll —en el mapa, al lado de la Mesa (no tapan la Botonera); en la ficha suelta, abajo a la izquierda—. «Cuando tenga una moneda de reroll, quiero que aparezca en el mismo estilo que cuando está la polilla activa, un botón en el
+   FLOTANTES — los botones de recordatorio (2026-10-09, pedido del dueño): la 🦋 Polilla mística, el 💍 anillo de impulso y la 🪙 Moneda
+   Re-Roll —en el mapa, arriba, en fila a la izquierda de la barra de los lentes y a su misma altura (2026-10-10, el dueño eligió entre dos
+   capturas: «arriba me gustan más»); en la ficha suelta, abajo a la izquierda—. «Cuando tenga una moneda de reroll, quiero que aparezca en el mismo estilo que cuando está la polilla activa, un botón en el
    mismo rincón, con cierto brillo de moneda, como recordatorio de que tenés esa posibilidad.»
    Flotantes.moneda({mostrar, sub, alClic}) dibuja (o saca) el de la moneda; Flotantes.apilar() acomoda los que haya, uno arriba del otro, en ese
    orden (cada pantalla lo llama después de dibujar o sacar uno). Lo usan el mapa (js/02, js/25) y la ficha suelta (js/03).
    ========================================================= */
 const Flotantes = (() => {
   const ORDEN = ['polilla-flotante', 'impulso-flotante', 'moneda-flotante'];
-  // Dónde van (2026-10-09, dueño: «a la derecha, justo al lado del log de la Mesa, así no tapan la Botonera»): en el mapa, pegados a la
-  // izquierda de la columna de la Mesa; donde no hay esa columna (la ficha suelta), abajo a la izquierda.
+  // Dónde van. En el mapa (2026-10-10, dueño: «arriba, al lado de los botones de los lentes, a la misma altura que esa botonera»): en fila,
+  // a la izquierda de la barra de arriba (#flotantes-mapa), con la altura de sus botones y en un solo renglón (la línea de ayuda pasa al
+  // globo del mouse). Donde no hay esa barra (la ficha suelta): uno arriba del otro, abajo a la izquierda.
+  const CSS_ARRIBA = `
+.flot-arriba{display:flex!important;align-items:center;gap:6px;padding:0 12px!important;border-radius:10px!important;font-size:13px!important;
+  white-space:nowrap;animation:none!important;transform:none!important;bottom:auto!important}
+.flot-arriba small{display:none!important}`;
+  let observado = null;
   function apilar(){
-    const mesa = document.getElementById('mesa'), col = mesa && mesa.closest('aside');
-    const r = col && col.offsetWidth ? col.getBoundingClientRect() : null;
+    const barra = document.getElementById('flotantes-mapa');
+    const rb = barra && barra.offsetWidth ? barra.getBoundingClientRect() : null;
+    if(rb){
+      if(!document.getElementById('flot-arriba-css')){
+        const st = document.createElement('style'); st.id = 'flot-arriba-css'; st.textContent = CSS_ARRIBA; document.head.appendChild(st);
+      }
+      // Si la barra se corre (se abre o se cierra la Mesa, cambia la ventana), se vuelven a acomodar.
+      if(observado !== barra && typeof ResizeObserver !== 'undefined'){
+        observado = barra;
+        const ro = new ResizeObserver(() => apilar());
+        ro.observe(barra); if(barra.parentElement) ro.observe(barra.parentElement);
+      }
+      const ref = document.getElementById('btn-rango'), rr = ref && ref.offsetHeight ? ref.getBoundingClientRect() : null;
+      const top = rr ? rr.top : rb.top + 5, alto = rr ? rr.height : 36;
+      let x = rb.left - 8;
+      [...ORDEN].reverse().forEach(id => {   // la moneda pegada a la barra; a su izquierda el anillo y la Polilla
+        const b = document.getElementById(id);
+        if(!b) return;
+        b.classList.add('flot-arriba');
+        const sub = b.querySelector('small');
+        if(sub && id !== 'moneda-flotante') b.title = sub.textContent;
+        b.style.top = Math.round(top) + 'px'; b.style.height = Math.round(alto) + 'px';
+        b.style.right = 'auto'; b.style.left = '0px';
+        x -= b.offsetWidth;
+        b.style.left = Math.round(x) + 'px';
+        x -= 8;
+      });
+      return;
+    }
     let y = 16;
     ORDEN.forEach(id => {
       const b = document.getElementById(id);
       if(!b) return;
-      if(r){ b.style.left = 'auto'; b.style.right = Math.round(innerWidth - r.left + 16) + 'px'; b.style.transformOrigin = 'right bottom'; }
-      else{ b.style.right = 'auto'; b.style.left = '16px'; b.style.transformOrigin = 'left bottom'; }
+      b.classList.remove('flot-arriba');
+      b.style.top = 'auto'; b.style.height = '';
+      b.style.right = 'auto'; b.style.left = '16px'; b.style.transformOrigin = 'left bottom';
       b.style.bottom = y + 'px';
       y += (b.offsetHeight || 48) + 10;
     });

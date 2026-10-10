@@ -12,8 +12,10 @@
 >     parche poco sofisticado»): **debate más a fondo**, y contar con **las habilidades del asalto y del mago** (mejorar el crítico, etc.).
 >   - **P187 — varitas Raras:** no hay varitas de calidad Rara; el mago se cae a nivel 5 (de 72 % a 46 %). Crear varitas Raras (y más) o que las
 >     varitas escalen con el Especial.
->   - **P188 — la hacha a dos manos del guerrero:** rinde menos que espada y escudo (20–43 % contra 57–61 %). Revisar el valor de las armas a
->     dos manos frente al escudo.
+>   - **P188 — la hacha a dos manos del guerrero:** rinde menos que espada y escudo (20–43 % contra 57–61 %). **Dueño: darle más valor a lo de
+>     dos manos** (falta definir cómo y rehacer el catálogo).
+>   - **Dato:** las dagas con Crítico frecuente rinden **peor** que sin él (22 % contra 59 % ante el guerrero a nivel 3): sobrevaluado frente a la
+>     Perfora; entra en la revisión de sinergias.
 > - [x] (2026-10-10, corrido a las 10:05) **Estudio de peleas, segunda vuelta** ([`balance-peleas.md`](balance-peleas.md)): conclusiones arriba
 >   del informe. Quedan para decidir: P186 (armadura pesada), varitas Raras para el mago, la hacha a dos manos del guerrero. Antes, dejarlo listo: (a) **los efectos al golpear modelados como en el juego** (veneno y veneno severo, sangrado, quemadura,
 >   rompe armadura, lisiado, pajaritos, derribar → sentado, aturdir → stun, rengo, drena vida, daño elemental extra; con los presets de

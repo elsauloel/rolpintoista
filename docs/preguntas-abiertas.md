@@ -912,9 +912,14 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
 - ❓ **P186. La armadura pesada contra quien no suma Fuerza — 2026-10-10, del estudio de peleas** ([`balance-peleas.md`](balance-peleas.md)). En las peleas simuladas, el Tanque (Defensa 11 / 15 / 20) es casi intocable para el tirador y el asalto (0 %), y el rango se cae desde nivel 3 contra armadura media: la Defensa sube más rápido que el daño de las familias que no suman Fuerza. Palancas medidas (ninguna aplicada): Perfora por calidad en dagas y ballestas (arregla contra armadura media, no contra el tanque), armadura al 75 %, y un daño mínimo de ¼ (arregla al tanque pero se pasa). Medido después: la que mejor acomoda es **un daño mínimo de 1 por dado** (si el golpe entra y la armadura lo frena todo, pasa 1 por cada dado del arma): el tanque deja de ser intocable sin cambiar al guerrero contra el tanque; la Perfora sin tope se pasa contra armadura media. Propuesta: probar esa regla y ajustar fino con la Perfora de cada arma. **Decide el dueño.**
   **Dueño (2026-10-10):** el daño mínimo **no**: «ponerle un daño arbitrario es un parche poco sofisticado»; **amerita un debate más profundo**.
   Además, **las habilidades del asalto y del mago van a cumplir esa función** (mejorar el crítico, etc.): medir la armadura pesada con ellas.
+  **Dato (2026-10-10, peleas simuladas):** las dagas **con Crítico frecuente rinden peor** que las que no lo tienen (asalto contra guerrero, nivel 3:
+  22 % contra 59 %; nivel 5: 34 % contra 73 %): la Resistencia a crítico Tipo 4 lo apaga y esas dagas resignan la Perfora. Hoy el Crítico
+  frecuente en dagas está sobrevaluado frente a la Perfora (entra en la revisión de sinergias de bonos).
 - ❓ **P187. Varitas Raras — 2026-10-10, del estudio de peleas** ([`balance-peleas.md`](balance-peleas.md)). No hay varitas de calidad Rara en el
   catálogo (solo Comunes y Buenas): en las peleas simuladas el mago con varita gana 72 % a nivel 1 y cae a 46 % a nivel 5 (usa Buenas). Opciones:
   crear varitas Raras (y Excepcionales), o que el daño de las varitas escale con el Especial. **Decide el dueño.**
 - ❓ **P188. La hacha a dos manos frente a espada y escudo — 2026-10-10, del estudio de peleas.** El guerrero con hacha a dos manos gana
   20–43 % contra las otras clases; con espada y escudo, 57–61 %. Revisar cuánto vale el arma a dos manos frente al escudo (Defensa, Parry contra
   disparos, Bloqueo) en la calculadora y el catálogo. **Decide el dueño.**
+  **Dueño (2026-10-10): sí, darle más valor a lo de dos manos.** Falta definir cómo (más dados o daño por el mismo puntaje en la calculadora,
+  un rasgo propio de las armas a dos manos…) y rehacer el catálogo con eso.

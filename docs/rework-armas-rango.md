@@ -308,3 +308,46 @@ de oportunidad se come igual), y un enemigo a 2 ya no tapa el tiro. Para el Shoo
 sobra 1 No2 para otra cosa). Queda la diferencia con la ballesta (que dispara pegada). Sin decidir.
 - **Decidido y programado (dueño, 2026-10-10): el arco no pega al casillero de al lado, pero a 2 sí** (1 casillero libre en el medio:
   `Combatiente.ARCO_LIBRES = 1`; la «distancia ideal cerca» arranca en 2).
+
+## 2026-10-10 · Ballestas: programado y la lista para el OK
+**Programado (en el sitio):** el rasgo **Recarga N** de las armas de rango que no son arco (`Combatiente.recargaDe`: el disparo cuesta N, 2N, 3N…;
+el de oportunidad, N), en el cobro de personajes, creeps e invocaciones, el «?» del costo en el duelo y el menú «¿Qué ataque es?»; el asistente
+de ítems pregunta la Recarga (Sin / 1 rápida / 2 común / 3 de asedio); el glosario la explica; **los virotes** son flechas con `flecha.virote`:
+van en el mismo carcaj y con una ballesta la ventana ofrece «¿Qué virote?» (solo virotes); comprar una ballesta trae el carcaj, como el arco. La
+calculadora cobra la ballesta como el arco (×0,7; Recarga 3 ×0,9) y su casa es Rompe armadura. No suma Dmg (ya era así).
+
+**La lista** (Tipo 6 salvo aclaración; daño = dados + fijo; calidad y precio de `calculadora_armas.py`):
+| Calidad | Ballesta | Manos | Daño | Recarga | Rango | Lo suyo | $ |
+|---|---|---|---|---|---|---|---|
+| Común | de mano | 1 | 1d6 | 2 | 3 | Una mano | 55 |
+| Común | de cazador | 2 | 1d6+1 | 2 | 3 | La base | 55 |
+| Común | de estribo | 2 | 1d6+4 | 3 | 3 | Lenta y fuerte | 80 |
+| Buena | de mano reforzada | 1 | 2d6+3 | 2 | 3 | Una mano | 120 |
+| Buena | de guardia | 2 | 2d6+4 | 2 | 4 | La base | 140 |
+| Buena | de fortín | 2 | 2d6+3 | 2 | 4 | Rompe armadura 25 % | 160 |
+| Buena | de tranquera | 2 | 2d6+6 | 3 | 3 | Lenta y fuerte | 140 |
+| Rara | de guerra | 2 | 2d6+8 | 2 | 5 | La base | 290 |
+| Rara | pesada | 2 | 2d6+8 | 3 | 5 | Rompe armadura 50 % | 350 |
+| Rara | de repetición | 2 | 2d6+6 | 1 | 4 | Rápida (a probar) | 190 |
+| Rara | de mano del duelista | 1 | 2d6+6 | 2 | 4 | Una mano · el primer disparo cuesta 1 menos | 400 |
+| Excepcional | de asedio | 2 | 2d8+11 (Tipo 8) | 3 | 6 | Rompe armadura 50 % | 500 |
+| Excepcional | del alguacil | 1 | 2d6+10 | 2 | 5 | Una mano · PdG +1 | 850 |
+| Excepcional | de la frontera | 2 | 3d6+11 | 2 | 6 | Crítico frecuente +1 | 1300 |
+| Legendaria | Cruz del Sur | 2 | 3d6+14 | 2 | 7 | Rompe armadura 50 % · el primer disparo cuesta 1 menos | 3300 |
+
+**Virotes** (mismo molde que las flechas; la marca de la casa es la Perfora):
+| Calidad | Virote | Qué hace | No2 extra | $ |
+|---|---|---|---|---|
+| Común | perforante | Perfora 2 | 0 | 15 |
+| Común | marcador | Marcado 2 turnos | 0 | 15 |
+| Común | de punta roma | Derribar (queda Sentado) | 1 | 20 |
+| Buena | rompe-corazas | Rompe armadura (1 stack) | 1 | 40 |
+| Buena | envenenado | Perfora 2 + Veneno ×3 | 1 | 45 |
+| Buena | incendiario · de escarcha · de ácido · relámpago | Los mismos que las flechas | 1 | 40–45 |
+| Rara | de acero templado | Perfora 3 · PdG +1 | 1 | 80 |
+| Rara | de punta de diamante | Perfora 5 (casi toda la Defensa) | 2 | 120 |
+| Rara | de fuego vivo · de hielo negro · de tormenta | Los mismos que las flechas | 2–3 | 100–150 |
+
+**Quedan para una tanda con mapa** (necesitan código nuevo): llega cargada, apuntada, a quemarropa, atraviesa escudos, la ballesta de muralla y
+los virotes explosivo, de humo, de luz, de clavo y de rebote. El garfio con soga, como utilería de la Talabartería.
+**Después del OK:** reemplazar las 6 ballestas viejas del catálogo por esta lista, sumar los virotes y probar en el mapa (Recarga y «¿Qué virote?»).

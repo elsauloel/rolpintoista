@@ -160,7 +160,7 @@ const AsistenteDueloHab = (() => {
       ondaDodge: !!(ini && ini.ondaDodge),   // la onda deja dodge roll a quien gana (2026-10-02, Daño en área)   // hechizo de área (Paso 4/7 del casteo): radio del área, en casilleros
       modo: (ini && ini.modo) || 'hab', x: (ini && ini.x) || 'nitros',
       flashEn: new Set(ini && ini.flash && Array.isArray(ini.flash.en) ? ini.flash.en : ['pdg', 'parry', 'bloqueo', 'dano']), flashBono: (ini && ini.flash && ini.flash.bono) || 2,
-      arma: {pdg: 0, pdgPorX: 0, dadosPorX: 0, fijo: 0, fijoPorX: 0, sinParry: false, ignoraResistCrit: 0, critBono: 0, critpotBono: 0, ...((ini && ini.arma) || {})},
+      arma: {pdg: 0, pdgPorX: 0, dadosPorX: 0, fijo: 0, fijoPorX: 0, sinParry: false, ignoraResistCrit: 0, critBono: 0, critpotBono: 0, perfora: 0, ...((ini && ini.arma) || {})},
       // Critical Matters (2026-09-29, pedido del dueño — Lisiar: "Crítico frecuente ×1... si es crítico, el
       // efecto pasa a -2 fijo"): SOLO tiene sentido en modo 'arma' (es el único que puede critear). Mismo
       // andamiaje que los Efectos de siempre (◎ Estado/💚 Cura + Personalizar), pero una lista APARTE
@@ -262,7 +262,7 @@ const AsistenteDueloHab = (() => {
         <label class="op"><input type="checkbox" data-sinparry ${a.sinParry ? 'checked' : ''}> No se puede parrear (solo esquivar)</label>
         <label class="op"><input type="checkbox" data-ignoraresistcrit-on ${a.ignoraResistCrit > 0 ? 'checked' : ''}> Ignora Resistencia a crítico</label>
         ${a.ignoraResistCrit > 0 ? `<div class="fila"><span style="min-width:250px">¿Cuántos puntos ignora?</span><input type="number" min="1" style="width:80px" data-arma="ignoraResistCrit" value="${esc(a.ignoraResistCrit)}"></div>` : ''}
-        ${fila('critBono', '+ Crítico frecuente (solo en esta tirada)')}${fila('critpotBono', '+ Crítico potente (solo en esta tirada)')}
+        ${fila('critBono', '+ Crítico frecuente (solo en esta tirada)')}${fila('critpotBono', '+ Crítico potente (solo en esta tirada)')}${fila('perfora', 'Perfora (ignora N de la Defensa del golpe; se suma a la del arma)')}
         <p class="nota" style="margin-top:2px">A diferencia de un «Efecto sobre uno mismo» (que dura al menos 1 turno y podría alcanzar a otro ataque), estos dos suman solo para EL crítico de este ataque puntual — no dejan ningún estado activo.</p>
         <p class="nota" style="margin-top:10px"><b>🗡 Por la espalda</b> (opcional): se suma a lo que ya dé el arma, solo si quien ataca está <b>en sigilo</b> y pegado al defensor por atrás (su punto ciego). El mapa lo detecta solo.</p>
         ${fila('espaldaPdg', '+ PdG por la espalda')}${fila('espaldaFijo', '+ Daño por la espalda')}${fila('espaldaCritpot', '+ Crítico potente por la espalda')}`;
@@ -509,6 +509,7 @@ const AsistenteDueloHab = (() => {
         if(a.sinParry) partes.push('no se puede parrear');
         if(a.ignoraResistCrit) partes.push(`ignora ${a.ignoraResistCrit} de Resistencia a crítico`);
         if(a.critBono) partes.push(`+${a.critBono} Crítico frecuente (solo esta tirada)`);
+        if(a.perfora) partes.push(`perfora ${a.perfora}`);
         if(a.critpotBono) partes.push(`+${a.critpotBono} Crítico potente (solo esta tirada)`);
         const esp = [a.espaldaPdg ? `+${a.espaldaPdg} PdG` : '', a.espaldaFijo ? `+${a.espaldaFijo} de daño` : '', a.espaldaCritpot ? `+${a.espaldaCritpot} Crítico potente` : ''].filter(Boolean);
         if(esp.length) partes.push(`por la espalda (en sigilo): ${esp.join(', ')}`);

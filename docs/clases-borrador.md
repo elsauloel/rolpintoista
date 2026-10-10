@@ -124,7 +124,7 @@ cuesta 1 por defecto (`jobBudget`, 3 puntos + 3 por nivel).
    turnos. *Critical Matters:* si es crítico, en vez de eso Sangrado de 5 por
    turno, permanente hasta curarse. Se acumula como cualquier Sangrado.
    *(Auditada 2026-10-10 con el dueño: las «heridas» son Sangrado; números
-   del original. De paso: un efecto de Critical Matters con el mismo nombre
+   del original; Perfora 1 para que el Sangrado entre más seguido. De paso: un efecto de Critical Matters con el mismo nombre
    que uno de siempre lo reemplaza — antes se sumaban.)*
 4. **Invi** [5] — Invi × 2 turnos. Se detecta con Percepción (DES). El
    rango para esta tirada depende de a qué velocidad se mueva: a

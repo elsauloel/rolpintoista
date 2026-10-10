@@ -146,6 +146,7 @@
     <div class="seccion" id="caja-mantenimiento" hidden>
       <button type="button" class="btn btn-mant" id="btn-mantenimiento" title="Pasar el turno para toda la mesa: fichas de los jugadores y creeps (solo GM)">⟳ Mantenimiento</button>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
+        <button type="button" class="btn chico" id="btn-pausa-mapa" style="grid-column:1/-1">⏸ Pausar partida</button>
         <button type="button" class="btn chico" id="btn-finalizar-mapa" style="grid-column:1/-1" title="Reparte la experiencia, el oro y el botín de los creeps que están en el mapa publicado">🏁 Finalizar combate</button>
       </div>
     </div>
@@ -214,6 +215,7 @@
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
 <script src="../comun/confirmar.js?v=20261010a"></script>
+<script src="../comun/pausa.js?v=20261010za"></script>
 <script src="../comun/sesion.js"></script>
 <script src="../comun/barra.js?v=20261002a"></script>
 <script src="../comun/menu-sitio.js"></script>
@@ -262,10 +264,10 @@
 <script src="js/08-mover-trampas-y-zonas.js?v=20261008zl"></script>
 <script src="js/09-colocar-y-panel.js?v=20261010a"></script>
 <script src="js/10-hud-y-vida.js?v=20261010p"></script>
-<script src="js/11-botonera-nueva.js?v=20261010z"></script>
+<script src="js/11-botonera-nueva.js?v=20261010za"></script>
 <script src="js/12-acciones-nuevas.js?v=20261010z"></script>
 <script src="js/13-tokens-portal-duelo.js?v=20261010w"></script>
-<script src="js/14-herramientas-y-arranque.js?v=20261010p"></script>
+<script src="js/14-herramientas-y-arranque.js?v=20261010za"></script>
 <script src="js/15-ficha-lite.js?v=20261010z"></script>
 <script src="js/16-momentos.js?v=20261008zl"></script>
 <script src="js/17-oportunidad.js?v=20261009m"></script>

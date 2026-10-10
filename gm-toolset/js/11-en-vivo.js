@@ -389,6 +389,7 @@ function gmAlEntrar(){
   $('#gm-identidad').textContent = '⚔ GM Tools · ' + barraTexto();
   mesaEscuchar();
   mesaHistorialAlEntrar();
+  if(typeof Pausa !== 'undefined'){ Pausa.iniciar({donde: 'gm'}); if(fbMiembro.gm === true) Pausa.boton($('#btn-pausa')); else $('#btn-pausa').hidden = true; }   // ⏸ (2026-10-10)
   if(typeof PPT !== 'undefined') PPT.iniciar();   // ✊ piedra, papel o tijera (adentro del mapa no: lo muestra el mapa)
   gmVivo.activo = fbMiembro.gm === true;
   gmEstadoAlDia();

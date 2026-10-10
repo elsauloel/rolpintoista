@@ -367,6 +367,12 @@ versión parecida en más de una, es candidato a juntar.
   ni ninguna ficha — vive solo dentro de la cuenta de ese golpe. Mismas limitaciones que `ignoraResistCrit`: solo
   modo `'arma'`, sin conectar del lado de gm-tools todavía.
 
+- **`pausa.js`** (`Pausa`, 2026-10-10, pedido del dueño) — **⏸ pausar la partida** entre sesiones: `iniciar({donde: 'mapa'|'ficha'|'gm'})` (escucha
+  `ajustes/pausa`, muestra el cartel y, en el mapa de un jugador, una capa sobre el lienzo que no deja tocar y frena sus teclas; cierra la Botonera),
+  `boton(el)` (el botón del GM: ⏸ Pausar / ▶ Reanudar; al reanudar muestra el registro con «Borrar» o «Guardar»), `alGuardar(cambios, personaje)`
+  (lo llama `FichaSesion.guardar` después de guardar: si está en pausa y no es el GM, anota en `pausaLog` lo importante que cambió) y
+  `diferencias(parte, viejo, nuevo)` (las líneas: DDE, nivel, experiencia, atributos, mochila, equipo, cinturón, habilidades, pasivas, talentos;
+  la vida, los No2 y las notas no). Lo cargan el mapa, la ficha y GM Tools. Reglas nuevas (`ajustes/pausa`, `pausaLog`).
 - **Cargas** (2026-10-10, Envenenar arma y los óleos): un estado con `cargas` y `golpe = {fijo, efectos}` (efectos en la forma de `efectosGolpe`)
   le suma a tus próximos ataques con arma ese daño fijo y esos efectos. `Combatiente.gastarCarga(estados, dueloId)` (cada ataque gasta una al pagar y
   tirar el PdG, pegue o no; un Re-roll no gasta otra; sin cargas se va al empezar el ataque siguiente), `cargaDeDuelo(estados, dueloId)` →

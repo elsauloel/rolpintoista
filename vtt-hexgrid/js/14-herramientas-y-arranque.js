@@ -798,6 +798,8 @@ function arrancarEnVivo(){
   escucharVinculables();
   escucharMantenimiento();
   recibidosEscuchar();   // los estados y las recompensas que les llegan a mis personajes (B-8)
+  Pausa.iniciar({donde: 'mapa'});   // ⏸ la pausa de la partida (2026-10-10): el jugador ve el mapa congelado
+  if(soyGM) Pausa.boton($('#btn-pausa-mapa'));
   PPT.iniciar();   // ✊ piedra, papel o tijera: los juegos donde juego yo (comun/ppt.js)
   // Estos dos disparan cambiarMapaMostrado (y con eso, fondo/modo/
   // iniciativa/tokens del mapa que corresponda).

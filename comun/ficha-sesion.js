@@ -147,8 +147,10 @@ const FichaSesion = (() => {
     }
     if(Object.keys(cambios).length){ cambios.actualizado = ts; batch.update(base, cambios); }
 
+    const antes = listas.map(([parte, json]) => [parte, f.ultimo[parte], json]);   // para el registro de la pausa (lo de antes y lo de ahora)
     try{
       await batch.commit();
+      if(typeof Pausa !== 'undefined') Pausa.alGuardar(antes, nombre);   // ⏸ partida en pausa: lo importante que cambió queda anotado para el GM
       listas.forEach(([parte, json]) => {
         f.ultimo[parte] = json;
         if(f.sucias[parte] && f.sucias[parte].json === json) delete f.sucias[parte];

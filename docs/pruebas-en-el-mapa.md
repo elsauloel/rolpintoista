@@ -10,6 +10,9 @@
 
 ## Pendientes
 
+- [ ] **⏸ La pausa de la partida** (2026-10-10, necesita las reglas nuevas pegadas): el GM pausa desde el mapa o GM Tools → el jugador ve el
+  cartel, el mapa congelado (no se puede tocar ni abrir la Botonera) y su ficha anda; compra o equipa algo → al reanudar, el GM ve esas líneas y
+  elige borrar o guardar el registro.
 - [ ] **✨ Toque mágico (Mago) con un golpe que entra** (2026-10-10): probado en el mapa que solo deja elegir al que está al lado, que el
   defensor solo tiene Evasión (sin Parry) y que el daño queda «3d6+14» arcano (Ef.Esp 14 de juan), sin «directo». Falta verlo pegar: el
   daño aplicado, restando la Defensa especial del objetivo y no su Defensa.

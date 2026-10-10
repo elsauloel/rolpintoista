@@ -244,6 +244,7 @@ bitacoraRender();  // estado inicial: sin conexión hasta entrar a la partida
 async function fbAlEntrar(){
   if(window.parent === window && typeof Duelo !== 'undefined') Duelo.escuchar({aplicarEfecto: dueloAplicarEfectoPropio});   // aviso «te están atacando» (en el mapa lo escucha el propio mapa); aplicarEfecto: solo para lo que sea sobre uno mismo, ver dueloAplicarEfectoPropio
   bitacoraEscuchar();
+  if(typeof Pausa !== 'undefined') Pausa.iniciar({donde: 'ficha'});   // ⏸ la pausa de la partida: el cartel (2026-10-10)
   fichaIdentidadRender();
   mesaEscuchar();
   mesaHistorialAlEntrar();

@@ -11,7 +11,8 @@
 >   ya existe (estado con `cargas` y `golpe`, `Combatiente.gastarCarga`). Empezar por los óleos del Bazar — propuesta esperando el OK del dueño:
 >   Óleo venenoso (Común, 1 carga, +2 y Veneno ×3, 35) y Óleo venenoso concentrado (Buena, 2 cargas, +3 y Veneno ×3, 75) —; después otros
 >   (fuego, sangrado, piedras de afilar…).
-> - [ ] **⏸ Pausar la partida (2026-10-10, lo próximo después de Envenenar arma y el óleo):** el GM pausa la partida al terminar una sesión.
+> - [x] **⏸ Pausar la partida** — hecho 2026-10-10 (`comun/pausa.js`; botón en el mapa del GM y en GM Tools). **Falta: que el dueño pegue las
+>   reglas nuevas** (`ajustes/pausa`, `pausaLog`) y probarlo en el mapa (ver `pruebas-en-el-mapa.md`). Lo pedido: el GM pausa la partida al terminar una sesión.
 >   Hasta la próxima, los jugadores pueden entrar y tocar su ficha (cambios, compras…), pero **no explorar el mapa**. Todo lo que hagan los
 >   jugadores durante la pausa queda en un **log**; al despausar, el GM ve el mensaje con todo lo que pasó y elige **borrar el log o guardarlo**.
 > - [ ] **Decisiones del estudio de peleas, para cuando sigamos avanzando** ([`balance-peleas.md`](balance-peleas.md)):

@@ -88,6 +88,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="escaneo-grupo.js"></script>
 <script src="trampas-base.js"></script>
 <script src="confirmar.js"></script>
+<script src="pausa.js"></script>
 <script src="glosario.js"></script>
 <script src="item-corto.js"></script>
 <script src="filtro-catalogo.js"></script>
@@ -2228,6 +2229,20 @@ prueba('Ejecución ✨: «el daño de tu arma» y la onda con dodge roll (Daño 
   const pj = FichaAcciones.habDueloDatos(S, S.habilidades[0], 0, 0);
   igual([armaUi, dodgeUi, c && [c.danoArma, c.ondaDodge, c.tipoDano], h.dano, h.dodge, Duelo.limpiarHab(h).dodge, sinArma.dano, !!(pj.dano && pj.dano.formula === FichaCombate.armaDanoTxt(S.inventario[0], FichaCalculo.calcular(S).final.dmg))],
     [true, true, [true, true, 'fisico'], {formula: '1d8 + 3', tipo: 'fisico', ignoraDef: false}, true, true, null, true]);
+});
+prueba('⏸ La pausa (2026-10-10): el registro anota lo importante que cambió en la ficha y no lo chico', () => {
+  const S0 = FichaGuardado.normalizar({}).S;
+  const a = structuredClone(S0); a.meta.dde = 120; a.meta.nivel = 2; a.attrs.fue = 3;
+  a.inventario = [{id: 'i1', nombre: 'Daga', equipado: false}, {id: 'i2', nombre: 'Soga'}];
+  a.cinturon = [{id: 'c1', nombre: 'Poción', cantidad: 2}];
+  a.habilidades = [{id: 'h1', nombre: 'Tajear'}];
+  const b = structuredClone(a); b.meta.dde = 80; b.attrs.fue = 4; b.hp = 3; b.meta.historia = 'otra';
+  b.inventario = [{id: 'i1', nombre: 'Daga', equipado: true}, {id: 'i3', nombre: 'Coraza de cuero'}];
+  b.cinturon = [{id: 'c1', nombre: 'Poción', cantidad: 1}];
+  b.habilidades = [{id: 'h1', nombre: 'Tajear'}, {id: 'h2', nombre: 'Envenenar arma'}];
+  const pa = FichaGuardado.partes(a), pb = FichaGuardado.partes(b);
+  const L = ['general', 'inventario', 'cinturon', 'habilidades', 'notas'].flatMap(p => Pausa.diferencias(p, pa[p], pb[p]));
+  igual([L, Pausa.activa()], [['DDE 120 → 80', 'Fuerza 3 → 4', 'se equipó Daga', 'sumó Coraza de cuero', 'ya no tiene Soga', 'Poción (cinturón): 2 → 1', 'sumó la habilidad Envenenar arma'], false]);
 });
 prueba('Cargas (2026-10-10): Arma envenenada — cada ataque gasta una (pegue o no), su duelo suma +3 y Veneno ×3; sin cargas se va', () => {
   const env = CLASES_SKILLS.find(x => x.id === 'asalto').habilidades.find(x => x.id === 'asalto-envenenar-arma');

@@ -381,6 +381,10 @@ y la última posición vista se calculan en cada navegador y no se guardan.
 ## Pasar cosas y el baúl común (2026-10-05, P157; reemplaza a la mesa común)
 - `campanas/{id}/paquetes/{docId}` — un personaje le ofrece a otro: `{tipo: 'item'|'dde'|'despojos', nombre, json (el ítem), itemId, cantidad, despojo, despojoNombre, deFicha, deNombre, paraFicha, paraNombre, uids: [quien lo creó, dueño de deFicha, dueño de paraFicha], creadoPor, estado: 'pendiente'|'aceptado'|'rechazado', resolvio, creado}`. Lo leen los de `uids` y el GM; quien recibe lo marca aceptado (y se lo suma) o rechazado; la pantalla que maneja a quien lo ofreció lo borra (transacción) y saca el ítem reservado (`reservado: docId` en el ítem) o lo libera.
 - `campanas/{id}/baul/{docId}` — un ítem por documento `{tipo: 'item', nombre, json, ranuras, puso, pusoNombre, creado}`; el oro en `baul/dde` y los despojos en `baul/desp-<tipo>` (`{tipo, cantidad, despojo, despojoNombre}`). Cualquier miembro guarda y saca.
+- `campanas/{id}/ajustes/pausa` — ⏸ la pausa de la partida (2026-10-10, `comun/pausa.js`): `{pausada, desde, gmNombre, actualizado}`. La
+  escribe el GM; la leen todos (el cartel y, en el mapa de un jugador, la capa que no deja tocar).
+- `campanas/{id}/pausaLog/{docId}` — el registro de la pausa: `{quien, jugador, personaje, texto, cuando}`, una línea por cambio importante
+  en una ficha mientras la partida está pausada. La crea el propio jugador; la lee y la borra el GM al reanudar.
 - `campanas/{id}/baulLog/{docId}` — el registro: `{accion: 'metio'|'saco', que, quien, jugador, personaje, cuando}`. Se crea, no se cambia; lo borra el GM.
 - `campanas/{id}/mesaComun` (retirada): solo lectura y borrado, para devolver lo viejo.
 - Código: `comun/intercambio.js` (la ficha: `intercambioHost` en `js/08`; el mapa: `intercambioHostMapa` en `js/11`). **Hay que volver a pegar `firebase/firestore.rules`.**

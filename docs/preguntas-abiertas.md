@@ -942,4 +942,6 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   Defensa; el presupuesto se va en Defensa especial y resistencias elementales; ir pesado casi no tiene contras. El guerrero con piezas «medias»
   pierde casi todo (14–16 %) y con las más defensivas le gana al asalto y al tirador (76–81 %). Soluciones posibles: A tres pesos por parte
   (liviana / media / pesada), B contras reales para lo pesado, C Defensa más barata en las partes chicas, D encarecer o enrarecer la Defensa
-  especial y las resistencias, E bono de conjunto, F posturas del guerrero. Recomendación: A + B + D, medido antes en el simulador. **Decide el dueño.**
+  especial y las resistencias, E bono de conjunto, F posturas del guerrero. El dueño eligió **A + B + D** (2026-10-10). Medido con kits de prueba: −4 Evasión no alcanza (lo pesado sigue dominando); **−2 PdG con la
+  pesada completa sí** (la media pasa a ser la mejor del guerrero), pero el tanque queda sin poder cerrar peleas (empata casi todo); −1 PdG se queda
+  corto. Recomendación: −2 PdG + una habilidad del tanque que lo compense (F). **Decide el dueño** antes de armar la tabla por parte del cuerpo.

@@ -61,3 +61,42 @@ Evasión o Sigilo, pero son pocas.
 
 **Recomendación de Claude:** A como base (le da identidad a cada peso), con B (si no, la pesada sigue dominando) y D (devuelve presupuesto a la
 Defensa). C y E, si después de medir hace falta. Antes de rehacer piezas, medir A+B+D en el simulador con un catálogo de prueba.
+
+## Medición de A + B + D (2026-10-10, kits de prueba, no el catálogo)
+
+El dueño eligió **A + B + D**. Se midió con kits por peso (`herramientas/prueba_pesos_armadura.py`): Común liviana 3,5 Def / media 7 /
+pesada 12,5 (Buena 6 / 12 / 18), con tres versiones de la contra de lo pesado. Detalle en
+[`prueba-pesos-armadura.md`](prueba-pesos-armadura.md) (B: −4 Evasión), [`prueba-pesos-armadura-pdg.md`](prueba-pesos-armadura-pdg.md)
+(B′: −2 PdG y pesada 10 / 15 Def) y [`prueba-pesos-armadura-pdg1.md`](prueba-pesos-armadura-pdg1.md) (B″: −1 PdG y pesada 10 / 15).
+
+**Guerrero, promedio de victorias contra las otras cuatro clases (Común / Buena):**
+
+| Cómo se arma | B (−4 Eva) | B′ (−2 PdG) | B″ (−1 PdG) |
+|---|---|---|---|
+| Espada y escudo · media | 45 / 50 | **58 / 57** | 52 / 56 |
+| Espada y escudo · pesada | 65 / 56 | 55 / 47 | 68 / 59 |
+| Hacha a dos manos · media | 11 / 40 | 29 / 45 | 23 / 43 |
+| Hacha a dos manos · pesada | 36 / 47 | 36 / 37 | 41 / 50 |
+
+**El tanque (pesada completa + escudo) contra el asalto y el tirador** (% que gana el tanque · % que gana el rival · el resto, empates por
+tiempo):
+
+| | B (−4 Eva) | B′ (−2 PdG) | B″ (−1 PdG) |
+|---|---|---|---|
+| vs Asalto, Común | 41 · 0 | 0 · 5 (95 empate) | 7 · 8 |
+| vs Tirador, Buena | 73 · 5 | 37 · 3 | 55 · 5 |
+
+Lectura:
+
+1. **−4 Evasión no alcanza**: los que van pesados tienen poca Agilidad, así que casi no lo sienten; lo pesado sigue dominando.
+2. **−2 PdG sí ordena al guerrero**: la media pasa a ser la mejor opción (o empatada) y la pesada queda como una elección con costo.
+   **−1 PdG se queda corto**: lo pesado vuelve a ganar.
+3. **El tanque con −2 PdG no muere, pero no mata**: casi todas sus peleas 1 contra 1 terminan en empate por tiempo. Para un tanque en grupo
+   (que protege y aguanta) no está tan mal, pero sin habilidades queda sin herramienta para cerrar una pelea. Lo natural: que el tanque tenga
+   una pasiva o habilidad que le saque parte de esa contra (solución F, «acostumbrado a las placas»), en vez de achicar la contra para todos.
+4. **Lo que la armadura no arregla**: el mago le gana a todos los que pegan cuerpo a cuerpo (su daño directo ignora la Defensa) y, a nivel 1,
+   el tirador que mantiene la distancia le gana al guerrero. Eso va por el lado de las habilidades (F) o de P187 (varitas).
+
+**Recomendación de Claude:** B′ (−2 PdG con la pesada completa) + que el tanque lo compense con una habilidad propia (F). Si el dueño lo
+aprueba, el paso siguiente es una tabla por parte del cuerpo para Común (y después Buena) con los tres pesos, para su OK antes de tocar el
+catálogo.

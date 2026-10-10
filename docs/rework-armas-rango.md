@@ -213,3 +213,25 @@ Agi 4, Des 6, HP 45, Def 8, Res T4 2 / T6 1, espada 1d6+1. Arquero Fue 3, Agi 8,
 - A decidir: (a) cuál de las dos; (b) si «el doble» es fijo o un número del ítem («Recarga N»: No2 de más por disparo, para diseñar por
   calidad: la de mano, Recarga 0–1; la pesada, 2; la de asedio, 3); (c) cuánto daño fijo compensa ese costo (se prueba con
   `herramientas/balance_combate.py`).
+
+## 2026-10-10 · Ballestas: las formas de cobrar, medidas (Claude, para decidir)
+
+Premisa (dueño): **la ballesta no suma Fuerza: el daño se lo da el arma**; ninguna idea de costo está descartada, se elige por balance.
+Medición: `balance_combate.py` (script de prueba aparte), ballesta Tipo 6, el Shooter contra un blanco medio, daño por turno, comparado con su
+arco largo «bueno» de la escalera (1d6+1 / 3d6 / 3d6+3, más la mitad de su Fuerza) y con su mejor arma cuerpo a cuerpo.
+
+| Cobro | Disparos por turno (Shooter) | Lo que pasa |
+|---|---|---|
+| Como arma (Tipo ÷ 2 y después el Tipo: 3, 6) | 1–2 | Con el daño fijo de hoy (3/4/5) se cae a casi 0 desde nivel 3 |
+| Como varita (1, 2, 3…) | 3–4 | Para no pasarse, cada disparo tiene que pegar poco; un disparo chico **no pasa la armadura** (la varita sí, porque ignora la Defensa). Nivel 5: 3,6 contra el arco 5,5; contra el pesado, 0 |
+| **«Lenta» (2, 4, 6…)** — la idea del dueño | 2 | Pocos disparos fuertes: el que pasa la armadura. Con la escalera de abajo, **≈ el arco y el cuerpo a cuerpo** a nivel 3 y 5 (5,2 / 4,7 / 4,9 y 5,9 / 5,5 / 5,9); a nivel 1 un poco arriba (134 %) |
+
+**Escalera propuesta (Tipo 6, cobro «lenta»):** Común 1d6+1 · Buena 2d6+4 a 2d6+6 · Rara 2d6+7 a 2d6+9. **El daño fijo tiene que crecer con la
+calidad** al ritmo de la Defensa (≈ +3 cada dos niveles): es lo que reemplaza a la Fuerza.
+
+**Perfora en los virotes:** contra la armadura, cada punto de Perfora rinde **igual que +1 de daño fijo** (medido: fijo 4 + Perfora 2 = fijo 6),
+pero **no se multiplica en el crítico**. Sirve para darle a la ballesta lo «anti-armadura» sin inflar el crítico; en la calculadora se cobra un
+poco menos que el daño fijo (la propuesta de 0,8 se sostiene).
+
+**El que tiene Fuerza sale perdiendo con la ballesta** (a propósito: es el arma del que no la tiene). El problema del «mono-Destreza» sigue siendo
+general (no de la ballesta).

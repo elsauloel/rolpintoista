@@ -10,6 +10,13 @@
 
 ## Pendientes
 
+- [ ] **⚔ Tajear (Asalto) con daño que entra** (2026-10-10): probado en el mapa que se ejecuta como ataque con el arma, cobra lo de un
+  ataque, avisa sin No2 y deja seguir, suma +1 al Crítico frecuente («Tajear suma +1 a tu Crítico frecuente, solo en esta tirada») y trae el
+  Sangrado al paso de efectos. Falta verlo **aplicado**: un golpe que pase la Defensa (contra el Coloso no pasó: 14 − 16; la Bruja esquivó dos
+  veces por empate) → Sangrado 3 por 3 turnos; y uno **crítico** → solo Sangrado 5, permanente (la regla nueva: el de Critical Matters
+  reemplaza al de siempre; la cubre `comun/pruebas.html`).
+- [ ] **🌀 Ráfaga arcana: ganar la Evasión y quedarse adentro del cono** (2026-10-10): salir del cono ✅ probado (la Bruja esquivó). Falta el
+  caso contrario: gana la Evasión, no sale (o declina) → le pega igual.
 - [ ] **🏹 Virotes con mapa** (2026-10-10, sin probar): de **humo** (nube de diámetro 3, 2 turnos, donde pega o cae), de **luz** (bengala de
   diámetro 3, 3 turnos), **explosivo** (1d6 de fuego a todos en la flor de 7 del blanco; si falla, queda para el GM), de **clavo** (contra una
   pared detrás: Inmovilizado 1 turno) y de **rebote** (si falla, un disparo gratis con PdG −2 contra el que está pegado al blanco).

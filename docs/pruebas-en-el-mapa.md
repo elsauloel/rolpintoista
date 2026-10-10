@@ -13,8 +13,6 @@
 - [ ] **Disputa del botín** (2026-10-08): fin de combate publicado → un jugador 🙋 Reclama → otro ⚔ Disputa → ✊ piedra, papel o tijera en las
   dos pantallas → el ítem queda a nombre del ganador → ↩ Soltar → el GM cierra el botín → lo reclamado llega a la mochila (con la XP y el oro).
   Mirar: los botones de cada fila, el «✊ En disputa: jugar», la Mesa, la línea verde del cierre.
-- [ ] **🎭 Acción incierta: una trampa colocada** (2026-10-09; lo demás, probado): un creep escondido que coloca una trampa se anuncia al rival
-  como «acción incierta» (si ya lo conocían) y su bando ve el detalle.
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 
 - [ ] **🏹 Apuntar con un arma de rango** (cuando se construya; pedido del dueño 2026-10-09): al atacar se ve tu Rango, los objetivos posibles, los que
@@ -39,7 +37,7 @@
   arco, que no sirve de oportunidad» (**arreglado probando**: los creeps no publicaban ese dato y la Crónica decía siempre «no tiene No2»).
   **🎭 Acción incierta, lado del GM**, con niebla de verdad: una copia del Escarabajo escondida y lejos no aparece en el orden de turnos del jugador
   (6 filas contra 7 del GM) ni su tirada en la Mesa; al acercarse a juan, el mapa del GM la marcó «revelado» sola; vuelta a la niebla, sigue en el
-  orden del jugador y su tirada le llega como «🎭 … está realizando una acción incierta». **Glosario**: en el «Ver» del Arco corto y de la Varita de
+  orden del jugador y su tirada le llega como «🎭 … está realizando una acción incierta». Y usando una Trampa de oso de su cinturón: el GM ve «🎭 … colocó una trampa («Trampa de oso»)» y el jugador solo «acción incierta». **Glosario**: en el «Ver» del Arco corto y de la Varita de
   chispa eléctrica, los términos marcados y el globo al pasar el mouse (Parálisis); «Detalles técnicos» en lista corta. **Perfora sin crítico**:
   tres intentos, un fallo y dos críticos: sigue pendiente.
 - ✅ **Línea de tiro, tiro alto, distancia ideal y distancia mínima** (2026-10-09, probado antes y anotado ahora): la línea al mouse (verde/roja, con

@@ -133,14 +133,15 @@ const FichaDuelo = (() => {
       atacar: d => {
         const S = getS();
         const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null;
-        const gc = Combatiente.gastarCarga(S.efectos, d.id);   // un arma envenenada, un óleo: este ataque gasta una carga (pegue o no)
-        if(gc.cambio) ui.cambio(['efectos']);
-        if(gc.carga) ui.toast(Combatiente.cargaTxt(gc.carga));
+        // Un arma envenenada, un óleo: este ataque gasta una carga (pegue o no), recién cuando se pagó (cancelar no la gasta).
+        const gastar = () => { const gc = Combatiente.gastarCarga(S.efectos, d.id); if(gc.cambio) ui.cambio(['efectos']); if(gc.carga) ui.toast(Combatiente.cargaTxt(gc.carga)); };
+        if(d.ataque.tipo === 'habilidad-arma') gastar();   // (los No2 ya los cobró la habilidad)
+        const uiA = {...ui, alPagar: gastar};
         if(d.ataque.tipo === 'habilidad-arma'){   // los No2 del ataque ya los cobró la habilidad: solo se tira el PdG (con lo que le suma)
           tirarValorStat(arma ? `PdG · ${arma.nombre}` : 'PdG', FichaCombate.pdgParaArma(S, arma).valor + num(d.ataque.mods && d.ataque.mods.pdg), 'pdg');
           return;
         }
-        if(d.ataque.tipo === 'normal') FichaAcciones.atacarConArma(S, arma, undefined, ui); else FichaAcciones.ataqueEspecialConArma(S, arma, d.ataque.tipo, undefined, ui);
+        if(d.ataque.tipo === 'normal') FichaAcciones.atacarConArma(S, arma, undefined, uiA); else FichaAcciones.ataqueEspecialConArma(S, arma, d.ataque.tipo, undefined, uiA);
       },
       // Para el crítico: el Crítico frecuente y potente del atacante (con el arma que usa).
       statsCritico: d => {

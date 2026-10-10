@@ -43,15 +43,21 @@ const CreepDuelo = (() => {
   // Atacar en el duelo: normal, de oportunidad o contraataque (cobra y tira el PdG). El normal pregunta si está Sentado. Sin No2
   // suficientes pregunta «¿Atacar igual?» (2026-10-02: antes se rechazaba y el aviso quedaba en GM Tools, escondido en el mapa).
   // `ui.confirmar` puede devolver una promesa (el mapa: el cartel del juego, nunca un confirm() nativo, que congela la pestaña).
-  async function atacarCon(ui, ref, tipo){
+  async function atacarCon(ui, ref, tipo, dueloId){
     const sc = ui.creep(ref);
     if(!sc) return;
     const qs = Combatiente.preguntaSentado(sc.estados, sc.nombre);   // Sentado no puede atacar (cualquier ataque): avisa y deja seguir
     if(qs && !(await ui.confirmar(qs))) return;
     const forzar = A().faltanNitros(sc, tipo);
     if(forzar && !(await ui.confirmar(A().preguntaSinNitros(sc, tipo)))) return;
-    return ui.cambiar(ref, c => A().pagarAtaque(c, tipo, forzar)).then(x => {
+    let carga = null;
+    return ui.cambiar(ref, c => {
+      const x = A().pagarAtaque(c, tipo, forzar);
+      if(x && !x.error && dueloId) carga = Combatiente.gastarCarga(c.estados || (c.estados = []), dueloId).carga;   // un arma envenenada: recién pagado
+      return x;
+    }).then(x => {
       if(!x) return;
+      if(carga) ui.toast(`${sc.nombre} · ${Combatiente.cargaTxt(carga)}`);
       A().alertaSinNitros(sc, tipo, x.forzado);
       if(tipo === 'normal') ui.borrarParry(ref);   // atacar cierra el Parry que esperaba su Bloqueo
       ui.publicar(sc, A().tiradaAtaque(ui.creep(ref) || sc, tipo));
@@ -110,12 +116,12 @@ const CreepDuelo = (() => {
       atacar: async d => {
         const sc = deLado(d.atacante);
         if(!sc) return;
-        if((sc.estados || []).some(e => e && e.golpe)){   // un arma envenenada, un óleo: este ataque gasta una carga (pegue o no)
+        if(d.ataque.tipo === 'habilidad-arma' && (sc.estados || []).some(e => e && e.golpe)){   // un arma envenenada: los No2 ya los cobró la habilidad
           const gc = await ui.cambiar(d.atacante.ref, c => Combatiente.gastarCarga(c.estados || (c.estados = []), d.id));
           if(gc && gc.carga) ui.toast(`${sc.nombre} · ${Combatiente.cargaTxt(gc.carga)}`);
         }
         if(d.ataque.tipo === 'habilidad-arma'){ ui.publicar(sc, pdgDeArreglos(sc, d.ataque)); return; }   // los No2 ya los cobró la habilidad
-        return atacarCon(ui, d.atacante.ref, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo);
+        return atacarCon(ui, d.atacante.ref, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo, d.id);
       },
       // Para el crítico: el Crítico frecuente y potente del creep y su Resistencia a crítico contra el Tipo del arma que lo ataca.
       statsCritico: d => {

@@ -462,6 +462,7 @@ const FichaAcciones = (() => {
     }
     S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, `atacó${arma ? ' con ' + arma.nombre : ''}`) : costo);
     const primero = FichaCombate.registrarAtaque(S, arma);   // cuenta el ataque con esa arma (comun/ficha-combate.js)
+    if(ui.alPagar) ui.alPagar();   // ya se pagó: un arma envenenada gasta su carga recién acá (2026-10-10)
     ui.cambio(['nitros']);
     tirarValorStat(S, arma ? `PdG · ${arma.nombre}` : 'PdG', FichaCombate.pdgParaArma(S, arma).valor, 'pdg', undefined, undefined, undefined, ui);
     const tipo = FichaCombate.tipoAtaque(arma);
@@ -478,6 +479,7 @@ const FichaAcciones = (() => {
       return;
     }
     S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, `hizo un ${nombre.toLowerCase()}${con}`) : costo);
+    if(ui.alPagar) ui.alPagar();   // ya se pagó (2026-10-10)
     ui.cambio(['nitros']);
     // Solo el contraataque suma el «PdG en contraataque» de la propia arma (los tipos 6 lo traen: +1 a +3, mucho menos valioso que un PdG normal porque es circunstancial);
     // y solo el ataque de oportunidad suma el «PdG en oportunidad» (los tipos 4, mismo criterio).

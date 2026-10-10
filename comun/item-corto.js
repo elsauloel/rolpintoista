@@ -20,11 +20,17 @@ const ItemCorto = (() => {
 .ic-filas .ic-v{color:var(--paper,#EDE3D2)}
 .ic-filas .ic-mano{color:var(--muted,#9A867E);font-size:11px}
 .ic-hace{font-size:12.5px;line-height:1.45;color:var(--paper,#EDE3D2);margin-top:4px}
-.ic-tecnico{margin-top:10px;border:1px dashed var(--line,#3B2E34);border-radius:4px;padding:8px 10px;font-size:12.5px;line-height:1.5;color:var(--muted,#9A867E)}
-.ic-tecnico > b{display:block;font-family:"Space Mono",monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;color:var(--muted,#9A867E)}
-.ic-tecnico p{margin:0 0 4px}
+.ic-tecnico{margin-top:10px;border:1px dashed var(--line,#3B2E34);border-radius:6px;padding:7px 10px;font-size:12px;line-height:1.45;color:var(--muted,#9A867E)}
+.ic-tecnico > b{display:block;font-family:"Space Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;color:var(--muted,#9A867E)}
+.ic-tecnico ul{margin:0;padding-left:16px}
+.ic-tecnico li{margin:1px 0}
+.ic-tecnico .ic-pie{margin-top:4px;font-size:11px;opacity:.8}
 .ic-trampa{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin-top:5px;padding:2px 9px;border:1px solid #C9A227;border-radius:999px;background:rgba(201,162,39,.16);color:#F0D27A;font-family:"Space Mono",monospace;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.ic-trampa span{font-family:inherit;font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted,#9A867E);font-size:11px}`;
+.ic-trampa span{font-family:inherit;font-weight:400;letter-spacing:0;text-transform:none;color:var(--muted,#9A867E);font-size:11px}
+`
+    + (typeof Glosario !== 'undefined' ? Glosario.CSS : '');   // los términos con globo (comun/glosario.js, se carga antes)
+  // Un texto con los términos del glosario marcados (al pasar el mouse, su explicación); sin el glosario, el texto tal cual.
+  const mk = t => typeof Glosario !== 'undefined' ? Glosario.marcar(t) : esc(t);
   let cssPuesto = false;
   function estilos(){
     if(cssPuesto || typeof document === 'undefined') return;
@@ -92,7 +98,7 @@ const ItemCorto = (() => {
   }
   function filasHtml(filas){
     estilos();
-    return `<div class="ic-filas">${filas.map(([e, v, nota]) => `<span class="ic-e">${esc(e)}</span><span class="ic-v">${esc(v)}${nota ? ` <span class="ic-mano">(${esc(nota)})</span>` : ''}</span>`).join('')}</div>`;
+    return `<div class="ic-filas">${filas.map(([e, v, nota]) => `<span class="ic-e">${esc(e)}</span><span class="ic-v">${mk(v)}${nota ? ` <span class="ic-mano">(${esc(nota)})</span>` : ''}</span>`).join('')}</div>`;
   }
   // El distintivo de una trampa (dueño, 2026-10-08: «tiene que ser visiblemente claro cuando un ítem es trampa»).
   const TRAMPA_BADGE = '<div class="ic-trampa">🪤 Trampa <span>se coloca en el mapa · la dispara un rival al pisarla</span></div>';
@@ -160,76 +166,33 @@ const ItemCorto = (() => {
     if(es && (num(es.pdg) || num(es.fijo) || num(es.critpot))) p.push(`Por la espalda (en sigilo): ${[num(es.pdg) ? `+${num(es.pdg)} PdG` : '', num(es.fijo) ? `+${num(es.fijo)} de daño` : '', num(es.critpot) ? `+${num(es.critpot)} Crítico potente` : ''].filter(Boolean).join(', ')}`);
     return p.join(' · ');
   }
-  // Las explicaciones de cada mecánica que tiene el arma (para «Detalles técnicos»).
-  const MECANICA = {
-    pdg: 'PdG: se suma a la tirada para pegar.',
-    pdgopor: 'PdG en oportunidad: solo se suma en un ataque de oportunidad (cuando un rival se aleja de tu lado). Ese ataque cuesta lo de un primer ataque y no cuenta como ataque del turno.',
-    pdgcontra: 'PdG en contraataque: solo se suma en un contraataque (después de ganar un Parry y un Bloqueo). Cuesta lo de un primer ataque y no cuenta como ataque del turno.',
-    rng: 'Alcance: pega a más casilleros de distancia sin dejar de ser cuerpo a cuerpo (sigue sumando el Dmg).',
-    ini: 'Iniciativa: actúa antes en el orden de los turnos.',
-    crit: 'Crítico frecuente: achica el rango del crítico (críticos más seguidos). El rango no baja de 2: en un Tipo 4 sirve hasta +2.',
-    critpot: 'Crítico potente: hace más fuerte el crítico (baja lo que hay que sacar en el d20 para ×2, ×3 y ×4), no lo hace más seguido. A diferencia del frecuente, en el Tipo 4 rinde hasta +6.',
-    parry: 'Parry: se suma al parar un golpe con el arma.', bloqueo: 'Bloqueo: se suma al aguantar el golpe después de un Parry.',
-    dmg: 'Dmg: se suma al daño de cada golpe.', eva: 'Evasión: se suma al esquivar.',
-  };
-  const MEC_EFECTO = {
-    'Drena vida': 'Drena vida N %: quien ataca se cura el N % de la vida que el golpe le sacó de verdad al defensor (lo que frena la armadura no cuenta; curar redondea para arriba). Lo que pase de su máximo se pierde.',
-    Rengo: 'Rengo: 3 turnos en que moverse le cuesta 2 No2 por casillero.',
-    Lisiado: 'Lisiado: 3 turnos con el PdG y el Parry a la mitad (se tira el dado completo y el resultado se divide por 2).',
-    Sangrado: 'Sangrado: pierde 1 HP por stack en cada Mantenimiento (entra con 2, o los stacks que diga el arma). El de un arma dura 2 turnos salvo que diga otra cosa; con un golpe crítico, queda permanente. Si ya sangraba: +1 stack y los turnos vuelven a empezar.',
-    Veneno: 'Veneno: pierde 1 HP por stack en cada Mantenimiento y un stack por turno (los turnos son los stacks). Los stacks nuevos se suman a los que ya tenía.',
-    'Veneno severo': 'Veneno severo: daño por turno que crece en cada Mantenimiento y no se va solo: hay que curarlo.',
-    Demora: 'Demora: baja al golpeado 1 lugar en el orden de turnos, para siempre (hasta que el GM reordene). Lo hace solo el mapa.',
-    Pajaritos: 'Pajaritos: 3 turnos con el PdG y la Evasión a la mitad (se tira el dado completo y el resultado se divide por 2).',
-    Aturdir: 'Aturdir: queda Stun (sin No2 por 2 turnos: no puede actuar).',
-    Derribar: 'Derribar: cae al suelo y queda Sentado: Evasión a la mitad y no puede atacar. No se le pasa solo: levantarse cuesta 1 No2.',
-    'Rompe armadura': 'Rompe armadura: deja Armadura rota (−1 de Defensa por stack). «Armadura rota doble»: deja 2 stacks por golpe.',
-  };
+  // «Detalles técnicos» de un arma (2026-10-09, dueño: «una vez que esté la explicación con el hover, se borra del detalle técnico para que no
+  // sea redundante; que sea más amigable a la vista»): solo lo que NO explica un globo del glosario (comun/glosario.js: Tipo, Perfora, tiro
+  // alto, Crítico frecuente, cada efecto…). Lo que queda: el Peso, el Alcance o Rango, la línea de tiro, cómo se tiran los efectos y la
+  // durabilidad con su número.
   function armaTecnico(it){
     if(!esArma(it)) return [];
-    // Un arma especial (varita, báculo, 2026-10-05) no tiene Tipo ni dados por Peso: se explica lo suyo (cómo se usa y qué cuesta).
-    if(it.especial){
-      const e = it.especial, sp = num(e.sp), du = e.duelo || {};
-      const E = [`Arma especial: se usa desde «✨ Atacar» de la Botonera, con su propio recorrido (sin ataque de oportunidad ni contraataque). Cuesta ${num(e.no2 ?? 1)} No2 el primer uso del turno y ${num(e.sube ?? 1)} más por cada uso siguiente, más ${sp} SP por uso (sin SP: 1 No2 más por cada SP).`];
-      E.push(`Peso ${Math.max(1, num(it.peso) || 1)}: lo que carga mientras está equipada (no cambia el daño).`);
+    if(it.especial){   // ✨ arma especial (varita, báculo, 2026-10-05): cómo se usa y qué cuesta
+      const e = it.especial, du = e.duelo || {};
+      const E = [`Se usa desde «✨ Atacar» de la Botonera, con su propio recorrido (sin oportunidad ni contraataque).`,
+        `Cuesta ${num(e.no2 ?? 1)} No2 el primer uso del turno, ${num(e.sube ?? 1)} más por cada uso siguiente y ${num(e.sp)} SP por uso (sin SP: 1 No2 más por cada SP).`];
       if(e.sumaEspecial) E.push(`Suma ${e.sumaEspecial === true ? 'tu Ef.Esp' : 'la mitad de tu Ef.Esp'} al daño.`);
-      if(num(du.critTipo)) E.push(`Es física: la frena la Defensa y critica como un arma de Tipo ${num(du.critTipo)} (contra la Resistencia a crítico Tipo ${num(du.critTipo)} del defensor).`);
+      if(num(du.critTipo)) E.push(`Es física: la frena la Defensa y critica como un arma de Tipo ${num(du.critTipo)}.`);
       E.push('No sirve para parrear ni bloquear.');
       return E;
     }
-    const tipo = num(it.tipoDado) || 8, L = [];
-    L.push(`Tipo ${tipo}: cada dado de daño es un d${tipo}. El primer ataque del turno con esta arma cuesta ${Math.ceil(tipo / 2)} No2 y los siguientes ${tipo}.`);
-    L.push(`Peso ${Math.max(1, num(it.peso) || 1)}: es la cantidad de dados de daño y lo que carga mientras está equipada.`);
-    if(num(it.danoAmplificado)) L.push('Daño amplificado: dados de daño de más que no pesan.');
-    if(num(it.danoFijo)) L.push('Daño fijo: se suma al resultado de los dados en cada golpe.');
-    if(it.tipoItem === 'arma_2m') L.push('A dos manos: ocupa las dos manos.');
-    if(it.armaDeRango) L.push('Línea de tiro: la tapan los obstáculos Sólidos y cualquier token que esté en el medio, aliado o rival. Si el disparo está tapado o la línea roza una casilla ocupada, el mapa avisa y lo decide la mesa. ⚙ Automatizado (al apuntar se ve la línea).');
-    if(Combatiente.esArco(it) && it.sinTiroAlto) L.push('Sin tiro alto: a diferencia del resto de los arcos, este no puede tirar por encima de los tokens que tapan la línea.');
-    if(Combatiente.tieneTiroAlto(it)) L.push(`Tiro alto: puede disparar por encima de los tokens que tapan la línea (no de los Sólidos), con el objetivo a ${Combatiente.TIRO_ALTO_MIN} casilleros o más y PdG ${Combatiente.TIRO_ALTO_PDG} en ese disparo. ⚙ Automatizado: el mapa lo ofrece cuando la línea está tapada por tokens.`);
-    if(it.armaDeRango && it.ideal && it.ideal.donde) L.push(`${Combatiente.idealTxt(it.ideal)}. Si el objetivo está en esa franja, el disparo suma eso; «a media distancia» y «lejos» se miden con tu alcance. Ubicarte cuesta No2. ⚙ Automatizado: al apuntar, los objetivos en tu distancia ideal brillan en celeste y el duelo suma el bono.`);
-    if(it.armaDeRango) L.push(Combatiente.esArco(it)
-      ? 'Arco: suma la mitad de tu Dmg (Fuerza), redondeada para arriba. Dispara con al menos 2 casilleros libres entre vos y el objetivo (en el mapa brillan los que están a tiro; si elegís uno más cerca, avisa y lo decide la mesa), y con el arco no se pega cuerpo a cuerpo ni se hacen ataques de oportunidad: si te encaran, alejate o cambiá de arma. ⚙ Automatizado.'
-      : 'A distancia: el daño es solo el del arma, no suma tu Dmg. ⚙ Automatizado.');
-    const vistos = new Set();
-    (it.mods || []).forEach(m => { if(m && MECANICA[m.stat] && !vistos.has(m.stat)){ vistos.add(m.stat); L.push(m.stat === 'rng' && it.armaDeRango ? 'Rango: lo que el arma le suma al alcance de quien la usa (su Rango, de la Destreza): hasta dónde llega el disparo.' : MECANICA[m.stat]); } });
-    if(num(it.ignoraResistCrit) || (it.efectosGolpe || []).some(e => /^ignora\s+\d+\s+de\s+res/i.test(String((e && e.nombre) || '').trim())))
-      L.push('Ignora N de Resistencia a crítico: al calcular el crítico, el defensor cuenta N puntos menos de Resistencia a crítico contra este golpe: es más fácil que salga crítico y se tiran más d20. ⚙ El duelo lo resta solo y lo muestra en la cuenta.');
+    const peso = Math.max(1, num(it.peso) || 1), L = [];
+    L.push(`Peso ${peso}: ${peso} dado${peso === 1 ? '' : 's'} de daño y lo que carga mientras está equipada.`);
+    if((it.mods || []).some(m => m && m.stat === 'rng' && num(m.val))) L.push(it.armaDeRango
+      ? 'Rango: lo que el arma le suma a tu Rango (de la Destreza): hasta dónde llega el disparo.'
+      : 'Alcance: pega a más casilleros de distancia sin dejar de ser cuerpo a cuerpo (sigue sumando el Dmg).');
+    if(it.armaDeRango) L.push('Dispara con Línea de tiro. ⚙ El mapa muestra la línea al apuntar.');
     const efs = (it.efectosGolpe || []).filter(e => e && e.nombre && !/^ignora\s+\d+\s+de\s+res/i.test(String(e.nombre).trim()));
-    efs.forEach(e => { const n = nombreEf(e); if(MEC_EFECTO[n] && !vistos.has(n)){ vistos.add(n); L.push(MEC_EFECTO[n]); } });
-    if(it.sinParry) L.push('No se puede parrear: contra esta arma el defensor solo puede esquivar (Evasión). ⚙ El duelo no le ofrece el Parry.');
-    if(it.oporGratis) L.push('Oportunidad sin No2: el ataque de oportunidad con esta arma no cuesta Nitros. ⚙ Automatizado.');
-    if(num(it.ahorroNitros)) L.push(`Primer ataque −${num(it.ahorroNitros)} No2: el primer ataque normal del turno con esta arma cuesta ${num(it.ahorroNitros)} No2 menos. ⚙ Automatizado.`);
-    if(num(it.critD20)) L.push(`+${num(it.critD20)} d20 en el crítico: cuando el golpe es crítico se tira${num(it.critD20) === 1 ? ' un d20' : 'n ' + num(it.critD20) + ' d20'} más para el multiplicador (más chance de ×3, ×4 y de supercrítico). ⚙ Automatizado.`);
-    if(efs.some(e => e.danoMagico)) L.push('Daño mágico (rayo, hielo…): se tira aparte cuando el golpe pega; va directo: no lo frenan la Defensa ni la Defensa especial, solo la resistencia a su elemento, y queda afuera del multiplicador del crítico. ⚙ Automatizado.');
-    if(efs.some(e => e.soloCritico)) L.push('⚡ Si es crítico (Critical Matters): ese efecto solo entra si el golpe fue crítico; si no, ni aparece.');
-    if(efs.some(e => pctEf(e) < 100 && !e.soloCritico)) L.push('Los porcentajes se tiran en el duelo, después del daño (50 % = una moneda, 33 % = un d6 que sale con 5 o 6, 25 % = un d4, 75 % = un d4 que falla solo con 1). Lisiado, Veneno y Sangrado necesitan que el golpe haga daño.');
-    if(efs.some(e => e.seguroCritico)) L.push('Seguro si es crítico: con un golpe crítico, el efecto entra sin tirar.');
-    if(efs.length) L.push('⚙ Automatizado: el duelo tira cada efecto y lo aplica con «Aplicar».');
-    { const dx = Math.round(num(it.durExtra));
-      if(dx) L.push(`Durabilidad ${durMax(it)} (${dx > 0 ? `Resistente ×${dx}: +${dx}` : `Frágil ×${-dx}: −${-dx}`} sobre lo normal, 3 por punto de Peso): cuánto desgaste aguanta antes de romperse.`);
-      else if(num(it.durPorPeso) > 0 && num(it.durPorPeso) !== 3) L.push(`Durabilidad ${durMax(it)} (${durPP(it)} por punto de Peso; lo normal es 3): cuánto desgaste aguanta antes de romperse.`); }
-    const es = it.espalda;
-    if(es && (num(es.pdg) || num(es.fijo) || num(es.critpot))) L.push('Por la espalda: cuenta solo si quien ataca está en sigilo y en el casillero justo de atrás del defensor (si lo ve, se da vuelta). ⚙ El mapa lo suma solo.');
+    if(efs.some(e => pctEf(e) < 100 && !e.soloCritico)) L.push('Los porcentajes se tiran en el duelo, después del daño.');
+    if(efs.length) L.push('⚙ El duelo tira los efectos y los aplica con «Aplicar».');
+    const dx = Math.round(num(it.durExtra));
+    if(dx) L.push(`Durabilidad ${durMax(it)} (${dx > 0 ? `+${dx}` : `−${-dx}`} sobre lo normal).`);
+    else if(num(it.durPorPeso) > 0 && num(it.durPorPeso) !== 3) L.push(`Durabilidad ${durMax(it)} (${durPP(it)} por punto de Peso; lo normal es 3).`);
     return L;
   }
   // Lo que se ve de un ítem en la tarjeta de una grilla para elegir.
@@ -239,7 +202,7 @@ const ItemCorto = (() => {
     if(item.trampaDatos) return trampaHtml(item.trampaDatos);
     const p = partes(item.detalle);
     const hace = p.hace || armaEsencial(item);   // un arma sin Detalle: lo esencial, de sus datos
-    return hace ? `<div class="ic-hace cat-detalle">${esc(hace)}</div>` : '';
+    return hace ? `<div class="ic-hace cat-detalle">${mk(hace)}</div>` : '';
   }
   // El recuadro «Detalles técnicos» (para «Ver»): '' si no hay nada técnico que contar.
   function tecnicoHtml(fuente){
@@ -252,16 +215,18 @@ const ItemCorto = (() => {
       if(fuente.trampaDatos && fuente.trampaDatos.detectar === undefined) extra.push('La dificultad para detectarla todavía no está definida.');
       if(fuente.pilaInfinita && !/apila/.test(p.tecnico)) extra.push('Se apila sin límite en la mochila.');
     }
-    const lineas = [p.tecnico, ...extra, p.auditar ? 'Creada automáticamente: las cifras están para auditar.' : ''].filter(Boolean);
-    if(!lineas.length) return '';
-    return `<div class="ic-tecnico"><b>Detalles técnicos</b>${lineas.map(l => `<p>${esc(l)}</p>`).join('')}</div>`;
+    const notas = String(p.tecnico || '').split(/\s*(?=[⚙✋])/).map(x => x.trim()).filter(Boolean);
+    const lineas = [...notas, ...extra].filter(Boolean);
+    if(!lineas.length && !p.auditar) return '';
+    return `<div class="ic-tecnico"><b>Detalles técnicos</b>${lineas.length ? `<ul>${lineas.map(l => `<li>${mk(l)}</li>`).join('')}</ul>` : ''}`
+      + `${p.auditar ? '<div class="ic-pie">Creada automáticamente: las cifras están para auditar.</div>' : ''}</div>`;
   }
   // Lo de «Ver»: qué hace (una trampa, en datos cortos), el Detalle sin las notas técnicas y el recuadro «Detalles técnicos».
   function verHtml(item){
     if(!item) return '';
     const p = partes(item.detalle);
     return (item.trampaDatos ? `<div class="view-detalle"><span class="view-label">Qué hace</span>${trampaHtml(item.trampaDatos)}</div>` : '')
-      + (p.hace ? `<div class="view-detalle"><span class="view-label">Detalle</span>${esc(p.hace)}</div>` : '')
+      + (p.hace ? `<div class="view-detalle"><span class="view-label">Detalle</span>${mk(p.hace)}</div>` : '')
       + tecnicoHtml(item);
   }
   return {CSS, partes, trampaFilas, trampaHtml, filasHtml, grillaHtml, tecnicoHtml, verHtml, armaEsencial, armaTecnico};

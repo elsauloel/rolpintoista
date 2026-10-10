@@ -87,6 +87,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ppt.js"></script>
 <script src="escaneo-grupo.js"></script>
 <script src="trampas-base.js"></script>
+<script src="glosario.js"></script>
 <script src="item-corto.js"></script>
 <script src="filtro-catalogo.js"></script>
 <script src="ficha-tienda.js"></script>
@@ -3368,18 +3369,27 @@ prueba('regla universal: el PdG en oportunidad / contraataque cuenta venga del a
     [true, 2, 'oportunidad', 'normal', 3, true, 'pdgopor', '']);
 });
 
+prueba('el glosario: marca los términos (la primera vez), no los básicos; «Detalles técnicos» no repite lo que explica un globo (2026-10-09)', () => {
+  const h = Glosario.marcar('Pasos de baile +1 · PdG +1 · Parálisis 1 turno · Perfora 1 · otra Parálisis');
+  const arco = CATALOGO_BASE.find(i => i.id === 'new-arco-corto');
+  const tec = ItemCorto.armaTecnico(arco).join(' | ');
+  igual([(h.match(/class="glo"/g) || []).length, /data-glo="Pasos de baile"/.test(h), /data-glo="PdG"/.test(h), /data-glo="Perfora"/.test(h),
+    !!Glosario.def('Parálisis'), /Tiro alto:/.test(tec), /Línea de tiro/.test(tec), Glosario.marcar('<b>') === '&lt;b&gt;'],
+    [3, true, false, true, true, false, true, true]);
+});
 prueba('cómo se ve un arma: en la grilla lo esencial (= el Detalle de las T4 Comunes, armado de sus datos); en «Ver», «Detalles técnicos» explica cada mecánica', () => {
   const t4 = CATALOGO_BASE.filter(i => /^arma_/.test(i.tipoItem) && !i.armaDeRango && ((i.tipoDado === 4 && ['Común', 'Buena Calidad', 'Raro', 'Excepcional'].includes(i.tier)) || (i.tipoDado === 6 && ['Común', 'Buena Calidad', 'Raro'].includes(i.tier)) || (i.tipoDado === 8 && ['Común', 'Buena Calidad', 'Raro'].includes(i.tier) && i.nombre !== 'Hacha arrojadiza') || (i.tipoDado === 10 && ['Común', 'Buena Calidad', 'Raro'].includes(i.tier))));   // las armas ya rehechas (la arrojadiza va con las de rango)
   const distintos = t4.filter(i => i.detalle !== ItemCorto.armaEsencial(i)).map(i => i.nombre);
   const punzon = t4.find(i => i.nombre === 'Punzón de matarife'), ver = ItemCorto.verHtml(punzon), grilla = ItemCorto.grillaHtml(punzon);
-  igual([t4.length, distintos, t4.every(i => i.descripcionNarrativa), /Detalles técnicos/.test(ver), /Lisiado: 3 turnos/.test(ver), /Seguro si es crítico/.test(ver), /Lisiado: 3 turnos/.test(grilla),
+  igual([t4.length, distintos, t4.every(i => i.descripcionNarrativa), /Detalles técnicos/.test(ver), /data-glo="Lisiado"/.test(ver) && /^Lisiado: 3 turnos/.test(Glosario.def('Lisiado').texto), /data-glo="seguro si es crítico"/.test(ver), /Lisiado: 3 turnos/.test(grilla),
     ItemCorto.armaEsencial({tipoItem: 'arma_2m', tipoDado: 4, peso: 2, mods: [{stat: 'rng', val: 1}], efectosGolpe: [{nombre: 'Sangrado', caras: 2, exitos: 1, turnos: 2}]})],
     [258, [], true, true, true, true, false, 'Tipo 4 · 2 manos · 2 dados · Alcance +1 · Sangrado 50 % (2 en d2) · 2 turnos']);
 });
 prueba('Demora (Tipo 10): el duelo la reconoce (también el nombre viejo, Knockdown) y «Detalles técnicos» la explica; Derribar sigue siendo Sentado', () => {
   const ver = ItemCorto.verHtml({nombre: 'Garrote de pastor', tipoItem: 'arma_1m', tipoDado: 10, peso: 1, efectosGolpe: [{nombre: 'Demora', caras: 3, exitos: 1}]});
-  igual([Duelo.specDeEfecto({nombre: 'Demora'}), Duelo.specDeEfecto({nombre: 'Knockdown'}), Duelo.specDeEfecto({nombre: 'Derribar'}), /1 lugar en el orden de turnos/.test(ver)],
+  igual([Duelo.specDeEfecto({nombre: 'Demora'}), Duelo.specDeEfecto({nombre: 'Knockdown'}), Duelo.specDeEfecto({nombre: 'Derribar'}), /1 lugar en el orden de turnos/.test(Glosario.def('Demora').texto) && !!ver],
     [{nombre: 'Demora'}, {nombre: 'Demora'}, {nombre: 'Sentado'}, true]);
+  igual([/data-glo="Demora"/.test(ItemCorto.grillaHtml({nombre: 'Garrote de pastor', tipoItem: 'arma_1m', tipoDado: 10, peso: 1, efectosGolpe: [{nombre: 'Demora', caras: 3, exitos: 1}]}))], [true]);
 });
 prueba('Armadura rota doble (Raras del Tipo 8): el texto lo dice y el duelo deja 2 stacks', () => {
   const ra = {nombre: 'Rompe armadura', caras: 2, exitos: 1, stacks: 2};
@@ -3394,7 +3404,7 @@ prueba('arma que ignora Resistencia a crítico: el duelo se la resta al defensor
   const sin = {pdg: {total: 15}, eva: {total: 3}, ataque: {tipoDado: 4, mods: {}}, critDatos: {frecuente: 0, potente: 0, resistencia: 3}};
   Duelo.entrarCritico(sin);
   const arma = {tipoItem: 'arma_1m', tipoDado: 4, peso: 1, danoFijo: 2, ignoraResistCrit: 2};
-  igual([ign, m.crit.resistencia, sin.crit.resistencia, m.crit.dados - sin.crit.dados, ItemCorto.armaEsencial(arma), ItemCorto.armaTecnico(arma).some(l => /^Ignora N/.test(l)),
+  igual([ign, m.crit.resistencia, sin.crit.resistencia, m.crit.dados - sin.crit.dados, ItemCorto.armaEsencial(arma), /data-glo="Res. crítico"/.test(ItemCorto.grillaHtml(arma)),
     Combatiente.ignoraResistCritArma(null)], [3, 1, 3, 2, 'Tipo 4 · 1 dado · +2 de daño · Ignora 2 de Res. crítico', true, 0]);
 });
 

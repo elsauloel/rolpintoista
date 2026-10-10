@@ -1450,3 +1450,12 @@ versión parecida en más de una, es candidato a juntar.
   (`cfg.flecha` → `ataque.flecha`: `guardarDano` suma los efectos; el mapa resta la Perfora de la Defensa). Si erra: hook `flechaErrada` del duelo
   (vtt-hexgrid/js/33). Los creeps con arco dejan siempre una flecha especial (`CombateFin`, `peleaConArco`). **Falta:** elegir flecha en la ficha
   suelta, en las Acciones de un creep y en las invocaciones.
+- **`glosario.js`** (`Glosario`, 2026-10-09, pedido del dueño) — **los términos del juego con globo al pasar el mouse**: un solo glosario armado de
+  los estados (`ESTADOS_PRESET`, su `detalle` sin las notas ⚙/✋), los bonos de las piezas (`FichaCalculo`: el `full` de cada stat) y las mecánicas
+  de armas y flechas (`MECANICAS`: Tipo, Perfora, tiro alto, distancia ideal, Crítico frecuente/potente, daño elemental, salto, carcaj…).
+  `marcar(texto)` → HTML con cada término (la primera vez que aparece; no los básicos: PdG, Evasión, Defensa…) en `<span class="glo">`; el globo
+  lo arma este archivo solo, en cualquier pantalla (también en los recuadros aislados del mapa: `composedPath`). `def(termino)`, `CSS` (va dentro de
+  `ItemCorto.CSS`). Lo usa `item-corto.js` en la grilla, el «Ver» y las filas de una trampa; se carga **antes** de `item-corto.js` (ficha, GM Tools,
+  generador de tiendas, editor del catálogo, mapa). **«Detalles técnicos» de un arma ya no repite lo que explica un globo**: queda el Peso, el
+  Alcance/Rango, la línea de tiro, cómo se tiran los efectos y la durabilidad, en una lista corta. **Un término nuevo**: sumarlo en `MECANICAS`, o
+  darle `full` a su stat o `detalle` a su estado.

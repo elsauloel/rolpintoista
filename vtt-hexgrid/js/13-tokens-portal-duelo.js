@@ -1224,7 +1224,6 @@ async function dueloAplicarDano(d){
   const perfora = !crit && d.ataque && d.ataque.flecha ? Math.min(num(d.ataque.flecha.perfora), def) : 0;
   let aplicar = golpe + perfora, ignoraDef = crit;   // sumar lo que perfora (hasta la Defensa) es lo mismo que restarle eso a la Defensa
   if(base.mitad){ aplicar = Math.ceil(Math.max(0, golpe - (def - perfora)) / 2); ignoraDef = true; }
-  if(perfora) freno = [freno, `perfora ${perfora}`].filter(Boolean).join(' − ');
   // Bloqueo perdido (mitad del daño): el arma o escudo con el que bloqueó pierde 1 punto de durabilidad (solo personajes: los creeps y las invocaciones no llevan).
   let desgaste = '';
   if(base.mitad && t.tipo === 'pj' && d.defensa && d.defensa.itemId){
@@ -1261,7 +1260,8 @@ async function dueloAplicarDano(d){
     if(!d.hab && d.ataque && d.ataque.flecha && d.ataque.flecha.salto && !res.r.invulnerable) await flechaSalto(d, dn.magico ? num(dn.magico.total) : 0).catch(err => console.error('No se pudo hacer saltar la flecha:', err));
     if(d.hab && d.hab.atrae && !res.r.invulnerable) await dueloAtraer(d).catch(err => console.error('No se pudo atraer al objetivo:', err));   // el gancho
     if(d.hab && d.hab.riesgo && (dn.rolls || []).map(num).includes(num(d.hab.riesgo.si))) await dueloRiesgo(d).catch(err => console.error('No se pudo aplicar el riesgo:', err));   // la inestable
-    return {...base, desgaste, defensa: crit ? restaIgnorando : def, ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {})};
+    // La Perfora le resta a la Defensa (no al daño): se informa la Defensa que contó y cuánto perforó (2026-10-09: «6 − Defensa 4 − perfora 1» confundía).
+    return {...base, desgaste, defensa: crit ? restaIgnorando : def - perfora, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);
     return {...base, defensa: def, manual: true, golpe: base.mitad ? aplicar : golpe, motivoManual: err && err.message === 'SIN_DEF' ? 'la ficha todavía no publicó su Defensa' : 'falló la escritura'};

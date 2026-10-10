@@ -398,6 +398,8 @@ const Duelo = (() => {
   const esAdjMag = n => /^(rayo|el[eé]ctric|t[oó]xic)/i.test(String(n || ''));
   const adjMag = n => /^t/i.test(String(n || '')) ? 'tóxico' : 'eléctrico';
   const magCorto = e => esAdjMag(e.nombre) ? `+${e.dado} ${adjMag(e.nombre)}` : `+${e.dado} de ${String(e.nombre).toLowerCase()}`;
+  // «Defensa 3 (4 − perfora 1)»: la Perfora le resta a la Defensa, no al daño.
+  const defTxt = dn => _num(dn.perfora) ? `Defensa ${_num(dn.defensa)} (${_num(dn.defensa) + _num(dn.perfora)} − perfora ${_num(dn.perfora)})` : `Defensa ${_num(dn.defensa)}`;
   const magTitulo = tipo => esAdjMag(tipo) && !/ y /.test(String(tipo)) ? `Daño ${adjMag(tipo)}` : `Daño de ${tipo}`;
   const limpiarEfectosFlecha = lista => (Array.isArray(lista) ? lista : []).filter(e => e && e.nombre).slice(0, 6).map(e => {
     const o = {nombre: txtCorto(e.nombre, 40), caras: Math.max(1, Math.round(_num(e.caras)) || 1), exitos: Math.max(1, Math.round(_num(e.exitos)) || 1), dado: txtCorto(e.dado, 20), detalle: txtCorto(e.detalle, 200)};
@@ -1055,7 +1057,7 @@ const Duelo = (() => {
       else if(dn.manual) L.push(`Daño: ${dn.golpe} (se aplicó a mano)`);
       else if(crit) L.push(`Daño: ${dn.crudo} × ${dn.mult} = ${dn.golpe} derecho a la vida (${dn.hpAntes} → ${dn.hpDespues} HP)`);
       else if(dn.mitad) L.push(`Daño: pasó la mitad → ${dn.recibido} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
-      else L.push(`Daño: ${dn.crudo} − Defensa ${dn.defensa}${dn.freno ? ` − ${dn.freno}` : ''} = ${dn.recibido} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
+      else L.push(`Daño: ${dn.crudo} − ${defTxt(dn)}${dn.freno ? ` − ${dn.freno}` : ''} = ${dn.recibido} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
     }
     if(dn && dn.magico) L.push(`${magTitulo(dn.magico.tipo)}: ${dn.magico.total} (${dn.magico.formula}; ignora la Defensa, sin multiplicar${dn.magico.resEl ? `; − ${dn.magico.resEl}` : ''})${dn.magico.recibido !== undefined ? ` → recibió ${dn.magico.recibido}` : ''}${dn.magico.hpDespues !== undefined ? ` (${dn.magico.hpAntes} → ${dn.magico.hpDespues} HP)` : ''}`);
     if(dn && dn.drena) L.push(`Drena: ${dn.drena.quien || d.atacante.nombre} se cura ${dn.drena.monto}${dn.drena.manual ? ` (a mano${dn.drena.motivo ? ': ' + dn.drena.motivo : ''})` : `${dn.drena.hpAntes !== undefined && dn.drena.hpAntes !== null ? ` (${dn.drena.hpAntes} → ${dn.drena.hpDespues} HP)` : ''}${_num(dn.drena.excedente) ? ` · Vida extra ${dn.drena.excedente}` : ''}${dn.drena.nota ? ' · ' + dn.drena.nota : ''}`}`);
@@ -1157,7 +1159,7 @@ const Duelo = (() => {
         : dn.mitad ? `⚠ ${m.atacante.nombre} → ${m.defensor.nombre}: pasó la mitad: ${dn.recibido} de daño (${dn.hpAntes} → ${dn.hpDespues} HP)`
         // El daño especial (ignora la Defensa): lo que lo frena va en `freno` (Defensa especial, Res. elemental) — no se repite como «Defensa» (2026-10-07).
         : dn.ignoraDef ? `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.crudo}${dn.freno ? ` − ${dn.freno}` : ''} = ${dn.recibido} de daño, directo a la vida (${dn.hpAntes} → ${dn.hpDespues} HP)`
-        : `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.crudo} − Defensa ${dn.defensa}${dn.freno ? ` − ${dn.freno}` : ''} = ${dn.recibido} de daño (${dn.hpAntes} → ${dn.hpDespues} HP)`;
+        : `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.crudo} − ${defTxt(dn)}${dn.freno ? ` − ${dn.freno}` : ''} = ${dn.recibido} de daño (${dn.hpAntes} → ${dn.hpDespues} HP)`;
     });
     anunciarMesa(anuncio);
   }
@@ -1714,7 +1716,7 @@ const Duelo = (() => {
         else if(dn.ignoraDef && d.hab && !(d.crit && d.crit.critico)) grande = `<div class="duelo-danonum rojo">${_fmt(golpe)}</div><div class="duelo-danosub rojo">DERECHO A LA VIDA</div><div class="duelo-danosub">daño ${_esc(d.hab.dano ? d.hab.dano.tipo : 'mágico')} · ignora la Defensa y no critica${dn.freno ? ` · lo frenan: ${_esc(dn.freno)} → entran ${_fmt(_num(dn.recibido) + _num(dn.absorbido))}` : ''}</div>`;
         else if(dn.ignoraDef) grande = `<div class="duelo-danonum rojo">${_fmt(golpe)}</div><div class="duelo-danosub rojo">DERECHO A LA VIDA</div><div class="duelo-danosub">${_fmt(dn.crudo)} × ${_fmt(dn.mult)} · el crítico ignora la Defensa</div>`;
         else if(dn.mitad) grande = `<div class="duelo-danonum">${_fmt(dn.recibido)}</div><div class="duelo-danosub">de daño (la mitad de ${_fmt(dn.crudo)} − Defensa ${_fmt(dn.defensa)}, redondeada para arriba${dn.freno ? `; además − ${_esc(dn.freno)}` : ''})</div>`;
-        else grande = `<div class="duelo-danonum">${_fmt(dn.recibido)}</div><div class="duelo-danosub">de daño (${_fmt(dn.crudo)} − Defensa ${_fmt(dn.defensa)}${dn.freno ? ` − ${_esc(dn.freno)}` : ''})</div>`;
+        else grande = `<div class="duelo-danonum">${_fmt(dn.recibido)}</div><div class="duelo-danosub">de daño (${_fmt(dn.crudo)} − ${_esc(defTxt(dn))}${dn.freno ? ` − ${_esc(dn.freno)}` : ''})</div>`;
         const vida = dn.hpAntes !== undefined && dn.hpAntes !== null && dn.hpDespues !== undefined && dn.hpDespues !== null
           ? `<div class="duelo-mini">${_esc(d.defensor.nombre)}: <b>${_fmt(dn.hpAntes)}</b> → <b>${_fmt(dn.hpDespues)}</b> HP${_num(dn.absorbido) ? ` · el escudo absorbió ${_fmt(dn.absorbido)}` : ''}</div>` : '';
         const esp = dn.espinas ? `<div class="duelo-mini" style="color:#8fe3a9">🌵 Espinas: ${_esc(dn.espinas.quien || d.atacante.nombre)} recibe <b>${_fmt(dn.espinas.monto)}</b> de daño devuelto (1/4 del daño del golpe, directo a la vida)${dn.espinas.manual ? ' — <b>aplicalo a mano</b>' + (dn.espinas.motivo ? ' (' + _esc(dn.espinas.motivo) + ')' : '') : (dn.espinas.hpAntes !== undefined && dn.espinas.hpAntes !== null ? ` · ${_fmt(dn.espinas.hpAntes)} → ${_fmt(dn.espinas.hpDespues)} HP` : '')}</div>` : '';

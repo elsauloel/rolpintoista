@@ -39,6 +39,9 @@
 > - [ ] **✨ Animaciones** (consulta del dueño, 2026-10-10; «no hagas nada todavía»): animar más cosas sin sobrecargar ni romper — nube tóxica
 >   con humo verde que persiste, piso congelado con un reflejo celeste (como la moneda), terreno incendiado con llamas, la bola de fuego con
 >   una explosión al ejecutarla y el fuego que queda unos segundos. Ver la respuesta del 2026-10-10 (qué se puede y cómo, sin cargar el mapa).
+>   **Para hacer con tiempo.** Sumado (dueño, 2026-10-10): **todo efecto eléctrico con trayectoria anima el rayo desde el que lo lanza hasta el
+>   primer objetivo**, no solo los saltos (hoy el rayo se ve solo en el rebote, momento «rayo»). Cuidados: animar solo lo visible, pocas
+>   partículas, pausar con la ventana oculta, y un interruptor «Animaciones: sí / no».
 > - [ ] **📏 «Calcular trayectoria» con la R** (dueño, 2026-10-10): que el botón de Rango (R) también permita ver la **línea de tiro** sin ir a
 >   «Atacar», y **elegir el punto de partida y el de llegada** (evaluar cómo sería el tiro desde otro casillero, no solo desde donde está parado).
 >   Reusar `lineaDeTiro` (js/32) y el dibujo de la línea del apuntado.

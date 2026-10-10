@@ -1042,6 +1042,17 @@ const Duelo = (() => {
     });
   }
 
+  // Los efectos que la habilidad le suma al golpe (2026-10-10, Tajear): los de siempre y, si fue crítico, los de ⚡ Critical Matters. Uno de
+  // Critical Matters con el mismo nombre que uno de siempre lo REEMPLAZA («de una manera si no es crítico, más intensa si lo es»): Tajear deja
+  // Sangrado 3 o, con crítico, Sangrado 5; Lisiar, Lesión −1 o −2. Lo que no se repite se suma, como antes.
+  function efectosDeHabilidad(d){
+    const normales = (d.ataque && d.ataque.efectos) || [];
+    const crit = (d.crit && d.crit.critico && d.ataque && d.ataque.critico && d.ataque.critico.efectos) || [];
+    const clave = e => String((e && (e.nombre || (e.spec && e.spec.nombre))) || '').trim().toLowerCase();
+    const reemplaza = new Set(crit.map(clave).filter(Boolean));
+    return [...normales.filter(e => !reemplaza.has(clave(e))), ...crit];
+  }
+
   /* ---------- resumen final en la Mesa ---------- */
   // Un renglón por cosa que pasó, para la línea de reporte de la Mesa.
   function lineasResumen(d){
@@ -2124,8 +2135,7 @@ const Duelo = (() => {
       // ⚡ Critical Matters (2026-09-29): a esta altura (el daño se tira después del crítico, ver entrarCritico)
       // d.crit ya está resuelto — si el golpe salió crítico, los efectos de duelo.critico.efectos se suman a
       // los de siempre (arma + habilidad), mismo mecanismo de "recordar y tirar" que ya usan efectosArma/efectos.
-      if(campo === 'dano') extra = {efectos: d.hab ? [] : [...(h.efectosArma ? (h.efectosArma(d) || []) : []), ...((d.ataque && d.ataque.efectos) || []),
-        ...((d.crit && d.crit.critico && d.ataque && d.ataque.critico && d.ataque.critico.efectos) || [])]};
+      if(campo === 'dano') extra = {efectos: d.hab ? [] : [...(h.efectosArma ? (h.efectosArma(d) || []) : []), ...efectosDeHabilidad(d)]};
       if(campo !== 'dano') retener(true);   // el PdG / Evasión / Parry / Fuerza / Bloqueo se muestran juntos cuando tiran los dos (elegir la defensa es a ciegas)
       let re = campo === 'eva' ? (m.modo === 'parry' ? /parry/i : /evasi/i) : RE_CAMPO[campo];
       if(d.hab && campo === 'pdg') re = new RegExp(escRe(etqTira(d)), 'i');
@@ -2469,5 +2479,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

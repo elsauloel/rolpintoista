@@ -367,6 +367,9 @@ versión parecida en más de una, es candidato a juntar.
   ni ninguna ficha — vive solo dentro de la cuenta de ese golpe. Mismas limitaciones que `ignoraResistCrit`: solo
   modo `'arma'`, sin conectar del lado de gm-tools todavía.
 
+- **Critical Matters reemplaza al mismo efecto** (2026-10-10, Tajear): `Duelo.efectosDeHabilidad(d)` — si el golpe fue crítico, un efecto de
+  `ataque.critico.efectos` con el mismo nombre que uno de `ataque.efectos` lo reemplaza (Tajear: Sangrado 3 → 5; Lisiar: Lesión −1 → −2); lo que
+  no se repite se suma. `Combatiente.ataqueConArreglos` lleva los `stacks` de un efecto (Sangrado de N).
 - **⚡ Critical Matters: efectos que solo pasan si el golpe es crítico (2026-09-29, pedido del dueño, auditando
   Lisiar — "un efecto que es de una manera si no es crítico, y de una manera más intensa si el golpe sí es
   crítico")**: en el paso "Al pegar" del 🎯/✨, solo para modo `'arma'` (el único que puede critear), un checkbox

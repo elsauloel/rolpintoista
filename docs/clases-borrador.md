@@ -119,9 +119,13 @@ cuesta 1 por defecto (`jobBudget`, 3 puntos + 3 por nivel).
 2. **Lisiar** [2] — Ataque con +1 al crítico. Causa lesión de -1 de PG al
    objetivo durante 2 turnos. *Critical Matters:* si es crítico, cambia
    el efecto a -2 fijo a la PG por 2 turnos.
-3. **Tajear** [3] — Ataque con +1 al crítico. Deja heridas de 3 de daño
-   por 3 turnos. *Critical Matters:* si es crítico, cambia el efecto a 5
-   de daño hasta curarse.
+3. ✅ **Tajear** — **No2:** ataque. **SP:** 3. Ataque con tu arma con +1 al
+   Crítico frecuente (solo ese golpe). Si pega: Sangrado de 3 por turno, 3
+   turnos. *Critical Matters:* si es crítico, en vez de eso Sangrado de 5 por
+   turno, permanente hasta curarse. Se acumula como cualquier Sangrado.
+   *(Auditada 2026-10-10 con el dueño: las «heridas» son Sangrado; números
+   del original. De paso: un efecto de Critical Matters con el mismo nombre
+   que uno de siempre lo reemplaza — antes se sumaban.)*
 4. **Invi** [5] — Invi × 2 turnos. Se detecta con Percepción (DES). El
    rango para esta tirada depende de a qué velocidad se mueva: a
    velocidad normal (1 No2 por casillero) el rango es una flor de 3; a

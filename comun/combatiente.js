@@ -977,7 +977,8 @@ const Combatiente = (() => {
     const a = c.arma || {}, arma = o.arma || {}, conX = o.X !== undefined && o.X !== null, X = nf(o.X);
     const sx = t => conX ? sustituirX(t, X) : t;
     const mapEf = e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1,
-      spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: nf(e.val)}] : e.mods, polaridad: e.stat ? (nf(e.val) >= 0 ? 'buff' : 'debuff') : undefined},
+      spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: nf(e.val)}] : e.mods, polaridad: e.stat ? (nf(e.val) >= 0 ? 'buff' : 'debuff') : undefined,
+        ...(nf(e.stacks) > 0 ? {stacks: Math.round(nf(e.stacks))} : {})},   // (Sangrado de N: Tajear, 2026-10-10)
       cura: nf(e.cura), detalle: e.detalle || ''});
     const critico = c.critico ? {
       ...(c.critico.efectos && c.critico.efectos.length ? {efectos: c.critico.efectos.map(mapEf)} : {}),

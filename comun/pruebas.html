@@ -2229,6 +2229,14 @@ prueba('Ejecución ✨: «el daño de tu arma» y la onda con dodge roll (Daño 
   igual([armaUi, dodgeUi, c && [c.danoArma, c.ondaDodge, c.tipoDano], h.dano, h.dodge, Duelo.limpiarHab(h).dodge, sinArma.dano, !!(pj.dano && pj.dano.formula === FichaCombate.armaDanoTxt(S.inventario[0], FichaCalculo.calcular(S).final.dmg))],
     [true, true, [true, true, 'fisico'], {formula: '1d8 + 3', tipo: 'fisico', ignoraDef: false}, true, true, null, true]);
 });
+prueba('Tajear (2026-10-10): Sangrado 3 por 3 turnos; con crítico, el de ⚡ Critical Matters (Sangrado 5) REEMPLAZA al de siempre', () => {
+  const taj = CLASES_SKILLS.find(x => x.id === 'asalto').habilidades.find(x => x.id === 'asalto-tajear');
+  const atq = Combatiente.ataqueConArreglos(taj, taj.duelo, {arma: {id: 'd', nombre: 'Daga', tipoDado: 4}, X: 0});
+  const sin = Duelo.efectosDeHabilidad({ataque: atq, crit: {critico: false}}), con = Duelo.efectosDeHabilidad({ataque: atq, crit: {critico: true}});
+  const otro = Duelo.efectosDeHabilidad({ataque: {efectos: [{nombre: 'Lesión'}], critico: {efectos: [{nombre: 'Veneno'}]}}, crit: {critico: true}});
+  igual([taj.costo, taj.nitrosCosto, atq.mods.critBono, sin.map(e => [e.nombre, e.spec.stacks, e.spec.turnos]), con.map(e => [e.nombre, e.spec.stacks]), otro.map(e => e.nombre)],
+    ['3', 'ATAQUE', 1, [['Sangrado', 3, 3]], [['Sangrado', 5]], ['Lesión', 'Veneno']]);
+});
 prueba('Ejecución ✨: el cono con dodge roll (Ráfaga arcana, 2026-10-10) — la skill del pool, el editor, la regla común y el duelo', async () => {
   const raf = CLASES_SKILLS.find(x => x.id === 'mago').habilidades.find(x => x.id === 'mago-rafaga-arcana');
   let r = 'nada';

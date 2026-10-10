@@ -80,3 +80,85 @@
 - **Virotes especiales:** se pueden **repetir muchos efectos de las flechas** sin problema; los que propuso Claude «están muy bien».
 - **Virotes de control:** se ven caso por caso.
 - Con esto «ya tenemos un panorama»: lo que sigue es elegir qué entra a la lista por calidad y medirlo.
+
+## 2026-10-10 · Lluvia de ideas de BONOS de ballesta (para elegir una por una y decir en qué calidad va)
+> Pedido del dueño: «muchas, muchas ideas de bonos de ballesta; yo después te digo: esta me gusta, esta en Común, esta en Buena…».
+> ✅ = ya existe (se puede usar ya) · ⚙ = hay que programarla.
+
+**Ritmo y recarga**
+1. ✅ Recarga 1 / 2 / 3 (rápida, común, de asedio).
+2. ✅ Llega cargada: el primer disparo del turno es gratis si no disparaste el turno anterior.
+3. ✅ Primer disparo −1 No2.
+4. ⚙ Cargador: 2 disparos «cargados» por combate (los dos primeros gratis), después recarga normal.
+5. ⚙ Doble cuerda: el segundo disparo del turno cuesta como el primero (2, 2, 6…).
+6. ⚙ Recarga rápida tras matar: si el disparo voltea al blanco, el siguiente es gratis.
+7. ⚙ Manivela: gastar 1 No2 sin disparar deja la próxima «cargada» (gratis).
+
+**Puntería**
+8. ✅ PdG +N.
+9. ✅ Apuntada +N (sin moverse en el turno).
+10. ⚙ Mira de lejos: +1 PdG por cada 3 casilleros de distancia.
+11. ⚙ Mira de cerca: +2 PdG a 1–3 casilleros.
+12. ✅ Distancia ideal (franja con PdG, daño o crítico).
+13. ⚙ Al acecho: +2 PdG contra un rival que no te vio este turno (sigilo/niebla).
+14. ⚙ Marcar: el blanco queda Marcado 1 turno (lo ven todos, no se esconde).
+15. ⚙ Tirador de apoyo: +1 PdG a los aliados que ataquen al mismo blanco este turno.
+
+**Contra la armadura (la casa)**
+16. ✅ Perfora N.
+17. ✅ Rompe armadura N % (y ×2 stacks).
+18. ✅ Atraviesa escudos (abolla el escudo que lo para).
+19. ⚙ Punta de diamante: contra Defensa 12 o más, Perfora +2.
+20. ⚙ Remachadora: cada golpe al mismo blanco en el combate suma +1 Perfora (hasta +3).
+21. ⚙ Desarma: 25 % de que el escudo del blanco caiga al piso (Desarmado del escudo).
+22. ⚙ Ignora la Defensa especial (el virote encantado).
+
+**Daño y crítico**
+23. ✅ Daño fijo +N · Crítico frecuente +N · Crítico potente +N · ignora N de Res. crítico.
+24. ⚙ Golpe de gracia: +3 de daño contra un blanco con la mitad de la vida o menos.
+25. ⚙ Primer disparo del combate: +1 dado.
+26. ⚙ Virote pesado: +2 de daño pero −1 Rango.
+27. ⚙ Daño elemental de la ballesta (+1d4 fuego / hielo / rayo / ácido), sin virote especial.
+28. ⚙ Doble virote: dispara dos virotes juntos al mismo blanco, dos tiradas de daño, por el doble de No2.
+
+**Control**
+29. ✅ Lisiado · Derribar · Sangrado · Veneno · Veneno severo · Demora · Rengo · Prende fuego (con %).
+30. ⚙ Empujón: el blanco retrocede 1 casillero (2 con Recarga 3).
+31. ⚙ Clavar al suelo: 25 % Inmovilizado 1 turno sin necesitar pared.
+32. ⚙ Silbido: Demora + avisa a los aliados (mesa).
+33. ⚙ Aturdir 20 % en un crítico.
+34. ⚙ Desequilibra: el blanco queda Sentado si estaba corriendo (se movió 3 o más este turno).
+
+**Posición y movimiento**
+35. ✅ A quemarropa (+N pegado).
+36. ✅ Oportunidad sin No2 · ⚙ Oportunidad con +2 PdG.
+37. ⚙ Disparo en retirada: alejarse 1 casillero después de disparar no provoca ataque de oportunidad.
+38. ⚙ Tiro alto (como el arco) en una ballesta de cuerda larga.
+39. ⚙ Trípode: si no te moviste, Recarga −1 en ese turno.
+40. ⚙ Desde lo alto: +2 PdG si estás en una casilla elevada (cuando exista la altura en el mapa).
+
+**Defensa y mano libre**
+41. ✅ Una mano (escudo u otra arma en la otra).
+42. ⚙ Ballesta-escudo: hace de escudo chico (Parry contra disparos con −2).
+43. ⚙ Bayoneta: se puede pegar cuerpo a cuerpo con ella (Tipo 4 flojo) y parrear.
+44. ⚙ Disparo de cobertura: si un aliado pegado a vos es atacado, podés gastar tu disparo para darle −2 al PdG del atacante.
+
+**Mapa y utilería**
+45. ⚙ Garfio con soga (la utilería de la Talabartería, o como rasgo).
+46. ⚙ Ballesta de muralla (torreta que usa cualquiera que esté al lado).
+47. ⚙ Linterna en la culata: luz de diámetro 3 alrededor del tirador.
+48. ⚙ Silenciosa (espera al sigilo, P184).
+49. ⚙ Señalizadora: el virote marca la casilla para los aliados (dibujo en el mapa 2 turnos).
+
+**Carcaj y virotes**
+50. ⚙ Carcaj integrado: +3 lugares de virotes especiales.
+51. ⚙ Virote recuperable: el virote especial que erra no se rompe nunca contra un obstáculo.
+52. ⚙ Ahorro: 50 % de que el virote especial no se gaste.
+53. ⚙ Afinidad: un tipo de virote (fuego, veneno…) hace +1 de su efecto con esta ballesta.
+
+**Debilidades que la abaratan (para diseñar barato)**
+54. ⚙ Pesada: −1 Evasión mientras está equipada.
+55. ⚙ Ruidosa: disparar rompe el sigilo de los que están cerca tuyo.
+56. ⚙ Frágil: −50 % de durabilidad.
+57. ⚙ Lenta de montar: no se puede disparar en el mismo turno que te moviste más de 2 casilleros.
+58. ⚙ Corto alcance: Rango −1.

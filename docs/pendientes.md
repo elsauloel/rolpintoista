@@ -28,6 +28,9 @@
 >   las combinaciones de bonos en defensas (`herramientas/calculadora_defensa.py`), con el mismo criterio.
 > - [x] (2026-10-10, dueño) **Parry: solo con armas cuerpo a cuerpo** (o escudo): ninguna de rango (arco, ballesta, pólvora), ninguna varita ni
 >   orbe; los báculos sí (son a dos manos: el Báculo de aprendiz pasó a dos manos).
+> - [ ] **📏 «Calcular trayectoria» con la R** (dueño, 2026-10-10): que el botón de Rango (R) también permita ver la **línea de tiro** sin ir a
+>   «Atacar», y **elegir el punto de partida y el de llegada** (evaluar cómo sería el tiro desde otro casillero, no solo desde donde está parado).
+>   Reusar `lineaDeTiro` (js/32) y el dibujo de la línea del apuntado.
 > - [ ] **Rework de los anillos** (dueño, 2026-10-10: «ameritan un rework, fueron hechos muy a ojo»).
 > - [ ] **La espada contra armadura** (idea del dueño, 2026-10-10): una espada que combine Rompe armadura, Perfora y Veneno. Medida: 1d6 + Perfora 1 +
 >   Rompe armadura 100 % + Veneno ×2 seguro = Rara (PC 13,1, ~$260); con Rompe armadura 50 %, Buena (10,1); con 25 % y Veneno al 50 %, Común (7,4).

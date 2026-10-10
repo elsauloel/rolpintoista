@@ -253,17 +253,21 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const muro = ignoraDef ? null : muroDe(t);   // Muro de escudos (js/26): un aliado con escudo al lado
   const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}`));
   const parteRef = base.collection('partes').doc('general');
+  const efectosRef = base.collection('partes').doc('efectos');   // los estados viven en su propia parte (2026-10-10: antes se leían de «general» y no estaban)
   const ts = firebase.firestore.FieldValue.serverTimestamp();
   const res = await fbDb.runTransaction(async tx => {
-    const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
+    const [parte, ficha, partEf] = await Promise.all([tx.get(parteRef), tx.get(base), tx.get(efectosRef)]);
     if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
     const datos = JSON.parse(parte.data().json || '{}');
+    const datosEf = partEf.exists ? JSON.parse(partEf.data().json || '{}') : null;
+    const efectos = datosEf && Array.isArray(datosEf.efectos) ? datosEf.efectos : (datos.efectos || []);
+    const efectosAntes = JSON.stringify(efectos);
     const rs = ficha.data().resumen || {};
     if(rs.def === undefined) throw new Error('SIN_DEF');
     const primero = !num((datos.ataquesArma || {})._golpe);
     datos.ataquesArma = {...(datos.ataquesArma || {}), _golpe: 1};   // (el Mantenimiento la vacía)
     const extra = defExtra(ignoraDef, primero, st => rs[st], o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0);
-    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : num(rs.def) + extra) + num(restaExtra || 0), datos.efectos);
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : num(rs.def) + extra) + num(restaExtra || 0), efectos);
     const previo = num(datos.hp);
     datos.hp = Math.max(0, previo - r.recibido);
     // Orbe de absorción (js/26): el daño mágico o elemental que llegó a la vida devuelve SP, una vez por turno.
@@ -274,6 +278,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
       datos.spGastado = num(datos.spGastado) - absorbe;
     }
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
+    if(datosEf && JSON.stringify(efectos) !== efectosAntes) tx.set(efectosRef, {json: JSON.stringify(datosEf), actualizado: ts});   // el escudo que bajó, lo que absorbió la Armadura arcana
     tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp, ...(absorbe ? {'resumen.sp': num(rs.sp) + absorbe} : {})});
     return {r, previo, nuevo: datos.hp, absorbe};
   });

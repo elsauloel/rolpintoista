@@ -2229,6 +2229,20 @@ prueba('Ejecución ✨: «el daño de tu arma» y la onda con dodge roll (Daño 
   igual([armaUi, dodgeUi, c && [c.danoArma, c.ondaDodge, c.tipoDano], h.dano, h.dodge, Duelo.limpiarHab(h).dodge, sinArma.dano, !!(pj.dano && pj.dano.formula === FichaCombate.armaDanoTxt(S.inventario[0], FichaCalculo.calcular(S).final.dmg))],
     [true, true, [true, true, 'fisico'], {formula: '1d8 + 3', tipo: 'fisico', ignoraDef: false}, true, true, null, true]);
 });
+prueba('Ejecución ✨: el cono con dodge roll (Ráfaga arcana, 2026-10-10) — la skill del pool, el editor, la regla común y el duelo', async () => {
+  const raf = CLASES_SKILLS.find(x => x.id === 'mago').habilidades.find(x => x.id === 'mago-rafaga-arcana');
+  let r = 'nada';
+  AsistenteDueloHab.abrir({nombre: raf.nombre, inicial: structuredClone(raf.duelo), costoInicial: {sp: raf.costo, nitrosCosto: raf.nitrosCosto}, alGuardar: x => { r = x; }});
+  const mia = [...document.querySelectorAll('.pap')].pop(), q = s => mia.querySelector(s);
+  const tabs = [...mia.querySelectorAll('[data-pap-paso]')].map(b => b.textContent.replace(/^\d+\. /, ''));
+  q(`[data-pap-paso="${tabs.indexOf('Objetivo')}"]`).click();
+  const dodgeUi = !!q('[data-ondadodge]:checked');
+  q('[data-pap="guardar"]').click(); await new Promise(res => setTimeout(res, 0));
+  const h = Combatiente.habEjecucion(raf, raf.duelo, {stat: () => 6, etq: s => s});
+  const sonic = Combatiente.habEjecucion({nombre: 'S'}, {objetivo: 'cono', tira: 'fue', contra: ['con'], efectos: []}, {stat: () => 6, etq: s => s});
+  igual([raf.costo, raf.nitrosCosto, dodgeUi, r && r.duelo && r.duelo.ondaDodge, h.objetivo, h.dodge, h.dano, Duelo.limpiarHab(h).dodge, sonic.dodge, Duelo.limpiarHab(sonic).dodge],
+    ['2', 3, true, true, 'cono', true, {formula: '2d4', tipo: 'arcano', ignoraDef: true, directo: true}, true, undefined, undefined]);
+});
 prueba('Ejecución ✨: el cono y «Pierde No2» (Sonic Boom) — editor, regla común, duelo y lo que recibe un personaje', async () => {
   let r = 'nada';
   const ini = {objetivo: 'cono', tira: 'fue', contra: ['con'], efectos: [{nombre: 'Pierde No2', no2: 1, no2Dif: true, no2Sentado: true}]};

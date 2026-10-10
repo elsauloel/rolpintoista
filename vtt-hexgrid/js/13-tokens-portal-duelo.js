@@ -877,6 +877,7 @@ function dueloChequearDodge(d){
   const t = tokens.get(d.defensor.tokenId);
   if(!a || !t) return true;   // sin datos: por las dudas, efecto completo (más seguro que dejarlo pasar gratis)
   if(a.centro && Array.isArray(a.centro.linea)) return a.centro.linea.includes(nbPack(t.col, t.fila));   // la línea (Varita láser)
+  if(a.centro && a.centro.cono) return conoDeArea(a.centro).has(nbPack(t.col, t.fila));   // el cono (Ráfaga arcana, 2026-10-10)
   return distanciaHex(a.centro, t) <= num(a.radio);
 }
 

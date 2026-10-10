@@ -276,7 +276,9 @@ const AsistenteDueloHab = (() => {
           <div class="fila"><input type="number" min="1" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros de largo</span></div>`;
       }
       if(st.objetivo === 'cono'){
-        h += `<p class="nota" style="margin-top:10px">No hay que marcar nada: al ejecutarla, todo rival dentro del <b>cono al frente de tu token</b> (el mismo de 16 casillas de la detección, hacia donde mirás; lo que tapa un Sólido no entra) entra en la cascada, uno detrás del otro. Vos tirás una sola vez y cada uno se resiste por separado. Sin dodge roll. No te afecta a vos.</p>`;
+        h += `<p class="nota" style="margin-top:10px">No hay que marcar nada: al ejecutarla, todo rival dentro del <b>cono al frente de tu token</b> (el mismo de 16 casillas de la detección, hacia donde mirás; lo que tapa un Sólido no entra) entra en la cascada, uno detrás del otro. Vos tirás una sola vez y cada uno se resiste por separado. No te afecta a vos.</p>
+          <label class="op" style="margin-top:8px"><input type="checkbox" data-ondadodge ${st.ondaDodge ? 'checked' : ''}> Quien gana su tirada tiene derecho a un dodge roll (salir del cono moviéndose, como en un área)</label>
+          <p class="nota">${st.ondaDodge ? 'Si gana, puede moverse para salir del cono: si sale, la esquiva; si se queda adentro, le pega igual.' : 'Sin tildar: quien gana su tirada no recibe nada (como Sonic Boom).'}</p>`;
       }
       if(st.objetivo === 'onda'){
         h += `<p class="nota" style="margin-top:10px">No hay que marcar nada: al ejecutarla, todo rival dentro de esta área <b>alrededor de tu token</b> entra en la cascada, uno detrás del otro. Vos tirás una sola vez y cada uno se resiste por separado. No te afecta a vos.</p>
@@ -730,7 +732,7 @@ const AsistenteDueloHab = (() => {
         if(st.efectosNotaOn && st.efectosNota.trim()) out.efectosNota = st.efectosNota.trim();
         if(st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'zona') out.radio = Math.max(st.objetivo === 'area' ? 0 : 1, st.radio);
         if(st.objetivo === 'linea') out.largo = Math.max(1, st.radio);
-        if(st.objetivo === 'onda' && st.ondaDodge) out.ondaDodge = true;
+        if((st.objetivo === 'onda' || st.objetivo === 'cono') && st.ondaDodge) out.ondaDodge = true;
         if(st.objetivo === 'zona'){
           out.zonaTurnos = st.zonaTurnos;
           if(st.zonaAmiga) out.zonaAmiga = true;

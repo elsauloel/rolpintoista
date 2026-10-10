@@ -879,7 +879,7 @@ const Combatiente = (() => {
       efectos: (c.efectos || []).map(efectoDeEjecucion),
       ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: nf(c.radio)} : {}),
       ...(c.objetivo === 'linea' ? {largo: Math.max(1, Math.round(nf(c.largo)) || 4)} : {}),   // línea recta desde quien la usa (2026-10-05, Varita láser)
-      ...(c.objetivo === 'onda' && c.ondaDodge ? {dodge: true} : {}),   // la onda que deja dodge roll (Daño en área)
+      ...((c.objetivo === 'onda' || c.objetivo === 'cono') && c.ondaDodge ? {dodge: true} : {}),   // la onda o el cono que deja dodge roll (Daño en área, Ráfaga arcana)
       ...(c.objetivo === 'onda' && c.conVista ? {conVista: true} : {}),   // la luz (2026-10-05, Varita de la luz): solo los que ve (los sólidos la tapan)
       // Tercera tanda de armas especiales (2026-10-05): lo que deja en el suelo un área (bola de fuego, ventisca), el −1 por casillero (pelea
       // cercana), lo que atrae (gancho, con la Fuerza del objetivo contra el Ef.Esp de quien la usa), los dos misiles que se reparten y el

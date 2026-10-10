@@ -187,8 +187,14 @@ Salvo Carga Elemental, todas son **Hechizo (PG: Esp · Daño: Esp)**.
 4. **Tormenta arcana** [15] — NO2: (5). Provoca una lluvia de 1d20
    proyectiles arcanos T4 P1 en flor de 2. Caen aleatoriamente sobre todos
    los objetivos posibles. Esquivable solo con dodge roll.
-5. **Ráfaga arcana** [2] — NO2: (3). Dispara una ráfaga arcana que hace
-   daño en área tipo 3. Área: cono de 3 al frente.
+5. ✅ **Ráfaga arcana** — **No2:** 3. **SP:** 2. Hechizo. 2d4 de daño arcano
+   a cada rival en el cono al frente (el de 16 casillas de la detección); no
+   afecta a aliados. PdG.Esp una vez contra la Evasión de cada uno; quien
+   gana tiene dodge roll (si sale del cono la esquiva, si queda adentro le
+   pega igual). Daño directo (ignora la Defensa especial). *(Auditada
+   2026-10-10 con el dueño: «tipo 3» no existía → 2d4; costo del original;
+   solo rivales; dodge roll como un área, no «ganar = esquivar». Antes:
+   «daño en área tipo 3, cono de 3 al frente».)*
 6. **Toque mágico** [3] — NO2: (4). Requiere un toque físico con la mano o
    el arma, usando PG contra Evasión. No se puede bloquear. A distancia
    melé, hace 3d T6 + ESP de daño mágico.

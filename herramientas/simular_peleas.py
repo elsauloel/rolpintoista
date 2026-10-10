@@ -296,7 +296,10 @@ def pct(x): return f'{round(100 * x)} %'
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--n', type=int, default=400)
+    ap.add_argument('--sin-efectos', action='store_true', help='sin los efectos al golpear (como la primera vuelta)')
     o = ap.parse_args()
+    global EFECTOS
+    EFECTOS = not o.sin_efectos
     random.seed(10)
     L = []
     L.append('# Balance — peleas simuladas entre arquetipos (2026-10-10)\n')
@@ -309,8 +312,13 @@ def main():
              'Recarga), Evasión o Parry → Bloqueo (el defensor elige Parry si su Destreza es mayor que su Agilidad y guarda 1 No2 para eso), crítico completo, '
              'Perfora, la Fuerza que suma cada familia y la distancia (arrancan a 6 casilleros; el cuerpo a cuerpo se acerca a 1 No2 por casillero; el arco '
              'no dispara pegado y se aleja comiéndose el ataque de oportunidad).\n')
-    L.append('**Qué NO mide:** efectos al golpear (veneno, sangrado, lisiado, rompe armadura…), habilidades y SP, consumibles, terreno y línea de tiro, '
-             'hechizos (Mago, Support y Debuffer no entran), y la inteligencia táctica de un jugador real. Los números son una guía, no un veredicto.\n')
+    L.append('**Segunda vuelta:** ' + ('con **los efectos al golpear** modelados como en el juego (veneno, veneno severo, sangrado, quemadura, rompe armadura, '
+             'lisiado, pajaritos, derribar → sentado, aturdir → stun, rengo, drena vida, daño elemental extra)' if EFECTOS else 'SIN los efectos al golpear (`--sin-efectos`)') +
+             ' y con **el Mago con varitas** (SP = Especial × 3 y su recarga; el costo que sube por uso; el daño directo ignora la Defensa y el especial lo frena la '
+             'Defensa especial, que el simulador supone 0 en armadura liviana, ¼ de la Defensa en la media y ⅓ en la pesada). A nivel 5 el mago usa varitas Buenas: '
+             'no hay Raras en el catálogo.\n')
+    L.append('**Qué NO mide:** habilidades, consumibles, terreno y línea de tiro, Support y Debuffer, y la inteligencia táctica de un jugador real. '
+             'Los números son una guía, no un veredicto.\n')
 
     # 1) 1 vs 1 con la mejor arma de cada clase, por nivel.
     clases = list(ARQ)
@@ -365,6 +373,8 @@ def main():
         'Warrior + Tanque': [('Warrior', MEJOR['Warrior']), ('Tanque', MEJOR['Tanque'])],
         'Asalto + Asalto': [('Asalto', 'daga'), ('Asalto', 'daga')],
         'Shooter + Shooter': [('Shooter', 'arco'), ('Shooter', 'ballesta')],
+        'Warrior + Mago': [('Warrior', MEJOR['Warrior']), ('Mago', 'varita')],
+        'Tanque + Mago': [('Tanque', MEJOR['Tanque']), ('Mago', 'varita')],
     }
     nombres = list(PAREJAS)
     for nivel in (1, 3, 5):
@@ -394,6 +404,32 @@ def main():
             del ARQ[c]['juegos']['_prueba']
             L.append(f'| {fam[0]} | ' + ' | '.join(cel) + ' |')
     print('familias listo', flush=True)
+
+    # 6) Cuánto suman los efectos al golpear (lo que se juntó en todas las peleas de arriba) y cada clase con y sin efectos.
+    if EFECTOS:
+        L.append('\n## Cuánto suman los efectos al golpear\n')
+        L.append('Juntado en todas las peleas de arriba. «Por aplicación»: el daño que hizo cada vez que entró (en el momento o por turno, hasta que venció '
+                 'o terminó la pelea; Drena vida: lo que curó). «Por ataque»: ese daño repartido entre todos los ataques hechos con armas que lo traen '
+                 '(cuenta la probabilidad y los que fallan): **es lo que suma, en promedio, tener ese efecto en el arma**. Los de control (lisiado, pajaritos, '
+                 'sentado, stun, rengo, rompe armadura) no hacen daño propio: su valor se ve en la tabla de abajo.\n')
+        L.append('| Efecto | Veces que entró | Daño por aplicación | Daño por ataque |')
+        L.append('|---|---|---|---|')
+        for nombre, (veces, dano) in sorted(EF_STATS.items(), key=lambda x: -x[1][1]):
+            if not veces: continue
+            por_ap = dano / veces if veces else 0
+            por_at = dano / ATAQUES_CON[nombre] if ATAQUES_CON[nombre] else 0
+            L.append(f'| {nombre} | {veces} | {por_ap:.1f} | {por_at:.2f} |')
+        L.append('\n**Cada clase con su mejor arma, con y sin los efectos** (% de victorias promedio contra las otras clases; nivel 1 / 3 / 5).\n')
+        L.append('| Clase · arma | Con efectos | Sin efectos |')
+        L.append('|---|---|---|')
+        for a in clases:
+            fila = []
+            for ef in (True, False):
+                EFECTOS = ef
+                fila.append(' / '.join(pct(statistics.mean([cruce([(a, MEJOR[a])], [(b, MEJOR[b])], nivel, o.n // 4)['A'] for b in clases if b != a])) for nivel in (1, 3, 5)))
+            EFECTOS = True
+            L.append(f'| {a} · {MEJOR[a]} | ' + ' | '.join(fila) + ' |')
+        print('efectos listo', flush=True)
 
     salida = RAIZ / 'docs' / 'balance-peleas.md'
     salida.write_text('\n'.join(L) + '\n', encoding='utf-8')

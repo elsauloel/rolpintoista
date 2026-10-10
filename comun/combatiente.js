@@ -400,8 +400,10 @@ const Combatiente = (() => {
      ahorroNitros N (el primer ataque del turno con ella cuesta N menos) · critD20 N (N d20 más al tirar el crítico). Un ítem los lleva sueltos; un
      creep o una invocación, en `armaRasgos` (los campos viejos armaEspalda / armaIgnoraResistCrit también cuentan).
      arco (2026-10-09, dueño; docs/rework-armas-rango.md): el arma de rango es un arco — suma la mitad del Dmg (ver dmgDelArma).
-     recarga N (2026-10-10, dueño: las ballestas): un arma de rango que no es arco cobra el disparo N, 2N, 3N… No2 (ver recargaDe). */
-  const RASGOS_ARMA = ['espalda', 'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga'];
+     recarga N (2026-10-10, dueño: las ballestas): un arma de rango que no es arco cobra el disparo N, 2N, 3N… No2 (ver recargaDe).
+     perfora N (2026-10-10, dueño: «la gracia de la ballesta es perforar»): el golpe ignora N puntos de la Defensa (no toda; con crítico no hace
+     falta). Cualquier arma puede traerla; se suma a la de la flecha o el virote. La aplica el mapa con el daño (ataque.perfora). */
+  const RASGOS_ARMA = ['espalda', 'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga', 'perfora'];
   /* Cuánto del Dmg (la Fuerza) suma el daño de un arma (2026-10-09, dueño): cuerpo a cuerpo, entero; un arco, la mitad redondeada para arriba;
      cualquier otra de rango (ballesta, pólvora), nada. `arma` = {armaDeRango, arco} (un ítem; de un creep o una invocación: armaDeRango y
      armaRasgos.arco). */
@@ -450,6 +452,7 @@ const Combatiente = (() => {
     if(esArco(arma)) o.arco = true;   // el mapa pide la distancia mínima del arco al elegir el objetivo (no viaja al duelo)
     if(arma && arma.armaDeRango && arma.ideal) o.ideal = arma.ideal;   // la distancia ideal y el tiro alto: los usa el mapa al apuntar
     if(tieneTiroAlto(arma)) o.tiroAlto = true;
+    if(n(arma && arma.perfora) > 0) o.perfora = Math.min(5, Math.round(n(arma.perfora)));   // Perfora N del arma (la suma el mapa al daño)
     return o;
   }
   /* La distancia ideal de un arma de rango (sweet spot, 2026-10-09, dueño): `ideal = {donde: 'cerca' | 'medio' | 'lejos' | 'franja', ancho,

@@ -1223,8 +1223,8 @@ async function dueloAplicarDano(d){
   const restaIgnorando = frenaAm ? armadmg : 0;
   const resEl = elDano && !trueDmg ? (await resistenciasDe(t, elDano, invLeida)).res : 0;
   let freno = [...(menosDist ? [d.hab && d.hab.menosPorOrden ? `${menosDist} por los que tocó antes en la línea` : `la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Defensa especial ${armadmg}`] : []), ...(resEl ? [Combatiente.resElementalTxt(elDano, resEl)] : [])].join(' − ');
-  // 🏹 Perfora N (la flecha, 2026-10-09): ignora N puntos de Defensa (no toda). Con crítico no hace falta: el crítico ya la ignora entera.
-  const perfora = !crit && d.ataque && d.ataque.flecha ? Math.min(num(d.ataque.flecha.perfora), def) : 0;
+  // 🏹 Perfora N (la flecha, 2026-10-09; el arma, 2026-10-10): ignora N puntos de Defensa (no toda). Con crítico no hace falta: el crítico ya la ignora entera.
+  const perfora = !crit && d.ataque ? Math.min(num(d.ataque.flecha && d.ataque.flecha.perfora) + num(d.ataque.perfora), def) : 0;
   let aplicar = golpe + perfora, ignoraDef = crit;   // sumar lo que perfora (hasta la Defensa) es lo mismo que restarle eso a la Defensa
   if(base.mitad){ aplicar = Math.ceil(Math.max(0, golpe - (def - perfora)) / 2); ignoraDef = true; }
   // Bloqueo perdido (mitad del daño): el arma o escudo con el que bloqueó pierde 1 punto de durabilidad (solo personajes: los creeps y las invocaciones no llevan).

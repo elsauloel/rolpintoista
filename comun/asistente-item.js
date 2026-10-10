@@ -441,7 +441,9 @@ const AsistenteItem = (() => {
         <div class="aa-fila">${campo('Primer ataque del turno: No2 de menos', `<input data-aa-c="ahorroNitros" type="number" step="1" min="0" value="${n(d.ahorroNitros) || 0}" style="max-width:110px">`)}
         ${campo('d20 de más en el crítico', `<input data-aa-c="critD20" type="number" step="1" min="0" value="${n(d.critD20) || 0}" style="max-width:110px">`)}</div></div>`;
       h += `<div class="aa-fila">${campo('Ignora Resistencia a crítico', `<input data-aa-c="ignoraResistCrit" type="number" step="1" min="0" value="${n(d.ignoraResistCrit) || 0}" style="max-width:110px">`,
-        'Puntos de Resistencia a crítico del defensor que este arma no cuenta al calcular el crítico (el duelo los resta solo). Típico de estiletes y estoques, desde Raro.')}</div>`;
+        'Puntos de Resistencia a crítico del defensor que este arma no cuenta al calcular el crítico (el duelo los resta solo). Típico de estiletes y estoques, desde Raro.')}
+        ${campo('Perfora', `<input data-aa-c="perfora" type="number" step="1" min="0" max="5" value="${n(d.perfora) || 0}" style="max-width:110px">`,
+          'Ignora esos puntos de la Defensa de quien recibe el golpe (no toda; con crítico no hace falta). Se suma a la de la flecha o el virote. La gracia de las ballestas; también en punzantes.')}</div>`;
       if(!d.armaDeRango){   // por la espalda (2026-10-03): solo si quien ataca está en sigilo y en el punto ciego del defensor; el mapa lo suma solo
         const es = d.espalda || {};
         const ne = k => `<input data-aa-esp="${k}" type="number" step="1" min="0" value="${n(es[k]) || 0}" style="max-width:110px">`;
@@ -646,6 +648,7 @@ const AsistenteItem = (() => {
           + (d.armaDeRango && typeof Combatiente !== 'undefined' && Combatiente.tieneTiroAlto(d) ? fila('Tiro alto', 'por encima de los tokens (objetivo a 4+, PdG −2)') : d.arco && d.sinTiroAlto ? fila('Tiro alto', 'no (debilidad)') : '')
           + (d.armaDeRango && d.ideal && d.ideal.donde && typeof Combatiente !== 'undefined' ? fila('Distancia ideal', e(Combatiente.idealTxt(d.ideal))) : '')
           + (n(d.ignoraResistCrit) > 0 ? fila('Ignora', `${f(n(d.ignoraResistCrit))} de Resistencia a crítico`) : '')
+          + (n(d.perfora) > 0 ? fila('Perfora', `${f(n(d.perfora))} (ignora ${f(n(d.perfora))} de Defensa)`) : '')
           + ([d.sinParry ? 'no se puede parrear' : '', d.oporGratis ? 'oportunidad sin No2' : '', n(d.ahorroNitros) ? `primer ataque −${f(n(d.ahorroNitros))} No2` : '', n(d.critD20) ? `+${f(n(d.critD20))} d20 en el crítico` : ''].filter(Boolean).length
             ? fila('Firma', e([d.sinParry ? 'no se puede parrear' : '', d.oporGratis ? 'oportunidad sin No2' : '', n(d.ahorroNitros) ? `primer ataque −${f(n(d.ahorroNitros))} No2` : '', n(d.critD20) ? `+${f(n(d.critD20))} d20 en el crítico` : ''].filter(Boolean).join(' · '))) : '')
           + (!d.armaDeRango && espaldaTxt(d.espalda) ? fila('Por la espalda', e(espaldaTxt(d.espalda) + ' (en sigilo)')) : '')
@@ -811,7 +814,7 @@ const AsistenteItem = (() => {
 
   // «+2 PdG, +1 de daño» (el bono por la espalda de un arma).
   const espaldaTxt = es => es ? [n(es.pdg) ? `+${f(n(es.pdg))} PdG` : '', n(es.fijo) ? `+${f(n(es.fijo))} de daño` : '', n(es.critpot) ? `+${f(n(es.critpot))} Crítico potente` : ''].filter(Boolean).join(', ') : '';
-  const NUMERICOS = ['peso', 'danoFijo', 'danoAmplificado', 'ignoraResistCrit', 'ahorroNitros', 'critD20', 'precioCompra', 'ranuras', 'equipoEstadoHpTurno', 'durExtra', 'durPorPeso'];
+  const NUMERICOS = ['peso', 'danoFijo', 'danoAmplificado', 'ignoraResistCrit', 'perfora', 'ahorroNitros', 'critD20', 'precioCompra', 'ranuras', 'equipoEstadoHpTurno', 'durExtra', 'durPorPeso'];
   function alEscribir(ev){
     if(!st) return;
     const t = ev.target, d = st.d;
@@ -888,7 +891,7 @@ const AsistenteItem = (() => {
       const am = es.aMano || {}, amT = String(am.texto || '').trim(), amR = String(am.tirada || '').replace(/\s+/g, ''), amE = String(am.etiqueta || '').trim();
       if(amT || amR) es.aMano = {...(amT ? {texto: amT} : {}), ...(amR ? {tirada: amR} : {}), ...(amE ? {etiqueta: amE} : {})}; else delete es.aMano;
       d.peso = Math.max(1, n(d.peso) || 1);
-      ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', ...(typeof Combatiente !== 'undefined' ? Combatiente.RASGOS_ARMA : ['ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga'])].forEach(k => delete d[k]);
+      ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', ...(typeof Combatiente !== 'undefined' ? Combatiente.RASGOS_ARMA : ['ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga', 'perfora'])].forEach(k => delete d[k]);
       if(!(d.efectosGolpe || []).length) delete d.efectosGolpe;
       d.mods = d.mods.filter(m => m.stat !== 'rng');
     }else if(grupoDe(d.tipoItem) === 'arma'){
@@ -899,6 +902,7 @@ const AsistenteItem = (() => {
       ['pdg', 'fijo', 'critpot'].forEach(k => { if(n(es[k]) > 0) eo[k] = Math.round(n(es[k])); });
       if(d.armaDeRango || !Object.keys(eo).length) delete d.espalda; else d.espalda = eo;
       if(n(d.ignoraResistCrit) > 0) d.ignoraResistCrit = Math.round(n(d.ignoraResistCrit)); else delete d.ignoraResistCrit;
+      if(n(d.perfora) > 0) d.perfora = Math.min(5, Math.round(n(d.perfora))); else delete d.perfora;   // Perfora N (2026-10-10)
       ['ahorroNitros', 'critD20'].forEach(k => { if(n(d[k]) > 0) d[k] = Math.round(n(d[k])); else delete d[k]; });
       ['sinParry', 'oporGratis'].forEach(k => { if(d[k]) d[k] = true; else delete d[k]; });
       if(d.armaDeRango && d.arco){ d.arco = true; d.tipoItem = 'arma_2m'; } else delete d.arco;   // un arco: siempre a dos manos
@@ -946,7 +950,7 @@ const AsistenteItem = (() => {
      con `{...base, ...d}` a una varita le quedaba el Tipo 8 de fábrica (y con él, daño físico y Parry), y a un arma que dejó de ser especial, su
      hechizo. Todas las pantallas guardan con esto. */
   const CONTROLADOS = ['especial', 'orbe', 'orbeResguardo', 'orbeSalvaje', 'orbeCustodio', 'orbeAbsorcion', 'tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', 'efectosGolpe',
-    'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga', 'durExtra', 'durPorPeso'];
+    'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga', 'perfora', 'durExtra', 'durPorPeso'];
   function fusionar(base, d){
     const o = {...(base || {}), ...(d || {})};
     CONTROLADOS.forEach(k => { if(!(k in (d || {}))) delete o[k]; });

@@ -51,6 +51,7 @@ DESCUENTO_ARCO = 0.7
 # medida con balance_combate.py con el cobro de la Recarga: Común 1d6+1 · Buena 2d6+4…+6 · Rara 2d6+7…+9). Se cobra al mismo factor que el arco
 # (así cae en su calidad con lugar para bonos); la de asedio (Recarga 3) un poco menos por punto (un solo disparo por turno, más grande).
 DESCUENTO_BALLESTA = 0.7
+PERFORA_VALOR = 0.8   # lo que vale cada punto de Perfora frente a +1 de daño fijo (docs/ideas-arcos-flechas.md)
 RECARGA_FACTOR = {1: 1.0, 2: 1.0, 3: 0.9}
 TIRO_ALTO_PC = 1.5            # el tiro alto (por encima de los tokens, PdG −2)
 IDEAL_FACTOR = {1: 0.35, 2: 0.5, 3: 0.65}   # la distancia ideal: qué fracción de sus bonos fijos vale, según el ancho de la franja
@@ -106,7 +107,8 @@ def puntaje(arma):
     """Devuelve (PC total, desglose)."""
     tipo, peso, fijo = int(arma.get('tipoDado') or 0), int(arma.get('peso') or 1), float(arma.get('danoFijo') or 0)
     amp = int(arma.get('danoAmplificado') or 0)   # los dados amplificados también pegan (no pesan)
-    d = {'daño': (peso + amp) * (tipo + 1) / 2 + fijo * factor_plano(tipo)}
+    perf = min(5.0, float(arma.get('perfora') or 0))   # Perfora N (2026-10-10): 0,8 de un punto de daño fijo por punto
+    d = {'daño': (peso + amp) * (tipo + 1) / 2 + (fijo + PERFORA_VALOR * perf) * factor_plano(tipo)}
     if arma.get('armaDeRango') and arma.get('arco'): d['daño'] *= DESCUENTO_ARCO
     elif arma.get('armaDeRango') and int(arma.get('recarga') or 0) > 0: d['daño'] *= DESCUENTO_BALLESTA * RECARGA_FACTOR.get(int(arma['recarga']), 1.0)
     fam = familia(arma)
@@ -210,6 +212,7 @@ def extras(arma):
     n += 1 if arma.get('espalda') else 0
     n += 1 if float(arma.get('durPorPeso') or 0) > 3 or round(float(arma.get('durExtra') or 0)) else 0
     n += sum(1 for k in ('sinParry', 'oporGratis', 'ahorroNitros', 'critD20') if arma.get(k))
+    n += 1 if float(arma.get('perfora') or 0) > 0 else 0
     n += 1 if arma.get('armaDeRango') and not arma.get('arco') and arma.get('tiroAlto') else 0
     n += 1 if arma.get('armaDeRango') and (arma.get('ideal') or {}).get('donde') else 0
     return n

@@ -450,6 +450,8 @@ const Duelo = (() => {
     if(_num(cfg.primeraSangre) > 0 && !hab) inicial.ataque.primeraSangre = Math.min(10, Math.round(_num(cfg.primeraSangre)));
     // El bono del tiro (2026-10-09, arcos; docs/rework-armas-rango.md): lo calcula el mapa al elegir el objetivo — la distancia ideal del arco
     // (PdG, Crítico frecuente / potente, daño fijo, ignora Resistencia) y el tiro alto (PdG −2). `motivo` es lo que se lee («distancia ideal»).
+    // Perfora N del arma (2026-10-10, las ballestas): viaja en el ataque; el mapa la suma a la de la flecha o el virote al aplicar el daño.
+    if(_num(cfg.ataque.perfora) > 0 && !hab && inicial.ataque.tipo !== 'habilidad-arma') inicial.ataque.perfora = Math.min(5, Math.round(_num(cfg.ataque.perfora)));
     const tiro = cfg.tiro && !hab ? limpiarTiroBono(cfg.tiro) : null;
     if(tiro) inicial.ataque.tiro = tiro;
     // 🏹 La flecha especial del disparo (2026-10-09): sus efectos al golpear (siempre, sin %) se suman a los del arco al tirar el daño, y su

@@ -1153,6 +1153,8 @@ const Combatiente = (() => {
     const rc = recargaDe(o.arma);
     if(rc){   // una ballesta (o.arma, opcional): Recarga N → N, 2N, 3N…
       const h = Math.max(0, Math.round(n(o.hechos))), especial = o.ataque === 'oportunidad' || o.ataque === 'contra';
+      if(!especial && h === 0 && Math.round(n(o.costo)) === 0 && o.arma && (o.arma.cargada || (o.arma.armaRasgos && o.arma.armaRasgos.cargada)))   // llega cargada (2026-10-10)
+        return {no2: 0, lineas: ['Llega cargada: este disparo es gratis (no disparó con ella el turno anterior)', recargaTxt(rc)]};
       const base = especial ? rc : rc * (h + 1), l = [recargaTxt(rc)];
       l.push(especial ? `${o.ataque === 'contra' ? 'Contraataque' : 'Ataque de oportunidad'}: lo de un primer disparo = ${rc}; no cuenta como disparo del turno`
         : h ? `Ya disparó ${h === 1 ? 'una vez' : `${h} veces`} este turno: el disparo ${h + 1}.º = ${rc} × ${h + 1} = ${base}` : `Primer disparo del turno: ${rc}`);

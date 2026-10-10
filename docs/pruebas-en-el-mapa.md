@@ -10,6 +10,11 @@
 
 ## Pendientes
 
+- [ ] **🏹 Rasgos de ballesta** (2026-10-10): «llega cargada» ✅ probado (Ballesta de tranquera: el primer disparo marca 0 No2 y el duelo lo
+  dice). Falta: **apuntada** (Ballesta de guerra o del alguacil: sin moverse en el turno, el duelo suma «+2 PdG apuntada (no se movió)»; si se
+  movió, no) y **atraviesa escudos** (Ballesta pesada o de asedio contra un rival que pare el disparo con escudo: queda «¡PARADO!» y el que paró
+  recibe 1 stack de Armadura rota, con la línea en la Mesa).
+
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 
 

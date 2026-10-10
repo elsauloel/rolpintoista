@@ -72,3 +72,11 @@
 - «Llega cargada» y «Apuntada»: cuánto suben el daño por turno (un disparo gratis por combate es mucho al principio y poco en un combate largo).
 - «Doble carga» y «Un par de ballestas»: cuidado con duplicar el daño por turno.
 - Los de control (Aturdir, Inmovilizado) van con porcentaje y en virotes caros: «la ballesta pasa la armadura», no es la reina del control.
+
+## 2026-10-10 · Primera poda (dueño)
+- **Silenciosa (17): en espera** hasta definir el dilema del rango con sigilo (P184).
+- **Arpón / garfio con soga (18 y virote 7): no se descarta, pero va primero como ítem de utilería** — un **garfio con soga** (grappling hook) que
+  se vende en la **Talabartería**, no un arma. Como arma habría que buscarle la vuelta (una tirada de Fuerza contra la Constitución del objetivo, etc.).
+- **Virotes especiales:** se pueden **repetir muchos efectos de las flechas** sin problema; los que propuso Claude «están muy bien».
+- **Virotes de control:** se ven caso por caso.
+- Con esto «ya tenemos un panorama»: lo que sigue es elegir qué entra a la lista por calidad y medirlo.

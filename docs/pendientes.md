@@ -5,6 +5,35 @@
 
 > **En curso (2026-10-02): automatizar las habilidades de los personajes de «El origen de las especies»** → [`automatizar-habilidades-origen.md`](automatizar-habilidades-origen.md) (cuál está hecha, cuál espera y por qué).
 
+> **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
+> de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **Estudio de peleas, segunda vuelta** ([`balance-peleas.md`](balance-peleas.md), `herramientas/simular_peleas.py`): **se corre cuando el
+>   dueño diga.** Antes, dejarlo listo: (a) **los efectos al golpear modelados como en el juego** (veneno y veneno severo, sangrado, quemadura,
+>   rompe armadura, lisiado, pajaritos, derribar → sentado, aturdir → stun, rengo, drena vida, daño elemental extra; con los presets de
+>   `comun/estados-presets.js`) y **una estimación de cuánto daño suma cada efecto** (por aplicación, y cada arma con y sin efectos: «¿cuánto suma
+>   una daga que envenena al 25 %?»); (b) **las armas especiales y los magos**: un arquetipo Mago con varitas del catálogo real (su SP = Esp × 3 y
+>   la recarga, el costo que sube por uso, el daño directo que ignora la Defensa y el especial que frena la Defensa especial). Después, volver a
+>   correr todo. Sigue abierta la decisión de la armadura pesada (P186).
+> - [ ] **Sinergias de bonos: la combinación tiene valor en sí** (dueño: «el salto efectivo de calidad entre las comunes y las de buena calidad
+>   me parece un poco grande cuando veo todo lo que hace un arma de buena calidad»). Investigar **los bonos presentes en cada tipo de arma**, ver
+>   **cuáles interactúan** y **cuánto pesa la interacción**, para sumarla al **valor de calidad** (no solo al precio, como hoy el recargo de combo):
+>   - **Se potencian (la suma vale más que las partes):** Perfora + Veneno / Sangrado / Lisiado (los efectos que necesitan que pase daño:
+>     perforar los hace entrar más seguido); Crítico frecuente + Crítico potente.
+>   - **No interactúan o se anulan:** Crítico potente + Perfora (si hay crítico, la Defensa ya no cuenta: la Perfora no suma nada en ese golpe).
+>     Ahí la combinación vale **menos** que la suma (un descuento, a medir).
+>   - **Neutros (ni se potencian ni se anulan):** igual **+0,1 de valor de calidad por la combinación** («hay una subjetividad: la combinación de
+>     bonos en sí misma es un valor agregado»).
+>   - Hacerlo con números (la calculadora y el simulador), tipo de arma por tipo de arma; el objetivo es que una Buena traiga menos cosas juntas.
+> - [ ] **Lo mismo en escudos y el resto de los equipables** (dueño: «habría que pensar qué tanto sucede lo mismo con escudos y el resto»):
+>   las combinaciones de bonos en defensas (`herramientas/calculadora_defensa.py`), con el mismo criterio.
+> - [ ] **¿La ballesta parrea?** (visto al probarla, 2026-10-10): hoy una ballesta a dos manos tiene Parry contra cuerpo a cuerpo (el arco no).
+>   Decidir si se parrea con ella (quizás solo la de mano, o ninguna). Va a P (pregunta abierta) cuando se decida.
+> - [x] (2026-10-10) Perfora en dagas (su casa, la mitad de cada calidad) y espadas (un cuarto), con 10 armas nuevas — ver [`rework-armas.md`](rework-armas.md).
+> - [x] (2026-10-10) Ballestas (37), virotes (24), Recarga y Perfora del arma, probadas en el mapa — ver [`rework-armas-rango.md`](rework-armas-rango.md).
+> - [ ] Ballestas, tanda con mapa: rasgos «llega cargada», «apuntada», «a quemarropa» (hoy con la distancia ideal), «atraviesa escudos», ballesta
+>   de muralla; virotes explosivo, de humo, de luz, de clavo y de rebote; el garfio con soga como utilería de la Talabartería
+>   ([`ideas-ballestas.md`](ideas-ballestas.md)). La silenciosa espera al sigilo (P184).
+
 > **⭐ Prioridad (dueño, 2026-10-03): la auditoría del catálogo, con el paso a paso** ([`rework-armas.md`](rework-armas.md), «Rework metódico por
 > Tipo»): «el equipo es una parte esencial de la mecánica y si está desbalanceado te puede romper todo el juego». Tipo por Tipo y tier por tier.
 > - [x] (2026-10-03, armas: `ItemCorto.armaEsencial` / `armaTecnico`; aplicado a las T4 Comunes; falta el resto de los ítems a medida que se auditan) **Regla de cómo se ve un ítem** (dueño, 2026-10-03, como ya se hizo con las trampas): en la **grilla** del catálogo/tienda, solo lo esencial

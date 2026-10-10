@@ -27,6 +27,9 @@ Ya no hace falta correr nada para que un cambio del catálogo llegue a las herra
 - **detectar_efectos.py** — marca los ítems cuyo Detalle promete una mecánica que no está implementada
   (`python herramientas/detectar_efectos.py`).
 - **compilar_manual.py** — compila el manual (`manual-usuario/notas/` → `datos/manual.json`).
+- **balance_combate.py** (2026-10-09) — daño esperado por turno de cada clase y familia de arma (las palancas son opciones; ver docs/balance-combate.md).
+- **simular_peleas.py** (2026-10-10) — peleas completas 1 vs 1 y 2 vs 2 entre arquetipos con armas del catálogo real; escribe docs/balance-peleas.md.
+- **palancas_peleas.py** (2026-10-10) — prueba palancas de balance con esas peleas (sin cambiar reglas) y agrega la tabla al informe.
 - **rutas.py** — rutas del proyecto.
 
 ## Sobre los efectos escritos en Detalle

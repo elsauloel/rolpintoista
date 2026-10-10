@@ -151,7 +151,7 @@ function preguntarTipoAtaque(arma, otro){
   if(arma && arma.especial){ FichaAcciones.usarArmaEspecial(S, arma.id, false, habUi); return; }
   const costoNormal = costoAtaqueNitros(arma), primero = ataquesConArma(arma) === 0, especial = costoAtaqueEspecial(arma, 'contra', S), especialOpor = costoAtaqueEspecial(arma, 'oportunidad', S);
   const id = arma ? arma.id : '';
-  $('#tipo-ataque-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: arma ? arma.nombre : 'Sin arma', normal: costoNormal, primero, especial, especialOpor, attr: 'data-tipoataque', ref: id, primeroTxt: 'primer ataque con esta arma (Tipo ÷ 2)', siguienteTxt: 'Tipo completo (ya atacaste con esta arma este turno)'});   // el menú común
+  $('#tipo-ataque-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: arma ? arma.nombre : 'Sin arma', arma, normal: costoNormal, primero, especial, especialOpor, attr: 'data-tipoataque', ref: id, primeroTxt: 'primer ataque con esta arma (Tipo ÷ 2)', siguienteTxt: 'Tipo completo (ya atacaste con esta arma este turno)'});   // el menú común
   const normal = !otro && $('#tipo-ataque-lista').querySelector('[data-tipoataque^="normal:"]');
   if(normal){ normal.click(); return; }
   $('#scrim-tipo-ataque').classList.add('open');

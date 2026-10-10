@@ -541,7 +541,7 @@ async function ataqueEspecialCreep(sc, tipo){
 }
 function preguntarTipoAtaqueCreep(sc, otro){
   const normal = costoAtaqueCreep(sc), primero = num(sc.ataquesTurno) === 0, especial = costoContraataqueCreep(sc), especialOpor = CreepCalculo.costoOportunidad(sc);
-  $('#tipo-ataque-creep-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: sc.nombre, normal, primero, especial, especialOpor, attr: 'data-tipoataquecreep', ref: sc.id});   // el menú común
+  $('#tipo-ataque-creep-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: sc.nombre, arma: Combatiente.armaDeCombatiente(sc), normal, primero, especial, especialOpor, attr: 'data-tipoataquecreep', ref: sc.id});   // el menú común
   const directo = !otro && $('#tipo-ataque-creep-lista').querySelector('[data-tipoataquecreep^="normal:"]');
   if(directo){ directo.click(); return; }   // Atacar = ataque normal (dueño, 2026-10-06)
   $('#scrim-tipo-ataque-creep').classList.add('open');

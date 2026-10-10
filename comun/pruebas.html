@@ -534,6 +534,17 @@ prueba('el arco: distancia mínima (2 casilleros libres) y sin ataque de oportun
     CreepCalculo.oportunidadPosible(creepArco), CreepCalculo.oportunidadPosible(creepEspada)],
     [1, true, false, false, false, false, true, true, true, true, undefined, false, true]);   // 2026-10-10: el arco ya pega a 2 (1 libre)
 });
+prueba('la Recarga de la ballesta (2026-10-10): N, 2N, 3N… No2; no suma Dmg; un arco o una cuerpo a cuerpo no la tienen', () => {
+  const bal = {armaDeRango: true, recarga: 2, tipoDado: 6}, asedio = {armaDeRango: true, recarga: 3}, arcoR = {armaDeRango: true, arco: true, recarga: 2}, espada = {recarga: 2, tipoDado: 6};
+  const creep = {nombre: 'Ballestero', armaTipo: 6, armaDeRango: true, armaRasgos: {recarga: 3}, ataquesTurno: 1};
+  const l = Combatiente.costoAtaqueLineas({tipoArma: 6, arma: bal, hechos: 1, costo: 4, tiene: 8});
+  igual([Combatiente.recargaDe(bal), Combatiente.recargaDe(arcoR), Combatiente.recargaDe(espada),
+    [0, 1, 2].map(h => Combatiente.costoAtaque(6, h, bal)), [0, 1, 2].map(h => Combatiente.costoAtaque(6, h)),
+    Combatiente.ataquesPosibles(6, 8, bal), Combatiente.ataquesPosibles(6, 12, bal), Combatiente.ataquesPosibles(6, 8, asedio),
+    Combatiente.costoEspecial(6, bal, 'oportunidad'), Combatiente.dmgDelArma(bal, 10), CreepCalculo.costoAtaque(creep),
+    l.no2, /2\.º = 2 × 2 = 4/.test(l.lineas.join(' ')), Combatiente.rasgosDeItem(bal).recarga],
+    [2, 0, 0, [2, 4, 6], [3, 6, 6], 2, 3, 1, 2, 0, 6, 4, true, 2]);
+});
 prueba('la distancia ideal de un arma de rango: dónde está y qué da (2026-10-09)', () => {
   const arco = (ideal) => ({armaDeRango: true, arco: true, ideal});
   const cerca = arco({donde: 'cerca', ancho: 2, pdg: 1}), lejos = arco({donde: 'lejos', ancho: 2, crit: 1}), medio = arco({donde: 'medio', ancho: 1, critpot: 2}), fija = arco({donde: 'franja', desde: 5, hasta: 6, fijo: 2});

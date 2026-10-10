@@ -107,7 +107,7 @@ const FichaCombate = (() => {
   // El daño de un ataque sin arma (provisorio, P150): 1 dado del Tipo sin arma + Dmg. Antes no había, y el duelo quedaba «Tirando…».
   const danoSinArmaTxt = dmg => `1d${TIPO_SIN_ARMA}${num(dmg) ? ` + ${fmt(num(dmg))}` : ''}`;
   const ataquesConArma = (S, arma) => num((S.ataquesArma || {})[claveAtaque(arma)]);
-  const costoAtaque = (S, arma) => Combatiente.costoConAhorro(Combatiente.costoAtaque(tipoAtaque(arma), ataquesConArma(S, arma)), arma, ataquesConArma(S, arma));   // − ahorroNitros del arma en el primero
+  const costoAtaque = (S, arma) => Combatiente.costoConAhorro(Combatiente.costoAtaque(tipoAtaque(arma), ataquesConArma(S, arma), arma), arma, ataquesConArma(S, arma));   // − ahorroNitros del arma en el primero
   // Ataque de oportunidad y contraataque: siempre lo de un primer ataque, y no cuentan como ataque del turno (oportunidad: gratis si el arma es oporGratis).
   // S (opcional): con quien ataca, sus guantes que abaratan la oportunidad o el contraataque (2026-10-05).
   const costoAtaqueEspecial = (arma, tipo, S) => Math.max(0, Combatiente.costoEspecial(tipoAtaque(arma), arma, tipo) - (S ? Combatiente.ahorroEspecial(tipo, st => calc(S).final[st]) : 0));

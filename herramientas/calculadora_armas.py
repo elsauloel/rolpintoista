@@ -47,13 +47,18 @@ SOBREPRECIO = 1.5
 # del Dmg y su crítico choca con la resistencia más abundante). Su daño se cobra a este factor: así la escalera medida con balance_combate.py
 # (Común 1d4+1…2d4 / 1d6…1d6+1, Buena 3d4+1…3d4+2 / 2d6+2…3d6, Rara 4d4+2 / 3d6+2…4d6) cae en su calidad y deja lugar para bonos.
 DESCUENTO_ARCO = 0.7
+# Ballestas (2026-10-10, docs/rework-armas-rango.md): no suman Dmg; su daño fijo alto reemplaza a la Fuerza y crece con la calidad (la escalera
+# medida con balance_combate.py con el cobro de la Recarga: Común 1d6+1 · Buena 2d6+4…+6 · Rara 2d6+7…+9). Se cobra al mismo factor que el arco
+# (así cae en su calidad con lugar para bonos); la de asedio (Recarga 3) un poco menos por punto (un solo disparo por turno, más grande).
+DESCUENTO_BALLESTA = 0.7
+RECARGA_FACTOR = {1: 1.0, 2: 1.0, 3: 0.9}
 TIRO_ALTO_PC = 1.5            # el tiro alto (por encima de los tokens, PdG −2)
 IDEAL_FACTOR = {1: 0.35, 2: 0.5, 3: 0.65}   # la distancia ideal: qué fracción de sus bonos fijos vale, según el ancho de la franja
 # El valor de los bonos depende del Tipo del arma (dicho por el dueño): un bono plano (Dmg, daño fijo) rinde más en un arma barata en Nitros que en una cara:
 # se normaliza al costo en Nitros del primer ataque (Tipo ÷ 2): factor = 4 / ceil(Tipo / 2) (Tipo 8 = 1). El crítico mejorado rinde más en Tipo bajo (calculado con la regla del crítico).
 # Dos stats "de casa" por familia (P16, propuesta a confirmar); fuera de casa el bono cuesta ×1,25. Dmg, daño fijo y crítico valen para todas las familias (su valor ya depende del Tipo).
 STATS_CASA = {'punzante': {'pdg', 'rng', 'pdgopor'}, 'cortante': {'parry', 'ini', 'pdgcontra'}, 'hacha': {'bloqueo', 'rng'}, 'contundente': {'bloqueo', 'parry'},
-              'explosivo': {'rng', 'pdg'}, 'rango': {'rng', 'pdg'}}
+              'explosivo': {'rng', 'pdg'}, 'rango': {'rng', 'pdg'}, 'ballesta': {'rng', 'pdg'}}
 STATS_UNIVERSALES = {'dmg', 'crit', 'critpot'}
 FACTOR_CRIT = {4: 1.75, 6: 1.0, 8: 0.75, 10: 0.6, 12: 0.5}
 
@@ -67,10 +72,10 @@ ORDEN = [t for t, _ in UMBRAL_TIER]
 PESO_EFECTO = {'Rompe armadura': 4, 'Demora': 4, 'Aturdir': 5, 'Lisiado': 3, 'Sangrado': 2, 'Envenenar': 2, 'Veneno severo': 3,
                'Derribar': 3, 'Prende fuego': 3.5, 'Drena vida': 4, 'Explosión': 6, 'Rengo': 3,
                'Pajaritos': 4}   # Pajaritos (2026-10-03, dueño: de los contundentes): PdG y Evasión a la mitad 3 turnos   # Explosión: la razón de ser del Tipo 12; el peso es a radio 1, cada radio extra suma +50 %
-CASA = {'hacha': {'Rompe armadura'}, 'contundente': {'Demora', 'Aturdir', 'Pajaritos'}, 'punzante': {'Lisiado'}, 'cortante': {'Sangrado'}, 'explosivo': {'Explosión'}}
-HABILITADO = {'Envenenar': {'hacha', 'cortante', 'punzante', 'rango'}, 'Veneno severo': {'hacha', 'cortante', 'punzante', 'rango'},
+CASA = {'ballesta': {'Rompe armadura'}, 'hacha': {'Rompe armadura'}, 'contundente': {'Demora', 'Aturdir', 'Pajaritos'}, 'punzante': {'Lisiado'}, 'cortante': {'Sangrado'}, 'explosivo': {'Explosión'}}
+HABILITADO = {'Envenenar': {'hacha', 'cortante', 'punzante', 'rango', 'ballesta'}, 'Veneno severo': {'hacha', 'cortante', 'punzante', 'rango', 'ballesta'},
               'Sangrado': {'punzante', 'hacha'}, 'Lisiado': {'cortante'}, 'Rompe armadura': {'contundente'}, 'Aturdir': {'explosivo'},
-              'Demora': {'explosivo'}, 'Derribar': {'contundente', 'hacha', 'explosivo'}, 'Prende fuego': {'explosivo', 'rango'},
+              'Demora': {'explosivo'}, 'Derribar': {'contundente', 'hacha', 'explosivo', 'ballesta'}, 'Prende fuego': {'explosivo', 'rango', 'ballesta'},
               'Drena vida': {'cortante', 'punzante'}, 'Rengo': {'punzante', 'cortante'}, 'Pajaritos': {'explosivo'}}
 FAMILIA_POR_TIPO = {4: 'punzante', 6: 'cortante', 8: 'hacha', 10: 'contundente', 12: 'explosivo'}
 # efectos del catálogo actual que ya no existen en el diseño nuevo (no suman)
@@ -80,7 +85,7 @@ ALIAS = {'Knockdown': 'Demora'}
 
 def familia(arma):
     if arma.get('armaDeRango'):
-        return 'rango'
+        return 'ballesta' if int(arma.get('recarga') or 0) > 0 else 'rango'   # la ballesta: su casa es Rompe armadura (2026-10-10)
     return FAMILIA_POR_TIPO.get(int(arma.get('tipoDado') or 0), 'cortante')
 
 
@@ -103,6 +108,7 @@ def puntaje(arma):
     amp = int(arma.get('danoAmplificado') or 0)   # los dados amplificados también pegan (no pesan)
     d = {'daño': (peso + amp) * (tipo + 1) / 2 + fijo * factor_plano(tipo)}
     if arma.get('armaDeRango') and arma.get('arco'): d['daño'] *= DESCUENTO_ARCO
+    elif arma.get('armaDeRango') and int(arma.get('recarga') or 0) > 0: d['daño'] *= DESCUENTO_BALLESTA * RECARGA_FACTOR.get(int(arma['recarga']), 1.0)
     fam = familia(arma)
     bonos = crit = 0.0
     for m in arma.get('mods') or []:

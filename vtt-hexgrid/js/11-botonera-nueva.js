@@ -111,9 +111,9 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261009z', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261009r', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261009r', '../comun/ficha-mantenimiento.js?v=20261008y', '../comun/ficha-calculo.js?v=20261009r', '../comun/ficha-combate.js?v=20261009n', '../comun/skills-clase.js?v=20261008x', '../comun/ficha-habilidades.js?v=20261007ar',
-  '../comun/catalogo.js?v=20261009z9', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261009r', '../comun/ficha-resumen.js?v=20261009m', '../comun/inv-calculo.js?v=20261009n', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261009x', '../comun/inv-duelo.js?v=20261010a', '../comun/ficha-acciones.js?v=20261010a', '../comun/inv-habilidades.js?v=20261010a', '../comun/inv-lupa.js?v=20261009k',
-  '../comun/confirmar-turno.js?v=20261006e', '../comun/ficha-duelo.js?v=20261009y', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261009k'];
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261009z', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261009r', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261010g', '../comun/ficha-mantenimiento.js?v=20261008y', '../comun/ficha-calculo.js?v=20261009r', '../comun/ficha-combate.js?v=20261010g', '../comun/skills-clase.js?v=20261008x', '../comun/ficha-habilidades.js?v=20261007ar',
+  '../comun/catalogo.js?v=20261009z9', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261001b', '../comun/ficha-botonera.js?v=20261009r', '../comun/ficha-resumen.js?v=20261009m', '../comun/inv-calculo.js?v=20261010g', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261010g', '../comun/inv-duelo.js?v=20261010g', '../comun/ficha-acciones.js?v=20261010a', '../comun/inv-habilidades.js?v=20261010a', '../comun/inv-lupa.js?v=20261009k',
+  '../comun/confirmar-turno.js?v=20261006e', '../comun/ficha-duelo.js?v=20261010g', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261009k'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
    anterior"): en la ficha las columnas se juntan recién con la PANTALLA angosta (@media), pero en el mapa la pantalla es ancha y el panel
@@ -613,7 +613,7 @@ function bnPreguntarTipoAtaque(arma, otro){
   if(!otro){ bnAtacar('normal', arma ? arma.id : ''); return; }
   const S = bn.S, costoNormal = FichaCombate.costoAtaque(S, arma), primero = FichaCombate.ataquesConArma(S, arma) === 0, especial = FichaCombate.costoAtaqueEspecial(arma, 'contra', S), especialOpor = FichaCombate.costoAtaqueEspecial(arma, 'oportunidad', S);
   const id = arma ? arma.id : '';
-  bn.raiz.querySelector('#bn-tipo-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: arma ? arma.nombre : 'Sin arma', normal: costoNormal, primero, especial, especialOpor, attr: 'data-bn-tipo', ref: id, primeroTxt: 'primer ataque con esta arma (Tipo ÷ 2)', siguienteTxt: 'Tipo completo (ya atacaste con esta arma este turno)'});   // el menú común
+  bn.raiz.querySelector('#bn-tipo-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: arma ? arma.nombre : 'Sin arma', arma, normal: costoNormal, primero, especial, especialOpor, attr: 'data-bn-tipo', ref: id, primeroTxt: 'primer ataque con esta arma (Tipo ÷ 2)', siguienteTxt: 'Tipo completo (ya atacaste con esta arma este turno)'});   // el menú común
   bn.raiz.querySelector('#bn-tipo-ataque').classList.add('open');
 }
 /* 🏹 ¿Qué flecha? (2026-10-09, dueño; docs/ideas-arcos-flechas.md): atacar con un arco con flechas especiales en el carcaj pregunta cuál (la común
@@ -621,8 +621,9 @@ function bnPreguntarTipoAtaque(arma, otro){
    (`saqueRapido` = N, dueño 2026-10-09): las primeras N flechas especiales del turno que cuestan No2 tiran una moneda; 2 = ese disparo no lo cobra
    (Buena 1, Rara 2, Excepcional 3: rara vez se dispara más de 2 o 3 veces por turno, así que la primera es la que más vale). */
 function bnElegirFlecha(arma, flechas, alElegir){
-  AvisoCombate.mostrar({icono: '🏹', titulo: `¿Qué flecha? · ${arma ? arma.nombre : 'arco'}`, texto: 'Las flechas comunes no se gastan. Una especial se gasta al dispararla, pegue o no, y su efecto entra siempre que pegue.',
-    botones: [{texto: '🏹 Flecha común', detalle: 'sin costo extra', alClic: () => { AvisoCombate.cerrar(); alElegir(''); }},
+  const vir = Combatiente.municionDe(arma) === 'virote', cosa = vir ? 'virote' : 'flecha';   // la ballesta dispara virotes (2026-10-10)
+  AvisoCombate.mostrar({icono: '🏹', titulo: `¿Qué ${cosa}? · ${arma ? arma.nombre : 'arco'}`, texto: `Los ${cosa}s comunes no se gastan. Un${vir ? '' : 'a'} especial se gasta al disparar${vir ? 'lo' : 'la'}, pegue o no, y su efecto entra siempre que pegue.`,
+    botones: [{texto: vir ? '🏹 Virote común' : '🏹 Flecha común', detalle: 'sin costo extra', alClic: () => { AvisoCombate.cerrar(); alElegir(''); }},
       ...flechas.map(f => ({texto: `${f.nombre} ×${fmt(num(f.unidades) || 1)}`, detalle: FichaEquipo.flechaTxt(f), alClic: () => { AvisoCombate.cerrar(); alElegir(f.id); }}))],
     grilla: flechas.length > 3});
 }
@@ -648,7 +649,8 @@ function bnDispararFlecha(flechaId){
 }
 function bnAtacar(tipo, armaId, flechaId){
   const S = bn.S, arma = S.inventario.find(x => x.id === armaId) || null;
-  const flechas = tipo === 'normal' && Combatiente.esArco(arma) && typeof FichaEquipo.flechasDelCarcaj === 'function' ? FichaEquipo.flechasDelCarcaj(S) : [];
+  // Las flechas (arco) o los virotes (ballesta) del carcaj que le sirven a esta arma (Combatiente.sirveLaMunicion, 2026-10-10).
+  const flechas = tipo === 'normal' && Combatiente.municionDe(arma) && typeof FichaEquipo.flechasDelCarcaj === 'function' ? FichaEquipo.flechasDelCarcaj(S).filter(f => Combatiente.sirveLaMunicion(arma, f)) : [];
   if(flechaId === undefined && flechas.length && typeof Duelo !== 'undefined' && Duelo.disponible()){ bnElegirFlecha(arma, flechas, id => bnAtacar(tipo, armaId, id)); return; }
   const fl = flechaId ? flechas.find(f => f.id === flechaId) || null : null;
   const hacer = () => { const ui = bnCombateUi(); if(tipo === 'normal') FichaAcciones.atacarConArma(S, arma, false, ui); else FichaAcciones.ataqueEspecialConArma(S, arma, tipo, false, ui); };
@@ -1597,7 +1599,7 @@ function bnRerollDibujar(){
    (comun/ficha-editor.js: el mismo formulario, el paso a paso de las habilidades, el asistente de ítems, la trampa y la Ejecución ✨),
    adentro del recuadro de la Botonera nueva (#bn-editor). Guardar pasa por bnUi (las partes que cambiaron y el resumen). Los estados de
    la lista (para "estado al usar" y para la Ejecución) se eligen con el selector común (comun/selector-estados.js). */
-const ED_PIEZAS = ['../comun/ficha-editor.js?v=20261010a', '../comun/asistente-item.js?v=20261010d', '../comun/asistente-duelo-hab.js?v=20261008q'];
+const ED_PIEZAS = ['../comun/ficha-editor.js?v=20261010a', '../comun/asistente-item.js?v=20261010g', '../comun/asistente-duelo-hab.js?v=20261008q'];
 let bnTipoItemResolver = null;
 // op.comoGM: el GM sin el control (el ⚙ de un estado del HUD, como hacía la ficha con "Editar como GM"). → true si se abrió.
 async function bnEditar(key, id, op = {}){

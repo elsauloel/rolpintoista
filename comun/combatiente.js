@@ -399,8 +399,9 @@ const Combatiente = (() => {
      espalda {pdg, fijo, critpot} · ignoraResistCrit N · sinParry (no se puede parrear) · oporGratis (el ataque de oportunidad no cuesta No2) ·
      ahorroNitros N (el primer ataque del turno con ella cuesta N menos) · critD20 N (N d20 más al tirar el crítico). Un ítem los lleva sueltos; un
      creep o una invocación, en `armaRasgos` (los campos viejos armaEspalda / armaIgnoraResistCrit también cuentan).
-     arco (2026-10-09, dueño; docs/rework-armas-rango.md): el arma de rango es un arco — suma la mitad del Dmg (ver dmgDelArma). */
-  const RASGOS_ARMA = ['espalda', 'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto'];
+     arco (2026-10-09, dueño; docs/rework-armas-rango.md): el arma de rango es un arco — suma la mitad del Dmg (ver dmgDelArma).
+     recarga N (2026-10-10, dueño: las ballestas): un arma de rango que no es arco cobra el disparo N, 2N, 3N… No2 (ver recargaDe). */
+  const RASGOS_ARMA = ['espalda', 'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga'];
   /* Cuánto del Dmg (la Fuerza) suma el daño de un arma (2026-10-09, dueño): cuerpo a cuerpo, entero; un arco, la mitad redondeada para arriba;
      cualquier otra de rango (ballesta, pólvora), nada. `arma` = {armaDeRango, arco} (un ítem; de un creep o una invocación: armaDeRango y
      armaRasgos.arco). */
@@ -410,6 +411,21 @@ const Combatiente = (() => {
     if(!arma || !arma.armaDeRango) return v;
     return esArco(arma) ? Math.ceil(v / 2) : 0;
   }
+  /* La Recarga (2026-10-10, dueño; docs/rework-armas-rango.md): la ballesta es lenta — el primer disparo del turno cuesta N No2, el segundo 2N, el
+     tercero 3N… (1 = rápida o de repetición, 2 = la común, 3 = de asedio), en vez de Tipo ÷ 2 y después el Tipo. Solo en un arma de rango que no
+     sea arco. 0 = sin Recarga (cobra como cualquier arma). El ataque de oportunidad con ella cuesta N (lo de un primer disparo). */
+  const RECARGA_NOMBRE = {1: 'rápida', 2: 'común', 3: 'de asedio'};
+  function recargaDe(arma){
+    if(!arma || !arma.armaDeRango || esArco(arma)) return 0;
+    const r = Math.round(n(arma.recarga || (arma.armaRasgos && arma.armaRasgos.recarga)));
+    return r > 0 ? Math.min(5, r) : 0;
+  }
+  /* La munición especial (2026-10-10, dueño): el arco dispara flechas y la ballesta (un arma con Recarga), virotes. Las dos van en el carcaj
+     (`flecha` en el ítem; un virote lleva `flecha.virote = true`) y comparten la mecánica («¿Qué flecha?», Perfora, efectos, daño híbrido). */
+  const municionDe = arma => esArco(arma) ? 'flecha' : recargaDe(arma) ? 'virote' : '';
+  const esVirote = it => !!(it && it.flecha && it.flecha.virote);
+  const sirveLaMunicion = (arma, it) => { const m = municionDe(arma); return !!m && !!(it && it.flecha) && (m === 'virote') === esVirote(it); };
+  const recargaTxt = r => `Recarga ${r}${RECARGA_NOMBRE[r] ? ` (${RECARGA_NOMBRE[r]})` : ''}: ${[1, 2, 3].map(k => k * r).join(', ')}… No2`;
   // El texto de cuánto Dmg suma («arco: la mitad del Dmg» / «de rango: no suma Dmg»; cuerpo a cuerpo, '').
   const dmgDelArmaTxt = arma => !arma || !arma.armaDeRango ? '' : esArco(arma) ? 'arco: suma la mitad del Dmg' : 'de rango: no suma Dmg';
   function rasgosDeItem(it){
@@ -479,7 +495,7 @@ const Combatiente = (() => {
   const sirveDeOportunidad = arma => !esArco(arma);
   // Costos con los rasgos: el primer ataque del turno con el arma (ahorroNitros) y el ataque de oportunidad (oporGratis).
   const costoConAhorro = (costo, arma, previos) => Math.max(0, costo - (n(previos) === 0 ? n(arma && arma.ahorroNitros) : 0));
-  const costoEspecial = (tipoDado, arma, tipo) => tipo === 'oportunidad' && arma && arma.oporGratis ? 0 : costoPrimerAtaque(tipoDado);
+  const costoEspecial = (tipoDado, arma, tipo) => tipo === 'oportunidad' && arma && arma.oporGratis ? 0 : recargaDe(arma) || costoPrimerAtaque(tipoDado);
   const RE_IGNORA_CRIT = /^ignora\s+(\d+)\s+de\s+res/i;
   const esEfectoIgnora = e => RE_IGNORA_CRIT.test(String((e && e.nombre) || '').trim());
   function ignoraResistCritArma(arma){
@@ -492,14 +508,20 @@ const Combatiente = (() => {
   function menuTipoAtaqueHtml(o){
     const e = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
     const b = (tipo, txt) => `<button class="btn" ${o.attr}="${tipo}:${e(o.ref)}" style="width:100%">${txt}</button>`;
+    const rc = recargaDe(o.arma);   // una ballesta: su Recarga (o.arma, opcional)
     return `<div class="hint">${e(o.nombre)}</div>
-    ${b('normal', `⚔ Ataque normal — ${n(o.normal)} No2<br><span class="hint">${o.primero ? (o.primeroTxt || 'primer ataque del turno (Tipo ÷ 2)') : (o.siguienteTxt || 'Tipo completo (ya atacó este turno)')}</span>`)}
-    ${b('oportunidad', `🏃 Ataque de oportunidad — ${n(o.especialOpor ?? o.especial)} No2<br><span class="hint">${o.especialOpor === 0 ? 'gratis con esta arma' : 'siempre Tipo ÷ 2'}; no suma al conteo de ataques</span>`)}
+    ${b('normal', `⚔ Ataque normal — ${n(o.normal)} No2<br><span class="hint">${rc ? e(recargaTxt(rc)) : o.primero ? (o.primeroTxt || 'primer ataque del turno (Tipo ÷ 2)') : (o.siguienteTxt || 'Tipo completo (ya atacó este turno)')}</span>`)}
+    ${b('oportunidad', `🏃 Ataque de oportunidad — ${n(o.especialOpor ?? o.especial)} No2<br><span class="hint">${o.especialOpor === 0 ? 'gratis con esta arma' : rc ? `lo de un primer disparo (Recarga ${rc})` : 'siempre Tipo ÷ 2'}; no suma al conteo de ataques</span>`)}
     ${b('contra', `↩ Contraataque — ${n(o.especial)} No2<br><span class="hint">solo tras ganar un Parry y un Bloqueo; siempre Tipo ÷ 2; no suma al conteo de ataques</span>`)}`;
   }
-  function costoAtaque(tipo, ataquesPrevios){ return n(ataquesPrevios) === 0 ? costoPrimerAtaque(tipo) : n(tipo); }
-  // Cuántos ataques alcanzan con esos No2 (el primero a mitad de precio, los demás completos).
-  function ataquesPosibles(tipo, nitros){ const t = n(tipo), p = costoPrimerAtaque(t); return n(nitros) < p ? 0 : 1 + (t > 0 ? Math.floor((n(nitros) - p) / t) : 0); }
+  // `arma` (opcional): con Recarga, el disparo cuesta Recarga × (los ya hechos + 1).
+  function costoAtaque(tipo, ataquesPrevios, arma){ const rc = recargaDe(arma); if(rc) return rc * (Math.max(0, Math.round(n(ataquesPrevios))) + 1); return n(ataquesPrevios) === 0 ? costoPrimerAtaque(tipo) : n(tipo); }
+  // Cuántos ataques alcanzan con esos No2 (el primero a mitad de precio, los demás completos; con Recarga, N, 2N, 3N…).
+  function ataquesPosibles(tipo, nitros, arma){
+    const rc = recargaDe(arma);
+    if(rc){ let k = 0, g = 0; while(g + rc * (k + 1) <= n(nitros)){ g += rc * (k + 1); k++; } return k; }
+    const t = n(tipo), p = costoPrimerAtaque(t); return n(nitros) < p ? 0 : 1 + (t > 0 ? Math.floor((n(nitros) - p) / t) : 0);
+  }
 
   // El Parry cuesta siempre 1 No2, con cualquier arma o escudo (2026-09-26, dueño). Sin arma ni escudo no se puede (P121).
   function costoParry(){ return 1; }
@@ -1116,6 +1138,16 @@ const Combatiente = (() => {
   function costoAtaqueLineas(o){
     const t = Math.round(n(o.tipoArma)) || 8, costo = Math.max(0, Math.round(n(o.costo))), mitad = Math.ceil(t / 2);
     if(o.ataque === 'habilidad-arma') return {no2: 0, lineas: ['Los No2 de este ataque ya los cobró la habilidad.']};
+    const rc = recargaDe(o.arma);
+    if(rc){   // una ballesta (o.arma, opcional): Recarga N → N, 2N, 3N…
+      const h = Math.max(0, Math.round(n(o.hechos))), especial = o.ataque === 'oportunidad' || o.ataque === 'contra';
+      const base = especial ? rc : rc * (h + 1), l = [recargaTxt(rc)];
+      l.push(especial ? `${o.ataque === 'contra' ? 'Contraataque' : 'Ataque de oportunidad'}: lo de un primer disparo = ${rc}; no cuenta como disparo del turno`
+        : h ? `Ya disparó ${h === 1 ? 'una vez' : `${h} veces`} este turno: el disparo ${h + 1}.º = ${rc} × ${h + 1} = ${base}` : `Primer disparo del turno: ${rc}`);
+      if(costo !== base) l.push(`${costo < base ? 'Ahorro' : 'Recargo'} (arma, equipo o estados): ${costo < base ? '−' : '+'}${Math.abs(base - costo)}`);
+      l.push(`Cuesta ${costo} No2 · tiene ${Math.round(n(o.tiene))}${costo > n(o.tiene) ? ' (no le alcanzan: pregunta y deja seguir)' : ''}`);
+      return {no2: costo, lineas: l};
+    }
     const l = [`Tipo del arma: ${t}`];
     if(o.ataque === 'oportunidad' || o.ataque === 'contra') l.push(`${o.ataque === 'contra' ? 'Contraataque' : 'Ataque de oportunidad'}: lo de un primer ataque (Tipo ÷ 2${t % 2 ? ', para arriba' : ''} = ${mitad}); no cuenta como ataque del turno`);
     // `porArma`: un personaje cuenta el primer ataque por arma (cada arma tiene el suyo a mitad de precio).
@@ -1184,7 +1216,7 @@ const Combatiente = (() => {
   // El texto de lo que cura un ítem: «Heridas (Sangrado, Lisiado, Rengo)».
   const textoCura = grupos => grupos.map(k => `${GRUPOS_CURA[k].label} (${GRUPOS_CURA[k].estados.join(', ')})`).join(' · ');
 
-  return {arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

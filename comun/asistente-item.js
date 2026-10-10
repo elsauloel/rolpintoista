@@ -389,11 +389,14 @@ const AsistenteItem = (() => {
       if(esEspecial(d)) return {h: h + efecto('Un arma especial no tiene distancia propia: hasta dónde llega lo dice su Ejecución ✨ (tu Rango, una línea, un área…).'), ayuda};
       h += campo('Distancia', `<div class="aa-opciones">${op('rango', '0', !d.armaDeRango, 'Cuerpo a cuerpo')}${op('rango', '1', !!d.armaDeRango, 'A distancia')}</div>`);
       if(d.armaDeRango) h += campo('¿Es un arco?', `<div class="aa-opciones">${op('arco', '1', !!d.arco, '🏹 Arco')}${op('arco', '0', !d.arco, 'Otra (ballesta, pistola, lanzallamas…)')}</div>`);
+      // La Recarga (2026-10-10, dueño): la ballesta es lenta — cobra N, 2N, 3N… No2 por disparo en el turno.
+      if(d.armaDeRango && !d.arco) h += campo('Recarga (ballestas)', `<div class="aa-opciones">${op('recarga', '0', !n(d.recarga), 'Sin Recarga')}${op('recarga', '1', n(d.recarga) === 1, '1 · rápida')}${op('recarga', '2', n(d.recarga) === 2, '2 · común')}${op('recarga', '3', n(d.recarga) === 3, '3 · de asedio')}</div>`,
+        'Con Recarga N, el primer disparo del turno cuesta N No2, el segundo 2N, el tercero 3N… (en vez de Tipo ÷ 2 y después el Tipo). Pocos tiros y fuertes: así pasa la armadura. La común es la 2.');
       h += efecto(!d.armaDeRango
         ? `Es <b>cuerpo a cuerpo</b>: al tirar daño se suma el <b>Dmg</b> ${e(q.de)}${p ? ` (hoy ${f(n(p.dmg))})` : ''}.`
         : d.arco
         ? `Es un <b>arco</b> (2026-10-09): el daño suma <b>la mitad del Dmg</b> ${e(q.de)}, redondeada para arriba${p ? ` (hoy +${f(Math.ceil(n(p.dmg) / 2))})` : ''}. Dispara con al menos 1 casillero libre entre el arquero y el objetivo (no al de al lado), y con el arco no se pega cuerpo a cuerpo. Su Tipo es su dado: un arco de d4 es Tipo 4, uno de d6, Tipo 6 (para acercarse a un d6 sin cambiar el Tipo, daño fijo: 1d4+1).`
-        : `Es <b>de rango</b> (ballesta, pistola, lanzallamas…): tiene su propia mecánica — el daño <b>no suma el Dmg</b>, es solo el del arma. No confundir con el <b>Alcance</b> de las armas cuerpo a cuerpo: son dos cosas distintas.`);
+        : `Es <b>de rango</b> (ballesta, pistola, lanzallamas…): tiene su propia mecánica — el daño <b>no suma el Dmg</b>, es solo el del arma${n(d.recarga) ? `, y con <b>Recarga ${f(n(d.recarga))}</b> cada disparo del turno cuesta más (${[1, 2, 3].map(k => f(k * n(d.recarga))).join(', ')}… No2). A diferencia del arco, puede disparar con el rival al lado` : ''}. No confundir con el <b>Alcance</b> de las armas cuerpo a cuerpo: son dos cosas distintas.`);
       // Mismo mod ('rng'), pero se explica distinto: en un arma de rango es su
       // propia distancia de disparo; en una cuerpo a cuerpo es el Alcance
       // (deja pegar a más de un casillero sin dejar de sumar el Dmg).
@@ -638,7 +641,7 @@ const AsistenteItem = (() => {
         ${esOrbe(d) ? fila('Clase', '🔮 orbe') + fila('Al usar una varita', e([n(d.orbeResguardo) ? `Vida extra ${Math.round(n(d.orbeResguardo))} (1 vez por turno)` : '', d.orbeSalvaje ? (d.orbeSalvaje === 'domado' ? '1d6 domado' : '1d6 salvaje') : '', n(d.orbeCustodio) ? `Vida extra ${Math.round(n(d.orbeCustodio))} a un aliado al lado` : ''].filter(Boolean).join(' · ') || 'nada'))
           + (n(d.orbeAbsorcion) ? fila('Absorción', e(`+${Math.round(n(d.orbeAbsorcion))} SP al recibir daño mágico o elemental (1 vez por turno)`)) : '') : ''}
         ${g === 'arma' && !esEspecial(d) ? fila('Tipo', e(`Tipo ${tipo} · ${TIPOS[tipo].nombre}`)) + fila('Distancia', d.armaDeRango ? (d.arco ? 'arco (suma la mitad del Dmg)' : 'a distancia (no suma Dmg)') : 'cuerpo a cuerpo')
-          + fila('Daño', e(danoTxt(d))) + fila('Atacar', `${primer(tipo)} No2 el primero, ${tipo} los siguientes`)
+          + fila('Daño', e(danoTxt(d))) + fila('Atacar', d.armaDeRango && !d.arco && n(d.recarga) ? e(`Recarga ${f(n(d.recarga))}: ${[1, 2, 3].map(k => f(k * n(d.recarga))).join(', ')}… No2`) : `${primer(tipo)} No2 el primero, ${tipo} los siguientes`)
           + (modVal(d, 'rng') ? fila(d.armaDeRango ? 'Rango' : 'Alcance', `+${f(modVal(d, 'rng'))}`) : '')
           + (d.armaDeRango && typeof Combatiente !== 'undefined' && Combatiente.tieneTiroAlto(d) ? fila('Tiro alto', 'por encima de los tokens (objetivo a 4+, PdG −2)') : d.arco && d.sinTiroAlto ? fila('Tiro alto', 'no (debilidad)') : '')
           + (d.armaDeRango && d.ideal && d.ideal.donde && typeof Combatiente !== 'undefined' ? fila('Distancia ideal', e(Combatiente.idealTxt(d.ideal))) : '')
@@ -791,6 +794,7 @@ const AsistenteItem = (() => {
     else if(ds.aaManos) d.tipoItem = ds.aaManos;
     else if(ds.aaRango) d.armaDeRango = ds.aaRango === '1';
     else if(ds.aaArco){ d.arco = ds.aaArco === '1'; if(d.arco) d.tipoItem = 'arma_2m'; }   // un arco es siempre a dos manos (2026-10-09)
+    else if(ds.aaRecarga !== undefined) d.recarga = n(ds.aaRecarga);
     else if(ds.aaEquipado) d.equipado = ds.aaEquipado === '1';
     else if(ds.aaModadd !== undefined) d.mods.push({stat: ds.aaModadd, val: ds.aaModadd ? 1 : 0});
     else if(ds.aaModrm !== undefined) d.mods.splice(n(ds.aaModrm), 1);
@@ -884,7 +888,7 @@ const AsistenteItem = (() => {
       const am = es.aMano || {}, amT = String(am.texto || '').trim(), amR = String(am.tirada || '').replace(/\s+/g, ''), amE = String(am.etiqueta || '').trim();
       if(amT || amR) es.aMano = {...(amT ? {texto: amT} : {}), ...(amR ? {tirada: amR} : {}), ...(amE ? {etiqueta: amE} : {})}; else delete es.aMano;
       d.peso = Math.max(1, n(d.peso) || 1);
-      ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', ...(typeof Combatiente !== 'undefined' ? Combatiente.RASGOS_ARMA : ['ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto'])].forEach(k => delete d[k]);
+      ['tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', ...(typeof Combatiente !== 'undefined' ? Combatiente.RASGOS_ARMA : ['ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga'])].forEach(k => delete d[k]);
       if(!(d.efectosGolpe || []).length) delete d.efectosGolpe;
       d.mods = d.mods.filter(m => m.stat !== 'rng');
     }else if(grupoDe(d.tipoItem) === 'arma'){
@@ -900,6 +904,7 @@ const AsistenteItem = (() => {
       if(d.armaDeRango && d.arco){ d.arco = true; d.tipoItem = 'arma_2m'; } else delete d.arco;   // un arco: siempre a dos manos
       if(d.armaDeRango && !d.arco && d.tiroAlto) d.tiroAlto = true; else delete d.tiroAlto;   // en un arco viene solo
       if(d.armaDeRango && d.arco && d.sinTiroAlto) d.sinTiroAlto = true; else delete d.sinTiroAlto;
+      if(d.armaDeRango && !d.arco && n(d.recarga) > 0) d.recarga = Math.min(5, Math.round(n(d.recarga))); else delete d.recarga;   // la Recarga: solo de rango, no arco
       if(d.armaDeRango && d.ideal && d.ideal.donde){   // la distancia ideal: solo lo que tiene valor
         const id = {donde: d.ideal.donde};
         (d.ideal.donde === 'franja' ? ['desde', 'hasta'] : ['ancho']).concat(['pdg', 'crit', 'critpot', 'fijo', 'ignora']).forEach(k => { const v = Math.round(n(d.ideal[k])); if(v) id[k] = v; });
@@ -941,7 +946,7 @@ const AsistenteItem = (() => {
      con `{...base, ...d}` a una varita le quedaba el Tipo 8 de fábrica (y con él, daño físico y Parry), y a un arma que dejó de ser especial, su
      hechizo. Todas las pantallas guardan con esto. */
   const CONTROLADOS = ['especial', 'orbe', 'orbeResguardo', 'orbeSalvaje', 'orbeCustodio', 'orbeAbsorcion', 'tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', 'efectosGolpe',
-    'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'durExtra', 'durPorPeso'];
+    'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga', 'durExtra', 'durPorPeso'];
   function fusionar(base, d){
     const o = {...(base || {}), ...(d || {})};
     CONTROLADOS.forEach(k => { if(!(k in (d || {}))) delete o[k]; });

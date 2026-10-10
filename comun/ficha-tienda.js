@@ -274,9 +274,10 @@ const FichaTienda = (() => {
     }
   }
   // 🏹 Todo arco viene con un carcaj de 10 lugares (dueño, 2026-10-09): si el personaje no tiene ninguno, se suma el Carcaj de cuero del catálogo.
+  // Una ballesta también (2026-10-10): los virotes van en el mismo carcaj.
   const CARCAJ_DEL_ARCO = 'carcaj-de-cuero';
   function carcajConElArco(S, item){
-    if(!(typeof Combatiente !== 'undefined' && Combatiente.esArco(item))) return;
+    if(!(typeof Combatiente !== 'undefined' && Combatiente.municionDe && Combatiente.municionDe(item))) return;   // un arco o una ballesta (2026-10-10)
     if((S.inventario || []).some(x => x.tipoItem === 'carcaj')) return;
     const cat = (S.catalogo || []).find(x => x.id === CARCAJ_DEL_ARCO) || (typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(x => x.id === CARCAJ_DEL_ARCO) : null);
     if(!cat) return;

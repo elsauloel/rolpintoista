@@ -106,7 +106,7 @@ const InvAcciones = (() => {
     : tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + pdgExtraInv(inv), 'pdg');
 
   // El menú «¿Qué ataque es?» de una invocación (el mismo de personajes y creeps: Combatiente.menuTipoAtaqueHtml).
-  const menuTipoAtaque = (inv, attr) => Combatiente.menuTipoAtaqueHtml({nombre: inv.nombre, normal: I().costoAtaque(inv), primero: num(inv.ataquesTurno) === 0,
+  const menuTipoAtaque = (inv, attr) => Combatiente.menuTipoAtaqueHtml({nombre: inv.nombre, arma: Combatiente.armaDeCombatiente(inv), normal: I().costoAtaque(inv), primero: num(inv.ataquesTurno) === 0,
     especial: costoAtaqueDe(inv, 'contra'), especialOpor: costoAtaqueDe(inv, 'oportunidad'), attr, ref: inv.id});
   /* Levantarse (Sentado) y Soltarse (trampas de Atrapar): 2026-10-03, «las reglas de combate aplican a creeps, personajes e invocaciones
      por igual». Levantarse cuesta lo mismo que a un personaje (FichaCalculo.IT2.nitrosLevantarse). Soltarse: primero la tirada (una sola

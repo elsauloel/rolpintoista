@@ -106,7 +106,7 @@ const FichaDuelo = (() => {
           const extra = tipo === 'habilidad-arma' ? num(d.ataque.mods && d.ataque.mods.pdg) : tipo === 'contra' ? statParaArma('pdgcontra', arma) : tipo === 'oportunidad' ? statParaArma('pdgopor', arma) : 0;
           const costo = tipo === 'oportunidad' || tipo === 'contra' ? FichaCombate.costoAtaqueEspecial(arma, tipo, S) : FichaCombate.costoAtaque(S, arma);
           return {formula: f(FichaCombate.pdgParaArma(S, arma).valor + (Number.isNaN(extra) ? 0 : extra), 'pdg'), ...L('atacar:' + (arma ? arma.id : '')),
-            costo: Combatiente.costoAtaqueLineas({tipoArma: FichaCombate.tipoAtaque(arma), hechos: FichaCombate.ataquesConArma(S, arma), costo, tiene: num(S.nitros), ataque: tipo, porArma: true})};
+            costo: Combatiente.costoAtaqueLineas({tipoArma: FichaCombate.tipoAtaque(arma), arma, hechos: FichaCombate.ataquesConArma(S, arma), costo, tiene: num(S.nitros), ataque: tipo, porArma: true})};
         }
         if(campo === 'fuerza'){
           const l = L('stat:fue');

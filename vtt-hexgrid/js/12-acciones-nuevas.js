@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261009k', '../comun/creep-botonera.js?v=20261007aw', '../comun/creep-acciones.js?v=20261010a', '../comun/confirmar-turno.js?v=20261006e', '../comun/creep-duelo.js?v=20261009y'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261009k', '../comun/creep-botonera.js?v=20261007aw', '../comun/creep-acciones.js?v=20261010a', '../comun/confirmar-turno.js?v=20261006e', '../comun/creep-duelo.js?v=20261010g'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -266,7 +266,7 @@ function acHooksDuelo(lado){
    en el marco (tanda 4). */
 function acPreguntarTipoAtaque(sc){
   const normal = CreepCalculo.costoAtaque(sc), primero = num(sc.ataquesTurno) === 0, especial = CreepCalculo.costoContraataque(sc), especialOpor = CreepCalculo.costoOportunidad(sc);
-  ac.raiz.querySelector('#ac-tipo-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: sc.nombre, normal, primero, especial, especialOpor, attr: 'data-ac-tipo', ref: sc.id});   // el menú común
+  ac.raiz.querySelector('#ac-tipo-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: sc.nombre, arma: Combatiente.armaDeCombatiente(sc), normal, primero, especial, especialOpor, attr: 'data-ac-tipo', ref: sc.id});   // el menú común
   ac.raiz.querySelector('#ac-tipo-ataque').classList.add('open');
 }
 function acAtacar(tipo){

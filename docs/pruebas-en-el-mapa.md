@@ -13,28 +13,38 @@
 - [ ] **Disputa del botín** (2026-10-08): fin de combate publicado → un jugador 🙋 Reclama → otro ⚔ Disputa → ✊ piedra, papel o tijera en las
   dos pantallas → el ítem queda a nombre del ganador → ↩ Soltar → el GM cierra el botín → lo reclamado llega a la mochila (con la XP y el oro).
   Mirar: los botones de cada fila, el «✊ En disputa: jugar», la Mesa, la línea verde del cierre.
-- [ ] **🎭 Acción incierta, del lado del GM** (2026-10-09): con niebla de verdad, un creep que los jugadores todavía no vieron no aparece en su orden
-  de turnos ni en la Mesa; al verlo, el mapa del GM lo marca «revelado» y ya no desaparece aunque se esconda; lo que hace escondido sale como
-  «acción incierta»; una trampa colocada se anuncia así al rival. (El lado del jugador ya se vio con niebla simulada.)
-- [ ] **🪙 Moneda Re-Roll apagada** (2026-10-09): sin moneda en el cinturón ni la mochila, el 🪙 del mapa y el de la Botonera de la ficha se ven
-  grises y tachados con una línea roja; tocarlo avisa. Con una moneda, encendido. (Hace falta que la ficha se haya guardado una vez.)
-- [ ] **👆 Estados al pasar el mouse por un token** (2026-10-09): el cartelito aparece al lado del puntero, con el mouse real (la prueba fue con un
-  movimiento simulado; falta la captura).
-- [ ] **✊ Piedra, papel o tijera desde el mapa del GM** (2026-10-09): el GM jugó desde GM Tools porque su mapa estaba congelado; falta verlo en el
-  mapa del GM.
+- [ ] **🎭 Acción incierta: una trampa colocada** (2026-10-09; lo demás, probado): un creep escondido que coloca una trampa se anuncia al rival
+  como «acción incierta» (si ya lo conocían) y su bando ve el detalle.
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 
 - [ ] **🏹 Apuntar con un arma de rango** (cuando se construya; pedido del dueño 2026-10-09): al atacar se ve tu Rango, los objetivos posibles, los que
   no (fuera de Rango o tapados por un obstáculo aunque se vean por la visión de un aliado) y los obstáculos que los tapan. Ver docs/rework-armas-rango.md.
-- [ ] **🏹 El arco suma la mitad del Dmg** (2026-10-09; anda en las pruebas automáticas, todavía ningún arco del catálogo lo trae): con un arco  marcado «🏹 Arco» (asistente de ítems), el botón Daño de la Botonera dice «1d4 + mitad del Dmg» y el duelo tira eso; su 🔍 muestra la mitad. Lo  mismo con un creep y una invocación que lleven ese arco.
-- [ ] **🏹 Distancia mínima del arco y sin oportunidad** (2026-10-09, P183): al atacar con un arco brillan solo los objetivos a 3 casilleros o más; elegir uno a 1 o 2 pregunta «Muy cerca para el arco · Disparar igual / Elegir otro» y, si sigue, deja una línea roja en la Mesa. Un rival que solo tiene un arco no frena a quien se le aleja y la Mesa dice «tiene un arco, que no sirve de oportunidad»; con arco y otra arma, la oportunidad no ofrece el arco.
-- [ ] **🏹 Parry de un personaje o invocación contra un disparo, con escudo** (2026-10-09; sin arco en las manos, ya probado): uno con escudo
-  atacado con un arco ve el Parry solo con el escudo y, si gana, «¡PARADO!» sin Bloqueo.
 - [ ] **🏹 Perfora sin crítico** (2026-10-09): un disparo con la Perforante o la Envenenada que pega SIN crítico muestra «perfora 1» en el daño (con
   crítico no hace falta: la Defensa ya se ignora entera).
-- [ ] **🏹 Línea de tiro, tiro alto y distancia ideal** (2026-10-09): al atacar con un arma de rango se ve la línea al mouse (verde / ámbar «roza» / roja «tapado»); elegir un objetivo tapado por un token pregunta «Tiro alto (PdG −2)» (si el arma lo tiene y está a 4+), «Disparar igual» o «Elegir otro»; un obstáculo Sólido no permite tiro alto; con distancia ideal, los objetivos en la franja brillan en celeste y el duelo suma el bono (y lo muestra en la Mesa).
+- [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
+  bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no
+  repite eso. Mirar si sobra o falta algún término, y si algún texto del globo conviene reescribirlo.
+- [ ] **🏹 El arco en una invocación** (2026-10-09): el Daño de su Botonera dice la mitad del Dmg (en personajes y creeps, probado: la Bruja,
+  «Dmg (arco: la mitad, para arriba) +2» con Dmg 3).
 
 ## Probado
+
+- ✅ **Tanda del 2026-10-09 (tarde, el dueño afuera)**: **Parry con escudo de un personaje contra un disparo**: Clementino con la Tapa de tacho de
+  basura, la Bruja le dispara: «Elegí cómo te defendés» ofrece Evasión y Parry solo con el escudo (el cuchillo no), «si ganás, el disparo queda parado
+  (sin Bloqueo)»; ganó 6 contra 3 → «¡PARADO!», sin Bloqueo ni contraataque. **Moneda Re-Roll**: sin moneda el 🪙 sale gris y tachado y avisa; con una
+  en la mochila se enciende y abre «mis últimas tiradas». **Estados al pasar el mouse**: sobre el Coloso, el cartelito con Piernas de prueba (no
+  vence), Veneno 1 turno y Parálisis 1 turno. **Piedra, papel o tijera desde el mapa del GM**: desafío con motivo, piedra contra tijera, el GM ve
+  «¡Ganaste!» y el jugador «Perdiste», en la Mesa. **El arco suma la mitad del Dmg**: el 🔍 del Daño de juan dice «Dmg (arco: la mitad, para arriba)
+  +2» con Dmg 3. **Sin oportunidad con un arco**: juan se aleja de la Bruja (solo arco) en combate: no lo frena y la Mesa y la Crónica dicen «tiene un
+  arco, que no sirve de oportunidad» (**arreglado probando**: los creeps no publicaban ese dato y la Crónica decía siempre «no tiene No2»).
+  **🎭 Acción incierta, lado del GM**, con niebla de verdad: una copia del Escarabajo escondida y lejos no aparece en el orden de turnos del jugador
+  (6 filas contra 7 del GM) ni su tirada en la Mesa; al acercarse a juan, el mapa del GM la marcó «revelado» sola; vuelta a la niebla, sigue en el
+  orden del jugador y su tirada le llega como «🎭 … está realizando una acción incierta». **Glosario**: en el «Ver» del Arco corto y de la Varita de
+  chispa eléctrica, los términos marcados y el globo al pasar el mouse (Parálisis); «Detalles técnicos» en lista corta. **Perfora sin crítico**:
+  tres intentos, un fallo y dos críticos: sigue pendiente.
+- ✅ **Línea de tiro, tiro alto, distancia ideal y distancia mínima** (2026-10-09, probado antes y anotado ahora): la línea al mouse (verde/roja, con
+  la distancia), los tokens tapan, el cartel de «tapado» con «Elegir otro», el tiro alto con PdG −2 («1d6 −2 tiro alto»), los resaltes de la
+  distancia mínima y de la distancia ideal, el daño del arco 2d6+3.
 
 - ✅ **🏹 Disparo contra un personaje y la flecha envenenada** (2026-10-09): la Bruja (Arco largo de tejo) le dispara a juan: «Elegí cómo te
   defendés» ofrece solo la Evasión (juan tiene el arco en las manos: no parrea con él) y ya sin la nota del disparo; esquivó 5 contra 2. juan

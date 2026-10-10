@@ -260,7 +260,7 @@ const FichaEquipo = (() => {
   // El texto de lo que hace una flecha (su detalle sin el encabezado «Flecha especial…:»).
   // Lo que hace + su No2 (una sola vez: el detalle del catálogo ya lo trae, se saca y se arma de `flecha.no2`).
   const flechaTxt = f => {
-    const t = String((f && f.detalle) || '').replace(/^Flecha especial[^:]*:\s*/, '').replace(/\.$/, '').replace(/\s*·\s*\+\d+ No2 al dispararla/, '');
+    const t = String((f && f.detalle) || '').replace(/^(?:Flecha|Virote) especial[^:]*:\s*/, '').replace(/\.$/, '').replace(/\s*·\s*\+\d+ No2 al dispararl[ao]/, '');   // también los virotes (2026-10-10)
     const n = num(f && f.flecha && f.flecha.no2);
     return t + (n ? ` · +${fmt(n)} No2 al dispararla` : '');
   };

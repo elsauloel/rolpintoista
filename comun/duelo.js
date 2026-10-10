@@ -500,6 +500,7 @@ const Duelo = (() => {
     if(d.ataque && _num(d.ataque.quieto) > 0) t.push(`💍 ${d.hab ? 'foco' : 'pulso quieto'}: +${_fmt(d.ataque.quieto)} ${d.hab ? 'PdG.Esp' : 'PdG'}`);
     if(d.ataque && _num(d.ataque.primeraSangre) > 0) t.push(`💍 primera sangre: +${_fmt(d.ataque.primeraSangre)} de daño si pega`);
     if(d.ataque && d.ataque.tiro) t.push(`🏹 ${d.ataque.tiro.motivo}: ${tiroTxt(d.ataque.tiro)}`);
+    if(d.ataque && _num(d.ataque.perfora) > 0) t.push(`perfora ${_fmt(d.ataque.perfora)} (el arma)`);   // la Perfora del arma (2026-10-10): se suma a la del virote
     if(d.ataque && d.ataque.flecha) t.push(`🏹 ${d.ataque.flecha.nombre}${(d.ataque.flecha.efectos || []).length ? ': ' + d.ataque.flecha.efectos.map(e => e.danoMagico ? magCorto(e) : e.nombre).join(', ') : ''}${d.ataque.flecha.perfora ? ` · perfora ${d.ataque.flecha.perfora}` : ''}`);
     return t.join(' · ');
   };

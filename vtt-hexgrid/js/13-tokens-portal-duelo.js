@@ -716,7 +716,8 @@ function dueloElegirObjetivoMapa(msg){
           Object.keys(extra).forEach(k => { if(extra[k]) tiro[k] = num(tiro[k]) + extra[k]; });
           tiro.motivo = tiro.motivo ? `${tiro.motivo} y ${fl.nombre}` : fl.nombre;
         }
-        flecha = {nombre: fl.nombre, efectos: b.efectosGolpe || [], perfora: num(b.perfora), ...(b.salto ? {salto: b.salto} : {})};
+        flecha = {nombre: fl.nombre, efectos: b.efectosGolpe || [], perfora: num(b.perfora), ...(b.salto ? {salto: b.salto} : {}),
+          ...['humo', 'luz', 'clava', 'rebota'].reduce((o, k) => b[k] ? {...o, [k]: true} : o, {}), ...(b.explota ? {explota: b.explota} : {})};   // virotes con mapa (js/33)
         if(msg.alDisparar){ try{ msg.alDisparar(); }catch(err){ console.error('No se pudo gastar la flecha:', err); } }
       }
       Duelo.crear({yo, ataque, espalda, embestida, quieto, primeraSangre, tiro, flecha}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
@@ -1267,6 +1268,8 @@ async function dueloAplicarDano(d){
     if(d.hab && d.hab.cadena && golpe > 0 && !res.r.invulnerable) await dueloCadena(d, golpe).catch(err => console.error('No se pudo hacer saltar el rayo:', err));
     // ⚡ La flecha que salta (relámpago, tormenta: js/33): pase o no el daño, salta igual (el golpe entró).
     if(!d.hab && d.ataque && d.ataque.flecha && d.ataque.flecha.salto && !res.r.invulnerable) await flechaSalto(d, dn.magico ? num(dn.magico.total) : 0).catch(err => console.error('No se pudo hacer saltar la flecha:', err));
+    // 🏹 El virote que hace algo en el mapa al pegar (2026-10-10): humo, luz, explota, clava (js/33).
+    if(!d.hab && d.ataque && d.ataque.flecha && (d.ataque.flecha.humo || d.ataque.flecha.luz || d.ataque.flecha.explota || d.ataque.flecha.clava)) await flechaAlPegar(d, !!res.r.invulnerable).catch(err => console.error('No se pudo aplicar el virote en el mapa:', err));
     if(d.hab && d.hab.atrae && !res.r.invulnerable) await dueloAtraer(d).catch(err => console.error('No se pudo atraer al objetivo:', err));   // el gancho
     if(d.hab && d.hab.riesgo && (dn.rolls || []).map(num).includes(num(d.hab.riesgo.si))) await dueloRiesgo(d).catch(err => console.error('No se pudo aplicar el riesgo:', err));   // la inestable
     // La Perfora le resta a la Defensa (no al daño): se informa la Defensa que contó y cuánto perforó (2026-10-09: «6 − Defensa 4 − perfora 1» confundía).

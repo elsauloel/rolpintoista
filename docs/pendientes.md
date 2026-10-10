@@ -33,6 +33,12 @@
 >   ventana tapada por otra y se puede probar con las dos ventanas encimadas, sin maximizar y sin partir la pantalla. Lo cambia el dueño.
 > - [ ] **🔍 Revisión de cerca de ballestas y arcos, sobre todo ballestas** (dueño, 2026-10-10): hacerla juntos, **con el dueño en la compu y con
 >   tiempo** (no es para hacer solo ni desde el celular). Una por una, calidad por calidad: números, nombres, rasgos, el Rango como bono (falta Buena para arriba) y los virotes.
+> - [ ] **🎯 La línea de tiro para todo lo que es a distancia** (dueño, 2026-10-10): el sistema de trayectoria de arcos y ballestas (línea que
+>   tapan Sólidos y tokens, aviso, tiro alto si lo tiene) tiene que valer para **todo** lo de rango: varitas, habilidades a distancia, pólvora,
+>   lanzables. Hoy lo usan las armas de rango (`tiroRevisar`, js/32).
+> - [ ] **✨ Animaciones** (consulta del dueño, 2026-10-10; «no hagas nada todavía»): animar más cosas sin sobrecargar ni romper — nube tóxica
+>   con humo verde que persiste, piso congelado con un reflejo celeste (como la moneda), terreno incendiado con llamas, la bola de fuego con
+>   una explosión al ejecutarla y el fuego que queda unos segundos. Ver la respuesta del 2026-10-10 (qué se puede y cómo, sin cargar el mapa).
 > - [ ] **📏 «Calcular trayectoria» con la R** (dueño, 2026-10-10): que el botón de Rango (R) también permita ver la **línea de tiro** sin ir a
 >   «Atacar», y **elegir el punto de partida y el de llegada** (evaluar cómo sería el tiro desde otro casillero, no solo desde donde está parado).
 >   Reusar `lineaDeTiro` (js/32) y el dibujo de la línea del apuntado.

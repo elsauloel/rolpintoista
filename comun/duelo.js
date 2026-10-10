@@ -459,6 +459,9 @@ const Duelo = (() => {
     // Perfora (ignora N de Defensa) lo aplica el mapa con el daño. Sus bonos de PdG / crítico ya vienen en `tiro`.
     if(cfg.flecha && !hab && cfg.flecha.nombre) inicial.ataque.flecha = {nombre: txtCorto(cfg.flecha.nombre, 60), efectos: limpiarEfectosFlecha(cfg.flecha.efectos),
       ...(_num(cfg.flecha.perfora) > 0 ? {perfora: Math.min(5, Math.round(_num(cfg.flecha.perfora)))} : {}),
+      // Lo que hace en el mapa (2026-10-10, virotes): humo, luz, explota (el dado de fuego), clava (contra una pared detrás), rebota (si falla).
+      ...(cfg.flecha.humo ? {humo: true} : {}), ...(cfg.flecha.luz ? {luz: true} : {}), ...(cfg.flecha.explota ? {explota: txtCorto(cfg.flecha.explota, 12)} : {}),
+      ...(cfg.flecha.clava ? {clava: true} : {}), ...(cfg.flecha.rebota ? {rebota: true} : {}),
       // ⚡ El salto (relámpago, tormenta): a cuántos más salta, si lleva el daño eléctrico (la mitad cada vez) y el % de Parálisis de cada salto.
       ...(cfg.flecha.salto ? {salto: {saltos: Math.min(4, Math.max(1, Math.round(_num(cfg.flecha.salto.saltos)) || 1)), dano: !!cfg.flecha.salto.dano,
         paralisis: (Array.isArray(cfg.flecha.salto.paralisis) ? cfg.flecha.salto.paralisis : []).slice(0, 4).map(v => Math.min(100, Math.max(0, Math.round(_num(v)))))}} : {})};

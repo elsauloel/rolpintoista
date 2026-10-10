@@ -26,7 +26,7 @@ function flechaItem(fl){
   const cat = typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(i => i.flecha && i.nombre === fl.nombre) : null;
   if(cat){ const c = structuredClone(cat); delete c.id; return {...c, unidades: 1}; }
   return {nombre: fl.nombre, tipoItem: 'consumibles', consumible: true, unidades: 1, peso: 0, ranuras: 1, precioCompra: 0, mods: [],
-    flecha: {efectosGolpe: fl.efectos || [], ...(num(fl.perfora) ? {perfora: num(fl.perfora)} : {})}, detalle: 'Flecha especial (va en el carcaj).'};
+    flecha: {efectosGolpe: fl.efectos || [], ...(num(fl.perfora) ? {perfora: num(fl.perfora)} : {}), ...(fl.clava ? {clava: true} : {}), ...(fl.rebota ? {rebota: true} : {})}, detalle: 'Flecha especial (va en el carcaj).'};
 }
 async function flechaErrada(d){
   const fl = d && d.ataque && d.ataque.flecha;
@@ -43,6 +43,10 @@ async function flechaErrada(d){
     if(solidos.has(nbPack(c.col, c.fila))){ choco = true; break; }   // choca contra un obstáculo: cae justo antes (si no se rompe)
     celda = c;
   }
+  // Los virotes que estallan donde caen (humo, luz, explosivo, 2026-10-10): no quedan en el piso. El de rebote, si falla, sale contra el que
+  // está pegado al blanco (y tampoco queda).
+  if(fl.humo || fl.luz || fl.explota){ await virotEstalla(d, celda, false); return; }
+  if(fl.rebota && d.resultado === 'fallo' && await viroteRebota(d)) return;
   if(choco){
     const moneda = 1 + Math.floor(Math.random() * 2);
     if(moneda === 1){ mesaLinea(`🏹 La ${fl.nombre} de ${quien} erró, chocó contra un obstáculo y se rompió (moneda: 1)`, 'recordatorio'); return; }
@@ -99,4 +103,68 @@ async function flechaSalto(d, totalMag){
   momentoAbrir({tipo: 'rayo', icono: '⚡', titulo: `${fl.nombre}: salta`, estado: 'listo', datos: {saltos}, resultado});
   mesaLinea(`⚡ La ${fl.nombre} de ${d.atacante.nombre} saltó: ${resultado}`, 'recordatorio');
   if(conDano) await rayoCadenaAplicar(cadena);
+}
+
+/* 🏹 LOS VIROTES QUE HACEN ALGO EN EL MAPA (2026-10-10, dueño: «la tanda de ballestas que necesita el mapa»; docs/ideas-ballestas.md).
+   En la flecha: `humo` (una nube de niebla, diámetro 3, 2 turnos: tapa la vista y no deja elegir de objetivo a quien quede adentro), `luz` (una
+   bengala, diámetro 3, 3 turnos), `explota` (el dado de fuego que reciben todos en la flor de 7 del blanco, directo, menos la Res. fuego),
+   `clava` (si detrás del blanco, en la línea del disparo, hay un Sólido: Inmovilizado 1 turno) y `rebota` (si falla: un disparo gratis con PdG −2
+   contra el que esté pegado al blanco). Al pegar los aplica la pantalla que aplica el daño (el GM); al fallar, la de quien disparó. */
+async function flechaAlPegar(d, invulnerable){
+  const fl = d.ataque.flecha, tD = tokens.get(d.defensor.tokenId);
+  if(!tD) return;
+  const celda = {col: tD.col, fila: tD.fila};
+  if(fl.humo || fl.luz || fl.explota) await virotEstalla(d, celda, true);
+  if(fl.clava && !invulnerable){
+    const tA = tokens.get(d.atacante.tokenId);
+    if(!tA) return;
+    const atras = flechaLinea(tA, tD, distanciaHex(tA, tD) + 1).slice(-1)[0];
+    if(atras && solidosSet().has(nbPack(atras.col, atras.fila))){
+      const r = await dueloAplicarEfecto(d, {nombre: 'Inmovilizado', caras: 1, exitos: 1, dado: '', detalle: 'Clavado contra la pared: Inmovilizado 1 turno.', spec: {nombre: 'Inmovilizado', turnos: 1}});
+      mesaLinea(`📌 El ${fl.nombre} clavó a ${d.defensor.nombre} contra la pared: Inmovilizado 1 turno${r && r.nota ? ` — ${r.nota}` : ''}`, 'recordatorio');
+    }else mesaLinea(`📌 El ${fl.nombre} pegó, pero ${d.defensor.nombre} no tenía una pared detrás: no quedó clavado`, 'recordatorio');
+  }
+}
+async function virotEstalla(d, celda, pego){
+  const fl = d.ataque.flecha, quien = (d.atacante && d.atacante.nombre) || 'Alguien', donde = pego ? `sobre ${d.defensor.nombre}` : 'donde cayó';
+  if(fl.humo){ await crearNiebla(celda, 1, {nombre: fl.nombre, zonaTurnos: 2}); mesaLinea(`💨 El ${fl.nombre} de ${quien} soltó una nube de humo ${donde} (diámetro 3, 2 turnos)`, 'recordatorio'); }
+  if(fl.luz){
+    await crearElementoZona(celda, {radio: 1, turnos: 3, nombre: fl.nombre, luz: true, color: '#FFE9A0', alfa: 25, enMantenimiento: false});
+    mesaLinea(`✨ El ${fl.nombre} de ${quien} prendió una bengala ${donde} (diámetro 3, 3 turnos)`, 'recordatorio');
+  }
+  if(fl.explota){
+    const afectados = [...tokens.values()].filter(t => t && distanciaHex(t, celda) <= 1);
+    if(!pego){   // al fallar lo ve la pantalla de quien disparó, que no puede tocar la vida de los demás: queda para el GM
+      mesaLinea(`💥 El ${fl.nombre} de ${quien} explotó ${donde}: ${fl.explota} de fuego a ${afectados.length ? afectados.map(t => t.oculto ? 'alguien' : nombreDe(t)).join(', ') : 'nadie'} (el GM lo aplica a mano)`, 'alerta-roja');
+      return;
+    }
+    const partes = [];
+    for(const t of afectados){
+      const v = Math.max(0, num((tirarDados(fl.explota) || {}).total));
+      try{
+        const rz = await resistenciasDe(t, 'fuego');
+        if(t.tipo === 'creep') await danioCreep(t, String(v), true, 0, rz.res, {magico: true});
+        else if(puedoMover(t)) await (String(t.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(t, String(v), true, 0, rz.res, {magico: true});
+        partes.push(`${t.oculto ? 'alguien' : nombreDe(t)} ${v}${rz.res ? ` (− Res. fuego ${rz.res})` : ''}`);
+      }catch(err){ console.error('No se pudo aplicar la explosión:', err); partes.push(`${nombreDe(t)} ${v} (a mano)`); }
+    }
+    momentoAbrir({tipo: 'golpe', icono: '💥', titulo: `${fl.nombre}: explota`, estado: 'listo', resultado: partes.join(' · ') || 'no alcanzó a nadie', datos: {chico: true}});
+    mesaLinea(`💥 El ${fl.nombre} de ${quien} explotó ${donde}: fuego ${fl.explota} (diámetro 3) — ${partes.join(' · ') || 'no alcanzó a nadie'}`, 'recordatorio');
+  }
+}
+async function viroteRebota(d){
+  const fl = d.ataque.flecha, tA = tokens.get(d.atacante.tokenId), tD = tokens.get(d.defensor.tokenId);
+  if(!tA || !tD) return false;
+  const otro = [...tokens.values()].filter(t => t && t.id !== tD.id && t.id !== tA.id && !t.oculto && distanciaHex(t, tD) === 1 && t.tipo !== 'elemento')
+    .sort((a, b) => distanciaHex(a, tA) - distanciaHex(b, tA))[0];
+  if(!otro){ mesaLinea(`↩ El ${fl.nombre} de ${d.atacante.nombre} erró y no tenía a nadie pegado al blanco para rebotar`, 'recordatorio'); return false; }
+  mesaLinea(`↩ El ${fl.nombre} de ${d.atacante.nombre} erró y rebota hacia ${nombreDe(otro)} (PdG −2, sin costo)`, 'recordatorio');
+  const a = d.ataque;
+  try{
+    await Duelo.crear({yo: {ref: d.atacante.ref, tipo: d.atacante.tipo, nombre: d.atacante.nombre},
+      ataque: {tipo: 'habilidad-arma', habNombre: `Rebote del ${fl.nombre}`, armaId: a.armaId || '', armaNombre: a.armaNombre || '', tipoDado: num(a.tipoDado), mods: {pdg: -2}, efectos: fl.efectos || []},
+      flecha: {nombre: `${fl.nombre} (rebote)`, efectos: fl.efectos || [], perfora: num(fl.perfora)}},
+      {id: otro.id, nombre: nombreDe(otro), tipo: otro.tipo, fichaId: otro.fichaId, duenoUid: otro.duenoUid}, tA.id);
+    return true;
+  }catch(err){ console.error('No se pudo hacer rebotar el virote:', err); return false; }
 }

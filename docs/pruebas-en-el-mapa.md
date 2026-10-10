@@ -10,6 +10,9 @@
 
 ## Pendientes
 
+- [ ] **✨ Toque mágico (Mago) con un golpe que entra** (2026-10-10): probado en el mapa que solo deja elegir al que está al lado, que el
+  defensor solo tiene Evasión (sin Parry) y que el daño queda «3d6+14» arcano (Ef.Esp 14 de juan), sin «directo». Falta verlo pegar: el
+  daño aplicado, restando la Defensa especial del objetivo y no su Defensa.
 - [ ] **⚔ Tajear (Asalto) con daño que entra** (2026-10-10): probado en el mapa que se ejecuta como ataque con el arma, cobra lo de un
   ataque, avisa sin No2 y deja seguir, suma +1 al Crítico frecuente («Tajear suma +1 a tu Crítico frecuente, solo en esta tirada») y trae el
   Sangrado al paso de efectos. Falta verlo **aplicado**: un golpe que pase la Defensa (contra el Coloso no pasó: 14 − 16; la Bruja esquivó dos

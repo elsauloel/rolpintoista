@@ -20,9 +20,10 @@ const Flotantes = (() => {
 #moneda-flotante.flot-arriba, #impulso-flotante.flot-arriba{--flot-glow:rgba(255,205,90,.75)}
 @keyframes flot-latido{0%{box-shadow:0 2px 8px rgba(0,0,0,.5),0 0 3px var(--flot-glow)}100%{box-shadow:0 2px 8px rgba(0,0,0,.5),0 0 13px var(--flot-glow)}}`;
   // Lo que explica el mouse (dueño: «al hacer hover te explica: tenés una moneda / tenés una polilla activa»).
-  const TITULO = {'polilla-flotante': 'Tenés una Polilla mística activa: tocá para sumarle +2 a tu última tirada',
-    'moneda-flotante': 'Tenés una Moneda Re-Roll: tocá para repetir una de tus últimas tiradas',
-    'impulso-flotante': 'Tenés un anillo de impulso activo: tocá para sumarle su bono a tu última tirada'};
+  const TITULO = {'polilla-flotante': 'Tenés una Polilla mística activa', 'moneda-flotante': 'Tenés una Moneda Re-Roll',
+    'impulso-flotante': 'Tenés un anillo de impulso activo'};
+  const ACCION = {'polilla-flotante': 'tocá para sumarle +2 a tu última tirada', 'moneda-flotante': 'tocá para repetir una de tus últimas tiradas',
+    'impulso-flotante': 'tocá para sumarle su bono a tu última tirada'};
   // Deja solo el ícono (el primer «carácter» del texto; la moneda conserva su cara que gira).
   function soloIcono(b){
     const div = b.querySelector('div');
@@ -55,7 +56,7 @@ const Flotantes = (() => {
         b.classList.add('flot-arriba');
         soloIcono(b);
         const sub = b.querySelector('small'), det = sub && id !== 'moneda-flotante' ? String(sub.textContent || '').trim() : '';
-        b.title = (TITULO[id] || '') + (det ? ` (${det})` : '');
+        b.title = `${TITULO[id] || ''}. ${det ? det.charAt(0).toUpperCase() + det.slice(1) + ' — ' : ''}${ACCION[id] || ''}.`;   // «Tenés una Polilla mística activa. +2 a tu última tirada: … — tocá para…»
         b.style.top = Math.round(top) + 'px'; b.style.height = Math.round(alto) + 'px'; b.style.width = Math.round(alto) + 'px';
         b.style.right = 'auto'; b.style.left = '0px';
         x -= b.offsetWidth;

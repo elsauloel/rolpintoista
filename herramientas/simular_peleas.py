@@ -8,8 +8,12 @@ Bloqueo, crítico (niveles, resistencia, d20, supercrítico), Perfora, la Fuerza
 ballesta) y la distancia (el cuerpo a cuerpo tiene que acercarse; el arco no dispara pegado y se aleja comiéndose el ataque de oportunidad).
 Las armas salen del CATÁLOGO REAL (comun/catalogo.js): en cada pelea, una al azar de esa familia y esa calidad.
 
-Lo que NO mide (se aclara en el informe): los efectos al golpear (veneno, sangrado, lisiado…), las habilidades y el SP, los consumibles, el
-terreno y la línea de tiro, los hechizos (Mago, Support, Debuffer no entran).
+Segunda vuelta (2026-10-10, dueño): **los efectos al golpear** se modelan como en el juego (comun/estados-presets.js: Veneno, Veneno severo,
+Sangrado, Quemadura, Armadura rota, Lisiado, Pajaritos, Sentado, Stun, Rengo, Drena vida, daño elemental extra) y se mide cuánto daño agrega
+cada uno; y entra **el Mago con varitas** del catálogo real (SP = Especial × 3 y su recarga, el costo que sube por uso, el daño directo que
+ignora la Defensa y el especial que frena la Defensa especial). Sin efectos: `--sin-efectos`.
+
+Lo que NO mide (se aclara en el informe): las habilidades, los consumibles, el terreno y la línea de tiro, Support y Debuffer.
 
 Uso:  py simular_peleas.py            → escribe docs/balance-peleas.md
       py simular_peleas.py --n 300    (peleas por cruce; por defecto 400)
@@ -22,13 +26,29 @@ from catalogo_comun import leer_catalogo
 RAIZ = pathlib.Path(__file__).resolve().parent.parent
 TIER_NIVEL = {1: 'Común', 3: 'Buena Calidad', 5: 'Raro'}
 CAT = [i for i in leer_catalogo() if not i.get('archivo') and str(i.get('tipoItem', '')).startswith('arma') and i.get('tipoDado') and not i.get('especial') and not i.get('orbe')]
+# Las varitas (armas especiales de un solo objetivo con daño): las de Rara no hay, se usan las Buenas.
+CAT_VAR = [i for i in leer_catalogo() if not i.get('archivo') and i.get('especial') and i['especial'].get('dano') and i.get('tipoItem') == 'arma_1m'
+           and (i['especial'].get('duelo') or {}).get('dano') and (i['especial'].get('duelo') or {}).get('objetivo', 'enemigo') == 'enemigo'
+           and not (i['especial'].get('duelo') or {}).get('area')]
+EFECTOS = True                                     # --sin-efectos lo apaga
+EF_STATS = collections.defaultdict(lambda: [0, 0.0])   # efecto → [veces que se aplicó, daño que hizo (directo o por turno)]
+ATAQUES_CON = collections.Counter()                # efecto → ataques hechos con un arma que lo trae (para «cuánto suma por ataque»)
+def tirar_formula(f):
+    import re
+    m = re.match(r'\s*(\d*)d(\d+)\s*([+-]\s*\d+)?', str(f or ''))
+    if not m: return 0
+    n = int(m.group(1) or 1); c = int(m.group(2)); k = int((m.group(3) or '0').replace(' ', ''))
+    return sum(random.randint(1, c) for _ in range(n)) + k
 ESCUDO = {1: dict(peso=2, defensa=1, bloqueo=0), 3: dict(peso=2, defensa=1, bloqueo=1), 5: dict(peso=2, defensa=2, bloqueo=1)}
 
 def familia(it):
+    if it.get('especial'): return 'Varita'
     if it.get('armaDeRango'): return 'Arco' if it.get('arco') else 'Ballesta' if it.get('recarga') else 'Otra de rango'
     return {4: 'Daga', 6: 'Espada', 8: 'Hacha', 10: 'Maza', 12: 'Explosiva'}.get(int(it['tipoDado']), 'Otra')
 def pool(fam, nivel, manos=None):
     t = TIER_NIVEL[nivel]
+    if fam == 'Varita':
+        return [i for i in CAT_VAR if i.get('tier') == t] or [i for i in CAT_VAR if i.get('tier') == 'Buena Calidad']
     p = [i for i in CAT if familia(i) == fam and i.get('tier') == t and (manos is None or i['tipoItem'] == manos)]
     return p or [i for i in CAT if familia(i) == fam and i.get('tier') == t]
 
@@ -44,10 +64,13 @@ ARQ = {
     'Warrior': dict(armadura='media', juegos={'hacha 2 manos': ('Hacha', 'arma_2m', False), 'espada y escudo': ('Espada', 'arma_1m', True), 'arco': ('Arco', None, False), 'ballesta': ('Ballesta', 'arma_2m', False)}),
     'Tanque': dict(armadura='pesada', juegos={'maza y escudo': ('Maza', 'arma_1m', True), 'espada y escudo': ('Espada', 'arma_1m', True), 'ballesta de mano y escudo': ('Ballesta', 'arma_1m', True)}),
     'Asalto': dict(armadura='liviana', juegos={'daga': ('Daga', 'arma_1m', False), 'espada': ('Espada', 'arma_1m', False), 'maza 2 manos': ('Maza', 'arma_2m', False), 'arco': ('Arco', None, False)}),
+    'Mago': dict(armadura='liviana', juegos={'varita': ('Varita', None, False), 'daga': ('Daga', 'arma_1m', False)}),
     'Shooter': dict(armadura='liviana', juegos={'arco': ('Arco', None, False), 'ballesta': ('Ballesta', 'arma_2m', False), 'daga': ('Daga', 'arma_1m', False), 'hacha 2 manos': ('Hacha', 'arma_2m', False)}),
 }
 MEJOR = {'Warrior': 'hacha 2 manos', 'Tanque': 'espada y escudo',   # la maza le pide Agilidad 5 (M5, a propósito): con 3–4 no le alcanza para atacar
-         'Asalto': 'daga', 'Shooter': 'arco'}
+         'Asalto': 'daga', 'Shooter': 'arco', 'Mago': 'varita'}
+# La Defensa especial de cada armadura (frena el daño especial, no el directo): supuesto del simulador hasta medir el catálogo de defensas.
+DEF_ESPECIAL = {'liviana': 0, 'media': 0.25, 'pesada': 0.34}
 
 def mod(it, st): return sum(float(m.get('val') or 0) for m in it.get('mods') or [] if m.get('stat') == st)
 
@@ -69,9 +92,22 @@ class Luchador:
         self.recarga = int(self.arma.get('recarga') or 0) if self.rango and not self.arco else 0
         self.alcance = max(1, at['des'] + mod(self.arma, 'rng')) if self.rango else 1 + max(0, mod(self.arma, 'rng'))
         self.pos = 0
+        self.est = collections.Counter()   # estados: veneno (stacks), severo (daño del próximo turno), sangrado, quemadura (turnos), rota (stacks),
+        self.sentado = False               # lisiado / pajaritos / stun / rengo (turnos que le quedan)
+        self.varita = self.fam == 'Varita'
+        if self.varita:
+            self.rango, self.arco, self.recarga = True, False, 0
+            self.alcance = max(1, at['des'])
+            self.sp_max = self.sp = at['esp'] * 3
+        self.def_esp = round(self.defensa * DEF_ESPECIAL[ARQ[clase]['armadura']])
     vivo = property(lambda s: s.hp > 0)
-    def tipo(self): return int(self.arma['tipoDado'])
+    def defensa_ef(self): return max(0, self.defensa - self.est['rota'])
+    def tipo(self): return int(self.arma.get('tipoDado') or 6)
     def costo(self, k):
+        if self.varita:   # 1 No2 el primer uso y +1 por cada uno más; el SP que falte se paga con No2
+            e = self.arma['especial']
+            no2 = int(e.get('no2', 1) if e.get('no2') is not None else 1) + k * int(e.get('sube', 1) if e.get('sube') is not None else 1)
+            return no2 + max(0, int(e.get('sp') or 0) - self.sp)
         if self.recarga: return self.recarga * (k + 1)
         t = self.tipo(); c = math.ceil(t / 2) if k == 0 else t
         return max(0, c - (int(self.arma.get('ahorroNitros') or 0) if k == 0 else 0))
@@ -85,26 +121,30 @@ class Luchador:
 
 def tirar(v): return B.tirar(max(1, v))
 
+def mitad(v, si): return max(1, v // 2) if si else v
 def ataque(a, d, k):
-    """a ataca a d (k = cuántos ataques hizo a en el turno, para la Perfora no importa). Devuelve el daño."""
+    """a ataca a d (k = cuántos ataques hizo a en el turno). Devuelve el daño (y aplica los efectos al golpear)."""
+    if a.varita: return ataque_varita(a, d)
     it = a.arma
-    p = tirar(a.at['des'] + mod(it, 'pdg'))
+    if EFECTOS:
+        for e in it.get('efectosGolpe') or []: ATAQUES_CON[e['nombre']] += 1
+    p = mitad(tirar(a.at['des'] + mod(it, 'pdg')), EFECTOS and (a.est['lisiado'] > 0 or a.est['pajaritos'] > 0))
     # El defensor elige: Parry (si puede, le quedan No2 y su Parry es mejor que su Evasión) o Evasión.
-    usa_parry = d.puede_parry(a) and d.no2 >= 1 and d.at['des'] > d.at['agl']
+    usa_parry = d.puede_parry(a) and d.no2 >= 1 and d.at['des'] > d.at['agl'] and not d.est['stun']
     if usa_parry:
         d.no2 -= 1
-        if tirar(d.at['des'] + (0)) >= p:
+        if mitad(tirar(d.at['des']), EFECTOS and d.est['lisiado'] > 0) >= p:
             # Bloqueo: Fuerza + Peso del arma o escudo, contra la Fuerza del atacante + el Peso de su arma.
             bl = tirar(d.at['fue'] + d.peso_bloqueo() + (d.escudo['bloqueo'] if d.escudo else 0))
             fz = tirar(a.at['fue'] + int(it.get('peso') or 1))
             if bl >= fz: return 0
-            mitad = True
-        else: mitad = False
+            amedias = True
+        else: amedias = False
         e = None
     else:
-        e = max(1, tirar(d.at['agl']))
+        e = 1 if (EFECTOS and d.est['stun']) else max(1, mitad(tirar(d.at['agl']), EFECTOS and (d.est['pajaritos'] > 0 or d.sentado)))
         if p < e or (p == e and random.random() < .5): return 0
-        mitad = False
+        amedias = False
     n = int(it.get('peso') or 1) + int(it.get('danoAmplificado') or 0)
     tipo = a.tipo()
     dano = sum(random.randint(1, tipo) for _ in range(n)) + a.fue_suma() + float(it.get('danoFijo') or 0)
@@ -116,23 +156,85 @@ def ataque(a, d, k):
         if niveles > 0:
             r = [random.randint(1, 20) for _ in range(niveles)]
             v = r.count(20); bmax = max(r)
-            return dano * (4 * v if v >= 2 else 4 if bmax >= 20 else 3 if bmax >= 17 else 2 if bmax >= 7 else 1)
+            golpe = dano * (4 * v if v >= 2 else 4 if bmax >= 20 else 3 if bmax >= 17 else 2 if bmax >= 7 else 1)
+            return golpe + efectos_al_golpear(a, d, golpe)
     perf = min(5, int(it.get('perfora') or 0))
-    golpe = max(0, dano - max(0, d.defensa - perf))
-    return math.ceil(golpe / 2) if mitad else golpe
+    golpe = max(0, dano - max(0, d.defensa_ef() - perf))
+    golpe = math.ceil(golpe / 2) if amedias else golpe
+    return golpe + efectos_al_golpear(a, d, golpe)
+
+def efectos_al_golpear(a, d, golpe):
+    """Los efectos al golpear del arma de a sobre d (golpe = el daño que pasó). Devuelve el daño de más que hacen en el momento."""
+    if not EFECTOS: return 0
+    extra = 0
+    for e in a.arma.get('efectosGolpe') or []:
+        n = e.get('nombre')
+        if random.random() > min(1.0, int(e.get('exitos') or 1) / max(1, int(e.get('caras') or 1))): continue
+        if e.get('danoMagico') and e.get('dado'):   # el daño elemental de más: directo
+            v = tirar_formula(e['dado']); extra += v; EF_STATS[n][0] += 1; EF_STATS[n][1] += v; continue
+        st = int(e.get('stacks') or 0)
+        if n in ('Envenenar', 'Veneno severo', 'Sangrado') and golpe <= 0: continue   # necesitan que el golpe haga daño
+        EF_STATS[n][0] += 1
+        if n == 'Envenenar': d.est['veneno'] += st or 2
+        elif n == 'Veneno severo': d.est['severo'] = max(d.est['severo'], 1)
+        elif n == 'Sangrado': d.est['sangrado'] = d.est['sangrado'] + 1 if d.est['sangrado'] else (st or 2)
+        elif n == 'Rompe armadura': d.est['rota'] += st or 1
+        elif n == 'Lisiado': d.est['lisiado'] = 3
+        elif n == 'Pajaritos': d.est['pajaritos'] = 3
+        elif n == 'Derribar': d.sentado = True
+        elif n == 'Aturdir': d.est['stun'] = 2
+        elif n == 'Rengo': d.est['rengo'] = 3
+        elif n == 'Prende fuego': d.est['quemadura'] = 3
+        elif n == 'Drena vida':
+            cura = min(a.hp_max - a.hp, math.floor(golpe * float(e.get('drenaPct') or 50) / 100)); a.hp += max(0, cura); EF_STATS[n][1] += max(0, cura)
+    return extra
+
+def ataque_varita(a, d):
+    """La varita: PdG.Esp contra la Evasión (sin Parry ni crítico en este modelo), daño de la varita (+ el Especial si lo suma); el directo
+    ignora la Defensa, el especial lo frena la Defensa especial."""
+    e = a.arma['especial']
+    p = mitad(tirar(a.at['esp']), EFECTOS and (a.est['lisiado'] > 0 or a.est['pajaritos'] > 0))
+    ev = 1 if (EFECTOS and d.est['stun']) else max(1, mitad(tirar(d.at['agl']), EFECTOS and (d.est['pajaritos'] > 0 or d.sentado)))
+    if p < ev or (p == ev and random.random() < .5): return 0
+    suma = e.get('sumaEspecial')
+    dano = tirar_formula(e['dano']) + (math.floor(a.at['esp'] * (1 if suma is True else float(suma))) if suma else 0)
+    directo = (e.get('duelo') or {}).get('danoDirecto')
+    return max(0, dano - (0 if directo else d.def_esp))
+
+def estados_al_empezar(a):
+    """El daño por turno de los estados y lo que vence. Devuelve False si pierde el turno (Stun)."""
+    if not EFECTOS: return True
+    for clave, nombre in (('veneno', 'Envenenar'), ('severo', 'Veneno severo'), ('sangrado', 'Sangrado'), ('quemadura', 'Prende fuego')):
+        if a.est[clave] <= 0: continue
+        v = 2 if clave == 'quemadura' else a.est[clave]
+        a.hp -= v; EF_STATS[nombre][1] += v
+        if clave == 'veneno': a.est['veneno'] -= 1
+        elif clave == 'severo': a.est['severo'] += 1
+        elif clave == 'quemadura': a.est['quemadura'] -= 1
+    for k in ('lisiado', 'pajaritos', 'rengo'):
+        if a.est[k] > 0: a.est[k] -= 1
+    if a.est['stun'] > 0:
+        a.est['stun'] -= 1; EF_STATS['Aturdir'][1] += 0
+        return False
+    return True
 
 def turno(a, enemigos, aliados, log):
     vivos = [e for e in enemigos if e.vivo]
     if not vivos: return
     a.no2 = a.at['agl']
+    if a.varita: a.sp = min(a.sp_max, a.sp + a.at['esp'] // 2)
+    if not estados_al_empezar(a) or not a.vivo: return
+    if a.sentado:   # levantarse cuesta 1 No2
+        a.no2 -= 1; a.sentado = False
     # Objetivo: el que está más cerca; entre iguales, el de menos vida.
     obj = min(vivos, key=lambda e: (abs(e.pos - a.pos), e.hp))
     dist = abs(obj.pos - a.pos)
     k = 0
     if not a.rango:
         # Acercarse (1 No2 por casillero) hasta tenerlo al alcance.
-        while dist > a.alcance and a.no2 >= 1:
-            a.pos += 1 if obj.pos > a.pos else -1; a.no2 -= 1; dist -= 1
+        paso = 2 if (EFECTOS and a.est['rengo'] > 0) else 1
+        while dist > a.alcance and a.no2 >= paso:
+            a.pos += 1 if obj.pos > a.pos else -1; a.no2 -= paso; dist -= 1
         if dist > a.alcance: return
     else:
         if a.arco and dist < 2:   # el arco no dispara pegado: se aleja 1 y se come el ataque de oportunidad de quien estaba al lado
@@ -146,6 +248,7 @@ def turno(a, enemigos, aliados, log):
     reserva = 1 if (a.at['des'] > a.at['agl'] and (not a.rango or a.escudo)) else 0   # guarda 1 No2 para un Parry si le conviene (no a costa del primer ataque)
     while a.no2 >= a.costo(k) and (k == 0 or a.no2 - a.costo(k) >= reserva) and obj.vivo:
         a.no2 -= a.costo(k)
+        if a.varita: a.sp = max(0, a.sp - int(a.arma['especial'].get('sp') or 0))
         obj.hp -= ataque(a, obj, k)
         k += 1
         if not obj.vivo:

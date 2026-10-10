@@ -566,10 +566,10 @@ prueba('el carcaj: viene con el arco, guarda las flechas especiales y las gasta;
     FichaEquipo.carcajUsado(car), S.inventario.some(i => i.flecha), FichaEquipo.carcajDe(S) === car, GeneradorTiendas.seccionDe(flecha), GeneradorTiendas.seccionDe(car)],
     ['Carcaj de cuero', 10, 1, 1, 3, 'Flecha de fuego', 2, false, true, 'talabarteria', 'talabarteria']);
 });
-prueba('la flecha envenenada perfora 1 y su veneno entra aunque la armadura pare el golpe (2026-10-09)', () => {
+prueba('la flecha envenenada perfora 1 y su veneno necesita que pase el daño, como siempre (2026-10-09)', () => {
   const f = CATALOGO_BASE.find(i => i.id === 'flecha-envenenada'), fuego = CATALOGO_BASE.find(i => i.id === 'flecha-de-fuego');
   const ef = EfectosGolpe.lista(f.flecha.efectosGolpe)[0];
-  igual([f.flecha.perfora, ef.nombre, ef.stacks, ef.requiereDano, 'requiereDano' in EfectosGolpe.lista(fuego.flecha.efectosGolpe)[1]], [1, 'Envenenar', 3, false, false]);
+  igual([f.flecha.perfora, ef.nombre, ef.stacks, 'requiereDano' in ef, 'requiereDano' in EfectosGolpe.lista(fuego.flecha.efectosGolpe)[1]], [1, 'Envenenar', 3, false, false]);
 });
 prueba('las flechas eléctricas saltan y paralizan; la de escarcha deja Escarcha 1 turno (2026-10-09)', () => {
   const f = id => CATALOGO_BASE.find(i => i.id === id).flecha;

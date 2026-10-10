@@ -31,15 +31,15 @@
 - [ ] **🏹 Parry de un personaje o invocación contra un disparo, con escudo** (2026-10-09; sin arco en las manos, ya probado): uno con escudo
   atacado con un arco ve el Parry solo con el escudo y, si gana, «¡PARADO!» sin Bloqueo.
 - [ ] **🏹 Perfora sin crítico** (2026-10-09): un disparo con la Perforante o la Envenenada que pega SIN crítico muestra «perfora 1» en el daño (con
-  crítico no hace falta: la Defensa ya se ignora entera). Y la Envenenada contra alguien con mucha Defensa: el veneno entra aunque no pase el daño.
+  crítico no hace falta: la Defensa ya se ignora entera).
 - [ ] **🏹 Línea de tiro, tiro alto y distancia ideal** (2026-10-09): al atacar con un arma de rango se ve la línea al mouse (verde / ámbar «roza» / roja «tapado»); elegir un objetivo tapado por un token pregunta «Tiro alto (PdG −2)» (si el arma lo tiene y está a 4+), «Disparar igual» o «Elegir otro»; un obstáculo Sólido no permite tiro alto; con distancia ideal, los objetivos en la franja brillan en celeste y el duelo suma el bono (y lo muestra en la Mesa).
 
 ## Probado
 
 - ✅ **🏹 Disparo contra un personaje y la flecha envenenada** (2026-10-09): la Bruja (Arco largo de tejo) le dispara a juan: «Elegí cómo te
   defendés» ofrece solo la Evasión (juan tiene el arco en las manos: no parrea con él) y ya sin la nota del disparo; esquivó 5 contra 2. juan
-  dispara la Envenenada: la declaración dice «Flecha envenenada: Envenenar · perfora 1»; crítico ×2 (18); el veneno sale como «siempre», en el
-  duelo guardado `requiereDano: false` y se aplicó Veneno ×3.
+  dispara la Envenenada: la declaración dice «Flecha envenenada: Envenenar · perfora 1»; crítico ×2 (18); se aplicó Veneno ×3. (Después, dueño: el
+  veneno sigue necesitando que pase el daño; para eso está la Perfora.)
 
 - ✅ **🏹 Flechas eléctricas y levantar una flecha** (2026-10-09): juan a la Bruja (con Stun, para que pegue). **Relámpago**: el duelo dice
   «Flecha relámpago: Parálisis», pegó, Parálisis 1 turno aplicada al blanco y saltó al Coloso de mineral (a 2 casillas): 1d2 = 2 → paralizado

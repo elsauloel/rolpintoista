@@ -19,7 +19,7 @@ const Glosario = (() => {
     {titulo: 'Tipo', re: 'Tipo (?:4|6|8|10|12)', texto: 'Tipo N: el dado del arma (Tipo 6 = d6) y contra qué Resistencia a crítico pega. El primer ataque del turno cuesta la mitad del Tipo en No2 y los siguientes, el Tipo entero.'},
     {titulo: 'Amplificado', re: 'amplificados?', texto: 'Daño amplificado: dados de daño de más que no pesan.'},
     {titulo: '2 manos', re: '2 manos|a dos manos', texto: 'A dos manos: ocupa las dos manos (no se puede llevar un escudo ni otra arma).'},
-    {titulo: 'Arco', re: 'arco', texto: 'Arco: suma la mitad de tu Dmg (para arriba). Dispara con al menos 2 casilleros libres entre vos y el objetivo; con el arco no se pega cuerpo a cuerpo, no se hacen ataques de oportunidad ni se parrea.'},
+    {titulo: 'Arco', re: 'arco', texto: 'Arco: suma la mitad de tu Dmg (para arriba) y tiene Tiro alto (salvo que diga «Sin tiro alto»). Dispara con al menos 2 casilleros libres entre vos y el objetivo; con el arco no se pega cuerpo a cuerpo, no se hacen ataques de oportunidad ni se parrea.'},
     {titulo: 'A distancia', re: 'a distancia', texto: 'Arma a distancia: el daño es solo el del arma, no suma tu Dmg.'},
     {titulo: 'Tiro alto', re: 'Tiro alto', texto: 'Tiro alto: dispara por encima de los tokens que tapan la línea (no de los Sólidos), con el objetivo a 4 casilleros o más y PdG −2 en ese disparo. Lo tienen todos los arcos. ⚙ El mapa lo ofrece solo.'},
     {titulo: 'Sin tiro alto', re: 'Sin tiro alto', texto: 'Sin tiro alto: a diferencia del resto de los arcos, este no puede tirar por encima de los tokens que tapan la línea.'},
@@ -133,8 +133,11 @@ padding:9px 12px;font:13px/1.45 system-ui,sans-serif;box-shadow:0 8px 28px rgba(
       const d = def(el.dataset.glo);
       if(!d){ esconder(); return; }
       actual = el;
-      const resto = d.texto.startsWith(d.titulo) ? d.texto.slice(d.titulo.length).replace(/^\s*[:.]\s*/, '') : d.texto;
-      globo.innerHTML = `<b>${esc(d.titulo)}</b>${esc(resto || d.texto)}`;
+      // Título: lo que dice el texto marcado («Tipo 4», «Perfora 1»); el cuerpo, sin el «Nombre:» del principio si lo trae.
+      const cab = /^([^:]{1,48}):\s+/.exec(d.texto);
+      const cuerpo = cab && cab[1].toLowerCase().includes(d.titulo.toLowerCase().split(' ')[0]) ? d.texto.slice(cab[0].length) : d.texto;
+      const titulo = (el.textContent || d.titulo).trim();
+      globo.innerHTML = `<b>${esc(titulo.charAt(0).toUpperCase() + titulo.slice(1))}</b>${esc(cuerpo.charAt(0).toUpperCase() + cuerpo.slice(1))}`;
       globo.style.display = 'block';
       const r = el.getBoundingClientRect(), g = globo.getBoundingClientRect();
       let x = Math.min(Math.max(8, r.left), innerWidth - g.width - 8), y = r.bottom + 6;
@@ -142,7 +145,21 @@ padding:9px 12px;font:13px/1.45 system-ui,sans-serif;box-shadow:0 8px 28px rgba(
       globo.style.left = x + 'px'; globo.style.top = y + 'px';
     };
     const esconder = () => { actual = null; if(globo) globo.style.display = 'none'; };
-    document.addEventListener('mouseover', e => { const el = cual(e); if(el && el !== actual) mostrar(el); else if(!el && actual) esconder(); }, true);
+    // Lo que hay debajo del puntero, entrando en los recuadros aislados (por si el evento llega apuntado al recuadro y no al término).
+    const bajo = e => {
+      const c = cual(e);
+      if(c) return c;
+      let el = document.elementFromPoint(e.clientX, e.clientY);
+      for(let i = 0; el && el.shadowRoot && i < 4; i++){ const x = el.shadowRoot.elementFromPoint(e.clientX, e.clientY); if(!x || x === el) break; el = x; }
+      return el && el.closest ? el.closest('.glo') : null;
+    };
+    let pendiente = null;
+    const revisar = e => {
+      pendiente = e;
+      requestAnimationFrame(() => { if(!pendiente) return; const ev = pendiente; pendiente = null; const el = bajo(ev); if(el && el !== actual) mostrar(el); else if(!el && actual) esconder(); });
+    };
+    document.addEventListener('mouseover', revisar, true);
+    document.addEventListener('mousemove', revisar, true);
     document.addEventListener('focusin', e => { const el = cual(e); if(el) mostrar(el); }, true);
     document.addEventListener('focusout', () => esconder(), true);
     ['scroll', 'mousedown', 'keydown'].forEach(ev => document.addEventListener(ev, () => esconder(), true));

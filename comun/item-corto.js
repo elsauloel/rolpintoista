@@ -216,7 +216,8 @@ const ItemCorto = (() => {
       if(fuente.pilaInfinita && !/apila/.test(p.tecnico)) extra.push('Se apila sin límite en la mochila.');
     }
     const notas = String(p.tecnico || '').split(/\s*(?=[⚙✋])/).map(x => x.trim()).filter(Boolean);
-    const lineas = [...notas, ...extra].filter(Boolean);
+    const dicen = notas.join(' ');   // lo que ya cuentan las notas del ítem no se repite (el costo de una varita, por ejemplo)
+    const lineas = [...notas, ...extra.filter(l => !(/^Cuesta /.test(l) && /Cuesta/.test(dicen)))].filter(Boolean);
     if(!lineas.length && !p.auditar) return '';
     return `<div class="ic-tecnico"><b>Detalles técnicos</b>${lineas.length ? `<ul>${lineas.map(l => `<li>${mk(l)}</li>`).join('')}</ul>` : ''}`
       + `${p.auditar ? '<div class="ic-pie">Creada automáticamente: las cifras están para auditar.</div>' : ''}</div>`;

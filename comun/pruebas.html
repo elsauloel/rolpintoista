@@ -3334,12 +3334,12 @@ prueba('habilidad con el arma: suma el bono del arma y el de la habilidad', () =
 });
 
 grupo('Rework de armas: T4 Común (2026-10-03)');
-prueba('el catálogo trae las 24 T4 Comunes cuerpo a cuerpo, sin las copias', () => {
+prueba('el catálogo trae las 26 T4 Comunes (24 + 2 con Perfora, 2026-10-10) cuerpo a cuerpo, sin las copias', () => {
   const t4 = CATALOGO_BASE.filter(i => /^arma_/.test(i.tipoItem) && i.tipoDado === 4 && i.tier === 'Común' && !i.armaDeRango);
   const nom = n => t4.find(i => i.nombre === n);
   igual([t4.length, ['Cuchillo del grumete polizón', 'Punzón del ladronzuelo', 'Lanza de guardia de puerta', 'Estileto ritual del acólito'].some(nom), nom('Lanza corta').peso,
     nom('Estileto').mods, nom('Cuchillo de trinchera').durExtra, Combatiente.durMax(nom('Cuchillo de trinchera')), nom('Punzón de matarife').efectosGolpe[0].seguroCritico],
-    [24, false, 1, [{stat: 'critpot', val: 1}], 3, 6, true]);
+    [26, false, 1, [{stat: 'critpot', val: 1}], 3, 6, true]);
 });
 prueba('efecto «seguro si es crítico»: el asistente lo conserva (y los stacks); en el duelo, con crítico entra sin tirar', () => { const pp = fbFalsoCola.then(async () => {
   const n = EfectosGolpe.normalizar({nombre: 'Envenenar', caras: 4, exitos: 1, stacks: 2, seguroCritico: true});
@@ -3415,7 +3415,7 @@ prueba('cómo se ve un arma: en la grilla lo esencial (= el Detalle de las T4 Co
   const punzon = t4.find(i => i.nombre === 'Punzón de matarife'), ver = ItemCorto.verHtml(punzon), grilla = ItemCorto.grillaHtml(punzon);
   igual([t4.length, distintos, t4.every(i => i.descripcionNarrativa), /Detalles técnicos/.test(ver), /data-glo="Lisiado"/.test(ver) && /^Lisiado: 3 turnos/.test(Glosario.def('Lisiado').texto), /data-glo="seguro si es crítico"/.test(ver), /Lisiado: 3 turnos/.test(grilla),
     ItemCorto.armaEsencial({tipoItem: 'arma_2m', tipoDado: 4, peso: 2, mods: [{stat: 'rng', val: 1}], efectosGolpe: [{nombre: 'Sangrado', caras: 2, exitos: 1, turnos: 2}]})],
-    [258, [], true, true, true, true, false, 'Tipo 4 · 2 manos · 2 dados · Alcance +1 · Sangrado 50 % (2 en d2) · 2 turnos']);
+    [268, [], true, true, true, true, false, 'Tipo 4 · 2 manos · 2 dados · Alcance +1 · Sangrado 50 % (2 en d2) · 2 turnos']);
 });
 prueba('Demora (Tipo 10): el duelo la reconoce (también el nombre viejo, Knockdown) y «Detalles técnicos» la explica; Derribar sigue siendo Sentado', () => {
   const ver = ItemCorto.verHtml({nombre: 'Garrote de pastor', tipoItem: 'arma_1m', tipoDado: 10, peso: 1, efectosGolpe: [{nombre: 'Demora', caras: 3, exitos: 1}]});

@@ -52,6 +52,7 @@ DESCUENTO_ARCO = 0.7
 # (así cae en su calidad con lugar para bonos); la de asedio (Recarga 3) un poco menos por punto (un solo disparo por turno, más grande).
 DESCUENTO_BALLESTA = 0.7
 PERFORA_VALOR = 0.8   # lo que vale cada punto de Perfora frente a +1 de daño fijo (docs/ideas-arcos-flechas.md)
+PERFORA_CASA = {'punzante': 1.0, 'cortante': 1.25}   # la casa de la Perfora cuerpo a cuerpo: las dagas (Tipo 4); en las espadas (Tipo 6), habilitada (dueño, 2026-10-10)
 RECARGA_FACTOR = {1: 1.0, 2: 1.0, 3: 0.9}
 TIRO_ALTO_PC = 1.5            # el tiro alto (por encima de los tokens, PdG −2)
 IDEAL_FACTOR = {1: 0.35, 2: 0.5, 3: 0.65}   # la distancia ideal: qué fracción de sus bonos fijos vale, según el ancho de la franja
@@ -108,7 +109,10 @@ def puntaje(arma):
     tipo, peso, fijo = int(arma.get('tipoDado') or 0), int(arma.get('peso') or 1), float(arma.get('danoFijo') or 0)
     amp = int(arma.get('danoAmplificado') or 0)   # los dados amplificados también pegan (no pesan)
     perf = min(5.0, float(arma.get('perfora') or 0))   # Perfora N (2026-10-10): 0,8 de un punto de daño fijo por punto
-    d = {'daño': (peso + amp) * (tipo + 1) / 2 + (fijo + PERFORA_VALOR * perf) * factor_plano(tipo)}
+    rango = bool(arma.get('armaDeRango'))
+    d = {'daño': (peso + amp) * (tipo + 1) / 2 + (fijo + (PERFORA_VALOR * perf if rango else 0)) * factor_plano(tipo)}
+    if perf and not rango:   # cuerpo a cuerpo: la casa de la Perfora es el Tipo 4 (dueño, 2026-10-10); en el Tipo 6, habilitada; en el resto, fuera de casa
+        d['perfora'] = PERFORA_VALOR * perf * factor_plano(tipo) * PERFORA_CASA.get(familia(arma), 1.5)
     if arma.get('armaDeRango') and arma.get('arco'): d['daño'] *= DESCUENTO_ARCO
     elif arma.get('armaDeRango') and int(arma.get('recarga') or 0) > 0: d['daño'] *= DESCUENTO_BALLESTA * RECARGA_FACTOR.get(int(arma['recarga']), 1.0)
     fam = familia(arma)

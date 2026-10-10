@@ -2120,3 +2120,13 @@ ahorro en armas especiales va a otro slot (a definir).
 
 **«Arma especial», no «varita» (dueño, 2026-10-05):** todos estos efectos valen para **cualquier arma especial** (varitas, báculos…); decir
 «varita» los acota de más.
+
+## 2026-10-10 · Perfora en dagas (su casa) y espadas (dueño)
+**Pedido:** «incorporar el daño perforante en las dagas y en las espadas; en las dagas que sea su casa, desde nivel bajo, todas las posibilidades
+que permita el puntaje; reemplazar rellenos y sumar armas si hace falta; en Tipo 6, la mitad de la proporción de las Tipo 4».
+**Hecho:** la mitad de las Tipo 4 cuerpo a cuerpo de cada calidad tiene Perfora (Común 13/26 · Buena 10/20 · Rara 10/20 · Excepcional 10/19;
+valores 1–2 en Común hasta 5 en Excepcional) y un cuarto de las Tipo 6 (Común 6/25 · Buena 5/19 · Rara 5/19). 10 armas nuevas pensadas para
+perforar (Punzón de talabartero, Daga de cota, Estilete de malla, Aguja de corsario, Misericordia, Puñal de la frontera, Rompecotas; Sable de
+punta, Espada ropera, Espada de estocada). A las convertidas se les hizo lugar sin cambiar de calidad ni tocar su identidad: solo daño fijo o
+bonos de relleno (PdG en oportunidad, Iniciativa, PdG en contraataque); el precio subió en la misma proporción que su valor. En la
+calculadora, la Perfora cuerpo a cuerpo es «de la casa» en el Tipo 4 (×1) y habilitada en el Tipo 6 (×1,25).

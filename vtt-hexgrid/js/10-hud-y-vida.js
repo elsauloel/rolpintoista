@@ -125,6 +125,8 @@ function resolverGolpe(golpe, defensa, efectos){
   if(activos.some(e => e.invulnerable)) return {recibido: 0, invulnerable: true, defensa, absorbido: 0};
   let recibido = Math.max(0, golpe - defensa);
   let absorbido = 0;
+  const ab = Combatiente.absorberPct(activos, recibido);   // Armadura arcana: se queda con el 50 % de lo que llega, hasta 10 (2026-10-10)
+  recibido = ab.recibido; absorbido += ab.tomado;
   const capas = activos.filter(e => (e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) && num(e.escudoMagicoActual ?? e.escudoMagico) > 0)
     .sort((a, b) => (a.excedenteVida ? 1 : 0) - (b.excedenteVida ? 1 : 0));   // primero los escudos, al final la vida extra
   capas.forEach(c => {
@@ -134,7 +136,7 @@ function resolverGolpe(golpe, defensa, efectos){
     if(c.excedenteVida) c.escudoMagico = c.escudoMagicoActual;   // valor neto: no hay máximo
     absorbido += tomado; recibido -= tomado;
   });
-  return {recibido, absorbido, defensa};
+  return {recibido, absorbido, defensa, ...(ab.tomado ? {arcano: ab.tomado} : {})};
 }
 
 function leerGolpe(texto){
@@ -144,7 +146,8 @@ function leerGolpe(texto){
 
 function golpeTexto(nombre, golpe, r, previo, nuevo){
   const extra = [];
-  if(r.absorbido) extra.push(`Vida extra absorbió ${fmt(r.absorbido)}`);
+  if(r.arcano) extra.push(`la Armadura arcana absorbió ${fmt(r.arcano)}`);
+  if(num(r.absorbido) - num(r.arcano) > 0) extra.push(`Vida extra absorbió ${fmt(num(r.absorbido) - num(r.arcano))}`);
   const suf = extra.length ? ` · ${extra.join(' · ')}` : '';
   if(r.invulnerable) return `${nombre}: Invulnerable, el golpe de ${fmt(golpe)} no hizo nada`;
   if(r.recibido <= 0 && !r.absorbido) return `${nombre}: golpe de ${fmt(golpe)} · Defensa ${fmt(r.defensa)} lo frenó entero`;

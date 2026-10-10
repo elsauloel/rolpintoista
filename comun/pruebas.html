@@ -2230,6 +2230,17 @@ prueba('Ejecución ✨: «el daño de tu arma» y la onda con dodge roll (Daño 
   igual([armaUi, dodgeUi, c && [c.danoArma, c.ondaDodge, c.tipoDano], h.dano, h.dodge, Duelo.limpiarHab(h).dodge, sinArma.dano, !!(pj.dano && pj.dano.formula === FichaCombate.armaDanoTxt(S.inventario[0], FichaCalculo.calcular(S).final.dmg))],
     [true, true, [true, true, 'fisico'], {formula: '1d8 + 3', tipo: 'fisico', ignoraDef: false}, true, true, null, true]);
 });
+prueba('Armadura arcana (2026-10-10): absorbe el 50 % de cada golpe (para arriba) hasta 10; al vencerse explota con lo absorbido, daño directo', () => {
+  const aa = CLASES_SKILLS.find(x => x.id === 'mago').habilidades.find(x => x.id === 'mago-armadura-arcana');
+  const pre = estadosPresetFicha().find(p => p.nombre === 'Armadura arcana');
+  const est = [{...structuredClone(pre), id: 'a1', activo: true}];
+  const g1 = Combatiente.absorberPct(est, 7), g2 = Combatiente.absorberPct(est, 9), g3 = Combatiente.absorberPct(est, 6), g4 = Combatiente.absorberPct(est, 5);
+  const antes = Combatiente.explosivos(est), venc = Combatiente.vencidosExplosivos(antes, []), sigue = Combatiente.vencidosExplosivos(antes, est);
+  const marcado = Glosario.marcar('Hace 1d6 de daño directo.');
+  igual([aa.costo, aa.nitrosCosto, aa.duelo.efectos[0].nombre, [g1.recibido, g1.tomado], [g2.recibido, g2.tomado], [g3.recibido, g3.tomado], [g4.recibido, g4.tomado], est[0].absorbido,
+    venc.map(x => [x.nombre, x.absorbido, x.radio, x.directo]), sigue.length, /class="glo"/.test(marcado), !!Glosario.def('Daño directo')],
+    ['5', 3, 'Armadura arcana', [3, 4], [4, 5], [5, 1], [5, 0], 10, [['Armadura arcana', 10, 1, true]], 0, true, true]);
+});
 prueba('Los óleos del Bazar (2026-10-10): consumirlo deja el estado con sus cargas; van a la góndola del Bazar', () => {
   const S = FichaGuardado.normalizar({}).S;
   const o1 = CATALOGO_BASE.find(i => i.id === 'oleo-venenoso'), o2 = CATALOGO_BASE.find(i => i.id === 'oleo-venenoso-concentrado');

@@ -111,8 +111,8 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261010j', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261009r', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261010g', '../comun/ficha-mantenimiento.js?v=20261010p', '../comun/ficha-calculo.js?v=20261009r', '../comun/ficha-combate.js?v=20261010p', '../comun/skills-clase.js?v=20261010y', '../comun/ficha-habilidades.js?v=20261010zb',
-  '../comun/catalogo.js?v=20261010zb', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261010za', '../comun/ficha-botonera.js?v=20261009r', '../comun/ficha-resumen.js?v=20261009m', '../comun/inv-calculo.js?v=20261010p', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261010g', '../comun/inv-duelo.js?v=20261010y', '../comun/ficha-acciones.js?v=20261010a', '../comun/inv-habilidades.js?v=20261010a', '../comun/inv-lupa.js?v=20261009k',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261010j', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261009r', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261010g', '../comun/ficha-mantenimiento.js?v=20261010p', '../comun/ficha-calculo.js?v=20261009r', '../comun/ficha-combate.js?v=20261010p', '../comun/skills-clase.js?v=20261010zc', '../comun/ficha-habilidades.js?v=20261010zb',
+  '../comun/catalogo.js?v=20261010zb', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261010za', '../comun/ficha-botonera.js?v=20261009r', '../comun/ficha-resumen.js?v=20261009m', '../comun/inv-calculo.js?v=20261010p', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261010g', '../comun/inv-duelo.js?v=20261010y', '../comun/ficha-acciones.js?v=20261010a', '../comun/inv-habilidades.js?v=20261010a', '../comun/inv-lupa.js?v=20261010zc',
   '../comun/confirmar-turno.js?v=20261006e', '../comun/ficha-duelo.js?v=20261010y', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261009k'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -1267,6 +1267,8 @@ async function mantenimientoPersonaje(fichaId, numero){
     if(!veces) return false;
     const nombre = ((S.meta && S.meta.nombre) || '').trim();
     let hubo = false;
+    const todos = () => [...(S.efectos || []).map(e => ({e, ref: fichaId})), ...(S.invocaciones || []).flatMap(inv => (inv.estados || []).map(e => ({e, ref: `${fichaId}${SEP_INVOCACION}${inv.id}`})))];
+    const ant = todos().filter(x => x.e && x.e.explota).map(x => ({ref: x.ref, ex: Combatiente.explosivos([x.e])[0]})).filter(x => x.ex);
     for(let i = 0; i < veces; i++){
       const r = FichaMantenimiento.aplicar(S, {
         fijarHp: v => mantFijarHp(S, v),
@@ -1277,6 +1279,12 @@ async function mantenimientoPersonaje(fichaId, numero){
       FichaMantenimiento.publicarReporte(`Turno ${S.turno}`, r.rep, nombre);
       FichaMantenimiento.publicarRecordatorios(r.avisos, nombre);
     }
+    // 💥 Un estado que explota al terminar (Armadura arcana): el que se venció en el pase de turno, alrededor de su token.
+    const quedan = todos();
+    ant.filter(x => !quedan.some(q => q.e && q.e.id === x.ex.id && q.e.activo !== false)).forEach(x => {
+      const tk = [...tokens.entries()].map(([id, t]) => ({...t, id})).find(t => t.tipo === 'pj' && t.fichaId === x.ref);
+      setTimeout(() => tk ? explotarAlTerminar(tk, x.ex) : mesaLinea(`💥 ${x.ex.nombre} explota por ${x.ex.absorbido} (a mano: su token no está en este mapa)`), 300);
+    });
     return hubo;
   });
 }

@@ -373,6 +373,12 @@ versión parecida en más de una, es candidato a juntar.
   (lo llama `FichaSesion.guardar` después de guardar: si está en pausa y no es el GM, anota en `pausaLog` lo importante que cambió) y
   `diferencias(parte, viejo, nuevo)` (las líneas: DDE, nivel, experiencia, atributos, mochila, equipo, cinturón, habilidades, pasivas, talentos;
   las notas y la imagen no; la vida, los No2 y el SP sí). Lo cargan el mapa, la ficha y GM Tools. Reglas nuevas (`ajustes/pausa`, `pausaLog`).
+- **Absorber un % y explotar al terminar** (2026-10-10, Armadura arcana): un estado con `absorbePct`/`absorbeMax` se queda con ese % de cada golpe
+  que llega a la vida (`Combatiente.absorberPct`, lo usa `resolverGolpe` del mapa, js/10: solo el daño que aplica el mapa) y junta `absorbido`; con
+  `explota = {radio, tipo, directo}`, al vencerse el mapa lanza la explosión (`explosivos`/`vencidosExplosivos`; js/04 el turno propio, js/12 el
+  Mantenimiento de los creeps, js/11 el de los personajes; `explotarAlTerminar` en js/13: una onda con tirada y dodge roll).
+- **«Daño directo» con su globo** (2026-10-10, dueño: «siempre que hables de daño directo, ponele el hipervínculo»): entrada en `Glosario`; se marca
+  en los ítems, en el Ver de las habilidades (personaje, creep, invocación) y en el texto de la Mesa.
 - **Cargas** (2026-10-10, Envenenar arma y los óleos): un estado con `cargas` y `golpe = {fijo, efectos}` (efectos en la forma de `efectosGolpe`)
   le suma a tus próximos ataques con arma ese daño fijo y esos efectos. `Combatiente.gastarCarga(estados, dueloId)` (cada ataque gasta una al pagar y
   tirar el PdG, pegue o no; un Re-roll no gasta otra; sin cargas se va al empezar el ataque siguiente), `cargaDeDuelo(estados, dueloId)` →

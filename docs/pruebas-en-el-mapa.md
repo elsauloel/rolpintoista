@@ -10,6 +10,9 @@
 
 ## Pendientes
 
+- [ ] **🔮 Armadura arcana** (2026-10-10): ponérsela, que un rival le pegue (el Anuncio dice «la Armadura arcana absorbió N» y la vida baja
+  la mitad), y que al vencerse (2 turnos propios, o el ⟳ Mantenimiento sin orden de turnos) explote: la Mesa «💥 … explota: N de daño arcano
+  directo», la cascada con PdG.Esp contra la Evasión de cada rival al lado y el dodge roll. El daño que se aplica desde la ficha suelta no absorbe.
 - [ ] **⏸ La pausa de la partida** (2026-10-10, necesita las reglas nuevas pegadas): el GM pausa desde el mapa o GM Tools → el jugador ve el
   cartel, el mapa congelado (no se puede tocar ni abrir la Botonera) y su ficha anda; compra o equipa algo → al reanudar, el GM ve esas líneas y
   elige borrar o guardar el registro.

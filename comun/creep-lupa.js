@@ -105,7 +105,7 @@ const CreepLupa = (() => {
     return {titulo: h.nombre || 'Sin nombre', html: `
     ${paraHtml(h)}
     <div class="hint" style="margin-bottom:10px">${esc(costoTxt)} · ${esc(cdTxt)}</div>
-    <div>${h.detalle ? esc(h.detalle) : 'Sin detalle cargado — tocá ✎ en la habilidad para escribir uno.'}</div>`};
+    <div>${h.detalle ? (typeof Glosario !== 'undefined' ? Glosario.marcar(h.detalle) : esc(h.detalle)) : 'Sin detalle cargado — tocá ✎ en la habilidad para escribir uno.'}</div>`};
   }
 
   /* ---------- El «Ver» de un creep entero (2026-10-02, hoja de ruta A6a) ----------

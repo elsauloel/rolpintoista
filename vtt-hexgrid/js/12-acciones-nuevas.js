@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261009k', '../comun/creep-botonera.js?v=20261007aw', '../comun/creep-acciones.js?v=20261010zb', '../comun/confirmar-turno.js?v=20261006e', '../comun/creep-duelo.js?v=20261010y'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261010zc', '../comun/creep-botonera.js?v=20261007aw', '../comun/creep-acciones.js?v=20261010zb', '../comun/confirmar-turno.js?v=20261006e', '../comun/creep-duelo.js?v=20261010y'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -94,10 +94,12 @@ async function mantenimientoCreeps(numero){
     for(const doc of snap.docs){
       for(let i = 0; i < veces; i++){
         let r = null, nombre = '';
-        try{ await modificarCreep(doc.id, crudo => { const sc = CreepCalculo.normalizar(crudo); r = CreepAcciones.mantenimiento(sc, numero); nombre = sc.nombre; return r; }); }
+        let expl = [];
+        try{ await modificarCreep(doc.id, crudo => { const sc = CreepCalculo.normalizar(crudo); const ant = Combatiente.explosivos(sc.estados); r = CreepAcciones.mantenimiento(sc, numero); nombre = sc.nombre; expl = Combatiente.vencidosExplosivos(ant, sc.estados); return r; }); }
         catch(err){ r = null; console.error(`Mantenimiento: no se pudo pasar el turno del creep ${doc.id}`, err); }   // un creep a medio borrar, etc.
         if(!r) continue;
         enCooldown += r.enCooldown; hpAplicado += r.hpAplicado; vencidos += r.vencidos;
+        if(expl.length){ const tk = [...tokens.entries()].map(([id, x]) => ({...x, id})).find(x => x.tipo === 'creep' && x.fichaId === doc.id); expl.forEach(ex => tk ? explotarAlTerminar(tk, ex) : mesaLinea(`💥 ${ex.nombre} de ${nombre} explota por ${ex.absorbido} (a mano: su token no está en este mapa)`)); }
         if(r.rep.length && typeof historialReporteMantenimiento === 'function') historialReporteMantenimiento(nombre, r.rep);
       }
     }

@@ -419,20 +419,33 @@ async function turnoDeToken(tokenId, clave, inicio){
       if(!soyGM) return [];
       await acCargarPiezas();
       let r = null, nombre = '';
-      await modificarCreep(t.fichaId, crudo => { const sc = CreepCalculo.normalizar(crudo); nombre = sc.nombre; r = inicio ? CreepAcciones.inicioTurno(sc, clave, numero) : CreepAcciones.finTurno(sc, clave, numero); if(inicio && r) provocadoAvisar(t, sc.estados); return r; });
+      let expl = [];
+      await modificarCreep(t.fichaId, crudo => {
+        const sc = CreepCalculo.normalizar(crudo); nombre = sc.nombre;
+        const ant = Combatiente.explosivos(sc.estados);
+        r = inicio ? CreepAcciones.inicioTurno(sc, clave, numero) : CreepAcciones.finTurno(sc, clave, numero);
+        expl = Combatiente.vencidosExplosivos(ant, sc.estados);
+        if(inicio && r) provocadoAvisar(t, sc.estados);
+        return r;
+      });
       if(r && r.rep.length && typeof historialReporteMantenimiento === 'function') historialReporteMantenimiento(`${nombre} · ${inicio ? 'empieza' : 'termina'} su turno`, r.rep);
+      expl.forEach(ex => explotarAlTerminar(t, ex));   // 💥 un estado que explota al terminar (Armadura arcana)
       if(typeof ac !== 'undefined' && ac && !ac.host.hidden) acDibujar();
       return r ? publicas(r.rep) : [];
     }
     const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
     const conTurno = invConTurno(fichaId);
-    let r = null;
+    let r = null, expl = [];
     await editarPersonajeMapa(fichaId, S => {
       const ui = {fijarHp: v => mantFijarHp(S, v)};
+      const estadosDe = () => invId ? ((S.invocaciones || []).find(x => x && x.id === invId) || {}).estados : S.efectos;
+      const ant = Combatiente.explosivos(estadosDe());
       r = inicio ? FichaMantenimiento.inicioTurno(S, ui, clave, invId || '', conTurno, numero) : FichaMantenimiento.finTurno(S, ui, clave, invId || '', conTurno, numero);
       if(inicio && r) provocadoAvisar(t, invId ? ((S.invocaciones || []).find(x => x && x.id === invId) || {}).estados : S.efectos);
+      expl = Combatiente.vencidosExplosivos(ant, estadosDe());
       return !!r;
     });
+    expl.forEach(ex => explotarAlTerminar(t, ex));   // 💥 un estado que explota al terminar (Armadura arcana)
     if(r && r.rep.length) FichaMantenimiento.publicarReporte(inicio ? 'Empieza su turno' : 'Termina su turno', r.rep, r.nombre);
     if(r && r.avisos && r.avisos.length) FichaMantenimiento.publicarRecordatorios(r.avisos, r.nombre);
     return r ? publicas(r.rep) : [];

@@ -143,7 +143,7 @@ function mesaFilaContenido(t){
         `<span style="opacity:.6;text-decoration:line-through;border:1px dashed #888;border-radius:4px;padding:1px 6px">✘ [${esc(t.ventaja.rolls.join(', '))}]${esc(mod)} = ${fmt(num(t.ventaja.total))}</span></div>`
       : `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}</div>`) +
     estadosHtml +
-    (t.texto ? `<div class="mesa-texto">${esc(t.texto)}</div>` : '');
+    (t.texto ? `<div class="mesa-texto">${typeof Glosario !== 'undefined' ? Glosario.marcar(t.texto) : esc(t.texto)}</div>` : '');   // con los globos del glosario (2026-10-10)
 }
 
 // Ruta del PNG del ojo, relativa a este script (así sirve desde cualquier herramienta).

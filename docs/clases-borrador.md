@@ -215,12 +215,13 @@ Salvo Carga Elemental, todas son **Hechizo (PG: Esp · Daño: Esp)**.
    elementos. X es la mitad del coste del skill. Elementos: **Fuego** +50%
    de daño. **Frío** -1 No2 cada 5 de daño (mínimo 1). **Eléctrico** el
    daño se propaga a enemigos hasta 5 de distancia.
-8. **Armadura arcana** [5] — NO2: (3). *(Renombrada 2026-09-27, antes
-   "Armadura Mágica" — para no confundirla con la Armadura mágica, el
-   stat nuevo del Paso 3 de las reglas de casteo.)* Crea una armadura que
-   reduce el daño recibido en un 50% (máximo 10). Cuando termina el
-   efecto, hace daño mágico en área de flor igual al daño absorbido. Duración: 2
-   turnos.
+8. ✅ **Armadura arcana** — **No2:** 3. **SP:** 5. Hechizo sobre vos, 2 turnos:
+   absorbe el 50 % de cada golpe que te llega (después de la Defensa, para
+   arriba), hasta 10 en total. Al terminar explota: lo absorbido como daño
+   arcano **directo** a cada rival al lado (PdG.Esp contra Evasión; quien
+   gana tiene dodge roll). *(Auditada 2026-10-10 con el dueño: el 50 % del
+   original con una mecánica nueva; la explosión programada, con dodge roll,
+   y daño directo.)*
 9. **Telekinesis** [15] — NO2: (3). Mueve y controla un objeto con la
    mente. Puede usarse para arrebatar el arma a un enemigo con Esp/Fue, y
    usarla para atacar: atacar así usa ESP como PG y ESP como daño. Paga 1

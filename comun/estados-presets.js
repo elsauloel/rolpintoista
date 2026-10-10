@@ -123,6 +123,10 @@ const ESTADOS_PRESET = [
   // no, gasta una y suma su `golpe` (+3 de daño y Veneno ×3) a ese golpe. Sin cargas, se va. Volver a ponerlo lo deja otra vez en 2.
   {nombre:'Arma envenenada', polaridad:'buff', permanente:true, cargas:2, golpe:{fijo:3, efectos:[{nombre:'Envenenar', stacks:3}]},
     detalle:'Sus próximos 2 ataques con arma (peguen o no) suman +3 de daño y Veneno ×3 (el veneno entra si el golpe hace daño). Cada ataque gasta una carga. ⚙ Automatizado.'},
+  // Armadura arcana (2026-10-10, dueño: Mago): absorbe el 50 % de cada golpe que le llega (hasta 10 en total) y, al terminar, explota
+  // con lo que absorbió alrededor (Combatiente.absorberPct, explosivos; el mapa: resolverGolpe y explotarAlTerminar).
+  {nombre:'Armadura arcana', polaridad:'buff', turnos:2, absorbePct:50, absorbeMax:10, absorbido:0, explota:{radio:1, tipo:'arcano', directo:true},
+    detalle:'Absorbe el 50 % de cada golpe que le llega (después de la Defensa), hasta 10 en total. Al terminar, explota: lo que absorbió, como daño arcano directo a cada rival al lado (PdG.Esp contra Evasión; quien gana tiene dodge roll). ⚙ Automatizado en el mapa.'},
   // Los óleos del Bazar (2026-10-10, aprobados por el dueño): la misma mecánica de cargas.
   {nombre:'Óleo venenoso', polaridad:'buff', permanente:true, cargas:1, golpe:{fijo:2, efectos:[{nombre:'Envenenar', stacks:3}]},
     detalle:'Su próximo ataque con arma (pegue o no) suma +2 de daño y Veneno ×3 (el veneno entra si el golpe hace daño). ⚙ Automatizado.'},

@@ -78,7 +78,7 @@ const InvLupa = (() => {
 
   function verHab(inv, h){
     return {titulo: h.nombre || 'Sin nombre', html: `<div class="hint" style="margin-bottom:10px">${esc(I.costoHabTxt(inv,h))}${num(h.cd)>0?` · ${fmt(num(h.cd))} turno(s) de cooldown`:' · sin cooldown'}</div>
-    <div>${h.detalle ? esc(h.detalle) : 'Sin detalle cargado.'}</div>`};
+    <div>${h.detalle ? (typeof Glosario !== 'undefined' ? Glosario.marcar(h.detalle) : esc(h.detalle)) : 'Sin detalle cargado.'}</div>`};
   }
 
   return {contenido, verHab, stat};

@@ -1014,6 +1014,17 @@ function dueloZonaQueda(hab, centro, radio, yo){
     directo: !!(hab.dano && (hab.dano.directo || hab.dano.trueDamage)),   // lo que deja una varita de daño directo, también directo (2026-10-07)
   }).catch(err => console.error('No se pudo dejar la zona del área:', err));
 }
+/* 💥 Explotar al terminar (2026-10-10, Armadura arcana): lo que absorbió, como daño arcano a cada rival alrededor de quien la tenía. Es la
+   cascada de un área (una onda): quien la tenía tira su PdG.Esp una vez, cada uno su Evasión, y quien gana tiene dodge roll. */
+function explotarAlTerminar(t, ex){
+  if(!t || !ex) return;
+  const dano = Math.max(0, Math.round(num(ex.absorbido)));
+  if(!dano){ mesaLinea(`💥 ${ex.nombre} de ${nombreDe(t)} se terminó sin haber absorbido nada: no explota`); return; }
+  mesaLinea(`💥 ${ex.nombre} de ${nombreDe(t)} se termina y explota: ${dano} de daño ${ex.tipo || 'arcano'}${ex.directo ? ' directo' : ''} alrededor (se esquiva con dodge roll)`);
+  const hab = {nombre: `💥 ${ex.nombre}`, objetivo: 'onda', radio: ex.radio || 1, dodge: true, tira: {stat: 'pdgmg', etq: 'PdG.Esp'},
+    contra: [{modo: 'eva', stat: 'eva', etq: 'Evasión'}], dano: {formula: String(dano), tipo: ex.tipo || 'arcano', ignoraDef: true, ...(ex.directo ? {directo: true} : {})}, efectos: [], sinOposicion: false};
+  dueloElegirAreaMapa({yo: {ref: t.fichaId, tipo: t.tipo === 'creep' ? 'creep' : 'pj', nombre: nombreDe(t)}, ataque: {hab}});
+}
 function dueloElegirAreaMapa(msg){
   const yo = msg.yo, hab = msg.ataque.hab;
   cerrarBotonera();

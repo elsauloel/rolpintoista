@@ -40,7 +40,41 @@ function renderMapasBarra(){
       ${enUnMapa ? `<span style="margin-left:auto;display:flex;gap:6px;align-items:center">
         <button type="button" class="btn" data-mapa-estimado="1" title="Cuánto oro van a sacar aproximadamente si derrotan a todos los creeps de este mapa: su oro y la venta de lo que sueltan">💰 Botín estimado</button>
         <button type="button" class="btn primary" data-mapa-tokens="1" title="Pone en «${esc(nombreDeMapaGM(pestanaMapa))}» un token oculto por cada creep de este mapa que todavía no tenga, en fila, en el centro de la vista">🎯 Poner sus tokens (${cuenta(pestanaMapa)})</button></span>` : ''}
-    </div>`;
+    </div>${enUnMapa ? estimadoCajaHtml(reales.filter(sc => mapaDeCreepGM(sc) === pestanaMapa)) : ''}`;
+}
+/* El recuadro «Si derrotan a todos» (2026-10-10, pedido del dueño: «cuando uno tiene abierto un mapa con los creeps cargados, que haya un
+   recuadro donde se vea claramente cuánta experiencia va a dar ese combate si vencen a todos, cuánto oro estimado según la calculadora del
+   drop y cuánto oro van a tener si venden todo el equipo que van a soltar»). Siempre a la vista debajo de las pestañas; los números son los
+   de 💰 Botín estimado (CombateFin.estimar: el oro de cada creep sin el ±20 %, la venta de su equipo y su trofeo a mitad de precio y los
+   consumibles al azar como valor esperado), que sigue abriendo el detalle creep por creep. Por jugador: entre las fichas de la partida. */
+let jugadoresCantGM = null, jugadoresCantPedido = 0;
+function pedirJugadoresCant(){
+  if(!fbDb || Date.now() - jugadoresCantPedido < 60000) return;
+  jugadoresCantPedido = Date.now();
+  fbDb.collection(fbRutaCampana('fichas')).get().then(snap => {
+    const n = snap.size;
+    if(n !== jugadoresCantGM){ jugadoresCantGM = n; renderMapasBarra(); }
+  }).catch(err => console.error('No se pudieron contar las fichas:', err));
+}
+function estimadoCajaHtml(lista){
+  if(!lista.length || typeof CombateFin === 'undefined') return '';
+  const est = CombateFin.estimar(lista, CATALOGO_EQUIPO);
+  if(!est.filas.length) return `<div class="hint" style="margin:-4px 0 10px">💰 Ya se repartió lo de todos los creeps de este mapa.</div>`;
+  pedirJugadoresCant();
+  const r = n => fmt(Math.round(n)), venta = est.venta + est.drop, n = jugadoresCantGM;
+  const dato = (icono, titulo, valor, nota, fuerte) => `<div style="flex:1 1 150px;min-width:140px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:${fuerte ? 'rgba(224,184,74,.12)' : 'rgba(255,255,255,.03)'}">
+      <div class="hint" style="font-size:11.5px">${icono} ${titulo}</div><div style="font-size:19px;font-weight:800${fuerte ? ';color:#ffd76a' : ''}">${valor}</div>${nota ? `<div class="hint" style="font-size:11.5px">${nota}</div>` : ''}</div>`;
+  return `<div id="estimado-caja" style="margin:0 0 12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(26,20,24,.5)">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><b>🏁 Si derrotan a todos</b> <span class="hint">(${est.filas.length} creep${est.filas.length === 1 ? '' : 's'} de «${esc(nombreDeMapaGM(pestanaMapa))}»)</span>
+      <button type="button" class="btn ghost" data-mapa-estimado="1" style="margin-left:auto;padding:3px 10px;font-size:12px" title="El detalle creep por creep: qué suelta cada uno y cuánto vale">Ver detalle</button></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      ${dato('⭐', 'Experiencia', `${r(est.xp)} XP`, n ? `~${r(Math.ceil(est.xp / n))} c/u entre ${n}` : '')}
+      ${dato('🪙', 'Oro que sueltan', `~${r(est.oro)}`, '±20 % al tirarlo')}
+      ${dato('🧰', 'Si venden todo lo que sueltan', `~${r(venta)}`, `equipo y trofeos ${r(est.venta)}${est.drop ? ` · consumibles al azar ~${r(est.drop)}` : ''}`)}
+      ${dato('💰', 'Oro total', `~${r(est.total)} DDE`, n ? `~${r(est.total / n)} c/u entre ${n}` : '', true)}
+    </div>
+    <div class="hint" style="font-size:11.5px;margin-top:6px">Lo que sueltan se cuenta a lo que paga una tienda (la mitad del precio de compra); si se lo quedan, vale como equipo.</div>
+  </div>`;
 }
 function mapasGMEscuchar(){
   fbDb.collection(fbRutaCampana('mapas')).onSnapshot(snap => {

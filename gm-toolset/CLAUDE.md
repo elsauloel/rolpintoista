@@ -466,3 +466,7 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   y tablas: resistencia a crítico por Tipo, elementales, defensas, atributos, ataque, armas y tipos de daño (rojo lo más bajo, verde lo más alto; se
   destilda a quien no va). **🤖 Proponer creeps**: le pasa ese escaneo a la IA de «+ Creep con IA» (misma clave y modelo de OpenRouter) y muestra su
   propuesta en texto. No escribe nada en la partida.
+- **🏁 «Si derrotan a todos», siempre a la vista** (2026-10-10, pedido del dueño): con la pestaña de un mapa abierta y creeps en él, debajo de las
+  pestañas hay un recuadro con la **experiencia** (total y por jugador), el **oro que sueltan** (±20 %), **lo que sacan si venden todo lo que
+  sueltan** (equipo, trofeos y consumibles al azar) y el **oro total** (y por jugador, entre las fichas de la partida). Son los números de
+  `CombateFin.estimar` (los mismos de 💰 Botín estimado, que queda como «Ver detalle»). `estimadoCajaHtml` en js/09.

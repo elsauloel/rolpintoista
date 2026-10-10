@@ -14,6 +14,10 @@
 >     varitas escalen con el Especial.
 >   - **P188 — la hacha a dos manos del guerrero:** rinde menos que espada y escudo (20–43 % contra 57–61 %). **Dueño: darle más valor a lo de
 >     dos manos** (falta definir cómo y rehacer el catálogo).
+>   - **Dirección del dueño (2026-10-10): «la clave es Ignora N de Resistencia a crítico».** Pasos: (1) quizás **sacar la Resistencia a crítico
+>     de algunas partes de la armadura** (menos abundancia); (2) **rework de las Tipo 4 con esa identidad** (Ignora Res. crítico como su rasgo,
+>     junto al Crítico frecuente); (3) **las Tipo 6 con presencia de esa característica** (menos frecuente, como la Perfora). Medir cada paso con
+>     el simulador (que el asalto y el tirador no se disparen) — P189.
 >   - **Dato (corregido, misma daga aislada):** el Crítico frecuente **casi no suma** contra armadura (2,1 → 2,1 de daño por ataque ante el
 >     guerrero a nivel 3) y la Perfora 2 sí (2,1 → 3,5). Causa: **la abundancia de Resistencia a crítico** (guerrero nivel 3: Res. T4 2 → hace
 >     falta ganar por 9–12 para un nivel de crítico). Sinergia a valorar: **Crítico frecuente + Ignora Res. crítico** (juntos rinden); y las

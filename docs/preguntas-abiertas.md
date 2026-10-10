@@ -923,3 +923,7 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   disparos, Bloqueo) en la calculadora y el catálogo. **Decide el dueño.**
   **Dueño (2026-10-10): sí, darle más valor a lo de dos manos.** Falta definir cómo (más dados o daño por el mismo puntaje en la calculadora,
   un rasgo propio de las armas a dos manos…) y rehacer el catálogo con eso.
+- ❓ **P189. Ignora Resistencia a crítico como identidad del Tipo 4 — 2026-10-10** (dueño: «la clave es ignora N resistencias al crítico,
+  definitivamente va por ahí»). Hoy la Resistencia a crítico es tan abundante que el Crítico frecuente casi no suma contra armadura (peleas
+  simuladas: una daga con +1 pasa de 2,1 a 2,1 de daño por ataque ante el guerrero). Plan a decidir: ¿de qué partes de la armadura se saca la
+  Resistencia a crítico? ¿cuánto «Ignora N» llevan las Tipo 4 por calidad (y las Tipo 6, menos)? Rework de esas armas y medir con el simulador.

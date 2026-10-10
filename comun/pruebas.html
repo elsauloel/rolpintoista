@@ -2229,6 +2229,17 @@ prueba('Ejecución ✨: «el daño de tu arma» y la onda con dodge roll (Daño 
   igual([armaUi, dodgeUi, c && [c.danoArma, c.ondaDodge, c.tipoDano], h.dano, h.dodge, Duelo.limpiarHab(h).dodge, sinArma.dano, !!(pj.dano && pj.dano.formula === FichaCombate.armaDanoTxt(S.inventario[0], FichaCalculo.calcular(S).final.dmg))],
     [true, true, [true, true, 'fisico'], {formula: '1d8 + 3', tipo: 'fisico', ignoraDef: false}, true, true, null, true]);
 });
+prueba('Cargas (2026-10-10): Arma envenenada — cada ataque gasta una (pegue o no), su duelo suma +3 y Veneno ×3; sin cargas se va', () => {
+  const env = CLASES_SKILLS.find(x => x.id === 'asalto').habilidades.find(x => x.id === 'asalto-envenenar-arma');
+  const pre = estadosPresetFicha().find(p => p.nombre === 'Arma envenenada');
+  const est = [{nombre: 'Otro'}, {...structuredClone(pre), id: 'ae', activo: true}];
+  const g1 = Combatiente.gastarCarga(est, 'd1'), quedan1 = g1.carga && g1.carga.cargas, otraVez = Combatiente.gastarCarga(est, 'd1'), g2 = Combatiente.gastarCarga(est, 'd2');
+  const c1 = Combatiente.cargaDeDuelo(est, 'd1'), c2 = Combatiente.cargaDeDuelo(est, 'd2');
+  const g3 = Combatiente.gastarCarga(est, 'd3');   // sin cargas: se va al empezar el ataque siguiente
+  igual([env.costo, env.nitrosCosto, env.duelo.objetivo, env.duelo.efectos[0].nombre, quedan1, otraVez.cambio, g2.carga && g2.carga.cargas,
+    c1 && [c1.fijo, c1.efectos[0].nombre, c1.efectos[0].stacks], !!c2, g3.cambio, g3.carga, est.map(e => e.nombre), Combatiente.cargaTxt({nombre: 'Arma envenenada', cargas: 1})],
+    ['2', 0, 'uno mismo', 'Arma envenenada', 1, false, 0, [3, 'Envenenar', 3], true, true, null, ['Otro'], 'Arma envenenada: le queda 1 carga']);
+});
 prueba('Perfora N = N puntos del golpe pasan siempre la Defensa, el resto va contra ella (dueño, 2026-10-10)', () => {
   const P = Combatiente.perforaPasa;
   // 14 contra Defensa 16 con Perfora 1 → pasa 1 · 20 contra 10 con Perfora 2 → la Defensa deja pasar 10, la Perfora no manda

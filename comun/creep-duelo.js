@@ -75,6 +75,8 @@ const CreepDuelo = (() => {
         if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${num(sc.armaTipo) || 8}`;
         if(num(m.fijo)) formula += ` ${num(m.fijo) > 0 ? '+' : '-'} ${fmt(Math.abs(num(m.fijo)))}`;
       }
+      const cg = Combatiente.cargaDeDuelo(sc.estados, d.id);   // lo que suma un arma envenenada / un óleo en este golpe
+      if(cg && cg.fijo) formula += ` + ${cg.fijo}`;
       return formula;
     }
     const formulaDe = t => t && t.r ? t.r.formula : '';
@@ -105,9 +107,13 @@ const CreepDuelo = (() => {
       },
       // El daño de una habilidad dirigida (duelo.js, tirarDanoHab) se publica a nombre del creep (2026-10-05: en el mapa no había cómo y se quedaba callado).
       registrarTirada: (origen, r, d) => { const sc = d ? deLado(d.atacante) : null; if(sc) ui.publicar(sc, {origen, r}); else ui.toast('No se encontró el creep para tirar el daño'); },
-      atacar: d => {
+      atacar: async d => {
         const sc = deLado(d.atacante);
         if(!sc) return;
+        if((sc.estados || []).some(e => e && e.golpe)){   // un arma envenenada, un óleo: este ataque gasta una carga (pegue o no)
+          const gc = await ui.cambiar(d.atacante.ref, c => Combatiente.gastarCarga(c.estados || (c.estados = []), d.id));
+          if(gc && gc.carga) ui.toast(`${sc.nombre} · ${Combatiente.cargaTxt(gc.carga)}`);
+        }
         if(d.ataque.tipo === 'habilidad-arma'){ ui.publicar(sc, pdgDeArreglos(sc, d.ataque)); return; }   // los No2 ya los cobró la habilidad
         return atacarCon(ui, d.atacante.ref, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo);
       },
@@ -125,7 +131,8 @@ const CreepDuelo = (() => {
       // Los efectos al golpear del arma del creep, que el duelo resuelve uno por uno.
       efectosArma: d => {
         const sc = deLado(d.atacante);
-        return sc ? (sc.armaEfectos || []).map(e => ({...EfectosGolpe.normalizar(e), stacks: num(e.stacks)})) : [];
+        const cg = sc ? Combatiente.cargaDeDuelo(sc.estados, d.id) : null;   // + los del arma envenenada / el óleo de este golpe
+        return sc ? [...(sc.armaEfectos || []), ...(cg ? cg.efectos : [])].map(e => ({...EfectosGolpe.normalizar(e), stacks: num(e.stacks)})) : [];
       },
       // El daño del arma del creep (sin los efectos del golpe: los resuelve el duelo en su paso de efectos).
       dano: d => {

@@ -106,6 +106,11 @@ const InvDuelo = (() => {
       atacar: d => {
         const inv = ui.inv(d.atacante);
         if(!inv) return;
+        if((inv.estados || []).some(e => e && e.golpe)){   // un arma envenenada, un óleo: este ataque gasta una carga (pegue o no)
+          let gc = null;
+          ui.cambiar(() => { gc = Combatiente.gastarCarga(inv.estados, d.id); });
+          if(gc && gc.carga) ui.toast(`${inv.nombre} · ${Combatiente.cargaTxt(gc.carga)}`);
+        }
         if(d.ataque.tipo === 'habilidad-arma') publicar(A().tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + num(d.ataque && d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: num(inv.armaTipo), armaDeRango: !!inv.armaDeRango}), 'pdg'));
         else return atacarSuelto(inv, d.ataque.tipo);
       },
@@ -124,13 +129,17 @@ const InvDuelo = (() => {
       },
       efectosArma: d => {
         const inv = ui.inv(d.atacante);
-        return (inv.armaEfectos || []).map(e => ({...EfectosGolpe.normalizar(e), stacks: num(e.stacks)}));
+        const cg = Combatiente.cargaDeDuelo(inv.estados, d.id);   // + los del arma envenenada / el óleo de este golpe
+        return [...(inv.armaEfectos || []), ...(cg ? cg.efectos : [])].map(e => ({...EfectosGolpe.normalizar(e), stacks: num(e.stacks)}));
       },
       // El daño del arma (sin los efectos del golpe: los resuelve el duelo en su paso de efectos).
       dano: d => {
         const inv = ui.inv(d.atacante);
         if(!inv) return;
-        const t = A().dano(inv, d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null);
+        const cg = Combatiente.cargaDeDuelo(inv.estados, d.id);   // lo que suma un arma envenenada / un óleo en este golpe
+        const mods = d.ataque.tipo === 'habilidad-arma' ? {...(d.ataque.mods || {})} : (cg && cg.fijo ? {} : null);
+        if(mods && cg && cg.fijo) mods.fijo = num(mods.fijo) + cg.fijo;
+        const t = A().dano(inv, mods);
         if(t) ui.registrar(t.origen, t.r);
       },
       rerollInfo: () => ({disponible: false}),

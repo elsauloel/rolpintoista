@@ -130,8 +130,13 @@ cuesta 1 por defecto (`jobBudget`, 3 puntos + 3 por nivel).
    rango para esta tirada depende de a qué velocidad se mueva: a
    velocidad normal (1 No2 por casillero) el rango es una flor de 3; a
    velocidad lenta (2 No2 por casillero), una flor de 2.
-5. **Envenenar arma** [2] — Mejora el arma con veneno que le otorga +3
-   fijo al daño y aplica 3 stacks de veneno. Duración: 2 ataques.
+5. ✅ **Envenenar arma** — **SP:** 2. **No2:** 0. Tus próximos 2 ataques con
+   arma (peguen o no) suman +3 de daño y Veneno ×3 (entra si el golpe hace
+   daño). Cada ataque gasta una carga; usarla de nuevo vuelve a 2 cargas.
+   *(Auditada 2026-10-10 con el dueño. Cuenta: ~9 de daño extra esperado,
+   un poco arriba de Tajear (~7, 3 SP); la otra opción, +1 No2 y Perfora 1 con
+   cargas que se gastan solo al pegar, daba ~23 y se descartó. Primera skill
+   con «cargas», la mecánica que usan también los óleos.)*
 6. **Backstab** [2] — Únicamente por la espalda. +5 daño fijo. Ignora 1
    de resistencia a crítico.
 7. **Degollar** [7] — Ataque devastador con +4 de PG, +7 de daño y +1 al

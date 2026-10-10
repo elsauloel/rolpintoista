@@ -119,6 +119,10 @@ const ESTADOS_PRESET = [
   // Inamovible (2026-10-06, dueño: «el buff tiene que existir; la armadura simplemente te lo aplica»): la chance de no moverse, en 100 %.
   {nombre:'Inamovible', polaridad:'buff', turnos:2, mods:[{stat:'inamovible', val:100}],
     detalle:'No lo pueden empujar ni atraer (ganchos, muros que empujan, portales). ⚙ Automatizado: el mapa no lo mueve.'},
+  // Arma envenenada (2026-10-10, dueño: Envenenar arma del Asalto): un estado con CARGAS (Combatiente.gastarCarga): cada ataque con arma, pegue o
+  // no, gasta una y suma su `golpe` (+3 de daño y Veneno ×3) a ese golpe. Sin cargas, se va. Volver a ponerlo lo deja otra vez en 2.
+  {nombre:'Arma envenenada', polaridad:'buff', permanente:true, cargas:2, golpe:{fijo:3, efectos:[{nombre:'Envenenar', stacks:3}]},
+    detalle:'Sus próximos 2 ataques con arma (peguen o no) suman +3 de daño y Veneno ×3 (el veneno entra si el golpe hace daño). Cada ataque gasta una carga. ⚙ Automatizado.'},
   {nombre:'Marcado', polaridad:'debuff', turnos:3, marcado:true,
     detalle:'⚙ Automatizado: no puede entrar en sigilo (si estaba, sale) y se lo sigue viendo con un brillo, aunque vuelva la niebla de guerra o esté en una nube de niebla. Se resiste con Res.Esp.'},
 ];

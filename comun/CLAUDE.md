@@ -367,6 +367,11 @@ versión parecida en más de una, es candidato a juntar.
   ni ninguna ficha — vive solo dentro de la cuenta de ese golpe. Mismas limitaciones que `ignoraResistCrit`: solo
   modo `'arma'`, sin conectar del lado de gm-tools todavía.
 
+- **Cargas** (2026-10-10, Envenenar arma y los óleos): un estado con `cargas` y `golpe = {fijo, efectos}` (efectos en la forma de `efectosGolpe`)
+  le suma a tus próximos ataques con arma ese daño fijo y esos efectos. `Combatiente.gastarCarga(estados, dueloId)` (cada ataque gasta una al pagar y
+  tirar el PdG, pegue o no; un Re-roll no gasta otra; sin cargas se va al empezar el ataque siguiente), `cargaDeDuelo(estados, dueloId)` →
+  {nombre, fijo, efectos} y `cargaTxt`. Lo usan los ganchos `atacar`, `dano`/`formulaDano` y `efectosArma` de `FichaDuelo`, `CreepDuelo` e
+  `InvDuelo`. Preset «Arma envenenada» (2 cargas, +3, Veneno ×3) en `estados-presets.js`.
 - **Daño de una habilidad + el Efecto especial** (2026-10-10, Toque mágico): `duelo.danoSumaEsp` (true = el Ef.Esp entero, 0.5 = la mitad, para abajo),
   como `sumaEspecial` de las varitas; lo suma `Combatiente.habEjecucion` con `o.stat('dmgesp')`. En la Ejecución, paso Daño, «Suma tu Efecto especial». La
   Perfora de un ataque con habilidad: `duelo.arma.perfora` (Tajear), se suma a la del arma.

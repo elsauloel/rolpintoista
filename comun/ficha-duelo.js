@@ -83,6 +83,8 @@ const FichaDuelo = (() => {
         if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${FichaCombate.tipoAtaque(arma)}`;
         if(num(m.fijo)) formula += ` ${num(m.fijo) > 0 ? '+' : '−'} ${fmt(Math.abs(num(m.fijo)))}`.replace('−', '-');
       }
+      const cg = Combatiente.cargaDeDuelo(getS().efectos, d.id);   // lo que suma un arma envenenada / un óleo en este golpe
+      if(cg && cg.fijo) formula += ` + ${cg.fijo}`;
       return formula;
     }
     return {
@@ -131,6 +133,9 @@ const FichaDuelo = (() => {
       atacar: d => {
         const S = getS();
         const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null;
+        const gc = Combatiente.gastarCarga(S.efectos, d.id);   // un arma envenenada, un óleo: este ataque gasta una carga (pegue o no)
+        if(gc.cambio) ui.cambio(['efectos']);
+        if(gc.carga) ui.toast(Combatiente.cargaTxt(gc.carga));
         if(d.ataque.tipo === 'habilidad-arma'){   // los No2 del ataque ya los cobró la habilidad: solo se tira el PdG (con lo que le suma)
           tirarValorStat(arma ? `PdG · ${arma.nombre}` : 'PdG', FichaCombate.pdgParaArma(S, arma).valor + num(d.ataque.mods && d.ataque.mods.pdg), 'pdg');
           return;
@@ -155,7 +160,8 @@ const FichaDuelo = (() => {
       efectosArma: d => {
         const S = getS();
         const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : (FichaCombate.armasEquipadasConDano(S)[0] || {}).item || null;
-        return arma ? (arma.efectosGolpe || []).map(e => ({...EfectosGolpe.normalizar(e), stacks: num(e.stacks)})) : [];
+        const cg = Combatiente.cargaDeDuelo(S.efectos, d.id);   // + los del arma envenenada / el óleo de este golpe
+        return [...(arma ? arma.efectosGolpe || [] : []), ...(cg ? cg.efectos : [])].map(e => ({...EfectosGolpe.normalizar(e), stacks: num(e.stacks)}));
       },
       // El daño del arma del ataque (sin los efectos del golpe: los resuelve el duelo en su paso de efectos).
       dano: d => {

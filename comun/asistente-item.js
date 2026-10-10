@@ -392,7 +392,7 @@ const AsistenteItem = (() => {
       h += efecto(!d.armaDeRango
         ? `Es <b>cuerpo a cuerpo</b>: al tirar daño se suma el <b>Dmg</b> ${e(q.de)}${p ? ` (hoy ${f(n(p.dmg))})` : ''}.`
         : d.arco
-        ? `Es un <b>arco</b> (2026-10-09): el daño suma <b>la mitad del Dmg</b> ${e(q.de)}, redondeada para arriba${p ? ` (hoy +${f(Math.ceil(n(p.dmg) / 2))})` : ''}. Dispara con al menos 2 casilleros libres entre el arquero y el objetivo, y con el arco no se pega cuerpo a cuerpo. Su Tipo es su dado: un arco de d4 es Tipo 4, uno de d6, Tipo 6 (para acercarse a un d6 sin cambiar el Tipo, daño fijo: 1d4+1).`
+        ? `Es un <b>arco</b> (2026-10-09): el daño suma <b>la mitad del Dmg</b> ${e(q.de)}, redondeada para arriba${p ? ` (hoy +${f(Math.ceil(n(p.dmg) / 2))})` : ''}. Dispara con al menos 1 casillero libre entre el arquero y el objetivo (no al de al lado), y con el arco no se pega cuerpo a cuerpo. Su Tipo es su dado: un arco de d4 es Tipo 4, uno de d6, Tipo 6 (para acercarse a un d6 sin cambiar el Tipo, daño fijo: 1d4+1).`
         : `Es <b>de rango</b> (ballesta, pistola, lanzallamas…): tiene su propia mecánica — el daño <b>no suma el Dmg</b>, es solo el del arma. No confundir con el <b>Alcance</b> de las armas cuerpo a cuerpo: son dos cosas distintas.`);
       // Mismo mod ('rng'), pero se explica distinto: en un arma de rango es su
       // propia distancia de disparo; en una cuerpo a cuerpo es el Alcance

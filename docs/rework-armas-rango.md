@@ -306,3 +306,5 @@ diseño). **Con un enemigo pegado, la ballesta sí puede disparar.**
 cambia (la herramienta no mide distancias); cambia la táctica: con un enemigo pegado, alejarse **1 casillero en vez de 2** (1 No2 menos; el ataque
 de oportunidad se come igual), y un enemigo a 2 ya no tapa el tiro. Para el Shooter casi nunca cambia la cantidad de flechas por turno (le
 sobra 1 No2 para otra cosa). Queda la diferencia con la ballesta (que dispara pegada). Sin decidir.
+- **Decidido y programado (dueño, 2026-10-10): el arco no pega al casillero de al lado, pero a 2 sí** (1 casillero libre en el medio:
+  `Combatiente.ARCO_LIBRES = 1`; la «distancia ideal cerca» arranca en 2).

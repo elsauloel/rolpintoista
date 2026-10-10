@@ -532,15 +532,15 @@ prueba('el arco: distancia mínima (2 casilleros libres) y sin ataque de oportun
     Combatiente.sirveDeOportunidad(arco), Combatiente.sirveDeOportunidad(ballesta), Combatiente.sirveDeOportunidad(espada),
     Combatiente.ataqueDeArma(arco).arco, Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(creepArco)).arco, Combatiente.ataqueDeArma(espada).arco,
     CreepCalculo.oportunidadPosible(creepArco), CreepCalculo.oportunidadPosible(creepEspada)],
-    [2, true, true, false, false, false, true, true, true, true, undefined, false, true]);
+    [1, true, false, false, false, false, true, true, true, true, undefined, false, true]);   // 2026-10-10: el arco ya pega a 2 (1 libre)
 });
 prueba('la distancia ideal de un arma de rango: dónde está y qué da (2026-10-09)', () => {
   const arco = (ideal) => ({armaDeRango: true, arco: true, ideal});
   const cerca = arco({donde: 'cerca', ancho: 2, pdg: 1}), lejos = arco({donde: 'lejos', ancho: 2, crit: 1}), medio = arco({donde: 'medio', ancho: 1, critpot: 2}), fija = arco({donde: 'franja', desde: 5, hasta: 6, fijo: 2});
   igual([Combatiente.franjaIdeal(cerca.ideal, 10), Combatiente.franjaIdeal(lejos.ideal, 10), Combatiente.franjaIdeal(medio.ideal, 9), Combatiente.franjaIdeal(fija.ideal, 10),
-    Combatiente.bonoIdeal(cerca, 4, 10), Combatiente.bonoIdeal(cerca, 5, 10), Combatiente.bonoIdeal(lejos, 9, 10), Combatiente.bonoIdeal(medio, 6, 9), Combatiente.bonoIdeal(fija, 5, 3),
+    Combatiente.bonoIdeal(cerca, 3, 10), Combatiente.bonoIdeal(cerca, 4, 10), Combatiente.bonoIdeal(lejos, 9, 10), Combatiente.bonoIdeal(medio, 6, 9), Combatiente.bonoIdeal(fija, 5, 3),
     Combatiente.ataqueDeArma(cerca).ideal === cerca.ideal, Combatiente.ataqueDeArma({armaDeRango: true, tiroAlto: true}).tiroAlto, Combatiente.idealTxt(lejos.ideal)],
-    [{desde: 3, hasta: 4}, {desde: 9, hasta: 10}, {desde: 6, hasta: 6}, {desde: 5, hasta: 6},
+    [{desde: 2, hasta: 3}, {desde: 9, hasta: 10}, {desde: 6, hasta: 6}, {desde: 5, hasta: 6},
      {motivo: 'distancia ideal', pdg: 1}, null, {motivo: 'distancia ideal', crit: 1}, {motivo: 'distancia ideal', critpot: 2}, {motivo: 'distancia ideal', fijo: 2},
      true, true, 'Distancia ideal lejos (franja de 2): Crítico frecuente +1']);
 });

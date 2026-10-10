@@ -19,7 +19,7 @@ const Glosario = (() => {
     {titulo: 'Tipo', re: 'Tipo (?:4|6|8|10|12)', texto: 'Tipo N: el dado del arma (Tipo 6 = d6) y contra qué Resistencia a crítico pega. El primer ataque del turno cuesta la mitad del Tipo en No2 y los siguientes, el Tipo entero.'},
     {titulo: 'Amplificado', re: 'amplificados?', texto: 'Daño amplificado: dados de daño de más que no pesan.'},
     {titulo: '2 manos', re: '2 manos|a dos manos', texto: 'A dos manos: ocupa las dos manos (no se puede llevar un escudo ni otra arma).'},
-    {titulo: 'Arco', re: 'arco', texto: 'Arco: suma la mitad de tu Dmg (para arriba) y tiene Tiro alto (salvo que diga «Sin tiro alto»). Dispara con al menos 2 casilleros libres entre vos y el objetivo; con el arco no se pega cuerpo a cuerpo, no se hacen ataques de oportunidad ni se parrea.'},
+    {titulo: 'Arco', re: 'arco', texto: 'Arco: suma la mitad de tu Dmg (para arriba) y tiene Tiro alto (salvo que diga «Sin tiro alto»). Dispara con al menos 1 casillero libre entre vos y el objetivo (no al de al lado); con el arco no se pega cuerpo a cuerpo, no se hacen ataques de oportunidad ni se parrea.'},
     {titulo: 'A distancia', re: 'a distancia', texto: 'Arma a distancia: el daño es solo el del arma, no suma tu Dmg.'},
     {titulo: 'Tiro alto', re: 'Tiro alto', texto: 'Tiro alto: dispara por encima de los tokens que tapan la línea (no de los Sólidos), con el objetivo a 4 casilleros o más y PdG −2 en ese disparo. Lo tienen todos los arcos. ⚙ El mapa lo ofrece solo.'},
     {titulo: 'Sin tiro alto', re: 'Sin tiro alto', texto: 'Sin tiro alto: a diferencia del resto de los arcos, este no puede tirar por encima de los tokens que tapan la línea.'},

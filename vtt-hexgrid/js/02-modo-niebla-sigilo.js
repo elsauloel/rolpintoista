@@ -394,9 +394,9 @@ function renderLentesControl(){
 }
 async function mapaCambiarControl(fichaId, nombre, tomar){
   if(!soyGM || !fbDb) return;
-  if(tomar && !confirm(`¿Tomar el control de ${nombre}?
-
-Lo vas a usar como si fueras su jugador (Botonera, duelos, habilidades, token, Mantenimiento). Su jugador queda en solo lectura hasta que se lo devuelvas, y la Mesa avisa.`)) return;
+  // El cartel del juego, no un confirm() nativo (2026-10-09).
+  if(tomar && !(await AvisoCombate.preguntar(`¿Tomar el control de ${nombre}? Lo vas a usar como si fueras su jugador (Botonera, duelos, habilidades, token, Mantenimiento). Su jugador queda en solo lectura hasta que se lo devuelvas, y la Mesa avisa.`,
+    {icono: '🎮', titulo: 'Tomar el control', si: 'Tomar el control', no: 'Cancelar'}))) return;
   const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
   const control = {uid: fbUsuario.uid, nombre: fbMiembro.nombre || 'GM', desde: Date.now()};
   try{

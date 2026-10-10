@@ -13,7 +13,7 @@ const Flotantes = (() => {
   // globo del mouse). Donde no hay esa barra (la ficha suelta): uno arriba del otro, abajo a la izquierda.
   const CSS_ARRIBA = `
 .flot-arriba{display:flex!important;align-items:center;gap:6px;padding:0 12px!important;border-radius:10px!important;font-size:13px!important;
-  white-space:nowrap;animation:none!important;transform:none!important;bottom:auto!important}
+  white-space:nowrap;animation:none!important;transform:none!important;bottom:auto!important;z-index:25!important}   /* arriba de la barra (24), abajo de las ventanas */
 .flot-arriba small{display:none!important}`;
   let observado = null;
   function apilar(){

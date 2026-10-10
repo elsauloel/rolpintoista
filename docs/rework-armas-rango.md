@@ -203,3 +203,13 @@ Agi 4, Des 6, HP 45, Def 8, Res T4 2 / T6 1, espada 1d6+1. Arquero Fue 3, Agi 8,
   si el Parry gana, el disparo queda parado (programado en `comun/duelo.js`: resultado «bloqueado», sin fase de Bloqueo ni contraataque).
 - **Lo próximo, después de ultimar los arcos: las ballestas** (dueño: «gran parte del terreno está preparado… tenemos los mecanismos para hacer
   testeos de balance»). Su casa de diseño: Rompe armadura; los virotes, Perfora.
+
+## 2026-10-10 · Ballestas: idea del dueño para el freno («más lenta») — en debate
+
+- **Dueño:** «la ballesta puede ser un poco más lenta: que el primer ataque cueste 2 en lugar de 1 y el segundo cueste 4, por ejemplo. Todo
+  está por debatir.» Es decir: **el doble de lo que cobra un arma común** (hoy el primer ataque cuesta Tipo ÷ 2 y los siguientes, el Tipo).
+- Compite con la propuesta anterior (pregunta 2: recarga «como las varitas», 1 No2 y +1 por cada disparo más en el turno). Diferencia: la de
+  las varitas deja disparar varias veces barato; la del dueño hace que la ballesta sea **un disparo fuerte por turno** y un segundo, caro.
+- A decidir: (a) cuál de las dos; (b) si «el doble» es fijo o un número del ítem («Recarga N»: No2 de más por disparo, para diseñar por
+  calidad: la de mano, Recarga 0–1; la pesada, 2; la de asedio, 3); (c) cuánto daño fijo compensa ese costo (se prueba con
+  `herramientas/balance_combate.py`).

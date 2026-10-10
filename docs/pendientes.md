@@ -8,7 +8,7 @@
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
 > - [ ] **🧪 Más ítems con la mecánica de cargas (2026-10-10, dueño; también en 🛠 Herramientas de diseño → A desarrollar):** la mecánica
->   ya existe (estado con `cargas` y `golpe`, `Combatiente.gastarCarga`). Empezar por los óleos del Bazar — propuesta esperando el OK del dueño:
+>   ya existe (estado con `cargas` y `golpe`, `Combatiente.gastarCarga`). Los óleos del Bazar ya están (aprobados y cargados 2026-10-10):
 >   Óleo venenoso (Común, 1 carga, +2 y Veneno ×3, 35) y Óleo venenoso concentrado (Buena, 2 cargas, +3 y Veneno ×3, 75) —; después otros
 >   (fuego, sangrado, piedras de afilar…).
 > - [x] **⏸ Pausar la partida** — hecho 2026-10-10 (`comun/pausa.js`; botón en el mapa del GM y en GM Tools). **Falta: que el dueño pegue las

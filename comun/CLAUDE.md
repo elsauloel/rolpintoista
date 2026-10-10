@@ -372,7 +372,7 @@ versión parecida en más de una, es candidato a juntar.
   `boton(el)` (el botón del GM: ⏸ Pausar / ▶ Reanudar; al reanudar muestra el registro con «Borrar» o «Guardar»), `alGuardar(cambios, personaje)`
   (lo llama `FichaSesion.guardar` después de guardar: si está en pausa y no es el GM, anota en `pausaLog` lo importante que cambió) y
   `diferencias(parte, viejo, nuevo)` (las líneas: DDE, nivel, experiencia, atributos, mochila, equipo, cinturón, habilidades, pasivas, talentos;
-  la vida, los No2 y las notas no). Lo cargan el mapa, la ficha y GM Tools. Reglas nuevas (`ajustes/pausa`, `pausaLog`).
+  las notas y la imagen no; la vida, los No2 y el SP sí). Lo cargan el mapa, la ficha y GM Tools. Reglas nuevas (`ajustes/pausa`, `pausaLog`).
 - **Cargas** (2026-10-10, Envenenar arma y los óleos): un estado con `cargas` y `golpe = {fijo, efectos}` (efectos en la forma de `efectosGolpe`)
   le suma a tus próximos ataques con arma ese daño fijo y esos efectos. `Combatiente.gastarCarga(estados, dueloId)` (cada ataque gasta una al pagar y
   tirar el PdG, pegue o no; un Re-roll no gasta otra; sin cargas se va al empezar el ataque siguiente), `cargaDeDuelo(estados, dueloId)` →

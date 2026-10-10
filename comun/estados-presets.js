@@ -123,6 +123,11 @@ const ESTADOS_PRESET = [
   // no, gasta una y suma su `golpe` (+3 de daño y Veneno ×3) a ese golpe. Sin cargas, se va. Volver a ponerlo lo deja otra vez en 2.
   {nombre:'Arma envenenada', polaridad:'buff', permanente:true, cargas:2, golpe:{fijo:3, efectos:[{nombre:'Envenenar', stacks:3}]},
     detalle:'Sus próximos 2 ataques con arma (peguen o no) suman +3 de daño y Veneno ×3 (el veneno entra si el golpe hace daño). Cada ataque gasta una carga. ⚙ Automatizado.'},
+  // Los óleos del Bazar (2026-10-10, aprobados por el dueño): la misma mecánica de cargas.
+  {nombre:'Óleo venenoso', polaridad:'buff', permanente:true, cargas:1, golpe:{fijo:2, efectos:[{nombre:'Envenenar', stacks:3}]},
+    detalle:'Su próximo ataque con arma (pegue o no) suma +2 de daño y Veneno ×3 (el veneno entra si el golpe hace daño). ⚙ Automatizado.'},
+  {nombre:'Óleo venenoso concentrado', polaridad:'buff', permanente:true, cargas:2, golpe:{fijo:3, efectos:[{nombre:'Envenenar', stacks:3}]},
+    detalle:'Sus próximos 2 ataques con arma (peguen o no) suman +3 de daño y Veneno ×3 (el veneno entra si el golpe hace daño). Cada ataque gasta una carga. ⚙ Automatizado.'},
   {nombre:'Marcado', polaridad:'debuff', turnos:3, marcado:true,
     detalle:'⚙ Automatizado: no puede entrar en sigilo (si estaba, sale) y se lo sigue viendo con un brillo, aunque vuelva la niebla de guerra o esté en una nube de niebla. Se resiste con Res.Esp.'},
 ];

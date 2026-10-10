@@ -2230,19 +2230,30 @@ prueba('Ejecución ✨: «el daño de tu arma» y la onda con dodge roll (Daño 
   igual([armaUi, dodgeUi, c && [c.danoArma, c.ondaDodge, c.tipoDano], h.dano, h.dodge, Duelo.limpiarHab(h).dodge, sinArma.dano, !!(pj.dano && pj.dano.formula === FichaCombate.armaDanoTxt(S.inventario[0], FichaCalculo.calcular(S).final.dmg))],
     [true, true, [true, true, 'fisico'], {formula: '1d8 + 3', tipo: 'fisico', ignoraDef: false}, true, true, null, true]);
 });
+prueba('Los óleos del Bazar (2026-10-10): consumirlo deja el estado con sus cargas; van a la góndola del Bazar', () => {
+  const S = FichaGuardado.normalizar({}).S;
+  const o1 = CATALOGO_BASE.find(i => i.id === 'oleo-venenoso'), o2 = CATALOGO_BASE.find(i => i.id === 'oleo-venenoso-concentrado');
+  FichaHabilidades.aplicarEfectoDeConsumo(S, o1, estadosPresetFicha());
+  const e = S.efectos.find(x => x.nombre === 'Óleo venenoso');
+  const sc = {nombre: 'C', estados: []};
+  const ce = CreepAcciones.efectoDeHab(sc, o2, estadosPresetCreep()), cargasCreep = ce.estado && ce.estado.cargas;
+  const g = Combatiente.gastarCarga(sc.estados, 'dz');
+  igual([o1.precioCompra, o2.precioCompra, o2.tier, e && e.cargas, e && e.golpe.fijo, e && e.permanente, cargasCreep, g.carga && g.carga.cargas,
+    GeneradorTiendas.seccionDe(o1), GeneradorTiendas.seccionDe(o2)], [35, 75, 'Buena Calidad', 1, 2, true, 2, 1, 'bazar', 'bazar']);
+});
 prueba('⏸ La pausa (2026-10-10): el registro anota lo importante que cambió en la ficha y no lo chico', () => {
   const S0 = FichaGuardado.normalizar({}).S;
   const a = structuredClone(S0); a.meta.dde = 120; a.meta.nivel = 2; a.attrs.fue = 3;
   a.inventario = [{id: 'i1', nombre: 'Daga', equipado: false}, {id: 'i2', nombre: 'Soga'}];
   a.cinturon = [{id: 'c1', nombre: 'Poción', cantidad: 2}];
   a.habilidades = [{id: 'h1', nombre: 'Tajear'}];
-  const b = structuredClone(a); b.meta.dde = 80; b.attrs.fue = 4; b.hp = 3; b.meta.historia = 'otra';
+  const b = structuredClone(a); b.meta.dde = 80; b.attrs.fue = 4; b.hp = 3; b.spGastado = (a.spGastado || 0) + 2; b.meta.historia = 'otra';
   b.inventario = [{id: 'i1', nombre: 'Daga', equipado: true}, {id: 'i3', nombre: 'Coraza de cuero'}];
   b.cinturon = [{id: 'c1', nombre: 'Poción', cantidad: 1}];
   b.habilidades = [{id: 'h1', nombre: 'Tajear'}, {id: 'h2', nombre: 'Envenenar arma'}];
   const pa = FichaGuardado.partes(a), pb = FichaGuardado.partes(b);
   const L = ['general', 'inventario', 'cinturon', 'habilidades', 'notas'].flatMap(p => Pausa.diferencias(p, pa[p], pb[p]));
-  igual([L, Pausa.activa()], [['DDE 120 → 80', 'Fuerza 3 → 4', 'se equipó Daga', 'sumó Coraza de cuero', 'ya no tiene Soga', 'Poción (cinturón): 2 → 1', 'sumó la habilidad Envenenar arma'], false]);
+  igual([L, Pausa.activa()], [['DDE 120 → 80', `vida ${a.hp} → 3`, 'gastó 2 SP', 'Fuerza 3 → 4', 'se equipó Daga', 'sumó Coraza de cuero', 'ya no tiene Soga', 'Poción (cinturón): 2 → 1', 'sumó la habilidad Envenenar arma'], false]);
 });
 prueba('Cargas (2026-10-10): Arma envenenada — cada ataque gasta una (pegue o no), su duelo suma +3 y Veneno ×3; sin cargas se va', () => {
   const env = CLASES_SKILLS.find(x => x.id === 'asalto').habilidades.find(x => x.id === 'asalto-envenenar-arma');

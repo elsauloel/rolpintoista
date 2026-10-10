@@ -14,7 +14,7 @@
    - `Pausa.alGuardar(cambios, personaje)`: lo llama `FichaSesion.guardar` después de guardar; `cambios` = [[parte, jsonViejo, jsonNuevo]].
      Si la partida está en pausa y quien guarda no es el GM, anota en el registro lo importante que cambió (`diferencias`).
    - `Pausa.diferencias(parte, viejo, nuevo)`: las líneas en palabras (DDE, nivel, atributos, mochila, equipo, cinturón,
-     habilidades, pasivas, talentos). Lo chico (vida, No2, notas, imagen) no se anota.
+     habilidades, pasivas, talentos; la vida, los No2 y el SP). Lo chico (notas, imagen) no se anota.
    ========================================================= */
 const Pausa = (() => {
   let doc = null, escuchando = false, donde = '';
@@ -60,6 +60,10 @@ const Pausa = (() => {
       if(n(ma.nivel) !== n(mb.nivel)) L.push(`nivel ${n(ma.nivel)} → ${n(mb.nivel)}`);
       if(n(ma.exp) !== n(mb.exp)) L.push(`experiencia ${n(ma.exp)} → ${n(mb.exp)}`);
       if(ma.nombre && mb.nombre && ma.nombre !== mb.nombre) L.push(`se cambió el nombre: ${ma.nombre} → ${mb.nombre}`);
+      if(n(a.hp) !== n(b.hp)) L.push(`vida ${n(a.hp)} → ${n(b.hp)}`);   // (dueño, 2026-10-10: la vida, los No2 y el SP también)
+      if(n(a.nitros) !== n(b.nitros)) L.push(`No2 ${n(a.nitros)} → ${n(b.nitros)}`);
+      const sp = n(b.spGastado) - n(a.spGastado);
+      if(sp) L.push(sp > 0 ? `gastó ${sp} SP` : `recuperó ${-sp} SP`);
       Object.keys(ATTR).forEach(k => { const x = n((a.attrs || {})[k]), y = n((b.attrs || {})[k]); if(x !== y) L.push(`${ATTR[k]} ${x} → ${y}`); });
     }
     if(parte === 'inventario') L.push(...listaItems(a.inventario, b.inventario, ''));

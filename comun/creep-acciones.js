@@ -177,6 +177,7 @@ const CreepAcciones = (() => {
     const categorias = preset ? {esCC:preset.esCC, esVeneno:preset.esVeneno, esSangrado:preset.esSangrado, esQuemadura:preset.esQuemadura,
       stacksTurno: preset.stacksTurno ?? 0, permanente: !!preset.permanente, escudoMagico: preset.escudoMagico ?? 0, forzarNitros: preset.forzarNitros ?? ''} : {};
     if(preset) FLAGS_ESTADO.forEach(f => { categorias[f] = !!preset[f]; });
+    if(preset && preset.golpe){ categorias.golpe = structuredClone(preset.golpe); categorias.cargas = preset.cargas; }   // las cargas (2026-10-10: los óleos)
     // P137 (2026-10-01): "no vence" lo decide la habilidad si lo marca (como en personajes e invocaciones); si no, el estado.
     const nuevo = {id: uid(), nombre, hpTurno, stacks, turnos, polaridad, detalle, mods, ...categorias, permanente: Combatiente.efectoPermanente(h, preset)};
     if(num(h.efectoEscudo) > 0){   // la habilidad da HP de escudo o de Vida extra (Absorber vida, Coraza de huesos…)

@@ -48,6 +48,7 @@ const FichaHabilidades = (() => {
     if(!p) return {};
     const out = {polaridad: p.polaridad};
     FLAGS_ESPECIALES.forEach(f => { if(p[f] !== undefined) out[f] = p[f]; });
+    if(p.golpe){ out.golpe = structuredClone(p.golpe); out.cargas = p.cargas; }   // las cargas (2026-10-10: los óleos, Envenenar arma)
     return out;
   }
   // Lo que está en la mochila es una copia del ítem del catálogo hecha al comprarlo. Si el efecto se configuró

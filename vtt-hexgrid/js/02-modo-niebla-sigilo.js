@@ -460,7 +460,8 @@ async function oportunidadPublicarAvisos(t, salidos){
   if(!salidos || !salidos.length || !fbDb || !fbUsuario || !fbMiembro) return;
   for(const {r} of salidos){
     const rs = (vinculo(r) || {}).resumen || {};
-    const texto = `${nombreDe(t)} se alejó de ${nombreDe(r)}: no hay ataque de oportunidad (${nombreDe(r)} ${rs.sinOpor ? 'tiene un arco, que no sirve de oportunidad' : r.tipo === 'creep' ? 'no puede aprovecharlo' : 'no tiene No2 suficientes'})`;
+    const motivo = rs.sinOpor ? 'tiene un arco, que no sirve de oportunidad' : r.tipo === 'creep' ? 'no puede aprovecharlo' : 'no tiene No2 suficientes';
+    const texto = `${nombreDe(t)} se alejó de ${nombreDe(r)}: no hay ataque de oportunidad (${nombreDe(r)} ${motivo})`;
     try{
       await fbDb.collection(fbRutaCampana('tiradas')).add({
         uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
@@ -470,7 +471,7 @@ async function oportunidadPublicarAvisos(t, salidos){
       });
     }catch(err){ console.error('No se pudo avisar el ataque de oportunidad:', err); }
     momentoAbrir({tipo: 'oportunidad-sin', icono: '⚔', titulo: `${nombreDe(t)} se aleja de ${nombreDe(r)}`,
-      resultado: `No hay ataque de oportunidad: ${nombreDe(r)} no tiene No2 suficientes.`, estado: 'listo'});
+      resultado: `No hay ataque de oportunidad: ${nombreDe(r)} ${motivo}.`, estado: 'listo'});   // el mismo motivo que la Mesa (antes decía siempre «No2»)
   }
 }
 

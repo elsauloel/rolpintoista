@@ -404,6 +404,8 @@ const CreepCalculo = (() => {
   // frena a quien se aleja si el que se queda puede aprovecharlo.) Se publica en su resumen (`opor`): los jugadores no ven sus No2.
   // El ataque de oportunidad: lo de un primer ataque, o nada si su arma es oporGratis.
   function costoOportunidad(sc){ return Math.max(0, Combatiente.costoEspecial(num(sc.armaTipo) || 8, Combatiente.armaDeCombatiente(sc), 'oportunidad') - Combatiente.ahorroEspecial('oportunidad', st => modTotal(sc, st))); }
+  // ¿Su arma no sirve de oportunidad? (un arco: 2026-10-09) — lo publica el creep para que el mapa diga el motivo.
+  const sinOportunidad = sc => !Combatiente.sirveDeOportunidad(Combatiente.armaDeCombatiente(sc));
   function oportunidadPosible(sc){
     const n = sc.nitros === null || sc.nitros === undefined ? nitrosMax(sc) : num(sc.nitros);
     return !(num(sc.hp) <= 0) && n >= costoOportunidad(sc) && Combatiente.sirveDeOportunidad(Combatiente.armaDeCombatiente(sc));   // con un arco, no (2026-10-09)
@@ -606,5 +608,5 @@ const CreepCalculo = (() => {
     statValor, estadoActivo, aportesMod, origenesMod, conSigno, statOrigenTxt, armadmgOrigenTxt, ataqueTxt, ataqueOrigenTxt,
     defensaOrigenTxt, critOrigenTxt, armaduraOrigenTxt, modsAfectanHp, actualizarHpMaxPorCon, nitrosMax, actualizarNo2PorAgl,
     costoAtaque, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor,
-    fuerzaGolpeValor, costoContraataque, costoOportunidad, oportunidadPosible, tarjetaPublica, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
+    fuerzaGolpeValor, costoContraataque, costoOportunidad, oportunidadPosible, sinOportunidad, tarjetaPublica, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
 })();

@@ -131,5 +131,8 @@ Drena vida ✔, Resistente ✔, Matabestias / matagente ⚙, contra lo que levit
   Silenciadora, De tormenta (Raras).
 - **Las flechas elementales son siempre híbridas** (dueño, 2026-10-09; descartadas las puramente especiales porque se pisan con las varitas): el
   daño del arco (físico: resta la Defensa, critea) + un daño elemental aparte, directo (no resta la Defensa ni la Defensa especial, solo la
-  resistencia a ese elemento; no se multiplica con el crítico) + el efecto que les da identidad. En revisión con el dueño: qué efecto de identidad lleva
-  cada elemento (rayo: el salto de su daño elemental y Parálisis; hielo: Escarcha corta, garantizada aunque la armadura pare el golpe).
+  resistencia a ese elemento; no se multiplica con el crítico) + el efecto que les da identidad. Identidad de cada una (dueño, 2026-10-09): **fuego** el daño que sigue
+  (Quemadura); **hielo** Escarcha 1 turno, que entra aunque la armadura pare el golpe; **ácido** Armadura rota; **eléctrico**: la Relámpago (Buena, +1 No2,
+  $45) no tiene daño extra: Parálisis 1 turno garantizada y salta una vez (50 % de Parálisis al segundo); la de Tormenta (Rara, +3 No2, $150): +2d4
+  eléctrico que salta a la mitad (con 1 se corta), Parálisis al blanco y 50 % / 25 % a los dos siguientes. **Envenenada**: Perfora 1 + Veneno ×3 (el
+  veneno sigue necesitando que pase el daño: para eso perfora).

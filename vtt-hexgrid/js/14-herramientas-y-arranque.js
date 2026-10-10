@@ -790,7 +790,7 @@ function arrancarEnVivo(){
   $('#aviso-mapa').hidden = true;
   soyGM = fbMiembro.gm === true;
   actualizarCabecera();
-  if($('#btn-reroll')) $('#btn-reroll').hidden = soyGM;   // la Moneda Re-Roll es de los jugadores
+  if($('#btn-reroll')) $('#btn-reroll').hidden = true;   // (2026-10-10, dueño) el cuadradito de la barra se sacó: la moneda se usa con su botón brillante (comun/flotantes.js)
   bnPintarInterruptor();   // ⚗ Botonera nueva (prueba, para quien la quiera prender)
   if(soyGM && bnActiva()) acCargarPiezas().catch(err => console.error(err));   // los ganchos del duelo de los creeps (paso 4c, tanda 4)
   $('#btn-botonera-nueva').onclick = bnAlternar;

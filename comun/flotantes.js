@@ -11,10 +11,27 @@ const Flotantes = (() => {
   // Dónde van. En el mapa (2026-10-10, dueño: «arriba, al lado de los botones de los lentes, a la misma altura que esa botonera»): en fila,
   // a la izquierda de la barra de arriba (#flotantes-mapa), con la altura de sus botones y en un solo renglón (la línea de ayuda pasa al
   // globo del mouse). Donde no hay esa barra (la ficha suelta): uno arriba del otro, abajo a la izquierda.
+  // 2026-10-10 (dueño): arriba van solo con el ícono, cuadrados como los botones de la barra, con un brillo suave que late; el mouse explica qué es.
   const CSS_ARRIBA = `
-.flot-arriba{display:flex!important;align-items:center;gap:6px;padding:0 12px!important;border-radius:10px!important;font-size:13px!important;
-  white-space:nowrap;animation:none!important;transform:none!important;bottom:auto!important;z-index:25!important}   /* arriba de la barra (24), abajo de las ventanas */
-.flot-arriba small{display:none!important}`;
+.flot-arriba{display:flex!important;align-items:center;justify-content:center;padding:0!important;border-radius:10px!important;font-size:18px!important;
+  white-space:nowrap;transform:none!important;bottom:auto!important;z-index:25!important;animation:flot-latido 2.8s ease-in-out infinite alternate!important}   /* arriba de la barra (24), abajo de las ventanas */
+.flot-arriba small{display:none!important}
+#polilla-flotante.flot-arriba{--flot-glow:rgba(190,130,255,.75)}
+#moneda-flotante.flot-arriba, #impulso-flotante.flot-arriba{--flot-glow:rgba(255,205,90,.75)}
+@keyframes flot-latido{0%{box-shadow:0 2px 8px rgba(0,0,0,.5),0 0 3px var(--flot-glow)}100%{box-shadow:0 2px 8px rgba(0,0,0,.5),0 0 13px var(--flot-glow)}}`;
+  // Lo que explica el mouse (dueño: «al hacer hover te explica: tenés una moneda / tenés una polilla activa»).
+  const TITULO = {'polilla-flotante': 'Tenés una Polilla mística activa: tocá para sumarle +2 a tu última tirada',
+    'moneda-flotante': 'Tenés una Moneda Re-Roll: tocá para repetir una de tus últimas tiradas',
+    'impulso-flotante': 'Tenés un anillo de impulso activo: tocá para sumarle su bono a tu última tirada'};
+  // Deja solo el ícono (el primer «carácter» del texto; la moneda conserva su cara que gira).
+  function soloIcono(b){
+    const div = b.querySelector('div');
+    if(!div || div.dataset.soloIcono) return;
+    const cara = div.querySelector('.moneda-cara');
+    const icono = cara ? cara.outerHTML : ([...String(div.textContent || '').trim()][0] || '•');
+    div.dataset.soloIcono = '1';
+    div.innerHTML = icono;
+  }
   let observado = null;
   function apilar(){
     const barra = document.getElementById('flotantes-mapa');
@@ -36,9 +53,10 @@ const Flotantes = (() => {
         const b = document.getElementById(id);
         if(!b) return;
         b.classList.add('flot-arriba');
-        const sub = b.querySelector('small');
-        if(sub && id !== 'moneda-flotante') b.title = sub.textContent;
-        b.style.top = Math.round(top) + 'px'; b.style.height = Math.round(alto) + 'px';
+        soloIcono(b);
+        const sub = b.querySelector('small'), det = sub && id !== 'moneda-flotante' ? String(sub.textContent || '').trim() : '';
+        b.title = (TITULO[id] || '') + (det ? ` (${det})` : '');
+        b.style.top = Math.round(top) + 'px'; b.style.height = Math.round(alto) + 'px'; b.style.width = Math.round(alto) + 'px';
         b.style.right = 'auto'; b.style.left = '0px';
         x -= b.offsetWidth;
         b.style.left = Math.round(x) + 'px';
@@ -51,7 +69,7 @@ const Flotantes = (() => {
       const b = document.getElementById(id);
       if(!b) return;
       b.classList.remove('flot-arriba');
-      b.style.top = 'auto'; b.style.height = '';
+      b.style.top = 'auto'; b.style.height = ''; b.style.width = '';
       b.style.right = 'auto'; b.style.left = '16px'; b.style.transformOrigin = 'left bottom';
       b.style.bottom = y + 'px';
       y += (b.offsetHeight || 48) + 10;

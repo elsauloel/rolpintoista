@@ -70,7 +70,7 @@ function tableroCreepIds(){
   });
   return set;
 }
-function tableroCardHtml(nombre, imagen, nivel, r, tipo){
+function tableroCardHtml(nombre, imagen, nivel, r, tipo, id){
   // De los creeps (resumen público) solo llega el porcentaje de vida: la barra va sin números.
   const conNumeros = r.hpPct === undefined || r.hpPct === null;
   const hp = num(r.hp), hpMax = num(r.hpMax);
@@ -79,7 +79,7 @@ function tableroCardHtml(nombre, imagen, nivel, r, tipo){
   const {sp, spMax} = spDeResumen(r);
   const spPct = spMax > 0 ? Math.max(0, Math.min(100, sp / spMax * 100)) : 0;
   const estados = (r.estados || []).filter(e => e && e.nombre);
-  return `<div class="tablero-card${caido ? ' caido' : ''}">
+  return `<div class="tablero-card${caido ? ' caido' : ''}" data-tablero-ficha="${esc(id || '')}" title="Ir a su token" style="cursor:pointer">
     <div class="tablero-card-top">
       ${imagen ? `<img class="tablero-foto" src="${esc(imagen)}" alt="">` : ''}
       <div class="tablero-nombre">${esc(nombre)}${nivel ? ` <span class="tablero-nivel">Lv ${fmt(num(nivel))}</span>` : ''}</div>
@@ -103,19 +103,19 @@ function renderTablero(){
   if(!tableroAbierto) return;
   const idsFichas = tableroFichaIds(), idsCreeps = tableroCreepIds();
   const fichas = [...fichasPub.entries()].filter(([id]) => idsFichas.has(id))
-    .map(([id, f]) => ({nombre: f.nombre, imagen: f.miniatura, r: f.resumen || {}}))
+    .map(([id, f]) => ({id, nombre: f.nombre, imagen: f.miniatura, r: f.resumen || {}}))
     .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
   const creeps = [...creepsPub.entries()].filter(([id]) => idsCreeps.has(id))
-    .map(([id, c]) => ({nombre: c.nombre, imagen: c.miniatura, r: c.resumen || {}}))
+    .map(([id, c]) => ({id, nombre: c.nombre, imagen: c.miniatura, r: c.resumen || {}}))
     .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
   let html = '';
   if(fichas.length){
     html += `<div class="tablero-grupo">Personajes · ${fmt(fichas.length)}</div>`;
-    html += `<div class="tablero-grid">${fichas.map(x => tableroCardHtml(x.nombre, x.imagen, x.r.nivel, x.r, 'pj')).join('')}</div>`;
+    html += `<div class="tablero-grid">${fichas.map(x => tableroCardHtml(x.nombre, x.imagen, x.r.nivel, x.r, 'pj', x.id)).join('')}</div>`;
   }
   if(creeps.length){
     html += `<div class="tablero-grupo">Creeps · ${fmt(creeps.length)}</div>`;
-    html += `<div class="tablero-grid">${creeps.map(x => tableroCardHtml(x.nombre, x.imagen, null, x.r, 'creep')).join('')}</div>`;
+    html += `<div class="tablero-grid">${creeps.map(x => tableroCardHtml(x.nombre, x.imagen, null, x.r, 'creep', x.id)).join('')}</div>`;
   }
   $('#tablero-body').innerHTML = html || '<div class="tablero-vacio">Todavía no hay nadie con token en el mapa publicado.</div>';
   const total = fichas.length + creeps.length;
@@ -134,6 +134,21 @@ function tableroCerrar(){
 }
 $('#btn-tablero').onclick = tableroAbrir;
 $('#tablero-x').onclick = tableroCerrar;
+// Tocar una tarjeta lleva a su token (2026-10-09, «Herramientas de diseño → Falta testear»: «poder seleccionar un personaje desde el
+// tablero y que se centre su token»): se selecciona, se centra la vista y lo marca el anillo, como un nombre del orden de turnos.
+$('#tablero-body').addEventListener('click', e => {
+  const card = e.target.closest('[data-tablero-ficha]');
+  if(!card || !card.dataset.tableroFicha) return;
+  const par = [...tokens.entries()].find(([, t]) => t.fichaId === card.dataset.tableroFicha && (soyGM || !t.oculto));
+  if(!par){ toast('No tiene token en el mapa que estás viendo'); return; }
+  const [id, t] = par;
+  tableroCerrar();
+  seleccionar(id);
+  hudCerrar();
+  centrarEn(hexCentro(t.col, t.fila).x, hexCentro(t.col, t.fila).y);
+  iniResaltado = {id, hasta: Date.now() + 3000};
+  pedirDibujo();
+});
 $('#tablero-capa').addEventListener('pointerdown', e => { if(e.target === $('#tablero-capa')) tableroCerrar(); });
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && tableroAbierto) tableroCerrar(); });
 

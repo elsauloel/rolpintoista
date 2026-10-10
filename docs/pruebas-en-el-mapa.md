@@ -13,11 +13,6 @@
 - [ ] **✨ Toque mágico (Mago) con un golpe que entra** (2026-10-10): probado en el mapa que solo deja elegir al que está al lado, que el
   defensor solo tiene Evasión (sin Parry) y que el daño queda «3d6+14» arcano (Ef.Esp 14 de juan), sin «directo». Falta verlo pegar: el
   daño aplicado, restando la Defensa especial del objetivo y no su Defensa.
-- [ ] **⚔ Tajear (Asalto) con daño que entra** (2026-10-10): probado en el mapa que se ejecuta como ataque con el arma, cobra lo de un
-  ataque, avisa sin No2 y deja seguir, suma +1 al Crítico frecuente («Tajear suma +1 a tu Crítico frecuente, solo en esta tirada») y trae el
-  Sangrado al paso de efectos. Falta verlo **aplicado**: un golpe que pase la Defensa (contra el Coloso no pasó: 14 − 16; la Bruja esquivó dos
-  veces por empate) → Sangrado 3 por 3 turnos; y uno **crítico** → solo Sangrado 5, permanente (la regla nueva: el de Critical Matters
-  reemplaza al de siempre; la cubre `comun/pruebas.html`).
 - [ ] **🌀 Ráfaga arcana: ganar la Evasión y quedarse adentro del cono** (2026-10-10): salir del cono ✅ probado (la Bruja esquivó). Falta el
   caso contrario: gana la Evasión, no sale (o declina) → le pega igual.
 - [ ] **🏹 Virotes con mapa** (2026-10-10, sin probar): de **humo** (nube de diámetro 3, 2 turnos, donde pega o cae), de **luz** (bengala de
@@ -33,14 +28,15 @@
 
 - [ ] **🏹 Apuntar con un arma de rango** (cuando se construya; pedido del dueño 2026-10-09): al atacar se ve tu Rango, los objetivos posibles, los que
   no (fuera de Rango o tapados por un obstáculo aunque se vean por la visión de un aliado) y los obstáculos que los tapan. Ver docs/rework-armas-rango.md.
-- [ ] **🏹 La Perfora nueva** (2026-10-10, regla del dueño: N puntos del golpe pasan siempre la Defensa): un golpe con Perfora que NO pasa la
-  Defensa (ej. Tajear contra el Coloso: 14 contra 16) tiene que hacer N de daño y decir «14 − Defensa 16 (pasa 1 por la Perfora) = 1»; uno que
-  sí la pasa, la cuenta de siempre, sin Perfora. Y el Sangrado de Tajear entra con ese punto.
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no
   repite eso. Mirar si sobra o falta algún término, y si algún texto del globo conviene reescribirlo.
 
 ## Probado
+
+- [x] **⚔ Tajear y la Perfora nueva** (2026-10-10, en el mapa, «Claude · pruebas»): juan contra el Coloso (Defensa 16): «11 − Defensa 16
+  (pasa 1 por la Perfora) = 1», el Coloso 31 → 30, el Sangrado ×3 (3 turnos) entra con «Aplicar» y su primer tick lo deja en 27. Antes se vio
+  el +1 al Crítico frecuente solo en esa tirada y el aviso sin No2.
 
 - [x] **🏹 Ballestas: Recarga, «¿Qué virote?» y Perfora del arma** (2026-10-10, probado en el mapa con juan y la Ballesta de guardia): el primer disparo cobró 2 No2 y el siguiente marca 4; la ventana dice «¿Qué virote?» y ofrece solo el virote (no las flechas del carcaj); disparó al Coloso pegado (la ballesta no tiene distancia mínima); el daño dijo «12 − Defensa 11 (16 − perfora 5)» (3 del arma + 2 del virote). Arreglado después: el texto del virote repetía su encabezado y la declaración no mostraba la Perfora del arma.
 

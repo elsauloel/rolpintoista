@@ -927,3 +927,8 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   definitivamente va por ahí»). Hoy la Resistencia a crítico es tan abundante que el Crítico frecuente casi no suma contra armadura (peleas
   simuladas: una daga con +1 pasa de 2,1 a 2,1 de daño por ataque ante el guerrero). Plan a decidir: ¿de qué partes de la armadura se saca la
   Resistencia a crítico? ¿cuánto «Ignora N» llevan las Tipo 4 por calidad (y las Tipo 6, menos)? Rework de esas armas y medir con el simulador.
+  **La cuenta (2026-10-10):** piezas de defensa con Res. crítico — Común (245): T4 12 %, T6 3 %, T8 1 %, T10 1 %; Buena (208): T4 18 %, T6 6 %,
+  T8 3 %, T10 3 % (todas de a 1; no hay defensas Raras). Con ~7 piezas, un personaje junta ~1 de Res. T4. Armas que la ignoran: T4 Común 0/36,
+  Buena 0/26, Rara 5/22, Excepcional 4/20; T6 Buena 1/33, Rara 1/33; T8+ ninguna. **Propuesta (dueño: «una frecuencia similar»):** T4 Común ~12 %
+  e Ignora 1, Buena ~18 % e Ignora 1, Rara/Excepcional Ignora 1–2; T6 1–2 por calidad con Ignora 1. **Ojo:** el simulador de peleas usa la curva de
+  Defensa máxima (Res. T4 2–3 en armadura media), más que el catálogo real (~1): antes de reworkear, medir con armaduras armadas del catálogo.

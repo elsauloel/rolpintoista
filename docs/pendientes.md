@@ -8,8 +8,8 @@
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
 > - [ ] **Decisiones del estudio de peleas, para cuando sigamos avanzando** ([`balance-peleas.md`](balance-peleas.md)):
->   - **P186 — la armadura pesada:** el tanque con escudo es casi intocable para el arco y la daga. Propuesta medida: **daño mínimo de 1 por
->     dado** (si el golpe entra y la armadura lo frena todo, pasa 1 por cada dado del arma).
+>   - **P186 — la armadura pesada:** el tanque con escudo es casi intocable para el arco y la daga. **El daño mínimo se descartó** (dueño: «un
+>     parche poco sofisticado»): **debate más a fondo**, y contar con **las habilidades del asalto y del mago** (mejorar el crítico, etc.).
 >   - **P187 — varitas Raras:** no hay varitas de calidad Rara; el mago se cae a nivel 5 (de 72 % a 46 %). Crear varitas Raras (y más) o que las
 >     varitas escalen con el Especial.
 >   - **P188 — la hacha a dos manos del guerrero:** rinde menos que espada y escudo (20–43 % contra 57–61 %). Revisar el valor de las armas a

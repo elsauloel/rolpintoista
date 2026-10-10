@@ -351,3 +351,11 @@ calculadora cobra la ballesta como el arco (×0,7; Recarga 3 ×0,9) y su casa es
 **Quedan para una tanda con mapa** (necesitan código nuevo): llega cargada, apuntada, a quemarropa, atraviesa escudos, la ballesta de muralla y
 los virotes explosivo, de humo, de luz, de clavo y de rebote. El garfio con soga, como utilería de la Talabartería.
 **Después del OK:** reemplazar las 6 ballestas viejas del catálogo por esta lista, sumar los virotes y probar en el mapa (Recarga y «¿Qué virote?»).
+
+## 2026-10-10 · Ballestas y virotes: en el catálogo (dueño: «más variedad, con efectos propios y compartidos»; «los virotes, inventátelos»)
+**33 ballestas** (`bal-*`, 7 Comunes, 9 Buenas, 8 Raras, 6 Excepcionales, 3 Legendarias) y **24 virotes** (`virote-*`, 6 Comunes, 10 Buenos, 8
+Raros) en `comun/catalogo.js`; las 6 ballestas viejas quedaron archivadas. Generadas con un script que calcula la calidad y el precio con
+`calculadora_armas.py` (todas caen en su calidad). Efectos: Rompe armadura (la casa), Lisiado, Sangrado, Envenenar, Veneno severo, Derribar,
+Demora, Prende fuego, Rengo, eléctrico; rasgos: una mano, Recarga 1/2/3, Ignora Res. crítico, oportunidad sin No2, primer disparo −1 No2,
+Crítico frecuente, PdG, y **a quemarropa** (la distancia ideal en una franja de 1–2 casillas, que ya existía). Lista y textos: ver el catálogo
+(`bal-` y `virote-`).

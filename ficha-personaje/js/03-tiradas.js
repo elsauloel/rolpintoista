@@ -39,7 +39,7 @@ const esPolillaActiva = () => S.efectos.find(e => e && e.activo !== false && /^P
 function renderPolillaBoton(){
   const est = esPolillaActiva();
   let b = document.getElementById('polilla-flotante');
-  if(!est){ if(b) b.remove(); return; }
+  if(!est){ if(b){ b.remove(); if(typeof Flotantes !== 'undefined') Flotantes.apilar(); } return; }
   if(!b){
     b = document.createElement('button');
     b.type = 'button';
@@ -58,7 +58,15 @@ function renderPolillaBoton(){
   }
   const ultima = tiradasPropias()[0];
   $('#polilla-flotante-sub').textContent = ultima ? `+2 a tu última tirada: ${ultima.origen} (${fmt(num(ultima.total))})` : 'todavía no hiciste ninguna tirada';
+  if(typeof Flotantes !== 'undefined') Flotantes.apilar();
 }
+// 🪙 La Moneda Re-Roll en el rincón, como la Polilla (2026-10-09, dueño): mientras tengas una, un botón con brillo que abre «mis últimas tiradas».
+// Solo en la ficha suelta (adentro del mapa la pone el mapa).
+function renderMonedaFlotante(){
+  if(typeof Flotantes === 'undefined') return;
+  Flotantes.moneda({mostrar: window.parent === window && typeof S !== 'undefined' && !!S && !!FichaDuelo.monedaReroll(S), alClic: () => abrirReroll()});
+}
+setInterval(renderMonedaFlotante, 1500);
 function usarPolilla(){
   const est = esPolillaActiva();
   if(!est) return;

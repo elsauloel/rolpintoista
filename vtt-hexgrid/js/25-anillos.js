@@ -198,7 +198,7 @@ function impulsoEsDelAtributo(origen, attr){
 function renderImpulsoBoton(){
   const a = impulsoActivo();
   let b = document.getElementById('impulso-flotante');
-  if(!a){ if(b) b.remove(); return; }
+  if(!a){ if(b){ b.remove(); if(typeof Flotantes !== 'undefined') Flotantes.apilar(); } return; }
   const info = Object.values(ANILLO_ATRIB).find(x => x.attr === a.e.impulso) || {icono: '💍', nombre: a.e.nombre};
   if(!b){
     b = document.createElement('button');
@@ -209,6 +209,7 @@ function renderImpulsoBoton(){
   }
   const n = Math.max(1, num(a.e.impulsoVal) || 2);
   b.innerHTML = `<div>${info.icono} ${esc(info.nombre)}</div><small style="display:block;font-weight:500;font-size:11px;opacity:.9">${mesaMiUltima ? `+${n} a tu última tirada: ${esc(mesaMiUltima.origen)} (${fmt(num(mesaMiUltima.total))})` : 'todavía no hiciste ninguna tirada'}</small>`;
+  if(typeof Flotantes !== 'undefined') Flotantes.apilar();   // la Polilla, este y la moneda, uno arriba del otro (comun/flotantes.js)
 }
 async function usarImpulso(){
   const a = impulsoActivo();

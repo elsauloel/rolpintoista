@@ -195,7 +195,7 @@ function polillaIndice(){
 function renderPolillaBoton(){
   const idx = polillaIndice();
   let b = document.getElementById('polilla-flotante');
-  if(idx < 0){ if(b) b.remove(); return; }
+  if(idx < 0){ if(b){ b.remove(); if(typeof Flotantes !== 'undefined') Flotantes.apilar(); } return; }
   if(!b){
     b = document.createElement('button');
     b.type = 'button';
@@ -212,6 +212,7 @@ function renderPolillaBoton(){
     }
   }
   $('#polilla-flotante-sub').textContent = mesaMiUltima ? `+2 a tu última tirada: ${mesaMiUltima.origen} (${fmt(num(mesaMiUltima.total))})` : 'todavía no hiciste ninguna tirada';
+  if(typeof Flotantes !== 'undefined') Flotantes.apilar();
 }
 async function usarPolillaMapa(){
   const idx = polillaIndice();
@@ -325,6 +326,9 @@ function rerollTieneMoneda(){
   return !f || !f.resumen || f.resumen.moneda !== false;
 }
 function renderRerollBoton(){
+  // 🪙 Con una moneda, además, el botón del rincón (como la Polilla, 2026-10-09, dueño): un recordatorio de que se puede repetir una tirada.
+  const fp = fichaPrincipalId(), fr = fp && fichasPub.get(fp);
+  if(typeof Flotantes !== 'undefined') Flotantes.moneda({mostrar: !soyGM && !!(fr && fr.resumen && fr.resumen.moneda === true), alClic: () => $('#btn-reroll').onclick()});
   const b = $('#btn-reroll');
   if(!b || b.hidden) return;
   const tiene = rerollTieneMoneda();

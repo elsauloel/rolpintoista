@@ -1,21 +1,28 @@
 /* =========================================================
    FLOTANTES — los botones del rincón de abajo a la izquierda (2026-10-09, pedido del dueño): la 🦋 Polilla mística, el 💍 anillo de impulso y
-   la 🪙 Moneda Re-Roll. «Cuando tenga una moneda de reroll, quiero que aparezca en el mismo estilo que cuando está la polilla activa, un botón en el
+   la 🪙 Moneda Re-Roll —en el mapa, al lado de la Mesa (no tapan la Botonera); en la ficha suelta, abajo a la izquierda—. «Cuando tenga una moneda de reroll, quiero que aparezca en el mismo estilo que cuando está la polilla activa, un botón en el
    mismo rincón, con cierto brillo de moneda, como recordatorio de que tenés esa posibilidad.»
    Flotantes.moneda({mostrar, sub, alClic}) dibuja (o saca) el de la moneda; Flotantes.apilar() acomoda los que haya, uno arriba del otro, en ese
    orden (cada pantalla lo llama después de dibujar o sacar uno). Lo usan el mapa (js/02, js/25) y la ficha suelta (js/03).
    ========================================================= */
 const Flotantes = (() => {
   const ORDEN = ['polilla-flotante', 'impulso-flotante', 'moneda-flotante'];
+  // Dónde van (2026-10-09, dueño: «a la derecha, justo al lado del log de la Mesa, así no tapan la Botonera»): en el mapa, pegados a la
+  // izquierda de la columna de la Mesa; donde no hay esa columna (la ficha suelta), abajo a la izquierda.
   function apilar(){
+    const mesa = document.getElementById('mesa'), col = mesa && mesa.closest('aside');
+    const r = col && col.offsetWidth ? col.getBoundingClientRect() : null;
     let y = 16;
     ORDEN.forEach(id => {
       const b = document.getElementById(id);
       if(!b) return;
+      if(r){ b.style.left = 'auto'; b.style.right = Math.round(innerWidth - r.left + 16) + 'px'; b.style.transformOrigin = 'right bottom'; }
+      else{ b.style.right = 'auto'; b.style.left = '16px'; b.style.transformOrigin = 'left bottom'; }
       b.style.bottom = y + 'px';
       y += (b.offsetHeight || 48) + 10;
     });
   }
+  if(typeof window !== 'undefined') window.addEventListener('resize', () => apilar());
   const CSS = `
 #moneda-flotante{position:fixed;left:16px;bottom:16px;z-index:999997;background:linear-gradient(135deg,#4a3a12,#2e240c);color:#ffe9a8;border:2px solid #e0b84a;
   border-radius:16px;padding:10px 16px;font-size:15px;font-weight:800;cursor:pointer;text-align:left;overflow:hidden;transform-origin:left bottom;

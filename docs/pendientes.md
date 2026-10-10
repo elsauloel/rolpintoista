@@ -28,6 +28,9 @@
 >   las combinaciones de bonos en defensas (`herramientas/calculadora_defensa.py`), con el mismo criterio.
 > - [x] (2026-10-10, dueño) **Parry: solo con armas cuerpo a cuerpo** (o escudo): ninguna de rango (arco, ballesta, pólvora), ninguna varita ni
 >   orbe; los báculos sí (son a dos manos: el Báculo de aprendiz pasó a dos manos).
+> - [ ] **🖥 Configurar Chrome para las pruebas** (recordárselo al dueño cuando esté en casa, 2026-10-10): en las dos ventanas de pruebas (GM y
+>   jugador), `chrome://flags` → «Calculate window occlusion on Windows» → **Disabled** y reiniciar Chrome. Así Chrome no deja de dibujar una
+>   ventana tapada por otra y se puede probar con las dos ventanas encimadas, sin maximizar y sin partir la pantalla. Lo cambia el dueño.
 > - [ ] **🔍 Revisión de cerca de ballestas y arcos, sobre todo ballestas** (dueño, 2026-10-10): hacerla juntos, **con el dueño en la compu y con
 >   tiempo** (no es para hacer solo ni desde el celular). Una por una, calidad por calidad: números, nombres, rasgos, el Rango como bono (falta Buena para arriba) y los virotes.
 > - [ ] **📏 «Calcular trayectoria» con la R** (dueño, 2026-10-10): que el botón de Rango (R) también permita ver la **línea de tiro** sin ir a

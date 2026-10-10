@@ -235,3 +235,56 @@ poco menos que el daño fijo (la propuesta de 0,8 se sostiene).
 
 **El que tiene Fuerza sale perdiendo con la ballesta** (a propósito: es el arma del que no la tiene). El problema del «mono-Destreza» sigue siendo
 general (no de la ballesta).
+
+## 2026-10-10 · Ballestas: diseño desde cero (borrador para el OK del dueño)
+
+> Dueño: «avancemos con el diseño… lo que hay en el catálogo puede servir de referencia, pero estamos inventando todo de cero».
+
+### 1. La base (las reglas de todas las ballestas)
+- **No suman Fuerza:** el daño es el del arma (dados + daño fijo). El daño fijo crece con la calidad, al ritmo de la Defensa (≈ Defensa media − 4).
+- **Recarga N** (número del ítem): el disparo cuesta **N No2, 2N el segundo del turno, 3N el tercero…**
+  - **Recarga 2 = la ballesta común** (2, 4, 6…: la idea «lenta» del dueño, la que mide bien).
+  - **Recarga 1 = de repetición** (1, 2, 3…: la referencia de las varitas): muchos tiros chicos; **medido: un tiro chico no pasa la armadura** (nivel 3
+    y 5, casi 0 contra un blanco medio). Solo sirve con daño fijo alto o contra lo liviano: rasgo de una ballesta puntual, a medir.
+  - **Recarga 3 = de asedio** (3, 6, 9…): un tiro por turno casi siempre, muy fuerte.
+- **Tipo 6** de base (el Tipo es el dado). Tipo 8 solo en las pesadas de calidad alta: **medido, el Tipo 8 es muy volátil** (la resistencia a Tipo 8
+  es escasa: a nivel 3 una de asedio 2d8+6 rinde 3–4 veces el arco), así que va con Recarga 3 y se mide antes.
+- **Una mano** las «de mano» (dejan llevar escudo u otra arma: por eso pegan menos); **dos manos** las demás.
+- **Sin tiro alto** (es la firma del arco). Se esquiva con Evasión; se para solo con escudo (lo de todos los disparos).
+- **Rango:** un poco menos que el arco de su calidad (Común 3 · Buena 4 · Rara 5 · Excepcional 5–6 · Legendaria 6–7).
+- **Identidad:** pasar la armadura. **Perfora** (en los virotes y en alguna ballesta) y **Rompe armadura** (en las buenas).
+
+### 2. Lo que hay hoy (solo referencia)
+| Nombre | Calidad | Manos | Daño | Rango | Extra | $ |
+|---|---|---|---|---|---|---|
+| Ballesta de mano | Buena | 1 | 1d6+1 | 3 | — | 130 |
+| Ballesta de almenara · del arbusto | Buena | 1 | 1d6+1 | 3 | copias de la de mano | 130 |
+| Ballesta de repetición | Buena | 1 | 1d6+2 | 4 | — | 110 |
+| Ballesta pesada | Rara | 2 | 2d8+2 | 5 | Rompe armadura 25 % | 260 |
+| Ballesta de asedio | Rara | 2 | 2d8 | 5 | Rompe armadura 50 % | 300 |
+
+Lectura: sin Fuerza, ninguna pasa la armadura desde nivel 3 (daño fijo 0–2); tres son la misma; no hay Común.
+
+### 3. La lista nueva (borrador; números de la escalera medida, precios con la calculadora cuando se programe)
+| Calidad | Nombre | Manos | Daño | Recarga | Rango | Lo suyo |
+|---|---|---|---|---|---|---|
+| Común | Ballesta de mano | 1 | 1d6 | 2 | 3 | Una mano: escudo o daga en la otra |
+| Común | Ballesta de cazador | 2 | 1d6+1 | 2 | 3 | La base |
+| Común | Ballesta de estribo | 2 | 1d6+3 | 3 | 3 | Lenta y más fuerte |
+| Buena | Ballesta de mano reforzada | 1 | 2d6+3 | 2 | 3 | Una mano |
+| Buena | Ballesta de guardia | 2 | 2d6+5 | 2 | 4 | La base |
+| Buena | Ballesta de fortín | 2 | 2d6+4 | 2 | 4 | Perfora 1 |
+| Rara | Ballesta de guerra | 2 | 2d6+8 | 2 | 5 | La base |
+| Rara | Ballesta pesada | 2 | 2d6+9 | 3 | 5 | Rompe armadura 50 % |
+| Rara | Ballesta de repetición | 2 | 2d6+6 | 1 | 4 | Muchos tiros (a medir) |
+| Excepcional | Ballesta de asedio | 2 | 2d8+11 | 3 | 6 | Tipo 8 · Rompe armadura · Peso alto |
+| Excepcional | Ballesta del alguacil | 1 | 2d6+9 | 2 | 5 | Una mano · Perfora 2 |
+| Legendaria | (a inventar) | 2 | 3d6+13 | 2 | 7 | Un rasgo único |
+
+### 4. A decidir con el dueño
+1. ¿**Recarga N** como número de cada ballesta (1 rápida, 2 común, 3 de asedio)?
+2. **Virotes:** ¿munición como las flechas (un «carcaj de virotes», virotes especiales con Perfora como marca) o la ballesta los trae y no se cuentan?
+3. **Disparar con un enemigo pegado:** el arco no puede (distancia mínima). ¿La ballesta sí (se apunta y se dispara), con el ataque de oportunidad
+   normal si después se aleja?
+4. Lo que hay que programar después del OK: que la ballesta no sume Fuerza (`Combatiente.dmgDelArma`), el cobro de la Recarga, la ballesta en la
+   calculadora (su daño fijo reemplaza a la Fuerza: un descuento como el del arco), y reemplazar las del catálogo.

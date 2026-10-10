@@ -288,3 +288,21 @@ Lectura: sin Fuerza, ninguna pasa la armadura desde nivel 3 (daño fijo 0–2); 
    normal si después se aleja?
 4. Lo que hay que programar después del OK: que la ballesta no sume Fuerza (`Combatiente.dmgDelArma`), el cobro de la Recarga, la ballesta en la
    calculadora (su daño fijo reemplaza a la Fuerza: un descuento como el del arco), y reemplazar las del catálogo.
+
+## 2026-10-10 · Ballestas: decidido (dueño) y medición de Recarga 1 y 3
+**Decidido:** cobro **2, 4, 6** como regla de la ballesta común (se priorizó el balance antes que no tener una regla aparte; 2, 4, 4 «como el arco»
+se midió y queda en el filo: con el mismo daño se pasa ~60 %, con un tercio menos se desploma). **Recarga 1 / 2 / 3** (rápida, común, de asedio)
+«probemos si dan los números». **Virotes:** comunes, que no se cuentan, y **especiales**, como las flechas (se comparten mecánicas: espacio de
+diseño). **Con un enemigo pegado, la ballesta sí puede disparar.**
+
+**Medición** (Shooter y Asalto contra el blanco medio y el pesado, % de lo mejor que tienen entre su arco y su cuerpo a cuerpo):
+- **Recarga 3 (asedio): da.** Común 1d6+4 · Buena 2d6+7 · Rara 2d6+10 rinden ~100–140 % contra el medio y **mejor que todo contra el pesado**
+  (lo que se busca: el tiro que pasa la armadura). Para el que tiene poca Agilidad es la mejor (un solo disparo, pero entero).
+- **Recarga 1 (rápida): da solo en el filo.** Cada disparo pega apenas por encima de la armadura: +2 de daño fijo pasa de 35 % a 115 % (nivel 3,
+  1d6+6 → 1d6+8), y **contra el pesado hace 0 en todos los niveles**. Funciona como ballesta «contra lo liviano» con daño fijo alto (Común 1d6 ·
+  Buena 1d6+8 · Rara 2d6+7), pero es muy sensible: va como rasgo de **una** ballesta puntual, no como familia, y se prueba en el mapa.
+
+**Consulta del dueño (2026-10-10): ¿y si el arco no pudiera pegar al lado, pero sí a 2?** (hoy: objetivo a 3 o más). El daño por turno no
+cambia (la herramienta no mide distancias); cambia la táctica: con un enemigo pegado, alejarse **1 casillero en vez de 2** (1 No2 menos; el ataque
+de oportunidad se come igual), y un enemigo a 2 ya no tapa el tiro. Para el Shooter casi nunca cambia la cantidad de flechas por turno (le
+sobra 1 No2 para otra cosa). Queda la diferencia con la ballesta (que dispara pegada). Sin decidir.

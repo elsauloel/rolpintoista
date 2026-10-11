@@ -10,10 +10,8 @@
 
 ## Pendientes
 
-- [ ] **🧱 Paredes y 📐 lápiz en rectas** (2026-10-10, necesita las reglas nuevas pegadas): el GM dibuja en rectas con imán una habitación
-  (clic, clic…, cerrar en el primer punto) con «🧱 Con colisión»; un token no puede salir cruzando la pared (se choca), los conos, la visión con
-  niebla y el rango (R) no pasan del otro lado, una flecha choca. Un garabato a mano alzada con el 🧱 del dibujo seleccionado también. Sacarle la
-  colisión con el mismo 🧱. Un jugador no ve la casilla ni el botón.
+- [ ] **🧱 Paredes: lo que falta** (2026-10-10): la línea de tiro de un arco tapada por una pared, una flecha que choca contra una, la visión con
+  niebla y los conos de sigilo del otro lado, y cerrar una figura con clic en el primer punto.
 - [ ] **⏸ La pausa de la partida** (2026-10-10, necesita las reglas nuevas pegadas): el GM pausa desde el mapa o GM Tools → el jugador ve el
   cartel, el mapa congelado (no se puede tocar ni abrir la Botonera) y su ficha anda; compra o equipa algo → al reanudar, el GM ve esas líneas y
   elige borrar o guardar el registro.
@@ -36,6 +34,11 @@
 
 ## Probado
 
+- [x] **🧱 Paredes y 📐 lápiz en rectas** (2026-10-10, en el mapa, con las reglas pegadas): el GM dibujó en rectas, con imán y «🧱 Con colisión», 5
+  puntos sobre las esquinas del casillero de juan (arriba, izquierda y abajo); se guardó (, ) y se ve en las dos pantallas (borde
+  oscuro y línea roja cortada). juan no pudo cruzarla (el arrastre no armó camino), mientras que por el lado abierto sí (pidió No2). Su rango (R) se
+  abre solo hacia la derecha. Un garabato a mano alzada: el 🧱 del dibujo seleccionado lo volvió pared («Ese dibujo ahora es una pared…») y
+  otra vez lo sacó («ya no es una pared»). La casilla de colisión y el 🧱 son solo del GM.
 - [x] **🪵 Tronco de huída** (2026-10-10, en el mapa): la Bruja atacó a juan; juan marcó el Flash «Tronco de huída +2» y eligió Evasión: 1d8 +2 ⚡ = 7
   contra 6, esquivó gracias al +2. Apareció «🪵 juan esquivó: dodge roll»; lo arrastró 2 casilleros lejos del Coloso (al que se le dieron No2 para
   que pudiera aprovechar): pagó sus 2 No2, el cartel se cerró solo y no hubo ataque de oportunidad ni aviso. Falta: el caso de un cono (la fase dodge).

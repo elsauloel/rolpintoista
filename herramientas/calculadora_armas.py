@@ -57,6 +57,20 @@ DESCUENTO_BALLESTA = 0.7
 BAL_DANO = {3: (1.0, 1.45), 2: (1.2, -2.85)}   # Recarga → (k, c): PC del daño = k × promedio + c
 BAL_PERFORA_EQ = 1.15  # un punto de Perfora en una ballesta rinde ~1,2–1,5 de daño fijo contra el blanco medio
 BAL_IGNORA_MULT = 2.0   # en una ballesta, ignorar Resistencia a crítico vale el doble (medido: a nivel 3, «ignora 1» lleva al Shooter de ~70 % a ~240 %)
+# La planilla de las ballestas (2026-10-11, tabla_ballestas.py → tabla_ballestas.json): para cada base (Tipo, dados, daño fijo, Perfora, Recarga),
+# lo que rinde medido. Si la base está en la planilla, el daño se cobra por eso (no por las rectas de BAL_DANO): rinde = 0,7 × medio + 0,3 ×
+# pesado (el pesado, hasta 1,5), y la calidad de sus dados lo pone en su banda: 1 dado (Común) 74 % → 5,5 · 106 % → 7,5; 2 o más (Buena) 74 % → 9 ·
+# 106 % → 11 (el total de la ballesta pelada; los bonos y efectos se suman encima).
+def _tabla_bal():
+    import json, os
+    f = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tabla_ballestas.json')
+    try: return json.load(open(f, encoding='utf-8'))['bases']
+    except Exception: return {}
+TABLA_BAL = _tabla_bal()
+BAL_BANDA = {1: (5.5, 7.5), 2: (9.0, 11.0)}
+def rinde_ballesta(tipo, dados, fijo, perfora, recarga):
+    e = TABLA_BAL.get(f'{tipo}|{dados}|{fijo}|{perfora}|{recarga}')
+    return None if e is None else 0.7 * e['medio'] + 0.3 * min(1.5, e['pesado'])
 BAL_R2_MIN = 7.5       # una ballesta con Recarga 2 vale al menos lo de una Buena
 PERFORA_VALOR = 0.8   # lo que vale cada punto de Perfora frente a +1 de daño fijo (docs/ideas-arcos-flechas.md)
 PERFORA_CASA = {'punzante': 1.0, 'cortante': 1.25}   # la casa de la Perfora cuerpo a cuerpo: las dagas (Tipo 4); en las espadas (Tipo 6), habilitada (dueño, 2026-10-10)
@@ -123,7 +137,11 @@ def puntaje(arma):
     if arma.get('armaDeRango') and arma.get('arco'): d['daño'] *= DESCUENTO_ARCO
     elif arma.get('armaDeRango') and int(arma.get('recarga') or 0) > 0 and int(arma['recarga']) not in BAL_DANO: d['daño'] *= DESCUENTO_BALLESTA * RECARGA_FACTOR.get(int(arma['recarga']), 1.0)
     rcb = int(arma.get('recarga') or 0) if rango and not arma.get('arco') else 0
-    if rcb in BAL_DANO:   # la ballesta (2026-10-11): el daño vale lo que rinde contra la Defensa de su calidad (medido con balance_ballestas.py)
+    rinde_bal = rinde_ballesta(tipo, peso + amp, int(fijo), int(perf), rcb) if rcb else None
+    if rinde_bal is not None:   # la planilla (lo medido): el total de la ballesta pelada, según la banda de su calidad
+        lo, hi = BAL_BANDA[1 if peso + amp == 1 else 2]
+        d['daño'] = lo + (rinde_bal - 0.74) / 0.32 * (hi - lo) + TASA_PESO * peso + (DESCUENTO_DOS_MANOS if arma.get('tipoItem') == 'arma_2m' else 0)
+    elif rcb in BAL_DANO:   # la ballesta (2026-10-11): el daño vale lo que rinde contra la Defensa de su calidad (medido con balance_ballestas.py)
         prom = (peso + amp) * (tipo + 1) / 2 + fijo + BAL_PERFORA_EQ * perf
         k, c = BAL_DANO[rcb]
         d['daño'] = k * prom + c
@@ -229,7 +247,7 @@ def puntaje(arma):
     d['peso del arma'] = -TASA_PESO * peso
     if arma.get('tipoItem') == 'arma_2m':   # dos manos (dueño, 2026-10-03): sin segunda arma ni escudo, un poco menos de valor
         d['dos manos'] = -DESCUENTO_DOS_MANOS
-    if rcb == 2 and sum(d.values()) < BAL_R2_MIN:   # Recarga 2 empieza en Buena (2026-10-11): a nivel 1 dispara dos veces y una 1d6 pelada ya rinde 103 %
+    if rcb == 2 and rinde_bal is None and sum(d.values()) < BAL_R2_MIN:   # Recarga 2 empieza en Buena (2026-10-11): a nivel 1 dispara dos veces y una 1d6 pelada ya rinde 103 %
         d['recarga 2 (desde Buena)'] = BAL_R2_MIN - sum(d.values())
     return sum(d.values()), d
 

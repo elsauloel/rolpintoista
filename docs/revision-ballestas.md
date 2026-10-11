@@ -123,3 +123,150 @@ cuerpo a cuerpo = 100 %) y el Mago contra el medio.
 | Ballesta de tranquera (150) | 2d6 · Perfora 2 → **2d6 · Perfora 2** | Llega cargada | 72 / 87 % | 163 % |
 | Ballesta del acechador (150) | 2d6+3 → **2d6 · Perfora 2** | Espalda a distancia: +2 PdG, +1 de daño | 71 / 87 % | 166 % |
 | Ballesta del rastreador (150) | 3d6+1 → **2d6 · Perfora 1** | Lisiado 25 % (4 en d4) · Crítico frecuente +1 | 70 / 44 % | 83 % |
+
+## 2026-10-11 · Tercera vuelta: todas Tipo 4 (propuesta para el OK, sin cargar)
+Dueño: «armá la planilla esa que decís y armá las todas tipo 4 con las comunes de +2 a +4 con Perfora 0–1, de +4 a +8 con Perfora 1 y 2 [las
+Buenas]; jugá con las perillas para meterle más diversidad de mecánicas…; y mové todas las perillas necesarias para meter romper armadura de 0,25 a
+100 % con la máxima cantidad de variantes posibles» — y «inclusive una de buena calidad que tira un dado de 4 y rompe armadura por 2, nada más».
+
+- **La planilla:** `herramientas/tabla_ballestas.py` → `tabla_ballestas.json` (Tipo 4 y 6, 1–3 dados, daño fijo 0–10, Perfora 0–3, Recarga 2 y 3,
+  medido contra el blanco medio y el pesado). La calculadora cobra el daño de una ballesta por lo medido: rinde = 0,7 × medio + 0,3 × pesado, y la
+  calidad de sus dados lo pone en su banda (1 dado: 74 % → 5,5 · 106 % → 7,5; 2 dados: 74 % → 9 · 106 % → 11). Los bonos y efectos se suman como siempre.
+- **Todas Tipo 4 y Recarga 2** (dos disparos rápidos). Comunes 1d4+2…+4 con Perfora 0–1; Buenas 2d4+4…+8 con Perfora 1–2; el daño se reparte entre
+  las bases que le entran a cada una con su mecánica, para que haya variedad.
+- **Rinde:** el Shooter con esa ballesta ÷ su mejor arma cuerpo a cuerpo de la misma calidad, contra el blanco medio / el pesado (sin contar la
+  mecánica). Sin Perfora, contra el pesado no hace nada: esas son de tirador.
+- Ajustes para que entren: la del rastreador sin el Crítico frecuente; la del matrero viejo sin Espalda a distancia; la del sargento con Tirador de
+  apoyo +2 en vez del ahorro de No2.
+
+### Las que ya estaban · Comunes (16)
+| Ballesta (precio) | Daño | Lo que tiene | Shooter medio / pesado |
+|---|---|---|---|
+| corta (80) | **1d4+4 · Perfora 1** | 1 mano · Rango −1 | 110 / 62 % |
+| de estribo (75) | **1d4+3 · Perfora 1** | — | 97 / 61 % |
+| de pared (85) | **1d4+3 · Perfora 1** | Evasión −1 · Rompe armadura 25 % | 97 / 61 % |
+| de virote dentado (95) | **1d4+3 · Perfora 1** | Sangrado 33 % | 97 / 61 % |
+| de batida (95) | **1d4+2 · Perfora 1** | Tirador de apoyo +1 PdG | 91 / 60 % |
+| de mano (95) | **1d4+2 · Perfora 1** | 1 mano · Iniciativa +2 | 91 / 60 % |
+| de tiro largo (90) | **1d4+2 · Perfora 1** | Alcance con caída −2 | 91 / 60 % |
+| del baqueano (90) | **1d4+2 · Perfora 1** | Lisiado 25 % | 91 / 60 % |
+| del calderero (95) | **1d4+2 · Perfora 1** | Rompe armadura 33 % | 91 / 60 % |
+| del matrero (85) | **1d4+2 · Perfora 1** | Envenenar 33 % ×2 | 91 / 60 % |
+| de cazador (80) | **1d4+4** | Rango +3 | 84 / 0 % |
+| de mira (75) | **1d4+4** | Apuntada firme +2 | 84 / 0 % |
+| de quemarropa (75) | **1d4+4** | 1 mano · de 1 a 1 casilleros: fijo +3 | 84 / 0 % |
+| del rematador (70) | **1d4+4** | Remate: Crít. frec. +2 | 84 / 0 % |
+| de acecho (80) | **1d4+3** | Emboscada: Crít. frec. +2 | 68 / 0 % |
+| rompescudos (90) | **1d4+3** | Rompe armadura 25 % (seguro con crítico) · Atraviesa escudos | 68 / 0 % |
+
+### Las que ya estaban · Buenas (20)
+| Ballesta (precio) | Daño | Lo que tiene | Shooter medio / pesado |
+|---|---|---|---|
+| abollacascos (170) | **2d4+8 · Perfora 1** | Rompe armadura 25 % | 108 / 46 % |
+| de mano reforzada (130) | **2d4+8 · Perfora 1** | 1 mano | 108 / 46 % |
+| del boyero (170) | **2d4+8 · Perfora 1** | Derribar 25 % | 108 / 46 % |
+| de centinela (160) | **2d4+7 · Perfora 1** | Oportunidad sin No2 | 78 / 43 % |
+| de doble cuerda (170) | **2d4+7 · Perfora 1** | Doble cuerda | 78 / 43 % |
+| de mira corta (170) | **2d4+7 · Perfora 1** | de 1 a 3 casilleros: pdg +1 | 78 / 43 % |
+| de tiro rápido (160) | **2d4+7 · Perfora 1** | Tiro rápido | 78 / 43 % |
+| de vigía (160) | **2d4+7 · Perfora 1** | Apuntada firme +2 | 78 / 43 % |
+| remachadora (160) | **2d4+7 · Perfora 1** | Remachadora | 78 / 43 % |
+| de escolta (160) | **2d4+6 · Perfora 2** | Tirador de apoyo +1 PdG | 77 / 88 % |
+| de fortín (150) | **2d4+6 · Perfora 2** | Rompe armadura 25 % | 77 / 88 % |
+| de guardia (170) | **2d4+6 · Perfora 2** | Rango +2 | 77 / 88 % |
+| de punta de diamante (150) | **2d4+6 · Perfora 2** | Punta de diamante | 77 / 88 % |
+| de estopa (160) | **2d4+4 · Perfora 2** | Prende fuego 33 % | 71 / 82 % |
+| de primer tiro (160) | **2d4+4 · Perfora 2** | Primer disparo +1 dado | 71 / 82 % |
+| virotera (170) | **2d4+4 · Perfora 2** | Cargador 2 · Carcaj integrado +3 | 71 / 82 % |
+| de la ciénaga (170) | **2d4+5 · Perfora 2** | Envenenar 50 % ×3 | 71 / 83 % |
+| del rastreador (150) | **2d4+5 · Perfora 2** | Lisiado 25 % | 71 / 83 % |
+| de tranquera (160) | **2d4+6 · Perfora 1** | Llega cargada | 56 / 44 % |
+| del acechador (160) | **2d4+6 · Perfora 1** | Espalda a distancia +2 PdG / +1 | 56 / 44 % |
+
+### Nuevas, con mecánicas que no tenía ninguna · Comunes (11)
+| Ballesta (precio) | Daño | Lo que tiene | Shooter medio / pesado |
+|---|---|---|---|
+| de mecha (90) | **1d4+3 · Perfora 1** | Afinidad elemental | 97 / 61 % |
+| de largo vuelo (95) | **1d4+2 · Perfora 1** | Largo alcance −1 PdG/casillero | 91 / 60 % |
+| del montero (95) | **1d4+2 · Perfora 1** | Matabestias +2 | 91 / 60 % |
+| de la señal (95) | **1d4+2 · Perfora 1** | Contra el Marcado +2 PdG | 91 / 60 % |
+| del tropero (90) | **1d4+2 · Perfora 1** | Rengo 25 % | 91 / 60 % |
+| de tensión (75) | **1d4+4** | Tensar +2 | 84 / 0 % |
+| del arriero (75) | **1d4+4** | Demora 33 % | 84 / 0 % |
+| de filo fino (80) | **1d4+4** | Crítico potente +2 | 84 / 0 % |
+| del bandolero (80) | **1d4+3** | 1 mano · Primer disparo −1 No2 | 68 / 0 % |
+| del centinela viejo (80) | **1d4+3** | Llega cargada | 68 / 0 % |
+| de mira fija (85) | **1d4+3** | Apuntada +2 | 68 / 0 % |
+
+### Nuevas, con mecánicas que no tenía ninguna · Buenas (8)
+| Ballesta (precio) | Daño | Lo que tiene | Shooter medio / pesado |
+|---|---|---|---|
+| del baqueano fino (180) | **2d4+4 · Perfora 2** | Lisiado 25 % · Remate: Crít. frec. +1 | 71 / 82 % |
+| de las brasas (180) | **2d4+5 · Perfora 2** | Prende fuego 25 % · Afinidad elemental | 71 / 83 % |
+| de tensión doble (160) | **2d4+6 · Perfora 1** | Tensar +3 | 56 / 44 % |
+| del cazador de fieras (170) | **2d4+6 · Perfora 1** | Matabestias +3 · Contra el Marcado +1 PdG | 56 / 44 % |
+| del tirador fino (160) | **2d4+6 · Perfora 1** | +1 d20 en el crítico | 56 / 44 % |
+| de largo vuelo reforzada (180) | **2d4+6 · Perfora 1** | Largo alcance −1 PdG/casillero · Apuntada +1 | 56 / 44 % |
+| del matrero viejo (160) | **2d4+6 · Perfora 1** | Llega cargada | 56 / 44 % |
+| del sargento (160) | **2d4+6 · Perfora 1** | Tirador de apoyo +2 PdG | 56 / 44 % |
+
+### Variantes con Rompe armadura · Comunes (26)
+| Ballesta (precio) | Daño | Lo que tiene | Shooter medio / pesado |
+|---|---|---|---|
+| de la cuña (95) | **1d4+3 · Perfora 1** | 1 mano · Rompe armadura 25 % | 97 / 61 % |
+| del minero (95) | **1d4+2 · Perfora 1** | Rompe armadura 33 % | 91 / 60 % |
+| del carretero (95) | **1d4+2 · Perfora 1** | 1 mano · Rompe armadura 33 % | 91 / 60 % |
+| del cincel (90) | **1d4+2 · Perfora 1** | Rompe armadura 25 % | 91 / 60 % |
+| del leñador (95) | **1d4+2 · Perfora 1** | Rompe armadura doble 25 % | 91 / 60 % |
+| del barretero (95) | **1d4+2 · Perfora 1** | 1 mano · Rompe armadura doble 25 % | 91 / 60 % |
+| del cantero (75) | **1d4+4** | Rompe armadura 50 % | 84 / 0 % |
+| del zapador (75) | **1d4+4** | 1 mano · Rompe armadura 50 % | 84 / 0 % |
+| de la fragua (80) | **1d4+4** | Rompe armadura 50 % (seguro con crítico) | 84 / 0 % |
+| del yunque (80) | **1d4+4** | 1 mano · Rompe armadura 50 % (seguro con crítico) | 84 / 0 % |
+| del alabardero (75) | **1d4+4** | Rompe armadura 33 % (seguro con crítico) | 84 / 0 % |
+| del lancero (75) | **1d4+4** | 1 mano · Rompe armadura 33 % (seguro con crítico) | 84 / 0 % |
+| del remachador (75) | **1d4+4** | Rompe armadura doble 33 % | 84 / 0 % |
+| del martillo (75) | **1d4+4** | 1 mano · Rompe armadura doble 33 % | 84 / 0 % |
+| del clavo (75) | **1d4+4** | Rompe armadura 25 % (seguro con crítico) | 84 / 0 % |
+| del hachero (75) | **1d4+4** | 1 mano · Rompe armadura 25 % (seguro con crítico) | 84 / 0 % |
+| del capataz (85) | **1d4+4** | Rompe armadura doble 25 % (seguro con crítico) | 84 / 0 % |
+| del sitiador (85) | **1d4+4** | 1 mano · Rompe armadura doble 25 % (seguro con crítico) | 84 / 0 % |
+| del ariete (80) | **1d4+3** | Rompe armadura doble 50 % | 68 / 0 % |
+| de la brecha (80) | **1d4+3** | 1 mano · Rompe armadura doble 50 % | 68 / 0 % |
+| de la maza (80) | **1d4+3** | Rompe armadura doble 33 % (seguro con crítico) | 68 / 0 % |
+| del pico (80) | **1d4+3** | 1 mano · Rompe armadura doble 33 % (seguro con crítico) | 68 / 0 % |
+| del herrero (85) | **1d4+2** | Rompe armadura 100 % | 52 / 0 % |
+| del picapedrero (85) | **1d4+2** | 1 mano · Rompe armadura 100 % | 52 / 0 % |
+| de la grieta (80) | **1d4+2** | Rompe armadura doble 50 % (seguro con crítico) | 52 / 0 % |
+| del tonelero (80) | **1d4+2** | 1 mano · Rompe armadura doble 50 % (seguro con crítico) | 52 / 0 % |
+
+### Variantes con Rompe armadura · Buenas (27)
+| Ballesta (precio) | Daño | Lo que tiene | Shooter medio / pesado |
+|---|---|---|---|
+| del albañil (170) | **2d4+8 · Perfora 1** | Rompe armadura 25 % | 108 / 46 % |
+| del foso (160) | **2d4+7 · Perfora 1** | Rompe armadura 50 % | 78 / 43 % |
+| del portón (160) | **2d4+7 · Perfora 1** | 1 mano · Rompe armadura 50 % | 78 / 43 % |
+| de la cota (160) | **2d4+7 · Perfora 1** | Rompe armadura 33 % (seguro con crítico) | 78 / 43 % |
+| de la coraza (160) | **2d4+7 · Perfora 1** | 1 mano · Rompe armadura 33 % (seguro con crítico) | 78 / 43 % |
+| del peto (160) | **2d4+7 · Perfora 1** | Rompe armadura doble 33 % | 78 / 43 % |
+| del yelmo (160) | **2d4+7 · Perfora 1** | 1 mano · Rompe armadura doble 33 % | 78 / 43 % |
+| del calderero viejo (160) | **2d4+6 · Perfora 2** | 1 mano · Rompe armadura 33 % | 77 / 88 % |
+| del herrero viejo (150) | **2d4+6 · Perfora 2** | 1 mano · Rompe armadura 25 % | 77 / 88 % |
+| del sargento mayor (170) | **2d4+6 · Perfora 2** | 1 mano · Rompe armadura doble 25 % | 77 / 88 % |
+| de la barreta (160) | **2d4+4 · Perfora 2** | Rompe armadura 25 % (seguro con crítico) | 71 / 82 % |
+| del forjador (150) | **2d4+5 · Perfora 2** | Rompe armadura 33 % | 71 / 83 % |
+| del mazo (160) | **2d4+5 · Perfora 2** | 1 mano · Rompe armadura 25 % (seguro con crítico) | 71 / 83 % |
+| del almádena (160) | **2d4+5 · Perfora 2** | Rompe armadura doble 25 % | 71 / 83 % |
+| del cerrojo (150) | **2d4+6 · Perfora 1** | Rompe armadura 50 % (seguro con crítico) | 56 / 44 % |
+| de la tranca (150) | **2d4+6 · Perfora 1** | 1 mano · Rompe armadura 50 % (seguro con crítico) | 56 / 44 % |
+| del candado (160) | **2d4+6 · Perfora 1** | Rompe armadura doble 50 % | 56 / 44 % |
+| de la reja (160) | **2d4+6 · Perfora 1** | 1 mano · Rompe armadura doble 50 % | 56 / 44 % |
+| del broquel (160) | **2d4+6 · Perfora 1** | Rompe armadura doble 33 % (seguro con crítico) | 56 / 44 % |
+| del pavés (160) | **2d4+6 · Perfora 1** | 1 mano · Rompe armadura doble 33 % (seguro con crítico) | 56 / 44 % |
+| del asedio menor (150) | **2d4+6 · Perfora 1** | Rompe armadura doble 25 % (seguro con crítico) | 56 / 44 % |
+| de la empalizada (150) | **2d4+6 · Perfora 1** | 1 mano · Rompe armadura doble 25 % (seguro con crítico) | 56 / 44 % |
+| quiebracascos (110) | **1d4+2** | Rompe armadura doble 100 % | 52 / 0 % |
+| del escudero (170) | **2d4+5 · Perfora 1** | Rompe armadura doble 50 % (seguro con crítico) | 43 / 46 % |
+| de la torre (160) | **2d4+4 · Perfora 1** | Rompe armadura 100 % | 37 / 42 % |
+| de la almena (160) | **2d4+4 · Perfora 1** | 1 mano · Rompe armadura 100 % | 37 / 42 % |
+| del herrador (160) | **2d4+4 · Perfora 1** | 1 mano · Rompe armadura doble 50 % (seguro con crítico) | 37 / 42 % |

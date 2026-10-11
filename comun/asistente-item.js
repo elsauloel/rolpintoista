@@ -409,10 +409,10 @@ const AsistenteItem = (() => {
           : `<div class="aa-campo"><label>Tiro alto</label><label style="display:flex;gap:6px;align-items:center;font-size:12.5px"><input type="checkbox" data-aa-firma="tiroAlto" ${d.tiroAlto ? 'checked' : ''} style="width:auto"> Puede tirar por encima de los tokens del medio (no de los Sólidos): el objetivo a 4 o más y PdG −2</label></div>`;
         const id = d.ideal || {}, opD = (v, t) => `<option value="${v}"${(id.donde || '') === v ? ' selected' : ''}>${t}</option>`;
         const nIdeal = (k, txt, extra = '') => campo(txt, `<input data-aa-ideal="${k}" type="number" step="1" value="${n(id[k]) || 0}" style="max-width:90px" ${extra}>`);
-        h += `<div class="aa-campo"><label>Distancia ideal (opcional)</label><select data-aa-ideal="donde">${opD('', 'No tiene')}${opD('cerca', 'Cerca (justo después de la distancia mínima)')}${opD('medio', 'A media distancia (la mitad de su alcance)')}${opD('lejos', 'Lejos (las últimas casillas de su alcance)')}${opD('franja', 'Una franja fija (de… a…)')}</select>
+        h += `<div class="aa-campo"><label>Distancia ideal (opcional)</label><select data-aa-ideal="donde">${opD('', 'No tiene')}${opD('cerca', 'Cerca (a 3 o 4 casilleros)')}${opD('medio', 'A media distancia (la mitad de su alcance)')}${opD('lejos', 'Lejos (los 3 últimos casilleros de su alcance, desde 8)')}${opD('franja', 'Una franja fija (de… a…)')}</select>
           <div class="aa-nota" style="margin:2px 0 0">Cuando el objetivo está en esa franja, el disparo suma lo de abajo. «Medio» y «lejos» se miden con el alcance de quien la usa. Ubicarse cuesta No2: ese es el balance.</div></div>`;
         if(id.donde){
-          h += `<div class="aa-fila">${id.donde === 'franja' ? nIdeal('desde', 'Desde (casilleros)', 'min="1"') + nIdeal('hasta', 'Hasta', 'min="1"') : nIdeal('ancho', 'Ancho de la franja', 'min="1" max="5"')}</div>`;
+          h += `<div class="aa-fila">${id.donde === 'franja' ? nIdeal('desde', 'Desde (casilleros)', 'min="1"') + nIdeal('hasta', 'Hasta', 'min="1"') : id.donde === 'medio' ? nIdeal('ancho', 'Ancho de la franja', 'min="1" max="5"') : ''}</div>`;
           h += `<div class="aa-fila">${nIdeal('pdg', 'PdG +')}${nIdeal('crit', 'Crítico frecuente +', 'min="0"')}${nIdeal('critpot', 'Crítico potente +', 'min="0"')}${nIdeal('fijo', 'Daño fijo +', 'min="0"')}${nIdeal('ignora', 'Ignora Res. crítico', 'min="0"')}</div>`;
           h += `<div class="aa-nota" id="aa-ideal">${e(typeof Combatiente !== 'undefined' ? Combatiente.idealTxt(d.ideal) : '')}</div>`;
         }
@@ -938,7 +938,7 @@ const AsistenteItem = (() => {
       { const ed = d.espaldaDistancia || {}, eo = {}; ['pdg', 'fijo'].forEach(k => { if(n(ed[k]) > 0) eo[k] = Math.round(n(ed[k])); }); if(d.armaDeRango && Object.keys(eo).length) d.espaldaDistancia = eo; else delete d.espaldaDistancia; }
       if(d.armaDeRango && d.ideal && d.ideal.donde){   // la distancia ideal: solo lo que tiene valor
         const id = {donde: d.ideal.donde};
-        (d.ideal.donde === 'franja' ? ['desde', 'hasta'] : ['ancho']).concat(['pdg', 'crit', 'critpot', 'fijo', 'ignora']).forEach(k => { const v = Math.round(n(d.ideal[k])); if(v) id[k] = v; });
+        (d.ideal.donde === 'franja' ? ['desde', 'hasta'] : d.ideal.donde === 'medio' ? ['ancho'] : []).concat(['pdg', 'crit', 'critpot', 'fijo', 'ignora']).forEach(k => { const v = Math.round(n(d.ideal[k])); if(v) id[k] = v; });
         d.ideal = id;
       }else delete d.ideal;
     }else{

@@ -226,7 +226,8 @@ def puntaje(arma):
     if arma.get('armaDeRango'):
         id_ = arma.get('ideal') or {}
         if id_.get('donde'):
-            ancho = (int(id_.get('hasta') or 0) - int(id_.get('desde') or 0) + 1) if id_['donde'] == 'franja' else int(id_.get('ancho') or 2)
+            ancho = ((int(id_.get('hasta') or 0) - int(id_.get('desde') or 0) + 1) if id_['donde'] == 'franja' else int(id_.get('ancho') or 2) if id_['donde'] == 'medio'
+                     else 3 if id_['donde'] == 'lejos' else 2)   # cerca: a 3 o 4 (2) · lejos: los 3 últimos (2026-10-11)
             fac = IDEAL_FACTOR.get(max(1, min(3, ancho)), 0.5)
             v = (float(id_.get('pdg') or 0) * TASA_STAT['pdg'] + min(float(id_.get('crit') or 0), max(0, tipo - 2)) * PESO_CRIT * FACTOR_CRIT.get(tipo, 1.0)
                  + min(float(id_.get('critpot') or 0), 6) * PESO_CRIT * PESO_CRITPOT + float(id_.get('fijo') or 0) * factor_plano(tipo)

@@ -307,13 +307,13 @@ crítico multiplica como mucho ×2) · 29 Cuerda floja con lluvia o agua (✋ a 
 ### 2026-10-11 · Propuesta: los 24 arcos Comunes nuevos (todos Tipo 4; para el OK del dueño, después se testean uno por uno)
 Precio y calidad con la calculadora ya conectada a la planilla medida (`herramientas/tabla_arcos.py`); todavía **sin la pelea simulada** (el dueño:
 «primero armamos los 24, y corremos la tabla sobre los ítems concretos»). Reemplazan a los 13 Comunes de hoy (13 nombres se reusan, 11 son nuevos).
-1. **Arco corto** — 2d4 · Rango 4 · distancia ideal cerca (2): +1 PdG · $90
+1. **Arco corto** — 2d4 · Rango 4 · distancia ideal cerca (a 3 o 4): +1 PdG · $90
 2. **Arco de rama** — 1d4+2 · Rango 5 · Flecha en la cuerda · Veneno 25 % (2) · sin tiro alto · $80
 3. **Arco de pastor** — 1d4+1 · Rango 5 · Crítico potente +1 · Emboscada: Crítico frecuente +1 · $100
-4. **Arco de liebrero** — 1d4+1 · Rango 4 · distancia ideal cerca (2): Crítico potente +2 · Contra el que corre +2 · $95
+4. **Arco de liebrero** — 1d4+1 · Rango 4 · distancia ideal cerca (a 3 o 4): Crítico potente +2 · Contra el que corre +2 · $95
 5. **Arco de punta de hueso** — 1d4+1 · Perfora 1 · Rango 4 · $80
 6. **Arco del monte** — 1d4+1 · Rango 5 · Matabestias +2 · Emboscada: Crítico potente +1 · Veneno 25 % (2) · $100
-7. **Arco de batidor** — 1d4+1 · Rango 5 · Largo alcance 2 · distancia ideal lejos (2): +1 de daño · Emboscada: +1 PdG · $110
+7. **Arco de batidor** — 1d4+1 · Rango 5 · Largo alcance 2 · distancia ideal lejos (los 3 últimos casilleros, desde 8): +1 de daño · Emboscada: +1 PdG · $110
 8. **Arco de acecho** — 1d4+1 · Rango 4 · Emboscada: Crítico frecuente +2 y potente +1 · $100
 9. **Arco de cuerda doble** — 1d4 · Rango 5 · Tensar +1 · $90
 10. **Arco del cuatrero** — 1d4+1 · Rango 4 · Espalda a distancia (+2 PdG, +1 de daño) · $85
@@ -323,7 +323,7 @@ Precio y calidad con la calculadora ya conectada a la planilla medida (`herramie
 14. **Arco de cazador de pájaros** — 1d4+1 · Rango 5 · Lisiado 33 %, seguro con crítico · $85
 15. **Arco de tiro ligero** — 1d4+1 · Rango 5 · Encadenar · Racha · $95
 16. **Arco del matrero** — 1d4 · Perfora 1 · Rango 4 · Sangrado 25 %, seguro con crítico · $100
-17. **Arco de la espera** — 1d4+1 · Rango 4 · Respiración contenida · distancia ideal lejos (2): +1 PdG · Sangrado 25 %, seguro con crítico · $110
+17. **Arco de la espera** — 1d4+1 · Rango 4 · Respiración contenida · distancia ideal lejos (los 3 últimos casilleros, desde 8): +1 PdG · Sangrado 25 %, seguro con crítico · $110
 18. **Arco del cazador de recompensas** — 1d4+1 · Rango 4 · Contra humanos +2 de daño · Lisiado 25 %, seguro con crítico · $100
 19. **Arco del bañado** — 1d4 · Perfora 1 · Rango 4 · Crítico potente +1 · Afinidad especial · Veneno 25 % (3) · sin tiro alto · $120
 20. **Arco de quebracho** — 1d4 · Perfora 1 · Rango 5 · Tensar +1 · Arco duro (Fuerza 4) · Mínima más larga · $95

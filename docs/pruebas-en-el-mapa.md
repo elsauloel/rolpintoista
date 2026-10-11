@@ -10,6 +10,10 @@
 
 ## Pendientes
 
+- [ ] **💠 Distancia ideal nueva (2026-10-11, dueño)**: «cerca» = a 3 o 4 casilleros; «media» = una franja en la mitad del alcance; «lejos» = los 3
+  últimos casilleros del alcance, nunca antes del 8. Ver en el mapa que, al apuntar con un arco de distancia ideal, brillen en celeste los
+  objetivos en esa franja y que el duelo sume el bono (se prueba con los arcos Comunes nuevos cargados).
+
 - [ ] **🎯 Ballestas revisadas** (2026-10-11): una Común (Recarga 3) cobra 3, 6, 9 No2; una Buena (Recarga 2) 2, 4, 6; ninguna trae Rango de bono.
 - [ ] **⚔ Tabla de turnos minimizada** (2026-10-11): achicada, la cabecera dice «⚔ Turno: *nombre*» de quien tiene el turno (si quien mira lo ve;
   si no, «Orden de turnos»); al pasar el turno cambia sola; agrandada vuelve a «Orden de turnos».

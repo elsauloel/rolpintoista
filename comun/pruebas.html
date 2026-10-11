@@ -564,15 +564,15 @@ prueba('rasgos de ballesta (2026-10-10): llega cargada (gratis si no disparó el
     Combatiente.ataqueDeArma(guerra).apuntada, Combatiente.ataqueDeArma(asedio).atraviesaEscudos, !!Combatiente.ataqueDeArma(tranq).apuntada],
     [0, 4, 2, 0, 2, 2, true, false]);   // la de tranquera pasó a Recarga 2 (revisión de las Buenas, 2026-10-11)
 });
-prueba('la distancia ideal de un arma de rango: dónde está y qué da (2026-10-09)', () => {
+prueba('la distancia ideal de un arma de rango: dónde está y qué da (2026-10-09; cerca 3–4 y lejos los 3 últimos desde 8, 2026-10-11)', () => {
   const arco = (ideal) => ({armaDeRango: true, arco: true, ideal});
   const cerca = arco({donde: 'cerca', ancho: 2, pdg: 1}), lejos = arco({donde: 'lejos', ancho: 2, crit: 1}), medio = arco({donde: 'medio', ancho: 1, critpot: 2}), fija = arco({donde: 'franja', desde: 5, hasta: 6, fijo: 2});
   igual([Combatiente.franjaIdeal(cerca.ideal, 10), Combatiente.franjaIdeal(lejos.ideal, 10), Combatiente.franjaIdeal(medio.ideal, 9), Combatiente.franjaIdeal(fija.ideal, 10),
-    Combatiente.bonoIdeal(cerca, 3, 10), Combatiente.bonoIdeal(cerca, 4, 10), Combatiente.bonoIdeal(lejos, 9, 10), Combatiente.bonoIdeal(medio, 6, 9), Combatiente.bonoIdeal(fija, 5, 3),
+    Combatiente.bonoIdeal(cerca, 3, 10), Combatiente.bonoIdeal(cerca, 2, 10), Combatiente.bonoIdeal(lejos, 9, 10), Combatiente.franjaIdeal(lejos.ideal, 15), Combatiente.franjaIdeal(lejos.ideal, 6), Combatiente.bonoIdeal(medio, 6, 9), Combatiente.bonoIdeal(fija, 5, 3),
     Combatiente.ataqueDeArma(cerca).ideal === cerca.ideal, Combatiente.ataqueDeArma({armaDeRango: true, tiroAlto: true}).tiroAlto, Combatiente.idealTxt(lejos.ideal)],
-    [{desde: 2, hasta: 3}, {desde: 9, hasta: 10}, {desde: 6, hasta: 6}, {desde: 5, hasta: 6},
-     {motivo: 'distancia ideal', pdg: 1}, null, {motivo: 'distancia ideal', crit: 1}, {motivo: 'distancia ideal', critpot: 2}, {motivo: 'distancia ideal', fijo: 2},
-     true, true, 'Distancia ideal lejos (franja de 2): Crítico frecuente +1']);
+    [{desde: 3, hasta: 4}, {desde: 8, hasta: 10}, {desde: 6, hasta: 6}, {desde: 5, hasta: 6},
+     {motivo: 'distancia ideal', pdg: 1}, null, {motivo: 'distancia ideal', crit: 1}, {desde: 13, hasta: 15}, {desde: 6, hasta: 6}, {motivo: 'distancia ideal', critpot: 2}, {motivo: 'distancia ideal', fijo: 2},
+     true, true, 'Distancia ideal lejos (los 3 últimos casilleros de tu alcance, desde 8): Crítico frecuente +1']);
 });
 prueba('el tiro alto: todos los arcos lo tienen salvo «sin tiro alto»; otra arma de rango, solo si lo trae (2026-10-09)', () => {
   igual([Combatiente.tieneTiroAlto({armaDeRango: true, arco: true}), Combatiente.tieneTiroAlto({armaDeRango: true, arco: true, sinTiroAlto: true}),

@@ -636,15 +636,18 @@ const Combatiente = (() => {
   /* La distancia ideal de un arma de rango (sweet spot, 2026-10-09, dueño): `ideal = {donde: 'cerca' | 'medio' | 'lejos' | 'franja', ancho,
      desde, hasta, pdg, crit, critpot, fijo, ignora}`. «Cerca» = justo después de la distancia mínima; «medio» = la mitad del alcance; «lejos» = las
      últimas casillas del alcance (se mueven con el Rango de quien la usa); «franja» = de `desde` a `hasta`. El objetivo adentro → el bono del tiro.
-     Ubicarse cuesta No2: es el balance (dueño). */
+     Ubicarse cuesta No2: es el balance (dueño).
+     2026-10-11 (dueño): «cerca» = a 3 o 4 casilleros (a 2 era demasiado); «medio» = una franja en el medio, entre la distancia mínima y el alcance;
+     «lejos» = los 3 últimos casilleros del alcance, nunca antes del 8 (con mucho alcance, la franja se corre con él). El ancho solo cuenta en «medio». */
   const IDEAL_DONDE = {cerca: 'cerca', medio: 'a media distancia', lejos: 'lejos', franja: 'en una franja fija'};
+  const IDEAL_CERCA = [3, 4], IDEAL_LEJOS_ANCHO = 3, IDEAL_LEJOS_MIN = 8;
   function franjaIdeal(ideal, alcance){
     if(!ideal) return null;
     const min = ARCO_LIBRES + 1, ancho = Math.max(1, Math.round(n(ideal.ancho) || 2)), al = Math.max(min, Math.round(n(alcance)));
     if(ideal.donde === 'franja') return {desde: Math.max(1, Math.round(n(ideal.desde))), hasta: Math.max(Math.round(n(ideal.desde)), Math.round(n(ideal.hasta)))};
-    if(ideal.donde === 'lejos') return {desde: Math.max(min, al - ancho + 1), hasta: al};
+    if(ideal.donde === 'lejos') return {desde: Math.min(al, Math.max(IDEAL_LEJOS_MIN, al - IDEAL_LEJOS_ANCHO + 1)), hasta: al};
     if(ideal.donde === 'medio'){ const c = Math.round((min + al) / 2), d = Math.max(min, c - Math.floor((ancho - 1) / 2)); return {desde: d, hasta: d + ancho - 1}; }
-    return {desde: min, hasta: min + ancho - 1};   // cerca
+    return {desde: Math.max(min, IDEAL_CERCA[0]), hasta: Math.max(min, IDEAL_CERCA[0]) + IDEAL_CERCA[1] - IDEAL_CERCA[0]};   // cerca: a 3 o 4
   }
   const BONOS_IDEAL = ['pdg', 'crit', 'critpot', 'fijo', 'ignora'];
   // El bono del tiro si el objetivo está en la distancia ideal (o null): {pdg, crit, critpot, fijo, ignora, motivo}.
@@ -659,7 +662,9 @@ const Combatiente = (() => {
     if(!ideal) return '';
     const b = [n(ideal.pdg) ? `PdG +${n(ideal.pdg)}` : '', n(ideal.crit) ? `Crítico frecuente +${n(ideal.crit)}` : '', n(ideal.critpot) ? `Crítico potente +${n(ideal.critpot)}` : '',
       n(ideal.fijo) ? `+${n(ideal.fijo)} de daño` : '', n(ideal.ignora) ? `ignora ${n(ideal.ignora)} de Res. crítico` : ''].filter(Boolean).join(', ');
-    const donde = ideal.donde === 'franja' ? `de ${n(ideal.desde)} a ${n(ideal.hasta)} casilleros` : `${IDEAL_DONDE[ideal.donde] || 'cerca'} (franja de ${Math.max(1, Math.round(n(ideal.ancho) || 2))})`;
+    const donde = ideal.donde === 'franja' ? `de ${n(ideal.desde)} a ${n(ideal.hasta)} casilleros`
+      : ideal.donde === 'medio' ? `a media distancia (franja de ${Math.max(1, Math.round(n(ideal.ancho) || 2))})`
+      : ideal.donde === 'lejos' ? `lejos (los ${IDEAL_LEJOS_ANCHO} últimos casilleros de tu alcance, desde ${IDEAL_LEJOS_MIN})` : `cerca (a ${IDEAL_CERCA[0]} o ${IDEAL_CERCA[1]} casilleros)`;
     return `Distancia ideal ${donde}: ${b || 'sin bono'}`;
   }
   // El tiro alto (2026-10-09, dueño): pasa por encima de los tokens del medio (no de los Sólidos), con el objetivo a TIRO_ALTO_MIN o más y PdG −2.

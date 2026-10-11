@@ -464,7 +464,7 @@ async function oportunidadPublicarAvisos(t, salidos){
   if(!salidos || !salidos.length || !fbDb || !fbUsuario || !fbMiembro) return;
   for(const {r} of salidos){
     const rs = (vinculo(r) || {}).resumen || {};
-    const motivo = rs.sinOpor ? 'tiene un arco, que no sirve de oportunidad' : r.tipo === 'creep' ? 'no puede aprovecharlo' : 'no tiene No2 suficientes';
+    const motivo = expuestoPub(rs) ? 'está Expuesto: no puede reaccionar con No2' : rs.sinOpor ? 'tiene un arco, que no sirve de oportunidad' : r.tipo === 'creep' ? 'no puede aprovecharlo' : 'no tiene No2 suficientes';
     const texto = `${nombreDe(t)} se alejó de ${nombreDe(r)}: no hay ataque de oportunidad (${nombreDe(r)} ${motivo})`;
     try{
       await fbDb.collection(fbRutaCampana('tiradas')).add({

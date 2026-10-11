@@ -379,6 +379,10 @@ versión parecida en más de una, es candidato a juntar.
   Mantenimiento de los creeps, js/11 el de los personajes; `explotarAlTerminar` en js/13: una onda con tirada y dodge roll).
 - **«Daño directo» con su globo** (2026-10-10, dueño: «siempre que hables de daño directo, ponele el hipervínculo»): entrada en `Glosario`; se marca
   en los ítems, en el Ver de las habilidades (personaje, creep, invocación) y en el texto de la Mesa.
+- **Expuesto y «termina el turno»** (2026-10-10, Degollar): preset `Expuesto` (`expuesto`, `mitadEva`: la Evasión a la mitad, y `alEmpezarTurno`).
+  `Combatiente.expuesto(estados)` y `sinReaccionesNo2(ops, estados)` (las opciones de defensa del duelo sin Parry ni nada que cueste No2: ficha,
+  creep, invocación y el mapa); el resumen público lleva la marca (la oportunidad y el dodge roll del mapa la miran). Una Ejecución «con tu arma»
+  con `terminaTurno` (casilla en el paso «Tu ataque») lo lleva en el ataque del duelo; al resolverse, `cfgEscuchar.terminaTurno(d)` (solo el GM).
 - **Cargas** (2026-10-10, Envenenar arma y los óleos): un estado con `cargas` y `golpe = {fijo, efectos}` (efectos en la forma de `efectosGolpe`)
   le suma a tus próximos ataques con arma ese daño fijo y esos efectos. `Combatiente.gastarCarga(estados, dueloId)` (cada ataque gasta una al pagar y
   tirar el PdG, pegue o no; un Re-roll no gasta otra; sin cargas se va al empezar el ataque siguiente), `cargaDeDuelo(estados, dueloId)` →

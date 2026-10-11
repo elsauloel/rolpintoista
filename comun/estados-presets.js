@@ -73,6 +73,9 @@ const ESTADOS_PRESET = [
   // Silencio (2026-10-04, dueño: la Runa de silencio automatizada): no puede usar habilidades que cuestan SP. Se avisa al ejecutarla y se deja seguir.
   {nombre:'Silencio', polaridad:'debuff', turnos:1, silencio:true, esCC:true,
     detalle:'Silenciado: no puede usar habilidades que cuestan SP mientras dure. ⚙ Automatizado: al ejecutar una habilidad con costo en SP, avisa (y deja seguir si la mesa lo decide).'},
+  // Expuesto (dueño, 2026-10-10: Degollar del Asalto): hasta que empieza su próximo turno (`alEmpezarTurno`; sin orden de turnos, hasta el ⟳).
+  {nombre:'Expuesto', polaridad:'debuff', turnos:1, expuesto:true, mitadEva:true, alEmpezarTurno:true,
+    detalle:'Quedó al descubierto: hasta que empieza su próximo turno, su Evasión se parte a la mitad (al resultado, para abajo) y no puede reaccionar con nada que cueste No2: ni Parry (y por lo tanto ni Bloqueo ni contraataque), ni ataque de oportunidad, ni dodge roll. ⚙ Automatizado: la Evasión, las defensas del duelo, la oportunidad y el dodge roll.'},
   {nombre:'Sentado', polaridad:'debuff', permanente:true, turnos:0, sentado:true, esCC:true,
     detalle:'Está en el piso: su Evasión se parte a la mitad (al resultado de la tirada, redondeado hacia abajo), no puede atacar y no puede hacer dodge roll (✋ a mano). No vence solo: levantarse cuesta 1 No2 (botón Levantarse de la Botonera o de las Acciones del creep).'},
   // Desarmado (dueño, 2026-10-07, la Varita del manotazo): el arma cae en su casilla y levantarla cuesta 1 No2. Como Sentado: no vence solo.

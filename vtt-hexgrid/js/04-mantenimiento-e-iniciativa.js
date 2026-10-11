@@ -196,7 +196,11 @@ $('#btn-mantenimiento').onclick = async () => {
    lo ven. Se muestra solo en modo combate, flotante sobre el mapa y
    plegable, como el "Turn Order" de Roll20. */
 
-let iniciativa = {orden: [], turno: 0, ronda: 1, paso: 0, termino: null};
+let iniciativa = {orden: [], turno: 0, ronda: 1, paso: 0, termino: null, actuaron: []};
+/* Quién ya jugó en esta ronda (`actuaron`, 2026-10-10, regla del dueño con Degollar): un token al que algo lo mueve más abajo en el orden
+   después de haber jugado (Degollar lo manda al final, o el GM lo baja con ▼) no vuelve a jugar en la misma ronda: ▶ Siguiente lo saltea.
+   Se vacía al empezar una ronda nueva. */
+const ordenSerial = lista => lista.map(o => o.oculto ? {id: o.id, valor: num(o.valor), oculto: true} : {id: o.id, valor: num(o.valor)});
 // Turno propio (2026-10-06): cada ▶ Siguiente sube `paso` y deja en `termino` de quién fue el turno que terminó; los estados nuevos llevan la
 // marca «mapa:paso» del turno en curso (Combatiente.agregarEstado), así uno que te ponen en tu propio turno no se descuenta al terminarlo.
 Combatiente.fijarMarcaTurno(() => iniciativa.orden.length ? `${mapaMostrado}:${iniciativa.paso}` : null);
@@ -227,6 +231,7 @@ function escucharIniciativa(){
       ronda: Math.max(1, Math.round(num(d.ronda)) || 1),
       paso: Math.max(0, Math.round(num(d.paso))),
       termino: d.termino && d.termino.id ? {id: String(d.termino.id), paso: Math.round(num(d.termino.paso))} : null,
+      actuaron: Array.isArray(d.actuaron) ? d.actuaron.map(String) : [],
     };
     const cambioTurno = iniciativa.turno !== antesTurno || iniciativa.ronda !== antesRonda;
     if(cambioTurno) giroLibre.clear();   // avanzó el turno: acción de otro
@@ -246,8 +251,9 @@ function puedeEditarIniciativa(t){
 
 async function guardarIniciativa(cambios){
   const datos = {
-    orden: iniciativa.orden.map(o => o.oculto ? {id: o.id, valor: num(o.valor), oculto: true} : {id: o.id, valor: num(o.valor)}),
+    orden: ordenSerial(iniciativa.orden),
     turno: iniciativa.turno,
+    actuaron: iniciativa.actuaron || [],
     ronda: iniciativa.ronda,
     paso: iniciativa.paso,
     ...(iniciativa.termino ? {termino: iniciativa.termino} : {}),
@@ -272,7 +278,7 @@ function ordenarIniciativa(lista){
 function iniciativaPonerTodos(){
   const previos = new Map(iniciativa.orden.map(o => [o.id, o]));
   const lista = [...tokens.keys()].map(id => ({id, valor: num(previos.get(id) && previos.get(id).valor), oculto: !!(previos.get(id) && previos.get(id).oculto)}));
-  guardarIniciativa({orden: ordenarIniciativa(lista).map(o => o.oculto ? {id: o.id, valor: o.valor, oculto: true} : {id: o.id, valor: o.valor}), turno: 0});
+  guardarIniciativa({orden: ordenarIniciativa(lista).map(o => o.oculto ? {id: o.id, valor: o.valor, oculto: true} : {id: o.id, valor: o.valor}), turno: 0, actuaron: []});
 }
 
 // Mover a mano una fila del orden de turnos (▲ ▼, solo GM): para cuando algo del juego cambia a alguien de lugar. El turno
@@ -358,25 +364,31 @@ function iniciativaFueraDeJuego(id){
    ⟳ Mantenimiento de la ronda solo (lo que es de la ronda: formas que vencen, zonas, fuego, trampas; a los que tienen turno propio no les
    toca nada). Los caídos que se saltean igual pasan su turno (su cuenta de muerte y su sangrado siguen). Lo aplica la pantalla que tocó
    ▶ Siguiente, para que no dependa de que el jugador esté conectado. Todo se cuenta en la Crónica y en la Mesa. */
-async function iniciativaSiguiente(){
-  const n = iniciativa.orden.length;
+// `o` (Degollar, 2026-10-10): {orden (el orden nuevo, con quien termina ya al final), termina (su id), desde (el lugar donde estaba: sigue el que
+// quedó ahí)}. Sin `o`, el ▶ Siguiente de siempre.
+async function iniciativaSiguiente(o){
+  o = o && o.orden ? o : {};
+  const orden = o.orden || iniciativa.orden, n = orden.length;
   if(!n) return;
-  const termina = iniciativa.orden[iniciativa.turno], pasoFin = iniciativa.paso, mapaFin = mapaMostrado;
-  let i = iniciativa.turno, ronda = iniciativa.ronda;
+  const termina = o.termina ? orden.find(x => x.id === o.termina) : iniciativa.orden[iniciativa.turno], pasoFin = iniciativa.paso, mapaFin = mapaMostrado;
+  let i = o.orden ? num(o.desde) - 1 : iniciativa.turno, ronda = iniciativa.ronda;
   const salteados = [];
-  for(let paso = 0; paso < n; paso++){
+  const ya = new Set(iniciativa.actuaron || []);   // los que ya jugaron esta ronda: no repiten aunque hayan quedado más abajo
+  if(termina) ya.add(termina.id);
+  for(let paso = 0; paso < 2 * n; paso++){
     i++;
-    if(i >= n){ i = 0; ronda++; }
-    if(!iniciativaFueraDeJuego(iniciativa.orden[i].id)) break;   // salta a los caídos (si caen todos, avanza normal)
-    salteados.push(iniciativa.orden[i].id);
+    if(i >= n){ i = 0; ronda++; ya.clear(); }
+    if(ya.has(orden[i].id)) continue;   // ya jugó esta ronda (lo movieron más abajo): no le vuelve a tocar
+    if(!iniciativaFueraDeJuego(orden[i].id)) break;   // salta a los caídos (si caen todos, avanza normal)
+    salteados.push(orden[i].id);
   }
   const fin = termina ? {termino: {id: termina.id, paso: pasoFin}} : {};
   const nuevaRonda = ronda !== iniciativa.ronda;
-  const ok = await guardarIniciativa({turno: i, paso: pasoFin + 1, ...fin, ...(nuevaRonda ? {ronda} : {})});
+  const ok = await guardarIniciativa({...(o.orden ? {orden: ordenSerial(orden)} : {}), turno: i, paso: pasoFin + 1, actuaron: [...ya], ...fin, ...(nuevaRonda ? {ronda} : {})});
   if(!ok) return;
   // La Crónica, para todos (dueño, 2026-10-06): «Empieza el turno de Fulano» sale enseguida (antes esperaba a que se procesara todo, ~5 s) y
   // después se le suman lo que pasó al terminar el anterior y al empezar el suyo.
-  const sig = iniciativa.orden[i] || {id: ''};
+  const sig = orden[i] || {id: ''};
   const tSig = tokens.get(sig.id);
   // A quién se nombra (2026-10-09): un creep, si los jugadores ya lo conocen (js/29); un personaje, si no está en sigilo.
   const publico = (o, t) => !!t && !t.oculto && !(o && o.oculto) && (t.tipo === 'creep' ? creepConocido(t) : !enSigilo(t));
@@ -386,7 +398,7 @@ async function iniciativaSiguiente(){
   const lineas = [];
   if(termina) lineas.push(...await finDeTurno(termina.id, `${mapaFin}:${pasoFin}`));
   // Los caídos que se saltean: su turno pasa igual, sin jugar.
-  for(const id of salteados.filter(x => x !== (iniciativa.orden[i] || {}).id)){
+  for(const id of salteados.filter(x => x !== (orden[i] || {}).id)){
     const ini2 = await inicioDeTurno(id, `${mapaFin}:${pasoFin}:${id}`), fin2 = await finDeTurno(id, `${mapaFin}:${pasoFin}:${id}`);
     lineas.push(...ini2, ...fin2);
   }
@@ -396,6 +408,28 @@ async function iniciativaSiguiente(){
   const todas = [...lineas, ...lineasZonas, ...lineasInicio];
   if(todas.length) momentoActualizar(await tarjeta, {'datos.lineas': todas.slice(0, 14)});
 }
+/* Termina el turno y pasa al final del orden (Degollar, dueño 2026-10-10): lo llama el duelo en el mapa del GM cuando se resuelve un ataque
+   con `terminaTurno`. Si era su turno, el turno pasa al que quedó en su lugar y él ya cuenta como que jugó la ronda (no le vuelve a tocar al
+   final); si no era su turno (lo usó fuera de turno), solo pasa al final del orden. Sin orden de turnos, no hace nada. */
+async function dueloTerminaTurno(d){
+  const id = d && d.atacante && d.atacante.tokenId;
+  if(!soyGM || !id || !iniciativa.orden.length) return;
+  const i = iniciativa.orden.findIndex(o => o.id === id);
+  if(i < 0) return;
+  const orden = iniciativa.orden.slice(), [fila] = orden.splice(i, 1);
+  orden.push(fila);
+  const t = tokens.get(id), nombre = t && !t.oculto && !enSigilo(t) ? nombreDe(t) : (d.atacante.nombre || 'Alguien');
+  const hab = (d.ataque && (d.ataque.habNombre || d.ataque.armaNombre)) || 'su ataque';
+  if(i === iniciativa.turno){
+    mesaLinea(`⏭ ${nombre} usó ${hab}: termina su turno y pasa al final del orden (en esta ronda no le vuelve a tocar)`, 'recordatorio');
+    await iniciativaSiguiente({orden, termina: id, desde: i});
+    return;
+  }
+  const activo = iniciativa.orden[iniciativa.turno] ? iniciativa.orden[iniciativa.turno].id : null;
+  const turno = activo ? Math.max(0, orden.findIndex(o => o.id === activo)) : iniciativa.turno;
+  if(await guardarIniciativa({orden: ordenSerial(orden), turno})) mesaLinea(`⏭ ${nombre} usó ${hab}: pasa al final del orden de turnos`, 'recordatorio');
+}
+
 // Las invocaciones de un personaje que tienen turno propio (su token está en el orden): las demás van con el personaje.
 function invConTurno(fichaId){
   return iniciativa.orden.map(o => tokens.get(o.id)).filter(t => t && String(t.fichaId || '').startsWith(fichaId + SEP_INVOCACION))
@@ -591,7 +625,9 @@ function renderIniciativa(){
     };
     // La lista gira con el turno (dueño, 2026-10-06: «una línea para saber cuándo se da la vuelta completa»): arriba el que actúa, después los
     // que faltan en esta ronda, la línea «↻ Ronda N+1» y abajo, apagados, los que ya jugaron (vuelven a jugar en la ronda siguiente).
-    const faltan = visibles.filter(x => x.i >= iniciativa.turno), jugaron = visibles.filter(x => x.i < iniciativa.turno);
+    // Los que ya jugaron esta ronda y quedaron más abajo (Degollar, o el GM los bajó) van con los apagados: no les vuelve a tocar.
+    const yaJugo = x => x.i > iniciativa.turno && (iniciativa.actuaron || []).includes(x.o.id);
+    const faltan = visibles.filter(x => x.i >= iniciativa.turno && !yaJugo(x)), jugaron = [...visibles.filter(yaJugo), ...visibles.filter(x => x.i < iniciativa.turno)];
     lista.innerHTML = faltan.map(x => filaIni(x, false)).join('') +
       `<div class="ini-ronda" title="Acá termina la ronda: los de abajo ya jugaron y vuelven a jugar en la ronda siguiente">↻ Ronda ${fmt(iniciativa.ronda + 1)}</div>` +
       jugaron.map(x => filaIni(x, true)).join('');
@@ -651,9 +687,9 @@ function conectarIniciativa(){
   const ordenar = $('#ini-ordenar');
   if(ordenar) ordenar.onclick = () => guardarIniciativa({orden: ordenarIniciativa(iniciativa.orden), turno: 0});
   const siguiente = $('#ini-siguiente');
-  if(siguiente) siguiente.onclick = iniciativaSiguiente;
+  if(siguiente) siguiente.onclick = () => iniciativaSiguiente();
   const limpiar = $('#ini-limpiar');
-  if(limpiar) limpiar.onclick = async () => { if(await Confirmar.preguntar('¿Vaciar el orden de turnos?', {titulo: 'Vaciar turnos', si: 'Vaciar', peligro: true})) guardarIniciativa({orden: [], turno: 0, ronda: 1}); };
+  if(limpiar) limpiar.onclick = async () => { if(await Confirmar.preguntar('¿Vaciar el orden de turnos?', {titulo: 'Vaciar turnos', si: 'Vaciar', peligro: true})) guardarIniciativa({orden: [], turno: 0, ronda: 1, actuaron: []}); };
 }
 
 /* El orden de turnos flota sobre el mapa y se arrastra desde la cabecera (mismo

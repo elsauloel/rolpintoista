@@ -139,10 +139,16 @@ cuesta 1 por defecto (`jobBudget`, 3 puntos + 3 por nivel).
    con «cargas», la mecánica que usan también los óleos.)*
 6. **Backstab** [2] — Únicamente por la espalda. +5 daño fijo. Ignora 1
    de resistencia a crítico.
-7. **Degollar** [7] — Ataque devastador con +4 de PG, +7 de daño y +1 al
-   crítico. Interrumpe su turno y se pasa al final de la tabla de
-   iniciativa. Hasta su próximo turno pierde 50% de evasión y no puede
-   usar No2 para responder a acciones enemigas.
+7. ✅ **Degollar** — **SP:** 7. **No2:** los de un ataque. Ataque con tu arma con
+   +4 PdG, +7 de daño, +1 al Crítico frecuente y +1 al Crítico potente (solo
+   en este golpe). Al resolverse, se termina tu turno y pasás al final del
+   orden de turnos (en esa ronda no te vuelve a tocar). Hasta que empieza tu
+   próximo turno quedás **Expuesto** (estado nuevo): la Evasión a la mitad y
+   ninguna reacción que cueste No2 (ni Parry ni Bloqueo, ni oportunidad, ni
+   contraataque, ni dodge roll). *(Auditada 2026-10-10 con el dueño: los
+   números vienen del sistema anterior y se dejaron, abiertos a revisarse;
+   regla nueva del orden de turnos: quien ya jugó la ronda no repite aunque
+   algo lo mueva más abajo.)*
 8. **Sprint** [1] — 2 No2: avanza 3 casillas.
 9. **Tronco de huída** [2] — +2 fijo a una tirada de evasión con giro.
 10. **Robar SP** [1] — Gana 2 SP por cada crítico obtenido.

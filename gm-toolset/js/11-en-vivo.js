@@ -91,7 +91,8 @@ function creepPublico(sc, orden){
       hpPct: hpMax > 0 ? Math.round(Math.max(0, Math.min(1, hp / hpMax)) * 100) : 0,
       muerto: hp <= 0,
       opor: CreepCalculo.oportunidadPosible(sc),   // ¿puede aprovechar un ataque de oportunidad? (2026-10-02; sin mostrar sus No2)
-      sinOpor: CreepCalculo.sinOportunidad(sc),   // su arma no sirve de oportunidad (un arco, 2026-10-09): el mapa dice el motivo
+      sinOpor: CreepCalculo.sinOportunidad(sc),
+      expuesto: Combatiente.expuesto(sc.estados),   // Expuesto (Degollar, 2026-10-10): sin oportunidad ni dodge roll   // su arma no sirve de oportunidad (un arco, 2026-10-09): el mapa dice el motivo
       estados: (sc.estados || [])
         .filter(es => es && es.activo !== false && es.nombre)
         .slice(0, 30)

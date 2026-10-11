@@ -605,7 +605,8 @@ async function modificarCreep(creepId, cambiar){
       'resumen.hpPct': hpMax > 0 ? Math.round(Math.max(0, Math.min(1, sc.hp / hpMax)) * 100) : 0,
       'resumen.muerto': sc.hp <= 0,
       'resumen.opor': CreepCalculo.oportunidadPosible(sc),   // ataque de oportunidad (2026-10-02)
-      'resumen.sinOpor': CreepCalculo.sinOportunidad(sc),   // su arma no sirve de oportunidad (un arco, 2026-10-09)
+      'resumen.sinOpor': CreepCalculo.sinOportunidad(sc),
+      'resumen.expuesto': Combatiente.expuesto(sc.estados),   // Expuesto (Degollar, 2026-10-10)   // su arma no sirve de oportunidad (un arco, 2026-10-09)
       ...CreepCalculo.tarjetaPublica(sc),   // la 🪪: nombres del arma y del equipo, y la nota (lo mismo que publica GM Tools)
       'resumen.estados': (Array.isArray(sc.estados) ? sc.estados : [])
         .filter(e => e && e.activo !== false && e.nombre).slice(0, 30)

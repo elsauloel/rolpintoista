@@ -888,8 +888,21 @@ function dueloChequearDodge(d){
    resolvió, moviéndose o declinando), el cuadro se vuelve a abrir solo — así se ve el veredicto. Para cualquier
    otro cliente (espectadores) estos dos hooks no hacen nada: cada uno mira su propio duelo como siempre. */
 let dodgeBanner = null;   // {id, tokenId, nombre, grupoId}
+// ¿Está Expuesto (Degollar)? Un creep, en sus datos (el GM); si no, lo que publica su resumen (js/17).
+function tokenExpuesto(t){
+  if(!t) return false;
+  if(t.tipo === 'creep' && soyGM){ const sc = creepPrivadoDe(t.fichaId); if(sc) return Combatiente.expuesto(sc.estados); }
+  const v = vinculo(t);
+  return expuestoPub(v && v.resumen);
+}
 function dueloDodgeEmpieza(d){
   if(!d.defensor || !(soyGM || (fbUsuario && d.defensor.uid === fbUsuario.uid))) return;
+  // Expuesto (Degollar, 2026-10-10): sin dodge roll — se queda en el área (lo resuelve el mapa del GM, una sola vez).
+  if(tokenExpuesto(tokens.get(d.defensor.tokenId))){
+    if(soyGM) Duelo.resolverDodge(d.id, false).then(() => mesaLinea(`😱 ${d.defensor.nombre} está Expuesto: no puede hacer el dodge roll y se queda en el área`, 'recordatorio'))
+      .catch(err => console.error('No se pudo resolver el dodge roll de un Expuesto:', err));
+    return;
+  }
   Duelo.abrir(d.id);
   Duelo.minimizar();
   seleccionar(d.defensor.tokenId);
@@ -1439,14 +1452,14 @@ function dueloOpcionesLocal(d){
   // Con las Acciones nuevas cargadas, las mismas opciones que GM Tools (comun/creep-duelo.js: con los dados que tiraría, su 🔍 y la Evasión contra
   // oportunidad / contraataque, 2026-10-04); si no, la versión corta de abajo.
   const hk = typeof acHooksDuelo === 'function' ? acHooksDuelo(d.defensor) : null;
-  if(d.hab) return Duelo.conVistas(d, Duelo.opcionesHab(d, hk || {puedeParry: () => !!defensaCreepMapa(sc)}), hk);   // habilidad dirigida: lo que puede tirar el creep contra ella
+  if(d.hab) return Duelo.conVistas(d, Duelo.opcionesHab(d, hk || {puedeParry: () => !!defensaCreepMapa(sc) && !Combatiente.expuesto(sc.estados)}), hk);   // habilidad dirigida: lo que puede tirar el creep contra ella
   if(hk && hk.opcionesDefensa){ const o = hk.opcionesDefensa(d) || []; return Duelo.conVistas(d, d.ataque && d.ataque.sinParry ? o.filter(x => x.modo !== 'parry') : o, hk); }
   // Parry solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30, comun/combatiente.js; la misma que GM Tools).
   const def = defensaCreepMapa(sc), c = Combatiente.costoParry();
   if(Combatiente.stuneado(sc.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1'}];   // Stun (2026-10-06)
   const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión'}];
   if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === sc.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}`, costo: c, motivoNo: ''});   // sin No2: queda en negativo (2026-10-06)
-  return d.ataque && d.ataque.sinParry ? ops.filter(o => o.modo !== 'parry') : ops;   // Takle y otros ataques que no se pueden parrear
+  return Combatiente.sinReaccionesNo2(d.ataque && d.ataque.sinParry ? ops.filter(o => o.modo !== 'parry') : ops, sc.estados);   // Takle y otros ataques que no se pueden parrear; Expuesto (Degollar)
 }
 // ⚡ Flash de un creep (P135): si no tiene ninguno que sirva para esta tirada, el mapa contesta solo ([]) y no hace falta
 // cargar GM Tools; si tiene, contesta GM Tools (que es quien lo cobra: cooldown). null = que pregunte.

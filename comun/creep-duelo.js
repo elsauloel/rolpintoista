@@ -184,7 +184,7 @@ const CreepDuelo = (() => {
       },
       // ¿El creep objetivo de una habilidad dirigida puede parriar ahora? (2026-09-29, misma regla que un ataque
       // normal, P121: sin arma no hay Parry.)
-      puedeParry: d => !!C().defensa(deLado(d.defensor)),   // arma de verdad o escudo (un arma natural no alcanza, por ahora)
+      puedeParry: d => { const sc = deLado(d.defensor); return !!C().defensa(sc) && !Combatiente.expuesto(sc && sc.estados); },   // arma de verdad o escudo (un arma natural no alcanza, por ahora)
       // Cómo puede defenderse el creep (elige el GM, a ciegas): Evasión o Parry con su arma (siempre 1 No2).
       opcionesDefensa: d => {
         const sc = deLado(d.defensor);
@@ -200,7 +200,7 @@ const CreepDuelo = (() => {
         if(Combatiente.stuneado(sc.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
         if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === sc.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, motivoNo: '',
           info: [`Parry 🎲 ${fx(C().statValor(sc, 'parry'), 'parry')}`, disparo ? 'si gana, el disparo queda parado (sin Bloqueo)' : `si gana, Bloqueo 🎲 ${fx(C().bloqueoValor(sc))}`, ...(c > num(sc.nitros) ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
-        return ops;
+        return Combatiente.sinReaccionesNo2(ops, sc.estados);   // Expuesto (Degollar): sin Parry
       },
       defender: (d, modo) => {
         const sc = deLado(d.defensor);

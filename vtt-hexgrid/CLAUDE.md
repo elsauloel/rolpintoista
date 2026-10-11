@@ -226,6 +226,11 @@ línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar
   que gm-tools, así la otra herramienta se entera y lo trae). Topes: vida
   entre 0 y el máximo; SP hasta el máximo. El GM ve los números de sus
   creeps escuchando la parte privada del seleccionado.
+- **Quién ya jugó la ronda** (2026-10-10, regla del dueño con Degollar): `iniciativa.actuaron` (en el documento de la iniciativa) = los que ya
+  terminaron su turno en esta ronda; ▶ Siguiente los saltea aunque algo los haya movido más abajo (Degollar, o el GM con ▼), y se vacía al
+  empezar la ronda. La lista los muestra con los apagados. `dueloTerminaTurno(d)` (js/04): un ataque con `terminaTurno` que se resuelve manda
+  a quien atacó al final del orden y, si era su turno, pasa el turno (`iniciativaSiguiente({orden, termina, desde})`). Expuesto: sin oportunidad
+  (`expuestoPub`, js/17) ni dodge roll (`tokenExpuesto`, js/13).
 - **Orden de turnos (iniciativa)**: tablero flotante y plegable arriba a la
   izquierda del mapa (`#iniciativa`, estilo "Turn Order" de Roll20) — **de
   siempre** (decidido 2026-09-22: antes visible solo en modo combate y

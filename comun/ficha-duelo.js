@@ -220,7 +220,7 @@ const FichaDuelo = (() => {
         return f ? f.formula : fmt(num(v));
       },
       // ¿El objetivo de una habilidad dirigida puede parriar ahora? (sin arma ni escudo equipado, no hay Parry.)
-      puedeParry: d => armasYEscudosParaParry().length > 0,
+      puedeParry: d => armasYEscudosParaParry().length > 0 && !Combatiente.expuesto(getS().efectos),   // Expuesto (Degollar): sin Parry
       // Cómo puede defenderse (elige a ciegas): Evasión, o Parry con cada arma o escudo equipado (siempre 1 No2).
       opcionesDefensa: d => {
         const S = getS();
@@ -244,7 +244,7 @@ const FichaDuelo = (() => {
         });
         // Stun (2026-10-06): no puede hacer nada; si lo atacan, su Evasión es 1 (sin Parry ni pagar el sobrepeso).
         if(Combatiente.stuneado(S.efectos)) return [{modo: 'evasion', itemId: '', etiqueta: '🏃 Evasión · Stun: 1', motivoNo: '', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];
-        return ops;
+        return Combatiente.sinReaccionesNo2(ops, S.efectos);   // Expuesto (Degollar): sin Parry
       },
       defender: (d, modo, itemId) => {
         const S = getS();

@@ -815,7 +815,7 @@ function arrancarEnVivo(){
     if(!lado || lado.tipo !== 'pj') return '';
     const f = fichasPub.get(String(lado.ref || '').split(SEP_INVOCACION)[0]);
     return (f && f.resumen && f.resumen.control) || '';
-  }, aplicar: dueloAplicarDano, aplicarEfecto: dueloAplicarEfecto, opcionesLocal: dueloOpcionesLocal, flashLocal: dueloFlashLocal, grupoResuelto: dueloGrupoResuelto, chequearDodge: dueloChequearDodge, dodgeEmpieza: dueloDodgeEmpieza, dodgeTermina: dueloDodgeTermina, paso: (...a) => dueloPasoCronica(...a), aplicaDemora: true, bloqueado: d => { dueloEmpujon(d); dueloAtraviesaEscudo(d).catch(err => console.error('No se pudo abollar el escudo:', err)); }, flechaErrada: d => flechaErrada(d)});   // 🏹 la flecha especial que erra (js/33)   // Empujón (js/26)   // js/16 carga después
+  }, aplicar: dueloAplicarDano, aplicarEfecto: dueloAplicarEfecto, opcionesLocal: dueloOpcionesLocal, flashLocal: dueloFlashLocal, grupoResuelto: dueloGrupoResuelto, chequearDodge: dueloChequearDodge, dodgeEmpieza: dueloDodgeEmpieza, dodgeTermina: dueloDodgeTermina, paso: (...a) => dueloPasoCronica(...a), aplicaDemora: true, bloqueado: d => { dueloEmpujon(d); dueloAtraviesaEscudo(d).catch(err => console.error('No se pudo abollar el escudo:', err)); }, flechaErrada: d => flechaErrada(d), terminaTurno: d => dueloTerminaTurno(d).catch(err => console.error('No se pudo terminar el turno (Degollar):', err))});   // 🏹 la flecha especial que erra (js/33)   // Empujón (js/26)   // js/16 carga después
   escucharAreas();   // hechizos de área (Paso 4/7 del casteo): el círculo compartido y, el GM, la cascada
   actualizarBotonMapas();
   // Si ya estaba abierta de una sesión anterior, recién ahora hay conexión.

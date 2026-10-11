@@ -10,6 +10,10 @@
 
 ## Pendientes
 
+- [ ] **🗡 Degollar** (2026-10-10): juan (en su turno, con orden de turnos) lo ejecuta contra un rival → el duelo dice +4 PdG, el daño «+ 7»,
+  el crítico +1/+1; al resolverse, la Mesa «⏭ … termina su turno y pasa al final del orden», el turno pasa al siguiente y juan aparece abajo
+  con los que ya jugaron; al darse la vuelta la ronda no le vuelve a tocar. Expuesto: su Evasión ÷2, en un duelo solo la Evasión (sin Parry),
+  no se lo frena al alejarse un rival (sin oportunidad) y en un área no tiene dodge roll. Se va al empezar su próximo turno.
 - [ ] **⏸ La pausa de la partida** (2026-10-10, necesita las reglas nuevas pegadas): el GM pausa desde el mapa o GM Tools → el jugador ve el
   cartel, el mapa congelado (no se puede tocar ni abrir la Botonera) y su ficha anda; compra o equipa algo → al reanudar, el GM ve esas líneas y
   elige borrar o guardar el registro.

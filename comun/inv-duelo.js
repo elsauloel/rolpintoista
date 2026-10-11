@@ -174,7 +174,7 @@ const InvDuelo = (() => {
         const f = formulaParaValor(num(v));
         return f ? f.formula : fmt(num(v));
       },
-      puedeParry: d => !!I().defensa(ui.inv(d.defensor)),   // arma de verdad o escudo (2026-09-30)
+      puedeParry: d => { const inv = ui.inv(d.defensor); return !!I().defensa(inv) && !Combatiente.expuesto(inv && inv.estados); },   // arma de verdad o escudo (2026-09-30)
       // Cómo puede defenderse (elige a ciegas): Evasión, o Parry con su arma o un escudo (siempre 1 No2).
       opcionesDefensa: d => {
         const inv = ui.inv(d.defensor);
@@ -188,7 +188,7 @@ const InvDuelo = (() => {
         if(Combatiente.stuneado(inv.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
         if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === inv.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, motivoNo: '',
           info: [`Parry 🎲 ${fx(I().statValor(inv, 'parry'), 'parry', inv.estados)}`, disparo ? 'si gana, el disparo queda parado (sin Bloqueo)' : `si ganás, Bloqueo 🎲 ${fx(I().bloqueoValor(inv))}`, ...(c > num(inv.nitros) ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
-        return ops;
+        return Combatiente.sinReaccionesNo2(ops, inv.estados);   // Expuesto (Degollar): sin Parry
       },
       defender: (d, modo) => {
         const inv = ui.inv(d.defensor);

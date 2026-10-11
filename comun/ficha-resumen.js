@@ -155,6 +155,7 @@ const FichaResumen = (() => {
           turnos: num(e.turnos),
           permanente: !!e.permanente, ...(e.invulnerable ? {invulnerable: true} : {}),
           ...(num(e.absorbePct) > 0 ? {absorbePct: num(e.absorbePct), absorbeMax: num(e.absorbeMax), absorbido: num(e.absorbido)} : {}),   // Armadura arcana (la vista previa del mapa)
+          ...(e.expuesto ? {expuesto: true} : {}),   // Expuesto (Degollar): el mapa no le ofrece oportunidad ni dodge roll
           ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
           ...(e.derivado ? {derivado: true} : {}), ...(e.confusion ? {confusion: true} : {}), ...(e.anillo ? {anillo: true} : {}), ...(e.impulso ? {impulso: e.impulso, impulsoVal: num(e.impulsoVal)} : {}),   // la Confusión: el mapa la tira (js/20)
           ...(e.espinas ? {espinas: true} : {}), ...(e.espejo ? {espejo: true} : {}), ...(e.ceguera ? {ceguera: true} : {}), ...(e.desarmado ? {desarmado: true} : {}),   // el mapa devuelve el daño aunque el estado tenga un nombre propio («Espinas (poción)»)
@@ -196,6 +197,7 @@ const FichaResumen = (() => {
               turnos: num(e.turnos),
               permanente: !!e.permanente, ...(e.invulnerable ? {invulnerable: true} : {}),
           ...(num(e.absorbePct) > 0 ? {absorbePct: num(e.absorbePct), absorbeMax: num(e.absorbeMax), absorbido: num(e.absorbido)} : {}),   // Armadura arcana (la vista previa del mapa)
+          ...(e.expuesto ? {expuesto: true} : {}),   // Expuesto (Degollar): el mapa no le ofrece oportunidad ni dodge roll
               ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
               polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '', ...(e.confusion ? {confusion: true} : {}), ...(e.lento ? {lento: true} : {}),
               detalle: String(e.detalle || '').slice(0, 300),

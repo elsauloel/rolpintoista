@@ -160,6 +160,7 @@ const AsistenteDueloHab = (() => {
       radio: (ini && (ini.radio || ini.largo)) || 2,   // también el largo de la línea recta
       ondaDodge: !!(ini && ini.ondaDodge),   // la onda deja dodge roll a quien gana (2026-10-02, Daño en área)   // hechizo de área (Paso 4/7 del casteo): radio del área, en casilleros
       modo: (ini && ini.modo) || 'hab', x: (ini && ini.x) || 'nitros',
+      terminaTurno: !!(ini && ini.terminaTurno),   // Degollar (2026-10-10): al resolverse, termina el turno y pasa al final del orden
       flashEn: new Set(ini && ini.flash && Array.isArray(ini.flash.en) ? ini.flash.en : ['pdg', 'parry', 'bloqueo', 'dano']), flashBono: (ini && ini.flash && ini.flash.bono) || 2,
       arma: {pdg: 0, pdgPorX: 0, dadosPorX: 0, fijo: 0, fijoPorX: 0, sinParry: false, ignoraResistCrit: 0, critBono: 0, critpotBono: 0, perfora: 0, ...((ini && ini.arma) || {})},
       // Critical Matters (2026-09-29, pedido del dueño — Lisiar: "Crítico frecuente ×1... si es crítico, el
@@ -261,6 +262,7 @@ const AsistenteDueloHab = (() => {
       h += `${fila('pdg', '+ a la PdG (fijo)')}${fila('pdgPorX', '+ a la PdG por cada X')}${fila('dadosPorX', 'Dados de daño extra por cada X (del Tipo del arma)')}${fila('fijo', 'Daño fijo extra')}${fila('fijoPorX', 'Daño fijo extra por cada X')}
         <div class="fila"><span style="min-width:250px">La X de su costo es…</span><select data-x><option value="nitros"${st.x === 'nitros' ? ' selected' : ''}>los No2 (Nitros)</option><option value="sp"${st.x === 'sp' ? ' selected' : ''}>los SP</option></select></div>
         <label class="op"><input type="checkbox" data-sinparry ${a.sinParry ? 'checked' : ''}> No se puede parrear (solo esquivar)</label>
+        <label class="op"><input type="checkbox" data-terminaturno ${st.terminaTurno ? 'checked' : ''}> Al resolverse, termina tu turno y pasás al final del orden de turnos (Degollar)</label>
         <label class="op"><input type="checkbox" data-ignoraresistcrit-on ${a.ignoraResistCrit > 0 ? 'checked' : ''}> Ignora Resistencia a crítico</label>
         ${a.ignoraResistCrit > 0 ? `<div class="fila"><span style="min-width:250px">¿Cuántos puntos ignora?</span><input type="number" min="1" style="width:80px" data-arma="ignoraResistCrit" value="${esc(a.ignoraResistCrit)}"></div>` : ''}
         ${fila('critBono', '+ Crítico frecuente (solo en esta tirada)')}${fila('critpotBono', '+ Crítico potente (solo en esta tirada)')}${fila('perfora', 'Perfora (ignora N de la Defensa del golpe; se suma a la del arma)')}
@@ -509,6 +511,7 @@ const AsistenteDueloHab = (() => {
         if(a.fijo) partes.push(`${a.fijo > 0 ? '+' : ''}${a.fijo} de daño fijo`);
         if(a.fijoPorX) partes.push(`${a.fijoPorX > 0 ? '+' : ''}${a.fijoPorX} de daño fijo por X`);
         if(a.sinParry) partes.push('no se puede parrear');
+        if(st.terminaTurno) partes.push('al resolverse termina tu turno (al final del orden)');
         if(a.ignoraResistCrit) partes.push(`ignora ${a.ignoraResistCrit} de Resistencia a crítico`);
         if(a.critBono) partes.push(`+${a.critBono} Crítico frecuente (solo esta tirada)`);
         if(a.perfora) partes.push(`perfora ${a.perfora}`);
@@ -579,6 +582,7 @@ const AsistenteDueloHab = (() => {
       f.querySelectorAll('[data-flashen]').forEach(c => c.onchange = () => { c.checked ? st.flashEn.add(c.dataset.flashen) : st.flashEn.delete(c.dataset.flashen); });
       q('[data-x]', e => { st.x = e.target.value; });
       q('[data-sinparry]', e => { st.arma.sinParry = e.target.checked; });
+      q('[data-terminaturno]', e => { st.terminaTurno = e.target.checked; });
       q('[data-ignoraresistcrit-on]', e => { st.arma.ignoraResistCrit = e.target.checked ? 1 : 0; dibujar(); });
       f.querySelectorAll('[data-arma]').forEach(i => i.onchange = () => { st.arma[i.dataset.arma] = Number(i.value) || 0; });
       q('[data-tira]', e => { st.tira = e.target.value; dibujar(); });
@@ -687,7 +691,7 @@ const AsistenteDueloHab = (() => {
         }
         const efs = st.efectos.filter(e => e.cura !== undefined ? curaValida(e.cura) : e.nombre).map(mapEfectoOut);
         if(st.modo === 'arma'){
-          const o2 = {modo: 'arma', objetivo: 'enemigo', x: st.x, arma: {...st.arma}, efectos: efs};
+          const o2 = {modo: 'arma', objetivo: 'enemigo', x: st.x, arma: {...st.arma}, efectos: efs, ...(st.terminaTurno ? {terminaTurno: true} : {})};
           if(st.efectosNotaOn && st.efectosNota.trim()) o2.efectosNota = st.efectosNota.trim();
           if(st.alcance !== 'auto'){ o2.alcance = st.alcance; if(st.alcance === 'fijo') o2.alcanceN = st.alcanceN; }
           // ⚡ Critical Matters: solo se manda si está tildado Y tiene algo cargado (si se destilda, o se deja

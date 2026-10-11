@@ -372,3 +372,10 @@ frecuente**: «la mayoría de los personajes que se enfocan en esas armas ya tie
 baqueano +4). A las que lo perdieron, otro bono o un efecto más seguido (Arco corto +1 de daño, de pastor Crítico potente +1, de liebrero
 Iniciativa +2, de tiro ligero PdG +1; ballesta de mano Iniciativa +2, del matrero Veneno 33 %, dentado Sangrado 33 %, quemarropa +4 pegado,
 calderero Rompe armadura 33 %); el Arco de rama quedó pelado y más barato. Las de Buena para arriba, todavía como estaban.
+
+## 2026-10-11 · Arcos Comunes auditados (dueño)
+Medidos con `balance_combate.py` (el arco del Shooter contra su mejor cuerpo a cuerpo, blanco medio, nivel 1; la meta de Común es 74–106 %): Arco
+corto 150 % · rastreador 109 % · pastor 96 % · tiro ligero 93 % · rama 72 % · cazador de pájaros 70 % · liebrero 65 % (lo que no mide la herramienta:
+Rango, Crítico potente, distancia ideal, Iniciativa, ahorro de No2, Lisiado). **Cambios (OK del dueño):** Arco corto 2d4+1 → **2d4** (~109 %, el
+arco común de referencia; precio 50 → 40); Arco de liebrero 1d4+1 → **1d4+2** (~91 %; 60 → 75). Los otros cinco, como estaban. Después: lluvia de
+ideas de mecánicas de arco (el dueño siente que son más acotadas que las de cuerpo a cuerpo) — ver `ideas-arcos-flechas.md`.

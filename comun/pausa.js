@@ -145,6 +145,8 @@ const Pausa = (() => {
       .pausa-cartel{position:fixed;top:54px;left:50%;transform:translateX(-50%);z-index:100015;background:#2a2410;border:1px solid #c9a227;color:#f3e2a0;
         padding:7px 16px;border-radius:8px;font:600 13px/1.35 system-ui,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.45);text-align:center;max-width:min(560px,92vw)}
       .pausa-cartel small{display:block;font-weight:400;opacity:.85}
+      /* Con otra ventana abierta (un aviso, un paso a paso, la Botonera…) el cartel se esconde: si no, tapaba su título (2026-10-10). */
+      body:has(.scrim.open) .pausa-cartel, body:has(.cfj-fondo) .pausa-cartel, body:has(.pap-fondo) .pausa-cartel, body:has(.pausa-fondo) .pausa-cartel{display:none}
       .pausa-capa{position:absolute;inset:0;z-index:90;background:rgba(10,10,14,.28);cursor:not-allowed}
       .pausa-fondo{position:fixed;inset:0;z-index:100030;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px}
       .pausa-caja{background:#171b26;color:#e6e9f2;border:1px solid #39435c;border-radius:12px;width:min(640px,100%);max-height:86vh;display:flex;flex-direction:column;

@@ -12,9 +12,6 @@
 
 - [ ] **🧱 Paredes: lo que falta** (2026-10-10): la línea de tiro de un arco tapada por una pared, una flecha que choca contra una, la visión con
   niebla y los conos de sigilo del otro lado, y cerrar una figura con clic en el primer punto.
-- [ ] **⏸ La pausa de la partida** (2026-10-10, necesita las reglas nuevas pegadas): el GM pausa desde el mapa o GM Tools → el jugador ve el
-  cartel, el mapa congelado (no se puede tocar ni abrir la Botonera) y su ficha anda; compra o equipa algo → al reanudar, el GM ve esas líneas y
-  elige borrar o guardar el registro.
 - [ ] **🏹 Virotes con mapa** (2026-10-10, sin probar): de **humo** (nube de diámetro 3, 2 turnos, donde pega o cae), de **luz** (bengala de
   diámetro 3, 3 turnos), **explosivo** (1d6 de fuego a todos en la flor de 7 del blanco; si falla, queda para el GM), de **clavo** (contra una
   pared detrás: Inmovilizado 1 turno) y de **rebote** (si falla, un disparo gratis con PdG −2 contra el que está pegado al blanco).
@@ -34,6 +31,11 @@
 
 ## Probado
 
+- [x] **⏸ La pausa de la partida** (2026-10-10, en el mapa, con las reglas pegadas): el GM pausó desde el mapa (cartel «La partida está en pausa» y
+  el botón pasa a «▶ Reanudar»); el jugador vio «Partida en pausa hasta la próxima sesión», arrastrar a juan no armó camino y la B no abrió la
+  Botonera; en su ficha se sacó y se volvió a equipar la ballesta; al reanudar, el GM vio las dos líneas con la hora y eligió «Borrar el registro y
+  reanudar» (el registro quedó vacío y el mapa del jugador se destrabó). Arreglado después: el cartel de la pausa tapaba el título de otras
+  ventanas (ahora se esconde mientras haya una abierta). Queda la duda P194 (en pausa, ¿cobra como en combate?).
 - [x] **🧱 Paredes y 📐 lápiz en rectas** (2026-10-10, en el mapa, con las reglas pegadas): el GM dibujó en rectas, con imán y «🧱 Con colisión», 5
   puntos sobre las esquinas del casillero de juan (arriba, izquierda y abajo); se guardó (en rectas y con colisión) y se ve en las dos pantallas (borde
   oscuro y línea roja cortada). juan no pudo cruzarla (el arrastre no armó camino), mientras que por el lado abierto sí (pidió No2). Su rango (R) se

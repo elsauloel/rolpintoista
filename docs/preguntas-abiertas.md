@@ -962,3 +962,7 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   doble en turno ajeno (P136). Tronco de huída casi siempre se usa en el turno del rival (es una defensa), así que con la regla común costaría 4 SP.
   **El dueño la dejó en 2 SP fijos** (`turnoAjenoSp: "2"`), con la duda para el grupo (anotada en 🛠 Herramientas de diseño → Preguntas):
   ¿los Flash defensivos deberían pagar igual el doble, o tener su propio costo de turno ajeno?
+- ❓ **P194. En pausa, ¿equipar o desequipar cuesta No2? — 2026-10-10** (pausa de la partida, probándola). Si el mapa quedó en modo combate al pausar,
+  la ficha sigue cobrando como en combate: desequipar la ballesta pidió 1 No2 (con «Realizar de cualquier modo» si no alcanzan). Entre sesiones
+  parece más natural que la pausa cuente como modo narrativo (sin costos de combate). Propuesta de Claude: mientras dure la pausa, la ficha no
+  cobra No2 por equipar, desequipar ni pasar cosas a la mochila. **A decidir por el dueño.**

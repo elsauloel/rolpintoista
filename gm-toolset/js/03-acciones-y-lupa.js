@@ -179,7 +179,7 @@ function cardHtml(sc){
       <div>
         <div class="sect-label">Estados</div>
         <div class="est-list" style="margin-top:4px">
-          ${sc.estados.length ? sc.estados.map(es => estadoHtml(sc.id, es)).join('') : '<div class="hint">Sin estados activos.</div>'}
+          ${sc.estados.filter(Combatiente.estadoVisible).length ? sc.estados.filter(Combatiente.estadoVisible).map(es => estadoHtml(sc.id, es)).join('') : '<div class="hint">Sin estados activos.</div>'}
         </div>
         <button class="addhab" data-addestado="${sc.id}" style="margin-top:6px">+ Estado</button>
       </div>
@@ -211,7 +211,7 @@ function cerrarChipEstado(boton){
 function cardCompactoHtml(sc){
   // Cada estado: la descripción al pasar el mouse; al tocarlo, botones para
   // quitarlo (×) o editarlo (⚙).
-  const chips = sc.estados.map(es => {
+  const chips = sc.estados.filter(Combatiente.estadoVisible).map(es => {
     const clave = `${sc.id}:${es.id}`;
     const abierto = estadoChipAbierto === clave;
     const dura = es.permanente ? 'perm.' : `${fmt(num(es.turnos))}t`;

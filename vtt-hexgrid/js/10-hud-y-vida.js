@@ -380,6 +380,17 @@ function hudHpHtml(t, d){
 }
 
 // Lo que va a pasar, en vivo mientras se escribe (sin tocar nada todavía).
+// Los estados con los que se calcula la vista previa (copia: solo mirar). Un creep, los suyos; un personaje o una invocación, los que publica su
+// ficha (escudos, Vida extra, Invulnerable, Armadura arcana: 2026-10-10, antes la vista previa de un personaje no veía ninguno).
+function estadosPrevia(t, d){
+  const sc = t.tipo === 'creep' ? creepPrivadoDe(t.fichaId) : null;
+  if(sc) return structuredClone(sc.estados || []);
+  return (d.estados || []).map(e => ({nombre: e.nombre, ...(e.invulnerable ? {invulnerable: true} : {}),
+    ...(e.escudo !== undefined ? {escudoMagicoActual: num(e.escudo), escudoMagico: num(e.escudoMax ?? e.escudo), ...(e.excedente ? {excedenteVida: true} : {})} : {}),
+    ...(num(e.absorbePct) > 0 ? {absorbePct: num(e.absorbePct), absorbeMax: num(e.absorbeMax), absorbido: num(e.absorbido)} : {})}));
+}
+// «(Armadura arcana −4) (escudo −3)»: lo que se queda cada cosa en la vista previa.
+const previaAbs = r => `${r.arcano ? ` (Armadura arcana −${fmt(r.arcano)})` : ''}${num(r.absorbido) - num(r.arcano) > 0 ? ` (escudo −${fmt(num(r.absorbido) - num(r.arcano))})` : ''}`;
 function hudHpPrevia(t, d, texto){
   const crudo = String(texto || '').trim();
   if(!crudo) return '';
@@ -394,24 +405,22 @@ function hudHpPrevia(t, d, texto){
   const golpe = leerGolpe(crudo);
   if(golpe === null) return 'Escribí el daño del golpe (un número)';
   if(d.def === null || d.def === undefined) return '—';
-  const sc = t.tipo === 'creep' ? creepPrivadoDe(t.fichaId) : null;
   if(hpRayo){   // rayo: directo a la vida + cadena
-    const sc0 = t.tipo === 'creep' ? creepPrivadoDe(t.fichaId) : null;
-    const r0 = resolverGolpe(golpe, 0, sc0 ? structuredClone(sc0.estados || []) : []);
+    const r0 = resolverGolpe(golpe, 0, estadosPrevia(t, d));
     if(r0.invulnerable) return 'Invulnerable: no recibe daño';
     const cad = rayoCadena(seleccion, golpe);
-    return `⚡ ${fmt(golpe)} directo → HP ${fmt(hp)} → ${fmt(Math.max(0, hp - r0.recibido))}` + (cad.length > 1 ? ` · salta a ${cad.slice(1).map(c => `${nombreDe(c.t)} ${c.dano}`).join(' → ')}` : ' · no hay a quién saltar');
+    return `⚡ ${fmt(golpe)} directo${previaAbs(r0)} → HP ${fmt(hp)} → ${fmt(Math.max(0, hp - r0.recibido))}` + (cad.length > 1 ? ` · salta a ${cad.slice(1).map(c => `${nombreDe(c.t)} ${c.dano}`).join(' → ')}` : ' · no hay a quién saltar');
   }
   if(hpCritMult > 1){   // crítico: todo el daño × multiplicador, sin restar la Defensa
     const total = golpe * hpCritMult;
-    const rc = resolverGolpe(total, 0, sc ? structuredClone(sc.estados || []) : []);
+    const rc = resolverGolpe(total, 0, estadosPrevia(t, d));
     if(rc.invulnerable) return 'Invulnerable: no recibe daño';
-    return `${fmt(golpe)} × ${hpCritMult} = ${fmt(total)} (ignora la Defensa)${rc.absorbido ? ` (escudo −${fmt(rc.absorbido)})` : ''} → HP ${fmt(hp)} → ${fmt(Math.max(0, hp - rc.recibido))}`;
+    return `${fmt(golpe)} × ${hpCritMult} = ${fmt(total)} (ignora la Defensa)${previaAbs(rc)} → HP ${fmt(hp)} → ${fmt(Math.max(0, hp - rc.recibido))}`;
   }
-  const r = resolverGolpe(golpe, num(d.def), sc ? structuredClone(sc.estados || []) : []);
+  const r = resolverGolpe(golpe, num(d.def), estadosPrevia(t, d));
   if(r.invulnerable) return 'Invulnerable: no recibe daño';
   const nuevo = Math.max(0, hp - r.recibido);
-  return `${fmt(golpe)} − Def ${fmt(num(d.def))} = ${fmt(Math.max(0, golpe - num(d.def)))}${r.absorbido ? ` (escudo −${fmt(r.absorbido)})` : ''} → HP ${fmt(hp)} → ${fmt(nuevo)}`;
+  return `${fmt(golpe)} − Def ${fmt(num(d.def))} = ${fmt(Math.max(0, golpe - num(d.def)))}${previaAbs(r)} → HP ${fmt(hp)} → ${fmt(nuevo)}`;
 }
 
 /* ---------- Rayo en cadena (2026-09-25, regla del dueño, P118) ----------

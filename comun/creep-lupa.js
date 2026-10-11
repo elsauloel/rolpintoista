@@ -146,7 +146,7 @@ const CreepLupa = (() => {
       return `<span class="vc-chip con-tip" data-tip="${esc(tip)}">${esc(h.nombre || '(sin nombre)')}</span>`;
     }).join('');
 
-    const estados = sc.estados.map(es => {
+    const estados = sc.estados.filter(Combatiente.estadoVisible).map(es => {
       const dura = es.permanente ? 'permanente' : `${fmt(num(es.turnos))}t`;
       return `<span class="vc-chip vc-estado-${es.polaridad || 'otro'} con-tip" data-tip="${esc(es.detalle || 'Sin descripción.')}">${esc(es.nombre || '(sin nombre)')} · ${dura}</span>`;
     }).join('');

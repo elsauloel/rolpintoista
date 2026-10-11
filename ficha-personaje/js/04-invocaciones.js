@@ -304,7 +304,7 @@ function invPasoHtml(id, inv){
     <button type="button" class="inv-addhab" data-addhabinv="${inv.id}" style="margin-top:6px">+ Habilidad</button>`;
   if(id === 'estados') return `
     <div class="inv-hablist">
-      ${(inv.estados||[]).length ? inv.estados.map(es => invEstadoChipHtml(inv, es)).join('') : '<div class="hint">Sin estados activos.</div>'}
+      ${(inv.estados||[]).filter(Combatiente.estadoVisible).length ? inv.estados.filter(Combatiente.estadoVisible).map(es => invEstadoChipHtml(inv, es)).join('') : '<div class="hint">Sin estados activos.</div>'}
     </div>
     <button type="button" class="inv-addhab" data-addestadoinv="${inv.id}" style="margin-top:6px">+ Estado</button>`;
   if(id === 'notas') return `<textarea class="inv-notas" data-invf="notas" data-invid="${inv.id}" placeholder="Lo que haga falta recordar de esta invocación." style="min-height:120px">${esc(inv.notas)}</textarea>`;

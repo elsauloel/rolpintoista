@@ -262,7 +262,7 @@ DESCUENTO_DOS_MANOS = 0.75   # PC que resta usarla a dos manos (dueño, 2026-10-
 PRECIO_A, PRECIO_B = 27, 0.158   # precio = A · e^(B · PC): ~40 con 2,3 PC, ~90 con 7,5, ~150 con 11, ~400 con 17, ~1650 con 26
 RECARGO_COMBO = 0.10      # +10 % por cada extra después del primero
 # Mecánicas de arco (2026-10-11, docs/ideas-arcos-flechas.md, segunda ronda); valen en cualquier arma de rango.
-TENSAR_FACTOR = 0.3       # Tensar N: +N PdG pagando 1 No2 más: rinde ~0,3 de un PdG fijo (cuesta No2 cada vez)
+TENSAR_FACTOR = 0.8       # Tensar N: +N PdG pagando 1 No2 más. Medido (2026-10-11, combate_ballestas.py): con Recarga 2 al Shooter casi siempre le sobran No2 → casi un PdG fijo
 LARGO_PC = {1: 1.5, 2: 1.0}   # Largo alcance −1 / −2 PdG por casillero de más (hasta 4 más): poder disparar más lejos
 EMBOSCADA_FACTOR = 0.3    # Emboscada: el Crítico frecuente vale en un disparo por combate (~1 de cada 3–4)
 MATABESTIAS_FACTOR = 0.35 # Matabestias: daño fijo solo contra bestias (una parte de los rivales)

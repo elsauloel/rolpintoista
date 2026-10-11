@@ -284,3 +284,9 @@ resto del grupo sí. Las que no llevan Perfora (de tensión, de filo fino, del s
 nada al pesado ni sirven al Mago: son de tirador. La de doble cuerda queda floja para el Shooter (63 %), buena para el Mago.
 **Ajustes propuestos (medidos):** de tensión 1d4+2 · Tensar +1 (93 %) · del rematador 1d4+2 · Perfora 1 · Remate +1 (95 %; Sentado 124 %) · del
 ariete 1d4+2 (107 %) · del cantero 1d4+3 (100 %) · de virote dentado 1d4+2 · Perfora 1 (112 %) · del montero Matabestias +1 (bestia 126 %).
+
+**Aplicado (2026-10-11, OK del dueño):** de tensión 1d4+2 · Tensar +1 (70) · del rematador 1d4+2 · Perfora 1 · Remate +1 (85) · del ariete 1d4+2 (70) ·
+del cantero 1d4+3 (70) · de virote dentado 1d4+2 · Perfora 1 (90) · del montero Matabestias +1 (85; contra lo que no es bestia rinde como una normal:
+~90 % contra el medio) · **del herrero** baja a Rompe armadura 50 % seguro con crítico (1d4+2, 65) y **nueva del maestro herrero** (Buena, 2d4+4 · Perfora 1 ·
+Rompe armadura 100 %, 160: al pesado de nivel 3 le baja la Defensa de 14 a ~6 en 4 rondas). La calculadora cobra Tensar casi como un PdG
+(`TENSAR_FACTOR` 0,3 → 0,8).

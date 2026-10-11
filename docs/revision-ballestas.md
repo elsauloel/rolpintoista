@@ -66,3 +66,5 @@ Buenas a Recarga 2, con el daño de la tabla de arriba. Recortes: la de doble cu
 la de vigía sin la caída (2d6+3); la de mira corta con PdG +1 de 1 a 3 (2d6+3); la del acechador sin la Emboscada (2d6+3); la virotera sin el
 virote recuperable (2d6+4); la abollacascos con Rompe armadura 25 % (3d6+1). Las de dos mecánicas o una mecánica cara quedan con menos daño de base
 (Comunes ~50 %, Buenas ~35–55 %), como los arcos: su mecánica pone el resto.
+
+**Ajuste (2026-10-11, dueño: «la de fortín, punta de diamante y mano reforzada son iguales»):** para que no queden mellizas, la de cazador recupera Rango +3 (1d6+1, la Común «de lejos», 85), la de estribo es la del disparo fuerte (1d6+3, 100 %, 80) y la de guardia recupera Rango +2 (2d6+1 · Perfora 2, 140).

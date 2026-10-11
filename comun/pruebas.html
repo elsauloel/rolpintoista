@@ -553,7 +553,7 @@ prueba('Perfora N del arma (2026-10-10): viaja en el ataque, la copia el creep y
     Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente({armaDeRango: true, armaRasgos: {perfora: 2}})).perfora,
     Combatiente.sirveLaMunicion(bal, vir), Combatiente.sirveLaMunicion(bal, fl), Combatiente.sirveLaMunicion(arco, vir), Combatiente.sirveLaMunicion(arco, fl), Combatiente.municionDe(bal),
     Combatiente.sirveParaParry(bal, false), Combatiente.armaParaDefensa({arma: {nombre: 'Ballesta', peso: 2}, arco: true, escudos: []})],   // con una ballesta no se parrea (2026-10-10)
-    [3, 5, undefined, 3, 2, true, false, false, true, 'virote', false, null]);
+    [2, 5, undefined, 2, 2, true, false, false, true, 'virote', false, null]);   // la de guardia quedó con Perfora 2 (revisión, 2026-10-11)
 });
 prueba('rasgos de ballesta (2026-10-10): llega cargada (gratis si no disparó el turno anterior), apuntada y atraviesa escudos viajan al ataque', () => {
   const tranq = CATALOGO_BASE.find(i => i.id === 'bal-de-tranquera'), guerra = CATALOGO_BASE.find(i => i.id === 'bal-de-guerra'), asedio = CATALOGO_BASE.find(i => i.id === 'bal-de-asedio');

@@ -945,10 +945,16 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   especial y las resistencias, E bono de conjunto, F posturas del guerrero. El dueño eligió **A + B + D** (2026-10-10). Medido con kits de prueba: −4 Evasión no alcanza (lo pesado sigue dominando); **−2 PdG con la
   pesada completa sí** (la media pasa a ser la mejor del guerrero), pero el tanque queda sin poder cerrar peleas (empata casi todo); −1 PdG se queda
   corto. Recomendación: −2 PdG + una habilidad del tanque que lo compense (F). **En pausa (dueño, 2026-10-10):** los pesos con contra que se acumula le parecen enroscados; si el desbalance no es desmedido,
-  se regula con las habilidades y con el equipo que el GM pone a disposición. Se retoma cuando tenga tiempo para pensarlo.- ❓ **P191. Backstab y el ataque por la espalda — 2026-10-10** (auditoría de skills de clase, Asalto). Hoy el mapa da el bono «por la
+  se regula con las habilidades y con el equipo que el GM pone a disposición. Se retoma cuando tenga tiempo para pensarlo.
+- ❓ **P191. Backstab y el ataque por la espalda — 2026-10-10** (auditoría de skills de clase, Asalto). Hoy el mapa da el bono «por la
   espalda» solo si el atacante está **en sigilo** y en el **punto ciego** del rival. Backstab (2 SP): «Únicamente por la espalda. +5 de daño
   fijo. Ignora 1 de resistencia a crítico». Preguntas: (1) ¿exige sigilo, como la regla general, o le alcanza con el punto ciego (flanquear en
   pleno combate)? (2) ¿+5 de daño e ignora 1 por 2 SP? (se apila con el bono por la espalda del arma, +1/+2); (3) fuera de la espalda, ¿se usa
   igual como ataque común sin bono, o no se puede? Propuesta de Claude: la regla común (sigilo + punto ciego), los números así, y avisar sin
   bloquear; sumar «ignora resistencia a crítico» al bono por la espalda (sirve también para armas). **El dueño lo habla con el grupo**
   (anotada en 🛠 Herramientas de diseño → Preguntas).
+- ❓ **P192. Paredes de línea: ¿cuándo una línea cierra un hexágono? — 2026-10-10** (mapa, las paredes de línea fina, `vtt-hexgrid/js/34-paredes.js`).
+  Hoy una pared nunca ocupa un casillero: solo impide pasar de un casillero al de al lado si la línea queda entre sus centros (con el imán, la
+  pared va siempre por los bordes y no hay duda). Un garabato a mano que cruza un hexágono por el medio deja que un token se pare ahí. Opciones:
+  (1) dejarlo así; (2) cerrar el hexágono si la línea pasa cerca de su centro (por ejemplo, a menos de un tercio del radio); (3) cerrar todo
+  hexágono que la línea toque (pared «gruesa», como la Colisión de casilleros). Propuesta de Claude: la (2). **El dueño lo define conversando.**

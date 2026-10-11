@@ -10,10 +10,8 @@
 
 ## Pendientes
 
-- [ ] **🗡 Degollar** (2026-10-10): juan (en su turno, con orden de turnos) lo ejecuta contra un rival → el duelo dice +4 PdG, el daño «+ 7»,
-  el crítico +1/+1; al resolverse, la Mesa «⏭ … termina su turno y pasa al final del orden», el turno pasa al siguiente y juan aparece abajo
-  con los que ya jugaron; al darse la vuelta la ronda no le vuelve a tocar. Expuesto: su Evasión ÷2, en un duelo solo la Evasión (sin Parry),
-  no se lo frena al alejarse un rival (sin oportunidad) y en un área no tiene dodge roll. Se va al empezar su próximo turno.
+- [ ] **😱 Expuesto y el dodge roll** (2026-10-10): con Expuesto, un área que gana no le da dodge roll (la Mesa «… está Expuesto: no puede
+  hacer el dodge roll y se queda en el área»). Lo demás de Degollar y Expuesto ya está probado (abajo).
 - [ ] **⏸ La pausa de la partida** (2026-10-10, necesita las reglas nuevas pegadas): el GM pausa desde el mapa o GM Tools → el jugador ve el
   cartel, el mapa congelado (no se puede tocar ni abrir la Botonera) y su ficha anda; compra o equipa algo → al reanudar, el GM ve esas líneas y
   elige borrar o guardar el registro.
@@ -36,6 +34,12 @@
 
 ## Probado
 
+- [x] **🗡 Degollar y Expuesto** (2026-10-10, en el mapa, con orden de turnos): juan, en su turno (4.º de 7), contra el Coloso: la declaración
+  dice «+4 PdG · +7 de daño fijo», el crítico «Degollar suma +1 a tu Crítico frecuente / potente», el daño «2d6 + 4 + 7» (salió crítico ×2:
+  28, el Coloso 43 → 15). Al resolverse: la Mesa «⏭ juan usó Degollar: termina su turno y pasa al final del orden», el turno pasó solo
+  (salteando al Escarabajo caído) a Clementino y juan quedó último, abajo con los que ya jugaron. La Bruja atacó a juan: su defensa ofrecía
+  solo la Evasión, «1d8 ÷2» con el aviso «😱 Expuesto…» (salió 5 → 2). La Bruja se alejó de juan: «no hay ataque de oportunidad (juan está
+  Expuesto)». ▶ Siguiente después de la Bruja: juan se salteó y empezó la Ronda 2; al llegarle su turno en la Ronda 2, Expuesto se fue solo.
 - [x] **🔮 Armadura arcana** (2026-10-10, prueba completa en el mapa, juan contra el Coloso y la Bruja): un golpe de 8 → «la Armadura arcana
   absorbió 4», juan 10 → 6. Al vencerse (al empezar su turno) la Mesa dice «💥 … explota: 4 de daño arcano directo» y sale la cascada: el
   Coloso 56 → 52 (empate desempatado a par o impar), la Bruja 21 → 17 (su Defensa especial 3 no resta: es directo). **Bug encontrado y

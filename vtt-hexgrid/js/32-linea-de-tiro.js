@@ -112,7 +112,7 @@ async function tiroRevisar(mio, t, ataque, yo){
         ? `La línea hacia ${nombreDe(t)} pasa justo por el borde de ${tapa}. ¿Pasa o no? Lo decide la mesa.`
         : `Entre vos y ${nombreDe(t)} está ${tapa}: los tokens y los obstáculos tapan el disparo.`,
       opciones: [
-        ...(puedeAlto ? [{valor: 'alto', texto: `🏹 Tiro alto, por encima (PdG ${Combatiente.TIRO_ALTO_PDG})`, detalle: 'tu arma lo permite: pasa por encima de los tokens'}] : []),
+        ...(puedeAlto ? [{valor: 'alto', texto: `🏹 Tiro alto, por encima${ataque.tiroAltoLimpio ? ' (sin castigo)' : ` (PdG ${Combatiente.TIRO_ALTO_PDG})`}`, detalle: 'tu arma lo permite: pasa por encima de los tokens'}] : []),
         {valor: 'igual', texto: 'Ignorar obstáculo', detalle: 'lo decide la mesa', sec: puedeAlto},   // (dueño, 2026-10-09: «que diga ignorar obstáculo»)
         {valor: 'otro', texto: 'Elegir otro', sec: true},
       ]});
@@ -123,7 +123,7 @@ async function tiroRevisar(mio, t, ataque, yo){
   const ideal = Combatiente.bonoIdeal(ataque, d, ataque.alcance);
   if(!ideal && !alto) return {seguir: true, tiro: null};
   const tiro = ideal ? {...ideal} : {motivo: ''};
-  if(alto){ tiro.pdg = Math.round(num(tiro.pdg)) + Combatiente.TIRO_ALTO_PDG; tiro.motivo = tiro.motivo ? `${tiro.motivo} y tiro alto` : 'tiro alto'; }
+  if(alto){ tiro.pdg = Math.round(num(tiro.pdg)) + (ataque.tiroAltoLimpio ? 0 : Combatiente.TIRO_ALTO_PDG); tiro.motivo = tiro.motivo ? `${tiro.motivo} y tiro alto` : 'tiro alto'; }   // sin castigo: el arco que lo trae (2026-10-11)
   return {seguir: true, tiro};
 }
 // Los objetivos en la distancia ideal (para que brillen distinto mientras se apunta).

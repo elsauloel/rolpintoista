@@ -92,7 +92,7 @@ def factor_plano(tipo):
 ORDEN = [t for t, _ in UMBRAL_TIER]
 
 # Pesos de los efectos (P7, cerrado) y familias (de casa / habilitado). Familia por Tipo: 4 punzante, 6 cortante, 8 hacha, 10 contundente, 12 explosivo; de rango aparte.
-PESO_EFECTO = {'Rompe armadura': 4, 'Demora': 4, 'Aturdir': 5, 'Lisiado': 3, 'Sangrado': 2, 'Envenenar': 2, 'Veneno severo': 3,
+PESO_EFECTO = {'Expuesto': 3, 'Rompe armadura': 4, 'Demora': 4, 'Aturdir': 5, 'Lisiado': 3, 'Sangrado': 2, 'Envenenar': 2, 'Veneno severo': 3,
                'Derribar': 3, 'Prende fuego': 3.5, 'Drena vida': 4, 'Explosión': 6, 'Rengo': 3,
                'Pajaritos': 4}   # Pajaritos (2026-10-03, dueño: de los contundentes): PdG y Evasión a la mitad 3 turnos   # Explosión: la razón de ser del Tipo 12; el peso es a radio 1, cada radio extra suma +50 %
 CASA = {'ballesta': {'Rompe armadura'}, 'hacha': {'Rompe armadura'}, 'contundente': {'Demora', 'Aturdir', 'Pajaritos'}, 'punzante': {'Lisiado'}, 'cortante': {'Sangrado'}, 'explosivo': {'Explosión'}}
@@ -235,6 +235,10 @@ def puntaje(arma):
                + (PUNTA_DIAMANTE_PC if arma.get('puntaDiamante') else 0) + (REMACHADORA_PC if arma.get('remachadora') else 0)
                + (RECUPERABLE_PC if arma.get('recuperable') else 0) + CARGADOR_PC * float(arma.get('cargador') or 0)
                + CARCAJ_EXTRA_PC * float(arma.get('carcajExtra') or 0))
+        arc += sum(v for k, v in ARCO_PC.items() if arma.get(k))
+        arc += CORRE_FACTOR * float(arma.get('contraCorre') or 0) * TASA_STAT['pdg'] + MATAGENTE_FACTOR * float(arma.get('matagente') or 0) * factor_plano(tipo)
+        arc += MATABESTIAS_FACTOR * float(arma.get('mataadefesios') or 0) * factor_plano(tipo) + (ARCO_DURO_PC if arma.get('arcoDuro') else 0)
+        arc += EMBOSCADA_FACTOR * (min(float(arma.get('emboscadaPot') or 0), 6) * PESO_CRIT * PESO_CRITPOT + float(arma.get('emboscadaPdg') or 0) * TASA_STAT['pdg'])
         rc = int(arma.get('recarga') or 0)
         if rc and not arma.get('arco'):
             if arma.get('tiroRapido'): arc += TIRO_RAPIDO_FACTOR * (rc - 1) + 0.5
@@ -282,6 +286,11 @@ CARGADOR_PC = 0.5         # por virote especial del combate sin su No2
 CARCAJ_EXTRA_PC = 0.15    # por lugar de más en el carcaj
 DOBLE_CUERDA_FACTOR = 1.2   # × Recarga: el segundo disparo del turno cuesta N en vez de 2N
 TIRO_RAPIDO_FACTOR = 1.5    # × (Recarga − 1), + 0,5: cada disparo más cuesta +1, no +N
+# Las de los arcos Comunes (2026-10-11): valores de partida, a ajustar con lo que mida combate_ballestas.py --familia arco.
+ARCO_PC = {'enCuerda': 0.8, 'encadenar': 1.5, 'respiracion': 0.8, 'racha': 1.0, 'lectura': 2.5, 'tiroAltoLimpio': 1.0, 'abanico': 0.8, 'minimaLarga': -1.0}
+CORRE_FACTOR = 0.3          # Contra el que corre: PdG solo contra el que se movió 3 o más
+MATAGENTE_FACTOR = 0.45     # Contra humanos: los humanos y humanoides son muchos de los rivales
+ARCO_DURO_PC = -1.5         # Arco duro: −2 PdG si la Fuerza no llega (pesa en el Shooter, que tiene poca)
 
 
 def extras(arma):
@@ -297,7 +306,8 @@ def extras(arma):
     n += 1 if arma.get('armaDeRango') and not arma.get('arco') and arma.get('tiroAlto') else 0
     n += 1 if arma.get('armaDeRango') and (arma.get('ideal') or {}).get('donde') else 0
     n += sum(1 for k in ('tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad', 'caida', 'apuntadaFirme', 'tiradorApoyo',
-                         'remate', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'cargador', 'carcajExtra', 'dobleCuerda', 'tiroRapido') if arma.get('armaDeRango') and arma.get(k))
+                         'remate', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'cargador', 'carcajExtra', 'dobleCuerda', 'tiroRapido',
+                         'enCuerda', 'encadenar', 'respiracion', 'racha', 'lectura', 'tiroAltoLimpio', 'contraCorre', 'abanico', 'matagente', 'mataadefesios', 'emboscadaPot', 'emboscadaPdg') if arma.get('armaDeRango') and arma.get(k))
     return n
 
 

@@ -68,6 +68,8 @@ const Duelo = (() => {
   // 🏹 Una flecha especial que erró (2026-10-09): cfgEscuchar.flechaErrada(d), en la pantalla de quien disparó (no los que ya estaban al entrar).
   const flechaAvisada = new Set();
   const remachaAvisada = new Set();
+  const disparoAvisado = new Set();
+  let disparoPrimera = true;
   let flechaPrimera = true;
   // 🪵 Un dodge roll de Tronco de huída en un golpe directo (2026-10-10): cfgEscuchar.dodgeLibre(d), en la pantalla de quien esquivó.
   const dodgeLibreAvisado = new Set();
@@ -875,6 +877,7 @@ const Duelo = (() => {
     if(n === 'rengo') return {nombre: 'Rengo'};   // Rengo en armas (2026-10-03)
     if(n === 'envenenar' || n === 'veneno severo') return (n === 'veneno severo' || /severo/i.test(ef.detalle || '')) ? {nombre: 'Veneno severo'} : (st ? {nombre: 'Veneno', stacks: st} : {nombre: 'Veneno'});
     if(n === 'lisiado') return {nombre: 'Lisiado'};
+    if(n === 'expuesto') return {nombre: 'Expuesto', turnos: 1};   // Exponer (arcos, 2026-10-11)
     if(n === 'pajaritos') return {nombre: 'Pajaritos'};
     if(n === 'aturdir') return {nombre: 'Stun'};
     if(n === 'derribar') return {nombre: 'Sentado'};
@@ -2445,6 +2448,14 @@ const Duelo = (() => {
         });
       }
       flechaPrimera = false;
+      if(cfgEscuchar.disparoResuelto){   // 🏹 un ataque que terminó, en la pantalla de quien atacó (Lectura del viento, Racha, Encadenar; 2026-10-11)
+        listaDuelos.forEach(d => {
+          if(d.estado !== 'resuelto' || !d.ataque || d.hab || disparoAvisado.has(d.id)) return;
+          disparoAvisado.add(d.id);
+          if(!disparoPrimera && (esMio(d.atacante) || (soyGM() && d.atacante && d.atacante.tipo === 'creep'))) try{ cfgEscuchar.disparoResuelto(d); }catch(err){ console.error('Duelo: disparoResuelto', err); }
+        });
+        disparoPrimera = false;
+      }
       if(cfgEscuchar.remachadoraErro && soyGM()){   // 🎯 la Remachadora (2026-10-11): errar o que la bloqueen vuelve la cuenta a 0
         listaDuelos.forEach(d => {
           if(d.estado !== 'resuelto' || !d.ataque || !d.ataque.remachadora || !['fallo', 'bloqueado'].includes(d.resultado) || remachaAvisada.has(d.id)) return;

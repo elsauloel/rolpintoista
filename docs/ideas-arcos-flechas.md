@@ -284,3 +284,22 @@ alienígenas) · 23 Contra humanos y humanoides (el arco del cazador de recompen
 primera flecha especial del combate no cobra su No2.
 **H. Debilidades (abaratan):** 26 Arco duro (−2 PdG si la Fuerza es baja) · 27 Mínima más larga (2 casilleros libres) · 28 Crítico corto (el
 crítico multiplica como mucho ×2) · 29 Cuerda floja con lluvia o agua (✋ a mano).
+
+### 2026-10-11 · Pautas del dueño para recrear los arcos Comunes («guidelines generales, no estrictos»)
+- **Todos Tipo 4** (se deja de lado lo de corto y largo).
+- **Proporciones de efectos** (pueden superponerse y estar en distintos %, para dar variedad y combinaciones): **Veneno en 1/4**; **Crítico frecuente /
+  potente en 1/4**; **Rango de bono en 1/3**; **Perfora en 1/4** (Perfora 1 desde Común en algunos, 2 desde Rara); **distancia ideal en 1/5 – 1/4** (el
+  dueño quiere definirla mejor); **Lisiado / Sangrado en 1/5**, con distintos % y «seguro si es crítico»; **Emboscada en ~1/3** (efectos al primer
+  disparo del combate: Crítico frecuente y/o potente, −1 No2, otros); **Tensar +1, +2 o +3**, según eso se cuadra la calidad («ideal para el arco»).
+- **Sin tiro alto** se usa como desventaja para emparejar con otros efectos.
+- **Rompe armadura**, alguno desde Buena, en no más de 1/5.
+- **Mecánicas para Común y Buena:** Tensar, Largo alcance, Emboscada, Matabestias, Espalda a distancia, **Afinidad especial** (antes «elemental»: fuego,
+  hielo, eléctrico, tóxico y ácido), Corto alcance (debilidad). **Rara:** Tiro rápido, Arco rúnico, Que se calienta, Compuesto. Contra lo que vuela,
+  cuando exista el vuelo.
+- **De la tercera ronda (para evaluar si entran en Común o Buena):** Flecha en la cuerda (evaluar peso) · Encadenar · Respiración contenida (probar en
+  uno o dos) · Racha · Lectura del viento (disparos consecutivos al mismo blanco) · Línea limpia (**desde Buena**) · Tiro alto sin castigo · Exponer
+  (con crítico; un bono leve) · Contra el que corre · Abanico · Lisiado / Sangrado con crítico · Contra adefesios y alienígenas · Contra humanos y
+  humanoides (el arco del cazador de recompensas) · Flecha de más · Arco duro (−2 PdG con poca Fuerza: fijar el mínimo) · Mínima más larga (2 libres).
+  **Ceguera y Demora: para flechas especiales**, no para el arco.
+- **El pesado:** «no debería ser un problema; quizás con las nuevas mecánicas alguno puede entrarle».
+- **Lo que no entre en Común queda asentado para Buena y más** (lista abajo, cuando esté la escalera).

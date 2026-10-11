@@ -134,6 +134,7 @@ function escucharTokens(){
         const celdas = [];
         for(let i = 0; i + 1 < ruta.length; i += 2) celdas.push({col: ruta[i], fila: ruta[i + 1]});
         estelas.set(ch.doc.id, {celdas, hasta: Date.now() + ESTELA_MS});
+        if(typeof contarCasilleros === 'function') contarCasilleros(ch.doc.id, celdas.length - 1);   // lo que se movió (Contra el que corre, js/35)
       }
       tokens.set(ch.doc.id, {
         rutaJson,

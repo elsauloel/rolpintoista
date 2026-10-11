@@ -482,7 +482,8 @@ const Combatiente = (() => {
   }
   const RASGOS_ARMA = ['espalda', 'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga', 'perfora', 'apuntada', 'cargada', 'atraviesaEscudos',
     'tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad',   // + las mecánicas de arco (2026-10-11, RASGOS_ARCO)
-    'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'cargador', 'dobleCuerda', 'tiroRapido', 'carcajExtra'];   // + las de ballesta (2026-10-11)
+    'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'cargador', 'dobleCuerda', 'tiroRapido', 'carcajExtra',   // + las de ballesta (2026-10-11)
+    'enCuerda', 'encadenar', 'respiracion', 'racha', 'lectura', 'tiroAltoLimpio', 'contraCorre', 'abanico', 'matagente', 'mataadefesios', 'arcoDuro', 'minimaLarga', 'emboscadaPot', 'emboscadaPdg'];   // + las de los arcos Comunes (2026-10-11)
   /* Rasgos de ballesta con el mapa (2026-10-10, dueño; docs/ideas-ballestas.md): **apuntada N** (+N PdG si no te moviste en el turno: el mapa lo
      suma al apuntar), **cargada** (llega cargada: el primer disparo del turno es gratis si no disparaste con ella el turno anterior; ver
      cargadaGratis) y **atraviesaEscudos** (si te paran el disparo con un escudo, el escudo se abolla: 1 stack de Armadura rota; lo hace el mapa). */
@@ -566,6 +567,14 @@ const Combatiente = (() => {
     // Inmovilizado), primerDisparo (el primer disparo del combate, +1 dado), puntaDiamante (contra Defensa 12 o más, Perfora +2), remachadora
     // (cada golpe seguido al mismo blanco, Perfora +1, hasta +3; errar lo vuelve a 0), recuperable (el virote especial que erra no se rompe contra
     // un obstáculo) y cargador N (los N primeros virotes especiales del combate no cobran su No2).
+    // 🏹 Las de los arcos Comunes (2026-10-11, dueño; docs/ideas-arcos-flechas.md, «Pautas del dueño»): enCuerda (Flecha en la cuerda: si no disparó
+    // el turno anterior, el primer disparo −1 No2) y encadenar (si el disparo anterior del turno pegó, el siguiente −1 No2) — los dos en el costo
+    // (ahorroArco); respiracion (+2 PdG al primer disparo del turno, −2 a los siguientes), racha (después de un crítico, el próximo disparo del turno
+    // Crítico frecuente +1), lectura (+1 PdG por cada golpe seguido al mismo blanco, hasta +3; errar lo vuelve a 0), tiroAltoLimpio (el tiro alto no
+    // resta PdG), contraCorre N (+N PdG contra un rival que se movió 3+ casilleros en su último turno completo), abanico (+1 PdG si cambia de blanco en el turno),
+    // matagente / mataadefesios N (+N de daño contra humanos y humanoides / alienígenas y «otros»), arcoDuro N (−2 PdG si la Fuerza es menor que N),
+    // minimaLarga (necesita 2 casilleros libres) y emboscadaPot / emboscadaPdg N (la Emboscada también da Crítico potente o PdG).
+    'enCuerda', 'encadenar', 'respiracion', 'racha', 'lectura', 'tiroAltoLimpio', 'contraCorre', 'abanico', 'matagente', 'mataadefesios', 'arcoDuro', 'minimaLarga', 'emboscadaPot', 'emboscadaPdg',
     'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'cargador'];
   const LARGO_ALCANCE_MAX = 4, TENSAR_NO2 = 1;
   // Largo alcance: el objetivo más allá del alcance (hasta LARGO_ALCANCE_MAX de más) → {extra, pdg} (pdg negativo); si no corresponde, null.
@@ -595,7 +604,7 @@ const Combatiente = (() => {
     if(r('matabestias') > 0) p.push(`Matabestias +${r('matabestias')} de daño`);
     if(r('contraMarcado') > 0) p.push(`Contra el Marcado +${r('contraMarcado')} PdG`);
     if(n(es.pdg) > 0 || n(es.fijo) > 0) p.push(`Espalda a distancia: ${[n(es.pdg) > 0 ? `+${Math.round(n(es.pdg))} PdG` : '', n(es.fijo) > 0 ? `+${Math.round(n(es.fijo))} de daño` : ''].filter(Boolean).join(', ')}`);
-    if(it.afinidad) p.push('Afinidad elemental');
+    if(it.afinidad) p.push('Afinidad especial');
     if(r('caida') > 0) p.push(`Alcance con caída: −${r('caida')} de daño por casillero de más`);
     if(r('apuntadaFirme') > 0) p.push(`Apuntada firme +${r('apuntadaFirme')}`);
     if(r('tiradorApoyo') > 0) p.push(`Tirador de apoyo +${r('tiradorApoyo')} PdG`);
@@ -604,10 +613,24 @@ const Combatiente = (() => {
     if(it.puntaDiamante) p.push('Punta de diamante');
     if(it.remachadora) p.push('Remachadora');
     if(it.recuperable) p.push('Virote recuperable');
-    if(r('cargador') > 0) p.push(`Cargador ${r('cargador')}`);
+    if(r('cargador') > 0) p.push(esArco(it) && r('cargador') === 1 ? 'Flecha de más' : `Cargador ${r('cargador')}`);
     if(r('carcajExtra') > 0) p.push(`Carcaj integrado +${r('carcajExtra')}`);
     if(it.dobleCuerda) p.push('Doble cuerda');
     if(it.tiroRapido) p.push('Tiro rápido');
+    if(it.enCuerda) p.push('Flecha en la cuerda');
+    if(it.encadenar) p.push('Encadenar');
+    if(it.respiracion) p.push('Respiración contenida');
+    if(it.racha) p.push('Racha');
+    if(it.lectura) p.push('Lectura del viento');
+    if(it.tiroAltoLimpio) p.push('Tiro alto sin castigo');
+    if(r('contraCorre') > 0) p.push(`Contra el que corre +${r('contraCorre')} PdG`);
+    if(it.abanico) p.push('Abanico');
+    if(r('matagente') > 0) p.push(`Contra humanos +${r('matagente')} de daño`);
+    if(r('mataadefesios') > 0) p.push(`Contra adefesios +${r('mataadefesios')} de daño`);
+    if(r('arcoDuro') > 0) p.push(`Arco duro (Fuerza ${r('arcoDuro')})`);
+    if(it.minimaLarga) p.push('Mínima más larga');
+    if(r('emboscadaPot') > 0) p.push(`Emboscada: Crítico potente +${r('emboscadaPot')}`);
+    if(r('emboscadaPdg') > 0) p.push(`Emboscada: PdG +${r('emboscadaPdg')}`);
     return p;
   }
   /* La distancia ideal de un arma de rango (sweet spot, 2026-10-09, dueño): `ideal = {donde: 'cerca' | 'medio' | 'lejos' | 'franja', ancho,
@@ -648,8 +671,17 @@ const Combatiente = (() => {
      el arquero y el objetivo (el objetivo a ARCO_LIBRES + 1 o más), no se pega cuerpo a cuerpo y no se hacen ataques de oportunidad.
      2026-10-10 (dueño): 1 casillero libre — el arco no pega al lado, pero a 2 sí (antes eran 2 libres: objetivo a 3 o más). */
   const ARCO_LIBRES = 1;
-  const arcoLibresTxt = () => ARCO_LIBRES === 1 ? '1 casillero libre' : `${ARCO_LIBRES} casilleros libres`;
-  const arcoMuyCerca = (arma, distancia) => esArco(arma) && n(distancia) <= ARCO_LIBRES;
+  // Mínima más larga (2026-10-11): ese arco necesita 2 casilleros libres.
+  const arcoLibres = arma => arma && (arma.minimaLarga || (arma.armaRasgos && arma.armaRasgos.minimaLarga)) ? 2 : ARCO_LIBRES;
+  const arcoLibresTxt = arma => arcoLibres(arma) === 1 ? '1 casillero libre' : `${arcoLibres(arma)} casilleros libres`;
+  const arcoMuyCerca = (arma, distancia) => esArco(arma) && n(distancia) <= arcoLibres(arma);
+  // Lo que se ahorra en No2 un disparo con Flecha en la cuerda o Encadenar (2026-10-11): previos = los disparos de ese turno con esa arma;
+  // descargada = disparó con ella el turno anterior; pego = el disparo anterior de este turno pegó.
+  function ahorroArco(arma, previos, descargada, pego){
+    if(!arma) return 0;
+    const r = k => arma[k] || (arma.armaRasgos && arma.armaRasgos[k]);
+    return (r('enCuerda') && n(previos) === 0 && !descargada ? 1 : 0) + (r('encadenar') && n(previos) > 0 && pego ? 1 : 0);
+  }
   const sirveDeOportunidad = arma => !esArco(arma);
   // Costos con los rasgos: el primer ataque del turno con el arma (ahorroNitros) y el ataque de oportunidad (oporGratis).
   const costoConAhorro = (costo, arma, previos) => Math.max(0, costo - (n(previos) === 0 ? n(arma && arma.ahorroNitros) : 0));
@@ -1385,7 +1417,7 @@ const Combatiente = (() => {
   // El texto de lo que cura un ítem: «Heridas (Sangrado, Lisiado, Rengo)».
   const textoCura = grupos => grupos.map(k => `${GRUPOS_CURA[k].label} (${GRUPOS_CURA[k].estados.join(', ')})`).join(' · ');
 
-  return {RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

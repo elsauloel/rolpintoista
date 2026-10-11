@@ -1068,11 +1068,25 @@ function trazoEn(x, y){
    línea recta (js/13, embestidaDe). Solo en esta pantalla: la que mueve al token es la que después lo hace atacar. */
 const embestidaRutas = new Map();   // tokenId → {clave: 'id@mantenimiento', celdas}
 // Paso fantasma (anillo, 2026-10-06): cuántos casilleros se movió cada token en esta ronda (de Mantenimiento a Mantenimiento).
-const casillerosRonda = new Map();
-window.mapaCasillerosRonda = id => { const r = casillerosRonda.get(id); return r && r.clave === `${id}@${Math.round(num(mantenimientoNumero))}` ? r.n : 0; };
+// Desde 2026-10-11 también los de los demás (los cuenta el listener de los tokens, js/09) y las dos últimas rondas: «Contra el que corre» de los arcos
+// mira lo que se movió el blanco en su último turno completo (dueño: «no la ronda, sino el último turno completo del personaje»).
+const casillerosRonda = new Map();   // tokenId → {ronda: casilleros}
+function contarCasilleros(id, pasos){
+  if(!(pasos > 0)) return;
+  const r = Math.round(num(mantenimientoNumero)), m = casillerosRonda.get(id) || {}, nuevo = {[r]: (m[r] || 0) + pasos};
+  if(m[r - 1]) nuevo[r - 1] = m[r - 1];
+  casillerosRonda.set(id, nuevo);
+}
+window.mapaCasillerosRonda = id => (casillerosRonda.get(id) || {})[Math.round(num(mantenimientoNumero))] || 0;
+// Su último turno completo: si ya jugó en esta ronda, lo de esta ronda; si todavía no (o es su turno ahora), lo de la ronda anterior.
+window.mapaCasillerosUltimoTurno = id => {
+  const r = Math.round(num(mantenimientoNumero)), i = (iniciativa.orden || []).findIndex(o => o.id === id);
+  const jugo = i >= 0 && ((iniciativa.actuaron || []).includes(id) || i < num(iniciativa.turno));
+  return (casillerosRonda.get(id) || {})[jugo ? r : r - 1] || 0;
+};
 async function moverToken(id, col, fila, celdas, levita){
   if(celdas && celdas.length > 1) embestidaRutas.set(id, {clave: `${id}@${Math.round(num(mantenimientoNumero))}`, celdas: celdas.map(c => ({col: c.col, fila: c.fila}))});
-  if(celdas && celdas.length > 1){ const k = `${id}@${Math.round(num(mantenimientoNumero))}`; const r = casillerosRonda.get(id); casillerosRonda.set(id, {clave: k, n: (r && r.clave === k ? r.n : 0) + celdas.length - 1}); }
+  if(celdas && celdas.length > 1) contarCasilleros(id, celdas.length - 1);
   const t = tokens.get(id);
   if(!t) return;
   giroLibre.clear();   // moverse es una acción: cierra los giros gratis de antes (el de este se abre al guardar)

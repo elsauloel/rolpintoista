@@ -355,7 +355,7 @@ const CreepCalculo = (() => {
 
   /* ---------- Costos ---------- */
   // Primer ataque del turno: Tipo ÷ 2 (redondeado para arriba); los demás, Tipo completo.
-  function costoAtaque(sc){ const a = Combatiente.armaDeCombatiente(sc); if(Combatiente.cargadaGratis(a, sc.ataquesTurno, sc.descargada)) return 0; return Combatiente.costoConAhorro(Combatiente.costoAtaque(num(sc.armaTipo) || 8, sc.ataquesTurno, a), a, sc.ataquesTurno); }   // regla común (comun/combatiente.js)
+  function costoAtaque(sc){ const a = Combatiente.armaDeCombatiente(sc); if(Combatiente.cargadaGratis(a, sc.ataquesTurno, sc.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(num(sc.armaTipo) || 8, sc.ataquesTurno, a), a, sc.ataquesTurno) - Combatiente.ahorroArco(a, sc.ataquesTurno, sc.descargada, sc.ultimoPego)); }   // regla común (comun/combatiente.js)   // + Flecha en la cuerda / Encadenar (2026-10-11)
   // Nitros de una habilidad: un número, o "ATAQUE" = lo que le cuesta un
   // ataque con su arma (Tipo ÷ 2 el primero del turno) y cuenta como ese ataque.
   function habAtaque(h){ return String((h && h.nitrosCosto) ?? "").trim().toUpperCase() === "ATAQUE"; }

@@ -651,7 +651,7 @@ function dueloElegirObjetivoMapa(msg){
   const objetivoTipo = (ataque && ataque.hab && ataque.hab.objetivo) || 'enemigo';
   const esValido = objetivoTipo === 'aliado' ? t => !dueloEsRival(yo, t) : objetivoTipo === 'enemigo' ? t => dueloEsRival(yo, t) : null;
   const conArco = !!(ataque && ataque.arco && !ataque.hab);   // el arco: el objetivo, con al menos 2 casilleros libres en el medio (P183)
-  const minimo = conArco ? Combatiente.ARCO_LIBRES + 1 : 0;
+  const minimo = conArco ? Combatiente.arcoLibres(ataque) + 1 : 0;   // (la Mínima más larga: 2 libres)
   // Un disparo (arma de rango): la línea de tiro se dibuja hasta el mouse y brillan en celeste los que están en la distancia ideal (js/32).
   const mioTiro = ataque && ataque.rango && !ataque.hab ? [...tokens.entries()].map(([id, t]) => ({...t, id})).find(propio) : null;
   let nEnAlcance = 0, nIdeal = 0;
@@ -683,7 +683,7 @@ function dueloElegirObjetivoMapa(msg){
       try{ t = await dueloVincularSiFalta(t); }catch(err){ console.error('No se pudo vincular el token al creep:', err); }
       const mio = todos.find(propio);
       if(conArco && mio && Combatiente.arcoMuyCerca(ataque, distanciaHex({col: mio.col, fila: mio.fila}, {col: t.col, fila: t.fila}))){   // avisa y deja seguir: lo decide la mesa
-        const si = await AvisoCombate.preguntar(`${nombreDe(t)} está muy cerca para el arco: hace falta al menos ${Combatiente.arcoLibresTxt()} entre los dos. Con el arco no se pega cuerpo a cuerpo: alejate o cambiá de arma. ¿Disparar igual? (lo decide la mesa)`,
+        const si = await AvisoCombate.preguntar(`${nombreDe(t)} está muy cerca para el arco: hace falta al menos ${Combatiente.arcoLibresTxt(ataque)} entre los dos. Con el arco no se pega cuerpo a cuerpo: alejate o cambiá de arma. ¿Disparar igual? (lo decide la mesa)`,
           {icono: '🏹', titulo: 'Muy cerca para el arco', si: 'Disparar igual', no: 'Elegir otro'});
         if(!si){ pedir(); return; }
         mesaLinea(`🏹 ${yo.nombre || 'Alguien'} disparó el arco a ${nombreDe(t)}, que estaba demasiado cerca (lo decidió la mesa)`, 'alerta-roja');
@@ -726,10 +726,10 @@ function dueloElegirObjetivoMapa(msg){
       }
       Duelo.crear({yo, ataque, espalda, embestida, quieto, primeraSangre, tiro, flecha}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
-    }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + (minimo ? `de ${minimo} a ` : '') + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : conArco ? ` · 🏹 el arco necesita ${Combatiente.ARCO_LIBRES} casilleros libres en el medio` : ''}${mioTiro ? ' · la línea muestra si el tiro pasa' : ''}${nIdeal ? ' · 💠 en celeste, tu distancia ideal (' + esc(Combatiente.idealTxt(ataque.ideal)) + ')' : ''}</span>`, true, cancelado);
+    }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + (minimo ? `de ${minimo} a ` : '') + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : conArco ? ` · 🏹 el arco necesita ${Combatiente.arcoLibresTxt(ataque)} en el medio` : ''}${mioTiro ? ' · la línea muestra si el tiro pasa' : ''}${nIdeal ? ' · 💠 en celeste, tu distancia ideal (' + esc(Combatiente.idealTxt(ataque.ideal)) + ')' : ''}</span>`, true, cancelado);
     // Sin nadie a tiro con un arco (2026-10-09): se dice por qué — su alcance no llega a la distancia mínima, o no hay nadie en esa franja.
     const sinTiro = conArco && !nEnAlcance ? (num(ataque.alcance) < minimo ? `🏹 tu alcance (${Math.round(num(ataque.alcance))}) no llega a los ${minimo} casilleros que necesita el arco: si disparás igual, lo decide la mesa`
-      : `🏹 nadie a tiro: el arco necesita ${Combatiente.arcoLibresTxt()} en el medio y llega hasta ${Math.round(num(ataque.alcance))}`) : '';
+      : `🏹 nadie a tiro: el arco necesita ${Combatiente.arcoLibresTxt(ataque)} en el medio y llega hasta ${Math.round(num(ataque.alcance))}`) : '';
     const extraTiro = mioTiro ? [nEnAlcance ? `✨ brillan los que están a tu alcance (${minimo ? `de ${minimo} a ` : ''}${Math.round(num(ataque.alcance))} casilleros)` : sinTiro, 'la línea muestra si el tiro pasa',
       nIdeal ? `💠 en celeste, tu distancia ideal: ${esc(Combatiente.idealTxt(ataque.ideal).replace(/^Distancia ideal /, ''))}` : ''].filter(Boolean).join(' · ') : '';
     dueloAvisoObjetivo(yo.nombre, msg.conSuelto, alSuelto, ataque && ataque.hab ? ataque.hab.nombre : '', extraTiro);

@@ -291,7 +291,8 @@ function acAtacar(tipo){
   };
   if(typeof Duelo === 'undefined' || !Duelo.disponible()){ hacer(); return; }
   acElegirObjetivo(sc, {tipo, armaId: '', armaNombre: sc.armaNombre || '', tipoDado: num(sc.armaTipo) || 8, rango: !!sc.armaDeRango, alcance: CreepCalculo.alcance(sc),
-    ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(sc))}, hacer);   // los rasgos de su arma: por la espalda, sin Parry
+    ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(sc)),   // los rasgos de su arma: por la espalda, sin Parry
+    ...(num((sc.armaRasgos || {}).arcoDuro) > 0 && num(CreepCalculo.statValor(sc, 'fue')) < num(sc.armaRasgos.arcoDuro) ? {arcoDuroPdg: -2} : {})}, hacer);   // Arco duro
 }
 // Elegir el objetivo (de un ataque o de una habilidad) con un clic en el token: mientras tanto las Acciones nuevas se esconden
 // (tapan el mapa); "Sin objetivo" o cancelar las vuelven a mostrar. `suelto`: lo que se hace sin objetivo.

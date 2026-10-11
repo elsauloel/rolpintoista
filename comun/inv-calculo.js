@@ -98,7 +98,7 @@ const InvCalculo = (() => {
       escudos: (inv.equipo || []).filter(it => slotDe(it.tipoItem) === 'escudo').map(it => ({nombre: it.nombre, peso: num(it.peso)}))});
   }
   function bloqueoValor(inv){ const d = defensa(inv); return statValor(inv, 'bloqueo') + (d ? num(d.peso) : 0); }
-  function costoAtaque(inv){ const a = Combatiente.armaDeCombatiente(inv); if(Combatiente.cargadaGratis(a, inv.ataquesTurno, inv.descargada)) return 0; return Combatiente.costoConAhorro(Combatiente.costoAtaque(num(inv.armaTipo) || 8, inv.ataquesTurno, a), a, inv.ataquesTurno); }   // regla común (comun/combatiente.js)
+  function costoAtaque(inv){ const a = Combatiente.armaDeCombatiente(inv); if(Combatiente.cargadaGratis(a, inv.ataquesTurno, inv.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(num(inv.armaTipo) || 8, inv.ataquesTurno, a), a, inv.ataquesTurno) - Combatiente.ahorroArco(a, inv.ataquesTurno, inv.descargada, inv.ultimoPego)); }   // regla común (comun/combatiente.js)   // + Flecha en la cuerda / Encadenar (2026-10-11)
   function costoNitrosHab(inv, h){ return Combatiente.costoNitrosHab(h, () => costoAtaque(inv), IT2_INV.nitrosHabilidad); }
   function costoHabTxt(inv, h){
     const n = costoNitrosHab(inv, h);

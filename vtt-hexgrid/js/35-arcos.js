@@ -57,6 +57,24 @@ function arcoBonos(mio, t, ataque, tiro){
   if(num(ataque.apuntadaFirme) > 0 && !seMovioEsteTurno(mio.id) && !seMovioTurnoAnterior(mio.id)) tiro = arcoSumar(tiro, {pdg: Math.round(num(ataque.apuntadaFirme))}, 'apuntada firme');
   if(num(ataque.tiradorApoyo) > 0 && arcoAliadoPegado(mio, t)) tiro = arcoSumar(tiro, {pdg: Math.round(num(ataque.tiradorApoyo))}, 'tirador de apoyo');
   if(num(ataque.remate) > 0 && arcoQuieto(t)) tiro = arcoSumar(tiro, {crit: Math.round(num(ataque.remate))}, 'remate');
+  // 🏹 Las de los arcos Comunes (2026-10-11).
+  const emb = modoMapa === 'combate' && !emboscadaUsadas.has(mio.id + '·pot');
+  if(emb && (num(ataque.emboscadaPot) > 0 || num(ataque.emboscadaPdg) > 0)){
+    tiro = arcoSumar(tiro, {critpot: Math.round(num(ataque.emboscadaPot)), pdg: Math.round(num(ataque.emboscadaPdg))}, 'emboscada');
+    emboscadaUsadas.add(mio.id + '·pot');
+  }
+  const turno = `${mio.id}@${Math.round(num(mantenimientoNumero))}`, enTurno = arcoTurno.get(turno) || {disparos: 0, blanco: '', critico: false};
+  if(ataque.respiracion) tiro = arcoSumar(tiro, {pdg: enTurno.disparos === 0 ? 2 : -2}, enTurno.disparos === 0 ? 'respiración contenida' : 'sin respiración (ya disparó)');
+  if(ataque.racha && enTurno.critico) tiro = arcoSumar(tiro, {crit: 1}, 'racha');
+  if(ataque.abanico && enTurno.disparos > 0 && enTurno.blanco && enTurno.blanco !== t.id) tiro = arcoSumar(tiro, {pdg: 1}, 'abanico');
+  const lec = arcoLectura.get(mio.id);
+  if(ataque.lectura && lec && lec.blanco === t.id && lec.golpes > 0) tiro = arcoSumar(tiro, {pdg: Math.min(3, lec.golpes)}, 'lectura del viento');
+  if(num(ataque.contraCorre) > 0 && typeof window.mapaCasillerosUltimoTurno === 'function' && window.mapaCasillerosUltimoTurno(t.id) >= 3) tiro = arcoSumar(tiro, {pdg: Math.round(num(ataque.contraCorre))}, 'contra el que corre');
+  if(num(ataque.matagente) > 0 && arcoTipoCriatura(t, ['humano', 'humanoide'])) tiro = arcoSumar(tiro, {fijo: Math.round(num(ataque.matagente))}, 'contra humanos');
+  if(num(ataque.mataadefesios) > 0 && arcoTipoCriatura(t, ['alienígena', 'otros'], true)) tiro = arcoSumar(tiro, {fijo: Math.round(num(ataque.mataadefesios))}, 'contra adefesios');
+  if(num(ataque.arcoDuroPdg) < 0) tiro = arcoSumar(tiro, {pdg: num(ataque.arcoDuroPdg)}, 'arco duro (poca Fuerza)');
+  arcoTurno.set(turno, {...enTurno, disparos: enTurno.disparos + 1, blanco: t.id});
+  arcoUltimo.set(mio.id, {blanco: t.id, ataque, turno});
   if(ataque.primerDisparo && modoMapa === 'combate' && !primerDisparoUsados.has(mio.id)){
     tiro = tiro || {motivo: ''};
     tiro.dado = `1d${Math.round(num(ataque.tipoDado)) || 6}`;
@@ -64,6 +82,29 @@ function arcoBonos(mio, t, ataque, tiro){
     primerDisparoUsados.add(mio.id);
   }
   return tiro;
+}
+/* 🏹 Lo que el arco recuerda entre disparos (2026-10-11, en la pantalla de quien dispara): los disparos de este turno (Respiración, Abanico) y si
+   el último fue crítico (Racha); los golpes seguidos al mismo blanco (Lectura del viento); y, para Encadenar, si el último pegó (lo guarda en el
+   personaje o el creep: el costo lo cobra su ficha). Lo actualiza arcoResuelto, con cada duelo que termina (hook disparoResuelto de js/14). */
+const arcoTurno = new Map(), arcoLectura = new Map(), arcoUltimo = new Map();
+function arcoTipoCriatura(t, tipos, otros){
+  if(!t || t.tipo !== 'creep') return false;
+  const v = vinculo(t), tc = String((v && v.tipoCriatura) || '').toLowerCase();
+  return tipos.includes(tc) || (otros && tc && !['humano', 'humanoide', 'bestia', 'planta', 'elemental', 'constructo', 'no-muerto', 'alienígena'].includes(tc));
+}
+function arcoResuelto(d){
+  const tid = d.atacante && d.atacante.tokenId, u = tid && arcoUltimo.get(tid);
+  if(!u || u.blanco !== (d.defensor && d.defensor.tokenId)) return;
+  const pego = ['pego', 'mitad'].includes(d.resultado), critico = !!(d.crit && d.crit.critico), a = u.ataque;
+  const tu = arcoTurno.get(u.turno); if(tu) arcoTurno.set(u.turno, {...tu, critico});
+  const lec = arcoLectura.get(tid);
+  arcoLectura.set(tid, pego ? {blanco: u.blanco, golpes: (lec && lec.blanco === u.blanco ? lec.golpes : 0) + 1} : {blanco: u.blanco, golpes: 0});
+  if(a && a.encadenar){   // Encadenar: el costo del próximo disparo lo cobra su ficha (o el creep): se le anota si este pegó
+    const t = tokens.get(tid);
+    if(t && t.tipo === 'creep' && soyGM && typeof modificarCreep === 'function') modificarCreep(t.fichaId, sc => { sc.ultimoPego = pego; }).catch(err => console.error('Encadenar:', err));
+    else if(t && t.tipo === 'pj' && !String(t.fichaId).includes(SEP_INVOCACION) && typeof editarPersonajeMapa === 'function')
+      editarPersonajeMapa(t.fichaId, S => { S.ataquesArma = {...(S.ataquesArma || {}), ['pego:' + (a.armaId || 'sin-arma')]: pego}; return ['otros']; }).catch(err => console.error('Encadenar:', err));
+  }
 }
 // Tirador de apoyo: ¿el objetivo está pegado a un aliado de quien dispara? (un token de su mismo bando que se ve, no él mismo)
 function arcoAliadoPegado(mio, t){

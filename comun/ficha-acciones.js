@@ -536,9 +536,11 @@ const FichaAcciones = (() => {
     return `ataque con ${arma ? arma.nombre : 'sin arma'}${primero ? ' (primero del turno)' : ''}`;
   }
   // Tope de X en costos variables. PLACEHOLDER: ver IT2.limiteXNitros/limiteXSp.
-  function limiteCostoX(S, cual){
+  // El tope de X: el general (si algún día se define) y el de la habilidad (`xMax`, 2026-10-11: Apuntar, X de 1 a 3), el menor de los dos.
+  function limiteCostoX(S, cual, it){
     const f = cual === 'sp' ? IT2().limiteXSp : IT2().limiteXNitros;
-    return typeof f === 'function' ? f(FichaCalculo.calcular(S)) : null;
+    const base = typeof f === 'function' ? f(FichaCalculo.calcular(S)) : null, xm = it && num(it.xMax) > 0 ? num(it.xMax) : null;
+    return base === null ? xm : xm === null ? base : Math.min(base, xm);
   }
   async function ejecutarHabilidad(S, id, armaId, forzar, ui){
     const it = S.habilidades.find(h => h.id === id);
@@ -749,9 +751,9 @@ const FichaAcciones = (() => {
       ui.toast(`No te alcanzan los Nitros — tenés ${fmt(num(S.nitros))}`);
       return false;
     }
-    const limN = limiteCostoX(S, 'nitros'), limS = limiteCostoX(S, 'sp');
-    if(limN !== null && nitros > limN){ ui.toast(`Como mucho ${fmt(limN)} Nitros en X`); return false; }
-    if(limS !== null && sp > limS){ ui.toast(`Como mucho ${fmt(limS)} SP en X`); return false; }
+    const limN = limiteCostoX(S, 'nitros', it), limS = limiteCostoX(S, 'sp', it);
+    if(limN !== null && FichaHabilidades.nitrosVariable(it) && nitros > limN){ ui.toast(`Como mucho ${fmt(limN)} Nitros en X`); return false; }
+    if(limS !== null && FichaHabilidades.spVariable(it) && sp > limS){ ui.toast(`Como mucho ${fmt(limS)} SP en X`); return false; }
     S.nitros = Math.max(0, num(S.nitros) - nitros);
     S.spGastado = num(S.spGastado) + sp;
     const costoHp = num(it.hpCosto);

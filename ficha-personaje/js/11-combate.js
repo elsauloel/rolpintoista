@@ -246,8 +246,8 @@ const habUi = {...combateUi,
     if(campoSp.oninput) campoNitros.value = campoSp.value;
     if(nitrosVariable(it) && !spVariable(it)) setTimeout(() => campoNitros.select(), 50);
     $('#costox-disponibles').textContent = `${fmt(num(S.nitros))} No2 y ${fmt(spMaximo() - num(S.spGastado))} SP`;
-    const limN = limiteCostoX('nitros'), limS = limiteCostoX('sp');
-    $('#costox-limite').innerHTML = (limN === null || limS === null)
+    const limN = limiteCostoX('nitros', it), limS = limiteCostoX('sp', it);
+    $('#costox-limite').innerHTML = num(it.xMax) > 0 ? `X: de 1 a ${fmt(num(it.xMax))}.` : (limN === null || limS === null)
       ? `${IT2_PENDIENTE('el tope de X todavía no está confirmado')} Tope de X sin definir: por ahora solo te frena lo que tengas.`
       : '';
     $('#scrim-costox').classList.add('open');
@@ -413,7 +413,7 @@ function esCostoVariable(costo){
 }
 
 // Tope de X en costos variables. PLACEHOLDER: ver IT2.limiteXNitros/limiteXSp.
-function limiteCostoX(cual){ return FichaAcciones.limiteCostoX(S, cual); }   // comun/ficha-acciones.js
+function limiteCostoX(cual, it){ return FichaAcciones.limiteCostoX(S, cual, it); }   // comun/ficha-acciones.js
 
 // Habilidades con costo de Nitros "ATAQUE": cuestan lo mismo que un ataque
 // con el arma que se elige al ejecutarlas y cuentan como ese ataque.

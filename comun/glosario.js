@@ -41,7 +41,7 @@ const Glosario = (() => {
     {titulo: 'Contra el que corre', re: 'Contra el que corre', texto: 'Contra el que corre: PdG de más contra un rival que se movió 3 casilleros o más en su último turno completo (en la primera ronda, si todavía no jugó, no cuenta).'},
     {titulo: 'Abanico', re: 'Abanico', texto: 'Abanico: si en el mismo turno le disparás a un blanco distinto del anterior, ese disparo suma +1 PdG.'},
     {titulo: 'Contra humanos', re: 'Contra humanos', texto: 'Contra humanos: daño de más contra un creep humano o humanoide (el arco del cazador de recompensas).'},
-    {titulo: 'Contra adefesios', re: 'Contra adefesios', texto: 'Contra adefesios: daño de más contra un creep alienígena o de un tipo raro («otros»).'},
+    {titulo: 'Contra lo sobrenatural', re: 'Contra lo sobrenatural', texto: 'Contra lo sobrenatural: daño de más contra un creep no-muerto, demonio o de otra dimensión (interdimensional). ⚙ Lo suma el mapa según el tipo de criatura del creep.'},
     {titulo: 'Arco duro', re: 'Arco duro', texto: 'Arco duro: si tu Fuerza es menor que la que dice, tus disparos con este arco tienen −2 PdG.'},
     {titulo: 'Mínima más larga', re: 'Mínima más larga', texto: 'Mínima más larga: este arco necesita 2 casilleros libres entre vos y el blanco (los demás, 1).'},
     {titulo: 'Flecha de más', re: 'Flecha de más', texto: 'Flecha de más: la primera flecha especial que disparás en el combate no cobra su No2.'},

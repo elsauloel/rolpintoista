@@ -307,33 +307,36 @@ crítico multiplica como mucho ×2) · 29 Cuerda floja con lluvia o agua (✋ a 
 ### 2026-10-11 · Propuesta: los 24 arcos Comunes nuevos (todos Tipo 4; para el OK del dueño, después se testean uno por uno)
 Precio y calidad con la calculadora ya conectada a la planilla medida (`herramientas/tabla_arcos.py`); todavía **sin la pelea simulada** (el dueño:
 «primero armamos los 24, y corremos la tabla sobre los ítems concretos»). Reemplazan a los 13 Comunes de hoy (13 nombres se reusan, 11 son nuevos).
-1. **Arco corto** — 2d4 · Rango 4 · distancia ideal cerca (a 3 o 4): +1 PdG · $90
-2. **Arco de rama** — 1d4+2 · Rango 5 · Flecha en la cuerda · Veneno 25 % (2) · sin tiro alto · $80
-3. **Arco de pastor** — 1d4+1 · Rango 5 · Crítico potente +1 · Emboscada: Crítico frecuente +1 · $100
-4. **Arco de liebrero** — 1d4+1 · Rango 4 · distancia ideal cerca (a 3 o 4): Crítico potente +2 · Contra el que corre +2 · $95
-5. **Arco de punta de hueso** — 1d4+1 · Perfora 1 · Rango 4 · $80
-6. **Arco del monte** — 1d4+1 · Rango 5 · Matabestias +2 · Emboscada: Crítico potente +1 · Veneno 25 % (2) · $100
-7. **Arco de batidor** — 1d4+1 · Rango 5 · Largo alcance 2 · distancia ideal lejos (los 3 últimos casilleros, desde 8): +1 de daño · Emboscada: +1 PdG · $110
-8. **Arco de acecho** — 1d4+1 · Rango 4 · Emboscada: Crítico frecuente +2 y potente +1 · $100
-9. **Arco de cuerda doble** — 1d4 · Rango 5 · Tensar +1 · $90
-10. **Arco del cuatrero** — 1d4+1 · Rango 4 · Espalda a distancia (+2 PdG, +1 de daño) · $85
-11. **Arco petizo** — 1d4+3 · Rango 2 (corto alcance) · Crítico potente +1 · Emboscada: Crítico frecuente +1 · Veneno 25 % (2) · sin tiro alto · $100
-12. **Arco de la víbora** — 1d4 · Perfora 1 · Rango 4 · Veneno 50 % (2), seguro con crítico · $100
-13. **Arco del baqueano** — 1d4+1 · Rango 4 · Lectura del viento · Emboscada: +1 PdG · $100
-14. **Arco de cazador de pájaros** — 1d4+1 · Rango 5 · Lisiado 33 %, seguro con crítico · $85
-15. **Arco de tiro ligero** — 1d4+1 · Rango 5 · Encadenar · Racha · $95
-16. **Arco del matrero** — 1d4 · Perfora 1 · Rango 4 · Sangrado 25 %, seguro con crítico · $100
-17. **Arco de la espera** — 1d4+1 · Rango 4 · Respiración contenida · distancia ideal lejos (los 3 últimos casilleros, desde 8): +1 PdG · Sangrado 25 %, seguro con crítico · $110
-18. **Arco del cazador de recompensas** — 1d4+1 · Rango 4 · Contra humanos +2 de daño · Lisiado 25 %, seguro con crítico · $100
-19. **Arco del bañado** — 1d4 · Perfora 1 · Rango 4 · Crítico potente +1 · Afinidad especial · Veneno 25 % (3) · sin tiro alto · $120
-20. **Arco de quebracho** — 1d4 · Perfora 1 · Rango 5 · Tensar +1 · Arco duro (Fuerza 4) · Mínima más larga · $95
-21. **Arco de la tropilla** — 1d4+1 · Rango 4 · Abanico · Emboscada: +1 PdG · Sangrado 50 % · $110
-22. **Arco del tero** — 1d4+1 · Rango 4 · Tiro alto sin castigo · distancia ideal media (3): +1 PdG · $95
-23. **Arco del forastero** — 1d4+1 · Rango 4 · Contra adefesios +2 de daño · Emboscada: +1 PdG · con crítico, 50 % de Expuesto · Veneno 25 % (2) · $120
-24. **Arco de caña** — 1d4+1 · Rango 4 · Tensar +1 · Flecha de más · $95
+Cambios del dueño (2026-10-11, leyendo la lista): **Rango 3 = sin bono** (más es bono, menos es desventaja); distancia ideal cerca = a 3 o 4,
+lejos = los 3 últimos del alcance (desde 8); +daño en la distancia ideal, +2 como mínimo; «Contra adefesios» → **Contra lo sobrenatural** (no-muertos,
+demonios e interdimensionales); en el del forastero, **Stun** con crítico en lugar de Expuesto («Expuesto con flechas no me gusta»).
+1. **Arco corto** — 2d4 · Rango 3 · distancia ideal cerca (a 3 o 4): +1 PdG · $90
+2. **Arco de rama** — 1d4+2 · Rango 4 · Flecha en la cuerda · Veneno 25 % (2) · sin tiro alto · $80
+3. **Arco de pastor** — 1d4+1 · Rango 4 · Crítico potente +1 · Emboscada: Crítico frecuente +1 · $100
+4. **Arco de liebrero** — 1d4+1 · Rango 3 · distancia ideal cerca (a 3 o 4): Crítico potente +2 · Contra el que corre +2 · $95
+5. **Arco de punta de hueso** — 1d4+1 · Perfora 1 · Rango 3 · $80
+6. **Arco del monte** — 1d4+1 · Rango 4 · Matabestias +2 · Emboscada: Crítico potente +1 · Veneno 25 % (2) · $100
+7. **Arco de batidor** — 1d4+1 · Rango 3 · Largo alcance 2 · distancia ideal lejos: +2 de daño · $100
+8. **Arco de acecho** — 1d4+1 · Rango 3 · Emboscada: Crítico frecuente +2 y potente +1 · $100
+9. **Arco de cuerda doble** — 1d4 · Rango 4 · Tensar +1 · $90
+10. **Arco del cuatrero** — 1d4+1 · Rango 3 · Espalda a distancia (+2 PdG, +1 de daño) · $85
+11. **Arco petizo** — 1d4+3 · Rango 1 (corto alcance) · Crítico potente +1 · Emboscada: Crítico frecuente +1 · Veneno 25 % (2) · sin tiro alto · $100
+12. **Arco de la víbora** — 1d4 · Perfora 1 · Rango 3 · Veneno 50 % (2), seguro con crítico · $100
+13. **Arco del baqueano** — 1d4+1 · Rango 3 · Lectura del viento · Emboscada: +1 PdG · $100
+14. **Arco de cazador de pájaros** — 1d4+1 · Rango 4 · Lisiado 33 %, seguro con crítico · $85
+15. **Arco de tiro ligero** — 1d4+1 · Rango 4 · Encadenar · Racha · $95
+16. **Arco del matrero** — 1d4 · Perfora 1 · Rango 3 · Sangrado 25 %, seguro con crítico · $100
+17. **Arco de la espera** — 1d4+1 · Rango 3 · Respiración contenida · distancia ideal lejos: +1 PdG · $95
+18. **Arco del cazador de recompensas** — 1d4+1 · Rango 3 · Contra humanos +2 de daño · Lisiado 25 %, seguro con crítico · $100
+19. **Arco del bañado** — 1d4 · Perfora 1 · Rango 3 · Crítico potente +1 · Afinidad especial · Veneno 25 % (3) · sin tiro alto · $120
+20. **Arco de quebracho** — 1d4 · Perfora 1 · Rango 4 · Tensar +1 · Arco duro (Fuerza 4) · Mínima más larga · $95
+21. **Arco de la tropilla** — 1d4+1 · Rango 3 · Abanico · Emboscada: +1 PdG · Sangrado 50 % · $110
+22. **Arco del tero** — 1d4+1 · Rango 3 · Tiro alto sin castigo · distancia ideal media (3): +1 PdG · $95
+23. **Arco del forastero** — 1d4+1 · Rango 3 · Contra lo sobrenatural +2 de daño · Emboscada: +1 PdG · con crítico, 50 % de Stun · $110
+24. **Arco de caña** — 1d4+1 · Rango 3 · Tensar +1 · Flecha de más · $95
 
-**Proporciones:** Veneno 6 · Crítico potente / frecuente 5 (más la Racha) · Rango de bono 8 · Perfora 5 · distancia ideal 5 · Lisiado / Sangrado 5 ·
-Emboscada 8 · Tensar 3 · sin tiro alto 3.
+**Proporciones:** Veneno 5 · Crítico potente / frecuente 5 (más la Racha) · Rango de bono 7 (y uno con desventaja) · Perfora 5 · distancia ideal 5 ·
+Lisiado / Sangrado 4 · Emboscada 7 · Tensar 3 · sin tiro alto 3.
 
 **Lo que no entró en Común (queda para Buena y más):** Crítico frecuente fijo en el arco (+1 en un Tipo 4 vale 5,25 por sí solo: con cualquier daño
 pasa a Buena) · Tensar +2 y +3 · Perfora 1 junto con Tensar o con Espalda a distancia · Perfora 1 con un daño de 1d4+2 o más · Emboscada de Crítico

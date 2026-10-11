@@ -50,7 +50,7 @@ def costo(arma, h):
 
 def pelea(arma, clase, nivel, blanco, rondas, sentado=False, bestia=False, caso=False):
     """`caso` (2026-10-11, arcos): el blanco cumple todas las condiciones del arma — Sentado (Remate), bestia (Matabestias), se movió 3 o más
-    (Contra el que corre), humano (Contra humanos), adefesio (Contra adefesios), y el arquero está a su distancia ideal."""
+    (Contra el que corre), humano (Contra humanos), sobrenatural (Contra lo sobrenatural), y el arquero está a su distancia ideal."""
     if caso: sentado = bestia = True
     o = BB.opciones()
     d = dict(B.blancos(nivel, o)[blanco])
@@ -58,7 +58,7 @@ def pelea(arma, clase, nivel, blanco, rondas, sentado=False, bestia=False, caso=
     defensa, total = d['defensa'], 0.0
     ideal = (arma.get('ideal') or {}) if caso else {}
     pdg_fijo = (int(arma.get('contraCorre') or 0) if caso else 0) + int(ideal.get('pdg') or 0) - (2 if arma.get('arcoDuro') and at['fue'] < int(arma['arcoDuro']) else 0)
-    dano_fijo = (int(arma.get('matagente') or 0) + int(arma.get('mataadefesios') or 0) + int(ideal.get('fijo') or 0)) if caso else 0
+    dano_fijo = (int(arma.get('matagente') or 0) + int(arma.get('matasobrenatural') or 0) + int(ideal.get('fijo') or 0)) if caso else 0
     lectura = 0   # Lectura del viento: golpes seguidos al mismo blanco (hasta 3)
     sangra, veneno = [0, 0], 0  # Sangrado [stacks = daño por turno, turnos que quedan] y stacks de Veneno
     frec0 = sum(m['val'] for m in arma.get('mods') or [] if m['stat'] == 'crit') + int(ideal.get('crit') or 0)

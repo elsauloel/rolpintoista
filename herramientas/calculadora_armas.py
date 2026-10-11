@@ -75,8 +75,8 @@ BAL_R2_MIN = 7.5       # una ballesta con Recarga 2 vale al menos lo de una Buen
 # La planilla de los arcos (2026-10-11, tabla_arcos.py → tabla_arcos.json): lo mismo para los arcos (Tipo, dados, daño fijo, Perfora), medido en el
 # nivel 1 (Común) y en el 3 (Buena). El arco pelado vale lo que rinde: si en el nivel 3 entra en la banda de una Buena (74 % o más), por esa escala
 # (74 % → 9 · 106 % → 11); si no, por la de la Común en el nivel 1 (74 % → 5,5 · 106 % → 7,5); rinde = 0,7 × medio + 0,3 × pesado (el pesado, hasta
-# 1,5), como las ballestas. El Rango 4 de todo arco es parte del arco pelado: se cobra solo lo que pasa de 4 (ARCO_RANGO_BASE).
-ARCO_RANGO_BASE = 4
+# 1,5), como las ballestas. El Rango 3 de todo arco es parte del arco pelado: se cobra solo lo que pasa de 3 (ARCO_RANGO_BASE).
+ARCO_RANGO_BASE = 3   # dueño, 2026-10-11: Rango 3 = sin bono; más arriba es bono, más abajo una desventaja
 def _tabla_arc():
     import json, os
     f = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tabla_arcos.json')
@@ -260,7 +260,7 @@ def puntaje(arma):
                + CARCAJ_EXTRA_PC * float(arma.get('carcajExtra') or 0))
         arc += sum(v for k, v in ARCO_PC.items() if arma.get(k))
         arc += CORRE_FACTOR * float(arma.get('contraCorre') or 0) * TASA_STAT['pdg'] + MATAGENTE_FACTOR * float(arma.get('matagente') or 0) * factor_plano(tipo)
-        arc += MATABESTIAS_FACTOR * float(arma.get('mataadefesios') or 0) * factor_plano(tipo) + (ARCO_DURO_PC if arma.get('arcoDuro') else 0)
+        arc += MATABESTIAS_FACTOR * float(arma.get('matasobrenatural') or 0) * factor_plano(tipo) + (ARCO_DURO_PC if arma.get('arcoDuro') else 0)
         arc += EMBOSCADA_FACTOR * (min(float(arma.get('emboscadaPot') or 0), 6) * PESO_CRIT * PESO_CRITPOT + float(arma.get('emboscadaPdg') or 0) * TASA_STAT['pdg'])
         rc = int(arma.get('recarga') or 0)
         if rc and not arma.get('arco'):
@@ -330,7 +330,7 @@ def extras(arma):
     n += 1 if arma.get('armaDeRango') and (arma.get('ideal') or {}).get('donde') else 0
     n += sum(1 for k in ('tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad', 'caida', 'apuntadaFirme', 'tiradorApoyo',
                          'remate', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'cargador', 'carcajExtra', 'dobleCuerda', 'tiroRapido',
-                         'enCuerda', 'encadenar', 'respiracion', 'racha', 'lectura', 'tiroAltoLimpio', 'contraCorre', 'abanico', 'matagente', 'mataadefesios', 'emboscadaPot', 'emboscadaPdg') if arma.get('armaDeRango') and arma.get(k))
+                         'enCuerda', 'encadenar', 'respiracion', 'racha', 'lectura', 'tiroAltoLimpio', 'contraCorre', 'abanico', 'matagente', 'matasobrenatural', 'emboscadaPot', 'emboscadaPdg') if arma.get('armaDeRango') and arma.get(k))
     return n
 
 

@@ -483,7 +483,7 @@ const Combatiente = (() => {
   const RASGOS_ARMA = ['espalda', 'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga', 'perfora', 'apuntada', 'cargada', 'atraviesaEscudos',
     'tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad',   // + las mecánicas de arco (2026-10-11, RASGOS_ARCO)
     'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'cargador', 'dobleCuerda', 'tiroRapido', 'carcajExtra',   // + las de ballesta (2026-10-11)
-    'enCuerda', 'encadenar', 'respiracion', 'racha', 'lectura', 'tiroAltoLimpio', 'contraCorre', 'abanico', 'matagente', 'mataadefesios', 'arcoDuro', 'minimaLarga', 'emboscadaPot', 'emboscadaPdg'];   // + las de los arcos Comunes (2026-10-11)
+    'enCuerda', 'encadenar', 'respiracion', 'racha', 'lectura', 'tiroAltoLimpio', 'contraCorre', 'abanico', 'matagente', 'matasobrenatural', 'arcoDuro', 'minimaLarga', 'emboscadaPot', 'emboscadaPdg'];   // + las de los arcos Comunes (2026-10-11)
   /* Rasgos de ballesta con el mapa (2026-10-10, dueño; docs/ideas-ballestas.md): **apuntada N** (+N PdG si no te moviste en el turno: el mapa lo
      suma al apuntar), **cargada** (llega cargada: el primer disparo del turno es gratis si no disparaste con ella el turno anterior; ver
      cargadaGratis) y **atraviesaEscudos** (si te paran el disparo con un escudo, el escudo se abolla: 1 stack de Armadura rota; lo hace el mapa). */
@@ -572,9 +572,9 @@ const Combatiente = (() => {
     // (ahorroArco); respiracion (+2 PdG al primer disparo del turno, −2 a los siguientes), racha (después de un crítico, el próximo disparo del turno
     // Crítico frecuente +1), lectura (+1 PdG por cada golpe seguido al mismo blanco, hasta +3; errar lo vuelve a 0), tiroAltoLimpio (el tiro alto no
     // resta PdG), contraCorre N (+N PdG contra un rival que se movió 3+ casilleros en su último turno completo), abanico (+1 PdG si cambia de blanco en el turno),
-    // matagente / mataadefesios N (+N de daño contra humanos y humanoides / alienígenas y «otros»), arcoDuro N (−2 PdG si la Fuerza es menor que N),
+    // matagente / matasobrenatural N (+N de daño contra humanos y humanoides / no-muertos, demonios e interdimensionales: «Contra lo sobrenatural», dueño 2026-10-11), arcoDuro N (−2 PdG si la Fuerza es menor que N),
     // minimaLarga (necesita 2 casilleros libres) y emboscadaPot / emboscadaPdg N (la Emboscada también da Crítico potente o PdG).
-    'enCuerda', 'encadenar', 'respiracion', 'racha', 'lectura', 'tiroAltoLimpio', 'contraCorre', 'abanico', 'matagente', 'mataadefesios', 'arcoDuro', 'minimaLarga', 'emboscadaPot', 'emboscadaPdg',
+    'enCuerda', 'encadenar', 'respiracion', 'racha', 'lectura', 'tiroAltoLimpio', 'contraCorre', 'abanico', 'matagente', 'matasobrenatural', 'arcoDuro', 'minimaLarga', 'emboscadaPot', 'emboscadaPdg',
     'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'cargador'];
   const LARGO_ALCANCE_MAX = 4, TENSAR_NO2 = 1;
   // Largo alcance: el objetivo más allá del alcance (hasta LARGO_ALCANCE_MAX de más) → {extra, pdg} (pdg negativo); si no corresponde, null.
@@ -626,7 +626,7 @@ const Combatiente = (() => {
     if(r('contraCorre') > 0) p.push(`Contra el que corre +${r('contraCorre')} PdG`);
     if(it.abanico) p.push('Abanico');
     if(r('matagente') > 0) p.push(`Contra humanos +${r('matagente')} de daño`);
-    if(r('mataadefesios') > 0) p.push(`Contra adefesios +${r('mataadefesios')} de daño`);
+    if(r('matasobrenatural') > 0) p.push(`Contra lo sobrenatural +${r('matasobrenatural')} de daño`);
     if(r('arcoDuro') > 0) p.push(`Arco duro (Fuerza ${r('arcoDuro')})`);
     if(it.minimaLarga) p.push('Mínima más larga');
     if(r('emboscadaPot') > 0) p.push(`Emboscada: Crítico potente +${r('emboscadaPot')}`);

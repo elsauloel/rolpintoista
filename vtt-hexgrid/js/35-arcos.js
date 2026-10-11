@@ -71,7 +71,7 @@ function arcoBonos(mio, t, ataque, tiro){
   if(ataque.lectura && lec && lec.blanco === t.id && lec.golpes > 0) tiro = arcoSumar(tiro, {pdg: Math.min(3, lec.golpes)}, 'lectura del viento');
   if(num(ataque.contraCorre) > 0 && typeof window.mapaCasillerosUltimoTurno === 'function' && window.mapaCasillerosUltimoTurno(t.id) >= 3) tiro = arcoSumar(tiro, {pdg: Math.round(num(ataque.contraCorre))}, 'contra el que corre');
   if(num(ataque.matagente) > 0 && arcoTipoCriatura(t, ['humano', 'humanoide'])) tiro = arcoSumar(tiro, {fijo: Math.round(num(ataque.matagente))}, 'contra humanos');
-  if(num(ataque.mataadefesios) > 0 && arcoTipoCriatura(t, ['alienígena', 'otros'], true)) tiro = arcoSumar(tiro, {fijo: Math.round(num(ataque.mataadefesios))}, 'contra adefesios');
+  if(num(ataque.matasobrenatural) > 0 && arcoTipoCriatura(t, SOBRENATURAL)) tiro = arcoSumar(tiro, {fijo: Math.round(num(ataque.matasobrenatural))}, 'contra lo sobrenatural');
   if(num(ataque.arcoDuroPdg) < 0) tiro = arcoSumar(tiro, {pdg: num(ataque.arcoDuroPdg)}, 'arco duro (poca Fuerza)');
   arcoTurno.set(turno, {...enTurno, disparos: enTurno.disparos + 1, blanco: t.id});
   arcoUltimo.set(mio.id, {blanco: t.id, ataque, turno});
@@ -87,6 +87,8 @@ function arcoBonos(mio, t, ataque, tiro){
    el último fue crítico (Racha); los golpes seguidos al mismo blanco (Lectura del viento); y, para Encadenar, si el último pegó (lo guarda en el
    personaje o el creep: el costo lo cobra su ficha). Lo actualiza arcoResuelto, con cada duelo que termina (hook disparoResuelto de js/14). */
 const arcoTurno = new Map(), arcoLectura = new Map(), arcoUltimo = new Map();
+// Contra lo sobrenatural (dueño, 2026-10-11: «no-muertos, demonios y criaturas interdimensionales»); el tipo de criatura se compara sin tildes.
+const SOBRENATURAL = ['no-muerto', 'demonio', 'interdimensional'];
 function arcoTipoCriatura(t, tipos, otros){
   if(!t || t.tipo !== 'creep') return false;
   const v = vinculo(t), tc = String((v && v.tipoCriatura) || '').toLowerCase();

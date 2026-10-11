@@ -430,17 +430,22 @@ const Combatiente = (() => {
      arma su daño fijo y sus efectos al golpear (en la forma de `efectosGolpe` de un arma: {nombre: 'Envenenar', stacks: 3}). Cada ataque gasta una
      carga AL PAGAR Y TIRAR EL PdG (pegue o no) y queda anotado en qué duelo (`duelos`): el daño y los efectos de ese duelo lo suman. Sin cargas,
      se va al empezar el ataque siguiente (así el último duelo todavía lo encuentra). Un Re-roll del PdG no gasta otra. */
+  // Cada ataque gasta una carga de CADA estado con cargas (2026-10-11: Arma envenenada y Ojo de asesino a la vez). → {cambio, carga (la primera,
+  // con `todas` = las que se gastaron, para el aviso)}. Un Re-roll del mismo duelo no gasta otra.
   function gastarCarga(estados, dueloId){
     if(!Array.isArray(estados) || !dueloId) return {cambio: false, carga: null};
     if(estados.some(e => e && e.golpe && (e.duelos || []).includes(dueloId))) return {cambio: false, carga: null};
     let cambio = false;
     for(let i = estados.length - 1; i >= 0; i--) if(estados[i] && estados[i].golpe && n(estados[i].cargas) <= 0){ estados.splice(i, 1); cambio = true; }
-    const e = estados.find(x => x && x.golpe && x.activo !== false && n(x.cargas) > 0);
-    if(!e) return {cambio, carga: null};
-    e.cargas = n(e.cargas) - 1;
-    e.duelos = [...(e.duelos || []).slice(-3), String(dueloId)];
-    if(e.cargas <= 0){ e.activo = false; e.agotada = true; }   // gastada (2026-10-10): ya no se ve; se va al próximo ataque o al pasar el turno
-    return {cambio: true, carga: {...e}};
+    const lista = estados.filter(x => x && x.golpe && x.activo !== false && n(x.cargas) > 0);
+    if(!lista.length) return {cambio, carga: null};
+    lista.forEach(e => {
+      e.cargas = n(e.cargas) - 1;
+      e.duelos = [...(e.duelos || []).slice(-3), String(dueloId)];
+      if(e.cargas <= 0){ e.activo = false; e.agotada = true; }   // gastada (2026-10-10): ya no se ve; se va al próximo ataque o al pasar el turno
+    });
+    const todas = lista.map(e => ({...e}));
+    return {cambio: true, carga: {...todas[0], todas}};
   }
   // ¿Se muestra en una lista de estados? Un estado con cargas que ya gastó la última no (queda escondido hasta irse).
   /* Expuesto (Degollar, dueño 2026-10-10): hasta que empieza su próximo turno, la Evasión a la mitad (`mitadEva`) y nada que cueste No2 para
@@ -453,12 +458,22 @@ const Combatiente = (() => {
     return (ops || []).filter(o => o && o.modo !== 'parry' && !(n(o.costo) > 0)).map(o => ({...o, info: [...(o.info || []), EXPUESTO_TXT]}));
   }
   const estadoVisible = e => !(e && e.agotada);
-  // Lo que el estado con cargas le suma al golpe de ESE duelo: {fijo, efectos, nombre} o null.
+  // Lo que los estados con cargas le suman al golpe de ESE duelo: {nombre, fijo, efectos, crit, critpot} (sumados) o null.
+  const sumarCargas = lista => lista.length ? {nombre: lista.map(e => e.nombre).join(' + '), fijo: lista.reduce((t, e) => t + Math.round(n(e.golpe.fijo)), 0),
+    efectos: lista.flatMap(e => Array.isArray(e.golpe.efectos) ? e.golpe.efectos : []), crit: lista.reduce((t, e) => t + Math.round(n(e.golpe.crit)), 0),
+    critpot: lista.reduce((t, e) => t + Math.round(n(e.golpe.critpot)), 0)} : null;
   function cargaDeDuelo(estados, dueloId){
-    const e = Array.isArray(estados) && dueloId ? estados.find(x => x && x.golpe && (x.duelos || []).includes(String(dueloId))) : null;
-    return e ? {nombre: e.nombre, fijo: Math.round(n(e.golpe.fijo)), efectos: Array.isArray(e.golpe.efectos) ? e.golpe.efectos : []} : null;
+    return Array.isArray(estados) && dueloId ? sumarCargas(estados.filter(x => x && x.golpe && (x.duelos || []).includes(String(dueloId)))) : null;
   }
-  const cargaTxt = c => c ? `${c.nombre}: ${n(c.cargas) > 0 ? `le queda${n(c.cargas) > 1 ? 'n' : ''} ${n(c.cargas)} carga${n(c.cargas) > 1 ? 's' : ''}` : 'era la última carga'}` : '';
+  // El crítico que suman las cargas a este ataque (Ojo de asesino, 2026-10-11): lo pide el duelo ANTES de pagar el ataque, así que si todavía no
+  // se gastaron, mira las que se van a gastar (las activas con cargas). → {crit, critpot}.
+  function cargaCritico(estados, dueloId){
+    const ya = cargaDeDuelo(estados, dueloId);
+    const c = ya || sumarCargas((estados || []).filter(x => x && x.golpe && x.activo !== false && n(x.cargas) > 0));
+    return {crit: c ? c.crit : 0, critpot: c ? c.critpot : 0};
+  }
+  const cargaTxt1 = c => c ? `${c.nombre}: ${n(c.cargas) > 0 ? `le queda${n(c.cargas) > 1 ? 'n' : ''} ${n(c.cargas)} carga${n(c.cargas) > 1 ? 's' : ''}` : 'era la última carga'}` : '';
+  const cargaTxt = c => c && Array.isArray(c.todas) && c.todas.length > 1 ? c.todas.map(cargaTxt1).join(" · ") : cargaTxt1(c);
   // Perfora N (dueño, 2026-10-10): N puntos del golpe pasan siempre la Defensa. Devuelve cuánto pasa POR la Perfora (N, o el golpe si es menor)
   // cuando la Defensa frenaría más que eso; si no, 0 (el golpe va contra la Defensa como siempre). La usa el mapa al aplicar el daño (js/13).
   function perforaPasa(golpe, def, perfora){
@@ -1298,7 +1313,7 @@ const Combatiente = (() => {
   // El texto de lo que cura un ítem: «Heridas (Sangrado, Lisiado, Rengo)».
   const textoCura = grupos => grupos.map(k => `${GRUPOS_CURA[k].label} (${GRUPOS_CURA[k].estados.join(', ')})`).join(' · ');
 
-  return {absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

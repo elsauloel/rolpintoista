@@ -28,8 +28,8 @@ const ConfirmarTurno = (() => {
   }
   /* Con turno propio (2026-10-06, P161): la pantalla que sabe de quién es el turno (el mapa, con el orden de turnos) define
      `window.confirmarTurnoSaber(o)` → true (es su turno) / false (no lo es) / null (no sabe: se pregunta como siempre). `o.ident` =
-     {nombre, ref} de quien actúa (o `o.quien`). Si no es su turno no se frena nada: se cobra lo de turno ajeno y se avisa (dueño: «que aparezca
-     una notificación: No es tu turno, cuesta el doble»), con un toast y una línea en la Mesa. */
+     {nombre, ref} de quien actúa (o `o.quien`). Si no es su turno, un cartel lo anuncia con el costo de turno ajeno y se confirma o se
+     cancela (dueño, 2026-10-11; antes cobraba directo y solo avisaba); al confirmar, el toast y la línea en la Mesa de siempre. */
   function saberTurno(o){
     try{ return typeof window !== 'undefined' && typeof window.confirmarTurnoSaber === 'function' ? window.confirmarTurnoSaber(o) : null; }catch(e){ return null; }
   }
@@ -39,13 +39,39 @@ const ConfirmarTurno = (() => {
     if(typeof toast === 'function') toast(t);
     if(typeof mesaLinea === 'function') mesaLinea(t);
   }
+  // «No es tu turno: cuesta tanto» → Promise<bool> (true = confirmó; Esc, clic afuera o Cancelar = false).
+  function confirmarAjeno(nombre, o, costoTxt){
+    estilos();
+    const quien = (o.ident && o.ident.nombre) || o.quien || '';
+    return new Promise(resolver => {
+      const fondo = document.createElement('div');
+      fondo.id = 'ct-fondo';
+      fondo.innerHTML = `<div id="ct-caja" role="dialog" aria-modal="true">
+        <div class="ct-titulo">⏱ No es ${quien ? `el turno de ${esc(quien)}` : 'tu turno'}</div>
+        <div class="ct-nombre">${esc(nombre)}</div>
+        <div class="ct-pregunta">${o.flash ? 'Fuera del propio turno es un ⚡ Flash: cuesta el doble.' : 'Fuera del propio turno cuesta distinto.'} Cuesta <b>${esc(costoTxt)}</b>.</div>
+        <button type="button" class="ct-primario" id="ct-si">Confirmar — ${esc(costoTxt)}</button>
+        <button type="button" class="ct-cancelar" id="ct-cancelar">Cancelar</button>
+      </div>`;
+      document.body.appendChild(fondo);
+      const cerrar = v => { document.removeEventListener('keydown', teclas, true); fondo.remove(); resolver(v); };
+      const teclas = e => { if(e.key === 'Escape'){ e.preventDefault(); cerrar(false); } else if(e.key === 'Enter'){ e.preventDefault(); cerrar(true); } };
+      document.addEventListener('keydown', teclas, true);
+      fondo.addEventListener('mousedown', e => { if(e.target === fondo) cerrar(false); });
+      fondo.querySelector('#ct-si').onclick = () => cerrar(true);
+      fondo.querySelector('#ct-cancelar').onclick = () => cerrar(false);
+    });
+  }
   // pedir(nombre, costoPropio, costoAjeno, o) → Promise<number|null> (lo que se cobra; null = canceló, no cobra nada).
   function pedir(nombre, costoPropio, costoAjeno, o){
     o = o || {};
     const unidad = o.unidad || 'SP';
     const sabe = saberTurno(o);
     if(sabe === true) return Promise.resolve(costoPropio);
-    if(sabe === false){ avisarAjeno(nombre, o, o.textos ? o.textos[1] : `${costoAjeno} ${unidad}`); return Promise.resolve(costoAjeno); }
+    if(sabe === false){   // el mapa sabe que no es su turno: lo anuncia con el costo y se confirma o se cancela (dueño, 2026-10-11)
+      const txt = o.textos ? o.textos[1] : `${costoAjeno} ${unidad}`;
+      return confirmarAjeno(nombre, o, txt).then(ok => { if(!ok) return null; avisarAjeno(nombre, o, txt); return costoAjeno; });
+    }
     estilos();
     return new Promise(resolver => {
       const fondo = document.createElement('div');

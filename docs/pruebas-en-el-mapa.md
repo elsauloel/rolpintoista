@@ -10,6 +10,10 @@
 
 ## Pendientes
 
+- [ ] **⏱ Turno ajeno: anunciar y confirmar** (2026-10-11): con el orden de turnos, usar Shockwave o Takle (o cualquier Flash) fuera del propio turno
+  muestra «⏱ No es tu turno · … cuesta 6 SP» con Confirmar / Cancelar; cancelar no cobra nada. En el propio turno no pregunta.
+- [ ] **🎯 Ojo de asesino como carga** (2026-10-11): ejecutarlo deja «Ojo de asesino» (1 carga); el próximo ataque con arma muestra Crítico frecuente
+  +1 en la cuenta del crítico y la carga se va; con Arma envenenada a la vez, el mismo ataque gasta las dos.
 - [ ] **🧱 Paredes: lo que falta** (2026-10-10): la línea de tiro de un arco tapada por una pared, una flecha que choca contra una, la visión con
   niebla y los conos de sigilo del otro lado, y cerrar una figura con clic en el primer punto.
 - [ ] **🏹 Virotes con mapa** (2026-10-10, sin probar): de **humo** (nube de diámetro 3, 2 turnos, donde pega o cae), de **luz** (bengala de

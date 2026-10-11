@@ -148,7 +148,8 @@ const FichaDuelo = (() => {
         const arma = armaDelInv(d.ataque.armaId);
         const f = statParaArma('crit', arma), p = statParaArma('critpot', arma);
         const conque = arma || (FichaCombate.armasEquipadasConDano(getS())[0] || {}).item || null;   // sin arma elegida: la principal (como el daño)
-        return {frecuente: Number.isNaN(f) ? 0 : Math.max(0, Math.round(f)), potente: Number.isNaN(p) ? 0 : Math.max(0, Math.round(p)), ignora: Combatiente.ignoraResistCritArma(conque), d20: Math.max(0, Math.round(num(conque && conque.critD20)))};
+        const cc = Combatiente.cargaCritico(getS().efectos, d.id);   // Ojo de asesino: el crítico de una carga
+        return {frecuente: (Number.isNaN(f) ? 0 : Math.max(0, Math.round(f))) + cc.crit, potente: (Number.isNaN(p) ? 0 : Math.max(0, Math.round(p))) + cc.critpot, ignora: Combatiente.ignoraResistCritArma(conque), d20: Math.max(0, Math.round(num(conque && conque.critD20)))};
       },
       // La Resistencia a crítico del defensor contra el Tipo del arma.
       resistenciaCritico: d => {

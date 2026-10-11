@@ -656,7 +656,7 @@ function dueloElegirObjetivoMapa(msg){
   const mioTiro = ataque && ataque.rango && !ataque.hab ? [...tokens.entries()].map(([id, t]) => ({...t, id})).find(propio) : null;
   let nEnAlcance = 0, nIdeal = 0;
   const resaltar = () => {   // también al volver a elegir (después de «Elegir otro»)
-    nEnAlcance = dueloResaltarObjetivos(propio, ataque && ataque.alcance, esValido, minimo);
+    nEnAlcance = dueloResaltarObjetivos(propio, ataque && ataque.rango && !ataque.hab ? Combatiente.alcanceMaximo(ataque, ataque.alcance) : ataque && ataque.alcance, esValido, minimo);   // con Largo alcance, más lejos (js/35)
     nIdeal = mioTiro ? tiroResaltarIdeal(mioTiro, ataque, esValido) : 0;
     if(mioTiro) tiroPreview = {desde: {col: mioTiro.col, fila: mioTiro.fila}, mioId: mioTiro.id, ataque};
   };
@@ -698,6 +698,8 @@ function dueloElegirObjetivoMapa(msg){
           tiro.pdg = num(tiro.pdg) + num(ataque.apuntada);
           tiro.motivo = tiro.motivo ? `${tiro.motivo} y apuntada` : 'apuntada (no se movió)';
         }
+        // 🏹 Las mecánicas de arco (js/35, 2026-10-11): largo alcance, emboscada, matabestias, contra el Marcado, espalda a distancia y Tensar.
+        try{ tiro = arcoBonos(mio, t, ataque, tiro); tiro = await arcoTensar(ataque, msg, tiro); }catch(err){ console.error('No se pudieron sumar las mecánicas del arco:', err); }
       }
       let espalda = false, embestida = 0;
       try{ espalda = porLaEspalda(mio, t); }catch(err){ console.error('No se pudo ver si es por la espalda:', err); }   // nunca traba el ataque
@@ -716,7 +718,8 @@ function dueloElegirObjetivoMapa(msg){
           Object.keys(extra).forEach(k => { if(extra[k]) tiro[k] = num(tiro[k]) + extra[k]; });
           tiro.motivo = tiro.motivo ? `${tiro.motivo} y ${fl.nombre}` : fl.nombre;
         }
-        flecha = {nombre: fl.nombre, efectos: b.efectosGolpe || [], perfora: num(b.perfora), ...(b.salto ? {salto: b.salto} : {}),
+        flecha = {nombre: fl.nombre, efectos: ataque.afinidad ? Combatiente.afinidadEfectos(b.efectosGolpe) : (b.efectosGolpe || []), perfora: num(b.perfora),   // afinidad elemental (js/35)
+          ...(b.salto ? {salto: b.salto} : {}),
           ...['humo', 'luz', 'clava', 'rebota'].reduce((o, k) => b[k] ? {...o, [k]: true} : o, {}), ...(b.explota ? {explota: b.explota} : {})};   // virotes con mapa (js/33)
         if(msg.alDisparar){ try{ msg.alDisparar(); }catch(err){ console.error('No se pudo gastar la flecha:', err); } }
       }

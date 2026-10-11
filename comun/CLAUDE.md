@@ -1468,6 +1468,12 @@ versión parecida en más de una, es candidato a juntar.
   ideal: …»). El asistente de ítems los pregunta en un arma a distancia; `ItemCorto` los muestra y explica; `calculadora_armas.py` les pone precio.
   **El tiro alto es de todos los arcos** (`Combatiente.tieneTiroAlto(arma)`): un arco sin él lleva `sinTiroAlto` (debilidad, lo abarata); otra
   arma de rango, solo con `tiroAlto`. La comba quedó para después (P185: falta definir cuán curva es).
+- **🏹 Mecánicas de arco** (2026-10-11, dueño; `../docs/ideas-arcos-flechas.md`): `Combatiente.RASGOS_ARCO` (también en `RASGOS_ARMA`; valen en
+  cualquier arma de rango) = `tensar`, `largoAlcance`, `emboscada`, `matabestias`, `contraMarcado`, `espaldaDistancia` {pdg, fijo} y `afinidad`.
+  `ataqueDeArma` los lleva al ataque; `largoAlcance(arma, distancia, alcance)`, `alcanceMaximo`, `afinidadEfectos` y `arcoRasgosTxt` (el texto de
+  `ItemCorto`); los aplica el mapa al apuntar (`vtt-hexgrid/js/35-arcos.js`). El asistente de ítems los pregunta en un arma de rango; el glosario
+  los explica. `CreepCalculo.tarjetaPublica` publica `tipoCriatura` (Matabestias). `GeneradorTiendas`: un ítem con `gondolaFija` sale siempre en
+  la góndola de su sección (las 4 flechas elementales).
 - **🏹 Flechas especiales y el carcaj** (2026-10-09, dueño; `../docs/ideas-arcos-flechas.md`): las flechas comunes son ilimitadas; las
   **especiales** son consumibles con `flecha = {no2, pdg, crit, critpot, ignora, perfora, efectosGolpe}` (21 en `catalogo.js`, ids `flecha-*`; sus
   efectos son **siempre**, sin %: lo fuerte se paga con No2 y oro) y se venden en la góndola de la Talabartería (`GeneradorTiendas.gondolaDe`). El

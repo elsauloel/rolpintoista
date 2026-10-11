@@ -239,6 +239,8 @@ const GeneradorTiendas = (() => {
     const tabla = CALIDAD_POR_NIVEL[nivel] || CALIDAD_POR_NIVEL[1];
     secs.forEach(k => {
       let n = num((tam.gondola || {})[k]);
+      // Siempre en la góndola (2026-10-11, dueño: las flechas elementales «siempre disponibles en la Talabartería»): `gondolaFija` en el ítem.
+      cat.filter(it => it.gondolaFija && !it.archivo && gastable(it) && gondolaDe(it) === k && !usados.has(it.id)).forEach(it => { usados.add(it.id); gondola.push(it); });
       const pool = cat.filter(it => gastable(it) && gondolaDe(it) === k && !usados.has(it.id));
       while(n-- > 0 && pool.length){
         const pesos = pool.map(it => num(tabla[TIERS.indexOf(it.tier)]) + 10);

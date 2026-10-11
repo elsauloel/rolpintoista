@@ -10,6 +10,14 @@
 
 ## Pendientes
 
+- [ ] **🏹 Mecánicas de arco nuevas** (2026-10-11, `vtt-hexgrid/js/35-arcos.js`): con un arco que las tenga (los 12 nuevos del catálogo), en el
+  mapa y en modo combate: **Tensar** (al elegir el objetivo pregunta «¿Tensás…?»; «Tensar» cobra 1 No2 y el duelo muestra «tensado» con +2 PdG);
+  **Largo alcance** (brillan también los que están hasta 4 casilleros más allá del alcance; el duelo resta 1 o 2 PdG por cada uno de más);
+  **Emboscada** (solo el primer disparo del combate suma Crítico frecuente; el segundo ya no; al volver a narrativo se libera); **Matabestias**
+  (contra un creep con tipo «bestia» suma el daño; hace falta que GM Tools vuelva a publicar al creep para que salga el tipo); **Contra el
+  Marcado** (con la Flecha marcadora, el segundo disparo suma el PdG); **Espalda a distancia** (disparando desde los casilleros de atrás del
+  objetivo, sin sigilo); **Afinidad elemental** (una Flecha de fuego tira 1d4+1). Y en la Talabartería, las 4 flechas elementales siempre en la
+  góndola; la Flecha de punta roma ya no aparece.
 - [ ] **⏱ Turno ajeno: anunciar y confirmar** (2026-10-11): con el orden de turnos, usar Shockwave o Takle (o cualquier Flash) fuera del propio turno
   muestra «⏱ No es tu turno · … cuesta 6 SP» con Confirmar / Cancelar; cancelar no cobra nada. En el propio turno no pregunta.
 - [ ] **🎯 Ojo de asesino como carga** (2026-10-11): ejecutarlo deja «Ojo de asesino» (1 carga); el próximo ataque con arma muestra Crítico frecuente

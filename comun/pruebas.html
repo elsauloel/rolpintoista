@@ -581,6 +581,19 @@ prueba('el tiro alto: todos los arcos lo tienen salvo «sin tiro alto»; otra ar
     Combatiente.ataqueDeArma({armaDeRango: true, arco: true}).tiroAlto, Combatiente.ataqueDeArma({armaDeRango: true, arco: true, sinTiroAlto: true}).tiroAlto],
     [true, false, false, true, false, true, false, true, undefined]);
 });
+prueba('las mecánicas de arco: largo alcance, afinidad, lo que viaja al ataque y el texto (2026-10-11)', () => {
+  const arco = {armaDeRango: true, arco: true, tensar: 2, largoAlcance: 1, emboscada: 2, matabestias: 2, contraMarcado: 1, espaldaDistancia: {pdg: 2, fijo: 1}, afinidad: true};
+  const at = Combatiente.ataqueDeArma(arco);
+  const fuego = [{nombre: 'Fuego', dado: '1d4', danoMagico: true}, {nombre: 'Quemadura', caras: 1, exitos: 1}];
+  igual([Combatiente.largoAlcance(arco, 7, 5), Combatiente.largoAlcance(arco, 5, 5), Combatiente.largoAlcance(arco, 10, 5), Combatiente.largoAlcance({armaDeRango: true, largoAlcance: 2}, 6, 4),
+    Combatiente.largoAlcance({armaDeRango: true}, 7, 5), Combatiente.alcanceMaximo(arco, 5), Combatiente.alcanceMaximo({armaDeRango: true}, 5),
+    [at.tensar, at.largoAlcance, at.emboscada, at.matabestias, at.contraMarcado, at.espaldaDistancia, at.afinidad], Combatiente.ataqueDeArma({tensar: 2}).tensar,
+    Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente({armaDeRango: true, armaRasgos: {arco: true, matabestias: 3}})).matabestias,
+    Combatiente.afinidadEfectos(fuego).map(e => e.dado), Combatiente.rasgosDeItem(arco).largoAlcance, Combatiente.arcoRasgosTxt(arco)],
+    [{extra: 2, pdg: -2}, null, null, {extra: 2, pdg: -4}, null, 9, 5,
+     [2, 1, 2, 2, 1, {pdg: 2, fijo: 1}, true], undefined, 3, ['1d4+1', undefined], 1,
+     ['Tensar +2 PdG (+1 No2)', 'Largo alcance −1 PdG por casillero', 'Emboscada: Crítico frecuente +2', 'Matabestias +2 de daño', 'Contra el Marcado +1 PdG', 'Espalda a distancia: +2 PdG, +1 de daño', 'Afinidad elemental']]);
+});
 prueba('el carcaj: viene con el arco, guarda las flechas especiales y las gasta; una flecha no se «consume» (2026-10-09)', () => {
   const S = fichaDePrueba({inventario: []});
   const arco = CATALOGO_BASE.find(i => i.id === 'new-arco-corto'), flecha = CATALOGO_BASE.find(i => i.id === 'flecha-de-fuego');
@@ -1369,7 +1382,7 @@ prueba('la 🪪 pública: solo los nombres del arma (también la natural) y del 
   const sc = creepPrueba({notas: '  Huele a pantano.  ', equipo: [{nombre: 'Yelmo', tipoItem: 'cabeza', def: 2, mods: [{stat: 'con', val: 1}]}, {nombre: ''}]});
   const nat = CreepCalculo.tarjetaPublica(creepPrueba({armaNombre: 'Garras', armaNatural: true}));
   igual([CreepCalculo.tarjetaPublica(sc), nat.armaNombre, nat.armaNatural, nat.equipoNombres],
-    [{armaNombre: 'Hacha', armaNatural: false, equipoNombres: ['Yelmo'], notas: 'Huele a pantano.'}, 'Garras', true, []]);
+    [{armaNombre: 'Hacha', armaNatural: false, equipoNombres: ['Yelmo'], notas: 'Huele a pantano.', tipoCriatura: ''}, 'Garras', true, []]);   // + el tipo de criatura (Matabestias, 2026-10-11)
 });
 prueba('Parry y Bloqueo: con su arma o un escudo; un arma natural sola no alcanza', () => {
   const nat = creepPrueba({armaNatural: true}), conEscudo = creepPrueba({armaNatural: true, equipo: [{nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 3}]});
@@ -3309,7 +3322,9 @@ prueba('la góndola (P181): gastables aparte del equipo, N variedades por secci�
     if(!tala.some(i => G.parteDe(i) === 'cinturon')) sinCinturon++;
   }
   igual([malas, consumiblesEnEquipo, sinMochila, sinCinturon, cuantas, G.gondolaDe({nombre: 'Bengala de mano'}), G.gondolaDe({nombre: 'Poción de fuerza'}), G.gondolaDe({nombre: 'Púas', trampaDatos: {}}),
-    G.gastable(CATALOGO_BASE.find(i => i.nombre === 'Vendas'))], [0, 0, 0, 0, 11, 'talabarteria', 'bazar', 'talabarteria', false]);
+    G.gastable(CATALOGO_BASE.find(i => i.nombre === 'Vendas'))], [0, 0, 0, 0, 15, 'talabarteria', 'bazar', 'talabarteria', false]);   // 11 al azar + las 4 flechas elementales fijas (2026-10-11)
+  const r2 = G.generar({tamano: 'pueblito', nivel: 1, catalogo: cat});
+  igual(['flecha-de-fuego', 'flecha-de-escarcha', 'flecha-relampago', 'flecha-de-acido'].map(id => r2.gondola.includes(id)), [true, true, true, true]);
 });
 prueba('los clásicos (legacy hasta Raro) van en toda tienda, de cualquier tamaño y con cualquier sección', () => {
   const G = GeneradorTiendas, cat = CATALOGO_BASE.filter(G.publicable), cl = G.clasicos(CATALOGO_BASE).map(i => i.id);
@@ -3334,7 +3349,7 @@ prueba('reposición (2026-10-07): lo comprado se repone con otro de la misma par
   // La proporción de Buena en lo sorteado (sin los clásicos fijos) no depende del tamaño.
   const porId = new Map(cat.map(i => [i.id, i]));
   const pct = (tam, veces) => { let b = 0, t = 0; for(let n = 0; n < veces; n++){ const r = G.generar({tamano: tam, nivel: 4, catalogo: cat}), g = new Set(r.garantizados);
-    r.items.filter(id => !g.has(id)).forEach(id => { t++; if(porId.get(id).tier === 'Buena Calidad') b++; }); } return b / t; };
+    r.items.filter(id => !g.has(id) && !porId.get(id).gondolaFija).forEach(id => { t++; if(porId.get(id).tier === 'Buena Calidad') b++; }); } return b / t; };   // sin lo fijo de la góndola (2026-10-11)
   igual([malas, sinRepo < 40 * 30 * 0.2, Math.abs(pct('ambulante', 60) - pct('capital', 30)) < 0.15, G.reservaDe('pueblito'), G.reservaDe('personalizada')], [0, true, true, 6, 10]);
 });
 

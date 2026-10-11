@@ -162,6 +162,7 @@ const ItemCorto = (() => {
     if(it.armaDeRango && Combatiente.esArco(it) && it.sinTiroAlto) p.push('Sin tiro alto');
     else if(it.armaDeRango && !Combatiente.esArco(it) && it.tiroAlto) p.push('Tiro alto');
     if(it.armaDeRango && it.ideal && it.ideal.donde) p.push(Combatiente.idealTxt(it.ideal));
+    if(Combatiente.arcoRasgosTxt) p.push(...Combatiente.arcoRasgosTxt(it));   // las mecánicas de arco (2026-10-11)
     if(num(it.ahorroNitros)) p.push(`Primer ataque −${num(it.ahorroNitros)} No2`);
     if(num(it.critD20)) p.push(`+${num(it.critD20)} d20 en el crítico`);
     const dx = Math.round(num(it.durExtra));

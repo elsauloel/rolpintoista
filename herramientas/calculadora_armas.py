@@ -190,6 +190,15 @@ def puntaje(arma):
     # Rasgos de ballesta (2026-10-10): llega cargada ~ un disparo gratis cada dos turnos (3); apuntada: PdG que pide no moverse (la mitad de un PdG,
     # 1,75 por punto); atraviesa escudos: situacional (solo contra quien para con escudo, 1,5).
     firma += (3.0 if arma.get('cargada') else 0) + 1.75 * float(arma.get('apuntada') or 0) + (1.5 if arma.get('atraviesaEscudos') else 0)
+    if arma.get('armaDeRango'):   # mecánicas de arco (2026-10-11)
+        ed = arma.get('espaldaDistancia') or {}
+        arc = (TENSAR_FACTOR * float(arma.get('tensar') or 0) * TASA_STAT['pdg'] + LARGO_PC.get(int(arma.get('largoAlcance') or 0), 0)
+               + EMBOSCADA_FACTOR * min(float(arma.get('emboscada') or 0), max(0, tipo - 2)) * PESO_CRIT * FACTOR_CRIT.get(tipo, 1.0)
+               + MATABESTIAS_FACTOR * float(arma.get('matabestias') or 0) * factor_plano(tipo)
+               + MARCADO_FACTOR * float(arma.get('contraMarcado') or 0) * TASA_STAT['pdg']
+               + ESPALDA_DIST_FACTOR * (float(ed.get('pdg') or 0) * TASA_STAT['pdg'] + float(ed.get('fijo') or 0) * factor_plano(tipo))
+               + (AFINIDAD_PC if arma.get('afinidad') else 0))
+        if arc: d['mecánicas de arco'] = arc
     if firma: d['firma'] = firma   # mecánicas de firma (2026-10-03): sin Parry 2 · oportunidad sin No2 2 · −1 No2 en el primero 3 · +1 d20 en el crítico 3
     dx = round(float(arma.get('durExtra') or 0)) + ((float(arma['durPorPeso']) - 3) * peso if float(arma.get('durPorPeso') or 0) > 3 else 0)
     if dx:   # Resistente ×N / Frágil ×N (2026-10-04: durabilidad total de más o de menos; antes, por punto de Peso)
@@ -209,6 +218,14 @@ TASA_DUR = 0.25           # PC por cada punto de durabilidad de más
 DESCUENTO_DOS_MANOS = 0.75   # PC que resta usarla a dos manos (dueño, 2026-10-03: "baja un poquito el precio, no demasiado"): ~10 % del precio
 PRECIO_A, PRECIO_B = 27, 0.158   # precio = A · e^(B · PC): ~40 con 2,3 PC, ~90 con 7,5, ~150 con 11, ~400 con 17, ~1650 con 26
 RECARGO_COMBO = 0.10      # +10 % por cada extra después del primero
+# Mecánicas de arco (2026-10-11, docs/ideas-arcos-flechas.md, segunda ronda); valen en cualquier arma de rango.
+TENSAR_FACTOR = 0.3       # Tensar N: +N PdG pagando 1 No2 más: rinde ~0,3 de un PdG fijo (cuesta No2 cada vez)
+LARGO_PC = {1: 1.5, 2: 1.0}   # Largo alcance −1 / −2 PdG por casillero de más (hasta 4 más): poder disparar más lejos
+EMBOSCADA_FACTOR = 0.3    # Emboscada: el Crítico frecuente vale en un disparo por combate (~1 de cada 3–4)
+MATABESTIAS_FACTOR = 0.35 # Matabestias: daño fijo solo contra bestias (una parte de los rivales)
+MARCADO_FACTOR = 0.2      # Contra el Marcado: PdG solo contra un Marcado (hace falta marcarlo antes)
+ESPALDA_DIST_FACTOR = 0.35   # Espalda a distancia: como por la espalda, pero sin sigilo (un poco más fácil de lograr)
+AFINIDAD_PC = 0.75        # Afinidad elemental: +1 a cada dado elemental de las flechas especiales
 
 
 def extras(arma):
@@ -223,6 +240,7 @@ def extras(arma):
     n += sum(1 for k in ('cargada', 'apuntada', 'atraviesaEscudos') if arma.get(k))
     n += 1 if arma.get('armaDeRango') and not arma.get('arco') and arma.get('tiroAlto') else 0
     n += 1 if arma.get('armaDeRango') and (arma.get('ideal') or {}).get('donde') else 0
+    n += sum(1 for k in ('tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad') if arma.get('armaDeRango') and arma.get(k))
     return n
 
 

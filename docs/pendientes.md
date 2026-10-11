@@ -15,6 +15,13 @@
 >   dibujo permanente del lápiz puede ser pared (casilla «🧱 Con colisión» o el 🧱 del dibujo seleccionado; solo el GM), y el lápiz suma el estilo
 >   **📐 En rectas** (clic, clic…, con imán a las esquinas de los hexágonos). **Falta: que el dueño pegue las reglas** (`recto`, `colision` de los
 >   trazos) y probarlo en el mapa (`pruebas-en-el-mapa.md`).
+> - [ ] **🕊 Vuelo (2026-10-11, dueño, con los arcos: «todavía no diseñamos nada, pero eventualmente aparecerán creeps voladores — anotar para
+>   desarrollar: vuelo»):** creeps que vuelan o levitan. Cuando exista, los arcos «Contra lo que vuela o levita» (+PdG) ya están elegidos por el dueño
+>   (docs/ideas-arcos-flechas.md). Hoy existe Levitar (pies), que no es lo mismo.
+> - [ ] **🏹 Mecánicas de arco que faltan (2026-10-11):** hechas y en el catálogo (12 arcos nuevos, Común y Buena): Tensar, Largo alcance, Emboscada,
+>   Matabestias, Contra el Marcado, Espalda a distancia, Afinidad elemental, Perfora 1 y Corto alcance (Rango −2). **Faltan, para la Rara**: Tiro
+>   rápido, Arco rúnico, Arco que se calienta, Arco compuesto (medirlo antes: «miedo a que rompa todo») y la Flecha de empuje. Tensar solo lo
+>   ofrece la Botonera de un personaje (un creep o una invocación con un arco que tense, todavía no).
 > - [ ] **🎲 Prueba que falla a veces (2026-10-10):** «Plantillas · reposición (2026-10-07)» de `comun/pruebas.html` depende del azar y a veces da
 >   falso (el tercer valor); hay que fijarle la semilla o el caso para que no falle sola.
 > - [ ] **🔍 Revisión de las skills de clase ya auditadas (2026-10-10, pedido del dueño: «muchas las audité antes del menú de duelo»):** 33 auditadas;

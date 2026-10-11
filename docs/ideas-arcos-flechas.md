@@ -185,3 +185,20 @@ disparo) · 52 Arco que se calienta (+1 de daño por cada rival que cae en el co
 - **Skills, no mecánicas de arco:** Disparo doble (creep o Shooter) · Disparo de retirada · A la articulación (con crítico, Rengo o Lisiado seguro) ·
   Paciencia (pasiva: +2 PdG por cada turno sin disparar, con arcos) · Contra el recién descubierto (pasiva).
 - **No:** Derriba con crítico (Sentado no va con los proyectiles Tipo 4).
+
+### Hecho (2026-10-11)
+- **Programado** (`Combatiente.RASGOS_ARCO`, el mapa en `vtt-hexgrid/js/35-arcos.js`, el asistente de ítems, el glosario y la calculadora):
+  **Tensar N** (1 No2 más → +N PdG, se pregunta en cada disparo), **Largo alcance N** (hasta 4 casilleros más allá del alcance, −N PdG por cada uno),
+  **Emboscada N** (primer disparo desde que el mapa pasa a combate: Crítico frecuente +N), **Matabestias N** (+N de daño contra una bestia; el tipo
+  de criatura ahora es público), **Contra el Marcado N** (+N PdG), **Espalda a distancia** {PdG, daño} (todo el trayecto por el punto ciego del
+  objetivo, sin sigilo) y **Afinidad elemental** (+1 a cada dado elemental de las flechas especiales). Valen en cualquier arma de rango.
+- **Datos:** la Flecha de punta roma, archivada; las 4 flechas elementales (fuego, escarcha, relámpago, ácido) siempre en la góndola de la
+  Talabartería (`gondolaFija`), sin dejar de ser Buenas.
+- **12 arcos nuevos** (precio de la calculadora; el daño base, medido en la banda de los Comunes):
+  - Común: Arco del monte (1 dado +1, Matabestias +2, 50) · de batidor (1 dado +1, Iniciativa +1, Largo alcance −2, 55) · de acecho (1 dado,
+    Emboscada +2, 50) · de cuerda doble (1 dado +1, Tensar +2, 55) · de punta de hueso (1 dado +1, Perfora 1, 45) · del cuatrero (1 dado, Espalda a
+    distancia +2 PdG / +1 daño, 50) · petizo (Tipo 6, 1 dado +1, Rango −2, 30).
+  - Buena: Arco largo de cazador (Tipo 6, 2 dados, Rango +4, Largo alcance −1, 110) · de doble curva (2 dados, +1, Rango +4, Perfora 1, Tensar +2,
+    160) · del rastreador de bestias (Tipo 6, 2 dados, Rango +4, Matabestias +3, Contra el Marcado +2, 150) · de las brasas (2 dados, +1, Rango +4,
+    Afinidad elemental, 100) · de la sombra (2 dados, Rango +4, Emboscada +1, Espalda a distancia +2 PdG / +1 daño, 160).
+- **Falta (Rara en adelante):** Tiro rápido, Arco rúnico, Arco que se calienta, Arco compuesto y la Flecha de empuje.

@@ -129,7 +129,7 @@ setInterval(() => {
     if(d.v('absorbearmadura') > 0 && !d.absorbe && antes !== undefined && d.rota > antes) anillosAbsorber(id, t, antes);
   });
   if(modo !== anillosModo){
-    if(modo !== 'combate') primeraSangreUsadas.clear();
+    if(modo !== 'combate'){ primeraSangreUsadas.clear(); if(typeof emboscadaUsadas !== 'undefined') emboscadaUsadas.clear(); }   // + la Emboscada de los arcos (js/35)
     if(anillosModo === 'combate' && modo !== 'combate'){ autoRepararAlTerminar(); polillaAlTerminar(); if(typeof desarmarAlTerminar === 'function') desarmarAlTerminar(); }   // la piel de troll, la Polilla y Desarmar trampas (2026-10-08)
     anillosModo = modo;
   }

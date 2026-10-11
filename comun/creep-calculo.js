@@ -421,6 +421,7 @@ const CreepCalculo = (() => {
       armaNatural: sc.armaNatural === true,
       equipoNombres: (Array.isArray(sc.equipo) ? sc.equipo : []).map(it => nom(it && it.nombre)).filter(Boolean).slice(0, 30),
       notas: String(sc.notas || '').trim().slice(0, 600),
+      tipoCriatura: tipoDe(sc).slice(0, 30),   // el tipo de criatura (Matabestias de los arcos, 2026-10-11)
     };
   }
   // Alcance de su arma, en casilleros: un arma de rango usa su Rango; una de cuerpo a cuerpo, 1 + lo que le sume a Rango.

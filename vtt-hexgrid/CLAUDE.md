@@ -1503,3 +1503,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (`js/33-flechas.js`, hook `flechaErrada` del duelo, en la pantalla de quien disparó): **queda en el piso siempre**, en la casilla más lejana de su
   alcance siguiendo la línea del disparo; si choca contra un Sólido o la Colisión en el camino, moneda: 1 se rompe, 2 cae justo antes. Queda como un
   elemento `arma` (se levanta como un arma, js/27; se dibuja con 🏹). La Perfora de la flecha la aplica `dueloAplicarDano` (js/13): desde el 2026-10-10, N puntos del golpe pasan siempre la Defensa.
+
+- **🏹 Mecánicas de arco al apuntar** (2026-10-11, `js/35-arcos.js`): después de la línea de tiro y la apuntada, `arcoBonos(mio, t, ataque, tiro)`
+  suma al `tiro` del duelo el Largo alcance (más allá del alcance; los objetivos brillan hasta `Combatiente.alcanceMaximo`), la Emboscada
+  (`emboscadaUsadas`, se libera al volver a narrativo en js/25), Matabestias (`vinculo(t).tipoCriatura`, que lee js/09), Contra el Marcado
+  (`marcado(t)`) y Espalda a distancia (`arcoPorLaEspalda`: todas las casillas de `tiroCeldas` en la cuña ciega). `arcoTensar(ataque, msg, tiro)`
+  pregunta Tensar si quien dispara trae `msg.alTensar` (la Botonera nueva: `bnTensar`, js/11). La Afinidad elemental se aplica a la flecha en js/13.

@@ -269,6 +269,7 @@ function escucharVinculables(){
         o.armaNombre = String(d.armaNombre || '').trim();
         o.armaNatural = d.armaNatural === true;
         o.equipoNombres = Array.isArray(d.equipoNombres) ? d.equipoNombres.map(n => String(n || '').trim()).filter(Boolean) : [];
+        o.tipoCriatura = String(d.tipoCriatura || '').trim();   // Matabestias de los arcos (js/35, 2026-10-11)
       }
       mapa.set(ch.doc.id, o);
     });

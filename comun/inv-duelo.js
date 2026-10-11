@@ -147,7 +147,7 @@ const InvDuelo = (() => {
       rerollInfo: () => ({disponible: false}),
       flashOpciones: (d, campo) => {
         const inv = ui.inv(ladoDe(d, campo));
-        return (inv.habilidades || []).filter(h => Combatiente.flashPara(h.duelo, campo)).map(h => ({habId: h.id, nombre: h.nombre, bono: num(h.duelo.flash.bono), en: h.duelo.flash.en || [],
+        return (inv.habilidades || []).filter(h => Combatiente.flashPara(h.duelo, campo)).map(h => ({habId: h.id, nombre: h.nombre, bono: num(h.duelo.flash.bono), en: h.duelo.flash.en || [], ...(h.duelo.flash.dodge ? {dodge: true} : {}),
           costoTxt: ConfirmarTurno.textoFlash(costoFlash(h)), motivoNo: Combatiente.bloqueoHab(h, {hp: inv.hp}).toLowerCase()}));   // invocación: como un creep (cooldown)
       },
       flashUsar: (d, campo, modo, habId) => {

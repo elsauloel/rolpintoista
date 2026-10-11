@@ -1396,7 +1396,7 @@ const Duelo = (() => {
     return `<div class="duelo-flash"><div class="det">⚡ Flash (se declara antes de tirar · no cuesta No2):</div>${ops.map(o => {   // costoTxt: lo que cuesta (un creep: cooldown); si no, SP
       const on = flashSel[k] === o.habId;
       const vale = (o.en || []).map(e => ETQ_FLASH[e] || e).join(', ');
-      return `<button type="button" class="flash${on ? ' on' : ''}" data-flash="${_esc(campo)}:${_esc(o.habId)}"${o.motivoNo ? ' disabled' : ''} title="Vale para: ${_esc(vale)}">${on ? '✔ ' : ''}⚡ ${_esc(o.nombre)} +${_fmt(o.bono)}<small>${o.costoTxt ? _esc(o.costoTxt) : _fmt(o.costoSp) + ' SP'}${campo === 'eva' && (o.en || []).length ? ' · vale con ' + _esc((o.en || []).filter(e => e === 'eva' || e === 'parry').map(e => ETQ_FLASH[e]).join(' o ')) : ''}${o.motivoNo ? ' · ' + _esc(o.motivoNo) : ''}</small></button>`;
+      return `<button type="button" class="flash${on ? ' on' : ''}" data-flash="${_esc(campo)}:${_esc(o.habId)}"${o.motivoNo ? ' disabled' : ''} title="Vale para: ${_esc(vale)}">${on ? '✔ ' : ''}⚡ ${_esc(o.nombre)} +${_fmt(o.bono)}<small>${o.costoTxt ? _esc(o.costoTxt) : _fmt(o.costoSp) + ' SP'}${campo === 'eva' && (o.en || []).length ? ' · vale con ' + _esc((o.en || []).filter(e => e === 'eva' || e === 'parry').map(e => ETQ_FLASH[e]).join(' o ')) : ''}${o.dodge ? ' · si ganás, dodge roll' : ''}${o.motivoNo ? ' · ' + _esc(o.motivoNo) : ''}</small></button>`;
     }).join('')}</div>`;
   }
 

@@ -191,7 +191,7 @@ const FichaDuelo = (() => {
         const S = getS();
         const sp = FichaBotonera.spMaximo(S) - num(S.spGastado);
         return S.habilidades.filter(h => Combatiente.flashPara(FichaBotonera.dueloDe(h), campo))   // regla común (comun/combatiente.js)
-          .map(h => { const c = FichaBotonera.dueloDe(h).flash, costo = FichaHabilidades.parseCostoSp(h.costo); return {habId: h.id, nombre: h.nombre, bono: num(c.bono), en: c.en || [], costoSp: costo,
+          .map(h => { const c = FichaBotonera.dueloDe(h).flash, costo = FichaHabilidades.parseCostoSp(h.costo); return {habId: h.id, nombre: h.nombre, bono: num(c.bono), en: c.en || [], ...(c.dodge ? {dodge: true} : {}), costoSp: costo,
             costoTxt: ConfirmarTurno.textoFlash(costoFlashDe(h), {spAjeno: h.turnoAjenoSp}), motivoNo: costo > sp ? 'no te alcanzan los SP' : ''}; });
       },
       // Usarlo: «¿es tu turno?» — en turno ajeno cuesta el doble (P136); se cobra al contestar y el duelo suma el bono.

@@ -10,8 +10,6 @@
 
 ## Pendientes
 
-- [ ] **🪵 Tronco de huída** (2026-10-10): la Bruja ataca a juan; en la Evasión, juan marca el Flash (4 SP en turno ajeno), suma +2 y, si gana,
-  aparece el cartel del dodge roll: se mueve hasta 2 casilleros sin que lo frene una oportunidad. En un cono, la fase dodge de siempre.
 - [ ] **🧱 Paredes y 📐 lápiz en rectas** (2026-10-10, necesita las reglas nuevas pegadas): el GM dibuja en rectas con imán una habitación
   (clic, clic…, cerrar en el primer punto) con «🧱 Con colisión»; un token no puede salir cruzando la pared (se choca), los conos, la visión con
   niebla y el rango (R) no pasan del otro lado, una flecha choca. Un garabato a mano alzada con el 🧱 del dibujo seleccionado también. Sacarle la
@@ -38,6 +36,9 @@
 
 ## Probado
 
+- [x] **🪵 Tronco de huída** (2026-10-10, en el mapa): la Bruja atacó a juan; juan marcó el Flash «Tronco de huída +2» y eligió Evasión: 1d8 +2 ⚡ = 7
+  contra 6, esquivó gracias al +2. Apareció «🪵 juan esquivó: dodge roll»; lo arrastró 2 casilleros lejos del Coloso (al que se le dieron No2 para
+  que pudiera aprovechar): pagó sus 2 No2, el cartel se cerró solo y no hubo ataque de oportunidad ni aviso. Falta: el caso de un cono (la fase dodge).
 - [x] **😱 Expuesto y el dodge roll** (2026-10-10, en el mapa): el Coloso Expuesto (con +60 de Evasión de prueba) contra la Ráfaga arcana de
   juan: su Evasión salió «2d12+2d20 ÷2» = 17 contra 13, la ganó, y en vez del dodge roll la Mesa dijo «😱 Coloso … está Expuesto: no puede hacer
   el dodge roll y se queda en el área» y «no logró salir del área: efecto completo»; juan tiró el daño. (Detalle de texto, de antes: cuando quien

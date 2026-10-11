@@ -152,7 +152,7 @@ const CreepDuelo = (() => {
         const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
         const sc = deLado(lado);
         if(!sc) return [];
-        return (sc.habilidades || []).filter(h => Combatiente.flashPara(h.duelo, campo)).map(h => ({habId: h.id, nombre: h.nombre, bono: num(h.duelo.flash.bono), en: h.duelo.flash.en || [],
+        return (sc.habilidades || []).filter(h => Combatiente.flashPara(h.duelo, campo)).map(h => ({habId: h.id, nombre: h.nombre, bono: num(h.duelo.flash.bono), en: h.duelo.flash.en || [], ...(h.duelo.flash.dodge ? {dodge: true} : {}),
           costoTxt: costoFlashTxt(h), motivoNo: Combatiente.bloqueoHab(h, {hp: sc.hp}).toLowerCase()}));
       },
       flashUsar: (d, campo, modo, habId) => {

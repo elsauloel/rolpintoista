@@ -564,6 +564,13 @@ prueba('rasgos de ballesta (2026-10-10): llega cargada (gratis si no disparó el
     Combatiente.ataqueDeArma(guerra).apuntada, Combatiente.ataqueDeArma(asedio).atraviesaEscudos, !!Combatiente.ataqueDeArma(tranq).apuntada],
     [0, 4, 2, 0, 2, 2, true, false]);   // la de tranquera pasó a Recarga 2 (revisión de las Buenas, 2026-10-11)
 });
+prueba('Apuntar (Shooter, 2026-10-11): la X llega a los stacks de «Apuntando» y se lee de los estados', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'shooter').habilidades.find(h => h.id === 'shooter-apuntar');
+  const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 2});
+  const ef = ej.efectos[0];
+  igual([hab.costo, hab.nitrosCosto, ef.spec.nombre, ef.spec.stacks, Combatiente.apuntandoX([{nombre: 'Apuntando', stacks: 2}]), Combatiente.apuntandoX([{nombre: 'Apuntando', stacks: 9}]), Combatiente.apuntandoX([]),
+    FichaAcciones.estadoDeSpec(EstadosAplicar.limpiarSpec(ef.spec), []).turnos], ['X', 'X', 'Apuntando', 2, 2, 3, 0, 0]);
+});
 prueba('Heal (Support, 2026-10-11): 1d6+4 a un aliado o a uno mismo, y «conmigo» llega al duelo', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-heal');
   const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});

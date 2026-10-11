@@ -90,7 +90,7 @@ const CLASES_SKILLS = [
     skillSA("mago", "Control Mental", "SP 7. No2 3. Hechizo. Tira Esp contra (Esp + Res.M) de otro personaje. Si gana, lo controla y lo obliga a cualquier acción que no lo dañe a sí mismo. Pagás 1 SP y 1 No2 por cada No2 que gaste el controlado."),
   ]},
   {id: "shooter", nombre: "Shooter", habilidades: [
-    skillSA("shooter", "Apuntar", "SP X (X ≤ 3). X No2: +X a la PG y Crítico frecuente ×X en el próximo ataque a distancia (el rango del crítico nunca baja de 2)."),
+    {"id":"shooter-apuntar","nombre":"Apuntar","detalle":"Elegí X (de 1 a 3): pagás X SP y X No2 y quedás Apuntando: tu próximo disparo con un arma a distancia suma +X PdG y Crítico potente +X, aunque sea en otro turno (no vence: se gasta al disparar). Se suma con Tensar. ⚙ Automatizado: el estado y el bono del disparo (en el mapa).","costo":"X","nitrosCosto":"X","duelo":{"objetivo":"uno mismo","tira":"","contra":[],"efectos":[{"nombre":"Apuntando","stacks":"X","polaridad":"buff","detalle":"Tu próximo disparo con un arma a distancia: +X PdG y Crítico potente +X (lo cuenta la marca). Se gasta al disparar."}]},"modo":"auto"},
     skillSA("shooter", "Acelerado", "SP 1. Reduce el cooldown de un ataque. Repetible (+1 SP por repetición)."),
     skillSA("shooter", "Enfocado", "SP 1. +2 de daño al próximo ataque. Repetible (+1 SP por repetición)."),
     skillSA("shooter", "Parry a distancia", "SP 2. Flash. Realiza un ataque de rango como instantáneo. Si es respuesta a un ataque, tira Agilidad para cancelarlo."),

@@ -32,6 +32,7 @@ const Glosario = (() => {
     {titulo: 'Contra el Marcado', re: 'Contra el Marcado', texto: 'Contra el Marcado: PdG de más contra un objetivo Marcado (por ejemplo, con una Flecha marcadora). ⚙ Lo suma el mapa.'},
     {titulo: 'Espalda a distancia', re: 'Espalda a distancia', texto: 'Espalda a distancia: si todo el trayecto del disparo pasa por el punto ciego del objetivo (los casilleros de atrás, que no ve), suma ese bono. No hace falta estar en sigilo. ⚙ Lo mira el mapa.'},
     {titulo: 'Afinidad especial', re: 'Afinidad (?:especial|elemental)', texto: 'Afinidad especial: con este arco, el daño de las flechas especiales de fuego, hielo, eléctricas, tóxicas y de ácido suma +1.'},
+    {titulo: 'Apuntando', re: 'Apuntando', texto: 'Apuntando (Apuntar, del Shooter): tu próximo disparo con un arma a distancia suma +PdG y Crítico potente por cada stack (de 1 a 3), aunque sea en otro turno; se gasta al disparar. ⚙ Lo suma el mapa.'},
     {titulo: 'Flecha en la cuerda', re: 'Flecha en la cuerda', texto: 'Flecha en la cuerda: si no disparaste con este arco el turno anterior, el primer disparo del turno cuesta 1 No2 menos.'},
     {titulo: 'Encadenar', re: 'Encadenar', texto: 'Encadenar: si el disparo anterior de este turno pegó, el siguiente cuesta 1 No2 menos. ⚙ El mapa anota si pegó.'},
     {titulo: 'Respiración contenida', re: 'Respiración contenida', texto: 'Respiración contenida: el primer disparo del turno suma +2 PdG; si disparás de nuevo en el mismo turno, esos tienen −2.'},

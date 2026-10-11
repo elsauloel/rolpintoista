@@ -252,8 +252,10 @@ Salvo Carga Elemental, todas son **Hechizo (PG: Esp · Daño: Esp)**.
 
 ## Shooter ⏳
 
-1. **Apuntar** [X] — X No2: +X a la PG y al crítico en el próximo ataque a
-   distancia (X ≤ 3).
+1. ✅ **Apuntar** — **SP:** X. **No2:** X (X de 1 a 3, la misma). Quedás **Apuntando**: tu **próximo disparo con un arma a distancia** suma **+X PdG
+   y Crítico potente +X**, **aunque sea en otro turno** (no vence: se gasta al disparar). **Se suma con Tensar.** ⚙ Automatizado: el estado (con X stacks) y
+   el bono del disparo, en el mapa. *(Auditada 2026-10-11 con el dueño; original: «Apuntar [X] — X No2: +X a la PG y al crítico en el próximo ataque a
+   distancia (X ≤ 3).» El «crítico» pasó a ser Crítico potente: el frecuente en un Tipo 4 vale demasiado.)*
 2. **Acelerado** [1] — Reduce el cooldown de un ataque. Repetible (+1 SP
    por repetición).
 3. **Enfocado** [1] — +2 de daño al próximo ataque. Repetible (+1 SP por

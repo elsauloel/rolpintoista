@@ -40,6 +40,9 @@ function arcoEsBestia(t){
 // Los bonos de las mecánicas del arma contra ese objetivo → el tiro (o el mismo, si no suma nada).
 function arcoBonos(mio, t, ataque, tiro){
   if(!mio || !t || !ataque || !ataque.rango || ataque.hab) return tiro;
+  // 🎯 Apuntar (Shooter, 2026-10-11): +X PdG y Crítico potente +X en este disparo; el estado se gasta al disparar (arcoApuntarGastar, js/13).
+  const ax = Combatiente.apuntandoX(((vinculo(mio) || {}).resumen || {}).estados);
+  if(ax) tiro = arcoSumar(tiro, {pdg: ax, critpot: ax}, `apuntando (+${ax})`);
   const d = distanciaHex({col: mio.col, fila: mio.fila}, {col: t.col, fila: t.fila});
   const la = Combatiente.largoAlcance(ataque, d, ataque.alcance);
   if(la) tiro = arcoSumar(tiro, {pdg: la.pdg}, `largo alcance (${la.extra} de más)`);
@@ -87,6 +90,13 @@ function arcoBonos(mio, t, ataque, tiro){
    el último fue crítico (Racha); los golpes seguidos al mismo blanco (Lectura del viento); y, para Encadenar, si el último pegó (lo guarda en el
    personaje o el creep: el costo lo cobra su ficha). Lo actualiza arcoResuelto, con cada duelo que termina (hook disparoResuelto de js/14). */
 const arcoTurno = new Map(), arcoLectura = new Map(), arcoUltimo = new Map();
+// 🎯 Apuntar: el disparo ya salió con el bono; el estado se va (solo un personaje: lo saca de su ficha).
+async function arcoApuntarGastar(mio, ataque){
+  if(!mio || !ataque || !ataque.rango || ataque.hab || mio.tipo !== 'pj' || String(mio.fichaId).includes(SEP_INVOCACION)) return;
+  if(!Combatiente.apuntandoX(((vinculo(mio) || {}).resumen || {}).estados)) return;
+  try{ await editarPersonajeMapa(mio.fichaId, S => { const antes = (S.efectos || []).length; S.efectos = (S.efectos || []).filter(e => e.nombre !== Combatiente.APUNTANDO); return S.efectos.length !== antes; }); }
+  catch(err){ console.error('No se pudo gastar el Apuntar:', err); mesaLinea(`🎯 ${nombreDe(mio)}: sacale «Apuntando» a mano (ya disparó)`); }
+}
 // Contra lo sobrenatural (dueño, 2026-10-11: «no-muertos, demonios y criaturas interdimensionales», y los adefesios).
 const SOBRENATURAL = ['no-muerto', 'demonio', 'interdimensional', 'adefesio'];
 function arcoTipoCriatura(t, tipos, otros){

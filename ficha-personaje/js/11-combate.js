@@ -242,6 +242,8 @@ const habUi = {...combateUi,
     campoSp.disabled = !spVariable(it);
     campoNitros.value = nitrosVariable(it) ? Math.min(num(S.nitros), 1) : costoNitrosHab(it, arma);
     campoNitros.disabled = !nitrosVariable(it);
+    campoSp.oninput = spVariable(it) && nitrosVariable(it) ? () => { campoNitros.value = campoSp.value; } : null;   // la misma X en SP y No2 (Apuntar, 2026-10-11)
+    if(campoSp.oninput) campoNitros.value = campoSp.value;
     if(nitrosVariable(it) && !spVariable(it)) setTimeout(() => campoNitros.select(), 50);
     $('#costox-disponibles').textContent = `${fmt(num(S.nitros))} No2 y ${fmt(spMaximo() - num(S.spGastado))} SP`;
     const limN = limiteCostoX('nitros'), limS = limiteCostoX('sp');

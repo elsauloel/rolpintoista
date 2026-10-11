@@ -254,3 +254,20 @@ pagar 1 No2 para tensarla).
 ### Skills, no ballestas
 Golpe de gracia · Tiro raso (un aliado en el medio no tapa la línea) · Recuperar proyectiles (pasiva: al terminar el combate, cada flecha o virote
 especial que pegó vuelve con una moneda).
+
+## 2026-10-11 · Los bonos de las ballestas (lo que eligió el dueño al filtrar las Comunes)
+> «Que queden estos bonos como parte de la mecánica de ballestas.» El repertorio para diseñar ballestas (Comunes ya cargadas; Buenas, a filtrar):
+- **Base:** Tipo 4, Recarga 2 (dos disparos). Común 1d4+2…+4 con Perfora 0–1; Buena 2d4+4…+8 con Perfora 1–2. El precio del daño sale de la
+  planilla medida (`herramientas/tabla_ballestas.json`).
+- **Rompe armadura**, la casa: 25 %, 33 %, 50 % y 100 %; simple o **doble** (2 stacks por golpe); **seguro con crítico**; y **Atraviesa escudos** (si
+  paran el virote con escudo, 1 stack al que lo paró).
+- **Efectos al golpear:** Sangrado 33 %, Veneno ×2 33 %, Lisiado 25 %, Rengo 25 %.
+- **Rasgos:** Emboscada (Crít. frec. +2 en el primer disparo del combate), Remate (Crít. frec. +2 contra Sentado o Inmovilizado), Tensar +2, Crítico
+  potente +2, Llega cargada, Primer disparo −1 No2, Afinidad elemental, Matabestias +2, Alcance con caída −2, Doble cuerda; y debilidades como
+  Evasión −1.
+- **Para los arcos (no para las ballestas):** Espalda a distancia.
+
+**Las 25 Comunes cargadas:** de pared · de virote dentado · de tiro largo · del calderero · del matrero · de acecho · de mecha · del montero · del
+tropero · de tensión · de filo fino · del sereno · del herrero · de la grieta · del ariete · del leñador · del cincel · del carretero · de estribo · del
+baqueano · del rematador · del bandolero · del cantero · rompescudos (Perfora 1 · Atraviesa escudos) · de doble cuerda (1d4 · Perfora 1: con Perfora 1
+solo entra sin daño fijo, rompe el piso de +2). Archivadas: de mano, de cazador, de mira, de quemarropa, corta, de batida.

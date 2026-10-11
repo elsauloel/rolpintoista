@@ -2388,6 +2388,8 @@ const Duelo = (() => {
 
   // cfg.opcionesLocal(duelo) → opciones de defensa o null (el mapa del GM las calcula solo para un creep, sin cargar las Acciones).
   // cfg.aplicarEfecto(duelo, efecto) → {nota, manual?} (solo el mapa del GM): pone el estado del efecto sobre el defensor.
+  // cfg.aplicaSolo(duelo, efecto) → bool (opcional, 2026-10-11): qué efectos reclama esta pantalla; sin él, todos los que puede. La ficha suelta solo los de
+  // su personaje (antes, con dos personajes del mismo jugador, la ficha de uno reclamaba el efecto del otro y lo dejaba «a mano»).
   // cfg.aplicar(duelo) → info (solo el mapa del GM): aplica el daño al HP del defensor y devuelve lo que pasó.
   // cfg.relay(lado, mensaje) (el mapa): cómo mandarle un pedido al iframe de la ficha o de las Acciones del dueño de ese lado.
   function escuchar(cfg){
@@ -2506,6 +2508,7 @@ const Duelo = (() => {
           (d.efectos || []).forEach((ef, i) => {
             const clave = d.id + ':' + i;
             if(ef.aplicar !== 'pedido' || ef.aplicado || aplicando.has(clave)) return;
+            if(cfgEscuchar.aplicaSolo && !soyGM() && !cfgEscuchar.aplicaSolo(d, ef)) return;
             const sp = specDeEfecto(ef);
             if(sp && sp.nombre === 'Demora' && !cfgEscuchar.aplicaDemora) return;   // el orden de turnos lo mueve el mapa
             aplicando.add(clave);

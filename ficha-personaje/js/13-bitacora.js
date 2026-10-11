@@ -242,7 +242,8 @@ bitacoraRender();  // estado inicial: sin conexión hasta entrar a la partida
 // Se llama cuando ya se entró a la mesa: arranca las tiradas y abre el
 // último personaje de esta pestaña (o de este navegador).
 async function fbAlEntrar(){
-  if(window.parent === window && typeof Duelo !== 'undefined') Duelo.escuchar({aplicarEfecto: dueloAplicarEfectoPropio});   // aviso «te están atacando» (en el mapa lo escucha el propio mapa); aplicarEfecto: solo para lo que sea sobre uno mismo, ver dueloAplicarEfectoPropio
+  if(window.parent === window && typeof Duelo !== 'undefined') Duelo.escuchar({aplicarEfecto: dueloAplicarEfectoPropio, aplicaSolo: (d, ef) => !!(d.defensor && d.defensor.tipo === 'pj' && fichaVivo && d.defensor.ref === fichaVivo.id)
+    && Duelo.specDeEfecto(ef) && Duelo.specDeEfecto(ef).nombre !== 'Miti-Miti'});   // solo lo de su personaje; Miti-Miti lo resuelve el mapa (va sobre quien la usa)   // aviso «te están atacando» (en el mapa lo escucha el propio mapa); aplicarEfecto: solo para lo que sea sobre uno mismo, ver dueloAplicarEfectoPropio
   bitacoraEscuchar();
   if(typeof Pausa !== 'undefined') Pausa.iniciar({donde: 'ficha'});   // ⏸ la pausa de la partida: el cartel (2026-10-10)
   fichaIdentidadRender();

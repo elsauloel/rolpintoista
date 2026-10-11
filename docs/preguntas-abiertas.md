@@ -958,3 +958,7 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   pared va siempre por los bordes y no hay duda). Un garabato a mano que cruza un hexágono por el medio deja que un token se pare ahí. Opciones:
   (1) dejarlo así; (2) cerrar el hexágono si la línea pasa cerca de su centro (por ejemplo, a menos de un tercio del radio); (3) cerrar todo
   hexágono que la línea toque (pared «gruesa», como la Colisión de casilleros). Propuesta de Claude: la (2). **El dueño lo define conversando.**
+- ❓ **P193. Tronco de huída: ¿2 SP fijos o el doble en turno ajeno? — 2026-10-10** (auditoría de skills de clase, Asalto). Todo Flash cuesta el
+  doble en turno ajeno (P136). Tronco de huída casi siempre se usa en el turno del rival (es una defensa), así que con la regla común costaría 4 SP.
+  **El dueño la dejó en 2 SP fijos** (`turnoAjenoSp: "2"`), con la duda para el grupo (anotada en 🛠 Herramientas de diseño → Preguntas):
+  ¿los Flash defensivos deberían pagar igual el doble, o tener su propio costo de turno ajeno?

@@ -150,7 +150,7 @@ cuesta 1 por defecto (`jobBudget`, 3 puntos + 3 por nivel).
    regla nueva del orden de turnos: quien ya jugó la ronda no repite aunque
    algo lo mueva más abajo.)*
 8. **Sprint** [1] — 2 No2: avanza 3 casillas.
-9. ✅ **Tronco de huída** — **SP:** 2 (⚡ Flash: el doble en turno ajeno). **No2:** 0.
+9. ✅ **Tronco de huída** — **SP:** 2 (⚡ Flash; 2 también en turno ajeno, decisión del dueño, en duda para el grupo: P193). **No2:** 0.
    Al defenderte con Evasión (duelo o área), +2 a esa tirada; si ganás, dodge
    roll: hasta 2 casilleros pagando sus No2, sin ataque de oportunidad, aunque
    el ataque no lo dé (golpe directo, cono, onda). *(Auditada 2026-10-10 con el

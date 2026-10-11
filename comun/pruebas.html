@@ -2291,11 +2291,11 @@ prueba('Degollar (2026-10-10): +4 PdG, +7, +1/+1 al crítico, termina el turno; 
     filtradas.map(o => o.modo), sinNada.length, Combatiente.expuesto(S.efectos), venc.quedan.length, /deja/i.test(deg.detalle) || /orden de turnos/.test(deg.detalle)],
     ['7', 'ATAQUE', 4, 7, 1, 1, true, true, 'Expuesto', true, true, 1, 0, ['Expuesto'], ['evasion'], 2, true, 0, true]);
 });
-prueba('Tronco de huída (2026-10-10): Flash +2 a la Evasión con dodge roll; 2 SP, el doble en turno ajeno', () => {
+prueba('Tronco de huída (2026-10-10): Flash +2 a la Evasión con dodge roll; 2 SP fijos (también en turno ajeno)', () => {
   const tr = CLASES_SKILLS.find(x => x.id === 'asalto').habilidades.find(x => x.id === 'asalto-tronco-de-huida');
   igual([tr.costo, tr.nitrosCosto, tr.duelo.modo, tr.duelo.flash.bono, tr.duelo.flash.dodge, Combatiente.flashPara(tr.duelo, 'eva', 'evasion'),
-    Combatiente.flashPara(tr.duelo, 'eva', 'parry'), Combatiente.flashPara(tr.duelo, 'pdg'), Combatiente.esFlash(tr), Combatiente.costoFlash({sp: 2}, false).sp],
-    ['2', 0, 'flash', 2, true, true, false, false, true, 4]);
+    Combatiente.flashPara(tr.duelo, 'eva', 'parry'), Combatiente.flashPara(tr.duelo, 'pdg'), Combatiente.esFlash(tr), Combatiente.costoFlash({sp: 2}, false, {spAjeno: tr.turnoAjenoSp}).sp],
+    ['2', 0, 'flash', 2, true, true, false, false, true, 2]);
 });
 prueba('Cargas: la que gasta la última se apaga y no se ve, su ataque la sigue sumando, y se va al pasar el turno (2026-10-10)', () => {
   const pre = estadosPresetFicha().find(p => p.nombre === 'Arma envenenada');

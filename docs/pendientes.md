@@ -15,6 +15,8 @@
 >   dibujo permanente del lápiz puede ser pared (casilla «🧱 Con colisión» o el 🧱 del dibujo seleccionado; solo el GM), y el lápiz suma el estilo
 >   **📐 En rectas** (clic, clic…, con imán a las esquinas de los hexágonos). **Falta: que el dueño pegue las reglas** (`recto`, `colision` de los
 >   trazos) y probarlo en el mapa (`pruebas-en-el-mapa.md`).
+> - [ ] **🎲 Prueba que falla a veces (2026-10-10):** «Plantillas · reposición (2026-10-07)» de `comun/pruebas.html` depende del azar y a veces da
+>   falso (el tercer valor); hay que fijarle la semilla o el caso para que no falle sola.
 > - [x] **⏸ Pausar la partida** — hecho 2026-10-10 (`comun/pausa.js`; botón en el mapa del GM y en GM Tools). **Falta: que el dueño pegue las
 >   reglas nuevas** (`ajustes/pausa`, `pausaLog`) y probarlo en el mapa (ver `pruebas-en-el-mapa.md`). Lo pedido: el GM pausa la partida al terminar una sesión.
 >   Hasta la próxima, los jugadores pueden entrar y tocar su ficha (cambios, compras…), pero **no explorar el mapa**. Todo lo que hagan los

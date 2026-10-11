@@ -687,7 +687,7 @@ const FichaAcciones = (() => {
       && !(await confirmar(`${it.nombre} se usa una vez por turno, y ya la usaste en este. ¿Usarla igual?`))) return;
     // ⚡ Flash (2026-10-07, la Expelliarmus): se puede usar en turno ajeno, y ahí el SP cuesta el doble (la regla de siempre del Flash).
     if(e.flash && spFijo === undefined && !sinSp && !forzar && typeof ConfirmarTurno !== 'undefined'){
-      const p = await ConfirmarTurno.flash(`⚡ ${it.nombre}`, {sp: c.sp}, {ident: {nombre: ((S.meta && S.meta.nombre) || '').trim(), ref: ui.yo ? (ui.yo() || {}).ref : ''}});
+      const p = await ConfirmarTurno.flash(`⚡ ${it.nombre}`, {sp: c.sp}, {spAjeno: it.turnoAjenoSp, ident: {nombre: ((S.meta && S.meta.nombre) || '').trim(), ref: ui.yo ? (ui.yo() || {}).ref : ''}});
       if(!p) return;
       spFijo = num(p.sp);
     }

@@ -641,7 +641,9 @@ function bnDispararFlecha(flechaId, arma){
   const nCarg = Math.round(num(arma && arma.cargador)), kCarg = bn.fichaId;
   if(costo && nCarg > 0 && modoMapa === 'combate' && num(cargadorUsados.get(kCarg)) < nCarg){
     cargadorUsados.set(kCarg, num(cargadorUsados.get(kCarg)) + 1);
-    mesaLinea(`🎯 ${((S.meta && S.meta.nombre) || 'Alguien').trim()} disparó ${f.nombre} del cargador: no cobra su No2 (${cargadorUsados.get(kCarg)} de ${nCarg} del combate)`, 'recordatorio');
+    const quien = ((S.meta && S.meta.nombre) || 'Alguien').trim();   // en un arco, el mismo rasgo se llama «Flecha de más» (2026-10-11)
+    mesaLinea(arma && arma.arco ? `🏹 ${quien} disparó ${f.nombre} · Flecha de más: no cobra su No2 (${cargadorUsados.get(kCarg)} de ${nCarg} del combate)`
+      : `🎯 ${quien} disparó ${f.nombre} del cargador: no cobra su No2 (${cargadorUsados.get(kCarg)} de ${nCarg} del combate)`, 'recordatorio');
     costo = 0;
   }
   S.ataquesArma = S.ataquesArma || {};   // (se vacía al empezar el turno)

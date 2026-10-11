@@ -18,6 +18,11 @@
 > - [ ] **🕊 Vuelo (2026-10-11, dueño, con los arcos: «todavía no diseñamos nada, pero eventualmente aparecerán creeps voladores — anotar para
 >   desarrollar: vuelo»):** creeps que vuelan o levitan. Cuando exista, los arcos «Contra lo que vuela o levita» (+PdG) ya están elegidos por el dueño
 >   (docs/ideas-arcos-flechas.md). Hoy existe Levitar (pies), que no es lo mismo.
+> - [ ] **🏷 Clasificar los tipos de creeps (2026-10-11, dueño: «anotá como pendiente clasificar los tipos de creeps»):** hoy un creep puede ser humano,
+>   humanoide, bestia, planta, elemental, constructo, no-muerto, alienígena y, desde el 2026-10-11, demonio, interdimensional y adefesio (los sumó el
+>   dueño con «Contra lo sobrenatural» de los arcos). A ordenar: qué es cada tipo y dónde termina uno y empieza otro (¿alienígena vs. interdimensional?,
+>   ¿adefesio vs. demonio?), revisar el tipo de los creeps de fábrica (`comun/creeps-base.js`) y de la biblioteca, y lo que depende del tipo: Matabestias,
+>   Contra humanos, Contra lo sobrenatural, el arma natural, el oro, las pasivas por familia y, a futuro, los drops por arquetipo (el punto de abajo).
 > - [ ] **🎁 Drops de consumibles por arquetipo de creep (2026-10-11, dueño: «proyecto a futuro, lo dejo anotado para no olvidarme; lo veremos con
 >   tiempo»):** afinar lo que dejan los enemigos, ordenado por temática: **grupos de consumibles vinculados a arquetipos de creeps**. Ejemplos del
 >   dueño: el que usa arco o ballesta tiene chances de dejar **flechas y virotes especiales**; el que hace magia, más chances de **pergaminos y

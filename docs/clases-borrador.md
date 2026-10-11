@@ -345,7 +345,9 @@ ya tenían este mismo formato (número azul, Maldición Esp / Res.M):
    tipo 1. El peso del proyectil es igual a la vida gastada.
 8. **Transfusión sanguínea** [1] — Transfiere hasta 20 de HP de un
    personaje aliado a otro.
-9. **Veneno** [2] — Maldición (Esp / Res.M). Aplica 3 stacks de veneno.
+9. ✅ **Veneno** — **SP:** 2. **No2:** 1. Maldición: tirás **PdG.Esp contra el Res.Esp** de un enemigo dentro de tu Rango; si ganás, le dejás
+   **3 stacks de Veneno** (se suman al que ya tenga). Empate: la regla general. ⚙ Automatizado en el duelo. *(Auditada 2026-10-11 con el dueño;
+   original: «Veneno [2] — Maldición (Esp / Res.M). Aplica 3 stacks de veneno.» La tirada pasó de Especial a PdG.Esp, como Taunt.)*
 10. ✅ **Nube tóxica** [3] — SP 3, No2 1. Marcás el centro en el mapa; queda una nube de diámetro 3 (radio 1)
     durante 3 turnos. Cada rival que entra, o que sigue adentro en el Mantenimiento, resiste con Res.Esp contra
     tu Especial (tirado una sola vez, al lanzarla); quien pierde queda con 3 stacks de Veneno — una vez

@@ -564,6 +564,12 @@ prueba('rasgos de ballesta (2026-10-10): llega cargada (gratis si no disparó el
     Combatiente.ataqueDeArma(guerra).apuntada, Combatiente.ataqueDeArma(asedio).atraviesaEscudos, !!Combatiente.ataqueDeArma(tranq).apuntada],
     [0, 4, 2, 0, 2, 2, true, false]);   // la de tranquera pasó a Recarga 2 (revisión de las Buenas, 2026-10-11)
 });
+prueba('Veneno (Debuffer, 2026-10-11): PdG.Esp contra Res.Esp y 3 stacks de Veneno', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-veneno');
+  const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});
+  igual([hab.costo, hab.nitrosCosto, ej.objetivo, ej.tira.stat, ej.contra.map(c => c.stat), ej.efectos[0].spec.nombre, ej.efectos[0].spec.stacks, /Sin auditar/.test(hab.detalle)],
+    ['2', 1, 'enemigo', 'pdgmg', ['resmg'], 'Veneno', 3, false]);
+});
 prueba('Apuntar (Shooter, 2026-10-11): la X llega a los stacks de «Apuntando» y se lee de los estados', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'shooter').habilidades.find(h => h.id === 'shooter-apuntar');
   const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 2});

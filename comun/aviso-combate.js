@@ -37,7 +37,8 @@ const AvisoCombate = (() => {
   }
   /* `grilla: true` (2026-10-08, la Varita del caos): los botones en una grilla, para elegir entre muchos.
      Paso a paso (2026-10-04, trampas: «cada tirada en su momento y cada resultado anunciado»): `botones: [{texto, alClic, sec, deshabilitado}]`
-     reemplazan a «Entendido» (la tirada que toca ahora; `detalle`: una línea chica debajo del texto del botón, ej. qué hace el arma, 2026-10-04); un paso con `espera: true` es el que falta (punteado). Con `clave`, volver a llamar
+     reemplazan a «Entendido» (la tirada que toca ahora; `detalle`: una línea chica debajo del texto del botón, ej. qué hace el arma, 2026-10-04;
+     `fila: true` (2026-10-11, el desplegable de las flechas especiales): el botón ocupa todo el ancho, alineado a la izquierda, como un renglón de una lista); un paso con `espera: true` es el que falta (punteado). Con `clave`, volver a llamar
      con la misma clave redibuja la ventana abierta sin cerrarla (ni llamar a alCerrar). */
   function mostrar(o){
     o = o || {};
@@ -58,7 +59,7 @@ const AvisoCombate = (() => {
         ${v ? `<div class="duelo-veredicto ${TONO[v.tono] || 'bloqueado'}"><div class="grande">${e(v.grande)}</div>${v.chico ? `<div class="chico">${e(v.chico)}</div>` : ''}</div>` : ''}
         ${o.aMano ? `<div class="aviso-mano">✋ ${e(o.aMano)}</div>` : ''}
         <div class="duelo-pie"${o.grilla ? ' style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px"' : ''}>${botones.length
-          ? botones.map((b, i) => `<button type="button" data-aviso-b="${i}"${b.sec ? ' class="sec"' : ''}${b.titulo ? ` title="${e(b.titulo)}"` : ''}${b.deshabilitado ? ' disabled' : ''}>${e(b.texto)}${b.detalle ? `<small style="display:block;font-weight:400;font-size:12px;line-height:1.35;opacity:.88;margin-top:4px;white-space:normal;text-align:left">${e(b.detalle)}</small>` : ''}</button>`).join('')
+          ? botones.map((b, i) => `<button type="button" data-aviso-b="${i}"${b.sec ? ' class="sec"' : ''}${b.fila ? ' style="flex:1 1 100%;text-align:left;padding:7px 12px"' : ''}${b.titulo ? ` title="${e(b.titulo)}"` : ''}${b.deshabilitado ? ' disabled' : ''}>${e(b.texto)}${b.detalle ? `<small style="display:block;font-weight:400;font-size:12px;line-height:1.35;opacity:.88;margin-top:4px;white-space:normal;text-align:left">${e(b.detalle)}</small>` : ''}</button>`).join('')
           : `<button type="button" data-aviso-ok>${e(o.boton || 'Entendido')}</button>`}</div>
       </div>
     </div>`;

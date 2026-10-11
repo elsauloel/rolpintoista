@@ -619,13 +619,18 @@ function bnPreguntarTipoAtaque(arma, otro){
 /* 🏹 ¿Qué flecha? (2026-10-09, dueño; docs/ideas-arcos-flechas.md): atacar con un arco con flechas especiales en el carcaj pregunta cuál (la común
    no se gasta). La flecha se gasta y cobra su No2 al disparar (cuando se crea el duelo); sus efectos son siempre (sin %). Un carcaj veloz
    (`saqueRapido` = N, dueño 2026-10-09): las primeras N flechas especiales del turno que cuestan No2 tiran una moneda; 2 = ese disparo no lo cobra
-   (Buena 1, Rara 2, Excepcional 3: rara vez se dispara más de 2 o 3 veces por turno, así que la primera es la que más vale). */
-function bnElegirFlecha(arma, flechas, alElegir){
-  const vir = Combatiente.municionDe(arma) === 'virote', cosa = vir ? 'virote' : 'flecha';   // la ballesta dispara virotes (2026-10-10)
-  AvisoCombate.mostrar({icono: '🏹', titulo: `¿Qué ${cosa}? · ${arma ? arma.nombre : 'arco'}`, texto: `Los ${cosa}s comunes no se gastan. Un${vir ? '' : 'a'} especial se gasta al disparar${vir ? 'lo' : 'la'}, pegue o no, y su efecto entra siempre que pegue.`,
-    botones: [{texto: vir ? '🏹 Virote común' : '🏹 Flecha común', detalle: 'sin costo extra', alClic: () => { AvisoCombate.cerrar(); alElegir(''); }},
-      ...flechas.map(f => ({texto: `${f.nombre} ×${fmt(num(f.unidades) || 1)}`, detalle: FichaEquipo.flechaTxt(f), alClic: () => { AvisoCombate.cerrar(); alElegir(f.id); }}))],
-    grilla: flechas.length > 3});
+   (Buena 1, Rara 2, Excepcional 3: rara vez se dispara más de 2 o 3 veces por turno, así que la primera es la que más vale).
+   Dos botones y un desplegable (dueño, 2026-10-11: «cuando tenés flechas especiales, que aparezca flecha común / flecha especial, y al apretar
+   especial un desplegable con las especiales más ordenaditas; si no, con mucha variedad se despelota el menú»): «Flecha especial ▾» abre abajo
+   la lista, un renglón por flecha, ordenada por nombre. */
+function bnElegirFlecha(arma, flechas, alElegir, abierto){
+  const vir = Combatiente.municionDe(arma) === 'virote', cosa = vir ? 'virote' : 'flecha', Cosa = vir ? 'Virote' : 'Flecha';   // la ballesta dispara virotes (2026-10-10)
+  const total = flechas.reduce((t, f) => t + (num(f.unidades) || 1), 0);
+  const lista = [...flechas].sort((a, b) => String(a.nombre).localeCompare(String(b.nombre), 'es'));
+  AvisoCombate.mostrar({clave: 'elegir-flecha', icono: '🏹', titulo: `¿Qué ${cosa}? · ${arma ? arma.nombre : 'arco'}`, texto: `Los ${cosa}s comunes no se gastan. Un${vir ? '' : 'a'} especial se gasta al disparar${vir ? 'lo' : 'la'}, pegue o no, y su efecto entra siempre que pegue.`,
+    botones: [{texto: `🏹 ${Cosa} común`, detalle: 'sin costo extra', alClic: () => { AvisoCombate.cerrar(); alElegir(''); }},
+      {texto: `✨ ${Cosa} especial ${abierto ? '▴' : '▾'}`, sec: !!abierto, detalle: `${fmt(total)} en el carcaj · ${flechas.length === 1 ? '1 clase' : `${flechas.length} clases`}`, alClic: () => bnElegirFlecha(arma, flechas, alElegir, !abierto)},
+      ...(abierto ? lista.map(f => ({fila: true, texto: `${f.nombre} ×${fmt(num(f.unidades) || 1)}`, detalle: FichaEquipo.flechaTxt(f), alClic: () => { AvisoCombate.cerrar(); alElegir(f.id); }})) : [])]});
 }
 function bnDispararFlecha(flechaId, arma){
   const S = bn.S, c = FichaEquipo.carcajDe(S), f = c && (c.flechas || []).find(x => x.id === flechaId);

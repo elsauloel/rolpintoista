@@ -136,3 +136,35 @@ Drena vida ✔, Resistente ✔, Matabestias / matagente ⚙, contra lo que levit
   $45) no tiene daño extra: Parálisis 1 turno garantizada y salta una vez (50 % de Parálisis al segundo); la de Tormenta (Rara, +3 No2, $150): +2d4
   eléctrico que salta a la mitad (con 1 se corta), Parálisis al blanco y 50 % / 25 % a los dos siguientes. **Envenenada**: Perfora 1 + Veneno ×3 (el
   veneno sigue necesitando que pase el daño: para eso perfora).
+
+## Segunda ronda: mecánicas de arco (2026-10-11, lluvia de ideas para podar)
+El dueño: «siento que es más acotado en efectos que otras armas». Mismo protocolo que con las armas cuerpo a cuerpo: el dueño marca **sí / no /
+desde tal calidad**. ✔ = la mecánica ya existe en el juego (solo falta ponerla en un arco).
+
+**A. Ritmo y tensar:** 1 Tensar (1 No2 extra antes de disparar: +2 PdG o +1 dado) · 2 Disparo doble (dos flechas al mismo objetivo, −2 PdG cada
+una) · 3 Ráfaga (una flecha a cada uno de hasta 3 objetivos en un cono, una sola PdG) · 4 Tiro rápido (los disparos después del primero −1 No2) ·
+5 Llega cargado (si no disparó el turno anterior, el primero suma +2 de daño) · 6 ✔ Primer disparo del turno −1 No2.
+**B. Distancia y posición:** 7 ✔ Tirador quieto (+PdG si no se movió) · 8 Disparo de retirada (un paso atrás gratis, sin oportunidad) · 9 Tiro en
+movimiento (disparar a mitad del movimiento) · 10 Largo alcance (más allá del Rango con −1 PdG por casillero) · 11 ✔ Distancia ideal con dos franjas
+distintas · 12 Contra el que se acerca (+PdG contra un rival que se movió hacia vos este turno) · 13 Distancia mínima menor (tira con 1 casillero
+libre en el medio) · 14 Altura (+PdG desde un elemento alto, cuando haya alturas).
+**C. Crítico y precisión:** 15 ✔ +1 d20 en el crítico · 16 ✔ Ignora Resistencia a crítico · 17 Emboscada (primer disparo del combate: Crítico
+frecuente +2) · 18 El crítico no cuesta No2 · 19 ✔ El crítico marca · 20 A la articulación (con crítico, Rengo o Lisiado seguro) · 21 Paciencia
+(+1 PdG por turno sin disparar, hasta +3).
+**D. Sobre el objetivo:** 22 Matabestias (+daño contra bestias) · 23 Contra lo que vuela o levita (+PdG) · 24 Contra el Marcado (+PdG o +daño) ·
+25 Contra el que estaba en sigilo y lo acaban de descubrir (+daño) · 26 Empuje 1 casillero · 27 ✔ Clava contra una pared (Inmovilizado) ·
+28 ✔ Silbadora (Demora) · 29 ✔ Derriba (Sentado) con crítico.
+**E. Cobertura y defensa:** 30 Fuego de cobertura (un aliado al lado del objetivo suma +1 Evasión hasta tu próximo turno) · 31 Supresión (si
+pega, el objetivo paga +1 No2 por casillero para acercarse a vos en su turno) · 32 Guardia (+1 Evasión con el arco en las manos si no disparaste
+este turno) · 33 Arco con hojas (rompe la regla: deja pegar cuerpo a cuerpo con el arco, débil).
+**F. Sigilo y caza:** 34 Disparo silencioso (disparar no rompe el sigilo, o con tirada) · 35 Por la espalda a distancia (el primer disparo desde el
+sigilo cuenta como por la espalda) · 36 Rastro (el objetivo queda a la vista en la niebla N turnos) · 37 Detonador (disparar a una trampa propia
+la dispara) · 38 Señuelo (una flecha que suena en una casilla: los creeps de cerca miran hacia ahí).
+**G. Utilidad:** 39 ✔ Mira (+Visión o +Percepción) · 40 ✔ Iniciativa +N · 41 Garfio o soga (moverse hasta un punto) · 42 ✔ Disparo de señal (luz).
+**H. El arco y sus flechas:** 43 Afinidad (con un tipo de flecha, su efecto +1) · 44 Recupera (una flecha especial que erra vuelve al carcaj con
+moneda) · 45 Arco rúnico (sus flechas comunes hacen daño elemental, desde Rara) · 46 Doble carga (dos flechas especiales a la vez).
+**I. Identidad del arco:** 47 Arco de guerra (suma la Fuerza entera) · 48 Arco compuesto (suma la mitad de la Destreza en vez de la Fuerza: el arco
+del Shooter) · 49 Arco arcano (suma la mitad del Efecto especial) · 50 Arco de mano (Tipo 4, una mano) · 51 Arco maldito (+daño, pero −1 HP por
+disparo) · 52 Arco que se calienta (+1 de daño por cada rival que cae en el combate).
+**J. Debilidades (abaratan):** 53 Ruidoso (rompe el sigilo siempre) · 54 ✔ Frágil · 55 Pesado (−1 Evasión equipado) · 56 Corto alcance (Rango −2) ·
+57 Cuerda floja (si todos los dados salen 1, se corta: 1 No2 para arreglarla) · 58 ✔ Sin tiro alto.

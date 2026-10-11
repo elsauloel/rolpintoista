@@ -35,7 +35,7 @@
 ## Probado
 
 - [x] **🧱 Paredes y 📐 lápiz en rectas** (2026-10-10, en el mapa, con las reglas pegadas): el GM dibujó en rectas, con imán y «🧱 Con colisión», 5
-  puntos sobre las esquinas del casillero de juan (arriba, izquierda y abajo); se guardó (, ) y se ve en las dos pantallas (borde
+  puntos sobre las esquinas del casillero de juan (arriba, izquierda y abajo); se guardó (en rectas y con colisión) y se ve en las dos pantallas (borde
   oscuro y línea roja cortada). juan no pudo cruzarla (el arrastre no armó camino), mientras que por el lado abierto sí (pidió No2). Su rango (R) se
   abre solo hacia la derecha. Un garabato a mano alzada: el 🧱 del dibujo seleccionado lo volvió pared («Ese dibujo ahora es una pared…») y
   otra vez lo sacó («ya no es una pared»). La casilla de colisión y el 🧱 son solo del GM.

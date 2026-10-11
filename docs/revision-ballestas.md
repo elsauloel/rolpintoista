@@ -59,3 +59,10 @@ vale al menos lo de una Buena** (a nivel 1 dispara dos veces y una 1d6 pelada ya
 | Ballesta remachadora | 2d6+1 · Perfora 1 · R2 → **2d6+2 · Perfora 1 · R2** | 38 % → **46 %** | 170 → 150 | Buena Calidad |  |
 | Ballesta virotera | 2d6+2 · R2 → **2d6+3 · R2** | 18 % → **33 %** | 190 → 160 | Buena Calidad | Con sus tres bonos le queda 2d6+3 (33 %): floja. Propuesta: dejar Cargador y Carcaj integrado y sacar el Virote recuperable. |
 
+## ✅ Aplicado (2026-10-11, OK del dueño)
+Todas las Comunes y Buenas perdieron el Rango de bono (queda el de la Destreza; el Rango −1 de la corta sigue). Las Comunes pasaron a Recarga 3 y las
+Buenas a Recarga 2, con el daño de la tabla de arriba. Recortes: la de doble cuerda **pasó a Buena** (con Recarga 3 su mecánica la dejaba en el borde)
+→ 2d6+2 · Perfora 1; la de tranquera, Recarga 2 y 2d6 · Perfora 2 con Llega cargada (150); la del rastreador sin «ignora 1 de Res. crítico» (3d6+1);
+la de vigía sin la caída (2d6+3); la de mira corta con PdG +1 de 1 a 3 (2d6+3); la del acechador sin la Emboscada (2d6+3); la virotera sin el
+virote recuperable (2d6+4); la abollacascos con Rompe armadura 25 % (3d6+1). Las de dos mecánicas o una mecánica cara quedan con menos daño de base
+(Comunes ~50 %, Buenas ~35–55 %), como los arcos: su mecánica pone el resto.

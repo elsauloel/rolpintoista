@@ -562,7 +562,7 @@ prueba('rasgos de ballesta (2026-10-10): llega cargada (gratis si no disparó el
   igual([FichaCombate.costoAtaque(S0, tranq), FichaCombate.costoAtaque(S1, tranq), FichaCombate.costoAtaque(S2, tranq),
     CreepCalculo.costoAtaque(creep), CreepCalculo.costoAtaque({...creep, descargada: true}),
     Combatiente.ataqueDeArma(guerra).apuntada, Combatiente.ataqueDeArma(asedio).atraviesaEscudos, !!Combatiente.ataqueDeArma(tranq).apuntada],
-    [0, 6, 3, 0, 2, 2, true, false]);
+    [0, 4, 2, 0, 2, 2, true, false]);   // la de tranquera pasó a Recarga 2 (revisión de las Buenas, 2026-10-11)
 });
 prueba('la distancia ideal de un arma de rango: dónde está y qué da (2026-10-09)', () => {
   const arco = (ideal) => ({armaDeRango: true, arco: true, ideal});

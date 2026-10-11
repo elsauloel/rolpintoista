@@ -10,6 +10,7 @@
 
 ## Pendientes
 
+- [ ] **🎯 Ballestas revisadas** (2026-10-11): una Común (Recarga 3) cobra 3, 6, 9 No2; una Buena (Recarga 2) 2, 4, 6; ninguna trae Rango de bono.
 - [ ] **⚔ Tabla de turnos minimizada** (2026-10-11): achicada, la cabecera dice «⚔ Turno: *nombre*» de quien tiene el turno (si quien mira lo ve;
   si no, «Orden de turnos»); al pasar el turno cambia sola; agrandada vuelve a «Orden de turnos».
 - [ ] **🎯 Mecánicas de ballesta nuevas** (2026-10-11): con las ballestas nuevas del catálogo, en combate: **Doble cuerda** (2, 2, 6 No2) y **Tiro

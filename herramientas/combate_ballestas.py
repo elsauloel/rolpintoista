@@ -48,14 +48,21 @@ def costo(arma, h):
     if arma.get('dobleCuerda') and h == 1: return rc
     return rc * (h + 1)
 
-def pelea(arma, clase, nivel, blanco, rondas, sentado=False, bestia=False):
+def pelea(arma, clase, nivel, blanco, rondas, sentado=False, bestia=False, caso=False):
+    """`caso` (2026-10-11, arcos): el blanco cumple todas las condiciones del arma — Sentado (Remate), bestia (Matabestias), se movió 3 o más
+    (Contra el que corre), humano (Contra humanos), adefesio (Contra adefesios), y el arquero está a su distancia ideal."""
+    if caso: sentado = bestia = True
     o = BB.opciones()
     d = dict(B.blancos(nivel, o)[blanco])
     at = B.atributos(clase, nivel)
     defensa, total = d['defensa'], 0.0
+    ideal = (arma.get('ideal') or {}) if caso else {}
+    pdg_fijo = (int(arma.get('contraCorre') or 0) if caso else 0) + int(ideal.get('pdg') or 0) - (2 if arma.get('arcoDuro') and at['fue'] < int(arma['arcoDuro']) else 0)
+    dano_fijo = (int(arma.get('matagente') or 0) + int(arma.get('mataadefesios') or 0) + int(ideal.get('fijo') or 0)) if caso else 0
+    lectura = 0   # Lectura del viento: golpes seguidos al mismo blanco (hasta 3)
     sangra, veneno = [0, 0], 0  # Sangrado [stacks = daño por turno, turnos que quedan] y stacks de Veneno
-    frec0 = sum(m['val'] for m in arma.get('mods') or [] if m['stat'] == 'crit')
-    pot = sum(m['val'] for m in arma.get('mods') or [] if m['stat'] == 'critpot')
+    frec0 = sum(m['val'] for m in arma.get('mods') or [] if m['stat'] == 'crit') + int(ideal.get('crit') or 0)
+    pot = sum(m['val'] for m in arma.get('mods') or [] if m['stat'] == 'critpot') + int(ideal.get('critpot') or 0)
     pdg_arma = sum(m['val'] for m in arma.get('mods') or [] if m['stat'] == 'pdg')   # el PdG +N del arma
     primero, disparo_anterior = True, False
     for r in range(rondas):
@@ -63,19 +70,27 @@ def pelea(arma, clase, nivel, blanco, rondas, sentado=False, bestia=False):
         if sangra[1] > 0: total += sangra[0]; sangra[1] -= 1
         if sangra[1] == 0: sangra[0] = 0
         if veneno: total += veneno; veneno -= 1
-        no2, h, disparo_este = at['agl'], 0, False
+        no2, h, disparo_este, pego_ant, racha = at['agl'], 0, False, False, 0
         while True:
             c = costo(arma, h)
             if h == 0 and arma.get('cargada') and not disparo_anterior and r > 0 or (h == 0 and arma.get('cargada') and r == 0): c = 0
             if h == 0: c = max(0, c - int(arma.get('ahorroNitros') or 0))
+            if h == 0 and arma.get('enCuerda') and not disparo_anterior: c = max(0, c - 1)   # Flecha en la cuerda
+            if h > 0 and arma.get('encadenar') and pego_ant: c = max(0, c - 1)              # Encadenar
             if c > no2: break
             no2 -= c
-            pdg = pdg_arma
+            pdg = pdg_arma + pdg_fijo + (min(3, lectura) if arma.get('lectura') else 0)
+            if arma.get('respiracion'): pdg += 2 if h == 0 else -2
+            if primero: pdg += int(arma.get('emboscadaPdg') or 0)
             if arma.get('tensar') and no2 >= 1 and (costo(arma, h + 1) > no2 - 1 or True):   # tensa si le alcanza (aunque le saque un disparo, no: se fija abajo)
                 if no2 - 1 >= 0 and (costo(arma, h + 1) > no2 or costo(arma, h + 1) <= no2 - 1): no2 -= 1; pdg += int(arma['tensar'])
-            frec = frec0 + (int(arma.get('emboscada') or 0) if primero else 0) + (int(arma.get('remate') or 0) if sentado else 0)
-            pego, dmg, crit = disparo(at, arma, d, defensa, frec, pot, pdg)
+            frec = frec0 + (int(arma.get('emboscada') or 0) if primero else 0) + (int(arma.get('remate') or 0) if sentado else 0) + racha
+            pot_t = pot + (int(arma.get('emboscadaPot') or 0) if primero else 0)
+            pego, dmg, crit = disparo(at, arma, d, defensa, frec, pot_t, pdg)
             if pego and bestia: dmg += int(arma.get('matabestias') or 0)
+            if pego: dmg += dano_fijo
+            pego_ant, racha = pego, (1 if arma.get('racha') and crit else 0)
+            lectura = lectura + 1 if pego else 0
             total += dmg
             if pego:
                 for e in arma.get('efectosGolpe') or []:
@@ -114,17 +129,21 @@ def main():
         if it.get('archivo') or it.get('soloBotin') or not es or it['tier'] != a.calidad.replace('Buena', 'Buena Calidad') and it['tier'] != a.calidad: continue
         bal.append(it)
     clases = a.clases.split(',')
-    esc = [('liviano', False, False), ('medio', False, False), ('pesado', False, False), ('pesado', True, False), ('medio', False, True)]
-    nom_esc = ['liviano', 'medio', 'pesado', 'pesado Sentado', 'bestia (medio)']
-    base = {(c, n): melee(c, a.nivel, b, a.rondas) for c in clases for (b, s, be), n in zip(esc, nom_esc)}
+    if a.familia == 'arco':   # los arcos: un solo «en su caso» (el medio, con todas las condiciones del arco)
+        esc = [('liviano', False, False, False), ('medio', False, False, False), ('pesado', False, False, False), ('medio', False, False, True)]
+        nom_esc = ['liviano', 'medio', 'pesado', 'en su caso']
+    else:
+        esc = [('liviano', False, False, False), ('medio', False, False, False), ('pesado', False, False, False), ('pesado', True, False, False), ('medio', False, True, False)]
+        nom_esc = ['liviano', 'medio', 'pesado', 'pesado Sentado', 'bestia (medio)']
+    base = {(c, n): melee(c, a.nivel, b, a.rondas) for c in clases for (b, s, be, ca), n in zip(esc, nom_esc)}
     print(f'Nivel {a.nivel} · {a.rondas} rondas · daño total con la ballesta ÷ con su mejor cuerpo a cuerpo (100 % = lo mismo)')
     print('Cuerpo a cuerpo de referencia (daño total): ' + ' · '.join(f"{c} " + '/'.join(f"{base[(c, n)]:.0f}" for n in nom_esc[:3]) for c in clases))
     for it in bal:
         fila = []
         for c in clases:
             vals = []
-            for (b, s, be), n in zip(esc, nom_esc):
-                tot = sum(pelea(it, c, a.nivel, b, a.rondas, s, be)[0] for _ in range(a.n)) / a.n
+            for (b, s, be, ca), n in zip(esc, nom_esc):
+                tot = sum(pelea(it, c, a.nivel, b, a.rondas, s, be, ca)[0] for _ in range(a.n)) / a.n
                 vals.append(tot / max(0.5, base[(c, n)]))
             fila.append((c, vals))
         dfin = sum(pelea(it, 'Shooter', a.nivel, 'pesado', a.rondas)[1] for _ in range(400)) / 400

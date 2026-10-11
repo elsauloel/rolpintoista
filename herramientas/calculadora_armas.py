@@ -72,6 +72,23 @@ def rinde_ballesta(tipo, dados, fijo, perfora, recarga):
     e = TABLA_BAL.get(f'{tipo}|{dados}|{fijo}|{perfora}|{recarga}')
     return None if e is None else 0.7 * e['medio'] + 0.3 * min(1.5, e['pesado'])
 BAL_R2_MIN = 7.5       # una ballesta con Recarga 2 vale al menos lo de una Buena
+# La planilla de los arcos (2026-10-11, tabla_arcos.py → tabla_arcos.json): lo mismo para los arcos (Tipo, dados, daño fijo, Perfora), medido en el
+# nivel 1 (Común) y en el 3 (Buena). El arco pelado vale lo que rinde: si en el nivel 3 entra en la banda de una Buena (74 % o más), por esa escala
+# (74 % → 9 · 106 % → 11); si no, por la de la Común en el nivel 1 (74 % → 5,5 · 106 % → 7,5); rinde = 0,7 × medio + 0,3 × pesado (el pesado, hasta
+# 1,5), como las ballestas. El Rango 4 de todo arco es parte del arco pelado: se cobra solo lo que pasa de 4 (ARCO_RANGO_BASE).
+ARCO_RANGO_BASE = 4
+def _tabla_arc():
+    import json, os
+    f = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tabla_arcos.json')
+    try: return json.load(open(f, encoding='utf-8'))['bases']
+    except Exception: return {}
+TABLA_ARC = _tabla_arc()
+def dano_arco(tipo, dados, fijo, perfora):
+    e = TABLA_ARC.get(f'{tipo}|{dados}|{fijo}|{perfora}')
+    if e is None: return None
+    r = {n: 0.7 * e[n]['medio'] + 0.3 * min(1.5, e[n]['pesado']) for n in ('n1', 'n3')}
+    v1 = 5.5 + (r['n1'] - 0.74) / 0.32 * 2.0
+    return max(v1, 9.0 + (r['n3'] - 0.74) / 0.32 * 2.0) if r['n3'] >= 0.74 else v1
 PERFORA_VALOR = 0.8   # lo que vale cada punto de Perfora frente a +1 de daño fijo (docs/ideas-arcos-flechas.md)
 PERFORA_CASA = {'punzante': 1.0, 'cortante': 1.25}   # la casa de la Perfora cuerpo a cuerpo: las dagas (Tipo 4); en las espadas (Tipo 6), habilitada (dueño, 2026-10-10)
 RECARGA_FACTOR = {1: 1.0, 2: 1.0, 3: 0.9}
@@ -134,7 +151,10 @@ def puntaje(arma):
     d = {'daño': (peso + amp) * (tipo + 1) / 2 + (fijo + (PERFORA_VALOR * perf if rango else 0)) * factor_plano(tipo)}
     if perf and not rango:   # cuerpo a cuerpo: la casa de la Perfora es el Tipo 4 (dueño, 2026-10-10); en el Tipo 6, habilitada; en el resto, fuera de casa
         d['perfora'] = PERFORA_VALOR * perf * factor_plano(tipo) * PERFORA_CASA.get(familia(arma), 1.5)
-    if arma.get('armaDeRango') and arma.get('arco'): d['daño'] *= DESCUENTO_ARCO
+    if arma.get('armaDeRango') and arma.get('arco'):
+        da = dano_arco(tipo, peso + amp, int(fijo), int(perf))
+        if da is not None: d['daño'] = da + TASA_PESO * peso + (DESCUENTO_DOS_MANOS if arma.get('tipoItem') == 'arma_2m' else 0)   # la planilla (lo medido)
+        else: d['daño'] *= DESCUENTO_ARCO
     elif arma.get('armaDeRango') and int(arma.get('recarga') or 0) > 0 and int(arma['recarga']) not in BAL_DANO: d['daño'] *= DESCUENTO_BALLESTA * RECARGA_FACTOR.get(int(arma['recarga']), 1.0)
     rcb = int(arma.get('recarga') or 0) if rango and not arma.get('arco') else 0
     rinde_bal = rinde_ballesta(tipo, peso + amp, int(fijo), int(perf), rcb) if rcb else None
@@ -156,6 +176,8 @@ def puntaje(arma):
                 crit += min(v, 6) * PESO_CRIT * PESO_CRITPOT * K_EFECTO
         elif st == 'dmg':
             bonos += v * TASA_STAT['dmg'] * factor_plano(tipo)
+        elif st == 'rng' and arma.get('arco') and dano_arco(tipo, peso + amp, int(fijo), int(perf)) is not None:   # el arco: solo lo que pasa del Rango base
+            bonos += (v - ARCO_RANGO_BASE) * TASA_STAT['rng']
         elif st == 'rng' and not arma.get('armaDeRango'):   # Alcance cuerpo a cuerpo: el 1.º punto deja pegar sin estar adyacente (vale mucho); los siguientes, menos
             fuera = 1.0 if 'rng' in STATS_CASA.get(fam, ()) else 1.25
             bonos += (ALCANCE_PRIMERO + max(0.0, v - 1) * ALCANCE_EXTRA) * fuera if v > 0 else v * ALCANCE_EXTRA

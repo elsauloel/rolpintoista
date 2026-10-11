@@ -379,3 +379,20 @@ corto 150 % · rastreador 109 % · pastor 96 % · tiro ligero 93 % · rama 72 % 
 Rango, Crítico potente, distancia ideal, Iniciativa, ahorro de No2, Lisiado). **Cambios (OK del dueño):** Arco corto 2d4+1 → **2d4** (~109 %, el
 arco común de referencia; precio 50 → 40); Arco de liebrero 1d4+1 → **1d4+2** (~91 %; 60 → 75). Los otros cinco, como estaban. Después: lluvia de
 ideas de mecánicas de arco (el dueño siente que son más acotadas que las de cuerpo a cuerpo) — ver `ideas-arcos-flechas.md`.
+
+## 2026-10-11 · Ballestas: medidas de nuevo, con las reglas reales (Común y Buena; dueño: «las raras para arriba, ignoralas»)
+`balance_combate.py` no modelaba la Recarga (cobraba como un arma: 3 y 6) ni la Perfora nueva (N pasan siempre): las medidas anteriores estaban
+corridas. Ahora sí (`--bal-recarga`, `--bal-perfora`), y `herramientas/balance_ballestas.py` barre la escalera. Shooter, ballesta ÷ su mejor cuerpo a
+cuerpo, blanco medio (banda buscada: 74–106 %), 8000 tiradas:
+
+| Calidad | Lo que mide |
+|---|---|
+| Común (nivel 1) | **1d6 pelado = 103 %** · 1d6+1 = 130 % · 1d6 Perfora 1 = 127 % · Perfora 2 = 137 % · con Recarga 3: 1d6+2 = 82 %, 1d6+3 = 100 % |
+| Buena (nivel 3) | 2d6+3 = 32 % · 2d6+4 = 52 % · **2d6+5 = 82 %** · 3d6+1 = 72 % · **3d6+2 = 98 %** · 2d6+2 Perfora 2 = 72 % · 2d6+2 Perfora 3 = 106 % |
+
+**Lo que pasa:** a nivel 1 la Recarga 2 deja al Shooter disparar dos veces (2 + 4 = 6 de sus 8 No2) y con la espada pega una (3 + 6 = 9): con un
+1d6 pelado ya está en el techo, y casi todas las Comunes del catálogo (Perfora o daño fijo) quedan en 120–190 %. A nivel 3 la Defensa media es 10:
+lo que no llega a ~12 de promedio rebota, y casi todas las Buenas (2d6+0…+2, Perfora 1–2) quedan en 4–70 %. La Perfora rinde ~1,3 de daño fijo a
+nivel 1 y ~1,5 a nivel 3. La Recarga 3 solo cambia algo a nivel 1 (a nivel 3 el Shooter dispara dos veces igual).
+**La calculadora:** cobra 1d6 pelado como 1,5 puntos (debería rondar 7) y 3d6+2 como 7,9 (debería rondar 11). Hay que decidir la escalera antes de
+calibrarla (ver la pregunta al dueño).

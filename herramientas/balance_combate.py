@@ -74,7 +74,8 @@ FAMILIAS = ['Daga T4', 'Espada T6', 'Hacha T8', 'Maza T10', 'Arco T4']
 BAL_FIJO = {1: 3, 3: 4, 5: 5}
 def arma(fam, nivel, o):
     if fam.startswith('Ballesta'):
-        return dict(tipo=o.bal_tipo, dados=o.bal_dados if o.bal_dados else DADOS_NIVEL[nivel], rango=True, fijo=(o.bal_fijo if o.bal_fijo is not None else BAL_FIJO[nivel]), ballesta=True)
+        return dict(tipo=o.bal_tipo, dados=o.bal_dados if o.bal_dados else DADOS_NIVEL[nivel], rango=True, fijo=(o.bal_fijo if o.bal_fijo is not None else BAL_FIJO[nivel]), ballesta=True,
+                    perfora=o.bal_perfora, recarga=o.bal_recarga)
     t = int(fam.split('T')[-1])
     if fam == 'Arco T4':   # el arco: Tipo 4 o 6 (el dado es el Tipo; dueño, 2026-10-09), con sus dados y su daño fijo (palancas)
         return dict(tipo=o.arco_tipo, dados=o.arco_dados, rango=True, fijo=o.arco_fijo)
@@ -96,7 +97,8 @@ def golpe(at, a, d, o):
         v = r.count(20); b = max(r)
         return dano * (4 * v if v >= 2 else 4 if b >= 20 else 3 if b >= 17 else 2 if b >= 7 else 1)
     defensa = d['defensa'] * o.def_mult * (1 - (o.perfora if a['tipo'] == 4 else 0)) * (1 - (o.arco_perfora if a['rango'] else 0))
-    return max(0, dano - math.ceil(defensa))
+    # Perfora N (2026-10-10): N puntos del golpe pasan siempre la Defensa; el resto va contra ella (nunca menos de N ni más que el golpe).
+    return max(0, dano - math.ceil(defensa), min(a.get('perfora', 0), dano))
 
 def ataques_por_turno(no2, tipo, o=None):
     n, gasto = 0, 0
@@ -106,6 +108,10 @@ def ataques_por_turno(no2, tipo, o=None):
         if gasto + c > no2: return n
         gasto += c; n += 1
 
+def disparos_recarga(no2, r):   # la Recarga N (2026-10-10): N, 2N, 3N… No2 por disparo en el turno
+    k, gasto = 0, 0
+    while gasto + r * (k + 1) <= no2: gasto += r * (k + 1); k += 1
+    return k
 def recargas(no2):   # la ballesta como varita: 1 No2 el primer disparo del turno, +1 por cada uno más (1, 2, 3…)
     k, gasto = 0, 0
     while gasto + k + 1 <= no2: gasto += k + 1; k += 1
@@ -119,7 +125,8 @@ def tabla(nivel, blanco, o, N):
         for fam in FAMILIAS + ([f'Ballesta T{o.bal_tipo}'] if o.ballesta else []):
             a = arma(fam, nivel, o)
             por = sum(golpe(at, a, d, o) for _ in range(N)) / N
-            k = ataques_por_turno(at['agl'], a['tipo'], o) if not (a.get('ballesta') and o.bal_costo == 'varita') else recargas(at['agl'])
+            k = (disparos_recarga(at['agl'], a['recarga']) if a.get('ballesta') and a.get('recarga') else
+                 recargas(at['agl']) if a.get('ballesta') and o.bal_costo == 'varita' else ataques_por_turno(at['agl'], a['tipo'], o))
             fila[fam] = None if k == 0 else por * k   # None: no le alcanzan los No2 para un ataque con esa arma
         filas[clase] = fila
     return d, filas
@@ -150,6 +157,8 @@ def main():
     ap.add_argument('--bal-tipo', type=int, default=6, help='Tipo de la ballesta (sus dados y su crítico)')
     ap.add_argument('--bal-dados', type=float, default=0, help='dados de la ballesta (0 = los de la calidad del nivel)')
     ap.add_argument('--bal-fijo', type=int, default=None, help='daño fijo de la ballesta (por defecto 3 / 4 / 5 por nivel)')
+    ap.add_argument('--bal-recarga', type=int, default=2, help='Recarga de la ballesta: el disparo cuesta N, 2N, 3N… (0 = como dice --bal-costo)')
+    ap.add_argument('--bal-perfora', type=int, default=0, help='Perfora N de la ballesta: N puntos del golpe pasan siempre la Defensa')
     ap.add_argument('--bal-costo', default='arma', help="cómo cobra el disparo: 'arma' (Tipo ÷ 2 y después el Tipo) o 'varita' (1, 2, 3…)")
     ap.add_argument('--clases', default='', help='solo estas clases, separadas por coma')
     ap.add_argument('--metas', action='store_true', help='en vez de las tablas, el resumen de las metas del paso 2')

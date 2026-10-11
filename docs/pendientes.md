@@ -11,6 +11,9 @@
 >   ya existe (estado con `cargas` y `golpe`, `Combatiente.gastarCarga`). Los óleos del Bazar ya están (aprobados y cargados 2026-10-10):
 >   Óleo venenoso (Común, 1 carga, +2 y Veneno ×3, 35) y Óleo venenoso concentrado (Buena, 2 cargas, +3 y Veneno ×3, 75) —; después otros
 >   (fuego, sangrado, piedras de afilar…).
+> - [ ] **🧱 Paredes de línea fina (colisión dibujada a mano), 2026-10-10, dueño: «después de Degollar seguimos con las líneas con
+>   colisión»:** dibujar un garabato libre (como el lápiz «Libre») que corte el paso y la vista entre casilleros sin ocupar casilleros
+>   enteros, para calcar el borde de una habitación del dibujo de fondo. Hoy existe 🧱 Colisión del mapa, pero pinta casilleros enteros.
 > - [x] **⏸ Pausar la partida** — hecho 2026-10-10 (`comun/pausa.js`; botón en el mapa del GM y en GM Tools). **Falta: que el dueño pegue las
 >   reglas nuevas** (`ajustes/pausa`, `pausaLog`) y probarlo en el mapa (ver `pruebas-en-el-mapa.md`). Lo pedido: el GM pausa la partida al terminar una sesión.
 >   Hasta la próxima, los jugadores pueden entrar y tocar su ficha (cambios, compras…), pero **no explorar el mapa**. Todo lo que hagan los

@@ -672,7 +672,8 @@ function dueloElegirObjetivoMapa(msg){
     resaltar();
     elegirDestino(async h => {
       const todos = [...tokens.entries()].map(([id, t]) => ({...t, id}));   // los tokens del mapa no traen su id adentro: es la clave del Map
-      const cand = todos.filter(t => t.col === h.col && t.fila === h.fila && !propio(t) && (!t.oculto || soyGM) && !tapadoPorNiebla(t));   // la niebla: no se apunta adentro
+      const conmigo = !!(ataque && ataque.hab && ataque.hab.objetivo === 'aliado' && ataque.hab.conmigo);   // «un aliado o vos mismo» (Heal, 2026-10-11)
+      const cand = todos.filter(t => t.col === h.col && t.fila === h.fila && (conmigo || !propio(t)) && (!t.oculto || soyGM) && !tapadoPorNiebla(t));   // la niebla: no se apunta adentro
       if(!cand.length){ toast('Ahí no hay otro token: hacé clic sobre el que querés atacar'); pedir(); return; }
       let t = cand[0];
       if(esValido && !esValido(t)){

@@ -564,6 +564,12 @@ prueba('rasgos de ballesta (2026-10-10): llega cargada (gratis si no disparó el
     Combatiente.ataqueDeArma(guerra).apuntada, Combatiente.ataqueDeArma(asedio).atraviesaEscudos, !!Combatiente.ataqueDeArma(tranq).apuntada],
     [0, 4, 2, 0, 2, 2, true, false]);   // la de tranquera pasó a Recarga 2 (revisión de las Buenas, 2026-10-11)
 });
+prueba('Heal (Support, 2026-10-11): 1d6+4 a un aliado o a uno mismo, y «conmigo» llega al duelo', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-heal');
+  const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});
+  const lh = Duelo.limpiarHab(ej);
+  igual([hab.costo, hab.nitrosCosto, ej.objetivo, ej.conmigo, lh.conmigo, Duelo.limpiarHab({...ej, objetivo: 'enemigo'}).conmigo, /Sin auditar/.test(hab.detalle)], ['2', 1, 'aliado', true, true, undefined, false]);
+});
 prueba('Miti-Miti (Tanque, 2026-10-11): la marca guarda a quién protege, en el mapa y en la ficha, y la skill está auditada', () => {
   const sp = {nombre: 'Miti-Miti', turnos: 1, polaridad: 'buff', protege: 'ficha-juan', protegeNombre: 'juan'};
   const c = EstadosAplicar.componer(sp), l = EstadosAplicar.limpiarSpec(sp), f = FichaAcciones.estadoDeSpec(l, []);

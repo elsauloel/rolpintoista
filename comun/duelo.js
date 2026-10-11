@@ -574,6 +574,7 @@ const Duelo = (() => {
     return {nombre: txtCorto(h.nombre, 60), objetivo, tira: t, contra, dano, efectos, sinOposicion: !(t && contra.length),
       ...((objetivo === 'onda' || objetivo === 'cono') && h.dodge ? {dodge: true} : {}),
       ...(objetivo === 'onda' && h.conVista ? {conVista: true} : {}),   // la luz: solo a los que ve (los sólidos la tapan)
+      ...(objetivo === 'aliado' && h.conmigo ? {conmigo: true} : {}),   // un aliado o uno mismo (Heal, 2026-10-11)
       ...(h.zonaQueda ? {zonaQueda: {turnos: Math.min(6, Math.max(1, Math.round(_num(h.zonaQueda.turnos)) || 1)), nombre: txtCorto(h.zonaQueda.nombre || '', 40),
         ...(h.zonaQueda.dano ? {dano: txtCorto(h.zonaQueda.dano, 12)} : {}), ...(h.zonaQueda.tipoDano ? {tipoDano: txtCorto(h.zonaQueda.tipoDano, 20)} : {}),
         ...(h.zonaQueda.estado ? {estado: {nombre: txtCorto(h.zonaQueda.estado.nombre || '', 40), ...(h.zonaQueda.estado.turnos ? {turnos: _num(h.zonaQueda.estado.turnos)} : {})}} : {}),

@@ -291,7 +291,9 @@ verifica con 1d20: hasta DES×2 → 7+; hasta DES×3 → 17+; más de DES×3 →
 1. **Empower** [2] — NO2: (0). +3 a cualquier tirada propia o de un
    aliado.
 2. **Blessing** [5] — +1 fijo en todas las tiradas por 2 turnos.
-3. **Heal** [2] — NO2: (1). Cura 4 + 1d6 HP.
+3. ✅ **Heal** — **SP:** 2. **No2:** 1. Curás **1d6+4** de vida (se tira al usarla) **a vos o a un aliado a la vista** (dentro de tu Rango),
+   **sin pasar la vida máxima**. **Sobre alguien caído (en 0) no hace nada**: para eso hace falta revivirlo. ⚙ Automatizado: la tirada y la cura (objetivo
+   «aliado» con `conmigo`: se puede elegir el propio token). *(Auditada 2026-10-11 con el dueño; original: «Heal [2] — NO2: (1). Cura 4 + 1d6 HP.»)*
 4. **Shield** [2] — Flash (SP x 2). Otorga un blindaje temporal que
    absorbe 14 de HP hasta el final del turno.
 5. **Acelerador** [1] — Marca una casilla con flechitas para adelante

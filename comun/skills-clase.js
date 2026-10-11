@@ -104,7 +104,7 @@ const CLASES_SKILLS = [
   {id: "support", nombre: "Support", habilidades: [
     skillSA("support", "Empower", "SP 2. No2 0. +3 a cualquier tirada propia o de un aliado."),
     skillSA("support", "Blessing", "SP 5. +1 fijo en todas las tiradas por 2 turnos."),
-    skillSA("support", "Heal", "SP 2. No2 1. Cura 4 + 1d6 HP."),
+    {"id":"support-heal","nombre":"Heal","detalle":"Curás 1d6+4 de vida (se tira al usarla) a vos o a un aliado a la vista (dentro de tu Rango), sin pasar su vida máxima. Sobre alguien caído (en 0) no hace nada: para eso hace falta revivirlo. ⚙ Automatizado: la tirada y la cura.","costo":"2","nitrosCosto":1,"duelo":{"objetivo":"aliado","conmigo":true,"tira":"","contra":[],"alcance":"rango","efectos":[{"cura":"1d6+4"}]},"modo":"auto"},
     skillSA("support", "Shield", "SP 2. Flash (SP x 2). Blindaje temporal que absorbe 14 de HP hasta el final del turno."),
     skillSA("support", "Acelerador", "SP 1. Marca una casilla con flechitas (>>). Cada aliado que la pisa obtiene +2 No2 (máx. una vez por turno). Dura 10 turnos."),
     skillSA("support", "Endurecimiento", "SP 5. Armadura temporal: Defensa 3, Res. Mágica 3, reduce críticos de todo tipo. Dura 2 turnos."),

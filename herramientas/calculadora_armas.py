@@ -56,6 +56,7 @@ DESCUENTO_BALLESTA = 0.7
 # 82 % → 6, 1d6+3 = 100 % → 7; Recarga 2 (desde Buena): 2d6+3 = 32 % → 8, 2d6+5 = 82 % → 10,4, 3d6+2 = 98 % → 10,8, 2d6+2 Perfora 3 = 106 % → 11.
 BAL_DANO = {3: (1.0, 1.45), 2: (1.2, -2.85)}   # Recarga → (k, c): PC del daño = k × promedio + c
 BAL_PERFORA_EQ = 1.15  # un punto de Perfora en una ballesta rinde ~1,2–1,5 de daño fijo contra el blanco medio
+BAL_IGNORA_MULT = 2.0   # en una ballesta, ignorar Resistencia a crítico vale el doble (medido: a nivel 3, «ignora 1» lleva al Shooter de ~70 % a ~240 %)
 BAL_R2_MIN = 7.5       # una ballesta con Recarga 2 vale al menos lo de una Buena
 PERFORA_VALOR = 0.8   # lo que vale cada punto de Perfora frente a +1 de daño fijo (docs/ideas-arcos-flechas.md)
 PERFORA_CASA = {'punzante': 1.0, 'cortante': 1.25}   # la casa de la Perfora cuerpo a cuerpo: las dagas (Tipo 4); en las espadas (Tipo 6), habilitada (dueño, 2026-10-10)
@@ -174,7 +175,7 @@ def puntaje(arma):
         if e.get('seguroCritico') and not e.get('soloCritico'): prob = min(1.0, prob + (1 - prob) * P_CRITICO)   # con crítico entra seguro
         ef += base * escala * prob * K_EFECTO * modulacion(nombre, fam)
     if arma.get('ignoraResistCrit'):   # el campo nuevo del arma (2026-10-03): igual que el efecto viejo «Ignora N», siempre
-        ef += float(arma['ignoraResistCrit']) * PESO_CRIT * K_EFECTO * FACTOR_CRIT.get(tipo, 1.0)
+        ef += float(arma['ignoraResistCrit']) * PESO_CRIT * K_EFECTO * FACTOR_CRIT.get(tipo, 1.0) * (BAL_IGNORA_MULT if rcb in BAL_DANO else 1)
     d['efectos'] = ef
     es = arma.get('espalda') or {}
     if es:   # por la espalda: vale como sus bonos, pero es situacional (solo en sigilo y por atrás)

@@ -68,3 +68,58 @@ virote recuperable (2d6+4); la abollacascos con Rompe armadura 25 % (3d6+1). Las
 (Comunes ~50 %, Buenas ~35–55 %), como los arcos: su mecánica pone el resto.
 
 **Ajuste (2026-10-11, dueño: «la de fortín, punta de diamante y mano reforzada son iguales»):** para que no queden mellizas, la de cazador recupera Rango +3 (1d6+1, la Común «de lejos», 85), la de estribo es la del disparo fuerte (1d6+3, 100 %, 80) y la de guardia recupera Rango +2 (2d6+1 · Perfora 2, 140).
+
+## 2026-10-11 · Segunda vuelta: la Perfora de base (propuesta para el OK, sin cargar)
+El dueño, viendo la lista: «sin sumar tu Dmg, ¿no para todo la armadura?», «si no tenés Destreza para garantizar críticos no sirve para nada», «y daño T4
++N?», «le metemos ignora resist y crit frec, además de perfora y rompe». Medido en todas las clases (Warrior, Tanque, Asalto, Shooter, Mago,
+Support), contra el blanco medio y el pesado:
+- Una ballesta de **daño fijo, sin Perfora**, solo le sirve al que mete críticos (Shooter, Asalto): al resto la Defensa le come todo, y contra el
+  pesado no le hace nada a nadie. **Tipo 4** no ayuda (la Resistencia a Tipo 4 es la más común y el d4 pega menos).
+- **La Perfora** hace andar la ballesta para cualquiera: al Mago y al Support les rinde igual o más que su arma cuerpo a cuerpo (nivel 3: casi el
+  doble), y contra el pesado deja de rebotar.
+- **Crítico frecuente e «ignora Resistencia»** solo suman en manos de quien tiene Destreza, y ahí multiplican: «ignora 2» en una Buena triplica al
+  Shooter. La calculadora ahora cobra el doble el «ignora» en una ballesta (`BAL_IGNORA_MULT`); el Crítico frecuente +1 mide manso.
+- **Rompe armadura** (no lo mide el simulador): baja la Defensa del blanco para todo el grupo y no depende del crítico: el rasgo «de equipo».
+
+**Propuesta:** la Perfora es la base de todas; el daño fijo alto queda en la de estribo («el disparo fuerte», la de tirador); la del rastreador
+es la Buena «de tirador» (Crítico frecuente +1); la de pared suma Rompe armadura. Rinde = Shooter contra el blanco medio / pesado (su mejor
+cuerpo a cuerpo = 100 %) y el Mago contra el medio.
+
+| Ballesta (precio) | Daño (antes → propuesta) | Lo que tiene | Shooter medio / pesado | Mago medio |
+|---|---|---|---|---|
+| Ballesta de estribo (80) | 1d6+3 → **1d6+3** | — | 97 / 0 % | 24 % |
+| Ballesta corta (95) | 1d6+2 · Perfora 1 → **1d6+1 · Perfora 2** | 1 mano · Rango −1 | 91 / 58 % | 94 % |
+| Ballesta de pared (100) | 1d6+2 · Perfora 1 → **1d6+1 · Perfora 2** | Evasión −1 · Rompe armadura 25 % | 91 / 58 % | 92 % |
+| Ballesta del calderero (95) | 1d6+2 → **1d6+1 · Perfora 1** | Rompe armadura 33 % (5–6 en d6) | 76 / 29 % | 46 % |
+| Ballesta del rematador (95) | 1d6+2 → **1d6 · Perfora 2** | Remate: Crítico frecuente +2 | 74 / 53 % | 85 % |
+| Ballesta de tiro largo (95) | 1d6+1 · Perfora 1 → **1d6 · Perfora 2** | Alcance con caída: −2 de daño por casillero de más | 73 / 54 % | 85 % |
+| Ballesta del baqueano (95) | 1d6+2 → **1d6 · Perfora 2** | Lisiado 25 % (4 en d4) | 72 / 54 % | 85 % |
+| Ballesta del matrero (90) | 1d6+1 · Perfora 1 → **1d6 · Perfora 2** | Veneno 2 stacks 33 % (5–6 en d6) | 71 / 54 % | 85 % |
+| Ballesta de virote dentado (95) | 1d6+2 → **1d6 · Perfora 2** | Sangrado 33 % (5–6 en d6) | 71 / 54 % | 84 % |
+| Ballesta de cazador (95) | 1d6+1 → **1d6 · Perfora 1** | Rango +3 | 67 / 29 % | 46 % |
+| Ballesta de batida (85) | 1d6 → **1d6 · Perfora 1** | Tirador de apoyo +1 PdG | 64 / 29 % | 46 % |
+| Ballesta de mira (90) | 1d6 → **1d6 · Perfora 1** | Apuntada firme +2 | 63 / 29 % | 47 % |
+| Ballesta de acecho (90) | 1d6 · Perfora 1 → **1d6 · Perfora 1** | Emboscada: Crítico frecuente +2 | 63 / 29 % | 46 % |
+| Ballesta de mano (90) | 1d6 · Perfora 1 → **1d6 · Perfora 1** | 1 mano · Iniciativa +2 | 62 / 29 % | 46 % |
+| Ballesta de quemarropa (95) | 1d6 → **1d6 · Perfora 1** | 1 mano · A quemarropa (a 1 casilla): +3 de daño | 60 / 29 % | 46 % |
+| Ballesta rompescudos (95) | 1d6 → **1d6** | Rompe armadura 25 % (4 en d4), seguro si es crítico · Atraviesa escudos | 51 / 0 % | 0 % |
+| Ballesta abollacascos (160) | 3d6+1 → **2d6+1 · Perfora 3** | Rompe armadura 25 % (4 en d4) | 109 / 132 % | 247 % |
+| Ballesta del boyero (160) | 3d6+1 → **2d6+1 · Perfora 3** | Derribar 25 % (4 en d4) | 109 / 131 % | 239 % |
+| Ballesta de punta de diamante (160) | 2d6+2 · Perfora 2 → **2d6+1 · Perfora 3** | Punta de diamante | 108 / 131 % | 247 % |
+| Ballesta de mano reforzada (140) | 2d6+2 · Perfora 2 → **2d6+1 · Perfora 3** | 1 mano | 108 / 131 % | 249 % |
+| Ballesta de centinela (160) | 2d6+1 · Perfora 2 → **2d6 · Perfora 3** | Oportunidad sin No2 | 107 / 130 % | 244 % |
+| Ballesta de la ciénaga (150) | 2d6+1 · Perfora 2 → **2d6 · Perfora 3** | Veneno 3 stacks 50 % (2 en d2) | 107 / 130 % | 241 % |
+| Ballesta virotera (160) | 2d6+4 → **2d6 · Perfora 3** | Cargador 2 · Carcaj integrado +3 | 107 / 130 % | 244 % |
+| Ballesta de fortín (160) | 2d6+2 · Perfora 2 → **2d6+1 · Perfora 3** | Rompe armadura 25 % (4 en d4) | 107 / 131 % | 250 % |
+| Ballesta de doble cuerda (170) | 2d6+2 · Perfora 1 → **2d6 · Perfora 3** | Doble cuerda | 107 / 130 % | 240 % |
+| Ballesta de vigía (160) | 2d6+3 → **2d6 · Perfora 3** | Apuntada firme +2 | 107 / 131 % | 238 % |
+| Ballesta de guardia (150) | 2d6+1 · Perfora 2 → **2d6 · Perfora 3** | Rango +2 | 107 / 129 % | 252 % |
+| Ballesta de tiro rápido (160) | 2d6+2 · Perfora 1 → **2d6 · Perfora 3** | Tiro rápido | 106 / 130 % | 241 % |
+| Ballesta remachadora (160) | 2d6+2 · Perfora 1 → **2d6 · Perfora 3** | Remachadora | 105 / 131 % | 250 % |
+| Ballesta de mira corta (160) | 2d6+3 → **2d6 · Perfora 3** | Distancia ideal de 1 a 3 casilleros: PdG +1 | 105 / 129 % | 244 % |
+| Ballesta de estopa (140) | 2d6+4 → **2d6 · Perfora 3** | Prende fuego 33 % (5–6 en d6) | 105 / 129 % | 244 % |
+| Ballesta de primer tiro (170) | 2d6+3 · Perfora 1 → **2d6+2 · Perfora 2** | Primer disparo: +1 dado | 77 / 87 % | 171 % |
+| Ballesta de escolta (170) | 2d6+3 · Perfora 1 → **2d6+2 · Perfora 2** | Tirador de apoyo +1 PdG | 75 / 87 % | 167 % |
+| Ballesta de tranquera (150) | 2d6 · Perfora 2 → **2d6 · Perfora 2** | Llega cargada | 72 / 87 % | 163 % |
+| Ballesta del acechador (150) | 2d6+3 → **2d6 · Perfora 2** | Espalda a distancia: +2 PdG, +1 de daño | 71 / 87 % | 166 % |
+| Ballesta del rastreador (150) | 3d6+1 → **2d6 · Perfora 1** | Lisiado 25 % (4 en d4) · Crítico frecuente +1 | 70 / 44 % | 83 % |

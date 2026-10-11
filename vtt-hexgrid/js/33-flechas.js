@@ -49,6 +49,7 @@ async function flechaErrada(d){
   // está pegado al blanco (y tampoco queda).
   if(fl.humo || fl.luz || fl.explota){ await virotEstalla(d, celda, false); return; }
   if(fl.rebota && d.resultado === 'fallo' && await viroteRebota(d)) return;
+  if(choco && fl.recuperable){ choco = false; mesaLinea(`🏹 ${fl.nombre} chocó contra un obstáculo, pero con esa ballesta no se rompe (virote recuperable)`, 'recordatorio'); }   // 2026-10-11
   if(choco){
     const moneda = 1 + Math.floor(Math.random() * 2);
     if(moneda === 1){ mesaLinea(`🏹 La ${fl.nombre} de ${quien} erró, chocó contra un obstáculo y se rompió (moneda: 1)`, 'recordatorio'); return; }

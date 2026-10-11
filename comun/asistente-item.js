@@ -441,7 +441,12 @@ const AsistenteItem = (() => {
         return `<div class="aa-fila">${campo('Tensar: +PdG pagando 1 No2 más', nc('tensar', 5))}${campo('Largo alcance: −PdG por casillero de más', `<select data-aa-c="largoAlcance">${[0, 1, 2].map(v => `<option value="${v}" ${Math.round(n(d.largoAlcance)) === v ? 'selected' : ''}>${v ? '−' + v + ' PdG por casillero' : 'No'}</option>`).join('')}</select>`)}${campo('Emboscada: Crítico frecuente en el 1.er disparo del combate', nc('emboscada', 3))}</div>
           <div class="aa-fila">${campo('Matabestias: + daño contra bestias', nc('matabestias', 5))}${campo('Contra el Marcado: + PdG', nc('contraMarcado', 5))}</div>
           <div class="aa-fila">${campo('Espalda a distancia: + PdG', ne('pdg'))}${campo('Espalda a distancia: + daño', ne('fijo'))}</div>
-          ${chk('afinidad', 'Afinidad elemental: +1 al daño elemental de las flechas especiales')}`; };
+          ${chk('afinidad', 'Afinidad elemental: +1 al daño elemental de las flechas especiales')}
+          <div class="aa-fila">${campo('Alcance con caída: −daño por casillero de más', `<select data-aa-c="caida">${[0, 1, 2, 3].map(v => `<option value="${v}" ${Math.round(n(d.caida)) === v ? 'selected' : ''}>${v ? '−' + v + ' de daño por casillero' : 'No'}</option>`).join('')}</select>`)}${campo('Apuntada firme: +PdG sin moverse este turno ni el anterior', nc('apuntadaFirme', 5))}</div>
+          <div class="aa-fila">${campo('Tirador de apoyo: +PdG contra un rival pegado a un aliado', nc('tiradorApoyo', 3))}${campo('Remate: Crítico frecuente contra Sentado o Inmovilizado', nc('remate', 3))}</div>
+          <div class="aa-fila">${campo('Cargador: virotes especiales del combate sin su No2', nc('cargador', 5))}${campo('Carcaj integrado: lugares de más', nc('carcajExtra', 10))}</div>
+          ${chk('primerDisparo', 'Primer disparo del combate: +1 dado de daño')}${chk('puntaDiamante', 'Punta de diamante: contra Defensa 12 o más, Perfora +2')}${chk('remachadora', 'Remachadora: cada golpe seguido al mismo blanco, Perfora +1 (hasta +3)')}${chk('recuperable', 'Virote recuperable: el especial que erra no se rompe contra un obstáculo')}
+          ${!d.arco ? chk('dobleCuerda', 'Doble cuerda: el segundo disparo del turno cuesta como el primero') + chk('tiroRapido', 'Tiro rápido: cada disparo más cuesta 1 No2 más, no la Recarga entera') : ''}`; };
       h += `<div class="aa-campo"><label>Mecánicas de firma (opcional)</label>
         ${chk('sinParry', 'No se puede parrear (el defensor solo puede esquivar)')}
         ${chk('oporGratis', 'El ataque de oportunidad con esta arma no cuesta No2')}
@@ -823,7 +828,7 @@ const AsistenteItem = (() => {
 
   // «+2 PdG, +1 de daño» (el bono por la espalda de un arma).
   const espaldaTxt = es => es ? [n(es.pdg) ? `+${f(n(es.pdg))} PdG` : '', n(es.fijo) ? `+${f(n(es.fijo))} de daño` : '', n(es.critpot) ? `+${f(n(es.critpot))} Crítico potente` : ''].filter(Boolean).join(', ') : '';
-  const NUMERICOS = ['peso', 'danoFijo', 'danoAmplificado', 'ignoraResistCrit', 'perfora', 'apuntada', 'tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'ahorroNitros', 'critD20', 'precioCompra', 'ranuras', 'equipoEstadoHpTurno', 'durExtra', 'durPorPeso'];
+  const NUMERICOS = ['peso', 'danoFijo', 'danoAmplificado', 'ignoraResistCrit', 'perfora', 'apuntada', 'tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'cargador', 'carcajExtra', 'ahorroNitros', 'critD20', 'precioCompra', 'ranuras', 'equipoEstadoHpTurno', 'durExtra', 'durPorPeso'];
   function alEscribir(ev){
     if(!st) return;
     const t = ev.target, d = st.d;
@@ -922,8 +927,9 @@ const AsistenteItem = (() => {
       if(d.armaDeRango && d.arco && d.sinTiroAlto) d.sinTiroAlto = true; else delete d.sinTiroAlto;
       if(d.armaDeRango && !d.arco && n(d.recarga) > 0) d.recarga = Math.min(5, Math.round(n(d.recarga))); else delete d.recarga;   // la Recarga: solo de rango, no arco
       // 🏹 Las mecánicas de arco (2026-10-11): solo en un arma de rango, y solo lo que tiene valor.
-      [['tensar', 5], ['largoAlcance', 2], ['emboscada', 3], ['matabestias', 5], ['contraMarcado', 5]].forEach(([k, max]) => { if(d.armaDeRango && n(d[k]) > 0) d[k] = Math.min(max, Math.round(n(d[k]))); else delete d[k]; });
-      if(d.armaDeRango && d.afinidad) d.afinidad = true; else delete d.afinidad;
+      [['tensar', 5], ['largoAlcance', 2], ['emboscada', 3], ['matabestias', 5], ['contraMarcado', 5], ['caida', 3], ['apuntadaFirme', 5], ['tiradorApoyo', 3], ['remate', 3], ['cargador', 5], ['carcajExtra', 10]].forEach(([k, max]) => { if(d.armaDeRango && n(d[k]) > 0) d[k] = Math.min(max, Math.round(n(d[k]))); else delete d[k]; });
+      ['afinidad', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable'].forEach(k => { if(d.armaDeRango && d[k]) d[k] = true; else delete d[k]; });
+      ['dobleCuerda', 'tiroRapido'].forEach(k => { if(d.armaDeRango && !d.arco && d[k]) d[k] = true; else delete d[k]; });   // solo con Recarga (ballestas)
       { const ed = d.espaldaDistancia || {}, eo = {}; ['pdg', 'fijo'].forEach(k => { if(n(ed[k]) > 0) eo[k] = Math.round(n(ed[k])); }); if(d.armaDeRango && Object.keys(eo).length) d.espaldaDistancia = eo; else delete d.espaldaDistancia; }
       if(d.armaDeRango && d.ideal && d.ideal.donde){   // la distancia ideal: solo lo que tiene valor
         const id = {donde: d.ideal.donde};
@@ -940,7 +946,7 @@ const AsistenteItem = (() => {
       }
       else { delete d.orbe; delete d.orbeResguardo; delete d.orbeSalvaje; delete d.orbeCustodio; delete d.orbeAbsorcion; }
       delete d.efectosGolpe; delete d.tipoDado; delete d.danoFijo; delete d.danoAmplificado; delete d.armaDeRango; delete d.espalda; delete d.ignoraResistCrit; delete d.sinParry; delete d.oporGratis; delete d.ahorroNitros; delete d.critD20; delete d.arco; delete d.ideal; delete d.tiroAlto; delete d.sinTiroAlto;
-      ['tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad'].forEach(k => delete d[k]);
+      ['tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad', 'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'cargador', 'carcajExtra', 'dobleCuerda', 'tiroRapido'].forEach(k => delete d[k]);
     }
     // Durabilidad: solo se guarda si no es la de siempre (3 por Peso) y el ítem la tiene.
     // Una pieza vieja con durPorPeso: se pasa a Resistente / Frágil conservando su durabilidad.
@@ -968,7 +974,8 @@ const AsistenteItem = (() => {
      hechizo. Todas las pantallas guardan con esto. */
   const CONTROLADOS = ['especial', 'orbe', 'orbeResguardo', 'orbeSalvaje', 'orbeCustodio', 'orbeAbsorcion', 'tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', 'efectosGolpe',
     'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga', 'perfora', 'apuntada', 'cargada', 'atraviesaEscudos', 'durExtra', 'durPorPeso',
-    'tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad'];
+    'tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad',
+    'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'cargador', 'carcajExtra', 'dobleCuerda', 'tiroRapido'];
   function fusionar(base, d){
     const o = {...(base || {}), ...(d || {})};
     CONTROLADOS.forEach(k => { if(!(k in (d || {}))) delete o[k]; });

@@ -11,6 +11,7 @@
    Todo va al `tiro` del duelo ({pdg, crit, critpot, fijo, ignora, motivo}), como la distancia ideal. Nunca traba el disparo.
    ========================================================= */
 const emboscadaUsadas = new Set();
+const primerDisparoUsados = new Set();   // el +1 dado del primer disparo del combate (se libera con la Emboscada, js/25)
 function arcoSumar(tiro, o, motivo){
   tiro = tiro || {motivo: ''};
   Object.keys(o).forEach(k => { if(num(o[k])) tiro[k] = num(tiro[k]) + num(o[k]); });
@@ -50,8 +51,41 @@ function arcoBonos(mio, t, ataque, tiro){
   if(num(ataque.contraMarcado) > 0 && marcado(t)) tiro = arcoSumar(tiro, {pdg: Math.round(num(ataque.contraMarcado))}, 'contra el Marcado');
   const es = ataque.espaldaDistancia;
   if(es && (num(es.pdg) > 0 || num(es.fijo) > 0) && arcoPorLaEspalda(mio, t)) tiro = arcoSumar(tiro, {pdg: num(es.pdg), fijo: num(es.fijo)}, 'por la espalda');
+  // 🎯 Las de ballesta (2026-10-11): alcance con caída, apuntada firme, tirador de apoyo, remate y el primer disparo del combate.
+  const ca = Combatiente.caidaDano(ataque, d, ataque.alcance);
+  if(ca) tiro = arcoSumar(tiro, {fijo: ca.fijo}, `caída (${ca.extra} de más)`);
+  if(num(ataque.apuntadaFirme) > 0 && !seMovioEsteTurno(mio.id) && !seMovioTurnoAnterior(mio.id)) tiro = arcoSumar(tiro, {pdg: Math.round(num(ataque.apuntadaFirme))}, 'apuntada firme');
+  if(num(ataque.tiradorApoyo) > 0 && arcoAliadoPegado(mio, t)) tiro = arcoSumar(tiro, {pdg: Math.round(num(ataque.tiradorApoyo))}, 'tirador de apoyo');
+  if(num(ataque.remate) > 0 && arcoQuieto(t)) tiro = arcoSumar(tiro, {crit: Math.round(num(ataque.remate))}, 'remate');
+  if(ataque.primerDisparo && modoMapa === 'combate' && !primerDisparoUsados.has(mio.id)){
+    tiro = tiro || {motivo: ''};
+    tiro.dado = `1d${Math.round(num(ataque.tipoDado)) || 6}`;
+    tiro.motivo = tiro.motivo ? `${tiro.motivo} y primer disparo` : 'primer disparo';
+    primerDisparoUsados.add(mio.id);
+  }
   return tiro;
 }
+// Tirador de apoyo: ¿el objetivo está pegado a un aliado de quien dispara? (un token de su mismo bando que se ve, no él mismo)
+function arcoAliadoPegado(mio, t){
+  const crep = x => x.tipo === 'creep';
+  return [...tokens.entries()].some(([id, x]) => id !== mio.id && id !== t.id && crep(x) === crep(mio) && (!x.oculto || soyGM) && distanciaHex({col: x.col, fila: x.fila}, {col: t.col, fila: t.fila}) === 1);
+}
+// Remate: el objetivo está Sentado o Inmovilizado.
+function arcoQuieto(t){
+  const e = estadoDe(t);
+  return !!(e && e.estados.some(s => s && s.activo !== false && /^(sentado|inmovilizado)$/i.test(String(s.nombre || '').trim())));
+}
+/* 🎯 La Remachadora (2026-10-11): cada golpe seguido al mismo blanco suma Perfora +1 (hasta Combatiente.REMACHADORA_MAX); errar, que lo bloqueen o
+   tirarle a otro la vuelven a 0. La lleva el mapa del GM, que es el que aplica el daño (js/13) y el que ve terminar los duelos (hook remachadoraErro). */
+const remachadoraCuenta = new Map();   // tokenId de quien dispara → {blanco, golpes}
+function remachadoraPerfora(d){
+  if(!d || !d.ataque || !d.ataque.remachadora) return 0;
+  const k = d.atacante && d.atacante.tokenId, b = d.defensor && d.defensor.tokenId, c = remachadoraCuenta.get(k);
+  const previos = c && c.blanco === b ? c.golpes : 0;
+  remachadoraCuenta.set(k, {blanco: b, golpes: previos + 1});
+  return Math.min(Combatiente.REMACHADORA_MAX, previos);
+}
+function remachadoraErro(d){ if(d && d.atacante) remachadoraCuenta.delete(d.atacante.tokenId); }
 // 🏹 Tensar: «¿Tensás a fondo?» (1 No2 más → +N PdG). Se cobra con msg.alTensar; sin eso no se ofrece.
 async function arcoTensar(ataque, msg, tiro){
   const n = Math.round(num(ataque && ataque.tensar));

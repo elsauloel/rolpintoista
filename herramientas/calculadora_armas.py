@@ -197,8 +197,19 @@ def puntaje(arma):
                + MATABESTIAS_FACTOR * float(arma.get('matabestias') or 0) * factor_plano(tipo)
                + MARCADO_FACTOR * float(arma.get('contraMarcado') or 0) * TASA_STAT['pdg']
                + ESPALDA_DIST_FACTOR * (float(ed.get('pdg') or 0) * TASA_STAT['pdg'] + float(ed.get('fijo') or 0) * factor_plano(tipo))
-               + (AFINIDAD_PC if arma.get('afinidad') else 0))
-        if arc: d['mecánicas de arco'] = arc
+               + (AFINIDAD_PC if arma.get('afinidad') else 0)
+               + CAIDA_PC.get(int(arma.get('caida') or 0), 0) + APUNTADA_FIRME_PC * float(arma.get('apuntadaFirme') or 0)
+               + APOYO_FACTOR * float(arma.get('tiradorApoyo') or 0) * TASA_STAT['pdg']
+               + REMATE_FACTOR * min(float(arma.get('remate') or 0), max(0, tipo - 2)) * PESO_CRIT * FACTOR_CRIT.get(tipo, 1.0)
+               + (PRIMER_DISPARO_FACTOR * (tipo + 1) / 2 * factor_plano(tipo) if arma.get('primerDisparo') else 0)
+               + (PUNTA_DIAMANTE_PC if arma.get('puntaDiamante') else 0) + (REMACHADORA_PC if arma.get('remachadora') else 0)
+               + (RECUPERABLE_PC if arma.get('recuperable') else 0) + CARGADOR_PC * float(arma.get('cargador') or 0)
+               + CARCAJ_EXTRA_PC * float(arma.get('carcajExtra') or 0))
+        rc = int(arma.get('recarga') or 0)
+        if rc and not arma.get('arco'):
+            if arma.get('tiroRapido'): arc += TIRO_RAPIDO_FACTOR * (rc - 1) + 0.5
+            elif arma.get('dobleCuerda'): arc += DOBLE_CUERDA_FACTOR * rc
+        if arc: d['mecánicas de rango'] = arc
     if firma: d['firma'] = firma   # mecánicas de firma (2026-10-03): sin Parry 2 · oportunidad sin No2 2 · −1 No2 en el primero 3 · +1 d20 en el crítico 3
     dx = round(float(arma.get('durExtra') or 0)) + ((float(arma['durPorPeso']) - 3) * peso if float(arma.get('durPorPeso') or 0) > 3 else 0)
     if dx:   # Resistente ×N / Frágil ×N (2026-10-04: durabilidad total de más o de menos; antes, por punto de Peso)
@@ -226,6 +237,19 @@ MATABESTIAS_FACTOR = 0.35 # Matabestias: daño fijo solo contra bestias (una par
 MARCADO_FACTOR = 0.2      # Contra el Marcado: PdG solo contra un Marcado (hace falta marcarlo antes)
 ESPALDA_DIST_FACTOR = 0.35   # Espalda a distancia: como por la espalda, pero sin sigilo (un poco más fácil de lograr)
 AFINIDAD_PC = 0.75        # Afinidad elemental: +1 a cada dado elemental de las flechas especiales
+# Mecánicas de ballesta (2026-10-11, docs/ideas-ballestas.md); valen en cualquier arma de rango salvo Doble cuerda y Tiro rápido (Recarga).
+CAIDA_PC = {1: 1.5, 2: 1.0, 3: 0.7}   # Alcance con caída: disparar más lejos perdiendo daño por casillero de más
+APUNTADA_FIRME_PC = 1.0   # por punto: +PdG si no se movió ni este turno ni el anterior (la apuntada común vale 1,75)
+APOYO_FACTOR = 0.4        # Tirador de apoyo: PdG contra un rival pegado a un aliado (pasa seguido)
+REMATE_FACTOR = 0.15      # Remate: Crítico frecuente contra Sentado o Inmovilizado
+PRIMER_DISPARO_FACTOR = 0.3   # Primer disparo del combate: un dado más, una vez por combate
+PUNTA_DIAMANTE_PC = 1.0   # Perfora +2 contra Defensa 12 o más
+REMACHADORA_PC = 2.0      # Perfora +1 por golpe seguido, hasta +3
+RECUPERABLE_PC = 0.5      # el virote especial que erra no se rompe
+CARGADOR_PC = 0.5         # por virote especial del combate sin su No2
+CARCAJ_EXTRA_PC = 0.15    # por lugar de más en el carcaj
+DOBLE_CUERDA_FACTOR = 1.2   # × Recarga: el segundo disparo del turno cuesta N en vez de 2N
+TIRO_RAPIDO_FACTOR = 1.5    # × (Recarga − 1), + 0,5: cada disparo más cuesta +1, no +N
 
 
 def extras(arma):
@@ -240,7 +264,8 @@ def extras(arma):
     n += sum(1 for k in ('cargada', 'apuntada', 'atraviesaEscudos') if arma.get(k))
     n += 1 if arma.get('armaDeRango') and not arma.get('arco') and arma.get('tiroAlto') else 0
     n += 1 if arma.get('armaDeRango') and (arma.get('ideal') or {}).get('donde') else 0
-    n += sum(1 for k in ('tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad') if arma.get('armaDeRango') and arma.get(k))
+    n += sum(1 for k in ('tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad', 'caida', 'apuntadaFirme', 'tiradorApoyo',
+                         'remate', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'cargador', 'carcajExtra', 'dobleCuerda', 'tiroRapido') if arma.get('armaDeRango') and arma.get(k))
     return n
 
 

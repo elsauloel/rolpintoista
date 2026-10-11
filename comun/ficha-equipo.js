@@ -214,7 +214,9 @@ const FichaEquipo = (() => {
      desde el carcaj equipado; pasarlas de la mochila al carcaj (o al revés) es gratis fuera de combate y cuesta como equipar en combate. */
   const esFlecha = it => !!(it && it.flecha);
   const carcajDe = S => (S.inventario || []).find(i => i.tipoItem === 'carcaj' && i.equipado) || null;
-  const capCarcaj = c => c ? Math.max(1, Math.round(num(c.capFlechas)) || 10) : 0;
+  // + el Carcaj integrado de una ballesta (o un arma de rango) equipada (`carcajExtra`, 2026-10-11): solo si se pasa el personaje.
+  const carcajExtraDe = S => S ? (S.inventario || []).filter(i => i && i.equipado && i.armaDeRango).reduce((a, i) => a + Math.max(0, Math.round(num(i.carcajExtra))), 0) : 0;
+  const capCarcaj = (c, S) => c ? Math.max(1, Math.round(num(c.capFlechas)) || 10) + carcajExtraDe(S) : 0;
   const carcajUsado = c => c ? (c.flechas || []).reduce((a, f) => a + Math.max(0, num(f.unidades) || 1), 0) : 0;
   const flechasDelCarcaj = S => { const c = carcajDe(S); return c ? (c.flechas || []).filter(f => num(f.unidades) > 0) : []; };
   const nuevoId = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -222,8 +224,8 @@ const FichaEquipo = (() => {
     const it = (S.inventario || []).find(x => x.id === id), c = carcajDe(S);
     if(!it || !esFlecha(it)) return false;
     if(!c){ ui.toast('Equipá un carcaj para llevar flechas especiales (viene uno con cada arco)'); return true; }
-    const libre = capCarcaj(c) - carcajUsado(c), tiene = Math.max(1, num(it.unidades) || 1), mover = Math.min(libre, tiene);
-    if(mover <= 0){ ui.toast(`${c.nombre} está lleno (${fmt(carcajUsado(c))} / ${fmt(capCarcaj(c))})`); return true; }
+    const libre = capCarcaj(c, S) - carcajUsado(c), tiene = Math.max(1, num(it.unidades) || 1), mover = Math.min(libre, tiene);
+    if(mover <= 0){ ui.toast(`${c.nombre} está lleno (${fmt(carcajUsado(c))} / ${fmt(capCarcaj(c, S))})`); return true; }
     conCosto(S, 1, `pasar ${it.nombre} al carcaj`, `pasó ${it.nombre} al carcaj`, () => {
       c.flechas = c.flechas || [];
       const pila = c.flechas.find(f => f.nombre === it.nombre);
@@ -274,7 +276,7 @@ const FichaEquipo = (() => {
       : '<div class="hint equipo-vacio">Equipá un carcaj para disparar flechas especiales (viene uno con cada arco).</div>';
     const fuera = sueltas.length ? `<div class="hint" style="margin:6px 0 2px">Flechas especiales en la mochila:</div>` + sueltas.map(f => fila(f, `<button type="button" class="mini on" data-alcarcaj="${f.id}" title="Pasarlas al carcaj"${c ? '' : ' disabled'}>→ Carcaj</button>`)).join('') : '';
     return `<div class="equipo-slot" style="margin-top:10px">
-      <div class="equipo-slot-cab"><span>🏹 ${c ? esc(c.nombre) : 'Flechas especiales'}</span>${c ? `<span class="hint">${fmt(carcajUsado(c))} / ${fmt(capCarcaj(c))}</span>` : ''}</div>
+      <div class="equipo-slot-cab"><span>🏹 ${c ? esc(c.nombre) : 'Flechas especiales'}</span>${c ? `<span class="hint">${fmt(carcajUsado(c))} / ${fmt(capCarcaj(c, S))}</span>` : ''}</div>
       ${dentro}${fuera}
     </div>`;
   }

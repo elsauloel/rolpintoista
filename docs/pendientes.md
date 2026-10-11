@@ -24,7 +24,7 @@
 >   ofrece la Botonera de un personaje (un creep o una invocación con un arco que tense, todavía no).
 >   **La lista de bonos de arco para diseñar Rara, Excepcional y Legendaria** está en `docs/ideas-arcos-flechas.md` → «Bonos de arco para
 >   diseñar los otros tiers».
-> - [ ] **🎲 Prueba que falla a veces (2026-10-10):** «Plantillas · reposición (2026-10-07)» de `comun/pruebas.html` depende del azar y a veces da
+> - [x] **🎲 Prueba que falla a veces (2026-10-10)** — resuelto el 2026-10-11: contaba también la góndola de gastables (que vino después y se arma distinto según el tamaño); ahora mide solo el equipo. Lo de antes: «Plantillas · reposición (2026-10-07)» de `comun/pruebas.html` depende del azar y a veces da
 >   falso (el tercer valor); hay que fijarle la semilla o el caso para que no falle sola.
 > - [ ] **🔍 Revisión de las skills de clase ya auditadas (2026-10-10, pedido del dueño: «muchas las audité antes del menú de duelo»):** 33 auditadas;
 >   31 tienen la Ejecución armada. Arreglado: Shockwave y Takle cobran solos el doble en turno ajeno. Arreglado (2026-10-11): fuera del propio turno, un cartel anuncia el costo y se confirma o cancela. Quedan para el dueño, que los revisa uno por uno: (1) Cañón Vasco sin

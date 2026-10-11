@@ -111,7 +111,7 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261010j', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261011c', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261010g', '../comun/ficha-mantenimiento.js?v=20261010p', '../comun/ficha-calculo.js?v=20261009r', '../comun/ficha-combate.js?v=20261010p', '../comun/skills-clase.js?v=20261011a', '../comun/ficha-habilidades.js?v=20261010zg',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261011e', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261011c', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261010g', '../comun/ficha-mantenimiento.js?v=20261010p', '../comun/ficha-calculo.js?v=20261009r', '../comun/ficha-combate.js?v=20261010p', '../comun/skills-clase.js?v=20261011a', '../comun/ficha-habilidades.js?v=20261010zg',
   '../comun/catalogo.js?v=20261011d', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261010za', '../comun/ficha-botonera.js?v=20261009r', '../comun/ficha-resumen.js?v=20261010zg', '../comun/inv-calculo.js?v=20261010p', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261010g', '../comun/inv-duelo.js?v=20261011a', '../comun/ficha-acciones.js?v=20261010zk', '../comun/inv-habilidades.js?v=20261010a', '../comun/inv-lupa.js?v=20261010zc',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261011a', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261009k'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
@@ -627,11 +627,18 @@ function bnElegirFlecha(arma, flechas, alElegir){
       ...flechas.map(f => ({texto: `${f.nombre} ×${fmt(num(f.unidades) || 1)}`, detalle: FichaEquipo.flechaTxt(f), alClic: () => { AvisoCombate.cerrar(); alElegir(f.id); }}))],
     grilla: flechas.length > 3});
 }
-function bnDispararFlecha(flechaId){
+function bnDispararFlecha(flechaId, arma){
   const S = bn.S, c = FichaEquipo.carcajDe(S), f = c && (c.flechas || []).find(x => x.id === flechaId);
   if(!f){ toast('Esa flecha ya no está en el carcaj: va una común'); return true; }
   const antes = FichaGuardado.partes(S);
   let costo = Math.max(0, num(f.flecha && f.flecha.no2));
+  // 🎯 Cargador (2026-10-11): los N primeros virotes especiales del combate no cobran su No2 (se libera al volver a narrativo, js/25).
+  const nCarg = Math.round(num(arma && arma.cargador)), kCarg = bn.fichaId;
+  if(costo && nCarg > 0 && modoMapa === 'combate' && num(cargadorUsados.get(kCarg)) < nCarg){
+    cargadorUsados.set(kCarg, num(cargadorUsados.get(kCarg)) + 1);
+    mesaLinea(`🎯 ${((S.meta && S.meta.nombre) || 'Alguien').trim()} disparó ${f.nombre} del cargador: no cobra su No2 (${cargadorUsados.get(kCarg)} de ${nCarg} del combate)`, 'recordatorio');
+    costo = 0;
+  }
   S.ataquesArma = S.ataquesArma || {};   // (se vacía al empezar el turno)
   if(costo && num(c.saqueRapido) > num(S.ataquesArma._saqueFlecha)){   // 🎲 la moneda del carcaj veloz, a la vista (nunca en silencio)
     S.ataquesArma._saqueFlecha = num(S.ataquesArma._saqueFlecha) + 1;
@@ -648,6 +655,7 @@ function bnDispararFlecha(flechaId){
   return true;
 }
 // 🏹 Tensar (js/35, 2026-10-11): el No2 de más de tensar el arco a fondo (sin No2: avisa y deja seguir, como una flecha).
+const cargadorUsados = new Map();   // fichaId → virotes del cargador ya usados en este combate
 function bnTensar(costo){
   const S = bn.S, antes = FichaGuardado.partes(S);
   const gasto = costo > num(S.nitros) ? FichaAcciones.gastoNitrosForzado(S, costo, 'tensó el arco a fondo') : costo;
@@ -668,7 +676,7 @@ function bnAtacar(tipo, armaId, flechaId){
   dueloElegirObjetivoMapa({yo: {ref: bn.fichaId, tipo: 'pj', nombre: (S.meta && S.meta.nombre) || 'Personaje'},
     ataque: {tipo, armaId: arma ? arma.id : '', armaNombre: arma ? arma.nombre : '', tipoDado: FichaCombate.tipoAtaque(arma), rango: !!(arma && arma.armaDeRango), alcance: FichaCombate.alcanceDeArma(S, arma),
       ...Combatiente.ataqueDeArma(arma), ...(fl ? {flecha: fl} : {})},   // los rasgos del arma: por la espalda, sin Parry; 🏹 la flecha especial
-    conSuelto: true, alSuelto: () => { reabrir(); hacer(); }, alCancelar: () => {}, ...(fl ? {alDisparar: () => bnDispararFlecha(fl.id)} : {}),
+    conSuelto: true, alSuelto: () => { reabrir(); hacer(); }, alCancelar: () => {}, ...(fl ? {alDisparar: () => bnDispararFlecha(fl.id, arma)} : {}),
     ...(arma && num(arma.tensar) > 0 ? {alTensar: bnTensar} : {})});
 }
 function bnCombateAca(b){
@@ -1615,7 +1623,7 @@ function bnRerollDibujar(){
    (comun/ficha-editor.js: el mismo formulario, el paso a paso de las habilidades, el asistente de ítems, la trampa y la Ejecución ✨),
    adentro del recuadro de la Botonera nueva (#bn-editor). Guardar pasa por bnUi (las partes que cambiaron y el resumen). Los estados de
    la lista (para "estado al usar" y para la Ejecución) se eligen con el selector común (comun/selector-estados.js). */
-const ED_PIEZAS = ['../comun/ficha-editor.js?v=20261010a', '../comun/asistente-item.js?v=20261011c', '../comun/asistente-duelo-hab.js?v=20261010zi'];
+const ED_PIEZAS = ['../comun/ficha-editor.js?v=20261010a', '../comun/asistente-item.js?v=20261011e', '../comun/asistente-duelo-hab.js?v=20261010zi'];
 let bnTipoItemResolver = null;
 // op.comoGM: el GM sin el control (el ⚙ de un estado del HUD, como hacía la ficha con "Editar como GM"). → true si se abrió.
 async function bnEditar(key, id, op = {}){

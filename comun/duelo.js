@@ -67,6 +67,7 @@ const Duelo = (() => {
   let terminaPrimera = true;
   // 🏹 Una flecha especial que erró (2026-10-09): cfgEscuchar.flechaErrada(d), en la pantalla de quien disparó (no los que ya estaban al entrar).
   const flechaAvisada = new Set();
+  const remachaAvisada = new Set();
   let flechaPrimera = true;
   // 🪵 Un dodge roll de Tronco de huída en un golpe directo (2026-10-10): cfgEscuchar.dodgeLibre(d), en la pantalla de quien esquivó.
   const dodgeLibreAvisado = new Set();
@@ -393,8 +394,9 @@ const Duelo = (() => {
   const espaldaTxt = e => [e.pdg ? `+${e.pdg} PdG` : '', e.fijo ? `+${e.fijo} de daño` : '', e.critpot ? `+${e.critpot} Crítico potente` : ''].filter(Boolean).join(', ');
   const limpiarTiroBono = t => {
     const c = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(_num(v))));
-    const o = {pdg: c(t.pdg, -6, 10), crit: c(t.crit, 0, 5), critpot: c(t.critpot, 0, 6), fijo: c(t.fijo, 0, 10), ignora: c(t.ignora, 0, 5)};
+    const o = {pdg: c(t.pdg, -6, 10), crit: c(t.crit, 0, 5), critpot: c(t.critpot, 0, 6), fijo: c(t.fijo, -10, 10), ignora: c(t.ignora, 0, 5)};   // fijo negativo: la caída (2026-10-11)
     Object.keys(o).forEach(k => { if(!o[k]) delete o[k]; });
+    if(/^\d?d\d{1,2}$/.test(String(t.dado || ''))) o.dado = String(t.dado);   // el primer disparo del combate: +1 dado (2026-10-11)
     if(!Object.keys(o).length) return null;
     o.motivo = txtCorto(t.motivo || 'el tiro', 60);
     return o;
@@ -419,7 +421,7 @@ const Duelo = (() => {
     return o;
   });
   const tiroTxt = t => [t.pdg ? `${t.pdg > 0 ? '+' : '−'}${_fmt(Math.abs(t.pdg))} PdG` : '', t.crit ? `Crítico frecuente +${_fmt(t.crit)}` : '', t.critpot ? `Crítico potente +${_fmt(t.critpot)}` : '',
-    t.fijo ? `+${_fmt(t.fijo)} de daño` : '', t.ignora ? `ignora ${_fmt(t.ignora)} de Resistencia a crítico` : ''].filter(Boolean).join(', ');
+    t.fijo ? `${t.fijo > 0 ? '+' : '−'}${_fmt(Math.abs(t.fijo))} de daño` : '', t.dado ? `+${t.dado} de daño` : '', t.ignora ? `ignora ${_fmt(t.ignora)} de Resistencia a crítico` : ''].filter(Boolean).join(', ');
   // tokDef = un token del mapa ({id, nombre, tipo, fichaId, duenoUid}); miTokenId = el token del atacante (o ''); contraDe = id del duelo que se contraataca.
   async function crear(cfg, tokDef, miTokenId, contraDe){
     const hab = limpiarHab(cfg.ataque.hab);
@@ -459,7 +461,9 @@ const Duelo = (() => {
     // (PdG, Crítico frecuente / potente, daño fijo, ignora Resistencia) y el tiro alto (PdG −2). `motivo` es lo que se lee («distancia ideal»).
     // Perfora N del arma (2026-10-10, las ballestas): viaja en el ataque; el mapa la suma a la de la flecha o el virote al aplicar el daño.
     if(_num(cfg.ataque.perfora) > 0 && !hab) inicial.ataque.perfora = Math.min(5, Math.round(_num(cfg.ataque.perfora)));
-    if(cfg.ataque.atraviesaEscudos && !hab) inicial.ataque.atraviesaEscudos = true;   // si lo paran con escudo, el escudo se abolla (el mapa, js/26)
+    if(cfg.ataque.atraviesaEscudos && !hab) inicial.ataque.atraviesaEscudos = true;
+    if(cfg.ataque.puntaDiamante && !hab) inicial.ataque.puntaDiamante = true;   // contra Defensa 12 o más, Perfora +2 (el mapa, 2026-10-11)
+    if(cfg.ataque.remachadora && !hab) inicial.ataque.remachadora = true;   // golpes seguidos al mismo blanco, Perfora +1 cada uno (el mapa del GM)   // si lo paran con escudo, el escudo se abolla (el mapa, js/26)
     const tiro = cfg.tiro && !hab ? limpiarTiroBono(cfg.tiro) : null;
     if(tiro) inicial.ataque.tiro = tiro;
     // 🏹 La flecha especial del disparo (2026-10-09): sus efectos al golpear (siempre, sin %) se suman a los del arco al tirar el daño, y su
@@ -469,6 +473,7 @@ const Duelo = (() => {
       // Lo que hace en el mapa (2026-10-10, virotes): humo, luz, explota (el dado de fuego), clava (contra una pared detrás), rebota (si falla).
       ...(cfg.flecha.humo ? {humo: true} : {}), ...(cfg.flecha.luz ? {luz: true} : {}), ...(cfg.flecha.explota ? {explota: txtCorto(cfg.flecha.explota, 12)} : {}),
       ...(cfg.flecha.clava ? {clava: true} : {}), ...(cfg.flecha.rebota ? {rebota: true} : {}),
+      ...(cfg.flecha.recuperable ? {recuperable: true} : {}), ...(cfg.flecha.sinDano ? {sinDano: true} : {}),   // virote recuperable (el arma) y el de red (2026-10-11)
       // ⚡ El salto (relámpago, tormenta): a cuántos más salta, si lleva el daño eléctrico (la mitad cada vez) y el % de Parálisis de cada salto.
       ...(cfg.flecha.salto ? {salto: {saltos: Math.min(4, Math.max(1, Math.round(_num(cfg.flecha.salto.saltos)) || 1)), dano: !!cfg.flecha.salto.dano,
         paralisis: (Array.isArray(cfg.flecha.salto.paralisis) ? cfg.flecha.salto.paralisis : []).slice(0, 4).map(v => Math.min(100, Math.max(0, Math.round(_num(v)))))}} : {})};
@@ -1020,8 +1025,11 @@ const Duelo = (() => {
       if(be && be.fijo) m.dano = {...m.dano, crudo: m.dano.crudo + be.fijo, mod: m.dano.mod + be.fijo, formula: `${m.dano.formula} +${be.fijo} espalda`.slice(0, 60)};
       const ps = m.ataque ? _num(m.ataque.primeraSangre) : 0;   // Primera sangre (anillo): el daño de su primer ataque del combate
       if(ps > 0) m.dano = {...m.dano, crudo: m.dano.crudo + ps, mod: m.dano.mod + ps, formula: `${m.dano.formula} +${ps} primera sangre`.slice(0, 60)};
-      const tf = m.ataque && m.ataque.tiro ? _num(m.ataque.tiro.fijo) : 0;   // el bono del tiro: daño fijo de la distancia ideal
-      if(tf > 0) m.dano = {...m.dano, crudo: m.dano.crudo + tf, mod: m.dano.mod + tf, formula: `${m.dano.formula} +${tf} ${m.ataque.tiro.motivo}`.slice(0, 60)};
+      const tf = m.ataque && m.ataque.tiro ? _num(m.ataque.tiro.fijo) : 0;   // el bono del tiro: daño fijo de la distancia ideal (o la caída, negativo)
+      if(tf) m.dano = {...m.dano, crudo: Math.max(0, m.dano.crudo + tf), mod: m.dano.mod + tf, formula: `${m.dano.formula} ${tf > 0 ? '+' : '−'}${Math.abs(tf)} ${m.ataque.tiro.motivo}`.slice(0, 60)};
+      const td = m.ataque && m.ataque.tiro && m.ataque.tiro.dado && typeof tirarDados === 'function' ? tirarDados(m.ataque.tiro.dado) : null;   // el primer disparo del combate: +1 dado
+      if(td) m.dano = {...m.dano, crudo: m.dano.crudo + _num(td.total), rolls: [...m.dano.rolls, ...(td.rolls || []).map(_num)].slice(0, 20), formula: `${m.dano.formula} +${m.ataque.tiro.dado} (${_num(td.total)})`.slice(0, 60)};
+      if(m.ataque && m.ataque.flecha && m.ataque.flecha.sinDano) m.dano = {...m.dano, crudo: 0, formula: `${m.ataque.flecha.nombre}: sin daño`.slice(0, 60)};   // el virote de red (2026-10-11)
       const critGolpe = !!(m.crit && m.crit.critico);
       let crudos = m.hab ? m.hab.efectos : efectos;
       if(!m.hab && m.ataque && m.ataque.flecha && Array.isArray(m.ataque.flecha.efectos)) crudos = [...(Array.isArray(crudos) ? crudos : []), ...m.ataque.flecha.efectos];   // 🏹 la flecha especial
@@ -2437,6 +2445,13 @@ const Duelo = (() => {
         });
       }
       flechaPrimera = false;
+      if(cfgEscuchar.remachadoraErro && soyGM()){   // 🎯 la Remachadora (2026-10-11): errar o que la bloqueen vuelve la cuenta a 0
+        listaDuelos.forEach(d => {
+          if(d.estado !== 'resuelto' || !d.ataque || !d.ataque.remachadora || !['fallo', 'bloqueado'].includes(d.resultado) || remachaAvisada.has(d.id)) return;
+          remachaAvisada.add(d.id);
+          try{ cfgEscuchar.remachadoraErro(d); }catch(err){ console.error('Duelo: remachadoraErro', err); }
+        });
+      }
       // Fase 'dodge' de un hechizo de área (pedido del dueño, 2026-09-27): avisa cuando un duelo ENTRA y cuando SALE
       // de la fase (se resolvió, moviéndose o declinando) — el mapa usa esto para minimizar/reabrir el cuadro solo y
       // mostrar un cartel de "no me quiero mover" mientras le toca decidir a quien defiende (o al GM).

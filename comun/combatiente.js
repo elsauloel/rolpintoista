@@ -481,7 +481,8 @@ const Combatiente = (() => {
     return p > 0 && n(golpe) - n(def) < p ? p : 0;
   }
   const RASGOS_ARMA = ['espalda', 'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga', 'perfora', 'apuntada', 'cargada', 'atraviesaEscudos',
-    'tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad'];   // + las mecánicas de arco (2026-10-11, RASGOS_ARCO)
+    'tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad',   // + las mecánicas de arco (2026-10-11, RASGOS_ARCO)
+    'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'cargador', 'dobleCuerda', 'tiroRapido', 'carcajExtra'];   // + las de ballesta (2026-10-11)
   /* Rasgos de ballesta con el mapa (2026-10-10, dueño; docs/ideas-ballestas.md): **apuntada N** (+N PdG si no te moviste en el turno: el mapa lo
      suma al apuntar), **cargada** (llega cargada: el primer disparo del turno es gratis si no disparaste con ella el turno anterior; ver
      cargadaGratis) y **atraviesaEscudos** (si te paran el disparo con un escudo, el escudo se abolla: 1 stack de Armadura rota; lo hace el mapa). */
@@ -509,7 +510,16 @@ const Combatiente = (() => {
   const municionDe = arma => esArco(arma) ? 'flecha' : recargaDe(arma) ? 'virote' : '';
   const esVirote = it => !!(it && it.flecha && it.flecha.virote);
   const sirveLaMunicion = (arma, it) => { const m = municionDe(arma); return !!m && !!(it && it.flecha) && (m === 'virote') === esVirote(it); };
-  const recargaTxt = r => `Recarga ${r}${RECARGA_NOMBRE[r] ? ` (${RECARGA_NOMBRE[r]})` : ''}: ${[1, 2, 3].map(k => k * r).join(', ')}… No2`;
+  /* Lo que cuesta el disparo h+1 del turno (h = los ya hechos) con Recarga N: N × (h + 1). Doble cuerda (2026-10-11): el segundo cuesta como el
+     primero (N, N, 3N…). Tiro rápido (2026-10-11): cada disparo más suma 1, no N (N, N+1, N+2…). */
+  function recargaCosto(arma, h){
+    const rc = recargaDe(arma); if(!rc) return 0;
+    const k = Math.max(0, Math.round(n(h))), r = x => arma[x] || (arma.armaRasgos && arma.armaRasgos[x]);
+    if(r('tiroRapido')) return rc + k;
+    if(r('dobleCuerda') && k === 1) return rc;
+    return rc * (k + 1);
+  }
+  const recargaTxt = (r, arma) => `Recarga ${r}${RECARGA_NOMBRE[r] ? ` (${RECARGA_NOMBRE[r]})` : ''}${arma && (arma.tiroRapido || arma.dobleCuerda) ? (arma.tiroRapido ? ', tiro rápido' : ', doble cuerda') : ''}: ${[0, 1, 2].map(k => arma && recargaDe(arma) === r ? recargaCosto(arma, k) : (k + 1) * r).join(', ')}… No2`;
   // El texto de cuánto Dmg suma («arco: la mitad del Dmg» / «de rango: no suma Dmg»; cuerpo a cuerpo, '').
   const dmgDelArmaTxt = arma => !arma || !arma.armaDeRango ? '' : esArco(arma) ? 'arco: suma la mitad del Dmg' : 'de rango: no suma Dmg';
   function rasgosDeItem(it){
@@ -549,7 +559,14 @@ const Combatiente = (() => {
      - contraMarcado N: +N PdG contra un objetivo Marcado.
      - espaldaDistancia {pdg, fijo}: si todos los casilleros que cruza el disparo están en el punto ciego del objetivo (no hace falta sigilo).
      - afinidad: +1 a cada dado de daño elemental de las flechas especiales. */
-  const RASGOS_ARCO = ['tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad'];
+  const RASGOS_ARCO = ['tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad',
+    // 🎯 Las de ballesta (2026-10-11, dueño; docs/ideas-ballestas.md, «Lo que eligió el dueño»), también para cualquier arma de rango:
+    // caida N (más allá del alcance, hasta LARGO_ALCANCE_MAX, −N de DAÑO por casillero de más), apuntadaFirme N (+N PdG si no se movió ni este
+    // turno ni el anterior), tiradorApoyo N (+N PdG contra un rival pegado a un aliado tuyo), remate N (Crítico frecuente +N contra un Sentado o
+    // Inmovilizado), primerDisparo (el primer disparo del combate, +1 dado), puntaDiamante (contra Defensa 12 o más, Perfora +2), remachadora
+    // (cada golpe seguido al mismo blanco, Perfora +1, hasta +3; errar lo vuelve a 0), recuperable (el virote especial que erra no se rompe contra
+    // un obstáculo) y cargador N (los N primeros virotes especiales del combate no cobran su No2).
+    'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'cargador'];
   const LARGO_ALCANCE_MAX = 4, TENSAR_NO2 = 1;
   // Largo alcance: el objetivo más allá del alcance (hasta LARGO_ALCANCE_MAX de más) → {extra, pdg} (pdg negativo); si no corresponde, null.
   function largoAlcance(arma, distancia, alcance){
@@ -558,7 +575,14 @@ const Combatiente = (() => {
     return {extra, pdg: -pen * extra};
   }
   // Hasta dónde brillan los objetivos al apuntar: el alcance, y con Largo alcance LARGO_ALCANCE_MAX más.
-  const alcanceMaximo = (arma, alcance) => Math.round(n(alcance)) + (n(arma && arma.largoAlcance) > 0 ? LARGO_ALCANCE_MAX : 0);
+  const alcanceMaximo = (arma, alcance) => Math.round(n(alcance)) + (n(arma && arma.largoAlcance) > 0 || n(arma && arma.caida) > 0 ? LARGO_ALCANCE_MAX : 0);
+  // Alcance con caída (ballesta): el objetivo más allá del alcance (hasta LARGO_ALCANCE_MAX) → {extra, fijo} (fijo negativo); si no, null.
+  function caidaDano(arma, distancia, alcance){
+    const pen = Math.round(n(arma && arma.caida)), extra = Math.round(n(distancia)) - Math.round(n(alcance));
+    if(!(pen > 0) || extra <= 0 || extra > LARGO_ALCANCE_MAX) return null;
+    return {extra, fijo: -pen * extra};
+  }
+  const PUNTA_DIAMANTE_DEF = 12, PUNTA_DIAMANTE_PERFORA = 2, REMACHADORA_MAX = 3;
   // Afinidad elemental: los efectos de una flecha especial con su dado de daño elemental +1.
   const afinidadEfectos = efectos => (efectos || []).map(e => e && e.danoMagico && String(e.dado || '').trim() ? {...e, dado: `${String(e.dado).replace(/\s+/g, '')}+1`} : e);
   // El texto corto de las mecánicas de arco de un arma (para ItemCorto).
@@ -572,6 +596,18 @@ const Combatiente = (() => {
     if(r('contraMarcado') > 0) p.push(`Contra el Marcado +${r('contraMarcado')} PdG`);
     if(n(es.pdg) > 0 || n(es.fijo) > 0) p.push(`Espalda a distancia: ${[n(es.pdg) > 0 ? `+${Math.round(n(es.pdg))} PdG` : '', n(es.fijo) > 0 ? `+${Math.round(n(es.fijo))} de daño` : ''].filter(Boolean).join(', ')}`);
     if(it.afinidad) p.push('Afinidad elemental');
+    if(r('caida') > 0) p.push(`Alcance con caída: −${r('caida')} de daño por casillero de más`);
+    if(r('apuntadaFirme') > 0) p.push(`Apuntada firme +${r('apuntadaFirme')}`);
+    if(r('tiradorApoyo') > 0) p.push(`Tirador de apoyo +${r('tiradorApoyo')} PdG`);
+    if(r('remate') > 0) p.push(`Remate: Crítico frecuente +${r('remate')}`);
+    if(it.primerDisparo) p.push('Primer disparo: +1 dado');
+    if(it.puntaDiamante) p.push('Punta de diamante');
+    if(it.remachadora) p.push('Remachadora');
+    if(it.recuperable) p.push('Virote recuperable');
+    if(r('cargador') > 0) p.push(`Cargador ${r('cargador')}`);
+    if(r('carcajExtra') > 0) p.push(`Carcaj integrado +${r('carcajExtra')}`);
+    if(it.dobleCuerda) p.push('Doble cuerda');
+    if(it.tiroRapido) p.push('Tiro rápido');
     return p;
   }
   /* La distancia ideal de un arma de rango (sweet spot, 2026-10-09, dueño): `ideal = {donde: 'cerca' | 'medio' | 'lejos' | 'franja', ancho,
@@ -637,11 +673,11 @@ const Combatiente = (() => {
     ${b('contra', `↩ Contraataque — ${n(o.especial)} No2<br><span class="hint">solo tras ganar un Parry y un Bloqueo; siempre Tipo ÷ 2; no suma al conteo de ataques</span>`)}`;
   }
   // `arma` (opcional): con Recarga, el disparo cuesta Recarga × (los ya hechos + 1).
-  function costoAtaque(tipo, ataquesPrevios, arma){ const rc = recargaDe(arma); if(rc) return rc * (Math.max(0, Math.round(n(ataquesPrevios))) + 1); return n(ataquesPrevios) === 0 ? costoPrimerAtaque(tipo) : n(tipo); }
+  function costoAtaque(tipo, ataquesPrevios, arma){ const rc = recargaDe(arma); if(rc) return recargaCosto(arma, ataquesPrevios); return n(ataquesPrevios) === 0 ? costoPrimerAtaque(tipo) : n(tipo); }
   // Cuántos ataques alcanzan con esos No2 (el primero a mitad de precio, los demás completos; con Recarga, N, 2N, 3N…).
   function ataquesPosibles(tipo, nitros, arma){
     const rc = recargaDe(arma);
-    if(rc){ let k = 0, g = 0; while(g + rc * (k + 1) <= n(nitros)){ g += rc * (k + 1); k++; } return k; }
+    if(rc){ let k = 0, g = 0; while(g + recargaCosto(arma, k) <= n(nitros)){ g += recargaCosto(arma, k); k++; } return k; }
     const t = n(tipo), p = costoPrimerAtaque(t); return n(nitros) < p ? 0 : 1 + (t > 0 ? Math.floor((n(nitros) - p) / t) : 0);
   }
 
@@ -1274,9 +1310,9 @@ const Combatiente = (() => {
       const h = Math.max(0, Math.round(n(o.hechos))), especial = o.ataque === 'oportunidad' || o.ataque === 'contra';
       if(!especial && h === 0 && Math.round(n(o.costo)) === 0 && o.arma && (o.arma.cargada || (o.arma.armaRasgos && o.arma.armaRasgos.cargada)))   // llega cargada (2026-10-10)
         return {no2: 0, lineas: ['Llega cargada: este disparo es gratis (no disparó con ella el turno anterior)', recargaTxt(rc)]};
-      const base = especial ? rc : rc * (h + 1), l = [recargaTxt(rc)];
+      const base = especial ? rc : recargaCosto(o.arma, h), l = [recargaTxt(rc, o.arma)];
       l.push(especial ? `${o.ataque === 'contra' ? 'Contraataque' : 'Ataque de oportunidad'}: lo de un primer disparo = ${rc}; no cuenta como disparo del turno`
-        : h ? `Ya disparó ${h === 1 ? 'una vez' : `${h} veces`} este turno: el disparo ${h + 1}.º = ${rc} × ${h + 1} = ${base}` : `Primer disparo del turno: ${rc}`);
+        : h ? `Ya disparó ${h === 1 ? 'una vez' : `${h} veces`} este turno: el disparo ${h + 1}.º = ${base}${base === rc * (h + 1) ? ` (${rc} × ${h + 1})` : ''}` : `Primer disparo del turno: ${rc}`);
       if(costo !== base) l.push(`${costo < base ? 'Ahorro' : 'Recargo'} (arma, equipo o estados): ${costo < base ? '−' : '+'}${Math.abs(base - costo)}`);
       l.push(`Cuesta ${costo} No2 · tiene ${Math.round(n(o.tiene))}${costo > n(o.tiene) ? ' (no le alcanzan: pregunta y deja seguir)' : ''}`);
       return {no2: costo, lineas: l};
@@ -1349,7 +1385,7 @@ const Combatiente = (() => {
   // El texto de lo que cura un ítem: «Heridas (Sangrado, Lisiado, Rengo)».
   const textoCura = grupos => grupos.map(k => `${GRUPOS_CURA[k].label} (${GRUPOS_CURA[k].estados.join(', ')})`).join(' · ');
 
-  return {RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

@@ -719,6 +719,7 @@ function dueloElegirObjetivoMapa(msg){
           tiro.motivo = tiro.motivo ? `${tiro.motivo} y ${fl.nombre}` : fl.nombre;
         }
         flecha = {nombre: fl.nombre, efectos: ataque.afinidad ? Combatiente.afinidadEfectos(b.efectosGolpe) : (b.efectosGolpe || []), perfora: num(b.perfora),   // afinidad elemental (js/35)
+          ...(ataque.recuperable ? {recuperable: true} : {}), ...(b.sinDano ? {sinDano: true} : {}),   // virote recuperable (el arma) y el de red (2026-10-11)
           ...(b.salto ? {salto: b.salto} : {}),
           ...['humo', 'luz', 'clava', 'rebota'].reduce((o, k) => b[k] ? {...o, [k]: true} : o, {}), ...(b.explota ? {explota: b.explota} : {})};   // virotes con mapa (js/33)
         if(msg.alDisparar){ try{ msg.alDisparar(); }catch(err){ console.error('No se pudo gastar la flecha:', err); } }
@@ -1279,7 +1280,9 @@ async function dueloAplicarDano(d){
   // 🏹 Perfora N (regla del dueño, 2026-10-10): N puntos del golpe pasan SIEMPRE, sin que los frene la Defensa; el resto va contra la Defensa como
   // siempre. O sea: recibe lo que pase la Defensa, pero nunca menos de N (ni más que el golpe). Con crítico no hace falta: ya ignora la Defensa entera.
   // (Antes, hasta el 2026-10-10, le restaba N a la Defensa: contra un tanque casi no servía.)
-  const perfN = !crit && d.ataque ? Math.min(num(d.ataque.flecha && d.ataque.flecha.perfora) + num(d.ataque.perfora), golpe) : 0;
+  // 🎯 Punta de diamante (contra Defensa 12 o más, Perfora +2) y Remachadora (golpes seguidos al mismo blanco, js/35), 2026-10-11.
+  const perfExtra = d.ataque && !crit ? (d.ataque.puntaDiamante && def >= Combatiente.PUNTA_DIAMANTE_DEF ? Combatiente.PUNTA_DIAMANTE_PERFORA : 0) + remachadoraPerfora(d) : 0;
+  const perfN = !crit && d.ataque ? Math.min(num(d.ataque.flecha && d.ataque.flecha.perfora) + num(d.ataque.perfora) + perfExtra, golpe) : 0;
   const perfora = Combatiente.perforaPasa(golpe, def, perfN);   // solo cuenta si la Defensa frenaría más que eso
   let aplicar = perfora || golpe, ignoraDef = crit || perfora > 0;
   if(base.mitad){ aplicar = Math.ceil(Math.max(0, golpe - def, perfN) / 2); ignoraDef = true; }

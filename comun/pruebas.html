@@ -543,7 +543,7 @@ prueba('la Recarga de la ballesta (2026-10-10): N, 2N, 3N… No2; no suma Dmg; u
     [0, 1, 2].map(h => Combatiente.costoAtaque(6, h, bal)), [0, 1, 2].map(h => Combatiente.costoAtaque(6, h)),
     Combatiente.ataquesPosibles(6, 8, bal), Combatiente.ataquesPosibles(6, 12, bal), Combatiente.ataquesPosibles(6, 8, asedio),
     Combatiente.costoEspecial(6, bal, 'oportunidad'), Combatiente.dmgDelArma(bal, 10), CreepCalculo.costoAtaque(creep),
-    l.no2, /2\.º = 2 × 2 = 4/.test(l.lineas.join(' ')), Combatiente.rasgosDeItem(bal).recarga],
+    l.no2, /2\.º = 4 \(2 × 2\)/.test(l.lineas.join(' ')), Combatiente.rasgosDeItem(bal).recarga],
     [2, 0, 0, [2, 4, 6], [3, 6, 6], 2, 3, 1, 2, 0, 6, 4, true, 2]);
 });
 prueba('Perfora N del arma (2026-10-10): viaja en el ataque, la copia el creep y la cuenta la calculadora del catálogo; los virotes van con la ballesta', () => {
@@ -593,6 +593,19 @@ prueba('las mecánicas de arco: largo alcance, afinidad, lo que viaja al ataque 
     [{extra: 2, pdg: -2}, null, null, {extra: 2, pdg: -4}, null, 9, 5,
      [2, 1, 2, 2, 1, {pdg: 2, fijo: 1}, true], undefined, 3, ['1d4+1', undefined], 1,
      ['Tensar +2 PdG (+1 No2)', 'Largo alcance −1 PdG por casillero', 'Emboscada: Crítico frecuente +2', 'Matabestias +2 de daño', 'Contra el Marcado +1 PdG', 'Espalda a distancia: +2 PdG, +1 de daño', 'Afinidad elemental']]);
+});
+prueba('las mecánicas de ballesta: doble cuerda, tiro rápido, caída, carcaj integrado y lo que viaja al ataque (2026-10-11)', () => {
+  const bal = x => ({armaDeRango: true, recarga: 2, ...x});
+  const doble = bal({dobleCuerda: true}), rapido = bal({tiroRapido: true}), comun = bal({}), caida = bal({caida: 2, primerDisparo: true, puntaDiamante: true, remachadora: true, recuperable: true, cargador: 2, apuntadaFirme: 3});
+  const at = Combatiente.ataqueDeArma(caida);
+  const S = fichaDePrueba({inventario: [{id: 'b', nombre: 'Ballesta', armaDeRango: true, recarga: 2, equipado: true, carcajExtra: 3}, {id: 'c', nombre: 'Carcaj', tipoItem: 'carcaj', capFlechas: 10, equipado: true, flechas: []}]});
+  igual([[0, 1, 2].map(h => Combatiente.costoAtaque(6, h, comun)), [0, 1, 2].map(h => Combatiente.costoAtaque(6, h, doble)), [0, 1, 2].map(h => Combatiente.costoAtaque(6, h, rapido)),
+    Combatiente.ataquesPosibles(6, 6, comun), Combatiente.ataquesPosibles(6, 6, doble), Combatiente.ataquesPosibles(6, 6, rapido),
+    Combatiente.caidaDano(caida, 7, 5), Combatiente.caidaDano(caida, 5, 5), Combatiente.alcanceMaximo(caida, 5),
+    [at.caida, at.primerDisparo, at.puntaDiamante, at.remachadora, at.recuperable, at.cargador, at.apuntadaFirme], Combatiente.ataqueDeArma(doble).dobleCuerda,
+    FichaEquipo.capCarcaj(FichaEquipo.carcajDe(S), S), FichaEquipo.capCarcaj(FichaEquipo.carcajDe(S)), Combatiente.arcoRasgosTxt(doble), Combatiente.arcoRasgosTxt(bal({caida: 2}))],
+    [[2, 4, 6], [2, 2, 6], [2, 3, 4], 2, 2, 2, {extra: 2, fijo: -4}, null, 9,
+     [2, true, true, true, true, 2, 3], undefined, 13, 10, ['Doble cuerda'], ['Alcance con caída: −2 de daño por casillero de más']]);
 });
 prueba('el carcaj: viene con el arco, guarda las flechas especiales y las gasta; una flecha no se «consume» (2026-10-09)', () => {
   const S = fichaDePrueba({inventario: []});
@@ -1997,17 +2010,23 @@ prueba('creeps: el turno propio (al empezar cuenta y después dispara, P177) y e
   igual([a.hpAplicado, hpA, no2 > 0, sc.estados[0].stacks, b.vencidos, m.enTurno, p.hp, lista[0].turnos, lista[0].disparado], [1, 19, true, 1, 0, true, 0, 1, false]);
 });
 
-prueba('con el turno sabido, el Flash no pregunta: en turno ajeno cobra el doble y avisa; en el propio, lo normal', async () => {
+prueba('con el turno sabido: en turno ajeno anuncia «No es tu turno, cuesta tanto» con Confirmar / Cancelar (2026-10-11); en el propio, lo normal sin preguntar', async () => {
   const viejo = window.toast;
   let aviso = '';
   window.toast = t => { aviso = t; };
+  // Toca el botón del cartel de esta prueba (el que nombra a juan; puede haber otros carteles de pruebas que corren a la vez).
+  const tocar = sel => { const i = setInterval(() => { const f = [...document.querySelectorAll('#ct-fondo')].find(x => /juan/.test(x.textContent)); if(f){ clearInterval(i); f.querySelector(sel).click(); } }, 10); };
+  await new Promise(r => setTimeout(r, 2500));   // después de las otras pruebas con carteles (alguna aprieta Esc, que cerraría este)
   try{
     window.confirmarTurnoSaber = () => false;
+    tocar('#ct-si');
     const ajeno = {sp: await ConfirmarTurno.pedir('⚡ Golpe veloz', 2, 4, {flash: true, ident: {nombre: 'juan'}})};   // (pedir: otra prueba reemplaza un rato a flash)
+    tocar('#ct-cancelar');
+    const cancelado = await ConfirmarTurno.pedir('⚡ Golpe veloz', 2, 4, {flash: true, ident: {nombre: 'juan'}});
     window.confirmarTurnoSaber = () => true;
     const propio = {sp: await ConfirmarTurno.pedir('⚡ Golpe veloz', 2, 4, {flash: true})};
-    igual([ajeno.sp, propio.sp, /No es el turno de juan/.test(aviso), Combatiente.esFlash({duelo: {modo: 'flash'}}), Combatiente.esFlash({duelo: {modo: 'hab'}})],
-      [4, 2, true, true, false]);
+    igual([ajeno.sp, cancelado, propio.sp, /No es el turno de juan/.test(aviso), Combatiente.esFlash({duelo: {modo: 'flash'}}), Combatiente.esFlash({duelo: {modo: 'hab'}})],
+      [4, null, 2, true, true, false]);
   }finally{ delete window.confirmarTurnoSaber; window.toast = viejo; }
 });
 prueba('Stun (2026-10-06): no le toca los No2; si lo atacan, su Evasión es 1 sin tirar; Barrera dura 2 turnos', () => {
@@ -3348,8 +3367,8 @@ prueba('reposición (2026-10-07): lo comprado se repone con otro de la misma par
   }
   // La proporción de Buena en lo sorteado (sin los clásicos fijos) no depende del tamaño.
   const porId = new Map(cat.map(i => [i.id, i]));
-  const pct = (tam, veces) => { let b = 0, t = 0; for(let n = 0; n < veces; n++){ const r = G.generar({tamano: tam, nivel: 4, catalogo: cat}), g = new Set(r.garantizados);
-    r.items.filter(id => !g.has(id) && !porId.get(id).gondolaFija).forEach(id => { t++; if(porId.get(id).tier === 'Buena Calidad') b++; }); } return b / t; };   // sin lo fijo de la góndola (2026-10-11)
+  const pct = (tam, veces) => { let b = 0, t = 0; for(let n = 0; n < veces; n++){ const r = G.generar({tamano: tam, nivel: 4, catalogo: cat}), g = new Set([...r.garantizados, ...r.gondola]);
+    r.items.filter(id => !g.has(id)).forEach(id => { t++; if(porId.get(id).tier === 'Buena Calidad') b++; }); } return b / t; };   // solo el equipo: sin los clásicos ni la góndola (2026-10-11: la góndola, que vino después, la hacía fallar a veces)
   igual([malas, sinRepo < 40 * 30 * 0.2, Math.abs(pct('ambulante', 60) - pct('capital', 30)) < 0.15, G.reservaDe('pueblito'), G.reservaDe('personalizada')], [0, true, true, 6, 10]);
 });
 

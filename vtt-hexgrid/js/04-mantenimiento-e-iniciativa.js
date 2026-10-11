@@ -814,10 +814,12 @@ const costoRuta = (ruta, porCasillero, pasos, gratis, recargo, levita) => { cons
 const movidosTurno = new Set();
 try{ JSON.parse(localStorage.getItem('movidos-turno') || '[]').forEach(k => movidosTurno.add(k)); }catch(e){}
 const seMovioEsteTurno = id => !!id && movidosTurno.has(`${id}@${Math.round(num(mantenimientoNumero))}`);
+const seMovioTurnoAnterior = id => !!id && movidosTurno.has(`${id}@${Math.round(num(mantenimientoNumero)) - 1}`);   // Apuntada firme (js/35, 2026-10-11)
 function marcarMovido(id, si){
   const k = `${id}@${Math.round(num(mantenimientoNumero))}`;
   if(si === false) movidosTurno.delete(k); else movidosTurno.add(k);
-  try{ localStorage.setItem('movidos-turno', JSON.stringify([...movidosTurno].filter(x => x.endsWith('@' + Math.round(num(mantenimientoNumero)))))); }catch(e){}
+  const ahora = Math.round(num(mantenimientoNumero));   // se guardan este turno y el anterior (la Apuntada firme mira los dos)
+  try{ localStorage.setItem('movidos-turno', JSON.stringify([...movidosTurno].filter(x => x.endsWith('@' + ahora) || x.endsWith('@' + (ahora - 1))))); }catch(e){}
 }
 window.mapaSeMovio = tokenId => seMovioEsteTurno(tokenId);
 // Lento: lo que se suma al primer casillero si todavía no se movió en este turno (0 si no está Lento o si no se puede mover).

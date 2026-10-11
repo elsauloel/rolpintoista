@@ -25,3 +25,8 @@ usa: **Asalto**. Banda: 74–106 % contra el blanco medio. No cuenta: Alcance, I
 - **Aguja de zurcir untada:** Perfora 1 en vez de 2 → 98 %.
 - **Mellizas:** Punzón de talabartero → 1d4 Perfora 2 y PdG en oportunidad +1 (se diferencia de la Daga); Cuchillo de cazador → 1d4+1 Perfora 1 con
   Sangrado 25 % (se diferencia de la Daga de cota) — o dejarlo como está.
+
+## Aplicado (2026-10-11, con el OK del dueño)
+Todo lo propuesto: +1 de daño a las 11 flojas; Pica Hielos y Cuchillo de la pensión, 2d4 sin Perfora y PdG −1 ($50); Aguja de zurcir untada, Perfora 1
+($65); Punzón de talabartero, + PdG en oportunidad +1; Cuchillo de cazador, 1d4+1 Perfora 1 y Sangrado 25 %. Las lanzas con Alcance, como estaban. La
+calculadora cobra el dado de más de un Tipo 4 cuerpo a cuerpo al doble (`DADO_EXTRA_T4`).

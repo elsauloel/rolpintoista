@@ -33,7 +33,7 @@
 >   banda Común (74–106 %) es **1d6+3** (95 %; 1d6+4 = 114 %, 2d6 = 110 %). Ajustarla mueve el precio y la calidad de todas las ballestas: revisarlo
 >   con el dueño antes de tocarla. Mientras tanto, para diseñar: Común sin bonos, como mucho 1d6+3.
 > - [ ] **🧪 Rondas de testeo por tipo y tier (dueño, 2026-10-11: «hacer esta misma ronda de testeo con cada uno de los tipos de arma y con cada
->   uno de los tiers; cuando lo tenga libre te voy a decir cuál toca»).** El método está en `docs/metodo-testeo-armas.md`. Hechas: ✅ arcos Comunes (2026-10-11, `revision-arcos.md`), ✅ ballestas
+>   uno de los tiers; cuando lo tenga libre te voy a decir cuál toca»).** El método está en `docs/metodo-testeo-armas.md`. Hechas: ✅ cuerpo a cuerpo Tipo 4 Común (2026-10-11, `revision-cuerpo-a-cuerpo-t4.md`), ✅ arcos Comunes (2026-10-11, `revision-arcos.md`), ✅ ballestas
 >   Comunes. Faltan: ballestas Buenas (después de que el dueño filtre la lista), arcos (Común y Buena; después de su rework), cuerpo a cuerpo Tipo 4 /
 >   6 / 8 / 10 en Común y Buena, y lo mismo para Rara en adelante cuando toque. Antes de la primera de cuerpo a cuerpo: generalizar
 >   `herramientas/combate_ballestas.py` (ver «Falta» en el método).

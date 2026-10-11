@@ -89,6 +89,7 @@ def dano_arco(tipo, dados, fijo, perfora):
     r = {n: 0.7 * e[n]['medio'] + 0.3 * min(1.5, e[n]['pesado']) for n in ('n1', 'n3')}
     v1 = 5.5 + (r['n1'] - 0.74) / 0.32 * 2.0
     return max(v1, 9.0 + (r['n3'] - 0.74) / 0.32 * 2.0) if r['n3'] >= 0.74 else v1
+DADO_EXTRA_T4 = 1.0   # lo que se suma por cada dado de más en un arma cuerpo a cuerpo Tipo 4 (× su promedio; ver puntaje)
 PERFORA_VALOR = 0.8   # lo que vale cada punto de Perfora frente a +1 de daño fijo (docs/ideas-arcos-flechas.md)
 PERFORA_CASA = {'punzante': 1.0, 'cortante': 1.25}   # la casa de la Perfora cuerpo a cuerpo: las dagas (Tipo 4); en las espadas (Tipo 6), habilitada (dueño, 2026-10-10)
 RECARGA_FACTOR = {1: 1.0, 2: 1.0, 3: 0.9}
@@ -149,6 +150,9 @@ def puntaje(arma):
     perf = min(5.0, float(arma.get('perfora') or 0))   # Perfora N (2026-10-10): 0,8 de un punto de daño fijo por punto
     rango = bool(arma.get('armaDeRango'))
     d = {'daño': (peso + amp) * (tipo + 1) / 2 + (fijo + (PERFORA_VALOR * perf if rango else 0)) * factor_plano(tipo)}
+    # Cuerpo a cuerpo Tipo 4 (2026-10-11, revision-cuerpo-a-cuerpo-t4.md): cada dado más allá del primero rinde ~2,5 veces lo que +1 de daño (2d4 = 131 %
+    # contra el medio, 1d4+2 = 116 %); se cobraba menos que +2 de daño. Ahora vale el doble.
+    if not rango and tipo == 4 and peso + amp > 1: d['daño'] += (peso + amp - 1) * (tipo + 1) / 2 * DADO_EXTRA_T4
     if perf and not rango:   # cuerpo a cuerpo: la casa de la Perfora es el Tipo 4 (dueño, 2026-10-10); en el Tipo 6, habilitada; en el resto, fuera de casa
         d['perfora'] = PERFORA_VALOR * perf * factor_plano(tipo) * PERFORA_CASA.get(familia(arma), 1.5)
     if arma.get('armaDeRango') and arma.get('arco'):

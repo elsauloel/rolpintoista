@@ -10,6 +10,14 @@
 
 ## Pendientes
 
+- [ ] **🎯 Apuntar: el tope de X y el ×2** (2026-10-11; subido, sin ver en el mapa): en el cartel del costo tiene que decir «X: de 1 a 3» y no dejar
+  pagar 4; con X = 2, «Apuntando ×2» y el disparo «apuntando (+2): +2 PdG, Crítico potente +2». Ojo: la copia de Apuntar de juan es vieja (sin `xMax`):
+  volver a dársela desde el catálogo de skills.
+- [ ] **🛡 Shield (Support)** (2026-10-11): decidida por el dueño (2 SP, Flash, 0 No2, absorbe 14 hasta gastarse, a cualquiera de su equipo); falta
+  programarla y probarla (tarea propuesta aparte: «Skills: probar Apuntar y hacer Shield»).
+- [ ] **🗡 Dagas Tipo 4 Comunes ajustadas** (2026-10-11, `revision-cuerpo-a-cuerpo-t4.md`): ver en la tienda o el inventario que los textos y precios
+  nuevos se vean bien (por ejemplo el Estileto 1d4+1, la Pica Hielos 2d4 con PdG −1) y un golpe con una de ellas desde la Botonera.
+
 - [ ] **💠 Distancia ideal nueva (2026-10-11, dueño)**: «cerca» = a 3 o 4 casilleros; «media» = una franja en la mitad del alcance; «lejos» = los 3
   últimos casilleros del alcance, nunca antes del 8. Ver en el mapa que, al apuntar con un arco de distancia ideal, brillen en celeste los
   objetivos en esa franja y que el duelo sume el bono (se prueba con los arcos Comunes nuevos cargados).

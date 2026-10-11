@@ -203,3 +203,54 @@ mitad del Efecto especial) · 43 Maldita (≈ arco: +daño, pero −1 HP por dis
 **K. Debilidades (abaratan):** 44 Corto alcance (≈ arco: Rango −2) · 45 Se traba (si todos los dados del PdG salen 1, se traba: 1 No2 para
 destrabarla) · 46 Lenta de apuntar (−2 PdG si te moviste en el turno) · 47 Cuerda que se afloja (desde el 3.er disparo del combate, −1 de daño hasta
 pagar 1 No2 para tensarla).
+
+## 2026-10-11 · Lo que eligió el dueño (de las tres listas) y lo que se hizo
+> El dueño pasó «lo que queda, con algunos comentarios»: evaluar el peso y ampliar Común y Buena; lo que no entra, anotado para las Raras.
+
+### Ya existía (se usa tal cual)
+- **Llega cargada** · **Apuntada +N** (sin moverse este turno) · **Rompe armadura con %** (desde Común) y **seguro si es crítico** (`seguroCritico`:
+  «% de rompe armadura con golpe normal, 1 punto asegurado si es crítico») · **Atraviesa escudos** (si lo paran con escudo, 1 stack de Armadura rota
+  al que lo paró: «rompe escudos seguro, desde común») · **Perfora N** en el arma · **A quemarropa** · **Mira de cerca** (= distancia ideal de 1 a 3
+  casilleros, PdG +2) · **Pesada** (Evasión −1 como bono negativo) · **Corto alcance** (Rango −1 / −2) · **Emboscada**, **Espalda a distancia** y
+  **Afinidad elemental** (las de los arcos ya valen para cualquier arma de rango).
+- Virotes que ya estaban: perforante, marcador (Marcar), silbador, dentado (Sangrado), envenenado (Perfora + Veneno), incendiario, de escarcha, de
+  ácido, relámpago (con salto), explosivo (Raro), de punta de diamante (Raro, Perfora 5), rompe-corazas (×1, Buena) y quiebra-escudos (×2, Raro).
+
+### Programado hoy (`Combatiente.RASGOS_ARCO` / `recargaCosto`, el mapa en `vtt-hexgrid/js/35-arcos.js`)
+- **Doble cuerda** (el 2.º disparo cuesta como el 1.º: 2, 2, 6) y **Tiro rápido** (cada disparo más, +1: 2, 3, 4), con Recarga.
+- **Alcance con caída** (hasta 4 casilleros más allá del alcance, −N de daño por cada uno; el dueño: −2).
+- **Apuntada firme** (+N PdG si no se movió ni este turno ni el anterior; el dueño: +3).
+- **Tirador de apoyo** (+N PdG contra un rival pegado a un aliado tuyo).
+- **Remate** (Crítico frecuente +N contra Sentado o Inmovilizado).
+- **Primer disparo** (el primer disparo del combate, +1 dado de daño).
+- **Punta de diamante** (contra Defensa 12 o más, Perfora +2).
+- **Remachadora** (cada golpe seguido al mismo blanco, Perfora +1, hasta +3; errar, que lo bloqueen o tirarle a otro la vuelve a 0).
+- **Virote recuperable** (el especial que erra no se rompe contra un obstáculo), **Cargador N** (los N primeros virotes especiales del combate no
+  cobran su No2), **Carcaj integrado +N** (lugares de más en el carcaj mientras está equipada).
+
+### Cargado al catálogo (precio de la calculadora)
+- **Ballestas Comunes (9):** de doble cuerda (60) · de mira (Apuntada firme +3, 85) · de batida (Tirador de apoyo +2, 65) · del rematador (Remate +2,
+  45) · de acecho (Emboscada +2, 55) · de pared (+2, Perfora 1, Evasión −1, 45) · rompescudos (Rompe armadura 25 %, seguro con crítico, Atraviesa
+  escudos, 65) · de tiro largo (Alcance con caída −2, 75) · corta (1 mano, Rango −1, 50).
+- **Ballestas Buenas (9):** de tiro rápido (170) · de punta de diamante (160) · remachadora (170) · virotera (Cargador 2, Carcaj +3, Virote
+  recuperable, 190) · de vigía (Apuntada firme +2, Alcance con caída −1, 160) · de escolta (Tirador de apoyo +1, 150) · de mira corta (de 1 a 3: PdG
+  +2, 160) · del acechador (Emboscada +1, Espalda a distancia, 170) · de primer tiro (+1 dado el primer disparo, 150).
+- **Virote de red** (Común, 25): sin daño, Inmovilizado 1 turno, +1 No2 (`flecha.sinDano`).
+- **Flecha rompe-corazas** (Buena, 40): Rompe armadura 1 stack, +1 No2 (lectura de Claude del punto 11: «también debe existir una flecha especial
+  que rompa armadura»).
+
+### Para las Raras (anotado, sin hacer)
+- **Rompe armadura ×3** en un virote especial (×1 Buena y ×2 Raro ya existen).
+- **Daño elemental de la ballesta** (+1d4 fuego / hielo / rayo / ácido, sin virote especial), desde Raro.
+- **Ballesta rúnica** (sus virotes comunes hacen daño elemental), desde Raro.
+- **Que se calienta** (+1 por rival caído, +3 si lo volteó ella).
+- **Desarmar a distancia**: con crítico, 50 % de desarmar como la Varita del manotazo («expelliarmus»), desde Rara.
+- **De asedio emplazada** (Recarga 3; no se puede mover y disparar en el mismo turno, con PdG o Perfora de más): «podría probarse».
+- **De repetición** (Recarga 1): puntual, no como mecánica; pensar los números.
+- **Culatazo** (pegar cuerpo a cuerpo con la culata: 1d10, Demora con %): necesita un arma de rango que también sirva cuerpo a cuerpo (no existe).
+- **Recargar en vez de disparar** (la Manivela): ver P195.
+- **Virote de punta de diamante** (ya es Raro).
+
+### Skills, no ballestas
+Golpe de gracia · Tiro raso (un aliado en el medio no tapa la línea) · Recuperar proyectiles (pasiva: al terminar el combate, cada flecha o virote
+especial que pegó vuelve con una moneda).

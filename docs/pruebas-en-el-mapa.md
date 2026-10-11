@@ -10,6 +10,13 @@
 
 ## Pendientes
 
+- [ ] **🎯 Mecánicas de ballesta nuevas** (2026-10-11): con las ballestas nuevas del catálogo, en combate: **Doble cuerda** (2, 2, 6 No2) y **Tiro
+  rápido** (2, 3, 4) en el costo de cada disparo; **Alcance con caída** (más allá del alcance, el duelo resta daño); **Apuntada firme** (sin
+  moverse dos turnos: +PdG); **Tirador de apoyo** (blanco pegado a un aliado); **Remate** (blanco Sentado o Inmovilizado); **Primer disparo** (el
+  daño suma «+1d6 primer disparo»); **Punta de diamante** (contra Defensa 12+, Perfora +2) y **Remachadora** (Perfora 1, 2, 3 con golpes seguidos;
+  errar la vuelve a 0) — las dos las aplica el mapa del GM; **Virote recuperable** (un virote que erra contra una pared no se rompe); **Cargador**
+  (los primeros virotes especiales no cobran No2, con su línea en la Mesa); **Carcaj integrado** (el carcaj muestra 13 / 13). Y el **Virote de
+  red**: pega sin daño y deja Inmovilizado.
 - [ ] **🏹 Mecánicas de arco nuevas** (2026-10-11, `vtt-hexgrid/js/35-arcos.js`): con un arco que las tenga (los 12 nuevos del catálogo), en el
   mapa y en modo combate: **Tensar** (al elegir el objetivo pregunta «¿Tensás…?»; «Tensar» cobra 1 No2 y el duelo muestra «tensado» con +2 PdG);
   **Largo alcance** (brillan también los que están hasta 4 casilleros más allá del alcance; el duelo resta 1 o 2 PdG por cada uno de más);

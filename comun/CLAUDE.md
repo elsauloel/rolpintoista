@@ -1474,6 +1474,11 @@ versión parecida en más de una, es candidato a juntar.
   `ItemCorto`); los aplica el mapa al apuntar (`vtt-hexgrid/js/35-arcos.js`). El asistente de ítems los pregunta en un arma de rango; el glosario
   los explica. `CreepCalculo.tarjetaPublica` publica `tipoCriatura` (Matabestias). `GeneradorTiendas`: un ítem con `gondolaFija` sale siempre en
   la góndola de su sección (las 4 flechas elementales).
+  **Las de ballesta** (2026-10-11, `../docs/ideas-ballestas.md`) se sumaron a la misma lista: `caida` (`caidaDano`), `apuntadaFirme`, `tiradorApoyo`,
+  `remate`, `primerDisparo` (el duelo acepta `tiro.dado`: un dado de daño de más; y `tiro.fijo` puede ser negativo), `puntaDiamante` y
+  `remachadora` (`Duelo.crear` los guarda en el ataque; el mapa del GM los suma a la Perfora; hook `remachadoraErro` de `Duelo.escuchar`),
+  `recuperable` y `cargador`; además `dobleCuerda` / `tiroRapido` (`Combatiente.recargaCosto(arma, h)`: el costo del disparo h+1 con Recarga) y
+  `carcajExtra` (`FichaEquipo.capCarcaj(c, S)`). Una flecha o virote con `flecha.sinDano` pega sin daño (el Virote de red).
 - **🏹 Flechas especiales y el carcaj** (2026-10-09, dueño; `../docs/ideas-arcos-flechas.md`): las flechas comunes son ilimitadas; las
   **especiales** son consumibles con `flecha = {no2, pdg, crit, critpot, ignora, perfora, efectosGolpe}` (21 en `catalogo.js`, ids `flecha-*`; sus
   efectos son **siempre**, sin %: lo fuerte se paga con No2 y oro) y se venden en la góndola de la Talabartería (`GeneradorTiendas.gondolaDe`). El

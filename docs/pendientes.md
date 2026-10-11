@@ -18,6 +18,8 @@
 > - [ ] **🕊 Vuelo (2026-10-11, dueño, con los arcos: «todavía no diseñamos nada, pero eventualmente aparecerán creeps voladores — anotar para
 >   desarrollar: vuelo»):** creeps que vuelan o levitan. Cuando exista, los arcos «Contra lo que vuela o levita» (+PdG) ya están elegidos por el dueño
 >   (docs/ideas-arcos-flechas.md). Hoy existe Levitar (pies), que no es lo mismo.
+> - [ ] **🎯 Ballestas: Comunes y Buenas hechas (2026-10-11)**; lo que queda para las Raras y P195 (la Manivela) en `docs/ideas-ballestas.md` →
+>   «Para las Raras». Tensar, el Cargador y el Virote recuperable solo andan desde la Botonera de un personaje (no en creeps ni invocaciones).
 > - [ ] **🏹 Mecánicas de arco que faltan (2026-10-11):** hechas y en el catálogo (12 arcos nuevos, Común y Buena): Tensar, Largo alcance, Emboscada,
 >   Matabestias, Contra el Marcado, Espalda a distancia, Afinidad elemental, Perfora 1 y Corto alcance (Rango −2). **Faltan, para la Rara**: Tiro
 >   rápido, Arco rúnico, Arco que se calienta, Arco compuesto (medirlo antes: «miedo a que rompa todo») y la Flecha de empuje. Tensar solo lo

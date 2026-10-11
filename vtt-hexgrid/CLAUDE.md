@@ -1509,3 +1509,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (`emboscadaUsadas`, se libera al volver a narrativo en js/25), Matabestias (`vinculo(t).tipoCriatura`, que lee js/09), Contra el Marcado
   (`marcado(t)`) y Espalda a distancia (`arcoPorLaEspalda`: todas las casillas de `tiroCeldas` en la cuña ciega). `arcoTensar(ataque, msg, tiro)`
   pregunta Tensar si quien dispara trae `msg.alTensar` (la Botonera nueva: `bnTensar`, js/11). La Afinidad elemental se aplica a la flecha en js/13.
+- **🎯 Mecánicas de ballesta al apuntar** (2026-10-11, también en `js/35-arcos.js`): alcance con caída, apuntada firme (`seMovioTurnoAnterior`, js/04:
+  ahora se guardan los movimientos de este turno y del anterior), tirador de apoyo (`arcoAliadoPegado`), remate (`arcoQuieto`) y el +1 dado del primer
+  disparo (`primerDisparoUsados`). La Remachadora la lleva el mapa del GM (`remachadoraCuenta`, `remachadoraPerfora` en `dueloAplicarDano`, js/13;
+  `remachadoraErro` desde el hook del duelo, js/14) y la Punta de diamante también (contra Defensa 12+). El Cargador, en `bnDispararFlecha` (js/11,
+  `cargadorUsados`); el virote recuperable, en `flechaErrada` (js/33). Todo se libera al volver a narrativo (js/25).

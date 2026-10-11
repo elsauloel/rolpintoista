@@ -966,3 +966,8 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   la ficha sigue cobrando como en combate: desequipar la ballesta pidió 1 No2 (con «Realizar de cualquier modo» si no alcanzan). Entre sesiones
   parece más natural que la pausa cuente como modo narrativo (sin costos de combate). Propuesta de Claude: mientras dure la pausa, la ficha no
   cobra No2 por equipar, desequipar ni pasar cosas a la mochila. **A decidir por el dueño.**
+- ❓ **P195. Recargar en vez de disparar (la Manivela) — 2026-10-11** (ballestas). El dueño: «parece interesante, para cuando no puede atacar por lo
+  que sea, adelanta los No2, ¿correcto?» — **Sí**: en un turno sin disparar se pagan los No2 de un disparo (la Recarga) y el primer disparo del
+  turno siguiente sale gratis; no ahorra No2, los mueve a un turno en que sobraban. Falta decidir: (a) ¿regla de todas las ballestas o un rasgo de
+  algunas (y en qué calidad)?; (b) ¿se paga con un botón propio «⚙ Cargar» en la Botonera? Propuesta de Claude: regla de todas las ballestas, con
+  el botón; «Llega cargada» queda como la versión mejor (gratis, sin pagar antes). **A decidir por el dueño.**

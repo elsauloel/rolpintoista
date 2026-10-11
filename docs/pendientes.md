@@ -18,6 +18,11 @@
 > - [ ] **🕊 Vuelo (2026-10-11, dueño, con los arcos: «todavía no diseñamos nada, pero eventualmente aparecerán creeps voladores — anotar para
 >   desarrollar: vuelo»):** creeps que vuelan o levitan. Cuando exista, los arcos «Contra lo que vuela o levita» (+PdG) ya están elegidos por el dueño
 >   (docs/ideas-arcos-flechas.md). Hoy existe Levitar (pies), que no es lo mismo.
+> - [ ] **🎁 Drops de consumibles por arquetipo de creep (2026-10-11, dueño: «proyecto a futuro, lo dejo anotado para no olvidarme; lo veremos con
+>   tiempo»):** afinar lo que dejan los enemigos, ordenado por temática: **grupos de consumibles vinculados a arquetipos de creeps**. Ejemplos del
+>   dueño: el que usa arco o ballesta tiene chances de dejar **flechas y virotes especiales**; el que hace magia, más chances de **pergaminos y
+>   pociones de SP**; los guerreros, más chances de **pociones de curación y cosas de Fuerza**. A pensar cuando toque: cómo se reconoce el arquetipo
+>   de un creep (sus armas, sus habilidades, una etiqueta), qué grupos hay, cuánto pesa la chance y dónde entra en el botín de hoy.
 > - [ ] **🧮 La calculadora cobra barato el daño fijo de las ballestas (2026-10-11)**: una ballesta Común con solo daño, según la calculadora,
 >   puede llegar a 1d6+6 o 2d6+4; según el simulador de balance (`balance_combate.py --ballesta`, Shooter contra el blanco medio) el techo de la
 >   banda Común (74–106 %) es **1d6+3** (95 %; 1d6+4 = 114 %, 2d6 = 110 %). Ajustarla mueve el precio y la calidad de todas las ballestas: revisarlo

@@ -161,7 +161,7 @@ const AsistenteDueloHab = (() => {
       ondaDodge: !!(ini && ini.ondaDodge),   // la onda deja dodge roll a quien gana (2026-10-02, Daño en área)   // hechizo de área (Paso 4/7 del casteo): radio del área, en casilleros
       modo: (ini && ini.modo) || 'hab', x: (ini && ini.x) || 'nitros',
       terminaTurno: !!(ini && ini.terminaTurno),   // Degollar (2026-10-10): al resolverse, termina el turno y pasa al final del orden
-      flashEn: new Set(ini && ini.flash && Array.isArray(ini.flash.en) ? ini.flash.en : ['pdg', 'parry', 'bloqueo', 'dano']), flashBono: (ini && ini.flash && ini.flash.bono) || 2,
+      flashEn: new Set(ini && ini.flash && Array.isArray(ini.flash.en) ? ini.flash.en : ['pdg', 'parry', 'bloqueo', 'dano']), flashBono: (ini && ini.flash && ini.flash.bono) || 2, flashDodge: !!(ini && ini.flash && ini.flash.dodge),
       arma: {pdg: 0, pdgPorX: 0, dadosPorX: 0, fijo: 0, fijoPorX: 0, sinParry: false, ignoraResistCrit: 0, critBono: 0, critpotBono: 0, perfora: 0, ...((ini && ini.arma) || {})},
       // Critical Matters (2026-09-29, pedido del dueño — Lisiar: "Crítico frecuente ×1... si es crítico, el
       // efecto pasa a -2 fijo"): SOLO tiene sentido en modo 'arma' (es el único que puede critear). Mismo
@@ -252,7 +252,8 @@ const AsistenteDueloHab = (() => {
       let h = titulo('', 'Reacción Flash', 'Una habilidad Flash se usa <b>antes de una tirada</b> de otro cuadro de ejecución (nunca después de verla) y <b>no cuesta No2</b>, solo sus SP. En ese cuadro aparece un botón «⚡» en las tiradas donde vale; al marcarlo y tirar, se cobran los SP y el bono se suma a esa tirada. Una vez por tirada.');
       h += `<div class="fila"><span>Suma</span><input type="number" style="width:70px" data-flashbono value="${esc(st.flashBono)}"><span>a la tirada</span></div>
         <p class="nota" style="margin-top:8px">Vale para:</p>
-        ${FLASH_EN.map(([v, t]) => `<label class="op"><input type="checkbox" data-flashen="${v}" ${st.flashEn.has(v) ? 'checked' : ''}> ${t}</label>`).join('')}`;
+        ${FLASH_EN.map(([v, t]) => `<label class="op"><input type="checkbox" data-flashen="${v}" ${st.flashEn.has(v) ? 'checked' : ''}> ${t}</label>`).join('')}
+        <label class="op" style="margin-top:8px"><input type="checkbox" data-flashdodge ${st.flashDodge ? 'checked' : ''}> Si gana la Evasión, tiene dodge roll: puede moverse hasta 2 casilleros, sin ataque de oportunidad (Tronco de huída)</label>`;
       return h;
     }
     function cuerpoArma(){
@@ -502,7 +503,7 @@ const AsistenteDueloHab = (() => {
       const nitrosTxt = st.costoNitrosModo === 'ataque' ? 'como un ataque' : st.costoNitrosModo === 'x' ? 'X (se elige al usarla)' : `${st.costoNitrosNum}`;
       filas.push(`<b>Costo</b>: SP ${esc(st.costoSp) || '0'} · No2 ${nitrosTxt}${st.costoHp ? ` · HP ${st.costoHp}` : ''}${st.costoTurnoOn && st.costoTurnoSp ? ` · ${esc(st.costoTurnoSp)} SP en turno ajeno` : ''}`);
       if(st.modo === 'flash'){
-        filas.push(`<b>Flash</b>: +${esc(st.flashBono)} a ${[...st.flashEn].map(v => (FLASH_EN.find(x => x[0] === v) || [v, v])[1].split(' (')[0]).join(', ') || 'ninguna tirada'}`);
+        filas.push(`<b>Flash</b>: +${esc(st.flashBono)} a ${[...st.flashEn].map(v => (FLASH_EN.find(x => x[0] === v) || [v, v])[1].split(' (')[0]).join(', ') || 'ninguna tirada'}${st.flashDodge ? ' · si gana la Evasión, dodge roll' : ''}`);
       }else if(st.modo === 'arma'){
         const a = st.arma, partes = [];
         if(a.pdg) partes.push(`${a.pdg > 0 ? '+' : ''}${a.pdg} PdG`);
@@ -579,6 +580,7 @@ const AsistenteDueloHab = (() => {
       q('[data-objetivo]', e => { st.objetivo = e.target.value; if(st.objetivo === 'onda' && st.radio > 1 && !ini) st.radio = 1; if((st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono' || st.objetivo === 'linea') && st.contraModo !== 'stats') st.contraModo = 'stats'; dibujar(); });
       q('[data-modo]', e => { st.modo = e.target.value; dibujar(); });
       q('[data-flashbono]', e => { st.flashBono = Number(e.target.value) || 0; });
+      q('[data-flashdodge]', e => { st.flashDodge = e.target.checked; });
       f.querySelectorAll('[data-flashen]').forEach(c => c.onchange = () => { c.checked ? st.flashEn.add(c.dataset.flashen) : st.flashEn.delete(c.dataset.flashen); });
       q('[data-x]', e => { st.x = e.target.value; });
       q('[data-sinparry]', e => { st.arma.sinParry = e.target.checked; });
@@ -687,7 +689,7 @@ const AsistenteDueloHab = (() => {
         if(!st.activo){ cerrar(); cfg.alGuardar(null); return; }
         if(st.modo === 'flash'){
           if(!st.flashEn.size){ alert('Marcá al menos una tirada donde vale el Flash.'); return false; }
-          cerrar(); cfg.alGuardar({duelo: {modo: 'flash', flash: {en: [...st.flashEn], bono: st.flashBono}}, costo: costoResultado()}); return;
+          cerrar(); cfg.alGuardar({duelo: {modo: 'flash', flash: {en: [...st.flashEn], bono: st.flashBono, ...(st.flashDodge ? {dodge: true} : {})}}, costo: costoResultado()}); return;
         }
         const efs = st.efectos.filter(e => e.cura !== undefined ? curaValida(e.cura) : e.nombre).map(mapEfectoOut);
         if(st.modo === 'arma'){

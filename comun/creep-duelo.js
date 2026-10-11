@@ -162,7 +162,7 @@ const CreepDuelo = (() => {
         if(!h || !Combatiente.flashPara(h.duelo, campo)) return null;
         if(!Combatiente.flashPara(h.duelo, campo, modo)){ ui.toast(`${h.nombre} no vale para esta tirada (${modo === 'parry' ? 'Parry' : campo})`); return null; }
         // «¿es su turno?»: lo de la habilidad o el doble (P136); sin No2
-        return pagarFlash(ui, lado.ref, habId).then(p => p ? {bono: num(h.duelo.flash.bono), etq: h.nombre, quien: sc.nombre} : null);
+        return pagarFlash(ui, lado.ref, habId).then(p => p ? {bono: num(h.duelo.flash.bono), etq: h.nombre, quien: sc.nombre, ...(h.duelo.flash.dodge ? {dodge: true} : {})} : null);
       },
       // Habilidades dirigidas: la tirada del creep que la usa (quien = 'atacante') o la del creep que se resiste (quien = 'defensor').
       habTirar: (d, quien, modo) => {

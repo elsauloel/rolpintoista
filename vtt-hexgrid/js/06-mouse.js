@@ -551,10 +551,12 @@ function rutaSoltada(a, t){
   }else if(a.movio && t && pasos > 0){
     if(a.chocado) toast('🚧 Te chocaste con un obstáculo');
     visibles.set(a.id, {x: a.x, y: a.y});
+    const libre = dodgeLibreDe(a.id);   // 🪵 el dodge roll de Tronco de huída: se cierra al moverse
     const oportunidad = oportunidadEvaluarRuta(t, a.ruta);
+    if(libre){ dodgeBanner = null; renderDodgeBanner(); }
     if(a.costo){
       const costoTotal = costoRuta(a.ruta, a.costo.porCasillero, pasos, a.costo.gratis, a.costo.recargo, a.costo.levita);   // con el terreno lento (arena movediza), los pasos gratis y Lento
-      const dodge = enDodge(a.id);   // el dodge roll: se hace aunque no alcancen los No2 (queda en negativo, 2026-10-06)
+      const dodge = enDodge(a.id) || libre;   // el dodge roll: se hace aunque no alcancen los No2 (queda en negativo, 2026-10-06)
       rutaPendiente = {id: a.id, celdas: a.ruta, pasos, porCasillero: a.costo.porCasillero, costo: costoTotal, disponibles: a.costo.disponibles, oportunidad,
         gratis: Math.min(pasos, num(a.costo.gratis)), lento: num(a.costo.recargo) > 0, dodge, levita: Math.min(pasos, num(a.costo.levita))};
       // Solo se pregunta si el movimiento se pasa de los No2 que quedan.

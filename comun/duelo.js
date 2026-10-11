@@ -68,6 +68,9 @@ const Duelo = (() => {
   // 🏹 Una flecha especial que erró (2026-10-09): cfgEscuchar.flechaErrada(d), en la pantalla de quien disparó (no los que ya estaban al entrar).
   const flechaAvisada = new Set();
   let flechaPrimera = true;
+  // 🪵 Un dodge roll de Tronco de huída en un golpe directo (2026-10-10): cfgEscuchar.dodgeLibre(d), en la pantalla de quien esquivó.
+  const dodgeLibreAvisado = new Set();
+  let dodgeLibrePrimera = true;
   let bloqueadoPrimera = true;
   let grupoAvisado = new Set();   // ids de sub-duelos de área ya avisados a cfgEscuchar.grupoResuelto (no avisar dos veces)
   let dodgeActivos = new Set();   // ids de duelos con fase 'dodge' ya avisados a cfgEscuchar.dodgeEmpieza (para saber cuándo avisar dodgeTermina)
@@ -641,15 +644,18 @@ const Duelo = (() => {
 
   function cerrarPar(m, par, r){
     const info = {gana: r.gana, dif: r.dif, desempate: r.desempate || null, moneda: r.moneda || null};
+    // 🪵 Tronco de huída (2026-10-10): la Evasión que gana con ese Flash da dodge roll — en un área que no lo daba (cono, onda), la fase
+    // dodge de siempre; en un golpe directo, esquivó igual y además puede moverse (`contacto.dodgeLibre`: lo ofrece el mapa de quien esquivó).
+    const tronco = par === 'contacto' && r.gana === 'defensor' && !!(m.eva && m.eva.dodge) && !(m.defensa && m.defensa.modo === 'parry');
     m.empate = null;
     m.estado = 'esperando';
     if(par === 'contacto' && m.hab){   // habilidad dirigida: gana quien la usa → sigue; gana el objetivo → se resistió
       m.contacto = info;
       if(r.gana === 'atacante'){ m.resultado = 'pego'; if(m.hab.critTipo && m.hab.dano) entrarCritico(m); else entrarHab(m); }   // lo físico invocado (estaca, canto rodado) critica
-      else if(m.grupo && m.hab.objetivo !== 'enemigo' && ((m.hab.objetivo !== 'onda' && m.hab.objetivo !== 'cono') || m.hab.dodge)){   // (dos misiles repartidos: sin dodge)   // (una onda solo si deja dodge: `hab.dodge`, Daño en área)   // hechizo de área (Paso 4 del casteo): ganar la Evasión no termina el duelo, gana el DERECHO a un dodge roll (la onda alrededor de quien la usa no da dodge: no hay a dónde salir)
+      else if(m.grupo && m.hab.objetivo !== 'enemigo' && ((m.hab.objetivo !== 'onda' && m.hab.objetivo !== 'cono') || m.hab.dodge || tronco)){   // (dos misiles repartidos: sin dodge)   // (una onda solo si deja dodge: `hab.dodge`, Daño en área)   // hechizo de área (Paso 4 del casteo): ganar la Evasión no termina el duelo, gana el DERECHO a un dodge roll (la onda alrededor de quien la usa no da dodge: no hay a dónde salir)
         m.fase = 'dodge'; m.estado = 'esperando';
       }
-      else{ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; }
+      else{ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; if(tronco) m.contacto.dodgeLibre = true; }
       return;
     }
     if(par === 'contacto'){
@@ -658,7 +664,7 @@ const Duelo = (() => {
       if(m.defensa && m.defensa.modo === 'parry' && r.gana === 'defensor' && typeof Combatiente !== 'undefined' && Combatiente.contraDisparo(m)){ m.resultado = 'bloqueado'; m.fase = 'fin'; m.estado = 'resuelto'; }
       else if(m.defensa && m.defensa.modo === 'parry' && r.gana === 'defensor'){ m.fase = 'bloqueo'; }   // el Parry paró el PdG: sigue el Bloqueo
       else if(r.gana === 'atacante'){ m.resultado = 'pego'; entrarCritico(m); }   // el golpe pega: ¿es crítico?
-      else{ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; }
+      else{ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; if(tronco) m.contacto.dodgeLibre = true; }
     }else{
       m.bloq = info;
       m.resultado = r.gana === 'defensor' ? 'bloqueado' : 'mitad';
@@ -768,7 +774,7 @@ const Duelo = (() => {
   // Anota la tirada de `campo` ('pdg'|'eva'|'fuerza'|'bloqueo'); si ya está el otro del par, lo resuelve en la misma transacción.
   async function guardarTiro(id, campo, r, defensa, extra){
     const tiro = {total: campo === 'eva' ? Math.max(1, Math.round(_num(r.total))) : Math.round(_num(r.total)), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod),
-      ...(r.nota ? {nota: String(r.nota).slice(0, 60)} : {})};   // lo que se sumó a la tirada (2026-10-04: «+2 contra oportunidad»): se ve en el cuadro y en la Mesa
+      ...(r.nota ? {nota: String(r.nota).slice(0, 60)} : {}), ...(r.dodge ? {dodge: true} : {})};   // (dodge: un Flash con dodge roll, Tronco de huída) · lo que se sumó a la tirada (2026-10-04: «+2 contra oportunidad»): se ve en el cuadro y en la Mesa
     const fase = (campo === 'pdg' || campo === 'eva') ? 'contacto' : 'bloqueo';
     const ref = col().doc(id);
     let anuncio = '', par = null;
@@ -2187,7 +2193,8 @@ const Duelo = (() => {
     const notaEsp = String(det.origen || '').match(/\(([+−-]\s*\d+\s+(?:contra |Pasos de baile)[^)]*)\)/);   // y Pasos de baile
     if(notaEsp) rr = {...r, nota: notaEsp[1]};
     if(flash && _num(flash.bono)){   // el Flash suma un «+» fijo a la tirada (y cuenta como tal en el desempate)
-      rr = {...r, mod: _num(r.mod) + _num(flash.bono), total: _num(r.total) + _num(flash.bono), formula: String(r.formula || '') + ` +${_num(flash.bono)} ⚡`};
+      rr = {...r, mod: _num(r.mod) + _num(flash.bono), total: _num(r.total) + _num(flash.bono), formula: String(r.formula || '') + ` +${_num(flash.bono)} ⚡`,
+        ...(flash.dodge && campo === 'eva' ? {dodge: true} : {})};   // Tronco de huída (2026-10-10): si gana la Evasión, dodge roll
       anunciarMesa(`⚡ ${flash.etq || 'Flash'}: +${_num(flash.bono)} a ${ETQ_FLASH[campo === 'eva' ? 'eva' : campo] || 'la tirada'} (${flash.quien || 'un jugador'})`);
     }
     (campo === 'dano' ? guardarDano(id, rr, extra && extra.efectos) : guardarTiro(id, campo, rr, defensa, extra)).catch(err => { console.error('Duelo: no se pudo guardar la tirada', err); _toast('No se pudo anotar la tirada en el duelo'); })
@@ -2414,6 +2421,14 @@ const Duelo = (() => {
         });
       }
       terminaPrimera = false;
+      if(cfgEscuchar.dodgeLibre){
+        listaDuelos.forEach(d => {
+          if(d.estado !== 'resuelto' || !d.contacto || !d.contacto.dodgeLibre || dodgeLibreAvisado.has(d.id)) return;
+          dodgeLibreAvisado.add(d.id);
+          if(!dodgeLibrePrimera && (esMio(d.defensor) || (soyGM() && d.defensor && d.defensor.tipo === 'creep'))) try{ cfgEscuchar.dodgeLibre(d); }catch(err){ console.error('Duelo: dodgeLibre', err); }
+        });
+      }
+      dodgeLibrePrimera = false;
       if(cfgEscuchar.flechaErrada){
         listaDuelos.forEach(d => {
           if(d.estado !== 'resuelto' || !d.ataque || !d.ataque.flecha || !['fallo', 'bloqueado'].includes(d.resultado) || flechaAvisada.has(d.id)) return;

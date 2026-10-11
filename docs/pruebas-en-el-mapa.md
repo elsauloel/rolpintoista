@@ -10,6 +10,8 @@
 
 ## Pendientes
 
+- [ ] **🪵 Tronco de huída** (2026-10-10): la Bruja ataca a juan; en la Evasión, juan marca el Flash (4 SP en turno ajeno), suma +2 y, si gana,
+  aparece el cartel del dodge roll: se mueve hasta 2 casilleros sin que lo frene una oportunidad. En un cono, la fase dodge de siempre.
 - [ ] **🧱 Paredes y 📐 lápiz en rectas** (2026-10-10, necesita las reglas nuevas pegadas): el GM dibuja en rectas con imán una habitación
   (clic, clic…, cerrar en el primer punto) con «🧱 Con colisión»; un token no puede salir cruzando la pared (se choca), los conos, la visión con
   niebla y el rango (R) no pasan del otro lado, una flecha choca. Un garabato a mano alzada con el 🧱 del dibujo seleccionado también. Sacarle la

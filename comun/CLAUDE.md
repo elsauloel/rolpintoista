@@ -379,6 +379,9 @@ versión parecida en más de una, es candidato a juntar.
   Mantenimiento de los creeps, js/11 el de los personajes; `explotarAlTerminar` en js/13: una onda con tirada y dodge roll).
 - **«Daño directo» con su globo** (2026-10-10, dueño: «siempre que hables de daño directo, ponele el hipervínculo»): entrada en `Glosario`; se marca
   en los ítems, en el Ver de las habilidades (personaje, creep, invocación) y en el texto de la Mesa.
+- **Flash con dodge roll** (2026-10-10, Tronco de huída): `duelo.flash.dodge` (casilla en el paso del Flash). La Evasión que gana con ese Flash
+  lleva `dodge`; en un área sin dodge (cono, onda) abre la fase dodge de siempre, y en un golpe directo deja `contacto.dodgeLibre` y el mapa de
+  quien esquivó ofrece moverse hasta 2 casilleros sin oportunidad (`cfgEscuchar.dodgeLibre`, js/13 `dueloDodgeLibre`).
 - **Expuesto y «termina el turno»** (2026-10-10, Degollar): preset `Expuesto` (`expuesto`, `mitadEva`: la Evasión a la mitad, y `alEmpezarTurno`).
   `Combatiente.expuesto(estados)` y `sinReaccionesNo2(ops, estados)` (las opciones de defensa del duelo sin Parry ni nada que cueste No2: ficha,
   creep, invocación y el mapa); el resumen público lleva la marca (la oportunidad y el dodge roll del mapa la miran). Una Ejecución «con tu arma»

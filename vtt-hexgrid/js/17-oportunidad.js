@@ -43,7 +43,8 @@ function oporPuede(r){
 }
 // El primer punto del camino en que se aleja de un rival que puede aprovecharlo → {indice (último casillero al lado), rivalId} o null.
 function oportunidadCorte(t, id, ruta){
-  if(modoMapa !== 'combate') return null;   // en modo narrativo no hay ataques de oportunidad: se mueve sin frenar
+  if(modoMapa !== 'combate') return null;
+  if(typeof dodgeLibreDe === 'function' && dodgeLibreDe(id)) return null;   // 🪵 el dodge roll de Tronco de huída no da oportunidad   // en modo narrativo no hay ataques de oportunidad: se mueve sin frenar
   if(!t || t.oculto || enSigilo(t) || !ruta || ruta.length < 2) return null;
   const rivales = new Set(rivalesDe(t));
   const ids = [...tokens.entries()].filter(([, r]) => rivales.has(r) && oporPuede(r)).map(([rid, r]) => ({rid, r, usada: oporUsada(id, rid)}));

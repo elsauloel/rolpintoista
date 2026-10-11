@@ -200,7 +200,7 @@ const FichaDuelo = (() => {
         const h = S.habilidades.find(x => x.id === habId), c = h && FichaBotonera.dueloDe(h);
         if(!c || c.modo !== 'flash' || !c.flash) return null;
         if(!Combatiente.flashPara(c, campo, modo)){ ui.toast(`${h.nombre} no vale para esta tirada (${modo === 'parry' ? 'Parry' : campo})`); return null; }
-        return pagarFlash(S, h, ui).then(p => p ? {bono: num(c.flash.bono), etq: h.nombre, quien: (S.meta && S.meta.nombre) || 'Personaje'} : null);
+        return pagarFlash(S, h, ui).then(p => p ? {bono: num(c.flash.bono), etq: h.nombre, quien: (S.meta && S.meta.nombre) || 'Personaje', ...(c.flash.dodge ? {dodge: true} : {})} : null);
       },
       // Habilidades dirigidas: la tirada de quien la usa (quien = 'atacante') o la de quien se resiste (quien = 'defensor', modo = el stat que eligió).
       habTirar: (d, quien, modo) => {

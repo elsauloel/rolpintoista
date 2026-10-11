@@ -913,9 +913,27 @@ function dueloDodgeTermina(d){
   if(dodgeBanner && dodgeBanner.id === d.id){ dodgeBanner = null; renderDodgeBanner(); }
   if(d.defensor && (soyGM || (fbUsuario && d.defensor.uid === fbUsuario.uid))) Duelo.abrir(d.id);
 }
+/* 🪵 Tronco de huída (2026-10-10): esquivó un golpe directo con el Flash que da dodge roll → en la pantalla de quien esquivó, el mismo cartel
+   del dodge roll (`libre`): puede moverse hasta 2 casilleros pagando sus No2 (aunque no le alcancen, como cualquier dodge) y sin que lo frene un
+   ataque de oportunidad; «Me quedo» lo cierra, y se cierra solo al moverse. Estando Expuesto no puede moverse (no reacciona con No2). */
+function dueloDodgeLibre(d){
+  const t = d.defensor && tokens.get(d.defensor.tokenId);
+  if(!t) return;
+  if(tokenExpuesto(t)){ toast(`${d.defensor.nombre} está Expuesto: no puede hacer el dodge roll`); return; }
+  seleccionar(d.defensor.tokenId);
+  dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, libre: true};
+  renderDodgeBanner();
+}
+const dodgeLibreDe = id => !!(dodgeBanner && dodgeBanner.libre && dodgeBanner.tokenId === id);
 function renderDodgeBanner(){
   // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
   if(!dodgeBanner){ AvisoCombate.cartel('dodge', null); return; }
+  if(dodgeBanner.libre){
+    AvisoCombate.cartel('dodge', {icono: '🪵', titulo: `${dodgeBanner.nombre} esquivó: dodge roll`, posicion: 'abajo',
+      texto: 'Arrastrá el token hasta 2 casilleros (paga sus No2; sin ataque de oportunidad).',
+      botones: [{texto: '✋ Me quedo', alClic: () => { dodgeBanner = null; renderDodgeBanner(); }}]});
+    return;
+  }
   AvisoCombate.cartel('dodge', {icono: '🏃', titulo: `${dodgeBanner.nombre} ganó la Evasión`, posicion: 'abajo',
     texto: 'Arrastrá el token hasta 2 casilleros para intentar salir del área.',
     botones: [{texto: '🔎 Ver el duelo', sec: true, alClic: () => Duelo.abrir(dodgeBanner.id)}, {texto: '✋ No me quiero mover', alClic: () => dodgeDeclinar()}]});

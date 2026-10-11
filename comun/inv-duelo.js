@@ -155,7 +155,7 @@ const InvDuelo = (() => {
         const hi = (inv.habilidades || []).find(x => x.id === habId);
         if(!hi || !Combatiente.flashPara(hi.duelo, campo)) return null;
         if(!Combatiente.flashPara(hi.duelo, campo, modo)){ ui.toast(`${hi.nombre} no vale para esta tirada (${modo === 'parry' ? 'Parry' : campo})`); return null; }
-        return pagarFlash(inv, hi, ui).then(p => p ? {bono: num(hi.duelo.flash.bono), etq: hi.nombre, quien: inv.nombre} : null);
+        return pagarFlash(inv, hi, ui).then(p => p ? {bono: num(hi.duelo.flash.bono), etq: hi.nombre, quien: inv.nombre, ...(hi.duelo.flash.dodge ? {dodge: true} : {})} : null);
       },
       // Habilidades dirigidas: la tirada de quien la usa (quien = 'atacante') o la de quien se resiste (quien = 'defensor', modo = el stat que eligió).
       habTirar: (d, quien, modo) => {

@@ -447,6 +447,7 @@ function oportunidadEvaluarRuta(t, ruta){
   if(!ruta || ruta.length < 2) return [];
   if(t.oculto || enSigilo(t)) return [];  // un token oculto no delata su movimiento
   const id = rutaTokenId(t);
+  if(typeof dodgeLibreDe === 'function' && dodgeLibreDe(id)) return [];   // 🪵 el dodge roll de Tronco de huída: sin oportunidad
   const rivales = new Set(rivalesDe(t));
   const ids = [...tokens.entries()].filter(([, r]) => rivales.has(r) && !oporPuede(r)).map(([rid, r]) => ({rid, r, usada: oporUsada(id, rid)}));
   const salidos = [];

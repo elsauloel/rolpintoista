@@ -112,7 +112,7 @@ const CREEPS_GRUPOS = [
   {nombre: 'Escenario', tags: ['minas', 'bosque', 'montañas', 'templo alienígena']},
   {nombre: 'Nivel', tags: ['nivel 1', 'nivel 2', 'nivel 3', 'nivel 4', 'nivel 5']},
   {nombre: 'Rol', tags: ['melee', 'tanque', 'asalto', 'rango', 'mágico', 'apoyo', 'debuffer']},
-  {nombre: 'Tipo', tags: ['humano', 'humanoide', 'bestia', 'constructo', 'planta', 'no-muerto', 'elemental', 'alienígena']},
+  {nombre: 'Tipo', tags: ['humano', 'humanoide', 'bestia', 'constructo', 'planta', 'no-muerto', 'elemental', 'alienígena', 'demonio', 'interdimensional', 'adefesio']},
   {nombre: 'Facción', tags: ['bandidos', 'bárbaros', 'guardia de la ciudad', 'piratas espaciales', 'cultistas', 'mercenarios']},
   {nombre: 'Tribu', tags: ['goblin', 'tribu goblin', 'kobold', 'tribu kobold', 'hombre cabra', 'clan cabruno']},
   {nombre: 'Mecánica', tags: ['trampas', 'sigilo']},

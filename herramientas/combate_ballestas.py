@@ -94,6 +94,7 @@ def pelea(arma, clase, nivel, blanco, rondas, sentado=False, bestia=False, caso=
             total += dmg
             if pego:
                 for e in arma.get('efectosGolpe') or []:
+                    if e.get('soloCritico') and not crit: continue   # solo con crítico (el del forastero: Veneno seguro con crítico)
                     if random.random() >= 1 / int(e.get('caras') or 1) and not (e.get('seguroCritico') and crit): continue
                     n = e.get('nombre')
                     if n == 'Rompe armadura': defensa -= int(e.get('stacks') or 1)

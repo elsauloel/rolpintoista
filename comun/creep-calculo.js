@@ -511,8 +511,9 @@ const CreepCalculo = (() => {
   /* ---------- Recompensas del creep: oro, arma natural y trofeo (2026-10-02, hoja de ruta A6a) ----------
      Copiado tal cual de gm-toolset/js/02 (tipoDeCreep, oroSugeridoCreep, trofeoDeCreep, dropsResumenCreep…): lo usan GM Tools y
      el «Ver» de un creep (comun/creep-lupa.js), también en el mapa. */
-  const TIPOS_CRIATURA = ['humano', 'humanoide', 'bestia', 'planta', 'elemental', 'constructo', 'no-muerto', 'alienígena'];
-  const TIPOS_CON_ARMA_NATURAL = ['bestia', 'planta', 'elemental', 'alienígena', 'constructo', 'no-muerto'];
+  // demonio, interdimensional y adefesio (dueño, 2026-10-11, con «Contra lo sobrenatural» de los arcos).
+  const TIPOS_CRIATURA = ['humano', 'humanoide', 'bestia', 'planta', 'elemental', 'constructo', 'no-muerto', 'alienígena', 'demonio', 'interdimensional', 'adefesio'];
+  const TIPOS_CON_ARMA_NATURAL = ['bestia', 'planta', 'elemental', 'alienígena', 'constructo', 'no-muerto', 'demonio', 'interdimensional', 'adefesio'];
   const TROFEO_PRECIO_NIVEL = [16, 30, 50, 75, 110];
   const TIPOITEM_LABEL = {
     escudo_1m:'Escudo 1 mano', escudo_2m:'Escudo 2 manos',

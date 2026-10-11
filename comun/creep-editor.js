@@ -514,7 +514,7 @@ const CreepEditor = (() => {
     {nombre: 'A quién apunta', tags: ['a sí mismo', 'un enemigo', 'zona o área', 'aliados', 'terreno']},
     {nombre: 'Velocidad', tags: ['rápida', 'lenta']},
     {nombre: 'Rol', tags: ['melee', 'tanque', 'asalto', 'rango', 'mágico', 'apoyo', 'debuffer']},
-    {nombre: 'Raza', tags: ['cualquiera', 'humano', 'humanoide', 'bestia', 'planta', 'elemental', 'no-muerto', 'constructo', 'alienígena']},
+    {nombre: 'Raza', tags: ['cualquiera', 'humano', 'humanoide', 'bestia', 'planta', 'elemental', 'no-muerto', 'constructo', 'alienígena', 'demonio', 'interdimensional', 'adefesio']},
     {nombre: 'Automatización', tags: ['toda automatizada', 'con parte a mano']},
   ];
   // ⬆ Sube a la biblioteca una habilidad ya calculada (queda con valores fijos), marcada 🐾 de creep (o 🧙 si ya era de jugador). Si salió

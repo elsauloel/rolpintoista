@@ -87,12 +87,12 @@ function arcoBonos(mio, t, ataque, tiro){
    el último fue crítico (Racha); los golpes seguidos al mismo blanco (Lectura del viento); y, para Encadenar, si el último pegó (lo guarda en el
    personaje o el creep: el costo lo cobra su ficha). Lo actualiza arcoResuelto, con cada duelo que termina (hook disparoResuelto de js/14). */
 const arcoTurno = new Map(), arcoLectura = new Map(), arcoUltimo = new Map();
-// Contra lo sobrenatural (dueño, 2026-10-11: «no-muertos, demonios y criaturas interdimensionales»); el tipo de criatura se compara sin tildes.
-const SOBRENATURAL = ['no-muerto', 'demonio', 'interdimensional'];
+// Contra lo sobrenatural (dueño, 2026-10-11: «no-muertos, demonios y criaturas interdimensionales», y los adefesios).
+const SOBRENATURAL = ['no-muerto', 'demonio', 'interdimensional', 'adefesio'];
 function arcoTipoCriatura(t, tipos, otros){
   if(!t || t.tipo !== 'creep') return false;
   const v = vinculo(t), tc = String((v && v.tipoCriatura) || '').toLowerCase();
-  return tipos.includes(tc) || (otros && tc && !['humano', 'humanoide', 'bestia', 'planta', 'elemental', 'constructo', 'no-muerto', 'alienígena'].includes(tc));
+  return tipos.includes(tc) || (otros && tc && !CreepCalculo.TIPOS_CRIATURA.includes(tc));
 }
 function arcoResuelto(d){
   const tid = d.atacante && d.atacante.tokenId, u = tid && arcoUltimo.get(tid);

@@ -32,6 +32,7 @@ def disparo(at, arma, d, defensa, frec, potente, pdg_extra):
     if p < e or (p == e and random.random() < .5): return False, 0, False
     dano = sum(random.randint(1, arma['tipoDado']) for _ in range(arma['peso'] + int(arma.get('danoAmplificado') or 0))) + arma.get('danoFijo', 0)
     if arma.get('arco'): dano += math.ceil(at['fue'] / 2)   # el arco suma la mitad del Dmg (la ballesta, nada)
+    elif not arma.get('armaDeRango'): dano += math.ceil(at['fue'])   # cuerpo a cuerpo (2026-10-11): la Fuerza entera
     res = d['res'].get(arma['tipoDado'], 0)
     niveles = (p - e) // max(2, arma['tipoDado'] - frec) - res
     if niveles > 0:
@@ -117,7 +118,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--rondas', type=int, default=4); ap.add_argument('--n', type=int, default=2500); ap.add_argument('--nivel', type=int, default=1)
     ap.add_argument('--clases', default='Shooter,Asalto,MonoDes,Mago,Warrior'); ap.add_argument('--calidad', default='Común')
-    ap.add_argument('--familia', default='ballesta', help='ballesta | arco')
+    ap.add_argument('--familia', default='ballesta', help='ballesta | arco | melee (cuerpo a cuerpo; con --tipo)')
+    ap.add_argument('--tipo', type=int, default=0, help='con --familia melee: el Tipo (4, 6, 8, 10)')
     a = ap.parse_args()
     random.seed(17)
     raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -126,11 +128,13 @@ def main():
         t = ln.strip().rstrip(',')
         if not t.startswith('{"id"'): continue
         it = json.loads(t)
-        es = it.get('arco') if a.familia == 'arco' else (it.get('armaDeRango') and it.get('recarga'))
+        es = (it.get('arco') if a.familia == 'arco' else
+              (not it.get('armaDeRango') and str(it.get('tipoItem', '')).startswith('arma') and not it.get('especial') and (not a.tipo or it.get('tipoDado') == a.tipo)) if a.familia == 'melee' else
+              (it.get('armaDeRango') and it.get('recarga')))
         if it.get('archivo') or it.get('soloBotin') or not es or it['tier'] != a.calidad.replace('Buena', 'Buena Calidad') and it['tier'] != a.calidad: continue
         bal.append(it)
     clases = a.clases.split(',')
-    if a.familia == 'arco':   # los arcos: un solo «en su caso» (el medio, con todas las condiciones del arco)
+    if a.familia in ('arco', 'melee'):   # los arcos: un solo «en su caso» (el medio, con todas las condiciones del arco)
         esc = [('liviano', False, False, False), ('medio', False, False, False), ('pesado', False, False, False), ('medio', False, False, True)]
         nom_esc = ['liviano', 'medio', 'pesado', 'en su caso']
     else:

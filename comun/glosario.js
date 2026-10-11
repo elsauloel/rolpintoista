@@ -36,7 +36,7 @@ const Glosario = (() => {
     {titulo: 'Encadenar', re: 'Encadenar', texto: 'Encadenar: si el disparo anterior de este turno pegó, el siguiente cuesta 1 No2 menos. ⚙ El mapa anota si pegó.'},
     {titulo: 'Respiración contenida', re: 'Respiración contenida', texto: 'Respiración contenida: el primer disparo del turno suma +2 PdG; si disparás de nuevo en el mismo turno, esos tienen −2.'},
     {titulo: 'Racha', re: 'Racha', texto: 'Racha: si sacás un crítico, tu próximo disparo de este turno tiene Crítico frecuente +1.'},
-    {titulo: 'Lectura del viento', re: 'Lectura del viento', texto: 'Lectura del viento: +1 PdG por cada golpe seguido al mismo blanco (hasta +3). Si errás o le tirás a otro, vuelve a 0.'},
+    {titulo: 'Lectura del viento', re: 'Lectura del viento', texto: 'Lectura del viento: +1 PdG por cada golpe seguido al mismo blanco, hasta lo que diga el arco (hasta +1 en los Comunes, +2 en los Buenos, +3 en los Raros). Si errás o le tirás a otro, vuelve a 0.'},
     {titulo: 'Tiro alto sin castigo', re: 'Tiro alto sin castigo', texto: 'Tiro alto sin castigo: el tiro alto (por encima de los tokens) no te resta PdG.'},
     {titulo: 'Contra el que corre', re: 'Contra el que corre', texto: 'Contra el que corre: PdG de más contra un rival que se movió 3 casilleros o más en su último turno completo (en la primera ronda, si todavía no jugó, no cuenta).'},
     {titulo: 'Abanico', re: 'Abanico', texto: 'Abanico: si en el mismo turno le disparás a un blanco distinto del anterior, ese disparo suma +1 PdG.'},

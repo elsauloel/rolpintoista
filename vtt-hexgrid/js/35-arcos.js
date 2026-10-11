@@ -15,7 +15,7 @@ const primerDisparoUsados = new Set();   // el +1 dado del primer disparo del co
 function arcoSumar(tiro, o, motivo){
   tiro = tiro || {motivo: ''};
   Object.keys(o).forEach(k => { if(num(o[k])) tiro[k] = num(tiro[k]) + num(o[k]); });
-  tiro.motivo = tiro.motivo ? `${tiro.motivo} y ${motivo}` : motivo;
+  tiro.motivo = !tiro.motivo ? motivo : tiro.motivo.split(' y ').includes(motivo) ? tiro.motivo : `${tiro.motivo} y ${motivo}`;   // sin repetir («emboscada y emboscada»)
   return tiro;
 }
 // ¿Todos los casilleros que cruza el disparo (sin el del objetivo) están en su punto ciego? El mismo «atrás» que porLaEspalda (js/13).
@@ -68,7 +68,7 @@ function arcoBonos(mio, t, ataque, tiro){
   if(ataque.racha && enTurno.critico) tiro = arcoSumar(tiro, {crit: 1}, 'racha');
   if(ataque.abanico && enTurno.disparos > 0 && enTurno.blanco && enTurno.blanco !== t.id) tiro = arcoSumar(tiro, {pdg: 1}, 'abanico');
   const lec = arcoLectura.get(mio.id);
-  if(ataque.lectura && lec && lec.blanco === t.id && lec.golpes > 0) tiro = arcoSumar(tiro, {pdg: Math.min(3, lec.golpes)}, 'lectura del viento');
+  if(ataque.lectura && lec && lec.blanco === t.id && lec.golpes > 0) tiro = arcoSumar(tiro, {pdg: Math.min(Combatiente.lecturaTope(ataque), lec.golpes)}, 'lectura del viento');
   if(num(ataque.contraCorre) > 0 && typeof window.mapaCasillerosUltimoTurno === 'function' && window.mapaCasillerosUltimoTurno(t.id) >= 3) tiro = arcoSumar(tiro, {pdg: Math.round(num(ataque.contraCorre))}, 'contra el que corre');
   if(num(ataque.matagente) > 0 && arcoTipoCriatura(t, ['humano', 'humanoide'])) tiro = arcoSumar(tiro, {fijo: Math.round(num(ataque.matagente))}, 'contra humanos');
   if(num(ataque.matasobrenatural) > 0 && arcoTipoCriatura(t, SOBRENATURAL)) tiro = arcoSumar(tiro, {fijo: Math.round(num(ataque.matasobrenatural))}, 'contra lo sobrenatural');

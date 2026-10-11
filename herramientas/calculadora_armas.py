@@ -259,6 +259,7 @@ def puntaje(arma):
                + (RECUPERABLE_PC if arma.get('recuperable') else 0) + CARGADOR_PC * float(arma.get('cargador') or 0)
                + CARCAJ_EXTRA_PC * float(arma.get('carcajExtra') or 0))
         arc += sum(v for k, v in ARCO_PC.items() if arma.get(k))
+        if arma.get('lectura'): arc += LECTURA_PC.get(3 if arma['lectura'] is True else min(3, int(arma['lectura'])), 0)
         arc += CORRE_FACTOR * float(arma.get('contraCorre') or 0) * TASA_STAT['pdg'] + MATAGENTE_FACTOR * float(arma.get('matagente') or 0) * factor_plano(tipo)
         arc += MATABESTIAS_FACTOR * float(arma.get('matasobrenatural') or 0) * factor_plano(tipo) + (ARCO_DURO_PC if arma.get('arcoDuro') else 0)
         arc += EMBOSCADA_FACTOR * (min(float(arma.get('emboscadaPot') or 0), 6) * PESO_CRIT * PESO_CRITPOT + float(arma.get('emboscadaPdg') or 0) * TASA_STAT['pdg'])
@@ -310,7 +311,9 @@ CARCAJ_EXTRA_PC = 0.15    # por lugar de más en el carcaj
 DOBLE_CUERDA_FACTOR = 1.2   # × Recarga: el segundo disparo del turno cuesta N en vez de 2N
 TIRO_RAPIDO_FACTOR = 1.5    # × (Recarga − 1), + 0,5: cada disparo más cuesta +1, no +N
 # Las de los arcos Comunes (2026-10-11): valores de partida, a ajustar con lo que mida combate_ballestas.py --familia arco.
-ARCO_PC = {'enCuerda': 0.8, 'encadenar': 1.5, 'respiracion': 0.8, 'racha': 1.0, 'lectura': 2.5, 'tiroAltoLimpio': 1.0, 'abanico': 0.8, 'minimaLarga': -1.0}
+ARCO_PC = {'enCuerda': 0.8, 'encadenar': 1.5, 'respiracion': 0.8, 'racha': 1.0, 'tiroAltoLimpio': 1.0, 'abanico': 0.8, 'minimaLarga': -1.0}
+# La Lectura del viento hasta +N (medida 2026-10-11, revision-arcos.md: con 1d4+1 el Shooter pasa de ~68 % a 97 / 126 / 181 % con tope 1 / 2 / 3).
+LECTURA_PC = {1: 1.8, 2: 3.8, 3: 6.0}
 CORRE_FACTOR = 0.3          # Contra el que corre: PdG solo contra el que se movió 3 o más
 MATAGENTE_FACTOR = 0.45     # Contra humanos: los humanos y humanoides son muchos de los rivales
 ARCO_DURO_PC = -1.5         # Arco duro: −2 PdG si la Fuerza no llega (pesa en el Shooter, que tiene poca)

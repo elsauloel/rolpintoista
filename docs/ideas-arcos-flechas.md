@@ -320,19 +320,19 @@ demonios e interdimensionales); en el del forastero, **Stun** con crítico en lu
 8. **Arco de acecho** — 1d4+1 · Rango 3 · Emboscada: Crítico frecuente +2 y potente +1 · $100
 9. **Arco de cuerda doble** — 1d4 · Rango 4 · Tensar +1 · $90
 10. **Arco del cuatrero** — 1d4+1 · Rango 3 · Espalda a distancia (+2 PdG, +1 de daño) · $85
-11. **Arco petizo** — 1d4+3 · Rango 1 (corto alcance) · Crítico potente +1 · Emboscada: Crítico frecuente +1 · Veneno 25 % (2) · sin tiro alto · $100
-12. **Arco de la víbora** — 1d4 · Perfora 1 · Rango 3 · Veneno 50 % (2), seguro con crítico · $100
-13. **Arco del baqueano** — 1d4+1 · Rango 3 · Lectura del viento · Emboscada: +1 PdG · $100
+11. **Arco petizo** — 1d4+1 (ajustado: era +3) · Rango 1 (corto alcance) · Crítico potente +1 · Emboscada: Crítico frecuente +1 · Veneno 25 % (2) · sin tiro alto · $100
+12. **Arco de la víbora** — 1d4 (ajustado: sin Perfora) · Rango 3 · Veneno 50 % (2), seguro con crítico · $100
+13. **Arco del baqueano** — 1d4+1 · Rango 3 · Lectura del viento (ajustado: hasta +1) · Emboscada: +1 PdG · $100
 14. **Arco de cazador de pájaros** — 1d4+1 · Rango 4 · Lisiado 33 %, seguro con crítico · $85
 15. **Arco de tiro ligero** — 1d4+1 · Rango 4 · Encadenar · Racha · $95
-16. **Arco del matrero** — 1d4 · Perfora 1 · Rango 3 · Sangrado 25 %, seguro con crítico · $100
+16. **Arco del matrero** — 1d4 · Perfora 1 · Rango 3 · Sangrado 25 % (ajustado: sin el seguro con crítico) · $90
 17. **Arco de la espera** — 1d4+1 · Rango 3 · Respiración contenida · distancia ideal lejos: +1 PdG · $95
 18. **Arco del cazador de recompensas** — 1d4+1 · Rango 3 · Contra humanos +2 de daño · Lisiado 25 %, seguro con crítico · $100
-19. **Arco del bañado** — 1d4 · Perfora 1 · Rango 3 · Crítico potente +1 · Afinidad especial · Veneno 25 % (3) · sin tiro alto · $120
+19. **Arco del bañado** — 1d4 · Perfora 1 · Rango 3 · Afinidad especial · Veneno 25 % (2) (ajustado: era 3 stacks y Crítico potente +1) · sin tiro alto · $85
 20. **Arco de quebracho** — 1d4 · Perfora 1 · Rango 4 · Tensar +1 · Arco duro (Fuerza 4) · Mínima más larga · $95
 21. **Arco de la tropilla** — 1d4+1 · Rango 3 · Abanico · Emboscada: +1 PdG · Sangrado 50 % · $110
 22. **Arco del tero** — 1d4+1 · Rango 3 · Tiro alto sin castigo · distancia ideal media (3): +1 PdG · $95
-23. **Arco del forastero** — 1d4+1 · Rango 3 · Contra lo sobrenatural +2 de daño · Emboscada: +1 PdG · con crítico, 50 % de Stun · $110
+23. **Arco del forastero** — 1d4+1 · Rango 3 · Contra lo sobrenatural +1 de daño (ajustado) · Emboscada: +1 PdG · con crítico, Veneno ×4 seguro · $100
 24. **Arco de caña** — 1d4+1 · Rango 3 · Tensar +1 · Flecha de más · $95
 
 **Proporciones:** Veneno 5 · Crítico potente / frecuente 5 (más la Racha) · Rango de bono 7 (y uno con desventaja) · Perfora 5 · distancia ideal 5 ·

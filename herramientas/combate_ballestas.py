@@ -79,7 +79,7 @@ def pelea(arma, clase, nivel, blanco, rondas, sentado=False, bestia=False, caso=
             if h > 0 and arma.get('encadenar') and pego_ant: c = max(0, c - 1)              # Encadenar
             if c > no2: break
             no2 -= c
-            pdg = pdg_arma + pdg_fijo + (min(int(arma.get('lecturaMax') or 3), lectura) if arma.get('lectura') else 0)
+            pdg = pdg_arma + pdg_fijo + (min(3 if arma.get('lectura') is True else int(arma.get('lectura') or 0), lectura) if arma.get('lectura') else 0)
             if arma.get('respiracion'): pdg += 2 if h == 0 else -2
             if primero: pdg += int(arma.get('emboscadaPdg') or 0)
             if arma.get('tensar') and no2 >= 1 and (costo(arma, h + 1) > no2 - 1 or True):   # tensa si le alcanza (aunque le saque un disparo, no: se fija abajo)

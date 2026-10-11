@@ -24,3 +24,13 @@ lo sobrenatural / bestias, que corre). Banda: 74–106 % contra el medio. Ruido 
 Respiración contenida, Abanico + Emboscada de PdG, Contra lo sobrenatural (Coloso pasado a demonio), Arco duro, Mínima más larga, Lectura del viento
 (segundo golpe seguido: +1), Contra humanos (la Bruja, humanoide). Faltan: Racha (hace falta un crítico), Flecha de más, distancia ideal nueva y Emboscada
 de Crítico potente. Ojo: la Emboscada es una por combate y por personaje (no por arco), y recargar la página la vuelve a dar.
+
+## Aplicado (2026-10-11, con el OK del dueño)
+- Petizo 1d4+1 ($65) · víbora sin Perfora ($65) · bañado Veneno 2 stacks y sin Crítico potente ($85) · matrero Sangrado 25 % sin seguro ($90) ·
+  baqueano **Lectura del viento hasta +1** ($90; la Lectura pasó a ser un número: hasta +1 en Común, +2 en Buena, +3 en Rara; la calculadora la cobra
+  1,8 / 3,8 / 6) · forastero Contra lo sobrenatural +1 ($100). Medidos de nuevo: 103–114 % contra el medio (dentro del ruido); el forastero, 143 % en su caso.
+- **Quedan como están** (dueño): los de situación (pájaros, cuatrero, tero, recompensas, batidor, liebrero) y el de quebracho con **Arco duro Fuerza 4**
+  («no me parece demasiado»).
+- Probados además en el mapa: Racha (con un crítico: «racha: Crítico frecuente +1», y el segundo cuesta 3 por Encadenar), Flecha de más («no cobra su
+  No2»), la distancia ideal «cerca» (brilla en celeste y suma +1 PdG) y la Emboscada de Crítico potente. **Falta** la distancia ideal «media» y «lejos»:
+  en la partida de prueba la pantalla del jugador no deja ver un blanco a 8 o más casilleros.

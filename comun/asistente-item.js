@@ -446,10 +446,10 @@ const AsistenteItem = (() => {
           <div class="aa-fila">${campo('Tirador de apoyo: +PdG contra un rival pegado a un aliado', nc('tiradorApoyo', 3))}${campo('Remate: Crítico frecuente contra Sentado o Inmovilizado', nc('remate', 3))}</div>
           <div class="aa-fila">${campo('Cargador: virotes especiales del combate sin su No2', nc('cargador', 5))}${campo('Carcaj integrado: lugares de más', nc('carcajExtra', 10))}</div>
           ${chk('primerDisparo', 'Primer disparo del combate: +1 dado de daño')}${chk('puntaDiamante', 'Punta de diamante: contra Defensa 12 o más, Perfora +2')}${chk('remachadora', 'Remachadora: cada golpe seguido al mismo blanco, Perfora +1 (hasta +3)')}${chk('recuperable', 'Virote recuperable: el especial que erra no se rompe contra un obstáculo')}
-          <div class="aa-fila">${campo('Emboscada: Crítico potente', nc('emboscadaPot', 3))}${campo('Emboscada: PdG', nc('emboscadaPdg', 3))}${campo('Contra el que corre: + PdG', nc('contraCorre', 3))}</div>
+          <div class="aa-fila">${campo('Emboscada: Crítico potente', nc('emboscadaPot', 3))}${campo('Emboscada: PdG', nc('emboscadaPdg', 3))}${campo('Contra el que corre: + PdG', nc('contraCorre', 3))}${campo('Lectura del viento: hasta + PdG (Común 1, Buena 2, Rara 3)', nc('lectura', 3))}</div>
           <div class="aa-fila">${campo('Contra humanos: + daño', nc('matagente', 5))}${campo('Contra lo sobrenatural: + daño', nc('matasobrenatural', 5))}${campo('Arco duro: Fuerza mínima (−2 PdG si no llega)', nc('arcoDuro', 15))}</div>
           ${chk('enCuerda', 'Flecha en la cuerda: sin disparar el turno anterior, el primero −1 No2')}${chk('encadenar', 'Encadenar: si el anterior del turno pegó, el siguiente −1 No2')}${chk('respiracion', 'Respiración contenida: +2 PdG el primer disparo del turno, −2 los siguientes')}
-          ${chk('racha', 'Racha: después de un crítico, el próximo disparo del turno Crítico frecuente +1')}${chk('lectura', 'Lectura del viento: +1 PdG por golpe seguido al mismo blanco (hasta +3)')}${chk('tiroAltoLimpio', 'Tiro alto sin castigo')}
+          ${chk('racha', 'Racha: después de un crítico, el próximo disparo del turno Crítico frecuente +1')}${chk('tiroAltoLimpio', 'Tiro alto sin castigo')}
           ${chk('abanico', 'Abanico: +1 PdG si cambia de blanco en el turno')}${chk('minimaLarga', 'Mínima más larga: necesita 2 casilleros libres')}
           ${!d.arco ? chk('dobleCuerda', 'Doble cuerda: el segundo disparo del turno cuesta como el primero') + chk('tiroRapido', 'Tiro rápido: cada disparo más cuesta 1 No2 más, no la Recarga entera') : ''}`; };
       h += `<div class="aa-campo"><label>Mecánicas de firma (opcional)</label>
@@ -833,7 +833,7 @@ const AsistenteItem = (() => {
 
   // «+2 PdG, +1 de daño» (el bono por la espalda de un arma).
   const espaldaTxt = es => es ? [n(es.pdg) ? `+${f(n(es.pdg))} PdG` : '', n(es.fijo) ? `+${f(n(es.fijo))} de daño` : '', n(es.critpot) ? `+${f(n(es.critpot))} Crítico potente` : ''].filter(Boolean).join(', ') : '';
-  const NUMERICOS = ['peso', 'danoFijo', 'danoAmplificado', 'ignoraResistCrit', 'perfora', 'apuntada', 'tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'cargador', 'carcajExtra', 'contraCorre', 'matagente', 'matasobrenatural', 'arcoDuro', 'emboscadaPot', 'emboscadaPdg', 'ahorroNitros', 'critD20', 'precioCompra', 'ranuras', 'equipoEstadoHpTurno', 'durExtra', 'durPorPeso'];
+  const NUMERICOS = ['peso', 'danoFijo', 'danoAmplificado', 'ignoraResistCrit', 'perfora', 'apuntada', 'tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'cargador', 'carcajExtra', 'contraCorre', 'matagente', 'matasobrenatural', 'arcoDuro', 'emboscadaPot', 'emboscadaPdg', 'ahorroNitros', 'critD20', 'precioCompra', 'ranuras', 'equipoEstadoHpTurno', 'durExtra', 'durPorPeso', 'lectura'];
   function alEscribir(ev){
     if(!st) return;
     const t = ev.target, d = st.d;
@@ -932,8 +932,8 @@ const AsistenteItem = (() => {
       if(d.armaDeRango && d.arco && d.sinTiroAlto) d.sinTiroAlto = true; else delete d.sinTiroAlto;
       if(d.armaDeRango && !d.arco && n(d.recarga) > 0) d.recarga = Math.min(5, Math.round(n(d.recarga))); else delete d.recarga;   // la Recarga: solo de rango, no arco
       // 🏹 Las mecánicas de arco (2026-10-11): solo en un arma de rango, y solo lo que tiene valor.
-      [['tensar', 5], ['largoAlcance', 2], ['emboscada', 3], ['matabestias', 5], ['contraMarcado', 5], ['caida', 3], ['apuntadaFirme', 5], ['tiradorApoyo', 3], ['remate', 3], ['cargador', 5], ['carcajExtra', 10], ['contraCorre', 3], ['matagente', 5], ['matasobrenatural', 5], ['arcoDuro', 15], ['emboscadaPot', 3], ['emboscadaPdg', 3]].forEach(([k, max]) => { if(d.armaDeRango && n(d[k]) > 0) d[k] = Math.min(max, Math.round(n(d[k]))); else delete d[k]; });
-      ['afinidad', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'enCuerda', 'encadenar', 'respiracion', 'racha', 'lectura', 'tiroAltoLimpio', 'abanico', 'minimaLarga'].forEach(k => { if(d.armaDeRango && d[k]) d[k] = true; else delete d[k]; });
+      [['tensar', 5], ['largoAlcance', 2], ['emboscada', 3], ['matabestias', 5], ['contraMarcado', 5], ['caida', 3], ['apuntadaFirme', 5], ['tiradorApoyo', 3], ['remate', 3], ['cargador', 5], ['carcajExtra', 10], ['contraCorre', 3], ['lectura', 3], ['matagente', 5], ['matasobrenatural', 5], ['arcoDuro', 15], ['emboscadaPot', 3], ['emboscadaPdg', 3]].forEach(([k, max]) => { if(d.armaDeRango && n(d[k]) > 0) d[k] = Math.min(max, Math.round(n(d[k]))); else delete d[k]; });
+      ['afinidad', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'enCuerda', 'encadenar', 'respiracion', 'racha', 'tiroAltoLimpio', 'abanico', 'minimaLarga'].forEach(k => { if(d.armaDeRango && d[k]) d[k] = true; else delete d[k]; });
       ['dobleCuerda', 'tiroRapido'].forEach(k => { if(d.armaDeRango && !d.arco && d[k]) d[k] = true; else delete d[k]; });   // solo con Recarga (ballestas)
       { const ed = d.espaldaDistancia || {}, eo = {}; ['pdg', 'fijo'].forEach(k => { if(n(ed[k]) > 0) eo[k] = Math.round(n(ed[k])); }); if(d.armaDeRango && Object.keys(eo).length) d.espaldaDistancia = eo; else delete d.espaldaDistancia; }
       if(d.armaDeRango && d.ideal && d.ideal.donde){   // la distancia ideal: solo lo que tiene valor

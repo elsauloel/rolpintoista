@@ -597,8 +597,10 @@ prueba('las mecánicas de arco: largo alcance, afinidad, lo que viaja al ataque 
 prueba('las mecánicas de los arcos Comunes: flecha en la cuerda, encadenar, mínima más larga y los textos (2026-10-11)', () => {
   const a = {armaDeRango: true, arco: true, enCuerda: true, encadenar: true, lectura: true, contraCorre: 2, matagente: 1, arcoDuro: 6, minimaLarga: true, emboscadaPot: 2, cargador: 1};
   igual([Combatiente.ahorroArco(a, 0, false, false), Combatiente.ahorroArco(a, 0, true, false), Combatiente.ahorroArco(a, 1, false, true), Combatiente.ahorroArco(a, 1, false, false),
-    Combatiente.arcoLibres(a), Combatiente.arcoLibres({arco: true}), Combatiente.arcoMuyCerca(a, 2), Combatiente.arcoMuyCerca(a, 3), Combatiente.arcoRasgosTxt(a)],
-    [1, 0, 1, 0, 2, 1, true, false, ['Flecha de más', 'Flecha en la cuerda', 'Encadenar', 'Lectura del viento', 'Contra el que corre +2 PdG', 'Contra humanos +1 de daño', 'Arco duro (Fuerza 6)', 'Mínima más larga', 'Emboscada: Crítico potente +2']]);
+    Combatiente.arcoLibres(a), Combatiente.arcoLibres({arco: true}), Combatiente.arcoMuyCerca(a, 2), Combatiente.arcoMuyCerca(a, 3), Combatiente.arcoRasgosTxt(a),
+    Combatiente.lecturaTope(a), Combatiente.lecturaTope({lectura: 1}), Combatiente.lecturaTope({}), Combatiente.arcoRasgosTxt({armaDeRango: true, arco: true, lectura: 1})],
+    [1, 0, 1, 0, 2, 1, true, false, ['Flecha de más', 'Flecha en la cuerda', 'Encadenar', 'Lectura del viento (hasta +3 PdG)', 'Contra el que corre +2 PdG', 'Contra humanos +1 de daño', 'Arco duro (Fuerza 6)', 'Mínima más larga', 'Emboscada: Crítico potente +2'],
+     3, 1, 0, ['Lectura del viento (hasta +1 PdG)']]);
 });
 prueba('las mecánicas de ballesta: doble cuerda, tiro rápido, caída, carcaj integrado y lo que viaja al ataque (2026-10-11)', () => {
   const bal = x => ({armaDeRango: true, recarga: 2, ...x});

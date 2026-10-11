@@ -1487,6 +1487,17 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   «Elegir otro». Los objetivos en la **distancia ideal** del arma brillan con un anillo celeste (`objetivosIdeal`, `tiroResaltarIdeal`) y el bono
   viaja al duelo en `cfg.tiro`. Los resaltes se rehacen cada vez que se vuelve a elegir (`resaltar()` en `dueloElegirObjetivoMapa`).
 
+- **🧱 Paredes de línea fina y 📐 el lápiz en rectas** (2026-10-10, pedido del dueño; `js/34-paredes.js`): el lápiz suma el estilo **📐 En rectas**
+  (como los polígonos de Paint: cada clic suma un punto y una recta desde el anterior; doble clic o Enter termina, clic en el primer punto cierra la
+  figura, Retroceso saca el último, Esc descarta; con **🧲 Imán**, prendido por defecto, cada punto se pega a la esquina de hexágono más cercana). Se
+  guarda como un trazo más con `recto: true` (sin suavizar). **Cualquier dibujo permanente (a mano alzada o en rectas) puede ser una pared**
+  (`colision: true`, solo el GM): la casilla «🧱 Con colisión» del lápiz o el botón 🧱 del dibujo seleccionado (del lado opuesto a la manija de
+  rotar). Una pared no ocupa casilleros: corta el paso y la vista **entre** casilleros — `paredCorta(a, b)` mira si la línea entre sus centros la
+  cruza. La usan `lineaLibre` (la vista, conos, rango, visión: `sinParedes` para la visión «sin sólidos» de los creeps), `extenderRuta` y el soltar
+  del arrastre (el token se choca), `lineaDeTiro` (js/32) y el vuelo de una flecha (js/33). `solidosFirma()` incluye `paredesFirma()` para que los
+  cachés de la visión se rehagan. Se ve con un borde oscuro y una línea roja cortada. Reglas nuevas (`recto`, `colision` en `trazoValido`; la colisión
+  la crea o la cambia solo el GM): hay que pegarlas.
+
 - **🏹 Flechas especiales** (2026-10-09, dueño): atacar con un arco con flechas en el carcaj abre «¿Qué flecha?» (`bnElegirFlecha`, js/11); la
   elegida va en `ataque.flecha` y se gasta (con su No2) justo antes de crear el duelo (`msg.alDisparar` → `bnDispararFlecha`). **Si erra**
   (`js/33-flechas.js`, hook `flechaErrada` del duelo, en la pantalla de quien disparó): **queda en el piso siempre**, en la casilla más lejana de su

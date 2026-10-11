@@ -123,7 +123,8 @@ lienzo.addEventListener('pointerdown', e => {
     // Un trazo permanente ahí: seleccionarlo y, si se puede, arrastrarlo.
     // Con el lápiz por casilleros activo se dibuja directo (un marcador
     // fijo ya puesto se selecciona saliendo de la herramienta).
-    const idTrazo = (herramientaActiva === 'lapiz' && lapizEstilo === 'casillas') ? null : trazoEn(m.x, m.y);
+    if(!herramientaActiva && clicBotonPared(m)) return;   // el 🧱 del dibujo seleccionado (js/34)
+    const idTrazo = (herramientaActiva === 'lapiz' && lapizEstilo !== 'libre') ? null : trazoEn(m.x, m.y);
     if(idTrazo){
       trazoSeleccionar(idTrazo);
       const t = trazos.get(idTrazo);
@@ -138,6 +139,7 @@ lienzo.addEventListener('pointerdown', e => {
     // Lápiz activo: empieza un trazo nuevo a mano alzada.
     if(herramientaActiva === 'lapiz'){
       trazoSeleccionar(null);
+      if(lapizEstilo === 'recta'){ rectaClic(m); lienzo.style.cursor = 'crosshair'; return; }   // 📐 clic, clic… (js/34)
       dibujando = lapizEstilo === 'casillas'
         ? {hex: true, celdas: [mundoAHex(m.x, m.y)], marcador: true}
         : {puntos: [m]};
@@ -218,6 +220,7 @@ lienzo.addEventListener('pointermove', e => {
   if(lineaPreview) lineaPreviewMover(pantallaAMundo(px, py));   // la línea recta que se está apuntando (js/13)
   if(pincelNiebla){ nieblaPintar(px, py); return; }
   if(colocando){ colocacionMover(px, py); return; }
+  if(dibujando && dibujando.recto){ rectaMover(pantallaAMundo(px, py)); return; }   // la recta de prueba sigue al mouse (js/34)
   if(dibujando){
     if(dibujando.hex){
       // Casillero por casillero, como la estela de un token (sin costo ni
@@ -394,7 +397,7 @@ function extenderRuta(a, casilla){
   for(const c of lineaHex(ruta[ruta.length - 1], casilla)){
     const j = ruta.findIndex(x => mismoHex(x, c));
     if(j >= 0){ ruta.length = j + 1; continue; }
-    if(!a.marcador && elementoSolidoEn(c.col, c.fila)){ chocado = true; break; }
+    if(!a.marcador && (elementoSolidoEn(c.col, c.fila) || paredCorta(ruta[ruta.length - 1], c))){ chocado = true; break; }   // un Sólido o una pared de línea (js/34)
     if(ruta.length >= RUTA_MAX_CELDAS) break;
     ruta.push(c);
   }
@@ -407,11 +410,11 @@ function extenderRuta(a, casilla){
 
 function soltar(){
   if(pincelNiebla) nieblaGuardarPincel();
-  if(dibujando){
+  if(dibujando && !dibujando.recto){   // (en rectas, soltar no termina: se termina con doble clic o Enter)
     const d = dibujando;
     dibujando = null;
     if(d.hex) guardarTrazoHex(d.celdas, lapizPermanente);
-    else if(d.puntos.length > 1) guardarTrazo(d.puntos, lapizPermanente);
+    else if(d.puntos.length > 1) guardarTrazo(d.puntos, lapizPermanente || lapizColisionActiva(), {colision: lapizColisionActiva()});
     pedirDibujo();
   }
   if(arrastreTrazo){
@@ -542,7 +545,7 @@ function rutaSoltada(a, t){
       visibles.set(a.id, {x: a.x, y: a.y});
       moverTokenLibre(a.id, fin.col, fin.fila);
     }
-  }else if(a.movio && t && pasos > 0 && a.ruta.slice(1).some(c => elementoSolidoEn(c.col, c.fila))){
+  }else if(a.movio && t && pasos > 0 && a.ruta.slice(1).some((c, i) => elementoSolidoEn(c.col, c.fila) || paredCorta(a.ruta[i], c))){
     toast('Ese camino pasa por un obstáculo — no se puede confirmar así');
     visibles.delete(a.id);
   }else if(a.movio && t && pasos > 0){

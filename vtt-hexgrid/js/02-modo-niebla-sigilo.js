@@ -110,7 +110,7 @@ let solidosCache = {firma: '', set: new Set()};
 function solidosFirma(){
   let f = '';
   elementos.forEach((el, id) => { if(el.solido) f += `${id}:${el.origen.col},${el.origen.fila},${el.rotacion},${el.celdas.length};`; });
-  return f;
+  return f + '|' + (typeof paredesFirma === 'function' ? paredesFirma() : '');   // las paredes de línea (js/34) también cambian lo que se ve
 }
 // Casillas ocupadas por elementos Sólidos (claves nbPack), recalculadas solo si cambian.
 function solidosSet(){
@@ -124,7 +124,9 @@ function solidosSet(){
 }
 // ¿Se ve `hasta` desde `desde`? No si hay un sólido en el medio (el propio
 // sólido de destino sí: se ve la pared, no lo que hay detrás).
-function lineaLibre(desde, hasta, solidos){
+// Las paredes de línea fina (js/34) también tapan; `sinParedes` las ignora (la visión de los creeps «sin sólidos»).
+function lineaLibre(desde, hasta, solidos, sinParedes){
+  if(!sinParedes && typeof paredCorta === 'function' && paredCorta(desde, hasta)) return false;
   if(!solidos.size) return true;
   const l = lineaHex(desde, hasta);
   for(let i = 0; i < l.length - 1; i++) if(solidos.has(nbPack(l[i].col, l[i].fila))) return false;

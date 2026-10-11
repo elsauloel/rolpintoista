@@ -929,6 +929,8 @@ function escucharTrazos(){
         color: /^#[0-9a-fA-F]{6}$/.test(d.color || '') ? d.color : '#E0A458',
         grosor: num(d.grosor) || 4,
         permanente: d.permanente === true,
+        recto: d.recto === true,   // 📐 en rectas: sin suavizar (js/34)
+        colision: d.colision === true,   // 🧱 pared de línea fina (js/34)
         duenoUid: d.duenoUid,
         creadoMs: d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now(),
       });
@@ -946,10 +948,12 @@ function escucharTrazos(){
 
 // Guarda un trazo nuevo ya simplificado, relativo a su propio centro (para
 // poder moverlo/rotarlo entero después si es permanente).
-async function guardarTrazo(puntosMundo, permanente){
+// `opc`: {recto (en rectas: los puntos tal cual, sin simplificar), colision (pared, solo el GM)} — js/34.
+async function guardarTrazo(puntosMundo, permanente, opc){
   if(!fbUsuario || puntosMundo.length < 2) return;
+  opc = opc || {};
   const tolerancia = 2.5 / vista.zoom;
-  const suaves = simplificarTrazo(puntosMundo, tolerancia);
+  const suaves = opc.recto ? puntosMundo.slice(0, 200) : simplificarTrazo(puntosMundo, tolerancia);
   const xs = suaves.map(p => p.x), ys = suaves.map(p => p.y);
   const origen = {x: (Math.min(...xs) + Math.max(...xs)) / 2, y: (Math.min(...ys) + Math.max(...ys)) / 2};
   const puntos = [];
@@ -957,6 +961,7 @@ async function guardarTrazo(puntosMundo, permanente){
   try{
     await coleccionTrazos().add({
       puntos, origen, rotacion: 0, color: lapizColor, grosor: 4, permanente: !!permanente,
+      ...(opc.recto ? {recto: true} : {}), ...(opc.colision && soyGM ? {colision: true} : {}),
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){
@@ -985,7 +990,7 @@ async function guardarTrazoHex(celdas, permanente, opc){
 
 async function moverTrazo(id, cambios){
   try{ await coleccionTrazos().doc(id).update(cambios); }
-  catch(err){ console.error('No se pudo mover el trazo:', err); toast('No se pudo mover el dibujo'); }
+  catch(err){ console.error('No se pudo mover el trazo:', err); toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudo mover el dibujo'); }
 }
 
 async function borrarTrazo(id){

@@ -104,9 +104,14 @@ function renderHerramientaFlotante(){
       <select id="lapiz-estilo-select">
         <option value="libre"${lapizEstilo === 'libre' ? ' selected' : ''}>✏️ Libre (a mano alzada)</option>
         <option value="casillas"${lapizEstilo === 'casillas' ? ' selected' : ''}>⬡ Por casilleros (trayectoria)</option>
+        <option value="recta"${lapizEstilo === 'recta' ? ' selected' : ''}>📐 En rectas (clic, clic, clic…)</option>
       </select>
+      ${lapizEstilo === 'recta' ? `<label class="tk-lapiz-check"><input type="checkbox" id="lapiz-iman-check"${lapizIman ? ' checked' : ''}> 🧲 Imán: pegar los puntos a las esquinas de los hexágonos</label>` : ''}
+      ${soyGM && lapizEstilo !== 'casillas' ? `<label class="tk-lapiz-check"><input type="checkbox" id="lapiz-colision-check"${lapizColision ? ' checked' : ''}> 🧱 Con colisión (es una pared: corta el paso y la vista)</label>` : ''}
       <label class="tk-lapiz-check"><input type="checkbox" id="lapiz-permanente-check"${lapizPermanente ? ' checked' : ''}> ${lapizEstilo === 'casillas' ? 'Trayectoria fija' : 'Dibujo permanente'}</label>
-      <p class="tk-lapiz-ayuda">${lapizEstilo === 'casillas'
+      <p class="tk-lapiz-ayuda">${lapizEstilo === 'recta'
+        ? 'Cada clic suma un punto y una recta desde el anterior. Doble clic o Enter termina; clic en el primer punto cierra la figura; Retroceso saca el último punto; Esc la descarta.' + (soyGM ? ' Un dibujo permanente se vuelve pared (o deja de serlo) con el 🧱 que aparece al seleccionarlo.' : '')
+        : lapizEstilo === 'casillas'
         ? (lapizPermanente ? 'Queda fija en esas casillas: se selecciona (fuera de la herramienta) y se borra con Suprimir. No se mueve.' : 'Marcá la trayectoria arrastrando casillero por casillero; se ve un par de segundos y se borra sola.')
         : (lapizPermanente ? 'Queda como un objeto: cualquiera con permiso lo mueve o lo rota después.' : 'Se ve un par de segundos y se borra sola, como la estela al moverse.')}</p>`;
   }else if(herramientaActiva === 'niebla'){
@@ -302,11 +307,14 @@ $('#herramienta-flotante').addEventListener('change', e => {
     return;
   }
   if(e.target.id === 'lapiz-estilo-select'){
-    lapizEstilo = e.target.value === 'casillas' ? 'casillas' : 'libre';
+    lapizEstilo = e.target.value === 'casillas' || e.target.value === 'recta' ? e.target.value : 'libre';
+    if(typeof rectaCancelar === 'function') rectaCancelar();
     try{ localStorage.setItem('lapiz-estilo', lapizEstilo); }catch(err){}
     renderHerramientaFlotante();
     return;
   }
+  if(e.target.id === 'lapiz-iman-check'){ lapizIman = e.target.checked; try{ localStorage.setItem('lapiz-iman', lapizIman ? '1' : '0'); }catch(err){} return; }
+  if(e.target.id === 'lapiz-colision-check'){ lapizColision = e.target.checked; try{ localStorage.setItem('lapiz-colision', lapizColision ? '1' : ''); }catch(err){} return; }
   if(e.target.id === 'lapiz-permanente-check'){
     lapizPermanente = e.target.checked;
     try{ localStorage.setItem('lapiz-permanente', lapizPermanente ? '1' : ''); }catch(err){}

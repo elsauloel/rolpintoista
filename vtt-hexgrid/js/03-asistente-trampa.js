@@ -435,23 +435,24 @@ function celdasVisionDe(t, ignorarSolidos){
   // La niebla de una varita (2026-10-05): desde afuera tapa como un Sólido; desde adentro se ve a 1.
   const nb = nieblaSet(), enNiebla = nb.has(nbPack(t.col, t.fila));
   const solidos = nb.size && !enNiebla ? new Set([...solidos0, ...nb]) : solidos0;
+  const conParedes = !ignorarSolidos && hayParedes();   // las paredes de línea fina (js/34)
   const res = [], ciego = ciegoDe(t);
   (ciego ? celdasDisco(1) : offsetsVision(k, enNiebla ? 1 : radioVisionDe(t))).forEach(o => {
     const col = cuboACol(c0.q + o.dq, c0.r + o.dr), fila = cuboAFila(c0.q + o.dq, c0.r + o.dr);
     // Los elementos Sólidos tapan la vista: no se ve lo que queda detrás.
-    if(solidos.size && !lineaLibre(origen, {col, fila}, solidos)) return;
+    if((solidos.size || conParedes) && !lineaLibre(origen, {col, fila}, solidos, !conParedes)) return;
     res.push(nbPack(col, fila));
   });
   // Las luces del piso (luz flotante): se ven desde donde no las tape un Sólido, aunque estén lejos.
   const lp = ciego ? null : luzPisoSet();
-  if(lp && lp.size) lp.forEach(k => { const c = nbUnpack(k); if(!res.includes(k) && (!solidos.size || lineaLibre(origen, c, solidos))) res.push(k); });
+  if(lp && lp.size) lp.forEach(k => { const c = nbUnpack(k); if(!res.includes(k) && ((!solidos.size && !conParedes) || lineaLibre(origen, c, solidos, !conParedes))) res.push(k); });
   // Luz portada: un disco completo alrededor (sin punto ciego), también tapado por los Sólidos.
   const luz = ciego ? 0 : luzPortadaDe(t);
   if(luz > 0){
     const vistas = new Set(res);
     celdasDisco(enNiebla ? Math.min(1, luz) : luz).forEach(o => {
       const col = cuboACol(c0.q + o.dq, c0.r + o.dr), fila = cuboAFila(c0.q + o.dq, c0.r + o.dr);
-      if(solidos.size && !lineaLibre(origen, {col, fila}, solidos)) return;
+      if((solidos.size || conParedes) && !lineaLibre(origen, {col, fila}, solidos, !conParedes)) return;
       vistas.add(nbPack(col, fila));
     });
     return [...vistas];
@@ -478,7 +479,7 @@ const iluminadaPorLuz = el => { const s = luzReveladas(); return !!s.size && cel
 // Lo oculto que ven los personajes con «Ve lo oculto» (radio) dentro de su campo de visión: creeps en sigilo y trampas escondidas.
 let revelaFirma = '', reveladas = new Set();
 function revelarActualizar(){
-  const firma = [...tokens.entries()].filter(([, t]) => veOcultoDe(t) > 0 && !t.oculto).map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${veOcultoDe(t)},${luzPortadaDe(t)},${radioVisionDe(t)}`).join('|') + '#' + solidosSet().size;
+  const firma = [...tokens.entries()].filter(([, t]) => veOcultoDe(t) > 0 && !t.oculto).map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${veOcultoDe(t)},${luzPortadaDe(t)},${radioVisionDe(t)}`).join('|') + '#' + solidosFirma();
   if(firma === revelaFirma) return;
   revelaFirma = firma;
   reveladas = new Set();

@@ -209,8 +209,10 @@ let dibujando = null;         // {puntos: [{x,y}]} mientras se arrastra el lápi
 let cortarTrazosListener = null;
 let lapizColor = '#E0A458';
 let lapizPermanente = false;
-let lapizEstilo = 'libre';    // 'libre' (a mano alzada) | 'casillas' (marcador de trayectoria atado a la grilla)
-try{ lapizEstilo = localStorage.getItem('lapiz-estilo') === 'casillas' ? 'casillas' : 'libre'; }catch(e){}
+let lapizEstilo = 'libre';    // 'libre' (a mano alzada) | 'casillas' (marcador de trayectoria atado a la grilla) | 'recta' (clic, clic…: js/34)
+try{ const e = localStorage.getItem('lapiz-estilo'); lapizEstilo = e === 'casillas' || e === 'recta' ? e : 'libre'; }catch(e){}
+let lapizColision = false;   // 🧱 el dibujo nuevo es una pared (solo el GM; js/34)
+try{ lapizColision = localStorage.getItem('lapiz-colision') === '1'; }catch(e){}
 try{ lapizColor = localStorage.getItem('lapiz-color') || lapizColor; }catch(e){}
 try{ lapizPermanente = localStorage.getItem('lapiz-permanente') === '1'; }catch(e){}
 

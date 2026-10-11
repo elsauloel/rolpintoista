@@ -10,6 +10,10 @@
 
 ## Pendientes
 
+- [ ] **🧱 Paredes y 📐 lápiz en rectas** (2026-10-10, necesita las reglas nuevas pegadas): el GM dibuja en rectas con imán una habitación
+  (clic, clic…, cerrar en el primer punto) con «🧱 Con colisión»; un token no puede salir cruzando la pared (se choca), los conos, la visión con
+  niebla y el rango (R) no pasan del otro lado, una flecha choca. Un garabato a mano alzada con el 🧱 del dibujo seleccionado también. Sacarle la
+  colisión con el mismo 🧱. Un jugador no ve la casilla ni el botón.
 - [ ] **😱 Expuesto y el dodge roll** (2026-10-10): con Expuesto, un área que gana no le da dodge roll (la Mesa «… está Expuesto: no puede
   hacer el dodge roll y se queda en el área»). Lo demás de Degollar y Expuesto ya está probado (abajo).
 - [ ] **⏸ La pausa de la partida** (2026-10-10, necesita las reglas nuevas pegadas): el GM pausa desde el mapa o GM Tools → el jugador ve el

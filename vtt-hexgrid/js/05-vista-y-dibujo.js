@@ -112,7 +112,7 @@ function dibujarAuraHex(centro, aura, z){
 // NO está en el rango. Se ve la pared misma, no lo que hay del otro lado. Sin sólidos en el mapa se dibuja el círculo completo, como siempre.
 function dibujarRangoConVision(centro, radio, color, z){
   const solidos = solidosSet();
-  if(!solidos.size){ dibujarAuraHex(centro, {radio, color}, z); return; }
+  if(!solidos.size && !hayParedes()){ dibujarAuraHex(centro, {radio, color}, z); return; }
   const C = hexACubo(centro), R = radio, origen = {col: centro.col, fila: centro.fila};
   const dentro = new Set(), celdas = [];
   for(let dq = -R; dq <= R; dq++){
@@ -937,11 +937,12 @@ function dibujar(){
       if(!t.permanente) animando = true;
       return;
     }
+    if(t.colision) dibujarParedDebajo(t, z);   // 🧱 una pared (js/34)
     ctx.save();
     ctx.translate(t.origen.x, t.origen.y);
     ctx.rotate(t.rotacion * Math.PI / 180);
     ctx.beginPath();
-    trazarSuave(ctx, t.puntos);
+    trazarTrazo(ctx, t);   // en rectas o suavizado (js/34)
     ctx.globalAlpha = alfa;
     ctx.strokeStyle = t.color;
     ctx.lineWidth = t.grosor / z;
@@ -956,6 +957,8 @@ function dibujar(){
       ctx.setLineDash([]);
     }
     ctx.restore();
+    if(t.colision) dibujarParedEncima(t, z);
+    if(id === trazoSeleccionado) dibujarBotonPared(t, z);   // el 🧱 del GM para ponerle o sacarle la colisión
     if(id === trazoSeleccionado && puedeManipularTrazo(t)){
       const h = trazoManijaMundo(t);
       ctx.beginPath(); ctx.moveTo(t.origen.x, t.origen.y); ctx.lineTo(h.x, h.y);
@@ -968,6 +971,7 @@ function dibujar(){
   });
   // El trazo que se está dibujando ahora mismo, en vivo.
   if(dibujando && dibujando.hex) dibujarRutaHex(dibujando.celdas, lapizColor, 1);
+  else if(dibujando && dibujando.recto) dibujarRectaEnCurso(z);   // 📐 en rectas (js/34)
   else if(dibujando && dibujando.puntos.length > 1){
     ctx.beginPath();
     trazarSuave(ctx, simplificarTrazo(dibujando.puntos, 1.5 / z));

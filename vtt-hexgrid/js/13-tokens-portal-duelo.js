@@ -173,7 +173,7 @@ function blinkDeHabilidad(msg){
     const [id, t] = e;
     if(id !== yo[0]){
       if(t.tipo === 'creep'){ toast('El blink es para vos o para un aliado'); blinkDeHabilidad(msg); return; }
-      if(solidosSet().size && !lineaLibre(yo[1], t, solidosSet())){ toast(`No ves a ${nombreDe(t)}: hay algo sólido en el medio`); blinkDeHabilidad(msg); return; }
+      if((solidosSet().size || hayParedes()) && !lineaLibre(yo[1], t, solidosSet())){ toast(`No ves a ${nombreDe(t)}: hay algo sólido en el medio`); blinkDeHabilidad(msg); return; }
     }
     adonde(id, t);
   }, `<b>✨ ${nom}¿a quién?</b> <span>clic sobre vos o sobre un aliado que ves · Esc o clic derecho cancelan</span>`, true);

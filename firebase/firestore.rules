@@ -627,8 +627,9 @@ service cloud.firestore {
       // uno ajeno con esa marca (nunca uno permanente ajeno). Mover/rotar
       // uno permanente (solo origen/rotacion) o borrarlo: su dueño o el GM.
       function trazoValido(d) {
-        return d.keys().hasOnly(['puntos', 'origen', 'rotacion', 'color', 'grosor', 'permanente', 'hex', 'duenoUid', 'creado'])
+        return d.keys().hasOnly(['puntos', 'origen', 'rotacion', 'color', 'grosor', 'permanente', 'hex', 'recto', 'colision', 'duenoUid', 'creado'])
           && (!('hex' in d) || d.hex is bool)
+          && (!('recto' in d) || d.recto is bool) && (!('colision' in d) || d.colision is bool)
           && d.puntos is list && d.puntos.size() >= (d.get('hex', false) ? 2 : 4) && d.puntos.size() <= 400 && d.puntos.size() % 2 == 0
           && d.origen is map && d.origen.x is number && d.origen.y is number
           && d.rotacion is number
@@ -642,10 +643,12 @@ service cloud.firestore {
         allow create: if esMiembro(c)
           && trazoValido(request.resource.data)
           && request.resource.data.duenoUid == request.auth.uid
-          && request.resource.data.creado == request.time;
+          && request.resource.data.creado == request.time
+          && (request.resource.data.get('colision', false) == false || esGM(c));   // 🧱 una pared la pone el GM (2026-10-10)
         allow update: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c))
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion']);
+          && (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion'])
+            || (esGM(c) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'colision'])));
         allow delete: if esMiembro(c)
           && (resource.data.permanente == false || resource.data.duenoUid == request.auth.uid || esGM(c));
       }
@@ -894,10 +897,12 @@ service cloud.firestore {
           allow create: if esMiembro(c)
             && trazoValido(request.resource.data)
             && request.resource.data.duenoUid == request.auth.uid
-            && request.resource.data.creado == request.time;
+            && request.resource.data.creado == request.time
+            && (request.resource.data.get('colision', false) == false || esGM(c));   // 🧱 una pared la pone el GM (2026-10-10)
           allow update: if esMiembro(c)
             && (resource.data.duenoUid == request.auth.uid || esGM(c))
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion']);
+            && (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion'])
+              || (esGM(c) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'colision'])));
           allow delete: if esMiembro(c)
             && (resource.data.permanente == false || resource.data.duenoUid == request.auth.uid || esGM(c));
         }

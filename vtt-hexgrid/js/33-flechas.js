@@ -39,8 +39,10 @@ async function flechaErrada(d){
   try{ alcance = Math.max(dist, Math.round(num(rangoDeToken(tA).rng)) || dist); }catch(e){}
   const solidos = solidosSet();
   let celda = {col: tD.col, fila: tD.fila}, choco = false;
+  let previa = {col: tA.col, fila: tA.fila};
   for(const c of flechaLinea(tA, tD, alcance)){
-    if(solidos.has(nbPack(c.col, c.fila))){ choco = true; break; }   // choca contra un obstáculo: cae justo antes (si no se rompe)
+    if(solidos.has(nbPack(c.col, c.fila)) || paredCorta(previa, c)){ choco = true; break; }   // (una pared de línea fina también, js/34)
+    previa = c;   // choca contra un obstáculo: cae justo antes (si no se rompe)
     celda = c;
   }
   // Los virotes que estallan donde caen (humo, luz, explosivo, 2026-10-10): no quedan en el piso. El de rebote, si falla, sale contra el que

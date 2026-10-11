@@ -52,6 +52,7 @@ function lineaDeTiro(a, b, ignorar){
   const ign = ignorar || new Set();
   const c1 = tiroCeldas(a, b, 1), c2 = tiroCeldas(a, b, -1);
   const t1 = tiroTapan(c1, ign), t2 = tiroTapan(c2, ign);
+  if(typeof paredCorta === 'function' && paredCorta(a, b)){ const p = {tipo: 'solido', nombre: 'una pared', col: b.col, fila: b.fila}; t1.push(p); t2.push(p); }   // una pared de línea fina (js/34)
   const unidos = [...t1, ...t2].filter((x, i, arr) => arr.findIndex(y => y.col === x.col && y.fila === x.fila && y.nombre === x.nombre) === i);
   const estado = !t1.length && !t2.length ? 'libre' : (!t1.length || !t2.length) ? 'roza' : 'tapado';
   return {estado, tapan: unidos, soloTokens: unidos.every(x => x.tipo === 'token'), celdas: t1.length <= t2.length ? c1 : c2};

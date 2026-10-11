@@ -1071,18 +1071,21 @@ const embestidaRutas = new Map();   // tokenId → {clave: 'id@mantenimiento', c
 // Desde 2026-10-11 también los de los demás (los cuenta el listener de los tokens, js/09) y las dos últimas rondas: «Contra el que corre» de los arcos
 // mira lo que se movió el blanco en su último turno completo (dueño: «no la ronda, sino el último turno completo del personaje»).
 const casillerosRonda = new Map();   // tokenId → {ronda: casilleros}
+// La ronda: la del orden de turnos si hay (la misma con la que se sabe quién ya jugó; el Mantenimiento llega un instante después); si no, el Mantenimiento.
+const rondaDeCasilleros = () => (iniciativa.orden || []).length ? 'i' + Math.round(num(iniciativa.ronda)) : 'm' + Math.round(num(mantenimientoNumero));
+const rondaAnterior = r => r[0] + (Number(r.slice(1)) - 1);
 function contarCasilleros(id, pasos){
   if(!(pasos > 0)) return;
-  const r = Math.round(num(mantenimientoNumero)), m = casillerosRonda.get(id) || {}, nuevo = {[r]: (m[r] || 0) + pasos};
-  if(m[r - 1]) nuevo[r - 1] = m[r - 1];
+  const r = rondaDeCasilleros(), m = casillerosRonda.get(id) || {}, nuevo = {[r]: (m[r] || 0) + pasos};
+  if(m[rondaAnterior(r)]) nuevo[rondaAnterior(r)] = m[rondaAnterior(r)];
   casillerosRonda.set(id, nuevo);
 }
-window.mapaCasillerosRonda = id => (casillerosRonda.get(id) || {})[Math.round(num(mantenimientoNumero))] || 0;
+window.mapaCasillerosRonda = id => (casillerosRonda.get(id) || {})[rondaDeCasilleros()] || 0;
 // Su último turno completo: si ya jugó en esta ronda, lo de esta ronda; si todavía no (o es su turno ahora), lo de la ronda anterior.
 window.mapaCasillerosUltimoTurno = id => {
-  const r = Math.round(num(mantenimientoNumero)), i = (iniciativa.orden || []).findIndex(o => o.id === id);
+  const r = rondaDeCasilleros(), i = (iniciativa.orden || []).findIndex(o => o.id === id);
   const jugo = i >= 0 && ((iniciativa.actuaron || []).includes(id) || i < num(iniciativa.turno));
-  return (casillerosRonda.get(id) || {})[jugo ? r : r - 1] || 0;
+  return (casillerosRonda.get(id) || {})[jugo ? r : rondaAnterior(r)] || 0;
 };
 async function moverToken(id, col, fila, celdas, levita){
   if(celdas && celdas.length > 1) embestidaRutas.set(id, {clave: `${id}@${Math.round(num(mantenimientoNumero))}`, celdas: celdas.map(c => ({col: c.col, fila: c.fila}))});

@@ -467,7 +467,9 @@ aside{
   font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.06em;color:var(--brass);border-bottom:1px solid var(--line-soft)
 }
 #iniciativa.plegado #iniciativa-cab{border-bottom:none}
-#iniciativa-ronda{margin-left:auto;color:var(--muted);font-size:10.5px}
+#iniciativa-ronda{margin-left:auto;color:var(--muted);font-size:10.5px;flex:none}
+#iniciativa-titulo{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#iniciativa.plegado #iniciativa-titulo{color:#F2C27A;font-weight:700}
 #iniciativa .ini-plegar{color:var(--muted);font-size:13px;line-height:1;padding:0 2px;cursor:pointer}
 #iniciativa.plegado #iniciativa-cuerpo{display:none}
 #iniciativa-lista{max-height:46vh;overflow-y:auto}

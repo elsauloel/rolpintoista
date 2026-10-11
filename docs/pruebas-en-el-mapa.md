@@ -10,6 +10,8 @@
 
 ## Pendientes
 
+- [ ] **⚔ Tabla de turnos minimizada** (2026-10-11): achicada, la cabecera dice «⚔ Turno: *nombre*» de quien tiene el turno (si quien mira lo ve;
+  si no, «Orden de turnos»); al pasar el turno cambia sola; agrandada vuelve a «Orden de turnos».
 - [ ] **🎯 Mecánicas de ballesta nuevas** (2026-10-11): con las ballestas nuevas del catálogo, en combate: **Doble cuerda** (2, 2, 6 No2) y **Tiro
   rápido** (2, 3, 4) en el costo de cada disparo; **Alcance con caída** (más allá del alcance, el duelo resta daño); **Apuntada firme** (sin
   moverse dos turnos: +PdG); **Tirador de apoyo** (blanco pegado a un aliado); **Remate** (blanco Sentado o Inmovilizado); **Primer disparo** (el

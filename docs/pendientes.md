@@ -18,6 +18,10 @@
 > - [ ] **🕊 Vuelo (2026-10-11, dueño, con los arcos: «todavía no diseñamos nada, pero eventualmente aparecerán creeps voladores — anotar para
 >   desarrollar: vuelo»):** creeps que vuelan o levitan. Cuando exista, los arcos «Contra lo que vuela o levita» (+PdG) ya están elegidos por el dueño
 >   (docs/ideas-arcos-flechas.md). Hoy existe Levitar (pies), que no es lo mismo.
+> - [ ] **🧮 La calculadora cobra barato el daño fijo de las ballestas (2026-10-11)**: una ballesta Común con solo daño, según la calculadora,
+>   puede llegar a 1d6+6 o 2d6+4; según el simulador de balance (`balance_combate.py --ballesta`, Shooter contra el blanco medio) el techo de la
+>   banda Común (74–106 %) es **1d6+3** (95 %; 1d6+4 = 114 %, 2d6 = 110 %). Ajustarla mueve el precio y la calidad de todas las ballestas: revisarlo
+>   con el dueño antes de tocarla. Mientras tanto, para diseñar: Común sin bonos, como mucho 1d6+3.
 > - [ ] **🎯 Ballestas: Comunes y Buenas hechas (2026-10-11)**; lo que queda para las Raras y P195 (la Manivela) en `docs/ideas-ballestas.md` →
 >   «Para las Raras». Tensar, el Cargador y el Virote recuperable solo andan desde la Botonera de un personaje (no en creeps ni invocaciones).
 > - [ ] **🏹 Mecánicas de arco que faltan (2026-10-11):** hechas y en el catálogo (12 arcos nuevos, Común y Buena): Tensar, Largo alcance, Emboscada,

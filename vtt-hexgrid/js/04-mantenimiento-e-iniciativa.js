@@ -596,6 +596,10 @@ function renderIniciativa(){
     if(t && ocultoPorSigiloParaMi(t)) return false;
     return soyGM || !(o.oculto || (t && t.oculto));   // oculto por el GM en la lista, o token oculto
   });
+  // Minimizada, la cabecera dice de quién es el turno (dueño, 2026-10-11), si quien mira lo puede ver (si no, el título de siempre).
+  const actual = visibles.find(x => x.i === iniciativa.turno), tActual = actual && tokens.get(actual.o.id);
+  const titulo = $('#iniciativa-titulo');
+  if(titulo){ titulo.textContent = iniciativaPlegada && tActual ? `⚔ Turno: ${nombreDe(tActual)}` : '⚔ Orden de turnos'; titulo.title = titulo.textContent; }
   if(!visibles.length){
     lista.innerHTML = `<div id="iniciativa-vacio">${soyGM ? 'Sin orden todavía: tocá "Traer tokens" y cargá las tiradas.' : 'El GM todavía no armó el orden.'}</div>`;
   }else{

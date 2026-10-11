@@ -1325,7 +1325,7 @@ async function dueloAplicarDano(d){
     if(d.hab && d.hab.atrae && !res.r.invulnerable) await dueloAtraer(d).catch(err => console.error('No se pudo atraer al objetivo:', err));   // el gancho
     if(d.hab && d.hab.riesgo && (dn.rolls || []).map(num).includes(num(d.hab.riesgo.si))) await dueloRiesgo(d).catch(err => console.error('No se pudo aplicar el riesgo:', err));   // la inestable
     // `perfora`: solo si la Perfora mandó (pasaron esos N, la Defensa frenaba más): el duelo lo cuenta así.
-    return {...base, desgaste, defensa: crit ? restaIgnorando : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {})};
+    return {...base, desgaste, defensa: crit ? restaIgnorando : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, ...(num(res.r.mitiMiti) > 0 ? {mitiMiti: num(res.r.mitiMiti), mitiMitiNombre: String(res.r.mitiMitiNombre || '').slice(0, 40)} : {}), hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);
     return {...base, defensa: def, manual: true, golpe: base.mitad ? aplicar : golpe, motivoManual: err && err.message === 'SIN_DEF' ? 'la ficha todavía no publicó su Defensa' : 'falló la escritura'};

@@ -168,3 +168,20 @@ del Shooter) · 49 Arco arcano (suma la mitad del Efecto especial) · 50 Arco de
 disparo) · 52 Arco que se calienta (+1 de daño por cada rival que cae en el combate).
 **J. Debilidades (abaratan):** 53 Ruidoso (rompe el sigilo siempre) · 54 ✔ Frágil · 55 Pesado (−1 Evasión equipado) · 56 Corto alcance (Rango −2) ·
 57 Cuerda floja (si todos los dados salen 1, se corta: 1 No2 para arreglarla) · 58 ✔ Sin tiro alto.
+
+### Lo que eligió el dueño de la segunda ronda (2026-10-11)
+«Habría que ampliar el catálogo con estos efectos; si alguno necesita ajuste y definición, lo charlamos. Se les busca el mecanismo y el tier.»
+- **Al catálogo de arcos:** Marca (deja Marcado al golpeado), **desde Común** · Silbadora (Demora), **desde Común, con %** · **Tensar** (pagás 1 No2
+  extra: +2 PdG o un dado más) — evaluar su valor y su calidad · **Tiro rápido** (los disparos después del primero −1 No2) — parece poderoso,
+  evaluar la calidad · **Largo alcance** (más allá del Rango, con −1 o −2 PdG por casillero, valores distintos según el arco) · **Perfora** en algunos
+  arcos (**Rompe armadura: exclusivo de las ballestas**) · **Emboscada** (el primer disparo del combate, Crítico frecuente +2), un bono valioso ·
+  **Matabestias** (+daño contra bestias) · **Contra lo que vuela o levita** (+PdG) · **Contra el Marcado** (+PdG o +daño); si no hay flecha que marca en
+  la Talabartería, crearla (también va a ser skill del Hunter) · **Por la espalda a distancia** (+PdG y/o +daño si la trayectoria no toca los
+  casilleros de visión del rival) · **Afinidad elemental** (+1 al efecto de las flechas elementales) · **Arco rúnico** (sus flechas comunes hacen
+  daño elemental, desde Rara) · **Arco que se calienta** (+1 de daño por cada rival que cae en el combate), puede ser · **Corto alcance** (Rango −2),
+  como debilidad · **Arco compuesto** (la mitad de la Destreza en vez de la Fuerza): evaluar en Raro, «miedo a que rompa todo».
+- **Flechas especiales:** Empuje (lo corre 1 casillero) · Silbadora (Demora) · Rastro (el objetivo queda a la vista unos turnos). **Las flechas
+  elementales comunes, siempre en la góndola de la Talabartería.**
+- **Skills, no mecánicas de arco:** Disparo doble (creep o Shooter) · Disparo de retirada · A la articulación (con crítico, Rengo o Lisiado seguro) ·
+  Paciencia (pasiva: +2 PdG por cada turno sin disparar, con arcos) · Contra el recién descubierto (pasiva).
+- **No:** Derriba con crítico (Sentado no va con los proyectiles Tipo 4).

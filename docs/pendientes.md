@@ -17,6 +17,13 @@
 >   trazos) y probarlo en el mapa (`pruebas-en-el-mapa.md`).
 > - [ ] **🎲 Prueba que falla a veces (2026-10-10):** «Plantillas · reposición (2026-10-07)» de `comun/pruebas.html` depende del azar y a veces da
 >   falso (el tercer valor); hay que fijarle la semilla o el caso para que no falle sola.
+> - [ ] **🔍 Revisión de las skills de clase ya auditadas (2026-10-10, pedido del dueño: «muchas las audité antes del menú de duelo»):** 33 auditadas;
+>   31 tienen la Ejecución armada. Arreglado: Shockwave y Takle cobran solos el doble en turno ajeno. Quedan para el dueño: (1) Cañón Vasco sin
+>   Ejecución (salto + onda al caer); (2) Carga y Takle: el ataque sale gratis (la habilidad cobra solo el movimiento o nada), el texto dice que se
+>   paga aparte; (3) Dash, Carga, Takle y Cañón Vasco mueven «a mano» (se podría usar el movimiento libre del dodge roll de Tronco de huída);
+>   (4) Ojo de asesino dice «tu próximo ataque» pero dura todo el turno (se podría hacer con una carga); (5) Chispazo, Rayo Mágico, Orbe arcano,
+>   Drenar vida y Pedos Tóxicos dicen «directo a la vida» pero los frena la Defensa especial (o es directo, o se corrige el texto); (6) Invocar
+>   portal no usa la Ejecución, pero funciona por su propio camino (el portal del mapa).
 > - [x] **⏸ Pausar la partida** — hecho 2026-10-10 (`comun/pausa.js`; botón en el mapa del GM y en GM Tools). **Falta: que el dueño pegue las
 >   reglas nuevas** (`ajustes/pausa`, `pausaLog`) y probarlo en el mapa (ver `pruebas-en-el-mapa.md`). Lo pedido: el GM pausa la partida al terminar una sesión.
 >   Hasta la próxima, los jugadores pueden entrar y tocar su ficha (cambios, compras…), pero **no explorar el mapa**. Todo lo que hagan los

@@ -821,7 +821,8 @@ const FichaAcciones = (() => {
       const txt = mods.map(m => `${num(m.val) > 0 ? '+' : ''}${fmt(num(m.val))} ${FichaCalculo.STAT_LABEL[m.stat] || m.stat}`);
       if(spec.hp) txt.push(`${spec.hp > 0 ? '+' : ''}${spec.hp} HP por turno`);
       if(spec.escudoMagico) txt.push(`escudo de ${num(spec.escudoMagico)}`);
-      draft = {id: uid(), nombre: spec.nombre || 'Efecto', polaridad: spec.polaridad || (spec.escudoMagico ? 'buff' : 'debuff'), turnos: num(spec.turnos), stacks: 1, hpturno: num(spec.hp), stacksturno: 0,
+      draft = {id: uid(), nombre: spec.nombre || 'Efecto', polaridad: spec.polaridad || (spec.escudoMagico ? 'buff' : 'debuff'), turnos: num(spec.turnos), stacks: Math.max(1, Math.round(num(spec.stacks)) || 1),   // los stacks que manda (Apuntando ×X, 2026-10-11)
+         hpturno: num(spec.hp), stacksturno: 0,
         permanente: false, detalle: spec.detalle || txt.join(', '), mods, ...(num(spec.escudoMagico) ? {escudoMagico: num(spec.escudoMagico)} : {})};
     }
     draft.activo = true;

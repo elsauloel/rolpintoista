@@ -569,7 +569,7 @@ prueba('Apuntar (Shooter, 2026-10-11): la X llega a los stacks de «Apuntando» 
   const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 2});
   const ef = ej.efectos[0];
   igual([hab.costo, hab.nitrosCosto, ef.spec.nombre, ef.spec.stacks, Combatiente.apuntandoX([{nombre: 'Apuntando', stacks: 2}]), Combatiente.apuntandoX([{nombre: 'Apuntando', stacks: 9}]), Combatiente.apuntandoX([]),
-    FichaAcciones.estadoDeSpec(EstadosAplicar.limpiarSpec(ef.spec), []).turnos], ['X', 'X', 'Apuntando', 2, 2, 3, 0, 0]);
+    FichaAcciones.estadoDeSpec(EstadosAplicar.limpiarSpec(ef.spec), []).turnos, FichaAcciones.estadoDeSpec(EstadosAplicar.limpiarSpec(ef.spec), []).stacks], ['X', 'X', 'Apuntando', 2, 2, 3, 0, 0, 2]);
 });
 prueba('Heal (Support, 2026-10-11): 1d6+4 a un aliado o a uno mismo, y «conmigo» llega al duelo', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-heal');

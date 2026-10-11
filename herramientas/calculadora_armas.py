@@ -51,6 +51,12 @@ DESCUENTO_ARCO = 0.7
 # medida con balance_combate.py con el cobro de la Recarga: Común 1d6+1 · Buena 2d6+4…+6 · Rara 2d6+7…+9). Se cobra al mismo factor que el arco
 # (así cae en su calidad con lugar para bonos); la de asedio (Recarga 3) un poco menos por punto (un solo disparo por turno, más grande).
 DESCUENTO_BALLESTA = 0.7
+# Ballestas, recalibrado (2026-10-11, docs/rework-armas-rango.md «medidas de nuevo»): el daño se cobra por su promedio (dados + fijo + Perfora ×
+# BAL_PERFORA_EQ) en una recta por Recarga, ajustada a lo que mide balance_ballestas.py (Shooter, blanco medio): Recarga 3 (las Comunes): 1d6+2 =
+# 82 % → 6, 1d6+3 = 100 % → 7; Recarga 2 (desde Buena): 2d6+3 = 32 % → 8, 2d6+5 = 82 % → 10,4, 3d6+2 = 98 % → 10,8, 2d6+2 Perfora 3 = 106 % → 11.
+BAL_DANO = {3: (1.0, 1.45), 2: (1.2, -2.85)}   # Recarga → (k, c): PC del daño = k × promedio + c
+BAL_PERFORA_EQ = 1.15  # un punto de Perfora en una ballesta rinde ~1,2–1,5 de daño fijo contra el blanco medio
+BAL_R2_MIN = 7.5       # una ballesta con Recarga 2 vale al menos lo de una Buena
 PERFORA_VALOR = 0.8   # lo que vale cada punto de Perfora frente a +1 de daño fijo (docs/ideas-arcos-flechas.md)
 PERFORA_CASA = {'punzante': 1.0, 'cortante': 1.25}   # la casa de la Perfora cuerpo a cuerpo: las dagas (Tipo 4); en las espadas (Tipo 6), habilitada (dueño, 2026-10-10)
 RECARGA_FACTOR = {1: 1.0, 2: 1.0, 3: 0.9}
@@ -114,7 +120,12 @@ def puntaje(arma):
     if perf and not rango:   # cuerpo a cuerpo: la casa de la Perfora es el Tipo 4 (dueño, 2026-10-10); en el Tipo 6, habilitada; en el resto, fuera de casa
         d['perfora'] = PERFORA_VALOR * perf * factor_plano(tipo) * PERFORA_CASA.get(familia(arma), 1.5)
     if arma.get('armaDeRango') and arma.get('arco'): d['daño'] *= DESCUENTO_ARCO
-    elif arma.get('armaDeRango') and int(arma.get('recarga') or 0) > 0: d['daño'] *= DESCUENTO_BALLESTA * RECARGA_FACTOR.get(int(arma['recarga']), 1.0)
+    elif arma.get('armaDeRango') and int(arma.get('recarga') or 0) > 0 and int(arma['recarga']) not in BAL_DANO: d['daño'] *= DESCUENTO_BALLESTA * RECARGA_FACTOR.get(int(arma['recarga']), 1.0)
+    rcb = int(arma.get('recarga') or 0) if rango and not arma.get('arco') else 0
+    if rcb in BAL_DANO:   # la ballesta (2026-10-11): el daño vale lo que rinde contra la Defensa de su calidad (medido con balance_ballestas.py)
+        prom = (peso + amp) * (tipo + 1) / 2 + fijo + BAL_PERFORA_EQ * perf
+        k, c = BAL_DANO[rcb]
+        d['daño'] = k * prom + c
     fam = familia(arma)
     bonos = crit = 0.0
     for m in arma.get('mods') or []:
@@ -217,6 +228,8 @@ def puntaje(arma):
     d['peso del arma'] = -TASA_PESO * peso
     if arma.get('tipoItem') == 'arma_2m':   # dos manos (dueño, 2026-10-03): sin segunda arma ni escudo, un poco menos de valor
         d['dos manos'] = -DESCUENTO_DOS_MANOS
+    if rcb == 2 and sum(d.values()) < BAL_R2_MIN:   # Recarga 2 empieza en Buena (2026-10-11): a nivel 1 dispara dos veces y una 1d6 pelada ya rinde 103 %
+        d['recarga 2 (desde Buena)'] = BAL_R2_MIN - sum(d.values())
     return sum(d.values()), d
 
 

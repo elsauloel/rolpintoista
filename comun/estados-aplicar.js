@@ -40,6 +40,7 @@ const EstadosAplicar = (() => {
     if(s.pct) out.pct = Math.max(1, Math.min(100, Math.round(Number(s.pct) || 0)));   // «Revivir» (el consumible Revive): con qué % de la vida
     if(s.estado) out.estado = String(s.estado).slice(0, 40);   // «Acortar estado» (Recuperarse rápido, 2026-10-04): a cuál le saca turnos   // «Pierde No2» (Sonic Boom): si llega a 0, queda Sentado
     if(s.soltar && Combatiente.soltarNorm(s.soltar)) out.soltar = Combatiente.soltarNorm(s.soltar);   // cómo se suelta (trampas de Atrapar)
+    if(s.protege){ out.protege = String(s.protege).slice(0, 80); out.protegeNombre = String(s.protegeNombre || '').slice(0, 40); }   // Miti-Miti (Tanque, 2026-10-11): a quién protege
     return out;
   }
   const esPreset = nombre => !!presetPorNombre(nombre);
@@ -59,7 +60,8 @@ const EstadosAplicar = (() => {
       if(base.escudoMagico) partes.push(`escudo de ${base.escudoMagico}`);
       base.detalle = partes.length ? partes.join(', ') + (base.turnos ? ` durante ${base.turnos} turno(s).` : '.') : '';
     }
-    return {id: id(), activo: true, stacks: 1, hpTurno: 0, stacksTurno: 0, permanente: false, escudoMagico: 0, forzarNitros: '', mods: [], ...base, ...(s.soltar ? {soltar: s.soltar} : {})};
+    return {id: id(), activo: true, stacks: 1, hpTurno: 0, stacksTurno: 0, permanente: false, escudoMagico: 0, forzarNitros: '', mods: [], ...base, ...(s.soltar ? {soltar: s.soltar} : {}),
+      ...(s.protege ? {protege: s.protege, protegeNombre: s.protegeNombre} : {})};
   }
 
   // Inmunidades del que recibe el estado: la regla vive en comun/combatiente.js (la misma para ficha, gm-tools y mapa).

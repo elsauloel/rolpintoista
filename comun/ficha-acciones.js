@@ -827,6 +827,7 @@ const FichaAcciones = (() => {
     draft.activo = true;
     if(!draft.polaridad) draft.polaridad = 'debuff';
     if(spec.soltar && Combatiente.soltarNorm(spec.soltar)) draft.soltar = Combatiente.soltarNorm(spec.soltar);   // cómo se suelta (trampas de Atrapar)
+    if(spec.protege){ draft.protege = spec.protege; draft.protegeNombre = spec.protegeNombre || ''; }   // Miti-Miti (Tanque, 2026-10-11): a quién protege
     return draft;
   }
   function aplicarEstadoRecibido(S, spec, origen, ui){

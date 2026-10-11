@@ -147,6 +147,7 @@ function leerGolpe(texto){
 function golpeTexto(nombre, golpe, r, previo, nuevo){
   const extra = [];
   if(r.arcano) extra.push(`la Armadura arcana absorbió ${fmt(r.arcano)}`);
+  if(r.mitiMiti) extra.push(`🛡 ${r.mitiMitiNombre} se llevó ${fmt(r.mitiMiti)} (Miti-Miti)`);
   if(num(r.absorbido) - num(r.arcano) > 0) extra.push(`Vida extra absorbió ${fmt(num(r.absorbido) - num(r.arcano))}`);
   const suf = extra.length ? ` · ${extra.join(' · ')}` : '';
   if(r.invulnerable) return `${nombre}: Invulnerable, el golpe de ${fmt(golpe)} no hizo nada`;
@@ -213,6 +214,33 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   return res;
 }
 
+/* 🛡 Miti-Miti (Tanque, 2026-10-11, decisiones del dueño): un personaje con la marca «Miti-Miti» (`protege` = la ficha del protegido, en su resumen
+   público) se lleva la mitad de cada golpe o área que daña al protegido, redondeada para arriba, directo a su vida (sin su Defensa: ya pasó la del
+   protegido). Solo el daño que llega con `o.reparte` (golpes del duelo, áreas, «Recibe daño»); no el de estados que siguen corriendo ni trampas. */
+function mitiMitiDe(t){
+  if(!t || !t.fichaId || t.tipo === 'creep') return null;
+  for(const x of tokens.values()){
+    if(!x || x === t || x.tipo !== 'pj' || !x.fichaId || String(x.fichaId).includes(SEP_INVOCACION)) continue;
+    const est = (((vinculo(x) || {}).resumen || {}).estados) || [];
+    if(est.some(e => e && e.activo !== false && e.nombre === 'Miti-Miti' && e.protege === t.fichaId)) return x;
+  }
+  return null;
+}
+function mitiMitiPartir(r, prot){
+  if(!prot || !(r.recibido > 0)) return 0;
+  const m = Math.ceil(r.recibido / 2);
+  r.recibido -= m; r.mitiMiti = m; r.mitiMitiNombre = nombreDe(prot);
+  return m;
+}
+async function mitiMitiCobrar(t, prot, res){
+  if(!prot || !res || !(num(res.r && res.r.mitiMiti) > 0)) return;
+  try{
+    const m = num(res.r.mitiMiti);
+    const rp = await danioPj(prot, String(m), true, 0, 0);
+    mesaLinea(`🛡 Miti-Miti: ${nombreDe(prot)} se lleva ${fmt(m)} del golpe a ${nombreDe(t)}, directo a la vida (${fmt(rp.previo)} → ${fmt(rp.nuevo)} HP)`);
+  }catch(err){ console.error('No se pudo cobrar el Miti-Miti:', err); mesaLinea(`🛡 Miti-Miti: a ${nombreDe(prot)} le tocan ${fmt(num(res.r.mitiMiti))} de daño (✋ a mano: no se pudo aplicar solo)`); }
+}
+
 /* La cosecha (2026-10-07, Varita de la cosecha): si alguien cae con la marca «Cosecha de X», X recupera 2 SP y 2 de vida (un creep, solo la
    vida: no usa SP). Lo hace el mapa del GM, como el resto del daño. */
 async function cosechaSiMuere(t, res){
@@ -251,6 +279,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   if(golpe === null) throw new Error(ERROR_TIPEO);
   const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
   const muro = ignoraDef ? null : muroDe(t);   // Muro de escudos (js/26): un aliado con escudo al lado
+  const prot = o && o.reparte ? mitiMitiDe(t) : null;   // 🛡 Miti-Miti: un Tanque que se lleva la mitad
   const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}`));
   const parteRef = base.collection('partes').doc('general');
   const efectosRef = base.collection('partes').doc('efectos');   // los estados viven en su propia parte (2026-10-10: antes se leían de «general» y no estaban)
@@ -268,6 +297,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     datos.ataquesArma = {...(datos.ataquesArma || {}), _golpe: 1};   // (el Mantenimiento la vacía)
     const extra = defExtra(ignoraDef, primero, st => rs[st], o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0);
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : num(rs.def) + extra) + num(restaExtra || 0), efectos);
+    mitiMitiPartir(r, prot);
     const previo = num(datos.hp);
     datos.hp = Math.max(0, previo - r.recibido);
     // Orbe de absorción (js/26): el daño mágico o elemental que llegó a la vida devuelve SP, una vez por turno.
@@ -286,6 +316,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   if(guarda && golpe > 0) guardianAviso(t, guarda);
   if(muro && golpe > 0) muroAviso(t, muro);
   if(res.absorbe) mesaLinea(`🔮 Orbe de absorción: ${nombreDe(t)} recupera ${res.absorbe} SP del daño mágico`);
+  await mitiMitiCobrar(t, prot, res);
   await cosechaSiMuere(t, res);
   return res;
 }
@@ -305,6 +336,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   if(golpe === null) throw new Error(ERROR_TIPEO);
   const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
   const muro = ignoraDef ? null : muroDe(t);   // Muro de escudos (js/26): un aliado con escudo al lado
+  const prot = o && o.reparte ? mitiMitiDe(t) : null;   // 🛡 Miti-Miti: un Tanque que se lleva la mitad
   const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
   const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
   const parteRef = base.collection('partes').doc('invocaciones');
@@ -320,6 +352,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     inv.golpeTurno = 1;   // (el Mantenimiento la vacía)
     const extra = defExtra(ignoraDef, primero, st => FichaResumen.invModTotal(inv, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0);
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : defensasDeInv(inv).def + extra) + num(restaExtra || 0), inv.estados);
+    mitiMitiPartir(r, prot);
     const previo = num(inv.hp);
     inv.hp = Math.max(0, previo - r.recibido);
     const rs = ficha.data().resumen || {};
@@ -330,6 +363,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
   if(guarda && golpe > 0) guardianAviso(t, guarda);
   if(muro && golpe > 0) muroAviso(t, muro);
+  await mitiMitiCobrar(t, prot, res);
   await cosechaSiMuere(t, res);
   return res;
 }
@@ -485,7 +519,7 @@ async function hudHpAplicar(t, texto){
     const crit = hpCritMult > 1 && golpe !== null;   // crítico: daño × multiplicador y directo (sin Defensa)
     const txtDanio = crit ? String(golpe * hpCritMult) : texto;
     const directo = crit || (hpRayo && golpe !== null);   // el rayo también va directo a la vida
-    if(t.tipo === 'creep') await danioCreep(t, txtDanio, directo); else await danioPj(t, txtDanio, directo);
+    if(t.tipo === 'creep') await danioCreep(t, txtDanio, directo); else await danioPj(t, txtDanio, directo, 0, 0, {reparte: true});   // reparte: Miti-Miti
     if(hpRayo && golpe !== null) rayoCadenaAplicar(rayoCadena(idTok, golpe));   // salta a los cercanos (no espera: se avisa en la Mesa)
     vitalRegistrar(idTok, 'hp', antes);   // (Ctrl+Z devuelve el HP; un escudo que absorbió el golpe no se recarga)
     hudGlobo = '';

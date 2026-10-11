@@ -564,6 +564,13 @@ prueba('rasgos de ballesta (2026-10-10): llega cargada (gratis si no disparó el
     Combatiente.ataqueDeArma(guerra).apuntada, Combatiente.ataqueDeArma(asedio).atraviesaEscudos, !!Combatiente.ataqueDeArma(tranq).apuntada],
     [0, 4, 2, 0, 2, 2, true, false]);   // la de tranquera pasó a Recarga 2 (revisión de las Buenas, 2026-10-11)
 });
+prueba('Miti-Miti (Tanque, 2026-10-11): la marca guarda a quién protege, en el mapa y en la ficha, y la skill está auditada', () => {
+  const sp = {nombre: 'Miti-Miti', turnos: 1, polaridad: 'buff', protege: 'ficha-juan', protegeNombre: 'juan'};
+  const c = EstadosAplicar.componer(sp), l = EstadosAplicar.limpiarSpec(sp), f = FichaAcciones.estadoDeSpec(l, []);
+  const hab = CLASES_SKILLS.find(k => k.id === 'tanque').habilidades.find(h => h.id === 'tanque-miti-miti');
+  igual([c.protege, c.protegeNombre, c.turnos, c.polaridad, l.protege, f.protege, f.protegeNombre, f.turnos, hab.costo, hab.nitrosCosto, hab.duelo.objetivo, hab.duelo.alcance, /Sin auditar/.test(hab.detalle)],
+    ['ficha-juan', 'juan', 1, 'buff', 'ficha-juan', 'ficha-juan', 'juan', 1, '2', 1, 'aliado', 'rango', false]);
+});
 prueba('la distancia ideal de un arma de rango: dónde está y qué da (2026-10-09; cerca 3–4 y lejos los 3 últimos desde 8, 2026-10-11)', () => {
   const arco = (ideal) => ({armaDeRango: true, arco: true, ideal});
   const cerca = arco({donde: 'cerca', ancho: 2, pdg: 1}), lejos = arco({donde: 'lejos', ancho: 2, crit: 1}), medio = arco({donde: 'medio', ancho: 1, critpot: 2}), fija = arco({donde: 'franja', desde: 5, hasta: 6, fijo: 2});

@@ -183,9 +183,13 @@ Estados que define la clase:
 7. ✅ **Daño en área** — SP 2, No2 = **un ataque** (`ATAQUE`, cuenta como ese ataque). Ataque con el arma que golpea a **todos los enemigos adyacentes al tanque** (flor de radio 1 centrada en quien la ejecuta; el ejecutor no se afecta; solo enemigos). Automático: costo, tirada de PdG y el mapa dibuja la flor 3 segundos (`zonaMapa: 'flor'`, `zonaRadio: 1`); el daño va con el 🎲 (a mano). Los afectados pueden **esquivar con dodge roll** (a mano). ¿Se esquiva normal o exige dodge roll? ¿Se puede parrear? → P110. (2026-09-24)
 8. ✅ **Takle** — SP 3, No2 0 en el ataque (Flash; el desplazamiento **sí gasta** los No2 normales: 1 por casillero, hasta 2). Automático: cobra el SP y tira **PdG +1** (`tiradaStat: 'pdg'`, `tiradaBono: 1`). Ataque normal: el objetivo puede **esquivar pero no parrear**. Si conecta y el tanque gana **Constitución vs Constitución** (a mano): el objetivo pierde 2 No2 y es empujado 2 casillas; si Takle se usó **durante el turno del enemigo**, además se interrumpe su turno y pasa al final de la iniciativa (si ya era el último, lo pierde). Lo demás, a mano. (2026-09-24; el 'si conecta' es interpretación, confirmar)
 9. ✅ **Taunt** — SP 1, No2 1 (dueño, 2026-09-27: cuesta un Nitro). Duelo de habilidad (`comun/skills-clase.js`, `duelo: {objetivo:'enemigo', tira:'pdgmg', contra:['resmg'], alcance:'rango'}`): tira **PdG.Esp +1** contra el **Res.Esp** del objetivo (cambiado el mismo día de Especial vs Especial a PdG.Esp vs Res.Esp), dentro de su **Rango** (Destreza — no cuerpo a cuerpo). Empate: la regla general del juego. Si gana, aplica el estado **Provocado** (2 turnos, control — lo reducen Resistencia a CC e Inmunidad a CC): mientras dure, si el objetivo ataca, tiene que elegir a quien lo provocó, si puede llegar (✋ a mano — es conceptual, no se automatiza). Se juega igual que un ataque: cuadro del duelo visible para toda la mesa, con su botón «Aplicar» en el paso de efectos. **PdG.Esp / Res.Esp** son los nombres nuevos (2026-09-27) de **PdG.Mg / Res.Mg** — los ids no cambiaron (`pdgmg`, `resmg`).
-10. **Miti-Miti** [2] — Marca un personaje como protegido. El protegido
-    comparte con el tanque la mitad del daño que recibe. Duración: 1
-    turno.
+10. ✅ **Miti-Miti** — **SP:** 2. **No2:** 1. Marcás a un aliado **a la vista** (dentro de tu Rango): hasta que **empieza tu próximo
+    turno**, de cada **golpe o área** que lo daña te llevás **la mitad, redondeada para arriba, directo a tu vida** (no pasa por tu Defensa:
+    ya pasó la de él). **Un protegido por vez** (marcar a otro saca la marca anterior). **Los estados** (Veneno, Sangrado…) los sigue
+    recibiendo él, y el daño que siguen haciendo, igual que las trampas y el fuego del piso, **no se reparte**. ⚙ Automatizado: la marca
+    (queda en el Tanque: «Miti-Miti», con a quién protege) y el reparto del daño en el mapa. *(Auditada 2026-10-11 con el dueño; original:
+    «Marca un personaje como protegido. El protegido comparte con el tanque la mitad del daño que recibe. Duración: 1 turno.» Las
+    decisiones, publicadas también en 🛠 Herramientas de diseño → Preguntas.)*
 
 ## Mago ⏳
 

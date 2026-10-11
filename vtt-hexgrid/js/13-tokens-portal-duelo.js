@@ -1293,7 +1293,7 @@ async function dueloAplicarDano(d){
     catch(err){ console.error('No se pudo pedir el desgaste del ítem:', err); }
   }
   try{
-    const oD = {distancia: !!(d.ataque && d.ataque.rango), magico: !!(habMagica || elDano)};   // magico: el Orbe de absorción (js/26)   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
+    const oD = {distancia: !!(d.ataque && d.ataque.rango), magico: !!(habMagica || elDano), reparte: true};   // reparte: Miti-Miti (js/10)   // magico: el Orbe de absorción (js/26)   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
     const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD)
       : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD);
     const espinas = res.r.invulnerable ? null : await dueloEspinas(d, golpe, habMagica);   // el daño inflictido (con el multiplicador del crítico), antes de la Defensa; solo el físico
@@ -1305,8 +1305,8 @@ async function dueloAplicarDano(d){
       // elemento (Res. fuego…), como el daño de una habilidad. Con dos elementos juntos («Fuego y Hielo») no se resta ninguna.
       const elMag = String(dn.magico.tipo || '').includes(' y ') ? '' : Combatiente.elementoDe(dn.magico.tipo);
       const resMag = elMag ? (await resistenciasDe(t, elMag, invLeida)).res : 0;
-      const rm = esInv ? await danioInv(t, String(num(dn.magico.total)), true, 0, resMag, {magico: true})
-        : t.tipo === 'creep' ? await danioCreep(t, String(num(dn.magico.total)), true, 0, resMag, {magico: true}) : await danioPj(t, String(num(dn.magico.total)), true, 0, resMag, {magico: true});
+      const rm = esInv ? await danioInv(t, String(num(dn.magico.total)), true, 0, resMag, {magico: true, reparte: true})
+        : t.tipo === 'creep' ? await danioCreep(t, String(num(dn.magico.total)), true, 0, resMag, {magico: true, reparte: true}) : await danioPj(t, String(num(dn.magico.total)), true, 0, resMag, {magico: true, reparte: true});
       magico = {...dn.magico, recibido: num(rm.r.recibido), hpAntes: num(rm.previo), hpDespues: num(rm.nuevo), ...(resMag ? {resEl: Combatiente.resElementalTxt(elMag, resMag)} : {})};
     }
     // El Espejo: 1/4 de todo el daño especial que le tiraron (el de la habilidad y el elemental del arma), antes de la Defensa especial.
@@ -1586,6 +1586,17 @@ async function dueloAplicarEfectoBase(d, ef){
   const t = tokens.get(d.defensor.tokenId);
   if(!t) return {manual: true, nota: 'el token ya no está: aplicalo a mano'};
   if(spec.nombre === 'Demora') return dueloDemora(d.defensor.tokenId);
+  // 🛡 Miti-Miti (Tanque, 2026-10-11): la marca queda en quien la usa, con a quién protege; el reparto del daño lo hace js/10 (mitiMitiDe).
+  if(spec.nombre === 'Miti-Miti'){
+    const ta = tokens.get(d.atacante.tokenId);
+    if(!ta || ta.tipo !== 'pj' || String(ta.fichaId).includes(SEP_INVOCACION)) return {manual: true, nota: 'Miti-Miti la usa un personaje: aplicalo a mano'};
+    if(ta.fichaId === t.fichaId) return {manual: true, nota: 'Miti-Miti es para un aliado, no para vos'};
+    const nom = nombreDe(t);
+    await EstadosAplicar.encolarPj({fichaId: ta.fichaId, duenoUid: ta.duenoUid, origen: `${d.atacante.nombre} · Miti-Miti`,
+      spec: {nombre: 'Miti-Miti', turnos: 1, polaridad: 'buff', protege: t.fichaId, protegeNombre: nom,
+        detalle: `Protege a ${nom}: de cada golpe o área que lo daña se lleva la mitad (para arriba), directo a la vida, hasta su próximo turno.`}});
+    return {nota: `${nom} queda protegido: ${d.atacante.nombre} se lleva la mitad del daño hasta su próximo turno`};
+  }
   // La purga (2026-10-07, Varita de la purga): el estado malo más reciente (el último de la lista; no los que salen solos del equipo o las pasivas).
   if(spec.purga){
     const lista = ((vinculo(t) || {}).resumen || {}).estados || [];

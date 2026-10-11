@@ -22,6 +22,8 @@
 >   Matabestias, Contra el Marcado, Espalda a distancia, Afinidad elemental, Perfora 1 y Corto alcance (Rango −2). **Faltan, para la Rara**: Tiro
 >   rápido, Arco rúnico, Arco que se calienta, Arco compuesto (medirlo antes: «miedo a que rompa todo») y la Flecha de empuje. Tensar solo lo
 >   ofrece la Botonera de un personaje (un creep o una invocación con un arco que tense, todavía no).
+>   **La lista de bonos de arco para diseñar Rara, Excepcional y Legendaria** está en `docs/ideas-arcos-flechas.md` → «Bonos de arco para
+>   diseñar los otros tiers».
 > - [ ] **🎲 Prueba que falla a veces (2026-10-10):** «Plantillas · reposición (2026-10-07)» de `comun/pruebas.html` depende del azar y a veces da
 >   falso (el tercer valor); hay que fijarle la semilla o el caso para que no falle sola.
 > - [ ] **🔍 Revisión de las skills de clase ya auditadas (2026-10-10, pedido del dueño: «muchas las audité antes del menú de duelo»):** 33 auditadas;

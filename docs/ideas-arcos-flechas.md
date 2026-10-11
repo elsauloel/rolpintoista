@@ -202,3 +202,49 @@ disparo) · 52 Arco que se calienta (+1 de daño por cada rival que cae en el co
     160) · del rastreador de bestias (Tipo 6, 2 dados, Rango +4, Matabestias +3, Contra el Marcado +2, 150) · de las brasas (2 dados, +1, Rango +4,
     Afinidad elemental, 100) · de la sombra (2 dados, Rango +4, Emboscada +1, Espalda a distancia +2 PdG / +1 daño, 160).
 - **Falta (Rara en adelante):** Tiro rápido, Arco rúnico, Arco que se calienta, Arco compuesto y la Flecha de empuje.
+
+### Bonos de arco para diseñar los otros tiers (Rara, Excepcional, Legendaria) — 2026-10-11, pedido del dueño
+> «Dejá anotados los bonos para arcos para cuando sigamos diseñando los otros tiers.» La caja de herramientas para armar los arcos de
+> Rara en adelante. ✅ = ya existe (se carga en el ítem y anda) · ⚙ = elegido por el dueño, falta programarlo. Precio: siempre con
+> `herramientas/calculadora_armas.py`; el daño base, medido con `balance_combate.py` contra la banda del tier.
+
+**Daño y base**
+- ✅ Dados (Peso) y dados amplificados · ✅ daño fijo · ✅ Tipo 4 o 6 · ✅ suma la mitad del Dmg (todos los arcos).
+- ⚙ **Arco compuesto** (la mitad de la Destreza en vez de la mitad de la Fuerza): candidato a Raro; medirlo antes («miedo a que rompa todo»).
+
+**Puntería y crítico**
+- ✅ PdG +N · ✅ Crítico frecuente / potente +N · ✅ ignora N de Res. crítico · ✅ +N d20 en el crítico.
+- ✅ **Distancia ideal** (cerca / media / lejos / franja fija, con PdG, crítico, daño o ignora).
+- ✅ **Tensar N** (1 No2 más → +N PdG; en Común +2).
+- ✅ **Emboscada N** (primer disparo del combate: Crítico frecuente +N; «un bono valioso»; Común +2, Buena +1 junto con otra cosa).
+- ✅ **Contra el Marcado N** (+N PdG; combina con la Flecha marcadora y con la skill del Hunter).
+- ⚙ **Contra lo que vuela o levita** (+PdG): espera a que exista el vuelo (pendientes, «🕊 Vuelo»).
+
+**Distancia**
+- ✅ Rango +N (como bono, ~1/3 de los arcos; tope por tier en la calculadora) · ✅ Corto alcance (Rango −2, debilidad).
+- ✅ **Largo alcance −1 / −2 PdG por casillero** (hasta 4 de más; −1 es el bueno).
+- ✅ Tiro alto (todos los arcos) · ✅ Sin tiro alto (debilidad).
+
+**Contra la armadura y el objetivo**
+- ✅ **Perfora 1** desde Común; **Perfora 2 desde Rara** (dueño). Rompe armadura: **no** (exclusivo de las ballestas).
+- ✅ **Matabestias N** (+N de daño contra bestias).
+- ✅ **Espalda a distancia** {PdG, daño} (todo el trayecto por el punto ciego, sin sigilo).
+- ✅ Efectos al golpear con % (Lisiado, Sangrado, Veneno, Prende fuego, Rengo…): los de siempre de las armas.
+
+**Elemental y mágico**
+- ✅ **Afinidad elemental** (+1 a cada dado elemental de las flechas especiales).
+- ✅ Daño mágico de un efecto con dado (`danoMagico`): ya funciona en armas.
+- ⚙ **Arco rúnico** (sus flechas comunes hacen daño elemental), **desde Rara**: se arma con `efectosGolpe` con `danoMagico` y su elemento
+  (casi sin código nuevo); falta decidir el dado por tier.
+
+**Ritmo y combate largo**
+- ✅ Primer ataque del turno −N No2 · ✅ Iniciativa +N.
+- ⚙ **Tiro rápido** (los disparos después del primero del turno, −1 No2): «poderoso, evaluar el tier» → candidato a Raro.
+- ⚙ **Arco que se calienta** (+1 de daño por cada rival que cae en el combate, lo voltee quien lo voltee; +3 si el golpe de gracia lo da ese
+  mismo arco): «puede ser»; candidato a Raro o Excepcional.
+
+**Flechas (van aparte, no en el arco)**
+- ⚙ **Flecha de empuje** (lo corre 1 casillero hacia atrás). ✅ Marcadora y Silbadora (Demora), en la tienda. ✅ Elementales siempre en la góndola.
+
+**Skills, no arcos** (para el Shooter, el Hunter o los creeps): Disparo doble · Disparo de retirada · A la articulación · Paciencia (pasiva) ·
+Contra el recién descubierto (pasiva).

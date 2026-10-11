@@ -248,3 +248,39 @@ disparo) · 52 Arco que se calienta (+1 de daño por cada rival que cae en el co
 
 **Skills, no arcos** (para el Shooter, el Hunter o los creeps): Disparo doble · Disparo de retirada · A la articulación · Paciencia (pasiva) ·
 Contra el recién descubierto (pasiva).
+
+## 2026-10-11 · Arcos Comunes: lo que hay, lo medido y la tercera ronda de ideas (el mismo proceso que las ballestas)
+**Lo que hay:** 13 Comunes en venta (corto, de rama, de pastor, de liebrero, de tiro ligero, de cazador de pájaros, del monte, de batidor, de acecho,
+de cuerda doble, de punta de hueso, del cuatrero, petizo) + el del rastreador (solo botín). La meta para quedar parejos con una familia cuerpo a
+cuerpo: ~24.
+**Medido** (`combate_ballestas.py --familia arco`: 4 rondas, nivel 1; Shooter contra liviano / medio / pesado): casi todos entre 67 % y 108 % contra el
+medio; **contra el pesado, todos 0 % salvo de punta de hueso (63 %, la única con Perfora) y de acecho (32 %)**; al Mago no le sirve casi ninguno. Se
+pasan: **de cuerda doble 159 %** (Tensar +2, lo mismo que en la ballesta) y **corto 155 % contra el liviano** (2d4 + la mitad de la Fuerza). Flojos: **del
+cuatrero 52 %** (Espalda a distancia no entra en la medida) y de rama 67 %. La simulación todavía no cuenta: distancia ideal, Espalda a distancia,
+Largo alcance, tiro alto, ni la mínima del arco.
+**La identidad ya decidida:** suma la mitad de la Fuerza · Tipo 4 (liviano, juega al crítico) y Tipo 6 (largo, parejo) · tiro alto de todos (salvo
+«sin tiro alto») · un casillero libre de mínima · no pega cuerpo a cuerpo ni hace oportunidad · no se parrea con él · carcaj y flechas especiales
+(efecto seguro, No2 de más) · distancia ideal · Perfora 1 desde Común (algunos), 2 desde Rara · Rompe armadura es de las ballestas · mecánicas
+elegidas: Tensar, Largo alcance, Emboscada, Matabestias, Contra el Marcado, Espalda a distancia, Afinidad, Corto alcance (debilidad); para Rara: Tiro
+rápido, Arco rúnico, Que se calienta, Compuesto; Contra lo que vuela (cuando haya vuelo).
+
+### Tercera ronda: ideas nuevas para arcos (para podar; no repite las dos anteriores)
+**A. Ritmo y No2:** 1 Flecha en la cuerda (si terminás el turno sin disparar, el primer disparo del siguiente −1 No2) · 2 Encadenar (si el disparo
+anterior del turno pegó, el siguiente −1 No2) · 3 Respiración contenida (+2 PdG si es el único disparo del turno) · 4 Arco de jinete (moverse 1
+casillero gratis entre dos disparos del mismo turno).
+**B. Puntería y crítico:** 5 Racha (si sacás crítico, el próximo disparo del turno Crítico frecuente +1) · 6 Lectura del viento (+1 PdG por cada
+disparo anterior al mismo blanco en el combate, hasta +3; errar la vuelve a 0: la «remachadora» del arco) · 7 Línea limpia (+1 PdG si la línea de
+tiro está libre: ni tapada ni rozando) · 8 Tiro alto sin castigo (el tiro alto no resta PdG) · 9 Contra lo pesado (+PdG contra un blanco de Defensa
+alta: al arco le cuesta el pesado, así le mete crítico) · 10 Exponer (con crítico, el blanco queda Expuesto un turno).
+**C. Posición y movimiento:** 11 Contra el que corre (+PdG contra un rival que se movió 3 o más casilleros este turno) · 12 Parapeto (+1 Evasión si
+disparás con un Sólido al lado) · 13 Arco de mano (puede disparar pegado al blanco, con −2 PdG; rompe la mínima).
+**D. Varios blancos:** 14 Abanico (si reparte los disparos del turno entre blancos distintos, +1 PdG cada vez que cambia) · 15 Contra el montón (+1 de
+daño por cada rival pegado al blanco).
+**E. Efectos al golpear (estados que ya existen):** 16 Cansado 25 % · 17 Ceguera 1 turno 17 % · 18 Demora 25 % (la silbadora como rasgo del arco) ·
+19 Pajaritos con crítico.
+**F. Contra un tipo de criatura (como Matabestias):** 20 Matamuertos (no-muertos) · 21 Matagigantes / constructos · 22 Matabrujos (elementales y
+alienígenas) · 23 Contra humanos y humanoides (el arco del cazador de recompensas).
+**G. Flechas:** 24 Afinidad con un tipo de flecha que no es elemental (+1 al Veneno, al Sangrado o al Marcado de la flecha) · 25 Flecha de más: la
+primera flecha especial del combate no cobra su No2.
+**H. Debilidades (abaratan):** 26 Arco duro (−2 PdG si la Fuerza es baja) · 27 Mínima más larga (2 casilleros libres) · 28 Crítico corto (el
+crítico multiplica como mucho ×2) · 29 Cuerda floja con lluvia o agua (✋ a mano).

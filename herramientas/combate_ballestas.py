@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Peleas de varias rondas con las ballestas del catálogo (2026-10-11, dueño: «con esas 25, hacete una ronda de testeo: fijate si hay alguna que
+"""Peleas de varias rondas con las ballestas (y desde 2026-10-11 los arcos: --familia arco) del catálogo (2026-10-11, dueño: «con esas 25, hacete una ronda de testeo: fijate si hay alguna que
 pueda llegar a romper algo… contra personajes pesados, livianos»). A diferencia de balance_ballestas.py (un disparo promedio), acá se juega la pelea
 entera contra el mismo blanco, ronda por ronda, con lo que se acumula y lo que se gasta:
   - la Recarga N, 2N, 3N… con los No2 de la Agilidad, y Doble cuerda, Tiro rápido, Llega cargada, primer disparo −N No2 y Tensar (si sobran No2);
@@ -30,7 +30,8 @@ def disparo(at, arma, d, defensa, frec, potente, pdg_extra):
     """→ (pegó, daño, crítico)"""
     p, e = B.tirar(at['des']) + pdg_extra, max(1, B.tirar(d['eva']))
     if p < e or (p == e and random.random() < .5): return False, 0, False
-    dano = sum(random.randint(1, arma['tipoDado']) for _ in range(arma['peso'])) + arma.get('danoFijo', 0)
+    dano = sum(random.randint(1, arma['tipoDado']) for _ in range(arma['peso'] + int(arma.get('danoAmplificado') or 0))) + arma.get('danoFijo', 0)
+    if arma.get('arco'): dano += math.ceil(at['fue'] / 2)   # el arco suma la mitad del Dmg (la ballesta, nada)
     res = d['res'].get(arma['tipoDado'], 0)
     niveles = (p - e) // max(2, arma['tipoDado'] - frec) - res
     if niveles > 0:
@@ -39,6 +40,9 @@ def disparo(at, arma, d, defensa, frec, potente, pdg_extra):
     return True, max(0, dano - max(0, defensa), perf), False
 
 def costo(arma, h):
+    if not arma.get('recarga'):   # un arco (o cualquier arma sin Recarga): Tipo ÷ 2 el primero del turno, el Tipo completo los siguientes
+        t = int(arma['tipoDado']); c = math.ceil(t / 2) if h == 0 else t
+        return max(0, c - 1) if arma.get('tiroRapido') and h > 0 else c
     rc = int(arma['recarga'])
     if arma.get('tiroRapido'): return rc + h
     if arma.get('dobleCuerda') and h == 1: return rc
@@ -52,6 +56,7 @@ def pelea(arma, clase, nivel, blanco, rondas, sentado=False, bestia=False):
     sangra, veneno = [0, 0], 0  # Sangrado [stacks = daño por turno, turnos que quedan] y stacks de Veneno
     frec0 = sum(m['val'] for m in arma.get('mods') or [] if m['stat'] == 'crit')
     pot = sum(m['val'] for m in arma.get('mods') or [] if m['stat'] == 'critpot')
+    pdg_arma = sum(m['val'] for m in arma.get('mods') or [] if m['stat'] == 'pdg')   # el PdG +N del arma
     primero, disparo_anterior = True, False
     for r in range(rondas):
         # Al empezar el turno del blanco: lo que le hacen los estados
@@ -65,7 +70,7 @@ def pelea(arma, clase, nivel, blanco, rondas, sentado=False, bestia=False):
             if h == 0: c = max(0, c - int(arma.get('ahorroNitros') or 0))
             if c > no2: break
             no2 -= c
-            pdg = 0
+            pdg = pdg_arma
             if arma.get('tensar') and no2 >= 1 and (costo(arma, h + 1) > no2 - 1 or True):   # tensa si le alcanza (aunque le saque un disparo, no: se fija abajo)
                 if no2 - 1 >= 0 and (costo(arma, h + 1) > no2 or costo(arma, h + 1) <= no2 - 1): no2 -= 1; pdg += int(arma['tensar'])
             frec = frec0 + (int(arma.get('emboscada') or 0) if primero else 0) + (int(arma.get('remate') or 0) if sentado else 0)
@@ -96,6 +101,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--rondas', type=int, default=4); ap.add_argument('--n', type=int, default=2500); ap.add_argument('--nivel', type=int, default=1)
     ap.add_argument('--clases', default='Shooter,Asalto,MonoDes,Mago,Warrior'); ap.add_argument('--calidad', default='Común')
+    ap.add_argument('--familia', default='ballesta', help='ballesta | arco')
     a = ap.parse_args()
     random.seed(17)
     raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -104,7 +110,8 @@ def main():
         t = ln.strip().rstrip(',')
         if not t.startswith('{"id"'): continue
         it = json.loads(t)
-        if it.get('archivo') or not (it.get('armaDeRango') and it.get('recarga')) or it['tier'] != a.calidad.replace('Buena', 'Buena Calidad') and it['tier'] != a.calidad: continue
+        es = it.get('arco') if a.familia == 'arco' else (it.get('armaDeRango') and it.get('recarga'))
+        if it.get('archivo') or it.get('soloBotin') or not es or it['tier'] != a.calidad.replace('Buena', 'Buena Calidad') and it['tier'] != a.calidad: continue
         bal.append(it)
     clases = a.clases.split(',')
     esc = [('liviano', False, False), ('medio', False, False), ('pesado', False, False), ('pesado', True, False), ('medio', False, True)]
@@ -121,7 +128,7 @@ def main():
                 vals.append(tot / max(0.5, base[(c, n)]))
             fila.append((c, vals))
         dfin = sum(pelea(it, 'Shooter', a.nivel, 'pesado', a.rondas)[1] for _ in range(400)) / 400
-        print(f"{it['nombre'][9:]:22} | " + ' | '.join(f"{c[:4]} " + '/'.join(f'{v*100:.0f}' for v in vals) for c, vals in fila) + f" | Def. pesado al final {dfin:.1f}")
+        print(f"{it['nombre'].replace('Ballesta ', '').replace('Arco ', ''):22} | " + ' | '.join(f"{c[:4]} " + '/'.join(f'{v*100:.0f}' for v in vals) for c, vals in fila) + f" | Def. pesado al final {dfin:.1f}")
 
 if __name__ == '__main__':
     main()

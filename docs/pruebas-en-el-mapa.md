@@ -14,8 +14,6 @@
   (clic, clic…, cerrar en el primer punto) con «🧱 Con colisión»; un token no puede salir cruzando la pared (se choca), los conos, la visión con
   niebla y el rango (R) no pasan del otro lado, una flecha choca. Un garabato a mano alzada con el 🧱 del dibujo seleccionado también. Sacarle la
   colisión con el mismo 🧱. Un jugador no ve la casilla ni el botón.
-- [ ] **😱 Expuesto y el dodge roll** (2026-10-10): con Expuesto, un área que gana no le da dodge roll (la Mesa «… está Expuesto: no puede
-  hacer el dodge roll y se queda en el área»). Lo demás de Degollar y Expuesto ya está probado (abajo).
 - [ ] **⏸ La pausa de la partida** (2026-10-10, necesita las reglas nuevas pegadas): el GM pausa desde el mapa o GM Tools → el jugador ve el
   cartel, el mapa congelado (no se puede tocar ni abrir la Botonera) y su ficha anda; compra o equipa algo → al reanudar, el GM ve esas líneas y
   elige borrar o guardar el registro.
@@ -38,6 +36,10 @@
 
 ## Probado
 
+- [x] **😱 Expuesto y el dodge roll** (2026-10-10, en el mapa): el Coloso Expuesto (con +60 de Evasión de prueba) contra la Ráfaga arcana de
+  juan: su Evasión salió «2d12+2d20 ÷2» = 17 contra 13, la ganó, y en vez del dodge roll la Mesa dijo «😱 Coloso … está Expuesto: no puede hacer
+  el dodge roll y se queda en el área» y «no logró salir del área: efecto completo»; juan tiró el daño. (Detalle de texto, de antes: cuando quien
+  gana la Evasión no sale del área, el cartel dice «¡FUNCIONÓ! … venció la Eva», aunque la Evasión la ganó.)
 - [x] **🗡 Degollar y Expuesto** (2026-10-10, en el mapa, con orden de turnos): juan, en su turno (4.º de 7), contra el Coloso: la declaración
   dice «+4 PdG · +7 de daño fijo», el crítico «Degollar suma +1 a tu Crítico frecuente / potente», el daño «2d6 + 4 + 7» (salió crítico ×2:
   28, el Coloso 43 → 15). Al resolverse: la Mesa «⏭ juan usó Degollar: termina su turno y pasa al final del orden», el turno pasó solo

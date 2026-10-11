@@ -162,3 +162,44 @@
 56. ⚙ Frágil: −50 % de durabilidad.
 57. ⚙ Lenta de montar: no se puede disparar en el mismo turno que te moviste más de 2 casilleros.
 58. ⚙ Corto alcance: Rango −1.
+
+## Tercera ronda: mecánicas de ballesta (2026-10-11, lluvia de ideas para podar)
+Pedido del dueño, después de la segunda ronda de los arcos: «lo mismo con las ballestas; no importa si algunas se superponen con el arco». No repite
+las dos listas de arriba (rasgos y bonos del 10-10). (≈ arco) = la versión de ballesta de una idea que el dueño eligió para los arcos.
+Recordatorio de la base: no suma Fuerza, Recarga N (N, 2N, 3N…), dispara pegada, sin tiro alto, su casa es Perfora y **Rompe armadura (exclusivo)**.
+
+**A. Recarga y mecanismo:** 1 Tensar a fondo (≈ arco: 1 No2 extra antes de disparar → +2 de daño fijo; en la ballesta el bono va al daño) ·
+2 Tiro rápido (≈ arco: el 2.º disparo del turno cuesta N+1 en vez de 2N) · 3 Engranajes (la Recarga no sube: N, N, N; a cambio, Rango −2) ·
+4 En guardia (si no disparaste en tu turno, dejás la ballesta apuntando a una línea o cono: el primer rival que entra recibe el disparo, pagando la
+Recarga en ese momento) · 5 Palanca de pie de cabra (la Fuerza no suma daño pero ayuda a cargar: Recarga −1 con Fuerza alta).
+**B. Puntería y distancia:** 6 Largo alcance (≈ arco: más allá del Rango, −1 o −2 PdG por casillero) · 7 Mira telescópica (+1 PdG por cada
+casillero más allá de 4, hasta +3; +Visión) · 8 Emboscada (≈ arco: primer disparo del combate, Crítico frecuente +2) · 9 Por la espalda a
+distancia (≈ arco) · 10 Contra el que carga (+PdG o +daño contra un rival que se movió hacia vos este turno: la ballesta frena la carga) ·
+11 Tiro raso (un aliado en el medio no tapa la línea de tiro).
+**C. Contra la armadura (la casa):** 12 Atraviesa cuerpos (el virote pasa al de atrás en la misma línea, con la mitad del daño) · 13 Contra lo
+pesado (+1 de daño por cada 2 de Defensa del blanco por encima de 6, hasta +3) · 14 Clavo en la grieta (Perfora +1 por cada stack de Armadura rota
+que ya tenga el blanco: combina con Rompe armadura) · 15 Rompe armadura doble con crítico · 16 Contra escudos (+PdG contra un rival con escudo
+equipado) · 17 Revienta barreras (el daño contra un Escudo especial o una Barrera cuenta doble).
+**D. Daño y crítico:** 18 Pega parejo (los dados de daño nunca salen menos de la mitad de sus caras: poca varianza, la identidad de la ballesta) ·
+19 Matagigantes (≈ Matabestias: +daño contra un tipo de criatura; para la ballesta, constructos o gigantes) · 20 Que se calienta (≈ arco: +1 por
+rival caído, +3 si lo volteó ella) · 21 Remate (contra un blanco Sentado o Inmovilizado, Crítico frecuente +1).
+**E. Control:** 22 Clavar la ropa (con crítico, Inmovilizado 1 turno sin necesitar pared) · 23 Estampar (si el Empujón lo choca contra un Sólido,
++2 de daño) · 24 Desarmar a distancia (con crítico, el arma del blanco cae al piso) · 25 Tiro al brazo (el blanco tiene −2 PdG hasta su próximo
+turno) · 26 Supresión (≈ arco: si pega, acercarse a vos le cuesta +1 No2 por casillero en su turno) · 27 Cortar la retirada (si pega, el blanco no
+puede alejarse más de 2 casilleros en su turno).
+**F. Posición y cobertura:** 28 Apoyada (+1 PdG si tenés un Sólido o un aliado al lado: apoyás la ballesta) · 29 Pavés (un escudo grande que se
+planta en el mapa como Sólido de 1 casilla y tapa los disparos de los rivales; el ballestero dispara desde atrás) · 30 Moverse después de disparar
+sin perder la Apuntada del próximo turno.
+**G. Sigilo y caza:** 31 Ballesta trampera (se coloca como trampa real: queda armada en el mapa y dispara a quien cruza una línea) ·
+32 Virote que marca (≈ arco: deja Marcado) · 33 Silenciosa (sigue en espera, P184).
+**H. Manos:** 34 Con escudo (la de dos manos se puede usar con escudo, pero la Recarga sube 1) · 35 Culatazo (se puede pegar cuerpo a cuerpo con la
+culata: contundente Tipo 4, Demora con %).
+**I. Virotes y carcaj:** 36 Afinidad elemental (≈ arco: +1 al efecto de los virotes elementales) · 37 Ballesta rúnica (≈ arco: sus virotes comunes
+hacen daño elemental, desde Rara) · 38 Cargador (los 2 primeros virotes especiales del combate no cobran su No2 extra) · 39 Pesado o liviano (cada
+disparo se elige: virote pesado +2 de daño y −2 Rango, o liviano +2 Rango y −1 de daño) · 40 Recuperar virotes (al terminar el combate, cada virote
+especial que pegó vuelve con una moneda).
+**J. Identidad:** 41 De cranequín (suma la mitad de la Destreza al daño: la de un tirador; cuidado, como el arco compuesto) · 42 Arcana (suma la
+mitad del Efecto especial) · 43 Maldita (≈ arco: +daño, pero −1 HP por disparo).
+**K. Debilidades (abaratan):** 44 Corto alcance (≈ arco: Rango −2) · 45 Se traba (si todos los dados del PdG salen 1, se traba: 1 No2 para
+destrabarla) · 46 Lenta de apuntar (−2 PdG si te moviste en el turno) · 47 Cuerda que se afloja (desde el 3.er disparo del combate, −1 de daño hasta
+pagar 1 No2 para tensarla).

@@ -270,3 +270,17 @@ Buenas]; jugá con las perillas para meterle más diversidad de mecánicas…; y
 | de la torre (160) | **2d4+4 · Perfora 1** | Rompe armadura 100 % | 37 / 42 % |
 | de la almena (160) | **2d4+4 · Perfora 1** | 1 mano · Rompe armadura 100 % | 37 / 42 % |
 | del herrador (160) | **2d4+4 · Perfora 1** | 1 mano · Rompe armadura doble 50 % (seguro con crítico) | 37 / 42 % |
+
+## 2026-10-11 · Ronda de pruebas de las 25 Comunes (`herramientas/combate_ballestas.py`)
+Peleas de 4 rondas contra el mismo blanco (nivel 1), con lo que se acumula (Rompe armadura, Sangrado, Veneno) y las mecánicas que cambian el daño
+(Tensar, Emboscada, Remate contra un Sentado, Crítico potente, Llega cargada, Doble cuerda, Matabestias contra una bestia). Daño total ÷ el de su mejor
+cuerpo a cuerpo. Shooter, Asalto, MonoDes (casi todo a Destreza), Mago y Warrior; blanco liviano, medio, pesado, pesado Sentado y bestia.
+
+**Las que rompen (Shooter, contra el medio):** de tensión 203 % (Tensar +2 es casi un +2 PdG fijo: al Shooter siempre le sobran No2 para pagarlo; la
+calculadora lo cobraba como si costara) · del rematador contra un Sentado 340 % (Remate +2 en Tipo 4 deja el rango del crítico en 2) · del ariete 137 %
+· del cantero 128 % (liviano 166 %) · de virote dentado 122 % (el Sangrado se acumula) · del montero contra una bestia 169 %.
+**Para mirar:** del herrero (Rompe armadura 100 %): al pesado le baja la Defensa de 10 a ~2,6 en 4 rondas — la ballesta casi no le pega, pero el
+resto del grupo sí. Las que no llevan Perfora (de tensión, de filo fino, del sereno, del bandolero, del rematador, del cantero, de acecho) no le hacen
+nada al pesado ni sirven al Mago: son de tirador. La de doble cuerda queda floja para el Shooter (63 %), buena para el Mago.
+**Ajustes propuestos (medidos):** de tensión 1d4+2 · Tensar +1 (93 %) · del rematador 1d4+2 · Perfora 1 · Remate +1 (95 %; Sentado 124 %) · del
+ariete 1d4+2 (107 %) · del cantero 1d4+3 (100 %) · de virote dentado 1d4+2 · Perfora 1 (112 %) · del montero Matabestias +1 (bestia 126 %).

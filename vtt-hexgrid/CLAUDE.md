@@ -1520,6 +1520,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   puede sumar +3 (la de cada lado de un duelo reciente de vos o un aliado dentro de tu Rango, `Duelo.tiradaSumable`; si no, su última tirada de la
   Mesa) con su costo (2 SP + 1 por cada Empower que ya lleva esa tirada; Flash: 4 + … en turno ajeno, `ConfirmarTurno.flash`); `empowerUsar` cobra
   el SP (`editarPersonajeMapa`) y suma con `Duelo.sumarATirada(…, 'Empower')` (el duelo se vuelve a resolver). El Ejecutar de la Botonera abre lo mismo.
+- **🧚 Re-roll** (2026-10-12, Support; `js/39-reroll.js`, absorbió a Afortunado): botón fijo 🧚 (`Flotantes.reroll`, `resumen.reroll`; una copia
+  vieja de Afortunado con `suerte` cuenta igual); `abrirReroll` lista las tiradas recientes tuyas o de un aliado en tu Rango que se puedan cambiar y
+  `rerollUsar` cobra 2 SP (Flash, 4 en turno ajeno) + 2 No2 y llama a `Duelo.enyetarTirada(id, lado, 'mejor')`: queda la más alta (marca 🍀).
+- **🦋 La Polilla revoloteando se ve** (2026-10-12, dueño): `polillaRevolotea(est)` / `dibujarPolillita` (js/05): una polillita celeste da vueltas
+  alrededor del token mientras dura el estado.
 - **🐈‍⬛ Enyetar** (2026-10-12, Debuffer; `js/38-enyetar.js`): botón fijo como Empower (`resumen.enyetar`, `Flotantes.enyetar`); su menú lista la
   tirada más reciente de cada enemigo a tu alcance que se pueda cambiar y ejecuta la habilidad contra él sin marcarlo (`bn.objetivoFijo` →
   `dueloElegirObjetivoMapa({objetivoFijo})`). Si gana la maldición, el efecto «Enyetar» (js/13 → `enyetarAplicar`) llama a `Duelo.enyetarTirada`

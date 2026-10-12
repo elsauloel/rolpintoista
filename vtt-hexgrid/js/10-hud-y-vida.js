@@ -274,6 +274,18 @@ async function cosechaSiMuere(t, res){
   }catch(err){ console.error('No se pudo aplicar la cosecha:', err); }
 }
 
+// Los estados con escudo del resumen público, con el escudo que les queda (se emparejan por nombre, en orden: el resumen no lleva ids).
+function escudosAlResumen(pub, efectos){
+  const conEscudo = efectos.filter(e => e && e.activo !== false && (e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0));
+  const usados = new Set();
+  return pub.map(x => {
+    if(!x || x.escudo === undefined) return x;
+    const e = conEscudo.find(y => y.nombre === x.nombre && !usados.has(y));
+    if(!e) return x;
+    usados.add(e);
+    return {...x, escudo: num(e.escudoMagicoActual ?? e.escudoMagico)};
+  });
+}
 async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const golpe = leerGolpe(texto);
   if(golpe === null) throw new Error(ERROR_TIPEO);
@@ -309,7 +321,9 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     }
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
     if(datosEf && JSON.stringify(efectos) !== efectosAntes) tx.set(efectosRef, {json: JSON.stringify(datosEf), actualizado: ts});   // el escudo que bajó, lo que absorbió la Armadura arcana
-    tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp, ...(absorbe ? {'resumen.sp': num(rs.sp) + absorbe} : {})});
+    // El escudo que bajó también en el resumen público (2026-10-11, probando Shield: el token seguía mostrando 14/14 con el escudo gastado).
+    const estPub = datosEf && JSON.stringify(efectos) !== efectosAntes && Array.isArray(rs.estados) ? escudosAlResumen(rs.estados, efectos) : null;
+    tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp, ...(absorbe ? {'resumen.sp': num(rs.sp) + absorbe} : {}), ...(estPub ? {'resumen.estados': estPub} : {})});
     return {r, previo, nuevo: datos.hp, absorbe};
   });
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));

@@ -266,7 +266,7 @@ Salvo Carga Elemental, todas son **Hechizo (PG: Esp · Daño: Esp)**.
    ese ataque, pegue o no). ⚙ Automatizado: el estado (que se apila), el costo que sube y el daño. *(Auditada 2026-10-11 con el dueño; original:
    «Enfocado [1] — +2 de daño al próximo ataque. Repetible (+1 SP por repetición).» Queda en las Preguntas de 🛠 Herramientas de diseño si vale
    para cualquier ataque o solo a distancia; por ahora, cualquier ataque con arma —los hechizos no lo gastan—.)*
-4. ✅ **Parry a distancia** — **SP:** 2 (⚡ Flash: 4 en turno ajeno) **+ el No2 de un disparo**. Una defensa más, **contra cualquier ataque**,
+4. ✅ **Parry a distancia** — **SP:** 2, **siempre** (se usa en turno ajeno: no es un Flash que cuesta el doble; dueño, 2026-10-12) **+ el No2 de un disparo**. Una defensa más, **contra cualquier ataque**,
    con un arma a distancia en mano: **Evasión contra el PdG** del atacante; si gana, el golpe queda anulado y **cuenta como un Parry ganado**
    (puede contraatacar, sin Bloqueo). **Con arco**, para contraatacar, antes el **dodge roll**: alejarse 1 casillero pagando sus No2 (si no
    alcanzan, no hay contraataque); con ballesta no hace falta. La parte de «disparo instantáneo en turno ajeno» queda como el disparo de siempre.

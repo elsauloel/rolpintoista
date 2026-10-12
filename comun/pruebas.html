@@ -607,6 +607,12 @@ prueba('Blessing (Support, 2026-10-11): a un aliado o a uno mismo, Bendecido +1 
   igual([hab.costo, hab.nitrosCosto, ej.objetivo, ej.conmigo, lista.length, lista[0].turnos, CreepCalculo.modTotal(sc, 'pdg'), CreepCalculo.modTotal(sc, 'eva'), CreepCalculo.modTotal(sc, 'dmg'), /Sin auditar/.test(hab.detalle)],
     ['5', 1, 'aliado', true, 1, 2, 1, 1, 1, false]);
 });
+prueba('Un stat en 0 o negativo se tira igual: da el valor sin dados (el duelo no queda en «Tirando…», 2026-10-12)', () => {
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
+  S.efectos = [{id: 'x', nombre: 'Muy debilitado', polaridad: 'debuff', turnos: 2, activo: true, mods: [{stat: 'pdg', val: -50}]}];
+  const t = FichaBotonera.tiradaStat(S, 'pdg'), v = FichaCalculo.calcular(S).final.pdg;
+  igual([!!t.r, t.error, t.r && t.r.total === Math.round(v), v <= 0], [true, undefined, true, true]);
+});
 prueba('Skills auditadas: el texto original del borrador se ve en «Detalles técnicos» (también en una copia vieja del personaje)', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-heal');
   const copiaVieja = {nombre: 'Heal', detalle: hab.detalle, habClaseId: 'support-heal'};
@@ -1037,9 +1043,10 @@ prueba('la tirada de un stat de la Botonera es la del motor común, con su nombr
   const S = fichaBotonera(), t = FichaBotonera.tiradaStat(S, 'fue');
   igual([t.origen, t.r.formula], ['Fue', Combatiente.tirarStat(FichaCalculo.calcular(S).final.fue, S.efectos, 'fue', {}).formula]);
 });
-prueba('un stat que no se puede tirar con dados reales avisa en vez de tirar', () => {
+prueba('un stat en 0 se tira igual: da 0, sin dados (2026-10-12: antes avisaba y no tiraba, y el duelo quedaba trabado)', () => {
   const S = fichaBotonera({attrs: {con: 3, fue: 0, agl: 6, des: 5, esp: 4}});
-  igual(FichaBotonera.tiradaStat(S, 'fue').error, 'Fue: 0 no se puede tirar con dados reales');
+  const t = FichaBotonera.tiradaStat(S, 'fue');
+  igual([t.error, t.r.total, t.r.rolls.length], [undefined, 0, 0]);
 });
 prueba('los costos de la Iteración 2 son los de siempre', () => igual([FichaCalculo.IT2.nitrosHabilidad, FichaCalculo.IT2.nitrosConsumirMochila, FichaCalculo.IT2.nitrosSigilo], [1, 2, 1]));
 

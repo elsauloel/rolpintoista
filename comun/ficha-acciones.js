@@ -202,8 +202,8 @@ const FichaAcciones = (() => {
     const stat = it.tiradaStat;
     if(stat && (FichaCalculo.ATTR_LIST.some(a => a.id === stat) || FichaBotonera.statsConTirada().some(s => s.id === stat))){
       const nombre = `${it.nombre} · ${FichaCalculo.STAT_LABEL[stat]}`, valor = FichaCalculo.calcular(S).final[stat] + num(it.tiradaBono);
-      if(!formulaParaValor(valor)) out.push({error: `${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`});
-      else out.push({origen: nombre, r: Combatiente.tirarStat(valor, S.efectos, stat, {extra: undefined})});
+      const r = Combatiente.tirarStat(valor, S.efectos, stat, {extra: undefined});   // en 0 o negativo: el valor, sin dados (no traba nada)
+      out.push(r ? {origen: nombre, r} : {error: `${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`});
     }
     const formula = (it.tiradaExtra || '').trim();
     if(formula){
@@ -348,8 +348,9 @@ const FichaAcciones = (() => {
      llama a armaElegida) y efectosAlPegar(arma) (los efectos al golpear, comun/efectos-golpe.js). */
   // Tirar un stat: Afortunado, mitades y Evasión mínimo 1 (Combatiente.tirarStat); la Evasión con sobrepeso pregunta antes.
   function tirarValorStat(S, nombre, valor, statId, extra, sobrepeso, sobre, ui){
-    const f = formulaParaValor(valor);
-    if(!f){ ui.toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
+    // Un valor en 0 o negativo (un PdG con Debilitado ×2, por ejemplo) se tira igual: el motor da el valor sin dados. Antes se cortaba acá
+    // y el duelo quedaba en «Tirando…» para siempre (encontrado probando la Remachadora en el mapa, 2026-10-12).
+    if(!formulaParaValor(valor) && !(Number.isFinite(Number(valor)) && Math.round(num(valor)) <= 0)){ ui.toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
     if(statId === 'eva' && !sobrepeso){
       const s = FichaCalculo.calcular(S).sobrecarga;
       if(s > 0){

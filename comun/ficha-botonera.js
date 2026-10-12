@@ -197,8 +197,8 @@ const FichaBotonera = (() => {
   function tiradaStat(S, statId){
     const c = FichaCalculo.calcular(S);
     const nombre = FichaCalculo.STAT_LABEL[statId] || statId, valor = c.final[statId];
-    if(!formulaParaValor(valor)) return {error: `${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`};
-    return {origen: nombre, r: Combatiente.tirarStat(valor, S.efectos, statId, {extra: undefined})};
+    const r = Combatiente.tirarStat(valor, S.efectos, statId, {extra: undefined});   // en 0 o negativo: el valor, sin dados
+    return r ? {origen: nombre, r} : {error: `${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`};
   }
   // Percepción (de Destreza): con Percepción aumentada, cada dado sube un escalón (d6 → d8, d8 → d10…). azar: para las pruebas.
   const PERCEPCION_DADO_SUBE = {2: 4, 3: 4, 4: 6, 6: 8, 8: 10, 10: 12, 12: 20, 20: 20};

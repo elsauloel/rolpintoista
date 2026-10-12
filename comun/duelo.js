@@ -192,6 +192,8 @@ const Duelo = (() => {
 .duelo-crit-cinco{display:flex;gap:2px;margin:0 7px 4px 0}
 .duelo-crit-cuad{width:20px;height:20px;border-radius:4px;background:#1d2335;border:1px solid #39435c;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#9aa4bd;flex:none;position:relative}
 .duelo-crit-cuad.frec{background:#1f6b3a;border-color:#5fd08a;color:#e6ffee}
+.duelo-crit-cuad svg{width:72%;height:72%;display:block}
+.duelo-crit-cuad.mira{color:#c9a24a}
 .duelo-crit-cuad.eva{background:#3b1820;border-color:#d95a6e;color:#ffe3e7}
 .duelo-crit-cuad.activo{background:#2d6cdf;border-color:#8db3ff;color:#fff}
 .duelo-crit-cuad.suelto{background:#12172a;border-color:#2b3347;color:#565f78}
@@ -1893,7 +1895,9 @@ const Duelo = (() => {
 
     // Fila del Rango: los cuadraditos que resta el Crítico frecuente van en verde con una «F» (pedido del dueño).
     const nFrec = Math.max(0, tipo - rango);
-    const filaTipo = deA5(Array.from({length: tipo}, (_, i) => i < nFrec ? cuad('frec', 'F') : cuad('')));
+    // Los que quedan llevan la mira (dueño, 2026-10-12: «los recuadros vacíos podrían estar con el ícono de la mira, el círculo con las cuatro rayitas»).
+    const MIRA = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="4.6"/><path d="M8 1v3.2M8 11.8V15M1 8h3.2M11.8 8H15"/></svg>';
+    const filaTipo = deA5(Array.from({length: tipo}, (_, i) => i < nFrec ? cuad('frec', 'F') : cuad('mira', MIRA)));
 
     // La tirada, agrupada de a «rango» (2026-09-28, el dueño volvió a este agrupado en vez de a 5: cada grupo
     // entero es un nivel de crítico, así se cuentan de un vistazo). Primero lo que come la Evasión/Parry (rojo,
@@ -1914,6 +1918,7 @@ const Duelo = (() => {
     const filaTirada = grupos.map(g => `<div class="duelo-crit-cinco">${g.join('')}</div>`).join('');
 
     const leyenda = [
+      `${cuad('mira', MIRA)}<span>= el rango del crítico: cuántos puntos de diferencia hacen falta para cada nivel</span>`,
       nFrec ? `${cuad('frec', 'F')}<span>= Crítico frecuente (${_fmt(nFrec)}): se resta del Tipo y achica el rango</span>` : '',
       evaTotal ? `${cuad('eva', 'E')}<span>= tirada de ${_esc(nombreDef2)}</span>` : '',
       `${cuad('activo')}<span>= cuenta para un nivel de crítico</span>`,

@@ -123,7 +123,7 @@ const FichaBotonera = (() => {
     return key === 'cinturon' ? IT2().nitrosConsumirCinturon : IT2().nitrosConsumirMochila;
   }
   // conLupa: en la Botonera la 🔍 va dentro del botón (sin "disabled", que no deja abrirla).
-  function consumeButton(i, key, conLupa, lupa){
+  function consumeButton(i, key, conLupa, lupa, S){
     if(!i.consumible) return '';
     if(i.nombre === 'Ankh de Reencarnación'){
       if(key === 'cinturon') return `<span class="hint">Se activa solo al llegar tu HP a 0</span>`;
@@ -136,7 +136,7 @@ const FichaBotonera = (() => {
     if(i.trampaDatos) partes.push('🪤 se coloca en el mapa');
     if(i.curahp) partes.push(`${num(i.curahp)>0?'+':''}${fmt(num(i.curahp))} HP`);
     if(num(i.curaspPct) > 0) partes.push(`${fmt(num(i.curaspPct))}% SP`);
-    partes.push(`-${costoConsumirNitros(key)} No2`);
+    partes.push(`-${S ? Combatiente.conExtenuado(S.efectos, costoConsumirNitros(key)) : costoConsumirNitros(key)} No2`);   // + Extenuado
     const agotado = num(i.unidades) <= 0;
     if(conLupa){
       return `<button class="consume-btn con-lupa${agotado ? " sin-recursos" : ""}" data-consume="${i.id}"${agotado ? ' aria-disabled="true"' : ""}>
@@ -422,7 +422,7 @@ const FichaBotonera = (() => {
     <div class="bot-fila-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
     <div class="bot-fila-btns">
       <button class="mini" data-view="${key}:${i.id}">Ver</button>
-      ${consumeButton(i, key, true, lupaBotonHtml)}
+      ${consumeButton(i, key, true, lupaBotonHtml, S)}
     </div>
   </div>`;
 

@@ -94,12 +94,12 @@ const CreepBotonera = (() => {
     const sentadoCreep = (sc.estados || []).some(e => e.activo !== false && e.sentado);
     if(sentadoCreep){
       const sinNitrosLev = num(sc.nitros) < 1;
-      combate.push({nombre:'🧍 Levantarse · 1 No2', dado:'', soloTexto:true, sinNitros: sinNitrosLev, motivo: `${sinNitrosLev ? 'Sin No2 · ' : ''}Cuesta 1 No2 y saca el estado Sentado`, attr:`data-levantarcreep="${sc.id}"`});
+      combate.push({nombre:`🧍 Levantarse · ${fmt(Combatiente.conExtenuado(sc.estados, Combatiente.costoLevantarse(st => C().modTotal(sc, st))))} No2`, dado:'', soloTexto:true, sinNitros: sinNitrosLev, motivo: `${sinNitrosLev ? 'Sin No2 · ' : ''}Cuesta 1 No2 y saca el estado Sentado`, attr:`data-levantarcreep="${sc.id}"`});
     }
     // Desarmado (2026-10-07): levantar el arma, 1 No2 (el mismo botón; primero se levanta si está Sentado).
     else if((sc.estados || []).some(Combatiente.esDesarmado) && !o.armaEnElPiso){   // (si su arma está en el piso del mapa, se levanta desde ahí)
       const sinNitrosArma = num(sc.nitros) < Combatiente.COSTO_LEVANTAR_ARMA;
-      combate.push({nombre:`🗡️ Levantar el arma · ${fmt(Combatiente.COSTO_LEVANTAR_ARMA)} No2`, dado:'', soloTexto:true, sinNitros: sinNitrosArma, motivo: `${sinNitrosArma ? 'Sin No2 · ' : ''}Cuesta 1 No2 y saca el estado Desarmado`, attr:`data-levantarcreep="${sc.id}"`});
+      combate.push({nombre:`🗡️ Levantar el arma · ${fmt(Combatiente.conExtenuado(sc.estados, Combatiente.COSTO_LEVANTAR_ARMA))} No2`, dado:'', soloTexto:true, sinNitros: sinNitrosArma, motivo: `${sinNitrosArma ? 'Sin No2 · ' : ''}Cuesta 1 No2 y saca el estado Desarmado`, attr:`data-levantarcreep="${sc.id}"`});
     }
     // Las armas en el piso al lado (el mapa las pasa, 2026-10-07): las levanta cualquiera, 1 No2 cada una.
     (o.armasCerca || []).forEach(a => {
@@ -192,7 +192,7 @@ const CreepBotonera = (() => {
      data-cin-agregar (creepId, con el elegido en el desplegable data-cin-sel). */
   function cinturonHtml(sc, opts){
     const o = opts || {}, usado = C().cinturonUsado(sc), cap = C().capCinturon(sc);
-    const costo = typeof FichaCalculo !== 'undefined' ? num(FichaCalculo.IT2.nitrosConsumirCinturon) || 1 : 1;
+    const costo = Combatiente.conExtenuado(sc.estados, typeof FichaCalculo !== 'undefined' ? num(FichaCalculo.IT2.nitrosConsumirCinturon) || 1 : 1);   // + Extenuado
     const filas = (sc.cinturon || []).map(it => `
       <div class="accion-row">
         <div class="accion-nombre">${esc(it.nombre)} <span class="hint">×${fmt(num(it.unidades))}${num(it.curahp) ? ` · ${num(it.curahp) > 0 ? '+' : ''}${fmt(num(it.curahp))} HP` : ''}${it.efectoNombre ? ` · ${esc(it.efectoNombre)}` : ''}</span></div>

@@ -10,55 +10,51 @@
 
 ## Pendientes
 
-- [ ] **🗡 Dagas Tipo 4 Comunes ajustadas** (2026-10-11, `revision-cuerpo-a-cuerpo-t4.md`): ver en la tienda o el inventario que los textos y precios
-  nuevos se vean bien (por ejemplo el Estileto 1d4+1, la Pica Hielos 2d4 con PdG −1) y un golpe con una de ellas desde la Botonera.
-
-- [ ] **💠 Distancia ideal nueva (2026-10-11, dueño)**: «cerca» = a 3 o 4 casilleros; «media» = una franja en la mitad del alcance; «lejos» = los 3
-  últimos casilleros del alcance, nunca antes del 8. Ver en el mapa que, al apuntar con un arco de distancia ideal, brillen en celeste los
-  objetivos en esa franja y que el duelo sume el bono (se prueba con los arcos Comunes nuevos cargados).
-
-- [ ] **🎯 Ballestas revisadas** (2026-10-11): una Común (Recarga 3) cobra 3, 6, 9 No2; una Buena (Recarga 2) 2, 4, 6; ninguna trae Rango de bono.
-- [ ] **⚔ Tabla de turnos minimizada** (2026-10-11): achicada, la cabecera dice «⚔ Turno: *nombre*» de quien tiene el turno (si quien mira lo ve;
-  si no, «Orden de turnos»); al pasar el turno cambia sola; agrandada vuelve a «Orden de turnos».
-- [ ] **🎯 Mecánicas de ballesta nuevas** (2026-10-11): con las ballestas nuevas del catálogo, en combate: **Doble cuerda** (2, 2, 6 No2) y **Tiro
-  rápido** (2, 3, 4) en el costo de cada disparo; **Alcance con caída** (más allá del alcance, el duelo resta daño); **Apuntada firme** (sin
-  moverse dos turnos: +PdG); **Tirador de apoyo** (blanco pegado a un aliado); **Remate** (blanco Sentado o Inmovilizado); **Primer disparo** (el
-  daño suma «+1d6 primer disparo»); **Punta de diamante** (contra Defensa 12+, Perfora +2) y **Remachadora** (Perfora 1, 2, 3 con golpes seguidos;
-  errar la vuelve a 0) — las dos las aplica el mapa del GM; **Virote recuperable** (un virote que erra contra una pared no se rompe); **Cargador**
-  (los primeros virotes especiales no cobran No2, con su línea en la Mesa); **Carcaj integrado** (el carcaj muestra 13 / 13). Y el **Virote de
-  red**: pega sin daño y deja Inmovilizado.
-- [ ] **🏹 Mecánicas de arco nuevas** (2026-10-11, `vtt-hexgrid/js/35-arcos.js`): con un arco que las tenga (los 12 nuevos del catálogo), en el
-  mapa y en modo combate: **Tensar** (al elegir el objetivo pregunta «¿Tensás…?»; «Tensar» cobra 1 No2 y el duelo muestra «tensado» con +2 PdG);
-  **Largo alcance** (brillan también los que están hasta 4 casilleros más allá del alcance; el duelo resta 1 o 2 PdG por cada uno de más);
-  **Emboscada** (solo el primer disparo del combate suma Crítico frecuente; el segundo ya no; al volver a narrativo se libera); **Matabestias**
-  (contra un creep con tipo «bestia» suma el daño; hace falta que GM Tools vuelva a publicar al creep para que salga el tipo); **Contra el
-  Marcado** (con la Flecha marcadora, el segundo disparo suma el PdG); **Espalda a distancia** (disparando desde los casilleros de atrás del
-  objetivo, sin sigilo); **Afinidad elemental** (una Flecha de fuego tira 1d4+1). Y en la Talabartería, las 4 flechas elementales siempre en la
-  góndola; la Flecha de punta roma ya no aparece.
-- [ ] **⏱ Turno ajeno: anunciar y confirmar** (2026-10-11): con el orden de turnos, usar Shockwave o Takle (o cualquier Flash) fuera del propio turno
-  muestra «⏱ No es tu turno · … cuesta 6 SP» con Confirmar / Cancelar; cancelar no cobra nada. En el propio turno no pregunta.
-- [ ] **🎯 Ojo de asesino como carga** (2026-10-11): ejecutarlo deja «Ojo de asesino» (1 carga); el próximo ataque con arma muestra Crítico frecuente
-  +1 en la cuenta del crítico y la carga se va; con Arma envenenada a la vez, el mismo ataque gasta las dos.
-- [ ] **🧱 Paredes: lo que falta** (2026-10-10): la línea de tiro de un arco tapada por una pared, una flecha que choca contra una, la visión con
-  niebla y los conos de sigilo del otro lado, y cerrar una figura con clic en el primer punto.
-- [ ] **🏹 Virotes con mapa** (2026-10-10, sin probar): de **humo** (nube de diámetro 3, 2 turnos, donde pega o cae), de **luz** (bengala de
-  diámetro 3, 3 turnos), **explosivo** (1d6 de fuego a todos en la flor de 7 del blanco; si falla, queda para el GM), de **clavo** (contra una
-  pared detrás: Inmovilizado 1 turno) y de **rebote** (si falla, un disparo gratis con PdG −2 contra el que está pegado al blanco).
-- [ ] **🏹 Rasgos de ballesta** (2026-10-10): «llega cargada» ✅ probado (Ballesta de tranquera: el primer disparo marca 0 No2 y el duelo lo
-  dice). Falta: **apuntada** (Ballesta de guerra o del alguacil: sin moverse en el turno, el duelo suma «+2 PdG apuntada (no se movió)»; si se
-  movió, no) y **atraviesa escudos** (Ballesta pesada o de asedio contra un rival que pare el disparo con escudo: queda «¡PARADO!» y el que paró
-  recibe 1 stack de Armadura rota, con la línea en la Mesa).
-
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
-
-
-- [ ] **🏹 Apuntar con un arma de rango** (cuando se construya; pedido del dueño 2026-10-09): al atacar se ve tu Rango, los objetivos posibles, los que
-  no (fuera de Rango o tapados por un obstáculo aunque se vean por la visión de un aliado) y los obstáculos que los tapan. Ver docs/rework-armas-rango.md.
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no
   repite eso. Mirar si sobra o falta algún término, y si algún texto del globo conviene reescribirlo.
+- [ ] **🏹 Talabartería: las 4 flechas elementales siempre en la góndola** (2026-10-11): no se pudo ver en el mapa — la tienda abierta
+  («Tienda de pueblito») es anterior al cambio y su Talabartería no trae flechas. Hace falta generar una tienda nueva en el Generador de
+  tiendas y mirarla desde el 🏪 del mapa (y que no salga la Flecha de punta roma).
+- [ ] **🎯 Virote recuperable**: ninguna ballesta del catálogo trae el rasgo `recuperable`, así que no hay con qué probarlo en el mapa.
+- [ ] **🐺 Una invocación que recibe un rebote** (2026-10-12): el Virote de rebote rebotó hacia el Lobo de prueba (invocación de Clementino) y el
+  duelo dijo «No llegaron tus opciones de defensa». Puede ser porque el Lobo está sin invocar; revisarlo con una invocación invocada.
 
 ## Probado
+
+- [x] **Las pruebas pendientes del 2026-10-09 al 11, en el mapa** (2026-10-12, «Claude · pruebas», juan y el GM; blanco casi siempre Clementino,
+  con un estado de prueba de puntería y otro sin críticos para forzar golpes normales):
+  - **🗡 Dagas T4**: Pica Hielos «Tipo 4 · 2 dados · PdG −1», 2d4, $50; golpe con el Estileto «1d4 + 5» contra el Coloso (Defensa 16 → 0).
+  - **💠 Distancia ideal**: media (alcance 14 → franja 7–9) brilla en celeste la Bruja a 7 y el duelo suma +1 PdG; lejos (los 3 últimos, desde
+    8) brilla el Coloso a 12 y suma.
+  - **🎯 Ballestas revisadas**: Común (Recarga 3) 3, 6, 9 No2; Buena (Recarga 2) 2, 4, 6. La de cazador y la de guardia conservan su Rango de
+    bono a propósito (ajuste del 2026-10-11 para que no queden mellizas); las Raras en adelante no se revisaron.
+  - **⚔ Tabla de turnos achicada**: «⚔ Turno: *nombre*», cambia sola al pasar el turno, agrandada vuelve a «Orden de turnos». Un creep que juan
+    ya conoce sigue figurando con su nombre aunque no lo vea (misma regla que la lista).
+  - **🎯 Mecánicas de ballesta**: Doble cuerda 2, 2, 6; Tiro rápido 2, 3, 4; Alcance con caída «(2 de más): −4 de daño» (5 − 4 = 1, ×4 de
+    crítico = 4); Apuntada firme +3 sin moverse y nada después de moverse; Tirador de apoyo +2 PdG; Remate Crítico frecuente +1 contra el
+    Inmovilizado; Primer disparo +1d6 (9 + 5 = 14); Punta de diamante pasan 4 contra Defensa 21; Remachadora pasan 2 y 3 en golpes seguidos y
+    al errar vuelve a 0; Cargador «no cobra su No2 (1 de 2 del combate)»; Carcaj integrado 12 / 13; Virote de red 0 de daño e Inmovilizado 1
+    turno.
+  - **🏹 Mecánicas de arco**: Tensar («¿Tensás…?» → «tensado: +1 PdG»); Largo alcance (Clementino a 16 con alcance 14 brilla y «(2 de más):
+    −4 PdG»); Emboscada solo el primer disparo y se libera al volver a narrativo; Matabestias +2 de daño contra la bestia; Contra el Marcado
+    (Flecha marcadora y el segundo disparo +2 PdG); Espalda a distancia +2 PdG +1 de daño sin sigilo; Afinidad elemental (fuego 1d4+1).
+  - **⏱ Turno ajeno**: «No es el turno de juan… Cuesta 4 SP» (Shield); Cancelar no cobra nada; en el propio turno no pregunta.
+  - **🎯 Ojo de asesino**: «Rango del crítico: 3 (Tipo 4 − Crítico frecuente 1)»; el mismo disparo gastó el Ojo y una carga del Arma envenenada.
+  - **🧱 Paredes**: figura en rectas cerrada con un clic en el primer punto; «Entre vos y Clementino está una pared»; una flecha que erró chocó y
+    se rompió (moneda); con la pared juan no ve la casilla de Clementino ni la alcanza su cono (sin la pared, sí).
+  - **🏹 Virotes con mapa**: humo (nube flor de 7, 2 turnos), luz (bengala, 3 turnos), explosivo (fuego 1d6 a Clementino y al Lobo pegado),
+    clavo (contra la pared: Inmovilizado 1 turno), rebote (rebota al que está pegado, PdG −2).
+  - **🏹 Rasgos de ballesta**: apuntada «+2 PdG (no se movió)» y nada si se movió; atraviesa escudos «¡PARADO!» y el escudo de Clementino se
+    abolló (Armadura rota).
+  - **🏹 Apuntar con un arma de rango**: al apuntar se ve el alcance, brillan los objetivos posibles, la línea muestra si pasa y avisa cuando la
+    tapa un token o una pared.
+  - **Arreglado en el camino**: un PdG en 0 o negativo dejaba el duelo en «Tirando…» para siempre (ahora da el valor, sin dados); el Virote de
+    rebote nunca rebotaba (comparaba ids que los tokens no llevan).
+  - **Observaciones para el dueño**: cancelar un duelo después de elegir el objetivo ya cuenta como disparo (gasta Apuntar, la Emboscada, la
+    Respiración contenida); el Virote de red igual muestra «Tirar el daño» (después da 0); el dado extra del Primer disparo no aparece en el
+    botón de daño (se suma aparte).
 
 - [x] **Skills auditadas del 2026-10-11, en el mapa** (2026-10-12, «Claude · pruebas», juan y el GM, con capturas):
   - **🎯 Enfocado**: tres usos seguidos cobraron 1, 2 y 3 SP (y 1 No2 cada uno), el botón decía «2 SP (+1 por usarla seguida)»… y quedó

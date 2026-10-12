@@ -132,6 +132,10 @@ const ESTADOS_PRESET = [
   // Ojo de asesino (2026-10-11, dueño: Asalto, como mecánica de cargas): su próximo ataque con arma de este turno tiene Crítico frecuente +1.
   {nombre:'Ojo de asesino', polaridad:'buff', turnos:1, cargas:1, golpe:{crit:1},
     detalle:'Su próximo ataque con arma de este turno tiene Crítico frecuente +1 (el rango del crítico baja 1; mínimo 2). Lo gasta ese ataque, pegue o no. ⚙ Automatizado.'},
+  // Enfocado (2026-10-11, dueño: Shooter): una carga que se APILA (`golpePorStack`, Combatiente.agregarEstado): cada uso suma un stack y +2 de
+  // daño a su próximo ataque con arma, aunque sea en otro turno. Lo gasta ese ataque, pegue o no.
+  {nombre:'Enfocado', polaridad:'buff', permanente:true, turnos:0, cargas:1, stacks:1, golpePorStack:{fijo:2}, golpe:{fijo:2},
+    detalle:'Su próximo ataque con arma suma +2 de daño por cada stack (se usa varias veces seguidas y se suma todo). No vence: lo gasta ese ataque, pegue o no. ⚙ Automatizado.'},
   // Armadura arcana (2026-10-10, dueño: Mago): absorbe el 50 % de cada golpe que le llega (hasta 10 en total) y, al terminar, explota
   // con lo que absorbió alrededor (Combatiente.absorberPct, explosivos; el mapa: resolverGolpe y explotarAlTerminar).
   {nombre:'Armadura arcana', polaridad:'buff', turnos:2, absorbePct:50, absorbeMax:10, absorbido:0, explota:{radio:1, tipo:'arcano', directo:true},

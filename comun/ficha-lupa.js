@@ -182,7 +182,7 @@ const FichaLupa = (() => {
         costo += lupaFila('No2', fmt(B.costoNitrosHab(S, h0)));
       }
       if(H.spVariable(h0)){ usaSp = true; costo += lupaFila('SP', 'X (lo elegís al usarla)'); }
-      else if(H.parseCostoSp(h0.costo)){ usaSp = true; costo += lupaFila('SP', fmt(H.parseCostoSp(h0.costo))); }
+      else if(H.costoSpDe(S, h0)){ usaSp = true; costo += lupaFila('SP', fmt(H.costoSpDe(S, h0))); }
       let usaHp = false;
       if(num(h0.hpCosto) > 0){ usaHp = true; costo += lupaFila('HP', fmt(num(h0.hpCosto))); }
       if(!costo) costo = lupaFila('Costo', 'gratis');
@@ -191,7 +191,7 @@ const FichaLupa = (() => {
       if(usaHp) disp += lupaFila('HP', fmt(num(S.hp)), num(S.hp) <= num(h0.hpCosto) ? 'lupa-falta' : '');
       if(usaSp){
         const spDisp = B.spMaximo(S, c) - num(S.spGastado);
-        disp += lupaFila('SP', fmt(spDisp), H.parseCostoSp(h0.costo) > spDisp ? 'lupa-falta' : '');
+        disp += lupaFila('SP', fmt(spDisp), H.costoSpDe(S, h0) > spDisp ? 'lupa-falta' : '');
       }
       let tirada = '';
       const stat = h0.tiradaStat;
@@ -212,7 +212,7 @@ const FichaLupa = (() => {
         const n = B.costoNitrosHab(S, h0);
         if(H.nitrosAtaque(h0)) B.armasParaHabilidad(S).forEach(o => { costo += lupaFila(`Como un ataque con ${o.arma ? esc(o.arma.nombre) : "sin arma"} <span class="lupa-gris">(${FichaCombate.ataquesConArma(S, o.arma) ? "Tipo completo" : "primer ataque, Tipo ÷ 2"})</span>`, `${fmt(FichaCombate.costoAtaque(S, o.arma))} No2`); });
         else costo += lupaFila(h0.nitrosCosto === undefined || h0.nitrosCosto === null || h0.nitrosCosto === '' ? `Nitros (por defecto, ${fmt(IT2().nitrosHabilidad)})` : 'Nitros de la habilidad', `${fmt(n)} No2`);
-        const sp = H.parseCostoSp(h0.costo);
+        const sp = H.costoSpDe(S, h0);
         if(sp) costo += lupaFila(`SP <span class="lupa-gris">(${esc(h0.costo)})</span>`, `${fmt(sp)} SP`);
       }
       costo += lupaFila('Disponibles', `${fmt(num(S.nitros))} No2 · ${fmt(B.spMaximo(S, c) - num(S.spGastado))} SP`);

@@ -102,7 +102,9 @@ const FichaBotonera = (() => {
     else if(FichaHabilidades.nitrosVariable(h)) partes.push("X No2");
     else if(nitros) partes.push(`${fmt(nitros)} No2`);
     const costo = String(h.costo || '').trim();
-    if(costo) partes.push(/sp|bono/i.test(costo) ? costo : `${costo} SP`);
+    const sube = FichaHabilidades.spSube(S, h);   // Enfocado: cada uso seguido cuesta 1 SP más
+    if(sube) partes.push(`${fmt(FichaHabilidades.costoSpDe(S, h))} SP (+${fmt(sube)} por usarla seguida)`);
+    else if(costo) partes.push(/sp|bono/i.test(costo) ? costo : `${costo} SP`);
     if(num(h.hpCosto) > 0) partes.push(`${fmt(num(h.hpCosto))} HP`);
     if(num(h.curaHp) > 0) partes.push(`cura ${fmt(num(h.curaHp))} HP`);
     return partes.join(' · ');

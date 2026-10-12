@@ -258,8 +258,11 @@ Salvo Carga Elemental, todas son **Hechizo (PG: Esp · Daño: Esp)**.
    distancia (X ≤ 3).» El «crítico» pasó a ser Crítico potente: el frecuente en un Tipo 4 vale demasiado.)*
 2. **Acelerado** [1] — Reduce el cooldown de un ataque. Repetible (+1 SP
    por repetición).
-3. **Enfocado** [1] — +2 de daño al próximo ataque. Repetible (+1 SP por
-   repetición).
+3. ✅ **Enfocado** — **SP:** 1, y **+1 por cada uso seguido** (1, 2, 3…). **No2:** 1 cada vez. Quedás **Enfocado**: tu **próximo ataque con
+   arma** (cuerpo a cuerpo o a distancia) suma **+2 de daño por cada uso**, todo al mismo ataque, **aunque sea en otro turno** (no vence: lo gasta
+   ese ataque, pegue o no). ⚙ Automatizado: el estado (que se apila), el costo que sube y el daño. *(Auditada 2026-10-11 con el dueño; original:
+   «Enfocado [1] — +2 de daño al próximo ataque. Repetible (+1 SP por repetición).» Queda en las Preguntas de 🛠 Herramientas de diseño si vale
+   para cualquier ataque o solo a distancia; por ahora, cualquier ataque con arma —los hechizos no lo gastan—.)*
 4. **Parry a distancia** [2] — Flash. Realiza un ataque de rango como
    instantáneo. Si se hace como respuesta a un ataque, tira Agilidad para
    cancelarlo.

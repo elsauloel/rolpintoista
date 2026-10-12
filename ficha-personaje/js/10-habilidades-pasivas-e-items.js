@@ -153,6 +153,7 @@ function abrirHabClase(claseId, yaLeido){
         ${costoTxt ? `<div class="habs-grid-costo">${esc(costoTxt)}</div>` : ''}
         ${(h.etiquetas || []).length ? `<div class="hint" style="margin-top:2px">${h.etiquetas.map(esc).join(' · ')}</div>` : ''}
         <div class="hint" style="margin-top:4px">${esc(h.detalle)}</div>
+        ${h.original ? `<div class="hint" style="margin-top:3px;opacity:.75">📜 Adaptada del borrador de clases: «${esc(h.original)}»</div>` : ''}
       </div>`;
     }).join('') || `<div class="hint">${esCustomPool && listaCompleta.length ? 'Ninguna con ese filtro.' : 'Todavía no hay ninguna acá.'}</div>`}</div>`;
   if(claseId === '_custom'){

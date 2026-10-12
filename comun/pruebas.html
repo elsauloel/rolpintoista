@@ -572,6 +572,24 @@ prueba('Shield (Support, 2026-10-11): escudo de 14 que no se recarga, no vence y
   igual([hab.costo, hab.nitrosCosto, hab.turnoAjenoSp, hab.duelo.conmigo, e.escudoMagico, e.permanente, e.escudoMagicoActual ?? e.escudoMagico, sigue, gastado],
     ['2', 0, '4', true, 14, true, 14, 1, 0]);
 });
+prueba('Enfocado (Shooter, 2026-10-11): se apila +2 por uso, el SP sube 1, 1, 2, 3 y lo gasta el próximo ataque', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'shooter').habilidades.find(h => h.id === 'shooter-enfocado');
+  const presets = estadosPresetFicha(), S = {efectos: []}, costos = [];
+  for(let i = 0; i < 3; i++){ costos.push(FichaHabilidades.costoSpDe(S, hab)); Combatiente.agregarEstado(S.efectos, FichaAcciones.estadoDeSpec({nombre: 'Enfocado'}, presets)); }
+  const antes = [S.efectos.length, S.efectos[0].stacks, S.efectos[0].golpe.fijo, FichaHabilidades.costoSpDe(S, hab)];
+  Combatiente.gastarCarga(S.efectos, 'd1');
+  const carga = Combatiente.cargaDeDuelo(S.efectos, 'd1'), despues = FichaHabilidades.costoSpDe(S, hab);
+  Combatiente.agregarEstado(S.efectos, FichaAcciones.estadoDeSpec({nombre: 'Enfocado'}, presets));
+  const nuevo = S.efectos.filter(e => e.nombre === 'Enfocado' && !e.agotada);
+  igual([costos, antes, carga.fijo, despues, nuevo.length, nuevo[0].stacks, nuevo[0].golpe.fijo, hab.nitrosCosto, /Sin auditar/.test(hab.detalle)],
+    [[1, 2, 3], [1, 3, 6, 4], 6, 1, 1, 1, 2, 1, false]);
+});
+prueba('Skills auditadas: el texto original del borrador se ve en «Detalles técnicos» (también en una copia vieja del personaje)', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-heal');
+  const copiaVieja = {nombre: 'Heal', detalle: hab.detalle, habClaseId: 'support-heal'};
+  igual([/Heal \[2\]/.test(hab.original), /borrador de clases/.test(ItemCorto.tecnicoHtml(hab)), /Cura 4 \+ 1d6/.test(ItemCorto.tecnicoHtml(copiaVieja)),
+    Plantillas.habilidad(hab).original === hab.original], [true, true, true, true]);
+});
 prueba('Veneno (Debuffer, 2026-10-11): PdG.Esp contra Res.Esp y 3 stacks de Veneno', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-veneno');
   const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});

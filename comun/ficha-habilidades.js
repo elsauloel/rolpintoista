@@ -26,6 +26,10 @@ const FichaHabilidades = (() => {
     const m = String(costo).match(/(\d+(\.\d+)?)/);
     return m ? n(m[1]) : 0;
   }
+  // El SP que cuesta HOY (2026-10-11, Enfocado): el fijo + 1 por cada stack que ya tengas de `costoSube` (el estado que deja la habilidad),
+  // mientras no se haya gastado. Así, usarla varias veces seguidas cuesta 1, 2, 3…
+  const spSube = (S, h) => h && h.costoSube && S ? Combatiente.stacksCargaActiva(S.efectos, h.costoSube) : 0;
+  const costoSpDe = (S, h) => parseCostoSp(h && h.costo) + spSube(S, h);
   const nitrosAtaque = h => String((h && h.nitrosCosto) ?? '').trim().toUpperCase() === 'ATAQUE';
   const spVariable = h => esCostoVariable(h && h.costo);
   const nitrosVariable = h => esCostoVariable(h && h.nitrosCosto) && !nitrosAtaque(h);
@@ -97,6 +101,6 @@ const FichaHabilidades = (() => {
     return {ok: true, estado: r.estado, disparo: dis};
   }
 
-  return {parseCostoSp, spVariable, nitrosVariable, nitrosAtaque, habCostoVariable,
+  return {parseCostoSp, spSube, costoSpDe, spVariable, nitrosVariable, nitrosAtaque, habCostoVariable,
     presetPorNombre, flagsDePreset, configEfectoDe, estaBloqueadoElDebuff, aplicarEfectoDeConsumo};
 })();

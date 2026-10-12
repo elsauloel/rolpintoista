@@ -574,7 +574,7 @@ const FichaAcciones = (() => {
       ui.avisarSinNitros(costoNitros, `usar ${it.nombre}${FichaHabilidades.nitrosAtaque(it) ? ` (ataque con ${arma ? arma.nombre : 'sin arma'})` : ''}`, () => ejecutarHabilidad(S, id, armaId, true, ui));
       return;
     }
-    let costoSp = FichaHabilidades.parseCostoSp(it.costo);
+    let costoSp = FichaHabilidades.costoSpDe(S, it);   // Enfocado: sube con cada uso seguido
     // Costo distinto en turno ajeno (2026-09-28, pedido del dueño): antes de cobrar nada, un cartelito pregunta.
     if(String(it.turnoAjenoSp || '').trim() && !FichaHabilidades.spVariable(it)){
       const elegido = await ConfirmarTurno.pedir(it.nombre, costoSp, num(it.turnoAjenoSp), {ident: {nombre: ((S.meta && S.meta.nombre) || '').trim(), ref: ui.yo ? (ui.yo() || {}).ref : ''}});

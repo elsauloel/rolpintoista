@@ -210,6 +210,12 @@ const ItemCorto = (() => {
     const hace = p.hace || armaEsencial(item);   // un arma sin Detalle: lo esencial, de sus datos
     return hace ? `<div class="ic-hace cat-detalle">${mk(hace)}</div>` : '';
   }
+  function originalDe(h){
+    if(h.original) return String(h.original);
+    if(!h.habClaseId || typeof CLASES_SKILLS === 'undefined') return '';
+    for(const c of CLASES_SKILLS){ const x = (c.habilidades || []).find(y => y.id === h.habClaseId); if(x) return x.original || ''; }
+    return '';
+  }
   // El recuadro «Detalles técnicos» (para «Ver»): '' si no hay nada técnico que contar.
   function tecnicoHtml(fuente){
     estilos();
@@ -220,6 +226,10 @@ const ItemCorto = (() => {
       extra.push(...armaTecnico(fuente));   // las armas: cada mecánica que tiene, explicada
       if(fuente.trampaDatos && fuente.trampaDatos.detectar === undefined) extra.push('La dificultad para detectarla todavía no está definida.');
       if(fuente.pilaInfinita && !/apila/.test(p.tecnico)) extra.push('Se apila sin límite en la mochila.');
+      // Una skill de clase auditada: de qué texto del borrador de clases se adaptó (2026-10-11, dueño: «así los jugadores pueden ver desde
+      // dónde lo estoy adaptando»). Las copias viejas del personaje no lo traen: se busca por `habClaseId` en el pool.
+      const orig = originalDe(fuente);
+      if(orig) extra.push(`📜 Adaptada del borrador de clases, que decía: «${orig}»`);
     }
     const notas = String(p.tecnico || '').split(/\s*(?=[⚙✋])/).map(x => x.trim()).filter(Boolean);
     const dicen = notas.join(' ');   // lo que ya cuentan las notas del ítem no se repite (el costo de una varita, por ejemplo)

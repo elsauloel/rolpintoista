@@ -599,9 +599,9 @@ function dibujar(){
   // pagables: casilleros que alcanzan los Nitros; los de más van en magenta (antes en rojo: el rojo ahora es la estela normal,
   // 2026-09-24, para que se destaque sobre la niebla). Cada casillero lleva su numerito: los Nitros que suma hasta ahí
   // (porCasillero × pasos; en modo narrativo o en la estela de otro, solo la cuenta de pasos).
-  const dibujarEstela = (celdas, alfa, pagables = Infinity, porCasillero = 1) => {
+  const dibujarEstela = (celdas, alfa, pagables = Infinity, porCasillero = 1, ext = 0) => {
     if(celdas.length < 2) return;
-    const acum = porCasillero > 0 ? costoPasos(celdas, porCasillero) : null;   // con el terreno lento (arena movediza)
+    const acum = porCasillero > 0 ? costoPasos(celdas, porCasillero, 0, 0, 0, ext) : null;   // con el terreno lento (arena movediza)
     const ROJO = '255,38,38', IMPAGO = '226,40,214';
     const casillas = (color, lista) => {
       if(!lista.length) return;
@@ -689,8 +689,8 @@ function dibujar(){
     dibujarEstela(e.celdas, Math.min(1, resta / 1200));
     animando = true;
   });
-  if(rutaPendiente) dibujarEstela(rutaPendiente.celdas, 1, pasosPagables(rutaPendiente, rutaPendiente.celdas), rutaPendiente.porCasillero || 1);
-  if(arrastre && arrastre.movio) dibujarEstela(arrastre.ruta, 1, pasosPagables(arrastre.costo, arrastre.ruta), arrastre.costo ? arrastre.costo.porCasillero : 1);
+  if(rutaPendiente) dibujarEstela(rutaPendiente.celdas, 1, pasosPagables(rutaPendiente, rutaPendiente.celdas), rutaPendiente.porCasillero || 1, rutaPendiente.ext);
+  if(arrastre && arrastre.movio) dibujarEstela(arrastre.ruta, 1, pasosPagables(arrastre.costo, arrastre.ruta), arrastre.costo ? arrastre.costo.porCasillero : 1, arrastre.costo ? arrastre.costo.ext : 0);
 
   // 👓 Ver conos: el cono de detección (azul) y la zona de alerta (naranja) de todos los tokens
   // que se ven (los ocultos o en sigilo que no ves, tampoco muestran sus zonas).
@@ -1129,7 +1129,7 @@ function dibujar(){
   // Mientras se arrastra un token en combate, una esferita con los Nitros que le quedarían al llegar a donde está el
   // mouse queda pegada al token (verde; en magenta si se pasa) — no depende del anillo del HUD (2026-09-24).
   if(arrastre && arrastre.movio && !arrastre.libre && arrastre.costo && modoMapa === 'combate' && tokens.has(arrastre.id)){
-    const porCas = arrastre.costo.porCasillero, gastado = costoRuta(arrastre.ruta, porCas, Math.max(0, arrastre.ruta.length - 1), arrastre.costo.gratis, arrastre.costo.recargo, arrastre.costo.levita);
+    const porCas = arrastre.costo.porCasillero, gastado = costoRuta(arrastre.ruta, porCas, Math.max(0, arrastre.ruta.length - 1), arrastre.costo.gratis, arrastre.costo.recargo, arrastre.costo.levita, arrastre.costo.ext);
     const quedan = arrastre.costo.disponibles - gastado;
     const bx = arrastre.x + HEX * 0.75, by = arrastre.y - HEX * 0.75, rad = 17 / z;
     ctx.save();

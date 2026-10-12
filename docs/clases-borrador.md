@@ -339,9 +339,12 @@ ya tenían este mismo formato (número azul, Maldición Esp / Res.M):
    (ataque, Evasión, Parry, Bloqueo, daño, resistencias, Percepción, Sigilo, Iniciativa). **Acumulable:** otra vez = −1 más y vuelve a durar 2
    turnos. ⚙ Automatizado; ✋ a mano, la tirada de un atributo pelado (Fuerza, Constitución…). *(Auditada 2026-10-11 con el dueño; original:
    «Maldición debilitante [5] — Maldición (Esp / Res.M). -1 a todas las tiradas. Duración: 2 turnos. Acumulable. Lento.»)*
-4. **Maldición extenuante** [3] — Maldición (Esp / Res.M). Incrementa en 1
-   los Nitros de todas las acciones. Debe pagar 1 Nitro para moverse cada 2
-   casillas. Duración: 1 turno. Acumulable. Lento.
+4. ✅ **Maldición extenuante** — **SP:** 3. **No2:** 2 (lo «Lento»). Maldición: tirás **PdG.Esp contra el Res.Esp** de un enemigo dentro de
+   tu Rango; si ganás, queda **Extenuado** (estado nuevo) 1 turno: **+1 No2 a todo lo que cuesta No2** (atacar, habilidades, Parry, consumir,
+   equipar, levantarse, soltarse, el sigilo…) y, al moverse, **1 No2 más cada 2 casillas** (además de lo normal). **Acumulable:** otra vez =
+   +1 más a todo y vuelve a durar 1 turno. ⚙ Automatizado (personajes, invocaciones y creeps). *(Auditada 2026-10-12 con el dueño; original:
+   «Maldición extenuante [3] — Maldición (Esp / Res.M). Incrementa en 1 los Nitros de todas las acciones. Debe pagar 1 Nitro para moverse
+   cada 2 casillas. Duración: 1 turno. Acumulable. Lento.»)*
 5. **Maldición tormentosa** [5] — Maldición (Esp / Res.M). Por cada acción
    recibe daño igual a No2 - 1. Debe pagar 1 HP para moverse cada 2
    casillas. Duración: 3 turnos. Acumulable. Lento.

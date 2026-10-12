@@ -81,6 +81,10 @@ const ESTADOS_PRESET = [
     detalle:'−1 a todas sus tiradas por cada stack (ataque, defensas, daño, resistencias, Percepción, Sigilo, Iniciativa) durante 2 turnos. Si se lo vuelven a poner, −1 más y vuelve a durar 2 turnos. ⚙ Automatizado. ✋ A mano: una tirada de un atributo pelado (Fuerza, Constitución…) no lo resta sola.'},
   // Bendecido (2026-10-11, dueño: Blessing del Support): el espejo de Debilitado, +1 a las mismas tiradas por 2 turnos. No se apila: otra vez
   // renueva los 2 turnos.
+  // Extenuado (2026-10-12, dueño: Maldición extenuante del Debuffer): +1 No2 por stack a todo lo que cuesta No2, y moverse cuesta 1 No2 más
+  // cada 2 casillas por stack. 1 turno; se apila (`apila`) y vuelve a durar 1 turno. Lo suman Combatiente.conExtenuado y el mapa (costoPasos).
+  {nombre:'Extenuado', polaridad:'debuff', turnos:1, stacks:1, apila:true, extenuante:true,
+    detalle:'+1 No2 por stack a todo lo que cuesta No2 (atacar, habilidades, Parry, consumir, equipar, levantarse, el sigilo…) y, al moverse, 1 No2 más cada 2 casillas por stack. Dura 1 turno; otra vez es +1 más y vuelve a durar 1 turno. ⚙ Automatizado.'},
   {nombre:'Bendecido', polaridad:'buff', turnos:2, mods:[{stat:'pdg', val:1}, {stat:'pdgmg', val:1}, {stat:'eva', val:1}, {stat:'parry', val:1}, {stat:'bloqueo', val:1}, {stat:'dmg', val:1}, {stat:'dmgesp', val:1}, {stat:'resmg', val:1}, {stat:'resm', val:1}, {stat:'rescc', val:1}, {stat:'percepcion', val:1}, {stat:'sigilo', val:1}, {stat:'ini', val:1}],
     detalle:'+1 a todas sus tiradas (ataque, defensas, daño, resistencias, Percepción, Sigilo, Iniciativa) durante 2 turnos. Otra vez no se suma: vuelve a durar 2 turnos. ⚙ Automatizado. ✋ A mano: una tirada de un atributo pelado (Fuerza, Constitución…) no lo suma sola.'},
   {nombre:'Expuesto', polaridad:'debuff', turnos:1, expuesto:true, mitadEva:true, alEmpezarTurno:true,

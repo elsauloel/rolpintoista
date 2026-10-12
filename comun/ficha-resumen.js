@@ -143,6 +143,7 @@ const FichaResumen = (() => {
       oporCosto: (() => { const armas = FichaCombate.armasEquipadasConDano(S).map(x => x.item).filter(Combatiente.sirveDeOportunidad); return Math.min(...(armas.length ? armas : [null]).map(a => FichaCombate.costoAtaqueEspecial(a, 'oportunidad', S))); })(),
       sinOpor: (() => { const armas = FichaCombate.armasEquipadasConDano(S).map(x => x.item); return armas.length > 0 && !armas.some(Combatiente.sirveDeOportunidad); })(),
       costoMover: IT2().inmovilizadoBloqueaMover && estadoActivo(S, 'inmovilizado') ? 0 : costoMoverCasillero(S),
+      extenuado: Combatiente.extenuado(S.efectos),   // Extenuado (2026-10-12): el mapa cobra 1 No2 más cada 2 casillas por stack
       muerto: !!(S.muerto && S.muerto.activo),
       muertoDef: !!(S.muerto && S.muerto.definitivo),   // muerto de verdad (el GM lo usa al repartir la experiencia)
       // 🎮 Si el GM tiene el control, su uid: el mapa le deja usar este token como si fuera suyo (Botonera, moverlo pagando No2).
@@ -183,7 +184,7 @@ const FichaResumen = (() => {
           sinOpor: !Combatiente.sirveDeOportunidad(Combatiente.armaDeCombatiente(inv)),   // con un arco no hay oportunidad (2026-10-09)
           // Las reglas del mapa, iguales para todos (dueño, 2026-10-04): moverse cuesta No2 (Rengo el doble, Inmovilizado no se mueve), los Pasos
           // gratis, las chances de las piezas (Retirada limpia, Inamovible, Recuperarse rápido, Reflejos de mangosta) y Pisada atenta con su Percepción.
-          costoMover: invCostoMover(inv), pasosGratis: num(invModTotal(inv, 'pasosgratis')), retirada: num(invModTotal(inv, 'retirada')),
+          costoMover: invCostoMover(inv), extenuado: Combatiente.extenuado(inv.estados), pasosGratis: num(invModTotal(inv, 'pasosgratis')), retirada: num(invModTotal(inv, 'retirada')),
           inamovible: num(invModTotal(inv, 'inamovible')), recuperarse: num(invModTotal(inv, 'recuperarse')), reflejos: num(invModTotal(inv, 'reflejos')),
           venenista: num(invModTotal(inv, 'venenista')),   // Guantes del envenenador (2026-10-05)
           guardian: num(invModTotal(inv, 'guardian')),

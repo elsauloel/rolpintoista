@@ -355,11 +355,12 @@ const CreepCalculo = (() => {
 
   /* ---------- Costos ---------- */
   // Primer ataque del turno: Tipo ÷ 2 (redondeado para arriba); los demás, Tipo completo.
-  function costoAtaque(sc){ const a = Combatiente.armaDeCombatiente(sc); if(Combatiente.cargadaGratis(a, sc.ataquesTurno, sc.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(num(sc.armaTipo) || 8, sc.ataquesTurno, a), a, sc.ataquesTurno) - Combatiente.ahorroArco(a, sc.ataquesTurno, sc.descargada, sc.ultimoPego)); }   // regla común (comun/combatiente.js)   // + Flecha en la cuerda / Encadenar (2026-10-11)
+  function costoAtaque(sc){ return Combatiente.conExtenuado(sc.estados, costoAtaque0(sc)); }   // + Extenuado (2026-10-12)
+  function costoAtaque0(sc){ const a = Combatiente.armaDeCombatiente(sc); if(Combatiente.cargadaGratis(a, sc.ataquesTurno, sc.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(num(sc.armaTipo) || 8, sc.ataquesTurno, a), a, sc.ataquesTurno) - Combatiente.ahorroArco(a, sc.ataquesTurno, sc.descargada, sc.ultimoPego)); }   // regla común (comun/combatiente.js)   // + Flecha en la cuerda / Encadenar (2026-10-11)
   // Nitros de una habilidad: un número, o "ATAQUE" = lo que le cuesta un
   // ataque con su arma (Tipo ÷ 2 el primero del turno) y cuenta como ese ataque.
   function habAtaque(h){ return String((h && h.nitrosCosto) ?? "").trim().toUpperCase() === "ATAQUE"; }
-  function costoNitrosHab(sc, h){ return Combatiente.costoNitrosHab(h, () => costoAtaque(sc), IT2_CREEP.nitrosHabilidad); }   // comun/combatiente.js
+  function costoNitrosHab(sc, h){ const c = Combatiente.costoNitrosHab(h, () => costoAtaque(sc), IT2_CREEP.nitrosHabilidad); return habAtaque(h) ? c : Combatiente.conExtenuado(sc.estados, c); }   // + Extenuado   // comun/combatiente.js
   /* La descripción de las habilidades del catálogo termina con un aviso para el GM: "⚙ Automatizado: … ✋ A mano: …".
      Eso es cosa de la herramienta (se ve en Ver y en la tarjeta), no de la mesa: a la Mesa, que lee todo el mundo,
      va solo lo que hace la habilidad (la descripción más lo que se resuelve a mano, que también es lo que hace). */
@@ -385,7 +386,7 @@ const CreepCalculo = (() => {
   // Parry y Bloqueo de un creep (2026-09-24, pedido del dueño; igual que en la ficha): el Parry cuesta 1 No2 (2026-09-26; antes el Peso de su arma);
   // el Bloqueo suma su Bloqueo + el Peso del arma y ESA SUMA es el dado.
   function pesoArma(sc){ return Math.max(1, num(sc.armaPeso) || 1); }
-  function costoParry(sc){ return Combatiente.costoParry(); }   // siempre 1 No2, sin importar el arma (comun/combatiente.js)
+  function costoParry(sc){ return Combatiente.conExtenuado(sc && sc.estados, Combatiente.costoParry()); }   // + Extenuado   // siempre 1 No2, sin importar el arma (comun/combatiente.js)
   // Con qué para el creep (Parry y Bloqueo): su arma si no es natural, si no un escudo de su equipo; null = no puede
   // (regla del dueño 2026-09-30, comun/combatiente.js). El Bloqueo suma el peso de eso.
   // o.soloEscudo: contra un disparo, solo un escudo (2026-10-09). Con un arco no se parrea.
@@ -399,11 +400,11 @@ const CreepCalculo = (() => {
   // Fuerza del golpe (reglas del escudo, 2026-09-26): la tirada del atacante contra el Bloqueo del defensor = su Fuerza (con los estados activos) + el peso de su arma; la SUMA es el dado.
   function fuerzaGolpeValor(sc){ return num(sc.fue) + (sc.estados || []).filter(e => e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'fue').reduce((x, m) => x + num(m.val) * Math.max(1, num(e.stacks) || 1), 0), 0) + pesoArma(sc); }
   // Contraataque (regla a prueba, 2026-09-26): tras un Parry, siempre cuesta lo de un primer ataque y no suma al conteo de ataques del turno.
-  function costoContraataque(sc){ return Math.max(0, Combatiente.costoPrimerAtaque(num(sc.armaTipo) || 8) - Combatiente.ahorroEspecial('contra', st => modTotal(sc, st))); }   // regla común (comun/combatiente.js)
+  function costoContraataque(sc){ return Combatiente.conExtenuado(sc.estados, Math.max(0, Combatiente.costoPrimerAtaque(num(sc.armaTipo) || 8) - Combatiente.ahorroEspecial('contra', st => modTotal(sc, st)))); }   // regla común (comun/combatiente.js)
   // ¿Le alcanzan los No2 para un ataque de oportunidad (lo de un primer ataque con su arma)? (2026-10-02, pedido del dueño: el mapa solo
   // frena a quien se aleja si el que se queda puede aprovecharlo.) Se publica en su resumen (`opor`): los jugadores no ven sus No2.
   // El ataque de oportunidad: lo de un primer ataque, o nada si su arma es oporGratis.
-  function costoOportunidad(sc){ return Math.max(0, Combatiente.costoEspecial(num(sc.armaTipo) || 8, Combatiente.armaDeCombatiente(sc), 'oportunidad') - Combatiente.ahorroEspecial('oportunidad', st => modTotal(sc, st))); }
+  function costoOportunidad(sc){ return Combatiente.conExtenuado(sc.estados, Math.max(0, Combatiente.costoEspecial(num(sc.armaTipo) || 8, Combatiente.armaDeCombatiente(sc), 'oportunidad') - Combatiente.ahorroEspecial('oportunidad', st => modTotal(sc, st)))); }
   // ¿Su arma no sirve de oportunidad? (un arco: 2026-10-09) — lo publica el creep para que el mapa diga el motivo.
   const sinOportunidad = sc => !Combatiente.sirveDeOportunidad(Combatiente.armaDeCombatiente(sc));
   function oportunidadPosible(sc){

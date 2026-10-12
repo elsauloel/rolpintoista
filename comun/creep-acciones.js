@@ -52,7 +52,7 @@ const CreepAcciones = (() => {
     // Primero el cuerpo (Sentado); si no, el arma (Desarmado, 2026-10-07: 1 No2).
     const lv = Combatiente.levantable(sc.estados);
     if(!lv) return {error: `${sc.nombre}: no tiene nada que levantar`};
-    const costo = lv.arma ? Combatiente.COSTO_LEVANTAR_ARMA : Combatiente.costoLevantarse(st => C().modTotal(sc, st));   // Levantarse rápido (2026-10-06)
+    const costo = Combatiente.conExtenuado(sc.estados, lv.arma ? Combatiente.COSTO_LEVANTAR_ARMA : Combatiente.costoLevantarse(st => C().modTotal(sc, st)));   // + Extenuado   // Levantarse rápido (2026-10-06)
     if(num(sc.nitros) < costo) return {error: `${sc.nombre}: no le alcanzan los No2 — ${lv.arma ? 'levantar el arma' : 'levantarse'} cuesta ${costo}`};
     sc.nitros = num(sc.nitros) - costo;
     sc.estados = (sc.estados || []).filter(e => e !== lv.est);
@@ -63,9 +63,9 @@ const CreepAcciones = (() => {
   function tiradaSoltarse(sc){
     const est = Combatiente.estadoSoltable(sc.estados);
     if(!est) return null;
-    const s = Combatiente.soltarNorm(est.soltar);
+    const s0 = Combatiente.soltarNorm(est.soltar), s = {...s0, no2: Combatiente.conExtenuado(sc.estados, s0.no2)};   // + Extenuado
     const t = Combatiente.tiradaSoltarse(est, C().statValor(sc, s.stat) + Math.max(0, num(C().modTotal(sc, 'soltarse'))), sc.estados);
-    return {...t, estId: est.id, origen: `${sc.nombre} · Soltarse (${est.nombre}) · ${s.etq} contra ${s.dif}`};
+    return {...t, s, estId: est.id, origen: `${sc.nombre} · Soltarse (${est.nombre}) · ${s.etq} contra ${s.dif}`};
   }
   function aplicarSoltarse(sc, t){
     if(num(sc.nitros) < t.s.no2) return {error: `${sc.nombre}: no le alcanzan los No2 — soltarse cuesta ${t.s.no2}`};
@@ -233,13 +233,13 @@ const CreepAcciones = (() => {
   // Los consumibles del catálogo para el desplegable del cinturón: [{id, nombre, tier}], por nombre. `cat`: la lista del catálogo.
   const consumiblesDe = cat => (cat || []).filter(it => it && it.tipoItem === 'consumibles' && !it.trofeo && !it.archivo)
     .map(it => ({id: it.id, nombre: it.nombre, tier: it.tier || ''})).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
-  function faltanNitrosConsumir(sc){ return num(sc.nitros) < costoConsumir(); }
+  function faltanNitrosConsumir(sc){ return num(sc.nitros) < Combatiente.conExtenuado(sc.estados, costoConsumir()); }
   // Usar un consumible del cinturón: → {error} | {aviso, tiradas: [{origen, r}], trampa} (trampa: el ítem, para que la pantalla la coloque).
   function consumir(sc, id, presets, forzar){
     const it = (sc.cinturon || []).find(x => x.id === id);
     if(!it || num(it.unidades) <= 0) return {error: 'Ese consumible ya no está'};
     // Saque rápido (2026-10-05): el primero del turno puede no costar (la chance se tira a la vista: va en las tiradas).
-    let costo = costoConsumir(), saque = null;
+    let costo = Combatiente.conExtenuado(sc.estados, costoConsumir()), saque = null;   // + Extenuado
     const pctSaque = Combatiente.chancePct(C().modTotal(sc, 'saquerapido'));
     if(pctSaque > 0 && !sc.saqueUsado){   // sin dado que rueda: se tira callado y se anuncia en texto (dueño, 2026-10-05)
       const d = Combatiente.chanceDado(pctSaque);
@@ -413,7 +413,7 @@ const CreepAcciones = (() => {
     const ahorro = usos ? 0 : Math.max(0, Math.round(num(C().modTotal(sc, 'ahorroespsp'))));   // primer conjuro: el SP de menos baja la espera
     // Las cargas (2026-10-08): mientras le queden, no hay espera (el SP de un creep).
     const cargas = Math.max(0, Math.round(num(e.cargas))), conCarga = cargas > 0 && num((sc.cargasEsp || {})[k]) < cargas;
-    return {no2: Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1)), espera: conCarga ? 0 : ESPERA_POR_SP(Math.max(0, num(e.sp) - ahorro)), usos, enEspera: num((sc.esperaEspecial || {})[k]),
+    return {no2: Combatiente.conExtenuado(sc.estados, Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1))), espera: conCarga ? 0 : ESPERA_POR_SP(Math.max(0, num(e.sp) - ahorro)), usos, enEspera: num((sc.esperaEspecial || {})[k]),
       ...(cargas ? {cargas, cargaUsadas: num((sc.cargasEsp || {})[k])} : {})};
   }
   function habDeEspecialCreep(sc, it){

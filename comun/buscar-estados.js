@@ -25,7 +25,7 @@ const BuscarEstados = (() => {
     'Vida extra': 'escudo shield absorbe excedente hp', 'Barrera': 'escudo shield absorbe', 'Blindado': 'defensa escudo armadura',
     'Afortunado': 'suerte ventaja dos veces', 'Sigilo': 'oculto invisible stealth esconderse', 'Marcado': 'visible brillo revelado',
     'Crítico frecuente': 'crit critico', 'Crítico potente': 'crit critico', 'Sangre pura': 'inmune veneno', 'Coagulación': 'inmune sangrado coagulacion extrema',
-    'Inamovible': 'empujon empuje no se mueve', 'Debilitado': 'maldicion debilitante menos tiradas debuff penalidad', 'Bendecido': 'blessing bendicion mas tiradas buff bono', 'Marcando': 'marcar marca shooter bono blanco', 'Mareo de invocación': 'invocacion espera',
+    'Inamovible': 'empujon empuje no se mueve', 'Debilitado': 'maldicion debilitante menos tiradas debuff penalidad', 'Bendecido': 'blessing bendicion mas tiradas buff bono', 'Marcando': 'marcar marca shooter bono blanco', 'Extenuado': 'maldicion extenuante no2 nitros caro cansado', 'Mareo de invocación': 'invocacion espera',
   };
   const CSS = `.be-caja{display:flex;gap:8px;align-items:center;margin:2px 0 10px}
 .be-caja input{flex:1;min-width:0;padding:7px 10px;border-radius:5px;border:1px solid #5A4650;background:rgba(0,0,0,.25);color:inherit;font:inherit;font-size:13px}

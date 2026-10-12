@@ -45,7 +45,7 @@ const FichaAcciones = (() => {
     }
     // Marcado (2026-10-05): mientras dure la marca no se puede entrar en sigilo (se le saca a mano si la mesa decide otra cosa).
     if(Combatiente.marcadoEn(S.efectos)){ ui.toast('Estás Marcado: no podés entrar en sigilo hasta que se te vaya la marca'); return; }
-    const costo = num(IT2().nitrosSigilo);
+    const costo = Combatiente.conExtenuado(S.efectos, num(IT2().nitrosSigilo));   // + Extenuado
     if(num(S.nitros) < costo && !forzar){
       ui.avisarSinNitros(costo, 'entrar en sigilo', () => alternarSigilo(S, true, ui));
       return;
@@ -65,7 +65,7 @@ const FichaAcciones = (() => {
     const lv = Combatiente.levantable(S.efectos);
     if(!lv) return;
     const actual = lv.est;
-    const costo = lv.arma ? Combatiente.COSTO_LEVANTAR_ARMA : Math.max(0, num(IT2().nitrosLevantarse) - num(FichaCalculo.calcular(S).final.levantarse));   // Levantarse rápido (2026-10-06)
+    const costo = Combatiente.conExtenuado(S.efectos, lv.arma ? Combatiente.COSTO_LEVANTAR_ARMA : Math.max(0, num(IT2().nitrosLevantarse) - num(FichaCalculo.calcular(S).final.levantarse)));   // Levantarse rápido (2026-10-06) + Extenuado
     if(num(S.nitros) < costo && !forzar){
       ui.avisarSinNitros(costo, lv.arma ? 'levantar el arma' : 'levantarte', () => levantarse(S, true, ui));
       return;
@@ -81,7 +81,7 @@ const FichaAcciones = (() => {
   function soltarse(S, forzar, ui){
     const est = Combatiente.estadoSoltable(S.efectos);
     if(!est) return;
-    const s = Combatiente.soltarNorm(est.soltar);
+    const s0 = Combatiente.soltarNorm(est.soltar), s = {...s0, no2: Combatiente.conExtenuado(S.efectos, s0.no2)};   // + Extenuado
     if(num(S.nitros) < s.no2 && !forzar){
       ui.avisarSinNitros(s.no2, 'intentar soltarte', () => soltarse(S, true, ui));
       return;
@@ -234,7 +234,7 @@ const FichaAcciones = (() => {
       if(sale) costo = 0;
     }
     if(key === 'inventario' && num(f.bolsilloext) > 0 && meta.bolsilloTurno !== turno){ costo = Math.max(0, costo - 1); bolsillo = true; }
-    return {costo, saque, bolsillo};
+    return {costo: Combatiente.conExtenuado(S.efectos, costo), saque, bolsillo};   // + Extenuado
   }
   async function consumir(S, id, forzar, ui, sacado){
     { const it = [...(S.inventario || []), ...(S.cinturon || [])].find(x => x.id === id); if(it && (it.enMesa || it.reservado)){ ui.toast(`Está ofrecido a ${it.reservadoPara || 'otro personaje'}: cancelá la oferta primero (🤝)`); return; } }   // 🤝 comun/intercambio.js
@@ -367,9 +367,10 @@ const FichaAcciones = (() => {
   }
   // El cartel de sobrepeso, "Pagar 1 No2": devuelve false si no alcanzan (y no cierra el cartel).
   function sobrepesoPagar(S, ui){
-    S.nitros = num(S.nitros) - 1;   // una defensa: sin No2 queda en negativo, se descuenta en la próxima recarga (2026-10-06)
+    const pago = Combatiente.conExtenuado(S.efectos, 1);   // + Extenuado
+    S.nitros = num(S.nitros) - pago;   // una defensa: sin No2 queda en negativo, se descuenta en la próxima recarga (2026-10-06)
     ui.cambio(['nitros', 'refresh']);
-    Combatiente.avisarDeudaNo2({nombre: ((S.meta && S.meta.nombre) || '').trim(), accion: 'la Evasión (pagando el sobrepeso)', costo: 1, quedan: num(S.nitros)});
+    Combatiente.avisarDeudaNo2({nombre: ((S.meta && S.meta.nombre) || '').trim(), accion: 'la Evasión (pagando el sobrepeso)', costo: pago, quedan: num(S.nitros)});
     return true;
   }
   // Parry: siempre 1 No2 (Combatiente.costoParry); queda esperando su Bloqueo con esa misma arma o escudo.
@@ -377,7 +378,7 @@ const FichaAcciones = (() => {
     // Parada fácil (escudos de Buena calidad, 2026-10-06): el primer Parry del turno, gratis. La marca se vacía al empezar su turno.
     const fin = FichaCalculo.calcular(S).final;
     const gratis = Combatiente.parryGratis(st => fin[st], num((S.ataquesArma || {})._parry));
-    const costo = gratis ? 0 : Combatiente.costoParry();
+    const costo = gratis ? 0 : Combatiente.conExtenuado(S.efectos, Combatiente.costoParry());   // + Extenuado
     S.ataquesArma = {...(S.ataquesArma || {}), _parry: 1};
     const con = arma ? ' con ' + arma.nombre : '';
     // Una defensa: sin No2 se hace igual y queda en negativo; la deuda se descuenta en la próxima recarga (dueño, 2026-10-06).
@@ -619,7 +620,7 @@ const FichaAcciones = (() => {
     const e = it.especial || {}, usos = usosEspecial(S, it);
     const ahorro = usos ? 0 : Math.max(0, Math.round(num(FichaCalculo.calcular(S).final.ahorroespsp)));   // Mitones del primer conjuro (2026-10-05)
     const cargas = Math.max(0, Math.round(num(e.cargas))), conCarga = cargas > 0 && cargasUsadas(S, it) < cargas;
-    return {no2: Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1)), sp: conCarga ? 0 : Math.max(0, num(e.sp) - ahorro), usos, vida: vidaPorUso(S, e),
+    return {no2: Combatiente.conExtenuado(S.efectos, Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1))), sp: conCarga ? 0 : Math.max(0, num(e.sp) - ahorro), usos, vida: vidaPorUso(S, e),
       ...(cargas ? {cargas, cargaUsadas: cargasUsadas(S, it)} : {})};
   }
   // El báculo de sangre (2026-10-08): cada uso cuesta `spVidaPct` % de tu vida máxima (para arriba) en vez de SP.
@@ -748,14 +749,15 @@ const FichaAcciones = (() => {
       ui.toast('Los valores no pueden ser negativos');
       return false;
     }
-    if(nitros > num(S.nitros)){
+    const pagaN = FichaHabilidades.nitrosVariable(it) ? Combatiente.conExtenuado(S.efectos, nitros) : nitros;   // X No2 + Extenuado (lo fijo ya lo trae)
+    if(pagaN > num(S.nitros)){
       ui.toast(`No te alcanzan los Nitros — tenés ${fmt(num(S.nitros))}`);
       return false;
     }
     const limN = limiteCostoX(S, 'nitros', it), limS = limiteCostoX(S, 'sp', it);
     if(limN !== null && FichaHabilidades.nitrosVariable(it) && nitros > limN){ ui.toast(`Como mucho ${fmt(limN)} Nitros en X`); return false; }
     if(limS !== null && FichaHabilidades.spVariable(it) && sp > limS){ ui.toast(`Como mucho ${fmt(limS)} SP en X`); return false; }
-    S.nitros = Math.max(0, num(S.nitros) - nitros);
+    S.nitros = Math.max(0, num(S.nitros) - pagaN);
     S.spGastado = num(S.spGastado) + sp;
     const costoHp = num(it.hpCosto);
     if(costoHp > 0) ui.fijarHp(num(S.hp) - costoHp);

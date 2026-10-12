@@ -197,7 +197,7 @@ const FichaEquipo = (() => {
   // En modo combate, equipar o desequipar un ítem cuesta No2 (IT2.nitrosEquipar) cada vez: reemplazar uno por otro son dos. Sin No2
   // suficientes: el cartel de siempre (cancelar o hacerlo igual, con la línea roja en la Mesa). En narrativo no cuesta nada.
   function conCosto(S, veces, infinitivo, pasado, accion, ui){
-    const costo = ui.modoCombate() ? veces * FichaCalculo.IT2.nitrosEquipar : 0;
+    const costo = ui.modoCombate() ? veces * Combatiente.conExtenuado(S.efectos, FichaCalculo.IT2.nitrosEquipar) : 0;   // + Extenuado, por cada acción
     if(!costo){ accion(); return; }
     const pagar = forzar => {
       const gasto = forzar && costo > num(S.nitros) ? FichaAcciones.gastoNitrosForzado(S, costo, pasado) : costo;

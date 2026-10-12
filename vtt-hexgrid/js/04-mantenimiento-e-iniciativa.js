@@ -798,20 +798,22 @@ function lentoEn(col, fila){
 // `recargo` (2026-10-04, estado Lento): lo que se suma al primer casillero (el primero del turno cuesta el doble).
 // `levita` (Levitar, 2026-10-06): los primeros casilleros de la ruta (los que le quedan levitando en este turno) no tocan el piso: el terreno
 // lento no los frena.
-function costoPasos(ruta, porCasillero, gratis, recargo, levita){
+// `ext` (Extenuado, Maldición extenuante, 2026-10-12): además, 1 No2 más por stack cada 2 casillas que se pagan (la 2.ª, la 4.ª…).
+function costoPasos(ruta, porCasillero, gratis, recargo, levita, ext){
   const acc = [];
-  let s = 0;
+  let s = 0, pagados = 0;
   for(let i = 1; i < (ruta || []).length; i++){
     if(i > num(gratis)){
       const lento = porCasillero > 0 && i > num(levita) ? lentoEn(ruta[i - 1].col, ruta[i - 1].fila) : 0;
       s += porCasillero > 0 ? Math.max(porCasillero, lento) : 0;
+      if(porCasillero > 0 && ++pagados % 2 === 0) s += Math.max(0, num(ext));
     }
     if(i === 1) s += num(recargo);
     acc.push(s);
   }
   return acc;
 }
-const costoRuta = (ruta, porCasillero, pasos, gratis, recargo, levita) => { const a = costoPasos((ruta || []).slice(0, pasos + 1), porCasillero, gratis, recargo, levita); return a.length ? a[a.length - 1] : 0; };
+const costoRuta = (ruta, porCasillero, pasos, gratis, recargo, levita, ext) => { const a = costoPasos((ruta || []).slice(0, pasos + 1), porCasillero, gratis, recargo, levita, ext); return a.length ? a[a.length - 1] : 0; };
 
 /* Quién ya se movió en este turno (2026-10-04, los pies): Lento cobra doble el primer casillero del turno y Pasos de baile suma Evasión si ya se
    movió. Como los Pasos gratis, lo anota esta pantalla (y el navegador, por si se recarga). El duelo lo pregunta con window.mapaSeMovio. */
@@ -873,7 +875,7 @@ function costoMoverDe(t){
   const f = fichasPub.get(t.fichaId);
   const r = f && f.resumen;
   if(!r || r.costoMover === undefined) return null;
-  return {porCasillero: num(r.costoMover), disponibles: num(r.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, num(r.costoMover)), levita: levitarRestante(t)};
+  return {porCasillero: num(r.costoMover), disponibles: num(r.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, num(r.costoMover)), levita: levitarRestante(t), ext: num(r.extenuado)};
 }
 /* Stats de los pies (2026-10-06) de cualquier token: un personaje o una invocación, de lo que publica la ficha de su dueño; un creep, de sus datos. */
 function statPiesDe(t, st){
@@ -907,7 +909,7 @@ function costoMoverInv(t){
   const ri = resumenDeInv(t);
   if(!ri || ri.costoMover === undefined) return null;
   const por = num(ri.costoMover);
-  return {porCasillero: por, disponibles: num(ri.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, por), levita: levitarRestante(t)};
+  return {porCasillero: por, disponibles: num(ri.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, por), levita: levitarRestante(t), ext: num(ri.extenuado)};
 }
 
 // Mismas reglas que la ficha publica en resumen.costoMover: 1 por
@@ -918,7 +920,7 @@ function costoMoverCreep(t){
   if(!sc || sc.nitros === undefined || sc.nitros === null) return null;
   const activos = (Array.isArray(sc.estados) ? sc.estados : []).filter(e => e && e.activo !== false);
   const porCasillero = activos.some(e => e.inmovilizado) ? 0 : activos.some(e => e.rengo) ? 2 : 1;
-  return {porCasillero, disponibles: num(sc.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, porCasillero), levita: levitarRestante(t)};
+  return {porCasillero, disponibles: num(sc.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, porCasillero), levita: levitarRestante(t), ext: Combatiente.extenuado(sc.estados)};
 }
 
 // 🎮 El GM tomó el control de este personaje (la ficha publica resumen.control = su uid, 2026-09-30): lo usa como si fuera su

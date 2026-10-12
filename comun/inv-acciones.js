@@ -34,7 +34,7 @@ const InvAcciones = (() => {
     }
     if(statId === 'parry'){
       const gratis = Combatiente.parryGratis(st => I().modTotal(inv, st), num(inv.parryTurno));   // Parada fácil (2026-10-06)
-      const costo = gratis ? 0 : Combatiente.costoParry();   // el Parry siempre cuesta 1 No2
+      const costo = gratis ? 0 : Combatiente.conExtenuado(inv.estados, Combatiente.costoParry());   // el Parry siempre cuesta 1 No2 (+ Extenuado)
       inv.parryTurno = 1;   // (se vacía al empezar su turno)
       inv.nitros = num(inv.nitros) - costo;   // sin No2 queda en negativo: se descuenta en su próxima recarga (2026-10-06)
       Combatiente.avisarDeudaNo2({nombre: inv.nombre, accion: 'Parry', costo, quedan: num(inv.nitros)});
@@ -73,7 +73,7 @@ const InvAcciones = (() => {
   // La regla universal (Combatiente.statAtaqueEspecial): el PdG especial venga de su arma, su equipo o sus estados.
   const bonoEspecial = (inv, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return st ? I().modTotal(inv, st) : 0; };
   const especial = tipo => tipo === 'oportunidad' || tipo === 'contra';
-  const costoAtaqueDe = (inv, tipo) => especial(tipo) ? Math.max(0, Combatiente.costoEspecial(num(inv.armaTipo) || 8, Combatiente.armaDeCombatiente(inv), tipo) - Combatiente.ahorroEspecial(tipo, st => I().modTotal(inv, st))) : I().costoAtaque(inv);
+  const costoAtaqueDe = (inv, tipo) => especial(tipo) ? Combatiente.conExtenuado(inv.estados, Math.max(0, Combatiente.costoEspecial(num(inv.armaTipo) || 8, Combatiente.armaDeCombatiente(inv), tipo) - Combatiente.ahorroEspecial(tipo, st => I().modTotal(inv, st)))) : I().costoAtaque(inv);
   const faltanNitros = (inv, tipo) => costoAtaqueDe(inv, tipo) > num(inv.nitros);
   function preguntaSinNitros(inv, tipo){
     return `${inv.nombre} no tiene No2 suficientes: ${especial(tipo) ? 'el ' + NOMBRE_ESPECIAL[tipo].toLowerCase() : 'este ataque'} cuesta ${fmt(costoAtaqueDe(inv, tipo))} y tiene ${fmt(Math.max(0, num(inv.nitros)))}.\n\n¿Atacar igual? Gasta los No2 que tenga y queda anotado en rojo en la Mesa.`;
@@ -116,7 +116,7 @@ const InvAcciones = (() => {
     const lv = Combatiente.levantable(inv.estados);
     if(!lv) return null;
     const est = lv.est;
-    const costo = lv.arma ? Combatiente.COSTO_LEVANTAR_ARMA : Math.max(0, num(FichaCalculo.IT2.nitrosLevantarse) - num(I().modTotal(inv, 'levantarse')));   // Levantarse rápido (2026-10-06)
+    const costo = Combatiente.conExtenuado(inv.estados, lv.arma ? Combatiente.COSTO_LEVANTAR_ARMA : Math.max(0, num(FichaCalculo.IT2.nitrosLevantarse) - num(I().modTotal(inv, 'levantarse'))));   // + Extenuado   // Levantarse rápido (2026-10-06)
     if(num(inv.nitros) < costo) return {error: `${inv.nombre}: no le alcanzan los No2 — ${lv.arma ? 'levantar el arma' : 'levantarse'} cuesta ${costo}`};
     inv.nitros = num(inv.nitros) - costo;
     inv.estados = inv.estados.filter(e => e !== est);
@@ -125,9 +125,9 @@ const InvAcciones = (() => {
   function tiradaSoltarse(inv){
     const est = Combatiente.estadoSoltable(inv.estados);
     if(!est) return null;
-    const s = Combatiente.soltarNorm(est.soltar);
+    const s0 = Combatiente.soltarNorm(est.soltar), s = {...s0, no2: Combatiente.conExtenuado(inv.estados, s0.no2)};   // + Extenuado
     const t = Combatiente.tiradaSoltarse(est, I().statValor(inv, s.stat) + Math.max(0, num(I().modTotal(inv, 'soltarse'))), inv.estados);
-    return {...t, est, origen: `${inv.nombre} · Soltarse (${est.nombre}) · ${s.etq} contra ${s.dif}`};
+    return {...t, s, est, origen: `${inv.nombre} · Soltarse (${est.nombre}) · ${s.etq} contra ${s.dif}`};
   }
   function aplicarSoltarse(inv, t){
     if(num(inv.nitros) < t.s.no2) return {error: `${inv.nombre}: no le alcanzan los No2 — soltarse cuesta ${t.s.no2}`};

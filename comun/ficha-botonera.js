@@ -84,7 +84,8 @@ const FichaBotonera = (() => {
   }
   // Nitros fijos de una habilidad (0 si son X: se eligen al usarla).
   function costoNitrosHab(S, h, arma){
-    return Combatiente.costoNitrosHab(h, () => arma === undefined ? costoAtaqueMinimo(S) : costoAtaqueNitros(S, arma), IT2().nitrosHabilidad);
+    const c = Combatiente.costoNitrosHab(h, () => arma === undefined ? costoAtaqueMinimo(S) : costoAtaqueNitros(S, arma), IT2().nitrosHabilidad);
+    return FichaHabilidades.nitrosAtaque(h) ? c : Combatiente.conExtenuado(S.efectos, c);   // + Extenuado (si cuesta «como un ataque», ya viene en el ataque)
   }
   function sinNitrosPara(S, h){
     if(!habAutomatizada(h)) return false;

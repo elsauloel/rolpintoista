@@ -607,6 +607,24 @@ prueba('Blessing (Support, 2026-10-11): a un aliado o a uno mismo, Bendecido +1 
   igual([hab.costo, hab.nitrosCosto, ej.objetivo, ej.conmigo, lista.length, lista[0].turnos, CreepCalculo.modTotal(sc, 'pdg'), CreepCalculo.modTotal(sc, 'eva'), CreepCalculo.modTotal(sc, 'dmg'), /Sin auditar/.test(hab.detalle)],
     ['5', 1, 'aliado', true, 1, 2, 1, 1, 1, false]);
 });
+prueba('Maldición extenuante (Debuffer, 2026-10-12): Extenuado +1 No2 por stack a lo que cuesta No2 (no a lo gratis ni dos veces a «como un ataque»)', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-maldicion-extenuante');
+  const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});
+  const presets = estadosPresetFicha(), lista = [];
+  Combatiente.agregarEstado(lista, FichaAcciones.estadoDeSpec({nombre: 'Extenuado'}, presets));
+  const sc = {nombre: 'Coloso', armaTipo: 8, ataquesTurno: 0, nitros: 10, estados: []};
+  const base = [CreepCalculo.costoAtaque(sc), CreepCalculo.costoParry(sc), CreepCalculo.costoNitrosHab(sc, {nitrosCosto: 1})];
+  sc.estados = [{...lista[0]}];
+  const uno = [CreepCalculo.costoAtaque(sc), CreepCalculo.costoParry(sc), CreepCalculo.costoNitrosHab(sc, {nitrosCosto: 1}), CreepCalculo.costoNitrosHab(sc, {nitrosCosto: 'ATAQUE'}), CreepCalculo.costoNitrosHab(sc, {nitrosCosto: 0})];
+  lista[0].turnos = 0;   // se le estaba yendo
+  Combatiente.agregarEstado(lista, FichaAcciones.estadoDeSpec({nombre: 'Extenuado'}, presets));
+  sc.estados = [{...lista[0]}];
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
+  S.efectos = [{...lista[0]}];
+  igual([hab.costo, hab.nitrosCosto, ej.tira.stat, ej.contra.map(c => c.stat), lista[0].extenuante, base, uno, lista.length, lista[0].stacks, lista[0].turnos,
+    CreepCalculo.costoAtaque(sc), Combatiente.extenuado(S.efectos), FichaBotonera.costoNitrosHab(S, {nitrosCosto: 1}), /Sin auditar/.test(hab.detalle), /Maldición extenuante \[3\]/.test(hab.original)],
+    ['3', 2, 'pdgmg', ['resmg'], true, [4, 1, 1], [5, 2, 2, 5, 0], 1, 2, 1, 6, 2, 3, false, true]);
+});
 prueba('Un stat en 0 o negativo se tira igual: da el valor sin dados (el duelo no queda en «Tirando…», 2026-10-12)', () => {
   const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
   S.efectos = [{id: 'x', nombre: 'Muy debilitado', polaridad: 'debuff', turnos: 2, activo: true, mods: [{stat: 'pdg', val: -50}]}];

@@ -21,7 +21,8 @@ function mostrarConfirmacionRuta(){
   $('#ruta-texto').textContent = exceso > 0
     ? `Mover ${p.pasos} casillero${p.pasos === 1 ? '' : 's'} cuesta ${fmt(costo)} No2 y tenés ${fmt(Math.max(0, p.disponibles))} · ⚠ te faltan ${fmt(exceso)}: no se puede hacer · clic afuera lo cancela (para moverte igual, usá Mover libre 🦶)`
     : `Mover ${p.pasos} casillero${p.pasos === 1 ? '' : 's'} · −${fmt(costo)} No2 (te quedan ${fmt(p.disponibles - costo)})` +
-      (p.porCasillero !== 1 ? ` · ${fmt(p.porCasillero)} por casillero` : '') + (costo > p.pasos * p.porCasillero ? ' · salir de la arena cuesta más' : '') +
+      (p.porCasillero !== 1 ? ` · ${fmt(p.porCasillero)} por casillero` : '') + (costo > p.pasos * p.porCasillero + Math.floor(p.pasos / 2) * num(p.ext) ? ' · salir de la arena cuesta más' : '') +
+      (num(p.ext) > 0 ? ` · Extenuado: +${fmt(num(p.ext))} cada 2 casilleros` : '') +
       (p.gratis > 0 ? ` · ${p.gratis} gratis` : '') + (p.lento ? ' · Lento: el primero cuesta el doble' : '') +
       ' · clic afuera para confirmar';
   $('#ruta-confirmar').classList.toggle('excede', exceso > 0);

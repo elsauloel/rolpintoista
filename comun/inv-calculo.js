@@ -71,6 +71,8 @@ const InvCalculo = (() => {
     const {arruinada} = estadosArmadura(inv);
     let v = num(inv.crit[i]);
     if(arruinada) v -= aporteArmadura(inv, 'tipo'+(i+1));
+    // + lo que dan los estados (Endurecido…, 2026-10-12)
+    (inv.estados || []).forEach(es => { if(es && es.activo !== false) (es.mods || []).forEach(m => { if(m.stat === 'tipo' + (i + 1)) v += num(m.val) * Math.max(1, num(es.stacks) || 1); }); });
     return v;
   }
   function estadoActivo(inv, flag){

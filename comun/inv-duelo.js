@@ -128,7 +128,7 @@ const InvDuelo = (() => {
         const i = [4, 6, 8, 10, 12].indexOf(num(d.ataque.tipoDado));
         if(i < 0) return 0;
         const inv = ui.inv(d.defensor);
-        return num((inv.crit || [])[i]);
+        return Math.max(0, num(InvCalculo.critEfectivo(inv, i)));   // con los estados (2026-10-12)
       },
       efectosArma: d => {
         const inv = ui.inv(d.atacante);

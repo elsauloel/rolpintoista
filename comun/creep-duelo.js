@@ -133,7 +133,7 @@ const CreepDuelo = (() => {
       resistenciaCritico: d => {
         const sc = deLado(d.defensor);
         const i = [4, 6, 8, 10, 12].indexOf(num(d.ataque.tipoDado));
-        return sc && i >= 0 ? num((sc.crit || [])[i]) : 0;
+        return sc && i >= 0 ? Math.max(0, num(CreepCalculo.critEfectivo(sc, i))) : 0;   // con los estados (2026-10-12)
       },
       // Los efectos al golpear del arma del creep, que el duelo resuelve uno por uno.
       efectosArma: d => {

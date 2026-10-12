@@ -154,8 +154,10 @@ const CreepCalculo = (() => {
   function armadmgEfectiva(sc){
     return Math.max(0, num(sc.armadmg) + modTotal(sc, 'armadmg'));
   }
+  // La resistencia a crítico: la cargada (el equipo ya se le sumó al equiparlo) + lo que dan los estados (Endurecido…, 2026-10-12).
+  const critDeEstados = (estados, i) => (estados || []).filter(e => e && e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'tipo' + (i + 1)).reduce((x, m) => x + num(m.val), 0) * Math.max(1, num(e.stacks) || 1), 0);
   function critEfectivo(sc, i){
-    return num(sc.crit[i]);
+    return num((sc.crit || [])[i]) + critDeEstados(sc.estados, i);
   }
   /* Stats secundarios de los creeps: los mismos que un PJ, cada uno sale de
      su atributo (fórmula base = el atributo) + mods (ver statValor).
@@ -317,6 +319,8 @@ const CreepCalculo = (() => {
     });
     const resto = num(sc.crit[i]) - deItems;
     if(resto || !L.length) L.push(`${conSigno(resto)} base (cargada a mano)`);
+    const deEst = critDeEstados(sc.estados, i);
+    if(deEst) L.push(`${conSigno(deEst)} por estados`);
     L.push(`= ${conSigno(critEfectivo(sc, i))}`);
     return L.join('\n');
   }
@@ -608,7 +612,7 @@ const CreepCalculo = (() => {
     TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto,
     trofeo, despojosDePrecio, dropsResumen,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,
-    danoTxt, fuentesEquipo, modTotal, estadosArmadura, aporteArmadura, defensaEfectiva, armadmgEfectiva, resElemental, critEfectivo,
+    danoTxt, fuentesEquipo, modTotal, estadosArmadura, aporteArmadura, defensaEfectiva, armadmgEfectiva, resElemental, critEfectivo, critDeEstados,
     statValor, estadoActivo, aportesMod, origenesMod, conSigno, statOrigenTxt, armadmgOrigenTxt, ataqueTxt, ataqueOrigenTxt,
     defensaOrigenTxt, critOrigenTxt, armaduraOrigenTxt, modsAfectanHp, actualizarHpMaxPorCon, nitrosMax, actualizarNo2PorAgl,
     costoAtaque, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor,

@@ -393,11 +393,23 @@ function pasosPagables(costo, ruta){
    otra sin pisar nada Sólido ni cruzar una pared de línea; un paso que sale de terreno lento cuesta lo que cuesta salir de ahí. Los tokens no
    tapan (no hay choque entre tokens). → [casillas sin la de partida] o null (no hay paso, o queda más lejos de lo razonable). */
 const RODEO_MAX_NODOS = 3000;
+/* Los rivales cortan el paso (dueño, 2026-10-12): en modo combate, las casillas de los tokens rivales que esta pantalla ve (los ocultos o en
+   sigilo que no se ven, no: si no, delatarían dónde están). Por un aliado se pasa, pero no se termina encima de nadie (rutaSoltada). */
+function celdasQueTapan(id){
+  const s = new Set(), yo = tokens.get(id);
+  if(!yo || modoMapa !== 'combate') return s;
+  tokens.forEach((t, tid) => {
+    if(tid === id || !t || !dueloEsRival(yo, t)) return;
+    if((t.oculto && !soyGM) || !tokenVisiblePorNiebla(t) || ocultoPorSigiloParaMi(t)) return;
+    s.add(nbPack(t.col, t.fila));
+  });
+  return s;
+}
 let rodeoUltimo = null;   // el último cálculo (el mouse se mueve dentro de la misma casilla muchas veces)
-function rutaRodeo(desde, hasta){
-  const solidos = solidosSet(), esSolido = c => solidos.has(nbPack(c.col, c.fila));
+function rutaRodeo(desde, hasta, tapan){
+  const solidos = solidosSet(), esSolido = c => solidos.has(nbPack(c.col, c.fila)) || !!(tapan && tapan.has(nbPack(c.col, c.fila)));
   if(esSolido(hasta)) return null;
-  const clave = c => c.col + ',' + c.fila, k0 = clave(desde) + '>' + clave(hasta) + '|' + solidosFirma();
+  const clave = c => c.col + ',' + c.fila, k0 = clave(desde) + '>' + clave(hasta) + '|' + solidosFirma() + '|' + (tapan ? [...tapan].join(';') : '');
   if(rodeoUltimo && rodeoUltimo.k === k0) return rodeoUltimo.r && rodeoUltimo.r.slice();
   const r = rutaRodeo0(desde, hasta, esSolido, clave);
   rodeoUltimo = {k: k0, r};
@@ -432,16 +444,17 @@ function extenderRuta(a, casilla){
   const i = ruta.findIndex(c => mismoHex(c, casilla));
   if(i >= 0){ ruta.length = i + 1; return false; }
   let chocado = false;
+  const tapan = a.marcador ? null : (a.tapan || (a.tapan = a.libre ? new Set() : celdasQueTapan(a.id)));   // los rivales (en combate, no con 🦶 Mover libre), una vez por arrastre
   for(const c of lineaHex(ruta[ruta.length - 1], casilla)){
     const j = ruta.findIndex(x => mismoHex(x, c));
     if(j >= 0){ ruta.length = j + 1; continue; }
-    if(!a.marcador && (elementoSolidoEn(c.col, c.fila) || paredCorta(ruta[ruta.length - 1], c))){ chocado = true; break; }   // un Sólido o una pared de línea (js/34)
+    if(!a.marcador && (elementoSolidoEn(c.col, c.fila) || paredCorta(ruta[ruta.length - 1], c) || tapan.has(nbPack(c.col, c.fila)))){ chocado = true; break; }   // un Sólido, una pared de línea (js/34) o un rival
     if(ruta.length >= RUTA_MAX_CELDAS) break;
     ruta.push(c);
   }
   // 🧭 Chocó: si hay un rodeo hasta donde está el mouse, el camino lo rodea solo (si no, se queda chocado en la última casilla libre).
   if(chocado && !a.marcador){
-    const rodeo = rutaRodeo(ruta[ruta.length - 1], casilla);
+    const rodeo = rutaRodeo(ruta[ruta.length - 1], casilla, tapan);
     if(rodeo && ruta.length + rodeo.length <= RUTA_MAX_CELDAS){
       rodeo.forEach(c => { const j = ruta.findIndex(x => mismoHex(x, c)); if(j >= 0) ruta.length = j + 1; else ruta.push(c); });
       chocado = false;
@@ -582,6 +595,17 @@ function rutaSoltada(a, t){
         trampaPendiente = {tokenId: a.id, tipo: corteTrampa.tipo, id: corteTrampa.id, el: corteTrampa.el, celda: a.ruta[a.ruta.length - 1], desde: a.ruta[a.ruta.length - 2]};
         if(corteTrampa.tipo === 'pisa') toast('⚠ Pisaste algo: el movimiento se corta acá');   // 'cerca': lo dice el cartelito, sin nombrar la trampa (P145)
       }
+    }
+  }
+  // No se termina encima de nadie (dueño, 2026-10-12): en combate, si la última casilla tiene otro token a la vista, el movimiento queda antes.
+  if(!a.libre && a.movio && t && modoMapa === 'combate' && a.ruta.length > 1){
+    const ocupada = c => [...tokens.entries()].find(([tid, x]) => tid !== a.id && x && x.col === c.col && x.fila === c.fila && !(x.oculto && !soyGM) && tokenVisiblePorNiebla(x) && !ocultoPorSigiloParaMi(x));
+    const quien = ocupada(a.ruta[a.ruta.length - 1]);
+    if(quien){
+      while(a.ruta.length > 1 && ocupada(a.ruta[a.ruta.length - 1])) a.ruta.pop();
+      const fc = a.ruta[a.ruta.length - 1], pc = hexCentro(fc.col, fc.fila);
+      a.x = pc.x; a.y = pc.y;
+      toast(`No podés terminar en la casilla de ${nombreDe(quien[1])}: quedás antes`);
     }
   }
   const pasos = a.ruta.length - 1;

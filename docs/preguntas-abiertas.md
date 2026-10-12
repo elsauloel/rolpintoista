@@ -127,7 +127,9 @@ Valores que el código usa pero están marcados `PLACEHOLDER` (bloque `IT2` de `
   adelante si conviene sumar pathfinding automático. *(2026-09-18)*
   **Decidido (dueño, 2026-10-12): que el mapa calcule el rodeo.** Al arrastrar un token, mientras el camino directo no choca, la ruta sigue al
   mouse como siempre; cuando choca con algo Sólido o una pared de línea, el mapa busca solo el camino más corto (A*) hasta la casilla del mouse,
-  rodeando (un paso que sale de terreno lento cuesta más). Si no hay paso, el token se choca como antes. Los tokens no tapan.
+  rodeando (un paso que sale de terreno lento cuesta más). Si no hay paso, el token se choca como antes. **En modo combate, los rivales también
+  cortan el paso** (el camino los rodea; los que no se ven, no) **y por un aliado se pasa, pero nadie termina el movimiento encima de otro**
+  (dueño, el mismo día; es lo de P40). En narrativo, los tokens no tapan.
   (`rutaRodeo` en `vtt-hexgrid/js/06-mouse.js`.)
 - 🔲 **P42. Grilla del mapa girada 30° (código).** La grilla pasó de hexágonos "de punta arriba" a "de lado arriba" para poder rotar tokens con el frente alineado a un lado (no a un vértice). Esto corre la posición en pantalla de todo lo que ya estaba puesto: el fondo (imagen del mapa) va a quedar desalineado y hay que volver a ajustarlo (arrastrar + ancho en casillas), y los tokens que ya estaban en el tablero conviene revisarlos y, si hace falta, reacomodarlos a mano. *(2026-09-17)*
 - ✅ **P44. "Esp" con dos significados en `docs/clases-borrador.md`.**

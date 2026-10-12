@@ -16,6 +16,9 @@ const Glosario = (() => {
 
   // Las mecánicas (titulo = lo que se lee; `re` si el texto que aparece no es el título tal cual).
   const MECANICAS = [
+    // Habilidades (2026-10-12, dueño: el glosario también en el selector de habilidades).
+    {titulo: 'Flash', re: 'Flash', texto: 'Flash: se puede usar en cualquier momento, también en el turno de otro (por ejemplo, en medio de un duelo). En turno ajeno cuesta el doble de SP. ⚙ Si el mapa sabe de quién es el turno, cobra solo lo que corresponde.'},
+    {titulo: 'Maldición', re: 'Maldición(?! (?:debilitante|extenuante|tormentosa))', texto: 'Maldición: tirás tu PdG.Esp contra la Res.Esp del objetivo; si ganás, le pasa el efecto. Empate: la regla general del juego.'},
     {titulo: 'Tipo', re: 'Tipo (?:4|6|8|10|12)', texto: 'Tipo N: el dado del arma (Tipo 6 = d6) y contra qué Resistencia a crítico pega. El primer ataque del turno cuesta la mitad del Tipo en No2 y los siguientes, el Tipo entero.'},
     {titulo: 'Amplificado', re: 'amplificados?', texto: 'Daño amplificado: dados de daño de más que no pesan.'},
     {titulo: '2 manos', re: '2 manos|a dos manos', texto: 'A dos manos: ocupa las dos manos (no se puede llevar un escudo ni otra arma).'},

@@ -584,6 +584,18 @@ prueba('Enfocado (Shooter, 2026-10-11): se apila +2 por uso, el SP sube 1, 1, 2,
   igual([costos, antes, carga.fijo, despues, nuevo.length, nuevo[0].stacks, nuevo[0].golpe.fijo, hab.nitrosCosto, /Sin auditar/.test(hab.detalle)],
     [[1, 2, 3], [1, 3, 6, 4], 6, 1, 1, 1, 2, 1, false]);
 });
+prueba('Maldición debilitante (Debuffer, 2026-10-11): PdG.Esp contra Res.Esp, Debilitado −1 por stack y otra vez −1 más con 2 turnos de nuevo', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-maldicion-debilitante');
+  const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});
+  const presets = estadosPresetFicha(), lista = [];
+  Combatiente.agregarEstado(lista, FichaAcciones.estadoDeSpec({nombre: 'Debilitado'}, presets));
+  lista[0].turnos = 1;   // le queda un turno
+  Combatiente.agregarEstado(lista, FichaAcciones.estadoDeSpec({nombre: 'Debilitado'}, presets));
+  const sc = {estados: [{...lista[0]}]};
+  igual([hab.costo, hab.nitrosCosto, ej.tira.stat, ej.contra.map(c => c.stat), lista.length, lista[0].stacks, lista[0].turnos,
+    CreepCalculo.modTotal(sc, 'pdg'), CreepCalculo.modTotal(sc, 'eva'), CreepCalculo.modTotal(sc, 'dmg'), /Sin auditar/.test(hab.detalle)],
+    ['5', 3, 'pdgmg', ['resmg'], 1, 2, 2, -2, -2, -2, false]);
+});
 prueba('Skills auditadas: el texto original del borrador se ve en «Detalles técnicos» (también en una copia vieja del personaje)', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-heal');
   const copiaVieja = {nombre: 'Heal', detalle: hab.detalle, habClaseId: 'support-heal'};

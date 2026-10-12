@@ -74,6 +74,11 @@ const ESTADOS_PRESET = [
   {nombre:'Silencio', polaridad:'debuff', turnos:1, silencio:true, esCC:true,
     detalle:'Silenciado: no puede usar habilidades que cuestan SP mientras dure. ⚙ Automatizado: al ejecutar una habilidad con costo en SP, avisa (y deja seguir si la mesa lo decide).'},
   // Expuesto (dueño, 2026-10-10: Degollar del Asalto): hasta que empieza su próximo turno (`alEmpezarTurno`; sin orden de turnos, hasta el ⟳).
+  // Debilitado (2026-10-11, dueño: Maldición debilitante del Debuffer): −1 a todas las tiradas que salen de un stat derivado (ataque, defensas,
+  // daño, resistencias, Percepción, Sigilo, Iniciativa) por 2 turnos. `apila` (Combatiente.agregarEstado): otra vez = un stack más (−1 más) y vuelve
+  // a durar 2 turnos. Los mods se multiplican por los stacks en personajes, creeps e invocaciones.
+  {nombre:'Debilitado', polaridad:'debuff', turnos:2, stacks:1, apila:true, mods:[{stat:'pdg', val:-1}, {stat:'pdgmg', val:-1}, {stat:'eva', val:-1}, {stat:'parry', val:-1}, {stat:'bloqueo', val:-1}, {stat:'dmg', val:-1}, {stat:'dmgesp', val:-1}, {stat:'resmg', val:-1}, {stat:'resm', val:-1}, {stat:'rescc', val:-1}, {stat:'percepcion', val:-1}, {stat:'sigilo', val:-1}, {stat:'ini', val:-1}],
+    detalle:'−1 a todas sus tiradas por cada stack (ataque, defensas, daño, resistencias, Percepción, Sigilo, Iniciativa) durante 2 turnos. Si se lo vuelven a poner, −1 más y vuelve a durar 2 turnos. ⚙ Automatizado. ✋ A mano: una tirada de un atributo pelado (Fuerza, Constitución…) no lo resta sola.'},
   {nombre:'Expuesto', polaridad:'debuff', turnos:1, expuesto:true, mitadEva:true, alEmpezarTurno:true,
     detalle:'Quedó al descubierto: hasta que empieza su próximo turno, su Evasión se parte a la mitad (al resultado, para abajo) y no puede reaccionar con nada que cueste No2: ni Parry (y por lo tanto ni Bloqueo ni contraataque), ni ataque de oportunidad, ni dodge roll. ⚙ Automatizado: la Evasión, las defensas del duelo, la oportunidad y el dodge roll.'},
   {nombre:'Sentado', polaridad:'debuff', permanente:true, turnos:0, sentado:true, esCC:true,

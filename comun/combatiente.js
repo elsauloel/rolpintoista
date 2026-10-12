@@ -907,6 +907,11 @@ const Combatiente = (() => {
       estados.push(nuevo);
       return {ok: true, que: 'nuevo', sumado: true, estado: nuevo};
     }
+    // Un estado que se apila (Debilitado, 2026-10-11): otra vez = un stack más y la duración vuelve a la del nuevo.
+    if(nuevo.apila){
+      const ya = estados.find(e => e && e.nombre === nuevo.nombre && e.apila && e.activo !== false);
+      if(ya){ ya.stacks = Math.max(1, n(ya.stacks) || 1) + 1; ya.turnos = n(nuevo.turnos); return {ok: true, que: 'acumulado', estado: ya}; }
+    }
     // Una carga que se apila (Enfocado, 2026-10-11): si todavía no se gastó, suma un stack y su golpe crece (`golpePorStack` × stacks).
     if(nuevo.golpePorStack){
       const ya = estados.find(e => e && e.nombre === nuevo.nombre && e.golpePorStack && e.activo !== false && !e.agotada && n(e.cargas) > 0);

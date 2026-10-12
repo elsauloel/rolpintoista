@@ -19,6 +19,9 @@
   desde «+ Habilidad → De clase» (y ver ahí la línea «📜 Adaptada del borrador de clases…»); usarla tres veces seguidas: el botón tiene que decir 1,
   2 y 3 SP y cobrar 1 No2 cada vez, con «Enfocado ×3»; el próximo ataque con arma (probar uno cuerpo a cuerpo y otro a distancia) suma +6 de daño
   y el estado se va; el ataque siguiente ya no suma. En «Ver» de la skill, «Detalles técnicos» muestra el texto original.
+- [ ] **🌑 Maldición debilitante (Debuffer)** (2026-10-11, cargada y con prueba automática): juan se la tira al Coloso (PdG.Esp contra Res.Esp);
+  si gana, «Debilitado» 2 turnos y en sus Acciones el PdG, la Evasión, el Parry y el daño bajan 1 (botones en rojo); otra vez = ×2 (−2) y vuelve a 2
+  turnos; cobra 5 SP y 3 No2. Probar también contra un personaje (Clementino) para ver que le llega a su ficha.
 - [ ] **🗡 Dagas Tipo 4 Comunes ajustadas** (2026-10-11, `revision-cuerpo-a-cuerpo-t4.md`): ver en la tienda o el inventario que los textos y precios
   nuevos se vean bien (por ejemplo el Estileto 1d4+1, la Pica Hielos 2d4 con PdG −1) y un golpe con una de ellas desde la Botonera.
 

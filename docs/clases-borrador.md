@@ -329,8 +329,11 @@ ya tenían este mismo formato (número azul, Maldición Esp / Res.M):
    objetivo al azar; 4) actúa normalmente. Los objetivos alternativos
    deben estar en un radio de 3 No2; si la acción requiere moverse, deberá
    hacerlo. Duración: 2 turnos.
-3. **Maldición debilitante** [5] — Maldición (Esp / Res.M). -1 a todas las
-   tiradas. Duración: 2 turnos. Acumulable. Lento.
+3. ✅ **Maldición debilitante** — **SP:** 5. **No2:** 3 (el No2 alto es lo «Lento»). Maldición: tirás **PdG.Esp contra el Res.Esp** de un
+   enemigo dentro de tu Rango; si ganás, queda **Debilitado** (estado nuevo) 2 turnos: **−1 a todas sus tiradas**, también defensas y daño
+   (ataque, Evasión, Parry, Bloqueo, daño, resistencias, Percepción, Sigilo, Iniciativa). **Acumulable:** otra vez = −1 más y vuelve a durar 2
+   turnos. ⚙ Automatizado; ✋ a mano, la tirada de un atributo pelado (Fuerza, Constitución…). *(Auditada 2026-10-11 con el dueño; original:
+   «Maldición debilitante [5] — Maldición (Esp / Res.M). -1 a todas las tiradas. Duración: 2 turnos. Acumulable. Lento.»)*
 4. **Maldición extenuante** [3] — Maldición (Esp / Res.M). Incrementa en 1
    los Nitros de todas las acciones. Debe pagar 1 Nitro para moverse cada 2
    casillas. Duración: 1 turno. Acumulable. Lento.

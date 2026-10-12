@@ -468,7 +468,7 @@ function dibujar(){
       // 2026-10-07), esos; si no, los Mantenimientos.
       const porTurnos = Math.round(num(el.turnos)) > 0 && colocadorEnOrden(colocadorDe(el));
       const quedan = porTurnos ? Math.round(num(el.turnos)) : Math.max(0, el.venceMant - mantenimientoNumero);
-      const cm = celdas[Math.floor(celdas.length / 2)], pm = hexCentro(cm.col, cm.fila);
+      const cm = celdas[Math.floor(celdas.length / 2)], pm0 = hexCentro(cm.col, cm.fila), pm = el.acelerador ? {x: pm0.x, y: pm0.y + HEX * 0.9} : pm0;   // el Acelerador: debajo del círculo, para no tapar las flechitas
       ctx.save();
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.font = `700 ${12 / z}px "Space Mono", monospace`;

@@ -752,6 +752,12 @@ bando; `neutral` colisiona con cualquiera, incluso otro neutral) más la
 regla aparte de que, en modo combate, ningún personaje comparte
 hexágono con otro sin importar bando. Todavía no está construido.
 
+**Hecho en parte (2026-10-12, dueño: «los tokens de otros personajes sí obstaculizan el paso»; «solo los rivales», «solo en modo combate»)**:
+sin campo `bando` todavía (rival = `dueloEsRival`: personajes contra creeps). En combate, `celdasQueTapan(id)` (js/06) da las casillas de los
+rivales que esta pantalla ve (los ocultos o en sigilo que no se ven, no); `extenderRuta` se choca con ellas y `rutaRodeo(desde, hasta, tapan)`
+las rodea como a un Sólido. Por un aliado se pasa, pero `rutaSoltada` no deja terminar encima de ningún token a la vista: recorta el final
+(«No podés terminar en la casilla de X: quedás antes»). Con 🦶 Mover libre y en narrativo, nada de esto. Probado en el mapa.
+
 ## Dependencias con otras carpetas
 
 - `../firebase/firestore.rules` — reglas de `tokens` y `tiradas`.

@@ -355,6 +355,14 @@ const FichaEquipo = (() => {
     const df = defValor(it);
     return [d ? `Daño ${d}` : '', df ? `Def ${df > 0 ? '+' : ''}${fmt(df)}` : '', `Peso ${fmt(num(it.peso))}`].filter(Boolean).join(' · ');
   }
+  // 🔧 La durabilidad y la armadura rota de la pieza (2026-10-12: la ventana del mapa no la mostraba; la ficha tiene además sus − y +).
+  function durHtml(it){
+    if(!FichaCalculo.durableItem(it)) return '';
+    const max = FichaCalculo.durMax(it), act = FichaCalculo.durActual(it), ar = FichaCalculo.esArmaduraItem(it) || num(it.armRota) ? FichaCalculo.armRotaDe(it) : 0;
+    const color = act <= 0 ? '#e06060' : act <= 1 ? '#e0a040' : '';
+    const est = act <= 0 ? ' · ROTO (sin efectos)' : act <= 1 ? ' · a punto de romperse' : '';
+    return `<div class="hint equipo-dur"${color ? ` style="color:${color};font-weight:700"` : ''} title="Durabilidad: ${esc(Combatiente.durTexto(it) || String(max))}. Cada punto de armadura rota le baja 1 a la Defensa de esta pieza. Se repara fuera de combate (herrero de una tienda).">🔧 ${fmt(act)}/${fmt(max)}${ar ? ` · Armadura rota ×${fmt(ar)} (−${fmt(ar)} Defensa)` : ''}${est}</div>`;
+  }
   function filaHtml(it, boton){
     const tierColor = veCalidad() ? (TIER_COLOR[it.tier] || '') : '';   // el color del nombre delataba la calidad
     return `<div class="equipo-fila">
@@ -363,6 +371,7 @@ const FichaEquipo = (() => {
       <div class="cat-nombre"${tierColor ? ` style="color:${tierColor}"` : ''}>${esc(it.nombre)}</div>
       <div class="cat-meta">${esc(statTxt(it))}</div>
       <div class="imeta">${modTags(it.mods)}</div>
+      ${durHtml(it)}
     </div>
     <button type="button" class="mini" data-view="inventario:${it.id}">Ver</button><button type="button" class="mini" data-edit="inventario:${it.id}">Editar</button>
     ${boton}

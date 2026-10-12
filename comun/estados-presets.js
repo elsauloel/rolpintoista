@@ -35,7 +35,7 @@ const ESTADOS_PRESET = [
   {nombre:'Hypeado', polaridad:'buff', turnos:3, hypeado:true,
     detalle:'Sus No2 máximos suben un tercio del natural (redondeado hacia arriba). Ej.: con 9 de máximo, gana 3 y llega a 12; con 7, gana 3 y llega a 10.'},
   {nombre:'Armadura rota', polaridad:'debuff', stacks:1, turnos:0, permanente:true, armaduraRota:true,
-    detalle:'−1 Defensa por cada acumulación (×N). Permanente y acumulable: cada rotura suma una; solo se cura con un ítem o habilidad especial (Oleo reparador la quita entera). Los ± del chip ajustan cuántas hay.'},
+    detalle:'−1 Defensa por cada acumulación (×N). Permanente y acumulable: cada rotura suma una. En un personaje no queda como estado: cae en una pieza de armadura equipada al azar (esa pieza pierde 1 de Defensa y 1 de durabilidad) y se arregla reparando la pieza. Un golpe crítico no rompe armadura. Los ± del chip ajustan cuántas hay.'},
   {nombre:'Veneno severo', polaridad:'debuff', stacks:1, turnos:0, hpTurno:-1, stacksTurno:1, permanente:true, esVeneno:true,
     detalle:'Hace daño apenas se lo ponen y al empezar cada uno de sus turnos. Al terminar cada turno aumenta 1 el daño para el siguiente.'},
   // Sangrado (2026-09-22): N de daño = N stacks de 1 HP, así cada reaplicación suma +1 al daño por turno.

@@ -426,7 +426,7 @@ estado: borrador
 
 +++
 
-**Armadura rota** castiga tu armadura: **−1 Defensa por cada acumulación** (×N). Es **permanente y acumulable**: cada vez que te rompen la armadura ([[Romper armadura]]) suma una. Solo se cura con un ítem (el *Óleo reparador* la quita entera) o una habilidad especial.
+**Armadura rota** castiga la armadura: **−1 Defensa por cada acumulación** (×N). Es **permanente y acumulable**: cada vez que le rompen la armadura ([[Romper armadura]]) suma una. **En un personaje no queda como estado**: la rotura cae en una pieza de armadura equipada al azar y se arregla reparando esa pieza. En creeps e invocaciones es este estado (los − del chip lo bajan).
 
 
 

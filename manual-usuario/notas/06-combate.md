@@ -304,11 +304,15 @@ estado: borrador
 +++
 **Romper armadura** es un [[Efectos al golpear|efecto de arma]] (típico de hachas y armas pesadas) con una probabilidad de activarse por golpe (por ejemplo, 50%).
 
-Cada vez que se activa, **baja en 1 la [[Defensa]] que da el equipo** del objetivo. Lo modela el estado [[Armadura rota]]: se acumula (×N) y **es permanente hasta que se repara**.
+Cada vez que se activa, **baja en 1 la [[Defensa]]** del objetivo y es **permanente hasta que se repara**:
+
+- **A un personaje** se le daña **una pieza de armadura equipada, elegida al azar**: esa pieza pierde 1 de Defensa y 1 de durabilidad (ver [[Durabilidad]]). El daño queda en la pieza aunque se la saque.
+- **A un creep o una invocación** le queda el estado [[Armadura rota]] (×N).
+- **Un golpe crítico no rompe armadura**, ni el de un arma con Romper armadura: el crítico justamente evita la armadura.
 
 ## Cómo se repara
-- Con una **habilidad**, o
-- Con el consumible **Óleo reparador** (Común, 25 DDE), que quita la armadura rota entera.
+- **Reparando la pieza** (en un personaje): con el herrero de una tienda o con el talento de reparar. Cada punto reparado devuelve 1 de Defensa.
+- En un creep o una invocación, con los − del estado.
 
 > [!question] Detalles abiertos
 > - ¿La reducción tiene piso (puede llegar a Defensa 0 o negativa)?

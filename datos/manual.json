@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-10-08T00:11:47Z",
+ "actualizado": "2026-10-12T22:25:00Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -866,7 +866,7 @@
    ],
    "estado": "borrador",
    "capitulo": "combate",
-   "cuerpo": "**Romper armadura** es un [[Efectos al golpear|efecto de arma]] (típico de hachas y armas pesadas) con una probabilidad de activarse por golpe (por ejemplo, 50%).\n\nCada vez que se activa, **baja en 1 la [[Defensa]] que da el equipo** del objetivo. Lo modela el estado [[Armadura rota]]: se acumula (×N) y **es permanente hasta que se repara**.\n\n## Cómo se repara\n- Con una **habilidad**, o\n- Con el consumible **Óleo reparador** (Común, 25 DDE), que quita la armadura rota entera.\n\n> [!question] Detalles abiertos\n> - ¿La reducción tiene piso (puede llegar a Defensa 0 o negativa)?\n> - ¿Qué habilidades de clase reparan armadura?"
+   "cuerpo": "**Romper armadura** es un [[Efectos al golpear|efecto de arma]] (típico de hachas y armas pesadas) con una probabilidad de activarse por golpe (por ejemplo, 50%).\n\nCada vez que se activa, **baja en 1 la [[Defensa]]** del objetivo y es **permanente hasta que se repara**:\n\n- **A un personaje** se le daña **una pieza de armadura equipada, elegida al azar**: esa pieza pierde 1 de Defensa y 1 de durabilidad (ver [[Durabilidad]]). El daño queda en la pieza aunque se la saque.\n- **A un creep o una invocación** le queda el estado [[Armadura rota]] (×N).\n- **Un golpe crítico no rompe armadura**, ni el de un arma con Romper armadura: el crítico justamente evita la armadura.\n\n## Cómo se repara\n- **Reparando la pieza** (en un personaje): con el herrero de una tienda o con el talento de reparar. Cada punto reparado devuelve 1 de Defensa.\n- En un creep o una invocación, con los − del estado.\n\n> [!question] Detalles abiertos\n> - ¿La reducción tiene piso (puede llegar a Defensa 0 o negativa)?\n> - ¿Qué habilidades de clase reparan armadura?"
   },
   {
    "id": "inconsciente-y-muerte",
@@ -1251,7 +1251,7 @@
    ],
    "estado": "borrador",
    "capitulo": "estados",
-   "cuerpo": "**Armadura rota** castiga tu armadura: **−1 Defensa por cada acumulación** (×N). Es **permanente y acumulable**: cada vez que te rompen la armadura ([[Romper armadura]]) suma una. Solo se cura con un ítem (el *Óleo reparador* la quita entera) o una habilidad especial.\n\n\n\n> [!info] Armadura arruinada se sacó (2026-09-21)\n\n> Existía un segundo estado, Armadura arruinada, que anulaba al 100% lo que daba la armadura. Se eliminó del repaso de debuffs; lo que la aplicaba (algunas hachas, un par de armas naturales y una habilidad de creep) ahora suma stacks de Armadura rota en su lugar."
+   "cuerpo": "**Armadura rota** castiga la armadura: **−1 Defensa por cada acumulación** (×N). Es **permanente y acumulable**: cada vez que le rompen la armadura ([[Romper armadura]]) suma una. **En un personaje no queda como estado**: la rotura cae en una pieza de armadura equipada al azar y se arregla reparando esa pieza. En creeps e invocaciones es este estado (los − del chip lo bajan).\n\n\n\n> [!info] Armadura arruinada se sacó (2026-09-21)\n\n> Existía un segundo estado, Armadura arruinada, que anulaba al 100% lo que daba la armadura. Se eliminó del repaso de debuffs; lo que la aplicaba (algunas hachas, un par de armas naturales y una habilidad de creep) ahora suma stacks de Armadura rota en su lugar."
   },
   {
    "id": "escudo-magico",

@@ -23,7 +23,7 @@
 >   dueño con «Contra lo sobrenatural» de los arcos). A ordenar: qué es cada tipo y dónde termina uno y empieza otro (¿alienígena vs. interdimensional?,
 >   ¿adefesio vs. demonio?), revisar el tipo de los creeps de fábrica (`comun/creeps-base.js`) y de la biblioteca, y lo que depende del tipo: Matabestias,
 >   Contra humanos, Contra lo sobrenatural, el arma natural, el oro, las pasivas por familia y, a futuro, los drops por arquetipo (el punto de abajo).
-> - [ ] **⚔ Rework de las espadas (Tipo 6) — a futuro, cuando el dueño tenga tiempo (2026-10-11):** «vi algunos bonos en las espadas que quedaron un
+> - [ ] **⚔ Rework de espadas (Tipo 6), hachas (Tipo 8) y contundentes (Tipo 10) — en pausa (dueño, 2026-10-11: «vamos a tener que dejar en pausa el testeo de espadas, hachas y contundentes»). Hachas medidas: `docs/revision-cuerpo-a-cuerpo-t8.md`. Espadas:** «vi algunos bonos en las espadas que quedaron un
 >   poco fuera de lugar con los últimos reworks». El mismo proceso que arcos y ballestas: ver lo que hay → lluvia de ideas de mecánicas → definir las
 >   mecánicas propias → podar → volver a crear las espadas → ronda de testeo. Lo ya medido (sin aplicar): `docs/revision-cuerpo-a-cuerpo-t6.md`.
 > - [ ] **🎁 Drops de consumibles por arquetipo de creep (2026-10-11, dueño: «proyecto a futuro, lo dejo anotado para no olvidarme; lo veremos con

@@ -1,13 +1,14 @@
 /* =========================================================
    🧚 RE-ROLL (Support, 2026-10-12, dueño). Vos o un aliado a la vista (dentro de tu Rango) repite su última tirada de un duelo y se queda con
-   la más alta; el duelo se vuelve a resolver. Sin tirada de por medio (no hay nada que resistir). 2 SP, Flash (4 en turno ajeno), + 2 No2.
+   la más alta; el duelo se vuelve a resolver. Sin tirada de por medio (no hay nada que resistir). 2 SP, Flash (4 en turno ajeno), sin No2
+   (dueño: «le puse dos nitros porque era lento, pero como tiene flash, cuesta cero»).
    Una vez por tirada (la marca 🍀). Era Afortunado, una skill aparte que salió de Enyetar al revés; el dueño la juntó con Re-roll: «que no
    existan las dos porque son muy parecidas… que exista Re-roll y que funcione como Afortunado, con el botón de la hadita, 2 en lugar de 5».
    En combate, quien la tiene ve el botón fijo 🧚 (Flotantes.reroll); el Ejecutar de su Botonera abre lo mismo (js/11).
    Usa Duelo.enyetarTirada(id, lado, 'mejor') y publicarRepeticion (js/38: los dos juegos de dados ruedan y brilla el que queda).
    ========================================================= */
-const REROLL = {sp: 2, spAjeno: 4, no2: 2};
-const rerollCosto = `${REROLL.sp} SP (turno ajeno ${REROLL.spAjeno}) + ${REROLL.no2} No2`;
+const REROLL = {sp: 2, spAjeno: 4, no2: 0};
+const rerollCosto = `${REROLL.sp} SP (turno ajeno ${REROLL.spAjeno})${REROLL.no2 ? ` + ${REROLL.no2} No2` : ''}`;
 // ¿Tiene Re-roll? (un personaje que todavía tenga la copia de Afortunado cuenta igual: `suerte`).
 function rerollToken(){
   if(modoMapa !== 'combate' || !fbUsuario) return null;
@@ -63,15 +64,17 @@ async function rerollUsar(yo, o){
   if(!pago) return;
   // Los No2: con Extenuado, más caros; si no alcanzan, se pregunta y se hace igual (gasta los que tenga, con su línea roja).
   const r0 = (fichasPub.get(yo.fichaId) || {}).resumen || {};
-  const no2 = REROLL.no2 + num(r0.extenuado);
-  if(num(r0.nitros) < no2 && !(await Confirmar.preguntar(`Re-roll cuesta ${fmt(no2)} No2 y ${nomYo} tiene ${fmt(Math.max(0, num(r0.nitros)))}. ¿Hacerlo igual?`, {titulo: 'Sin No2', si: 'Hacerlo igual'}))) return;
+  const no2 = REROLL.no2 ? REROLL.no2 + num(r0.extenuado) : 0;
+  if(no2 && num(r0.nitros) < no2 && !(await Confirmar.preguntar(`Re-roll cuesta ${fmt(no2)} No2 y ${nomYo} tiene ${fmt(Math.max(0, num(r0.nitros)))}. ¿Hacerlo igual?`, {titulo: 'Sin No2', si: 'Hacerlo igual'}))) return;
   let falta = null;
   const ok = await editarPersonajeMapa(yo.fichaId, S => {
     const disp = Math.max(0, FichaBotonera.spMaximo(S, FichaCalculo.calcular(S)) - num(S.spGastado));
     if(disp < pago.sp){ falta = disp; return false; }
     S.spGastado = num(S.spGastado) + pago.sp;
-    S.nitros = num(S.nitros) - (no2 > num(S.nitros) ? FichaAcciones.gastoNitrosForzado(S, no2, 'usó Re-roll') : no2);
-    FichaAcciones.tormentaPj(S, no2, 'usar Re-roll');   // ⛈ Atormentado
+    if(no2){
+      S.nitros = num(S.nitros) - (no2 > num(S.nitros) ? FichaAcciones.gastoNitrosForzado(S, no2, 'usó Re-roll') : no2);
+      FichaAcciones.tormentaPj(S, no2, 'usar Re-roll');   // ⛈ Atormentado
+    }
     return true;
   });
   if(!ok){ toast(falta !== null ? `No te alcanza el SP: Re-roll cuesta ${fmt(pago.sp)} y tenés ${fmt(falta)}` : 'No se pudo cobrar el Re-roll'); return; }
@@ -83,7 +86,7 @@ async function rerollUsar(yo, o){
     texto = `${nomYo} le dio un Re-roll a ${o.nombre}: repite su ${r.etq}, ${fmt(r.antes)} y ${fmt(r.nueva)} → queda ${fmt(r.ahora)}${r.contra !== null ? ` contra ${fmt(r.contra)}` : ''}. El duelo contra ${o.contra} se volvió a resolver.`;
   }
   try{
-    await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: nomYo, origen: `🧚 ${nomYo} usó Re-roll (−${fmt(pago.sp)} SP · −${fmt(no2)} No2)`,
+    await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: nomYo, origen: `🧚 ${nomYo} usó Re-roll (−${fmt(pago.sp)} SP${no2 ? ` · −${fmt(no2)} No2` : ''})`,
       formula: `sobre ${o.nombre}`, rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
   }catch(err){ console.error('Re-roll: no se pudo avisar en la Mesa', err); }
   momentoAbrir({tipo: 'reroll', icono: '🧚', titulo: `${nomYo} usó Re-roll`, resultado: texto, estado: 'listo',

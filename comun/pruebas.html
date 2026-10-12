@@ -625,7 +625,7 @@ prueba('Maldición extenuante (Debuffer, 2026-10-12): Extenuado +1 No2 por stack
     CreepCalculo.costoAtaque(sc), Combatiente.extenuado(S.efectos), FichaBotonera.costoNitrosHab(S, {nitrosCosto: 1}), /Sin auditar/.test(hab.detalle), /Maldición extenuante \[3\]/.test(hab.original)],
     ['3', 2, 'pdgmg', ['resmg'], true, [4, 1, 1], [5, 2, 2, 5, 0], 1, 2, 1, 6, 2, 3, false, true]);
 });
-prueba('Re-roll (Support, 2026-10-12, absorbió a Afortunado): 2 SP (4 en turno ajeno) + 2 No2, sin tiradas, queda la mejor (🍀, aparte de la 🐈 de Enyetar)', () => {
+prueba('Re-roll (Support, 2026-10-12, absorbió a Afortunado): 2 SP (4 en turno ajeno), sin No2, sin tiradas, queda la mejor (🍀, aparte de la 🐈 de Enyetar)', () => {
   const sup = CLASES_SKILLS.find(k => k.id === 'support').habilidades;
   const hab = sup.find(h => h.id === 'support-reroll');
   const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
@@ -638,7 +638,7 @@ prueba('Re-roll (Support, 2026-10-12, absorbió a Afortunado): 2 SP (4 en turno 
   const a = Duelo.tiradaSumable(d, 'atacante'), b = Duelo.tiradaSumable(d, 'defensor');
   igual([hab.costo, hab.nitrosCosto, hab.turnoAjenoSp, hab.reroll, !!hab.duelo, /Sin auditar/.test(hab.detalle), Plantillas.limpiar('skills', hab).reroll, sin, con, vieja,
     sup.some(h => h.id === 'support-afortunado'), a.enyetada, a.afortunada, b.enyetada, b.afortunada],
-    ['2', 2, '4', true, false, false, true, false, true, true, false, true, false, false, true]);
+    ['2', 0, '4', true, false, false, true, false, true, true, false, true, false, false, true]);
 });
 prueba('Maldición tormentosa (Debuffer, 2026-10-12): Atormentado saca vida al pagar No2 (costo − 1, +1 por stack) y cada 2 casillas al moverse', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-maldicion-tormentosa');

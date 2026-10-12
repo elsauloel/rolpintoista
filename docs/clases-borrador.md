@@ -329,7 +329,7 @@ verifica con 1d20: hasta DES×2 → 7+; hasta DES×3 → 17+; más de DES×3 →
    turnos: **+3 Defensa, +3 Armadura mágica y +1 a la resistencia a crítico** contra los cinco Tipos. **No se apila:** otra vez renueva los 2 turnos.
    ⚙ Automatizado. *(Auditada 2026-10-12 con el dueño; original: «Endurecimiento [5] — Otorga una armadura temporal: Defensa 3, Res. Mágica 3,
    reduce críticos de todo tipo. Duración: 2 turnos.»)*
-7. ✅ **Re-roll** — **SP:** 2 (⚡ Flash: 4 en turno ajeno). **No2:** 2 (lo «Lento»). Vos o un aliado a la vista (dentro de tu Rango) **repite su
+7. ✅ **Re-roll** — **SP:** 2 (⚡ Flash: 4 en turno ajeno). **No2:** 0 (dueño: el «Lento» no cuenta, porque es Flash). Vos o un aliado a la vista (dentro de tu Rango) **repite su
    última tirada de un duelo y se queda con la más alta**; el duelo se vuelve a resolver. Sin tirada de por medio. **Una vez por tirada.** Botón
    fijo **🧚** (la hadita) en combate. **Absorbió a Afortunado** (2026-10-12, dueño: «que no existan las dos porque son muy parecidas… que exista
    Re-roll y que funcione como Afortunado, con el botón de la hadita, 2 en lugar de 5»). *(Auditada 2026-10-12 con el dueño; original:

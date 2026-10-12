@@ -24,7 +24,7 @@ const ModTirada = (() => {
     (estados || []).filter(e => e && e.activo !== false).forEach(e => {
       const pol = e.polaridad === 'buff' ? 'buff' : e.polaridad === 'debuff' ? 'debuff' : 'otro';
       (e.mods || []).filter(m => m && m.stat === statId && num(m.val)).forEach(m => {
-        const v = num(m.val);
+        const v = num(m.val) * Math.max(1, num(e.stacks) || 1);   // los mods se multiplican por los stacks (Debilitado ×2 = −2, 2026-10-11)
         out.push({txt: `${e.nombre} ${v > 0 ? '+' : '−'}${Math.abs(v)}`, p: pol === 'otro' ? (v > 0 ? 'buff' : 'debuff') : pol});
       });
       if(parten.has(e)) out.push({txt: `${e.nombre} ÷${2 ** parten.get(e)}`, p: 'debuff'});

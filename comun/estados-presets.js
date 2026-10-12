@@ -85,6 +85,10 @@ const ESTADOS_PRESET = [
   // cada 2 casillas por stack. 1 turno; se apila (`apila`) y vuelve a durar 1 turno. Lo suman Combatiente.conExtenuado y el mapa (costoPasos).
   // Acelerado (2026-10-12, dueño: Shooter): −1 No2 por stack al próximo disparo de este turno (solo armas a distancia); se apila; se va al
   // terminar el turno (`alTerminarTurno`) o lo gasta ese disparo (Combatiente.acelerado / gastarAcelerado, en FichaCombate).
+  // Endurecido (2026-10-12, dueño: Endurecimiento del Support): una armadura temporal — +3 Defensa, +3 Armadura mágica y +1 a la resistencia a
+  // crítico contra los cinco Tipos. 2 turnos; otra vez renueva (no se apila).
+  {nombre:'Endurecido', polaridad:'buff', turnos:2, mods:[{stat:'def', val:3}, {stat:'armadmg', val:3}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}, {stat:'tipo5', val:1}],
+    detalle:'Una armadura temporal: +3 de Defensa, +3 de Armadura mágica y +1 a la resistencia a crítico contra todos los Tipos (4 a 12). Dura 2 turnos; otra vez vuelve a durar 2 turnos (no se suma). ⚙ Automatizado.'},
   {nombre:'Acelerado', polaridad:'buff', turnos:1, stacks:1, apila:true, acelera:true, alTerminarTurno:true,
     detalle:'Su próximo ataque con un arma a distancia de este turno cuesta 1 No2 menos por stack (mínimo 0). Lo gasta ese disparo; si termina el turno sin disparar, se pierde. ⚙ Automatizado.'},
   {nombre:'Extenuado', polaridad:'debuff', turnos:1, stacks:1, apila:true, extenuante:true,

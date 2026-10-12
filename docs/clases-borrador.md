@@ -324,8 +324,10 @@ verifica con 1d20: hasta DES×2 → 7+; hasta DES×3 → 17+; más de DES×3 →
    ellos no les da nada. También es un consumible del Bazar arcano: la **Runa aceleradora**. ⚙ Automatizado. *(Auditada 2026-10-12 con el dueño;
    original: «Acelerador [1] — Marca una casilla con flechitas para adelante (>>). Cada aliado que la pisa obtiene +2 No2 (máximo una vez por
    turno). Duración: 10 turnos.»)*
-6. **Endurecimiento** [5] — Otorga una armadura temporal: Defensa 3, Res.
-   Mágica 3, reduce críticos de todo tipo. Duración: 2 turnos.
+6. ✅ **Endurecimiento** — **SP:** 5. **No2:** 1. **A vos o a un aliado a la vista** (dentro de tu Rango): queda **Endurecido** (estado nuevo) 2
+   turnos: **+3 Defensa, +3 Armadura mágica y +1 a la resistencia a crítico** contra los cinco Tipos. **No se apila:** otra vez renueva los 2 turnos.
+   ⚙ Automatizado. *(Auditada 2026-10-12 con el dueño; original: «Endurecimiento [5] — Otorga una armadura temporal: Defensa 3, Res. Mágica 3,
+   reduce críticos de todo tipo. Duración: 2 turnos.»)*
 7. **Re-roll** [2] — Flash. Permite rerolear tiradas aliadas. Lento.
 8. **Smite** [1] — NO2: (1). Rayo de daño holy inesquivable que causa 1d4
    de daño.

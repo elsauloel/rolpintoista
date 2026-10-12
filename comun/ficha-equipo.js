@@ -358,10 +358,13 @@ const FichaEquipo = (() => {
   // 🔧 La durabilidad y la armadura rota de la pieza (2026-10-12: la ventana del mapa no la mostraba; la ficha tiene además sus − y +).
   function durHtml(it){
     if(!FichaCalculo.durableItem(it)) return '';
-    const max = FichaCalculo.durMax(it), act = FichaCalculo.durActual(it), ar = FichaCalculo.esArmaduraItem(it) || num(it.armRota) ? FichaCalculo.armRotaDe(it) : 0;
+    const max = FichaCalculo.durMax(it), act = FichaCalculo.durActual(it), ar = FichaCalculo.armRotaDe(it), armadura = FichaCalculo.esArmaduraItem(it);
+    // Solo las piezas de armadura pierden Defensa por la rotura (sin pasar de la que dan); un escudo abollado pierde solo durabilidad.
+    const defPieza = (it.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + num(m.val), 0), menos = armadura ? Math.min(ar, Math.max(0, defPieza)) : 0;
+    const rota = !ar ? '' : armadura ? ` · Armadura rota ×${fmt(ar)}${menos ? ` (−${fmt(menos)} Defensa)` : ''}` : ` · abollado ×${fmt(ar)}`;
     const color = act <= 0 ? '#e06060' : act <= 1 ? '#e0a040' : '';
     const est = act <= 0 ? ' · ROTO (sin efectos)' : act <= 1 ? ' · a punto de romperse' : '';
-    return `<div class="hint equipo-dur"${color ? ` style="color:${color};font-weight:700"` : ''} title="Durabilidad: ${esc(Combatiente.durTexto(it) || String(max))}. Cada punto de armadura rota le baja 1 a la Defensa de esta pieza. Se repara fuera de combate (herrero de una tienda).">🔧 ${fmt(act)}/${fmt(max)}${ar ? ` · Armadura rota ×${fmt(ar)} (−${fmt(ar)} Defensa)` : ''}${est}</div>`;
+    return `<div class="hint equipo-dur"${color ? ` style="color:${color};font-weight:700"` : ''} title="Durabilidad: ${esc(Combatiente.durTexto(it) || String(max))}.${armadura ? ' Cada punto de armadura rota le baja 1 a la Defensa de esta pieza.' : ''} Se repara fuera de combate (herrero de una tienda).">🔧 ${fmt(act)}/${fmt(max)}${rota}${est}</div>`;
   }
   function filaHtml(it, boton){
     const tierColor = veCalidad() ? (TIER_COLOR[it.tier] || '') : '';   // el color del nombre delataba la calidad

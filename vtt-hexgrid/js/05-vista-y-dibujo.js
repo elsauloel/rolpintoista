@@ -168,6 +168,33 @@ function brilloMarca(x, y, rad, z){
   ctx.shadowColor = 'rgba(160,225,255,.95)'; ctx.shadowBlur = (10 + 16 * p) / z; ctx.stroke();
   ctx.restore();
 }
+// 🦋 Polilla revoloteando (2026-10-12, dueño: «una partícula azul que le revolotea alrededor del token, algo pequeñito, sutil»): mientras
+// dura el estado, una polillita celeste da vueltas alrededor del token, sube y baja, aletea y deja una estela de tres puntitos.
+function polillaRevolotea(est){
+  return !!(est && est.estados.some(e => e && e.activo !== false && /^Polilla revoloteando/i.test(String(e.nombre || ''))));
+}
+const semillaDe = id => [...String(id)].reduce((a, c) => a + c.charCodeAt(0), 0) % 13;
+function dibujarPolillita(x, y, rad, z, semilla){
+  const s = performance.now() / 1000 + semilla;
+  const pos = k => {
+    const u = s - k, a = u * 1.7, r = rad * (1.0 + 0.16 * Math.sin(u * 2.3));
+    return [x + Math.cos(a) * r, y + Math.sin(a) * r * 0.85 + Math.sin(u * 5.1) * rad * 0.06];
+  };
+  ctx.save();
+  for(let i = 3; i >= 1; i--){   // la estela
+    const [px, py] = pos(i * 0.09);
+    ctx.beginPath(); ctx.arc(px, py, rad * 0.02 * (4 - i) / 3 + 0.5 / z, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(150,210,255,${0.12 * (4 - i)})`; ctx.fill();
+  }
+  const [px, py] = pos(0), [qx, qy] = pos(0.02), aleteo = 0.25 + 0.75 * Math.abs(Math.sin(s * 16)), ala = rad * 0.11;
+  ctx.translate(px, py); ctx.rotate(Math.atan2(py - qy, px - qx));
+  ctx.shadowColor = 'rgba(120,200,255,.95)'; ctx.shadowBlur = 10 / z;
+  ctx.fillStyle = 'rgba(170,220,255,.9)';
+  [-1, 1].forEach(lado => { ctx.beginPath(); ctx.ellipse(0, lado * ala * 0.55 * aleteo, ala * 0.55, ala * 0.5 * aleteo + 0.3 / z, 0, 0, Math.PI * 2); ctx.fill(); });
+  ctx.fillStyle = 'rgba(230,245,255,.95)';
+  ctx.beginPath(); ctx.ellipse(0, 0, ala * 0.45, ala * 0.14, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
 // 🌫 La niebla de una varita (2026-10-05): un velo con volutas que se mueven, encima de los tokens; los Marcados de adentro brillan por encima.
 // Devuelve true si hay que seguir animando.
 function dibujarNieblaVarita(z){
@@ -823,6 +850,7 @@ function dibujar(){
       const [fx1, fy1] = puntos[frenteI], [fx2, fy2] = puntos[(frenteI + 1) % 6];
       trazarFrente(fx1, fy1, fx2, fy2, rad, z, x, y);
     }
+    if(polillaRevolotea(est)){ dibujarPolillita(x, y, rad, z, semillaDe(d.id)); animando = true; }   // 🦋 la Polilla, revoloteando
 
     if(seleccion === d.id){
       trazarPuntos(verticesHex(x, y, rad + 5 / z));

@@ -145,7 +145,8 @@ const FichaResumen = (() => {
       costoMover: IT2().inmovilizadoBloqueaMover && estadoActivo(S, 'inmovilizado') ? 0 : costoMoverCasillero(S),
       extenuado: Combatiente.extenuado(S.efectos),
       empower: (S.habilidades || []).some(h => h && h.empower),
-      enyetar: (S.habilidades || []).some(h => h && h.enyetar),   // 🐈‍⬛ Enyetar (2026-10-12): también con su botón fijo   // 💪 Empower (2026-10-12): el mapa le pone el botón fijo   // Extenuado (2026-10-12): el mapa cobra 1 No2 más cada 2 casillas por stack
+      enyetar: (S.habilidades || []).some(h => h && h.enyetar),
+      suerte: (S.habilidades || []).some(h => h && h.suerte),   // 🧚 Afortunado (2026-10-12): su botón fijo   // 🐈‍⬛ Enyetar (2026-10-12): también con su botón fijo   // 💪 Empower (2026-10-12): el mapa le pone el botón fijo   // Extenuado (2026-10-12): el mapa cobra 1 No2 más cada 2 casillas por stack
       muerto: !!(S.muerto && S.muerto.activo),
       muertoDef: !!(S.muerto && S.muerto.definitivo),   // muerto de verdad (el GM lo usa al repartir la experiencia)
       // 🎮 Si el GM tiene el control, su uid: el mapa le deja usar este token como si fuera suyo (Botonera, moverlo pagando No2).

@@ -76,6 +76,22 @@ async function enyetarUsar(yo, objetivoId){
   FichaAcciones.ejecutarHabilidad(bn.S, it.id, undefined, false, bnHabUi());
 }
 
+/* La tirada repetida en la Mesa (2026-10-12, dueño: «cuando se tiran los dos dados, el seleccionado tiene que tener una animación»): ruedan los dos
+   juegos (el de antes y el nuevo) y el que queda se destaca — Enyetar con la animación de mala vibra (destacar 'malo:idx:…', comun/dados3d.js),
+   Afortunado (js/39) con el brillo dorado de siempre. Si los dados de antes no se pueden reconstruir, rueda solo el nuevo. */
+async function publicarRepeticion(nom, r, modo, desde){
+  const malo = modo === 'peor', antes = Array.isArray(r.rollsAntes) ? r.rollsAntes : [], n = (r.rolls || []).length;
+  const juntos = n > 0 && antes.length === n;
+  const queda = juntos ? (r.nuevaQueda ? [...Array(n).keys()].map(i => i + n) : [...Array(n).keys()]) : (r.nuevaQueda ? [...Array(n).keys()] : []);
+  const que = malo ? 'se queda con la peor (Enyetar)' : 'se queda con la mejor (Afortunado)';
+  try{
+    await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: nom,
+      origen: `${malo ? '🐈‍⬛' : '🧚'} ${nom} · repite su ${r.etq}: ${fmt(r.antes)} y ${fmt(r.nueva)} → queda ${fmt(r.ahora)} (${que})`.slice(0, 160),
+      formula: juntos ? `${r.dados}+${r.dados}` : (r.dados || '0'), rolls: juntos ? [...antes, ...r.rolls] : (r.rolls || []), mod: 0, total: r.ahora,
+      ...(queda.length && queda.length <= 20 ? {destacar: (malo ? 'malo:' : '') + 'idx:' + queda.join(',')} : {}),
+      desde, cuando: firebase.firestore.FieldValue.serverTimestamp()});
+  }catch(err){ console.error('No se pudo publicar la tirada repetida', err); }
+}
 // El efecto «Enyetar» (lo aplica el mapa del GM, js/13): la tirada más reciente de ese enemigo que se pueda cambiar se repite y queda la peor.
 async function enyetarAplicar(d, t){
   const nom = nombreDe(t);
@@ -92,11 +108,7 @@ async function enyetarAplicar(d, t){
       const r = await Duelo.enyetarTirada(doc.id, lado);
       if(!r) continue;
       const otro = (lado === 'atacante' ? x.defensor : x.atacante) || {};
-      try{
-        await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: nom, origen: `🐈‍⬛ ${nom} · repite su ${r.etq} (Enyetar)`,
-          formula: `${r.dados || '0'}${r.mod ? (r.mod > 0 ? '+' : '') + fmt(r.mod) : ''} · antes ${fmt(r.antes)} → queda ${fmt(r.ahora)}`.slice(0, 120), rolls: r.rolls, mod: r.mod, total: r.nueva,
-          desde: t.tipo === 'creep' ? 'gm' : 'mapa', cuando: firebase.firestore.FieldValue.serverTimestamp()});
-      }catch(err){ console.error('Enyetar: no se pudo publicar la tirada', err); }
+      await publicarRepeticion(nom, r, 'peor', t.tipo === 'creep' ? 'gm' : 'mapa');
       return {nota: `${nom} repite su ${r.etq}: ${fmt(r.antes)} y ${fmt(r.nueva)} → queda ${fmt(r.ahora)}${r.contra !== null ? ` contra ${fmt(r.contra)}` : ''}; el duelo contra ${otro.nombre || 'el otro'} se volvió a resolver`};
     }
   }catch(err){ console.error('Enyetar: no se pudo ver el duelo', err); }

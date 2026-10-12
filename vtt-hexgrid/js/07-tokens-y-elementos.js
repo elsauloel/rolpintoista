@@ -361,6 +361,7 @@ function escucharElementos(){
         zonaResueltos: Array.isArray(d.zonaResueltos) ? d.zonaResueltos.filter(x => typeof x === 'string') : [],
         zonaEnMantenimiento: d.zonaEnMantenimiento !== false,
         zonaCadaPaso: d.zonaCadaPaso === true,
+        acelerador: Number.isFinite(d.acelerador) ? d.acelerador : 0,   // ⏩ el Acelerador (2026-10-12, js/40): los No2 que da
         zonaInmediata: d.zonaInmediata === true, zonaLuz: d.zonaLuz === true,   // (2026-10-08) enseguida a los de adentro · una luz (js/03)
         zonaAltura: ['piso', 'aire', 'ambos'].includes(d.zonaAltura) ? d.zonaAltura : '',   // dónde está su efecto (2026-10-07, js/08 alturaDe)
         zonaDanoDif: d.zonaDanoDif === true,   // el daño es la diferencia entre las tiradas (2026-10-02)
@@ -448,7 +449,7 @@ async function zonasDelQueLaTiro(tokenId){
   if(!soyGM || !t || !t.fichaId) return [];
   const tipo = t.tipo === 'creep' ? 'creep' : 'pj', lineas = [];
   for(const [id, el] of elementos){
-    const c = (el.zona || el.trampa || el.portal) && Math.round(num(el.turnos)) > 0 ? colocadorDe(el) : null;
+    const c = (el.zona || el.trampa || el.portal || el.acelerador) && Math.round(num(el.turnos)) > 0 ? colocadorDe(el) : null;
     if(!c || c.ref !== String(t.fichaId) || c.tipo !== tipo || elementosVencidosBorrando.has(id)) continue;
     const quedan = Math.round(num(el.turnos)) - 1;
     try{
@@ -456,7 +457,7 @@ async function zonasDelQueLaTiro(tokenId){
         elementosVencidosBorrando.add(id);
         await borrarElemento(id);
         setTimeout(() => elementosVencidosBorrando.delete(id), 5000);
-        const txt = el.portal ? 'Se cerraron los portales (terminaron sus turnos).' : `Se fue ${el.zonaNombre || el.trampaNombre || 'la zona'} (terminaron sus turnos).`;
+        const txt = el.portal ? 'Se cerraron los portales (terminaron sus turnos).' : el.acelerador ? 'Se apagó el Acelerador (terminaron sus turnos).' : `Se fue ${el.zonaNombre || el.trampaNombre || 'la zona'} (terminaron sus turnos).`;
         if(!lineas.includes(txt)) lineas.push(txt);   // (los dos portales, una sola línea)
       }else await coleccionElementos().doc(id).update({turnos: quedan});
     }catch(err){ console.error('No se pudo descontar el turno de la zona:', err); }
@@ -1122,11 +1123,12 @@ async function moverToken(id, col, fila, celdas, levita){
     abrirGiroLibre(id, celdas);
     fuegoEntrada(id, pisadas);
     zonaRevisarEntrada(id, celdas, num(levita));   // las zonas del piso no tocan lo levitado; las del aire, sí (2026-10-07)
+    if(typeof aceleradorRevisar === 'function') aceleradorRevisar(id, celdas);   // ⏩ (js/40)
   }catch(err){
     // Reglas de Firestore sin publicar todavía (no conocen "ruta"): se mueve
     // igual, solo que los demás no ven la estela.
     if(err.code === 'permission-denied' && ruta.length > 2){
-      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); percepcionPublicarAvisos(id); abrirGiroLibre(id, celdas); fuegoEntrada(id, pisadas); zonaRevisarEntrada(id, celdas, num(levita)); return; }catch(e){ err = e; }
+      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); percepcionPublicarAvisos(id); abrirGiroLibre(id, celdas); fuegoEntrada(id, pisadas); zonaRevisarEntrada(id, celdas, num(levita)); if(typeof aceleradorRevisar === 'function') aceleradorRevisar(id, celdas); return; }catch(e){ err = e; }
     }
     sigiloAvisosPendientes.delete(id);
     percepcionAvisosPendientes.delete(id);

@@ -316,9 +316,11 @@ verifica con 1d20: hasta DES×2 → 7+; hasta DES×3 → 17+; más de DES×3 →
    **Shield**) que absorbe **14 de daño**, de un golpe o de varios, y **dura hasta gastarse** (no vence por turnos ni se recarga; gastado, se va). ⚙
    Automatizado. *(Auditada 2026-10-11 con el dueño; original: «Shield [2] — Flash (SP x 2). Otorga un blindaje temporal que absorbe 14 de HP hasta el
    final del turno.»)*
-5. **Acelerador** [1] — Marca una casilla con flechitas para adelante
-   (>>). Cada aliado que la pisa obtiene +2 No2 (máximo una vez por
-   turno). Duración: 10 turnos.
+5. ✅ **Acelerador** — **SP:** 1. **No2:** 1. Marcás **una casilla dentro de tu Rango**: queda un **círculo con flechitas que avanzan**. Cada
+   **aliado** que la pisa gana **+2 No2** (**pueden pasar su máximo**), una vez por ronda. **Dura 10 turnos** (los tuyos). Los enemigos la ven, pero a
+   ellos no les da nada. También es un consumible del Bazar arcano: la **Runa aceleradora**. ⚙ Automatizado. *(Auditada 2026-10-12 con el dueño;
+   original: «Acelerador [1] — Marca una casilla con flechitas para adelante (>>). Cada aliado que la pisa obtiene +2 No2 (máximo una vez por
+   turno). Duración: 10 turnos.»)*
 6. **Endurecimiento** [5] — Otorga una armadura temporal: Defensa 3, Res.
    Mágica 3, reduce críticos de todo tipo. Duración: 2 turnos.
 7. **Re-roll** [2] — Flash. Permite rerolear tiradas aliadas. Lento.
@@ -327,6 +329,10 @@ verifica con 1d20: hasta DES×2 → 7+; hasta DES×3 → 17+; más de DES×3 →
 9. **Transferir SP** [1] — Transfiere 1d6 SP entre sí mismo y un aliado.
 10. **Adrenalina** [5] — Otorga +1 a Destreza, Fuerza y Agilidad durante 2
     turnos. Acumulable. Lento.
+11. ✅ **Afortunado** (nueva, 2026-10-12, pedida por el dueño: el reverso de Enyetar) — **SP:** 5 (⚡ Flash: 10 en turno ajeno). **No2:** 0. Vos o
+    un aliado a la vista (dentro de tu Rango) **repite su última tirada de un duelo y se queda con la más alta**; el duelo se vuelve a resolver. Sin
+    tirada de por medio. **Una vez por tirada.** Botón fijo **🧚** (la hadita) en combate. *(Costo, alcance y límite copiados de Enyetar: a confirmar
+    con el dueño.)*
 
 ## Debuffer ⏳
 

@@ -1473,8 +1473,10 @@ const Duelo = (() => {
   }
   /* 🐈‍⬛ Enyetar (Debuffer, 2026-10-12, dueño): esa misma tirada de ese lado se repite (los mismos dados, con el mismo «+») y queda la más baja;
      el duelo se vuelve a resolver (un empate, con la regla de siempre). Una vez por tirada (queda 🐈 en su fórmula).
-     → {campo, etq, antes, nueva, ahora, contra, dados, rolls} o null (no se puede: ya siguió, o ya estaba enyetada). */
-  async function enyetarTirada(id, lado){
+     modo 'mejor' (🧚 Afortunado, Support, el reverso): queda la más alta (y la marca es 🍀). Cada una, una vez por tirada.
+     → {campo, etq, antes, nueva, ahora, contra, dados, rolls, rollsAntes, nuevaQueda} o null (no se puede: ya siguió, o ya la tenía). */
+  async function enyetarTirada(id, lado, modo){
+    const mejor = modo === 'mejor', marca = mejor ? '🍀' : '🐈';
     const ref = col().doc(id);
     let res = null, anuncio = '', tiro = null;
     await fbDb.runTransaction(async tx => {
@@ -1485,21 +1487,21 @@ const Duelo = (() => {
       const campo = campoPolilla(m, lado);
       if(!campo) return;
       const t0 = m[campo] || {}, otro = {pdg: 'eva', eva: 'pdg', fuerza: 'bloqueo', bloqueo: 'fuerza'}[campo];
-      if(String(t0.formula || '').includes('🐈')) return;
+      if(String(t0.formula || '').includes(marca)) return;
       if(!tiro){   // se tira una sola vez aunque la transacción se repita
         const dados = String(t0.formula || '').match(/\d*d\d+/g) || [], rolls = [];
         dados.forEach(dd => { const [c, f] = dd.split('d'); for(let i = 0; i < Math.min(20, Math.max(1, _num(c) || 1)); i++) rolls.push(1 + Math.floor(Math.random() * Math.max(1, _num(f)))); });
         tiro = {rolls, dados: dados.join('+'), total: rolls.reduce((a, b) => a + b, 0) + _num(t0.mod)};
       }
-      const peor = tiro.total < _num(t0.total);
-      m[campo] = {...t0, ...(peor ? {total: tiro.total, rolls: tiro.rolls} : {}), formula: `${t0.formula || ''} 🐈`.slice(0, 60)};
+      const queda = mejor ? tiro.total > _num(t0.total) : tiro.total < _num(t0.total);
+      m[campo] = {...t0, ...(queda ? {total: tiro.total, rolls: tiro.rolls} : {}), formula: `${t0.formula || ''} ${marca}`.slice(0, 60)};
       reabrirPaso(m, campo);
       anuncio = avanzar(m) || '';
       const upd = cambiosDe(m);
       if(m.resumido) upd.resumido = false;
       tx.update(ref, upd);
       res = {campo, etq: etqCampo(m, campo), antes: _num(t0.total), nueva: tiro.total, ahora: m[campo].total, contra: m[otro] ? _num(m[otro].total) : null,
-        dados: tiro.dados, rolls: tiro.rolls, mod: _num(t0.mod)};
+        dados: tiro.dados, rolls: tiro.rolls, rollsAntes: (Array.isArray(t0.rolls) ? t0.rolls : []).map(_num), mod: _num(t0.mod), nuevaQueda: queda};
     });
     if(anuncio) anunciarMesa(anuncio);
     return res;
@@ -1541,7 +1543,7 @@ const Duelo = (() => {
     const c = campoPolilla(m, lado);
     if(!c) return null;
     const t = m[c] || {};
-    return {campo: c, etq: etqCampo(m, c), total: _num(t.total), empowers: (String(t.formula || '').match(/💪/gu) || []).length, enyetada: String(t.formula || '').includes('🐈')};
+    return {campo: c, etq: etqCampo(m, c), total: _num(t.total), empowers: (String(t.formula || '').match(/💪/gu) || []).length, enyetada: String(t.formula || '').includes('🐈'), afortunada: String(t.formula || '').includes('🍀')};
   }
   let rerollInfo = {}, rerollPedidas = new Set();
   function ladoMio(d){ return puedoTirarYo(d.atacante) ? 'atacante' : puedoTirarYo(d.defensor) ? 'defensor' : ''; }

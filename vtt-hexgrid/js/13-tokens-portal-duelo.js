@@ -560,6 +560,7 @@ window.addEventListener('message', e => {
   if(e.data.tipo === 'botonera-cerrada' || e.data.tipo === 'acciones-cerrada') cerrarBotonera();
   if(e.data.tipo === 'zona-habilidad') zonaDeHabilidad(e.data);
   if(e.data.tipo === 'portal-habilidad') portalDeHabilidad(e.data);
+  if(e.data.tipo === 'acelerador-habilidad' && typeof aceleradorDeHabilidad === 'function') aceleradorDeHabilidad(e.data);
   if(e.data.tipo === 'blink-habilidad') blinkDeHabilidad(e.data);
   if(e.data.tipo === 'caos-habilidad') caosDeHabilidad(e.data);
   if(e.data.tipo === 'zona-persistente-habilidad') zonaPersistenteDeHabilidad(e.data);

@@ -37,6 +37,7 @@ const MensajesMapa = (() => {
     'muerte-estado':    {de: 'ficha', a: 'mapa', que: 'el personaje está inconsciente/muerto (`activo`, `turnos`, `definitivo`): filtro rojo'},
     'zona-habilidad':   {de: 'ficha', a: 'mapa', que: 'dibujar la zona del sistema anterior (`forma`, `radio`)'},
     'portal-habilidad': {de: 'ficha', a: 'mapa', que: 'elegir los dos puntos de un portal (`turnos`)'},
+    'acelerador-habilidad': {de: 'ficha', a: 'mapa', que: 'elegir la casilla de un Acelerador (`turnos`, `no2`)'},
     'blink-habilidad':  {de: 'ficha', a: 'mapa', que: 'el blink: a quién (vos o un aliado que ves) y adónde (`distancia`)'},
     'caos-habilidad':   {de: 'ficha', a: 'mapa', que: 'la Varita del caos: el objetivo, el d10 y el estado al azar (`caos`)'},
     'zona-persistente-habilidad': {de: 'marco', a: 'mapa', que: 'dejar una zona persistente (lo arma Combatiente.zonaDeHab)'},

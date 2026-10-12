@@ -230,7 +230,13 @@ function dadosEstilosOnda(){
   const st = document.createElement('style');
   st.id = 'dados3d-css';
   st.textContent = '.dados3d-onda{position:absolute;width:90px;height:90px;margin:-45px 0 0 -45px;border:3px solid #FFD25A;border-radius:50%;opacity:0;pointer-events:none;box-shadow:0 0 14px rgba(255,190,60,.8);animation:dados3d-onda 1.6s ease-out infinite}' +
-    '@keyframes dados3d-onda{0%{transform:scale(.35);opacity:.95}100%{transform:scale(3.2);opacity:0}}';
+    '@keyframes dados3d-onda{0%{transform:scale(.35);opacity:.95}100%{transform:scale(3.2);opacity:0}}' +
+    // 🐈‍⬛ La mala (2026-10-12, Enyetar, dueño: «al revés del dorado: violeta o rojo, con sangre o rayos violetas, algo que dé mala vibra»).
+    '.dados3d-onda.mala{border-color:#A020F0;box-shadow:0 0 18px rgba(150,20,255,.95),inset 0 0 12px rgba(210,10,40,.85);animation-duration:1.15s}' +
+    '.dados3d-rayo{position:absolute;font-size:34px;margin:-20px 0 0 -14px;opacity:0;pointer-events:none;filter:hue-rotate(215deg) saturate(2.2) drop-shadow(0 0 8px rgba(160,40,255,1));animation:dados3d-rayo 1.3s steps(1) infinite}' +
+    '@keyframes dados3d-rayo{0%{opacity:0}8%{opacity:1}12%{opacity:.15}16%{opacity:1}26%{opacity:0}100%{opacity:0}}' +
+    '.dados3d-gota{position:absolute;font-size:18px;margin:-10px 0 0 -9px;opacity:0;pointer-events:none;animation:dados3d-gota 1.7s ease-in infinite}' +
+    '@keyframes dados3d-gota{0%{opacity:0;transform:translateY(-6px) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translateY(48px) scale(1)}}';
   document.head.appendChild(st);
 }
 
@@ -242,21 +248,22 @@ function dadosDestacar(c, notacion, cual){
   const lista = c.caja.diceList || [];
   if(!vals.length || lista.length < vals.length) return;
   const nuevos = lista.slice(-vals.length);
-  const idx = cual === 'max' ? [vals.indexOf(Math.max(...vals))] : String(cual).replace(/^idx:/, '').split(',').map(n => parseInt(n, 10)).filter(n => n >= 0 && n < nuevos.length);
+  const malo = String(cual).startsWith('malo:'), cual2 = malo ? String(cual).slice(5) : cual;   // 'malo:…' = la animación de mala vibra (Enyetar)
+  const idx = cual2 === 'max' ? [vals.indexOf(Math.max(...vals))] : String(cual2).replace(/^idx:/, '').split(',').map(n => parseInt(n, 10)).filter(n => n >= 0 && n < nuevos.length);
   if(!idx.length) return;
   dadosEstilosOnda();
   if(c.destacado) c.destacado.cancelar();
-  const cancelar = idx.map(i => dadosDestacarDado(c, nuevos[i])).filter(Boolean);
+  const cancelar = idx.map(i => dadosDestacarDado(c, nuevos[i], malo)).filter(Boolean);
   c.destacado = {cancelar: () => cancelar.forEach(f => f())};
 }
 const dadosDestacarMayor = (c, notacion) => dadosDestacar(c, notacion, 'max');
-function dadosDestacarDado(c, die){
+function dadosDestacarDado(c, die, malo){
   if(!die || !die.position || !die.scale) return null;
   // Materiales propios (los de la librería se comparten entre dados del mismo tipo).
   const orig = die.material;
   const mats = (Array.isArray(orig) ? orig : [orig]).map(m => (m && m.clone ? m.clone() : m));
   die.material = Array.isArray(orig) ? mats : mats[0];
-  mats.forEach(m => { if(m && m.emissive){ m.emissive.setHex(0xFFB400); m.emissiveIntensity = 0; } });
+  mats.forEach(m => { if(m && m.emissive){ m.emissive.setHex(malo ? 0x8A10FF : 0xFFB400); m.emissiveIntensity = 0; } });
   const cam = c.caja.camera, render = () => c.caja.renderer.render(c.caja.scene, cam);
   const p0 = die.position.clone(), s0 = die.scale.x || 1;
   const dir = cam.position.clone().sub(p0).normalize();
@@ -265,7 +272,13 @@ function dadosDestacarDado(c, die){
   const v = p0.clone().project(cam), r = c.capa.getBoundingClientRect();
   const centro = document.createElement('div');
   centro.style.cssText = `position:absolute;left:${(v.x * 0.5 + 0.5) * r.width}px;top:${(-v.y * 0.5 + 0.5) * r.height}px;width:0;height:0;pointer-events:none`;
-  for(let i = 0; i < 3; i++){ const o = document.createElement('div'); o.className = 'dados3d-onda'; o.style.animationDelay = (i * 0.5) + 's'; centro.appendChild(o); }
+  for(let i = 0; i < 3; i++){ const o = document.createElement('div'); o.className = 'dados3d-onda' + (malo ? ' mala' : ''); o.style.animationDelay = (i * (malo ? 0.38 : 0.5)) + 's'; centro.appendChild(o); }
+  if(malo){   // rayos violetas que titilan alrededor y gotas de sangre que caen
+    [[-46, -40, 0], [44, -30, .45], [-30, 40, .85], [50, 34, .25]].forEach(([x, y, d]) => { const r = document.createElement('div'); r.className = 'dados3d-rayo'; r.textContent = '⚡';
+      r.style.left = x + 'px'; r.style.top = y + 'px'; r.style.animationDelay = d + 's'; r.style.transform = `rotate(${x < 0 ? -18 : 18}deg)`; centro.appendChild(r); });
+    [[-14, 26, 0], [12, 30, .8]].forEach(([x, y, d]) => { const g = document.createElement('div'); g.className = 'dados3d-gota'; g.textContent = '🩸';
+      g.style.left = x + 'px'; g.style.top = y + 'px'; g.style.animationDelay = d + 's'; centro.appendChild(g); });
+  }
   c.capa.appendChild(centro);
   let vivo = true;
   const t0 = performance.now();
@@ -274,10 +287,18 @@ function dadosDestacarDado(c, die){
     if(!vivo) return;
     const k = Math.min(1, (ahora - t0) / 800), c1 = 1.70158, c3 = c1 + 1;
     const e = 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2);   // easeOutBack: sube con un pequeño rebote
-    die.scale.setScalar(s0 + s0 * 0.8 * e);
-    die.position.copy(p0).addScaledVector(dir, 70 * e);
     const pulso = 0.5 + 0.5 * Math.sin((ahora - t0) / 170);
-    mats.forEach(m => { if(m && m.emissive) m.emissiveIntensity = (0.3 + 0.5 * pulso) * k; });
+    if(malo){   // la mala: crece menos, tiembla y late entre violeta y rojo sangre
+      const tr = 3 * k;
+      die.scale.setScalar(s0 + s0 * 0.45 * e);
+      die.position.copy(p0).addScaledVector(dir, 35 * e);
+      die.position.x += Math.sin((ahora - t0) / 23) * tr; die.position.z += Math.cos((ahora - t0) / 29) * tr;
+      mats.forEach(m => { if(m && m.emissive){ m.emissive.setHex(pulso > 0.5 ? 0x8A10FF : 0xC0102A); m.emissiveIntensity = (0.35 + 0.55 * pulso) * k; } });
+    }else{
+      die.scale.setScalar(s0 + s0 * 0.8 * e);
+      die.position.copy(p0).addScaledVector(dir, 70 * e);
+      mats.forEach(m => { if(m && m.emissive) m.emissiveIntensity = (0.3 + 0.5 * pulso) * k; });
+    }
     try{ render(); }catch(err){ fin(); return; }
     if(ahora - t0 < DADOS_QUIETOS_MS - 300) requestAnimationFrame(paso); else fin();
   };

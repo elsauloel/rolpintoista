@@ -685,7 +685,7 @@ service cloud.firestore {
       // solo lo puede prender o apagar el GM (al crear o después, desde ⚙️);
       // sirve con o sin Sólido. alfa 0 se permite (solo se ve el contorno).
       function elementoValido(d) {
-        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'niebla', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'usoEn', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant', 'trampaItem', 'trampaFicha', 'zona', 'zonaNombre', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaAmiga', 'zonaResistStat', 'zonaResistValor', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaDanoDif', 'zonaDanoTipo', 'zonaTiraExtra', 'zonaNota', 'zonaTiraStat', 'zonaTiraValor', 'trampaDetectar', 'descubierta', 'trampaDejaZona', 'zonaTurnos', 'zonaAltura', 'zonaDirecto', 'zonaInmediata', 'zonaLuz', 'arma', 'armaNombre', 'armaDe', 'armaItem'])
+        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'niebla', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'usoEn', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant', 'trampaItem', 'trampaFicha', 'zona', 'zonaNombre', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaAmiga', 'zonaResistStat', 'zonaResistValor', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaDanoDif', 'zonaDanoTipo', 'zonaTiraExtra', 'zonaNota', 'zonaTiraStat', 'zonaTiraValor', 'trampaDetectar', 'descubierta', 'trampaDejaZona', 'zonaTurnos', 'zonaAltura', 'zonaDirecto', 'zonaInmediata', 'zonaLuz', 'arma', 'armaNombre', 'armaDe', 'armaItem', 'acelerador'])
           && d.tipo in ['flor', 'linea', 'libre']
           && d.origen is map && d.origen.col is int && d.origen.fila is int
           && d.celdas is list && d.celdas.size() >= 2 && d.celdas.size() <= 6000 && d.celdas.size() % 2 == 0
@@ -720,6 +720,8 @@ service cloud.firestore {
           // La tirada de daño de la trampa ignora la Defensa de quien la pisa (daño directo).
           && (!('trampaIgnoraDef' in d) || d.trampaIgnoraDef is bool)
           && (!('portal' in d) || d.portal is bool)
+          // ⏩ Acelerador (2026-10-12): los No2 que da a quien lo pisa.
+          && (!('acelerador' in d) || (d.acelerador is int && d.acelerador >= 1 && d.acelerador <= 9))
           && (!('usoEn' in d) || d.usoEn is number)
           && (!('fuego' in d) || d.fuego is bool)
           && (!('fuegoDano' in d) || (d.fuegoDano is int && d.fuegoDano >= 1 && d.fuegoDano <= 999))

@@ -346,7 +346,8 @@ function dibujar(){
     if(!puedeVerElemento(el)) return;  // invisible: solo el GM y su creador
     if(el.arma){ if(typeof armaDibujar === 'function') armaDibujar(el, z); return; }   // 🗡 el arma en el piso: solo su ficha redonda (js/27)
     const celdas = celdasDeElemento(el);
-    const esColision = !!el.colision;   // su relleno y su contorno ya se dibujaron arriba, todos juntos
+    if(el.acelerador && typeof aceleradorDibujar === 'function') aceleradorDibujar(el, z);   // ⏩ un círculo con flechitas, no la casilla (js/40)
+    const esColision = !!el.colision || !!el.acelerador;   // su relleno y su contorno ya se dibujaron arriba, todos juntos (el Acelerador, en js/40)
     if(!esColision){
     const img = el.imagen ? imagenLista(el.imagen) : null;
     if(img){

@@ -263,7 +263,7 @@ const FichaAcciones = (() => {
       }
       // Un consumible que deja una zona en el mapa (2026-10-08, las bengalas: `zonaUso`, la misma Ejecución de una zona): se usa desde el mapa;
       // sin el mapa, no se gasta.
-      if(it.zonaUso && !ui.colocarZona){ ui.toast(`${it.nombre} se usa desde el mapa (tu Botonera en el mapa): ahí elegís dónde`); return; }
+      if((it.zonaUso && !ui.colocarZona) || (it.aceleradorMapa && !ui.acelerador)){ ui.toast(`${it.nombre} se usa desde el mapa (tu Botonera en el mapa): ahí elegís dónde`); return; }
       // Trampa consumible (2026-09-25): al usarla se coloca sola junto a tu token; si no se puede, no se gasta.
       if(it.trampaDatos){
         if(consumiendoTrampa.has(id)) return;
@@ -276,6 +276,7 @@ const FichaAcciones = (() => {
       }
       S.nitros = num(S.nitros) - gastoNitros;
       if(it.zonaUso) ui.colocarZona(it);   // la bengala: se elige el centro en el mapa
+      if(it.aceleradorMapa) ui.acelerador(it);   // ⏩ la Runa aceleradora: se elige la casilla en el mapa
       if(sac.saque) S.meta.saqueTurno = num(S.turno) || 1;   // el primero del turno ya se sacó
       if(sac.bolsillo) S.meta.bolsilloTurno = num(S.turno) || 1;
 
@@ -952,7 +953,7 @@ const FichaAcciones = (() => {
     if(FichaBotonera.modoHab(it) !== 'auto'){ anunciarHabilidad(S, it, ui); tirarPrimeraDeHab(S, it, ui); return; }
     if(!FichaBotonera.dueloDe(it)){
       if(it.trampaColocar) return;   // una trampa sola: el anuncio y la casilla ya los maneja colocarTrampa
-      if(it.portalMapa || it.blink || it.caos){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // los portales, el blink y el caos: se anuncian y se eligen en el mapa
+      if(it.portalMapa || it.blink || it.caos || it.aceleradorMapa){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // los portales, el blink, el caos y el Acelerador: se anuncian y se eligen en el mapa
       if(it.invoca && it.invoca.invId){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // solo invoca: se anuncia (la invocación ya la hizo invocarConHab)
       ui.toast(`${it.nombre}: todavía no tiene armada la ejecución paso a paso (✨) — se ejecutó como semiautomática`); anunciarHabilidad(S, it, ui); tirarPrimeraDeHab(S, it, ui); return;
     }
@@ -990,6 +991,12 @@ const FichaAcciones = (() => {
       // `distancia` (2026-10-07, Varita del portal aliado): el segundo, a esa distancia o menos del primero. Los turnos son los de quien los abre.
       try{ ui.alMapa('portal-habilidad', {fichaId: ui.yo().ref, casteadorTipo: 'pj', turnos: Math.max(1, num(h.portalMapa.turnos) || 3), distancia: Math.max(0, num(h.portalMapa.distancia) || 0), nombre: h.nombre}); }
       catch(err){ console.error('No se pudo avisar el portal al mapa:', err); }
+      return;
+    }
+    // ⏩ El Acelerador (2026-10-12, Support): se elige la casilla en el mapa (vtt-hexgrid/js/40).
+    if(h.aceleradorMapa){
+      try{ ui.alMapa('acelerador-habilidad', {fichaId: ui.yo().ref, casteadorTipo: 'pj', turnos: Math.max(1, num(h.aceleradorMapa.turnos) || 10), no2: Math.max(1, num(h.aceleradorMapa.no2) || 2), nombre: h.nombre}); }
+      catch(err){ console.error('No se pudo avisar el Acelerador al mapa:', err); }
       return;
     }
     // El caos (2026-10-08, Varita del caos): se elige el objetivo en el mapa y ahí se tira el d10.

@@ -348,12 +348,13 @@ ya tenían este mismo formato (número azul, Maldición Esp / Res.M):
    por tirada.** En combate, quien la tiene ve un **botón fijo 🐈‍⬛** (como el 💪 de Empower) para elegir la tirada en cualquier momento. ⚙
    Automatizado; ✋ a mano, una tirada fuera de un duelo. *(Auditada 2026-10-12 con el dueño; original: «Enyetar [5] — Maldición (Esp / Res.M).
    Flash. Obliga a repetir una tirada y quedarse con el valor más bajo.»)*
-2. **Confusión** [5] — Maldición (Esp / Res.M). Antes de realizar un
-   ataque o habilidad con objetivo, tira 1d4: 1) el debuffer elige el
-   objetivo; 2) gasta los No2 pero no realiza la acción; 3) elige el
-   objetivo al azar; 4) actúa normalmente. Los objetivos alternativos
-   deben estar en un radio de 3 No2; si la acción requiere moverse, deberá
-   hacerlo. Duración: 2 turnos.
+2. ✅ **Confusión** — **SP:** 5. **No2:** 2. Maldición: **PdG.Esp contra el Res.Esp** de un enemigo dentro de tu Rango; si ganás, queda con el
+   estado **Confusión** de siempre, 2 turnos: antes de su primera acción de cada turno (moverse incluido) tira 1d4 — 1, el GM decide; 2, pierde el
+   turno; 3, objetivo al azar entre los que ve; 4, normal; vale todo el turno. **No se apila:** otra vez renueva los 2 turnos. ⚙ Automatizado.
+   *(Auditada 2026-10-12 con el dueño, que eligió el estado que ya existía antes que el texto original; original: «Confusión [5] — Maldición
+   (Esp / Res.M). Antes de realizar un ataque o habilidad con objetivo, tira 1d4: 1) el debuffer elige el objetivo; 2) gasta los No2 pero no realiza
+   la acción; 3) elige el objetivo al azar; 4) actúa normalmente. Los objetivos alternativos deben estar en un radio de 3 No2; si la acción requiere
+   moverse, deberá hacerlo. Duración: 2 turnos.»)*
 3. ✅ **Maldición debilitante** — **SP:** 5. **No2:** 3 (el No2 alto es lo «Lento»). Maldición: tirás **PdG.Esp contra el Res.Esp** de un
    enemigo dentro de tu Rango; si ganás, queda **Debilitado** (estado nuevo) 2 turnos: **−1 a todas sus tiradas**, también defensas y daño
    (ataque, Evasión, Parry, Bloqueo, daño, resistencias, Percepción, Sigilo, Iniciativa). **Acumulable:** otra vez = −1 más y vuelve a durar 2

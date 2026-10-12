@@ -1586,7 +1586,7 @@ const Duelo = (() => {
     if(rerollInfo[k] === undefined){ pedirRerollInfo(d, lado); return ''; }
     const info = rerollInfo[k];
     if(!info.disponible) return '';
-    return `<button type="button" class="duelo-reroll" data-reroll="${_esc(lado)}:${_esc(campo)}" title="Volver a tirar ${_esc(etqCampo(d, campo))} (moneda en ${_esc(info.donde || 'el inventario')}, sin costo de No2) y después se tira una moneda: par se conserva, impar se rompe">🪙 Re-roll<small>volver a tirar ${_esc(etqCampo(d, campo))}</small></button>`;
+    return `<button type="button" class="duelo-reroll" data-reroll="${_esc(lado)}:${_esc(campo)}" title="Volver a tirar ${_esc(etqCampo(d, campo))} (moneda en ${_esc(info.donde || 'el inventario')}, sin costo de No2) y después se tira una moneda: par se conserva, impar se rompe">🪙 Moneda<small>volver a tirar ${_esc(etqCampo(d, campo))}</small></button>`;
   }
 
 

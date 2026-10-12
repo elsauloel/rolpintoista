@@ -313,7 +313,7 @@ const FichaDuelo = (() => {
     const filas = lista.length ? lista.map(h => {
       const usada = TiradasPropias.usada(h, S.rerollUsados);
       return `<div class="item"><div class="ihead"><div><div class="iname">${esc(h.origen)}</div><div class="idesc">${esc(h.formula || '')}${h.rolls && h.rolls.length ? ' → ' + h.rolls.join(' + ') : ''}${num(h.mod) ? ' ' + (num(h.mod) > 0 ? '+' : '−') + ' ' + Math.abs(num(h.mod)) : ''} = <b>${fmt(num(h.total))}</b></div></div>
-      ${usada ? '<span class="tag">ya usó su re-roll</span>' : `<button type="button" class="mini" data-rerollpick="${esc(h.clave)}"${m ? '' : ' disabled'}>🪙 Re-roll</button>`}</div></div>`;
+      ${usada ? '<span class="tag">ya usó su moneda</span>' : `<button type="button" class="mini" data-rerollpick="${esc(h.clave)}"${m ? '' : ' disabled'}>🪙 Moneda</button>`}</div></div>`;
     }).join('') : '<div class="hint">Todavía no hiciste ninguna tirada.</div>';
     return {aviso, filas};
   }

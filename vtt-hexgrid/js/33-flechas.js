@@ -156,9 +156,11 @@ async function virotEstalla(d, celda, pego){
   }
 }
 async function viroteRebota(d){
-  const fl = d.ataque.flecha, tA = tokens.get(d.atacante.tokenId), tD = tokens.get(d.defensor.tokenId);
+  const fl = d.ataque.flecha, idA = d.atacante.tokenId, idD = d.defensor.tokenId, tA = tokens.get(idA), tD = tokens.get(idD);
   if(!tA || !tD) return false;
-  const otro = [...tokens.values()].filter(t => t && t.id !== tD.id && t.id !== tA.id && !t.oculto && distanciaHex(t, tD) === 1 && t.tipo !== 'elemento')
+  // Los tokens no llevan su id adentro (es la clave del Map): antes se comparaba `t.id` y el filtro dejaba afuera a todos, así que nunca
+  // rebotaba (encontrado probándolo en el mapa, 2026-10-12).
+  const otro = [...tokens.entries()].map(([id, t]) => ({...t, id})).filter(t => t.id !== idD && t.id !== idA && !t.oculto && distanciaHex(t, tD) === 1 && t.tipo !== 'elemento')
     .sort((a, b) => distanciaHex(a, tA) - distanciaHex(b, tA))[0];
   if(!otro){ mesaLinea(`↩ El ${fl.nombre} de ${d.atacante.nombre} erró y no tenía a nadie pegado al blanco para rebotar`, 'recordatorio'); return false; }
   mesaLinea(`↩ El ${fl.nombre} de ${d.atacante.nombre} erró y rebota hacia ${nombreDe(otro)} (PdG −2, sin costo)`, 'recordatorio');
@@ -167,7 +169,7 @@ async function viroteRebota(d){
     await Duelo.crear({yo: {ref: d.atacante.ref, tipo: d.atacante.tipo, nombre: d.atacante.nombre},
       ataque: {tipo: 'habilidad-arma', habNombre: `Rebote del ${fl.nombre}`, armaId: a.armaId || '', armaNombre: a.armaNombre || '', tipoDado: num(a.tipoDado), mods: {pdg: -2}, efectos: fl.efectos || []},
       flecha: {nombre: `${fl.nombre} (rebote)`, efectos: fl.efectos || [], perfora: num(fl.perfora)}},
-      {id: otro.id, nombre: nombreDe(otro), tipo: otro.tipo, fichaId: otro.fichaId, duenoUid: otro.duenoUid}, tA.id);
+      {id: otro.id, nombre: nombreDe(otro), tipo: otro.tipo, fichaId: otro.fichaId, duenoUid: otro.duenoUid}, idA);
     return true;
   }catch(err){ console.error('No se pudo hacer rebotar el virote:', err); return false; }
 }

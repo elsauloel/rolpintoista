@@ -881,10 +881,21 @@ const FichaAcciones = (() => {
       return;
     }
     if(spec.nombre === 'Armadura rota'){
+      let n = Math.max(1, num(spec.stacks) || 1);
+      // 💍 Armadura indestructible (anillo, 2026-10-12): la primera Armadura rota del combate se absorbe. En un personaje la rotura va a las piezas,
+      // no a un estado, así que se frena acá (el mapa solo la veía en los estados; la marca la libera el mapa al terminar el combate, js/25).
+      if(num(FichaCalculo.calcular(S).final.absorbearmadura) > 0 && !S.absorbeUsada){
+        S.absorbeUsada = true; n -= 1;
+        const quien = ((S.meta && S.meta.nombre) || '').trim();
+        ui.toast('💍 El anillo de armadura indestructible absorbió la Armadura rota');
+        try{ ui.recordatorios([{nombre: `💍 ${quien ? quien + ': ' : ''}el anillo absorbió la Armadura rota (una vez por combate)`, detalle: ''}]); }catch(e){}
+        ui.cambio(['otros', 'refresh']);
+        if(n <= 0) return;
+      }
       // Con `item` (Atraviesa escudos, 2026-10-12): esa pieza puntual (el escudo que paró el disparo), no una al azar.
       const it = spec.item ? S.inventario.find(x => x.id === spec.item) : null;
-      if(it && FichaCalculo.durableItem(it)){ romperPieza(S, it, Math.max(1, num(spec.stacks) || 1), ui); return; }
-      rompeArmaduraAlAzar(S, Math.max(1, num(spec.stacks) || 1), ui); return;
+      if(it && FichaCalculo.durableItem(it)){ romperPieza(S, it, n, ui); return; }
+      rompeArmaduraAlAzar(S, n, ui); return;
     }
     // «Revivir» (2026-10-06, el consumible Revive que usa un aliado): si sigue inconsciente (no muerto del todo), vuelve con `pct` % de la
     // vida máxima y Titilando. Si ya se levantó o ya murió, no hace nada (y lo dice).

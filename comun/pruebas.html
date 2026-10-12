@@ -1527,6 +1527,15 @@ prueba('Atraviesa escudos (2026-10-12): la Armadura rota con `item` abolla ESE e
   igual([FichaCalculo.armRotaDe(S.inventario[0]), FichaCalculo.durActual(S.inventario[0]), FichaCalculo.armRotaDe(S.inventario[1]), FichaCalculo.durActual(S.inventario[1])],
     [1, durEsc - 1, 0, durPeto]);
 });
+prueba('Anillo de armadura indestructible (2026-10-12): la primera Armadura rota del combate no daña ninguna pieza; la segunda sí', () => {
+  const peto = {id: 'peto', nombre: 'Peto', tipoItem: 'armadura_rigida', categoria: 'armadura', equipado: true, peso: 2, def: 3, mods: []};
+  const anillo = {id: 'an', nombre: 'Anillo de armadura indestructible', tipoItem: 'anillos', equipado: true, peso: 0, mods: [{stat: 'absorbearmadura', val: 1}]};
+  const S = fichaBotonera({inventario: [peto, anillo]}), reg = [];
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Armadura rota', stacks: 1}, '', uiAuto(reg, true));
+  const tras1 = [FichaCalculo.armRotaDe(S.inventario[0]), !!S.absorbeUsada];
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Armadura rota', stacks: 1}, '', uiAuto(reg, true));
+  igual([tras1, FichaCalculo.armRotaDe(S.inventario[0])], [[0, true], 1]);
+});
 
 grupo('Habilidades que colocan algo (comun/ficha-acciones.js, paso 5c)');
 const uiMapa = (reg, enMapa) => ({...uiAuto(reg, true), enMapa: () => enMapa, alMapa: (tipo, m) => reg.push(`alMapa ${tipo}`)});

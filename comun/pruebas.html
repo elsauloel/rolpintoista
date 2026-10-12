@@ -637,6 +637,25 @@ prueba('Empower (Support, 2026-10-12): 2 SP (4 en turno ajeno, turnoAjenoSp) (4 
     sin, FichaResumen.resumen(S).empower, ts && ts.campo, ts && ts.empowers],
     ['2', 0, '4', 3, 'aliado', true, 0, ['Empower'], false, true, false, true, 'pdg', 2]);
 });
+prueba('Acelerado (Shooter, 2026-10-12): 2 SP +1 por uso seguido; −1 No2 por stack al próximo disparo a distancia; lo gasta el disparo o el fin del turno', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'shooter').habilidades.find(h => h.id === 'shooter-acelerado');
+  const presets = estadosPresetFicha();
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
+  const arco = {id: 'arco1', nombre: 'Arco', armaDeRango: true, tipoDado: 8}, espada = {id: 'esp1', nombre: 'Espada', tipoDado: 8};
+  const base = [FichaCombate.costoAtaque(S, arco), FichaCombate.costoAtaque(S, espada)];
+  const sp0 = FichaHabilidades.costoSpDe(S, hab);
+  Combatiente.agregarEstado(S.efectos, FichaAcciones.estadoDeSpec({nombre: 'Acelerado'}, presets));
+  Combatiente.agregarEstado(S.efectos, FichaAcciones.estadoDeSpec({nombre: 'Acelerado'}, presets));
+  const dos = [FichaCombate.costoAtaque(S, arco), FichaCombate.costoAtaque(S, espada), FichaHabilidades.costoSpDe(S, hab), S.efectos.length, S.efectos[0].stacks];
+  FichaCombate.registrarAtaque(S, espada);
+  const trasEspada = S.efectos.length;
+  FichaCombate.registrarAtaque(S, arco);
+  const trasArco = S.efectos.length;
+  Combatiente.agregarEstado(S.efectos, FichaAcciones.estadoDeSpec({nombre: 'Acelerado'}, presets));
+  const fin = Combatiente.terminarTurnoEstados(S.efectos);
+  igual([hab.costo, hab.nitrosCosto, /Sin auditar/.test(hab.detalle), /Acelerado \[1\]/.test(hab.original), base, sp0, dos, trasEspada, trasArco, fin.terminados.map(e => e.nombre), S.efectos.length],
+    ['2', 0, false, true, [4, 4], 2, [2, 4, 4, 1, 2], 1, 0, ['Acelerado'], 0]);
+});
 prueba('Un stat en 0 o negativo se tira igual: da el valor sin dados (el duelo no queda en «Tirando…», 2026-10-12)', () => {
   const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
   S.efectos = [{id: 'x', nombre: 'Muy debilitado', polaridad: 'debuff', turnos: 2, activo: true, mods: [{stat: 'pdg', val: -50}]}];

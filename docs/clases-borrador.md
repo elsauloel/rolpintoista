@@ -256,8 +256,11 @@ Salvo Carga Elemental, todas son **Hechizo (PG: Esp · Daño: Esp)**.
    y Crítico potente +X**, **aunque sea en otro turno** (no vence: se gasta al disparar). **Se suma con Tensar.** ⚙ Automatizado: el estado (con X stacks) y
    el bono del disparo, en el mapa. *(Auditada 2026-10-11 con el dueño; original: «Apuntar [X] — X No2: +X a la PG y al crítico en el próximo ataque a
    distancia (X ≤ 3).» El «crítico» pasó a ser Crítico potente: el frecuente en un Tipo 4 vale demasiado.)*
-2. **Acelerado** [1] — Reduce el cooldown de un ataque. Repetible (+1 SP
-   por repetición).
+2. ✅ **Acelerado** — **SP:** 2, y **+1 por cada uso seguido** (2, 3, 4…). **No2:** 0. Quedás **Acelerado**: tu **próximo ataque con un arma a
+   distancia** de **este turno** cuesta **1 No2 menos por cada uso** (mínimo 0). Lo gasta ese disparo; **si termina el turno sin disparar, se pierde**.
+   ⚙ Automatizado: el estado (que se apila), el costo que sube, el descuento y el fin al terminar el turno. *(Auditada 2026-10-12 con el dueño;
+   original: «Acelerado [1] — Reduce el cooldown de un ataque. Repetible (+1 SP por repetición).» El «cooldown de un ataque» pasó a ser el No2 del
+   próximo disparo.)*
 3. ✅ **Enfocado** — **SP:** 1, y **+1 por cada uso seguido** (1, 2, 3…). **No2:** 1 cada vez. Quedás **Enfocado**: tu **próximo ataque con
    arma** (cuerpo a cuerpo o a distancia) suma **+2 de daño por cada uso**, todo al mismo ataque, **aunque sea en otro turno** (no vence: lo gasta
    ese ataque, pegue o no). ⚙ Automatizado: el estado (que se apila), el costo que sube y el daño. *(Auditada 2026-10-11 con el dueño; original:

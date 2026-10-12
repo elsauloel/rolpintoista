@@ -108,7 +108,7 @@ const FichaCombate = (() => {
   const danoSinArmaTxt = dmg => `1d${TIPO_SIN_ARMA}${num(dmg) ? ` + ${fmt(num(dmg))}` : ''}`;
   const ataquesConArma = (S, arma) => num((S.ataquesArma || {})[claveAtaque(arma)]);
   // Llega cargada (2026-10-10): el primer disparo del turno es gratis si con esa arma no disparó el turno anterior (S.descargadas, ficha-mantenimiento).
-  const costoAtaque = (S, arma) => Combatiente.conExtenuado(S.efectos, costoAtaque0(S, arma));   // + Extenuado (2026-10-12)
+  const costoAtaque = (S, arma) => Math.max(0, Combatiente.conExtenuado(S.efectos, costoAtaque0(S, arma)) - (arma && arma.armaDeRango ? Combatiente.acelerado(S.efectos) : 0));   // + Extenuado, − Acelerado (2026-10-12)
   const costoAtaque0 = (S, arma) => Combatiente.cargadaGratis(arma, ataquesConArma(S, arma), arma && (S.descargadas || {})[claveAtaque(arma)]) ? 0 : Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(tipoAtaque(arma), ataquesConArma(S, arma), arma), arma, ataquesConArma(S, arma))   // − ahorroNitros del arma en el primero
     - Combatiente.ahorroArco(arma, ataquesConArma(S, arma), arma && (S.descargadas || {})[claveAtaque(arma)], arma && (S.ataquesArma || {})['pego:' + claveAtaque(arma)]));   // Flecha en la cuerda / Encadenar (2026-10-11)
   // Ataque de oportunidad y contraataque: siempre lo de un primer ataque, y no cuentan como ataque del turno (oportunidad: gratis si el arma es oporGratis).
@@ -119,6 +119,7 @@ const FichaCombate = (() => {
     const primero = ataquesConArma(S, arma) === 0;
     S.ataquesTurno = num(S.ataquesTurno) + 1;
     S.ataquesArma = {...(S.ataquesArma || {}), [claveAtaque(arma)]: ataquesConArma(S, arma) + 1};
+    if(arma && arma.armaDeRango) Combatiente.gastarAcelerado(S.efectos);   // Acelerado: lo gasta este disparo
     return primero;
   }
 

@@ -204,9 +204,12 @@ const Combatiente = (() => {
     const d = dispararEstados(k.quedan, {...(campos || {}), todos: k.quedan});
     return {hp: d.hp, quedan: k.quedan, terminados: k.terminados, eventos: [...k.eventos, ...d.eventos]};
   }
+  // `alTerminarTurno` (2026-10-12, Acelerado): lo que vale solo dentro del turno se va al terminarlo (se saca de la misma lista).
   function terminarTurnoEstados(estados){
+    const terminados = [];
+    if(Array.isArray(estados)) for(let i = estados.length - 1; i >= 0; i--) if(estados[i] && estados[i].alTerminarTurno){ terminados.unshift(estados[i]); estados.splice(i, 1); }
     (estados || []).forEach(e => { if(e && e.recien) delete e.recien; });
-    return {hp: 0, quedan: estados || [], terminados: [], eventos: []};
+    return {hp: 0, quedan: estados || [], terminados, eventos: []};
   }
   // El pase de turno de siempre (⟳ Mantenimiento, sin orden de turnos): dispara (lo que no se disparó al aplicarse) y cuenta.
   function pasarTurnoEstados(estados, campos){
@@ -878,6 +881,9 @@ const Combatiente = (() => {
   // 2 casillas (eso lo cobra el mapa, costoPasos). `conExtenuado(estados, costo)`: el costo con el recargo, solo si ya costaba algo.
   const extenuado = estados => activos(estados).filter(e => e.extenuante).reduce((a, e) => a + Math.max(1, n(e.stacks) || 1), 0);
   const conExtenuado = (estados, costo) => n(costo) > 0 ? n(costo) + extenuado(estados) : n(costo);
+  // Acelerado (Shooter, 2026-10-12): −1 No2 por stack al próximo ataque con un arma a distancia de este turno (mínimo 0). Lo gasta ese ataque.
+  const acelerado = estados => activos(estados).filter(e => e.acelera).reduce((a, e) => a + Math.max(1, n(e.stacks) || 1), 0);
+  const gastarAcelerado = estados => { if(!Array.isArray(estados)) return false; let hubo = false; for(let i = estados.length - 1; i >= 0; i--) if(estados[i] && estados[i].acelera){ estados.splice(i, 1); hubo = true; } return hubo; };
   const golpeDeStacks = e => {
     const g = {...(e.golpe || {})}, k = Math.max(1, n(e.stacks) || 1);
     Object.entries(e.golpePorStack || {}).forEach(([c, v]) => { g[c] = Math.round(n(v)) * k; });
@@ -885,7 +891,7 @@ const Combatiente = (() => {
   };
   // Cuántos stacks tiene ya de un estado con cargas que todavía no se gastó (el costo de Enfocado sube con esto).
   const stacksCargaActiva = (estados, nombre) => {
-    const e = (Array.isArray(estados) ? estados : []).find(x => x && x.nombre === nombre && x.activo !== false && !x.agotada && n(x.cargas) > 0);
+    const e = (Array.isArray(estados) ? estados : []).find(x => x && x.nombre === nombre && x.activo !== false && !x.agotada && (n(x.cargas) > 0 || x.apila));   // con cargas (Enfocado) o que se apila (Acelerado)
     return e ? Math.max(1, n(e.stacks) || 1) : 0;
   };
   function agregarEstado0(estados, nuevo, o){
@@ -1455,7 +1461,7 @@ const Combatiente = (() => {
   // El texto de lo que cura un ítem: «Heridas (Sangrado, Lisiado, Rengo)».
   const textoCura = grupos => grupos.map(k => `${GRUPOS_CURA[k].label} (${GRUPOS_CURA[k].estados.join(', ')})`).join(' · ');
 
-  return {extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

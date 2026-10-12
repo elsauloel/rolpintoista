@@ -83,6 +83,10 @@ const ESTADOS_PRESET = [
   // renueva los 2 turnos.
   // Extenuado (2026-10-12, dueño: Maldición extenuante del Debuffer): +1 No2 por stack a todo lo que cuesta No2, y moverse cuesta 1 No2 más
   // cada 2 casillas por stack. 1 turno; se apila (`apila`) y vuelve a durar 1 turno. Lo suman Combatiente.conExtenuado y el mapa (costoPasos).
+  // Acelerado (2026-10-12, dueño: Shooter): −1 No2 por stack al próximo disparo de este turno (solo armas a distancia); se apila; se va al
+  // terminar el turno (`alTerminarTurno`) o lo gasta ese disparo (Combatiente.acelerado / gastarAcelerado, en FichaCombate).
+  {nombre:'Acelerado', polaridad:'buff', turnos:1, stacks:1, apila:true, acelera:true, alTerminarTurno:true,
+    detalle:'Su próximo ataque con un arma a distancia de este turno cuesta 1 No2 menos por stack (mínimo 0). Lo gasta ese disparo; si termina el turno sin disparar, se pierde. ⚙ Automatizado.'},
   {nombre:'Extenuado', polaridad:'debuff', turnos:1, stacks:1, apila:true, extenuante:true,
     detalle:'+1 No2 por stack a todo lo que cuesta No2 (atacar, habilidades, Parry, consumir, equipar, levantarse, el sigilo…) y, al moverse, 1 No2 más cada 2 casillas por stack. Dura 1 turno; otra vez es +1 más y vuelve a durar 1 turno. ⚙ Automatizado.'},
   {nombre:'Bendecido', polaridad:'buff', turnos:2, mods:[{stat:'pdg', val:1}, {stat:'pdgmg', val:1}, {stat:'eva', val:1}, {stat:'parry', val:1}, {stat:'bloqueo', val:1}, {stat:'dmg', val:1}, {stat:'dmgesp', val:1}, {stat:'resmg', val:1}, {stat:'resm', val:1}, {stat:'rescc', val:1}, {stat:'percepcion', val:1}, {stat:'sigilo', val:1}, {stat:'ini', val:1}],

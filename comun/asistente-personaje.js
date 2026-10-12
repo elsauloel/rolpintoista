@@ -156,12 +156,13 @@ const AsistentePersonaje = (() => {
           <span>PdG <b>${fmt(num(c.pdg))}</b></span><span>Evasión <b>${fmt(num(c.eva))}</b></span><span>Daño <b>${fmt(num(c.dmg))}</b></span><span>PdG.Esp <b>${fmt(num(c.pdgmg))}</b></span></div>
         <p class="pap-nota">Mínimo 3 en cada uno. Constitución da la vida; Fuerza el daño; Agilidad la Evasión y los No2; Destreza el PdG; Especial los SP y los hechizos.</p>`;
     }
+    const glo = t => typeof Glosario !== 'undefined' ? Glosario.marcar(t || '') : esc(t || '');   // los términos con su globo (dueño, 2026-10-12)
     function tarjetaHab(claseId, h, propia){
       const k = `${claseId}:${h.id}`, on = st.habs.has(k);
       const costo = [h.costo ? `${h.costo}${/sp/i.test(String(h.costo)) ? '' : ' SP'}` : '', h.nitrosCosto !== undefined && h.nitrosCosto !== '' ? `${h.nitrosCosto} No2` : ''].filter(Boolean).join(' · ');
       const det = String(h.detalle || '').split(/⚙|✋/)[0].trim();
       return `<button type="button" class="ap-op${on ? ' on' : ''}" data-ap-hab="${esc(k)}"><span class="ap-cab"><b>${propia ? '★ ' : ''}${esc(h.nombre)}</b><em>${on ? '✔ ' : ''}${costoHab(claseId)} Job</em></span>
-        <small>${esc(costo)}${costo && det ? ' — ' : ''}${esc(det.length > 170 ? det.slice(0, 170) + '…' : det)}</small></button>`;
+        <small>${esc(costo)}${costo && det ? ' — ' : ''}${glo(det.length > 170 ? det.slice(0, 170) + '…' : det)}</small></button>`;
     }
     function pasoHabilidades(){
       const jt = jobTotal(), ju = jobUsado();

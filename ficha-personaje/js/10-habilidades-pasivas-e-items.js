@@ -132,6 +132,7 @@ function abrirHabClase(claseId, yaLeido){
     return;
   }
   const listaCompleta = habsDelPool(claseId);
+  const glo = t => typeof Glosario !== 'undefined' ? Glosario.marcar(t || '') : esc(t || '');   // los términos con su globo (dueño, 2026-10-12)
   const lista = claseId === '_custom' ? listaCompleta.filter(h => (!poolFiltroFuncion || (h.etiquetas || []).includes(poolFiltroFuncion)) && (!poolFiltroTipoDano || (h.etiquetas || []).includes(poolFiltroTipoDano))) : listaCompleta;
   const costo = esCustomPool ? HAB_JOB_CUSTOM : HAB_JOB_CLASE;
   $('#hab-clase-titulo').textContent = deCreep ? '🐾 Habilidades de creep' : esCustomPool ? '🧩 Pool custom' : `Habilidades de ${clase.nombre}`;
@@ -152,8 +153,8 @@ function abrirHabClase(claseId, yaLeido){
         ${h._bib && h._bib.subida ? `<div class="hint" style="margin-top:2px">${h._bib.auditado ? '' : '<b style="color:#e0a040" title="La subió alguien del grupo y todavía no la revisó el dueño. Se puede usar igual.">🔶 sin auditar</b> · '}${h._bib.version > 1 ? `v${fmt(h._bib.version)} · ` : ''}subida por ${esc(h._bib.autor || 'alguien')}</div>` : ''}
         ${costoTxt ? `<div class="habs-grid-costo">${esc(costoTxt)}</div>` : ''}
         ${(h.etiquetas || []).length ? `<div class="hint" style="margin-top:2px">${h.etiquetas.map(esc).join(' · ')}</div>` : ''}
-        <div class="hint" style="margin-top:4px">${esc(h.detalle)}</div>
-        ${h.original ? `<div class="hint" style="margin-top:3px;opacity:.75">📜 Adaptada del borrador de clases: «${esc(h.original)}»</div>` : ''}
+        <div class="hint" style="margin-top:4px">${glo(h.detalle)}</div>
+        ${h.original ? `<div class="hint" style="margin-top:3px;opacity:.75">📜 Adaptada del borrador de clases: «${glo(h.original)}»</div>` : ''}
       </div>`;
     }).join('') || `<div class="hint">${esCustomPool && listaCompleta.length ? 'Ninguna con ese filtro.' : 'Todavía no hay ninguna acá.'}</div>`}</div>`;
   if(claseId === '_custom'){

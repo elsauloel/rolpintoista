@@ -644,6 +644,14 @@ function dueloElegirObjetivoMapa(msg){
     }catch(err){ console.error('No se pudo abrir el duelo (uno mismo):', err); toast('No se pudo abrir el duelo: ' + String((err && err.message) || err)); }
     return;
   }
+  // Un objetivo ya elegido (2026-10-12, 🐈‍⬛ Enyetar: se eligió en su menú): el duelo se abre directo contra él.
+  if(msg.objetivoFijo && tokens.get(msg.objetivoFijo)){
+    const mio0 = [...tokens.entries()].map(([id, t]) => ({...t, id})).find(propio), t = tokens.get(msg.objetivoFijo);
+    if(!mio0){ toast(`${(ataque && ataque.habNombre) || 'Habilidad'}: no encontré tu token en este mapa`); return; }
+    Duelo.crear({yo, ataque}, {id: msg.objetivoFijo, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio0.id)
+      .catch(err => { console.error('No se pudo abrir el duelo:', err); toast('No se pudo abrir el duelo: ' + String((err && err.message) || err)); });
+    return;
+  }
   // Objetivo hostil (por defecto, ataques y habilidades sin objetivo explícito) → brillan los rivales; objetivo
   // "aliado" → brillan los del mismo bando (2026-09-27, pedido del dueño). Es solo una ayuda visual: se puede
   // clickear cualquiera igual, pero si no es del bando esperado se pide confirmar antes de abrir el duelo
@@ -1652,6 +1660,7 @@ async function dueloAplicarEfectoBase(d, ef){
   // persona está en un duelo que todavía se puede reabrir, se suma a su última tirada y el duelo se vuelve a resolver (como la Polilla;
   // con el +3 empatado pierde quien lo recibió). Si no, se anuncia sobre su última tirada de la Mesa. Sin límite: se puede apilar.
   if(spec.nombre === 'Empower') return empowerAplicar(d, t, Math.round(num(ef.suma)) || 3);
+  if(spec.nombre === 'Enyetar' && typeof enyetarAplicar === 'function') return enyetarAplicar(d, t);   // 🐈‍⬛ Enyetar (Debuffer, 2026-10-12, js/38)
   // La cosecha (2026-10-07, Varita de la cosecha): la marca lleva el nombre de quien la puso («Cosecha de juan»); si muere marcado, ese
   // recupera 2 SP y 2 de vida (js/10 cosechaSiMuere).
   if(spec.nombre === 'Cosecha'){

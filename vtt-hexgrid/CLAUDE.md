@@ -1514,6 +1514,10 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   puede sumar +3 (la de cada lado de un duelo reciente de vos o un aliado dentro de tu Rango, `Duelo.tiradaSumable`; si no, su última tirada de la
   Mesa) con su costo (2 SP + 1 por cada Empower que ya lleva esa tirada; Flash: 4 + … en turno ajeno, `ConfirmarTurno.flash`); `empowerUsar` cobra
   el SP (`editarPersonajeMapa`) y suma con `Duelo.sumarATirada(…, 'Empower')` (el duelo se vuelve a resolver). El Ejecutar de la Botonera abre lo mismo.
+- **🐈‍⬛ Enyetar** (2026-10-12, Debuffer; `js/38-enyetar.js`): botón fijo como Empower (`resumen.enyetar`, `Flotantes.enyetar`); su menú lista la
+  tirada más reciente de cada enemigo a tu alcance que se pueda cambiar y ejecuta la habilidad contra él sin marcarlo (`bn.objetivoFijo` →
+  `dueloElegirObjetivoMapa({objetivoFijo})`). Si gana la maldición, el efecto «Enyetar» (js/13 → `enyetarAplicar`) llama a `Duelo.enyetarTirada`
+  (repite los mismos dados, queda la peor, el duelo se vuelve a resolver) y publica la tirada repetida en la Mesa.
 - **🎯 Mecánicas de ballesta al apuntar** (2026-10-11, también en `js/35-arcos.js`): alcance con caída, apuntada firme (`seMovioTurnoAnterior`, js/04:
   ahora se guardan los movimientos de este turno y del anterior), tirador de apoyo (`arcoAliadoPegado`), remate (`arcoQuieto`) y el +1 dado del primer
   disparo (`primerDisparoUsados`). La Remachadora la lleva el mapa del GM (`remachadoraCuenta`, `remachadoraPerfora` en `dueloAplicarDano`, js/13;

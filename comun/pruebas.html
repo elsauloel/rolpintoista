@@ -656,6 +656,17 @@ prueba('Acelerado (Shooter, 2026-10-12): 2 SP +1 por uso seguido; −1 No2 por s
   igual([hab.costo, hab.nitrosCosto, /Sin auditar/.test(hab.detalle), /Acelerado \[1\]/.test(hab.original), base, sp0, dos, trasEspada, trasArco, fin.terminados.map(e => e.nombre), S.efectos.length],
     ['2', 0, false, true, [4, 4], 2, [2, 4, 4, 1, 2], 1, 0, ['Acelerado'], 0]);
 });
+prueba('Enyetar (Debuffer, 2026-10-12): 5 SP (10 en turno ajeno), sin No2, PdG.Esp contra Res.Esp de un enemigo; botón fijo; una vez por tirada', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-enyetar');
+  const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
+  const sin = FichaResumen.resumen(S).enyetar;
+  S.habilidades = [{...structuredClone(hab), id: 'y1'}];
+  const d = {atacante: {nombre: 'A'}, defensor: {nombre: 'B'}, pdg: {total: 5, formula: '1d6+2'}, eva: {total: 7, formula: '1d8 🐈'}, fase: 'contacto'};
+  igual([hab.costo, hab.nitrosCosto, hab.turnoAjenoSp, hab.enyetar, ej.objetivo, ej.tira.stat, ej.contra.map(c => c.stat), (ej.efectos || []).map(e => e.nombre), /Sin auditar/.test(hab.detalle), /Enyetar \[5\]/.test(hab.original),
+    sin, FichaResumen.resumen(S).enyetar, Duelo.tiradaSumable(d, 'atacante').enyetada, Duelo.tiradaSumable(d, 'defensor').enyetada, typeof Duelo.enyetarTirada],
+    ['5', 0, '10', true, 'enemigo', 'pdgmg', ['resmg'], ['Enyetar'], false, true, false, true, false, true, 'function']);
+});
 prueba('Un stat en 0 o negativo se tira igual: da el valor sin dados (el duelo no queda en «Tirando…», 2026-10-12)', () => {
   const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
   S.efectos = [{id: 'x', nombre: 'Muy debilitado', polaridad: 'debuff', turnos: 2, activo: true, mods: [{stat: 'pdg', val: -50}]}];

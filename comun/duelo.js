@@ -1465,6 +1465,45 @@ const Duelo = (() => {
      y vuelve a resolver ese paso con el número nuevo — puede dar vuelta quién ganó. Vale mientras el paso se pueda reabrir (como la Moneda: antes
      de los d20 del crítico, del daño y de aplicar efectos). lado: 'atacante' | 'defensor'. → {campo, etq, antes, ahora, contra, resultado} o null. */
   const campoPolilla = (m, lado) => (lado === 'atacante' ? ['fuerza', 'pdg'] : ['bloqueo', 'eva']).find(c => m && m[c] && puedeReabrir({...m, rerollUsado: null}, c)) || null;
+  // Con una tirada cambiada (Polilla, Empower, Enyetar), el paso vuelve a resolverse desde ahí.
+  function reabrirPaso(m, campo){
+    if(campo === 'fuerza' || campo === 'bloqueo'){ m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'bloqueo'; }
+    else{ m.contacto = null; m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'contacto'; if(m.hab) m.efectos = null; }
+    m.estado = 'esperando';
+  }
+  /* 🐈‍⬛ Enyetar (Debuffer, 2026-10-12, dueño): esa misma tirada de ese lado se repite (los mismos dados, con el mismo «+») y queda la más baja;
+     el duelo se vuelve a resolver (un empate, con la regla de siempre). Una vez por tirada (queda 🐈 en su fórmula).
+     → {campo, etq, antes, nueva, ahora, contra, dados, rolls} o null (no se puede: ya siguió, o ya estaba enyetada). */
+  async function enyetarTirada(id, lado){
+    const ref = col().doc(id);
+    let res = null, anuncio = '', tiro = null;
+    await fbDb.runTransaction(async tx => {
+      res = null; anuncio = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      const campo = campoPolilla(m, lado);
+      if(!campo) return;
+      const t0 = m[campo] || {}, otro = {pdg: 'eva', eva: 'pdg', fuerza: 'bloqueo', bloqueo: 'fuerza'}[campo];
+      if(String(t0.formula || '').includes('🐈')) return;
+      if(!tiro){   // se tira una sola vez aunque la transacción se repita
+        const dados = String(t0.formula || '').match(/\d*d\d+/g) || [], rolls = [];
+        dados.forEach(dd => { const [c, f] = dd.split('d'); for(let i = 0; i < Math.min(20, Math.max(1, _num(c) || 1)); i++) rolls.push(1 + Math.floor(Math.random() * Math.max(1, _num(f)))); });
+        tiro = {rolls, dados: dados.join('+'), total: rolls.reduce((a, b) => a + b, 0) + _num(t0.mod)};
+      }
+      const peor = tiro.total < _num(t0.total);
+      m[campo] = {...t0, ...(peor ? {total: tiro.total, rolls: tiro.rolls} : {}), formula: `${t0.formula || ''} 🐈`.slice(0, 60)};
+      reabrirPaso(m, campo);
+      anuncio = avanzar(m) || '';
+      const upd = cambiosDe(m);
+      if(m.resumido) upd.resumido = false;
+      tx.update(ref, upd);
+      res = {campo, etq: etqCampo(m, campo), antes: _num(t0.total), nueva: tiro.total, ahora: m[campo].total, contra: m[otro] ? _num(m[otro].total) : null,
+        dados: tiro.dados, rolls: tiro.rolls, mod: _num(t0.mod)};
+    });
+    if(anuncio) anunciarMesa(anuncio);
+    return res;
+  }
   // usa (2026-10-12, Empower): el nombre de lo que suma, para el aviso del empate (por defecto, la Polilla).
   async function sumarATirada(id, lado, n, marca, usa = 'la Polilla'){
     const ref = col().doc(id);
@@ -1478,9 +1517,7 @@ const Duelo = (() => {
       if(!campo) return;
       const t0 = m[campo], otro = {pdg: 'eva', eva: 'pdg', fuerza: 'bloqueo', bloqueo: 'fuerza'}[campo];
       m[campo] = {...t0, total: _num(t0.total) + n, mod: _num(t0.mod) + n, formula: `${t0.formula || ''} +${n}${marca ? ' ' + marca : ''}`.slice(0, 60)};
-      if(campo === 'fuerza' || campo === 'bloqueo'){ m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'bloqueo'; }
-      else{ m.contacto = null; m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'contacto'; if(m.hab) m.efectos = null; }
-      m.estado = 'esperando';
+      reabrirPaso(m, campo);
       // Si con el +n queda empatado, pierde quien usó la Polilla (dueño, 2026-10-08): no hay desempate.
       const par = campo === 'fuerza' || campo === 'bloqueo' ? 'bloqueo' : 'contacto';
       const pa = par === 'contacto' ? m.pdg : m.fuerza, pb = par === 'contacto' ? m.eva : m.bloqueo;
@@ -1504,7 +1541,7 @@ const Duelo = (() => {
     const c = campoPolilla(m, lado);
     if(!c) return null;
     const t = m[c] || {};
-    return {campo: c, etq: etqCampo(m, c), total: _num(t.total), empowers: (String(t.formula || '').match(/💪/gu) || []).length};
+    return {campo: c, etq: etqCampo(m, c), total: _num(t.total), empowers: (String(t.formula || '').match(/💪/gu) || []).length, enyetada: String(t.formula || '').includes('🐈')};
   }
   let rerollInfo = {}, rerollPedidas = new Set();
   function ladoMio(d){ return puedoTirarYo(d.atacante) ? 'atacante' : puedoTirarYo(d.defensor) ? 'defensor' : ''; }
@@ -2545,5 +2582,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {tiradaSumable, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

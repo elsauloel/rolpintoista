@@ -334,8 +334,11 @@ En el PDF nuevo la página del Debuffer repite las tarjetas del Support.
 **A confirmar:** usar las tarjetas del Debuffer de la versión anterior, que
 ya tenían este mismo formato (número azul, Maldición Esp / Res.M):
 
-1. **Enyetar** [5] — Maldición (Esp / Res.M). Flash. Obliga a repetir una
-   tirada y quedarse con el valor más bajo.
+1. ✅ **Enyetar** — **SP:** 5 (⚡ Flash: el doble, 10, en turno ajeno). **No2:** 0. Después de que un **enemigo a la vista dentro de tu Rango**
+   tira: maldición, **PdG.Esp contra su Res.Esp**; si ganás, **esa tirada se repite y queda la más baja** y el duelo se vuelve a resolver. **Una vez
+   por tirada.** En combate, quien la tiene ve un **botón fijo 🐈‍⬛** (como el 💪 de Empower) para elegir la tirada en cualquier momento. ⚙
+   Automatizado; ✋ a mano, una tirada fuera de un duelo. *(Auditada 2026-10-12 con el dueño; original: «Enyetar [5] — Maldición (Esp / Res.M).
+   Flash. Obliga a repetir una tirada y quedarse con el valor más bajo.»)*
 2. **Confusión** [5] — Maldición (Esp / Res.M). Antes de realizar un
    ataque o habilidad con objetivo, tira 1d4: 1) el debuffer elige el
    objetivo; 2) gasta los No2 pero no realiza la acción; 3) elige el

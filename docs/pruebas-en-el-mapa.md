@@ -10,20 +10,6 @@
 
 ## Pendientes
 
-- [ ] **🎯 Apuntar: el tope de X y el ×2** (2026-10-11; subido, sin ver en el mapa): en el cartel del costo tiene que decir «X: de 1 a 3» y no dejar
-  pagar 4; con X = 2, «Apuntando ×2» y el disparo «apuntando (+2): +2 PdG, Crítico potente +2». Ojo: la copia de Apuntar de juan es vieja (sin `xMax`):
-  volver a dársela desde el catálogo de skills.
-- [ ] **🛡 Shield (Support)** (2026-10-11, cargada y con prueba automática): en el mapa, juan se la pone a Clementino (y a sí mismo); un golpe de 9
-  la deja en 5 y otro de 8 entra 3 a la vida; al gastarse, al próximo turno de Clementino se va; usada en turno ajeno cobra 4 SP; no vence por turnos.
-- [ ] **🎯 Enfocado (Shooter)** (2026-10-11, cargada y con prueba automática; solo estaba conectado el navegador del GM): darle Enfocado a juan
-  desde «+ Habilidad → De clase» (y ver ahí la línea «📜 Adaptada del borrador de clases…»); usarla tres veces seguidas: el botón tiene que decir 1,
-  2 y 3 SP y cobrar 1 No2 cada vez, con «Enfocado ×3»; el próximo ataque con arma (probar uno cuerpo a cuerpo y otro a distancia) suma +6 de daño
-  y el estado se va; el ataque siguiente ya no suma. En «Ver» de la skill, «Detalles técnicos» muestra el texto original.
-- [ ] **🌑 Maldición debilitante (Debuffer)** (2026-10-11, cargada y con prueba automática): juan se la tira al Coloso (PdG.Esp contra Res.Esp);
-  si gana, «Debilitado» 2 turnos y en sus Acciones el PdG, la Evasión, el Parry y el daño bajan 1 (botones en rojo); otra vez = ×2 (−2) y vuelve a 2
-  turnos; cobra 5 SP y 3 No2. Probar también contra un personaje (Clementino) para ver que le llega a su ficha.
-- [ ] **✨ Blessing (Support)** (2026-10-11, cargada y con prueba automática): juan se la pone a Clementino y a sí mismo; «Bendecido» 2 turnos y
-  en la Botonera el PdG, la Evasión, el Parry y el daño suben 1 (en verde); otra vez renueva sin sumar; cobra 5 SP y 1 No2.
 - [ ] **🗡 Dagas Tipo 4 Comunes ajustadas** (2026-10-11, `revision-cuerpo-a-cuerpo-t4.md`): ver en la tienda o el inventario que los textos y precios
   nuevos se vean bien (por ejemplo el Estileto 1d4+1, la Pica Hielos 2d4 con PdG −1) y un golpe con una de ellas desde la Botonera.
 
@@ -73,6 +59,23 @@
   repite eso. Mirar si sobra o falta algún término, y si algún texto del globo conviene reescribirlo.
 
 ## Probado
+
+- [x] **Skills auditadas del 2026-10-11, en el mapa** (2026-10-12, «Claude · pruebas», juan y el GM, con capturas):
+  - **🎯 Enfocado**: tres usos seguidos cobraron 1, 2 y 3 SP (y 1 No2 cada uno), el botón decía «2 SP (+1 por usarla seguida)»… y quedó
+    «Enfocado ×3»; el disparo de arco al Coloso: «Arco corto · 2d4 + 2 + 6» (crítico ×3 = 45); el estado se gastó y volvió a costar 1 SP. No se
+    probó un golpe cuerpo a cuerpo (juan solo tiene arco): es el mismo mecanismo de cargas que Envenenar arma. En «Ver», «Detalles técnicos»
+    muestra el texto original del borrador.
+  - **🌑 Maldición debilitante**: PdG.Esp 9 contra Res.Esp 3 → Debilitado 2 turnos en el Coloso (Acciones: «Debilitado −1» en Atacar y Esquivar);
+    la segunda (10 contra 7): ×2, 2 turnos, −2 (los dados bajan de 1d4 a 1d3). **Arreglado en el camino**: el cartelito decía −1 con ×2 (ahora
+    multiplica por los stacks). No se probó contra un personaje: va por el mismo aviso que Veneno, ya probado.
+  - **✨ Blessing**: sobre juan mismo, Bendecido 2 turnos, PdG 11 → 12, «Bendecido +1» en Atacar y Esquivar; 5 SP y 1 No2. El daño del arco no
+    cambia (suma la mitad del Dmg). **Arreglado en el camino**: la ficha suelta en segundo plano se adjudicaba el efecto y guardaba tarde (el
+    navegador frena sus relojes); ahora solo lo toma si está a la vista, si no lo aplica el mapa.
+  - **🛡 Shield**: sobre Clementino 14/14; golpe de 9 → 5; golpe de 8 → 0 y 3 a la vida (18 → 15); al empezar el turno de Clementino, el escudo
+    gastado se fue. En turno ajeno: «No es el turno de juan… Cuesta 4 SP» y cobró 4. **Arreglado en el camino**: el token seguía mostrando el escudo
+    lleno después de un golpe (el resumen público no se actualizaba; venía de antes).
+  - **🎯 Apuntar**: el cartel dice «X: de 1 a 3»; con 4 avisa «Como mucho 3 Nitros en X» y no cobra; con 2: «Apuntando ×2» y el disparo
+    «distancia ideal y apuntando (+2): +3 PdG, Crítico potente +2». Ojo: cancelar el duelo después de elegir el objetivo ya gastó Apuntando.
 
 - [x] **☠ Veneno (Debuffer)** (2026-10-11, en el mapa, las dos cuentas): juan («1 No2 · 2 SP») contra el Coloso: el duelo «PdG.Esp contra Res.Esp»;
   la primera vez resistió (6 contra 11: «se resistió»); con un estado de prueba en el Coloso (−10 Res.Esp) ganó juan (9 contra 4: «¡Funcionó!») y

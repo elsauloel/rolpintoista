@@ -389,6 +389,44 @@ function pasosPagables(costo, ruta){
 // (quedan en negativo), pero avisa y la estela sigue en rojo.
 // Devuelve true si un elemento sólido cortó el avance: el token "se choca"
 // y se queda en la última casilla libre.
+/* 🧭 El rodeo (2026-10-12, dueño: «que el mapa calcule la ruta más corta para rodear un objeto»; P46): el camino más corto (A*) de una casilla a
+   otra sin pisar nada Sólido ni cruzar una pared de línea; un paso que sale de terreno lento cuesta lo que cuesta salir de ahí. Los tokens no
+   tapan (no hay choque entre tokens). → [casillas sin la de partida] o null (no hay paso, o queda más lejos de lo razonable). */
+const RODEO_MAX_NODOS = 3000;
+let rodeoUltimo = null;   // el último cálculo (el mouse se mueve dentro de la misma casilla muchas veces)
+function rutaRodeo(desde, hasta){
+  const solidos = solidosSet(), esSolido = c => solidos.has(nbPack(c.col, c.fila));
+  if(esSolido(hasta)) return null;
+  const clave = c => c.col + ',' + c.fila, k0 = clave(desde) + '>' + clave(hasta) + '|' + solidosFirma();
+  if(rodeoUltimo && rodeoUltimo.k === k0) return rodeoUltimo.r && rodeoUltimo.r.slice();
+  const r = rutaRodeo0(desde, hasta, esSolido, clave);
+  rodeoUltimo = {k: k0, r};
+  return r && r.slice();
+}
+function rutaRodeo0(desde, hasta, esSolido, clave){
+  const abiertos = [{c: desde, g: 0, f: distanciaHex(desde, hasta)}], g = new Map([[clave(desde), 0]]), previo = new Map();
+  let nodos = 0;
+  while(abiertos.length && nodos++ < RODEO_MAX_NODOS){
+    let k = 0;
+    for(let i = 1; i < abiertos.length; i++) if(abiertos[i].f < abiertos[k].f) k = i;
+    const {c} = abiertos.splice(k, 1)[0], kc = clave(c);
+    if(mismoHex(c, hasta)){
+      const camino = [];
+      for(let x = kc; x !== clave(desde); x = previo.get(x)){ const [col, fila] = x.split(',').map(Number); camino.unshift({col, fila}); }
+      return camino;
+    }
+    const cubo = hexACubo(c), paso = Math.max(1, num(typeof lentoEn === 'function' ? lentoEn(c.col, c.fila) : 0));
+    VECINO_LADO.forEach(([vq, vr]) => {
+      const v = {col: cuboACol(cubo.q + vq, cubo.r + vr), fila: cuboAFila(cubo.q + vq, cubo.r + vr)}, kv = clave(v);
+      if(esSolido(v) || paredCorta(c, v)) return;
+      const ng = g.get(kc) + paso;
+      if(g.has(kv) && g.get(kv) <= ng) return;
+      g.set(kv, ng); previo.set(kv, kc);
+      abiertos.push({c: v, g: ng, f: ng + distanciaHex(v, hasta)});
+    });
+  }
+  return null;
+}
 function extenderRuta(a, casilla){
   const ruta = a.ruta;
   const i = ruta.findIndex(c => mismoHex(c, casilla));
@@ -400,6 +438,14 @@ function extenderRuta(a, casilla){
     if(!a.marcador && (elementoSolidoEn(c.col, c.fila) || paredCorta(ruta[ruta.length - 1], c))){ chocado = true; break; }   // un Sólido o una pared de línea (js/34)
     if(ruta.length >= RUTA_MAX_CELDAS) break;
     ruta.push(c);
+  }
+  // 🧭 Chocó: si hay un rodeo hasta donde está el mouse, el camino lo rodea solo (si no, se queda chocado en la última casilla libre).
+  if(chocado && !a.marcador){
+    const rodeo = rutaRodeo(ruta[ruta.length - 1], casilla);
+    if(rodeo && ruta.length + rodeo.length <= RUTA_MAX_CELDAS){
+      rodeo.forEach(c => { const j = ruta.findIndex(x => mismoHex(x, c)); if(j >= 0) ruta.length = j + 1; else ruta.push(c); });
+      chocado = false;
+    }
   }
   if(a.costo && ruta.length - 1 > pasosPagables(a.costo, ruta) && !a.avisado){
     // Sin aviso verde: la estela en rojo y el cartel ya lo muestran.

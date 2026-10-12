@@ -1222,7 +1222,7 @@ const Combatiente = (() => {
       efectos: (c.efectos || []).map(mapEf),
       ...(c.efectosNota ? {efectosNota: sx(c.efectosNota)} : {}),
       ...(critico && Object.keys(critico).length ? {critico} : {}),
-      ...(c.terminaTurno ? {terminaTurno: true} : {})};   // Degollar (2026-10-10): al resolverse, termina el turno y pasa al final del orden
+      ...(c.terminaTurno ? {terminaTurno: true} : {}), ...(c.soloCritico ? {soloCritico: true} : {})};   // Headshot (2026-10-12): si no es crítico, falla   // Degollar (2026-10-10): al resolverse, termina el turno y pasa al final del orden
   }
   /* ⚡ Flash (P136, regla del dueño 2026-09-30): en el propio turno cuesta lo que dice la habilidad; en turno ajeno, EL DOBLE —
      SP (personaje), cooldown (creep) y vida por igual, se use dentro del duelo o con el botón. `costo` = {sp, cd, hp};

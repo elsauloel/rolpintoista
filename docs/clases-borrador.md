@@ -272,8 +272,9 @@ Salvo Carga Elemental, todas son **Hechizo (PG: Esp · Daño: Esp)**.
    alcanzan, no hay contraataque); con ballesta no hace falta. La parte de «disparo instantáneo en turno ajeno» queda como el disparo de siempre.
    ⚙ Automatizado. *(Auditada 2026-10-12 con el dueño; original: «Parry a distancia [2] — Flash. Realiza un ataque de rango como instantáneo. Si
    se hace como respuesta a un ataque, tira Agilidad para cancelarlo.»)*
-5. **Headshot** [4] — Ataque con +1 al crítico y crítico mejorado. Daño
-   +5. +2 fijo a PG. Falla si no es crítico.
+5. ✅ **Headshot** — **SP:** 4. **No2:** el del disparo. Un disparo **con un arma a distancia**: **+2 PdG, +5 de daño, Crítico frecuente +1 y Crítico
+   potente +1**. **Todo o nada: si no es crítico, no hace nada** (aunque pegue). ⚙ Automatizado en el duelo. *(Auditada 2026-10-12 con el dueño;
+   original: «Headshot [4] — Ataque con +1 al crítico y crítico mejorado. Daño +5. +2 fijo a PG. Falla si no es crítico.»)*
 6. **Proyectil perforante** [2] — Ataque que continúa hasta alcanzar un
    segundo objetivo. Todos los efectos especiales se pierden después del
    primer objetivo.

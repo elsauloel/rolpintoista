@@ -435,7 +435,7 @@ const Duelo = (() => {
         : cfg.ataque.tipo === 'habilidad-arma' ? {tipo: 'habilidad-arma', habNombre: txtCorto(cfg.ataque.habNombre, 60), armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado), rango: !!cfg.ataque.rango,
           sinParry: !!cfg.ataque.sinParry, mods: {pdg: _num(cfg.ataque.mods && cfg.ataque.mods.pdg), dados: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.dados))), fijo: _num(cfg.ataque.mods && cfg.ataque.mods.fijo), ignoraResistCrit: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.ignoraResistCrit))),
             critBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critBono))), critpotBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critpotBono)))}, efectos: limpiarEfectos(cfg.ataque.efectos),
-          ...(cfg.ataque.terminaTurno ? {terminaTurno: true} : {}),   // Degollar: al resolverse, el mapa del GM le termina el turno
+          ...(cfg.ataque.terminaTurno ? {terminaTurno: true} : {}), ...(cfg.ataque.soloCritico ? {soloCritico: true} : {}),   // Degollar: al resolverse, el mapa del GM le termina el turno
           ...(cfg.ataque.efectosNota ? {efectosNota: txtCorto(cfg.ataque.efectosNota, 200)} : {}),
           // ⚡ Critical Matters (2026-09-29): efectos/nota que solo cuentan si el golpe es crítico (ver
           // entrarCritico/efectosHtml) — mismo saneo que los de siempre, adentro de un campo aparte.
@@ -710,6 +710,8 @@ const Duelo = (() => {
       m.estado = 'esperando';
     }else{
       m.crit = e ? {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados, critico: false, frecuente, potente, resistencia, d20: null, mejor: 0, mult: 1} : null;
+      // 🎯 Headshot (Shooter, 2026-10-12): «falla si no es crítico» — pegó, pero sin crítico no hace nada.
+      if(m.ataque && m.ataque.soloCritico){ m.crit = {...(m.crit || {}), critico: false, soloCritico: true}; m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; return; }
       entrarDano(m);
     }
   }
@@ -1693,6 +1695,8 @@ const Duelo = (() => {
     }else if(d.resultado === 'pego'){
       const porParry = d.defensa && d.defensa.modo === 'parry';
       caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">⚔ ¡PEGÓ!</div><div class="chico">${porParry ? 'El Parry no alcanzó: el golpe entra completo' : 'El golpe entra completo'}</div>${mot}</div>`;
+    }else if(d.resultado === 'fallo' && d.crit && d.crit.soloCritico){
+      caja = `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🎯 SIN CRÍTICO</div><div class="chico">Pegó, pero no fue crítico: ${_esc(d.ataque.habNombre || 'el disparo')} no hace nada (solo vale si es crítico)</div>${mot}</div>`;
     }else if(d.resultado === 'fallo'){
       caja = `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🛡 FALLÓ</div><div class="chico">${_esc(d.defensor.nombre)} lo esquivó</div>${mot}</div>`;
     }else if(interceptado){

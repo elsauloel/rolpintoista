@@ -566,7 +566,8 @@ const FichaAcciones = (() => {
     // Con costo de ataque: primero se elige el arma (si hay más de una).
     let arma = null;
     if(FichaHabilidades.nitrosAtaque(it)){
-      const opciones = FichaBotonera.armasParaHabilidad(S);
+      const opciones = FichaBotonera.armasParaHabilidad(S, it);
+      if(it.soloRango && !opciones.some(o => o.arma)){ ui.toast(`${it.nombre} se usa con un arma a distancia en la mano`); return; }   // Headshot
       if(armaId === undefined && opciones.length > 1){ ui.elegirArmaHab(it, opciones); return; }
       arma = armaId ? (S.inventario.find(x => x.id === armaId) || null) : opciones[0].arma;
     }

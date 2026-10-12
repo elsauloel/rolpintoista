@@ -69,8 +69,9 @@ const FichaBotonera = (() => {
   const modoHab = h => Combatiente.modoHab(h, h && dueloDe(h));
   const habAutomatizada = h => modoHab(h) !== 'manual';
   // Con costo de Nitros "ATAQUE": lo mismo que un ataque con el arma que se elija al ejecutarla.
-  function armasParaHabilidad(S){
-    const armas = FichaCombate.armasEquipadasConDano(S);
+  // h.soloRango (2026-10-12, Headshot): solo las armas a distancia.
+  function armasParaHabilidad(S, h){
+    const armas = FichaCombate.armasEquipadasConDano(S).filter(a => !(h && h.soloRango) || (a.item && a.item.armaDeRango));
     return armas.length ? armas.map(a => ({arma: a.item, mano: a.mano})) : [{arma: null, mano: null}];
   }
   const costoAtaqueNitros = (S, arma) => FichaCombate.costoAtaque(S, arma);

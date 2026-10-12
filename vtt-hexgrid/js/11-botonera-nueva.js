@@ -1376,7 +1376,9 @@ async function recibidosAplicar(fichaId){
   await editarPersonajeMapa(fichaId, async S => {
     const nombre = ((S.meta && S.meta.nombre) || '').trim();
     const aviso = t => toast(nombre && !String(t).includes(nombre) ? `${nombre} · ${t}` : t);
-    const ui = {presets: estadosPresetFicha(), cambio: () => {}, toast: aviso};
+    // recordatorios: las líneas para la Mesa (la pieza a punto de romperse o rota, el anillo que absorbió la Armadura rota; 2026-10-12).
+    const ui = {presets: estadosPresetFicha(), cambio: () => {}, toast: aviso,
+      recordatorios: lista => (lista || []).forEach(r => r && r.nombre && mesaLinea(`${r.nombre}${r.detalle ? ' — ' + r.detalle : ''}`, 'recordatorio', nombre))};
     const borrar = controloFicha(fichaId);   // 🎮 el GM lo borra en vez de marcarlo
     let hubo = false;
     for(const d of de('recompensas')){

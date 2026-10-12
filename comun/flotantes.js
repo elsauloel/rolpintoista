@@ -7,7 +7,7 @@
    orden (cada pantalla lo llama después de dibujar o sacar uno). Lo usan el mapa (js/02, js/25) y la ficha suelta (js/03).
    ========================================================= */
 const Flotantes = (() => {
-  const ORDEN = ['afortunado-flotante', 'enyetar-flotante', 'empower-flotante', 'polilla-flotante', 'impulso-flotante', 'moneda-flotante'];
+  const ORDEN = ['reroll-flotante', 'afortunado-flotante', 'enyetar-flotante', 'empower-flotante', 'polilla-flotante', 'impulso-flotante', 'moneda-flotante'];
   // Dónde van. En el mapa (2026-10-10, dueño: «arriba, al lado de los botones de los lentes, a la misma altura que esa botonera»): en fila,
   // a la izquierda de la barra de arriba (#flotantes-mapa), con la altura de sus botones y en un solo renglón (la línea de ayuda pasa al
   // globo del mouse). Donde no hay esa barra (la ficha suelta): uno arriba del otro, abajo a la izquierda.
@@ -43,6 +43,10 @@ const Flotantes = (() => {
 #afortunado-flotante.flot-arriba::after{bottom:5px;left:5px;animation:polilla-chispa 2.2s ease-in-out 1.2s infinite}
 .afortunado-hada{display:inline-block;animation:afortunado-flota 2.6s ease-in-out infinite}
 @keyframes afortunado-flota{0%,100%{transform:translateY(1px) rotate(-6deg)}50%{transform:translateY(-3px) rotate(6deg);filter:drop-shadow(0 0 5px rgba(140,255,170,.95))}}
+/* 🔄 Re-roll (2026-10-12): las flechas giran una vuelta cada tanto, con brillo celeste. */
+#reroll-flotante.flot-arriba{--flot-glow:rgba(90,200,255,.85)}
+.reroll-flechas{display:inline-block;animation:reroll-gira 3s ease-in-out infinite}
+@keyframes reroll-gira{0%,60%{transform:rotate(0);filter:none}80%{transform:rotate(360deg);filter:drop-shadow(0 0 5px rgba(110,210,255,1))}100%{transform:rotate(360deg);filter:none}}
 /* 🐈‍⬛ Enyetar (2026-10-12): el gato negro se eriza cada tanto, con un brillo violeta oscuro. */
 #enyetar-flotante.flot-arriba{--flot-glow:rgba(170,90,255,.8);overflow:visible}
 .enyetar-gato{display:inline-block;transform-origin:50% 90%;animation:enyetar-eriza 3s ease-in-out infinite}
@@ -50,9 +54,9 @@ const Flotantes = (() => {
   70%{transform:scale(.95,1.15) translateY(-2px);filter:drop-shadow(0 0 7px rgba(190,110,255,1))}80%{transform:scale(1) translateY(0);filter:none}}
 @keyframes flot-latido{0%{box-shadow:0 2px 8px rgba(0,0,0,.5),0 0 3px var(--flot-glow)}100%{box-shadow:0 2px 8px rgba(0,0,0,.5),0 0 13px var(--flot-glow)}}`;
   // Lo que explica el mouse (dueño: «al hacer hover te explica: tenés una moneda / tenés una polilla activa»).
-  const TITULO = {'afortunado-flotante': 'Tenés Afortunado', 'enyetar-flotante': 'Tenés Enyetar', 'empower-flotante': 'Tenés Empower', 'polilla-flotante': 'Tenés una Polilla mística activa', 'moneda-flotante': 'Tenés una Moneda Re-Roll',
+  const TITULO = {'reroll-flotante': 'Tenés Re-roll', 'afortunado-flotante': 'Tenés Afortunado', 'enyetar-flotante': 'Tenés Enyetar', 'empower-flotante': 'Tenés Empower', 'polilla-flotante': 'Tenés una Polilla mística activa', 'moneda-flotante': 'Tenés una Moneda Re-Roll',
     'impulso-flotante': 'Tenés un anillo de impulso activo'};
-  const ACCION = {'afortunado-flotante': 'tocá para elegir a qué tirada tuya o de un aliado le das suerte', 'enyetar-flotante': 'tocá para elegir a qué tirada de un enemigo le echás la yeta', 'empower-flotante': 'tocá para elegir a qué tirada le sumás +3', 'polilla-flotante': 'tocá para sumarle +2 a tu última tirada', 'moneda-flotante': 'tocá para repetir una de tus últimas tiradas',
+  const ACCION = {'reroll-flotante': 'tocá para elegir qué tirada tuya o de un aliado se vuelve a tirar', 'afortunado-flotante': 'tocá para elegir a qué tirada tuya o de un aliado le das suerte', 'enyetar-flotante': 'tocá para elegir a qué tirada de un enemigo le echás la yeta', 'empower-flotante': 'tocá para elegir a qué tirada le sumás +3', 'polilla-flotante': 'tocá para sumarle +2 a tu última tirada', 'moneda-flotante': 'tocá para repetir una de tus últimas tiradas',
     'impulso-flotante': 'tocá para sumarle su bono a tu última tirada'};
   // Deja solo el ícono (el primer «carácter» del texto; la moneda conserva su cara que gira).
   function soloIcono(b){
@@ -60,7 +64,7 @@ const Flotantes = (() => {
     if(!div || div.dataset.soloIcono) return;
     const cara = div.querySelector('.moneda-cara');
     const primero = [...String(div.textContent || '').trim()][0] || '•';
-    const icono = cara ? cara.outerHTML : b.id === 'polilla-flotante' ? `<span class="polilla-ala">${primero}</span>` : b.id === 'empower-flotante' ? `<span class="empower-brazo">${primero}</span>` : b.id === 'enyetar-flotante' ? `<span class="enyetar-gato">🐈‍⬛</span>` : b.id === 'afortunado-flotante' ? `<span class="afortunado-hada">🧚</span>` : primero;   // la mariposa aletea; el brazo hace fuerza
+    const icono = cara ? cara.outerHTML : b.id === 'polilla-flotante' ? `<span class="polilla-ala">${primero}</span>` : b.id === 'empower-flotante' ? `<span class="empower-brazo">${primero}</span>` : b.id === 'enyetar-flotante' ? `<span class="enyetar-gato">🐈‍⬛</span>` : b.id === 'afortunado-flotante' ? `<span class="afortunado-hada">🧚</span>` : b.id === 'reroll-flotante' ? `<span class="reroll-flechas">🔄</span>` : primero;   // la mariposa aletea; el brazo hace fuerza
     div.dataset.soloIcono = '1';
     div.innerHTML = icono;
   }
@@ -122,7 +126,10 @@ const Flotantes = (() => {
 #empower-flotante{position:fixed;left:16px;bottom:16px;z-index:999997;background:linear-gradient(135deg,#5a2412,#34140a);color:#ffdcc4;border:2px solid #ff8a4a;
   border-radius:16px;padding:10px 16px;font-size:15px;font-weight:800;cursor:pointer;text-align:left;transform-origin:left bottom;
   box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 14px rgba(255,120,60,.5);animation:moneda-latido 2.6s ease-in-out infinite alternate}
-#empower-flotante small, #enyetar-flotante small, #afortunado-flotante small{display:block;font-weight:500;font-size:11px;opacity:.9}
+#reroll-flotante{position:fixed;left:16px;bottom:16px;z-index:999997;background:linear-gradient(135deg,#123247,#0a1c2a);color:#d6f0ff;border:2px solid #5ac8ff;
+  border-radius:16px;padding:10px 16px;font-size:15px;font-weight:800;cursor:pointer;text-align:left;transform-origin:left bottom;
+  box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 14px rgba(90,200,255,.5);animation:moneda-latido 2.6s ease-in-out infinite alternate}
+#empower-flotante small, #enyetar-flotante small, #afortunado-flotante small, #reroll-flotante small{display:block;font-weight:500;font-size:11px;opacity:.9}
 #afortunado-flotante{position:fixed;left:16px;bottom:16px;z-index:999997;background:linear-gradient(135deg,#123a22,#0a2214);color:#d8ffe2;border:2px solid #6ee68c;
   border-radius:16px;padding:10px 16px;font-size:15px;font-weight:800;cursor:pointer;text-align:left;transform-origin:left bottom;
   box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 14px rgba(110,230,140,.5);animation:moneda-latido 2.6s ease-in-out infinite alternate}
@@ -177,5 +184,6 @@ const Flotantes = (() => {
   const empower = o => fijo('empower-flotante', '<span class="empower-brazo">💪</span>', 'Empower', o && {...o, sub: o.sub || '+3 a una tirada tuya o de un aliado'});
   const enyetar = o => fijo('enyetar-flotante', '<span class="enyetar-gato">🐈‍⬛</span>', 'Enyetar', o && {...o, sub: o.sub || 'que un enemigo repita una tirada'});
   const afortunado = o => fijo('afortunado-flotante', '<span class="afortunado-hada">🧚</span>', 'Afortunado', o && {...o, sub: o.sub || 'que vos o un aliado repita una tirada'});
-  return {moneda, empower, enyetar, afortunado, apilar};
+  const reroll = o => fijo('reroll-flotante', '<span class="reroll-flechas">🔄</span>', 'Re-roll', o && {...o, sub: o.sub || 'que vos o un aliado vuelva a tirar'});
+  return {moneda, empower, enyetar, afortunado, reroll, apilar};
 })();

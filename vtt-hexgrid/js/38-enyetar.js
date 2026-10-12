@@ -83,10 +83,10 @@ async function publicarRepeticion(nom, r, modo, desde){
   const malo = modo === 'peor', antes = Array.isArray(r.rollsAntes) ? r.rollsAntes : [], n = (r.rolls || []).length;
   const juntos = n > 0 && antes.length === n;
   const queda = juntos ? (r.nuevaQueda ? [...Array(n).keys()].map(i => i + n) : [...Array(n).keys()]) : (r.nuevaQueda ? [...Array(n).keys()] : []);
-  const que = malo ? 'se queda con la peor (Enyetar)' : 'se queda con la mejor (Afortunado)';
+  const que = malo ? 'se queda con la peor (Enyetar)' : modo === 'nueva' ? 'queda la nueva (Re-roll)' : 'se queda con la mejor (Afortunado)';
   try{
     await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: nom,
-      origen: `${malo ? '🐈‍⬛' : '🧚'} ${nom} · repite su ${r.etq}: ${fmt(r.antes)} y ${fmt(r.nueva)} → queda ${fmt(r.ahora)} (${que})`.slice(0, 160),
+      origen: `${malo ? '🐈‍⬛' : modo === 'nueva' ? '🔄' : '🧚'} ${nom} · repite su ${r.etq}: ${fmt(r.antes)} y ${fmt(r.nueva)} → queda ${fmt(r.ahora)} (${que})`.slice(0, 160),
       formula: juntos ? `${r.dados}+${r.dados}` : (r.dados || '0'), rolls: juntos ? [...antes, ...r.rolls] : (r.rolls || []), mod: 0, total: r.ahora,
       ...(queda.length && queda.length <= 20 ? {destacar: (malo ? 'malo:' : '') + 'idx:' + queda.join(',')} : {}),
       desde, cuando: firebase.firestore.FieldValue.serverTimestamp()});

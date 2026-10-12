@@ -625,6 +625,14 @@ prueba('Maldición extenuante (Debuffer, 2026-10-12): Extenuado +1 No2 por stack
     CreepCalculo.costoAtaque(sc), Combatiente.extenuado(S.efectos), FichaBotonera.costoNitrosHab(S, {nitrosCosto: 1}), /Sin auditar/.test(hab.detalle), /Maldición extenuante \[3\]/.test(hab.original)],
     ['3', 2, 'pdgmg', ['resmg'], true, [4, 1, 1], [5, 2, 2, 5, 0], 1, 2, 1, 6, 2, 3, false, true]);
 });
+prueba('Re-roll (Support, 2026-10-12): 2 SP (4 en turno ajeno) + 2 No2, sin tiradas; el resumen avisa al mapa para el botón fijo 🔄', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-reroll');
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
+  S.habilidades = [{...hab, id: 'r1'}];
+  const res = FichaResumen.resumen(S, {});
+  igual([hab.costo, hab.nitrosCosto, hab.turnoAjenoSp, hab.reroll, !!hab.duelo, /Sin auditar/.test(hab.detalle), Plantillas.limpiar('skills', hab).reroll, res.reroll],
+    ['2', 2, '4', true, false, false, true, true]);
+});
 prueba('Maldición tormentosa (Debuffer, 2026-10-12): Atormentado saca vida al pagar No2 (costo − 1, +1 por stack) y cada 2 casillas al moverse', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-maldicion-tormentosa');
   const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});

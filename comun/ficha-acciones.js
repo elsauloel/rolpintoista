@@ -832,6 +832,9 @@ const FichaAcciones = (() => {
     if(!draft.polaridad) draft.polaridad = 'debuff';
     if(spec.soltar && Combatiente.soltarNorm(spec.soltar)) draft.soltar = Combatiente.soltarNorm(spec.soltar);   // cómo se suelta (trampas de Atrapar)
     if(spec.protege){ draft.protege = spec.protege; draft.protegeNombre = spec.protegeNombre || ''; }   // Miti-Miti (Tanque, 2026-10-11): a quién protege
+    if(spec.permanente === true) draft.permanente = true;   // «no vence» (Marcar, 2026-10-12)
+    if(spec.marca){ draft.marca = spec.marca; draft.marcaNombre = spec.marcaNombre || ''; }   // Marcar (Shooter, 2026-10-12): a quién marcó
+    if(spec.marcadoPor){ draft.marcadoPor = spec.marcadoPor; draft.marcadoToken = spec.marcadoToken || ''; }
     return draft;
   }
   function aplicarEstadoRecibido(S, spec, origen, ui){

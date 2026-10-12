@@ -613,6 +613,15 @@ prueba('Un stat en 0 o negativo se tira igual: da el valor sin dados (el duelo n
   const t = FichaBotonera.tiradaStat(S, 'pdg'), v = FichaCalculo.calcular(S).final.pdg;
   igual([!!t.r, t.error, t.r && t.r.total === Math.round(v), v <= 0], [true, undefined, true, true]);
 });
+prueba('Marcar (Shooter, 2026-10-12): 3 SP y 1 No2 sin tirada; la marca guarda quién marcó (creep) y a quién (personaje)', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'shooter').habilidades.find(h => h.id === 'shooter-marcar');
+  const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});
+  const c = EstadosAplicar.componer({nombre: 'Marcado', turnos: 0, permanente: true, marcadoPor: 'tokJuan', marcadoToken: 'tokColoso'});
+  const f = FichaAcciones.estadoDeSpec(EstadosAplicar.limpiarSpec({nombre: 'Marcando', turnos: 0, permanente: true, polaridad: 'buff', marca: 'tokColoso', marcaNombre: 'Coloso'}), []);
+  igual([hab.costo, hab.nitrosCosto, ej.objetivo, ej.tira, ej.contra.length, ej.efectos[0].spec.nombre, c.marcado, c.marcadoPor, c.marcadoToken, c.turnos,
+    Combatiente.contarEstados([c]).quedan.length, f.marca, f.marcaNombre, f.turnos, Combatiente.contarEstados([f]).quedan.length, /Sin auditar/.test(hab.detalle)],
+    ['3', 1, 'enemigo', null, 0, 'Marcar', true, 'tokJuan', 'tokColoso', 0, 1, 'tokColoso', 'Coloso', 0, 1, false]);
+});
 prueba('Skills auditadas: el texto original del borrador se ve en «Detalles técnicos» (también en una copia vieja del personaje)', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-heal');
   const copiaVieja = {nombre: 'Heal', detalle: hab.detalle, habClaseId: 'support-heal'};

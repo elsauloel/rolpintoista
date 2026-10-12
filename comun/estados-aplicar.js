@@ -41,6 +41,9 @@ const EstadosAplicar = (() => {
     if(s.estado) out.estado = String(s.estado).slice(0, 40);   // «Acortar estado» (Recuperarse rápido, 2026-10-04): a cuál le saca turnos   // «Pierde No2» (Sonic Boom): si llega a 0, queda Sentado
     if(s.soltar && Combatiente.soltarNorm(s.soltar)) out.soltar = Combatiente.soltarNorm(s.soltar);   // cómo se suelta (trampas de Atrapar)
     if(s.protege){ out.protege = String(s.protege).slice(0, 80); out.protegeNombre = String(s.protegeNombre || '').slice(0, 40); }   // Miti-Miti (Tanque, 2026-10-11): a quién protege
+    if(s.permanente === true) out.permanente = true;   // «no vence» (Marcar, 2026-10-12: la marca dura hasta que ataque a otro)
+    if(s.marcadoPor){ out.marcadoPor = String(s.marcadoPor).slice(0, 80); out.marcadoToken = String(s.marcadoToken || '').slice(0, 80); }   // Marcar (Shooter, 2026-10-12): quién lo marcó
+    if(s.marca){ out.marca = String(s.marca).slice(0, 80); out.marcaNombre = String(s.marcaNombre || '').slice(0, 40); }   // y en quien marca, a quién
     return out;
   }
   const esPreset = nombre => !!presetPorNombre(nombre);
@@ -61,7 +64,8 @@ const EstadosAplicar = (() => {
       base.detalle = partes.length ? partes.join(', ') + (base.turnos ? ` durante ${base.turnos} turno(s).` : '.') : '';
     }
     return {id: id(), activo: true, stacks: 1, hpTurno: 0, stacksTurno: 0, permanente: false, escudoMagico: 0, forzarNitros: '', mods: [], ...base, ...(s.soltar ? {soltar: s.soltar} : {}),
-      ...(s.protege ? {protege: s.protege, protegeNombre: s.protegeNombre} : {})};
+      ...(s.protege ? {protege: s.protege, protegeNombre: s.protegeNombre} : {}),
+      ...(s.permanente ? {permanente: true} : {}), ...(s.marcadoPor ? {marcadoPor: s.marcadoPor, marcadoToken: s.marcadoToken} : {}), ...(s.marca ? {marca: s.marca, marcaNombre: s.marcaNombre} : {})};
   }
 
   // Inmunidades del que recibe el estado: la regla vive en comun/combatiente.js (la misma para ficha, gm-tools y mapa).

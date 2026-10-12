@@ -702,6 +702,7 @@ function dueloElegirObjetivoMapa(msg){
         // 🏹 Las mecánicas de arco (js/35, 2026-10-11): largo alcance, emboscada, matabestias, contra el Marcado, espalda a distancia y Tensar.
         try{ tiro = arcoBonos(mio, t, ataque, tiro); tiro = await arcoTensar(ataque, msg, tiro); arcoApuntarGastar(mio, ataque); }catch(err){ console.error('No se pudieron sumar las mecánicas del arco:', err); }
       }
+      try{ tiro = marcaBonos(mio, t, ataque, tiro); }catch(err){ console.error('No se pudo sumar la marca:', err); }   // 🎯 Marcar (js/36)
       let espalda = false, embestida = 0;
       try{ espalda = porLaEspalda(mio, t); }catch(err){ console.error('No se pudo ver si es por la espalda:', err); }   // nunca traba el ataque
       try{ if(!(ataque && ataque.hab)) embestida = embestidaDe(mio, t); }catch(err){ console.error('No se pudo ver la embestida:', err); }
@@ -1607,6 +1608,17 @@ async function dueloAplicarEfectoBase(d, ef){
     const nom = lista[idx].nombre;
     try{ await hudEstadoCambiar(t, idx, 'quitar'); return {nota: `le sacó ${nom}`}; }
     catch(err){ console.error('No se pudo aplicar la purga:', err); return {manual: true, nota: `sacale ${nom} a mano`}; }
+  }
+  // 🎯 Marcar (Shooter, 2026-10-12, decisiones del dueño): el blanco queda con el Marcado de siempre (brilla, no entra en sigilo) sin vencer,
+  // con quién lo marcó; quien marca recibe «Marcando» (a quién). El bono contra su marca y el fin de la marca los lleva js/36.
+  if(spec.nombre === 'Marcar'){
+    const ta = tokens.get(d.atacante.tokenId), nom = nombreDe(t), quien = d.atacante.nombre || 'Alguien';
+    if(!ta || ta.tipo !== 'pj') return {manual: true, nota: 'Marcar la usa un personaje: aplicalo a mano'};
+    await EstadosAplicar.encolarPj({fichaId: ta.fichaId, duenoUid: ta.duenoUid, origen: `${quien} · Marcar`,
+      spec: {nombre: 'Marcando', turnos: 0, permanente: true, polaridad: 'buff', marca: d.defensor.tokenId, marcaNombre: nom,
+        detalle: `Marcaste a ${nom}: contra él, +1 PdG, +1 de daño, Crítico frecuente +1 y Crítico potente +1. Dura hasta que ataques a otro.`}});
+    Object.assign(spec, {nombre: 'Marcado', turnos: 0, permanente: true, polaridad: 'debuff', marcadoPor: d.atacante.tokenId, marcadoToken: d.defensor.tokenId,
+      detalle: `Marcado por ${quien}: brilla y no puede entrar en sigilo; ${quien} le pega mejor (+1 PdG, +1 de daño, +1 a los dos críticos). Dura hasta que ${quien} ataque a otro.`});
   }
   // La cosecha (2026-10-07, Varita de la cosecha): la marca lleva el nombre de quien la puso («Cosecha de juan»); si muere marcado, ese
   // recupera 2 SP y 2 de vida (js/10 cosechaSiMuere).

@@ -271,9 +271,12 @@ Salvo Carga Elemental, todas son **Hechizo (PG: Esp · Daño: Esp)**.
 6. **Proyectil perforante** [2] — Ataque que continúa hasta alcanzar un
    segundo objetivo. Todos los efectos especiales se pierden después del
    primer objetivo.
-7. **Marcar** [3] — Designa un objetivo como marcado; sigue marcado hasta
-   que ataque a un objetivo diferente. Obtiene +1 PG, +1 Daño y +1 Crítico
-   contra el objetivo marcado.
+7. ✅ **Marcar** — **SP:** 3. **No2:** 1. Sin tirada: marcás a un **enemigo dentro de tu Rango**. Queda **Marcado** (el de siempre: brilla y no
+   puede entrar en sigilo) y, **solo para vos**, contra él sumás **+1 PdG, +1 de daño, Crítico frecuente +1 y Crítico potente +1**. **Dura hasta que
+   ataques a otro** (o marques a otro). ⚙ Automatizado: quien marca queda «Marcando» (con a quién), el bono en sus ataques, y al atacar a otro la
+   marca se termina (el mapa del GM le saca el Marcado al blanco). *(Auditada 2026-10-12 con el dueño; original: «Marcar [3] — Designa un objetivo
+   como marcado; sigue marcado hasta que ataque a un objetivo diferente. Obtiene +1 PG, +1 Daño y +1 Crítico contra el objetivo marcado.» El «+1
+   Crítico» es los dos críticos, decisión del dueño.)*
 8. **Repetición** [X] — Realiza X ataques consecutivos idénticos entre sí
    (los ataques gastan No2 normalmente). Por cada ataque adicional al
    primero suma +1 a la PG y amplifica +1 el daño.

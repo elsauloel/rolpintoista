@@ -888,6 +888,7 @@ const Duelo = (() => {
     if(!r.spec) r.permanente = true;   // el de un arma: si no, quedaría con los 2 turnos estándar
     return {...r, detalle: `${r.detalle ? r.detalle + ' ' : ''}(Fue crítico: el Sangrado queda permanente.)`.slice(0, 200)};
   }
+  const esRompeArmadura = ef => !!ef && ((ef.spec && ef.spec.nombre === 'Armadura rota') || /^(rompe|arruina|media) armadura$|^armadura rota/i.test(String(ef.nombre || '').trim()));
   function specArma(n, st, ef){
     if(n === 'rompe armadura' || n === 'arruina armadura' || n === 'media armadura') return {nombre: 'Armadura rota', stacks: Math.max(1, st)};
     // Sangrado de un arma (regla del dueño, 2026-10-03): 2 de daño por turno durante SANGRADO_ARMA_TURNOS (2), salvo que el arma diga otros turnos
@@ -1078,6 +1079,9 @@ const Duelo = (() => {
       // Regla del dueño (2026-10-03), característica del Sangrado: si entra con un golpe CRÍTICO de arma es permanente, aunque diga turnos —
       // venga del arma o de la habilidad con la que se atacó (Ejecución «con tu arma», Critical Matters…). Solo hay crítico con un arma.
       if(m.crit && m.crit.critico) m.efectos = m.efectos.map(sangradoPermanente);
+      // Regla del dueño (durabilidad, 2026-09-26; programada el 2026-10-12): un golpe crítico NO rompe armadura, ni el de un arma con Rompe
+      // armadura — el crítico justamente evita la armadura. El efecto queda «no entra», con el motivo.
+      if(critGolpe) m.efectos = m.efectos.map(ef => esRompeArmadura(ef) ? {...ef, omitido: true, motivo: 'fue crítico: el crítico evita la armadura, no la rompe'} : ef);
       tx.update(ref, cambiosDe(m));
     });
   }

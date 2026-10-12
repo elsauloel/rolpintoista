@@ -3777,6 +3777,20 @@ prueba('efecto «seguro si es crítico»: el asistente lo conserva (y los stacks
       [2, true, 'Envenenar (25%, 2 stacks, seguro si es crítico)', [1, 4], [4, 4], true]);
   }finally{ Object.assign(window, antes); }
 }); fbFalsoCola = pp.catch(() => {}); return pp; });
+prueba('un golpe crítico no rompe armadura (regla del dueño, programada 2026-10-12): Rompe armadura queda «no entra»', () => { const pp = fbFalsoCola.then(async () => {
+  const docs = {};
+  const tx = {get: async r => ({exists: !!docs[r.id], data: () => docs[r.id]}), update: (r, c) => { docs[r.id] = {...docs[r.id], ...c}; }};
+  const antes = {fbDb: window.fbDb, fbRutaCampana: window.fbRutaCampana};
+  window.fbDb = {collection: () => ({doc: id => ({id})}), runTransaction: fn => fn(tx)}; window.fbRutaCampana = p => p;
+  try{
+    const base = {estado: 'esperando', fase: 'dano', dano: null, atacante: {nombre: 'A'}, defensor: {nombre: 'B'}, ataque: {}};
+    docs.c = {...base, crit: {critico: true}}; docs.s = {...base, crit: {critico: false}};
+    const efs = [{nombre: 'Rompe armadura', caras: 1, exitos: 1, spec: {nombre: 'Armadura rota', stacks: 1}}, {nombre: 'Sangrado', caras: 4, exitos: 1}];
+    await Duelo.guardarDano('c', {total: 3, formula: '1d4', rolls: [3]}, efs);
+    await Duelo.guardarDano('s', {total: 3, formula: '1d4', rolls: [3]}, efs);
+    igual([docs.c.efectos.map(e => !!e.omitido), /crítico/.test(docs.c.efectos[0].motivo), docs.s.efectos.map(e => !!e.omitido)], [[true, false], true, [false, false]]);
+  }finally{ Object.assign(window, antes); }
+}); fbFalsoCola = pp.catch(() => {}); return pp; });
 
 prueba('efecto de arma con turnos: Sangrado por 2 turnos vence (deja de ser permanente); Veneno 3 stacks = 3 turnos', () => {
   const sp = Duelo.specDeEfecto({nombre: 'Sangrado', turnos: 2}), sv = Duelo.specDeEfecto({nombre: 'Envenenar', stacks: 3});

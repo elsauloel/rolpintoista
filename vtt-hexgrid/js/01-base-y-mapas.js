@@ -15,7 +15,7 @@ const esc = s => String(s??'').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;'
 let toastT;
 function toast(msg){
   const t = $('#toast'); t.textContent = msg; t.classList.add('show');
-  clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), 2600);
+  clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), Math.max(2600, String(msg).length * 55));   // un cartel largo dura más
 }
 
 // El sitio publicado (GitHub Pages) cachea cada archivo hasta 10 minutos:

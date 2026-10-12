@@ -605,7 +605,8 @@ function rutaSoltada(a, t){
       while(a.ruta.length > 1 && ocupada(a.ruta[a.ruta.length - 1])) a.ruta.pop();
       const fc = a.ruta[a.ruta.length - 1], pc = hexCentro(fc.col, fc.fila);
       a.x = pc.x; a.y = pc.y;
-      toast(`No podés terminar en la casilla de ${nombreDe(quien[1])}: quedás antes`);
+      a.avisoFin = `🚧 No se puede terminar en la casilla de ${nombreDe(quien[1])}: queda en la de antes`;
+      toast(a.avisoFin);   // (si el movimiento cobra No2, el cartel del cobro lo repite adelante: si no, lo tapaba enseguida)
     }
   }
   const pasos = a.ruta.length - 1;
@@ -637,7 +638,7 @@ function rutaSoltada(a, t){
       const costoTotal = costoRuta(a.ruta, a.costo.porCasillero, pasos, a.costo.gratis, a.costo.recargo, a.costo.levita, a.costo.ext);   // con el terreno lento (arena movediza), los pasos gratis y Lento
       const dodge = enDodge(a.id) || (libre && !dodgeArco);   // el dodge roll: se hace aunque no alcancen los No2 (queda en negativo, 2026-10-06); el del arco, no
       rutaPendiente = {id: a.id, celdas: a.ruta, pasos, porCasillero: a.costo.porCasillero, ext: a.costo.ext, costo: costoTotal, disponibles: a.costo.disponibles, oportunidad,
-        gratis: Math.min(pasos, num(a.costo.gratis)), lento: num(a.costo.recargo) > 0, dodge, levita: Math.min(pasos, num(a.costo.levita))};
+        gratis: Math.min(pasos, num(a.costo.gratis)), lento: num(a.costo.recargo) > 0, dodge, levita: Math.min(pasos, num(a.costo.levita)), avisoFin: a.avisoFin || ''};
       // Solo se pregunta si el movimiento se pasa de los No2 que quedan.
       if(costoTotal > Math.max(0, a.costo.disponibles) && !dodge) mostrarConfirmacionRuta();
       else confirmarRuta();

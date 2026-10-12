@@ -625,13 +625,20 @@ prueba('Maldición extenuante (Debuffer, 2026-10-12): Extenuado +1 No2 por stack
     CreepCalculo.costoAtaque(sc), Combatiente.extenuado(S.efectos), FichaBotonera.costoNitrosHab(S, {nitrosCosto: 1}), /Sin auditar/.test(hab.detalle), /Maldición extenuante \[3\]/.test(hab.original)],
     ['3', 2, 'pdgmg', ['resmg'], true, [4, 1, 1], [5, 2, 2, 5, 0], 1, 2, 1, 6, 2, 3, false, true]);
 });
-prueba('Re-roll (Support, 2026-10-12): 2 SP (4 en turno ajeno) + 2 No2, sin tiradas; el resumen avisa al mapa para el botón fijo 🔄', () => {
-  const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-reroll');
+prueba('Re-roll (Support, 2026-10-12, absorbió a Afortunado): 2 SP (4 en turno ajeno) + 2 No2, sin tiradas, queda la mejor (🍀, aparte de la 🐈 de Enyetar)', () => {
+  const sup = CLASES_SKILLS.find(k => k.id === 'support').habilidades;
+  const hab = sup.find(h => h.id === 'support-reroll');
   const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
+  const sin = FichaResumen.resumen(S).reroll;
   S.habilidades = [{...hab, id: 'r1'}];
-  const res = FichaResumen.resumen(S, {});
-  igual([hab.costo, hab.nitrosCosto, hab.turnoAjenoSp, hab.reroll, !!hab.duelo, /Sin auditar/.test(hab.detalle), Plantillas.limpiar('skills', hab).reroll, res.reroll],
-    ['2', 2, '4', true, false, false, true, true]);
+  const con = FichaResumen.resumen(S).reroll;
+  S.habilidades = [{nombre: 'Afortunado', suerte: true, id: 'viejo'}];   // una copia vieja de Afortunado cuenta como Re-roll
+  const vieja = FichaResumen.resumen(S).reroll;
+  const d = {atacante: {nombre: 'A'}, defensor: {nombre: 'B'}, pdg: {total: 5, formula: '1d6+2 🐈'}, eva: {total: 7, formula: '1d8 🍀'}, fase: 'contacto'};
+  const a = Duelo.tiradaSumable(d, 'atacante'), b = Duelo.tiradaSumable(d, 'defensor');
+  igual([hab.costo, hab.nitrosCosto, hab.turnoAjenoSp, hab.reroll, !!hab.duelo, /Sin auditar/.test(hab.detalle), Plantillas.limpiar('skills', hab).reroll, sin, con, vieja,
+    sup.some(h => h.id === 'support-afortunado'), a.enyetada, a.afortunada, b.enyetada, b.afortunada],
+    ['2', 2, '4', true, false, false, true, false, true, true, false, true, false, false, true]);
 });
 prueba('Maldición tormentosa (Debuffer, 2026-10-12): Atormentado saca vida al pagar No2 (costo − 1, +1 por stack) y cada 2 casillas al moverse', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-maldicion-tormentosa');
@@ -695,16 +702,6 @@ prueba('Enyetar (Debuffer, 2026-10-12): 5 SP (10 en turno ajeno), sin No2, PdG.E
   igual([hab.costo, hab.nitrosCosto, hab.turnoAjenoSp, hab.enyetar, ej.objetivo, ej.tira.stat, ej.contra.map(c => c.stat), (ej.efectos || []).map(e => e.nombre), /Sin auditar/.test(hab.detalle), /Enyetar \[5\]/.test(hab.original),
     sin, FichaResumen.resumen(S).enyetar, Duelo.tiradaSumable(d, 'atacante').enyetada, Duelo.tiradaSumable(d, 'defensor').enyetada, typeof Duelo.enyetarTirada],
     ['5', 0, '10', true, 'enemigo', 'pdgmg', ['resmg'], ['Enyetar'], false, true, false, true, false, true, 'function']);
-});
-prueba('Afortunado (Support, nueva, 2026-10-12): 5 SP (10 en turno ajeno), sin No2, botón fijo; la marca 🍀 es aparte de la de Enyetar', () => {
-  const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-afortunado');
-  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
-  const sin = FichaResumen.resumen(S).suerte;
-  S.habilidades = [{...structuredClone(hab), id: 'f1'}];
-  const d = {atacante: {nombre: 'A'}, defensor: {nombre: 'B'}, pdg: {total: 5, formula: '1d6+2 🐈'}, eva: {total: 7, formula: '1d8 🍀'}, fase: 'contacto'};
-  const a = Duelo.tiradaSumable(d, 'atacante'), b = Duelo.tiradaSumable(d, 'defensor');
-  igual([hab.costo, hab.nitrosCosto, hab.turnoAjenoSp, hab.suerte, /Sin auditar/.test(hab.detalle), sin, FichaResumen.resumen(S).suerte, a.enyetada, a.afortunada, b.enyetada, b.afortunada],
-    ['5', 0, '10', true, false, false, true, true, false, false, true]);
 });
 prueba('Acelerador (Support, 2026-10-12): 1 SP y 1 No2, 10 turnos, +2 No2; y la Runa aceleradora, consumible del Bazar arcano', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-acelerador');

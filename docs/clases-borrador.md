@@ -369,9 +369,13 @@ ya tenían este mismo formato (número azul, Maldición Esp / Res.M):
    +1 más a todo y vuelve a durar 1 turno. ⚙ Automatizado (personajes, invocaciones y creeps). *(Auditada 2026-10-12 con el dueño; original:
    «Maldición extenuante [3] — Maldición (Esp / Res.M). Incrementa en 1 los Nitros de todas las acciones. Debe pagar 1 Nitro para moverse
    cada 2 casillas. Duración: 1 turno. Acumulable. Lento.»)*
-5. **Maldición tormentosa** [5] — Maldición (Esp / Res.M). Por cada acción
-   recibe daño igual a No2 - 1. Debe pagar 1 HP para moverse cada 2
-   casillas. Duración: 3 turnos. Acumulable. Lento.
+5. ✅ **Maldición tormentosa** — **SP:** 5. **No2:** 2. Maldición: tirás **PdG.Esp contra el Res.Esp** de un enemigo dentro de tu Rango; si
+   ganás, queda **Atormentado** (estado nuevo) 3 turnos: **cada acción que le cuesta No2 le saca vida al pagarla — lo que costó menos 1**
+   (atacar con 3 No2 = 2; algo de 1 No2, nada) y, al moverse, **1 de vida cada 2 casillas completas**. **Directo a la vida**: no lo frenan la
+   Defensa ni la Armadura mágica, sí los escudos, la vida extra e Invulnerable. **Acumulable:** otra vez = +1 más (a cada acción y cada 2
+   casillas) y vuelve a durar 3 turnos. ⚙ Automatizado (personajes, invocaciones y creeps), con su línea en la Mesa. *(Auditada 2026-10-12 con
+   el dueño; original: «SP 5. Maldición (Esp / Res.M). Por cada acción recibe daño igual a No2 - 1; paga 1 HP para moverse cada 2 casillas.
+   Dura 3 turnos. Acumulable. Lento.»)*
 6. ✅ **Drenar vida** — SP X (X ≤ tu Especial), No2 2 (dicho por el dueño: no está en el texto original). Le drenás
    HP al objetivo igual a la diferencia entre tu tirada y su Res.Esp, y te la sumás vos (Excedente de vida si pasa
    tu máximo). *(Auditada 2026-09-27 — primera skill con "tirada personalizada" del 🎯 (`comun/asistente-duelo-hab.js`,

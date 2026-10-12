@@ -840,10 +840,8 @@ async function tormentaAlMoverse(t, pasos, stacks){
   try{
     const f = t.tipo === 'creep' ? danioCreep : String(t.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj;
     const res = await f(t, String(d), true, 0, 0, {});
-    const llego = res && res.r ? num(res.r.recibido) : d;
-    const frena = res && res.r && num(res.r.absorbido) > 0 ? ` (los escudos frenaron ${fmt(num(res.r.absorbido))})` : '';
-    mesaLinea(res && res.r && res.r.invulnerable ? `⛈ Maldición tormentosa: ${nombreDe(t)} es Invulnerable, moverse no le hizo nada`
-      : `⛈ Maldición tormentosa: ${nombreDe(t)} pierde ${fmt(llego)} de vida por moverse ${pasos} casilla${pasos === 1 ? '' : 's'}${frena}`, 'alerta-roja', nombreDe(t));
+    const r = res && res.r ? {dano: d, recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable} : {dano: d, recibido: d, absorbido: 0};
+    mesaLinea(Combatiente.tormentaTxt(nombreDe(t), r, `moverse ${pasos} casilla${pasos === 1 ? '' : 's'}`), 'alerta-roja', nombreDe(t));
   }catch(err){
     console.error('No se pudo cobrar la Maldición tormentosa al moverse:', err);
     toast(`⛈ ${nombreDe(t)} se movió Atormentado: −${d} de vida, aplicalo a mano`);

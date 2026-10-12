@@ -915,8 +915,9 @@ const Combatiente = (() => {
   }
   function tormentaTxt(nombre, r, motivo){
     if(r.invulnerable) return `⛈ Maldición tormentosa: ${nombre || 'alguien'} es Invulnerable, ${motivo || 'actuar'} no le hizo nada`;
-    const frena = r.absorbido > 0 ? ` (los escudos frenaron ${r.absorbido})` : '';
-    return `⛈ Maldición tormentosa: ${nombre || 'alguien'} pierde ${r.recibido} de vida por ${motivo || 'actuar'}${frena}`;
+    const quien = nombre || 'alguien', por = motivo || 'actuar';
+    if(r.absorbido > 0) return `⛈ Maldición tormentosa: ${quien} recibe ${r.dano} por ${por} · los escudos frenaron ${r.absorbido}${r.recibido > 0 ? ` y pierde ${r.recibido} de vida` : ': no pierde vida'}`;
+    return `⛈ Maldición tormentosa: ${quien} pierde ${r.recibido} de vida por ${por}`;
   }
   let tormentaUltimo = {txt: '', t: 0};   // (una transacción que se repite no lo cuenta dos veces)
   function avisarTormenta(nombre, r, motivo){

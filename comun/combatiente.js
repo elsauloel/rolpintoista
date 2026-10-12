@@ -152,6 +152,7 @@ const Combatiente = (() => {
     const eventos = [], fin = new Set();
     lista.forEach(e => {
       if(e && e.agotada){ fin.add(e); return; }   // un estado con cargas ya gastado se va sin aviso
+      if(e && e.seGasta && e.activo !== false && n(e.escudoMagicoActual ?? e.escudoMagico) <= 0){ fin.add(e); eventos.push({tipo: 'fin', nombre: e.nombre}); return; }   // Shield gastado (2026-10-11)
       if(!e || e.activo === false) return;
       if(e.recien){ delete e.recien; if(o && o.alEmpezar) return; }
       e.disparado = false;   // en la vuelta que viene se vuelve a disparar

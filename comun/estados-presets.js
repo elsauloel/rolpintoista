@@ -100,6 +100,9 @@ const ESTADOS_PRESET = [
   // dura hasta gastarse; con turnos, vence. Si llega otra, se suma: cada una aparte, con su duración (dueño, 2026-10-07; antes reemplazaba, P137).
   {nombre:'Vida extra', alias:['Escudo especial', 'Escudo mágico', 'Excedente de vida'], polaridad:'buff', permanente:true, turnos:0, escudoMagico:5, excedenteVida:true,
     detalle:'Vida de más: se gasta antes que la vida y absorbe el daño de cualquier fuente, también el True Damage. Es neta: lo que se gasta no vuelve (salvo que el efecto diga que se renueva). Sin turnos dura hasta gastarse; si el efecto le pone turnos, vence. Se sube o baja a mano desde el chip.'},
+  // Shield (Support, dueño 2026-10-11): absorbe 14 de daño y dura hasta gastarse — no vence por turnos ni se recarga; gastado, se va (seGasta).
+  {nombre:'Shield', polaridad:'buff', permanente:true, turnos:0, escudoMagico:14, sinRecarga:true, seGasta:true,
+    detalle:'Shield del Support: absorbe 14 de daño, de un golpe o de varios, como una barra de HP secundaria (🛡). Dura hasta gastarse: no vence por turnos ni se recarga.'},
   // Barrera (dueño, 2026-10-06): 2 turnos — con el turno propio, la de 1 turno que uno se pone en su turno se iba antes de que lo atacaran.
   {nombre:'Barrera', polaridad:'buff', turnos:2, escudoMagico:8,
     detalle:'Blindaje del Tanque: absorbe daño de la próxima fuente de daño, como una barra de HP secundaria (🛡). Si la fuente hace más, el resto entra normal. Dura 2 turnos de quien la tiene (si se la pone en su turno, lo cubre hasta el final del siguiente).'},

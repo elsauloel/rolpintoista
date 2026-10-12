@@ -296,8 +296,10 @@ verifica con 1d20: hasta DES×2 → 7+; hasta DES×3 → 17+; más de DES×3 →
 3. ✅ **Heal** — **SP:** 2. **No2:** 1. Curás **1d6+4** de vida (se tira al usarla) **a vos o a un aliado a la vista** (dentro de tu Rango),
    **sin pasar la vida máxima**. **Sobre alguien caído (en 0) no hace nada**: para eso hace falta revivirlo. ⚙ Automatizado: la tirada y la cura (objetivo
    «aliado» con `conmigo`: se puede elegir el propio token). *(Auditada 2026-10-11 con el dueño; original: «Heal [2] — NO2: (1). Cura 4 + 1d6 HP.»)*
-4. **Shield** [2] — Flash (SP x 2). Otorga un blindaje temporal que
-   absorbe 14 de HP hasta el final del turno.
+4. ✅ **Shield** — **SP:** 2 (⚡ Flash: el doble, 4, en turno ajeno). **No2:** 0. **A vos o a cualquiera de tu equipo**: un escudo (estado nuevo
+   **Shield**) que absorbe **14 de daño**, de un golpe o de varios, y **dura hasta gastarse** (no vence por turnos ni se recarga; gastado, se va). ⚙
+   Automatizado. *(Auditada 2026-10-11 con el dueño; original: «Shield [2] — Flash (SP x 2). Otorga un blindaje temporal que absorbe 14 de HP hasta el
+   final del turno.»)*
 5. **Acelerador** [1] — Marca una casilla con flechitas para adelante
    (>>). Cada aliado que la pisa obtiene +2 No2 (máximo una vez por
    turno). Duración: 10 turnos.

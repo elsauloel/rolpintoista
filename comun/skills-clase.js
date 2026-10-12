@@ -105,7 +105,7 @@ const CLASES_SKILLS = [
     skillSA("support", "Empower", "SP 2. No2 0. +3 a cualquier tirada propia o de un aliado."),
     skillSA("support", "Blessing", "SP 5. +1 fijo en todas las tiradas por 2 turnos."),
     {"id":"support-heal","nombre":"Heal","detalle":"Curás 1d6+4 de vida (se tira al usarla) a vos o a un aliado a la vista (dentro de tu Rango), sin pasar su vida máxima. Sobre alguien caído (en 0) no hace nada: para eso hace falta revivirlo. ⚙ Automatizado: la tirada y la cura.","costo":"2","nitrosCosto":1,"duelo":{"objetivo":"aliado","conmigo":true,"tira":"","contra":[],"alcance":"rango","efectos":[{"cura":"1d6+4"}]},"modo":"auto"},
-    skillSA("support", "Shield", "SP 2. Flash (SP x 2). Blindaje temporal que absorbe 14 de HP hasta el final del turno."),
+    {"id":"support-shield","nombre":"Shield","detalle":"Flash: en turno ajeno cuesta el doble (4 SP); al usarla te pregunta si es tu turno y lo cobra solo. A vos o a cualquiera de tu equipo: un escudo que absorbe 14 de daño (de un golpe o de varios) y dura hasta gastarse. ⚙ Automatizado: el escudo (estado Shield).","costo":"2","nitrosCosto":0,"duelo":{"objetivo":"aliado","conmigo":true,"tira":"","contra":[],"alcance":"ilimitado","efectos":[{"nombre":"Shield","polaridad":"buff"}]},"turnoAjenoSp":"4","modo":"auto"},
     skillSA("support", "Acelerador", "SP 1. Marca una casilla con flechitas (>>). Cada aliado que la pisa obtiene +2 No2 (máx. una vez por turno). Dura 10 turnos."),
     skillSA("support", "Endurecimiento", "SP 5. Armadura temporal: Defensa 3, Res. Mágica 3, reduce críticos de todo tipo. Dura 2 turnos."),
     skillSA("support", "Re-roll", "SP 2. Flash. Permite rerolear tiradas aliadas. Lento."),

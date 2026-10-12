@@ -564,6 +564,14 @@ prueba('rasgos de ballesta (2026-10-10): llega cargada (gratis si no disparó el
     Combatiente.ataqueDeArma(guerra).apuntada, Combatiente.ataqueDeArma(asedio).atraviesaEscudos, !!Combatiente.ataqueDeArma(tranq).apuntada],
     [0, 4, 2, 0, 2, 2, true, false]);   // la de tranquera pasó a Recarga 2 (revisión de las Buenas, 2026-10-11)
 });
+prueba('Shield (Support, 2026-10-11): escudo de 14 que no se recarga, no vence y se va al gastarse', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-shield');
+  const e = EstadosAplicar.componer({nombre: 'Shield'});
+  const lista = [e]; Combatiente.dispararEstados(lista, {});
+  const sigue = Combatiente.contarEstados([{...e, escudoMagicoActual: 5}]).quedan.length, gastado = Combatiente.contarEstados([{...e, escudoMagicoActual: 0}]).quedan.length;
+  igual([hab.costo, hab.nitrosCosto, hab.turnoAjenoSp, hab.duelo.conmigo, e.escudoMagico, e.permanente, e.escudoMagicoActual ?? e.escudoMagico, sigue, gastado],
+    ['2', 0, '4', true, 14, true, 14, 1, 0]);
+});
 prueba('Veneno (Debuffer, 2026-10-11): PdG.Esp contra Res.Esp y 3 stacks de Veneno', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-veneno');
   const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});

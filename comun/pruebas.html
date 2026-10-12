@@ -625,6 +625,18 @@ prueba('Maldición extenuante (Debuffer, 2026-10-12): Extenuado +1 No2 por stack
     CreepCalculo.costoAtaque(sc), Combatiente.extenuado(S.efectos), FichaBotonera.costoNitrosHab(S, {nitrosCosto: 1}), /Sin auditar/.test(hab.detalle), /Maldición extenuante \[3\]/.test(hab.original)],
     ['3', 2, 'pdgmg', ['resmg'], true, [4, 1, 1], [5, 2, 2, 5, 0], 1, 2, 1, 6, 2, 3, false, true]);
 });
+prueba('Empower (Support, 2026-10-12): 2 SP (4 en turno ajeno, turnoAjenoSp) (4 en turno ajeno), sin No2, a vos o a un aliado en tu Rango, sin tiradas: el efecto Empower', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-empower');
+  const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
+  const sin = FichaResumen.resumen(S).empower;
+  S.habilidades = [{...structuredClone(hab), id: 'e1'}];
+  const d = {atacante: {nombre: 'A'}, defensor: {nombre: 'B'}, pdg: {total: 5, formula: '1d6 +3 💪 +3 💪'}, eva: {total: 7, formula: '1d8'}, fase: 'contacto'};
+  const ts = Duelo.tiradaSumable(d, 'atacante');
+  igual([hab.costo, hab.nitrosCosto, hab.turnoAjenoSp, hab.empower, ej.objetivo, ej.conmigo, ej.contra.length, (ej.efectos || []).map(e => e.nombre), /Sin auditar/.test(hab.detalle), /Empower \[2\]/.test(hab.original),
+    sin, FichaResumen.resumen(S).empower, ts && ts.campo, ts && ts.empowers],
+    ['2', 0, '4', 3, 'aliado', true, 0, ['Empower'], false, true, false, true, 'pdg', 2]);
+});
 prueba('Un stat en 0 o negativo se tira igual: da el valor sin dados (el duelo no queda en «Tirando…», 2026-10-12)', () => {
   const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
   S.efectos = [{id: 'x', nombre: 'Muy debilitado', polaridad: 'debuff', turnos: 2, activo: true, mods: [{stat: 'pdg', val: -50}]}];

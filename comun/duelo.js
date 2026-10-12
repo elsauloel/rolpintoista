@@ -1465,7 +1465,8 @@ const Duelo = (() => {
      y vuelve a resolver ese paso con el número nuevo — puede dar vuelta quién ganó. Vale mientras el paso se pueda reabrir (como la Moneda: antes
      de los d20 del crítico, del daño y de aplicar efectos). lado: 'atacante' | 'defensor'. → {campo, etq, antes, ahora, contra, resultado} o null. */
   const campoPolilla = (m, lado) => (lado === 'atacante' ? ['fuerza', 'pdg'] : ['bloqueo', 'eva']).find(c => m && m[c] && puedeReabrir({...m, rerollUsado: null}, c)) || null;
-  async function sumarATirada(id, lado, n, marca){
+  // usa (2026-10-12, Empower): el nombre de lo que suma, para el aviso del empate (por defecto, la Polilla).
+  async function sumarATirada(id, lado, n, marca, usa = 'la Polilla'){
     const ref = col().doc(id);
     let res = null, anuncio = '';
     await fbDb.runTransaction(async tx => {
@@ -1486,17 +1487,24 @@ const Duelo = (() => {
       if(pa && pb && resolverPar(pa, pb).empate){
         const gana = lado === 'atacante' ? 'defensor' : 'atacante';
         cerrarPar(m, par, {gana, dif: 0, desempate: 'polilla'});
-        anuncio = `⚖ Empate (${_num(pa.total)} a ${_num(pb.total)}) después de la Polilla: gana ${gana === 'atacante' ? m.atacante.nombre : m.defensor.nombre} (quien usa la Polilla pierde los empates)`;
+        anuncio = `⚖ Empate (${_num(pa.total)} a ${_num(pb.total)}) después de ${usa}: gana ${gana === 'atacante' ? m.atacante.nombre : m.defensor.nombre} (quien usa ${usa} pierde los empates)`;
       }
       else anuncio = avanzar(m) || '';
       const upd = cambiosDe(m);
       if(m.resumido) upd.resumido = false;   // el resumen final se vuelve a publicar cuando termine
       tx.update(ref, upd);
-      res = {campo, etq: etqCampo(m, campo), antes: _num(t0.total), ahora: m[campo].total, contra: m[otro] ? _num(m[otro].total) : null, empate: /quien usa la Polilla/.test(anuncio),
+      res = {campo, etq: etqCampo(m, campo), antes: _num(t0.total), ahora: m[campo].total, contra: m[otro] ? _num(m[otro].total) : null, empate: /quien usa /.test(anuncio),
         resultado: m.estado === 'empate' ? 'empate' : (m.resultado || (m.contacto && m.contacto.gana) || '')};
     });
     if(anuncio) anunciarMesa(anuncio);
     return res;
+  }
+  // 💪 Empower (2026-10-12): la tirada de ese lado a la que todavía se le puede sumar (la misma que la Polilla) y cuántos Empower ya lleva.
+  function tiradaSumable(m, lado){
+    const c = campoPolilla(m, lado);
+    if(!c) return null;
+    const t = m[c] || {};
+    return {campo: c, etq: etqCampo(m, c), total: _num(t.total), empowers: (String(t.formula || '').match(/💪/gu) || []).length};
   }
   let rerollInfo = {}, rerollPedidas = new Set();
   function ladoMio(d){ return puedoTirarYo(d.atacante) ? 'atacante' : puedoTirarYo(d.defensor) ? 'defensor' : ''; }
@@ -2537,5 +2545,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {tiradaSumable, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

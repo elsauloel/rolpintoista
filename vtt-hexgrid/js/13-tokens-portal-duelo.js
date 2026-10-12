@@ -1582,6 +1582,34 @@ async function dueloAplicarEfecto(d, ef){
   }catch(err){ console.error('No se pudo dejar el arma en el piso:', err); }
   return r;
 }
+async function empowerAplicar(d, t, n){
+  const nom = nombreDe(t), quien = d.atacante.nombre || 'Alguien';
+  try{
+    const q = await fbDb.collection(fbRutaCampana('duelos')).orderBy('creado', 'desc').limit(10).get();
+    for(const doc of q.docs){
+      if(doc.id === d.id) continue;
+      const x = doc.data();
+      if(!x || x.estado === 'cancelado' || !(x.creado && x.creado.toMillis && Date.now() - x.creado.toMillis() < 10 * 60 * 1000)) continue;
+      const lado = x.atacante && x.atacante.tokenId === d.defensor.tokenId ? 'atacante' : x.defensor && x.defensor.tokenId === d.defensor.tokenId ? 'defensor' : '';
+      if(!lado) continue;
+      const r = await Duelo.sumarATirada(doc.id, lado, n, '💪', 'Empower');
+      if(!r) continue;
+      const otro = lado === 'atacante' ? x.defensor : x.atacante;
+      return {nota: `+${n} a la ${r.etq} de ${nom}: ${fmt(r.antes)} → ${fmt(r.ahora)}${r.contra !== null ? ` contra ${fmt(r.contra)}` : ''}${r.empate ? ` · empatado: quien recibe Empower pierde los empates, gana ${otro.nombre || 'el otro'}` : ` · el duelo contra ${otro.nombre || 'el otro'} se volvió a resolver`}`};
+    }
+  }catch(err){ console.error('Empower: no se pudo ver el duelo', err); }
+  // Sin un duelo que se pueda reabrir: la última tirada de esa persona en la Mesa.
+  try{
+    const q = await fbDb.collection(fbRutaCampana('tiradas')).orderBy('cuando', 'desc').limit(40).get();
+    const u = q.docs.map(x => x.data()).find(x => x && x.quien === nom && !['recordatorio', 'reporte', 'alerta', 'alerta-roja', 'sigilo-alerta', 'efecto'].includes(x.desde) && Array.isArray(x.rolls) && x.rolls.length);
+    if(!u) return {manual: true, nota: `${nom} no tiene ninguna tirada reciente: sumale +${n} a mano a la próxima que corresponda`};
+    const total = num(u.total) + n;
+    await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien, origen: `💪 ${quien} usó Empower sobre ${nom}`,
+      formula: `+${n} a «${u.origen || 'su última tirada'}»: ${fmt(num(u.total))} → ${fmt(total)}`, rolls: [], mod: 0, total: 0, desde: 'recordatorio',
+      cuando: firebase.firestore.FieldValue.serverTimestamp()});
+    return {nota: `+${n} a «${u.origen || 'su última tirada'}» de ${nom}: ${fmt(num(u.total))} → ${fmt(total)} (✋ si eso cambia algo, a mano)`};
+  }catch(err){ console.error('Empower: no se pudo ver la Mesa', err); return {manual: true, nota: `sumale +${n} a la última tirada de ${nom} a mano`}; }
+}
 async function dueloAplicarEfectoBase(d, ef){
   const spec = Duelo.specDeEfecto(ef);
   if(!spec) return {manual: true, nota: 'a mano'};
@@ -1620,6 +1648,10 @@ async function dueloAplicarEfectoBase(d, ef){
     Object.assign(spec, {nombre: 'Marcado', turnos: 0, permanente: true, polaridad: 'debuff', marcadoPor: d.atacante.tokenId, marcadoToken: d.defensor.tokenId,
       detalle: `Marcado por ${quien}: brilla y no puede entrar en sigilo; ${quien} le pega mejor (+1 PdG, +1 de daño, +1 a los dos críticos). Dura hasta que ${quien} ataque a otro.`});
   }
+  // 💪 Empower (Support, 2026-10-12, decisiones del dueño): +3 a una tirada ya hecha de quien la recibe (vos o un aliado a la vista). Si esa
+  // persona está en un duelo que todavía se puede reabrir, se suma a su última tirada y el duelo se vuelve a resolver (como la Polilla;
+  // con el +3 empatado pierde quien lo recibió). Si no, se anuncia sobre su última tirada de la Mesa. Sin límite: se puede apilar.
+  if(spec.nombre === 'Empower') return empowerAplicar(d, t, Math.round(num(ef.suma)) || 3);
   // La cosecha (2026-10-07, Varita de la cosecha): la marca lleva el nombre de quien la puso («Cosecha de juan»); si muere marcado, ese
   // recupera 2 SP y 2 de vida (js/10 cosechaSiMuere).
   if(spec.nombre === 'Cosecha'){

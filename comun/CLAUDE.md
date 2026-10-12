@@ -1504,6 +1504,9 @@ versión parecida en más de una, es candidato a juntar.
   dibuja (o saca) el de la 🪙 Moneda Re-Roll —con brillo de moneda, mientras tengas una: un recordatorio— y `apilar()` acomoda la 🦋 Polilla, el 💍
   anillo de impulso y la moneda uno arriba del otro (cada pantalla lo llama después de dibujar o sacar uno). Lo usan el mapa (js/02, js/25; la moneda
   con `resumen.moneda` de su personaje) y la ficha suelta (js/03, `renderMonedaFlotante`; adentro del mapa no, la pone el mapa).
+- **Extenuado y Empower** (2026-10-12): `Combatiente.extenuado(estados)` / `conExtenuado(estados, costo)` suman el recargo de No2 de Extenuado
+  (Maldición extenuante) en cada costo (personaje, creep, invocación; el mapa lo suma al moverse con `costoPasos(…, ext)`). `Duelo.tiradaSumable(m, lado)`
+  y `Duelo.sumarATirada(id, lado, n, marca, usa)` (el nombre de lo que suma, para el aviso del empate); `Flotantes.empower(o)` (el botón 💪).
 - **`confirmar.js`** (`Confirmar`, 2026-10-10, pedido del dueño) — **el cartel del juego para preguntar sí o no**, en vez del `confirm()` del
   navegador (que además congelaba la pestaña con la extensión de Chrome): `Confirmar.preguntar(texto, {titulo, icono, si, no, peligro})` →
   `Promise<boolean>` (Esc / ✕ / clic afuera = no; Enter = sí). Trae su propio estilo y va arriba de todo. Lo cargan todas las páginas; **no se usa

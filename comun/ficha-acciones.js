@@ -822,6 +822,13 @@ const FichaAcciones = (() => {
     i.dur = Math.max(0, antes - Math.max(1, n || 1));
     if(FichaCalculo.durActual(i) !== antes) durAviso(S, i, ui);
   }
+  // Una pieza puntual: +N de armadura rota (hasta su durabilidad) y −N de durabilidad.
+  function romperPieza(S, it, n, ui){
+    it.armRota = Math.min(FichaCalculo.durMax(it), FichaCalculo.armRotaDe(it) + n);
+    desgastarItem(S, it, n, ui);
+    ui.toast(`💥 Se dañó ${it.nombre}`);
+    ui.cambio(['equipo', 'mochila', 'refresh']);
+  }
   // Rompe armadura: una pieza de armadura equipada (que todavía no esté rota) elegida AL AZAR.
   function rompeArmaduraAlAzar(S, veces, ui){
     const tocadas = [];
@@ -873,7 +880,12 @@ const FichaAcciones = (() => {
       else ui.toast(`Desgaste: no encuentro ese ítem en tu inventario`);
       return;
     }
-    if(spec.nombre === 'Armadura rota'){ rompeArmaduraAlAzar(S, Math.max(1, num(spec.stacks) || 1), ui); return; }
+    if(spec.nombre === 'Armadura rota'){
+      // Con `item` (Atraviesa escudos, 2026-10-12): esa pieza puntual (el escudo que paró el disparo), no una al azar.
+      const it = spec.item ? S.inventario.find(x => x.id === spec.item) : null;
+      if(it && FichaCalculo.durableItem(it)){ romperPieza(S, it, Math.max(1, num(spec.stacks) || 1), ui); return; }
+      rompeArmaduraAlAzar(S, Math.max(1, num(spec.stacks) || 1), ui); return;
+    }
     // «Revivir» (2026-10-06, el consumible Revive que usa un aliado): si sigue inconsciente (no muerto del todo), vuelve con `pct` % de la
     // vida máxima y Titilando. Si ya se levantó o ya murió, no hace nada (y lo dice).
     if(spec.nombre === 'Revivir'){

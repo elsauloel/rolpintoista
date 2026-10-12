@@ -44,6 +44,15 @@ function muroAviso(t, m){
 async function dueloAtraviesaEscudo(d){
   if(!d || d.hab || !d.ataque || !d.ataque.atraviesaEscudos || d.bloq || !Combatiente.contraDisparo(d)) return;
   const quien = d.defensor.nombre || 'el defensor';
+  // Un personaje: se abolla EL ESCUDO con el que lo paró (2026-10-12: antes caía en una pieza de armadura al azar).
+  const t = tokens.get(d.defensor.tokenId);
+  if(t && t.tipo === 'pj' && t.fichaId && !String(t.fichaId).includes(SEP_INVOCACION) && d.defensa && d.defensa.itemId){
+    try{
+      await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Armadura rota', stacks: 1, item: d.defensa.itemId}, origen: `${d.ataque.armaNombre || 'El disparo'} · atraviesa escudos`});
+      mesaLinea(`🛡 ${d.ataque.armaNombre || 'El disparo'} atraviesa escudos: ${quien} lo paró, pero ${d.defensa.itemNombre || 'el escudo'} se abolló (1 de armadura rota y 1 de durabilidad)`);
+    }catch(err){ console.error('No se pudo abollar el escudo:', err); mesaLinea(`🛡 ${quien}: el escudo se abolló — ✋ a mano: 1 de armadura rota en ${d.defensa.itemNombre || 'el escudo'}`); }
+    return;
+  }
   const r = await dueloAplicarEfecto(d, {nombre: 'Rompe armadura', caras: 1, exitos: 1, dado: '', detalle: 'El escudo se abolla: 1 stack de Armadura rota.'});
   mesaLinea(`🛡 ${d.ataque.armaNombre || 'El disparo'} atraviesa escudos: ${quien} lo paró, pero el escudo se abolló${r && r.nota ? ` — ${r.nota}` : ' (1 stack de Armadura rota)'}`);
 }

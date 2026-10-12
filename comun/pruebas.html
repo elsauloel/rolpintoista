@@ -1519,6 +1519,14 @@ prueba('un estado recibido respeta Invulnerable; el Desgaste baja la durabilidad
   FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Desgaste', item: 'esc'}, '', uiAuto(reg, true));
   igual([S.efectos.some(e => e.nombre === 'Stun'), FichaCalculo.durActual(S.inventario[0])], [false, durAntes - 1]);
 });
+prueba('Atraviesa escudos (2026-10-12): la Armadura rota con `item` abolla ESE escudo, no una pieza al azar', () => {
+  const peto = {id: 'peto', nombre: 'Peto', tipoItem: 'armadura', categoria: 'armadura', equipado: true, peso: 2, def: 3, mods: []};
+  const S = fichaBotonera({inventario: [{...escudo}, peto]}), reg = [];
+  const durEsc = FichaCalculo.durActual(S.inventario[0]), durPeto = FichaCalculo.durActual(S.inventario[1]);
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Armadura rota', stacks: 1, item: 'esc'}, '', uiAuto(reg, true));
+  igual([FichaCalculo.armRotaDe(S.inventario[0]), FichaCalculo.durActual(S.inventario[0]), FichaCalculo.armRotaDe(S.inventario[1]), FichaCalculo.durActual(S.inventario[1])],
+    [1, durEsc - 1, 0, durPeto]);
+});
 
 grupo('Habilidades que colocan algo (comun/ficha-acciones.js, paso 5c)');
 const uiMapa = (reg, enMapa) => ({...uiAuto(reg, true), enMapa: () => enMapa, alMapa: (tipo, m) => reg.push(`alMapa ${tipo}`)});

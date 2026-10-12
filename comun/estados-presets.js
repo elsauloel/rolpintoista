@@ -93,6 +93,10 @@ const ESTADOS_PRESET = [
     detalle:'Su próximo ataque con un arma a distancia de este turno cuesta 1 No2 menos por stack (mínimo 0). Lo gasta ese disparo; si termina el turno sin disparar, se pierde. ⚙ Automatizado.'},
   {nombre:'Extenuado', polaridad:'debuff', turnos:1, stacks:1, apila:true, extenuante:true,
     detalle:'+1 No2 por stack a todo lo que cuesta No2 (atacar, habilidades, Parry, consumir, equipar, levantarse, el sigilo…) y, al moverse, 1 No2 más cada 2 casillas por stack. Dura 1 turno; otra vez es +1 más y vuelve a durar 1 turno. ⚙ Automatizado.'},
+  // Atormentado (2026-10-12, dueño: Maldición tormentosa del Debuffer): cada acción que cuesta No2 le saca vida (lo que costó − 1, +1 por stack de
+  // más) y moverse, 1 de vida por stack cada 2 casillas. Directo a la vida. 3 turnos; se apila y vuelve a durar 3. Combatiente.cobroTormenta.
+  {nombre:'Atormentado', polaridad:'debuff', turnos:3, stacks:1, apila:true, tormenta:true,
+    detalle:'Cada acción que le cuesta No2 le saca vida: lo que costó menos 1 (atacar con 3 No2 = 2; algo de 1 No2, nada), +1 por cada stack de más. Al moverse, pierde 1 de vida por stack cada 2 casillas. Va directo a la vida: lo frenan los escudos, la vida extra e Invulnerable. Dura 3 turnos; otra vez es +1 más y vuelve a durar 3 turnos. ⚙ Automatizado.'},
   {nombre:'Bendecido', polaridad:'buff', turnos:2, mods:[{stat:'pdg', val:1}, {stat:'pdgmg', val:1}, {stat:'eva', val:1}, {stat:'parry', val:1}, {stat:'bloqueo', val:1}, {stat:'dmg', val:1}, {stat:'dmgesp', val:1}, {stat:'resmg', val:1}, {stat:'resm', val:1}, {stat:'rescc', val:1}, {stat:'percepcion', val:1}, {stat:'sigilo', val:1}, {stat:'ini', val:1}],
     detalle:'+1 a todas sus tiradas (ataque, defensas, daño, resistencias, Percepción, Sigilo, Iniciativa) durante 2 turnos. Otra vez no se suma: vuelve a durar 2 turnos. ⚙ Automatizado. ✋ A mano: una tirada de un atributo pelado (Fuerza, Constitución…) no lo suma sola.'},
   {nombre:'Expuesto', polaridad:'debuff', turnos:1, expuesto:true, mitadEva:true, alEmpezarTurno:true,

@@ -202,6 +202,7 @@ const FichaEquipo = (() => {
     const pagar = forzar => {
       const gasto = forzar && costo > num(S.nitros) ? FichaAcciones.gastoNitrosForzado(S, costo, pasado) : costo;
       S.nitros = num(S.nitros) - gasto;
+      if(typeof FichaAcciones !== 'undefined' && FichaAcciones.tormentaPj) for(let i = 0; i < veces; i++) FichaAcciones.tormentaPj(S, costo / veces, infinitivo, ui);   // ⛈ Atormentado: cada acción por separado
       if(ui.alPagar) ui.alPagar();   // la ficha redibuja los No2
       accion();
       ui.toast(`−${fmt(gasto)} No2 (equipar en combate)`);

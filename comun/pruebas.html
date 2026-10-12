@@ -625,6 +625,27 @@ prueba('Maldición extenuante (Debuffer, 2026-10-12): Extenuado +1 No2 por stack
     CreepCalculo.costoAtaque(sc), Combatiente.extenuado(S.efectos), FichaBotonera.costoNitrosHab(S, {nitrosCosto: 1}), /Sin auditar/.test(hab.detalle), /Maldición extenuante \[3\]/.test(hab.original)],
     ['3', 2, 'pdgmg', ['resmg'], true, [4, 1, 1], [5, 2, 2, 5, 0], 1, 2, 1, 6, 2, 3, false, true]);
 });
+prueba('Maldición tormentosa (Debuffer, 2026-10-12): Atormentado saca vida al pagar No2 (costo − 1, +1 por stack) y cada 2 casillas al moverse', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-maldicion-tormentosa');
+  const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});
+  const presets = estadosPresetFicha(), lista = [];
+  Combatiente.agregarEstado(lista, FichaAcciones.estadoDeSpec({nombre: 'Atormentado'}, presets));
+  const uno = [Combatiente.danoTormenta(lista, 3), Combatiente.danoTormenta(lista, 1), Combatiente.danoTormenta(lista, 0), Combatiente.danoTormentaMover(lista, 1), Combatiente.danoTormentaMover(lista, 5)];
+  lista[0].turnos = 1;
+  Combatiente.agregarEstado(lista, FichaAcciones.estadoDeSpec({nombre: 'Atormentado'}, presets));
+  const dos = [Combatiente.danoTormenta(lista, 3), Combatiente.danoTormenta(lista, 1), Combatiente.danoTormentaMover(lista, 5)];
+  // Un creep: el ataque se paga y le saca vida; un escudo frena una parte. Invulnerable, nada.
+  const sc = {nombre: 'Coloso', armaTipo: 8, ataquesTurno: 0, nitros: 10, hp: 20, estados: [{...lista[0], stacks: 1}, {nombre: 'Escudo especial', activo: true, escudoMagico: 1, escudoMagicoActual: 1}]};
+  CreepAcciones.pagarAtaque(sc, 'normal');
+  const inv = {nombre: 'Lobo', hp: 10, estados: [{...lista[0], stacks: 1}, {nombre: 'Invulnerable', activo: true, invulnerable: true}]};
+  const rInv = Combatiente.aplicarTormenta(inv, inv.estados, 4);
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
+  S.hp = 15; S.efectos = [{...lista[0], stacks: 1}];
+  const rPj = FichaAcciones.tormentaPj(S, 3, 'atacar');
+  igual([hab.costo, hab.nitrosCosto, ej.tira.stat, ej.contra.map(c => c.stat), lista[0].tormenta, lista[0].turnos, lista.length, uno, dos,
+    sc.nitros, sc.hp, sc.estados[1].escudoMagicoActual, inv.hp, rInv.invulnerable, S.hp, rPj.recibido, /Sin auditar/.test(hab.detalle), /Por cada acción/.test(hab.original)],
+    ['5', 2, 'pdgmg', ['resmg'], true, 3, 1, [2, 0, 0, 0, 2], [3, 1, 4], 6, 18, 0, 10, true, 13, 2, false, true]);
+});
 prueba('Empower (Support, 2026-10-12): 2 SP (4 en turno ajeno, turnoAjenoSp) (4 en turno ajeno), sin No2, a vos o a un aliado en tu Rango, sin tiradas: el efecto Empower', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-empower');
   const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});

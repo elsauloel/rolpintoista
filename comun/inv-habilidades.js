@@ -125,6 +125,7 @@ const InvHabilidades = (() => {
     // Se cobra lo que la habilidad tenga cargado (P133): No2, cooldown y vida; y si trae una cura del sistema anterior, cura.
     const costo = I().costoNitrosHab(inv, h), costoHp = num(h.hpCosto), curaHp = num(h.curaHp);
     inv.nitros = num(inv.nitros) - costo;
+    Combatiente.aplicarTormenta(inv, inv.estados, costo, {motivo: `usar ${h.nombre || 'una habilidad'}`});
     if(I().habAtaque(h)) inv.ataquesTurno = num(inv.ataquesTurno) + 1;
     if(num(h.cd) > 0) h.cdActual = num(h.cd);
     if(costoHp > 0) inv.hp = num(inv.hp) - costoHp;

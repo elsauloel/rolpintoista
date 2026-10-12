@@ -52,6 +52,7 @@ const FichaAcciones = (() => {
     }
     const preset = ui.presets.find(p => p.nombre === 'Sigilo');
     S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, 'entró en sigilo') : costo);
+    tormentaPj(S, costo, 'entrar en sigilo', ui);
     S.efectos.push({id: uid(), nombre: 'Sigilo', imagen: '', turnos: 0, stacks: 1, hpturno: 0, stacksturno: 0,
       permanente: true, activo: true, popup: false, detalle: (preset && preset.detalle) || '', mods: [], ...FichaHabilidades.flagsDePreset(ui.presets, 'Sigilo')});
     ui.cambio(['efectos', 'nitros']);
@@ -71,6 +72,7 @@ const FichaAcciones = (() => {
       return;
     }
     S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, lv.arma ? 'levantó el arma' : 'se levantó') : costo);
+    tormentaPj(S, costo, lv.arma ? 'levantar el arma' : 'levantarse', ui);
     S.efectos = S.efectos.filter(e => e !== actual);
     ui.cambio(['efectos', 'nitros']);
     ui.toast(`${lv.arma ? 'Levantaste el arma' : 'Te levantaste'}${costo ? ` · -${fmt(costo)} No2` : ''}`);
@@ -87,6 +89,7 @@ const FichaAcciones = (() => {
       return;
     }
     S.nitros = num(S.nitros) - (forzar && s.no2 > num(S.nitros) ? gastoNitrosForzado(S, s.no2, 'intentó soltarse') : s.no2);
+    tormentaPj(S, s.no2, 'intentar soltarse', ui);
     const f = FichaCalculo.calcular(S).final;
     const t = Combatiente.tiradaSoltarse(est, num(f[s.stat]) + Math.max(0, num(f.soltarse)), S.efectos);   // + Guantes de escapista (2026-10-05)
     if(t.r && ui.registrarTirada) ui.registrarTirada(`Soltarse (${est.nombre}) · ${s.etq} contra ${s.dif}`, t.r);
@@ -117,6 +120,19 @@ const FichaAcciones = (() => {
     if(e){ S.efectos = S.efectos || []; Combatiente.agregarEstado(S.efectos, e); }
   }
   // Toda baja de HP pasa por acá: nunca baja de 0 ni pasa del máximo. Devuelve el HP que quedó.
+  // ⛈ Maldición tormentosa (2026-10-12): al pagar una acción con No2, Atormentado le saca vida (Combatiente.cobroTormenta). Se llama justo
+  // después de descontar los No2, con el costo de la acción (no lo que alcanzó a pagar).
+  function tormentaPj(S, costo, motivo, ui){
+    const r = Combatiente.cobroTormenta(S.efectos, costo);
+    if(!r.dano) return r;
+    if(r.recibido > 0){
+      if(ui && ui.fijarHp) ui.fijarHp(num(S.hp) - r.recibido);
+      else{ S.hp = Math.max(0, num(S.hp) - r.recibido); revisarAnkh(S); revisarMuerte(S); }
+    }
+    if(ui && ui.cambio) ui.cambio(['efectos', 'nitros', 'vitals']);
+    Combatiente.avisarTormenta(((S.meta && S.meta.nombre) || '').trim(), r, motivo);
+    return r;
+  }
   function fijarHp(S, valor){
     const c = FichaCalculo.calcular(S);
     const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
@@ -275,6 +291,7 @@ const FichaAcciones = (() => {
         if(!ok) return;
       }
       S.nitros = num(S.nitros) - gastoNitros;
+      tormentaPj(S, gastoNitros, `usar ${it.nombre}`, ui);
       if(it.zonaUso) ui.colocarZona(it);   // la bengala: se elige el centro en el mapa
       if(it.aceleradorMapa) ui.acelerador(it);   // ⏩ la Runa aceleradora: se elige la casilla en el mapa
       if(sac.saque) S.meta.saqueTurno = num(S.turno) || 1;   // el primero del turno ya se sacó
@@ -370,6 +387,7 @@ const FichaAcciones = (() => {
   function sobrepesoPagar(S, ui){
     const pago = Combatiente.conExtenuado(S.efectos, 1);   // + Extenuado
     S.nitros = num(S.nitros) - pago;   // una defensa: sin No2 queda en negativo, se descuenta en la próxima recarga (2026-10-06)
+    tormentaPj(S, pago, 'esquivar con sobrepeso', ui);
     ui.cambio(['nitros', 'refresh']);
     Combatiente.avisarDeudaNo2({nombre: ((S.meta && S.meta.nombre) || '').trim(), accion: 'la Evasión (pagando el sobrepeso)', costo: pago, quedan: num(S.nitros)});
     return true;
@@ -384,6 +402,7 @@ const FichaAcciones = (() => {
     const con = arma ? ' con ' + arma.nombre : '';
     // Una defensa: sin No2 se hace igual y queda en negativo; la deuda se descuenta en la próxima recarga (dueño, 2026-10-06).
     S.nitros = num(S.nitros) - costo;
+    tormentaPj(S, costo, `el Parry${con}`, ui);
     ui.cambio(['nitros']);
     Combatiente.avisarDeudaNo2({nombre: ((S.meta && S.meta.nombre) || '').trim(), accion: `Parry${con}`, costo, quedan: num(S.nitros)});
     ui.setParry(arma ? arma.id : null);   // queda esperando su Bloqueo (si ganás el Parry)
@@ -464,6 +483,7 @@ const FichaAcciones = (() => {
       return;
     }
     S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, `atacó${arma ? ' con ' + arma.nombre : ''}`) : costo);
+    tormentaPj(S, costo, `atacar${arma ? ' con ' + arma.nombre : ''}`, ui);
     const primero = FichaCombate.registrarAtaque(S, arma);   // cuenta el ataque con esa arma (comun/ficha-combate.js)
     if(ui.alPagar) ui.alPagar();   // ya se pagó: un arma envenenada gasta su carga recién acá (2026-10-10)
     ui.cambio(['nitros']);
@@ -482,6 +502,7 @@ const FichaAcciones = (() => {
       return;
     }
     S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, `hizo un ${nombre.toLowerCase()}${con}`) : costo);
+    tormentaPj(S, costo, `el ${nombre.toLowerCase()}${con}`, ui);
     if(ui.alPagar) ui.alPagar();   // ya se pagó (2026-10-10)
     ui.cambio(['nitros']);
     // Solo el contraataque suma el «PdG en contraataque» de la propia arma (los tipos 6 lo traen: +1 a +3, mucho menos valioso que un PdG normal porque es circunstancial);
@@ -586,6 +607,7 @@ const FichaAcciones = (() => {
       costoSp = elegido;
     }
     S.nitros = num(S.nitros) - (forzar && costoNitros > num(S.nitros) ? gastoNitrosForzado(S, costoNitros, `usó ${it.nombre}`) : costoNitros);
+    tormentaPj(S, costoNitros, `usar ${it.nombre}`, ui);
     S.spGastado = num(S.spGastado) + costoSp;
     const costoHp = num(it.hpCosto);
     if(costoHp > 0) ui.fijarHp(num(S.hp) - costoHp);
@@ -721,6 +743,7 @@ const FichaAcciones = (() => {
       return;
     }
     S.nitros = num(S.nitros) - (forzar && no2 > num(S.nitros) ? gastoNitrosForzado(S, no2, `usó ${it.nombre}`) : no2);
+    tormentaPj(S, no2, `usar ${it.nombre}`, ui);
     S.spGastado = num(S.spGastado) + sp;
     if(hpVida){   // la Túnica de sangre: el SP, con vida
       if(ui.fijarHp) ui.fijarHp(num(S.hp) - hpVida); else S.hp = Math.max(0, num(S.hp) - hpVida);
@@ -760,6 +783,7 @@ const FichaAcciones = (() => {
     if(limN !== null && FichaHabilidades.nitrosVariable(it) && nitros > limN){ ui.toast(`Como mucho ${fmt(limN)} Nitros en X`); return false; }
     if(limS !== null && FichaHabilidades.spVariable(it) && sp > limS){ ui.toast(`Como mucho ${fmt(limS)} SP en X`); return false; }
     S.nitros = Math.max(0, num(S.nitros) - pagaN);
+    tormentaPj(S, pagaN, `usar ${it.nombre}`, ui);
     S.spGastado = num(S.spGastado) + sp;
     const costoHp = num(it.hpCosto);
     if(costoHp > 0) ui.fijarHp(num(S.hp) - costoHp);
@@ -1134,7 +1158,7 @@ const FichaAcciones = (() => {
     return aplicarRevivirConAnkh(S, key, id);
   }
 
-  return {gastoNitrosForzado, alternarSigilo, levantarse, soltarse, hpRevivir, revivir,
+  return {gastoNitrosForzado, tormentaPj, alternarSigilo, levantarse, soltarse, hpRevivir, revivir,
     tirarSocial, colocarTrampaDeItem, ankhAMano,
     TRAMPA_DANO_RE, avisarZonaAlMapa, colocarTrampaDeHab, colocarZonaDeHab, invocacionDeHab, invocarConHab,
     durAviso, desgastarItem, rompeArmaduraAlAzar, estadoDeSpec, aplicarEstadoRecibido, dueloAplicarEfectoPropio, xDeHab, habDueloDatos,

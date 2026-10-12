@@ -55,6 +55,7 @@ const CreepAcciones = (() => {
     const costo = Combatiente.conExtenuado(sc.estados, lv.arma ? Combatiente.COSTO_LEVANTAR_ARMA : Combatiente.costoLevantarse(st => C().modTotal(sc, st)));   // + Extenuado   // Levantarse rápido (2026-10-06)
     if(num(sc.nitros) < costo) return {error: `${sc.nombre}: no le alcanzan los No2 — ${lv.arma ? 'levantar el arma' : 'levantarse'} cuesta ${costo}`};
     sc.nitros = num(sc.nitros) - costo;
+    Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: lv.arma ? 'levantar el arma' : 'levantarse'});
     sc.estados = (sc.estados || []).filter(e => e !== lv.est);
     return {aviso: `${sc.nombre} ${lv.arma ? 'levantó el arma' : 'se levantó'}${costo ? ` · −${fmt(costo)} No2 · quedan ${fmt(sc.nitros)}` : ' (gratis)'}`};
   }
@@ -70,6 +71,7 @@ const CreepAcciones = (() => {
   function aplicarSoltarse(sc, t){
     if(num(sc.nitros) < t.s.no2) return {error: `${sc.nombre}: no le alcanzan los No2 — soltarse cuesta ${t.s.no2}`};
     sc.nitros = num(sc.nitros) - t.s.no2;
+    Combatiente.aplicarTormenta(sc, sc.estados, t.s.no2, {motivo: 'intentar soltarse'});
     if(t.ok) sc.estados = (sc.estados || []).filter(e => e.id !== t.estId);
     const hundio = Combatiente.hundirSiFalla((sc.estados || []).find(e => e.id === t.estId), t);
     return {aviso: `${sc.nombre} ${t.ok ? 'se soltó' : 'no se soltó'} (${t.r ? t.r.total : '—'} contra ${t.s.dif}) · −${fmt(t.s.no2)} No2 · quedan ${fmt(sc.nitros)}${hundio ? ` · se hundió más: +${t.s.hunde} turno${t.s.hunde === 1 ? '' : 's'}` : ''}`};
@@ -81,6 +83,7 @@ const CreepAcciones = (() => {
     const costo = gratis ? 0 : C().costoParry(sc);
     sc.usosEspecial = {...(sc.usosEspecial || {}), _parry: 1};   // (se vacía al empezar su turno)
     sc.nitros = num(sc.nitros) - costo;   // sin No2 queda en negativo: se descuenta en su próxima recarga (2026-10-06)
+    Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: 'el Parry'});
     const deuda = sc.nitros < 0 ? {nombre: sc.nombre, accion: 'Parry', costo, quedan: sc.nitros} : null;
     return {aviso: `${sc.nombre}: Parry ${gratis ? 'gratis (Parada fácil)' : `−${fmt(costo)} No2`} · quedan ${fmt(sc.nitros)} · si lo gana, tirá el Bloqueo`, deuda};
   }
@@ -109,12 +112,14 @@ const CreepAcciones = (() => {
       if(forzado && !forzar) return {error: `${sc.nombre}: no le alcanzan los No2 — este ataque cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`};
       const primero = num(sc.ataquesTurno) === 0;
       sc.nitros = forzado ? 0 : num(sc.nitros) - costo;
+      Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: 'atacar'});
       sc.ataquesTurno = num(sc.ataquesTurno) + 1;
       return {forzado, aviso: `${sc.nombre}: −${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · ${primero ? 'primer ataque del turno' : `ataque ${fmt(sc.ataquesTurno)} del turno`} · quedan ${fmt(sc.nitros)}`};
     }
     const nombre = NOMBRE_ESPECIAL[tipo] || 'Contraataque';
     if(forzado && !forzar) return {error: `${sc.nombre}: no le alcanzan los No2 — el ${nombre.toLowerCase()} cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`};
     sc.nitros = forzado ? 0 : num(sc.nitros) - costo;
+    Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: 'el ' + nombre.toLowerCase()});
     const bono = bonoEspecial(sc, tipo);
     return {forzado, aviso: `${sc.nombre}: ${nombre.toLowerCase()} −${fmt(forzado ? tenia : costo)} No2 ${forzado ? `(costaba ${fmt(costo)})` : '(lo de un primer ataque)'}${bono ? ` · PdG +${fmt(bono)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''} · quedan ${fmt(sc.nitros)}`};
   }
@@ -252,6 +257,7 @@ const CreepAcciones = (() => {
     if(costo > num(sc.nitros) && !forzar) return {error: `${sc.nombre}: no le alcanzan los No2 — usar ${it.nombre} cuesta ${fmt(costo)}`};
     const pagado = Math.min(costo, Math.max(0, num(sc.nitros)));
     sc.nitros = num(sc.nitros) - pagado;
+    Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: `usar ${it.nombre}`});
     const cargaMax = Math.max(1, num(it.cargaMax) || 1);
     let carga = num(it.cargaActual ?? cargaMax);
     if(carga <= 0) carga = cargaMax;
@@ -317,6 +323,7 @@ const CreepAcciones = (() => {
     // Se cobra lo que la habilidad tenga cargado (P133): No2, cooldown y vida; y la cura del sistema anterior, si la trae.
     const costo = C().costoNitrosHab(sc, h), costoHp = num(h.hpCosto);
     sc.nitros = num(sc.nitros) - costo;
+    Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: `usar ${h.nombre || 'una habilidad'}`});
     h.cdActual = num(h.cd);
     if(C().habAtaque(h)) sc.ataquesTurno = num(sc.ataquesTurno) + 1;  // cuenta como su ataque
     if(costoHp > 0) sc.hp = num(sc.hp) - costoHp;

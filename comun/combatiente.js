@@ -881,6 +881,59 @@ const Combatiente = (() => {
   // 2 casillas (eso lo cobra el mapa, costoPasos). `conExtenuado(estados, costo)`: el costo con el recargo, solo si ya costaba algo.
   const extenuado = estados => activos(estados).filter(e => e.extenuante).reduce((a, e) => a + Math.max(1, n(e.stacks) || 1), 0);
   const conExtenuado = (estados, costo) => n(costo) > 0 ? n(costo) + extenuado(estados) : n(costo);
+  // ⛈ Atormentado (Maldición tormentosa, Debuffer, 2026-10-12, dueño): cada acción que cuesta No2 le saca vida al pagarla — lo que costó
+  // menos 1, +1 por cada stack de más (con 1 stack, algo de 1 No2 no duele) — y moverse, 1 de vida por stack cada 2 casillas completas (eso lo
+  // cobra el mapa). Directo a la vida: lo frenan los escudos, la vida extra e Invulnerable (no la Defensa ni la Armadura mágica).
+  // `cobroTormenta(estados, costo, {mover})` → {dano, recibido, absorbido, invulnerable}: baja los escudos de `estados`; la vida la baja quien
+  // llama (`aplicarTormenta(x, estados, costo, o)` lo hace sobre x.hp, para un creep o una invocación). `avisarTormenta` lo cuenta en la Mesa.
+  const tormenta = estados => activos(estados).filter(e => e.tormenta).reduce((a, e) => a + Math.max(1, n(e.stacks) || 1), 0);
+  const danoTormenta = (estados, costo) => { const t = tormenta(estados); return t > 0 && n(costo) > 0 ? Math.max(0, n(costo) - 1 + t - 1) : 0; };
+  const danoTormentaMover = (estados, casillas) => Math.floor(Math.max(0, n(casillas)) / 2) * tormenta(estados);
+  // Un golpe directo a la vida sobre una lista de estados: Invulnerable lo anula; la Armadura arcana, los escudos y la vida extra lo frenan
+  // (los bajan en la misma lista). Es lo de resolverGolpe del mapa, sin la Defensa.
+  function golpeDirecto(estados, golpe){
+    const act = activos(estados);
+    if(act.some(e => e.invulnerable)) return {recibido: 0, absorbido: 0, invulnerable: true};
+    let recibido = Math.max(0, n(golpe)), absorbido = 0;
+    const ab = absorberPct(act, recibido);
+    recibido = ab.recibido; absorbido += ab.tomado;
+    act.filter(e => (e.escudoMagicoActual !== undefined || n(e.escudoMagico) > 0) && n(e.escudoMagicoActual ?? e.escudoMagico) > 0)
+      .sort((a, b) => (a.excedenteVida ? 1 : 0) - (b.excedenteVida ? 1 : 0))
+      .forEach(c => {
+        if(recibido <= 0) return;
+        const actual = n(c.escudoMagicoActual ?? c.escudoMagico), tomado = Math.min(recibido, actual);
+        c.escudoMagicoActual = actual - tomado;
+        if(c.excedenteVida) c.escudoMagico = c.escudoMagicoActual;
+        absorbido += tomado; recibido -= tomado;
+      });
+    return {recibido, absorbido, invulnerable: false};
+  }
+  function cobroTormenta(estados, costo, o){
+    const dano = o && o.mover ? danoTormentaMover(estados, costo) : danoTormenta(estados, costo);
+    if(dano <= 0) return {dano: 0, recibido: 0, absorbido: 0, invulnerable: false};
+    return {dano, ...golpeDirecto(estados, dano)};
+  }
+  function tormentaTxt(nombre, r, motivo){
+    if(r.invulnerable) return `⛈ Maldición tormentosa: ${nombre || 'alguien'} es Invulnerable, ${motivo || 'actuar'} no le hizo nada`;
+    const frena = r.absorbido > 0 ? ` (los escudos frenaron ${r.absorbido})` : '';
+    return `⛈ Maldición tormentosa: ${nombre || 'alguien'} pierde ${r.recibido} de vida por ${motivo || 'actuar'}${frena}`;
+  }
+  let tormentaUltimo = {txt: '', t: 0};   // (una transacción que se repite no lo cuenta dos veces)
+  function avisarTormenta(nombre, r, motivo){
+    if(!r || !r.dano) return;
+    const txt = tormentaTxt(nombre, r, motivo), ahora = Date.now();
+    if(tormentaUltimo.txt === txt && ahora - tormentaUltimo.t < 2500) return;
+    tormentaUltimo = {txt, t: ahora};
+    if(typeof window !== 'undefined' && typeof window.avisoTormenta === 'function'){ try{ window.avisoTormenta(txt, r, nombre); }catch(e){} }
+    else if(typeof toast === 'function') toast(txt);
+    if(typeof mesaLinea === 'function') mesaLinea(txt, 'alerta-roja', nombre);
+  }
+  function aplicarTormenta(x, estados, costo, o){
+    const r = cobroTormenta(estados, costo, o);
+    if(x && r.recibido > 0) x.hp = Math.max(0, n(x.hp) - r.recibido);
+    if(x && r.dano) avisarTormenta((o && o.nombre) || x.nombre, r, o && o.motivo);
+    return r;
+  }
   // Acelerado (Shooter, 2026-10-12): −1 No2 por stack al próximo ataque con un arma a distancia de este turno (mínimo 0). Lo gasta ese ataque.
   const acelerado = estados => activos(estados).filter(e => e.acelera).reduce((a, e) => a + Math.max(1, n(e.stacks) || 1), 0);
   const gastarAcelerado = estados => { if(!Array.isArray(estados)) return false; let hubo = false; for(let i = estados.length - 1; i >= 0; i--) if(estados[i] && estados[i].acelera){ estados.splice(i, 1); hubo = true; } return hubo; };
@@ -1461,7 +1514,7 @@ const Combatiente = (() => {
   // El texto de lo que cura un ítem: «Heridas (Sangrado, Lisiado, Rengo)».
   const textoCura = grupos => grupos.map(k => `${GRUPOS_CURA[k].label} (${GRUPOS_CURA[k].estados.join(', ')})`).join(' · ');
 
-  return {acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {tormenta, danoTormenta, danoTormentaMover, golpeDirecto, cobroTormenta, tormentaTxt, avisarTormenta, aplicarTormenta, acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

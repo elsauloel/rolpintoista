@@ -264,7 +264,9 @@ const FichaDuelo = (() => {
         else if(modo === 'parrydist'){   // 🏹 Parry a distancia: cobra (2 SP siempre, y el No2 del disparo) y tira la Evasión
           const it = S.inventario.find(x => x.id === itemId) || null, ee = evaEsp(d);
           S.spGastado = num(S.spGastado) + 2;
-          S.nitros = num(S.nitros) - (it ? FichaCombate.costoAtaque(S, it) : 0);
+          const pagoDist = it ? FichaCombate.costoAtaque(S, it) : 0;
+          S.nitros = num(S.nitros) - pagoDist;
+          FichaAcciones.tormentaPj(S, pagoDist, 'el Parry a distancia', ui);
           ui.cambio(['nitros', 'vitals']);
           tirarValorStat(`Evasión (Parry a distancia${it ? ' · ' + it.nombre : ''}${ee.val ? ', ' + ee.txt : ''})`, num(compute().final.eva) + ee.val, 'eva');
         }

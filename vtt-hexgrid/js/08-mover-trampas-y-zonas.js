@@ -832,6 +832,23 @@ function percepcionPublicarAvisos(id){
   pasos.forEach(n => alertaRojaAnonima(n === 1 ? '⚠ Hace falta una tirada de percepción' : `⚠ Hacen falta ${n} tiradas de percepción`));
 }
 
+// ⛈ Maldición tormentosa (2026-10-12): moverse cuesta 1 de vida por stack de Atormentado cada 2 casillas completas, directo a la vida (lo
+// frenan los escudos y la vida extra). Lo aplica la pantalla que mueve el token, con los mismos daños del mapa.
+async function tormentaAlMoverse(t, pasos, stacks){
+  const d = Math.floor(Math.max(0, num(pasos)) / 2) * Math.max(0, num(stacks));
+  if(d <= 0) return;
+  try{
+    const f = t.tipo === 'creep' ? danioCreep : String(t.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj;
+    const res = await f(t, String(d), true, 0, 0, {});
+    const llego = res && res.r ? num(res.r.recibido) : d;
+    const frena = res && res.r && num(res.r.absorbido) > 0 ? ` (los escudos frenaron ${fmt(num(res.r.absorbido))})` : '';
+    mesaLinea(res && res.r && res.r.invulnerable ? `⛈ Maldición tormentosa: ${nombreDe(t)} es Invulnerable, moverse no le hizo nada`
+      : `⛈ Maldición tormentosa: ${nombreDe(t)} pierde ${fmt(llego)} de vida por moverse ${pasos} casilla${pasos === 1 ? '' : 's'}${frena}`, 'alerta-roja', nombreDe(t));
+  }catch(err){
+    console.error('No se pudo cobrar la Maldición tormentosa al moverse:', err);
+    toast(`⛈ ${nombreDe(t)} se movió Atormentado: −${d} de vida, aplicalo a mano`);
+  }
+}
 async function confirmarRuta(){
   const p = rutaPendiente;
   if(!p || p.confirmando) return;  // un solo cobro aunque lleguen dos clics
@@ -853,6 +870,7 @@ async function confirmarRuta(){
     const esCreep = t.tipo === 'creep';
     const quedan = esCreep ? await gastarNitrosCreep(t.fichaId, costo) : await gastarNitros(t.fichaId, costo);
     if(p.dodge && quedan < 0) Combatiente.avisarDeudaNo2({nombre: nombreDe(t), accion: 'el dodge roll', costo, quedan});
+    if(cm && num(cm.tormenta) > 0) tormentaAlMoverse(t, p.pasos, num(cm.tormenta));   // ⛈ Atormentado: 1 de vida por stack cada 2 casillas
     pasosGratisUsar(p.id, num(p.gratis));   // los primeros casilleros de este turno ya se usaron
     levitarUsar(p.id, num(p.levita));   // los casilleros levitados de este turno ya se usaron (2026-10-06)
     const primerMov = !seMovioEsteTurno(p.id);

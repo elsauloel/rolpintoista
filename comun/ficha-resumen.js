@@ -143,7 +143,7 @@ const FichaResumen = (() => {
       oporCosto: (() => { const armas = FichaCombate.armasEquipadasConDano(S).map(x => x.item).filter(Combatiente.sirveDeOportunidad); return Math.min(...(armas.length ? armas : [null]).map(a => FichaCombate.costoAtaqueEspecial(a, 'oportunidad', S))); })(),
       sinOpor: (() => { const armas = FichaCombate.armasEquipadasConDano(S).map(x => x.item); return armas.length > 0 && !armas.some(Combatiente.sirveDeOportunidad); })(),
       costoMover: IT2().inmovilizadoBloqueaMover && estadoActivo(S, 'inmovilizado') ? 0 : costoMoverCasillero(S),
-      extenuado: Combatiente.extenuado(S.efectos),
+      extenuado: Combatiente.extenuado(S.efectos), tormenta: Combatiente.tormenta(S.efectos),   // ⛈ Atormentado: el mapa cobra la vida al moverse
       empower: (S.habilidades || []).some(h => h && h.empower),
       enyetar: (S.habilidades || []).some(h => h && h.enyetar),
       suerte: (S.habilidades || []).some(h => h && h.suerte),   // 🧚 Afortunado (2026-10-12): su botón fijo   // 🐈‍⬛ Enyetar (2026-10-12): también con su botón fijo   // 💪 Empower (2026-10-12): el mapa le pone el botón fijo   // Extenuado (2026-10-12): el mapa cobra 1 No2 más cada 2 casillas por stack
@@ -187,7 +187,7 @@ const FichaResumen = (() => {
           sinOpor: !Combatiente.sirveDeOportunidad(Combatiente.armaDeCombatiente(inv)),   // con un arco no hay oportunidad (2026-10-09)
           // Las reglas del mapa, iguales para todos (dueño, 2026-10-04): moverse cuesta No2 (Rengo el doble, Inmovilizado no se mueve), los Pasos
           // gratis, las chances de las piezas (Retirada limpia, Inamovible, Recuperarse rápido, Reflejos de mangosta) y Pisada atenta con su Percepción.
-          costoMover: invCostoMover(inv), extenuado: Combatiente.extenuado(inv.estados), pasosGratis: num(invModTotal(inv, 'pasosgratis')), retirada: num(invModTotal(inv, 'retirada')),
+          costoMover: invCostoMover(inv), extenuado: Combatiente.extenuado(inv.estados), tormenta: Combatiente.tormenta(inv.estados), pasosGratis: num(invModTotal(inv, 'pasosgratis')), retirada: num(invModTotal(inv, 'retirada')),
           inamovible: num(invModTotal(inv, 'inamovible')), recuperarse: num(invModTotal(inv, 'recuperarse')), reflejos: num(invModTotal(inv, 'reflejos')),
           venenista: num(invModTotal(inv, 'venenista')),   // Guantes del envenenador (2026-10-05)
           guardian: num(invModTotal(inv, 'guardian')),

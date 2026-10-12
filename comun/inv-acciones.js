@@ -37,6 +37,7 @@ const InvAcciones = (() => {
       const costo = gratis ? 0 : Combatiente.conExtenuado(inv.estados, Combatiente.costoParry());   // el Parry siempre cuesta 1 No2 (+ Extenuado)
       inv.parryTurno = 1;   // (se vacía al empezar su turno)
       inv.nitros = num(inv.nitros) - costo;   // sin No2 queda en negativo: se descuenta en su próxima recarga (2026-10-06)
+      Combatiente.aplicarTormenta(inv, inv.estados, costo, {motivo: 'el Parry'});
       Combatiente.avisarDeudaNo2({nombre: inv.nombre, accion: 'Parry', costo, quedan: num(inv.nitros)});
       parry = 'poner';   // si gana el Parry, sigue el Bloqueo
       cambio = true;
@@ -84,11 +85,13 @@ const InvAcciones = (() => {
     if(forzado && !forzar) return {error: `${inv.nombre}: no le alcanzan los Nitros — ${especial(tipo) ? 'el ' + NOMBRE_ESPECIAL[tipo].toLowerCase() : 'este ataque'} cuesta ${fmt(costo)} y tiene ${fmt(num(inv.nitros))}`};
     if(especial(tipo)){
       inv.nitros = forzado ? 0 : num(inv.nitros) - costo;
+      Combatiente.aplicarTormenta(inv, inv.estados, costo, {motivo: 'el ' + NOMBRE_ESPECIAL[tipo].toLowerCase()});
       const bono = bonoEspecial(inv, tipo);
       return {forzado, aviso: `${inv.nombre}: ${NOMBRE_ESPECIAL[tipo].toLowerCase()} −${fmt(forzado ? tenia : costo)} No2 ${forzado ? `(costaba ${fmt(costo)})` : '(lo de un primer ataque)'}${bono ? ` · PdG +${fmt(bono)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''}`};
     }
     const primero = num(inv.ataquesTurno) === 0;
     inv.nitros = forzado ? 0 : num(inv.nitros) - costo;
+    Combatiente.aplicarTormenta(inv, inv.estados, costo, {motivo: 'atacar'});
     inv.ataquesTurno = num(inv.ataquesTurno) + 1;
     return {forzado, aviso: `${inv.nombre}: -${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · ${primero ? 'primer ataque del turno' : 'ataque extra'}`};
   }
@@ -119,6 +122,7 @@ const InvAcciones = (() => {
     const costo = Combatiente.conExtenuado(inv.estados, lv.arma ? Combatiente.COSTO_LEVANTAR_ARMA : Math.max(0, num(FichaCalculo.IT2.nitrosLevantarse) - num(I().modTotal(inv, 'levantarse'))));   // + Extenuado   // Levantarse rápido (2026-10-06)
     if(num(inv.nitros) < costo) return {error: `${inv.nombre}: no le alcanzan los No2 — ${lv.arma ? 'levantar el arma' : 'levantarse'} cuesta ${costo}`};
     inv.nitros = num(inv.nitros) - costo;
+    Combatiente.aplicarTormenta(inv, inv.estados, costo, {motivo: lv.arma ? 'levantar el arma' : 'levantarse'});
     inv.estados = inv.estados.filter(e => e !== est);
     return {aviso: `${inv.nombre} ${lv.arma ? 'levantó el arma' : 'se levantó'}${costo ? ` · −${fmt(costo)} No2` : ''}`};
   }
@@ -132,6 +136,7 @@ const InvAcciones = (() => {
   function aplicarSoltarse(inv, t){
     if(num(inv.nitros) < t.s.no2) return {error: `${inv.nombre}: no le alcanzan los No2 — soltarse cuesta ${t.s.no2}`};
     inv.nitros = num(inv.nitros) - t.s.no2;
+    Combatiente.aplicarTormenta(inv, inv.estados, t.s.no2, {motivo: 'intentar soltarse'});
     if(t.ok) inv.estados = (inv.estados || []).filter(e => e !== t.est && !(t.est.id && e.id === t.est.id));
     const hundio = Combatiente.hundirSiFalla((inv.estados || []).find(e => e === t.est || (t.est.id && e.id === t.est.id)), t);
     return {aviso: `${inv.nombre} ${t.ok ? 'se soltó' : 'no se soltó'} (${t.r ? t.r.total : '—'} contra ${t.s.dif}) · −${fmt(t.s.no2)} No2${hundio ? ` · se hundió más: +${t.s.hunde} turno${t.s.hunde === 1 ? '' : 's'}` : ''}`};

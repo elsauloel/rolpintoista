@@ -140,6 +140,7 @@ const Intercambio = (() => {
   const preguntarNitros = (S, costo) => Confirmar.preguntar(`Cuesta ${fmt(costo)} No2 y tenés ${fmt(num(S.nitros))}. ¿Hacerlo igual?`, {titulo: 'Sin No2', si: 'Hacerlo igual'});
   function cobrarNitros(S, costo, hizo){
     if(!(costo > 0)) return;
+    if(typeof FichaAcciones !== 'undefined' && FichaAcciones.tormentaPj) FichaAcciones.tormentaPj(S, costo, 'pasar algo');   // ⛈ Atormentado
     if(num(S.nitros) < costo){
       const pagado = typeof FichaAcciones !== 'undefined' && FichaAcciones.gastoNitrosForzado ? FichaAcciones.gastoNitrosForzado(S, costo, hizo) : num(S.nitros);
       S.nitros = Math.max(0, num(S.nitros) - pagado);

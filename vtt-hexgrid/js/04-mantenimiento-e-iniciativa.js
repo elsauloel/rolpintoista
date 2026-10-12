@@ -875,7 +875,7 @@ function costoMoverDe(t){
   const f = fichasPub.get(t.fichaId);
   const r = f && f.resumen;
   if(!r || r.costoMover === undefined) return null;
-  return {porCasillero: num(r.costoMover), disponibles: num(r.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, num(r.costoMover)), levita: levitarRestante(t), ext: num(r.extenuado)};
+  return {porCasillero: num(r.costoMover), disponibles: num(r.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, num(r.costoMover)), levita: levitarRestante(t), ext: num(r.extenuado), tormenta: num(r.tormenta)};
 }
 /* Stats de los pies (2026-10-06) de cualquier token: un personaje o una invocación, de lo que publica la ficha de su dueño; un creep, de sus datos. */
 function statPiesDe(t, st){
@@ -909,7 +909,7 @@ function costoMoverInv(t){
   const ri = resumenDeInv(t);
   if(!ri || ri.costoMover === undefined) return null;
   const por = num(ri.costoMover);
-  return {porCasillero: por, disponibles: num(ri.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, por), levita: levitarRestante(t), ext: num(ri.extenuado)};
+  return {porCasillero: por, disponibles: num(ri.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, por), levita: levitarRestante(t), ext: num(ri.extenuado), tormenta: num(ri.tormenta)};
 }
 
 // Mismas reglas que la ficha publica en resumen.costoMover: 1 por
@@ -920,7 +920,7 @@ function costoMoverCreep(t){
   if(!sc || sc.nitros === undefined || sc.nitros === null) return null;
   const activos = (Array.isArray(sc.estados) ? sc.estados : []).filter(e => e && e.activo !== false);
   const porCasillero = activos.some(e => e.inmovilizado) ? 0 : activos.some(e => e.rengo) ? 2 : 1;
-  return {porCasillero, disponibles: num(sc.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, porCasillero), levita: levitarRestante(t), ext: Combatiente.extenuado(sc.estados)};
+  return {porCasillero, disponibles: num(sc.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, porCasillero), levita: levitarRestante(t), ext: Combatiente.extenuado(sc.estados), tormenta: Combatiente.tormenta(sc.estados)};
 }
 
 // 🎮 El GM tomó el control de este personaje (la ficha publica resumen.control = su uid, 2026-09-30): lo usa como si fuera su

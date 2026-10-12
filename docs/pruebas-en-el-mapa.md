@@ -15,6 +15,10 @@
   volver a dársela desde el catálogo de skills.
 - [ ] **🛡 Shield (Support)** (2026-10-11, cargada y con prueba automática): en el mapa, juan se la pone a Clementino (y a sí mismo); un golpe de 9
   la deja en 5 y otro de 8 entra 3 a la vida; al gastarse, al próximo turno de Clementino se va; usada en turno ajeno cobra 4 SP; no vence por turnos.
+- [ ] **🎯 Enfocado (Shooter)** (2026-10-11, cargada y con prueba automática; solo estaba conectado el navegador del GM): darle Enfocado a juan
+  desde «+ Habilidad → De clase» (y ver ahí la línea «📜 Adaptada del borrador de clases…»); usarla tres veces seguidas: el botón tiene que decir 1,
+  2 y 3 SP y cobrar 1 No2 cada vez, con «Enfocado ×3»; el próximo ataque con arma (probar uno cuerpo a cuerpo y otro a distancia) suma +6 de daño
+  y el estado se va; el ataque siguiente ya no suma. En «Ver» de la skill, «Detalles técnicos» muestra el texto original.
 - [ ] **🗡 Dagas Tipo 4 Comunes ajustadas** (2026-10-11, `revision-cuerpo-a-cuerpo-t4.md`): ver en la tienda o el inventario que los textos y precios
   nuevos se vean bien (por ejemplo el Estileto 1d4+1, la Pica Hielos 2d4 con PdG −1) y un golpe con una de ellas desde la Botonera.
 

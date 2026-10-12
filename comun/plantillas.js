@@ -25,7 +25,7 @@ const Plantillas = (() => {
   const HAB = ['id', 'nombre', 'detalle', 'original', 'automatizada', 'modo', 'etiquetas', 'costo', 'nitrosCosto', 'hpCosto', 'turnoAjenoSp', 'xMax', 'costoSube',
     'tiradaStat', 'tiradaBono', 'tiradaExtra', 'curaHp',
     'efectoNombre', 'efectoTurnos', 'efectoHpTurno', 'efectoEscudo', 'efectoStacks', 'efectoPermanente', 'efectoMods', 'efectoDetalle',
-    'zonaMapa', 'zonaRadio', 'portalMapa', 'aceleradorMapa', 'empower', 'enyetar', 'suerte', 'trampaColocar', 'duelo',
+    'zonaMapa', 'zonaRadio', 'portalMapa', 'aceleradorMapa', 'empower', 'enyetar', 'suerte', 'parryDistancia', 'trampaColocar', 'duelo',
     // Solo en lo subido a la biblioteca (el archivo de fábrica no los lleva): para quién es (P122: 'jugador' paga con
     // SP, 'creep' con cooldown) y en qué lista de "+ Habilidad" aparece (id de clase o '_custom').
     'para', 'clase'];

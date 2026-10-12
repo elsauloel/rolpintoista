@@ -243,6 +243,16 @@ const FichaDuelo = (() => {
           ops.push({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, etiqueta: `${String(a.item.tipoItem).startsWith('escudo') ? '🛡' : '🗡'} Parry · ${a.item.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo, motivoNo: '',
             info: [`Parry 🎲 ${fx(statParaArma('parry', a.item), 'parry', S.efectos)}`, disparo ? 'si ganás, el disparo queda parado (sin Bloqueo)' : `si ganás, Bloqueo 🎲 ${fx(FichaCombate.bloqueoValor(S, a.item))}`, ...(costo > num(S.nitros) ? ['⚠ sin No2: quedás en negativo (se descuenta al recargar)'] : [])]});
         });
+        // 🏹 Parry a distancia (Shooter, 2026-10-12): con la habilidad y un arma a distancia en mano, contra cualquier ataque: Evasión contra el PdG,
+        // 2 SP (Flash: 4 en turno ajeno) + el No2 de un disparo; si gana, cuenta como un Parry (contraataque). Con arco, antes, el dodge roll.
+        const hp = (S.habilidades || []).find(x => x && x.parryDistancia);
+        if(hp) FichaCombate.armasEquipadasConDano(S).map(a => a.item).filter(it => it && it.armaDeRango).forEach(it => {
+          const no2 = FichaCombate.costoAtaque(S, it), sp = Math.max(0, FichaBotonera.spMaximo(S, c) - num(S.spGastado)), arco = Combatiente.esArco(it);
+          ops.push({modo: 'parrydist', itemId: it.id, itemNombre: it.nombre, etiqueta: `🏹 Parry a distancia · ${it.nombre}`, costo: no2, arco,
+            motivoNo: no2 > num(S.nitros) ? `te faltan No2 (cuesta ${fmt(no2)})` : sp < 2 ? 'te falta SP (2, o 4 en turno ajeno)' : '',
+            info: [`Evasión 🎲 ${fx(evaV, 'eva', S.efectos)}${evaInfo}`, `${fmt(no2)} No2 del disparo + 2 SP (4 en turno ajeno)`,
+              arco ? 'si ganás, cuenta como Parry: para contraatacar, antes el dodge roll (alejarte 1 casillero, pagando sus No2)' : 'si ganás, cuenta como Parry: podés contraatacar']});
+        });
         // Stun (2026-10-06): no puede hacer nada; si lo atacan, su Evasión es 1 (sin Parry ni pagar el sobrepeso).
         if(Combatiente.stuneado(S.efectos)) return [{modo: 'evasion', itemId: '', etiqueta: '🏃 Evasión · Stun: 1', motivoNo: '', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];
         return Combatiente.sinReaccionesNo2(ops, S.efectos);   // Expuesto (Degollar): sin Parry
@@ -250,6 +260,16 @@ const FichaDuelo = (() => {
       defender: (d, modo, itemId) => {
         const S = getS();
         if(modo === 'parry') FichaAcciones.parryConArma(S, itemId ? S.inventario.find(x => x.id === itemId) || null : null, undefined, ui);
+        else if(modo === 'parrydist'){   // 🏹 Parry a distancia: cobra (SP con la pregunta de Flash, y el No2 del disparo) y tira la Evasión
+          const it = S.inventario.find(x => x.id === itemId) || null, ee = evaEsp(d), nombre = ((S.meta && S.meta.nombre) || '').trim();
+          return ConfirmarTurno.flash('Parry a distancia', {sp: 2}, {quien: nombre, spAjeno: 4}).then(pago => {
+            if(!pago) return;
+            S.spGastado = num(S.spGastado) + num(pago.sp);
+            S.nitros = num(S.nitros) - (it ? FichaCombate.costoAtaque(S, it) : 0);
+            ui.cambio(['nitros', 'vitals']);
+            tirarValorStat(`Evasión (Parry a distancia${it ? ' · ' + it.nombre : ''}${ee.val ? ', ' + ee.txt : ''})`, num(compute().final.eva) + ee.val, 'eva');
+          });
+        }
         else if(itemId === 'pagado' || itemId === 'penal'){   // Evasión con sobrepeso: la elección ya se hizo en el cuadro del duelo
           const sobre = compute().sobrecarga;
           if(itemId === 'pagado') FichaAcciones.sobrepesoPagar(S, ui);   // sin No2 queda en negativo (2026-10-06)

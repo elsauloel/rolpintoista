@@ -552,11 +552,20 @@ function rutaSoltada(a, t){
     if(a.chocado) toast('🚧 Te chocaste con un obstáculo');
     visibles.set(a.id, {x: a.x, y: a.y});
     const libre = dodgeLibreDe(a.id);   // 🪵 el dodge roll de Tronco de huída: se cierra al moverse
+    const dodgeArco = libre && dodgeBanner.arco ? {...dodgeBanner} : null;   // 🏹 Parry a distancia con arco: el dodge roll que habilita el contraataque
     const oportunidad = oportunidadEvaluarRuta(t, a.ruta);
     if(libre){ dodgeBanner = null; renderDodgeBanner(); }
+    if(dodgeArco){
+      const at = tokens.get(dodgeArco.atacanteId), ini = a.ruta[0], fin = a.ruta[a.ruta.length - 1];
+      const costo0 = a.costo ? costoRuta(a.ruta, a.costo.porCasillero, pasos, a.costo.gratis, a.costo.recargo, a.costo.levita, a.costo.ext) : 0;
+      if(pasos > 2) toast('El dodge roll es de 1 o 2 casilleros: no habilita el contraataque');
+      else if(a.costo && costo0 > num(a.costo.disponibles)) toast('No te alcanzan los No2 para el dodge roll: sin contraataque');
+      else if(at && distanciaHex(fin, at) <= distanciaHex(ini, at)) toast('El dodge roll tiene que alejarte del atacante: sin contraataque');
+      else Duelo.marcarDodgeArco(dodgeArco.id).then(() => toast('🏹 Dodge roll hecho: ya podés contraatacar')).catch(err => console.error('No se pudo marcar el dodge roll:', err));
+    }
     if(a.costo){
       const costoTotal = costoRuta(a.ruta, a.costo.porCasillero, pasos, a.costo.gratis, a.costo.recargo, a.costo.levita, a.costo.ext);   // con el terreno lento (arena movediza), los pasos gratis y Lento
-      const dodge = enDodge(a.id) || libre;   // el dodge roll: se hace aunque no alcancen los No2 (queda en negativo, 2026-10-06)
+      const dodge = enDodge(a.id) || (libre && !dodgeArco);   // el dodge roll: se hace aunque no alcancen los No2 (queda en negativo, 2026-10-06); el del arco, no
       rutaPendiente = {id: a.id, celdas: a.ruta, pasos, porCasillero: a.costo.porCasillero, ext: a.costo.ext, costo: costoTotal, disponibles: a.costo.disponibles, oportunidad,
         gratis: Math.min(pasos, num(a.costo.gratis)), lento: num(a.costo.recargo) > 0, dodge, levita: Math.min(pasos, num(a.costo.levita))};
       // Solo se pregunta si el movimiento se pasa de los No2 que quedan.

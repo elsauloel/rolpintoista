@@ -684,6 +684,11 @@ prueba('Acelerador (Support, 2026-10-12): 1 SP y 1 No2, 10 turnos, +2 No2; y la 
     !!runa, runa && runa.consumible, runa && runa.aceleradorMapa, runa && GeneradorTiendas.seccionDe(runa), runa && GeneradorTiendas.gastable(runa)],
     ['1', 1, {turnos: 10, no2: 2}, false, true, {turnos: 10, no2: 2}, true, true, {turnos: 10, no2: 2}, 'bazar', true]);
 });
+prueba('Parry a distancia (Shooter, 2026-10-12): 2 SP (4 en turno ajeno), la marca parryDistancia y su texto original', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'shooter').habilidades.find(h => h.id === 'shooter-parry-distancia');
+  igual([hab.costo, hab.nitrosCosto, hab.turnoAjenoSp, hab.parryDistancia, /Sin auditar/.test(hab.detalle), /Parry a distancia \[2\]/.test(hab.original), Plantillas.limpiar('skills', hab).parryDistancia, typeof Duelo.marcarDodgeArco],
+    ['2', 0, '4', true, false, true, true, 'function']);
+});
 prueba('Un stat en 0 o negativo se tira igual: da el valor sin dados (el duelo no queda en «Tirando…», 2026-10-12)', () => {
   const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
   S.efectos = [{id: 'x', nombre: 'Muy debilitado', polaridad: 'debuff', turnos: 2, activo: true, mods: [{stat: 'pdg', val: -50}]}];

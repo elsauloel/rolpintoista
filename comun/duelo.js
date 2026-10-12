@@ -603,7 +603,7 @@ const Duelo = (() => {
       const c = d.defensa ? (d.hab.contra || []).find(x => x.modo === d.defensa.modo) : null;
       return c ? c.etq : ((d.hab.contra || []).length === 1 ? d.hab.contra[0].etq : 'Defensa');
     }
-    return d.defensa && d.defensa.modo === 'parry' ? 'Parry' : 'Evasión';
+    return d.defensa && d.defensa.modo === 'parry' ? 'Parry' : d.defensa && d.defensa.modo === 'parrydist' ? 'Parry a distancia (Evasión)' : 'Evasión';
   };
   // Las opciones de defensa de una habilidad: lo que el objetivo puede tirar contra ella (un botón por cada stat de `contra`).
   // Parry (2026-09-29, pedido del dueño: "cajas individuales, ante el posible caso de algún skill que no se pueda
@@ -669,7 +669,10 @@ const Duelo = (() => {
     if(par === 'contacto'){
       m.contacto = info;
       // Un disparo parado con escudo (dueño, 2026-10-09): no hay Bloqueo — parar con escudo es como esquivar (cuesta el No2 del Parry): queda parado.
-      if(m.defensa && m.defensa.modo === 'parry' && r.gana === 'defensor' && typeof Combatiente !== 'undefined' && Combatiente.contraDisparo(m)){ m.resultado = 'bloqueado'; m.fase = 'fin'; m.estado = 'resuelto'; }
+      // 🏹 Parry a distancia (Shooter, 2026-10-12, dueño): Evasión contra el PdG; si gana, cuenta como un Parry ganado (sin Bloqueo: puede contraatacar).
+      // Con un arco, antes del contraataque, el dodge roll: alejarse 1 casillero pagando sus No2 (`dodgeArco`; con ballesta no hace falta).
+      if(m.defensa && m.defensa.modo === 'parrydist' && r.gana === 'defensor'){ m.resultado = 'bloqueado'; m.fase = 'fin'; m.estado = 'resuelto'; if(m.defensa.arco){ m.contacto.dodgeLibre = true; m.contacto.dodgeArco = true; } }
+      else if(m.defensa && m.defensa.modo === 'parry' && r.gana === 'defensor' && typeof Combatiente !== 'undefined' && Combatiente.contraDisparo(m)){ m.resultado = 'bloqueado'; m.fase = 'fin'; m.estado = 'resuelto'; }
       else if(m.defensa && m.defensa.modo === 'parry' && r.gana === 'defensor'){ m.fase = 'bloqueo'; }   // el Parry paró el PdG: sigue el Bloqueo
       else if(r.gana === 'atacante'){ m.resultado = 'pego'; entrarCritico(m); }   // el golpe pega: ¿es crítico?
       else{ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; if(tronco) m.contacto.dodgeLibre = true; }
@@ -823,6 +826,17 @@ const Duelo = (() => {
   // el GM lo puede marcar a mano — "ayuda, no bloquea"). Si logró salir, el duelo termina sin efecto ("SE
   // RESISTIÓ"); si sigue adentro (perdió la Evasión, no se movió, no le alcanzó, Inmovilizado…), NO hay
   // término medio (regla 4e): sigue como si hubiera perdido el contacto, con el efecto completo.
+  // 🏹 Parry a distancia con arco (2026-10-12): el dodge roll ya se hizo → aparece el contraataque.
+  async function marcarDodgeArco(id){
+    const ref = col().doc(id);
+    await fbDb.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const c = doc.data().contacto;
+      if(!c || !c.dodgeArco || c.dodgeHecho) return;
+      tx.update(ref, {contacto: {...c, dodgeHecho: true}});
+    });
+  }
   async function resolverDodge(id, logroSalir){
     const ref = col().doc(id);
     let anuncio = '';
@@ -1082,7 +1096,7 @@ const Duelo = (() => {
     const arma = d.ataque.armaNombre ? 'con ' + d.ataque.armaNombre : 'sin arma';
     if(d.hab) L.push(`${d.atacante.nombre} → ${d.defensor.nombre} · ✨ ${d.hab.nombre}${d.hab.sinOposicion ? '' : ' (' + etqTira(d) + ' contra ' + etqContra(d) + ')'}`);
     else L.push(`${d.atacante.nombre} → ${d.defensor.nombre} · ${nombreAtq(d)} ${arma} (Tipo ${_fmt(_num(d.ataque.tipoDado))})${modsTxt(d) ? ' · ' + modsTxt(d) : ''}`);
-    const defTxt = d.defensa && d.defensa.modo === 'parry' ? 'Parry' + (d.defensa.itemNombre ? ' con ' + d.defensa.itemNombre : '') : 'Evasión';
+    const defTxt = d.defensa && d.defensa.modo === 'parry' ? 'Parry' + (d.defensa.itemNombre ? ' con ' + d.defensa.itemNombre : '') : d.defensa && d.defensa.modo === 'parrydist' ? 'Parry a distancia' + (d.defensa.itemNombre ? ' con ' + d.defensa.itemNombre : '') : 'Evasión';
     if(d.hab){
       if(d.pdg && d.eva) L.push(`${etqTira(d)} ${d.pdg.total} contra ${etqContra(d)} ${d.eva.total} → ${d.contacto && d.contacto.gana === 'atacante' ? 'funcionó' : 'se resistió'}${d.contacto && d.contacto.desempate ? ' (por desempate)' : ''}`);
     }
@@ -1574,7 +1588,7 @@ const Duelo = (() => {
   }
 
 
-  const nombreDefensa = d => d.hab ? etqContra(d) : d.defensa ? (d.defensa.modo === 'parry' ? 'Parry' + (d.defensa.itemNombre ? ' · ' + d.defensa.itemNombre : '') : 'Evasión') : 'Defensa';
+  const nombreDefensa = d => d.hab ? etqContra(d) : d.defensa ? (d.defensa.modo === 'parry' ? 'Parry' + (d.defensa.itemNombre ? ' · ' + d.defensa.itemNombre : '') : d.defensa.modo === 'parrydist' ? '🏹 Parry a distancia' + (d.defensa.itemNombre ? ' · ' + d.defensa.itemNombre : '') : 'Evasión') : 'Defensa';
 
   function numerosHtml(tiro, esNuevo, que, quien){
     return `<div class="duelo-tiro${esNuevo ? ' nuevo' : ''}"><div class="que">${_esc(que)}${tiro.nota ? ' (' + _esc(tiro.nota) + ')' : ''} · ${_esc(quien)}</div><div class="num">${_fmt(tiro.total)}</div><div class="det">${_esc(tiro.formula || '')}${tiro.rolls && tiro.rolls.length ? ' → ' + tiro.rolls.join(' + ') : ''}${_num(tiro.mod) ? ' ' + (_num(tiro.mod) > 0 ? '+' : '−') + ' ' + Math.abs(_num(tiro.mod)) : ''}</div></div>`;
@@ -1663,7 +1677,8 @@ const Duelo = (() => {
     });
     const mot = motivos.map(t => `<div class="duelo-motivo">⚖ ${t}</div>`).join('');
     const item = d.defensa && d.defensa.itemNombre ? d.defensa.itemNombre : 'el objeto con el que bloqueó';
-    const disparoParado = d.resultado === 'bloqueado' && !d.bloq && typeof Combatiente !== 'undefined' && Combatiente.contraDisparo(d);
+    const disparoParado = d.resultado === 'bloqueado' && !d.bloq && !(d.defensa && d.defensa.modo === 'parrydist') && typeof Combatiente !== 'undefined' && Combatiente.contraDisparo(d);
+    const interceptado = d.resultado === 'bloqueado' && d.defensa && d.defensa.modo === 'parrydist';
     // Efecto que la skill no puede automatizar del todo (2026-09-27, pedido del dueño — "Pasos personalizados"
     // del 🎯): texto libre + la diferencia entre las dos tiradas, si hubo contienda, para resolverlo a mano.
     const efectoLibre = d.hab && d.hab.efectoLibre
@@ -1680,6 +1695,8 @@ const Duelo = (() => {
       caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">⚔ ¡PEGÓ!</div><div class="chico">${porParry ? 'El Parry no alcanzó: el golpe entra completo' : 'El golpe entra completo'}</div>${mot}</div>`;
     }else if(d.resultado === 'fallo'){
       caja = `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🛡 FALLÓ</div><div class="chico">${_esc(d.defensor.nombre)} lo esquivó</div>${mot}</div>`;
+    }else if(interceptado){
+      caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🏹 ¡INTERCEPTADO!</div><div class="chico">${_esc(d.defensor.nombre)} lo paró con un disparo (Parry a distancia): el golpe queda anulado</div>${mot}</div>`;
     }else if(d.resultado === 'bloqueado' && disparoParado){
       caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🛡 ¡PARADO!</div><div class="chico">${_esc(d.defensor.nombre)} paró el disparo con el escudo: queda anulado</div>${mot}</div>`;
     }else if(d.resultado === 'bloqueado'){
@@ -1693,7 +1710,10 @@ const Duelo = (() => {
     // el id de ese duelo, 'no' si decidió no contraatacar, vacío mientras decide.
     // Un disparo parado con escudo no da contraataque (dueño, 2026-10-09): no hubo Bloqueo y el tirador está lejos.
     let contra = '';
-    if(d.resultado === 'bloqueado' && !d.contra && !disparoParado){
+    const faltaDodgeArco = !!(d.contacto && d.contacto.dodgeArco && !d.contacto.dodgeHecho);   // 🏹 con arco: primero el dodge roll
+    if(d.resultado === 'bloqueado' && !d.contra && !disparoParado && faltaDodgeArco)
+      contra = `<div class="duelo-mini">🏹 Con el arco, para contraatacar ${esMio(d.defensor) ? 'primero hacé' : _esc(d.defensor.nombre) + ' primero hace'} el dodge roll: alejarse 1 casillero de ${_esc(d.atacante.nombre)} (pagando sus No2).</div>`;
+    else if(d.resultado === 'bloqueado' && !d.contra && !disparoParado){
       const propio = esMio(d.defensor);
       if(propio || soyGM()) contra = `<div class="duelo-contra"><div class="duelo-nota" style="margin-bottom:8px">⚔ ${propio ? 'Ganaste' : _esc(d.defensor.nombre) + ' ganó'} el Parry y el Bloqueo: <b>¿${propio ? 'contraatacás' : 'contraataca'} a ${_esc(d.atacante.nombre)}?</b><br><span style="opacity:.8">Cuesta lo de un primer ataque con su arma y se abre un duelo nuevo con los papeles al revés.</span></div>`
         + `<button type="button" data-contra>Sí, contraatacar${propio ? '' : ' (por ' + _esc(d.defensor.nombre) + ')'}</button> <button type="button" class="sec" data-contra-no>No</button></div>`;
@@ -2180,7 +2200,7 @@ const Duelo = (() => {
         return;
       }
       if(m.tipo === 'duelo-contra'){
-        if(!h.soy || !h.soy(d.defensor) || !h.armaContra || d.resultado !== 'bloqueado' || d.contra) return;
+        if(!h.soy || !h.soy(d.defensor) || !h.armaContra || d.resultado !== 'bloqueado' || d.contra || (d.contacto && d.contacto.dodgeArco && !d.contacto.dodgeHecho)) return;
         const arma = h.armaContra(d) || {};
         const tok = {id: d.atacante.tokenId, nombre: d.atacante.nombre, tipo: d.atacante.tipo, fichaId: d.atacante.ref, duenoUid: d.atacante.uid};
         const nid = await crear({yo: {ref: d.defensor.ref, tipo: d.defensor.tipo, nombre: d.defensor.nombre}, ataque: {tipo: 'contra', armaId: arma.armaId || '', armaNombre: arma.armaNombre || '', tipoDado: arma.tipoDado || 8}}, tok, d.defensor.tokenId, d.id);
@@ -2197,7 +2217,7 @@ const Duelo = (() => {
       if(campo === 'eva'){
         const op = (d.hab ? opcionesHab(d, h) : (h.opcionesDefensa ? h.opcionesDefensa(d) : [])).find(o => o.modo === m.modo && (o.itemId || '') === (m.itemId || ''));
         if(!op || op.motivoNo) return;
-        defensa = {modo: op.modo, itemId: op.itemId || '', itemNombre: op.itemNombre || '', costo: _num(op.costo)};
+        defensa = {modo: op.modo, itemId: op.itemId || '', itemNombre: op.itemNombre || '', costo: _num(op.costo), ...(op.arco ? {arco: true} : {})};
       }
       let extra = null;
       if(!d.hab && campo === 'pdg' && h.statsCritico) extra = h.statsCritico(d) || null;
@@ -2584,5 +2604,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

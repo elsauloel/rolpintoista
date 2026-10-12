@@ -936,13 +936,21 @@ function dueloDodgeLibre(d){
   if(!t) return;
   if(tokenExpuesto(t)){ toast(`${d.defensor.nombre} está Expuesto: no puede hacer el dodge roll`); return; }
   seleccionar(d.defensor.tokenId);
-  dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, libre: true};
+  // 🏹 Parry a distancia con arco (2026-10-12): el dodge roll es obligatorio para contraatacar: 1 casillero más lejos del atacante, pagando sus No2.
+  const arco = !!(d.contacto && d.contacto.dodgeArco);
+  dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, libre: true, ...(arco ? {arco: true, atacanteId: d.atacante.tokenId} : {})};
   renderDodgeBanner();
 }
 const dodgeLibreDe = id => !!(dodgeBanner && dodgeBanner.libre && dodgeBanner.tokenId === id);
 function renderDodgeBanner(){
   // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
   if(!dodgeBanner){ AvisoCombate.cartel('dodge', null); return; }
+  if(dodgeBanner.libre && dodgeBanner.arco){
+    AvisoCombate.cartel('dodge', {icono: '🏹', titulo: `${dodgeBanner.nombre}: dodge roll para contraatacar`, posicion: 'abajo',
+      texto: 'Con el arco, para contraatacar: arrastrá el token 1 o 2 casilleros, más lejos del atacante (tienen que alcanzarte los No2; sin ataque de oportunidad).',
+      botones: [{texto: '✋ No contraataco', alClic: () => { dodgeBanner = null; renderDodgeBanner(); }}]});
+    return;
+  }
   if(dodgeBanner.libre){
     AvisoCombate.cartel('dodge', {icono: '🪵', titulo: `${dodgeBanner.nombre} esquivó: dodge roll`, posicion: 'abajo',
       texto: 'Arrastrá el token hasta 2 casilleros (paga sus No2; sin ataque de oportunidad).',

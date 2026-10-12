@@ -198,7 +198,7 @@ lienzo.addEventListener('dblclick', () => { if(dibujando && dibujando.recto) rec
 const rectaCartel = (() => {
   const d = document.createElement('div');
   d.id = 'recta-cartel';
-  d.style.cssText = 'position:fixed;z-index:60;pointer-events:none;display:none;background:rgba(20,15,18,.92);color:#EDE3D2;border:1px solid #E0A458;'
+  d.style.cssText = 'position:fixed;z-index:99990;pointer-events:none;display:none;background:rgba(20,15,18,.92);color:#EDE3D2;border:1px solid #E0A458;'
     + 'border-radius:8px;padding:4px 9px;font:600 12px "Space Grotesk",system-ui,sans-serif;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.5)';
   document.body.appendChild(d);
   return d;

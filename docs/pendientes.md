@@ -281,7 +281,7 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 9. [ ] **Auditoría de skills de clase** (§7): Tanque 10/10 ✅ (Miti-Miti, 2026-10-11); sigue la alternancia Support → Shooter → Debuffer (dueño, 2026-10-11) hasta que a cada una le queden 4.
 10. [ ] **Paso 8 del casteo** (§1): quedan 10 skills de clase que tocan casteo.
 11. [ ] **Rework de armas no mágicas** elemento por elemento y el crítico nuevo en ficha y mapa (§8).
-12. [ ] **Preguntas para la mesa**: P143 (la tirada de la zona) y P144 (la armadura mágica), esperan la opinión del grupo.
+12. [ ] **Preguntas para la mesa**: P143 (la tirada de la zona) espera la opinión del grupo. (P144 ✅ 2026-10-12: la Defensa especial es un stat.)
 
 - [ ] **Los carteles del navegador («elsauloel.github.io dice…») → el cartel del juego** (dueño, 2026-10-08: «se siente raro, ¿se podría integrar?»).
   La pieza ya está: `AvisoCombate.preguntar(texto, {titulo, icono, si, no})` → Promise (comun/aviso-combate.js). Ya pasados (el mapa): atacar a un

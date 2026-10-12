@@ -652,13 +652,14 @@ resuelven a mano, como el resto de los avisos).
   solo con la Armadura mágica): es un **lugar intermedio**. ¿Lo consolidamos como **regla del tipo tóxico** (todo daño tóxico se resiste
   con Res.Esp) o es una **peculiaridad de esta skill puntual** (Pedos Tóxicos)?
 
-- **P144. La Armadura mágica: ¿un stat más o un bono excepcional? (2026-10-02, abierta a pedido del dueño para que la discutan Enro y
+- ✅ **P144. La Armadura mágica: ¿un stat más o un bono excepcional?** **Decidida (dueño, 2026-10-12: «esto ya lo definimos, existe la armadura especial»): es un stat, la **Defensa especial** (`armadmg`, «Def. especial»), que se resta al daño especial como la Defensa al físico.** Lo de abajo queda como historia.
+  ~~ (2026-10-02, abierta a pedido del dueño para que la discutan Enro y
   Seba — también va en la pestaña 💬 Preguntas de las Herramientas de diseño).** Hoy existe como stat (`armadmg`, paso 7 de las reglas de
   casteo, 2026-09-27): arranca en 0, no sale de ningún atributo, la dan ítems (por criterio, Raros o mejores) y se resta al daño mágico
   que ignora la Defensa (en el duelo, en las zonas de habilidad y al tóxico, P142). Planteo: ¿debería ser un **stat** como los demás (que
   aparece en la ficha, sube con pasivas, etc.) o un **bono particular y excepcional**, que se mantenga en valores bajos y solo lo
   otorguen algunos equipos, efectos, habilidades o consumibles, y cuyo único trabajo sea reducir el daño mágico? ¿Qué topes o valores
-  típicos? ¿Debería reducir todo daño mágico o solo algunos tipos?
+  típicos? ¿Debería reducir todo daño mágico o solo algunos tipos?~~
 
 - **P145. Percepción aumentada: "algo está fuera de lugar" (2026-10-02, pedido del dueño; reemplaza el aviso actual).** **Respondido el mismo día:** (a) la trampa tiene su dificultad para detectarla — de fábrica o armada a mano, un número (común 8: espacio de diseño, trampas de buena o mala calidad); colocada por una habilidad, la Destreza (física) o el Efecto especial (mágica) de quien la coloca; (b) en sigilo, Percepción contra Destreza; (c) descubierta, la ve todo el equipo; (d) la tirada nunca dice para qué es. **Trampas y sigilo: hechos (2026-10-02; el sigilo lo resuelve la pantalla del GM — empate: sigue escondido).** Lo decidido:
   con la pasiva, (1) **trampas**: al quedar al lado de una trampa oculta de un rival, el movimiento se corta **sin revelar nada ni decir

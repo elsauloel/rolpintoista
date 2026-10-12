@@ -22,6 +22,8 @@
 - [ ] **🌑 Maldición debilitante (Debuffer)** (2026-10-11, cargada y con prueba automática): juan se la tira al Coloso (PdG.Esp contra Res.Esp);
   si gana, «Debilitado» 2 turnos y en sus Acciones el PdG, la Evasión, el Parry y el daño bajan 1 (botones en rojo); otra vez = ×2 (−2) y vuelve a 2
   turnos; cobra 5 SP y 3 No2. Probar también contra un personaje (Clementino) para ver que le llega a su ficha.
+- [ ] **✨ Blessing (Support)** (2026-10-11, cargada y con prueba automática): juan se la pone a Clementino y a sí mismo; «Bendecido» 2 turnos y
+  en la Botonera el PdG, la Evasión, el Parry y el daño suben 1 (en verde); otra vez renueva sin sumar; cobra 5 SP y 1 No2.
 - [ ] **🗡 Dagas Tipo 4 Comunes ajustadas** (2026-10-11, `revision-cuerpo-a-cuerpo-t4.md`): ver en la tienda o el inventario que los textos y precios
   nuevos se vean bien (por ejemplo el Estileto 1d4+1, la Pica Hielos 2d4 con PdG −1) y un golpe con una de ellas desde la Botonera.
 

@@ -295,7 +295,9 @@ verifica con 1d20: hasta DES×2 → 7+; hasta DES×3 → 17+; más de DES×3 →
 
 1. **Empower** [2] — NO2: (0). +3 a cualquier tirada propia o de un
    aliado.
-2. **Blessing** [5] — +1 fijo en todas las tiradas por 2 turnos.
+2. ✅ **Blessing** — **SP:** 5. **No2:** 1. **A vos o a un aliado a la vista** (dentro de tu Rango): queda **Bendecido** (estado nuevo, el espejo de
+   Debilitado) 2 turnos, **+1 a todas sus tiradas**, también defensas y daño. **No se acumula:** otra vez renueva los 2 turnos. ⚙ Automatizado; ✋ a
+   mano, la tirada de un atributo pelado. *(Auditada 2026-10-11 con el dueño; original: «Blessing [5] — +1 fijo en todas las tiradas por 2 turnos.»)*
 3. ✅ **Heal** — **SP:** 2. **No2:** 1. Curás **1d6+4** de vida (se tira al usarla) **a vos o a un aliado a la vista** (dentro de tu Rango),
    **sin pasar la vida máxima**. **Sobre alguien caído (en 0) no hace nada**: para eso hace falta revivirlo. ⚙ Automatizado: la tirada y la cura (objetivo
    «aliado» con `conmigo`: se puede elegir el propio token). *(Auditada 2026-10-11 con el dueño; original: «Heal [2] — NO2: (1). Cura 4 + 1d6 HP.»)*

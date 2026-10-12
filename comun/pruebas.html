@@ -596,6 +596,17 @@ prueba('Maldición debilitante (Debuffer, 2026-10-11): PdG.Esp contra Res.Esp, D
     CreepCalculo.modTotal(sc, 'pdg'), CreepCalculo.modTotal(sc, 'eva'), CreepCalculo.modTotal(sc, 'dmg'), /Sin auditar/.test(hab.detalle)],
     ['5', 3, 'pdgmg', ['resmg'], 1, 2, 2, -2, -2, -2, false]);
 });
+prueba('Blessing (Support, 2026-10-11): a un aliado o a uno mismo, Bendecido +1 a todas las tiradas 2 turnos, y otra vez renueva sin sumar', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-blessing');
+  const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});
+  const presets = estadosPresetFicha(), lista = [];
+  Combatiente.agregarEstado(lista, FichaAcciones.estadoDeSpec({nombre: 'Bendecido'}, presets));
+  lista[0].turnos = 1;
+  Combatiente.agregarEstado(lista, FichaAcciones.estadoDeSpec({nombre: 'Bendecido'}, presets));
+  const sc = {estados: [{...lista[0]}]};
+  igual([hab.costo, hab.nitrosCosto, ej.objetivo, ej.conmigo, lista.length, lista[0].turnos, CreepCalculo.modTotal(sc, 'pdg'), CreepCalculo.modTotal(sc, 'eva'), CreepCalculo.modTotal(sc, 'dmg'), /Sin auditar/.test(hab.detalle)],
+    ['5', 1, 'aliado', true, 1, 2, 1, 1, 1, false]);
+});
 prueba('Skills auditadas: el texto original del borrador se ve en «Detalles técnicos» (también en una copia vieja del personaje)', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-heal');
   const copiaVieja = {nombre: 'Heal', detalle: hab.detalle, habClaseId: 'support-heal'};

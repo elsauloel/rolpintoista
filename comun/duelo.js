@@ -1715,7 +1715,7 @@ const Duelo = (() => {
       contra = `<div class="duelo-mini">🏹 Con el arco, para contraatacar ${esMio(d.defensor) ? 'primero hacé' : _esc(d.defensor.nombre) + ' primero hace'} el dodge roll: alejarse 1 casillero de ${_esc(d.atacante.nombre)} (pagando sus No2).</div>`;
     else if(d.resultado === 'bloqueado' && !d.contra && !disparoParado){
       const propio = esMio(d.defensor);
-      if(propio || soyGM()) contra = `<div class="duelo-contra"><div class="duelo-nota" style="margin-bottom:8px">⚔ ${propio ? 'Ganaste' : _esc(d.defensor.nombre) + ' ganó'} el Parry y el Bloqueo: <b>¿${propio ? 'contraatacás' : 'contraataca'} a ${_esc(d.atacante.nombre)}?</b><br><span style="opacity:.8">Cuesta lo de un primer ataque con su arma y se abre un duelo nuevo con los papeles al revés.</span></div>`
+      if(propio || soyGM()) contra = `<div class="duelo-contra"><div class="duelo-nota" style="margin-bottom:8px">⚔ ${propio ? 'Ganaste' : _esc(d.defensor.nombre) + ' ganó'} ${interceptado ? 'el Parry a distancia' : 'el Parry y el Bloqueo'}: <b>¿${propio ? 'contraatacás' : 'contraataca'} a ${_esc(d.atacante.nombre)}?</b><br><span style="opacity:.8">Cuesta lo de un primer ataque con su arma y se abre un duelo nuevo con los papeles al revés.</span></div>`
         + `<button type="button" data-contra>Sí, contraatacar${propio ? '' : ' (por ' + _esc(d.defensor.nombre) + ')'}</button> <button type="button" class="sec" data-contra-no>No</button></div>`;
       else contra = `<div class="duelo-mini">⚔ ${_esc(d.defensor.nombre)} puede contraatacar: está decidiendo…</div>`;
     }

@@ -192,3 +192,28 @@ document.addEventListener('keydown', e => {
   else if(e.key === 'Backspace'){ e.preventDefault(); e.stopPropagation(); rectaDeshacer(); }
 }, true);
 lienzo.addEventListener('dblclick', () => { if(dibujando && dibujando.recto) rectaTerminar(); });
+
+/* El cartelito que sigue al puntero (2026-10-12, pedido del dueño: «mientras esté activa, al lado del puntero, un cartelito que diga doble clic
+   para terminar»): con el lápiz en rectas activo y el mouse sobre el mapa. Antes del primer clic, cómo empezar; después, cómo terminar. */
+const rectaCartel = (() => {
+  const d = document.createElement('div');
+  d.id = 'recta-cartel';
+  d.style.cssText = 'position:fixed;z-index:60;pointer-events:none;display:none;background:rgba(20,15,18,.92);color:#EDE3D2;border:1px solid #E0A458;'
+    + 'border-radius:8px;padding:4px 9px;font:600 12px "Space Grotesk",system-ui,sans-serif;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.5)';
+  document.body.appendChild(d);
+  return d;
+})();
+function rectaCartelMostrar(e){
+  const activa = herramientaActiva === 'lapiz' && lapizEstilo === 'recta';
+  if(!activa || !e){ rectaCartel.style.display = 'none'; return; }
+  const empezado = !!(dibujando && dibujando.recto);
+  rectaCartel.innerHTML = empezado ? '🖱 Doble clic para terminar <span style="opacity:.7;font-weight:400">· Esc descarta</span>' : '📐 Clic para empezar · doble clic para terminar';
+  rectaCartel.style.left = (e.clientX + 16) + 'px';
+  rectaCartel.style.top = (e.clientY + 18) + 'px';
+  rectaCartel.style.display = 'block';
+}
+lienzo.addEventListener('pointermove', e => rectaCartelMostrar(e));
+lienzo.addEventListener('pointerleave', () => rectaCartelMostrar(null));
+lienzo.addEventListener('pointerdown', e => setTimeout(() => rectaCartelMostrar(e), 0));
+lienzo.addEventListener('dblclick', e => setTimeout(() => rectaCartelMostrar(e), 0));
+document.addEventListener('keydown', () => setTimeout(() => { if(rectaCartel.style.display === 'block' && !(herramientaActiva === 'lapiz' && lapizEstilo === 'recta')) rectaCartel.style.display = 'none'; }, 0));

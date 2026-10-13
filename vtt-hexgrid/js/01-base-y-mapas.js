@@ -461,11 +461,18 @@ async function borrarMapa(id){
     const [tokensDocs, estadoDocs, trazosDocs, elementosDocs, pingsDocs] = await Promise.all([
       base.collection('tokens').get(), base.collection('estado').get(), base.collection('trazos').get(), base.collection('elementos').get(), base.collection('pings').get(),
     ]);
-    const refs = [...tokensDocs.docs, ...estadoDocs.docs, ...trazosDocs.docs, ...elementosDocs.docs, ...pingsDocs.docs].map(d => d.ref).concat([base]);
+    const refs = [...tokensDocs.docs, ...estadoDocs.docs, ...trazosDocs.docs, ...elementosDocs.docs, ...pingsDocs.docs].map(d => d.ref);
     for(let i = 0; i < refs.length; i += 450){
       const lote = fbDb.batch();
       refs.slice(i, i + 450).forEach(r => lote.delete(r));
       await lote.commit();
+    }
+    // El mapa en sí, aparte y al final (2026-10-13): si las reglas no lo dejan borrar, que se sepa por qué (antes fallaba todo el lote, sin decir nada).
+    try{ await base.delete(); }
+    catch(err){
+      console.error('No se pudo borrar el mapa (el documento):', err);
+      toast(err && err.code === 'permission-denied' ? `Se vació "${nombre}", pero el mapa no se pudo borrar: faltan pegar las reglas nuevas de Firestore` : 'No se pudo borrar el mapa');
+      return;
     }
     if(mapaActivo === id) await publicarMapa(MAPA_PRINCIPAL);
     if(mapaEligiendoGM === id){

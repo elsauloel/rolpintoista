@@ -854,10 +854,13 @@ service cloud.firestore {
       // tokens/{id}, un nivel más adentro.
       match /mapas/{mapaId} {
         allow read: if esMiembro(c);
-        allow write: if esGM(c)
+        allow create, update: if esGM(c)
           && request.resource.data.keys().hasOnly(['nombre', 'creado'])
           && request.resource.data.nombre is string
           && request.resource.data.nombre.size() > 0 && request.resource.data.nombre.size() <= 40;
+        // Borrar un mapa (2026-10-13): antes iba dentro del `write` de arriba, que mira los datos nuevos — al borrar no hay, así que
+        // Firestore lo rechazaba siempre y el mapa no se podía borrar.
+        allow delete: if esGM(c);
 
         match /estado/{doc} {
           allow read: if esMiembro(c);

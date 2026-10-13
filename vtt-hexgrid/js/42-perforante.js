@@ -22,6 +22,20 @@ function perforanteSiguiente(tA, tD, alcance, ignorar){
   }
   return null;
 }
+// Una sola pantalla sigue cada disparo (2026-10-13, probándolo en el mapa: con dos pantallas de la misma cuenta se abrían dos duelos): un
+// momento con id fijo `perf-<duelo>`, tomado en una transacción; si ya existe, otra lo hizo. De paso, es la tarjeta de la Crónica.
+async function perforanteReclamar(d, nombre, quien, blanco, sig){
+  const ref = fbDb.collection(fbRutaCampana('momentos')).doc('perf-' + d.id);
+  const resultado = !sig ? 'siguió de largo: no había nadie detrás' : sig.frena ? 'se frenó contra un obstáculo' : `sigue hacia ${nombreDe(sig.t)} (misma tirada de PdG, sin efectos)`;
+  try{
+    return await fbDb.runTransaction(async tx => {
+      if((await tx.get(ref)).exists) return false;
+      tx.set(ref, {tipo: 'perforante', icono: '🏹', titulo: `${nombre}: ${quien} atravesó a ${blanco}`.slice(0, 200), resultado: resultado.slice(0, 400), estado: 'listo',
+        datos: {chico: true}, creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp()});
+      return true;
+    });
+  }catch(err){ console.error('Proyectil perforante: no se pudo reclamar', err); return true; }   // sin la marca, mejor seguir que no seguir
+}
 async function perforanteResuelto(d){
   const a = d && d.ataque;
   if(!a || !a.perforante || d.hab || !d.id || perforanteHechos.has(d.id)) return;
@@ -35,6 +49,7 @@ async function perforanteResuelto(d){
   let alcance = dist;
   try{ alcance = Math.max(dist, Math.round(num(rangoDeToken(tA).rng)) || dist); }catch(e){}
   const sig = perforanteSiguiente(tA, tD, alcance, new Set([idA, idD]));
+  if(!(await perforanteReclamar(d, nombre, quien, blanco, sig))) return;   // otra pantalla ya lo siguió (encontrado probándolo: se abrían dos duelos)
   if(!sig || sig.frena){
     mesaLinea(`🏹 El ${nombre} de ${quien} atravesó a ${blanco} y ${sig && sig.frena ? 'se frenó contra un obstáculo' : 'siguió de largo: no había nadie detrás, dentro de su Rango'}`, 'recordatorio');
     return;

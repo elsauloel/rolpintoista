@@ -470,3 +470,9 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   pestañas hay un recuadro con la **experiencia** (total y por jugador), el **oro que sueltan** (±20 %), **lo que sacan si venden todo lo que
   sueltan** (equipo, trofeos y consumibles al azar) y el **oro total** (y por jugador, entre las fichas de la partida). Son los números de
   `CombateFin.estimar` (los mismos de 💰 Botín estimado, que queda como «Ver detalle»). `estimadoCajaHtml` en js/09.
+
+- **El menú de la izquierda** (2026-10-12, pedido del dueño: «en este mismo estilo, para mantener la coherencia»): `#dock-izq` con **🗺 Mapa** y
+  **👥 Personajes** (la lista se abre a su derecha), con los estilos comunes de `../comun/dock-izq.css` (los mismos que la ficha). Salieron de la
+  cabecera. Adentro del mapa (modo acciones) se esconde (`Embebido.iniciar`, `pagina`).
+- **👥 Quién cuenta** (2026-10-12): en «Si derrotan a todos», chips por personaje para dejar afuera al que solo observa o al que no vino
+  (`CombateFin.fuera`/`fueraCambiar`, `gm/personajes` = {fuera}); se recuerda en la partida y lo usan también Escanear grupo y Finalizar combate.

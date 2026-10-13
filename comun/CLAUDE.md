@@ -1514,3 +1514,10 @@ versión parecida en más de una, es candidato a juntar.
   se inyectan a las piezas comunes son `(t, o) => Confirmar.preguntar(t, o)` y las piezas los esperan con `await`. Excepción: `CreepAcciones.ejecutarHab`
   e `InvHabilidades.ejecutar` siguen sincrónicas (corren en una transacción): el Silencio se pregunta antes con `confirmarSilencio(...)` y se les
   pasa `silencioOk = true`. `AvisoCombate.preguntar` delega en este.
+- **`dock-izq.css`** (2026-10-12) — los estilos del menú de botones de la izquierda (`.dock-izq`, `.dock-btn`, `.dock-ico`, `.dock-txt`), que
+  comparten la ficha y GM Tools (salieron de `ficha.css`). Cada página pone sus botones.
+- **`combate-fin.js`, quién cuenta** (2026-10-12): `fuera()` / `fueraCambiar(id, afuera)` — los personajes que el GM deja afuera de los cálculos
+  (`gm/personajes`); `jugadores()` los arranca destildados.
+- **La Defensa especial va siempre con la Defensa** (dueño, 2026-10-12): «Def. especial» (antes «Armad. mágica») en las botoneras de
+  personaje, invocación y creep, debajo de la Defensa en Equipo y mochila, en la cabecera de la Botonera («Def 2 · Def.Esp 0») y siempre en
+  la ficha lite.

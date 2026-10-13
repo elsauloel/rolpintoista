@@ -853,6 +853,21 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
     coleccionAreas().doc(areaId).update(siguiente >= objetivos.length ? {estado: 'terminado'} : {indice: siguiente}).catch(err => console.error(err));
     return;
   }
+  // Una sola pantalla del GM crea cada sub-duelo (2026-10-13, probándolo: con dos pantallas del GM abiertas se abrían dos duelos iguales —el
+  // «riesgo chico» de antes pasaba siempre—): se reserva el lugar en el área con una transacción; si otra ya lo reservó, esta no hace nada.
+  try{
+    const ref = coleccionAreas().doc(areaId);
+    const mia = await fbDb.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      if(!doc.exists) return false;
+      const duelos = (doc.data().duelos || []).slice();
+      if(duelos[idx] || num(doc.data().indice) !== idx) return false;
+      duelos[idx] = 'reservado:' + fbUsuario.uid;
+      tx.update(ref, {duelos});
+      return true;
+    });
+    if(!mia) return;
+  }catch(err){ console.error('No se pudo reservar el sub-duelo del área:', err); areaSubDueloCreando.delete(clave); return; }
   let dueloId;
   try{
     // El casteador tira su PdG.Esp/PdG UNA SOLA VEZ para toda la cascada (dicho por el dueño, 2026-09-27): del 2do
@@ -860,7 +875,11 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
     // precargado — este sub-duelo solo le pide la Evasión a ESTE objetivo, contra esa misma tirada.
     dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: tormentaHabDe(a.hab, tokenId), alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: Math.max(objetivos.length, num(a.hab && a.hab.reparte && a.hab.reparte.total))}, pdgCompartido: a.pdgCompartido || null},
       {id: tokenId, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, a.casteador.tokenId, '');
-  }catch(err){ console.error('No se pudo crear el sub-duelo del área:', err); areaSubDueloCreando.delete(clave); return; }   // (que se pueda reintentar)
+  }catch(err){   // (que se pueda reintentar: se libera la reserva)
+    console.error('No se pudo crear el sub-duelo del área:', err); areaSubDueloCreando.delete(clave);
+    try{ const doc = await coleccionAreas().doc(areaId).get(); const duelos = ((doc.exists && doc.data().duelos) || []).slice(); duelos[idx] = null; await coleccionAreas().doc(areaId).update({duelos}); }catch(e){}
+    return;
+  }
   try{
     const doc = await coleccionAreas().doc(areaId).get();
     if(!doc.exists) return;

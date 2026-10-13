@@ -71,7 +71,7 @@ function estimadoCajaHtml(lista){
   const est = CombateFin.estimar(lista, CATALOGO_EQUIPO);
   if(!est.filas.length) return `<div class="hint" style="margin:-4px 0 10px">💰 Ya se repartió lo de todos los creeps de este mapa.</div>`;
   pedirJugadoresCant();
-  const r = n => fmt(Math.round(n)), venta = est.venta + est.drop, lista = jugadoresListaGM || [], n = lista.filter(p => !jugadoresFueraGM.has(p.id)).length;
+  const r = n => fmt(Math.round(n)), venta = est.venta + est.drop, pjs = jugadoresListaGM || [], n = pjs.filter(p => !jugadoresFueraGM.has(p.id)).length;
   const dato = (icono, titulo, valor, nota, fuerte) => `<div style="flex:1 1 150px;min-width:140px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:${fuerte ? 'rgba(224,184,74,.12)' : 'rgba(255,255,255,.03)'}">
       <div class="hint" style="font-size:11.5px">${icono} ${titulo}</div><div style="font-size:19px;font-weight:800${fuerte ? ';color:#ffd76a' : ''}">${valor}</div>${nota ? `<div class="hint" style="font-size:11.5px">${nota}</div>` : ''}</div>`;
   return `<div id="estimado-caja" style="margin:0 0 12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(26,20,24,.5)">
@@ -83,7 +83,7 @@ function estimadoCajaHtml(lista){
       ${dato('🧰', 'Si venden todo lo que sueltan', `~${r(venta)}`, `equipo y trofeos ${r(est.venta)}${est.drop ? ` · consumibles al azar ~${r(est.drop)}` : ''}`)}
       ${dato('💰', 'Oro total', `~${r(est.total)} DDE`, n ? `~${r(est.total / n)} c/u entre ${n}` : '', true)}
     </div>
-    ${lista.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px"><span class="hint" style="font-size:11.5px">👥 Cuentan:</span>${lista.map(p => {
+    ${pjs.length ? `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px"><span class="hint" style="font-size:11.5px">👥 Cuentan:</span>${pjs.map(p => {
       const no = jugadoresFueraGM.has(p.id);
       return `<button type="button" class="btn ghost" data-estimado-pj="${esc(p.id)}" title="${no ? 'No cuenta (observa o no vino): tocá para contarlo' : 'Cuenta: tocá para dejarlo afuera'}" style="padding:2px 9px;font-size:12px;${no ? 'opacity:.45;text-decoration:line-through' : 'border-color:#5fd08a'}">${no ? '✗' : '✓'} ${esc(p.nombre)}</button>`;
     }).join('')}<span class="hint" style="font-size:11px">· se recuerda en la partida (también para Escanear grupo y Finalizar combate)</span></div>` : ''}

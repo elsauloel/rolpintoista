@@ -1094,7 +1094,7 @@ function dueloElegirAreaMapa(msg){
     if(hab.zonaQueda) dueloZonaQueda(hab, h, Math.max(1, radio), yo);   // lo que deja en el suelo (bola de fuego, ventisca)
     if(hab.despeja) despejarEn(enCono || new Set(celdasFlor(Math.max(1, radio)).map(o => { const c0 = hexACubo(h); return nbPack(cuboACol(c0.q + o.dq, c0.r + o.dr), cuboAFila(c0.q + o.dq, c0.r + o.dr)); })), hab.nombre);   // el vendaval
     const objetivos = todos
-      .filter(t => !t.oculto && !propio(t) && (enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio))
+      .filter(t => !t.oculto && !propio(t) && (enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio || (h.otro && distanciaHex(h.otro, t) <= radio)))   // (h.otro: la casilla de salida del Remolino)
       .filter(t => hab.fuegoAmigo || h.linea || dueloEsRival(yo, t))   // (la línea tiene fuego amigo: dueño, 2026-10-05)
       .filter(t => !hab.conVista || lineaLibre(h, t, solidosSet()))   // la luz (Varita de la luz): todos los rivales que alcanza a ver, en sigilo o no (dueño, 2026-10-05)
       .sort((a, b) => h.linea ? distanciaHex(h, a) - distanciaHex(h, b) : 0)   // en la línea, del más cercano al más lejano (el láser largo pierde 1 por cada uno)
@@ -1139,6 +1139,7 @@ function dueloElegirAreaMapa(msg){
   if(hab.objetivo === 'onda'){
     const mio = [...tokens.values()].find(propio);
     if(!mio){ toast('Tu token no está en el mapa: no se puede lanzar la onda'); cancelado(); return; }
+    if(hab.giro){ ondaConGiro(mio, hab, lanzar); return; }   // Remolino (js/43)
     lanzar({col: mio.col, fila: mio.fila});
     return;
   }

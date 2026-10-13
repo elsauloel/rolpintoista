@@ -1547,3 +1547,6 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   línea más allá del blanco con `flechaLinea` (js/33) hasta el Rango (`rangoDeToken`): un Sólido o una pared lo frenan; el primer token que se ve
   (`tiroTokenVisible`, aliado incluido; un caído no, `iniciativaFueraDeJuego`) recibe un segundo duelo con `pdgCompartido` = la tirada del primero y
   `sinEfectos` (sin la flecha). Pegue o no al primero. La Mesa cuenta a quién atravesó.
+- **🌀 Remolino** (2026-10-13, Warrior; `js/43-remolino.js`): una onda con `giro` (`Combatiente.habEjecucion` → `hab.giro`). En `dueloElegirAreaMapa`
+  (js/13), antes de lanzar, `ondaConGiro` pide una casilla al lado (o la propia: sin moverse), mueve el token gratis (sin No2 ni oportunidad) y lanza
+  con `otro` = la casilla de salida: los objetivos son los de al lado de las dos posiciones. Si la casilla no sirve o se cancela, gira sin moverse.

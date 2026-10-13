@@ -93,10 +93,13 @@ cuesta 1 por defecto (`jobBudget`, 3 puntos + 3 por nivel).
    **SP:** X, sin tope (a confirmar si X tiene tope). Avanza X casilleros en
    línea recta y al final ataca con +X de daño fijo y +X a la PdG.
 6. ✅ **Estoicismo** — SP 2, No2 0, Flash (dueño, 2026-09-27: se puede usar en el turno de cualquiera, sin costo de No2; ese es el punto de Flash). **+1 a cada Resistencia a crítico** (todos los Tipos) durante **2 turnos** (automático, `efectoMods`). **+2 a la Defensa por cada enemigo adyacente**, sin tope (✋ a mano: no hay forma de que la ficha sepa cuántos enemigos tenés al lado sin el mapa, así que se ajusta a mano en el estado al usarla; no se recalcula si se mueven).
-7. **Remolino** [3] — Ataque que daña a todos los objetivos adyacentes.
-   Puede desplazarse una casilla; si lo hace, cuenta las áreas de efecto
-   de ambas posiciones. Repetirlo de inmediato ignora el cooldown del
-   arma.
+7. ✅ **Remolino** — **SP:** 3. **No2:** lo de un ataque con tu arma (cuenta como ese ataque). Girás y le pegás a **todos los enemigos de al
+   lado** (flor de diámetro 3): una sola tirada de PdG contra la Evasión de cada uno, el daño de tu arma menos su Defensa. **Antes de pegar podés
+   moverte 1 casilla, gratis**: alcanza a los de al lado de las dos posiciones (a cada uno una vez). Quien gana su Evasión no recibe nada (**sin
+   dodge roll**, a diferencia de Daño en área del Tanque). ⚙ Automatizado en el mapa; ✋ a mano las trampas y zonas de la casilla de llegada.
+   *(Auditada 2026-10-13 con el dueño; original: «Remolino [3] — Ataque que daña a todos los objetivos adyacentes. Puede desplazarse una casilla;
+   si lo hace, cuenta las áreas de efecto de ambas posiciones. Repetirlo de inmediato ignora el cooldown del arma.» Lo de repetirla barata no se
+   conservó.)*
 8. **Parry** [2] — NO2: 1. Cooldown: 1. Flash. Reemplaza la EV por PG en
    una tirada de evasión. El que tenga el arma más pesada tiene una
    bonificación igual a la diferencia en el peso de las armas.

@@ -773,7 +773,7 @@ const AsistenteDueloHab = (() => {
     }
     // Un efecto de la lista `st.efectos`, listo para guardar en `duelo.efectos` — mismo shape tanto si vino del
     // selector real (origen:'preset', con mods/hp/stacks/permanente/detalle) como si se escribió a mano.
-    const CONSERVA = ['cadena', 'conVista', 'conmigo', 'niebla', 'zonaQueda', 'menosDistancia', 'atrae', 'reparte', 'critTipo', 'soloSigilo', 'fuegoAmigo', 'soloCritico', 'perforante'];
+    const CONSERVA = ['cadena', 'conVista', 'conmigo', 'niebla', 'zonaQueda', 'menosDistancia', 'atrae', 'reparte', 'critTipo', 'soloSigilo', 'fuegoAmigo', 'soloCritico', 'perforante', 'giro'];
     function mapEfectoOut(e){
       if(e.no2 !== undefined) return {nombre: 'Pierde No2', no2: e.no2, ...(e.no2Dif ? {no2Dif: true} : {}), ...(e.no2Sentado ? {no2Sentado: true} : {})};
       if(e.cura !== undefined) return {cura: e.cura};

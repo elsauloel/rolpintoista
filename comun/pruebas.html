@@ -756,6 +756,12 @@ prueba('Proyectil perforante (Shooter, 2026-10-13): 2 SP + el disparo, solo a di
   igual([hab.costo, hab.nitrosCosto, hab.soloRango, a.perforante, a.mods.pdg, a.mods.fijo, !!a.soloCritico, /Sin auditar/.test(hab.detalle), !!hab.original],
     ['2', 'ATAQUE', true, true, 0, 0, false, false, true]);
 });
+prueba('Remolino (Warrior, 2026-10-13): onda de diámetro 3 con el daño del arma, el giro (moverse 1) viaja al mapa, sin dodge roll', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'warrior').habilidades.find(h => h.id === 'warrior-remolino');
+  const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0, armaDano: '1d8+2'});
+  igual([hab.costo, hab.nitrosCosto, ej.objetivo, ej.radio, !!ej.giro, !!ej.dodge, ej.dano.formula, ej.dano.ignoraDef, ej.tira.stat, /Sin auditar/.test(hab.detalle)],
+    ['3', 'ATAQUE', 'onda', 1, true, false, '1d8+2', false, 'pdg', false]);
+});
 prueba('Balas de sangre (Debuffer, 2026-10-13): la vida en X (de 1 a tu Especial, tiene que sobrar), X d4 que ignora la Defensa, PdG contra Evasión', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-balas-de-sangre');
   const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;

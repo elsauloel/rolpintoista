@@ -20,6 +20,9 @@
 - [ ] **🩸 Balas de sangre** (Debuffer, 2026-10-13): un personaje con la skill (Especial 4 o más) contra un creep. Ver: Ejecutar abre el cartel
   del costo con «Vida (HP) a gastar» (de 1 a tu Especial; avisa si te pasás o si no te sobra vida), cobra 1 SP, 2 No2 y la vida, y el duelo tira
   PdG contra la Evasión y X d4 que ignora la Defensa (le resta la Defensa especial). En la ficha suelta y en la Botonera del mapa.
+- [ ] **🌀 Remolino** (Warrior, 2026-10-13): un personaje con arma cuerpo a cuerpo y la skill, dos creeps (uno al lado de la casilla de salida y
+  otro al lado de la de llegada). Ver: pide la casilla del giro, mueve el token gratis, la onda alcanza a los dos (una sola tirada de PdG) y quien
+  gana la Evasión no hace dodge roll. Clic en la propia casilla = sin moverse.
 - [ ] **⟳ Pasar de ronda en GM Tools** (2026-10-13): se probó con datos (el botón se escondió al poner el mapa de prueba en combate, con orden);
   falta verlo con el mapa abierto y ▶ Siguiente.
 

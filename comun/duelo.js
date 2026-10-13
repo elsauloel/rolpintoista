@@ -2111,6 +2111,12 @@ const Duelo = (() => {
     f.querySelector('[data-x2]').onclick = cerrar;
     const bc = f.querySelector('[data-cancelarduelo]');
     if(bc) bc.onclick = () => col().doc(d.id).update({estado: 'cancelado'}).catch(err => console.error(err));
+    // Un duelo cancelado se cierra solo en todas las pantallas (2026-10-13, dueño: quedaban abiertos «Duelo cancelado» en los mapas de los demás
+    // esperando un «Terminar duelo»): se ve 4 segundos y se va. Si en el medio se abrió otro duelo, no lo toca.
+    if(d.estado === 'cancelado' && f.dataset.autocierre !== d.id){
+      f.dataset.autocierre = d.id;
+      setTimeout(() => { if(actual && actual.id === d.id && actual.dato && actual.dato.estado === 'cancelado') cerrar(); }, 4000);
+    }
     const bDodgeResolver = f.querySelector('[data-dodge-resolver]');
     if(bDodgeResolver) bDodgeResolver.onclick = () => {
       bDodgeResolver.disabled = true;

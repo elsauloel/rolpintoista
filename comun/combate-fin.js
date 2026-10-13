@@ -220,12 +220,32 @@ const CombateFin = (() => {
     return 'en pie';
   }
   // Los personajes de la partida (conserva si estaban incluidos, de `previos`).
+  /* 👥 Quién cuenta (2026-10-12, dueño: «un pj que creé solo para observar no cuenta para ningún cálculo, y un jugador a veces está y a veces
+     no»): los personajes que el GM deja afuera, guardados en la partida (`gm/personajes` = {fuera: [fichaId]}, solo el GM). Los usan el
+     recuadro «Si derrotan a todos», el Escanear grupo y quiénes cobran al terminar el combate (arrancan destildados). */
+  let fueraCache = null;
+  const refFuera = () => fbDb.doc(fbRutaCampana('gm/personajes'));
+  async function fuera(){
+    if(fueraCache) return fueraCache;
+    try{ const d = await refFuera().get(); fueraCache = new Set(d.exists && Array.isArray(d.data().fuera) ? d.data().fuera : []); }
+    catch(err){ console.error('No se pudo leer quién cuenta:', err); fueraCache = new Set(); }
+    return fueraCache;
+  }
+  async function fueraCambiar(id, afuera){
+    const s = new Set(await fuera());
+    if(afuera) s.add(id); else s.delete(id);
+    fueraCache = s;
+    try{ await refFuera().set({fuera: [...s], actualizado: firebase.firestore.FieldValue.serverTimestamp()}); }
+    catch(err){ console.error('No se pudo guardar quién cuenta:', err); }
+    return s;
+  }
   async function jugadores(previos){
+    const afuera = await fuera();
     const [fichas, miembros] = await Promise.all([fbDb.collection(fbRutaCampana('fichas')).get(), fbDb.collection(fbRutaCampana('miembros')).get()]);
     const nombres = new Map(miembros.docs.map(d => [d.id, String(d.data().nombre || '')]));
     const prev = new Map((previos || []).map(j => [j.id, j]));
     return fichas.docs.map(d => ({id: d.id, nombre: String(d.data().nombre || 'Sin nombre'), duenoUid: d.data().duenoUid, dueno: nombres.get(d.data().duenoUid) || '',
-      estado: estadoDeFicha(d.data()), incluido: prev.has(d.id) ? prev.get(d.id).incluido : true}))
+      estado: estadoDeFicha(d.data()), incluido: prev.has(d.id) ? prev.get(d.id).incluido : !afuera.has(d.id)}))
       .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
   }
 
@@ -541,7 +561,7 @@ const CombateFin = (() => {
     </div>`;
   }
 
-  return {estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
+  return {fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
     plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, calcularReparto,
     itemsPublicables, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

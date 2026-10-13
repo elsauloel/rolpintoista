@@ -588,6 +588,7 @@ function escaneoVentana(){
     const c = e.target.closest('[data-esc-quien]');
     if(!c) return;
     if(c.checked) escaneo.fuera.delete(c.dataset.escQuien); else escaneo.fuera.add(c.dataset.escQuien);
+    CombateFin.fueraCambiar(c.dataset.escQuien, !c.checked);   // se recuerda en la partida (👥)
     escaneoDibujar();
   });
   return f;
@@ -616,6 +617,7 @@ async function abrirEscaneo(){
       }catch(err){ console.error('No se pudo leer la ficha ' + d.id + ':', err); }
     }
     escaneo.perfiles = perfiles.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+    escaneo.fuera = new Set(await CombateFin.fuera());   // 👥 los que no cuentan (2026-10-12): arrancan destildados
     escaneoDibujar();
   }catch(err){
     console.error('No se pudo escanear el grupo:', err);

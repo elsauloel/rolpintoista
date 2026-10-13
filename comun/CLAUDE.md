@@ -1549,3 +1549,7 @@ versión parecida en más de una, es candidato a juntar.
 - **⚡ Salto eléctrico, regla general** (dueño, 2026-10-13): 4 casillas (`RAYO_SALTO_MAX`, js/10; `cadena.rango` por defecto 4); cada salto es la
   mitad de lo que le ENTRÓ al anterior y resta la Res. eléctrica de quien lo recibe (`rayoCadenaAplicar` lo recorre de verdad y devuelve los saltos
   que hubo); salta todas las veces que pueda hasta llegar a 1 (sin el tope de `saltos`, salvo la flecha sin daño). La Parálisis, la de cada cosa.
+- **El equipo de un creep vivo, a medias** (2026-10-13, dueño: «que vean que tiene una varita, un pico, pero no el detalle hasta que mueran»):
+  `CreepCalculo.tarjetaPublica(sc)` publica, mientras el creep tiene vida, solo qué es cada cosa (`nombreGenerico`: «Varita del susurro» → «Varita»,
+  salteando «Buena», «Gran»…); con vida 0, los nombres de verdad. El arma natural se ve siempre. GM Tools vuelve a publicar al entrar si lo público
+  no coincide; el mapa del GM ve los nombres de la ficha privada.

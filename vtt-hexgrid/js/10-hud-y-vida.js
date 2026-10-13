@@ -38,9 +38,11 @@ function hudDatos(t){
     def: t.tipo === 'creep' ? (sc ? creepDefensaMapa(sc) : null) : (r.def === undefined ? null : num(r.def)),
     estados: (v && v.resumen && v.resumen.estados) || [],
     notas: (v && v.notas) || '',
-    armaNombre: (v && v.armaNombre) || '',
+    // El GM ve los nombres de verdad (de la ficha privada); los jugadores, lo publicado: de un creep vivo, solo qué es (2026-10-13).
+    armaNombre: (t.tipo === 'creep' && soyGM && sc ? sc.armaNombre : (v && v.armaNombre)) || '',
     armaNatural: !!(v && v.armaNatural),
-    equipoNombres: (v && v.equipoNombres) || [],
+    equipoNombres: (t.tipo === 'creep' && soyGM && sc ? (sc.equipo || []).map(e => e && e.nombre).filter(Boolean) : (v && v.equipoNombres)) || [],
+    equipoVago: t.tipo === 'creep' && !soyGM && !(v && v.resumen && v.resumen.muerto) && num(sc ? sc.hp : 1) > 0,
   };
 }
 
@@ -607,7 +609,7 @@ function hudTarjetaHtml(t, d){
     ? `<span class="arma" title="${d.armaNatural ? 'Arma natural: es parte de su cuerpo' : 'Su arma'}">🗡 ${esc(d.armaNombre)}${d.armaNatural ? ' <i>(natural)</i>' : ''}</span>`
     : '';
   const equipo = (arma || (d.equipoNombres && d.equipoNombres.length))
-    ? `<div class="hud-tarjeta-equipo">${arma}${(d.equipoNombres || []).map(n => `<span>${esc(n)}</span>`).join('')}</div>`
+    ? `<div class="hud-tarjeta-equipo">${arma}${(d.equipoNombres || []).map(n => `<span>${esc(n)}</span>`).join('')}</div>${d.equipoVago ? '<div style="color:var(--muted);font-size:11.5px;margin-top:4px">Se ve qué lleva; cómo es, recién al derrotarlo.</div>' : ''}`
     : '<span style="color:var(--muted)">Sin equipo.</span>';
   const estados = d.estados.length
     ? d.estados.map(e => {

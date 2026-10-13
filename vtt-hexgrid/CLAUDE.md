@@ -1572,3 +1572,5 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   cuando no llega a 1 y devuelve los saltos que hubo. Lo usan el duelo (`dueloCadena`, con lo que entró; sin tope de `saltos`), la flecha que salta
   (js/33, con `magico.recibido`), el ⚡ del menú de vida y, aparte, la trampa Descarga (js/19: `danoEntro`). `dueloPorDano` (js/13): el estado según el
   daño que entró (`hab.dano.porDano`, Carga Elemental); el +50 % de fuego (`hab.dano.mult`) en `dueloAplicarDano`.
+- **🪪 La tarjeta del creep, a medias** (2026-10-13): `hudDatos` (js/10) le da al GM los nombres de la ficha privada y a los jugadores lo publicado
+  (de un creep vivo, solo qué es cada pieza, `CreepCalculo.tarjetaPublica`), con la nota «Se ve qué lleva; cómo es, recién al derrotarlo».

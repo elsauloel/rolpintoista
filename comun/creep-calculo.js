@@ -419,12 +419,25 @@ const CreepCalculo = (() => {
   // Lo que muestra la 🪪 tarjeta del creep en el mapa a cualquier jugador (2026-10-09): solo NOMBRES — el arma (también la natural,
   // marcada) y cada pieza de equipo, sin defensa, bonos ni detalle — y la nota. Lo publican GM Tools (creepPublico) y el mapa al
   // cambiar un creep (modificarCreep), en el documento público del creep; el resto de la ficha sigue siendo privada del GM.
+  /* Lo que se ve de una pieza de un creep vivo (2026-10-13, dueño: «que vean que tiene una varita, un pico, pero no el detalle hasta que
+     mueran»): solo qué es — la primera palabra que nombra la cosa («Varita del susurro» → «Varita», «Chaleco de cuero» → «Chaleco»),
+     salteando lo que la califica («Buena», «Gran», «El»…). */
+  const NO_NOMBRA = new Set(['el', 'la', 'los', 'las', 'un', 'una', 'buen', 'buena', 'buenas', 'buenos', 'gran', 'grande', 'pequeño', 'pequeña',
+    'viejo', 'vieja', 'nuevo', 'nueva', 'mi', 'su', 'mayor', 'menor', 'doble', 'falso', 'falsa']);
+  function nombreGenerico(nombre){
+    const palabras = String(nombre || '').trim().split(/\s+/).filter(Boolean);
+    const p = palabras.find(w => !NO_NOMBRA.has(w.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''))) || palabras[0] || '';
+    return p ? p.charAt(0).toUpperCase() + p.slice(1).toLowerCase() : '';
+  }
+  // Vivo, se publica solo qué es cada cosa; derrotado (vida 0), los nombres de verdad. El arma natural (es su cuerpo) se ve siempre.
   function tarjetaPublica(sc){
     const nom = x => String(x || '').trim().slice(0, 60);
+    const vivo = num(sc.hp) > 0;
+    const ver = x => vivo ? nombreGenerico(x) : nom(x);
     return {
-      armaNombre: nom(sc.armaNombre),
+      armaNombre: sc.armaNatural === true ? nom(sc.armaNombre) : ver(sc.armaNombre),
       armaNatural: sc.armaNatural === true,
-      equipoNombres: (Array.isArray(sc.equipo) ? sc.equipo : []).map(it => nom(it && it.nombre)).filter(Boolean).slice(0, 30),
+      equipoNombres: (Array.isArray(sc.equipo) ? sc.equipo : []).map(it => ver(it && it.nombre)).filter(Boolean).slice(0, 30),
       notas: String(sc.notas || '').trim().slice(0, 600),
       tipoCriatura: tipoDe(sc).slice(0, 30),   // el tipo de criatura (Matabestias de los arcos, 2026-10-11)
     };
@@ -616,5 +629,5 @@ const CreepCalculo = (() => {
     statValor, estadoActivo, aportesMod, origenesMod, conSigno, statOrigenTxt, armadmgOrigenTxt, ataqueTxt, ataqueOrigenTxt,
     defensaOrigenTxt, critOrigenTxt, armaduraOrigenTxt, modsAfectanHp, actualizarHpMaxPorCon, nitrosMax, actualizarNo2PorAgl,
     costoAtaque, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor,
-    fuerzaGolpeValor, costoContraataque, costoOportunidad, oportunidadPosible, sinOportunidad, tarjetaPublica, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
+    fuerzaGolpeValor, costoContraataque, costoOportunidad, oportunidadPosible, sinOportunidad, tarjetaPublica, nombreGenerico, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
 })();

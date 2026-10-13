@@ -305,6 +305,8 @@ async function gmProcesarSnapshot(snap){
         if(!r || r.hpPct === undefined || r.hp !== undefined) gmVivo.ultimo[sc.id].publico = '';
         // Los guardados antes de que la 🪪 tuviera arma, equipo y nota en lo público (2026-10-09): se vuelven a publicar solos.
         if(docs[i].data().equipoNombres === undefined) gmVivo.ultimo[sc.id].publico = '';
+        // El equipo de un creep vivo se ve solo por lo que es (2026-10-13): si lo publicado no coincide, se vuelve a publicar.
+        { const tp = CreepCalculo.tarjetaPublica(sc), dd = docs[i].data(); if(dd.armaNombre !== tp.armaNombre || JSON.stringify(dd.equipoNombres || []) !== JSON.stringify(tp.equipoNombres)) gmVivo.ultimo[sc.id].publico = ''; }
       });
       toast(`${creeps.length} creep(s) cargados de la mesa`);
       gmTarjetasFaltantes(docs, creeps);

@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-10-13T00:46:28Z",
+ "actualizado": "2026-10-13T19:57:44Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1133,7 +1133,7 @@
    ],
    "estado": "borrador",
    "capitulo": "estados",
-   "cuerpo": "Los estados del **hielo** y del **rayo** (elementos de la magia, todavía en definición).\n\n\n\n- **Escarcha** (hielo): **−1 a tus No2 máximos por cada stack.** Se **acumula**: si te la vuelven a poner mientras la tenés, suma un stack (×2, ×3…) y renueva la duración. **Fuego y hielo se cancelan entre sí** (a mano, por ahora).\n\n- **Parálisis** (rayo): **PdG, [[Parry]] y [[Evasión]] a la mitad** (redondeado hacia abajo). Es una mezcla de [[Lisiado]] y [[Pajaritos]], más suave que un [[Stun]]. Cada stat se parte **una sola vez**: no se suma a Lisiado ni a Pajaritos sobre el mismo stat.\n\n\n\nLos dos están en el menú de estados alterados (debuffs) de la ficha y de las herramientas del GM.\n\n\n\nEl **rayo** además puede **saltar en cadena**: hasta **3 casillas** de distancia, **una sola vez por objetivo**, y cada salto hace la **mitad del daño** del anterior (redondeado hacia arriba). Es daño mágico, así que va **directo a la vida**. En el mapa, el menú de vida de un token tiene el botón **⚡ Rayo en cadena**."
+   "cuerpo": "Los estados del **hielo** y del **rayo** (elementos de la magia, todavía en definición).\n\n\n\n- **Escarcha** (hielo): **−1 a tus No2 máximos por cada stack.** Se **acumula**: si te la vuelven a poner mientras la tenés, suma un stack (×2, ×3…) y renueva la duración. **Fuego y hielo se cancelan entre sí** (a mano, por ahora).\n\n- **Parálisis** (rayo): **PdG, [[Parry]] y [[Evasión]] a la mitad** (redondeado hacia abajo). Es una mezcla de [[Lisiado]] y [[Pajaritos]], más suave que un [[Stun]]. Cada stat se parte **una sola vez**: no se suma a Lisiado ni a Pajaritos sobre el mismo stat.\n\n\n\nLos dos están en el menú de estados alterados (debuffs) de la ficha y de las herramientas del GM.\n\n\n\nEl **rayo** además puede **saltar en cadena**: hasta **4 casillas** de distancia, **una sola vez por objetivo**, y cada salto hace la **mitad del daño** del anterior (redondeado hacia arriba). Es daño mágico, así que va **directo a la vida**. En el mapa, el menú de vida de un token tiene el botón **⚡ Rayo en cadena**."
   },
   {
    "id": "terreno-incendiado",

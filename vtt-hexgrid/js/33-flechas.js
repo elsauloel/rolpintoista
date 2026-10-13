@@ -70,7 +70,7 @@ async function flechaErrada(d){
 }
 
 /* ⚡ LA FLECHA QUE SALTA (2026-10-09, dueño): la relámpago y la de tormenta. Cuando el disparo pega, salta al más cercano del mismo bando que el
-   golpeado (a 3 casillas o menos, una vez por objetivo: la regla del Rayo en cadena, js/10). `salto = {saltos, dano, paralisis: [%…]}`: con
+   golpeado (a 4 casillas o menos desde el 2026-10-13, una vez por objetivo: la regla del Rayo en cadena, js/10). `salto = {saltos, dano, paralisis: [%…]}`: con
    `dano`, el daño eléctrico de la flecha salta a la mitad cada vez (redondeada para abajo; quien recibe 1 es el último) y va directo a la vida;
    sin `dano`, salta sin daño. Cada salto tira su % de Parálisis (1 turno): `paralisis[0]` el primero que alcanza, `paralisis[1]` el segundo.
    Lo aplica la pantalla que aplica el daño del duelo (el GM); se ve en todas (momento «rayo») y queda en la Mesa. */
@@ -78,13 +78,16 @@ async function flechaSalto(d, totalMag){
   const fl = d.ataque.flecha, s = fl.salto || {}, id = d.defensor && d.defensor.tokenId;
   if(!id || !tokens.get(id)) return;
   const n = Math.max(1, Math.round(num(s.saltos)) || 1);
+  // Con daño (regla general del 2026-10-13): salta con la mitad de lo que entró, restando la Res. eléctrica de cada uno, todas las veces que pueda
+  // (`totalMag` = lo que le entró al primero). Sin daño (la relámpago): sus `saltos`.
   const conDano = !!s.dano && num(totalMag) > 1;
-  const cadena = (conDano ? rayoCadena(id, num(totalMag)) : rayoCadena(id, Math.pow(2, n + 1)).map(c => ({...c, dano: 0}))).slice(0, 1 + n);
-  if(cadena.length < 2){ mesaLinea(`⚡ La ${fl.nombre} de ${d.atacante.nombre} no tuvo a quién saltar (nadie a 3 casillas o menos)`, 'recordatorio'); return; }
+  const cadena0 = conDano ? rayoCadena(id, num(totalMag)) : rayoCadena(id, Math.pow(2, n + 1)).map(c => ({...c, dano: 0})).slice(0, 1 + n);
+  const cadena = conDano && cadena0.length > 1 ? [cadena0[0], ...(await rayoCadenaAplicar(cadena0, {callado: true}))] : cadena0;
+  if(cadena.length < 2){ mesaLinea(`⚡ La ${fl.nombre} de ${d.atacante.nombre} no tuvo a quién saltar (nadie a 4 casillas o menos${conDano ? ', o no le quedó daño' : ''})`, 'recordatorio'); return; }
   const partes = [];
   for(let i = 1; i < cadena.length; i++){
     const c = cadena[i], nom = c.t.oculto ? 'Alguien' : nombreDe(c.t);
-    let txt = nom + (c.dano ? ` (${c.dano} de daño eléctrico)` : '');
+    let txt = nom + (c.dano ? ` (${c.dano} de daño eléctrico${c.entro !== undefined && c.entro !== c.dano ? ` → le entraron ${c.entro}` : ''})` : '');
     const pct = num((s.paralisis || [])[i - 1]);
     if(pct > 0){
       const dd = Combatiente.chanceDado(pct) || {caras: 1, exitos: 1};
@@ -105,7 +108,6 @@ async function flechaSalto(d, totalMag){
   const resultado = partes.join(' → ');
   momentoAbrir({tipo: 'rayo', icono: '⚡', titulo: `${fl.nombre}: salta`, estado: 'listo', datos: {saltos}, resultado});
   mesaLinea(`⚡ La ${fl.nombre} de ${d.atacante.nombre} saltó: ${resultado}`, 'recordatorio');
-  if(conDano) await rayoCadenaAplicar(cadena);
 }
 
 /* 🏹 LOS VIROTES QUE HACEN ALGO EN EL MAPA (2026-10-10, dueño: «la tanda de ballestas que necesita el mapa»; docs/ideas-ballestas.md).

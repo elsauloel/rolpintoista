@@ -240,7 +240,7 @@ Los dos están en el menú de estados alterados (debuffs) de la ficha y de las h
 
 
 
-El **rayo** además puede **saltar en cadena**: hasta **3 casillas** de distancia, **una sola vez por objetivo**, y cada salto hace la **mitad del daño** del anterior (redondeado hacia arriba). Es daño mágico, así que va **directo a la vida**. En el mapa, el menú de vida de un token tiene el botón **⚡ Rayo en cadena**.
+El **rayo** además puede **saltar en cadena**: hasta **4 casillas** de distancia, **una sola vez por objetivo**, y cada salto hace la **mitad del daño** del anterior (redondeado hacia arriba). Es daño mágico, así que va **directo a la vida**. En el mapa, el menú de vida de un token tiene el botón **⚡ Rayo en cadena**.
 
 
 

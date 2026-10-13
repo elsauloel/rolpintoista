@@ -1019,6 +1019,26 @@ const FichaAcciones = (() => {
     return true;
   }
   // Lo último que hace ejecutar una habilidad: anunciarla y tirar su primera tirada, o abrir el duelo.
+  /* ✨ Carga Elemental (Mago, 2026-10-13, dueño): con la habilidad, al lanzar una skill de daño especial se pregunta el elemento (o ninguno); cuesta
+     la mitad del SP de esa skill (para arriba, mínimo 1), y se lanza una copia con la carga (Combatiente.conCarga). Sin SP para la carga, sale sin ella. */
+  async function cargaElemental(S, it, xSp, ui){
+    if(!(S.habilidades || []).some(h => h && h.cargaElemental)) return it;
+    const c = FichaBotonera.dueloDe(it);
+    if(!Combatiente.cargable(it, c)) return it;
+    const sp = FichaHabilidades.spVariable(it) ? num(xSp) : num(it.costo);
+    const costo = Math.max(1, Math.ceil(sp / 2));
+    const tengo = Math.max(0, FichaBotonera.spMaximo(S, FichaCalculo.calcular(S)) - num(S.spGastado));
+    if(tengo < costo){ ui.toast(`✨ Carga Elemental: te falta SP (cuesta ${fmt(costo)}, tenés ${fmt(tengo)}) — ${it.nombre} sale sin carga`); return it; }
+    const elegir = ui.elegir || ((t, o) => Confirmar.elegir(t, o));
+    const clave = await elegir(`¿Le ponés un elemento a ${it.nombre}? Cuesta ${fmt(costo)} SP (la mitad de la skill).`, {titulo: 'Carga Elemental', icono: '✨',
+      opciones: Object.entries(Combatiente.CARGAS).map(([k, x]) => ({valor: k, texto: `${x.icono} ${x.nombre}`, detalle: x.que})), no: 'Sin carga'});
+    if(!clave || !Combatiente.CARGAS[clave]) return it;
+    S.spGastado = num(S.spGastado) + costo;
+    ui.cambio(['vitals']);
+    const k = Combatiente.CARGAS[clave];
+    ui.toast(`✨ Carga Elemental: ${k.icono} ${k.nombre} · −${fmt(costo)} SP`);
+    return {...it, nombre: `${it.nombre} (${k.nombre})`, duelo: Combatiente.conCarga(c, clave)};
+  }
   function terminarEjecucionHab(S, it, arma, xSp, xNitros, ui){
     // 💰 Semiautomática: ya cobró el costo; anuncia y tira la tirada inicial (si tiene). Los efectos, a mano.
     if(FichaBotonera.modoHab(it) !== 'auto'){ anunciarHabilidad(S, it, ui); tirarPrimeraDeHab(S, it, ui); return; }
@@ -1043,6 +1063,14 @@ const FichaAcciones = (() => {
     }
     // Solo sobre uno mismo y sin nada que tirar (Blindaje y parecidos): no hace falta el cuadro — se aplica directo y se anuncia.
     if(aplicarHabSobreMiDirecto(S, it, habDueloDatos(S, it, xSp, xNitros, arma), ui)) return;
+    // ✨ Carga Elemental (2026-10-13): si se puede cargar, primero la pregunta (y después sigue igual, con la copia cargada).
+    if(ui.dueloDisponible() && (S.habilidades || []).some(h => h && h.cargaElemental) && Combatiente.cargable(it, FichaBotonera.dueloDe(it))){
+      cargaElemental(S, it, xSp, ui).then(it2 => lanzarDirigida(S, it2, arma, xSp, xNitros, ui)).catch(err => { console.error('Carga Elemental:', err); lanzarDirigida(S, it, arma, xSp, xNitros, ui); });
+      return;
+    }
+    lanzarDirigida(S, it, arma, xSp, xNitros, ui);
+  }
+  function lanzarDirigida(S, it, arma, xSp, xNitros, ui){
     const hDuelo = ui.dueloDisponible() ? habDueloDatos(S, it, xSp, xNitros, arma) : null;   // habilidad dirigida (duelo): se anuncia sin tirada y la contienda va en el cuadro
     if(hDuelo) ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); else anunciarHabilidad(S, it, ui);
     if(hDuelo) ui.elegirObjetivo({yo: ui.yo(), ataque: {tipo: 'habilidad', hab: hDuelo, alcance: hDuelo.alcance}, suelto: () => tirarPrimeraDeHab(S, it, ui)});

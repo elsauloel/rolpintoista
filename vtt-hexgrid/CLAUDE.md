@@ -1567,3 +1567,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `transfusionMapa`). `transfusionDeHabilidad` pide con dos `elegirDestino` quién da y quién recibe (personajes; fuera del Rango avisa y deja seguir),
   calcula el máximo con lo público (quien da queda en 1, quien recibe no pasa su máximo) y el cartel de cuánto; `transfusionAplicar` manda a cada uno
   el aviso «Transfusión» (`EstadosAplicar.encolarPj`, `vida` ±n —no `hp`: una pantalla sin recargar lo tomaría como «por turno»—), que aplica `FichaAcciones.aplicarEstadoRecibido` en la pantalla que maneja a cada uno.
+- **⚡ Salto eléctrico, regla general** (dueño, 2026-10-13): `rayoCadena` (js/10) arma el camino a 4 casillas (`RAYO_SALTO_MAX`); `rayoCadenaAplicar(cadena,
+  {callado})` lo recorre: cada salto, la mitad de lo que le entró al anterior (cadena[0].dano = lo que entró al primero), menos la Res. eléctrica; corta
+  cuando no llega a 1 y devuelve los saltos que hubo. Lo usan el duelo (`dueloCadena`, con lo que entró; sin tope de `saltos`), la flecha que salta
+  (js/33, con `magico.recibido`), el ⚡ del menú de vida y, aparte, la trampa Descarga (js/19: `danoEntro`). `dueloPorDano` (js/13): el estado según el
+  daño que entró (`hab.dano.porDano`, Carga Elemental); el +50 % de fuego (`hab.dano.mult`) en `dueloAplicarDano`.

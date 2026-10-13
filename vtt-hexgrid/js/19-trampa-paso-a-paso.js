@@ -173,19 +173,19 @@ function trampaMeToca(id, dt){
 }
 
 /* La Descarga que salta (2026-10-04, dueño): cuando a una víctima se le terminó de resolver, la descarga salta al enemigo más cercano (del
-   mismo bando que la víctima) a `rango` casillas o menos, con la mitad del daño (para abajo, dueño 2026-10-07: con 1 ya no salta), una sola vez por enemigo. Cada salto es un
+   mismo bando que la víctima) a `rango` casillas o menos (4 desde el 2026-10-13), con la mitad del daño QUE LE ENTRÓ (para abajo, dueño 2026-10-07 y 2026-10-13: con 1 ya no salta), una sola vez por enemigo. Cada salto es un
    momento propio: todas las pantallas ven el rayo en el mapa y, después, a quien lo recibe le aparece el Anuncio para resistir la Parálisis. */
 async function trampaSaltar(dt){
-  const c = dt.cadena, n = Math.floor(num(dt.danoTirado) / 2), de = tokens.get(dt.tokenId);
+  const c = dt.cadena, n = Math.floor(num(dt.danoEntro !== undefined ? dt.danoEntro : dt.danoTirado) / 2), de = tokens.get(dt.tokenId);
   if(!c || n < 1 || !de) return;
   const golpeados = new Set(c.golpeados || []), lado = x => x.tipo === 'creep' ? 'creep' : 'pj';
-  const cand = [...tokens.entries()].filter(([id, x]) => !golpeados.has(id) && x.fichaId && !x.oculto && lado(x) === lado(de) && distanciaHex(x, de) <= (num(c.rango) || 3))
+  const cand = [...tokens.entries()].filter(([id, x]) => !golpeados.has(id) && x.fichaId && !x.oculto && lado(x) === lado(de) && distanciaHex(x, de) <= (num(c.rango) || 4))
     .sort((a, b) => distanciaHex(a[1], de) - distanciaHex(b[1], de));
   if(!cand.length) return;
   const [hid, h] = cand[0], quien = nombreDe(h);
   const nd = {tokenId: hid, creep: h.tipo === 'creep', fichaId: String(h.fichaId || ''), quien, nombreT: dt.nombreT, pisador: false, salva: dt.salva || null,
     dano: '', danoFijo: n, ignoraDef: true, elemento: dt.elemento || '', pierdeSp: '', spec: dt.spec || '', muro: 0, muroLargo: 0, zona: 0, aMano: '',
-    fase: '', tirando: false, evita: '', pasos: [], cadena: {rango: num(c.rango) || 3, golpeados: [...golpeados, hid]}, salto: {desde: dt.tokenId, hacia: hid}};
+    fase: '', tirando: false, evita: '', pasos: [], cadena: {rango: num(c.rango) || 4, golpeados: [...golpeados, hid]}, salto: {desde: dt.tokenId, hacia: hid}};
   nd.fase = trampaFaseInicial(nd);
   nd.lineas = trampaLineas(nd);
   await momentoAbrir({tipo: 'trampa', icono: '⚡', titulo: `La descarga salta a ${quien}`, estado: 'paso', datos: nd});
@@ -480,7 +480,7 @@ async function trampaPasoDano(id, dt){
   const entro = monto <= 0 ? 0 : res ? num(res.r.recibido) : monto;   // lo que llegó a la vida (sin poder aplicarlo, se da por hecho)
   const sinHerida = dt.requiereDano && entro <= 0;
   if(sinHerida) texto += ' → no lo lastimó: lo que deja no entra';
-  const sig = {...dt, danoTirado: r.total, ...(sinHerida ? {evita: 'efecto'} : {}), pasos: [...(dt.pasos || []), {titulo: dt.danoFijo ? 'Le llega la descarga' : 'Daño', texto}]};
+  const sig = {...dt, danoTirado: r.total, danoEntro: entro, ...(sinHerida ? {evita: 'efecto'} : {}), pasos: [...(dt.pasos || []), {titulo: dt.danoFijo ? 'Le llega la descarga' : 'Daño', texto}]};
   sig.fase = trampaFaseSiguiente(sig, 'dano');
   await trampaGuardar(id, sig);
 }

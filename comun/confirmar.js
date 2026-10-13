@@ -6,6 +6,8 @@
    Trae su propio estilo (el del cuadro del duelo: oscuro, cabecera, tarjeta y dos botones), así que anda en cualquier página, con o sin el duelo.
    Va arriba de todo (z-index 100020) y no cierra ninguna otra ventana. `peligro: true` pinta el botón de sí en rojo (borrar, retirar…).
    Uso: `if(!(await Confirmar.preguntar('¿Borrar X?', {si: 'Borrar', peligro: true}))) return;` — la función que lo llama tiene que ser async.
+   Confirmar.elegir(texto, {titulo, icono, opciones: [{valor, texto, detalle}], no}) → Promise<valor | null> (2026-10-13, Carga Elemental): una opción
+   por botón (con una línea chica debajo), y «no» (Cancelar) = null. Esc / ✕ / clic afuera = null.
    ========================================================= */
 const Confirmar = (() => {
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
@@ -20,7 +22,11 @@ const Confirmar = (() => {
 .cfj-pie button{border:none;border-radius:10px;padding:9px 18px;font-size:14.5px;font-weight:700;cursor:pointer;background:#2d6cdf;color:#fff}
 .cfj-pie button.peligro{background:#c0394f}
 .cfj-pie button.sec{background:#2a3348;color:#d6dcea}
-.cfj-pie button:focus-visible{outline:2px solid #ffd25a;outline-offset:2px}`;
+.cfj-pie button:focus-visible{outline:2px solid #ffd25a;outline-offset:2px}
+.cfj-ops{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.cfj-ops button{border:1px solid #39435c;border-radius:10px;padding:8px 12px;cursor:pointer;background:#1f2a40;color:#e6e9f2;text-align:left;font-size:14.5px;font-weight:700}
+.cfj-ops button:hover,.cfj-ops button:focus-visible{background:#2d6cdf;outline:none}
+.cfj-ops small{display:block;font-weight:400;opacity:.85;font-size:12.5px;margin-top:2px}`;
   function estilos(){
     if(document.getElementById('confirmar-css')) return;
     const s = document.createElement('style');
@@ -50,5 +56,30 @@ const Confirmar = (() => {
       const b = f.querySelector('[data-cfj="si"]'); if(b) b.focus();
     });
   }
-  return {preguntar};
+  function elegir(texto, o){
+    o = o || {};
+    estilos();
+    return new Promise(ok => {
+      const f = document.createElement('div');
+      f.className = 'cfj-fondo';
+      const ops = o.opciones || [];
+      f.innerHTML = `<div class="cfj-caja" role="dialog" aria-modal="true">
+        <div class="cfj-cab"><span>${esc(o.icono || '❓')} ${esc(o.titulo || 'Elegí')}</span><button type="button" data-cfj-x title="Cancelar">✕</button></div>
+        <div class="cfj-cuerpo">${texto ? `<p class="cfj-texto">${esc(texto)}</p>` : ''}
+          <div class="cfj-ops">${ops.map((x, i) => `<button type="button" data-cfj-op="${i}">${esc(x.texto)}${x.detalle ? `<small>${esc(x.detalle)}</small>` : ''}</button>`).join('')}</div>
+          <div class="cfj-pie"><button type="button" class="sec" data-cfj-x>${esc(o.no || 'Cancelar')}</button></div></div>
+      </div>`;
+      const tecla = ev => { if(ev.key === 'Escape'){ ev.stopImmediatePropagation(); ev.preventDefault(); fin(null); } };
+      const fin = v => { document.removeEventListener('keydown', tecla, true); f.remove(); ok(v); };
+      f.onclick = ev => {
+        const b = ev.target.closest('[data-cfj-op]');
+        if(b){ const x = ops[Number(b.dataset.cfjOp)]; fin(x ? x.valor : null); return; }
+        if(ev.target.closest('[data-cfj-x]') || ev.target === f) fin(null);
+      };
+      document.addEventListener('keydown', tecla, true);
+      document.body.appendChild(f);
+      const b = f.querySelector('[data-cfj-op]'); if(b) b.focus();
+    });
+  }
+  return {preguntar, elegir};
 })();

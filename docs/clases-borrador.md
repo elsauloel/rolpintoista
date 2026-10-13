@@ -237,11 +237,15 @@ Salvo Carga Elemental, todas son **Hechizo (PG: Esp · Daño: Esp)**.
    ignora la Defensa, lo frena la Defensa especial). *(Auditada 2026-10-10 con
    el dueño: se probó la mitad del Esp; quedó el original, porque la Defensa
    especial lo frena.)*
-7. **Carga Elemental** [X] — Modifica un skill de daño mágico para que
-   tenga propiedades elementales. Cada nivel en este skill otorga nuevos
-   elementos. X es la mitad del coste del skill. Elementos: **Fuego** +50%
-   de daño. **Frío** -1 No2 cada 5 de daño (mínimo 1). **Eléctrico** el
-   daño se propaga a enemigos hasta 5 de distancia.
+7. ✅ **Carga Elemental** — **SP:** la mitad del SP de la skill que carga (para arriba, mínimo 1). Al lanzar una skill propia de daño especial
+   (no zonas ni armas especiales) se elige un elemento; el daño pasa a ser de ese elemento (lo frena la resistencia a él). **Fuego:** +50 % de
+   daño. **Frío:** Escarcha 1, y una más cada 5 de daño que entra. **Eléctrico:** salta (regla general del salto: 4 casillas, la mitad de lo que
+   entró, cada uno resta su Res. eléctrica, hasta llegar a 1) y 20 % de Parálisis 1 turno solo al primero. **Ácido:** Armadura rota 1, y una más
+   cada 5. **Tóxico:** Veneno, 1 stack cada 3 de daño que entra (mínimo 1). Los cinco desde el principio (no hay niveles de skill).
+   *(Auditada 2026-10-13 con el dueño; original: «Carga Elemental [X] — Modifica un skill de daño mágico para que tenga propiedades elementales.
+   Cada nivel en este skill otorga nuevos elementos. X es la mitad del coste del skill. Elementos: Fuego +50% de daño. Frío -1 No2 cada 5 de daño
+   (mínimo 1). Eléctrico el daño se propaga a enemigos hasta 5 de distancia.» Ácido y Tóxico, sumados por el dueño. «Stacks según el daño» queda
+   como una opción de cada skill, no como regla general de los elementos (dueño). Regla general nueva del salto eléctrico, de paso.)*
 8. ✅ **Armadura arcana** — **No2:** 3. **SP:** 5. Hechizo sobre vos, 2 turnos:
    absorbe el 50 % de cada golpe que te llega (después de la Defensa, para
    arriba), hasta 10 en total. Al terminar explota: lo absorbido como daño

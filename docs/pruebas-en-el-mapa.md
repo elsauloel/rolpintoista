@@ -27,6 +27,12 @@
 - [ ] **🐈‍⬛ La animación «mala» de los dados de Enyetar** (2026-10-12): los datos salen bien (los dos juegos, `destacar: 'malo:idx:…'`), pero no se
   pudo ver la animación 3D (la ventana de Chrome estaba de fondo). Mirarla en una sesión real.
 
+- [ ] **✨ Carga Elemental** (Mago, 2026-10-13): un personaje con la skill lanza una skill de daño especial → «Carga Elemental» con los 5
+  elementos y «Sin carga»; cobra la mitad del SP; Fuego (+50 % en el cuadro), Frío (Escarcha ×N según lo que entró), Ácido (Armadura rota),
+  Tóxico (Veneno), Eléctrico (salta y 20 % de Parálisis solo al primero).
+- [ ] **⚡ Salto eléctrico, regla general** (2026-10-13): 4 casillas; la mitad de lo que entró; cada salto resta la Res. eléctrica; sin tope
+  (la varita de chispa, el relámpago, la flecha de tormenta, la trampa Descarga y el ⚡ del menú de vida).
+
 ## Probado
 
 - [x] **⚔ Contraataque** (Warrior, 2026-10-13; GM rolpintoista + jugador elsaulo, los dos mapas recargados): el Escarabajo (copia) ataca a juan

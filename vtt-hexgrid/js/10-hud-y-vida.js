@@ -472,11 +472,14 @@ function hudHpPrevia(t, d, texto){
 }
 
 /* ---------- Rayo en cadena (2026-09-25, regla del dueño, P118) ----------
-   El rayo salta a otros personajes: hasta 3 casillas de distancia del último golpeado, UNA sola vez por objetivo, y cada salto hace la MITAD del
+   El rayo salta a otros personajes: hasta 4 casillas de distancia (3 hasta el 2026-10-13; dueño: «en general el salto eléctrico, 4 casilleros») del último golpeado, UNA sola vez por objetivo, y cada salto hace la MITAD del
    daño del anterior, redondeada hacia abajo (dueño, 2026-10-07: «salta tantas veces como le permita el número»: 8 → 4 → 2 → 1; el salto que
    llega con 1 es el último). Salta a los del mismo bando que el primer golpeado (los rivales de quien lanza el rayo: si golpeó a un
-   creep, salta a creeps; si a un personaje, a personajes) y siempre al más cercano. Daño mágico: directo a la vida. */
-const RAYO_SALTO_MAX = 3;
+   creep, salta a creeps; si a un personaje, a personajes) y siempre al más cercano. Daño mágico: directo a la vida.
+   Regla general del salto eléctrico (dueño, 2026-10-13): 4 casillas; cada salto es la MITAD DEL DAÑO QUE ENTRÓ al anterior (no del tirado) y
+   resta la Res. eléctrica de quien lo recibe; salta todas las veces que pueda, sin tope, hasta llegar a 1. `rayoCadena` arma el camino (los
+   más cercanos, con el daño que tendría sin resistencias); `rayoCadenaAplicar` lo recorre de verdad y corta cuando el daño no llega a 1. */
+const RAYO_SALTO_MAX = 4;
 function rayoCadena(idInicial, dano){
   const t0 = tokens.get(idInicial);
   if(!t0) return [];
@@ -498,25 +501,35 @@ function rayoCadena(idInicial, dano){
   }
   return cadena;
 }
-// Aplica los saltos que este cliente puede (el GM, todos; un jugador, los suyos) y avisa en la Mesa lo demás para hacerlo a mano.
-async function rayoCadenaAplicar(cadena){
-  const saltos = cadena.slice(1);
-  if(!saltos.length) return;
-  const hechos = [], manual = [];
-  for(const s of saltos){
+// Aplica los saltos que este cliente puede (el GM, todos; un jugador, los suyos) y avisa en la Mesa lo demás para hacerlo a mano. Cada salto: la
+// mitad de lo que le entró al anterior (cadena[0].dano = lo que le entró al primero), menos la Res. eléctrica de quien lo recibe. Devuelve los
+// saltos que hubo de verdad ({id, t, dano, entro}), para el momento de la Crónica y lo que se aplica a cada uno (la Parálisis de la flecha…).
+async function rayoCadenaAplicar(cadena, o){
+  o = o || {};
+  const hubo = [], hechos = [], manual = [];
+  let prev = Math.max(0, Math.floor(num(cadena[0] && cadena[0].dano)));
+  for(const s of cadena.slice(1)){
+    const dano = Math.floor(prev / 2);
+    if(dano < 1) break;
     const nombre = s.t.oculto ? 'Alguien' : nombreDe(s.t);
-    let ok = false;
+    let ok = false, entro = dano, resTxt = '';
     try{
-      if(s.t.tipo === 'creep' && s.t.fichaId && soyGM){ await danioCreep(s.t, String(s.dano), true, 0, 0, {magico: true}); ok = true; }
-      // Personajes e invocaciones: el GM también (como el daño del duelo, que su mapa aplica a cualquiera); antes solo los propios (2026-10-05).
-      else if(s.t.tipo === 'pj' && s.t.fichaId && (soyGM || puedoMover(s.t))){
-        if(String(s.t.fichaId).includes(SEP_INVOCACION)) await danioInv(s.t, String(s.dano), true, 0, 0, {magico: true}); else await danioPj(s.t, String(s.dano), true, 0, 0, {magico: true});
+      const esInv = s.t.tipo === 'pj' && String(s.t.fichaId).includes(SEP_INVOCACION);
+      const puede = s.t.fichaId && (s.t.tipo === 'creep' ? soyGM : (soyGM || puedoMover(s.t)));   // personajes e invocaciones: el GM también (2026-10-05)
+      if(puede){
+        const res = (await resistenciasDe(s.t, 'rayo')).res;
+        if(res) resTxt = ` − ${Combatiente.resElementalTxt('rayo', res)}`;
+        const r = s.t.tipo === 'creep' ? await danioCreep(s.t, String(dano), true, 0, res, {magico: true}) : esInv ? await danioInv(s.t, String(dano), true, 0, res, {magico: true}) : await danioPj(s.t, String(dano), true, 0, res, {magico: true});
+        entro = r && r.r ? num(r.r.recibido) : Math.max(0, dano - res);
         ok = true;
       }
     }catch(err){ console.error('No se pudo aplicar el salto del rayo:', err); }
-    (ok ? hechos : manual).push(`${nombre}: ${s.dano}`);
+    hubo.push({id: s.id, t: s.t, dano, entro});
+    (ok ? hechos : manual).push(`${nombre}: ${dano}${resTxt}${ok && entro !== dano ? ` → ${entro}` : ''}`);
+    prev = entro;
   }
-  alertaRojaAnonima('⚡ Relámpago en cadena', `Saltó a ${saltos.length} más (la mitad del daño en cada salto, redondeada hacia abajo). ${hechos.length ? 'Aplicado solo: ' + hechos.join(' · ') + '. ' : ''}${manual.length ? 'Aplicalo a mano: ' + manual.join(' · ') + ' (directo a la vida).' : ''}`);
+  if(hubo.length && !o.callado) alertaRojaAnonima('⚡ Relámpago en cadena', `Saltó a ${hubo.length} más (la mitad de lo que le entró al anterior, para abajo; cada uno resta su Res. eléctrica). ${hechos.length ? 'Aplicado solo: ' + hechos.join(' · ') + '. ' : ''}${manual.length ? 'Aplicalo a mano: ' + manual.join(' · ') + ' (directo a la vida).' : ''}`);
+  return hubo;
 }
 
 async function hudHpAplicar(t, texto){
@@ -533,8 +546,9 @@ async function hudHpAplicar(t, texto){
     const crit = hpCritMult > 1 && golpe !== null;   // crítico: daño × multiplicador y directo (sin Defensa)
     const txtDanio = crit ? String(golpe * hpCritMult) : texto;
     const directo = crit || (hpRayo && golpe !== null);   // el rayo también va directo a la vida
-    if(t.tipo === 'creep') await danioCreep(t, txtDanio, directo); else await danioPj(t, txtDanio, directo, 0, 0, {reparte: true});   // reparte: Miti-Miti
-    if(hpRayo && golpe !== null) rayoCadenaAplicar(rayoCadena(idTok, golpe));   // salta a los cercanos (no espera: se avisa en la Mesa)
+    const resH = t.tipo === 'creep' ? await danioCreep(t, txtDanio, directo) : await danioPj(t, txtDanio, directo, 0, 0, {reparte: true});   // reparte: Miti-Miti
+    const entroH = resH && resH.r ? num(resH.r.recibido) : golpe;   // salta la mitad de lo que entró (2026-10-13)
+    if(hpRayo && golpe !== null && entroH > 1) rayoCadenaAplicar(rayoCadena(idTok, entroH));   // salta a los cercanos (no espera: se avisa en la Mesa)
     vitalRegistrar(idTok, 'hp', antes);   // (Ctrl+Z devuelve el HP; un escudo que absorbió el golpe no se recarga)
     hudGlobo = '';
   }catch(err){

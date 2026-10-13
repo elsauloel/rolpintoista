@@ -767,6 +767,27 @@ prueba('Transfusión sanguínea (Debuffer, 2026-10-13): el aviso «Transfusión�
   igual([hab.costo, hab.nitrosCosto, hab.transfusionMapa.max, EstadosAplicar.limpiarSpec({nombre: 'Transfusión', vida: -7}).vida, da, recibe === max, caido],
     ['1', 1, 20, -7, 1, true, 0]);
 });
+prueba('Carga Elemental (Mago, 2026-10-13): stacks según el daño que entra, la Ejecución con la carga y el duelo la conserva', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'mago').habilidades.find(h => h.id === 'mago-carga-elemental');
+  const C = Combatiente.CARGAS;
+  const esc = [0, 1, 4, 5, 9, 10].map(d => Combatiente.stacksPorDano(d, C.hielo.duelo.porDano));
+  const ven = [1, 2, 3, 7].map(d => Combatiente.stacksPorDano(d, C.toxico.duelo.porDano));
+  const aci = [3, 5].map(d => Combatiente.stacksPorDano(d, C.acido.duelo.porDano));
+  const base = {objetivo: 'enemigo', tira: 'pdgmg', contra: ['eva'], dano: true, tipoDano: 'arcano'};
+  const eh = Combatiente.habEjecucion({nombre: 'Rayo', tiradaExtra: '2d6'}, Combatiente.conCarga(base, 'fuego'), {});
+  const el = Combatiente.conCarga(base, 'rayo');
+  const limpio = Duelo.limpiarHab(Combatiente.habEjecucion({nombre: 'Rayo', tiradaExtra: '2d6'}, Combatiente.conCarga(base, 'hielo'), {}));
+  igual([hab.costo, hab.cargaElemental, esc, ven, aci, eh.dano.tipo, eh.dano.mult, el.cadena.rango, el.efectos.map(e => [e.nombre, e.caras, e.exitos]),
+    limpio.dano.porDano, Combatiente.cargable({}, base), Combatiente.cargable({}, {...base, tipoDano: 'fisico'}), Combatiente.cargable({deItem: 'x'}, base), typeof Confirmar.elegir],
+    ['X', true, [0, 1, 1, 2, 2, 3], [1, 1, 1, 2], [1, 2], 'fuego', 1.5, 4, [['Parálisis', 10, 2]], {estado: 'Escarcha', cada: 5, mas1: true}, true, false, false, 'function']);
+});
+prueba('Escarcha: reaplicarla suma los stacks que trae (la Carga de frío), y sin stacks suma 1 como siempre', () => {
+  const p = estadosPresetFicha().find(x => x.nombre === 'Escarcha');
+  const ya = [{...p, stacks: 1, activo: true}];
+  Combatiente.acumularSangrado(ya, {...p, stacks: 3}); const tres = ya[0].stacks;
+  Combatiente.acumularSangrado(ya, {...p, stacks: undefined}); const uno = ya[0].stacks;
+  igual([tres, uno], [4, 5]);
+});
 prueba('Repetición (Shooter, 2026-10-13): X SP (1 a 3), sin No2, deja «Repitiendo» con X disparos y el resumen lo publica', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'shooter').habilidades.find(h => h.id === 'shooter-repeticion');
   const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
@@ -2108,7 +2129,7 @@ prueba('asistente de ítems: una varita del catálogo se edita como arma especia
   const r = q('[data-aa-amano="tirada"]'); r.value = '1d6'; r.dispatchEvent(new Event('input', {bubbles: true}));
   q('[data-pap="guardar"]').click(); await new Promise(res => setTimeout(res, 0));
   igual([tabs.slice(0, 5), guardado.tipoDado, guardado.danoFijo, guardado.especial.sp, guardado.especial.duelo.cadena, guardado.especial.duelo.efectos[0].caras, guardado.especial.aMano],
-    [['Qué es', 'Empuñadura', 'Hechizo', 'Qué hace ✨', '✋ A mano'], undefined, undefined, 3, {saltos: 2, rango: 3}, 4, {texto: 'Mojado: salta 1 vez más', tirada: '1d6'}]);
+    [['Qué es', 'Empuñadura', 'Hechizo', 'Qué hace ✨', '✋ A mano'], undefined, undefined, 3, {saltos: 2, rango: 4}, 4, {texto: 'Mojado: salta 1 vez más', tirada: '1d6'}]);   // (rango 4 desde el 2026-10-13)
 });
 prueba('asistente de ítems: un orbe nuevo (escudo de una mano) pregunta lo del orbe en vez de la Defensa', async () => {
   let guardado = null;
@@ -2574,7 +2595,7 @@ prueba('Ejecución ✨: guardar sin cambios conserva lo que todavía no edita (s
   AsistenteDueloHab.abrir({nombre: 'Chispa', inicial: ini, siempreActivo: true, costoInicial: {sp: '3', nitrosCosto: 1}, alGuardar: x => { r = x; }});
   const mia = [...document.querySelectorAll('.pap')].pop();
   mia.querySelector('[data-pap="guardar"]').click(); await new Promise(res => setTimeout(res, 0));
-  igual([r.duelo.cadena, r.duelo.efectos[0].caras, r.duelo.efectos[0].exitos, r.duelo.efectos[0].turnos], [{saltos: 2, rango: 3}, 4, 1, undefined]);
+  igual([r.duelo.cadena, r.duelo.efectos[0].caras, r.duelo.efectos[0].exitos, r.duelo.efectos[0].turnos], [{saltos: 2, rango: 4}, 4, 1, undefined]);
 });
 prueba('Ejecución ✨ en la ventana común: los pasos dependen del objetivo y Guardar devuelve la configuración', async () => {
   let r = 'nada';
@@ -3271,11 +3292,11 @@ prueba('✨ armas especiales (2026-10-05): la varita arma su tiro como una Ejecu
     hab.dano.ignoraDef, hab.efectos[0].nombre, hab.efectos[0].caras],
     ['enemigo', '1d6', '2d4+3', {no2: 1, sp: 1, usos: 0, vida: 0}, {no2: 3, sp: 1, usos: 2, vida: 0}, ['v1', 'v2'], 0, false, 'Escarcha', 3]);
 });
-prueba('✨ varita de chispa eléctrica (2026-10-05): su Ejecución lleva la cadena del rayo (2 saltos, a 3 casillas)', () => {
+prueba('✨ varita de chispa eléctrica (2026-10-05): su Ejecución lleva la cadena del rayo (2 saltos, a 4 casillas desde el 2026-10-13)', () => {
   const S = FichaGuardado.normalizar({}).S, v = {...structuredClone(CATALOGO_BASE.find(i => i.id === 'esp-varita-de-chispa-electrica')), id: 'r', equipado: true};
   S.inventario = [v];
   const h = FichaAcciones.habDeArmaEspecial(S, v), hab = Combatiente.habEjecucion(h, h.duelo, {stat: () => 5, etq: x => x});
-  igual([hab.cadena, hab.dano.tipo, hab.efectos[0].nombre, hab.efectos[0].caras], [{saltos: 2, rango: 3}, 'rayo', 'Parálisis', 4]);
+  igual([hab.cadena, hab.dano.tipo, hab.efectos[0].nombre, hab.efectos[0].caras], [{saltos: 2, rango: 4}, 'rayo', 'Parálisis', 4]);
 });
 prueba('Marcado (2026-10-05): saca el sigilo al ponerse y no deja entrar en sigilo mientras dure (personaje, invocación y creep por igual)', () => {
   const E = [{nombre: 'Sigilo', polaridad: 'buff', activo: true}, {nombre: 'Lento', polaridad: 'debuff', activo: true}];

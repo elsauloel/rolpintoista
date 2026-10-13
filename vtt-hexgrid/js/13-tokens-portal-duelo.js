@@ -1298,8 +1298,10 @@ async function dueloAplicarDano(d){
   const ta0 = d.atacante && tokens.get(d.atacante.tokenId);
   const menosDist = (d.hab && d.hab.menosDistancia && ta0 && t ? Math.max(0, distanciaHex(ta0, t) - 1) : 0)
     + (d.hab && d.hab.menosPorOrden && d.grupo ? Math.max(0, Math.round(num(d.grupo.indice)) - 1) : 0);   // el láser largo: −1 a cada uno de los siguientes en la línea
-  const mult = critReal ? d.crit.mult : 1, crudo = Math.max(0, num(dn.crudo) - menosDist), golpe = crudo * mult;
-  const base = {crudo, mult, golpe, ignoraDef: crit, mitad: d.resultado === 'mitad'};
+  // 🔥 Carga Elemental de fuego (2026-10-13): +50 % del daño tirado, para arriba (`hab.dano.mult`).
+  const multHab = d.hab && d.hab.dano && num(d.hab.dano.mult) > 1 ? num(d.hab.dano.mult) : 1;
+  const mult = critReal ? d.crit.mult : 1, crudo = Math.ceil(Math.max(0, num(dn.crudo) - menosDist) * multHab), golpe = crudo * mult;
+  const base = {crudo, mult, golpe, ignoraDef: crit, mitad: d.resultado === 'mitad', ...(multHab > 1 ? {cargaMult: `${d.hab.dano.carga || 'Carga'}: ${fmt(Math.max(0, num(dn.crudo) - menosDist))} +${Math.round((multHab - 1) * 100)} % = ${fmt(crudo)}`} : {})};
   if(!t) return {...base, manual: true, motivoManual: 'el token ya no está en el mapa'};
   const esInv = t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION);
   let def = 0, armadmg = 0, invLeida = null;
@@ -1360,29 +1362,43 @@ async function dueloAplicarDano(d){
     // Una habilidad que drena: lo que perdió, o su % (`drenaPct`, la Sanguijuela: la mitad, para arriba).
     const drena = d.hab && d.hab.dano && d.hab.dano.drena ? await dueloDrenar(d, num(d.hab.dano.drenaPct) > 0 ? Math.ceil(perdio * num(d.hab.dano.drenaPct) / 100) : perdio)
       : !d.hab && num(dn.drenaPct) > 0 ? await dueloDrenar(d, Math.ceil(perdio * num(dn.drenaPct) / 100)) : null;
+    // ✨ El estado según el daño que entró (2026-10-13, Carga Elemental: Escarcha, Veneno, Armadura rota): `hab.dano.porDano`.
+    const porDano = d.hab && d.hab.dano && d.hab.dano.porDano && !res.r.invulnerable ? await dueloPorDano(d, num(res.r.recibido)).catch(err => { console.error('No se pudo aplicar el estado por daño:', err); return null; }) : null;
     // Rayo en cadena (2026-10-05): el golpe de una habilidad o arma especial de rayo salta (la misma regla de ⚡ Rayo en cadena del token).
-    if(d.hab && d.hab.cadena && golpe > 0 && !res.r.invulnerable) await dueloCadena(d, golpe).catch(err => console.error('No se pudo hacer saltar el rayo:', err));
+    if(d.hab && d.hab.cadena && num(res.r.recibido) > 1 && !res.r.invulnerable) await dueloCadena(d, num(res.r.recibido)).catch(err => console.error('No se pudo hacer saltar el rayo:', err));   // la mitad de lo que entró (2026-10-13)
     // ⚡ La flecha que salta (relámpago, tormenta: js/33): pase o no el daño, salta igual (el golpe entró).
-    if(!d.hab && d.ataque && d.ataque.flecha && d.ataque.flecha.salto && !res.r.invulnerable) await flechaSalto(d, dn.magico ? num(dn.magico.total) : 0).catch(err => console.error('No se pudo hacer saltar la flecha:', err));
+    if(!d.hab && d.ataque && d.ataque.flecha && d.ataque.flecha.salto && !res.r.invulnerable) await flechaSalto(d, magico ? num(magico.recibido) : 0).catch(err => console.error('No se pudo hacer saltar la flecha:', err));
     // 🏹 El virote que hace algo en el mapa al pegar (2026-10-10): humo, luz, explota, clava (js/33).
     if(!d.hab && d.ataque && d.ataque.flecha && (d.ataque.flecha.humo || d.ataque.flecha.luz || d.ataque.flecha.explota || d.ataque.flecha.clava)) await flechaAlPegar(d, !!res.r.invulnerable).catch(err => console.error('No se pudo aplicar el virote en el mapa:', err));
     if(d.hab && d.hab.atrae && !res.r.invulnerable) await dueloAtraer(d).catch(err => console.error('No se pudo atraer al objetivo:', err));   // el gancho
     if(d.hab && d.hab.riesgo && (dn.rolls || []).map(num).includes(num(d.hab.riesgo.si))) await dueloRiesgo(d).catch(err => console.error('No se pudo aplicar el riesgo:', err));   // la inestable
     // `perfora`: solo si la Perfora mandó (pasaron esos N, la Defensa frenaba más): el duelo lo cuenta así.
-    return {...base, desgaste, defensa: crit ? restaIgnorando : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, ...(num(res.r.mitiMiti) > 0 ? {mitiMiti: num(res.r.mitiMiti), mitiMitiNombre: String(res.r.mitiMitiNombre || '').slice(0, 40)} : {}), hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {})};
+    return {...base, desgaste, defensa: crit ? restaIgnorando : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, ...(num(res.r.mitiMiti) > 0 ? {mitiMiti: num(res.r.mitiMiti), mitiMitiNombre: String(res.r.mitiMitiNombre || '').slice(0, 40)} : {}), hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {}), ...(porDano ? {porDano} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);
     return {...base, defensa: def, manual: true, golpe: base.mitad ? aplicar : golpe, motivoManual: err && err.message === 'SIN_DEF' ? 'la ficha todavía no publicó su Defensa' : 'falló la escritura'};
   }
 }
 
-// Los saltos del rayo: al más cercano del mismo bando que el golpeado, la mitad cada salto (rayoCadena, js/10), hasta `saltos` veces; se ve el rayo
-// saltando en el mapa (rayoSaltoEfecto, js/19) y se aplica lo que este cliente puede (rayoCadenaAplicar: el GM los creeps; lo demás, en la Mesa).
-async function dueloCadena(d, golpe){
+// ✨ El estado según el daño que entró (2026-10-13, Carga Elemental): N stacks (Combatiente.stacksPorDano) del estado al defensor, con el mismo camino
+// que los efectos del duelo (dueloAplicarEfecto: un creep directo, un personaje o una invocación por el aviso de su ficha).
+async function dueloPorDano(d, entro){
+  const p = d.hab.dano.porDano, stacks = Combatiente.stacksPorDano(entro, p);
+  if(!stacks) return null;
+  const r = await dueloAplicarEfecto(d, {nombre: p.estado, spec: {nombre: p.estado, stacks}});
+  return {estado: p.estado, stacks, entro: Math.floor(num(entro)), regla: Combatiente.porDanoTxt(p), ...(r && r.nota ? {nota: String(r.nota).slice(0, 120)} : {}), ...(r && r.manual ? {manual: true} : {})};
+}
+// Los saltos del rayo: al más cercano del mismo bando que el golpeado, la mitad de lo que entró cada salto (rayoCadena / rayoCadenaAplicar, js/10),
+// todas las veces que pueda (regla general del 2026-10-13: ya no hay tope de `saltos`); se ve el rayo saltando en el mapa (rayoSaltoEfecto, js/19)
+// y se aplica lo que este cliente puede (el GM, todos; lo demás, en la Mesa).
+async function dueloCadena(d, entro){
   const id = d.defensor && d.defensor.tokenId;
   if(!id || !tokens.get(id)) return;
-  const c = d.hab.cadena, cadena = rayoCadena(id, golpe).slice(0, 1 + Math.max(1, num(c.saltos) || 2));
-  if(cadena.length < 2) return;
+  const c = d.hab.cadena, cadena0 = rayoCadena(id, entro);
+  if(cadena0.length < 2) return;
+  const hubo = await rayoCadenaAplicar(cadena0);
+  if(!hubo.length) return;
+  const cadena = [cadena0[0], ...hubo];
   // El rayo saltando se ve en TODAS las pantallas (2026-10-05, dueño): va en un momento de la Crónica (rayoMomento, js/16), no solo acá.
   const saltos = cadena.slice(1).map((s, i) => ({desde: cadena[i].id, hacia: s.id}));
   // Los efectos del golpe también a cada uno al que salta (`cadena.efectos`, el Relámpago, 2026-10-07): cada uno tira su chance, como en el golpe.
@@ -1398,8 +1414,7 @@ async function dueloCadena(d, golpe){
     }
   }
   momentoAbrir({tipo: 'rayo', icono: '⚡', titulo: `${d.hab.nombre}: el rayo salta`, estado: 'listo', datos: {saltos},
-    resultado: cadena.slice(1).map(s => `${s.t.oculto ? 'Alguien' : nombreDe(s.t)} (${s.dano})`).join(' → ') + (extra.length ? ` · ${extra.join(' · ')}` : '')});
-  await rayoCadenaAplicar(cadena);
+    resultado: cadena.slice(1).map(s => `${s.t.oculto ? 'Alguien' : nombreDe(s.t)} (${s.dano}${s.entro !== s.dano ? ` → ${s.entro}` : ''})`).join(' → ') + (extra.length ? ` · ${extra.join(' · ')}` : '')});
 }
 
 /* El gancho (2026-10-05, Varita del gancho): si pegó, el objetivo tira su Fuerza contra el Ef.Esp de quien la usó (el valor de cuando la usó); si

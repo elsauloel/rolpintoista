@@ -846,7 +846,7 @@ const Combatiente = (() => {
     if(!clave) return null;
     const ya = (estados || []).find(e => e[clave] && e.nombre === nuevo.nombre);
     if(!ya) return null;
-    if(clave !== 'esQuemadura') ya.stacks = Math.max(1, n(ya.stacks) || 1) + 1;   // la Quemadura no sube (dueño, 2026-10-04: identidad propia)
+    if(clave !== 'esQuemadura') ya.stacks = Math.max(1, n(ya.stacks) || 1) + (clave === 'esEscarcha' ? Math.max(1, Math.round(n(nuevo.stacks)) || 1) : 1);   // la Quemadura no sube (dueño, 2026-10-04: identidad propia)   // la Escarcha suma los que trae (Carga de frío, 2026-10-13)
     ya.activo = true;
     if(clave === 'esEscarcha') ya.turnos = Math.max(n(ya.turnos), n(nuevo.turnos));
     if(clave === 'esQuemadura' && n(nuevo.turnos) > 0) ya.turnos = n(nuevo.turnos);   // la Quemadura: solo vuelven a contar los turnos
@@ -1157,6 +1157,7 @@ const Combatiente = (() => {
       // Daño directo (ignora la Defensa especial: proyectiles chicos) y True Damage (ignora toda defensa y la Res. elemental): dueño, 2026-10-07.
       dano: c.dano && (formula || c.danoDiferencia) ? {formula: c.danoDiferencia ? '' : formula, tipo, ignoraDef: c.trueDamage ? true : c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico',
         ...(c.trueDamage ? {trueDamage: true} : c.danoDirecto && tipo !== 'fisico' ? {directo: true} : {}),
+        ...(nf(c.danoMult) > 1 ? {mult: nf(c.danoMult)} : {}), ...(porDanoNorm(c.porDano) ? {porDano: porDanoNorm(c.porDano)} : {}), ...(c.carga ? {carga: String(c.carga)} : {}),   // ✨ Carga Elemental (2026-10-13)
         ...(c.danoDiferencia ? {diferencia: true} : {}), ...(c.drena ? {drena: true, drenaTope: Math.max(0, nf(c.drenaTope)), ...(nf(c.drenaPct) > 0 && nf(c.drenaPct) < 100 ? {drenaPct: Math.round(nf(c.drenaPct))} : {})} : {})} : null,   // drenaPct: cura solo ese % (2026-10-07, la Sanguijuela)
       efectos: (c.efectos || []).map(e => efectoDeEjecucion(conX && e && e.stacks === 'X' ? {...e, stacks: Math.max(1, Math.round(X))} : e)),   // stacks «X» (Apuntar, 2026-10-11)
       ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: nf(c.radio)} : {}),
@@ -1183,11 +1184,42 @@ const Combatiente = (() => {
       ...(nf(c.critTipo) ? {critTipo: Math.round(nf(c.critTipo))} : {}),   // la luz (2026-10-05, Varita de la luz): solo los rivales en sigilo que alcanza
       // Rayo en cadena (2026-10-05, Varita de chispa eléctrica): si el golpe entra, salta `saltos` veces al más cercano del mismo bando a
       // `rango` casillas o menos, la mitad cada salto (P118: la misma regla de ⚡ Rayo en cadena del token y de la trampa Descarga).
-      ...(c.cadena ? {cadena: {saltos: Math.max(1, Math.round(nf(c.cadena.saltos)) || 2), rango: Math.max(1, Math.round(nf(c.cadena.rango)) || 3), ...(c.cadena.efectos ? {efectos: true} : {})}} : {}),   // efectos: también a los que salta (2026-10-07)
+      ...(c.cadena ? {cadena: {saltos: Math.max(1, Math.round(nf(c.cadena.saltos)) || 2), rango: Math.max(1, Math.round(nf(c.cadena.rango)) || 4), ...(c.cadena.efectos ? {efectos: true} : {})}} : {}),   // efectos: también a los que salta (2026-10-07)
       ...(c.efectoLibre ? {efectoLibre: sx(c.efectoLibre)} : {}),
       ...(c.efectosNota ? {efectosNota: sx(c.efectosNota)} : {}),
       ...(c.contraOtro ? {contraOtro: c.contraOtro} : {}),
     };
+  }
+  /* El daño que deja un estado según cuánto entró (2026-10-13, Carga Elemental; dueño: «que pueda existir como regla, pero que no sea la regla
+     general»): `porDano = {estado, cada, mas1}` → 1 stack cada `cada` de daño que entró de verdad, mínimo 1 (Veneno cada 3);
+     con `mas1`, 1 y uno más cada `cada` (la Escarcha y la Armadura rota: 1, y un segundo cada 5). Sin daño, nada. Lo aplica el mapa del GM (js/13, dueloPorDano). */
+  function porDanoNorm(p){
+    if(!p || !String(p.estado || '').trim()) return null;
+    return {estado: String(p.estado).trim().slice(0, 30), cada: Math.max(1, Math.round(nf(p.cada)) || 4), ...(p.mas1 ? {mas1: true} : {})};
+  }
+  function stacksPorDano(entro, p){
+    const d = Math.max(0, Math.floor(nf(entro))), q = porDanoNorm(p);
+    if(!q || d <= 0) return 0;
+    return q.mas1 ? 1 + Math.floor(d / q.cada) : Math.max(1, Math.floor(d / q.cada));
+  }
+  const porDanoTxt = p => { const q = porDanoNorm(p); return q ? (q.mas1 ? `${q.estado}: 1, y uno más cada ${q.cada} de daño` : `${q.estado}: 1 stack cada ${q.cada} de daño (mínimo 1)`) : ''; };
+  /* ✨ Carga Elemental (Mago, 2026-10-13, dueño): los cinco elementos y lo que le cambian a la Ejecución de la skill de daño. */
+  const CARGAS = {
+    fuego: {nombre: 'Fuego', icono: '🔥', que: '+50 % de daño (para arriba)', duelo: {tipoDano: 'fuego', danoMult: 1.5}},
+    hielo: {nombre: 'Frío', icono: '❄', que: 'Escarcha: 1, y una más cada 5 de daño que entra', duelo: {tipoDano: 'hielo', porDano: {estado: 'Escarcha', cada: 5, mas1: true}}},
+    rayo: {nombre: 'Eléctrico', icono: '⚡', que: 'salta al rival más cercano (4 casillas o menos) con la mitad del daño que entró, sin repetir, hasta llegar a 1; 20 % de Parálisis al primero', duelo: {tipoDano: 'eléctrico', cadena: {saltos: 99, rango: 4}, paralisis: {nombre: 'Parálisis', turnos: 1, caras: 10, exitos: 2}}},
+    acido: {nombre: 'Ácido', icono: '🧪', que: 'Armadura rota: 1, y una más cada 5 de daño que entra', duelo: {tipoDano: 'ácido', porDano: {estado: 'Armadura rota', cada: 5, mas1: true}}},
+    toxico: {nombre: 'Tóxico', icono: '☠', que: 'Veneno: 1 stack cada 3 de daño que entra (mínimo 1)', duelo: {tipoDano: 'tóxico', porDano: {estado: 'Veneno', cada: 3}}},
+  };
+  // ¿Esta Ejecución se puede cargar? Una skill (no un arma especial) de daño especial que se tira (no el arma, no la diferencia), no una zona.
+  const cargable = (it, c) => !!(it && !it.deItem && c && typeof c === 'object' && c.dano && !c.danoArma && !c.danoDiferencia && (c.tipoDano || 'arcano') !== 'fisico' && c.objetivo !== 'zona' && c.modo !== 'arma' && c.modo !== 'flash');
+  // La Ejecución con la carga puesta (una copia): el tipo de daño, el ×, el estado por daño, el salto y la Parálisis al primero.
+  function conCarga(c, clave){
+    const k = CARGAS[clave];
+    if(!k) return c;
+    const x = {...c, ...k.duelo, carga: k.nombre};
+    if(k.duelo.paralisis){ delete x.paralisis; x.efectos = [...(c.efectos || []), k.duelo.paralisis]; }
+    return x;
   }
   // La fórmula de daño de la Ejecución: la de la habilidad («tiradaExtra») más danoFijoPorX × X (P119); sin X, tal cual.
   function formulaDanoHab(h, c, X){
@@ -1200,7 +1232,7 @@ const Combatiente = (() => {
      `o.resistValor`: la tirada de «tira», hecha UNA vez y reusada contra cada uno que entra o sigue adentro. */
   // Daño «la diferencia» (2026-10-02, Pedos Tóxicos): `zonaDanoDif` = cada uno que no resiste recibe la tirada de quien la creó
   // menos la suya; `zonaTiraExtra` (ej. '1d20') + `zonaNota`: si el daño entra, se tira y se publica con ese texto (a mano).
-  const TIPO_DANO_NOMBRE = {arcano: 'arcano', fuego: 'de fuego', hielo: 'de hielo', rayo: 'eléctrico', toxico: 'tóxico', fisico: 'físico'};
+  const TIPO_DANO_NOMBRE = {arcano: 'arcano', fuego: 'de fuego', hielo: 'de hielo', rayo: 'eléctrico', toxico: 'tóxico', acido: 'ácido', fisico: 'físico'};
   function zonaDeHab(h, c, o){
     o = o || {};
     const dif = !!(c.dano && c.danoDiferencia);
@@ -1520,7 +1552,7 @@ const Combatiente = (() => {
   // El texto de lo que cura un ítem: «Heridas (Sangrado, Lisiado, Rengo)».
   const textoCura = grupos => grupos.map(k => `${GRUPOS_CURA[k].label} (${GRUPOS_CURA[k].estados.join(', ')})`).join(' · ');
 
-  return {tormenta, danoTormenta, danoTormentaMover, golpeDirecto, cobroTormenta, tormentaTxt, avisarTormenta, aplicarTormenta, acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {porDanoNorm, stacksPorDano, porDanoTxt, CARGAS, cargable, conCarga, tormenta, danoTormenta, danoTormentaMover, golpeDirecto, cobroTormenta, tormentaTxt, avisarTormenta, aplicarTormenta, acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

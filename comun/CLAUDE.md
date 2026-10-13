@@ -1540,3 +1540,12 @@ versión parecida en más de una, es candidato a juntar.
   activo + el `alcance` que devuelve `armaContra`) y lo guarda en `defensa.{contraEsquiva, contraAlcanza, contraDist, contraAlcance}`. Si gana
   la Evasión, el veredicto ofrece «¿Contraatacás?» (como tras Parry + Bloqueo); el gancho `contraEsquivaPagar(d, arma)` cobra 2 SP (o devuelve
   por qué no) y se abre el duelo `contra` de siempre (el No2 de un primer ataque lo cobra al tirar el PdG). Solo personajes.
+- **✨ Carga Elemental y el estado según el daño** (2026-10-13, Mago): `Combatiente.CARGAS` (fuego, hielo, rayo, acido, toxico: lo que le cambia a
+  la Ejecución), `cargable(it, c)`, `conCarga(c, clave)`; en la Ejecución, `danoMult` (→ `hab.dano.mult`, el mapa lo aplica al daño tirado) y
+  `porDano = {estado, cada, mas1}` (→ `hab.dano.porDano`; `stacksPorDano(entro, p)`: 1 cada `cada` de lo que entró, mínimo 1; con `mas1`, 1 y uno
+  más cada `cada`). «Stacks según el daño» es una opción de cada skill, no una regla general de los elementos (dueño). `FichaAcciones.terminarEjecucionHab`
+  pregunta la carga (`cargaElemental`) antes de lanzar una dirigida. La Escarcha, al reaplicarse, suma los stacks que trae (antes siempre 1).
+  `Confirmar.elegir(texto, {titulo, icono, opciones: [{valor, texto, detalle}], no})` → Promise<valor | null>: una pregunta con varias opciones.
+- **⚡ Salto eléctrico, regla general** (dueño, 2026-10-13): 4 casillas (`RAYO_SALTO_MAX`, js/10; `cadena.rango` por defecto 4); cada salto es la
+  mitad de lo que le ENTRÓ al anterior y resta la Res. eléctrica de quien lo recibe (`rayoCadenaAplicar` lo recorre de verdad y devuelve los saltos
+  que hubo); salta todas las veces que pueda hasta llegar a 1 (sin el tope de `saltos`, salvo la flecha sin daño). La Parálisis, la de cada cosa.

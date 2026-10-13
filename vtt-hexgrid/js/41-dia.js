@@ -28,7 +28,7 @@ function escucharDia(){
 }
 function renderDiaBoton(){
   const b = $('#btn-dia-mapa');
-  if(b) b.textContent = `⏳ Pasar de día${diaActual ? ` (hoy: Día ${diaActual})` : ''}`;
+  if(b) b.title = `Hoy es el Día ${diaActual || 0}. Pasa un día para toda la mesa: todos descansan (vida, SP y No2), terminan los estados con turnos, se renuevan los topes diarios y se repone la góndola de la tienda (solo GM)`;
 }
 
 // El descanso de un personaje y qué estados terminan: comun/ficha-mantenimiento.js (FichaMantenimiento.descansar / terminaAlPasarDia).

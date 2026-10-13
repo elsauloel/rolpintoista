@@ -10,6 +10,16 @@
 
 ## Pendientes
 
+> **Tanda del 2026-10-13 (dueño: «hasta que te diga que abrí los mapas, anotarlos como pendiente de testeo y no nos salteamos esa instancia»):**
+> todo lo que se hizo mientras el dueño tenía los mapas cerrados va acá y se prueba en el mapa apenas avise que los abrió.
+
+- [ ] **🏹 Proyectil perforante** (Shooter, 2026-10-13): un personaje con un arco y la skill, un creep de blanco y otro token detrás en la misma
+  línea (probar también con un aliado detrás, con un Sólido en el medio y con nadie). Ver: el segundo duelo se abre solo con la misma tirada de PdG
+  (solo pide la Evasión del de atrás), el daño se tira de nuevo y no trae efectos (con una flecha especial y con un arma con efectos), y la Mesa
+  cuenta a quién atravesó. Que siga también si el primero la esquiva.
+- [ ] **⟳ Pasar de ronda en GM Tools** (2026-10-13): se probó con datos (el botón se escondió al poner el mapa de prueba en combate, con orden);
+  falta verlo con el mapa abierto y ▶ Siguiente.
+
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no

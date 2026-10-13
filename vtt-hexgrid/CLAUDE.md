@@ -1542,3 +1542,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   disparo (`primerDisparoUsados`). La Remachadora la lleva el mapa del GM (`remachadoraCuenta`, `remachadoraPerfora` en `dueloAplicarDano`, js/13;
   `remachadoraErro` desde el hook del duelo, js/14) y la Punta de diamante también (contra Defensa 12+). El Cargador, en `bnDispararFlecha` (js/11,
   `cargadorUsados`); el virote recuperable, en `flechaErrada` (js/33). Todo se libera al volver a narrativo (js/25).
+- **🏹 Proyectil perforante** (2026-10-13, Shooter; `js/42-perforante.js`): un ataque con `perforante` (la Ejecución «con tu arma» de la skill,
+  `Combatiente.ataqueConArreglos`) al terminar, en la pantalla de quien disparó (hook `disparoResuelto` de js/14, junto a `arcoResuelto`), sigue la
+  línea más allá del blanco con `flechaLinea` (js/33) hasta el Rango (`rangoDeToken`): un Sólido o una pared lo frenan; el primer token que se ve
+  (`tiroTokenVisible`, aliado incluido; un caído no, `iniciativaFueraDeJuego`) recibe un segundo duelo con `pdgCompartido` = la tirada del primero y
+  `sinEfectos` (sin la flecha). Pegue o no al primero. La Mesa cuenta a quién atravesó.

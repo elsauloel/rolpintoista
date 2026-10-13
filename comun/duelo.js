@@ -438,6 +438,9 @@ const Duelo = (() => {
           sinParry: !!cfg.ataque.sinParry, mods: {pdg: _num(cfg.ataque.mods && cfg.ataque.mods.pdg), dados: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.dados))), fijo: _num(cfg.ataque.mods && cfg.ataque.mods.fijo), ignoraResistCrit: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.ignoraResistCrit))),
             critBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critBono))), critpotBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critpotBono)))}, efectos: limpiarEfectos(cfg.ataque.efectos),
           ...(cfg.ataque.terminaTurno ? {terminaTurno: true} : {}), ...(cfg.ataque.soloCritico ? {soloCritico: true} : {}),   // Degollar: al resolverse, el mapa del GM le termina el turno
+          // Proyectil perforante (2026-10-13): `perforante` = al terminar, el mapa de quien disparó sigue al que está detrás (js/42);
+          // `sinEfectos` = ese segundo golpe, sin los efectos especiales (ni del arma, ni de la flecha, ni del crítico).
+          ...(cfg.ataque.perforante ? {perforante: true} : {}), ...(cfg.ataque.sinEfectos ? {sinEfectos: true} : {}),
           ...(cfg.ataque.efectosNota ? {efectosNota: txtCorto(cfg.ataque.efectosNota, 200)} : {}),
           // ⚡ Critical Matters (2026-09-29): efectos/nota que solo cuentan si el golpe es crítico (ver
           // entrarCritico/efectosHtml) — mismo saneo que los de siempre, adentro de un campo aparte.
@@ -1055,6 +1058,7 @@ const Duelo = (() => {
       if(m.ataque && m.ataque.flecha && m.ataque.flecha.sinDano) m.dano = {...m.dano, crudo: 0, formula: `${m.ataque.flecha.nombre}: sin daño`.slice(0, 60)};   // el virote de red (2026-10-11)
       const critGolpe = !!(m.crit && m.crit.critico);
       let crudos = m.hab ? m.hab.efectos : efectos;
+      if(m.ataque && m.ataque.sinEfectos) crudos = [];   // el segundo golpe del Proyectil perforante: los efectos se pierden después del primero
       if(!m.hab && m.ataque && m.ataque.flecha && Array.isArray(m.ataque.flecha.efectos)) crudos = [...(Array.isArray(crudos) ? crudos : []), ...m.ataque.flecha.efectos];   // 🏹 la flecha especial
       if(!m.hab){
         // ⚡ Critical Matters de un arma (2026-10-03): el efecto con `soloCritico` entra solo si el golpe fue crítico.

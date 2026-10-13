@@ -275,9 +275,12 @@ Salvo Carga Elemental, todas son **Hechizo (PG: Esp · Daño: Esp)**.
 5. ✅ **Headshot** — **SP:** 4. **No2:** el del disparo. Un disparo **con un arma a distancia**: **+2 PdG, +5 de daño, Crítico frecuente +1 y Crítico
    potente +1**. **Todo o nada: si no es crítico, no hace nada** (aunque pegue). ⚙ Automatizado en el duelo. *(Auditada 2026-10-12 con el dueño;
    original: «Headshot [4] — Ataque con +1 al crítico y crítico mejorado. Daño +5. +2 fijo a PG. Falla si no es crítico.»)*
-6. **Proyectil perforante** [2] — Ataque que continúa hasta alcanzar un
-   segundo objetivo. Todos los efectos especiales se pierden después del
-   primer objetivo.
+6. ✅ **Proyectil perforante** — **SP:** 2. **No2:** el del disparo. Un disparo **con un arma a distancia** que atraviesa: **pegue o no al
+   primero**, sigue derecho por la misma línea y le pega al **primer token que haya detrás** (**aliado incluido**), dentro de tu Rango; un
+   Sólido o una pared lo frenan (un caído no). El segundo se defiende contra la **misma tirada de PdG** y recibe el **daño entero** (se tira de
+   nuevo), **sin los efectos especiales** (los del arma, la flecha y el crítico solo le llegan al primero). ⚙ Automatizado en el mapa.
+   *(Auditada 2026-10-13 con el dueño; original: «Proyectil perforante [2] — Ataque que continúa hasta alcanzar un segundo objetivo. Todos los
+   efectos especiales se pierden después del primer objetivo.»)*
 7. ✅ **Marcar** — **SP:** 3. **No2:** 1. Sin tirada: marcás a un **enemigo dentro de tu Rango**. Queda **Marcado** (el de siempre: brilla y no
    puede entrar en sigilo) y, **solo para vos**, contra él sumás **+1 PdG, +1 de daño, Crítico frecuente +1 y Crítico potente +1**. **Dura hasta que
    ataques a otro** (o marques a otro). ⚙ Automatizado: quien marca queda «Marcando» (con a quién), el bono en sus ataques, y al atacar a otro la

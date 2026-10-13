@@ -1521,3 +1521,6 @@ versión parecida en más de una, es candidato a juntar.
 - **La Defensa especial va siempre con la Defensa** (dueño, 2026-10-12): «Def. especial» (antes «Armad. mágica») en las botoneras de
   personaje, invocación y creep, debajo de la Defensa en Equipo y mochila, en la cabecera de la Botonera («Def 2 · Def.Esp 0») y siempre en
   la ficha lite.
+- **Proyectil perforante** (2026-10-13): `duelo.perforante` (al nivel del duelo, como `soloCritico`) viaja con `Combatiente.ataqueConArreglos` y
+  `Duelo.crear` lo guarda en el ataque; el segundo golpe lleva `ataque.sinEfectos` y `Duelo.guardarDano` le vacía los efectos (del arma, la flecha y
+  el crítico; tampoco tira daño mágico de efectos). La Ejecución (`asistente-duelo-hab.js`) lo conserva al editar.

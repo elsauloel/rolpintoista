@@ -29,6 +29,12 @@
 
 ## Probado
 
+- [x] **⚔ Contraataque** (Warrior, 2026-10-13; GM rolpintoista + jugador elsaulo, los dos mapas recargados): el Escarabajo (copia) ataca a juan
+  (con la skill); «Elegí cómo te defendés» muestra en la Evasión «⚔ si esquivás, podés contraatacar…»; juan esquiva (29 contra 1) y aparece
+  «Esquivaste: ¿contraatacás…? (Contraataque)»; con «Sí», SP 40 → 38 y se abre el duelo «Contraataque» con su Arco corto; al tirar el PdG,
+  No2 10 → 8 (un primer ataque); pegó (6 contra 3), 3 de daño (Escarabajo 12 → 9). Duelos terminados en los dos mapas. Sin probar: el caso
+  «no lo alcanza» (hace falta un atacante a distancia más lejos que el alcance de quien esquiva).
+
 - [x] **🩸 Transfusión sanguínea** (2026-10-13, con la cuenta del jugador dueño —elsaulo—, sin tomar el control, con todos los mapas recargados):
   Clementino → juan: los carteles «¿quién da?», «¿quién la recibe? (da: Clementino)» y «¿cuánta vida? … Como mucho 9» (juan en 21 de 30); con «9 (lo
   máximo)», Clementino 22 → 13 y juan 21 → 30, sin dejar ningún estado; la Mesa lo contó. (Una primera vuelta con mapas sin recargar dejó un estado de

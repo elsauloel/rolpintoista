@@ -177,6 +177,14 @@ async function pasarMantenimiento(titulo){
   });
   publicarPaseDeTurno(turno, titulo);
 }
+// «⟳ Pasar de ronda» (2026-10-12, dueño; antes «⟳ Mantenimiento»): en combate con la lista de turnos armada no aparece (la ronda la pasa sola
+// ▶ Siguiente al dar la vuelta, y apretarlo además le contaba un turno de más a los que no están en la lista). Afuera, es como corre el tiempo.
+function mantBotonActualizar(){
+  const b = $('#btn-mantenimiento');
+  if(!b) return;
+  const conOrden = modoMapa === 'combate' && iniciativa && Array.isArray(iniciativa.orden) && iniciativa.orden.length > 0;
+  b.hidden = conOrden;
+}
 $('#btn-mantenimiento').onclick = async () => {
   if(!soyGM) return;
   const btn = $('#btn-mantenimiento');
@@ -573,6 +581,7 @@ async function invocacionAlOrden(tokenId){
 }
 
 function renderIniciativa(){
+  mantBotonActualizar();   // ⟳ Pasar de ronda: solo sin lista de turnos en combate
   const caja = $('#iniciativa');
   if(!caja) return;
   // Herramienta flotante de siempre (decidido 2026-09-22: antes solo se

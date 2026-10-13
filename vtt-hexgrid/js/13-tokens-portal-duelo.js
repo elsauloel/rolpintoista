@@ -941,7 +941,7 @@ function dueloDodgeEmpieza(d){
   Duelo.abrir(d.id);
   Duelo.minimizar();
   seleccionar(d.defensor.tokenId);
-  dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, grupoId: d.grupo && d.grupo.id};
+  dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, grupoId: d.grupo && d.grupo.id, ...(d.hab && d.hab.soloDodge ? {tormenta: (d.hab.dano && d.hab.dano.formula) || '?'} : {})};   // (la Tormenta arcana: sin tirada)
   renderDodgeBanner();
 }
 function dueloDodgeTermina(d){
@@ -977,7 +977,7 @@ function renderDodgeBanner(){
       botones: [{texto: '✋ Me quedo', alClic: () => { dodgeBanner = null; renderDodgeBanner(); }}]});
     return;
   }
-  AvisoCombate.cartel('dodge', {icono: '🏃', titulo: `${dodgeBanner.nombre} ganó la Evasión`, posicion: 'abajo',
+  AvisoCombate.cartel('dodge', {icono: dodgeBanner.tormenta ? '🌩' : '🏃', titulo: dodgeBanner.tormenta ? `Le cae la tormenta a ${dodgeBanner.nombre} (${dodgeBanner.tormenta})` : `${dodgeBanner.nombre} ganó la Evasión`, posicion: 'abajo',
     texto: 'Arrastrá el token hasta 2 casilleros para intentar salir del área.',
     botones: [{texto: '🔎 Ver el duelo', sec: true, alClic: () => Duelo.abrir(dodgeBanner.id)}, {texto: '✋ No me quiero mover', alClic: () => dodgeDeclinar()}]});
 }

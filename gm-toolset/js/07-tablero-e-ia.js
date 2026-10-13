@@ -338,13 +338,56 @@ function poblarSelectorModelos(){
   if(guardado && OR_MODELS.some(m => m.id === guardado)) sel.value = guardado;
 }
 
-function orKey(pedirDeNuevo){
-  let t = localStorage.getItem('openrouter-key');
-  if(!t || pedirDeNuevo){
-    t = prompt('Pegá tu clave de OpenRouter (la que copiaste en el paso "2. Crear clave").\n\nQueda guardada en este navegador.');
-    if(t) localStorage.setItem('openrouter-key', t.trim());
-  }
-  return t ? t.trim() : null;
+/* La clave de OpenRouter (2026-10-13, dueño: «intenté usar la ia y me pide esto, pero ni idea de dónde sale»): si falta, una ventana con
+   los pasos para sacarla gratis y dónde pegarla, en vez del cartelito del navegador. La usan «+ Creep con IA» y 🔎 Escanear grupo.
+   orKey(pedirDeNuevo) → Promise<clave | null>. Queda guardada solo en este navegador (localStorage). */
+function orPedirClave(motivo){
+  return new Promise(listo => {
+    const f = document.createElement('div');
+    f.className = 'scrim open'; f.id = 'scrim-or-clave'; f.style.zIndex = '100010';
+    const paso = 'display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:8px';
+    const circ = 'flex:none;width:22px;height:22px;border-radius:50%;background:var(--copper);color:#180F08;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:12px';
+    f.innerHTML = `<div class="modal" style="max-width:520px">
+      <header><h3>🔑 Clave de OpenRouter</h3><button class="iconbtn" data-orc="no">Cerrar</button></header>
+      <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;font-size:13.5px;line-height:1.45">
+        ${motivo ? `<div class="hint" style="color:#ff9aa9">${esc(motivo)}</div>` : ''}
+        <div>La IA de GM Tools usa <b>OpenRouter</b>, un sitio que da acceso a modelos de IA gratuitos. Hace falta una clave tuya, una sola vez. <b>Es gratis</b>: no hace falta cargar saldo ni poner tarjeta.</div>
+        <div style="${paso}"><span style="${circ}">1</span><div style="flex:1">Entrá a OpenRouter (con tu cuenta de Google sirve).<br>
+          <a class="btn ghost" href="https://openrouter.ai/sign-in?redirect_url=https%3A%2F%2Fopenrouter.ai%2Fkeys" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;margin-top:6px">Abrir OpenRouter ↗</a></div></div>
+        <div style="${paso}"><span style="${circ}">2</span><div style="flex:1">En «Keys», tocá <b>Create API key</b>: ponele un nombre cualquiera (ej. «rol») y dejá el límite de crédito vacío. Copiá la clave que aparece (empieza con <code>sk-or-</code>): <b>se muestra una sola vez</b>.<br>
+          <a class="btn ghost" href="https://openrouter.ai/keys" target="_blank" rel="noopener" style="display:inline-block;text-decoration:none;margin-top:6px">Ir a Keys ↗</a></div></div>
+        <div style="${paso}"><span style="${circ}">3</span><div style="flex:1">Pegala acá:
+          <input type="text" id="or-clave-input" autocomplete="off" spellcheck="false" placeholder="sk-or-v1-…" style="width:100%;margin-top:6px;font-family:'Space Mono',monospace;font-size:12px"></div></div>
+        <div class="hint" style="font-size:11.5px">Queda guardada solo en este navegador: en otra compu o en otro navegador se pega otra vez. Los modelos gratuitos a veces tardan o están ocupados; si falla, probá de nuevo o con otro modelo.</div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <button class="btn ghost" data-orc="no">Cancelar</button>
+          <button class="btn primary" data-orc="si">Guardar la clave</button>
+        </div>
+      </div></div>`;
+    document.body.appendChild(f);
+    const input = f.querySelector('#or-clave-input');
+    const cerrar = valor => { f.remove(); listo(valor); };
+    const guardar = () => {
+      const t = input.value.trim();
+      if(!t){ input.focus(); toast('Pegá la clave en el paso 3'); return; }
+      if(!/^sk-or-/.test(t)) toast('Ojo: las claves de OpenRouter suelen empezar con «sk-or-». La guardo igual.');
+      localStorage.setItem('openrouter-key', t);
+      toast('Clave de OpenRouter guardada ✓');
+      cerrar(t);
+    };
+    f.addEventListener('mousedown', e => { if(e.target === f) cerrar(null); });
+    f.addEventListener('click', e => {
+      const b = e.target.closest('[data-orc]');
+      if(b) b.dataset.orc === 'si' ? guardar() : cerrar(null);
+    });
+    input.addEventListener('keydown', e => { if(e.key === 'Enter') guardar(); else if(e.key === 'Escape') cerrar(null); });
+    setTimeout(() => input.focus(), 30);
+  });
+}
+async function orKey(pedirDeNuevo, motivo){
+  const t = localStorage.getItem('openrouter-key');
+  if(t && !pedirDeNuevo) return t.trim();
+  return await orPedirClave(motivo);
 }
 
 const IA_SISTEMA = `Sos un asistente que diseña enemigos ("creeps") para un juego de rol táctico. Devolvé SOLO un objeto JSON, sin texto alrededor ni bloques de código, con exactamente este formato:
@@ -427,7 +470,7 @@ function creepDesdeIA(data){
 
 async function generarCreepIA(promptUsuario){
   if(!promptUsuario){ toast('Describí el creep antes de generar'); return; }
-  const key = orKey(false);
+  const key = await orKey(false);
   if(!key){ toast('Sin clave de OpenRouter no se puede generar'); return; }
   const modelo = $('#ia-modelo').value || OR_MODELS[0].id;
   localStorage.setItem('openrouter-modelo', modelo);
@@ -459,7 +502,7 @@ async function generarCreepIA(promptUsuario){
     });
     if(resp.status === 401){
       localStorage.removeItem('openrouter-key');
-      toast('La clave de OpenRouter no sirve o venció — tocá Generar de nuevo');
+      toast('La clave de OpenRouter no sirve o venció — tocá Generar de nuevo para pegar otra');
       return;
     }
     if(!resp.ok) throw new Error(`OpenRouter respondió ${resp.status}: ${await resp.text()}`);
@@ -574,7 +617,7 @@ function escaneoVentana(){
       <div class="eg-sec" style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 0 4px">🤖 Pedirle a la IA un equipo de creeps para este grupo</div>
       <textarea id="escaneo-notas" style="min-height:54px;width:100%" placeholder="Opcional: escenario, nivel, tono… ej. «minas abandonadas, nivel 3, que sea difícil pero ganable»"></textarea>
       <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
-        <span class="hint" style="flex:1">Usa la misma clave y modelo de «+ Creep con IA» (OpenRouter). La IA solo propone: vos decidís y armás los creeps.</span>
+        <span class="hint" style="flex:1">Usa la misma clave y modelo de «+ Creep con IA» (OpenRouter, gratis; si no la tenés, te dice cómo sacarla). La IA solo propone: vos decidís y armás los creeps.</span>
         <button class="btn primary" data-esc="ia">🤖 Proponer creeps</button>
       </div>
       <div id="escaneo-ia" style="white-space:pre-wrap;margin-top:10px;font-size:13px;line-height:1.5"></div>
@@ -627,8 +670,8 @@ async function abrirEscaneo(){
 async function escaneoPedirIA(){
   const ps = escaneoElegidos();
   if(!ps.length){ toast('Elegí al menos un personaje'); return; }
-  const key = orKey(false);
-  if(!key){ toast('Sin clave de OpenRouter no se puede (pegala en «+ Creep con IA»)'); return; }
+  const key = await orKey(false);
+  if(!key){ toast('Sin clave de OpenRouter no se puede pedir la propuesta'); return; }
   const f = escaneoVentana(), caja = f.querySelector('#escaneo-ia'), btn = f.querySelector('[data-esc="ia"]');
   const modelo = localStorage.getItem('openrouter-modelo') || OR_MODELS[0].id;
   btn.disabled = true; btn.textContent = 'Pensando…';
@@ -638,7 +681,7 @@ async function escaneoPedirIA(){
       method: 'POST', headers: {'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json'},
       body: JSON.stringify({model: modelo, messages: [{role: 'system', content: EscaneoGrupo.IA_SISTEMA}, {role: 'user', content: EscaneoGrupo.textoParaIA(ps, f.querySelector('#escaneo-notas').value.trim())}]}),
     });
-    if(resp.status === 401){ localStorage.removeItem('openrouter-key'); caja.textContent = 'La clave de OpenRouter no sirve o venció: volvé a pegarla en «+ Creep con IA».'; return; }
+    if(resp.status === 401){ localStorage.removeItem('openrouter-key'); caja.textContent = 'La clave de OpenRouter no sirve o venció: tocá «🤖 Proponer creeps» de nuevo para pegar otra.'; return; }
     if(!resp.ok) throw new Error(`OpenRouter respondió ${resp.status}: ${await resp.text()}`);
     const data = await resp.json();
     const texto = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;

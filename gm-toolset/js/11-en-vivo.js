@@ -398,7 +398,7 @@ function gmAlEntrar(){
   cargarItemsSubidosGM();   // ítems que subió el grupo (catálogo compartido, paso 5)
   // Los "Mis presets" de estados, guardados en la partida (comun/presets-gm.js, B-7b): antes se perdían al recargar.
   if(gmVivo.activo) PresetsGM.escuchar(l => { S.estadosPersonalizados = l; });
-  if(gmVivo.activo){ gmEscuchar(); gmMantenimientoEscuchar(); try{ mapasGMEscuchar(); }catch(err){ console.error('No se pudo escuchar la lista de mapas:', err); } combateEscuchar(); gbitEscuchar(); }
+  if(gmVivo.activo){ gmEscuchar(); gmMantenimientoEscuchar(); gmRondaEscuchar(); try{ mapasGMEscuchar(); }catch(err){ console.error('No se pudo escuchar la lista de mapas:', err); } combateEscuchar(); gbitEscuchar(); }
 }
 
 /* ---------- Mantenimiento del GM ----------
@@ -417,6 +417,33 @@ function gmMantenimientoEscuchar(){
     gmMantenimientoSenal = doc.exists ? Math.round(num(doc.data().numero)) : 0;
     gmMantenimientoRevisar();
   }, err => console.error('Error escuchando el mantenimiento:', err));
+}
+
+/* «⟳ Pasar de ronda» (2026-10-13, como en el mapa —js/04 mantBotonActualizar—, dueño: «con el sistema de turnos y rondas, en teoría
+   ese botón quedó obsoleto»): en combate con orden de iniciativa la ronda pasa sola con los turnos, así que el botón se esconde; en
+   narrativo, o en combate sin orden, sigue a mano. Escucha el modo y la iniciativa del mapa que ven los jugadores (mapa/activo). */
+const gmRonda = {modo: 'narrativo', orden: 0, cortes: []};
+function gmRondaBoton(){
+  const b = document.getElementById('btn-mant');
+  if(b) b.style.display = gmRonda.modo === 'combate' && gmRonda.orden > 0 ? 'none' : '';
+}
+function gmRondaEscuchar(){
+  fbDb.doc(fbRutaCampana('mapa/activo')).onSnapshot(doc => {
+    const id = (doc.exists && doc.data().mapaId) || '_principal';
+    const ruta = d => id === '_principal' ? `mapa/${d}` : `mapas/${id}/estado/${d}`;
+    gmRonda.cortes.forEach(cortar => cortar());
+    gmRonda.cortes = [
+      fbDb.doc(fbRutaCampana(ruta('modo'))).onSnapshot(d => {
+        gmRonda.modo = d.exists && d.data().modo === 'combate' ? 'combate' : 'narrativo';
+        gmRondaBoton();
+      }, err => console.error('Error escuchando el modo del mapa:', err)),
+      fbDb.doc(fbRutaCampana(ruta('iniciativa'))).onSnapshot(d => {
+        const o = d.exists ? d.data().orden : null;
+        gmRonda.orden = Array.isArray(o) ? o.length : 0;
+        gmRondaBoton();
+      }, err => console.error('Error escuchando la iniciativa del mapa:', err)),
+    ];
+  }, err => console.error('Error escuchando el mapa publicado:', err));
 }
 
 async function mantenimientoGlobal(){

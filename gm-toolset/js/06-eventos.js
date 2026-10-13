@@ -515,7 +515,7 @@ document.addEventListener('click', async e => {
   }
   if(b.id === 'btn-ia'){ $('#ia-prompt').value = ''; poblarSelectorModelos(); $('#scrim-ia').classList.add('open'); $('#ia-prompt').focus(); return; }
   if(b.id === 'ia-x'){ $('#scrim-ia').classList.remove('open'); return; }
-  if(b.id === 'ia-token'){ if(orKey(true)) toast('Clave de OpenRouter actualizada'); return; }
+  if(b.id === 'ia-token'){ orKey(true); return; }   // la ventana de la clave avisa al guardar
   if(b.id === 'ia-generar'){ generarCreepIA($('#ia-prompt').value.trim()); return; }
 });
 

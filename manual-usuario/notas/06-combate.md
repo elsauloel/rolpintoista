@@ -549,4 +549,7 @@ estado: borrador
 - **Armadura rota** es de **cada pieza**, no del personaje: si se saca la armadura, **sigue rota**. Cada punto le baja **1 la Defensa** a esa pieza, y **nunca supera la durabilidad total** de la pieza.
 - **Un escudo abollado** (por ejemplo, un disparo que *atraviesa escudos*) también pierde **1 de Defensa por cada abolladura**, sin pasar de la que da. Un orbe no.
 - Al quedar en **1 punto** se avisa que el arma, el escudo o la armadura **está a punto de romperse**. En **0 queda rota**: ocupa el slot pero **es como si no la tuvieras equipada** (sin efectos).
-- **No se puede reparar durante el combate.** Reparar: **herrero** (en las tiendas con herrero hay un botón **🔧 Reparación**; cobra **1 DDE por punto** salvo que la tienda diga otra cosa) y **habilidades de talento** con despojos (2 despojos por punto, todavía sin automatizar). Cada punto reparado devuelve 1 de Armadura rota de esa pieza. El Óleo reparador se quitó del catálogo hasta definirlo.
+- **No se puede reparar durante el combate.** Formas de reparar (cada punto reparado devuelve también 1 de armadura rota o abolladura de esa pieza):
+  - **Herrero** (en las tiendas con herrero, botón **🔧 Reparación**): **1 DDE por punto** salvo que la tienda diga otra cosa; una pieza **rota** cuesta el doble hasta quedar entera.
+  - **El talento «Reparar equipo»** (en 🛡 Equipo y mochila): **2 despojos por punto**, sin tirada; una pieza rota, el doble. Tope: **2 puntos por nivel del talento entre combate y combate**.
+  - **Óleo reparador** (consumible Común, 25 DDE, en la Talabartería): **3 puntos a una pieza dañada**, desde Equipo y mochila (🧴). **No arregla una pieza rota.**

@@ -1296,7 +1296,8 @@ const Combatiente = (() => {
     o = o || {};
     const a = c.arma || {}, arma = o.arma || {}, conX = o.X !== undefined && o.X !== null, X = nf(o.X);
     const sx = t => conX ? sustituirX(t, X) : t;
-    const mapEf = e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: 1, exitos: 1,
+    // La probabilidad del efecto (`caras`/`exitos`, 2026-10-13: el Mordisco infectado, 25 % = 4 en d4); sin eso, entra siempre.
+    const mapEf = e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: Math.max(1, Math.round(nf(e.caras)) || 1), exitos: Math.min(Math.max(1, Math.round(nf(e.caras)) || 1), Math.max(1, Math.round(nf(e.exitos)) || 1)),
       spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: nf(e.val)}] : e.mods, polaridad: e.stat ? (nf(e.val) >= 0 ? 'buff' : 'debuff') : undefined,
         ...(nf(e.stacks) > 0 ? {stacks: Math.round(nf(e.stacks))} : {})},   // (Sangrado de N: Tajear, 2026-10-10)
       cura: nf(e.cura), detalle: e.detalle || ''});

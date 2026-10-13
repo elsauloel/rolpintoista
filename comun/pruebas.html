@@ -786,6 +786,10 @@ prueba('Ataque con arreglos: dados extra de otro tamaño (+1d6, 2026-10-13) viaj
   const malo = Combatiente.ataqueConArreglos({nombre: 'X'}, {modo: 'arma', arma: {dadoExtra: 'mucho'}}, {arma: {}});
   igual([a.mods.dadoExtra, 'dadoExtra' in malo.mods], ['1d6', false]);
 });
+prueba('Ataque con arreglos: un efecto con probabilidad la conserva (Veneno ×4, 4 en d4); sin probabilidad, entra siempre', () => {
+  const a = Combatiente.ataqueConArreglos({nombre: 'Mordisco'}, {modo: 'arma', arma: {perfora: 1}, efectos: [{nombre: 'Veneno', stacks: 4, caras: 4, exitos: 1}, {nombre: 'Sangrado'}]}, {arma: {}});
+  igual([a.perfora, a.efectos.map(e => [e.nombre, e.caras, e.exitos, e.spec.stacks])], [1, [['Veneno', 4, 1, 4], ['Sangrado', 1, 1, undefined]]]);
+});
 prueba('Carga Elemental en un creep: Escarcha ×5 y Armadura rota ×2 entran con sus stacks, y reaplicadas se suman', () => {
   const sc = {estados: []};
   EstadosAplicar.aplicarACreep(sc, {nombre: 'Escarcha', stacks: 5});

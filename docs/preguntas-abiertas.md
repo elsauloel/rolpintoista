@@ -983,3 +983,11 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   personajes (antes no hacía nada: la rotura va a las piezas). Mientras se revisa, el anillo está **archivado** (`archivo: true` en
   `comun/catalogo.js`): no sale en las tiendas ni en el catálogo para comprar; quien ya lo tenga, lo conserva y le sigue funcionando. Falta decidir:
   ¿se baja (una sola vez por día, solo una pieza, Raro en vez de Común, más caro) o se saca?
+- ❓ **P197. Invi (Asalto): ¿qué es frente al Sigilo? — 2026-10-13, EN PAUSA (dueño: «la dejamos como está, como anunciar, hasta que la debata
+  con mis colegas»).** Original: «Invi [5] — Invi × 2 turnos. Se detecta con Percepción (DES). El rango para esta tirada depende de a qué velocidad
+  se mueva: a velocidad normal (1 No2 por casillero) el rango es una flor de 3; a velocidad lenta (2 No2 por casillero), una flor de 2» (el pool
+  decía «(ESP)»). Preguntas: (1) ¿un Sigilo mejorado (estado Invisible 2 turnos que no rompe el cono; solo lo descubre la Percepción de un rival
+  dentro de su flor: diámetro 7 caminando normal, diámetro 5 caminando lento) o invisibilidad total sin tirada?; (2) la Percepción, ¿contra su
+  Sigilo (Destreza) o contra su Especial?; (3) ¿se tira a cada paso dentro de la flor o una vez por turno?; (4) ¿la rompe una acción hostil (como
+  el Sigilo) o solo el tiempo / ser descubierto?; (5) ¿5 SP + el No2 de entrar en sigilo (1)? Propuesta de Claude: la primera opción de cada una.
+  Mientras tanto queda en el pool como «(Sin auditar)»: solo se anuncia.

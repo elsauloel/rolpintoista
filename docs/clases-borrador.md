@@ -133,7 +133,7 @@ cuesta 1 por defecto (`jobBudget`, 3 puntos + 3 por nivel).
    *(Auditada 2026-10-10 con el dueño: las «heridas» son Sangrado; números
    del original; Perfora 1 para que el Sangrado entre siempre (con la regla de la Perfora del mismo día: 1 punto del golpe pasa siempre la Defensa). De paso: un efecto de Critical Matters con el mismo nombre
    que uno de siempre lo reemplaza — antes se sumaban.)*
-4. **Invi** [5] — Invi × 2 turnos. Se detecta con Percepción (DES). El
+4. ⏸ **Invi** — **EN PAUSA (P197, 2026-10-13: el dueño lo debate con el grupo; queda como «anunciar»).** [5] — Invi × 2 turnos. Se detecta con Percepción (DES). El
    rango para esta tirada depende de a qué velocidad se mueva: a
    velocidad normal (1 No2 por casillero) el rango es una flor de 3; a
    velocidad lenta (2 No2 por casillero), una flor de 2.

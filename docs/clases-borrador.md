@@ -100,9 +100,10 @@ cuesta 1 por defecto (`jobBudget`, 3 puntos + 3 por nivel).
    *(Auditada 2026-10-13 con el dueño; original: «Remolino [3] — Ataque que daña a todos los objetivos adyacentes. Puede desplazarse una casilla;
    si lo hace, cuenta las áreas de efecto de ambas posiciones. Repetirlo de inmediato ignora el cooldown del arma.» Lo de repetirla barata no se
    conservó.)*
-8. **Parry** [2] — NO2: 1. Cooldown: 1. Flash. Reemplaza la EV por PG en
-   una tirada de evasión. El que tenga el arma más pesada tiene una
-   bonificación igual a la diferencia en el peso de las armas.
+8. ❌ **Parry** — **retirada del pool** (dueño, 2026-10-13: «este skill es obsoleto»). El Parry ya es de todos (en el duelo, con
+   arma o escudo, pagando su No2). Original: «Parry [2] — NO2: 1. Cooldown: 1. Flash. Reemplaza la EV por PG en una tirada de
+   evasión. El que tenga el arma más pesada tiene una bonificación igual a la diferencia en el peso de las armas.» Se descartó
+   también quedarse solo con el bono por diferencia de Peso como pasiva («Parry del maestro»).
 9. **Contraataque** [2] — Permite realizar un ataque de oportunidad
    después de esquivar un ataque.
 

@@ -455,7 +455,8 @@ const Duelo = (() => {
       ataque: hab ? {tipo: 'habilidad', armaId: '', armaNombre: hab.nombre, tipoDado: _num(hab.critTipo), rango: true}
         : cfg.ataque.tipo === 'habilidad-arma' ? {tipo: 'habilidad-arma', habNombre: txtCorto(cfg.ataque.habNombre, 60), armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado), rango: !!cfg.ataque.rango,
           sinParry: !!cfg.ataque.sinParry, mods: {pdg: _num(cfg.ataque.mods && cfg.ataque.mods.pdg), dados: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.dados))), fijo: _num(cfg.ataque.mods && cfg.ataque.mods.fijo), ignoraResistCrit: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.ignoraResistCrit))),
-            critBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critBono))), critpotBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critpotBono)))}, efectos: limpiarEfectos(cfg.ataque.efectos),
+            critBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critBono))), critpotBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critpotBono))),
+            ...(cfg.ataque.mods && /^\d{1,2}d\d{1,3}$/i.test(String(cfg.ataque.mods.dadoExtra || '')) ? {dadoExtra: String(cfg.ataque.mods.dadoExtra).toLowerCase()} : {})}, efectos: limpiarEfectos(cfg.ataque.efectos),
           ...(cfg.ataque.terminaTurno ? {terminaTurno: true} : {}), ...(cfg.ataque.soloCritico ? {soloCritico: true} : {}),   // Degollar: al resolverse, el mapa del GM le termina el turno
           // Proyectil perforante (2026-10-13): `perforante` = al terminar, el mapa de quien disparó sigue al que está detrás (js/42);
           // `sinEfectos` = ese segundo golpe, sin los efectos especiales (ni del arma, ni de la flecha, ni del crítico).
@@ -536,6 +537,7 @@ const Duelo = (() => {
     const m = (d.ataque && d.ataque.mods) || {}, t = [];
     if(_num(m.pdg)) t.push(`${_num(m.pdg) > 0 ? '+' : ''}${_fmt(m.pdg)} PdG`);
     if(_num(m.dados)) t.push(`+${_fmt(m.dados)} dado${_num(m.dados) === 1 ? '' : 's'} de daño`);
+    if(m.dadoExtra) t.push(`+${_esc(m.dadoExtra)} de daño`);
     if(_num(m.fijo)) t.push(`${_num(m.fijo) > 0 ? '+' : ''}${_fmt(m.fijo)} de daño fijo`);
     if(d.ataque && d.ataque.sinParry) t.push('no se puede parrear');
     if(d.ataque && d.ataque.porLaEspalda) t.push(`🗡 por la espalda${d.ataque.espalda ? ': ' + espaldaTxt(d.ataque.espalda) : ''}`);

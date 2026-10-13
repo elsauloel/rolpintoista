@@ -261,6 +261,7 @@ const AsistenteDueloHab = (() => {
       const fila = (k, t) => `<div class="fila"><span style="min-width:250px">${t}</span><input type="number" style="width:80px" data-arma="${k}" value="${esc(a[k] ?? 0)}"></div>`;
       let h = titulo('', 'Lo que la habilidad le suma a tu ataque', 'Se juega como un ataque normal con tu arma (PdG contra Evasión o Parry, crítico, daño y efectos del arma). Los No2 del ataque ya los cobra la habilidad. «Por X» se multiplica por la X que elegís al ejecutarla.');
       h += `${fila('pdg', '+ a la PdG (fijo)')}${fila('pdgPorX', '+ a la PdG por cada X')}${fila('dadosPorX', 'Dados de daño extra por cada X (del Tipo del arma)')}${fila('fijo', 'Daño fijo extra')}${fila('fijoPorX', 'Daño fijo extra por cada X')}
+        <div class="fila"><span style="min-width:250px">Dados de daño extra, de otro tamaño (ej. 1d6)</span><input type="text" style="width:80px" placeholder="1d6" data-arma-dados value="${esc(a.dadoExtra || '')}"></div>
         <div class="fila"><span style="min-width:250px">La X de su costo es…</span><select data-x><option value="nitros"${st.x === 'nitros' ? ' selected' : ''}>los No2 (Nitros)</option><option value="sp"${st.x === 'sp' ? ' selected' : ''}>los SP</option></select></div>
         <label class="op"><input type="checkbox" data-sinparry ${a.sinParry ? 'checked' : ''}> No se puede parrear (solo esquivar)</label>
         <label class="op"><input type="checkbox" data-terminaturno ${st.terminaTurno ? 'checked' : ''}> Al resolverse, termina tu turno y pasás al final del orden de turnos (Degollar)</label>
@@ -509,6 +510,7 @@ const AsistenteDueloHab = (() => {
         if(a.pdg) partes.push(`${a.pdg > 0 ? '+' : ''}${a.pdg} PdG`);
         if(a.pdgPorX) partes.push(`${a.pdgPorX > 0 ? '+' : ''}${a.pdgPorX} PdG por X`);
         if(a.dadosPorX) partes.push(`+${a.dadosPorX} dado(s) de daño por X`);
+        if(a.dadoExtra) partes.push(`+${a.dadoExtra} de daño`);
         if(a.fijo) partes.push(`${a.fijo > 0 ? '+' : ''}${a.fijo} de daño fijo`);
         if(a.fijoPorX) partes.push(`${a.fijoPorX > 0 ? '+' : ''}${a.fijoPorX} de daño fijo por X`);
         if(a.sinParry) partes.push('no se puede parrear');
@@ -587,6 +589,8 @@ const AsistenteDueloHab = (() => {
       q('[data-terminaturno]', e => { st.terminaTurno = e.target.checked; });
       q('[data-ignoraresistcrit-on]', e => { st.arma.ignoraResistCrit = e.target.checked ? 1 : 0; dibujar(); });
       f.querySelectorAll('[data-arma]').forEach(i => i.onchange = () => { st.arma[i.dataset.arma] = Number(i.value) || 0; });
+      // Dados extra de otro tamaño que los del arma (2026-10-13, Picada del Kobold Rabioso: +1d6): «NdM», o vacío.
+      f.querySelectorAll('[data-arma-dados]').forEach(i => i.onchange = () => { const v = String(i.value || '').trim().toLowerCase().replace(/\s+/g, ''); st.arma.dadoExtra = /^\d{1,2}d\d{1,3}$/.test(v) ? v : ''; if(v && !st.arma.dadoExtra) i.value = ''; });
       q('[data-tira]', e => { st.tira = e.target.value; dibujar(); });
       q('[data-tira-ninguna]', e => { st.tiraNinguna = e.target.checked; dibujar(); });
       f.querySelectorAll('[name=tiramodo]').forEach(x => x.onchange = () => { st.tiraModo = x.value; dibujar(); });

@@ -781,6 +781,11 @@ prueba('Carga Elemental (Mago, 2026-10-13): stacks según el daño que entra, la
     limpio.dano.porDano, Combatiente.cargable({}, base), Combatiente.cargable({}, {...base, tipoDano: 'fisico'}), Combatiente.cargable({deItem: 'x'}, base), typeof Confirmar.elegir],
     ['X', true, [0, 1, 1, 2, 2, 3], [1, 1, 1, 2], [1, 2], 'fuego', 1.5, 4, [['Parálisis', 10, 2]], {estado: 'Escarcha', cada: 5, mas1: true}, true, false, false, 'function']);
 });
+prueba('Ataque con arreglos: dados extra de otro tamaño (+1d6, 2026-10-13) viajan al duelo', () => {
+  const a = Combatiente.ataqueConArreglos({nombre: 'Picada'}, {modo: 'arma', arma: {dadoExtra: '1d6', fijo: 0}}, {arma: {}});
+  const malo = Combatiente.ataqueConArreglos({nombre: 'X'}, {modo: 'arma', arma: {dadoExtra: 'mucho'}}, {arma: {}});
+  igual([a.mods.dadoExtra, 'dadoExtra' in malo.mods], ['1d6', false]);
+});
 prueba('Carga Elemental en un creep: Escarcha ×5 y Armadura rota ×2 entran con sus stacks, y reaplicadas se suman', () => {
   const sc = {estados: []};
   EstadosAplicar.aplicarACreep(sc, {nombre: 'Escarcha', stacks: 5});

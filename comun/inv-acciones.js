@@ -52,6 +52,7 @@ const InvAcciones = (() => {
     let formula = I().danoTxt(inv, I().statValor(inv, 'dmg'));
     if(mods){
       if(num(mods.dados) > 0) formula += ` + ${Math.round(num(mods.dados))}d${num(inv.armaTipo) || 8}`;
+      if(mods.dadoExtra) formula += ` + ${mods.dadoExtra}`;
       if(num(mods.fijo)) formula += ` ${num(mods.fijo) > 0 ? '+' : '-'} ${fmt(Math.abs(num(mods.fijo)))}`;
     }
     const r = tirarDados(formula);

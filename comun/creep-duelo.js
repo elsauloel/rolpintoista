@@ -79,6 +79,7 @@ const CreepDuelo = (() => {
       const m = d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null;   // lo que le suma la habilidad: dados del Tipo del arma y daño fijo
       if(m){
         if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${num(sc.armaTipo) || 8}`;
+        if(m.dadoExtra) formula += ` + ${m.dadoExtra}`;
         if(num(m.fijo)) formula += ` ${num(m.fijo) > 0 ? '+' : '-'} ${fmt(Math.abs(num(m.fijo)))}`;
       }
       const cg = Combatiente.cargaDeDuelo(sc.estados, d.id);   // lo que suma un arma envenenada / un óleo en este golpe

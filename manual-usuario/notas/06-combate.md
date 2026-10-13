@@ -551,5 +551,5 @@ estado: borrador
 - Al quedar en **1 punto** se avisa que el arma, el escudo o la armadura **está a punto de romperse**. En **0 queda rota**: ocupa el slot pero **es como si no la tuvieras equipada** (sin efectos).
 - **No se puede reparar durante el combate.** Formas de reparar (cada punto reparado devuelve también 1 de armadura rota o abolladura de esa pieza):
   - **Herrero** (en las tiendas con herrero, botón **🔧 Reparación**): **1 DDE por punto** salvo que la tienda diga otra cosa; una pieza **rota** cuesta el doble hasta quedar entera.
-  - **El talento «Reparar equipo»** (en 🛡 Equipo y mochila): **2 despojos por punto**, sin tirada; una pieza rota, el doble. Tope: **2 puntos por nivel del talento entre combate y combate**.
+  - **El talento «Reparar equipo»** (en 🛡 Equipo y mochila): **2 despojos por punto**, sin tirada; una pieza rota, el doble. Tope: **3 puntos por nivel del talento por día** (se renueva cuando el GM pasa el día).
   - **Óleo reparador** (consumible Común, 25 DDE, en la Talabartería): **3 puntos a una pieza dañada**, desde Equipo y mochila (🧴). **No arregla una pieza rota.**

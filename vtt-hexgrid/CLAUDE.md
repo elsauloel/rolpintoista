@@ -1520,6 +1520,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   puede sumar +3 (la de cada lado de un duelo reciente de vos o un aliado dentro de tu Rango, `Duelo.tiradaSumable`; si no, su última tirada de la
   Mesa) con su costo (2 SP + 1 por cada Empower que ya lleva esa tirada; Flash: 4 + … en turno ajeno, `ConfirmarTurno.flash`); `empowerUsar` cobra
   el SP (`editarPersonajeMapa`) y suma con `Duelo.sumarATirada(…, 'Empower')` (el duelo se vuelve a resolver). El Ejecutar de la Botonera abre lo mismo.
+- **⏳ Pasar de día** (2026-10-12, `js/41-dia.js`): el GM aprieta «⏳ Pasar de día» (caja del Mantenimiento) → `campanas/<id>/mapa/dia` = {dia,
+  manual} sube 1; la cabecera muestra «☀ Día N» (`actualizarCabecera`, js/01). Cada pantalla, para lo que maneja (`bnManejo`), aplica
+  `FichaMantenimiento.descansar(S)` (vida, SP y No2; terminan los estados con turnos; `S.reparadoTalento` a 0; sus invocaciones) una sola vez
+  (`S.diaAplicado`); el GM termina los estados con turnos de sus creeps con token y repone la góndola (`tienda/stock.gondola`). «✎ Corregir el día»
+  (`manual: true`) solo cambia el número.
 - **🧚 Re-roll** (2026-10-12, Support; `js/39-reroll.js`, absorbió a Afortunado): botón fijo 🧚 (`Flotantes.reroll`, `resumen.reroll`; una copia
   vieja de Afortunado con `suerte` cuenta igual); `abrirReroll` lista las tiradas recientes tuyas o de un aliado en tu Rango que se puedan cambiar y
   `rerollUsar` cobra 2 SP (Flash, 4 en turno ajeno; sin No2) y llama a `Duelo.enyetarTirada(id, lado, 'mejor')`: queda la más alta (marca 🍀).

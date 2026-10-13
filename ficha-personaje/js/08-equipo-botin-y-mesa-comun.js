@@ -5,7 +5,7 @@
    inventario (si el slot está lleno abre Reemplazar/Comparar). El mapa lo
    pide con el mensaje 'abrir-equipo' (ver MODO_BOTONERA). */
 // Lo que se ve y la regla viven en comun/ficha-equipo.js (hoja de ruta A4, 2026-10-02): el mapa muestra la misma ventana.
-function renderEquipo(){ $('#equipo-body').innerHTML = FichaEquipo.html(S, {lupa: true}); }
+function renderEquipo(){ $('#equipo-body').innerHTML = FichaEquipo.html(S, {lupa: true, enCombate: equipoUi.modoCombate()}); }
 /* ---------- Ficha liviana dentro del mapa (2026-09-26, pedido del dueño) ----------
    El 📜 del token propio abre este menú: un resumen chico (Nivel, Despojos, DDE y Defensa, cada uno con su descripción al pasar el mouse; la vida, el SP y los No2 ya se
    ven en los circulitos del token) y un botón por módulo. Cada módulo se abre en su propia ventana encima del menú (las mismas ventanas de siempre); al cerrarla se vuelve

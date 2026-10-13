@@ -1527,6 +1527,23 @@ prueba('Atraviesa escudos (2026-10-12): la Armadura rota con `item` abolla ESE e
   igual([FichaCalculo.armRotaDe(S.inventario[0]), FichaCalculo.durActual(S.inventario[0]), FichaCalculo.armRotaDe(S.inventario[1]), FichaCalculo.durActual(S.inventario[1])],
     [1, durEsc - 1, 0, durPeto]);
 });
+prueba('Reparar sin herrero (2026-10-12): el talento (2 despojos por punto, tope 2 por nivel, una rota al doble) y el Óleo reparador (3 puntos, no a una rota)', () => {
+  const peto = {id: 'peto', nombre: 'Peto', tipoItem: 'armadura_rigida', equipado: true, peso: 2, mods: [{stat: 'def', val: 2}], dur: 3, armRota: 2};
+  const roto = {id: 'roto', nombre: 'Yelmo', tipoItem: 'cabeza', equipado: true, peso: 1, mods: [], dur: 0};
+  const oleo = {...CATALOGO_BASE.find(i => i.id === 'cat-oleo-reparador'), id: 'ol', unidades: 1};
+  const S = fichaBotonera({inventario: [peto, roto, oleo], sociales: [{id: 's', nombre: 'Reparar equipo', puntosInt: 1, nivelExtra: 0}]}), reg = [];
+  S.loot = {...(S.loot || {}), normal: 10};
+  const ui = {toast: t => reg.push(t), cambio: () => {}, modoCombate: () => false};
+  const tope = FichaEquipo.topeTalento(S);
+  FichaEquipo.repararTalento(S, 'roto', ui);   // rota: 4 despojos
+  FichaEquipo.repararTalento(S, 'peto', ui);   // 2 despojos
+  const tras2 = [FichaCalculo.durActual(S.inventario[1]), FichaCalculo.durActual(S.inventario[0]), FichaCalculo.armRotaDe(S.inventario[0]), S.loot.normal, FichaEquipo.restoTalento(S)];
+  const sinTope = FichaEquipo.repararTalento(S, 'peto', ui);
+  const oleoRoto = FichaEquipo.usarOleo(S, 'roto', ui);   // el yelmo quedó en 1/3 (ya no está roto: sí se puede)
+  const enCombate = FichaEquipo.usarOleo(S, 'peto', {...ui, modoCombate: () => true});
+  igual([tope, tras2, sinTope, oleoRoto, FichaCalculo.durActual(S.inventario[1]), S.inventario.some(i => i.id === 'ol'), enCombate],
+    [2, [1, 4, 1, 4, 0], false, true, 3, false, false]);
+});
 prueba('Un escudo abollado pierde Defensa como la armadura rota (dueño, 2026-10-12); un orbe no', () => {
   const esc = {id: 'esc2', nombre: 'Tapa', tipoItem: 'escudo_1m', equipado: true, peso: 1, mods: [{stat: 'def', val: 2}], armRota: 1};
   const S = fichaBotonera({inventario: [esc]});

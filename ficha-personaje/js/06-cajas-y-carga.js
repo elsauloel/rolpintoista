@@ -359,6 +359,7 @@ document.addEventListener('click', async e => {
     return;
   }
   if(b.dataset.amano){ FichaEquipo.alternarAMano(S, b.dataset.amano, equipoUi); return; }   // vaina o correa (2026-10-05)
+  if(FichaEquipo.repararClic(S, b, equipoUi)) return;   // 🔧 el talento de reparar y el óleo (2026-10-12)
   if(b.dataset.alcarcaj){ FichaEquipo.alCarcaj(S, b.dataset.alcarcaj, equipoUi); return; }   // 🏹 las flechas especiales (2026-10-09)
   if(b.dataset.delcarcaj){ FichaEquipo.delCarcaj(S, b.dataset.delcarcaj, equipoUi); return; }
   if(b.dataset.toggle){

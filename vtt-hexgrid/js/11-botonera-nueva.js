@@ -111,8 +111,8 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261012zq', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261011c', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261010g', '../comun/ficha-mantenimiento.js?v=20261010p', '../comun/ficha-calculo.js?v=20261012zq', '../comun/ficha-combate.js?v=20261012i', '../comun/skills-clase.js?v=20261012ze', '../comun/ficha-habilidades.js?v=20261011zj',
-  '../comun/catalogo.js?v=20261012zq', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261010za', '../comun/ficha-botonera.js?v=20261012r', '../comun/ficha-resumen.js?v=20261012zb', '../comun/inv-calculo.js?v=20261012s', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261012y', '../comun/inv-duelo.js?v=20261012s', '../comun/ficha-acciones.js?v=20261012zl', '../comun/inv-habilidades.js?v=20261012y', '../comun/inv-lupa.js?v=20261010zc',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261012zr', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261012zr', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261010g', '../comun/ficha-mantenimiento.js?v=20261010p', '../comun/ficha-calculo.js?v=20261012zq', '../comun/ficha-combate.js?v=20261012i', '../comun/skills-clase.js?v=20261012ze', '../comun/ficha-habilidades.js?v=20261011zj',
+  '../comun/catalogo.js?v=20261012zr', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261010za', '../comun/ficha-botonera.js?v=20261012r', '../comun/ficha-resumen.js?v=20261012zb', '../comun/inv-calculo.js?v=20261012s', '../comun/inv-botonera.js?v=20261007aw', '../comun/inv-acciones.js?v=20261012y', '../comun/inv-duelo.js?v=20261012s', '../comun/ficha-acciones.js?v=20261012zr', '../comun/inv-habilidades.js?v=20261012y', '../comun/inv-lupa.js?v=20261010zc',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261012zf', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261011zj'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -1476,7 +1476,7 @@ async function abrirEquipoMapa(fichaId){
 }
 function bnEquipoDibujar(){
   if(!bn || !bn.S) return;
-  bn.raiz.querySelector('#bn-equipo-cuerpo').innerHTML = FichaEquipo.html(bn.S, {lupa: true});
+  bn.raiz.querySelector('#bn-equipo-cuerpo').innerHTML = FichaEquipo.html(bn.S, {lupa: true, enCombate: modoMapa === 'combate'});
   if(bnComparando) bnCompararDibujar();
 }
 function bnEquipoCerrar(){
@@ -1530,6 +1530,7 @@ function bnEquipoClic(b){
   const soloLeer = () => { if(bnPuedeGuardar()) return false; toast('Ese personaje no lo manejás vos: solo se puede mirar'); return true; };
   if(b.dataset.toggle){ if(!soloLeer()) FichaEquipo.equipar(bn.S, b.dataset.toggle, bnEquipoUi()); return true; }
   if(b.dataset.amano){ if(!soloLeer()) FichaEquipo.alternarAMano(bn.S, b.dataset.amano, bnEquipoUi()); return true; }   // vaina o correa (2026-10-05)
+  if((b.dataset.reptal || b.dataset.repoleo) && enEquipo){ if(!soloLeer()) FichaEquipo.repararClic(bn.S, b, bnEquipoUi()); return true; }   // 🔧 el talento de reparar y el óleo (2026-10-12)
   if(b.dataset.alcarcaj){ if(!soloLeer()) FichaEquipo.alCarcaj(bn.S, b.dataset.alcarcaj, bnEquipoUi()); return true; }   // 🏹 las flechas especiales (2026-10-09)
   if(b.dataset.delcarcaj){ if(!soloLeer()) FichaEquipo.delCarcaj(bn.S, b.dataset.delcarcaj, bnEquipoUi()); return true; }
   if(b.dataset.reemplazar){ if(!soloLeer()){ const [eqId, nuevoId] = b.dataset.reemplazar.split(':'); FichaEquipo.reemplazar(bn.S, eqId, nuevoId, bnEquipoUi()); } return true; }

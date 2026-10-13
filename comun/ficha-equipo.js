@@ -433,10 +433,87 @@ const FichaEquipo = (() => {
       <div style="grid-column:-2 / -1;min-width:0">${Combatiente.resElementalesHtml(el => cEq.final['res' + el], el => lupa(`defensa:res${el}`))}</div>   <!-- debajo de la de crítico (la última columna) -->
     </div>
   </div>`;
-    return resumen + pesoEq + `<div class="equipo-cols">
+    return resumen + pesoEq + repararHtml(S, !!(o.enCombate)) + `<div class="equipo-cols">
     <div><h4 class="equipo-tit">Equipado</h4>${izq}${carcajHtml(S)}</div>
     <div><h4 class="equipo-tit">Mochila${typeof Intercambio !== 'undefined' ? ` <button type="button" class="mini" data-ix-abrir-dar="" title="Pasarle a otro personaje un ítem (también pociones y trofeos), DDE o despojos, o convertir un ítem en despojos (♻)">🤝 Pasar · ♻</button>` : ''}</h4>${der || '<div class="hint">No hay nada equipable en la mochila.</div>'}</div>
   </div>`;
+  }
+  /* 🔧 Reparar sin herrero (dueño, 2026-10-12; P99): el talento «Reparar equipo» y el Óleo reparador. Solo fuera de combate. Cada punto
+     reparado devuelve también 1 de armadura rota (o de abolladura) de esa pieza.
+     - Talento (cualquier talento con «repar» en el nombre): 2 despojos por punto, sin tirada; una pieza ROTA cuesta el doble hasta quedar entera
+       (como el herrero). Tope: 2 puntos por nivel del talento entre combate y combate (`S.reparadoTalento`; lo vacía el mapa al terminar el
+       combate, js/25 — hasta que exista «Pasar de día»).
+     - Óleo reparador (`oleoReparador: N` en el consumible): N puntos a UNA pieza dañada; una pieza ROTA no (esa, solo el herrero o el talento).
+       Se gasta una unidad. */
+  const DESPOJOS_POR_PUNTO = 2, TOPE_POR_NIVEL = 2, RECARGO_ROTO = 2;
+  const talentoReparar = S => (S.sociales || []).find(x => x && /repar/i.test(String(x.nombre || ''))) || null;
+  const topeTalento = S => { const t = talentoReparar(S); return t ? TOPE_POR_NIVEL * Math.max(1, FichaBotonera.nivelSocial(t)) : 0; };
+  const restoTalento = S => Math.max(0, topeTalento(S) - Math.max(0, num(S.reparadoTalento)));
+  const oleosDe = S => [...(S.cinturon || []), ...(S.inventario || [])].filter(x => x && num(x.oleoReparador) > 0 && num(x.unidades ?? 1) > 0);
+  const faltanDe = it => Math.max(0, FichaCalculo.durMax(it) - FichaCalculo.durActual(it));
+  const danadas = S => (S.inventario || []).filter(i => FichaCalculo.durableItem(i) && faltanDe(i) > 0);
+  const factorRoto = it => FichaCalculo.itemRoto(it) || it.reparoRoto ? RECARGO_ROTO : 1;
+  function repararPuntos(it, q){
+    q = Math.min(q, faltanDe(it));
+    if(q <= 0) return 0;
+    if(FichaCalculo.itemRoto(it)) it.reparoRoto = true;
+    it.dur = FichaCalculo.durActual(it) + q;
+    if(it.dur >= FichaCalculo.durMax(it)) delete it.reparoRoto;
+    it.armRota = Math.max(0, FichaCalculo.armRotaDe(it) - q);
+    return q;
+  }
+  function repararHtml(S, enCombate){
+    const tal = talentoReparar(S), oleos = oleosDe(S);
+    if(!tal && !oleos.length) return '';
+    const lista = danadas(S), desp = Math.floor(num(S.loot && S.loot.normal)), resto = restoTalento(S);
+    const oleo = oleos[0], nOleo = oleo ? num(oleo.oleoReparador) : 0, uds = oleos.reduce((a, x) => a + num(x.unidades ?? 1), 0);
+    const cab = [tal ? `talento <b>${esc(tal.nombre)}</b>: te quedan <b>${fmt(resto)} de ${fmt(topeTalento(S))}</b> puntos hasta el próximo combate · ${DESPOJOS_POR_PUNTO} despojos por punto (una pieza rota, el doble) · tenés ${fmt(desp)} despojos` : '',
+      oleo ? `🧴 <b>${esc(oleo.nombre)}</b> ×${fmt(uds)}: ${fmt(nOleo)} puntos a una pieza dañada (no a una rota)` : ''].filter(Boolean).join('<br>');
+    const filas = lista.map(it => {
+      const roto = FichaCalculo.itemRoto(it), f = factorRoto(it), costo = DESPOJOS_POR_PUNTO * f;
+      const bTal = tal ? `<button type="button" class="mini" data-reptal="${esc(it.id)}"${enCombate || resto < 1 || desp < costo ? ' disabled' : ''} title="Reparar 1 punto con tu talento">🔧 +1 · ${fmt(costo)} despojos</button>` : '';
+      const bOleo = oleo ? `<button type="button" class="mini" data-repoleo="${esc(it.id)}"${enCombate || roto ? ' disabled' : ''} title="${roto ? 'Una pieza rota no se arregla con óleo: herrero o talento' : `Usar ${esc(oleo.nombre)}: +${fmt(nOleo)} puntos`}">🧴 +${fmt(nOleo)}</button>` : '';
+      return `<div class="equipo-fila"><div class="equipo-info"><div class="cat-nombre">${esc(it.nombre)}${it.equipado ? ' <span class="hint">(equipado)</span>' : ''}</div>${durHtml(it)}</div>${bTal}${bOleo}</div>`;
+    }).join('');
+    return `<div class="equipo-slot equipo-reparar"><div class="equipo-slot-cab"><span>🔧 Reparar</span></div>
+      <div class="hint" style="margin:4px 0 6px">${cab}</div>
+      ${enCombate ? '<div class="hint" style="color:#FF9E7E">⚔ No se puede reparar durante el combate.</div>' : ''}
+      ${filas || '<div class="hint equipo-vacio">Todo tu equipo está entero.</div>'}</div>`;
+  }
+  function repararTalento(S, itemId, ui){
+    if(ui.modoCombate && ui.modoCombate()){ ui.toast('No se puede reparar durante el combate'); return false; }
+    const tal = talentoReparar(S), it = (S.inventario || []).find(x => x.id === itemId);
+    if(!tal || !it){ ui.toast('No tenés el talento de reparar o esa pieza ya no está'); return false; }
+    if(restoTalento(S) < 1){ ui.toast(`Ya reparaste los ${fmt(topeTalento(S))} puntos de tu talento: hasta el próximo combate, no más`); return false; }
+    const costo = DESPOJOS_POR_PUNTO * factorRoto(it), desp = Math.floor(num(S.loot && S.loot.normal));
+    if(desp < costo){ ui.toast(`No te alcanzan los despojos: 1 punto cuesta ${fmt(costo)} y tenés ${fmt(desp)}`); return false; }
+    if(!repararPuntos(it, 1)){ ui.toast(`${it.nombre} ya está entera`); return false; }
+    S.loot.normal = num(S.loot.normal) - costo;
+    S.reparadoTalento = Math.max(0, num(S.reparadoTalento)) + 1;
+    ui.toast(`🔧 Reparaste 1 punto de ${it.nombre} con ${tal.nombre} (−${fmt(costo)} despojos) · 🔧 ${fmt(FichaCalculo.durActual(it))}/${fmt(FichaCalculo.durMax(it))}`);
+    ui.cambio(['inventario', 'general', 'otros']);
+    return true;
+  }
+  function usarOleo(S, itemId, ui){
+    if(ui.modoCombate && ui.modoCombate()){ ui.toast('El óleo se usa fuera de combate'); return false; }
+    const it = (S.inventario || []).find(x => x.id === itemId), oleo = oleosDe(S)[0];
+    if(!it || !oleo){ ui.toast('No tenés óleo o esa pieza ya no está'); return false; }
+    if(FichaCalculo.itemRoto(it)){ ui.toast(`${it.nombre} está rota: el óleo no alcanza (herrero o talento de reparar)`); return false; }
+    const q = repararPuntos(it, num(oleo.oleoReparador));
+    if(!q){ ui.toast(`${it.nombre} ya está entera`); return false; }
+    oleo.unidades = num(oleo.unidades ?? 1) - 1;
+    if(oleo.unidades <= 0){
+      ['cinturon', 'inventario'].forEach(k => { S[k] = (S[k] || []).filter(x => x !== oleo); });
+    }
+    ui.toast(`🧴 ${oleo.nombre}: ${it.nombre} +${fmt(q)} · 🔧 ${fmt(FichaCalculo.durActual(it))}/${fmt(FichaCalculo.durMax(it))}`);
+    ui.cambio(['inventario', 'cinturon']);
+    return true;
+  }
+  // Los clics de la sección (la ficha y el mapa): true si lo atendió.
+  function repararClic(S, b, ui){
+    if(b.dataset.reptal){ repararTalento(S, b.dataset.reptal, ui); return true; }
+    if(b.dataset.repoleo){ usarOleo(S, b.dataset.repoleo, ui); return true; }
+    return false;
   }
   // El cuerpo de «el slot está lleno»: Reemplazar cada uno de los equipados del mismo tipo, o Comparar. null si no hay con qué.
   function slotLlenoHtml(S, it){
@@ -494,6 +571,6 @@ const FichaEquipo = (() => {
   `};
   }
 
-  return {SLOT_DEFS, TIER_COLOR, veCalidad, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, BASE_CINTURON, esFlecha, carcajDe, capCarcaj, carcajUsado, flechasDelCarcaj, alCarcaj, delCarcaj, gastarFlecha, flechaTxt, carcajHtml, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, alCinturon, textoAlCinturon, aManoCap, aManoEntra, alternarAMano, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
+  return {talentoReparar, topeTalento, restoTalento, repararHtml, repararTalento, usarOleo, repararClic, SLOT_DEFS, TIER_COLOR, veCalidad, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, BASE_CINTURON, esFlecha, carcajDe, capCarcaj, carcajUsado, flechasDelCarcaj, alCarcaj, delCarcaj, gastarFlecha, flechaTxt, carcajHtml, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, alCinturon, textoAlCinturon, aManoCap, aManoEntra, alternarAMano, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
     modTags, thumb, statTxt, html, slotLlenoHtml, compararHtml};
 })();

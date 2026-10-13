@@ -258,6 +258,7 @@ const FichaAcciones = (() => {
     let key = 'inventario';
     if(!it){ it = S.cinturon.find(x=>x.id===id); key = 'cinturon'; }
     if(it && it.flecha){ ui.toast(`${it.nombre}: es una flecha especial; va en el carcaj y se elige al disparar con un arco`); return false; }
+    if(it && num(it.oleoReparador) > 0){ ui.toast(`${it.nombre}: se usa desde 🛡 Equipo y mochila, con el 🧴 de la pieza que querés reparar (fuera de combate)`); return false; }   // 2026-10-12
     if(it && num(it.unidades) > 0){
       const sac = sacado || costoDeSacar(S, key, ui);   // Saque rápido / Bolsillo exterior: se calcula una vez (si pide «hacerlo igual», no se vuelve a tirar)
       const costoNitros = sac.costo;

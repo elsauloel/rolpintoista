@@ -38,7 +38,7 @@ const GeneradorTiendas = (() => {
   const LUZ_COMUN = /antorcha|bengala|cohete|farol|l[aá]mpara de minero|vela de|p[oó]lvora|soga|cuerda|garfio|humo|ganz[uú]a|yesca/i;
   const gastable = it => !!it && it.tipoItem === 'consumibles' && !it.legacy && !it.trofeo && publicable(it) && TIERS.indexOf(it.tier) <= 2;
   // En qué góndola va un gastable: trampas y luces de todos los días, la Talabartería; pociones, pergaminos y lo mágico, el Bazar.
-  const gondolaDe = it => it.trampaDatos || it.flecha || LUZ_COMUN.test(String(it.nombre || '')) ? 'talabarteria' : 'bazar';   // 🏹 las flechas especiales, en la Talabartería (2026-10-09)
+  const gondolaDe = it => it.trampaDatos || it.flecha || it.oleoReparador || LUZ_COMUN.test(String(it.nombre || '')) ? 'talabarteria' : 'bazar';   // 🧴 el Óleo reparador también (2026-10-12)   // 🏹 las flechas especiales, en la Talabartería (2026-10-09)
 
   // Las partes (en qué parte de la receta cae cada ítem).
   const PARTE_LABEL = {arma: 'Armas', distancia: 'Armas a distancia', especial: 'Varitas y báculos', torso: 'Torso', escudo: 'Escudos', orbe: 'Orbes',

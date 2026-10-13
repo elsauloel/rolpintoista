@@ -808,13 +808,15 @@ function lentoEn(col, fila){
 // `levita` (Levitar, 2026-10-06): los primeros casilleros de la ruta (los que le quedan levitando en este turno) no tocan el piso: el terreno
 // lento no los frena.
 // `ext` (Extenuado, Maldición extenuante, 2026-10-12): además, 1 No2 más por stack cada 2 casillas que se pagan (la 2.ª, la 4.ª…).
-function costoPasos(ruta, porCasillero, gratis, recargo, levita, ext){
+// `sprint` (Sprint, 2026-10-13): los primeros casilleros pagados (después de los gratis) ya están pagos: cuestan solo el recargo (Rengo, terreno lento).
+function costoPasos(ruta, porCasillero, gratis, recargo, levita, ext, sprint){
   const acc = [];
-  let s = 0, pagados = 0;
+  let s = 0, pagados = 0, sp = Math.max(0, num(sprint));
   for(let i = 1; i < (ruta || []).length; i++){
     if(i > num(gratis)){
       const lento = porCasillero > 0 && i > num(levita) ? lentoEn(ruta[i - 1].col, ruta[i - 1].fila) : 0;
-      s += porCasillero > 0 ? Math.max(porCasillero, lento) : 0;
+      const paso = porCasillero > 0 ? Math.max(porCasillero, lento) : 0;
+      s += sp > 0 && porCasillero > 0 ? (sp--, Math.max(0, paso - 1)) : paso;
       if(porCasillero > 0 && ++pagados % 2 === 0) s += Math.max(0, num(ext));
     }
     if(i === 1) s += num(recargo);
@@ -822,7 +824,7 @@ function costoPasos(ruta, porCasillero, gratis, recargo, levita, ext){
   }
   return acc;
 }
-const costoRuta = (ruta, porCasillero, pasos, gratis, recargo, levita, ext) => { const a = costoPasos((ruta || []).slice(0, pasos + 1), porCasillero, gratis, recargo, levita, ext); return a.length ? a[a.length - 1] : 0; };
+const costoRuta = (ruta, porCasillero, pasos, gratis, recargo, levita, ext, sprint) => { const a = costoPasos((ruta || []).slice(0, pasos + 1), porCasillero, gratis, recargo, levita, ext, sprint); return a.length ? a[a.length - 1] : 0; };
 
 /* Quién ya se movió en este turno (2026-10-04, los pies): Lento cobra doble el primer casillero del turno y Pasos de baile suma Evasión si ya se
    movió. Como los Pasos gratis, lo anota esta pantalla (y el navegador, por si se recarga). El duelo lo pregunta con window.mapaSeMovio. */
@@ -875,6 +877,19 @@ function pasosGratisUsar(id, n){
   try{ const g = {}; pasosGratisUsados.forEach((v, kk) => { if(kk.endsWith('@' + Math.round(num(mantenimientoNumero)))) g[kk] = v; }); localStorage.setItem('pasos-gratis', JSON.stringify(g)); }catch(e){}
 }
 const idDeToken = t => { for(const [id, x] of tokens) if(x === t) return id; return ''; };
+// Sprint (2026-10-13): los casilleros pagos que se usaron se descuentan del estado del personaje (y el estado se va al llegar a 0).
+async function sprintUsar(t, n){
+  if(!(n > 0) || !t || t.tipo !== 'pj' || String(t.fichaId).includes(SEP_INVOCACION) || typeof editarPersonajeMapa !== 'function') return;
+  try{
+    await editarPersonajeMapa(t.fichaId, S => {
+      const e = (S.efectos || []).find(x => x && x.activo !== false && num(x.sprint) > 0);
+      if(!e) return false;
+      e.sprint = Math.max(0, num(e.sprint) - n);
+      if(e.sprint <= 0) S.efectos = S.efectos.filter(x => x !== e);
+      return ['efectos'];
+    });
+  }catch(err){ console.error('No se pudo descontar el Sprint:', err); }
+}
 
 function costoMoverDe(t){
   if(modoMapa !== 'combate') return null;  // en modo narrativo se mueve sin contar No2
@@ -884,7 +899,8 @@ function costoMoverDe(t){
   const f = fichasPub.get(t.fichaId);
   const r = f && f.resumen;
   if(!r || r.costoMover === undefined) return null;
-  return {porCasillero: num(r.costoMover), disponibles: num(r.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, num(r.costoMover)), levita: levitarRestante(t), ext: num(r.extenuado), tormenta: num(r.tormenta)};
+  const sprint = (r.estados || []).reduce((m, e) => Math.max(m, num(e && e.sprint)), 0);   // Sprint (2026-10-13): los casilleros pagos que le quedan
+  return {porCasillero: num(r.costoMover), disponibles: num(r.nitros), gratis: pasosGratisRestantes(idDeToken(t)), recargo: lentoRecargo(t, num(r.costoMover)), levita: levitarRestante(t), ext: num(r.extenuado), tormenta: num(r.tormenta), sprint};
 }
 /* Stats de los pies (2026-10-06) de cualquier token: un personaje o una invocación, de lo que publica la ficha de su dueño; un creep, de sus datos. */
 function statPiesDe(t, st){

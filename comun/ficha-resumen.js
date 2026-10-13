@@ -167,6 +167,7 @@ const FichaResumen = (() => {
           ...(e.derivado ? {derivado: true} : {}), ...(e.confusion ? {confusion: true} : {}), ...(e.anillo ? {anillo: true} : {}), ...(e.impulso ? {impulso: e.impulso, impulsoVal: num(e.impulsoVal)} : {}),   // la Confusión: el mapa la tira (js/20)
           ...(e.espinas ? {espinas: true} : {}), ...(e.espejo ? {espejo: true} : {}), ...(e.ceguera ? {ceguera: true} : {}), ...(e.desarmado ? {desarmado: true} : {}),   // el mapa devuelve el daño aunque el estado tenga un nombre propio («Espinas (poción)»)
           ...(e.lento ? {lento: true} : {}),   // Lento: el primer casillero del turno cuesta el doble (el mapa, js/04)
+          ...(num(e.sprint) > 0 ? {sprint: num(e.sprint)} : {}),   // Sprint (Asalto, 2026-10-13): los casilleros pagos que le quedan
           polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
           // Para el globito del mapa al pasar el mouse por el estado.
           detalle: String(e.detalle || '').slice(0, 300),

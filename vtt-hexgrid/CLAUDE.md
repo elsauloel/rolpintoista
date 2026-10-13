@@ -1550,3 +1550,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
 - **🌀 Remolino** (2026-10-13, Warrior; `js/43-remolino.js`): una onda con `giro` (`Combatiente.habEjecucion` → `hab.giro`). En `dueloElegirAreaMapa`
   (js/13), antes de lanzar, `ondaConGiro` pide una casilla al lado (o la propia: sin moverse), mueve el token gratis (sin No2 ni oportunidad) y lanza
   con `otro` = la casilla de salida: los objetivos son los de al lado de las dos posiciones. Si la casilla no sirve o se cancela, gira sin moverse.
+- **🏃 Sprint** (2026-10-13, Asalto): el estado Sprint (`sprint` = casilleros pagos que quedan, publicado en `resumen.estados`) entra en
+  `costoMoverDe` de un personaje (`sprint`) y en `costoPasos(…, sprint)` (js/04): los primeros casilleros pagados, después de los gratis, cuestan solo
+  el recargo (Rengo, terreno lento). Al confirmar el movimiento (js/08), `sprintUsar(t, n)` los descuenta del estado de la ficha (con
+  `editarPersonajeMapa`; en 0, el estado se va). El Ctrl+Z no los devuelve. Solo personajes.

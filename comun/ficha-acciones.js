@@ -581,6 +581,9 @@ const FichaAcciones = (() => {
     const sil = Combatiente.preguntaSilencio(S.efectos, it);
     if(sil && !(await (ui.confirmar || (txt => Confirmar.preguntar(txt, {titulo: 'Silencio', icono: '🤐', si: 'Usarla igual'})))(sil))) return;
     if(Combatiente.tipoEjecucion(FichaBotonera.dueloDe(it)) === 'flash'){ ui.flashFuera(it); return; }   // ⚡ su propia regla de costo (P136)
+    // Una vez por turno (2026-10-13, Sprint): avisa y deja seguir (lo decide la mesa). El conteo vive en S.ataquesArma, que vacía el turno.
+    if(it.unaVezPorTurno && !forzar && num((S.ataquesArma || {})['hab:' + it.id]) > 0
+      && !(await (ui.confirmar || (txt => Confirmar.preguntar(txt, {titulo: it.nombre})))(`${it.nombre} se usa una vez por turno, y ya la usaste en este. ¿Usarla igual?`))) return;
     // Costo en vida: hace falta que sobre vida después de pagarlo.
     if(num(it.hpCosto) > 0 && num(S.hp) <= num(it.hpCosto)){
       ui.toast(`No te alcanza la vida — ${it.nombre} cuesta ${fmt(num(it.hpCosto))} HP y tenés ${fmt(num(S.hp))}`);
@@ -611,6 +614,7 @@ const FichaAcciones = (() => {
     S.nitros = num(S.nitros) - (forzar && costoNitros > num(S.nitros) ? gastoNitrosForzado(S, costoNitros, `usó ${it.nombre}`) : costoNitros);
     tormentaPj(S, costoNitros, `usar ${it.nombre}`, ui);
     S.spGastado = num(S.spGastado) + costoSp;
+    if(it.unaVezPorTurno) S.ataquesArma = {...(S.ataquesArma || {}), ['hab:' + it.id]: num((S.ataquesArma || {})['hab:' + it.id]) + 1};
     const costoHp = num(it.hpCosto);
     if(costoHp > 0) ui.fijarHp(num(S.hp) - costoHp);
     const curaHp = num(it.curaHp);

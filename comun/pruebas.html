@@ -756,6 +756,22 @@ prueba('Proyectil perforante (Shooter, 2026-10-13): 2 SP + el disparo, solo a di
   igual([hab.costo, hab.nitrosCosto, hab.soloRango, a.perforante, a.mods.pdg, a.mods.fijo, !!a.soloCritico, /Sin auditar/.test(hab.detalle), !!hab.original],
     ['2', 'ATAQUE', true, true, 0, 0, false, false, true]);
 });
+prueba('Sprint (Asalto, 2026-10-13): 1 SP y 2 No2, una vez por turno, deja el estado Sprint (3 casilleros pagos) y el resumen lo publica', async () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'asalto').habilidades.find(h => h.id === 'asalto-sprint');
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
+  S.nitros = 10; S.spGastado = 0; S.efectos = [];
+  const pre = estadosPresetFicha().find(p => p.nombre === 'Sprint');
+  const est = FichaAcciones.estadoDeSpec({nombre: 'Sprint', turnos: 1}, estadosPresetFicha());
+  S.efectos.push({...est, activo: true});
+  const pub = FichaResumen.resumen(S, {}).estados.find(e => e.nombre === 'Sprint');
+  const preguntas = [];
+  const ui = {toast: () => {}, confirmar: async t => { preguntas.push(t); return false; }, fijarHp: () => {}, efecto: () => null, colocarTrampa: () => {}, avisarZona: () => {}, cambio: () => {}, terminar: () => {}, avisarSinNitros: () => {}, flashFuera: () => {}};
+  S.habilidades = [{...structuredClone(hab), id: 'hs'}];
+  await FichaAcciones.ejecutarHabilidad(S, 'hs', undefined, false, ui);   // primera: cobra
+  await FichaAcciones.ejecutarHabilidad(S, 'hs', undefined, false, ui);   // segunda: pregunta y (no) sigue
+  igual([hab.costo, hab.nitrosCosto, hab.unaVezPorTurno, pre.sprint, est.sprint, pub && pub.sprint, S.nitros, S.spGastado, preguntas.length],
+    ['1', 2, true, 3, 3, 3, 8, 1, 1]);
+});
 prueba('Remolino (Warrior, 2026-10-13): onda de diámetro 3 con el daño del arma, el giro (moverse 1) viaja al mapa, sin dodge roll', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'warrior').habilidades.find(h => h.id === 'warrior-remolino');
   const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0, armaDano: '1d8+2'});

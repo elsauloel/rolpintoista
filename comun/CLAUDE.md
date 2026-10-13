@@ -1529,3 +1529,6 @@ versión parecida en más de una, es candidato a juntar.
   hp)` la valida (de 1 a `limiteCostoX(S, 'hp', it)` = el Especial; tiene que sobrar vida), la cobra y pasa la X a la Ejecución en una copia
   (`{...it, _xHp}` → `xDeHab`). `Combatiente.habEjecucion` reemplaza la «X» de la fórmula de daño (`Xd4`). Solo personajes. **Ojo**: el paso Costo
   de la Ejecución ✨ y el editor guardan el HP como número: editar la skill ahí le borra la «X».
+- **Habilidades «una vez por turno»** (2026-10-13, Sprint): `h.unaVezPorTurno` → `FichaAcciones.ejecutarHabilidad` cuenta los usos en
+  `S.ataquesArma['hab:<id>']` (lo vacía el turno) y, si ya la usó, pregunta «¿Usarla igual?» (avisa y deja seguir). Preset nuevo **Sprint**
+  (`sprint: 3`, `alEmpezarTurno`), publicado por `FichaResumen` (`sprint`).

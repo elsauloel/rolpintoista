@@ -152,7 +152,10 @@ cuesta 1 por defecto (`jobBudget`, 3 puntos + 3 por nivel).
    números vienen del sistema anterior y se dejaron, abiertos a revisarse;
    regla nueva del orden de turnos: quien ya jugó la ronda no repite aunque
    algo lo mueva más abajo.)*
-8. **Sprint** [1] — 2 No2: avanza 3 casillas.
+8. ✅ **Sprint** — **SP:** 1. **No2:** 2. Los **próximos 3 casilleros** que camines en este turno **ya están pagos** (arrastrás el token como
+   siempre, por donde quieras). Solo pagás lo que sumen **Rengo o el terreno lento**, y alejarte de un rival **le da su ataque de oportunidad**.
+   **Una vez por turno** (si la usás otra vez, avisa y deja seguir). ⚙ Automatizado: el estado Sprint y el mapa descuenta los casilleros.
+   *(Auditada 2026-10-13 con el dueño; original: «Sprint [1] — 2 No2: avanza 3 casillas.»)*
 9. ✅ **Tronco de huída** — **SP:** 2 (⚡ Flash; 2 también en turno ajeno, decisión del dueño, en duda para el grupo: P193). **No2:** 0.
    Al defenderte con Evasión (duelo o área), +2 a esa tirada; si ganás, dodge
    roll: hasta 2 casilleros pagando sus No2, sin ataque de oportunidad, aunque

@@ -23,7 +23,7 @@ function mostrarConfirmacionRuta(){
     : `Mover ${p.pasos} casillero${p.pasos === 1 ? '' : 's'} · −${fmt(costo)} No2 (te quedan ${fmt(p.disponibles - costo)})` +
       (p.porCasillero !== 1 ? ` · ${fmt(p.porCasillero)} por casillero` : '') + (costo > p.pasos * p.porCasillero + Math.floor(p.pasos / 2) * num(p.ext) ? ' · salir de la arena cuesta más' : '') +
       (num(p.ext) > 0 ? ` · Extenuado: +${fmt(num(p.ext))} cada 2 casilleros` : '') +
-      (p.gratis > 0 ? ` · ${p.gratis} gratis` : '') + (p.lento ? ' · Lento: el primero cuesta el doble' : '') +
+      (p.gratis > 0 ? ` · ${p.gratis} gratis` : '') + (p.sprint > 0 ? ` · ${p.sprint} con Sprint` : '') + (p.lento ? ' · Lento: el primero cuesta el doble' : '') +
       ' · clic afuera para confirmar';
   $('#ruta-confirmar').classList.toggle('excede', exceso > 0);
   $('#ruta-confirmar').hidden = false;
@@ -870,6 +870,7 @@ async function confirmarRuta(){
     if(p.dodge && quedan < 0) Combatiente.avisarDeudaNo2({nombre: nombreDe(t), accion: 'el dodge roll', costo, quedan});
     if(cm && num(cm.tormenta) > 0) tormentaAlMoverse(t, p.pasos, num(cm.tormenta));   // ⛈ Atormentado: 1 de vida por stack cada 2 casillas
     pasosGratisUsar(p.id, num(p.gratis));   // los primeros casilleros de este turno ya se usaron
+    if(num(p.sprint) > 0) sprintUsar(t, num(p.sprint));   // Sprint: los casilleros pagos que se usaron
     levitarUsar(p.id, num(p.levita));   // los casilleros levitados de este turno ya se usaron (2026-10-06)
     const primerMov = !seMovioEsteTurno(p.id);
     marcarMovido(p.id);   // ya se movió en este turno (Lento, Pasos de baile)

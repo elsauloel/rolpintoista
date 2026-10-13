@@ -10,22 +10,6 @@
 
 ## Pendientes
 
-> **Tanda del 2026-10-13 (dueño: «hasta que te diga que abrí los mapas, anotarlos como pendiente de testeo y no nos salteamos esa instancia»):**
-> todo lo que se hizo mientras el dueño tenía los mapas cerrados va acá y se prueba en el mapa apenas avise que los abrió.
-
-- [ ] **🏹 Proyectil perforante** (Shooter, 2026-10-13): un personaje con un arco y la skill, un creep de blanco y otro token detrás en la misma
-  línea (probar también con un aliado detrás, con un Sólido en el medio y con nadie). Ver: el segundo duelo se abre solo con la misma tirada de PdG
-  (solo pide la Evasión del de atrás), el daño se tira de nuevo y no trae efectos (con una flecha especial y con un arma con efectos), y la Mesa
-  cuenta a quién atravesó. Que siga también si el primero la esquiva.
-- [ ] **🩸 Balas de sangre** (Debuffer, 2026-10-13): un personaje con la skill (Especial 4 o más) contra un creep. Ver: Ejecutar abre el cartel
-  del costo con «Vida (HP) a gastar» (de 1 a tu Especial; avisa si te pasás o si no te sobra vida), cobra 1 SP, 2 No2 y la vida, y el duelo tira
-  PdG contra la Evasión y X d4 que ignora la Defensa (le resta la Defensa especial). En la ficha suelta y en la Botonera del mapa.
-- [ ] **🌀 Remolino** (Warrior, 2026-10-13): un personaje con arma cuerpo a cuerpo y la skill, dos creeps (uno al lado de la casilla de salida y
-  otro al lado de la de llegada). Ver: pide la casilla del giro, mueve el token gratis, la onda alcanza a los dos (una sola tirada de PdG) y quien
-  gana la Evasión no hace dodge roll. Clic en la propia casilla = sin moverse.
-- [ ] **⟳ Pasar de ronda en GM Tools** (2026-10-13): se probó con datos (el botón se escondió al poner el mapa de prueba en combate, con orden);
-  falta verlo con el mapa abierto y ▶ Siguiente.
-
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no
@@ -44,6 +28,20 @@
   pudo ver la animación 3D (la ventana de Chrome estaba de fondo). Mirarla en una sesión real.
 
 ## Probado
+
+- [x] **🏹 Proyectil perforante** (2026-10-13, «Claude · pruebas», el GM con el control de juan, Arco corto): juan → Escarabajo (copia) con el
+  Coloso detrás en la misma línea. PdG 9 contra Evasión 1 → pegó; al terminar se abrió solo el segundo duelo contra el Coloso con la misma tirada
+  (solo pidió su Evasión): crítico ×3, 18 de daño, sin efectos. **Arreglo encontrado**: con dos pantallas del GM abiertas se abrían dos duelos
+  iguales; ahora una marca en la Crónica (`perf-<duelo>`) deja seguir a una sola (verificado: de dos intentos, uno solo pasa).
+- [x] **🩸 Balas de sangre** (2026-10-13, juan con Especial 14): el cartel del costo trae «Vida (HP) a gastar» y el tope «de 1 a 14»; con 20
+  avisó y no ejecutó; con 4 cobró 1 SP, 2 No2 y 4 de vida (30 → 26), duelo PdG 3 contra Evasión 1, daño 4d4 = 8 (23 → 15).
+- [x] **🌀 Remolino** (2026-10-13, juan con el Caronero, Escarabajo al lado de la salida y Coloso al lado de la llegada): pidió la casilla del giro,
+  juan se movió gratis y el área tomó a los dos; un solo PdG (4) contra la Evasión de cada uno, daño 1d6+3 menos la Defensa (al Coloso, 9 − 16 = 0),
+  sin dodge roll. **Arreglo encontrado**: el cartel de instrucciones de «elegí una casilla» se escondía en el redibujo (afectaba también al centro
+  de un área y al teleport); corregido (`actualizarAvisoColocacion`, js/09). Visto también: con dos pantallas del GM, la cascada del área abre dos
+  sub-duelos iguales (riesgo ya anotado de los hechizos de área).
+- [x] **⟳ Pasar de ronda en GM Tools** (2026-10-13): con el mapa abierto, al pasarlo a combate (con la lista de turnos armada) el botón se escondió
+  en GM Tools, y volvió al pasar a narrativo.
 
 - [x] **🧱 Los rivales cortan el paso** (2026-10-12, «Claude · pruebas», el GM, modo combate): la Bruja del pantano arrastrada en línea recta
   contra Clementino (rival) y un casillero sólido: la línea los rodea por arriba mientras se arrastra (captura enviada al dueño). El Escarabajo

@@ -8,7 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="ficha.css?v=20261009g">
+<link rel="stylesheet" href="../comun/dock-izq.css?v=20261012zy">
+<link rel="stylesheet" href="ficha.css?v=20261012zy">
 <style>
 .dock-btn:disabled{opacity:.4;cursor:not-allowed}
 </style>
@@ -32,6 +33,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <body>
 <!-- Accesos rápidos pegados al borde izquierdo: la Botonera y el Mapa. Se abren al pasar el mouse. -->
 <aside class="dock-izq" id="dock-izq" aria-label="Accesos rápidos">
+  <a class="dock-btn" id="acceso-mapa" href="../vtt-hexgrid/mapa.html" target="_blank" rel="noopener" title="Abrir el mapa de la partida en una pestaña nueva"><span class="dock-ico">🗺</span><span class="dock-txt">Mapa</span></a>
   <button type="button" class="dock-btn" id="btn-botonera" title="Botonera: ataques, habilidades y estados"><span class="dock-ico">⚡</span><span class="dock-txt">Botonera</span></button>
   <button type="button" class="dock-btn" id="btn-equipo" title="Equipo: lo que llevás puesto y la mochila, para cambiar de un lado a otro"><span class="dock-ico">🛡</span><span class="dock-txt">Equipo</span></button>
   <button type="button" class="dock-btn" id="btn-botin-loot" disabled title="Despojos: se habilita cuando el GM publica el botín de un combate"><span class="dock-ico">🎁</span><span class="dock-txt">Despojos <b id="botin-loot-n"></b></span></button>
@@ -92,7 +94,6 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
       </section>
     </div>
   </div>
-  <a class="dock-btn" id="acceso-mapa" href="../vtt-hexgrid/mapa.html" target="_blank" rel="noopener" title="Abrir el mapa de la partida en una pestaña nueva"><span class="dock-ico">🗺</span><span class="dock-txt">Mapa</span></a>
   <button type="button" class="dock-btn" id="acceso-respaldo" title="Bajar un respaldo de la partida (personajes, tokens, mapa y tiradas)"><span class="dock-ico">💾</span><span class="dock-txt">Respaldo</span></button>
 </aside>
 <div class="wrap">
@@ -821,11 +822,11 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/ficha-habilidades.js?v=20261011zj"></script>
 <script src="../comun/ficha-guardado.js?v=20261007am"></script>
 <script src="../comun/ficha-sesion.js?v=20261010za"></script>
-<script src="../comun/ficha-botonera.js?v=20261012r"></script>
+<script src="../comun/ficha-botonera.js?v=20261012zy"></script>
 <script src="../comun/ficha-resumen.js?v=20261012zb"></script>
 <script src="../comun/inv-calculo.js?v=20261012s"></script>
 <script src="../comun/ficha-mantenimiento.js?v=20261012zs"></script>
-<script src="../comun/ficha-equipo.js?v=20261012zs"></script>
+<script src="../comun/ficha-equipo.js?v=20261012zy"></script>
 <script src="../comun/ficha-botin.js?v=20261008zz4"></script>
 <script src="../comun/glosario.js?v=20261012zi"></script>
 <script src="../comun/item-corto.js?v=20261011zj"></script>
@@ -833,7 +834,7 @@ if(new URLSearchParams(location.search).get('modo') === 'mantenimiento') documen
 <script src="../comun/filtro-catalogo.js?v=20261009r"></script>   <!-- el filtro del catálogo, uno para todos lados (2026-10-08) -->
 <script src="../comun/ficha-tienda.js?v=20261010g"></script>
 <script src="../comun/ficha-stats.js?v=20261005ff"></script>
-<script src="../comun/inv-botonera.js?v=20261007aw"></script>
+<script src="../comun/inv-botonera.js?v=20261012zy"></script>
 <script src="../comun/inv-acciones.js?v=20261012y"></script>
 <script src="../comun/inv-duelo.js?v=20261012s"></script>
 <script src="../comun/inv-habilidades.js?v=20261012y"></script>

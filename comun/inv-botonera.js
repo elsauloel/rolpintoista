@@ -97,7 +97,7 @@ const InvBotonera = (() => {
                 <span class="bt-label">Defensa</span><span class="bt-value">${fmt(I.defensaEfectiva(inv))}</span>
               </div>
               <div class="botonera-tile bt-info" title="Defensa especial: se resta al daño de casteo que ignora la Defensa (no se tira)">
-                <span class="bt-label">Armad. mágica</span><span class="bt-value">${fmt(Math.max(0, num(I.statValor(inv, 'armadmg'))))}</span>
+                <span class="bt-label">Def. especial</span><span class="bt-value">${fmt(Math.max(0, num(I.statValor(inv, 'armadmg'))))}</span>
               </div>
             </div>
             <div class="botonera-crit">

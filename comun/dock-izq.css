@@ -1,0 +1,12 @@
+/* El menú de botones de la izquierda (2026-10-12, dueño: «gm tools debería tener a la izquierda una línea de botones en este mismo estilo,
+   para mantener la coherencia»). Lo usan la ficha y GM Tools: <aside class="dock-izq"> con botones .dock-btn (.dock-ico + .dock-txt); se
+   abre al pasar el mouse. Usa las variables de color de cada página (--panel, --panel2, --line, --paper, --copper, --brass). */
+.dock-izq{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;gap:6px} /* por debajo del menú del sitio (z 49, ver más abajo): si no, el menú abierto queda tapado por el dock (bug real, 2026-09-29) */
+.dock-btn{display:flex;align-items:center;gap:10px;width:44px;height:40px;padding:0 0 0 12px;overflow:hidden;box-sizing:border-box;
+  background:var(--panel);border:1px solid var(--line);border-left:0;border-radius:0 6px 6px 0;color:var(--paper);text-decoration:none;
+  cursor:pointer;font-family:"Space Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+  box-shadow:0 4px 12px rgba(0,0,0,.45);transition:width .18s,border-color .15s,background .15s}
+.dock-btn .dock-ico{font-size:19px;line-height:1;flex:none;width:18px;text-align:center}
+.dock-btn .dock-txt{white-space:nowrap}
+.dock-izq:hover .dock-btn,.dock-btn:focus-visible{width:176px}
+.dock-btn:hover{border-color:var(--copper);background:var(--panel2);color:var(--brass)}

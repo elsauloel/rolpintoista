@@ -65,6 +65,9 @@ a.btn{text-decoration:none;display:inline-block}
 .btn.btn-personajes{background:rgba(63,111,176,.2);border-color:#3F6FB0;color:#B9D2EA}
 .btn.btn-personajes:hover,.btn.btn-personajes[aria-expanded="true"]{background:#3F6FB0;border-color:#5B8DBE;color:#F2F6FB}
 .desplegable{position:relative}
+/* El menú de la izquierda (comun/dock-izq.css, 2026-10-12): la lista de personajes se abre a su derecha. */
+#dock-izq .dock-desplegable .desplegable-lista{top:0;left:182px}
+#dock-izq #btn-personajes[aria-expanded="true"]{width:176px;border-color:#3F6FB0}
 .desplegable-lista{
   position:absolute;top:calc(100% + 6px);left:0;z-index:70;min-width:240px;max-width:min(320px,calc(100vw - 24px));max-height:60vh;overflow-y:auto;
   background:var(--panel);border:1px solid #3F6FB0;border-radius:var(--r);box-shadow:0 12px 28px rgba(0,0,0,.6);padding:5px

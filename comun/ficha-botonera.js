@@ -236,7 +236,7 @@ const FichaBotonera = (() => {
     const badgeNitros = `No2 ${fmt(num(S.nitros))}/${fmt(nitrosMaximo(S, c))}`;
     const spMax = spMaximo(S, c);
     const badgeSp = `SP ${fmt(spMax - num(S.spGastado))}/${fmt(spMax)}`;
-    const badgeDef = `Def ${Number.isNaN(c.final.def) ? '?' : fmt(c.final.def)}`;
+    const badgeDef = `Def ${Number.isNaN(c.final.def) ? '?' : fmt(c.final.def)} · Def.Esp ${Number.isNaN(c.final.armadmg) ? '?' : fmt(c.final.armadmg || 0)}`;   // las dos juntas (dueño, 2026-10-12)
 
     // Habilidades sociales: arriba de todo en modo narrativo, al final (con el resto de las habilidades) en modo combate —
     // según lo que publique el mapa (modoMapa; 'combate' si todavía no se sabe).
@@ -377,7 +377,7 @@ const FichaBotonera = (() => {
             </div>
             <div class="botonera-tile bt-info" title="Defensa especial: se resta al daño de casteo que ignora la Defensa (no se tira)">
               ${lupaBotonHtml('defensa:armadmg')}
-              <span class="bt-label">Armad. mágica</span><span class="bt-value">${Number.isNaN(c.final.armadmg) ? '?' : fmt(c.final.armadmg || 0)}</span>
+              <span class="bt-label">Def. especial</span><span class="bt-value">${Number.isNaN(c.final.armadmg) ? '?' : fmt(c.final.armadmg || 0)}</span>
             </div>
           </div>
           <div class="botonera-crit">

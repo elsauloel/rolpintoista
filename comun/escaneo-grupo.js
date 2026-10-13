@@ -123,7 +123,7 @@ const EscaneoGrupo = (() => {
     <div class="eg-sec">Lectura rápida · fortalezas</div><ul class="eg-lista">${l.fuertes.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
     ${tabla(ps, 'Resistencia a crítico (por Tipo de arma)', TIPOS.map((t, i) => col(ps, 'T' + t, p => p.rescrit[i])))}
     ${tabla(ps, 'Resistencias elementales (negativo = vulnerable)', ELEM.map(el => col(ps, ELEM_TXT[el], p => p.elem[el])))}
-    ${tabla(ps, 'Defensas', [col(ps, 'Def', p => p.defensas.def, 'Defensa'), col(ps, 'Arm.Mág', p => p.defensas.armadmg, 'Armadura mágica'), col(ps, 'Eva', p => p.defensas.eva, 'Evasión'),
+    ${tabla(ps, 'Defensas', [col(ps, 'Def', p => p.defensas.def, 'Defensa'), col(ps, 'Def.Esp', p => p.defensas.armadmg, 'Defensa especial'), col(ps, 'Eva', p => p.defensas.eva, 'Evasión'),
       col(ps, 'Parry', p => p.defensas.parry), col(ps, 'Bloq', p => p.defensas.bloqueo, 'Bloqueo'), col(ps, 'Res.Esp', p => p.defensas.resmg), col(ps, 'Res.CC', p => p.defensas.rescc),
       col(ps, 'HP', p => p.vida.hp), col(ps, 'No2', p => p.vida.no2)])}
     ${tabla(ps, 'Atributos', ATTR.map(([k, n]) => col(ps, n, p => p.attrs[k])))}

@@ -123,7 +123,7 @@ const FichaLite = (() => {
         {etq: 'Despojos', valor: `${fmt(num(S.loot && S.loot.normal))} · ${fmt(num(S.loot && S.loot.magico))} · ${fmt(esp)}`,
           lineas: [{txt: 'Normales · mágicos · especiales: los materiales que soltaron los rivales. Las tiendas los compran y sirven para reparar.'}]},
         // Sigilo y las resistencias que no están en 0 (2026-10-04), con de dónde salen.
-        ...['sigilo', 'armadmg', ...Object.keys(ELEM)].filter(id => id === 'sigilo' || num(c.final[id]) > 0).map(id => ({etq: ETQ_EXTRA[id], valor: fmt(num(c.final[id])), lineas: lineasFicha(S, c, id).lineas})),
+        ...['sigilo', 'armadmg', ...Object.keys(ELEM)].filter(id => id === 'sigilo' || id === 'armadmg' || num(c.final[id]) > 0).map(id => ({etq: ETQ_EXTRA[id], valor: fmt(num(c.final[id])), lineas: lineasFicha(S, c, id).lineas})),
       ],
     };
   }
@@ -183,7 +183,7 @@ const FichaLite = (() => {
       equipo: equipoGuardado(sc, C.slotDe),
       estados: estadosLista(sc.estados),
       extras: [{etq: ETQ_EXTRA.sigilo, valor: fmt(C.statValor(sc, 'sigilo')), lineas: []},
-        ...(C.armadmgEfectiva(sc) > 0 ? [{etq: ETQ_EXTRA.armadmg, valor: fmt(C.armadmgEfectiva(sc)), lineas: []}] : []),
+        {etq: ETQ_EXTRA.armadmg, valor: fmt(C.armadmgEfectiva(sc)), lineas: []},
         ...Object.keys(ELEM).filter(el => C.resElemental && C.resElemental(sc, ELEM[el]) > 0).map(el => ({etq: ETQ_EXTRA[el], valor: fmt(C.resElemental(sc, ELEM[el])), lineas: []}))],
     };
   }
@@ -201,7 +201,7 @@ const FichaLite = (() => {
       equipo: equipoGuardado(inv, slotDe),
       estados: estadosLista(inv.estados),
       extras: [{etq: ETQ_EXTRA.sigilo, valor: fmt(I.statValor(inv, 'sigilo')), lineas: []},
-        ...['armadmg', ...Object.keys(ELEM)].filter(id => num(I.statValor(inv, id)) > 0).map(id => ({etq: ETQ_EXTRA[id], valor: fmt(num(I.statValor(inv, id))), lineas: []}))],
+        ...['armadmg', ...Object.keys(ELEM)].filter(id => id === 'armadmg' || num(I.statValor(inv, id)) > 0).map(id => ({etq: ETQ_EXTRA[id], valor: fmt(num(I.statValor(inv, id))), lineas: []}))],
     };
   }
 

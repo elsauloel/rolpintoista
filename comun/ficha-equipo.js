@@ -416,9 +416,15 @@ const FichaEquipo = (() => {
     const resumen = `<div class="equipo-resumen">
     <div class="equipo-manos">${manosHtml}</div>
     <div class="botonera-defensa">
-      <div class="botonera-tile bt-info" title="Defensa (no se tira)">
-        ${lupa('defensa:def')}
-        <span class="bt-label">Defensa</span><span class="bt-value">${Number.isNaN(cEq.final.def) ? '?' : fmt(cEq.final.def)}</span>
+      <div style="display:flex;flex-direction:column;gap:8px;min-width:0">
+        <div class="botonera-tile bt-info" title="Defensa: se resta al daño físico (no se tira)">
+          ${lupa('defensa:def')}
+          <span class="bt-label">Defensa</span><span class="bt-value">${Number.isNaN(cEq.final.def) ? '?' : fmt(cEq.final.def)}</span>
+        </div>
+        <div class="botonera-tile bt-info" title="Defensa especial: se resta al daño especial (arcano, eléctrico, fuego, hielo, tóxico, ácido), como la Defensa al físico (no se tira)">
+          ${lupa('defensa:armadmg')}
+          <span class="bt-label">Def. especial</span><span class="bt-value">${Number.isNaN(cEq.final.armadmg) ? '?' : fmt(cEq.final.armadmg || 0)}</span>
+        </div>
       </div>
       <div class="botonera-crit">
         <div class="botonera-crit-t">Resistencia a críticos</div>

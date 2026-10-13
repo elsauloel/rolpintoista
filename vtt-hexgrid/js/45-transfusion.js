@@ -40,8 +40,8 @@ async function transfusionDeHabilidad(msg){
 }
 async function transfusionAplicar(msg, da, recibe, n){
   try{
-    await EstadosAplicar.encolarPj({fichaId: da.t.fichaId, duenoUid: da.t.duenoUid, spec: {nombre: 'Transfusión', hp: -n}, origen: msg.nombre});
-    await EstadosAplicar.encolarPj({fichaId: recibe.t.fichaId, duenoUid: recibe.t.duenoUid, spec: {nombre: 'Transfusión', hp: n}, origen: msg.nombre});
+    await EstadosAplicar.encolarPj({fichaId: da.t.fichaId, duenoUid: da.t.duenoUid, spec: {nombre: 'Transfusión', vida: -n, polaridad: 'debuff', detalle: `Dio ${n} de vida (${msg.nombre}).`}, origen: msg.nombre});
+    await EstadosAplicar.encolarPj({fichaId: recibe.t.fichaId, duenoUid: recibe.t.duenoUid, spec: {nombre: 'Transfusión', vida: n, polaridad: 'buff', detalle: `Recibió ${n} de vida (${msg.nombre}).`}, origen: msg.nombre});
     mesaLinea(`🩸 ${msg.nombre}: ${nombreDe(da.t)} le pasa ${n} de vida a ${nombreDe(recibe.t)}`, 'recordatorio');
   }catch(err){
     console.error('No se pudo hacer la Transfusión:', err);

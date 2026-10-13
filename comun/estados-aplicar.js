@@ -29,6 +29,7 @@ const EstadosAplicar = (() => {
     if(s.turnos !== undefined && s.turnos !== null) out.turnos = Math.max(0, Math.round(Number(s.turnos) || 0));
     if(Array.isArray(s.mods)) out.mods = s.mods.filter(m => m && m.stat).map(m => ({stat: String(m.stat), val: Number(m.val) || 0})).slice(0, 8);
     if(s.hp) out.hp = Math.round(Number(s.hp) || 0);
+    if(s.vida) out.vida = Math.max(-99, Math.min(99, Math.round(Number(s.vida) || 0)));   // «Transfusión» (2026-10-13): la vida que da (−) o recibe (+); no `hp`, que una pantalla vieja tomaría como «por turno»
     if(s.detalle) out.detalle = String(s.detalle).slice(0, 200);
     if(s.polaridad) out.polaridad = s.polaridad;
     if(s.item) out.item = String(s.item).slice(0, 64);   // el ítem al que se le da el desgaste (nombre: 'Desgaste')

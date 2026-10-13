@@ -1566,4 +1566,4 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
 - **🩸 Transfusión sanguínea** (2026-10-13, Debuffer; `js/45-transfusion.js`): mensaje `transfusion-habilidad` (`FichaAcciones.avisarZonaAlMapa`,
   `transfusionMapa`). `transfusionDeHabilidad` pide con dos `elegirDestino` quién da y quién recibe (personajes; fuera del Rango avisa y deja seguir),
   calcula el máximo con lo público (quien da queda en 1, quien recibe no pasa su máximo) y el cartel de cuánto; `transfusionAplicar` manda a cada uno
-  el aviso «Transfusión» (`EstadosAplicar.encolarPj`, `hp` ±n), que aplica `FichaAcciones.aplicarEstadoRecibido` en la pantalla que maneja a cada uno.
+  el aviso «Transfusión» (`EstadosAplicar.encolarPj`, `vida` ±n —no `hp`: una pantalla sin recargar lo tomaría como «por turno»—), que aplica `FichaAcciones.aplicarEstadoRecibido` en la pantalla que maneja a cada uno.

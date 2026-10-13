@@ -942,10 +942,10 @@ const FichaAcciones = (() => {
       ui.toast(`${origen ? origen + ': ' : ''}${spec.estado} ${e.turnos > 0 ? `queda en ${e.turnos} turno${e.turnos === 1 ? '' : 's'}` : 'se terminó'}`);
       return;
     }
-    // «Transfusión» (2026-10-13, Transfusión sanguínea): `hp` negativo = da vida (nunca baja de 1); positivo = recibe (sin pasar el máximo; a un
+    // «Transfusión» (2026-10-13, Transfusión sanguínea): `vida` negativa = da vida (nunca baja de 1); positivo = recibe (sin pasar el máximo; a un
     // caído no lo levanta: Combatiente.curaQueEntra).
     if(spec.nombre === 'Transfusión'){
-      const d = Math.round(num(spec.hp)), antes = num(S.hp), max = num(FichaCalculo.calcular(S).final.hpmax);
+      const d = Math.round(num(spec.vida !== undefined ? spec.vida : spec.hp)), antes = num(S.hp), max = num(FichaCalculo.calcular(S).final.hpmax);
       const nuevo = d < 0 ? Math.max(Math.min(antes, 1), antes + d) : Math.min(max > 0 ? max : antes + d, antes + Combatiente.curaQueEntra(antes, d));
       S.hp = nuevo;
       ui.cambio(['vitals', 'refresh']);

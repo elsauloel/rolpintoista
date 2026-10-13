@@ -42,7 +42,7 @@ function actualizarCabecera(){
   if(typeof fbMiembro === 'undefined' || !fbMiembro || !fbUsuario) return;
   const id = soyGM ? '' : fichaPrincipalId();
   const f = id ? fichasPub.get(id) : null;
-  const texto = barraTextoRol(f ? f.nombre : '');
+  const texto = barraTextoRol(f ? f.nombre : '') + (typeof diaActual !== 'undefined' && diaActual > 0 ? ` · ☀ Día ${diaActual}` : '');   // ⏳ Pasar de día (js/41)
   if(texto && $('#estado').textContent !== texto) estado(texto);
 }
 

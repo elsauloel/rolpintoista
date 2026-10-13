@@ -147,6 +147,8 @@
       <button type="button" class="btn btn-mant" id="btn-mantenimiento" title="Pasar el turno para toda la mesa: fichas de los jugadores y creeps (solo GM)">⟳ Mantenimiento</button>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
         <button type="button" class="btn chico" id="btn-pausa-mapa" style="grid-column:1/-1">⏸ Pausar partida</button>
+        <button type="button" class="btn chico" id="btn-dia-mapa" title="Pasa un día para toda la mesa: todos descansan (vida, SP y No2), terminan los estados con turnos, se renuevan los topes diarios y se repone la góndola de la tienda (solo GM)">⏳ Pasar de día</button>
+        <button type="button" class="btn chico" id="btn-dia-corregir" title="Corregir el número del día a mano (no renueva nada)">✎ Corregir el día</button>
         <button type="button" class="btn chico" id="btn-finalizar-mapa" style="grid-column:1/-1" title="Reparte la experiencia, el oro y el botín de los creeps que están en el mapa publicado">🏁 Finalizar combate</button>
       </div>
     </div>
@@ -254,7 +256,7 @@
 <script src="../comun/duelo.js?v=20261012zk"></script>
 <script src="../comun/aviso-combate.js?v=20261011r"></script>
 <script src="../comun/mensajes-mapa.js?v=20261012k"></script>
-<script src="js/01-base-y-mapas.js?v=20261012x"></script>
+<script src="js/01-base-y-mapas.js?v=20261012zs"></script>
 <script src="js/02-modo-niebla-sigilo.js?v=20261010zi"></script>
 <script src="js/03-asistente-trampa.js?v=20261010zh"></script>
 <script src="js/04-mantenimiento-e-iniciativa.js?v=20261012y"></script>
@@ -264,10 +266,10 @@
 <script src="js/08-mover-trampas-y-zonas.js?v=20261012z"></script>
 <script src="js/09-colocar-y-panel.js?v=20261011p"></script>
 <script src="js/10-hud-y-vida.js?v=20261012y"></script>
-<script src="js/11-botonera-nueva.js?v=20261012zr"></script>
-<script src="js/12-acciones-nuevas.js?v=20261012zr"></script>
+<script src="js/11-botonera-nueva.js?v=20261012zs"></script>
+<script src="js/12-acciones-nuevas.js?v=20261012zs"></script>
 <script src="js/13-tokens-portal-duelo.js?v=20261012m"></script>
-<script src="js/14-herramientas-y-arranque.js?v=20261011o"></script>
+<script src="js/14-herramientas-y-arranque.js?v=20261012zs"></script>
 <script src="js/15-ficha-lite.js?v=20261010zd"></script>
 <script src="js/16-momentos.js?v=20261008zl"></script>
 <script src="js/17-oportunidad.js?v=20261010zi"></script>
@@ -278,7 +280,7 @@
 <script src="js/22-titilando.js?v=20261007f"></script>
 <script src="js/23-reflejos.js?v=20261006a"></script>
 <script src="js/24-emergencia.js?v=20261006a"></script>
-<script src="js/25-anillos.js?v=20261012zr"></script>
+<script src="js/25-anillos.js?v=20261012zs"></script>
 <script src="js/26-escudos.js?v=20261012zj"></script>
 <script src="js/27-armas-en-el-piso.js?v=20261009z7"></script>
 <script src="js/28-desarmar-trampas.js?v=20261008zm"></script>
@@ -294,5 +296,6 @@
 <script src="js/38-enyetar.js?v=20261012zb"></script>
 <script src="js/39-reroll.js?v=20261012ze"></script>
 <script src="js/40-acelerador.js?v=20261012k"></script>
+<script src="js/41-dia.js?v=20261012zs"></script>
 </body>
 </html>

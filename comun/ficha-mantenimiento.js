@@ -239,5 +239,31 @@ const FichaMantenimiento = (() => {
     });
   }
 
-  return {MAX_SEGUIDOS, aplicar, inicioTurno, finTurno, reclamar, publicarReporte, publicarRecordatorios};
+  /* ⏳ Pasar de día (2026-10-12, dueño; lo dispara vtt-hexgrid/js/41-dia.js). ¿Qué estados terminan? Los que duran por turnos (o un turno);
+     quedan los permanentes, los de un ítem equipado y los derivados. `descansar(S)`: vida, SP y No2 al máximo (un caído no se levanta), los
+     estados con turnos terminan, el tope diario del talento de reparar vuelve a 0, y lo mismo sus invocaciones. Devuelve las líneas del cambio. */
+  const terminaAlPasarDia = e => !!e && !e.permanente && !e.origenItem && !e.derivado && !e.anillo;
+  function descansar(S){
+    const lineas = [], c = FichaCalculo.calcular(S), hpmax = Number.isNaN(c.final.hpmax) ? 0 : num(c.final.hpmax);
+    const caido = num(S.hp) <= 0 || (S.muerto && (S.muerto.activo || S.muerto.definitivo));
+    if(!caido && hpmax > 0 && num(S.hp) < hpmax){ lineas.push(`vida ${fmt(num(S.hp))} → ${fmt(hpmax)}`); S.hp = hpmax; }
+    if(num(S.spGastado) > 0){ lineas.push('SP lleno'); S.spGastado = 0; }
+    const no2 = FichaBotonera.nitrosMaximo(S);
+    if(num(S.nitros) < no2){ lineas.push('No2 lleno'); S.nitros = no2; }
+    const fin = (S.efectos || []).filter(terminaAlPasarDia);
+    if(fin.length){ S.efectos = S.efectos.filter(e => !terminaAlPasarDia(e)); lineas.push(`terminaron: ${fin.map(e => e.nombre).join(', ')}`); }
+    if(num(S.reparadoTalento) > 0) S.reparadoTalento = 0;
+    (S.invocaciones || []).forEach(inv => {
+      if(!inv) return;
+      const li = [];
+      if(num(inv.hp) > 0 && num(inv.hpMax) > num(inv.hp)){ li.push(`vida ${fmt(num(inv.hp))} → ${fmt(num(inv.hpMax))}`); inv.hp = num(inv.hpMax); }
+      if(typeof InvCalculo !== 'undefined'){ const m = InvCalculo.nitrosMax(inv); if(num(inv.nitros) < m){ inv.nitros = m; li.push('No2 lleno'); } }
+      const finI = (inv.estados || []).filter(terminaAlPasarDia);
+      if(finI.length){ inv.estados = inv.estados.filter(e => !terminaAlPasarDia(e)); li.push(`terminaron: ${finI.map(e => e.nombre).join(', ')}`); }
+      if(li.length) lineas.push(`${inv.nombre || 'su invocación'}: ${li.join(', ')}`);
+    });
+    if(caido) lineas.push('sigue caído (descansar no lo levanta)');
+    return lineas;
+  }
+  return {terminaAlPasarDia, descansar, MAX_SEGUIDOS, aplicar, inicioTurno, finTurno, reclamar, publicarReporte, publicarRecordatorios};
 })();

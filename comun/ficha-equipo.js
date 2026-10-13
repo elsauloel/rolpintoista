@@ -441,11 +441,10 @@ const FichaEquipo = (() => {
   /* 🔧 Reparar sin herrero (dueño, 2026-10-12; P99): el talento «Reparar equipo» y el Óleo reparador. Solo fuera de combate. Cada punto
      reparado devuelve también 1 de armadura rota (o de abolladura) de esa pieza.
      - Talento (cualquier talento con «repar» en el nombre): 2 despojos por punto, sin tirada; una pieza ROTA cuesta el doble hasta quedar entera
-       (como el herrero). Tope: 2 puntos por nivel del talento entre combate y combate (`S.reparadoTalento`; lo vacía el mapa al terminar el
-       combate, js/25 — hasta que exista «Pasar de día»).
+       (como el herrero). Tope: 3 puntos por nivel del talento por día (`S.reparadoTalento`; lo vacía «⏳ Pasar de día», vtt-hexgrid/js/41).
      - Óleo reparador (`oleoReparador: N` en el consumible): N puntos a UNA pieza dañada; una pieza ROTA no (esa, solo el herrero o el talento).
        Se gasta una unidad. */
-  const DESPOJOS_POR_PUNTO = 2, TOPE_POR_NIVEL = 2, RECARGO_ROTO = 2;
+  const DESPOJOS_POR_PUNTO = 2, TOPE_POR_NIVEL = 3, RECARGO_ROTO = 2;   // el tope: 3 por nivel por día (dueño, 2026-10-12)
   const talentoReparar = S => (S.sociales || []).find(x => x && /repar/i.test(String(x.nombre || ''))) || null;
   const topeTalento = S => { const t = talentoReparar(S); return t ? TOPE_POR_NIVEL * Math.max(1, FichaBotonera.nivelSocial(t)) : 0; };
   const restoTalento = S => Math.max(0, topeTalento(S) - Math.max(0, num(S.reparadoTalento)));
@@ -467,7 +466,7 @@ const FichaEquipo = (() => {
     if(!tal && !oleos.length) return '';
     const lista = danadas(S), desp = Math.floor(num(S.loot && S.loot.normal)), resto = restoTalento(S);
     const oleo = oleos[0], nOleo = oleo ? num(oleo.oleoReparador) : 0, uds = oleos.reduce((a, x) => a + num(x.unidades ?? 1), 0);
-    const cab = [tal ? `talento <b>${esc(tal.nombre)}</b>: te quedan <b>${fmt(resto)} de ${fmt(topeTalento(S))}</b> puntos hasta el próximo combate · ${DESPOJOS_POR_PUNTO} despojos por punto (una pieza rota, el doble) · tenés ${fmt(desp)} despojos` : '',
+    const cab = [tal ? `talento <b>${esc(tal.nombre)}</b>: te quedan <b>${fmt(resto)} de ${fmt(topeTalento(S))}</b> puntos hoy · ${DESPOJOS_POR_PUNTO} despojos por punto (una pieza rota, el doble) · tenés ${fmt(desp)} despojos` : '',
       oleo ? `🧴 <b>${esc(oleo.nombre)}</b> ×${fmt(uds)}: ${fmt(nOleo)} puntos a una pieza dañada (no a una rota)` : ''].filter(Boolean).join('<br>');
     const filas = lista.map(it => {
       const roto = FichaCalculo.itemRoto(it), f = factorRoto(it), costo = DESPOJOS_POR_PUNTO * f;
@@ -484,7 +483,7 @@ const FichaEquipo = (() => {
     if(ui.modoCombate && ui.modoCombate()){ ui.toast('No se puede reparar durante el combate'); return false; }
     const tal = talentoReparar(S), it = (S.inventario || []).find(x => x.id === itemId);
     if(!tal || !it){ ui.toast('No tenés el talento de reparar o esa pieza ya no está'); return false; }
-    if(restoTalento(S) < 1){ ui.toast(`Ya reparaste los ${fmt(topeTalento(S))} puntos de tu talento: hasta el próximo combate, no más`); return false; }
+    if(restoTalento(S) < 1){ ui.toast(`Ya reparaste los ${fmt(topeTalento(S))} puntos de tu talento por hoy: se renueva al pasar el día`); return false; }
     const costo = DESPOJOS_POR_PUNTO * factorRoto(it), desp = Math.floor(num(S.loot && S.loot.normal));
     if(desp < costo){ ui.toast(`No te alcanzan los despojos: 1 punto cuesta ${fmt(costo)} y tenés ${fmt(desp)}`); return false; }
     if(!repararPuntos(it, 1)){ ui.toast(`${it.nombre} ya está entera`); return false; }

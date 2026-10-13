@@ -174,9 +174,7 @@ async function autoRepararAlTerminar(){
           it.dur = Math.min(max, antes + n);
           lineas.push(`${it.nombre}: se reparó sola, durabilidad ${antes} → ${it.dur}`);
         });
-        const reset = num(S.reparadoTalento) > 0;   // 🔧 el tope del talento de reparar vuelve a empezar (2026-10-12)
-        if(reset) S.reparadoTalento = 0;
-        return lineas.length > 0 || reset;
+        return lineas.length > 0;
       });
     }catch(err){ console.error('No se pudo reparar el equipo al terminar el combate:', err); }
     if(lineas.length) momentoAbrir({tipo: 'reparacion', icono: '🧵', titulo: `${t.oculto ? 'Alguien' : nombreDe(t)}: su equipo se repara solo`, estado: 'listo', datos: {lineas}});

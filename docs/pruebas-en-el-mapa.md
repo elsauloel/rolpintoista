@@ -10,6 +10,8 @@
 
 ## Pendientes
 
+- [ ] **🔁 Repetición** (2026-10-13): X = 3 con un arco al mismo creep: el 1.º sin bono, el 2.º +1 PdG y +1 dado, el 3.º +2 y +2 (en el duelo y en
+  la Mesa) y el estado se va; cambiar de blanco a mitad corta la cadena.
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no

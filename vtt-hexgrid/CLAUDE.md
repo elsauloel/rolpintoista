@@ -1560,3 +1560,6 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `tormentaHabDe` (k × 1d4, directo). Cada sub-duelo arranca en el dodge roll (comun/duelo.js).
 - **✨ Lo sagrado** (2026-10-13, Smite): una habilidad con `hab.sagrado` (`Combatiente.habEjecucion`) contra un creep de tipo no-muerto o demonio
   (`vinculo(t).tipoCriatura`) tira el doble de dados de daño: `sagradoContra(ataque, t)` en `dueloElegirObjetivoMapa` (js/13), con una línea en la Mesa.
+- **🔁 Repetición** (2026-10-13, Shooter; en `js/35-arcos.js`): el estado Repitiendo (publicado como `repetir` = {quedan, hechos, arma, blanco}) lo
+  lee `repeticionBonos` dentro de `arcoBonos` (+n PdG y +n dados del Tipo del arma en `tiro`) y `repeticionGastar` (js/13, junto a `arcoApuntarGastar`)
+  cuenta el disparo en la ficha o corta la cadena si cambió el arma o el blanco.

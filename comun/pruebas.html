@@ -756,6 +756,15 @@ prueba('Proyectil perforante (Shooter, 2026-10-13): 2 SP + el disparo, solo a di
   igual([hab.costo, hab.nitrosCosto, hab.soloRango, a.perforante, a.mods.pdg, a.mods.fijo, !!a.soloCritico, /Sin auditar/.test(hab.detalle), !!hab.original],
     ['2', 'ATAQUE', true, true, 0, 0, false, false, true]);
 });
+prueba('Repetición (Shooter, 2026-10-13): X SP (1 a 3), sin No2, deja «Repitiendo» con X disparos y el resumen lo publica', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'shooter').habilidades.find(h => h.id === 'shooter-repeticion');
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
+  const est = FichaAcciones.estadoDeSpec({nombre: 'Repitiendo', stacks: 3}, estadosPresetFicha());
+  S.efectos = [{...est, activo: true, repHechos: 1, repArma: 'a1', repBlanco: 't1'}];
+  const pub = FichaResumen.resumen(S, {}).estados.find(e => e.nombre === 'Repitiendo');
+  igual([hab.costo, hab.nitrosCosto, hab.xMax, est.stacks, est.alEmpezarTurno, pub && pub.repetir],
+    ['X', 0, 3, 3, true, {quedan: 3, hechos: 1, arma: 'a1', blanco: 't1'}]);
+});
 prueba('Smite (Support, 2026-10-13): 1 SP y 1 No2, sin tirada, 1d4 directo, en tu Rango, lo sagrado viaja al duelo', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-smite');
   const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: s => s === 'rng' ? 6 : 5, etq: s => s, X: 0});

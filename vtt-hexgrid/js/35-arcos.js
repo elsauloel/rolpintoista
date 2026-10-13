@@ -43,6 +43,7 @@ function arcoBonos(mio, t, ataque, tiro){
   // 🎯 Apuntar (Shooter, 2026-10-11): +X PdG y Crítico potente +X en este disparo; el estado se gasta al disparar (arcoApuntarGastar, js/13).
   const ax = Combatiente.apuntandoX(((vinculo(mio) || {}).resumen || {}).estados);
   if(ax) tiro = arcoSumar(tiro, {pdg: ax, critpot: ax}, `apuntando (+${ax})`);
+  tiro = repeticionBonos(mio, t, ataque, tiro);   // 🔁 Repetición (Shooter, 2026-10-13)
   const d = distanciaHex({col: mio.col, fila: mio.fila}, {col: t.col, fila: t.fila});
   const la = Combatiente.largoAlcance(ataque, d, ataque.alcance);
   if(la) tiro = arcoSumar(tiro, {pdg: la.pdg}, `largo alcance (${la.extra} de más)`);
@@ -149,4 +150,40 @@ async function arcoTensar(ataque, msg, tiro){
   if(!si) return tiro;
   try{ msg.alTensar(c); }catch(err){ console.error('No se pudo cobrar el Tensar:', err); return tiro; }
   return arcoSumar(tiro, {pdg: n}, 'tensado');
+}
+
+/* 🔁 REPETICIÓN (Shooter, 2026-10-13, dueño). El estado «Repitiendo» (`repetir`: quedan, hechos, arma, blanco; lo publica el resumen) encadena
+   disparos con la misma arma al mismo blanco: el 2.º suma +1 PdG y +1 dado del Tipo del arma, el 3.º +2 y +2. Cambiar de arma o de blanco corta la
+   cadena (ese disparo, sin bono). Cada disparo paga sus No2 como siempre. Solo personajes. */
+function repeticionDe(mio){
+  const e = (((vinculo(mio) || {}).resumen || {}).estados || []).find(x => x && x.repetir);
+  return e && num(e.repetir.quedan) > 0 ? e.repetir : null;
+}
+const repeticionMismo = (rp, t, ataque) => !num(rp.hechos) || (rp.arma === String(ataque.armaId || '') && rp.blanco === t.id);
+function repeticionBonos(mio, t, ataque, tiro){
+  const rp = mio && t && ataque ? repeticionDe(mio) : null;
+  if(!rp || !num(rp.hechos) || !repeticionMismo(rp, t, ataque)) return tiro;
+  const k = Math.round(num(rp.hechos)), caras = Math.max(2, Math.round(num(ataque.tipoDado)) || 4);
+  tiro = arcoSumar(tiro, {pdg: k}, `repetición (+${k})`);
+  const m = String(tiro.dado || '').match(/^(\d+)d(\d+)$/);
+  tiro.dado = !tiro.dado ? `${k}d${caras}` : m && num(m[2]) === caras ? `${num(m[1]) + k}d${caras}` : `${tiro.dado}+${k}d${caras}`;
+  return tiro;
+}
+// Después de disparar: cuenta el disparo (o corta la cadena si cambió el arma o el blanco); al usar los X, el estado se va.
+async function repeticionGastar(mio, t, ataque){
+  if(!mio || !t || !ataque || mio.tipo !== 'pj' || String(mio.fichaId).includes(SEP_INVOCACION) || !repeticionDe(mio)) return;
+  try{
+    let txt = '';
+    await editarPersonajeMapa(mio.fichaId, S => {
+      const e = (S.efectos || []).find(x => x && x.repetir && x.activo !== false);
+      if(!e) return false;
+      const mismo = !num(e.repHechos) || (String(e.repArma || '') === String(ataque.armaId || '') && String(e.repBlanco || '') === t.id);
+      if(!mismo){ S.efectos = S.efectos.filter(x => x !== e); txt = `🔁 ${nombreDe(mio)} cambió de arma o de blanco: se cortó la Repetición`; return ['efectos']; }
+      e.repHechos = num(e.repHechos) + 1; e.repArma = String(ataque.armaId || ''); e.repBlanco = t.id; e.stacks = Math.max(0, num(e.stacks) - 1);
+      txt = e.stacks > 0 ? `🔁 ${nombreDe(mio)}: disparo ${e.repHechos} de la Repetición (el próximo, +${e.repHechos} PdG y +${e.repHechos} dado)` : `🔁 ${nombreDe(mio)}: último disparo de la Repetición`;
+      if(e.stacks <= 0) S.efectos = S.efectos.filter(x => x !== e);
+      return ['efectos'];
+    });
+    if(txt) mesaLinea(txt, 'recordatorio');
+  }catch(err){ console.error('No se pudo contar la Repetición:', err); }
 }

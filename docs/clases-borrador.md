@@ -296,9 +296,11 @@ Salvo Carga Elemental, todas son **Hechizo (PG: Esp · Daño: Esp)**.
    marca se termina (el mapa del GM le saca el Marcado al blanco). *(Auditada 2026-10-12 con el dueño; original: «Marcar [3] — Designa un objetivo
    como marcado; sigue marcado hasta que ataque a un objetivo diferente. Obtiene +1 PG, +1 Daño y +1 Crítico contra el objetivo marcado.» El «+1
    Crítico» es los dos críticos, decisión del dueño.)*
-8. **Repetición** [X] — Realiza X ataques consecutivos idénticos entre sí
-   (los ataques gastan No2 normalmente). Por cada ataque adicional al
-   primero suma +1 a la PG y amplifica +1 el daño.
+8. ✅ **Repetición** — **SP:** X (de 1 a 3). **No2:** ninguno (cada disparo paga los suyos). Quedás **Repitiendo**: encadenás X disparos con un
+   arma a distancia, **misma arma y mismo blanco**. El 2.º suma **+1 PdG y +1 dado** del Tipo del arma, el 3.º **+2 y +2**. Cambiar de arma o de
+   blanco **corta la cadena**; lo que no uses se pierde al empezar tu próximo turno. ⚙ Automatizado en el mapa. *(Auditada 2026-10-13 con el dueño;
+   original: «Repetición [X] — Realiza X ataques consecutivos idénticos entre sí (los ataques gastan No2 normalmente). Por cada ataque adicional al
+   primero suma +1 a la PG y amplifica +1 el daño.»)*
 9. **Disparo múltiple** [X] — Ataca simultáneamente a múltiples objetivos
    en línea directa en un área de cono ancho. X es igual al doble del
    número de objetivos adicionales.

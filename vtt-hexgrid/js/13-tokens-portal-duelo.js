@@ -709,7 +709,7 @@ function dueloElegirObjetivoMapa(msg){
           tiro.motivo = tiro.motivo ? `${tiro.motivo} y apuntada` : 'apuntada (no se movió)';
         }
         // 🏹 Las mecánicas de arco (js/35, 2026-10-11): largo alcance, emboscada, matabestias, contra el Marcado, espalda a distancia y Tensar.
-        try{ tiro = arcoBonos(mio, t, ataque, tiro); tiro = await arcoTensar(ataque, msg, tiro); arcoApuntarGastar(mio, ataque); }catch(err){ console.error('No se pudieron sumar las mecánicas del arco:', err); }
+        try{ tiro = arcoBonos(mio, t, ataque, tiro); tiro = await arcoTensar(ataque, msg, tiro); arcoApuntarGastar(mio, ataque); repeticionGastar(mio, t, ataque); }catch(err){ console.error('No se pudieron sumar las mecánicas del arco:', err); }
       }
       try{ tiro = marcaBonos(mio, t, ataque, tiro); }catch(err){ console.error('No se pudo sumar la marca:', err); }   // 🎯 Marcar (js/36)
       let espalda = false, embestida = 0;

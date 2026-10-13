@@ -1009,6 +1009,7 @@ const Combatiente = (() => {
     if(n(s.stacks) && base.esVeneno && !base.permanente){ base.stacks = n(s.stacks); base.turnos = base.stacks; }
     if(n(s.stacks) && (base.esSangrado || base.esQuemadura)) base.stacks = n(s.stacks);   // un arma que deja Sangrado con más stacks (2026-10-03)
     if(n(s.escudoMagico)) base.escudoMagico = n(s.escudoMagico);
+    if(n(s.stacks) && base.repetir) base.stacks = Math.max(1, Math.min(3, n(s.stacks)));   // Repitiendo (2026-10-13): cuántos disparos encadena
     if(s.detalle) base.detalle = s.detalle;
     return base;
   }

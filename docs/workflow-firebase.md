@@ -302,8 +302,8 @@ puede borrar desde la consola.
 
 ## Mantenimiento del GM
 
-El GM pasa el turno para toda la mesa con "⟳ Mantenimiento" en el mapa (o
-"Mantenimiento · toda la mesa" en gm-tools). Eso sube
+El GM pasa la ronda para toda la mesa con "⟳ Pasar de ronda" en el mapa o en gm-tools
+(los dos se esconden en combate con orden de iniciativa, donde la ronda pasa sola con los turnos). Eso sube
 `campanas/{id}/mapa/mantenimiento` = `{numero, cuando}`. El GM no puede
 escribir las fichas, así que cada una aplica su propio `mantenimiento()`
 (la lógica de siempre) una vez por número que le falte, hasta 10 seguidos:

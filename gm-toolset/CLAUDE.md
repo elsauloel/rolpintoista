@@ -476,3 +476,8 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   cabecera. Adentro del mapa (modo acciones) se esconde (`Embebido.iniciar`, `pagina`).
 - **👥 Quién cuenta** (2026-10-12): en «Si derrotan a todos», chips por personaje para dejar afuera al que solo observa o al que no vino
   (`CombateFin.fuera`/`fueraCambiar`, `gm/personajes` = {fuera}); se recuerda en la partida y lo usan también Escanear grupo y Finalizar combate.
+- **«⟳ Pasar de ronda» y la clave de OpenRouter** (2026-10-13): el botón de arriba (`#btn-mant`, antes «Mantenimiento · toda la mesa») se
+  llama como en el mapa y se esconde en combate con orden de iniciativa (`gmRondaEscuchar`/`gmRondaBoton`, `js/11`: escucha `modo` e
+  `iniciativa` del mapa publicado en `mapa/activo`). Si falta la clave de OpenRouter, `orKey` (`js/07`, ahora async) abre `orPedirClave`:
+  una ventana con los tres pasos (entrar, crear la clave gratis, pegarla) en vez del `prompt()` del navegador; la usan «+ Creep con IA»
+  (y su botón «3. Pegar la clave acá») y 🔎 Escanear grupo.

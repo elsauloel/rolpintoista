@@ -132,6 +132,21 @@
 > - [ ] Ballestas, tanda con mapa: rasgos «llega cargada», «apuntada», «a quemarropa» (hoy con la distancia ideal), «atraviesa escudos», ballesta
 >   de muralla; virotes explosivo, de humo, de luz, de clavo y de rebote; el garfio con soga como utilería de la Talabartería
 >   ([`ideas-ballestas.md`](ideas-ballestas.md)). La silenciosa espera al sigilo (P184).
+> - [ ] **🚀 Publicar con Firebase Hosting desde GitHub, con vistas previas (dueño, 2026-10-12: «eventualmente voy a querer configurar
+>   publicación automática de Firebase Hosting desde GitHub con `firebase init hosting:github`, con vistas previas para las ramas, y te voy a
+>   pedir que me guíes paso a paso»).** No empezar sin que lo pida; cuando lo pida, guiarlo **de a un paso, sin jerga**. Lo que ya se sabe:
+>   - **Hoy** publica GitHub Pages, solo, en cada push a `nueva-version` (`https://elsauloel.github.io/rolpintoista/`).
+>   - `firebase init hosting:github` arma dos publicaciones automáticas en GitHub (GitHub Actions): una que publica el sitio en vivo cuando
+>     cambia una rama elegida, y otra que arma una **vista previa** (una dirección propia y temporal) por cada **pull request**. Ojo: de
+>     fábrica las vistas previas son **por pull request, no por rama**; si se quiere una por rama hay que retocar el archivo que crea.
+>   - **Hace falta**: la herramienta de Firebase en la compu (Firebase CLI, que necesita **Node.js — hoy no está instalado en esta
+>     compu**), entrar con la cuenta de Google dueña del proyecto de Firebase (el mismo de Firestore), y permiso de administrador en el repo
+>     de GitHub (guarda una clave del proyecto como secreto del repo).
+>   - **A decidir con el dueño**: si reemplaza a GitHub Pages o conviven un tiempo; la dirección nueva (`…web.app`) cambia el sitio, así que
+>     **lo guardado en el navegador no viaja** (la partida elegida, preferencias, dados 3D: es por dirección) — hay que avisar al grupo; y
+>     revisar que el inicio de sesión ande en la dirección nueva (dominios autorizados de Firebase Auth).
+>   - **De yapa**: con la herramienta de Firebase instalada, las reglas de Firestore se podrían publicar desde el repo
+>     (`firebase deploy --only firestore:rules`) en vez de pegarlas a mano en la consola.
 
 > **⭐ Prioridad (dueño, 2026-10-03): la auditoría del catálogo, con el paso a paso** ([`rework-armas.md`](rework-armas.md), «Rework metódico por
 > Tipo»): «el equipo es una parte esencial de la mecánica y si está desbalanceado te puede romper todo el juego». Tipo por Tipo y tier por tier.

@@ -1520,6 +1520,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   puede sumar +3 (la de cada lado de un duelo reciente de vos o un aliado dentro de tu Rango, `Duelo.tiradaSumable`; si no, su última tirada de la
   Mesa) con su costo (2 SP + 1 por cada Empower que ya lleva esa tirada; Flash: 4 + … en turno ajeno, `ConfirmarTurno.flash`); `empowerUsar` cobra
   el SP (`editarPersonajeMapa`) y suma con `Duelo.sumarATirada(…, 'Empower')` (el duelo se vuelve a resolver). El Ejecutar de la Botonera abre lo mismo.
+- **⟳ Pasar de ronda** (2026-10-12, dueño; antes «⟳ Mantenimiento», mismo botón `#btn-mantenimiento` y mismo `pasarMantenimiento`): en combate
+  con la lista de turnos armada **no aparece** (`mantBotonActualizar`, js/04): ahí la ronda la pasa sola ▶ Siguiente al dar la vuelta, y apretarlo
+  además le contaba un turno de más a los que no están en la lista. Fuera de eso (narrativo, o un combate sin la lista) es como corre el tiempo.
 - **⏳ Pasar de día** (2026-10-12, `js/41-dia.js`): el GM aprieta «⏳ Pasar de día» (caja del Mantenimiento) → `campanas/<id>/mapa/dia` = {dia,
   manual} sube 1; la cabecera muestra «☀ Día N» (`actualizarCabecera`, js/01). Cada pantalla, para lo que maneja (`bnManejo`), aplica
   `FichaMantenimiento.descansar(S)` (vida, SP y No2; terminan los estados con turnos; `S.reparadoTalento` a 0; sus invocaciones) una sola vez

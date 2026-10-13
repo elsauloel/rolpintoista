@@ -1535,3 +1535,8 @@ versión parecida en más de una, es candidato a juntar.
 - **Sub-duelo que arranca en el dodge roll** (2026-10-13, Tormenta arcana): `hab.soloDodge` (lo conserva `limpiarHab`, junto con `hab.tormenta`)
   hace que `Duelo.crear` de un sub-duelo de área (`cfg.grupo`) empiece en la fase `dodge` (sin tirada); el cuadro dice «¡CAE LA TORMENTA!» y el daño
   que le toca.
+- **⚔ Contraataque al esquivar** (2026-10-13, Warrior): un personaje con una habilidad `contraEsquiva` marca su opción de Evasión
+  (`FichaDuelo.opcionesDefensa` → `op.contraEsquiva`); al elegirla, `duelo.js` mide si alcanza al atacante (`alcanceContra`: tokens del mapa
+  activo + el `alcance` que devuelve `armaContra`) y lo guarda en `defensa.{contraEsquiva, contraAlcanza, contraDist, contraAlcance}`. Si gana
+  la Evasión, el veredicto ofrece «¿Contraatacás?» (como tras Parry + Bloqueo); el gancho `contraEsquivaPagar(d, arma)` cobra 2 SP (o devuelve
+  por qué no) y se abre el duelo `contra` de siempre (el No2 de un primer ataque lo cobra al tirar el PdG). Solo personajes.

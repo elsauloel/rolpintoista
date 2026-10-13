@@ -104,8 +104,11 @@ cuesta 1 por defecto (`jobBudget`, 3 puntos + 3 por nivel).
    arma o escudo, pagando su No2). Original: «Parry [2] — NO2: 1. Cooldown: 1. Flash. Reemplaza la EV por PG en una tirada de
    evasión. El que tenga el arma más pesada tiene una bonificación igual a la diferencia en el peso de las armas.» Se descartó
    también quedarse solo con el bono por diferencia de Peso como pasiva («Parry del maestro»).
-9. **Contraataque** [2] — Permite realizar un ataque de oportunidad
-   después de esquivar un ataque.
+9. ✅ **Contraataque** — **SP:** 2, siempre (se usa en turno ajeno) **+ el No2 de un primer ataque** con el arma. Al ganar con la
+   **Evasión**, contraataca a quien lo atacó, **si lo alcanza** con su arma (cuerpo a cuerpo hasta donde llegue; a distancia, su Rango). Suma
+   el PdG de contraataque y no cuenta como ataque del turno. **Sin límite**, mientras alcancen el SP y los No2. ⚙ El duelo lo ofrece al
+   esquivar (mide la distancia al elegir la Evasión), cobra y abre el duelo nuevo. *(Auditada 2026-10-13 con el dueño; original:
+   «Contraataque [2] — Permite realizar un ataque de oportunidad después de esquivar un ataque.»)*
 
 ## Asalto ⏳
 

@@ -254,6 +254,8 @@ const FichaDuelo = (() => {
             info: [`Evasión 🎲 ${fx(evaV, 'eva', S.efectos)}${evaInfo}`, `${fmt(no2)} No2 del disparo + 2 SP`,
               arco ? 'si ganás, cuenta como Parry: para contraatacar, antes el dodge roll (alejarte 1 casillero, pagando sus No2)' : 'si ganás, cuenta como Parry: podés contraatacar']});
         });
+        // ⚔ Contraataque (Warrior, 2026-10-13): con la habilidad, si esquiva con la Evasión puede contraatacar (2 SP + un primer ataque).
+        if((S.habilidades || []).some(x => x && x.contraEsquiva)) ops.filter(o => o.modo === 'evasion').forEach(o => { o.contraEsquiva = true; o.info = [...o.info, '⚔ si esquivás, podés contraatacar (Contraataque: 2 SP + un primer ataque), si lo alcanzás']; });
         // Stun (2026-10-06): no puede hacer nada; si lo atacan, su Evasión es 1 (sin Parry ni pagar el sobrepeso).
         if(Combatiente.stuneado(S.efectos)) return [{modo: 'evasion', itemId: '', etiqueta: '🏃 Evasión · Stun: 1', motivoNo: '', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];
         return Combatiente.sinReaccionesNo2(ops, S.efectos);   // Expuesto (Degollar): sin Parry
@@ -295,7 +297,22 @@ const FichaDuelo = (() => {
         const usada = d.defensa && d.defensa.itemId ? S.inventario.find(x => x.id === d.defensa.itemId) : null;
         const conDano = FichaCombate.armasEquipadasConDano(S);
         const it = (usada && conDano.some(a => a.item.id === usada.id)) ? usada : (conDano.length ? conDano[0].item : null);
-        return {armaId: it ? it.id : '', armaNombre: it ? it.nombre : '', tipoDado: FichaCombate.tipoAtaque(it)};
+        return {armaId: it ? it.id : '', armaNombre: it ? it.nombre : '', tipoDado: FichaCombate.tipoAtaque(it), alcance: FichaCombate.alcanceDeArma(S, it)};
+      },
+      // ⚔ Contraataque (Warrior, 2026-10-13, dueño): al esquivar, 2 SP (siempre: es en turno ajeno) — el No2 de un primer ataque lo cobra el
+      // duelo nuevo al tirar el PdG. Sin límite, mientras alcancen los recursos: si falta SP o No2, no se contraataca. '' = cobrado.
+      contraEsquivaPagar: (d, armaC) => {
+        const S = getS(), c = compute();
+        if(!(S.habilidades || []).some(x => x && x.contraEsquiva)) return 'no tenés la habilidad Contraataque';
+        const sp = Math.max(0, FichaBotonera.spMaximo(S, c) - num(S.spGastado));
+        const arma = armaDelInv(armaC && armaC.armaId);
+        const no2 = FichaCombate.costoAtaqueEspecial(arma, 'contra', S);
+        if(sp < 2) return `te falta SP (cuesta 2, tenés ${fmt(sp)})`;
+        if(no2 > num(S.nitros)) return `te faltan No2 (el contraataque cuesta ${fmt(no2)}, tenés ${fmt(num(S.nitros))})`;
+        S.spGastado = num(S.spGastado) + 2;
+        ui.cambio(['vitals']);
+        ui.toast('⚔ Contraataque: −2 SP');
+        return '';
       },
     };
   }

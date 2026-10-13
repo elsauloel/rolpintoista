@@ -353,6 +353,25 @@ const Duelo = (() => {
     return snap.docs.map(d => ({id: d.id, ...d.data()})).filter(t => !t.oculto || soyGM());
   }
 
+  // ⚔ Contraataque (Warrior, 2026-10-13): ¿el que esquiva alcanza con su arma a quien lo atacó? Se mide al elegir la Evasión (antes de
+  // tirar), con los tokens del mapa activo. Sin los dos tokens (la ficha suelta, otro mapa), no se frena: decide la mesa.
+  const distHex = (a, b) => {
+    const cubo = c => { const q = _num(c.col), r = _num(c.fila) - (q - (q & 1)) / 2; return {q, r, s: -q - r}; };
+    const A = cubo(a), B = cubo(b);
+    return (Math.abs(A.q - B.q) + Math.abs(A.r - B.r) + Math.abs(A.s - B.s)) / 2;
+  };
+  async function alcanceContra(d, h){
+    const arma = (h.armaContra && h.armaContra(d)) || {};
+    const alcance = Math.max(1, _num(arma.alcance) || 1);
+    try{
+      const toks = await tokensDelMapa();
+      const a = toks.find(t => t.id === d.atacante.tokenId), b = toks.find(t => t.id === d.defensor.tokenId);
+      if(!a || !b) return {contraAlcanza: true, contraAlcance: alcance};
+      const dist = distHex(a, b);
+      return {contraAlcanza: dist <= alcance, contraDist: dist, contraAlcance: alcance};
+    }catch(e){ return {contraAlcanza: true, contraAlcance: alcance}; }
+  }
+
   async function elegirObjetivoLista(cfg){
     const f = fondo();
     f.classList.remove('min');
@@ -1739,6 +1758,14 @@ const Duelo = (() => {
         + `<button type="button" data-contra>Sí, contraatacar${propio ? '' : ' (por ' + _esc(d.defensor.nombre) + ')'}</button> <button type="button" class="sec" data-contra-no>No</button></div>`;
       else contra = `<div class="duelo-mini">⚔ ${_esc(d.defensor.nombre)} puede contraatacar: está decidiendo…</div>`;
     }
+    else if(d.resultado === 'fallo' && !d.hab && !d.contra && d.defensa && d.defensa.contraEsquiva){
+      // ⚔ Contraataque (Warrior, 2026-10-13, dueño): esquivó con la Evasión → puede contestar, si lo alcanza: 2 SP + el No2 de un primer ataque.
+      const propio = esMio(d.defensor);
+      if(!d.defensa.contraAlcanza) contra = `<div class="duelo-mini">⚔ ${_esc(d.defensor.nombre)} esquivó, pero no alcanza a ${_esc(d.atacante.nombre)} para contraatacar (distancia ${_fmt(d.defensa.contraDist)}, su alcance ${_fmt(d.defensa.contraAlcance)})</div>`;
+      else if(propio || soyGM()) contra = `<div class="duelo-contra"><div class="duelo-nota" style="margin-bottom:8px">⚔ ${propio ? 'Esquivaste' : _esc(d.defensor.nombre) + ' esquivó'}: <b>¿${propio ? 'contraatacás' : 'contraataca'} a ${_esc(d.atacante.nombre)}?</b> (Contraataque)<br><span style="opacity:.8">Cuesta 2 SP y lo de un primer ataque con su arma; se abre un duelo nuevo con los papeles al revés.</span></div>`
+        + `<button type="button" data-contra>Sí, contraatacar${propio ? '' : ' (por ' + _esc(d.defensor.nombre) + ')'}</button> <button type="button" class="sec" data-contra-no>No</button></div>`;
+      else contra = `<div class="duelo-mini">⚔ ${_esc(d.defensor.nombre)} puede contraatacar: está decidiendo…</div>`;
+    }
     else if(d.contra === 'no') contra = `<div class="duelo-mini">${_esc(d.defensor.nombre)} decidió no contraatacar</div>`;
     else if(d.contra) contra = `<div class="duelo-mini">⚔ ${_esc(d.defensor.nombre)} contraatacó: hay otro duelo abierto</div>`;
     return caja + contra;
@@ -2231,8 +2258,13 @@ const Duelo = (() => {
         return;
       }
       if(m.tipo === 'duelo-contra'){
-        if(!h.soy || !h.soy(d.defensor) || !h.armaContra || d.resultado !== 'bloqueado' || d.contra || (d.contacto && d.contacto.dodgeArco && !d.contacto.dodgeHecho)) return;
+        const alEsquivar = d.resultado === 'fallo' && !d.hab && d.defensa && d.defensa.contraEsquiva && d.defensa.contraAlcanza;   // ⚔ Contraataque (Warrior)
+        if(!h.soy || !h.soy(d.defensor) || !h.armaContra || (d.resultado !== 'bloqueado' && !alEsquivar) || d.contra || (d.contacto && d.contacto.dodgeArco && !d.contacto.dodgeHecho)) return;
         const arma = h.armaContra(d) || {};
+        if(alEsquivar){
+          const err = h.contraEsquivaPagar ? await h.contraEsquivaPagar(d, arma) : 'esta página no sabe cobrar el Contraataque';
+          if(err){ _toast('No se pudo contraatacar: ' + err); return; }
+        }
         const tok = {id: d.atacante.tokenId, nombre: d.atacante.nombre, tipo: d.atacante.tipo, fichaId: d.atacante.ref, duenoUid: d.atacante.uid};
         const nid = await crear({yo: {ref: d.defensor.ref, tipo: d.defensor.tipo, nombre: d.defensor.nombre}, ataque: {tipo: 'contra', armaId: arma.armaId || '', armaNombre: arma.armaNombre || '', tipoDado: arma.tipoDado || 8}}, tok, d.defensor.tokenId, d.id);
         await col().doc(d.id).update({contra: nid});
@@ -2249,6 +2281,7 @@ const Duelo = (() => {
         const op = (d.hab ? opcionesHab(d, h) : (h.opcionesDefensa ? h.opcionesDefensa(d) : [])).find(o => o.modo === m.modo && (o.itemId || '') === (m.itemId || ''));
         if(!op || op.motivoNo) return;
         defensa = {modo: op.modo, itemId: op.itemId || '', itemNombre: op.itemNombre || '', costo: _num(op.costo), ...(op.arco ? {arco: true} : {})};
+        if(op.contraEsquiva && !d.hab) defensa = {...defensa, contraEsquiva: true, ...(await alcanceContra(d, h))};   // ⚔ Contraataque (Warrior)
       }
       let extra = null;
       if(!d.hab && campo === 'pdg' && h.statsCritico) extra = h.statsCritico(d) || null;

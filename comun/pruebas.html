@@ -792,6 +792,11 @@ prueba('El escudo de un creep, guardado sin peso, toma el del catálogo (contra 
   const d = CreepCalculo.defensa(sc, {soloEscudo: true});
   igual([d.nombre, d.peso, CreepCalculo.defensa(sc).nombre], ['Tapa de tacho de basura', num(tapa.peso), 'Palo con clavos']);
 });
+prueba('Puntos de atributo de un creep: 33 + 3 por nivel después del primero; dice si faltan o sobran', () => {
+  const sc = n => ({nivel: n, con: 9, fue: 10, agl: 4, des: 6, esp: 4});
+  igual([CreepCalculo.presupuestoTxt(sc(1)), CreepCalculo.presupuestoTxt(sc(2)), CreepCalculo.presupuestoTxt({...sc(1), agl: 7})],
+    ['Puntos de atributo: 33 de 33 ✓', 'Puntos de atributo: 33 de 36 · faltan 3', 'Puntos de atributo: 36 de 33 · 3 de más']);
+});
 prueba('La 🪪 de un creep vivo muestra solo qué lleva; derrotado, los nombres (2026-10-13)', () => {
   const sc = {hp: 10, armaNombre: 'Pico de juguete', armaNatural: false, equipo: [{nombre: 'Varita del susurro'}, {nombre: 'Capucha de lana del culto'}, {nombre: 'Buena varita del relámpago'}]};
   const vivo = CreepCalculo.tarjetaPublica(sc), muerto = CreepCalculo.tarjetaPublica({...sc, hp: 0});

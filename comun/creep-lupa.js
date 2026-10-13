@@ -181,7 +181,7 @@ const CreepLupa = (() => {
       </div>
     </div>
     <div class="vc-cuerpo">
-      ${seccion('Atributos', `<div class="vc-cajas vc-5">${ATTR_IDS.map(a => {
+      ${seccion('Atributos', `<div style="margin:-2px 0 6px">${K.presupuestoHtml(sc)}</div><div class="vc-cajas vc-5">${ATTR_IDS.map(a => {
         const mod = K.modTotal(sc, a);
         return `<div class="attr-col">${caja(ATTR_LABELS[a], fmt(num(sc[a]) + mod), mod ? `Base ${fmt(num(sc[a]))} ${K.conSigno(mod)} por ${K.origenesMod(sc, a).join(', ')}` : '')}${derivadosHtml(sc, a)}</div>`;
       }).join('')}</div>`)}

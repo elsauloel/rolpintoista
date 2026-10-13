@@ -425,6 +425,22 @@ const CreepCalculo = (() => {
   // Lo que muestra la 🪪 tarjeta del creep en el mapa a cualquier jugador (2026-10-09): solo NOMBRES — el arma (también la natural,
   // marcada) y cada pieza de equipo, sin defensa, bonos ni detalle — y la nota. Lo publican GM Tools (creepPublico) y el mapa al
   // cambiar un creep (modificarCreep), en el documento público del creep; el resto de la ficha sigue siendo privada del GM.
+  /* Los puntos de atributo de un creep (2026-10-13, dueño: «en Ver o Editar no dice en ningún lado si faltan o sobran puntos»): 33 + 3 por
+     cada nivel después del primero, repartidos entre Con, Fue, Agl, Des y Esp. Es una guía: avisa, no bloquea. */
+  function presupuesto(sc){
+    const nivel = Math.max(1, num(sc && sc.nivel) || 1), total = 33 + 3 * (nivel - 1);
+    const usado = ['con', 'fue', 'agl', 'des', 'esp'].reduce((a, k) => a + num(sc && sc[k]), 0);
+    return {nivel, total, usado, pend: total - usado};
+  }
+  function presupuestoTxt(sc){
+    const b = presupuesto(sc);
+    return `Puntos de atributo: ${b.usado} de ${b.total}${b.pend > 0 ? ` · faltan ${b.pend}` : b.pend < 0 ? ` · ${-b.pend} de más` : ' ✓'}`;
+  }
+  // Verde si está justo, ámbar si faltan, rojo si sobran.
+  function presupuestoHtml(sc){
+    const b = presupuesto(sc), color = b.pend > 0 ? '#e0b84a' : b.pend < 0 ? '#e0685a' : '#6fcf8a';
+    return `<span class="creep-puntos" title="Nivel ${b.nivel}: 33 + 3 por cada nivel después del primero = ${b.total}. Es una guía: solo avisa." style="font-size:12px;font-weight:700;color:${color};text-transform:none;letter-spacing:0">${presupuestoTxt(sc)}</span>`;
+  }
   /* Lo que se ve de una pieza de un creep vivo (2026-10-13, dueño: «que vean que tiene una varita, un pico, pero no el detalle hasta que
      mueran»): solo qué es — la primera palabra que nombra la cosa («Varita del susurro» → «Varita», «Chaleco de cuero» → «Chaleco»),
      salteando lo que la califica («Buena», «Gran», «El»…). */
@@ -635,5 +651,5 @@ const CreepCalculo = (() => {
     statValor, estadoActivo, aportesMod, origenesMod, conSigno, statOrigenTxt, armadmgOrigenTxt, ataqueTxt, ataqueOrigenTxt,
     defensaOrigenTxt, critOrigenTxt, armaduraOrigenTxt, modsAfectanHp, actualizarHpMaxPorCon, nitrosMax, actualizarNo2PorAgl,
     costoAtaque, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor,
-    fuerzaGolpeValor, costoContraataque, costoOportunidad, oportunidadPosible, sinOportunidad, tarjetaPublica, nombreGenerico, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
+    fuerzaGolpeValor, costoContraataque, costoOportunidad, oportunidadPosible, sinOportunidad, tarjetaPublica, nombreGenerico, presupuesto, presupuestoTxt, presupuestoHtml, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
 })();

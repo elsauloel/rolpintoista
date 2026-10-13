@@ -449,19 +449,12 @@ function actualizarNo2EnDOM(sc, card){
   }
 }
 
-function attrBudgetCreep(sc){
-  const nivel = Math.max(1, num(sc.nivel) || 1);
-  const total = 33 + 3 * (nivel - 1);
-  const usado = ATTR_IDS.reduce((a,id) => a + num(sc[id]), 0);
-  return {total, usado, pend: total - usado};
-}
-function attrBudgetTxt(sc){
-  const b = attrBudgetCreep(sc);
-  return `${fmt(b.usado)}/${fmt(b.total)}${b.pend<0?` · +${fmt(Math.abs(b.pend))} de más`:''}`;
-}
+// Los puntos de atributo (comun/creep-calculo.js, 2026-10-13: más a la vista, y dice si faltan o sobran).
+function attrBudgetCreep(sc){ return CreepCalculo.presupuesto(sc); }
+function attrBudgetTxt(sc){ return CreepCalculo.presupuestoTxt(sc); }
 function attrBudgetStyle(sc){
-  const over = attrBudgetCreep(sc).pend < 0;
-  return `font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0;text-transform:none;color:${over?'var(--danger)':'var(--muted)'}`;
+  const p = attrBudgetCreep(sc).pend;
+  return `font-size:12px;font-weight:700;letter-spacing:0;text-transform:none;color:${p > 0 ? '#e0b84a' : p < 0 ? 'var(--danger)' : '#6fcf8a'}`;
 }
 function actualizarBadgePresupuesto(sc, card){
   if(!card) return;

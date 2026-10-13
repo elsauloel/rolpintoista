@@ -30,6 +30,10 @@
 - [ ] **✨ Carga Elemental** (Mago, 2026-10-13): un personaje con la skill lanza una skill de daño especial → «Carga Elemental» con los 5
   elementos y «Sin carga»; cobra la mitad del SP; Fuego (+50 % en el cuadro), Frío (Escarcha ×N según lo que entró), Ácido (Armadura rota),
   Tóxico (Veneno), Eléctrico (salta y 20 % de Parálisis solo al primero).
+  **Probado en parte (2026-10-13, GM + jugador elsaulo):** la pregunta con los 5 elementos y «Sin carga» ✔; Eléctrico ✔ (Toque mágico, 28 al
+  Escarabajo, saltó al Coloso con 14 → 41 → 27; Parálisis 20 % tirada en el cuadro, salió 8: no). Frío: el daño entró pero la Escarcha no — la
+  aplicó otra pantalla del GM con código viejo (los mapas abiertos del dueño); en la pestaña recargada, 6 de hielo → Escarcha ×2 ✔. **Falta,
+  con todos los mapas recargados:** Frío, Fuego, Ácido y Tóxico de punta a punta.
 - [ ] **⚡ Salto eléctrico, regla general** (2026-10-13): 4 casillas; la mitad de lo que entró; cada salto resta la Res. eléctrica; sin tope
   (la varita de chispa, el relámpago, la flecha de tormenta, la trampa Descarga y el ⚡ del menú de vida).
 

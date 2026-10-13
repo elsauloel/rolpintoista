@@ -10,8 +10,6 @@
 
 ## Pendientes
 
-- [ ] **🔁 Repetición** (2026-10-13): X = 3 con un arco al mismo creep: el 1.º sin bono, el 2.º +1 PdG y +1 dado, el 3.º +2 y +2 (en el duelo y en
-  la Mesa) y el estado se va; cambiar de blanco a mitad corta la cadena.
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no
@@ -30,6 +28,11 @@
   pudo ver la animación 3D (la ventana de Chrome estaba de fondo). Mirarla en una sesión real.
 
 ## Probado
+
+- [x] **🔁 Repetición** (2026-10-13, juan con el Arco corto; la pestaña estaba en segundo plano, así que los botones se tocaron desde adentro de la
+  página): X = 3 cobró 3 SP y 0 No2; tres disparos al Coloso: el 1.º sin bono, el 2.º «repetición (+1)» = +1 PdG y +1d4, el 3.º +2 PdG y +2d4, y el
+  estado se fue. Con X = 2: un disparo al Coloso y el siguiente al escarabajo → sin bono, «se cortó la Repetición» y el estado se fue. Los duelos de
+  prueba se cancelaron (no se tiró el daño). Visto: con flechas especiales en el carcaj, el ataque pregunta «¿Qué flecha?» primero.
 
 - [x] **✨ Smite** (2026-10-13, juan con el control del GM): contra el Coloso marcado como no-muerto, sin tirada, la Mesa avisó «lo sagrado le pega el
   doble» y tiró 2d4 = 6 directo a la vida (47 → 41).

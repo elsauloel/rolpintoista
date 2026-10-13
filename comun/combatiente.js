@@ -1174,6 +1174,7 @@ const Combatiente = (() => {
       // El riesgo (2026-10-08, Varita inestable): si en los dados del daño sale `si` (un 1), quien la usa se hace `dano`.
       ...(c.riesgo ? {riesgo: {si: Math.max(1, Math.round(nf(c.riesgo.si)) || 1), dano: String(c.riesgo.dano || '2d4'), ...(c.riesgo.porCada ? {porCada: true} : {})}} : {}),
       ...(c.fuegoAmigo ? {fuegoAmigo: true} : {}),
+      ...(c.sagrado ? {sagrado: true} : {}),   // Smite (Support, 2026-10-13): contra un no-muerto o un demonio, el doble de dados
       // Tormenta arcana (Mago, 2026-10-13): `proyectiles` (1d20) que caen al azar, de `cada` (1d4) cada uno; sin tirada: solo se zafa con el dodge roll.
       ...(c.objetivo === 'area' && c.tormenta ? {tormenta: {proyectiles: String(c.tormenta.proyectiles || '1d20'), cada: String(c.tormenta.cada || '1d4')}, soloDodge: true} : {}),   // un área que también agarra a los aliados (2026-10-07, Bola de fuego mayor)
       ...(c.atrae ? {atrae: {casillas: Math.max(1, Math.round(nf(c.atrae.casillas)) || 2), contra: c.atrae.contra || 'fue', ...(o.stat ? {tiraValor: Math.round(nf(o.stat(c.atrae.tira || 'dmgesp')))} : {})}} : {}),

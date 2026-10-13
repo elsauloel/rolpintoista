@@ -756,6 +756,13 @@ prueba('Proyectil perforante (Shooter, 2026-10-13): 2 SP + el disparo, solo a di
   igual([hab.costo, hab.nitrosCosto, hab.soloRango, a.perforante, a.mods.pdg, a.mods.fijo, !!a.soloCritico, /Sin auditar/.test(hab.detalle), !!hab.original],
     ['2', 'ATAQUE', true, true, 0, 0, false, false, true]);
 });
+prueba('Smite (Support, 2026-10-13): 1 SP y 1 No2, sin tirada, 1d4 directo, en tu Rango, lo sagrado viaja al duelo', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-smite');
+  const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: s => s === 'rng' ? 6 : 5, etq: s => s, X: 0});
+  const limpio = Duelo.limpiarHab(ej);
+  igual([hab.costo, hab.nitrosCosto, ej.tira, ej.dano.formula, ej.dano.directo, !!ej.sagrado, limpio.sinOposicion, /Sin auditar/.test(hab.detalle)],
+    ['1', 1, null, '1d4', true, true, true, false]);
+});
 prueba('Tormenta arcana (Mago, 2026-10-13): área de diámetro 5 con aliados, sin tirada (solo dodge roll), el reparto viaja limpio al duelo', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'mago').habilidades.find(h => h.id === 'mago-tormenta-arcana');
   const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});

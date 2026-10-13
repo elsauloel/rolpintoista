@@ -735,7 +735,8 @@ function dueloElegirObjetivoMapa(msg){
           ...['humo', 'luz', 'clava', 'rebota'].reduce((o, k) => b[k] ? {...o, [k]: true} : o, {}), ...(b.explota ? {explota: b.explota} : {})};   // virotes con mapa (js/33)
         if(msg.alDisparar){ try{ msg.alDisparar(); }catch(err){ console.error('No se pudo gastar la flecha:', err); } }
       }
-      Duelo.crear({yo, ataque, espalda, embestida, quieto, primeraSangre, tiro, flecha}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
+      const ataqueFinal = ataque && ataque.hab && ataque.hab.sagrado && ataque.hab.dano ? sagradoContra(ataque, t) : ataque;   // Smite: el doble contra un no-muerto o un demonio
+      Duelo.crear({yo, ataque: ataqueFinal, espalda, embestida, quieto, primeraSangre, tiro, flecha}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
     }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + (minimo ? `de ${minimo} a ` : '') + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : conArco ? ` · 🏹 el arco necesita ${Combatiente.arcoLibresTxt(ataque)} en el medio` : ''}${mioTiro ? ' · la línea muestra si el tiro pasa' : ''}${nIdeal ? ' · 💠 en celeste, tu distancia ideal (' + esc(Combatiente.idealTxt(ataque.ideal)) + ')' : ''}</span>`, true, cancelado);
     // Sin nadie a tiro con un arco (2026-10-09): se dice por qué — su alcance no llega a la distancia mínima, o no hay nadie en esa franja.
@@ -1777,3 +1778,12 @@ function precargarMarco(){
 
 $('#botonera-cargando-x').onclick = () => { cerrarBotonera(); botonera = {herramienta: '', fichaId: '', lista: false}; $('#botonera-marco').src = 'about:blank'; };
 
+/* ✨ Lo sagrado (2026-10-13, Smite del Support, dueño: «doble contra no-muertos»): contra un creep de tipo no-muerto o demonio, el daño de la
+   habilidad tira el doble de dados (1d4 → 2d4). El tipo es el de la tarjeta pública del creep (`vinculo(t).tipoCriatura`). */
+function sagradoContra(ataque, t){
+  const v = vinculo(t), tc = String((v && v.tipoCriatura) || '').toLowerCase();
+  if(!['no-muerto', 'demonio'].includes(tc)) return ataque;
+  const formula = String(ataque.hab.dano.formula || '').replace(/(\d*)d(\d+)/i, (m, n, k) => `${2 * (num(n) || 1)}d${k}`);
+  mesaLinea(`✨ ${ataque.hab.nombre} contra ${nombreDe(t)} (${tc}): lo sagrado le pega el doble (${formula})`, 'recordatorio');
+  return {...ataque, hab: {...ataque.hab, nombre: ataque.hab.nombre, dano: {...ataque.hab.dano, formula}}};
+}

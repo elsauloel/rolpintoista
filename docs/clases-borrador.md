@@ -346,8 +346,9 @@ verifica con 1d20: hasta DES×2 → 7+; hasta DES×3 → 17+; más de DES×3 →
    fijo **🧚** (la hadita) en combate. **Absorbió a Afortunado** (2026-10-12, dueño: «que no existan las dos porque son muy parecidas… que exista
    Re-roll y que funcione como Afortunado, con el botón de la hadita, 2 en lugar de 5»). *(Auditada 2026-10-12 con el dueño; original:
    «Re-roll [2] — Flash. Permite rerolear tiradas aliadas. Lento.»)*
-8. **Smite** [1] — NO2: (1). Rayo de daño holy inesquivable que causa 1d4
-   de daño.
+8. ✅ **Smite** — **SP:** 1. **No2:** 1. Un rayo sagrado a un enemigo dentro de tu Rango: **sin tirada** (no se esquiva ni se resiste), **1d4
+   directo a la vida** (ni Defensa ni Defensa especial); **contra un no-muerto o un demonio, 2d4** (por el tipo de criatura del creep). ⚙ Automatizado.
+   *(Auditada 2026-10-13 con el dueño; original: «Smite [1] — NO2: (1). Rayo de daño holy inesquivable que causa 1d4 de daño.»)*
 9. **Transferir SP** [1] — Transfiere 1d6 SP entre sí mismo y un aliado.
 10. **Adrenalina** [5] — Otorga +1 a Destreza, Fuerza y Agilidad durante 2
     turnos. Acumulable. Lento.

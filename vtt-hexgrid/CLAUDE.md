@@ -1558,3 +1558,5 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `tormentaRepartir` tira los proyectiles y reparte cada uno al azar entre los de adentro (rivales y aliados, sin caídos), lo cuenta en la Mesa y deja
   `hab.tormenta.cuenta`; solo entran a la cascada los que recibieron alguno. `areaCrearSiguienteSubDuelo` arma el daño de cada uno con
   `tormentaHabDe` (k × 1d4, directo). Cada sub-duelo arranca en el dodge roll (comun/duelo.js).
+- **✨ Lo sagrado** (2026-10-13, Smite): una habilidad con `hab.sagrado` (`Combatiente.habEjecucion`) contra un creep de tipo no-muerto o demonio
+  (`vinculo(t).tipoCriatura`) tira el doble de dados de daño: `sagradoContra(ataque, t)` en `dueloElegirObjetivoMapa` (js/13), con una línea en la Mesa.

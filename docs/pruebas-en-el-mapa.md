@@ -10,6 +10,7 @@
 
 ## Pendientes
 
+- [ ] **✨ Smite** (2026-10-13): contra un creep común (1d4, sin tirada, directo) y contra uno no-muerto (2d4 y la línea en la Mesa).
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no

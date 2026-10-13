@@ -11,7 +11,10 @@
    ========================================================= */
 let diaActual = 0, diaManual = false, diaVisto = false;
 const refDia = () => fbDb.doc(fbRutaCampana('mapa/dia'));
+let diaEscuchando = false;
 function escucharDia(){
+  if(diaEscuchando || typeof fbDb === 'undefined' || !fbDb || typeof fbMiembro === 'undefined' || !fbMiembro) return;
+  diaEscuchando = true;
   refDia().onSnapshot(doc => {
     const d = doc.exists ? doc.data() || {} : {};
     const antes = diaActual;
@@ -114,4 +117,6 @@ async function corregirDia(){
   catch(err){ console.error(err); toast('No se pudo cambiar el día'); }
 }
 $('#btn-dia-mapa').onclick = () => pasarDeDia();
+// El arranque (js/14, arrancarEnVivo) lo llama; si ya arrancó antes de que cargara este archivo, se empieza acá (2026-10-12: pasaba).
+escucharDia();
 $('#btn-dia-corregir').onclick = () => corregirDia();

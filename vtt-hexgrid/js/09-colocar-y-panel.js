@@ -50,7 +50,9 @@ function colocacionClic(px, py){
 // Cartel fijo que dice qué paso toca.
 function actualizarAvisoColocacion(){
   const el = $('#colocando-aviso');
-  if(!colocando){ if(!el.hidden) el.hidden = true; return; }
+  // Mientras se elige una casilla (elegirDestino: el centro de un área, un teleport, el giro del Remolino…) el cartel es suyo: no esconderlo
+  // (2026-10-13: lo escondía en el redibujo siguiente y no se veía qué hacer).
+  if(!colocando){ if(!el.hidden && !elegirDestinoCb) el.hidden = true; return; }
   const txt = colocando.paso === 'lugar'
     ? `Poné a <b>${esc(colocando.datos.nombre)}</b>: elegí la casilla con un clic`
     : `Ahora elegí hacia dónde mira <b>${esc(colocando.datos.nombre)}</b>: movés el mouse y clic para confirmar`;

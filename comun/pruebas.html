@@ -786,6 +786,12 @@ prueba('Ataque con arreglos: dados extra de otro tamaño (+1d6, 2026-10-13) viaj
   const malo = Combatiente.ataqueConArreglos({nombre: 'X'}, {modo: 'arma', arma: {dadoExtra: 'mucho'}}, {arma: {}});
   igual([a.mods.dadoExtra, 'dadoExtra' in malo.mods], ['1d6', false]);
 });
+prueba('El escudo de un creep, guardado sin peso, toma el del catálogo (contra un disparo para con el escudo)', () => {
+  const tapa = CATALOGO_BASE.find(x => x.nombre === 'Tapa de tacho de basura');
+  const sc = {armaNombre: 'Palo con clavos', armaPeso: 1, equipo: [{nombre: 'Tapa de tacho de basura', tipoItem: tapa.tipoItem}]};
+  const d = CreepCalculo.defensa(sc, {soloEscudo: true});
+  igual([d.nombre, d.peso, CreepCalculo.defensa(sc).nombre], ['Tapa de tacho de basura', num(tapa.peso), 'Palo con clavos']);
+});
 prueba('La 🪪 de un creep vivo muestra solo qué lleva; derrotado, los nombres (2026-10-13)', () => {
   const sc = {hp: 10, armaNombre: 'Pico de juguete', armaNatural: false, equipo: [{nombre: 'Varita del susurro'}, {nombre: 'Capucha de lana del culto'}, {nombre: 'Buena varita del relámpago'}]};
   const vivo = CreepCalculo.tarjetaPublica(sc), muerto = CreepCalculo.tarjetaPublica({...sc, hp: 0});

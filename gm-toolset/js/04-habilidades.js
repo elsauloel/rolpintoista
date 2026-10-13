@@ -251,7 +251,7 @@ function equiparItemEnCreep(idx){
     sc.defensa = num(sc.defensa) + num(item.def);
     aplicarModsEquipo(sc, mods, 1);
     sc.equipo = sc.equipo || [];
-    sc.equipo.push({id: uid(), nombre: item.nombre, tipoItem: item.tipoItem, def: num(item.def), mods, detalle: item.detalle || '', ...CreepCalculo.magiaDeItem(item)});
+    sc.equipo.push({id: uid(), nombre: item.nombre, tipoItem: item.tipoItem, def: num(item.def), peso: num(item.peso), mods, detalle: item.detalle || '', ...CreepCalculo.magiaDeItem(item)});   // peso: un escudo para con su peso (2026-10-13)
     actualizarArmaduraTipo(sc);
     if(modsAfectanHp(mods)) actualizarHpMaxPorCon(sc);
     toast(`${sc.nombre} equipado con ${item.nombre}`);

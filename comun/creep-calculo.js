@@ -398,7 +398,13 @@ const CreepCalculo = (() => {
     if(!sc) return null;
     return Combatiente.armaParaDefensa({arma: sc.armaNombre ? {nombre: sc.armaNombre, peso: pesoArma(sc)} : null, natural: sc.armaNatural,
       arco: !!sc.armaDeRango, soloEscudo: !!(o && o.soloEscudo),
-      escudos: (sc.equipo || []).filter(it => slotDe(it.tipoItem) === 'escudo').map(it => ({nombre: it.nombre, peso: num(it.peso)}))});
+      escudos: (sc.equipo || []).filter(it => slotDe(it.tipoItem) === 'escudo').map(it => ({nombre: it.nombre, peso: pesoPieza(it)}))});
+  }
+  // El peso de una pieza del equipo (2026-10-13): las equipadas antes no lo guardaban; si falta, el del catálogo con ese nombre.
+  function pesoPieza(it){
+    if(num(it && it.peso) > 0) return num(it.peso);
+    const c = typeof CATALOGO_BASE !== 'undefined' && it ? CATALOGO_BASE.find(x => x && x.nombre === it.nombre) : null;
+    return c ? num(c.peso) : 0;
   }
   function bloqueoValor(sc){ const d = defensa(sc); return statValor(sc, 'bloqueo') + (d ? num(d.peso) : 0); }
   // Fuerza del golpe (reglas del escudo, 2026-09-26): la tirada del atacante contra el Bloqueo del defensor = su Fuerza (con los estados activos) + el peso de su arma; la SUMA es el dado.

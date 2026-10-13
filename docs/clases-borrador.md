@@ -389,8 +389,11 @@ ya tenían este mismo formato (número azul, Maldición Esp / Res.M):
    las dos tiradas al resolverse. El drenaje en sí sigue siendo a mano, mismo criterio que Shockwave y Sonic Boom —
    la diferencia entre "Pasos personalizados" (una ventanita aparte, descartada) y esto es que la tirada, el
    objetivo y la contienda SÍ quedan automatizados, solo lo que de verdad no se puede calcular queda a mano.)*
-7. **Balas de sangre** [1] — Gasta X HP (máximo ESP). Dispara un proyectil
-   tipo 1. El peso del proyectil es igual a la vida gastada.
+7. ✅ **Balas de sangre** — **SP:** 1. **No2:** 2. **HP:** X (de 1 a tu Especial; tiene que sobrarte vida). Disparás un proyectil de
+   sangre: **X d4** de daño, que **ignora la Defensa** (le resta la Defensa especial; sin crítico). Tirás **PdG contra Evasión**, dentro de tu
+   Rango. ⚙ Automatizado: al ejecutar se elige la vida (X), se cobra y el duelo tira X d4. *(Auditada 2026-10-13 con el dueño; original:
+   «Balas de sangre [1] — Gasta X HP (máximo ESP). Dispara un proyectil tipo 1. El peso del proyectil es igual a la vida gastada.» El «tipo 1»
+   pasó al Tipo más chico de hoy, el d4, y el «peso» a la cantidad de dados.)*
 8. **Transfusión sanguínea** [1] — Transfiere hasta 20 de HP de un
    personaje aliado a otro.
 9. ✅ **Veneno** — **SP:** 2. **No2:** 1. Maldición: tirás **PdG.Esp contra el Res.Esp** de un enemigo dentro de tu Rango; si ganás, le dejás

@@ -563,6 +563,7 @@ const FichaAcciones = (() => {
   // Tope de X en costos variables. PLACEHOLDER: ver IT2.limiteXNitros/limiteXSp.
   // El tope de X: el general (si algún día se define) y el de la habilidad (`xMax`, 2026-10-11: Apuntar, X de 1 a 3), el menor de los dos.
   function limiteCostoX(S, cual, it){
+    if(cual === 'hp') return Math.max(0, Math.floor(num(FichaCalculo.calcular(S).final.esp)));   // la vida en X: como mucho tu Especial (Balas de sangre)
     const f = cual === 'sp' ? IT2().limiteXSp : IT2().limiteXNitros;
     const base = typeof f === 'function' ? f(FichaCalculo.calcular(S)) : null, xm = it && num(it.xMax) > 0 ? num(it.xMax) : null;
     return base === null ? xm : xm === null ? base : Math.min(base, xm);
@@ -770,8 +771,9 @@ const FichaAcciones = (() => {
   }
 
   // El costo X ya elegido en el cartel (sp y nitros): valida, cobra y sigue como Ejecutar. Devuelve true si se ejecutó.
-  function confirmarCostoVariable(S, it, sp, nitros, arma, ui){
-    if(sp < 0 || nitros < 0){
+  function confirmarCostoVariable(S, it, sp, nitros, arma, ui, hp){
+    const hpX = FichaHabilidades.hpVariable(it);
+    if(sp < 0 || nitros < 0 || (hpX && num(hp) < 0)){
       ui.toast('Los valores no pueden ser negativos');
       return false;
     }
@@ -783,10 +785,16 @@ const FichaAcciones = (() => {
     const limN = limiteCostoX(S, 'nitros', it), limS = limiteCostoX(S, 'sp', it);
     if(limN !== null && FichaHabilidades.nitrosVariable(it) && nitros > limN){ ui.toast(`Como mucho ${fmt(limN)} Nitros en X`); return false; }
     if(limS !== null && FichaHabilidades.spVariable(it) && sp > limS){ ui.toast(`Como mucho ${fmt(limS)} SP en X`); return false; }
+    if(hpX){   // la vida en X (Balas de sangre): de 1 a tu Especial, y tiene que sobrarte vida
+      const limH = limiteCostoX(S, 'hp', it);
+      if(num(hp) < 1){ ui.toast('Elegí cuánta vida gastás (al menos 1)'); return false; }
+      if(limH !== null && num(hp) > limH){ ui.toast(`Como mucho ${fmt(limH)} de vida en X (tu Especial)`); return false; }
+      if(num(S.hp) <= num(hp)){ ui.toast(`No te alcanza la vida — tenés ${fmt(num(S.hp))}`); return false; }
+    }
     S.nitros = Math.max(0, num(S.nitros) - pagaN);
     tormentaPj(S, pagaN, `usar ${it.nombre}`, ui);
     S.spGastado = num(S.spGastado) + sp;
-    const costoHp = num(it.hpCosto);
+    const costoHp = hpX ? Math.round(num(hp)) : num(it.hpCosto);
     if(costoHp > 0) ui.fijarHp(num(S.hp) - costoHp);
     if(num(it.curaHp) > 0) ui.fijarHp(num(S.hp) + num(it.curaHp));
     const ataque = registrarAtaqueDeHabilidad(S, it, arma);
@@ -794,7 +802,7 @@ const FichaAcciones = (() => {
     ui.colocarTrampa(it);
     ui.avisarZona(it);
     const invocada = invocarConHab(S, it, ui);
-    ui.terminar(it, arma, sp, nitros);
+    ui.terminar(hpX ? {...it, _xHp: costoHp} : it, arma, sp, nitros);   // la X de vida viaja en la copia (xDeHab)
     ui.cerrarCostoX();
     ui.cambio(['habilidades', ...(efecto ? ['efectos'] : []), ...(invocada ? ['invocaciones'] : []), 'nitros', 'vitals']);
     const partes = [`ejecutada`, `-${fmt(sp)} SP`, `-${fmt(nitros)} No2`];
@@ -967,7 +975,7 @@ const FichaAcciones = (() => {
     aplicarEstadoRecibido(S, spec, `${d.atacante.nombre} · ${ef.nombre}`, ui);
     return {nota: typeof EstadosAplicar !== 'undefined' ? EstadosAplicar.texto(spec) : spec.nombre};
   }
-  function xDeHab(it, xSp, xNitros){ return FichaHabilidades.spVariable(it) ? num(xSp) : FichaHabilidades.nitrosVariable(it) ? num(xNitros) : 0; }
+  function xDeHab(it, xSp, xNitros){ return FichaHabilidades.spVariable(it) ? num(xSp) : FichaHabilidades.nitrosVariable(it) ? num(xNitros) : FichaHabilidades.hpVariable(it) ? num(it._xHp) : 0; }
   // La Ejecución para el cuadro del duelo: la regla común (comun/combatiente.js, habEjecucion).
   // `arma`: con la que se ejecuta (si cuesta lo mismo que un ataque); sin ella, la principal — para «el daño de tu arma».
   function habDueloDatos(S, it, xSp, xNitros, arma){

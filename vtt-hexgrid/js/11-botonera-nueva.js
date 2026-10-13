@@ -111,8 +111,8 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261012zy', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261012zr', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261010g', '../comun/ficha-mantenimiento.js?v=20261012zs', '../comun/ficha-calculo.js?v=20261012zq', '../comun/ficha-combate.js?v=20261012i', '../comun/skills-clase.js?v=20261013b', '../comun/ficha-habilidades.js?v=20261011zj',
-  '../comun/catalogo.js?v=20261012zr', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261010za', '../comun/ficha-botonera.js?v=20261012zy', '../comun/ficha-resumen.js?v=20261012zb', '../comun/inv-calculo.js?v=20261012s', '../comun/inv-botonera.js?v=20261012zy', '../comun/inv-acciones.js?v=20261012y', '../comun/inv-duelo.js?v=20261012s', '../comun/ficha-acciones.js?v=20261012zr', '../comun/inv-habilidades.js?v=20261012y', '../comun/inv-lupa.js?v=20261010zc',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261005ff', '../comun/ficha-equipo.js?v=20261012zy', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261012zr', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261010g', '../comun/ficha-mantenimiento.js?v=20261012zs', '../comun/ficha-calculo.js?v=20261012zq', '../comun/ficha-combate.js?v=20261012i', '../comun/skills-clase.js?v=20261013c', '../comun/ficha-habilidades.js?v=20261013c',
+  '../comun/catalogo.js?v=20261012zr', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261007am', '../comun/ficha-sesion.js?v=20261010za', '../comun/ficha-botonera.js?v=20261013c', '../comun/ficha-resumen.js?v=20261012zb', '../comun/inv-calculo.js?v=20261012s', '../comun/inv-botonera.js?v=20261012zy', '../comun/inv-acciones.js?v=20261012y', '../comun/inv-duelo.js?v=20261012s', '../comun/ficha-acciones.js?v=20261013c', '../comun/inv-habilidades.js?v=20261012y', '../comun/inv-lupa.js?v=20261010zc',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261012zf', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261011zj'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -795,10 +795,13 @@ function bnHabUi(){
       // X en SP y en No2 a la vez (Apuntar, 2026-10-11): es la misma X, los No2 siguen a los SP.
       campoSp.oninput = FichaHabilidades.spVariable(it) && FichaHabilidades.nitrosVariable(it) ? () => { campoNitros.value = campoSp.value; } : null;
       if(campoSp.oninput) campoNitros.value = campoSp.value;
-      r.querySelector('#bn-cx-disp').textContent = `${fmt(num(S.nitros))} No2 y ${fmt(FichaBotonera.spMaximo(S) - num(S.spGastado))} SP`;
+      const hpX = FichaHabilidades.hpVariable(it), campoHp = r.querySelector('#bn-cx-hp');   // la vida en X (Balas de sangre, 2026-10-13)
+      r.querySelector('#bn-cx-hp-caja').hidden = !hpX;
+      if(hpX){ campoHp.value = 1; campoHp.max = FichaAcciones.limiteCostoX(S, 'hp', it); setTimeout(() => campoHp.select(), 50); }
+      r.querySelector('#bn-cx-disp').textContent = `${fmt(num(S.nitros))} No2, ${fmt(FichaBotonera.spMaximo(S) - num(S.spGastado))} SP${hpX ? ` y ${fmt(num(S.hp))} de vida` : ''}`;
       const limN = FichaAcciones.limiteCostoX(S, 'nitros', it), limS = FichaAcciones.limiteCostoX(S, 'sp', it);
       campoSp.max = limS !== null ? limS : ''; campoNitros.max = limN !== null ? limN : '';
-      r.querySelector('#bn-cx-limite').textContent = num(it.xMax) > 0 ? `X: de 1 a ${fmt(num(it.xMax))}.` : (limN === null || limS === null) ? '⚠ Tope de X sin definir: por ahora solo te frena lo que tengas.' : '';
+      r.querySelector('#bn-cx-limite').textContent = hpX ? `Vida: de 1 a ${fmt(FichaAcciones.limiteCostoX(S, 'hp', it))} (tu Especial), y tiene que sobrarte vida.` : num(it.xMax) > 0 ? `X: de 1 a ${fmt(num(it.xMax))}.` : (limN === null || limS === null) ? '⚠ Tope de X sin definir: por ahora solo te frena lo que tengas.' : '';
       r.querySelector('#bn-costox').classList.add('open');
       if(FichaHabilidades.nitrosVariable(it) && !FichaHabilidades.spVariable(it)) setTimeout(() => campoNitros.select(), 50);
     },
@@ -1032,6 +1035,7 @@ function bnCrear(){
           <div class="f"><label>SP a gastar</label><input type="number" id="bn-cx-sp" value="0" min="0"></div>
           <div class="f"><label>Nitros a gastar</label><input type="number" id="bn-cx-nitros" value="1" min="0"></div>
         </div>
+        <div class="f" id="bn-cx-hp-caja" hidden><label>Vida (HP) a gastar</label><input type="number" id="bn-cx-hp" value="1" min="1"></div>
         <div class="hint">Tenés <span id="bn-cx-disp"></span> disponibles ahora mismo.</div>
         <div class="hint" id="bn-cx-limite"></div>
       </div>
@@ -1172,7 +1176,7 @@ function bnCrear(){
       if(b.dataset.bnCx === 'no' || !c){ bnCostoX = null; raiz.querySelector('#bn-costox').classList.remove('open'); return; }
       const it = (bn.S.habilidades || []).find(h => h.id === c.id);
       if(!it){ bnCostoX = null; raiz.querySelector('#bn-costox').classList.remove('open'); return; }
-      FichaAcciones.confirmarCostoVariable(bn.S, it, num(raiz.querySelector('#bn-cx-sp').value), num(raiz.querySelector('#bn-cx-nitros').value), c.arma, bnHabUi());
+      FichaAcciones.confirmarCostoVariable(bn.S, it, num(raiz.querySelector('#bn-cx-sp').value), num(raiz.querySelector('#bn-cx-nitros').value), c.arma, bnHabUi(), num(raiz.querySelector('#bn-cx-hp').value));
       return;
     }
     if(b.dataset.bnHabarma){

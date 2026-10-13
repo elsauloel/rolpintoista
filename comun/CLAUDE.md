@@ -1524,3 +1524,8 @@ versión parecida en más de una, es candidato a juntar.
 - **Proyectil perforante** (2026-10-13): `duelo.perforante` (al nivel del duelo, como `soloCritico`) viaja con `Combatiente.ataqueConArreglos` y
   `Duelo.crear` lo guarda en el ataque; el segundo golpe lleva `ataque.sinEfectos` y `Duelo.guardarDano` le vacía los efectos (del arma, la flecha y
   el crítico; tampoco tira daño mágico de efectos). La Ejecución (`asistente-duelo-hab.js`) lo conserva al editar.
+- **La vida en X** (2026-10-13, Balas de sangre): `hpCosto: 'X'` → `FichaHabilidades.hpVariable(h)` (cuenta en `habCostoVariable`). El cartel del
+  costo X (ficha `#scrim-costox`, mapa `#bn-costox`) suma «Vida (HP) a gastar»; `FichaAcciones.confirmarCostoVariable(S, it, sp, nitros, arma, ui,
+  hp)` la valida (de 1 a `limiteCostoX(S, 'hp', it)` = el Especial; tiene que sobrar vida), la cobra y pasa la X a la Ejecución en una copia
+  (`{...it, _xHp}` → `xDeHab`). `Combatiente.habEjecucion` reemplaza la «X» de la fórmula de daño (`Xd4`). Solo personajes. **Ojo**: el paso Costo
+  de la Ejecución ✨ y el editor guardan el HP como número: editar la skill ahí le borra la «X».

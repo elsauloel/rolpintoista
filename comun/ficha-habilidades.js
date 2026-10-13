@@ -33,7 +33,9 @@ const FichaHabilidades = (() => {
   const nitrosAtaque = h => String((h && h.nitrosCosto) ?? '').trim().toUpperCase() === 'ATAQUE';
   const spVariable = h => esCostoVariable(h && h.costo);
   const nitrosVariable = h => esCostoVariable(h && h.nitrosCosto) && !nitrosAtaque(h);
-  const habCostoVariable = h => spVariable(h) || nitrosVariable(h);
+  // Vida en X (2026-10-13, Balas de sangre): pagás X de vida, elegida al ejecutar.
+  const hpVariable = h => esCostoVariable(h && h.hpCosto);
+  const habCostoVariable = h => spVariable(h) || nitrosVariable(h) || hpVariable(h);
 
   /* ---------- El "estado del sistema anterior" al ejecutar/consumir ----------
      Una habilidad o un ítem puede llevar efectoNombre/efectoTurnos/efectoHpTurno/efectoPermanente/efectoMods/
@@ -101,6 +103,6 @@ const FichaHabilidades = (() => {
     return {ok: true, estado: r.estado, disparo: dis};
   }
 
-  return {parseCostoSp, spSube, costoSpDe, spVariable, nitrosVariable, nitrosAtaque, habCostoVariable,
+  return {parseCostoSp, spSube, costoSpDe, spVariable, nitrosVariable, hpVariable, nitrosAtaque, habCostoVariable,
     presetPorNombre, flagsDePreset, configEfectoDe, estaBloqueadoElDebuff, aplicarEfectoDeConsumo};
 })();

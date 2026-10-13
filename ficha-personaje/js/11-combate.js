@@ -245,9 +245,12 @@ const habUi = {...combateUi,
     campoSp.oninput = spVariable(it) && nitrosVariable(it) ? () => { campoNitros.value = campoSp.value; } : null;   // la misma X en SP y No2 (Apuntar, 2026-10-11)
     if(campoSp.oninput) campoNitros.value = campoSp.value;
     if(nitrosVariable(it) && !spVariable(it)) setTimeout(() => campoNitros.select(), 50);
-    $('#costox-disponibles').textContent = `${fmt(num(S.nitros))} No2 y ${fmt(spMaximo() - num(S.spGastado))} SP`;
+    const hpX = FichaHabilidades.hpVariable(it);   // la vida en X (Balas de sangre, 2026-10-13)
+    $('#costox-hp-caja').hidden = !hpX;
+    if(hpX){ $('#f-costox-hp').value = 1; $('#f-costox-hp').max = FichaAcciones.limiteCostoX(S, 'hp', it); setTimeout(() => $('#f-costox-hp').select(), 50); }
+    $('#costox-disponibles').textContent = `${fmt(num(S.nitros))} No2, ${fmt(spMaximo() - num(S.spGastado))} SP${hpX ? ` y ${fmt(num(S.hp))} de vida` : ''}`;
     const limN = limiteCostoX('nitros', it), limS = limiteCostoX('sp', it);
-    $('#costox-limite').innerHTML = num(it.xMax) > 0 ? `X: de 1 a ${fmt(num(it.xMax))}.` : (limN === null || limS === null)
+    $('#costox-limite').innerHTML = hpX ? `Vida: de 1 a ${fmt(FichaAcciones.limiteCostoX(S, 'hp', it))} (tu Especial), y tiene que sobrarte vida.` : num(it.xMax) > 0 ? `X: de 1 a ${fmt(num(it.xMax))}.` : (limN === null || limS === null)
       ? `${IT2_PENDIENTE('el tope de X todavía no está confirmado')} Tope de X sin definir: por ahora solo te frena lo que tengas.`
       : '';
     $('#scrim-costox').classList.add('open');
@@ -445,7 +448,7 @@ function confirmarCostoVariable(){
   const sp = num($('#f-costox-sp').value);
   const nitros = num($('#f-costox-nitros').value);
   const armaDeLaHab = pendingArmaHab === undefined ? null : pendingArmaHab;
-  if(FichaAcciones.confirmarCostoVariable(S, it, sp, nitros, armaDeLaHab, habUi)) pendingArmaHab = undefined;
+  if(FichaAcciones.confirmarCostoVariable(S, it, sp, nitros, armaDeLaHab, habUi, num($('#f-costox-hp').value))) pendingArmaHab = undefined;
 }
 
 // El pase de turno (2026-10-02, hoja de ruta A2): la regla vive en comun/ficha-mantenimiento.js (la usa también el mapa, que

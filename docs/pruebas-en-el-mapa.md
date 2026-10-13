@@ -10,6 +10,8 @@
 
 ## Pendientes
 
+- [ ] **🌩 Tormenta arcana** (2026-10-13): marcar el centro con varios tokens adentro (un aliado incluido); ver el reparto en la Mesa, que cada
+  sub-duelo arranque en el dodge roll, que salir del área no reciba nada y que quedarse reciba k × 1d4 directo.
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no

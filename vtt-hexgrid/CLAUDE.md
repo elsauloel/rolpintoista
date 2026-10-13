@@ -1554,3 +1554,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `costoMoverDe` de un personaje (`sprint`) y en `costoPasos(…, sprint)` (js/04): los primeros casilleros pagados, después de los gratis, cuestan solo
   el recargo (Rengo, terreno lento). Al confirmar el movimiento (js/08), `sprintUsar(t, n)` los descuenta del estado de la ficha (con
   `editarPersonajeMapa`; en 0, el estado se va). El Ctrl+Z no los devuelve. Solo personajes.
+- **🌩 Tormenta arcana** (2026-10-13, Mago; `js/44-tormenta.js`): un área con `hab.tormenta` (y `soloDodge`). En `dueloElegirAreaMapa` (js/13),
+  `tormentaRepartir` tira los proyectiles y reparte cada uno al azar entre los de adentro (rivales y aliados, sin caídos), lo cuenta en la Mesa y deja
+  `hab.tormenta.cuenta`; solo entran a la cascada los que recibieron alguno. `areaCrearSiguienteSubDuelo` arma el daño de cada uno con
+  `tormentaHabDe` (k × 1d4, directo). Cada sub-duelo arranca en el dodge roll (comun/duelo.js).

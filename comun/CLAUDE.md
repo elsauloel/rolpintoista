@@ -1532,3 +1532,6 @@ versión parecida en más de una, es candidato a juntar.
 - **Habilidades «una vez por turno»** (2026-10-13, Sprint): `h.unaVezPorTurno` → `FichaAcciones.ejecutarHabilidad` cuenta los usos en
   `S.ataquesArma['hab:<id>']` (lo vacía el turno) y, si ya la usó, pregunta «¿Usarla igual?» (avisa y deja seguir). Preset nuevo **Sprint**
   (`sprint: 3`, `alEmpezarTurno`), publicado por `FichaResumen` (`sprint`).
+- **Sub-duelo que arranca en el dodge roll** (2026-10-13, Tormenta arcana): `hab.soloDodge` (lo conserva `limpiarHab`, junto con `hab.tormenta`)
+  hace que `Duelo.crear` de un sub-duelo de área (`cfg.grupo`) empiece en la fase `dodge` (sin tirada); el cuadro dice «¡CAE LA TORMENTA!» y el daño
+  que le toca.

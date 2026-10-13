@@ -491,7 +491,8 @@ const Duelo = (() => {
     }
     if(hab){
       inicial.hab = hab;   // (la regla de Firestore tiene que conocer el campo `hab`)
-      if(hab.sinOposicion){ inicial.resultado = 'pego'; entrarHab(inicial); }   // sin oposición: el cuadro se abre directo en los efectos
+      if(hab.soloDodge && cfg.grupo){ inicial.fase = 'dodge'; inicial.estado = 'esperando'; inicial.contacto = {gana: 'defensor', dif: 0, soloDodge: true}; }   // la Tormenta arcana: directo al dodge roll
+      else if(hab.sinOposicion){ inicial.resultado = 'pego'; entrarHab(inicial); }   // sin oposición: el cuadro se abre directo en los efectos
     }
     if(cfg.grupo) inicial.grupo = limpiarGrupo(cfg.grupo);   // hechizo de área (Paso 4/7): ata este sub-duelo a la cascada (docs/reglas-casteo.md §1.3)
     const ref = await col().add(inicial);
@@ -587,6 +588,11 @@ const Duelo = (() => {
         ...(h.zonaQueda.contra ? {contra: txtCorto(h.zonaQueda.contra, 12)} : {}), ...(h.zonaQueda.tira ? {tira: txtCorto(h.zonaQueda.tira, 12), tiraValor: _num(h.zonaQueda.tiraValor)} : {}),
         ...(h.zonaQueda.color ? {color: txtCorto(h.zonaQueda.color, 7)} : {})}} : {}),   // lo que deja en el suelo (bola de fuego, ventisca)
       ...(h.menosDistancia ? {menosDistancia: true} : {}),   // −1 por casillero después del primero (pelea cercana)
+      // Tormenta arcana (2026-10-13): sin tirada, cada sub-duelo arranca en el dodge roll; `cuenta` = cuántos proyectiles le tocaron a cada token.
+      ...(h.soloDodge ? {soloDodge: true} : {}),
+      ...(h.tormenta ? {tormenta: {proyectiles: txtCorto(h.tormenta.proyectiles || '1d20', 12), cada: txtCorto(h.tormenta.cada || '1d4', 12),
+        ...(h.tormenta.cuenta && typeof h.tormenta.cuenta === 'object' ? {cuenta: Object.fromEntries(Object.entries(h.tormenta.cuenta).slice(0, 40).map(([k, v]) => [txtCorto(k, 40), Math.max(0, Math.min(40, Math.round(_num(v))))]))} : {}),
+        ...(_num(h.tormenta.total) > 0 ? {total: Math.round(_num(h.tormenta.total))} : {})}} : {}),
       ...(h.reparte ? {reparte: {cada: txtCorto(h.reparte.cada || '1d4', 12), total: Math.min(6, Math.max(2, Math.round(_num(h.reparte.total)) || 2))}} : {}),   // misiles de a uno (Varita de misiles)
       ...(h.menosPorOrden ? {menosPorOrden: true} : {}), ...(h.despeja ? {despeja: true} : {}),   // el láser largo · el vendaval
       ...(h.riesgo ? {riesgo: {si: Math.min(20, Math.max(1, Math.round(_num(h.riesgo.si)) || 1)), dano: txtCorto(h.riesgo.dano || '2d4', 12), ...(h.riesgo.porCada ? {porCada: true} : {})}} : {}),   // la inestable
@@ -1870,8 +1876,10 @@ const Duelo = (() => {
   function dodgeHtml(d, nuevo){
     const puedeMapa = !!(cfgEscuchar && cfgEscuchar.chequearDodge);
     const puedeAMano = esMio(d.defensor) || soyGM();
+    const tormenta = d.hab && d.hab.soloDodge;   // Tormenta arcana: no hubo tirada, el dodge roll es la única salida
     return `<div class="duelo-veredicto pego${nuevo ? ' nuevo' : ''}">
-      <div class="grande">🏃 ¡GANÓ LA EVASIÓN!</div>
+      <div class="grande">${tormenta ? '🌩 ¡CAE LA TORMENTA!' : '🏃 ¡GANÓ LA EVASIÓN!'}</div>
+      ${tormenta && d.hab.dano ? `<div class="chico">A ${_esc(d.defensor.nombre)} le tocan <b>${_esc(d.hab.dano.formula)}</b> de daño arcano, directo a la vida, si sigue adentro.</div>` : ''}
       <div class="chico">${_esc(d.defensor.nombre)} tiene derecho a un <b>dodge roll</b>: hasta 2 casilleros, arrastrando el token en el mapa (ya cuesta No2 solo, con Rengo/Inmovilizado de siempre). Si logra salir del área, no recibe nada; si sigue adentro por cualquier motivo, recibe el efecto completo — no hay término medio.</div>
       ${puedeMapa ? '<div class="duelo-contra" style="text-align:center;margin-top:10px"><button type="button" data-dodge-resolver>▶ Ya se movió (o decidió no hacerlo): revisar</button></div>' : ''}
       ${puedeAMano ? `<div class="duelo-nota" style="margin:8px 0 4px">${puedeMapa ? 'O a mano, si ya sabés el resultado:' : 'Se revisa mejor desde el mapa. A mano:'}</div>

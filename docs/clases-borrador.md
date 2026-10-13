@@ -213,9 +213,12 @@ Salvo Carga Elemental, todas son **Hechizo (PG: Esp · Daño: Esp)**.
    cada uno, en cascada; a quien gane le toca un dodge roll, si no logra salir hace 1d12+4 de daño arcano directo a la vida.
    *(Auditada 2026-09-27 con `duelo` de objetivo "área", para probar la cascada de hechizos de área. ⚖ El "amplifica el
    daño en 4" del texto original se tomó como +4 fijo sobre 1d12 (Tipo 12) — a revisar el balance con el grupo.)*
-4. **Tormenta arcana** [15] — NO2: (5). Provoca una lluvia de 1d20
-   proyectiles arcanos T4 P1 en flor de 2. Caen aleatoriamente sobre todos
-   los objetivos posibles. Esquivable solo con dodge roll.
+4. ✅ **Tormenta arcana** — **SP:** 15. **No2:** 5. Marcás el centro de una flor de diámetro 5 (19 casillas): caen **1d20 proyectiles**, cada uno
+   **al azar** sobre alguien de adentro (**rivales y aliados**, vos no). **Sin tirada**: cada uno puede salir con un **dodge roll**; quien sigue
+   adentro recibe **1d4 por proyectil**, **directo a la vida** (ni Defensa ni Defensa especial). ⚙ Automatizado en el mapa (reparto en la Mesa, dodge
+   roll y daño); ✋ a mano que el centro esté en tu Rango. *(Auditada 2026-10-13 con el dueño; original: «Tormenta arcana [15] — NO2: (5). Provoca
+   una lluvia de 1d20 proyectiles arcanos T4 P1 en flor de 2. Caen aleatoriamente sobre todos los objetivos posibles. Esquivable solo con dodge
+   roll.» Los proyectiles se reparten al lanzarla: los de quien sale del área se pierden.)*
 5. ✅ **Ráfaga arcana** — **No2:** 3. **SP:** 2. Hechizo. 2d4 de daño arcano
    a cada rival en el cono al frente (el de 16 casillas de la detección); no
    afecta a aliados. PdG.Esp una vez contra la Evasión de cada uno; quien

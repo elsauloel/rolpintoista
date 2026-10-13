@@ -756,6 +756,13 @@ prueba('Proyectil perforante (Shooter, 2026-10-13): 2 SP + el disparo, solo a di
   igual([hab.costo, hab.nitrosCosto, hab.soloRango, a.perforante, a.mods.pdg, a.mods.fijo, !!a.soloCritico, /Sin auditar/.test(hab.detalle), !!hab.original],
     ['2', 'ATAQUE', true, true, 0, 0, false, false, true]);
 });
+prueba('Tormenta arcana (Mago, 2026-10-13): área de diámetro 5 con aliados, sin tirada (solo dodge roll), el reparto viaja limpio al duelo', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'mago').habilidades.find(h => h.id === 'mago-tormenta-arcana');
+  const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});
+  const limpio = Duelo.limpiarHab({...ej, tormenta: {...ej.tormenta, cuenta: {a: 3, b: 0}, total: 3}});
+  igual([hab.costo, hab.nitrosCosto, ej.objetivo, ej.radio, !!ej.fuegoAmigo, !!ej.soloDodge, ej.tira, ej.dano.directo, limpio.soloDodge, limpio.tormenta.cuenta, limpio.tormenta.total, limpio.sinOposicion],
+    ['15', 5, 'area', 2, true, true, null, true, true, {a: 3, b: 0}, 3, true]);
+});
 prueba('Sprint (Asalto, 2026-10-13): 1 SP y 2 No2, una vez por turno, deja el estado Sprint (3 casilleros pagos) y el resumen lo publica', async () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'asalto').habilidades.find(h => h.id === 'asalto-sprint');
   const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;

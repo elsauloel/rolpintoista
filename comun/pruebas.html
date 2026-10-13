@@ -781,6 +781,13 @@ prueba('Carga Elemental (Mago, 2026-10-13): stacks según el daño que entra, la
     limpio.dano.porDano, Combatiente.cargable({}, base), Combatiente.cargable({}, {...base, tipoDano: 'fisico'}), Combatiente.cargable({deItem: 'x'}, base), typeof Confirmar.elegir],
     ['X', true, [0, 1, 1, 2, 2, 3], [1, 1, 1, 2], [1, 2], 'fuego', 1.5, 4, [['Parálisis', 10, 2]], {estado: 'Escarcha', cada: 5, mas1: true}, true, false, false, 'function']);
 });
+prueba('Carga Elemental en un creep: Escarcha ×5 y Armadura rota ×2 entran con sus stacks, y reaplicadas se suman', () => {
+  const sc = {estados: []};
+  EstadosAplicar.aplicarACreep(sc, {nombre: 'Escarcha', stacks: 5});
+  EstadosAplicar.aplicarACreep(sc, {nombre: 'Armadura rota', stacks: 2});
+  EstadosAplicar.aplicarACreep(sc, {nombre: 'Armadura rota', stacks: 3});
+  igual(sc.estados.map(e => [e.nombre, e.stacks]), [['Escarcha', 5], ['Armadura rota', 5]]);
+});
 prueba('Escarcha: reaplicarla suma los stacks que trae (la Carga de frío), y sin stacks suma 1 como siempre', () => {
   const p = estadosPresetFicha().find(x => x.nombre === 'Escarcha');
   const ya = [{...p, stacks: 1, activo: true}];

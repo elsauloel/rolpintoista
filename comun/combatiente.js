@@ -958,7 +958,7 @@ const Combatiente = (() => {
     }
     if(nuevo.armaduraRota){
       const ya = estados.find(e => e && e.armaduraRota);
-      if(ya){ ya.stacks = Math.max(1, n(ya.stacks) || 1) + 1; ya.activo = true; return {ok: true, que: 'acumulado', estado: ya}; }
+      if(ya){ ya.stacks = Math.max(1, n(ya.stacks) || 1) + Math.max(1, Math.round(n(nuevo.stacks)) || 1); ya.activo = true; return {ok: true, que: 'acumulado', estado: ya}; }   // suma los que trae (2026-10-13)
     }
     const veneno = acumularVeneno(estados, nuevo);
     if(veneno) return {ok: true, que: nuevo.permanente ? 'yaLoTiene' : 'acumulado', estado: veneno};
@@ -1008,6 +1008,7 @@ const Combatiente = (() => {
     if(n(s.hp)) base[campoHp || 'hpTurno'] = n(s.hp);
     if(n(s.stacks) && base.esVeneno && !base.permanente){ base.stacks = n(s.stacks); base.turnos = base.stacks; }
     if(n(s.stacks) && (base.esSangrado || base.esQuemadura)) base.stacks = n(s.stacks);   // un arma que deja Sangrado con más stacks (2026-10-03)
+    if(n(s.stacks) && (base.esEscarcha || base.armaduraRota)) base.stacks = Math.max(1, Math.round(n(s.stacks)));   // la Carga Elemental (Escarcha ×N, Armadura rota ×N) y la Armadura rota doble de un arma en un creep (2026-10-13)
     if(n(s.escudoMagico)) base.escudoMagico = n(s.escudoMagico);
     if(n(s.stacks) && base.repetir) base.stacks = Math.max(1, Math.min(3, n(s.stacks)));   // Repitiendo (2026-10-13): cuántos disparos encadena
     if(s.detalle) base.detalle = s.detalle;

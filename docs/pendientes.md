@@ -460,6 +460,15 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 ## 5. Contenido a revisar (números de primer borrador)
 - [ ] Las **321 habilidades de creeps**: daño, cooldowns, bonos, cuáles son rápidas y cuáles lentas.
 - [ ] Los **173 creeps base** (todos dicen "(auditar)") y sus recompensas.
+  - [ ] **Después de esta auditoría: la IA del 🔎 Escanear grupo con los creeps reales** (dueño, 2026-10-13: «dejemos la mejora de la ia para
+    después de la auditoría de creeps»). Hoy la IA (GM Tools → Escanear grupo → 🤖 Proponer creeps, `comun/escaneo-grupo.js`: `IA_SISTEMA` +
+    `textoParaIA`) recibe solo un resumen de reglas de diez líneas, el escaneo del grupo y la nota del GM: no ve los creeps base, la biblioteca,
+    los creeps de la partida ni el catálogo, así que inventa creeps de cero. La mejora: mandarle también la lista de creeps para elegir
+    (`CREEPS_BASE` —hoy 269, con etiquetas de escenario y tribu: minas, bosque, kobold, goblin, cripta…— más la biblioteca y los creeps de la
+    partida), filtrada por el nivel del grupo (±1) y por el escenario que pida el GM, con sus números y habilidades en forma compacta; y el
+    equipo Común del catálogo. Que proponga entre lo que existe (con el nombre exacto, para buscarlo en «+ Creep»). Ojo con el tamaño: los
+    modelos gratuitos aguantan poco texto, de ahí el filtro. Va después de la auditoría para no mandarle números de primer borrador. De paso:
+    el texto todavía dice «Armadura mágica» en vez de «Defensa especial».
 - [ ] Las **66 armas naturales**: potencia y porcentajes de los efectos.
 - [ ] Las **24 trampas base** y su daño.
 - [ ] El pool de **habilidades de clase** (`skills-clase.js`): 62 skills, casi todas todavía "(Sin auditar)".

@@ -10,12 +10,6 @@
 
 ## Pendientes
 
-- [ ] **🩸 Transfusión sanguínea** (2026-10-13): juan le pasa vida a Clementino (y al revés con juan de los dos lados): elegir quién da, quién
-  recibe, el cartel de cuánto (5 · 10 · … · lo máximo), y que cada ficha lo aplique (la de Clementino, desde la pantalla de su jugador).
-  **Probado en parte (2026-10-13)**: con clics, juan → Clementino: los dos carteles («¿quién da?», «¿quién la recibe?») y el de cuánto («como mucho
-  8»: Clementino 17 de 25) andan, y la Mesa lo cuenta. Pero el aviso lo tomó una pantalla del GM **sin recargar** y lo convirtió en un estado de ±5
-  por turno (sacado a mano; la vida quedó bien: 26 → 21 y 17 → 22). Arreglado: el número viaja en `vida`, que el código viejo ignora. **Falta**: repetirla
-  con todos los mapas recargados y ver que la vida la aplique el código nuevo, sin dejar ningún estado.
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no
@@ -34,6 +28,11 @@
   pudo ver la animación 3D (la ventana de Chrome estaba de fondo). Mirarla en una sesión real.
 
 ## Probado
+
+- [x] **🩸 Transfusión sanguínea** (2026-10-13, con la cuenta del jugador dueño —elsaulo—, sin tomar el control, con todos los mapas recargados):
+  Clementino → juan: los carteles «¿quién da?», «¿quién la recibe? (da: Clementino)» y «¿cuánta vida? … Como mucho 9» (juan en 21 de 30); con «9 (lo
+  máximo)», Clementino 22 → 13 y juan 21 → 30, sin dejar ningún estado; la Mesa lo contó. (Una primera vuelta con mapas sin recargar dejó un estado de
+  vida por turno: arreglado, el número viaja en `vida`.)
 
 - [x] **🔁 Repetición** (2026-10-13, juan con el Arco corto; la pestaña estaba en segundo plano, así que los botones se tocaron desde adentro de la
   página): X = 3 cobró 3 SP y 0 No2; tres disparos al Coloso: el 1.º sin bono, el 2.º «repetición (+1)» = +1 PdG y +1d4, el 3.º +2 PdG y +2d4, y el

@@ -978,3 +978,8 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   turno siguiente sale gratis; no ahorra No2, los mueve a un turno en que sobraban. Falta decidir: (a) ¿regla de todas las ballestas o un rasgo de
   algunas (y en qué calidad)?; (b) ¿se paga con un botón propio «⚙ Cargar» en la Botonera? Propuesta de Claude: regla de todas las ballestas, con
   el botón; «Llega cargada» queda como la versión mejor (gratis, sin pagar antes). **A decidir por el dueño.**
+- ❓ **P196. Anillo de armadura indestructible: ¿demasiado poderoso? — 2026-10-12, EN PAUSA (dueño: «lo vamos a revisar, ponelo en pausa porque
+  puede ser demasiado poderoso»).** Absorbe la primera Armadura rota de cada combate (`absorbearmadura`). Ese mismo día se arregló para que funcione en
+  personajes (antes no hacía nada: la rotura va a las piezas). Mientras se revisa, el anillo está **archivado** (`archivo: true` en
+  `comun/catalogo.js`): no sale en las tiendas ni en el catálogo para comprar; quien ya lo tenga, lo conserva y le sigue funcionando. Falta decidir:
+  ¿se baja (una sola vez por día, solo una pieza, Raro en vez de Común, más caro) o se saca?

@@ -1527,6 +1527,13 @@ prueba('Atraviesa escudos (2026-10-12): la Armadura rota con `item` abolla ESE e
   igual([FichaCalculo.armRotaDe(S.inventario[0]), FichaCalculo.durActual(S.inventario[0]), FichaCalculo.armRotaDe(S.inventario[1]), FichaCalculo.durActual(S.inventario[1])],
     [1, durEsc - 1, 0, durPeto]);
 });
+prueba('Un escudo abollado pierde Defensa como la armadura rota (dueño, 2026-10-12); un orbe no', () => {
+  const esc = {id: 'esc2', nombre: 'Tapa', tipoItem: 'escudo_1m', equipado: true, peso: 1, mods: [{stat: 'def', val: 2}], armRota: 1};
+  const S = fichaBotonera({inventario: [esc]});
+  const sin = fichaBotonera({inventario: [{...esc, armRota: 0}]});
+  const orbe = {id: 'or', nombre: 'Orbe', tipoItem: 'escudo_1m', orbe: true, equipado: true, peso: 1, mods: [{stat: 'def', val: 2}], armRota: 1};
+  igual([FichaCalculo.calcular(sin).final.def - FichaCalculo.calcular(S).final.def, FichaCalculo.pierdeDefPorRotura(esc), FichaCalculo.pierdeDefPorRotura(orbe)], [1, true, false]);
+});
 prueba('Anillo de armadura indestructible (2026-10-12): la primera Armadura rota del combate no daña ninguna pieza; la segunda sí', () => {
   const peto = {id: 'peto', nombre: 'Peto', tipoItem: 'armadura_rigida', categoria: 'armadura', equipado: true, peso: 2, def: 3, mods: []};
   const anillo = {id: 'an', nombre: 'Anillo de armadura indestructible', tipoItem: 'anillos', equipado: true, peso: 0, mods: [{stat: 'absorbearmadura', val: 1}]};

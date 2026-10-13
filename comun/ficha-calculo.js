@@ -177,6 +177,9 @@ const FichaCalculo = (() => {
   const SLOTS_ARMADURA = ['armadura', 'cabeza', 'manos', 'piernas', 'pies'];
   const durableItem = i => !!i && !i.consumible && SLOTS_DURABLES.includes(slotDe(i.tipoItem));
   const esArmaduraItem = i => durableItem(i) && SLOTS_ARMADURA.includes(slotDe(i.tipoItem));
+  // Un escudo (no un orbe): abollado, pierde Defensa como la armadura rota (dueño, 2026-10-12).
+  const esEscudoItem = i => durableItem(i) && ['escudo_1m', 'escudo_2m'].includes(i.tipoItem) && !i.orbe;
+  const pierdeDefPorRotura = i => esArmaduraItem(i) || esEscudoItem(i);
   const durMax = i => Combatiente.durMax(i);
   const durActual = i => (i.dur === undefined || i.dur === null) ? durMax(i) : Math.max(0, Math.min(durMax(i), Math.round(num(i.dur))));
   const itemRoto = i => durableItem(i) && durActual(i) <= 0;
@@ -200,12 +203,12 @@ const FichaCalculo = (() => {
     (S.inventario || []).filter(i=>i.equipado).forEach(i => {
       if(itemRoto(i)) return;   // roto: ocupa el lugar pero no da ningún efecto
       (i.mods||[]).forEach(m => push(m, i.nombre, 'equipado', i.id));
-      // Armadura rota de la pieza: cada punto baja 1 su Defensa (sin pasar de lo que la pieza da).
-      const ar = esArmaduraItem(i) ? armRotaDe(i) : 0;
+      // Armadura rota de la pieza (o un escudo abollado, 2026-10-12): cada punto baja 1 su Defensa (sin pasar de lo que la pieza da).
+      const ar = pierdeDefPorRotura(i) ? armRotaDe(i) : 0;
       if(ar > 0){
         const defPieza = (i.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + num(m.val), 0);
         const r = Math.min(ar, Math.max(0, defPieza));
-        if(r > 0) push({stat: 'def', val: -r}, `${i.nombre} · Armadura rota ×${ar}`, 'equipado', i.id);
+        if(r > 0) push({stat: 'def', val: -r}, `${i.nombre} · ${esEscudoItem(i) ? 'abollado' : 'Armadura rota'} ×${ar}`, 'equipado', i.id);
       }
     });
     (S.pasivas || []).forEach(p => {
@@ -303,6 +306,6 @@ const FichaCalculo = (() => {
   };
 
   return {IT2, GRUPOS, EXTRA, STAT_LIST, ATTR_LIST, MOD_TARGETS, STAT_LABEL, STAT_FULL, ES_ATTR,
-    SLOT_MAP, SLOT_LABEL, slotDe, SLOTS_DURABLES, SLOTS_ARMADURA, durableItem, esArmaduraItem, durMax, durActual, itemRoto, armRotaDe,
+    SLOT_MAP, SLOT_LABEL, slotDe, SLOTS_DURABLES, SLOTS_ARMADURA, durableItem, esArmaduraItem, esEscudoItem, pierdeDefPorRotura, durMax, durActual, itemRoto, armRotaDe,
     pasivaCompras, jobTotal, modsDe, evalFormula, calcular};
 })();

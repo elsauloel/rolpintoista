@@ -134,7 +134,8 @@
 >   ([`ideas-ballestas.md`](ideas-ballestas.md)). La silenciosa espera al sigilo (P184).
 > - [ ] **🚀 Publicar con Firebase Hosting desde GitHub, con vistas previas (dueño, 2026-10-12: «eventualmente voy a querer configurar
 >   publicación automática de Firebase Hosting desde GitHub con `firebase init hosting:github`, con vistas previas para las ramas, y te voy a
->   pedir que me guíes paso a paso»).** No empezar sin que lo pida; cuando lo pida, guiarlo **de a un paso, sin jerga**. Lo que ya se sabe:
+>   pedir que me guíes paso a paso»).** No empezar sin que lo pida; cuando lo pida, guiarlo **de a un paso, sin jerga**. **El plan completo
+>   (etapas, reglas de trabajo, testeo en la nube y costos) está en [`plan-trabajo-remoto.md`](plan-trabajo-remoto.md)**. Lo que ya se sabe:
 >   - **Hoy** publica GitHub Pages, solo, en cada push a `nueva-version` (`https://elsauloel.github.io/rolpintoista/`).
 >   - `firebase init hosting:github` arma dos publicaciones automáticas en GitHub (GitHub Actions): una que publica el sitio en vivo cuando
 >     cambia una rama elegida, y otra que arma una **vista previa** (una dirección propia y temporal) por cada **pull request**. Ojo: de

@@ -406,8 +406,10 @@ ya tenían este mismo formato (número azul, Maldición Esp / Res.M):
    Rango. ⚙ Automatizado: al ejecutar se elige la vida (X), se cobra y el duelo tira X d4. *(Auditada 2026-10-13 con el dueño; original:
    «Balas de sangre [1] — Gasta X HP (máximo ESP). Dispara un proyectil tipo 1. El peso del proyectil es igual a la vida gastada.» El «tipo 1»
    pasó al Tipo más chico de hoy, el d4, y el «peso» a la cantidad de dados.)*
-8. **Transfusión sanguínea** [1] — Transfiere hasta 20 de HP de un
-   personaje aliado a otro.
+8. ✅ **Transfusión sanguínea** — **SP:** 1. **No2:** 1. Le pasás vida de un aliado a otro (**vos podés ser cualquiera de los dos**), los dos
+   **dentro de tu Rango**: elegís quién da, quién recibe y **cuánto, hasta 20**. Quien da queda con al menos 1; quien recibe no pasa su máximo (a un
+   caído no lo levanta). ⚙ Automatizado en el mapa; ✋ a mano entre invocaciones. *(Auditada 2026-10-13 con el dueño; original: «Transfusión
+   sanguínea [1] — Transfiere hasta 20 de HP de un personaje aliado a otro.»)*
 9. ✅ **Veneno** — **SP:** 2. **No2:** 1. Maldición: tirás **PdG.Esp contra el Res.Esp** de un enemigo dentro de tu Rango; si ganás, le dejás
    **3 stacks de Veneno** (se suman al que ya tenga). Empate: la regla general. ⚙ Automatizado en el duelo. *(Auditada 2026-10-11 con el dueño;
    original: «Veneno [2] — Maldición (Esp / Res.M). Aplica 3 stacks de veneno.» La tirada pasó de Especial a PdG.Esp, como Taunt.)*

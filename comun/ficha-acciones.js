@@ -942,6 +942,16 @@ const FichaAcciones = (() => {
       ui.toast(`${origen ? origen + ': ' : ''}${spec.estado} ${e.turnos > 0 ? `queda en ${e.turnos} turno${e.turnos === 1 ? '' : 's'}` : 'se terminó'}`);
       return;
     }
+    // «Transfusión» (2026-10-13, Transfusión sanguínea): `hp` negativo = da vida (nunca baja de 1); positivo = recibe (sin pasar el máximo; a un
+    // caído no lo levanta: Combatiente.curaQueEntra).
+    if(spec.nombre === 'Transfusión'){
+      const d = Math.round(num(spec.hp)), antes = num(S.hp), max = num(FichaCalculo.calcular(S).final.hpmax);
+      const nuevo = d < 0 ? Math.max(Math.min(antes, 1), antes + d) : Math.min(max > 0 ? max : antes + d, antes + Combatiente.curaQueEntra(antes, d));
+      S.hp = nuevo;
+      ui.cambio(['vitals', 'refresh']);
+      ui.toast(`🩸 ${origen ? origen + ': ' : ''}${d < 0 ? 'diste' : 'recibiste'} ${fmt(Math.abs(nuevo - antes))} de vida (${fmt(antes)} → ${fmt(nuevo)})`);
+      return;
+    }
     // «Pierde No2» (2026-10-02, Sonic Boom): baja los No2 (`stacks` = cuántos); si llega a 0 y corresponde, queda Sentado.
     if(spec.nombre === 'Pierde No2'){
       const n = Math.max(0, Math.round(num(spec.stacks))), antes = num(S.nitros);
@@ -1014,7 +1024,7 @@ const FichaAcciones = (() => {
     if(FichaBotonera.modoHab(it) !== 'auto'){ anunciarHabilidad(S, it, ui); tirarPrimeraDeHab(S, it, ui); return; }
     if(!FichaBotonera.dueloDe(it)){
       if(it.trampaColocar) return;   // una trampa sola: el anuncio y la casilla ya los maneja colocarTrampa
-      if(it.portalMapa || it.blink || it.caos || it.aceleradorMapa){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // los portales, el blink, el caos y el Acelerador: se anuncian y se eligen en el mapa
+      if(it.portalMapa || it.blink || it.caos || it.aceleradorMapa || it.transfusionMapa){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // los portales, el blink, el caos y el Acelerador: se anuncian y se eligen en el mapa
       if(it.invoca && it.invoca.invId){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // solo invoca: se anuncia (la invocación ya la hizo invocarConHab)
       ui.toast(`${it.nombre}: todavía no tiene armada la ejecución paso a paso (✨) — se ejecutó como semiautomática`); anunciarHabilidad(S, it, ui); tirarPrimeraDeHab(S, it, ui); return;
     }
@@ -1052,6 +1062,12 @@ const FichaAcciones = (() => {
       // `distancia` (2026-10-07, Varita del portal aliado): el segundo, a esa distancia o menos del primero. Los turnos son los de quien los abre.
       try{ ui.alMapa('portal-habilidad', {fichaId: ui.yo().ref, casteadorTipo: 'pj', turnos: Math.max(1, num(h.portalMapa.turnos) || 3), distancia: Math.max(0, num(h.portalMapa.distancia) || 0), nombre: h.nombre}); }
       catch(err){ console.error('No se pudo avisar el portal al mapa:', err); }
+      return;
+    }
+    // 🩸 Transfusión sanguínea (2026-10-13, Debuffer): se eligen en el mapa quién da, quién recibe y cuánto (vtt-hexgrid/js/45).
+    if(h.transfusionMapa){
+      try{ ui.alMapa('transfusion-habilidad', {fichaId: ui.yo().ref, nombre: h.nombre, max: Math.max(1, num(h.transfusionMapa.max) || 20)}); }
+      catch(err){ console.error('No se pudo avisar la Transfusión al mapa:', err); }
       return;
     }
     // ⏩ El Acelerador (2026-10-12, Support): se elige la casilla en el mapa (vtt-hexgrid/js/40).

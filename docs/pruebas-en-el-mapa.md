@@ -10,6 +10,8 @@
 
 ## Pendientes
 
+- [ ] **🩸 Transfusión sanguínea** (2026-10-13): juan le pasa vida a Clementino (y al revés con juan de los dos lados): elegir quién da, quién
+  recibe, el cartel de cuánto (5 · 10 · … · lo máximo), y que cada ficha lo aplique (la de Clementino, desde la pantalla de su jugador).
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no

@@ -1563,3 +1563,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
 - **🔁 Repetición** (2026-10-13, Shooter; en `js/35-arcos.js`): el estado Repitiendo (publicado como `repetir` = {quedan, hechos, arma, blanco}) lo
   lee `repeticionBonos` dentro de `arcoBonos` (+n PdG y +n dados del Tipo del arma en `tiro`) y `repeticionGastar` (js/13, junto a `arcoApuntarGastar`)
   cuenta el disparo en la ficha o corta la cadena si cambió el arma o el blanco.
+- **🩸 Transfusión sanguínea** (2026-10-13, Debuffer; `js/45-transfusion.js`): mensaje `transfusion-habilidad` (`FichaAcciones.avisarZonaAlMapa`,
+  `transfusionMapa`). `transfusionDeHabilidad` pide con dos `elegirDestino` quién da y quién recibe (personajes; fuera del Rango avisa y deja seguir),
+  calcula el máximo con lo público (quien da queda en 1, quien recibe no pasa su máximo) y el cartel de cuánto; `transfusionAplicar` manda a cada uno
+  el aviso «Transfusión» (`EstadosAplicar.encolarPj`, `hp` ±n), que aplica `FichaAcciones.aplicarEstadoRecibido` en la pantalla que maneja a cada uno.

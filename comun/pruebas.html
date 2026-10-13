@@ -756,6 +756,17 @@ prueba('Proyectil perforante (Shooter, 2026-10-13): 2 SP + el disparo, solo a di
   igual([hab.costo, hab.nitrosCosto, hab.soloRango, a.perforante, a.mods.pdg, a.mods.fijo, !!a.soloCritico, /Sin auditar/.test(hab.detalle), !!hab.original],
     ['2', 'ATAQUE', true, true, 0, 0, false, false, true]);
 });
+prueba('Transfusión sanguínea (Debuffer, 2026-10-13): el aviso «Transfusión» da (nunca baja de 1) y recibe (sin pasar el máximo; a un caído no lo levanta)', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-transfusion-sanguinea');
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S; S.attrs.con = 6;
+  const max = FichaCalculo.calcular(S).final.hpmax;
+  const ui = {cambio: () => {}, toast: () => {}, presets: estadosPresetFicha()};
+  S.hp = 10; FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Transfusión', hp: -20}, 'T', ui); const da = S.hp;
+  S.hp = max - 3; FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Transfusión', hp: 8}, 'T', ui); const recibe = S.hp;
+  S.hp = 0; FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Transfusión', hp: 5}, 'T', ui); const caido = S.hp;
+  igual([hab.costo, hab.nitrosCosto, hab.transfusionMapa.max, EstadosAplicar.limpiarSpec({nombre: 'Transfusión', hp: -7}).hp, da, recibe === max, caido],
+    ['1', 1, 20, -7, 1, true, 0]);
+});
 prueba('Repetición (Shooter, 2026-10-13): X SP (1 a 3), sin No2, deja «Repitiendo» con X disparos y el resumen lo publica', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'shooter').habilidades.find(h => h.id === 'shooter-repeticion');
   const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;

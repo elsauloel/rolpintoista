@@ -39,7 +39,8 @@ function renderMapasBarra(){
       <button type="button" class="btn ghost" data-mapa-nuevo="1" style="padding:4px 10px;font-size:12.5px" title="Crear un mapa nuevo (un escenario de combate); aparece también en 🗺 Mapas del mapa">＋ Mapa</button>
       ${enUnMapa ? `<span style="margin-left:auto;display:flex;gap:6px;align-items:center">
         <button type="button" class="btn" data-mapa-estimado="1" title="Cuánto oro van a sacar aproximadamente si derrotan a todos los creeps de este mapa: su oro y la venta de lo que sueltan">💰 Botín estimado</button>
-        <button type="button" class="btn primary" data-mapa-tokens="1" title="Pone en «${esc(nombreDeMapaGM(pestanaMapa))}» un token oculto por cada creep de este mapa que todavía no tenga, en fila, en el centro de la vista">🎯 Poner sus tokens (${cuenta(pestanaMapa)})</button></span>` : ''}
+        <button type="button" class="btn primary" data-mapa-tokens="1" title="Pone en «${esc(nombreDeMapaGM(pestanaMapa))}» un token oculto por cada creep de este mapa que todavía no tenga, en fila, en el centro de la vista">🎯 Poner sus tokens (${cuenta(pestanaMapa)})</button>
+        ${pestanaMapa !== CreepsMapas.PRINCIPAL ? `<button type="button" class="btn ghost" data-mapa-borrar="1" title="Borra «${esc(nombreDeMapaGM(pestanaMapa))}» con todo lo que tiene en el mapa (tokens y dibujos). Sus creeps no se borran: pasan a la Reserva">🗑 Borrar mapa</button>` : ''}</span>` : ''}
     </div>${enUnMapa ? estimadoCajaHtml(reales.filter(sc => mapaDeCreepGM(sc) === pestanaMapa)) : ''}`;
 }
 /* El recuadro «Si derrotan a todos» (2026-10-10, pedido del dueño: «cuando uno tiene abierto un mapa con los creeps cargados, que haya un
@@ -165,7 +166,25 @@ document.addEventListener('click', async e => {
   if(b.dataset.mapaNuevo){ const id = await pedirMapaNuevo(); if(id) fijarPestanaMapa(id); return; }
   if(b.dataset.mapaTokens){ crearTokensDelMapa(); return; }
   if(b.dataset.mapaEstimado){ abrirBotinEstimado(); return; }
+  if(b.dataset.mapaBorrar){ borrarMapaGM(pestanaMapa); return; }
 });
+// 🗑 Borrar mapa (2026-10-13, pedido del dueño: «se debería poder borrar desde GM Tools también»): el mismo borrado que el 🗺 Mapas del mapa
+// (comun/creeps-mapas.js). Sus creeps quedan en la Reserva (mapaDeCreepGM ya los manda ahí cuando su mapa no existe).
+async function borrarMapaGM(id){
+  if(!id || id === PESTANA_TODOS || id === CreepsMapas.RESERVA || id === CreepsMapas.PRINCIPAL) return;
+  if(!fbDb || !fbMiembro || !fbMiembro.gm){ toast('Sin conexión con la partida como GM'); return; }
+  const nombre = nombreDeMapaGM(id), creeps = creepsReales().filter(sc => mapaDeCreepGM(sc) === id);
+  if(!(await CreepsMapas.confirmarBorrado(nombre))) return;
+  try{
+    await CreepsMapas.borrarMapa(id);
+    creeps.forEach(sc => { sc.mapa = CreepsMapas.RESERVA; });
+    fijarPestanaMapa(PESTANA_TODOS);
+    toast(`"${nombre}" borrado${creeps.length ? ` · sus ${creeps.length} creep${creeps.length === 1 ? '' : 's'} pasaron a la Reserva` : ''}`);
+  }catch(err){
+    console.error('No se pudo borrar el mapa:', err);
+    toast(err && err.paso === 'mapa' && err.code === 'permission-denied' ? `Se vació "${nombre}", pero el mapa no se pudo borrar: faltan pegar las reglas nuevas de Firestore` : 'No se pudo borrar el mapa');
+  }
+}
 // 💰 Botín estimado de la pestaña abierta (2026-10-04): comun/combate-fin.js (estimar), el mismo que muestra el mapa en 🗺 Mapas.
 function abrirBotinEstimado(){
   const lista = creepsReales().filter(sc => mapaDeCreepGM(sc) === pestanaMapa);

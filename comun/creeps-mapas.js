@@ -12,6 +12,10 @@
      hay, crea uno oculto en el destino (en `centro`, o el centro que guardó la vista del mapa). A Reserva: solo los borra.
      → {borrados, creado}.
    - `crearMapa(nombre)` → id.
+   - `confirmarBorrado(nombre)` → Promise<bool>: el cartel «¿Borrar el mapa…?» y escribir el nombre tal cual (2026-10-13).
+   - `borrarMapa(id)`: borra el mapa con todo lo que tiene (tokens, estado, dibujos, formas, pings) y, si era el publicado, publica el
+     primero. Lo de adentro primero y el mapa al final, aparte: si las reglas no dejan borrarlo, tira un error con `paso: 'mapa'`. Sus
+     creeps quedan en la Reserva solos (`mapaDe`). El primer mapa no se borra. Lo usan el mapa (🗺 Mapas) y GM Tools (la pestaña).
    - `migrar(creeps, {vacios})`: los grupos viejos → mapas. Un creep que ya tiene token en un mapa se queda en ese mapa; si no, un
      grupo vinculado va a su mapa y uno sin vincular, a un mapa con su nombre (el que ya exista con ese nombre, o uno nuevo y vacío:
      decisión del dueño, 2026-10-02). Pone `sc.mapa`, saca `sc.grupo` y
@@ -59,6 +63,32 @@ const CreepsMapas = (() => {
     return ref.id;
   }
 
+  async function confirmarBorrado(nombre){
+    if(!(await Confirmar.preguntar(`¿Borrar el mapa "${nombre}" con todo lo que tiene (tokens y dibujos)? No se puede deshacer.`, {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return false;
+    const escrito = prompt(`Para confirmar, escribí el nombre tal cual: ${nombre}`);
+    if(escrito === null) return false;
+    if(escrito.trim().toLowerCase() !== String(nombre).trim().toLowerCase()){ if(typeof toast === 'function') toast('El nombre no coincide — no se borró nada'); return false; }
+    return true;
+  }
+  async function borrarMapa(id){
+    if(!id || id === PRINCIPAL) throw new Error('El primer mapa no se puede borrar');
+    const base = fbDb.doc(fbRutaCampana(`mapas/${id}`));
+    const docs = await Promise.all(['tokens', 'estado', 'trazos', 'elementos', 'pings'].map(c => base.collection(c).get()));
+    const refs = docs.flatMap(s => s.docs.map(d => d.ref));
+    for(let i = 0; i < refs.length; i += 450){
+      const lote = fbDb.batch();
+      refs.slice(i, i + 450).forEach(r => lote.delete(r));
+      await lote.commit();
+    }
+    try{ await base.delete(); }
+    catch(err){ err.paso = 'mapa'; throw err; }
+    // Si era el publicado, los jugadores pasan a ver el primero.
+    try{
+      const act = await fbDb.doc(fbRutaCampana('mapa/activo')).get();
+      if(act.exists && act.data().mapaId === id) await fbDb.doc(fbRutaCampana('mapa/activo')).set({mapaId: PRINCIPAL, actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+    }catch(err){ console.error('No se pudo publicar el primer mapa:', err); }
+  }
+
   async function migrar(creeps, o){
     const vacios = (o && o.vacios) || [];
     const conGrupo = creeps.filter(sc => sc && sc.grupo && !sc.mapa);
@@ -103,5 +133,5 @@ const CreepsMapas = (() => {
     return {cambiados: conGrupo.length, creados};
   }
 
-  return {RESERVA, PRINCIPAL, ordenar, mapaDe, idsDeMapas, tokensDeCreep, mudarTokens, crearMapa, migrar};
+  return {RESERVA, PRINCIPAL, ordenar, mapaDe, idsDeMapas, tokensDeCreep, mudarTokens, crearMapa, confirmarBorrado, borrarMapa, migrar};
 })();

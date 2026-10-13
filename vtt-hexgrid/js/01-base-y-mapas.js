@@ -452,36 +452,19 @@ async function publicarMapa(id){
 async function borrarMapa(id){
   if(id === MAPA_PRINCIPAL){ toast('El primer mapa no se puede borrar'); return; }
   const nombre = nombreMapa(id);
-  if(!(await Confirmar.preguntar(`¿Borrar el mapa "${nombre}" con todo lo que tiene (tokens y dibujos)? No se puede deshacer.`, {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return;
-  const escrito = prompt(`Para confirmar, escribí el nombre tal cual: ${nombre}`);
-  if(escrito === null) return;
-  if(escrito.trim().toLowerCase() !== nombre.trim().toLowerCase()){ toast('El nombre no coincide — no se borró nada'); return; }
+  if(!(await CreepsMapas.confirmarBorrado(nombre))) return;
   try{
-    const base = fbDb.doc(fbRutaCampana(`mapas/${id}`));
-    const [tokensDocs, estadoDocs, trazosDocs, elementosDocs, pingsDocs] = await Promise.all([
-      base.collection('tokens').get(), base.collection('estado').get(), base.collection('trazos').get(), base.collection('elementos').get(), base.collection('pings').get(),
-    ]);
-    const refs = [...tokensDocs.docs, ...estadoDocs.docs, ...trazosDocs.docs, ...elementosDocs.docs, ...pingsDocs.docs].map(d => d.ref);
-    for(let i = 0; i < refs.length; i += 450){
-      const lote = fbDb.batch();
-      refs.slice(i, i + 450).forEach(r => lote.delete(r));
-      await lote.commit();
-    }
-    // El mapa en sí, aparte y al final (2026-10-13): si las reglas no lo dejan borrar, que se sepa por qué (antes fallaba todo el lote, sin decir nada).
-    try{ await base.delete(); }
-    catch(err){
-      console.error('No se pudo borrar el mapa (el documento):', err);
-      toast(err && err.code === 'permission-denied' ? `Se vació "${nombre}", pero el mapa no se pudo borrar: faltan pegar las reglas nuevas de Firestore` : 'No se pudo borrar el mapa');
-      return;
-    }
-    if(mapaActivo === id) await publicarMapa(MAPA_PRINCIPAL);
+    await CreepsMapas.borrarMapa(id);   // comun/creeps-mapas.js (2026-10-13: el mismo borrado que GM Tools)
     if(mapaEligiendoGM === id){
       mapaEligiendoGM = null;
       try{ localStorage.removeItem('mapa-viendo'); }catch(e){}
       recalcularMapaMostrado();
     }
     toast(`"${nombre}" borrado`);
-  }catch(err){ console.error('No se pudo borrar el mapa:', err); toast('No se pudo borrar el mapa'); }
+  }catch(err){
+    console.error('No se pudo borrar el mapa:', err);
+    toast(err && err.paso === 'mapa' && err.code === 'permission-denied' ? `Se vació "${nombre}", pero el mapa no se pudo borrar: faltan pegar las reglas nuevas de Firestore` : 'No se pudo borrar el mapa');
+  }
 }
 
 const COLORES = ['#C98545', '#8C2F3E', '#2E6B57', '#3F6FB0', '#7A4FA8', '#A8C256', '#D4574E', '#E0C35A', '#4FA3A0', '#9A867E'];

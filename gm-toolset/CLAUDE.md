@@ -481,3 +481,6 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   `iniciativa` del mapa publicado en `mapa/activo`). Si falta la clave de OpenRouter, `orKey` (`js/07`, ahora async) abre `orPedirClave`:
   una ventana con los tres pasos (entrar, crear la clave gratis, pegarla) en vez del `prompt()` del navegador; la usan «+ Creep con IA»
   (y su botón «3. Pegar la clave acá») y 🔎 Escanear grupo.
+- **🗑 Borrar mapa** (2026-10-13, pedido del dueño): con la pestaña de un mapa abierta (no el primero), «🗑 Borrar mapa» (`borrarMapaGM`, js/09) lo borra
+  con todo lo que tiene en el mapa, con el mismo cartel y el mismo «escribí el nombre» que el 🗺 Mapas del mapa (`CreepsMapas.confirmarBorrado` /
+  `borrarMapa`, comun/creeps-mapas.js). Sus creeps no se borran: pasan a la Reserva.

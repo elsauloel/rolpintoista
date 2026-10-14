@@ -12,13 +12,13 @@ const Combatiente = (() => {
   const activos = estados => (estados || []).filter(e => e && e.activo !== false);
 
   /* ---------- Tiradas a la mitad (2026-09-24, dueño) ----------
-     Pajaritos (PdG y Evasión), Lisiado (PdG y Parry) y Sentado (Evasión) parten la TIRADA a la mitad: se tira el dado
+     Pajaritos (PdG, PdG.Esp y Evasión: el PdG.Esp desde el 2026-10-14, dueño), Lisiado (PdG y Parry) y Sentado (Evasión) parten la TIRADA a la mitad: se tira el dado
      completo y al resultado se lo divide por 2, para abajo, mínimo 1 — una vez por cada uno. Parálisis (PdG, Parry y
      Evasión) es una sola mitad por stat y no se suma a Lisiado ni a Pajaritos. Devuelve cuántas veces se parte. */
   function mitadesDeTirada(estados, statId){
     const act = activos(estados);
     let m = 0;
-    if(['pdg', 'eva'].includes(statId) && act.some(e => e.mitadPdgEva)) m++;
+    if(['pdg', 'pdgmg', 'eva'].includes(statId) && act.some(e => e.mitadPdgEva)) m++;
     if(['pdg', 'parry'].includes(statId) && act.some(e => e.lisiado)) m++;
     if(['pdg', 'parry', 'eva'].includes(statId) && m === 0 && act.some(e => e.paralisis)) m++;
     if(statId === 'eva' && act.some(e => e.sentado)) m++;
@@ -31,7 +31,7 @@ const Combatiente = (() => {
   function estadosQueParten(estados, statId){
     const act = activos(estados), out = [];
     const primero = marca => act.find(e => e[marca]);
-    if(['pdg', 'eva'].includes(statId) && primero('mitadPdgEva')) out.push(primero('mitadPdgEva'));
+    if(['pdg', 'pdgmg', 'eva'].includes(statId) && primero('mitadPdgEva')) out.push(primero('mitadPdgEva'));
     if(['pdg', 'parry'].includes(statId) && primero('lisiado')) out.push(primero('lisiado'));
     if(['pdg', 'parry', 'eva'].includes(statId) && !out.length && primero('paralisis')) out.push(primero('paralisis'));
     if(statId === 'eva' && primero('sentado')) out.push(primero('sentado'));

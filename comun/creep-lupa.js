@@ -23,7 +23,7 @@ const CreepLupa = (() => {
     K.aportesMod(sc, attr).forEach(a => { h += lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${a.tipo} · ${K.ATTR_NOMBRE[attr]})</span>`, lupaSigno(a.val)); });
     if(statId !== attr) K.aportesMod(sc, statId).forEach(a => { h += lupaFila(`${esc(a.nombre)} <span class="lupa-gris">(${a.tipo} · ${esc(d.label)})</span>`, lupaSigno(a.val)); });
     if(!K.aportesMod(sc, attr).length && (statId === attr || !K.aportesMod(sc, statId).length)) h += lupaFila('<span class="lupa-gris">Sin modificadores</span>', '–');
-    if((statId === 'pdg' || statId === 'eva') && K.estadoActivo(sc, 'mitadPdgEva')) h += lupaFila('Pajaritos <span class="lupa-gris">(al resultado de la tirada: ÷ 2, para abajo, mínimo 1)</span>', '÷ 2');
+    if(['pdg', 'pdgmg', 'eva'].includes(statId) && K.estadoActivo(sc, 'mitadPdgEva')) h += lupaFila('Pajaritos <span class="lupa-gris">(al resultado de la tirada: ÷ 2, para abajo, mínimo 1)</span>', '÷ 2');
     if((statId === 'pdg' || statId === 'parry') && K.estadoActivo(sc, 'lisiado')) h += lupaFila('Lisiado <span class="lupa-gris">(al resultado de la tirada: ÷ 2, para abajo, mínimo 1)</span>', '÷ 2');
     if(statId === 'resmg' && sc.jefe) h += lupaFila('Protección de jefe', '+1');
     const valor = K.statValor(sc, statId);

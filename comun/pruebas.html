@@ -819,6 +819,11 @@ prueba('🎲 Volver a tirar el consumible al azar antes de publicar (2026-10-14)
   const esCons = !!CATALOGO_BASE.find(x => x.nombre === nuevo && x.tipoItem === 'consumibles');
   igual([ok, rep.drops.j.length, esCons, CombateFin.dropReroll(rep, CATALOGO_BASE, sc, 5)], [true, 1, true, false]);
 });
+prueba('Pajaritos también parte el PdG.Esp (2026-10-14); Pajaritos y Lento entran aunque el golpe no haga daño', () => {
+  const est = [{nombre: 'Pajaritos', mitadPdgEva: true}];
+  igual([Combatiente.mitadesDeTirada(est, 'pdg'), Combatiente.mitadesDeTirada(est, 'pdgmg'), Combatiente.mitadesDeTirada(est, 'eva'), Combatiente.mitadesDeTirada(est, 'parry'),
+    Combatiente.estadosQueParten(est, 'pdgmg').length], [1, 1, 1, 0, 1]);
+});
 prueba('Ataque con arreglos: dados extra de otro tamaño (+1d6, 2026-10-13) viajan al duelo', () => {
   const a = Combatiente.ataqueConArreglos({nombre: 'Picada'}, {modo: 'arma', arma: {dadoExtra: '1d6', fijo: 0}}, {arma: {}});
   const malo = Combatiente.ataqueConArreglos({nombre: 'X'}, {modo: 'arma', arma: {dadoExtra: 'mucho'}}, {arma: {}});

@@ -36,7 +36,7 @@ const FichaEditor = (() => {
     manoPreferida:'Mano', efectoNombre:'Nombre del estado', efectoTurnos:'Turnos del estado', efectoHpTurno:'HP por turno del estado', efectoEscudo:'HP del escudo del estado', efectoStacks:'Stacks del estado', efectoDetalle:'Detalle del estado',
     curaspPct:'% de SP al consumir (0-100, redondea hacia arriba)',
     cargaMax:'Cargas por unidad (usos antes de gastar 1 de la cantidad)', cargaActual:'Cargas restantes (de la unidad actual)',
-    forzarNitros:'Forzar Nitros máx. a (vacío = no forzar; el más bajo activo gana)', mitadPdgEva:'PdG y Evasión a la mitad (redondeado abajo)',
+    forzarNitros:'Forzar Nitros máx. a (vacío = no forzar; el más bajo activo gana)', mitadPdgEva:'PdG, PdG.Esp y Evasión a la mitad (redondeado abajo)',
     escudoMagico:'Vida extra — vida de más que se gasta antes que la vida; es neta: lo que se gasta no vuelve (dejalo en 0 si no aplica)',
     armaduraRota:'Armadura rota: -1 Defensa por cada acumulación (stack)',
     tiradaExtra:'Tirada de efecto: fórmula de dados, botón 🎲 (opcional, ej. 2d6+3)',

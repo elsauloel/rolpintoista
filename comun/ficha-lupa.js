@@ -74,7 +74,7 @@ const FichaLupa = (() => {
     if(!(c.mods[id] || []).length) h += lupaFila(`<span class="lupa-gris">Sin modificadores${ES_ATTR(id) ? '' : ` directos a ${esc(STAT_LABEL[id] || id)}`}</span>`, '–');
     const activos = (S.efectos || []).filter(e => e.activo !== false);
     const mitad = [];
-    if(['pdg', 'eva'].includes(id)) activos.filter(e => e.mitadPdgEva).forEach(e => mitad.push(e.nombre));
+    if(['pdg', 'pdgmg', 'eva'].includes(id)) activos.filter(e => e.mitadPdgEva).forEach(e => mitad.push(e.nombre));
     if(['pdg', 'parry'].includes(id)) activos.filter(e => e.lisiado).forEach(e => mitad.push(e.nombre));
     if(['pdg', 'parry', 'eva'].includes(id)) activos.filter(e => e.paralisis).forEach(e => mitad.push(e.nombre));
     if(id === 'eva') activos.filter(e => e.sentado).forEach(e => mitad.push(e.nombre));

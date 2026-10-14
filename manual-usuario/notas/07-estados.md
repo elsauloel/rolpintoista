@@ -66,7 +66,7 @@ Un **estado alterado** es un efecto **temporal** (o permanente hasta que se cure
 
 | [[Regeneración]] | buff | Cura HP cada turno |
 
-| [[Pajaritos]] | debuff | PdG y Evasión a la mitad |
+| [[Pajaritos]] | debuff | PdG, PdG.Esp y Evasión a la mitad |
 
 | [[Lisiado]] | debuff | PdG y Parry a la mitad |
 
@@ -204,7 +204,7 @@ estado: borrador
 
 +++
 
-**Pajaritos** es un debuff (típico del [[Tanque]] y de golpes fuertes en la cabeza): **tu PdG y tu Evasión quedan a la mitad** (redondeado hacia abajo) mientras dure.
+**Pajaritos** es un debuff (típico del [[Tanque]] y de golpes fuertes en la cabeza): **tu PdG, tu PdG.Esp y tu Evasión quedan a la mitad** (redondeado hacia abajo) mientras dure.
 
 
 

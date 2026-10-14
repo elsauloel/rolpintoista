@@ -21,7 +21,7 @@ const ESTADOS_PRESET = [
   {nombre:'Regeneración', polaridad:'buff', stacks:1, turnos:3, hpTurno:5, stacksTurno:0,
     detalle:'Cura HP cada turno.'},
   {nombre:'Pajaritos', polaridad:'debuff', turnos:3, mitadPdgEva:true, esCC:true,
-    detalle:'PdG y Evasión a la mitad (redondeado hacia abajo) mientras dure.'},
+    detalle:'PdG, PdG.Esp y Evasión a la mitad (redondeado hacia abajo) mientras dure.'},
   // PLACEHOLDER (Iteración 2): Exhausto, Stun, Hypeado, Inmovilizado y Rengo
   // pasaron de Acciones/Movimiento a Nitros 1 a 1, sin recalibrar. Cansado ya
   // se recalibró (2026-09-21, P28): pierde un tercio de sus No2 máximos.

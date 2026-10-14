@@ -23,7 +23,7 @@ const AsistenteEstado = (() => {
 
   // Reglas especiales que el juego YA automatiza (las mismas marcas que llevan los presets). `flags` se suma al estado.
   const ESPECIALES = [
-    {id: 'mitadEva',   texto: 'Parte a la mitad la Evasión y el PdG',             ayuda: 'Como Pajaritos: se tira el dado entero y al resultado se lo divide por 2, para abajo.', flags: {mitadPdgEva: true}},
+    {id: 'mitadEva',   texto: 'Parte a la mitad la Evasión, el PdG y el PdG.Esp',             ayuda: 'Como Pajaritos: se tira el dado entero y al resultado se lo divide por 2, para abajo.', flags: {mitadPdgEva: true}},
     {id: 'mitadPar',   texto: 'Parte a la mitad el PdG y el Parry',               ayuda: 'Como Lisiado.', flags: {lisiado: true}},
     {id: 'inmov',      texto: 'No se puede mover',                                ayuda: 'Como Inmovilizado: no puede moverse (los No2 siguen sirviendo para lo demás).', flags: {inmovilizado: true, esCC: true}},
     {id: 'rengo',      texto: 'Moverse cuesta el doble de No2',                   ayuda: 'Como Rengo: 2 No2 por casillero.', flags: {rengo: true, esCC: true}},

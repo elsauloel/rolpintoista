@@ -247,7 +247,7 @@ const CreepCalculo = (() => {
     const L = [`${ATTR_NOMBRE[attr]} base: ${fmt(num(sc[attr]))}`];
     aportesMod(sc, attr).forEach(a => L.push(`${conSigno(a.val)} ${ATTR_NOMBRE[attr]} por ${a.nombre}`));
     aportesMod(sc, statId).forEach(a => L.push(`${conSigno(a.val)} ${label} por ${a.nombre}`));
-    if((statId === 'pdg' || statId === 'eva') && estadoActivo(sc, 'mitadPdgEva')) L.push('Pajaritos: a la mitad');
+    if(['pdg', 'pdgmg', 'eva'].includes(statId) && estadoActivo(sc, 'mitadPdgEva')) L.push('Pajaritos: a la mitad');
     if((statId === 'pdg' || statId === 'parry') && estadoActivo(sc, 'lisiado')) L.push('Lisiado: a la mitad');
     if(['pdg', 'parry', 'eva'].includes(statId) && estadoActivo(sc, 'paralisis')) L.push('Parálisis: a la mitad');
     L.push(`= ${fmt(statValor(sc, statId))}`);

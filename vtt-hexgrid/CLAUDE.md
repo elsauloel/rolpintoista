@@ -1578,7 +1578,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   sí, sin tiradas) le pide al mapa `ui.excavar` (`CreepAcciones.terminarHab` → `excavarToken`): el token guarda `bajoTierra: true` (reglas:
   `tokenValido`). Los jugadores no lo tienen en `calcularDisposicion` y ven el pozo (`dibujarPozos`, js/05); el GM lo ve transparente encima. No se lo
   elige de objetivo (`dueloResaltarObjetivos`, el clic, el área, la línea, los misiles, js/13), no le llega el salto eléctrico (`rayoCadena`, js/10) y
-  no da ni recibe oportunidad (js/17). Una habilidad con `emerger: {distancia}` (ataque con el arma) en `acLanzarAtaqueDeHab` (js/12): si está bajo
+  no da ni recibe oportunidad (js/17). Una habilidad con `emerger: {distancia, pdg}` (ataque con el arma; `pdg`: lo que suma a la Probabilidad de Golpe si sale de abajo, la Puñalada +2) en `acLanzarAtaqueDeHab` (js/12): si está bajo
   tierra, `emergerToken` pide la casilla de salida (libre, a `distancia` o menos del pozo; Esc = sigue abajo), borra `bajoTierra`, la tierra salta
   (`dibujarEfectosEmerger`) y sigue la elección del objetivo. `acEjecutarHab` avisa antes de cobrar: sin token, ya bajo tierra, o «no está bajo
   tierra: ¿usarla igual como un ataque común?». Hoy, creeps; personajes e invocaciones, pendiente (docs/pendientes.md).

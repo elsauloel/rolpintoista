@@ -36,14 +36,18 @@
   con todos los mapas recargados:** Frío, Fuego, Ácido y Tóxico de punta a punta.
 - [ ] **⚡ Salto eléctrico, regla general** (2026-10-13): 4 casillas; la mitad de lo que entró; cada salto resta la Res. eléctrica; sin tope
   (la varita de chispa, el relámpago, la flecha de tormenta, la trampa Descarga y el ⚡ del menú de vida).
-- [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): ver el pozo con la pantalla de un JUGADOR (no ve el token ni lo puede apuntar, un área no lo
-  toca) y un crítico de la Puñalada (Rengo 2 y Lisiado 1). Lo del GM ya se probó (abajo, en Probado).
+- [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): un crítico de la Puñalada (Rengo 2 y Lisiado 1). El pozo visto como jugador ya se vio (con
+  «👁 Ver como jugador», abajo, en Probado).
+- [ ] **⚙ Dibujos: color, sin relleno, ⭕ figura cerrada y sólida** (2026-10-14): falta que el dueño pegue las reglas (`color`, `transparente`,
+  `cerrada`); el 📌 y el ⚙ ya se vieron andar.
 - [ ] **❄ Granizo de cristal** (Chamán del cristal, «El origen de las especies», MINAS, 2026-10-13): área de diámetro 3, PdG.Esp contra
   Evasión, 1d6+2 de hielo; a quien le entran 5 o más, 1 de Escarcha (uno solo); con 4 o menos, nada. Usa la regla nueva «estado según el
   daño» con `desde`/`tope` (`comun/combatiente.js`, en verde en pruebas.html). Probar con una copia del chamán en «Claude · pruebas»,
   o ver la primera vez que se use en la sesión real.
 
 ## Probado
+- [x] **👁 Ver como jugador** (2026-10-14, con capturas): desde el menú del ojo, el GM ve el pozo en vez del tunelero bajo tierra, la niebla de los
+  jugadores y el cartel «Estás viendo el mapa como un jugador»; tocándolo vuelve.
 - [x] **🕳 Excavar y Puñalada desde abajo** (2026-10-14, «Claude · pruebas», con capturas): Excavar cobra 1 No2 y cooldown 3, lo anuncia, el
   token queda transparente para el GM y bajo tierra (reglas pegadas). Puñalada: «¿por dónde sale?», sale pegado a juan con la tierra que salta,
   pide el objetivo, el duelo dice +1 PdG y +1d6, Crítico frecuente (1); pegó (3 contra 1), 10 − 2 de Defensa → Rengo 1 turno, aplicado.

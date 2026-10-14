@@ -585,9 +585,12 @@ function renderNiebla(){
   b.classList.toggle('primary', nieblaActiva);
   b.textContent = nieblaActiva ? '🌫 Niebla: sí' : '🌫 Niebla: no';
   b.title = nieblaActiva ? 'Apagar la niebla de guerra en este mapa' : 'Prender la niebla de guerra en este mapa';
-  j.hidden = !nieblaActiva;   // solo tiene sentido con la niebla prendida
+  j.hidden = false;   // 👁 ver como jugador: siempre (2026-10-14; antes solo con la niebla)
+  j.textContent = nieblaComoJugador ? '👁 Viendo como jugador · volver' : '👁 Ver como jugador';
+  const bj = document.getElementById('banner-como-jugador');
+  if(bj) bj.hidden = !(soyGM && nieblaComoJugador);
   j.classList.toggle('primary', nieblaComoJugador);
-  j.title = nieblaComoJugador ? 'Volver a verlo todo' : 'Ver el mapa como lo ven los jugadores';
+  j.title = nieblaComoJugador ? 'Volver a verlo todo, como GM' : 'Ver el mapa como lo ve un jugador: sin lo oculto, con su niebla';
   $('#btn-ojo-menu').classList.toggle('activo', nieblaActiva || nieblaComoJugador || visionCreepsActiva);
   renderLuz();
   const vc = $('#btn-vision-creeps');
@@ -654,6 +657,15 @@ function visionCreepsCalcular(){
   }
   return visionCreepsCache;
 }
+// El cartel de arriba mientras el GM ve como jugador (se toca para volver).
+(() => {
+  const b = document.createElement('button');
+  b.id = 'banner-como-jugador'; b.type = 'button'; b.hidden = true;
+  b.textContent = '👁 Estás viendo el mapa como un jugador · tocá para volver a verlo todo';
+  b.style.cssText = 'position:fixed;top:56px;left:50%;transform:translateX(-50%);z-index:40;padding:6px 14px;border-radius:999px;border:1px solid #E0A458;background:rgba(31,26,32,.92);color:#E0A458;font:600 12.5px "Space Grotesk",system-ui,sans-serif;cursor:pointer';
+  b.onclick = () => $('#btn-niebla-jugador').click();
+  document.body.appendChild(b);
+})();
 $('#btn-niebla-jugador').onclick = () => {
   nieblaComoJugador = !nieblaComoJugador;
   try{ localStorage.setItem('niebla-como-jugador', nieblaComoJugador ? '1' : ''); }catch(e){}

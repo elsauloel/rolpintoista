@@ -1594,3 +1594,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   cerrada. **Una figura cerrada con pared es sólida por dentro** (`figurasSolidas`, `celdaEnFiguraSolida`: la casilla cuyo centro cae adentro no
   se pisa —`elementoSolidoEn`, js/07— y no dibuja la grilla —js/05—). Un dibujo viejo que termina donde empezó cuenta como cerrado. Reglas:
   `transparente`, `cerrada` (y `color` en los `update`).
+- **👁 Ver como jugador, completo** (2026-10-14, dueño: «como GM tengo la opción de ver como creep pero no de ver como jugador»): el botón del
+  menú del ojo (`#btn-niebla-jugador`, `nieblaComoJugador`) ya no depende de la niebla. `dibujar()` (js/05) hace lo suyo como GM (niebla,
+  sigilo, que pueden escribir) y después dibuja el lienzo (`dibujarLienzo`) con `soyGM = false` por un momento: sin ocultos, sin trampas
+  ocultas ni lo invisible, con la niebla de los jugadores y el pozo del que está bajo tierra. Un cartel arriba (`#banner-como-jugador`) recuerda
+  que se está viendo así y se toca para volver.

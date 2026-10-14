@@ -281,6 +281,14 @@ function dibujar(){
   nieblaActualizar();
   sigiloRevisar();
   sigiloFantasmasActualizar();
+  /* 👁 Ver como jugador (2026-10-14, dueño: «como GM tengo la opción de ver como creep pero no de ver como jugador»): el GM dibuja el lienzo
+     como lo dibuja un jugador — sin tokens ocultos ni en sigilo ajeno, sin trampas ocultas ni lo invisible, con la niebla de los jugadores y
+     el pozo en vez del que está bajo tierra. Solo cambia el dibujo: lo de arriba (niebla, sigilo) y todo lo que escribe sigue como GM. */
+  const gm = soyGM, como = gm && nieblaComoJugador;
+  if(como) soyGM = false;
+  try{ return dibujarLienzo(); } finally { if(como) soyGM = gm; }
+}
+function dibujarLienzo(){
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.fillStyle = '#0F0C0E';
   ctx.fillRect(0, 0, lienzo.width, lienzo.height);

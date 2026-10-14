@@ -318,17 +318,20 @@ function acMesaHabilidad(sc, h, extra){
   }).catch(err => console.error('No se pudo publicar la habilidad en la Mesa:', err));
 }
 // «Ataque con mi arma, con arreglos»: se anuncia y va al cuadro del duelo; sin duelo, se tira el PdG suelto.
-function acLanzarAtaqueDeHab(sc, h){
-  // 🕳 Emerger (js/46): si está bajo tierra, primero sale (se elige la casilla) y recién ahí elige a quién le pega.
+function acLanzarAtaqueDeHab(sc, h, emergio){
+  // 🕳 Emerger (js/46): si está bajo tierra, primero sale (se elige la casilla) y recién ahí elige a quién le pega; saliendo de abajo, suma
+  // `emerger.pdg` a la Probabilidad de Golpe (2026-10-14, dueño: «si la hace estando bajo tierra, tiene +2 a la probabilidad de golpe»).
   const pozo = h && h.emerger ? tokenEntradaCreep(sc.id) : null;
   if(pozo && pozo[1].bajoTierra){
     const id = ac && ac.creepId;
     ac.host.hidden = true;
-    emergerToken(pozo[0], {distancia: num(h.emerger.distancia) || BAJO_TIERRA_DIST, nombre: h.nombre, alSalir: () => acLanzarAtaqueDeHab(sc, h),
+    emergerToken(pozo[0], {distancia: num(h.emerger.distancia) || BAJO_TIERRA_DIST, nombre: h.nombre, alSalir: () => acLanzarAtaqueDeHab(sc, h, true),
       alCancelar: () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } }});
     return;
   }
   const atq = CreepAcciones.ataqueDeHab(sc, h);
+  const bonoSalida = emergio && atq && atq.mods ? Math.round(num(h.emerger && h.emerger.pdg)) : 0;
+  if(bonoSalida) atq.mods.pdg = num(atq.mods.pdg) + bonoSalida;
   acParry.delete(sc.id);   // atacar cierra el Parry que esperaba su Bloqueo
   acMesaHabilidad(sc, h);
   if(atq && typeof Duelo !== 'undefined' && Duelo.disponible()) acElegirObjetivo(sc, atq, () => acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq)));

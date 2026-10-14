@@ -831,6 +831,12 @@ prueba('🪨 La honda (2026-10-14): mitad del Dmg, alcance la mitad del Rango, s
     Combatiente.esHonda(Combatiente.armaDeCombatiente(creep)), Combatiente.alcanceArmaRango({armaDeRango: true}, 11), Combatiente.dmgDelArmaTxt(h), /honda/.test(ItemCorto.armaEsencial(h))],
     [true, false, 3, 5, 1, false, 0, '', false, true, 11, 'honda: suma la mitad del Dmg', true]);
 });
+prueba('🐾 Equipo natural de un creep (2026-10-14): da sus bonos pero no se suelta al morir', () => {
+  const sc = {id: 'n', nombre: 'Coraza', nivel: 2, armaNombre: 'Martillo', equipo: [{id: 'a', nombre: 'Piel de piedra', tipoItem: 'armadura_rigida', def: 3, natural: true}, {id: 'b', nombre: 'Chaleco de cuero', tipoItem: 'armadura_blanda', def: 2}]};
+  const its = CombateFin.itemsDeCreep(CATALOGO_BASE, sc).map(i => i.nombre);
+  igual([its.includes('Piel de piedra'), its.includes('Chaleco de cuero'), /Piel de piedra/.test(CreepCalculo.dropsResumen(sc)), CreepCalculo.tarjetaPublica({...sc, hp: 10}).equipoNombres],
+    [false, true, false, ['Piel de piedra', 'Chaleco']]);
+});
 prueba('Ataque con arreglos: dados extra de otro tamaño (+1d6, 2026-10-13) viajan al duelo', () => {
   const a = Combatiente.ataqueConArreglos({nombre: 'Picada'}, {modo: 'arma', arma: {dadoExtra: '1d6', fijo: 0}}, {arma: {}});
   const malo = Combatiente.ataqueConArreglos({nombre: 'X'}, {modo: 'arma', arma: {dadoExtra: 'mucho'}}, {arma: {}});

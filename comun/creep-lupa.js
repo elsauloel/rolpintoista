@@ -164,7 +164,7 @@ const CreepLupa = (() => {
     const equipo = [
       equipado(sc.armaNombre || 'Arma sin nombre', sc.armaDeRango ? 'Arma de rango' : 'Arma', esc(K.danoTxt(sc)),
         [sc.armaDetalle, efectos].filter(Boolean).join(' · ')),
-      ...(sc.equipo || []).map(it => equipado(it.nombre || '(sin nombre)', K.TIPOITEM_LABEL[it.tipoItem] || it.tipoItem || '', `<small>DEF</small>+${fmt(num(it.def))}`, it.detalle)),
+      ...(sc.equipo || []).map(it => equipado(it.nombre || '(sin nombre)', (K.TIPOITEM_LABEL[it.tipoItem] || it.tipoItem || '') + (it.natural ? ' · 🐾 natural (no se suelta)' : ''), `<small>DEF</small>+${fmt(num(it.def))}`, it.detalle)),
     ].join('');
 
     return {titulo: sc.nombre || 'Creep', html: `

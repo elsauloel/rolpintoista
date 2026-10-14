@@ -360,6 +360,15 @@ document.addEventListener('click', async e => {
     verItemGM(num(b.dataset.veritem));
     return;
   }
+  if(b.dataset.naturalequipo){   // 🐾 armadura natural (2026-10-14): da sus bonos pero no se suelta al morir
+    const [scId, equipoId] = b.dataset.naturalequipo.split(':');
+    const sc = S.creeps.find(s => s.id === scId), it = sc && (sc.equipo || []).find(x => x.id === equipoId);
+    if(!it) return;
+    if(it.natural) delete it.natural; else it.natural = true;
+    renderAll();
+    toast(it.natural ? `🐾 ${it.nombre}: natural, no se suelta al morir` : `${it.nombre}: se suelta al morir`);
+    return;
+  }
   if(b.dataset.quitarequipo){
     const [scId, equipoId] = b.dataset.quitarequipo.split(':');
     quitarEquipoDeCreep(scId, equipoId);

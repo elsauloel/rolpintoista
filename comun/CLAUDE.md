@@ -1565,3 +1565,7 @@ versión parecida en más de una, es candidato a juntar.
   para abajo: `HONDA_RANGO`, provisorio, P198) — lo usan `FichaCombate.alcanceDeArma`, `CreepCalculo.alcance` y las invocaciones —,
   `sirveDeOportunidad` (no), sin Recarga, sin munición, sin tiro alto. El asistente de ítems pregunta «¿Es una honda?»; `ItemCorto` y el
   glosario la nombran. Una sola en el catálogo (Honda de piedras); la serie y la auditoría, en `docs/pendientes.md`.
+- **🐾 Equipo natural de un creep** (2026-10-14, dueño: «que los ítems defensivos también puedan marcarse como armadura natural, para darles
+  equipos inspirados en el catálogo que no dejen el drop»): una pieza del equipo de un creep con `natural: true` da sus bonos pero no se suelta
+  (`CombateFin.itemsDeCreep`, y por eso el botín estimado; `CreepCalculo.dropsResumen`); en la tarjeta pública se ve con su nombre, como el arma
+  natural. El 🐾 de cada pieza en GM Tools (editor del creep y su vista) la marca o desmarca.

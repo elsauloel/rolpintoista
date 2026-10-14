@@ -459,7 +459,7 @@ const CreepCalculo = (() => {
     return {
       armaNombre: sc.armaNatural === true ? nom(sc.armaNombre) : ver(sc.armaNombre),
       armaNatural: sc.armaNatural === true,
-      equipoNombres: (Array.isArray(sc.equipo) ? sc.equipo : []).map(it => ver(it && it.nombre)).filter(Boolean).slice(0, 30),
+      equipoNombres: (Array.isArray(sc.equipo) ? sc.equipo : []).map(it => it && it.natural ? nom(it.nombre) : ver(it && it.nombre)).filter(Boolean).slice(0, 30),   // lo natural se ve con su nombre, como el arma natural
       notas: String(sc.notas || '').trim().slice(0, 600),
       tipoCriatura: tipoDe(sc).slice(0, 30),   // el tipo de criatura (Matabestias de los arcos, 2026-10-11)
     };
@@ -639,7 +639,7 @@ const CreepCalculo = (() => {
   function dropsResumen(sc){
     const partes = [];
     if(sc.armaNombre && !sc.armaNatural) partes.push(`${sc.armaNombre} (arma equipable)`);
-    (sc.equipo || []).forEach(it => partes.push(`${it.nombre} (equipo)`));
+    (sc.equipo || []).filter(it => !it.natural).forEach(it => partes.push(`${it.nombre} (equipo)`));   // 🐾 lo natural no se suelta (2026-10-14)
     const tr = trofeo(sc);
     if(tr) partes.push(`${tr.nombre} (trofeo: compra ${fmt(tr.precioCompra)}, venta ${fmt(tr.precioCompra / 2)}, ${fmt(despojosDePrecio(tr.precioCompra))} despojos)`);
     dropsFijos(sc).forEach(n => partes.push(`${n} (drop fijo)`));

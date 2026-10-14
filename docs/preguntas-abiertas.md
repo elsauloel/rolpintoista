@@ -991,3 +991,8 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   Sigilo (Destreza) o contra su Especial?; (3) ¿se tira a cada paso dentro de la flor o una vez por turno?; (4) ¿la rompe una acción hostil (como
   el Sigilo) o solo el tiempo / ser descubierto?; (5) ¿5 SP + el No2 de entrar en sigilo (1)? Propuesta de Claude: la primera opción de cada una.
   Mientras tanto queda en el pool como «(Sin auditar)»: solo se anuncia.
+- ❓ **P198. La honda: ¿cuánto alcanza? — 2026-10-14.** El dueño creó la categoría «honda» (arma de rango contundente: suma la mitad del
+  Dmg, le tira al de al lado, sin tiro alto ni flechas, sin oportunidad) y pidió que el alcance no sea fijo sino «el rango con alguna
+  penalidad». Idea del dueño: que la penalidad salga de la diferencia entre Fuerza y Destreza (pero, si la Fuerza es menor, el alcance
+  terminaría siendo la Fuerza: «hay que pensarlo»). **Provisorio (Claude):** la mitad del Rango, para abajo (`Combatiente.HONDA_RANGO`,
+  `alcanceHonda`). Falta: auditar la categoría y armar la serie de hondas del catálogo (ver `pendientes.md`).

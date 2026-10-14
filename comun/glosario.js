@@ -22,6 +22,7 @@ const Glosario = (() => {
     {titulo: 'Tipo', re: 'Tipo (?:4|6|8|10|12)', texto: 'Tipo N: el dado del arma (Tipo 6 = d6) y contra qué Resistencia a crítico pega. El primer ataque del turno cuesta la mitad del Tipo en No2 y los siguientes, el Tipo entero.'},
     {titulo: 'Amplificado', re: 'amplificados?', texto: 'Daño amplificado: dados de daño de más que no pesan.'},
     {titulo: '2 manos', re: '2 manos|a dos manos', texto: 'A dos manos: ocupa las dos manos (no se puede llevar un escudo ni otra arma).'},
+    {titulo: 'Honda', re: 'honda', texto: 'Honda: arma de rango contundente. Suma la mitad de tu Dmg (para arriba), como el arco, pero le tira también al de al lado y no tiene tiro alto. Su alcance es la mitad de tu Rango (para abajo). No hace ataques de oportunidad.'},
     {titulo: 'Arco', re: 'arco', texto: 'Arco: suma la mitad de tu Dmg (para arriba) y tiene Tiro alto (salvo que diga «Sin tiro alto»). Dispara con al menos 1 casillero libre entre vos y el objetivo (no al de al lado); con el arco no se pega cuerpo a cuerpo, no se hacen ataques de oportunidad ni se parrea.'},
     {titulo: 'A distancia', re: 'a distancia', texto: 'Arma a distancia: el daño es solo el del arma, no suma tu Dmg.'},
     {titulo: 'Recarga', re: 'Recarga \\d', texto: 'Recarga N (ballestas): el primer disparo del turno cuesta N No2, el segundo 2N, el tercero 3N… (1 = rápida, 2 = común, 3 = de asedio). Pocos tiros y fuertes. No suma tu Dmg: el daño es el del arma. A diferencia del arco, dispara con el rival al lado.'},

@@ -466,7 +466,7 @@ const CreepCalculo = (() => {
   }
   // Alcance de su arma, en casilleros: un arma de rango usa su Rango; una de cuerpo a cuerpo, 1 + lo que le sume a Rango.
   function alcance(sc){
-    if(sc.armaDeRango){ const v = statValor(sc, 'rng'); return Number.isNaN(v) ? 0 : Math.max(1, Math.round(v)); }
+    if(sc.armaDeRango){ const v = statValor(sc, 'rng'); return Number.isNaN(v) ? 0 : Combatiente.alcanceArmaRango(Combatiente.armaDeCombatiente(sc), v); }   // la honda, la mitad
     const bono = (sc.armaMods || []).filter(m => m.stat === 'rng').reduce((a, m) => a + num(m.val), 0);
     return 1 + Math.max(0, Math.round(bono));
   }

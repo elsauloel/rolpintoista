@@ -53,7 +53,7 @@ const InvHabilidades = (() => {
   function ataqueDeHab(inv, h){
     const c = h && h.duelo;
     return Combatiente.ataqueConArreglos(h, c, {arma: {...Combatiente.armaDeCombatiente(inv), id: '', nombre: inv.armaNombre || '', rango: !!inv.armaDeRango},
-      alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? alcanceHab(inv, c, 'pdg') : (inv.armaDeRango ? Math.max(1, Math.round(num(I().statValor(inv, 'rng')))) : 1)});
+      alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? alcanceHab(inv, c, 'pdg') : (inv.armaDeRango ? Combatiente.alcanceArmaRango(Combatiente.armaDeCombatiente(inv), I().statValor(inv, 'rng')) : 1)});
   }
   // El PdG del ataque con arreglos, con lo que le suma la habilidad (los No2 ya los cobró la habilidad).
   const tiradaPdgArreglos = (inv, atq) => A().tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + num(atq && atq.mods && atq.mods.pdg), 'pdg');

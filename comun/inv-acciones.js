@@ -65,7 +65,7 @@ const InvAcciones = (() => {
      lo borra cada pantalla. */
   function ataqueDuelo(inv, tipo){
     return {tipo: tipo === 'oportunidad' || tipo === 'contra' ? tipo : 'normal', armaId: '', armaNombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8, rango: !!inv.armaDeRango, ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(inv)),
-      alcance: inv.armaDeRango ? Math.max(1, Math.round(num(I().statValor(inv, 'rng')))) : 1};
+      alcance: inv.armaDeRango ? Combatiente.alcanceArmaRango(Combatiente.armaDeCombatiente(inv), I().statValor(inv, 'rng')) : 1};
   }
   /* Sin No2 suficientes (2026-10-02, hoja de ruta B-7, igual que los creeps y los personajes: avisar y dejar seguir): faltanNitros, la
      pregunta «¿Atacar igual?», pagar forzando (gasta los que tenga, hasta 0) y la línea roja de la Mesa (alertaSinNitros). */

@@ -390,12 +390,16 @@ const AsistenteItem = (() => {
       h += campo('Distancia', `<div class="aa-opciones">${op('rango', '0', !d.armaDeRango, 'Cuerpo a cuerpo')}${op('rango', '1', !!d.armaDeRango, 'A distancia')}</div>`);
       if(d.armaDeRango) h += campo('¿Es un arco?', `<div class="aa-opciones">${op('arco', '1', !!d.arco, '🏹 Arco')}${op('arco', '0', !d.arco, 'Otra (ballesta, pistola, lanzallamas…)')}</div>`);
       // La Recarga (2026-10-10, dueño): la ballesta es lenta — cobra N, 2N, 3N… No2 por disparo en el turno.
-      if(d.armaDeRango && !d.arco) h += campo('Recarga (ballestas)', `<div class="aa-opciones">${op('recarga', '0', !n(d.recarga), 'Sin Recarga')}${op('recarga', '1', n(d.recarga) === 1, '1 · rápida')}${op('recarga', '2', n(d.recarga) === 2, '2 · común')}${op('recarga', '3', n(d.recarga) === 3, '3 · de asedio')}</div>`,
+      if(d.armaDeRango && !d.arco) h += campo('¿Es una honda?', `<div class="aa-opciones">${op('honda', '1', !!d.honda, '🪨 Honda')}${op('honda', '0', !d.honda, 'No')}</div>`,
+        'La honda (2026-10-14): arma de rango contundente, suma la mitad del Dmg, alcance la mitad del Rango, le tira también al de al lado y no hace ataques de oportunidad.');
+      if(d.armaDeRango && !d.arco && !d.honda) h += campo('Recarga (ballestas)', `<div class="aa-opciones">${op('recarga', '0', !n(d.recarga), 'Sin Recarga')}${op('recarga', '1', n(d.recarga) === 1, '1 · rápida')}${op('recarga', '2', n(d.recarga) === 2, '2 · común')}${op('recarga', '3', n(d.recarga) === 3, '3 · de asedio')}</div>`,
         'Con Recarga N, el primer disparo del turno cuesta N No2, el segundo 2N, el tercero 3N… (en vez de Tipo ÷ 2 y después el Tipo). Pocos tiros y fuertes: así pasa la armadura. La común es la 2.');
       h += efecto(!d.armaDeRango
         ? `Es <b>cuerpo a cuerpo</b>: al tirar daño se suma el <b>Dmg</b> ${e(q.de)}${p ? ` (hoy ${f(n(p.dmg))})` : ''}.`
         : d.arco
         ? `Es un <b>arco</b> (2026-10-09): el daño suma <b>la mitad del Dmg</b> ${e(q.de)}, redondeada para arriba${p ? ` (hoy +${f(Math.ceil(n(p.dmg) / 2))})` : ''}. Dispara con al menos 1 casillero libre entre el arquero y el objetivo (no al de al lado), y con el arco no se pega cuerpo a cuerpo. Su Tipo es su dado: un arco de d4 es Tipo 4, uno de d6, Tipo 6 (para acercarse a un d6 sin cambiar el Tipo, daño fijo: 1d4+1).`
+        : d.honda
+        ? `Es una <b>honda</b>: el daño suma <b>la mitad del Dmg</b> ${e(q.de)}, redondeada para arriba${p ? ` (hoy +${f(Math.ceil(n(p.dmg) / 2))})` : ''}; su alcance es la mitad del Rango (para abajo); le tira también al de al lado y no hace ataques de oportunidad.`
         : `Es <b>de rango</b> (ballesta, pistola, lanzallamas…): tiene su propia mecánica — el daño <b>no suma el Dmg</b>, es solo el del arma${n(d.recarga) ? `, y con <b>Recarga ${f(n(d.recarga))}</b> cada disparo del turno cuesta más (${[1, 2, 3].map(k => f(k * n(d.recarga))).join(', ')}… No2). A diferencia del arco, puede disparar con el rival al lado` : ''}. No confundir con el <b>Alcance</b> de las armas cuerpo a cuerpo: son dos cosas distintas.`);
       // Mismo mod ('rng'), pero se explica distinto: en un arma de rango es su
       // propia distancia de disparo; en una cuerpo a cuerpo es el Alcance
@@ -815,7 +819,8 @@ const AsistenteItem = (() => {
     else if(ds.aaTipo) d.tipoDado = n(ds.aaTipo);
     else if(ds.aaManos) d.tipoItem = ds.aaManos;
     else if(ds.aaRango) d.armaDeRango = ds.aaRango === '1';
-    else if(ds.aaArco){ d.arco = ds.aaArco === '1'; if(d.arco) d.tipoItem = 'arma_2m'; }   // un arco es siempre a dos manos (2026-10-09)
+    else if(ds.aaArco){ d.arco = ds.aaArco === '1'; if(d.arco){ d.tipoItem = 'arma_2m'; delete d.honda; } }   // un arco es siempre a dos manos (2026-10-09)
+    else if(ds.aaHonda){ if(ds.aaHonda === '1'){ d.honda = true; delete d.recarga; } else delete d.honda; }   // 🪨 la honda (2026-10-14)
     else if(ds.aaRecarga !== undefined) d.recarga = n(ds.aaRecarga);
     else if(ds.aaEquipado) d.equipado = ds.aaEquipado === '1';
     else if(ds.aaModadd !== undefined) d.mods.push({stat: ds.aaModadd, val: ds.aaModadd ? 1 : 0});

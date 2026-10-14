@@ -15,6 +15,10 @@
 >   dibujo permanente del lápiz puede ser pared (casilla «🧱 Con colisión» o el 🧱 del dibujo seleccionado; solo el GM), y el lápiz suma el estilo
 >   **📐 En rectas** (clic, clic…, con imán a las esquinas de los hexágonos). **Falta: que el dueño pegue las reglas** (`recto`, `colision` de los
 >   trazos) y probarlo en el mapa (`pruebas-en-el-mapa.md`).
+> - [ ] **🪨 Hondas: auditar la categoría y armar la serie del catálogo (2026-10-14, dueño):** la categoría existe (`honda` en el arma:
+>   `Combatiente.esHonda`, `alcanceHonda`; P198 el alcance) y por ahora hay una sola honda nueva, la **Honda de piedras** (Común, Tipo 10).
+>   Falta auditarla y crear la serie (calidades, mecánicas propias). Las hondas viejas del catálogo (Honda de cuero, de pastor, del cazador de
+>   jabalíes: Tipo 4, sin la categoría) quedan para esa auditoría.
 > - [ ] **🕳 Bajo tierra para personajes e invocaciones (2026-10-13):** Excavar / Emerger (`excavar`, `emerger` en la habilidad;
 >   `vtt-hexgrid/js/46-bajo-tierra.js`) hoy anda para creeps (el Kobold tunelero). Falta el camino de la ficha (mensaje al mapa, como el blink) y
 >   el de las invocaciones, cuando alguien tenga una skill así.

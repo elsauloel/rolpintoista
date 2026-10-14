@@ -824,6 +824,13 @@ prueba('Pajaritos también parte el PdG.Esp (2026-10-14); Pajaritos y Lento entr
   igual([Combatiente.mitadesDeTirada(est, 'pdg'), Combatiente.mitadesDeTirada(est, 'pdgmg'), Combatiente.mitadesDeTirada(est, 'eva'), Combatiente.mitadesDeTirada(est, 'parry'),
     Combatiente.estadosQueParten(est, 'pdgmg').length], [1, 1, 1, 0, 1]);
 });
+prueba('🪨 La honda (2026-10-14): mitad del Dmg, alcance la mitad del Rango, sin oportunidad ni Recarga ni flechas; no es arco', () => {
+  const h = CATALOGO_BASE.find(x => x.nombre === 'Honda de piedras'), creep = {armaDeRango: true, armaRasgos: {honda: true}, armaTipo: 10};
+  igual([Combatiente.esHonda(h), Combatiente.esArco(h), Combatiente.dmgDelArma(h, 5), Combatiente.alcanceArmaRango(h, 11), Combatiente.alcanceArmaRango(h, 1),
+    Combatiente.sirveDeOportunidad(h), Combatiente.recargaDe({...h, recarga: 2}), Combatiente.municionDe(h), Combatiente.tieneTiroAlto(h),
+    Combatiente.esHonda(Combatiente.armaDeCombatiente(creep)), Combatiente.alcanceArmaRango({armaDeRango: true}, 11), Combatiente.dmgDelArmaTxt(h), /honda/.test(ItemCorto.armaEsencial(h))],
+    [true, false, 3, 5, 1, false, 0, '', false, true, 11, 'honda: suma la mitad del Dmg', true]);
+});
 prueba('Ataque con arreglos: dados extra de otro tamaño (+1d6, 2026-10-13) viajan al duelo', () => {
   const a = Combatiente.ataqueConArreglos({nombre: 'Picada'}, {modo: 'arma', arma: {dadoExtra: '1d6', fijo: 0}}, {arma: {}});
   const malo = Combatiente.ataqueConArreglos({nombre: 'X'}, {modo: 'arma', arma: {dadoExtra: 'mucho'}}, {arma: {}});

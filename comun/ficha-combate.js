@@ -87,7 +87,7 @@ const FichaCombate = (() => {
   const bloqueoValor = (S, arma, c) => statParaArma(S, 'bloqueo', arma, c) + (arma ? num(arma.peso) : 0);
   // Hasta dónde llega: de rango, su Rango (mínimo 1); cuerpo a cuerpo, 1 + lo que el arma sume al Rango.
   function alcanceDeArma(S, arma, c){
-    if(arma && arma.armaDeRango){ const v = statParaArma(S, 'rng', arma, c); return Number.isNaN(v) ? 0 : Math.max(1, Math.round(v)); }
+    if(arma && arma.armaDeRango){ const v = statParaArma(S, 'rng', arma, c); return Number.isNaN(v) ? 0 : Combatiente.alcanceArmaRango(arma, v); }   // la honda, la mitad
     const bono = arma ? (arma.mods || []).filter(m => m.stat === 'rng').reduce((a, m) => a + num(m.val), 0) : 0;
     return 1 + Math.max(0, Math.round(bono));
   }

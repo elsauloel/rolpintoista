@@ -145,7 +145,7 @@ const ItemCorto = (() => {
     const peso = Math.max(1, num(it.peso) || 1), amp = Math.max(0, num(it.danoAmplificado)), tipo = num(it.tipoDado) || 8;
     const p = [`Tipo ${tipo}`];
     if(it.tipoItem === 'arma_2m') p.push('2 manos');
-    if(it.armaDeRango) p.push(Combatiente.esArco(it) ? 'arco' : 'a distancia');
+    if(it.armaDeRango) p.push(Combatiente.esArco(it) ? 'arco' : Combatiente.esHonda(it) ? 'honda' : 'a distancia');
     p.push(`${peso} dado${peso === 1 ? '' : 's'}${amp ? ` + ${amp} amplificado${amp === 1 ? '' : 's'}` : ''}`);
     if(num(it.danoFijo)) p.push(`${num(it.danoFijo) > 0 ? '+' : ''}${num(it.danoFijo)} de daño`);
     (it.mods || []).forEach(m => { if(m && m.stat && num(m.val) && m.stat !== 'def') p.push(`${m.stat === 'rng' && it.armaDeRango ? 'Rango' : (BONO[m.stat] || m.stat)} ${num(m.val) > 0 ? '+' : ''}${num(m.val)}`); });   // en un arma de rango, «Rango» (no Alcance)

@@ -30,6 +30,16 @@ async function roboAplicar(d, t){
   const f = fichasPub.get(t.fichaId), cin = f && f.resumen && Array.isArray(f.resumen.cinturon) ? f.resumen.cinturon : null;
   if(!cin) return {manual: true, nota: `no se ve el cinturón de ${nombreDe(t)} (que abra su ficha una vez): el robo, a mano`};
   const bolsa = cin.flatMap(x => Array(Math.max(0, Math.min(20, Math.round(num(x && x.u))))).fill(String((x && x.n) || '')).filter(Boolean));
+  // Lo ya robado que su ficha todavía no descontó (el aviso sigue pendiente): no se puede robar dos veces la misma unidad.
+  try{
+    const pend = await fbDb.collection(fbRutaCampana('estados')).where('fichaId', '==', String(t.fichaId)).get();
+    pend.docs.forEach(doc => {
+      const x = doc.data(); if(x.aplicada) return;
+      let sp = {}; try{ sp = JSON.parse(x.spec || '{}'); }catch(e){}
+      const i = /^robo$/i.test(String(sp.nombre || '')) ? bolsa.indexOf(String(sp.item || '')) : -1;
+      if(i >= 0) bolsa.splice(i, 1);
+    });
+  }catch(err){ console.error('No se pudieron mirar los robos pendientes:', err); }
   if(!bolsa.length){
     momentoAbrir({tipo: 'robo', icono: '🫳', titulo: `${d.atacante.nombre} intentó robarle a ${nombreDe(t)}`, resultado: 'No tenía nada en el cinturón.', estado: 'listo'});
     return {nota: `${nombreDe(t)} no tenía nada en el cinturón`};

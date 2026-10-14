@@ -45,9 +45,9 @@ function oporPuede(r){
 function oportunidadCorte(t, id, ruta){
   if(modoMapa !== 'combate') return null;
   if(typeof dodgeLibreDe === 'function' && dodgeLibreDe(id)) return null;   // 🪵 el dodge roll de Tronco de huída no da oportunidad   // en modo narrativo no hay ataques de oportunidad: se mueve sin frenar
-  if(!t || t.oculto || enSigilo(t) || !ruta || ruta.length < 2) return null;
+  if(!t || t.oculto || t.bajoTierra || enSigilo(t) || !ruta || ruta.length < 2) return null;   // 🕳 por abajo de la tierra no da oportunidad
   const rivales = new Set(rivalesDe(t));
-  const ids = [...tokens.entries()].filter(([, r]) => rivales.has(r) && oporPuede(r)).map(([rid, r]) => ({rid, r, usada: oporUsada(id, rid)}));
+  const ids = [...tokens.entries()].filter(([, r]) => rivales.has(r) && !r.bajoTierra && oporPuede(r)).map(([rid, r]) => ({rid, r, usada: oporUsada(id, rid)}));
   if(!ids.length) return null;
   for(let i = 1; i < ruta.length; i++){
     const antes = ruta[i - 1], despues = ruta[i];

@@ -243,7 +243,7 @@ function calcularDisposicion(){
   // Tokens ocultos (solo el GM los prepara y los muestra cuando corresponde):
   // a los jugadores ni se les dibujan ni se pueden tocar.
   const orden = [...tokens.entries()]
-    .filter(([, t]) => (soyGM || !t.oculto) && tokenVisiblePorNiebla(t))
+    .filter(([, t]) => (soyGM || !t.oculto) && (soyGM || !t.bajoTierra) && tokenVisiblePorNiebla(t))   // 🕳 bajo tierra: los jugadores ven solo el pozo (js/46)
     .map(([id, t]) => ({id, t}))
     .sort((a, b) => (a.t.creadoMs - b.t.creadoMs) || (a.id < b.id ? -1 : 1));
   const grupos = new Map();
@@ -770,6 +770,7 @@ function dibujar(){
     }
   }
 
+  if(typeof dibujarPozos === 'function') dibujarPozos(z);   // 🕳 el pozo de los que están bajo tierra (js/46)
   // Tokens.
   disposicion = calcularDisposicion();
   // Si el token seleccionado dejó de verse (niebla, sigilo), se suelta.
@@ -811,6 +812,7 @@ function dibujar(){
     // Oculto: solo lo dibuja el GM (los demás ni lo tienen en disposicion),
     // más transparente para acordarse de que los jugadores no lo ven.
     if(t.oculto || enSigilo(t)) ctx.globalAlpha = 0.5;
+    if(t.bajoTierra) ctx.globalAlpha = 0.3;   // 🕳 bajo tierra: el GM lo ve transparente, encima del pozo
     // Titila (2026-10-06, dueño: «como en el Contra»): con cualquier estado que lo hace invulnerable, prende y apaga rápido.
     if(tokenTitila(t)){ if(Math.floor(performance.now() / 260) % 2) ctx.globalAlpha *= 0.2; animando = true; }
 
@@ -1152,6 +1154,7 @@ function dibujar(){
   if(typeof lineaPreview !== 'undefined' && lineaPreview) dibujarLineaPreview(z);   // la línea recta que se está apuntando
   if(typeof tiroPreview !== 'undefined' && tiroPreview) dibujarTiroPreview(z);   // la línea de tiro de un disparo (js/32)
   if(dibujarEfectosTeleport()) animando = true;
+  if(typeof dibujarEfectosEmerger === 'function' && dibujarEfectosEmerger(z)) animando = true;   // 🕳 la tierra que salta al salir (js/46)
   if(typeof dibujarEfectosRayo === 'function' && dibujarEfectosRayo()) animando = true;   // la Descarga que salta (js/19)
   if(typeof dibujarConfusionNumeros === 'function') dibujarConfusionNumeros();   // el objetivo al azar de la Confusión (js/20)
 

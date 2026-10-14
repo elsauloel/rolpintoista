@@ -341,9 +341,10 @@ const CreepAcciones = (() => {
   }
   /* Lo que pasa después de cobrar. ui = {mesaHabilidad(sc, h, extra), mesaConTexto(texto), publicar(sc, t), toast(t),
        habDuelo(sc, h) (la Ejecución para el duelo, o null si no hay duelo), lanzarAtaque(sc, h), lanzarDuelo(sc, h, hab),
-       colocarTrampa(sc, h, auto), colocarZona(sc, h) → bool, elegirObjetivo(sc, h) (el estado sobre el objetivo)} */
+       colocarTrampa(sc, h, auto), colocarZona(sc, h) → bool, elegirObjetivo(sc, h) (el estado sobre el objetivo), excavar(sc, h) (🕳, solo el mapa)} */
   function terminarHab(sc, h, p, ui){
     const {costo, costoHp, efecto, falta, auto, esZona, directo} = p;
+    if(h.excavar && ui.excavar) ui.excavar(sc, h);   // 🕳 Bajo tierra (2026-10-13): el mapa mete el token bajo tierra (vtt-hexgrid/js/46)
     if(directo){ ui.mesaHabilidad(sc, h, directo.nota); ui.toast(`${h.nombre || 'Habilidad'} ejecutada sobre ${sc.nombre}${directo.hechos.length ? ' → ' + directo.hechos.join(' · ') : ''}${costoHp > 0 ? ` · −${fmt(costoHp)} HP` : ''}`); return; }
     // Una trampa se coloca en secreto: la habilidad no se anuncia en la Mesa (los jugadores no deben enterarse).
     const hDuelo = (!auto || h.trampaColocar || esZona) ? null : ui.habDuelo(sc, h);   // habilidad dirigida: la contienda va en el cuadro del duelo

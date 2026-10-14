@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261013ab', '../comun/creep-botonera.js?v=20261012zy', '../comun/creep-acciones.js?v=20261012y', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261013x'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261013ab', '../comun/creep-botonera.js?v=20261012zy', '../comun/creep-acciones.js?v=20261013ad', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261013x'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -319,6 +319,15 @@ function acMesaHabilidad(sc, h, extra){
 }
 // «Ataque con mi arma, con arreglos»: se anuncia y va al cuadro del duelo; sin duelo, se tira el PdG suelto.
 function acLanzarAtaqueDeHab(sc, h){
+  // 🕳 Emerger (js/46): si está bajo tierra, primero sale (se elige la casilla) y recién ahí elige a quién le pega.
+  const pozo = h && h.emerger ? tokenEntradaCreep(sc.id) : null;
+  if(pozo && pozo[1].bajoTierra){
+    const id = ac && ac.creepId;
+    ac.host.hidden = true;
+    emergerToken(pozo[0], {distancia: num(h.emerger.distancia) || BAJO_TIERRA_DIST, nombre: h.nombre, alSalir: () => acLanzarAtaqueDeHab(sc, h),
+      alCancelar: () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } }});
+    return;
+  }
   const atq = CreepAcciones.ataqueDeHab(sc, h);
   acParry.delete(sc.id);   // atacar cierra el Parry que esperaba su Bloqueo
   acMesaHabilidad(sc, h);
@@ -392,6 +401,12 @@ function acHabUi(){
       return true;
     },
     elegirObjetivo: (sc, h) => acElegirObjetivoEstado(sc, h),
+    // 🕳 Excavar (js/46): el token queda bajo tierra; en su casilla, el pozo.
+    excavar: (sc, h) => {
+      const e = tokenEntradaCreep(sc.id);
+      if(!e){ toast(`${sc.nombre} no tiene token en este mapa: no se pudo meter bajo tierra`); return; }
+      excavarToken(e[0]).then(ok => { if(ok) toast(`🕳 ${sc.nombre} se metió bajo tierra: queda el pozo a la vista y nadie lo puede atacar hasta que salga`); });
+    },
   };
 }
 // ⚡ Un Flash con el botón, fuera del cuadro del duelo: la misma regla de costo (cooldown y vida, el doble en turno ajeno); se
@@ -431,6 +446,13 @@ async function acEjecutarHab(sc, habId){
   if(modo === 'manual'){ acMesaHabilidad(sc, h); toast(`${h.nombre || 'Habilidad'} anunciada`); return; }   // 📣 solo el texto
   if(modo === 'auto' && Combatiente.tipoEjecucion(h.duelo) === 'flash'){ acFlashFuera(sc, h); return; }   // ⚡ sin No2, cooldown según el turno
   if(!(await CreepAcciones.confirmarSilencio(sc, h))){ toast(`${sc.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`); return; }   // el cartel del juego, antes de cobrar
+  if(h.excavar || h.emerger){   // 🕳 Bajo tierra (js/46): hace falta el token; avisa y deja seguir
+    const e = tokenEntradaCreep(sc.id);
+    if(!e){ toast(`${sc.nombre} no tiene token en este mapa: ${h.nombre || 'la habilidad'} necesita el token`); return; }
+    if(h.excavar && e[1].bajoTierra){ toast(`${sc.nombre} ya está bajo tierra`); return; }
+    if(h.emerger && !e[1].bajoTierra && !(await Confirmar.preguntar(`${sc.nombre} no está bajo tierra (le falta Excavar). ¿Usar ${h.nombre || 'la habilidad'} igual, como un ataque común, sin salir de un pozo?`,
+      {titulo: 'No está bajo tierra', icono: '🕳', si: 'Usarla igual'}))) return;
+  }
   const id = sc.id;
   acCambiar(c => {
     const p = CreepAcciones.ejecutarHab(c, (c.habilidades || []).find(x => x.id === habId), estadosPresetCreep(), true);

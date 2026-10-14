@@ -491,7 +491,7 @@ function rayoCadena(idInicial, dano){
   for(let i = 0; i < 12; i++){
     let mejor = null, mejorDist = Infinity;
     tokens.forEach((x, id) => {
-      if(usados.has(id) || x.tipo !== t0.tipo || !x.fichaId || (x.oculto && !soyGM)) return;
+      if(usados.has(id) || x.tipo !== t0.tipo || !x.fichaId || (x.oculto && !soyGM) || x.bajoTierra) return;   // 🕳 bajo tierra: no le llega
       const dist = distanciaHex({col: actual.col, fila: actual.fila}, {col: x.col, fila: x.fila});
       if(dist <= RAYO_SALTO_MAX && dist < mejorDist){ mejor = {id, x}; mejorDist = dist; }
     });

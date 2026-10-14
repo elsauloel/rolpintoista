@@ -1553,3 +1553,10 @@ versión parecida en más de una, es candidato a juntar.
   `CreepCalculo.tarjetaPublica(sc)` publica, mientras el creep tiene vida, solo qué es cada cosa (`nombreGenerico`: «Varita del susurro» → «Varita»,
   salteando «Buena», «Gran»…); con vida 0, los nombres de verdad. El arma natural se ve siempre. GM Tools vuelve a publicar al entrar si lo público
   no coincide; el mapa del GM ve los nombres de la ficha privada.
+- **Drops fijos de un creep** (2026-10-14, dueño, la Grapa del capataz: «aunque la consuma, quiero que esté entre sus drops»): `sc.dropsFijos`
+  (nombres del catálogo, hasta 10; `CreepCalculo.dropsFijos`) — `CombateFin.itemsDeCreep` los suma siempre al botín (un consumible con
+  `plantillaConsumible`, lo demás con `plantillaDeCatalogo`) y `dropsResumen` los lista «(drop fijo)». Se editan en GM Tools → Recompensas.
+- **Área con el centro cerca y onda solo de aliados** (2026-10-13, Capataz kobold): `duelo.centroAlcance` (un área cuyo centro va a esa
+  distancia o menos, y no en la propia casilla: Golpe al piso = 1) y `duelo.aliados` (un área u onda que alcanza solo a los del bando de quien
+  la usa: ¡A laburar!). Los pasa `Combatiente.habEjecucion`; los mira el mapa (`dueloElegirAreaMapa`, js/13). Todavía no están en el asistente
+  de la Ejecución (si se reedita la habilidad con el asistente, se pierden: volver a ponerlos).

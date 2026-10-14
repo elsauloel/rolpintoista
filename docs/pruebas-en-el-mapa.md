@@ -40,7 +40,7 @@
   → pozo a la vista, el jugador no ve el token ni lo puede apuntar, un área no lo toca; Puñalada → casilla de salida a 4 o menos, la tierra salta,
   duelo con +1d6 y +1 al crítico; Rengo 1 turno; crítico: Rengo 2 y Lisiado 1. Hace falta que el dueño pegue las reglas (`bajoTierra`).
 - [ ] **👷 Capataz kobold: ¡A laburar! y Golpe al piso** (2026-10-14; copia «Capataz (prueba)» en «Claude · pruebas», pegado a juan y a 2 del
-  Tunelero (prueba)): ¡A laburar! → Bendecido solo a los aliados a 2 o menos (el tunelero sí, juan no); Golpe al piso → el centro solo en una
+  Tunelero (prueba)): ¡A laburar! (radio 3 desde el 2026-10-14; la copia de prueba quedó en 2) → Bendecido solo a los aliados (el tunelero sí, juan no); Golpe al piso → el centro solo en una
   casilla pegada (más lejos avisa y vuelve a pedir), flor de diámetro 3, PdG contra Evasión, 1d10+Dmg físico, Sentado. No se pudo el 2026-10-14:
   Chrome minimizado, sin capturas.
 - [ ] **❄ Granizo de cristal** (Chamán del cristal, «El origen de las especies», MINAS, 2026-10-13): área de diámetro 3, PdG.Esp contra

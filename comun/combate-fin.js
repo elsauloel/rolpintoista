@@ -198,8 +198,21 @@ const CombateFin = (() => {
       const c = cat.find(x => x.nombre === n && x.tipoItem === 'consumibles');
       if(!c) return null;
       const t = plantillaConsumible(c);
-      return {clave: `${sc.id}:drop${i ? i + 1 : ''}`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: K.nombreLimpio(sc), drop: true};
+      return {clave: `${sc.id}:drop${i ? i + 1 : ''}`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: K.nombreLimpio(sc), drop: true, scId: sc.id, dropIdx: i};
     }).filter(Boolean);
+  }
+  /* 🎲 Volver a tirar un consumible soltado al azar (2026-10-14, dueño: «que el master pueda rerrollearlo antes de publicarlo»): otro del
+     tier que salga ahora (una flecha, entre las flechas). Cambia `rep.drops`, así que reabrir el reporte muestra el nuevo. → true si cambió. */
+  function dropReroll(rep, cat, sc, idx){
+    const lista = [].concat((rep.drops || {})[sc.id] || []);
+    if(!(idx >= 0 && idx < lista.length)) return false;
+    const actual = cat.find(x => x.nombre === lista[idx] && x.tipoItem === 'consumibles');
+    const nivel = num(sc.nivel) + (sc.jefe ? 1 : 0);
+    const c = dropElegir(actual && actual.flecha ? cat.filter(i => i.flecha) : cat, dropTier(nivel));
+    if(!c) return false;
+    lista[idx] = c.nombre;
+    rep.drops[sc.id] = lista;
+    return true;
   }
   function itemsExtra(rep){
     return rep.extras.map((e, i) => ({clave: `extra:${i}`, nombre: e.nombre, precioCompra: e.precioCompra, origen: 'Botín extra',
@@ -296,7 +309,7 @@ const CombateFin = (() => {
     </div>`).join('');
 
     const itemHtml = i => `<label class="reporte-loot-item" style="cursor:pointer;display:inline-flex;gap:5px;align-items:center${rep.quitados.has(i.clave) ? ';opacity:.45' : ''}" title="${i.template.estimado ? 'Precio estimado por comparación con el catálogo' : ''}">
-      <input type="checkbox" data-rep-item="${esc(i.clave)}"${rep.quitados.has(i.clave) ? '' : ' checked'}>${esc(i.nombre)}${i.trofeo ? ' 🏆' : ''}${i.drop ? ' <span title="Consumible que soltó al azar (humano / humanoide)">🎲</span>' : ''} <span class="reporte-loot-precio">${fmt(i.precioCompra)} DDE${i.template.estimado ? ' (est.)' : ''}</span><button type="button" class="iconbtn" data-rep-ver="${esc(i.clave)}" style="padding:2px 8px;font-size:11px">Ver</button></label>`;
+      <input type="checkbox" data-rep-item="${esc(i.clave)}"${rep.quitados.has(i.clave) ? '' : ' checked'}>${esc(i.nombre)}${i.trofeo ? ' 🏆' : ''}${i.drop ? ` <button type="button" class="iconbtn" data-rep-reroll="${esc(i.clave)}" title="Soltó este consumible al azar: tocá para volver a tirarlo (otro al azar, antes de publicar)" style="padding:0 4px;margin:0">🎲</button>` : ''} <span class="reporte-loot-precio">${fmt(i.precioCompra)} DDE${i.template.estimado ? ' (est.)' : ''}</span><button type="button" class="iconbtn" data-rep-ver="${esc(i.clave)}" style="padding:2px 8px;font-size:11px">Ver</button></label>`;
     const conItems = filas.filter(f => f.items.length);
     const extras = itemsExtra(rep);
     const lootHtml = (conItems.length || extras.length)
@@ -369,6 +382,14 @@ const CombateFin = (() => {
       return it ? {ver: it.template} : null;
     }
     if(d.repReset !== undefined){ rep.xpPorJugador = null; rep.ddePorJugador = null; return true; }
+    if(d.repReroll !== undefined){   // 🎲 otro consumible al azar, antes de publicar
+      const r = generar(rep, creeps, cat);
+      const it = r.filas.flatMap(f => f.items).find(i => i.clave === d.repReroll && i.drop);
+      const sc = it && (creeps || []).find(s => s.id === it.scId);
+      if(!sc || !dropReroll(rep, cat, sc, it.dropIdx)) return {toast: 'No se pudo volver a tirar'};
+      rep.quitados.delete(d.repReroll);
+      return true;
+    }
     if(d.repExtraAdd !== undefined){
       const nombre = raiz.querySelector('[data-rep-extra-nombre]').value.trim();
       if(!nombre) return {toast: 'Escribí el nombre del ítem extra'};
@@ -567,7 +588,7 @@ const CombateFin = (() => {
     </div>`;
   }
 
-  return {itemsDeCreep, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
+  return {itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
     plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, calcularReparto,
     itemsPublicables, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

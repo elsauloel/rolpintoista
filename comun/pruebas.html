@@ -812,6 +812,13 @@ prueba('Drops fijos (2026-10-14, la Grapa del capataz): el creep los suelta siem
     garrote.ahorroNitros, garrote.mods, Combatiente.rasgosDeItem(garrote).ahorroNitros],
     [['Grapa del capataz', 'No existe'], true, true, [{stat: 'pdg', val: 1}, {stat: 'dmg', val: 2}], false, true, 1, [{stat: 'parry', val: 1}], 1]);
 });
+prueba('🎲 Volver a tirar el consumible al azar antes de publicar (2026-10-14)', () => {
+  const sc = {id: 'j', nombre: 'Jefe', nivel: 3, jefe: true, tipoCriatura: 'humanoide'};
+  const rep = {drops: {j: ['Poción de HP']}};
+  const ok = CombateFin.dropReroll(rep, CATALOGO_BASE, sc, 0), nuevo = rep.drops.j[0];
+  const esCons = !!CATALOGO_BASE.find(x => x.nombre === nuevo && x.tipoItem === 'consumibles');
+  igual([ok, rep.drops.j.length, esCons, CombateFin.dropReroll(rep, CATALOGO_BASE, sc, 5)], [true, 1, true, false]);
+});
 prueba('Ataque con arreglos: dados extra de otro tamaño (+1d6, 2026-10-13) viajan al duelo', () => {
   const a = Combatiente.ataqueConArreglos({nombre: 'Picada'}, {modo: 'arma', arma: {dadoExtra: '1d6', fijo: 0}}, {arma: {}});
   const malo = Combatiente.ataqueConArreglos({nombre: 'X'}, {modo: 'arma', arma: {dadoExtra: 'mucho'}}, {arma: {}});

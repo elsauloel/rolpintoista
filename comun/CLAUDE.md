@@ -1560,3 +1560,8 @@ versión parecida en más de una, es candidato a juntar.
   distancia o menos, y no en la propia casilla: Golpe al piso = 1) y `duelo.aliados` (un área u onda que alcanza solo a los del bando de quien
   la usa: ¡A laburar!). Los pasa `Combatiente.habEjecucion`; los mira el mapa (`dueloElegirAreaMapa`, js/13). Todavía no están en el asistente
   de la Ejecución (si se reedita la habilidad con el asistente, se pierden: volver a ponerlos).
+- **🪨 La honda** (2026-10-14, dueño): rasgo de arma `honda` (en `RASGOS_ARMA`; un creep o invocación, en `armaRasgos`). `Combatiente.esHonda`
+  (nunca a la vez que arco), `dmgDelArma` (la mitad del Dmg, como el arco), `alcanceArmaRango(arma, rng)` / `alcanceHonda` (la mitad del Rango,
+  para abajo: `HONDA_RANGO`, provisorio, P198) — lo usan `FichaCombate.alcanceDeArma`, `CreepCalculo.alcance` y las invocaciones —,
+  `sirveDeOportunidad` (no), sin Recarga, sin munición, sin tiro alto. El asistente de ítems pregunta «¿Es una honda?»; `ItemCorto` y el
+  glosario la nombran. Una sola en el catálogo (Honda de piedras); la serie y la auditoría, en `docs/pendientes.md`.

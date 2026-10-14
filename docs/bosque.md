@@ -65,7 +65,7 @@ Los skills viejos se armaron a ojo: son **referencia**, se pueden reinventar (du
 
 | Creep | Estado |
 |---|---|
-| Ladrón del monte | Probando el Robo en «Claude · pruebas» (creep «Ladrón (prueba)»); después, configurar el de verdad |
+| Ladrón del monte | El Robo probado en el mapa (2026-10-14); falta auditarlo y configurar su Bolsillo ajeno de verdad |
 | Goblin hondero ×2 | Sin empezar |
 | Goblin de choque ×2 (nuevo) | Sin empezar |
 | Lobo gris ×2–3 | Sin empezar |

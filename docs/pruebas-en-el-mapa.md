@@ -44,8 +44,8 @@
   tirada a mano = 1) → ¡Funcionó! → «✔ Aplicar Robo sobre juan» (solo lo ve el GM) → «le robó Cepo de prueba». El Cepo quedó en el cinturón
   del ladrón, la Crónica dijo «Ladrón (prueba) le robó a juan · Se llevó: Cepo de prueba», salió el cartel «🫳 huye con lo robado» y al
   arrastrarlo 2 casilleros se cerró sin ataque de oportunidad. La ficha de juan descontó el Cepo sola (queda Púas). Arreglado en el camino: un
-  segundo robo antes de que la ficha del robado guarde ya no se lleva la misma unidad (mira los avisos de robo pendientes). Sin probar: el +2
-  en sigilo o por la espalda.
+  segundo robo antes de que la ficha del robado guarde ya no se lleva la misma unidad (mira los avisos de robo pendientes). Con el ladrón en Sigilo, el botón dijo «Tirar Sigilo (+2 en
+  sigilo) · 1d12+1» (9 contra 1) y se llevó las Púas. Sin probar: el +2 por la espalda (sin sigilo).
 - [x] **⚙ Dibujos: color, sin relleno, ⭕ puntas cerradas, figura sólida** (2026-10-14, con capturas, reglas pegadas): a la pared en L se le
   cerraron las puntas desde el ⚙ (quedó un triángulo), pasó a rojo y con relleno tenue; adentro no se dibuja la grilla y sus 7 casillas
   cuentan como sólidas; «sin relleno» la deja como línea roja cortada para el GM y casi invisible como jugador. Todo se guarda.

@@ -3818,7 +3818,7 @@ prueba('la góndola (P181): gastables aparte del equipo, N variedades por secci�
     if(!tala.some(i => G.parteDe(i) === 'cinturon')) sinCinturon++;
   }
   igual([malas, consumiblesEnEquipo, sinMochila, sinCinturon, cuantas, G.gondolaDe({nombre: 'Bengala de mano'}), G.gondolaDe({nombre: 'Poción de fuerza'}), G.gondolaDe({nombre: 'Púas', trampaDatos: {}}),
-    G.gastable(CATALOGO_BASE.find(i => i.nombre === 'Vendas'))], [0, 0, 0, 0, 15, 'talabarteria', 'bazar', 'talabarteria', false]);   // 11 al azar + las 4 flechas elementales fijas (2026-10-11)
+    G.gastable(CATALOGO_BASE.find(i => i.nombre === 'Vendas'))], [0, 0, 0, 0, 19, 'talabarteria', 'bazar', 'talabarteria', false]);   // 11 al azar + las 4 flechas elementales fijas (2026-10-11) + las 4 luces básicas fijas (2026-10-14)
   const r2 = G.generar({tamano: 'pueblito', nivel: 1, catalogo: cat});
   igual(['flecha-de-fuego', 'flecha-de-escarcha', 'flecha-relampago', 'flecha-de-acido'].map(id => r2.gondola.includes(id)), [true, true, true, true]);
 });

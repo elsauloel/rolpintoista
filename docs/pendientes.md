@@ -15,6 +15,15 @@
 >   dibujo permanente del lápiz puede ser pared (casilla «🧱 Con colisión» o el 🧱 del dibujo seleccionado; solo el GM), y el lápiz suma el estilo
 >   **📐 En rectas** (clic, clic…, con imán a las esquinas de los hexágonos). **Falta: que el dueño pegue las reglas** (`recto`, `colision` de los
 >   trazos) y probarlo en el mapa (`pruebas-en-el-mapa.md`).
+> - [x] **💡 Luces básicas siempre en la Talabartería (2026-10-14, dueño):** Vela de sebo, Antorcha de brea, Farol de aceite y Bengala
+>   llevan `gondolaFija` (se suman a las variedades al azar, como las flechas elementales).
+> - [ ] **💡 Una luz Común que ilumine un spot y revele lo oculto (2026-10-14, dueño: «que sea común y revele lo oculto»):** hoy lo que revela
+>   un spot arranca en Buena (Bengala estelar, Varita de la luz flotante). Diseñar el Común.
+> - [ ] **💡 Luces caras: que rindan más o cuesten menos (2026-10-14, dueño: «un consumible de 350 doblones me parece un montón»):** revisar
+>   las Buenas y sobre todo las Raras (Faro de la revelación 350, Esfera de luz fría 160, Luz de la verdad 140, Cohete de luz 140): varios usos
+>   (cargas) o precio más bajo.
+> - [ ] **🎁 Creeps que dejen ítems de la góndola fija (2026-10-14, dueño):** que algún creep (de la mina, por ejemplo) suelte una luz o algo
+>   de lo que siempre hay en la tienda, para que lo encuentren en la misma cueva (drops fijos: `sc.dropsFijos`).
 > - [ ] **🪨 Hondas: auditar la categoría y armar la serie del catálogo (2026-10-14, dueño):** la categoría existe (`honda` en el arma:
 >   `Combatiente.esHonda`, `alcanceHonda`; P198 el alcance) y por ahora hay una sola honda nueva, la **Honda de piedras** (Común, Tipo 10).
 >   Falta auditarla y crear la serie (calidades, mecánicas propias). Las hondas viejas del catálogo (Honda de cuero, de pastor, del cazador de

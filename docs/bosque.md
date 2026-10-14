@@ -22,6 +22,9 @@ recuperarla. Los jugadores creen que es un problema de goblins y al final descub
 | **Larry** (Debuffer) | PdG.Esp 17 | 20 de vida, Defensa 1, Evasión 4 |
 | **Bizzante** (Asalto / invocador) | Evasión 7, Parry 8, dos abejas | 25 de vida; las abejas mueren con un área |
 
+**Larry es frágil a propósito** (dueño, 2026-10-14): el jugador puso todo en lo ofensivo sabiendo que queda muy vulnerable. Sirve de
+referencia del más débil, pero es un riesgo que el jugador eligió: no hay que diseñar los encuentros para protegerlo.
+
 Nadie tiene Defensa especial ni resistencias elementales; casi no pelean a distancia. Ranuras vacías de todos: piernas, anillos, cinturón y
 mochila (la Mina dejó la Mochila de minero con farol).
 
@@ -58,8 +61,9 @@ Los skills viejos se armaron a ojo: son **referencia**, se pueden reinventar (du
 
 - **🫳 Robar** (2026-10-14, `vtt-hexgrid/js/47-robo.js`): un efecto «Robo» en la Ejecución de una habilidad (pegado al objetivo, el
   Ladrón: Sigilo contra Percepción) saca una unidad al azar del cinturón del personaje y la pasa al cinturón del ladrón; +2 si viene en
-  sigilo o por la espalda; después puede alejarse hasta 3 casilleros sin oportunidad. Lo aplica el GM. Pendiente: que un personaje le robe
-  a un creep, y robar oro si el cinturón está vacío.
+  sigilo o por la espalda; después puede alejarse hasta 3 casilleros sin oportunidad. Lo aplica el GM. Si sale bien, el ladrón **sigue en sigilo** (dueño,
+  2026-10-14: el robo está muy ligado al sigilo). Pendiente: que el robo en sigilo no se anuncie (P199), que un personaje le robe a un creep, y
+  robar oro si el cinturón está vacío.
 
 ## Estado, creep por creep
 
@@ -67,7 +71,7 @@ Los skills viejos se armaron a ojo: son **referencia**, se pueden reinventar (du
 
 | Creep | Estado |
 |---|---|
-| Ladrón del monte | ✅ Listo (2026-10-14). Bolsillo ajeno con el Robo: cooldown 3 pero arranca disponible (dueño). Golpe doble = un ataque con su arma, +1d4, ignora 1 de Res. crítico y +2 por la espalda en sigilo (probado en el mapa). Chaleco de cuero y Botas de suela de goma (Defensa 2, Sigilo 12). Juego: Desaparecer → Bolsillo ajeno (+2) o Golpe doble por la espalda → huir |
+| Ladrón del monte | ✅ Listo (2026-10-14). Bolsillo ajeno con el Robo: cooldown 3 pero arranca disponible (dueño). Golpe doble = un ataque con su arma que tira dos veces su daño (1d4+1 y 1d4+1, dueño), ignora 1 de Res. crítico y +2 por la espalda en sigilo (probado en el mapa). Chaleco de cuero y Botas de suela de goma (Defensa 2, Sigilo 12). Juego: Desaparecer → Bolsillo ajeno (+2) o Golpe doble por la espalda → huir |
 | Goblin hondero ×2 | Sin empezar |
 | Goblin de choque ×2 (nuevo) | Sin empezar |
 | Lobo gris ×2–3 | Sin empezar |

@@ -996,3 +996,9 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   penalidad». Idea del dueño: que la penalidad salga de la diferencia entre Fuerza y Destreza (pero, si la Fuerza es menor, el alcance
   terminaría siendo la Fuerza: «hay que pensarlo»). **Provisorio (Claude):** la mitad del Rango, para abajo (`Combatiente.HONDA_RANGO`,
   `alcanceHonda`). Falta: auditar la categoría y armar la serie de hondas del catálogo (ver `pendientes.md`).
+- ❓ **P199. El robo en sigilo, sin anuncio — 2026-10-14.** El dueño: el robo puede dejar al ladrón en sigilo si sale bien, y «preferiría que la
+  acción no sea necesaria, no sea anunciada» (hoy el cuadro se le abre a todos con «Sigilo contra Percepción», el jugador tira su Percepción, la Mesa
+  anuncia la habilidad y la Crónica lo cuenta). Propuesta: si el ladrón está en sigilo, el robo es secreto — lo ve solo el GM, la Percepción del
+  personaje se tira sola con su valor publicado, y nada va a la Mesa ni a la Crónica pública. Falta decidir: (a) si sale bien, ¿el robado se entera
+  en el momento («te falta algo del cinturón»), recién al buscarlo, o nunca hasta que mire? (b) si sale mal, ¿lo pillan (queda revelado y se anuncia
+  «juan pilló a X metiéndole la mano»)? Sin sigilo, el robo sigue siendo un duelo a la vista.

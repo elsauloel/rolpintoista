@@ -633,19 +633,23 @@ const CreepCalculo = (() => {
     return {nombre, precioCompra: precio, especial: !!nombreEsp};
   }
   function despojosDePrecio(precioCompra){ return Math.ceil(num(precioCompra) / 4); }   // un cuarto del precio de compra
+  /* Drops fijos (2026-10-14, dueño, la Grapa del capataz: «aunque la consuma, quiero que esté entre sus drops»): nombres de ítems del
+     catálogo que el creep suelta siempre al morir, además de su arma, su equipo, el trofeo y el consumible al azar (comun/combate-fin.js). */
+  const dropsFijos = sc => (Array.isArray(sc && sc.dropsFijos) ? sc.dropsFijos : []).map(n => String(n || '').trim()).filter(Boolean).slice(0, 10);
   function dropsResumen(sc){
     const partes = [];
     if(sc.armaNombre && !sc.armaNatural) partes.push(`${sc.armaNombre} (arma equipable)`);
     (sc.equipo || []).forEach(it => partes.push(`${it.nombre} (equipo)`));
     const tr = trofeo(sc);
     if(tr) partes.push(`${tr.nombre} (trofeo: compra ${fmt(tr.precioCompra)}, venta ${fmt(tr.precioCompra / 2)}, ${fmt(despojosDePrecio(tr.precioCompra))} despojos)`);
+    dropsFijos(sc).forEach(n => partes.push(`${n} (drop fijo)`));
     if(num(sc.oroBase) > 0) partes.push(`${fmt(num(sc.oroBase))} DDE de oro (±20% al final del combate)`);
     return partes.length ? partes.join(' · ') : 'nada';
   }
 
   return {BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
     TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto,
-    trofeo, despojosDePrecio, dropsResumen,
+    trofeo, despojosDePrecio, dropsResumen, dropsFijos,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,
     danoTxt, fuentesEquipo, modTotal, estadosArmadura, aporteArmadura, defensaEfectiva, armadmgEfectiva, resElemental, critEfectivo, critDeEstados,
     statValor, estadoActivo, aportesMod, origenesMod, conSigno, statOrigenTxt, armadmgOrigenTxt, ataqueTxt, ataqueOrigenTxt,

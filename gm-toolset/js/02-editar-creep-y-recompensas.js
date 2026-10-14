@@ -87,6 +87,9 @@ function recompensasHtml(sc){
         <input type="number" min="0" data-rec="trofeoPrecio" data-id="${sc.id}" value="${num(esp.precio) > 0 ? num(esp.precio) : ''}" placeholder="Valor de compra" style="width:120px">
       </div>
     </div>
+    <div class="mini-f" style="margin-top:8px"><label>Drops fijos (opcional): ítems del catálogo que suelta siempre, separados por coma</label>
+      <input type="text" data-rec="dropsFijos" data-id="${sc.id}" value="${esc(CreepCalculo.dropsFijos(sc).join(', '))}" placeholder="Ej.: Grapa del capataz" maxlength="300">
+    </div>
     <div class="hint" style="margin-top:6px"><b>Al morir suelta:</b> ${esc(dropsResumenCreep(sc))}</div>`;
 }
 function recompensasVerHtml(sc){ return CreepLupa.recompensasVerHtml(sc); }   // comun/creep-lupa.js
@@ -109,6 +112,7 @@ document.addEventListener('change', e => {
   else if(campo === 'armaNatural'){ sc.armaNatural = t.checked; }
   else if(campo === 'trofeoNombre'){ sc.trofeoEspecial = {...(sc.trofeoEspecial || {}), nombre: t.value.trim()}; }
   else if(campo === 'trofeoPrecio'){ sc.trofeoEspecial = {...(sc.trofeoEspecial || {}), precio: Math.max(0, num(t.value))}; }
+  else if(campo === 'dropsFijos'){ sc.dropsFijos = t.value.split(',').map(x => x.trim()).filter(Boolean).slice(0, 10); if(!sc.dropsFijos.length) delete sc.dropsFijos; }
   renderAll();
 });
 document.addEventListener('click', e => {

@@ -804,6 +804,14 @@ prueba('Área con el centro pegado (Golpe al piso) y onda solo de aliados (¡A l
   const sin = Combatiente.habEjecucion({nombre: 'X'}, {objetivo: 'enemigo', centroAlcance: 1, aliados: true, tira: 'pdg', contra: ['eva']}, {stat: () => 0});
   igual([e.centroAlcance, e.radio, e.dano.formula, e.dano.ignoraDef, o.aliados, o.radio, 'centroAlcance' in sin, 'aliados' in sin], [1, 1, '1d10+5', false, true, 2, false, false]);
 });
+prueba('Drops fijos (2026-10-14, la Grapa del capataz): el creep los suelta siempre, del catálogo; los que no existen se ignoran', () => {
+  const sc = {id: 'k', nombre: 'Capataz kobold', nivel: 3, armaNombre: 'Garrote del capataz', equipo: [], dropsFijos: ['Grapa del capataz', 'No existe', ' ']};
+  const its = CombateFin.itemsDeCreep(CATALOGO_BASE, sc), g = its.find(x => x.clave === 'k:fijo:0');
+  const garrote = CATALOGO_BASE.find(x => x.nombre === 'Garrote del capataz');
+  igual([CreepCalculo.dropsFijos(sc), !!g, g && g.template.consumible, g && g.template.efectoMods, its.some(x => x.clave === 'k:fijo:1'), /Grapa del capataz \(drop fijo\)/.test(CreepCalculo.dropsResumen(sc)),
+    garrote.ahorroNitros, garrote.mods, Combatiente.rasgosDeItem(garrote).ahorroNitros],
+    [['Grapa del capataz', 'No existe'], true, true, [{stat: 'pdg', val: 1}, {stat: 'dmg', val: 2}], false, true, 1, [{stat: 'parry', val: 1}], 1]);
+});
 prueba('Ataque con arreglos: dados extra de otro tamaño (+1d6, 2026-10-13) viajan al duelo', () => {
   const a = Combatiente.ataqueConArreglos({nombre: 'Picada'}, {modo: 'arma', arma: {dadoExtra: '1d6', fijo: 0}}, {arma: {}});
   const malo = Combatiente.ataqueConArreglos({nombre: 'X'}, {modo: 'arma', arma: {dadoExtra: 'mucho'}}, {arma: {}});
@@ -4050,7 +4058,7 @@ prueba('cómo se ve un arma: en la grilla lo esencial (= el Detalle de las T4 Co
   const punzon = t4.find(i => i.nombre === 'Punzón de matarife'), ver = ItemCorto.verHtml(punzon), grilla = ItemCorto.grillaHtml(punzon);
   igual([t4.length, distintos, t4.every(i => i.descripcionNarrativa), /Detalles técnicos/.test(ver), /data-glo="Lisiado"/.test(ver) && /^Lisiado: 3 turnos/.test(Glosario.def('Lisiado').texto), /data-glo="seguro si es crítico"/.test(ver), /Lisiado: 3 turnos/.test(grilla),
     ItemCorto.armaEsencial({tipoItem: 'arma_2m', tipoDado: 4, peso: 2, mods: [{stat: 'rng', val: 1}], efectosGolpe: [{nombre: 'Sangrado', caras: 2, exitos: 1, turnos: 2}]})],
-    [272, [], true, true, true, true, false, 'Tipo 4 · 2 manos · 2 dados · Alcance +1 · Sangrado 50 % (2 en d2) · 2 turnos']);
+    [273, [], true, true, true, true, false, 'Tipo 4 · 2 manos · 2 dados · Alcance +1 · Sangrado 50 % (2 en d2) · 2 turnos']);
 });
 prueba('Demora (Tipo 10): el duelo la reconoce (también el nombre viejo, Knockdown) y «Detalles técnicos» la explica; Derribar sigue siendo Sentado', () => {
   const ver = ItemCorto.verHtml({nombre: 'Garrote de pastor', tipoItem: 'arma_1m', tipoDado: 10, peso: 1, efectosGolpe: [{nombre: 'Demora', caras: 3, exitos: 1}]});

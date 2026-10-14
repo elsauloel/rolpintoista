@@ -127,6 +127,12 @@ const CombateFin = (() => {
     const nom = K.nombreLimpio(sc);
     if(sc.armaNombre && !sc.armaNatural){ const t = plantillaArmaCreep(cat, sc); out.push({clave: `${sc.id}:arma`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: nom}); }
     (sc.equipo || []).forEach(it => { const t = plantillaEquipoCreep(cat, it, sc.nivel); out.push({clave: `${sc.id}:eq:${it.id}`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: nom}); });
+    K.dropsFijos(sc).forEach((n, i) => {   // los drops fijos (2026-10-14): del catálogo, siempre
+      const c = cat.find(x => sinAviso(x.nombre) === sinAviso(n));
+      if(!c) return;
+      const t = c.tipoItem === 'consumibles' ? plantillaConsumible(c) : {...plantillaDeCatalogo(c), estimado: false};
+      out.push({clave: `${sc.id}:fijo:${i}`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: nom});
+    });
     const tr = K.trofeo(sc);
     if(tr) out.push({clave: `${sc.id}:trofeo`, nombre: tr.nombre, precioCompra: tr.precioCompra, template: plantillaTrofeo(tr, sc), origen: nom, trofeo: true});
     return out;
@@ -561,7 +567,7 @@ const CombateFin = (() => {
     </div>`;
   }
 
-  return {fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
+  return {itemsDeCreep, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
     plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, calcularReparto,
     itemsPublicables, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

@@ -10,7 +10,7 @@
 let paredesCache = {firma: '', segs: []};
 function paredesFirma(){
   let f = '';
-  trazos.forEach((t, id) => { if(t.colision && !t.hex) f += `${id}:${t.origen.x},${t.origen.y},${t.rotacion},${t.puntos.length};`; });
+  trazos.forEach((t, id) => { if(t.colision && !t.hex) f += `${id}:${t.origen.x},${t.origen.y},${t.rotacion},${t.puntos.length},${t.cerrada ? 1 : 0};`; });
   return f;
 }
 // Los puntos de un trazo en el mundo (deshace su rotación y su origen, como lo dibuja js/05).
@@ -26,6 +26,7 @@ function paredesSegs(){
     trazos.forEach(t => {
       if(!t.colision || t.hex) return;
       const p = trazoPuntosMundo(t);
+      if(t.cerrada && p.length >= 3) p.push(p[0]);   // ⭕ el tramo que une el final con el principio también es pared
       for(let i = 0; i + 1 < p.length; i++){
         const a = p[i], b = p[i + 1];
         segs.push({ax: a.x, ay: a.y, bx: b.x, by: b.y, x0: Math.min(a.x, b.x), x1: Math.max(a.x, b.x), y0: Math.min(a.y, b.y), y1: Math.max(a.y, b.y)});
@@ -36,6 +37,41 @@ function paredesSegs(){
   return paredesCache.segs;
 }
 const hayParedes = () => paredesSegs().length > 0;
+/* ⭕ Figuras cerradas y sólidas (2026-10-14, dueño: «que al finalizar la línea el punto de partida y el de llegada se unan, para definir lo que
+   está dentro; lo que está dentro de una figura sólida debe borrar las líneas del hexágono»): un dibujo cerrado (`cerrada`, o uno que termina
+   donde empezó) con colisión es sólido por dentro — una casilla cuyo centro cae adentro no se pisa (`elementoSolidoEn`, js/07) y no dibuja la
+   grilla (js/05). Su borde sigue siendo una pared. */
+let figurasCache = {firma: null, lista: []};
+function figurasSolidas(){
+  const f = paredesFirma();
+  if(f !== figurasCache.firma){
+    const lista = [];
+    trazos.forEach(t => {
+      if(!t.colision || t.hex || !t.cerrada) return;
+      const p = trazoPuntosMundo(t);
+      if(p.length < 3) return;
+      const xs = p.map(q => q.x), ys = p.map(q => q.y);
+      lista.push({p, x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys)});
+    });
+    figurasCache = {firma: f, lista};
+  }
+  return figurasCache.lista;
+}
+// ¿El punto está adentro del polígono? (rayo hacia la derecha)
+function puntoEnPoligono(x, y, p){
+  let dentro = false;
+  for(let i = 0, j = p.length - 1; i < p.length; j = i++){
+    const a = p[i], b = p[j];
+    if(((a.y > y) !== (b.y > y)) && (x < (b.x - a.x) * (y - a.y) / (b.y - a.y) + a.x)) dentro = !dentro;
+  }
+  return dentro;
+}
+function celdaEnFiguraSolida(col, fila){
+  const figs = figurasSolidas();
+  if(!figs.length) return false;
+  const c = hexCentro(col, fila);
+  return figs.some(f => c.x >= f.x0 && c.x <= f.x1 && c.y >= f.y0 && c.y <= f.y1 && puntoEnPoligono(c.x, c.y, f.p));
+}
 // ¿Se cruzan los segmentos AB y CD? (tocarse en un punto también cuenta: una pared que llega justo a la línea la corta)
 function segmentosCruzan(ax, ay, bx, by, cx, cy, dx, dy){
   const EPS = 1e-6;
@@ -66,7 +102,10 @@ function paredCorta(a, b){
   return paredEntrePuntos(hexCentro(a.col, a.fila), hexCentro(b.col, b.fila));
 }
 // Las paredes se ven: un borde oscuro debajo del dibujo y, encima, una línea cortada del color de la Colisión (lo llama js/05).
+// Sin relleno (`transparente`, 2026-10-14, dueño: «cuando las uso para marcar la colisión, rompe la naturalidad del mapa»): no se pinta el color
+// ni el borde grueso; queda una línea oscura finita y la línea cortada roja solo la ve el GM.
 function dibujarParedEncima(t, z){
+  if(t.transparente && !soyGM) return;
   ctx.save();
   ctx.translate(t.origen.x, t.origen.y);
   ctx.rotate(t.rotacion * Math.PI / 180);
@@ -86,16 +125,17 @@ function dibujarParedDebajo(t, z){
   ctx.rotate(t.rotacion * Math.PI / 180);
   ctx.beginPath();
   trazarTrazo(ctx, t);
-  ctx.strokeStyle = 'rgba(15,12,14,.75)';
-  ctx.lineWidth = (t.grosor + 5) / z;
+  ctx.strokeStyle = t.transparente ? 'rgba(15,12,14,.55)' : 'rgba(15,12,14,.75)';
+  ctx.lineWidth = t.transparente ? 2 / z : (t.grosor + 5) / z;
   ctx.lineJoin = 'round'; ctx.lineCap = 'round';
   ctx.stroke();
   ctx.restore();
 }
 // Un trazo en rectas va con líneas rectas; uno a mano alzada, suavizado (js/07, trazarSuave).
 function trazarTrazo(ctx2, t){
-  if(!t.recto) return trazarSuave(ctx2, t.puntos);
-  t.puntos.forEach((p, i) => { if(i) ctx2.lineTo(p.x, p.y); else ctx2.moveTo(p.x, p.y); });
+  if(!t.recto) trazarSuave(ctx2, t.puntos);
+  else t.puntos.forEach((p, i) => { if(i) ctx2.lineTo(p.x, p.y); else ctx2.moveTo(p.x, p.y); });
+  if(t.cerrada && t.puntos.length >= 3) ctx2.closePath();   // ⭕ puntas cerradas
 }
 // El botón 🧱 del dibujo seleccionado (solo el GM, solo los permanentes a mano alzada o en rectas): del lado opuesto a la manija de rotación.
 function trazoParedBotonMundo(t){
@@ -129,6 +169,78 @@ function dibujarBotonPinTrazo(t, z){
   ctx.save(); ctx.font = `${11 / z}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff';
   ctx.fillText(t.fijado ? '🔓' : '📌', b.x, b.y + 0.5 / z); ctx.restore();
 }
+/* ⚙ La configuración de un dibujo (2026-10-14, dueño: «al seleccionar una línea o una forma, una ruedita para cambiarle el color y activar o
+   desactivar que se cierren las puntas»): del lado opuesto al 📌 (a 270° de la manija). Abre una ventanita con el color, el relleno (◌ sin
+   relleno: casi no se ve, deja ver el mapa), las puntas cerradas (⭕), fijado (📌) y, para el GM, la pared (🧱). Lo puede usar quien puede moverlo. */
+const TRAZO_COLORES = ['#E0A458', '#D8524B', '#8EE6A8', '#7FB3F0', '#C9A8F5', '#F2D16B', '#6FD6C8', '#EDE3D2', '#9A867E', '#17121A'];
+function trazoGearMundo(t){
+  const rad = (t.rotacion + 270) * Math.PI / 180, r = HEX * 0.9;
+  return {x: t.origen.x - r * Math.sin(rad), y: t.origen.y + r * Math.cos(rad)};
+}
+function dibujarBotonTransp(t, z){   // (el ⚙; conserva el nombre que llama js/05)
+  if(!trazoAdmitePin(t)) return;
+  const b = trazoGearMundo(t);
+  ctx.beginPath(); ctx.arc(b.x, b.y, 9 / z, 0, 2 * Math.PI);
+  ctx.fillStyle = 'rgba(40,34,38,.92)'; ctx.fill();
+  ctx.strokeStyle = 'rgba(237,227,210,.85)'; ctx.lineWidth = 2 / z; ctx.stroke();
+  ctx.save(); ctx.font = `${11 / z}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff';
+  ctx.fillText('⚙', b.x, b.y + 0.5 / z); ctx.restore();
+}
+function clicBotonTransp(m){
+  const t = trazoSeleccionado ? trazos.get(trazoSeleccionado) : null;
+  if(!trazoAdmitePin(t)) return false;
+  const b = trazoGearMundo(t);
+  if(Math.hypot(m.x - b.x, m.y - b.y) > 11 / vista.zoom) return false;
+  trazoCfgAbrir(trazoSeleccionado);
+  return true;
+}
+let trazoCfgId = null;
+function trazoCfgCerrar(){ trazoCfgId = null; const el = document.getElementById('trazo-cfg'); if(el) el.hidden = true; }
+function trazoCfgAbrir(id){
+  const t = trazos.get(id);
+  if(!t){ trazoCfgCerrar(); return; }
+  trazoCfgId = id;
+  let el = document.getElementById('trazo-cfg');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'trazo-cfg';
+    el.style.cssText = 'position:fixed;z-index:70;width:250px;background:#1F1A20;border:1px solid #6B5B4B;border-radius:10px;padding:10px 12px;color:#EDE3D2;font:13px "Space Grotesk",system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.5)';
+    document.body.appendChild(el);
+    el.addEventListener('click', e => {
+      const b = e.target.closest('[data-tc]');
+      if(!b || !trazoCfgId || !trazos.has(trazoCfgId)) return;
+      const t2 = trazos.get(trazoCfgId), k = b.dataset.tc, cambios = {};
+      if(k === 'cerrar'){ trazoCfgCerrar(); return; }
+      if(k === 'color') cambios.color = b.dataset.v;
+      if(k === 'relleno') cambios.transparente = !t2.transparente;
+      if(k === 'puntas') cambios.cerrada = !t2.cerrada;
+      if(k === 'fijar') cambios.fijado = !t2.fijado;
+      if(k === 'pared' && soyGM) Object.assign(cambios, t2.colision ? {colision: false} : {colision: true, fijado: true});
+      Object.assign(t2, cambios); pedirDibujo(); trazoCfgAbrir(trazoCfgId);
+      moverTrazo(trazoCfgId, cambios).catch(err => { console.error('No se pudo cambiar el dibujo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan pegar las reglas nuevas de Firestore (dibujos)' : 'No se pudo cambiar el dibujo'); });
+    });
+    el.addEventListener('input', e => {
+      if(e.target.dataset.tc !== 'colorlibre' || !trazoCfgId) return;
+      const t2 = trazos.get(trazoCfgId); if(!t2) return;
+      t2.color = e.target.value; pedirDibujo();
+      clearTimeout(trazoCfgAbrir.t); trazoCfgAbrir.t = setTimeout(() => moverTrazo(trazoCfgId, {color: e.target.value}).catch(() => toast('No se pudo cambiar el color')), 400);
+    });
+  }
+  const op = (k, activo, txt) => `<button type="button" data-tc="${k}" style="display:block;width:100%;margin:4px 0 0;padding:6px 8px;text-align:left;border-radius:7px;border:1px solid ${activo ? '#E0A458' : '#4A3E36'};background:${activo ? 'rgba(224,164,88,.18)' : '#2A2328'};color:#EDE3D2;cursor:pointer">${txt}</button>`;
+  el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b>⚙ Dibujo</b><button type="button" data-tc="cerrar" style="background:none;border:0;color:#EDE3D2;cursor:pointer;font-size:15px">✕</button></div>
+    <div style="font-size:11px;letter-spacing:.08em;opacity:.75;margin-bottom:4px">COLOR</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center">${TRAZO_COLORES.map(c => `<button type="button" data-tc="color" data-v="${c}" title="${c}" style="width:20px;height:20px;border-radius:50%;cursor:pointer;background:${c};border:2px solid ${t.color === c ? '#fff' : 'rgba(0,0,0,.4)'}"></button>`).join('')}<input type="color" data-tc="colorlibre" value="${/^#[0-9a-fA-F]{6}$/.test(t.color || '') ? t.color : '#E0A458'}" title="Otro color" style="width:26px;height:22px;padding:0;border:0;background:none;cursor:pointer"></div>
+    ${op('relleno', !t.transparente, t.transparente ? '◌ Sin relleno (casi no se ve) · tocá para darle color' : '● Con color · tocá para dejarlo sin relleno')}
+    ${op('puntas', !!t.cerrada, t.cerrada ? '⭕ Puntas cerradas (el final se une con el principio)' : '〰 Puntas abiertas · tocá para cerrarlas')}
+    ${op('fijar', !!t.fijado, t.fijado ? '📌 Fijado (no se mueve ni se rota)' : '🔓 Suelto · tocá para fijarlo')}
+    ${soyGM ? op('pared', !!t.colision, t.colision ? `🧱 Es pared${t.cerrada ? ': lo de adentro es sólido y sin grilla' : ''}` : '🧱 No es pared · tocá para que corte el paso y la vista') : ''}`;
+  const r = lienzo.getBoundingClientRect(), g = trazoGearMundo(t);
+  const x = r.left + g.x * vista.zoom + vista.x, y = r.top + g.y * vista.zoom + vista.y;
+  el.style.left = Math.max(8, Math.min(innerWidth - 262, x + 16)) + 'px';
+  el.style.top = Math.max(8, Math.min(innerHeight - el.offsetHeight - 8, y - 20)) + 'px';
+  el.hidden = false;
+}
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && trazoCfgId) trazoCfgCerrar(); });
 // Clic en el 📌 → fija o suelta el dibujo. true si el clic era ahí.
 function clicBotonPinTrazo(m){
   const t = trazoSeleccionado ? trazos.get(trazoSeleccionado) : null;
@@ -170,15 +282,15 @@ function rectaClic(m){
   const p = rectaPunto(m);
   if(!dibujando || !dibujando.recto){ dibujando = {recto: true, puntos: [p], cursor: p}; pedirDibujo(); return; }
   const pts = dibujando.puntos, p0 = pts[0], ult = pts[pts.length - 1];
-  if(pts.length >= 3 && Math.hypot(p.x - p0.x, p.y - p0.y) <= 10 / vista.zoom){ pts.push({x: p0.x, y: p0.y}); rectaTerminar(); return; }   // cerró la figura
+  if(pts.length >= 3 && Math.hypot(p.x - p0.x, p.y - p0.y) <= 10 / vista.zoom){ rectaTerminar(true); return; }   // cerró la figura (se guarda cerrada, sin repetir el punto)
   if(Math.hypot(p.x - ult.x, p.y - ult.y) > 2 / vista.zoom && pts.length < 200) pts.push(p);   // (el segundo clic de un doble clic cae en el mismo lugar)
   pedirDibujo();
 }
-function rectaTerminar(){
+function rectaTerminar(cerro){
   if(!dibujando || !dibujando.recto) return;
   const pts = dibujando.puntos;
   dibujando = null;
-  if(pts.length >= 2) guardarTrazo(pts, lapizPermanente || lapizColisionActiva(), {recto: true, colision: lapizColisionActiva()});
+  if(pts.length >= 2) guardarTrazo(pts, lapizPermanente || lapizColisionActiva(), {recto: true, colision: lapizColisionActiva(), cerrada: !!cerro || lapizCerrar});
   pedirDibujo();
 }
 function rectaCancelar(){ if(dibujando && dibujando.recto){ dibujando = null; pedirDibujo(); } }

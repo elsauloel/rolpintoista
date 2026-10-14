@@ -1586,3 +1586,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   un dibujo permanente del lápiz (a mano alzada o en rectas) seleccionado muestra un 📌 (js/34, `dibujarBotonPinTrazo` / `clicBotonPinTrazo`,
   a 90° de la manija). Fijado (`fijado` del trazo; reglas: `trazoValido` y los `update`) no se arrastra, no se rota ni se borra con Supr (hay que
   soltarlo con 🔓); se sigue pudiendo seleccionar. Al ponerle la pared 🧱, queda fijado solo.
+- **⚙ Configuración de un dibujo, ◌ sin relleno y ⭕ figuras cerradas** (2026-10-14, dueño): un dibujo permanente seleccionado muestra un ⚙
+  (js/34, `trazoGearMundo`, a 270° de la manija) que abre `#trazo-cfg`: color (paleta o libre), relleno (`transparente`: no se pinta el color ni
+  el borde grueso; una pared queda como una línea oscura finita, la línea cortada roja solo para el GM; un dibujo común, tenue), puntas cerradas
+  (`cerrada`: `trazarTrazo` cierra el trazado, `paredesSegs` suma el tramo que une el final con el principio, y una figura cerrada se rellena
+  tenue), fijado y, el GM, la pared. El lápiz suma «⭕ Cerrar la figura» (`lapizCerrar`); en rectas, el clic sobre el primer punto la guarda
+  cerrada. **Una figura cerrada con pared es sólida por dentro** (`figurasSolidas`, `celdaEnFiguraSolida`: la casilla cuyo centro cae adentro no
+  se pisa —`elementoSolidoEn`, js/07— y no dibuja la grilla —js/05—). Un dibujo viejo que termina donde empezó cuenta como cerrado. Reglas:
+  `transparente`, `cerrada` (y `color` en los `update`).

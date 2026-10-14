@@ -646,6 +646,7 @@ async function guardarElemento(tipo, origen, celdasSet){
 // Si algún elemento sólido (Formas) ocupa esa casilla — cualquiera,
 // invisible o no: lo invisible solo cambia quién lo VE, no si bloquea.
 function elementoSolidoEn(col, fila){
+  if(typeof celdaEnFiguraSolida === 'function' && celdaEnFiguraSolida(col, fila)) return true;   // ⭕ adentro de una figura cerrada con colisión (js/34)
   for(const el of elementos.values()){
     if(el.solido && celdasDeElemento(el).some(c => c.col === col && c.fila === fila)) return true;
   }
@@ -933,6 +934,8 @@ function escucharTrazos(){
         recto: d.recto === true,   // 📐 en rectas: sin suavizar (js/34)
         colision: d.colision === true,   // 🧱 pared de línea fina (js/34)
         fijado: d.fijado === true,   // 📌 fijado: no se mueve ni se rota (js/34)
+        transparente: d.transparente === true,   // ◌ sin relleno (js/34)
+        cerrada: d.cerrada !== undefined ? d.cerrada === true : (!esHex && puntos.length >= 4 && Math.hypot(puntos[0].x - puntos[puntos.length - 1].x, puntos[0].y - puntos[puntos.length - 1].y) < 1),   // ⭕ (uno viejo que termina donde empezó, también)
         duenoUid: d.duenoUid,
         creadoMs: d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now(),
       });
@@ -963,7 +966,7 @@ async function guardarTrazo(puntosMundo, permanente, opc){
   try{
     await coleccionTrazos().add({
       puntos, origen, rotacion: 0, color: lapizColor, grosor: 4, permanente: !!permanente,
-      ...(opc.recto ? {recto: true} : {}), ...(opc.colision && soyGM ? {colision: true} : {}),
+      ...(opc.recto ? {recto: true} : {}), ...(opc.colision && soyGM ? {colision: true} : {}), ...(opc.cerrada && suaves.length >= 3 ? {cerrada: true} : {}),   // ⭕ el final se une con el principio (js/34)
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){

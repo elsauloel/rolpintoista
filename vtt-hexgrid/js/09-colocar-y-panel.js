@@ -470,6 +470,7 @@ function seleccionar(id){
 
 function trazoSeleccionar(id){
   if(trazoSeleccionado === id) return;
+  if(typeof trazoCfgCerrar === 'function') trazoCfgCerrar();   // el ⚙ del dibujo anterior (js/34)
   trazoSeleccionado = id;
   if(id){ if(seleccion) seleccionar(null); elementoSeleccionado = null; }
   pedirDibujo();

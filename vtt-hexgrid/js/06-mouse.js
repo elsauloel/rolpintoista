@@ -125,6 +125,7 @@ lienzo.addEventListener('pointerdown', e => {
     // fijo ya puesto se selecciona saliendo de la herramienta).
     if(!herramientaActiva && clicBotonPared(m)) return;   // el 🧱 del dibujo seleccionado (js/34)
     if(!herramientaActiva && clicBotonPinTrazo(m)) return;   // el 📌 del dibujo seleccionado (js/34)
+    if(!herramientaActiva && clicBotonTransp(m)) return;   // ◌ sin relleno (js/34)
     const idTrazo = (herramientaActiva === 'lapiz' && lapizEstilo !== 'libre') ? null : trazoEn(m.x, m.y);
     if(idTrazo){
       trazoSeleccionar(idTrazo);
@@ -474,7 +475,7 @@ function soltar(){
     const d = dibujando;
     dibujando = null;
     if(d.hex) guardarTrazoHex(d.celdas, lapizPermanente);
-    else if(d.puntos.length > 1) guardarTrazo(d.puntos, lapizPermanente || lapizColisionActiva(), {colision: lapizColisionActiva()});
+    else if(d.puntos.length > 1) guardarTrazo(d.puntos, lapizPermanente || lapizColisionActiva(), {colision: lapizColisionActiva(), cerrada: lapizCerrar});
     pedirDibujo();
   }
   if(arrastreTrazo){

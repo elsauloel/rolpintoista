@@ -303,6 +303,7 @@ function dibujar(){
   for(let f = filaMin; f <= filaMax; f++){
     for(let c = colMin; c <= colMax; c++){
       if(sinGrilla.size && sinGrilla.has(c + ',' + f)) continue;
+      if(typeof celdaEnFiguraSolida === 'function' && celdaEnFiguraSolida(c, f)) continue;   // ⭕ adentro de una figura sólida (js/34)
       const p = hexCentro(c, f);
       trazarHex(p.x, p.y);
     }
@@ -974,7 +975,8 @@ function dibujar(){
     ctx.rotate(t.rotacion * Math.PI / 180);
     ctx.beginPath();
     trazarTrazo(ctx, t);   // en rectas o suavizado (js/34)
-    ctx.globalAlpha = alfa;
+    ctx.globalAlpha = t.transparente ? (soyGM || !t.colision ? 0.18 : 0) * alfa : alfa;   // ◌ sin relleno (js/34): el GM lo ve tenue
+    if(t.cerrada && !t.transparente){ const ga = ctx.globalAlpha; ctx.globalAlpha = ga * 0.3; ctx.fillStyle = t.color; ctx.fill(); ctx.globalAlpha = ga; }   // ⭕ una figura cerrada se rellena tenue
     ctx.strokeStyle = t.color;
     ctx.lineWidth = t.grosor / z;
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
@@ -991,6 +993,7 @@ function dibujar(){
     if(t.colision) dibujarParedEncima(t, z);
     if(id === trazoSeleccionado) dibujarBotonPared(t, z);   // el 🧱 del GM para ponerle o sacarle la colisión
     if(id === trazoSeleccionado) dibujarBotonPinTrazo(t, z);   // el 📌 para fijarlo (js/34)
+    if(id === trazoSeleccionado) dibujarBotonTransp(t, z);   // ◌ sin relleno (js/34)
     if(id === trazoSeleccionado && puedeManipularTrazo(t) && !t.fijado){
       const h = trazoManijaMundo(t);
       ctx.beginPath(); ctx.moveTo(t.origen.x, t.origen.y); ctx.lineTo(h.x, h.y);

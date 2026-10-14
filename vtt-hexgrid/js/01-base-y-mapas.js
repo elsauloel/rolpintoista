@@ -213,6 +213,8 @@ let lapizEstilo = 'libre';    // 'libre' (a mano alzada) | 'casillas' (marcador 
 try{ const e = localStorage.getItem('lapiz-estilo'); lapizEstilo = e === 'casillas' || e === 'recta' ? e : 'libre'; }catch(e){}
 let lapizColision = false;   // 🧱 el dibujo nuevo es una pared (solo el GM; js/34)
 try{ lapizColision = localStorage.getItem('lapiz-colision') === '1'; }catch(e){}
+let lapizCerrar = false;   // ⭕ el dibujo nuevo se cierra solo: el final se une con el principio (js/34)
+try{ lapizCerrar = localStorage.getItem('lapiz-cerrar') === '1'; }catch(e){}
 try{ lapizColor = localStorage.getItem('lapiz-color') || lapizColor; }catch(e){}
 try{ lapizPermanente = localStorage.getItem('lapiz-permanente') === '1'; }catch(e){}
 

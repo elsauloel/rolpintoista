@@ -107,6 +107,7 @@ function renderHerramientaFlotante(){
         <option value="recta"${lapizEstilo === 'recta' ? ' selected' : ''}>📐 En rectas (clic, clic, clic…)</option>
       </select>
       ${lapizEstilo === 'recta' ? `<label class="tk-lapiz-check"><input type="checkbox" id="lapiz-iman-check"${lapizIman ? ' checked' : ''}> 🧲 Imán: pegar los puntos a las esquinas de los hexágonos</label>` : ''}
+      ${lapizEstilo !== 'casillas' ? `<label class="tk-lapiz-check"><input type="checkbox" id="lapiz-cerrar-check"${lapizCerrar ? ' checked' : ''}> ⭕ Cerrar la figura (el final se une con el principio${soyGM ? '; con colisión, lo de adentro es sólido y sin grilla' : ''})</label>` : ''}
       ${soyGM && lapizEstilo !== 'casillas' ? `<label class="tk-lapiz-check"><input type="checkbox" id="lapiz-colision-check"${lapizColision ? ' checked' : ''}> 🧱 Con colisión (es una pared: corta el paso y la vista)</label>` : ''}
       <label class="tk-lapiz-check"><input type="checkbox" id="lapiz-permanente-check"${lapizPermanente ? ' checked' : ''}> ${lapizEstilo === 'casillas' ? 'Trayectoria fija' : 'Dibujo permanente'}</label>
       <p class="tk-lapiz-ayuda">${lapizEstilo === 'recta'
@@ -314,6 +315,7 @@ $('#herramienta-flotante').addEventListener('change', e => {
     return;
   }
   if(e.target.id === 'lapiz-iman-check'){ lapizIman = e.target.checked; try{ localStorage.setItem('lapiz-iman', lapizIman ? '1' : '0'); }catch(err){} return; }
+  if(e.target.id === 'lapiz-cerrar-check'){ lapizCerrar = e.target.checked; try{ localStorage.setItem('lapiz-cerrar', lapizCerrar ? '1' : ''); }catch(err){} return; }
   if(e.target.id === 'lapiz-colision-check'){ lapizColision = e.target.checked; try{ localStorage.setItem('lapiz-colision', lapizColision ? '1' : ''); }catch(err){} return; }
   if(e.target.id === 'lapiz-permanente-check'){
     lapizPermanente = e.target.checked;

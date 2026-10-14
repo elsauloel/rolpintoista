@@ -36,6 +36,10 @@
   con todos los mapas recargados:** Frío, Fuego, Ácido y Tóxico de punta a punta.
 - [ ] **⚡ Salto eléctrico, regla general** (2026-10-13): 4 casillas; la mitad de lo que entró; cada salto resta la Res. eléctrica; sin tope
   (la varita de chispa, el relámpago, la flecha de tormenta, la trampa Descarga y el ⚡ del menú de vida).
+- [ ] **❄ Granizo de cristal** (Chamán del cristal, «El origen de las especies», MINAS, 2026-10-13): área de diámetro 3, PdG.Esp contra
+  Evasión, 1d6+2 de hielo; a quien le entran 5 o más, 1 de Escarcha (uno solo); con 4 o menos, nada. Usa la regla nueva «estado según el
+  daño» con `desde`/`tope` (`comun/combatiente.js`, en verde en pruebas.html). Probar con una copia del chamán en «Claude · pruebas»,
+  o ver la primera vez que se use en la sesión real.
 
 ## Probado
 

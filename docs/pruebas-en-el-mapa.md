@@ -39,6 +39,9 @@
 - [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): un crítico de la Puñalada (Rengo 2 y Lisiado 1). El pozo visto como jugador ya se vio (con
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **🗡 Golpe doble del Ladrón del monte** (2026-10-14, Claude · pruebas, en el «Ladrón (prueba)»): Ejecutar → juan → el duelo dice «con
+  Cuchillo · Tipo 4 · +1d4 de daño», «Los No2 de este ataque ya los cobró la habilidad»; PdG 4 contra Evasión 1 → pegó; daño «1d4 + 5 + 1d4» =
+  10 − Defensa 2 = 8. Sin probar: el +2 por la espalda en sigilo.
 - [x] **🫳 Robar** (2026-10-14, Claude · pruebas, GM rolpintoista + juan de elsaulo): el «Ladrón (prueba)» pegado a juan ejecuta Bolsillo
   ajeno → brillan los que están a 1 casillero → clic en juan → el cuadro «Sigilo contra Percepción» (Sigilo 1d10+1 = 5, Percepción de juan
   tirada a mano = 1) → ¡Funcionó! → «✔ Aplicar Robo sobre juan» (solo lo ve el GM) → «le robó Cepo de prueba». El Cepo quedó en el cinturón

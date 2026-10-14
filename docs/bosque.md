@@ -63,9 +63,11 @@ Los skills viejos se armaron a ojo: son **referencia**, se pueden reinventar (du
 
 ## Estado, creep por creep
 
+(En la partida también hay dos «Ladronzuelo del monte», en otro mapa: no son parte de este plan.)
+
 | Creep | Estado |
 |---|---|
-| Ladrón del monte | El Robo probado en el mapa (2026-10-14); falta auditarlo y configurar su Bolsillo ajeno de verdad |
+| Ladrón del monte | ✅ Listo (2026-10-14). Bolsillo ajeno con el Robo: cooldown 3 pero arranca disponible (dueño). Golpe doble = un ataque con su arma, +1d4, ignora 1 de Res. crítico y +2 por la espalda en sigilo (probado en el mapa). Chaleco de cuero y Botas de suela de goma (Defensa 2, Sigilo 12). Juego: Desaparecer → Bolsillo ajeno (+2) o Golpe doble por la espalda → huir |
 | Goblin hondero ×2 | Sin empezar |
 | Goblin de choque ×2 (nuevo) | Sin empezar |
 | Lobo gris ×2–3 | Sin empezar |

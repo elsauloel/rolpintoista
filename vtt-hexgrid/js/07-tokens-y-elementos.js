@@ -966,7 +966,7 @@ async function guardarTrazo(puntosMundo, permanente, opc){
   try{
     await coleccionTrazos().add({
       puntos, origen, rotacion: 0, color: lapizColor, grosor: 4, permanente: !!permanente,
-      ...(opc.recto ? {recto: true} : {}), ...(opc.colision && soyGM ? {colision: true} : {}), ...(opc.cerrada && suaves.length >= 3 ? {cerrada: true} : {}),   // ⭕ el final se une con el principio (js/34)
+      ...(opc.recto ? {recto: true} : {}), ...(opc.colision && soyGM ? {colision: true, fijado: true} : {}),   // una pared nace fijada (📌, 2026-10-14) ...(opc.cerrada && suaves.length >= 3 ? {cerrada: true} : {}),   // ⭕ el final se une con el principio (js/34)
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){

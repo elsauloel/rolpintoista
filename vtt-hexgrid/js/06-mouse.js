@@ -111,7 +111,7 @@ lienzo.addEventListener('pointerdown', e => {
     // Handle de rotación del trazo ya seleccionado (si se puede manipular).
     if(trazoSeleccionado && trazos.has(trazoSeleccionado)){
       const ts = trazos.get(trazoSeleccionado);
-      if(!ts.hex && puedeManipularTrazo(ts)){
+      if(!ts.hex && puedeManipularTrazo(ts) && !ts.fijado){
         const h = trazoManijaMundo(ts);
         if(Math.hypot(m.x - h.x, m.y - h.y) <= 12 / vista.zoom){
           rotandoTrazo = {id: trazoSeleccionado};
@@ -124,13 +124,14 @@ lienzo.addEventListener('pointerdown', e => {
     // Con el lápiz por casilleros activo se dibuja directo (un marcador
     // fijo ya puesto se selecciona saliendo de la herramienta).
     if(!herramientaActiva && clicBotonPared(m)) return;   // el 🧱 del dibujo seleccionado (js/34)
+    if(!herramientaActiva && clicBotonPinTrazo(m)) return;   // el 📌 del dibujo seleccionado (js/34)
     const idTrazo = (herramientaActiva === 'lapiz' && lapizEstilo !== 'libre') ? null : trazoEn(m.x, m.y);
     if(idTrazo){
       trazoSeleccionar(idTrazo);
       const t = trazos.get(idTrazo);
       // Un marcador por casilleros está atado a la grilla: se selecciona
       // (para borrarlo) pero no se arrastra ni se rota.
-      if(!t.hex && puedeManipularTrazo(t)){
+      if(!t.hex && puedeManipularTrazo(t) && !t.fijado){
         arrastreTrazo = {id: idTrazo, dx: m.x - t.origen.x, dy: m.y - t.origen.y, inicioX: px, inicioY: py, movio: false};
         lienzo.style.cursor = 'grabbing';
       }
@@ -347,7 +348,7 @@ lienzo.addEventListener('pointermove', e => {
   if(elegirDestinoCb){ lienzo.style.cursor = 'crosshair'; return; }   // sin arrastrar: sigue esperando el clic que elige el destino
   if(moverLibre){ lienzo.style.cursor = id === moverLibre ? 'grab' : 'crosshair'; return; }
   if(!id){
-    if(trazoSeleccionado && trazos.has(trazoSeleccionado) && !trazos.get(trazoSeleccionado).hex && puedeManipularTrazo(trazos.get(trazoSeleccionado))){
+    if(trazoSeleccionado && trazos.has(trazoSeleccionado) && !trazos.get(trazoSeleccionado).hex && !trazos.get(trazoSeleccionado).fijado && puedeManipularTrazo(trazos.get(trazoSeleccionado))){
       const h = trazoManijaMundo(trazos.get(trazoSeleccionado));
       if(Math.hypot(m.x - h.x, m.y - h.y) <= 12 / vista.zoom){ lienzo.style.cursor = 'grab'; return; }
     }
@@ -847,6 +848,7 @@ document.addEventListener('keydown', e => {
   if(e.key === 'Escape'){ seleccionar(null); trazoSeleccionar(null); elementoSeleccionar(null); }
   if((e.key === 'Delete' || e.key === 'Backspace') && seleccion) borrarToken(seleccion);
   if((e.key === 'Delete' || e.key === 'Backspace') && trazoSeleccionado && puedeManipularTrazo(trazos.get(trazoSeleccionado))){
+    if(trazos.get(trazoSeleccionado).fijado){ toast('Ese dibujo está fijado: soltalo con 🔓 para borrarlo'); return; }
     borrarTrazo(trazoSeleccionado);
     trazoSeleccionar(null);
   }

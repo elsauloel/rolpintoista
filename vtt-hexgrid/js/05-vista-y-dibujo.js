@@ -990,7 +990,8 @@ function dibujar(){
     ctx.restore();
     if(t.colision) dibujarParedEncima(t, z);
     if(id === trazoSeleccionado) dibujarBotonPared(t, z);   // el 🧱 del GM para ponerle o sacarle la colisión
-    if(id === trazoSeleccionado && puedeManipularTrazo(t)){
+    if(id === trazoSeleccionado) dibujarBotonPinTrazo(t, z);   // el 📌 para fijarlo (js/34)
+    if(id === trazoSeleccionado && puedeManipularTrazo(t) && !t.fijado){
       const h = trazoManijaMundo(t);
       ctx.beginPath(); ctx.moveTo(t.origen.x, t.origen.y); ctx.lineTo(h.x, h.y);
       ctx.strokeStyle = 'rgba(79,168,224,.7)'; ctx.lineWidth = 1.5 / z; ctx.stroke();

@@ -932,6 +932,7 @@ function escucharTrazos(){
         permanente: d.permanente === true,
         recto: d.recto === true,   // 📐 en rectas: sin suavizar (js/34)
         colision: d.colision === true,   // 🧱 pared de línea fina (js/34)
+        fijado: d.fijado === true,   // 📌 fijado: no se mueve ni se rota (js/34)
         duenoUid: d.duenoUid,
         creadoMs: d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now(),
       });

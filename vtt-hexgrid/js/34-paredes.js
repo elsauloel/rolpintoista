@@ -112,6 +112,34 @@ function dibujarBotonPared(t, z){
   ctx.font = `${12 / z}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText('🧱', b.x, b.y + 0.5 / z);
 }
+/* 📌 Fijar un dibujo (2026-10-14, dueño: «no veo el botón para fijar figuras al mapa, en particular líneas libres que marqué como sólidas»):
+   como el pin de Terreno y Formas — fijado no se arrastra ni se rota (se puede seleccionar, para soltarlo o ponerle la pared). Lo puede fijar
+   quien puede moverlo; una pared queda fijada sola al ponerla. A 90° de la manija de rotación (la pared va del lado opuesto). */
+const trazoAdmitePin = t => !!(t && t.permanente && !t.hex && puedeManipularTrazo(t));
+function trazoPinMundo(t){
+  const rad = (t.rotacion + 90) * Math.PI / 180, r = HEX * 0.9;
+  return {x: t.origen.x - r * Math.sin(rad), y: t.origen.y + r * Math.cos(rad)};
+}
+function dibujarBotonPinTrazo(t, z){
+  if(!trazoAdmitePin(t)) return;
+  const b = trazoPinMundo(t);
+  ctx.beginPath(); ctx.arc(b.x, b.y, 9 / z, 0, 2 * Math.PI);
+  ctx.fillStyle = t.fijado ? '#D8524B' : '#4FA8E0'; ctx.fill();
+  ctx.strokeStyle = 'rgba(15,12,14,.6)'; ctx.lineWidth = 2 / z; ctx.stroke();
+  ctx.save(); ctx.font = `${11 / z}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff';
+  ctx.fillText(t.fijado ? '🔓' : '📌', b.x, b.y + 0.5 / z); ctx.restore();
+}
+// Clic en el 📌 → fija o suelta el dibujo. true si el clic era ahí.
+function clicBotonPinTrazo(m){
+  const t = trazoSeleccionado ? trazos.get(trazoSeleccionado) : null;
+  if(!trazoAdmitePin(t)) return false;
+  const b = trazoPinMundo(t);
+  if(Math.hypot(m.x - b.x, m.y - b.y) > 11 / vista.zoom) return false;
+  const nuevo = !t.fijado;
+  moverTrazo(trazoSeleccionado, {fijado: nuevo}).then(() => toast(nuevo ? '📌 Dibujo fijado: ya no se mueve ni se rota (🔓 para soltarlo)' : '🔓 Dibujo suelto: se puede mover y rotar'))
+    .catch(err => { console.error('No se pudo fijar el dibujo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo fijar: faltan pegar las reglas nuevas de Firestore (fijado)' : 'No se pudo fijar el dibujo'); });
+  return true;
+}
 // Clic en el botón 🧱 → pone o saca la colisión. true si el clic era ahí.
 function clicBotonPared(m){
   const t = trazoSeleccionado ? trazos.get(trazoSeleccionado) : null;
@@ -119,7 +147,7 @@ function clicBotonPared(m){
   const b = trazoParedBotonMundo(t);
   if(Math.hypot(m.x - b.x, m.y - b.y) > 12 / vista.zoom) return false;
   const nuevo = !t.colision;
-  moverTrazo(trazoSeleccionado, {colision: nuevo}).then(() => toast(nuevo ? '🧱 Ese dibujo ahora es una pared: corta el paso y la vista' : 'Ese dibujo ya no es una pared'));
+  moverTrazo(trazoSeleccionado, nuevo ? {colision: true, fijado: true} : {colision: false}).then(() => toast(nuevo ? '🧱 Ese dibujo ahora es una pared: corta el paso y la vista' : 'Ese dibujo ya no es una pared'));
   return true;
 }
 

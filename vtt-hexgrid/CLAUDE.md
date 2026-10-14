@@ -1574,3 +1574,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   daño que entró (`hab.dano.porDano`, Carga Elemental); el +50 % de fuego (`hab.dano.mult`) en `dueloAplicarDano`.
 - **🪪 La tarjeta del creep, a medias** (2026-10-13): `hudDatos` (js/10) le da al GM los nombres de la ficha privada y a los jugadores lo publicado
   (de un creep vivo, solo qué es cada pieza, `CreepCalculo.tarjetaPublica`), con la nota «Se ve qué lleva; cómo es, recién al derrotarlo».
+- **🕳 Bajo tierra: Excavar y Emerger** (2026-10-13, dueño, el Kobold tunelero; `js/46-bajo-tierra.js`): una habilidad con `excavar: true` (✨, sobre
+  sí, sin tiradas) le pide al mapa `ui.excavar` (`CreepAcciones.terminarHab` → `excavarToken`): el token guarda `bajoTierra: true` (reglas:
+  `tokenValido`). Los jugadores no lo tienen en `calcularDisposicion` y ven el pozo (`dibujarPozos`, js/05); el GM lo ve transparente encima. No se lo
+  elige de objetivo (`dueloResaltarObjetivos`, el clic, el área, la línea, los misiles, js/13), no le llega el salto eléctrico (`rayoCadena`, js/10) y
+  no da ni recibe oportunidad (js/17). Una habilidad con `emerger: {distancia}` (ataque con el arma) en `acLanzarAtaqueDeHab` (js/12): si está bajo
+  tierra, `emergerToken` pide la casilla de salida (libre, a `distancia` o menos del pozo; Esc = sigue abajo), borra `bajoTierra`, la tierra salta
+  (`dibujarEfectosEmerger`) y sigue la elección del objetivo. `acEjecutarHab` avisa antes de cobrar: sin token, ya bajo tierra, o «no está bajo
+  tierra: ¿usarla igual como un ataque común?». Hoy, creeps; personajes e invocaciones, pendiente (docs/pendientes.md).

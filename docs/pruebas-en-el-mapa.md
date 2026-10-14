@@ -36,6 +36,9 @@
   con todos los mapas recargados:** Frío, Fuego, Ácido y Tóxico de punta a punta.
 - [ ] **⚡ Salto eléctrico, regla general** (2026-10-13): 4 casillas; la mitad de lo que entró; cada salto resta la Res. eléctrica; sin tope
   (la varita de chispa, el relámpago, la flecha de tormenta, la trampa Descarga y el ⚡ del menú de vida).
+- [ ] **🕳 Bajo tierra: Excavar y Puñalada desde abajo** (Kobold tunelero, 2026-10-13; copia «Tunelero (prueba)» en «Claude · pruebas»): Excavar
+  → pozo a la vista, el jugador no ve el token ni lo puede apuntar, un área no lo toca; Puñalada → casilla de salida a 4 o menos, la tierra salta,
+  duelo con +1d6 y +1 al crítico; Rengo 1 turno; crítico: Rengo 2 y Lisiado 1. Hace falta que el dueño pegue las reglas (`bajoTierra`).
 - [ ] **❄ Granizo de cristal** (Chamán del cristal, «El origen de las especies», MINAS, 2026-10-13): área de diámetro 3, PdG.Esp contra
   Evasión, 1d6+2 de hielo; a quien le entran 5 o más, 1 de Escarcha (uno solo); con 4 o menos, nada. Usa la regla nueva «estado según el
   daño» con `desde`/`tope` (`comun/combatiente.js`, en verde en pruebas.html). Probar con una copia del chamán en «Claude · pruebas»,

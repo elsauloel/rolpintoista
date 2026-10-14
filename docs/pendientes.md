@@ -15,6 +15,9 @@
 >   dibujo permanente del lápiz puede ser pared (casilla «🧱 Con colisión» o el 🧱 del dibujo seleccionado; solo el GM), y el lápiz suma el estilo
 >   **📐 En rectas** (clic, clic…, con imán a las esquinas de los hexágonos). **Falta: que el dueño pegue las reglas** (`recto`, `colision` de los
 >   trazos) y probarlo en el mapa (`pruebas-en-el-mapa.md`).
+> - [ ] **🕳 Bajo tierra para personajes e invocaciones (2026-10-13):** Excavar / Emerger (`excavar`, `emerger` en la habilidad;
+>   `vtt-hexgrid/js/46-bajo-tierra.js`) hoy anda para creeps (el Kobold tunelero). Falta el camino de la ficha (mensaje al mapa, como el blink) y
+>   el de las invocaciones, cuando alguien tenga una skill así.
 > - [ ] **🕊 Vuelo (2026-10-11, dueño, con los arcos: «todavía no diseñamos nada, pero eventualmente aparecerán creeps voladores — anotar para
 >   desarrollar: vuelo»):** creeps que vuelan o levitan. Cuando exista, los arcos «Contra lo que vuela o levita» (+PdG) ya están elegidos por el dueño
 >   (docs/ideas-arcos-flechas.md). Hoy existe Levitar (pies), que no es lo mismo.

@@ -38,14 +38,12 @@
   (la varita de chispa, el relámpago, la flecha de tormenta, la trampa Descarga y el ⚡ del menú de vida).
 - [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): un crítico de la Puñalada (Rengo 2 y Lisiado 1). El pozo visto como jugador ya se vio (con
   «👁 Ver como jugador», abajo, en Probado).
-- [ ] **⚙ Dibujos: color, sin relleno, ⭕ figura cerrada y sólida** (2026-10-14): falta que el dueño pegue las reglas (`color`, `transparente`,
-  `cerrada`); el 📌 y el ⚙ ya se vieron andar.
-- [ ] **❄ Granizo de cristal** (Chamán del cristal, «El origen de las especies», MINAS, 2026-10-13): área de diámetro 3, PdG.Esp contra
-  Evasión, 1d6+2 de hielo; a quien le entran 5 o más, 1 de Escarcha (uno solo); con 4 o menos, nada. Usa la regla nueva «estado según el
-  daño» con `desde`/`tope` (`comun/combatiente.js`, en verde en pruebas.html). Probar con una copia del chamán en «Claude · pruebas»,
-  o ver la primera vez que se use en la sesión real.
-
 ## Probado
+- [x] **⚙ Dibujos: color, sin relleno, ⭕ puntas cerradas, figura sólida** (2026-10-14, con capturas, reglas pegadas): a la pared en L se le
+  cerraron las puntas desde el ⚙ (quedó un triángulo), pasó a rojo y con relleno tenue; adentro no se dibuja la grilla y sus 7 casillas
+  cuentan como sólidas; «sin relleno» la deja como línea roja cortada para el GM y casi invisible como jugador. Todo se guarda.
+- [x] **❄ Granizo de cristal** (2026-10-14, copia «Chamán (prueba)», con capturas): centro en juan, flor con fuego amigo → cascada de 4 con
+  un solo PdG.Esp (6). Escarabajo 6 de daño → Escarcha ×1; Tunelero 6 → Escarcha ×1; juan 4 → nada; Capataz 3 → nada.
 - [x] **👁 Ver como jugador** (2026-10-14, con capturas): desde el menú del ojo, el GM ve el pozo en vez del tunelero bajo tierra, la niebla de los
   jugadores y el cartel «Estás viendo el mapa como un jugador»; tocándolo vuelve.
 - [x] **🕳 Excavar y Puñalada desde abajo** (2026-10-14, «Claude · pruebas», con capturas): Excavar cobra 1 No2 y cooldown 3, lo anuncia, el

@@ -662,7 +662,7 @@ function visionCreepsCalcular(){
   const b = document.createElement('button');
   b.id = 'banner-como-jugador'; b.type = 'button'; b.hidden = true;
   b.textContent = '👁 Estás viendo el mapa como un jugador · tocá para volver a verlo todo';
-  b.style.cssText = 'position:fixed;top:56px;left:50%;transform:translateX(-50%);z-index:40;padding:6px 14px;border-radius:999px;border:1px solid #E0A458;background:rgba(31,26,32,.92);color:#E0A458;font:600 12.5px "Space Grotesk",system-ui,sans-serif;cursor:pointer';
+  b.style.cssText = 'position:fixed;top:118px;left:50%;transform:translateX(-50%);z-index:40;padding:6px 14px;border-radius:999px;border:1px solid #E0A458;background:rgba(31,26,32,.92);color:#E0A458;font:600 12.5px "Space Grotesk",system-ui,sans-serif;cursor:pointer';
   b.onclick = () => $('#btn-niebla-jugador').click();
   document.body.appendChild(b);
 })();

@@ -320,7 +320,7 @@ function acMesaHabilidad(sc, h, extra){
 // «Ataque con mi arma, con arreglos»: se anuncia y va al cuadro del duelo; sin duelo, se tira el PdG suelto.
 function acLanzarAtaqueDeHab(sc, h, emergio){
   // 🕳 Emerger (js/46): si está bajo tierra, primero sale (se elige la casilla) y recién ahí elige a quién le pega; saliendo de abajo, suma
-  // `emerger.pdg` a la Probabilidad de Golpe (2026-10-14, dueño: «si la hace estando bajo tierra, tiene +2 a la probabilidad de golpe»).
+  // `emerger.pdg` a la Probabilidad de Golpe (2026-10-14, dueño: «si la hace estando bajo tierra, tiene +2 a la probabilidad de golpe»; después: «que sea +1 mejor»).
   const pozo = h && h.emerger ? tokenEntradaCreep(sc.id) : null;
   if(pozo && pozo[1].bajoTierra){
     const id = ac && ac.creepId;

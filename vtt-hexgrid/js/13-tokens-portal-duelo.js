@@ -1117,7 +1117,7 @@ function dueloElegirAreaMapa(msg){
     const objetivos = todos
       .filter(t => !hab.tormenta || !iniciativaFueraDeJuego(t.id))   // la tormenta no les cae a los caídos
       .filter(t => !t.oculto && !t.bajoTierra && !propio(t) && (enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio || (h.otro && distanciaHex(h.otro, t) <= radio)))   // (h.otro: la casilla de salida del Remolino)
-      .filter(t => hab.fuegoAmigo || h.linea || dueloEsRival(yo, t))   // (la línea tiene fuego amigo: dueño, 2026-10-05)
+      .filter(t => hab.aliados ? !dueloEsRival(yo, t) : (hab.fuegoAmigo || h.linea || dueloEsRival(yo, t)))   // (la línea tiene fuego amigo: dueño, 2026-10-05; `aliados`: solo los suyos, 2026-10-13)
       .filter(t => !hab.conVista || lineaLibre(h, t, solidosSet()))   // la luz (Varita de la luz): todos los rivales que alcanza a ver, en sigilo o no (dueño, 2026-10-05)
       .sort((a, b) => h.linea ? distanciaHex(h, a) - distanciaHex(h, b) : 0)   // en la línea, del más cercano al más lejano (el láser largo pierde 1 por cada uno)
       .map(t => t.id);
@@ -1167,7 +1167,13 @@ function dueloElegirAreaMapa(msg){
     lanzar({col: mio.col, fila: mio.fila});
     return;
   }
-  elegirDestino(lanzar, `<b>🌀 ${hab && hab.nombre ? esc(hab.nombre) + ': marcá el centro del área' : 'Elegí el centro del área'}</b> <span>clic en el mapa (${Combatiente.areaTxt(radio)}) · Esc o clic derecho cancelan</span>`, true, cancelado);
+  // El centro, cerca (2026-10-13, Golpe al piso): a `centroAlcance` casillas o menos, y no en la propia casilla.
+  const cAlc = Math.round(num(hab.centroAlcance)), mioC = cAlc > 0 ? [...tokens.values()].find(propio) : null;
+  const pedirCentro = () => elegirDestino(h => {
+    if(mioC){ const d = distanciaHex(h, mioC); if(d < 1 || d > cAlc){ toast(cAlc === 1 ? 'Tiene que caer en una casilla pegada a quien la usa' : `Tiene que caer a ${cAlc} casillas o menos (no en la propia)`); pedirCentro(); return; } }
+    lanzar(h);
+  }, `<b>🌀 ${hab && hab.nombre ? esc(hab.nombre) + ': marcá el centro del área' : 'Elegí el centro del área'}</b> <span>clic en el mapa (${Combatiente.areaTxt(radio)}${mioC ? cAlc === 1 ? ', en una casilla pegada' : `, a ${cAlc} o menos` : ''}) · Esc o clic derecho cancelan</span>`, true, cancelado);
+  pedirCentro();
 }
 
 /* ---------- Muerte de un jugador en el mapa (2026-09-26, pedido del dueño) ----------

@@ -1162,6 +1162,11 @@ const Combatiente = (() => {
         ...(c.danoDiferencia ? {diferencia: true} : {}), ...(c.drena ? {drena: true, drenaTope: Math.max(0, nf(c.drenaTope)), ...(nf(c.drenaPct) > 0 && nf(c.drenaPct) < 100 ? {drenaPct: Math.round(nf(c.drenaPct))} : {})} : {})} : null,   // drenaPct: cura solo ese % (2026-10-07, la Sanguijuela)
       efectos: (c.efectos || []).map(e => efectoDeEjecucion(conX && e && e.stacks === 'X' ? {...e, stacks: Math.max(1, Math.round(X))} : e)),   // stacks «X» (Apuntar, 2026-10-11)
       ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: nf(c.radio)} : {}),
+      // El centro del área, a `centroAlcance` casillas o menos de quien la usa (2026-10-13, Golpe al piso del Capataz kobold: «le pega al
+      // casillero enfrente suyo y hace daño en flor alrededor de donde golpea»; si golpea a alguien, alrededor de él).
+      ...(c.objetivo === 'area' && Math.round(nf(c.centroAlcance)) > 0 ? {centroAlcance: Math.round(nf(c.centroAlcance))} : {}),
+      // Solo a los aliados (2026-10-13, ¡A laburar! del Capataz kobold: un grito que bendice a los suyos y no a los rivales).
+      ...((c.objetivo === 'area' || c.objetivo === 'onda') && c.aliados ? {aliados: true} : {}),
       ...(c.objetivo === 'linea' ? {largo: Math.max(1, Math.round(nf(c.largo)) || 4)} : {}),   // línea recta desde quien la usa (2026-10-05, Varita láser)
       ...((c.objetivo === 'onda' || c.objetivo === 'cono') && c.ondaDodge ? {dodge: true} : {}),   // la onda o el cono que deja dodge roll (Daño en área, Ráfaga arcana)
       ...(c.objetivo === 'aliado' && c.conmigo ? {conmigo: true} : {}),   // un aliado o uno mismo (Heal del Support, 2026-10-11)

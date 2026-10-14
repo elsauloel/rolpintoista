@@ -798,6 +798,12 @@ prueba('🕳 Excavar (2026-10-13): cobra, se anuncia y le pide al mapa meter el 
   CreepAcciones.terminarHab(sc, h, p, ui);
   igual([p.error || '', p.auto, !!p.directo, sc.nitros, h.cdActual, llamados], ['', true, true, 4, 3, ['excavar', 'mesa']]);
 });
+prueba('Área con el centro pegado (Golpe al piso) y onda solo de aliados (¡A laburar!), 2026-10-13', () => {
+  const e = Combatiente.habEjecucion({nombre: 'Golpe al piso'}, {objetivo: 'area', radio: 1, centroAlcance: 1, tira: 'pdg', contra: ['eva'], dano: true, tipoDano: 'fisico', danoArma: true, efectos: [{nombre: 'Sentado'}]}, {armaDano: '1d10+5', stat: () => 0});
+  const o = Combatiente.habEjecucion({nombre: 'A laburar'}, {objetivo: 'onda', radio: 2, aliados: true, tira: '', contra: [], efectos: [{nombre: 'Bendecido'}]}, {});
+  const sin = Combatiente.habEjecucion({nombre: 'X'}, {objetivo: 'enemigo', centroAlcance: 1, aliados: true, tira: 'pdg', contra: ['eva']}, {stat: () => 0});
+  igual([e.centroAlcance, e.radio, e.dano.formula, e.dano.ignoraDef, o.aliados, o.radio, 'centroAlcance' in sin, 'aliados' in sin], [1, 1, '1d10+5', false, true, 2, false, false]);
+});
 prueba('Ataque con arreglos: dados extra de otro tamaño (+1d6, 2026-10-13) viajan al duelo', () => {
   const a = Combatiente.ataqueConArreglos({nombre: 'Picada'}, {modo: 'arma', arma: {dadoExtra: '1d6', fijo: 0}}, {arma: {}});
   const malo = Combatiente.ataqueConArreglos({nombre: 'X'}, {modo: 'arma', arma: {dadoExtra: 'mucho'}}, {arma: {}});

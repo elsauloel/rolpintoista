@@ -1193,17 +1193,28 @@ const Combatiente = (() => {
   }
   /* El daño que deja un estado según cuánto entró (2026-10-13, Carga Elemental; dueño: «que pueda existir como regla, pero que no sea la regla
      general»): `porDano = {estado, cada, mas1}` → 1 stack cada `cada` de daño que entró de verdad, mínimo 1 (Veneno cada 3);
-     con `mas1`, 1 y uno más cada `cada` (la Escarcha y la Armadura rota: 1, y un segundo cada 5). Sin daño, nada. Lo aplica el mapa del GM (js/13, dueloPorDano). */
+     con `mas1`, 1 y uno más cada `cada` (la Escarcha y la Armadura rota: 1, y un segundo cada 5). Sin daño, nada. Lo aplica el mapa del GM (js/13, dueloPorDano).
+     `desde`: solo si entró al menos eso; `tope`: como mucho tantos stacks (2026-10-13, Lluvia de esquirlas del Chamán del cristal, dueño:
+     «si le hace más de 4 puntos de daño, le aplica uno de escarcha» → {estado:'Escarcha', desde:5, tope:1}). */
   function porDanoNorm(p){
     if(!p || !String(p.estado || '').trim()) return null;
-    return {estado: String(p.estado).trim().slice(0, 30), cada: Math.max(1, Math.round(nf(p.cada)) || 4), ...(p.mas1 ? {mas1: true} : {})};
+    const desde = Math.max(0, Math.round(nf(p.desde))), tope = Math.max(0, Math.round(nf(p.tope)));
+    return {estado: String(p.estado).trim().slice(0, 30), cada: Math.max(1, Math.round(nf(p.cada)) || 4), ...(p.mas1 ? {mas1: true} : {}),
+      ...(desde > 1 ? {desde} : {}), ...(tope > 0 ? {tope} : {})};
   }
   function stacksPorDano(entro, p){
     const d = Math.max(0, Math.floor(nf(entro))), q = porDanoNorm(p);
-    if(!q || d <= 0) return 0;
-    return q.mas1 ? 1 + Math.floor(d / q.cada) : Math.max(1, Math.floor(d / q.cada));
+    if(!q || d <= 0 || (q.desde && d < q.desde)) return 0;
+    const n = q.mas1 ? 1 + Math.floor(d / q.cada) : Math.max(1, Math.floor(d / q.cada));
+    return q.tope ? Math.min(q.tope, n) : n;
   }
-  const porDanoTxt = p => { const q = porDanoNorm(p); return q ? (q.mas1 ? `${q.estado}: 1, y uno más cada ${q.cada} de daño` : `${q.estado}: 1 stack cada ${q.cada} de daño (mínimo 1)`) : ''; };
+  const porDanoTxt = p => {
+    const q = porDanoNorm(p);
+    if(!q) return '';
+    if(q.tope === 1) return `${q.estado}: 1${q.desde ? ` si entran ${q.desde} o más de daño` : ''}`;
+    const base = q.mas1 ? `${q.estado}: 1, y uno más cada ${q.cada} de daño` : `${q.estado}: 1 stack cada ${q.cada} de daño (mínimo 1)`;
+    return base + (q.desde ? `, si entran ${q.desde} o más` : '') + (q.tope ? `, hasta ${q.tope}` : '');
+  };
   /* ✨ Carga Elemental (Mago, 2026-10-13, dueño): los cinco elementos y lo que le cambian a la Ejecución de la skill de daño. */
   const CARGAS = {
     fuego: {nombre: 'Fuego', icono: '🔥', que: '+50 % de daño (para arriba)', duelo: {tipoDano: 'fuego', danoMult: 1.5}},

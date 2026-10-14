@@ -781,6 +781,14 @@ prueba('Carga Elemental (Mago, 2026-10-13): stacks según el daño que entra, la
     limpio.dano.porDano, Combatiente.cargable({}, base), Combatiente.cargable({}, {...base, tipoDano: 'fisico'}), Combatiente.cargable({deItem: 'x'}, base), typeof Confirmar.elegir],
     ['X', true, [0, 1, 1, 2, 2, 3], [1, 1, 1, 2], [1, 2], 'fuego', 1.5, 4, [['Parálisis', 10, 2]], {estado: 'Escarcha', cada: 5, mas1: true}, true, false, false, 'function']);
 });
+prueba('Estado según el daño con umbral y tope (Lluvia de esquirlas, 2026-10-13): 1 Escarcha si entran 5 o más', () => {
+  const p = {estado: 'Escarcha', desde: 5, tope: 1};
+  const st = [0, 4, 5, 12].map(d => Combatiente.stacksPorDano(d, p));
+  const limpio = Duelo.limpiarHab(Combatiente.habEjecucion({nombre: 'Lluvia', tiradaExtra: '1d6+2'},
+    {objetivo: 'area', radio: 1, tira: 'pdgmg', contra: ['eva'], dano: true, tipoDano: 'hielo', porDano: p}, {}));
+  igual([st, limpio.dano.porDano, Combatiente.porDanoTxt(p), Combatiente.stacksPorDano(20, {estado: 'Veneno', cada: 3, tope: 4})],
+    [[0, 0, 1, 1], {estado: 'Escarcha', cada: 4, desde: 5, tope: 1}, 'Escarcha: 1 si entran 5 o más de daño', 4]);
+});
 prueba('Ataque con arreglos: dados extra de otro tamaño (+1d6, 2026-10-13) viajan al duelo', () => {
   const a = Combatiente.ataqueConArreglos({nombre: 'Picada'}, {modo: 'arma', arma: {dadoExtra: '1d6', fijo: 0}}, {arma: {}});
   const malo = Combatiente.ataqueConArreglos({nombre: 'X'}, {modo: 'arma', arma: {dadoExtra: 'mucho'}}, {arma: {}});

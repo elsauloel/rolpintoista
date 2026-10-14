@@ -1599,3 +1599,10 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   sigilo, que pueden escribir) y después dibuja el lienzo (`dibujarLienzo`) con `soyGM = false` por un momento: sin ocultos, sin trampas
   ocultas ni lo invisible, con la niebla de los jugadores y el pozo del que está bajo tierra. Un cartel arriba (`#banner-como-jugador`) recuerda
   que se está viendo así y se toca para volver.
+- **🫳 Robar** (2026-10-14, dueño: «tendríamos que desarrollar el robo, puede ser divertido»; `js/47-robo.js`): una habilidad con el efecto
+  «Robo» en su Ejecución (dirigida, pegado; el Ladrón: Sigilo contra Percepción) — al aplicarse (`dueloAplicarEfecto` → `roboAplicar`; solo el GM,
+  `aplicaSolo` de js/14) saca una unidad al azar del cinturón del personaje (lo que publica `resumen.cinturon`), la pasa al cinturón del creep
+  ladrón (`CreepAcciones.alCinturon`, la del catálogo si se llama igual; con el cinturón lleno, igual) y le manda a la ficha el aviso «Robo»
+  (`FichaAcciones.aplicarEstadoRecibido` descuenta esa unidad). La Crónica lo cuenta y el ladrón huye: el cartel del dodge roll (`dodgeBanner.robo`,
+  hasta 3 casilleros, sin oportunidad). `roboBono` (antes de `Duelo.crear`, js/13): +2 a su tirada si viene en sigilo o por la espalda
+  (`enPuntoCiego`). Si lo matan, lo robado vuelve con el botín (es su cinturón). Pendiente: un personaje que le roba a un creep, robar oro.

@@ -837,6 +837,17 @@ prueba('🐾 Equipo natural de un creep (2026-10-14): da sus bonos pero no se su
   igual([its.includes('Piel de piedra'), its.includes('Chaleco de cuero'), /Piel de piedra/.test(CreepCalculo.dropsResumen(sc)), CreepCalculo.tarjetaPublica({...sc, hp: 10}).equipoNombres],
     [false, true, false, ['Piel de piedra', 'Chaleco']]);
 });
+prueba('🫳 Robo (2026-10-14): el aviso saca una unidad del cinturón; el resumen publica el cinturón', () => {
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
+  S.cinturon = [{id: 'p', nombre: 'Poción de HP', consumible: true, unidades: 2}, {id: 'v', nombre: 'Vela de sebo', consumible: true, unidades: 1}];
+  const toasts = [], ui = {cambio: () => {}, toast: t => toasts.push(t), presets: estadosPresetFicha()};
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Robo', item: 'Poción de HP'}, 'Ladrón', ui);
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Robo', item: 'Vela de sebo'}, 'Ladrón', ui);
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Robo', item: 'Vela de sebo'}, 'Ladrón', ui);
+  const pub = FichaResumen.resumen(S, {}).cinturon;
+  igual([S.cinturon.map(x => x.nombre + x.unidades), /te robó/.test(toasts[0]), /ya no lo tenías/.test(toasts[2]), pub, EstadosAplicar.limpiarSpec({nombre: 'Robo', item: 'Poción de HP'}).item],
+    [['Poción de HP1'], true, true, [{n: 'Poción de HP', u: 1}], 'Poción de HP']);
+});
 prueba('Ataque con arreglos: dados extra de otro tamaño (+1d6, 2026-10-13) viajan al duelo', () => {
   const a = Combatiente.ataqueConArreglos({nombre: 'Picada'}, {modo: 'arma', arma: {dadoExtra: '1d6', fijo: 0}}, {arma: {}});
   const malo = Combatiente.ataqueConArreglos({nombre: 'X'}, {modo: 'arma', arma: {dadoExtra: 'mucho'}}, {arma: {}});

@@ -124,6 +124,8 @@ const FichaResumen = (() => {
       // Desarmar trampas (talento, 2026-10-08): detecta trampas como Pisada atenta y el mapa le ofrece desarmarlas con la tirada del talento.
       desarmaTrampas: desarmaTrampasDe(S),
       // 🪙 ¿Tiene una Moneda Re-Roll para usar? (2026-10-09: el mapa apaga su botón si no; misma condición que FichaDuelo.monedaReroll)
+      // 🫳 Lo que lleva en el cinturón, para un robo (2026-10-14, vtt-hexgrid/js/47): nombre y unidades.
+      cinturon: (S.cinturon || []).filter(i => i && n(i.unidades) > 0 && !i.reservado).map(i => ({n: String(i.nombre || '').slice(0, 60), u: Math.min(99, Math.round(n(i.unidades)))})).slice(0, 20),
       moneda: [...(S.cinturon || []), ...(S.inventario || [])].some(i => i && (i.rerollMoneda || /moneda re-?roll/i.test(String(i.nombre || ''))) && n(i.unidades) > 0 && !i.reservado && !i.enMesa),
       pisadaAtenta: n(c.final.pisadaatenta) > 0 || !!desarmaTrampasDe(S), inamovible: n(c.final.inamovible), recuperarse: n(c.final.recuperarse), reflejos: n(c.final.reflejos),   // los primeros casilleros de cada turno, gratis (el mapa los descuenta del costo de moverse)   // Campo de visión (base 6 + ítems, pasivas y estados): el mapa lo suma a la luz de la escena para el radio de cada token
       // Crítico (2026-09-25): el mapa arma con esto la Calculadora de crítico sin que haya que escribirlo (equipo, habilidades y estados ya sumados).

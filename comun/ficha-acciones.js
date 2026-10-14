@@ -952,6 +952,16 @@ const FichaAcciones = (() => {
       ui.toast(`🩸 ${origen ? origen + ': ' : ''}${d < 0 ? 'diste' : 'recibiste'} ${fmt(Math.abs(nuevo - antes))} de vida (${fmt(antes)} → ${fmt(nuevo)})`);
       return;
     }
+    // 🫳 «Robo» (2026-10-14, vtt-hexgrid/js/47): un ladrón se llevó una unidad de este ítem del cinturón.
+    if(spec.nombre === 'Robo'){
+      const it = (S.cinturon || []).find(x => x && x.nombre === spec.item && num(x.unidades) > 0 && !x.reservado);
+      if(!it){ ui.toast(`🫳 ${origen ? origen + ' ' : ''}intentó robarte ${spec.item || 'algo'}, pero ya no lo tenías`); return; }
+      it.unidades = num(it.unidades) - 1;
+      if(it.unidades <= 0) S.cinturon = S.cinturon.filter(x => x !== it);
+      ui.cambio(['cinturon', 'refresh']);
+      ui.toast(`🫳 ${origen || 'Alguien'} te robó: ${spec.item}`);
+      return;
+    }
     // «Pierde No2» (2026-10-02, Sonic Boom): baja los No2 (`stacks` = cuántos); si llega a 0 y corresponde, queda Sentado.
     if(spec.nombre === 'Pierde No2'){
       const n = Math.max(0, Math.round(num(spec.stacks))), antes = num(S.nitros);

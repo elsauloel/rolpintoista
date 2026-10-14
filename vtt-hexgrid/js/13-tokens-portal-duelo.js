@@ -736,7 +736,8 @@ function dueloElegirObjetivoMapa(msg){
           ...['humo', 'luz', 'clava', 'rebota'].reduce((o, k) => b[k] ? {...o, [k]: true} : o, {}), ...(b.explota ? {explota: b.explota} : {})};   // virotes con mapa (js/33)
         if(msg.alDisparar){ try{ msg.alDisparar(); }catch(err){ console.error('No se pudo gastar la flecha:', err); } }
       }
-      const ataqueFinal = ataque && ataque.hab && ataque.hab.sagrado && ataque.hab.dano ? sagradoContra(ataque, t) : ataque;   // Smite: el doble contra un no-muerto o un demonio
+      let ataqueFinal = ataque && ataque.hab && ataque.hab.sagrado && ataque.hab.dano ? sagradoContra(ataque, t) : ataque;   // Smite: el doble contra un no-muerto o un demonio
+      if(typeof roboBono === 'function') ataqueFinal = roboBono(ataqueFinal, mio, t);   // 🫳 Robar: +2 en sigilo o por la espalda (js/47)
       Duelo.crear({yo, ataque: ataqueFinal, espalda, embestida, quieto, primeraSangre, tiro, flecha}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
     }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + (minimo ? `de ${minimo} a ` : '') + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : conArco ? ` · 🏹 el arco necesita ${Combatiente.arcoLibresTxt(ataque)} en el medio` : ''}${mioTiro ? ' · la línea muestra si el tiro pasa' : ''}${nIdeal ? ' · 💠 en celeste, tu distancia ideal (' + esc(Combatiente.idealTxt(ataque.ideal)) + ')' : ''}</span>`, true, cancelado);
@@ -970,6 +971,12 @@ function renderDodgeBanner(){
     AvisoCombate.cartel('dodge', {icono: '🏹', titulo: `${dodgeBanner.nombre}: dodge roll para contraatacar`, posicion: 'abajo',
       texto: 'Con el arco, para contraatacar: arrastrá el token 1 o 2 casilleros, más lejos del atacante (tienen que alcanzarte los No2; sin ataque de oportunidad).',
       botones: [{texto: '✋ No contraataco', alClic: () => { dodgeBanner = null; renderDodgeBanner(); }}]});
+    return;
+  }
+  if(dodgeBanner.libre && dodgeBanner.robo){   // 🫳 la huida del ladrón (js/47)
+    AvisoCombate.cartel('dodge', {icono: '🫳', titulo: `${dodgeBanner.nombre} huye con lo robado`, posicion: 'abajo',
+      texto: `Arrastrá el token hasta ${typeof ROBO_HUIDA !== 'undefined' ? ROBO_HUIDA : 3} casilleros (paga sus No2; sin ataque de oportunidad).`,
+      botones: [{texto: '✋ Se queda', alClic: () => { dodgeBanner = null; renderDodgeBanner(); }}]});
     return;
   }
   if(dodgeBanner.libre){
@@ -1714,6 +1721,7 @@ async function dueloAplicarEfectoBase(d, ef){
   // 💪 Empower (Support, 2026-10-12, decisiones del dueño): +3 a una tirada ya hecha de quien la recibe (vos o un aliado a la vista). Si esa
   // persona está en un duelo que todavía se puede reabrir, se suma a su última tirada y el duelo se vuelve a resolver (como la Polilla;
   // con el +3 empatado pierde quien lo recibió). Si no, se anuncia sobre su última tirada de la Mesa. Sin límite: se puede apilar.
+  if(/^robo$/i.test(String(spec.nombre || '').trim()) && typeof roboAplicar === 'function') return roboAplicar(d, t);   // 🫳 Robar (js/47)
   if(spec.nombre === 'Empower') return empowerAplicar(d, t, Math.round(num(ef.suma)) || 3);
   if(spec.nombre === 'Enyetar' && typeof enyetarAplicar === 'function') return enyetarAplicar(d, t);   // 🐈‍⬛ Enyetar (Debuffer, 2026-10-12, js/38)
   // La cosecha (2026-10-07, Varita de la cosecha): la marca lleva el nombre de quien la puso («Cosecha de juan»); si muere marcado, ese

@@ -9,13 +9,6 @@
 > capturas. Al probar algo: pasarlo a «Probado» con fecha, qué se vio y si hubo que arreglar algo.
 
 ## Pendientes
-- [ ] **🫳 Robo en sigilo, en secreto** (2026-10-14): el ladrón en sigilo ejecuta Bolsillo ajeno → sin duelo ni Mesa; al GM, el cartel «Robo en
-  secreto» con su Sigilo; a juan, «🤨 ¿Sentiste un movimiento raro? Tirá Percepción». Si pierde: «Mmm… Puede que estés flasheando», el ítem pasa
-  callado, el ladrón sigue en sigilo y al empezar el turno de juan (o en el ⟳) «Sentís el cinturón más liviano…». Si gana: «¡juan pescó a…!», el
-  ladrón pierde el sigilo y queda Marcado 2 turnos. «🎲 Tirar por juan» del GM. Hace falta ver las dos ventanas (GM y juan) a la vez.
-- [ ] **👁 Marcado al perder el sigilo** (2026-10-14): descubierto por el cono, la Percepción aumentada, una trampa o al robar → Marcado 2 turnos
-  (no puede volver a entrar en sigilo); salir con el botón no marca.
-
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no
@@ -45,6 +38,11 @@
 - [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): un crítico de la Puñalada (Rengo 2 y Lisiado 1). El pozo visto como jugador ya se vio (con
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **🫳 Robo en sigilo, en secreto + Marcado al perder el sigilo** (2026-10-14, GM rolpintoista + juan de elsaulo, las dos ventanas a la vista):
+  ladrón en sigilo → Bolsillo ajeno → sin duelo ni Mesa; el GM ve «Robo en secreto» con su Sigilo (8, con +2); juan ve «🤨 ¿Sentiste un movimiento
+  raro? juan, tirá Percepción». 1.ª vez: 9 contra 8 → «¡Lo pescaste! …» y en la Crónica «¡juan pescó a Ladrón (prueba) metiendo mano en su
+  cinturón!»; el ladrón quedó sin sigilo y **Marcado 2t**. 2.ª vez: Sigilo 11, Percepción 7 → «Mmm… Puede que estés flasheando», la Vela de sebo
+  pasó callada y al empezar el turno de juan le apareció «Sentís el cinturón más liviano… y te das cuenta de que te falta: Vela de sebo».
 - [x] **🗡 Golpe doble del Ladrón del monte** (2026-10-14, Claude · pruebas, en el «Ladrón (prueba)»): Ejecutar → juan → el duelo dice «con
   Cuchillo · Tipo 4 · +1d4 de daño», «Los No2 de este ataque ya los cobró la habilidad»; PdG 4 contra Evasión 1 → pegó; daño «1d4 + 5 + 1d4» =
   10 − Defensa 2 = 8. Sin probar: el +2 por la espalda en sigilo.

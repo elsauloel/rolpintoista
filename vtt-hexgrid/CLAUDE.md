@@ -231,6 +231,11 @@ línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar
   empezar la ronda. La lista los muestra con los apagados. `dueloTerminaTurno(d)` (js/04): un ataque con `terminaTurno` que se resuelve manda
   a quien atacó al final del orden y, si era su turno, pasa el turno (`iniciativaSiguiente({orden, termina, desde})`). Expuesto: sin oportunidad
   (`expuestoPub`, js/17) ni dodge roll (`tokenExpuesto`, js/13).
+- **▶ Es su turno** (2026-10-15, dueño): clic derecho del GM en una fila de la iniciativa → `iniciativaDarTurno(id)` (js/04) pregunta
+  (Confirmar.elegir) *Turno normal* = `iniciativaSiguiente({a: id})` (el mismo pase de turno, directo a ese, sin cambiar de ronda) o *Turno
+  libre* = `iniciativa.libre = {id, vuelve}` (turno se mueve sin fin/inicio de turno ni `paso`; ▶ Siguiente pasa a ser «↩ Volver a…» →
+  `iniciativaVolverDeLibre`). `guardarIniciativa` conserva `libre` (también cuando escribe un jugador); Ordenar y Limpiar lo terminan. La
+  lista muestra arriba al del turno libre (⚡) y gira desde `vuelve`.
 - **Orden de turnos (iniciativa)**: tablero flotante y plegable arriba a la
   izquierda del mapa (`#iniciativa`, estilo "Turn Order" de Roll20) — **de
   siempre** (decidido 2026-09-22: antes visible solo en modo combate y

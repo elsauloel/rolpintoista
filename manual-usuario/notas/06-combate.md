@@ -16,6 +16,9 @@ Un combate se juega en **rondas**. Dentro de cada ronda, todos actúan de a uno,
 1. El GM pasa el mapa a [[Modo narrativo y modo combate|modo combate]].
 2. **Todos tiran [[Iniciativa]]** (un stat de [[Agilidad]]). El resultado define el **orden**, que se intercala libremente entre aliados y enemigos: es personaje por personaje, no por bando.
 3. Ese orden aparece como una lista flotante en el mapa (**Orden de turnos**, arriba a la izquierda), y el GM avanza con **▶ Siguiente**.
+4. Para ocasiones especiales, el GM puede darle el turno a cualquiera: **clic derecho sobre su nombre** en el Orden de turnos. Pregunta cómo:
+   - **▶ Turno normal**: cuenta como su turno de la ronda. Termina el turno del que estaba jugando, el elegido recarga y bajan sus cooldowns y estados, y el orden sigue desde él (los que estaban en el medio se saltean esta ronda).
+   - **⚡ Turno libre**: juega ahora sin que pase el turno (no recarga ni baja nada). Mientras dura, aparece arriba de la lista con ⚡, y el botón del GM dice **↩ Volver a…**: al tocarlo, el turno vuelve a quien lo tenía, también sin recargar ni bajar nada.
 
 ## La ronda
 1. Cada uno actúa **en su turno**, en orden.

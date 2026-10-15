@@ -528,6 +528,9 @@ const Duelo = (() => {
       const be = limpiarEspalda(cfg.ataque.espalda);
       if(be) inicial.ataque.espalda = be;
     }
+    // 🗡 Ataque por la espalda, regla general (2026-10-15, dueño: «simplemente es un +1 a la pdg»; Pasos silenciosos, +1 más): lo calcula el mapa
+    // (quien ataca está en la cuña ciega del defensor, sin hacer falta sigilo) y se suma al PdG al guardarlo, junto con el bono del arma si hay.
+    if(_num(cfg.espaldaPdg) > 0 && !hab){ inicial.ataque.porLaEspalda = true; inicial.ataque.espaldaPdg = Math.min(5, Math.round(_num(cfg.espaldaPdg))); }
     if(hab){
       inicial.hab = hab;   // (la regla de Firestore tiene que conocer el campo `hab`)
       if(hab.soloDodge && cfg.grupo){ inicial.fase = 'dodge'; inicial.estado = 'esperando'; inicial.contacto = {gana: 'defensor', dif: 0, soloDodge: true}; }   // la Tormenta arcana: directo al dodge roll
@@ -559,7 +562,10 @@ const Duelo = (() => {
     if(m.dadoExtra) t.push(`+${_esc(m.dadoExtra)} de daño`);
     if(_num(m.fijo)) t.push(`${_num(m.fijo) > 0 ? '+' : ''}${_fmt(m.fijo)} de daño fijo`);
     if(d.ataque && d.ataque.sinParry) t.push('no se puede parrear');
-    if(d.ataque && d.ataque.porLaEspalda) t.push(`🗡 por la espalda${d.ataque.espalda ? ': ' + espaldaTxt(d.ataque.espalda) : ''}`);
+    if(d.ataque && d.ataque.porLaEspalda){
+      const pe = [_num(d.ataque.espaldaPdg) > 0 ? `+${_fmt(d.ataque.espaldaPdg)} PdG` : '', d.ataque.espalda ? espaldaTxt(d.ataque.espalda) : ''].filter(Boolean).join(', ');
+      t.push(`🗡 por la espalda${pe ? ': ' + pe : ''}`);
+    }
     if(d.ataque && _num(d.ataque.embestida) > 0) t.push(`🐂 embestida: +${_fmt(d.ataque.embestida)} PdG`);
     if(d.ataque && _num(d.ataque.quieto) > 0) t.push(`💍 ${d.hab ? 'foco' : 'pulso quieto'}: +${_fmt(d.ataque.quieto)} ${d.hab ? 'PdG.Esp' : 'PdG'}`);
     if(d.ataque && _num(d.ataque.primeraSangre) > 0) t.push(`💍 primera sangre: +${_fmt(d.ataque.primeraSangre)} de daño si pega`);
@@ -854,6 +860,8 @@ const Duelo = (() => {
       m[campo] = tiro;
       const be = campo === 'pdg' && m.ataque && m.ataque.espalda;   // por la espalda: el PdG del arma o la habilidad
       if(be && be.pdg) m.pdg = {...tiro, total: tiro.total + be.pdg, mod: tiro.mod + be.pdg, formula: `${tiro.formula} +${be.pdg} espalda`.slice(0, 60)};
+      const bep = campo === 'pdg' && m.ataque ? _num(m.ataque.espaldaPdg) : 0;   // 🗡 ataque por la espalda (la regla general, 2026-10-15)
+      if(bep > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + bep, mod: p0.mod + bep, formula: `${p0.formula} +${bep} espalda`.slice(0, 60)}; }
       const emb = campo === 'pdg' && m.ataque ? _num(m.ataque.embestida) : 0;   // la Embestida de las piernas
       if(emb > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + emb, mod: p0.mod + emb, formula: `${p0.formula} +${emb} embestida`.slice(0, 60)}; }
       const qto = campo === 'pdg' && m.ataque ? _num(m.ataque.quieto) : 0;   // Pulso quieto / Foco (anillos)

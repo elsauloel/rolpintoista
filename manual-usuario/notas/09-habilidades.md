@@ -88,6 +88,7 @@ Podés **comprar la misma pasiva varias veces** y los bonos se suman. El **tope 
 | **Golpe fuerte**, **Puntería**, **Ojo crítico** | Más Daño, PdG, Crítico |
 | **Pies ligeros**, **Impulso** | Evasión, Nitros |
 | **Prisa** | Vas primero en el orden de turnos (entre dos con Prisa, decide la tirada de iniciativa) |
+| **Pasos silenciosos** | No te oyen acercarte por la espalda (te ven recién pegado) y atacar por la espalda suma +1 PdG más ([[Atacar por la espalda]]) |
 | **Espalda de mula**, **Bolsillos extra** | Carga y capacidad |
 
 > [!question] Todavía por definir

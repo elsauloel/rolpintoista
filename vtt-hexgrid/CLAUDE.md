@@ -1611,3 +1611,13 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   Sólidos. `oidoPorJugadores(t)` la usan `tokenVisiblePorNiebla`, `visibleParaJugadores` (js/29) y la última posición vista: un rival ahí se
   ve aunque esté en el punto ciego o en la oscuridad, salvo en sigilo (lo decide antes el sigilo) o con `pasosSilenciosos(t)` (un estado con
   `pasosSilenciosos` o llamado «Pasos silenciosos»; quién lo da, P200). No descubre el terreno: el token se ve atenuado bajo la niebla gris.
+- **🗡 Ataque por la espalda, 👣 Pasos silenciosos y ↻ darse vuelta** (2026-10-15, reglas del dueño, P200): `enCunaCiega(atq, def)` (js/13, la
+  geometría de la cuña ciega; `porLaEspalda` la usa con sigilo) y `espaldaBono(atq, def, ataque)` = +1 PdG a cualquier ataque (no una habilidad
+  dirigida) desde el punto ciego, +1 más con `pasosSilenciosos(atq)`; viaja a `Duelo.crear` como `cfg.espaldaPdg` (también el de oportunidad,
+  js/17). `pasosSilenciosos(t)` (js/02) mira el estado, la pasiva publicada (personaje: `resumen.pasosSilenciosos`; creep: `pasosSilenciosos` de su
+  tarjeta pública, que lee js/09; el GM, la ficha privada) y hace que se lo oiga recién pegado (`nieblaOida1`, js/03). **`js/49-darse-vuelta.js`**:
+  cada 700 ms, para los personajes e invocaciones que maneja esta pantalla (`bnManejo`), en combate, si un rival sin sigilo ni pasos silenciosos
+  entra en su cuña ciega a `OIDO_RADIO` o menos (sin pared en el medio) y el propio no se movió ni giró, pregunta «¿Se da vuelta?»
+  (`Confirmar.preguntar` → `editarToken` con `rotacionDePaso`); con otro rival pegado y a la vista, «¡Flanqueado!» (`AvisoCombate.mostrar`). Las dos
+  cosas van a la Crónica. Los creeps no reciben la oferta (P201).
+

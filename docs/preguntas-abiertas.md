@@ -1002,9 +1002,17 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   personaje se tira sola con su valor publicado, y nada va a la Mesa ni a la Crónica pública. Falta decidir: (a) si sale bien, ¿el robado se entera
   en el momento («te falta algo del cinturón»), recién al buscarlo, o nunca hasta que mire? (b) si sale mal, ¿lo pillan (queda revelado y se anuncia
   «juan pilló a X metiéndole la mano»)? Sin sigilo, el robo sigue siendo un duelo a la vista.
-- **P200. Pasos silenciosos: cómo se consiguen — 2026-10-15.** Regla nueva (dueño, el mismo día, hecha): **el oído** — un rival a 3 casilleros
+- ✅ **P200. Pasos silenciosos: cómo se consiguen — 2026-10-15.** **Decidido (dueño, el mismo día):** «Ataque por la espalda» = +1 PdG
+  para cualquiera en el punto ciego del defensor; «Pasos silenciosos» es una **pasiva de job** que suma +1 PdG más por la espalda, y a quien
+  la tiene se lo ve recién pegado, sin darle tiempo al otro a darse vuelta. Sin pasos silenciosos, al oírlo a 3 casilleros el personaje puede
+  darse vuelta gratis, salvo que esté **flanqueado** (enfrentando a otro rival). Construido (comun/pasivas.js, vtt-hexgrid/js/02, 13, 17, 49;
+  comun/duelo.js). Planteo original: Regla nueva (dueño, el mismo día, hecha): **el oído** — un rival a 3 casilleros
   o menos de un personaje se ve aunque esté en su punto ciego (salvo en sigilo; las paredes y los Sólidos tapan; no descubre el terreno;
   `OIDO_RADIO`, vtt-hexgrid/js/02–03). La excepción, en palabras del dueño: «ahí ya podemos jugar con habilidades, pasos silenciosos, sin que
   sea necesariamente sigilo, como un sigilo soft». El mapa ya la respeta: un estado con `pasosSilenciosos` (o llamado «Pasos silenciosos»)
   no se oye. Falta decidir quién lo tiene y cómo: ¿una pasiva (para personajes y creeps), un estado que da una habilidad (cuántos turnos,
   cuánto cuesta), o algo propio de ciertos creeps (lobos, felinos, goblins exploradores)? ¿Pisar ciertos terrenos (hojas secas, agua) lo anula?
+- **P201. ¿Los creeps también se dan vuelta? — 2026-10-15.** La regla del dueño habla del personaje: «el pj debe tener la opción de darse
+  vuelta». Hoy la pregunta le aparece solo a quien maneja un personaje o una invocación (vtt-hexgrid/js/49); a un creep que un personaje se le
+  acerca por la espalda, el GM lo gira a mano si quiere. ¿Va también para los creeps (la pregunta al GM), o los creeps «poco inteligentes» no
+  se dan vuelta? Y, relacionado: la Evasión 1 de atacar desde el sigilo por la espalda (regla del 2026-09-26, a mano), ¿sigue además del +1 PdG?

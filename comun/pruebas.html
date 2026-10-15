@@ -889,6 +889,13 @@ prueba('La 🪪 de un creep vivo muestra solo qué lleva; derrotado, los nombres
   igual([vivo.armaNombre, vivo.equipoNombres, muerto.armaNombre, muerto.equipoNombres[0], nat.armaNombre],
     ['Pico', ['Varita', 'Capucha', 'Varita'], 'Pico de juguete', 'Varita del susurro', 'Dientes de rata']);
 });
+prueba('👣 Pasos silenciosos (2026-10-15): la pasiva sube el stat del personaje y la tarjeta pública del creep lo dice', () => {
+  const pas = PASIVAS_BASE.find(p => p.poolId === 'pasos-silenciosos');
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 3, agl: 3, des: 5, esp: 3}, pasivas: [{id: 'p1', ...pas}]}).S);
+  const sc = {hp: 5, equipo: [], estados: [], pasivas: [{id: 'p1', ...pas, compras: 1}]};
+  igual([!!pas, FichaCalculo.calcular(S).final.pasossilenciosos, CreepCalculo.tarjetaPublica(sc).pasosSilenciosos, CreepCalculo.tarjetaPublica({hp: 5, equipo: []}).pasosSilenciosos],
+    [true, 1, true, false]);
+});
 prueba('Ataque con arreglos: un efecto con probabilidad la conserva (Veneno ×4, 4 en d4); sin probabilidad, entra siempre', () => {
   const a = Combatiente.ataqueConArreglos({nombre: 'Mordisco'}, {modo: 'arma', arma: {perfora: 1}, efectos: [{nombre: 'Veneno', stacks: 4, caras: 4, exitos: 1}, {nombre: 'Sangrado'}]}, {arma: {}});
   igual([a.perfora, a.efectos.map(e => [e.nombre, e.caras, e.exitos, e.spec.stacks])], [1, [['Veneno', 4, 1, 4], ['Sangrado', 1, 1, undefined]]]);
@@ -1907,7 +1914,7 @@ prueba('la 🪪 pública: solo los nombres del arma (también la natural) y del 
   const sc = creepPrueba({notas: '  Huele a pantano.  ', equipo: [{nombre: 'Yelmo', tipoItem: 'cabeza', def: 2, mods: [{stat: 'con', val: 1}]}, {nombre: ''}]});
   const nat = CreepCalculo.tarjetaPublica(creepPrueba({armaNombre: 'Garras', armaNatural: true}));
   igual([CreepCalculo.tarjetaPublica(sc), nat.armaNombre, nat.armaNatural, nat.equipoNombres],
-    [{armaNombre: 'Hacha', armaNatural: false, equipoNombres: ['Yelmo'], notas: 'Huele a pantano.', tipoCriatura: ''}, 'Garras', true, []]);   // + el tipo de criatura (Matabestias, 2026-10-11)
+    [{armaNombre: 'Hacha', armaNatural: false, equipoNombres: ['Yelmo'], notas: 'Huele a pantano.', tipoCriatura: '', pasosSilenciosos: false}, 'Garras', true, []]);   // + el tipo de criatura (Matabestias, 2026-10-11)
 });
 prueba('Parry y Bloqueo: con su arma o un escudo; un arma natural sola no alcanza', () => {
   const nat = creepPrueba({armaNatural: true}), conEscudo = creepPrueba({armaNatural: true, equipo: [{nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 3}]});

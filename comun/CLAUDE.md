@@ -1569,3 +1569,9 @@ versión parecida en más de una, es candidato a juntar.
   equipos inspirados en el catálogo que no dejen el drop»): una pieza del equipo de un creep con `natural: true` da sus bonos pero no se suelta
   (`CombateFin.itemsDeCreep`, y por eso el botín estimado; `CreepCalculo.dropsResumen`); en la tarjeta pública se ve con su nombre, como el arma
   natural. El 🐾 de cada pieza en GM Tools (editor del creep y su vista) la marca o desmarca.
+- **🗡 Por la espalda, regla general, y 👣 Pasos silenciosos** (2026-10-15, P200): `duelo.js` acepta `cfg.espaldaPdg` (lo calcula el mapa: +1 en el
+  punto ciego, +2 con Pasos silenciosos) → `ataque.porLaEspalda` + `ataque.espaldaPdg`, sumado al PdG al guardarlo («+N espalda») y al texto
+  «🗡 por la espalda: +N PdG»; se suma al bono «por la espalda» del arma (que sigue pidiendo sigilo). Stat nuevo `pasossilenciosos`
+  (`FichaCalculo.EXTRA`; `FichaResumen` publica `pasosSilenciosos`; `CreepCalculo.tarjetaPublica` publica el booleano) y la pasiva
+  `pasos-silenciosos` en `pasivas.js` (jobCosto 1).
+

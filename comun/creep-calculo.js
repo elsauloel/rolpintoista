@@ -468,6 +468,7 @@ const CreepCalculo = (() => {
       equipoNombres: (Array.isArray(sc.equipo) ? sc.equipo : []).map(it => it && it.natural ? nom(it.nombre) : ver(it && it.nombre)).filter(Boolean).slice(0, 30),   // lo natural se ve con su nombre, como el arma natural
       notas: String(sc.notas || '').trim().slice(0, 600),
       tipoCriatura: tipoDe(sc).slice(0, 30),   // el tipo de criatura (Matabestias de los arcos, 2026-10-11)
+      pasosSilenciosos: num(modTotal(sc, 'pasossilenciosos')) > 0,   // 👣 (2026-10-15): el mapa de los jugadores no lo hace oír a 3 casilleros
     };
   }
   // Alcance de su arma, en casilleros: un arma de rango usa su Rango; una de cuerpo a cuerpo, 1 + lo que le sume a Rango.

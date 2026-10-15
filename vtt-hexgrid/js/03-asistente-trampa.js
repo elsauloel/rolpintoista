@@ -524,7 +524,7 @@ function daVision(t){
 // se movió, y suma lo nuevo a lo descubierto. Se llama al empezar a dibujar.
 function nieblaActualizar(){
   if(!nieblaActiva){
-    if(nieblaVista.size || nieblaFantasmas.size || nieblaFirma){ nieblaVista = new Set(); nieblaOida = new Set(); nieblaFantasmas.clear(); nieblaFirma = ''; }
+    if(nieblaVista.size || nieblaFantasmas.size || nieblaFirma){ nieblaVista = new Set(); nieblaOida = new Set(); nieblaOida1 = new Set(); nieblaFantasmas.clear(); nieblaFirma = ''; }
     return;
   }
   const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${t.tipo},${enSigilo(t) ? 1 : 0},${daVision(t) ? radioVisionDe(t) + '/' + luzPortadaDe(t) : 0}`).join('|') + '#' + solidosFirma() + '#' + nieblaSet().size;
@@ -541,7 +541,7 @@ function nieblaActualizar(){
   });
   nieblaVista = vista;
   // 👂 Lo que se oye (2026-10-15): la flor de OIDO_RADIO alrededor de cada uno, para todos lados; las paredes y los Sólidos tapan.
-  const oida = new Set(), solidosO = solidosSet(), paredesO = hayParedes();
+  const oida = new Set(), oida1 = new Set(), solidosO = solidosSet(), paredesO = hayParedes();
   tokens.forEach(t => {
     if(!daVision(t)) return;
     const c0 = hexACubo({col: t.col, fila: t.fila}), origen = {col: t.col, fila: t.fila};
@@ -549,9 +549,10 @@ function nieblaActualizar(){
       const col = cuboACol(c0.q + o.dq, c0.r + o.dr), fila = cuboAFila(c0.q + o.dq, c0.r + o.dr);
       if((solidosO.size || paredesO) && !lineaLibre(origen, {col, fila}, solidosO, !paredesO)) return;
       oida.add(nbPack(col, fila));
+      if(Math.max(Math.abs(o.dq), Math.abs(o.dr), Math.abs(o.dq + o.dr)) <= 1) oida1.add(nbPack(col, fila));   // pegado: lo oye aunque camine en silencio
     });
   });
-  nieblaOida = oida;
+  nieblaOida = oida; nieblaOida1 = oida1;
   // Última posición vista de lo que no es aliado: se anota mientras se ve (o se oye).
   tokens.forEach((t, id) => {
     if(t.tipo === 'pj' || t.oculto || enSigilo(t)) return;   // en sigilo no se sigue su rastro

@@ -344,16 +344,29 @@ Al terminar un combate, un personaje **inconsciente** recibe solo el **25%** de 
 
 +++
 titulo: Atacar por la espalda
-alias: [Ataque por la espalda, Por la espalda, Flanquear]
+alias: [Ataque por la espalda, Por la espalda, Flanquear, Flanqueado, Darse vuelta]
 tags: [combate, sigilo, regla]
 estado: confirmado
 +++
-Regla del dueño (2026-09-26). **No se automatiza: es una regla para anotar**; la mesa la aplica a mano.
-- **Sin sigilo:** si alguien aparece por la espalda del defensor, **el defensor simplemente se da vuelta** y se defiende como siempre ([[Defenderse de un ataque]]). No hay penalidad por estar de espaldas.
-- **Con sigilo:** si el atacante está en [[Sigilo]] y ataca por la espalda, **la Evasión del defensor es 1**: por regla la tirada de Evasión vale 1 (como cuando el [[Stun]] hace fallar la Evasión). Es el premio de acercarse sin que te vean.
-- **Excepciones (después):** situaciones en las que el defensor **no puede darse vuelta**, por ejemplo estando [[Inmovilizado]]; se definen más adelante.
+Reglas del dueño (2026-10-15; la de sigilo, del 2026-09-26).
+
+## +1 a la PdG
+Si quien ataca está **en el punto ciego** del defensor (la cuña de atrás, la que no ve), el ataque suma **+1 a la PdG**. Vale a cualquier distancia y no hace falta estar en [[Sigilo]]. Con la pasiva **Pasos silenciosos**, **+1 más** (+2 en total).
+
+## Darse vuelta
+Un enemigo que se acerca por la espalda **se oye** a 3 casilleros o menos ([[Niebla de guerra|el oído]]). En ese momento, el personaje puede **darse vuelta** para no darle la espalda, **sin costo de No2**.
+- **Flanqueado:** si ya está enfrentando a otro rival (uno pegado y a la vista), **no puede darse vuelta**: el que viene por atrás le queda por la espalda.
+- **Pasos silenciosos:** a quien la tiene se lo ve recién **al quedar pegado**, y no da la oportunidad de darse vuelta.
+
+## Con sigilo
+Si el atacante está en [[Sigilo]] y ataca por la espalda, **la Evasión del defensor es 1** (como cuando el [[Stun]] hace fallar la Evasión), y las armas que lo traen (dagas, estiletes) suman su bono «por la espalda».
+
+> [!info] Qué hace el mapa solo
+> ⚙ El +1 (y el +2 con Pasos silenciosos) se suma solo en el duelo, también en el ataque de oportunidad. ⚙ La pregunta de darse vuelta le aparece a quien maneja al personaje (o a la invocación), solo en modo combate, y lo gira solo; si está flanqueado, se lo avisa. ✋ A mano: la Evasión 1 del ataque desde el sigilo.
+
 > [!question] A confirmar
-> «La evasión defensora debería ser una» se anotó como **Evasión = 1** (el mismo criterio que Stun). Si se refería a otra cosa (por ejemplo, tirar un solo dado), corregir acá.
+> - La Evasión 1 desde el sigilo, ¿sigue igual ahora que por la espalda ya hay un +1 a la PdG?
+> - ¿Los creeps también pueden darse vuelta cuando un personaje se les acerca por atrás? Hoy la pregunta es solo para los personajes y sus invocaciones.
 
 +++
 titulo: Sigilo
@@ -429,7 +442,7 @@ Con la **niebla de guerra** prendida (la activa el GM por mapa), **solo ves lo q
 - **Negro**: nunca visto. No se ve ni el mapa ni los tokens.
 - **Gris semitransparente**: ya descubierto pero fuera de la visión de ahora. Se ve el mapa, pero **no los tokens** que no sean aliados.
 - **Visión por defecto:** un radio de **6 casilleros** menos una **cuña ciega de 120° hacia atrás**. Gira con el frente del token.
-- **El oído:** un enemigo que se acerca **a 3 casilleros o menos**, aunque venga por la espalda (o desde la oscuridad), **se oye y se ve**. Las paredes y los obstáculos sólidos lo tapan. No vale para quien está en [[Sigilo]] ni para quien tiene **pasos silenciosos** (un sigilo suave que pueden dar algunas habilidades). Oírlo no descubre el terreno de alrededor.
+- **El oído:** un enemigo que se acerca **a 3 casilleros o menos**, aunque venga por la espalda (o desde la oscuridad), **se oye y se ve**. Las paredes y los obstáculos sólidos lo tapan. No vale para quien está en [[Sigilo]]; a quien tiene **Pasos silenciosos** (una pasiva, un sigilo suave) se lo ve recién al quedar pegado. Oírlo no descubre el terreno de alrededor. Cuando lo oís venir por la espalda, podés darte vuelta: ver [[Atacar por la espalda]].
 - Cada jugador ve la **unión** de lo que ven todos los personajes (incluidas las [[Invocaciones]] mientras estén invocadas y vivas).
 - **Lo descubierto es del grupo y persiste.**
 - Cuando un enemigo sale de tu visión queda una marca **"?"** donde lo viste por última vez.

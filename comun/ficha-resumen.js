@@ -101,6 +101,7 @@ const FichaResumen = (() => {
       percepcion: n(c.final.percepcion),   // Percepción (de Destreza, 2026-09-22): por si el mapa la necesita más adelante
       sigilo: n(c.final.sigilo),   // Sigilo (2026-10-04): el mapa lo tira cuando lo intentan descubrir
       prisa: n(c.final.prisa),   // 💨 Prisa (2026-10-15): va primero en el orden de turnos
+      pasosSilenciosos: n(c.final.pasossilenciosos),   // 👣 Pasos silenciosos (2026-10-15): el mapa no lo hace oír a 3 y suma +1 PdG por la espalda
       // Resistencias elementales (2026-10-04): el mapa las resta al daño de su elemento.
       resfuego: n(c.final.resfuego), reshielo: n(c.final.reshielo), resrayo: n(c.final.resrayo), restoxico: n(c.final.restoxico), resacido: n(c.final.resacido),
       rng: n(c.final.rng),               // Rango (de Destreza): el visualizador de rango (📏) y el alcance de todo, también de la magia (2026-10-07)

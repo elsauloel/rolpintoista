@@ -54,6 +54,7 @@ let nieblaVista = new Set();         // lo que ven ahora los personajes jugadore
    token: no descubre la niebla del terreno. */
 const OIDO_RADIO = 3;
 let nieblaOida = new Set();          // las casillas que oyen ahora los personajes jugadores
+let nieblaOida1 = new Set();         // las de al lado (a quien camina con pasos silenciosos se lo oye recién pegado)
 let nieblaFirma = '';                // para recalcular solo cuando algo se movió
 let nieblaFantasmas = new Map();     // tokenId -> {col, fila}: última posición vista
 let nieblaComoJugador = false;       // solo GM, por navegador
@@ -80,13 +81,22 @@ function enSigilo(t){
   // Marcado (2026-10-05): no puede estar en sigilo (la marca se lo saca; esto cubre el ratito hasta que se guarda).
   return e.estados.some(s => nom(s) === 'sigilo') && !e.estados.some(s => s && s.activo !== false && (s.marcado || nom(s) === 'marcado'));
 }
-// 👂 Pasos silenciosos (2026-10-15): un estado con `pasosSilenciosos` (o que se llama así) no se oye al acercarse por la espalda.
+// 👣 Pasos silenciosos (2026-10-15, dueño): la pasiva (un personaje la publica en su resumen; un creep, en su tarjeta pública; el GM la ve en la
+// ficha privada) o un estado con `pasosSilenciosos` (o que se llama así). Se lo oye recién pegado y atacar por la espalda le suma +1 PdG más (js/13).
 function pasosSilenciosos(t){
+  if(!t) return false;
   const e = estadoDe(t);
-  return !!(e && e.estados.some(s => s && s.activo !== false && (s.pasosSilenciosos || String(s.nombre || '').trim().toLowerCase() === 'pasos silenciosos')));
+  if(e && e.estados.some(s => s && s.activo !== false && (s.pasosSilenciosos || String(s.nombre || '').trim().toLowerCase() === 'pasos silenciosos'))) return true;
+  const v = vinculo(t);
+  if(t.tipo === 'creep'){
+    if(v && v.pasosSilenciosos) return true;
+    const sc = soyGM && typeof creepPrivadoDe === 'function' ? creepPrivadoDe(t.fichaId) : null;
+    return !!(sc && typeof CreepCalculo !== 'undefined' && num(CreepCalculo.modTotal(sc, 'pasossilenciosos')) > 0);
+  }
+  return !!(v && v.resumen && num(v.resumen.pasosSilenciosos) > 0);
 }
-// ¿Lo oyen los personajes? (está a OIDO_RADIO o menos de alguno, sin una pared en el medio, y no camina en silencio).
-const oidoPorJugadores = t => !!t && nieblaOida.has(nbPack(t.col, t.fila)) && !pasosSilenciosos(t);
+// ¿Lo oyen los personajes? (está a OIDO_RADIO o menos de alguno, sin una pared en el medio; con pasos silenciosos, recién pegado).
+const oidoPorJugadores = t => !!t && (pasosSilenciosos(t) ? nieblaOida1 : nieblaOida).has(nbPack(t.col, t.fila));
 // Marcado (2026-10-05, Varita del rastreador y de la luz): brilla y se lo ve también a través de la niebla.
 function marcado(t){
   const e = estadoDe(t);

@@ -274,6 +274,7 @@ function escucharVinculables(){
         o.armaNatural = d.armaNatural === true;
         o.equipoNombres = Array.isArray(d.equipoNombres) ? d.equipoNombres.map(n => String(n || '').trim()).filter(Boolean) : [];
         o.tipoCriatura = String(d.tipoCriatura || '').trim();   // Matabestias de los arcos (js/35, 2026-10-11)
+        o.pasosSilenciosos = d.pasosSilenciosos === true;   // 👣 Pasos silenciosos (js/02, 2026-10-15)
       }
       mapa.set(ch.doc.id, o);
     });

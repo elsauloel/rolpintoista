@@ -715,8 +715,8 @@ function dueloElegirObjetivoMapa(msg){
         try{ tiro = arcoBonos(mio, t, ataque, tiro); tiro = await arcoTensar(ataque, msg, tiro); arcoApuntarGastar(mio, ataque); repeticionGastar(mio, t, ataque); }catch(err){ console.error('No se pudieron sumar las mecánicas del arco:', err); }
       }
       try{ tiro = marcaBonos(mio, t, ataque, tiro); }catch(err){ console.error('No se pudo sumar la marca:', err); }   // 🎯 Marcar (js/36)
-      let espalda = false, embestida = 0;
-      try{ espalda = porLaEspalda(mio, t); }catch(err){ console.error('No se pudo ver si es por la espalda:', err); }   // nunca traba el ataque
+      let espalda = false, embestida = 0, espaldaPdg = 0;
+      try{ espalda = porLaEspalda(mio, t); espaldaPdg = espaldaBono(mio, t, ataque); }catch(err){ console.error('No se pudo ver si es por la espalda:', err); }   // nunca traba el ataque
       try{ if(!(ataque && ataque.hab)) embestida = embestidaDe(mio, t); }catch(err){ console.error('No se pudo ver la embestida:', err); }
       let quieto = 0, primeraSangre = 0;
       try{ quieto = quietoDe(mio, ataque); primeraSangre = primeraSangreDe(mio, ataque); }catch(err){ console.error('No se pudieron ver los anillos del ataque:', err); }
@@ -741,7 +741,7 @@ function dueloElegirObjetivoMapa(msg){
       let ataqueFinal = ataque && ataque.hab && ataque.hab.sagrado && ataque.hab.dano ? sagradoContra(ataque, t) : ataque;   // Smite: el doble contra un no-muerto o un demonio
       if(typeof roboBono === 'function') ataqueFinal = roboBono(ataqueFinal, mio, t);   // 🫳 Robar: +2 en sigilo o por la espalda (js/47)
       if(typeof roboSecretoSi === 'function' && roboSecretoSi(ataqueFinal, mio, t)){ roboSecretoIniciar(yo, ataqueFinal, mio, t); return; }   // 🫳 en sigilo: en secreto (js/47)
-      Duelo.crear({yo, ataque: ataqueFinal, espalda, embestida, quieto, primeraSangre, tiro, flecha}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
+      Duelo.crear({yo, ataque: ataqueFinal, espalda, espaldaPdg, embestida, quieto, primeraSangre, tiro, flecha}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
     }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + (minimo ? `de ${minimo} a ` : '') + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : conArco ? ` · 🏹 el arco necesita ${Combatiente.arcoLibresTxt(ataque)} en el medio` : ''}${mioTiro ? ' · la línea muestra si el tiro pasa' : ''}${nIdeal ? ' · 💠 en celeste, tu distancia ideal (' + esc(Combatiente.idealTxt(ataque.ideal)) + ')' : ''}</span>`, true, cancelado);
     // Sin nadie a tiro con un arco (2026-10-09): se dice por qué — su alcance no llega a la distancia mínima, o no hay nadie en esa franja.
@@ -1080,7 +1080,17 @@ function embestidaDe(atq, def){
   return igual(p1, p2) && igual(p2, p3) && distanciaHex(atq, def) === 1 ? n : 0;
 }
 function porLaEspalda(atq, def){
-  if(!atq || !def || !enSigilo(atq)) return false;
+  return !!(atq && def && enSigilo(atq) && enCunaCiega(atq, def));
+}
+// 🗡 Ataque por la espalda, regla general (2026-10-15, dueño): +1 PdG si quien ataca está en la cuña ciega del defensor (a cualquier distancia, sin
+// hacer falta sigilo); con Pasos silenciosos, +1 más. Solo ataques (con el arma o con arreglos), no una habilidad dirigida.
+function espaldaBono(atq, def, ataque){
+  if(!atq || !def || (ataque && ataque.hab) || !enCunaCiega(atq, def)) return 0;
+  return 1 + (pasosSilenciosos(atq) ? 1 : 0);
+}
+// ¿`atq` está en el punto ciego de `def`? La misma cuña de la visión (VISION_CUNA_CIEGA a cada lado de atrás; las diagonales de atrás se ven).
+function enCunaCiega(atq, def){
+  if(!atq || !def) return false;
   const k = ((Math.round(num(def.rotacion || 0) / 60) % 6) + 6) % 6;
   const rot = k * 60 * Math.PI / 180, bx = Math.sin(rot), by = -Math.cos(rot);   // "atrás" del defensor (como offsetsVision)
   const a = hexCentro(atq.col, atq.fila), d = hexCentro(def.col, def.fila);

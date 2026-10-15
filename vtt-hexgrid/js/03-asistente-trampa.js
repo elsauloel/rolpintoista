@@ -216,8 +216,8 @@ function sigiloPublicarAvisos(id){
     ? '⚠ Hace falta una tirada de percepción'
     : `⚠ Hacen falta ${av.pasos} tiradas de percepción`));
 }
-/* Quien pierde el sigilo queda Marcado 2 turnos (regla del dueño, 2026-10-14: «aunque le dé el cooldown, tenga que estar sí o sí 2 turnos fuera de
-   sigilo»): brilla, se lo ve a través de la niebla y no puede volver a entrar en sigilo (Combatiente.agregarEstado lo rebota). Los cuenta su turno
+/* Quien pierde el sigilo porque lo DESCUBREN queda Marcado 2 turnos (regla del dueño, 2026-10-14: «aunque le dé el cooldown, tenga que estar sí o
+   sí 2 turnos fuera de sigilo»; salir por las suyas, con el botón, no marca: eso no pasa por romperSigilo): brilla, se lo ve a través de la niebla y no puede volver a entrar en sigilo (Combatiente.agregarEstado lo rebota). Los cuenta su turno
    (P177: puesto fuera de su turno, el primer inicio no descuenta). Lo pone la pantalla que rompe el sigilo (el dueño del token o el GM). */
 const SIGILO_MARCA_PERDIDA = 2;
 async function marcarAlPerderSigilo(id){

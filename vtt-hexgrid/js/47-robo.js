@@ -8,7 +8,8 @@
    duelo ni se anuncia en la Mesa (`CreepAcciones.roboEnSigilo`). El GM tira el Sigilo del ladrón sin mostrarlo; a la víctima le aparece
    «¿Sentiste un movimiento raro? Tirá Percepción» (un momento `robo-pedido`, que no va a la Crónica). Si el ladrón gana (o empata): «Mmm…
    puede que estés flasheando», el ítem pasa callado y sigue en sigilo; la víctima se da cuenta al empezar su próximo turno («sentís el
-   cinturón más liviano…», `robosSinNotar` → `roboAvisoNotado`). Si pierde: lo pillan — pierde el sigilo y queda Marcado 2 turnos (js/03).
+   cinturón más liviano…», `robosSinNotar` → `roboAvisoNotado`). Si pierde: «¡juan pescó a X metiendo mano en su cinturón!» — pierde el
+   sigilo y queda Marcado 2 turnos (js/03).
    Hoy: un creep le roba a un personaje. Un personaje que le roba a un creep, y robar oro si no hay nada en el cinturón, pendientes. */
 const ROBO_HUIDA = 3;
 const esRobo = hab => !!(hab && (hab.efectos || []).some(e => e && /^robo$/i.test(String(e.nombre || (e.spec && e.spec.nombre) || '').trim())));
@@ -146,9 +147,10 @@ async function roboResolver(id, percepcion){
   s.resuelto = true;
   const t = tokens.get(s.victimaId);
   if(num(percepcion) > s.sigilo){
-    // Lo pillan: pierde el sigilo (y queda Marcado 2 turnos, js/03) y se cuenta para todos.
-    await romperSigilo(s.ladron.tokenId, s.victima, `¡${s.victima} lo pilló metiéndole la mano en el cinturón!`);
-    s.resultado = `${s.victima} lo pilló (Percepción ${percepcion} contra Sigilo ${s.sigilo}): ${s.ladron.nombre} perdió el sigilo y queda Marcado.`;
+    // Lo pescan (dueño: «pescó es una forma muy nuestra de decir que alguien fue descubierto»): pierde el sigilo (y queda Marcado 2 turnos,
+    // js/03) y se cuenta para todos.
+    await romperSigilo(s.ladron.tokenId, s.victima, `¡${s.victima} pescó a ${s.ladron.nombre} metiendo mano en su cinturón!`);
+    s.resultado = `${s.victima} lo pescó (Percepción ${percepcion} contra Sigilo ${s.sigilo}): ${s.ladron.nombre} perdió el sigilo y queda Marcado.`;
     await momentoActualizar(id, {estado: 'listo', resultado: 'pillado', datos: {paraUid: (t && t.duenoUid) || '', victimaId: s.victimaId, pillado: true, ladron: s.ladron.nombre}});
   }else{
     const e = t ? await roboElegir(t) : {manual: true, nota: 'la víctima ya no está en el mapa'};
@@ -174,7 +176,7 @@ function roboMomento(id, d){
   }
   if(d.estado === 'listo' && roboVictima && roboVictima.id === id && !roboVictima.resultado){
     roboVictima.resultado = d.resultado === 'cancelado' ? 'Nada. Debe haber sido el viento.'
-      : dt.pillado ? `¡Lo pillaste! ${dt.ladron || 'Alguien'} te estaba metiendo la mano en el cinturón.` : 'Mmm… Puede que estés flasheando.';
+      : dt.pillado ? `¡Lo pescaste! ${dt.ladron || 'Alguien'} te estaba metiendo mano en el cinturón.` : 'Mmm… Puede que estés flasheando.';
     roboVictimaDibujar();
   }
 }

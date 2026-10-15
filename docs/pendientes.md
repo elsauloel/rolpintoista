@@ -13,6 +13,10 @@
 >   menú, ir hasta la parte del daño y donde se calcula el daño poder modificar ese número; no tener que traducir un menú al otro»). Rediseñar
 >   `comun/asistente-duelo-hab.js` para que se vea como el cuadro del duelo (1 Declaración, 2 Contacto, 3 Bloqueo/Crítico, 4 Daño, 5 Efectos) y
 >   cada recuadro se edite donde está. Plan a armar con el dueño.
+> - [ ] **🧹 Auditoría de textos: «descripción esencial» y «Detalles técnicos»** (2026-10-15, dueño: «podemos hacer una auditoría de cada uno de los
+>   skills ya cargados para separar cuál texto se muestra como descripción esencial y cuál va en el recuadro de la explicación técnica»): skill por
+>   skill (clase, creeps, catálogo de habilidades de creep), el texto principal dice solo qué pasa; los términos con su globo del glosario, sin
+>   re-explicarlos; lo técnico (⚙ / ✋ / cómo se arma) al recuadro. Hecho ya: los 8 Flash de clase («FLASH.» + el turno ajeno en el globo) y Sonic Boom.
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
@@ -186,11 +190,6 @@
 >   Regen en `0` (no regeneraban la mitad del Especial al empezar el turno; el dueño: «desapareció»). Se corrigió a `floor(esp/2)` desde el mapa
 >   (como GM). El código da bien la fórmula a un personaje nuevo y en «Claude · pruebas» regenera; ninguna parte del código escribe un `0` (la
 >   migración de `ficha-guardado.js` respeta un `0` puesto a mano si ya tienen `spRegenAuto`). Si vuelve a pasar, buscar qué pantalla lo guardó.
-
-- [ ] **🧹 Auditoría de textos: «descripción esencial» y «Detalles técnicos»** (2026-10-15, dueño: «podemos hacer una auditoría de cada uno de los
-  skills ya cargados para separar cuál texto se muestra como descripción esencial y cuál va en el recuadro de la explicación técnica»): skill por
-  skill (clase, creeps, catálogo de habilidades de creep), el texto principal dice solo qué pasa; los términos con su globo del glosario, sin
-  re-explicarlos; lo técnico (⚙ / ✋ / cómo se arma) al recuadro. Hecho ya: los 8 Flash de clase («FLASH.» + el turno ajeno en el globo) y Sonic Boom.
 
 ## 0. Hoja de ruta acordada (2026-10-02, a seguir en este orden)
 

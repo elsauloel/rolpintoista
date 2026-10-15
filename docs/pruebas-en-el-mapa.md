@@ -38,6 +38,9 @@
 - [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): un crítico de la Puñalada (Rengo 2 y Lisiado 1). El pozo visto como jugador ya se vio (con
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **📜 «Detalles técnicos» aparte en el recuadro del duelo** (2026-10-15, Claude · pruebas): Flecha a la rodilla de «Bosque (prueba)» →
+  el recuadro dice solo «Le apunta a las piernas.» y «▸ Detalles técnicos» despliega «⚙ Automatizado… ✋ A mano…». El «FLASH» con su globo
+  (Sonic Boom de Clementino) lo está mirando el dueño.
 - [x] **👂 El oído (punto ciego)** (2026-10-15, Claude · pruebas, GM con «👁 Ver como jugador»): «Bosque (prueba)» a 4 casilleros por la espalda
   de juan → los jugadores no lo ven; a 2 → aparece (atenuado, porque la casilla sigue en penumbra: oírlo no descubre el terreno). El Ladrón en
   sigilo, pegado a juan, sigue sin verse. Falta probar los pasos silenciosos cuando exista algo que los dé (P200).

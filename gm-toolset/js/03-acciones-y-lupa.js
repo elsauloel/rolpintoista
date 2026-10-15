@@ -166,6 +166,8 @@ function cardHtml(sc){
         </div>
       </div>` : ''}
 
+      ${pasivasCreepHtml(sc)}
+
       ${recompensasHtml(sc)}
 
       <div class="editar-separador"><span>Habilidades</span></div>

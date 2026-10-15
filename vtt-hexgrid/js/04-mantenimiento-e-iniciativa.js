@@ -299,7 +299,7 @@ function ordenarIniciativa(lista){
 function tokenTienePrisa(id){
   const t = tokens.get(id);
   if(!t) return false;
-  if(t.tipo === 'creep'){ const sc = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(t.fichaId) : null; return !!(sc && (sc.prisa || num(CreepCalculo.modTotal(sc, 'prisa')) > 0)); }
+  if(t.tipo === 'creep'){ const sc = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(t.fichaId) : null; return !!(sc && num(CreepCalculo.modTotal(sc, 'prisa')) > 0); }   // la pasiva Prisa (o lo que la dé)
   if(String(t.fichaId || '').includes(SEP_INVOCACION)) return false;
   const f = fichasPub.get(t.fichaId);
   return !!(f && f.resumen && num(f.resumen.prisa) > 0);

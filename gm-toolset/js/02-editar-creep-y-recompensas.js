@@ -53,6 +53,49 @@ function despojosDePrecio(precioCompra){ return CreepCalculo.despojosDePrecio(pr
 function dropsResumenCreep(sc){ return CreepCalculo.dropsResumen(sc); }
 function ayudaQ(txt){ return `<span class="ayuda-q con-tip" data-tip="${esc(txt)}">?</span>`; }
 
+/* Pasivas de un creep (2026-10-15, dueño: «habilitemos habilidades pasivas para creeps»): las mismas del catálogo de los personajes
+   (comun/pasivas.js + lo subido a la biblioteca), con compras. Suman como en un personaje (CreepCalculo.modTotal) y la vida por turno, al
+   empezar su turno (CreepAcciones). */
+function pasivasCreepHtml(sc){
+  const ps = sc.pasivas || [];
+  return `<div class="editar-separador"><span>Pasivas</span></div>
+    ${ps.length ? ps.map(p => `<div class="equipo-item" style="display:flex;gap:8px;align-items:center">
+      <div style="flex:1"><b>${esc(p.nombre)}</b>${CreepCalculo.pasivaComprasCreep(p) > 1 ? ` ×${CreepCalculo.pasivaComprasCreep(p)}` : ''}<div class="hint">${esc(p.detalle || '')}</div></div>
+      <button type="button" class="mini" data-pasivacreep-menos="${sc.id}|${p.id}" title="Una compra menos (en 1, la saca)">−</button>
+      <button type="button" class="mini" data-pasivacreep-mas="${sc.id}|${p.id}" title="Una compra más">+</button>
+      <button type="button" class="mini" data-pasivacreep-quitar="${sc.id}|${p.id}" title="Sacar la pasiva">✕</button></div>`).join('') : '<div class="hint">Sin pasivas.</div>'}
+    <button type="button" class="addhab" data-pasivacreep="${sc.id}" style="margin-top:6px">+ Pasiva</button>`;
+}
+function agregarPasivaACreep(sc, datos){
+  const clave = datos.poolId || String(datos.nombre || '').toLowerCase();
+  sc.pasivas = Array.isArray(sc.pasivas) ? sc.pasivas : [];
+  const ya = sc.pasivas.find(p => (p.poolId || String(p.nombre || '').toLowerCase()) === clave);
+  if(ya) ya.compras = CreepCalculo.pasivaComprasCreep(ya) + 1;
+  else sc.pasivas.push({id: uid(), poolId: clave, nombre: datos.nombre, detalle: datos.detalle || '', mods: (datos.mods || []).map(m => ({...m})), regenHp: num(datos.regenHp) || 0, compras: 1});
+  if((datos.mods || []).some(m => m.stat === 'con' || m.stat === 'hpmax')) actualizarHpMaxPorCon(sc);
+  toast(`${sc.nombre}: ${datos.nombre}${ya ? ' ×' + ya.compras : ''}`);
+  renderAll();
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-pasivacreep], [data-pasivacreep-mas], [data-pasivacreep-menos], [data-pasivacreep-quitar]');
+  if(!b) return;
+  if(b.dataset.pasivacreep){
+    const sc = S.creeps.find(s => s.id === b.dataset.pasivacreep);
+    if(!sc) return;
+    Biblioteca.abrir({tipo: 'pasivas', titulo: `Pasiva para ${sc.nombre}`, base: typeof PASIVAS_BASE !== 'undefined' ? PASIVAS_BASE : [],
+      alElegir: datos => agregarPasivaACreep(sc, datos), subtitulo: e2 => (e2.datos && e2.datos.detalle ? ` · ${e2.datos.detalle.slice(0, 60)}` : '')});
+    return;
+  }
+  const [scId, pId] = String(b.dataset.pasivacreepMas || b.dataset.pasivacreepMenos || b.dataset.pasivacreepQuitar).split('|');
+  const sc = S.creeps.find(s => s.id === scId), p = sc && (sc.pasivas || []).find(x => x.id === pId);
+  if(!p) return;
+  if(b.dataset.pasivacreepMas) p.compras = CreepCalculo.pasivaComprasCreep(p) + 1;
+  else if(b.dataset.pasivacreepMenos && CreepCalculo.pasivaComprasCreep(p) > 1) p.compras = CreepCalculo.pasivaComprasCreep(p) - 1;
+  else sc.pasivas = sc.pasivas.filter(x => x !== p);
+  if((p.mods || []).some(m => m.stat === 'con' || m.stat === 'hpmax')) actualizarHpMaxPorCon(sc);
+  renderAll();
+});
+
 function recompensasHtml(sc){
   const t = sc.tipoCriatura || '';
   const sug = oroSugeridoCreep(sc);

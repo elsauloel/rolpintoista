@@ -5,6 +5,15 @@
 
 > **En curso (2026-10-02): automatizar las habilidades de los personajes de «El origen de las especies»** → [`automatizar-habilidades-origen.md`](automatizar-habilidades-origen.md) (cuál está hecha, cuál espera y por qué).
 
+> **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
+> cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
+> vista, probar con su cuenta, pegar reglas.
+> - [ ] **✨ El editor de la Ejecución, como el cuadro del duelo** (2026-10-15, dueño: «en la pelea un skill de un creep me pareció muy débil, entré a
+>   editar duelo y el menú era muy poco intuitivo: la edición tiene que ser una emulación del mismo menú del duelo; paso a paso te aparece el mismo
+>   menú, ir hasta la parte del daño y donde se calcula el daño poder modificar ese número; no tener que traducir un menú al otro»). Rediseñar
+>   `comun/asistente-duelo-hab.js` para que se vea como el cuadro del duelo (1 Declaración, 2 Contacto, 3 Bloqueo/Crítico, 4 Daño, 5 Efectos) y
+>   cada recuadro se edite donde está. Plan a armar con el dueño.
+
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
 > - [ ] **🧪 Más ítems con la mecánica de cargas (2026-10-10, dueño; también en 🛠 Herramientas de diseño → A desarrollar):** la mecánica
@@ -173,11 +182,6 @@
 > - **Después del catálogo** (la próxima tarea grande): un sistema para probar que las habilidades de los **creeps usen maná (SP) en vez de
 >   cooldown**. Queda para más adelante.
 
-> - [ ] **✨ El editor de la Ejecución, como el cuadro del duelo** (2026-10-15, dueño: «en la pelea un skill de un creep me pareció muy débil, entré a
->   editar duelo y el menú era muy poco intuitivo: la edición tiene que ser una emulación del mismo menú del duelo; paso a paso te aparece el mismo
->   menú, ir hasta la parte del daño y donde se calcula el daño poder modificar ese número; no tener que traducir un menú al otro»). Rediseñar
->   `comun/asistente-duelo-hab.js` para que se vea como el cuadro del duelo (1 Declaración, 2 Contacto, 3 Bloqueo/Crítico, 4 Daño, 5 Efectos) y
->   cada recuadro se edite donde está. Plan a armar con el dueño.
 > - [ ] **🔍 ¿Por qué el SP Regen quedó en «0»?** (2026-10-15) En «El origen de las especies» los cinco personajes tenían guardada la fórmula de SP
 >   Regen en `0` (no regeneraban la mitad del Especial al empezar el turno; el dueño: «desapareció»). Se corrigió a `floor(esp/2)` desde el mapa
 >   (como GM). El código da bien la fórmula a un personaje nuevo y en «Claude · pruebas» regenera; ninguna parte del código escribe un `0` (la

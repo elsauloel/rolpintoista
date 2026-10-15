@@ -519,6 +519,8 @@ const CreepAcciones = (() => {
     const rep = Combatiente.reporteTurno([...v.eventos, ...d.eventos]);
     const rg = Math.max(0, Math.floor(num(C().modTotal(sc, 'hpregen'))));   // Regeneración de vida del equipo (2026-10-07)
     if(rg > 0 && num(sc.hp) > 0){ d.hp += rg; rep.push(`Regeneración de vida: +${rg} HP`); }
+    const rp = Math.max(0, Math.floor(num(C().regenPasivas(sc))));   // sus pasivas (2026-10-15)
+    if(rp > 0 && num(sc.hp) > 0){ d.hp += rp; rep.push(`Pasivas: +${rp} HP`); }
     const dh = Combatiente.curaQueEntra(sc.hp, d.hp);
     if(d.hp && !dh) rep.push('Caído: la cura de este turno no lo levanta');
     if(dh){ const antes = num(sc.hp); sc.hp = Math.max(0, Math.min(num(sc.hpMax), antes + dh)); rep.push(`HP total: ${antes} → ${sc.hp}`); }

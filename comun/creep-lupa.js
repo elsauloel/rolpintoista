@@ -198,6 +198,7 @@ const CreepLupa = (() => {
         ${K.armadmgEfectiva(sc) ? caja('Defensa especial', fmt(K.armadmgEfectiva(sc)), K.armadmgOrigenTxt(sc)) : ''}
       </div>
       ${crits ? `<div class="vc-cajas vc-5">${crits}</div>` : ''}`)}
+      ${(sc.pasivas || []).length ? seccion('Pasivas', `<div class="vc-chips">${sc.pasivas.map(p => `<span class="vc-chip" title="${esc(p.detalle || '')}">${esc(p.nombre)}${K.pasivaComprasCreep(p) > 1 ? ' ×' + K.pasivaComprasCreep(p) : ''}</span>`).join('')}</div>`) : ''}
       ${seccion('Habilidades', habsHtml !== undefined ? habsHtml : (habilidades ? `<div class="vc-chips">${habilidades}</div>` : '<div class="hint">Sin habilidades.</div>'))}
       ${seccion('Equipo', `<div class="vc-equipos">${equipo}</div>`)}
       ${seccion('Recompensas', recompensasVerHtml(sc))}

@@ -118,8 +118,14 @@ const CreepCalculo = (() => {
       const stacks = Math.max(1, num(es.stacks)||1);
       (es.mods||[]).forEach(m => { if(m.stat === statId || (statId === 'rng' && m.stat === 'rangocasteo')) total += num(m.val) * stacks; });
     });
+    // Pasivas (2026-10-15, dueño: «habilitemos habilidades pasivas para creeps, no hacemos una excepción»): las mismas del catálogo de los
+    // personajes, con sus compras.
+    (sc.pasivas||[]).forEach(p => { const c = pasivaComprasCreep(p); (p.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val) * c; }); });
     return total;
   }
+  const pasivaComprasCreep = p => Math.max(1, Math.round(num(p && p.compras)) || 1);
+  // La vida que recuperan sus pasivas por turno (Regeneración…).
+  const regenPasivas = sc => (sc.pasivas||[]).reduce((a, p) => a + num(p.regenHp) * pasivaComprasCreep(p), 0);
 
   // Armadura rota activa reduce la Defensa — igual que en ficha.html.
   function estadosArmadura(sc){
@@ -505,6 +511,7 @@ const CreepCalculo = (() => {
     sc.equipo = Array.isArray(sc.equipo) ? sc.equipo : [];
     sc.estados = Array.isArray(sc.estados) ? sc.estados : [];
     sc.habilidades = Array.isArray(sc.habilidades) ? sc.habilidades : [];
+    sc.pasivas = Array.isArray(sc.pasivas) ? sc.pasivas : [];   // (2026-10-15)
     sc.armaMods = Array.isArray(sc.armaMods) ? sc.armaMods : [];
     sc.armaEfectos = Array.isArray(sc.armaEfectos) ? sc.armaEfectos : [];
     sc.cinturon = Array.isArray(sc.cinturon) ? sc.cinturon : [];   // consumibles a mano (2026-10-04)
@@ -647,7 +654,7 @@ const CreepCalculo = (() => {
     return partes.length ? partes.join(' · ') : 'nada';
   }
 
-  return {BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
+  return {regenPasivas, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
     TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto,
     trofeo, despojosDePrecio, dropsResumen, dropsFijos,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,

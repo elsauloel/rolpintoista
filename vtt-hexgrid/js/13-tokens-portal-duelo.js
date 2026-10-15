@@ -753,7 +753,7 @@ function dueloElegirObjetivoMapa(msg){
   };
   if(typeof apuntarMioId !== 'undefined'){ const me = [...tokens.entries()].find(([, t]) => propio(t)); apuntarMioId = me ? me[0] : null; }   // 🎯 js/48
   pedir();
-  if(typeof encuadrarObjetivos === 'function') setTimeout(() => { if(elegirDestinoCb) encuadrarObjetivos(true); }, 60);   // si alguno de los que brillan quedó afuera de la pantalla
+  if(typeof encuadrarObjetivos === 'function') setTimeout(() => { if(elegirDestinoCb) encuadrarObjetivos(); }, 60);   // el mapa se encuadra en quien ataca y los que están a su alcance (dueño, 2026-10-15)
 }
 /* Los misiles (2026-10-05, Varita de misiles; dueño: «el segundo objetivo se elige una vez que se recorrió todo el efecto del primero»): van de a uno,
    como una cascada de área que se arma sobre la marcha. El primero es un duelo entero contra el rival elegido; cuando se resuelve, el área queda

@@ -756,6 +756,21 @@ prueba('Proyectil perforante (Shooter, 2026-10-13): 2 SP + el disparo, solo a di
   igual([hab.costo, hab.nitrosCosto, hab.soloRango, a.perforante, a.mods.pdg, a.mods.fijo, !!a.soloCritico, /Sin auditar/.test(hab.detalle), !!hab.original],
     ['2', 'ATAQUE', true, true, 0, 0, false, false, true]);
 });
+prueba('Duelo cancelado que no cuenta (2026-10-15): el conteo de ataques y los No2 vuelven a como estaban (personaje y creep)', () => {
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
+  const arma = {id: 'a1', nombre: 'Espada', tipoItem: 'arma_1m', tipoDado: 8, equipado: true};
+  S.inventario = [arma];
+  const primero = FichaCombate.costoAtaque(S, arma);
+  FichaCombate.registrarAtaque(S, arma);
+  const segundo = FichaCombate.costoAtaque(S, arma);
+  FichaCombate.desregistrarAtaque(S, arma);
+  const deNuevo = FichaCombate.costoAtaque(S, arma);
+  const sc = CreepCalculo.normalizar({id: 'c1', nombre: 'Goblin', con: 6, fue: 5, agl: 6, des: 6, esp: 3, armaTipo: 8, nitros: 10, ataquesTurno: 0, habilidades: [], estados: [], equipo: []});
+  const p = CreepAcciones.pagarAtaque(sc, 'normal');
+  const tras = [sc.ataquesTurno, sc.nitros];
+  const dev = CreepAcciones.devolverAtaque(sc, 'normal');
+  igual([primero < segundo, deNuevo === primero, num(S.ataquesTurno), !p.error, tras[0], dev, sc.ataquesTurno, sc.nitros], [true, true, 0, true, 1, 10 - tras[1], 0, 10]);
+});
 prueba('Transfusión sanguínea (Debuffer, 2026-10-13): el aviso «Transfusión» da (nunca baja de 1) y recibe (sin pasar el máximo; a un caído no lo levanta)', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-transfusion-sanguinea');
   const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S; S.attrs.con = 6;

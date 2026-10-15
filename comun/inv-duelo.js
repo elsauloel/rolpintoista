@@ -116,6 +116,14 @@ const InvDuelo = (() => {
         if(d.ataque.tipo === 'habilidad-arma') publicar(A().tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + num(d.ataque && d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: num(inv.armaTipo), armaDeRango: !!inv.armaDeRango}), 'pdg'));
         else return atacarSuelto(inv, d.ataque.tipo, d.id);
       },
+      // Un duelo cancelado que no cuenta como ataque (2026-10-15): el conteo y los No2, de vuelta. → los No2 devueltos.
+      devolverAtaque: d => {
+        const inv = ui.inv(d.atacante);
+        if(!inv || !d.ataque || d.ataque.tipo === 'habilidad-arma') return 0;
+        let costo = 0;
+        ui.cambiar(() => { costo = InvAcciones.devolverAtaque(inv, d.ataque.tipo); });
+        return costo;
+      },
       // Las invocaciones siguen las mismas reglas que los creeps.
       statsCritico: d => {
         const inv = ui.inv(d.atacante);

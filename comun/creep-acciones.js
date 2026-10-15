@@ -100,6 +100,13 @@ const CreepAcciones = (() => {
   const bonoEspecial = (sc, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return st ? C().modTotal(sc, st) : 0; };
   const costoAtaqueDe = (sc, tipo) => tipo === 'normal' ? C().costoAtaque(sc) : tipo === 'oportunidad' ? C().costoOportunidad(sc) : C().costoContraataque(sc);
   const faltanNitros = (sc, tipo) => costoAtaqueDe(sc, tipo) > num(sc.nitros);
+  // Un duelo cancelado que no cuenta como ataque (2026-10-15): se descuenta del conteo y se devuelven los No2. → los No2 devueltos.
+  function devolverAtaque(sc, tipo){
+    if(tipo === 'normal') sc.ataquesTurno = Math.max(0, num(sc.ataquesTurno) - 1);
+    const costo = costoAtaqueDe(sc, tipo);
+    sc.nitros = num(sc.nitros) + costo;
+    return costo;
+  }
   // El texto de «¿Atacar igual?» (cada pantalla lo muestra a su manera).
   function preguntaSinNitros(sc, tipo){
     const nombre = tipo === 'normal' ? 'este ataque' : `el ${(NOMBRE_ESPECIAL[tipo] || 'Contraataque').toLowerCase()}`;
@@ -560,7 +567,7 @@ const CreepAcciones = (() => {
 
   return {bloqueoFirmeCreep, ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, inicioTurno, finTurno, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
     tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, tiradaSoltarse, aplicarSoltarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
-    costoAtaqueDe, faltanNitros, preguntaSinNitros, alertaSinNitros,
+    costoAtaqueDe, devolverAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros,
     FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, confirmarSilencio, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,
     zonaDeHab, cdMod};
 })();

@@ -2143,7 +2143,7 @@ const Duelo = (() => {
     f.querySelector('[data-x]').onclick = cerrar;
     f.querySelector('[data-x2]').onclick = cerrar;
     const bc = f.querySelector('[data-cancelarduelo]');
-    if(bc) bc.onclick = () => col().doc(d.id).update({estado: 'cancelado'}).catch(err => console.error(err));
+    if(bc) bc.onclick = () => cancelarDuelo(d);
     // Un duelo cancelado se cierra solo en todas las pantallas (2026-10-13, dueño: quedaban abiertos «Duelo cancelado» en los mapas de los demás
     // esperando un «Terminar duelo»): se ve 4 segundos y se va. Si en el medio se abrió otro duelo, no lo toca.
     if(d.estado === 'cancelado' && f.dataset.autocierre !== d.id){
@@ -2531,9 +2531,54 @@ const Duelo = (() => {
   // su personaje (antes, con dos personajes del mismo jugador, la ficha de uno reclamaba el efecto del otro y lo dejaba «a mano»).
   // cfg.aplicar(duelo) → info (solo el mapa del GM): aplica el daño al HP del defensor y devuelve lo que pasó.
   // cfg.relay(lado, mensaje) (el mapa): cómo mandarle un pedido al iframe de la ficha o de las Acciones del dueño de ese lado.
+  /* Cancelar un duelo (2026-10-15, dueño: «alguien puso atacar, se abrió el duelo, pusimos cancelar duelo, el ataque no se ejecutó, y la
+     siguiente vez le cobraba los No2 de un segundo ataque»): si el ataque ya se pagó, pregunta si cuenta y explica que es para los No2. Si no
+     cuenta, el duelo queda con `resultado: 'devolver'` y la pantalla que maneja al atacante le devuelve los No2 y descuenta el ataque
+     (`devolverSiToca`, con el gancho `devolverAtaque` de FichaDuelo, CreepDuelo e InvDuelo); queda `resultado: 'devuelto'`. */
+  async function cancelarDuelo(d){
+    const a = d.ataque || {}, especial = a.tipo === 'oportunidad' || a.tipo === 'contra';
+    const pagado = !d.hab && a.tipo && a.tipo !== 'habilidad-arma' && d.pdg;
+    let devolver = false;
+    if(pagado && typeof Confirmar !== 'undefined' && Confirmar.elegir){
+      const quien = (d.atacante && d.atacante.nombre) || 'El atacante';
+      const r = await Confirmar.elegir(especial
+        ? `${quien} ya pagó los No2 de este ${a.tipo === 'contra' ? 'contraataque' : 'ataque de oportunidad'}. ¿Se los devolvemos?`
+        : `${quien} ya pagó este ataque. ¿Cuenta como un ataque hecho?\n\nEs para calcular los No2: en un turno, el primer ataque con un arma cuesta la mitad de su Tipo y los siguientes, el Tipo completo. Si no cuenta, se le devuelven los No2 que pagó y su próximo ataque vuelve a costar como si no hubiera atacado.`,
+        {titulo: 'Cancelar el duelo', icono: '⚔', no: 'Volver al duelo', opciones: especial
+          ? [{valor: 'no', texto: 'Sí, devolverle los No2'}, {valor: 'si', texto: 'No, ya los gastó'}]
+          : [{valor: 'no', texto: 'No cuenta', detalle: 'se le devuelven los No2'}, {valor: 'si', texto: 'Sí, cuenta como ataque', detalle: 'el próximo cuesta como un segundo ataque'}]});
+      if(r === null || r === undefined) return;
+      devolver = r === 'no';
+    }
+    col().doc(d.id).update({estado: 'cancelado', ...(devolver ? {resultado: 'devolver'} : {})}).catch(err => console.error(err));
+  }
+  const devolviendo = new Set();
+  async function devolverSiToca(d){
+    if(devolviendo.has(d.id) || d.resultado !== 'devolver' || !d.atacante) return;
+    let hk = null;
+    try{
+      if(cfgEscuchar.hooksLocal){ hk = cfgEscuchar.hooksLocal(d.atacante); if(hk && typeof hk.then === 'function') hk = await hk; }
+      const H = typeof window !== 'undefined' ? window.DUELO_HOOKS : null;
+      if(!hk && H && H.soy && H.soy(d.atacante)) hk = H;
+    }catch(err){ console.error('Duelo: ¿quién devuelve el ataque?', err); }
+    if(!hk || !hk.devolverAtaque) return;
+    devolviendo.add(d.id);
+    try{
+      const ref = col().doc(d.id);
+      const ok = await fbDb.runTransaction(async tx => { const s = await tx.get(ref); if(!s.exists || s.data().resultado !== 'devolver') return false; tx.update(ref, {resultado: 'devuelto'}); return true; });
+      if(!ok) return;
+      const costo = await hk.devolverAtaque(d);
+      const txt = `↩ ${d.atacante.nombre}: el duelo cancelado no cuenta como ataque${Number(costo) ? ` — se le devolvieron ${Number(costo)} No2` : ''}`;
+      if(typeof toast === 'function') toast(txt);
+      if(typeof mesaLinea === 'function') mesaLinea(txt, 'recordatorio');
+    }catch(err){ console.error('No se pudo devolver el ataque:', err); devolviendo.delete(d.id); }
+  }
+
   function escuchar(cfg){
     if(escuchando || !disponible()) return;
     cfgEscuchar = cfg || {};
+    col().where('resultado', '==', 'devolver').onSnapshot(snap => snap.docs.forEach(doc => devolverSiToca({id: doc.id, ...doc.data()})),
+      err => console.error('Error escuchando los duelos a devolver:', err));
     escuchando = col().where('estado', 'in', ['esperando', 'empate', 'resuelto']).onSnapshot(snap => {
       listaDuelos = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
       const ahora = Date.now();

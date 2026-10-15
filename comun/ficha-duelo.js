@@ -144,6 +144,18 @@ const FichaDuelo = (() => {
         }
         if(d.ataque.tipo === 'normal') FichaAcciones.atacarConArma(S, arma, undefined, uiA); else FichaAcciones.ataqueEspecialConArma(S, arma, d.ataque.tipo, undefined, uiA);
       },
+      // Un duelo cancelado que no cuenta como ataque (2026-10-15, dueño): se descuenta del conteo y se devuelven los No2 que pagó. → los No2 devueltos.
+      devolverAtaque: d => {
+        const S = getS();
+        if(!d.ataque || d.ataque.tipo === 'habilidad-arma') return 0;
+        const arma = d.ataque.armaId ? (S.inventario || []).find(x => x.id === d.ataque.armaId) || null : null;
+        let costo;
+        if(d.ataque.tipo === 'normal'){ FichaCombate.desregistrarAtaque(S, arma); costo = FichaCombate.costoAtaque(S, arma); }
+        else costo = FichaCombate.costoAtaqueEspecial(arma, d.ataque.tipo, S);
+        S.nitros = num(S.nitros) + costo;
+        ui.cambio(['nitros', 'refresh']);
+        return costo;
+      },
       // Para el crítico: el Crítico frecuente y potente del atacante (con el arma que usa).
       statsCritico: d => {
         const arma = armaDelInv(d.ataque.armaId);

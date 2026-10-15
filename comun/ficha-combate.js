@@ -123,7 +123,15 @@ const FichaCombate = (() => {
     return primero;
   }
 
-  return {TIPO_SIN_ARMA, danoSinArmaTxt, esArma, esMano, asignarManos, armaDanoTxt, armasEquipadasConDano, armasYEscudosParaParry,
+  // Lo contrario (2026-10-15, un duelo cancelado que no cuenta como ataque): vuelve a como estaba antes de registrarlo.
+  function desregistrarAtaque(S, arma){
+    S.ataquesTurno = Math.max(0, num(S.ataquesTurno) - 1);
+    const k = claveAtaque(arma), n = Math.max(0, ataquesConArma(S, arma) - 1);
+    S.ataquesArma = {...(S.ataquesArma || {})};
+    if(n) S.ataquesArma[k] = n; else delete S.ataquesArma[k];
+  }
+
+  return {desregistrarAtaque, TIPO_SIN_ARMA, danoSinArmaTxt, esArma, esMano, asignarManos, armaDanoTxt, armasEquipadasConDano, armasYEscudosParaParry,
     esArmaEnMano, esEnMano, pdgParaArma, STATS_DEFENSA_POR_ITEM, statParaArma, bloqueoValor, alcanceDeArma, formulasCombate,
     claveAtaque, tipoAtaque, ataquesConArma, costoAtaque, costoAtaqueEspecial, registrarAtaque};
 })();

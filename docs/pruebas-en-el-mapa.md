@@ -38,6 +38,9 @@
 - [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): un crítico de la Puñalada (Rengo 2 y Lisiado 1). El pozo visto como jugador ya se vio (con
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **👂 El oído (punto ciego)** (2026-10-15, Claude · pruebas, GM con «👁 Ver como jugador»): «Bosque (prueba)» a 4 casilleros por la espalda
+  de juan → los jugadores no lo ven; a 2 → aparece (atenuado, porque la casilla sigue en penumbra: oírlo no descubre el terreno). El Ladrón en
+  sigilo, pegado a juan, sigue sin verse. Falta probar los pasos silenciosos cuando exista algo que los dé (P200).
 - [x] **📜 El texto de la habilidad en el duelo, ✍ Elegir manualmente y 💨 Prisa** (2026-10-15, Claude · pruebas, GM con «Bosque (prueba)»):
   la pasiva Prisa puesta desde GM Tools (+ Pasiva) → al ordenar los turnos, Bosque (1) quedó arriba de juan (2). Flecha a la rodilla → el duelo
   muestra a la izquierda «📜 Flecha a la rodilla» con su texto, y se va al cerrar. ✍ en la defensa: «2» a mano → la Mesa dice «Evasión 2 (manual)»

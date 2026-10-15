@@ -1606,3 +1606,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (`FichaAcciones.aplicarEstadoRecibido` descuenta esa unidad). La Crónica lo cuenta y el ladrón huye: el cartel del dodge roll (`dodgeBanner.robo`,
   hasta 3 casilleros, sin oportunidad). `roboBono` (antes de `Duelo.crear`, js/13): +2 a su tirada si viene en sigilo o por la espalda
   (`enPuntoCiego`). Si lo matan, lo robado vuelve con el botín (es su cinturón). Pendiente: un personaje que le roba a un creep, robar oro.
+- **👂 El oído** (2026-10-15, regla del dueño: «si alguien se acerca por la espalda, el personaje lo escucha»): `nieblaOida` (js/02, se calcula
+  en `nieblaActualizar`, js/03) = la flor de `OIDO_RADIO` (3) alrededor de cada token que da visión, para todos lados, tapada por paredes y
+  Sólidos. `oidoPorJugadores(t)` la usan `tokenVisiblePorNiebla`, `visibleParaJugadores` (js/29) y la última posición vista: un rival ahí se
+  ve aunque esté en el punto ciego o en la oscuridad, salvo en sigilo (lo decide antes el sigilo) o con `pasosSilenciosos(t)` (un estado con
+  `pasosSilenciosos` o llamado «Pasos silenciosos»; quién lo da, P200). No descubre el terreno: el token se ve atenuado bajo la niebla gris.

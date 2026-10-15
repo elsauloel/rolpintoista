@@ -97,6 +97,7 @@ const FichaCalculo = (() => {
     {id:'vainas', label:'Vainas', full:'Armas que podés llevar envainadas: se equipan o se guardan sin gastar No2'},
     {id:'correas', label:'Correas laterales', full:'Armas o escudos colgados de la mochila: se equipan o se guardan sin gastar No2'},
     {id:'bolsilloext', label:'Bolsillo exterior', full:'El primer consumible del turno sacado de la mochila cuesta 1 No2 en vez de 2'},
+    {id:'prisa', label:'Prisa', full:'Prisa: vas primero en el orden de turnos (antes que todos los que no la tienen); entre dos con Prisa decide la tirada de iniciativa'},
     {id:'morral', label:'Morral de cazador', full:'Los trofeos no ocupan ranuras de la mochila'},
     {id:'pasamanos', label:'Pasamanos', full:'En combate, pasarle a un aliado al lado algo del cinturón no cuesta No2'},
     {id:'alforja', label:'Alforja compartida', full:'En combate, un aliado al lado puede sacar un consumible de tu mochila por 1 No2'},

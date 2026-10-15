@@ -153,6 +153,9 @@ const ESTADOS_PRESET = [
   // `soloSistema` (2026-10-08, dueño): no aparece en los menús para elegir un estado (solo lo pone el mapa a una invocación recién llegada).
   {nombre:'Mareo de invocación', polaridad:'debuff', turnos:1, forzarNitros:0, soloSistema:true,
     detalle:'Recién invocada: en su primer turno no puede hacer nada (sin No2). ⚙ Automatizado: se lo pone el mapa al sumarla al orden de turnos.'},
+  // 💨 Prisa (2026-10-15, dueño): va primero en el orden de turnos (la pasiva de los personajes; a un creep se la pone el GM con este estado).
+  {nombre:'Prisa', polaridad:'buff', permanente:true, mods:[{stat:'prisa', val:1}],
+    detalle:'Va primero en el orden de turnos: antes que todos los que no tienen Prisa; entre dos con Prisa decide la tirada de iniciativa. ⚙ Automatizado: el mapa lo pone arriba al ordenar los turnos.'},
   // Inamovible (2026-10-06, dueño: «el buff tiene que existir; la armadura simplemente te lo aplica»): la chance de no moverse, en 100 %.
   {nombre:'Inamovible', polaridad:'buff', turnos:2, mods:[{stat:'inamovible', val:100}],
     detalle:'No lo pueden empujar ni atraer (ganchos, muros que empujan, portales). ⚙ Automatizado: el mapa no lo mueve.'},

@@ -291,9 +291,18 @@ async function guardarIniciativa(cambios){
   }
 }
 
-// De mayor a menor; con el mismo valor queda el orden en que estaban.
+// De mayor a menor; con el mismo valor queda el orden en que estaban. 💨 Prisa (2026-10-15, dueño): los que la tienen van primero, antes que
+// todos; entre ellos (aliados o rivales) decide la tirada de iniciativa, como siempre.
 function ordenarIniciativa(lista){
-  return lista.map((o, i) => ({o, i})).sort((a, b) => (num(b.o.valor) - num(a.o.valor)) || (a.i - b.i)).map(x => x.o);
+  return lista.map((o, i) => ({o, i, p: tokenTienePrisa(o.id) ? 1 : 0})).sort((a, b) => (b.p - a.p) || (num(b.o.valor) - num(a.o.valor)) || (a.i - b.i)).map(x => x.o);
+}
+function tokenTienePrisa(id){
+  const t = tokens.get(id);
+  if(!t) return false;
+  if(t.tipo === 'creep'){ const sc = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(t.fichaId) : null; return !!(sc && (sc.prisa || num(CreepCalculo.modTotal(sc, 'prisa')) > 0)); }
+  if(String(t.fichaId || '').includes(SEP_INVOCACION)) return false;
+  const f = fichasPub.get(t.fichaId);
+  return !!(f && f.resumen && num(f.resumen.prisa) > 0);
 }
 
 function iniciativaPonerTodos(){

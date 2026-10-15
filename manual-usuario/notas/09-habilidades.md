@@ -86,7 +86,8 @@ Podés **comprar la misma pasiva varias veces** y los bonos se suman. El **tope 
 | **Percepción aumentada** | Te avisa de trampas cercanas ([[Trampas]]) |
 | **Ojo avizor**, **Vista de halcón** | Más visión |
 | **Golpe fuerte**, **Puntería**, **Ojo crítico** | Más Daño, PdG, Crítico |
-| **Pies ligeros**, **Reflejos de gato**, **Impulso** | Movimiento, Evasión, Nitros |
+| **Pies ligeros**, **Impulso** | Evasión, Nitros |
+| **Prisa** | Vas primero en el orden de turnos (entre dos con Prisa, decide la tirada de iniciativa) |
 | **Espalda de mula**, **Bolsillos extra** | Carga y capacidad |
 
 > [!question] Todavía por definir

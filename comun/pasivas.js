@@ -46,8 +46,10 @@ const PASIVAS_BASE = [
    detalle: '+1 Crg.Max (carga máxima).', mods: [{stat: 'crgmax', val: 1}]},
   {poolId: 'pies-ligeros', nombre: 'Pies ligeros', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
    detalle: '+1 Eva (evasión).', mods: [{stat: 'eva', val: 1}]},
-  {poolId: 'reflejos-de-gato', nombre: 'Reflejos de gato', jobCosto: 1, etiquetas: ['stat', 'utilidad'],
-   detalle: '+1 Iniciativa.', mods: [{stat: 'ini', val: 1}]},
+  // 💨 Prisa (2026-10-15, dueño: reemplaza a «Reflejos de gato», +1 Iniciativa): va primero en el orden de turnos; entre dos con Prisa (de bandos
+  // rivales o no), decide la tirada de iniciativa (vtt-hexgrid/js/04, ordenarIniciativa).
+  {poolId: 'prisa', nombre: 'Prisa', jobCosto: 1, etiquetas: ['utilidad'],
+   detalle: 'Vas primero en el orden de turnos: antes que todos los que no tienen Prisa. Si otro también la tiene (un aliado o un creep), entre ustedes decide la tirada de iniciativa. ⚙ Automatizado: el mapa te pone arriba al ordenar los turnos.', mods: [{stat: 'prisa', val: 1}]},
   {poolId: 'impulso', nombre: 'Impulso', jobCosto: 1, etiquetas: ['stat', 'utilidad'],
    detalle: '+1 No2 (nitros). ⚠ De las más fuertes para 1 Job: a revisar.', mods: [{stat: 'nitros', val: 1}]},
   {poolId: 'vista-de-halcon', nombre: 'Vista de halcón', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],

@@ -713,6 +713,10 @@ document.addEventListener('keydown', e => {
     return;
   }
   if(elegirDestinoCb && e.key === 'Escape'){ elegirDestinoCancelar(); return; }
+  // Las flechas mueven el mapa (2026-10-15, dueño: buscar el objetivo sin cancelar el ataque; js/48). Siempre, salvo escribiendo en un campo.
+  if(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key) && !e.ctrlKey && !e.altKey && !e.metaKey && !escribiendoEnCampo(e) && typeof moverMapaConFlecha === 'function'){
+    e.preventDefault(); moverMapaConFlecha(e.key); return;
+  }
   if(colocando && e.key === 'Escape'){ cancelarColocacion(); return; }
   if(colocando && e.key === 'Escape'){ cancelarColocacion(); return; }
   if(creando && e.key === 'Escape' && !document.querySelector('.recorte-scrim')){ cancelarNuevoToken(); return; }
@@ -815,6 +819,12 @@ document.addEventListener('keydown', e => {
     if(seleccion){ toast('Ese token no tiene Botonera para vos'); return; }
     if(soyGM) toast('Seleccioná un creep para abrir sus Acciones');
     else abrirBotoneraPrincipal();
+    return;
+  }
+  // A (2026-10-15, pedido del dueño): lo mismo que el botón Atacar de la Botonera (o de las Acciones del creep); si no está abierta, la abre (js/48).
+  if((e.key === 'a' || e.key === 'A') && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey && fbMiembro && !elegirDestinoCb && typeof atajoAtacar === 'function'){
+    e.preventDefault();
+    atajoAtacar();
     return;
   }
   // E (2026-09-25, pedido del dueño): abre o cierra el globo de ESTADOS ALTERADOS del token seleccionado.

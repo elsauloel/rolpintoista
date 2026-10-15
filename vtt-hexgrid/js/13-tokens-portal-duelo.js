@@ -598,9 +598,11 @@ function dueloAvisoObjetivo(nombre, conSuelto, alSuelto, hab, extra){
     document.body.appendChild(el);
   }
   el.hidden = false;
-  el.innerHTML = `<span>${hab ? '✨' : '⚔'} <b>${esc(nombre || 'Atacar')}</b>: ${hab ? 'elegí el objetivo de <b>' + esc(hab) + '</b>' : 'elegí a quién atacás'} — <b>clic sobre el token</b> <span style="opacity:.75">(Esc o clic derecho cancelan)</span>${extra ? `<br><span style="opacity:.85;font-size:12px">${extra}</span>` : ''}</span>${conSuelto ? '<button type="button" class="btn" data-duelo-suelto>Sin objetivo · tirada suelta</button>' : ''}`;
+  el.innerHTML = `<span>${hab ? '✨' : '⚔'} <b>${esc(nombre || 'Atacar')}</b>: ${hab ? 'elegí el objetivo de <b>' + esc(hab) + '</b>' : 'elegí a quién atacás'} — <b>clic sobre el token</b> <span style="opacity:.75">(Esc o clic derecho cancelan)</span>${extra ? `<br><span style="opacity:.85;font-size:12px">${extra}</span>` : ''}<br><span style="opacity:.75;font-size:12px">🗺 Para buscarlo: arrastrá el mapa, usá las flechas del teclado o la rueda (zoom) — no se cancela</span></span>${objetivosResaltados && objetivosResaltados.size ? '<button type="button" class="btn" data-duelo-encuadrar title="Aleja y centra el mapa para que entren tu token y todos los que están a tu alcance">🔭 Ver mis objetivos</button>' : ''}${conSuelto ? '<button type="button" class="btn" data-duelo-suelto>Sin objetivo · tirada suelta</button>' : ''}`;
   const b = el.querySelector('[data-duelo-suelto]');
   if(b) b.onclick = alSuelto;
+  const be = el.querySelector('[data-duelo-encuadrar]');   // 🔭 (js/48)
+  if(be) be.onclick = () => { if(typeof encuadrarObjetivos === 'function') encuadrarObjetivos(); };
 }
 /* Alcance del ataque o de la habilidad (2026-09-27, pedido del dueño): NO restringe a quién se puede apuntar; mientras se elige el objetivo, los tokens que están a
    tu alcance (casilleros desde tu token) «laten» con un brillo dorado. `ataque.alcance` lo calcula la página de quien actúa: cuerpo a cuerpo = 1 (más el Alcance del arma),
@@ -749,7 +751,9 @@ function dueloElegirObjetivoMapa(msg){
       nIdeal ? `💠 en celeste, tu distancia ideal: ${esc(Combatiente.idealTxt(ataque.ideal).replace(/^Distancia ideal /, ''))}` : ''].filter(Boolean).join(' · ') : '';
     dueloAvisoObjetivo(yo.nombre, msg.conSuelto, alSuelto, ataque && ataque.hab ? ataque.hab.nombre : '', extraTiro);
   };
+  if(typeof apuntarMioId !== 'undefined'){ const me = [...tokens.entries()].find(([, t]) => propio(t)); apuntarMioId = me ? me[0] : null; }   // 🎯 js/48
   pedir();
+  if(typeof encuadrarObjetivos === 'function') setTimeout(() => { if(elegirDestinoCb) encuadrarObjetivos(true); }, 60);   // si alguno de los que brillan quedó afuera de la pantalla
 }
 /* Los misiles (2026-10-05, Varita de misiles; dueño: «el segundo objetivo se elige una vez que se recorrió todo el efecto del primero»): van de a uno,
    como una cascada de área que se arma sobre la marcha. El primero es un duelo entero contra el rival elegido; cuando se resuelve, el área queda

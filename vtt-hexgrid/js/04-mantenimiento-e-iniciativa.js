@@ -685,7 +685,10 @@ function renderIniciativa(){
   if(!visibles.length){
     lista.innerHTML = `<div id="iniciativa-vacio">${soyGM ? 'Sin orden todavía: tocá "Traer tokens" y cargá las tiradas.' : 'El GM todavía no armó el orden.'}</div>`;
   }else{
-    const filaIni = ({o, i}, ya) => {
+    // En un turno libre (`libre`), la fila de quien lo juega va arriba de todo, aparte (`libreArriba`), y la lista gira desde quien tenía el turno.
+    const lib = iniciativa.libre, kLib = lib ? iniciativa.orden.findIndex(o => o.id === lib.vuelve) : -1;
+    const base = lib && kLib >= 0 ? kLib : iniciativa.turno;
+    const filaIni = ({o, i}, ya, libreArriba) => {
       const t = tokens.get(o.id);
       const nombre = t ? nombreDe(t) : '(token borrado)';
       const v = t ? vinculo(t) : null;
@@ -699,10 +702,10 @@ function renderIniciativa(){
       // siendo solo del GM.
       const puede = puedeEditarIniciativa(t);
       const fuera = iniciativaFueraDeJuego(o.id);
-      const libre = iniciativa.libre && iniciativa.libre.id === o.id && i === iniciativa.turno;
-      return `<div class="ini-fila${i === iniciativa.turno ? ' activo' : ''}${fuera ? ' fuera' : ''}${ya ? ' ya' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}${libre ? ' — turno libre (no pasa el turno)' : ''}${fuera ? ' — caído/derrotado: fuera del orden de turnos hasta que se recupere' : ''}${soyGM ? ' · clic derecho: es su turno' : ''}">
+      const libre = !!libreArriba;
+      return `<div class="ini-fila${(lib ? libre : i === iniciativa.turno) ? ' activo' : ''}${fuera ? ' fuera' : ''}${ya ? ' ya' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}${libre ? ' — turno libre (no pasa el turno)' : ''}${fuera ? ' — caído/derrotado: fuera del orden de turnos hasta que se recupere' : ''}${soyGM ? ' · clic derecho: es su turno' : ''}">
         <span class="ini-ficha" style="border-color:${esc(color)}">${mini ? `<img src="${esc(mini)}" alt="">` : esc(inicial(nombre))}</span>
-        <span class="ini-nombre">${iniciativa.libre && iniciativa.libre.id === o.id && i === iniciativa.turno ? '⚡ ' : ''}${fuera ? '💀 ' : ''}${oculto ? '🙈 ' : ''}${t && enSigilo(t) && (soyGM || t.tipo !== 'creep') ? '🥷 ' : ''}${esc(nombre)}</span>` +
+        <span class="ini-nombre">${libre ? '⚡ ' : ''}${fuera ? '💀 ' : ''}${oculto ? '🙈 ' : ''}${t && enSigilo(t) && (soyGM || t.tipo !== 'creep') ? '🥷 ' : ''}${esc(nombre)}</span>` +
         (puede
           ? `<input class="ini-valor" type="number" step="1" value="${fmt(num(o.valor))}" data-ini-valor="${esc(o.id)}" title="Iniciativa">`
           : `<span class="ini-valor">${fmt(num(o.valor))}</span>`) +
@@ -713,9 +716,10 @@ function renderIniciativa(){
     // La lista gira con el turno (dueño, 2026-10-06: «una línea para saber cuándo se da la vuelta completa»): arriba el que actúa, después los
     // que faltan en esta ronda, la línea «↻ Ronda N+1» y abajo, apagados, los que ya jugaron (vuelven a jugar en la ronda siguiente).
     // Los que ya jugaron esta ronda y quedaron más abajo (Degollar, o el GM los bajó) van con los apagados: no les vuelve a tocar.
-    const yaJugo = x => x.i > iniciativa.turno && (iniciativa.actuaron || []).includes(x.o.id);
-    const faltan = visibles.filter(x => x.i >= iniciativa.turno && !yaJugo(x)), jugaron = [...visibles.filter(yaJugo), ...visibles.filter(x => x.i < iniciativa.turno)];
-    lista.innerHTML = faltan.map(x => filaIni(x, false)).join('') +
+    const yaJugo = x => x.i > base && (iniciativa.actuaron || []).includes(x.o.id);
+    const faltan = visibles.filter(x => x.i >= base && !yaJugo(x)), jugaron = [...visibles.filter(yaJugo), ...visibles.filter(x => x.i < base)];
+    const arriba = lib ? visibles.find(x => x.o.id === lib.id) : null;
+    lista.innerHTML = (arriba ? filaIni(arriba, false, true) : '') + faltan.map(x => filaIni(x, false)).join('') +
       `<div class="ini-ronda" title="Acá termina la ronda: los de abajo ya jugaron y vuelven a jugar en la ronda siguiente">↻ Ronda ${fmt(iniciativa.ronda + 1)}</div>` +
       jugaron.map(x => filaIni(x, true)).join('');
   }

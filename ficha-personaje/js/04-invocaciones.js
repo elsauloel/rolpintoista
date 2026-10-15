@@ -642,7 +642,7 @@ function hiEjecucionRender(){
 }
 function hiAbrirEjecucion(){
   const e = editingHabInv;
-  AsistenteDueloHab.abrir({nombre: $('#hi-nombre').value.trim() || 'Habilidad', detalle: $('#hi-detalle').value.trim(), inicial: e.duelo || null, siempreActivo: true, tieneFormula: !!$('#hi-tirada').value.trim(),
+  AsistenteDueloHab.abrir({nombre: $('#hi-nombre').value.trim() || 'Habilidad', detalle: $('#hi-detalle').value.trim(), inicial: e.duelo || null, siempreActivo: true, formulaDano: $('#hi-tirada').value.trim(), tieneFormula: !!$('#hi-tirada').value.trim(),
     costoInicial: {sp: '', nitrosCosto: $('#hi-nitros-modo').value === 'ataque' ? 'ATAQUE' : num($('#hi-acciones').value), hpCosto: num($('#hi-hpcosto').value)}, elegirEstado: elegirEstadoDuelo,
     alGuardar: r => {
       if(editingHabInv !== e) return;

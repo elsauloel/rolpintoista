@@ -227,7 +227,7 @@ const FichaEditor = (() => {
   // Abre el cuadro que arma la ejecución paso a paso de una habilidad (comun/asistente-duelo-hab.js). Guardarla la deja
   // en ✨ Automático; sacarla la deja en 💰 Semiautomático.
   function abrirEjecucionHab(it, elegirEstado, alTerminar){
-    AsistenteDueloHab.abrir({nombre: it.nombre || 'Habilidad', detalle: it.detalle || '', inicial: FichaBotonera.dueloDe(it) || null, siempreActivo: true, tieneFormula: !!String(it.tiradaExtra || '').trim(), costoVariable: FichaHabilidades.spVariable(it) ? 'sp' : FichaHabilidades.nitrosVariable(it) ? 'nitros' : '',
+    AsistenteDueloHab.abrir({nombre: it.nombre || 'Habilidad', detalle: it.detalle || '', inicial: FichaBotonera.dueloDe(it) || null, siempreActivo: true, formulaDano: String(it.tiradaExtra || '').trim(), tieneFormula: !!String(it.tiradaExtra || '').trim(), costoVariable: FichaHabilidades.spVariable(it) ? 'sp' : FichaHabilidades.nitrosVariable(it) ? 'nitros' : '',
       costoInicial: {sp: it.costo, nitrosCosto: it.nitrosCosto, hpCosto: it.hpCosto, turnoAjenoSp: it.turnoAjenoSp}, elegirEstado,
       alGuardar: r => {
         if(r){ it.duelo = r.duelo; it.costo = r.costo.sp; it.nitrosCosto = r.costo.nitrosCosto; it.hpCosto = r.costo.hpCosto; it.turnoAjenoSp = r.costo.turnoAjenoSp || ''; it.modo = 'auto'; it.automatizada = true; }

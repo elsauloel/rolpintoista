@@ -617,14 +617,15 @@ const Duelo = (() => {
     const t = h.tira && h.tira.formula ? {formula: txtCorto(h.tira.formula, 60), etq: txtCorto(h.tira.etq || 'Tirada', 30)}
       : h.tira && h.tira.stat ? {stat: txtCorto(h.tira.stat, 20), etq: txtCorto(h.tira.etq || h.tira.stat, 30), bono: _num(h.tira.bono)} : null;
     const contra = (Array.isArray(h.contra) ? h.contra : []).slice(0, 4)
-      .map(c => ({modo: txtCorto(c.modo || c.stat, 20), stat: txtCorto(c.stat || c.modo, 20), etq: txtCorto(c.etq || c.stat || c.modo, 30)})).filter(c => c.stat);
+      .map(c => c && c.formula ? {modo: txtCorto(c.modo || 'f', 20), formula: txtCorto(c.formula, 60), etq: txtCorto(c.etq || 'Resistencia', 30)}   // fórmula propia (2026-10-15)
+        : ({modo: txtCorto(c.modo || c.stat, 20), stat: txtCorto(c.stat || c.modo, 20), etq: txtCorto(c.etq || c.stat || c.modo, 30), ...(_num(c.bono) ? {bono: Math.round(_num(c.bono))} : {})})).filter(c => c.stat || c.formula);
     const dano = h.dano && (String(h.dano.formula || '').trim() || h.dano.diferencia) ? {formula: txtCorto(h.dano.formula, 40), tipo: txtCorto(h.dano.tipo || 'arcano', 20), ignoraDef: h.dano.ignoraDef !== false,
       ...(h.dano.trueDamage ? {trueDamage: true} : h.dano.directo ? {directo: true} : {}),   // dueño, 2026-10-07 (P169)
       ...(_num(h.dano.mult) > 1 ? {mult: Math.min(4, _num(h.dano.mult))} : {}), ...(h.dano.carga ? {carga: txtCorto(h.dano.carga, 20)} : {}),   // ✨ Carga Elemental (2026-10-13)
       ...(h.dano.porDano && typeof Combatiente !== 'undefined' && Combatiente.porDanoNorm(h.dano.porDano) ? {porDano: Combatiente.porDanoNorm(h.dano.porDano)} : {}),
       ...(h.dano.diferencia ? {diferencia: true} : {}), ...(h.dano.drena ? {drena: true, drenaTope: Math.max(0, Math.round(_num(h.dano.drenaTope))), ...(_num(h.dano.drenaPct) > 0 && _num(h.dano.drenaPct) < 100 ? {drenaPct: Math.round(_num(h.dano.drenaPct))} : {})} : {})} : null;
     const efectos = limpiarEfectos(h.efectos);
-    const objetivo = ['enemigo', 'aliado', 'uno mismo', 'area', 'onda', 'cono', 'linea'].includes(h.objetivo) ? h.objetivo : 'enemigo';
+    const objetivo = ['enemigo', 'aliado', 'cualquiera', 'uno mismo', 'area', 'onda', 'cono', 'linea'].includes(h.objetivo) ? h.objetivo : 'enemigo';   // cualquiera: aliado o enemigo (2026-10-15)
     return {nombre: txtCorto(h.nombre, 60), objetivo, tira: t, contra, dano, efectos, sinOposicion: !(t && contra.length),
       ...((objetivo === 'onda' || objetivo === 'cono') && h.dodge ? {dodge: true} : {}),
       ...(objetivo === 'onda' && h.conVista ? {conVista: true} : {}),   // la luz: solo a los que ve (los sólidos la tapan)
@@ -634,7 +635,10 @@ const Duelo = (() => {
         ...(h.zonaQueda.estado ? {estado: {nombre: txtCorto(h.zonaQueda.estado.nombre || '', 40), ...(h.zonaQueda.estado.turnos ? {turnos: _num(h.zonaQueda.estado.turnos)} : {})}} : {}),
         ...(['piso', 'ambos'].includes(h.zonaQueda.altura) ? {altura: h.zonaQueda.altura} : {}),   // dónde está lo que deja (2026-10-07)
         ...(h.zonaQueda.contra ? {contra: txtCorto(h.zonaQueda.contra, 12)} : {}), ...(h.zonaQueda.tira ? {tira: txtCorto(h.zonaQueda.tira, 12), tiraValor: _num(h.zonaQueda.tiraValor)} : {}),
-        ...(h.zonaQueda.color ? {color: txtCorto(h.zonaQueda.color, 7)} : {})}} : {}),   // lo que deja en el suelo (bola de fuego, ventisca)
+        ...(h.zonaQueda.color ? {color: txtCorto(h.zonaQueda.color, 7)} : {}),
+        // Cuándo afecta y a quién (2026-10-15, editor de la Ejecución): por defecto, en cada turno a quien sigue adentro, no a cada paso, a todos.
+        ...(h.zonaQueda.enMantenimiento === false ? {enMantenimiento: false} : {}), ...(h.zonaQueda.cadaPaso ? {cadaPaso: true} : {}),
+        ...(h.zonaQueda.soloRivales ? {soloRivales: true} : {})}} : {}),   // lo que deja en el suelo (bola de fuego, ventisca)
       ...(h.menosDistancia ? {menosDistancia: true} : {}),   // −1 por casillero después del primero (pelea cercana)
       // Tormenta arcana (2026-10-13): sin tirada, cada sub-duelo arranca en el dodge roll; `cuenta` = cuántos proyectiles le tocaron a cada token.
       ...(h.soloDodge ? {soloDodge: true} : {}),
@@ -676,7 +680,7 @@ const Duelo = (() => {
     return ((d.hab && d.hab.contra) || [])
       .filter(c => c.stat !== 'parry' || !hk || !hk.puedeParry || hk.puedeParry(d))
       .map(c => ({modo: c.modo, stat: c.stat || '', itemId: '', itemNombre: '', etiqueta: `🛡 ${c.etq}`, costo: 0, motivoNo: '',
-        info: hk && hk.habValor ? [`${c.etq} 🎲 ${hk.habValor(d, 'defensor', c.stat) || '—'}`] : []}));
+        info: c.formula ? [`${c.etq} 🎲 ${c.formula}`] : hk && hk.habValor ? [`${c.etq} 🎲 ${hk.habValor(d, 'defensor', c.stat) || '—'}${_num(c.bono) ? ` ${_num(c.bono) > 0 ? '+' : ''}${_num(c.bono)}` : ''}`] : []}));
   }
   // Pasa a lo que sigue cuando quien usa la habilidad ganó la contienda (o no había): daño, efectos o fin.
   function entrarHab(m){
@@ -1916,7 +1920,7 @@ const Duelo = (() => {
       return `<div class="duelo-ef"><div class="duelo-ef-top"><b>${_esc(ef.nombre)}</b><span class="duelo-ef-prob">${_esc(prob)}</span></div>${ef.detalle ? `<div class="duelo-nota">${_esc(ef.detalle)}</div>` : ''}${estado}</div>`;
     }).join('');
     const contraCard = contraOtro ? `<div class="duelo-ef"><div class="duelo-nota">✋ Se resiste con: ${_esc(contraOtro)}</div></div>` : '';
-    const notaCard = contraCard + (nota ? `<div class="duelo-ef"><div class="duelo-nota">✋ ${_esc(nota)}</div></div>` : '')
+    const notaCard = contraCard + (nota ? `<div class="duelo-ef"><div class="duelo-nota">✋ <b>A mano:</b> ${_esc(nota)}</div></div>` : '')
       + (notaCritico ? `<div class="duelo-ef"><div class="duelo-nota">⚡ Crítico: ${_esc(notaCritico)}</div></div>` : '');
     const pendiente = d.fase === 'efectos' && efs.length;
     return `<div class="duelo-paso"><h4><span class="n">${d.hab ? (d.hab.sinOposicion ? 2 : d.hab.dano ? 4 : 3) : 6}</span>${d.hab ? 'Efectos de la habilidad' : 'Efectos del golpe'}</h4>${notaCard}${tablero}${cards}${pendiente && puedeAtq ? '<div class="duelo-pie" style="margin-top:8px"><button type="button" class="sec" data-ef-terminar>Terminar sin resolver los que faltan</button></div>' : ''}</div>`;

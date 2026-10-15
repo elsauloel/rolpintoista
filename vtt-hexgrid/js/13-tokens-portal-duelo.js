@@ -661,7 +661,7 @@ function dueloElegirObjetivoMapa(msg){
   // clickear cualquiera igual, pero si no es del bando esperado se pide confirmar antes de abrir el duelo
   // ("avisa y deja seguir", no bloquea — no hay razón mecánica para prohibir un golpe a un aliado a propósito).
   const objetivoTipo = (ataque && ataque.hab && ataque.hab.objetivo) || 'enemigo';
-  const esValido = objetivoTipo === 'aliado' ? t => !dueloEsRival(yo, t) : objetivoTipo === 'enemigo' ? t => dueloEsRival(yo, t) : null;
+  const esValido = objetivoTipo === 'aliado' ? t => !dueloEsRival(yo, t) : objetivoTipo === 'enemigo' ? t => dueloEsRival(yo, t) : null;   // «cualquiera» (2026-10-15): no sugiere bando
   const conArco = !!(ataque && ataque.arco && !ataque.hab);   // el arco: el objetivo, con al menos 2 casilleros libres en el medio (P183)
   const minimo = conArco ? Combatiente.arcoLibres(ataque) + 1 : 0;   // (la Mínima más larga: 2 libres)
   // Un disparo (arma de rango): la línea de tiro se dibuja hasta el mouse y brillan en celeste los que están en la distancia ideal (js/32).
@@ -1104,10 +1104,10 @@ function enCunaCiega(atq, def){
 function dueloZonaQueda(hab, centro, radio, yo){
   const z = hab.zonaQueda;
   crearElementoZona({col: centro.col, fila: centro.fila}, {
-    radio, turnos: z.turnos || 1, nombre: `${hab.nombre}${z.nombre ? ': ' + z.nombre : ''}`.slice(0, 40), color: z.color || '', amiga: true,
+    radio, turnos: z.turnos || 1, nombre: `${hab.nombre}${z.nombre ? ': ' + z.nombre : ''}`.slice(0, 40), color: z.color || '', amiga: !z.soloRivales,   // a todos, salvo «solo a los rivales» (2026-10-15)
     dano: z.dano || '', ignoraDef: true, danoTipo: z.tipoDano || '', estado: z.estado || null,
     ...(z.contra ? {resistStat: z.contra, tiraStat: z.tira || 'dmgesp', tiraValor: num(z.tiraValor)} : {}),
-    enMantenimiento: true, cadaPaso: false, casteadorRef: String(yo.ref || ''), casteadorTipo: yo.tipo === 'creep' ? 'creep' : 'pj', altura: z.altura,
+    enMantenimiento: z.enMantenimiento !== false, cadaPaso: !!z.cadaPaso, casteadorRef: String(yo.ref || ''), casteadorTipo: yo.tipo === 'creep' ? 'creep' : 'pj', altura: z.altura,
     directo: !!(hab.dano && (hab.dano.directo || hab.dano.trueDamage)),   // lo que deja una varita de daño directo, también directo (2026-10-07)
   }).catch(err => console.error('No se pudo dejar la zona del área:', err));
 }

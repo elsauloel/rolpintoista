@@ -1,4 +1,9 @@
 /* comun/asistente-duelo-hab.js — «⚔ Duelo» de una habilidad (2026-09-27, docs/duelo-de-habilidades.md).
+   **Desde el 2026-10-15 los pasos de una habilidad son los recuadros del duelo** (docs/plan-editor-ejecucion.md, dueño: «la edición tiene
+   que ser una emulación del mismo menú del duelo»): Costo · 1 Declaración (a quién —también «cualquier personaje»—, dónde tiene que estar, el
+   área y si es del momento o permanece) · La zona (si permanece: cuánto dura, cuándo afecta, qué deja) · 2 Contacto (qué tira contra con qué
+   se resiste: la lista, «Otro stat…» o «Fórmula propia», dados o stat + N) · 3 Daño (de dónde sale, la fórmula acá mismo —`danoFormula`—,
+   lo que se le suma —`danoMas`— y qué lo frena) · 4 Efectos (con «✋ Manual»). Un ataque con el arma y un Flash siguen con sus pasos.
    Desde 2026-10-02 (tanda 4 de docs/plan-paso-a-paso.md) se abre en la ventana común paso a paso (comun/paso-a-paso.js): título con
    el paso, pestañas que saltan, Guardar siempre visible y la paleta de todos (antes era azul, con pastillitas).
    Ventana PASO A PASO (2026-09-27, pedido del dueño — mismo criterio que el resto de los asistentes del
@@ -103,7 +108,22 @@ const AsistenteDueloHab = (() => {
 .adh-paso .aviso{background:rgba(201,133,69,.12);border:1px solid var(--pap-cobre,#C98545);border-radius:3px;padding:8px 10px;font-size:12.5px;color:var(--pap-laton,#E0A458)}
 .adh-paso .adh-resumen{border:1px solid var(--pap-linea,#3B2E34);background:#120D10;padding:10px 12px;border-radius:3px;font-size:13px;line-height:1.6}
 .adh-paso .adh-resumen b{color:var(--pap-laton,#E0A458)}
-.adh-paso textarea{width:100%;box-sizing:border-box}`;
+.adh-paso textarea{width:100%;box-sizing:border-box}
+.adh-paso .adh-card{border:1px solid var(--pap-linea,#3B2E34);border-radius:8px;padding:10px 12px;background:#120D10;display:flex;flex-direction:column;gap:10px}
+.adh-paso .adh-card-h{display:flex;align-items:center;gap:8px;font-family:"Space Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--pap-laton,#E0A458)}
+.adh-paso .adh-num{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:#2d6cdf;color:#fff;font-size:11px}
+.adh-paso .adh-vs{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;align-items:start}
+.adh-paso .adh-vs-t{align-self:center;font-weight:700;color:var(--pap-laton,#E0A458);font-size:18px}
+.adh-paso .adh-lado{border:1px dashed var(--pap-linea,#3B2E34);border-radius:6px;padding:8px 10px;min-width:0;display:flex;flex-direction:column;gap:6px}
+.adh-paso .adh-lbl{font-family:"Space Mono",ui-monospace,monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--pap-tenue,#9A867E);margin-bottom:2px}
+.adh-paso .adh-grid{margin-top:4px;border:1px solid var(--pap-cobre,#C98545);border-radius:6px;padding:8px;display:flex;flex-direction:column;gap:6px}
+.adh-paso .adh-grid-h{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--pap-laton,#E0A458)}
+.adh-paso .adh-grid-g{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.adh-paso .adh-grid-t{min-width:96px;font-size:12px;color:var(--pap-tenue,#9A867E)}
+.adh-paso button.adh-stat{border-style:solid;padding:4px 8px;text-transform:none;letter-spacing:0;font-size:12px}
+.adh-paso .adh-chip{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--pap-cobre,#C98545);border-radius:12px;padding:1px 2px 1px 10px;font-size:12.5px}
+.adh-paso button.adh-chip-x{border:none;background:none;padding:2px 6px}
+.adh-paso .adh-freno{border:1px solid var(--pap-linea,#3B2E34);border-radius:6px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}`;
     document.head.appendChild(s);
   }
 
@@ -124,7 +144,7 @@ const AsistenteDueloHab = (() => {
       // Mesa con `tiraEtiqueta` en vez del nombre de un stat; `tiraFormula` puede llevar «X» (costo variable).
       tiraModo: (ini && ini.tiraFormula) ? 'custom' : 'stat',
       tiraFormula: (ini && ini.tiraFormula) || '', tiraEtiqueta: (ini && ini.tiraEtiqueta) || '',
-      contra: new Set(ini && Array.isArray(ini.contra) && ini.contra.length ? ini.contra : ['resmg']),
+      contra: new Set(ini && Array.isArray(ini.contra) && ini.contra.length ? ini.contra.filter(x => typeof x === 'string') : ['resmg']),
       // Resistencia: además del stat de siempre, «Nadie» (se aplica directo, aunque haya tirada — ej. un buff
       // con una tirada propia de sabor) y «Otro» (texto libre para lo que no está en la lista: la mesa lo
       // resuelve a mano, ver `contraOtro`) — 2026-09-28, pedido del dueño.
@@ -197,6 +217,20 @@ const AsistenteDueloHab = (() => {
       zonaEstadoNombre: (ini && ini.zonaEstado && ini.zonaEstado.nombre) || '',
       zonaEstadoTurnos: (ini && ini.zonaEstado && ini.zonaEstado.turnos) ?? 2,
       zonaEstadoStacks: (ini && ini.zonaEstado && ini.zonaEstado.stacks) || '',
+      // El editor como el cuadro del duelo (2026-10-15, docs/plan-editor-ejecucion.md): stat + N, resistirse con otro stat o con una fórmula
+      // propia, el área que permanece (y cuándo afecta su zona), dónde cae el centro, la fórmula del daño acá mismo y lo que se le suma.
+      tiraBono: ini && Number(ini.tiraBono) ? Number(ini.tiraBono) : 0,
+      contraExtra: ini && Array.isArray(ini.contra) ? ini.contra.filter(x => x && typeof x === 'object').map(x => ({...x})) : [],
+      grid: '', contraFormula: '', contraFormulaEtq: '',
+      permanencia: ini && ini.objetivo === 'zona' ? 'solo' : ini && ini.zonaQueda ? 'queda' : 'momento',
+      zq: (() => { const z = (ini && ini.zonaQueda) || {}; return {turnos: Number(z.turnos) || 2, enMant: z.enMantenimiento !== false, cadaPaso: !!z.cadaPaso, soloRivales: !!z.soloRivales,
+        dano: z.dano || '', tipoDano: z.tipoDano || '', estadoNombre: (z.estado && z.estado.nombre) || '', estadoTurnos: (z.estado && z.estado.turnos) || 2, altura: z.altura || 'aire',
+        contra: z.contra || '', tira: z.tira || '', nombre: z.nombre || '', color: z.color || ''}; })(),
+      zonaEnMant: !(ini && ini.zonaEnMantenimiento === false), zonaCadaPaso: !!(ini && ini.zonaCadaPaso),
+      centroModo: ini && ini.centroAlcance === 'rango' ? 'rango' : ini && Number(ini.centroAlcance) === 1 ? 'adyacente' : ini && Number(ini.centroAlcance) > 1 ? 'fijo' : '',
+      centroN: ini && Number(ini.centroAlcance) > 1 ? Number(ini.centroAlcance) : 3,
+      danoFormula: (ini && ini.danoFormula) || cfg.formulaDano || '', danoMas: (ini && ini.danoMas) || '',
+      frenoAbierto: false,
     };
     let api = null, f = null;   // la ventana común abierta y su caja (f: donde se buscan los controles de cada paso)
     const cerrar = () => { if(api) api.cerrar(); };
@@ -214,11 +248,10 @@ const AsistenteDueloHab = (() => {
       }else if(st.modo === 'arma'){
         L.push({id: 'arma', corto: 'Tu ataque'}, {id: 'alcance', corto: 'Alcance'}, {id: 'efectos', corto: 'Al pegar'});
       }else{
-        L.push({id: 'objetivo', corto: 'Objetivo'});
-        if(st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda' && st.objetivo !== 'cono' && st.objetivo !== 'linea' && st.objetivo !== 'zona') L.push({id: 'alcance', corto: 'Alcance'});
-        L.push({id: 'tira', corto: st.objetivo === 'zona' ? 'Tirada de la zona' : 'Tirada'});
-        if(!sinOp()) L.push({id: 'contra', corto: 'Resistencia'});
-        L.push({id: 'dano', corto: 'Daño'});
+        // Los mismos recuadros del cuadro del duelo (2026-10-15, dueño: «la edición tiene que ser una emulación del mismo menú del duelo»).
+        L.push({id: 'declaracion', corto: 'Declaración'});
+        if(st.objetivo === 'zona' || ((st.objetivo === 'area' || st.objetivo === 'onda') && st.permanencia === 'queda')) L.push({id: 'zona', corto: 'La zona'});
+        L.push({id: 'contacto', corto: 'Contacto'}, {id: 'dano', corto: 'Daño'});
         if(st.objetivo !== 'zona') L.push({id: 'efectos', corto: 'Efectos'});
       }
       L.push({id: 'listo', corto: 'Listo'});
@@ -273,147 +306,160 @@ const AsistenteDueloHab = (() => {
         ${fila('espaldaPdg', '+ PdG por la espalda')}${fila('espaldaFijo', '+ Daño por la espalda')}${fila('espaldaCritpot', '+ Crítico potente por la espalda')}`;
       return h;
     }
-    function cuerpoObjetivo(){
-      let h = titulo('', '¿A quién apunta?', 'Elegí quién puede recibir esta habilidad.');
-      h += `<select data-objetivo>${[['enemigo', 'A un enemigo (o a cualquier otro token)'], ['aliado', 'A un aliado'], ['uno mismo', 'A uno mismo (no hay que elegir)'], ['area', 'A un área (varios objetivos, en cascada — Orbe arcano, Tormenta arcana…)'], ['onda', 'Onda alrededor de quien la usa (sin marcar centro — Shockwave…)'], ['cono', 'Cono al frente de quien la usa (sin marcar nada — Sonic Boom…)'], ['linea', 'Línea recta desde quien la usa (atraviesa — Varita láser…)'], ['zona', 'Zona persistente (queda puesta varios turnos — Nube tóxica…)']].map(([v, t]) => `<option value="${v}"${st.objetivo === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
-      if(st.objetivo === 'linea'){
-        h += `<p class="nota" style="margin-top:10px">Al ejecutarla marcás hacia dónde: sale una <b>línea recta desde tu token</b> de este largo y todo rival que esté en ella entra en la cascada, uno detrás del otro (vos tirás una sola vez; cada uno se resiste por separado y, si gana, tiene derecho a un dodge roll).</p>
-          <div class="fila"><input type="number" min="1" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros de largo</span></div>`;
+    /* ---------- Los recuadros del duelo (2026-10-15, docs/plan-editor-ejecucion.md) ----------
+       1 Declaración (a quién, dónde tiene que estar, el área y si permanece) · La zona (si permanece) · 2 Contacto (qué tira contra con qué se
+       resiste: la lista, «Otro stat…» o «Fórmula propia») · 3 Daño (de dónde sale, qué se le suma y qué lo frena) · 4 Efectos. */
+    const OBJETIVOS = [['enemigo', 'Un enemigo'], ['aliado', 'Un aliado'], ['cualquiera', 'Cualquier personaje (aliado o enemigo)'], ['uno mismo', 'Uno mismo'],
+      ['area', 'Un área (marcás el centro)'], ['onda', 'Onda alrededor tuyo'], ['cono', 'Cono al frente tuyo'], ['linea', 'Línea recta desde vos']];
+    const ESPACIAL = [['auto', 'Automático (lo especial: tu Rango; lo demás, sin límite)'], ['adyacente', 'Pegado (adyacente)'], ['rango', 'Dentro de tu Rango'], ['fijo', 'A un número de casilleros o menos'], ['ilimitado', 'Sin límite']];
+    const norm = x => String(x || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[.\s]/g, '');
+    const corto = t => String(t).split(' (')[0];
+    // Todos los stats, agrupados por atributo (la grilla de «Otro stat…»).
+    function gruposStats(){
+      if(typeof FichaCalculo !== 'undefined' && FichaCalculo.GRUPOS) return FichaCalculo.GRUPOS.map(g => ({nombre: g.full || g.label, stats: [{id: g.id, label: g.full || g.label}, ...(g.derived || []).map(d => ({id: d.id, label: d.label, full: d.full}))]}));
+      const vistos = new Set();
+      return [{nombre: 'Stats', stats: [...TIRA, ...CONTRA].filter(([id]) => !vistos.has(id) && vistos.add(id)).map(([id, t]) => ({id, label: corto(t)}))}];
+    }
+    function statNombre(id){
+      const x = [...TIRA, ...CONTRA].find(y => y[0] === id);
+      if(x) return corto(x[1]);
+      for(const g of gruposStats()) for(const s2 of g.stats) if(s2.id === id) return s2.full || s2.label;
+      return id;
+    }
+    function statDeTexto(txt){
+      const n = norm(txt);
+      if(!n) return '';
+      for(const [id, t] of [...TIRA, ...CONTRA]) if(norm(id) === n || norm(corto(t)) === n) return id;
+      for(const g of gruposStats()) for(const s2 of g.stats) if(norm(s2.id) === n || norm(s2.label) === n || norm(s2.full) === n) return s2.id;
+      return '';
+    }
+    // «Fórmula propia» (dueño, 2026-10-15): dados («1d4+3», «X+1dX») o un stat más un número («pdg + 5», «Destreza − 1»). → {stat, bono} | {formula} | null
+    function leerFormula(txt){
+      const t = String(txt || '').trim().replace(/−/g, '-');
+      const m = t.match(/^([^\d+\-][^+\-]*?)\s*(?:([+-])\s*(\d+))?$/);
+      if(m){ const id = statDeTexto(m[1]); if(id) return {stat: id, bono: m[2] ? (m[2] === '-' ? -1 : 1) * Number(m[3]) : 0}; }
+      if(/^[\dxXdD+\-\s]+$/.test(t) && /[\dxX]/.test(t)) return {formula: t.replace(/\s+/g, '')};
+      return null;
+    }
+    function gridHtml(){
+      return `<div class="adh-grid"><div class="adh-grid-h">Elegí el stat <button type="button" class="sec" data-grid-cerrar>Cerrar</button></div>
+        ${gruposStats().map(g => `<div class="adh-grid-g"><span class="adh-grid-t">${esc(g.nombre)}</span>${g.stats.map(x => `<button type="button" class="adh-stat" data-grid-stat="${esc(x.id)}" title="${esc(x.full || x.label)}">${esc(x.label)}</button>`).join('')}</div>`).join('')}</div>`;
+    }
+    const esAreaObj = o => ['area', 'onda', 'cono', 'linea'].includes(o);
+
+    function cuerpoDeclaracion(){
+      const vis = st.objetivo === 'zona' ? 'area' : st.objetivo;
+      let h = titulo('', '1 · Declaración', 'Quién la usa y sobre quién: el primer recuadro del duelo.');
+      h += `<div class="adh-card"><div class="adh-card-h"><span class="adh-num">1</span> Declaración</div>
+        <div class="adh-vs"><div class="adh-lado"><div class="adh-lbl">Usa la habilidad</div><b>${esc(cfg.portador || 'Quien la tenga')}</b></div><div class="adh-vs-t">VS</div>
+        <div class="adh-lado"><div class="adh-lbl">Objetivo</div><select data-objetivo>${OBJETIVOS.map(([v, t]) => `<option value="${v}"${vis === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div></div>`;
+      if(['enemigo', 'aliado', 'cualquiera'].includes(vis)){
+        h += `<div><div class="adh-lbl">¿Dónde tiene que estar?</div><div class="fila"><select data-alcance>${ESPACIAL.map(([v, t]) => `<option value="${v}"${st.alcance === v ? ' selected' : ''}>${t}</option>`).join('')}</select>${st.alcance === 'fijo' ? `<input type="number" min="1" style="width:70px" data-alcanceN value="${esc(st.alcanceN)}"><span>casilleros</span>` : ''}</div>
+          <p class="nota">No limita a quién podés apuntar: al elegir el objetivo, brillan los que están ahí.</p></div>`;
       }
-      if(st.objetivo === 'cono'){
-        h += `<p class="nota" style="margin-top:10px">No hay que marcar nada: al ejecutarla, todo rival dentro del <b>cono al frente de tu token</b> (el mismo de 16 casillas de la detección, hacia donde mirás; lo que tapa un Sólido no entra) entra en la cascada, uno detrás del otro. Vos tirás una sola vez y cada uno se resiste por separado. No te afecta a vos.</p>
-          <label class="op" style="margin-top:8px"><input type="checkbox" data-ondadodge ${st.ondaDodge ? 'checked' : ''}> Quien gana su tirada tiene derecho a un dodge roll (salir del cono moviéndose, como en un área)</label>
-          <p class="nota">${st.ondaDodge ? 'Si gana, puede moverse para salir del cono: si sale, la esquiva; si se queda adentro, le pega igual.' : 'Sin tildar: quien gana su tirada no recibe nada (como Sonic Boom).'}</p>`;
+      if(vis === 'area' || vis === 'onda'){
+        h += `<div><div class="adh-lbl">Tamaño</div><div class="fila"><select data-radio>${Combatiente.diametroOpciones(st.radio, {min: vis === 'area' && st.objetivo !== 'zona' ? 0 : 1})}</select>${vis === 'onda' ? '<span>alrededor tuyo (diámetro 3 = los de al lado)</span>' : ''}</div></div>`;
+        if(vis === 'area') h += `<div><div class="adh-lbl">¿Dónde cae el centro?</div><div class="fila"><select data-centro>${[['', 'Donde quieras (sin límite)'], ['adyacente', 'En una casilla pegada a vos'], ['rango', 'Dentro de tu Rango'], ['fijo', 'A un número de casilleros o menos']].map(([v, t]) => `<option value="${v}"${st.centroModo === v ? ' selected' : ''}>${t}</option>`).join('')}</select>${st.centroModo === 'fijo' ? `<input type="number" min="1" style="width:70px" data-centroN value="${esc(st.centroN)}"><span>casilleros</span>` : ''}</div></div>`;
+        const perm = [['momento', 'Del momento: se resuelve al ejecutar y no deja nada'], ['queda', 'Golpea y queda: se resuelve al ejecutar y además deja una zona'], ...(vis === 'area' ? [['solo', 'Solo queda: no golpea al ejecutar; queda una zona que afecta a quien esté o entre']] : [])];
+        h += `<div><div class="adh-lbl">¿Es del momento o permanece?</div>${perm.map(([v, t]) => `<label class="op"><input type="radio" name="permanencia" value="${v}" ${st.permanencia === v ? 'checked' : ''}> ${t}</label>`).join('')}
+          ${st.permanencia !== 'momento' ? '<p class="nota">El paso siguiente, «La zona», define cuánto dura, cuándo afecta y qué deja.</p>' : ''}</div>`;
       }
-      if(st.objetivo === 'onda'){
-        h += `<p class="nota" style="margin-top:10px">No hay que marcar nada: al ejecutarla, todo rival dentro de esta área <b>alrededor de tu token</b> entra en la cascada, uno detrás del otro. Vos tirás una sola vez y cada uno se resiste por separado. No te afecta a vos.</p>
-          <div class="fila"><select data-radio>${Combatiente.diametroOpciones(st.radio, {min: 1})}</select><span>alrededor de tu token (diámetro 3 = los de al lado)</span></div>
-          <label class="op" style="margin-top:8px"><input type="checkbox" data-ondadodge ${st.ondaDodge ? 'checked' : ''}> Quien gana su tirada tiene derecho a un dodge roll (salir de la onda moviéndose, como en un área)</label>
-          <p class="nota">${st.ondaDodge ? 'Si gana, puede moverse para salir del área: si sale, la esquiva; si se queda adentro, le pega igual.' : 'Sin tildar: quien gana su tirada no recibe nada (como Shockwave).'}</p>`;
+      if(vis === 'onda' || vis === 'cono') h += `<label class="op"><input type="checkbox" data-ondadodge ${st.ondaDodge ? 'checked' : ''}> Quien gana su tirada tiene dodge roll (puede salir moviéndose; si sale, la esquiva)</label>`;
+      if(vis === 'cono') h += `<p class="nota">El cono al frente tuyo, hacia donde mirás. No hay que marcar nada.</p>`;
+      if(vis === 'linea') h += `<div><div class="adh-lbl">Largo</div><div class="fila"><input type="number" min="1" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros, desde vos hacia donde marques</span></div></div>`;
+      if(vis === 'uno mismo') h += `<p class="nota">No hay que elegir a nadie: se aplica sobre quien la usa.</p>`;
+      return h + '</div>';
+    }
+
+    function cuerpoZona(){
+      const solo = st.objetivo === 'zona';
+      let h = titulo('', 'La zona que queda', solo ? 'No golpea al ejecutar: queda la zona. Su tirada y su daño se definen en Contacto y Daño; acá, cuánto dura, cuándo afecta y qué deja.'
+        : 'Lo que queda después del golpe (la bola de fuego que deja fuego, la ventisca que deja escarcha). Al ejecutar ya les pegó a los de adentro: esto es para después.');
+      const v = (a, b) => solo ? a : b;
+      const estado = v(st.zonaEstadoNombre, st.zq.estadoNombre);
+      h += `<div class="adh-card"><div class="fila"><input type="number" min="1" style="width:70px" data-z-turnos value="${esc(v(st.zonaTurnos, st.zq.turnos))}"><span>turnos que dura</span></div>
+        <div><div class="adh-lbl">¿Cuándo afecta?</div>
+          <label class="op"><input type="checkbox" checked disabled> Al entrar (siempre)</label>
+          <label class="op"><input type="checkbox" data-z-mant ${v(st.zonaEnMant, st.zq.enMant) ? 'checked' : ''}> En cada turno, a quien sigue adentro</label>
+          <label class="op"><input type="checkbox" data-z-paso ${v(st.zonaCadaPaso, st.zq.cadaPaso) ? 'checked' : ''}> A cada paso que da adentro (un piso de púas)</label></div>
+        <div><div class="adh-lbl">¿A quién?</div><select data-z-quien><option value="todos"${v(st.zonaAmiga, !st.zq.soloRivales) ? ' selected' : ''}>A todos (también a tus aliados)</option><option value="rivales"${v(!st.zonaAmiga, st.zq.soloRivales) ? ' selected' : ''}>Solo a los rivales</option></select></div>
+        <div><div class="adh-lbl">¿Dónde está?</div><select data-z-altura>${[['aire', '☁️ Del aire (gas, nube, humo): alcanza aunque levites'], ['piso', '🟫 Del piso (púas, brea, brasas): levitando se cruza sin tocarla'], ['ambos', '🔥 Ambos (fuego, escarcha)']].map(([x, t]) => `<option value="${x}"${v(st.zonaAltura, st.zq.altura) === x ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
+        <div><div class="adh-lbl">¿Deja un estado?</div><div class="fila"><select data-z-estado><option value="">— ninguno —</option>${nombresEstado().map(n => `<option value="${esc(n)}"${estado === n ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select>${estado ? `<span>dura</span><input type="number" min="0" style="width:64px" data-z-estadoturnos value="${esc(v(st.zonaEstadoTurnos, st.zq.estadoTurnos))}"><span>turnos</span>` : ''}${solo && ['Veneno', 'Veneno severo'].includes(st.zonaEstadoNombre) ? `<span>stacks</span><input type="number" min="1" style="width:64px" data-zonaestadostacks placeholder="por defecto" value="${esc(st.zonaEstadoStacks)}">` : ''}</div></div>`;
+      if(!solo){
+        h += `<div><div class="adh-lbl">¿Hace daño la zona?</div><div class="fila"><input type="text" style="width:110px" data-z-dano placeholder="ej. 1d4 (vacío: no)" value="${esc(st.zq.dano)}"><select data-z-tipo>${[['', 'sin elemento'], ...TIPOS.filter(t => t[0] !== 'fisico')].map(([x, t]) => `<option value="${x}"${st.zq.tipoDano === x ? ' selected' : ''}>${corto(t)}</option>`).join('')}</select></div>
+          <p class="nota">Va directo a la vida: la frena la Defensa especial y la resistencia a su elemento.</p></div>
+          <div><div class="adh-lbl">¿Se resiste?</div><div class="fila"><select data-z-contra><option value="">No: le entra a quien esté</option>${CONTRA.filter(c => c[0] !== 'parry').map(([x, t]) => `<option value="${x}"${st.zq.contra === x ? ' selected' : ''}>Sí, con ${corto(t)}</option>`).join('')}</select>${st.zq.contra ? `<span>contra tu</span><select data-z-tira>${TIRA.map(([x, t]) => `<option value="${x}"${(st.zq.tira || 'dmgesp') === x ? ' selected' : ''}>${corto(t)}</option>`).join('')}</select>` : ''}</div></div>`;
       }
-      if(st.objetivo === 'area'){
-        h += `<p class="nota" style="margin-top:10px">Marcás el centro en el mapa al ejecutarla; todo rival adentro de esta área entra en la cascada, uno detrás del otro (Paso 4 del casteo: primero tira Evasión contra tu tirada; si la gana, tiene derecho a un dodge roll).</p>
-          <div class="fila"><select data-radio>${Combatiente.diametroOpciones(st.radio, {min: 0})}</select><span>tamaño del área</span></div>`;
-      }
-      if(st.objetivo === 'zona'){
-        h += `<p class="nota" style="margin-top:10px">Marcás el centro en el mapa al ejecutarla, como el área — pero <b>queda puesta varios turnos</b>: no se resuelve todo de una. Cualquier rival que entre, o que siga adentro en cada Mantenimiento, se chequea por separado; si esta habilidad tiene una tirada (paso «Tirada»), la tirás una sola vez al lanzarla y esa misma tirada se reusa contra la resistencia de cada uno (paso «Resistencia»). A quien pierde (o entra sin nada que resistir) se le puede aplicar un estado y/o el daño del paso «Daño».</p>
-          <div class="fila"><select data-radio>${Combatiente.diametroOpciones(st.radio, {min: 1})}</select><span>tamaño de la zona</span></div>
-          <div class="fila"><input type="number" min="1" style="width:70px" data-zonaturnos value="${esc(st.zonaTurnos)}"><span>turnos que dura</span></div>
-          <label class="op"><input type="checkbox" data-zonaamiga ${st.zonaAmiga ? 'checked' : ''}> También afecta a tus aliados (no solo a los rivales)</label>
-          <div style="margin-top:12px"><h4 style="margin:0 0 6px">¿Dónde está?</h4><select data-zonaaltura style="max-width:100%">
-            <option value="aire"${st.zonaAltura === 'aire' ? ' selected' : ''}>☁️ Del aire: ocupa el espacio (gas, nube, humo, explosión) — alcanza aunque levites</option>
-            <option value="piso"${st.zonaAltura === 'piso' ? ' selected' : ''}>🟫 Del piso: está en el suelo (púas, brea, aceite, brasas) — levitando se cruza sin tocarla</option>
-            <option value="ambos"${st.zonaAltura === 'ambos' ? ' selected' : ''}>🔥 Ambos (fuego, escarcha): alcanza aunque levites; las Suelas le restan</option></select></div>
-          <div style="margin-top:12px"><h4 style="margin:0 0 6px">¿Deja un estado en quien corresponda?</h4>
-            <select data-zonaestado><option value="">— ninguno (solo el daño del paso «Daño», si tiene) —</option>${nombresEstado().map(n => `<option value="${esc(n)}"${st.zonaEstadoNombre === n ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select></div>`;
-        if(st.zonaEstadoNombre){
-          h += `<div class="fila"><span>Dura</span><input type="number" min="0" style="width:64px" data-zonaestadoturnos value="${esc(st.zonaEstadoTurnos)}"><span>turnos</span></div>`;
-          if(['Veneno', 'Veneno severo'].includes(st.zonaEstadoNombre)){
-            h += `<div class="fila"><span>Stacks</span><input type="number" min="1" style="width:64px" data-zonaestadostacks placeholder="por defecto" value="${esc(st.zonaEstadoStacks)}"></div>`;
-          }
+      return h + '</div>';
+    }
+
+    function cuerpoContacto(){
+      const esZona = st.objetivo === 'zona', esArea = esAreaObj(st.objetivo);
+      let h = titulo('', '2 · Contacto', esZona ? 'La tirada de la zona: cada vez que afecta a alguien, se tira lo de la izquierda (con el valor de quien la creó) contra lo de la derecha. Si gana quien entra, no le pasa nada.'
+        : 'Lo que tira quien la usa contra lo que tira el objetivo para resistirse. «Fórmula propia»: dados (1d4+3) o un stat más un número (pdg + 5).');
+      const opsT = [['', '— Nada: se aplica directo —'], ...TIRA.map(([x, t]) => [x, corto(t)])];
+      if(st.tira && !opsT.some(o => o[0] === st.tira)) opsT.push([st.tira, statNombre(st.tira)]);
+      const valT = st.tiraNinguna ? '' : st.tiraModo === 'custom' ? '__f' : st.tira;
+      let izq = `<div class="adh-lbl">Tira</div><select data-tirasel>${opsT.map(([x, t]) => `<option value="${esc(x)}"${valT === x ? ' selected' : ''}>${esc(t)}</option>`).join('')}<option value="__otro">Otro stat…</option>${esZona ? '' : `<option value="__f"${valT === '__f' ? ' selected' : ''}>Fórmula propia…</option>`}</select>`;
+      if(!st.tiraNinguna && st.tiraModo !== 'custom' && !esZona) izq += `<div class="fila"><span>+</span><input type="number" style="width:64px" data-tirabono value="${esc(st.tiraBono)}"><span class="nota" style="margin:0">un número de más (0 = nada)</span></div>`;
+      if(!st.tiraNinguna && st.tiraModo === 'custom') izq += `<input type="text" data-tira-formula placeholder="1d4+3, X+1dX o pdg + 5" value="${esc(st.tiraFormula)}"><input type="text" data-tira-etiqueta placeholder="¿Qué representa? (ej. Drenaje)" value="${esc(st.tiraEtiqueta)}">`;
+      if(st.grid === 'tira') izq += gridHtml();
+      let der = '<div class="adh-lbl">Se resiste con</div>';
+      if(st.tiraNinguna) der += '<p class="nota">Sin tirada no hay nada que resistir: se aplica directo.</p>';
+      else{
+        if(!esArea && !esZona) der += `<select data-contramodo><option value="stats"${st.contraModo === 'stats' ? ' selected' : ''}>Con…</option><option value="ninguna"${st.contraModo === 'ninguna' ? ' selected' : ''}>Nadie: se aplica directo</option><option value="otro"${st.contraModo === 'otro' ? ' selected' : ''}>Otra cosa (a mano)</option></select>`;
+        if(esArea || esZona || st.contraModo === 'stats'){
+          der += `<div class="adh-check-list">${CONTRA.map(([x, t]) => `<label class="op"><input type="checkbox" data-contra="${x}" ${st.contra.has(x) ? 'checked' : ''}> ${corto(t)}</label>`).join('')}</div>`;
+          const chips = [...[...st.contra].filter(x => !CONTRA.some(c => c[0] === x)).map(x => ({txt: statNombre(x), k: 's:' + x})),
+            ...st.contraExtra.map((x, i) => ({txt: x.formula ? `${x.etq || 'Fórmula'}: ${x.formula}` : `${statNombre(x.stat)} ${Number(x.bono) >= 0 ? '+' : '−'} ${Math.abs(Number(x.bono) || 0)}`, k: 'e:' + i}))];
+          if(chips.length) der += `<div class="fila">${chips.map(c => `<span class="adh-chip">${esc(c.txt)}<button type="button" class="adh-chip-x" data-contra-quitar="${esc(c.k)}" title="Sacar">✕</button></span>`).join('')}</div>`;
+          der += `<div class="fila"><button type="button" class="sec" data-grid="contra">＋ Otro stat…</button></div>`;
+          if(!esZona) der += `<div class="fila"><input type="text" style="width:130px" data-contra-formula placeholder="1d6+2 o des + 2" value="${esc(st.contraFormula)}"><input type="text" style="width:130px" data-contra-formula-etq placeholder="Nombre (opcional)" value="${esc(st.contraFormulaEtq)}"><button type="button" class="sec" data-contra-formula-mas>＋ Fórmula propia</button></div>`;
+          if(st.contra.has('parry')) der += `<p class="nota">Parry solo se ofrece si el objetivo tiene un arma o un escudo.</p>`;
+          if(!esZona) der += `<p class="nota">Si hay más de una, el objetivo elige una a ciegas, antes de ver tu tirada.</p>`;
+          if(st.grid === 'contra') der += gridHtml();
+        }else if(st.contraModo === 'otro'){
+          der += `<input type="text" data-contraotro placeholder="ej. Resistencia a X (a mano)" value="${esc(st.contraOtro)}"><p class="nota">Nadie lo tira solo: el cuadro lo muestra para resolverlo a mano.</p>`;
         }
       }
+      h += `<div class="adh-card"><div class="adh-card-h"><span class="adh-num">2</span> Contacto</div><div class="adh-vs"><div class="adh-lado">${izq}</div><div class="adh-vs-t">VS</div><div class="adh-lado">${der}</div></div></div>`;
       return h;
     }
-    function cuerpoTira(){
-      // Zona persistente (2026-10-02, dueño): la habilidad no falla — la zona aparece siempre; la tirada es del EFECTO de la zona,
-      // y se hace cada vez que afecta a alguien (P143, abierta: por ahora así).
-      if(st.objetivo === 'zona'){
-        st.tiraModo = 'stat';   // una zona tira un stat de quien la creó (la fórmula propia no va acá)
-        let h = titulo('', '¿La zona pide una tirada a quien afecta?', 'La habilidad no falla: al ejecutarla, la zona aparece. La tirada es del efecto de la zona: cada vez que afecta a alguien (al entrar, o en cada Mantenimiento si sigue adentro) se tira este stat de quien la creó —con el valor que tenía al crearla— contra la resistencia de esa persona (paso siguiente).');
-        h += `<label class="op"><input type="checkbox" data-tira-ninguna ${st.tiraNinguna ? 'checked' : ''}> No: el daño y el estado le entran directo a quien esté adentro</label>`;
-        if(!st.tiraNinguna) h += `<select data-tira style="margin-top:10px">${TIRA.map(([v, t]) => `<option value="${v}"${st.tira === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
-        return h;
-      }
-      let h = titulo('', '¿Qué tira quien la usa?', 'El stat que tira quien ejecuta la habilidad, o —si no encaja en ninguno— tu propia fórmula (ej. Drenar vida: «X + 1dX»).');
-      h += `<label class="op"><input type="checkbox" data-tira-ninguna ${st.tiraNinguna ? 'checked' : ''}> No lleva tirada: se aplica directo (buffs, curas sobre uno mismo o un aliado)</label>`;
-      if(st.tiraNinguna){
-        h += `<div class="aviso" style="margin-top:10px">Sin tirada: al ejecutarla se abre el cuadro con los efectos y su botón <b>Aplicar</b>. Así la acción tiene su momento en pantalla igual.</div>`;
-        return h;
-      }
-      // Las dos maneras a la vista (2026-10-02, pedido del dueño: antes «Personalizada» quedaba escondida adentro de un desplegable).
-      h += `<div class="adh-modo">
-          <label class="op"><input type="radio" name="tiramodo" value="stat" ${st.tiraModo !== 'custom' ? 'checked' : ''}> Un stat de la ficha</label>
-          <label class="op"><input type="radio" name="tiramodo" value="custom" ${st.tiraModo === 'custom' ? 'checked' : ''}> Tirada custom: mi propia fórmula de dados, con mi texto (ej. «X + 1dX», «2d6 + 3»)</label>
-        </div>`;
-      if(st.tiraModo === 'custom'){
-        h += `<div class="fila" style="margin-top:8px"><input type="text" style="min-width:160px" data-tira-formula placeholder="ej. X+1dX (podés usar «X»)" value="${esc(st.tiraFormula)}"></div>
-          <div class="fila"><input type="text" style="min-width:240px" data-tira-etiqueta placeholder="¿Qué representa? (ej. Drenaje)" value="${esc(st.tiraEtiqueta)}"></div>
-          <p class="nota" style="margin-top:6px">Se tira con esa fórmula (podés usar «X» si la habilidad ya tiene costo variable) y se anuncia en la Mesa con tu texto, en vez del nombre de un stat.</p>`;
-      }else{
-        h += `<select data-tira style="margin-top:8px">${TIRA.map(([v, t]) => `<option value="${v}"${st.tira === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
-      }
-      return h;
-    }
-    function cuerpoContra(){
-      const esArea = st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono' || st.objetivo === 'linea';
-      let h = titulo('', st.objetivo === 'zona' ? '¿Con qué se resiste quien la zona afecta?' : '¿Con qué se resiste el objetivo?', st.objetivo === 'zona'
-        ? 'Cada vez que la zona afecta a alguien, esa persona tira esto contra la tirada de la zona. Si gana, no le pasa nada (ni daño ni estado).'
-        : esArea
-        ? 'Un hechizo de área u onda necesita un stat real: cada objetivo lo tira contra vos por separado, en la cascada.'
-        : 'Para un ataque o control sobre un rival, elegí uno o más stats (si marcás más de uno, el objetivo elige uno a ciegas, antes de ver tu tirada). Un proyectil suele esquivarse (Evasión); un efecto sobre el cuerpo se resiste con Res.Esp; un control mental con Res.Mt. Para un buff sobre uno mismo o un aliado, casi siempre no hay nada que resistir.');
-      if(!esArea){
-        h += `<div class="adh-modo">
-          <label class="op"><input type="radio" name="contramodo" value="stats" ${st.contraModo === 'stats' ? 'checked' : ''}> Con un stat de la lista</label>
-          <label class="op"><input type="radio" name="contramodo" value="ninguna" ${st.contraModo === 'ninguna' ? 'checked' : ''}> Nadie: no hay nada que resista, se aplica directo</label>
-          <label class="op"><input type="radio" name="contramodo" value="otro" ${st.contraModo === 'otro' ? 'checked' : ''}> Otro (no está en la lista): lo resuelve la mesa a mano</label>
-        </div>`;
-      }
-      if(esArea || st.contraModo === 'stats'){
-        h += `<div class="adh-check-list">${CONTRA.map(([v, t]) => `<label class="op"><input type="checkbox" data-contra="${v}" ${st.contra.has(v) ? 'checked' : ''}> ${t}</label>`).join('')}</div>`;
-        if(!esArea && st.contra.has('parry')) h += `<p class="nota" style="margin-top:6px">Parry sale como una caja más para elegir, junto a lo demás que hayas marcado — pero solo se ofrece si el objetivo tiene un arma o escudo equipado (misma regla que un ataque normal): sin eso, esa caja no aparece, aunque la hayas marcado acá.</p>`;
-      }else if(st.contraModo === 'otro'){
-        h += `<input type="text" style="margin-top:8px;width:100%;box-sizing:border-box" data-contraotro placeholder="ej. Resistencia a X (a mano)" value="${esc(st.contraOtro)}">
-          <p class="nota" style="margin-top:6px">La habilidad tira igual (paso anterior), pero nadie automatiza lo que la resiste: el cuadro se abre directo en los efectos, con este texto como recordatorio.</p>`;
-      }else{
-        h += `<p class="nota" style="margin-top:10px">El cuadro se abre directo en los efectos: nadie tiene que tirar nada para resistirla.</p>`;
-      }
-      return h;
-    }
+
+    const FRENOS = [['fisico', 'Físico', 'Lo frena la Defensa (la armadura).'], ['especial', 'Especial', 'Ignora la Defensa; lo frena la Defensa especial (y la resistencia a su elemento).'],
+      ['directo', 'Especial directo', 'Ignora la Defensa y la Defensa especial; solo lo frenan las resistencias elementales, si las tiene.'], ['true', 'Verdadero', 'No lo frena nada, ni la resistencia a su elemento. Muy controlado.']];
+    const frenoDe = () => !st.ignoraDano || st.tipoDano === 'fisico' ? 'fisico' : st.frenoEsp === 'directo' ? 'directo' : st.frenoEsp === 'true' ? 'true' : 'especial';
+    const fuenteDano = () => !st.dano ? 'no' : st.danoDif && st.objetivo !== 'uno mismo' ? 'dif' : st.danoArma && st.objetivo !== 'zona' && st.objetivo !== 'uno mismo' ? 'arma' : 'formula';
     function cuerpoDano(){
-      let h = titulo('', 'Daño y lo que no se pueda automatizar', 'Si la habilidad hace daño, usa la fórmula que ya tiene cargada (su «segunda tirada», por ejemplo 2d6+3) — se escribe en el editor de siempre de la habilidad, no acá. Si además (o en vez de eso) tiene un efecto que el sistema no calcula solo, escribilo como texto.');
-      const esZona = st.objetivo === 'zona';
-      const puedeDif = st.objetivo !== 'uno mismo';
-      const dif = puedeDif && st.dano && st.danoDif;
-      const puedeArma = !esZona && st.objetivo !== 'uno mismo';
-      const conArma = puedeArma && st.dano && st.danoArma && !dif;
-      h += `<div class="adh-modo">
-        <label class="op"><input type="radio" name="hacedano" value="no" ${!st.dano ? 'checked' : ''}> No hace daño</label>
-        <label class="op"><input type="radio" name="hacedano" value="si" ${st.dano && !dif && !conArma ? 'checked' : ''}> Sí, con su fórmula${cfg.tieneFormula === false ? ' <span class="nota">(esta habilidad todavía no tiene fórmula: escribila en su editor)</span>' : ''}</label>
-        ${puedeDif ? `<label class="op"><input type="radio" name="hacedano" value="dif" ${dif ? 'checked' : ''}> Sí: la diferencia entre las tiradas</label>` : ''}
-        ${puedeArma ? `<label class="op"><input type="radio" name="hacedano" value="arma" ${conArma ? 'checked' : ''}> Sí: el daño de tu arma</label>` : ''}
-      </div>`;
-      if(conArma) h += `<p class="nota">Se tira el daño del arma con la que la usás (la que elegís si cuesta lo mismo que un ataque; si no, la principal), con su Fuerza, como el botón «Daño». A cada uno se le resta su Defensa, salvo que marques «Ignora la Defensa».</p>`;
-      if(dif) h += `<p class="nota">${esZona ? 'Cada uno que no resiste recibe' : 'Si no la resiste, recibe'} tu tirada menos la suya (si empatan, nada). Si resiste, no le pasa nada. Necesita una tirada (paso «Tirada») y una resistencia (paso «Resistencia»).</p>`;
-      if(st.dano){
-        h += `<div class="fila"><span>Tipo:</span><select data-tipodano>${TIPOS.map(([v, t]) => `<option value="${v}"${st.tipoDano === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>
-          <label class="op"><input type="checkbox" data-ignoradano ${st.ignoraDano ? 'checked' : ''}> Ignora la Defensa (va derecho a la vida y no critica)</label>
-          ${st.tipoDano !== 'fisico' && st.ignoraDano ? `<div class="fila"><span>La Defensa especial:</span><select data-frenoesp>${[['', 'la frena (lo normal; siempre, si suma el Ef.Esp)'], ['directo', 'daño directo: no la frena (proyectiles chicos)'], ['true', 'True Damage: no lo frena nada, ni la Res. elemental']].map(([v, t]) => `<option value="${v}"${st.frenoEsp === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>` : ''}
-          <p class="nota">Arranca marcado o no según el tipo (mágico = sí, físico = no), pero es independiente: lo que decide no es el elemento, es cómo se narra la habilidad — una "ráfaga de hielo" (energía) ignora la Defensa; una "aguja de hielo" (un objeto físico arrojado) no, aunque las dos sean "Hielo". Destildá acá para esa excepción.</p>`;
-        if(!dif && !conArma) h += `<div class="fila" style="margin-top:8px"><span>Suma tu Efecto especial (Ef.Esp):</span><select data-danosumaesp>${[['', 'no'], ['mitad', 'la mitad (para abajo)'], ['si', 'entero']].map(([v, t]) => `<option value="${v}"${st.danoSumaEsp === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>`;
-        if(cfg.costoVariable && !dif){
-          h += `<div class="fila" style="margin-top:8px"><span>Además, por cada punto de X (tu costo en ${cfg.costoVariable === 'sp' ? 'SP' : 'Nitros'}):</span><span>+</span><input type="number" style="width:70px" data-danoporx value="${esc(st.danoFijoPorX)}"><span>de daño fijo</span></div>
-            <p class="nota">Ej. "amplifica el daño en el doble de X" → poné 2: con X = 3 suma +6 al tirar. Vacío o 0 = la fórmula no cambia con X.</p>`;
+      const esZona = st.objetivo === 'zona', uno = st.objetivo === 'uno mismo', fuente = fuenteDano();
+      let h = titulo('', '3 · Daño', 'De dónde sale el daño, qué se le suma y qué lo frena. El número se cambia acá mismo.');
+      const ops = [['no', 'No hace daño'], ['formula', 'Una fórmula'], ...(!esZona && !uno ? [['arma', 'El daño de un ataque (tu arma + Fuerza)']] : []), ...(!uno ? [['dif', 'La diferencia entre las tiradas']] : [])];
+      h += `<div class="adh-card"><div class="adh-card-h"><span class="adh-num">3</span> Daño</div>
+        <div><div class="adh-lbl">¿De dónde sale?</div>${ops.map(([x, t]) => `<label class="op"><input type="radio" name="fuentedano" value="${x}" ${fuente === x ? 'checked' : ''}> ${t}</label>`).join('')}</div>`;
+      if(fuente === 'formula') h += `<div class="fila"><span>Fórmula</span><input type="text" style="width:140px" data-dano-formula placeholder="ej. 2d6+3" value="${esc(st.danoFormula)}"><span class="nota" style="margin:0">(podés usar «X»)</span></div>`;
+      if(fuente === 'arma') h += `<p class="nota">El daño de tu arma (la que elegís si cuesta como un ataque; si no, la principal), con su Fuerza, como el botón «Daño».</p>`;
+      if(fuente === 'dif') h += `<p class="nota">${esZona ? 'Cada uno que no resiste recibe' : 'Si no la resiste, recibe'} tu tirada menos la suya (empate: nada).</p>`;
+      if(fuente !== 'no'){
+        if(fuente !== 'dif') h += `<div class="fila"><span>Además suma</span><input type="text" style="width:100px" data-dano-mas placeholder="+2 o +1d6" value="${esc(st.danoMas)}"><span class="nota" style="margin:0">un fijo y/o un dado (vacío = nada)</span></div>`;
+        const fr = FRENOS.find(x => x[0] === frenoDe());
+        const elem = st.tipoDano !== 'fisico' ? ' · ' + corto((TIPOS.find(t => t[0] === st.tipoDano) || ['', st.tipoDano])[1]) : '';
+        h += `<div class="fila"><button type="button" data-freno-abrir>🛡 Qué lo frena: ${esc(fr[1])}${esc(elem)} ${st.frenoAbierto ? '▴' : '▾'}</button></div>`;
+        if(st.frenoAbierto){
+          const elementos = frenoDe() === 'fisico' ? [['fisico', 'Ninguno'], ...TIPOS.filter(t => t[0] !== 'fisico')] : TIPOS.filter(t => t[0] !== 'fisico').map(([x, t]) => [x, x === 'arcano' ? 'Arcano (energía, sin elemento)' : t]);
+          h += `<div class="adh-freno">${FRENOS.map(([x, t, d]) => `<label class="op"><input type="radio" name="freno" value="${x}" ${frenoDe() === x ? 'checked' : ''}><span><b>${t}</b> <span class="nota">${d}</span></span></label>`).join('')}
+            <div class="fila"><span>Elemento:</span><select data-tipodano>${elementos.map(([x, t]) => `<option value="${x}"${st.tipoDano === x ? ' selected' : ''}>${corto(t)}</option>`).join('')}</select><span class="nota" style="margin:0">lo frena la resistencia a ese elemento</span></div></div>`;
         }
+        if(fuente === 'formula') h += `<div class="fila"><span>Suma tu Efecto especial (Ef.Esp):</span><select data-danosumaesp>${[['', 'no'], ['mitad', 'la mitad'], ['si', 'entero']].map(([x, t]) => `<option value="${x}"${st.danoSumaEsp === x ? ' selected' : ''}>${t}</option>`).join('')}</select></div>`;
+        if(cfg.costoVariable && fuente !== 'dif') h += `<div class="fila"><span>Por cada punto de X (${cfg.costoVariable === 'sp' ? 'SP' : 'No2'}): +</span><input type="number" style="width:70px" data-danoporx value="${esc(st.danoFijoPorX)}"><span>de daño</span></div>`;
         if(!esZona){
-          h += `<label class="op" style="margin-top:10px"><input type="checkbox" data-drena ${st.drena ? 'checked' : ''}> Drena: quien la usa se cura lo que hizo de daño</label>`;
-          if(st.drena) h += `<div class="fila"><span>Se cura el</span><input type="number" min="1" max="100" style="width:70px" data-drenapct value="${esc(st.drenaPct)}"><span>% de lo que hizo (para arriba)</span></div>`;
-          if(st.drena) h += `<div class="fila"><span>Puede pasar su vida máxima hasta</span><input type="number" min="0" style="width:70px" data-drenatope value="${esc(st.drenaTope)}"><span>% (lo de más queda como Vida extra; 0 = no pasa el máximo)</span></div>
-            <p class="nota">Se cura lo que el objetivo perdió de verdad (si un escudo lo absorbió o era Invulnerable, drena menos o nada).</p>`;
+          h += `<label class="op"><input type="checkbox" data-drena ${st.drena ? 'checked' : ''}> Drena: quien la usa se cura lo que hizo de daño</label>`;
+          if(st.drena) h += `<div class="fila"><span>Se cura el</span><input type="number" min="1" max="100" style="width:70px" data-drenapct value="${esc(st.drenaPct)}"><span>% · puede pasar su máximo hasta</span><input type="number" min="0" style="width:70px" data-drenatope value="${esc(st.drenaTope)}"><span>% (como Vida extra)</span></div>`;
         }
-        if(esZona){
-          h += `<div class="fila" style="margin-top:10px"><span>Si el daño entra, tirar además:</span><input type="text" style="width:90px" data-danoextra placeholder="ej. 1d20" value="${esc(st.danoExtra)}"></div>
-            <p class="nota">Opcional. Se tira solo, a quien recibió daño, y sale en la Mesa con el texto de abajo («Tiene un efecto que no se puede automatizar»): ahí escribí qué significa cada resultado (ej. «7+ Pajaritos · 17+ Stun · 20 desmayo»).</p>`;
-        }
+        if(esZona) h += `<div class="fila"><span>Si el daño entra, tirar además:</span><input type="text" style="width:90px" data-danoextra placeholder="ej. 1d20" value="${esc(st.danoExtra)}"></div>`;
       }
-      h += `<div class="fila" style="margin-top:14px"><label class="op" style="padding:0"><input type="checkbox" data-efectolibre-on ${st.efectoLibreOn ? 'checked' : ''}> Tiene un efecto que no se puede automatizar del todo</label></div>`;
-      if(st.efectoLibreOn){
-        h += `<textarea data-efectolibre rows="3" style="width:100%;box-sizing:border-box;padding:8px;font-size:14px" placeholder="ej. Drenás una cantidad de HP igual a la diferencia entre tu tirada y su resistencia; sumátela a tu vida (Vida extra si pasa tu máximo).">${esc(st.efectoLibre)}</textarea>
-          <p class="nota" style="margin-top:6px">${st.objetivo === 'zona'
-            ? 'En una zona, este texto sale en la Mesa y en el cartelito cuando el daño entra (junto a la tirada de arriba, si hay), para que se resuelva a mano.'
-            : 'Este texto se muestra en el cuadro junto al resultado (con la diferencia entre las dos tiradas, si la hubo), para que quien juega lo resuelva a mano.'}</p>`;
-      }
-      return h;
+      h += `<label class="op"><input type="checkbox" data-efectolibre-on ${st.efectoLibreOn ? 'checked' : ''}> ✋ Algo del daño se resuelve a mano</label>`;
+      if(st.efectoLibreOn) h += `<textarea data-efectolibre rows="3" placeholder="ej. Drenás la diferencia: sumátela a tu vida.">${esc(st.efectoLibre)}</textarea><p class="nota">El cuadro lo muestra junto al resultado (con la diferencia entre las tiradas), aclarando que es a mano.</p>`;
+      return h + '</div>';
     }
     /* ¿Con qué probabilidad entra? (2026-10-05, armas especiales: «Parálisis 1 en d10»). Las mismas opciones que los efectos al golpear de un arma
        (EfectosGolpe.PROBABILIDADES); al usarse, el duelo tira el dado. Vacío = siempre. */
@@ -456,14 +502,14 @@ const AsistenteDueloHab = (() => {
         : e.origen === 'preset' ? filaEstadoPresetHtml(e, clave(i)) : filaEstadoManualHtml(e, clave(i))).join('');
     }
     function cuerpoEfectos(){
-      let h = titulo('', st.modo === 'arma' ? 'Efectos al pegar' : 'Efectos sobre el objetivo', 'Cada uno sale como un momento propio, con su botón «Aplicar» (los que no se puedan aplicar solos quedan «a mano»). Solo entran si la habilidad funciona.');
+      let h = titulo('', st.modo === 'arma' ? 'Efectos al pegar' : '4 · Efectos', 'Lo más frecuente (un estado, una cura, perder No2) se aplica con su botón «Aplicar». Lo que no, va en «✋ Manual», con tus palabras. Solo entran si la habilidad funciona.');
       h += filaEfectosLista(st.efectos, i => i);
       h += `<datalist id="adh-estados">${nombresEstado().map(n => `<option value="${esc(n)}">`).join('')}</datalist>
         <div class="fila"><button type="button" class="sec" data-ef-mas="estado">＋ Estado</button><button type="button" class="sec" data-ef-mas="cura">＋ Cura</button><button type="button" class="sec" data-ef-mas="no2">＋ Pierde No2</button></div>`;
-      h += `<div class="fila" style="margin-top:14px"><label class="op" style="padding:0"><input type="checkbox" data-efectosnota-on ${st.efectosNotaOn ? 'checked' : ''}> Personalizar: tiene otro efecto que no está en la lista</label></div>`;
+      h += `<div class="fila" style="margin-top:14px"><label class="op" style="padding:0"><input type="checkbox" data-efectosnota-on ${st.efectosNotaOn ? 'checked' : ''}> ✋ Manual: un efecto que se aplica a mano, con tus palabras</label></div>`;
       if(st.efectosNotaOn){
         h += `<textarea data-efectosnota rows="3" style="width:100%;box-sizing:border-box;padding:8px;font-size:14px" placeholder="ej. Invertí el orden de turno de todos los presentes hasta tu próximo turno.">${esc(st.efectosNota)}</textarea>
-          <p class="nota" style="margin-top:6px">Este texto se muestra junto a los demás efectos, sin botón «Aplicar» — para resolverlo a mano.</p>`;
+          <p class="nota" style="margin-top:6px">Al llegar a los efectos, el duelo muestra este texto aclarando que se aplica a mano.</p>`;
       }
       // ⚡ Critical Matters (2026-09-29, pedido del dueño — Lisiar: bono al crítico + un efecto que es más
       // intenso si el golpe termina siendo crítico). Solo tiene sentido en modo 'arma' (el único que puede
@@ -524,20 +570,20 @@ const AsistenteDueloHab = (() => {
         filas.push(`<b>Ataque con arma</b>: ${partes.join(', ') || 'sin arreglos'} · X en ${st.x === 'sp' ? 'SP' : 'Nitros'}`);
         if(st.alcance !== 'auto') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
       }else{
-        filas.push(`<b>Objetivo</b>: ${st.objetivo === 'linea' ? `línea recta de ${st.radio} casilleros` : st.objetivo === 'cono' ? 'cono al frente de quien la usa' : st.objetivo === 'onda' ? 'onda alrededor de quien la usa' : st.objetivo === 'zona' ? `zona persistente, ${st.zonaTurnos} turnos` : st.objetivo}${['area', 'onda', 'zona'].includes(st.objetivo) ? ` (${Combatiente.areaTxt(st.radio)})` : ''}`);
+        filas.push(`<b>Objetivo</b>: ${st.objetivo === 'linea' ? `línea recta de ${st.radio} casilleros` : st.objetivo === 'zona' ? `un área que solo queda, ${st.zonaTurnos} turnos` : corto((OBJETIVOS.find(o => o[0] === st.objetivo) || ['', st.objetivo])[1])}${['area', 'onda', 'zona'].includes(st.objetivo) ? ` (${Combatiente.areaTxt(st.radio)})` : ''}${(st.objetivo === 'area' || st.objetivo === 'onda') && st.permanencia === 'queda' ? ` · golpea y deja una zona ${st.zq.turnos} turnos` : ''}`);
         if(st.objetivo === 'zona'){
           filas.push(`<b>Alcanza</b>: ${st.zonaAmiga ? 'rivales y aliados' : 'solo rivales'}`);
           if(st.zonaEstadoNombre) filas.push(`<b>Deja</b>: ${esc(st.zonaEstadoNombre)}${['Veneno', 'Veneno severo'].includes(st.zonaEstadoNombre) && st.zonaEstadoStacks ? ` ×${st.zonaEstadoStacks}` : ''} (${st.zonaEstadoTurnos}t)`);
         }
         if(st.alcance !== 'auto' && st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda' && st.objetivo !== 'cono' && st.objetivo !== 'linea' && st.objetivo !== 'zona') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
         const esArea2 = st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono' || st.objetivo === 'linea';
-        const contraTxt = (esArea2 || st.contraModo === 'stats') ? ([...st.contra].map(v => STAT_TXT[v] || v).join(' / ') || '(elegí con qué se resiste)')
+        const contraTxt = (esArea2 || st.contraModo === 'stats') ? ([...[...st.contra].map(v => statNombre(v)), ...st.contraExtra.map(x => x.formula ? `${x.etq}: ${x.formula}` : `${statNombre(x.stat)} ${x.bono >= 0 ? '+' : '−'} ${Math.abs(x.bono)}`)].join(' / ') || '(elegí con qué se resiste)')
           : st.contraModo === 'otro' ? `${esc(st.contraOtro) || '(sin especificar)'} (a mano)`
           : 'nadie: se aplica directo';
         filas.push(sinOp() ? '<b>Sin tirada</b>: se aplica directo'
           : st.tiraModo === 'custom' ? `<b>Tirada custom</b>: ${esc(st.tiraFormula) || '(sin fórmula)'}${st.tiraEtiqueta ? ' · ' + esc(st.tiraEtiqueta) : ''} contra ${contraTxt}`
-          : `<b>Tirada</b>: ${STAT_TXT[st.tira] || st.tira} contra ${contraTxt}`);
-        if(st.dano) filas.push(`<b>Daño</b>: ${st.danoDif && st.objetivo !== 'uno mismo' ? 'la diferencia entre las tiradas, ' : st.danoArma && st.objetivo !== 'zona' && st.objetivo !== 'uno mismo' ? 'el de tu arma, ' : ''}${st.drena && st.objetivo !== 'zona' ? `drena (se cura lo que hace${st.drenaTope ? `, hasta +${st.drenaTope} % de su máximo` : ''}), ` : ''}tipo ${st.tipoDano}${st.ignoraDano ? ', ignora la Defensa' : ''}${st.tipoDano !== 'fisico' && st.ignoraDano ? (st.frenoEsp === 'true' ? ', True Damage (no lo frena nada)' : st.frenoEsp === 'directo' ? ', daño directo (no lo frena la Defensa especial)' : ', lo frena la Defensa especial') : ''}${cfg.costoVariable && st.danoFijoPorX ? `, +${st.danoFijoPorX} por X` : ''}${st.objetivo === 'zona' && st.danoExtra ? `; si entra, tira ${esc(st.danoExtra)}` : ''}`);
+          : `<b>Tirada</b>: ${statNombre(st.tira)}${st.tiraBono ? ` ${st.tiraBono > 0 ? '+' : '−'} ${Math.abs(st.tiraBono)}` : ''} contra ${contraTxt}`);
+        if(st.dano) filas.push(`<b>Daño</b>: ${st.danoDif && st.objetivo !== 'uno mismo' ? 'la diferencia entre las tiradas, ' : st.danoArma && st.objetivo !== 'zona' && st.objetivo !== 'uno mismo' ? 'el de tu arma, ' : `${esc(st.danoFormula || cfg.formulaDano || '(sin fórmula)')}, `}${st.danoMas && !st.danoDif ? `${esc(st.danoMas)} más, ` : ''}${st.drena && st.objetivo !== 'zona' ? `drena (se cura lo que hace${st.drenaTope ? `, hasta +${st.drenaTope} % de su máximo` : ''}), ` : ''}tipo ${st.tipoDano}${st.ignoraDano ? ', ignora la Defensa' : ''}${st.tipoDano !== 'fisico' && st.ignoraDano ? (st.frenoEsp === 'true' ? ', True Damage (no lo frena nada)' : st.frenoEsp === 'directo' ? ', daño directo (no lo frena la Defensa especial)' : ', lo frena la Defensa especial') : ''}${cfg.costoVariable && st.danoFijoPorX ? `, +${st.danoFijoPorX} por X` : ''}${st.objetivo === 'zona' && st.danoExtra ? `; si entra, tira ${esc(st.danoExtra)}` : ''}`);
         if(st.efectoLibreOn && st.efectoLibre.trim()){ const t = st.efectoLibre.trim(); filas.push(`<b>Efecto a mano</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
       }
       if(st.modo !== 'flash' && st.objetivo !== 'zona'){
@@ -559,8 +605,8 @@ const AsistenteDueloHab = (() => {
     // El contenido de un paso y su ayuda (titulo() la deja en ayudaPaso).
     function contenidoPaso(id){
       ayudaPaso = '';
-      const cuerpo = id === 'activo' ? cuerpoActivo() : id === 'costo' ? cuerpoCosto() : id === 'objetivo' ? cuerpoObjetivo() : id === 'alcance' ? cuerpoAlcance(st.modo === 'arma')
-        : id === 'tira' ? cuerpoTira() : id === 'contra' ? cuerpoContra() : id === 'dano' ? cuerpoDano() : id === 'efectos' ? cuerpoEfectos()
+      const cuerpo = id === 'activo' ? cuerpoActivo() : id === 'costo' ? cuerpoCosto() : id === 'declaracion' ? cuerpoDeclaracion() : id === 'zona' ? cuerpoZona() : id === 'alcance' ? cuerpoAlcance(st.modo === 'arma')
+        : id === 'contacto' ? cuerpoContacto() : id === 'dano' ? cuerpoDano() : id === 'efectos' ? cuerpoEfectos()
         : id === 'arma' ? cuerpoArma() : id === 'flash' ? cuerpoFlash() : cuerpoListo();
       return {h: `<div class="adh-paso">${cuerpo}</div>`, ayuda: ayudaPaso};
     }
@@ -579,7 +625,36 @@ const AsistenteDueloHab = (() => {
         dibujar();
       });
       q('[data-costoturno-sp]', e => { st.costoTurnoSp = e.target.value; });
-      q('[data-objetivo]', e => { st.objetivo = e.target.value; if(st.objetivo === 'onda' && st.radio > 1 && !ini) st.radio = 1; if((st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono' || st.objetivo === 'linea') && st.contraModo !== 'stats') st.contraModo = 'stats'; dibujar(); });
+      q('[data-objetivo]', e => {
+        const v = e.target.value;
+        if(v !== 'area' && v !== 'onda') st.permanencia = 'momento';
+        else if(v === 'onda' && st.permanencia === 'solo') st.permanencia = 'momento';
+        st.objetivo = v === 'area' && st.permanencia === 'solo' ? 'zona' : v;
+        if(st.objetivo === 'onda' && st.radio > 1 && !ini) st.radio = 1;
+        if(['area', 'onda', 'cono', 'linea', 'zona'].includes(st.objetivo) && st.contraModo !== 'stats') st.contraModo = 'stats';
+        dibujar();
+      });
+      f.querySelectorAll('[name=permanencia]').forEach(r => r.onchange = () => {
+        st.permanencia = r.value;
+        if(r.value === 'solo') st.objetivo = 'zona'; else if(st.objetivo === 'zona') st.objetivo = 'area';
+        dibujar();
+      });
+      q('[data-centro]', e => { st.centroModo = e.target.value; dibujar(); });
+      q('[data-centroN]', e => { st.centroN = Math.max(1, Math.round(Number(e.target.value) || 1)); });
+      // La zona que queda (la del área «solo queda» o la que deja un golpe)
+      const zSolo = () => st.objetivo === 'zona';
+      const nN = (v, min) => Math.max(min, Math.round(Number(v) || min));
+      q('[data-z-turnos]', e => { if(zSolo()) st.zonaTurnos = nN(e.target.value, 1); else st.zq.turnos = nN(e.target.value, 1); });
+      q('[data-z-mant]', e => { if(zSolo()) st.zonaEnMant = e.target.checked; else st.zq.enMant = e.target.checked; });
+      q('[data-z-paso]', e => { if(zSolo()) st.zonaCadaPaso = e.target.checked; else st.zq.cadaPaso = e.target.checked; });
+      q('[data-z-quien]', e => { const todos = e.target.value === 'todos'; if(zSolo()) st.zonaAmiga = todos; else st.zq.soloRivales = !todos; });
+      q('[data-z-altura]', e => { if(zSolo()) st.zonaAltura = e.target.value; else st.zq.altura = e.target.value; });
+      q('[data-z-estado]', e => { if(zSolo()) st.zonaEstadoNombre = e.target.value; else st.zq.estadoNombre = e.target.value; dibujar(); });
+      q('[data-z-estadoturnos]', e => { if(zSolo()) st.zonaEstadoTurnos = nN(e.target.value, 0); else st.zq.estadoTurnos = nN(e.target.value, 0); });
+      q('[data-z-dano]', e => { st.zq.dano = e.target.value.trim(); });
+      q('[data-z-tipo]', e => { st.zq.tipoDano = e.target.value; });
+      q('[data-z-contra]', e => { st.zq.contra = e.target.value; if(st.zq.contra && !st.zq.tira) st.zq.tira = 'dmgesp'; dibujar(); });
+      q('[data-z-tira]', e => { st.zq.tira = e.target.value; });
       q('[data-modo]', e => { st.modo = e.target.value; dibujar(); });
       q('[data-flashbono]', e => { st.flashBono = Number(e.target.value) || 0; });
       q('[data-flashdodge]', e => { st.flashDodge = e.target.checked; });
@@ -591,30 +666,64 @@ const AsistenteDueloHab = (() => {
       f.querySelectorAll('[data-arma]').forEach(i => i.onchange = () => { st.arma[i.dataset.arma] = Number(i.value) || 0; });
       // Dados extra de otro tamaño que los del arma (2026-10-13, Picada del Kobold Rabioso: +1d6): «NdM», o vacío.
       f.querySelectorAll('[data-arma-dados]').forEach(i => i.onchange = () => { const v = String(i.value || '').trim().toLowerCase().replace(/\s+/g, ''); st.arma.dadoExtra = /^\d{1,2}d\d{1,3}$/.test(v) ? v : ''; if(v && !st.arma.dadoExtra) i.value = ''; });
-      q('[data-tira]', e => { st.tira = e.target.value; dibujar(); });
-      q('[data-tira-ninguna]', e => { st.tiraNinguna = e.target.checked; dibujar(); });
-      f.querySelectorAll('[name=tiramodo]').forEach(x => x.onchange = () => { st.tiraModo = x.value; dibujar(); });
-      q('[data-tira-formula]', e => { st.tiraFormula = e.target.value; });
+      const clic = (sel, fn) => f.querySelectorAll(sel).forEach(b => b.onclick = () => fn(b));
+      q('[data-tirasel]', e => {
+        const v = e.target.value;
+        st.grid = '';
+        if(v === '') st.tiraNinguna = true;
+        else if(v === '__otro') st.grid = 'tira';
+        else if(v === '__f'){ st.tiraNinguna = false; st.tiraModo = 'custom'; }
+        else { st.tiraNinguna = false; st.tiraModo = 'stat'; st.tira = v; }
+        dibujar();
+      });
+      q('[data-tirabono]', e => { st.tiraBono = Math.round(Number(e.target.value) || 0); });
+      // «pdg + 5» en la fórmula propia: pasa a ser ese stat más el número
+      q('[data-tira-formula]', e => { const r = leerFormula(e.target.value); if(r && r.stat){ st.tiraModo = 'stat'; st.tira = r.stat; st.tiraBono = r.bono; st.tiraFormula = ''; dibujar(); } else st.tiraFormula = e.target.value.trim(); });
+      q('[data-contramodo]', e => { st.contraModo = e.target.value; dibujar(); });
+      clic('[data-grid]', b => { st.grid = st.grid === b.dataset.grid ? '' : b.dataset.grid; dibujar(); });
+      clic('[data-grid-cerrar]', () => { st.grid = ''; dibujar(); });
+      clic('[data-grid-stat]', b => {
+        const id = b.dataset.gridStat;
+        if(st.grid === 'tira'){ st.tiraNinguna = false; st.tiraModo = 'stat'; st.tira = id; } else st.contra.add(id);
+        st.grid = '';
+        dibujar();
+      });
+      clic('[data-contra-quitar]', b => { const k = b.dataset.contraQuitar; if(k.startsWith('s:')) st.contra.delete(k.slice(2)); else st.contraExtra.splice(+k.slice(2), 1); dibujar(); });
+      q('[data-contra-formula]', e => { st.contraFormula = e.target.value; });
+      q('[data-contra-formula-etq]', e => { st.contraFormulaEtq = e.target.value; });
+      clic('[data-contra-formula-mas]', () => {
+        const inp = f.querySelector('[data-contra-formula]'), et = f.querySelector('[data-contra-formula-etq]');
+        if(inp) st.contraFormula = inp.value;
+        if(et) st.contraFormulaEtq = et.value;
+        const r = leerFormula(st.contraFormula);
+        if(!r){ alert('Escribí dados (1d6+2) o un stat más un número (des + 2).'); return; }
+        if(r.stat && !r.bono) st.contra.add(r.stat);
+        else st.contraExtra.push(r.formula ? {formula: r.formula, etq: st.contraFormulaEtq.trim() || 'Resistencia'} : {stat: r.stat, bono: r.bono});
+        st.contraFormula = ''; st.contraFormulaEtq = '';
+        dibujar();
+      });
       q('[data-tira-etiqueta]', e => { st.tiraEtiqueta = e.target.value; });
       q('[data-alcance]', e => { st.alcance = e.target.value; dibujar(); });
       q('[data-alcanceN]', e => { st.alcanceN = Math.max(1, Math.round(Number(e.target.value) || 1)); });
       q('[data-radio]', e => { st.radio = Math.max(0, Math.round(Number(e.target.value) || 0)); });
-      q('[data-zonaturnos]', e => { st.zonaTurnos = Math.max(1, Math.round(Number(e.target.value) || 1)); });
-      q('[data-zonaamiga]', e => { st.zonaAmiga = e.target.checked; });
-      q('[data-zonaaltura]', e => { st.zonaAltura = e.target.value; });
-      q('[data-zonaestado]', e => { st.zonaEstadoNombre = e.target.value; dibujar(); });
-      q('[data-zonaestadoturnos]', e => { st.zonaEstadoTurnos = Math.max(0, Math.round(Number(e.target.value) || 0)); });
       q('[data-zonaestadostacks]', e => { st.zonaEstadoStacks = Math.max(0, Math.round(Number(e.target.value) || 0)); });
       f.querySelectorAll('[data-contra]').forEach(c => c.onchange = () => {
         c.checked ? st.contra.add(c.dataset.contra) : st.contra.delete(c.dataset.contra);
         if(c.dataset.contra === 'parry') dibujar();   // el aviso de abajo depende de si Parry está marcado
       });
-      f.querySelectorAll('[name=contramodo]').forEach(r => r.onchange = () => { st.contraModo = r.value; dibujar(); });
       q('[data-contraotro]', e => { st.contraOtro = e.target.value; });
-      f.querySelectorAll('[name=hacedano]').forEach(r => r.onchange = () => {
+      f.querySelectorAll('[name=fuentedano]').forEach(r => r.onchange = () => {
         const antesArma = st.danoArma;
         st.dano = r.value !== 'no'; st.danoDif = r.value === 'dif'; st.danoArma = r.value === 'arma';
         if(st.danoArma && !antesArma){ st.tipoDano = 'fisico'; st.ignoraDano = false; }   // un arma: físico, contra la Defensa
+        dibujar();
+      });
+      q('[data-dano-formula]', e => { st.danoFormula = e.target.value.trim(); });
+      q('[data-dano-mas]', e => { const v = e.target.value.replace(/\s+/g, '').replace(/−/g, '-'); st.danoMas = v && /^[+-]?(\d+|\d*d\d+)([+-](\d+|\d*d\d+))*$/i.test(v) ? v : ''; if(v && !st.danoMas){ alert('Escribí un fijo y/o un dado: +2, +1d6 o +1d6+2.'); e.target.value = ''; } });
+      clic('[data-freno-abrir]', () => { st.frenoAbierto = !st.frenoAbierto; dibujar(); });
+      f.querySelectorAll('[name=freno]').forEach(r => r.onchange = () => {
+        if(r.value === 'fisico') st.ignoraDano = false;
+        else { st.ignoraDano = true; st.frenoEsp = r.value === 'especial' ? '' : r.value; if(st.tipoDano === 'fisico') st.tipoDano = 'arcano'; }
         dibujar();
       });
       q('[data-drena]', e => { st.drena = e.target.checked; dibujar(); });
@@ -622,7 +731,7 @@ const AsistenteDueloHab = (() => {
       q('[data-drenatope]', e => { st.drenaTope = Math.max(0, Number(e.target.value) || 0); });
       q('[data-drenapct]', e => { st.drenaPct = Math.max(1, Math.min(100, Math.round(Number(e.target.value) || 100))); });
       q('[data-danoextra]', e => { st.danoExtra = e.target.value.trim(); });
-      q('[data-tipodano]', e => { st.tipoDano = e.target.value; st.ignoraDano = st.tipoDano !== 'fisico'; dibujar(); });
+      q('[data-tipodano]', e => { st.tipoDano = e.target.value; if(st.tipoDano === 'fisico') st.ignoraDano = false; dibujar(); });
       q('[data-ignoradano]', e => { st.ignoraDano = e.target.checked; dibujar(); });
       q('[data-frenoesp]', e => { st.frenoEsp = e.target.value; });
       q('[data-danoporx]', e => { st.danoFijoPorX = Number(e.target.value) || 0; });
@@ -714,11 +823,23 @@ const AsistenteDueloHab = (() => {
         const hayTira = !st.tiraNinguna && (st.tiraModo === 'custom' ? !!st.tiraFormula.trim() : !!st.tira);
         if(!st.tiraNinguna && st.tiraModo === 'custom' && !st.tiraFormula.trim()){ alert('Escribí la fórmula de la tirada custom (podés usar «X»), o tildá «No lleva tirada».'); return false; }
         const esArea = st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono' || st.objetivo === 'linea';
-        const out = {objetivo: st.objetivo, tira: (!st.tiraNinguna && st.tiraModo === 'stat') ? (st.tira || '') : '', contra: (hayTira && (esArea || st.contraModo === 'stats')) ? [...st.contra] : []};
+        const out = {objetivo: st.objetivo, tira: (!st.tiraNinguna && st.tiraModo === 'stat') ? (st.tira || '') : '',
+          contra: (hayTira && (esArea || st.objetivo === 'zona' || st.contraModo === 'stats')) ? [...st.contra, ...(st.objetivo === 'zona' ? [] : st.contraExtra)] : []};
+        if(!st.tiraNinguna && st.tiraModo === 'stat' && st.tiraBono && st.objetivo !== 'zona') out.tiraBono = st.tiraBono;
+        if(st.objetivo === 'area' && st.centroModo) out.centroAlcance = st.centroModo === 'rango' ? 'rango' : st.centroModo === 'adyacente' ? 1 : Math.max(1, st.centroN);
+        if((st.objetivo === 'area' || st.objetivo === 'onda') && st.permanencia === 'queda'){
+          const z = st.zq;
+          if(!z.dano && !z.estadoNombre){ alert('La zona que queda tiene que hacer algo: un daño o un estado (paso «La zona»).'); return false; }
+          if(z.dano && !/^\d*d\d+([+-]\d+)?$|^\d+$/i.test(z.dano.replace(/\s+/g, ''))){ alert('El daño de la zona tiene que ser un número o dados (1d4, 2d6+1).'); return false; }
+          out.zonaQueda = {turnos: z.turnos, ...(z.dano ? {dano: z.dano.replace(/\s+/g, ''), ...(z.tipoDano ? {tipoDano: z.tipoDano} : {})} : {}),
+            ...(z.estadoNombre ? {estado: {nombre: z.estadoNombre, turnos: z.estadoTurnos}} : {}), ...(z.altura !== 'aire' ? {altura: z.altura} : {}),
+            ...(z.contra ? {contra: z.contra, tira: z.tira || 'dmgesp'} : {}), ...(z.nombre ? {nombre: z.nombre} : {}), ...(z.color ? {color: z.color} : {}),
+            ...(!z.enMant ? {enMantenimiento: false} : {}), ...(z.cadaPaso ? {cadaPaso: true} : {}), ...(z.soloRivales ? {soloRivales: true} : {})};
+        }
         if(!st.tiraNinguna && st.tiraModo === 'custom'){ out.tiraFormula = st.tiraFormula.trim(); out.tiraEtiqueta = st.tiraEtiqueta.trim() || 'Tirada'; }
         if(esArea && !hayTira){ alert('Una habilidad de área u onda necesita una tirada (ej. PdG.Esp o Fuerza contra lo que resiste cada uno) — elegí qué tira quien la usa.'); return false; }
         if(st.objetivo === 'zona' && !st.dano && !st.zonaEstadoNombre){ alert('Una zona persistente necesita hacer algo: marcá «Esta habilidad hace daño» en el paso Daño y/o elegí un estado en el paso Objetivo.'); return false; }
-        if(hayTira && (esArea || st.contraModo === 'stats') && !out.contra.length){ alert('Marcá con qué se resiste el objetivo (o elegí «Nadie» / «Otro»).'); return false; }
+        if(hayTira && (esArea || st.contraModo === 'stats') && st.objetivo !== 'zona' && !out.contra.length){ alert('Marcá con qué se resiste el objetivo (o elegí «Nadie» / «Otra cosa»).'); return false; }
         if(hayTira && !esArea && st.contraModo === 'otro'){
           if(!st.contraOtro.trim()){ alert('Escribí con qué se resiste (o elegí «Nadie» si no hay nada que resista).'); return false; }
           out.contraOtro = st.contraOtro.trim();
@@ -726,7 +847,14 @@ const AsistenteDueloHab = (() => {
         if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; out.ignoraDano = st.ignoraDano;
           if(st.tipoDano !== 'fisico' && st.ignoraDano && st.frenoEsp === 'directo') out.danoDirecto = true;
           if(st.tipoDano !== 'fisico' && st.ignoraDano && st.frenoEsp === 'true') out.trueDamage = true; if(cfg.costoVariable && st.danoFijoPorX && !st.danoDif) out.danoFijoPorX = st.danoFijoPorX;
-          if(st.danoSumaEsp && !st.danoDif && !st.danoArma) out.danoSumaEsp = st.danoSumaEsp === 'si' ? true : 0.5; }
+          if(st.danoSumaEsp && !st.danoDif && !st.danoArma) out.danoSumaEsp = st.danoSumaEsp === 'si' ? true : 0.5;
+          // La fórmula se escribe acá (2026-10-15): si es otra que la «segunda tirada» de la habilidad, la Ejecución manda.
+          if(!st.danoDif && !st.danoArma){
+            const fd = st.danoFormula.trim();
+            if(!fd && !String(cfg.formulaDano || '').trim()){ alert('Escribí la fórmula del daño (ej. 2d6+3), o elegí otra cosa en «¿De dónde sale?».'); return false; }
+            if(fd && fd !== String(cfg.formulaDano || '').trim()) out.danoFormula = fd;
+          }
+          if(st.danoMas && !st.danoDif) out.danoMas = st.danoMas; }
         if(st.dano && st.objetivo !== 'zona' && st.objetivo !== 'uno mismo' && st.danoDif){
           if(!hayTira || !out.contra.length){ alert('El daño «la diferencia» necesita una tirada (paso Tirada) y algo con qué resistirla (paso Resistencia).'); return false; }
           out.danoDiferencia = true;
@@ -752,6 +880,8 @@ const AsistenteDueloHab = (() => {
           out.zonaTurnos = st.zonaTurnos;
           if(st.zonaAmiga) out.zonaAmiga = true;
           if(st.zonaAltura && st.zonaAltura !== 'aire') out.zonaAltura = st.zonaAltura;
+          if(!st.zonaEnMant) out.zonaEnMantenimiento = false;   // cuándo afecta (2026-10-15)
+          if(st.zonaCadaPaso) out.zonaCadaPaso = true;
           if(st.zonaEstadoNombre){
             const esVenenoZona = ['Veneno', 'Veneno severo'].includes(st.zonaEstadoNombre);
             // Veneno sin stacks a mano: no se manda `turnos` — si no, EstadosAplicar.componer lo toma igual y el
@@ -777,7 +907,7 @@ const AsistenteDueloHab = (() => {
     }
     // Un efecto de la lista `st.efectos`, listo para guardar en `duelo.efectos` — mismo shape tanto si vino del
     // selector real (origen:'preset', con mods/hp/stacks/permanente/detalle) como si se escribió a mano.
-    const CONSERVA = ['cadena', 'conVista', 'conmigo', 'niebla', 'zonaQueda', 'menosDistancia', 'atrae', 'reparte', 'critTipo', 'soloSigilo', 'fuegoAmigo', 'soloCritico', 'perforante', 'giro', 'tormenta', 'sagrado'];
+    const CONSERVA = ['cadena', 'conVista', 'conmigo', 'niebla', 'aliados', 'menosDistancia', 'atrae', 'reparte', 'critTipo', 'soloSigilo', 'fuegoAmigo', 'soloCritico', 'perforante', 'giro', 'tormenta', 'sagrado'];
     function mapEfectoOut(e){
       if(e.no2 !== undefined) return {nombre: 'Pierde No2', no2: e.no2, ...(e.no2Dif ? {no2Dif: true} : {}), ...(e.no2Sentado ? {no2Sentado: true} : {})};
       if(e.cura !== undefined) return {cura: e.cura};

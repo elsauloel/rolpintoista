@@ -38,6 +38,11 @@
 - [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): un crítico de la Puñalada (Rengo 2 y Lisiado 1). El pozo visto como jugador ya se vio (con
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **⌨ A = Atacar, B cierra, flechas, 🔭 y el duelo cancelado** (2026-10-15, Claude · pruebas, GM con el creep «Bosque (prueba)»): A abrió
+  las Acciones y apretó Atacar; el mapa se encuadró solo en el creep y los que brillan; las flechas movieron el mapa sin cancelar; «🔭 Ver mis
+  objetivos» encuadró; B cerró las Acciones con juan seleccionado. Duelo: pagó y tiró el PdG (No2 8 → 7, 1 ataque) → «Cancelar duelo» →
+  «¿Cuenta como un ataque hecho? Es para calcular los No2…» → «No cuenta» → No2 de vuelta a 8, 0 ataques, aviso y línea en la Mesa. Falta ver
+  lo mismo con un personaje (misma pieza: el gancho de FichaDuelo).
 - [x] **💤 Inactivos, 📦 Vender el baúl, el Ver de las habilidades y lo nuevo de los goblins del Bosque** (2026-10-15, Claude · pruebas):
   en el menú 👥 Personajes del mapa, ✓ al lado de cada uno → juan tachado (💤) y GM Tools lo ve afuera; «📦 Vender el baúl» (Daga + 2 Velas +
   10 DDE) → «Total 57,5 DDE → 57,5 para cada uno de Clementino» (juan inactivo, no cuenta), el baúl quedó vacío, la recompensa de Clementino

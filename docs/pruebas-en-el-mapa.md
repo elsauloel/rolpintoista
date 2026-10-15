@@ -9,6 +9,12 @@
 > capturas. Al probar algo: pasarlo a «Probado» con fecha, qué se vio y si hubo que arreglar algo.
 
 ## Pendientes
+- [ ] **🫳 Robo en sigilo, en secreto** (2026-10-14): el ladrón en sigilo ejecuta Bolsillo ajeno → sin duelo ni Mesa; al GM, el cartel «Robo en
+  secreto» con su Sigilo; a juan, «🤨 ¿Sentiste un movimiento raro? Tirá Percepción». Si pierde: «Mmm… Puede que estés flasheando», el ítem pasa
+  callado, el ladrón sigue en sigilo y al empezar el turno de juan (o en el ⟳) «Sentís el cinturón más liviano…». Si gana: «¡juan pescó a…!», el
+  ladrón pierde el sigilo y queda Marcado 2 turnos. «🎲 Tirar por juan» del GM. Hace falta ver las dos ventanas (GM y juan) a la vez.
+- [ ] **👁 Marcado al perder el sigilo** (2026-10-14): descubierto por el cono, la Percepción aumentada, una trampa o al robar → Marcado 2 turnos
+  (no puede volver a entrar en sigilo); salir con el botón no marca.
 
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,

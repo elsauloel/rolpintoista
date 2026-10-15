@@ -91,6 +91,18 @@ onda de aliados, aliado, dirigida, trampa); las combinaciones nuevas, en `prueba
 | **El ocultista** (nv 3, humano, JEFE, nuevo) | 60 HP, Def 2. Hoz del quintero, Túnica de aprendiz, Capucha de lana del culto, Varita arcana mayor (1d8 arcano). **Grilletes de sombra** (PdG.Esp contra Res.Esp: Inmovilizado 1t; cd 3), **Marca del amo** (Crítico frecuente a sus aliados a 4; cd 3) y **Estallido de sombras** (flor de 7, 1d6+2 arcano, dodge roll; lenta cd 4). Suelta un consumible seguro (jefe) |
 | Goblin marcado ×2 (nv 1, nuevo) | Hoz del quintero + Chaleco (1d6+7, Sangrado 50 % de la hoz). **Tajo frenético** (+1d4; cd 2) y **No siente el dolor** (Endurecido; lenta cd 4) |
 
+**Más goblins (2026-10-15, dueño: «son muy pocos, metele variedad» y «sumale algún goblin con arco»):**
+| Encuentro | Creep | Qué hace |
+|---|---|---|
+| 1 | Goblin arquero (nv 1) | Arco de rama, Chaleco, Capucha de emboscada. **Flecha a la rodilla** (Rengo 1t, cd 2) y **Tiro certero** (+2 PdG, +1 Crítico frecuente; lenta cd 3) |
+| 1 | Goblin trampero (nv 1) | Cuchillo dentado, Chaleco, Botas de suela de goma. **Trampa de red** (la del chamán) y **Tajo al tendón** (Lisiado 1t, cd 3) |
+| 2 | Lobo gris (3) | Igual a los otros lobos |
+| 2 | Goblin domador (nv 1) | Rebenque emplomado (1d10+6), Chaleco, Casco de cuero endurecido. **¡Azuzar!** (Crítico potente a un aliado a 4) y **Chasquido** (Miedo 1t; lenta cd 3) |
+| 3 | Goblin arquero del claro (nv 1) | Arco del monte, Chaleco, Capucha de lana cruda. **Flecha untada** (Veneno ×2, cd 2) y **Tiro certero** |
+| 3 | Goblin portaestandarte (nv 2) | Lanza corta, Escudo pequeño, Chaleco, Casco (Def 5, 55 HP). **¡Por el amo!** (Bendecido a los aliados a 3) y **Pared de escudos** |
+
+En la sesión del 2026-10-14 el dueño ya jugó parte del encuentro 1 (murieron el Ladrón y un lobo que llevó al Bosque 1, y sumó un hondero).
+
 **La historia en el mapa:** en el 1 los emboscan los goblins del ocultista (y el ladrón les afana algo); en el 2, el jinete que lleva la
 esfera; en el 3, el ocultista viene a buscarla. Si preferís que la esfera caiga recién con el jefe, se pasa el trofeo especial del jinete
 al ocultista (GM Tools → Recompensas).

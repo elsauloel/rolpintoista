@@ -13,8 +13,10 @@
   (mapa y GM Tools) el ✓/💤 de cada personaje (se ve igual en las dos pantallas y en «👥 Cuentan» de GM Tools; un inactivo no cuenta en Batalla
   terminada, despojos, venta del baúl, el estimado ni el escaneo); en GM Tools «📦 Vender el baúl»: la lista con precios, el reparto entre los
   activos (recompensas que cada ficha aplica sola), el resto en el baúl, el registro y la Mesa.
-- [ ] **🌲 Bosque: 6 goblins más** (pedido del dueño, sin crear: GM Tools estaba congelada): arquero y trampero (E1), tercer lobo y domador (E2),
-  arquero del claro y portaestandarte (E3). Antes de crearlos, fijarse que no se hayan creado solos (la instrucción quedó en espera en esa pestaña).
+- [ ] **🌲 Bosque, lo nuevo de los 6 goblins** (2026-10-15, creados en «El origen»; armado en «Bosque (prueba)» de «Claude · pruebas», falta
+  verlo con capturas): Flecha a la rodilla (un creep con arco, ataque con arreglos → Rengo), ¡Azuzar! (aliado sin incluirse a sí mismo → Crítico
+  potente), ¡Por el amo! (onda de aliados → Bendecido). Chasquido (Miedo) y Flecha untada (Veneno ×2) son la misma mecánica que ya anda.
+- [ ] **Ver de una habilidad de creep o invocación** (2026-10-15): lo que hace arriba y lo técnico (⚙/✋) en «Detalles técnicos».
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no

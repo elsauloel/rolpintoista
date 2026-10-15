@@ -9,14 +9,6 @@
 > capturas. Al probar algo: pasarlo a «Probado» con fecha, qué se vio y si hubo que arreglar algo.
 
 ## Pendientes
-- [ ] **💤 Inactivos y 📦 Vender el baúl** (2026-10-14, publicados durante la sesión del dueño, sin probar en el mapa): en el menú 👥 Personajes
-  (mapa y GM Tools) el ✓/💤 de cada personaje (se ve igual en las dos pantallas y en «👥 Cuentan» de GM Tools; un inactivo no cuenta en Batalla
-  terminada, despojos, venta del baúl, el estimado ni el escaneo); en GM Tools «📦 Vender el baúl»: la lista con precios, el reparto entre los
-  activos (recompensas que cada ficha aplica sola), el resto en el baúl, el registro y la Mesa.
-- [ ] **🌲 Bosque, lo nuevo de los 6 goblins** (2026-10-15, creados en «El origen»; armado en «Bosque (prueba)» de «Claude · pruebas», falta
-  verlo con capturas): Flecha a la rodilla (un creep con arco, ataque con arreglos → Rengo), ¡Azuzar! (aliado sin incluirse a sí mismo → Crítico
-  potente), ¡Por el amo! (onda de aliados → Bendecido). Chasquido (Miedo) y Flecha untada (Veneno ×2) son la misma mecánica que ya anda.
-- [ ] **Ver de una habilidad de creep o invocación** (2026-10-15): lo que hace arriba y lo técnico (⚙/✋) en «Detalles técnicos».
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no
@@ -46,6 +38,12 @@
 - [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): un crítico de la Puñalada (Rengo 2 y Lisiado 1). El pozo visto como jugador ya se vio (con
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **💤 Inactivos, 📦 Vender el baúl, el Ver de las habilidades y lo nuevo de los goblins del Bosque** (2026-10-15, Claude · pruebas):
+  en el menú 👥 Personajes del mapa, ✓ al lado de cada uno → juan tachado (💤) y GM Tools lo ve afuera; «📦 Vender el baúl» (Daga + 2 Velas +
+  10 DDE) → «Total 57,5 DDE → 57,5 para cada uno de Clementino» (juan inactivo, no cuenta), el baúl quedó vacío, la recompensa de Clementino
+  pendiente para su ficha, el registro y la Mesa. El Ver de «Flecha a la rodilla»: «Detalle» arriba y «Detalles técnicos» aparte. Flecha a la
+  rodilla (creep con arco) → pegó, Rengo aplicado y además el Envenenar 25 % del arco; ¡Azuzar! → Crítico potente al Escarabajo; ¡Por el amo! →
+  Bendecido a los aliados a 3 (Escarabajo y Ladrón), de a uno.
 - [x] **🌲 Bosque, combinaciones nuevas** (2026-10-14, Claude · pruebas, creep «Bosque (prueba)» con las cuatro): **No siente el dolor** → elegís
   objetivo, clic en sí mismo → Endurecido aplicado; **Aullido de la manada** → solo a los aliados a 3 (un Escarabajo y el Ladrón, de a uno), Acelerado
   1 turno, juan no; **Grilletes de sombra** → PdG.Esp 9 contra Res.Esp 1 → Inmovilizado 1 turno «le llegó a su ficha»; **Lluvia de piedras** → clic

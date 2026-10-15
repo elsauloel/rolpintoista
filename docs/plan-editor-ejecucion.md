@@ -73,6 +73,8 @@ ejecutando… uno puede editar qué hace ese botón específicamente en esa inst
   (prueba)», sin guardar. De paso se arregló que «Editar» una habilidad de creep desde sus Acciones no abría nada (js/12).
 - [x] Lo que salió al configurar la Lluvia de piedras del Goblin hondero con clics (2026-10-15, El origen): **«＋ Demora»** en Efectos (no es un
   estado: su tarjeta dice «baja un lugar en el orden de turnos», sin turnos ni bonos); el cartel de la pausa ya no tapa el editor; «Cargando el
-  editor…» la primera vez que se toca ✎ Editar desde las Acciones; la Lluvia pasa a costo fijo (5 No2, dueño).
+  editor…» la primera vez que se toca ✎ Editar desde las Acciones, y el editor ya no queda fuera de la vista (arriba) cuando las Acciones
+  están scrolleadas (era eso, no la demora: js/11 ventanasAlFrente no contaba la ventana paso a paso); la Lluvia pasa a costo fijo (5 No2,
+  dueño). Visto en el mapa con clics y capturas.
 - [ ] Que el dueño lo use y diga qué falta (ej. qué otros momentos necesitan su menú propio).
 - [ ] Preguntas que quedaron: ¿vista previa en vivo (la tirada que saldría)? (sin respuesta todavía).

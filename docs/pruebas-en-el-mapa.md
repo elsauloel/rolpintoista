@@ -38,6 +38,10 @@
 - [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): un crítico de la Puñalada (Rengo 2 y Lisiado 1). El pozo visto como jugador ya se vio (con
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **«＋ Demora» y el primer «Editar» desde las Acciones** (2026-10-15, El origen, GM, sin combate): Acciones del Goblin hondero (2) →
+  Lluvia de piedras → Ver → ✎ Editar: abre al frente al primer clic (antes quedaba arriba, fuera de la vista) y sin el cartel de la pausa
+  encima; Costo → «Un número» 5; Ejecución → Efectos: quitar la Demora y volver a ponerla con «＋ Demora» (tarjeta «baja un lugar en el
+  orden de turnos», sin turnos ni bonos); guardado: 5 No2 · 2d6 · Demora. **Falta**: verla aplicarse en un combate real.
 - [x] **✨ El editor de la Ejecución como el cuadro del duelo** (2026-10-15, Claude · pruebas, GM): Acciones de «Bosque (prueba)» → Ver → ✎ Editar →
   Ejecución: se abre el cuadro del duelo (Declaración, Contacto con «Pagar y tirar PdG» y «Elegí cómo te defendés», Bloqueo, Crítico, Daño,
   Efectos) con el 📜 a la izquierda; tocar «Tirar el daño» abre lo suyo debajo. Cerrado sin guardar. (Antes, «Editar» desde las Acciones no

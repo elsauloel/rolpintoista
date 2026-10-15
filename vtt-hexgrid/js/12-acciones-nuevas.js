@@ -593,7 +593,7 @@ function cerrarAccionesNuevas(){
    El ✎ Editar del Ver de una habilidad se lo pedía a GM Tools escondido. Ahora es el editor común (comun/creep-editor.js: el mismo paso
    a paso, con la trampa y la Ejecución ✨), adentro del recuadro de las Acciones nuevas; guarda con modificarCreep (acCambiarCreep). Los
    estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
-const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261015k', '../comun/asistente-duelo-hab.js?v=20261015q'];
+const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261015k', '../comun/asistente-duelo-hab.js?v=20261015r'];
 // Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
 const ACE_BASE = ['../comun/creeps-base.js?v=20261011u', '../comun/skills-creep-base.js?v=20261008q'];
 async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }
@@ -650,6 +650,7 @@ function cerrarSiSoloEstado(){ if(ac && ac.soloEstado){ ac.soloEstado = false; s
 // Una copia del creep, normalizada (la parte privada que escucha el mapa).
 function acCreepDe(id){ const crudo = creepPrivadoDe(id); if(!crudo) return null; const sc = CreepCalculo.normalizar(structuredClone(crudo)); sc.id = id; return sc; }
 async function acEditarHab(creepId, habId){
+  if(typeof CreepEditor === 'undefined') toast('Cargando el editor…');   // la primera vez tarda unos segundos (dueño, 2026-10-15)
   try{ await acCargarEditor(); await PresetsGM.listo(); }
   catch(err){ console.error(err); toast('No se pudo abrir el editor'); return; }
   if(!ac.editor){

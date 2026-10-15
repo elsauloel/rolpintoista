@@ -480,7 +480,7 @@ const AsistenteDueloHab = (() => {
        Los mismos recuadros, colores y botones que `comun/duelo.js` (usa sus estilos: Duelo.estilos). Cada botón o caja con ✎ abre, debajo,
        lo que hace (`st.pop`: costo, tipo, decl, zona, tira, contra, dano, efectos, arma, alcance, flash). */
     const efTxtDe = e => e.no2 !== undefined ? `⚡ Pierde ${e.no2}${e.no2Dif ? ' + la diferencia' : ''} en No2${e.no2Sentado ? ' (en 0, Sentado)' : ''}`
-      : e.cura !== undefined ? `💚 Cura ${e.cura} HP` : `◎ ${e.nombre || 'Estado'} (${e.permanente ? 'no vence' : (e.turnos ?? 2) + ' turnos'})${e.escudo ? ` · 🛡${e.escudo}` : ''}`;
+      : e.cura !== undefined ? `💚 Cura ${e.cura} HP` : e.nombre === 'Demora' ? '⏬ Demora: baja un lugar en el orden de turnos' : `◎ ${e.nombre || 'Estado'} (${e.permanente ? 'no vence' : (e.turnos ?? 2) + ' turnos'})${e.escudo ? ` · 🛡${e.escudo}` : ''}`;
     const pctTxt = e => Number(e.caras) > 1 ? `${Math.round(100 * Math.max(1, Number(e.exitos) || 1) / Number(e.caras))} %` : '';
     const tiraTxt = () => st.tiraModo === 'custom' ? `${st.tiraEtiqueta || 'Tirada'} · ${st.tiraFormula || '¿fórmula?'}` : `${statNombre(st.tira)}${st.tiraBono ? ` ${st.tiraBono > 0 ? '+' : '−'} ${Math.abs(st.tiraBono)}` : ''}`;
     const contraLista = () => [...[...st.contra].map(x => statNombre(x)), ...(st.objetivo === 'zona' ? [] : st.contraExtra.map(x => x.formula ? `${x.etq || 'Fórmula'} · ${x.formula}` : `${statNombre(x.stat)} ${Number(x.bono) >= 0 ? '+' : '−'} ${Math.abs(Number(x.bono) || 0)}`))];
@@ -621,15 +621,17 @@ const AsistenteDueloHab = (() => {
             <label class="op" style="padding:0"><input type="checkbox" data-ef-no2dif="${clave(i)}" ${e.no2Dif ? 'checked' : ''}> + la diferencia entre las tiradas</label>
             <label class="op" style="padding:0"><input type="checkbox" data-ef-no2sent="${clave(i)}" ${e.no2Sentado ? 'checked' : ''}> si llega a 0, queda Sentado</label>
             <button type="button" class="rojo" data-ef-x="${clave(i)}">Quitar</button></div>`
+        : e.nombre === 'Demora' && e.cura === undefined
+        ? `<div class="fila"><span>⏬ Demora</span><span class="nota" style="margin:0">baja un lugar en el orden de turnos (lo hace el mapa)</span><button type="button" class="rojo" data-ef-x="${clave(i)}">Quitar</button></div>${probHtml(e, clave(i))}`
         : e.cura !== undefined
         ? `<div class="fila"><span>💚 Cura</span><input type="text" style="width:80px" placeholder="5 o 1d10" title="Un número o dados (1d10, 2d8+1): los dados se tiran al usarla" data-ef-cura="${clave(i)}" value="${esc(e.cura)}"><span>HP</span><button type="button" class="rojo" data-ef-x="${clave(i)}">Quitar</button></div>`
         : e.origen === 'preset' ? filaEstadoPresetHtml(e, clave(i)) : filaEstadoManualHtml(e, clave(i))).join('');
     }
     function cuerpoEfectos(){
-      let h = titulo('', st.modo === 'arma' ? 'Efectos al pegar' : '4 · Efectos', 'Lo más frecuente (un estado, una cura, perder No2) se aplica con su botón «Aplicar». Lo que no, va en «✋ Manual», con tus palabras. Solo entran si la habilidad funciona.');
+      let h = titulo('', st.modo === 'arma' ? 'Efectos al pegar' : '4 · Efectos', 'Lo más frecuente (un estado, una cura, perder No2, la Demora) se aplica con su botón «Aplicar». Lo que no, va en «✋ Manual», con tus palabras. Solo entran si la habilidad funciona.');
       h += filaEfectosLista(st.efectos, i => i);
       h += `<datalist id="adh-estados">${nombresEstado().map(n => `<option value="${esc(n)}">`).join('')}</datalist>
-        <div class="fila"><button type="button" class="sec" data-ef-mas="estado">＋ Estado</button><button type="button" class="sec" data-ef-mas="cura">＋ Cura</button><button type="button" class="sec" data-ef-mas="no2">＋ Pierde No2</button></div>`;
+        <div class="fila"><button type="button" class="sec" data-ef-mas="estado">＋ Estado</button><button type="button" class="sec" data-ef-mas="cura">＋ Cura</button><button type="button" class="sec" data-ef-mas="no2">＋ Pierde No2</button><button type="button" class="sec" data-ef-mas="demora" title="Baja un lugar en el orden de turnos">＋ Demora</button></div>`;
       h += `<div class="fila" style="margin-top:14px"><label class="op" style="padding:0"><input type="checkbox" data-efectosnota-on ${st.efectosNotaOn ? 'checked' : ''}> ✋ Manual: un efecto que se aplica a mano, con tus palabras</label></div>`;
       if(st.efectosNotaOn){
         h += `<textarea data-efectosnota rows="3" style="width:100%;box-sizing:border-box;padding:8px;font-size:14px" placeholder="ej. Invertí el orden de turno de todos los presentes hasta tu próximo turno.">${esc(st.efectosNota)}</textarea>
@@ -839,6 +841,7 @@ const AsistenteDueloHab = (() => {
         const arr = esCritico ? st.efectosCritico : st.efectos;
         if(tipo === 'cura'){ arr.push({cura: 5}); dibujar(); return; }
         if(tipo === 'no2'){ arr.push({nombre: 'Pierde No2', no2: 1, no2Dif: true, no2Sentado: true}); dibujar(); return; }   // Sonic Boom (2026-10-02)
+        if(tipo === 'demora'){ arr.push({nombre: 'Demora'}); dibujar(); return; }   // no es un estado: la aplica el mapa (dueño, 2026-10-15, Lluvia de piedras)
         if(cfg.elegirEstado){
           const r = await cfg.elegirEstado();
           if(!r) return;
@@ -975,6 +978,7 @@ const AsistenteDueloHab = (() => {
     function mapEfectoOut(e){
       if(e.no2 !== undefined) return {nombre: 'Pierde No2', no2: e.no2, ...(e.no2Dif ? {no2Dif: true} : {}), ...(e.no2Sentado ? {no2Sentado: true} : {})};
       if(e.cura !== undefined) return {cura: e.cura};
+      if(e.nombre === 'Demora') return {nombre: 'Demora', ...(Number(e.caras) > 1 ? {caras: Number(e.caras), exitos: Math.max(1, Number(e.exitos) || 1)} : {})};
       return {
         nombre: e.nombre, ...(e.turnos !== undefined && e.turnos !== '' ? {turnos: e.turnos} : {}),   // sin turnos: los del estado
         ...(e.permanente ? {permanente: true} : {}),

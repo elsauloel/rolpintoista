@@ -436,7 +436,7 @@ const AsistenteDueloHab = (() => {
       const ops = [['no', 'No hace daño'], ['formula', 'Una fórmula'], ...(!esZona && !uno ? [['arma', 'El daño de un ataque (tu arma + Fuerza)']] : []), ...(!uno ? [['dif', 'La diferencia entre las tiradas']] : [])];
       h += `<div class="adh-card"><div class="adh-card-h"><span class="adh-num">3</span> Daño</div>
         <div><div class="adh-lbl">¿De dónde sale?</div>${ops.map(([x, t]) => `<label class="op"><input type="radio" name="fuentedano" value="${x}" ${fuente === x ? 'checked' : ''}> ${t}</label>`).join('')}</div>`;
-      if(fuente === 'formula') h += `<div class="fila"><span>Fórmula</span><input type="text" style="width:140px" data-dano-formula placeholder="ej. 2d6+3" value="${esc(st.danoFormula)}"><span class="nota" style="margin:0">(podés usar «X»)</span></div>`;
+      if(fuente === 'formula') h += `<div class="fila"><span>Fórmula</span><input type="text" style="width:140px" data-dano-formula placeholder="ej. 2d6+3" value="${esc(st.danoFormula)}"><span class="nota" style="margin:0">(podés usar «X»)</span></div>${!st.danoFormula.trim() && cfg.tieneFormula === false ? '<p class="aviso">Falta la fórmula del daño: sin ella, el duelo no tira daño.</p>' : ''}`;
       if(fuente === 'arma') h += `<p class="nota">El daño de tu arma (la que elegís si cuesta como un ataque; si no, la principal), con su Fuerza, como el botón «Daño».</p>`;
       if(fuente === 'dif') h += `<p class="nota">${esZona ? 'Cada uno que no resiste recibe' : 'Si no la resiste, recibe'} tu tirada menos la suya (empate: nada).</p>`;
       if(fuente !== 'no'){
@@ -851,7 +851,6 @@ const AsistenteDueloHab = (() => {
           // La fórmula se escribe acá (2026-10-15): si es otra que la «segunda tirada» de la habilidad, la Ejecución manda.
           if(!st.danoDif && !st.danoArma){
             const fd = st.danoFormula.trim();
-            if(!fd && !String(cfg.formulaDano || '').trim()){ alert('Escribí la fórmula del daño (ej. 2d6+3), o elegí otra cosa en «¿De dónde sale?».'); return false; }
             if(fd && fd !== String(cfg.formulaDano || '').trim()) out.danoFormula = fd;
           }
           if(st.danoMas && !st.danoDif) out.danoMas = st.danoMas; }

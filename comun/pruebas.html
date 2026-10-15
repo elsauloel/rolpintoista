@@ -2729,12 +2729,13 @@ prueba('Ejecución ✨ en la ventana común: los pasos dependen del objetivo y G
   const mia = [...document.querySelectorAll('.pap')].pop(), q = s => mia.querySelector(s);
   const tabs = () => [...mia.querySelectorAll('[data-pap-paso]')].map(b => b.textContent.replace(/^\d+\. /, ''));
   const antes = tabs();
-  q(`[data-pap-paso="${antes.indexOf('Objetivo')}"]`).click();
+  q(`[data-pap-paso="${antes.indexOf('Declaración')}"]`).click();
+  const conAlcance = !!q('[data-alcance]');
   const sel = q('[data-objetivo]'); sel.value = 'uno mismo'; sel.dispatchEvent(new Event('change', {bubbles: true}));
-  const despues = tabs(), titulo = q('.pap-cab h3').textContent;
+  const despues = tabs(), titulo = q('.pap-cab h3').textContent, sinAlcance = !q('[data-alcance]');
   q('[data-pap="guardar"]').click(); await new Promise(res => setTimeout(res, 0));
-  igual([antes.includes('Alcance'), despues.includes('Alcance'), titulo, r && r.duelo && r.duelo.objetivo, r && r.costo && r.costo.sp, mia.isConnected],
-    [true, false, `Ejecución ✨ · Rayo · paso ${antes.indexOf('Objetivo') + 1} de ${despues.length}: Objetivo`, 'uno mismo', '2', false]);
+  igual([antes.join(','), conAlcance, sinAlcance, titulo, r && r.duelo && r.duelo.objetivo, r && r.costo && r.costo.sp, mia.isConnected],
+    ['Tipo,Costo,Declaración,Contacto,Daño,Efectos,Listo', true, true, `Ejecución ✨ · Rayo · paso ${antes.indexOf('Declaración') + 1} de ${despues.length}: Declaración`, 'uno mismo', '2', false]);
 });
 prueba('Ejecución ✨ (2026-10-07, P169): en el paso Daño se elige si lo frena la Defensa especial, si es daño directo o True Damage', async () => {
   let r = null;
@@ -2743,8 +2744,9 @@ prueba('Ejecución ✨ (2026-10-07, P169): en el paso Daño se elige si lo frena
   const mia = [...document.querySelectorAll('.pap')].pop(), q = s => mia.querySelector(s);
   const tabs = [...mia.querySelectorAll('[data-pap-paso]')].map(b => b.textContent.replace(/^\d+\. /, ''));
   q(`[data-pap-paso="${tabs.findIndex(t => /Da[ñn]o/.test(t))}"]`).click();
-  const antes = q('[data-frenoesp]') && q('[data-frenoesp]').value;
-  const sel = q('[data-frenoesp]'); sel.value = 'true'; sel.dispatchEvent(new Event('change', {bubbles: true}));
+  q('[data-freno-abrir]').click();
+  const antes = q('[name=freno]:checked') && q('[name=freno]:checked').value;
+  const sel = q('[name=freno][value=true]'); sel.checked = true; sel.dispatchEvent(new Event('change', {bubbles: true}));
   q('[data-pap="guardar"]').click(); await new Promise(res => setTimeout(res, 0));
   igual([antes, r && r.duelo && r.duelo.trueDamage, r && r.duelo && !!r.duelo.danoDirecto], ['directo', true, false]);
 });
@@ -2755,7 +2757,7 @@ prueba('Ejecución ✨: «la diferencia» y «drena» se eligen en el paso Daño
   const mia = [...document.querySelectorAll('.pap')].pop(), q = s => mia.querySelector(s);
   const tabs = [...mia.querySelectorAll('[data-pap-paso]')].map(b => b.textContent.replace(/^\d+\. /, ''));
   q(`[data-pap-paso="${tabs.findIndex(t => /Da[ñn]o/.test(t))}"]`).click();
-  const ui = [!!q('input[name=hacedano][value=dif]:checked'), !!q('[data-drena]:checked'), q('[data-drenatope]') && q('[data-drenatope]').value];
+  const ui = [!!q('input[name=fuentedano][value=dif]:checked'), !!q('[data-drena]:checked'), q('[data-drenatope]') && q('[data-drenatope]').value];
   q('[data-pap="guardar"]').click(); await new Promise(res => setTimeout(res, 0));
   const c = r && r.duelo, h = Combatiente.habEjecucion({nombre: 'Drenar Vida', tiradaExtra: ''}, c, {X: 3});
   const limpia = Duelo.limpiarHab(h);
@@ -2770,8 +2772,8 @@ prueba('Ejecución ✨: «el daño de tu arma» y la onda con dodge roll (Daño 
   const mia = [...document.querySelectorAll('.pap')].pop(), q = s => mia.querySelector(s);
   const tabs = [...mia.querySelectorAll('[data-pap-paso]')].map(b => b.textContent.replace(/^\d+\. /, ''));
   q(`[data-pap-paso="${tabs.findIndex(t => /Da[ñn]o/.test(t))}"]`).click();
-  const armaUi = !!q('input[name=hacedano][value=arma]:checked');
-  q(`[data-pap-paso="${tabs.indexOf('Objetivo')}"]`).click();
+  const armaUi = !!q('input[name=fuentedano][value=arma]:checked');
+  q(`[data-pap-paso="${tabs.indexOf('Declaración')}"]`).click();
   const dodgeUi = !!q('[data-ondadodge]:checked');
   q('[data-pap="guardar"]').click(); await new Promise(res => setTimeout(res, 0));
   const c = r && r.duelo, h = Combatiente.habEjecucion({nombre: 'Daño en área'}, c, {stat: () => 6, etq: s => s, armaDano: '1d8 + 3'});
@@ -2899,7 +2901,7 @@ prueba('Ejecución ✨: el cono con dodge roll (Ráfaga arcana, 2026-10-10) — 
   AsistenteDueloHab.abrir({nombre: raf.nombre, inicial: structuredClone(raf.duelo), costoInicial: {sp: raf.costo, nitrosCosto: raf.nitrosCosto}, alGuardar: x => { r = x; }});
   const mia = [...document.querySelectorAll('.pap')].pop(), q = s => mia.querySelector(s);
   const tabs = [...mia.querySelectorAll('[data-pap-paso]')].map(b => b.textContent.replace(/^\d+\. /, ''));
-  q(`[data-pap-paso="${tabs.indexOf('Objetivo')}"]`).click();
+  q(`[data-pap-paso="${tabs.indexOf('Declaración')}"]`).click();
   const dodgeUi = !!q('[data-ondadodge]:checked');
   q('[data-pap="guardar"]').click(); await new Promise(res => setTimeout(res, 0));
   const h = Combatiente.habEjecucion(raf, raf.duelo, {stat: () => 6, etq: s => s});
@@ -2923,6 +2925,19 @@ prueba('Ejecución ✨: el cono y «Pierde No2» (Sonic Boom) — editor, regla 
   FichaAcciones.aplicarEstadoRecibido(S, EstadosAplicar.limpiarSpec({nombre: 'Pierde No2', stacks: 4, sentadoEnCero: true}), 'Sonic Boom', {...uiHab(reg), presets: estadosPresetFicha()});
   igual([tabs.includes('Alcance'), no2Ui, c && c.objetivo, h.alcance, lh.objetivo, !!lh.dodge, spec, S.nitros, S.efectos.some(e => e.sentado)],
     [false, ['1', true, true], 'cono', 0, 'cono', false, {nombre: 'Pierde No2', no2: 1, no2Dif: true, no2Sentado: true}, 0, true]);
+});
+prueba('Ejecución ✨ como el duelo (2026-10-15): otro stat + N, resistirse con una fórmula propia, el área que golpea y queda, la fórmula y lo que se le suma', async () => {
+  let r = null;
+  const ini = {objetivo: 'cualquiera', tira: 'des', tiraBono: 2, contra: ['con', {stat: 'agl', bono: 1}, {formula: '1d6+2', etq: 'Aguante'}], dano: true, tipoDano: 'fuego', ignoraDano: true, danoDirecto: true, danoFormula: '1d8+1', danoMas: '+1d4', efectos: []};
+  AsistenteDueloHab.abrir({nombre: 'Prueba', inicial: ini, siempreActivo: true, formulaDano: '2d6', costoInicial: {sp: '1', nitrosCosto: 1}, alGuardar: x => { r = x; }});
+  const mia = [...document.querySelectorAll('.pap')].pop();
+  mia.querySelector('[data-pap="guardar"]').click(); await new Promise(res => setTimeout(res, 0));
+  const h = Combatiente.habEjecucion({nombre: 'Prueba', tiradaExtra: '2d6'}, r.duelo, {stat: id => ({rng: 5, des: 4})[id] || 0, etq: s => s});
+  const lh = Duelo.limpiarHab(h);
+  const area = Combatiente.habEjecucion({nombre: 'B'}, {objetivo: 'area', radio: 1, centroAlcance: 'rango', tira: 'pdgmg', contra: ['eva'], zonaQueda: {turnos: 2, dano: '1d4', enMantenimiento: false, cadaPaso: true, soloRivales: true}}, {stat: id => ({rng: 5})[id] || 0, etq: s => s});
+  const canon = o => Array.isArray(o) ? o.map(canon) : o && typeof o === 'object' ? Object.keys(o).sort().reduce((x, k) => ({...x, [k]: canon(o[k])}), {}) : o;   // sin importar el orden
+  igual([JSON.stringify(canon(r.duelo)) === JSON.stringify(canon(ini)), h.objetivo, h.tira, h.contra.map(c => c.formula || `${c.stat}${c.bono ? '+' + c.bono : ''}`), h.dano.formula, h.dano.directo, lh.objetivo, lh.contra.length, area.centroAlcance, Duelo.limpiarHab(area).zonaQueda],
+    [true, 'cualquiera', {stat: 'des', etq: 'des', bono: 2}, ['con', 'agl+1', '1d6+2'], '1d8+1+1d4', true, 'cualquiera', 3, 5, {turnos: 2, nombre: '', dano: '1d4', enMantenimiento: false, cadaPaso: true, soloRivales: true}]);
 });
 prueba('duelo minimizado (P151): un texto por paso, sin la vida que le queda; el fin al resolverse', () => {
   const base = {atacante: {nombre: 'juan'}, defensor: {nombre: 'Coloso'}, ataque: {tipo: 'normal', tipoDado: 4}};

@@ -123,7 +123,32 @@ const AsistenteDueloHab = (() => {
 .adh-paso button.adh-stat{border-style:solid;padding:4px 8px;text-transform:none;letter-spacing:0;font-size:12px}
 .adh-paso .adh-chip{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--pap-cobre,#C98545);border-radius:12px;padding:1px 2px 1px 10px;font-size:12.5px}
 .adh-paso button.adh-chip-x{border:none;background:none;padding:2px 6px}
-.adh-paso .adh-freno{border:1px solid var(--pap-linea,#3B2E34);border-radius:6px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}`;
+.adh-paso .adh-freno{border:1px solid var(--pap-linea,#3B2E34);border-radius:6px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}
+#ejd-fondo{position:fixed;inset:0;z-index:99500;background:rgba(6,8,14,.78);display:flex;align-items:center;justify-content:center;padding:12px;font-family:inherit}
+#ejd-fondo.con-texto .duelo-caja{margin-left:calc(min(270px, 22vw) + 24px)}
+#ejd-fondo .duelo-caja{display:flex;flex-direction:column}
+#ejd-fondo .ejd-cuerpo{flex:1;overflow:auto}
+#ejd-fondo .ejd-ed{cursor:pointer;position:relative;outline:2px dashed transparent;outline-offset:3px;transition:outline-color .15s}
+#ejd-fondo .ejd-ed:hover{outline-color:#ffd25a}
+#ejd-fondo .ejd-ed::after{content:'✎';position:absolute;top:3px;right:7px;font-size:13px;color:#ffd25a;opacity:.55;pointer-events:none}
+#ejd-fondo .ejd-ed:hover::after{opacity:1}
+#ejd-fondo .duelo-tiro button,#ejd-fondo .duelo-ef button{animation:none}
+#ejd-fondo .ejd-barra{display:flex;gap:8px;flex-wrap:wrap}
+#ejd-fondo .ejd-chip{background:#1d2335;border:1px solid #39435c;color:#e9ecf4;border-radius:99px;padding:7px 26px 7px 14px;font-size:13px;font-weight:700;cursor:pointer}
+#ejd-fondo .ejd-dano{display:block;margin:4px auto;background:#2d6cdf;color:#fff;border:2px solid #8db3ff;border-radius:12px;padding:14px 34px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(45,108,223,.5)}
+#ejd-fondo .ejd-mas{display:block;width:100%;margin-top:8px;background:#1d2335;color:#d5dbec;border:1px dashed #4a5578;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:700;cursor:pointer;text-align:center}
+#ejd-fondo .ejd-vacio{min-height:0}
+#ejd-fondo .ejd-pop{margin-top:12px;background:#0f1424;border:2px solid #ffd25a;border-radius:12px;padding:12px 14px;color:#e9ecf4;text-align:left}
+#ejd-fondo .ejd-pop-ayuda{font-size:13px;color:#aab3ca;margin-bottom:8px;line-height:1.45}
+#ejd-fondo .ejd-pop-ayuda b{color:#ffd25a}
+#ejd-fondo .ejd-pop-pie{display:flex;justify-content:flex-end;margin-top:10px}
+#ejd-fondo .ejd-pop-pie button,#ejd-fondo .ejd-pie button{background:#2d6cdf;color:#fff;border:0;border-radius:10px;padding:10px 18px;font-size:15px;font-weight:700;cursor:pointer}
+#ejd-fondo .ejd-pie{display:flex;gap:8px;justify-content:flex-end;align-items:center;padding:12px 18px;border-top:1px solid #2b3347}
+#ejd-fondo .ejd-pie button.sec{background:#2b3347;color:#d5dbec}
+#ejd-fondo .ejd-ayuda{margin-right:auto;font-size:12.5px;color:#9aa4bd}
+#ejd-fondo .ejd-pop .adh-paso{--pap-tenue:#9aa4bd;--pap-laton:#ffd25a;--pap-cobre:#8db3ff;--pap-linea:#39435c;--pap-peligro:#f1a1ad;color:#e9ecf4}
+#ejd-fondo .ejd-pop input,#ejd-fondo .ejd-pop select,#ejd-fondo .ejd-pop textarea{background:#0e1220;color:#fff;border:1px solid #39435c;border-radius:6px;padding:6px 8px;font:inherit;font-size:14px}
+#ejd-fondo .ejd-pop .adh-modo,#ejd-fondo .ejd-pop .adh-ef-card,#ejd-fondo .ejd-pop .adh-resumen{background:#12172a}`;
     document.head.appendChild(s);
   }
 
@@ -232,31 +257,13 @@ const AsistenteDueloHab = (() => {
       danoFormula: (ini && ini.danoFormula) || cfg.formulaDano || '', danoMas: (ini && ini.danoMas) || '',
       frenoAbierto: false,
     };
-    let api = null, f = null;   // la ventana común abierta y su caja (f: donde se buscan los controles de cada paso)
-    const cerrar = () => { if(api) api.cerrar(); };
-    const ir = i => { if(api) api.irA(i); };
+    let fondo = null, f = null;   // la ventana (el cuadro del duelo para editar) y su cuerpo (f: donde se buscan los controles)
+    st.pop = '';
+    const alTecla = e => { if(e.key !== 'Escape' || !fondo || document.querySelector('.pap-fondo, .cfj-fondo')) return; e.stopImmediatePropagation(); e.preventDefault(); if(st.pop){ st.pop = ''; dibujar(); } else cancelar(); };
+    const cerrar = () => { if(fondo){ fondo.remove(); fondo = null; document.removeEventListener('keydown', alTecla, true); } };
+    const cancelar = () => { cerrar(); if(cfg.alCancelar) cfg.alCancelar(); };
     const sinOp = () => st.tiraNinguna;
     let ayudaPaso = '';   // la ayuda del paso que se está armando (la pone titulo())
-
-    // Lista de pasos: cambia según activo/modo/objetivo/tira, igual que en asistente-item.js (pasos()).
-    function pasos(){
-      const L = [{id: 'activo', corto: cfg.siempreActivo ? 'Tipo' : '¿Se juega?'}];
-      if(!st.activo){ L.push({id: 'listo', corto: 'Listo'}); return L; }
-      L.push({id: 'costo', corto: 'Costo'});
-      if(st.modo === 'flash'){
-        L.push({id: 'flash', corto: 'Flash'});
-      }else if(st.modo === 'arma'){
-        L.push({id: 'arma', corto: 'Tu ataque'}, {id: 'alcance', corto: 'Alcance'}, {id: 'efectos', corto: 'Al pegar'});
-      }else{
-        // Los mismos recuadros del cuadro del duelo (2026-10-15, dueño: «la edición tiene que ser una emulación del mismo menú del duelo»).
-        L.push({id: 'declaracion', corto: 'Declaración'});
-        if(st.objetivo === 'zona' || ((st.objetivo === 'area' || st.objetivo === 'onda') && st.permanencia === 'queda')) L.push({id: 'zona', corto: 'La zona'});
-        L.push({id: 'contacto', corto: 'Contacto'}, {id: 'dano', corto: 'Daño'});
-        if(st.objetivo !== 'zona') L.push({id: 'efectos', corto: 'Efectos'});
-      }
-      L.push({id: 'listo', corto: 'Listo'});
-      return L;
-    }
 
     const titulo = (h, t, ayuda) => { ayudaPaso = `<b>${t}</b> ${ayuda}`; return h; };
 
@@ -306,9 +313,9 @@ const AsistenteDueloHab = (() => {
         ${fila('espaldaPdg', '+ PdG por la espalda')}${fila('espaldaFijo', '+ Daño por la espalda')}${fila('espaldaCritpot', '+ Crítico potente por la espalda')}`;
       return h;
     }
-    /* ---------- Los recuadros del duelo (2026-10-15, docs/plan-editor-ejecucion.md) ----------
-       1 Declaración (a quién, dónde tiene que estar, el área y si permanece) · La zona (si permanece) · 2 Contacto (qué tira contra con qué se
-       resiste: la lista, «Otro stat…» o «Fórmula propia») · 3 Daño (de dónde sale, qué se le suma y qué lo frena) · 4 Efectos. */
+    /* ---------- Lo que se edita al tocar cada botón del cuadro (2026-10-15, docs/plan-editor-ejecucion.md) ----------
+       Declaración (a quién, dónde tiene que estar, el área y si permanece) · La zona (si permanece) · lo que tira quien la usa (la lista,
+       «Otro stat…» o «Fórmula propia») · con qué se resiste el objetivo · el daño (de dónde sale, qué se le suma y qué lo frena). */
     const OBJETIVOS = [['enemigo', 'Un enemigo'], ['aliado', 'Un aliado'], ['cualquiera', 'Cualquier personaje (aliado o enemigo)'], ['uno mismo', 'Uno mismo'],
       ['area', 'Un área (marcás el centro)'], ['onda', 'Onda alrededor tuyo'], ['cono', 'Cono al frente tuyo'], ['linea', 'Línea recta desde vos']];
     const ESPACIAL = [['auto', 'Automático (lo especial: tu Rango; lo demás, sin límite)'], ['adyacente', 'Pegado (adyacente)'], ['rango', 'Dentro de tu Rango'], ['fijo', 'A un número de casilleros o menos'], ['ilimitado', 'Sin límite']];
@@ -346,13 +353,13 @@ const AsistenteDueloHab = (() => {
         ${gruposStats().map(g => `<div class="adh-grid-g"><span class="adh-grid-t">${esc(g.nombre)}</span>${g.stats.map(x => `<button type="button" class="adh-stat" data-grid-stat="${esc(x.id)}" title="${esc(x.full || x.label)}">${esc(x.label)}</button>`).join('')}</div>`).join('')}</div>`;
     }
     const esAreaObj = o => ['area', 'onda', 'cono', 'linea'].includes(o);
+    const objetivoVisto = () => st.objetivo === 'zona' ? 'area' : st.objetivo;
 
+    // A quién, dónde tiene que estar, el área y si permanece (el lado «Se resiste / Objetivo» de la Declaración).
     function cuerpoDeclaracion(){
-      const vis = st.objetivo === 'zona' ? 'area' : st.objetivo;
-      let h = titulo('', '1 · Declaración', 'Quién la usa y sobre quién: el primer recuadro del duelo.');
-      h += `<div class="adh-card"><div class="adh-card-h"><span class="adh-num">1</span> Declaración</div>
-        <div class="adh-vs"><div class="adh-lado"><div class="adh-lbl">Usa la habilidad</div><b>${esc(cfg.portador || 'Quien la tenga')}</b></div><div class="adh-vs-t">VS</div>
-        <div class="adh-lado"><div class="adh-lbl">Objetivo</div><select data-objetivo>${OBJETIVOS.map(([v, t]) => `<option value="${v}"${vis === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div></div>`;
+      const vis = objetivoVisto();
+      let h = titulo('', 'Sobre quién', 'A quién se le puede apuntar y dónde tiene que estar.');
+      h += `<div><div class="adh-lbl">Objetivo</div><select data-objetivo>${OBJETIVOS.map(([v, t]) => `<option value="${v}"${vis === v ? ' selected' : ''}>${t}</option>`).join('')}</select></div>`;
       if(['enemigo', 'aliado', 'cualquiera'].includes(vis)){
         h += `<div><div class="adh-lbl">¿Dónde tiene que estar?</div><div class="fila"><select data-alcance>${ESPACIAL.map(([v, t]) => `<option value="${v}"${st.alcance === v ? ' selected' : ''}>${t}</option>`).join('')}</select>${st.alcance === 'fijo' ? `<input type="number" min="1" style="width:70px" data-alcanceN value="${esc(st.alcanceN)}"><span>casilleros</span>` : ''}</div>
           <p class="nota">No limita a quién podés apuntar: al elegir el objetivo, brillan los que están ahí.</p></div>`;
@@ -362,22 +369,22 @@ const AsistenteDueloHab = (() => {
         if(vis === 'area') h += `<div><div class="adh-lbl">¿Dónde cae el centro?</div><div class="fila"><select data-centro>${[['', 'Donde quieras (sin límite)'], ['adyacente', 'En una casilla pegada a vos'], ['rango', 'Dentro de tu Rango'], ['fijo', 'A un número de casilleros o menos']].map(([v, t]) => `<option value="${v}"${st.centroModo === v ? ' selected' : ''}>${t}</option>`).join('')}</select>${st.centroModo === 'fijo' ? `<input type="number" min="1" style="width:70px" data-centroN value="${esc(st.centroN)}"><span>casilleros</span>` : ''}</div></div>`;
         const perm = [['momento', 'Del momento: se resuelve al ejecutar y no deja nada'], ['queda', 'Golpea y queda: se resuelve al ejecutar y además deja una zona'], ...(vis === 'area' ? [['solo', 'Solo queda: no golpea al ejecutar; queda una zona que afecta a quien esté o entre']] : [])];
         h += `<div><div class="adh-lbl">¿Es del momento o permanece?</div>${perm.map(([v, t]) => `<label class="op"><input type="radio" name="permanencia" value="${v}" ${st.permanencia === v ? 'checked' : ''}> ${t}</label>`).join('')}
-          ${st.permanencia !== 'momento' ? '<p class="nota">El paso siguiente, «La zona», define cuánto dura, cuándo afecta y qué deja.</p>' : ''}</div>`;
+          ${st.permanencia !== 'momento' ? '<p class="nota">Aparece el recuadro «La zona que queda»: tocalo para decir cuánto dura, cuándo afecta y qué deja.</p>' : ''}</div>`;
       }
       if(vis === 'onda' || vis === 'cono') h += `<label class="op"><input type="checkbox" data-ondadodge ${st.ondaDodge ? 'checked' : ''}> Quien gana su tirada tiene dodge roll (puede salir moviéndose; si sale, la esquiva)</label>`;
       if(vis === 'cono') h += `<p class="nota">El cono al frente tuyo, hacia donde mirás. No hay que marcar nada.</p>`;
       if(vis === 'linea') h += `<div><div class="adh-lbl">Largo</div><div class="fila"><input type="number" min="1" style="width:70px" data-radio value="${esc(st.radio)}"><span>casilleros, desde vos hacia donde marques</span></div></div>`;
       if(vis === 'uno mismo') h += `<p class="nota">No hay que elegir a nadie: se aplica sobre quien la usa.</p>`;
-      return h + '</div>';
+      return h;
     }
 
     function cuerpoZona(){
       const solo = st.objetivo === 'zona';
-      let h = titulo('', 'La zona que queda', solo ? 'No golpea al ejecutar: queda la zona. Su tirada y su daño se definen en Contacto y Daño; acá, cuánto dura, cuándo afecta y qué deja.'
+      let h = titulo('', 'La zona que queda', solo ? 'No golpea al ejecutar: queda la zona. Su tirada y su daño son los del Contacto y el Daño de abajo; acá, cuánto dura, cuándo afecta y qué deja.'
         : 'Lo que queda después del golpe (la bola de fuego que deja fuego, la ventisca que deja escarcha). Al ejecutar ya les pegó a los de adentro: esto es para después.');
       const v = (a, b) => solo ? a : b;
       const estado = v(st.zonaEstadoNombre, st.zq.estadoNombre);
-      h += `<div class="adh-card"><div class="fila"><input type="number" min="1" style="width:70px" data-z-turnos value="${esc(v(st.zonaTurnos, st.zq.turnos))}"><span>turnos que dura</span></div>
+      h += `<div class="fila"><input type="number" min="1" style="width:70px" data-z-turnos value="${esc(v(st.zonaTurnos, st.zq.turnos))}"><span>turnos que dura</span></div>
         <div><div class="adh-lbl">¿Cuándo afecta?</div>
           <label class="op"><input type="checkbox" checked disabled> Al entrar (siempre)</label>
           <label class="op"><input type="checkbox" data-z-mant ${v(st.zonaEnMant, st.zq.enMant) ? 'checked' : ''}> En cada turno, a quien sigue adentro</label>
@@ -390,39 +397,39 @@ const AsistenteDueloHab = (() => {
           <p class="nota">Va directo a la vida: la frena la Defensa especial y la resistencia a su elemento.</p></div>
           <div><div class="adh-lbl">¿Se resiste?</div><div class="fila"><select data-z-contra><option value="">No: le entra a quien esté</option>${CONTRA.filter(c => c[0] !== 'parry').map(([x, t]) => `<option value="${x}"${st.zq.contra === x ? ' selected' : ''}>Sí, con ${corto(t)}</option>`).join('')}</select>${st.zq.contra ? `<span>contra tu</span><select data-z-tira>${TIRA.map(([x, t]) => `<option value="${x}"${(st.zq.tira || 'dmgesp') === x ? ' selected' : ''}>${corto(t)}</option>`).join('')}</select>` : ''}</div></div>`;
       }
-      return h + '</div>';
+      return h;
     }
 
-    function cuerpoContacto(){
-      const esZona = st.objetivo === 'zona', esArea = esAreaObj(st.objetivo);
-      let h = titulo('', '2 · Contacto', esZona ? 'La tirada de la zona: cada vez que afecta a alguien, se tira lo de la izquierda (con el valor de quien la creó) contra lo de la derecha. Si gana quien entra, no le pasa nada.'
-        : 'Lo que tira quien la usa contra lo que tira el objetivo para resistirse. «Fórmula propia»: dados (1d4+3) o un stat más un número (pdg + 5).');
+    // Lo que tira quien la usa (el botón azul de la izquierda del Contacto).
+    function cuerpoTira(){
+      const esZona = st.objetivo === 'zona';
+      let h = titulo('', 'Lo que tira quien la usa', esZona ? 'La tirada de la zona: cada vez que afecta a alguien, se tira con el valor de quien la creó.' : '«Fórmula propia»: dados (1d4+3) o un stat más un número (pdg + 5).');
       const opsT = [['', '— Nada: se aplica directo —'], ...TIRA.map(([x, t]) => [x, corto(t)])];
       if(st.tira && !opsT.some(o => o[0] === st.tira)) opsT.push([st.tira, statNombre(st.tira)]);
       const valT = st.tiraNinguna ? '' : st.tiraModo === 'custom' ? '__f' : st.tira;
-      let izq = `<div class="adh-lbl">Tira</div><select data-tirasel>${opsT.map(([x, t]) => `<option value="${esc(x)}"${valT === x ? ' selected' : ''}>${esc(t)}</option>`).join('')}<option value="__otro">Otro stat…</option>${esZona ? '' : `<option value="__f"${valT === '__f' ? ' selected' : ''}>Fórmula propia…</option>`}</select>`;
-      if(!st.tiraNinguna && st.tiraModo !== 'custom' && !esZona) izq += `<div class="fila"><span>+</span><input type="number" style="width:64px" data-tirabono value="${esc(st.tiraBono)}"><span class="nota" style="margin:0">un número de más (0 = nada)</span></div>`;
-      if(!st.tiraNinguna && st.tiraModo === 'custom') izq += `<input type="text" data-tira-formula placeholder="1d4+3, X+1dX o pdg + 5" value="${esc(st.tiraFormula)}"><input type="text" data-tira-etiqueta placeholder="¿Qué representa? (ej. Drenaje)" value="${esc(st.tiraEtiqueta)}">`;
-      if(st.grid === 'tira') izq += gridHtml();
-      let der = '<div class="adh-lbl">Se resiste con</div>';
-      if(st.tiraNinguna) der += '<p class="nota">Sin tirada no hay nada que resistir: se aplica directo.</p>';
-      else{
-        if(!esArea && !esZona) der += `<select data-contramodo><option value="stats"${st.contraModo === 'stats' ? ' selected' : ''}>Con…</option><option value="ninguna"${st.contraModo === 'ninguna' ? ' selected' : ''}>Nadie: se aplica directo</option><option value="otro"${st.contraModo === 'otro' ? ' selected' : ''}>Otra cosa (a mano)</option></select>`;
-        if(esArea || esZona || st.contraModo === 'stats'){
-          der += `<div class="adh-check-list">${CONTRA.map(([x, t]) => `<label class="op"><input type="checkbox" data-contra="${x}" ${st.contra.has(x) ? 'checked' : ''}> ${corto(t)}</label>`).join('')}</div>`;
-          const chips = [...[...st.contra].filter(x => !CONTRA.some(c => c[0] === x)).map(x => ({txt: statNombre(x), k: 's:' + x})),
-            ...st.contraExtra.map((x, i) => ({txt: x.formula ? `${x.etq || 'Fórmula'}: ${x.formula}` : `${statNombre(x.stat)} ${Number(x.bono) >= 0 ? '+' : '−'} ${Math.abs(Number(x.bono) || 0)}`, k: 'e:' + i}))];
-          if(chips.length) der += `<div class="fila">${chips.map(c => `<span class="adh-chip">${esc(c.txt)}<button type="button" class="adh-chip-x" data-contra-quitar="${esc(c.k)}" title="Sacar">✕</button></span>`).join('')}</div>`;
-          der += `<div class="fila"><button type="button" class="sec" data-grid="contra">＋ Otro stat…</button></div>`;
-          if(!esZona) der += `<div class="fila"><input type="text" style="width:130px" data-contra-formula placeholder="1d6+2 o des + 2" value="${esc(st.contraFormula)}"><input type="text" style="width:130px" data-contra-formula-etq placeholder="Nombre (opcional)" value="${esc(st.contraFormulaEtq)}"><button type="button" class="sec" data-contra-formula-mas>＋ Fórmula propia</button></div>`;
-          if(st.contra.has('parry')) der += `<p class="nota">Parry solo se ofrece si el objetivo tiene un arma o un escudo.</p>`;
-          if(!esZona) der += `<p class="nota">Si hay más de una, el objetivo elige una a ciegas, antes de ver tu tirada.</p>`;
-          if(st.grid === 'contra') der += gridHtml();
-        }else if(st.contraModo === 'otro'){
-          der += `<input type="text" data-contraotro placeholder="ej. Resistencia a X (a mano)" value="${esc(st.contraOtro)}"><p class="nota">Nadie lo tira solo: el cuadro lo muestra para resolverlo a mano.</p>`;
-        }
+      h += `<select data-tirasel>${opsT.map(([x, t]) => `<option value="${esc(x)}"${valT === x ? ' selected' : ''}>${esc(t)}</option>`).join('')}<option value="__otro">Otro stat…</option>${esZona ? '' : `<option value="__f"${valT === '__f' ? ' selected' : ''}>Fórmula propia…</option>`}</select>`;
+      if(!st.tiraNinguna && st.tiraModo !== 'custom' && !esZona) h += `<div class="fila"><span>+</span><input type="number" style="width:64px" data-tirabono value="${esc(st.tiraBono)}"><span class="nota" style="margin:0">un número de más (0 = nada)</span></div>`;
+      if(!st.tiraNinguna && st.tiraModo === 'custom') h += `<div class="fila"><input type="text" style="width:200px" data-tira-formula placeholder="1d4+3, X+1dX o pdg + 5" value="${esc(st.tiraFormula)}"><input type="text" style="width:200px" data-tira-etiqueta placeholder="¿Qué representa? (ej. Drenaje)" value="${esc(st.tiraEtiqueta)}"></div>`;
+      if(st.grid === 'tira') h += gridHtml();
+      return h;
+    }
+    // Con qué se resiste el objetivo (las cajas de «Elegí cómo te defendés»).
+    function cuerpoContra(){
+      const esZona = st.objetivo === 'zona', esArea = esAreaObj(st.objetivo);
+      let h = titulo('', 'Con qué se resiste', esZona ? 'Lo que tira quien entra en la zona. Si gana, no le pasa nada.' : 'Si hay más de una, el objetivo elige una a ciegas, antes de ver tu tirada. «Fórmula propia»: dados (1d6+2) o un stat más un número (des + 2).');
+      if(!esArea && !esZona) h += `<select data-contramodo><option value="stats"${st.contraModo === 'stats' ? ' selected' : ''}>Con…</option><option value="ninguna"${st.contraModo === 'ninguna' ? ' selected' : ''}>Nadie: se aplica directo</option><option value="otro"${st.contraModo === 'otro' ? ' selected' : ''}>Otra cosa (a mano)</option></select>`;
+      if(esArea || esZona || st.contraModo === 'stats'){
+        h += `<div class="adh-check-list">${CONTRA.map(([x, t]) => `<label class="op"><input type="checkbox" data-contra="${x}" ${st.contra.has(x) ? 'checked' : ''}> ${corto(t)}</label>`).join('')}</div>`;
+        const chips = [...[...st.contra].filter(x => !CONTRA.some(c => c[0] === x)).map(x => ({txt: statNombre(x), k: 's:' + x})),
+          ...st.contraExtra.map((x, i) => ({txt: x.formula ? `${x.etq || 'Fórmula'}: ${x.formula}` : `${statNombre(x.stat)} ${Number(x.bono) >= 0 ? '+' : '−'} ${Math.abs(Number(x.bono) || 0)}`, k: 'e:' + i}))];
+        if(chips.length) h += `<div class="fila">${chips.map(c => `<span class="adh-chip">${esc(c.txt)}<button type="button" class="adh-chip-x" data-contra-quitar="${esc(c.k)}" title="Sacar">✕</button></span>`).join('')}</div>`;
+        h += `<div class="fila"><button type="button" class="sec" data-grid="contra">＋ Otro stat…</button></div>`;
+        if(!esZona) h += `<div class="fila"><input type="text" style="width:140px" data-contra-formula placeholder="1d6+2 o des + 2" value="${esc(st.contraFormula)}"><input type="text" style="width:140px" data-contra-formula-etq placeholder="Nombre (opcional)" value="${esc(st.contraFormulaEtq)}"><button type="button" class="sec" data-contra-formula-mas>＋ Fórmula propia</button></div>`;
+        if(st.contra.has('parry')) h += `<p class="nota">Parry solo se ofrece si el objetivo tiene un arma o un escudo.</p>`;
+        if(st.grid === 'contra') h += gridHtml();
+      }else if(st.contraModo === 'otro'){
+        h += `<input type="text" style="width:100%" data-contraotro placeholder="ej. Resistencia a X (a mano)" value="${esc(st.contraOtro)}"><p class="nota">Nadie lo tira solo: el cuadro lo muestra para resolverlo a mano.</p>`;
       }
-      h += `<div class="adh-card"><div class="adh-card-h"><span class="adh-num">2</span> Contacto</div><div class="adh-vs"><div class="adh-lado">${izq}</div><div class="adh-vs-t">VS</div><div class="adh-lado">${der}</div></div></div>`;
       return h;
     }
 
@@ -432,10 +439,9 @@ const AsistenteDueloHab = (() => {
     const fuenteDano = () => !st.dano ? 'no' : st.danoDif && st.objetivo !== 'uno mismo' ? 'dif' : st.danoArma && st.objetivo !== 'zona' && st.objetivo !== 'uno mismo' ? 'arma' : 'formula';
     function cuerpoDano(){
       const esZona = st.objetivo === 'zona', uno = st.objetivo === 'uno mismo', fuente = fuenteDano();
-      let h = titulo('', '3 · Daño', 'De dónde sale el daño, qué se le suma y qué lo frena. El número se cambia acá mismo.');
+      let h = titulo('', 'El daño', 'De dónde sale, qué se le suma y qué lo frena.');
       const ops = [['no', 'No hace daño'], ['formula', 'Una fórmula'], ...(!esZona && !uno ? [['arma', 'El daño de un ataque (tu arma + Fuerza)']] : []), ...(!uno ? [['dif', 'La diferencia entre las tiradas']] : [])];
-      h += `<div class="adh-card"><div class="adh-card-h"><span class="adh-num">3</span> Daño</div>
-        <div><div class="adh-lbl">¿De dónde sale?</div>${ops.map(([x, t]) => `<label class="op"><input type="radio" name="fuentedano" value="${x}" ${fuente === x ? 'checked' : ''}> ${t}</label>`).join('')}</div>`;
+      h += `<div><div class="adh-lbl">¿De dónde sale?</div>${ops.map(([x, t]) => `<label class="op"><input type="radio" name="fuentedano" value="${x}" ${fuente === x ? 'checked' : ''}> ${t}</label>`).join('')}</div>`;
       if(fuente === 'formula') h += `<div class="fila"><span>Fórmula</span><input type="text" style="width:140px" data-dano-formula placeholder="ej. 2d6+3" value="${esc(st.danoFormula)}"><span class="nota" style="margin:0">(podés usar «X»)</span></div>${!st.danoFormula.trim() && cfg.tieneFormula === false ? '<p class="aviso">Falta la fórmula del daño: sin ella, el duelo no tira daño.</p>' : ''}`;
       if(fuente === 'arma') h += `<p class="nota">El daño de tu arma (la que elegís si cuesta como un ataque; si no, la principal), con su Fuerza, como el botón «Daño».</p>`;
       if(fuente === 'dif') h += `<p class="nota">${esZona ? 'Cada uno que no resiste recibe' : 'Si no la resiste, recibe'} tu tirada menos la suya (empate: nada).</p>`;
@@ -459,7 +465,118 @@ const AsistenteDueloHab = (() => {
       }
       h += `<label class="op"><input type="checkbox" data-efectolibre-on ${st.efectoLibreOn ? 'checked' : ''}> ✋ Algo del daño se resuelve a mano</label>`;
       if(st.efectoLibreOn) h += `<textarea data-efectolibre rows="3" placeholder="ej. Drenás la diferencia: sumátela a tu vida.">${esc(st.efectoLibre)}</textarea><p class="nota">El cuadro lo muestra junto al resultado (con la diferencia entre las tiradas), aclarando que es a mano.</p>`;
-      return h + '</div>';
+      return h;
+    }
+
+    /* ---------- El cuadro, como el del duelo (2026-10-15, dueño: «quiero que visualmente se vea igual el editor de un duelo como cuando uno lo
+       está ejecutando… uno puede editar qué hace ese botón específicamente en esa instancia») ----------
+       Los mismos recuadros, colores y botones que `comun/duelo.js` (usa sus estilos: Duelo.estilos). Cada botón o caja con ✎ abre, debajo,
+       lo que hace (`st.pop`: costo, tipo, decl, zona, tira, contra, dano, efectos, arma, alcance, flash). */
+    const efTxtDe = e => e.no2 !== undefined ? `⚡ Pierde ${e.no2}${e.no2Dif ? ' + la diferencia' : ''} en No2${e.no2Sentado ? ' (en 0, Sentado)' : ''}`
+      : e.cura !== undefined ? `💚 Cura ${e.cura} HP` : `◎ ${e.nombre || 'Estado'} (${e.permanente ? 'no vence' : (e.turnos ?? 2) + ' turnos'})${e.escudo ? ` · 🛡${e.escudo}` : ''}`;
+    const pctTxt = e => Number(e.caras) > 1 ? `${Math.round(100 * Math.max(1, Number(e.exitos) || 1) / Number(e.caras))} %` : '';
+    const tiraTxt = () => st.tiraModo === 'custom' ? `${st.tiraEtiqueta || 'Tirada'} · ${st.tiraFormula || '¿fórmula?'}` : `${statNombre(st.tira)}${st.tiraBono ? ` ${st.tiraBono > 0 ? '+' : '−'} ${Math.abs(st.tiraBono)}` : ''}`;
+    const contraLista = () => [...[...st.contra].map(x => statNombre(x)), ...(st.objetivo === 'zona' ? [] : st.contraExtra.map(x => x.formula ? `${x.etq || 'Fórmula'} · ${x.formula}` : `${statNombre(x.stat)} ${Number(x.bono) >= 0 ? '+' : '−'} ${Math.abs(Number(x.bono) || 0)}`))];
+    function dondeTxt(){
+      const vis = objetivoVisto();
+      if(['enemigo', 'aliado', 'cualquiera'].includes(vis)) return st.alcance === 'fijo' ? `a ${st.alcanceN} casilleros o menos` : corto((ESPACIAL.find(x => x[0] === st.alcance) || ['', ''])[1]).toLowerCase();
+      if(vis === 'area') return `${Combatiente.areaTxt(st.radio)}${st.centroModo === 'adyacente' ? ' · el centro pegado a vos' : st.centroModo === 'rango' ? ' · el centro dentro de tu Rango' : st.centroModo === 'fijo' ? ` · el centro a ${st.centroN} o menos` : ''}${st.permanencia === 'queda' ? ' · golpea y queda' : st.permanencia === 'solo' ? ' · solo queda' : ''}`;
+      if(vis === 'onda') return `${Combatiente.areaTxt(st.radio)} alrededor tuyo${st.permanencia === 'queda' ? ' · golpea y queda' : ''}`;
+      if(vis === 'cono') return 'el cono al frente tuyo';
+      if(vis === 'linea') return `${st.radio} casilleros desde vos`;
+      return 'sobre quien la usa';
+    }
+    function zonaTxt(){
+      const solo = st.objetivo === 'zona', v = (a, b) => solo ? a : b;
+      const cuando = ['al entrar', v(st.zonaEnMant, st.zq.enMant) ? 'en cada turno' : '', v(st.zonaCadaPaso, st.zq.cadaPaso) ? 'a cada paso' : ''].filter(Boolean).join(', ');
+      const estado = v(st.zonaEstadoNombre, st.zq.estadoNombre);
+      const dano = solo ? (st.dano ? 'el daño de abajo' : '') : st.zq.dano;
+      return `${v(st.zonaTurnos, st.zq.turnos)} turnos · afecta ${cuando}${dano ? ' · daño ' + dano : ''}${estado ? ' · deja ' + estado : ''}`;
+    }
+    function danoTxt(){
+      const f = fuenteDano();
+      const base = f === 'arma' ? 'tu arma + Fuerza' : f === 'dif' ? 'la diferencia entre las tiradas' : (st.danoFormula || cfg.formulaDano || '¿fórmula?');
+      return `${base}${st.danoMas && f !== 'dif' ? ' ' + (/^[+-]/.test(st.danoMas) ? st.danoMas : '+' + st.danoMas) : ''}`;
+    }
+    function frenoTxt(){
+      const fr = frenoDe();
+      const el = st.tipoDano !== 'fisico' ? ` · ${corto((TIPOS.find(t => t[0] === st.tipoDano) || ['', st.tipoDano])[1])}` : '';
+      return (fr === 'fisico' ? 'Se le resta la Defensa del defensor' : fr === 'especial' ? 'Ignora la Defensa; lo frena la Defensa especial' : fr === 'directo' ? 'Especial directo: solo lo frenan las resistencias elementales' : 'Verdadero: no lo frena nada') + el;
+    }
+    const sinContacto = () => st.tiraNinguna;
+    const paso = (n, tit, cuerpo) => `<div class="duelo-paso"><h4><span class="n">${n}</span>${tit}</h4>${cuerpo}</div>`;
+    // Lo que se abre debajo al tocar un botón (los controles de siempre, con los colores del duelo).
+    function popHtml(id){
+      if(st.pop !== id) return '';
+      ayudaPaso = '';
+      const C = {tipo: cuerpoActivo, costo: cuerpoCosto, decl: cuerpoDeclaracion, zona: cuerpoZona, tira: cuerpoTira, contra: cuerpoContra, dano: cuerpoDano, efectos: cuerpoEfectos,
+        arma: cuerpoArma, alcance: () => cuerpoAlcance(true), flash: cuerpoFlash};
+      const cuerpo = C[id]();
+      return `<div class="ejd-pop"><div class="ejd-pop-ayuda">${ayudaPaso}</div><div class="adh-paso">${cuerpo}</div><div class="ejd-pop-pie"><button type="button" data-ejd-listo>✔ Listo</button></div></div>`;
+    }
+    function efectosHtmlEd(titulo2){
+      const efs = st.efectos;
+      let c = efs.map(e => `<div class="duelo-ef ejd-ed" data-ejd-pop="efectos"><div class="duelo-ef-top"><b>${esc(efTxtDe(e))}</b>${pctTxt(e) ? `<span class="duelo-ef-prob">${pctTxt(e)}</span>` : ''}</div><button type="button" tabindex="-1">✔ Aplicar${e.nombre ? ' ' + esc(e.nombre) : ''}</button></div>`).join('');
+      if(st.efectosNotaOn && st.efectosNota.trim()) c += `<div class="duelo-ef ejd-ed" data-ejd-pop="efectos"><div class="duelo-nota">✋ <b>A mano:</b> ${esc(st.efectosNota.trim())}</div></div>`;
+      if(st.modo === 'arma' && st.critMatters) c += `<div class="duelo-ef ejd-ed" data-ejd-pop="efectos"><div class="duelo-ef-top"><b>⚡ Si es crítico, además: ${esc(st.efectosCritico.map(efTxtDe).join(', ') || st.efectosNotaCritico || '—')}</b></div></div>`;
+      if(!c) c = `<div class="duelo-tiro ejd-vacio"><div class="espera">Sin efectos</div></div>`;
+      c += `<button type="button" class="sec ejd-ed ejd-mas" data-ejd-pop="efectos">＋ Efecto (un estado, una cura, perder No2 o ✋ a mano)</button>`;
+      return paso(st.modo === 'arma' ? 6 : sinContacto() ? 3 : 4, titulo2, c + popHtml('efectos'));
+    }
+    function cuerpoCuadro(){
+      const nitrosTxt = st.costoNitrosModo === 'ataque' ? 'como un ataque' : st.costoNitrosModo === 'x' ? 'X' : `${st.costoNitrosNum}`;
+      const MODOS = {hab: 'Habilidad dirigida', arma: 'Ataque con tu arma, con arreglos', flash: '⚡ Reacción Flash'};
+      let h = `<div class="ejd-barra"><button type="button" class="ejd-chip ejd-ed" data-ejd-pop="costo">💰 SP ${esc(st.costoSp || '0')} · No2 ${esc(nitrosTxt)}${st.costoHp ? ` · HP ${st.costoHp}` : ''}${st.costoTurnoOn && st.costoTurnoSp ? ` · ${esc(st.costoTurnoSp)} SP en turno ajeno` : ''}</button>
+        <button type="button" class="ejd-chip ejd-ed" data-ejd-pop="tipo">Tipo: ${MODOS[st.modo] || st.modo}</button></div>${popHtml('costo')}${popHtml('tipo')}`;
+      if(st.modo === 'flash'){
+        h += paso(1, 'Reacción Flash', `<div class="duelo-tiros"><div class="duelo-tiro"><div class="que">antes de una tirada de otro cuadro</div><button type="button" class="ejd-ed" data-ejd-pop="flash">⚡ +${esc(st.flashBono)} a ${esc([...st.flashEn].map(v => corto((FLASH_EN.find(x => x[0] === v) || [v, v])[1])).join(', ') || '¿qué tirada?')}</button>${st.flashDodge ? '<div class="det">si gana la Evasión, dodge roll</div>' : ''}</div></div>${popHtml('flash')}`);
+        return h;
+      }
+      const arma = st.modo === 'arma';
+      const vis = objetivoVisto();
+      // 1 · Declaración
+      const atqSub = arma ? 'con su arma' : `${esc(cfg.nombre || '')}${!st.tiraNinguna ? ' · tira ' + esc(tiraTxt()) : ''}`;
+      const defRol = arma ? 'Defiende' : (sinContacto() || (!esAreaObj(st.objetivo) && st.objetivo !== 'zona' && st.contraModo !== 'stats')) ? 'Objetivo' : 'Se resiste';
+      const defNom = arma ? 'Un enemigo' : st.objetivo === 'zona' ? 'Un área que queda' : corto((OBJETIVOS.find(o => o[0] === vis) || ['', vis])[1]);
+      const defSub = arma ? (st.alcance === 'auto' ? 'al alcance de tu arma' : st.alcance === 'fijo' ? `a ${st.alcanceN} casilleros o menos` : corto((ESPACIAL.find(x => x[0] === st.alcance) || ['', ''])[1]).toLowerCase()) : dondeTxt();
+      h += paso(1, 'Declaración', `<div class="duelo-vs"><div class="duelo-lado atq ejd-ed" data-ejd-pop="tipo"><div class="rol">${arma ? 'Ataca' : 'Usa la habilidad'}</div><div class="nom">${esc(cfg.portador || 'Quien la tenga')}</div><div class="sub">${atqSub}</div></div>
+        <div class="vs">VS</div><div class="duelo-lado def ejd-ed" data-ejd-pop="${arma ? 'alcance' : 'decl'}"><div class="rol">${defRol}</div><div class="nom">${esc(defNom)}</div><div class="sub">${esc(defSub)}</div></div></div>${popHtml(arma ? 'alcance' : 'decl')}`);
+      if(!arma && (st.objetivo === 'zona' || ((vis === 'area' || vis === 'onda') && st.permanencia === 'queda'))){
+        h += paso('🌫', 'La zona que queda', `<div class="duelo-ef ejd-ed" data-ejd-pop="zona"><div class="duelo-ef-top"><b>${esc(zonaTxt())}</b></div></div>${popHtml('zona')}`);
+      }
+      if(arma){
+        const a = st.arma;
+        const masPdg = [a.pdg ? `${a.pdg > 0 ? '+' : ''}${a.pdg}` : '', a.pdgPorX ? `+${a.pdgPorX} por X` : ''].filter(Boolean).join(' ');
+        h += paso(2, 'Contacto: PdG contra la defensa que elija', `<div class="duelo-tiros"><div class="duelo-tiro"><div class="que">PdG · quien ataca</div><button type="button" class="ejd-ed" data-ejd-pop="arma">🎲 Pagar y tirar PdG · tu arma${masPdg ? ' ' + esc(masPdg) : ''}</button></div>
+          <div class="duelo-tiro"><div class="que">Defensa · quien defiende</div><div class="espera">Elegí cómo te defendés:</div><div class="duelo-opc"><button type="button" class="ejd-ed" data-ejd-pop="arma">🛡 Evasión</button><button type="button" class="ejd-ed${a.sinParry ? ' sec' : ''}" data-ejd-pop="arma">🛡 Parry${a.sinParry ? ' (no se puede)' : ''}</button></div></div></div>${popHtml('arma')}`);
+        h += paso(3, 'Bloqueo: Fuerza del golpe contra Bloqueo', `<div class="duelo-mini">Como cualquier ataque: si lo para con Parry, sigue el Bloqueo.</div>`);
+        const crit = [a.critBono ? `+${a.critBono} Crítico frecuente` : '', a.critpotBono ? `+${a.critpotBono} Crítico potente` : '', a.ignoraResistCrit ? `ignora ${a.ignoraResistCrit} de Resistencia a crítico` : ''].filter(Boolean).join(' · ');
+        h += paso(4, 'Crítico', `<div class="duelo-ef ejd-ed" data-ejd-pop="arma"><div class="duelo-ef-top"><b>${esc(crit || 'El de tu arma, sin cambios')}</b></div></div>`);
+        const masDano = [a.dadosPorX ? `+${a.dadosPorX} dado(s) por X` : '', a.dadoExtra ? `+${a.dadoExtra}` : '', a.fijo ? `${a.fijo > 0 ? '+' : ''}${a.fijo}` : '', a.fijoPorX ? `+${a.fijoPorX} por X` : '', a.perfora ? `perfora ${a.perfora}` : ''].filter(Boolean).join(' ');
+        h += paso(5, 'Daño', `<button type="button" class="ejd-dano ejd-ed" data-ejd-pop="arma">🎲 Tirar el daño · tu arma${masDano ? ' ' + esc(masDano) : ''}</button><div class="duelo-mini">Se le resta la Defensa del defensor.</div>`);
+        h += efectosHtmlEd('Efectos del golpe');
+        return h;
+      }
+      // 2 · Contacto
+      if(sinContacto()){
+        h += paso(2, 'Contacto', `<div class="duelo-tiros"><div class="duelo-tiro"><div class="que">quien la usa</div><button type="button" class="sec ejd-ed" data-ejd-pop="tira">Sin tirada: se aplica directo</button></div><div class="duelo-tiro"><div class="que">el objetivo</div><div class="espera">No tiene que resistir nada</div></div></div>${popHtml('tira')}`);
+      }else{
+        const lista = contraLista();
+        const abierta = esAreaObj(st.objetivo) || st.objetivo === 'zona' || st.contraModo === 'stats';
+        const der = abierta
+          ? `<div class="espera">Elegí cómo te defendés:</div><div class="duelo-opc">${lista.map(t => `<button type="button" class="ejd-ed" data-ejd-pop="contra">🛡 ${esc(t)}</button>`).join('') || '<div class="espera">¿con qué?</div>'}</div><button type="button" class="sec ejd-ed ejd-mas" data-ejd-pop="contra">＋ Otra forma de resistirse</button>`
+          : st.contraModo === 'otro' ? `<button type="button" class="sec ejd-ed" data-ejd-pop="contra">✋ A mano: ${esc(st.contraOtro || '¿con qué?')}</button>` : `<button type="button" class="sec ejd-ed" data-ejd-pop="contra">Nadie: se aplica directo</button>`;
+        const tit = `${tiraTxt()} contra ${abierta ? (lista.length === 1 ? lista[0] : 'la defensa que elija') : st.contraModo === 'otro' ? 'algo a mano' : 'nadie'}`;
+        h += paso(2, esc(tit), `<div class="duelo-tiros"><div class="duelo-tiro"><div class="que">${esc(st.tiraModo === 'custom' ? (st.tiraEtiqueta || 'Tirada') : statNombre(st.tira))} · quien la usa</div><button type="button" class="ejd-ed" data-ejd-pop="tira">🎲 Tirar ${esc(tiraTxt())}</button></div>
+          <div class="duelo-tiro"><div class="que">${st.objetivo === 'zona' ? 'quien entra en la zona' : 'Defensa · el objetivo'}</div>${der}</div></div>${popHtml('tira')}${popHtml('contra')}`);
+      }
+      // 3 · Daño
+      const nD = sinContacto() ? 2 : 3;
+      h += paso(nD === 2 ? '·' : 3, 'Daño', !st.dano ? `<button type="button" class="sec ejd-ed ejd-mas" data-ejd-pop="dano">Sin daño · tocá para agregarlo</button>${popHtml('dano')}`
+        : `<button type="button" class="ejd-dano ejd-ed" data-ejd-pop="dano">🎲 Tirar el daño · ${esc(danoTxt())}</button><div class="duelo-mini">${esc(frenoTxt())}${st.drena ? ' · 🩸 drena' : ''}</div>${st.efectoLibreOn && st.efectoLibre.trim() ? `<div class="duelo-ef ejd-ed" data-ejd-pop="dano"><div class="duelo-nota">✋ <b>A mano:</b> ${esc(st.efectoLibre.trim())}</div></div>` : ''}${popHtml('dano')}`);
+      // 4 · Efectos (una zona que solo queda deja lo suyo: está en «La zona que queda»)
+      if(st.objetivo !== 'zona') h += efectosHtmlEd('Efectos de la habilidad');
+      return h;
     }
     /* ¿Con qué probabilidad entra? (2026-10-05, armas especiales: «Parálisis 1 en d10»). Las mismas opciones que los efectos al golpear de un arma
        (EfectosGolpe.PROBABILIDADES); al usarse, el duelo tira el dado. Vacío = siempre. */
@@ -543,78 +660,17 @@ const AsistenteDueloHab = (() => {
       }
       return h;
     }
-    function cuerpoListo(){
-      if(!st.activo) return titulo('', 'Listo', 'Esta habilidad no usa este cuadro: se ejecuta como antes (se anuncia en la Mesa y tira su fórmula sola, sin objetivo ni cuadro).') + `<div class="adh-resumen">Ejecución simple, sin este cuadro.</div>`;
-      let h = titulo('', 'Revisá cómo quedó', 'Si algo no está bien, tocá el paso arriba para volver.');
-      const filas = [];
-      const nitrosTxt = st.costoNitrosModo === 'ataque' ? 'como un ataque' : st.costoNitrosModo === 'x' ? 'X (se elige al usarla)' : `${st.costoNitrosNum}`;
-      filas.push(`<b>Costo</b>: SP ${esc(st.costoSp) || '0'} · No2 ${nitrosTxt}${st.costoHp ? ` · HP ${st.costoHp}` : ''}${st.costoTurnoOn && st.costoTurnoSp ? ` · ${esc(st.costoTurnoSp)} SP en turno ajeno` : ''}`);
-      if(st.modo === 'flash'){
-        filas.push(`<b>Flash</b>: +${esc(st.flashBono)} a ${[...st.flashEn].map(v => (FLASH_EN.find(x => x[0] === v) || [v, v])[1].split(' (')[0]).join(', ') || 'ninguna tirada'}${st.flashDodge ? ' · si gana la Evasión, dodge roll' : ''}`);
-      }else if(st.modo === 'arma'){
-        const a = st.arma, partes = [];
-        if(a.pdg) partes.push(`${a.pdg > 0 ? '+' : ''}${a.pdg} PdG`);
-        if(a.pdgPorX) partes.push(`${a.pdgPorX > 0 ? '+' : ''}${a.pdgPorX} PdG por X`);
-        if(a.dadosPorX) partes.push(`+${a.dadosPorX} dado(s) de daño por X`);
-        if(a.dadoExtra) partes.push(`+${a.dadoExtra} de daño`);
-        if(a.fijo) partes.push(`${a.fijo > 0 ? '+' : ''}${a.fijo} de daño fijo`);
-        if(a.fijoPorX) partes.push(`${a.fijoPorX > 0 ? '+' : ''}${a.fijoPorX} de daño fijo por X`);
-        if(a.sinParry) partes.push('no se puede parrear');
-        if(st.terminaTurno) partes.push('al resolverse termina tu turno (al final del orden)');
-        if(a.ignoraResistCrit) partes.push(`ignora ${a.ignoraResistCrit} de Resistencia a crítico`);
-        if(a.critBono) partes.push(`+${a.critBono} Crítico frecuente (solo esta tirada)`);
-        if(a.perfora) partes.push(`perfora ${a.perfora}`);
-        if(a.critpotBono) partes.push(`+${a.critpotBono} Crítico potente (solo esta tirada)`);
-        const esp = [a.espaldaPdg ? `+${a.espaldaPdg} PdG` : '', a.espaldaFijo ? `+${a.espaldaFijo} de daño` : '', a.espaldaCritpot ? `+${a.espaldaCritpot} Crítico potente` : ''].filter(Boolean);
-        if(esp.length) partes.push(`por la espalda (en sigilo): ${esp.join(', ')}`);
-        filas.push(`<b>Ataque con arma</b>: ${partes.join(', ') || 'sin arreglos'} · X en ${st.x === 'sp' ? 'SP' : 'Nitros'}`);
-        if(st.alcance !== 'auto') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
-      }else{
-        filas.push(`<b>Objetivo</b>: ${st.objetivo === 'linea' ? `línea recta de ${st.radio} casilleros` : st.objetivo === 'zona' ? `un área que solo queda, ${st.zonaTurnos} turnos` : corto((OBJETIVOS.find(o => o[0] === st.objetivo) || ['', st.objetivo])[1])}${['area', 'onda', 'zona'].includes(st.objetivo) ? ` (${Combatiente.areaTxt(st.radio)})` : ''}${(st.objetivo === 'area' || st.objetivo === 'onda') && st.permanencia === 'queda' ? ` · golpea y deja una zona ${st.zq.turnos} turnos` : ''}`);
-        if(st.objetivo === 'zona'){
-          filas.push(`<b>Alcanza</b>: ${st.zonaAmiga ? 'rivales y aliados' : 'solo rivales'}`);
-          if(st.zonaEstadoNombre) filas.push(`<b>Deja</b>: ${esc(st.zonaEstadoNombre)}${['Veneno', 'Veneno severo'].includes(st.zonaEstadoNombre) && st.zonaEstadoStacks ? ` ×${st.zonaEstadoStacks}` : ''} (${st.zonaEstadoTurnos}t)`);
-        }
-        if(st.alcance !== 'auto' && st.objetivo !== 'uno mismo' && st.objetivo !== 'area' && st.objetivo !== 'onda' && st.objetivo !== 'cono' && st.objetivo !== 'linea' && st.objetivo !== 'zona') filas.push(`<b>Alcance</b>: ${(ALCANCES.find(x => x[0] === st.alcance) || [])[1] || st.alcance}${st.alcance === 'fijo' ? ` (${st.alcanceN})` : ''}`);
-        const esArea2 = st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono' || st.objetivo === 'linea';
-        const contraTxt = (esArea2 || st.contraModo === 'stats') ? ([...[...st.contra].map(v => statNombre(v)), ...st.contraExtra.map(x => x.formula ? `${x.etq}: ${x.formula}` : `${statNombre(x.stat)} ${x.bono >= 0 ? '+' : '−'} ${Math.abs(x.bono)}`)].join(' / ') || '(elegí con qué se resiste)')
-          : st.contraModo === 'otro' ? `${esc(st.contraOtro) || '(sin especificar)'} (a mano)`
-          : 'nadie: se aplica directo';
-        filas.push(sinOp() ? '<b>Sin tirada</b>: se aplica directo'
-          : st.tiraModo === 'custom' ? `<b>Tirada custom</b>: ${esc(st.tiraFormula) || '(sin fórmula)'}${st.tiraEtiqueta ? ' · ' + esc(st.tiraEtiqueta) : ''} contra ${contraTxt}`
-          : `<b>Tirada</b>: ${statNombre(st.tira)}${st.tiraBono ? ` ${st.tiraBono > 0 ? '+' : '−'} ${Math.abs(st.tiraBono)}` : ''} contra ${contraTxt}`);
-        if(st.dano) filas.push(`<b>Daño</b>: ${st.danoDif && st.objetivo !== 'uno mismo' ? 'la diferencia entre las tiradas, ' : st.danoArma && st.objetivo !== 'zona' && st.objetivo !== 'uno mismo' ? 'el de tu arma, ' : `${esc(st.danoFormula || cfg.formulaDano || '(sin fórmula)')}, `}${st.danoMas && !st.danoDif ? `${esc(st.danoMas)} más, ` : ''}${st.drena && st.objetivo !== 'zona' ? `drena (se cura lo que hace${st.drenaTope ? `, hasta +${st.drenaTope} % de su máximo` : ''}), ` : ''}tipo ${st.tipoDano}${st.ignoraDano ? ', ignora la Defensa' : ''}${st.tipoDano !== 'fisico' && st.ignoraDano ? (st.frenoEsp === 'true' ? ', True Damage (no lo frena nada)' : st.frenoEsp === 'directo' ? ', daño directo (no lo frena la Defensa especial)' : ', lo frena la Defensa especial') : ''}${cfg.costoVariable && st.danoFijoPorX ? `, +${st.danoFijoPorX} por X` : ''}${st.objetivo === 'zona' && st.danoExtra ? `; si entra, tira ${esc(st.danoExtra)}` : ''}`);
-        if(st.efectoLibreOn && st.efectoLibre.trim()){ const t = st.efectoLibre.trim(); filas.push(`<b>Efecto a mano</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
-      }
-      if(st.modo !== 'flash' && st.objetivo !== 'zona'){
-        const efTxtDe = lista => lista.filter(e => e.cura !== undefined ? curaValida(e.cura) : e.nombre).map(e => e.no2 !== undefined ? `⚡ pierde ${e.no2}${e.no2Dif ? ' + la diferencia' : ''} No2${e.no2Sentado ? ' (en 0, Sentado)' : ''}` : e.cura !== undefined ? `💚 ${e.cura} HP` : `◎ ${e.nombre} (${e.permanente ? 'no vence' : (e.turnos ?? 2) + 't'})${e.escudo ? ` · 🛡${e.escudo}` : ''}`).join(', ');
-        filas.push(`<b>Efectos</b>: ${efTxtDe(st.efectos) || 'ninguno'}`);
-        if(st.efectosNotaOn && st.efectosNota.trim()){ const t = st.efectosNota.trim(); filas.push(`<b>Efecto personalizado</b>: ${esc(t.length > 90 ? t.slice(0, 90) + '…' : t)}`); }
-        if(st.modo === 'arma' && st.critMatters){
-          const partesCrit = [];
-          const efTxtCrit = efTxtDe(st.efectosCritico);
-          if(efTxtCrit) partesCrit.push(efTxtCrit);
-          if(st.efectosNotaCriticoOn && st.efectosNotaCritico.trim()){ const t = st.efectosNotaCritico.trim(); partesCrit.push(esc(t.length > 90 ? t.slice(0, 90) + '…' : t)); }
-          filas.push(`<b>⚡ Si es crítico, además</b>: ${partesCrit.join(' · ') || '(nada cargado todavía)'}`);
-        }
-      }
-      h += `<div class="adh-resumen">${filas.join('<br>')}</div>`;
-      return h;
+    function dibujar(){
+      if(!fondo) return;
+      const caja = fondo.querySelector('.duelo-caja'), y = caja ? caja.scrollTop : 0;
+      f.innerHTML = cuerpoCuadro();
+      conectar();
+      if(caja) caja.scrollTop = y;
     }
-
-    // El contenido de un paso y su ayuda (titulo() la deja en ayudaPaso).
-    function contenidoPaso(id){
-      ayudaPaso = '';
-      const cuerpo = id === 'activo' ? cuerpoActivo() : id === 'costo' ? cuerpoCosto() : id === 'declaracion' ? cuerpoDeclaracion() : id === 'zona' ? cuerpoZona() : id === 'alcance' ? cuerpoAlcance(st.modo === 'arma')
-        : id === 'contacto' ? cuerpoContacto() : id === 'dano' ? cuerpoDano() : id === 'efectos' ? cuerpoEfectos()
-        : id === 'arma' ? cuerpoArma() : id === 'flash' ? cuerpoFlash() : cuerpoListo();
-      return {h: `<div class="adh-paso">${cuerpo}</div>`, ayuda: ayudaPaso};
-    }
-    function dibujar(){ if(api) api.redibujar(); }
     // Los controles del paso que se acaba de dibujar (la ventana común lo llama en cada dibujo).
     function conectar(){
       const q = (sel, fn) => { const el = f.querySelector(sel); if(el) el.onchange = fn; };
-      q('[data-activo]', e => { st.activo = e.target.checked; dibujar(); ir(0); });
+      q('[data-activo]', e => { st.activo = e.target.checked; dibujar(); });
       q('[data-costo-sp]', e => { st.costoSp = e.target.value; });
       q('[data-costo-nitros-modo]', e => { st.costoNitrosModo = e.target.value; dibujar(); });
       q('[data-costo-nitros-num]', e => { st.costoNitrosNum = Math.max(0, Math.round(Number(e.target.value) || 0)); });
@@ -923,27 +979,34 @@ const AsistenteDueloHab = (() => {
         ...(Number(e.caras) > 1 ? {caras: Number(e.caras), exitos: Math.max(1, Number(e.exitos) || 1)} : {}),   // con probabilidad (ej. Parálisis 1 en d10): se conserva
       };
     }
-    api = PasoAPaso.abrir({
-      titulo: `Ejecución ✨ · ${cfg.nombre || 'Habilidad'}`, crear: false, z: 99500,
-      pasos: () => pasos().map(x => {
-        let c = null;
-        const cont = () => c || (c = contenidoPaso(x.id));
-        return {id: x.id, nombre: x.corto, get ayuda(){ return cont().ayuda; }, html: () => cont().h, alMontar: (cuerpo, a) => { f = a.raiz; conectar(); }};
-      }),
-      alGuardar: () => okGuardar(),
-      extras: ini ? [{id: 'quitar', texto: 'Sacar esta configuración', alClic: () => { cerrar(); cfg.alGuardar(null); }}] : [],
+    // La ventana: el cuadro del duelo, para editar (2026-10-15). Cada botón o caja con ✎ abre debajo lo que hace (st.pop).
+    if(typeof Duelo !== 'undefined' && Duelo.estilos) Duelo.estilos();
+    fondo = document.createElement('div');
+    fondo.id = 'ejd-fondo';
+    fondo.innerHTML = `<div class="duelo-caja"><div class="duelo-cab"><span>✨ ${esc(cfg.nombre || 'Habilidad')} · editar la Ejecución</span><div class="bt"><button type="button" data-ejd-cancelar title="Cerrar sin guardar">✕</button></div></div>
+      <div class="duelo-cuerpo ejd-cuerpo"></div>
+      <div class="ejd-pie"><span class="ejd-ayuda">Tocá un botón o una caja (✎) para cambiar lo que hace en ese momento del duelo.</span>${ini ? '<button type="button" class="sec" data-ejd-quitar>Sacar esta configuración</button>' : ''}<button type="button" class="sec" data-ejd-cancelar>Cancelar</button><button type="button" data-ejd-guardar>Guardar</button></div></div>`;
+    document.body.appendChild(fondo);
+    f = fondo.querySelector('.ejd-cuerpo');
+    fondo.addEventListener('click', e => {
+      const t = e.target.closest('[data-ejd-pop]');
+      if(t && f.contains(t)){ st.pop = st.pop === t.dataset.ejdPop ? '' : t.dataset.ejdPop; st.grid = ''; dibujar(); return; }
+      if(e.target.closest('[data-ejd-listo]')){ st.pop = ''; st.grid = ''; dibujar(); return; }
+      if(e.target.closest('[data-ejd-guardar]')){ okGuardar(); return; }
+      if(e.target.closest('[data-ejd-quitar]')){ cerrar(); cfg.alGuardar(null); return; }
+      if(e.target.closest('[data-ejd-cancelar]')) cancelar();
     });
-    f = api.raiz;
-    // 📜 Lo que se escribió en «Qué es», a la izquierda mientras se arma la Ejecución (2026-10-15, dueño: «que uno, a medida que lo va editando,
-    // tenga el texto a mano»). `cfg.detalle` (lo pasan los editores de habilidades de personaje, creep e invocación y el de armas especiales).
+    document.addEventListener('keydown', alTecla, true);
+    dibujar();
+    // 📜 Lo que se escribió en «Qué es», a la izquierda (2026-10-15, dueño: «que uno, a medida que lo va editando, tenga el texto a mano»), como en el
+    // duelo. `cfg.detalle` (lo pasan los editores de habilidades de personaje, creep e invocación y el de armas especiales).
     if(String(cfg.detalle || '').trim()){
       const tx = document.createElement('div');
-      tx.style.cssText = 'position:fixed;left:14px;top:90px;width:min(270px,22vw);max-height:70vh;overflow:auto;background:rgba(21,26,38,.97);border:1px solid #39435c;border-left:3px solid #c98545;border-radius:10px;padding:10px 12px;color:#e9ecf4;font-size:13px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:5;font-family:system-ui,sans-serif';
-      tx.innerHTML = `<b style="display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#c98545;margin-bottom:6px">📜 ${esc(cfg.nombre || 'Habilidad')}</b>${(() => { const pt = typeof ItemCorto !== 'undefined' && ItemCorto.partes ? ItemCorto.partes(String(cfg.detalle).trim()) : {hace: String(cfg.detalle).trim(), tecnico: ''};
-        return (typeof Glosario !== 'undefined' && Glosario.marcar ? Glosario.marcar(pt.hace) : esc(pt.hace)) + (pt.tecnico ? `<details style="margin-top:8px;font-size:12px;color:#9aa3b8"><summary style="cursor:pointer;color:#c98545">Detalles técnicos</summary>${esc(pt.tecnico)}</details>` : ''); })()}`;
-      // En el fondo de la ventana (la caja se redibuja en cada paso y se lo llevaba), y la ventana corrida para que no lo tape (2026-10-15).
-      (f.parentElement || f).appendChild(tx);
-      f.style.marginLeft = 'calc(min(270px, 22vw) + 24px)';
+      tx.className = 'duelo-texto';
+      const pt = typeof ItemCorto !== 'undefined' && ItemCorto.partes ? ItemCorto.partes(String(cfg.detalle).trim()) : {hace: String(cfg.detalle).trim(), tecnico: ''};
+      tx.innerHTML = `<b class="t">📜 ${esc(cfg.nombre || 'Habilidad')}</b>${typeof Glosario !== 'undefined' && Glosario.marcar ? Glosario.marcar(pt.hace) : esc(pt.hace)}${pt.tecnico ? `<details class="tec"><summary>Detalles técnicos</summary>${esc(pt.tecnico)}</details>` : ''}`;
+      fondo.appendChild(tx);
+      fondo.classList.add('con-texto');
     }
   }
   return {abrir};

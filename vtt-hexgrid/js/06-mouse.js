@@ -703,6 +703,15 @@ document.addEventListener('keydown', e => {
     if(e.key === 'Escape' || ((e.key === 'b' || e.key === 'B') && !e.ctrlKey && !e.altKey && !e.metaKey)) escapeABotonera();
     return;
   }
+  // B cierra la Botonera o las Acciones abiertas, sea cual sea el token seleccionado (2026-10-15, dueño: «la B debe abrir y cerrar la
+  // Botonera»; con Escape a veces se cancelaba otra cosa). No mientras se escribe en un campo de la Botonera.
+  if((e.key === 'b' || e.key === 'B') && !e.ctrlKey && !e.altKey && !e.metaKey && !escribiendoEnCampo(e)
+    && ((typeof bn !== 'undefined' && bn && !bn.host.hidden) || (typeof ac !== 'undefined' && ac && !ac.host.hidden))){
+    e.preventDefault();
+    if(bn && !bn.host.hidden) cerrarBotoneraNueva();
+    if(ac && !ac.host.hidden) cerrarAccionesNuevas();
+    return;
+  }
   if(elegirDestinoCb && e.key === 'Escape'){ elegirDestinoCancelar(); return; }
   if(colocando && e.key === 'Escape'){ cancelarColocacion(); return; }
   if(colocando && e.key === 'Escape'){ cancelarColocacion(); return; }

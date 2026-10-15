@@ -651,6 +651,7 @@ function cerrarSiSoloEstado(){ if(ac && ac.soloEstado){ ac.soloEstado = false; s
 function acCreepDe(id){ const crudo = creepPrivadoDe(id); if(!crudo) return null; const sc = CreepCalculo.normalizar(structuredClone(crudo)); sc.id = id; return sc; }
 async function acEditarHab(creepId, habId){
   if(typeof CreepEditor === 'undefined') toast('Cargando el editor…');   // la primera vez tarda unos segundos (dueño, 2026-10-15)
+  // (Que «Editar» la primera vez «no abría»: el editor quedaba arriba, fuera de la vista, si las Acciones estaban scrolleadas; ver ventanasAlFrente, js/11.)
   try{ await acCargarEditor(); await PresetsGM.listo(); }
   catch(err){ console.error(err); toast('No se pudo abrir el editor'); return; }
   if(!ac.editor){

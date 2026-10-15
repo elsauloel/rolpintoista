@@ -217,7 +217,10 @@ $('#btn-mantenimiento').onclick = async () => {
    lo ven. Se muestra solo en modo combate, flotante sobre el mapa y
    plegable, como el "Turn Order" de Roll20. */
 
-let iniciativa = {orden: [], turno: 0, ronda: 1, paso: 0, termino: null, actuaron: []};
+let iniciativa = {orden: [], turno: 0, ronda: 1, paso: 0, termino: null, actuaron: [], libre: null};
+/* Turno libre (`libre: {id, vuelve}`, dueño 2026-10-15): el GM le dio el turno a alguien «de manera libre, sin contabilizar el paso del turno»
+   (clic derecho en su nombre → Turno libre). Mientras dura, el turno es suyo (esSuTurno), pero no recargó ni bajó nada; con ▶ Siguiente el
+   turno vuelve a `vuelve` (quien lo tenía), también sin recargar ni bajar nada. Ver iniciativaDarTurno. */
 /* Quién ya jugó en esta ronda (`actuaron`, 2026-10-10, regla del dueño con Degollar): un token al que algo lo mueve más abajo en el orden
    después de haber jugado (Degollar lo manda al final, o el GM lo baja con ▼) no vuelve a jugar en la misma ronda: ▶ Siguiente lo saltea.
    Se vacía al empezar una ronda nueva. */
@@ -253,6 +256,7 @@ function escucharIniciativa(){
       paso: Math.max(0, Math.round(num(d.paso))),
       termino: d.termino && d.termino.id ? {id: String(d.termino.id), paso: Math.round(num(d.termino.paso))} : null,
       actuaron: Array.isArray(d.actuaron) ? d.actuaron.map(String) : [],
+      libre: d.libre && d.libre.id ? {id: String(d.libre.id), vuelve: String(d.libre.vuelve || '')} : null,
     };
     const cambioTurno = iniciativa.turno !== antesTurno || iniciativa.ronda !== antesRonda;
     if(cambioTurno) giroLibre.clear();   // avanzó el turno: acción de otro
@@ -278,9 +282,11 @@ async function guardarIniciativa(cambios){
     ronda: iniciativa.ronda,
     paso: iniciativa.paso,
     ...(iniciativa.termino ? {termino: iniciativa.termino} : {}),
+    ...(iniciativa.libre ? {libre: iniciativa.libre} : {}),
     ...cambios,
     actualizado: firebase.firestore.FieldValue.serverTimestamp(),
   };
+  if(!datos.libre) delete datos.libre;   // `libre: null` en los cambios = se terminó el turno libre
   try{
     await fbDb.doc(fbRutaCampana(rutaMapaEstado('iniciativa'))).set(datos);
     return true;
@@ -395,17 +401,25 @@ function iniciativaFueraDeJuego(id){
    toca nada). Los caídos que se saltean igual pasan su turno (su cuenta de muerte y su sangrado siguen). Lo aplica la pantalla que tocó
    ▶ Siguiente, para que no dependa de que el jugador esté conectado. Todo se cuenta en la Crónica y en la Mesa. */
 // `o` (Degollar, 2026-10-10): {orden (el orden nuevo, con quien termina ya al final), termina (su id), desde (el lugar donde estaba: sigue el que
-// quedó ahí)}. Sin `o`, el ▶ Siguiente de siempre.
+// quedó ahí)}. `o.a` (dueño, 2026-10-15): el GM le da un turno normal a ese (clic derecho en su nombre): termina el turno del que jugaba y
+// empieza el suyo, como con ▶ Siguiente, pero salta directo a él (sin cambiar de ronda); el orden sigue desde ahí. Sin `o`, el ▶ Siguiente de siempre.
 async function iniciativaSiguiente(o){
-  o = o && o.orden ? o : {};
+  o = o && (o.orden || o.a) ? o : {};
+  if(!o.a && !o.orden && iniciativa.libre) return iniciativaVolverDeLibre();   // terminó el turno libre: vuelve a quien lo tenía
   const orden = o.orden || iniciativa.orden, n = orden.length;
   if(!n) return;
-  const termina = o.termina ? orden.find(x => x.id === o.termina) : iniciativa.orden[iniciativa.turno], pasoFin = iniciativa.paso, mapaFin = mapaMostrado;
+  // En un turno libre, el turno «de verdad» es el de quien lo tenía antes: ese es el que termina.
+  const real = iniciativa.libre ? orden.find(x => x.id === iniciativa.libre.vuelve) : null;
+  const termina = o.termina ? orden.find(x => x.id === o.termina) : real || iniciativa.orden[iniciativa.turno], pasoFin = iniciativa.paso, mapaFin = mapaMostrado;
   let i = o.orden ? num(o.desde) - 1 : iniciativa.turno, ronda = iniciativa.ronda;
   const salteados = [];
   const ya = new Set(iniciativa.actuaron || []);   // los que ya jugaron esta ronda: no repiten aunque hayan quedado más abajo
   if(termina) ya.add(termina.id);
-  for(let paso = 0; paso < 2 * n; paso++){
+  if(o.a){
+    i = orden.findIndex(x => x.id === o.a);
+    if(i < 0) return;
+    ya.delete(o.a);
+  }else for(let paso = 0; paso < 2 * n; paso++){
     i++;
     if(i >= n){ i = 0; ronda++; ya.clear(); }
     if(ya.has(orden[i].id)) continue;   // ya jugó esta ronda (lo movieron más abajo): no le vuelve a tocar
@@ -414,7 +428,7 @@ async function iniciativaSiguiente(o){
   }
   const fin = termina ? {termino: {id: termina.id, paso: pasoFin}} : {};
   const nuevaRonda = ronda !== iniciativa.ronda;
-  const ok = await guardarIniciativa({...(o.orden ? {orden: ordenSerial(orden)} : {}), turno: i, paso: pasoFin + 1, actuaron: [...ya], ...fin, ...(nuevaRonda ? {ronda} : {})});
+  const ok = await guardarIniciativa({...(o.orden ? {orden: ordenSerial(orden)} : {}), turno: i, paso: pasoFin + 1, actuaron: [...ya], ...fin, ...(nuevaRonda ? {ronda} : {}), libre: null});
   if(!ok) return;
   // La Crónica, para todos (dueño, 2026-10-06): «Empieza el turno de Fulano» sale enseguida (antes esperaba a que se procesara todo, ~5 s) y
   // después se le suman lo que pasó al terminar el anterior y al empezar el suyo.
@@ -424,7 +438,7 @@ async function iniciativaSiguiente(o){
   const publico = (o, t) => !!t && !t.oculto && !(o && o.oculto) && (t.tipo === 'creep' ? creepConocido(t) : !enSigilo(t));
   const nomSig = publico(sig, tSig) ? nombreDe(tSig) : '';
   const tarjeta = momentoAbrir({tipo: 'turno', icono: '▶', titulo: `${nuevaRonda ? `Ronda ${ronda} · ` : ''}${nomSig ? `Empieza el turno de ${nomSig}` : 'Pasa el turno'}`,
-    estado: 'listo', datos: {lineas: [nomSig ? `Le toca a ${nomSig}.` : 'Sigue el orden de turnos.']}});
+    estado: 'listo', datos: {lineas: [nomSig ? `Le toca a ${nomSig}${o.a ? ' (se lo dio el GM)' : ''}.` : 'Sigue el orden de turnos.']}});
   const lineas = [];
   if(termina) lineas.push(...await finDeTurno(termina.id, `${mapaFin}:${pasoFin}`));
   // Los caídos que se saltean: su turno pasa igual, sin jugar.
@@ -437,6 +451,42 @@ async function iniciativaSiguiente(o){
   const lineasInicio = sig.id ? await inicioDeTurno(sig.id, `${mapaFin}:${pasoFin + 1}`) : [];
   const todas = [...lineas, ...lineasZonas, ...lineasInicio];
   if(todas.length) momentoActualizar(await tarjeta, {'datos.lineas': todas.slice(0, 14)});
+}
+/* ▶ Es su turno (dueño, 2026-10-15: «poder desde el máster cambiar el turno de a quién le toca… botón derecho sobre el nombre en la tabla de
+   iniciativa… que te pregunte si se descuentan los cooldowns, si es como un turno normal de la ronda o es su turno de manera libre sin
+   contabilizar el paso del turno»). Clic derecho en una fila (solo el GM):
+   - Turno normal: como ▶ Siguiente, pero directo a ese (termina el turno del que jugaba, empieza el suyo: recarga, bajan sus cooldowns…).
+   - Turno libre: le toca ahora sin recargar ni bajar nada; con ▶ Siguiente vuelve el turno a quien lo tenía, también sin tocar nada. */
+async function iniciativaDarTurno(id){
+  if(!soyGM) return;
+  const j = iniciativa.orden.findIndex(o => o.id === id);
+  if(j < 0) return;
+  const t = tokens.get(id), nombre = t ? nombreDe(t) : 'ese token';
+  if(j === iniciativa.turno && !iniciativa.libre){ toast(`Ya es el turno de ${nombre}`); return; }
+  const actual = iniciativa.orden[iniciativa.turno], tAct = actual && tokens.get(actual.id);
+  const vuelve = iniciativa.libre ? iniciativa.libre.vuelve : actual && actual.id;
+  const tVuelve = tokens.get(vuelve), nomVuelve = tVuelve ? nombreDe(tVuelve) : 'quien lo tenía';
+  const modo = await Confirmar.elegir(`¿Cómo le das el turno a ${nombre}?`, {titulo: `Es el turno de ${nombre}`, icono: '▶', no: 'Cancelar', opciones: [
+    {valor: 'normal', texto: '▶ Turno normal', detalle: `Cuenta como su turno de la ronda: ${tAct ? `termina el de ${nombreDe(tAct)}` : 'termina el turno en curso'}, ${nombre} recarga y bajan sus cooldowns y estados. El orden sigue desde ${nombre}.`},
+    {valor: 'libre', texto: '⚡ Turno libre', detalle: `Juega ahora sin que pase el turno: no recarga ni baja cooldowns ni estados. Con ▶ Siguiente, el turno vuelve a ${nomVuelve}.`},
+  ]});
+  if(modo === 'normal') return iniciativaSiguiente({a: id});
+  if(modo !== 'libre') return;
+  if(!await guardarIniciativa({turno: j, libre: {id, vuelve: vuelve || ''}})) return;
+  const publico = tk => !!tk && !tk.oculto && (tk.tipo === 'creep' ? creepConocido(tk) : !enSigilo(tk));
+  const o = iniciativa.orden[j];
+  momentoAbrir({tipo: 'turno', icono: '⚡', titulo: publico(t) && !(o && o.oculto) ? `Turno libre de ${nombre}` : 'Turno libre', estado: 'listo',
+    datos: {lineas: [`El GM le da un turno libre${publico(t) ? ` a ${nombre}` : ''}: no pasa el turno (no recarga ni baja nada).${publico(tVuelve) ? ` Después vuelve el turno de ${nomVuelve}.` : ''}`]}});
+}
+// ▶ Siguiente durante un turno libre: el turno vuelve a quien lo tenía, sin recargar ni bajar nada (el suyo sigue en curso).
+async function iniciativaVolverDeLibre(){
+  const k = iniciativa.orden.findIndex(o => o.id === iniciativa.libre.vuelve);
+  if(k < 0){ await guardarIniciativa({libre: null}); return iniciativaSiguiente(); }   // ya no está en el orden: sigue el orden normal
+  if(!await guardarIniciativa({turno: k, libre: null})) return;
+  const t = tokens.get(iniciativa.orden[k].id);
+  const publico = !!t && !t.oculto && !iniciativa.orden[k].oculto && (t.tipo === 'creep' ? creepConocido(t) : !enSigilo(t));
+  momentoAbrir({tipo: 'turno', icono: '↩', titulo: publico ? `Vuelve el turno de ${nombreDe(t)}` : 'Termina el turno libre', estado: 'listo',
+    datos: {lineas: [publico ? `Terminó el turno libre: sigue el turno de ${nombreDe(t)}.` : 'Terminó el turno libre: sigue el orden de turnos.']}});
 }
 /* Termina el turno y pasa al final del orden (Degollar, dueño 2026-10-10): lo llama el duelo en el mapa del GM cuando se resuelve un ataque
    con `terminaTurno`. Si era su turno, el turno pasa al que quedó en su lugar y él ya cuenta como que jugó la ronda (no le vuelve a tocar al
@@ -649,9 +699,10 @@ function renderIniciativa(){
       // siendo solo del GM.
       const puede = puedeEditarIniciativa(t);
       const fuera = iniciativaFueraDeJuego(o.id);
-      return `<div class="ini-fila${i === iniciativa.turno ? ' activo' : ''}${fuera ? ' fuera' : ''}${ya ? ' ya' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}${fuera ? ' — caído/derrotado: fuera del orden de turnos hasta que se recupere' : ''}">
+      const libre = iniciativa.libre && iniciativa.libre.id === o.id && i === iniciativa.turno;
+      return `<div class="ini-fila${i === iniciativa.turno ? ' activo' : ''}${fuera ? ' fuera' : ''}${ya ? ' ya' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}${libre ? ' — turno libre (no pasa el turno)' : ''}${fuera ? ' — caído/derrotado: fuera del orden de turnos hasta que se recupere' : ''}${soyGM ? ' · clic derecho: es su turno' : ''}">
         <span class="ini-ficha" style="border-color:${esc(color)}">${mini ? `<img src="${esc(mini)}" alt="">` : esc(inicial(nombre))}</span>
-        <span class="ini-nombre">${fuera ? '💀 ' : ''}${oculto ? '🙈 ' : ''}${t && enSigilo(t) && (soyGM || t.tipo !== 'creep') ? '🥷 ' : ''}${esc(nombre)}</span>` +
+        <span class="ini-nombre">${iniciativa.libre && iniciativa.libre.id === o.id && i === iniciativa.turno ? '⚡ ' : ''}${fuera ? '💀 ' : ''}${oculto ? '🙈 ' : ''}${t && enSigilo(t) && (soyGM || t.tipo !== 'creep') ? '🥷 ' : ''}${esc(nombre)}</span>` +
         (puede
           ? `<input class="ini-valor" type="number" step="1" value="${fmt(num(o.valor))}" data-ini-valor="${esc(o.id)}" title="Iniciativa">`
           : `<span class="ini-valor">${fmt(num(o.valor))}</span>`) +
@@ -672,7 +723,8 @@ function renderIniciativa(){
     ? '<button type="button" class="btn" id="ini-traer" title="Poner en la lista todos los tokens del mapa">Traer tokens</button>' +
       '<button type="button" class="btn" id="ini-tirar" title="Tirar la iniciativa de todos los creeps de la lista y cargarla junto a cada nombre">🎲 Tirar iniciativa</button>' +
       '<button type="button" class="btn" id="ini-ordenar" title="Ordenar de mayor a menor">Ordenar</button>' +
-      '<button type="button" class="btn primary" id="ini-siguiente" title="Pasar al siguiente en el orden">▶ Siguiente</button>' +
+      (iniciativa.libre ? `<button type="button" class="btn primary" id="ini-siguiente" title="Termina el turno libre: el turno vuelve a quien lo tenía, sin recargar ni bajar nada">↩ Volver${tokens.get(iniciativa.libre.vuelve) ? ` a ${esc(nombreDe(tokens.get(iniciativa.libre.vuelve)))}` : ''}</button>`
+        : '<button type="button" class="btn primary" id="ini-siguiente" title="Pasar al siguiente en el orden">▶ Siguiente</button>') +
       '<button type="button" class="btn peligro" id="ini-limpiar" title="Vaciar el orden de turnos">Limpiar</button>'
     : (fbMiembro ? '<button type="button" class="btn primary" id="ini-tirar" title="Tirar la iniciativa de tu personaje y cargarla junto a su nombre">🎲 Tirar iniciativa</button>' : '');
   conectarIniciativa();
@@ -692,6 +744,11 @@ function conectarIniciativa(){
     if(t) centrarEn(hexCentro(t.col, t.fila).x, hexCentro(t.col, t.fila).y);
     iniResaltado = {id, hasta: Date.now() + 3000};
     pedirDibujo();
+  });
+  if(soyGM) caja.querySelectorAll('[data-ini-fila]').forEach(f => f.oncontextmenu = e => {
+    if(e.target.closest('input')) return;
+    e.preventDefault();
+    iniciativaDarTurno(f.dataset.iniFila);
   });
   caja.querySelectorAll('[data-ini-subir]').forEach(b => b.onclick = () => iniciativaMover(b.dataset.iniSubir, -1));
   caja.querySelectorAll('[data-ini-bajar]').forEach(b => b.onclick = () => iniciativaMover(b.dataset.iniBajar, 1));
@@ -721,11 +778,11 @@ function conectarIniciativa(){
   const traer = $('#ini-traer');
   if(traer) traer.onclick = iniciativaPonerTodos;
   const ordenar = $('#ini-ordenar');
-  if(ordenar) ordenar.onclick = () => guardarIniciativa({orden: ordenarIniciativa(iniciativa.orden), turno: 0});
+  if(ordenar) ordenar.onclick = () => guardarIniciativa({orden: ordenarIniciativa(iniciativa.orden), turno: 0, libre: null});
   const siguiente = $('#ini-siguiente');
   if(siguiente) siguiente.onclick = () => iniciativaSiguiente();
   const limpiar = $('#ini-limpiar');
-  if(limpiar) limpiar.onclick = async () => { if(await Confirmar.preguntar('¿Vaciar el orden de turnos?', {titulo: 'Vaciar turnos', si: 'Vaciar', peligro: true})) guardarIniciativa({orden: [], turno: 0, ronda: 1, actuaron: []}); };
+  if(limpiar) limpiar.onclick = async () => { if(await Confirmar.preguntar('¿Vaciar el orden de turnos?', {titulo: 'Vaciar turnos', si: 'Vaciar', peligro: true})) guardarIniciativa({orden: [], turno: 0, ronda: 1, actuaron: [], libre: null}); };
 }
 
 /* El orden de turnos flota sobre el mapa y se arrastra desde la cabecera (mismo

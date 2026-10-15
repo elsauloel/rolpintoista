@@ -2927,6 +2927,17 @@ prueba('Ejecución ✨ como el duelo (2026-10-15): otro stat + N, resistirse con
   igual([JSON.stringify(canon(r.duelo)) === JSON.stringify(canon(ini)), h.objetivo, h.tira, h.contra.map(c => c.formula || `${c.stat}${c.bono ? '+' + c.bono : ''}`), h.dano.formula, h.dano.directo, lh.objetivo, lh.contra.length, area.centroAlcance, Duelo.limpiarHab(area).zonaQueda],
     [true, 'cualquiera', {stat: 'des', etq: 'des', bono: 2}, ['con', 'agl+1', '1d6+2'], '1d8+1+1d4', true, 'cualquiera', 3, 5, {turnos: 2, nombre: '', dano: '1d4', enMantenimiento: false, cadaPaso: true, soloRivales: true}]);
 });
+prueba('Ejecución ✨: una zona que «al aparecer» afecta a los que ya están adentro (Pedos Tóxicos, 2026-10-15) y su d20 a la vista', async () => {
+  let r = null;
+  const ini = {objetivo: 'zona', radio: 2, zonaTurnos: 2, zonaAmiga: true, tira: 'dmgesp', contra: ['resmg'], dano: true, danoDiferencia: true, tipoDano: 'toxico', ignoraDano: true, danoExtra: '1d20', efectos: []};
+  AsistenteDueloHab.abrir({nombre: 'Pedos', inicial: ini, siempreActivo: true, costoInicial: {sp: '5', nitrosCosto: 2}, alGuardar: x => { r = x; }});
+  const d20 = /si entra: 1d20/.test(ejd('.ejd-cuerpo').textContent);
+  ejdPop('zona');
+  const c = ejd('[data-z-inmediata]'); c.checked = true; c.dispatchEvent(new Event('change', {bubbles: true}));
+  ejdGuardar(); await new Promise(res => setTimeout(res, 0));
+  const msg = Combatiente.zonaDeHab({nombre: 'Pedos'}, r.duelo, {fichaId: 'x', tipo: 'pj'});
+  igual([d20, r.duelo.zonaInmediata, msg.zonaInmediata, msg.zonaAmiga, msg.zonaTiraExtra], [true, true, true, true, '1d20']);
+});
 prueba('duelo minimizado (P151): un texto por paso, sin la vida que le queda; el fin al resolverse', () => {
   const base = {atacante: {nombre: 'juan'}, defensor: {nombre: 'Coloso'}, ataque: {tipo: 'normal', tipoDado: 4}};
   const enCurso = Duelo.pasosDe({...base, estado: 'esperando', fase: 'dano', pdg: {total: 6}, eva: {total: 4}, contacto: {gana: 'atacante'}});

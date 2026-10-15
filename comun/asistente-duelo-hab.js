@@ -252,6 +252,7 @@ const AsistenteDueloHab = (() => {
         dano: z.dano || '', tipoDano: z.tipoDano || '', estadoNombre: (z.estado && z.estado.nombre) || '', estadoTurnos: (z.estado && z.estado.turnos) || 2, altura: z.altura || 'aire',
         contra: z.contra || '', tira: z.tira || '', nombre: z.nombre || '', color: z.color || ''}; })(),
       zonaEnMant: !(ini && ini.zonaEnMantenimiento === false), zonaCadaPaso: !!(ini && ini.zonaCadaPaso),
+      zonaInmediata: !!(ini && ini.zonaInmediata),   // al aparecer, a los que ya están adentro (dueño, 2026-10-15, Pedos Tóxicos)
       centroModo: ini && ini.centroAlcance === 'rango' ? 'rango' : ini && Number(ini.centroAlcance) === 1 ? 'adyacente' : ini && Number(ini.centroAlcance) > 1 ? 'fijo' : '',
       centroN: ini && Number(ini.centroAlcance) > 1 ? Number(ini.centroAlcance) : 3,
       danoFormula: (ini && ini.danoFormula) || cfg.formulaDano || '', danoMas: (ini && ini.danoMas) || '',
@@ -391,6 +392,7 @@ const AsistenteDueloHab = (() => {
       const estado = v(st.zonaEstadoNombre, st.zq.estadoNombre);
       h += `<div class="fila"><input type="number" min="1" style="width:70px" data-z-turnos value="${esc(v(st.zonaTurnos, st.zq.turnos))}"><span>turnos que dura</span></div>
         <div><div class="adh-lbl">¿Cuándo afecta?</div>
+          ${solo ? `<label class="op"><input type="checkbox" data-z-inmediata ${st.zonaInmediata ? 'checked' : ''}> Al aparecer, a los que ya están adentro</label>` : ''}
           <label class="op"><input type="checkbox" checked disabled> Al entrar (siempre)</label>
           <label class="op"><input type="checkbox" data-z-mant ${v(st.zonaEnMant, st.zq.enMant) ? 'checked' : ''}> En cada turno, a quien sigue adentro</label>
           <label class="op"><input type="checkbox" data-z-paso ${v(st.zonaCadaPaso, st.zq.cadaPaso) ? 'checked' : ''}> A cada paso que da adentro (un piso de púas)</label></div>
@@ -493,7 +495,7 @@ const AsistenteDueloHab = (() => {
     }
     function zonaTxt(){
       const solo = st.objetivo === 'zona', v = (a, b) => solo ? a : b;
-      const cuando = ['al entrar', v(st.zonaEnMant, st.zq.enMant) ? 'en cada turno' : '', v(st.zonaCadaPaso, st.zq.cadaPaso) ? 'a cada paso' : ''].filter(Boolean).join(', ');
+      const cuando = [solo && st.zonaInmediata ? 'al aparecer' : '', 'al entrar', v(st.zonaEnMant, st.zq.enMant) ? 'en cada turno' : '', v(st.zonaCadaPaso, st.zq.cadaPaso) ? 'a cada paso' : ''].filter(Boolean).join(', ');
       const estado = v(st.zonaEstadoNombre, st.zq.estadoNombre);
       const dano = solo ? (st.dano ? 'el daño de abajo' : '') : st.zq.dano;
       return `${v(st.zonaTurnos, st.zq.turnos)} turnos · afecta ${cuando}${dano ? ' · daño ' + dano : ''}${estado ? ' · deja ' + estado : ''}`;
@@ -578,7 +580,7 @@ const AsistenteDueloHab = (() => {
       // 3 · Daño
       const nD = sinContacto() ? 2 : 3;
       h += paso(nD === 2 ? '·' : 3, 'Daño', !st.dano ? `<button type="button" class="sec ejd-ed ejd-mas" data-ejd-pop="dano">Sin daño · tocá para agregarlo</button>${popHtml('dano')}`
-        : `<button type="button" class="ejd-dano ejd-ed" data-ejd-pop="dano">🎲 Tirar el daño · ${esc(danoTxt())}</button><div class="duelo-mini">${esc(frenoTxt())}${st.drena ? ' · 🩸 drena' : ''}</div>${st.efectoLibreOn && st.efectoLibre.trim() ? `<div class="duelo-ef ejd-ed" data-ejd-pop="dano"><div class="duelo-nota">✋ <b>A mano:</b> ${esc(st.efectoLibre.trim())}</div></div>` : ''}${popHtml('dano')}`);
+        : `<button type="button" class="ejd-dano ejd-ed" data-ejd-pop="dano">🎲 Tirar el daño · ${esc(danoTxt())}</button><div class="duelo-mini">${esc(frenoTxt())}${st.drena ? ' · 🩸 drena' : ''}</div>${st.objetivo === 'zona' && st.danoExtra ? `<div class="duelo-mini ejd-ed" data-ejd-pop="dano">🎲 si entra: ${esc(st.danoExtra)}</div>` : ''}${st.efectoLibreOn && st.efectoLibre.trim() ? `<div class="duelo-ef ejd-ed" data-ejd-pop="dano"><div class="duelo-nota">✋ <b>A mano:</b> ${esc(st.efectoLibre.trim())}</div></div>` : ''}${popHtml('dano')}`);
       // 4 · Efectos (una zona que solo queda deja lo suyo: está en «La zona que queda»)
       if(st.objetivo !== 'zona') h += efectosHtmlEd('Efectos de la habilidad');
       return h;
@@ -706,6 +708,7 @@ const AsistenteDueloHab = (() => {
       const zSolo = () => st.objetivo === 'zona';
       const nN = (v, min) => Math.max(min, Math.round(Number(v) || min));
       q('[data-z-turnos]', e => { if(zSolo()) st.zonaTurnos = nN(e.target.value, 1); else st.zq.turnos = nN(e.target.value, 1); });
+      q('[data-z-inmediata]', e => { st.zonaInmediata = e.target.checked; dibujar(); });
       q('[data-z-mant]', e => { if(zSolo()) st.zonaEnMant = e.target.checked; else st.zq.enMant = e.target.checked; });
       q('[data-z-paso]', e => { if(zSolo()) st.zonaCadaPaso = e.target.checked; else st.zq.cadaPaso = e.target.checked; });
       q('[data-z-quien]', e => { const todos = e.target.value === 'todos'; if(zSolo()) st.zonaAmiga = todos; else st.zq.soloRivales = !todos; });
@@ -942,6 +945,7 @@ const AsistenteDueloHab = (() => {
           if(st.zonaAltura && st.zonaAltura !== 'aire') out.zonaAltura = st.zonaAltura;
           if(!st.zonaEnMant) out.zonaEnMantenimiento = false;   // cuándo afecta (2026-10-15)
           if(st.zonaCadaPaso) out.zonaCadaPaso = true;
+          if(st.zonaInmediata) out.zonaInmediata = true;
           if(st.zonaEstadoNombre){
             const esVenenoZona = ['Veneno', 'Veneno severo'].includes(st.zonaEstadoNombre);
             // Veneno sin stacks a mano: no se manda `turnos` — si no, EstadosAplicar.componer lo toma igual y el

@@ -173,6 +173,11 @@
 > - **Después del catálogo** (la próxima tarea grande): un sistema para probar que las habilidades de los **creeps usen maná (SP) en vez de
 >   cooldown**. Queda para más adelante.
 
+> - [ ] **✨ El editor de la Ejecución, como el cuadro del duelo** (2026-10-15, dueño: «en la pelea un skill de un creep me pareció muy débil, entré a
+>   editar duelo y el menú era muy poco intuitivo: la edición tiene que ser una emulación del mismo menú del duelo; paso a paso te aparece el mismo
+>   menú, ir hasta la parte del daño y donde se calcula el daño poder modificar ese número; no tener que traducir un menú al otro»). Rediseñar
+>   `comun/asistente-duelo-hab.js` para que se vea como el cuadro del duelo (1 Declaración, 2 Contacto, 3 Bloqueo/Crítico, 4 Daño, 5 Efectos) y
+>   cada recuadro se edite donde está. Plan a armar con el dueño.
 > - [ ] **🔍 ¿Por qué el SP Regen quedó en «0»?** (2026-10-15) En «El origen de las especies» los cinco personajes tenían guardada la fórmula de SP
 >   Regen en `0` (no regeneraban la mitad del Especial al empezar el turno; el dueño: «desapareció»). Se corrigió a `floor(esp/2)` desde el mapa
 >   (como GM). El código da bien la fórmula a un personaje nuevo y en «Claude · pruebas» regenera; ninguna parte del código escribe un `0` (la

@@ -1350,6 +1350,9 @@ async function dueloAplicarDano(d){
   const perfora = Combatiente.perforaPasa(golpe, def, perfN);   // solo cuenta si la Defensa frenaría más que eso
   let aplicar = perfora || golpe, ignoraDef = crit || perfora > 0;
   if(base.mitad){ aplicar = Math.ceil(Math.max(0, golpe - def, perfN) / 2); ignoraDef = true; }
+  // ✍ La Defensa elegida a mano en el duelo (2026-10-15): «no resta» o un número, en lugar de la del defensor.
+  if(dn.defensaManual === 'no'){ aplicar = base.mitad ? Math.ceil(golpe / 2) : golpe; ignoraDef = true; }
+  else if(dn.defensaManual !== undefined && dn.defensaManual !== null && dn.defensaManual !== ''){ const dmn = Math.max(0, num(dn.defensaManual)); aplicar = base.mitad ? Math.ceil(Math.max(0, golpe - dmn) / 2) : Math.max(0, golpe - dmn); ignoraDef = true; }
   // Bloqueo perdido (mitad del daño): el arma o escudo con el que bloqueó pierde 1 punto de durabilidad (solo personajes: los creeps y las invocaciones no llevan).
   let desgaste = '';
   if(base.mitad && t.tipo === 'pj' && d.defensa && d.defensa.itemId){

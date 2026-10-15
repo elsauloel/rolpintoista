@@ -7,9 +7,10 @@ async function renderListaPersonajes(){
   if(!fbDb || !fbMiembro){ caja.innerHTML = '<div class="desplegable-vacio">Sin conexión con la partida.</div>'; return; }
   caja.innerHTML = '<div class="desplegable-vacio">Cargando…</div>';
   try{
-    const [fichas, miembros] = await Promise.all([
+    const [fichas, miembros, afuera] = await Promise.all([
       fbDb.collection(fbRutaCampana('fichas')).get(),
       fbDb.collection(fbRutaCampana('miembros')).get(),
+      CombateFin.fuera(),
     ]);
     const nombres = new Map(miembros.docs.map(d => [d.id, String(d.data().nombre || '')]));
     const lista = fichas.docs.map(d => ({id: d.id, ...d.data()}))
@@ -18,15 +19,20 @@ async function renderListaPersonajes(){
       ? lista.map(f => {
           const dueno = nombres.get(f.duenoUid);
           const mini = f.miniatura ? `<img class="pj-mini" src="${esc(f.miniatura)}" alt="">` : '<span class="pj-mini"></span>';
-          return `<div class="pj-fila">
+          const inactivo = afuera.has(f.id);
+          return `<div class="pj-fila${inactivo ? ' pj-inactivo' : ''}">
             <a href="../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}#${encodeURIComponent(f.id)}" target="_blank" rel="noopener" title="Abrir la ficha en una pestaña nueva">` +
               `${mini}<span class="pj-nombre">${esc(f.nombre || 'Sin nombre')}</span>${dueno ? `<span class="pj-dueno">${esc(dueno)}</span>` : ''}</a>` +
+            `<button type="button" class="pj-inactivar" data-inactivo-personaje="${esc(f.id)}" title="${inactivo ? 'Inactivo: no cuenta para la experiencia, el botín, los despojos, la venta del baúl ni el escaneo. Tocá para activarlo' : 'Activo. Tocá para marcarlo inactivo (no vino, observa): deja de contar para la experiencia, el botín, los despojos, la venta del baúl y el escaneo'}">${inactivo ? '💤' : '✓'}</button>` +
             `<button type="button" class="pj-borrar" data-borrar-personaje="${esc(f.id)}" data-nombre="${esc(f.nombre || 'Sin nombre')}" title="Borrar a ${esc(f.nombre || 'este personaje')} de la partida">✕</button>
           </div>`;
         }).join('')
       : '<div class="desplegable-vacio">Todavía no hay personajes en la partida.</div>';
     caja.querySelectorAll('[data-borrar-personaje]').forEach(b => {
       b.onclick = () => borrarPersonajeGM(b.dataset.borrarPersonaje, b.dataset.nombre, b);
+    });
+    caja.querySelectorAll('[data-inactivo-personaje]').forEach(b => {
+      b.onclick = async () => { const id = b.dataset.inactivoPersonaje; b.disabled = true; const s = await CombateFin.fueraCambiar(id, !afuera.has(id)); if(typeof jugadoresFueraGM !== 'undefined'){ jugadoresFueraGM = new Set(s); renderMapasBarra(); } renderListaPersonajes(); };
     });
   }catch(err){
     console.error('No se pudieron leer los personajes:', err);

@@ -15,7 +15,7 @@ function acCargarPiezas(){
       const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = BN_FUENTES; l.dataset.bnFuentes = '1'; document.head.appendChild(l);
     }
     acCargando = cargarPiezas(AC_PIEZAS)
-      .then(() => fetch('../gm-toolset/gm-tools.css?v=20261012zy').then(r => r.text()))
+      .then(() => fetch('../gm-toolset/gm-tools.css?v=20261014u').then(r => r.text()))
       .then(css => { acCss = css.replace(/:root\b/g, ':host'); })
       .catch(err => { acCargando = null; throw err; });
   }

@@ -266,7 +266,8 @@ async function abrirBotinGM(){
   if(botinGM.jugadores === null && fbDb && fbMiembro){
     try{
       botinGM.jugadores = await CombateFin.jugadoresBotin();
-      botinGM.incluidos = new Set(botinGM.jugadores.map(j => j.id));
+      const afuera = await CombateFin.fuera();   // 👥 los inactivos no cuentan para los despojos (2026-10-14, dueño)
+      botinGM.incluidos = new Set(botinGM.jugadores.filter(j => !afuera.has(j.id)).map(j => j.id));
     }catch(err){ botinGM.jugadores = []; console.error(err); }
     renderBotinGM();
   }
@@ -293,6 +294,18 @@ $('#botin-gm-despojar').onclick = despojarBotin;
 $('#botin-gm-x').onclick = () => $('#scrim-botin-gm').classList.remove('open');
 $('#botin-gm-cerrar').onclick = () => $('#scrim-botin-gm').classList.remove('open');
 document.addEventListener('click', e => { if(e.target.closest('#btn-botin')) abrirBotinGM(); });
+// 📦 Vender el baúl común y repartir el oro entre los personajes que cuentan (2026-10-14, comun/combate-fin.js venderBaul).
+document.addEventListener('click', async e => {
+  const b = e.target.closest('#btn-vender-baul');
+  if(!b || b.disabled) return;
+  b.disabled = true;
+  try{
+    const r = await CombateFin.venderBaul({confirmar: texto => Confirmar.preguntar(texto, {titulo: 'Vender el baúl común', icono: '📦', si: 'Vender y repartir', no: 'Cancelar'})});
+    if(r && r.error) toast(r.error);
+    else if(r) toast(`📦 Vendido por ${fmt(r.total)} DDE: ${fmt(r.cada)} para cada uno de los ${r.n}`);
+  }catch(err){ console.error('No se pudo vender el baúl:', err); toast('No se pudo vender el baúl — mirá la consola'); }
+  finally{ b.disabled = false; }
+});
 
 /* =========================================================
    BITÁCORA DEL GM (privada, Firebase)

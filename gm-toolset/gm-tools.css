@@ -777,3 +777,9 @@ input[type=file]{display:none}
 .modo-hab-btn{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;white-space:normal;padding:10px 12px;line-height:1.4}
 .modo-hab-btn span{font-size:12.5px;color:var(--muted);font-weight:400}
 .modo-hab-btn.activa span{color:inherit}
+
+/* 💤 Personaje inactivo (2026-10-14): el botón de la lista 👥 y la fila atenuada. */
+.desplegable-lista .pj-inactivar{flex:0 0 auto;border:1px solid var(--line);background:transparent;color:inherit;border-radius:8px;padding:2px 7px;cursor:pointer;font-size:13px}
+.desplegable-lista .pj-inactivar:hover{border-color:#5fd08a}
+.desplegable-lista .pj-inactivo a{opacity:.5}
+.desplegable-lista .pj-inactivo .pj-nombre{text-decoration:line-through}

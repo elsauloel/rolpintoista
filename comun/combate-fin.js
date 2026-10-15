@@ -243,11 +243,13 @@ const CombateFin = (() => {
   /* 👥 Quién cuenta (2026-10-12, dueño: «un pj que creé solo para observar no cuenta para ningún cálculo, y un jugador a veces está y a veces
      no»): los personajes que el GM deja afuera, guardados en la partida (`gm/personajes` = {fuera: [fichaId]}, solo el GM). Los usan el
      recuadro «Si derrotan a todos», el Escanear grupo y quiénes cobran al terminar el combate (arrancan destildados). */
-  let fueraCache = null;
+  let fueraCache = null, fueraLeido = 0;
   const refFuera = () => fbDb.doc(fbRutaCampana('gm/personajes'));
+  // 💤 Los inactivos (2026-10-14, dueño: «desde el menú de personajes marcar personajes como inactivos, para todo»): se marcan también desde el
+  // menú 👥 Personajes del mapa y de GM Tools; la memoria dura unos segundos, así lo que se marca en otra pantalla se ve enseguida.
   async function fuera(){
-    if(fueraCache) return fueraCache;
-    try{ const d = await refFuera().get(); fueraCache = new Set(d.exists && Array.isArray(d.data().fuera) ? d.data().fuera : []); }
+    if(fueraCache && Date.now() - fueraLeido < 5000) return fueraCache;
+    try{ const d = await refFuera().get(); fueraCache = new Set(d.exists && Array.isArray(d.data().fuera) ? d.data().fuera : []); fueraLeido = Date.now(); }
     catch(err){ console.error('No se pudo leer quién cuenta:', err); fueraCache = new Set(); }
     return fueraCache;
   }
@@ -589,7 +591,49 @@ const CombateFin = (() => {
     </div>`;
   }
 
-  return {itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
+  /* 📦 Vender el baúl común y repartir (2026-10-14, dueño: «se debería poder vender todo lo del baúl común, y que el oro se reparta entre los
+     jugadores activos»). Lo hace el GM: cada ítem a la mitad de su precio de compra (como vender en una tienda, sin el ajuste del vendedor), cada
+     despojo a 1 DDE, más el oro que ya estaba en el baúl; se reparte en partes iguales (hacia abajo, en centavos) entre los personajes tildados
+     de «quién cuenta» (`jugadores()`), como recompensas (la ficha de cada uno las aplica sola). Lo que no se puede partir queda en el baúl.
+     → {error} | {total, cada, n} | null (canceló). `o = {confirmar(texto) → Promise<bool>}`. */
+  async function venderBaul(o){
+    const col = c => fbDb.collection(fbRutaCampana(c));
+    const [snap, js] = await Promise.all([col('baul').get(), jugadores()]);
+    const docs = snap.docs.map(d => ({id: d.id, ref: d.ref, ...d.data()}));
+    const lineas = [];
+    let total = 0;
+    docs.filter(x => x.tipo === 'item').forEach(x => {
+      let it = null; try{ it = JSON.parse(x.json || 'null'); }catch(e){}
+      const u = Math.max(1, num(it && it.unidades) || 1), v = Math.round(num(it && it.precioCompra) / 2 * 100) / 100 * u;
+      total += v; lineas.push(`${x.nombre}${u > 1 ? ` ×${u}` : ''}: ${fmt(v)}`);
+    });
+    const desps = docs.filter(x => x.tipo === 'despojos' && num(x.cantidad) > 0);
+    desps.forEach(x => { total += num(x.cantidad); lineas.push(`${fmt(num(x.cantidad))} despojos${x.despojoNombre ? ` (${x.despojoNombre})` : ''}: ${fmt(num(x.cantidad))}`); });
+    const ddeDoc = docs.find(x => x.id === 'dde'), dde = num(ddeDoc && ddeDoc.cantidad);
+    if(dde > 0){ total += dde; lineas.push(`oro que ya estaba: ${fmt(dde)}`); }
+    total = Math.round(total * 100) / 100;
+    if(total <= 0) return {error: 'El baúl común está vacío'};
+    const inc = js.filter(j => j.incluido);
+    if(!inc.length) return {error: 'No hay personajes tildados en «quién cuenta»'};
+    const cada = Math.floor(total * 100 / inc.length) / 100, resto = Math.round((total - cada * inc.length) * 100) / 100;
+    const texto = ['¿Vender todo el baúl común?', '', ...lineas.map(l => '· ' + l), '',
+      `Total: ${fmt(total)} DDE → ${fmt(cada)} DDE para cada uno de ${inc.map(j => j.nombre).join(', ')}.`,
+      ...(resto > 0 ? [`Quedan ${fmt(resto)} DDE en el baúl (no se pueden partir).`] : [])].join('\n');
+    if(!(await o.confirmar(texto))) return null;
+    const ts = firebase.firestore.FieldValue.serverTimestamp();
+    const lote = fbDb.batch();
+    docs.filter(x => x.tipo === 'item' || x.tipo === 'despojos').forEach(x => lote.delete(x.ref));
+    lote.set(col('baul').doc('dde'), {tipo: 'dde', cantidad: resto});
+    inc.forEach(j => lote.set(col('recompensas').doc(), {fichaId: j.id, duenoUid: j.duenoUid, nombre: j.nombre.slice(0, 60), xp: 0, dde: cada, despojos: 0, estado: j.estado, aplicada: false, creado: ts}));
+    lote.set(col('baulLog').doc(), {accion: 'saco', que: `todo, vendido por ${fmt(total)} DDE (${fmt(cada)} para cada uno)`.slice(0, 160), quien: fbUsuario.uid,
+      jugador: String((fbMiembro && fbMiembro.nombre) || 'GM').slice(0, 60), personaje: 'GM', cuando: firebase.firestore.FieldValue.serverTimestamp()});
+    try{ await lote.commit(); }
+    catch(err){ console.error('No se pudo vender el baúl:', err); return {error: err.code === 'permission-denied' ? 'No hay permiso (¿faltan publicar las reglas?)' : 'No se pudo vender el baúl — mirá la consola'}; }
+    if(typeof mesaLinea === 'function') mesaLinea(`📦 El GM vendió el baúl común por ${fmt(total)} DDE: ${fmt(cada)} DDE para cada uno (${inc.map(j => j.nombre).join(', ')})`, 'recompensa');
+    return {total, cada, n: inc.length};
+  }
+
+  return {venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
     plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, calcularReparto,
     itemsPublicables, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

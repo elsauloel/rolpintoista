@@ -726,3 +726,9 @@ body.con-ruta .toast{bottom:auto;top:74px}
 /* 🪙 Sin Moneda Re-Roll (2026-10-09, dueño): el botón gris y tachado con una línea roja; tocarlo avisa. */
 .sin-moneda{position:relative;filter:grayscale(1);opacity:.55}
 .sin-moneda::after{content:'';position:absolute;left:12%;right:12%;top:50%;height:2px;margin-top:-1px;background:#D8524B;transform:rotate(-40deg);border-radius:2px;pointer-events:none}
+
+/* 💤 Personaje inactivo (2026-10-14): el botón de la lista 👥 y la fila atenuada. */
+.desplegable-lista .pj-inactivar{flex:0 0 auto;border:1px solid var(--line);background:transparent;color:inherit;border-radius:8px;padding:2px 7px;cursor:pointer;font-size:13px}
+.desplegable-lista .pj-inactivar:hover{border-color:#5fd08a}
+.desplegable-lista .pj-inactivo a{opacity:.5}
+.desplegable-lista .pj-inactivo .pj-nombre{text-decoration:line-through}

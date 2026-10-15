@@ -5,7 +5,7 @@
    terminada» (XP, oro, quién cobra, despojos), 📢 Publicar despojos y el botín para despojar. Los creeps salen de su parte privada
    (solo cuentan los que tienen token en el mapa publicado); al publicar, se marcan recompensados con modificarCreep (GM Tools, abierto
    en otra pestaña, se entera por la firma). El Ver de un ítem, con comun/creep-lupa.js (verItem). */
-const VG_PIEZAS = ['../comun/combate-fin.js?v=20261014m'];
+const VG_PIEZAS = ['../comun/combate-fin.js?v=20261014u'];
 var vg = null;            // {host, raiz}
 var vgRep = null;         // el estado del reporte (CombateFin.nuevo)
 var vgCreeps = [];        // los creeps del reporte, con su parte privada
@@ -191,7 +191,8 @@ async function abrirBotinGMMapa(){
   if(vgBotin.jugadores === null){
     try{
       vgBotin.jugadores = await CombateFin.jugadoresBotin();
-      vgBotin.incluidos = new Set(vgBotin.jugadores.map(j => j.id));
+      const afuera = await CombateFin.fuera();   // 👥 los inactivos no cuentan para los despojos (2026-10-14, dueño)
+      vgBotin.incluidos = new Set(vgBotin.jugadores.filter(j => !afuera.has(j.id)).map(j => j.id));
     }catch(err){ vgBotin.jugadores = []; console.error(err); }
     vgBotinDibujar();
   }

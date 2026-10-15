@@ -94,7 +94,14 @@ async function publicarPaseDeTurno(turno, titulo){
 /* ---------- Personajes: lista de las fichas de la partida ----------
    Cada una abre en una pestaña nueva (las de otros jugadores, en solo lectura).
    El GM además tiene un ✕ para borrar cualquiera. */
-function renderListaPersonajes(){
+let personajesInactivos = new Set();   // 💤 (CombateFin.fuera, gm/personajes: solo el GM)
+async function personajesInactivosLeer(){
+  if(!soyGM) return;
+  try{ await cargarPiezas(VG_PIEZAS); personajesInactivos = new Set(await CombateFin.fuera()); }catch(err){ console.error('No se pudo leer quién está inactivo:', err); }
+  if(!$('#personajes-lista').hidden) renderListaPersonajes(true);
+}
+function renderListaPersonajes(sinLeer){
+  if(!sinLeer) personajesInactivosLeer();
   const lista = [...fichasPub.entries()].sort((a, b) => a[1].nombre.localeCompare(b[1].nombre, 'es'));
   $('#personajes-lista').innerHTML = lista.length
     ? lista.map(([id, f]) => {
@@ -103,11 +110,17 @@ function renderListaPersonajes(){
         const enlace = `<a href="../ficha-personaje/ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}#${encodeURIComponent(id)}" target="_blank" rel="noopener" title="Abrir la ficha en una pestaña nueva">` +
           `${mini}<span class="pj-nombre">${esc(f.nombre)}</span>${dueno ? `<span class="pj-dueno">${esc(dueno.nombre)}</span>` : ''}</a>`;
         if(!soyGM) return enlace;
-        return `<div class="pj-fila">${enlace}<button type="button" class="pj-borrar" data-borrar-personaje="${esc(id)}" data-nombre="${esc(f.nombre)}" title="Borrar a ${esc(f.nombre)} de la partida">✕</button></div>`;
+        const inactivo = personajesInactivos.has(id);
+        return `<div class="pj-fila${inactivo ? ' pj-inactivo' : ''}">${enlace}<button type="button" class="pj-inactivar" data-inactivo-personaje="${esc(id)}" title="${inactivo ? 'Inactivo: no cuenta para la experiencia, el botín, los despojos, la venta del baúl ni el escaneo. Tocá para activarlo' : 'Activo. Tocá para marcarlo inactivo (no vino, observa): deja de contar para la experiencia, el botín, los despojos, la venta del baúl y el escaneo'}">${inactivo ? '💤' : '✓'}</button><button type="button" class="pj-borrar" data-borrar-personaje="${esc(id)}" data-nombre="${esc(f.nombre)}" title="Borrar a ${esc(f.nombre)} de la partida">✕</button></div>`;
       }).join('')
     : '<div class="desplegable-vacio">Todavía no hay personajes en la partida.</div>';
   $('#personajes-lista').querySelectorAll('[data-borrar-personaje]').forEach(b => {
     b.onclick = () => borrarPersonajeGM(b.dataset.borrarPersonaje, b.dataset.nombre, b);
+  });
+  $('#personajes-lista').querySelectorAll('[data-inactivo-personaje]').forEach(b => {
+    b.onclick = async () => { const id = b.dataset.inactivoPersonaje; b.disabled = true;
+      try{ await cargarPiezas(VG_PIEZAS); personajesInactivos = new Set(await CombateFin.fueraCambiar(id, !personajesInactivos.has(id))); }catch(err){ console.error(err); toast('No se pudo cambiar — mirá la consola'); }
+      renderListaPersonajes(true); };
   });
 }
 

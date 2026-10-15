@@ -9,6 +9,12 @@
 > capturas. Al probar algo: pasarlo a «Probado» con fecha, qué se vio y si hubo que arreglar algo.
 
 ## Pendientes
+- [ ] **💤 Inactivos y 📦 Vender el baúl** (2026-10-14, publicados durante la sesión del dueño, sin probar en el mapa): en el menú 👥 Personajes
+  (mapa y GM Tools) el ✓/💤 de cada personaje (se ve igual en las dos pantallas y en «👥 Cuentan» de GM Tools; un inactivo no cuenta en Batalla
+  terminada, despojos, venta del baúl, el estimado ni el escaneo); en GM Tools «📦 Vender el baúl»: la lista con precios, el reparto entre los
+  activos (recompensas que cada ficha aplica sola), el resto en el baúl, el registro y la Mesa.
+- [ ] **🌲 Bosque: 6 goblins más** (pedido del dueño, sin crear: GM Tools estaba congelada): arquero y trampero (E1), tercer lobo y domador (E2),
+  arquero del claro y portaestandarte (E3). Antes de crearlos, fijarse que no se hayan creado solos (la instrucción quedó en espera en esa pestaña).
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no

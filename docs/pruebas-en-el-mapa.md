@@ -9,6 +9,9 @@
 > capturas. Al probar algo: pasarlo a «Probado» con fecha, qué se vio y si hubo que arreglar algo.
 
 ## Pendientes
+- [ ] **🌲 Bosque, combinaciones nuevas** (2026-10-14, cargadas sin probar porque la sesión del dueño empezaba): la Lluvia de piedras del hondero
+  (área a distancia con la honda, PdG contra Evasión, daño físico menos la Defensa); el Aullido de la manada (onda de aliados con Acelerado); los
+  Grilletes de sombra del ocultista (dirigida PdG.Esp contra Res.Esp → Inmovilizado); No siente el dolor (aliado con alcance 0 = solo él).
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no

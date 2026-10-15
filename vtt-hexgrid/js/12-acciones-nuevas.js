@@ -674,10 +674,12 @@ async function acEditarHab(creepId, habId){
       },
       toast: m => toast(m),
     }, {id: 'scrim-hab-creep'});
-    // Sus botones son solo suyos: que no los atienda también el manejador general del recuadro.
-    ['click', 'change', 'input'].forEach(ev => ac.editor.scrim.addEventListener(ev, e => e.stopPropagation()));
   }
   ac.editor.abrir(creepId, habId);
+  // Sus botones son solo suyos: que no los atienda también el manejador general del recuadro. (2026-10-15: el editor abre la ventana común
+  // en cada `abrir` —ya no tiene un `scrim` fijo—, así que se engancha a la ventana recién abierta; antes esto tiraba error y «Editar» no abría.)
+  const rz = ac.editor.raiz;
+  if(rz && !rz.dataset.sinPropagar){ rz.dataset.sinPropagar = '1'; ['click', 'change', 'input'].forEach(ev => rz.addEventListener(ev, e => e.stopPropagation())); }
 }
 /* ---------- 🔍 Ver todo de un creep, hecho por el mapa (2026-10-02, hoja de ruta A6a) ----------
    El 🔍 Ver todo de la ficha lite abría la ventana «Ver» de GM Tools escondido en el marco. Ahora la muestra el mapa adentro del

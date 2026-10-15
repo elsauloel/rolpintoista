@@ -173,6 +173,11 @@
 > - **Después del catálogo** (la próxima tarea grande): un sistema para probar que las habilidades de los **creeps usen maná (SP) en vez de
 >   cooldown**. Queda para más adelante.
 
+> - [ ] **🔍 ¿Por qué el SP Regen quedó en «0»?** (2026-10-15) En «El origen de las especies» los cinco personajes tenían guardada la fórmula de SP
+>   Regen en `0` (no regeneraban la mitad del Especial al empezar el turno; el dueño: «desapareció»). Se corrigió a `floor(esp/2)` desde el mapa
+>   (como GM). El código da bien la fórmula a un personaje nuevo y en «Claude · pruebas» regenera; ninguna parte del código escribe un `0` (la
+>   migración de `ficha-guardado.js` respeta un `0` puesto a mano si ya tienen `spRegenAuto`). Si vuelve a pasar, buscar qué pantalla lo guardó.
+
 ## 0. Hoja de ruta acordada (2026-10-02, a seguir en este orden)
 
 > **Criterio del dueño (2026-10-02): primero prolijar lo estructural, después lo puntual** ("tomándonos el tiempo que haga falta").

@@ -296,22 +296,27 @@ const AsistenteDueloHab = (() => {
         <label class="op" style="margin-top:8px"><input type="checkbox" data-flashdodge ${st.flashDodge ? 'checked' : ''}> Si gana la Evasión, tiene dodge roll: puede moverse hasta 2 casilleros, sin ataque de oportunidad (Tronco de huída)</label>`;
       return h;
     }
-    function cuerpoArma(){
+    // Lo que la habilidad le suma a tu ataque, por momento del duelo (2026-10-15: cada botón edita lo suyo): 'pdg' (el PdG), 'def' (la defensa),
+    // 'crit' (el crítico), 'dano' (el daño).
+    function cuerpoArma(parte){
       const a = st.arma;
       const fila = (k, t) => `<div class="fila"><span style="min-width:250px">${t}</span><input type="number" style="width:80px" data-arma="${k}" value="${esc(a[k] ?? 0)}"></div>`;
-      let h = titulo('', 'Lo que la habilidad le suma a tu ataque', 'Se juega como un ataque normal con tu arma (PdG contra Evasión o Parry, crítico, daño y efectos del arma). Los No2 del ataque ya los cobra la habilidad. «Por X» se multiplica por la X que elegís al ejecutarla.');
-      h += `${fila('pdg', '+ a la PdG (fijo)')}${fila('pdgPorX', '+ a la PdG por cada X')}${fila('dadosPorX', 'Dados de daño extra por cada X (del Tipo del arma)')}${fila('fijo', 'Daño fijo extra')}${fila('fijoPorX', 'Daño fijo extra por cada X')}
-        <div class="fila"><span style="min-width:250px">Dados de daño extra, de otro tamaño (ej. 1d6)</span><input type="text" style="width:80px" placeholder="1d6" data-arma-dados value="${esc(a.dadoExtra || '')}"></div>
-        <div class="fila"><span style="min-width:250px">La X de su costo es…</span><select data-x><option value="nitros"${st.x === 'nitros' ? ' selected' : ''}>los No2 (Nitros)</option><option value="sp"${st.x === 'sp' ? ' selected' : ''}>los SP</option></select></div>
-        <label class="op"><input type="checkbox" data-sinparry ${a.sinParry ? 'checked' : ''}> No se puede parrear (solo esquivar)</label>
-        <label class="op"><input type="checkbox" data-terminaturno ${st.terminaTurno ? 'checked' : ''}> Al resolverse, termina tu turno y pasás al final del orden de turnos (Degollar)</label>
-        <label class="op"><input type="checkbox" data-ignoraresistcrit-on ${a.ignoraResistCrit > 0 ? 'checked' : ''}> Ignora Resistencia a crítico</label>
+      const xSel = `<div class="fila"><span style="min-width:250px">La X de su costo es…</span><select data-x><option value="nitros"${st.x === 'nitros' ? ' selected' : ''}>los No2 (Nitros)</option><option value="sp"${st.x === 'sp' ? ' selected' : ''}>los SP</option></select></div>`;
+      const espalda = '<p class="nota" style="margin-top:8px"><b>🗡 Por la espalda, en sigilo</b> (opcional): se suma solo si quien ataca está en sigilo y pegado al defensor por atrás. El mapa lo detecta solo.</p>';
+      if(parte === 'def') return titulo('', 'La defensa de quien recibe el ataque', 'Como en cualquier ataque, elige Evasión o Parry antes de ver tu tirada.')
+        + `<label class="op"><input type="checkbox" data-sinparry ${a.sinParry ? 'checked' : ''}> No se puede parrear (solo esquivar)</label>`;
+      if(parte === 'crit') return titulo('', 'El crítico de este ataque', 'Suman solo para el crítico de este ataque puntual; no dejan ningún estado.')
+        + `<label class="op"><input type="checkbox" data-ignoraresistcrit-on ${a.ignoraResistCrit > 0 ? 'checked' : ''}> Ignora Resistencia a crítico</label>
         ${a.ignoraResistCrit > 0 ? `<div class="fila"><span style="min-width:250px">¿Cuántos puntos ignora?</span><input type="number" min="1" style="width:80px" data-arma="ignoraResistCrit" value="${esc(a.ignoraResistCrit)}"></div>` : ''}
-        ${fila('critBono', '+ Crítico frecuente (solo en esta tirada)')}${fila('critpotBono', '+ Crítico potente (solo en esta tirada)')}${fila('perfora', 'Perfora (ignora N de la Defensa del golpe; se suma a la del arma)')}
-        <p class="nota" style="margin-top:2px">A diferencia de un «Efecto sobre uno mismo» (que dura al menos 1 turno y podría alcanzar a otro ataque), estos dos suman solo para EL crítico de este ataque puntual — no dejan ningún estado activo.</p>
-        <p class="nota" style="margin-top:10px"><b>🗡 Por la espalda</b> (opcional): se suma a lo que ya dé el arma, solo si quien ataca está <b>en sigilo</b> y pegado al defensor por atrás (su punto ciego). El mapa lo detecta solo.</p>
-        ${fila('espaldaPdg', '+ PdG por la espalda')}${fila('espaldaFijo', '+ Daño por la espalda')}${fila('espaldaCritpot', '+ Crítico potente por la espalda')}`;
-      return h;
+        ${fila('critBono', '+ Crítico frecuente')}${fila('critpotBono', '+ Crítico potente')}${espalda}${fila('espaldaCritpot', '+ Crítico potente por la espalda')}`;
+      if(parte === 'dano') return titulo('', 'El daño de este ataque', 'El daño de tu arma, más lo que le suma la habilidad. «Por X» se multiplica por la X que elegís al usarla.')
+        + `${fila('fijo', 'Daño fijo extra')}<div class="fila"><span style="min-width:250px">Dados de daño extra (ej. 1d6)</span><input type="text" style="width:80px" placeholder="1d6" data-arma-dados value="${esc(a.dadoExtra || '')}"></div>
+        ${fila('dadosPorX', 'Dados extra por cada X (del Tipo del arma)')}${fila('fijoPorX', 'Daño fijo extra por cada X')}${xSel}
+        ${fila('perfora', 'Perfora (ignora N de la Defensa; se suma a la del arma)')}${espalda}${fila('espaldaFijo', '+ Daño por la espalda')}`;
+      return titulo('', 'El PdG de este ataque', 'Se juega como un ataque normal con tu arma. Los No2 del ataque ya los cobra la habilidad.')
+        + `${fila('pdg', '+ a la PdG (fijo)')}${fila('pdgPorX', '+ a la PdG por cada X')}${xSel}
+        <label class="op"><input type="checkbox" data-terminaturno ${st.terminaTurno ? 'checked' : ''}> Al resolverse, termina tu turno y pasás al final del orden de turnos (Degollar)</label>
+        ${espalda}${fila('espaldaPdg', '+ PdG por la espalda')}`;
     }
     /* ---------- Lo que se edita al tocar cada botón del cuadro (2026-10-15, docs/plan-editor-ejecucion.md) ----------
        Declaración (a quién, dónde tiene que estar, el área y si permanece) · La zona (si permanece) · lo que tira quien la usa (la lista,
@@ -510,7 +515,7 @@ const AsistenteDueloHab = (() => {
       if(st.pop !== id) return '';
       ayudaPaso = '';
       const C = {tipo: cuerpoActivo, costo: cuerpoCosto, decl: cuerpoDeclaracion, zona: cuerpoZona, tira: cuerpoTira, contra: cuerpoContra, dano: cuerpoDano, efectos: cuerpoEfectos,
-        arma: cuerpoArma, alcance: () => cuerpoAlcance(true), flash: cuerpoFlash};
+        arma: () => cuerpoArma('pdg'), armadef: () => cuerpoArma('def'), armacrit: () => cuerpoArma('crit'), armadano: () => cuerpoArma('dano'), alcance: () => cuerpoAlcance(true), flash: cuerpoFlash};
       const cuerpo = C[id]();
       return `<div class="ejd-pop"><div class="ejd-pop-ayuda">${ayudaPaso}</div><div class="adh-paso">${cuerpo}</div><div class="ejd-pop-pie"><button type="button" data-ejd-listo>✔ Listo</button></div></div>`;
     }
@@ -548,12 +553,12 @@ const AsistenteDueloHab = (() => {
         const a = st.arma;
         const masPdg = [a.pdg ? `${a.pdg > 0 ? '+' : ''}${a.pdg}` : '', a.pdgPorX ? `+${a.pdgPorX} por X` : ''].filter(Boolean).join(' ');
         h += paso(2, 'Contacto: PdG contra la defensa que elija', `<div class="duelo-tiros"><div class="duelo-tiro"><div class="que">PdG · quien ataca</div><button type="button" class="ejd-ed" data-ejd-pop="arma">🎲 Pagar y tirar PdG · tu arma${masPdg ? ' ' + esc(masPdg) : ''}</button></div>
-          <div class="duelo-tiro"><div class="que">Defensa · quien defiende</div><div class="espera">Elegí cómo te defendés:</div><div class="duelo-opc"><button type="button" class="ejd-ed" data-ejd-pop="arma">🛡 Evasión</button><button type="button" class="ejd-ed${a.sinParry ? ' sec' : ''}" data-ejd-pop="arma">🛡 Parry${a.sinParry ? ' (no se puede)' : ''}</button></div></div></div>${popHtml('arma')}`);
+          <div class="duelo-tiro"><div class="que">Defensa · quien defiende</div><div class="espera">Elegí cómo te defendés:</div><div class="duelo-opc"><button type="button" class="ejd-ed" data-ejd-pop="armadef">🛡 Evasión</button><button type="button" class="ejd-ed${a.sinParry ? ' sec' : ''}" data-ejd-pop="armadef">🛡 Parry${a.sinParry ? ' (no se puede)' : ''}</button></div></div></div>${popHtml('arma')}${popHtml('armadef')}`);
         h += paso(3, 'Bloqueo: Fuerza del golpe contra Bloqueo', `<div class="duelo-mini">Como cualquier ataque: si lo para con Parry, sigue el Bloqueo.</div>`);
         const crit = [a.critBono ? `+${a.critBono} Crítico frecuente` : '', a.critpotBono ? `+${a.critpotBono} Crítico potente` : '', a.ignoraResistCrit ? `ignora ${a.ignoraResistCrit} de Resistencia a crítico` : ''].filter(Boolean).join(' · ');
-        h += paso(4, 'Crítico', `<div class="duelo-ef ejd-ed" data-ejd-pop="arma"><div class="duelo-ef-top"><b>${esc(crit || 'El de tu arma, sin cambios')}</b></div></div>`);
+        h += paso(4, 'Crítico', `<div class="duelo-ef ejd-ed" data-ejd-pop="armacrit"><div class="duelo-ef-top"><b>${esc(crit || 'El de tu arma, sin cambios')}</b></div></div>${popHtml('armacrit')}`);
         const masDano = [a.dadosPorX ? `+${a.dadosPorX} dado(s) por X` : '', a.dadoExtra ? `+${a.dadoExtra}` : '', a.fijo ? `${a.fijo > 0 ? '+' : ''}${a.fijo}` : '', a.fijoPorX ? `+${a.fijoPorX} por X` : '', a.perfora ? `perfora ${a.perfora}` : ''].filter(Boolean).join(' ');
-        h += paso(5, 'Daño', `<button type="button" class="ejd-dano ejd-ed" data-ejd-pop="arma">🎲 Tirar el daño · tu arma${masDano ? ' ' + esc(masDano) : ''}</button><div class="duelo-mini">Se le resta la Defensa del defensor.</div>`);
+        h += paso(5, 'Daño', `<button type="button" class="ejd-dano ejd-ed" data-ejd-pop="armadano">🎲 Tirar el daño · tu arma${masDano ? ' ' + esc(masDano) : ''}</button><div class="duelo-mini">Se le resta la Defensa del defensor.</div>${popHtml('armadano')}`);
         h += efectosHtmlEd('Efectos del golpe');
         return h;
       }

@@ -38,6 +38,10 @@
 - [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): un crítico de la Puñalada (Rengo 2 y Lisiado 1). El pozo visto como jugador ya se vio (con
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **✨ El editor de la Ejecución como el cuadro del duelo** (2026-10-15, Claude · pruebas, GM): Acciones de «Bosque (prueba)» → Ver → ✎ Editar →
+  Ejecución: se abre el cuadro del duelo (Declaración, Contacto con «Pagar y tirar PdG» y «Elegí cómo te defendés», Bloqueo, Crítico, Daño,
+  Efectos) con el 📜 a la izquierda; tocar «Tirar el daño» abre lo suyo debajo. Cerrado sin guardar. (Antes, «Editar» desde las Acciones no
+  abría nada: arreglado.) **Falta**: que el dueño edite una de verdad y la ejecute.
 - [x] **🗡 Ataque por la espalda, 👣 Pasos silenciosos y ↻ darse vuelta** (2026-10-15, Claude · pruebas, GM rolpintoista): «Bosque (prueba)» a
   la espalda de Clementino → el duelo declara «🗡 por la espalda: +1 PdG» y el PdG sale «1d12 +1 espalda → 5 + 1 = 6» (duelo cancelado, «No cuenta»).
   Con la pasiva «Pasos silenciosos» puesta desde GM Tools (+ Pasiva): el bono pasa a +2 y la tarjeta pública la publica; con «👁 Ver como jugador»

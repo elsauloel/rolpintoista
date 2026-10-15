@@ -1574,4 +1574,14 @@ versión parecida en más de una, es candidato a juntar.
   «🗡 por la espalda: +N PdG»; se suma al bono «por la espalda» del arma (que sigue pidiendo sigilo). Stat nuevo `pasossilenciosos`
   (`FichaCalculo.EXTRA`; `FichaResumen` publica `pasosSilenciosos`; `CreepCalculo.tarjetaPublica` publica el booleano) y la pasiva
   `pasos-silenciosos` en `pasivas.js` (jobCosto 1).
+- **`asistente-duelo-hab.js`: el editor de la Ejecución ES el cuadro del duelo** (2026-10-15, `../docs/plan-editor-ejecucion.md`, dueño: «quiero que
+  visualmente se vea igual el editor de un duelo como cuando uno lo está ejecutando»). Ya no usa la ventana común paso a paso: abre `#ejd-fondo`
+  con los estilos de `duelo.js` (`Duelo.estilos`; por eso el editor del catálogo y el generador de tiendas cargan también `duelo.js`) y los mismos
+  recuadros (Declaración, la zona que queda, Contacto, Daño, Efectos; un ataque con el arma: PdG, defensa, Bloqueo, Crítico, Daño, Efectos). Cada
+  botón o caja con ✎ (`data-ejd-pop`) abre debajo sus controles (`st.pop`; los `cuerpo*` de siempre, con los colores del duelo). Lo nuevo en el dato:
+  `objetivo: 'cualquiera'`, `tiraBono`, `contra` con `{stat, bono}` / `{formula, etq}` (`Combatiente.contraDeEjecucion`; `limpiarHab` los conserva y
+  `opcionesHab` muestra la fórmula), `zonaQueda.{enMantenimiento, cadaPaso, soloRivales}`, `danoFormula` (la fórmula del daño se escribe acá; si es
+  otra que la «segunda tirada» de la habilidad, manda esta) y `danoMas` (un fijo y/o un dado que se le suma, también al daño del arma),
+  `centroAlcance: 'rango'`. `cfg.formulaDano` (lo pasan los cinco editores que la abren) es la fórmula de la habilidad. En las pruebas: `ejd(s)`,
+  `ejdPop(id)`, `ejdGuardar()`.
 

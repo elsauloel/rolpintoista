@@ -8,7 +8,7 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
-> - [ ] **✨ El editor de la Ejecución, como el cuadro del duelo** (2026-10-15, dueño: «en la pelea un skill de un creep me pareció muy débil, entré a
+> - [x] **✨ El editor de la Ejecución, como el cuadro del duelo** (hecho el 2026-10-15, `docs/plan-editor-ejecucion.md`; falta que el dueño lo use) (2026-10-15, dueño: «en la pelea un skill de un creep me pareció muy débil, entré a
 >   editar duelo y el menú era muy poco intuitivo: la edición tiene que ser una emulación del mismo menú del duelo; paso a paso te aparece el mismo
 >   menú, ir hasta la parte del daño y donde se calcula el daño poder modificar ese número; no tener que traducir un menú al otro»). Rediseñar
 >   `comun/asistente-duelo-hab.js` para que se vea como el cuadro del duelo (1 Declaración, 2 Contacto, 3 Bloqueo/Crítico, 4 Daño, 5 Efectos) y

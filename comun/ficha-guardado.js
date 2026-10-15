@@ -259,10 +259,22 @@ const FichaGuardado = (() => {
   }
   // Lo que la ficha completa cada vez que dibuja (renderAll): migraciones que se pueden correr de nuevo sin cambiar
   // nada, y los No2 llenos si todavía no se fijaron.
+  // Los textos viejos de las skills Flash de clase (2026-10-15, dueño: «FLASH» con su globo; lo del turno ajeno va en el globo, no en el texto):
+  // la copia que todavía empieza con «Flash: … en turno ajeno cuesta el doble…» toma el texto nuevo del pool.
+  const FLASH_VIEJO = /^Flash: (?:si la usás )?en turno ajeno cuesta el doble/;
+  function migrarTextosFlash(S){
+    if(typeof CLASES_SKILLS === 'undefined') return;
+    (S.habilidades || []).forEach(h => {
+      if(!h || !h.habClaseId || !FLASH_VIEJO.test(String(h.detalle || ''))) return;
+      const base = CLASES_SKILLS.flatMap(c => c.habilidades || []).find(x => x.id === h.habClaseId);
+      if(base && /^FLASH\./.test(String(base.detalle || ''))) h.detalle = base.detalle;
+    });
+  }
   function completar(S, o){
     o = o || {};
     migrarEstadoIt2(S, o.spPorBono);
     migrarEstadoEspecial(S);
+    migrarTextosFlash(S);
     if(S.nitros === null || S.nitros === undefined){
       const n = FichaCalculo.calcular(S).final.nitros;
       S.nitros = Number.isNaN(n) ? 0 : n;

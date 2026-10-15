@@ -134,6 +134,8 @@ const Duelo = (() => {
 .duelo-texto{position:fixed;left:14px;top:90px;width:min(270px,22vw);max-height:70vh;overflow:auto;background:rgba(21,26,38,.97);border:1px solid #39435c;border-left:3px solid #c98545;border-radius:10px;padding:10px 12px;color:#e9ecf4;font-size:13px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:2}
 .duelo-texto b.t{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#c98545;margin-bottom:6px}
 #duelo-fondo.min .duelo-texto{display:none}
+.duelo-texto details.tec{margin-top:8px;font-size:12px;color:#9aa3b8}
+.duelo-texto details.tec summary{cursor:pointer;color:#c98545}
 .duelo-manual .tg{display:inline-flex;gap:5px;align-items:center;cursor:pointer;float:right}
 .duelo-manual .tg input{width:auto}
 .duelo-mcaja{clear:both;margin-top:6px;padding:8px;border:1px dashed #39435c;border-radius:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:center}
@@ -2194,7 +2196,10 @@ const Duelo = (() => {
     if(d.ataque && d.ataque.texto){
       const tx = document.createElement('div');
       tx.className = 'duelo-texto';
-      tx.innerHTML = `<b class="t">📜 ${_esc(nombreAtq(d))}</b>${typeof Glosario !== 'undefined' && Glosario.marcar ? Glosario.marcar(d.ataque.texto) : _esc(d.ataque.texto)}`;
+      // Lo que pasa, con sus globos; las notas ⚙ / ✋ en «Detalles técnicos» (dueño, 2026-10-15: lo técnico no va en el texto).
+      const pt = typeof ItemCorto !== 'undefined' && ItemCorto.partes ? ItemCorto.partes(d.ataque.texto) : {hace: d.ataque.texto, tecnico: ''};
+      const marcar = x => typeof Glosario !== 'undefined' && Glosario.marcar ? Glosario.marcar(x) : _esc(x);
+      tx.innerHTML = `<b class="t">📜 ${_esc(nombreAtq(d))}</b>${marcar(pt.hace)}${pt.tecnico ? `<details class="tec"><summary>Detalles técnicos</summary>${_esc(pt.tecnico)}</details>` : ''}`;
       f.appendChild(tx);
     }
     // El paso en curso (el último que aparece, mientras el duelo siga abierto) late para llamar la atención.

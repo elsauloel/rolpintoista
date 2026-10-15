@@ -187,6 +187,11 @@
 >   (como GM). El código da bien la fórmula a un personaje nuevo y en «Claude · pruebas» regenera; ninguna parte del código escribe un `0` (la
 >   migración de `ficha-guardado.js` respeta un `0` puesto a mano si ya tienen `spRegenAuto`). Si vuelve a pasar, buscar qué pantalla lo guardó.
 
+- [ ] **🧹 Auditoría de textos: «descripción esencial» y «Detalles técnicos»** (2026-10-15, dueño: «podemos hacer una auditoría de cada uno de los
+  skills ya cargados para separar cuál texto se muestra como descripción esencial y cuál va en el recuadro de la explicación técnica»): skill por
+  skill (clase, creeps, catálogo de habilidades de creep), el texto principal dice solo qué pasa; los términos con su globo del glosario, sin
+  re-explicarlos; lo técnico (⚙ / ✋ / cómo se arma) al recuadro. Hecho ya: los 8 Flash de clase («FLASH.» + el turno ajeno en el globo) y Sonic Boom.
+
 ## 0. Hoja de ruta acordada (2026-10-02, a seguir en este orden)
 
 > **Criterio del dueño (2026-10-02): primero prolijar lo estructural, después lo puntual** ("tomándonos el tiempo que haga falta").

@@ -810,7 +810,8 @@ const AsistenteDueloHab = (() => {
     if(String(cfg.detalle || '').trim()){
       const tx = document.createElement('div');
       tx.style.cssText = 'position:fixed;left:14px;top:90px;width:min(270px,22vw);max-height:70vh;overflow:auto;background:rgba(21,26,38,.97);border:1px solid #39435c;border-left:3px solid #c98545;border-radius:10px;padding:10px 12px;color:#e9ecf4;font-size:13px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:5;font-family:system-ui,sans-serif';
-      tx.innerHTML = `<b style="display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#c98545;margin-bottom:6px">📜 ${esc(cfg.nombre || 'Habilidad')}</b>${esc(String(cfg.detalle).trim())}`;
+      tx.innerHTML = `<b style="display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#c98545;margin-bottom:6px">📜 ${esc(cfg.nombre || 'Habilidad')}</b>${(() => { const pt = typeof ItemCorto !== 'undefined' && ItemCorto.partes ? ItemCorto.partes(String(cfg.detalle).trim()) : {hace: String(cfg.detalle).trim(), tecnico: ''};
+        return (typeof Glosario !== 'undefined' && Glosario.marcar ? Glosario.marcar(pt.hace) : esc(pt.hace)) + (pt.tecnico ? `<details style="margin-top:8px;font-size:12px;color:#9aa3b8"><summary style="cursor:pointer;color:#c98545">Detalles técnicos</summary>${esc(pt.tecnico)}</details>` : ''); })()}`;
       f.appendChild(tx);
     }
   }

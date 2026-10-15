@@ -1105,8 +1105,10 @@ const FichaAcciones = (() => {
       return;
     }
     // 🩸 Transfusión sanguínea (2026-10-13, Debuffer): se eligen en el mapa quién da, quién recibe y cuánto (vtt-hexgrid/js/45).
+    // El tope es el Especial de quien la usa (dueño, 2026-10-14: «el ESP del caster en lugar de 20»), aunque la copia de la habilidad diga otro número.
     if(h.transfusionMapa){
-      try{ ui.alMapa('transfusion-habilidad', {fichaId: ui.yo().ref, nombre: h.nombre, max: Math.max(1, num(h.transfusionMapa.max) || 20)}); }
+      const esp = Math.round(num(FichaCalculo.calcular(S).final.esp));
+      try{ ui.alMapa('transfusion-habilidad', {fichaId: ui.yo().ref, nombre: h.nombre, max: Math.max(1, esp || num(h.transfusionMapa.max) || 20)}); }
       catch(err){ console.error('No se pudo avisar la Transfusión al mapa:', err); }
       return;
     }

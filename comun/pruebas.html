@@ -764,8 +764,11 @@ prueba('Transfusión sanguínea (Debuffer, 2026-10-13): el aviso «Transfusión�
   S.hp = 10; FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Transfusión', vida: -20}, 'T', ui); const da = S.hp;
   S.hp = max - 3; FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Transfusión', vida: 8}, 'T', ui); const recibe = S.hp;
   S.hp = 0; FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Transfusión', vida: 5}, 'T', ui); const caido = S.hp;
-  igual([hab.costo, hab.nitrosCosto, hab.transfusionMapa.max, EstadosAplicar.limpiarSpec({nombre: 'Transfusión', vida: -7}).vida, da, recibe === max, caido],
-    ['1', 1, 20, -7, 1, true, 0]);
+  // El tope es el Especial de quien la usa (dueño, 2026-10-14), aunque una copia vieja diga 20.
+  let msg = null; const uiMapa = {enMapa: () => true, yo: () => ({ref: 'f1'}), alMapa: (t, m) => { msg = m; }};
+  FichaAcciones.avisarZonaAlMapa(S, {...hab, transfusionMapa: {max: 20}}, uiMapa);
+  igual([hab.costo, hab.nitrosCosto, hab.transfusionMapa.max, EstadosAplicar.limpiarSpec({nombre: 'Transfusión', vida: -7}).vida, da, recibe === max, caido, msg && msg.max === Math.round(FichaCalculo.calcular(S).final.esp)],
+    ['1', 1, 'esp', -7, 1, true, 0, true]);
 });
 prueba('Carga Elemental (Mago, 2026-10-13): stacks según el daño que entra, la Ejecución con la carga y el duelo la conserva', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'mago').habilidades.find(h => h.id === 'mago-carga-elemental');

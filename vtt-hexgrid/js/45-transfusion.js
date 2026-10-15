@@ -1,5 +1,5 @@
 /* 🩸 TRANSFUSIÓN SANGUÍNEA (Debuffer, 2026-10-13, dueño; docs/clases-borrador.md). Después de cobrar (1 SP y 1 No2), se eligen en el mapa quién da
-   y quién recibe —dos personajes aliados, quien la usa incluido, dentro de su Rango (si no, avisa y deja seguir)— y cuánto (hasta `max`, 20): quien
+   y quién recibe —dos personajes aliados, quien la usa incluido, dentro de su Rango (si no, avisa y deja seguir)— y cuánto (hasta `max`: el Especial de quien la usa, dueño 2026-10-14): quien
    da queda con al menos 1 de vida y quien recibe no pasa su máximo. La vida no la escribe esta pantalla (un jugador no escribe la ficha de otro):
    va como un aviso «Transfusión» a cada ficha (EstadosAplicar.encolarPj → FichaAcciones.aplicarEstadoRecibido), que lo aplica su dueño (o el mapa
    que lo maneja). Las invocaciones, a mano. */

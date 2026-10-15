@@ -805,6 +805,14 @@ const AsistenteDueloHab = (() => {
       extras: ini ? [{id: 'quitar', texto: 'Sacar esta configuración', alClic: () => { cerrar(); cfg.alGuardar(null); }}] : [],
     });
     f = api.raiz;
+    // 📜 Lo que se escribió en «Qué es», a la izquierda mientras se arma la Ejecución (2026-10-15, dueño: «que uno, a medida que lo va editando,
+    // tenga el texto a mano»). `cfg.detalle` (lo pasan los editores de habilidades de personaje, creep e invocación y el de armas especiales).
+    if(String(cfg.detalle || '').trim()){
+      const tx = document.createElement('div');
+      tx.style.cssText = 'position:fixed;left:14px;top:90px;width:min(270px,22vw);max-height:70vh;overflow:auto;background:rgba(21,26,38,.97);border:1px solid #39435c;border-left:3px solid #c98545;border-radius:10px;padding:10px 12px;color:#e9ecf4;font-size:13px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:5;font-family:system-ui,sans-serif';
+      tx.innerHTML = `<b style="display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#c98545;margin-bottom:6px">📜 ${esc(cfg.nombre || 'Habilidad')}</b>${esc(String(cfg.detalle).trim())}`;
+      f.appendChild(tx);
+    }
   }
   return {abrir};
 })();

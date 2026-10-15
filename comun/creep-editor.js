@@ -189,7 +189,7 @@ const CreepEditor = (() => {
     }
     function abrirEjecucion(){
       const ed = e;
-      AsistenteDueloHab.abrir({nombre: $h('nombre').value.trim() || 'Habilidad', inicial: ed.duelo || null, siempreActivo: true, tieneFormula: !!$h('tirada').value.trim(),
+      AsistenteDueloHab.abrir({nombre: $h('nombre').value.trim() || 'Habilidad', detalle: $h('detalle').value.trim(), inicial: ed.duelo || null, siempreActivo: true, tieneFormula: !!$h('tirada').value.trim(),
         costoInicial: {sp: $h('costo').value, nitrosCosto: $h('nitros-modo').value === 'ataque' ? 'ATAQUE' : num($h('acciones').value), hpCosto: num($h('hpcosto').value)}, elegirEstado: ctx.elegirEstadoDuelo,
         alGuardar: r => {
           if(e !== ed) return;

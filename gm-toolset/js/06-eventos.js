@@ -441,7 +441,7 @@ document.addEventListener('click', async e => {
     const [scId, habId] = b.dataset.duelohabcreep.split(':');
     const sc = S.creeps.find(s => s.id === scId);
     const h = sc && sc.habilidades.find(x => x.id === habId);
-    if(sc && h) AsistenteDueloHab.abrir({nombre: h.nombre, inicial: h.duelo || null, siempreActivo: true, tieneFormula: !!String(h.tiradaExtra || '').trim(),
+    if(sc && h) AsistenteDueloHab.abrir({nombre: h.nombre, detalle: h.detalle || '', inicial: h.duelo || null, siempreActivo: true, tieneFormula: !!String(h.tiradaExtra || '').trim(),
       costoInicial: {sp: h.costo, nitrosCosto: h.nitrosCosto, hpCosto: h.hpCosto}, elegirEstado: elegirEstadoDuelo,   // costo en vida: se cobra igual que en un personaje (P133)
       alGuardar: r => {
         if(r){ h.duelo = r.duelo; h.costo = r.costo.sp; h.nitrosCosto = r.costo.nitrosCosto; if(num(r.costo.hpCosto) > 0) h.hpCosto = num(r.costo.hpCosto); else delete h.hpCosto; h.modo = 'auto'; h.automatizada = true; }

@@ -554,6 +554,7 @@ const Combatiente = (() => {
     const o = {};
     if(arma && arma.espalda) o.espalda = arma.espalda;
     if(arma && arma.sinParry) o.sinParry = true;
+    if(arma && (arma.detalle || arma.armaDetalle)) o.armaDetalle = String(arma.detalle || arma.armaDetalle).slice(0, 400);   // el texto del arma, para el recuadro del duelo (2026-10-15)
     if(esArco(arma)) o.arco = true;   // el mapa pide la distancia mínima del arco al elegir el objetivo (no viaja al duelo)
     if(arma && arma.armaDeRango && arma.ideal) o.ideal = arma.ideal;   // la distancia ideal y el tiro alto: los usa el mapa al apuntar
     if(tieneTiroAlto(arma)) o.tiroAlto = true;
@@ -1157,7 +1158,7 @@ const Combatiente = (() => {
     const sumaEsp = c.danoSumaEsp && o.stat ? Math.floor(nf(o.stat('dmgesp')) * (c.danoSumaEsp === true ? 1 : nf(c.danoSumaEsp))) : 0;
     const formula = sx(formula0 && sumaEsp > 0 ? `${formula0}+${sumaEsp}` : formula0);   // «Xd4» con la X elegida (Balas de sangre, 2026-10-13)
     return {
-      nombre: h.nombre, objetivo: c.objetivo || 'enemigo',
+      nombre: h.nombre, objetivo: c.objetivo || 'enemigo', ...(h.detalle ? {detalle: String(h.detalle).slice(0, 600)} : {}),   // el texto, para el recuadro del duelo (2026-10-15)
       alcance: c.objetivo === 'uno mismo' || c.objetivo === 'area' || c.objetivo === 'onda' || c.objetivo === 'cono' || c.objetivo === 'linea' ? 0 : alcanceHab(c, stat, o.stat),
       tira: c.tiraFormula ? {formula: sx(c.tiraFormula), etq: c.tiraEtiqueta || 'Tirada'} : (stat ? {stat, etq: etq(stat), bono: nf(h.tiradaBono)} : null),
       contra: (c.contra || []).map(s => ({modo: s, stat: s, etq: etq(s)})),
@@ -1333,7 +1334,7 @@ const Combatiente = (() => {
     const ESP = {pdg: 'espaldaPdg', fijo: 'espaldaFijo', critpot: 'espaldaCritpot'};
     const esp = Object.keys(ESP).reduce((acc, k) => { const v = nf(arma.espalda && arma.espalda[k]) + nf(a[ESP[k]]); if(v > 0) acc[k] = v; return acc; }, {});
     const perfora = Math.min(5, Math.round(nf(arma.perfora) + nf(a.perfora)));   // Perfora: la del arma + la de la habilidad (Tajear, 2026-10-10)
-    return {tipo: 'habilidad-arma', habNombre: h.nombre, armaId: arma.id || '', armaNombre: arma.nombre || '', tipoDado: arma.tipoDado, rango: !!arma.rango,
+    return {tipo: 'habilidad-arma', habNombre: h.nombre, ...(h.detalle ? {habDetalle: String(h.detalle).slice(0, 600)} : {}), armaId: arma.id || '', armaNombre: arma.nombre || '', tipoDado: arma.tipoDado, rango: !!arma.rango,
       alcance: o.alcance, sinParry: !!a.sinParry || !!arma.sinParry, ...(Object.keys(esp).length ? {espalda: esp} : {}), ...(perfora > 0 ? {perfora} : {}),
       mods: {pdg: nf(a.pdg) + nf(a.pdgPorX) * X, dados: nf(a.dadosPorX) * X, fijo: nf(a.fijo) + nf(a.fijoPorX) * X, ignoraResistCrit: nf(a.ignoraResistCrit), critBono: nf(a.critBono), critpotBono: nf(a.critpotBono),
         ...(/^\d{1,2}d\d{1,3}$/i.test(String(a.dadoExtra || '')) ? {dadoExtra: String(a.dadoExtra).toLowerCase()} : {})},   // +1d6 de otro tamaño que el arma (2026-10-13)

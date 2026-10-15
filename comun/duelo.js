@@ -131,6 +131,9 @@ const Duelo = (() => {
 .duelo-opc small.duelo-info{font-size:13px;font-weight:700;opacity:1;color:#dfe8ff;margin-top:2px}
 .duelo-man{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap}
 .duelo-manual{margin-top:8px;font-size:12px;color:#9aa3b8}
+.duelo-texto{position:fixed;left:14px;top:90px;width:min(270px,22vw);max-height:70vh;overflow:auto;background:rgba(21,26,38,.97);border:1px solid #39435c;border-left:3px solid #c98545;border-radius:10px;padding:10px 12px;color:#e9ecf4;font-size:13px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:2}
+.duelo-texto b.t{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#c98545;margin-bottom:6px}
+#duelo-fondo.min .duelo-texto{display:none}
 .duelo-manual .tg{display:inline-flex;gap:5px;align-items:center;cursor:pointer;float:right}
 .duelo-manual .tg input{width:auto}
 .duelo-mcaja{clear:both;margin-top:6px;padding:8px;border:1px dashed #39435c;border-radius:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:center}
@@ -460,6 +463,7 @@ const Duelo = (() => {
   // tokDef = un token del mapa ({id, nombre, tipo, fichaId, duenoUid}); miTokenId = el token del atacante (o ''); contraDe = id del duelo que se contraataca.
   async function crear(cfg, tokDef, miTokenId, contraDe){
     const hab = limpiarHab(cfg.ataque.hab);
+    const textoAtq = txtCorto((hab && hab.detalle) || cfg.ataque.habDetalle || cfg.ataque.armaDetalle || '', 600);   // 📜 el recuadro de la izquierda (2026-10-15)
     const inicial = {
       estado: 'esperando', fase: 'contacto',
       atacante: {ref: String(cfg.yo.ref), tipo: cfg.yo.tipo, nombre: String(cfg.yo.nombre || '').slice(0, 40), uid: cfg.yo.uid || yo(), tokenId: miTokenId || ''},
@@ -486,6 +490,7 @@ const Duelo = (() => {
       creadoPor: yo(),
       creado: firebase.firestore.FieldValue.serverTimestamp(),
     };
+    if(textoAtq && inicial.ataque) inicial.ataque.texto = textoAtq;
     // Hechizo de área (dicho por el dueño, 2026-09-27): el casteador tira su PdG.Esp/PdG UNA SOLA VEZ para toda la
     // cascada; cada objetivo tira su Evasión individualmente contra esa MISMA tirada. `cfg.pdgCompartido` (la tirada
     // ya resuelta del primer objetivo) llega precargada acá, así que este sub-duelo arranca con el contacto ya
@@ -635,6 +640,7 @@ const Duelo = (() => {
       ...(_num(h.critTipo) ? {critTipo: Math.min(12, Math.max(1, Math.round(_num(h.critTipo))))} : {}),   // lo físico invocado critica como su Tipo
       ...(objetivo === 'linea' ? {largo: Math.min(12, Math.max(1, Math.round(_num(h.largo)) || 4))} : {}),
       ...(h.cadena ? {cadena: {saltos: Math.min(6, Math.max(1, Math.round(_num(h.cadena.saltos)) || 2)), rango: Math.min(6, Math.max(1, Math.round(_num(h.cadena.rango)) || 3)), ...(h.cadena.efectos ? {efectos: true} : {})}} : {}),   // rayo en cadena (2026-10-05)
+      ...(h.detalle ? {detalle: txtCorto(h.detalle, 600)} : {}),   // el texto de la habilidad (el recuadro de la izquierda, 2026-10-15)
       ...(h.efectoLibre ? {efectoLibre: txtCorto(h.efectoLibre, 200)} : {}),
       ...(h.efectosNota ? {efectosNota: txtCorto(h.efectosNota, 200)} : {}),
       // «Otro»: se resiste con algo que no está en la lista de stats — texto libre para que la mesa lo
@@ -2183,6 +2189,14 @@ const Duelo = (() => {
         </div>
       </div></div>${rerollBtnHtml(d)}`;
     if(min) f.classList.add('min');
+    // 📜 El texto de la habilidad o del arma, a la izquierda (2026-10-15, dueño: «durante un duelo tener a la izquierda el recuadro del texto de la
+    // habilidad, para saber qué está sucediendo y qué debería suceder»). Viaja en `ataque.texto` (lo arma crear()).
+    if(d.ataque && d.ataque.texto){
+      const tx = document.createElement('div');
+      tx.className = 'duelo-texto';
+      tx.innerHTML = `<b class="t">📜 ${_esc(nombreAtq(d))}</b>${typeof Glosario !== 'undefined' && Glosario.marcar ? Glosario.marcar(d.ataque.texto) : _esc(d.ataque.texto)}`;
+      f.appendChild(tx);
+    }
     // El paso en curso (el último que aparece, mientras el duelo siga abierto) late para llamar la atención.
     if(d.estado !== 'resuelto' && d.estado !== 'cancelado'){
       const pasos = f.querySelectorAll('.duelo-paso');

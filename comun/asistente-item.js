@@ -700,7 +700,7 @@ const AsistenteItem = (() => {
   // La Ejecución ✨ de un arma especial: la misma ventana que las habilidades (comun/asistente-duelo-hab.js), con el costo del arma.
   function abrirEjecucion(){
     const yo = st, es = st.d.especial;
-    AsistenteDueloHab.abrir({nombre: st.d.nombre || 'Arma especial', inicial: es.duelo || null, siempreActivo: true, tieneFormula: !!String(es.dano || '').trim(),
+    AsistenteDueloHab.abrir({nombre: st.d.nombre || 'Arma especial', detalle: st.d.detalle || '', inicial: es.duelo || null, siempreActivo: true, tieneFormula: !!String(es.dano || '').trim(),
       costoInicial: {sp: String(Math.round(n(es.sp))), nitrosCosto: Math.round(n(es.no2 ?? 1))}, elegirEstado: st.cfg.elegirEstado,
       alGuardar: r => {
         if(st !== yo) return;

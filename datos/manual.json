@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-10-15T11:47:54Z",
+ "actualizado": "2026-10-15T11:54:45Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -959,7 +959,7 @@
    ],
    "estado": "borrador",
    "capitulo": "combate",
-   "cuerpo": "Con la **niebla de guerra** prendida (la activa el GM por mapa), **solo ves lo que tu grupo ve o vio**:\n\n- **Negro**: nunca visto. No se ve ni el mapa ni los tokens.\n- **Gris semitransparente**: ya descubierto pero fuera de la visión de ahora. Se ve el mapa, pero **no los tokens** que no sean aliados.\n- **Visión por defecto:** un radio de **6 casilleros** menos una **cuña ciega de 120° hacia atrás**. Gira con el frente del token.\n- Cada jugador ve la **unión** de lo que ven todos los personajes (incluidas las [[Invocaciones]] mientras estén invocadas y vivas).\n- **Lo descubierto es del grupo y persiste.**\n- Cuando un enemigo sale de tu visión queda una marca **\"?\"** donde lo viste por última vez.\n\nEl GM puede **destapar o tapar a mano** con un pincel, \"ver como jugador\" y reiniciar. El stat **Visión** de la ficha permite cambiar el radio.\n\n> [!question] Pendientes de diseño\n> Obstáculos que tapen la vista, y ocultar de verdad (hoy es solo visual) las listas que nombran tokens fuera de la visión."
+   "cuerpo": "Con la **niebla de guerra** prendida (la activa el GM por mapa), **solo ves lo que tu grupo ve o vio**:\n\n- **Negro**: nunca visto. No se ve ni el mapa ni los tokens.\n- **Gris semitransparente**: ya descubierto pero fuera de la visión de ahora. Se ve el mapa, pero **no los tokens** que no sean aliados.\n- **Visión por defecto:** un radio de **6 casilleros** menos una **cuña ciega de 120° hacia atrás**. Gira con el frente del token.\n- **El oído:** un enemigo que se acerca **a 3 casilleros o menos**, aunque venga por la espalda (o desde la oscuridad), **se oye y se ve**. Las paredes y los obstáculos sólidos lo tapan. No vale para quien está en [[Sigilo]] ni para quien tiene **pasos silenciosos** (un sigilo suave que pueden dar algunas habilidades). Oírlo no descubre el terreno de alrededor.\n- Cada jugador ve la **unión** de lo que ven todos los personajes (incluidas las [[Invocaciones]] mientras estén invocadas y vivas).\n- **Lo descubierto es del grupo y persiste.**\n- Cuando un enemigo sale de tu visión queda una marca **\"?\"** donde lo viste por última vez.\n\nEl GM puede **destapar o tapar a mano** con un pincel, \"ver como jugador\" y reiniciar. El stat **Visión** de la ficha permite cambiar el radio.\n\n> [!question] Pendientes de diseño\n> Obstáculos que tapen la vista, y ocultar de verdad (hoy es solo visual) las listas que nombran tokens fuera de la visión."
   },
   {
    "id": "trampas",

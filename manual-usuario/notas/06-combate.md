@@ -429,6 +429,7 @@ Con la **niebla de guerra** prendida (la activa el GM por mapa), **solo ves lo q
 - **Negro**: nunca visto. No se ve ni el mapa ni los tokens.
 - **Gris semitransparente**: ya descubierto pero fuera de la visión de ahora. Se ve el mapa, pero **no los tokens** que no sean aliados.
 - **Visión por defecto:** un radio de **6 casilleros** menos una **cuña ciega de 120° hacia atrás**. Gira con el frente del token.
+- **El oído:** un enemigo que se acerca **a 3 casilleros o menos**, aunque venga por la espalda (o desde la oscuridad), **se oye y se ve**. Las paredes y los obstáculos sólidos lo tapan. No vale para quien está en [[Sigilo]] ni para quien tiene **pasos silenciosos** (un sigilo suave que pueden dar algunas habilidades). Oírlo no descubre el terreno de alrededor.
 - Cada jugador ve la **unión** de lo que ven todos los personajes (incluidas las [[Invocaciones]] mientras estén invocadas y vivas).
 - **Lo descubierto es del grupo y persiste.**
 - Cuando un enemigo sale de tu visión queda una marca **"?"** donde lo viste por última vez.

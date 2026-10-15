@@ -1034,7 +1034,7 @@ function dibujarLienzo(){
     if(aplica){
       nieblaFantasmas.forEach((f, id) => {
         const t = tokens.get(id);
-        if(!t || nieblaVista.has(nbPack(t.col, t.fila))) return;
+        if(!t || nieblaVista.has(nbPack(t.col, t.fila)) || oidoPorJugadores(t)) return;
         dibujarFantasma(f.col, f.fila, t.color, z);
       });
     }

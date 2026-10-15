@@ -48,6 +48,12 @@ const VISION_CUNA_CIEGA = 60;   // grados a cada lado de "atrás" que no se ven 
 let nieblaActiva = false;
 let nieblaDescubierta = new Set();   // claves empaquetadas (col, fila)
 let nieblaVista = new Set();         // lo que ven ahora los personajes jugadores
+/* 👂 El oído (2026-10-15, regla del dueño): «si alguien se acerca por la espalda, el personaje lo escucha». Un rival a OIDO_RADIO casilleros o
+   menos de un personaje se ve aunque esté en su punto ciego (o fuera de su visión por la luz), salvo que esté en sigilo (eso lo maneja el sigilo)
+   o tenga pasos silenciosos (`pasosSilenciosos`: un «sigilo suave» que dan las habilidades). Las paredes y los Sólidos tapan. Solo deja ver al
+   token: no descubre la niebla del terreno. */
+const OIDO_RADIO = 3;
+let nieblaOida = new Set();          // las casillas que oyen ahora los personajes jugadores
 let nieblaFirma = '';                // para recalcular solo cuando algo se movió
 let nieblaFantasmas = new Map();     // tokenId -> {col, fila}: última posición vista
 let nieblaComoJugador = false;       // solo GM, por navegador
@@ -74,6 +80,13 @@ function enSigilo(t){
   // Marcado (2026-10-05): no puede estar en sigilo (la marca se lo saca; esto cubre el ratito hasta que se guarda).
   return e.estados.some(s => nom(s) === 'sigilo') && !e.estados.some(s => s && s.activo !== false && (s.marcado || nom(s) === 'marcado'));
 }
+// 👂 Pasos silenciosos (2026-10-15): un estado con `pasosSilenciosos` (o que se llama así) no se oye al acercarse por la espalda.
+function pasosSilenciosos(t){
+  const e = estadoDe(t);
+  return !!(e && e.estados.some(s => s && s.activo !== false && (s.pasosSilenciosos || String(s.nombre || '').trim().toLowerCase() === 'pasos silenciosos')));
+}
+// ¿Lo oyen los personajes? (está a OIDO_RADIO o menos de alguno, sin una pared en el medio, y no camina en silencio).
+const oidoPorJugadores = t => !!t && nieblaOida.has(nbPack(t.col, t.fila)) && !pasosSilenciosos(t);
 // Marcado (2026-10-05, Varita del rastreador y de la luz): brilla y se lo ve también a través de la niebla.
 function marcado(t){
   const e = estadoDe(t);

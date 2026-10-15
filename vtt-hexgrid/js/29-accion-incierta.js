@@ -17,7 +17,7 @@ function visibleParaJugadores(t){
   if(typeof marcado === 'function' && marcado(t)) return true;
   if(t.tipo === 'creep' && enSigilo(t)) return false;
   if(!nieblaActiva) return true;
-  return nieblaVista.has(nbPack(t.col, t.fila));
+  return nieblaVista.has(nbPack(t.col, t.fila)) || oidoPorJugadores(t);   // o lo oyen (el punto ciego, 2026-10-15)
 }
 // ¿Los jugadores saben que existe? (revelado alguna vez, o a la vista ahora).
 function creepConocido(t){

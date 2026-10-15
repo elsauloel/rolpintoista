@@ -334,7 +334,7 @@ function cambiarMapaMostrado(nuevoId){
   trazos.clear(); trazoSeleccionado = null;
   elementos.clear(); elementoSeleccionado = null;
   pings.clear();
-  nieblaActiva = false; nieblaDescubierta = new Set(); nieblaVista = new Set(); nieblaFirma = ''; nieblaFantasmas.clear(); nieblaPendientes.clear();
+  nieblaActiva = false; nieblaDescubierta = new Set(); nieblaVista = new Set(); nieblaOida = new Set(); nieblaFirma = ''; nieblaFantasmas.clear(); nieblaPendientes.clear();
   giroLibre.clear();
   fondoPos = null; fondoImagen = ''; componerFondo();
   modoMapa = 'narrativo';

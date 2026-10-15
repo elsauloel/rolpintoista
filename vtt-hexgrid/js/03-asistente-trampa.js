@@ -385,7 +385,7 @@ function tokenVisiblePorNiebla(t){
   if(!soyGM && t.tipo === 'creep' && enSigilo(t) && !reveladaCasilla(t)) return false;   // creep en sigilo: los jugadores no lo ven (salvo que un aliado vea lo oculto ahí)
   if(soyGM && !ojoRevelando && t.tipo === 'pj' && enSigilo(t)) return false;   // personaje en sigilo: el GM no lo ve sin el 👁
   if(!nieblaAplica() || t.tipo === 'pj') return true;
-  return nieblaVista.has(nbPack(t.col, t.fila));
+  return nieblaVista.has(nbPack(t.col, t.fila)) || oidoPorJugadores(t);   // o lo oyen (el punto ciego, 2026-10-15)
 }
 
 // Casillas (offsets en cubo) que ve un token según hacia dónde mira:
@@ -524,7 +524,7 @@ function daVision(t){
 // se movió, y suma lo nuevo a lo descubierto. Se llama al empezar a dibujar.
 function nieblaActualizar(){
   if(!nieblaActiva){
-    if(nieblaVista.size || nieblaFantasmas.size || nieblaFirma){ nieblaVista = new Set(); nieblaFantasmas.clear(); nieblaFirma = ''; }
+    if(nieblaVista.size || nieblaFantasmas.size || nieblaFirma){ nieblaVista = new Set(); nieblaOida = new Set(); nieblaFantasmas.clear(); nieblaFirma = ''; }
     return;
   }
   const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${t.tipo},${enSigilo(t) ? 1 : 0},${daVision(t) ? radioVisionDe(t) + '/' + luzPortadaDe(t) : 0}`).join('|') + '#' + solidosFirma() + '#' + nieblaSet().size;
@@ -540,10 +540,22 @@ function nieblaActualizar(){
     });
   });
   nieblaVista = vista;
-  // Última posición vista de lo que no es aliado: se anota mientras se ve.
+  // 👂 Lo que se oye (2026-10-15): la flor de OIDO_RADIO alrededor de cada uno, para todos lados; las paredes y los Sólidos tapan.
+  const oida = new Set(), solidosO = solidosSet(), paredesO = hayParedes();
+  tokens.forEach(t => {
+    if(!daVision(t)) return;
+    const c0 = hexACubo({col: t.col, fila: t.fila}), origen = {col: t.col, fila: t.fila};
+    celdasDisco(OIDO_RADIO).forEach(o => {
+      const col = cuboACol(c0.q + o.dq, c0.r + o.dr), fila = cuboAFila(c0.q + o.dq, c0.r + o.dr);
+      if((solidosO.size || paredesO) && !lineaLibre(origen, {col, fila}, solidosO, !paredesO)) return;
+      oida.add(nbPack(col, fila));
+    });
+  });
+  nieblaOida = oida;
+  // Última posición vista de lo que no es aliado: se anota mientras se ve (o se oye).
   tokens.forEach((t, id) => {
     if(t.tipo === 'pj' || t.oculto || enSigilo(t)) return;   // en sigilo no se sigue su rastro
-    if(vista.has(nbPack(t.col, t.fila))) nieblaFantasmas.set(id, {col: t.col, fila: t.fila});
+    if(vista.has(nbPack(t.col, t.fila)) || oidoPorJugadores(t)) nieblaFantasmas.set(id, {col: t.col, fila: t.fila});
   });
   nieblaFantasmas.forEach((f, id) => {
     const t = tokens.get(id);

@@ -1002,3 +1002,9 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   personaje se tira sola con su valor publicado, y nada va a la Mesa ni a la Crónica pública. Falta decidir: (a) si sale bien, ¿el robado se entera
   en el momento («te falta algo del cinturón»), recién al buscarlo, o nunca hasta que mire? (b) si sale mal, ¿lo pillan (queda revelado y se anuncia
   «juan pilló a X metiéndole la mano»)? Sin sigilo, el robo sigue siendo un duelo a la vista.
+- **P200. Pasos silenciosos: cómo se consiguen — 2026-10-15.** Regla nueva (dueño, el mismo día, hecha): **el oído** — un rival a 3 casilleros
+  o menos de un personaje se ve aunque esté en su punto ciego (salvo en sigilo; las paredes y los Sólidos tapan; no descubre el terreno;
+  `OIDO_RADIO`, vtt-hexgrid/js/02–03). La excepción, en palabras del dueño: «ahí ya podemos jugar con habilidades, pasos silenciosos, sin que
+  sea necesariamente sigilo, como un sigilo soft». El mapa ya la respeta: un estado con `pasosSilenciosos` (o llamado «Pasos silenciosos»)
+  no se oye. Falta decidir quién lo tiene y cómo: ¿una pasiva (para personajes y creeps), un estado que da una habilidad (cuántos turnos,
+  cuánto cuesta), o algo propio de ciertos creeps (lobos, felinos, goblins exploradores)? ¿Pisar ciertos terrenos (hojas secas, agua) lo anula?

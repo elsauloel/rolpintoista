@@ -98,6 +98,13 @@ const CreepLupa = (() => {
     return `<div class="hint" style="margin-bottom:6px;color:#e0a040"><b>${PARA_TXT.jugador}</b> — es una habilidad de jugador: paga con SP, que un creep no tiene. Revisale el costo y, si hace falta, ponele cooldown.</div>`;
   }
 
+  // Lo que hace arriba y lo técnico (⚙ / ✋) aparte, en «Detalles técnicos» (2026-10-15, dueño: «está mezclada la info de lo que hace con lo
+  // técnico»): la misma pieza que el «Ver» de un ítem o de una habilidad de personaje (ItemCorto.verHtml). La usa también inv-lupa.js.
+  function detalleHab(h, vacio){
+    if(!h.detalle) return `<div>${esc(vacio)}</div>`;
+    if(typeof ItemCorto !== 'undefined') return ItemCorto.verHtml(h);
+    return `<div>${typeof Glosario !== 'undefined' ? Glosario.marcar(h.detalle) : esc(h.detalle)}</div>`;
+  }
   function verHab(sc, h){
     const costo = K.costoNitrosHab(sc, h);
     const costoTxt = K.costoHabTxt(sc, h);
@@ -105,7 +112,7 @@ const CreepLupa = (() => {
     return {titulo: h.nombre || 'Sin nombre', html: `
     ${paraHtml(h)}
     <div class="hint" style="margin-bottom:10px">${esc(costoTxt)} · ${esc(cdTxt)}</div>
-    <div>${h.detalle ? (typeof Glosario !== 'undefined' ? Glosario.marcar(h.detalle) : esc(h.detalle)) : 'Sin detalle cargado — tocá ✎ en la habilidad para escribir uno.'}</div>`};
+    ${detalleHab(h, 'Sin detalle cargado — tocá ✎ en la habilidad para escribir uno.')}`};
   }
 
   /* ---------- El «Ver» de un creep entero (2026-10-02, hoja de ruta A6a) ----------
@@ -235,5 +242,5 @@ const CreepLupa = (() => {
   `};
   }
 
-  return {contenido, verHab, paraHtml, stat, derivadosHtml, recompensasVerHtml, verCreep, verItem};
+  return {contenido, verHab, detalleHab, paraHtml, stat, derivadosHtml, recompensasVerHtml, verCreep, verItem};
 })();

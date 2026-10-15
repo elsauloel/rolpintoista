@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-10-15T11:34:11Z",
+ "actualizado": "2026-10-15T11:47:54Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -2062,7 +2062,25 @@
    ],
    "estado": "pendiente",
    "capitulo": "gm",
-   "cuerpo": "Una guía rápida para preparar una pelea:\n\n1. **Elegí el escenario** y armá el [[El mapa|mapa]] con [[Terreno y dibujo|obstáculos]] y, si querés, un fondo.\n2. **Sumá creeps** desde el [[Catálogo de creeps]] o creá los tuyos. Para una pelea \"normal\", suele andar **uno o dos por jugador, del nivel del grupo** o uno menos.\n3. **Ponelos en el mapa** (vinculados a su creep) y decidí cuáles empiezan **ocultos** ([[Ocultar y revelar]]).\n4. Cuando empiece: pasá a **[[Modo narrativo y modo combate|modo combate]]**, tirá [[Iniciativa]] para todos (\"Traer tokens\" en el orden de turnos).\n5. En tu turno con un creep: **⚡ Acciones**. Al terminar, **▶ Siguiente**. Después de cada ronda: **[[Mantenimiento]]**.\n6. Al terminar, volvé a narrativo y repartí el botín, los [[Despojos|despojos]] y la experiencia.\n\n> [!question] Cómo medir la dificultad\n> No hay todavía una guía de **balance**: cuántos creeps de qué nivel para un grupo de N personajes de nivel X. Es material para armar con la experiencia de las primeras sesiones."
+   "cuerpo": "Una guía rápida para preparar una pelea:\n\n1. **Elegí el escenario** y armá el [[El mapa|mapa]] con [[Terreno y dibujo|obstáculos]] y, si querés, un fondo.\n2. **Sumá creeps** desde el [[Catálogo de creeps]] o creá los tuyos. Para una pelea \"normal\", suele andar **uno o dos por jugador, del nivel del grupo** o uno menos.\n3. **Ponelos en el mapa** (vinculados a su creep) y decidí cuáles empiezan **ocultos** ([[Ocultar y revelar]]).\n4. Cuando empiece: pasá a **[[Modo narrativo y modo combate|modo combate]]**, tirá [[Iniciativa]] para todos (\"Traer tokens\" en el orden de turnos).\n5. En tu turno con un creep: **⚡ Acciones**. Al terminar, **▶ Siguiente**. Después de cada ronda: **[[Mantenimiento]]**.\n6. Al terminar, volvé a narrativo y repartí el botín, los [[Despojos|despojos]] y la experiencia.\n\n> [!tip] Para que la pelea sea interesante\n> Creeps que entren por un costado, algo de daño mágico para el tanque, variedad de roles… Ver [[Tips para el GM]].\n\n> [!question] Cómo medir la dificultad\n> No hay todavía una guía de **balance**: cuántos creeps de qué nivel para un grupo de N personajes de nivel X. Es material para armar con la experiencia de las primeras sesiones."
+  },
+  {
+   "id": "tips-para-el-gm",
+   "titulo": "Tips para el GM",
+   "alias": [
+    "Consejos para el GM",
+    "Estrategia del GM",
+    "Tips de GM",
+    "Cómo hacer una buena pelea"
+   ],
+   "tags": [
+    "gm",
+    "guía",
+    "combate"
+   ],
+   "estado": "borrador",
+   "capitulo": "gm",
+   "cuerpo": "Notas de estrategia para que las peleas sean interesantes. Salen de jugar (las primeras las dictó el dueño, 2026-10-15) y se van sumando. Como todo en el Rol Pintoísta, son **sugerencias**, no reglas ([[La esencia del Rol Pintoísta]]).\n\n## Que el combate tenga ángulos\n- **Casi nunca dos filas enfrentadas**, los creeps de un lado y los jugadores del otro. Es la pelea más aburrida que hay: todos avanzan, chocan en el medio y se pegan hasta que alguien cae.\n- **Por lo menos un lateral.** Los creeps poco inteligentes atacan **lo primero que ven**: si todos vienen por el frente, el tanque se vuelve un **embudo** que se come todos los golpes y el resto del grupo no tiene de qué preocuparse. Uno que entre por un costado (o por atrás) obliga a todos a mirar alrededor.\n- **Usá el mapa:** creeps que arrancan [[Ocultar y revelar|ocultos]] y aparecen a mitad de la pelea, alguno en [[Sigilo]], paredes y sólidos que cortan la línea de visión, niebla, luz, [[Trampas|trampas]] puestas de antemano.\n\n## Que el tanque también sufra\n- **Siempre algo de daño mágico** (especial): la Defensa física no lo frena, así que es lo que le hace caber **daño y control** al tanque. Sin eso, el que tiene mucha Defensa es invulnerable y la pelea pierde tensión.\n- Otras respuestas al tanque: **Armadura rota**, **Demora**, armas que perforan, ataques que lo saltean y van directo a los de atrás.\n\n## Las apuestas se cobran\n- Si un jugador elige ir **full ofensivo y nada defensivo** (un *glass cannon*: mucho daño, poca vida o poca Defensa), es una **apuesta que hace a sabiendas**. No te frenes de **explotar esa vulnerabilidad**: es jugar con las reglas del juego, y la apuesta pierde la gracia si nunca se cobra.\n- Ejemplo: un personaje así siempre tendría que tener **por lo menos un creep que aparezca por el lateral y le dispare a distancia**, para que su decisión tenga peso.\n- **Explotar no es ensañarse:** mirá cuánto daño pueden hacer los creeps en una ronda contra la vida del más frágil. Que sienta el peligro, pero que **un mal turno no lo mate sin chance** de reaccionar.\n\n## Variedad\n- **Que cada creep haga algo distinto**: uno rompe armadura, otro demora, otro ciega, otro cura a los suyos. Cinco creeps iguales que pegan igual cansan rápido.\n- **Mezclá roles**: alguien al frente que aguante o controle, alguien que presione al más débil, alguien de apoyo (buffs a los suyos, debuffs a los otros), alguien **a distancia** que obligue a correr, y en los encuentros importantes un **jefe** con una mecánica que haga girar la pelea.\n- **Cada fortaleza del grupo, una respuesta; cada debilidad, una amenaza.** Mirá al grupo antes de armar el encuentro (GM Tools → 🔎 Escanear grupo).\n\n## Que cada creep pelee como lo que es\n- Una bestia o un goblin cualquiera va contra **lo primero que ve**; un ocultista o un jefe listo busca al que **está solo, herido o sin defensa**.\n- Eso también es una herramienta: los tontos se pueden engañar (el tanque los atrae), los listos castigan al que se descuida.\n\n## El ritmo\n- En un dungeon, los encuentros **escalan**: el primero **presenta** la mecánica del lugar, el segundo **la combina** con otra, el último es el **jefe**.\n- **Entre peleas, respiros**: curarse, encontrar una luz o un consumible, una pista de lo que viene.\n- Si una regla traba la mesa, **decidí y seguí**; se discute después. Las herramientas ayudan a recordar, no obligan.\n\n> [!info] Para preparar el encuentro paso a paso\n> Ver [[Cómo armar un encuentro]]."
   },
   {
    "id": "generador-de-tiendas",

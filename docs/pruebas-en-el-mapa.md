@@ -9,9 +9,6 @@
 > capturas. Al probar algo: pasarlo a «Probado» con fecha, qué se vio y si hubo que arreglar algo.
 
 ## Pendientes
-- [ ] **🌲 Bosque, combinaciones nuevas** (2026-10-14, cargadas sin probar porque la sesión del dueño empezaba): la Lluvia de piedras del hondero
-  (área a distancia con la honda, PdG contra Evasión, daño físico menos la Defensa); el Aullido de la manada (onda de aliados con Acelerado); los
-  Grilletes de sombra del ocultista (dirigida PdG.Esp contra Res.Esp → Inmovilizado); No siente el dolor (aliado con alcance 0 = solo él).
 - [ ] **🔎 Escanear grupo → 🤖 Proponer creeps** (2026-10-09): la respuesta de la IA (usa la clave de OpenRouter del dueño).
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no
@@ -41,6 +38,10 @@
 - [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): un crítico de la Puñalada (Rengo 2 y Lisiado 1). El pozo visto como jugador ya se vio (con
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **🌲 Bosque, combinaciones nuevas** (2026-10-14, Claude · pruebas, creep «Bosque (prueba)» con las cuatro): **No siente el dolor** → elegís
+  objetivo, clic en sí mismo → Endurecido aplicado; **Aullido de la manada** → solo a los aliados a 3 (un Escarabajo y el Ladrón, de a uno), Acelerado
+  1 turno, juan no; **Grilletes de sombra** → PdG.Esp 9 contra Res.Esp 1 → Inmovilizado 1 turno «le llegó a su ficha»; **Lluvia de piedras** → clic
+  en el centro, PdG contra Eva, «Tirar el daño · 1d4+1 · se le resta la Defensa», 3 − 0. Ojo: con la honda (Tipo 10) cada ataque cuesta 5 No2.
 - [x] **🫳 Robo en sigilo, en secreto + Marcado al perder el sigilo** (2026-10-14, GM rolpintoista + juan de elsaulo, las dos ventanas a la vista):
   ladrón en sigilo → Bolsillo ajeno → sin duelo ni Mesa; el GM ve «Robo en secreto» con su Sigilo (8, con +2); juan ve «🤨 ¿Sentiste un movimiento
   raro? juan, tirá Percepción». 1.ª vez: 9 contra 8 → «¡Lo pescaste! …» y en la Crónica «¡juan pescó a Ladrón (prueba) metiendo mano en su

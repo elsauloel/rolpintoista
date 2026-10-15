@@ -77,6 +77,7 @@ function rayoMomento(id, d){
 }
 const caosHechos = new Set();
 function momentoRecibido(id, d){
+  if(d.tipo === 'robo-pedido'){ if(typeof roboMomento === 'function') roboMomento(id, d); return; }   // 🫳 el robo en sigilo (js/47): solo la víctima y el GM
   if(d.tipo === 'rayo' && d.datos && Array.isArray(d.datos.saltos)) rayoMomento(id, d);
   if(d.tipo === 'confusion') confusionMomento(d);   // la tirada de Confusión del turno (js/20)
   oporMomento(id, d);   // el ataque de oportunidad: la pregunta a quien decide y la respuesta a quien se aleja (js/17)

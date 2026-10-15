@@ -354,6 +354,7 @@ const CreepAcciones = (() => {
     else if(esZona){ ui.mesaHabilidad(sc, h); if(!ui.colocarZona(sc, h)) ui.toast(`${h.nombre}: para colocar la zona hace falta ejecutarla desde el mapa (⚔ Acciones)`); }
     // Con tirada, la descripción viaja con ella (una sola línea en la Mesa).
     else if(habTira(h) && !hDuelo) ui.mesaConTexto(C().habTextoMesa(h));
+    else if(hDuelo && roboEnSigilo(sc, h)){ /* 🫳 un robo en sigilo no se anuncia (2026-10-14, dueño; vtt-hexgrid/js/47) */ }
     else ui.mesaHabilidad(sc, h);
     if(esArma){ /* ya fue al duelo */ }
     else if(hDuelo) ui.lanzarDuelo(sc, h, hDuelo);
@@ -366,6 +367,12 @@ const CreepAcciones = (() => {
     if(h.cd > 0) partes.push(`cooldown ${fmt(num(h.cd))} turno(s)`);
     if(efecto) partes.push(`${efecto.nombre} (${fmt(efecto.turnos)}t)`);
     ui.toast(`${h.nombre||'Habilidad'} ${partes.join(' · ')}`);
+  }
+  // 🫳 ¿Es un robo (efecto «Robo» en su Ejecución) y el creep está en sigilo? Entonces es secreto: ni la Mesa ni el duelo a la vista.
+  function roboEnSigilo(sc, h){
+    const ef = (h && h.duelo && h.duelo.efectos) || [];
+    return ef.some(e => e && /^robo$/i.test(String(e.nombre || '').trim()))
+      && (sc.estados || []).some(e => e && e.activo !== false && /^sigilo$/i.test(String(e.nombre || '').trim()));
   }
   // La primera tirada (Ejecutar): el stat vinculado o, si no tiene, la fórmula. null si no tira nada.
   function tiradaPrimeraHab(sc, h){

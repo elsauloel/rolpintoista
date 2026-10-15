@@ -490,6 +490,7 @@ async function turnoDeToken(tokenId, clave, inicio){
     expl.forEach(ex => explotarAlTerminar(t, ex));   // 💥 un estado que explota al terminar (Armadura arcana)
     if(r && r.rep.length) FichaMantenimiento.publicarReporte(inicio ? 'Empieza su turno' : 'Termina su turno', r.rep, r.nombre);
     if(r && r.avisos && r.avisos.length) FichaMantenimiento.publicarRecordatorios(r.avisos, r.nombre);
+    if(r && r.robos && typeof roboAvisoNotado === 'function') roboAvisoNotado(fichaId, r.robos);   // 🫳 lo que le robaron en sigilo (js/47)
     return r ? publicas(r.rep) : [];
   }catch(err){
     console.error(`No se pudo aplicar el ${inicio ? 'inicio' : 'fin'} del turno:`, err);

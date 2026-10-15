@@ -216,6 +216,19 @@ function sigiloPublicarAvisos(id){
     ? '⚠ Hace falta una tirada de percepción'
     : `⚠ Hacen falta ${av.pasos} tiradas de percepción`));
 }
+/* Quien pierde el sigilo queda Marcado 2 turnos (regla del dueño, 2026-10-14: «aunque le dé el cooldown, tenga que estar sí o sí 2 turnos fuera de
+   sigilo»): brilla, se lo ve a través de la niebla y no puede volver a entrar en sigilo (Combatiente.agregarEstado lo rebota). Los cuenta su turno
+   (P177: puesto fuera de su turno, el primer inicio no descuenta). Lo pone la pantalla que rompe el sigilo (el dueño del token o el GM). */
+const SIGILO_MARCA_PERDIDA = 2;
+async function marcarAlPerderSigilo(id){
+  const t = tokens.get(id);
+  if(!t || !t.fichaId) return;
+  const spec = {nombre: 'Marcado', turnos: SIGILO_MARCA_PERDIDA, detalle: `Perdió el sigilo: ${SIGILO_MARCA_PERDIDA} turnos a la vista, sin poder volver a esconderse.`};
+  try{
+    if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
+    else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: 'Perdió el sigilo'});
+  }catch(err){ console.error('No se pudo marcar al que perdió el sigilo:', err); toast(`✋ Marcalo a mano: ${nombreDe(t)} perdió el sigilo (Marcado ${SIGILO_MARCA_PERDIDA} turnos)`); }
+}
 async function romperSigilo(id, detector, motivo, sinMomento){   // motivo (opcional): otra causa que no sea que lo detecten (una trampa); sinMomento: ya lo cuenta otro momento (P146)
   const t = tokens.get(id);
   const e = t && estadoDe(t);
@@ -224,6 +237,7 @@ async function romperSigilo(id, detector, motivo, sinMomento){   // motivo (opci
   sigiloRompiendo.add(id);
   try{
     await hudEstadoCambiar(t, idx, 'quitar');
+    await marcarAlPerderSigilo(id);
     sigiloAviso(`🕶 ${nombreDe(t)} perdió el sigilo`, motivo || `Lo detectó ${detector}: entró en su cono de detección`);
     if(!sinMomento) momentoAbrir({tipo: 'sigilo', icono: '🕶', titulo: `¡${nombreDe(t)} quedó al descubierto!`, resultado: motivo || `Lo detectó ${detector}`, estado: 'listo'});   // P146 (js/16)
   }finally{ setTimeout(() => sigiloRompiendo.delete(id), 3000); }

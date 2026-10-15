@@ -135,7 +135,9 @@ const FichaMantenimiento = (() => {
     log.push(`Nitros recargados a ${fmt(num(S.nitros))}.` + (spRegen ? ` SP ${spRecuperado ? `<span class="heal">+${fmt(spRecuperado)}</span>` : '+0'} (SP Regen ${fmt(spRegen)}${spRegen && !spRecuperado ? ', ya estaba lleno' : ''}).` : ''));
     S.log = log;
     const avisos = (S.efectos || []).filter(e => e.popup && e.activo !== false);
-    return {rep, avisos, spRegen, spRecuperado};
+    const robos = robosNotar(S);   // 🫳 sin orden de turnos, el ⟳ es su «próximo turno»
+    if(robos.length) rep.push(`🫳 ${robosTexto(robos)}`);
+    return {rep, avisos, spRegen, spRecuperado, ...(robos.length ? {robos} : {})};
   }
 
   /* El TURNO PROPIO de un personaje (o de una invocación suya, `invId`) en el orden de turnos (2026-10-06, P161, turno completo).
@@ -179,8 +181,17 @@ const FichaMantenimiento = (() => {
     S.ataquesArma = {};
     rep.push(`No2 recargados a ${fmt(num(S.nitros))}${num(S.nitros) < FichaBotonera.nitrosMaximo(S) && deudaAntes < 0 ? ` (se descontó la deuda de ${fmt(-deudaAntes)})` : ''}`);
     (S.invocaciones || []).forEach(inv => { if(inv && inv.activa !== false && !sin.has(inv.id)){ inv.finTurnoEn = turno; invInicio(inv).forEach(l => rep.push(`${inv.nombre}: ${l}`)); } });
-    return {rep, nombre: ((S.meta && S.meta.nombre) || '').trim(), avisos: (S.efectos || []).filter(e => e.popup && e.activo !== false)};
+    const robos = robosNotar(S);
+    return {rep, nombre: ((S.meta && S.meta.nombre) || '').trim(), avisos: (S.efectos || []).filter(e => e.popup && e.activo !== false), ...(robos.length ? {robos} : {})};
   }
+  // 🫳 Lo que le robaron en sigilo (2026-10-14, dueño): «al principio de su próximo turno siente el cinturón más liviano y se da cuenta de que le
+  // falta tal objeto». Devuelve los nombres y los saca de la lista.
+  function robosNotar(S){
+    const l = Array.isArray(S.robosSinNotar) ? S.robosSinNotar.filter(Boolean) : [];
+    if(l.length) S.robosSinNotar = [];   // vacío, no borrado: así la parte «otros» de las otras pantallas también lo vacía
+    return l;
+  }
+  const robosTexto = l => `Sentís el cinturón más liviano… y te das cuenta de que te falta: ${l.join(', ')}.`;
   function finTurno(S, ui, clave, invId, conTurno, numero){
     const turno = num(numero), sin = new Set(conTurno || []);
     if(invId){
@@ -265,5 +276,5 @@ const FichaMantenimiento = (() => {
     if(caido) lineas.push('sigue caído (descansar no lo levanta)');
     return lineas;
   }
-  return {terminaAlPasarDia, descansar, MAX_SEGUIDOS, aplicar, inicioTurno, finTurno, reclamar, publicarReporte, publicarRecordatorios};
+  return {terminaAlPasarDia, descansar, MAX_SEGUIDOS, aplicar, inicioTurno, finTurno, reclamar, publicarReporte, publicarRecordatorios, robosTexto};
 })();

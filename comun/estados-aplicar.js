@@ -33,6 +33,7 @@ const EstadosAplicar = (() => {
     if(s.detalle) out.detalle = String(s.detalle).slice(0, 200);
     if(s.polaridad) out.polaridad = s.polaridad;
     if(s.item) out.item = String(s.item).slice(0, 64);   // el ítem al que se le da el desgaste (nombre: 'Desgaste')
+    if(s.secreto) out.secreto = true;   // 🫳 un robo en sigilo (2026-10-14): se descuenta callado y se avisa al empezar su turno
     if(s.stacks) out.stacks = Math.max(1, Math.min(20, Math.round(Number(s.stacks) || 1)));
     // Vida extra (2026-09-28): HP de una barra secundaria que absorbe daño antes que el HP real —
     // ver BUFFS. Un valor explícito manda sobre el del preset (se resuelve en `componer`).

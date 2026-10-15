@@ -955,9 +955,11 @@ const FichaAcciones = (() => {
     // 🫳 «Robo» (2026-10-14, vtt-hexgrid/js/47): un ladrón se llevó una unidad de este ítem del cinturón.
     if(spec.nombre === 'Robo'){
       const it = (S.cinturon || []).find(x => x && x.nombre === spec.item && num(x.unidades) > 0 && !x.reservado);
-      if(!it){ ui.toast(`🫳 ${origen ? origen + ' ' : ''}intentó robarte ${spec.item || 'algo'}, pero ya no lo tenías`); return; }
+      if(!it){ if(!spec.secreto) ui.toast(`🫳 ${origen ? origen + ' ' : ''}intentó robarte ${spec.item || 'algo'}, pero ya no lo tenías`); return; }
       it.unidades = num(it.unidades) - 1;
       if(it.unidades <= 0) S.cinturon = S.cinturon.filter(x => x !== it);
+      // En sigilo (2026-10-14, dueño): sin aviso; se da cuenta al empezar su próximo turno (FichaMantenimiento: `robosSinNotar`).
+      if(spec.secreto){ S.robosSinNotar = [...(Array.isArray(S.robosSinNotar) ? S.robosSinNotar : []), String(spec.item || 'algo')].slice(-10); ui.cambio(['cinturon', 'refresh']); return; }
       ui.cambio(['cinturon', 'refresh']);
       ui.toast(`🫳 ${origen || 'Alguien'} te robó: ${spec.item}`);
       return;

@@ -95,7 +95,7 @@ onda de aliados, aliado, dirigida, trampa); las combinaciones nuevas, en `prueba
 | Encuentro | Creep | Qué hace |
 |---|---|---|
 | 1 | Goblin arquero (nv 1) | Arco de rama, Chaleco, Capucha de emboscada. **Flecha a la rodilla** (Rengo 1t, cd 2) y **Tiro certero** (+2 PdG, +1 Crítico frecuente; lenta cd 3) |
-| 1 | Goblin trampero (nv 1) | Cuchillo dentado, Chaleco, Botas de suela de goma. **Trampa de red** (la del chamán) y **Tajo al tendón** (Lisiado 1t, cd 3) |
+| 1 | Goblin trampero (nv 1) | Cuchillo dentado, Chaleco, Botas de suela de goma. **Trampa de red** (2026-10-15, dueño: la tira hasta 3 casilleros, se detecta con Percepción contra su Destreza y uno se suelta con Fuerza contra su Fuerza, 1 No2) y **Tajo al tendón** (Lisiado 1t, cd 3) |
 | 2 | Lobo gris (3) | Igual a los otros lobos |
 | 2 | Goblin domador (nv 1) | Rebenque emplomado (1d10+6), Chaleco, Casco de cuero endurecido. **¡Azuzar!** (Crítico potente a un aliado a 4) y **Chasquido** (Miedo 1t; lenta cd 3) |
 | 3 | Goblin arquero del claro (nv 1) | Arco del monte, Chaleco, Capucha de lana cruda. **Flecha untada** (Veneno ×2, cd 2) y **Tiro certero** |
@@ -120,3 +120,11 @@ al ocultista (GM Tools → Recompensas).
 | Chamán goblin | ✅ (encuentro 2) |
 | Goblin jinete de lobo | ✅ (encuentro 2) |
 | El ocultista (jefe) + Goblin marcado ×2 | ✅ (encuentro 3) |
+
+## Auditoría de habilidades con el dueño (2026-10-15, simuladas contra Petro, Larry y Bizzante, sin combates)
+De a una, de nivel más bajo a más alto; la simulación usa las fichas reales y las reglas del duelo.
+- Goblin de choque · **Ensartar y sostener**: + Perfora 2 (a Petro le saca 2 por golpe en vez de 0). **Pared de escudos**: queda igual.
+- Goblin arquero · **Flecha a la rodilla**: +1 PdG (de 1d10+1 a 1d12: casi igual, un poco más de crítico; el dueño puede pasarla a +2). **Tiro certero**: igual.
+- Goblin trampero · **Trampa de red**: hasta 3 casilleros (el GM elige la casilla), detectable y con soltarse (Fuerza contra la Fuerza del trampero, 1 No2: Petro 62 %, Bizzante 33 %, Larry 0 %).
+- **Encontrado de paso:** las fichas de Petro, Larry y Bizzante calculan el Crítico frecuente con la Destreza (`formulas.crit = 'des'`, quedó de antes del 2026-09-25): les da 8 y el crítico salta con 2 de diferencia. Pregunta al dueño: ¿migrar a 0?
+

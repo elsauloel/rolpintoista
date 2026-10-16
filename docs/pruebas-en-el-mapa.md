@@ -44,6 +44,7 @@
 - [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): un crítico de la Puñalada (Rengo 2 y Lisiado 1). El pozo visto como jugador ya se vio (con
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [ ] **¡Tu vieeeja! (provocación de creep) y Tapa de barril** (2026-10-16, Kobold escudero de barril de El origen; no se prueba ahí, hace falta una copia en una partida de prueba): que la Botonera resalte a 3 casilleros, tire Fuerza contra Res.Esp y ponga Provocado 2 turnos; que la Tapa sume +3 Defensa, +3 Armadura mágica y +1 de resistencia a crítico por 1 turno.
 - [x] **📣 Llamar refuerzos** (2026-10-16, «Test con claude elsaulo», GM): una copia de la Rata de alcantarilla con «Plaga en la galería»
   (`refuerzos: {cant: 2}`) → Acciones → Ejecutar: cobra 2 No2 y el cooldown, la Mesa la anuncia, aparece «elegí dónde aparece (1 de 2)», dos
   clics → dos «Rata de prueba (refuerzo)» en esas casillas, 30/30, No2 llenos, sin la Plaga, en el orden de turnos detrás de la que chilló.

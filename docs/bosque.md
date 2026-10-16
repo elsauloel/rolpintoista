@@ -166,3 +166,7 @@ De a uno, de nivel más bajo a más alto; primero el ataque básico y después c
 - Kobold rabioso ×2 (`7f4m19f`, `6piufzf`): **Furia** +1 PdG y +2 de daño, 2 turnos, cooldown 3, lenta. El pico oxidado: Envenenar 50 % ×2.
 - Rata de alcantarilla ×2 (`7yfjk9q`, `bohj2rz`): el mordisco perfora 1. **Plaga en la galería** automática: 📣 llama 2 ratas (el GM elige en el mapa dónde aparece cada una);
   solo con menos del 50 % de la vida (si tiene más, avisa y pregunta). Sin lenta y sin cooldown (dueño: la condición de la vida ya la frena; solo la limitan los 2 No2).
+- Kobold escudero de barril (`8ah2r2u`): Destreza 3 → 6 (PdG 1d6) y el palo con clavos perfora 1. **Tapa de barril**: +3 Defensa, +3 Armadura mágica y +1 de resistencia a todos los críticos hasta su próximo turno.
+  **Bien agachado** (Blindado, casi no hacía nada) → **¡Tu vieeeja!**: Fuerza contra Res.Esp a 3 casilleros, Provocado 2 turnos (1 No2, cooldown 3; 81 % contra Larry, 75 % Bizzante, 62 % Petro).
+- Cerrados (sin «(auditar)» en el nombre; las copias se llaman «(2)») y sus 8 habilidades subidas a la biblioteca como auditadas (etiqueta «minas»).
+- El cooldown empieza a contar al usar la habilidad, no cuando termina el efecto: la Furia (2 turnos, cooldown 3) queda 1 turno sin furia y vuelve.

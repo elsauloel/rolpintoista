@@ -126,5 +126,14 @@ De a una, de nivel más bajo a más alto; la simulación usa las fichas reales y
 - Goblin de choque · **Ensartar y sostener**: + Perfora 2 (a Petro le saca 2 por golpe en vez de 0). **Pared de escudos**: queda igual.
 - Goblin arquero · **Flecha a la rodilla**: +1 PdG (de 1d10+1 a 1d12: casi igual, un poco más de crítico; el dueño puede pasarla a +2). **Tiro certero**: igual.
 - Goblin trampero · **Trampa de red**: hasta 3 casilleros (el GM elige la casilla), detectable y con soltarse (Fuerza contra la Fuerza del trampero, 1 No2: Petro 62 %, Bizzante 33 %, Larry 0 %).
+- Goblin trampero · **Tajo al tendón**: +1d4 de daño (el Lisiado necesita que el golpe haga daño; el cuchillo perfora 1, así que siempre lo hace).
+- Goblin domador · **¡Azuzar!**: el Crítico potente no hacía nada (ningún aliado llega al crítico contra este grupo) → **Azuzado** (+2 PdG, +2 daño, 2 turnos) a un aliado a 4. **Chasquido**: igual.
+- Goblin marcado ×2 · **Tajo frenético**: igual. **No siente el dolor**: de Endurecido a **Vida extra 10, 2 turnos** (absorbe de cualquier fuente).
+- Goblin arquero del claro · **Flecha untada**: Veneno ×3 (entra aunque la armadura pare la flecha). Tiro certero: igual.
+- Goblin jinete de lobo · **Carga montada**: igual (se probó sin el +1d6 y el dueño la dejó como estaba). **Aullido de la manada**: Acelerado no hacía nada (nadie de la manada dispara) → **Bendecido 2 turnos** a los aliados a 3.
+- Chamán goblin · **Savia que cierra heridas**: de Regeneración (+5 × 3) a una **cura de 2d6**. **Espina de sombra**: igual. **Trampa de red** → **Trampa de sombra**: hasta 3 casilleros, se detecta con Percepción contra su Ef.Esp (12) y uno se suelta con Fuerza contra 6 (1 No2).
+- Goblin portaestandarte · **¡Por el amo!**: ahora lenta (arranca con el cooldown activo). Pared de escudos: igual.
+- El ocultista · **Grilletes de sombra**: + 1d4 de daño arcano. **Marca del amo**: de Crítico frecuente +1 a **+1 PdG y Crítico frecuente +1** (estado «Marca del amo», 2 turnos). **Estallido de sombras**: 2d6+2 (antes 1d6+2).
+- Ojo con las reglas del duelo: **Rengo, Lisiado, Sangrado y Envenenar necesitan que el golpe haga daño** (Lento, Sentado, Miedo, Veneno de una habilidad, no). Por eso la Flecha a la rodilla casi nunca deja Rengo a Petro (8–10 %).
 - **Encontrado de paso:** las fichas de Petro, Larry y Bizzante calculan el Crítico frecuente con la Destreza (`formulas.crit = 'des'`, quedó de antes del 2026-09-25): les da 8 y el crítico salta con 2 de diferencia. Pregunta al dueño: ¿migrar a 0?
 

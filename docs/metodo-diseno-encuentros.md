@@ -62,6 +62,12 @@ Uno por uno, con el dueño (como en la auditoría de skills: el texto original p
 
 ## 7. Probar y anotar
 
+- **Cada creep contra cada personaje** (dueño, 2026-10-16; también en el manual, «Tips para el GM»): el ataque básico y cada habilidad,
+  simulados con las fichas reales y las reglas del duelo (sin combates en la partida real). Se presenta **creep por creep, de nivel más bajo a
+  más alto**, con una tabla por rival (pega, daño por golpe, daño medio por intento, si entra el efecto) y opciones a/b/c; el dueño elige.
+  **Ninguna acción puede quedar en cero contra todos**: que sea mejor contra uno y peor contra otro está bien. Ojo: Rengo, Lisiado, Sangrado y
+  Envenenar necesitan que el golpe haga daño. Hecho así con el Bosque (`bosque.md`, «Auditoría de habilidades»).
+
 - Lo nuevo (una mecánica, una skill automatizada) se prueba en el mapa de **«Claude · pruebas»** con una copia del creep y capturas
   (`docs/pruebas-en-el-mapa.md`); en la partida real no se hacen combates de prueba.
 - Las ideas que aparecen, a `docs/pendientes.md`; las preguntas de diseño, a `docs/preguntas-abiertas.md`.

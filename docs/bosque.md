@@ -159,3 +159,10 @@ historia. El dueño eligió cambiarlas por una frase de ambientación; lo de dis
   de lejos: inmoviliza al que se le acerca, marca a sus goblins y revienta sombras sobre los que se juntan. Tiene la Varita arcana mayor
   (1d8 arcano). Defensa +2 de base: amuletos y vendas rituales (no se sueltan).
 
+
+## Auditoría de los creeps de las minas (kobolds, 2026-10-16, mismo método: simulados contra Petro, Larry y Bizzante)
+De a uno, de nivel más bajo a más alto; primero el ataque básico y después cada habilidad. Formato: ficha completa y el texto de cada habilidad tal cual, antes de los números.
+- Kobold farolero (`35kgm38`): menos Constitución (Destreza 6, Constitución 6, vida 30): se queda lejos. **Aceite hirviendo**: igual (pega fuerte, a propósito: «más tendiendo a lo agresivo»).
+- Kobold rabioso ×2 (`7f4m19f`, `6piufzf`): **Furia** +1 PdG y +2 de daño, 2 turnos, cooldown 3, lenta. El pico oxidado: Envenenar 50 % ×2.
+- Rata de alcantarilla ×2 (`7yfjk9q`, `bohj2rz`): el mordisco perfora 1. **Plaga en la galería** automática: 📣 llama 2 ratas (el GM elige en el mapa dónde aparece cada una);
+  solo con menos del 50 % de la vida (si tiene más, avisa y pregunta). Sin lenta (la condición de la vida ya la frena al principio); después de usarla, cooldown 3.

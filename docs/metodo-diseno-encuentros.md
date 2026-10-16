@@ -65,6 +65,8 @@ Uno por uno, con el dueño (como en la auditoría de skills: el texto original p
 - **Cada creep contra cada personaje** (dueño, 2026-10-16; también en el manual, «Tips para el GM»): el ataque básico y cada habilidad,
   simulados con las fichas reales y las reglas del duelo (sin combates en la partida real). Se presenta **creep por creep, de nivel más bajo a
   más alto**, con una tabla por rival (pega, daño por golpe, daño medio por intento, si entra el efecto) y opciones a/b/c; el dueño elige.
+  **Formato (dueño, 2026-10-16):** primero la **ficha completa** del creep (nivel, vida, atributos, Defensa/Evasión/No2, arma, equipo, nota) y
+  **cada habilidad con su texto tal cual**, costo, cooldown (y si es lenta) y qué hace; recién después la tabla de números y las opciones.
   **Ninguna acción puede quedar en cero contra todos**: que sea mejor contra uno y peor contra otro está bien. Ojo: Rengo, Lisiado, Sangrado y
   Envenenar necesitan que el golpe haga daño. Hecho así con el Bosque (`bosque.md`, «Auditoría de habilidades»).
 

@@ -136,7 +136,7 @@ De a una, de nivel más bajo a más alto; la simulación usa las fichas reales y
 - El ocultista · **Grilletes de sombra**: + 1d4 de daño arcano. **Marca del amo**: de Crítico frecuente +1 a **+1 PdG y Crítico frecuente +1** (estado «Marca del amo», 2 turnos). **Estallido de sombras**: 2d6+2 (antes 1d6+2).
 - **Ataques básicos** (2026-10-16): todos le pegan a Larry y a Bizzante; a Petro (Defensa 12) casi ninguno le hace nada (lo cubren las
   habilidades mágicas y el veneno). Cambios: **Chamán** + **Varita arcana** (1d6 arcano directo, 1 No2: ~2,5 a 2,9 por intento a los tres);
-  **El ocultista** cambia la hoz por una **Daga ritual** propia (Tipo 4, Perfora 1, 25 % de Veneno ×2): poco, pero pincha a todos si lo
+  **El ocultista** cambia la hoz por la **Daga ritual** (nueva en el catálogo, `nuevo-daga-ritual`, Común, 80: Tipo 4, Perfora 1, Veneno ×2 en cada golpe): poco, pero pincha a todos si lo
   acorralan (su ataque de verdad sigue siendo la Varita arcana mayor).
 - Ojo con las reglas del duelo: **Rengo, Lisiado, Sangrado y Envenenar necesitan que el golpe haga daño** (Lento, Sentado, Miedo, Veneno de una habilidad, no). Por eso la Flecha a la rodilla casi nunca deja Rengo a Petro (8–10 %).
 - **Encontrado de paso:** las fichas de Petro, Larry y Bizzante calculan el Crítico frecuente con la Destreza (`formulas.crit = 'des'`, quedó de antes del 2026-09-25): les da 8 y el crítico salta con 2 de diferencia. **Arreglado (dueño, 2026-10-16):** las tres pasaron a `formulas.crit = '0'` (Crítico frecuente 0 + bonos). Estrella y Aurelius (las otras dos fichas de El origen) también tienen `'des'`: sin tocar, a decidir.

@@ -170,4 +170,4 @@ De a uno, de nivel más bajo a más alto; primero el ataque básico y después c
   **Bien agachado** (Blindado, casi no hacía nada) → **¡Tu vieeeja!**: Fuerza contra Res.Esp a 3 casilleros, Provocado 2 turnos (1 No2, cooldown 3; 81 % contra Larry, 75 % Bizzante, 62 % Petro).
 - Cerrados (sin «(auditar)» en el nombre; las copias se llaman «(2)») y sus 8 habilidades subidas a la biblioteca como auditadas (etiqueta «minas»).
 - El cooldown empieza a contar al usar la habilidad, no cuando termina el efecto: la Furia (2 turnos, cooldown 3) queda 1 turno sin furia y vuelve.
-- Kobold hondero (`ja9iyyn`): se queda con la honda; Fuerza 4 → 6, Agilidad 8 → 7, Constitución 6 → 5 (daño 1d10+3: 2,5 por tiro a Bizzante, 4,2 a Larry, casi nada a Petro). Piedrazo a la cabeza y Tiro al pie: igual, subidas a la biblioteca como auditadas.
+- Kobold hondero (`ja9iyyn`): se queda con la honda; Fuerza 4 → 6, Agilidad 8 → 7, Constitución 6 → 5, vida 30 → 25 (daño 1d10+3: 2,5 por tiro a Bizzante, 4,2 a Larry, casi nada a Petro). Piedrazo a la cabeza y Tiro al pie: igual, subidas a la biblioteca como auditadas.

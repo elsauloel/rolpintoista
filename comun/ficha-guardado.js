@@ -275,6 +275,8 @@ const FichaGuardado = (() => {
     migrarEstadoIt2(S, o.spPorBono);
     migrarEstadoEspecial(S);
     migrarTextosFlash(S);
+    // Crítico frecuente (dueño, 2026-10-16): desde el 2026-09-25 es solo un bono (receta '0'); las fichas de antes lo sacaban de la Destreza.
+    if(S.formulas && String(S.formulas.crit).trim() === 'des') S.formulas.crit = '0';
     if(S.nitros === null || S.nitros === undefined){
       const n = FichaCalculo.calcular(S).final.nitros;
       S.nitros = Number.isNaN(n) ? 0 : n;

@@ -1763,6 +1763,12 @@ prueba('⏳ Pasar de día (2026-10-12): descansar llena vida, SP y No2 (no levan
   igual([S.hp === hpmax, S.spGastado, S.nitros === FichaBotonera.nitrosMaximo(S), S.efectos.map(e => e.nombre), S.reparadoTalento, lineas.some(l => /Veneno/.test(l)), C.hp],
     [true, 0, true, ['Sigilo'], 0, true, 0]);
 });
+prueba('Crítico frecuente (2026-10-16): una ficha vieja con la receta «= Destreza» pasa a 0 al cargarla; los bonos se siguen sumando', () => {
+  const S = fichaBotonera({}); S.formulas.crit = 'des';
+  FichaGuardado.completar(S);
+  const T = fichaBotonera({efectos: [{nombre: 'Crítico frecuente', activo: true, turnos: 2, polaridad: 'buff', mods: [{stat: 'crit', val: 1}]}]});
+  igual([S.formulas.crit, FichaCalculo.calcular(S).final.crit, FichaCalculo.calcular(T).final.crit], ['0', 0, 1]);
+});
 prueba('🃏 Wildcards (2026-10-15): el descanso normal da 1 al que no tiene, el reparador deja 2; no se acumulan por encima', () => {
   const d = (w, n) => { const S = fichaBotonera({}); S.meta.wildcards = w; const l = FichaMantenimiento.descansar(S, {wildcards: n}); return [S.meta.wildcards, l.some(x => /wildcard/.test(x))]; };
   const sin = fichaBotonera({}); sin.meta.wildcards = 0; FichaMantenimiento.descansar(sin);

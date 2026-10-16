@@ -732,3 +732,5 @@ body.con-ruta .toast{bottom:auto;top:74px}
 .desplegable-lista .pj-inactivar:hover{border-color:#5fd08a}
 .desplegable-lista .pj-inactivo a{opacity:.5}
 .desplegable-lista .pj-inactivo .pj-nombre{text-decoration:line-through}
+/* La lista de 👥 Personajes se abre hacia la izquierda (2026-10-16): el botón está pegado al borde derecho y los ✓/💤 y ✕ quedaban afuera. */
+#personajes-lista{left:auto;right:0}

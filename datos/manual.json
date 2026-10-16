@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-10-16T16:38:27Z",
+ "actualizado": "2026-10-16T21:05:09Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1303,6 +1303,22 @@
    "estado": "borrador",
    "capitulo": "estados",
    "cuerpo": "**Invulnerable** es un buff: **no recibís daño de ninguna fuente** (golpes, veneno, sangrado…) y no te pueden aplicar ningún debuff.\n\n\n\nParientes más limitados:\n\n- **Blindado:** inmune a [[Golpe crítico|golpes críticos]]. **A mano**: la herramienta solo recuerda que está activo y cuántos turnos dura; el que lleva la mesa anula el crítico.\n\n- **Espinas:** devuelven al atacante **1/4 (25 %) del daño crudo** de cada golpe **cuerpo a cuerpo** (antes de Defensa y escudos, redondeado hacia arriba, directo a la vida). Solo el daño físico. ⚙ El duelo lo aplica solo.\n- **Espejo** (la pareja de las Espinas, 2026-10-07): devuelve al que lo tiró **1/4 del daño especial** que recibís (varita, báculo, habilidad o el daño elemental de un arma), **a cualquier distancia** y también en un área; antes de la Defensa especial, redondeado hacia arriba, directo a la vida. Las zonas que quedan en el piso y los saltos del rayo no cuentan. ⚙ El duelo lo aplica solo.\n\n- **Inmunidad a CC:** inmune a los estados de control: [[Stun]], Exhausto, [[Inmovilizado]], Rengo, Lisiado y Pajaritos (Veneno y Sangrado no cuentan como control).\n\n- **Sangre pura:** inmune a [[Veneno]]. **Coagulación extrema:** inmune a [[Sangrado]].\n\n\n\n> [!info] Inmunidades sin mecanismo\n\n> Algunos ítems dicen \"inmunidad a X\" pero **casi todos son un recordatorio**: el jugador y el GM lo tienen en cuenta a mano. Solo unos pocos están cableados a un estado real."
+  },
+  {
+   "id": "vuela",
+   "titulo": "Vuela",
+   "alias": [
+    "Volador",
+    "Vuelo",
+    "Volar"
+   ],
+   "tags": [
+    "estado",
+    "movimiento"
+   ],
+   "estado": "confirmado",
+   "capitulo": "estados",
+   "cuerpo": "**Vuela** es un buff, casi siempre **permanente** (lo llevan de nacimiento las criaturas que vuelan, como las abejas de Bizzante). Quien vuela **va bajo, pero nunca toca el piso**:\n\n- No lo frena el terreno lento, **no pisa ni detecta trampas** y no lo tocan las zonas del piso (púas, brea, brasas). Las zonas del aire (gas, nube, humo) sí lo alcanzan. Es como Levitar, pero sin límite de casilleros y sin aterrizar al terminar el turno.\n- **Pasa por encima de los tokens**, aliados y rivales, pero no de las paredes ni de los Sólidos, y no puede terminar su movimiento encima de nadie.\n- Si cruza por encima de un **rival**, **antes** de pasar ese rival tiene su [[Ataque de oportunidad]] (el mapa lo frena al lado y pregunta, como cuando alguien se aleja). Del otro lado ya no hay otro.\n- **No le entran Sentado ni Rengo**: no se lo puede tirar al piso ni dejar rengo.\n- Cuerpo a cuerpo **se le pega normal**: vuela bajo.\n\n⚙ Automatizado: todo lo de arriba lo hace el mapa solo."
   },
   {
    "id": "sigilo-estado",

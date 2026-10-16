@@ -502,6 +502,22 @@ Parientes más limitados:
 
 
 +++
+titulo: Vuela
+alias: [Volador, Vuelo, Volar]
+tags: [estado, movimiento]
+estado: confirmado
++++
+**Vuela** es un buff, casi siempre **permanente** (lo llevan de nacimiento las criaturas que vuelan, como las abejas de Bizzante). Quien vuela **va bajo, pero nunca toca el piso**:
+
+- No lo frena el terreno lento, **no pisa ni detecta trampas** y no lo tocan las zonas del piso (púas, brea, brasas). Las zonas del aire (gas, nube, humo) sí lo alcanzan. Es como Levitar, pero sin límite de casilleros y sin aterrizar al terminar el turno.
+- **Pasa por encima de los tokens**, aliados y rivales, pero no de las paredes ni de los Sólidos, y no puede terminar su movimiento encima de nadie.
+- Si cruza por encima de un **rival**, **antes** de pasar ese rival tiene su [[Ataque de oportunidad]] (el mapa lo frena al lado y pregunta, como cuando alguien se aleja). Del otro lado ya no hay otro.
+- **No le entran Sentado ni Rengo**: no se lo puede tirar al piso ni dejar rengo.
+- Cuerpo a cuerpo **se le pega normal**: vuela bajo.
+
+⚙ Automatizado: todo lo de arriba lo hace el mapa solo.
+
++++
 
 titulo: Sigilo (estado)
 

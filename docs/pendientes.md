@@ -47,6 +47,10 @@
 > - [ ] **🕳 Bajo tierra para personajes e invocaciones (2026-10-13):** Excavar / Emerger (`excavar`, `emerger` en la habilidad;
 >   `vtt-hexgrid/js/46-bajo-tierra.js`) hoy anda para creeps (el Kobold tunelero). Falta el camino de la ficha (mensaje al mapa, como el blink) y
 >   el de las invocaciones, cuando alguien tenga una skill así.
+> - [x] **🕊 Vuela, el estado (2026-10-16, dueño):** hecho — `comun/estados-presets.js` (Levitar en 100 + `volador`): nunca toca el piso, pasa
+>   por encima de los tokens (no de paredes ni Sólidos) con el ataque de oportunidad ANTES de cruzar a un rival, inmune a Sentado y Rengo, cuerpo a
+>   cuerpo normal. Puesto permanente a las dos abejas de Bizzante (El origen). Probado en el mapa («Test con claude elsaulo»).
+>   **Falta:** los arcos «Contra lo que vuela o levita» (+PdG), que esperaban esto.
 > - [ ] **🕊 Vuelo (2026-10-11, dueño, con los arcos: «todavía no diseñamos nada, pero eventualmente aparecerán creeps voladores — anotar para
 >   desarrollar: vuelo»):** creeps que vuelan o levitan. Cuando exista, los arcos «Contra lo que vuela o levita» (+PdG) ya están elegidos por el dueño
 >   (docs/ideas-arcos-flechas.md). Hoy existe Levitar (pies), que no es lo mismo.

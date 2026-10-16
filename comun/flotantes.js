@@ -18,7 +18,13 @@ const Flotantes = (() => {
 .flot-arriba small{display:none!important}
 #polilla-flotante.flot-arriba{--flot-glow:rgba(190,130,255,.75)}
 #moneda-flotante.flot-arriba, #impulso-flotante.flot-arriba{--flot-glow:rgba(255,205,90,.75)}
-#wildcard-flotante.flot-arriba{--flot-glow:rgba(140,150,255,.85)}
+#wildcard-flotante.flot-arriba{--flot-glow:rgba(140,150,255,.85);overflow:visible}
+#wildcard-flotante.flot-arriba::after{display:none}
+/* 🃏 Cuántas hay (dueño, 2026-10-16: «que el botón te muestre cuando tenés más de una»): un circulito con el número abajo a la izquierda. */
+.wildcard-n{display:none}
+#wildcard-flotante.flot-arriba .wildcard-n{display:flex;position:absolute;left:-7px;bottom:-7px;min-width:18px;height:18px;padding:0 4px;box-sizing:border-box;
+  align-items:center;justify-content:center;border-radius:9px;background:#e8ebff;color:#1d2347;border:2px solid #8f9cff;font:800 11px system-ui,sans-serif;
+  box-shadow:0 1px 4px rgba(0,0,0,.6);pointer-events:none}
 /* La Polilla (2026-10-10, dueño: «buscale un equivalente a la moneda: algo animado sutil, brillo latente, chispas»): aletea cada tanto y unas
    chispitas violetas titilan alrededor. */
 #polilla-flotante.flot-arriba{overflow:visible}
@@ -174,6 +180,9 @@ const Flotantes = (() => {
     const b = document.getElementById('wildcard-flotante');
     if(b){
       b.title = `Tenés ${n} wildcard${n === 1 ? '' : 's'}: podés volver a hacer cualquiera de tus últimas tiradas (se gasta una)`;
+      let badge = b.querySelector('.wildcard-n');
+      if(n > 1){ if(!badge){ badge = document.createElement('span'); badge.className = 'wildcard-n'; b.appendChild(badge); } if(badge.textContent !== String(n)) badge.textContent = String(n); }
+      else if(badge) badge.remove();
       const cont = b.querySelector('div');
       if(cont && !cont.dataset.soloIcono){ const t = `<span class="wildcard-carta">🃏</span> ${n > 1 ? `Wildcards ×${n}` : 'Wildcard'}`; if(cont.innerHTML !== t) cont.innerHTML = t; }
     }

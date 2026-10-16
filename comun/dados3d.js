@@ -13,6 +13,9 @@
      ('dados3d'). Cada uno ve todas las tiradas con su propio estilo.
    - Tiradas con más de DADOS_MAX dados, o con dados que la librería no
      tiene, no se animan (la Mesa las muestra igual).
+   - (2026-10-16, dueño) Como mucho 2 tiradas a la vista (la tercera saca la más
+     vieja), 3 s quietas, un seguro de 8 s para la que se cuelga y el botón
+     🧹 Limpiar dados (abajo a la derecha, solo mientras hay dados).
    ========================================================= */
 
 const DADOS_LIBRERIA = 'https://cdn.jsdelivr.net/npm/@3d-dice/dice-box-threejs@0.0.12/dist/dice-box-threejs.umd.js';
@@ -44,7 +47,9 @@ const DADOS_RECURSOS = 'https://cdn.jsdelivr.net/npm/@3d-dice/dice-box-threejs@0
 const DADOS_CLAVE = 'dados3d';
 const DADOS_MAX = 12;
 const DADOS_CARAS = [2, 4, 6, 8, 10, 12, 20];
-const DADOS_QUIETOS_MS = 4500;  // cuánto quedan a la vista después de caer
+const DADOS_QUIETOS_MS = 3000;  // cuánto quedan a la vista después de caer (2026-10-16, dueño: antes 4500, «reducirle un poco el tiempo»)
+const DADOS_VISIBLES_MAX = 2;   // tiradas a la vista a la vez (dueño, 2026-10-16: «se acumulaban muchos dados y quedaban bugueados»)
+const DADOS_TRABA_MS = 8000;    // una tirada que no termina de rodar en este tiempo se da por terminada (para que nada quede trabado)
 
 // Estilo de la mesa por defecto (elegido en la página de prueba).
 const DADOS_DEFECTO = {
@@ -155,7 +160,7 @@ function dadosEstiloDe(txt){
    se esperan unas a otras. Dentro de un mismo estilo, los dados nuevos se
    suman a los que ya están rodando o quietos. */
 
-const dados = {cajas: new Map(), n: 0};
+const dados = {cajas: new Map(), n: 0, visibles: []};   // visibles: [{clave}] las tiradas a la vista, de la más vieja a la más nueva
 const DADOS_CAJAS_MAX = 6;       // canvas WebGL simultáneos (uno por estilo)
 const DADOS_EN_MESA_MAX = 24;    // por caja; pasado esto se limpia lo viejo
 
@@ -174,6 +179,40 @@ function dadosQuitarCaja(clave){
   try{ c.caja.clearDice(); }catch(e){}
   c.capa.remove();
   dados.cajas.delete(clave);
+  dados.visibles = dados.visibles.filter(v => v.clave !== clave);
+  dadosBotonLimpiar();
+}
+// Apaga y vacía una caja (sin destruirla): sus tiradas dejan de estar a la vista.
+function dadosApagarCaja(c, clave){
+  clearTimeout(c.ocultarT);
+  if(c.destacado) c.destacado.cancelar();
+  try{ c.caja.clearDice(); }catch(e){}
+  c.capa.style.transition = 'none'; c.capa.style.opacity = '0';
+  dados.visibles = dados.visibles.filter(v => v.clave !== clave);
+}
+/* 🧹 Limpiar dados (2026-10-16, dueño: «un botón abajo a la derecha que sea limpiar dados»): saca todo lo que haya en pantalla y destraba lo
+   que esté esperando a los dados (el cuadro del duelo espera «dados-quietos»). El botón aparece solo mientras hay dados a la vista. */
+function dadosLimpiarTodo(){
+  dados.cajas.forEach((c, clave) => { c.pendientes = 0; dadosApagarCaja(c, clave); });
+  dados.visibles = [];
+  document.getElementById('dados-afortunado')?.remove();
+  if(dados.rodando){ dados.rodando = 0; try{ window.dispatchEvent(new Event('dados-quietos')); }catch(e){} }
+  dadosBotonLimpiar();
+}
+function dadosBotonLimpiar(){
+  const hay = [...dados.cajas.values()].some(c => c.capa.style.opacity === '1');
+  let b = document.getElementById('dados-limpiar');
+  if(!hay){ if(b) b.remove(); return; }
+  if(b) return;
+  b = document.createElement('button');
+  b.type = 'button';
+  b.id = 'dados-limpiar';
+  b.textContent = '🧹 Limpiar dados';
+  b.title = 'Sacar los dados de la pantalla';
+  b.style.cssText = 'position:fixed;right:24px;bottom:84px;z-index:100001;pointer-events:auto;background:#241b2a;color:#f1e6d0;border:1px solid #6b5876;'
+    + 'border-radius:10px;padding:7px 12px;font:600 13px system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.5);opacity:.92';
+  b.onclick = () => dadosLimpiarTodo();
+  document.body.appendChild(b);
 }
 
 // Caja del estilo dado; se rearma si cambió el tamaño de la ventana o algún ajuste del que mira.
@@ -193,7 +232,7 @@ async function dadosCaja(estilo){
   const DiceBox = dadosClase();
   const caja = new DiceBox('#' + capa.id, dadosConfigLibreria(estilo));
   await caja.initialize();
-  const c = {caja, capa, firma, uso: Date.now(), pendientes: 0, ocultarT: null};
+  const c = {caja, capa, firma, clave, uso: Date.now(), pendientes: 0, ocultarT: null};
   dados.cajas.set(clave, c);
   return c;
 }
@@ -320,8 +359,18 @@ async function dadosTirar(notacion, estilo, opts){
     c.capa.style.transition = 'none'; c.capa.style.opacity = '1';
     // Con la caja llena (dados viejos quietos) se limpia antes de sumar.
     const enMesa = (c.caja.diceList || []).length;
-    if(c.pendientes === 1 && enMesa > DADOS_EN_MESA_MAX - DADOS_MAX) c.caja.clearDice();
-    await c.caja.add(notacion);
+    if(c.pendientes === 1 && enMesa > DADOS_EN_MESA_MAX - DADOS_MAX){ c.caja.clearDice(); dados.visibles = dados.visibles.filter(v => v.clave !== c.clave); }
+    // Como mucho DADOS_VISIBLES_MAX tiradas a la vista: con una más, se va la caja de la más vieja (con todas las suyas).
+    while(dados.visibles.length >= DADOS_VISIBLES_MAX){
+      const vieja = dados.visibles[0], cv = dados.cajas.get(vieja.clave);
+      if(cv && cv !== c) dadosApagarCaja(cv, vieja.clave);
+      else if(cv === c && c.pendientes === 1){ try{ c.caja.clearDice(); }catch(e){} dados.visibles = dados.visibles.filter(v => v.clave !== vieja.clave); }
+      else dados.visibles.shift();
+    }
+    dados.visibles.push({clave: c.clave});
+    dadosBotonLimpiar();
+    // Una tirada que se cuelga no deja la caja prendida para siempre (2026-10-16).
+    await Promise.race([c.caja.add(notacion), new Promise(r => setTimeout(r, DADOS_TRABA_MS))]);
     if(opts && opts.destacar){ try{ dadosDestacar(c, notacion, opts.destacar); }catch(err){ console.error('Dados 3D: no se pudo destacar el dado', err); } }
   }catch(err){
     console.error('Dados 3D:', err);
@@ -335,6 +384,8 @@ async function dadosTirar(notacion, estilo, opts){
         c.ocultarT = setTimeout(() => {
           if(c.destacado) c.destacado.cancelar();
           c.capa.style.transition = 'opacity .5s'; c.capa.style.opacity = '0';
+          dados.visibles = dados.visibles.filter(v => v.clave !== c.clave);
+          dadosBotonLimpiar();
           c.ocultarT = setTimeout(() => { if(c.pendientes === 0){ try{ c.caja.clearDice(); }catch(e){} } }, 600);
         }, DADOS_QUIETOS_MS);
       }

@@ -44,6 +44,10 @@
 - [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): un crítico de la Puñalada (Rengo 2 y Lisiado 1). El pozo visto como jugador ya se vio (con
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **📣 Llamar refuerzos** (2026-10-16, «Test con claude elsaulo», GM): una copia de la Rata de alcantarilla con «Plaga en la galería»
+  (`refuerzos: {cant: 2}`) → Acciones → Ejecutar: cobra 2 No2 y el cooldown, la Mesa la anuncia, aparece «elegí dónde aparece (1 de 2)», dos
+  clics → dos «Rata de prueba (refuerzo)» en esas casillas, 30/30, No2 llenos, sin la Plaga, en el orden de turnos detrás de la que chilló.
+  Todo borrado al terminar. **Falta**: el editor de creeps no tiene todavía un campo para armar `refuerzos` (se carga el dato).
 - [x] **⏸ Mapa en pausa: mirar sí, tocar no** (2026-10-16, El origen, pantalla del GM en modo jugador solo en el navegador, sin guardar nada):
   arrastrar mueve la vista, la rueda hace zoom (1 → 1,76). Después (dueño: «ver lo mismo que durante una partida»): tocar un token sí lo
   selecciona y abre su menú (vida, No2, estados, ⋯, la tarjeta 🪪 de un creep), pero sin ↻ girar, sin ⚡ Botonera y con los números sin

@@ -231,6 +231,10 @@ línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar
   empezar la ronda. La lista los muestra con los apagados. `dueloTerminaTurno(d)` (js/04): un ataque con `terminaTurno` que se resuelve manda
   a quien atacó al final del orden y, si era su turno, pasa el turno (`iniciativaSiguiente({orden, termina, desde})`). Expuesto: sin oportunidad
   (`expuestoPub`, js/17) ni dodge roll (`tokenExpuesto`, js/13).
+- **📣 Llamar refuerzos** (2026-10-16, dueño; js/31): una habilidad de creep ✨ con `refuerzos: {cant}` → `CreepAcciones.terminarHab` llama
+  `ui.refuerzos` → `llamarRefuerzos(sc, h)`: un `elegirDestino` por cada uno (casilla libre), `duplicarCreepDesdeMapa(id, {refuerzo: true})`
+  (vida y No2 llenos, sin estados, cooldowns como al empezar, sin las habilidades de refuerzos; «… (refuerzo)») y `refuerzoAlOrden` (detrás de
+  quien llamó, misma iniciativa). La usa la «Plaga en la galería» de las ratas.
 - **▶ Es su turno** (2026-10-15, dueño): clic derecho del GM en una fila de la iniciativa → `iniciativaDarTurno(id)` (js/04) pregunta
   (Confirmar.elegir) *Turno normal* = `iniciativaSiguiente({a: id})` (el mismo pase de turno, directo a ese, sin cambiar de ronda) o *Turno
   libre* = `iniciativa.libre = {id, vuelve}` (turno se mueve sin fin/inicio de turno ni `paso`; ▶ Siguiente pasa a ser «↩ Volver a…» →

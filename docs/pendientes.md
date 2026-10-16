@@ -18,6 +18,9 @@
 >   skill (clase, creeps, catálogo de habilidades de creep), el texto principal dice solo qué pasa; los términos con su globo del glosario, sin
 >   re-explicarlos; lo técnico (⚙ / ✋ / cómo se arma) al recuadro. Hecho ya: los 8 Flash de clase («FLASH.» + el turno ajeno en el globo) y Sonic Boom.
 
+> - [ ] **📣 Refuerzos en el editor de creeps** (2026-10-16): la mecánica ya anda (`refuerzos: {cant}`, la Plaga de las ratas), pero el editor
+>   de habilidades de creep no tiene un campo para armarla; hoy se carga el dato. Sumar un paso «¿Llama refuerzos? ¿cuántos?».
+
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
 > - [ ] **🧪 Más ítems con la mecánica de cargas (2026-10-10, dueño; también en 🛠 Herramientas de diseño → A desarrollar):** la mecánica

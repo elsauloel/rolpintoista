@@ -54,7 +54,7 @@ function hudHtml(t){
     if(hudEditando === clave && puede){
       return `<input class="hud-in" data-hud-in="${clave}" style="border-color:${color}" inputmode="decimal" placeholder="${fmt(valor)}" title="Escribí el valor, o +5 / -3, y apretá Enter">`;
     }
-    return `<button type="button" class="hud-circulo" data-hud-valor="${clave}" style="border-color:${color}" ${puede ? '' : 'disabled'} title="${puede ? 'Clic para cambiar' : 'Solo lo cambia su dueño'}">${fmt(valor)}</button>`;
+    return `<button type="button" class="hud-circulo" data-hud-valor="${clave}" style="border-color:${color}" ${puede ? '' : 'disabled'} title="${puede ? 'Clic para cambiar' : pausaSoloMirar() ? 'Partida en pausa: desde el mapa no se cambia (en tu ficha sí)' : 'Solo lo cambia su dueño'}">${fmt(valor)}</button>`;
   };
   const icono = (clave, simbolo, titulo, activo) =>
     `<button type="button" class="hud-circulo icono${activo ? ' abierto' : ''}" data-hud-boton="${clave}" title="${titulo}">${simbolo}</button>`;
@@ -63,7 +63,7 @@ function hudHtml(t){
   // Una invocación la maneja el mismo dueño que su personaje: mismo ⚡
   // (Botonera propia) que un PJ, ya no queda afuera.
   const propio = fichaDeToken && ((!soyGM && vinculo(t) && vinculo(t).duenoUid === fbUsuario.uid) || controloFicha(fichaDeToken));
-  const conRayo = propio || (soyGM && t.tipo === 'creep' && t.fichaId && creepsPub.has(t.fichaId));
+  const conRayo = !pausaSoloMirar() && (propio || (soyGM && t.tipo === 'creep' && t.fichaId && creepsPub.has(t.fichaId)));   // ⏸ en pausa, sin Botonera
 
   // Con 🦶 Mover libre prendido el HUD se limpia: solo queda el pie, en rojo, para que
   // se note que el modo está activo (y el ↻ para girar, que no cuesta No2).
@@ -1227,7 +1227,7 @@ async function cambiarNitros(t, texto){
 }
 
 function puedeAgregarEstado(t){
-  if(!t || !t.fichaId) return false;
+  if(!t || !t.fichaId || pausaSoloMirar()) return false;
   return t.tipo === 'creep' ? soyGM : true;
 }
 

@@ -1039,12 +1039,16 @@ function controloFicha(fichaId){
   const f = fichasPub.get(String(fichaId).split(SEP_INVOCACION)[0]);
   return !!(f && f.resumen && f.resumen.control === fbUsuario.uid);
 }
+/* ⏸ Partida en pausa (dueño, 2026-10-16): un jugador mira el mapa como siempre —arrastrarlo, zoom, tocar cualquier token y ver lo mismo que
+   en una sesión (su menú, sus estados, la tarjeta de un creep)— pero desde el mapa no cambia nada: ni mover ni girar, ni vida, No2 o estados,
+   ni los ajustes del token. Su ficha sí la puede tocar (lo que cambie le queda anotado al GM, comun/pausa.js). Lo usan los permisos de abajo. */
+const pausaSoloMirar = () => typeof Pausa !== 'undefined' && Pausa.activa() && !soyGM;
 function puedoMover(t){
-  if(!t || !fbUsuario) return false;
+  if(!t || !fbUsuario || pausaSoloMirar()) return false;
   return t.tipo === 'creep' ? soyGM : (t.duenoUid === fbUsuario.uid || controloFicha(t.fichaId));
 }
 function puedoMoverLibre(t){
-  if(!t || !fbUsuario) return false;
+  if(!t || !fbUsuario || pausaSoloMirar()) return false;
   return soyGM || (t.tipo === 'pj' && t.duenoUid === fbUsuario.uid);
 }
 function activarMoverLibre(id){
@@ -1055,7 +1059,7 @@ function activarMoverLibre(id){
   pedirDibujo();
 }
 function puedoBorrar(t){
-  return !!t && !!fbUsuario && (t.duenoUid === fbUsuario.uid || soyGM);
+  return !!t && !!fbUsuario && !pausaSoloMirar() && (t.duenoUid === fbUsuario.uid || soyGM);
 }
 function nombreMiembro(uid){
   const m = miembros.get(uid);

@@ -550,7 +550,7 @@ function opcionesDueno(elegido){
 // cambiados la ficha, gm-tools, el tablero y los demás. Los PJ los cambia
 // su dueño; los creeps, el GM (lo imponen las reglas).
 function puedoCambiarVida(t){
-  if(!t || !t.fichaId || !fbUsuario) return false;
+  if(!t || !t.fichaId || !fbUsuario || pausaSoloMirar()) return false;   // ⏸ en pausa, solo mirar (js/04)
   if(t.tipo === 'creep') return soyGM && creepsPub.has(t.fichaId);
   const v = vinculo(t);
   return !!v && ((!soyGM && v.duenoUid === fbUsuario.uid) || controloFicha(t.fichaId));
@@ -558,7 +558,7 @@ function puedoCambiarVida(t){
 // Estados alterados (agregar, sacar, cambiar turnos, editar): el dueño en su personaje y el GM en TODOS (2026-09-24, pedido
 // del dueño); los creeps, el GM. La vida de un personaje sigue siendo solo de su dueño.
 function puedoCambiarEstados(t){
-  if(!t || !t.fichaId || !fbUsuario) return false;
+  if(!t || !t.fichaId || !fbUsuario || pausaSoloMirar()) return false;
   if(t.tipo === 'creep') return soyGM && creepsPub.has(t.fichaId);
   const v = vinculo(t);
   return !!v && (soyGM || v.duenoUid === fbUsuario.uid);

@@ -17,11 +17,14 @@ function cancelarArrastreToken(){
 }
 lienzo.addEventListener('mousedown', e => { if(e.button === 2) cancelarArrastreToken(); });
 lienzo.addEventListener('pointerdown', e => {
-  // ⏸ Partida en pausa (dueño, 2026-10-16: «uno pueda navegar el mapa, solo que no mover los tokens»): un jugador arrastra la vista y hace
-  // zoom (la rueda, más abajo), pero ningún clic selecciona, mueve ni marca nada (tampoco el ping del clic derecho).
-  if(typeof Pausa !== 'undefined' && Pausa.activa() && !soyGM){
+  // ⏸ Partida en pausa (dueño, 2026-10-16: «uno pueda navegar el mapa, solo que no mover los tokens»; «hacer clic sobre un token propio o
+  // ajeno y ver lo mismo que se ve durante una partida»): un jugador arrastra la vista, hace zoom (la rueda, más abajo) y toca un token para
+  // ver su menú, pero nada se mueve ni se marca (tampoco el ping del clic derecho); lo que se puede cambiar lo frenan los permisos (js/04).
+  if(pausaSoloMirar()){
     if(e.pointerType === 'mouse' && e.button !== 0) return;
-    const pc = posEvento(e);
+    const pc = posEvento(e), mw = pantallaAMundo(pc.px, pc.py), idToken = tokenEn(mw.x, mw.y);
+    if(idToken){ seleccionar(idToken); hudPonerNivel('vital'); }
+    else if(!hudGlobo) seleccionar(null);
     paneo = {inicioX: pc.px, inicioY: pc.py, x: vista.x, y: vista.y};
     lienzo.style.cursor = 'grabbing';
     return;

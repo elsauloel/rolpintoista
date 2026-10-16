@@ -411,7 +411,7 @@ const RODEO_MAX_NODOS = 3000;
    sigilo que no se ven, no: si no, delatarían dónde están). Por un aliado se pasa, pero no se termina encima de nadie (rutaSoltada). */
 function celdasQueTapan(id){
   const s = new Set(), yo = tokens.get(id);
-  if(!yo || modoMapa !== 'combate') return s;
+  if(!yo || modoMapa !== 'combate' || vuelaToken(yo)) return s;   // 🕊 el que vuela pasa por encima (js/04; antes, la oportunidad: js/17)
   tokens.forEach((t, tid) => {
     if(tid === id || !t || !dueloEsRival(yo, t)) return;
     if((t.oculto && !soyGM) || !tokenVisiblePorNiebla(t) || ocultoPorSigiloParaMi(t)) return;

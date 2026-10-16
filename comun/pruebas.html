@@ -236,6 +236,16 @@ prueba('inmunidades: Invulnerable, CC, Sangre pura, Coagulación, jefe', () => {
     Combatiente.inmunidad([E({invulnerable: true})], {nombre: 'Hypeado', polaridad: 'buff'}),
   ], ['Invulnerable', 'Inmunidad a CC', 'Sangre pura', 'Coagulación', 'Protección de jefe', false]);
 });
+prueba('Vuela: Levitar en 100, permanente, y no le entran Sentado ni Rengo (lo demás sí)', () => {
+  const v = ESTADOS_PRESET.find(p => p.nombre === 'Vuela'), deb = o => ({polaridad: 'debuff', ...o});
+  const lev = (v.mods || []).find(m => m.stat === 'levitar');
+  igual([!!v.volador, !!v.permanente, lev && lev.val,
+    Combatiente.inmunidad([E({volador: true})], deb({nombre: 'Sentado', sentado: true})),
+    Combatiente.inmunidad([E({volador: true})], deb({nombre: 'Rengo', rengo: true})),
+    Combatiente.inmunidad([E({volador: true})], deb({nombre: 'Lento', lento: true})),
+    Combatiente.inmunidad([E({volador: true, activo: false})], deb({nombre: 'Sentado', sentado: true}))],
+    [true, true, 100, 'Vuela', 'Vuela', false, false]);
+});
 prueba('dos Pajaritos parten una sola vez y el cartel muestra uno', () => {
   const es = [E({nombre: 'Pajaritos', mitadPdgEva: true}), E({nombre: 'Pajaritos 2', mitadPdgEva: true})];
   igual([Combatiente.mitadesDeTirada(es, 'pdg'), Combatiente.estadosQueParten(es, 'pdg').length], [1, 1]);

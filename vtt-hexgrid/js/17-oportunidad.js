@@ -13,7 +13,8 @@
    La oportunidad dura lo que dura el contacto cuerpo a cuerpo (regla del dueño, 2026-10-02): una vez ofrecida (pegue, falle, la dejen
    pasar o no alcancen los No2) queda usada MIENTRAS los dos sigan pegados — quien se frenó puede alejarse después sin otro ataque —;
    apenas dejan de estar al lado (se mueva quien se mueva), se renueva: volver a pegarse y alejarse, aunque sea en el mismo turno o en el
-   mismo arrastre, es otro ataque de oportunidad. Sin tope: tantos como alcancen los No2. No aplica en modo narrativo, con 🦶 Mover libre,
+   mismo arrastre, es otro ataque de oportunidad. Sin tope: tantos como alcancen los No2. 🕊 El que vuela (2026-10-16) puede cruzar por
+   encima de un rival: la oportunidad se le ofrece antes de pasar (y al otro lado ya está usada). No aplica en modo narrativo, con 🦶 Mover libre,
    a un token oculto ni a uno en sigilo. */
 let oportunidadPendiente = null;          // {tokenId, rivalId, resto} frenado acá, a resolver al llegar
 const oportunidadUsadas = new Set();      // 'mover|rival': ya se ofreció y siguen pegados (se borra apenas dejan de estar al lado)
@@ -53,6 +54,8 @@ function oportunidadCorte(t, id, ruta){
     const antes = ruta[i - 1], despues = ruta[i];
     for(const o of ids){
       const c = {col: o.r.col, fila: o.r.fila};
+      // 🕊 Vuela (2026-10-16, dueño): el que cruza por encima de un rival, antes de pasar le da su oportunidad (se frena al lado).
+      if(distanciaHex(antes, c) === 1 && distanciaHex(despues, c) === 0){ if(!o.usada) return {indice: i - 1, rivalId: o.rid}; continue; }
       if(distanciaHex(antes, c) === 1 && distanciaHex(despues, c) > 1){
         if(!o.usada) return {indice: i - 1, rivalId: o.rid};
         o.usada = false;   // se alejó con la oportunidad ya usada: si se vuelve a pegar, es otra

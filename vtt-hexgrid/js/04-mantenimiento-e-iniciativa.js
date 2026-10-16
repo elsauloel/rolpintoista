@@ -1000,10 +1000,14 @@ function statPiesDe(t, st){
    trampa, se dispara: `levitarAterrizar`, desde el fin del turno). Los usados se anotan en esta pantalla, como los Pasos gratis. */
 const levitarUsados = new Map();
 const levitarRestante = t => Math.max(0, Math.round(statPiesDe(t, 'levitar')) - num(levitarUsados.get(pasosGratisClave(idDeToken(t)))));
+// 🕊 Vuela (2026-10-16): el estado pone Levitar en VUELA_LEVITAR — nunca toca el piso (no aterriza), pasa por encima de los tokens (js/06
+// celdasQueTapan) y, si cruza a un rival, antes le da su ataque de oportunidad (js/17 oportunidadCorte).
+const VUELA_LEVITAR = 100;
+const vuelaToken = t => statPiesDe(t, 'levitar') >= VUELA_LEVITAR;
 const levitarUsar = (id, n) => { if(n > 0){ const k = pasosGratisClave(id); levitarUsados.set(k, num(levitarUsados.get(k)) + n); } };
 async function levitarAterrizar(tokenId){
   const t = tokens.get(tokenId);
-  if(!t || !(statPiesDe(t, 'levitar') > 0) || typeof trampaResolver !== 'function') return;
+  if(!t || !(statPiesDe(t, 'levitar') > 0) || vuelaToken(t) || typeof trampaResolver !== 'function') return;   // 🕊 el que vuela no aterriza
   if(typeof zonaRevisarToken === 'function') zonaRevisarToken(t, false, false, true);   // las zonas del piso donde quedó parado (2026-10-07)
   let pisada = null;
   elementos.forEach((el, id) => { if(!pisada && el.trampa && !el.disparada && trampaDispara(t, el) && celdasDeElemento(el).some(c => c.col === t.col && c.fila === t.fila)) pisada = {id, el}; });

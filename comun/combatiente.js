@@ -1034,7 +1034,7 @@ const Combatiente = (() => {
 
   /* ---------- Inmunidades ----------
      ¿Este debuff rebota en quien lo recibe? Devuelve el motivo ('Invulnerable', 'Inmunidad a CC', 'Sangre pura',
-     'Coagulación extrema', 'Protección de jefe') o false. `o.jefe`: un creep jefe es inmune a Stun (P95). */
+     'Coagulación extrema', 'Vuela' (Sentado y Rengo), 'Protección de jefe') o false. `o.jefe`: un creep jefe es inmune a Stun (P95). */
   // Marcado (2026-10-05): mientras dure no puede entrar en sigilo, y al ponérselo se le cae el que tenía.
   const esSigilo = e => String((e && e.nombre) || '').trim().toLowerCase() === 'sigilo';
   const esMarca = e => !!e && (!!e.marcado || String(e.nombre || '').trim().toLowerCase() === 'marcado');
@@ -1049,6 +1049,7 @@ const Combatiente = (() => {
     if(est.esCC && act.some(e => e.inmunidadCC)) return 'Inmunidad a CC';
     if(est.esVeneno && act.some(e => e.sangrePura)) return 'Sangre pura';
     if(est.esSangrado && act.some(e => e.coagulacionExtrema)) return 'Coagulación';
+    if((est.sentado || est.rengo) && act.some(e => e.volador)) return 'Vuela';   // (dueño, 2026-10-16) no se lo tira al piso ni se lo deja rengo
     return false;
   }
 

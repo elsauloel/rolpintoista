@@ -48,7 +48,7 @@ const FichaHabilidades = (() => {
   const FLAGS_ESPECIALES = ['esCC', 'esVeneno', 'esSangrado', 'esQuemadura', 'afortunado', 'invulnerable',
     'inmunidadCC', 'sangrePura', 'coagulacionExtrema', 'blindado', 'espinas', 'espejo', 'desarmado', 'ceguera', 'mitadPdgEva',
     'lisiado', 'paralisis', 'silencio', 'confusion', 'esEscarcha', 'inmovilizado', 'rengo', 'lento', 'cansado', 'exhausto', 'hypeado', 'sentado',
-    'armaduraRota', 'escudoMagico', 'excedenteVida', 'forzarNitros', 'stun', 'expuesto', 'mitadEva', 'alEmpezarTurno'];
+    'armaduraRota', 'escudoMagico', 'excedenteVida', 'forzarNitros', 'stun', 'expuesto', 'mitadEva', 'alEmpezarTurno', 'volador'];
   function flagsDePreset(presets, nombrePreset){
     const p = presetPorNombre(presets, (nombrePreset || '').trim());
     if(!p) return {};

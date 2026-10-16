@@ -339,25 +339,27 @@ const CreepAcciones = (() => {
     const efecto = ef.estado;
     if(efecto && C().modsAfectanHp(efecto.mods)) C().actualizarHpMaxPorCon(sc);
     // Lo que todavía no anda para creeps o una ✨ sin la Ejecución armada: avisa y va como 💰.
-    const falta = modo === 'auto' && !h.trampaColocar ? Combatiente.ejecucionNoDisponible(h.duelo, 'creep') : '';
+    const falta = modo === 'auto' && !h.trampaColocar && !h.refuerzos ? Combatiente.ejecucionNoDisponible(h.duelo, 'creep') : '';   // 📣 refuerzos: no lleva Ejecución
     const auto = modo === 'auto' && !falta;
     const esZona = auto && h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'zona';
     // ✨ Solo sobre el creep y sin nada que tirar: se aplica directo, sin abrir el cuadro.
-    const directo = auto && !h.trampaColocar ? sobreSi(sc, h) : null;
+    const directo = auto && !h.trampaColocar && !h.refuerzos ? sobreSi(sc, h) : null;
     return {costo, costoHp, efecto, aviso: ef.aviso || '', falta, auto, esZona, directo, nitros: sc.nitros};
   }
   /* Lo que pasa después de cobrar. ui = {mesaHabilidad(sc, h, extra), mesaConTexto(texto), publicar(sc, t), toast(t),
        habDuelo(sc, h) (la Ejecución para el duelo, o null si no hay duelo), lanzarAtaque(sc, h), lanzarDuelo(sc, h, hab),
-       colocarTrampa(sc, h, auto), colocarZona(sc, h) → bool, elegirObjetivo(sc, h) (el estado sobre el objetivo), excavar(sc, h) (🕳, solo el mapa)} */
+       colocarTrampa(sc, h, auto), colocarZona(sc, h) → bool, elegirObjetivo(sc, h) (el estado sobre el objetivo), excavar(sc, h) (🕳, solo el mapa),
+       refuerzos(sc, h) (📣 llamar refuerzos: `h.refuerzos = {cant}`; el GM elige en el mapa dónde aparece cada copia, solo el mapa)} */
   function terminarHab(sc, h, p, ui){
     const {costo, costoHp, efecto, falta, auto, esZona, directo} = p;
     if(h.excavar && ui.excavar) ui.excavar(sc, h);   // 🕳 Bajo tierra (2026-10-13): el mapa mete el token bajo tierra (vtt-hexgrid/js/46)
     if(directo){ ui.mesaHabilidad(sc, h, directo.nota); ui.toast(`${h.nombre || 'Habilidad'} ejecutada sobre ${sc.nombre}${directo.hechos.length ? ' → ' + directo.hechos.join(' · ') : ''}${costoHp > 0 ? ` · −${fmt(costoHp)} HP` : ''}`); return; }
     // Una trampa se coloca en secreto: la habilidad no se anuncia en la Mesa (los jugadores no deben enterarse).
-    const hDuelo = (!auto || h.trampaColocar || esZona) ? null : ui.habDuelo(sc, h);   // habilidad dirigida: la contienda va en el cuadro del duelo
+    const hDuelo = (!auto || h.trampaColocar || esZona || h.refuerzos) ? null : ui.habDuelo(sc, h);   // habilidad dirigida: la contienda va en el cuadro del duelo
     const esArma = auto && !h.trampaColocar && Combatiente.tipoEjecucion(h.duelo) === 'arma';   // ataque con arreglos: al duelo como un ataque
     if(esArma) ui.lanzarAtaque(sc, h);
     else if(h.trampaColocar) ui.colocarTrampa(sc, h, auto);
+    else if(auto && h.refuerzos){ ui.mesaHabilidad(sc, h); if(ui.refuerzos) ui.refuerzos(sc, h); else ui.toast(`${h.nombre}: los refuerzos se eligen desde el mapa (⚔ Acciones)`); }
     else if(esZona){ ui.mesaHabilidad(sc, h); if(!ui.colocarZona(sc, h)) ui.toast(`${h.nombre}: para colocar la zona hace falta ejecutarla desde el mapa (⚔ Acciones)`); }
     // Con tirada, la descripción viaja con ella (una sola línea en la Mesa).
     else if(habTira(h) && !hDuelo) ui.mesaConTexto(C().habTextoMesa(h));
@@ -365,7 +367,7 @@ const CreepAcciones = (() => {
     else ui.mesaHabilidad(sc, h);
     if(esArma){ /* ya fue al duelo */ }
     else if(hDuelo) ui.lanzarDuelo(sc, h, hDuelo);
-    else if(habTira(h) && !h.trampaColocar && !esZona) ui.publicar(sc, tiradaPrimeraHab(sc, h));
+    else if(habTira(h) && !h.trampaColocar && !esZona && !h.refuerzos) ui.publicar(sc, tiradaPrimeraHab(sc, h));
     if(h.estadoObjetivo) ui.elegirObjetivo(sc, h);   // a quién le pegó: se le aplica el estado solo
     const partes = [`ejecutada`, costo ? `−${fmt(costo)} No2 (quedan ${fmt(p.nitros)})` : 'sin costo de No2'];
     if(costoHp > 0) partes.push(`−${fmt(costoHp)} HP`);

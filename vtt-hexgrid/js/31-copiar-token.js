@@ -17,7 +17,9 @@ function copiarTokenSeleccionado(){
 }
 const uidCorto = () => Math.random().toString(36).slice(2, 9);
 // Un creep nuevo, copia de otro, con lo que guarda GM Tools: lo público (con su firma), la ficha privada y la imagen. → {id, nombre}.
-async function duplicarCreepDesdeMapa(creepId){
+// `o.refuerzo` (2026-10-16, 📣 llamar refuerzos): una copia «recién llegada»: vida llena, sin estados, No2 llenos, sin ataques en el turno,
+// los cooldowns como al empezar un combate y sin las habilidades que llaman refuerzos (los refuerzos no llaman a más). Se llama «… (refuerzo)».
+async function duplicarCreepDesdeMapa(creepId, o){
   const col = fbDb.collection(fbRutaCampana('creeps'));
   const base = col.doc(creepId);
   const [pub, priv, img] = await Promise.all([base.get(), base.collection('privado').doc('ficha').get(), base.collection('privado').doc('imagen').get()]);
@@ -25,7 +27,13 @@ async function duplicarCreepDesdeMapa(creepId){
   const sc = JSON.parse(priv.data().json || '{}');
   const nuevo = col.doc();
   sc.id = nuevo.id;
-  sc.nombre = (sc.nombre || 'Creep') + ' (copia)';
+  sc.nombre = o && o.refuerzo ? String(sc.nombre || 'Creep').replace(/\s*\((copia|refuerzo)\)\s*$/i, '') + ' (refuerzo)' : (sc.nombre || 'Creep') + ' (copia)';
+  if(o && o.refuerzo){
+    sc.habilidades = (sc.habilidades || []).filter(h => h && !h.refuerzos).map(h => ({...h, cdActual: h.cdArranca ? num(h.cd) : 0}));
+    sc.estados = [];
+    sc.ataquesTurno = 0;
+    try{ const n = CreepCalculo.normalizar(structuredClone(sc)); sc.hp = num(n.hpMax) || num(sc.hpMax); sc.nitros = CreepCalculo.nitrosMax(n); }catch(err){ sc.hp = num(sc.hpMax); }
+  }
   sc.mapa = mapaMostrado;
   ['habilidades', 'estados', 'equipo', 'cinturon'].forEach(k => { if(Array.isArray(sc[k])) sc[k] = sc[k].map(x => x && typeof x === 'object' ? {...x, id: uidCorto()} : x); });
   delete sc.bibOrigen; delete sc.recompensado;
@@ -44,7 +52,7 @@ async function duplicarCreepDesdeMapa(creepId){
   return {id: nuevo.id, nombre: sc.nombre};
 }
 async function pegarTokenEn(c, celda, fichaId, nombre){
-  await coleccionTokens().add({
+  return coleccionTokens().add({
     nombre: String(nombre || c.nombre).slice(0, 40), color: /^#[0-9a-fA-F]{6}$/.test(c.color) ? c.color : '#9A867E', tipo: c.tipo === 'creep' || !fichaId ? 'creep' : 'pj',
     duenoUid: fbUsuario.uid, col: celda.col, fila: celda.fila, rotacion: c.rotacion || 0, oculto: !!c.oculto,
     ...(fichaId ? {fichaId} : (c.imagen ? {imagen: c.imagen} : {})),
@@ -76,3 +84,39 @@ function pegarToken(){
       {texto: 'Cancelar', sec: true, alClic: () => AvisoCombate.cerrar()},
     ]});
 }
+
+/* ---------- 📣 Llamar refuerzos (2026-10-16, dueño: la «Plaga en la galería» de las ratas) ----------
+   Una habilidad de creep con `refuerzos: {cant}` (✨ automática): al ejecutarla, el GM elige en el mapa, con un clic por cada uno, dónde aparece
+   cada refuerzo («una vez que ponés ejecutar, te ofrezca el mapa hacer clic donde quieras que aparezcan»). Cada uno es una copia recién llegada
+   del creep (duplicarCreepDesdeMapa con `refuerzo`), visible, mirando para el mismo lado, y entra al orden de turnos justo detrás de quien lo
+   llamó (con su misma iniciativa). Esc o clic derecho: el primero cancela; después, termina con los que ya llegaron. */
+function llamarRefuerzos(sc, h){
+  const cant = Math.max(1, Math.min(6, Math.round(num(h.refuerzos && h.refuerzos.cant)) || 1));
+  const orig = [...tokens.entries()].find(([, t]) => t.tipo === 'creep' && t.fichaId === sc.id);
+  const tOrig = orig ? orig[1] : null;
+  let llegaron = 0;
+  const fin = () => { if(llegaron) toast(`📣 ${h.nombre}: ${llegaron === 1 ? 'llegó 1 refuerzo' : `llegaron ${llegaron} refuerzos`}`); };
+  const otro = i => elegirDestino(async c => {
+    if((typeof elementoSolidoEn === 'function' && elementoSolidoEn(c.col, c.fila)) || [...tokens.values()].some(x => x.col === c.col && x.fila === c.fila)){
+      toast('Esa casilla no está libre (hay un token o un Sólido): elegí otra'); otro(i); return;
+    }
+    try{
+      const n = await duplicarCreepDesdeMapa(sc.id, {refuerzo: true});
+      const ref = await pegarTokenEn({nombre: n.nombre, color: (tOrig && tOrig.color) || '#9A867E', tipo: 'creep', rotacion: (tOrig && tOrig.rotacion) || 0, oculto: false}, c, n.id, n.nombre);
+      llegaron++;
+      await refuerzoAlOrden(orig ? orig[0] : '', ref && ref.id);
+    }catch(err){ console.error('No se pudo traer el refuerzo:', err); toast('No se pudo traer el refuerzo — mirá la consola'); return; }
+    if(i + 1 < cant) otro(i + 1); else fin();
+  }, `<b>📣 ${esc(h.nombre)}: elegí dónde aparece${cant > 1 ? ` (${i + 1} de ${cant})` : ''}</b> <span>clic en el mapa · Esc o clic derecho ${i ? 'terminan' : 'cancelan'}</span>`, true, i ? fin : null);
+  otro(0);
+}
+// El refuerzo entra al orden de turnos justo detrás de quien lo llamó, con su misma iniciativa (si hay orden y quien llamó está en él).
+async function refuerzoAlOrden(idQuienLlama, idNuevo){
+  if(!idNuevo || !soyGM || typeof iniciativa === 'undefined' || !iniciativa.orden.length) return;
+  const k = iniciativa.orden.findIndex(x => x.id === idQuienLlama);
+  if(k < 0) return;
+  const orden = iniciativa.orden.slice();
+  orden.splice(k + 1, 0, {id: idNuevo, valor: num(orden[k].valor)});
+  await guardarIniciativa({orden: ordenSerial(orden), turno: k + 1 <= iniciativa.turno ? iniciativa.turno + 1 : iniciativa.turno});
+}
+

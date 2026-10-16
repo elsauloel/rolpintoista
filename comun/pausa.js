@@ -8,8 +8,8 @@
    `campanas/<id>/pausaLog/<id>` = {quien, jugador, personaje, texto, cuando} (lo escribe cada jugador; lo lee y borra el GM).
    Reglas nuevas de Firestore (hay que pegarlas).
 
-   - `Pausa.iniciar({donde: 'mapa'|'ficha'|'gm'})`: escucha la pausa y muestra el cartel (en el mapa, a un jugador, además la capa
-     que no deja tocar). Adentro de un marco no hace nada.
+   - `Pausa.iniciar({donde: 'mapa'|'ficha'|'gm'})`: escucha la pausa y muestra el cartel (en el mapa, a un jugador, además una capa
+     oscura: puede arrastrar el mapa y hacer zoom, pero no tocar nada — lo frena vtt-hexgrid/js/06). Adentro de un marco no hace nada.
    - `Pausa.boton(el)`: un botón del GM que pausa / reanuda (el texto cambia solo).
    - `Pausa.alGuardar(cambios, personaje)`: lo llama `FichaSesion.guardar` después de guardar; `cambios` = [[parte, jsonViejo, jsonNuevo]].
      Si la partida está en pausa y quien guarda no es el GM, anota en el registro lo importante que cambió (`diferencias`).
@@ -147,7 +147,7 @@ const Pausa = (() => {
       .pausa-cartel small{display:block;font-weight:400;opacity:.85}
       /* Con otra ventana abierta (un aviso, un paso a paso, la Botonera…) el cartel se esconde: si no, tapaba su título (2026-10-10). */
       body:has(.scrim.open) .pausa-cartel, body:has(.cfj-fondo) .pausa-cartel, body:has(.pap-fondo) .pausa-cartel, body:has(.pausa-fondo) .pausa-cartel, body:has(#ejd-fondo) .pausa-cartel, body:has(#acciones-nuevas.con-ventana) .pausa-cartel, body:has(#botonera-nueva.con-ventana) .pausa-cartel{display:none}
-      .pausa-capa{position:absolute;inset:0;z-index:90;background:rgba(10,10,14,.28);cursor:not-allowed}
+      .pausa-capa{position:absolute;inset:0;z-index:90;background:rgba(10,10,14,.28);pointer-events:none}
       .pausa-fondo{position:fixed;inset:0;z-index:100030;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px}
       .pausa-caja{background:#171b26;color:#e6e9f2;border:1px solid #39435c;border-radius:12px;width:min(640px,100%);max-height:86vh;display:flex;flex-direction:column;
         font:14px/1.45 system-ui,sans-serif;box-shadow:0 10px 40px rgba(0,0,0,.6)}
@@ -168,9 +168,10 @@ const Pausa = (() => {
     if(activa()){
       if(!c){ c = document.createElement('div'); c.id = 'pausa-cartel'; c.className = 'pausa-cartel'; document.body.appendChild(c); }
       c.innerHTML = esGM() ? '⏸ La partida está en pausa<small>Los jugadores pueden tocar su ficha, pero no el mapa. Reanudala con «▶ Reanudar partida».</small>'
-        : `⏸ Partida en pausa hasta la próxima sesión<small>${donde === 'mapa' ? 'El mapa se ve, pero no se puede tocar. ' : ''}Podés tocar tu ficha: lo que cambies le queda anotado al GM.</small>`;
+        : `⏸ Partida en pausa hasta la próxima sesión<small>${donde === 'mapa' ? 'Podés mirar el mapa (arrastrarlo y hacer zoom), pero no mover nada. ' : ''}Podés tocar tu ficha: lo que cambies le queda anotado al GM.</small>`;
     }else if(c) c.remove();
-    // El mapa de un jugador: una capa encima del lienzo que no deja tocar nada.
+    // El mapa de un jugador: una capa oscura encima del lienzo (solo se ve: no frena el mouse). Mirar sí (arrastrar y zoom); tocar no:
+    // eso lo frena el mapa (vtt-hexgrid/js/06, pointerdown) (dueño, 2026-10-16).
     if(donde === 'mapa' && !esGM()){
       const caja = document.getElementById('lienzo-caja');
       let capa = document.getElementById('pausa-capa');

@@ -17,6 +17,15 @@ function cancelarArrastreToken(){
 }
 lienzo.addEventListener('mousedown', e => { if(e.button === 2) cancelarArrastreToken(); });
 lienzo.addEventListener('pointerdown', e => {
+  // ⏸ Partida en pausa (dueño, 2026-10-16: «uno pueda navegar el mapa, solo que no mover los tokens»): un jugador arrastra la vista y hace
+  // zoom (la rueda, más abajo), pero ningún clic selecciona, mueve ni marca nada (tampoco el ping del clic derecho).
+  if(typeof Pausa !== 'undefined' && Pausa.activa() && !soyGM){
+    if(e.pointerType === 'mouse' && e.button !== 0) return;
+    const pc = posEvento(e);
+    paneo = {inicioX: pc.px, inicioY: pc.py, x: vista.x, y: vista.y};
+    lienzo.style.cursor = 'grabbing';
+    return;
+  }
   if(e.pointerType === 'mouse' && e.button === 2){
     // Con la Botonera o las Acciones abiertas, el clic derecho sobre el mapa (afuera de la ventana) las cierra.
     if(!$('#botonera-capa').hidden){ escapeABotonera(); return; }

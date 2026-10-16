@@ -88,16 +88,21 @@ function hudHtml(t){
     (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (la línea de color del marco). Girar no gasta No2">↻</div>' : '') +
     (hudGlobo === 'tarjeta' && t.tipo === 'creep' ? '<div class="hud-globos">' + hudTarjetaHtml(t, d) + '</div>'
       : hudGlobo === 'ajustes' && (puedoMover(t) || soyGM) ? '<div class="hud-globos">' + hudAjustesHtml(t, d) + '</div>' : '');
+  // Un creep visto por un jugador (dueño, 2026-10-16): tiene pocos botones, así que la tarjeta 🪪 va en este primer menú y no hace falta el ⋯
+  // (los dos niveles eran para la ficha propia, que tenía demasiados).
+  const creepJugador = t.tipo === 'creep' && !soyGM;
   let html = '<div class="hud-anillo">' +
     circulo('hp', d.hp, HP_COLOR) + circulo('sp', d.sp, SP_COLOR) + circulo('no2', d.no2, NO2_COLOR) +
     icono('estados', '◎', 'Estados alterados', hudGlobo === 'estados') +
+    (creepJugador ? icono('tarjeta', '🪪', 'Ver tarjeta: imagen, equipo y nota', hudGlobo === 'tarjeta') : '') +
     (conRayo ? icono('rayo', '⚡', propio ? 'Abrir la Botonera (atajo: B, la de tu personaje principal)' : 'Abrir las Acciones del creep') : '') +
-    '<button type="button" class="hud-circulo icono hud-nivel" data-hud-nivel="resto" title="Más: ficha, tarjeta, ajustes, mover libre, equipo…">⋯</button>' +
+    (creepJugador ? '' : '<button type="button" class="hud-circulo icono hud-nivel" data-hud-nivel="resto" title="Más: ficha, tarjeta, ajustes, mover libre, equipo…">⋯</button>') +
     '</div>' +
     (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (la línea de color del marco). Girar no gasta No2">↻</div>' : '');
   let globo = '';
   if(hudGlobo === 'estados') globo = hudEstadosHtml(t, d.estados, puedoCambiarEstados(t));
   if(hudGlobo === 'hp' && puede) globo = hudHpHtml(t, d);
+  if(hudGlobo === 'tarjeta' && creepJugador) globo = hudTarjetaHtml(t, d);
   return html + (globo ? '<div class="hud-globos">' + globo + '</div>' : '');
 }
 

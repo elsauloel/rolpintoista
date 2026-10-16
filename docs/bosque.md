@@ -137,3 +137,21 @@ De a una, de nivel más bajo a más alto; la simulación usa las fichas reales y
 - Ojo con las reglas del duelo: **Rengo, Lisiado, Sangrado y Envenenar necesitan que el golpe haga daño** (Lento, Sentado, Miedo, Veneno de una habilidad, no). Por eso la Flecha a la rodilla casi nunca deja Rengo a Petro (8–10 %).
 - **Encontrado de paso:** las fichas de Petro, Larry y Bizzante calculan el Crítico frecuente con la Destreza (`formulas.crit = 'des'`, quedó de antes del 2026-09-25): les da 8 y el crítico salta con 2 de diferencia. **Arreglado (dueño, 2026-10-16):** las tres pasaron a `formulas.crit = '0'` (Crítico frecuente 0 + bonos). Estrella y Aurelius (las otras dos fichas de El origen) también tienen `'des'`: sin tocar, a decidir.
 
+## Notas del GM que estaban en los creeps (sacadas el 2026-10-16)
+La **nota** de un creep es pública (la ven los jugadores en su tarjeta 🪪), y estas eran notas de diseño — la del ocultista adelantaba la
+historia. El dueño eligió cambiarlas por una frase de ambientación; lo de diseño queda acá.
+- Goblin hondero ×3 (`3z6arg7`, `arhji0k`, `ln2aizc`): Encuentro 1 (El sendero). Tirador: se queda lejos, entre los árboles o en un lugar alto.
+- Goblin de choque ×2 (`m9t4mk0`, `92o6r0q`): Encuentro 1. Frente: sostiene a Petro para que los honderos tiren tranquilos.
+- Goblin arquero (`5vjgekj`): Encuentro 1. Arquero escondido entre los árboles. Pelea con arco: suelta siempre una flecha especial.
+- Goblin trampero (`svsfzqv`): Encuentro 1. Prepara el terreno: pone redes en el camino antes de la emboscada.
+- Goblin jinete de lobo (`31l42h7`): Encuentro 2 (La guarida). Abre con la Carga y azuza a la manada. Lo mandó el ocultista a buscar la esfera.
+- Lobo gris ×3 (`4znzbx7`, `ou80yqx`, `dlv3a70`): Encuentro 2. Caza en manada: van juntos por el más débil.
+- Goblin domador (`izy1s5j`): Encuentro 2. El que cría a los lobos: se queda cerca de ellos y los azuza.
+- Chamán goblin (`pdw2b5i`): Encuentro 2. Atrás de los lobos: cura y deja redes (trampas de sombra) en el camino; ponerlas antes de que entren.
+- Goblin marcado ×2 (`2s5ledu`, `9o3cxqo`): Encuentro 3 (El claro). Goblin con la marca del ocultista: lo cuidan de cerca.
+- Goblin arquero del claro (`c56dvpc`): Encuentro 3. Cubre al ocultista desde atrás. Pelea con arco: suelta siempre una flecha especial.
+- Goblin portaestandarte (`mi2pjl1`): Encuentro 3. Lleva el estandarte con la marca del amo: mientras esté de pie, los goblins pelean mejor.
+- El ocultista (`vz9uwgy`): Encuentro 3, JEFE. Un humano que usa a los goblins para recuperar la esfera mística que le robó un goblin. Pelea
+  de lejos: inmoviliza al que se le acerca, marca a sus goblins y revienta sombras sobre los que se juntan. Tiene la Varita arcana mayor
+  (1d8 arcano). Defensa +2 de base: amuletos y vendas rituales (no se sueltan).
+

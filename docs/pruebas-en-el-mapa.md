@@ -45,8 +45,9 @@
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
 - [x] **⏸ Mapa en pausa: mirar sí, tocar no** (2026-10-16, El origen, pantalla del GM en modo jugador solo en el navegador, sin guardar nada):
-  arrastrar mueve la vista, la rueda hace zoom (1 → 1,76) y tocar un token no lo selecciona ni abre su menú. **Falta**: verlo con una cuenta
-  de jugador de verdad (la capa oscura ya no frena el mouse).
+  arrastrar mueve la vista, la rueda hace zoom (1 → 1,76). Después (dueño: «ver lo mismo que durante una partida»): tocar un token sí lo
+  selecciona y abre su menú (vida, No2, estados, ⋯, la tarjeta 🪪 de un creep), pero sin ↻ girar, sin ⚡ Botonera y con los números sin
+  poder cambiarse. **Falta**: verlo con una cuenta de jugador de verdad. (🃏 La carta de arriba con el número, probada igual, local.)
 - [x] **🃏 Wildcards: descanso y ventana** (2026-10-16, «Test con claude elsaulo», GM con el control de Silvia Suller): ⏳ Pasar de día → «¿Cómo
   descansaron?» → 🌙 Descanso reparador: Silvia queda con 2 wildcards (la Mesa lo dice); en su ficha suelta la cartita «Wildcards ×2» abajo a
   la izquierda; tirar Fuerza (1) → la carta → «🃏 Wildcard»: re-roll 4, quedan 1, la original «ya se repitió». La partida quedó en el Día 1.

@@ -9,6 +9,9 @@
 > capturas. Al probar algo: pasarlo a «Probado» con fecha, qué se vio y si hubo que arreglar algo.
 
 ## Pendientes
+- [ ] **🃏 Wildcards en el duelo y en el mapa de un jugador** (2026-10-15): desde una cuenta de jugador con wildcards, (1) la cartita 🃏 arriba, en la
+  fila de los lentes, girando; (2) en un duelo, después de tirar PdG/Evasión, aparecen «🃏 Wildcard» y «🪙 Moneda» lado a lado (o solo la carta) y
+  reabrir con la carta descuenta 1. (Probado ya: el descanso del GM y la ventana de la ficha, ver «Probado».)
 - [ ] **Trampa de red del Goblin trampero con alcance 3** (2026-10-15): en una partida de prueba, un creep con una trampa ✨ con `trampaColocar.alcance: 3` → al
   elegir una casilla a 4+ avisa «la trampa llega hasta 3»; la red se coloca oculta; un personaje que la pisa queda Inmovilizado y le aparece 🔓 Soltarse · Fuerza
   contra 5 · 1 No2. (El cambio de código es solo el aviso: js/13 `trampaAvisarAlcance`.)
@@ -41,6 +44,9 @@
 - [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): un crítico de la Puñalada (Rengo 2 y Lisiado 1). El pozo visto como jugador ya se vio (con
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **🃏 Wildcards: descanso y ventana** (2026-10-16, «Test con claude elsaulo», GM con el control de Silvia Suller): ⏳ Pasar de día → «¿Cómo
+  descansaron?» → 🌙 Descanso reparador: Silvia queda con 2 wildcards (la Mesa lo dice); en su ficha suelta la cartita «Wildcards ×2» abajo a
+  la izquierda; tirar Fuerza (1) → la carta → «🃏 Wildcard»: re-roll 4, quedan 1, la original «ya se repitió». La partida quedó en el Día 1.
 - [x] **▶ Es su turno (clic derecho en la iniciativa)** (2026-10-15, «Test con claude elsaulo», GM, con Xeena / Aurelia / Silvia de prueba):
   le tocaba a Xeena; clic derecho en Silvia → *Turno libre*: le toca a Silvia (⚡ arriba), no pasa el turno; «↩ Volver a Xeena» lo devuelve sin
   tocar nada. Clic derecho en Silvia → *Turno normal*: termina el de Xeena, empieza el de Silvia («se lo dio el GM»), el contador de turnos

@@ -135,5 +135,5 @@ De a una, de nivel más bajo a más alto; la simulación usa las fichas reales y
 - Goblin portaestandarte · **¡Por el amo!**: ahora lenta (arranca con el cooldown activo). Pared de escudos: igual.
 - El ocultista · **Grilletes de sombra**: + 1d4 de daño arcano. **Marca del amo**: de Crítico frecuente +1 a **+1 PdG y Crítico frecuente +1** (estado «Marca del amo», 2 turnos). **Estallido de sombras**: 2d6+2 (antes 1d6+2).
 - Ojo con las reglas del duelo: **Rengo, Lisiado, Sangrado y Envenenar necesitan que el golpe haga daño** (Lento, Sentado, Miedo, Veneno de una habilidad, no). Por eso la Flecha a la rodilla casi nunca deja Rengo a Petro (8–10 %).
-- **Encontrado de paso:** las fichas de Petro, Larry y Bizzante calculan el Crítico frecuente con la Destreza (`formulas.crit = 'des'`, quedó de antes del 2026-09-25): les da 8 y el crítico salta con 2 de diferencia. Pregunta al dueño: ¿migrar a 0?
+- **Encontrado de paso:** las fichas de Petro, Larry y Bizzante calculan el Crítico frecuente con la Destreza (`formulas.crit = 'des'`, quedó de antes del 2026-09-25): les da 8 y el crítico salta con 2 de diferencia. **Arreglado (dueño, 2026-10-16):** las tres pasaron a `formulas.crit = '0'` (Crítico frecuente 0 + bonos). Estrella y Aurelius (las otras dos fichas de El origen) también tienen `'des'`: sin tocar, a decidir.
 

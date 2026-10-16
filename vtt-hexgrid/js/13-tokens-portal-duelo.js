@@ -479,6 +479,9 @@ function trampaDeHabilidad(msg){
 // Si la casilla elegida queda fuera del Rango de quien la usa: avisa (la mesa decide), no bloquea.
 function trampaAvisarAlcance(msg, h){
   const mio = [...tokens.values()].find(x => x.fichaId === msg.fichaId && x.tipo === (msg.tipoToken || 'pj'));
+  // Una trampa con alcance propio (`trampa.alcance`, dueño 2026-10-15: la red del Goblin trampero, hasta 3 casilleros): ese manda.
+  const propio = Math.round(num(msg.trampa && msg.trampa.alcance));
+  if(mio && propio > 0){ if(distanciaHex(mio, h) > propio) toast(`⚠ Esa casilla queda a ${distanciaHex(mio, h)}: la trampa llega hasta ${propio}`); return; }
   const rr = mio && typeof rangoDeToken === 'function' ? rangoDeToken(mio) : null;
   if(rr && rr.rng > 0 && distanciaHex(mio, h) > rr.rng) toast(`⚠ Esa casilla queda a ${distanciaHex(mio, h)}: fuera de tu Rango (${fmt(rr.rng)})`);
 }

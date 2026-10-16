@@ -55,7 +55,7 @@ function oportunidadCorte(t, id, ruta){
     for(const o of ids){
       const c = {col: o.r.col, fila: o.r.fila};
       // 🕊 Vuela (2026-10-16, dueño): el que cruza por encima de un rival, antes de pasar le da su oportunidad (se frena al lado).
-      if(distanciaHex(antes, c) === 1 && distanciaHex(despues, c) === 0){ if(!o.usada) return {indice: i - 1, rivalId: o.rid}; continue; }
+      if(distanciaHex(antes, c) === 1 && distanciaHex(despues, c) === 0){ if(!o.usada) return {indice: i - 1, rivalId: o.rid, cruza: true}; continue; }
       if(distanciaHex(antes, c) === 1 && distanciaHex(despues, c) > 1){
         if(!o.usada) return {indice: i - 1, rivalId: o.rid};
         o.usada = false;   // se alejó con la oportunidad ya usada: si se vuelve a pegar, es otra
@@ -87,10 +87,10 @@ async function oportunidadResolver(){
   const decide = oporDecide(r);
   oporEspera = {...p, momentoId: null, resultado: null};
   const e = oporEspera;
-  oporMesa(`${nombreDe(t)} se alejó de ${nombreDe(r)}: posible ataque de oportunidad`, 'alerta-roja');
+  oporMesa(`${nombreDe(t)} ${p.cruza ? 'pasa por encima de' : 'se alejó de'} ${nombreDe(r)}: posible ataque de oportunidad`, 'alerta-roja');
   renderOporEspera();
-  e.momentoId = await momentoAbrir({tipo: 'oportunidad', icono: '⚔', titulo: `${nombreDe(t)} se aleja de ${nombreDe(r)}…`, estado: 'esperando', resuelve: decide,
-    datos: {centro: true, moverId: p.tokenId, rivalId: p.rivalId, decide}});
+  e.momentoId = await momentoAbrir({tipo: 'oportunidad', icono: '⚔', titulo: `${nombreDe(t)} ${p.cruza ? 'pasa por encima de' : 'se aleja de'} ${nombreDe(r)}…`, estado: 'esperando', resuelve: decide,
+    datos: {centro: true, moverId: p.tokenId, rivalId: p.rivalId, decide, ...(p.cruza ? {cruza: true} : {})}});   // 🕊 cruza: el que vuela pasa por encima
   if(!e.momentoId && oporEspera === e){ oporEspera = null; renderOporEspera(); oporContinuar(e); }   // sin reglas publicadas: sigue como antes
 }
 /* Retirada limpia (2026-10-04, dueño, mecánica de las piernas): quien se aleja tiene una chance de no darle el ataque de oportunidad al
@@ -106,7 +106,7 @@ async function oporRetirada(t, r, p){
   const nomT = nombreDe(t), nomR = nombreDe(r);
   // El cartel común de las chances (js/21: cartel, dados, resultado, Crónica y Mesa).
   const sale = await chanceCartel({clave: 'retirada', icono: '🦵', titulo: 'Retirada limpia', mecanica: 'Retirada limpia', pct, t,
-    paso1: {titulo: `Te alejás de ${nomR}`, texto: pct >= 100
+    paso1: {titulo: `${p.cruza ? 'Pasás por encima de' : 'Te alejás de'} ${nomR}`, texto: pct >= 100
       ? 'Tus piernas te sacan siempre del cuerpo a cuerpo: te alejás sin darle ataque de oportunidad.'
       : `Retirada limpia ${Combatiente.chanceTexto(pct)}: si sale, te alejás sin darle ataque de oportunidad; si no, ${nomR} puede atacarte.`},
     momento: `${nomT} intenta una Retirada limpia de ${nomR}`,
@@ -129,7 +129,7 @@ function renderOporEspera(){
       botones: [{texto: 'Entendido', id: 'opor-espera-ok', alClic: () => { oporEspera = null; renderOporEspera(); }}]});
     return;
   }
-  AvisoCombate.cartel('opor-espera', {icono: '⚔', titulo: `Te alejás de ${nomR}`, texto: 'Esperando a ver si aprovecha el ataque de oportunidad…',
+  AvisoCombate.cartel('opor-espera', {icono: '⚔', titulo: `${oporEspera.cruza ? 'Pasás por encima de' : 'Te alejás de'} ${nomR}`, texto: 'Esperando a ver si aprovecha el ataque de oportunidad…',
     botones: [{texto: 'Seguir sin esperar', sec: true, id: 'opor-espera-seguir', titulo: 'Si nadie contesta: seguís tu camino como lo marcaste', alClic: () => {
       const e = oporEspera; oporEspera = null; renderOporEspera();
       if(e.momentoId) momentoActualizar(e.momentoId, {estado: 'no', resultado: '…nadie contestó: sigue su camino.'});
@@ -174,7 +174,7 @@ function renderOporDecision(){
     AvisoCombate.cartel('opor-decision', {icono: '⚔', titulo: `¿Con qué arma ataca ${nomR}?`, texto: 'Ataque de oportunidad: cuesta lo de un primer ataque y no cuenta como ataque del turno.',
       botones: [...oporDecision.armas.map(a => ({texto: `${a.nombre} — ${a.costo} No2`, detalle: a.detalle || '', alClic: () => oporAtacar(a)})), {texto: 'Mejor no', sec: true, alClic: () => oporResponder(false)}]});
   }else{
-    AvisoCombate.cartel('opor-decision', {icono: '⚔', titulo: `${nomM} se aleja de ${nomR}`, texto: '¿Ataque de oportunidad?',
+    AvisoCombate.cartel('opor-decision', {icono: '⚔', titulo: `${nomM} ${dt.cruza ? 'pasa por encima de' : 'se aleja de'} ${nomR}`, texto: '¿Ataque de oportunidad?',
       botones: [{texto: 'Sí, atacar', alClic: () => oporResponder(true)}, {texto: 'No, dejarlo pasar', sec: true, alClic: () => oporResponder(false)}]});
   }
 }

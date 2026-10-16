@@ -1763,6 +1763,12 @@ prueba('⏳ Pasar de día (2026-10-12): descansar llena vida, SP y No2 (no levan
   igual([S.hp === hpmax, S.spGastado, S.nitros === FichaBotonera.nitrosMaximo(S), S.efectos.map(e => e.nombre), S.reparadoTalento, lineas.some(l => /Veneno/.test(l)), C.hp],
     [true, 0, true, ['Sigilo'], 0, true, 0]);
 });
+prueba('Habilidad de creep «solo con menos del N % de la vida» (2026-10-16, la Plaga de las ratas): con la vida alta avisa y pregunta; baja, no', () => {
+  const h = {nombre: 'Plaga en la galería', soloVidaMenos: 50};
+  const sc = n => ({nombre: 'Rata', hp: n, hpMax: 30});
+  igual([!!CreepAcciones.preguntaVida(sc(30), h), !!CreepAcciones.preguntaVida(sc(15), h), !!CreepAcciones.preguntaVida(sc(14), h), CreepAcciones.preguntaVida(sc(30), {nombre: 'Otra'})],
+    [true, true, false, '']);
+});
 prueba('Crítico frecuente (2026-10-16): una ficha vieja con la receta «= Destreza» pasa a 0 al cargarla; los bonos se siguen sumando', () => {
   const S = fichaBotonera({}); S.formulas.crit = 'des';
   FichaGuardado.completar(S);

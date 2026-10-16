@@ -467,7 +467,7 @@ document.addEventListener('click', async e => {
     if(modo === 'auto' && Combatiente.tipoEjecucion(h.duelo) === 'flash'){ usarFlashFueraDelDueloCreep(sc, h); return; }   // ⚡ sin No2, cooldown según el turno
     // Lo que cambia al creep (cobrar, cura y estado del sistema anterior, el atajo «solo sobre sí») y lo que pasa después (Mesa,
     // duelo, trampa, zona, a quién le pegó, el aviso): comun/creep-acciones.js (paso 4 etapa 4c, tanda 5), con gmHabUi (js/04).
-    if(!(await CreepAcciones.confirmarSilencio(sc, h))){ toast(`${sc.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`); return; }   // el cartel del juego, antes de cobrar
+    if(!(await CreepAcciones.confirmarSilencio(sc, h))){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }   // el cartel del juego, antes de cobrar
     const p = CreepAcciones.ejecutarHab(sc, h, ESTADOS_PRESET_GM, true);
     if(p.error){ toast(p.error); return; }
     if(p.aviso) toast(p.aviso);

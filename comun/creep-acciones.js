@@ -315,7 +315,18 @@ const CreepAcciones = (() => {
   }
   // Silencio (2026-10-04): avisa y deja seguir. La pregunta la hace quien llama ANTES de ejecutarHab, con el cartel del juego (no el
   // confirm() nativo): ejecutarHab corre adentro de una transacción en el mapa y no puede esperar. true = sigue (o no había nada que preguntar).
+  // `h.soloVidaMenos = N` (2026-10-16, dueño: la Plaga de las ratas, «solamente lo puede ejecutar si tiene menos del 50 % de la vida»): con
+  // la vida en N % o más, avisa y pregunta (no bloquea: la mesa decide). → el texto de la pregunta, o ''.
+  function preguntaVida(sc, h){
+    const n = Math.round(num(h && h.soloVidaMenos)), max = num(sc.hpMax);
+    if(!(n > 0) || !(max > 0)) return '';
+    const pct = Math.round(100 * num(sc.hp) / max);
+    return pct < n ? '' : `${sc.nombre} tiene ${fmt(num(sc.hp))} de ${fmt(max)} de vida (${pct} %): ${h.nombre || 'esta habilidad'} se usa solo con menos del ${n} % de la vida. ¿Usarla igual?`;
+  }
+  // Lo que se pregunta antes de cobrar (el Silencio y la condición de vida). → true si sigue.
   async function confirmarSilencio(sc, h){
+    const vida = preguntaVida(sc, h);
+    if(vida && !(await Confirmar.preguntar(vida, {titulo: h.nombre || 'Habilidad', icono: '❤', si: 'Usarla igual'}))) return false;
     const sil = Combatiente.preguntaSilencio(sc.estados, h, sc.nombre);
     return !sil || !!(await Confirmar.preguntar(sil, {titulo: 'Silencio', icono: '🤐', si: 'Usarla igual'}));
   }
@@ -572,6 +583,6 @@ const CreepAcciones = (() => {
   return {bloqueoFirmeCreep, ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, inicioTurno, finTurno, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
     tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, tiradaSoltarse, aplicarSoltarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
     costoAtaqueDe, devolverAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros,
-    FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, confirmarSilencio, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,
+    FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, confirmarSilencio, preguntaVida, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,
     zonaDeHab, cdMod};
 })();

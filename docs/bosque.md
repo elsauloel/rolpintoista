@@ -165,4 +165,4 @@ De a uno, de nivel más bajo a más alto; primero el ataque básico y después c
 - Kobold farolero (`35kgm38`): menos Constitución (Destreza 6, Constitución 6, vida 30): se queda lejos. **Aceite hirviendo**: igual (pega fuerte, a propósito: «más tendiendo a lo agresivo»).
 - Kobold rabioso ×2 (`7f4m19f`, `6piufzf`): **Furia** +1 PdG y +2 de daño, 2 turnos, cooldown 3, lenta. El pico oxidado: Envenenar 50 % ×2.
 - Rata de alcantarilla ×2 (`7yfjk9q`, `bohj2rz`): el mordisco perfora 1. **Plaga en la galería** automática: 📣 llama 2 ratas (el GM elige en el mapa dónde aparece cada una);
-  solo con menos del 50 % de la vida (si tiene más, avisa y pregunta). Sin lenta (la condición de la vida ya la frena al principio); después de usarla, cooldown 3.
+  solo con menos del 50 % de la vida (si tiene más, avisa y pregunta). Sin lenta y sin cooldown (dueño: la condición de la vida ya la frena; solo la limitan los 2 No2).

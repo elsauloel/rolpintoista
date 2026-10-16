@@ -186,7 +186,7 @@ Todas las palabras y siglas del juego, con un enlace a la nota que las explica.
 
 > [!question] Términos que faltan
 
-> Wellness y la definición formal de "descanso" están abiertos. **Wildcard** ya tiene contador en la ficha (ver [[Tiradas y dados]]), pero le falta la mecánica — sumalo entero cuando esté definida.
+> Wellness y la definición formal de "descanso" están abiertos. (**Wildcard** ya está definida: ver [[Wildcards]].)
 
 
 

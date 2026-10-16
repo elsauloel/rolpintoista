@@ -252,9 +252,11 @@ const FichaMantenimiento = (() => {
 
   /* ⏳ Pasar de día (2026-10-12, dueño; lo dispara vtt-hexgrid/js/41-dia.js). ¿Qué estados terminan? Los que duran por turnos (o un turno);
      quedan los permanentes, los de un ítem equipado y los derivados. `descansar(S)`: vida, SP y No2 al máximo (un caído no se levanta), los
-     estados con turnos terminan, el tope diario del talento de reparar vuelve a 0, y lo mismo sus invocaciones. Devuelve las líneas del cambio. */
+     estados con turnos terminan, el tope diario del talento de reparar vuelve a 0, carga las 🃏 wildcards del descanso (`o.wildcards`) y lo
+     mismo sus invocaciones. Devuelve las líneas del cambio. */
   const terminaAlPasarDia = e => !!e && !e.permanente && !e.origenItem && !e.derivado && !e.anillo;
-  function descansar(S){
+  // `o.wildcards` (2026-10-15, dueño): el descanso carga wildcards hasta ese número (1 normal, 2 reparador); no se acumulan por encima.
+  function descansar(S, o){
     const lineas = [], c = FichaCalculo.calcular(S), hpmax = Number.isNaN(c.final.hpmax) ? 0 : num(c.final.hpmax);
     const caido = num(S.hp) <= 0 || (S.muerto && (S.muerto.activo || S.muerto.definitivo));
     if(!caido && hpmax > 0 && num(S.hp) < hpmax){ lineas.push(`vida ${fmt(num(S.hp))} → ${fmt(hpmax)}`); S.hp = hpmax; }
@@ -264,6 +266,8 @@ const FichaMantenimiento = (() => {
     const fin = (S.efectos || []).filter(terminaAlPasarDia);
     if(fin.length){ S.efectos = S.efectos.filter(e => !terminaAlPasarDia(e)); lineas.push(`terminaron: ${fin.map(e => e.nombre).join(', ')}`); }
     if(num(S.reparadoTalento) > 0) S.reparadoTalento = 0;
+    const wc = Math.max(0, Math.round(num(o && o.wildcards)));
+    if(wc && S.meta && Math.round(num(S.meta.wildcards)) < wc){ const antes = Math.max(0, Math.round(num(S.meta.wildcards))); S.meta.wildcards = wc; lineas.push(`🃏 ${wc - antes === 1 ? 'una wildcard' : `${wc - antes} wildcards`} (tiene ${wc})`); }
     (S.invocaciones || []).forEach(inv => {
       if(!inv) return;
       const li = [];

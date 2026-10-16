@@ -1584,4 +1584,8 @@ versión parecida en más de una, es candidato a juntar.
   otra que la «segunda tirada» de la habilidad, manda esta) y `danoMas` (un fijo y/o un dado que se le suma, también al daño del arma),
   `centroAlcance: 'rango'`. `cfg.formulaDano` (lo pasan los cinco editores que la abren) es la fórmula de la habilidad. En las pruebas: `ejd(s)`,
   `ejdPop(id)`, `ejdGuardar()`.
+- **🃏 Wildcards** (2026-10-15, `../docs/reroll.md`): repiten una tirada como la Moneda Re-Roll, pero se gastan siempre. `ficha-duelo.js`
+  (`wildcards`, `conQueReroll`, `usarReroll(S, h, ui, con)`, hooks `rerollInfo`/`rerollUsar(d, campo, con)`), `duelo.js` (el botón «🃏 Wildcard» junto
+  al 🪙), `flotantes.js` (`Flotantes.wildcard`: la cartita que gira), `ficha-resumen.js` (`resumen.wildcards`), `ficha-mantenimiento.js`
+  (`descansar(S, {wildcards})`: el descanso del día las carga hasta 1 o 2).
 

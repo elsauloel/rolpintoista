@@ -348,24 +348,26 @@ $('#btn-ppt').onclick = () => PPT.retar();   // ✊ piedra, papel o tijera (comu
 // (`resumen.moneda`); una ficha que todavía no lo publicó (sin el dato) queda encendida, como antes.
 function rerollTieneMoneda(){
   const f = fichasPub.get(fichaPrincipalId());
-  return !f || !f.resumen || f.resumen.moneda !== false;
+  return !f || !f.resumen || f.resumen.moneda !== false || num(f.resumen.wildcards) > 0;   // 🃏 una wildcard también sirve (2026-10-15)
 }
 function renderRerollBoton(){
   // 🪙 Con una moneda, además, el botón del rincón (como la Polilla, 2026-10-09, dueño): un recordatorio de que se puede repetir una tirada.
   const fp = fichaPrincipalId(), fr = fp && fichasPub.get(fp);
   if(typeof Flotantes !== 'undefined') Flotantes.moneda({mostrar: !soyGM && !!(fr && fr.resumen && fr.resumen.moneda === true), alClic: () => $('#btn-reroll').onclick()});
+  const nw = !soyGM && fr && fr.resumen ? Math.max(0, Math.round(num(fr.resumen.wildcards))) : 0;   // 🃏 la carta (2026-10-15)
+  if(typeof Flotantes !== 'undefined' && Flotantes.wildcard) Flotantes.wildcard({mostrar: nw > 0, n: nw, alClic: () => $('#btn-reroll').onclick()});
   const b = $('#btn-reroll');
   if(!b || b.hidden) return;
   const tiene = rerollTieneMoneda();
   b.classList.toggle('sin-moneda', !tiene);
-  b.title = tiene ? 'Moneda Re-Roll: volver a hacer cualquiera de tus últimas tiradas, sin costo de No2, mientras tengas una moneda equipada (cinturón o mochila)'
-    : 'Moneda Re-Roll: no tenés ninguna (hace falta una en el cinturón o la mochila)';
+  b.title = tiene ? 'Repetir una tirada: con una Moneda Re-Roll equipada (cinturón o mochila) o una 🃏 wildcard, sin costo de No2'
+    : 'Repetir una tirada: no tenés Moneda Re-Roll (cinturón o mochila) ni wildcards';
 }
 setInterval(renderRerollBoton, 1500);
 $('#btn-reroll').onclick = () => {
   const fid = fichaPrincipalId();
   if(!fid){ toast('Necesitás un personaje para usar la Moneda Re-Roll'); return; }
-  if(!rerollTieneMoneda()){ toast('🪙 No tenés una Moneda Re-Roll: hace falta una en el cinturón o la mochila'); return; }
+  if(!rerollTieneMoneda()){ toast('🪙 No tenés una Moneda Re-Roll (hace falta una en el cinturón o la mochila) ni wildcards'); return; }
   abrirRerollMapa(fid);   // el mapa (js/11, A6a)
 };
 

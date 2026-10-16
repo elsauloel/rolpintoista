@@ -502,7 +502,7 @@ $('#reroll-lista').addEventListener('click', e => {
   const b = e.target.closest('[data-rerollpick]');
   if(!b) return;
   const h = tiradasPropias().find(x => x.clave === b.dataset.rerollpick);
-  if(!FichaDuelo.usarReroll(S, h, combateUi)) return;
+  if(!FichaDuelo.usarReroll(S, h, combateUi, b.dataset.rerollcon)) return;   // 🪙 moneda o 🃏 wildcard (2026-10-15)
   renderReroll();
 });
 // Botón 🪙 (Botonera y mapa): abre la ventana de re-roll.

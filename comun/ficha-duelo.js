@@ -26,6 +26,22 @@ const FichaDuelo = (() => {
     const enM = S.inventario.find(i => esMonedaReroll(i) && num(i.unidades) > 0 && !i.enMesa && !i.reservado);
     return enM ? {key: 'inventario', it: enM} : null;
   }
+  /* ---------- 🃏 Wildcards (2026-10-15, dueño: «funcionan igual que una moneda de reroll»; docs/reroll.md) ----------
+     `S.meta.wildcards`: las que tiene (las carga el descanso al pasar el día, vtt-hexgrid/js/41). Repite una tirada tuya como la moneda
+     (una por tirada), pero no se tira nada: la carta se gasta siempre. */
+  const wildcards = S => Math.max(0, Math.round(num(S && S.meta && S.meta.wildcards)));
+  function gastarWildcard(S, ui){
+    S.meta.wildcards = Math.max(0, wildcards(S) - 1);
+    ui.toast(`🃏 Usaste una wildcard${wildcards(S) ? ` (te quedan ${wildcards(S)})` : ': era la última'}`);
+    ui.cambio(['refresh']);
+  }
+  // Con qué se repite: lo que se eligió (`con`), o la moneda si hay y si no la wildcard. → 'moneda' | 'wildcard' | ''.
+  function conQueReroll(S, con){
+    const m = !!monedaReroll(S), w = wildcards(S) > 0;
+    if(con === 'wildcard') return w ? 'wildcard' : '';
+    if(con === 'moneda') return m ? 'moneda' : '';
+    return m ? 'moneda' : w ? 'wildcard' : '';
+  }
   // Tira la moneda: par se conserva, impar se rompe.
   function tirarMonedaReroll(S, m, ui){
     const r = tirarDados('1d2');   // 2 = par (se conserva) · 1 = impar (se rompe)
@@ -187,17 +203,18 @@ const FichaDuelo = (() => {
         const r = tirarDados(formula);
         if(r) ui.registrarTirada(`Daño · ${arma ? arma.nombre : 'sin arma'}`, r);
       },
-      // Moneda Re-Roll: ¿tengo una? / usarla para reabrir una tirada del duelo.
+      // Moneda Re-Roll o 🃏 wildcard: ¿tengo? / usarla para reabrir una tirada del duelo (`con`: 'moneda' | 'wildcard').
       rerollInfo: d => {
-        const m = monedaReroll(getS());
-        return m ? {disponible: true, donde: m.key === 'cinturon' ? 'el cinturón' : 'la mochila'} : {disponible: false};
+        const S = getS(), m = monedaReroll(S), w = wildcards(S);
+        return m || w ? {disponible: true, moneda: !!m, wildcards: w, ...(m ? {donde: m.key === 'cinturon' ? 'el cinturón' : 'la mochila'} : {})} : {disponible: false};
       },
-      rerollUsar: async (d, campo) => {
-        const m = monedaReroll(getS());
-        if(!m){ ui.toast('No tenés una Moneda Re-Roll'); return false; }
+      rerollUsar: async (d, campo, con) => {
+        const S = getS(), que = conQueReroll(S, con), m = monedaReroll(S);
+        if(!que){ ui.toast(con === 'wildcard' ? 'No tenés wildcards' : 'No tenés una Moneda Re-Roll'); return false; }
         const ok = await ui.reabrir(d.id, campo);
-        if(!ok){ ui.toast('La tirada ya no se puede repetir (no se gastó la moneda)'); return false; }
-        setTimeout(() => tirarMonedaReroll(getS(), m, ui), 800);
+        if(!ok){ ui.toast(`La tirada ya no se puede repetir (no se gastó la ${que === 'wildcard' ? 'wildcard' : 'moneda'})`); return false; }
+        if(que === 'wildcard') gastarWildcard(getS(), ui);
+        else setTimeout(() => tirarMonedaReroll(getS(), m, ui), 800);
         return true;
       },
       // Flash: las habilidades Flash que me sirven para esta tirada del duelo (se marcan ANTES de tirar) y su uso.
@@ -335,15 +352,20 @@ const FichaDuelo = (() => {
      (`data-rerollpick` = la clave) o "ya usó su re-roll". repetirTirada(u, registrar): vuelve a tirar los mismos dados de una tirada
      (con sus mismos bonos y mitades) y la registra con registrar(origen, r); false si no se puede. */
   function rerollHtml(S, lista){
-    const m = monedaReroll(S);
+    const m = monedaReroll(S), w = wildcards(S);
     lista = (lista || []).filter(h => !/^🪙 Moneda Re-Roll/.test(String(h.origen)));
-    const aviso = m
-      ? `Tenés una Moneda Re-Roll en <b>${m.key === 'cinturon' ? 'el cinturón' : 'la mochila'}</b>. Elegí qué tirada repetir: no cuesta No2, pero después se tira la moneda (par se conserva, impar se rompe).`
-      : `No tenés una Moneda Re-Roll equipada (cinturón o mochila). Podés ver tus últimas tiradas igual.`;
+    const partes = [];
+    if(m) partes.push(`una Moneda Re-Roll en <b>${m.key === 'cinturon' ? 'el cinturón' : 'la mochila'}</b> (después se tira la moneda: par se conserva, impar se rompe)`);
+    if(w) partes.push(`<b>${w} wildcard${w === 1 ? '' : 's'}</b> 🃏 (se gasta al usarla)`);
+    const aviso = partes.length
+      ? `Tenés ${partes.join(' y ')}. Elegí qué tirada repetir: no cuesta No2.`
+      : `No tenés una Moneda Re-Roll equipada (cinturón o mochila) ni wildcards. Podés ver tus últimas tiradas igual.`;
     const filas = lista.length ? lista.map(h => {
       const usada = TiradasPropias.usada(h, S.rerollUsados);
+      const botones = `<button type="button" class="mini" data-rerollpick="${esc(h.clave)}" data-rerollcon="moneda"${m ? '' : ' disabled'}>🪙 Moneda</button>`
+        + (w ? `<button type="button" class="mini" data-rerollpick="${esc(h.clave)}" data-rerollcon="wildcard" title="Gastar una wildcard">🃏 Wildcard</button>` : '');
       return `<div class="item"><div class="ihead"><div><div class="iname">${esc(h.origen)}</div><div class="idesc">${esc(h.formula || '')}${h.rolls && h.rolls.length ? ' → ' + h.rolls.join(' + ') : ''}${num(h.mod) ? ' ' + (num(h.mod) > 0 ? '+' : '−') + ' ' + Math.abs(num(h.mod)) : ''} = <b>${fmt(num(h.total))}</b></div></div>
-      ${usada ? '<span class="tag">ya usó su moneda</span>' : `<button type="button" class="mini" data-rerollpick="${esc(h.clave)}"${m ? '' : ' disabled'}>🪙 Moneda</button>`}</div></div>`;
+      ${usada ? '<span class="tag">ya se repitió</span>' : `<div style="display:flex;gap:6px;flex:none">${botones}</div>`}</div></div>`;
     }).join('') : '<div class="hint">Todavía no hiciste ninguna tirada.</div>';
     return {aviso, filas};
   }
@@ -358,15 +380,16 @@ const FichaDuelo = (() => {
     registrar(`${String(u.origen).replace(/ \(re-roll\)$/, '')} (re-roll)`, {formula: u.formula, rolls, mod: u.mod, total, estados: u.estados});
     return true;
   }
-  // Usar la moneda en una tirada: la marca (una moneda por tirada), la repite y, un momento después, tira la moneda.
-  function usarReroll(S, h, ui){
-    const m = monedaReroll(S);
-    if(!h || !m || TiradasPropias.usada(h, S.rerollUsados)) return false;
+  // Usar la moneda (o una 🃏 wildcard, `con`) en una tirada: la marca (una por tirada), la repite y, con la moneda, un momento después la tira.
+  function usarReroll(S, h, ui, con){
+    const que = conQueReroll(S, con), m = monedaReroll(S);
+    if(!h || !que || TiradasPropias.usada(h, S.rerollUsados)) return false;
     S.rerollUsados = [...(S.rerollUsados || []), h.clave, ...(h.docId && h.docId !== h.clave ? [h.docId] : [])].slice(-50);
     if(!repetirTirada(h, ui.registrarTirada, ui.toast)) return false;
-    setTimeout(() => tirarMonedaReroll(S, m, ui), 900);
+    if(que === 'wildcard') gastarWildcard(S, ui);
+    else setTimeout(() => tirarMonedaReroll(S, m, ui), 900);
     return true;
   }
 
-  return {esMonedaReroll, monedaReroll, tirarMonedaReroll, rerollHtml, repetirTirada, usarReroll, costoFlashDe, pagarFlash, usarFlashFueraDelDuelo, hooks};
+  return {esMonedaReroll, monedaReroll, wildcards, conQueReroll, tirarMonedaReroll, rerollHtml, repetirTirada, usarReroll, costoFlashDe, pagarFlash, usarFlashFueraDelDuelo, hooks};
 })();

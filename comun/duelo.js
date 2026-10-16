@@ -251,6 +251,10 @@ const Duelo = (() => {
 .viva,.duelo-nota.viva,.espera.duelo-reroll{position:fixed;right:22px;bottom:22px;z-index:99100;background:#3a2f12;color:#ffe9a8;border:2px solid #d9b45a;border-radius:16px;padding:12px 18px;font-size:17px;font-weight:800;cursor:pointer;box-shadow:0 8px 30px rgba(0,0,0,.6),0 0 22px rgba(255,190,60,.55);animation:duelo-latido 1.6s ease-in-out infinite alternate;text-align:center}
 .duelo-reroll small{display:block;font-size:11.5px;font-weight:500;opacity:.9}
 #duelo-fondo.min .duelo-reroll{display:none}
+.duelo-reroll-fila{position:fixed;right:22px;bottom:22px;z-index:99100;display:flex;gap:10px;align-items:flex-end}
+.duelo-reroll-fila .duelo-reroll{position:static}
+.duelo-reroll.wildcard{background:#1d2347;color:#dfe4ff;border-color:#8f9cff;box-shadow:0 8px 30px rgba(0,0,0,.6),0 0 22px rgba(130,140,255,.55)}
+#duelo-fondo.min .duelo-reroll-fila{display:none}
 .duelo-flash{margin-top:8px;display:flex;flex-direction:column;gap:6px;align-items:stretch}
 .duelo-flash button.flash{background:#3a2f12;color:#ffe9a8;border:1px solid #d9b45a;font-size:14px}
 .duelo-flash button.flash small{display:block;font-weight:500;font-size:11px;opacity:.85}
@@ -1659,7 +1663,11 @@ const Duelo = (() => {
     if(rerollInfo[k] === undefined){ pedirRerollInfo(d, lado); return ''; }
     const info = rerollInfo[k];
     if(!info.disponible) return '';
-    return `<button type="button" class="duelo-reroll" data-reroll="${_esc(lado)}:${_esc(campo)}" title="Volver a tirar ${_esc(etqCampo(d, campo))} (moneda en ${_esc(info.donde || 'el inventario')}, sin costo de No2) y después se tira una moneda: par se conserva, impar se rompe">🪙 Moneda<small>volver a tirar ${_esc(etqCampo(d, campo))}</small></button>`;
+    // 🃏 Wildcard (2026-10-15): al lado de la moneda, si tiene; se gasta al usarla. Una info vieja (sin `moneda`) es una moneda.
+    const etq = _esc(etqCampo(d, campo)), conMoneda = info.moneda !== false, w = Math.max(0, Math.round(_num(info.wildcards)));
+    const bMoneda = conMoneda ? `<button type="button" class="duelo-reroll" data-reroll="${_esc(lado)}:${_esc(campo)}:moneda" title="Volver a tirar ${etq} (moneda en ${_esc(info.donde || 'el inventario')}, sin costo de No2) y después se tira una moneda: par se conserva, impar se rompe">🪙 Moneda<small>volver a tirar ${etq}</small></button>` : '';
+    const bWild = w ? `<button type="button" class="duelo-reroll wildcard" data-reroll="${_esc(lado)}:${_esc(campo)}:wildcard" title="Volver a tirar ${etq} gastando una wildcard (te quedan ${w}), sin costo de No2">🃏 Wildcard<small>volver a tirar ${etq}</small></button>` : '';
+    return bMoneda && bWild ? `<div class="duelo-reroll-fila">${bWild}${bMoneda}</div>` : bMoneda || bWild;
   }
 
 
@@ -2296,14 +2304,13 @@ const Duelo = (() => {
     if(bam) bam.onclick = () => { const v = Math.max(0, Math.round(_num((f.querySelector('[data-manual="recibido"]') || {}).value))); guardarAplicacion(d.id, {manual: true, golpe: v, recibido: v, mult: 1, crudo: d.dano.crudo, motivoManual: 'lo aplicó el GM a mano'}).catch(err => console.error(err)); };
     const bcr = f.querySelector('[data-critico]');
     if(bcr) bcr.onclick = () => { bcr.disabled = true; bcr.textContent = 'Tirando…'; tirarCritico(d.id).catch(err => { console.error(err); _toast('No se pudo tirar el crítico'); }); };
-    const brr = f.querySelector('[data-reroll]');
-    if(brr) brr.onclick = () => {
-      const [lado, campo] = brr.dataset.reroll.split(':');
-      brr.disabled = true;
-      enviar(d[lado], {tipo: 'duelo-reroll', id: d.id, campo});
+    f.querySelectorAll('[data-reroll]').forEach(brr => brr.onclick = () => {
+      const [lado, campo, con] = brr.dataset.reroll.split(':');
+      f.querySelectorAll('[data-reroll]').forEach(x => { x.disabled = true; });
+      enviar(d[lado], {tipo: 'duelo-reroll', id: d.id, campo, ...(con ? {con} : {})});
       delete rerollInfo[d.id + ':' + lado]; rerollPedidas.delete(d.id + ':' + lado);
       setTimeout(() => { if(actual && actual.dato) dibujar(); }, 4000);
-    };
+    });
     const bfin = f.querySelector('[data-fin-duelo]');
     if(bfin){ bfin.onclick = cerrar; if(nuevoFin){ try{ bfin.scrollIntoView({behavior: 'smooth', block: 'nearest'}); }catch(err){} } }
     const bcon = f.querySelector('[data-contra]');
@@ -2341,7 +2348,7 @@ const Duelo = (() => {
       if(m.tipo === 'duelo-reroll'){   // usar la moneda: verifica, cobra, reabre la tirada y tira la moneda
         const lado = (m.campo === 'pdg' || m.campo === 'fuerza' || m.campo === 'critico') ? d.atacante : d.defensor;
         if(!(h.soy && h.soy(lado) && h.rerollUsar) || !puedeReabrir(d, m.campo)){ _toast('Esa tirada ya no se puede repetir'); return; }
-        await h.rerollUsar(d, m.campo);
+        await h.rerollUsar(d, m.campo, m.con === 'wildcard' ? 'wildcard' : m.con === 'moneda' ? 'moneda' : undefined);
         return;
       }
       if(m.tipo === 'duelo-vista'){   // ¿qué dado tirás en esta tirada, y de dónde sale? (2026-10-08)

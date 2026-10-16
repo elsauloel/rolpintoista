@@ -189,5 +189,15 @@ estado: confirmado
 +++
 **Afortunado** es un [[Estados alterados|estado]] (buff): **toda tirada de PdG, Parry o Evasión se hace dos veces y te quedás con la mejor.** Dura unos turnos (o todo el combate, si viene de un pergamino). Es lo más parecido a una "ventaja" del sistema.
 
-> [!question] Wildcards (P102)
-> **El contador volvió a la ficha (2026-09-22)**, en el panel ⭐ Exp y Job: un valor actual y un máximo, los dos a mano, **sin ninguna mecánica todavía** — como Job o DDE pero sin fórmula, solo un número libre. La pregunta de diseño de antes sigue abierta: ¿para qué se usan? La idea original era un recurso diario para **repetir una tirada**. ¿Se retoman con esa regla? ¿Cuántos por día, se acumulan, y se puede repetir la tirada de otro?
++++
+titulo: Wildcards
+alias: [Wildcard, Comodín, Carta]
+tags: [tiradas, descanso]
+estado: confirmado
++++
+Una **wildcard** 🃏 sirve para **repetir cualquier tirada tuya**, sin costo de [[Nitros (No2)|Nitros]], igual que la Moneda Re-Roll: una por tirada. La diferencia es que **se gasta siempre** (la moneda, en cambio, se tira después: par se conserva, impar se rompe).
+
+- **Cómo se consiguen:** descansando. Al pasar el día, el GM elige cómo descansaron: **🌙 descanso reparador** → cada uno queda con **2** wildcards; **💤 descanso normal** → el que no tenía ninguna recibe **1**. No se acumulan por encima de eso.
+- **Cómo se usan:** con el botón 🪙 (en el mapa, arriba; o en la Botonera) se abre la lista de tus últimas tiradas, y cada una tiene «🃏 Wildcard». En el duelo aparece el botón «🃏 Wildcard» al lado del de la moneda.
+- Mientras tengas alguna, en el rincón aparece una **cartita 🃏 que gira**, para que te acuerdes.
+- El número también se puede tocar a mano en la ficha (⭐ Exp y Job).

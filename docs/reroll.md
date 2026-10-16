@@ -1,6 +1,6 @@
 # Re-roll: la Moneda Re-Roll (2026-09-27, regla del dueño)
 
-> Por ahora **solo con la Moneda Re-Roll** (consumible del catálogo, `cat-moneda-reroll`). Más adelante se suman las **wildcards** (el dueño todavía no tiene definidas sus reglas).
+> Con la **Moneda Re-Roll** (consumible del catálogo, `cat-moneda-reroll`) y, desde el 2026-10-15, con las **🃏 wildcards** (ver abajo).
 
 ## La regla
 - Con una **Moneda Re-Roll equipada** (cinturón o mochila) podés volver a hacer **cualquier tirada tuya del juego**, **sin costo de No2**.
@@ -16,7 +16,20 @@
 - Creeps e invocaciones no usan monedas.
 - El catálogo: la moneda explica esta regla en su detalle y lleva `rerollMoneda: true`.
 
+## 🃏 Wildcards (2026-10-15, regla del dueño)
+- **De dónde salen:** del descanso al pasar el día. El GM aprieta «⏳ Pasar de día» y elige cómo descansaron:
+  **🌙 Descanso reparador** → cada personaje queda con **2** wildcards (si tenía menos); **💤 Descanso normal** → el que no tenía ninguna recibe **1**.
+  No se acumulan por encima de eso (quien ya tenía 3 a mano, las conserva). El número sigue editable a mano en la ficha (⭐ Exp y Job).
+- **Para qué:** igual que la moneda: repetir **cualquier tirada tuya**, sin costo de No2, una por tirada. **Diferencia:** no se tira nada:
+  la wildcard **se gasta siempre**.
+- **Dónde:** la misma ventana (🪙 «Repetir una tirada»: cada tirada tiene «🪙 Moneda» y «🃏 Wildcard»), el mismo botón del duelo (al lado de la
+  moneda aparece «🃏 Wildcard») y, en el rincón, **una cartita 🃏 que gira** (como la moneda) mientras tengas alguna.
+- **Código:** `FichaDuelo.wildcards / conQueReroll / usarReroll(S, h, ui, con)` y los hooks `rerollInfo` (`{moneda, wildcards}`) / `rerollUsar(d, campo, con)`
+  (comun/ficha-duelo.js); el botón del duelo `rerollBtnHtml` (comun/duelo.js); `Flotantes.wildcard` (comun/flotantes.js); `resumen.wildcards`
+  (comun/ficha-resumen.js); el descanso `FichaMantenimiento.descansar(S, {wildcards})` y la pregunta del GM en vtt-hexgrid/js/41-dia.js
+  (`mapa/dia.descanso`).
+
 ## Pendiente / a decidir
-- **Wildcards:** cuando el dueño defina sus reglas, mismo botón y mismas piezas (cambia solo de dónde sale el permiso).
+- Wildcards: ¿se puede usar para repetir la tirada de **otro** jugador? Hoy no (como la moneda).
 - ¿Reabrir el daño con un margen de tiempo antes de que el GM lo aplique? Hoy no.
 - Falta probarlo en mesa (el botón fijo del mapa abriendo el iframe, la ventana con varias tiradas, y «una moneda por tirada» en un duelo real).

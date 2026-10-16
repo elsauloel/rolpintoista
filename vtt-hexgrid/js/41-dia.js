@@ -5,11 +5,13 @@
    - **Descanso**: vida, SP y No2 al máximo (los caídos no se levantan solos), también sus invocaciones.
    - **Los estados con turnos terminan** (los permanentes, los de un ítem equipado y los derivados quedan).
    - **Los topes diarios**: el del talento de reparar (`S.reparadoTalento`; 3 puntos por nivel por día, comun/ficha-equipo.js).
+   - **🃏 Wildcards** (2026-10-15, dueño): el GM elige el descanso (`descanso: 'bueno' | 'normal'` en el mismo documento): reparador = cada
+     personaje queda con 2 wildcards si tenía menos; normal = el que no tenía recibe 1. Se usan como la Moneda Re-Roll (docs/reroll.md).
    El GM además termina los estados con turnos de sus creeps (los que tienen token) y **repone la góndola** de la tienda publicada.
    Cada personaje guarda el día que ya aplicó (`S.diaAplicado`): no se aplica dos veces, y quien no estaba conectado lo recibe al entrar.
    Corregir el número a mano (✎) no renueva nada: solo cambia la cuenta (y todos lo anotan como aplicado).
    ========================================================= */
-let diaActual = 0, diaManual = false, diaVisto = false;
+let diaActual = 0, diaManual = false, diaVisto = false, diaDescanso = 'normal';
 const refDia = () => fbDb.doc(fbRutaCampana('mapa/dia'));
 let diaEscuchando = false;
 function escucharDia(){
@@ -20,6 +22,7 @@ function escucharDia(){
     const antes = diaActual;
     diaActual = Math.max(0, Math.round(num(d.dia)));
     diaManual = !!d.manual;
+    diaDescanso = d.descanso === 'bueno' ? 'bueno' : 'normal';   // 🃏 (2026-10-15): reparador = 2 wildcards, normal = 1
     diaVisto = true;
     if(typeof actualizarCabecera === 'function') actualizarCabecera();
     renderDiaBoton();
@@ -33,14 +36,15 @@ function renderDiaBoton(){
 
 // El descanso de un personaje y qué estados terminan: comun/ficha-mantenimiento.js (FichaMantenimiento.descansar / terminaAlPasarDia).
 const diaTermina = e => FichaMantenimiento.terminaAlPasarDia(e);
-const diaDescansarPj = S => FichaMantenimiento.descansar(S);
+const DIA_WILDCARDS = {normal: 1, bueno: 2};   // 🃏 cuántas carga cada descanso (dueño, 2026-10-15)
+const diaDescansarPj = (S, descanso) => FichaMantenimiento.descansar(S, {wildcards: DIA_WILDCARDS[descanso] || 1});
 let diaTrabajando = false;
 async function diaRevisar(antes){
   if(diaTrabajando || !fbUsuario) return;
   diaTrabajando = true;
   try{
     if(typeof bnCargarPiezas === 'function') await bnCargarPiezas();
-    const dia = diaActual, manual = diaManual;
+    const dia = diaActual, manual = diaManual, descanso = diaDescanso;
     // Mis personajes.
     for(const [fichaId] of fichasPub){
       if(typeof bnManejo !== 'function' || !bnManejo(fichaId)) continue;
@@ -51,7 +55,7 @@ async function diaRevisar(antes){
           // Corregido a mano: solo se anota el número (aunque sea más chico, así el próximo día se aplica bien).
           if(manual ? num(S.diaAplicado) === dia : num(S.diaAplicado) >= dia) return false;
           nombre = ((S.meta && S.meta.nombre) || '').trim();
-          if(!manual) lineas = diaDescansarPj(S);
+          if(!manual) lineas = diaDescansarPj(S, descanso);
           S.diaAplicado = dia;
           return true;
         });
@@ -99,12 +103,17 @@ async function diaReponerGondola(){
 async function pasarDeDia(){
   if(!soyGM) return;
   const sig = diaActual + 1;
-  if(!(await Confirmar.preguntar(`Pasa al Día ${sig}. Todos descansan (vida, SP y No2 al máximo; los caídos no se levantan), terminan los estados con turnos, se renuevan los topes diarios (el talento de reparar) y se repone la góndola de la tienda. ¿Seguir?`, {titulo: '⏳ Pasar de día', icono: '☀', si: `Pasar al Día ${sig}`}))) return;
+  // 🃏 ¿Cómo descansaron? (dueño, 2026-10-15): reparador = hasta 2 wildcards; normal = hasta 1 (a quien no tiene). Lo demás del día, igual.
+  const descanso = await Confirmar.elegir(`Pasa al Día ${sig}. Todos descansan (vida, SP y No2 al máximo; los caídos no se levantan), terminan los estados con turnos, se renuevan los topes diarios (el talento de reparar) y se repone la góndola de la tienda. ¿Cómo descansaron?`, {titulo: '⏳ Pasar de día', icono: '☀', no: 'Cancelar', opciones: [
+    {valor: 'bueno', texto: '🌙 Descanso reparador', detalle: 'Durmieron bien, a salvo: cada uno queda con 2 wildcards 🃏 (si tenía menos).'},
+    {valor: 'normal', texto: '💤 Descanso normal', detalle: 'Descansaron como pudieron: el que no tenía ninguna recibe 1 wildcard 🃏.'},
+  ]});
+  if(descanso !== 'bueno' && descanso !== 'normal') return;
   try{
-    await refDia().set({dia: sig, manual: false, actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+    await refDia().set({dia: sig, manual: false, descanso, actualizado: firebase.firestore.FieldValue.serverTimestamp()});
   }catch(err){ console.error(err); toast('No se pudo pasar de día'); return; }
   const gond = await diaReponerGondola();
-  const texto = `☀ Pasó un día: es el Día ${sig}. Todos descansaron (vida, SP y No2 al máximo; los caídos siguen caídos), terminaron los estados con turnos y se renovaron los topes diarios${gond ? '; ' + gond : ''}.`;
+  const texto = `☀ Pasó un día: es el Día ${sig}. ${descanso === 'bueno' ? '🌙 Descanso reparador: cada uno queda con 2 wildcards' : '💤 Descanso normal: el que no tenía wildcard recibe 1'}. Todos descansaron (vida, SP y No2 al máximo; los caídos siguen caídos), terminaron los estados con turnos y se renovaron los topes diarios${gond ? '; ' + gond : ''}.`;
   mesaLinea(texto, 'recordatorio', 'GM');
   if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'dia', icono: '☀', titulo: `Día ${sig}`, resultado: texto, estado: 'listo', datos: {chico: true}});
 }

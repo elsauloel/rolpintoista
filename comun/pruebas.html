@@ -1763,6 +1763,26 @@ prueba('⏳ Pasar de día (2026-10-12): descansar llena vida, SP y No2 (no levan
   igual([S.hp === hpmax, S.spGastado, S.nitros === FichaBotonera.nitrosMaximo(S), S.efectos.map(e => e.nombre), S.reparadoTalento, lineas.some(l => /Veneno/.test(l)), C.hp],
     [true, 0, true, ['Sigilo'], 0, true, 0]);
 });
+prueba('🃏 Wildcards (2026-10-15): el descanso normal da 1 al que no tiene, el reparador deja 2; no se acumulan por encima', () => {
+  const d = (w, n) => { const S = fichaBotonera({}); S.meta.wildcards = w; const l = FichaMantenimiento.descansar(S, {wildcards: n}); return [S.meta.wildcards, l.some(x => /wildcard/.test(x))]; };
+  const sin = fichaBotonera({}); sin.meta.wildcards = 0; FichaMantenimiento.descansar(sin);
+  igual([d(0, 1), d(1, 1), d(0, 2), d(1, 2), d(3, 2), sin.meta.wildcards], [[1, true], [1, false], [2, true], [2, true], [3, false], 0]);
+});
+prueba('🃏 Wildcards: repiten una tirada como la moneda (una por tirada), se gastan sin tirar moneda; en el duelo, la info dice cuántas', async () => {
+  const S = fichaBotonera({}); S.meta.wildcards = 2;
+  const h = {clave: 'L1', rerollId: 1, origen: 'PdG', formula: '1d8', rolls: [3], mod: 0, total: 3};
+  const html = FichaDuelo.rerollHtml(S, [h]);
+  const reg = [], toasts = [];
+  const ui = {registrarTirada: (o, r) => reg.push(o), toast: t => toasts.push(t), cambio: () => {}};
+  const ok = FichaDuelo.usarReroll(S, h, ui, 'wildcard');
+  const otraVez = FichaDuelo.usarReroll(S, h, ui, 'wildcard');   // una por tirada
+  await new Promise(r => setTimeout(r, 1000));
+  const info = FichaDuelo.hooks(() => S, ui).rerollInfo({});
+  const T = fichaBotonera({}); T.meta.wildcards = 0;
+  igual([/data-rerollcon="wildcard"/.test(html.filas), /2 wildcards/.test(html.aviso), ok, otraVez, S.meta.wildcards, reg, reg.some(x => /Moneda/.test(x)), info.disponible, info.wildcards, info.moneda,
+    FichaDuelo.conQueReroll(T, 'wildcard'), FichaDuelo.conQueReroll(S, undefined)],
+    [true, true, true, false, 1, ['PdG (re-roll)'], false, true, 1, false, '', 'wildcard']);
+});
 prueba('Reparar sin herrero (2026-10-12): el talento (2 despojos por punto, tope 3 por nivel por día, una rota al doble) y el Óleo reparador (3 puntos, no a una rota)', () => {
   const peto = {id: 'peto', nombre: 'Peto', tipoItem: 'armadura_rigida', equipado: true, peso: 2, mods: [{stat: 'def', val: 2}], dur: 3, armRota: 2};
   const roto = {id: 'roto', nombre: 'Yelmo', tipoItem: 'cabeza', equipado: true, peso: 1, mods: [], dur: 0};

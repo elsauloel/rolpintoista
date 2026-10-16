@@ -68,7 +68,7 @@ Cambios importantes del sistema, para entender material viejo:
 | **Escala de Tipos** | Tipos 2, 4, 6, 8, 10 | Tipos **4, 6, 8, 10, 12** ([[Daño y Tipo de arma]]) |
 | **Piezas de defensa** | Cascos/guantes/piernas/botas blandos y rígidos | Una sola categoría plana por ranura; solo el torso distingue blanda/rígida |
 | **Skill de clase** | 1 de tu clase, 2 de otra, 3 custom | **1** de clase (cualquiera), **2** custom ([[Puntos de Job]]) |
-| **Wildcards** | Contador diario para repetir tiradas | De vuelta en la ficha (2026-09-22) como contador libre, sin mecánica todavía (ver [[Tiradas y dados]]) |
+| **Wildcards** | Contador diario para repetir tiradas | Se cargan al descansar (1 normal, 2 reparador) y repiten una tirada como la Moneda Re-Roll, pero se gastan siempre ([[Wildcards]], 2026-10-15) |
 | **Sync de datos** | Subir/Bajar datos por GitHub | Todo en vivo, se guarda solo |
 
 ## La campaña vieja

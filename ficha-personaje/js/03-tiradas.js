@@ -65,6 +65,8 @@ function renderPolillaBoton(){
 function renderMonedaFlotante(){
   if(typeof Flotantes === 'undefined') return;
   Flotantes.moneda({mostrar: window.parent === window && typeof S !== 'undefined' && !!S && !!FichaDuelo.monedaReroll(S), alClic: () => abrirReroll()});
+  const nw = window.parent === window && typeof S !== 'undefined' && S ? FichaDuelo.wildcards(S) : 0;   // 🃏 la carta (2026-10-15)
+  if(Flotantes.wildcard) Flotantes.wildcard({mostrar: nw > 0, n: nw, alClic: () => abrirReroll()});
 }
 setInterval(renderMonedaFlotante, 1500);
 function usarPolilla(){

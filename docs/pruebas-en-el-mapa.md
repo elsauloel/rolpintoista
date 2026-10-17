@@ -44,6 +44,9 @@
 - [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): un crítico de la Puñalada (Rengo 2 y Lisiado 1). El pozo visto como jugador ya se vio (con
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **💔 Duelo: «Aplicar el daño»** (2026-10-17, «Test con claude elsaulo», GM con 🎮 el control de Xeena): el Creep de prueba le pegó
+  (empate resuelto con par) y tiró 2d8+1 = 6: el paso 5 quedó en «6 de daño, menos tu Defensa» con «💔 Aplicar el daño» y la vida sin tocar; al
+  tocarlo: «6 de daño (6 − Defensa 0) · Xeena: 5 → 0 HP». Falta: la variante del GM «Aplicar por …» con un personaje de otra cuenta.
 - [x] **💥 Trampa que explota** (2026-10-17, «Test con claude elsaulo», GM con 🎮 el control de Xeena): una trampa en flor con «Explota»: al
   pisarla, las 7 casillas se encendieron con la onda y el mapa quedó quieto; 1,5 s después, el anuncio («🎲 Tirar el daño», «💔 Aplicar el daño (3)»,
   «Entendido»). Captura de la explosión en la conversación. Falta: verlo el dueño y un jugador desde su cuenta (pendientes, 🖥).

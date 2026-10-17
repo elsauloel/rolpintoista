@@ -81,7 +81,7 @@ Así se resuelve un ataque cuerpo a cuerpo estándar:
 2. **El defensor elige** cómo defenderse: [[Evasión]] o [[Parry]] ([[Defenderse de un ataque]]).
 3. Es una [[Tirada enfrentada]]: si el atacante gana, **conecta**.
 4. El atacante tira el **daño**: los dados de su arma ([[Daño y Tipo de arma]]) **+ su stat Daño** ([[Fuerza]]).
-5. Al resultado se le **resta la [[Defensa]]** del objetivo. La diferencia se descuenta de su [[HP]].
+5. Al resultado se le **resta la [[Defensa]]** del objetivo. La diferencia se descuenta de su [[HP]]. Si el que recibe el golpe es un **personaje** (o una invocación), el cuadro del duelo se frena antes: dice cuánto pasó («6 de daño, menos tu Defensa») y el jugador toca **💔 Aplicar el daño**; ahí se descuenta solo y se ve cómo queda la vida. Si el jugador no está, el GM lo aplica por él. Lo mismo al caer en una trampa.
 6. Si el golpe fue [[Golpe crítico|crítico]] (la diferencia PdG − Evasión llega al Tipo del arma), se ignora la Defensa y **todo el daño se multiplica** según el d20 (doble, triple o cuádruple daño). **Si se alcanza el crítico, es crítico pase lo que pase con el d20:** un d20 bajo (menos de 7) solo significa que **no multiplica (×1)**, pero el golpe **igual ignora la Defensa** y va derecho a la vida.
 7. Si el arma tiene [[Efectos al golpear]], aparecen resaltados en la Mesa (y se tiran, si tienen porcentaje).
 

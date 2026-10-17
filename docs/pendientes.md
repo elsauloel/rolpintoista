@@ -8,6 +8,10 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
+> - [ ] **💔 Ver en el mapa el «Aplicar el daño» del duelo** (2026-10-17, dueño: «anotalo también en pendiente para ver en la compu»): cuando
+>   un creep le pega a un personaje, el cuadro del duelo frena en «N de daño, menos tu Defensa» con el botón **💔 Aplicar el daño** (el jugador) o
+>   **💔 Aplicar por …** (el GM, si el jugador no contesta); recién ahí baja la vida. Probado por Claude (capturas en la conversación); falta verlo
+>   el dueño, y sobre todo desde la cuenta de un jugador (la variante «Aplicar por …» no se pudo ver: en la partida de prueba el GM es dueño de Xeena).
 > - [ ] **💥 Ver en el mapa la trampa que explota y el daño en dos pasos** (2026-10-17, dueño: «anotalo en pendientes cuando esté en la compu,
 >   así yo lo veo efectivamente en el mapa»): una trampa con la casilla **💥 Explota** (asistente de trampas, paso «Daño»; ya la tiene el Cartucho
 >   enterrado del Kobold boom boom): al pisarla el mapa queda quieto 1,5 s con la explosión sobre el área y después el anuncio, con
@@ -30,9 +34,10 @@
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
 > - [ ] **💔 Un clic antes de recibir daño automatizado, en todo (2026-10-17, dueño):** «en jugadores debería suceder cada vez que un jugador
 >   recibe daño que esté automatizado… si en un ataque pasa el daño, el duelo debe tener la instancia de pasó tanto daño, menos tu armadura,
->   apretá aplicar daño… tiene que haber una instancia donde el jugador hace un clic antes de recibir daño automatizado». Hecho en las trampas
->   (💔 Aplicar el daño, 2026-10-17). Falta: el duelo (el defensor que es personaje o invocación), las zonas, las áreas y lo demás que baje vida
->   solo. Para el GM (creeps) no hace tanta falta.
+>   apretá aplicar daño… tiene que haber una instancia donde el jugador hace un clic antes de recibir daño automatizado». **Hecho** en las
+>   trampas y en el **duelo** (2026-10-17: si el que recibe es personaje o invocación, «N de daño, menos tu Defensa» y «💔 Aplicar el daño»; el GM
+>   tiene «Aplicar por …»; las áreas son sub-duelos, así que también). Las zonas ya pedían «Aplicar». **Falta:** lo que baja vida al empezar el
+>   turno (Veneno, Sangrado, Quemadura): hoy se aplica solo y se anuncia; ¿también con un clic?
 > - [ ] **🪤 Aprender trampas: ver una, copiarla y saber armarla (2026-10-17, dueño; también en 🛠 Herramientas de diseño → A desarrollar):**
 >   un **talento** para «imitar trampas»: ver una trampa (la detectada o la que lo agarró), copiarla y aprender a construirla, que quede en su
 >   lista para armarla después. **Desarmar trampas ya existe** (talento, 2026-10-08: detecta como la Pisada atenta y el mapa ofrece desarmarla

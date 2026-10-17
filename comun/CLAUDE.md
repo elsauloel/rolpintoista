@@ -1588,4 +1588,8 @@ versión parecida en más de una, es candidato a juntar.
   (`wildcards`, `conQueReroll`, `usarReroll(S, h, ui, con)`, hooks `rerollInfo`/`rerollUsar(d, campo, con)`), `duelo.js` (el botón «🃏 Wildcard» junto
   al 🪙), `flotantes.js` (`Flotantes.wildcard`: la cartita que gira), `ficha-resumen.js` (`resumen.wildcards`), `ficha-mantenimiento.js`
   (`descansar(S, {wildcards})`: el descanso del día las carga hasta 1 o 2).
+- **💔 Aplicar el daño en el duelo** (2026-10-17, dueño: un clic del jugador antes de recibir daño automatizado): `duelo.js` `pideAceptar(d)`
+  (el defensor no es un creep) → el GM no reclama ni aplica el daño hasta que `dano.aceptado` (`aceptarDano`, el botón `[data-dano-aceptar]`
+  del paso 5: «💔 Aplicar el daño» para el dueño o quien tiene 🎮 el control, «💔 Aplicar por …» para el GM). En las trampas, el paso
+  `dano-aplicar` (vtt-hexgrid/js/19).
 

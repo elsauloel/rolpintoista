@@ -197,6 +197,10 @@ const Duelo = (() => {
 #duelo-fondo .duelo-costo-ayuda:hover,#duelo-fondo .duelo-costo-ayuda:focus{opacity:1;outline:none;background:rgba(255,255,255,.12)}
 #duelo-fondo .duelo-costo-ayuda:hover::after,#duelo-fondo .duelo-costo-ayuda:focus::after{content:attr(data-txt);position:absolute;left:50%;top:22px;transform:translateX(-50%);z-index:5;width:max-content;max-width:300px;white-space:pre-line;text-align:left;background:#1d1712;color:#EDE3D6;border:1px solid #E0A458;border-radius:6px;padding:8px 10px;font:12.5px/1.45 system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.5)}
 #duelo-fondo [data-dano-tirar]:disabled,#duelo-fondo [data-critico]:disabled{opacity:.5;cursor:default}
+#duelo-fondo [data-dano-aceptar]{background:#a3263a;color:#fff;border:2px solid #f08a9a;border-radius:12px;padding:14px 28px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(163,38,58,.5)}
+#duelo-fondo [data-dano-aceptar].sec{font-size:14px;padding:8px 16px}
+#duelo-fondo [data-dano-aceptar]:hover{background:#bd3046}
+#duelo-fondo [data-dano-aceptar]:disabled{opacity:.5;cursor:default}
 .duelo-crit-titulo{text-align:center;font-size:30px;font-weight:900;letter-spacing:.04em;padding:10px 0 4px}
 .duelo-crit-titulo.no{color:#9aa4bd}
 .duelo-crit-titulo.posible{color:#ffd25a}

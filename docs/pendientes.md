@@ -29,10 +29,10 @@
 >   con la tirada del talento; las Ganzúas suman +2). **Decidido (dueño, 2026-10-17):** es un talento; se aprende tirando **Destreza**; armar
 >   una copia gasta **loot y tiempo fuera de combate**; las trampas **invocadas** (las de una habilidad, de un creep o de un personaje) también
 >   se pueden copiar, pero **con más dificultad**. «Lo vamos a enseñar en su momento.» Falta: las dificultades y cuánto loot y tiempo.
-> - [ ] **🪤 Revisar la dificultad para detectar de todas las trampas (2026-10-17, dueño):** la Percepción de los personajes es baja (1d8 o
->   menos en El origen) y las trampas de los creeps se detectan contra su Destreza o su Efecto especial (11 o 12): nadie las ve nunca. Revisar las
->   de los creeps (de fábrica, biblioteca y El origen) y las del catálogo contra la Percepción real. Primera: el Cartucho enterrado del Kobold
->   boom boom pasó a dificultad fija 6 (`detectarStat: 'fijo'`, nuevo).
+> - [ ] **🪤 Revisar la dificultad para detectar de las trampas del catálogo (2026-10-17, dueño):** la Percepción de los personajes es baja
+>   (1d8 o menos en El origen). **Las de una habilidad están bien** (dueño: la dificultad sale de la Destreza o el Efecto especial de quien la
+>   coloca, y si es alta, es una trampa difícil de ver); revisar las del catálogo y las que se arman en el mapa (número fijo, una común 8)
+>   contra la Percepción real.
 > - [ ] **🧪 Más ítems con la mecánica de cargas (2026-10-10, dueño; también en 🛠 Herramientas de diseño → A desarrollar):** la mecánica
 >   ya existe (estado con `cargas` y `golpe`, `Combatiente.gastarCarga`). Los óleos del Bazar ya están (aprobados y cargados 2026-10-10):
 >   Óleo venenoso (Común, 1 carga, +2 y Veneno ×3, 35) y Óleo venenoso concentrado (Buena, 2 cargas, +3 y Veneno ×3, 75) —; después otros

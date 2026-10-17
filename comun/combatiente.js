@@ -1340,15 +1340,13 @@ const Combatiente = (() => {
   }
   // La trampa que coloca una habilidad, lista para el mapa: si no trae nombre propio, lleva el de la habilidad.
   // `valorDe(statId)` (2026-10-02, P145): el valor de un stat de quien la coloca — la dificultad para detectarla sale de su Destreza (trampas
-  // físicas) o de su Efecto especial (mágicas, `detectarStat: 'dmgesp'`), en el momento de colocarla; o un número fijo (`detectarStat: 'fijo'` +
-  // `detectar`). Sin `valorDe`, queda la de siempre (8).
+  // físicas) o de su Efecto especial (mágicas, `detectarStat: 'dmgesp'`), en el momento de colocarla. Sin `valorDe`, queda la de siempre (8).
   function trampaDeHab(h, valorDe){
     const t = h && h.trampaColocar;
     if(!t) return null;
     const out = {...t, nombre: String(t.nombre || '').trim() || h.nombre};
     if(typeof valorDe === 'function'){
-      // `detectarStat: 'fijo'` (2026-10-17, dueño: el Cartucho enterrado del Kobold boom boom, dificultad 6): un número fijo (`detectar`).
-      const v = t.detectarStat === 'fijo' ? (Math.round(n(t.detectar)) || 8) : Number(valorDe(t.detectarStat === 'dmgesp' ? 'dmgesp' : 'des'));
+      const v = Number(valorDe(t.detectarStat === 'dmgesp' ? 'dmgesp' : 'des'));
       const oculta = Math.max(0, Math.round(n(valorDe('trampaoculta'))));   // Guantes de trampero (2026-10-05): tus trampas, más difíciles de ver
       if(Number.isFinite(v)) out.detectar = Math.max(1, Math.round(v)) + oculta;
       // La tirada para evitarla o para soltarse, contra un stat de quien la coloca (dueño, 2026-10-07: la trampa portal, Res.Esp contra tu

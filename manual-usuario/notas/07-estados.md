@@ -477,6 +477,20 @@ tags: [estado]
 estado: borrador
 
 +++
+titulo: Maldito
+alias: [Maldición de la sangre, Maldición]
+tags: [estado, debuff, sp]
+estado: confirmado
++++
+**Maldito** es un debuff de 2 turnos (lo pone la **Maldición de la sangre** del Kobold maldiciente): **cada punto de SP que gastes te saca 1 de vida**, directo, **en el momento de pagar**, antes de que salga el efecto. Puede dejarte caído.
+
+- Antes de pagar te aparece un aviso: «Estás Maldito: usar tal cosa cuesta N SP y te va a bajar N de vida (de A a B)», con **Aceptar** o **Cancelar**. Si cancelás, no se cobra nada.
+- Vale para todo lo que pagás con SP: habilidades (también las de costo X, como Drenar Vida), armas especiales, Flash, Carga Elemental, Empower y Re-roll.
+- A un creep no le hace nada: los creeps no usan SP.
+
+⚙ Automatizado.
+
++++
 
 **Invulnerable** es un buff: **no recibís daño de ninguna fuente** (golpes, veneno, sangrado…) y no te pueden aplicar ningún debuff.
 

@@ -8,6 +8,9 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
+> - [ ] **🩸 Ver en el mapa la Maldición de la sangre** (2026-10-17): con Maldito, al usar algo que cuesta SP sale «Estás Maldito: … te va a
+>   bajar N de vida (A → B)» con Aceptar / Cancelar; al aceptar baja la vida y queda en la Mesa. Probado por Claude con Xeena (capturas en la
+>   conversación); falta verlo el dueño, y sobre todo Larry con Drenar Vida (costo X) desde su cuenta.
 > - [ ] **▶ Ver en el mapa el «Empieza tu turno»** (2026-10-17, dueño: «un pequeño anuncio al principio del turno… que la persona ponga
 >   aplicar»): al pasarle el turno a un personaje o invocación, a su dueño le aparece al centro lo que pasa (estados, vida y SP, No2) con
 >   **✔ Aplicar** → «✔ YA SE APLICÓ»; el GM tiene «▶ Aplicar por él» en la Crónica; si el turno pasa sin aplicarlo, se aplica solo. Probado por

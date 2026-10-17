@@ -32,6 +32,7 @@ Coagulación). La Parálisis dura **1 turno** (dueño, 2026-10-08) y recarga 1 N
 | Coagulación (antes «extrema») | 3 turnos · caos |
 | Blindado | 2 turnos · caos |
 | Inamovible | 2 turnos · caos |
+| Maldito (2026-10-17) | 2 turnos · cada SP que paga le saca 1 de vida, al pagar (Maldición de la sangre) |
 | Vuela (2026-10-16) | Permanente (de nacimiento: abejas de Bizzante, creeps voladores) · no entra en el caos |
 | Sigilo | Hasta que lo descubran (como siempre) · caos (dueño, 2026-10-08: también entra) |
 | Invulnerable al revivir | Hasta su próximo turno · titila (es lo mismo que Invulnerable) |

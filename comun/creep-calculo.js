@@ -458,6 +458,9 @@ const CreepCalculo = (() => {
     return p ? p.charAt(0).toUpperCase() + p.slice(1).toLowerCase() : '';
   }
   // Vivo, se publica solo qué es cada cosa; derrotado (vida 0), los nombres de verdad. El arma natural (es su cuerpo) se ve siempre.
+  // Lo que va en las manos (2026-10-17, dueño: «las varitas, los báculos, las armas especiales son armas, no son equipo; lo mismo los orbes…
+  // lo que tiene en las manos son las armas y los escudos»): armas (también varitas y báculos), escudos, orbes y talismanes.
+  const enLasManos = it => /^(arma_|escudo_)/.test(String((it && it.tipoItem) || ''));
   function tarjetaPublica(sc){
     const nom = x => String(x || '').trim().slice(0, 60);
     const vivo = num(sc.hp) > 0;
@@ -465,7 +468,9 @@ const CreepCalculo = (() => {
     return {
       armaNombre: sc.armaNatural === true ? nom(sc.armaNombre) : ver(sc.armaNombre),
       armaNatural: sc.armaNatural === true,
-      equipoNombres: (Array.isArray(sc.equipo) ? sc.equipo : []).map(it => it && it.natural ? nom(it.nombre) : ver(it && it.nombre)).filter(Boolean).slice(0, 30),   // lo natural se ve con su nombre, como el arma natural
+      // Lo de las manos (además del arma) va aparte del equipo (2026-10-17): una varita, un escudo, un orbe.
+      manosNombres: (Array.isArray(sc.equipo) ? sc.equipo : []).filter(enLasManos).map(it => it.natural ? nom(it.nombre) : ver(it.nombre)).filter(Boolean).slice(0, 6),
+      equipoNombres: (Array.isArray(sc.equipo) ? sc.equipo : []).filter(it => it && !enLasManos(it)).map(it => it.natural ? nom(it.nombre) : ver(it.nombre)).filter(Boolean).slice(0, 30),   // lo natural se ve con su nombre, como el arma natural
       notas: String(sc.notas || '').trim().slice(0, 600),
       tipoCriatura: tipoDe(sc).slice(0, 30),   // el tipo de criatura (Matabestias de los arcos, 2026-10-11)
       pasosSilenciosos: num(modTotal(sc, 'pasossilenciosos')) > 0,   // 👣 (2026-10-15): el mapa de los jugadores no lo hace oír a 3 casilleros
@@ -656,7 +661,7 @@ const CreepCalculo = (() => {
     return partes.length ? partes.join(' · ') : 'nada';
   }
 
-  return {regenPasivas, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
+  return {enLasManos, regenPasivas, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
     TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto,
     trofeo, despojosDePrecio, dropsResumen, dropsFijos,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,

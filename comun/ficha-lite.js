@@ -155,15 +155,24 @@ const FichaLite = (() => {
     (o.armaEfectos || []).forEach(e => lineas.push({txt: efectoTxt(e)}));
     return {nombre: o.armaNombre, detalle: `${danoTxt} · Tipo ${fmt(num(o.armaTipo) || 8)}`, lineas};
   }
+  // La otra mano de un creep o una invocación (2026-10-17, dueño: varitas, báculos, orbes y escudos son armas, no equipo): el primer escudo, o
+  // si no hay, lo primero que va en la mano (una varita).
+  const enMano = (it, slotDe) => ['escudo', 'mano'].includes(slotDe(it.tipoItem));
+  const otraManoDe = (o, slotDe) => (o.equipo || []).find(it => slotDe(it.tipoItem) === 'escudo') || (o.equipo || []).find(it => enMano(it, slotDe)) || null;
   function segundaMano(o, slotDe){
-    const esc2 = (o.equipo || []).find(it => slotDe(it.tipoItem) === 'escudo');
+    const esc2 = otraManoDe(o, slotDe);
     if(!esc2) return {nombre: '', detalle: 'vacía', lineas: []};
+    if(slotDe(esc2.tipoItem) !== 'escudo'){
+      const d = String(esc2.detalle || '').split('⚙')[0].trim();
+      return {nombre: esc2.nombre || 'Arma', detalle: d.slice(0, 60) || 'en la mano', lineas: d ? [{txt: d}] : []};
+    }
     const lineas = [{txt: modsTxt(esc2.mods) || 'No suma a ningún stat'}];
     if(num(esc2.def)) lineas.unshift({txt: `Defensa ${signo(num(esc2.def))}`});
     return {nombre: esc2.nombre || 'Escudo', detalle: num(esc2.def) ? `Defensa ${signo(num(esc2.def))}` : 'escudo', lineas};
   }
   function equipoGuardado(o, slotDe){
-    return (o.equipo || []).filter(it => slotDe(it.tipoItem) !== 'escudo').map(it => {
+    const otra = otraManoDe(o, slotDe);
+    return (o.equipo || []).filter(it => it !== otra && !(slotDe(it.tipoItem) === 'escudo')).map(it => {
       const lineas = [];
       if(num(it.def)) lineas.push({txt: `Defensa ${signo(num(it.def))}`});
       const mt = modsTxt(it.mods);

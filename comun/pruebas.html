@@ -276,6 +276,11 @@ prueba('invocación: sus pasivas suman y la que da un estado lo pone (InvCalculo
   const inv = InvCalculo.migrar({nombre: 'Abeja', con: 2, agl: 3, fue: 1, des: 1, esp: 1, estados: [], pasivas: [pasivaParaCombatiente({nombre: 'Pies ligeros', mods: [{stat: 'eva', val: 1}]}, 'a'), pasivaParaCombatiente(PASIVAS_BASE.find(p => p.poolId === 'vuela'), 'b')]});
   igual([InvCalculo.modTotal(inv, 'eva'), InvCalculo.modTotal(inv, 'levitar'), inv.estados.map(e => e.nombre)], [1, 100, ['Vuela']]);
 });
+prueba('lo que va en las manos (varita, orbe, escudo) va aparte del equipo: en la 🪪 y en la ficha lite (2026-10-17)', () => {
+  const sc = CreepCalculo.normalizar({nombre: 'K', hp: 10, hpMax: 10, armaNombre: 'Pico', equipo: [{nombre: 'Varita del susurro', tipoItem: 'arma_1m'}, {nombre: 'Capucha', tipoItem: 'cabeza'}]});
+  const tp = CreepCalculo.tarjetaPublica(sc), m = FichaLite.creep(sc);
+  igual([tp.manosNombres.length, tp.equipoNombres.length, m.manos.map(x => x.nombre), m.equipo.map(x => x.nombre)], [1, 1, ['Pico', 'Varita del susurro'], ['Capucha']]);
+});
 prueba('dos Pajaritos parten una sola vez y el cartel muestra uno', () => {
   const es = [E({nombre: 'Pajaritos', mitadPdgEva: true}), E({nombre: 'Pajaritos 2', mitadPdgEva: true})];
   igual([Combatiente.mitadesDeTirada(es, 'pdg'), Combatiente.estadosQueParten(es, 'pdg').length], [1, 1]);
@@ -1986,7 +1991,7 @@ prueba('la 🪪 pública: solo los nombres del arma (también la natural) y del 
   const sc = creepPrueba({notas: '  Huele a pantano.  ', equipo: [{nombre: 'Yelmo', tipoItem: 'cabeza', def: 2, mods: [{stat: 'con', val: 1}]}, {nombre: ''}]});
   const nat = CreepCalculo.tarjetaPublica(creepPrueba({armaNombre: 'Garras', armaNatural: true}));
   igual([CreepCalculo.tarjetaPublica(sc), nat.armaNombre, nat.armaNatural, nat.equipoNombres],
-    [{armaNombre: 'Hacha', armaNatural: false, equipoNombres: ['Yelmo'], notas: 'Huele a pantano.', tipoCriatura: '', pasosSilenciosos: false}, 'Garras', true, []]);   // + el tipo de criatura (Matabestias, 2026-10-11)
+    [{armaNombre: 'Hacha', armaNatural: false, manosNombres: [], equipoNombres: ['Yelmo'], notas: 'Huele a pantano.', tipoCriatura: '', pasosSilenciosos: false}, 'Garras', true, []]);   // + el tipo de criatura (Matabestias, 2026-10-11)
 });
 prueba('Parry y Bloqueo: con su arma o un escudo; un arma natural sola no alcanza', () => {
   const nat = creepPrueba({armaNatural: true}), conEscudo = creepPrueba({armaNatural: true, equipo: [{nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 3}]});

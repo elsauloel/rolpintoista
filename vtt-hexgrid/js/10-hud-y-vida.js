@@ -41,7 +41,8 @@ function hudDatos(t){
     // El GM ve los nombres de verdad (de la ficha privada); los jugadores, lo publicado: de un creep vivo, solo qué es (2026-10-13).
     armaNombre: (t.tipo === 'creep' && soyGM && sc ? sc.armaNombre : (v && v.armaNombre)) || '',
     armaNatural: !!(v && v.armaNatural),
-    equipoNombres: (t.tipo === 'creep' && soyGM && sc ? (sc.equipo || []).map(e => e && e.nombre).filter(Boolean) : (v && v.equipoNombres)) || [],
+    equipoNombres: (t.tipo === 'creep' && soyGM && sc ? (sc.equipo || []).filter(e => e && !CreepCalculo.enLasManos(e)).map(e => e.nombre).filter(Boolean) : (v && v.equipoNombres)) || [],
+    manosNombres: (t.tipo === 'creep' && soyGM && sc ? (sc.equipo || []).filter(e => CreepCalculo.enLasManos(e)).map(e => e.nombre).filter(Boolean) : (v && v.manosNombres)) || [],   // (2026-10-17)
     equipoVago: t.tipo === 'creep' && !soyGM && !(v && v.resumen && v.resumen.muerto) && num(sc ? sc.hp : 1) > 0,
   };
 }
@@ -613,8 +614,10 @@ function hudTarjetaHtml(t, d){
   const arma = d.armaNombre
     ? `<span class="arma" title="${d.armaNatural ? 'Arma natural: es parte de su cuerpo' : 'Su arma'}">🗡 ${esc(d.armaNombre)}${d.armaNatural ? ' <i>(natural)</i>' : ''}</span>`
     : '';
-  const equipo = (arma || (d.equipoNombres && d.equipoNombres.length))
-    ? `<div class="hud-tarjeta-equipo">${arma}${(d.equipoNombres || []).map(n => `<span>${esc(n)}</span>`).join('')}</div>${d.equipoVago ? '<div style="color:var(--muted);font-size:11.5px;margin-top:4px">Se ve qué lleva; cómo es, recién al derrotarlo.</div>' : ''}`
+  // Lo de las manos (2026-10-17, dueño): el arma y además una varita, un báculo, un escudo, un orbe — armas, no equipo.
+  const manos = (d.manosNombres || []).map(n => `<span class="arma" title="En la otra mano">✋ ${esc(n)}</span>`).join('');
+  const equipo = (arma || manos || (d.equipoNombres && d.equipoNombres.length))
+    ? `<div class="hud-tarjeta-equipo">${arma}${manos}${(d.equipoNombres || []).map(n => `<span>${esc(n)}</span>`).join('')}</div>${d.equipoVago ? '<div style="color:var(--muted);font-size:11.5px;margin-top:4px">Se ve qué lleva; cómo es, recién al derrotarlo.</div>' : ''}`
     : '<span style="color:var(--muted)">Sin equipo.</span>';
   const estados = d.estados.length
     ? d.estados.map(e => {

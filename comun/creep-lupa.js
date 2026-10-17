@@ -168,11 +168,14 @@ const CreepLupa = (() => {
       ${detalle ? `<div class="arma-detalle">${esc(detalle)}</div>` : ''}
     </div>`;
     const efectos = (sc.armaEfectos || []).length && typeof EfectosGolpe !== 'undefined' ? `Al golpear: ${EfectosGolpe.resumenLista(sc.armaEfectos)}` : '';
-    const equipo = [
+    // Las armas (lo que va en las manos: el arma, y una varita, un báculo, un escudo, un orbe) y aparte el equipo (2026-10-17, dueño).
+    const pieza = it => equipado(it.nombre || '(sin nombre)', (K.TIPOITEM_LABEL[it.tipoItem] || it.tipoItem || '') + (it.natural ? ' · 🐾 natural (no se suelta)' : ''), `<small>DEF</small>+${fmt(num(it.def))}`, it.detalle);
+    const armas = [
       equipado(sc.armaNombre || 'Arma sin nombre', sc.armaDeRango ? 'Arma de rango' : 'Arma', esc(K.danoTxt(sc)),
         [sc.armaDetalle, efectos].filter(Boolean).join(' · ')),
-      ...(sc.equipo || []).map(it => equipado(it.nombre || '(sin nombre)', (K.TIPOITEM_LABEL[it.tipoItem] || it.tipoItem || '') + (it.natural ? ' · 🐾 natural (no se suelta)' : ''), `<small>DEF</small>+${fmt(num(it.def))}`, it.detalle)),
+      ...(sc.equipo || []).filter(K.enLasManos).map(pieza),
     ].join('');
+    const equipo = (sc.equipo || []).filter(it => !K.enLasManos(it)).map(pieza).join('');
 
     return {titulo: sc.nombre || 'Creep', html: `
     <div class="view-wrap">
@@ -200,7 +203,8 @@ const CreepLupa = (() => {
       ${crits ? `<div class="vc-cajas vc-5">${crits}</div>` : ''}`)}
       ${(sc.pasivas || []).length ? seccion('Pasivas', `<div class="vc-chips">${sc.pasivas.map(p => `<span class="vc-chip" title="${esc(p.detalle || '')}">${esc(p.nombre)}${K.pasivaComprasCreep(p) > 1 ? ' ×' + K.pasivaComprasCreep(p) : ''}</span>`).join('')}</div>`) : ''}
       ${seccion('Habilidades', habsHtml !== undefined ? habsHtml : (habilidades ? `<div class="vc-chips">${habilidades}</div>` : '<div class="hint">Sin habilidades.</div>'))}
-      ${seccion('Equipo', `<div class="vc-equipos">${equipo}</div>`)}
+      ${seccion('Manos', `<div class="vc-equipos">${armas}</div>`)}
+      ${seccion('Equipo', equipo ? `<div class="vc-equipos">${equipo}</div>` : '<div class="hint">Sin equipo.</div>')}
       ${seccion('Recompensas', recompensasVerHtml(sc))}
     </div>
     ${sc.notas ? `<div class="view-detalle"><span class="view-label">Notas</span>${esc(sc.notas)}</div>` : ''}

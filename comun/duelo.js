@@ -1252,6 +1252,22 @@ const Duelo = (() => {
     return mio;
   }
 
+  /* 💔 Un clic antes de recibir el daño (2026-10-17, dueño: «si en un ataque pasa el daño, el duelo debe tener la instancia de pasó tanto daño,
+     menos tu armadura, apretá aplicar daño… tiene que haber una instancia donde el jugador hace un clic antes de recibir daño automatizado»):
+     si el que recibe es un personaje o una invocación, el GM no aplica el daño hasta que su dueño (o quien tiene 🎮 su control) toca
+     «💔 Aplicar el daño» (`dano.aceptado`); si el jugador no está, el GM lo hace «por él». A un creep se le aplica como siempre. */
+  const pideAceptar = d => !!(d && d.defensor && d.defensor.tipo !== 'creep');
+  async function aceptarDano(id){
+    const ref = col().doc(id);
+    await fbDb.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.fase !== 'dano' || !m.dano || m.dano.aplicado || m.dano.aceptado) return;
+      m.dano = {...m.dano, aceptado: yo()};
+      tx.update(ref, cambiosDe(m));
+    });
+  }
   // El GM (en el mapa) aplica el daño al HP: primero se «reclama» para que, con varias pestañas del GM, solo una lo aplique.
   async function reclamarAplicacion(id){
     const ref = col().doc(id);
@@ -1262,6 +1278,7 @@ const Duelo = (() => {
       if(!doc.exists) return;
       const m = {...doc.data()};
       if(m.fase !== 'dano' || !m.dano || m.dano.aplicado || m.dano.reclamado) return;
+      if(pideAceptar(m) && !m.dano.aceptado) return;   // 💔 espera el OK de quien lo recibe
       m.dano = {...m.dano, reclamado: yo()};
       tx.update(ref, cambiosDe(m));
       mio = true;
@@ -1951,7 +1968,18 @@ const Duelo = (() => {
     }else{
       const defMan = dn.defensaManual === 'no' ? ' · ✍ sin restar Defensa' : dn.defensaManual !== undefined && dn.defensaManual !== null ? ` · ✍ Defensa ${_fmt(_num(dn.defensaManual))} (a mano)` : '';
       const tiro = `<div class="duelo-mini">Daño${arma}${defMan}: <b>${_fmt(dn.crudo)}</b> <span style="opacity:.7">(${_esc(dn.formula || '')}${dn.rolls && dn.rolls.length ? ' → ' + dn.rolls.join(' + ') : ''}${_num(dn.mod) ? ' ' + (_num(dn.mod) > 0 ? '+' : '−') + ' ' + Math.abs(_num(dn.mod)) : ''})</span></div>`;
-      if(!dn.aplicado){
+      if(!dn.aplicado && pideAceptar(d) && !dn.aceptado){
+        // 💔 Lo que pasó, antes de descontarlo: «tanto de daño, menos tu Defensa» y el botón (el dueño) o la espera (el resto; el GM, «por él»).
+        const ignora = d.hab && d.hab.dano && d.hab.dano.ignoraDef;
+        const suyo = esMio(d.defensor), tu = suyo ? 'tu' : 'su';
+        const que = crit ? `Crítico: ${_fmt(dn.crudo)} × ${mult} = <b>${_fmt(dn.crudo * mult)}</b> de daño, derecho a la vida (no se resta ${tu} Defensa).`
+          : ignora ? `<b>${_fmt(dn.crudo)}</b> de daño ${_esc(d.hab.dano.tipo || 'especial')}, derecho a la vida (lo frenan ${tu} Defensa especial y ${tu}s resistencias, ${suyo ? 'si tenés' : 'si tiene'}).`
+          : d.resultado === 'mitad' ? `Pasa la mitad: (<b>${_fmt(dn.crudo)}</b> − ${tu} Defensa) ÷ 2, redondeado para arriba.`
+          : `<b>${_fmt(dn.crudo)}</b> de daño, menos ${tu} Defensa.`;
+        cuerpo = tiro + `<div class="duelo-danobox"><div class="duelo-danosub" style="font-size:14px">${que}</div></div>`
+          + (suyo ? `<div style="text-align:center;margin-top:8px"><button type="button" data-dano-aceptar>💔 Aplicar el daño</button><div class="duelo-nota" style="margin-top:6px">⚙ Al tocarlo se descuenta solo de tu vida (y se ve cómo queda).</div></div>`
+            : `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.defensor.nombre)} aplique el daño…</div>${soyGM() ? `<div style="text-align:center;margin-top:6px"><button type="button" class="sec" data-dano-aceptar>💔 Aplicar por ${_esc(d.defensor.nombre)}</button></div>` : ''}`);
+      }else if(!dn.aplicado){
         cuerpo = tiro + `<div class="duelo-mini">${crit ? `×${mult} = <b>${_fmt(dn.crudo * mult)}</b> derecho a la vida…` : 'Calculando lo que pasa con la Defensa…'}</div>
           <div class="duelo-nota" style="text-align:center">${soyGM() ? 'Aplicando el daño al HP…' : 'El GM aplica el daño al HP.'}</div>
           ${soyGM() ? `<div class="duelo-man"><input type="number" min="0" data-manual="recibido" placeholder="daño recibido" value="${_esc(manual.recibido || '')}"><button type="button" class="sec" data-aplicar-mano>Ya lo apliqué a mano</button></div>` : ''}`;
@@ -2300,6 +2328,8 @@ const Duelo = (() => {
     if(bft) bft.onclick = () => terminarEfectos(d.id).catch(err => console.error(err));
     const bdt = f.querySelector('[data-dano-tirar]');
     if(bdt) bdt.onclick = () => { bdt.disabled = true; bdt.textContent = 'Tirando…'; enviar(d.atacante, {tipo: 'duelo-tirar', id: d.id, campo: 'dano', flash: flashSel[d.id + ':dano'] || ''}); setTimeout(() => { if(actual && actual.dato && !actual.dato.dano) dibujar(); }, 8000); };
+    const bac = f.querySelector('[data-dano-aceptar]');
+    if(bac) bac.onclick = () => { bac.disabled = true; bac.textContent = 'Aplicando…'; aceptarDano(d.id).catch(err => { console.error(err); _toast('No se pudo aplicar el daño'); bac.disabled = false; }); };
     const bam = f.querySelector('[data-aplicar-mano]');
     if(bam) bam.onclick = () => { const v = Math.max(0, Math.round(_num((f.querySelector('[data-manual="recibido"]') || {}).value))); guardarAplicacion(d.id, {manual: true, golpe: v, recibido: v, mult: 1, crudo: d.dano.crudo, motivoManual: 'lo aplicó el GM a mano'}).catch(err => console.error(err)); };
     const bcr = f.querySelector('[data-critico]');
@@ -2773,6 +2803,7 @@ const Duelo = (() => {
       if(cfgEscuchar.aplicar && soyGM()){
         listaDuelos.forEach(d => {
           if(d.fase !== 'dano' || !d.dano || d.dano.aplicado || d.dano.reclamado || aplicando.has(d.id)) return;
+          if(pideAceptar(d) && !d.dano.aceptado) return;   // 💔 el personaje que lo recibe todavía no tocó «Aplicar el daño»
           aplicando.add(d.id);
           reclamarAplicacion(d.id).then(async mio => {
             if(!mio) return;

@@ -86,7 +86,7 @@ const CreepBotonera = (() => {
     // ✨ Sus armas especiales (2026-10-05): un «Atacar» más cada una, con su costo (No2) y su espera (el SP de un creep, ver CreepAcciones).
     if(typeof CreepAcciones !== 'undefined' && CreepAcciones.especialesCreep) CreepAcciones.especialesCreep(sc).forEach(it => {
       const c = CreepAcciones.costoEspecialCreep(sc, it), e = it.especial || {}, sinNitros = num(sc.nitros) < c.no2;
-      combate.push({nombre: `✨ Atacar · ${e.nombre || it.nombre} · ${fmt(c.no2)} No2${c.enEspera ? ` · en espera ${fmt(c.enEspera)}` : ''}`, dado: e.dano ? `${e.dano}${e.sumaEspecial ? ' + Ef.Esp' : ''}` : '✨',
+      combate.push({nombre: `✨ Atacar · ${e.nombre || it.nombre} · ${fmt(c.no2)} No2${c.enEspera ? ` · en espera ${fmt(c.enEspera)}` : ''}`, dado: e.dano ? `${e.dano}${e.sumaEspecial ? (e.sumaEspecial === true ? ' + Ef.Esp' : num(e.sumaEspecial) === 0.25 ? ' + ¼ Ef.Esp' : ' + ½ Ef.Esp') : ''}` : '✨',
         sinNitros: sinNitros || c.enEspera > 0, motivo: `${c.enEspera ? `En espera ${fmt(c.enEspera)} turno(s) · ` : sinNitros ? 'Sin No2 · ' : ''}Cuesta ${fmt(c.no2)} No2 y deja ${fmt(c.espera)} turno(s) de espera (su SP ${fmt(num(e.sp))}) · ${String(it.detalle || '').split(' ⚙')[0]}`,
         attr: `data-especialcreep="${sc.id}:${it.id}"`});
     });

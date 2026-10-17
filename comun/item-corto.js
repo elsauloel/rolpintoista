@@ -140,7 +140,7 @@ const ItemCorto = (() => {
     if(!esArma(it)) return '';
     if(it.especial){   // ✨ arma especial (2026-10-05): su daño (si tiene) y lo que cuesta, sin Tipo ni dados por Peso
       const e = it.especial, du = e.duelo || {};
-      return ['✨ Arma especial', ...(e.dano ? [`${e.dano}${e.sumaEspecial ? ' + Ef.Esp' : ''} ${du.tipoDano || 'arcano'}`] : []), `${num(e.no2 ?? 1)} No2 + ${num(e.sp)} SP por uso`].join(' · ');
+      return ['✨ Arma especial', ...(e.dano ? [`${e.dano}${e.sumaEspecial ? (e.sumaEspecial === true ? ' + Ef.Esp' : num(e.sumaEspecial) === 0.25 ? ' + ¼ Ef.Esp' : ' + ½ Ef.Esp') : ''} ${du.tipoDano || 'arcano'}`] : []), `${num(e.no2 ?? 1)} No2 + ${num(e.sp)} SP por uso`].join(' · ');
     }
     const peso = Math.max(1, num(it.peso) || 1), amp = Math.max(0, num(it.danoAmplificado)), tipo = num(it.tipoDado) || 8;
     const p = [`Tipo ${tipo}`];
@@ -182,7 +182,7 @@ const ItemCorto = (() => {
       const e = it.especial, du = e.duelo || {};
       const E = [`Se usa desde «✨ Atacar» de la Botonera, con su propio recorrido (sin oportunidad ni contraataque).`,
         `Cuesta ${num(e.no2 ?? 1)} No2 el primer uso del turno, ${num(e.sube ?? 1)} más por cada uso siguiente y ${num(e.sp)} SP por uso (sin SP: 1 No2 más por cada SP).`];
-      if(e.sumaEspecial) E.push(`Suma ${e.sumaEspecial === true ? 'tu Ef.Esp' : 'la mitad de tu Ef.Esp'} al daño.`);
+      if(e.sumaEspecial) E.push(`Suma ${e.sumaEspecial === true ? 'tu Ef.Esp' : num(e.sumaEspecial) === 0.25 ? '¼ de tu Ef.Esp' : 'la mitad de tu Ef.Esp'} al daño (para arriba).`);
       if(num(du.critTipo)) E.push(`Es física: la frena la Defensa y critica como un arma de Tipo ${num(du.critTipo)}.`);
       E.push('No sirve para parrear ni bloquear.');
       return E;

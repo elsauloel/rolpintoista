@@ -23,7 +23,7 @@ resistencia de su elemento; el arcano no tiene). Cada uso cuesta 1 No2 + su SP (
 | Varita de cura mayor | Cura 2d8 a un aliado. · 3 · 110 |
 | Varita de la purga | A un aliado: le saca el estado malo más reciente. Arranca en **2 No2** (dueño). · 3 · 80 |
 | Báculo de brasas | 1d6 de fuego + ¼ de tu Ef.Esp; 25 % de Quemadura. · 2 · 85 |
-| Báculo de escarcha | 1d6 de hielo + ¼ de tu Ef.Esp; 25 % de Escarcha. · 2 · 85 |
+| Báculo de escarcha | 1d6 de hielo + ¼ de tu Ef.Esp (para arriba); 1 de Escarcha por cada 5 de daño que entra (2026-10-17, dueño). · 2 · 85 |
 | Báculo del sabio | 1d8 arcano + ¼ de tu Ef.Esp. · 2 · 90 |
 | Báculo guardián | 1d4 arcano + ¼ de tu Ef.Esp; en las manos, Parry +1 y Bloqueo +1. · 1 · 115 |
 | Varita del portal aliado mayor | Dos portales a 6 o menos uno del otro, solo tu bando, 2 turnos. · 2 · 80 |

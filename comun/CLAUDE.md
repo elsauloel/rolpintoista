@@ -1593,3 +1593,8 @@ versión parecida en más de una, es candidato a juntar.
   del paso 5: «💔 Aplicar el daño» para el dueño o quien tiene 🎮 el control, «💔 Aplicar por …» para el GM). En las trampas, el paso
   `dano-aplicar` (vtt-hexgrid/js/19).
 
+- **El Ef.Esp de un arma especial, para arriba** (2026-10-17, dueño, con el Báculo de escarcha): `Combatiente.sumaEspecialDe(dmgesp, sumaEspecial)`
+  (true = entero, 0.5 = la mitad, 0.25 = un cuarto: los seis báculos) redondea **para arriba** y lo usan personajes y creeps; `sumaEspecialTxt`.
+  El asistente de ítems ofrece «Un cuarto» (antes borraba el ¼ de un báculo al editarlo). El Báculo de escarcha deja la Escarcha por daño
+  (`duelo.porDano = {estado: 'Escarcha', cada: 5, desde: 5}`: 1 por cada 5 que entran), no por porcentaje. La habilidad (`danoSumaEsp`, Toque
+  mágico) sigue para abajo.

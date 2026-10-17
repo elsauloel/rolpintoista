@@ -453,7 +453,7 @@ const CreepAcciones = (() => {
   }
   function habDeEspecialCreep(sc, it){
     const e = it.especial || {}, dano = String(e.dano || '').trim();
-    const suma = e.sumaEspecial ? Math.floor(num(C().statValor(sc, 'dmgesp')) * (e.sumaEspecial === true ? 1 : num(e.sumaEspecial))) : 0;
+    const suma = Combatiente.sumaEspecialDe(C().statValor(sc, 'dmgesp'), e.sumaEspecial);   // para arriba (2026-10-17)
     return {id: 'esp:' + it.id, deItem: it.id, nombre: e.nombre || it.nombre, detalle: it.detalle || '', modo: 'auto', duelo: e.duelo ? structuredClone(e.duelo) : null,
       tiradaStat: (e.duelo && e.duelo.tira) || 'pdgmg', tiradaExtra: dano ? dano + (suma > 0 ? '+' + suma : '') : '',
       ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {}), nitrosCosto: costoEspecialCreep(sc, it).no2, cd: 0};

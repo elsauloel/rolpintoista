@@ -304,6 +304,12 @@ prueba('🩸 Maldito: antes de pagar SP pregunta «esto te va a bajar N de vida�
   igual([si, no, sinPreguntar, preguntas.length, preguntas[0].includes(`usar Drenar Vida cuesta 3 SP y te va a bajar 3 de vida (${max} → ${max - 3})`), /quedás caído/.test(preguntas[1])],
     [true, false, true, 2, true, true]);
 });
+prueba('❄ Báculo de escarcha: ¼ del Ef.Esp para arriba y 1 de Escarcha por cada 5 de daño que entra (no un porcentaje)', () => {
+  const b = CATALOGO_BASE.find(i => i.id === 'esp-buena-baculo-de-escarcha'), du = b.especial.duelo;
+  const S = [14, 13, 1, 0].map(e => Combatiente.sumaEspecialDe(e, b.especial.sumaEspecial));
+  const st = [4, 5, 9, 10].map(d => Combatiente.stacksPorDano(d, du.porDano));
+  igual([S, st, du.efectos.length, Combatiente.sumaEspecialDe(7, 0.5), Combatiente.sumaEspecialDe(7, true)], [[4, 4, 1, 0], [0, 1, 1, 2], 0, 4, 7]);
+});
 prueba('dos Pajaritos parten una sola vez y el cartel muestra uno', () => {
   const es = [E({nombre: 'Pajaritos', mitadPdgEva: true}), E({nombre: 'Pajaritos 2', mitadPdgEva: true})];
   igual([Combatiente.mitadesDeTirada(es, 'pdg'), Combatiente.estadosQueParten(es, 'pdg').length], [1, 1]);

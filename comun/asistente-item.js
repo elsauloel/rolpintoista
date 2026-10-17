@@ -485,8 +485,8 @@ const AsistenteItem = (() => {
       h += efecto(`<span id="aa-espcosto">${espCostoHtml(es)}</span>`);
       h += campo('Daño (fórmula; vacío = no hace daño)', `<input data-aa-esp1="dano" value="${e(es.dano || '')}" placeholder="ej. 1d6" style="max-width:160px">`,
         'El tipo (arcano, fuego, hielo…) y a quién le pega se eligen en el paso siguiente, «Qué hace ✨».');
-      const suma = es.sumaEspecial === true ? 'si' : n(es.sumaEspecial) === 0.5 ? 'mitad' : 'no';
-      h += campo('¿Suma el Ef.Esp de quien la usa?', `<div class="aa-opciones">${op('sumaesp', 'no', suma === 'no', 'No')}${op('sumaesp', 'si', suma === 'si', 'Sí, entero')}${op('sumaesp', 'mitad', suma === 'mitad', 'La mitad')}</div>`);
+      const suma = es.sumaEspecial === true ? 'si' : n(es.sumaEspecial) === 0.5 ? 'mitad' : n(es.sumaEspecial) === 0.25 ? 'cuarto' : 'no';
+      h += campo('¿Suma el Ef.Esp de quien la usa?', `<div class="aa-opciones">${op('sumaesp', 'no', suma === 'no', 'No')}${op('sumaesp', 'si', suma === 'si', 'Sí, entero')}${op('sumaesp', 'mitad', suma === 'mitad', 'La mitad')}${op('sumaesp', 'cuarto', suma === 'cuarto', 'Un cuarto')}</div>`, 'Se redondea para arriba.');
       h += campo('Peso', num('peso', d.peso, 'step="1" min="1" style="max-width:120px"'), 'Una varita suele pesar 1 y un báculo 2, pero no es una regla: puede haber báculos más pesados (o de una mano) si el ítem lo justifica.');
       if(q.ctx !== 'creep') h += efecto(`<span id="aa-carga">${cargaHtml()}</span>`);
       h += durCampo();
@@ -659,7 +659,7 @@ const AsistenteItem = (() => {
         ${fila('Tipo de ítem', e(labelDe(d.tipoItem)))}
         ${cfg.destinos ? fila(cfg.destinos.label, e(dest || '—')) : ''}
         ${cfg.tiers ? fila('Tier', e(d.tier)) : ''}
-        ${esEspecial(d) ? fila('Clase', '✨ arma especial') + fila('Cuesta', e(costoEspTxt(d.especial))) + fila('Daño', e(d.especial.dano ? d.especial.dano + (d.especial.sumaEspecial === true ? ' + Ef.Esp' : n(d.especial.sumaEspecial) === 0.5 ? ' + la mitad del Ef.Esp' : '') : 'no hace'))
+        ${esEspecial(d) ? fila('Clase', '✨ arma especial') + fila('Cuesta', e(costoEspTxt(d.especial))) + fila('Daño', e(d.especial.dano ? d.especial.dano + (d.especial.sumaEspecial === true ? ' + Ef.Esp' : n(d.especial.sumaEspecial) === 0.5 ? ' + la mitad del Ef.Esp' : n(d.especial.sumaEspecial) === 0.25 ? ' + ¼ del Ef.Esp' : '') : 'no hace'))
           + fila('Qué hace ✨', d.especial.duelo ? e(ejecucionLineas(d.especial.duelo).join(' · ')) : 'sin Ejecución')
           + (d.especial.trampaColocar ? fila('Trampa', e(trampaTxt(d.especial.trampaColocar))) : '')
           + (aManoTxt(d.especial) ? fila('✋ A mano', e(aManoTxt(d.especial))) : '') : ''}
@@ -810,7 +810,7 @@ const AsistenteItem = (() => {
     }
     else if(ds.aaClase){ if(ds.aaClase === 'especial'){ d.especial = d.especial || ESPECIAL_NUEVA(); d.armaDeRango = false; } else delete d.especial; }
     else if(ds.aaOrbe !== undefined){ if(ds.aaOrbe === '1') d.orbe = true; else { delete d.orbe; delete d.orbeResguardo; delete d.orbeSalvaje; delete d.orbeCustodio; delete d.orbeAbsorcion; } }
-    else if(ds.aaSumaesp && d.especial){ if(ds.aaSumaesp === 'si') d.especial.sumaEspecial = true; else if(ds.aaSumaesp === 'mitad') d.especial.sumaEspecial = 0.5; else delete d.especial.sumaEspecial; }
+    else if(ds.aaSumaesp && d.especial){ if(ds.aaSumaesp === 'si') d.especial.sumaEspecial = true; else if(ds.aaSumaesp === 'mitad') d.especial.sumaEspecial = 0.5; else if(ds.aaSumaesp === 'cuarto') d.especial.sumaEspecial = 0.25; else delete d.especial.sumaEspecial; }
     else if(ds.aaEjec && d.especial){ abrirEjecucion(); return; }
     else if(ds.aaEjecrm && d.especial) delete d.especial.duelo;
     else if(ds.aaTrampa && d.especial){ abrirTrampa(); return; }
@@ -912,7 +912,7 @@ const AsistenteItem = (() => {
       es.no2 = Math.max(0, Math.round(n(es.no2 ?? 1))); if(es.no2 === 1) delete es.no2;
       es.sube = Math.max(0, Math.round(n(es.sube ?? 1))); if(es.sube === 1) delete es.sube;
       es.dano = String(es.dano || '').replace(/\s+/g, ''); if(!es.dano) delete es.dano;
-      if(es.sumaEspecial !== true && n(es.sumaEspecial) !== 0.5) delete es.sumaEspecial;
+      if(es.sumaEspecial !== true && n(es.sumaEspecial) !== 0.5 && n(es.sumaEspecial) !== 0.25) delete es.sumaEspecial;   // ¼: los báculos (antes se borraba al editarlos)
       const am = es.aMano || {}, amT = String(am.texto || '').trim(), amR = String(am.tirada || '').replace(/\s+/g, ''), amE = String(am.etiqueta || '').trim();
       if(amT || amR) es.aMano = {...(amT ? {texto: amT} : {}), ...(amR ? {tirada: amR} : {}), ...(amE ? {etiqueta: amE} : {})}; else delete es.aMano;
       d.peso = Math.max(1, n(d.peso) || 1);

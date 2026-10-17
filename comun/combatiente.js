@@ -1036,8 +1036,8 @@ const Combatiente = (() => {
   /* ---------- Pasivas que dan un estado (2026-10-16, dueño: «Vuela debería ser una habilidad pasiva también… en la abeja») ----------
      Una pasiva con `estado` (el nombre de un preset de comun/estados-presets.js) mantiene ese estado puesto, permanente, mientras la tenga —
      como los ítems que dan un estado. Va en la lista de estados de siempre (así lo leen el mapa, el duelo y las inmunidades sin nada nuevo),
-     marcado con `origenPasiva` (el id de la pasiva): si se lo borran vuelve; si se saca la pasiva, se va. Uno con el mismo nombre que ya
-     estaba puesto a mano se adopta (no se duplica). `presets`: la lista en la forma de la herramienta (estadosPresetFicha / estadosPresetCreep);
+     marcado con `origenPasiva` (el id de la pasiva): si se lo borran vuelve; si se saca la pasiva, se va; siempre queda igual al preset
+     (si el preset cambia, cambia con él; se respeta si está pausado). Uno con el mismo nombre que ya estaba puesto a mano se adopta (no se duplica). `presets`: la lista en la forma de la herramienta (estadosPresetFicha / estadosPresetCreep);
      `nuevoId()`: un id. → true si cambió algo. Igual para personajes, creeps e invocaciones. */
   function sincronizarEstadosDePasivas(estados, pasivas, presets, nuevoId){
     if(!Array.isArray(estados)) return false;
@@ -1047,10 +1047,16 @@ const Combatiente = (() => {
     for(let i = estados.length - 1; i >= 0; i--) if(estados[i] && estados[i].origenPasiva && !ids.has(estados[i].origenPasiva)){ estados.splice(i, 1); cambio = true; }
     const mismo = (a, b) => String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
     conEstado.forEach(p => {
-      if(estados.some(e => e && e.origenPasiva === p.id)) return;
-      const suelto = estados.find(e => e && !e.origenPasiva && mismo(e.nombre, p.estado));
-      if(suelto){ suelto.origenPasiva = p.id; suelto.permanente = true; suelto.turnos = 0; cambio = true; return; }
       const pre = (presets || []).find(x => x && (mismo(x.nombre, p.estado) || (x.alias || []).some(a => mismo(a, p.estado))));
+      // El que ya está (de la pasiva, o uno suelto con ese nombre que se adopta) queda igual al preset: si el preset cambia, cambia con él
+      // (solo se respeta si está pausado y su id).
+      const ya = estados.find(e => e && e.origenPasiva === p.id) || estados.find(e => e && !e.origenPasiva && mismo(e.nombre, p.estado));
+      if(ya){
+        // Solo lo que dice el preset (lo que el turno le agrega por su cuenta, como `recien`, queda): así no cambia en cada pasada.
+        const base = {...(pre ? {stacks: 1, ...structuredClone(pre)} : {}), permanente: true, turnos: 0, origenPasiva: p.id};
+        Object.keys(base).forEach(k => { if(k !== 'id' && JSON.stringify(ya[k]) !== JSON.stringify(base[k])){ ya[k] = base[k]; cambio = true; } });
+        return;
+      }
       if(!pre) return;
       estados.push({stacks: 1, ...structuredClone(pre), id: nuevoId ? nuevoId() : 'ps' + Math.random().toString(36).slice(2, 9), activo: true, permanente: true, turnos: 0, origenPasiva: p.id});
       cambio = true;

@@ -513,7 +513,8 @@ estado: confirmado
 - **Pasa por encima de los tokens**, aliados y rivales, pero no de las paredes ni de los Sólidos, y no puede terminar su movimiento encima de nadie.
 - Si cruza por encima de un **rival**, **antes** de pasar ese rival tiene su [[Ataque de oportunidad]] (el mapa lo frena al lado y pregunta, como cuando alguien se aleja). Del otro lado ya no hay otro.
 - **No le entran Sentado ni Rengo**: no se lo puede tirar al piso ni dejar rengo.
-- Cuerpo a cuerpo **se le pega normal**: vuela bajo.
+- Cuerpo a cuerpo **se le pega normal**: vuela bajo. Y a los **disparos** (arco, ballesta, honda, arrojadiza) se expone más: **−1 a la Evasión** contra ellos.
+- También es una **pasiva** («+ Pasiva → Vuela»): mientras la tenga, lleva puesto el estado. Así la tienen las abejas de Bizzante.
 
 ⚙ Automatizado: todo lo de arriba lo hace el mapa solo.
 

@@ -260,10 +260,12 @@ prueba('pasiva que da un estado (Vuela): lo pone, adopta el que ya estaba a mano
   const puesto = es.map(e => [e.nombre, e.origenPasiva, e.permanente, !!e.volador]);
   es.length = 0; Combatiente.sincronizarEstadosDePasivas(es, pas, pres); const vuelve = es.length;
   const sc = {estados: es}; Combatiente.sincronizarEstadosDePasivas(sc.estados, [], pres); const sinPasiva = sc.estados.length;
-  const amano = [{id: 'x', nombre: 'Vuela', activo: true, permanente: true}]; Combatiente.sincronizarEstadosDePasivas(amano, pas, pres);
+  const amano = [{id: 'x', nombre: 'Vuela', activo: true, permanente: true, mods: [{stat: 'levitar', val: 100}]}]; Combatiente.sincronizarEstadosDePasivas(amano, pas, pres);
+  const alDia = [amano[0].id, (amano[0].mods || []).some(m => m.stat === 'evadisparo'), !!amano[0].volador];
   const creep = CreepCalculo.normalizar({nombre: 'Abeja', con: 2, agl: 3, estados: [], pasivas: pas});
   igual([n1, n2, puesto, vuelve, sinPasiva, amano.length, amano[0].origenPasiva, pv.estado, CreepCalculo.modTotal(creep, 'levitar'), Plantillas.limpiar('pasivas', pv).estado],
     [true, false, [['Vuela', 'p1', true, true]], 1, 0, 1, 'p1', 'Vuela', 100, 'Vuela']);
+  igual(alDia, ['x', true, true]);
 });
 prueba('invocación: sus pasivas suman y la que da un estado lo pone (InvCalculo.migrar)', () => {
   const inv = InvCalculo.migrar({nombre: 'Abeja', con: 2, agl: 3, fue: 1, des: 1, esp: 1, estados: [], pasivas: [pasivaParaCombatiente({nombre: 'Pies ligeros', mods: [{stat: 'eva', val: 1}]}, 'a'), pasivaParaCombatiente(PASIVAS_BASE.find(p => p.poolId === 'vuela'), 'b')]});

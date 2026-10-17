@@ -77,7 +77,8 @@ function rayoMomento(id, d){
 }
 const caosHechos = new Set();
 function momentoRecibido(id, d){
-  if(d.tipo === 'robo-pedido'){ if(typeof roboMomento === 'function') roboMomento(id, d); return; }   // 🫳 el robo en sigilo (js/47): solo la víctima y el GM
+  if(d.tipo === 'robo-pedido'){ if(typeof roboMomento === 'function') roboMomento(id, d); return; }
+  if(d.tipo === 'inicio-turno' && inicioTurnoMomento(id, d)) return;   // ▶ Empieza tu turno: al centro de su dueño (js/04)   // 🫳 el robo en sigilo (js/47): solo la víctima y el GM
   if(d.tipo === 'rayo' && d.datos && Array.isArray(d.datos.saltos)) rayoMomento(id, d);
   if(d.tipo === 'confusion') confusionMomento(d);   // la tirada de Confusión del turno (js/20)
   oporMomento(id, d);   // el ataque de oportunidad: la pregunta a quien decide y la respuesta a quien se aleja (js/17)
@@ -125,8 +126,35 @@ function momentoRecibido(id, d){
   if(delGM) momentosFeed.delete(id);
   if(mio || delGM){ renderMomentosFeed(); return; }
   const ya = momentosFeed.get(id);
-  momentosFeed.set(id, {d, hasta: Date.now() + MOMENTO_DURA_MS, orden: ya ? ya.orden : ++momentosOrden});   // el más nuevo, arriba
+  const largo = d.tipo === 'inicio-turno' && d.estado === 'esperando';   // ▶ el inicio de turno sin aplicar queda (el GM tiene «Aplicar por él»)
+  momentosFeed.set(id, {d, hasta: Date.now() + (largo ? 30 * 60 * 1000 : MOMENTO_DURA_MS), orden: ya ? ya.orden : ++momentosOrden});   // el más nuevo, arriba
   renderMomentosFeed();
+}
+/* ▶ Empieza tu turno (js/04, 2026-10-17): a su dueño (o a quien tiene 🎮 su control), al centro, con lo que va a pasar y «✔ Aplicar»; al tocarlo,
+   el mismo cartel dice «✔ Ya se aplicó» y se cierra con «Entendido». El resto lo ve en la Crónica (el GM, con «▶ Aplicar por él» mientras
+   espera). → true si esta pantalla lo mostró al centro. */
+const inicioMostrados = new Set();
+function inicioTurnoMomento(id, d){
+  const dt = d.datos || {};
+  if(!dt.paraUid || dt.paraUid !== fbUsuario.uid) return false;
+  if(d.estado === 'esperando'){
+    if(inicioMostrados.has(id)) return true;
+    inicioMostrados.add(id);
+    AvisoCombate.mostrar({clave: 'inicio-turno:' + id, icono: '▶', titulo: 'Empieza tu turno', pasos: dt.pasos || [],
+      texto: '', botones: [{texto: '✔ Aplicar', id: 'inicio-turno-aplicar', alClic: () => {
+        const b = document.getElementById('inicio-turno-aplicar'); if(b){ b.disabled = true; b.textContent = 'Aplicando…'; }
+        inicioTurnoAplicar(id, d, false);
+      }}],
+      alCerrar: () => { inicioMostrados.delete(id); }});   // cerrado sin aplicar: el GM lo puede aplicar por él, y al pasar el turno se aplica solo
+    return true;
+  }
+  // Ya aplicado: el mismo cartel, con lo que pasó, y «Entendido».
+  if(d.estado === 'listo' && inicioMostrados.has(id) && AvisoCombate.abiertoClave && AvisoCombate.abiertoClave() === 'inicio-turno:' + id){
+    AvisoCombate.mostrar({clave: 'inicio-turno:' + id, icono: '▶', titulo: 'Empieza tu turno', pasos: dt.pasos || [], texto: '',
+      veredicto: {tono: 'bueno', grande: '✔ YA SE APLICÓ'}, botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}]});
+    return true;
+  }
+  return d.estado === 'listo' && inicioMostrados.has(id);
 }
 let momentosFeedTimer = null;
 function renderMomentosFeed(){
@@ -137,7 +165,10 @@ function renderMomentosFeed(){
     feed = document.createElement('div');
     feed.id = 'momentos-feed';
     feed.style.cssText = 'position:absolute;right:12px;top:118px;width:min(300px,60vw);z-index:31;display:flex;flex-direction:column;gap:6px;pointer-events:none';
-    feed.addEventListener('click', ev => { const b = ev.target.closest('[data-trampa-seguir]'); if(b) trampaSeguir(b.dataset.trampaSeguir); });
+    feed.addEventListener('click', ev => {
+      const b = ev.target.closest('[data-trampa-seguir]'); if(b) trampaSeguir(b.dataset.trampaSeguir);
+      const bi = ev.target.closest('[data-inicio-aplicar]'); if(bi){ const v = momentosFeed.get(bi.dataset.inicioAplicar); if(v){ bi.disabled = true; inicioTurnoAplicar(bi.dataset.inicioAplicar, v.d, true); } }
+    });
     caja.appendChild(feed);
   }
   const ahora = Date.now();
@@ -150,6 +181,7 @@ function renderMomentosFeed(){
       ${lineas ? lineas.map((l, i) => `<div style="margin-top:3px;color:${i === lineas.length - 1 ? '#e9ecf4' : '#9aa3b8'}">${esc(l)}</div>`).join('')
         : d.resultado ? `<div style="margin-top:3px;color:#cfd6e6">${esc(d.resultado)}</div>` : (d.estado === 'listo' ? '' : '<div style="margin-top:3px;color:#8d97ad">…</div>')}
       ${d.tipo === 'trampa' && d.datos && d.datos.fase ? trampaBotonFeed(k, d) : ''}
+      ${d.tipo === 'inicio-turno' && d.estado === 'esperando' && soyGM ? `<div style="margin-top:6px"><button type="button" data-inicio-aplicar="${esc(k)}" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid #6fae7d;background:#1d2a20;color:#bfe8c7;cursor:pointer">▶ Aplicar por él</button></div>` : ''}
     </div>`;
   }).join('');
   clearTimeout(momentosFeedTimer);

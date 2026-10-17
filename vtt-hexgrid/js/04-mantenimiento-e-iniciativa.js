@@ -426,6 +426,8 @@ async function iniciativaSiguiente(o){
     if(!iniciativaFueraDeJuego(orden[i].id)) break;   // salta a los caídos (si caen todos, avanza normal)
     salteados.push(orden[i].id);
   }
+  // ▶ Si el que terminaba nunca tocó «Aplicar» al empezar su turno, se aplica ahora, antes de terminarlo (no se pierde; js abajo).
+  if(termina) await inicioTurnoForzar(termina.id, `${mapaFin}:${pasoFin}`);
   const fin = termina ? {termino: {id: termina.id, paso: pasoFin}} : {};
   const nuevaRonda = ronda !== iniciativa.ronda;
   const ok = await guardarIniciativa({...(o.orden ? {orden: ordenSerial(orden)} : {}), turno: i, paso: pasoFin + 1, actuaron: [...ya], ...fin, ...(nuevaRonda ? {ronda} : {}), libre: null});
@@ -448,7 +450,9 @@ async function iniciativaSiguiente(o){
   }
   if(nuevaRonda) await pasarMantenimiento(`Ronda ${ronda}`);   // lo que es de la ronda (P161)
   const lineasZonas = sig.id ? await zonasDelQueLaTiro(sig.id) : [];   // P172: sus zonas, un turno menos (js/07)
-  const lineasInicio = sig.id ? await inicioDeTurno(sig.id, `${mapaFin}:${pasoFin + 1}`) : [];
+  // ▶ Un personaje o una invocación (2026-10-17, dueño): lo de empezar su turno espera su «✔ Aplicar» (inicioTurnoPendiente); un creep, como siempre.
+  const pendiente = sig.id ? await inicioTurnoPendiente(sig.id, `${mapaFin}:${pasoFin + 1}`) : false;
+  const lineasInicio = sig.id && !pendiente ? await inicioDeTurno(sig.id, `${mapaFin}:${pasoFin + 1}`) : [];
   const todas = [...lineas, ...lineasZonas, ...lineasInicio];
   if(todas.length) momentoActualizar(await tarjeta, {'datos.lineas': todas.slice(0, 14)});
 }
@@ -589,6 +593,68 @@ function provocadoAvisar(t, estados){
       pasos: [{titulo: 'Estás Provocado', texto: `${texto} ✋ Lo respeta quien juega (no lo frena el mapa).`}]}}), 600);
 }
 const inicioDeTurno = (tokenId, clave) => turnoDeToken(tokenId, clave, true);
+
+/* ▶ Empieza tu turno (2026-10-17, dueño: «un pequeño anuncio al principio del turno… los estados bajaron de X a X turnos, la regeneración de SP
+   fue tal, la de HP fue tal, que la persona ponga aplicar»; los jugadores preguntaban si la regeneración se había aplicado). Para un personaje o
+   una invocación: se calcula sobre una copia de la ficha (sin guardar nada) y se abre el momento `inicio-turno` (esperando) para su dueño —o
+   quien tiene 🎮 su control—, con lo que va a pasar y «✔ Aplicar» (js/16 inicioTurnoMomento). Al tocarlo se aplica de verdad (turnoDeToken: la
+   misma clave, así nunca se aplica dos veces). Si nadie lo toca, el GM tiene «▶ Aplicar por él» en la Crónica, y al pasar el turno se aplica solo
+   antes de terminarlo (inicioTurnoForzar). → true si quedó esperando. */
+async function inicioTurnoPendiente(tokenId, clave){
+  const t = tokens.get(tokenId);
+  if(!t || !t.fichaId || t.tipo === 'creep') return false;
+  const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
+  const conTurno = invConTurno(fichaId), numero = Math.round(num(mantenimientoNumero));
+  let prev = null;
+  try{
+    await editarPersonajeMapa(fichaId, S => {
+      const C = structuredClone(S);
+      const est = () => (invId ? (((C.invocaciones || []).find(x => x && x.id === invId) || {}).estados) : C.efectos) || [];
+      const antes = est().filter(e => e && e.activo !== false && !e.permanente && num(e.turnos) > 0).map(e => ({id: e.id, nombre: e.nombre, turnos: num(e.turnos)}));
+      const r = FichaMantenimiento.inicioTurno(C, {fijarHp: v => FichaAcciones.fijarHp(C, v)}, clave, invId || '', conTurno, numero);
+      if(!r) return false;
+      const despues = new Map(est().map(e => [e.id, e]));
+      const tt = n => `${fmt(n)} turno${n === 1 ? '' : 's'}`;
+      prev = {rep: r.rep, turnos: antes.map(a => { const e = despues.get(a.id); return e ? `${a.nombre}: ${tt(a.turnos)} → ${tt(num(e.turnos))}` : `${a.nombre}: se termina`; })};
+      return false;   // solo mirar: no se guarda nada
+    });
+  }catch(err){ console.error('No se pudo calcular el inicio del turno:', err); return false; }
+  if(!prev) return false;   // ya estaba aplicado (o no se pudo leer la ficha): sigue como siempre
+  const f = fichasPub.get(fichaId);
+  const paraUid = (f && f.resumen && f.resumen.control) || t.duenoUid || (f && f.duenoUid) || '';
+  const pasos = [
+    ...(prev.turnos.length ? [{titulo: 'Tus estados', texto: prev.turnos.join(' · ')}] : []),
+    {titulo: 'Lo que pasa al empezar', texto: prev.rep.length ? prev.rep.join(' · ') : 'Nada que cambie.'},
+  ];
+  await momentoAbrir({tipo: 'inicio-turno', icono: '▶', titulo: `Empieza el turno de ${nombreDe(t)}`, estado: 'esperando',
+    resultado: 'Esperando que aplique el inicio de su turno…', datos: {tokenId, clave, paraUid, pasos}});
+  return true;
+}
+// «✔ Aplicar» (su dueño) o «▶ Aplicar por él» (el GM): lo aplica de verdad y deja el momento con lo que pasó.
+const inicioAplicando = new Set();
+async function inicioTurnoAplicar(id, d, porGM){
+  const dt = (d && d.datos) || {};
+  if(inicioAplicando.has(id) || !dt.tokenId || !dt.clave) return;
+  inicioAplicando.add(id);
+  try{
+    await turnoDeToken(dt.tokenId, dt.clave, true);
+    const pasos = [...(dt.pasos || []), {titulo: '✔ Aplicado', texto: `Ya se aplicó${porGM ? ' (lo aplicó el GM)' : ''}: los estados, la regeneración, la vida y los No2 quedaron como dice arriba.`}];
+    await momentoActualizar(id, {estado: 'listo', resultado: `✔ Se aplicó el inicio de su turno${porGM ? ' (lo aplicó el GM)' : ''}`, 'datos.pasos': pasos});
+  }catch(err){ console.error('No se pudo aplicar el inicio del turno:', err); toast('No se pudo aplicar el inicio del turno — mirá la consola'); }
+  finally{ inicioAplicando.delete(id); }
+}
+// Al pasar el turno: si quedó sin aplicar, se aplica ahora (turnoDeToken no aplica dos veces la misma clave) y se cierra su momento.
+async function inicioTurnoForzar(tokenId, clave){
+  const t = tokens.get(tokenId);
+  if(!t || t.tipo === 'creep') return;
+  try{
+    const snap = await fbDb.collection(fbRutaCampana('momentos')).where('tipo', '==', 'inicio-turno').where('datos.clave', '==', clave).get();
+    const pend = snap.docs.find(x => x.data().estado === 'esperando');
+    if(!pend) return;
+    await turnoDeToken(tokenId, clave, true);
+    await momentoActualizar(pend.id, {estado: 'listo', resultado: '✔ Se aplicó solo al pasar el turno (nadie lo había aplicado)'});
+  }catch(err){ console.error('No se pudo cerrar el inicio de turno pendiente:', err); }
+}
 const finDeTurno = (tokenId, clave) => turnoDeToken(tokenId, clave, false);
 
 /* ¿Es el turno de este token? true / false; null si no hay orden de turnos o no está en él (2026-10-06, P161). */

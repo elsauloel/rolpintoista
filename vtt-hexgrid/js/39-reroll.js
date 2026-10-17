@@ -70,7 +70,7 @@ async function rerollUsar(yo, o){
   const ok = await editarPersonajeMapa(yo.fichaId, S => {
     const disp = Math.max(0, FichaBotonera.spMaximo(S, FichaCalculo.calcular(S)) - num(S.spGastado));
     if(disp < pago.sp){ falta = disp; return false; }
-    S.spGastado = num(S.spGastado) + pago.sp;
+    FichaAcciones.gastarSp(S, pago.sp, {fijarHp: v => mantFijarHp(S, v), toast}, 'Re-roll');   // 🩸 Maldito
     if(no2){
       S.nitros = num(S.nitros) - (no2 > num(S.nitros) ? FichaAcciones.gastoNitrosForzado(S, no2, 'usó Re-roll') : no2);
       FichaAcciones.tormentaPj(S, no2, 'usar Re-roll');   // ⛈ Atormentado

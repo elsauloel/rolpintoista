@@ -156,6 +156,11 @@ const ESTADOS_PRESET = [
   // Inamovible (2026-10-06, dueño: «el buff tiene que existir; la armadura simplemente te lo aplica»): la chance de no moverse, en 100 %.
   {nombre:'Inamovible', polaridad:'buff', turnos:2, mods:[{stat:'inamovible', val:100}],
     detalle:'No lo pueden empujar ni atraer (ganchos, muros que empujan, portales). ⚙ Automatizado: el mapa no lo mueve.'},
+  // Maldito (2026-10-17, dueño: «un skill que castigue por uso de SP… por dos turnos te deja maldito y por cada punto de SP perdés un punto de
+  // HP»; la vida se pierde al pagar —antes del efecto— y puede dejarlo caído): `sangraSp` (FichaAcciones.gastarSp). Lo pone la Maldición de la
+  // sangre del Kobold maldiciente. Un creep no paga SP: no lo siente.
+  {nombre:'Maldito', polaridad:'debuff', turnos:2, sangraSp:true,
+    detalle:'Maldición de la sangre: cada punto de SP que gastes te saca 1 de vida, directo, en el momento de pagar (antes de que salga el efecto; puede dejarte caído). ⚙ Automatizado: al pagar SP se descuenta la vida y se avisa.'},
   // Vuela (2026-10-16, dueño; para las abejas de Bizzante y los creeps voladores): como Levitar sin límite y sin aterrizar (la marca `levitar`
   // en 100, como Inamovible), pasa por encima de los tokens (no de paredes ni Sólidos; al cruzar a un rival, antes le da su ataque de
   // oportunidad) y no le entran Sentado ni Rengo (`volador`, Combatiente.inmunidad). Cuerpo a cuerpo se le pega normal (vuela bajo); −1 a la

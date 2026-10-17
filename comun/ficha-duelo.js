@@ -65,7 +65,7 @@ const FichaDuelo = (() => {
     if(!p) return null;
     if(p.sp > FichaBotonera.spMaximo(S) - num(S.spGastado)){ ui.toast(`No te alcanzan los SP para ${h.nombre} (${fmt(p.sp)} SP)`); return null; }
     if(p.hp > 0 && num(S.hp) <= p.hp){ ui.toast(`No te alcanza la vida para ${h.nombre} (${fmt(p.hp)} HP)`); return null; }
-    S.spGastado = num(S.spGastado) + p.sp;
+    FichaAcciones.gastarSp(S, p.sp, ui, h.nombre);   // 🩸 Maldito
     if(p.hp > 0) ui.fijarHp(num(S.hp) - p.hp);
     ui.cambio(['vitals', 'refresh']);
     return p;
@@ -295,7 +295,7 @@ const FichaDuelo = (() => {
         if(modo === 'parry') FichaAcciones.parryConArma(S, itemId ? S.inventario.find(x => x.id === itemId) || null : null, undefined, ui);
         else if(modo === 'parrydist'){   // 🏹 Parry a distancia: cobra (2 SP siempre, y el No2 del disparo) y tira la Evasión
           const it = S.inventario.find(x => x.id === itemId) || null, ee = evaEsp(d);
-          S.spGastado = num(S.spGastado) + 2;
+          FichaAcciones.gastarSp(S, 2, ui, 'Parry a distancia');   // 🩸 Maldito
           const pagoDist = it ? FichaCombate.costoAtaque(S, it) : 0;
           S.nitros = num(S.nitros) - pagoDist;
           FichaAcciones.tormentaPj(S, pagoDist, 'el Parry a distancia', ui);
@@ -339,7 +339,7 @@ const FichaDuelo = (() => {
         const no2 = FichaCombate.costoAtaqueEspecial(arma, 'contra', S);
         if(sp < 2) return `te falta SP (cuesta 2, tenés ${fmt(sp)})`;
         if(no2 > num(S.nitros)) return `te faltan No2 (el contraataque cuesta ${fmt(no2)}, tenés ${fmt(num(S.nitros))})`;
-        S.spGastado = num(S.spGastado) + 2;
+        FichaAcciones.gastarSp(S, 2, ui, 'contraataque');   // 🩸 Maldito
         ui.cambio(['vitals']);
         ui.toast('⚔ Contraataque: −2 SP');
         return '';

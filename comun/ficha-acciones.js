@@ -164,6 +164,22 @@ const FichaAcciones = (() => {
     return revisarMuerte(S);
   }
   // Con HP > 0 deja de estar inconsciente; con 0, queda inconsciente (5 turnos para morir). Devuelve {vivo, revivio} o {vivo: false, cayo}.
+  /* 🩸 Pagar SP (2026-10-17): suma lo gastado y, si está Maldito (la Maldición de la sangre), le saca 1 de vida por cada punto, en el momento
+     de pagar (antes del efecto; puede dejarlo caído: dueño). Lo avisa con un toast y en la Mesa (`ui.mesaHabilidad`, si la pantalla la tiene).
+     → la vida que perdió. Lo que se pierde por un estado ajeno (Succión arcana) no es «gastar»: no pasa por acá. */
+  function gastarSp(S, n, ui, motivo){
+    n = Math.max(0, num(n));
+    S.spGastado = num(S.spGastado) + n;
+    const k = Combatiente.sangraPorSp(S.efectos);
+    if(!k || !n) return 0;
+    const perdida = n * k, antes = num(S.hp);
+    if(ui && ui.fijarHp) ui.fijarHp(antes - perdida); else{ fijarHp(S, antes - perdida); revisarMuerte(S); }
+    const txt = `🩸 Maldito: pagar ${fmt(n)} SP${motivo ? ` (${motivo})` : ''} te sacó ${fmt(perdida)} de vida (${fmt(antes)} → ${fmt(num(S.hp))})`;
+    if(ui && ui.toast) ui.toast(txt);
+    if(ui && ui.mesaHabilidad) try{ ui.mesaHabilidad('Maldición de la sangre', txt); }catch(err){}
+    if(ui && ui.cambio) ui.cambio(['vitals']);
+    return perdida;
+  }
   function revisarMuerte(S){
     if(!S.muerto) S.muerto = {activo:false, turnos:5, definitivo:false};
     if(num(S.hp) > 0){
@@ -613,7 +629,7 @@ const FichaAcciones = (() => {
     }
     S.nitros = num(S.nitros) - (forzar && costoNitros > num(S.nitros) ? gastoNitrosForzado(S, costoNitros, `usó ${it.nombre}`) : costoNitros);
     tormentaPj(S, costoNitros, `usar ${it.nombre}`, ui);
-    S.spGastado = num(S.spGastado) + costoSp;
+    gastarSp(S, costoSp, ui, it.nombre);   // 🩸 Maldito: la vida, al pagar
     if(it.unaVezPorTurno) S.ataquesArma = {...(S.ataquesArma || {}), ['hab:' + it.id]: num((S.ataquesArma || {})['hab:' + it.id]) + 1};
     const costoHp = num(it.hpCosto);
     if(costoHp > 0) ui.fijarHp(num(S.hp) - costoHp);
@@ -750,7 +766,7 @@ const FichaAcciones = (() => {
     }
     S.nitros = num(S.nitros) - (forzar && no2 > num(S.nitros) ? gastoNitrosForzado(S, no2, `usó ${it.nombre}`) : no2);
     tormentaPj(S, no2, `usar ${it.nombre}`, ui);
-    S.spGastado = num(S.spGastado) + sp;
+    gastarSp(S, sp, ui, it.nombre);   // 🩸 Maldito
     if(hpVida){   // la Túnica de sangre: el SP, con vida
       if(ui.fijarHp) ui.fijarHp(num(S.hp) - hpVida); else S.hp = Math.max(0, num(S.hp) - hpVida);
       ui.mesaHabilidad(it.nombre, c.vida > 0 ? `🩸 cuesta vida: −${fmt(hpVida)} HP (el ${fmt(num(e.spVidaPct))} % de su vida máxima).` : `🩸 pagó ${fmt(hpVida)} SP con vida (−${fmt(hpVida)} HP).`);
@@ -797,7 +813,7 @@ const FichaAcciones = (() => {
     }
     S.nitros = Math.max(0, num(S.nitros) - pagaN);
     tormentaPj(S, pagaN, `usar ${it.nombre}`, ui);
-    S.spGastado = num(S.spGastado) + sp;
+    gastarSp(S, sp, ui, it.nombre);   // 🩸 Maldito
     const costoHp = hpX ? Math.round(num(hp)) : num(it.hpCosto);
     if(costoHp > 0) ui.fijarHp(num(S.hp) - costoHp);
     if(num(it.curaHp) > 0) ui.fijarHp(num(S.hp) + num(it.curaHp));
@@ -1045,7 +1061,7 @@ const FichaAcciones = (() => {
     const clave = await elegir(`¿Le ponés un elemento a ${it.nombre}? Cuesta ${fmt(costo)} SP (la mitad de la skill).`, {titulo: 'Carga Elemental', icono: '✨',
       opciones: Object.entries(Combatiente.CARGAS).map(([k, x]) => ({valor: k, texto: `${x.icono} ${x.nombre}`, detalle: x.que})), no: 'Sin carga'});
     if(!clave || !Combatiente.CARGAS[clave]) return it;
-    S.spGastado = num(S.spGastado) + costo;
+    gastarSp(S, costo, ui, 'Carga Elemental');   // 🩸 Maldito
     ui.cambio(['vitals']);
     const k = Combatiente.CARGAS[clave];
     ui.toast(`✨ Carga Elemental: ${k.icono} ${k.nombre} · −${fmt(costo)} SP`);
@@ -1252,7 +1268,7 @@ const FichaAcciones = (() => {
     return aplicarRevivirConAnkh(S, key, id);
   }
 
-  return {gastoNitrosForzado, tormentaPj, alternarSigilo, levantarse, soltarse, hpRevivir, revivir,
+  return {gastarSp, gastoNitrosForzado, tormentaPj, alternarSigilo, levantarse, soltarse, hpRevivir, revivir,
     tirarSocial, colocarTrampaDeItem, ankhAMano,
     TRAMPA_DANO_RE, avisarZonaAlMapa, colocarTrampaDeHab, colocarZonaDeHab, invocacionDeHab, invocarConHab,
     durAviso, desgastarItem, rompeArmaduraAlAzar, estadoDeSpec, aplicarEstadoRecibido, dueloAplicarEfectoPropio, xDeHab, habDueloDatos,

@@ -281,6 +281,18 @@ prueba('lo que va en las manos (varita, orbe, escudo) va aparte del equipo: en l
   const tp = CreepCalculo.tarjetaPublica(sc), m = FichaLite.creep(sc);
   igual([tp.manosNombres.length, tp.equipoNombres.length, m.manos.map(x => x.nombre), m.equipo.map(x => x.nombre)], [1, 1, ['Pico', 'Varita del susurro'], ['Capucha']]);
 });
+prueba('🩸 Maldito: pagar SP saca 1 de vida por punto, al pagar, y puede dejarlo caído; sin el estado, nada', () => {
+  const mal = ESTADOS_PRESET.find(p => p.nombre === 'Maldito'), avisos = [];
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S, max = num(FichaCalculo.calcular(S).final.hpmax);
+  S.hp = max; S.spGastado = 0; S.efectos = [{...structuredClone(mal), id: 'm', activo: true}];
+  const ui = {fijarHp: v => FichaAcciones.fijarHp(S, v), toast: t => avisos.push(t)};
+  const p1 = FichaAcciones.gastarSp(S, 2, ui, 'Drenar Vida');
+  const hp1 = S.hp;
+  const p2 = FichaAcciones.gastarSp(S, max + 3, ui, 'Pedos Tóxicos');
+  const libre = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S; libre.hp = max; libre.spGastado = 0; libre.efectos = [];
+  igual([p1, hp1, p2, S.hp, S.spGastado, avisos[0].includes(`Maldito: pagar 2 SP (Drenar Vida) te sacó 2 de vida (${max} → ${max - 2})`), FichaAcciones.gastarSp(libre, 5), libre.hp, libre.spGastado],
+    [2, max - 2, max + 3, 0, max + 5, true, 0, max, 5]);
+});
 prueba('dos Pajaritos parten una sola vez y el cartel muestra uno', () => {
   const es = [E({nombre: 'Pajaritos', mitadPdgEva: true}), E({nombre: 'Pajaritos 2', mitadPdgEva: true})];
   igual([Combatiente.mitadesDeTirada(es, 'pdg'), Combatiente.estadosQueParten(es, 'pdg').length], [1, 1]);

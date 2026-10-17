@@ -88,7 +88,7 @@ async function empowerUsar(yo, o){
   const ok = await editarPersonajeMapa(yo.fichaId, S => {
     const disp = Math.max(0, FichaBotonera.spMaximo(S, FichaCalculo.calcular(S)) - num(S.spGastado));
     if(disp < pago.sp){ falta = disp; return false; }
-    S.spGastado = num(S.spGastado) + pago.sp;
+    FichaAcciones.gastarSp(S, pago.sp, {fijarHp: v => mantFijarHp(S, v), toast}, 'Empower');   // 🩸 Maldito
     return true;
   });
   if(!ok){ toast(falta !== null ? `No te alcanza el SP: Empower cuesta ${fmt(pago.sp)} y tenés ${fmt(falta)}` : 'No se pudo cobrar el SP de Empower'); return; }

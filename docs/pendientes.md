@@ -8,6 +8,11 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
+> - [ ] **💥 Ver en el mapa la trampa que explota y el daño en dos pasos** (2026-10-17, dueño: «anotalo en pendientes cuando esté en la compu,
+>   así yo lo veo efectivamente en el mapa»): una trampa con la casilla **💥 Explota** (asistente de trampas, paso «Daño»; ya la tiene el Cartucho
+>   enterrado del Kobold boom boom): al pisarla el mapa queda quieto 1,5 s con la explosión sobre el área y después el anuncio, con
+>   «🎲 Tirar el daño» y «💔 Aplicar el daño (N)» → «✔ ya se descontó de la vida (A → B)». Probado por Claude en «Test con claude elsaulo»;
+>   falta que lo vea el dueño (y un jugador desde su cuenta). Después: ver qué otras trampas de fuego en área explotan.
 > - [x] **✨ El editor de la Ejecución, como el cuadro del duelo** (hecho el 2026-10-15, `docs/plan-editor-ejecucion.md`; falta que el dueño lo use) (2026-10-15, dueño: «en la pelea un skill de un creep me pareció muy débil, entré a
 >   editar duelo y el menú era muy poco intuitivo: la edición tiene que ser una emulación del mismo menú del duelo; paso a paso te aparece el mismo
 >   menú, ir hasta la parte del daño y donde se calcula el daño poder modificar ese número; no tener que traducir un menú al otro»). Rediseñar

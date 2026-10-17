@@ -1634,4 +1634,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `vuelaToken(t)` (js/04: `statPiesDe(t, 'levitar') >= 100`); no aterriza (`levitarAterrizar`); `celdasQueTapan` (js/06) no le pone rivales en el
   camino (pasa por encima; terminar encima de alguien sigue sin poderse); `oportunidadCorte` (js/17) lo frena ANTES de entrar a la casilla de un
   rival (`cruza: true`: los carteles dicen «pasa por encima de»). La inmunidad a Sentado y Rengo es de `Combatiente.inmunidad`.
+- **💥 Trampas que explotan** (2026-10-17, dueño): `explota: true` en la trampa (asistente de trampas, paso «Daño»; en `trampaEstado` vía
+  `TokensAuto.estadoJson(..., {explota})`; en una habilidad, `trampaColocar.explota`). Al dispararse, js/08 `trampaAplicarEfectos` arma
+  `explota: {clave, celdas}` (`trampaCeldasEfecto`: la flor del efecto, las casillas de la trampa o la pisada) y js/19 `trampaMomento` →
+  `explosionEmpezar`: la primera vez por clave dibuja la explosión (`dibujarEfectosExplosion`, desde js/05) y pone el velo `#explosion-congela`
+  1,5 s (`EXPLOSION_MS`); el Anuncio de quien la resuelve espera con `trampaRetenidas`.
 

@@ -67,9 +67,10 @@ async function rerollUsar(yo, o){
   const no2 = REROLL.no2 ? REROLL.no2 + num(r0.extenuado) : 0;
   if(no2 && num(r0.nitros) < no2 && !(await Confirmar.preguntar(`Re-roll cuesta ${fmt(no2)} No2 y ${nomYo} tiene ${fmt(Math.max(0, num(r0.nitros)))}. ¿Hacerlo igual?`, {titulo: 'Sin No2', si: 'Hacerlo igual'}))) return;
   let falta = null;
-  const ok = await editarPersonajeMapa(yo.fichaId, S => {
+  const ok = await editarPersonajeMapa(yo.fichaId, async S => {
     const disp = Math.max(0, FichaBotonera.spMaximo(S, FichaCalculo.calcular(S)) - num(S.spGastado));
     if(disp < pago.sp){ falta = disp; return false; }
+    if(!(await FichaAcciones.confirmarMaldito(S, pago.sp, {}, 'Re-roll'))) return false;   // 🩸 Maldito: avisa y deja cancelar
     FichaAcciones.gastarSp(S, pago.sp, {fijarHp: v => mantFijarHp(S, v), toast}, 'Re-roll');   // 🩸 Maldito
     if(no2){
       S.nitros = num(S.nitros) - (no2 > num(S.nitros) ? FichaAcciones.gastoNitrosForzado(S, no2, 'usó Re-roll') : no2);

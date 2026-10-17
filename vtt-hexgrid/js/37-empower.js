@@ -85,9 +85,10 @@ async function empowerUsar(yo, o){
   const pago = await ConfirmarTurno.flash('Empower', {sp: 2 + o.previos}, {quien: nomYo, spAjeno: 4 + o.previos, ident: {nombre: nomYo, ref: yo.fichaId}});
   if(!pago) return;
   let falta = null;
-  const ok = await editarPersonajeMapa(yo.fichaId, S => {
+  const ok = await editarPersonajeMapa(yo.fichaId, async S => {
     const disp = Math.max(0, FichaBotonera.spMaximo(S, FichaCalculo.calcular(S)) - num(S.spGastado));
     if(disp < pago.sp){ falta = disp; return false; }
+    if(!(await FichaAcciones.confirmarMaldito(S, pago.sp, {}, 'Empower'))) return false;   // 🩸 Maldito: avisa y deja cancelar
     FichaAcciones.gastarSp(S, pago.sp, {fijarHp: v => mantFijarHp(S, v), toast}, 'Empower');   // 🩸 Maldito
     return true;
   });

@@ -180,6 +180,18 @@ const FichaAcciones = (() => {
     if(ui && ui.cambio) ui.cambio(['vitals']);
     return perdida;
   }
+  /* 🩸 Antes de pagar (2026-10-17, dueño: «cuando alguien está maldito, a la hora de ejecutar cualquier habilidad que le cueste SP, le debe
+     aparecer una notificación: estás maldito, esto te va a bajar tanto la vida… Aceptar, cancelar»). → true para seguir (sin maldición o sin SP,
+     sin preguntar); false si canceló: no se cobra nada. */
+  async function confirmarMaldito(S, sp, ui, motivo){
+    const k = Combatiente.sangraPorSp(S.efectos);
+    sp = Math.max(0, num(sp));
+    if(!k || !sp) return true;
+    const perdida = sp * k, antes = num(S.hp), queda = Math.max(0, antes - perdida);
+    const txt = `Estás Maldito: ${motivo ? `usar ${motivo} ` : 'pagar '}cuesta ${fmt(sp)} SP y te va a bajar ${fmt(perdida)} de vida (${fmt(antes)} → ${fmt(queda)})${queda <= 0 ? ': quedás caído' : ''}.`;
+    const preguntar = (ui && ui.confirmarMaldito) || (t => Confirmar.preguntar(t, {titulo: 'Estás Maldito', icono: '🩸', si: 'Aceptar', no: 'Cancelar', peligro: queda <= 0}));
+    return !!(await preguntar(txt));
+  }
   function revisarMuerte(S){
     if(!S.muerto) S.muerto = {activo:false, turnos:5, definitivo:false};
     if(num(S.hp) > 0){
@@ -627,6 +639,7 @@ const FichaAcciones = (() => {
       if(elegido === null) return;   // canceló: no se cobra ni se ejecuta nada
       costoSp = elegido;
     }
+    if(Combatiente.sangraPorSp(S.efectos) && !(await confirmarMaldito(S, costoSp, ui, it.nombre))) return;   // 🩸 Maldito: avisa y deja cancelar antes de cobrar nada
     S.nitros = num(S.nitros) - (forzar && costoNitros > num(S.nitros) ? gastoNitrosForzado(S, costoNitros, `usó ${it.nombre}`) : costoNitros);
     tormentaPj(S, costoNitros, `usar ${it.nombre}`, ui);
     gastarSp(S, costoSp, ui, it.nombre);   // 🩸 Maldito: la vida, al pagar
@@ -764,6 +777,7 @@ const FichaAcciones = (() => {
       ui.avisarSinNitros(no2, `usar ${it.nombre}`, () => usarArmaEspecial(S, itemId, true, ui, sinSp, spFijo));
       return;
     }
+    if(Combatiente.sangraPorSp(S.efectos) && !(await confirmarMaldito(S, sp, ui, it.nombre))) return;   // 🩸 Maldito
     S.nitros = num(S.nitros) - (forzar && no2 > num(S.nitros) ? gastoNitrosForzado(S, no2, `usó ${it.nombre}`) : no2);
     tormentaPj(S, no2, `usar ${it.nombre}`, ui);
     gastarSp(S, sp, ui, it.nombre);   // 🩸 Maldito
@@ -811,6 +825,11 @@ const FichaAcciones = (() => {
       if(limH !== null && num(hp) > limH){ ui.toast(`Como mucho ${fmt(limH)} de vida en X (tu Especial)`); return false; }
       if(num(S.hp) <= num(hp)){ ui.toast(`No te alcanza la vida — tenés ${fmt(num(S.hp))}`); return false; }
     }
+    // 🩸 Maldito (Drenar Vida: el SP que eligió en X): pregunta antes de cobrar; sin maldición sigue igual que siempre (sin esperar).
+    if(Combatiente.sangraPorSp(S.efectos) && sp > 0) return confirmarMaldito(S, sp, ui, it.nombre).then(ok => ok ? cobrarCostoVariable(S, it, sp, nitros, arma, ui, hp, hpX, pagaN) : false);
+    return cobrarCostoVariable(S, it, sp, nitros, arma, ui, hp, hpX, pagaN);
+  }
+  function cobrarCostoVariable(S, it, sp, nitros, arma, ui, hp, hpX, pagaN){
     S.nitros = Math.max(0, num(S.nitros) - pagaN);
     tormentaPj(S, pagaN, `usar ${it.nombre}`, ui);
     gastarSp(S, sp, ui, it.nombre);   // 🩸 Maldito
@@ -1061,6 +1080,7 @@ const FichaAcciones = (() => {
     const clave = await elegir(`¿Le ponés un elemento a ${it.nombre}? Cuesta ${fmt(costo)} SP (la mitad de la skill).`, {titulo: 'Carga Elemental', icono: '✨',
       opciones: Object.entries(Combatiente.CARGAS).map(([k, x]) => ({valor: k, texto: `${x.icono} ${x.nombre}`, detalle: x.que})), no: 'Sin carga'});
     if(!clave || !Combatiente.CARGAS[clave]) return it;
+    if(Combatiente.sangraPorSp(S.efectos) && !(await confirmarMaldito(S, costo, ui, 'la Carga Elemental'))) return it;   // 🩸 Maldito
     gastarSp(S, costo, ui, 'Carga Elemental');   // 🩸 Maldito
     ui.cambio(['vitals']);
     const k = Combatiente.CARGAS[clave];
@@ -1268,7 +1288,7 @@ const FichaAcciones = (() => {
     return aplicarRevivirConAnkh(S, key, id);
   }
 
-  return {gastarSp, gastoNitrosForzado, tormentaPj, alternarSigilo, levantarse, soltarse, hpRevivir, revivir,
+  return {gastarSp, confirmarMaldito, gastoNitrosForzado, tormentaPj, alternarSigilo, levantarse, soltarse, hpRevivir, revivir,
     tirarSocial, colocarTrampaDeItem, ankhAMano,
     TRAMPA_DANO_RE, avisarZonaAlMapa, colocarTrampaDeHab, colocarZonaDeHab, invocacionDeHab, invocarConHab,
     durAviso, desgastarItem, rompeArmaduraAlAzar, estadoDeSpec, aplicarEstadoRecibido, dueloAplicarEfectoPropio, xDeHab, habDueloDatos,

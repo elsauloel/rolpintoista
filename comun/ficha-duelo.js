@@ -65,6 +65,7 @@ const FichaDuelo = (() => {
     if(!p) return null;
     if(p.sp > FichaBotonera.spMaximo(S) - num(S.spGastado)){ ui.toast(`No te alcanzan los SP para ${h.nombre} (${fmt(p.sp)} SP)`); return null; }
     if(p.hp > 0 && num(S.hp) <= p.hp){ ui.toast(`No te alcanza la vida para ${h.nombre} (${fmt(p.hp)} HP)`); return null; }
+    if(Combatiente.sangraPorSp(S.efectos) && !(await FichaAcciones.confirmarMaldito(S, p.sp, ui, h.nombre))) return null;   // 🩸 Maldito
     FichaAcciones.gastarSp(S, p.sp, ui, h.nombre);   // 🩸 Maldito
     if(p.hp > 0) ui.fijarHp(num(S.hp) - p.hp);
     ui.cambio(['vitals', 'refresh']);

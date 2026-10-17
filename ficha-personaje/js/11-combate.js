@@ -448,7 +448,7 @@ function confirmarCostoVariable(){
   const sp = num($('#f-costox-sp').value);
   const nitros = num($('#f-costox-nitros').value);
   const armaDeLaHab = pendingArmaHab === undefined ? null : pendingArmaHab;
-  if(FichaAcciones.confirmarCostoVariable(S, it, sp, nitros, armaDeLaHab, habUi, num($('#f-costox-hp').value))) pendingArmaHab = undefined;
+  Promise.resolve(FichaAcciones.confirmarCostoVariable(S, it, sp, nitros, armaDeLaHab, habUi, num($('#f-costox-hp').value))).then(ok => { if(ok) pendingArmaHab = undefined; });   // con Maldito pregunta antes (una promesa, 2026-10-17)
 }
 
 // El pase de turno (2026-10-02, hoja de ruta A2): la regla vive en comun/ficha-mantenimiento.js (la usa también el mapa, que

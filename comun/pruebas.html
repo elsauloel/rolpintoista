@@ -293,6 +293,17 @@ prueba('🩸 Maldito: pagar SP saca 1 de vida por punto, al pagar, y puede dejar
   igual([p1, hp1, p2, S.hp, S.spGastado, avisos[0].includes(`Maldito: pagar 2 SP (Drenar Vida) te sacó 2 de vida (${max} → ${max - 2})`), FichaAcciones.gastarSp(libre, 5), libre.hp, libre.spGastado],
     [2, max - 2, max + 3, 0, max + 5, true, 0, max, 5]);
 });
+prueba('🩸 Maldito: antes de pagar SP pregunta «esto te va a bajar N de vida» (Aceptar / Cancelar); sin maldición no pregunta', async () => {
+  const mal = ESTADOS_PRESET.find(p => p.nombre === 'Maldito'), preguntas = [];
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S, max = num(FichaCalculo.calcular(S).final.hpmax);
+  S.hp = max; S.efectos = [{...structuredClone(mal), id: 'm', activo: true}];
+  const si = await FichaAcciones.confirmarMaldito(S, 3, {confirmarMaldito: t => { preguntas.push(t); return true; }}, 'Drenar Vida');
+  const no = await FichaAcciones.confirmarMaldito(S, max, {confirmarMaldito: t => { preguntas.push(t); return false; }}, 'Pedos Tóxicos');
+  const libre = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S; libre.efectos = [];
+  const sinPreguntar = await FichaAcciones.confirmarMaldito(libre, 5, {confirmarMaldito: () => { preguntas.push('x'); return false; }});
+  igual([si, no, sinPreguntar, preguntas.length, preguntas[0].includes(`usar Drenar Vida cuesta 3 SP y te va a bajar 3 de vida (${max} → ${max - 3})`), /quedás caído/.test(preguntas[1])],
+    [true, false, true, 2, true, true]);
+});
 prueba('dos Pajaritos parten una sola vez y el cartel muestra uno', () => {
   const es = [E({nombre: 'Pajaritos', mitadPdgEva: true}), E({nombre: 'Pajaritos 2', mitadPdgEva: true})];
   igual([Combatiente.mitadesDeTirada(es, 'pdg'), Combatiente.estadosQueParten(es, 'pdg').length], [1, 1]);

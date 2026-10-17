@@ -23,9 +23,9 @@
    los marcados ⚠ (No2, Rng, Crit) son los que más hay que revisar. */
 const PASIVAS_BASE = [
   // 🕊 Vuela (2026-10-16, dueño: «Vuela debería ser una habilidad pasiva también… en la abeja»): da el estado Vuela, permanente.
-  // jobCosto 3 provisorio (pensada para criaturas; si un personaje la quiere, la mesa decide: docs/preguntas-abiertas.md).
+  // Un personaje también la puede elegir, justificándola con el GM (dueño, 2026-10-17, P202); jobCosto 3 provisorio.
   {poolId: 'vuela', nombre: 'Vuela', jobCosto: 3, etiquetas: ['movimiento', 'criatura'], estado: 'Vuela', mods: [],
-   detalle: 'Vuela bajo: nunca toca el piso (no lo frena el terreno lento, no pisa trampas, no lo tocan las zonas del piso), pasa por encima de los tokens (al cruzar a un rival, antes le da su ataque de oportunidad), no le entran Sentado ni Rengo, y −1 a la Evasión contra disparos. ⚙ Automatizado: mientras la tenga, lleva puesto el estado Vuela.'},
+   detalle: 'Vuela bajo: nunca toca el piso (no lo frena el terreno lento, no pisa trampas, no lo tocan las zonas del piso), pasa por encima de los tokens (al cruzar a un rival, antes le da su ataque de oportunidad), no le entran Sentado ni Rengo, y −1 a la Evasión contra disparos. ⚙ Automatizado: mientras la tenga, lleva puesto el estado Vuela. ✋ A mano: un personaje la elige justificándola en la historia con el GM.'},
   {poolId: 'robustez', nombre: 'Robustez', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
    detalle: '+5 Hp.Max.', mods: [{stat: 'hpmax', val: 5}]},
   {poolId: 'reserva-de-poder', nombre: 'Reserva de poder', jobCosto: 1, etiquetas: ['stat'],

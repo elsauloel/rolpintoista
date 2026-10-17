@@ -53,8 +53,8 @@
 >   **Falta:** los arcos «Contra lo que vuela o levita» (+PdG), que esperaban esto.
   (2026-10-16) **Vuela también es una pasiva** (`comun/pasivas.js`, `estado: 'Vuela'`): una pasiva puede dar un estado
   (`Combatiente.sincronizarEstadosDePasivas`, personajes, creeps e invocaciones) y las invocaciones tienen pasivas (paso «Pasivas» del editor).
-  El estado trae −1 a la Evasión contra disparos (`evadisparo`). **Falta:** la vida por turno (`regenHp`) de una pasiva de invocación no se
-  aplica todavía (en creeps y personajes sí); y verlo desde la cuenta de un jugador.
+  El estado trae −1 a la Evasión contra disparos (`evadisparo`). La vida por turno (`regenHp`) de las pasivas vale para personajes, creeps
+  e invocaciones (esta última, 2026-10-17: `InvCalculo.regenPasivas`).
 > - [ ] **🕊 Vuelo (2026-10-11, dueño, con los arcos: «todavía no diseñamos nada, pero eventualmente aparecerán creeps voladores — anotar para
 >   desarrollar: vuelo»):** creeps que vuelan o levitan. Cuando exista, los arcos «Contra lo que vuela o levita» (+PdG) ya están elegidos por el dueño
 >   (docs/ideas-arcos-flechas.md). Hoy existe Levitar (pies), que no es lo mismo.

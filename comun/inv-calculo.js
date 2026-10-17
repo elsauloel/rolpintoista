@@ -53,6 +53,8 @@ const InvCalculo = (() => {
     });
     return out;
   }
+  // La vida que recuperan sus pasivas por turno (Regeneración…), con sus compras (2026-10-16, como un creep: CreepCalculo.regenPasivas).
+  const regenPasivas = inv => (inv.pasivas||[]).reduce((a, p) => a + num(p && p.regenHp) * Math.max(1, Math.round(num(p && p.compras)) || 1), 0);
   function estadosArmadura(inv){
     const activos = (inv.estados||[]).filter(e => e.activo !== false);
     return {rota: activos.filter(e => e.armaduraRota).reduce((a, e) => a + Math.max(1, num(e.stacks) || 1), 0)};
@@ -177,5 +179,5 @@ const InvCalculo = (() => {
   return {IT2_INV, ATTR_IDS_INV, INV_STAT_EXCLUIR, INV_DERIVADOS_POR_ATTR, INV_STAT_ATTR, INV_STATS_TIRADA_IDS, INV_STATS_HAB,
     fuentesEquipo, modTotal, aportesMod, estadosArmadura, aporteArmadura, defensaEfectiva, critEfectivo, estadoActivo, statValor,
     nitrosMax, habAtaque, pesoArma, defensa, bloqueoValor, costoAtaque, costoNitrosHab, costoHabTxt, bloqueoHab, danoTxt, ataqueTxt,
-    modsAfectanHp, actualizarHpMaxPorCon, migrar};
+    modsAfectanHp, actualizarHpMaxPorCon, migrar, regenPasivas};
 })();

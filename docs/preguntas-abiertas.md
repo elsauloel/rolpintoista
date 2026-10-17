@@ -1018,7 +1018,8 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   vuelta». Hoy la pregunta le aparece solo a quien maneja un personaje o una invocación (vtt-hexgrid/js/49); a un creep que un personaje se le
   acerca por la espalda, el GM lo gira a mano si quiere. ¿Va también para los creeps (la pregunta al GM), o los creeps «poco inteligentes» no
   se dan vuelta? Y, relacionado: la Evasión 1 de atacar desde el sigilo por la espalda (regla del 2026-09-26, a mano), ¿sigue además del +1 PdG?
-- 🔲 **P202. ¿Un personaje puede comprar la pasiva «Vuela»? — 2026-10-16.** El dueño pidió Vuela como pasiva para las abejas de Bizzante; como
+- ✅ **P202. ¿Un personaje puede comprar la pasiva «Vuela»? — 2026-10-16; decidida 2026-10-17.** **Decidido (dueño):** sí, «pero va a haber
+  que justificarla narrativamente con el máster» (lo dice el detalle de la pasiva); el costo sigue en Job 3, provisorio. Pregunta original: El dueño pidió Vuela como pasiva para las abejas de Bizzante; como
   las pasivas de creeps e invocaciones salen del mismo catálogo que las de los personajes, también aparece en «+ Pasiva» de la ficha. Quedó con
   **Job 3, provisorio** (comun/pasivas.js). ¿Se ofrece a los personajes, a qué costo, o es solo de criaturas?
 

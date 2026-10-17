@@ -80,6 +80,8 @@ const FichaMantenimiento = (() => {
     const rep = Combatiente.reporteTurno([...v.eventos, ...d.eventos]);
     const rg = Math.max(0, Math.floor(num(InvCalculo.statValor(inv, 'hpregen'))));   // Regeneración de vida (2026-10-07)
     if(rg > 0 && num(inv.hp) > 0){ d.hp += rg; rep.push(`Regeneración de vida: +${fmt(rg)} HP`); }
+    const rp = Math.max(0, Math.floor(num(InvCalculo.regenPasivas(inv))));   // sus pasivas (2026-10-16, como un creep)
+    if(rp > 0 && num(inv.hp) > 0){ d.hp += rp; rep.push(`Pasivas: +${fmt(rp)} HP`); }
     const dhInv = Combatiente.curaQueEntra(inv.hp, d.hp);
     if(d.hp && !dhInv) rep.push('Caída: la cura de este turno no la levanta');
     if(dhInv){ const antes = num(inv.hp); inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, antes + dhInv)); rep.push(`HP total: ${fmt(antes)} → ${fmt(inv.hp)}`); }
@@ -280,5 +282,5 @@ const FichaMantenimiento = (() => {
     if(caido) lineas.push('sigue caído (descansar no lo levanta)');
     return lineas;
   }
-  return {terminaAlPasarDia, descansar, MAX_SEGUIDOS, aplicar, inicioTurno, finTurno, reclamar, publicarReporte, publicarRecordatorios, robosTexto};
+  return {terminaAlPasarDia, descansar, MAX_SEGUIDOS, aplicar, inicioTurno, finTurno, reclamar, publicarReporte, publicarRecordatorios, robosTexto, invInicio};
 })();

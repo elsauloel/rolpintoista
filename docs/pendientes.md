@@ -45,6 +45,9 @@
 >   trampas y en el **duelo** (2026-10-17: si el que recibe es personaje o invocación, «N de daño, menos tu Defensa» y «💔 Aplicar el daño»; el GM
 >   tiene «Aplicar por …»; las áreas son sub-duelos, así que también). Las zonas ya pedían «Aplicar». **Falta:** lo que baja vida al empezar el
 >   turno (Veneno, Sangrado, Quemadura): hoy se aplica solo y se anuncia; ¿también con un clic?
+> - [ ] **✋ El mundo de los talismanes y demás objetos especiales para la mano libre (2026-10-17, dueño: «después de terminar de auditar
+>   los kobolds, quiero pasar al mundo de los talismanes y demás objetos especiales para la mano libre»):** lo siguiente después de cerrar
+>   los kobolds (quedan el tunelero, el chamán del cristal, el capataz y el coraza de cristal).
 > - [ ] **🪤 Aprender trampas: ver una, copiarla y saber armarla (2026-10-17, dueño; también en 🛠 Herramientas de diseño → A desarrollar):**
 >   un **talento** para «imitar trampas»: ver una trampa (la detectada o la que lo agarró), copiarla y aprender a construirla, que quede en su
 >   lista para armarla después. **Desarmar trampas ya existe** (talento, 2026-10-08: detecta como la Pisada atenta y el mapa ofrece desarmarla

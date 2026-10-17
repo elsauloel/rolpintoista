@@ -44,6 +44,9 @@
 - [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): un crítico de la Puñalada (Rengo 2 y Lisiado 1). El pozo visto como jugador ya se vio (con
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **💔 Trampas: el daño en dos pasos** (2026-10-17, «Test con claude elsaulo», GM con 🎮 el control de Xeena): al pisar una trampa de 1d6,
+  «🎲 Tirar el daño (1d6)» → «1d6 = 4» y el paso «Aplicar el daño: 4 de daño, menos su Defensa. ⚙ Al tocar el botón se descuenta solo…» →
+  «💔 Aplicar el daño (4)» → «4 − Defensa 0 → 4 de daño · ✔ ya se descontó de la vida (5 → 1)» → «¡CAYÓ EN LA TRAMPA!». Mapa limpio después.
 - [x] **🕊 Vuela como pasiva: trampas y zonas del piso** (2026-10-17, «Test con claude elsaulo», GM): con la pasiva Vuela, un creep cruzó una
   zona de púas del piso (de un personaje) y un personaje (Xeena, con 🎮 el control) cruzó una trampa escondida del GM: ni la trampa se disparó
   ni las púas pegaron, sin cartel de «pisaste algo». Contraprueba sin la pasiva: al creep las púas le sacaron 3; a Xeena la trampa la frenó y le

@@ -1390,7 +1390,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   afectado (`trampaMomentoNuevo`, tipo `trampa`, `datos.fase` = salva → dano → estado → fin). Lo resuelve la pantalla de quien maneja a la
   víctima (`trampaMeToca`: su dueño, el GM con 🎮 el control, el GM para un creep) en el cuadro del duelo (`AvisoCombate.mostrar` con `clave`):
   «🎲 Tirar Evasión (fórmula)» → los dados ruedan y recién quietos se anuncia («Evasión 3 contra 7 → no la esquivó»); «🎲 Tirar el daño» → se
-  aplica y se anuncia (Defensa, escudo, Invulnerable; sin la vida que queda); lo que le deja se aplica solo y dice cómo soltarse; al final el
+  anuncia la tirada y queda el paso `dano-aplicar`: «💔 Aplicar el daño (N)» (2026-10-17, dueño: un clic para que el jugador se entere) lo
+  descuenta y lo anuncia (Defensa, escudo, Invulnerable, «✔ ya se descontó de la vida (A → B)»; la de un creep no se muestra); lo que le deja se aplica solo y dice cómo soltarse; al final el
   cartel grande y «Entendido». Cada paso se escribe en el momento (`datos.pasos`, `datos.lineas`) y el resto lo sigue en la Crónica renglón por
   renglón. Un paso se toma con una transacción (`datos.tirando`). Cerrar el cuadro sin terminar deja la tarjeta en la Crónica con «🪤 Seguir»;
   el GM puede resolver por un jugador que no está con «🎲 Tirar por él». En una trampa de área, cada afectado tira su propio daño. Sin reglas

@@ -310,6 +310,16 @@ prueba('❄ Báculo de escarcha: ¼ del Ef.Esp para arriba y 1 de Escarcha por c
   const st = [4, 5, 9, 10].map(d => Combatiente.stacksPorDano(d, du.porDano));
   igual([S, st, du.efectos.length, Combatiente.sumaEspecialDe(7, 0.5), Combatiente.sumaEspecialDe(7, true)], [[4, 4, 1, 0], [0, 1, 1, 2], 0, 4, 7]);
 });
+prueba('🛡 Un creep para con un báculo de sus manos, no con un orbe ni una varita; contra un disparo, solo con un escudo', () => {
+  const b = CATALOGO_BASE.find(i => i.id === 'esp-buena-baculo-de-escarcha');
+  const base = {nombre: 'Chamán', armaNombre: 'Uñas', armaNatural: true, armaTipo: 6};
+  const con = eq => CreepCalculo.defensa({...base, equipo: eq});
+  const conBaculo = con([{...CreepCalculo.itemParaCreep(b), id: 'b'}]), soloOrbe = con([{nombre: 'Orbe salvaje', tipoItem: 'escudo_1m', orbe: true}]);
+  const varita = con([{nombre: 'Varita', tipoItem: 'arma_1m', especial: {sp: 1}}]);
+  const disparo = CreepCalculo.defensa({...base, equipo: [{...CreepCalculo.itemParaCreep(b), id: 'b'}]}, {soloEscudo: true});
+  const escudo = CreepCalculo.defensa({...base, equipo: [{...CreepCalculo.itemParaCreep(b), id: 'b'}, {nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 1}]}, {soloEscudo: true});
+  igual([conBaculo && conBaculo.nombre, conBaculo && conBaculo.peso, soloOrbe, varita, disparo, escudo && escudo.nombre], ['Báculo de escarcha', 2, null, null, null, 'Rodela']);
+});
 prueba('dos Pajaritos parten una sola vez y el cartel muestra uno', () => {
   const es = [E({nombre: 'Pajaritos', mitadPdgEva: true}), E({nombre: 'Pajaritos 2', mitadPdgEva: true})];
   igual([Combatiente.mitadesDeTirada(es, 'pdg'), Combatiente.estadosQueParten(es, 'pdg').length], [1, 1]);

@@ -103,7 +103,7 @@ const InvCalculo = (() => {
     if(!inv) return null;
     return Combatiente.armaParaDefensa({arma: inv.armaNombre ? {nombre: inv.armaNombre, peso: pesoArma(inv)} : null, natural: inv.armaNatural === true,
       arco: !!inv.armaDeRango, soloEscudo: !!(o && o.soloEscudo),
-      escudos: (inv.equipo || []).filter(it => slotDe(it.tipoItem) === 'escudo').map(it => ({nombre: it.nombre, peso: num(it.peso)}))});
+      escudos: Combatiente.piezasParaParry(inv.equipo, slotDe, it => num(it.peso))});   // un báculo sí, un orbe no (2026-10-17)
   }
   function bloqueoValor(inv){ const d = defensa(inv); return statValor(inv, 'bloqueo') + (d ? num(d.peso) : 0); }
   function costoAtaque(inv){ return Combatiente.conExtenuado(inv.estados, costoAtaque0(inv)); }   // + Extenuado (2026-10-12)

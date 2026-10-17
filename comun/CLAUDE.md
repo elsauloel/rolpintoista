@@ -1598,3 +1598,6 @@ versión parecida en más de una, es candidato a juntar.
   El asistente de ítems ofrece «Un cuarto» (antes borraba el ¼ de un báculo al editarlo). El Báculo de escarcha deja la Escarcha por daño
   (`duelo.porDano = {estado: 'Escarcha', cada: 5, desde: 5}`: 1 por cada 5 que entran), no por porcentaje. La habilidad (`danoSumaEsp`, Toque
   mágico) sigue para abajo.
+- **Con qué para un creep o una invocación** (2026-10-17): `Combatiente.piezasParaParry(equipo, slotDe, pesoDe)` — lo de sus manos que sirve
+  para parrear (escudos primero, después un báculo o un arma cuerpo a cuerpo; no un orbe, una varita ni un arma de rango), la misma regla que un
+  personaje. Lo usan `CreepCalculo.defensa` e `InvCalculo.defensa`. Antes miraban solo la ranura de escudo: un orbe parreaba y un báculo no.

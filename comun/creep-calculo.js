@@ -404,7 +404,7 @@ const CreepCalculo = (() => {
     if(!sc) return null;
     return Combatiente.armaParaDefensa({arma: sc.armaNombre ? {nombre: sc.armaNombre, peso: pesoArma(sc)} : null, natural: sc.armaNatural,
       arco: !!sc.armaDeRango, soloEscudo: !!(o && o.soloEscudo),
-      escudos: (sc.equipo || []).filter(it => slotDe(it.tipoItem) === 'escudo').map(it => ({nombre: it.nombre, peso: pesoPieza(it)}))});
+      escudos: Combatiente.piezasParaParry(sc.equipo, slotDe, pesoPieza)});   // un báculo sí, un orbe no (2026-10-17)
   }
   // El peso de una pieza del equipo (2026-10-13): las equipadas antes no lo guardaban; si falta, el del catálogo con ese nombre.
   function pesoPieza(it){

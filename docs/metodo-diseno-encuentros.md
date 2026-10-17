@@ -35,6 +35,10 @@ Uno por uno, con el dueño (como en la auditoría de skills: el texto original p
 
 - **Roles**: frente (aguanta o controla), atacante (presiona al más débil), control o apoyo (buffs a los suyos, debuffs a los otros),
   distancia (molesta y obliga a correr), jefe (la mecánica que hace girar la pelea).
+- **La mayor variedad de roles y mecánicas posible, por diversión** (dueño, 2026-10-17; recordatorio, no regla estricta): alguien que ponga
+  trampas, un caster con magia elemental (para que las resistencias elementales tengan sentido), alguien que haga otra magia, alguien a
+  distancia y cuerpo a cuerpo de por lo menos dos roles (uno tanque y otro de daño; puede haber uno balanceado, tipo guerrero). Al auditar
+  un encuentro que ya existe, mirar qué rol o mecánica falta.
 - **Cada fortaleza del grupo tiene una respuesta** (al tanque: Armadura rota, Demora, Perfora, ataques que lo saltean; al caster: alguien
   que llega por atrás; a las invocaciones: un área) **y cada debilidad tiene una amenaza** (pero sin que un mal turno mate a alguien sin
   chance: mirar el daño máximo de una ronda contra la vida del más frágil).

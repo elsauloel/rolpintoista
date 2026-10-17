@@ -53,7 +53,8 @@
 > - [ ] **🪨 Hondas: auditar la categoría y armar la serie del catálogo (2026-10-14, dueño):** la categoría existe (`honda` en el arma:
 >   `Combatiente.esHonda`, `alcanceHonda`; P198 el alcance) y por ahora hay una sola honda nueva, la **Honda de piedras** (Común, Tipo 10).
 >   Falta auditarla y crear la serie (calidades, mecánicas propias). Las hondas viejas del catálogo (Honda de cuero, de pastor, del cazador de
->   jabalíes: Tipo 4, sin la categoría) quedan para esa auditoría.
+>   jabalíes: Tipo 4, sin la categoría) quedan para esa auditoría. (2026-10-17, dueño: «anotar en pendientes diseñar hondas») Segunda honda:
+>   **Honda de minero** (Común, 85, Tipo 10, Demora 33 % — lo máximo que entra en Común; al 50 % ya es Buena), la del Kobold boom boom.
 > - [ ] **🕳 Bajo tierra para personajes e invocaciones (2026-10-13):** Excavar / Emerger (`excavar`, `emerger` en la habilidad;
 >   `vtt-hexgrid/js/46-bajo-tierra.js`) hoy anda para creeps (el Kobold tunelero). Falta el camino de la ficha (mensaje al mapa, como el blink) y
 >   el de las invocaciones, cuando alguien tenga una skill así.

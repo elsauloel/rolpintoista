@@ -183,4 +183,8 @@ De a uno, de nivel más bajo a más alto; primero el ataque básico y después c
   la **Varita del susurro** y el **Orbe salvaje** (con la varita tira 1d6: con 1 le hace 1 de daño, con 6 el efecto sale doble); el «Pico de
   juguete» (era Tipo 6) → **Uñas sucias** (arma natural, Tipo 6, 1 dado, para un caso de emergencia). Equipo: Capucha de lana del culto. La
   varita puede quedar de botín (a Larry le sirve). Las dos habilidades, en la biblioteca como auditadas.
+- Kobold tunelero (`ffrzpzl`): **Excavar** cooldown 3 → 2; **Puñalada desde abajo** con cooldown 2 (antes 0: siempre convenía más que el ataque
+  común) y el bonus por salir de abajo +1 → **+3** a la Probabilidad de Golpe (dueño; el +1 no cambiaba nada: PdG 11 = 1d10+1 y 12 = 1d12, el
+  mismo promedio). Saliendo de abajo pega 82 % a Bizzante (7,3 de daño), 88 % a Petro (8,3), 96 % a Larry (16,4 de sus 20). Daga Tipo 4 y el
+  resto, igual. Las dos habilidades, en la biblioteca como auditadas.
 

@@ -176,7 +176,7 @@ De a uno, de nivel más bajo a más alto; primero el ataque básico y después c
   el catálogo: Común, 85, Tipo 10, honda, Demora 33 %). **Cartucho**: igual (fuego en área, 5,8 a 7,7 por tiro a los tres, Petro incluido).
   **Cartucho enterrado**: cooldown 5 → 3, sigue lenta; la dificultad para detectarla sale de su Destreza (dueño: alta está bien, es de habilidad).
   Nota del GM: el encuentro arranca con un Cartucho enterrado ya puesto. Las dos habilidades, en la biblioteca como auditadas.
-- Kobold maldiciente (`84v7855`, en curso): **Mal de mina** (Cansado) → **Maldición de la sangre** (2 No2, cooldown 3, lenta; PdG.Esp contra
+- Kobold maldiciente (`84v7855`, en curso): **Mal de mina** (Cansado) → **Maldición de la sangre** (2 No2, cooldown 3, sin lenta —dueño—; PdG.Esp contra
   Res.Esp, entra 96 % a Larry, 95 % a Bizzante, 88 % a Petro): estado nuevo **Maldito** 2 turnos, cada SP que paga le saca 1 de vida al pagar
   (con aviso y Aceptar / Cancelar). Contra Larry: Drenar Vida con X alto todavía le da vida neta (cura ~1,5 por SP), pero pagar antes de curarse
   lo obliga a drenar de a poco. Mal de ojo: igual. Falta decidir el arma (el «Pico de juguete» era Tipo 6; propuesta: Daga ritual + Varita del susurro).

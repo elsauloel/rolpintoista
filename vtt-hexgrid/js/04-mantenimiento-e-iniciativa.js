@@ -622,10 +622,18 @@ async function inicioTurnoPendiente(tokenId, clave){
   if(!prev) return false;   // ya estaba aplicado (o no se pudo leer la ficha): sigue como siempre
   const f = fichasPub.get(fichaId);
   const paraUid = (f && f.resumen && f.resumen.control) || t.duenoUid || (f && f.duenoUid) || '';
+  // Ordenado para leerlo de un vistazo: los estados (cuántos turnos les quedan), la vida y el SP, los No2 y lo demás (invocaciones, avisos).
+  const esEstado = l => /turno|se termin|vence|venci/i.test(l) && !/^No2/.test(l);
+  const esVida = l => /HP|vida|SP|Regeneraci|Veneno|Sangrado|Quemadura|Meditar|Ca[ií]d/i.test(l) && !esEstado(l);
+  const est = prev.rep.filter(esEstado), vida = prev.rep.filter(esVida), no2 = prev.rep.filter(l => /^No2/.test(l)), otros = prev.rep.filter(l => !esEstado(l) && !esVida(l) && !/^No2/.test(l));
+  const estados = est.length ? est : prev.turnos;
   const pasos = [
-    ...(prev.turnos.length ? [{titulo: 'Tus estados', texto: prev.turnos.join(' · ')}] : []),
-    {titulo: 'Lo que pasa al empezar', texto: prev.rep.length ? prev.rep.join(' · ') : 'Nada que cambie.'},
+    ...(estados.length ? [{titulo: 'Tus estados', texto: estados.join(' · ')}] : []),
+    ...(vida.length ? [{titulo: 'Vida y SP', texto: vida.join(' · ')}] : []),
+    ...(no2.length ? [{titulo: 'No2', texto: no2.join(' · ')}] : []),
+    ...(otros.length ? [{titulo: 'Además', texto: otros.join(' · ')}] : []),
   ];
+  if(!pasos.length) pasos.push({titulo: 'Lo que pasa al empezar', texto: 'Nada que cambie.'});
   await momentoAbrir({tipo: 'inicio-turno', icono: '▶', titulo: `Empieza el turno de ${nombreDe(t)}`, estado: 'esperando',
     resultado: 'Esperando que aplique el inicio de su turno…', datos: {tokenId, clave, paraUid, pasos}});
   return true;

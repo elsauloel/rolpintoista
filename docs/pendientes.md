@@ -23,6 +23,11 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **🪤 Aprender trampas: ver una, copiarla y saber armarla (2026-10-17, dueño; también en 🛠 Herramientas de diseño → A desarrollar):**
+>   un talento o habilidad para «imitar trampas»: ver una trampa (la detectada o la que lo agarró), copiarla y aprender a construirla, que quede
+>   en su lista para armarla después. **Desarmar trampas ya existe** (talento, 2026-10-08: detecta como la Pisada atenta y el mapa ofrece
+>   desarmarla con la tirada del talento; las Ganzúas suman +2). A definir: ¿es un talento o una habilidad de clase?, ¿con qué tirada se aprende?,
+>   ¿qué cuesta armar la copia (materiales, No2, oro)?, ¿se puede copiar cualquier trampa (también la de un creep) o solo las del catálogo?
 > - [ ] **🧪 Más ítems con la mecánica de cargas (2026-10-10, dueño; también en 🛠 Herramientas de diseño → A desarrollar):** la mecánica
 >   ya existe (estado con `cargas` y `golpe`, `Combatiente.gastarCarga`). Los óleos del Bazar ya están (aprobados y cargados 2026-10-10):
 >   Óleo venenoso (Común, 1 carga, +2 y Veneno ×3, 35) y Óleo venenoso concentrado (Buena, 2 cargas, +3 y Veneno ×3, 75) —; después otros

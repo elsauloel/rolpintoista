@@ -44,6 +44,10 @@
 - [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): un crítico de la Puñalada (Rengo 2 y Lisiado 1). El pozo visto como jugador ya se vio (con
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **▶ Empieza tu turno** (2026-10-17, «Test con claude elsaulo»): Xeena con Bendecido (2 turnos), Regeneración (pasiva) y 1 de vida. Al
+  pasarle el turno: sin el control, el GM vio «▶ Aplicar por él» en la Crónica y al tocarlo se aplicó (Bendecido 2 → 1, +3 HP, 1 → 4); con 🎮 el
+  control, el cartel al centro «Empieza tu turno» (Tus estados · Vida y SP · No2) → «✔ Aplicar» → «✔ YA SE APLICÓ»; cerrándolo sin aplicar y
+  pasando el turno, se aplicó solo («✔ Se aplicó solo al pasar el turno»). Mapa limpio después.
 - [x] **💔 Duelo: «Aplicar el daño»** (2026-10-17, «Test con claude elsaulo», GM con 🎮 el control de Xeena): el Creep de prueba le pegó
   (empate resuelto con par) y tiró 2d8+1 = 6: el paso 5 quedó en «6 de daño, menos tu Defensa» con «💔 Aplicar el daño» y la vida sin tocar; al
   tocarlo: «6 de daño (6 − Defensa 0) · Xeena: 5 → 0 HP». Falta: la variante del GM «Aplicar por …» con un personaje de otra cuenta.

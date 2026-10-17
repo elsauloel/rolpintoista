@@ -26,6 +26,8 @@ Un combate se juega en **rondas**. Dentro de cada ronda, todos actúan de a uno,
 3. Empieza una **ronda nueva** desde el primero.
 
 ## Tu turno
+**Al empezar tu turno** te aparece un cartel, **▶ Empieza tu turno**, con lo que pasa: cuántos turnos les quedan a tus estados, lo que regenerás de vida y de SP (y lo que te saca un veneno o un sangrado) y con cuántos No2 arrancás. Tocás **✔ Aplicar** y ahí se aplica todo; el cartel lo confirma («✔ Ya se aplicó»). Si no estás, el GM lo aplica por vos, y si el turno pasa sin que nadie lo toque, se aplica solo antes de terminarlo.
+
 En tu turno gastás tus **Nitros** en lo que quieras: moverte, [[Atacar|atacar]], usar [[Habilidades|habilidades]] o ítems. No hay "fase de movimiento" separada: es todo del mismo bolsillo. Ver [[Costos en Nitros]].
 
 > [!tip] Tu turno, en tres preguntas

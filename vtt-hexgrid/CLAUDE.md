@@ -1639,4 +1639,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `explota: {clave, celdas}` (`trampaCeldasEfecto`: la flor del efecto, las casillas de la trampa o la pisada) y js/19 `trampaMomento` →
   `explosionEmpezar`: la primera vez por clave dibuja la explosión (`dibujarEfectosExplosion`, desde js/05) y pone el velo `#explosion-congela`
   1,5 s (`EXPLOSION_MS`); el Anuncio de quien la resuelve espera con `trampaRetenidas`.
+- **▶ Empieza tu turno** (2026-10-17, dueño): js/04 `iniciativaSiguiente` → para un personaje o invocación, `inicioTurnoPendiente` calcula el
+  inicio sobre una copia de la ficha (`editarPersonajeMapa` sin guardar) y abre el momento `inicio-turno` (esperando, `datos: {tokenId, clave,
+  paraUid, pasos}`); js/16 `inicioTurnoMomento` lo muestra al centro de su dueño (o de quien tiene 🎮 el control) con «✔ Aplicar»;
+  `inicioTurnoAplicar` lo aplica de verdad (`turnoDeToken`, misma clave: nunca dos veces); el GM, «▶ Aplicar por él» desde la Crónica; al
+  pasar el turno, `inicioTurnoForzar` lo aplica si quedó pendiente. Un creep sigue como siempre (solo el GM).
 

@@ -141,6 +141,36 @@ function abrirItemNuevoInv(invId){
     },
   });
 }
+// Pasivas de una invocación (2026-10-16, dueño: «Vuela… una habilidad pasiva en la abeja»): del catálogo de pasivas (comun/pasivas.js + la
+// biblioteca), como las de un creep (pasivaParaCombatiente). La que da un estado lo pone y lo saca con ella (Combatiente.sincronizarEstadosDePasivas).
+function abrirPasivaNuevaInv(invId){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  if(!inv) return;
+  Biblioteca.abrir({tipo: 'pasivas', titulo: `Pasiva para ${inv.nombre}`, base: typeof PASIVAS_BASE !== 'undefined' ? PASIVAS_BASE : [],
+    subtitulo: e2 => (e2.datos && e2.datos.detalle ? ` · ${e2.datos.detalle.slice(0, 60)}` : ''),
+    alElegir: datos => {
+      const x = S.invocaciones.find(y => y.id === invId);
+      if(!x) return;
+      x.pasivas = Array.isArray(x.pasivas) ? x.pasivas : [];
+      const clave = datos.poolId || String(datos.nombre || '').toLowerCase();
+      const ya = x.pasivas.find(p => (p.poolId || String(p.nombre || '').toLowerCase()) === clave);
+      if(ya) ya.compras = Math.max(1, num(ya.compras) || 1) + 1;
+      else x.pasivas.push(pasivaParaCombatiente(datos, uid()));
+      Combatiente.sincronizarEstadosDePasivas(x.estados = x.estados || [], x.pasivas, estadosPresetFicha(), uid);
+      if(modsAfectanHpInv(datos.mods)) actualizarHpMaxPorConInv(x);
+      toast(`${x.nombre}: ${datos.nombre}${ya ? ' ×' + ya.compras : ''}`);
+      renderInvocaciones();
+    }});
+}
+function quitarPasivaDeInv(invId, pasivaId){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  const p = inv && (inv.pasivas || []).find(x => x.id === pasivaId);
+  if(!p) return;
+  inv.pasivas = inv.pasivas.filter(x => x !== p);
+  Combatiente.sincronizarEstadosDePasivas(inv.estados = inv.estados || [], inv.pasivas, estadosPresetFicha(), uid);   // su estado se va con ella
+  if(modsAfectanHpInv(p.mods)) actualizarHpMaxPorConInv(inv);
+  renderInvocaciones();
+}
 function quitarEquipoDeInv(invId, equipoId){
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
@@ -248,6 +278,7 @@ const INV_PASOS = [
   {id: 'arma', nombre: 'Arma', ayuda: '<b>¿Con qué pega?</b> El arma (o el arma natural) y lo que hace al golpear.'},
   {id: 'defensa', nombre: 'Defensa', ayuda: '<b>¿Cómo aguanta?</b> Su Defensa, la armadura que lleva y la resistencia a críticos de cada Tipo de arma.'},
   {id: 'habilidades', nombre: 'Habilidades', ayuda: '<b>Habilidades.</b> Cada una se arma en su propio paso a paso.'},
+  {id: 'pasivas', nombre: 'Pasivas', ayuda: '<b>Pasivas.</b> Lo que es de nacimiento (Vuela, Regeneración…): las mismas del catálogo de los personajes, sin costo de Job. Una pasiva que da un estado lo mantiene puesto mientras la tenga.'},
   {id: 'estados', nombre: 'Estados', ayuda: '<b>Estados alterados</b> que tiene ahora.'},
   {id: 'notas', nombre: 'Notas', ayuda: '<b>Notas.</b> Lo que haga falta recordar de esta invocación.'},
 ];
@@ -302,6 +333,15 @@ function invPasoHtml(id, inv){
       ${inv.habilidades.length ? inv.habilidades.map(h => invHabHtml(inv, h)).join('') : '<div class="hint">Sin habilidades.</div>'}
     </div>
     <button type="button" class="inv-addhab" data-addhabinv="${inv.id}" style="margin-top:6px">+ Habilidad</button>`;
+  if(id === 'pasivas') return `
+    <div class="inv-hablist">
+      ${(inv.pasivas || []).length ? inv.pasivas.map(p => `<div class="inv-equipo-item">
+        <span class="inv-equipo-nombre">${esc(p.nombre)}${num(p.compras) > 1 ? ` ×${num(p.compras)}` : ''}</span>
+        <span class="hint" style="flex:1">${esc(String(p.detalle || '').slice(0, 140))}</span>
+        <button type="button" class="inv-rm" data-quitarpasivainv="${inv.id}:${p.id}" title="Sacar la pasiva">×</button>
+      </div>`).join('') : '<div class="hint">Sin pasivas.</div>'}
+    </div>
+    <button type="button" class="inv-addhab" data-addpasivainv="${inv.id}" style="margin-top:6px">+ Pasiva</button>`;
   if(id === 'estados') return `
     <div class="inv-hablist">
       ${(inv.estados||[]).filter(Combatiente.estadoVisible).length ? inv.estados.filter(Combatiente.estadoVisible).map(es => invEstadoChipHtml(inv, es)).join('') : '<div class="hint">Sin estados activos.</div>'}

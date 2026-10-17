@@ -59,6 +59,8 @@ const FichaResumen = (() => {
       const stacks = Math.max(1, num(es.stacks)||1);
       (es.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val) * stacks; });
     });
+    // Pasivas (2026-10-16, como las de un creep: con sus compras).
+    (inv.pasivas||[]).forEach(p => { const c = Math.max(1, Math.round(num(p && p.compras)) || 1); (p.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val) * c; }); });
     return total;
   }
   function invNitrosMax(inv){

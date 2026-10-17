@@ -71,7 +71,8 @@ function agregarPasivaACreep(sc, datos){
   sc.pasivas = Array.isArray(sc.pasivas) ? sc.pasivas : [];
   const ya = sc.pasivas.find(p => (p.poolId || String(p.nombre || '').toLowerCase()) === clave);
   if(ya) ya.compras = CreepCalculo.pasivaComprasCreep(ya) + 1;
-  else sc.pasivas.push({id: uid(), poolId: clave, nombre: datos.nombre, detalle: datos.detalle || '', mods: (datos.mods || []).map(m => ({...m})), regenHp: num(datos.regenHp) || 0, compras: 1});
+  else sc.pasivas.push(pasivaParaCombatiente(datos, uid()));   // comun/pasivas.js (con el estado que da, si da uno)
+  Combatiente.sincronizarEstadosDePasivas(sc.estados = sc.estados || [], sc.pasivas, estadosPresetCreep(), uid);   // Vuela… (2026-10-16)
   if((datos.mods || []).some(m => m.stat === 'con' || m.stat === 'hpmax')) actualizarHpMaxPorCon(sc);
   toast(`${sc.nombre}: ${datos.nombre}${ya ? ' ×' + ya.compras : ''}`);
   renderAll();
@@ -92,6 +93,7 @@ document.addEventListener('click', e => {
   if(b.dataset.pasivacreepMas) p.compras = CreepCalculo.pasivaComprasCreep(p) + 1;
   else if(b.dataset.pasivacreepMenos && CreepCalculo.pasivaComprasCreep(p) > 1) p.compras = CreepCalculo.pasivaComprasCreep(p) - 1;
   else sc.pasivas = sc.pasivas.filter(x => x !== p);
+  Combatiente.sincronizarEstadosDePasivas(sc.estados = sc.estados || [], sc.pasivas, estadosPresetCreep(), uid);   // sin la pasiva, se va su estado
   if((p.mods || []).some(m => m.stat === 'con' || m.stat === 'hpmax')) actualizarHpMaxPorCon(sc);
   renderAll();
 });

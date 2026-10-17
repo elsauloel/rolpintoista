@@ -158,9 +158,10 @@ const ESTADOS_PRESET = [
     detalle:'No lo pueden empujar ni atraer (ganchos, muros que empujan, portales). ⚙ Automatizado: el mapa no lo mueve.'},
   // Vuela (2026-10-16, dueño; para las abejas de Bizzante y los creeps voladores): como Levitar sin límite y sin aterrizar (la marca `levitar`
   // en 100, como Inamovible), pasa por encima de los tokens (no de paredes ni Sólidos; al cruzar a un rival, antes le da su ataque de
-  // oportunidad) y no le entran Sentado ni Rengo (`volador`, Combatiente.inmunidad). Cuerpo a cuerpo se le pega normal (vuela bajo).
-  {nombre:'Vuela', polaridad:'buff', permanente:true, turnos:0, volador:true, mods:[{stat:'levitar', val:100}],
-    detalle:'Vuela bajo: nunca toca el piso. No lo frena el terreno lento, no pisa ni detecta trampas y no lo tocan las zonas del piso (las del aire, como gas o humo, sí). Pasa por encima de los tokens (no de paredes ni Sólidos), pero no puede terminar encima de nadie; si cruza por encima de un rival, antes ese rival tiene su ataque de oportunidad. No le entran Sentado ni Rengo. Cuerpo a cuerpo se le pega normal. ⚙ Automatizado.'},
+  // oportunidad) y no le entran Sentado ni Rengo (`volador`, Combatiente.inmunidad). Cuerpo a cuerpo se le pega normal (vuela bajo); −1 a la
+  // Evasión contra disparos (`evadisparo`). También es una pasiva (comun/pasivas.js, `estado: 'Vuela'`).
+  {nombre:'Vuela', polaridad:'buff', permanente:true, turnos:0, volador:true, mods:[{stat:'levitar', val:100}, {stat:'evadisparo', val:-1}],
+    detalle:'Vuela bajo: nunca toca el piso. No lo frena el terreno lento, no pisa ni detecta trampas y no lo tocan las zonas del piso (las del aire, como gas o humo, sí). Pasa por encima de los tokens (no de paredes ni Sólidos), pero no puede terminar encima de nadie; si cruza por encima de un rival, antes ese rival tiene su ataque de oportunidad. No le entran Sentado ni Rengo. Cuerpo a cuerpo se le pega normal, y a los disparos (arco, ballesta, honda, arrojadiza) se expone más: −1 a la Evasión contra ellos. ⚙ Automatizado.'},
   // Arma envenenada (2026-10-10, dueño: Envenenar arma del Asalto): un estado con CARGAS (Combatiente.gastarCarga): cada ataque con arma, pegue o
   // no, gasta una y suma su `golpe` (+3 de daño y Veneno ×3) a ese golpe. Sin cargas, se va. Volver a ponerlo lo deja otra vez en 2.
   {nombre:'Arma envenenada', polaridad:'buff', permanente:true, cargas:2, golpe:{fijo:3, efectos:[{nombre:'Envenenar', stacks:3}]},

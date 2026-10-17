@@ -512,6 +512,8 @@ document.addEventListener('click', async e => {
     return;
   }
   if(b.dataset.addestadoinv){ abrirPresetsEfectoInv(b.dataset.addestadoinv); return; }
+  if(b.dataset.addpasivainv){ abrirPasivaNuevaInv(b.dataset.addpasivainv); return; }   // (2026-10-16)
+  if(b.dataset.quitarpasivainv){ const [invId, pId] = b.dataset.quitarpasivainv.split(':'); quitarPasivaDeInv(invId, pId); return; }
   if(b.dataset.rmestadoinv){
     const [invId, esId] = b.dataset.rmestadoinv.split(':');
     const inv = S.invocaciones.find(x=>x.id===invId);

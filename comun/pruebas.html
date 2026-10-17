@@ -246,6 +246,29 @@ prueba('Vuela: Levitar en 100, permanente, y no le entran Sentado ni Rengo (lo d
     Combatiente.inmunidad([E({volador: true, activo: false})], deb({nombre: 'Sentado', sentado: true}))],
     [true, true, 100, 'Vuela', 'Vuela', false, false]);
 });
+prueba('Vuela: −1 a la Evasión solo contra disparos (arma a distancia), no cuerpo a cuerpo ni contra una habilidad', () => {
+  const val = st => ({evadisparo: -1})[st] || 0;
+  const d = ataque => ({defensor: {}, ataque});
+  igual([Combatiente.evaExtraDuelo(d({tipo: 'normal', rango: true}), val), Combatiente.evaExtraDuelo(d({tipo: 'normal'}), val).val, Combatiente.evaExtraDuelo(d({tipo: 'habilidad', rango: true}), val).val,
+    (ESTADOS_PRESET.find(p => p.nombre === 'Vuela').mods || []).find(m => m.stat === 'evadisparo').val],
+    [{val: -1, txt: '−1 contra disparos'}, 0, 0, -1]);
+});
+prueba('pasiva que da un estado (Vuela): lo pone, adopta el que ya estaba a mano, vuelve si se borra y se va con la pasiva', () => {
+  const pres = estadosPresetCreep(), pv = PASIVAS_BASE.find(p => p.poolId === 'vuela');
+  const pas = [pasivaParaCombatiente(pv, 'p1')];
+  const es = [], n1 = Combatiente.sincronizarEstadosDePasivas(es, pas, pres), n2 = Combatiente.sincronizarEstadosDePasivas(es, pas, pres);
+  const puesto = es.map(e => [e.nombre, e.origenPasiva, e.permanente, !!e.volador]);
+  es.length = 0; Combatiente.sincronizarEstadosDePasivas(es, pas, pres); const vuelve = es.length;
+  const sc = {estados: es}; Combatiente.sincronizarEstadosDePasivas(sc.estados, [], pres); const sinPasiva = sc.estados.length;
+  const amano = [{id: 'x', nombre: 'Vuela', activo: true, permanente: true}]; Combatiente.sincronizarEstadosDePasivas(amano, pas, pres);
+  const creep = CreepCalculo.normalizar({nombre: 'Abeja', con: 2, agl: 3, estados: [], pasivas: pas});
+  igual([n1, n2, puesto, vuelve, sinPasiva, amano.length, amano[0].origenPasiva, pv.estado, CreepCalculo.modTotal(creep, 'levitar'), Plantillas.limpiar('pasivas', pv).estado],
+    [true, false, [['Vuela', 'p1', true, true]], 1, 0, 1, 'p1', 'Vuela', 100, 'Vuela']);
+});
+prueba('invocación: sus pasivas suman y la que da un estado lo pone (InvCalculo.migrar)', () => {
+  const inv = InvCalculo.migrar({nombre: 'Abeja', con: 2, agl: 3, fue: 1, des: 1, esp: 1, estados: [], pasivas: [pasivaParaCombatiente({nombre: 'Pies ligeros', mods: [{stat: 'eva', val: 1}]}, 'a'), pasivaParaCombatiente(PASIVAS_BASE.find(p => p.poolId === 'vuela'), 'b')]});
+  igual([InvCalculo.modTotal(inv, 'eva'), InvCalculo.modTotal(inv, 'levitar'), inv.estados.map(e => e.nombre)], [1, 100, ['Vuela']]);
+});
 prueba('dos Pajaritos parten una sola vez y el cartel muestra uno', () => {
   const es = [E({nombre: 'Pajaritos', mitadPdgEva: true}), E({nombre: 'Pajaritos 2', mitadPdgEva: true})];
   igual([Combatiente.mitadesDeTirada(es, 'pdg'), Combatiente.estadosQueParten(es, 'pdg').length], [1, 1]);

@@ -47,6 +47,10 @@ const InvCalculo = (() => {
       const v = (es.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val) * stacks, 0);
       if(v) out.push({nombre: es.nombre || '(sin nombre)', val: v});
     });
+    (inv.pasivas||[]).forEach(p => {   // (2026-10-16)
+      const c = Math.max(1, Math.round(num(p && p.compras)) || 1), v = (p.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val) * c, 0);
+      if(v) out.push({nombre: (p.nombre || '(sin nombre)') + (c > 1 ? ' ×' + c : ''), val: v});
+    });
     return out;
   }
   function estadosArmadura(inv){
@@ -144,6 +148,8 @@ const InvCalculo = (() => {
     inv.equipo = Array.isArray(inv.equipo) ? inv.equipo : [];
     inv.estados = Array.isArray(inv.estados) ? inv.estados : [];
     inv.habilidades = Array.isArray(inv.habilidades) ? inv.habilidades : [];
+    inv.pasivas = Array.isArray(inv.pasivas) ? inv.pasivas : [];   // (2026-10-16) como las de un creep; la que da un estado lo mantiene puesto
+    if(typeof estadosPresetFicha === 'function') Combatiente.sincronizarEstadosDePasivas(inv.estados, inv.pasivas, estadosPresetFicha());
     inv.armaMods = Array.isArray(inv.armaMods) ? inv.armaMods : [];
     inv.armaEfectos = Array.isArray(inv.armaEfectos) ? inv.armaEfectos : [];
     if(inv.armaManos === undefined) inv.armaManos = 'arma_1m';

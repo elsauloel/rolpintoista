@@ -387,6 +387,7 @@ function sincronizarEstadosDeEquipo(){
 
 function refresh(){
   sincronizarEstadosDeEquipo();
+  Combatiente.sincronizarEstadosDePasivas(S.efectos = Array.isArray(S.efectos) ? S.efectos : [], S.pasivas, estadosPresetFicha(), uid);   // la pasiva que da un estado (2026-10-16)
   renderAttrs(); renderArmadura(); renderVitals(); renderJob(); renderInteligencia(); renderExp(); renderNitros();
   renderList('efectos');
   renderPolillaBoton();

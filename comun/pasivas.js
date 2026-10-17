@@ -8,6 +8,8 @@
    - mods: [{stat, val}] — bonos a stats (mismos ids que MOD_TARGETS de la
      ficha). Con varias compras se multiplican.
    - regenHp: HP que recupera en cada Mantenimiento, por compra.
+   - estado: el nombre de un preset (comun/estados-presets.js) que queda puesto, permanente, mientras se tenga la pasiva
+     (Combatiente.sincronizarEstadosDePasivas; 2026-10-16, Vuela).
    Lo que no se puede automatizar va en `detalle` como recordatorio.
 
    Campos: poolId (estable, no cambiar: marca de dónde salió la copia y sirve
@@ -20,6 +22,10 @@
    P70): Res.CC da +2. Los +1 de los stats restantes se cargaron el 2026-09-19 a pedido del dueño;
    los marcados ⚠ (No2, Rng, Crit) son los que más hay que revisar. */
 const PASIVAS_BASE = [
+  // 🕊 Vuela (2026-10-16, dueño: «Vuela debería ser una habilidad pasiva también… en la abeja»): da el estado Vuela, permanente.
+  // jobCosto 3 provisorio (pensada para criaturas; si un personaje la quiere, la mesa decide: docs/preguntas-abiertas.md).
+  {poolId: 'vuela', nombre: 'Vuela', jobCosto: 3, etiquetas: ['movimiento', 'criatura'], estado: 'Vuela', mods: [],
+   detalle: 'Vuela bajo: nunca toca el piso (no lo frena el terreno lento, no pisa trampas, no lo tocan las zonas del piso), pasa por encima de los tokens (al cruzar a un rival, antes le da su ataque de oportunidad), no le entran Sentado ni Rengo, y −1 a la Evasión contra disparos. ⚙ Automatizado: mientras la tenga, lleva puesto el estado Vuela.'},
   {poolId: 'robustez', nombre: 'Robustez', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
    detalle: '+5 Hp.Max.', mods: [{stat: 'hpmax', val: 5}]},
   {poolId: 'reserva-de-poder', nombre: 'Reserva de poder', jobCosto: 1, etiquetas: ['stat'],
@@ -94,3 +100,12 @@ function categoriaDePasiva(p){
   if(et.includes('defensiva') || et.includes('resistencia')) return 'defensiva';
   return 'utilidad';
 }
+
+// Una pasiva del catálogo (o de la biblioteca) lista para un creep o una invocación (2026-10-16: la usan GM Tools y la ficha): lo que suma,
+// la vida por turno, el estado que da y las compras (sin Job). `id`: el id nuevo.
+function pasivaParaCombatiente(datos, id){
+  const clave = datos.poolId || String(datos.nombre || '').toLowerCase();
+  return {id, poolId: clave, nombre: datos.nombre, detalle: datos.detalle || '', mods: (datos.mods || []).map(m => ({...m})),
+    regenHp: Number(datos.regenHp) || 0, ...(String(datos.estado || '').trim() ? {estado: String(datos.estado).trim()} : {}), compras: 1};
+}
+

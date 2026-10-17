@@ -513,6 +513,7 @@ const CreepCalculo = (() => {
     sc.estados = Array.isArray(sc.estados) ? sc.estados : [];
     sc.habilidades = Array.isArray(sc.habilidades) ? sc.habilidades : [];
     sc.pasivas = Array.isArray(sc.pasivas) ? sc.pasivas : [];   // (2026-10-15)
+    if(typeof estadosPresetCreep === 'function') Combatiente.sincronizarEstadosDePasivas(sc.estados, sc.pasivas, estadosPresetCreep());   // la pasiva que da un estado (2026-10-16)
     sc.armaMods = Array.isArray(sc.armaMods) ? sc.armaMods : [];
     sc.armaEfectos = Array.isArray(sc.armaEfectos) ? sc.armaEfectos : [];
     sc.cinturon = Array.isArray(sc.cinturon) ? sc.cinturon : [];   // consumibles a mano (2026-10-04)
@@ -580,7 +581,7 @@ const CreepCalculo = (() => {
     percepcion:'Percepción', vision:'Visión', luz:'Luz', sigilo:'Sigilo', spregen:'SP Regen', boticario:'Mano de boticario',
     resfuego:'Res. fuego', reshielo:'Res. hielo', resrayo:'Res. eléctrica', restoxico:'Res. tóxico', resacido:'Res. ácido', armadmg:'Defensa especial', hpregen:'Regeneración de vida',
     pisadaatenta:'Pisada atenta', recuperarse:'Recuperarse rápido (%)', capcinturon:'Ranuras de cinturón', inamovible:'Inamovible (%)', guardian:'Guardián', escolta:'Escolta (a mano)', levantarse:'Levantarse rápido', levitar:'Levitar', suelagruesa:'Suela gruesa', meditar:'Meditar',
-    pdgt4:'PdG con punzantes', pdgt6:'PdG con cortantes', pdgt8:'PdG con hachas', pdgt10:'PdG con contundentes', pdgdist:'PdG a distancia',
+    pdgt4:'PdG con punzantes', pdgt6:'PdG con cortantes', pdgt8:'PdG con hachas', pdgt10:'PdG con contundentes', pdgdist:'PdG a distancia', evadisparo:'Evasión contra disparos',
     oporahorro:'Oportunidad: No2 de menos', contraahorro:'Contraataque: No2 de menos', soltarse:'Soltarse', trampaoculta:'Trampas mejor escondidas',
     ahorroespsp:'Primer conjuro: SP de menos', venenista:'Envenenador: stacks de más',
   };

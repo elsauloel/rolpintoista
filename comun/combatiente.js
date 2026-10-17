@@ -288,6 +288,7 @@ const Combatiente = (() => {
     const tipo = d && d.ataque && d.ataque.tipo, st = statEvaEspecial(tipo);
     const fmtN = v => `${v > 0 ? '+' : '−'}${Math.abs(v)}`;
     if(st){ const v = n(valorDe(st)); if(v){ val += v; partes.push(`${fmtN(v)} ${EVA_ESPECIAL[tipo].nombre}`); } }
+    if(contraDisparo(d)){ const v = n(valorDe('evadisparo')); if(v){ val += v; partes.push(`${fmtN(v)} contra disparos`); } }   // (2026-10-16: lo que vuela, −1)
     const tokenId = d && d.defensor && d.defensor.tokenId;
     const movio = !!tokenId && typeof window !== 'undefined' && typeof window.mapaSeMovio === 'function' && window.mapaSeMovio(tokenId);
     if(movio){ const v = n(valorDe('pasosbaile')); if(v){ val += v; partes.push(`${fmtN(v)} Pasos de baile`); } }
@@ -1032,6 +1033,31 @@ const Combatiente = (() => {
     return v !== undefined && v !== null ? !!v : !!(preset && preset.permanente);
   }
 
+  /* ---------- Pasivas que dan un estado (2026-10-16, dueño: «Vuela debería ser una habilidad pasiva también… en la abeja») ----------
+     Una pasiva con `estado` (el nombre de un preset de comun/estados-presets.js) mantiene ese estado puesto, permanente, mientras la tenga —
+     como los ítems que dan un estado. Va en la lista de estados de siempre (así lo leen el mapa, el duelo y las inmunidades sin nada nuevo),
+     marcado con `origenPasiva` (el id de la pasiva): si se lo borran vuelve; si se saca la pasiva, se va. Uno con el mismo nombre que ya
+     estaba puesto a mano se adopta (no se duplica). `presets`: la lista en la forma de la herramienta (estadosPresetFicha / estadosPresetCreep);
+     `nuevoId()`: un id. → true si cambió algo. Igual para personajes, creeps e invocaciones. */
+  function sincronizarEstadosDePasivas(estados, pasivas, presets, nuevoId){
+    if(!Array.isArray(estados)) return false;
+    const conEstado = (pasivas || []).filter(p => p && String(p.estado || '').trim());
+    const ids = new Set(conEstado.map(p => p.id));
+    let cambio = false;
+    for(let i = estados.length - 1; i >= 0; i--) if(estados[i] && estados[i].origenPasiva && !ids.has(estados[i].origenPasiva)){ estados.splice(i, 1); cambio = true; }
+    const mismo = (a, b) => String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
+    conEstado.forEach(p => {
+      if(estados.some(e => e && e.origenPasiva === p.id)) return;
+      const suelto = estados.find(e => e && !e.origenPasiva && mismo(e.nombre, p.estado));
+      if(suelto){ suelto.origenPasiva = p.id; suelto.permanente = true; suelto.turnos = 0; cambio = true; return; }
+      const pre = (presets || []).find(x => x && (mismo(x.nombre, p.estado) || (x.alias || []).some(a => mismo(a, p.estado))));
+      if(!pre) return;
+      estados.push({stacks: 1, ...structuredClone(pre), id: nuevoId ? nuevoId() : 'ps' + Math.random().toString(36).slice(2, 9), activo: true, permanente: true, turnos: 0, origenPasiva: p.id});
+      cambio = true;
+    });
+    return cambio;
+  }
+
   /* ---------- Inmunidades ----------
      ¿Este debuff rebota en quien lo recibe? Devuelve el motivo ('Invulnerable', 'Inmunidad a CC', 'Sangre pura',
      'Coagulación extrema', 'Vuela' (Sentado y Rengo), 'Protección de jefe') o false. `o.jefe`: un creep jefe es inmune a Stun (P95). */
@@ -1598,7 +1624,7 @@ const Combatiente = (() => {
 
   return {contraDeEjecucion, esHonda, alcanceHonda, alcanceArmaRango, HONDA_RANGO, porDanoNorm, stacksPorDano, porDanoTxt, CARGAS, cargable, conCarga, tormenta, danoTormenta, danoTormentaMover, golpeDirecto, cobroTormenta, tormentaTxt, avisarTormenta, aplicarTormenta, acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
-    escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad,
+    escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad, sincronizarEstadosDePasivas,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
     formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, esFlash, FLASH_CSS, flashPara, cdFlash, costoFlash};
 })();

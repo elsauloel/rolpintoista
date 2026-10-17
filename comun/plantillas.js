@@ -68,6 +68,7 @@ const Plantillas = (() => {
     const out = {nombre: String(p.nombre || ''), detalle: String(p.detalle || ''), jobCosto: Math.max(1, Number(p.jobCosto) || 1),
       mods: (p.mods || []).filter(m => m && m.stat).map(m => ({stat: m.stat, val: Number(m.val) || 0}))};
     if(Number(p.regenHp)) out.regenHp = Number(p.regenHp);
+    if(String(p.estado || '').trim()) out.estado = String(p.estado).trim();   // la pasiva que da un estado (2026-10-16, Vuela)
     if(Array.isArray(p.etiquetas) && p.etiquetas.length) out.etiquetas = [...p.etiquetas];
     return out;
   }

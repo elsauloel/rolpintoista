@@ -4,7 +4,9 @@
    tipo 'trampa', con lo que hace la trampa en `datos` y en qué paso va (`datos.fase`). Lo resuelve la pantalla de quien maneja a la víctima
    (su dueño, el GM con 🎮 el control, el GM para un creep), en el cuadro con la estética del duelo (AvisoCombate.mostrar, con clave):
      1 «Para esquivarla» (si tiene salvación): «🎲 Tirar Evasión»; los dados ruedan y recién quietos se anuncia el resultado;
-     2 «Daño»: «🎲 Tirar el daño»; los dados de la trampa ruedan, se aplica y se anuncia (Defensa, escudo, Invulnerable);
+     2 «Daño»: «🎲 Tirar el daño»; los dados de la trampa ruedan y se anuncia cuánto pega; después «💔 Aplicar el daño» (2026-10-17, dueño:
+       «que el aplicar daño involucre por lo menos un clic por parte del jugador para que se entere») lo descuenta solo y dice cuánto entró
+       (Defensa, escudo, Invulnerable) y cómo quedó la vida;
      3 «Lo que le deja»: el estado se aplica solo (sin tirada) y dice cómo soltarse;
      4 el cartel grande del resultado y «Entendido».
    Cada paso queda escrito en el momento (`datos.pasos`, `datos.lineas`): el resto de la mesa lo sigue en la Crónica, renglón por renglón. Si
@@ -93,6 +95,12 @@ function trampaPasoQueFalta(dt){
   }
   if(dt.fase === 'dano' && dt.danoFijo) return {titulo: 'Le llega la descarga', texto: `${dt.danoFijo} de daño${dt.elemento ? ' ' + Combatiente.ELEMENTOS[dt.elemento].icono : ''}, directo a la vida (la mitad del salto anterior; lo frenan ${dt.elemento ? Combatiente.ELEMENTOS[dt.elemento].etq + (Combatiente.frenaArmaduraMagica(dt.elemento) ? ' y la Defensa especial' : '') : 'la Defensa especial'}).`,
     boton: '▶ Recibir la descarga', espera: `a ${dt.quien} le llega la descarga…`};
+  if(dt.fase === 'dano-aplicar'){
+    const freno = dt.ignoraDef ? 'directo a la vida' : 'menos su Defensa';
+    const el = dt.elemento ? ` (lo ${Combatiente.frenaArmaduraMagica(dt.elemento) ? `frenan ${Combatiente.ELEMENTOS[dt.elemento].etq} y la Defensa especial` : `frena ${Combatiente.ELEMENTOS[dt.elemento].etq}`})` : '';
+    return {titulo: 'Aplicar el daño', texto: `${fmt(num(dt.danoMonto))} de daño, ${freno}${el}. ⚙ Al tocar el botón se descuenta solo de la vida de ${dt.quien}.`,
+      boton: `💔 Aplicar el daño (${fmt(num(dt.danoMonto))})`, espera: `${dt.quien} aplica el daño…`};
+  }
   if(dt.fase === 'dano') return {titulo: 'Daño', texto: `La trampa pega ${dt.dano}${dt.elemento ? ' ' + Combatiente.ELEMENTOS[dt.elemento].icono : ''}${dt.evita === 'mitad' ? ' (la mitad)' : ''}${dt.ignoraDef ? ', directo a la vida' : ', menos la Defensa'}${dt.elemento ? ` (lo ${Combatiente.frenaArmaduraMagica(dt.elemento) ? `frenan ${Combatiente.ELEMENTOS[dt.elemento].etq} y la Defensa especial` : `frena ${Combatiente.ELEMENTOS[dt.elemento].etq}`})` : ''}.`,
     boton: `🎲 Tirar el daño (${dt.dano})`, espera: `${dt.quien} tira el daño…`};
   if(dt.fase === 'portal'){
@@ -361,7 +369,7 @@ async function trampaTirar(id){
   const d = trampasDatos.get(id);
   const fase = d && d.datos && d.datos.fase;
   if(fase === 'portal'){ trampaPasoPortal(id); return; }
-  if(!['salva', 'dano', 'empuje', 'sp', 'firme-empuje', 'firme-portal', ...TRAMPA_INFO].includes(fase)) return;
+  if(!['salva', 'dano', 'dano-aplicar', 'empuje', 'sp', 'firme-empuje', 'firme-portal', ...TRAMPA_INFO].includes(fase)) return;
   const dt = await trampaTomar(id, fase);
   if(!dt){ toast('Ese paso ya se está tirando en otra pantalla'); return; }
   trampaTirandoAca = id;
@@ -373,6 +381,7 @@ async function trampaTirar(id){
     else if(fase === 'sp') await trampaPasoSp(id, dt);
     else if(fase === 'estado') await trampaPasoEstado(id, dt);
     else if(TRAMPA_INFO.includes(fase)) await trampaPasoInfo(id, dt);
+    else if(fase === 'dano-aplicar') await trampaPasoDanoAplicar(id, dt);
     else await trampaPasoDano(id, dt);
   }catch(err){
     console.error('No se pudo resolver el paso de la trampa:', err);
@@ -444,9 +453,10 @@ async function trampaPasoSalva(id, dt){
   await trampaGuardar(id, sig);
 }
 
-// 2 · Daño: la víctima tira los dados de la trampa; se aplica y se anuncia (sin la vida que le queda: la de un creep es privada).
+// 2 · Daño: la víctima tira los dados de la trampa y se anuncia cuánto pega; después lo aplica con «💔 Aplicar el daño» (trampaPasoDanoAplicar,
+// 2026-10-17, dueño: un clic para que se entere de que se le descuenta, aunque sea automático). Un salto de la Descarga trae su daño ya fijo
+// (la mitad del anterior): no se tira, y «▶ Recibir la descarga» ya es ese clic (se aplica en el mismo paso).
 async function trampaPasoDano(id, dt){
-  // Un salto de la Descarga trae su daño ya fijo (la mitad del anterior): no se tira.
   const r = dt.danoFijo ? {formula: String(dt.danoFijo), total: num(dt.danoFijo), rolls: [], mod: 0} : tirarDados(dt.dano);
   if(!r) throw new Error('Fórmula de daño inválida: ' + dt.dano);
   if(!dt.danoFijo){
@@ -454,6 +464,13 @@ async function trampaPasoDano(id, dt){
     await trampaEsperarDados();
   }
   const monto = dt.evita === 'mitad' ? Math.floor(r.total / 2) : r.total;
+  if(dt.danoFijo || monto <= 0) return trampaPasoDanoAplicar(id, {...dt, danoTirado: r.total, danoMonto: monto, danoFormula: r.formula});
+  const texto = `${r.formula} = ${r.total}${dt.evita === 'mitad' ? ` → la mitad: ${monto}` : ''}`;
+  await trampaGuardar(id, {...dt, danoTirado: r.total, danoMonto: monto, danoFormula: r.formula, fase: 'dano-aplicar', pasos: [...(dt.pasos || []), {titulo: 'Daño', texto}]});
+}
+// Lo aplica (se anuncia sin la vida de un creep: es privada).
+async function trampaPasoDanoAplicar(id, dt){
+  const monto = num(dt.danoMonto);
   const x = tokens.get(dt.tokenId);
   let res = null, freno = '', restaFreno = 0;
   if(monto > 0 && x && x.fichaId){
@@ -470,17 +487,19 @@ async function trampaPasoDano(id, dt){
       else res = await (String(x.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(x, String(monto), dt.ignoraDef, arm, rr.res, oT);
     }catch(err){ console.error('No se pudo aplicar el daño de la trampa:', err); }
   }
-  let texto = dt.danoFijo ? `${r.total} de descarga` : `${r.formula} = ${r.total}${dt.evita === 'mitad' ? ` → la mitad: ${monto}` : ''}`;
+  let texto = dt.danoFijo ? `${num(dt.danoTirado)} de descarga` : monto <= 0 ? `${dt.danoFormula} = ${num(dt.danoTirado)}` : `${fmt(monto)}`;
   if(monto <= 0) texto += ' → sin daño';
   else if(res){
     const g = res.r;
     texto += g.invulnerable ? ' → Invulnerable: no le hizo nada'
       : (dt.ignoraDef ? `${freno ? ` − ${freno}` : ''} → ${fmt(g.recibido)} de daño directo a la vida` : ` − Defensa ${fmt(g.defensa - restaFreno)}${freno ? ` − ${freno}` : ''} → ${fmt(g.recibido)} de daño`) + (g.absorbido ? ` (el escudo absorbió ${fmt(g.absorbido)})` : '');
+    if(!g.invulnerable) texto += ` · ✔ ya se descontó de la vida${x && x.tipo !== 'creep' && Number.isFinite(Number(res.previo)) && Number.isFinite(Number(res.nuevo)) ? ` (${fmt(num(res.previo))} → ${fmt(num(res.nuevo))})` : ''}`;
   }else texto += ` → ${monto} de daño${dt.ignoraDef ? ' directo a la vida' : ' menos su Defensa'} — aplicalo a mano`;
   const entro = monto <= 0 ? 0 : res ? num(res.r.recibido) : monto;   // lo que llegó a la vida (sin poder aplicarlo, se da por hecho)
   const sinHerida = dt.requiereDano && entro <= 0;
   if(sinHerida) texto += ' → no lo lastimó: lo que deja no entra';
-  const sig = {...dt, danoTirado: r.total, danoEntro: entro, ...(sinHerida ? {evita: 'efecto'} : {}), pasos: [...(dt.pasos || []), {titulo: dt.danoFijo ? 'Le llega la descarga' : 'Daño', texto}]};
+  const titulo = dt.danoFijo ? 'Le llega la descarga' : monto <= 0 ? 'Daño' : 'Daño aplicado';
+  const sig = {...dt, danoEntro: entro, ...(sinHerida ? {evita: 'efecto'} : {}), pasos: [...(dt.pasos || []), {titulo, texto}]};
   sig.fase = trampaFaseSiguiente(sig, 'dano');
   await trampaGuardar(id, sig);
 }

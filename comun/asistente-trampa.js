@@ -108,7 +108,7 @@ const AsistenteTrampa = (() => {
       // Dificultad para detectarla (2026-10-02, dueño, P145): con Percepción aumentada se tira contra este número. En el mapa, un número
       // (trampa común: 8; un espacio de diseño: trampas de buena o mala calidad); en una habilidad, sale de quien la coloca (su Destreza
       // —trampas físicas— o su Efecto especial —mágicas—).
-      detectar: Math.max(1, Math.round(num(ini.detectar)) || 8), detectarStat: ini.detectarStat === 'dmgesp' ? 'dmgesp' : 'des',
+      detectar: Math.max(1, Math.round(num(ini.detectar)) || 8), detectarStat: ['dmgesp', 'fijo'].includes(ini.detectarStat) ? ini.detectarStat : 'des',   // 'fijo': un número (2026-10-17)
       guardar: false,
     };
     const ZSTATS = [['resmg', 'Res.Esp'], ['resm', 'Res.Mt'], ['eva', 'Evasión'], ['con', 'Constitución'], ['fue', 'Fuerza'], ['agl', 'Agilidad'], ['des', 'Destreza'], ['esp', 'Especial']];
@@ -127,7 +127,7 @@ const AsistenteTrampa = (() => {
       if(est.dejaZona) f.push(`Al dispararse queda ${est.zonaTurnos} turno${est.zonaTurnos === 1 ? '' : 's'} como zona con el mismo efecto${est.zonaSeResiste ? ` (se resiste con ${(ZSTATS.find(s => s[0] === est.zonaResistStat) || [])[1]} contra ${est.zonaResistValor})` : ''}`);
       if(est.teleport && !deHab) f.push('Teletransporta a quien la pisa a otro punto del mapa (el destino se elige en el mapa)');
       if(est.seEvita) f.push(`${est.salStat} contra ${est.salDif} ${est.salQue === 'mitad' ? 'le saca la mitad del daño' : est.salQue === 'efecto' ? 'evita el efecto' : 'la evita'} (la tira el mapa solo)`);
-      f.push(deHab ? `Para detectarla: Percepción contra ${est.detectarStat === 'dmgesp' ? 'el Efecto especial' : 'la Destreza'} de quien la coloca` : `Para detectarla: Percepción contra ${est.detectar}`);
+      f.push(deHab && est.detectarStat !== 'fijo' ? `Para detectarla: Percepción contra ${est.detectarStat === 'dmgesp' ? 'el Efecto especial' : 'la Destreza'} de quien la coloca` : `Para detectarla: Percepción contra ${est.detectar}`);
       if(!f.length) f.push('No hace daño ni deja estados: solo avisa en la Mesa cuando se activa');
       return f;
     }
@@ -260,7 +260,9 @@ const AsistenteTrampa = (() => {
           ? `<div class="at-preg">¿Qué tan escondida queda?</div>
           <p class="at-ayuda">Quien tiene <b>Percepción aumentada</b> y pasa al lado tira Percepción contra este número; si gana, la ve (y la ve todo su equipo). En una habilidad, la dificultad sale de quien la coloca, al colocarla.</p>
           <label class="at-sin"><input type="radio" name="at-detectarStat" value="des"${est.detectarStat !== 'dmgesp' ? ' checked' : ''}> Su <b>Destreza</b> (trampas físicas: cepos, púas, cables)</label>
-          <label class="at-sin"><input type="radio" name="at-detectarStat" value="dmgesp"${est.detectarStat === 'dmgesp' ? ' checked' : ''}> Su <b>Efecto especial</b> (trampas mágicas: runas, glifos, nubes)</label>`
+          <label class="at-sin"><input type="radio" name="at-detectarStat" value="dmgesp"${est.detectarStat === 'dmgesp' ? ' checked' : ''}> Su <b>Efecto especial</b> (trampas mágicas: runas, glifos, nubes)</label>
+          <label class="at-sin"><input type="radio" name="at-detectarStat" value="fijo"${est.detectarStat === 'fijo' ? ' checked' : ''}> Un <b>número fijo</b> (una trampa común: 8; burda: menos)</label>
+          ${est.detectarStat === 'fijo' ? `<input type="number" id="at-detectar" min="1" max="99" value="${esc(est.detectar)}">` : ''}`
           : `<div class="at-preg">¿Qué tan difícil es detectarla?</div>
           <p class="at-ayuda">Quien tiene <b>Percepción aumentada</b> y pasa al lado tira Percepción contra este número; si gana, la ve (y la ve todo su equipo). Una trampa común: <b>8</b>. Más alto = mejor escondida (de buena calidad); más bajo = burda.</p>
           <input type="number" id="at-detectar" min="1" max="99" value="${esc(est.detectar)}">`;
@@ -295,7 +297,7 @@ const AsistenteTrampa = (() => {
       turnos: est.dura ? est.turnos : 0, guardar: !!est.guardar,
       dejaZona: !!est.dejaZona, zonaTurnos: est.zonaTurnos, zonaEnMant: est.zonaEnMant, zonaCadaPaso: est.zonaCadaPaso, altura: est.altura,
       zonaResistStat: est.zonaSeResiste ? est.zonaResistStat : '', zonaResistValor: est.zonaResistValor,
-      ...(deHab ? {detectarStat: est.detectarStat} : {detectar: est.detectar}),
+      ...(deHab ? {detectarStat: est.detectarStat, ...(est.detectarStat === 'fijo' ? {detectar: est.detectar} : {})} : {detectar: est.detectar}),
     });
 
     // Terminar (el «✓» del último paso): todo completo → el resultado (la ventana se cierra sola); si falta algo, avisa y sigue abierta.
@@ -351,7 +353,7 @@ const AsistenteTrampa = (() => {
       else if(t.id === 'at-zonaSeResiste'){ est.zonaSeResiste = t.checked; dibujar(); }
       else if(t.id === 'at-zonaResistStat') est.zonaResistStat = t.value;
       else if(t.id === 'at-altura') est.altura = t.value;
-      else if(t.name === 'at-detectarStat') est.detectarStat = t.value === 'dmgesp' ? 'dmgesp' : 'des';
+      else if(t.name === 'at-detectarStat'){ est.detectarStat = ['dmgesp', 'fijo'].includes(t.value) ? t.value : 'des'; dibujar(); }
     };
     const inicial = JSON.stringify(est);
     api = PasoAPaso.abrir({
@@ -395,7 +397,7 @@ const AsistenteTrampa = (() => {
       color: r.color, alfa: Number.isFinite(r.alfa) ? r.alfa : 45, ...(r.teleport ? {teleport: true} : {}),
       ...(r.dejaZona ? {dejaZona: true, zonaTurnos: Math.max(1, num(r.zonaTurnos) || 3), zonaEnMantenimiento: r.zonaEnMant !== false, zonaCadaPaso: !!r.zonaCadaPaso,
         zonaResistStat: r.zonaResistStat || '', zonaResistValor: num(r.zonaResistValor) || 12} : {}),
-      turnos: Math.max(0, num(r.turnos)), cant: Math.max(1, Math.min(6, num(r.cant) || 1)), detectarStat: r.detectarStat === 'dmgesp' ? 'dmgesp' : 'des'};
+      turnos: Math.max(0, num(r.turnos)), cant: Math.max(1, Math.min(6, num(r.cant) || 1)), detectarStat: ['dmgesp', 'fijo'].includes(r.detectarStat) ? r.detectarStat : 'des', ...(r.detectarStat === 'fijo' ? {detectar: Math.max(1, Math.round(num(r.detectar)) || 8)} : {})};
   }
   // Una trampa (cualquier forma, también las viejas de las habilidades) como valores de partida del asistente.
   function inicialDe(t0){

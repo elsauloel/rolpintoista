@@ -276,6 +276,12 @@ prueba('invocación: sus pasivas suman y la que da un estado lo pone (InvCalculo
   const inv = InvCalculo.migrar({nombre: 'Abeja', con: 2, agl: 3, fue: 1, des: 1, esp: 1, estados: [], pasivas: [pasivaParaCombatiente({nombre: 'Pies ligeros', mods: [{stat: 'eva', val: 1}]}, 'a'), pasivaParaCombatiente(PASIVAS_BASE.find(p => p.poolId === 'vuela'), 'b')]});
   igual([InvCalculo.modTotal(inv, 'eva'), InvCalculo.modTotal(inv, 'levitar'), inv.estados.map(e => e.nombre)], [1, 100, ['Vuela']]);
 });
+prueba('trampa de habilidad: dificultad para detectarla de la Destreza, del Efecto especial o un número fijo', () => {
+  const val = st => ({des: 11, dmgesp: 9, trampaoculta: 1})[st] || 0;
+  const h = tc => ({nombre: 'Cartucho enterrado', trampaColocar: {dano: '3d6+3', ...tc}});
+  igual([Combatiente.trampaDeHab(h({detectarStat: 'des'}), val).detectar, Combatiente.trampaDeHab(h({detectarStat: 'dmgesp'}), val).detectar, Combatiente.trampaDeHab(h({detectarStat: 'fijo', detectar: 6}), val).detectar],
+    [12, 10, 7]);
+});
 prueba('dos Pajaritos parten una sola vez y el cartel muestra uno', () => {
   const es = [E({nombre: 'Pajaritos', mitadPdgEva: true}), E({nombre: 'Pajaritos 2', mitadPdgEva: true})];
   igual([Combatiente.mitadesDeTirada(es, 'pdg'), Combatiente.estadosQueParten(es, 'pdg').length], [1, 1]);

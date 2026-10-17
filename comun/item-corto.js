@@ -91,7 +91,7 @@ const ItemCorto = (() => {
     if(num(t.lento) > 0) f.push(['Terreno', `una vez disparada, cada paso que sale de ella cuesta ${num(t.lento)} No2`]);
     const so = t.soltar && t.soltar.stat ? t.soltar : null;   // salir antes de que venza (el botón 🔓 Soltarse)
     if(so) f.push(['Para salir', `🔓 Soltarse: ${so.etq || so.stat} contra ${num(so.dif)} · ${num(so.no2)} No2${num(so.hunde) ? ` · si falla, se hunde más: +${num(so.hunde)} turno${num(so.hunde) === 1 ? '' : 's'}` : ''}`]);
-    f.push(['Detectarla', t.detectarStat ? `Percepción contra ${t.detectarStat === 'dmgesp' ? 'el Efecto especial' : 'la Destreza'} de quien la pone` : num(t.detectar) >= 1 ? `Percepción contra ${num(t.detectar)}` : 'sin definir']);
+    f.push(['Detectarla', t.detectarStat && t.detectarStat !== 'fijo' ? `Percepción contra ${t.detectarStat === 'dmgesp' ? 'el Efecto especial' : 'la Destreza'} de quien la pone` : num(t.detectar) >= 1 ? `Percepción contra ${num(t.detectar)}` : 'sin definir']);
     if(t.dejaZona) f.push(['Después', `queda como zona ${num(t.zonaTurnos) || 3} turnos`]);
     if(t.amiga) f.push(['Alcanza', 'también a los aliados del área']);
     return f;

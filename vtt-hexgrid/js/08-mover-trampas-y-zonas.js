@@ -601,6 +601,14 @@ function trampaCentro(el){
 }
 // Dónde va la flor del efecto: alrededor de la casilla pisada o, con `centro: 'trampa'`, del centro de la trampa.
 const trampaCentroEfecto = (el, ef, celdaPisada, t) => ef && ef.centro === 'trampa' ? trampaCentro(el) : (celdaPisada || {col: t.col, fila: t.fila});
+// Las casillas que alcanza el efecto (la flor alrededor de la pisada, las de la trampa o la pisada sola): las de la explosión (💥, js/19).
+function trampaCeldasEfecto(el, celdaPisada, t){
+  const ef = trampaEfectoDe(el), celdas = celdasDeElemento(el);
+  const pisada = celdaPisada || {col: t.col, fila: t.fila};
+  if(ef && ef.area === 'flor'){ const c0 = trampaCentroEfecto(el, ef, celdaPisada, t), k = hexACubo(c0); return celdasFlor(Math.max(0, num(ef.radio))).map(d => ({col: cuboACol(k.q + d.dq, k.r + d.dr), fila: cuboAFila(k.q + d.dq, k.r + d.dr)})); }
+  if(ef && ef.area === 'pisador') return [pisada];
+  return celdas.length ? celdas : [pisada];
+}
 // `esquive` (Reflejos de mangosta, js/23): {pos, id} — quien la pisó se tiró a `pos` antes de que se disparara: solo lo alcanza si sigue adentro.
 function trampaAfectados(t, el, celdaPisada, esquive){
   const ef = trampaEfectoDe(el), celdas = celdasDeElemento(el);
@@ -639,7 +647,10 @@ async function trampaAplicarEfectos(t, el, celdaPisada, esquive, idT){
   }
   let spec = null; try{ spec = el.trampaEstado ? JSON.parse(el.trampaEstado) : null; }catch(e){}
   const muro = trampaMuroDe(el);
+  // 💥 Explota (2026-10-17, dueño): las casillas de la explosión (el área del efecto o las de la trampa) y una clave por disparo (js/19).
+  const explota = spec && spec.explota ? {clave: `${idT || zonaIdDe(t)}-${Date.now()}`, celdas: trampaCeldasEfecto(el, celdaPisada, t).flatMap(c => [c.col, c.fila]).slice(0, 240)} : null;
   const comun = {
+    ...(explota ? {explota} : {}),
     nombreT: el.trampaNombre || 'una trampa', salva, dano: trampaDanoValido(el.trampaDano) ? el.trampaDano.trim() : '', ignoraDef: !!el.trampaIgnoraDef,
     specJson: spec && spec.nombre ? el.trampaEstado : '', elemento: (spec && spec.elemento) || '', altura: alturaDe(el), pierdeSp: (spec && spec.pierdeSp) || '', cadena: (spec && spec.cadena) || null, portal: (spec && spec.portal) || null, requiereDano: !!(spec && spec.requiereDano), duenoTrampa: el.duenoUid || '',
     aMano: (String(el.trampaDetalle || '').match(/[^.]*\(a mano\)\./g) || []).map(x => x.trim()).join(' '),   // lo que el texto dice que va a mano

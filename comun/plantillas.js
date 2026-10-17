@@ -93,6 +93,7 @@ const Plantillas = (() => {
     'pierdeSp', 'danoZona', 'cadena', 'portal', 'requiereDano', 'renuevaPaso', 'altura',   // altura (2026-10-07): dónde está su efecto — 'piso' | 'aire' | 'ambos' (Levitar, Suelas)   // renuevaPaso (2026-10-04, Brea): cada paso sobre la zona renueva el estado   // requiereDano (2026-10-04, Dardos): lo que deja solo entra si el daño pasó la Defensa   // portal (2026-10-04): {rango} — su dueño elige adónde manda a quien la pisa   // cadena (2026-10-04, Descarga eléctrica): {rango} — salta al enemigo más cercano con la mitad del daño   // 2026-10-04: lo que hace perder de SP (Succión arcana) y el daño por Mantenimiento de la zona que deja (Mina napalm)
     'pilar',   // pilar (2026-10-05, Varita de los pilares): no es una trampa, cada casilla es un Sólido de 1 casilla que dura `turnos`
     'lento',   // terreno lento (2026-10-04, arena movediza): una vez disparada, cada paso que sale de ella cuesta ese No2
+    'explota',   // 💥 (2026-10-17, dueño): al pisarla, el mapa se queda quieto 1,5 s con una explosión y recién después el Anuncio
     'elemento'];   // de qué elemento es el daño (2026-10-04): 'fuego' | 'hielo' | 'rayo' | 'toxico' | 'acido' — se resta esa resistencia
   function trampaDesde(t){
     if(!t || typeof t !== 'object') return null;

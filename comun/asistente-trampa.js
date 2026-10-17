@@ -99,6 +99,7 @@ const AsistenteTrampa = (() => {
       elemento: ini.elemento || '', lento: ini.lento || 0, pierdeSp: ini.pierdeSp || '', danoZona: ini.danoZona || '', cadena: ini.cadena || null, portal: ini.portal || null, requiereDano: !!ini.requiereDano, renuevaPaso: !!ini.renuevaPaso,   // el elemento del daño y el terreno lento (2026-10-04) se conservan   // qué evita: 'todo' | 'efecto' (el estado) | 'mitad' (la mitad del daño)
       dura: num(ini.turnos) > 0, turnos: num(ini.turnos) || 3,
       teleport: !!ini.teleport,
+      explota: !!ini.explota,   // 💥 (2026-10-17)
       // Trampa persistente (2026-09-28, pedido del dueño): al dispararse, además de su efecto de siempre, queda
       // como una zona con el mismo daño/estado — ver comun/CLAUDE.md "Trampas persistentes". Desde P123 (2026-09-29)
       // también para las que coloca una habilidad.
@@ -123,6 +124,7 @@ const AsistenteTrampa = (() => {
     function frases(){
       const f = [];
       if(danoTxt()) f.push(`Hace ${danoTxt()} de daño ${est.contemplaArmadura ? '(contempla la armadura: se le resta la Defensa)' : '(directo a la vida: ignora la armadura)'}`);
+      if(est.explota) f.push('💥 Explota: al pisarla, una explosión en el mapa antes del anuncio');
       if(est.aplicaEstado && preset()){ const d = durEstado(); f.push(`Deja el estado ${preset().nombre}${preset().permanente ? ' (no vence solo)' : ` durante ${d} turno${d === 1 ? '' : 's'}`}`); }
       if(est.dejaZona) f.push(`Al dispararse queda ${est.zonaTurnos} turno${est.zonaTurnos === 1 ? '' : 's'} como zona con el mismo efecto${est.zonaSeResiste ? ` (se resiste con ${(ZSTATS.find(s => s[0] === est.zonaResistStat) || [])[1]} contra ${est.zonaResistValor})` : ''}`);
       if(est.teleport && !deHab) f.push('Teletransporta a quien la pisa a otro punto del mapa (el destino se elige en el mapa)');
@@ -203,7 +205,8 @@ const AsistenteTrampa = (() => {
             <div class="at-fila"><input type="number" id="at-dados" min="1" max="20" value="${esc(est.dados)}" style="width:70px"><label>d</label>
               <select id="at-caras" style="width:90px">${[4, 6, 8, 10, 12, 20].map(c => `<option value="${c}"${est.caras === c ? ' selected' : ''}>${c}</option>`).join('')}</select>
               <label>+</label><input type="number" id="at-fijo" value="${esc(est.fijo)}" style="width:80px"><label>= <b id="at-dvista" style="color:#E0A458">${esc(danoTxt())}</b></label></div>
-            <label class="at-sin"><input type="checkbox" id="at-armadura"${est.contemplaArmadura ? ' checked' : ''}> <span><b>Contempla la armadura</b><br><small style="color:#B7A79E">Tildado: al daño se le resta la Defensa de quien lo recibe (como un golpe). Destildado: va directo a la vida y la armadura no sirve (fuego, hielo, electricidad, explosiones…).</small></span></label>` : ''}`;
+            <label class="at-sin"><input type="checkbox" id="at-armadura"${est.contemplaArmadura ? ' checked' : ''}> <span><b>Contempla la armadura</b><br><small style="color:#B7A79E">Tildado: al daño se le resta la Defensa de quien lo recibe (como un golpe). Destildado: va directo a la vida y la armadura no sirve (fuego, hielo, electricidad, explosiones…).</small></span></label>` : ''}
+          <label class="at-sin"><input type="checkbox" id="at-explota"${est.explota ? ' checked' : ''}> <span><b>💥 Explota</b><br><small style="color:#B7A79E">Al pisarla, el mapa se queda quieto un segundo y medio con una explosión sobre el área, y recién después aparece el anuncio.</small></span></label>`;
       }
       if(id === 'estado'){
         return `<div class="at-preg">¿Aplica algún estado?</div>
@@ -291,7 +294,7 @@ const AsistenteTrampa = (() => {
       estadoStacks: est.aplicaEstado && est.estado === est.estadoDeStacks && est.estadoStacks ? est.estadoStacks : 0,
       teleport: !deHab && !!est.teleport,
       salvacion: est.seEvita ? {stat: est.salStat, dif: est.salDif, que: est.salQue, ...(est.salLogra ? {logra: est.salLogra} : {})} : null,
-      ...(est.elemento ? {elemento: est.elemento} : {}), ...(est.lento ? {lento: est.lento} : {}), ...(est.pierdeSp ? {pierdeSp: est.pierdeSp} : {}), ...(est.danoZona ? {danoZona: est.danoZona} : {}), ...(est.cadena ? {cadena: est.cadena} : {}), ...(est.portal ? {portal: est.portal} : {}), ...(est.requiereDano ? {requiereDano: true} : {}), ...(est.renuevaPaso ? {renuevaPaso: true} : {}),
+      ...(est.explota ? {explota: true} : {}), ...(est.elemento ? {elemento: est.elemento} : {}), ...(est.lento ? {lento: est.lento} : {}), ...(est.pierdeSp ? {pierdeSp: est.pierdeSp} : {}), ...(est.danoZona ? {danoZona: est.danoZona} : {}), ...(est.cadena ? {cadena: est.cadena} : {}), ...(est.portal ? {portal: est.portal} : {}), ...(est.requiereDano ? {requiereDano: true} : {}), ...(est.renuevaPaso ? {renuevaPaso: true} : {}),
       turnos: est.dura ? est.turnos : 0, guardar: !!est.guardar,
       dejaZona: !!est.dejaZona, zonaTurnos: est.zonaTurnos, zonaEnMant: est.zonaEnMant, zonaCadaPaso: est.zonaCadaPaso, altura: est.altura,
       zonaResistStat: est.zonaSeResiste ? est.zonaResistStat : '', zonaResistValor: est.zonaResistValor,
@@ -340,6 +343,7 @@ const AsistenteTrampa = (() => {
     const alCambio = e => {
       const t = e.target;
       if(t.id === 'at-haceDano'){ est.haceDano = t.checked; est.error = ''; dibujar(); }
+      else if(t.id === 'at-explota') est.explota = t.checked;
       else if(t.id === 'at-caras'){ est.caras = num(t.value); const v = vista(); if(v) v.textContent = danoTxt(); }
       else if(t.id === 'at-armadura') est.contemplaArmadura = t.checked;
       else if(t.id === 'at-teleport'){ est.teleport = t.checked; }

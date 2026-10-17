@@ -563,7 +563,7 @@ function trampaEstadoSpec(){
       if(elemTrampaEstadoHp) estado.hp = elemTrampaEstadoHp;
     }
   }
-  return TokensAuto.estadoJson(estado, elemTrampaSalva, null, null, '', 0, {altura: elemTrampaAltura});
+  return TokensAuto.estadoJson(estado, elemTrampaSalva, null, null, '', 0, {altura: elemTrampaAltura, explota: elemTrampaExplota});
 }
 /* ---------- Menú paso a paso de trampas (comun/asistente-trampa.js, 2026-09-25) ----------
    Se abre al tildar "Trampa" en Terreno y Formas, desde el botón "Armar paso a paso" del panel, desde el catálogo ("crear custom") y
@@ -694,9 +694,10 @@ function abrirAsistenteTrampaPanel(){
     contexto: 'mapa', editando: false, colores: COLORES, estados: trampaEstadosParaAsistente(),
     inicial: {nombre: elemTrampaNombre, descripcion: elemTrampaDetalle, forma: elemTipo, color: elemColor, alfa: elemAlfa, amiga: elemTrampaAmiga,
       dano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim() : '', contemplaArmadura: !elemTrampaIgnoraDef, estado: elemTrampaEstado, estadoTurnos: elemTrampaEstadoTurnos, turnos: elemTurnos, teleport: elemTrampaTeleport,
-      dejaZona: elemTrampaDejaZona, zonaTurnos: elemTrampaZonaTurnos, zonaEnMant: elemTrampaZonaEnMant, zonaCadaPaso: elemTrampaZonaCadaPaso, zonaResistStat: elemTrampaZonaResistStat, zonaResistValor: elemTrampaZonaResistValor, detectar: elemTrampaDetectar, altura: elemTrampaAltura},
+      dejaZona: elemTrampaDejaZona, zonaTurnos: elemTrampaZonaTurnos, zonaEnMant: elemTrampaZonaEnMant, zonaCadaPaso: elemTrampaZonaCadaPaso, zonaResistStat: elemTrampaZonaResistStat, zonaResistValor: elemTrampaZonaResistValor, detectar: elemTrampaDetectar, altura: elemTrampaAltura, explota: elemTrampaExplota},
     alTerminar: res => {
       elemTrampaAltura = ['piso', 'aire', 'ambos'].includes(res.altura) ? res.altura : 'piso';
+      elemTrampaExplota = !!res.explota;
       elemTrampa = true; elemTrampaNombre = res.nombre.trim().slice(0, 40); elemTrampaDetalle = AsistenteTrampa.detalleFinal(res); elemTrampaAmiga = !!res.amiga;
       elemTrampaDano = res.dano || ''; elemTrampaIgnoraDef = !res.contemplaArmadura; elemTrampaEstado = res.estado || ''; elemTrampaEstadoTurnos = num(res.estadoTurnos);
       elemTrampaEstadoStacks = num(res.estadoStacks) || 0; elemTrampaEstadoHp = 0; elemTrampaSalva = res.salvacion || null;
@@ -733,12 +734,12 @@ function abrirAsistenteTrampaEditar(id, alCancelar){
       dano: trampaDanoValido(el.trampaDano) ? String(el.trampaDano).trim() : '', contemplaArmadura: !el.trampaIgnoraDef,
       estado: est && est.nombre || '', estadoTurnos: est ? num(est.turnos) : 0, turnos: restan, teleport: !!el.trampaDestino,
       dejaZona: !!el.trampaDejaZona, zonaTurnos: el.zonaTurnos, zonaEnMant: el.zonaEnMantenimiento, zonaCadaPaso: el.zonaCadaPaso, zonaResistStat: el.zonaResistStat, zonaResistValor: el.zonaResistValor, detectar: el.trampaDetectar || 8,
-      estadoStacks: est ? num(est.stacks) : 0, salvacion: est && est.salva ? est.salva : null, altura: (est && est.altura) || 'piso'},
+      estadoStacks: est ? num(est.stacks) : 0, salvacion: est && est.salva ? est.salva : null, altura: (est && est.altura) || 'piso', explota: !!(est && est.explota)},
     alTerminar: res => {
       const cambios = {trampa: true, trampaNombre: res.nombre.trim().slice(0, 40), trampaDetalle: AsistenteTrampa.detalleFinal(res), fuegoAmigo: !!res.amiga,
         trampaDano: res.dano || '', trampaIgnoraDef: !res.contemplaArmadura,
         trampaEstado: TokensAuto.estadoJson(res.estado ? {nombre: res.estado, turnos: res.estadoTurnos > 0 ? res.estadoTurnos : trampaEstadoTurnosPreset(res.estado), ...(num(res.estadoStacks) > 0 ? {stacks: num(res.estadoStacks)} : {}),
-          ...(est && est.nombre === res.estado && est.hp ? {hp: est.hp} : {})} : null, res.salvacion, null, null, '', 0, {altura: res.altura}),
+          ...(est && est.nombre === res.estado && est.hp ? {hp: est.hp} : {})} : null, res.salvacion, null, null, '', 0, {altura: res.altura, explota: !!res.explota}),
         trampaDestino: res.teleport ? String(el.trampaDestino || '') : '', color: res.color, alfa: res.alfa,
         trampaDejaZona: !!res.dejaZona, zonaTurnos: Math.max(1, num(res.zonaTurnos) || 3), zonaEnMantenimiento: res.zonaEnMant !== false, zonaCadaPaso: !!res.zonaCadaPaso,
         zonaResistStat: res.zonaResistStat || '', zonaResistValor: num(res.zonaResistValor) || 12, trampaDetectar: Math.max(1, Math.round(num(res.detectar)) || 8)};

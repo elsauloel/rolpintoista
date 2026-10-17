@@ -23,6 +23,11 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **💔 Un clic antes de recibir daño automatizado, en todo (2026-10-17, dueño):** «en jugadores debería suceder cada vez que un jugador
+>   recibe daño que esté automatizado… si en un ataque pasa el daño, el duelo debe tener la instancia de pasó tanto daño, menos tu armadura,
+>   apretá aplicar daño… tiene que haber una instancia donde el jugador hace un clic antes de recibir daño automatizado». Hecho en las trampas
+>   (💔 Aplicar el daño, 2026-10-17). Falta: el duelo (el defensor que es personaje o invocación), las zonas, las áreas y lo demás que baje vida
+>   solo. Para el GM (creeps) no hace tanta falta.
 > - [ ] **🪤 Aprender trampas: ver una, copiarla y saber armarla (2026-10-17, dueño; también en 🛠 Herramientas de diseño → A desarrollar):**
 >   un **talento** para «imitar trampas»: ver una trampa (la detectada o la que lo agarró), copiarla y aprender a construirla, que quede en su
 >   lista para armarla después. **Desarmar trampas ya existe** (talento, 2026-10-08: detecta como la Pisada atenta y el mapa ofrece desarmarla

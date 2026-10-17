@@ -143,6 +143,7 @@ async function trampaMomentoNuevo(p){
     celdas: Array.isArray(p.celdas) ? p.celdas.slice(0, 120) : [],
     portal: p.portal ? {rango: num(p.portal.rango) || 8, ...(p.portal.destino ? {destino: String(p.portal.destino)} : {})} : null, duenoTrampa: p.duenoTrampa || '', requiereDano: !!p.requiereDano, spec: p.specJson || '', muro: num(p.muro), muroLargo: num(p.muroLargo), zona: num(p.zona), aMano: p.aMano || '',
     fase: '', tirando: false, evita: '', pasos: [],
+    ...(p.explota ? {explota: p.explota} : {}),   // 💥 (2026-10-17)
   };
   // Los pies de la víctima (2026-10-04, js/21): Inamovible (para el portal). Reflejos de mangosta ya se jugó antes del disparo (js/23).
   const vic = tokens.get(p.tokenId);
@@ -241,9 +242,76 @@ function dibujarEfectosRayo(){
   return activo;
 }
 
+/* 💥 Una trampa que explota (2026-10-17, dueño: «al pisar la trampa se congele el mapa, durante un segundo y medio haya una animación de
+   explosión y ahí aparezca el anuncio»): la primera vez que una pantalla ve el disparo (una clave por disparo, aunque agarre a varios), dibuja la
+   explosión sobre sus casillas y deja el mapa quieto EXPLOSION_MS (un velo transparente que no deja tocar nada); el Anuncio de quien la resuelve
+   espera a que termine (trampaRetenidas, como el rayo de la Descarga). */
+const EXPLOSION_MS = 1500, efectosExplosion = [], explosionesVistas = new Map();   // clave → cuándo empezó
+function explosionEmpezar(ex){
+  if(!ex || !ex.clave) return 0;
+  if(!explosionesVistas.has(ex.clave)){
+    explosionesVistas.set(ex.clave, Date.now());
+    const cs = [];
+    for(let i = 0; i + 1 < (ex.celdas || []).length; i += 2) cs.push(hexCentro(num(ex.celdas[i]), num(ex.celdas[i + 1])));
+    if(cs.length){
+      const cx = cs.reduce((a, p) => a + p.x, 0) / cs.length, cy = cs.reduce((a, p) => a + p.y, 0) / cs.length;
+      const r = Math.max(HEX, ...cs.map(p => Math.hypot(p.x - cx, p.y - cy) + HEX));
+      efectosExplosion.push({cs, cx, cy, r, desde: Date.now(), chispas: Array.from({length: 26}, () => ({ang: Math.random() * 2 * Math.PI, vel: 0.5 + Math.random() * 0.8}))});
+      pedirDibujo();
+    }
+    explosionCongelar(EXPLOSION_MS);
+  }
+  return Math.max(0, explosionesVistas.get(ex.clave) + EXPLOSION_MS - Date.now());
+}
+function explosionCongelar(ms){
+  let v = document.getElementById('explosion-congela');
+  if(!v){ v = document.createElement('div'); v.id = 'explosion-congela'; v.style.cssText = 'position:fixed;inset:0;z-index:99990;cursor:wait;background:transparent'; document.body.appendChild(v); }
+  clearTimeout(v._t);
+  v.hidden = false;
+  if(typeof soltar === 'function') try{ soltar(); }catch(e){}   // si estaba arrastrando un token, lo suelta
+  v._t = setTimeout(() => { v.hidden = true; }, ms);
+}
+function dibujarEfectosExplosion(){
+  const ahora = Date.now();
+  let activo = false;
+  for(let i = efectosExplosion.length - 1; i >= 0; i--){
+    const fx = efectosExplosion[i], edad = ahora - fx.desde;
+    if(edad > EXPLOSION_MS){ efectosExplosion.splice(i, 1); continue; }
+    const t = edad / EXPLOSION_MS, apagar = t < 0.6 ? 1 : Math.max(0, 1 - (t - 0.6) / 0.4);
+    ctx.save();
+    // Las casillas: un fogonazo blanco-amarillo que pasa a naranja y se apaga.
+    const col = t < 0.15 ? `rgba(255,248,210,${0.85 * apagar})` : t < 0.45 ? `rgba(255,170,40,${0.7 * apagar})` : `rgba(200,60,20,${0.55 * apagar})`;
+    fx.cs.forEach(p => { ctx.beginPath(); trazarHex(p.x, p.y); ctx.fillStyle = col; ctx.fill(); });
+    // La onda: dos anillos que se agrandan desde el centro.
+    [[0, 9], [0.18, 5]].forEach(([retraso, ancho]) => {
+      const u = Math.max(0, Math.min(1, (t - retraso) / 0.55));
+      if(u <= 0 || u >= 1) return;
+      ctx.beginPath(); ctx.arc(fx.cx, fx.cy, fx.r * (0.2 + 1.1 * u), 0, 2 * Math.PI);
+      ctx.strokeStyle = `rgba(255,${Math.round(220 - 120 * u)},60,${(1 - u) * apagar})`; ctx.lineWidth = ancho / vista.zoom; ctx.stroke();
+    });
+    // Las chispas: salen disparadas y se apagan.
+    fx.chispas.forEach(c => {
+      const d = fx.r * c.vel * Math.min(1, t * 1.6), x = fx.cx + Math.cos(c.ang) * d, y = fx.cy + Math.sin(c.ang) * d;
+      ctx.beginPath(); ctx.arc(x, y, (3 + 3 * (1 - t)) / vista.zoom, 0, 2 * Math.PI); ctx.fillStyle = `rgba(255,${Math.round(200 - 100 * t)},70,${apagar})`; ctx.fill();
+    });
+    ctx.restore();
+    activo = true;
+  }
+  return activo;
+}
+
 // Lo llama momentoRecibido (js/16) con cada cambio de un momento de trampa.
 function trampaMomento(id, d){
   const dt = d.datos || {};
+  // 💥 Explota: primero la explosión en el mapa (todas las pantallas); el Anuncio de quien la resuelve, cuando termina.
+  if(dt.explota && d.estado !== 'listo'){
+    const resta = explosionEmpezar(dt.explota);
+    if(resta > 0 && trampaMeToca(id, dt) && !trampaRetenidas.has(id)){
+      trampasDatos.set(id, d); trampaRetenidas.add(id);
+      setTimeout(() => { trampaRetenidas.delete(id); trampaMomento(id, trampasDatos.get(id) || d); }, resta + 50);
+      return;
+    }
+  }
   // El portal: cuando se eligió el destino, todas las pantallas ven los pulsos (una vez).
   if(dt.destino && dt.destino.desde && !saltosVistos.has(id + ':portal')){
     saltosVistos.add(id + ':portal');

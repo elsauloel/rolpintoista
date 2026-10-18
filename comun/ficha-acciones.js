@@ -708,7 +708,7 @@ const FichaAcciones = (() => {
     const suma = Combatiente.sumaEspecialDe(f.dmgesp, e.sumaEspecial);   // para arriba (2026-10-17)
     const dano = String(e.dano || '').trim();
     return {id: claveEsp(it), deItem: it.id, nombre: e.nombre || it.nombre, detalle: it.detalle || '', modo: 'auto',
-      duelo: e.duelo ? conTalismanesVarita(structuredClone(e.duelo), (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i))) : null, tiradaStat: (e.duelo && e.duelo.tira) || 'pdgmg',
+      duelo: e.duelo ? structuredClone(e.duelo) : null, tiradaStat: (e.duelo && e.duelo.tira) || 'pdgmg',
       tiradaExtra: dano ? dano + (suma > 0 ? `+${suma}` : '') : '', ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {}),
       ...(e.portalMapa ? {portalMapa: structuredClone(e.portalMapa)} : {}), ...(e.blink ? {blink: structuredClone(e.blink)} : {}), ...(e.caos ? {caos: structuredClone(e.caos)} : {})};   // (el blink y el caos, 2026-10-08)   // los portales (2026-10-07, Varita del portal aliado)
   }
@@ -731,18 +731,8 @@ const FichaAcciones = (() => {
         const r = Combatiente.agregarEstado(S.efectos, estadoDeSpec({nombre: 'Vida extra', turnos: 1, escudoMagico: num(o.orbeResguardo)}, ui.presets || []));
         ui.mesaHabilidad(o.nombre, r.ok ? `Vida extra ${fmt(num(o.orbeResguardo))} hasta tu próximo turno.` : `No entra la Vida extra (${r.motivo || 'bloqueado'}).`);
       }
-      if(o.orbeSalvaje){   // salvaje (Común) o domado (Buena calidad): Combatiente.orbeSalvaje
-        const d = 1 + Math.floor(Math.random() * 6), x = Combatiente.orbeSalvaje(o, d);
-        if(x.dano && ui.fijarHp) ui.fijarHp(num(S.hp) - x.dano);
-        if(x.doble) doble = true;
-        ui.mesaHabilidad(o.nombre, `1d6 → ${d}: ${x.dano ? 'te hace 1 de daño' : x.doble ? (String(it.tiradaExtra || '').match(/\d+d\d+/) ? '¡el efecto sale doble! (los dados del daño, ×2)' : '¡el efecto sale doble! ✋ A mano: qué es el doble lo decide la mesa') : 'nada'}.`);
-      }
-      // Orbe del custodio (Buena calidad, 2026-10-06): un aliado al lado recibe Vida extra N, una vez por turno (el mapa lo elige).
-      if(num(o.orbeCustodio) > 0 && !num((S.ataquesArma || {})[k + ':c'])){
-        S.ataquesArma = {...(S.ataquesArma || {}), [k + ':c']: 1};
-        if(ui.custodio) ui.custodio(o);
-        else ui.mesaHabilidad(o.nombre, `✋ A mano: un aliado al lado tuyo recibe Vida extra ${fmt(num(o.orbeCustodio))} hasta su próximo turno.`);
-      }
+      // El Orbe salvaje y el del custodio (2026-10-18, dueño) ya no van al usar la varita: el salvaje, con cualquier daño especial; el custodio,
+      // al ganar una tirada de PdG.Esp. Los hace el mapa (vtt-hexgrid/js/53).
     });
     return doble;
   }

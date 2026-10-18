@@ -2,9 +2,14 @@
    Lo que hacen solos, con el daño y los efectos del duelo (los aplica la pantalla del GM, como todo el daño del duelo, js/13):
    · Espejito de bolsillo (`espejito` = %): a quien te pegó le vuelve ese % (para arriba, mínimo 1) del daño especial que TE ENTRÓ, directo.
    · Relicario de sangre (`relicario` = N): si tu daño especial lo deja en 0, ganás Vida extra N.
-   · Cabeza reducida y Muñeco vudú (`alPegarVarita` = {nombre, turnos}): la varita lleva ese efecto (Combatiente.efectosVarita); acá se cuida
-     que entre una sola vez por turno de quien la usó (`talismanUnaVez`).
-   Quién lo lleva: un personaje lo publica en su resumen (`espejito`, `relicario`); un creep, en su equipo (CreepCalculo.talisman, solo el GM). */
+   · Cabeza reducida y Muñeco vudú (`alDanoEspecial` = {nombre, turnos}; 2026-10-18, dueño: con el daño especial, no solo la varita): la primera
+     vez en cada turno (ronda) que quien la lleva le hace daño especial a alguien, ese estado (`talAlDanoEspecial`).
+   · Orbe salvaje (`orbeSalvaje`: true o 'domado'; 2026-10-18, dueño): con cualquier daño especial, 1d6 — con 6, ×2 (el domado ×3); con 1, el
+     mismo daño que entró le entra también a quien atacó (`talSalvajeTirar` antes del daño, `talSalvajePropio` después).
+   · Orbe del custodio (`orbeCustodio`; 2026-10-18, dueño): cada vez que quien lo lleva gana una tirada de PdG.Esp, Vida extra N a un aliado al
+     lado (`talCustodio`, desde el hook `pdgEspGanado` del duelo, en la pantalla de quien tiró; js/26 orbeCustodioMapa).
+   Quién lo lleva: un personaje lo publica en su resumen (`espejito`, `relicario`, `orbeCustodio`, `orbeSalvaje`, `alDanoEsp`); un creep, en su
+   equipo (CreepCalculo.talisman, solo el GM). */
 function talismanDe(t, campo){
   if(!t || !t.fichaId) return 0;
   if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return sc && typeof CreepCalculo !== 'undefined' && CreepCalculo.talisman ? num(CreepCalculo.talisman(sc, campo)) : 0; }
@@ -50,3 +55,57 @@ function talismanUnaVez(d, ef){
   talismanUsados.add(k);
   return true;
 }
+// Lo que lleva quien atacó: el resumen de un personaje o el equipo de un creep (null si no se sabe: una invocación).
+function talEquipoDe(t){
+  if(!t || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) return null;
+  if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return sc ? {creep: sc} : null; }
+  const f = fichasPub.get(t.fichaId);
+  return f && f.resumen ? {resumen: f.resumen} : null;
+}
+// La Cabeza reducida y el Muñeco vudú: el estado que dejan al hacer daño especial, una vez por turno de quien atacó.
+async function talAlDanoEspecial(d){
+  const ta = tokens.get(d.atacante.tokenId), eq = talEquipoDe(ta);
+  if(!eq) return;
+  const lista = eq.creep ? Combatiente.talismanesDanoEsp(eq.creep.equipo) : (eq.resumen.alDanoEsp || []);
+  for(const x of lista){
+    const k = `${x.de}|${d.atacante.tokenId}@${Math.round(num(mantenimientoNumero))}`;
+    if(talismanUsados.has(k)) continue;
+    talismanUsados.add(k);
+    const r = await dueloAplicarEfectoBase(d, {nombre: x.nombre, caras: 1, exitos: 1, spec: {nombre: x.nombre, turnos: x.turnos}});
+    try{ mesaLinea(`🔮 ${x.de} de ${d.atacante.nombre}: ${d.defensor.nombre} ${r && r.manual ? `queda ${x.nombre} (a mano)` : `queda ${x.nombre} ${x.turnos} turno${x.turnos === 1 ? '' : 's'}`}${r && r.nota ? ' · ' + r.nota : ''}`, 'recordatorio'); }catch(err){}
+  }
+}
+// El Orbe salvaje: la tirada (antes del daño). → {mult, propio, d, nombre} o null si quien atacó no lo lleva.
+async function talSalvajeTirar(d){
+  const ta = tokens.get(d.atacante.tokenId), eq = talEquipoDe(ta);
+  if(!eq) return null;
+  let tipo = null, nombre = '';
+  if(eq.creep){ const o = (eq.creep.equipo || []).find(i => i && i.orbeSalvaje === 'domado') || (eq.creep.equipo || []).find(i => i && i.orbeSalvaje); if(o){ tipo = o.orbeSalvaje; nombre = o.nombre; } }
+  else if(eq.resumen.orbeSalvaje){ tipo = eq.resumen.orbeSalvaje === 'domado' ? 'domado' : true; nombre = eq.resumen.orbeSalvajeNombre || 'Orbe salvaje'; }
+  if(!tipo) return null;
+  const dado = 1 + Math.floor(Math.random() * 6), x = Combatiente.orbeSalvaje({orbeSalvaje: tipo}, dado);
+  const txt = x.mult > 1 ? `¡el daño especial sale ${x.mult === 3 ? 'triple' : 'doble'}!` : x.propio ? `el mismo daño que le entre a ${d.defensor.nombre} le entra también a ${d.atacante.nombre}` : 'no pasa nada';
+  try{ await mesaPublicar(`${d.atacante.nombre} · ${nombre}`, {formula: '1d6', rolls: [dado], mod: 0, total: dado, quien: d.atacante.nombre, ...(ta && ta.tipo === 'creep' ? {desde: 'gm'} : {})}); }catch(err){}
+  try{ mesaLinea(`🔮 ${nombre} de ${d.atacante.nombre} (1d6 → ${dado}): ${txt}`, 'recordatorio'); }catch(err){}
+  return {mult: x.mult, propio: x.propio, d: dado, nombre};
+}
+// El Orbe salvaje con 1: lo mismo que le entró al rival, directo a quien atacó.
+async function talSalvajePropio(d, entro, sal){
+  const ta = tokens.get(d.atacante.tokenId);
+  const n = Math.max(0, Math.round(num(entro)));
+  if(!ta || !n) return;
+  const res = ta.tipo === 'pj' && String(ta.fichaId).includes(SEP_INVOCACION) ? await danioInv(ta, String(n), true)
+    : ta.tipo === 'creep' ? await danioCreep(ta, String(n), true) : await danioPj(ta, String(n), true);
+  try{ mesaLinea(`🔮 ${sal.nombre}: a ${d.atacante.nombre} también le entran ${fmt(num(res.r.recibido))} de daño`, 'recordatorio'); }catch(err){}
+}
+// El Orbe del custodio: ganó una tirada de PdG.Esp (en la pantalla de quien tiró).
+function talCustodio(d){
+  const ta = tokens.get(d.atacante.tokenId), eq = talEquipoDe(ta);
+  if(!eq || typeof orbeCustodioMapa !== 'function') return;
+  let n = 0, nombre = 'Orbe del custodio';
+  if(eq.creep){ const o = (eq.creep.equipo || []).find(i => i && num(i.orbeCustodio) > 0); if(o){ n = num(o.orbeCustodio); nombre = o.nombre; } }
+  else n = num(eq.resumen.orbeCustodio);
+  if(!(n > 0)) return;
+  orbeCustodioMapa({fichaId: ta.fichaId, tipo: ta.tipo === 'creep' ? 'creep' : 'pj', n, orbe: nombre, quien: d.atacante.nombre});
+}
+

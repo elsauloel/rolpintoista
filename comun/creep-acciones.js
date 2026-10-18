@@ -332,6 +332,14 @@ const CreepAcciones = (() => {
   }
   // Lo que cambia al ejecutar una 💰 o ✨ (no manual ni Flash): {error} o el plan para terminarHab.
   // `silencioOk`: ya se preguntó con confirmarSilencio y dijo que sí; sin eso, en Silencio no la usa.
+  // 🩸 Maldito en un creep (2026-10-18, dueño, hasta que los creeps gasten SP): cada habilidad que usa le saca tanta vida como su cooldown.
+  function malditoCreep(sc, h){
+    const mal = (sc.estados || []).some(e => e && e.activo !== false && (e.sangraSp || e.nombre === 'Maldito'));
+    const cd = Math.max(0, Math.round(num(h && h.cd)));
+    if(!mal || !cd) return 0;
+    sc.hp = Math.max(0, num(sc.hp) - cd);
+    return cd;
+  }
   function ejecutarHab(sc, h, presets, silencioOk){
     const sil = Combatiente.preguntaSilencio(sc.estados, h, sc.nombre);   // Silencio (2026-10-04): avisa y deja seguir
     if(sil && !silencioOk) return {error: `${sc.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`};
@@ -343,6 +351,7 @@ const CreepAcciones = (() => {
     sc.nitros = num(sc.nitros) - costo;
     Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: `usar ${h.nombre || 'una habilidad'}`});
     h.cdActual = num(h.cd);
+    const malditoDano = malditoCreep(sc, h);   // 🩸 Maldito: su cooldown en vida (2026-10-18)
     if(C().habAtaque(h)) sc.ataquesTurno = num(sc.ataquesTurno) + 1;  // cuenta como su ataque
     if(costoHp > 0) sc.hp = num(sc.hp) - costoHp;
     if(num(h.curaHp) > 0) sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, num(sc.hp) + num(h.curaHp));   // cura sobre sí mismo
@@ -355,7 +364,7 @@ const CreepAcciones = (() => {
     const esZona = auto && h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'zona';
     // ✨ Solo sobre el creep y sin nada que tirar: se aplica directo, sin abrir el cuadro.
     const directo = auto && !h.trampaColocar && !h.refuerzos ? sobreSi(sc, h) : null;
-    return {costo, costoHp, efecto, aviso: ef.aviso || '', falta, auto, esZona, directo, nitros: sc.nitros};
+    return {costo, costoHp, efecto, aviso: [ef.aviso || '', malditoDano ? `🩸 Maldito: usar ${h.nombre || 'la habilidad'} le saca ${fmt(malditoDano)} de vida` : ''].filter(Boolean).join(' · '), falta, auto, esZona, directo, nitros: sc.nitros, malditoDano};
   }
   /* Lo que pasa después de cobrar. ui = {mesaHabilidad(sc, h, extra), mesaConTexto(texto), publicar(sc, t), toast(t),
        habDuelo(sc, h) (la Ejecución para el duelo, o null si no hay duelo), lanzarAtaque(sc, h), lanzarDuelo(sc, h, hab),
@@ -461,7 +470,7 @@ const CreepAcciones = (() => {
   function habDeEspecialCreep(sc, it){
     const e = it.especial || {}, dano = String(e.dano || '').trim();
     const suma = Combatiente.sumaEspecialDe(C().statValor(sc, 'dmgesp'), e.sumaEspecial);   // para arriba (2026-10-17)
-    return {id: 'esp:' + it.id, deItem: it.id, nombre: e.nombre || it.nombre, detalle: it.detalle || '', modo: 'auto', duelo: e.duelo ? conTalismanesVarita(structuredClone(e.duelo), sc.equipo) : null,
+    return {id: 'esp:' + it.id, deItem: it.id, nombre: e.nombre || it.nombre, detalle: it.detalle || '', modo: 'auto', duelo: e.duelo ? structuredClone(e.duelo) : null,
       tiradaStat: (e.duelo && e.duelo.tira) || 'pdgmg', tiradaExtra: dano ? dano + (suma > 0 ? '+' + suma : '') : '',
       ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {}), ...(e.caos ? {caos: structuredClone(e.caos)} : {}),   // la Varita del caos (2026-10-18)
       nitrosCosto: costoEspecialCreep(sc, it).no2, cd: 0};
@@ -492,18 +501,7 @@ const CreepAcciones = (() => {
         const r = EstadosAplicar.aplicarACreep(sc, {nombre: 'Vida extra', turnos: 1, escudoMagico: num(o.orbeResguardo)});
         avisos.push(`${o.nombre}: ${r.ok ? `Vida extra ${fmt(num(o.orbeResguardo))} hasta su próximo turno` : `no entra la Vida extra (${r.motivo || 'bloqueado'})`}`);
       }
-      if(o.orbeSalvaje){   // salvaje (Común) o domado (Buena calidad): Combatiente.orbeSalvaje
-        const d = 1 + Math.floor(Math.random() * 6), x = Combatiente.orbeSalvaje(o, d);
-        if(x.dano) sc.hp = Math.max(0, num(sc.hp) - x.dano);
-        if(x.doble) p.doble = true;
-        avisos.push(`${o.nombre}: 1d6 → ${d}: ${x.dano ? 'le hace 1 de daño' : x.doble ? (/\d+d\d+/.test(h.tiradaExtra) ? '¡el efecto sale doble! (los dados del daño, ×2)' : '¡el efecto sale doble! ✋ A mano: qué es el doble lo decide la mesa') : 'nada'}`);
-      }
-      // Orbe del custodio (Buena calidad, 2026-10-06): un aliado al lado recibe Vida extra N (el mapa lo elige; en GM Tools, a mano).
-      if(num(o.orbeCustodio) > 0 && !num(sc.usosEspecial[k + ':c'])){
-        sc.usosEspecial[k + ':c'] = 1;
-        p.custodio = [...(p.custodio || []), {n: num(o.orbeCustodio), orbe: o.nombre}];
-        avisos.push(`${o.nombre}: un aliado al lado recibe Vida extra ${fmt(num(o.orbeCustodio))} hasta su próximo turno`);
-      }
+      // El Orbe salvaje y el del custodio (2026-10-18): ya no al usar la varita — el mapa (vtt-hexgrid/js/53), con el daño especial y el PdG.Esp ganado.
     });
     if(vida) avisos.push(`🩸 cuesta vida: −${fmt(vida)} HP (el ${fmt(num(it.especial.spVidaPct))} % de su vida máxima)`);
     p.hab = h; p.avisosOrbe = avisos; p.espera = c.espera;

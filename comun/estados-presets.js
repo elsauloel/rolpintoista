@@ -166,7 +166,7 @@ const ESTADOS_PRESET = [
   // HP»; la vida se pierde al pagar —antes del efecto— y puede dejarlo caído): `sangraSp` (FichaAcciones.gastarSp). Lo pone la Maldición de la
   // sangre del Kobold maldiciente. Un creep no paga SP: no lo siente.
   {nombre:'Maldito', polaridad:'debuff', turnos:2, sangraSp:true,
-    detalle:'Maldición de la sangre: cada punto de SP que gastes te saca 1 de vida, directo, en el momento de pagar (antes de que salga el efecto; puede dejarte caído). ⚙ Automatizado: al pagar SP se descuenta la vida y se avisa.'},
+    detalle:'Maldición de la sangre: cada punto de SP que gastes te saca 1 de vida, directo, en el momento de pagar (antes de que salga el efecto; puede dejarte caído). Un creep (mientras los creeps no gastan SP): cada habilidad que usa le saca tanta vida como su cooldown. ⚙ Automatizado: al pagar SP (o al usar la habilidad, un creep) se descuenta la vida y se avisa.'},
   // Vuela (2026-10-16, dueño; para las abejas de Bizzante y los creeps voladores): como Levitar sin límite y sin aterrizar (la marca `levitar`
   // en 100, como Inamovible), pasa por encima de los tokens (no de paredes ni Sólidos; al cruzar a un rival, antes le da su ataque de
   // oportunidad) y no le entran Sentado ni Rengo (`volador`, Combatiente.inmunidad). Cuerpo a cuerpo se le pega normal (vuela bajo); −1 a la

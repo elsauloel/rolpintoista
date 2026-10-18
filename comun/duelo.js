@@ -71,6 +71,8 @@ const Duelo = (() => {
   const remachaAvisada = new Set();
   const disparoAvisado = new Set();
   let disparoPrimera = true;
+  const pdgEspAvisado = new Set();   // 🔮 el Orbe del custodio (2026-10-18)
+  let pdgEspPrimera = true;
   let flechaPrimera = true;
   // 🪵 Un dodge roll de Tronco de huída en un golpe directo (2026-10-10): cfgEscuchar.dodgeLibre(d), en la pantalla de quien esquivó.
   const dodgeLibreAvisado = new Set();
@@ -2825,6 +2827,14 @@ const Duelo = (() => {
         });
       }
       flechaPrimera = false;
+      if(cfgEscuchar.pdgEspGanado){   // 🔮 ganó una tirada de PdG.Esp (el Orbe del custodio, 2026-10-18), en la pantalla de quien la tiró
+        listaDuelos.forEach(d => {
+          if(!d.contacto || d.contacto.gana !== 'atacante' || !d.hab || !d.hab.tira || d.hab.tira.stat !== 'pdgmg' || pdgEspAvisado.has(d.id)) return;
+          pdgEspAvisado.add(d.id);
+          if(!pdgEspPrimera && (esMio(d.atacante) || (soyGM() && d.atacante && d.atacante.tipo === 'creep'))) try{ cfgEscuchar.pdgEspGanado(d); }catch(err){ console.error('Duelo: pdgEspGanado', err); }
+        });
+        pdgEspPrimera = false;
+      }
       if(cfgEscuchar.disparoResuelto){   // 🏹 un ataque que terminó, en la pantalla de quien atacó (Lectura del viento, Racha, Encadenar; 2026-10-11)
         listaDuelos.forEach(d => {
           if(d.estado !== 'resuelto' || !d.ataque || d.hab || disparoAvisado.has(d.id)) return;

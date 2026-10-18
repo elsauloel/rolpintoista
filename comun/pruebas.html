@@ -2769,8 +2769,8 @@ prueba('escudos de Buena calidad (2026-10-06): Parada fácil (el primer Parry de
   InvAcciones.tirarStat(inv, 'parry', {}); const i1 = inv.nitros; InvAcciones.tirarStat(inv, 'parry', {});
   const sal = d => Combatiente.orbeSalvaje({orbeSalvaje: true}, d), dom = d => Combatiente.orbeSalvaje({orbeSalvaje: 'domado'}, d);
   igual([tras1, S.nitros, tiradas.filter(o => /Bloqueo firme/.test(o)).length, c1, sc.nitros, /\+2 Bloqueo firme/.test(bc), i1, inv.nitros,
-    sal(1).dano, sal(6).doble, sal(5).doble, dom(1).dano, dom(5).doble, Combatiente.esEscudo({tipoItem: 'escudo_1m'}), Combatiente.esEscudo({tipoItem: 'escudo_1m', orbe: true})],
-    [3, 2, 1, 3, 2, true, 3, 2, 1, true, false, 0, true, true, false]);
+    sal(1).propio, sal(6).mult, sal(5).mult, dom(1).propio, dom(5).mult, dom(6).mult, Combatiente.esEscudo({tipoItem: 'escudo_1m'}), Combatiente.esEscudo({tipoItem: 'escudo_1m', orbe: true})],
+    [3, 2, 1, 3, 2, true, 3, 2, true, 2, 1, true, 1, 3, true, false]);
 });
 prueba('Revive (2026-10-06): el aviso «Revivir» levanta a un inconsciente con el % de su vida y Titilando; no a uno en pie ni a uno muerto del todo', () => {
   const nuevo = (hp, muerto) => { const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, hp}).S); S.muerto = muerto; return S; };
@@ -4379,13 +4379,15 @@ prueba('Controles por grupo (P210, 2026-10-18): el estado dice con qué se resis
     ['resm', 'rescc', 'fue', 'agl', 'fue', 'Res.CC', '', true, 'Inmunidad mental', false, 'Inmunidad a CC', 'Inmunidad a CC']);
 });
 
-prueba('Talismanes (2026-10-18): la Cabeza reducida y el Muñeco vudú le suman su efecto a la varita, con su marca', () => {
-  const items = [{nombre: 'Cabeza reducida de jíbaro', alPegarVarita: {nombre: 'Maldito', turnos: 2}}, {nombre: 'Farol'}];
-  const ef = Combatiente.efectosVarita(items);
-  const ej = Combatiente.efectoDeEjecucion(ef[0]);
+prueba('Talismanes (2026-10-18): la Cabeza reducida y el Muñeco vudú dejan su estado con el daño especial; el Maldito de un creep: su cooldown en vida', () => {
+  const items = [{nombre: 'Cabeza reducida de jíbaro', alDanoEspecial: {nombre: 'Maldito', turnos: 2}}, {nombre: 'Farol'}];
+  const td = Combatiente.talismanesDanoEsp(items);
   const it = CATALOGO_BASE.find(i => i.id === 'tal-muneco-vudu');
-  igual([ef.length, ef[0].nombre, ef[0].turnos, /^🔮 Cabeza reducida de jíbaro:/.test(ej.detalle), ej.spec.nombre, ej.spec.turnos, it.alPegarVarita.nombre, CreepCalculo.talisman({equipo: [{espejito: 20}]}, 'espejito')],
-    [1, 'Maldito', 2, true, 'Maldito', 2, 'Debilitado', 20]);
+  const sc = CreepCalculo.normalizar({id: 'm', nombre: 'Goblin', hp: 10, hpMax: 10, nitros: 5, estados: [EstadosAplicar.componer({nombre: 'Maldito'})],
+    habilidades: [{id: 'h1', nombre: 'Golpe', modo: 'manual', cd: 3}]});
+  const p = CreepAcciones.ejecutarHab(sc, sc.habilidades[0], estadosPresetCreep(), true);
+  igual([td.length, td[0].nombre, td[0].turnos, td[0].de, it.alDanoEspecial.nombre, CreepCalculo.talisman({equipo: [{espejito: 20}]}, 'espejito'), p.malditoDano, sc.hp],
+    [1, 'Maldito', 2, 'Cabeza reducida de jíbaro', 'Debilitado', 20, 3, 7]);
 });
 
 prueba('Estatuilla del Gauchito Gil (2026-10-18): la primera tirada de PdG, PdG.Esp, Evasión o Parry de la ronda sale como Afortunado', () => {

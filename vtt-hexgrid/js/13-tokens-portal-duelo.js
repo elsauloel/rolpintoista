@@ -1367,7 +1367,10 @@ async function dueloAplicarDano(d){
   const menosDist = (d.hab && d.hab.menosDistancia && ta0 && t ? Math.max(0, distanciaHex(ta0, t) - 1) : 0)
     + (d.hab && d.hab.menosPorOrden && d.grupo ? Math.max(0, Math.round(num(d.grupo.indice)) - 1) : 0);   // el láser largo: −1 a cada uno de los siguientes en la línea
   // 🔥 Carga Elemental de fuego (2026-10-13): +50 % del daño tirado, para arriba (`hab.dano.mult`).
-  const multHab = d.hab && d.hab.dano && num(d.hab.dano.mult) > 1 ? num(d.hab.dano.mult) : 1;
+  let multHab = d.hab && d.hab.dano && num(d.hab.dano.mult) > 1 ? num(d.hab.dano.mult) : 1;
+  // 🔮 El Orbe salvaje (js/53): con daño especial, una tirada de 1d6 (6: ×2 o ×3; 1: el mismo daño a quien atacó, después).
+  const salvaje = (magico || (dn.magico && num(dn.magico.total) > 0)) && typeof talSalvajeTirar === 'function' ? await talSalvajeTirar(d).catch(err => { console.error('El Orbe salvaje:', err); return null; }) : null;
+  if(salvaje && salvaje.mult > 1 && magico) multHab *= salvaje.mult;
   const mult = critReal ? d.crit.mult : 1, crudo = Math.ceil(Math.max(0, num(dn.crudo) - menosDist) * multHab), golpe = crudo * mult;
   const base = {crudo, mult, golpe, ignoraDef: crit, mitad: d.resultado === 'mitad', ...(multHab > 1 ? {cargaMult: `${d.hab.dano.carga || 'Carga'}: ${fmt(Math.max(0, num(dn.crudo) - menosDist))} +${Math.round((multHab - 1) * 100)} % = ${fmt(crudo)}`} : {})};
   if(!t) return {...base, manual: true, motivoManual: 'el token ya no está en el mapa'};
@@ -1425,7 +1428,8 @@ async function dueloAplicarDano(d){
       // elemento (Res. fuego…), como el daño de una habilidad. Con dos elementos juntos («Fuego y Hielo») no se resta ninguna.
       const elMag = String(dn.magico.tipo || '').includes(' y ') ? '' : Combatiente.elementoDe(dn.magico.tipo);
       const resMag = elMag ? (await resistenciasDe(t, elMag, invLeida)).res : 0;
-      const agM = typeof aguaRayo === 'function' ? aguaRayo(t, elMag, num(dn.magico.total)) : {monto: num(dn.magico.total), txt: ''};   // 💧 (js/50)
+      const totMag = num(dn.magico.total) * (salvaje && !habMagica ? salvaje.mult : 1);   // 🔮 el Orbe salvaje (si no lo usó ya el daño de la habilidad)
+      const agM = typeof aguaRayo === 'function' ? aguaRayo(t, elMag, totMag) : {monto: totMag, txt: ''};   // 💧 (js/50)
       const rm = esInv ? await danioInv(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true})
         : t.tipo === 'creep' ? await danioCreep(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true}) : await danioPj(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true});
       magico = {...dn.magico, recibido: num(rm.r.recibido), hpAntes: num(rm.previo), hpDespues: num(rm.nuevo), ...(resMag ? {resEl: Combatiente.resElementalTxt(elMag, resMag)} : {})};
@@ -1441,6 +1445,9 @@ async function dueloAplicarDano(d){
       await talEspejito(d, (habMagica ? num(res.r.recibido) : 0) + (magico ? num(magico.recibido) : 0)).catch(err => console.error('El Espejito:', err));
       const mato = (habMagica && num(res.previo) > 0 && num(res.nuevo) <= 0) || !!(magico && num(magico.hpAntes) > 0 && num(magico.hpDespues) <= 0);
       await talRelicario(d, mato).catch(err => console.error('El Relicario:', err));
+      const entroEsp = (habMagica ? num(res.r.recibido) : 0) + (magico ? num(magico.recibido) : 0);
+      if(entroEsp > 0) await talAlDanoEspecial(d).catch(err => console.error('La Cabeza reducida / el Muñeco vudú:', err));   // una vez por turno
+      if(salvaje && salvaje.propio) await talSalvajePropio(d, entroEsp, salvaje).catch(err => console.error('El Orbe salvaje:', err));
     }
     const perdio = Math.max(0, num(res.previo) - num(res.nuevo));
     // Habilidad que drena: todo lo que perdió. Arma que drena (2026-10-03): su % de lo que perdió de verdad (curar redondea para arriba).

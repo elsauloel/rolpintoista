@@ -627,7 +627,9 @@ async function inicioTurnoPendiente(tokenId, clave){
   const esEstado = l => /turno|se termin|vence|venci/i.test(l) && !/^No2/.test(l);
   const esVida = l => /HP|vida|SP|Regeneraci|Veneno|Sangrado|Quemadura|Meditar|Ca[ií]d/i.test(l) && !esEstado(l);
   const est = prev.rep.filter(esEstado), vida = prev.rep.filter(esVida), no2 = prev.rep.filter(l => /^No2/.test(l)), otros = prev.rep.filter(l => !esEstado(l) && !esVida(l) && !/^No2/.test(l));
-  const estados = est.length ? est : prev.turnos;
+  // 🔮 Lo que se llevó el humo del Sahumerio: bajó un turno y después se fue (el orden de inicioTurno); se dice solo lo segundo.
+  const humo = new Set(prev.rep.map(l => (/^Sahumerio.*se llevó (.+)$/.exec(l) || [])[1]).filter(Boolean));
+  const estados = (est.length ? est : prev.turnos).map(l => { const n = [...humo].find(x => l.startsWith(`${x}:`)); return n ? `${n}: se lo llevó el humo` : l; });
   const pasos = [
     ...(estados.length ? [{titulo: 'Tus estados', texto: estados.join(' · ')}] : []),
     ...(vida.length ? [{titulo: 'Vida y SP', texto: vida.join(' · ')}] : []),

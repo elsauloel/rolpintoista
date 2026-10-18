@@ -2674,7 +2674,7 @@ prueba('Stun (2026-10-06): no le toca los No2; si lo atacan, su Evasión es 1 si
   const r = Combatiente.tirarStat(12, es, 'eva'), r2 = Combatiente.tirarStat(12, viejo, 'eva'), parry = Combatiente.tirarStat(12, es, 'parry');
   igual([stun.forzarNitros, stun.stun, r.total, r.rolls.length, r2.total, parry.rolls.length > 0, Combatiente.stuneado([]), barrera.turnos], [undefined, true, 1, 0, 1, true, false, 2]);
 });
-prueba('anillos Comunes (2026-10-06): los 29 nuevos son los únicos anillos (los de rango y los de calidades altas, afuera); Paso fantasma suma Evasión con 3 casilleros en la ronda; la Cáscara no se recarga; la Calma devuelve No2 si no atacó', () => {
+prueba('anillos Comunes (2026-10-06): los 29 nuevos y los 6 de los talismanes (2026-10-18: brasa, escarcha, chispa, miasma, ácido, tormenta) son los únicos anillos (los de rango y los de calidades altas, afuera); Paso fantasma suma Evasión con 3 casilleros en la ronda; la Cáscara no se recarga; la Calma devuelve No2 si no atacó', () => {
   const com = CATALOGO_BASE.filter(i => i.tipoItem === 'anillos' && i.tier === 'Común');
   const antes = window.mapaCasillerosRonda;
   window.mapaCasillerosRonda = id => id === 'lejos' ? 3 : 1;
@@ -2694,7 +2694,7 @@ prueba('anillos Comunes (2026-10-06): los 29 nuevos son los únicos anillos (los
     inventario: [{...structuredClone(calma), id: 'a1', equipado: true}]}).S);
   S2.nitros = 2; S2.ataquesTurno = 1;
   FichaMantenimiento.finTurno(S2, {fijarHp: v => FichaAcciones.fijarHp(S2, v)}, 'm:5', '', [], 1);
-  igual([com.length, CATALOGO_BASE.filter(i => i.tipoItem === 'anillos').length, pf, est[0].escudoMagicoActual, conCalma, S2.nitros], [29, 29, [1, 0], 1, 3, 2]);
+  igual([com.length, CATALOGO_BASE.filter(i => i.tipoItem === 'anillos').length, pf, est[0].escudoMagicoActual, conCalma, S2.nitros], [35, 35, [1, 0], 1, 3, 2]);
 });
 prueba('mochilas de Buena calidad (2026-10-06): 10 piezas, todas a 70 y con un efecto propio (ranuras o una mecánica de mochila)', () => {
   const bc = CATALOGO_BASE.filter(i => i.tipoItem === 'mochila' && i.tier === 'Buena Calidad' && !i.soloBotin);
@@ -4377,6 +4377,15 @@ prueba('Controles por grupo (P210, 2026-10-18): el estado dice con qué se resis
     Combatiente.resisteCCEtq('Lisiado'), Combatiente.resisteCC('Veneno'), Combatiente.esMental(comp('Confusión')),
     Combatiente.inmunidad(conMt, comp('Miedo')), Combatiente.inmunidad(conMt, comp('Stun')), Combatiente.inmunidad(conCC, comp('Miedo')), Combatiente.inmunidad(conCC, comp('Ceguera'))],
     ['resm', 'rescc', 'fue', 'agl', 'fue', 'Res.CC', '', true, 'Inmunidad mental', false, 'Inmunidad a CC', 'Inmunidad a CC']);
+});
+
+prueba('Talismanes (2026-10-18): la Cabeza reducida y el Muñeco vudú le suman su efecto a la varita, con su marca', () => {
+  const items = [{nombre: 'Cabeza reducida de jíbaro', alPegarVarita: {nombre: 'Maldito', turnos: 2}}, {nombre: 'Farol'}];
+  const ef = Combatiente.efectosVarita(items);
+  const ej = Combatiente.efectoDeEjecucion(ef[0]);
+  const it = CATALOGO_BASE.find(i => i.id === 'tal-muneco-vudu');
+  igual([ef.length, ef[0].nombre, ef[0].turnos, /^🔮 Cabeza reducida de jíbaro:/.test(ej.detalle), ej.spec.nombre, ej.spec.turnos, it.alPegarVarita.nombre, CreepCalculo.talisman({equipo: [{espejito: 20}]}, 'espejito')],
+    [1, 'Maldito', 2, true, 'Maldito', 2, 'Debilitado', 20]);
 });
 
 prueba('ataque sin arma: tiene daño (provisorio 1d4 + Dmg, P150)', () => {

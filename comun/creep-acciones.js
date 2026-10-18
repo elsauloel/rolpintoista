@@ -452,10 +452,16 @@ const CreepAcciones = (() => {
     return {no2: Combatiente.conExtenuado(sc.estados, Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1))), espera: conCarga ? 0 : ESPERA_POR_SP(Math.max(0, num(e.sp) - ahorro)), usos, enEspera: num((sc.esperaEspecial || {})[k]),
       ...(cargas ? {cargas, cargaUsadas: num((sc.cargasEsp || {})[k])} : {})};
   }
+  // 🔮 Los talismanes de su equipo que le suman algo a cada varita (la Cabeza reducida, el Muñeco vudú).
+  const conTalismanesVarita = (duelo, items) => {
+    const extra = Combatiente.efectosVarita(items);
+    if(extra.length && duelo && duelo.objetivo !== 'zona') duelo.efectos = [...(Array.isArray(duelo.efectos) ? duelo.efectos : []), ...extra];
+    return duelo;
+  };
   function habDeEspecialCreep(sc, it){
     const e = it.especial || {}, dano = String(e.dano || '').trim();
     const suma = Combatiente.sumaEspecialDe(C().statValor(sc, 'dmgesp'), e.sumaEspecial);   // para arriba (2026-10-17)
-    return {id: 'esp:' + it.id, deItem: it.id, nombre: e.nombre || it.nombre, detalle: it.detalle || '', modo: 'auto', duelo: e.duelo ? structuredClone(e.duelo) : null,
+    return {id: 'esp:' + it.id, deItem: it.id, nombre: e.nombre || it.nombre, detalle: it.detalle || '', modo: 'auto', duelo: e.duelo ? conTalismanesVarita(structuredClone(e.duelo), sc.equipo) : null,
       tiradaStat: (e.duelo && e.duelo.tira) || 'pdgmg', tiradaExtra: dano ? dano + (suma > 0 ? '+' + suma : '') : '',
       ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {}), ...(e.caos ? {caos: structuredClone(e.caos)} : {}),   // la Varita del caos (2026-10-18)
       nitrosCosto: costoEspecialCreep(sc, it).no2, cd: 0};

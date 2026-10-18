@@ -119,6 +119,8 @@ const FichaResumen = (() => {
       orbeAbsorcion: (S.inventario || []).filter(i => i && i.equipado && i.orbe && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.orbeAbsorcion)), 0),
       // 💀 La Calavera con vela (2026-10-18): el radio de su aura espeluznante y el Ef.Esp con que asusta (el mapa, js/52).
       auraMiedo: (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.auraMiedo)), 0),
+      // 🔮 Talismanes (2026-10-18): el Espejito (% que devuelve) y el Relicario (Vida extra al matar con daño especial). El mapa los mira (js/53).
+      ...Object.fromEntries(['espejito', 'relicario'].map(k => [k, (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i[k])), 0)]).filter(([, v]) => v)),
       dmgesp: n(c.final.dmgesp),
       levitar: n(c.final.levitar), suelagruesa: n(c.final.suelagruesa), embestida: n(c.final.embestida), pasodoble: n(c.final.pasodoble),   // piernas (2026-10-06)
       emergencia: n(c.final.emergencia), emergenciaUsada: !!S.emergenciaUsada,

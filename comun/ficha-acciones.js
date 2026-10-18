@@ -685,12 +685,18 @@ const FichaAcciones = (() => {
   // El báculo de sangre (2026-10-08): cada uso cuesta `spVidaPct` % de tu vida máxima (para arriba) en vez de SP.
   const vidaPorUso = (S, e) => num(e && e.spVidaPct) > 0 ? Math.max(1, Math.ceil(num(FichaCalculo.calcular(S).final.hpmax) * num(e.spVidaPct) / 100)) : 0;
   const spDisponible = S => Math.max(0, num(FichaCalculo.calcular(S).final.sp) - num(S.spGastado));
+  // 🔮 Los talismanes que le suman algo a cada varita (la Cabeza reducida, el Muñeco vudú): sus efectos, al final de los de la Ejecución.
+  const conTalismanesVarita = (duelo, items) => {
+    const extra = Combatiente.efectosVarita(items);
+    if(extra.length && duelo && duelo.objetivo !== 'zona') duelo.efectos = [...(Array.isArray(duelo.efectos) ? duelo.efectos : []), ...extra];
+    return duelo;
+  };
   function habDeArmaEspecial(S, it){
     const e = it.especial || {}, f = FichaCalculo.calcular(S).final;
     const suma = Combatiente.sumaEspecialDe(f.dmgesp, e.sumaEspecial);   // para arriba (2026-10-17)
     const dano = String(e.dano || '').trim();
     return {id: claveEsp(it), deItem: it.id, nombre: e.nombre || it.nombre, detalle: it.detalle || '', modo: 'auto',
-      duelo: e.duelo ? structuredClone(e.duelo) : null, tiradaStat: (e.duelo && e.duelo.tira) || 'pdgmg',
+      duelo: e.duelo ? conTalismanesVarita(structuredClone(e.duelo), (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i))) : null, tiradaStat: (e.duelo && e.duelo.tira) || 'pdgmg',
       tiradaExtra: dano ? dano + (suma > 0 ? `+${suma}` : '') : '', ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {}),
       ...(e.portalMapa ? {portalMapa: structuredClone(e.portalMapa)} : {}), ...(e.blink ? {blink: structuredClone(e.blink)} : {}), ...(e.caos ? {caos: structuredClone(e.caos)} : {})};   // (el blink y el caos, 2026-10-08)   // los portales (2026-10-07, Varita del portal aliado)
   }

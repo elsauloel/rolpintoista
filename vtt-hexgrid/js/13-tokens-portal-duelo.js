@@ -1436,6 +1436,12 @@ async function dueloAplicarDano(d){
     if((golpeRayo || rayoMag) && !res.r.invulnerable && typeof aguaConduceRayo === 'function') await aguaConduceRayo(d, t, golpeRayo || rayoMag).catch(err => console.error('El rayo por el agua:', err));
     // El Espejo: 1/4 de todo el daño especial que le tiraron (el de la habilidad y el elemental del arma), antes de la Defensa especial.
     const espejo = res.r.invulnerable ? null : await dueloEspejo(d, (habMagica ? golpe : 0) + (magico ? num(dn.magico.total) : 0));
+    // 🔮 Talismanes (js/53): el Espejito (el daño especial que ENTRÓ) y el Relicario (si el daño especial lo dejó en 0).
+    if(typeof talEspejito === 'function' && !res.r.invulnerable){
+      await talEspejito(d, (habMagica ? num(res.r.recibido) : 0) + (magico ? num(magico.recibido) : 0)).catch(err => console.error('El Espejito:', err));
+      const mato = (habMagica && num(res.previo) > 0 && num(res.nuevo) <= 0) || !!(magico && num(magico.hpAntes) > 0 && num(magico.hpDespues) <= 0);
+      await talRelicario(d, mato).catch(err => console.error('El Relicario:', err));
+    }
     const perdio = Math.max(0, num(res.previo) - num(res.nuevo));
     // Habilidad que drena: todo lo que perdió. Arma que drena (2026-10-03): su % de lo que perdió de verdad (curar redondea para arriba).
     // Una habilidad que drena: lo que perdió, o su % (`drenaPct`, la Sanguijuela: la mitad, para arriba).
@@ -1752,6 +1758,7 @@ async function dueloAplicarEfectoBase(d, ef){
   if(!spec) return {manual: true, nota: 'a mano'};
   const t = tokens.get(d.defensor.tokenId);
   if(!t) return {manual: true, nota: 'el token ya no está: aplicalo a mano'};
+  if(typeof talismanUnaVez === 'function' && !talismanUnaVez(d, ef)) return {nota: 'el talismán ya lo hizo este turno'};   // 🔮 la Cabeza reducida, el Muñeco vudú (js/53)
   if(spec.nombre === 'Demora') return dueloDemora(d.defensor.tokenId);
   if(spec.nombre === 'Miedo' && !spec.miedoDe && d.atacante.tokenId){ spec.miedoDe = d.atacante.tokenId; spec.miedoDeNombre = String(d.atacante.nombre || '').slice(0, 40); }   // 😱 a quién le tiene miedo
   // 🛡 Miti-Miti (Tanque, 2026-10-11): la marca queda en quien la usa, con a quién protege; el reparto del daño lo hace js/10 (mitiMitiDe).

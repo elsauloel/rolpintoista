@@ -463,6 +463,8 @@ const CreepCalculo = (() => {
   const enLasManos = it => /^(arma_|escudo_)/.test(String((it && it.tipoItem) || ''));
   // 💀 El radio del aura espeluznante (la Calavera con vela, 2026-10-18): lo más grande de lo que tiene equipado.
   const auraMiedo = sc => (Array.isArray(sc && sc.equipo) ? sc.equipo : []).reduce((a, it) => Math.max(a, num(it && it.auraMiedo)), 0);
+  // 🔮 Un talismán de su equipo (2026-10-18): lo más grande de ese campo (`espejito`, `relicario`).
+  const talisman = (sc, campo) => (Array.isArray(sc && sc.equipo) ? sc.equipo : []).reduce((a, it) => Math.max(a, num(it && it[campo])), 0);
   function tarjetaPublica(sc){
     const nom = x => String(x || '').trim().slice(0, 60);
     const vivo = num(sc.hp) > 0;
@@ -613,6 +615,7 @@ const CreepCalculo = (() => {
     if(it.durPorPeso) o.durPorPeso = it.durPorPeso;   // durabilidad de diseño (si no es la de siempre)
     if(it.durExtra) o.durExtra = it.durExtra;         // Resistente / Frágil (2026-10-04)
     if(it.auraMiedo) o.auraMiedo = it.auraMiedo;      // 💀 la Calavera con vela (2026-10-18)
+    ['espejito', 'relicario', 'alPegarVarita', 'talisman'].forEach(k => { if(it[k]) o[k] = structuredClone(it[k]); });   // 🔮 talismanes (2026-10-18)
     if(arma && it.armaDeRango) o.armaDeRango = true;
     if(arma) Object.assign(o, Combatiente.rasgosDeItem(it));   // los rasgos del arma (por la espalda, ignora, sin Parry, firmas…)
     if(arma && (it.efectosGolpe || []).length) o.efectosGolpe = structuredClone(it.efectosGolpe);
@@ -666,7 +669,7 @@ const CreepCalculo = (() => {
     return partes.length ? partes.join(' · ') : 'nada';
   }
 
-  return {auraMiedo, enLasManos, regenPasivas, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
+  return {talisman, auraMiedo, enLasManos, regenPasivas, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
     TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto,
     trofeo, despojosDePrecio, dropsResumen, dropsFijos,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,

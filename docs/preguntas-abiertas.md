@@ -1028,3 +1028,21 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   dejar parálisis, que esa probabilidad aumente y que el daño también aumente, todo en un 50 % o el doble» (escuchaba sugerencias). **Quedó:**
   el daño de rayo ×1,5 (para arriba, `AGUA_MULT_RAYO`) y la Parálisis con el doble de chance, a quien está parado en el agua
   (vtt-hexgrid/js/50; comun/duelo.js `aguaParalisis`). Si en la mesa se siente poco, subir a ×2.
+
+- **P204. La Calavera con vela (talismán) — 2026-10-18.** El dueño: «me gusta, pero provocar miedo de forma constante y pasiva me parece medio
+  broken. busquémosle la vuelta». Opciones: (a) activa: una vez por combate, 1 No2, alzás la calavera y los rivales a 2 casillas que te ven
+  tiran Res.Mt o quedan con Miedo 1 turno; (b) una vez por rival: el primero que llega a pegado tuyo tira Res.Mt (una sola vez por combate cada
+  uno); (c) de reacción: cuando te pegan cuerpo a cuerpo, 25 % de que quien te pegó tire Res.Mt o Miedo 1 turno. Hoja: docs/talismanes.md.
+- **P205. La Estampita del Gauchito Gil (talismán) — 2026-10-18.** ¿Afortunado una tirada o N turnos? Opciones: (a) una tirada: una vez por
+  combate repetís una tirada tuya que ya salió y te quedás con la mejor (como el 🧚 Re-roll, sin SP); (b) una vez por combate te ponés
+  Afortunado 1 turno (PdG, Parry y Evasión dos veces, la mejor); (c) empezás el combate Afortunado 2 turnos.
+- **P206. El Muñeco vudú (talismán) — 2026-10-18.** Idea del dueño: al usar la varita contra un rival, queda marcado 1 turno. Falta: (a) solo
+  tus golpes le pegan +1, sin tirada aparte (si la varita entró, queda); (b) +1 al daño de todo el grupo contra él (más fuerte, para más
+  calidad); (c) +1 PdG y +1 daño tuyos. Va con un estado propio («Embrujado»), no con Marcado (que es del sigilo).
+- **P207. El estado Sueño (para el Atrapasueños) — 2026-10-18.** Propuesta: Dormido no actúa ni se mueve, su Evasión es 1 (como Stun), el
+  primer daño que recibe lo despierta; 2 turnos; se resiste con Res.Mt; control (lo frena la Inmunidad a CC). ¿Quién lo da (una varita, creeps)?
+  Si no se define ahora: el Atrapasueños da inmunidad a Pajaritos y Confusión hasta que exista Sueño.
+- **P208. La maldición de la Cabeza reducida (talismán) — 2026-10-18.** Al pegar con una varita (una vez por turno), opciones: (a) la idea
+  original: se le critica más fácil, −1 Res. crítico a todos los Tipos por 2 turnos (le sirve al grupo); (b) Debilitado 1 turno (−1 a sus
+  tiradas; ya existe, pero pisa la Maldición debilitante del Debuffer); (c) Maldito 1 turno (cada SP que gaste le saca vida; pisa la Maldición
+  de la sangre).

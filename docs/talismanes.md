@@ -1,6 +1,7 @@
 # Talismanes (la otra mano) — ideas para más adelante
 
-> **Estado (2026-10-07):** en espera. El dueño: «muchas ideas me gustan, pero requieren cierta atención y ajuste; vamos de menos a más».
+> **Estado (2026-10-18):** en curso. El dueño eligió de la lluvia de ideas (ver «Elegidos», abajo); faltan 5 preguntas (P204–P208) y los
+> números por calidad. Antes (2026-10-07): en espera. El dueño: «muchas ideas me gustan, pero requieren cierta atención y ajuste; vamos de menos a más».
 > Se retoma cuando el dueño diga «sigamos con los talismanes». Mientras tanto, solo se consolidan los **orbes** que ya existen (Defensa
 > especial + resistencias elementales). Ver `docs/rework-defensa.md` («La otra mano»).
 
@@ -75,3 +76,41 @@ en un talismán sería la excepción (a decidir).
 
 Reservado para otros slots (no va en talismanes): el ahorro en varitas (cinturón), el Rango de casteo (afuera por ahora), usar varitas sin
 salir del sigilo (cabeza, desde Raro).
+
+## Elegidos (dueño, 2026-10-18)
+
+Lo que el dueño marcó de la lista, con sus cambios. Lo que no nombró queda afuera por ahora (ver al final).
+
+**Sin preguntas («sí» o con el cambio ya dicho)**
+| Talismán | Qué hace |
+|---|---|
+| Farol | Luz portada +2 · Visión +1 |
+| Bola de cristal | Te avisa que hay algo oculto dentro de tu campo de visión (un rival en sigilo, una trampa escondida), sin decir dónde ni revelarlo · Percepción +1 |
+| Brújula del baqueano | Iniciativa +1 · la niebla no te tapa la vista (ves a través de una nube de niebla; no la niebla de guerra) |
+| Feto de llama (ofrenda a la Pachamama) | Regeneración de vida +1 · Res. tóxico +1 |
+| Ekeko | +20 % de oro al final del combate (solo tu parte) · +3 ranuras de mochila |
+| Sahumerio de palo santo | Al empezar tu turno, 25 % (4 en d4) de sacarte un estado malo, al azar entre los que tengas |
+| Campana de bronce | Una vez por combate, 1 No2: a los aliados a 2 casillas o menos les saca Sueño, Pajaritos y Confusión |
+| Piedras de elemento (brasa, escarcha, tormenta, pantano, corrosiva) | Resistencia a su elemento +3 como mínimo (Común +3; las de más calidad, más) |
+| Piedra bezoar | Res. tóxico +2 · una vez por combate te saca el Veneno |
+| Espejito de bolsillo | 25 % (4 en d4) de devolverle a quien te pegó 1/4 del daño especial que recibiste |
+| Contrahechizo | Una vez por combate anulás un efecto especial que te tiren, si ganás tu Ef.Esp contra el suyo |
+| Brasa en un frasco (uno por elemento) | +2 al daño de ese elemento que hacés (la excepción a la Afinidad «a todo el daño mágico», decidida) |
+| Grimorio gastado | PdG.Esp +1 · SP máximo +2 |
+| Frasco de tormenta | Tus relámpagos saltan una casilla más lejos (el salto eléctrico, de 4 a 5) |
+| Botella con un diablito | Al usar una varita podés destaparla: +1d4 al daño; si el d4 sale 1, no suma y te quema a vos (1d4 de fuego directo) |
+| De sangre | Al matar con una varita, +5 de vida |
+| Mate con termo | Empezás el combate con 1 No2 de más (por encima del máximo; si no lo gastás, se va en la primera recarga) |
+| Estandarte chico (4 versiones) | Los aliados al lado tuyo: +1 Res.CC · +2 Res.Mt · +1 Defensa · +1 Defensa especial (una versión cada uno) |
+
+**Con preguntas (P204–P208 en `preguntas-abiertas.md`)**
+| Talismán | Lo que dijo el dueño |
+|---|---|
+| Calavera con vela (P204) | «me gusta, pero provocar miedo de forma constante y pasiva me parece medio broken. busquémosle la vuelta» |
+| Estampita del Gauchito Gil (P205) | «¿Afortunado para sólo una tirada? ¿O durante N turnos?» · Defensa especial +1 |
+| Muñeco vudú (P206) | «Definir mecánica, turnos, tiradas. Podría ser que siempre que uses la varita contra un rival, quede marcado 1 t» |
+| Atrapasueños (P207) | «Podría ser, habría que imaginar sueño» (el estado Sueño no existe todavía) |
+| Cabeza reducida de jíbaro (P208) | Al pegar con una varita, una maldición «a definir» · Res.Mt +2 |
+
+**Quedan afuera por ahora** (no los eligió): Ruda macho, Huesos de adivinar, Orbe de cuarzo opaco, Orbe cambiante, Orbe que se carga,
+Segunda oportunidad, Amortiguador, Cáscara, Anclaje, Piedra de afilar arcana, Cuerno de toro, De la calma, Guía, Pata de conejo, Bolsa de sal gruesa.

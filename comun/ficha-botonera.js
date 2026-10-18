@@ -276,7 +276,8 @@ const FichaBotonera = (() => {
     const mtEva = ModTirada.tile(S.efectos, 'eva'), mtParry = ModTirada.tile(S.efectos, 'parry'), mtBloqueo = ModTirada.tile(S.efectos, 'bloqueo');
 
     // Percepción: tirada de Destreza (con dado más alto si tiene la pasiva Percepción aumentada).
-    html += `<div class="botonera-caja" style="margin-bottom:8px"><button type="button" class="ejecutar-btn" data-botoneraaccion="percepcion" style="width:100%" title="Tirada de percepción: tu Destreza${tienePercepcionAumentada(S) ? ', con un dado más alto (Percepción aumentada)' : ''}">🔎 Tirar percepción${tienePercepcionAumentada(S) ? ' · dado más alto' : ''}</button></div>`;
+    // (2026-10-18, dueño: abajo de la caja de las Tiradas de stats; se arma acá y se pone allá)
+    const btnPercepcion = `<div style="margin-top:8px"><button type="button" class="ejecutar-btn" data-botoneraaccion="percepcion" style="width:100%" title="Tirada de percepción: tu Destreza${tienePercepcionAumentada(S) ? ', con un dado más alto (Percepción aumentada)' : ''}">🔎 Tirar percepción${tienePercepcionAumentada(S) ? ' · dado más alto' : ''}</button></div>`;
 
     // Sentado: levantarse cuesta 1 No2.
     if(efectoSentado(S)){
@@ -415,6 +416,7 @@ const FichaBotonera = (() => {
           </button>`;
         }).join('')}</div>`).join('')}
       </div>
+      ${btnPercepcion}
     </div>
   </div>`;
 

@@ -370,6 +370,7 @@ const CreepAcciones = (() => {
     const esArma = auto && !h.trampaColocar && Combatiente.tipoEjecucion(h.duelo) === 'arma';   // ataque con arreglos: al duelo como un ataque
     if(esArma) ui.lanzarAtaque(sc, h);
     else if(h.trampaColocar) ui.colocarTrampa(sc, h, auto);
+    else if(h.caos){ ui.mesaHabilidad(sc, h); if(ui.caos) ui.caos(sc, h); else ui.toast(`${h.nombre}: el objetivo se elige en el mapa (⚔ Acciones)`); }   // 🎲 la Varita del caos (2026-10-18)
     else if(auto && h.refuerzos){ ui.mesaHabilidad(sc, h); if(ui.refuerzos) ui.refuerzos(sc, h); else ui.toast(`${h.nombre}: los refuerzos se eligen desde el mapa (⚔ Acciones)`); }
     else if(esZona){ ui.mesaHabilidad(sc, h); if(!ui.colocarZona(sc, h)) ui.toast(`${h.nombre}: para colocar la zona hace falta ejecutarla desde el mapa (⚔ Acciones)`); }
     // Con tirada, la descripción viaja con ella (una sola línea en la Mesa).
@@ -377,7 +378,7 @@ const CreepAcciones = (() => {
     else if(hDuelo && roboEnSigilo(sc, h)){ /* 🫳 un robo en sigilo no se anuncia (2026-10-14, dueño; vtt-hexgrid/js/47) */ }
     else ui.mesaHabilidad(sc, h);
     if(esArma){ /* ya fue al duelo */ }
-    else if(hDuelo) ui.lanzarDuelo(sc, h, hDuelo);
+    else if(hDuelo && !h.caos) ui.lanzarDuelo(sc, h, hDuelo);
     else if(habTira(h) && !h.trampaColocar && !esZona && !h.refuerzos) ui.publicar(sc, tiradaPrimeraHab(sc, h));
     if(h.estadoObjetivo) ui.elegirObjetivo(sc, h);   // a quién le pegó: se le aplica el estado solo
     const partes = [`ejecutada`, costo ? `−${fmt(costo)} No2 (quedan ${fmt(p.nitros)})` : 'sin costo de No2'];
@@ -456,7 +457,8 @@ const CreepAcciones = (() => {
     const suma = Combatiente.sumaEspecialDe(C().statValor(sc, 'dmgesp'), e.sumaEspecial);   // para arriba (2026-10-17)
     return {id: 'esp:' + it.id, deItem: it.id, nombre: e.nombre || it.nombre, detalle: it.detalle || '', modo: 'auto', duelo: e.duelo ? structuredClone(e.duelo) : null,
       tiradaStat: (e.duelo && e.duelo.tira) || 'pdgmg', tiradaExtra: dano ? dano + (suma > 0 ? '+' + suma : '') : '',
-      ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {}), nitrosCosto: costoEspecialCreep(sc, it).no2, cd: 0};
+      ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {}), ...(e.caos ? {caos: structuredClone(e.caos)} : {}),   // la Varita del caos (2026-10-18)
+      nitrosCosto: costoEspecialCreep(sc, it).no2, cd: 0};
   }
   // Cobra y arma el plan (lo mismo que ejecutarHab, con la espera y los orbes). {error} o el plan, con `hab` (la habilidad de la varita).
   function usarEspecialCreep(sc, itemId, presets, silencioOk){

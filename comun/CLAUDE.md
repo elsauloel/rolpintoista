@@ -1605,3 +1605,9 @@ versión parecida en más de una, es candidato a juntar.
   tirarla a mano»): ya estaba (2026-10-15) en el PdG, la defensa, la Fuerza del golpe, el Bloqueo y el daño (con qué Defensa resta); se sumaron
   el **crítico** (`manualCriticoHtml`: los d20 escritos → `tirarCritico(id, aMano)`) y los **efectos** (`manualEfectosHtml`: «✔ Funcionó» /
   «✘ No funcionó» por cada uno → `tirarEfecto(id, i, {exito})`; el tablero muestra ✍).
+- **`rodillo.js`** (`Rodillo`, 2026-10-18, dueño: «el rodillo quedará como opción para ocasiones que lo ameriten») — **un sorteo con su momento**:
+  `Rodillo.girar({titulo, subtitulo, opciones: [{nombre, detalle, extra}], elegido, girar, aplicar, ms, auto})` → Promise al tocar «Aplicar». El
+  resultado ya viene decidido (`elegido`): el rodillo muestra los nombres pasando de abajo hacia arriba, frenando hasta clavarse en el elegido, y
+  después «¡Salió X!» con su detalle y `extra`. Lo usa la Varita del caos (vtt-hexgrid/js/13: `caosAnunciarD20` → `caosRodillo`). Los creeps
+  también usan la varita: `CreepAcciones.habDeEspecialCreep` lleva `caos` y `terminarHab` llama `ui.caos` (js/12).
+

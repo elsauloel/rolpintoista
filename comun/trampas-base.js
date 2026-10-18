@@ -47,8 +47,8 @@
     "Trampa de escarcha": {"estado": "Escarcha", "estadoTurnos": 3, "salvacion": {"stat": "resmg", "etq": "Res.Esp", "dif": 12, "que": "efecto"}, "detectar": 8},
     "Descarga eléctrica": {"estado": "Stun", "estadoTurnos": 1, "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 12, "que": "efecto"}, "detectar": 8},
     "Succión arcana": {"efectoManual": "drena 2d6 de SP (la mitad si resiste)", "salvacion": {"stat": "resm", "etq": "Res.Mt", "dif": 12, "que": "efecto"}, "detectar": 8},
-    "Espejo de discordia": {"estado": "Pajaritos", "estadoTurnos": 3, "efectoManual": "ve a sus aliados como enemigos hasta su próximo turno", "salvacion": {"stat": "resm", "etq": "Res.Mt", "dif": 14, "que": "efecto"}, "detectar": 8},
-    "Portal cósmico": {"estado": "Pajaritos", "estadoTurnos": 3, "efectoManual": "lo teletransporta a 10 casillas (elige el GM)", "salvacion": {"stat": "resm", "etq": "Res.Mt", "dif": 16, "que": "efecto"}, "detectar": 8},
+    "Espejo de discordia": {"estado": "Pajaritos", "estadoTurnos": 3, "efectoManual": "ve a sus aliados como enemigos hasta su próximo turno", "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 14, "que": "efecto"}, "detectar": 8},
+    "Portal cósmico": {"estado": "Pajaritos", "estadoTurnos": 3, "efectoManual": "lo teletransporta a 10 casillas (elige el GM)", "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 16, "que": "efecto"}, "detectar": 8},
     "Trampa de teleport": {"detectar": 8}
   };
   const ficha = nombre => FICHA_TRAMPAS[nombre] ? JSON.parse(JSON.stringify(FICHA_TRAMPAS[nombre])) : {detectar: 8};
@@ -138,9 +138,9 @@
   tr('Succión arcana', 3, ['debuff', 'mágica'], 'flor', 1, '#5B7FA6', '',
     'Drena 2d6 de SP a quien la pise (a mano): la mitad si supera Res.Mt contra 12. No hace daño.');
   tr('Espejo de discordia', 4, ['control', 'mágica'], 'flor', 1, '#C9A3EA', '',
-    'Pajaritos 2 turnos y ve a sus aliados como enemigos hasta su próximo turno (a mano). Res.Mt contra 14 lo evita.');
+    'Pajaritos 2 turnos y ve a sus aliados como enemigos hasta su próximo turno (a mano). Res.CC contra 14 lo evita.');
   tr('Portal cósmico', 5, ['control', 'mágica'], 'flor', 2, '#9B5FD0', '',
-    'Teletransporta a quien lo pise a un punto al azar a 10 casillas (elige el GM) y lo deja Pajaritos 1 turno (a mano). Res.Mt contra 16 lo evita.');
+    'Teletransporta a quien lo pise a un punto al azar a 10 casillas (elige el GM) y lo deja Pajaritos 1 turno (a mano). Res.CC contra 16 lo evita.');
 
   window.TRAMPAS_BASE = lista;
 })();

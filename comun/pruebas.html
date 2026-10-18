@@ -803,7 +803,7 @@ prueba('Parry a distancia (Shooter, 2026-10-12): siempre 2 SP (no es Flash), la 
   igual([hab.costo, hab.nitrosCosto, hab.turnoAjenoSp, hab.parryDistancia, /Sin auditar/.test(hab.detalle), /Parry a distancia \[2\]/.test(hab.original), Plantillas.limpiar('skills', hab).parryDistancia, typeof Duelo.marcarDodgeArco],
     ['2', 0, undefined, true, false, true, true, 'function']);
 });
-prueba('Confusión (Debuffer, 2026-10-12): 5 SP y 2 No2, PdG.Esp contra Res.Esp, el estado Confusión de siempre; otra vez renueva los 2 turnos', () => {
+prueba('Confusión (Debuffer, 2026-10-12): 5 SP y 2 No2, PdG.Esp contra Res.Mt (P210), el estado Confusión de siempre; otra vez renueva los 2 turnos', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-confusion');
   const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});
   const presets = estadosPresetFicha(), lista = [];
@@ -811,7 +811,7 @@ prueba('Confusión (Debuffer, 2026-10-12): 5 SP y 2 No2, PdG.Esp contra Res.Esp,
   lista[0].turnos = 1;
   Combatiente.agregarEstado(lista, FichaAcciones.estadoDeSpec({nombre: 'Confusión'}, presets));
   igual([hab.costo, hab.nitrosCosto, ej.tira.stat, ej.contra.map(c => c.stat), (ej.efectos || []).map(e => e.nombre), lista.length, lista[0].turnos, !!lista[0].confusion, /Sin auditar/.test(hab.detalle), /Confusión \[5\]/.test(hab.original)],
-    ['5', 2, 'pdgmg', ['resmg'], ['Confusión'], 1, 2, true, false, true]);
+    ['5', 2, 'pdgmg', ['resm'], ['Confusión'], 1, 2, true, false, true]);
 });
 prueba('Endurecimiento (Support, 2026-10-12): Endurecido +3 Def, +3 Armadura mágica, +1 a las cinco resistencias a crítico; renueva los 2 turnos', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-endurecimiento');

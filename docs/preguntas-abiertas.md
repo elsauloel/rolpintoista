@@ -1042,7 +1042,7 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
 - **P207. El estado Sueño (para el Atrapasueños) — 2026-10-18.** Propuesta: Dormido no actúa ni se mueve, su Evasión es 1 (como Stun), el
   primer daño que recibe lo despierta; 2 turnos; se resiste con Res.Mt; control (lo frena la Inmunidad a CC). ¿Quién lo da (una varita, creeps)?
   Si no se define ahora: el Atrapasueños da inmunidad a Pajaritos y Confusión hasta que exista Sueño.
-- ✅ **P208. La maldición de la Cabeza reducida (talismán) — 2026-10-18; decidida el mismo día.** **Decidido (dueño):** «a la cabeza reducida le vamos a dar +1 al daño especial. Y siempre que pegue con una varita por primera vez en un turno, el objetivo queda maldito» (el estado Maldito de siempre: cada SP que gaste le saca 1 de vida, 2 turnos). Falta confirmar si conserva la Res.Mt +2 de la idea original. Pregunta original: Al pegar con una varita (una vez por turno), opciones: (a) la idea
+- ✅ **P208. La maldición de la Cabeza reducida (talismán) — 2026-10-18; decidida el mismo día.** **Decidido (dueño):** «a la cabeza reducida le vamos a dar +1 al daño especial. Y siempre que pegue con una varita por primera vez en un turno, el objetivo queda maldito» (el estado Maldito de siempre: cada SP que gaste le saca 1 de vida, 2 turnos). Confirmado (dueño): el +1 es al Ef.Esp y conserva la Res.Mt +2. Pregunta original: Al pegar con una varita (una vez por turno), opciones: (a) la idea
   original: se le critica más fácil, −1 Res. crítico a todos los Tipos por 2 turnos (le sirve al grupo); (b) Debilitado 1 turno (−1 a sus
   tiradas; ya existe, pero pisa la Maldición debilitante del Debuffer); (c) Maldito 1 turno (cada SP que gaste le saca vida; pisa la Maldición
   de la sangre).

@@ -114,3 +114,8 @@ Lo que el dueño marcó de la lista, con sus cambios. Lo que no nombró queda af
 
 **Quedan afuera por ahora** (no los eligió): Ruda macho, Huesos de adivinar, Orbe de cuarzo opaco, Orbe cambiante, Orbe que se carga,
 Segunda oportunidad, Amortiguador, Cáscara, Anclaje, Piedra de afilar arcana, Cuerno de toro, De la calma, Guía, Pata de conejo, Bolsa de sal gruesa.
+
+**Para cargarlos al catálogo (2026-10-18, visto probando la Calavera):** un talismán va en la otra mano, pero **no sirve para parrear**. Probando
+con una Calavera armada como escudo de una mano, el duelo la ofrecía como Parry. Al cargarlos, marcarlos como los orbes (`orbe: true`) o con
+una marca propia de talismán que `Combatiente.piezasParaParry` y `armasYEscudosParaParry` dejen afuera.
+

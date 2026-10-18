@@ -499,3 +499,7 @@
   manualmente» en el crítico, escrito 17 → ×3 (la Mesa: «Crítico (1d20, a mano)»). Duelo cancelado sin contar el ataque.
 - [ ] **✍ Los efectos a mano** (2026-10-17): «✔ Funcionó / ✘ No funcionó» en el tablero de efectos; falta un duelo con un arma que tenga
   efectos con chance.
+- ✅ **😤 La Bronca** (2026-10-18, «Test con claude elsaulo», creep de prueba con tope 2): primer golpe → «junta bronca (1/2)» en la Crónica y la
+  Mesa; segundo → explosión de 2 casillas y «¡SE LE SALTÓ LA TÉRMICA!», y la onda arrancó el duelo de área (su PdG contra la Evasión). Falta
+  verla hasta el final en una sesión (los Sentado y el dodge roll de cada uno).
+

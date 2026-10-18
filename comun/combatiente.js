@@ -1261,9 +1261,10 @@ const Combatiente = (() => {
   const sumaEspecialTxt = v => v === true ? 'tu Ef.Esp' : nf(v) === 0.5 ? '½ de tu Ef.Esp' : nf(v) === 0.25 ? '¼ de tu Ef.Esp' : nf(v) ? `${nf(v)} × tu Ef.Esp` : '';
   function porDanoNorm(p){
     if(!p || !String(p.estado || '').trim()) return null;
-    const desde = Math.max(0, Math.round(nf(p.desde))), tope = Math.max(0, Math.round(nf(p.tope)));
+    const desde = Math.max(0, Math.round(nf(p.desde))), tope = Math.max(0, Math.round(nf(p.tope))), turnos = Math.max(0, Math.round(nf(p.turnos)));
+    // `turnos`: cuánto dura el estado que deja (2026-10-17, dueño: la Escarcha del Báculo de escarcha, 1 turno); sin él, la del preset.
     return {estado: String(p.estado).trim().slice(0, 30), cada: Math.max(1, Math.round(nf(p.cada)) || 4), ...(p.mas1 ? {mas1: true} : {}),
-      ...(desde > 1 ? {desde} : {}), ...(tope > 0 ? {tope} : {})};
+      ...(desde > 1 ? {desde} : {}), ...(tope > 0 ? {tope} : {}), ...(turnos > 0 ? {turnos} : {})};
   }
   function stacksPorDano(entro, p){
     const d = Math.max(0, Math.floor(nf(entro))), q = porDanoNorm(p);
@@ -1274,9 +1275,10 @@ const Combatiente = (() => {
   const porDanoTxt = p => {
     const q = porDanoNorm(p);
     if(!q) return '';
-    if(q.tope === 1) return `${q.estado}: 1${q.desde ? ` si entran ${q.desde} o más de daño` : ''}`;
+    const dura = q.turnos ? ` (${q.turnos} turno${q.turnos === 1 ? '' : 's'})` : '';
+    if(q.tope === 1) return `${q.estado}: 1${q.desde ? ` si entran ${q.desde} o más de daño` : ''}${dura}`;
     const base = q.mas1 ? `${q.estado}: 1, y uno más cada ${q.cada} de daño` : `${q.estado}: 1 stack cada ${q.cada} de daño (mínimo 1)`;
-    return base + (q.desde ? `, si entran ${q.desde} o más` : '') + (q.tope ? `, hasta ${q.tope}` : '');
+    return base + (q.desde ? `, si entran ${q.desde} o más` : '') + (q.tope ? `, hasta ${q.tope}` : '') + dura;
   };
   /* ✨ Carga Elemental (Mago, 2026-10-13, dueño): los cinco elementos y lo que le cambian a la Ejecución de la skill de daño. */
   const CARGAS = {

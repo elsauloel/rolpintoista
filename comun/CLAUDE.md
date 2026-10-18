@@ -1596,7 +1596,7 @@ versión parecida en más de una, es candidato a juntar.
 - **El Ef.Esp de un arma especial, para arriba** (2026-10-17, dueño, con el Báculo de escarcha): `Combatiente.sumaEspecialDe(dmgesp, sumaEspecial)`
   (true = entero, 0.5 = la mitad, 0.25 = un cuarto: los seis báculos) redondea **para arriba** y lo usan personajes y creeps; `sumaEspecialTxt`.
   El asistente de ítems ofrece «Un cuarto» (antes borraba el ¼ de un báculo al editarlo). El Báculo de escarcha deja la Escarcha por daño
-  (`duelo.porDano = {estado: 'Escarcha', cada: 5, desde: 5}`: 1 por cada 5 que entran), no por porcentaje. La habilidad (`danoSumaEsp`, Toque
+  (`duelo.porDano = {estado: 'Escarcha', cada: 5, desde: 5, turnos: 1}`: 1 por cada 5 que entran, 1 turno; `porDano.turnos` = cuánto dura lo que deja), no por porcentaje. La habilidad (`danoSumaEsp`, Toque
   mágico) sigue para abajo.
 - **Con qué para un creep o una invocación** (2026-10-17): `Combatiente.piezasParaParry(equipo, slotDe, pesoDe)` — lo de sus manos que sirve
   para parrear (escudos primero, después un báculo o un arma cuerpo a cuerpo; no un orbe, una varita ni un arma de rango), la misma regla que un

@@ -1419,7 +1419,7 @@ async function dueloAplicarDano(d){
 async function dueloPorDano(d, entro){
   const p = d.hab.dano.porDano, stacks = Combatiente.stacksPorDano(entro, p);
   if(!stacks) return null;
-  const r = await dueloAplicarEfecto(d, {nombre: p.estado, spec: {nombre: p.estado, stacks}});
+  const r = await dueloAplicarEfecto(d, {nombre: p.estado, spec: {nombre: p.estado, stacks, ...(num(p.turnos) > 0 ? {turnos: num(p.turnos)} : {})}});   // su duración, si la trae
   return {estado: p.estado, stacks, entro: Math.floor(num(entro)), regla: Combatiente.porDanoTxt(p), ...(r && r.nota ? {nota: String(r.nota).slice(0, 120)} : {}), ...(r && r.manual ? {manual: true} : {})};
 }
 // Los saltos del rayo: al más cercano del mismo bando que el golpeado, la mitad de lo que entró cada salto (rayoCadena / rayoCadenaAplicar, js/10),

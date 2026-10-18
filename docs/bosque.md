@@ -191,5 +191,8 @@ De a uno, de nivel más bajo a más alto; primero el ataque básico y después c
   (2 manos) y **Uñas** (arma natural de emergencia, Tipo 6). El báculo cambió en el catálogo (dueño): ¼ del Ef.Esp **para arriba** (los seis
   báculos) y **1 de Escarcha por cada 5 de daño**, que dura **1 turno** (antes 25 %, 2 turnos); cuesta **2 No2** el primer uso del turno y 3 el segundo (antes 1 y 2: «muy barato»; en Larry era 16 de daño por turno). Con Ef.Esp 14 pega 1d6+4 de hielo: 82 % a Bizzante, 88 % a Petro, 97 % a Larry,
   7,5 cuando pega y siempre deja Escarcha (2 si saca 10). De paso: un creep ahora para con un báculo de sus manos (y no con un orbe).
+  **Después (dueño: «demasiado dejarle el báculo a Larry, lo puede llegar a romper»: con Ef.Esp 19 eran ~16 de daño por turno):** en las manos
+  la **Varita de la ventisca** y el **Orbe del foco** (PdG.Esp +2: el granizo y la ventisca pegan 86 % a Bizzante, 91 % a Petro, 97 % a Larry).
+  Ya no para (una varita y un orbe no parrean; con Parry 1d4 igual le convenía esquivar). El báculo queda en el catálogo con los cambios.
   El granizo cuesta «lo de un ataque» = 3 No2 con las Uñas (antes 5 con el bastón); falta decidir si costo fijo y si suma Ef.Esp.
 

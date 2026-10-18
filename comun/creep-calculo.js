@@ -472,7 +472,9 @@ const CreepCalculo = (() => {
   // lo que tiene en las manos son las armas y los escudos»): armas (también varitas y báculos), escudos, orbes y talismanes.
   const enLasManos = it => /^(arma_|escudo_)/.test(String((it && it.tipoItem) || ''));
   // 💀 El radio del aura espeluznante (la Calavera con vela, 2026-10-18): lo más grande de lo que tiene equipado.
-  const auraMiedo = sc => (Array.isArray(sc && sc.equipo) ? sc.equipo : []).reduce((a, it) => Math.max(a, num(it && it.auraMiedo)), 0);
+  // 💀 El aura espeluznante (el radio): de la Calavera con vela del equipo o de una pasiva propia con su efecto (dueño 2026-10-18: El ocultista).
+  const auraMiedo = sc => [...(Array.isArray(sc && sc.equipo) ? sc.equipo : []), ...(Array.isArray(sc && sc.pasivas) ? sc.pasivas : [])]
+    .reduce((a, it) => Math.max(a, num(it && it.auraMiedo)), 0);
   // 🔮 Un talismán de su equipo (2026-10-18): lo más grande de ese campo (`espejito`, `relicario`).
   const talisman = (sc, campo) => (Array.isArray(sc && sc.equipo) ? sc.equipo : []).reduce((a, it) => Math.max(a, num(it && it[campo])), 0);
   function tarjetaPublica(sc){

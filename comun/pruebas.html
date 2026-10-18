@@ -4432,6 +4432,11 @@ prueba('Talismanes (2026-10-18): el +N a un elemento sale de un anillo del equip
     [4, 'Anillo de escarcha,Frío del cristal', 2, 0]);
 });
 
+prueba('Talismanes (2026-10-18): el aura de la Calavera sale del equipo o de una pasiva del creep', () => {
+  igual([CreepCalculo.auraMiedo({equipo: [{nombre: 'Calavera con vela', auraMiedo: 3}]}), CreepCalculo.auraMiedo({pasivas: [{nombre: 'Amuletos que tintinean', auraMiedo: 3}]}),
+    CreepCalculo.auraMiedo({equipo: [], pasivas: []})], [3, 3, 0]);
+});
+
 prueba('ataque sin arma: tiene daño (provisorio 1d4 + Dmg, P150)', () => {
   igual([FichaCombate.danoSinArmaTxt(3), FichaCombate.danoSinArmaTxt(0), FichaCombate.tipoAtaque(null)], ['1d4 + 3', '1d4', 4]);
 });

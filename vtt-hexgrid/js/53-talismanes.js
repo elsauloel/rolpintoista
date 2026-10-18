@@ -8,6 +8,8 @@
      mismo daño que entró le entra también a quien atacó (`talSalvajeTirar` antes del daño, `talSalvajePropio` después).
    · Orbe del custodio (`orbeCustodio`; 2026-10-18, dueño): cada vez que quien lo lleva gana una tirada de PdG.Esp, Vida extra N a un aliado al
      lado (`talCustodio`, desde el hook `pdgEspGanado` del duelo, en la pantalla de quien tiró; js/26 orbeCustodioMapa).
+   · Botella con un diablito (`botella` = N; 2026-10-18, dueño): +N a todo tu daño especial; si en los dados de ese daño sale algún 1, el diablito
+     te quema N (directo). El +N lo suma dueloAplicarDano (js/13); el aviso y la quemadura, `talBotella`.
    · Orbe de resguardo (`orbeResguardo`; 2026-10-18, dueño: «al ganar una tirada de probabilidad de golpe especial»): Vida extra N para quien lo
      lleva hasta su próximo turno, una vez por turno (`talResguardo`, el mismo hook).
    Quién lo lleva: un personaje lo publica en su resumen (`espejito`, `relicario`, `orbeCustodio`, `orbeSalvaje`, `alDanoEsp`); un creep, en su
@@ -133,3 +135,14 @@ function talPdgEspGanado(d){
   talCustodio(d);
   talResguardo(d).catch(err => console.error('El Orbe de resguardo:', err));
 }
+// La Botella con un diablito: el aviso del +N y, si en los dados del daño especial salió algún 1, la quemadura (directo).
+async function talBotella(d, n, rolls){
+  const ta = tokens.get(d.atacante.tokenId);
+  if(!ta) return;
+  const uno = (rolls || []).some(x => num(x) === 1);
+  if(!uno){ try{ mesaLinea(`😈 La Botella de ${d.atacante.nombre}: el diablito suma +${n} al daño especial`, 'recordatorio'); }catch(err){} return; }
+  const res = ta.tipo === 'pj' && String(ta.fichaId).includes(SEP_INVOCACION) ? await danioInv(ta, String(n), true)
+    : ta.tipo === 'creep' ? await danioCreep(ta, String(n), true) : await danioPj(ta, String(n), true);
+  try{ mesaLinea(`😈 La Botella de ${d.atacante.nombre}: +${n} al daño especial… pero salió un 1 en los dados y el diablito se ríe: a ${d.atacante.nombre} le entran ${fmt(num(res.r.recibido))} de fuego`, 'recordatorio'); }catch(err){}
+}
+

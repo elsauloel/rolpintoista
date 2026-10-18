@@ -1079,7 +1079,7 @@ const Combatiente = (() => {
      CC es el paraguas (la marca `esCC`: la Inmunidad a CC los frena a todos). Adentro, por grupo: los mentales (Res.Mt; además los frena la
      Inmunidad mental) y los del cuerpo (aturdimiento, heridas, sentidos, atrapar, equilibrio, desarme), cada uno con su stat. El estado dice con
      qué se resiste por defecto (los asistentes de la Ejecución y de las trampas lo proponen solos); una habilidad puntual lo puede cambiar.
-     Provisorios (no los cerró el dueño): Silencio como mental y Ceguera con Res.CC. Un estado propio puede traer `grupoCC` o `esMental`. */
+     Silencio como mental y Ceguera con Res.CC: confirmados por el dueño. Un estado propio puede traer `grupoCC` o `esMental`. */
   const GRUPOS_CC = {
     mental: {label: 'Mentales', icono: '🧠', resiste: 'resm', estados: ['Miedo', 'Confusión', 'Provocado', 'Sueño', 'Silencio']},
     aturdimiento: {label: 'Aturdimiento', icono: '💫', resiste: 'rescc', estados: ['Stun', 'Pajaritos', 'Parálisis', 'Exhausto']},

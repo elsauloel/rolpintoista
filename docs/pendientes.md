@@ -212,7 +212,7 @@
 > - [ ] **📏 «Calcular trayectoria» con la R** (dueño, 2026-10-10): que el botón de Rango (R) también permita ver la **línea de tiro** sin ir a
 >   «Atacar», y **elegir el punto de partida y el de llegada** (evaluar cómo sería el tiro desde otro casillero, no solo desde donde está parado).
 >   Reusar `lineaDeTiro` (js/32) y el dibujo de la línea del apuntado.
-> - [ ] **Rework de los anillos** (dueño, 2026-10-10: «ameritan un rework, fueron hechos muy a ojo»).
+> - [ ] **Rework de los anillos** (dueño, 2026-10-10: «ameritan un rework, fueron hechos muy a ojo») **En curso desde el 2026-10-18:** hoja de trabajo en [`rework-anillos.md`](rework-anillos.md).
 > - [ ] **La espada contra armadura** (idea del dueño, 2026-10-10): una espada que combine Rompe armadura, Perfora y Veneno. Medida: 1d6 + Perfora 1 +
 >   Rompe armadura 100 % + Veneno ×2 seguro = Rara (PC 13,1, ~$260); con Rompe armadura 50 %, Buena (10,1); con 25 % y Veneno al 50 %, Común (7,4).
 > - [x] (2026-10-10) Perfora en dagas (su casa, la mitad de cada calidad) y espadas (un cuarto), con 10 armas nuevas — ver [`rework-armas.md`](rework-armas.md).

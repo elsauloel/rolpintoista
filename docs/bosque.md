@@ -214,4 +214,8 @@ De a uno, de nivel más bajo a más alto; primero el ataque básico y después c
 - Chamán goblin (`pdw2b5i`): el **Machete** (Tipo 6, Rompe armadura ×3 50 %) → **Uñas** (natural, Tipo 6, para emergencias) y en esa mano el
   **Muñeco vudú** (PdG.Esp +1 → 13; la primera vez en cada turno que hace daño especial, Debilitado 1 turno). Se va el Rompe armadura del machete
   (casi nunca peleaba cuerpo a cuerpo: Destreza 5). De paso se arregló que GM Tools perdía la mecánica de un talismán al equipárselo a un creep.
+- Chamán del cristal (`rjj6rhe`, minas): las manos como estaban (Varita de la ventisca y Orbe del foco; el dueño no quiso que se suelte un anillo
+  ni la varita para Larry: con Ef.Esp 19 la ventisca lo deja Sentado a casi todos). El efecto del Anillo de escarcha, como **pasiva propia** que
+  no se suelta: **Frío del cristal** (+2 al daño de hielo: el Granizo 1d6+4, la ventisca 1d4+2 a cada uno). Mecánica nueva: una pasiva de creep
+  con `masDanoElem` suma como el anillo (`CreepCalculo.masDanoElem`), probado en el mapa de prueba.
 

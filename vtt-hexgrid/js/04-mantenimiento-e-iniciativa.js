@@ -1000,6 +1000,9 @@ function marcarMovido(id, si){
   try{ localStorage.setItem('movidos-turno', JSON.stringify([...movidosTurno].filter(x => x.endsWith('@' + ahora) || x.endsWith('@' + (ahora - 1))))); }catch(e){}
 }
 window.mapaSeMovio = tokenId => seMovioEsteTurno(tokenId);
+// 🔮 La ronda de combate (2026-10-18, la Estatuilla del Gauchito Gil: una vez por ronda): el número de Mantenimiento de esta partida, que sube al
+// pasar de ronda (a mano o con ▶ Siguiente al dar la vuelta). FichaAcciones.tirarValorStat lo pregunta.
+window.rondaDeCombate = () => `${FB_CAMPANA || ''}:${Math.round(num(mantenimientoNumero))}`;
 // Lento: lo que se suma al primer casillero si todavía no se movió en este turno (0 si no está Lento o si no se puede mover).
 // El «primer paso doble» de unas piernas pesadas (2026-10-06, dueño: «Movimiento −1» traducido) hace lo mismo; no se suman entre sí.
 function lentoRecargo(t, porCasillero){

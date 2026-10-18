@@ -407,11 +407,19 @@ const FichaAcciones = (() => {
     }
     if(sobrepeso === 'penal') extra = num(extra) - num(sobre);
     // La tirada en sí (Afortunado, mitades, Evasión mínimo 1) es la del motor común: comun/combatiente.js.
-    // 🔮 La Estatuilla del Gauchito Gil: la primera de estas tiradas de la ronda, como Afortunado (Combatiente.conGauchito).
+    // 🔮 La Estatuilla del Gauchito Gil: una sola tirada por RONDA (dueño, 2026-10-18: «una vez por ronda, independientemente de a qué tirada
+    // afecte»), la primera de PdG, PdG.Esp, Evasión o Parry, como Afortunado (Combatiente.conGauchito). En el mapa la ronda la dice
+    // window.rondaDeCombate (la marca queda en S.meta.gauchitoRonda); sin el mapa, se renueva al empezar su turno (S.ataquesArma._gauchito).
     const tieneG = (S.inventario || []).some(i => i && i.equipado && i.gauchito && !FichaCalculo.itemRoto(i));
-    const conG = Combatiente.conGauchito(S.efectos, statId, tieneG, num((S.ataquesArma || {})._gauchito));
+    const ronda = typeof window !== 'undefined' && typeof window.rondaDeCombate === 'function' ? window.rondaDeCombate() : null;
+    const usadoG = ronda !== null && ronda !== undefined ? (S.meta && S.meta.gauchitoRonda) === ronda : num((S.ataquesArma || {})._gauchito) > 0;
+    const conG = Combatiente.conGauchito(S.efectos, statId, tieneG, usadoG);
     const r = Combatiente.tirarStat(valor, conG || S.efectos, statId, {extra});
-    if(conG && r){ S.ataquesArma = {...(S.ataquesArma || {}), _gauchito: 1}; ui.cambio(['nitros']); }
+    if(conG && r){
+      S.ataquesArma = {...(S.ataquesArma || {}), _gauchito: 1};
+      if(ronda !== null && ronda !== undefined) S.meta = {...(S.meta || {}), gauchitoRonda: ronda};
+      ui.cambio(['nitros']);
+    }
     if(sobrepeso === 'penal') r.estados.push({n: 'Sobrepeso', p: 'debuff'});
     else if(sobrepeso === 'pagado') r.estados.push({n: 'Sobrepeso (pagó 1 No2)', p: 'otro'});
     ui.registrarTirada(nombre, r);

@@ -94,7 +94,42 @@ function superficieDibujar(el, celdas, z){
   // borde desparejo y borroso, en vez de hexágonos.
   const nube = nubeColor(el);
   if(nube){ nubeDibujar(celdas, nube, z); return {anima: false, sinBorde: true}; }
+  if(esFuego(el)){ fuegoDibujar(celdas, z); return {anima: true, sinBorde: true, fuego: true}; }
   return null;
+}
+/* 🔥 Lo que arde (dueño, 2026-10-17: «para superficies incendiadas, buscate algún tipo de textura»): el terreno incendiado y las zonas de fuego.
+   Una mancha de brasas (rojo oscuro, borde desparejo y un poco borroso), encima un resplandor naranja-amarillo por casilla que titila, y
+   chispas que suben y se apagan. Todo dibujado (sin imágenes). */
+function fuegoDibujar(celdas, z){
+  const s = performance.now() / 1000, lista = celdas.slice(0, 120);
+  ctx.save();
+  ctx.filter = `blur(${Math.max(1, HEX * 0.08 * z * (typeof dpr === 'number' ? dpr : 1)).toFixed(1)}px)`;
+  trazarManchon(celdas, {radio: [0.42, 0.22], sale: [-0.04, 0.2]});
+  ctx.fillStyle = 'rgba(120,28,8,.55)'; ctx.fill();
+  ctx.filter = 'none';
+  ctx.globalCompositeOperation = 'lighter';
+  lista.forEach(c => {
+    const p = hexCentro(c.col, c.fila);
+    for(let k = 0; k < 2; k++){   // dos focos por casilla, corridos y cada uno con su ritmo
+      const a = superficieAzar(c.col, c.fila, 50 + k), b = superficieAzar(c.col, c.fila, 60 + k);
+      const f = (Math.sin(s * (3 + 2 * a) + b * 6.28) + Math.sin(s * (5.3 + a) + a * 9)) / 4 + 0.5;   // 0–1, desparejo
+      const x = p.x + (a - 0.5) * HEX * 0.7, y = p.y + (b - 0.5) * HEX * 0.6, r = HEX * (0.42 + 0.18 * f);
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, `rgba(255,220,110,${(0.32 + 0.25 * f).toFixed(2)})`);
+      g.addColorStop(0.45, `rgba(255,120,30,${(0.22 + 0.15 * f).toFixed(2)})`);
+      g.addColorStop(1, 'rgba(200,40,0,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+    }
+    // Chispas: suben, se corren un poco y se apagan.
+    for(let k = 0; k < 3; k++){
+      const a = superficieAzar(c.col, c.fila, 70 + k), b = superficieAzar(c.col, c.fila, 80 + k);
+      const v = ((s * (0.35 + 0.3 * a)) + b) % 1;
+      const x = p.x + (a - 0.5) * HEX * 0.9 + Math.sin(s * 2 + a * 10) * HEX * 0.08, y = p.y + HEX * 0.35 - v * HEX * 1.1;
+      ctx.fillStyle = `rgba(255,${Math.round(170 + 60 * (1 - v))},80,${(0.85 * (1 - v)).toFixed(2)})`;
+      ctx.beginPath(); ctx.arc(x, y, Math.max(1.2 / z, HEX * 0.045 * (1 - v * 0.5)), 0, Math.PI * 2); ctx.fill();
+    }
+  });
+  ctx.restore();
 }
 // La mancha: las casillas enteras más una «panza» redonda en cada lado de afuera (tamaño y salida al azar, fijos por casilla).
 function trazarManchon(celdas, o){
@@ -165,7 +200,12 @@ function aguaRayo(t, elemento, monto){
 /* 🔥 El fuego seca el charco (dueño, 2026-10-17). Lo revisa el GM: las casillas de agua que quedan bajo un terreno incendiado o una zona de fuego
    se van (el charco se rehace con las que quedan; si no queda ninguna, se borra). */
 const aguaSecando = new Set();
-function esFuego(el){ return !!el && (el.fuego || (el.zona && /fuego/i.test(String(el.zonaDanoTipo || '')))); }
+function esFuego(el){
+  if(!el) return false;
+  if(el.fuego || (el.zona && /fuego/i.test(String(el.zonaDanoTipo || '')))) return true;
+  if(el.zona && el.trampa){ try{ return (JSON.parse(el.trampaEstado || '{}') || {}).elemento === 'fuego'; }catch(err){} }   // la zona que deja una trampa de fuego (la Mina napalm)
+  return false;
+}
 async function aguaRevisarFuego(){
   if(!soyGM || !elementos || !elementos.size) return;
   const fuego = new Set();

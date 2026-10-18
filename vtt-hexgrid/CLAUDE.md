@@ -1655,4 +1655,6 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   Resbalarse en el hielo lo deja en esa casilla y le devuelve los No2 de los pasos que no dio. **Nubes**: una zona de gas (tóxica, o «gas, nube,
   humo, miasma, pedos, esporas, vapor, niebla» en el nombre) y la niebla de una varita se dibujan como una mancha de borde desparejo y borroso
   (`nubeColor`, `nubeDibujar`: verde lo tóxico, violeta el resto de los gases, gris la niebla).
+  **Fuego**: el terreno incendiado y las zonas de fuego (`esFuego`, también la zona de una trampa de fuego) se dibujan con una textura propia
+  (`fuegoDibujar`: mancha de brasas, resplandor que titila y chispas que suben; reemplaza las llamitas 🔥).
 

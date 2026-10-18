@@ -490,7 +490,7 @@ function dibujarLienzo(){
       ctx.save();
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.font = `${Math.max(10, 16 / z)}px system-ui, sans-serif`;
-      celdas.slice(0, 60).forEach(c => { const p = hexCentro(c.col, c.fila); ctx.fillText('🔥', p.x, p.y); });
+      if(!(sup && sup.fuego)) celdas.slice(0, 60).forEach(c => { const p = hexCentro(c.col, c.fila); ctx.fillText('🔥', p.x, p.y); });   // con la textura de fuego (js/50), sin las llamitas
       const cm = celdas[Math.floor(celdas.length / 2)], pm = hexCentro(cm.col, cm.fila);
       ctx.font = `700 ${11 / z}px "Space Mono", monospace`;
       const txt = `${num(el.fuegoDano) || 5}`, w = ctx.measureText(txt).width + 8 / z, h = 15 / z;

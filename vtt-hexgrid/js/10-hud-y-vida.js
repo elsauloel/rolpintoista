@@ -213,9 +213,11 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : creepDefensaMapa(sc) + extra) + num(restaExtra || 0), sc.estados);
     const previo = num(sc.hp);
     sc.hp = Math.max(0, previo - r.recibido);
-    return {r, previo, nuevo: sc.hp};
+    const bronca = typeof broncaSumar === 'function' ? broncaSumar(sc, r) : null;   // 😤 cada golpe que le duele suma (js/51)
+    return {r, previo, nuevo: sc.hp, bronca};
   });
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
+  if(res.bronca && typeof broncaAnunciar === 'function') broncaAnunciar(t, res.bronca);
   if(guarda && golpe > 0) guardianAviso(t, guarda);
   if(muro && golpe > 0) muroAviso(t, muro);
   await cosechaSiMuere(t, res);

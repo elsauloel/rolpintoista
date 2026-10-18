@@ -223,4 +223,10 @@ De a uno, de nivel más bajo a más alto; primero el ataque básico y después c
   **pasiva propia**, **Amuletos que tintinean** (la nota ya hablaba de sus amuletos): aura de 3, el rival que entra tira Res.Mt contra su Ef.Esp 11
   o queda con Miedo. Es la respuesta a Petro (Esp 5), que lo iría a buscar; Larry (Res.Mt 19) casi siempre la resiste. No se suelta. Mecánica:
   `CreepCalculo.auraMiedo` lee también las pasivas (probado en el mapa de prueba); los textos del cartel dicen «aura espeluznante».
+- Kobold hongero (`knh89mu`, minas): las manos como estaban (Varita del caos y Escudo de bronce con runas) y el efecto del Estandarte del muro como
+  **pasiva propia** con **rango 2** (dueño): **Esporas de corteza**, sus aliados a 2 casillas o menos tienen +1 Defensa mientras sigan cerca
+  (estado «🚩 Esporas de corteza»; con la pantalla del GM abierta). Mecánica nueva: el `estandarte` puede llevar `rango` (sin él, al lado) y
+  sale también de una pasiva (`CreepCalculo.estandartes`), probado en el mapa de prueba.
+- **Resumen:** de los seis casters, tres cambiaron (Chamán goblin: Muñeco vudú en la mano; Chamán del cristal, El ocultista y Kobold hongero:
+  el efecto de un talismán como pasiva propia, que no se suelta) y tres quedaron igual (farolero, maldiciente y, en las manos, el del cristal).
 

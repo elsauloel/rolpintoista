@@ -134,3 +134,9 @@ una marca propia de talismán que `Combatiente.piezasParaParry` y `armasYEscudos
 - **Orbe salvaje (decidido):** con 1, el daño que le hacés al rival te lo hacés también a vos (los dos).
 - **Programado (2026-10-18):** el salvaje, el domado, el custodio, la Cabeza, el Vudú y el Maldito de los creeps (vtt-hexgrid/js/53, comun/creep-acciones.js). El Orbe de resguardo también (al ganar el PdG.Esp).
 
+**El efecto de un talismán como pasiva de un creep (2026-10-18, dueño):** para que un creep tenga lo de un talismán sin soltarlo como botín, se le
+pone una pasiva propia (no del pool) con el mismo campo que el ítem. Funcionan así: `masDanoElem` (el +N a un elemento: `CreepCalculo.masDanoElem`),
+`auraMiedo` (el aura de la Calavera: `CreepCalculo.auraMiedo`) y `estandarte`, que además puede llevar `rango` (sin él, al lado:
+`CreepCalculo.estandartes`). Los demás (Espejito, Bezoar…) todavía leen solo el equipo: sumarlos igual si hace falta. Usado en el Chamán del
+cristal, El ocultista y el Kobold hongero (ver `bosque.md`).
+

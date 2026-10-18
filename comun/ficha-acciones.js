@@ -968,6 +968,13 @@ const FichaAcciones = (() => {
       ui.toast(`${origen ? origen + ': ' : ''}−${fmt(n)} SP (${fmt(antes)} → ${fmt(antes - n)})`);
       return;
     }
+    // «Quitar estado» (2026-10-18, los Estandartes: el aliado se alejó): saca ese estado entero, sin aviso si ya no estaba.
+    if(spec.nombre === 'Quitar estado'){
+      const antes = (S.efectos || []).length;
+      S.efectos = (S.efectos || []).filter(x => !(x && x.nombre === spec.estado));
+      if(S.efectos.length !== antes) ui.cambio(['efectos', 'refresh']);
+      return;
+    }
     // «Acortar estado» (2026-10-04, Recuperarse rápido de los pies): le saca `stacks` turnos al estado `estado` (si llega a 0, se va).
     if(spec.nombre === 'Acortar estado'){
       const e = (S.efectos || []).find(x => x && x.activo !== false && x.nombre === spec.estado && !x.permanente);

@@ -120,12 +120,13 @@ const FichaResumen = (() => {
       // 💀 La Calavera con vela (2026-10-18): el radio de su aura espeluznante y el Ef.Esp con que asusta (el mapa, js/52).
       auraMiedo: (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.auraMiedo)), 0),
       // 🔮 Talismanes (2026-10-18): el Espejito (% que devuelve) y el Relicario (Vida extra al matar con daño especial). El mapa los mira (js/53).
-      ...Object.fromEntries(['espejito', 'relicario', 'orbeCustodio', 'orbeResguardo', 'botella', 'saltoMas', 'ekeko'].map(k => [k, (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i[k])), 0)]).filter(([, v]) => v)),
+      ...Object.fromEntries(['espejito', 'relicario', 'orbeCustodio', 'orbeResguardo', 'botella', 'saltoMas', 'ekeko', 'bolaCristal'].map(k => [k, (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i[k])), 0)]).filter(([, v]) => v)),
       // El Orbe salvaje (el más fuerte que tenga: 'domado' o true) y lo que dejan la Cabeza reducida y el Muñeco vudú al hacer daño especial (js/53).
       ...(() => { const eq = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)); const sv = eq.find(i => i.orbeSalvaje === 'domado') || eq.find(i => i.orbeSalvaje);
         const td = Combatiente.talismanesDanoEsp(eq);
         const me = {}; eq.forEach(i => { if(i.masDanoElem && i.masDanoElem.el) me[i.masDanoElem.el] = num(me[i.masDanoElem.el]) + num(i.masDanoElem.n); });   // 💍 los anillos elementales
-        return {...(Object.keys(me).length ? {masDanoElem: me} : {}), ...(sv ? {orbeSalvaje: sv.orbeSalvaje === 'domado' ? 'domado' : 'salvaje', orbeSalvajeNombre: String(sv.nombre || '').slice(0, 40)} : {}), ...(td.length ? {alDanoEsp: td} : {})}; })(),
+        const est = eq.filter(i => i.estandarte && i.estandarte.stat).slice(0, 4).map(i => ({stat: String(i.estandarte.stat), val: num(i.estandarte.val), nombre: String(i.nombre || '').slice(0, 40)}));   // 🚩 los estandartes
+        return {...(est.length ? {estandartes: est} : {}), ...(Object.keys(me).length ? {masDanoElem: me} : {}), ...(sv ? {orbeSalvaje: sv.orbeSalvaje === 'domado' ? 'domado' : 'salvaje', orbeSalvajeNombre: String(sv.nombre || '').slice(0, 40)} : {}), ...(td.length ? {alDanoEsp: td} : {})}; })(),
       dmgesp: n(c.final.dmgesp),
       levitar: n(c.final.levitar), suelagruesa: n(c.final.suelagruesa), embestida: n(c.final.embestida), pasodoble: n(c.final.pasodoble),   // piernas (2026-10-06)
       emergencia: n(c.final.emergencia), emergenciaUsada: !!S.emergenciaUsada,

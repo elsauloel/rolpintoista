@@ -54,6 +54,7 @@ const Recibidos = (() => {
     if(!invId){ FichaAcciones.aplicarEstadoRecibido(S, sp, origen, ui); return {}; }
     const inv = (S.invocaciones || []).find(i => i && i.id === invId);
     if(!inv){ ui.toast(`${origen ? origen + ': ' : ''}${sp.nombre} — la invocación ya no está`); return {}; }
+    if(sp.nombre === 'Quitar estado'){ inv.estados = (inv.estados || []).filter(x => !(x && x.nombre === sp.estado)); return {inv}; }   // los Estandartes (2026-10-18)
     if(sp.nombre === 'Acortar estado'){   // Recuperarse rápido (2026-10-04): le saca turnos a un estado de la invocación
       const e = (inv.estados || []).find(x => x && x.activo !== false && x.nombre === sp.estado && !x.permanente);
       if(!e){ ui.toast(`${inv.nombre}: ya no tiene ${sp.estado}`); return {}; }

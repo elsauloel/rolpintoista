@@ -239,4 +239,66 @@ async function talismanAccion(fichaId, itemId){
     }catch(err){ console.error('El mate:', err); toast('🧉 No se pudo pasar el mate: a mano'); }
   }
 }
+/* 🔮 La Bola de cristal (2026-10-18, dueño): al empezar el turno de quien la lleva, si dentro de su campo de visión hay algo oculto para los
+   jugadores (un creep en sigilo, una trampa del GM sin disparar ni descubrir), se anuncia junto con el inicio del turno (js/04
+   inicioTurnoPendiente, en la pantalla del GM, que ve todo). Sin decir dónde ni qué. → el paso del cartel, o null. */
+function bolaCristalAviso(t){
+  const f = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]);
+  if(!(f && f.resumen && f.resumen.bolaCristal) || typeof celdasVisionDe !== 'function') return null;
+  const vista = new Set(celdasVisionDe(t));
+  const enVista = (col, fila) => vista.has(nbPack(col, fila));
+  let hay = false;
+  tokens.forEach(x => { if(!hay && x && x.tipo === 'creep' && !x.oculto && !x.bajoTierra && typeof enSigilo === 'function' && enSigilo(x) && enVista(x.col, x.fila)) hay = true; });
+  if(!hay) elementos.forEach(el => { if(!hay && el && el.trampa && !el.disparada && !el.descubierta && typeof trampaEsDelGM === 'function' && trampaEsDelGM(el)
+    && celdasDeElemento(el).some(c => enVista(c.col, c.fila))) hay = true; });
+  return hay ? {titulo: '🔮 Bola de cristal', texto: 'La bola se nubla: hay algo oculto dentro de tu campo de visión.'} : null;
+}
+
+/* 🚩 Los Estandartes (2026-10-18, dueño): a los aliados al lado de quien lleva uno, el estado «🚩 <estandarte>» con su bono (+2 Res.CC, +3 Res.Mt,
+   +1 Defensa, +1 Defensa especial), mientras sigan al lado; al alejarse, se les va. Lo hace la pantalla del GM (cada 1,5 s): a un creep, directo;
+   a un personaje o invocación, por aviso (comun/recibidos.js: el estado, o «Quitar estado»). Lo mandado se recuerda 2 minutos para no repetirlo. */
+const ESTANDARTE_PREFIJO = '🚩 ';
+const estandarteEnviados = new Map();   // clave → hora del último envío
+function estandartesDe(t){
+  if(!t || !t.fichaId) return [];
+  if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return sc ? (sc.equipo || []).filter(i => i && i.estandarte && i.estandarte.stat).map(i => ({stat: i.estandarte.stat, val: num(i.estandarte.val), nombre: i.nombre})) : []; }
+  if(String(t.fichaId).includes(SEP_INVOCACION)) return [];
+  const f = fichasPub.get(t.fichaId);
+  return (f && f.resumen && f.resumen.estandartes) || [];
+}
+async function estandartesRevisar(){
+  if(!soyGM || !fbDb) return;
+  const quiere = new Map();   // tokenId del aliado → Map(nombre del estado → {stat, val})
+  tokens.forEach((t, id) => {
+    const lista = estandartesDe(t);
+    if(!lista.length || (typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(id))) return;
+    aliadosAlLado(t, 1).forEach(a => {
+      if(!quiere.has(a.id)) quiere.set(a.id, new Map());
+      lista.forEach(e => quiere.get(a.id).set(ESTANDARTE_PREFIJO + e.nombre, e));
+    });
+  });
+  const ahora = Date.now(), reciente = k => ahora - num(estandarteEnviados.get(k)) < 120000;   // no repetir el aviso por 2 minutos (si su dueño no está conectado, espera)
+  for(const [id, x] of tokens){
+    if(!x || !x.fichaId) continue;
+    const tiene = (typeof confusionEstadosDe === 'function' ? confusionEstadosDe(x) : []).filter(e => e && e.activo !== false && String(e.nombre || '').startsWith(ESTANDARTE_PREFIJO)).map(e => e.nombre);
+    const q = quiere.get(id) || new Map();
+    const poner = [...q.keys()].filter(n => !tiene.includes(n)), sacar = tiene.filter(n => !q.has(n));
+    for(const n of poner){
+      const k = `${id}|+${n}`; if(reciente(k)) continue; estandarteEnviados.set(k, ahora);
+      const e = q.get(n), spec = {nombre: n, polaridad: 'buff', permanente: true, mods: [{stat: e.stat, val: e.val}], detalle: `Al lado de un aliado con ${e.nombre}: +${e.val} ${FichaCalculo && FichaCalculo.STAT_LABEL ? FichaCalculo.STAT_LABEL[e.stat] || e.stat : e.stat}. Se va cuando se aleja.`};
+      try{
+        if(x.tipo === 'creep') await modificarCreep(x.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
+        else{ const f = fichasPub.get(String(x.fichaId).split(SEP_INVOCACION)[0]); await EstadosAplicar.encolarPj({fichaId: x.fichaId, duenoUid: (f && f.duenoUid) || x.duenoUid, spec, origen: e.nombre}); }
+      }catch(err){ console.error('El estandarte:', err); }
+    }
+    for(const n of sacar){
+      const k = `${id}|-${n}`; if(reciente(k)) continue; estandarteEnviados.set(k, ahora);
+      try{
+        if(x.tipo === 'creep') await modificarCreep(x.fichaId, sc => { sc.estados = (sc.estados || []).filter(e => !(e && e.nombre === n)); return true; });
+        else{ const f = fichasPub.get(String(x.fichaId).split(SEP_INVOCACION)[0]); await EstadosAplicar.encolarPj({fichaId: x.fichaId, duenoUid: (f && f.duenoUid) || x.duenoUid, spec: {nombre: 'Quitar estado', estado: n}, origen: n.slice(ESTANDARTE_PREFIJO.length)}); }
+      }catch(err){ console.error('El estandarte:', err); }
+    }
+  }
+}
+setInterval(() => { estandartesRevisar().catch(err => console.error('Los estandartes:', err)); }, 1500);
 

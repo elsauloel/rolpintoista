@@ -634,6 +634,8 @@ async function inicioTurnoPendiente(tokenId, clave){
     ...(otros.length ? [{titulo: 'Además', texto: otros.join(' · ')}] : []),
   ];
   if(!pasos.length) pasos.push({titulo: 'Lo que pasa al empezar', texto: 'Nada que cambie.'});
+  // 🔮 La Bola de cristal (2026-10-18): si hay algo oculto en su campo de visión, se anuncia acá (js/53).
+  try{ if(!invId && typeof bolaCristalAviso === 'function'){ const b = bolaCristalAviso(t); if(b) pasos.push(b); } }catch(err){ console.error('La Bola de cristal:', err); }
   await momentoAbrir({tipo: 'inicio-turno', icono: '▶', titulo: `Empieza el turno de ${nombreDe(t)}`, estado: 'esperando',
     resultado: 'Esperando que aplique el inicio de su turno…', datos: {tokenId, clave, paraUid, pasos}});
   return true;

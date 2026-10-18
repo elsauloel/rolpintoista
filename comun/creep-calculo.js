@@ -599,10 +599,14 @@ const CreepCalculo = (() => {
   // Un ítem del catálogo en la forma del equipo de un creep (antes itemParaCreep de GM Tools, js/01): sin id, la Defensa separada de los
   // otros bonos (`def`), sin los campos que un creep no usa. Es la forma de CATALOGO_EQUIPO (GM Tools) y del catálogo del fin del combate.
   // Lo mágico de un ítem (2026-10-05): el hechizo de un arma especial y lo de un orbe. Va igual en el equipo de un creep que en una ficha.
+  const TALISMAN_CAMPOS = ['talisman', 'auraMiedo', 'espejito', 'relicario', 'alDanoEspecial', 'botella', 'masDanoElem', 'saltoMas', 'estandarte', 'bezoar', 'contrahechizo'];
   function magiaDeItem(it){
     const o = {};
     if(it && it.especial) o.especial = structuredClone(it.especial);
     if(it && it.orbe){ o.orbe = true; if(it.orbeResguardo) o.orbeResguardo = it.orbeResguardo; if(it.orbeSalvaje) o.orbeSalvaje = it.orbeSalvaje === 'domado' ? 'domado' : true; if(it.orbeCustodio) o.orbeCustodio = it.orbeCustodio; }   // (la absorción: solo personajes, que tienen SP)
+    // 🔮 Los talismanes (2026-10-18): sus marcas viajan acá para que lleguen por todos los caminos que le equipan algo a un creep (el catálogo de
+    // GM Tools, «Poner en el creep», la copia al catálogo), no solo por itemParaCreep (antes se perdían: quedaban los stats y no la mecánica).
+    if(it) TALISMAN_CAMPOS.forEach(k => { if(it[k]) o[k] = structuredClone(it[k]); });
     return o;
   }
   // ¿Va en el equipo del creep (y no como su arma)? Todo lo que no es arma, y las armas especiales (2026-10-05: una varita no le cambia el arma).

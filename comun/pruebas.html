@@ -4417,6 +4417,13 @@ prueba('Talismanes (2026-10-18): la Piedra bezoar, 1 stack menos de Veneno (un c
   igual([(sc.estados.find(e => e.nombre === 'Veneno') || {}).stacks, r1.ok, (S.efectos.find(e => e.nombre === 'Veneno') || {}).stacks], [2, false, 3]);
 });
 
+prueba('Talismanes (2026-10-18): equipados a un creep por GM Tools conservan su mecánica (magiaDeItem)', () => {
+  const cat = id => CATALOGO_BASE.find(i => i.id === id);
+  const vudu = CreepCalculo.magiaDeItem(CreepCalculo.itemParaCreep(cat('tal-muneco-vudu')));
+  const calavera = CreepCalculo.magiaDeItem(cat('tal-calavera-con-vela'));
+  igual([!!vudu.alDanoEspecial, !!vudu.talisman, vudu.orbe, !!calavera.auraMiedo], [true, true, true, true]);
+});
+
 prueba('ataque sin arma: tiene daño (provisorio 1d4 + Dmg, P150)', () => {
   igual([FichaCombate.danoSinArmaTxt(3), FichaCombate.danoSinArmaTxt(0), FichaCombate.tipoAtaque(null)], ['1d4 + 3', '1d4', 4]);
 });

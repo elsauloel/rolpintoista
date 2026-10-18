@@ -1601,3 +1601,7 @@ versión parecida en más de una, es candidato a juntar.
 - **Con qué para un creep o una invocación** (2026-10-17): `Combatiente.piezasParaParry(equipo, slotDe, pesoDe)` — lo de sus manos que sirve
   para parrear (escudos primero, después un báculo o un arma cuerpo a cuerpo; no un orbe, una varita ni un arma de rango), la misma regla que un
   personaje. Lo usan `CreepCalculo.defensa` e `InvCalculo.defensa`. Antes miraban solo la ranura de escudo: un orbe parreaba y un báculo no.
+- **✍ Elegir manualmente, en todos los pasos del duelo** (2026-10-17, dueño: «cada uno de los pasos del duelo deben tener la alternativa de
+  tirarla a mano»): ya estaba (2026-10-15) en el PdG, la defensa, la Fuerza del golpe, el Bloqueo y el daño (con qué Defensa resta); se sumaron
+  el **crítico** (`manualCriticoHtml`: los d20 escritos → `tirarCritico(id, aMano)`) y los **efectos** (`manualEfectosHtml`: «✔ Funcionó» /
+  «✘ No funcionó» por cada uno → `tirarEfecto(id, i, {exito})`; el tablero muestra ✍).

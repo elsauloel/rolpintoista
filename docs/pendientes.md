@@ -45,7 +45,7 @@
 >   trampas y en el **duelo** (2026-10-17: si el que recibe es personaje o invocación, «N de daño, menos tu Defensa» y «💔 Aplicar el daño»; el GM
 >   tiene «Aplicar por …»; las áreas son sub-duelos, así que también). Las zonas ya pedían «Aplicar». **Falta:** lo que baja vida al empezar el
 >   turno (Veneno, Sangrado, Quemadura): hoy se aplica solo y se anuncia; ¿también con un clic?
-> - [ ] **🎲 Tirar a mano en cada paso del duelo (2026-10-17, dueño):** «aunque estén automatizadas todas las tiradas… en cada una de las
+> - [x] **🎲 Tirar a mano en cada paso del duelo (2026-10-17, dueño; hecho el mismo día: ya estaba en PdG, defensa, Fuerza, Bloqueo y daño; se sumaron el crítico y los efectos):** «aunque estén automatizadas todas las tiradas… en cada una de las
 >   instancias del duelo donde aparezca un botón para una tirada, que aparezca como un checkbox o algo que diga tirar manual y corregir esa
 >   tirada por situaciones circunstanciales específicas que quizás no se pueden programar sobre la marcha… cada uno de los pasos del duelo
 >   deben tener la alternativa de tirarla a mano». (PdG, Evasión, Parry, Bloqueo, Fuerza, crítico, daño, efectos: escribir el resultado o la

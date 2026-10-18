@@ -789,7 +789,8 @@ const Duelo = (() => {
   }
 
   // Tira los d20 del crítico (los tira el atacante o el GM): el mejor da el multiplicador.
-  async function tirarCritico(id){
+  // `aMano` (2026-10-17, dueño: «cada uno de los pasos del duelo deben tener la alternativa de tirarla a mano»): los d20 escritos (uno o varios).
+  async function tirarCritico(id, aMano){
     const ref = col().doc(id);
     let anuncio = '', publicar = null;
     await fbDb.runTransaction(async tx => {
@@ -798,8 +799,9 @@ const Duelo = (() => {
       if(!doc.exists) return;
       const m = {...doc.data()};
       if(m.estado !== 'esperando' || m.fase !== 'critico' || !m.crit || m.crit.d20) return;
-      const n = Math.max(1, _num(m.crit.dados));
-      const rolls = Array.from({length: n}, () => 1 + Math.floor(Math.random() * 20));
+      const man = Array.isArray(aMano) ? aMano.map(x => Math.max(1, Math.min(20, Math.round(_num(x))))).filter(x => x >= 1).slice(0, 10) : [];
+      const n = man.length || Math.max(1, _num(m.crit.dados));
+      const rolls = man.length ? man : Array.from({length: n}, () => 1 + Math.floor(Math.random() * 20));
       // Supercrítico (2026-09-30): dos o más 20 naturales suman sus ×4 (Critico.resultadoD20).
       const res = Critico.resultadoD20 ? Critico.resultadoD20(rolls, m.crit.potente) : {mejor: Math.max(...rolls), mult: Critico.multiplicador(Math.max(...rolls), m.crit.potente)};
       const mejor = res.mejor, mult = res.mult;
@@ -807,7 +809,7 @@ const Duelo = (() => {
       entrarDano(m);
       tx.update(ref, cambiosDe(m));
       const NOMBRE_MULT = {1: 'sin multiplicador: el d20 no alcanzó a multiplicar', 2: 'doble daño', 3: 'triple daño', 4: 'cuádruple daño'};
-      publicar = {origen: `${m.atacante.nombre} · Crítico (${n}d20)`, r: {formula: `${n}d20`, rolls, mod: 0, total: mejor, destacar: 'max'}};
+      publicar = {origen: `${m.atacante.nombre} · Crítico (${n}d20${man.length ? ', a mano' : ''})`, r: {formula: `${n}d20${man.length ? ' (manual)' : ''}`, rolls, mod: 0, total: mejor, destacar: 'max'}};
       anuncio = res.supercritico
         ? `🌟 ¡SUPERCRÍTICO! ${m.atacante.nombre} contra ${m.defensor.nombre}: ${res.veintes} veintes naturales, ×${mult}, ignora la Defensa`
         : `💥 ¡CRÍTICO! ${m.atacante.nombre} contra ${m.defensor.nombre}: ×${mult} (${NOMBRE_MULT[mult]}), ignora la Defensa`;
@@ -1008,7 +1010,8 @@ const Duelo = (() => {
   }
 
   // El atacante (o el GM) tira el dado de un efecto: el dado a la vista, «funcionó» o «no funcionó».
-  async function tirarEfecto(id, i){
+  // `aMano` = {exito} (2026-10-17): el resultado elegido a mano, sin tirar el dado (el dado extra de daño, si funciona, se tira igual).
+  async function tirarEfecto(id, i, aMano){
     const ref = col().doc(id);
     let publicar = null, anuncio = '';
     await fbDb.runTransaction(async tx => {
@@ -1019,7 +1022,8 @@ const Duelo = (() => {
       const ef = (m.efectos || [])[i];
       if(m.fase !== 'efectos' || !ef || ef.res || ef.omitido) return;
       const r = {dado: 0, exito: true, extra: null};
-      if(!siempreEf(ef)){
+      if(aMano){ r.exito = !!aMano.exito; r.manual = true; }
+      else if(!siempreEf(ef)){
         r.dado = 1 + Math.floor(Math.random() * ef.caras);
         r.exito = r.dado >= ef.caras - ef.exitos + 1;
       }
@@ -1031,6 +1035,7 @@ const Duelo = (() => {
       m.efectos = m.efectos.map((e, k) => k === i ? ef : e);
       cerrarSiListo(m);
       tx.update(ref, cambiosDe(m));
+      if(aMano){ anuncio = `✍ ${ef.nombre} de ${m.atacante.nombre} sobre ${m.defensor.nombre}, a mano: ${r.exito ? 'funcionó' : 'no funcionó'}`; return; }
       if(!siempreEf(ef)) publicar = {origen: `${m.atacante.nombre} · ${ef.nombre} ${pctEf(ef)}%`, r: {formula: `1d${ef.caras}`, rolls: [r.dado], mod: 0, total: r.dado, ...(r.exito ? {destacar: 'idx:0'} : {})}};
       anuncio = r.exito ? `✔ ${ef.nombre}${siempreEf(ef) ? '' : ' (' + pctEf(ef) + '%)'} de ${m.atacante.nombre} sobre ${m.defensor.nombre}: ${siempreEf(ef) ? '' : 'salió ' + r.dado + ' → '}¡FUNCIONÓ!${r.extra ? ' · ' + ef.dado + ' = ' + r.extra.total : ''}`
         : `✘ ${ef.nombre} (${pctEf(ef)}%) de ${m.atacante.nombre} sobre ${m.defensor.nombre}: salió ${r.dado} → no funcionó`;
@@ -1723,6 +1728,23 @@ const Duelo = (() => {
     return `<div class="duelo-manual">${tg}<div class="duelo-mcaja">${sel}<input type="text" data-mtirada="${campo}" placeholder="1d10+3 o un número" value="${_esc(manual['m:' + k] || '')}"><button type="button" data-musar="${campo}">✔ Usar esta tirada</button>${def}
       <div class="det">Una fórmula de dados (se tira) o un número (es el resultado). No cobra No2 ni cuenta como ataque: si corresponde, ajustalo a mano.</div></div></div>`;
   }
+  // El crítico a mano: los d20 que salieron (uno o varios), escritos.
+  function manualCriticoHtml(d){
+    const k = d.id + ':critico', abierto = manualAbierto.has(k);
+    const tg = `<label class="tg" title="Escribir los d20 en vez de tirarlos"><input type="checkbox" data-mtg="critico"${abierto ? ' checked' : ''}> ✍ Elegir manualmente</label>`;
+    if(!abierto) return `<div class="duelo-manual">${tg}</div>`;
+    return `<div class="duelo-manual">${tg}<div class="duelo-mcaja"><input type="text" data-critman placeholder="los d20: 18, o 12 19" value="${_esc(manual['crit:' + d.id] || '')}"><button type="button" data-critusar>✔ Usar</button>
+      <div class="det">El mejor d20 decide el multiplicador, como siempre (dos 20 naturales: supercrítico).</div></div></div>`;
+  }
+  // Los efectos a mano: para cada uno que falta, «funcionó» o «no funcionó».
+  function manualEfectosHtml(d, efs){
+    const k = d.id + ':efectos', abierto = manualAbierto.has(k);
+    const tg = `<label class="tg" title="Decidir a mano si cada efecto funciona"><input type="checkbox" data-mtg="efectos"${abierto ? ' checked' : ''}> ✍ Elegir manualmente</label>`;
+    if(!abierto) return `<div class="duelo-manual">${tg}</div>`;
+    const filas = efs.map((ef, i) => [ef, i]).filter(([ef]) => !ef.res && !ef.omitido && necesitaTiradaEf(ef))
+      .map(([ef, i]) => `<div class="duelo-mcaja"><b>${_esc(ef.nombre)}</b> <button type="button" data-efman="${i}:1">✔ Funcionó</button> <button type="button" class="sec" data-efman="${i}:0">✘ No funcionó</button></div>`).join('');
+    return `<div class="duelo-manual">${tg}${filas}<div class="det">Sin tirar el dado. Si el efecto trae daño propio, ese se tira igual.</div></div>`;
+  }
   async function usarManual(d, campo){
     const k = d.id + ':' + campo;
     const input = document.querySelector(`[data-mtirada="${campo}"]`);
@@ -1917,14 +1939,15 @@ const Duelo = (() => {
       const clave = d.id + ':efd' + i, nuevo = ef.res && !revelado[clave];
       if(ef.res) revelado[clave] = true;
       const desde = ef.caras - ef.exitos + 1;
+      const dadoTxt = ef.res && ef.res.manual ? '✍' : ef.res ? _fmt(ef.res.dado) : '';   // ✍ elegido a mano
       const res = ef.omitido ? `<span class="no">no entra</span>` : !ef.res ? '<span class="espera">—</span>'
-        : ef.res.exito ? `<b class="duelo-dado ok${nuevo ? ' nuevo' : ''}">${_fmt(ef.res.dado)}</b> <span class="ok duelo-funciono${nuevo ? ' nuevo' : ''}">¡FUNCIONÓ!</span>`
-        : `<b class="duelo-dado${nuevo ? ' nuevo' : ''}">${_fmt(ef.res.dado)}</b> <span class="no">✘ no funcionó</span>`;
+        : ef.res.exito ? `<b class="duelo-dado ok${nuevo ? ' nuevo' : ''}">${dadoTxt}</b> <span class="ok duelo-funciono${nuevo ? ' nuevo' : ''}">¡FUNCIONÓ!</span>`
+        : `<b class="duelo-dado${nuevo ? ' nuevo' : ''}">${dadoTxt}</b> <span class="no">✘ no funcionó</span>`;
       return `<tr><td>🎲 d${_fmt(ef.caras)}</td><td><b>${_esc(ef.nombre)}</b> <span class="hint">${pctEf(ef)} %</span></td><td>${desde === ef.caras ? _fmt(desde) : `${_fmt(desde)}–${_fmt(ef.caras)}`}</td><td>${res}</td></tr>`;
     };
     const tablero = conDado.length ? `<div class="duelo-ef duelo-ef-tablero"><table><thead><tr><th>Dado</th><th>Efecto</th><th>Funciona con</th><th>Salió</th></tr></thead><tbody>${conDado.map(fila).join('')}</tbody></table>
       ${faltan.length ? (puedeAtq ? `<button type="button" data-ef-tirar-todos>🎲 Tirar ${faltan.length === 1 ? 'el efecto' : 'los efectos'} (${faltan.map(ef => siempreEf(ef) ? _esc(ef.dado) : '1d' + _fmt(ef.caras)).join(' · ')})</button>`
-        : `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire los efectos…</div>`) : ''}</div>` : '';
+        : `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire los efectos…</div>`) : ''}${faltan.length && puedeAtq ? manualEfectosHtml(d, efs) : ''}</div>` : '';
     const cards = efs.map((ef, i) => {
       if(!siempreEf(ef) && !(ef.res && ef.res.exito && !ef.omitido && !ef.aplicado) && !ef.aplicado) return '';   // en el tablero: sin tirar, falló o no entra
       const clave = d.id + ':ef' + i;
@@ -2146,7 +2169,8 @@ const Duelo = (() => {
         + explica([`Ya es crítico y el golpe ignora la Defensa. Se tiran ${_fmt(c.dados)} d20 y el mejor decide cuánto se multiplica el daño.`, ...lCuenta])
         + viz
         + tablaCriticoHtml(c, d, 0)
-        + `<div class="duelo-contra" style="text-align:center">${puede ? `<button type="button" data-critico>🎲 Tirar ${_fmt(c.dados)} d20</button>` : `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire el crítico…</div>`}</div>`;
+        + `<div class="duelo-contra" style="text-align:center">${puede ? `<button type="button" data-critico>🎲 Tirar ${_fmt(c.dados)} d20</button>` : `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire el crítico…</div>`}</div>`
+        + (puede ? manualCriticoHtml(d) : '');
     }else{
       // Los d20 como fichas: el más alto destaca con ondas concéntricas.
       const nuevoD20 = !revelado[d.id + ':d20']; revelado[d.id + ':d20'] = true;
@@ -2329,6 +2353,20 @@ const Duelo = (() => {
     f.querySelectorAll('[data-tirarpor]').forEach(b => b.onclick = () => tirarPorAusente(d, b.dataset.tirarpor));
     f.querySelectorAll('[data-mtg]').forEach(c => c.onchange = () => { const k = d.id + ':' + c.dataset.mtg; if(c.checked) manualAbierto.add(k); else manualAbierto.delete(k); dibujar(); });   // ✍
     f.querySelectorAll('[data-musar]').forEach(b => b.onclick = () => usarManual(d, b.dataset.musar));
+    // ✍ El crítico y los efectos a mano (2026-10-17).
+    const bcm = f.querySelector('[data-critusar]');
+    if(bcm) bcm.onclick = () => {
+      const inp = f.querySelector('[data-critman]'), txt = String(inp ? inp.value : '');
+      const tiros = (txt.match(/\d+/g) || []).map(Number).filter(n => n >= 1 && n <= 20);
+      if(!tiros.length){ _toast('Escribí los d20 que salieron (de 1 a 20)'); return; }
+      manual['crit:' + d.id] = txt; manualAbierto.delete(d.id + ':critico'); bcm.disabled = true;
+      tirarCritico(d.id, tiros).catch(err => { console.error(err); _toast('No se pudo anotar el crítico'); });
+    };
+    f.querySelectorAll('[data-efman]').forEach(b => b.onclick = () => {
+      const [i, ok] = String(b.dataset.efman).split(':');
+      b.disabled = true;
+      tirarEfecto(d.id, Number(i), {exito: ok === '1'}).catch(err => { console.error(err); _toast('No se pudo anotar el efecto'); });
+    });
     f.querySelectorAll('[data-mdef]').forEach(rb => rb.onchange = () => { manual['mdef:' + d.id] = rb.value; });
     const brd = f.querySelector('[data-reintentar-def]');
     if(brd) brd.onclick = () => { opcionesPedidas.delete(d.id); delete opcionesFalla[d.id]; delete opciones[d.id]; dibujar(); };

@@ -100,6 +100,7 @@ const FichaResumen = (() => {
       resmg: n(c.final.resmg),   // Res.Esp (2026-09-28): el mapa la usa para tirar sola la resistencia de una zona persistente, sin que la ficha esté abierta
       // Evasión, Fuerza, Res.CC y Res.Mt (2026-10-02): el mapa tira con esto la salvación de una trampa por quien la pisa.
       eva: n(c.final.eva), fue: n(c.final.fue), rescc: n(c.final.rescc), resm: n(c.final.resm),
+      agl: n(c.final.agl), des: n(c.final.des), con: n(c.final.con),   // (2026-10-17) el hielo se resiste con Agilidad
       percepcion: n(c.final.percepcion),   // Percepción (de Destreza, 2026-09-22): por si el mapa la necesita más adelante
       sigilo: n(c.final.sigilo),   // Sigilo (2026-10-04): el mapa lo tira cuando lo intentan descubrir
       prisa: n(c.final.prisa),   // 💨 Prisa (2026-10-15): va primero en el orden de turnos

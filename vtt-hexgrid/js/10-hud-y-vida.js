@@ -392,7 +392,13 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
 
 /* La resistencia de un token a un elemento y su Defensa especial (2026-10-04), para restarlas al daño mágico o elemental: personaje (su resumen),
    creep (su parte privada, solo el GM), invocación (sus datos). → {res, armadmg}; con `inv` ya leída, sin volver a leerla. */
+// 💧 Quien está parado en el agua (un charco, js/50) es vulnerable al rayo: su Res. eléctrica baja AGUA_VULN_RAYO (2026-10-17, dueño).
 async function resistenciasDe(t, el, inv){
+  const r = await resistenciasBase(t, el, inv);
+  if(el === 'rayo' && typeof enAgua === 'function' && enAgua(t)) r.res = num(r.res) - AGUA_VULN_RAYO;
+  return r;
+}
+async function resistenciasBase(t, el, inv){
   if(!t) return {res: 0, armadmg: 0};
   if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return {res: sc && el ? CreepCalculo.resElemental(sc, el) : 0, armadmg: sc ? creepArmadmgMapa(sc) : 0}; }
   if(String(t.fichaId || '').includes(SEP_INVOCACION)){

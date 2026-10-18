@@ -1110,7 +1110,7 @@ function dueloZonaQueda(hab, centro, radio, yo){
     radio, turnos: z.turnos || 1, nombre: `${hab.nombre}${z.nombre ? ': ' + z.nombre : ''}`.slice(0, 40), color: z.color || '', amiga: !z.soloRivales,   // a todos, salvo «solo a los rivales» (2026-10-15)
     dano: z.dano || '', ignoraDef: true, danoTipo: z.tipoDano || '', estado: z.estado || null,
     ...(z.contra ? {resistStat: z.contra, tiraStat: z.tira || 'dmgesp', tiraValor: num(z.tiraValor)} : {}),
-    enMantenimiento: z.enMantenimiento !== false, cadaPaso: !!z.cadaPaso, casteadorRef: String(yo.ref || ''), casteadorTipo: yo.tipo === 'creep' ? 'creep' : 'pj', altura: z.altura,
+    enMantenimiento: z.enMantenimiento !== false, cadaPaso: !!z.cadaPaso, inmediata: !!z.inmediata, casteadorRef: String(yo.ref || ''),   // inmediata: el hielo, a quien ya está adentro (2026-10-17) casteadorTipo: yo.tipo === 'creep' ? 'creep' : 'pj', altura: z.altura,
     directo: !!(hab.dano && (hab.dano.directo || hab.dano.trueDamage)),   // lo que deja una varita de daño directo, también directo (2026-10-07)
   }).catch(err => console.error('No se pudo dejar la zona del área:', err));
 }

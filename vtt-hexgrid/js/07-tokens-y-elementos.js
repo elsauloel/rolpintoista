@@ -455,6 +455,7 @@ async function zonasDelQueLaTiro(tokenId){
     try{
       if(quedan <= 0){
         elementosVencidosBorrando.add(id);
+        if(typeof superficieAlIrse === 'function') await superficieAlIrse(el);   // 🧊 → 💧 el hielo deja un charco (js/50)
         await borrarElemento(id);
         setTimeout(() => elementosVencidosBorrando.delete(id), 5000);
         const txt = el.portal ? 'Se cerraron los portales (terminaron sus turnos).' : el.acelerador ? 'Se apagó el Acelerador (terminaron sus turnos).' : `Se fue ${el.zonaNombre || el.trampaNombre || 'la zona'} (terminaron sus turnos).`;
@@ -471,6 +472,7 @@ function elementosVencidosBarrer(){
     if(zonaEsperaSuFin(el, id)) return;   // su último Mantenimiento: primero hace efecto
     if((el.trampa || (el.zona && !el.zonaCasteadorRef)) && colocadorEnOrden(colocadorDe(el))) return;   // una trampa (o la zona que dejó) cuenta los turnos de quien la puso
     elementosVencidosBorrando.add(id);
+    if(typeof superficieAlIrse === 'function') superficieAlIrse(el);   // 🧊 → 💧 el hielo deja un charco (js/50)
     borrarElemento(id).finally(() => setTimeout(() => elementosVencidosBorrando.delete(id), 5000));
   });
 }

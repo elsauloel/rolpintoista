@@ -340,6 +340,10 @@ function zonaAplicaA(el, t){
 // disparar. Cuenta una vez por ronda, también el daño (el piso ardiendo de la Mina napalm).
 const zonaClave = (el, t) => el.trampa ? `${zonaIdDe(t)}@${Math.round(num(mantenimientoNumero))}` : zonaIdDe(t);
 function zonaLeFalta(el, t){
+  // 🧊 Superficies (js/50): el agua no tiene efecto propio (nada que resolver); el hielo, cada vez que alguien pisa (no se anota resuelto).
+  const sup = typeof superficieSpec === 'function' ? superficieSpec(el) : null;
+  if(sup && sup.superficie && !sup.nombre) return false;
+  if(sup && sup.tiraPaso) return true;
   if(el.trampa) return !(el.zonaResueltos || []).includes(zonaClave(el, t));
   if(el.zonaDano || el.zonaDanoDif) return true;
   if(el.zonaEstado && !(el.zonaResueltos || []).includes(zonaClave(el, t))) return true;
@@ -350,19 +354,25 @@ function zonaLeFalta(el, t){
 function zonaIdDe(t){ for(const [id, x] of tokens) if(x === t) return id; return ""; }
 let zonaCola = [];      // [{elId, tokenId}] a la espera de mostrarse en esta pantalla
 let zonaBanner = null;  // {elId, tokenId, el, t, resultado} el que se está mostrando ahora
-function zonaEncolar(el, t){
-  if(zonaCola.some(x => x.elId === el.id && x.tokenId === zonaIdDe(t))) return;
-  if(zonaBanner && zonaBanner.elId === el.id && zonaBanner.tokenId === zonaIdDe(t)) return;
-  zonaCola.push({elId: el.id, tokenId: zonaIdDe(t)});
+// `pasos` (el hielo, 2026-10-17): cuántos pasos dio sobre la zona en este movimiento = cuántas tiradas (se suman si ya esperaba).
+function zonaEncolar(el, t, pasos){
+  const id = zonaIdDe(t), n = Math.max(0, Math.round(num(pasos)));
+  const ya = zonaCola.find(x => x.elId === el.id && x.tokenId === id);
+  if(ya){ if(n) ya.pasos = Math.max(1, ya.pasos || 0) + n; return; }
+  if(zonaBanner && zonaBanner.elId === el.id && zonaBanner.tokenId === id && !(n && zonaBanner.resultado)){
+    if(n && !zonaBanner.tirando){ zonaBanner.pasos = Math.max(1, zonaBanner.pasos || 0) + n; renderZonaBanner(); }
+    return;
+  }
+  zonaCola.push({elId: el.id, tokenId: id, pasos: n});
   zonaMostrarSiguiente();
 }
 function zonaMostrarSiguiente(){
   if(zonaBanner) return;
   if(!zonaCola.length){ AvisoCombate.cartel('zona', null); return; }   // no queda nada: el cartel se cierra (antes quedaba colgado)
-  const {elId, tokenId} = zonaCola.shift();
+  const {elId, tokenId, pasos} = zonaCola.shift();
   const el = elementos.get(elId), t = tokens.get(tokenId);
   if(!el || !el.zona || !t || !zonaLeFalta(el, t)){ zonaMostrarSiguiente(); return; }
-  zonaBanner = {elId, tokenId, el, t, resultado: null};
+  zonaBanner = {elId, tokenId, el, t, resultado: null, pasos: pasos || 0};
   renderZonaBanner();
 }
 /* Del piso, del aire o ambos (2026-10-07, dueño): dónde está el efecto de una zona o una trampa. Levitar salva solo de lo del piso (mientras levita:
@@ -384,6 +394,8 @@ function zonaRevisarToken(t, desdeMantenimiento, flotando, soloPiso){
   if(!t || !zonaEsMia(t)) return;
   elementos.forEach(el => {
     if(!el.zona || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;
+    const sup = typeof superficieSpec === 'function' ? superficieSpec(el) : null;
+    if(sup && sup.tiraPaso) return;   // el hielo: al aparecer y por cada paso (zonaRevisarEntrada), no por estar parado
     if(desdeMantenimiento && el.zonaEnMantenimiento === false) return;
     if(flotando && alturaDe(el) === 'piso') return;
     if(soloPiso && alturaDe(el) !== 'piso') return;
@@ -400,9 +412,20 @@ function zonaRevisarEntrada(id, celdas, levita){
   if(!t || !zonaEsMia(t)) return;
   const lev = Math.max(0, Math.round(num(levita)));
   const alAire = (el, i) => i <= lev && alturaDe(el) === 'piso';   // ese casillero lo cruzó levitando
+  // 🧊 El hielo (2026-10-17, dueño: «cada paso que se da dentro de una superficie congelada»): una tirada por cada casillero que pisa adentro
+  // (entrando o caminando por él; levitando no).
+  if(celdas && celdas.length > 1) elementos.forEach(el => {
+    const sup = el.zona && typeof superficieSpec === 'function' ? superficieSpec(el) : null;
+    if(!sup || !sup.tiraPaso || !zonaAplicaA(el, t)) return;
+    const cs = celdasDeElemento(el), enCelda = c => cs.some(x => x.col === c.col && x.fila === c.fila);
+    let n = 0;
+    for(let i = 1; i < celdas.length; i++) if(enCelda(celdas[i]) && !alAire(el, i)) n++;
+    if(n) zonaEncolar(el, t, n);
+  });
   if(celdas && celdas.length > 1){
     elementos.forEach(el => {
-      if(!el.zona || !(el.zonaCadaPaso || el.trampa) || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;   // la de una trampa: al entrar, aunque solo la cruce
+      if(!el.zona || !(el.zonaCadaPaso || el.trampa) || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;
+      { const sup = typeof superficieSpec === 'function' ? superficieSpec(el) : null; if(sup && sup.tiraPaso) return; }   // (el hielo, arriba)   // la de una trampa: al entrar, aunque solo la cruce
       const cs = celdasDeElemento(el);
       const enCelda = c => cs.some(x => x.col === c.col && x.fila === c.fila);
       for(let i = 1; i < celdas.length; i++){
@@ -472,7 +495,9 @@ function renderZonaBanner(){
     // Qué se resiste, a la vista antes de tirar (dueño, 2026-10-04, norma general). Resistir una zona evita todo: el daño y lo que deja.
     let spec = null; try{ spec = el.zonaEstado ? JSON.parse(el.zonaEstado) : null; }catch(err){}
     const que = [...(spec && spec.nombre ? [EstadosAplicar.texto(spec)] : []), ...(el.zonaDanoDif ? [`el daño (la diferencia de las tiradas${el.zonaDano ? ' + ' + el.zonaDano : ''})`] : el.zonaDano ? [`${el.zonaDano} de daño${el.zonaDanoTipo ? ' ' + el.zonaDanoTipo : ''}`] : [])].join(' y ') || 'lo que deja la zona';
-    AvisoCombate.cartel('zona', {icono, titulo: `${nombreT} entró en ${nombreZ}`, texto: `Para resistir: ${que}. Tirá ${stat}: si resiste, no le pasa nada.`,
+    const pasosZ = Math.max(1, num(zonaBanner.pasos) || 1);   // el hielo: una tirada por paso; a la primera que falla, le pasa
+    const porPaso = spec && spec.tiraPaso ? (zonaBanner.pasos ? ` Dio ${pasosZ} paso${pasosZ === 1 ? '' : 's'} sobre ${nombreZ}: ${pasosZ === 1 ? 'una tirada' : `una tirada por paso; a la primera que falla, ${spec.nombre ? 'queda ' + spec.nombre : 'le pasa'}`}.` : ` ${nombreZ} apareció bajo sus pies.`) : '';
+    AvisoCombate.cartel('zona', {icono: spec && spec.superficie === 'hielo' ? '🧊' : icono, titulo: `${nombreT} entró en ${nombreZ}`, texto: `Para resistir: ${que}. Tirá ${stat}: si resiste, no le pasa nada.${porPaso}`,
       botones: [{texto: `🎲 Tirar ${stat} para resistir ${spec && spec.nombre ? spec.nombre : 'la zona'}`, id: 'zona-banner-ir', alClic: zonaResolverBanner}]});
   }else{
     AvisoCombate.cartel('zona', {icono, titulo: `${nombreZ}: le toca a ${nombreT}`, texto: 'No hay nada que tirar: se aplica lo que deja la zona.',
@@ -488,7 +513,10 @@ async function zonaResolverBanner(){
   let resistio = false, diferencia = null;
   const partes = [];
   const quienTxt = t.oculto ? 'Alguien' : nombreDe(t);
-  if(el.zonaResistStat){
+  const specZ = (() => { try{ return el.zonaEstado ? JSON.parse(el.zonaEstado) : null; }catch(err){ return null; } })();
+  const veces = specZ && specZ.tiraPaso ? Math.max(1, Math.round(num(zonaBanner.pasos)) || 1) : 1;   // 🧊 una tirada por paso
+  zonaBanner.tirando = true;
+  if(el.zonaResistStat) for(let paso = 1; paso <= veces; paso++){
     const valor = t.tipo === 'creep' ? (() => { const sc = creepPrivadoDe(t.fichaId); return sc ? zonaStatCreep(sc, el.zonaResistStat) : 0; })()
       : (() => { const f = fichasPub.get(t.fichaId); return f && f.resumen ? num(f.resumen[el.zonaResistStat]) : 0; })();
     // La misma tirada de stat que en la ficha y GM Tools (comun/combatiente.js), con los estados de quien resiste.
@@ -514,8 +542,10 @@ async function zonaResolverBanner(){
       diferencia = Math.max(0, contra - total);
       try{ mesaPublicar(`${quienTxt} · ${ZONA_STAT_LABEL[el.zonaResistStat] || el.zonaResistStat}`, {formula: rd.formula, rolls: rd.rolls, mod: rd.mod, total}); }catch(err){}
       const tuyo = `${ZONA_STAT_LABEL[el.zonaResistStat] || el.zonaResistStat} ${total}`;
-      partes.push(resistio ? `resistió (${tuyo} contra ${contraTxt})` : `no resistió (${tuyo} contra ${contraTxt})`);
+      const pre = veces > 1 ? `paso ${paso}: ` : '';
+      partes.push(resistio ? `${pre}resistió (${tuyo} contra ${contraTxt})` : `${pre}no resistió (${tuyo} contra ${contraTxt})`);
     }
+    if(!resistio) break;   // a la primera que falla, ahí le pasa (el hielo: se cae)
   }
   // El daño (2026-10-02, regla del dueño): quien resiste no recibe nada — ni el daño ni el estado. Con «la diferencia», el daño es
   // la tirada de quien la creó menos la de quien resiste (en un empate, 0: ni daño ni tirada extra).

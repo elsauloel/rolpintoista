@@ -288,7 +288,9 @@ function dibujar(){
   if(como) soyGM = false;
   try{ return dibujarLienzo(); } finally { if(como) soyGM = gm; }
 }
+let superficiesAnimando = false;   // 🧊 el brillo del hielo (js/50) pide seguir dibujando
 function dibujarLienzo(){
+  superficiesAnimando = false;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.fillStyle = '#0F0C0E';
   ctx.fillRect(0, 0, lienzo.width, lienzo.height);
@@ -386,6 +388,7 @@ function dibujarLienzo(){
     const esColision = !!el.colision || !!el.acelerador;   // su relleno y su contorno ya se dibujaron arriba, todos juntos (el Acelerador, en js/40)
     if(!esColision){
     const img = el.imagen ? imagenLista(el.imagen) : null;
+    const sup = !img && typeof superficieDibujar === 'function' ? superficieDibujar(el, celdas, z) : null;
     if(img){
       ctx.save();
       trazarCeldas(celdas); ctx.clip();
@@ -400,11 +403,14 @@ function dibujarLienzo(){
       ctx.globalAlpha = el.invisible ? el.alfa / 100 * 0.35 : el.alfa / 100;
       ctx.drawImage(img, cx - iw / 2, cy - ih / 2, iw, ih);
       ctx.restore();
+    }else if(sup){
+      if(sup.anima) superficiesAnimando = true;   // 🧊 hielo / 💧 agua: su propio dibujo (js/50)
     }else{
       trazarCeldas(celdas);
       ctx.fillStyle = colorConAlfa(el.color, (el.invisible ? el.alfa / 100 * 0.35 : el.alfa / 100 * 0.7));
       ctx.fill();
     }
+    if(!(sup && sup.sinBorde)){   // el charco no lleva el borde de los hexágonos
     bordeCeldas(celdas);
     if(el.invisible){
       // Solo GM y creador: contorno punteado violeta, para no confundirlo
@@ -434,6 +440,7 @@ function dibujarLienzo(){
       ctx.lineWidth = 2 / z;
       ctx.stroke();
     }
+    }   // fin del borde (no en el charco)
     if(el.trampa && !el.zona){   // la que ya quedó como efecto persistente se dibuja como zona
       // Trampa: armada = la ve su equipo (2026-10-04, dueño): DORADO donde se pisa (la superficie de disparo) y CELESTE hasta donde llega el
       // efecto si es más grande (una flor alrededor); disparada = roja con ✖ (la ven todos) hasta el próximo Mantenimiento.
@@ -631,7 +638,7 @@ function dibujarLienzo(){
 
   // Estelas: la ruta que se está dibujando, la que espera confirmación y las
   // de movimientos recientes (se desvanecen).
-  let animando = false;
+  let animando = superficiesAnimando;
   const ahora = Date.now();
   // pagables: casilleros que alcanzan los Nitros; los de más van en magenta (antes en rojo: el rojo ahora es la estela normal,
   // 2026-09-24, para que se destaque sobre la niebla). Cada casillero lleva su numerito: los Nitros que suma hasta ahí

@@ -1644,4 +1644,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   paraUid, pasos}`); js/16 `inicioTurnoMomento` lo muestra al centro de su dueño (o de quien tiene 🎮 el control) con «✔ Aplicar»;
   `inicioTurnoAplicar` lo aplica de verdad (`turnoDeToken`, misma clave: nunca dos veces); el GM, «▶ Aplicar por él» desde la Crónica; al
   pasar el turno, `inicioTurnoForzar` lo aplica si quedó pendiente. Un creep sigue como siempre (solo el GM).
+- **🧊 El hielo y el 💧 agua** (2026-10-17, dueño; `js/50-superficies.js`): una zona cuyo `zonaEstado` (JSON) lleva `superficie: 'hielo'` y
+  `tiraPaso: true` (el «suelo congelado» de la Varita de la ventisca, `zonaQueda` con `inmediata`): quien está parado cuando aparece tira, y
+  después **cada paso** sobre el hielo es una tirada (js/08 `zonaRevisarEntrada` → `zonaEncolar(el, t, pasos)`; el cartel tira una por paso y
+  a la primera que falla aplica el estado); no se anota resuelta ni cuenta en el Mantenimiento. Se dibuja celeste, con bordes de cristal
+  irregulares (`trazarHielo`) y una franja de brillo que la cruza (`superficieDibujar`, desde js/05: `superficiesAnimando`). Al irse (el GM la
+  borra, js/07) queda un **charco** permanente (`superficieAlIrse`: `superficie: 'agua'`, sin estado ni turnos; dibujado como una mancha
+  ondulada) y quien está parado en el agua tiene la Res. eléctrica −`AGUA_VULN_RAYO` (`resistenciasDe` → `enAgua`, js/10; P203).
 

@@ -1368,6 +1368,7 @@ async function dueloAplicarDano(d){
   else if(dn.defensaManual !== undefined && dn.defensaManual !== null && dn.defensaManual !== ''){ const dmn = Math.max(0, num(dn.defensaManual)); aplicar = base.mitad ? Math.ceil(Math.max(0, golpe - dmn) / 2) : Math.max(0, golpe - dmn); ignoraDef = true; }
   // Bloqueo perdido (mitad del daño): el arma o escudo con el que bloqueó pierde 1 punto de durabilidad (solo personajes: los creeps y las invocaciones no llevan).
   // 💧 En el agua, el rayo ×1,5 (js/50, 2026-10-17).
+  const golpeRayo = elDano === 'rayo' ? aplicar : 0;   // ⚡💧 lo que corre por el agua a los demás del charco (js/50), antes del ×1,5
   if(elDano === 'rayo' && typeof aguaRayo === 'function'){ const ag = aguaRayo(t, 'rayo', aplicar); if(ag.txt){ aplicar = ag.monto; freno = [freno, ag.txt].filter(Boolean).join(' · '); } }
   let desgaste = '';
   if(base.mitad && t.tipo === 'pj' && d.defensa && d.defensa.itemId){
@@ -1392,6 +1393,10 @@ async function dueloAplicarDano(d){
         : t.tipo === 'creep' ? await danioCreep(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true}) : await danioPj(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true});
       magico = {...dn.magico, recibido: num(rm.r.recibido), hpAntes: num(rm.previo), hpDespues: num(rm.nuevo), ...(resMag ? {resEl: Combatiente.resElementalTxt(elMag, resMag)} : {})};
     }
+    // ⚡💧 El rayo corre por el agua (dueño, 2026-10-17): si el golpeado está en un charco, el mismo golpe eléctrico les llega a todos los que
+    // están parados en ese charco, salte o no el Relámpago (js/50, aguaConduceRayo).
+    const rayoMag = dn.magico && num(dn.magico.total) > 0 && !String(dn.magico.tipo || '').includes(' y ') && Combatiente.elementoDe(dn.magico.tipo) === 'rayo' ? num(dn.magico.total) : 0;
+    if((golpeRayo || rayoMag) && !res.r.invulnerable && typeof aguaConduceRayo === 'function') await aguaConduceRayo(d, t, golpeRayo || rayoMag).catch(err => console.error('El rayo por el agua:', err));
     // El Espejo: 1/4 de todo el daño especial que le tiraron (el de la habilidad y el elemental del arma), antes de la Defensa especial.
     const espejo = res.r.invulnerable ? null : await dueloEspejo(d, (habMagica ? golpe : 0) + (magico ? num(dn.magico.total) : 0));
     const perdio = Math.max(0, num(res.previo) - num(res.nuevo));

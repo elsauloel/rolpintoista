@@ -1657,4 +1657,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (`nubeColor`, `nubeDibujar`: verde lo tóxico, violeta el resto de los gases, gris la niebla).
   **Fuego**: el terreno incendiado y las zonas de fuego (`esFuego`, también la zona de una trampa de fuego) se dibujan con una textura propia
   (`fuegoDibujar`: mancha de brasas, resplandor que titila y chispas que suben; reemplaza las llamitas 🔥).
+  **⚡💧 El rayo corre por el agua** (dueño, 2026-10-17): en el duelo, si el golpeado está en un charco, el mismo golpe eléctrico (de una
+  habilidad de rayo o el daño eléctrico de un arma) les llega a los demás parados en ese charco (`aguaConduceRayo`, desde `dueloAplicarDano`
+  de js/13): ×1,5, menos su Res. eléctrica, y la Parálisis del golpe con el doble de chance. Crónica y Mesa. (Las zonas y trampas de rayo, no.)
 

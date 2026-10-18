@@ -79,7 +79,9 @@ const EstadosAplicar = (() => {
   function aplicarACreep(sc, spec){
     sc.estados = Array.isArray(sc.estados) ? sc.estados : [];
     // Inmunidades, acumulación y renovación: la regla común de comun/combatiente.js (agregarEstado).
-    const r = Combatiente.agregarEstado(sc.estados, componer(spec), sc);
+    const nuevo = componer(spec);
+    if(!Combatiente.bezoar(nuevo, sc.equipo)) return {ok: false, motivo: 'la Piedra bezoar se tragó el Veneno'};   // 🔮 (2026-10-18)
+    const r = Combatiente.agregarEstado(sc.estados, nuevo, sc);
     if(!r.ok) return {ok: false, motivo: r.motivo};
     // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).
     const d = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: typeof CreepCalculo !== 'undefined' ? CreepCalculo.resElemental(sc, 'fuego') : 0, hpActual: sc.hp});

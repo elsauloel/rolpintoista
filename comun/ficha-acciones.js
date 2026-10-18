@@ -1027,6 +1027,8 @@ const FichaAcciones = (() => {
     }
     const draft = estadoDeSpec(spec, ui.presets);
     const quien = origen ? `${origen}: ` : '';
+    // 🔮 La Piedra bezoar: el Veneno entra con 1 stack menos (si no queda nada, no entra).
+    if(!Combatiente.bezoar(draft, (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)))){ ui.toast(`🔮 ${quien}la Piedra bezoar se tragó el Veneno`); return; }
     // Inmunidades, acumulación y renovación: la regla común (comun/combatiente.js, agregarEstado).
     const r = Combatiente.agregarEstado(S.efectos, draft);
     if(!r.ok){ ui.toast(`🛡 ${quien}Inmune ahora mismo (${r.motivo}) — ${draft.nombre} no te afectó`); return; }

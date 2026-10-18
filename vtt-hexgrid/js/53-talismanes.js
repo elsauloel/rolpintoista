@@ -301,4 +301,28 @@ async function estandartesRevisar(){
   }
 }
 setInterval(() => { estandartesRevisar().catch(err => console.error('Los estandartes:', err)); }, 1500);
+/* 🔮 El Contrahechizo (2026-10-18, dueño): Res.Esp +2 (un mod del talismán) y, una vez por ronda, cuando quien lo lleva le gana la Res.Esp a una
+   habilidad o varita especial, los estados que le iba a dejar le rebotan 1 turno a quien se la tiró (sin el daño ni la cura). Desde el hook
+   `habResistida` del duelo, en la pantalla del GM. */
+async function talContrahechizo(d){
+  const ta = tokens.get(d.defensor.tokenId), eq = talEquipoDe(ta);
+  if(!eq) return;
+  const tiene = eq.creep ? (eq.creep.equipo || []).some(i => i && i.contrahechizo) : !!eq.resumen.contrahechizo;
+  const contra = (d.hab && Array.isArray(d.hab.contra) ? d.hab.contra : []).map(x => typeof x === 'string' ? x : x && x.stat);
+  if(!tiene || !contra.includes('resmg')) return;
+  const efs = (d.hab.efectos || []).filter(e => e && e.spec && e.spec.nombre && !(num(e.cura) > 0) && e.no2 === undefined);
+  if(!efs.length) return;
+  const k = `contrahechizo|${d.defensor.tokenId}@${Math.round(num(mantenimientoNumero))}`;
+  if(talismanUsados.has(k)) return;
+  talismanUsados.add(k);
+  const d2 = {...d, atacante: d.defensor, defensor: d.atacante};
+  const notas = [];
+  for(const ef of efs){
+    const r = await dueloAplicarEfectoBase(d2, {...ef, caras: 1, exitos: 1, spec: {...ef.spec, turnos: 1}}).catch(err => { console.error('El Contrahechizo:', err); return {manual: true}; });
+    notas.push(`${ef.spec.nombre}${r && r.manual ? ' (a mano)' : r && r.nota && /no entr|inmune/i.test(r.nota) ? ' (no entró)' : ''}`);
+  }
+  const txt = `${d.defensor.nombre} resiste ${d.hab.nombre || 'la habilidad'} y le rebota a ${d.atacante.nombre}: ${notas.join(', ')} (1 turno)`;
+  try{ mesaLinea(`🔮 Contrahechizo: ${txt}`, 'recordatorio'); }catch(err){}
+  try{ momentoAbrir({tipo: 'zona-renueva', icono: '🔮', titulo: 'Contrahechizo', estado: 'listo', resultado: txt, datos: {}}); }catch(err){}
+}
 

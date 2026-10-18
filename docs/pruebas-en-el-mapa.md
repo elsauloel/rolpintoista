@@ -9,12 +9,6 @@
 > capturas. Al probar algo: pasarlo a «Probado» con fecha, qué se vio y si hubo que arreglar algo.
 
 ## Pendientes
-- [ ] **🔮 Talismanes que todavía no vi en el mapa** (2026-10-18; probados ya: Calavera, Cabeza reducida, Espejito, Relicario, Gauchito, Orbe salvaje,
-  Orbe del custodio, Botella, anillos elementales, Campana, Matelisto, Estandartes y Cruz de plata): **Piedra bezoar** (un Veneno ×3 entra ×2),
-  **Bola de cristal** (un creep en sigilo a la vista → «🔮 Bola de cristal» en el inicio del turno), **Sahumerio** (al empezar el turno, 1 en 4 de
-  sacarse un estado malo), **Ekeko** (+20 % en el reparto al finalizar el combate), **Muñeco vudú** (Debilitado con el daño especial, una vez por
-  turno), **Orbe de resguardo** (al ganar un PdG.Esp, una vez por turno), **Anillo de tormenta** (el salto del rayo a 5) y **Brújula** (el primer
-  casillero gratis).
 - [ ] **🃏 Wildcards en el duelo y en el mapa de un jugador** (2026-10-15): desde una cuenta de jugador con wildcards, (1) la cartita 🃏 arriba, en la
   fila de los lentes, girando; (2) en un duelo, después de tirar PdG/Evasión, aparecen «🃏 Wildcard» y «🪙 Moneda» lado a lado (o solo la carta) y
   reabrir con la carta descuenta 1. (Probado ya: el descanso del GM y la ventana de la ficha, ver «Probado».)
@@ -50,6 +44,13 @@
 - [ ] **🕳 Bajo tierra, lo que falta** (2026-10-14): un crítico de la Puñalada (Rengo 2 y Lisiado 1). El pozo visto como jugador ya se vio (con
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **🔮 Los ocho talismanes que faltaban** (2026-10-18, «Test con claude elsaulo», con capturas): **Piedra bezoar** (Veneno ×3 → ×2 en la
+  ficha; ojo: el cuadro del duelo sigue diciendo «le llegó Veneno ×3», porque lo baja la ficha al recibirlo), **Bola de cristal** (un creep en
+  sigilo a la vista → el paso «🔮 Bola de cristal» en «Empieza tu turno»), **Sahumerio** (1d4 → 4 se llevó Pajaritos; **arreglado**: el cartel
+  mostraba una tirada y al aplicar se tiraba otra; ahora el azar queda fijo por turno, y el estado dice «se lo llevó el humo»), **Brújula**
+  («−0 No2 (1 casillero gratis)»), **Muñeco vudú** en un creep (Debilitado 1 turno; con 0 de daño no salta, a propósito), **Orbe de resguardo**
+  (Vida extra 2 al ganar el PdG.Esp), **Anillo de tormenta** (el rayo saltó a 5 casillas) y **Ekeko** (+20 %; **arreglado**: daba 9,6 DDE, ahora
+  entero y para arriba).
 - [x] **🩸 Maldito** (2026-10-17, «Test con claude elsaulo», GM con 🎮 el control de Xeena): con Maldito y una habilidad de 2 SP, «Ejecutar» →
   «Estás Maldito: usar Chispa de prueba cuesta 2 SP y te va a bajar 2 de vida (5 → 3)»; Cancelar no cobró nada; Aceptar: vida 5 → 3, SP 3 → 1 y
   en la Mesa «🩸 Maldito: pagar 2 SP (Chispa de prueba) te sacó 2 de vida (5 → 3)». Mapa limpio después.

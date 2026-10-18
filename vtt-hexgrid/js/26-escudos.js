@@ -71,13 +71,13 @@ async function dueloEmpujon(d){
 async function orbeCustodioMapa(o){
   const origen = [...tokens.values()].find(t => t && t.fichaId === o.fichaId && bandoDe(t) === o.tipo);
   if(!origen){ mesaLinea(`🔮 ${o.orbe}: el token no está en este mapa — la Vida extra ${o.n} para un aliado al lado, a mano`); return; }
-  const lista = aliadosAlLado(origen);
-  if(!lista.length){ mesaLinea(`🔮 ${o.orbe}: no hay ningún aliado al lado de ${nombreDe(origen)} para cubrir`); return; }
+  // Quien lo lleva también puede quedarse la Vida extra (dueño, 2026-10-18): primero él, después los aliados al lado.
+  const lista = [{t: origen, yo: true}, ...aliadosAlLado(origen)];
   const el = lista.length === 1 ? lista[0] : await new Promise(res => {
     let listo = false;
     const fin = x => { if(listo) return; listo = true; AvisoCombate.cerrar(); res(x); };
-    AvisoCombate.mostrar({icono: '🔮', titulo: `${o.orbe}: ¿a quién cubrís?`, texto: `Vida extra ${o.n} hasta su próximo turno, a un aliado al lado.`,
-      botones: [...lista.map(a => ({texto: nombreDe(a.t), alClic: () => fin(a)})), {texto: 'A nadie', sec: true, alClic: () => fin(null)}], alCerrar: () => fin(null)});
+    AvisoCombate.mostrar({icono: '🔮', titulo: `${o.orbe}: ¿a quién cubrís?`, texto: `Vida extra ${o.n} hasta su próximo turno: para vos o para un aliado al lado.`,
+      botones: [...lista.map(a => ({texto: a.yo ? `${nombreDe(a.t)} (vos)` : nombreDe(a.t), alClic: () => fin(a)})), {texto: 'A nadie', sec: true, alClic: () => fin(null)}], alCerrar: () => fin(null)});
   });
   if(!el) return;
   const spec = {nombre: 'Vida extra', turnos: 1, escudoMagico: o.n};

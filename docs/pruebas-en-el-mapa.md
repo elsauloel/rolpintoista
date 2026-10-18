@@ -487,3 +487,8 @@
   las reglas, y la Mesa adelantaba el resultado.
 - ✅ **📋 Ctrl+C / Ctrl+V de un creep** (2026-10-09): «Sí, crear su ficha» duplicó el creep (GM Tools lo levantó con sus habilidades y su vida) y el
   token quedó vinculado; GM Tools pregunta «¿crear su token?» al duplicar.
+- ✅ **🧊 El hielo y 💧 el charco** (2026-10-17, «Test con claude elsaulo», con capturas): el hielo aparece bajo Silvia → «Tirar Agilidad» (2 contra
+  9, Sentada); caminar 2 y 3 casilleros → «una tirada por paso», falla el primero y queda en esa casilla; al derretirse queda el charco (una mancha
+  ondulada, permanente); una zona de fuego encima evaporó la parte de abajo. El rayo en el agua da ×1,5 (5 → 8). Las nubes: verde, violeta y gris.
+- [ ] **💧 La Parálisis al doble en el agua, dentro de un duelo** (2026-10-17): falta verla en un duelo de verdad (un rayo con Parálisis contra
+  alguien parado en un charco: el tablero de efectos tiene que mostrar el doble de chance y «💧 en el agua»).

@@ -4405,7 +4405,8 @@ prueba('Talismanes (2026-10-18): el Sahumerio saca un estado malo con un 4 en d4
   const r1 = [], x1 = FichaMantenimiento.sahumerio(S, r1, () => 0.1), r2 = [], x2 = FichaMantenimiento.sahumerio(S, r2, () => 0.99);
   const rep = {jugadores: [{id: 'a', incluido: true, estado: 'en pie', ekeko: 20}, {id: 'b', incluido: true, estado: 'en pie'}], extra: {}, xpPorJugador: null, ddePorJugador: null};
   const rr = CombateFin.calcularReparto ? CombateFin.calcularReparto(rep, {xpTotal: 0, filas: [{derrotado: true, oro: 100}]}) : null;
-  igual([x1.saco, x2.saco, S.efectos.map(e => e.nombre), rr ? rr.porJugador.map(p => p.dde) : null], [null, 'Veneno', ['Vida extra'], rr ? [60, 50] : null]);
+  const rr2 = CombateFin.calcularReparto(rep, {xpTotal: 0, filas: [{derrotado: true, oro: 16}]});   // 8 cada uno: el 20 % es 1,6 → 2 (para arriba)
+  igual([x1.saco, x2.saco, S.efectos.map(e => e.nombre), rr ? rr.porJugador.map(p => p.dde) : null, rr2.porJugador.map(p => p.dde)], [null, 'Veneno', ['Vida extra'], rr ? [60, 50] : null, [10, 8]]);
 });
 
 prueba('Talismanes (2026-10-18): la Piedra bezoar, 1 stack menos de Veneno (un creep y un personaje)', () => {

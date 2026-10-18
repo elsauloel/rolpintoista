@@ -287,7 +287,7 @@ const CombateFin = (() => {
     const porJugador = incluidos.map(j => {
       const ex = rep.extra[j.id] || {};
       const xpParte = Math.floor(xpValor * FACTOR_XP_ESTADO[j.estado]);
-      const ekeko = num(j.ekeko) > 0 ? Math.round(ddeValor * num(j.ekeko)) / 100 : 0;   // 🔮 el Ekeko: +N % de su parte
+      const ekeko = num(j.ekeko) > 0 ? Math.ceil(ddeValor * num(j.ekeko) / 100 - 1e-9) : 0;   // 🔮 el Ekeko: +N % de su parte, en DDE enteros y para arriba (es un bono)
       return {j, xpParte, ddeParte: ddeValor, xpExtra: num(ex.xp), ddeExtra: num(ex.dde), ekeko,
         xp: Math.max(0, xpParte + num(ex.xp)), dde: Math.max(0, Math.round((ddeValor + ekeko + num(ex.dde)) * 100) / 100)};
     });

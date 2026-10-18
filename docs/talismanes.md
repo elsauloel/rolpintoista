@@ -105,7 +105,7 @@ Lo que el dueño marcó de la lista, con sus cambios. Lo que no nombró queda af
 | Frasco de tormenta | Tus relámpagos saltan una casilla más lejos (el salto eléctrico, de 4 a 5) |
 | Botella con un diablito | Al usar una varita podés destaparla: +1d4 al daño; si el d4 sale 1, no suma y te quema a vos (1d4 de fuego directo) |
 | Relicario de sangre (antes «De sangre») | Al matar con una varita, +5 de vida |
-| Mate listo (antes «Mate con termo») | Empezás el combate con 1 No2 de más (por encima del máximo; si no lo gastás, se va en la primera recarga) |
+| Matelisto Taragüí (antes «Mate con termo»: termo, mate y bombilla integrados, se usa con una mano) | Empezás el combate con 1 No2 de más (por encima del máximo; si no lo gastás, se va en la primera recarga) |
 | Estandarte chico (4 versiones) | Los aliados al lado tuyo: +1 Res.CC · +2 Res.Mt · +1 Defensa · +1 Defensa especial (una versión cada uno) |
 
 **Con preguntas (P204–P208 en `preguntas-abiertas.md`)**

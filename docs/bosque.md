@@ -218,4 +218,9 @@ De a uno, de nivel más bajo a más alto; primero el ataque básico y después c
   ni la varita para Larry: con Ef.Esp 19 la ventisca lo deja Sentado a casi todos). El efecto del Anillo de escarcha, como **pasiva propia** que
   no se suelta: **Frío del cristal** (+2 al daño de hielo: el Granizo 1d6+4, la ventisca 1d4+2 a cada uno). Mecánica nueva: una pasiva de creep
   con `masDanoElem` suma como el anillo (`CreepCalculo.masDanoElem`), probado en el mapa de prueba.
+- Kobold maldiciente (`84v7855`, minas): sin cambios (sigue con la Varita del susurro y el Orbe salvaje; se ofreció la Botella con un diablito).
+- El ocultista (`vz9uwgy`, jefe del Bosque): las manos como estaban (Daga ritual y Varita arcana mayor) y el aura de la Calavera con vela como
+  **pasiva propia**, **Amuletos que tintinean** (la nota ya hablaba de sus amuletos): aura de 3, el rival que entra tira Res.Mt contra su Ef.Esp 11
+  o queda con Miedo. Es la respuesta a Petro (Esp 5), que lo iría a buscar; Larry (Res.Mt 19) casi siempre la resiste. No se suelta. Mecánica:
+  `CreepCalculo.auraMiedo` lee también las pasivas (probado en el mapa de prueba); los textos del cartel dicen «aura espeluznante».
 

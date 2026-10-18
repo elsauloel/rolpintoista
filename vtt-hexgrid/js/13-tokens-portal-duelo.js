@@ -1373,7 +1373,10 @@ async function dueloAplicarDano(d){
   if(salvaje && salvaje.mult > 1 && magico) multHab *= salvaje.mult;
   // 🔮 La Botella con un diablito (js/53): +N a todo tu daño especial (si hay el de la habilidad, ahí; si no, al del arma).
   const botella = typeof talismanDe === 'function' && (magico || (dn.magico && num(dn.magico.total) > 0)) ? talismanDe(d.atacante && tokens.get(d.atacante.tokenId), 'botella') : 0;
-  const mult = critReal ? d.crit.mult : 1, crudo = Math.ceil(Math.max(0, num(dn.crudo) - menosDist + (magico ? botella : 0)) * multHab), golpe = crudo * mult;
+  // 💍 Los anillos elementales (js/53): +N al daño de su elemento (el de la habilidad acá; el elemental del arma, más abajo).
+  const elHab = d.hab && d.hab.dano && num(dn.crudo) > 0 ? Combatiente.elementoDe(d.hab.dano.tipo) : '';
+  const anilloHab = elHab && typeof talMasDanoElem === 'function' ? talMasDanoElem(d, elHab) : 0;
+  const mult = critReal ? d.crit.mult : 1, crudo = Math.ceil(Math.max(0, num(dn.crudo) - menosDist + (magico ? botella : 0) + anilloHab) * multHab), golpe = crudo * mult;
   const base = {crudo, mult, golpe, ignoraDef: crit, mitad: d.resultado === 'mitad', ...(multHab > 1 ? {cargaMult: `${d.hab.dano.carga || 'Carga'}: ${fmt(Math.max(0, num(dn.crudo) - menosDist))} +${Math.round((multHab - 1) * 100)} % = ${fmt(crudo)}`} : {})};
   if(!t) return {...base, manual: true, motivoManual: 'el token ya no está en el mapa'};
   const esInv = t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION);
@@ -1430,7 +1433,8 @@ async function dueloAplicarDano(d){
       // elemento (Res. fuego…), como el daño de una habilidad. Con dos elementos juntos («Fuego y Hielo») no se resta ninguna.
       const elMag = String(dn.magico.tipo || '').includes(' y ') ? '' : Combatiente.elementoDe(dn.magico.tipo);
       const resMag = elMag ? (await resistenciasDe(t, elMag, invLeida)).res : 0;
-      const totMag = (num(dn.magico.total) + (habMagica ? 0 : botella)) * (salvaje && !habMagica ? salvaje.mult : 1);   // 🔮 la Botella y el Orbe salvaje (si no los usó ya el daño de la habilidad)
+      const anilloMag = elMag && typeof talMasDanoElem === 'function' ? talMasDanoElem(d, elMag) : 0;   // 💍 el anillo de ese elemento
+      const totMag = (num(dn.magico.total) + (habMagica ? 0 : botella) + anilloMag) * (salvaje && !habMagica ? salvaje.mult : 1);   // 🔮 la Botella y el Orbe salvaje (si no los usó ya el daño de la habilidad)
       const agM = typeof aguaRayo === 'function' ? aguaRayo(t, elMag, totMag) : {monto: totMag, txt: ''};   // 💧 (js/50)
       const rm = esInv ? await danioInv(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true})
         : t.tipo === 'creep' ? await danioCreep(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true}) : await danioPj(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true});
@@ -1489,7 +1493,7 @@ async function dueloPorDano(d, entro){
 async function dueloCadena(d, entro){
   const id = d.defensor && d.defensor.tokenId;
   if(!id || !tokens.get(id)) return;
-  const c = d.hab.cadena, cadena0 = rayoCadena(id, entro);
+  const c = d.hab.cadena, cadena0 = rayoCadena(id, entro, typeof talismanDe === 'function' ? talismanDe(tokens.get(d.atacante.tokenId), 'saltoMas') : 0);   // 💍 el Anillo de tormenta
   if(cadena0.length < 2) return;
   const hubo = await rayoCadenaAplicar(cadena0);
   if(!hubo.length) return;

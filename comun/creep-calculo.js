@@ -615,7 +615,7 @@ const CreepCalculo = (() => {
     if(it.durPorPeso) o.durPorPeso = it.durPorPeso;   // durabilidad de diseño (si no es la de siempre)
     if(it.durExtra) o.durExtra = it.durExtra;         // Resistente / Frágil (2026-10-04)
     if(it.auraMiedo) o.auraMiedo = it.auraMiedo;      // 💀 la Calavera con vela (2026-10-18)
-    ['espejito', 'relicario', 'alDanoEspecial', 'talisman', 'botella'].forEach(k => { if(it[k]) o[k] = structuredClone(it[k]); });   // 🔮 talismanes (2026-10-18)
+    ['espejito', 'relicario', 'alDanoEspecial', 'talisman', 'botella', 'masDanoElem', 'saltoMas'].forEach(k => { if(it[k]) o[k] = structuredClone(it[k]); });   // 🔮 talismanes (2026-10-18)
     if(arma && it.armaDeRango) o.armaDeRango = true;
     if(arma) Object.assign(o, Combatiente.rasgosDeItem(it));   // los rasgos del arma (por la espalda, ignora, sin Parry, firmas…)
     if(arma && (it.efectosGolpe || []).length) o.efectosGolpe = structuredClone(it.efectosGolpe);

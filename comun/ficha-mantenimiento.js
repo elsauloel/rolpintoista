@@ -148,6 +148,20 @@ const FichaMantenimiento = (() => {
      de la ronda sepa que ya lo atiende su turno). ui = {fijarHp(v), muerte?(), limpiarParry?()}.
      inicioTurno → {rep, nombre, avisos}: SP Regen, lo que se dispara, pasivas, vida, turnos de muerte, No2 al máximo, ataques a 0.
      finTurno → {rep, nombre}: lo recién puesto deja de serlo (P177: el contador baja al empezar el turno, no al terminarlo). */
+  /* 🔮 El Sahumerio de palo santo (talismán, 2026-10-18): al empezar su turno, `sahumerio` % (25: un 4 en d4) de sacarle un estado malo al azar.
+     Se tira solo y queda en el reporte del turno (la Mesa). */
+  function sahumerio(S, rep, azar){
+    const pct = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.sahumerio)), 0);
+    if(!(pct > 0)) return null;
+    const malos = (S.efectos || []).filter(e => e && e.activo !== false && e.polaridad === 'debuff' && !e.derivado && !e.origenItem);
+    if(!malos.length) return null;
+    const caras = Math.max(1, Math.round(100 / pct)), dado = 1 + Math.floor((azar || Math.random)() * caras);
+    if(dado !== caras){ rep.push(`Sahumerio de palo santo: 1d${caras} → ${dado}, el humo no alcanzó`); return {dado, saco: null}; }
+    const e = malos[Math.floor((azar || Math.random)() * malos.length)];
+    S.efectos = S.efectos.filter(x => x !== e);
+    rep.push(`Sahumerio de palo santo: 1d${caras} → ${dado}, el humo se llevó ${e.nombre}`);
+    return {dado, saco: e.nombre};
+  }
   function inicioTurno(S, ui, clave, invId, conTurno, numero){
     const turno = num(numero), sin = new Set(conTurno || []);
     if(invId){
@@ -172,6 +186,7 @@ const FichaMantenimiento = (() => {
     // P177: al empezar, primero bajan los turnos de sus estados y después pega lo que sigue (empezarTurnoEstados).
     const d = Combatiente.empezarTurnoEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(c.final.resfuego)});
     rep.push(...Combatiente.reporteTurno([...v.eventos, ...d.eventos]));
+    sahumerio(S, rep);   // 🔮 el Sahumerio de palo santo (2026-10-18)
     aplicarVida(S, ui, d.hp + regenPasivas(S, log, rep), hpAntes, rep);
     contarMuerte(S, ui, log, rep);
     if(d.terminados.length){ const finS = new Set(d.terminados); S.efectos = S.efectos.filter(e => !finS.has(e)); }
@@ -282,5 +297,5 @@ const FichaMantenimiento = (() => {
     if(caido) lineas.push('sigue caído (descansar no lo levanta)');
     return lineas;
   }
-  return {terminaAlPasarDia, descansar, MAX_SEGUIDOS, aplicar, inicioTurno, finTurno, reclamar, publicarReporte, publicarRecordatorios, robosTexto, invInicio};
+  return {sahumerio, terminaAlPasarDia, descansar, MAX_SEGUIDOS, aplicar, inicioTurno, finTurno, reclamar, publicarReporte, publicarRecordatorios, robosTexto, invInicio};
 })();

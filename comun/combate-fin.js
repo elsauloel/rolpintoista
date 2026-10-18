@@ -267,7 +267,8 @@ const CombateFin = (() => {
     const nombres = new Map(miembros.docs.map(d => [d.id, String(d.data().nombre || '')]));
     const prev = new Map((previos || []).map(j => [j.id, j]));
     return fichas.docs.map(d => ({id: d.id, nombre: String(d.data().nombre || 'Sin nombre'), duenoUid: d.data().duenoUid, dueno: nombres.get(d.data().duenoUid) || '',
-      estado: estadoDeFicha(d.data()), incluido: prev.has(d.id) ? prev.get(d.id).incluido : !afuera.has(d.id)}))
+      estado: estadoDeFicha(d.data()), incluido: prev.has(d.id) ? prev.get(d.id).incluido : !afuera.has(d.id),
+      ekeko: num(((d.data().resumen) || {}).ekeko)}))   // 🔮 el Ekeko (2026-10-18): su parte del oro, un % más
       .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
   }
 
@@ -286,8 +287,9 @@ const CombateFin = (() => {
     const porJugador = incluidos.map(j => {
       const ex = rep.extra[j.id] || {};
       const xpParte = Math.floor(xpValor * FACTOR_XP_ESTADO[j.estado]);
-      return {j, xpParte, ddeParte: ddeValor, xpExtra: num(ex.xp), ddeExtra: num(ex.dde),
-        xp: Math.max(0, xpParte + num(ex.xp)), dde: Math.max(0, Math.round((ddeValor + num(ex.dde)) * 100) / 100)};
+      const ekeko = num(j.ekeko) > 0 ? Math.round(ddeValor * num(j.ekeko)) / 100 : 0;   // 🔮 el Ekeko: +N % de su parte
+      return {j, xpParte, ddeParte: ddeValor, xpExtra: num(ex.xp), ddeExtra: num(ex.dde), ekeko,
+        xp: Math.max(0, xpParte + num(ex.xp)), dde: Math.max(0, Math.round((ddeValor + ekeko + num(ex.dde)) * 100) / 100)};
     });
     return {n, xpTotal, oroTotal, xpBase, ddeCada, xpValor, ddeValor, porJugador};
   }

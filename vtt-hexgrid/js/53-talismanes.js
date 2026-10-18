@@ -10,6 +10,8 @@
      lado (`talCustodio`, desde el hook `pdgEspGanado` del duelo, en la pantalla de quien tiró; js/26 orbeCustodioMapa).
    · Botella con un diablito (`botella` = N; 2026-10-18, dueño): +N a todo tu daño especial; si en los dados de ese daño sale algún 1, el diablito
      te quema N (directo). El +N lo suma dueloAplicarDano (js/13); el aviso y la quemadura, `talBotella`.
+   · Anillos elementales (`masDanoElem` = {el, n}; 2026-10-18): +N al daño de ese elemento que hace quien lo lleva (`talMasDanoElem`, desde
+     dueloAplicarDano). Anillo de tormenta (`saltoMas`): el salto eléctrico llega N casillas más lejos (rayoCadena, js/10).
    · Orbe de resguardo (`orbeResguardo`; 2026-10-18, dueño: «al ganar una tirada de probabilidad de golpe especial»): Vida extra N para quien lo
      lleva hasta su próximo turno, una vez por turno (`talResguardo`, el mismo hook).
    Quién lo lleva: un personaje lo publica en su resumen (`espejito`, `relicario`, `orbeCustodio`, `orbeSalvaje`, `alDanoEsp`); un creep, en su
@@ -171,5 +173,15 @@ function diablitoMomento(id, d){
     AvisoCombate.mostrar({...base, pasos: [paso], veredicto: {tono: 'malo', grande: '¡TE QUEMÓ!', chico: txt}, botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}]});
   }}], alCerrar: () => { diablitosVistos.delete(id); }});   // cerrado sin aplicar: vuelve a aparecer con el próximo cambio del momento
   return true;
+}
+// 💍 Los anillos elementales: cuánto suma quien atacó al daño de ese elemento (y lo cuenta en la Mesa).
+function talMasDanoElem(d, el){
+  const ta = tokens.get(d.atacante.tokenId), eq = talEquipoDe(ta);
+  if(!eq || !el) return 0;
+  let n = 0;
+  if(eq.creep) (eq.creep.equipo || []).forEach(i => { if(i && i.masDanoElem && i.masDanoElem.el === el) n += num(i.masDanoElem.n); });
+  else n = num((eq.resumen.masDanoElem || {})[el]);
+  if(n > 0) try{ mesaLinea(`💍 El anillo de ${d.atacante.nombre}: +${n} al daño de ${Combatiente.ELEMENTOS && Combatiente.ELEMENTOS[el] ? Combatiente.ELEMENTOS[el].nombre || el : el}`, 'recordatorio'); }catch(err){}
+  return n;
 }
 

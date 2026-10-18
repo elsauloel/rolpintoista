@@ -490,7 +490,8 @@ function hudHpPrevia(t, d, texto){
    resta la Res. eléctrica de quien lo recibe; salta todas las veces que pueda, sin tope, hasta llegar a 1. `rayoCadena` arma el camino (los
    más cercanos, con el daño que tendría sin resistencias); `rayoCadenaAplicar` lo recorre de verdad y corta cuando el daño no llega a 1. */
 const RAYO_SALTO_MAX = 4;
-function rayoCadena(idInicial, dano){
+// `mas` (2026-10-18, el Anillo de tormenta): casillas de más para cada salto.
+function rayoCadena(idInicial, dano, mas){
   const t0 = tokens.get(idInicial);
   if(!t0) return [];
   const cadena = [{id: idInicial, t: t0, dano: Math.max(0, Math.ceil(num(dano)))}];
@@ -501,7 +502,7 @@ function rayoCadena(idInicial, dano){
     tokens.forEach((x, id) => {
       if(usados.has(id) || x.tipo !== t0.tipo || !x.fichaId || (x.oculto && !soyGM) || x.bajoTierra) return;   // 🕳 bajo tierra: no le llega
       const dist = distanciaHex({col: actual.col, fila: actual.fila}, {col: x.col, fila: x.fila});
-      if(dist <= RAYO_SALTO_MAX && dist < mejorDist){ mejor = {id, x}; mejorDist = dist; }
+      if(dist <= RAYO_SALTO_MAX + Math.max(0, Math.round(num(mas))) && dist < mejorDist){ mejor = {id, x}; mejorDist = dist; }
     });
     if(!mejor || d <= 1) break;
     d = Math.floor(d / 2);

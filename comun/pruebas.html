@@ -4398,6 +4398,16 @@ prueba('Estatuilla del Gauchito Gil (2026-10-18): la primera tirada de PdG, PdG.
     [true, true, true, null, null, null]);
 });
 
+prueba('Talismanes (2026-10-18): el Sahumerio saca un estado malo con un 4 en d4; el Ekeko suma su % al oro', () => {
+  const S = FichaGuardado.normalizar({}).S;
+  S.inventario = [{id: 's', nombre: 'Sahumerio', equipado: true, sahumerio: 25}];
+  S.efectos = [EstadosAplicar.componer({nombre: 'Veneno'}), EstadosAplicar.componer({nombre: 'Escudo especial'})];
+  const r1 = [], x1 = FichaMantenimiento.sahumerio(S, r1, () => 0.1), r2 = [], x2 = FichaMantenimiento.sahumerio(S, r2, () => 0.99);
+  const rep = {jugadores: [{id: 'a', incluido: true, estado: 'en pie', ekeko: 20}, {id: 'b', incluido: true, estado: 'en pie'}], extra: {}, xpPorJugador: null, ddePorJugador: null};
+  const rr = CombateFin.calcularReparto ? CombateFin.calcularReparto(rep, {xpTotal: 0, filas: [{derrotado: true, oro: 100}]}) : null;
+  igual([x1.saco, x2.saco, S.efectos.map(e => e.nombre), rr ? rr.porJugador.map(p => p.dde) : null], [null, 'Veneno', ['Vida extra'], rr ? [60, 50] : null]);
+});
+
 prueba('ataque sin arma: tiene daño (provisorio 1d4 + Dmg, P150)', () => {
   igual([FichaCombate.danoSinArmaTxt(3), FichaCombate.danoSinArmaTxt(0), FichaCombate.tipoAtaque(null)], ['1d4 + 3', '1d4', 4]);
 });

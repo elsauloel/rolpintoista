@@ -492,3 +492,6 @@
   ondulada, permanente); una zona de fuego encima evaporó la parte de abajo. El rayo en el agua da ×1,5 (5 → 8). Las nubes: verde, violeta y gris.
 - [ ] **💧 La Parálisis al doble en el agua, dentro de un duelo** (2026-10-17): falta verla en un duelo de verdad (un rayo con Parálisis contra
   alguien parado en un charco: el tablero de efectos tiene que mostrar el doble de chance y «💧 en el agua»).
+- [ ] **⚡💧 El rayo corre por el agua, en un duelo de verdad** (2026-10-17): probado llamando a la función con dos personajes en un charco
+  (Xeena recibió 4 × 1,5 = 6, la Crónica y la Mesa lo contaron); falta un duelo real con un rayo con Parálisis, para ver que la Parálisis del
+  otro se aplica sola (en la prueba salió «a mano» por el duelo armado a mano).

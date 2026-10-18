@@ -98,14 +98,14 @@ Lo que el dueño marcó de la lista, con sus cambios. Lo que no nombró queda af
 | Muñeco vudú (P206) | PdG.Esp +1 · la primera vez en cada turno que pegás con una varita, el objetivo queda Debilitado 1 turno |
 | Piedras de elemento (brasa, escarcha, tormenta, pantano, corrosiva) | Resistencia a su elemento +3 como mínimo (Común +3; las de más calidad, más) |
 | Piedra bezoar | Res. tóxico +2 · una vez por combate te saca el Veneno |
-| Espejito de bolsillo | Le devolvés a quien te pegó el 20 % (para arriba) del daño especial que te entró (dueño: sin dado) |
-| Contrahechizo (**en revisión**: «una vez por combate» no convence; darle la vuelta) | Una vez por combate anulás un efecto especial que te tiren, si ganás tu Ef.Esp contra el suyo |
+| Espejito de bolsillo | Le devolvés a quien te pegó el 20 % (para arriba) del daño especial que te entró, mínimo 1 (dueño: sin dado) |
+| Contrahechizo | +2 a tus tiradas para resistir efectos especiales; una vez por ronda, cuando resistís uno, quien te lo tiró queda con ese mismo efecto 1 turno (rebota) · Buena, 140 |
 | ~~Brasa en un frasco~~ → **anillos** (dueño: poco efecto para una mano): Anillo de brasa, de escarcha, de chispa, de miasma, de ácido | +2 al daño de su elemento · Común, 50 |
 | Grimorio gastado | PdG.Esp +1 · SP máximo +2 |
 | ~~Frasco de tormenta~~ → **Anillo de tormenta** | El salto eléctrico, de 4 a 5 casillas · Común, 60 |
 | Botella con un diablito | Al usar una varita podés destaparla: +1d4 al daño; si el d4 sale 1, no suma y te quema a vos (1d4 de fuego directo) |
-| Relicario de sangre (antes «De sangre») | Cada vez que matás con daño especial, +5 de vida |
-| Matelisto Taragüí (**en revisión**: poco efecto para ocupar una mano; antes «Mate con termo») | Empezás el combate con 1 No2 de más (por encima del máximo; si no lo gastás, se va en la primera recarga) |
+| Relicario de sangre (antes «De sangre») | Cada vez que matás con daño especial, Vida extra 10 |
+| Matelisto Taragüí (antes «Mate con termo») | La ronda de mate: una vez por ronda, en tu turno, le pasás el mate a un aliado al lado tuyo y recupera 2 No2 · Buena, 130 |
 | Estandartes (4 versiones) | Los aliados al lado tuyo: Firmeza +2 Res.CC · Templanza +3 Res.Mt · Muro +1 Defensa · Amparo +1 Defensa especial |
 
 **Con preguntas (P204–P208 en `preguntas-abiertas.md`)**

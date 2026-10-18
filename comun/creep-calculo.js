@@ -473,6 +473,11 @@ const CreepCalculo = (() => {
   const enLasManos = it => /^(arma_|escudo_)/.test(String((it && it.tipoItem) || ''));
   // 💀 El radio del aura espeluznante (la Calavera con vela, 2026-10-18): lo más grande de lo que tiene equipado.
   // 💀 El aura espeluznante (el radio): de la Calavera con vela del equipo o de una pasiva propia con su efecto (dueño 2026-10-18: El ocultista).
+  // 🚩 Los estandartes de un creep (los aliados cerca, con el bono): de su equipo y de sus pasivas (dueño 2026-10-18: el Kobold hongero, rango 2).
+  // `rango`: hasta cuántas casillas llega (sin él, 1: al lado). → [{stat, val, rango, nombre}].
+  const estandartes = sc => [...(Array.isArray(sc && sc.equipo) ? sc.equipo : []), ...(Array.isArray(sc && sc.pasivas) ? sc.pasivas : [])]
+    .filter(x => x && x.estandarte && x.estandarte.stat)
+    .map(x => ({stat: String(x.estandarte.stat), val: num(x.estandarte.val), rango: Math.max(1, Math.round(num(x.estandarte.rango)) || 1), nombre: String(x.nombre || '').slice(0, 40)}));
   const auraMiedo = sc => [...(Array.isArray(sc && sc.equipo) ? sc.equipo : []), ...(Array.isArray(sc && sc.pasivas) ? sc.pasivas : [])]
     .reduce((a, it) => Math.max(a, num(it && it.auraMiedo)), 0);
   // 🔮 Un talismán de su equipo (2026-10-18): lo más grande de ese campo (`espejito`, `relicario`).
@@ -683,7 +688,7 @@ const CreepCalculo = (() => {
     return partes.length ? partes.join(' · ') : 'nada';
   }
 
-  return {talisman, auraMiedo, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
+  return {talisman, auraMiedo, estandartes, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
     TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto,
     trofeo, despojosDePrecio, dropsResumen, dropsFijos,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,

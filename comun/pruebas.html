@@ -4437,6 +4437,11 @@ prueba('Talismanes (2026-10-18): el aura de la Calavera sale del equipo o de una
     CreepCalculo.auraMiedo({equipo: [], pasivas: []})], [3, 3, 0]);
 });
 
+prueba('Talismanes (2026-10-18): los estandartes de un creep salen del equipo o de una pasiva, con su rango', () => {
+  const l = CreepCalculo.estandartes({equipo: [{nombre: 'Estandarte del muro', estandarte: {stat: 'def', val: 1}}], pasivas: [{nombre: 'Esporas de corteza', estandarte: {stat: 'def', val: 1, rango: 2}}, {nombre: 'Otra'}]});
+  igual(l.map(e => `${e.nombre}:${e.stat}+${e.val}@${e.rango}`), ['Estandarte del muro:def+1@1', 'Esporas de corteza:def+1@2']);
+});
+
 prueba('ataque sin arma: tiene daño (provisorio 1d4 + Dmg, P150)', () => {
   igual([FichaCombate.danoSinArmaTxt(3), FichaCombate.danoSinArmaTxt(0), FichaCombate.tipoAtaque(null)], ['1d4 + 3', '1d4', 4]);
 });

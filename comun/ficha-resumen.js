@@ -125,7 +125,7 @@ const FichaResumen = (() => {
       ...(() => { const eq = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)); const sv = eq.find(i => i.orbeSalvaje === 'domado') || eq.find(i => i.orbeSalvaje);
         const td = Combatiente.talismanesDanoEsp(eq);
         const me = {}; eq.forEach(i => { if(i.masDanoElem && i.masDanoElem.el) me[i.masDanoElem.el] = num(me[i.masDanoElem.el]) + num(i.masDanoElem.n); });   // 💍 los anillos elementales
-        const est = eq.filter(i => i.estandarte && i.estandarte.stat).slice(0, 4).map(i => ({stat: String(i.estandarte.stat), val: num(i.estandarte.val), nombre: String(i.nombre || '').slice(0, 40)}));   // 🚩 los estandartes
+        const est = eq.filter(i => i.estandarte && i.estandarte.stat).slice(0, 4).map(i => ({stat: String(i.estandarte.stat), val: num(i.estandarte.val), ...(num(i.estandarte.rango) > 1 ? {rango: Math.round(num(i.estandarte.rango))} : {}), nombre: String(i.nombre || '').slice(0, 40)}));   // 🚩 los estandartes
         return {...(est.length ? {estandartes: est} : {}), ...(Object.keys(me).length ? {masDanoElem: me} : {}), ...(sv ? {orbeSalvaje: sv.orbeSalvaje === 'domado' ? 'domado' : 'salvaje', orbeSalvajeNombre: String(sv.nombre || '').slice(0, 40)} : {}), ...(td.length ? {alDanoEsp: td} : {})}; })(),
       dmgesp: n(c.final.dmgesp),
       levitar: n(c.final.levitar), suelagruesa: n(c.final.suelagruesa), embestida: n(c.final.embestida), pasodoble: n(c.final.pasodoble),   // piernas (2026-10-06)

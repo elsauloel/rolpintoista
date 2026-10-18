@@ -261,7 +261,7 @@ const ESTANDARTE_PREFIJO = '🚩 ';
 const estandarteEnviados = new Map();   // clave → hora del último envío
 function estandartesDe(t){
   if(!t || !t.fichaId) return [];
-  if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return sc ? (sc.equipo || []).filter(i => i && i.estandarte && i.estandarte.stat).map(i => ({stat: i.estandarte.stat, val: num(i.estandarte.val), nombre: i.nombre})) : []; }
+  if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return sc ? CreepCalculo.estandartes(sc) : []; }   // del equipo y de las pasivas
   if(String(t.fichaId).includes(SEP_INVOCACION)) return [];
   const f = fichasPub.get(t.fichaId);
   return (f && f.resumen && f.resumen.estandartes) || [];
@@ -272,10 +272,10 @@ async function estandartesRevisar(){
   tokens.forEach((t, id) => {
     const lista = estandartesDe(t);
     if(!lista.length || (typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(id))) return;
-    aliadosAlLado(t, 1).forEach(a => {
+    lista.forEach(e => aliadosAlLado(t, Math.max(1, Math.round(num(e.rango)) || 1)).forEach(a => {   // `rango`: hasta dónde llega (sin él, al lado)
       if(!quiere.has(a.id)) quiere.set(a.id, new Map());
-      lista.forEach(e => quiere.get(a.id).set(ESTANDARTE_PREFIJO + e.nombre, e));
-    });
+      quiere.get(a.id).set(ESTANDARTE_PREFIJO + e.nombre, e);
+    }));
   });
   const ahora = Date.now(), reciente = k => ahora - num(estandarteEnviados.get(k)) < 120000;   // no repetir el aviso por 2 minutos (si su dueño no está conectado, espera)
   for(const [id, x] of tokens){
@@ -285,7 +285,7 @@ async function estandartesRevisar(){
     const poner = [...q.keys()].filter(n => !tiene.includes(n)), sacar = tiene.filter(n => !q.has(n));
     for(const n of poner){
       const k = `${id}|+${n}`; if(reciente(k)) continue; estandarteEnviados.set(k, ahora);
-      const e = q.get(n), spec = {nombre: n, polaridad: 'buff', permanente: true, mods: [{stat: e.stat, val: e.val}], detalle: `Al lado de un aliado con ${e.nombre}: +${e.val} ${FichaCalculo && FichaCalculo.STAT_LABEL ? FichaCalculo.STAT_LABEL[e.stat] || e.stat : e.stat}. Se va cuando se aleja.`};
+      const e = q.get(n), spec = {nombre: n, polaridad: 'buff', permanente: true, mods: [{stat: e.stat, val: e.val}], detalle: `${num(e.rango) > 1 ? `A ${Math.round(num(e.rango))} casillas o menos` : 'Al lado'} de un aliado con ${e.nombre}: +${e.val} ${FichaCalculo && FichaCalculo.STAT_LABEL ? FichaCalculo.STAT_LABEL[e.stat] || e.stat : e.stat}. Se va cuando se aleja.`};
       try{
         if(x.tipo === 'creep') await modificarCreep(x.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
         else{ const f = fichasPub.get(String(x.fichaId).split(SEP_INVOCACION)[0]); await EstadosAplicar.encolarPj({fichaId: x.fichaId, duenoUid: (f && f.duenoUid) || x.duenoUid, spec, origen: e.nombre}); }

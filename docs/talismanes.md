@@ -123,3 +123,13 @@ Segunda oportunidad, Amortiguador, Cáscara, Anclaje, Piedra de afilar arcana, C
 con una Calavera armada como escudo de una mano, el duelo la ofrecía como Parry. Al cargarlos, marcarlos como los orbes (`orbe: true`) o con
 una marca propia de talismán que `Combatiente.piezasParaParry` y `armasYEscudosParaParry` dejen afuera.
 
+## Disparadores de los orbes y talismanes «de varita» (dueño, 2026-10-18, en curso)
+
+- **Orbe salvaje (Común):** con cualquier daño especial (varita, habilidad, flecha elemental), no solo con varita. d6: 1 te hace 1 de daño a vos; 6, doble.
+- **Orbe salvaje domado (Buena):** igual de amplio. d6: 1 te hace 1 de daño a vos; 5 nada; **6, el triple**.
+- **Orbe del custodio:** se activa cuando quien lo lleva gana una tirada de PdG.Esp (su Vida extra 2 a un aliado al lado). Falta confirmar si sigue siendo una vez por turno.
+- **Orbe de resguardo:** sin decidir (propuesta: al usar algo especial —varita, báculo o habilidad con SP—, aunque falle).
+- **Botella con un diablito:** se rehace — el dueño quiere el diablillo impredecible pero sin una tirada extra que trabe el juego.
+- **Cabeza reducida y Muñeco vudú:** en revisión.
+- Pendiente de programar: todo lo de esta sección (hoy siguen disparándose con la varita).
+

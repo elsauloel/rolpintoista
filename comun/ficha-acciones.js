@@ -1002,9 +1002,9 @@ const FichaAcciones = (() => {
       return;
     }
     // «Pierde No2» (2026-10-02, Sonic Boom): baja los No2 (`stacks` = cuántos); si llega a 0 y corresponde, queda Sentado.
-    if(spec.nombre === 'Gana No2'){   // 🧉 el Matelisto Taragüí (2026-10-18): hasta su máximo
-      const n = Math.max(0, Math.round(num(spec.stacks))), antes = num(S.nitros), max = FichaBotonera.nitrosMaximo(S);
-      S.nitros = Math.max(antes, Math.min(max, antes + n));
+    if(spec.nombre === 'Gana No2'){   // 🧉 el Matelisto Taragüí (2026-10-18): aunque pase su máximo (dueño); lo de más se va en la próxima recarga
+      const n = Math.max(0, Math.round(num(spec.stacks))), antes = num(S.nitros);
+      S.nitros = antes + n;
       ui.cambio(['nitros', 'refresh']);
       ui.toast(`${origen ? origen + ': ' : ''}+${fmt(S.nitros - antes)} No2 (${fmt(antes)} → ${fmt(S.nitros)})`);
       return;

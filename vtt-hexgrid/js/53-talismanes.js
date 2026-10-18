@@ -187,7 +187,7 @@ function talMasDanoElem(d, el){
 /* 🔔 La Campana de bronce y 🧉 el Matelisto Taragüí (2026-10-18): el botón de la Botonera (data-talisman). La Campana: una vez por combate (la
    marca `S.meta.campanaUsada`, que se libera al volver a narrativo, js/25), 1 No2; a quien la toca y a sus aliados a 2 o menos les saca Pajaritos
    y Confusión. El Matelisto: una vez por ronda (`S.meta.mateRonda`), en su turno (fuera de turno avisa y deja seguir): un aliado al lado recibe
-   2 No2 (hasta su máximo). A los personajes les llega por aviso (comun/recibidos.js); a los creeps, directo. */
+   2 No2, aunque pase su máximo (dueño; lo de más se va en la próxima recarga). A los personajes les llega por aviso (comun/recibidos.js); a los creeps, directo. */
 const TAL_CAMPANA_SACA = ['Pajaritos', 'Confusión'];
 async function talismanAccion(fichaId, itemId){
   const S = bn && bn.fichaId === fichaId ? bn.S : null;
@@ -233,7 +233,7 @@ async function talismanAccion(fichaId, itemId){
     if(!el) return;
     await editarPersonajeMapa(fichaId, S2 => { S2.meta = {...(S2.meta || {}), mateRonda: ronda}; return ['general']; });
     try{
-      if(el.t.tipo === 'creep') await modificarCreep(el.t.fichaId, sc => { sc.nitros = Math.min(num(CreepCalculo.nitrosMax ? CreepCalculo.nitrosMax(sc) : sc.nitros + 2), num(sc.nitros) + 2); return true; });
+      if(el.t.tipo === 'creep') await modificarCreep(el.t.fichaId, sc => { sc.nitros = num(sc.nitros) + 2; return true; });   // aunque pase su máximo (dueño)
       else{ const f = fichasPub.get(String(el.t.fichaId).split(SEP_INVOCACION)[0]); await EstadosAplicar.encolarPj({fichaId: el.t.fichaId, duenoUid: (f && f.duenoUid) || el.t.duenoUid, spec: {nombre: 'Gana No2', stacks: 2}, origen: `${quien} · ${it.nombre}`}); }
       try{ mesaLinea(`🧉 ${quien} le pasa el mate a ${nombreDe(el.t)}: recupera 2 No2`, 'recordatorio'); }catch(err){}
     }catch(err){ console.error('El mate:', err); toast('🧉 No se pudo pasar el mate: a mano'); }

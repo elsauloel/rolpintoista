@@ -120,7 +120,7 @@ const FichaResumen = (() => {
       // 💀 La Calavera con vela (2026-10-18): el radio de su aura espeluznante y el Ef.Esp con que asusta (el mapa, js/52).
       auraMiedo: (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.auraMiedo)), 0),
       // 🔮 Talismanes (2026-10-18): el Espejito (% que devuelve) y el Relicario (Vida extra al matar con daño especial). El mapa los mira (js/53).
-      ...Object.fromEntries(['espejito', 'relicario', 'orbeCustodio', 'orbeResguardo', 'botella', 'saltoMas', 'ekeko', 'bolaCristal', 'contrahechizo'].map(k => [k, (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i[k])), 0)]).filter(([, v]) => v)),
+      ...Object.fromEntries(['espejito', 'relicario', 'orbeCustodio', 'orbeResguardo', 'botella', 'saltoMas', 'ekeko', 'bolaCristal', 'contrahechizo'].map(k => [k, (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, i[k] === true ? 1 : num(i[k])), 0)]).filter(([, v]) => v)),   // (un «sí» cuenta 1: la Bola de cristal, el Contrahechizo)
       // El Orbe salvaje (el más fuerte que tenga: 'domado' o true) y lo que dejan la Cabeza reducida y el Muñeco vudú al hacer daño especial (js/53).
       ...(() => { const eq = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)); const sv = eq.find(i => i.orbeSalvaje === 'domado') || eq.find(i => i.orbeSalvaje);
         const td = Combatiente.talismanesDanoEsp(eq);

@@ -98,15 +98,15 @@ Lo que el dueño marcó de la lista, con sus cambios. Lo que no nombró queda af
 | Muñeco vudú (P206) | PdG.Esp +1 · la primera vez en cada turno que pegás con una varita, el objetivo queda Debilitado 1 turno |
 | Piedras de elemento (brasa, escarcha, tormenta, pantano, corrosiva) | Resistencia a su elemento +3 como mínimo (Común +3; las de más calidad, más) |
 | Piedra bezoar | Res. tóxico +2 · una vez por combate te saca el Veneno |
-| Espejito de bolsillo | 25 % (4 en d4) de devolverle a quien te pegó 1/4 del daño especial que recibiste |
-| Contrahechizo | Una vez por combate anulás un efecto especial que te tiren, si ganás tu Ef.Esp contra el suyo |
-| Brasa en un frasco (uno por elemento) | +2 al daño de ese elemento que hacés (la excepción a la Afinidad «a todo el daño mágico», decidida) |
+| Espejito de bolsillo | Le devolvés a quien te pegó el 20 % (para arriba) del daño especial que te entró (dueño: sin dado) |
+| Contrahechizo (**en revisión**: «una vez por combate» no convence; darle la vuelta) | Una vez por combate anulás un efecto especial que te tiren, si ganás tu Ef.Esp contra el suyo |
+| ~~Brasa en un frasco~~ → **anillos** (dueño: poco efecto para una mano): Anillo de brasa, de escarcha, de chispa, de miasma, de ácido | +2 al daño de su elemento · Común, 50 |
 | Grimorio gastado | PdG.Esp +1 · SP máximo +2 |
-| Frasco de tormenta | Tus relámpagos saltan una casilla más lejos (el salto eléctrico, de 4 a 5) |
+| ~~Frasco de tormenta~~ → **Anillo de tormenta** | El salto eléctrico, de 4 a 5 casillas · Común, 60 |
 | Botella con un diablito | Al usar una varita podés destaparla: +1d4 al daño; si el d4 sale 1, no suma y te quema a vos (1d4 de fuego directo) |
-| Relicario de sangre (antes «De sangre») | Al matar con una varita, +5 de vida |
-| Matelisto Taragüí (antes «Mate con termo»: termo, mate y bombilla integrados, se usa con una mano) | Empezás el combate con 1 No2 de más (por encima del máximo; si no lo gastás, se va en la primera recarga) |
-| Estandarte chico (4 versiones) | Los aliados al lado tuyo: +1 Res.CC · +2 Res.Mt · +1 Defensa · +1 Defensa especial (una versión cada uno) |
+| Relicario de sangre (antes «De sangre») | Cada vez que matás con daño especial, +5 de vida |
+| Matelisto Taragüí (**en revisión**: poco efecto para ocupar una mano; antes «Mate con termo») | Empezás el combate con 1 No2 de más (por encima del máximo; si no lo gastás, se va en la primera recarga) |
+| Estandartes (4 versiones) | Los aliados al lado tuyo: Firmeza +2 Res.CC · Templanza +3 Res.Mt · Muro +1 Defensa · Amparo +1 Defensa especial |
 
 **Con preguntas (P204–P208 en `preguntas-abiertas.md`)**
 | Talismán | Lo que dijo el dueño |

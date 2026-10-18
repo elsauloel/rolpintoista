@@ -85,7 +85,7 @@ Lo que el dueño marcó de la lista, con sus cambios. Lo que no nombró queda af
 | Talismán | Qué hace |
 |---|---|
 | Farol | Luz portada +2 · Visión +1 |
-| Calavera con vela (P204) | Luz portada +2 · Visión +1 · Defensa especial +2 · el primero que te elige de objetivo de un ataque o una habilidad (también con varitas) en cada ronda tira Res.Mt contra tu Ef.Esp o queda con Miedo |
+| Calavera con vela (P204, P209) | Luz portada +2 · Visión +1 · Defensa especial +2 · aura espeluznante de 3 casillas alrededor tuyo: el rival que entra tira Res.Mt o queda con Miedo (moverse hacia vos le cuesta 2 No2 por casillero, y contra vos tiene −1 PdG y −1 daño, comunes y especiales) |
 | Bola de cristal | Te avisa que hay algo oculto dentro de tu campo de visión (un rival en sigilo, una trampa escondida), sin decir dónde ni revelarlo · Percepción +1 |
 | Brújula del baqueano | Iniciativa +1 · la niebla no te tapa la vista (ves a través de una nube de niebla; no la niebla de guerra) |
 | Feto de llama (ofrenda a la Pachamama) | Regeneración de vida +1 · Res. tóxico +1 |

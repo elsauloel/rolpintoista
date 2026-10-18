@@ -135,14 +135,41 @@ function talPdgEspGanado(d){
   talCustodio(d);
   talResguardo(d).catch(err => console.error('El Orbe de resguardo:', err));
 }
-// La Botella con un diablito: el aviso del +N y, si en los dados del daño especial salió algún 1, la quemadura (directo).
+/* La Botella con un diablito: el aviso del +N y, si en los dados del daño especial salió algún 1, la quemadura. La quemadura no se descuenta
+   sola (dueño, 2026-10-18: «que aparezca un cartel… el diablillo se te ríe, te hace 2 de daño de fuego y vos ponés aplicar»): un momento
+   `diablito` le abre el Anuncio a quien maneja al que lleva la Botella (`diablitoMomento`), con «Aplicar». */
 async function talBotella(d, n, rolls){
   const ta = tokens.get(d.atacante.tokenId);
   if(!ta) return;
   const uno = (rolls || []).some(x => num(x) === 1);
   if(!uno){ try{ mesaLinea(`😈 La Botella de ${d.atacante.nombre}: el diablito suma +${n} al daño especial`, 'recordatorio'); }catch(err){} return; }
-  const res = ta.tipo === 'pj' && String(ta.fichaId).includes(SEP_INVOCACION) ? await danioInv(ta, String(n), true)
-    : ta.tipo === 'creep' ? await danioCreep(ta, String(n), true) : await danioPj(ta, String(n), true);
-  try{ mesaLinea(`😈 La Botella de ${d.atacante.nombre}: +${n} al daño especial… pero salió un 1 en los dados y el diablito se ríe: a ${d.atacante.nombre} le entran ${fmt(num(res.r.recibido))} de fuego`, 'recordatorio'); }catch(err){}
+  const f = ta.tipo === 'creep' ? null : fichasPub.get(String(ta.fichaId).split(SEP_INVOCACION)[0]);
+  const paraUid = ta.tipo === 'creep' ? fbUsuario.uid : (f && f.resumen && f.resumen.control) || (f && f.duenoUid) || ta.duenoUid;
+  try{ mesaLinea(`😈 La Botella de ${d.atacante.nombre}: +${n} al daño especial… pero salió un 1 en los dados y el diablito se ríe: ${n} de fuego para ${d.atacante.nombre}`, 'recordatorio'); }catch(err){}
+  await momentoAbrir({tipo: 'diablito', icono: '😈', titulo: `El diablito de la Botella se ríe de ${d.atacante.nombre}`, estado: 'esperando',
+    resultado: `Salió un 1 en los dados del daño especial: ${n} de fuego para ${d.atacante.nombre}.`, datos: {tokenId: d.atacante.tokenId, n, paraUid, quien: d.atacante.nombre}});
+}
+const diablitosVistos = new Set();
+function diablitoMomento(id, d){
+  const dt = d.datos || {};
+  if(d.estado !== 'esperando' || !fbUsuario || dt.paraUid !== fbUsuario.uid || diablitosVistos.has(id)) return false;
+  diablitosVistos.add(id);
+  const base = {clave: 'diablito:' + id, icono: '😈', titulo: 'El diablito se ríe'};
+  const paso = {titulo: 'La Botella', texto: `Salió un 1 en los dados de tu daño especial: el diablito se te ríe y te hace ${dt.n} de daño de fuego.`};
+  AvisoCombate.mostrar({...base, pasos: [paso], botones: [{texto: `🔥 Aplicar ${dt.n} de fuego`, id: 'diablito-aplicar', alClic: async () => {
+    const b = document.getElementById('diablito-aplicar'); if(b){ b.disabled = true; b.textContent = 'Aplicando…'; }
+    const t = tokens.get(dt.tokenId);
+    let txt = '';
+    try{
+      if(!t) throw new Error('sin token');
+      const res = t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION) ? await danioInv(t, String(dt.n), true)
+        : t.tipo === 'creep' ? await danioCreep(t, String(dt.n), true) : await danioPj(t, String(dt.n), true);
+      txt = `${fmt(num(res.r.recibido))} de fuego (${fmt(num(res.previo))} → ${fmt(num(res.nuevo))})`;
+      try{ mesaLinea(`😈 El diablito quemó a ${dt.quien}: ${txt}`, 'recordatorio'); }catch(err){}
+    }catch(err){ console.error('El diablito:', err); txt = 'no se pudo aplicar solo: a mano'; }
+    try{ momentoActualizar(id, {estado: 'listo', resultado: `${dt.quien}: ${txt}.`}); }catch(err){}
+    AvisoCombate.mostrar({...base, pasos: [paso], veredicto: {tono: 'malo', grande: '¡TE QUEMÓ!', chico: txt}, botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}]});
+  }}], alCerrar: () => { diablitosVistos.delete(id); }});   // cerrado sin aplicar: vuelve a aparecer con el próximo cambio del momento
+  return true;
 }
 

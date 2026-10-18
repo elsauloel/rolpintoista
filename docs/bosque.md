@@ -201,4 +201,11 @@ De a uno, de nivel más bajo a más alto; primero el ataque básico y después c
   ítem del catálogo); deja siempre 3 botellas de botín. Nueva pasiva **Bronca acumulada** (mecánica nueva, vtt-hexgrid/js/51): cada golpe que le
   saca vida suma 1 (anunciado); al 5.º estalla: onda de 2 casillas, su PdG contra la Evasión de cada rival, 3d10+11 y Sentado. ¡A laburar!, Golpe
   al piso y Trago de grapa, en la biblioteca como auditadas.
+- **Kobold hongero** (`knh89mu`, nivel 3, cerrado; **reemplaza al Kobold coraza de cristal**, que era redundante con el escudero y el capataz —
+  dueño: faltaba un apoyo). Esp 9, Des 7, Agl 7, Con 6, Fue 4; 30 de vida. Arma: **Uñas** (natural, Tipo 6, Perfora 1, Veneno ×2 siempre); en las
+  manos la **Varita del caos** (Común) y el **Escudo de bronce con runas** (Defensa +2, Defensa especial +2: contra la maza de Petro y la magia de
+  Larry; el de obsidiana quedó como premio para otro lugar); Chaleco de cuero; pasiva **Temple mágico ×2** (Res.Esp 8). Habilidades: **Untar veneno**
+  (aliado a 2 o menos, «Arma envenenada»: 2 golpes +3 y Veneno ×3; 2 No2, cd 3), **Bejines** (trampa: flor de esporas, Pajaritos 2 turnos salvo Res.CC
+  contra 9; detectar con su Ef.Esp; 2 No2, cd 3) y **Esporas curativas** (aliado a 5 o menos, cura 2d4+2; 2 No2, cd 2). Las tres, en la biblioteca
+  como auditadas. **Los kobolds quedan auditados.**
 

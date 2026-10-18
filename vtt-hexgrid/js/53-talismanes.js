@@ -178,10 +178,10 @@ function diablitoMomento(id, d){
 function talMasDanoElem(d, el){
   const ta = tokens.get(d.atacante.tokenId), eq = talEquipoDe(ta);
   if(!eq || !el) return 0;
-  let n = 0;
-  if(eq.creep) (eq.creep.equipo || []).forEach(i => { if(i && i.masDanoElem && i.masDanoElem.el === el) n += num(i.masDanoElem.n); });
+  let n = 0, de = 'El anillo';
+  if(eq.creep){ const r = CreepCalculo.masDanoElem(eq.creep, el); n = r.n; if(r.fuentes.length) de = r.fuentes.join(' y '); }   // anillos y pasivas (comun/creep-calculo.js)
   else n = num((eq.resumen.masDanoElem || {})[el]);
-  if(n > 0) try{ mesaLinea(`💍 El anillo de ${d.atacante.nombre}: +${n} al daño de ${Combatiente.ELEMENTOS && Combatiente.ELEMENTOS[el] ? Combatiente.ELEMENTOS[el].nombre || el : el}`, 'recordatorio'); }catch(err){}
+  if(n > 0) try{ mesaLinea(`💍 ${de} de ${d.atacante.nombre}: +${n} al daño de ${Combatiente.ELEMENTOS && Combatiente.ELEMENTOS[el] ? Combatiente.ELEMENTOS[el].nombre || el : el}`, 'recordatorio'); }catch(err){}
   return n;
 }
 /* 🔔 La Campana de bronce y 🧉 el Matelisto Taragüí (2026-10-18): el botón de la Botonera (data-talisman). La Campana: una vez por combate (la

@@ -126,6 +126,16 @@ const CreepCalculo = (() => {
   const pasivaComprasCreep = p => Math.max(1, Math.round(num(p && p.compras)) || 1);
   // La vida que recuperan sus pasivas por turno (Regeneración…).
   const regenPasivas = sc => (sc.pasivas||[]).reduce((a, p) => a + num(p.regenHp) * pasivaComprasCreep(p), 0);
+  /* 💍 Cuánto suma un creep al daño de un elemento (`masDanoElem` = {el, n}): de los anillos de su equipo y de sus pasivas (una pasiva propia
+     con el efecto del anillo que no se suelta, dueño 2026-10-18: el Chamán del cristal). → {n, fuentes: [nombres]}. */
+  function masDanoElem(sc, el){
+    const fuentes = [];
+    let n = 0;
+    const sumar = (x, mult) => { if(x && x.masDanoElem && x.masDanoElem.el === el && num(x.masDanoElem.n)){ n += num(x.masDanoElem.n) * mult; fuentes.push(x.nombre || '?'); } };
+    (sc && sc.equipo || []).forEach(i => sumar(i, 1));
+    (sc && sc.pasivas || []).forEach(p => sumar(p, pasivaComprasCreep(p)));
+    return {n, fuentes};
+  }
 
   // Armadura rota activa reduce la Defensa — igual que en ficha.html.
   function estadosArmadura(sc){
@@ -618,8 +628,6 @@ const CreepCalculo = (() => {
     if(arma && it.danoAmplificado) o.danoAmplificado = it.danoAmplificado;
     if(it.durPorPeso) o.durPorPeso = it.durPorPeso;   // durabilidad de diseño (si no es la de siempre)
     if(it.durExtra) o.durExtra = it.durExtra;         // Resistente / Frágil (2026-10-04)
-    if(it.auraMiedo) o.auraMiedo = it.auraMiedo;      // 💀 la Calavera con vela (2026-10-18)
-    ['espejito', 'relicario', 'alDanoEspecial', 'talisman', 'botella', 'masDanoElem', 'saltoMas', 'estandarte', 'bezoar', 'contrahechizo'].forEach(k => { if(it[k]) o[k] = structuredClone(it[k]); });   // 🔮 talismanes (2026-10-18)
     if(arma && it.armaDeRango) o.armaDeRango = true;
     if(arma) Object.assign(o, Combatiente.rasgosDeItem(it));   // los rasgos del arma (por la espalda, ignora, sin Parry, firmas…)
     if(arma && (it.efectosGolpe || []).length) o.efectosGolpe = structuredClone(it.efectosGolpe);
@@ -673,7 +681,7 @@ const CreepCalculo = (() => {
     return partes.length ? partes.join(' · ') : 'nada';
   }
 
-  return {talisman, auraMiedo, enLasManos, regenPasivas, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
+  return {talisman, auraMiedo, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
     TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto,
     trofeo, despojosDePrecio, dropsResumen, dropsFijos,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,

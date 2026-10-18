@@ -92,7 +92,9 @@ Lo que el dueño marcó de la lista, con sus cambios. Lo que no nombró queda af
 | Feto de llama (ofrenda a la Pachamama) | Regeneración de vida +1 · Res. tóxico +1 |
 | Ekeko | +20 % de oro al final del combate (solo tu parte) · +3 ranuras de mochila |
 | Sahumerio de palo santo | Al empezar tu turno, 25 % (4 en d4) de sacarte un estado malo, al azar entre los que tengas |
-| Campana de bronce | Una vez por combate, 1 No2: a los aliados a 2 casillas o menos les saca Sueño, Pajaritos y Confusión |
+| Campana de bronce | Una vez por combate, 1 No2: a los aliados a 2 casillas o menos les saca Pajaritos y Confusión (y Sueño, si algún día existe) |
+| Estatuilla del Gauchito Gil (P205) | Defensa especial +2 · la primera tirada de PdG (o PdG.Esp), Evasión o Parry de cada ronda se tira como Afortunado: dos veces, la mejor |
+| Atrapasueños (P207) | Defensa especial +2 · Res.Mt +3 |
 | Piedras de elemento (brasa, escarcha, tormenta, pantano, corrosiva) | Resistencia a su elemento +3 como mínimo (Común +3; las de más calidad, más) |
 | Piedra bezoar | Res. tóxico +2 · una vez por combate te saca el Veneno |
 | Espejito de bolsillo | 25 % (4 en d4) de devolverle a quien te pegó 1/4 del daño especial que recibiste |
@@ -108,9 +110,7 @@ Lo que el dueño marcó de la lista, con sus cambios. Lo que no nombró queda af
 **Con preguntas (P204–P208 en `preguntas-abiertas.md`)**
 | Talismán | Lo que dijo el dueño |
 |---|---|
-| Estampita del Gauchito Gil (P205) | «¿Afortunado para sólo una tirada? ¿O durante N turnos?» · Defensa especial +1 |
-| Muñeco vudú (P206) | «Definir mecánica, turnos, tiradas. Podría ser que siempre que uses la varita contra un rival, quede marcado 1 t» |
-| Atrapasueños (P207) | «Podría ser, habría que imaginar sueño» (el estado Sueño no existe todavía) |
+| Muñeco vudú (P206) | PdG.Esp +1 · al pegar con una varita, el rival queda con un estado que ya exista (a elegir: Debilitado, Armadura rota o Marcado) |
 
 **Quedan afuera por ahora** (no los eligió): Ruda macho, Huesos de adivinar, Orbe de cuarzo opaco, Orbe cambiante, Orbe que se carga,
 Segunda oportunidad, Amortiguador, Cáscara, Anclaje, Piedra de afilar arcana, Cuerno de toro, De la calma, Guía, Pata de conejo, Bolsa de sal gruesa.

@@ -495,3 +495,7 @@
 - [ ] **⚡💧 El rayo corre por el agua, en un duelo de verdad** (2026-10-17): probado llamando a la función con dos personajes en un charco
   (Xeena recibió 4 × 1,5 = 6, la Crónica y la Mesa lo contaron); falta un duelo real con un rayo con Parálisis, para ver que la Parálisis del
   otro se aplica sola (en la prueba salió «a mano» por el duelo armado a mano).
+- ✅ **✍ El crítico a mano** (2026-10-17, duelo de prueba Silvia → Xeena): PdG 30 y Evasión 1 a mano → crítico de nivel 7; «Elegir
+  manualmente» en el crítico, escrito 17 → ×3 (la Mesa: «Crítico (1d20, a mano)»). Duelo cancelado sin contar el ataque.
+- [ ] **✍ Los efectos a mano** (2026-10-17): «✔ Funcionó / ✘ No funcionó» en el tablero de efectos; falta un duelo con un arma que tenga
+  efectos con chance.

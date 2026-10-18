@@ -846,6 +846,9 @@ const AsistenteDueloHab = (() => {
           const r = await cfg.elegirEstado();
           if(!r) return;
           arr.push(r.modo === 'preset' ? efectoDePreset(r) : {nombre: '', turnos: 2, origen: 'manual'});
+          // P210 (2026-10-18): el control dice con qué se resiste; se propone solo si todavía no se eligió ninguna (se puede cambiar).
+          const rs = r.modo === 'preset' && typeof Combatiente !== 'undefined' && Combatiente.resisteCC ? Combatiente.resisteCC(r.nombre) : '';
+          if(rs && !st.contra.size && !(st.contraExtra || []).length && !esCritico){ st.contra.add(rs); if(st.contraModo !== 'stats') st.contraModo = 'stats'; }
         }else{
           arr.push({nombre: nombresEstado()[0] || 'Estado', turnos: 2, origen: 'manual'});
         }

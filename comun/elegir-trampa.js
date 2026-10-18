@@ -13,7 +13,7 @@
 const ElegirTrampa = (() => {
   const num = v => { const n = Number(String(v ?? '').replace(',', '.')); return Number.isFinite(n) ? n : 0; };
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
-  const SALVACIONES = [['Evasión', 'Evasión'], ['Fuerza', 'Fuerza'], ['Res.CC', 'Res. a controles'], ['Res.Esp', 'Res. especial'], ['Res.Mt', 'Res. mental']];
+  const SALVACIONES = [['Evasión', 'Evasión'], ['Fuerza', 'Fuerza'], ['Res.CC', 'Res. a controles'], ['Res.Esp', 'Res. especial'], ['Res.Mt', 'Res. mental'], ['Agilidad', 'Agilidad']];
   const COLORES = ['#5C4033', '#8A8A8A', '#6B8E23', '#D9531E', '#E25822', '#7FB3D5', '#E6D84A', '#8E6BBF', '#3F6FB0', '#C4485A'];
 
   /* Los tipos de trampa (conceptos del catálogo; las cifras son una propuesta, a auditar). `pasos`: qué se pregunta, en orden, además de
@@ -197,7 +197,8 @@ const ElegirTrampa = (() => {
         if(d.etModo){ if(d.etModo === 'cero'){ deCero(); return; } if(d.etModo === 'catalogo'){ api.cerrar(); cfg.alCatalogo(); return; } st.modo = d.etModo; api.redibujar(); api.irA('tipo'); return; }
         if(d.etConcepto){ cargar(CONCEPTOS.find(x => x.id === d.etConcepto)); api.redibujar(); api.irA('tamano'); return; }
         if(d.etForma){ st.forma = d.etForma; api.redibujar(); return; }
-        if(d.etEstado !== undefined){ st.estado = d.etEstado; const p = presetDe(st.estado); st.estadoTurnos = p && (p.permanente || p.esVeneno) ? 0 : st.estado === 'Stun' ? 1 : 3; st.estadoStacks = conStacks(st.estado) ? (num(p && p.stacks) || 1) : 0; api.redibujar(); return; }
+        if(d.etEstado !== undefined){ st.estado = d.etEstado; { const rs = typeof Combatiente !== 'undefined' && Combatiente.resisteCCEtq ? Combatiente.resisteCCEtq(d.etEstado) : ''; if(rs) st.salStat = rs; }   // P210: con qué se resiste
+          const p = presetDe(st.estado); st.estadoTurnos = p && (p.permanente || p.esVeneno) ? 0 : st.estado === 'Stun' ? 1 : 3; st.estadoStacks = conStacks(st.estado) ? (num(p && p.stacks) || 1) : 0; api.redibujar(); return; }
         if(d.etOtros){ st.verOtros = !st.verOtros; api.redibujar(); return; }
         if(d.etColor){ st.color = d.etColor; api.redibujar(); return; }
         if(d.etQue){ st.salQue = d.etQue; api.redibujar(); return; }

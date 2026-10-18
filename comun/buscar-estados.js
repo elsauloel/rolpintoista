@@ -18,7 +18,7 @@ const BuscarEstados = (() => {
     'Pajaritos': 'control cc mareo aturdido mitad', 'Stun': 'control cc aturdido aturdir paralizado',
     'Inmovilizado': 'control cc atrapado quieto mover', 'Rengo': 'control cc mover lento', 'Lento': 'control mover paso',
     'Lisiado': 'control cc mitad', 'Parálisis': 'control cc paralizado', 'Sentado': 'control derribado suelo caido',
-    'Confusión': 'control confundido', 'Miedo': 'control asustado', 'Provocado': 'taunt control', 'Silencio': 'control sin habilidades mudo',
+    'Inmunidad mental': 'mente inmune mental control', 'Confusión': 'control confundido mental', 'Miedo': 'control asustado', 'Provocado': 'taunt control', 'Silencio': 'control sin habilidades mudo',
     'Desarmado': 'control arma suelta', 'Ceguera': 'control ciego vista', 'Cansado': 'no2 nitros fatiga', 'Exhausto': 'no2 nitros fatiga',
     'Hypeado': 'no2 nitros buff', 'Invulnerable': 'inmune inmunidad sin daño titilando titila revivido', 'Inmunidad a CC': 'inmune inmunidad control cc',
     'Espinas': 'devuelve refleja daño', 'Espejo': 'devuelve refleja daño especial',

@@ -36,7 +36,7 @@ const AsistenteTrampa = (() => {
   ];
   const SALVACIONES = [
     {id: 'Evasión', texto: 'Evasión'}, {id: 'Fuerza', texto: 'Fuerza'}, {id: 'Res.CC', texto: 'Res. a controles'},
-    {id: 'Res.Esp', texto: 'Res. especial'}, {id: 'Res.Mt', texto: 'Res. mental'},
+    {id: 'Res.Esp', texto: 'Res. especial'}, {id: 'Res.Mt', texto: 'Res. mental'}, {id: 'Agilidad', texto: 'Agilidad'},
   ];
 
   function estilos(){
@@ -317,7 +317,10 @@ const AsistenteTrampa = (() => {
       if(d.color){ est.color = d.color; dibujar(); return; }
       if(d.amiga !== undefined){ est.amiga = d.amiga === '1'; dibujar(); return; }
       if(d.aplica !== undefined){ est.aplicaEstado = d.aplica === '1'; if(!est.aplicaEstado){ est.estado = ''; } est.error = ''; dibujar(); return; }
-      if(d.estado){ est.estado = d.estado; est.estadoTurnos = 0; est.error = ''; dibujar(); return; }
+      if(d.estado){ est.estado = d.estado; est.estadoTurnos = 0; est.error = '';
+        const rs = typeof Combatiente !== 'undefined' && Combatiente.resisteCCEtq ? Combatiente.resisteCCEtq(d.estado) : '';   // P210: con qué se resiste
+        if(rs) est.salStat = rs;
+        dibujar(); return; }
       if(d.zonaEnMant !== undefined){ est.zonaEnMant = d.zonaEnMant === '1'; dibujar(); return; }
       if(d.zonaCadaPaso !== undefined){ est.zonaCadaPaso = d.zonaCadaPaso === '1'; dibujar(); return; }
       if(d.salQue){ est.salQue = d.salQue; dibujar(); return; }

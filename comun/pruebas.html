@@ -4370,6 +4370,15 @@ prueba('Miedo nuevo (2026-10-18): guarda quién lo asustó, se va al empezar su 
     ['tokCal', 'Silvia', true, 0, 1, 'tokCal', 0, 3, 3]);
 });
 
+prueba('Controles por grupo (P210, 2026-10-18): el estado dice con qué se resiste; Inmunidad mental frena solo los mentales', () => {
+  const comp = n => EstadosAplicar.componer({nombre: n});
+  const conCC = [comp('Inmunidad a CC')], conMt = [comp('Inmunidad mental')];
+  igual([Combatiente.resisteCC('Miedo'), Combatiente.resisteCC('Stun'), Combatiente.resisteCC('Inmovilizado'), Combatiente.resisteCC('Sentado'), Combatiente.resisteCC('Desarmado'),
+    Combatiente.resisteCCEtq('Lisiado'), Combatiente.resisteCC('Veneno'), Combatiente.esMental(comp('Confusión')),
+    Combatiente.inmunidad(conMt, comp('Miedo')), Combatiente.inmunidad(conMt, comp('Stun')), Combatiente.inmunidad(conCC, comp('Miedo')), Combatiente.inmunidad(conCC, comp('Ceguera'))],
+    ['resm', 'rescc', 'fue', 'agl', 'fue', 'Res.CC', '', true, 'Inmunidad mental', false, 'Inmunidad a CC', 'Inmunidad a CC']);
+});
+
 prueba('ataque sin arma: tiene daño (provisorio 1d4 + Dmg, P150)', () => {
   igual([FichaCombate.danoSinArmaTxt(3), FichaCombate.danoSinArmaTxt(0), FichaCombate.tipoAtaque(null)], ['1d4 + 3', '1d4', 4]);
 });

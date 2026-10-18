@@ -1075,6 +1075,36 @@ const Combatiente = (() => {
     return cambio;
   }
 
+  /* ---------- Los controles (CC) y con qué se resisten (2026-10-18, dueño, P210) ----------
+     CC es el paraguas (la marca `esCC`: la Inmunidad a CC los frena a todos). Adentro, por grupo: los mentales (Res.Mt; además los frena la
+     Inmunidad mental) y los del cuerpo (aturdimiento, heridas, sentidos, atrapar, equilibrio, desarme), cada uno con su stat. El estado dice con
+     qué se resiste por defecto (los asistentes de la Ejecución y de las trampas lo proponen solos); una habilidad puntual lo puede cambiar.
+     Provisorios (no los cerró el dueño): Silencio como mental y Ceguera con Res.CC. Un estado propio puede traer `grupoCC` o `esMental`. */
+  const GRUPOS_CC = {
+    mental: {label: 'Mentales', icono: '🧠', resiste: 'resm', estados: ['Miedo', 'Confusión', 'Provocado', 'Sueño', 'Silencio']},
+    aturdimiento: {label: 'Aturdimiento', icono: '💫', resiste: 'rescc', estados: ['Stun', 'Pajaritos', 'Parálisis', 'Exhausto']},
+    herida: {label: 'Heridas', icono: '🦵', resiste: 'rescc', estados: ['Lisiado', 'Rengo']},
+    sentidos: {label: 'Sentidos', icono: '👁', resiste: 'rescc', estados: ['Ceguera']},
+    atrapar: {label: 'Atrapar', icono: '⛓', resiste: 'fue', estados: ['Inmovilizado', 'Lento']},
+    equilibrio: {label: 'Equilibrio', icono: '🤸', resiste: 'agl', estados: ['Sentado']},
+    desarme: {label: 'Desarme', icono: '✋', resiste: 'fue', estados: ['Desarmado', 'Desarme']},
+  };
+  const RESISTE_ETQ = {resm: 'Res.Mt', rescc: 'Res.CC', fue: 'Fuerza', agl: 'Agilidad'};
+  const nombreEstadoBase = e => String((e && typeof e === 'object' ? e.nombre : e) || '').trim().toLowerCase();
+  // El grupo de control de un estado (o de su nombre): '' si no es un control.
+  function grupoCC(e){
+    if(e && typeof e === 'object' && e.grupoCC && GRUPOS_CC[e.grupoCC]) return e.grupoCC;
+    const n = nombreEstadoBase(e);
+    if(!n) return '';
+    for(const [k, g] of Object.entries(GRUPOS_CC)) if(g.estados.some(x => x.toLowerCase() === n)) return k;
+    return e && typeof e === 'object' && e.esMental ? 'mental' : '';
+  }
+  const esMental = e => !!(e && typeof e === 'object' && e.esMental) || grupoCC(e) === 'mental';
+  const esControl = e => !!(e && typeof e === 'object' && e.esCC) || !!grupoCC(e);
+  // Con qué se resiste por defecto: el id del stat ('resm', 'rescc', 'fue', 'agl') y su etiqueta ('Res.Mt'…). '' si no es un control.
+  const resisteCC = e => { const g = GRUPOS_CC[grupoCC(e)]; return g ? g.resiste : ''; };
+  const resisteCCEtq = e => RESISTE_ETQ[resisteCC(e)] || '';
+
   /* ---------- Inmunidades ----------
      ¿Este debuff rebota en quien lo recibe? Devuelve el motivo ('Invulnerable', 'Inmunidad a CC', 'Sangre pura',
      'Coagulación extrema', 'Vuela' (Sentado y Rengo), 'Protección de jefe') o false. `o.jefe`: un creep jefe es inmune a Stun (P95). */
@@ -1089,7 +1119,8 @@ const Combatiente = (() => {
     if(o && o.armaNatural && esDesarmado(est)) return 'Arma natural';   // (dueño, 2026-10-08): no se le cae — su arma es parte del cuerpo
     const act = activos(estados);
     if(act.some(e => e.invulnerable)) return 'Invulnerable';
-    if(est.esCC && act.some(e => e.inmunidadCC)) return 'Inmunidad a CC';
+    if(esControl(est) && act.some(e => e.inmunidadCC)) return 'Inmunidad a CC';
+    if(esMental(est) && act.some(e => e.inmunidadMental)) return 'Inmunidad mental';   // (2026-10-18, P210) solo los controles mentales
     if(est.esVeneno && act.some(e => e.sangrePura)) return 'Sangre pura';
     if(est.esSangrado && act.some(e => e.coagulacionExtrema)) return 'Coagulación';
     if((est.sentado || est.rengo) && act.some(e => e.volador)) return 'Vuela';   // (dueño, 2026-10-16) no se lo tira al piso ni se lo deja rengo
@@ -1650,7 +1681,7 @@ const Combatiente = (() => {
   // El texto de lo que cura un ítem: «Heridas (Sangrado, Lisiado, Rengo)».
   const textoCura = grupos => grupos.map(k => `${GRUPOS_CURA[k].label} (${GRUPOS_CURA[k].estados.join(', ')})`).join(' · ');
 
-  return {columnasStats, piezasParaParry, sumaEspecialDe, sumaEspecialTxt, contraDeEjecucion, esHonda, alcanceHonda, alcanceArmaRango, HONDA_RANGO, porDanoNorm, stacksPorDano, porDanoTxt, CARGAS, cargable, conCarga, tormenta, danoTormenta, danoTormentaMover, golpeDirecto, cobroTormenta, tormentaTxt, avisarTormenta, aplicarTormenta, acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {GRUPOS_CC, grupoCC, esMental, esControl, resisteCC, resisteCCEtq, columnasStats, piezasParaParry, sumaEspecialDe, sumaEspecialTxt, contraDeEjecucion, esHonda, alcanceHonda, alcanceArmaRango, HONDA_RANGO, porDanoNorm, stacksPorDano, porDanoTxt, CARGAS, cargable, conCarga, tormenta, danoTormenta, danoTormentaMover, golpeDirecto, cobroTormenta, tormentaTxt, avisarTormenta, aplicarTormenta, acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad, sincronizarEstadosDePasivas, sangraPorSp,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

@@ -1614,3 +1614,9 @@ versión parecida en más de una, es candidato a juntar.
   lleva `miedoDe` / `miedoDeNombre` (quién lo asustó; los conservan `EstadosAplicar.limpiarSpec/componer`, `FichaAcciones.estadoDeSpec` y el
   resumen público). Moverse hacia él cuesta 2 No2 por casillero (el mapa) y `Duelo.crear({miedo: 1})` → `ataque.miedo`: −1 al PdG (o PdG.Esp)
   y −1 al daño, con arma o habilidad. `CreepCalculo.auraMiedo(sc)` y `itemParaCreep` conservan `auraMiedo` (el radio del aura de la Calavera).
+- **Los controles por grupo** (2026-10-18, dueño, P210): `Combatiente.GRUPOS_CC` (mental, aturdimiento, herida, sentidos, atrapar, equilibrio,
+  desarme, cada uno con su `resiste`), `grupoCC(estado|nombre)`, `esMental`, `esControl`, `resisteCC` (el id del stat) y `resisteCCEtq`
+  («Res.Mt»…). `Combatiente.inmunidad`: la Inmunidad a CC frena todo control; la **Inmunidad mental** (`inmunidadMental`, preset nuevo) solo los
+  mentales. La Ejecución ✨ (al poner un control sin resistencia elegida) y los asistentes de trampas (al elegir el estado) proponen la resistencia
+  del grupo; se puede cambiar. **Un control nuevo: sumarlo a su grupo en `GRUPOS_CC`.**
+

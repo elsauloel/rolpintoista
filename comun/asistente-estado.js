@@ -34,11 +34,13 @@ const AsistenteEstado = (() => {
     {id: 'sinNo2',     texto: 'Se queda sin No2',                                 ayuda: 'Como Stun: sus No2 quedan en 0 mientras dure.', flags: {esCC: true}, forzarNitros: 0},
     {id: 'sentado',    texto: 'Está en el piso (Sentado)',                        ayuda: 'Evasión a la mitad, no puede atacar; levantarse cuesta 1 No2.', flags: {sentado: true, esCC: true}},
     {id: 'invul',      texto: 'No recibe daño de ninguna fuente',                 ayuda: 'Como Invulnerable: tampoco se le pueden aplicar debuffs.', flags: {invulnerable: true}},
-    {id: 'inmuneCC',   texto: 'Es inmune a los controles',                        ayuda: 'Como Inmunidad a CC: Stun, Exhausto, Inmovilizado, Rengo, Lisiado, Pajaritos…', flags: {inmunidadCC: true}},
+    {id: 'inmuneCC',   texto: 'Es inmune a los controles',                        ayuda: 'Como Inmunidad a CC: todos los controles, los del cuerpo y los mentales.', flags: {inmunidadCC: true}},
+    {id: 'inmuneMt',   texto: 'Es inmune a los controles mentales',               ayuda: 'Como Inmunidad mental: Miedo, Confusión, Provocado, Sueño, Silencio.', flags: {inmunidadMental: true}},
     {id: 'sangrePura', texto: 'Es inmune al Veneno',                              ayuda: 'Como Sangre pura.', flags: {sangrePura: true}},
     {id: 'coagulacion',texto: 'Es inmune al Sangrado',                            ayuda: 'Como Coagulación.', flags: {coagulacionExtrema: true}},
     {id: 'afortunado', texto: 'Tira dos veces PdG, Parry y Evasión y se queda con la mejor', ayuda: 'Como Afortunado.', flags: {afortunado: true}},
     {id: 'esCC',       texto: 'Cuenta como un estado de control',                 ayuda: 'No cambia números por sí solo: hace que Inmunidad a CC lo bloquee.', flags: {esCC: true}},
+    {id: 'esMental',   texto: 'Es un control mental',                             ayuda: 'Se resiste con Res.Mt y lo frenan la Inmunidad a CC y la Inmunidad mental.', flags: {esCC: true, esMental: true}},
   ];
   const POLARIDADES = [
     {id: 'buff',   icono: '👍', texto: 'Buff',   ayuda: 'Le hace bien a quien lo recibe (una bendición, una mejora).'},

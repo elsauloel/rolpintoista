@@ -116,14 +116,17 @@ const ESTADOS_PRESET = [
   {nombre:'Desarmado', alias:['Desarme'], polaridad:'debuff', permanente:true, turnos:0, desarmado:true, esCC:true,
     detalle:'Se le cayó el arma: no puede atacar con ella hasta levantarla, que cuesta 1 No2 (el botón «Levantar el arma» de la Botonera). ⚙ Automatizado: al atacar, avisa (y deja seguir si la mesa lo decide); en el mapa el arma queda en el piso (🗡 con su nombre) y la levanta cualquiera que esté al lado, desde su Botonera.'},
   // Ceguera (dueño, 2026-10-07, la Varita del eclipse): 1 turno, solo ve a 1 casilla y −2 PdG.
-  {nombre:'Ceguera', polaridad:'debuff', turnos:1, ceguera:true, mods:[{stat:'pdg', val:-2}],
+  {nombre:'Ceguera', polaridad:'debuff', turnos:1, ceguera:true, esCC:true, mods:[{stat:'pdg', val:-2}],
     detalle:'Ciego: solo ve a 1 casilla alrededor y tiene −2 PdG. ⚙ Automatizado: el −2 y, en el mapa, lo que ve un personaje (1 casilla, ni su propia luz).'},
   // Invulnerable = Titilando (2026-10-08, dueño: «son lo mismo»): siempre que alguien es invulnerable, titila. Al revivir se pone Invulnerable
   // hasta su próximo turno (Combatiente.estadoTitilando); `Titilando` queda como otro nombre de lo mismo (los estados ya puestos).
   {nombre:'Invulnerable', alias:['Titilando'], polaridad:'buff', turnos:3, invulnerable:true,
     detalle:'No recibe daño de ninguna fuente (golpes, veneno, sangrado, etc.) y no se le puede aplicar ningún debuff. En el mapa, su token titila.'},
   {nombre:'Inmunidad a CC', polaridad:'buff', turnos:2, inmunidadCC:true,
-    detalle:'Inmune a los controles: Stun, Exhausto, Inmovilizado, Rengo, Lisiado y Pajaritos (no se le pueden aplicar mientras dure). Veneno y Sangrado no cuentan como control.'},
+    detalle:'Inmune a todos los controles, los del cuerpo y los mentales: Stun, Pajaritos, Parálisis, Exhausto, Lisiado, Rengo, Ceguera, Inmovilizado, Lento, Sentado, Desarmado, Miedo, Confusión, Provocado, Silencio (no se le pueden aplicar mientras dure). Veneno y Sangrado no cuentan como control.'},
+  // Inmunidad mental (2026-10-18, dueño, P210): solo los controles mentales (Combatiente.GRUPOS_CC.mental). La dan el Atrapasueños y otros talismanes.
+  {nombre:'Inmunidad mental', polaridad:'buff', turnos:2, inmunidadMental:true,
+    detalle:'Inmune a los controles mentales: Miedo, Confusión, Provocado, Sueño y Silencio (no se le pueden aplicar mientras dure). Los del cuerpo (Stun, Inmovilizado…) le entran igual.'},
   {nombre:'Espinas', polaridad:'buff', turnos:3, espinas:true,
     detalle:'Mientras dure, cada ataque cuerpo a cuerpo que recibe le devuelve al atacante 1/4 (25 %) del daño del golpe (con el crítico, antes de la Defensa), redondeado hacia arriba, directo a la vida. ⚙ Automatizado en el duelo; ✋ a mano fuera de él.'},
   // Espejo (dueño, 2026-10-07): el espejo de las Espinas para el daño especial — a cualquier distancia (la magia se tira de lejos).

@@ -1051,3 +1051,12 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   hoy, o mientras sigas adentro del aura de la Calavera; (2) ¿se vuelve a tirar cada vez que alguien entra al aura, o una vez por combate por
   rival?; (3) la Res.Mt, ¿contra el Ef.Esp de quien lleva la calavera o contra un número fijo?; (4) el aura afecta solo a rivales (propuesta);
   (5) el Miedo de las habilidades de creeps y del catálogo pasa a ser este (sin el −2/−2 general de antes).
+- **P210. Separar el control (CC) de lo mental — 2026-10-18.** El dueño: «tenemos que separar lo que es crowd control, lo que es efectos
+  mentales, sobre todo para definir las resistencias y algunos efectos de inmunidad». Hoy: 14 estados llevan la marca de control (`esCC`:
+  Pajaritos, Exhausto, Stun, Confusión, Lisiado, Inmovilizado, Rengo, Lento, Miedo, Provocado, Parálisis, Silencio, Sentado, Desarmado) y la
+  Inmunidad a CC los bloquea a todos, aunque su texto nombra solo los físicos. Con qué se resiste lo elige cada habilidad o trampa (Res.CC,
+  Res.Mt o Res.Esp), sin regla. Propuesta de Claude: dos familias — **control** (el cuerpo; Res.CC, de Constitución; lo frena la Inmunidad a
+  CC): Stun, Inmovilizado, Rengo, Lento, Sentado, Lisiado, Exhausto, Parálisis, Pajaritos, Desarmado — y **mental** (la cabeza; Res.Mt, de
+  Especial; lo frena una Inmunidad mental nueva): Miedo, Confusión, Provocado, Sueño y quizás Silencio y Ceguera. El estado dice con qué se
+  resiste por defecto; la habilidad lo puede cambiar (el asistente lo propone solo).
+

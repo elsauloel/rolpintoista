@@ -150,6 +150,14 @@ const FichaMantenimiento = (() => {
      finTurno → {rep, nombre}: lo recién puesto deja de serlo (P177: el contador baja al empezar el turno, no al terminarlo). */
   /* 🔮 El Sahumerio de palo santo (talismán, 2026-10-18): al empezar su turno, `sahumerio` % (25: un 4 en d4) de sacarle un estado malo al azar.
      Se tira solo y queda en el reporte del turno (la Mesa). */
+  /* Un azar fijo para cada turno (2026-10-18): el mapa primero muestra lo que va a pasar al empezar el turno («▶ Empieza tu turno») y lo aplica
+     recién con «✔ Aplicar»; las dos veces corre inicioTurno con la misma `clave`, así que la tirada sale igual (antes se volvía a tirar y el
+     cartel podía decir «el humo se llevó Pajaritos» y después no pasar). */
+  function azarDeClave(clave){
+    let h = 2166136261;
+    for(const ch of String(clave || '')) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+    return () => { h = Math.imul(h ^ (h >>> 15), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; };
+  }
   function sahumerio(S, rep, azar){
     const pct = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.sahumerio)), 0);
     if(!(pct > 0)) return null;
@@ -186,7 +194,7 @@ const FichaMantenimiento = (() => {
     // P177: al empezar, primero bajan los turnos de sus estados y después pega lo que sigue (empezarTurnoEstados).
     const d = Combatiente.empezarTurnoEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(c.final.resfuego)});
     rep.push(...Combatiente.reporteTurno([...v.eventos, ...d.eventos]));
-    sahumerio(S, rep);   // 🔮 el Sahumerio de palo santo (2026-10-18)
+    sahumerio(S, rep, clave ? azarDeClave(`${clave}|sahumerio`) : null);   // 🔮 el Sahumerio de palo santo (2026-10-18): la misma tirada en la vista previa y al aplicar
     aplicarVida(S, ui, d.hp + regenPasivas(S, log, rep), hpAntes, rep);
     contarMuerte(S, ui, log, rep);
     if(d.terminados.length){ const finS = new Set(d.terminados); S.efectos = S.efectos.filter(e => !finS.has(e)); }

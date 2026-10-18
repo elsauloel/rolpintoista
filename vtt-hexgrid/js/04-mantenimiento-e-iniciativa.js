@@ -615,7 +615,8 @@ async function inicioTurnoPendiente(tokenId, clave){
       if(!r) return false;
       const despues = new Map(est().map(e => [e.id, e]));
       const tt = n => `${fmt(n)} turno${n === 1 ? '' : 's'}`;
-      prev = {rep: r.rep, turnos: antes.map(a => { const e = despues.get(a.id); return e ? `${a.nombre}: ${tt(a.turnos)} → ${tt(num(e.turnos))}` : `${a.nombre}: se termina`; })};
+      const humo = n => r.rep.some(l => /^Sahumerio/.test(l) && l.endsWith(`se llevó ${n}`));   // 🔮 lo sacó el Sahumerio, no se terminó
+      prev = {rep: r.rep, turnos: antes.map(a => { const e = despues.get(a.id); return e ? `${a.nombre}: ${tt(a.turnos)} → ${tt(num(e.turnos))}` : humo(a.nombre) ? `${a.nombre}: se lo llevó el humo` : `${a.nombre}: se termina`; })};
       return false;   // solo mirar: no se guarda nada
     });
   }catch(err){ console.error('No se pudo calcular el inicio del turno:', err); return false; }

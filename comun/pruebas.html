@@ -4442,6 +4442,14 @@ prueba('Talismanes (2026-10-18): los estandartes de un creep salen del equipo o 
   igual(l.map(e => `${e.nombre}:${e.stat}+${e.val}@${e.rango}`), ['Estandarte del muro:def+1@1', 'Esporas de corteza:def+1@2']);
 });
 
+prueba('Talismanes (2026-10-18): el Sahumerio tira lo mismo en la vista previa y al aplicar (mismo turno, misma tirada)', () => {
+  const base = () => { const S = FichaGuardado.normalizar({}).S; S.inventario = [{id: 's', nombre: 'Sahumerio', equipado: true, sahumerio: 25}];
+    S.efectos = [{id: 'p', nombre: 'Pajaritos', polaridad: 'debuff', turnos: 5, activo: true}]; return S; };
+  const queda = clave => { const S = base(); FichaMantenimiento.inicioTurno(S, {fijarHp: () => {}}, clave, '', [], 1); return S.efectos.some(e => e.nombre === 'Pajaritos'); };
+  const claves = Array.from({length: 60}, (_, i) => `m:${i}`);
+  igual([claves.every(c => queda(c) === queda(c)), claves.some(queda), claves.some(c => !queda(c))], [true, true, true]);
+});
+
 prueba('ataque sin arma: tiene daño (provisorio 1d4 + Dmg, P150)', () => {
   igual([FichaCombate.danoSinArmaTxt(3), FichaCombate.danoSinArmaTxt(0), FichaCombate.tipoAtaque(null)], ['1d4 + 3', '1d4', 4]);
 });

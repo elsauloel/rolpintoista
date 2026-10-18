@@ -257,7 +257,9 @@ async function oporAtacar(a){
   try{
     let espaldaPdg = 0;   // 🗡 quien se aleja dándole la espalda (js/13, la regla general del 2026-10-15)
     try{ espaldaPdg = r ? espaldaBono(r, m, a.ataque) : 0; }catch(err){ console.error('No se pudo ver si es por la espalda:', err); }
-    await Duelo.crear({yo: a.yo, ataque: a.ataque, espaldaPdg}, {id: dt.moverId, nombre: nombreDe(m), tipo: m.tipo, fichaId: m.fichaId, duenoUid: m.duenoUid}, dt.rivalId);
+    let miedo = 0;
+    try{ miedo = r ? miedoContra(r, m) : 0; }catch(err){ console.error('No se pudo ver el miedo:', err); }   // 😱 (js/52)
+    await Duelo.crear({yo: a.yo, ataque: a.ataque, espaldaPdg, miedo}, {id: dt.moverId, nombre: nombreDe(m), tipo: m.tipo, fichaId: m.fichaId, duenoUid: m.duenoUid}, dt.rivalId);
   }catch(err){
     console.error('No se pudo abrir el duelo de oportunidad:', err);
     toast('No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120));

@@ -1042,11 +1042,11 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
 - **P207. El estado Sueño (para el Atrapasueños) — 2026-10-18.** Propuesta: Dormido no actúa ni se mueve, su Evasión es 1 (como Stun), el
   primer daño que recibe lo despierta; 2 turnos; se resiste con Res.Mt; control (lo frena la Inmunidad a CC). ¿Quién lo da (una varita, creeps)?
   Si no se define ahora: el Atrapasueños da inmunidad a Pajaritos y Confusión hasta que exista Sueño.
-- **P208. La maldición de la Cabeza reducida (talismán) — 2026-10-18.** Al pegar con una varita (una vez por turno), opciones: (a) la idea
+- ✅ **P208. La maldición de la Cabeza reducida (talismán) — 2026-10-18; decidida el mismo día.** **Decidido (dueño):** «a la cabeza reducida le vamos a dar +1 al daño especial. Y siempre que pegue con una varita por primera vez en un turno, el objetivo queda maldito» (el estado Maldito de siempre: cada SP que gaste le saca 1 de vida, 2 turnos). Falta confirmar si conserva la Res.Mt +2 de la idea original. Pregunta original: Al pegar con una varita (una vez por turno), opciones: (a) la idea
   original: se le critica más fácil, −1 Res. crítico a todos los Tipos por 2 turnos (le sirve al grupo); (b) Debilitado 1 turno (−1 a sus
   tiradas; ya existe, pero pisa la Maldición debilitante del Debuffer); (c) Maldito 1 turno (cada SP que gaste le saca vida; pisa la Maldición
   de la sangre).
-- **P209. El Miedo nuevo: los detalles — 2026-10-18.** El dueño redefinió el Miedo (P204): moverse hacia quien te asustó cuesta 2 No2 por
+- ✅ **P209. El Miedo nuevo: los detalles — 2026-10-18; decidida el mismo día.** **Decidido (dueño):** dura hasta que empieza el próximo turno de quien lo tiene; se tira cada vez que se entra al aura; la tirada es el Ef.Esp de quien lleva la calavera contra la Res.Mt de quien entra; solo a los rivales; reemplaza al Miedo de antes. **Quedó** (2026-10-18): el preset Miedo (`miedo`, `miedoDe`, `alEmpezarTurno`), el costo de 2 No2 por paso hacia quien asustó (vtt-hexgrid/js/04 `costoPasos`), el −1 PdG y −1 al daño en el duelo (`ataque.miedo`) y el aura (vtt-hexgrid/js/52). El empate lo gana la calavera (como las zonas). ✋ A mano: el −1 en un área u onda. Pregunta original: El dueño redefinió el Miedo (P204): moverse hacia quien te asustó cuesta 2 No2 por
   casillero, y todo lo que hagas contra él va con −1 PdG/PdG.Esp y −1 al daño (común y especial). Faltan: (1) ¿cuánto dura? — 2 turnos como
   hoy, o mientras sigas adentro del aura de la Calavera; (2) ¿se vuelve a tirar cada vez que alguien entra al aura, o una vez por combate por
   rival?; (3) la Res.Mt, ¿contra el Ef.Esp de quien lleva la calavera o contra un número fijo?; (4) el aura afecta solo a rivales (propuesta);

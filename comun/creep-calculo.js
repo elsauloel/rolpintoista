@@ -461,6 +461,8 @@ const CreepCalculo = (() => {
   // Lo que va en las manos (2026-10-17, dueño: «las varitas, los báculos, las armas especiales son armas, no son equipo; lo mismo los orbes…
   // lo que tiene en las manos son las armas y los escudos»): armas (también varitas y báculos), escudos, orbes y talismanes.
   const enLasManos = it => /^(arma_|escudo_)/.test(String((it && it.tipoItem) || ''));
+  // 💀 El radio del aura espeluznante (la Calavera con vela, 2026-10-18): lo más grande de lo que tiene equipado.
+  const auraMiedo = sc => (Array.isArray(sc && sc.equipo) ? sc.equipo : []).reduce((a, it) => Math.max(a, num(it && it.auraMiedo)), 0);
   function tarjetaPublica(sc){
     const nom = x => String(x || '').trim().slice(0, 60);
     const vivo = num(sc.hp) > 0;
@@ -474,6 +476,8 @@ const CreepCalculo = (() => {
       notas: String(sc.notas || '').trim().slice(0, 600),
       tipoCriatura: tipoDe(sc).slice(0, 30),   // el tipo de criatura (Matabestias de los arcos, 2026-10-11)
       pasosSilenciosos: num(modTotal(sc, 'pasossilenciosos')) > 0,   // 👣 (2026-10-15): el mapa de los jugadores no lo hace oír a 3 casilleros
+      // 💀 La Calavera con vela (2026-10-18): el aura y el Ef.Esp con que asusta (lo tira la pantalla del jugador que entra, js/52).
+      ...(auraMiedo(sc) > 0 ? {auraMiedo: auraMiedo(sc), auraEfEsp: (v => Number.isFinite(v) ? Math.round(v) : 0)(statValor(sc, 'dmgesp'))} : {}),
     };
   }
   // Alcance de su arma, en casilleros: un arma de rango usa su Rango; una de cuerpo a cuerpo, 1 + lo que le sume a Rango.
@@ -608,6 +612,7 @@ const CreepCalculo = (() => {
     if(arma && it.danoAmplificado) o.danoAmplificado = it.danoAmplificado;
     if(it.durPorPeso) o.durPorPeso = it.durPorPeso;   // durabilidad de diseño (si no es la de siempre)
     if(it.durExtra) o.durExtra = it.durExtra;         // Resistente / Frágil (2026-10-04)
+    if(it.auraMiedo) o.auraMiedo = it.auraMiedo;      // 💀 la Calavera con vela (2026-10-18)
     if(arma && it.armaDeRango) o.armaDeRango = true;
     if(arma) Object.assign(o, Combatiente.rasgosDeItem(it));   // los rasgos del arma (por la espalda, ignora, sin Parry, firmas…)
     if(arma && (it.efectosGolpe || []).length) o.efectosGolpe = structuredClone(it.efectosGolpe);
@@ -661,7 +666,7 @@ const CreepCalculo = (() => {
     return partes.length ? partes.join(' · ') : 'nada';
   }
 
-  return {enLasManos, regenPasivas, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
+  return {auraMiedo, enLasManos, regenPasivas, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
     TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto,
     trofeo, despojosDePrecio, dropsResumen, dropsFijos,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,

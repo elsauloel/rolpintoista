@@ -1665,4 +1665,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   como el estado «Bronca» con sus stacks. Al llegar a `max` estalla (`broncaEstallar`): el momento `estallido` hace la explosión en todas las
   pantallas (js/16 → `explosionEmpezar`) y sale una onda de `radio` (`dueloElegirAreaMapa`: su PdG contra la Evasión de cada rival, dodge roll)
   con su arma a `dados` dados y Sentado. Vuelve a 0.
-
+- **😱 El Miedo y 💀 el aura de la Calavera con vela** (2026-10-18, dueño; `js/52-miedo.js`): el Miedo lleva `miedoDe` (el token que lo asustó;
+  en el duelo, `dueloAplicarEfectoBase` lo completa con el atacante). `miedoFuentes(t)` → `costoPasos(…, miedo)` (js/04): cada paso que lo
+  acerca a quien lo asustó cuesta `MIEDO_NO2` (2), también los gratis; `miedoContra(atq, def)` → `Duelo.crear({miedo})` (js/13 y js/17): −1 PdG y
+  −1 al daño. El aura: quien lleva un ítem con `auraMiedo` (el radio; la ficha lo publica en `resumen.auraMiedo` y `dmgesp`, un creep en su
+  tarjeta: `auraMiedo`, `auraEfEsp`) asusta a los rivales que entran: `auraRevisar` (cada 700 ms y al moverse, en combate, para lo que maneja
+  esta pantalla) los encola y `auraResolver` abre el Anuncio: Ef.Esp contra Res.Mt (empate: la calavera), Miedo si no llega, Crónica y Mesa.

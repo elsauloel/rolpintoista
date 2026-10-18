@@ -538,6 +538,8 @@ const Duelo = (() => {
     }
     // 🗡 Ataque por la espalda, regla general (2026-10-15, dueño: «simplemente es un +1 a la pdg»; Pasos silenciosos, +1 más): lo calcula el mapa
     // (quien ataca está en la cuña ciega del defensor, sin hacer falta sigilo) y se suma al PdG al guardarlo, junto con el bono del arma si hay.
+    // 😱 Miedo (2026-10-18): quien ataca le tiene miedo al defensor: −1 PdG (o PdG.Esp) y −1 al daño, con arma o con habilidad.
+    if(_num(cfg.miedo) > 0) inicial.ataque.miedo = Math.min(3, Math.round(_num(cfg.miedo)));
     if(_num(cfg.espaldaPdg) > 0 && !hab){ inicial.ataque.porLaEspalda = true; inicial.ataque.espaldaPdg = Math.min(5, Math.round(_num(cfg.espaldaPdg))); }
     if(hab){
       inicial.hab = hab;   // (la regla de Firestore tiene que conocer el campo `hab`)
@@ -574,6 +576,7 @@ const Duelo = (() => {
       const pe = [_num(d.ataque.espaldaPdg) > 0 ? `+${_fmt(d.ataque.espaldaPdg)} PdG` : '', d.ataque.espalda ? espaldaTxt(d.ataque.espalda) : ''].filter(Boolean).join(', ');
       t.push(`🗡 por la espalda${pe ? ': ' + pe : ''}`);
     }
+    if(d.ataque && _num(d.ataque.miedo) > 0) t.push(`😱 con miedo: −${_fmt(d.ataque.miedo)} PdG y −${_fmt(d.ataque.miedo)} de daño`);
     if(d.ataque && _num(d.ataque.embestida) > 0) t.push(`🐂 embestida: +${_fmt(d.ataque.embestida)} PdG`);
     if(d.ataque && _num(d.ataque.quieto) > 0) t.push(`💍 ${d.hab ? 'foco' : 'pulso quieto'}: +${_fmt(d.ataque.quieto)} ${d.hab ? 'PdG.Esp' : 'PdG'}`);
     if(d.ataque && _num(d.ataque.primeraSangre) > 0) t.push(`💍 primera sangre: +${_fmt(d.ataque.primeraSangre)} de daño si pega`);
@@ -880,6 +883,8 @@ const Duelo = (() => {
       if(emb > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + emb, mod: p0.mod + emb, formula: `${p0.formula} +${emb} embestida`.slice(0, 60)}; }
       const qto = campo === 'pdg' && m.ataque ? _num(m.ataque.quieto) : 0;   // Pulso quieto / Foco (anillos)
       if(qto > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + qto, mod: p0.mod + qto, formula: `${p0.formula} +${qto} quieto`.slice(0, 60)}; }
+      const mie = campo === 'pdg' && m.ataque ? _num(m.ataque.miedo) : 0;   // 😱 le tiene miedo al defensor
+      if(mie > 0){ const p0 = m.pdg; m.pdg = {...p0, total: Math.max(0, p0.total - mie), mod: p0.mod - mie, formula: `${p0.formula} −${mie} miedo`.slice(0, 60)}; }
       const tpd = campo === 'pdg' && m.ataque && m.ataque.tiro ? _num(m.ataque.tiro.pdg) : 0;   // el bono del tiro: distancia ideal (+) o tiro alto (−2)
       if(tpd){ const p0 = m.pdg; m.pdg = {...p0, total: Math.max(0, p0.total + tpd), mod: p0.mod + tpd, formula: `${p0.formula} ${tpd > 0 ? '+' : '−'}${Math.abs(tpd)} ${m.ataque.tiro.motivo}`.slice(0, 60)}; }
       if(campo === 'eva' && defensa) m.defensa = defensa;
@@ -1135,6 +1140,8 @@ const Duelo = (() => {
       if(be && be.fijo) m.dano = {...m.dano, crudo: m.dano.crudo + be.fijo, mod: m.dano.mod + be.fijo, formula: `${m.dano.formula} +${be.fijo} espalda`.slice(0, 60)};
       const ps = m.ataque ? _num(m.ataque.primeraSangre) : 0;   // Primera sangre (anillo): el daño de su primer ataque del combate
       if(ps > 0) m.dano = {...m.dano, crudo: m.dano.crudo + ps, mod: m.dano.mod + ps, formula: `${m.dano.formula} +${ps} primera sangre`.slice(0, 60)};
+      const mied = m.ataque ? _num(m.ataque.miedo) : 0;   // 😱 le tiene miedo al defensor: −1 al daño
+      if(mied > 0) m.dano = {...m.dano, crudo: Math.max(0, m.dano.crudo - mied), mod: m.dano.mod - mied, formula: `${m.dano.formula} −${mied} miedo`.slice(0, 60)};
       const tf = m.ataque && m.ataque.tiro ? _num(m.ataque.tiro.fijo) : 0;   // el bono del tiro: daño fijo de la distancia ideal (o la caída, negativo)
       if(tf) m.dano = {...m.dano, crudo: Math.max(0, m.dano.crudo + tf), mod: m.dano.mod + tf, formula: `${m.dano.formula} ${tf > 0 ? '+' : '−'}${Math.abs(tf)} ${m.ataque.tiro.motivo}`.slice(0, 60)};
       const td = m.ataque && m.ataque.tiro && m.ataque.tiro.dado && typeof tirarDados === 'function' ? tirarDados(m.ataque.tiro.dado) : null;   // el primer disparo del combate: +1 dado

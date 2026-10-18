@@ -1,6 +1,6 @@
 # Talismanes (la otra mano) — ideas para más adelante
 
-> **Estado (2026-10-18):** en curso. El dueño eligió de la lluvia de ideas (ver «Elegidos», abajo); faltan 4 preguntas (P205–P208; la P204 ya está) y los
+> **Estado (2026-10-18):** en curso. El dueño eligió de la lluvia de ideas (ver «Elegidos», abajo); faltan P205–P207 (P204, P208 y P209 ya están; el Miedo nuevo y el aura de la Calavera ya funcionan en el mapa, falta cargar la Calavera al catálogo) y los
 > números por calidad. Antes (2026-10-07): en espera. El dueño: «muchas ideas me gustan, pero requieren cierta atención y ajuste; vamos de menos a más».
 > Se retoma cuando el dueño diga «sigamos con los talismanes». Mientras tanto, solo se consolidan los **orbes** que ya existen (Defensa
 > especial + resistencias elementales). Ver `docs/rework-defensa.md` («La otra mano»).
@@ -85,6 +85,7 @@ Lo que el dueño marcó de la lista, con sus cambios. Lo que no nombró queda af
 | Talismán | Qué hace |
 |---|---|
 | Farol | Luz portada +2 · Visión +1 |
+| Cabeza reducida de jíbaro (P208) | Ef.Esp +1 · la primera vez en cada turno que pegás con una varita, el objetivo queda Maldito (¿Res.Mt +2 también? falta confirmar) |
 | Calavera con vela (P204, P209) | Luz portada +2 · Visión +1 · Defensa especial +2 · aura espeluznante de 3 casillas alrededor tuyo: el rival que entra tira Res.Mt o queda con Miedo (moverse hacia vos le cuesta 2 No2 por casillero, y contra vos tiene −1 PdG y −1 daño, comunes y especiales) |
 | Bola de cristal | Te avisa que hay algo oculto dentro de tu campo de visión (un rival en sigilo, una trampa escondida), sin decir dónde ni revelarlo · Percepción +1 |
 | Brújula del baqueano | Iniciativa +1 · la niebla no te tapa la vista (ves a través de una nube de niebla; no la niebla de guerra) |
@@ -110,7 +111,6 @@ Lo que el dueño marcó de la lista, con sus cambios. Lo que no nombró queda af
 | Estampita del Gauchito Gil (P205) | «¿Afortunado para sólo una tirada? ¿O durante N turnos?» · Defensa especial +1 |
 | Muñeco vudú (P206) | «Definir mecánica, turnos, tiradas. Podría ser que siempre que uses la varita contra un rival, quede marcado 1 t» |
 | Atrapasueños (P207) | «Podría ser, habría que imaginar sueño» (el estado Sueño no existe todavía) |
-| Cabeza reducida de jíbaro (P208) | Al pegar con una varita, una maldición «a definir» · Res.Mt +2 |
 
 **Quedan afuera por ahora** (no los eligió): Ruda macho, Huesos de adivinar, Orbe de cuarzo opaco, Orbe cambiante, Orbe que se carga,
 Segunda oportunidad, Amortiguador, Cáscara, Anclaje, Piedra de afilar arcana, Cuerno de toro, De la calma, Guía, Pata de conejo, Bolsa de sal gruesa.

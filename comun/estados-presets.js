@@ -57,8 +57,11 @@ const ESTADOS_PRESET = [
   // Lento (2026-10-04, dueño, con las mecánicas de los pies): el primer casillero que se mueve en cada turno cuesta el doble. Lo acorta Recuperarse rápido.
   {nombre:'Lento', polaridad:'debuff', turnos:2, lento:true, esCC:true,
     detalle:'Lento: el primer casillero que se mueve en cada turno cuesta el doble de No2 mientras dure.'},
-  {nombre:'Miedo', polaridad:'debuff', turnos:2, esCC:true, mods:[{stat:'pdg', val:-2}, {stat:'dmg', val:-2}],
-    detalle:'Miedo: −2 PdG y −2 Daño mientras dure, y no puede acercarse voluntariamente a quien lo asustó (✋ a mano: el jugador o el GM lo respeta; si termina su turno más cerca de la fuente pierde 1 No2). Es un control (lo reducen la resistencia a CC y la Inmunidad a CC).'},
+  // Miedo (2026-10-18, dueño, con la Calavera con vela; reemplaza al de −2 PdG y −2 Daño): lleva `miedoDe` = el token que lo asustó (y
+  // `miedoDeNombre`). Moverse hacia él cuesta 2 No2 por casillero (el mapa, js/04 y js/52) y lo que haga contra él va con −1 PdG y −1 al daño
+  // (el duelo, `ataque.miedo`). Dura hasta que empieza su próximo turno.
+  {nombre:'Miedo', polaridad:'debuff', turnos:1, esCC:true, miedo:true, alEmpezarTurno:true,
+    detalle:'Asustado: cada casillero que se mueve hacia quien lo asustó le cuesta 2 No2, y todo lo que hace contra él (un ataque, una habilidad, una varita) va con −1 a la probabilidad de golpe y −1 al daño, común o especial. Dura hasta que empieza su próximo turno. Es un control (lo frenan la resistencia a CC y la Inmunidad a CC). ⚙ Automatizado en el mapa. ✋ A mano: el −1 en un área o una onda que lo incluye, y el Miedo que no viene de nadie (una trampa).'},
   {nombre:'Provocado', polaridad:'debuff', turnos:2, esCC:true,
     detalle:'Provocado (Taunt): ira dirigida. Mientras dure, su turno es para ir contra quien lo provocó: atacarlo o usar contra él una habilidad hostil (si no llega, acercarse). No se cura, no se protege ni hace otra cosa en lugar de eso (✋ a mano: lo respeta el jugador o el GM). Es un control (lo reducen la resistencia a CC y la Inmunidad a CC).'},
   {nombre:'Escarcha', polaridad:'debuff', turnos:2, stacks:1, esEscarcha:true, mods:[{stat:'nitros', val:-1}],

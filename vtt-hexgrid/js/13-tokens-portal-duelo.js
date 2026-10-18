@@ -779,7 +779,9 @@ function dueloElegirObjetivoMapa(msg){
       let ataqueFinal = ataque && ataque.hab && ataque.hab.sagrado && ataque.hab.dano ? sagradoContra(ataque, t) : ataque;   // Smite: el doble contra un no-muerto o un demonio
       if(typeof roboBono === 'function') ataqueFinal = roboBono(ataqueFinal, mio, t);   // 🫳 Robar: +2 en sigilo o por la espalda (js/47)
       if(typeof roboSecretoSi === 'function' && roboSecretoSi(ataqueFinal, mio, t)){ roboSecretoIniciar(yo, ataqueFinal, mio, t); return; }   // 🫳 en sigilo: en secreto (js/47)
-      Duelo.crear({yo, ataque: ataqueFinal, espalda, espaldaPdg, embestida, quieto, primeraSangre, tiro, flecha}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
+      let miedo = 0;
+      try{ miedo = miedoContra(mio, t); }catch(err){ console.error('No se pudo ver el miedo:', err); }   // 😱 le tiene miedo (js/52): −1 PdG y −1 al daño
+      Duelo.crear({yo, ataque: ataqueFinal, espalda, espaldaPdg, embestida, quieto, primeraSangre, tiro, flecha, miedo}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
     }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + (minimo ? `de ${minimo} a ` : '') + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : conArco ? ` · 🏹 el arco necesita ${Combatiente.arcoLibresTxt(ataque)} en el medio` : ''}${mioTiro ? ' · la línea muestra si el tiro pasa' : ''}${nIdeal ? ' · 💠 en celeste, tu distancia ideal (' + esc(Combatiente.idealTxt(ataque.ideal)) + ')' : ''}</span>`, true, cancelado);
     // Sin nadie a tiro con un arco (2026-10-09): se dice por qué — su alcance no llega a la distancia mínima, o no hay nadie en esa franja.
@@ -1751,6 +1753,7 @@ async function dueloAplicarEfectoBase(d, ef){
   const t = tokens.get(d.defensor.tokenId);
   if(!t) return {manual: true, nota: 'el token ya no está: aplicalo a mano'};
   if(spec.nombre === 'Demora') return dueloDemora(d.defensor.tokenId);
+  if(spec.nombre === 'Miedo' && !spec.miedoDe && d.atacante.tokenId){ spec.miedoDe = d.atacante.tokenId; spec.miedoDeNombre = String(d.atacante.nombre || '').slice(0, 40); }   // 😱 a quién le tiene miedo
   // 🛡 Miti-Miti (Tanque, 2026-10-11): la marca queda en quien la usa, con a quién protege; el reparto del daño lo hace js/10 (mitiMitiDe).
   if(spec.nombre === 'Miti-Miti'){
     const ta = tokens.get(d.atacante.tokenId);

@@ -4362,6 +4362,14 @@ prueba('Sangrado de arma: 2 de daño por 2 turnos (salvo que diga otra cosa); si
     [2, 2, false, 3, 2, true, 3, 3]);
 });
 
+prueba('Miedo nuevo (2026-10-18): guarda quién lo asustó, se va al empezar su turno y ya no resta −2', () => {
+  const c = EstadosAplicar.componer({nombre: 'Miedo', miedoDe: 'tokCal', miedoDeNombre: 'Silvia'});
+  const f = FichaAcciones.estadoDeSpec(EstadosAplicar.limpiarSpec({nombre: 'Miedo', miedoDe: 'tokCal', miedoDeNombre: 'Silvia'}), []);
+  igual([c.miedoDe, c.miedoDeNombre, c.alEmpezarTurno, (c.mods || []).length, c.turnos, f.miedoDe, Combatiente.vencerAlEmpezar([c]).quedan.length,
+    CreepCalculo.auraMiedo({equipo: [{auraMiedo: 3}, {}]}), CreepCalculo.tarjetaPublica({hp: 5, equipo: [{nombre: 'Calavera', auraMiedo: 3}]}).auraMiedo],
+    ['tokCal', 'Silvia', true, 0, 1, 'tokCal', 0, 3, 3]);
+});
+
 prueba('ataque sin arma: tiene daño (provisorio 1d4 + Dmg, P150)', () => {
   igual([FichaCombate.danoSinArmaTxt(3), FichaCombate.danoSinArmaTxt(0), FichaCombate.tipoAtaque(null)], ['1d4 + 3', '1d4', 4]);
 });

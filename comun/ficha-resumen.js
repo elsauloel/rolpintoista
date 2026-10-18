@@ -117,6 +117,9 @@ const FichaResumen = (() => {
       conEscudo: (S.inventario || []).some(i => i && i.equipado && Combatiente.esEscudo(i) && !FichaCalculo.itemRoto(i)),
       muroescudos: n(c.final.muroescudos), empujon: n(c.final.empujon),
       orbeAbsorcion: (S.inventario || []).filter(i => i && i.equipado && i.orbe && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.orbeAbsorcion)), 0),
+      // 💀 La Calavera con vela (2026-10-18): el radio de su aura espeluznante y el Ef.Esp con que asusta (el mapa, js/52).
+      auraMiedo: (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.auraMiedo)), 0),
+      dmgesp: n(c.final.dmgesp),
       levitar: n(c.final.levitar), suelagruesa: n(c.final.suelagruesa), embestida: n(c.final.embestida), pasodoble: n(c.final.pasodoble),   // piernas (2026-10-06)
       emergencia: n(c.final.emergencia), emergenciaUsada: !!S.emergenciaUsada,
       ...Object.fromEntries(['cascara', 'primerasangre', 'foco', 'pulso', 'pasofantasma', 'cambiante', 'absorbearmadura', 'impulsofue', 'impulsodes', 'impulsoesp', 'impulsocon']
@@ -171,6 +174,7 @@ const FichaResumen = (() => {
           ...(e.nombre === Combatiente.APUNTANDO ? {stacks: Math.max(1, num(e.stacks) || 1)} : {}),   // Apuntar (Shooter): cuánto apunta
           ...(e.protege ? {protege: String(e.protege).slice(0, 80), protegeNombre: String(e.protegeNombre || '').slice(0, 40)} : {}),
           ...(e.marca ? {marca: String(e.marca).slice(0, 80), marcaNombre: String(e.marcaNombre || '').slice(0, 40)} : {}),   // Marcar (Shooter): a quién marcó   // Miti-Miti (Tanque): el mapa reparte el daño del protegido
+          ...(e.miedoDe ? {miedoDe: String(e.miedoDe).slice(0, 80), miedoDeNombre: String(e.miedoDeNombre || '').slice(0, 40)} : {}),   // 😱 Miedo: a quién le tiene miedo (el mapa, js/52)
           ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
           ...(e.derivado ? {derivado: true} : {}), ...(e.confusion ? {confusion: true} : {}), ...(e.anillo ? {anillo: true} : {}), ...(e.impulso ? {impulso: e.impulso, impulsoVal: num(e.impulsoVal)} : {}),   // la Confusión: el mapa la tira (js/20)
           ...(e.espinas ? {espinas: true} : {}), ...(e.espejo ? {espejo: true} : {}), ...(e.ceguera ? {ceguera: true} : {}), ...(e.desarmado ? {desarmado: true} : {}),   // el mapa devuelve el daño aunque el estado tenga un nombre propio («Espinas (poción)»)
@@ -218,6 +222,7 @@ const FichaResumen = (() => {
           ...(e.nombre === Combatiente.APUNTANDO ? {stacks: Math.max(1, num(e.stacks) || 1)} : {}),   // Apuntar (Shooter): cuánto apunta
           ...(e.protege ? {protege: String(e.protege).slice(0, 80), protegeNombre: String(e.protegeNombre || '').slice(0, 40)} : {}),
           ...(e.marca ? {marca: String(e.marca).slice(0, 80), marcaNombre: String(e.marcaNombre || '').slice(0, 40)} : {}),   // Marcar (Shooter): a quién marcó   // Miti-Miti (Tanque): el mapa reparte el daño del protegido
+          ...(e.miedoDe ? {miedoDe: String(e.miedoDe).slice(0, 80), miedoDeNombre: String(e.miedoDeNombre || '').slice(0, 40)} : {}),   // 😱 Miedo: a quién le tiene miedo (el mapa, js/52)
               ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
               polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '', ...(e.confusion ? {confusion: true} : {}), ...(e.lento ? {lento: true} : {}),
               detalle: String(e.detalle || '').slice(0, 300),

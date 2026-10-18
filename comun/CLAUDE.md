@@ -1610,4 +1610,7 @@ versión parecida en más de una, es candidato a juntar.
   resultado ya viene decidido (`elegido`): el rodillo muestra los nombres pasando de abajo hacia arriba, frenando hasta clavarse en el elegido, y
   después «¡Salió X!» con su detalle y `extra`. Lo usa la Varita del caos (vtt-hexgrid/js/13: `caosAnunciarD20` → `caosRodillo`). Los creeps
   también usan la varita: `CreepAcciones.habDeEspecialCreep` lleva `caos` y `terminarHab` llama `ui.caos` (js/12).
-
+- **😱 El Miedo nuevo** (2026-10-18, dueño, con la Calavera con vela): ya no es −2 PdG y −2 Daño. El preset (`miedo: true`, `alEmpezarTurno`)
+  lleva `miedoDe` / `miedoDeNombre` (quién lo asustó; los conservan `EstadosAplicar.limpiarSpec/componer`, `FichaAcciones.estadoDeSpec` y el
+  resumen público). Moverse hacia él cuesta 2 No2 por casillero (el mapa) y `Duelo.crear({miedo: 1})` → `ataque.miedo`: −1 al PdG (o PdG.Esp)
+  y −1 al daño, con arma o habilidad. `CreepCalculo.auraMiedo(sc)` y `itemParaCreep` conservan `auraMiedo` (el radio del aura de la Calavera).

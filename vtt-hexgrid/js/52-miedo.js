@@ -85,7 +85,7 @@ async function auraResolver(id, pid){
   const quien = nombreDe(t), de = p.oculto ? 'Alguien' : nombreDe(p);
   const res = auraResMtDe(t), ef = auraEfEspDe(p);
   const titulo = `${quien} entra en el aura espeluznante de ${de}`;
-  const paso1 = {titulo: '💀 La calavera', texto: `Tira Res.Mt contra el Ef.Esp de ${de}: si no llega, queda con Miedo (moverse hacia ${de} le cuesta ${MIEDO_NO2} No2 por casillero, y contra ${de} tiene −1 a la probabilidad de golpe y −1 al daño) hasta que empieza su próximo turno.`};
+  const paso1 = {titulo: '💀 El aura espeluznante', texto: `Tira Res.Mt contra el Ef.Esp de ${de}: si no llega, queda con Miedo (moverse hacia ${de} le cuesta ${MIEDO_NO2} No2 por casillero, y contra ${de} tiene −1 a la probabilidad de golpe y −1 al daño) hasta que empieza su próximo turno.`};
   if(res === null || ef === null){
     try{ momentoAbrir({tipo: 'zona-renueva', icono: '💀', titulo, estado: 'listo', resultado: `Res.Mt contra el Ef.Esp de ${de}: tiralo a mano (faltan los datos para tirarlo solo).`, datos: {}}); }catch(err){}
     try{ mesaLinea(`💀 ${quien} entró en el aura espeluznante de ${de}: Res.Mt contra su Ef.Esp, a mano`, 'recordatorio'); }catch(err){}
@@ -104,7 +104,7 @@ async function auraResolver(id, pid){
       const rr = Combatiente.tirarStat(res, confusionEstadosDe(t), 'resm');
       if(!rf || !rr){ tirando = false; AvisoCombate.mostrar({...base, pasos: [paso1], aMano: 'No se pudo tirar solo: tiralo a mano.', botones: [{texto: 'Entendido', alClic: terminar}], alCerrar: terminar}); return; }
       const gm = x => x.tipo === 'creep' ? {desde: 'gm'} : {};
-      try{ await mesaPublicar(`${de} · Ef.Esp (Calavera con vela)`, {formula: rf.formula, rolls: rf.rolls, mod: rf.mod, total: rf.total, quien: de, ...gm(p)}); }catch(err){}
+      try{ await mesaPublicar(`${de} · Ef.Esp (aura espeluznante)`, {formula: rf.formula, rolls: rf.rolls, mod: rf.mod, total: rf.total, quien: de, ...gm(p)}); }catch(err){}
       try{ await mesaPublicar(`${quien} · Res.Mt`, {formula: rr.formula, rolls: rr.rolls, mod: rr.mod, total: rr.total, quien, ...gm(t)}); }catch(err){}
       await new Promise(r => (typeof Duelo !== 'undefined' && Duelo.esperarDados) ? Duelo.esperarDados(r) : r());
       const resiste = rr.total > rf.total;   // el empate lo gana la calavera
@@ -116,13 +116,13 @@ async function auraResolver(id, pid){
           if(t.tipo === 'creep'){
             const r = await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
             if(r && !r.ok) nota = `no le entró (${r.motivo || 'está protegido'})`;
-          }else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: `${de} · Calavera con vela`});
+          }else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: `${de} · aura espeluznante`});
         }catch(err){ console.error('No se pudo poner el Miedo:', err); nota = 'ponelo a mano'; }
       }
       const cronica = resiste ? `${tiradas}: no se asustó.` : `${tiradas}: ¡queda con Miedo de ${de}!${nota ? ' (' + nota + ')' : ''}`;
       try{ if(momentoId) momentoActualizar(momentoId, {estado: 'listo', resultado: cronica}); }catch(err){}
       try{ mesaLinea(`💀 ${quien} entró en el aura de ${de}: ${cronica}`, 'recordatorio'); }catch(err){}
-      AvisoCombate.mostrar({...base, pasos: [paso1, {titulo: 'Tiradas', texto: tiradas + ' (el empate lo gana la calavera).'}],
+      AvisoCombate.mostrar({...base, pasos: [paso1, {titulo: 'Tiradas', texto: tiradas + ' (el empate lo gana el aura).'}],
         veredicto: resiste ? {tono: 'bueno', grande: 'NO SE ASUSTÓ', chico: ''} : {tono: 'malo', grande: '¡QUEDA CON MIEDO!', chico: nota || `hasta que empieza su próximo turno`},
         botones: [{texto: 'Entendido', alClic: terminar}], alCerrar: terminar});
     };
